@@ -400,6 +400,9 @@ agat9	 // Agat-9
 //  Lisa   January    1983
 //  Lisa 2   January  1984
 //Macintosh XL   January    1985
+// Lisa   January    1983
+// Lisa 2   January  1984
+// Macintosh XL   January    1985
 
 lisa	  // 1983 Apple Lisa
 lisa2	 // 1984 Apple Lisa 2
@@ -1711,7 +1714,29 @@ roma      // Roma
 roma32    // Roma
 polgar      // Polgar
 milano      // Milano
+academy      // Academy 65C02
+monteciv // Monte Carlo IV
+megaiv // Mega IV
+van16      // Vancouver 68000
+van32      // Vancouver 68020
+alm32      // Almeria 68020
+gen32      // Genius030 68030 V4.00
+gen32_41      // Genius030 68030 V4.01
+gen32_oc      // Genius030 68030 V4.01 2x overclocked for max ELO
+alm16      // Almeria 68000
+lyon16      // Lyon 68000
+lyon32      // Lyon 68020
+bpl32   // Berlin Pro London 68020
+berlinp   // Berlin Pro 68020
+lond030 // London Program 68030 33mhz
+lond020 // London Program 68020 12mhz
 
+
+// Saitek
+risc // Saitek 2500 14MHZ (skeleton)
+
+// TASC Final Chess Card
+finalchs // skeleton
 
 // JAKKS Pacific, Inc. / HotGen, Ltd.
 batmantv	// The Batman, 2004

@@ -1024,7 +1024,8 @@ $(MESSOBJ)/hegener.a:			\
 	$(MESS_MACHINE)/mboard.o	\
 	$(MESS_DRIVERS)/glasgow.o	\
 	$(MESS_DRIVERS)/mephisto.o	\
-        $(MESS_DRIVERS)/polgar.o	\
+        $(MESS_DRIVERS)/mmodular.o	\
+	
 
 $(MESSOBJ)/hitachi.a:			\
 	$(MESS_DRIVERS)/bmjr.o		\
