@@ -301,7 +301,7 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
 		{
 			case 0:
 			{
-				mask = (1<<7);
+				mask = (1<<6);
 			}
 			break;
 
@@ -313,13 +313,13 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
 
 			case 2:
 			{
-				mask = (1<<6);
+				mask = (1<<5);
 			}
 			break;
 
 			case 3:
 			{
-				mask = (1<<5);
+				mask = (1<<7);
 			}
 			break;
 		}
@@ -383,7 +383,7 @@ static WRITE8_HANDLER(pcw_bank_select_w)
 	state->m_banks[offset] = data;
 
 	pcw_update_mem(space->machine(), offset, data);
-//  popmessage("RAM Banks: %02x %02x %02x %02x",state->m_banks[0],state->m_banks[1],state->m_banks[2],state->m_banks[3]);
+//  popmessage("RAM Banks: %02x %02x %02x %02x Lock:%02x",state->m_banks[0],state->m_banks[1],state->m_banks[2],state->m_banks[3],state->m_bank_force);
 }
 
 static WRITE8_HANDLER(pcw_bank_force_selection_w)
@@ -1074,7 +1074,7 @@ static MACHINE_RESET( pcw )
 	int x;
 	/* ram paging is actually undefined at power-on */
 
-	state->m_bank_force = 0x00;
+	state->m_bank_force = 0xf0;  // banks are locked for CPC-style paging - Batman expects this
 
 	state->m_banks[0] = 0x80;
 	state->m_banks[1] = 0x81;
