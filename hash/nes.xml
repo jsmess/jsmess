@@ -39395,10 +39395,10 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="janggun">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<!-- Serial: DIF-002 - Release Date:  - Alternative Title: 장군의 아들 -->
 		<description>Janggun ui Adeul (Kor)</description>
 		<year>1992</year>
-		<publisher>Innovation Tech</publisher>
+		<publisher>Daou Infosys</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="DAOU-306" />
 			<dataarea name="chr" size="524288">
@@ -39691,6 +39691,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="kszgundmfv" cloneof="kszgundm">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Kidou Senshi Z Gundam: Hot Scramble (Jpn, Final Version release)</description>
+		<year>1986?</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BANDAI-GNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="8192">
+				<rom name="mobile suit z gundam - hot scramble (final version) (sample) (j) [!].chr" size="8192" crc="e0e5d638" sha1="7fe79b74015ad8aaaa6f70d1ee53c9c062833d94" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="mobile suit z gundam - hot scramble (final version) (sample) (j) [!].prg" size="32768" crc="4ef05d83" sha1="912cc434e1ef6427d4374f4b257f1fc9401b97ac" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingeyc" cloneof="kingey">
 		<!-- Serial: WT-KK-6 - Release Date: 1991 -->
 		<description>The King of Kings: The Early Years (USA, v1.1)</description>
@@ -39734,6 +39751,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="knight rider (japan).prg" size="65536" crc="4d2edf70" sha1="7938358a96636de678d465ee7d77ebca3a6474a2" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koko" cloneof="buzzwald">
+		<!-- Serial: DS-F301 - Release Date:  - Alternative Title: 코코 어드벤쳐 -->
+		<description>Ko Ko Eo Deu Ben Ce (Kor)</description>
+		<year>199?</year>
+		<publisher>Daou Infosys</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="DAOU-306" />
+			<dataarea name="chr" size="131072">
+				<rom name="ko ko eo deu ben ce (k).chr" size="131072" crc="f3efc194" sha1="00ceef537c9f40f6164f7b697bb29eded9c37d3d" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="ko ko eo deu ben ce (k).prg" size="131072" crc="710e3cf9" sha1="45e82bec4a0d4685be20feaacb4c57b4bea09575" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -40266,6 +40299,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="metal flame psybuster (japan).prg" size="131072" crc="1f864492" sha1="4b33fa0c0ec3e027dfde74533b80c357acf9cf32" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metlfrce">
+		<!-- Serial: DS-F401 - Release Date:  - Alternative Title: 메탈포스 -->
+		<description>Metal Force (Kor)</description>
+		<year>19??</year>
+		<publisher>Daou Infosys</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="DAOU-306" />
+			<dataarea name="chr" size="262144">
+				<rom name="metal force (k).chr" size="262144" crc="76974e6e" sha1="365d714b26e8ddbfd994a19eada9d14be2e00f89" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="metal force (k).prg" size="262144" crc="c57e1027" sha1="7e09097e89b629b2c13640fbde7875970ff238b2" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -41289,6 +41338,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="radac">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Radac Tailor-Made (Jpn)</description>
+		<year>19??</year>
+		<publisher>Bridgestone ~ Tokyo Shoseki</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="radac tailor-made (sample) (j)[!].prg" size="131072" crc="74ee0ffc" sha1="986f02624db41425d89d8c8632f77f2ffc860d04" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="redarmr2" cloneof="gargoyl2">
 		<!-- Serial:  - Release Date: 1992-07-17 - Alternative Title:  -->
 		<description>Red Arremar 2 (Jpn)</description>
@@ -41478,6 +41543,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-fv-0 chr" size="131072" crc="35cc1f51" sha1="36978506e7eb2ea4edad66f0a96dc9b2accf52f9" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="saferal">
+		<!-- Serial:  - Release Date:  - Alternative Title: セーフティーラリー -->
+		<description>Safety Rally (Jpn)</description>
+		<year>19??</year>
+		<publisher>Yasuda</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="chr" size="32768">
+				<rom name="safety rally (sample) (j)[!].chr" size="32768" crc="ff7f890d" sha1="6a27185017ccd377fc974153af582a709ad183c0" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="safety rally (sample) (j)[!].prg" size="131072" crc="c7de0745" sha1="9f24fa130c3e7cd0f94faa6f278d5eaffbd09f31" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -41856,22 +41937,6 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="space shadow (japan).prg" size="65536" crc="0cd00488" sha1="5ab195bbbd35cdecc9c00dd7de7a315234fe7300" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spcltagt">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Special Tag Team Pro Wrestling (Jpn)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-NROM-128" />
-			<dataarea name="chr" size="8192">
-				<rom name="special tag team pro wrestling (japan).chr" size="8192" crc="34a94f99" sha1="8e73516b91016023ffec2be20c0203949a7310a8" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="special tag team pro wrestling (japan).prg" size="32768" crc="aa437b75" sha1="4764c878b3d48a628e3ad044428e3cbc0c02cfda" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -42304,6 +42369,22 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="sword master (japan).prg" size="131072" crc="9e1ce13d" sha1="b424cc5f6cc285af4e2ea94a17333b13db360b9a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tagteamjsp" cloneof="tagteam">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tag Team Pro Wrestling (Jpn, Special release)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<dataarea name="chr" size="8192">
+				<rom name="special tag team pro wrestling (japan).chr" size="8192" crc="34a94f99" sha1="8e73516b91016023ffec2be20c0203949a7310a8" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="special tag team pro wrestling (japan).prg" size="32768" crc="aa437b75" sha1="4764c878b3d48a628e3ad044428e3cbc0c02cfda" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -50900,7 +50981,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 <!-- nointro & cah4e3 -->
 	<software name="koreaigo" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Korean Igo (Korea)</description>
+		<description>Korean Igo (Kor)</description>
 		<year>199?</year>
 		<publisher>DreamTech</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52166,6 +52247,24 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
+	<software name="crayon2" cloneof="biomirac">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Crayon Shin-Chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A0" />
+			<feature name="vrc4-pin4" value="PRG A1" />
+			<dataarea name="chr" size="131072">
+				<rom name="crayon shin-chan (unl).chr" size="131072" crc="6b161bb2" sha1="7e99d4be97a1e02f41e1112a17cc3f658e721a85" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="crayon shin-chan (unl).prg" size="131072" crc="7c65f9fd" sha1="3f5d92f66cabe82417ff053884270ae7aa0af3c1" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crayonc">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>La Bi Xiao Xin - Crayon Shin-Chan (Chi)</description>
@@ -52702,22 +52801,6 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="magic jewelry (1990)(rcm)(as)[p][a].prg" size="32768" crc="8113b937" sha1="b3214e34ef76b9c93d4829dc99f944fa698d7d48" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="metlfrce">
-		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Metal Force (Kor)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="DAOU-306" />
-			<dataarea name="chr" size="262144">
-				<rom name="metal force (k).chr" size="262144" crc="76974e6e" sha1="365d714b26e8ddbfd994a19eada9d14be2e00f89" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="metal force (k).prg" size="262144" crc="c57e1027" sha1="7e09097e89b629b2c13640fbde7875970ff238b2" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -61663,6 +61746,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="tekken">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken [p1][h1].chr" size="262144" crc="52f04652" sha1="ce07d92645064f39e73df9253efa8f69345a7382" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken [p1][h1].prg" size="131072" crc="7b4c7e38" sha1="5409d07983687f571f47a250ea9c269a94e9610b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tekken2" supported="no">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
 		<description>Tekken 2 (Asia)</description>
@@ -61679,10 +61778,10 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- why hacked? cah4e3 mentions that it only contains half CHR of Tekken 2... -->
+<!-- cah4e3 mentions that this only contains half CHR of Tekken 2, so I originally labeled this as hacked chr... anyway other Tekken dumps from jaeheee confirm that these Mapper 4 pirates only have 256k of chr! -->
 	<software name="tekken3">
 		<!-- Serial:  - Release Date:  - Alternative Title:  -->
-		<description>Tekken 3 (Asia, Hacked CHR?)</description>
+		<description>Tekken 3 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -61692,6 +61791,215 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="tekken 3 [p1][h1].prg" size="131072" crc="8d0af8d9" sha1="a619e37638e173478cf2d024212d79d2d4e77e81" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken3a" cloneof="tekken3">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 3 (Asia, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 3 [p1][h1][a1].chr" size="262144" crc="980d88de" sha1="c32b211d02c9ec6b940c525cec39c2a0682e8841" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 3 [p1][h1][a1].prg" size="131072" crc="1d344a99" sha1="ee0aedd6ef21de1506eb38c10e56e271db5e379b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Many of these share the same PRG as Tekken 1 or 3 (Alt)! cheap pirates! -->
+	<software name="tekken4">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 4 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 4 [p1][h1].chr" size="262144" crc="ceab4969" sha1="17878c6c2267c6cd5c6366aac96fd242104ba3fd" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 4 [p1][h1].prg" size="131072" crc="7b4c7e38" sha1="5409d07983687f571f47a250ea9c269a94e9610b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken5">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 5 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 5 [p1][h1].chr" size="262144" crc="5ab62d87" sha1="b3a9e9d0bb77c8d4eb6ed221162df1b2fd06c241" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 5 [p1][h1].prg" size="131072" crc="7b4c7e38" sha1="5409d07983687f571f47a250ea9c269a94e9610b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken6">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 6 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 6 [p1][h1].chr" size="262144" crc="99626dcb" sha1="c777d0ead5bd7ab215e11f1aba799bf64be2a8ce" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 6 [p1][h1].prg" size="131072" crc="7b4c7e38" sha1="5409d07983687f571f47a250ea9c269a94e9610b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken7">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 7 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 7 [p1][h1].chr" size="262144" crc="09095ee6" sha1="5d06b3119320c5c4605e199b3039f75eaa14c6c4" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 7 [p1][h1].prg" size="131072" crc="1d344a99" sha1="ee0aedd6ef21de1506eb38c10e56e271db5e379b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken8">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 8 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 8 [p1][h1].chr" size="262144" crc="3debb502" sha1="411c04565b43cd3bd66067ac731de6b27e7232a9" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 8 [p1][h1].prg" size="131072" crc="1d344a99" sha1="ee0aedd6ef21de1506eb38c10e56e271db5e379b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken9">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 9 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 9 [p1][h1].chr" size="262144" crc="43683129" sha1="bb8f7992a0272b4d10fa28b99813742842ee4157" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 9 [p1][h1].prg" size="131072" crc="7b4c7e38" sha1="5409d07983687f571f47a250ea9c269a94e9610b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken10">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 10 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 10 [p1][h1].chr" size="262144" crc="e9909bcb" sha1="7ded642f33a44049417ad4c8d05395815488b78b" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 10 [p1][h1].prg" size="131072" crc="afc11199" sha1="6e5435bdf20fd954e72f8818271d162c12bb0b92" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken11">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 11 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 11 [p1][h1].chr" size="262144" crc="5c423a0d" sha1="ee9a2c87cd985e5bd3b70fbaa48bb5a94e560457" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 11 [p1][h1].prg" size="131072" crc="7b4c7e38" sha1="5409d07983687f571f47a250ea9c269a94e9610b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekken12">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken 12 (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken 12 [p1][h1].chr" size="262144" crc="a64e94d4" sha1="35218ec5e40fd75571523956cf18af172f800ab3" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken 12 [p1][h1].prg" size="131072" crc="491e95fd" sha1="ca32852f8b97022cc1ee81c2d7ef51f518a1d3c2" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekkntg">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken Tag Tournament (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken tag tournament [p1][h1].chr" size="262144" crc="96f580cf" sha1="db709bcd281d803f76a647833ca512eb9932c249" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken tag tournament [p1][h1].prg" size="131072" crc="7b4c7e38" sha1="5409d07983687f571f47a250ea9c269a94e9610b" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekkntg2">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken Tag 2 Tournament (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken tag 2 tournament [p1][h1].chr" size="262144" crc="f01f512e" sha1="f82a5c4ec034af86269208b4a0ada4899a1ffc2f" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken tag 2 tournament [p1][h1].prg" size="131072" crc="ec385cf7" sha1="176acb26df59dc8801d436b3f7e18eac9cf46db8" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tekkntg3">
+		<!-- Serial:  - Release Date:  - Alternative Title:  -->
+		<description>Tekken Tag 3 Tournament (Asia)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="tekken tag 3 tournament [p1][h1].chr" size="262144" crc="f99e0d31" sha1="8d5c0e7929c46f57abbfe62473f7e3ad27fe40b5" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="tekken tag 3 tournament [p1][h1].prg" size="131072" crc="9df0d73b" sha1="040c0f844cf38e2367c0b9743a4028242fbb957c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
