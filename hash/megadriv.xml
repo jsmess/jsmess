@@ -25552,6 +25552,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="soulblada" cloneof="soulblad">
+		<description>Soul Blade (Alt)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SOULBLAD" />
+			<dataarea name="rom" size="3145728">
+				<rom name="soul blade (unl)[p].bin" size="3145728" crc="dd1c7a79" sha1="4bb00b8b42fb50e8d3be092516370fdf1bfc49e1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="squirrel">
 		<description>Squirrel King (Chi)</description>
 		<year>199?</year>
@@ -26187,6 +26199,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- There is also an alt bin available, with crc d3a65907 (size 2176698), which is the same image without the final 0xff padding -->
 	<software name="iceage" cloneof="awepossm">
 		<description>Ice Age (Rus)</description>
 		<year>199?</year>
@@ -26369,6 +26382,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="monstinc" cloneof="decapatt">
+		<description>Monsters, Inc. (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="monsters inc. (unl).bin" size="524288" crc="3f4657d5" sha1="71aa22e910d629d8bd7666e85e9b10dc6ec7f795" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="narnia3" cloneof="galahad">
 		<description>Narnia 3 (Rus)</description>
 		<year>199?</year>
@@ -26491,6 +26515,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+<!-- There is also an alt bin available, with crc 8bba0d40 (size 524534), which is the same image without the final 0xff padding -->
 	<software name="opensea" cloneof="rolo">
 	<!-- Alt. Title: Сезон охоты -->
 		<description>Sezon Ohoty (Rus)</description>
@@ -26578,6 +26603,18 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="t3 - the arcade game (unl).bin" size="1048576" crc="d2b5ef77" sha1="75d2c0821b94897b86b7cd19c0f179b476298f86" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars" cloneof="sskid">
+	<!-- Alt. Title: Тачки 2 -->
+		<description>Tachki (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="disney's cars (r).bin" size="2097152" crc="6c5f2530" sha1="654024f969e4b1ee0df4bf88d46f66f5301918ce" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
