@@ -4,6 +4,10 @@
 
         12/05/2009 Skeleton driver.
 
+    Some info obtained from EMU-80.
+    There are no manuals, diagrams, or anything else available afaik.
+    The entire driver is guesswork.
+
 The monitor will only allow certain characters to be typed, thus the
 modifier keys appear to do nothing. There is no need to use the enter
 key; using spacebar and the correct parameters is enough.
@@ -22,8 +26,9 @@ L - list registers
 M
 
 ToDo:
-- Everything
-- Fix scrolling
+- All devices
+- Beeper
+- Cassette
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -42,7 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unior_4c_w);
 	DECLARE_READ8_MEMBER(unior_4c_r);
 	DECLARE_READ8_MEMBER(unior_4d_r);
-	DECLARE_WRITE8_MEMBER(cursor_pos_w);
+	DECLARE_WRITE8_MEMBER(unior_50_w);
+	DECLARE_WRITE8_MEMBER(unior_60_w);
 	UINT8 *m_p_vram;
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
@@ -73,7 +79,13 @@ WRITE8_MEMBER( unior_state::vram_w )
 	m_p_vram[offset] = data;
 }
 
-WRITE8_MEMBER( unior_state::cursor_pos_w )
+WRITE8_MEMBER( unior_state::unior_50_w )
+{
+	if (data)
+		memcpy(m_p_vram, m_p_vram+80, 24*80);
+}
+
+WRITE8_MEMBER( unior_state::unior_60_w )
 {
 	static UINT8 ctrl=0;
 	if (offset)
@@ -88,7 +100,6 @@ WRITE8_MEMBER( unior_state::cursor_pos_w )
 	}
 }
 		
-
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7af) AM_RAM
@@ -99,9 +110,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x30, 0x3f) AM_NOP // dma data
 	AM_RANGE(0x4c, 0x4c) AM_READWRITE(unior_4c_r,unior_4c_w)
 	AM_RANGE(0x4d, 0x4d) AM_READ(unior_4d_r)
-	AM_RANGE(0x60, 0x61) AM_WRITE(cursor_pos_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(unior_50_w)
+	AM_RANGE(0x60, 0x61) AM_WRITE(unior_60_w)
 ADDRESS_MAP_END
 
 /* Input ports */
