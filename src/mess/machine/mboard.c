@@ -197,7 +197,7 @@ READ32_HANDLER( mboard_read_board_32 )
 WRITE8_HANDLER( mboard_write_board_8 )
 {
 	write_board(space->machine(),data);
-	logerror("Write Board Port  Data = %02x\n  ",data);
+	logerror("Write Board Port  Data = %02x\n",data);
 }
 
 WRITE16_HANDLER( mboard_write_board_16 )
