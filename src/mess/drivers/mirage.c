@@ -79,7 +79,7 @@ static SCREEN_UPDATE( mirage )
 void mirage_state::machine_reset()
 {
 	last_sndram_bank = 0;
-	memory_set_bankptr(machine(), "sndbank", machine().region("ensoniq")->base() );
+	memory_set_bankptr(machine(), "sndbank", machine().region("es5503")->base() );
 }
 
 static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )
@@ -121,7 +121,7 @@ static WRITE8_DEVICE_HANDLER( mirage_via_write_portb )
 	if (bank != mirage->last_sndram_bank)
 	{
 		mirage->last_sndram_bank = bank;
-		memory_set_bankptr(device->machine(), "sndbank", device->machine().region("ensoniq")->base() + bank);
+		memory_set_bankptr(device->machine(), "sndbank", device->machine().region("es5503")->base() + bank);
 	}
 }
 
