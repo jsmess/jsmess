@@ -27,8 +27,9 @@ M
 
 ToDo:
 - All devices
-- Beeper
-- Cassette
+- Beeper (requires a timer chip)
+- Cassette (requires a UART)
+- Colour?
 
 ****************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -110,11 +111,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( unior_io, AS_IO, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x3f) AM_NOP // dma data
+	AM_RANGE(0x30, 0x38) AM_NOP // dma data
+	AM_RANGE(0x3c, 0x3f) AM_NOP // cassette player control
 	AM_RANGE(0x4c, 0x4c) AM_READWRITE(unior_4c_r,unior_4c_w)
 	AM_RANGE(0x4d, 0x4d) AM_READ(unior_4d_r)
+	AM_RANGE(0x4e, 0x4f) AM_NOP // possibly the control ports of a PIO
 	AM_RANGE(0x50, 0x50) AM_WRITE(unior_50_w)
-	AM_RANGE(0x60, 0x61) AM_WRITE(unior_60_w)
+	AM_RANGE(0x60, 0x61) AM_READNOP AM_WRITE(unior_60_w)
+	AM_RANGE(0xdc, 0xdf) AM_NOP // timer chip + beeper
+	AM_RANGE(0xec, 0xed) AM_NOP // cassette data to&from UART
 ADDRESS_MAP_END
 
 /* Input ports */
