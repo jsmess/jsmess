@@ -1,8 +1,8 @@
 /******************************************************************************
 
 
-    Vii / The Batman
-    -------------------
+    Sport Vii / The Batman
+    ----------------------
 
     MESS driver by Harmony
     Based largely off of Unununium, by Segher
@@ -35,6 +35,34 @@
          D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
  Partial D - SPG200 - V-Tech V-Smile
         ND - Likely many more
+
+
+Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
+- V.Smile by Vtech, a system designed for children under the age of 10
+- V.Smile Pocket (2 versions)
+- V.SMile Cyber Pocket
+- V.Smile PC Pal
+- V-Motion Active Learning System
+- Leapster
+- V.Smile Baby Infant Development System
+- V.Flash
+
+Detailed list of bugs:
+- When loading a cart from file manager, sometimes it will crash
+- On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys
+- The game 'Jewel Master' on both above carts displays a priority error at top of screen
+- In the default bios (no cart loaded):
+-- In the menu, when 'Come On!' is selected, a graphics error appears
+-- Catch Fish, black screen
+-- Come On! freezes at the high score screen, controls seem haywire
+-- Bird Knight, no controls
+-- Lucky Dice, the dice never stop spinning
+-- Fever Move, after pressing A it freezes
+-- Alacrity Golf, black screen
+-- Smart Dart, black screen
+-- Happy Tennis, controls are haywire
+-- Bowling, freezes at the high score screen
+
 
 *******************************************************************************/
 #define ADDRESS_MAP_MODERN
@@ -1190,6 +1218,6 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
 CONS( 2004, batmantv, vii,      0,        batman,   batman,   batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman", GAME_NO_SOUND )
-CONS( 2005, vsmile,   vii,      0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
 CONS( 2007, vii,      0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
 CONS( 2008, walle,    vii,      0,        batman,   walle,    walle,    "JAKKS Pacific Inc",                                 "Wall-E",     GAME_NO_SOUND )
