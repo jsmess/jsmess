@@ -301,7 +301,7 @@ void wd1772_t::read_sector_continue()
 				live_start(SEARCH_ADDRESS_MARK);
 				return;
 			}
-			sector_size = cur_live.idbuf[3] < 4 ? size_codes[cur_live.idbuf[3]] : 512;
+			sector_size = size_codes[cur_live.idbuf[3] & 3];
 			sub_state = SECTOR_READ;
 			live_start(SEARCH_ADDRESS_MARK);
 			return;
