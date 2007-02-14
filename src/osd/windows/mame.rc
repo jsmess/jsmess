@@ -1,0 +1,8 @@
+//
+//	mame.rc - Minimal resource file for Win32 MAME
+//
+//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+
+1                       24      MOVEABLE PURE   "mame.man"
