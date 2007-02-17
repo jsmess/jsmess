@@ -347,15 +347,14 @@ int options_parse_command_line(int argc, char **argv)
 		options_data *data;
 		const char *optionname;
 		const char *newdata;
+		int is_unadorned;
 
 		/* determine the entry name to search for */
-		if (argv[arg][0] == '-')
+		is_unadorned = (argv[arg][0] != '-');
+		if (!is_unadorned)
 			optionname = &argv[arg][1];
 		else
-		{
 			optionname = OPTION_UNADORNED(unadorned_index);
-			unadorned_index++;
-		}
 
 		/* find our entry */
 		data = find_entry_data(optionname, TRUE);
@@ -366,6 +365,10 @@ int options_parse_command_line(int argc, char **argv)
 		}
 		if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL)) != 0)
 			continue;
+
+		/* if unadorned, we have to bump the count (unless if the option repeats) */
+		if (is_unadorned && !(data->flags & OPTION_REPEATS))
+			unadorned_index++;
 
 		/* get the data for this argument, special casing booleans */
 		if ((data->flags & (OPTION_BOOLEAN | OPTION_COMMAND)) != 0)

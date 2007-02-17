@@ -1,0 +1,27 @@
+<!DOCTYPE tests
+[
+	<!ENTITY eoln SYSTEM "http://www.mess.org/messtest/">
+]>
+
+<tests>
+
+<imgtooltest name="cybiko">
+	<createimage driver="cybiko"/>
+	<checkdirectory/>
+
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+
+	<putfile name="BIG.TXT">'Abcde' * 1500 </putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+		<entry name="BIG.TXT" size="7500"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+	<checkfile name="BIG.TXT">'Abcde' * 1500 </checkfile>
+</imgtooltest>
+
+</tests>

@@ -1,0 +1,159 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Controls</h1>
+<p class="normal">This section gives you the basic keys used in MESS. You will find a keymap for MESS and more importantly how to find and change the
+keys used for different systems. Finally you'll see how to configure your system to use a joystick and running systems using a joystick or mouse.</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Default Keymap (old UI)</h2>
+<table width="100%" border="1" cellpadding="" bordercolor="#EEEEEE">
+<tr>
+<td colspan="2" class="tabletitle">Main Keys</td>
+</tr>
+<tr>
+<td class="tablehead">Scroll Lock</td>
+<td class="tabledesc">On the new UI it will hide the menubar. On the old UI it will switch MESS to partial keyboard emulation which lets you use keys
+like TAB, Alt and Ctrl.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F2</div>
+</td>
+<td width="72%" class="tabledesc">Test/Service Switch</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F3</div>
+</td>
+<td width="72%" class="tabledesc">system Reset</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F4</div>
+</td>
+<td width="72%" class="tabledesc">Show the system graphics. Use cursor keys to change the set or colour.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F7</div>
+</td>
+<td width="72%" class="tabledesc">Load a saved system state from a slot number.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Shift+F7</div>
+</td>
+<td width="72%" class="tabledesc">Save system state to 1 of 10 slots.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F8</div>
+</td>
+<td width="72%" class="tabledesc">
+<p>Decrease frame skip during a system.</p>
+</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F9</div>
+</td>
+<td width="72%" class="tabledesc">Increase frame skip during a system.</td>
+</tr>
+<tr>
+<td width="28%" height="23" class="tablehead">
+<div>F10</div>
+</td>
+<td width="72%" height="23" class="tabledesc">Speed Throttle (Makes system overspeed)</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F11</div>
+</td>
+<td width="72%" class="tabledesc">Frames Per Second and Frameskip information</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Left Shift + F11</div>
+</td>
+<td width="72%" class="Maintext">Enables the profiler</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>F12</div>
+</td>
+<td width="72%" class="tabledesc">Saves image of system screen to snaps directory.</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>P</div>
+</td>
+<td width="72%" class="tabledesc">Pause the system</td>
+</tr>
+<tr>
+<td class="tablehead">
+<div>Shift + P</div>
+<p class="fixedsize">Skip one frame forward if paused.</p>
+</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Esc</div>
+</td>
+<td width="72%" class="tabledesc">Exit from system</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>"~" or "&#172;" (Above Tab)</div>
+</td>
+<td width="72%" class="tabledesc">Volume Control</td>
+</tr>
+<tr>
+<td width="28%" class="tablehead">
+<div>Tab</div>
+</td>
+<td width="72%" class="tabledesc">Access MESS's in-system menu</td>
+</tr>
+</table>
+<p class="normal">These are the default keys found in MESS. You can find out the system keys by pressing the "Tab" key during a system and selecting
+"Input (this system)".</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Changing The Default Keys</h2>
+<p class="normal">To change the system control keys simply run the system you want to play. Once the system has loaded press the "Tab" key to open
+the in-system menu and highlight "Input (this system)". Press enter and you will see this screen...</p>
+<p align="center" class="Tutorial"><img alt="easyEmu!" src="images/keybcnt.gif" width="293" height="262" /></p>
+<p class="normal">All you need to do now is to select the function you want to change, press enter and then press the key you want to use. It is
+possible to assign more than one key to a function by pressing enter again and pressing a different key.</p>
+<p class="normal">You must be careful when selecting the keys you want to use as they may be in use by other functions.</p>
+<p class="normal">If you want to assign joystick movements to a function then once you have selected the function you want to change move the
+joystick/pad or press the fire button you want to use. (N.B. You must have the <span class="command">-joystick</span> option used for the command
+line versions of MESS or Use Joystick selected in the MESS32 configuration)</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>If Things Go Wrong!</h2>
+<p class="normal">If you muck up your system keys and want to reset them to default then open the C:\MESS\Cfg folder and delete the relevant .cfg
+file for the system. If for some insane reason you change the default MESS keys and can't get back into the in-system menu then you will need to
+delete the default.cfg file from the same folder as before.</p>
+<p class="normal">&nbsp;</p>
+<hr />
+<h2>Configuring Joysticks</h2>
+<p class="normal">The simple fact is, if Windows supports your joystick or gampad and it has been set up properly in the windows control panel, there
+shouldn't be an issue with MESS supporting it.</p>
+<p class="normal">If you haven't configured your controller then open the Start&#8594;Settings&#8594;Control
+    Panel window. You'll see one of two things
+in Windows 95 there'll be a joystick icon, 98/2000 and XP will have a system Controllers icon. You'll have to refer to the Windows help file to
+configure your controller (as I can't remember how to do it on 9x) but make sure that the main controller is Joystick 1.</p>
+<hr />
+<h2>Using Joysticks &amp; Mice</h2>
+<p class="normal">MESS W32 needs the -joystick option in its command line and MESS GUI will need the "Use Joystick" option selected in its
+configuration window.</p>
+<p><span class="Tutorial">MESS also supports the mouse. As usual the command line versions of MESS will need the -mouse option and MESS GUI will need
+the "Use Mouse" option selected in it's config window.</span></p>
+</body>
+</html>

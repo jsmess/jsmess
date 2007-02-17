@@ -1,0 +1,8 @@
+<tests>
+
+<test name="coupe_000" driver="coupe">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

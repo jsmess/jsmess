@@ -1,0 +1,8 @@
+<tests>
+
+<test name="jupiter_000" driver="jupiter">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

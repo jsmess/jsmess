@@ -1,0 +1,13 @@
+<tests>
+
+<test name="pet_000" driver="pet">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="superpet_000" driver="superpet">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

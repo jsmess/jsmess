@@ -242,7 +242,7 @@ $(LIBOSD): $(OSDOBJS)
 
 ifneq ($(WINUI),)
 CFLAGS += -DWINUI=1
-include $(WINSRC)/ui.mak
+include $(WINSRC)/ui/ui.mak
 endif
 
 

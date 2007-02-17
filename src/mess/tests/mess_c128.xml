@@ -1,0 +1,8 @@
+<tests>
+
+<test name="c128_000" driver="c128">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

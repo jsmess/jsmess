@@ -278,12 +278,12 @@ void kbdc8042_init(const struct kbdc8042_interface *intf)
 	timer_pulse(TIME_IN_HZ(60), 0, kbdc8042_time);
 }
 
-static void at_8042_receive(UINT8 data)
+static void at_8042_receive(int data)
 {
 	if (LOG_KEYBOARD)
 		logerror("at_8042_receive Received 0x%02x\n", data);
 
-	kbdc8042.data = data;
+	kbdc8042.data = (UINT8) data;
 	kbdc8042.keyboard.received = 1;
 
 	if (kbdc8042.keyboard_interrupt)
@@ -509,7 +509,10 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			at_8042_receive(PS2_MOUSE_ON ? 0x00 : 0xff);
 			break;
 		case 0xaa:	/* selftest */
-			at_8042_receive(0x55);
+			if (Machine->drv->cpu[0].cpu_type == CPU_I486)
+				timer_set(TIME_IN_MSEC(10), 0x55, at_8042_receive); /* HACK */
+			else
+				at_8042_receive(0x55);
 			break;
 		case 0xab:	/* test keyboard */
 			at_8042_receive(KEYBOARD_ON ? 0x00 : 0xff);

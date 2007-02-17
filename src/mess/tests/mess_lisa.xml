@@ -1,0 +1,8 @@
+<tests>
+
+<test name="lisa2_000" driver="lisa2">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

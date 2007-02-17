@@ -1,0 +1,13 @@
+<tests>
+
+<test name="c16_000" driver="c16">
+	<wait time="1"/>
+	<checkblank/>
+</test>
+
+<test name="c16_001" driver="c16" ramsize="16k">
+	<wait time="1"/>
+	<checkblank/>
+</test>
+
+</tests>

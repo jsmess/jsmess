@@ -27,6 +27,7 @@
 #define OPTION_COMMAND				0x0004			/* option is a command */
 #define OPTION_HEADER				0x0008			/* text-only header */
 #define OPTION_INTERNAL				0x0010			/* option is internal-only */
+#define OPTION_REPEATS				0x0020			/* unadorned option repeats */
 
 /* unadorned option names */
 #define MAX_UNADORNED_OPTIONS		16

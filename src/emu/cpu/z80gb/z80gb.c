@@ -56,7 +56,6 @@ typedef struct {
 	int gb_speed;
 	int gb_speed_change_pending;
 	int enable;
-	int leavingHALT;
 	int doHALTbug;
 	const Z80GB_CONFIG *config;
 } z80gb_16BitRegs;
@@ -198,7 +197,6 @@ static void z80gb_reset(void)
 	Regs.w.IF = 0;
 
 	CheckInterrupts = 0;
-	Regs.w.leavingHALT = 0;
 	Regs.w.doHALTbug = 0;
 	Regs.w.ei_delay = 0;
 	Regs.w.gb_speed_change_pending = 0;
@@ -237,7 +235,12 @@ INLINE void z80gb_ProcessInterrupts (void)
 					if (Regs.w.enable & HALTED)
 					{
 						Regs.w.enable &= ~HALTED;
-						Regs.w.leavingHALT++;
+						Regs.w.IF &= ~(1 << irqline);
+						Regs.w.PC++;
+						if ( ! Regs.w.enable & IME ) {
+							/* check if the HALT bug should be performed */
+							Regs.w.doHALTbug = 1;
+						}
 					}
 					if ( Regs.w.enable & IME ) {
 						if ( Regs.w.irq_callback )

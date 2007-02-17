@@ -1,0 +1,23 @@
+<tests>
+
+<test name="a400_000" driver="a400">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="a400pal_000" driver="a400pal">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="a800_000" driver="a800">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="a800pal_000" driver="a800pal">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

@@ -1082,13 +1082,13 @@ $(CPUOBJ)/nec/nec.o:	$(CPUSRC)/nec/nec.c \
 						$(CPUSRC)/nec/necinstr.h \
 						$(CPUSRC)/nec/necmodrm.h
 
-$(CPUOBJ)/v30mz/v30mz.o:	$(CPUOBJ)/v30mz/v30mz.c \
-							$(CPUOBJ)/v30mz/v30mz.h \
-							$(CPUOBJ)/v30mz/necmodrm.h \
-							$(CPUOBJ)/v30mz/necinstr.h \
-							$(CPUOBJ)/v30mz/necea.h \
-							$(CPUOBJ)/v30mz/nechost.h \
-							$(CPUOBJ)/v30mz/necintrf.h
+$(CPUOBJ)/v30mz/v30mz.o:	$(CPUSRC)/v30mz/v30mz.c \
+							$(CPUSRC)/v30mz/v30mz.h \
+							$(CPUSRC)/v30mz/necmodrm.h \
+							$(CPUSRC)/v30mz/necinstr.h \
+							$(CPUSRC)/v30mz/necea.h \
+							$(CPUSRC)/v30mz/nechost.h \
+							$(CPUSRC)/v30mz/necintrf.h
 
 
 

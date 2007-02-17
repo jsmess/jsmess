@@ -1,0 +1,9 @@
+<tests>
+
+<!-- NPW 18-Oct-2006 - Temporarily disabling; broken in 0.109u1 -->
+<test name="c65_000" driver="c65" enabled="0">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

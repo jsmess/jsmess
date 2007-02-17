@@ -770,19 +770,9 @@ case 0x75: /*      LD (HL),L */
   mem_WriteByte (Regs.w.HL, Regs.b.L);
   break;
 case 0x76: /*      HALT */
-  if ( Regs.w.leavingHALT ) {
-	Regs.w.leavingHALT--;
-  } else {
-	CheckInterrupts = 1;
-	Regs.w.enable |= HALTED;
-	Regs.w.PC--;
-	if ( ! Regs.w.enable & IME ) {
-		/* check for pending interrupts to perform the HALT bug */
-		if ( Regs.w.IE & Regs.w.IF ) {
-			Regs.w.doHALTbug = 1;
-		}
-	}
-  }
+  CheckInterrupts = 1;
+  Regs.w.enable |= HALTED;
+  Regs.w.PC--;
   break;
 case 0x77: /*      LD (HL),A */
 

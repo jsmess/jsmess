@@ -1,0 +1,8 @@
+<tests>
+
+<test name="bebox_000" driver="bebox">
+	<wait time="3"/>
+	<checkblank/>
+</test>
+
+</tests>

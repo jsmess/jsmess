@@ -1,0 +1,190 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "messres.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <windows.h>
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_RUNTIME_MENU MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Load State...",              ID_FILE_LOADSTATE
+        MENUITEM "&Save State",                 ID_FILE_SAVESTATE
+        MENUITEM "S&ave State As...",           ID_FILE_SAVESTATE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "Save Sc&reenshot",            ID_FILE_SAVESCREENSHOT
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit",                       ID_FILE_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Paste",                       ID_EDIT_PASTE
+    END
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "&Pause",                      ID_OPTIONS_PAUSE, GRAYED
+        MENUITEM "Soft &Reset",                 ID_OPTIONS_SOFTRESET
+        MENUITEM "Ha&rd Reset",                 ID_OPTIONS_HARDRESET
+        MENUITEM SEPARATOR
+        POPUP "&Keyboard"
+        BEGIN
+            MENUITEM "Emulated",                    ID_KEYBOARD_EMULATED
+            MENUITEM "Natural",                     ID_KEYBOARD_NATURAL
+            MENUITEM SEPARATOR
+            MENUITEM "Customize Emulated Keyboard...",     ID_KEYBOARD_CUSTOMIZE
+        END
+        MENUITEM "&Joysticks",                  ID_OPTIONS_JOYSTICKS, GRAYED
+        POPUP "&Video"
+        BEGIN
+		    MENUITEM SEPARATOR
+		    MENUITEM "Rotate 0 degrees",        ID_VIDEO_ROTATE_0
+		    MENUITEM "Rotate 90 degrees",       ID_VIDEO_ROTATE_90
+		    MENUITEM "Rotate 180 degrees",      ID_VIDEO_ROTATE_180
+		    MENUITEM "Rotate 270 degrees",      ID_VIDEO_ROTATE_270
+        END
+        MENUITEM "&Configuration...",           ID_OPTIONS_CONFIGURATION
+        MENUITEM "&DIP Switches...",            ID_OPTIONS_DIPSWITCHES
+        MENUITEM "&Miscellaneous Inputs...",    ID_OPTIONS_MISCINPUT
+        MENUITEM "&Analog Controls...",         ID_OPTIONS_ANALOGCONTROLS
+        MENUITEM SEPARATOR
+        POPUP "&Frameskip"
+        BEGIN
+            MENUITEM "Auto",                        ID_FRAMESKIP_AUTO
+        END
+        MENUITEM "&Throttle",                   ID_OPTIONS_THROTTLE
+        MENUITEM "&Show FPS",                   ID_OPTIONS_TOGGLEFPS
+        MENUITEM SEPARATOR
+        MENUITEM "&Hide Menubar\tScrLk",        ID_OPTIONS_TOGGLEMENUBAR
+        MENUITEM "&Full Screen\tAlt+Enter",     ID_OPTIONS_FULLSCREEN
+        MENUITEM "Show P&rofiler",              ID_OPTIONS_PROFILER, GRAYED
+        MENUITEM "&Debugger...",                ID_OPTIONS_DEBUGGER
+    END
+    POPUP "&Devices"
+    BEGIN
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "About This System...",        ID_HELP_ABOUTSYSTEM
+        MENUITEM "&About MESS...",              ID_HELP_ABOUT
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "messres.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include <windows.h>\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+#ifndef UNDER_CE
+IDD_TAPEDIALOG DIALOGEX 0, 0, 172, 65
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "Tape Control"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_SLIDER,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,6,24,162,15
+    PUSHBUTTON      "Play",IDC_PLAY,6,41,35,17
+    PUSHBUTTON      "Stop",IDC_STOP,72,41,35,17
+    PUSHBUTTON      "Pause",IDC_PAUSE,132,41,35,17
+    LTEXT           "",IDC_CAPTION,12,6,102,12
+    LTEXT           "",IDC_STATUS,126,6,42,12
+END
+#endif
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+IDI_ICON_CART           ICON    DISCARDABLE     "../../osd/windows/ui/res/cpu.ico"
+IDI_ICON_HARD           ICON    DISCARDABLE     "../../osd/windows/ui/res/harddisk.ico"
+IDI_ICON_CASS           ICON    DISCARDABLE     "../../mess/osd/windows/ui/res/win_cass.ico"
+IDI_ICON_FLOP           ICON    DISCARDABLE     "../../mess/osd/windows/ui/res/win_flop.ico"
+IDI_ICON_PRIN           ICON    DISCARDABLE     "../../mess/osd/windows/ui/res/win_prin.ico"
+IDI_ICON_SERL           ICON    DISCARDABLE     "../../mess/osd/windows/ui/res/win_serl.ico"
+IDI_ICON_SNAP           ICON    DISCARDABLE     "../../mess/osd/windows/ui/res/win_snap.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_TAPEDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 165
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 58
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

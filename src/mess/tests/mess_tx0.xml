@@ -1,0 +1,7 @@
+<tests>
+
+<test name="tx0_000" driver="tx0_8kw">
+	<wait time="5"/>
+</test>
+
+</tests>
