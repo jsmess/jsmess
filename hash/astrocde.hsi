@@ -1,0 +1,413 @@
+<hashfile>
+	<!-- Bally Professional Arcade/Astrocade Casettrige CRC list -->
+	<!-- Compiled by MESSDEV Team -->
+	<!-- Revised by Discord -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Games in basic were tapes but ward shrake converted them to cartridge form in -->
+	<!-- Theory the original cassette forms must exist somewhere also -->
+	<!-- crc = Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="e4d285e5" name="280 ZZZap &amp; Dodgem">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>2001</extrainfo>
+	</hash>
+	<hash crc32="cd57c485" name="Amazing Maze &amp; Tic-Tac-Toe">
+		<year>1979</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>5001</extrainfo>
+	</hash>
+	<hash crc32="4f372019" name="Artillery Duel">
+		<year>1982</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>5005</extrainfo>
+	</hash>
+	<hash crc32="bc0d0336" name="Artillery Duel &amp; O-Jello (BASIC)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="70514687" name="Astro BASIC">
+		<year>1981</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<extrainfo>6004</extrainfo>
+	</hash>
+	<hash crc32="0b5298bc" name="Astro Battle">
+		<year>1979</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<extrainfo>2009</extrainfo>
+	</hash>
+	<hash crc32="9a3b9be2" name="Backgammon &amp; Checkers (BASIC)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="90e276aa" name="Bally BASIC">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>6002</extrainfo>
+	</hash>
+	<hash crc32="3f431613" name="Bally Pin / Astrocade Pinball">
+		<year>1979</year>
+		<manufacturer>Bally Manufacturing / Astrovision Inc.</manufacturer>
+		<extrainfo>2007 / 3005</extrainfo>
+	</hash>
+	<hash crc32="fc4bd27c" name="Biorhythm">
+		<year>1981</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<extrainfo>4004</extrainfo>
+	</hash>
+	<hash crc32="78d45a11" name="BlackJack &amp; Acey Deucey &amp; Poker">
+		<year>1979</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>5002</extrainfo>
+	</hash>
+	<hash crc32="79fe386b" name="Blast Droids">
+		<year>1983</year>
+		<manufacturer>Esoterica</manufacturer>
+	</hash>
+	<hash crc32="4da03dfe" name="Blue Ram BASIC 1.1">
+		<year>1981</year>
+		<manufacturer>Perkins Engineering</manufacturer>
+		<status>requires additional ram in memory map from $6000-$6FFF</status>
+	</hash>
+	<hash crc32="004ee140" name="Blue Ram Utility">
+		<year>19??</year>
+		<manufacturer>Perkins Engineering</manufacturer>
+		<status>requires additional ram and external 8154 chip</status>
+	</hash>
+	<hash crc32="1f8bc8ba" name="Bowling (prototype)">
+		<year>1985</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>3006</extrainfo>
+	</hash>
+	<hash crc32="0fc97852" name="Candyman">
+		<year>19??</year>
+	</hash>
+	<hash crc32="757bab8f" name="Checkers (prototype)">
+		<year>19??</year>
+		<manufacturer>New Image</manufacturer>
+		<extrainfo>5003</extrainfo>
+	</hash>
+	<hash crc32="5b946526" name="Chicken">
+		<year>19??</year>
+		<manufacturer>Bit Fiddlers</manufacturer>
+	</hash>
+	<hash crc32="28f9e502" name="Clowns &amp; Brickyard">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>2004</extrainfo>
+	</hash>
+	<hash crc32="313fee89" name="Collision Course &amp; Wack-a-mole (BASIC)">
+		<year>19??</year>
+		<status>requires blue ram basic</status>
+	</hash>
+	<hash crc32="14f36aba" name="Coloring Book (prototype)">
+		<year>19??</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>4005</extrainfo>
+	</hash>
+	<hash crc32="8a6adbfe" name="Conan the Barbarian / Quest for the Orb (prototype)">
+		<year>19??</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>5005</extrainfo>
+	</hash>
+	<hash crc32="05dd02c8" name="Connect Four &amp; Simon (BASIC)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a77b3fb" name="Cosmic Raider">
+		<year>1983</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>2019</extrainfo>
+	</hash>
+	<hash crc32="869b692e" name="Cosmic Raider (unfinished version)">
+		<year>1983</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>2019</extrainfo>
+	</hash>
+	<hash crc32="007e70d5" name="Demo: Bally BASIC">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+	</hash>
+	<hash crc32="16b77b44" name="Demo: Bally Pro Arcade">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>6001</extrainfo>
+	</hash>
+	<hash crc32="77bed6ba" name="Dogpatch">
+		<year>1980</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<extrainfo>2010</extrainfo>
+	</hash>
+	<hash crc32="7d30312a" name="Elementary Math &amp; Bingo Math / Speed Math &amp; Bingo Math">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>4001</extrainfo>
+	</hash>
+	<hash crc32="9e08814d" name="Flying Ace &amp; Monkey Jump (BASIC)">
+		<year>19??</year>
+		<status>requires blue ram basic</status>
+	</hash>
+	<hash crc32="fc8998a9" name="Football">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>3002</extrainfo>
+	</hash>
+	<hash crc32="ba558eb7" name="Galactic Invasion">
+		<year>1981</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<status>clone of galaxian</status>
+		<extrainfo>2011</extrainfo>
+	</hash>
+	<hash crc32="d75e9672" name="Galaxian">
+		<year>1981</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<extrainfo>2011</extrainfo>
+	</hash>
+	<hash crc32="d89abb30" name="Gate Escape (BASIC)">
+		<year>19??</year>
+		<status>requires blue ram basic</status>
+	</hash>
+	<hash crc32="7d56aa59" name="Gold Digger &amp; Yahtzee (BASIC)">
+		<year>19??</year>
+		<status>requires blue ram basic</status>
+	</hash>
+	<hash crc32="7b3b7b70" name="Grand Prix / Demolition Derby &amp; Grand Prix">
+		<year>1981</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<extrainfo>2014</extrainfo>
+	</hash>
+	<hash crc32="a1eb3e15" name="Great American Jigsaw &amp; QB-2B (BASIC)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bc2b6fe3" name="I.C.B.M. Attack">
+		<year>1982</year>
+		<manufacturer>Spectre Software</manufacturer>
+		<extrainfo>Bally Alley contacted rights owner this is now a public domain rom</extrainfo>
+	</hash>
+	<hash crc32="1395b130" name="Incredible Wizard, The">
+		<year>1982</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>2017</extrainfo>
+	</hash>
+	<hash crc32="a0cba256" name="Incredible Wizard, The (set 2?)">
+		<year>19??</year>
+		<status>not working</status>
+	</hash>
+	<hash crc32="2cf68f93" name="Letter Match &amp; Spell 'n Score &amp; Crosswords">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>4002</extrainfo>
+	</hash>
+	<hash crc32="752d13fd" name="Life (prototype)">
+		<year>1985</year>
+		<manufacturer>R.Diegler</manufacturer>
+	</hash>
+	<hash crc32="5393f920" name="Machine Language Manager">
+		<year>1982</year>
+		<manufacturer>Bit Fiddlers</manufacturer>
+	</hash>
+	<hash crc32="565a644c" name="Mazeman">
+		<year>1984</year>
+		<manufacturer>Anonymous</manufacturer>
+	</hash>
+	<hash crc32="88f56c4e" name="Missile Attack">
+		<year>1985</year>
+		<manufacturer>Mike White</manufacturer>
+		<extrainfo>clone of ICBM Attack</extrainfo>
+	</hash>
+	<hash crc32="14e93a41" name="Ms. Candyman">
+		<year>1983</year>
+		<manufacturer>L &amp; M Software</manufacturer>
+	</hash>
+	<hash crc32="e4726657" name="Muncher">
+		<year>1983</year>
+		<manufacturer>Esoterica</manufacturer>
+	</hash>
+	<hash crc32="b242ef84" name="Music Maker (prototype)">
+		<year>1985</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<status>requires tape support to save</status>
+		<extrainfo>4003</extrainfo>
+	</hash>
+	<hash crc32="784b256a" name="No-die">
+		<year>19??</year>
+		<status>clone of muncher</status>
+	</hash>
+	<hash crc32="be686630" name="Old Bent Nose &amp; Yahtzee (BASIC)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7bd3cfbb" name="Outpost 19 (BASIC)">
+		<year>19??</year>
+		<status>requires blue ram basic</status>
+	</hash>
+	<hash crc32="17363546" name="Pac-Man (prototype)">
+		<year>1985</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<status>clone of muncher</status>
+	</hash>
+	<hash crc32="a1c7e129" name="Panzer Attack &amp; Red Baron">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>2003</extrainfo>
+	</hash>
+	<hash crc32="7b1b206a" name="Pirates Chase">
+		<year>1982</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>2015</extrainfo>
+	</hash>
+	<hash crc32="a982c37a" name="Putt-Putt Golf &amp; Simon (BASIC)">
+		<year>19??</year>
+		<status>requires blue ram basic</status>
+	</hash>
+	<hash crc32="231f56ff" name="Quadra: Snoop Camera">
+		<year>1990</year>
+		<manufacturer>Mike White</manufacturer>
+	</hash>
+	<hash crc32="ef2c7744" name="Quadra: UFO">
+		<year>1990</year>
+		<manufacturer>Mike White</manufacturer>
+	</hash>
+	<hash crc32="d333e1e3" name="Quadra: Laser">
+		<year>1990</year>
+		<manufacturer>Mike White</manufacturer>
+	</hash>
+	<hash crc32="97c70ffa" name="Quadra: Smash-up">
+		<year>1990</year>
+		<manufacturer>Mike White</manufacturer>
+	</hash>
+	<hash crc32="b43b17dd" name="Quadra: Q Cartoon">
+		<year>1990</year>
+		<manufacturer>Mike White</manufacturer>
+	</hash>
+	<hash crc32="878cb3a5" name="Quadra: Part 1">
+		<year>1990</year>
+		<manufacturer>Mike White</manufacturer>
+	</hash>
+	<hash crc32="b1219aa9" name="Quadra: Part 2">
+		<year>1990</year>
+		<manufacturer>Mike White</manufacturer>
+	</hash>
+	<hash crc32="f74385ee" name="Road Toad">
+		<year>19??</year>
+	</hash>
+	<hash crc32="960b6f86" name="Sea Devil">
+		<year>1983</year>
+		<manufacturer>L &amp; M Software</manufacturer>
+	</hash>
+	<hash crc32="a021735e" name="Seawolf &amp; Missile">
+		<year>19??</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>2002</extrainfo>
+	</hash>
+	<hash crc32="3e9f4f0d" name="Sneaky Snake">
+		<year>1983</year>
+		<manufacturer>New Image</manufacturer>
+	</hash>
+	<hash crc32="56d28b62" name="Soccer">
+		<year>1985</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>3007</extrainfo>
+	</hash>
+	<hash crc32="7de08d9a" name="Soccer (prototype)">
+		<year>1985</year>
+		<manufacturer>Astrocade Inc.</manufacturer>
+		<extrainfo>3007</extrainfo>
+	</hash>
+	<hash crc32="d15ce025" name="Solar Conqueror">
+		<year>1983</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>2018</extrainfo>
+	</hash>
+	<hash crc32="fe6182b3" name="Songs (prototype)">
+		<year>1985</year>
+		<manufacturer>New Image</manufacturer>
+	</hash>
+	<hash crc32="e4f3766a" name="Sound Tweeker (prototype)">
+		<year>19??</year>
+		<manufacturer>New Image</manufacturer>
+	</hash>
+	<hash crc32="519cc707" name="Space Fortress">
+		<year>1981</year>
+		<manufacturer>Astrovision Inc.</manufacturer>
+		<extrainfo>2012</extrainfo>
+	</hash>
+	<hash crc32="52964c1f" name="Space Invaders">
+		<year>1979</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>2009 (2006,2008)</extrainfo>
+	</hash>
+	<hash crc32="d54a74c8" name="Star Battle">
+		<year>1979</year>
+		<manufacturer>Astrovision</manufacturer>
+		<extrainfo>2005</extrainfo>
+	</hash>
+	<hash crc32="df6b2304" name="Super Slope">
+		<year>19??</year>
+	</hash>
+	<hash crc32="49df19eb" name="Tests (prototype)">
+		<year>1986</year>
+		<manufacturer>New Image</manufacturer>
+	</hash>
+	<hash crc32="5be548cc" name="Tornado Baseball, Tennis, Hockey &amp; Handball">
+		<year>1978</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<extrainfo>3001</extrainfo>
+	</hash>
+	<hash crc32="1447f854" name="Treasure Cove">
+		<year>1983</year>
+		<manufacturer>Esoterica (Spectre Software)</manufacturer>
+		<extrainfo>Bally Alley contacted rights owner this is now a public domain rom</extrainfo>
+	</hash>
+	<hash crc32="2cc8cc3c" name="Video Story Book (prototype)">
+		<year>1985</year>
+		<manufacturer>Self-Published</manufacturer>
+	</hash>
+	<hash crc32="770143c5" name="Vipersoft BASIC">
+		<year>1981</year>
+		<manufacturer>Viper Systems</manufacturer>
+	</hash>
+	<hash crc32="f400e5d4" name="Yesterday (prototype)">
+		<year>1986</year>
+		<manufacturer>Self-Published</manufacturer>
+	</hash>
+	<!-- Unconfirmed -->
+	<hash crc32="0bba8261" name="Muncher (set 2?)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b5f9663f" name="Muncher (set 3?)">
+		<year>19??</year>
+	</hash>
+	<!-- Bad Dumps -->
+	<hash crc32="1a050094" name="Astro Battle">
+		<year>1981</year>
+		<manufacturer>Astrovision</manufacturer>
+		<status>OVERDUMPED</status>
+		<extrainfo>2009</extrainfo>
+	</hash>
+	<hash crc32="fb652bac" name="Bally Pin / Astrocade Pinball">
+		<year>1981</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<status>OVERDUMPED</status>
+		<extrainfo>3005</extrainfo>
+	</hash>
+	<hash crc32="ee3489ea" name="Seawolf &amp; Missile">
+		<year>19??</year>
+		<manufacturer>Bally Manufacturing</manufacturer>
+		<status>OVERDUMPED</status>
+		<extrainfo>2002</extrainfo>
+	</hash>
+	<hash crc32="ce15563b" name="Star Battle">
+		<year>19??</year>
+		<manufacturer>Astrovision</manufacturer>
+		<status>OVERDUMPED</status>
+		<extrainfo>2005</extrainfo>
+	</hash>
+	<!-- Undumped -->
+	<!-- ####### = Astrology (prototype) | 19?? | Bally Manufacturing | | 4003 -->
+	<!-- ####### = Bally Colour BASIC (prototype) | 19?? | | | -->
+	<!-- ####### = Basketball | 19?? | Bally Manufacturing | | 3006 -->
+	<!-- ####### = Computer Eye | 19?? | HARD | | -->
+	<!-- ####### = Creative Crayon | 19?? | Bally Manufacturing | | -->
+	<!-- ####### = Drag Race &amp; Desert Fox | 19?? | Bally Manufacturing | | 3004 -->
+	<!-- ####### = King Arthur's Adventure | 19?? | Bally Manufacturing | | -->
+	<!-- ####### = Quest for the Orb | 19?? | Bally Manufacturing | | 5004 -->
+	<!-- ####### = Skiing | 19?? | Bally Manufacturing | | -->
+</hashfile>

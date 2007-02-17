@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Memotech MTX512 (TOSEC-v0.12) -->
+	<hash crc32="f4db5d2b" name="3D Tachyon Fighter">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="505195d0" name="3D Tachyon Fighter [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="9d64a3e2" name="Agrovator">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="9bd011f8" name="Agrovator [a]">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="2992adf3" name="Alice in Wonderland">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="1d283d9d" name="Arcazion">
+		<year>1985</year>
+		<manufacturer>Chris Sawyer</manufacturer>
+	</hash>
+	<hash crc32="e41b2fed" name="Arcazion [a2]">
+		<year>1985</year>
+		<manufacturer>Chris Sawyer</manufacturer>
+	</hash>
+	<hash crc32="1663b4c4" name="Arcazion [a]">
+		<year>1985</year>
+		<manufacturer>Chris Sawyer</manufacturer>
+	</hash>
+	<hash crc32="9d7538c3" name="Assembler ROM [!]">
+		<year>1984</year>
+		<manufacturer>Memotech</manufacturer>
+	</hash>
+	<hash crc32="6a8afdb0" name="Astro-Pac">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="91b0db1b" name="Astro-Pac [a2]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="2ac48022" name="Astro-Pac [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="7644bb82" name="Astromilon">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="01b3aaae" name="Astromilon [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="07687290" name="Backgammon">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="f077460a" name="Backgammon [a2]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="6bdec5ce" name="Backgammon [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="87b4e59c" name="BASIC ROM [!]">
+		<year>1984</year>
+		<manufacturer>Memotech</manufacturer>
+	</hash>
+	<hash crc32="c4855eeb" name="Blobbo">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="b355d198" name="Blobbo [a2]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="5a462b8f" name="Blobbo [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="677af4c7" name="Bomber &amp; Etch A Sketch (PD)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b461e23f" name="Bomber &amp; Etch A Sketch (PD)[a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bc989c0b" name="Bomber &amp; Etch A Sketch (PD)[a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3d2ce24c" name="Brunword">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1b0af4ea" name="Chamberoids">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="3280d013" name="Chamberoids [a]">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="035bdccb" name="Draughts">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="78b2ec37" name="Draughts [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="5fa2f2d1" name="EdAsm">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="323b2062" name="Fathoms Deep">
+		<year>19??</year>
+	</hash>
+	<hash crc32="44c0dba5" name="Hawk Wars">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="58854fff" name="Hawk Wars [a]">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="c2c4955a" name="Johnny Rebel">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9485dd64" name="Johnny Rebel [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6c319641" name="K-N-U-C-K-L-E-S">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="e5529b3c" name="K-N-U-C-K-L-E-S [a2]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="28e744f2" name="K-N-U-C-K-L-E-S [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="296d26f3" name="Kilopede">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="dab26ec6" name="Kilopede [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="ed8c4875" name="Little Devils">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="58c50a4d" name="Little Devils [a]">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="ba57f9c7" name="Lydrolla">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8c34f96b" name="Man from G.R.A.N.N.Y, The">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="45f24ffe" name="Man from G.R.A.N.N.Y, The [loader]">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="9621f087" name="Maxima">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="4eac5372" name="Memotech Demo">
+		<year>1983</year>
+		<manufacturer>Memotech</manufacturer>
+	</hash>
+	<hash crc32="6513fcb7" name="Missile Kommand">
+		<year>1985</year>
+		<manufacturer>Chris Sawyer-Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="b5bee355" name="Missile Kommand [a]">
+		<year>1985</year>
+		<manufacturer>Chris Sawyer-Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="7aa5e87b" name="Mission Alphatron">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="2e21228c" name="Mission Omega">
+		<year>1985</year>
+		<manufacturer>Chris Sawyer-Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="bc421d4d" name="Mission Omega [a]">
+		<year>1985</year>
+		<manufacturer>Chris Sawyer-Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="9aaba664" name="MTX Chess">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="29b3c21c" name="MTX Chess [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="692637f7" name="Nemo">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="8ff85c8b" name="Nemo [a2]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="0f148a86" name="Nemo [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="bfafc0df" name="Noise Sample">
+		<year>1991</year>
+		<manufacturer>Matt Farrow</manufacturer>
+	</hash>
+	<hash crc32="dd49412d" name="Obloids">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="abc22748" name="Obloids [a2]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="2eb88e79" name="Obloids [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="9ca858cc" name="OS ROM [!]">
+		<year>1984</year>
+		<manufacturer>Memotech</manufacturer>
+	</hash>
+	<hash crc32="217bba05" name="Phaid">
+		<year>1994</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="471a984b" name="Phaid [a2]">
+		<year>1994</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="e29c2bdb" name="Phaid [a]">
+		<year>1994</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="a5a48aab" name="Pothole Pete">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="ae8bb137" name="Qogo">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="9d8fa05f" name="Qogo [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="7cbdc250" name="Qogo">
+		<year>1985</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="82497b0f" name="Quazzia">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="6fa34080" name="Quazzia [a]">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="d0394b06" name="Renumber (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6066ad9a" name="Reversi">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="991a6074" name="Reversi [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="1b312b7b" name="Sepulcri">
+		<year>19??</year>
+	</hash>
+	<hash crc32="636dbcc4" name="Sepulcri [loader]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7664a5d1" name="Snappo">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="d3ae25e4" name="Snappo [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="921fb553" name="Sprites (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="42516d8b" name="Square Sample">
+		<year>1991</year>
+		<manufacturer>Matt Farrow</manufacturer>
+	</hash>
+	<hash crc32="e45927fc" name="Star Command">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="d61b9046" name="Star Command [a2]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="3f800a44" name="Star Command [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="e1eb9ceb" name="Super Minefield">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="53ea6203" name="Super Minefield [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="a2b208a5" name="Surface Scanner">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="b4fd611c" name="Surface Scanner [a2]">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="6a7312b6" name="Surface Scanner [a]">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="4c7fac7e" name="Tapeworm">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="4458f862" name="Tapeworm [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="530bae28" name="Target Zone">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="8f9f902e" name="Target Zone [a]">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="beb423d3" name="Toado">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="8c96be92" name="Turbo Run">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="e7f034e3" name="Turbo Run [a2]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="3e857cd6" name="Turbo Run [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="22f9dd9e" name="Vortex (PD)">
+		<year>19??</year>
+		<manufacturer>Paul Daniels</manufacturer>
+	</hash>
+	<hash crc32="c21fd140" name="Wall, The">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="5a8dd526" name="Wall, The [a]">
+		<year>1985</year>
+		<manufacturer>Syntaxsoft</manufacturer>
+	</hash>
+	<hash crc32="1b6c9598" name="Zarcos">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<hash crc32="d9b9fad4" name="Zarcos [a]">
+		<year>1984</year>
+		<manufacturer>Megastar Games</manufacturer>
+	</hash>
+	<!-- Memotech MTX512 - WAV (TOSEC-v0.10) -->
+	<hash crc32="4c284701" name="3d Turbo">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="63e8a4a6" name="Contract Bridge II">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="c662669c" name="Contract Bridge II [a]">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="c4684ba3" name="Cosmic Raiders">
+		<year>1984</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="263b14a8" name="Goldmine">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="c7203844" name="Jumping Jack Flash">
+		<year>1985</year>
+		<manufacturer>Syntax Software</manufacturer>
+	</hash>
+	<hash crc32="32e73f52" name="Kilopede">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="fa8bb304" name="Knuckles">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="3dfcb4ba" name="Mission Alphatron">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="d14f3525" name="Mission Alphatron [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="5e96b81f" name="Mtx Chess">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="db9d7c98" name="Phaid">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="b8299386" name="Phaid [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="bd643977" name="Reversi">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="e468f5e9" name="Reversi [a]">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="a291ed23" name="Surface Scanner">
+		<year>1983</year>
+		<manufacturer>Megastar</manufacturer>
+	</hash>
+	<hash crc32="d39cc8e2" name="Tapeworm">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="0d7c47b4" name="Target Zone">
+		<year>1983</year>
+		<manufacturer>Syntax Software</manufacturer>
+	</hash>
+	<hash crc32="d0186e4c" name="Toado">
+		<year>1983</year>
+		<manufacturer>Continental Software</manufacturer>
+	</hash>
+	<hash crc32="533bdad4" name="Vernon And The Vampires">
+		<year>1983</year>
+		<manufacturer>Syntax Software</manufacturer>
+	</hash>
+	<hash crc32="bee454e5" name="microcan">
+		<year>19??</year>
+	</hash>
+</hashfile>

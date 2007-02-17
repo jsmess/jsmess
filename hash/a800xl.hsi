@@ -1,0 +1,6438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Atari 800XL - Binaries (TOSEC-v0.11) -->
+	<hash crc32="10d1d713" name="180 Darts">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dd61dd84" name="235 U (Po)">
+		<year>1992</year>
+		<manufacturer>L.K. Avalon</manufacturer>
+	</hash>
+	<hash crc32="c69782e6" name="3-D Red Baron">
+		<year>1980</year>
+		<manufacturer>Seebee's Computing</manufacturer>
+	</hash>
+	<hash crc32="c6e4f18a" name="3-D Tic-Tac-Toe">
+		<year>1979</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="15480a34" name="3-D Tic-Tac-Toe [a]">
+		<year>1979</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3a7136be" name="3Rd (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6cc5a52d" name="Abbuc Magazine (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5bc26c54" name="Abbuc Magazine 20 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fcdd432b" name="Abbuc Magazine 21 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="89208a17" name="Abbuc Magazine 25 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="de6976b7" name="Abbuc Magazine 34 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cbbc028d" name="Abbuc Magazine 36 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53e98b1d" name="Abbuc Magazine 39 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="440f2bea" name="Abbuc Magazine 40 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="672b642b" name="Abbuc Magazine 44 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="02d430e1" name="Abbuc Magazine 46 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f57f0614" name="Abbuc Magazine 47 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b52b7c99" name="Abbuc Magazine 50 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9a6f8a74" name="Abbuc Magazine 51 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="58fd8948" name="Abbuc Magazine 52 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f0aeaba" name="Abbuc Magazine 53 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="494d9cc8" name="Abracadabra">
+		<year>19??</year>
+		<manufacturer>TG Software</manufacturer>
+	</hash>
+	<hash crc32="8c6d54d5" name="Ace Ploter (demo) (1989)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f8aae29e" name="Acey Deucey">
+		<year>19??</year>
+	</hash>
+	<hash crc32="57062c9e" name="Acey Deucey">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="c221e693" name="Action Biker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ec9361b2" name="Action Quest">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1f301006" name="Adax (Po)">
+		<year>1992</year>
+		<manufacturer>L.K. Avalon</manufacturer>
+	</hash>
+	<hash crc32="b08f085d" name="Adventure 01 - Adventureland">
+		<year>19??</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="d6424153" name="Adventure 02 - Pirate Adventure">
+		<year>19??</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="519914a6" name="Adventure 03 - Mission Impossible">
+		<year>19??</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="8549d339" name="Adventure 04 - Voodoo Castle">
+		<year>19??</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="ba7f648c" name="Adventure 06 - Strange Odyssey">
+		<year>19??</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="8cb4802c" name="Adventure 10 - Savage Island">
+		<year>19??</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="2c8a6dbf" name="Adventure 13 - Sorceror Of Claymore Castle">
+		<year>19??</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="672c0ef2" name="Adventure Creator">
+		<year>1984</year>
+		<manufacturer>Spinnaker</manufacturer>
+	</hash>
+	<hash crc32="9bbfb95e" name="Adventure In Time">
+		<year>1983</year>
+		<manufacturer>Phoenix Software</manufacturer>
+	</hash>
+	<hash crc32="0664504f" name="Adventure In Time">
+		<year>19??</year>
+	</hash>
+	<hash crc32="318c9a8f" name="Adventure Quest">
+		<year>19??</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="2bea45f9" name="Adventure Writer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="56b68366" name="Agent 009">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c50dd50e" name="Agent USA">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a3e2a3ca" name="Agent USA [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="93f70e21" name="Air Hockey">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9cf736cc" name="Air Raid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="937fb640" name="Air Strike">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c3909b67" name="Air Strike">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="aaba14a0" name="Air Strike II">
+		<year>1983</year>
+		<manufacturer>English Software Company</manufacturer>
+	</hash>
+	<hash crc32="dbafe041" name="Air Strike II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="570d7538" name="Air Support">
+		<year>19??</year>
+	</hash>
+	<hash crc32="847bbae7" name="Air Traffic Controller">
+		<year>19??</year>
+	</hash>
+	<hash crc32="afb97e1d" name="Airwolf">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7036153a" name="Alf (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e8204604" name="Alf In The Color Caves">
+		<year>1984</year>
+		<manufacturer>Spinnaker</manufacturer>
+	</hash>
+	<hash crc32="9a4bc3ce" name="Alf In The Color Caves">
+		<year>19??</year>
+	</hash>
+	<hash crc32="634ad6ef" name="Alfaboot (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9db8768d" name="Alien (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f5796431" name="Alien Ambush">
+		<year>1982</year>
+	</hash>
+	<hash crc32="730f77b1" name="Alien Swarm">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3a63364f" name="Alley Cat">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ddaca84a" name="Alpha (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f34b7740" name="Alpha Shield">
+		<year>19??</year>
+		<manufacturer>Sirius</manufacturer>
+	</hash>
+	<hash crc32="7917fa40" name="Alphabet Zoo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e762b971" name="Alpman">
+		<year>19??</year>
+	</hash>
+	<hash crc32="59ed2660" name="Amaurote">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1b33f43e" name="Amaurote [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e51b2b94" name="Amazed">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6de6f11a" name="Amazing">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bd2e7637" name="Amazing Maze">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1582b561" name="Amazing Maze Editor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aa98caeb" name="Amphibian">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d5f06ad1" name="Amphibian [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="50371e43" name="Analog Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="38ba8918" name="Anarchy (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a32e4e15" name="Ander (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="55d463ca" name="Android">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3d973b00" name="Andromeda">
+		<year>1982</year>
+		<manufacturer>Gebelli Software</manufacturer>
+	</hash>
+	<hash crc32="dbd1942b" name="Andromeda">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a97a7213" name="Androton">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2d131480" name="Andrzej Laskowski (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9bcbee2d" name="Angleworms II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2cc0db35" name="Ankh">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d7d8116d" name="Annael (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="68c45310" name="Annoyed Angel (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="24a07dd1" name="Another World (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ea2bd61e" name="Ant-Eater">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1e54b9bd" name="Ant-Eater [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e87efd1b" name="Anteater">
+		<year>19??</year>
+	</hash>
+	<hash crc32="69cedcd7" name="Antic (demo) (1992)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8af4726d" name="Antic Space Sound (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="14078026" name="Anty Catholic Announcement (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca13c13e" name="Antyss! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1d1f2d1e" name="APC (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9942b01" name="Apocalypse Time Magazine (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="deaa7b1c" name="Apple Panic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="528076eb" name="Arachnid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="720139a3" name="Arcade Fruit Machine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2e647ff2" name="Archon">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c4df1e6e" name="Archon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7f8b95c2" name="Archon 2 - Adept">
+		<year>1984</year>
+		<manufacturer>Electronic Arts</manufacturer>
+	</hash>
+	<hash crc32="166676ab" name="Archon II">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1e704599" name="Archon II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="308bb376" name="Ardeny 1944">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0c27c7be" name="Ardy The Aardvark">
+		<year>19??</year>
+	</hash>
+	<hash crc32="62bf22a6" name="Ardy The Aardvark [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a86db445" name="Arena">
+		<year>19??</year>
+	</hash>
+	<hash crc32="45324c70" name="Arena [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8f8d24b2" name="Arena">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="0321b3e0" name="Arex">
+		<year>1983</year>
+		<manufacturer>Adventure International</manufacturer>
+	</hash>
+	<hash crc32="acf2dfae" name="Arex">
+		<year>19??</year>
+	</hash>
+	<hash crc32="be6709a1" name="Arex [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ba589905" name="Arkanoid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bbe35d0b" name="Arkanoid 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a649a0f" name="Around The Planet">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7c396d4c" name="Arrow Of Death">
+		<year>19??</year>
+		<manufacturer>File 1</manufacturer>
+	</hash>
+	<hash crc32="a34c0490" name="Artefakt (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5e4559f9" name="Ascii 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="08ac2d27" name="Ascii Art (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="224a081d" name="Ass Kisiel, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="006b7711" name="Asteroids">
+		<year>1981</year>
+	</hash>
+	<hash crc32="b328c117" name="Asteroids">
+		<year>1981</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="f6159eb7" name="Asteroids">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ddba68cb" name="Asteroids 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a464709b" name="Astro Chase">
+		<year>19??</year>
+	</hash>
+	<hash crc32="965d1d98" name="Astro Droid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c08b5a71" name="Astrogrover">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ede95232" name="Astron IX">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9967c62d" name="Astrowarriors">
+		<year>19??</year>
+	</hash>
+	<hash crc32="af1dae92" name="Atari Adventure">
+		<year>19??</year>
+	</hash>
+	<hash crc32="79c5e97b" name="Atari Blackjack Casino">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3f0a7185" name="Atari Dealer (demo) (19xx)[h]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="107d821b" name="Atari Invaders">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8e4cab4a" name="Atari Music">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9051dfbc" name="Atari Scene - Main Groups' Map v1.1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2642992e" name="Atari Star Force (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="40781a47" name="Atari Trivia">
+		<year>19??</year>
+	</hash>
+	<hash crc32="67fe230d" name="Ataroid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c1b19ce5" name="Atarowcze! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d0d3f5d2" name="Atartris">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dcb905c3" name="ATC (demo) (1993)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2ca81ec6" name="Atlantis">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c532f8b7" name="Atom Smasher">
+		<year>19??</year>
+	</hash>
+	<hash crc32="949de851" name="Atom Smasher [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="389824e6" name="Attack At EP-CYG-04">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f06a5a72" name="Attack Of The Mutant Camels [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c650d775" name="Attack Of The Mutant Camels">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2736736e" name="Aura BBS Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="04f5b45f" name="Aurum">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c4d36ece" name="Avalanche">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="5fee892c" name="Avalanche">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6b1a4a4e" name="Avalon Music (demo) (1993)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1afd97e0" name="Axel (demo) (19xx)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="2430cdb0" name="Axilox">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b1616d1f" name="Axis Assassin">
+		<year>19??</year>
+	</hash>
+	<hash crc32="72899509" name="Aztec">
+		<year>19??</year>
+	</hash>
+	<hash crc32="42d684b0" name="Aztec Challenge">
+		<year>1982</year>
+		<manufacturer>Cosmi</manufacturer>
+	</hash>
+	<hash crc32="70263bd0" name="Aztec Challenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e0036fae" name="Aztec Challenge 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="eb6abbdd" name="Babble (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="126a33d0" name="Bac Of Taquart Music (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dda126ea" name="Back To Life (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="565020e1" name="Back Track">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b028954" name="Bacterion! - The Plague Of 2369">
+		<year>19??</year>
+	</hash>
+	<hash crc32="81eeed37" name="Bacterion! - The Plague Of 2369 [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b04d3676" name="Baja Buggies">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="a4cc0c3b" name="Baja Buggies">
+		<year>19??</year>
+	</hash>
+	<hash crc32="213efe47" name="Baja Buggies [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d0dcd774" name="Ballblaster">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ed5dfddc" name="Ballblaster">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="759adaa9" name="Ballblazer">
+		<year>1983</year>
+		<manufacturer>Lucasfilm</manufacturer>
+	</hash>
+	<hash crc32="92b46f97" name="Ballblazer [a]">
+		<year>1983</year>
+		<manufacturer>Lucasfilm</manufacturer>
+	</hash>
+	<hash crc32="ed601202" name="Ballblazer">
+		<year>1985</year>
+	</hash>
+	<hash crc32="7a4ece19" name="Ballblazer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a9ef282" name="Ballistic Interceptor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a3ea0a2" name="Balltrap">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4180721a" name="Bank Bang">
+		<year>19??</year>
+	</hash>
+	<hash crc32="90215c47" name="Bank Panik">
+		<year>19??</year>
+	</hash>
+	<hash crc32="71999bb4" name="Banklan 2 (demo) (1994)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d5db2389" name="Bannercatch">
+		<year>19??</year>
+	</hash>
+	<hash crc32="07def0e0" name="Barahir">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c649e125" name="Baseball">
+		<year>1983</year>
+		<manufacturer>INHOME</manufacturer>
+	</hash>
+	<hash crc32="a87c6711" name="Basketball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a425a154" name="Bat &amp; Andy (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="db0cf6a4" name="Bat's Inf (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b3662648" name="Batman Pic (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a6259d6c" name="Battle In The B Ring">
+		<year>19??</year>
+	</hash>
+	<hash crc32="24070aff" name="Battle Ships">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c959a4be" name="Battleroom">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7efad8f6" name="Battleroom">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="56827a7f" name="BBSL Number 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ee2b15a" name="Bc's Quest For Tires">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6ad10d9c" name="BC's Quest For Tires [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2e37d3f2" name="Beamatron">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ffe08d63" name="Beamrider">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c14942db" name="Behind Jaggi Lines">
+		<year>1984</year>
+		<manufacturer>Lucasfilm</manufacturer>
+	</hash>
+	<hash crc32="ee50c7a0" name="Behind Jaggi Lines">
+		<year>19??</year>
+	</hash>
+	<hash crc32="43331e0f" name="Belmondo 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2fe7e6df" name="Berzerk">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="96a22d93" name="Berzerk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="20a28c61" name="Beta Lyri">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bb7ab3d0" name="Bhogoosh (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="52af38fc" name="Big Birds Special Delivery">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1ce7cec3" name="Big House">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a72307a2" name="Big In Japan (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="44c9ff89" name="Big Scroll (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19c27f9b" name="Bigbird">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0812be5" name="Bilbo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="762150b3" name="Bilbo [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5cd1caa9" name="Bill Gates (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bb62f34d" name="Billiards">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc81a38c" name="Bio-Defense">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a0b7332b" name="Bio-Defense [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="98f77589" name="Bird (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5d5ec3c6" name="Birth Of The Pheonix">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a1ebf5f7" name="Black Disk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dda06acc" name="Black Hawk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8318ae24" name="Black Hole">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e1b590aa" name="Black Lamp">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ff95926" name="Black Lamp [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ac22003" name="Blackjack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1e76f36d" name="Blast!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d9b01485" name="Blast! [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="541be1c1" name="Blinky's Scary School">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5fe826e1" name="Blip">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e5cb1488" name="Blip!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9657ce4" name="Blob (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f729bc07" name="Blocks">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e4db77e9" name="Blood Fighter (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f33f32ec" name="Blue Max">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b69345da" name="Blue Max [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="debc6ae5" name="Blue Max [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8defb4f0" name="Blue Max">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="1b9a9760" name="Blue Max 2001">
+		<year>19??</year>
+	</hash>
+	<hash crc32="83d668ea" name="Blue Max 2001 [h]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e7205e7e" name="Blue Print">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1bc8559d" name="Blue Thunder">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f1d17959" name="Blueprint [cr](5200)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3bfcd9e5" name="BMI Micro Chess">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0d3d7365" name="BMX">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cf71fca0" name="Bob's Land (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aa5877ab" name="Boing 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="98d9deb3" name="Boink! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="12d9afda" name="Bomb Bastic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="27e08261" name="Bomb Down">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a35c4329" name="Bomb Fusion">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b4916369" name="Bombjack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2de0cb9b" name="Bonanza (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6fc42813" name="Bonk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d5105409" name="Bonk [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e50bb27b" name="Bonus (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="58ec3f59" name="Bootleg">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1ca201e6" name="Boulder Bombers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="caf08ca9" name="Boulder Dash">
+		<year>19??</year>
+	</hash>
+	<hash crc32="848ca91d" name="Boulder Dash">
+		<year>19??</year>
+		<manufacturer>Cart Version</manufacturer>
+	</hash>
+	<hash crc32="6cd63cad" name="Boulder Dash">
+		<year>19??</year>
+		<manufacturer>Primitive</manufacturer>
+	</hash>
+	<hash crc32="c2f2065a" name="Boulder Dash '86">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a3128138" name="Boulder Dash - Alternate">
+		<year>19??</year>
+	</hash>
+	<hash crc32="68b90e17" name="Boulder Dash 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cdc9b437" name="Boulderdash">
+		<year>1982</year>
+		<manufacturer>First Star</manufacturer>
+	</hash>
+	<hash crc32="f301a502" name="Boulders And Bombs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c265130f" name="Bounty Bob Strikes Back!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7a8adb1b" name="Bounty Bob Strikes Back! [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c39c3590" name="Bowling">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4170c904" name="Breah, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="951d20c7" name="Breakout">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1ceb9259" name="Breath Of The Dragon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="23cb1490" name="Bricklayer's Nighmare">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c8d92079" name="Brickworks">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cbdb48d7" name="Bristles">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a7964294" name="Bristles">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="fd6c3cdf" name="Bristly Hedgehog Music Collection (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bc5f3c15" name="Bristy Hedgehog (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b85a7185" name="Bron Chaosu (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="de95e6b3" name="Bruce Lee">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4637dedf" name="BSS Magazine 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d4be72c0" name="BSS Magazine 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8d8966ba" name="Buck Rogers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0603d3c7" name="Buffalo Stampede">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a204d373" name="Bug Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f0ca49b" name="Bug Off">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d671c1df" name="Bughung">
+		<year>19??</year>
+		<manufacturer>Lightgun</manufacturer>
+	</hash>
+	<hash crc32="6bc24544" name="Bumper Ball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1c462250" name="Bumper Ball 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c713f7f0" name="Burgers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="58c63afd" name="Buried Bucks">
+		<year>19??</year>
+	</hash>
+	<hash crc32="17c6878a" name="Buried Bucks [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="43cace6e" name="Buried Bucks">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="a7170d87" name="Burt's Brew Biz!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d469c823" name="Burt's Brew Biz!">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="e84b8466" name="Busty (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="214e8b8f" name="Busy Baby">
+		<year>19??</year>
+	</hash>
+	<hash crc32="43d2711b" name="Busy Baby">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="bb684763" name="By Mistake (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d03209fd" name="C'est La Vie">
+		<year>1983</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="5d690d6c" name="Calculator">
+		<year>1979</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="df9fbb53" name="California Gold">
+		<year>19??</year>
+	</hash>
+	<hash crc32="90be4db1" name="California Gold">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="23601bfd" name="Cambodia">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a6ff9cf7" name="Camelot (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c10d2f3a" name="Candy Factory">
+		<year>1982</year>
+		<manufacturer>Gebelli</manufacturer>
+	</hash>
+	<hash crc32="a83acf6c" name="Cannibals">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2059a0c5" name="Canyon Climber">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19717628" name="Canyon Climber">
+		<year>19??</year>
+		<manufacturer>Cart Version</manufacturer>
+	</hash>
+	<hash crc32="3dca7834" name="Canyon Race">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9ac34c83" name="Captain Beeble">
+		<year>1982</year>
+		<manufacturer>INHOME</manufacturer>
+	</hash>
+	<hash crc32="a097c360" name="Captain Cosmo">
+		<year>1982</year>
+		<manufacturer>Nexa Corporation</manufacturer>
+	</hash>
+	<hash crc32="b054cccc" name="Captain Cosmo [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5ec01a26" name="Captain Gather">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7bdcc2d1" name="Captain Gather [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9848a93" name="Captain Sticky's Gold">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bbeda9f9" name="Captain Sticky's Gold">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="73d1b389" name="Capture The Flag">
+		<year>19??</year>
+	</hash>
+	<hash crc32="92ae0c42" name="Capture The Flag [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cbc36887" name="Capture The Flag">
+		<year>19??</year>
+		<manufacturer>Sirius</manufacturer>
+	</hash>
+	<hash crc32="088ba4c5" name="Car, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="72ec53eb" name="Carnival Massacre">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4fad436c" name="Carpe (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ba4062e5" name="Castle Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b6e722d6" name="Castle Hassle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="66616b87" name="Catapede">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ee0dba94" name="Catnap">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ba88c5f" name="Catnap">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="9ac576aa" name="Catterpiggle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="83462ac1" name="Catterpiggle">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="bb01c157" name="Cavelord">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="05ec2489" name="Cavelord">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d55a1383" name="Cavelord [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4fab3c02" name="Cavernia">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ae9be9b4" name="Caverns Of Khafka">
+		<year>1983</year>
+		<manufacturer>Cosmi</manufacturer>
+	</hash>
+	<hash crc32="a9cd7770" name="Caverns Of Mars">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4e2e93a1" name="Caverns Of Mars 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="56a80b5c" name="Caverns Of Mars 2 [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="74f523af" name="Cellar Terror">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2ea0d2ba" name="Centipede">
+		<year>1981</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="68e512a3" name="Centipede">
+		<year>19??</year>
+	</hash>
+	<hash crc32="325cee75" name="Centipede [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8996f45c" name="Centipede - 5200">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0fffac51" name="Centipede - 5200">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="b0546d92" name="Centipede - Atari 1982">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8a76fd2e" name="Centurion - Defender Of Rome">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2c8e4b39" name="Challenge 5">
+		<year>19??</year>
+	</hash>
+	<hash crc32="21fe08d6" name="Chambers Of Zorp">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7d938a9c" name="Change">
+		<year>19??</year>
+	</hash>
+	<hash crc32="76bf7e08" name="Chaos Music Composer (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a3aaac9" name="Chaotic, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="05320303" name="Charts 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f4abd32f" name="Checker King">
+		<year>1980</year>
+	</hash>
+	<hash crc32="76b4281a" name="Checkers">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="0611ff7d" name="Checkers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6703fa59" name="Checkers [a]">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="0e4b2d4f" name="Checkers - Version 2.1">
+		<year>19??</year>
+	</hash>
+	<hash crc32="970c1835" name="Checkers - Version 2.1 [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5667a902" name="Chess">
+		<year>1978</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="dc867afe" name="Chess">
+		<year>19??</year>
+		<manufacturer>Parker Bros</manufacturer>
+	</hash>
+	<hash crc32="de8b579e" name="Chicken">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a1fe939" name="Chimera">
+		<year>19??</year>
+	</hash>
+	<hash crc32="abc762c1" name="Chiseler">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0c8887e6" name="Chomper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fee1f9c0" name="Chop Suey">
+		<year>1985</year>
+		<manufacturer>English Software</manufacturer>
+	</hash>
+	<hash crc32="38e26637" name="Chop Suey">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cfae7f0f" name="Chop Suey [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d055cbbf" name="Chop Suey">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="f65e6585" name="Choplifter">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="f638f284" name="Choplifter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5ce51ec0" name="Choplifter [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2b9fa60d" name="Chopper Hunt">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d1567209" name="Chopperoid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3e7ca709" name="Chuckie Egg">
+		<year>1985</year>
+		<manufacturer>A&amp;F Software</manufacturer>
+	</hash>
+	<hash crc32="40333735" name="Chuckie Egg">
+		<year>19??</year>
+	</hash>
+	<hash crc32="40f7d85b" name="Cimex Rex">
+		<year>19??</year>
+	</hash>
+	<hash crc32="393b054c" name="CIS (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="13a930f9" name="Citadel Warrior">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e8061067" name="Citadel, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c68ebcf1" name="Claim Jumper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7c6975de" name="Clash Of Kings, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7e0bc6ef" name="Clash Of Kings, The [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ee8f57d6" name="Climber">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dcda4f45" name="Cloud Hopper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a777e6b5" name="Clowns &amp; Balloons">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f277514" name="CMC Music Set (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5dcf75fd" name="CMC Volume Master Disk No.#1234 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f772bee3" name="Cobra Team (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="40474988" name="Cohen's Towers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c07b09d0" name="Cohen's Towers [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4dbc49ab" name="Collision Course">
+		<year>19??</year>
+	</hash>
+	<hash crc32="631c1c26" name="Colony">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3b76fa0a" name="Colony 7">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3c156c47" name="Colossal Adventure">
+		<year>19??</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="27bcad55" name="Colossus Chess 3">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4cafcb5c" name="Colossus Chess 4.1">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ad87b3c6" name="Comet Game">
+		<year>19??</year>
+	</hash>
+	<hash crc32="03e4c246" name="Commando V. (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ceb6408b" name="Commbat">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b0d5564" name="Commbat">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7ae3c9ec" name="Commodore 64 Basic v2 (demo) (19xx)[a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9258dd32" name="Commodore 64 Basic v2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="be4c433f" name="Commodore 64 Basic v2 (demo) (19xx)[a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="18dfae0f" name="Computer Adventure">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e6b8fb0f" name="Computer War">
+		<year>19??</year>
+	</hash>
+	<hash crc32="34420378" name="Congo Bongo">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="4395fc2d" name="Congo Bongo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f6dee321" name="Congo Bongo [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ef7d4baa" name="Construction Kitt (demo) (1992)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="50c9afa1" name="Contagion">
+		<year>19??</year>
+	</hash>
+	<hash crc32="931f0d38" name="Convicts, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1abbd153" name="Copter Chase">
+		<year>19??</year>
+	</hash>
+	<hash crc32="51958a20" name="Copy Party (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="00b6083b" name="Copy-Party (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="871e7676" name="Cosinus (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ae1e60bd" name="Cosmic Defender">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5c121e14" name="Cosmic Defender">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="b0987afa" name="Cosmic Glob">
+		<year>19??</year>
+	</hash>
+	<hash crc32="67c29024" name="Cosmic Glob [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="22365208" name="Cosmic Glob 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fb527513" name="Cosmic Life">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a07d9fa" name="Cosmic Tunnels">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ee0b8e65" name="Cosmic Zap">
+		<year>19??</year>
+	</hash>
+	<hash crc32="629b4477" name="Count">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6212e959" name="Countdown">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a7cb889f" name="Countdown [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1c08a554" name="Countdown">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="87387ce5" name="Countdown">
+		<year>19??</year>
+		<manufacturer>Synapse</manufacturer>
+	</hash>
+	<hash crc32="657d6376" name="Counter Measure">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5e32af95" name="Countermeasures [cr]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="07fd7aef" name="Crab Nebula">
+		<year>19??</year>
+	</hash>
+	<hash crc32="693ba5e2" name="Crack-Up!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="066b6e82" name="Craps Simulator">
+		<year>19??</year>
+	</hash>
+	<hash crc32="56abdad3" name="Crash Dive!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9a0b6c4e" name="Crazy Cars (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b4966fca" name="Crazy Cars (demo) (19xx)[a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="899e82a3" name="Crazy Clown Jumper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="db76e08a" name="Crazy Scooter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c011f09b" name="Creep PAL">
+		<year>19??</year>
+	</hash>
+	<hash crc32="81fa0fe4" name="Creepshow Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ad0a4bd0" name="Crockford's Trench">
+		<year>1982</year>
+		<manufacturer>Atari Research</manufacturer>
+	</hash>
+	<hash crc32="448f148f" name="Crossfire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca6d25d7" name="Crossfire [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="412275f0" name="Crossword Magic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f77ec1fe" name="Crowley Manor">
+		<year>1982</year>
+	</hash>
+	<hash crc32="ccfbb46f" name="Cryphara (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6fa308ae" name="Crypts Of Egypt">
+		<year>19??</year>
+	</hash>
+	<hash crc32="823eb8f4" name="Crypts Of Polumbous">
+		<year>19??</year>
+	</hash>
+	<hash crc32="799a18db" name="Crystal 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bdd1dfc4" name="Crystal 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ecc9b780" name="Crystal 3 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bf48c859" name="Crystal 4 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e13438d0" name="Crystal 5 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a9ab1bab" name="Crystal Castles">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bdf7459d" name="Crystal Raider">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5ba5af12" name="Crystal Raider [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a4583f83" name="Cuthbert Goes Walkabout">
+		<year>19??</year>
+	</hash>
+	<hash crc32="06f226ba" name="CuttleMania!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="77d1b881" name="Cvtnum - Version 1.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19fb1dab" name="Cypher Bowl">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4fb8af42" name="Cyrtabor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="11690c08" name="Cytron Masters">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b839b3d5" name="Cywiliza">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2ce2defe" name="Czarny Orzet">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e7370e20" name="Czarny Orzet [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3ef6ca0b" name="Czerny (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="74458f0a" name="Da' Fuzz">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3237fca5" name="Dagobar">
+		<year>19??</year>
+	</hash>
+	<hash crc32="28655599" name="Dagobar [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a0c365e8" name="Dan Strikes Back">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c2dffd6d" name="Dan Strikes Back [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fd0e196c" name="Dance Fantasy">
+		<year>1984</year>
+		<manufacturer>Fisher-Price</manufacturer>
+	</hash>
+	<hash crc32="8b6a896b" name="Dancing Feats">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a849ffa2" name="Danger Ranger">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9bc3d59d" name="Darg">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ea5d3ce" name="Dark Abyss">
+		<year>19??</year>
+	</hash>
+	<hash crc32="22b8d000" name="Darkness Hour">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f3c0004f" name="Darkness Hour [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f339e53f" name="Darkstar">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c84a2531" name="Darkstar [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="09b3eef5" name="Darts">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f27ae874" name="Das Anty (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="057e43b3" name="Das Omen (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="209ed065" name="Das Thera-Med">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e67546eb" name="Das Thera-Med">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="69066642" name="Daxey Music (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9eb6c49" name="Dbase 1 Trivia (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c4cf4ba6" name="Death For Dealers (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c574e118" name="Death For Tiran (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="83b1987c" name="Death Races [cr]">
+		<year>1987</year>
+	</hash>
+	<hash crc32="18e8d63d" name="Death Star">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d03d9a54" name="Death Zone">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b3d8368e" name="Death Zone">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="29d50f09" name="Death Zone Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc9ea8b9" name="Deathland">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c965e46b" name="Decathalon">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="0d265e74" name="Decathalon [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dfbd6557" name="Decathlon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5132a9e1" name="Defender [a]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="c9a11f2d" name="Defender">
+		<year>1982</year>
+	</hash>
+	<hash crc32="a10680e6" name="Defender">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="0897810e" name="Defender">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3f06d4a1" name="Deimos">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b2794df9" name="Delirium Tremens (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3859fb97" name="Delta Drawing 3.20">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a39fa73" name="Delta Drawing 3.23">
+		<year>19??</year>
+	</hash>
+	<hash crc32="257fe572" name="Deluxe Invaders">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a4ef11b8" name="Demo II, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f7c4e745" name="Demon Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="87d7d9e1" name="Demon Racer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e125f069" name="DemonBirds">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cced30d5" name="DemonBirds">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="1c6b11c0" name="Denomia Effects (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="24319aea" name="Der Blitz!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4198ff0b" name="Designer's Pencil, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d14d4208" name="Desmond's Dungeon [a]">
+		<year>1984</year>
+		<manufacturer>Creative Sparks</manufacturer>
+	</hash>
+	<hash crc32="20284565" name="Desmond's Dungeon">
+		<year>1984</year>
+		<manufacturer>Creative Sparks</manufacturer>
+	</hash>
+	<hash crc32="c0d9e202" name="Desmond's Dungeon [a2]">
+		<year>1984</year>
+		<manufacturer>Creative Sparks</manufacturer>
+	</hash>
+	<hash crc32="c9b0333d" name="Despatch Rider">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3ba1a861" name="Destination Unknown">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f2eab233" name="Destiny The Crusier">
+		<year>19??</year>
+	</hash>
+	<hash crc32="80e19f84" name="Devil's Dare">
+		<year>19??</year>
+	</hash>
+	<hash crc32="62988118" name="Diamond Mine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fba4eee5" name="Diamonds">
+		<year>19??</year>
+	</hash>
+	<hash crc32="82788f4c" name="Diamonds 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="201e22ae" name="Diane's Magic Game">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ed5cd194" name="Dictaceb (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c0ba7fac" name="Diese Wurde (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="38443a74" name="Dig Dug">
+		<year>1982</year>
+	</hash>
+	<hash crc32="68052f80" name="Dig Dug">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="68d0e893" name="Dig Dug">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="9471bdc2" name="Dig Dug">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d13cac79" name="Diggerbonk">
+		<year>1982</year>
+	</hash>
+	<hash crc32="98f41aa6" name="Diggerbonk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7f275123" name="Digi Duck">
+		<year>19??</year>
+	</hash>
+	<hash crc32="df7a6b45" name="Digital Bonanza (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="36d44661" name="Digital CMC II (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0b01a2e5" name="Digital Concert II (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ded1be1a" name="Digital Dream (demo) (1992)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3fb64a76" name="Digital Technology (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="72666ae9" name="Digital Trash (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="18eb2760" name="Dimension X">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9f68a029" name="Dimension X - Deluxe Version">
+		<year>19??</year>
+	</hash>
+	<hash crc32="eb6664df" name="Dinamic (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c0a62c84" name="Dinky-Do">
+		<year>19??</year>
+	</hash>
+	<hash crc32="33041dea" name="Directory Master (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="561425ef" name="Disassembler 6502 - Version 1.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2cbbd7ce" name="Dizzy Dice">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d8d3b2ea" name="Do You (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9fe753e1" name="Doctor Boris!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9c5aaf04" name="Dog Daze">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d7f78e1b" name="Dog Daze Deluxe">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="b42cbff0" name="Dog Daze Deluxe [a]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="dfdf7ff6" name="Dog Daze Deluxe">
+		<year>1983</year>
+	</hash>
+	<hash crc32="73eb6f82" name="Don't Shoot That Word">
+		<year>19??</year>
+	</hash>
+	<hash crc32="97d0d70c" name="Donkey Kong [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6e3d3477" name="Donkey Kong">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d3ad1b49" name="Donkey Kong Junior">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9cf73df1" name="Donkey Kong Junior [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="359ed74a" name="Double Scroll (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="830dcba5" name="Dr. Seuss - Fix-up The Mix-up Puzzler">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="d6c9b67b" name="Dr. Seuss - Fix-up The Mix-up Puzzler">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f29226a2" name="Draconus">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e3d1b009" name="Draconus (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="09e6ad9b" name="Draconus 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dadd8f2f" name="Dracula (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a914e42e" name="Dreadnaught Factor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7cdd4c28" name="Dreadnought">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b314a4eb" name="Dream, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a7967eec" name="Drelbs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="364f9b5e" name="Droga Wojowmika Nstracja (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5c0fb39b" name="Drogawoj">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7cb0461b" name="Droids">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a36798d" name="Drop It">
+		<year>19??</year>
+	</hash>
+	<hash crc32="97dee64b" name="Dropzone">
+		<year>1984</year>
+	</hash>
+	<hash crc32="821d99f6" name="Dropzone">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="5ac850d6" name="Dropzone">
+		<year>19??</year>
+		<manufacturer>Crack</manufacturer>
+	</hash>
+	<hash crc32="d4765f46" name="Druid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e4822ce0" name="Druids (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c07940ea" name="Drunk Chessboard (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="45efc14b" name="Drunk Tank (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6e5680d9" name="Ducks Ahoy!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cf57415e" name="Duelists, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="13577a65" name="Duksap (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ab596e30" name="Dungeon Adventure">
+		<year>19??</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="f7d1c7bc" name="Dungeonlords">
+		<year>19??</year>
+	</hash>
+	<hash crc32="432140a0" name="Dziedzic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c0dbb812" name="E Factor, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="08b20e22" name="E.T. Phone Home!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2bcc9181" name="Eagle (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="94cfc798" name="Earth (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca00b6aa" name="Earth Views (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="370d6e7e" name="Earthquake 1906">
+		<year>1982</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="5116d4e6" name="East Party 2000 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ee8e239b" name="Eastern Front">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="1d3b07f0" name="Eastern Front 1941">
+		<year>19??</year>
+	</hash>
+	<hash crc32="571de2b4" name="Easy Money">
+		<year>19??</year>
+	</hash>
+	<hash crc32="02e4c1ee" name="Eggard [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="996946f7" name="Eggard">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5e5d8a9a" name="Electra">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d4d5ecc0" name="Electrician">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="d57805af" name="Electrician">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9e0e1b29" name="Electrician [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="11fe7f49" name="Electrician Title">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c7855623" name="Electroids, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c9ce2a9c" name="Electroids, The [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bdc0f7dd" name="Elektraglide [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8298422e" name="Elektraglide">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d61d0179" name="Elenium Sword (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2622add0" name="Elevator Repairman">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ae39a13" name="Eliminator">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ec9303c" name="Eliza">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4350e912" name="Embargo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d3a9a6d8" name="Emerald Isle [a]">
+		<year>1985</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="2cd4f8d1" name="Emerald Isle">
+		<year>1985</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="cf4a6474" name="Emil-Hilf">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ecb1dd6d" name="Empire Strikes Back, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="39f6f6ca" name="Encounter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="150253e7" name="Encounter! [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f5e38ea2" name="Encounter!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d44bca8d" name="Engine (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="087bd7dc" name="Equation Of Time (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dbffbd4c" name="Equestrian [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b14754a1" name="Equestrian">
+		<year>19??</year>
+	</hash>
+	<hash crc32="155db9c2" name="Erg">
+		<year>1984</year>
+		<manufacturer>D-Mind Software</manufacturer>
+	</hash>
+	<hash crc32="fe9fc992" name="Eriban">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b1d56a79" name="Ernies Magic Shapes">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5718e331" name="Eryus">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ed23992c" name="Eryus">
+		<year>19??</year>
+	</hash>
+	<hash crc32="12308bb3" name="Escape From Doomworld">
+		<year>19??</year>
+	</hash>
+	<hash crc32="69c4c4e9" name="Escape From Satellite A19790C">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ce4a53e5" name="Escape From Traam">
+		<year>1982</year>
+	</hash>
+	<hash crc32="a7e0b07a" name="Escape From Traam">
+		<year>1982</year>
+		<manufacturer>Alt</manufacturer>
+	</hash>
+	<hash crc32="e3d2265e" name="Espial">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8008aa13" name="Espial">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="73f5d810" name="Ethinicolor (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0cf185a3" name="Eureka">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1bbfc217" name="Evolution">
+		<year>19??</year>
+	</hash>
+	<hash crc32="715b3bf1" name="Excelsor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4b7b1853" name="Exchange">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ebecb3d1" name="Exit Watch">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cd3ac18e" name="Exocet Blastoff">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bac483e9" name="Exodus Music (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a59f270d" name="Express! 3.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="39122add" name="Exterminator, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="16626624" name="Extirpator, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a34b4c70" name="Eye Of The Tiger (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="34b0f595" name="F-15 Strike Eagle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9c26fdb" name="F-15 Strike Eagle [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b311cf58" name="Face Maker">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a09a24fe" name="Face Maker">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="d2c71525" name="Factor Blast">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c7402315" name="Fantastic Voyage">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5bf049c1" name="Fast Eddie">
+		<year>1982</year>
+		<manufacturer>Sirius</manufacturer>
+	</hash>
+	<hash crc32="d968a166" name="Fast Eddie">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4db86d81" name="Fastgammon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="be946619" name="Fatum">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f44d5b6" name="Fatum (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fd18e99d" name="Fear">
+		<year>19??</year>
+	</hash>
+	<hash crc32="48e89cb7" name="Fidget">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e2d19f54" name="Fighter Pilot">
+		<year>1982</year>
+		<manufacturer>Interceptor Software</manufacturer>
+	</hash>
+	<hash crc32="2d6104a6" name="Fighter Pilot">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="53488203" name="Fighter Pilot [a]">
+		<year>1982</year>
+		<manufacturer>Interceptor Software</manufacturer>
+	</hash>
+	<hash crc32="9acfad8b" name="Fill'er Up! 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d043e6e8" name="Film Editor (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="80f9cf4c" name="Film Editor Player (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a395becb" name="Final Flight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1dd03e72" name="Final Legacy">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="21a25ce1" name="Final Legacy [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d9871ca3" name="Final Legacy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="01e5472d" name="Final Orbit [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5d26fcc0" name="Final Orbit">
+		<year>19??</year>
+	</hash>
+	<hash crc32="68887384" name="Final Standings Of The -Competition (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="15f270d5" name="Fire Chief">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f6207964" name="Fire One">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a832352" name="Firebird">
+		<year>19??</year>
+	</hash>
+	<hash crc32="218a6c0f" name="Firebug">
+		<year>19??</year>
+	</hash>
+	<hash crc32="40e0588b" name="Firefleet">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d4e23c2" name="Fireworks">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3d7fb627" name="First, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a9efdd32" name="Fish-Adventures Of Mr. Fish, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bfccc4f6" name="Fishing Fun">
+		<year>19??</year>
+	</hash>
+	<hash crc32="60f27d0c" name="Five Card Stud Poker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a4f99ea" name="Five To Five (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6b314ee9" name="Flak">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a4b9bfda" name="Flash Gordon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7209f267" name="Flip And Flop">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7bbd27bb" name="Flip And Flop">
+		<year>19??</year>
+	</hash>
+	<hash crc32="33eb82e2" name="Flipper (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7a6c161c" name="Floor Walker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1fe25b05" name="Floyd The Droid Goes Blastin'">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3c2e7593" name="Floyd The Droid Goes Blastin' [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="643404fa" name="Fly Blaster">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6177959f" name="Flying Ace">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4bf1ef88" name="Food Fight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="873a5ad4" name="Football">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="6d9bdcdc" name="Football">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1860bf72" name="Forbidden Forest">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0b914bc6" name="Forest (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c49ae2a1" name="Fort Apocalypse">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c35d55a5" name="Fort Apocalypse [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f042a1b0" name="Fort Apocalypse DV">
+		<year>19??</year>
+	</hash>
+	<hash crc32="edb5b591" name="Fortress">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7340d725" name="Fortress">
+		<year>19??</year>
+	</hash>
+	<hash crc32="95070169" name="Four By Four Square">
+		<year>19??</year>
+	</hash>
+	<hash crc32="407f0dfc" name="Fraction Fever">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f4c6eda3" name="Fred">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4c8ad6bc" name="Frogger">
+		<year>19??</year>
+	</hash>
+	<hash crc32="49f686c3" name="Frogger 2 - Three Deep">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a3c467a4" name="Froggie">
+		<year>19??</year>
+	</hash>
+	<hash crc32="05be290b" name="Frogs And Flies [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d4d020c0" name="Frogs And Flies">
+		<year>19??</year>
+	</hash>
+	<hash crc32="959f3f7c" name="Fucked Vocabulary (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="de33f422" name="G Men">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1210fd9b" name="Galactic Avenger">
+		<year>19??</year>
+	</hash>
+	<hash crc32="54510f8c" name="Galactic Chase">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a42e79e0" name="Galactic Chase [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="40cff1f3" name="Galahad And The Holy Grail">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f63cecb5" name="Galaxian">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e486d642" name="Galaxian">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d04bfe75" name="Gallahad">
+		<year>19??</year>
+	</hash>
+	<hash crc32="99196376" name="Game Of Live!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0e4392cc" name="Gateway To Apshai">
+		<year>1983</year>
+		<manufacturer>Epyx</manufacturer>
+	</hash>
+	<hash crc32="a0098ce4" name="Gateway To Apshai">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e5a7a264" name="Gato 128K">
+		<year>19??</year>
+	</hash>
+	<hash crc32="085ae90d" name="Gauntlet [a]">
+		<year>19??</year>
+		<manufacturer>Shooter</manufacturer>
+	</hash>
+	<hash crc32="27d4f6b9" name="Gauntlet">
+		<year>19??</year>
+		<manufacturer>Shooter</manufacturer>
+	</hash>
+	<hash crc32="3243dbcf" name="Gauntlet">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="f0af3c14" name="General 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f5ff1841" name="General 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f9a72406" name="Genesis">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0b147cbd" name="Genetic Drift">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d5cb764" name="Get Out Your Lazy Bed (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5fbe42b0" name="Getaway!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d28252df" name="Ghost Chaser [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f3718e85" name="Ghost Chaser">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6d399e93" name="Ghost Encounters">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2b2401d1" name="Ghost Hunter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6692c7c3" name="Ghost!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="64a2e234" name="Ghostbusters">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53098303" name="Ghostbusters [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e0891add" name="Ghostbusters Voice">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b5ec407b" name="Girl, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d66a1786" name="Gitter (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cb4f2e81" name="Glactic Chase">
+		<year>19??</year>
+	</hash>
+	<hash crc32="48ffa8d3" name="Gladiator">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5b5fbfd3" name="Global War">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3f56ec3e" name="Go">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c09db082" name="Golf Challenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="70b82f0f" name="Golfer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="57d6d31e" name="Golfer [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="858759a1" name="Gomoku">
+		<year>19??</year>
+	</hash>
+	<hash crc32="93b64113" name="Gorf">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="f13505ad" name="Gorf">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ccc9c37a" name="Gossip">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dcb478f9" name="Graphics 8 &amp; 9 Picture Display">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b5dba9c6" name="Graphics Collection #1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7dfda60a" name="Gravity '97 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="73e21328" name="Great American Cross Country Road Race, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9c0cd6be" name="Great Lakes Atari Computer Users Conference (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d021e588" name="Green Beret">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a1fb268a" name="Gremlins [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a928b419" name="Gremlins">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a6acca52" name="Gremlins">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="5fe966f0" name="Gridrunner">
+		<year>1983</year>
+		<manufacturer>Human Engineered Software</manufacturer>
+	</hash>
+	<hash crc32="d02e2cb8" name="Gridrunner">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dffc9c33" name="Gridrunner 2 - Attack Of The Mutant Camels">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4597cb1b" name="Groove PAL">
+		<year>19??</year>
+	</hash>
+	<hash crc32="56468a62" name="Gumball [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e6655cdc" name="Gumball">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="e6948887" name="Gumball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="29ee45ad" name="Gumby">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d3a1b382" name="Gun-Powder-Charlie">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5ac9adeb" name="Gunfight">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="51adef69" name="Gunfight [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4b2f3e93" name="Gunfight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5c3d8ba9" name="Gunfight 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d58c4b29" name="Guns 'N Roses (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="da50cff1" name="Gunship Hit Space (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9b7311c1" name="Gutek Music (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e3ddd5ce" name="Gyruss">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bce695cb" name="Gyruss [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8e865d3e" name="H.E.R.O [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="72b29410" name="H.E.R.O">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19626b65" name="H2O">
+		<year>19??</year>
+	</hash>
+	<hash crc32="df4391f8" name="Hacker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="458004aa" name="Halftime Battlin' Bands">
+		<year>19??</year>
+	</hash>
+	<hash crc32="519fe4df" name="Halo! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="33736cb1" name="Hans Kloss">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c36e68f1" name="Happy Train To Kingdom Of Pleasures (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="03635467" name="Hard Hat Mack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0415794d" name="Hard Hat Mack">
+		<year>19??</year>
+		<manufacturer>Electronic Arts</manufacturer>
+	</hash>
+	<hash crc32="d9881c13" name="Hardball">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="61dc10e5" name="Hardball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="558e741b" name="Hardhat Willy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e4f48fbd" name="Haunted Hill">
+		<year>1982</year>
+		<manufacturer>Swifty Software</manufacturer>
+	</hash>
+	<hash crc32="4d6cbef7" name="Haunted Hill">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7ad5fa9d" name="Hawkmoon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9e5984f2" name="Hazard Run">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3f8ad664" name="Heart Break">
+		<year>19??</year>
+	</hash>
+	<hash crc32="11dc08ff" name="Heartlight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f00c96ae" name="Hearts">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fe54a74f" name="Heavy Metal [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca614686" name="Heavy Metal">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b2c3827d" name="Helix">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ed26dbb2" name="Henri">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2e793a59" name="Henri [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="78ce71c3" name="Henry's House">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="edddad29" name="Henry's House">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d2c24971" name="HI FI Music (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="302fe295" name="Hi Guys (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="638a3939" name="High Voltage, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bb753849" name="Highrise">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c5c2d62e" name="Highway Duel">
+		<year>19??</year>
+	</hash>
+	<hash crc32="35b280aa" name="Hijack!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="04d34c98" name="Hillemann &amp; Jung (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2659d0c4" name="Hillemann &amp; Jung 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6c8ec37d" name="Hip Pictures (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fd792352" name="Historia (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a1c9d53e" name="Hivmania (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="54d77811" name="Hlavolam 1">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cb087f7b" name="Hlavolam 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="26bc4fd8" name="Hobbey Tronic (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="48234051" name="Hockey Gamma">
+		<year>19??</year>
+	</hash>
+	<hash crc32="31a26b27" name="Hollywood Medieval">
+		<year>1982</year>
+		<manufacturer>Atari Research</manufacturer>
+	</hash>
+	<hash crc32="57f5881c" name="Homer's Honey Craze">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9e48bdb3" name="Hot Lips">
+		<year>1982</year>
+		<manufacturer>London Software</manufacturer>
+	</hash>
+	<hash crc32="9ace6448" name="House Of Crystals (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="46fddc85" name="House Of Usher">
+		<year>1985</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="82960cb9" name="House Of Usher">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5228ee0d" name="Hover Bovver">
+		<year>19??</year>
+	</hash>
+	<hash crc32="30bdb1d5" name="HTT Intro 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4481a2ea" name="Humpty Dumpty - Jigsaw Puzzle">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="28840dc4" name="Humpty Dumpty - Jigsaw Puzzle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a504c915" name="HVX Intro 95 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b10b6fb6" name="Hydraulik">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bc957bf7" name="Hydraulik 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d14d8c04" name="Hyperblast!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="af0c363f" name="I Like Chopin (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f2eee518" name="I Love Perestroyka (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1b380347" name="I4K (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="02bb2ae4" name="I8K (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2fd148be" name="Il3 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3051e864" name="Imagine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="254fad9f" name="Impact">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e0e6aab0" name="Incoming!!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53a48316" name="Incredible Laboratory, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a5359f3f" name="Inquisators Intro (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d5736109" name="Insects">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a871e2c" name="Inside Out (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ac47d80" name="Inspektor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="56969c74" name="Intel Outside 4 Invitation (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0faf4f6" name="Intel Outside 4 Invitation (demo) (19xx)[a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="371f5ef5" name="International Karate">
+		<year>19??</year>
+	</hash>
+	<hash crc32="75126a23" name="Into The Eagle's Nest">
+		<year>19??</year>
+	</hash>
+	<hash crc32="42a31bb5" name="Into The Eagle's Nest">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="eece3447" name="Intro (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8387aff8" name="Intro 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="73429b5c" name="Intro 97 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a475f732" name="Introx (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="663af91e" name="Intuitare">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8f341cb9" name="Invasion">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5185f621" name="Invitro (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9fbb3c7" name="Ion Roadway">
+		<year>19??</year>
+	</hash>
+	<hash crc32="447f151f" name="Ion Roadway">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="a9eea39f" name="IQ Master">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f41faa4c" name="Iraq (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3776b97c" name="Iron Roadway">
+		<year>19??</year>
+	</hash>
+	<hash crc32="94f08f2b" name="Ixion">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c3513068" name="Jackson Billy Jean (demo) (1990)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="13c04cc9" name="Jaffar">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2aa3132e" name="Jaffar [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e99934b2" name="James Bond [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dfb644ea" name="James Bond">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="015146fa" name="James Bond">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f025b6db" name="James Bond - Moonraker">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="b81fd439" name="James Bond - Moonraker">
+		<year>1984</year>
+		<manufacturer>Parker Bros</manufacturer>
+	</hash>
+	<hash crc32="1573f550" name="Jaskiniowiec (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="424be412" name="Java Jim">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bcdcdea6" name="Jaw Breaker">
+		<year>1980</year>
+		<manufacturer>Sierra On-Line</manufacturer>
+	</hash>
+	<hash crc32="a2ed0578" name="Jawbreaker - A">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7211e7f5" name="Jawbreaker - B [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="db98551b" name="Jawbreaker - B">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f8dde3b9" name="Jawbreaker II [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e98be98b" name="JawbreakerII">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="8c14face" name="JawbreakerII">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7fc3b144" name="Jeepers Creepers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f574a2d7" name="Jet Boot Jack">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="c09409fb" name="Jet Boot Jack [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="497fed17" name="Jet Boot Jack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d0f88867" name="Jet Fighter (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="beb8a622" name="Jet Set Willy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="696c6e6d" name="Jet, The - Action">
+		<year>19??</year>
+	</hash>
+	<hash crc32="06803513" name="Jet, The - Action [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="47d6f309" name="Jetman">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d8031730" name="JHS Victoria 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c28c6869" name="Jigsaws - Arch De Triumph">
+		<year>19??</year>
+	</hash>
+	<hash crc32="26681709" name="Jigsaws - Baa Baa Black Sheep">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c76296c8" name="Jigsaws - Bavarian Castle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2ab5ed73" name="Jigsaws - Hickory Dickory Dock">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a3a8be2a" name="Jigsaws - London Bridge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ce217755" name="Jigsaws - Parthenon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e463987e" name="Jigsaws - Tower Of London">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19564c71" name="Jigsaws - Windsor Castle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="110d6133" name="Jocky Wilson's Darts Challenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a11a4aa0" name="Joe Blade">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d99bf4c1" name="John Anderson's Rally Speedway [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="331a5108" name="John Anderson's Rally Speedway [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="520842d0" name="John Anderson's Rally Speedway">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="e4b5fb90" name="John Anderson's Rally Speedway">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e96a23f2" name="Joint (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3b4fe445" name="Journey To The Planets">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc97c90e" name="Journey To The Planets">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="4f146676" name="Joust">
+		<year>19??</year>
+	</hash>
+	<hash crc32="eddfc456" name="Jr. Pac-Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="10eaea9b" name="Jr. Pac-Man">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7d72e0a3" name="Juggler">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f9dc3052" name="Juice">
+		<year>19??</year>
+	</hash>
+	<hash crc32="79c9c11a" name="Juice">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="ba1b0250" name="Jumbo Jet Pilot">
+		<year>1982</year>
+		<manufacturer>Thorn EMI</manufacturer>
+	</hash>
+	<hash crc32="93af29f3" name="Jumbo Jet Pilot">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d6733387" name="Jump!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4f92a2ef" name="Jumping Jack">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="423acd83" name="Jumping Jack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="de9bce23" name="Jumping Jacks Big Adventure">
+		<year>19??</year>
+	</hash>
+	<hash crc32="31c3e032" name="Jumping Jim - Version 0.3">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bb76d279" name="Jumpjet">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5eebfdb7" name="Jumpman Jr">
+		<year>1983</year>
+		<manufacturer>Epyx</manufacturer>
+	</hash>
+	<hash crc32="7a361ae0" name="Jumpman Junior">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d23b4dbe" name="Jumpman Junior [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bffdb466" name="Jungle Boy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="88f60675" name="Jungle Hunt">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8e093eba" name="Juno First">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="84c0b88a" name="Juno First">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d034eed7" name="Jurrasic Park">
+		<year>19??</year>
+	</hash>
+	<hash crc32="acb8fbc9" name="Just (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="72630863" name="K-Razy Antiks">
+		<year>1982</year>
+		<manufacturer>K-Byte</manufacturer>
+	</hash>
+	<hash crc32="1e88cf9b" name="K-Razy Shootout">
+		<year>19??</year>
+	</hash>
+	<hash crc32="05071bd0" name="K-Robbo No.1 (Po)">
+		<year>1995</year>
+		<manufacturer>Luk Soft</manufacturer>
+	</hash>
+	<hash crc32="375eaae8" name="K-Robbo No.2 (Po)">
+		<year>1995</year>
+		<manufacturer>Luk Soft</manufacturer>
+	</hash>
+	<hash crc32="0035578d" name="K-Robbo No.3 (Po)">
+		<year>1995</year>
+		<manufacturer>Luk Soft</manufacturer>
+	</hash>
+	<hash crc32="da74b912" name="K-Robbo No.4 (Po)">
+		<year>1995</year>
+		<manufacturer>Luk Soft</manufacturer>
+	</hash>
+	<hash crc32="ba5ceb32" name="K-Star Patrol">
+		<year>19??</year>
+	</hash>
+	<hash crc32="062cd512" name="Kaboom!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="61076ba4" name="Kaboom!">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="4bc87a5e" name="Kaleidoscope 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8a3e47ec" name="Kaleidoscope 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="76b5beff" name="Kamakazi">
+		<year>19??</year>
+	</hash>
+	<hash crc32="73aca516" name="Kangaroo [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53b4704d" name="Kangaroo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bcd88d9e" name="Kaos 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c739fd09" name="Kapitan Planeta">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7c83ae5a" name="Karate Champ II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="851e2384" name="Kariera">
+		<year>19??</year>
+	</hash>
+	<hash crc32="77bace68" name="Karmic Caverns">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19c77ba8" name="Kasiarz Bank">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ef2c4da8" name="Kaszana (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d16af4f" name="Kayos">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b2c4d8e2" name="Kazoo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a42c4c2" name="Key Chase">
+		<year>19??</year>
+	</hash>
+	<hash crc32="90114f09" name="Keystone Kapers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c0248e82" name="Keystone Kapers">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="8d799f1f" name="Kickback">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a2e552a" name="Kickoff PAL">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1f5390c6" name="Kid Grid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0369d0b" name="Kids On Keys">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e3ea1d0a" name="Kik-Start">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ae46bcba" name="Kik-Start [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2c8adc7a" name="Kikstart 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9234895c" name="Kill Zone, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="373d897c" name="Killa Cycle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8e03b0f9" name="Killer 'Thello">
+		<year>19??</year>
+	</hash>
+	<hash crc32="117b05cd" name="King Of The Ring">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6979c141" name="Kissin' Kousins">
+		<year>19??</year>
+	</hash>
+	<hash crc32="27f44fcd" name="Kissin' Kousins [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53e17ab2" name="Kitt (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b898d52d" name="Kloss MIX (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a75595db" name="Klystron Raider">
+		<year>19??</year>
+	</hash>
+	<hash crc32="70b4bf01" name="Knock">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ff419696" name="Knockout">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0e6f0db9" name="Kolony">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5294e438" name="Korbol, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1d0ffeff" name="Krazy Katerpillars">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c47d7beb" name="Krazy Katerpillars [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="633b0948" name="Krazy Kopter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4cd9d7cd" name="KRazy Kritters">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9f53c581" name="Krucjata">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3a0928ae" name="Ku Przestrodze!!!! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="92704572" name="Kula (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fc2f2982" name="Kult">
+		<year>19??</year>
+	</hash>
+	<hash crc32="42bc0cc3" name="Kult [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cd8f821d" name="Kupiec">
+		<year>19??</year>
+	</hash>
+	<hash crc32="31f81416" name="Labyrinth">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6890c50e" name="Labyrinth - Dave Oblad">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="9d151c62" name="Labyrinth - Dave Oblad [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2744bb52" name="Labyrinth - Dave Oblad">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f7c35f2a" name="Labyrinths Of Kamerra">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a79ae18c" name="Lambada (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a1fe485f" name="Lameerop (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f15b853" name="Landscape">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2e96c9ab" name="Landscape (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4fd7e3ab" name="Laser Ants 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b7e443da" name="Laser Gates">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e2404da6" name="Laser Hawk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="82d71c37" name="Laser Strike">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b448c4fa" name="Last Chance">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d48366e0" name="Last Fucked, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="008f07b8" name="Last Guardian">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c88d0725" name="Last Ninja, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="85fd28f6" name="Last Party Invitation (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca25bb90" name="Last Party Invitation 1998 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e856a403" name="Last Starfighter">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c480ed87" name="Last Starfighter, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a65e0daa" name="Last Warrior [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9ddac310" name="Last Warrior">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4f2b8c16" name="Last, The v8">
+		<year>19??</year>
+	</hash>
+	<hash crc32="39b8e75d" name="Lato (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bd09c9d8" name="Lawkeeper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="192c4fe5" name="Lazer Type">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e90b6da1" name="Leader Board [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9ed1c15e" name="Leader Board">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bdd34da4" name="Leaper [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="824c3201" name="Leaper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f97f66ec" name="Led Zepplin Music (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="20263a19" name="Legionaire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="32a534ef" name="Legionnaire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b38625cd" name="Lemming (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="256a0783" name="Lemmingi (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ce28541c" name="Lepus Revenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c30e9c13" name="Leuchttu (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="25e8ad3f" name="Liebich (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1fa7427c" name="Life 2A">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2631b5a0" name="Lifespan">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7dd24038" name="Linking Logic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="971f0ada" name="List Gonczy (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5848ccfd" name="Little (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ce977a64" name="Little Devil">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d668ef20" name="Livewire">
+		<year>1983</year>
+		<manufacturer>ANALOG Computing</manufacturer>
+	</hash>
+	<hash crc32="cdd53ca0" name="Livewire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="65b0201a" name="Livewire 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="96d8edb3" name="Lizard">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3688ec50" name="Loco [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ec723a52" name="Loco">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b9e756d3" name="Loco-Motion">
+		<year>1982</year>
+		<manufacturer>Designer Software</manufacturer>
+	</hash>
+	<hash crc32="9e34163e" name="Lode Runner">
+		<year>19??</year>
+	</hash>
+	<hash crc32="97c310c8" name="Logic Levels">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dae999a1" name="Logo Square">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0b84e2b" name="Lone Raider">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2e229fc9" name="Lord Of The Orb">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="239634f1" name="Lord Of The Orb">
+		<year>19??</year>
+		<manufacturer>.Exe.fix</manufacturer>
+	</hash>
+	<hash crc32="b9468dad" name="Lords Of Time">
+		<year>19??</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="d2df70ea" name="Lorien's Tomb">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="9d71a353" name="Lorien's Tomb">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a4e420a" name="Lorien's Tomb [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2332afea" name="Lorneta (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="60e7680d" name="Lost Tomb">
+		<year>19??</year>
+	</hash>
+	<hash crc32="006157f5" name="Lowca">
+		<year>19??</year>
+	</hash>
+	<hash crc32="91d0dac9" name="LSD (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d003909f" name="Lucifer's Realm">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f19d69a4" name="Lunar Defender">
+		<year>19??</year>
+	</hash>
+	<hash crc32="103f5e1d" name="Mad Sinus (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f20447a5" name="Madness Of 32'S (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7225d8c7" name="Madnette">
+		<year>19??</year>
+	</hash>
+	<hash crc32="850266c8" name="Madonna (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="972f5e28" name="Maggie (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="01c79ab2" name="Maggie 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1c2ffb96" name="Magia">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ccdad98b" name="Magiakry">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d8983a58" name="Major Bronx">
+		<year>19??</year>
+	</hash>
+	<hash crc32="de97facf" name="Major League Hockey [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cc4095be" name="Major League Hockey">
+		<year>19??</year>
+	</hash>
+	<hash crc32="653af563" name="Makro (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c786ed43" name="Malpass The Asteroid Mines">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2b74e9a7" name="Maneuvering">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4b18dcfd" name="Maniac Miner">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0a8ebf2b" name="Maniac! [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1b2384ba" name="Maniac!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="94d8ca0a" name="Maniac!">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="f418420f" name="Mankala">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6ff5d960" name="Marauder">
+		<year>19??</year>
+	</hash>
+	<hash crc32="282ee517" name="Marauder 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9c19016b" name="Mario Bros [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="21af3988" name="Mario Bros">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2b30fe31" name="Mario Bros [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e98c926a" name="Marx Sound (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="adf2a5fa" name="MASH 4077">
+		<year>19??</year>
+	</hash>
+	<hash crc32="023d8847" name="Master Chess">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0ef62682" name="Master Head">
+		<year>19??</year>
+	</hash>
+	<hash crc32="59bf6138" name="Master Of The Lamps">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a19a5f99" name="Master Of The Lamps">
+		<year>19??</year>
+		<manufacturer>Crack</manufacturer>
+	</hash>
+	<hash crc32="7a728c22" name="Masterwolf (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3e877161" name="Match Racer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f3e94aad" name="Matchboxes">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c91b7bfc" name="Math Buster">
+		<year>19??</year>
+	</hash>
+	<hash crc32="517e2f72" name="Matrix [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f542c08" name="Matrix">
+		<year>19??</year>
+	</hash>
+	<hash crc32="443fb363" name="Matter Horn">
+		<year>19??</year>
+	</hash>
+	<hash crc32="86457ec8" name="Matterhorn">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4f57e426" name="Maxter Mind">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fd84e14c" name="Maxwell Manor - Skull Of Doom">
+		<year>19??</year>
+	</hash>
+	<hash crc32="75a29345" name="Mayday (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d871426a" name="Maze War">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2db29e09" name="Maze War [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="63055b52" name="MCMXC (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9545820b" name="MCMXC 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="070a1d59" name="Mec Intro (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3ce54b3a" name="Mega MIX (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="361f39ea" name="Megablast!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1d5eaa71" name="Megalegs [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4432c2be" name="Megalegs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a5339fef" name="Megamania">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f8ab469b" name="Meltdown">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="2105fcac" name="Meltdown [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c6828260" name="Meltdown">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca34b927" name="Memory Manor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e50b1a98" name="Mengcop">
+		<year>19??</year>
+	</hash>
+	<hash crc32="01235c14" name="Mercenary">
+		<year>19??</year>
+	</hash>
+	<hash crc32="092c8d68" name="Merry Christmas (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fb7a1eff" name="Metalica (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="33a8519c" name="Meteor - Germ-Soft">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8321492a" name="Meteor - Russell Payne">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bf533200" name="Micro 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c5711188" name="Micro 3 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="25e010cd" name="Micro Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f17583fe" name="Micro Man [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="73f250ab" name="Micro Shuttle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53b68e28" name="Microdeal Shuttle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6c37bbd4" name="Microx">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7c3b29d3" name="Midas Maze [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="08e7cf50" name="Midas Maze">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2dae1f19" name="Midnight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="95b72006" name="Miecze Valdgira">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c4abe05a" name="Miecze Valdgira 2 - Wladca Gor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="04ce6838" name="Mig Alley Ace">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2efe8335" name="Mike's Casino">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1656b606" name="Milk Race">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e2eedeff" name="Millipede [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cc51bc6e" name="Millipede">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5b5db8fe" name="Millipedes">
+		<year>19??</year>
+	</hash>
+	<hash crc32="43a68cf8" name="Miner 2049Er [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4fce3b8c" name="Miner 2049Er">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5d2d929c" name="Miner 2049Er [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a4534e90" name="Mines!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="516ce584" name="Miny">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b4de8719" name="Mirax Force">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d39488b6" name="Mirror (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d16dc37" name="Misja">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1021e9a1" name="Miss Mind">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6947956f" name="Missile Command">
+		<year>1981</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="72012f88" name="Missile Command">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1cd3b481" name="Mission">
+		<year>19??</year>
+	</hash>
+	<hash crc32="131a7fe8" name="Mission Shark">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0ad7ed0a" name="Modem Magic Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="54028939" name="Mogul Maniac">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b63d45c4" name="Mogul Maniac">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="fcf401b1" name="Monetzuma's Revenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="96d45e0b" name="Money Hungry">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b7752d6e" name="Monkey Magic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="979bd52f" name="Monopoly - German">
+		<year>19??</year>
+	</hash>
+	<hash crc32="55409831" name="Monster D (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="70e0e1e1" name="Monster Maze">
+		<year>1982</year>
+		<manufacturer>Epyx</manufacturer>
+	</hash>
+	<hash crc32="fa5b3c22" name="Monster Smash!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="528c6897" name="Monstrum [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f84c012d" name="Monstrum">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2ef96911" name="Montana">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="1ae5b1c5" name="Montana">
+		<year>19??</year>
+	</hash>
+	<hash crc32="49774b0b" name="Montezuma's Revenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5b5014bf" name="Montezuma's Revenge - Preliminary">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="83e44821" name="Montezuma's Revenge - Preliminary">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7d4e5b88" name="Moogles">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d4a88712" name="Moon Marauder">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b86a3170" name="Moon Patrol">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b4f57786" name="Moon Patrol [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d3ed4594" name="Moon Patrol - Avalon Hill">
+		<year>19??</year>
+	</hash>
+	<hash crc32="58b01cb1" name="Moon Shuttle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="eaaef545" name="Moonbase Io">
+		<year>19??</year>
+	</hash>
+	<hash crc32="090342be" name="Moonbeam Arcade 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="38d1a06c" name="Moonshadow (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="47908c47" name="More! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d2b4d3ea" name="Morky">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9cfba02c" name="Mortal Kombat (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5ba2d90d" name="Motorcross 800">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1e5872bd" name="Motorcycle Maze">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7cc55ea8" name="Mountain Bike">
+		<year>19??</year>
+	</hash>
+	<hash crc32="600ed7b8" name="Mountain King">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc3cacca" name="Mouse Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9e054a05" name="Mouse Trap">
+		<year>19??</year>
+	</hash>
+	<hash crc32="83c6e6f7" name="Mouse Trap (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="32cf7683" name="Movie, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="116de3ae" name="Movies Musical Madness">
+		<year>19??</year>
+	</hash>
+	<hash crc32="da6cefbd" name="Mr. Bear">
+		<year>19??</year>
+	</hash>
+	<hash crc32="28b4105f" name="Mr. Cool">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6cffe95d" name="Mr. Do">
+		<year>19??</year>
+		<manufacturer>Datasoft</manufacturer>
+	</hash>
+	<hash crc32="3f0db537" name="Mr. Do! [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b8cd021" name="Mr. Do!">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="0d0bc84e" name="Mr. Do!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="333f0170" name="Mr. Do! [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ccd6a3ad" name="Mr. Do's Castle [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="37b5f3df" name="Mr. Do's Castle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3fcd7704" name="Mr. M">
+		<year>19??</year>
+	</hash>
+	<hash crc32="13176a17" name="Mr. Robot And His Robot Factory [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f4bb5bab" name="Mr. Robot And His Robot Factory">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d694681d" name="Mr. TNT">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e0642973" name="Mr. TNT">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="22600b2f" name="Ms. Pac-Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1306f76a" name="Ms. Pac-Man [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aba4fb47" name="MSX 1996 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e14e78b0" name="MTV Fix MIX (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca6e043d" name="Muff">
+		<year>19??</year>
+	</hash>
+	<hash crc32="080b5f39" name="Multiply (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e1bc1872" name="Munchy Madness">
+		<year>19??</year>
+		<manufacturer>Quest For Hearts</manufacturer>
+	</hash>
+	<hash crc32="36c49ac4" name="Munsiepede">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ceb4414" name="Munsiepede 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e3666410" name="Murkomania (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a41513dd" name="Music Box II, The (demo) (1988)(19XX)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d7e8a276" name="Music From Poland! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="81b1609a" name="Music From The World (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c89a000b" name="Music Keyboard">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a850b55f" name="Music Master 3 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8fcf5bb6" name="Music Music Music (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9d66ee5a" name="Music Protracker (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="086dfb77" name="Music Show (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="307a056c" name="My DOS 4.50 Tool Disk Maker v2.0 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e85edb91" name="My Jong">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d20190c" name="Myriapede">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="c8f21f20" name="Myriapede">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9d1224dd" name="Myriapede [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="84a8dad0" name="Mysterious Adventure No. 10 - Ten Little Indians">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c0a487b5" name="Mysterious Adventure No. 11 - Waxworks">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5f726347" name="Mysterious Adventure No. 8">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9dc79ca9" name="Mysterious Adventure No. 9 - Perseus &amp; Andromeda">
+		<year>19??</year>
+	</hash>
+	<hash crc32="64f7eec2" name="Mysterious Adventures No. 1 - The Golden Baton">
+		<year>19??</year>
+	</hash>
+	<hash crc32="54471a92" name="Mysterious Adventures No. 2 - The Time Machine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bc6fb3b0" name="Mysterious Adventures No. 7 - Feasability Experiment">
+		<year>19??</year>
+	</hash>
+	<hash crc32="51c856c9" name="Mystery Fun House">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a35ae693" name="Nadral">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6473889d" name="Nadral [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ce8fb2d4" name="Najemnik">
+		<year>19??</year>
+	</hash>
+	<hash crc32="272fa173" name="Naked Woman (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="328babf9" name="Nasze Grzyb (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8d2f8653" name="National Flags">
+		<year>1982</year>
+	</hash>
+	<hash crc32="247f7b41" name="Nautilus">
+		<year>19??</year>
+	</hash>
+	<hash crc32="89980689" name="NDos Converter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3f1ef3be" name="Necromancer [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9baaf5db" name="Necromancer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d5abb13c" name="Necromancer">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7dbd1885" name="Nemesis (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="42633447" name="Nemo's Vault">
+		<year>19??</year>
+	</hash>
+	<hash crc32="979f271a" name="Nemo's Vault">
+		<year>19??</year>
+		<manufacturer>Crack</manufacturer>
+	</hash>
+	<hash crc32="2b9cf329" name="Neptune's Daughter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="645d02a4" name="Neptunes Daughters">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a3c74d29" name="Neron">
+		<year>19??</year>
+	</hash>
+	<hash crc32="142db3b5" name="Neuroid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4508a9d7" name="Nexuss - Part I">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a4bf176e" name="Nexuss - Part I [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="90c9ab13" name="Night Jager (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aeca8fcb" name="Night Mission Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0385894c" name="Night Mission Pinball [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a9932b7a" name="Night Strike!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="95225f30" name="Nighthawk (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8f60815a" name="Nightraiders">
+		<year>19??</year>
+	</hash>
+	<hash crc32="391fcb6a" name="Nineball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e99b549c" name="Ninja">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c498d7a2" name="Ninja Commando [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="873c5fd4" name="Ninja Commando">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9df10c62" name="Ninja Master, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f96bcc6c" name="No Nazi (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="34b60871" name="Noname (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="49b831d7" name="Nordic Ski">
+		<year>19??</year>
+	</hash>
+	<hash crc32="16f61cdb" name="Nova Graph (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="40e5af7e" name="Nova-Graph (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9d8483fa" name="November (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fc3093ab" name="Nuclear Kick">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f86b4271" name="Nudi (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3047adc6" name="Nus (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4194ca4a" name="NYC - The Big Apple">
+		<year>19??</year>
+	</hash>
+	<hash crc32="32e97d9c" name="NYC - The Big Apple [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ee5babda" name="O'Rileys Mine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="64f18cd9" name="Odezwa (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c6828035" name="Odezwa 3.1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a2b6915" name="Odezwa Do Ludu (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8afceab4" name="Odezwa Do Ludu 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e1e488b8" name="Odin">
+		<year>19??</year>
+	</hash>
+	<hash crc32="906027c8" name="Ogloszenie (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="326935ee" name="Oils Well">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc8fa3af" name="Olas (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="49a595e2" name="Old Thunder (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8ac8ed56" name="Ole Futbol (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2a1c7660" name="Olki (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="036d3d95" name="Ollies Follies">
+		<year>19??</year>
+	</hash>
+	<hash crc32="45162f94" name="Olympic Dash">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="c619910b" name="Olympic Dash">
+		<year>19??</year>
+	</hash>
+	<hash crc32="07869db9" name="Omega">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8436a95d" name="Omidor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3a284f15" name="On-Track">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9ea752a2" name="On-Track">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="5eea80be" name="One For The Road">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a574641" name="One Man And His Droid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ccdf6b21" name="One Man And His Droid [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2411ac81" name="One On One">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e32fb26a" name="One On One [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc58f11b" name="Onslaught">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b835bcb5" name="Operation Novatari">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2547c3cd" name="Operation Whirlwind">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53c6f9c5" name="Orbit">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ffb879d1" name="Orc Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ffeeeffe" name="Orneta '96 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c348f977" name="Orneta '97 Realtime (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c46173c1" name="Out Of Time (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2de74788" name="Outer (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8be811a4" name="Outer Space (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="660424a2" name="Outlaw &amp; Howitzer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2ef618a1" name="Oxygene">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1ed1840c" name="Ozor (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d73d66f2" name="Pac-Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e4ef2d60" name="Pac-Man - Atari">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bc366565" name="Pac-Man - Eric Wolz">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c99b9a81" name="Pac-Man - Eric Wolz">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="12b3264d" name="Pac-Man - Martin Day">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3489866d" name="Pac-Man - Unknown">
+		<year>19??</year>
+	</hash>
+	<hash crc32="74d234d9" name="Pacific Coast Hwy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3239e18c" name="Pacific Coast Hwy [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ddd2b004" name="Paczka Tynku">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6c6aa981" name="Pairs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="87b5c8be" name="Pakmans Brothers Revenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b0583711" name="Pakmans Brothers Revenge">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="52876ac0" name="Pang">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a257dff5" name="Panic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f271f449" name="Panic Express">
+		<year>19??</year>
+	</hash>
+	<hash crc32="76b26560" name="Panik!!! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fdcb72d9" name="Panther">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5c781ef7" name="Paperweight 3.1">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0d49933e" name="Paradise Threat, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e22ab842" name="Paradox 0.92 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="173237b5" name="Parallax">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d0181d25" name="Partro (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d599170d" name="Party Raport 97 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="78e4827c" name="Pastfinder">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0c2a3dc0" name="Pastfinder [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1bbdf030" name="Pastfinder [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c31e23a6" name="Patch Virtuoso 1.3 Disk To 1.4">
+		<year>19??</year>
+	</hash>
+	<hash crc32="90d75827" name="Pathfinder">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4c911328" name="Patrol Nighthawk One">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3da247d1" name="Pengo">
+		<year>1983</year>
+	</hash>
+	<hash crc32="550720cf" name="Pengo [a2]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4f0414d0" name="Pengo">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="f194c0ab" name="Pengo [a]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fda92731" name="Pengon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1ded92c7" name="Pensate">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc4cfe88" name="Per-Vert - Atari To Percom Converter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a096e056" name="Perly Orckyego">
+		<year>19??</year>
+	</hash>
+	<hash crc32="472d3a66" name="Perxor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e687d542" name="Pharaoh's Curse">
+		<year>19??</year>
+	</hash>
+	<hash crc32="662f0145" name="Pharaoh's Curse [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dd110fa6" name="Pharaoh's Pyramid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cf584f12" name="Pharaond (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="401e627a" name="Phase Shift (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a5438664" name="Phobos">
+		<year>19??</year>
+	</hash>
+	<hash crc32="22cf0e39" name="Phobos">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="019e36de" name="Phong Figures (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a6302968" name="Photo Finish Greyhound Racing">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="83147fa3" name="Photo Finish Greyhound Racing">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aafe8217" name="Picnic Paranoia [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5c4c4ae5" name="Picnic Paranoia">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fb423126" name="Picture 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="07f20a37" name="Picture 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fbd3b3aa" name="Pie Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fcd6572f" name="Pillbox">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a55c33dd" name="Pinhead">
+		<year>1982</year>
+	</hash>
+	<hash crc32="84862e14" name="Pinhead">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="8b786e2b" name="Pinhead [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d57ba973" name="Piranha">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f9421a04" name="Pirates Cove">
+		<year>19??</year>
+	</hash>
+	<hash crc32="273cd870" name="Pirates Cove [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="80af28bb" name="Pitfall">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7c52fb19" name="Pitfall 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="efb305a5" name="Pitfall II - Lost Caverns (1983-4)(Activision)[h]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="85a67ec6" name="Pitstop [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5a82e606" name="Pitstop">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fd8061ed" name="Pitstop 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="60837b73" name="Pitstop 2 [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ffe4af3e" name="Pitstop II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="37338845" name="Planet Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4997d6b0" name="Planetary Defense [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c75d0d22" name="Planetary Defense">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ab5c8157" name="Plaque Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f9130c88" name="Plastron">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6c8cadee" name="Platfus (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7974f1d1" name="Plattermania">
+		<year>19??</year>
+	</hash>
+	<hash crc32="071a8dbc" name="Playful Professor Math Tutor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="62f380c0" name="Plot 256 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a5c9a5fa" name="Pogo Joe">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="52d5000d" name="Pogo Joe">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9f04b8f2" name="Pogoman">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7346cbd0" name="Poker SAM">
+		<year>19??</year>
+	</hash>
+	<hash crc32="80abb06a" name="Pole Position">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="ea1487e8" name="Pole Position">
+		<year>19??</year>
+	</hash>
+	<hash crc32="787087f5" name="Pole Position">
+		<year>19??</year>
+		<manufacturer>Datasoft</manufacturer>
+	</hash>
+	<hash crc32="220f3696" name="Pole Position Race Designer [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0f0816cd" name="Pole Position Race Designer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="005cb42e" name="Pole Position Race Designer">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="2152b3fe" name="Polizei (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a440d06f" name="Polska Dla Polakow (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6a513428" name="Polynomials Present">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b398f914" name="Pond">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9c367d48" name="Pong">
+		<year>19??</year>
+	</hash>
+	<hash crc32="75d19024" name="Pong - Gary Domrow">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a4c13de5" name="Pong - Robert Champagne">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b5fb866" name="Pool 1.5">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a98e063" name="Pool 400">
+		<year>19??</year>
+	</hash>
+	<hash crc32="14c329aa" name="Pool 87 [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d38e407c" name="Pool 87">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8864ea8b" name="Pooyan">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0e8b398c" name="Pooyan">
+		<year>19??</year>
+		<manufacturer>Datasoft</manufacturer>
+	</hash>
+	<hash crc32="31dfe535" name="Popcorn!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a781c5a9" name="Popeye">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b42171a7" name="Popeye [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ded5a308" name="Popeye">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="267edab7" name="Porky's">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8f8044e0" name="Porn Movie (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f3c67a75" name="Poussinet">
+		<year>19??</year>
+	</hash>
+	<hash crc32="74c24440" name="Power Down">
+		<year>19??</year>
+	</hash>
+	<hash crc32="54bccfd6" name="Powerpath">
+		<year>1982</year>
+	</hash>
+	<hash crc32="ca9357e3" name="Preppie">
+		<year>1982</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="b4ffd5a1" name="Preppie [a]">
+		<year>1982</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="fa5c2d23" name="Preppie II">
+		<year>1983</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="950a8ab5" name="Prexor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8354be73" name="Princess And The Frog, The">
+		<year>19??</year>
+		<manufacturer>Romox</manufacturer>
+	</hash>
+	<hash crc32="574a7ff2" name="Prizrak Nuly">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b69ebcb" name="Pro Biker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9782f6e" name="Probj 1.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aca126c2" name="Problem Jasia (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b7d6845" name="Professor IQ">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f1a63f45" name="Protector">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7e8559f3" name="Protector II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cf3d1efa" name="Przemytnik">
+		<year>19??</year>
+	</hash>
+	<hash crc32="86401761" name="Przesuw (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4060fff4" name="Pushy Pig">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c24f9989" name="Puzmania Music Player (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="60dff3f6" name="Puzmania Music Player 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="60f257f0" name="Puzzle Mania 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e8ca79f1" name="Puzzle Panic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="387d3bff" name="PuzzleConstructionSet">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b0f8f87" name="PuzzleGatesoftheIncas">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c75a440a" name="Puzzlemania">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f6b6a78f" name="Pyramid Puzzler">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4310780f" name="Pyramid Run">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a211721a" name="Q-Bert">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b9e6ff12" name="Qix [a]">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="769bf773" name="Qix [a2]">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="84085845" name="Qix">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2808afc0" name="Qix (5200)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="5168962d" name="Qix [a](5200)">
+		<year>1982</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="5b08d02f" name="Quadron">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b23d1697" name="Quarxon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cf00e65d" name="Quasimodo">
+		<year>1984</year>
+	</hash>
+	<hash crc32="17d39abd" name="Quasimodo">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="9bcc2449" name="Quest For Quintana Roo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7b12c3be" name="Questprobe 1 The Incredible Hulk [TV]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b13f43b6" name="Questprobe 2 - Spider-Man [TV]">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="cb612520" name="Questprobe 2 - Spider-Man [TV]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1003d05f" name="R34Lly UNR34l (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ebe10b9f" name="Race">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4e48bc27" name="Race In Space">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b2cbdd19" name="Race In Space">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="baaedda5" name="Race In Space 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c8af9f82" name="Rack 'Em Up!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0416c9a1" name="Raid On Gravitron">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ee79fc0a" name="Raid Over Moscow">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1f8b639e" name="Raid Over Moscow">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="8be0f15e" name="Raid Over Moscow [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8261b318" name="Railking">
+		<year>19??</year>
+	</hash>
+	<hash crc32="93584703" name="Rainbow Walker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="843cab65" name="Rainstorm">
+		<year>19??</year>
+	</hash>
+	<hash crc32="89255736" name="Rainstorm [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="99988dcb" name="RAM DKA">
+		<year>19??</year>
+	</hash>
+	<hash crc32="70760a72" name="Rambug II [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="97b763f2" name="Rambug II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ebc0f75e" name="Rampage">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e2aa2fac" name="Rassilon's Block Puzzle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4aa7a08f" name="Raster Blaster Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="27ec3862" name="Rat Race">
+		<year>19??</year>
+	</hash>
+	<hash crc32="573f5284" name="Ratapede">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ea7944e0" name="Rats' Revenge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="498c5479" name="Rats' Revenge">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="798bf4ba" name="Rave (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1724cd7e" name="Rave Shadows 01 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="42b685ea" name="Raving (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0f0390e0" name="Raytracing (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19d806e0" name="Raz Pushky">
+		<year>19??</year>
+	</hash>
+	<hash crc32="68e67b14" name="Really Unreal (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3b52938f" name="Realsports Football">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="91a878b1" name="Realsports Football">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7046eca2" name="Rebel Fighter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f812c7e0" name="Rebound">
+		<year>19??</year>
+	</hash>
+	<hash crc32="65734aa5" name="Recycle (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7240a2cc" name="Red Fox (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="477b3b01" name="Red Moon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b8697064" name="Reklama (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d0c371cd" name="Renaissance">
+		<year>19??</year>
+	</hash>
+	<hash crc32="defa3f34" name="Report - Atari (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a8d412d3" name="Repton">
+		<year>1983</year>
+		<manufacturer>Sirius</manufacturer>
+	</hash>
+	<hash crc32="d12734e9" name="Repton">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="93396880" name="Repton">
+		<year>19??</year>
+	</hash>
+	<hash crc32="92c78366" name="Resal (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5234d0cb" name="Rescue At 94K">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b5e1e650" name="Rescue Mission">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4cba94a5" name="Rescue The Princess">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3113c444" name="Retraktur (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bfce914f" name="Retrofire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="05d7b320" name="Return To Eden">
+		<year>1984</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="3c5d5215" name="Return To Eden">
+		<year>19??</year>
+	</hash>
+	<hash crc32="061ab31b" name="Revenge Of Magnus (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c83e1a69" name="Revenge Of The Plutonian Flies">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a90441f" name="Revenge Of Volume (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="74a7faa8" name="Reverse">
+		<year>19??</year>
+	</hash>
+	<hash crc32="296aacb3" name="Reversi">
+		<year>19??</year>
+	</hash>
+	<hash crc32="29ea23ac" name="Reversi [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9e59f741" name="Rigolletto (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="042e6a22" name="Riot">
+		<year>19??</year>
+	</hash>
+	<hash crc32="65867777" name="Rip Off!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4fa2e841" name="Risa Zla! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a07b767e" name="River Raid [a]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ea1b5806" name="River Raid">
+		<year>1983</year>
+	</hash>
+	<hash crc32="87282609" name="River Raid [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d2d36087" name="River Raid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1f13ef64" name="River Rat">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ba5f1323" name="Road Block [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d2093dce" name="Road Block">
+		<year>19??</year>
+	</hash>
+	<hash crc32="eef7c773" name="Robbo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d613ea54" name="Robbo (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b09200df" name="Robbo [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1ea04722" name="Robbo V">
+		<year>19??</year>
+	</hash>
+	<hash crc32="57771bcc" name="Robin">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ab5c1b75" name="Robin Hood">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ea61cd68" name="Robocop (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e54205f5" name="Robot (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="905aa845" name="Robot Assault (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="923f1b28" name="Robot Assault (demo) (19xx)[a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="665796d8" name="Robot Battle">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="8cfe5ac3" name="Robot Battle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0c0e74c1" name="Robotron 2084">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="64206ff0" name="Robotron 2084">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1b5ee4cc" name="Robox [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fc95c3cf" name="Robox">
+		<year>19??</year>
+	</hash>
+	<hash crc32="89a6c01a" name="Rocket Repairman">
+		<year>19??</year>
+	</hash>
+	<hash crc32="69cd6ce1" name="Rockman">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d11f1e8" name="Rocks!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a8da320d" name="Roll 'Em">
+		<year>19??</year>
+	</hash>
+	<hash crc32="03469fd4" name="Rome And The Barbarians">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c9eef1a3" name="Rosens Brigade">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d38116ca" name="Rosens Brigade [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1bb4e4c6" name="Roto [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c18e8b83" name="Roto">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a55c5e19" name="Rough Rider">
+		<year>19??</year>
+	</hash>
+	<hash crc32="403a404d" name="Roulette">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a19897a" name="Round Up">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7a6cd5e4" name="Roundabout">
+		<year>19??</year>
+	</hash>
+	<hash crc32="82c1e2a1" name="Ruff And Reddy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2d5c0767" name="Runcow">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4bd3a69e" name="Rush Hours 97 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4f3b1653" name="Rythmizer AT1">
+		<year>19??</year>
+	</hash>
+	<hash crc32="32b1d692" name="Rzog Joins XE-Team (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3e9a3e48" name="S-Plot (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="75b7283b" name="Sabat (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7a34d769" name="Sabath (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4b7fda03" name="Saigon - The Final Days">
+		<year>1982</year>
+	</hash>
+	<hash crc32="0a59a491" name="Salmon Run">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dcade78d" name="Saman (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d3ce964" name="Samurai's Game">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f81a7fd" name="Saper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="36dce689" name="Saper (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2592ec5d" name="Saper Konstruktor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ee021a8" name="Saper X1">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1617b186" name="Saratoga [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="78afce3d" name="Saratoga">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c4ef96f5" name="Sargon II">
+		<year>1982</year>
+		<manufacturer>Hayden</manufacturer>
+	</hash>
+	<hash crc32="2ddb27fb" name="Sargon II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b7bcb848" name="Sargon III">
+		<year>19??</year>
+	</hash>
+	<hash crc32="32535579" name="Satan's Hollow">
+		<year>1982</year>
+		<manufacturer>CBS Software</manufacturer>
+	</hash>
+	<hash crc32="4bfc2e51" name="Satan's Hollow">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f071e4db" name="Satan's Hollow [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b903721b" name="Saturday (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="87e65f0a" name="Saucer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b7f804bb" name="Savage Pond">
+		<year>19??</year>
+	</hash>
+	<hash crc32="17c6628e" name="Scene Register 1.0 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dd2f24a2" name="Scene Register 4.0 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a0de0342" name="Scene Register 4.0 Short Ver (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b0bfc1b" name="Scenery (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7b1a8382" name="Scooter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d85b7098" name="Score 4">
+		<year>19??</year>
+	</hash>
+	<hash crc32="17608f43" name="Score 4">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="89619bf4" name="Screaming Wings [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="24728fe9" name="Screaming Wings">
+		<year>19??</year>
+	</hash>
+	<hash crc32="385f92a8" name="Screwlight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="18516666" name="Scrolls Of Abadon, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4dee80ff" name="Sea Bandit">
+		<year>19??</year>
+	</hash>
+	<hash crc32="39644342" name="Sea Bandit">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="1790a026" name="Sea Chase">
+		<year>19??</year>
+	</hash>
+	<hash crc32="44081a28" name="Sea Dragon">
+		<year>1982</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="63cd5221" name="Sea Dragon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bd51b5b2" name="Sea Dragon Title">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d52c2a6a" name="Sea Fox">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e54592f3" name="Sea Fox">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="574aa170" name="Sea Fox [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0ade9267" name="Seahorses">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bd414c17" name="Seaside (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="93dbc75e" name="Seawolf 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="21c6bce7" name="See-Saw Scramble">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7a4f8078" name="Self-Destruct (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8a643c4e" name="Sentinel">
+		<year>1982</year>
+		<manufacturer>INHOME</manufacturer>
+	</hash>
+	<hash crc32="c2ba1924" name="Sentinel">
+		<year>19??</year>
+	</hash>
+	<hash crc32="37ae29e4" name="Serial Of Impractible Effects 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aafc18cd" name="Serpentine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="523499f6" name="Serwus!!!!! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5516c0ed" name="Sesame Street Letter-Go-Round">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a8948a41" name="Sex Cartoon (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f94df19d" name="Sex Vansi">
+		<year>19??</year>
+	</hash>
+	<hash crc32="529ebb8b" name="SFY 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="950cb284" name="Shadow Hawk One">
+		<year>19??</year>
+	</hash>
+	<hash crc32="75f0e0cf" name="Shadow World">
+		<year>19??</year>
+	</hash>
+	<hash crc32="eca1a3a9" name="Shadows Boby (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9d79962" name="Shadows Shapes (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f5839383" name="Shaft">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6a241241" name="Shaft Of Light (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="de10e4a3" name="Shake! (demo) (19xx)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="df6103fc" name="Shake! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e1186481" name="Shamus">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b40a97e" name="Shamus - Case 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="77fa49bb" name="Sharks 1 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0505560" name="Shatablast">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bf422812" name="Shazza (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a23bb3f2" name="Shiny Bubbles 64 KB RAM (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ea3c8eb6" name="Ship (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7351b415" name="Ship [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="24b390b9" name="Ship">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d88ab4d2" name="Shit">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dfc5433b" name="Shootem">
+		<year>19??</year>
+	</hash>
+	<hash crc32="27c228b4" name="Shooting Arcade">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0e557649" name="Sidewinder">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4271d7bd" name="Sidewinder">
+		<year>19??</year>
+		<manufacturer>Crack</manufacturer>
+	</hash>
+	<hash crc32="35026806" name="Sidewinder 2 [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5aa2c3ab" name="Sidewinder 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d18423a9" name="Sidewinder 2">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="0aff3a26" name="Sierp 256 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1456899a" name="Silent Service, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f61f3f2f" name="Silicon Warrior">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c6ee6cf0" name="Simple Minds">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8c99b44c" name="Simplesoft Mozart Minuet">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2caaee9b" name="Sisyphos">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f667fe66" name="Skarbnik">
+		<year>19??</year>
+	</hash>
+	<hash crc32="30b92b05" name="Sky Blazer">
+		<year>1981</year>
+		<manufacturer>Star Craft</manufacturer>
+	</hash>
+	<hash crc32="d556c864" name="Sky Blazer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6943dbc8" name="Sky Network (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e19619b9" name="Slide">
+		<year>19??</year>
+	</hash>
+	<hash crc32="87cca0c6" name="Slidshow (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e5e81167" name="Slime">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4c9b9471" name="Slither">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ab5afdf1" name="Slither [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4688628e" name="Slot-Machine (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9e02ebb8" name="Slot-Machine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5fdce2a6" name="Sludge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="be8877d1" name="Smurf Porn (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="28fabac6" name="Smus">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3fce1de0" name="Snake (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ac52c625" name="Snapper, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="51f63704" name="Sneak Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="21aba7b2" name="Sneakers">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3bd35bae" name="Snokie">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6bc9fb82" name="Snokie [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b055237b" name="Snooker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="72b858d6" name="Snooker">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="a77091e9" name="Snoopy (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="12c3c951" name="Snow Ball Fight [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8f2691e3" name="Snow Ball Fight">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="03164f3a" name="Snow Ball Fight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4761cb03" name="Snowball">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="b76b1928" name="Snowball">
+		<year>19??</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="9c234e0f" name="Snowball - Platform">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6afee863" name="Snowman (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2c6733ec" name="Snowplow">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d2220a9a" name="Soccer - Gamma">
+		<year>19??</year>
+	</hash>
+	<hash crc32="90e2b939" name="Soccer - Thorn Emi">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ec86cbb6" name="Soft Toy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4e405880" name="Softball Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bf9a60d6" name="Solo Flight">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8a203b69" name="Sosaturn">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3aa1133f" name="Sound (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="63c5920c" name="Sound Collection, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0ce422ce" name="Space Ace">
+		<year>19??</year>
+	</hash>
+	<hash crc32="14dbe3d6" name="Space Ball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bddd4a49" name="Space Battle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="136b0957" name="Space Blaster">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a9d8865c" name="Space Blaster">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="82816d2b" name="Space Conflict 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aa5aef0b" name="Space Dungeon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="07961793" name="Space Eggs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0a3f1769" name="Space Hawk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cf1dd987" name="Space Invaders">
+		<year>1980</year>
+	</hash>
+	<hash crc32="188049f9" name="Space Invaders">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6f4dc5f9" name="Space Invaders 5200">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0841c0e8" name="Space Journey">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1e3c1f7f" name="Space Rider (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2c464e0d" name="Space Shuttle - A Journey Into Space">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cfc8942b" name="Space Station 2048">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9495dd93" name="Spaceball Pinball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d3cfeb3" name="Spark Bugs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b2a4cfd5" name="Spectrum Analyzer (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e97e522c" name="Speed Hawk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="44d6a025" name="Speed King">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bb89e266" name="Speed Matter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5e5a0123" name="Speed Ski">
+		<year>19??</year>
+	</hash>
+	<hash crc32="44cbc5ae" name="Speed Ski 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="284a7c56" name="Speedrun">
+		<year>19??</year>
+	</hash>
+	<hash crc32="75df005c" name="Speedway Blast">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="074e0b88" name="Speedway Blast">
+		<year>19??</year>
+	</hash>
+	<hash crc32="817af6e2" name="Spellbound">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e4ed448f" name="Sperm Invaders">
+		<year>19??</year>
+	</hash>
+	<hash crc32="be95c8dd" name="Spider City">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a54a5b82" name="Spider Invaders">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c13a1210" name="Spiderman's Music Collection (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f52adaf1" name="Spiderquake">
+		<year>19??</year>
+	</hash>
+	<hash crc32="21b9e435" name="Spiky Harold [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bbae8f6c" name="Spiky Harold">
+		<year>19??</year>
+	</hash>
+	<hash crc32="548f64dc" name="Spin Dizzy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4b5ccca6" name="Spinning (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e5ebeeca" name="Spirit (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f010882e" name="Springer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dd18eb82" name="Spy Fucker (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6e809ef5" name="Spy Games">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1adab4bb" name="Spy Hunter">
+		<year>1983</year>
+	</hash>
+	<hash crc32="edb29040" name="Spy Hunter">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="f4ca74eb" name="Spy Master (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6ecb2894" name="Spy Masters">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c63c3291" name="Spy Strikes Back, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7250d23d" name="Spy Vs. Spy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="37427bfd" name="Spy Vs. Spy 2 - The Island Caper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="89d2b24d" name="Spy's Demise CV">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b4108073" name="Spy's Demise DV">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a6f8fa04" name="Squint (demo) (19xx)[a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="564e9a9a" name="Squint (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="af460ffd" name="Squishem [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2c61ef2c" name="Squishem">
+		<year>19??</year>
+	</hash>
+	<hash crc32="536fe96b" name="SS Achilles">
+		<year>19??</year>
+	</hash>
+	<hash crc32="34bf905d" name="SS Achilles 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cff4dc38" name="Stackup">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d5e4a219" name="Star Base Fighter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4da31fb2" name="Star Base Fighter">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="d9eb36b4" name="Star Crystals">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6a9a442d" name="Star Fleet (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="09089ab0" name="Star Intruder">
+		<year>19??</year>
+	</hash>
+	<hash crc32="42246c08" name="Star Island">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cab39f91" name="Star League Baseball">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c2293207" name="Star Raiders">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8588a6c6" name="Star Raiders II">
+		<year>1985</year>
+	</hash>
+	<hash crc32="22aaa339" name="Star Raiders II [a]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="9ac9b7e2" name="Star Raiders II">
+		<year>1985</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cad71df7" name="Star Raiders II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b2f64f1a" name="Star Raiders II">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="8e8024da" name="Star Raiders II [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="79ccd583" name="Star Rider">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d48b8179" name="Star Rider">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="295bfafe" name="Star Sentry">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bd330ee2" name="Star Trek">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6abc83bb" name="Star Trek">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1632284b" name="Star Trux">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f8d373c6" name="Star Wars">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4f1ca3f1" name="Star Wars">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="c3646897" name="Star Wars (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e86c0d0d" name="Star Worx (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0825b80" name="Star, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="612f0997" name="Starbowl Football">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6d922ebc" name="Starfire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b71bcef7" name="Starfire Warrior">
+		<year>19??</year>
+	</hash>
+	<hash crc32="79f84f33" name="Stargate Courier">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b2634859" name="Stargunner [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1416cf85" name="Stargunner">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c57483e3" name="Starion">
+		<year>19??</year>
+	</hash>
+	<hash crc32="87a9b7ee" name="Starquake">
+		<year>19??</year>
+	</hash>
+	<hash crc32="74681c75" name="Starquake [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c4ce47fc" name="Starquake [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="30416dd7" name="Stars">
+		<year>19??</year>
+	</hash>
+	<hash crc32="96226e3a" name="Starsoft (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c259980d" name="Static">
+		<year>19??</year>
+	</hash>
+	<hash crc32="035253da" name="Static Ver (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="416d64dc" name="Stealth">
+		<year>1984</year>
+	</hash>
+	<hash crc32="96d497b2" name="Stealth [a]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4ea1033d" name="Stealth">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="36c7de60" name="Steeple Jack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="91b6f4a8" name="Stellar Shuttle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="06a31894" name="Steve's High Menu Creator">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2fe248bb" name="Stone Fire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="277593dc" name="Storm">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2b68bd4d" name="Story Machine">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0d2b7853" name="Stranded">
+		<year>19??</year>
+	</hash>
+	<hash crc32="18ab321b" name="Strange Mountains II (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="eceb60cd" name="Stratos">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="64f40091" name="Stratos">
+		<year>19??</year>
+	</hash>
+	<hash crc32="df2b311d" name="Stratosphere - Excelsor 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="53365d70" name="Streamliner v1.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c2d48640" name="Street Fighter! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a4650a0a" name="Streets">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c67458c7" name="Streets [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="749454e5" name="Strzyga">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9a2c1b2a" name="Studio Dream (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6547d8f6" name="Stun Trap">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d38ce9fd" name="Stun Trap">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="82e8aaf3" name="Sub Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fa04af8b" name="Submarine Commander">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fc45e65f" name="Submission">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ed2a24b1" name="Submission">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="a73064e7" name="Sun Star">
+		<year>19??</year>
+	</hash>
+	<hash crc32="79d1a866" name="Super Asteroids">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d9cc11a0" name="Super Bunny">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f108da76" name="Super Bunny">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7647c698" name="Super Cobra">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d13d7ef1" name="Super Cubes">
+		<year>19??</year>
+	</hash>
+	<hash crc32="562cb8bc" name="Super Fortuna">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ddf63ed7" name="Super Husa">
+		<year>19??</year>
+	</hash>
+	<hash crc32="358ed770" name="Super Pac-Man">
+		<year>19??</year>
+	</hash>
+	<hash crc32="940274ec" name="Super Pac-Man">
+		<year>19??</year>
+		<manufacturer>Alt</manufacturer>
+	</hash>
+	<hash crc32="0a7561ea" name="Super Pacman">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6e961c89" name="Superman - The Game">
+		<year>19??</year>
+	</hash>
+	<hash crc32="db84c78e" name="Swat">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c4b82542" name="Swiat Olkiego">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a3edff60" name="SYF 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="21c30bb3" name="Syn Boga Wiatru">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0285ed6d" name="Syn Boga Wiatru [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ac2f23c4" name="Syntron">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e456d98b" name="Szymon Soft (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="40048d78" name="T.G.I.F">
+		<year>19??</year>
+	</hash>
+	<hash crc32="08901cff" name="Table Football">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3abcd465" name="Tactic">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fc8828d0" name="Tail Of Beta Lyrae, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="39e83888" name="Taipei XL 1.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d9c768de" name="Tajemnice Atari (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="55ffd28d" name="Talladega">
+		<year>1984</year>
+		<manufacturer>Cosmi</manufacturer>
+	</hash>
+	<hash crc32="b22385fa" name="Talladega">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3846de79" name="Tank Commander">
+		<year>19??</year>
+	</hash>
+	<hash crc32="80524b65" name="Tank Commander">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7db53b3f" name="Tank Vs Tank">
+		<year>19??</year>
+	</hash>
+	<hash crc32="afc361fc" name="Tanks">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e0cbc741" name="Tanks (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="62757a61" name="Tapper">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="5a2c7193" name="Tapper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="56b6c6b7" name="Tapper [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f25be632" name="Taquart Intro (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="97b6cf69" name="Target">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1f26581f" name="Tarzan Of The Apes">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b14a7f4d" name="Tawernia">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5f451ae7" name="Tax Dodge">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e98ddd89" name="Taxicab Hill">
+		<year>1985</year>
+	</hash>
+	<hash crc32="262b1bb3" name="Taxicab Hill">
+		<year>19??</year>
+	</hash>
+	<hash crc32="479534fe" name="Te.mod (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1bcb6059" name="Techno (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5ad061e3" name="Techno 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e1d7831a" name="Technoid">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f2e3e304" name="Technoid [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b588efbc" name="Technoid (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="67af7480" name="Tennis">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7ddf2b67" name="Terminator 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d7c61667" name="Terminator 2 - Judgement Day (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e330e3fa" name="Tetris3D">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9e2e9f23" name="Tetrix">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e03f6c24" name="Tetrix [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a9329941" name="Tetrix">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="22594944" name="That (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a1a90eff" name="Theatre Europe">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e0a31abb" name="Thinker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a675d913" name="Thinker [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="387d43e4" name="Thrax Lair">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5934282b" name="Thrax Lair">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="b2dafc85" name="Thrust">
+		<year>19??</year>
+	</hash>
+	<hash crc32="368c54cf" name="Thrust">
+		<year>19??</year>
+		<manufacturer>Crack</manufacturer>
+	</hash>
+	<hash crc32="d82976e8" name="Thunderbombs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e7f6a24b" name="Tiger Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="faddd233" name="Tigris">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6e1878a8" name="Tilight World">
+		<year>19??</year>
+	</hash>
+	<hash crc32="38889026" name="Time Runner">
+		<year>1982</year>
+		<manufacturer>Funsoft</manufacturer>
+	</hash>
+	<hash crc32="8269a71b" name="Time To Enjoy (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1f195fa7" name="Timebound">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d1326af" name="Timeslip">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f9dcad51" name="Tomahawk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d6c989f7" name="Toms (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="09dda534" name="Toms 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1671fb9f" name="Too Hard (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b3c2615f" name="Too Hard Matter (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="998911dd" name="Tool Package 7.0 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="738d080b" name="Top #1, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dd77e864" name="Top #2, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="13d1339e" name="Topless (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="70237d13" name="Topper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d2996b2e" name="Total Shit (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3741b886" name="Tracer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5270244d" name="Track And Field">
+		<year>1983</year>
+	</hash>
+	<hash crc32="39d42b1c" name="Track And Field">
+		<year>19??</year>
+	</hash>
+	<hash crc32="30d4a720" name="Tragedy II (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="62d555ee" name="Trailblazer">
+		<year>1986</year>
+	</hash>
+	<hash crc32="a782f81a" name="Trailblazer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="24bf7328" name="Trans Muter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f27a94a8" name="Translator">
+		<year>19??</year>
+	</hash>
+	<hash crc32="95047156" name="Translator A">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7fb89f30" name="Tree Surgeon [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b6d32749" name="Tree Surgeon">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="515e433e" name="Tree Surgeon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2ba05419" name="Triad">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e7851b30" name="Trial By Fire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="be9dd61d" name="Tricky Tracks">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc1585ea" name="Trion 3D">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8e9f6f8a" name="Triumph!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="66b8e110" name="Trix">
+		<year>19??</year>
+	</hash>
+	<hash crc32="905d2f89" name="Troll War">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="cc6af756" name="Troll War">
+		<year>19??</year>
+	</hash>
+	<hash crc32="cf6ffec5" name="Troll War II">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0ed3c9cb" name="Tron">
+		<year>19??</year>
+	</hash>
+	<hash crc32="999b2038" name="TT Racer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d4b0a8d2" name="Tumble Bugs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="be345316" name="Tuptus [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2acbaf77" name="Tuptus">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5e48b7a8" name="Turbican">
+		<year>19??</year>
+	</hash>
+	<hash crc32="09454e4d" name="Turmoil">
+		<year>1982</year>
+		<manufacturer>Sirius</manufacturer>
+	</hash>
+	<hash crc32="7ed1666a" name="Turmoil">
+		<year>19??</year>
+	</hash>
+	<hash crc32="38ad4ee9" name="Tusker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a337c621" name="Tutankham">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f7e20e6" name="Tutunkhamun">
+		<year>1984</year>
+	</hash>
+	<hash crc32="7dce2360" name="Twarze I Cienie (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="af177e1d" name="Twerps">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3a799b92" name="Two Player Maze [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8c2218e8" name="Two Player Maze">
+		<year>19??</year>
+	</hash>
+	<hash crc32="dc363262" name="Twogun">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9bbe7ee1" name="Twogun [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="49dc8544" name="Tylenol Factory, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1813d659" name="Typo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aad6332b" name="Typo Attack">
+		<year>19??</year>
+	</hash>
+	<hash crc32="df5c8f4c" name="Uczen Czarnoksieznika">
+		<year>19??</year>
+	</hash>
+	<hash crc32="77b5dff9" name="Ultra 2 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c9db20b2" name="Underworld, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9fe19e51" name="Unicum">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a1fc08fe" name="Unicum [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a333583" name="Unite (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2fd00403" name="Unity (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0725564d" name="Unlimited Boby (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d420ef7a" name="Up 'N Down">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ded2e0b" name="Up For Grabs">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5380174e" name="Up Up And Away">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="352e2ab4" name="Up Up And Away">
+		<year>19??</year>
+	</hash>
+	<hash crc32="affdb5d1" name="Upior">
+		<year>19??</year>
+	</hash>
+	<hash crc32="998b9914" name="Upior [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8461f16f" name="Upward">
+		<year>19??</year>
+	</hash>
+	<hash crc32="929379ba" name="Uridium PAL">
+		<year>19??</year>
+	</hash>
+	<hash crc32="30647fc7" name="Usura (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="51ed157c" name="V.C">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fcba2f6b" name="Vagabond (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e5b52bbd" name="Valdgira (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bc6d17e1" name="Vanguard">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e5805b83" name="Vanguard [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7a2e7c2b" name="Vector Scroller (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="84bbb6d3" name="Vegas Jackpot">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0b2acc88" name="VI Quast Party Elblag 1998 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9a9fd814" name="Vicky">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ae8b717d" name="Vicky - Intro [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0aac6db1" name="Vicky - Intro">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e0770551" name="Video (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0224d61" name="Video Interface (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aece216f" name="Viper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="29c158eb" name="Viper [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bee1989d" name="Voice Of Silence III (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="09354334" name="Wall War">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8017d66c" name="Wall, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1221192a" name="Walls">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7d29cd45" name="Walls">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="dbe0183b" name="War Games">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bd2c51a2" name="Wargames">
+		<year>19??</year>
+	</hash>
+	<hash crc32="19c289a7" name="Warhawk">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1d8cc48d" name="Warhawk [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f0a6fb95" name="Warlok">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2e7ad1a3" name="Warlords">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2313af26" name="Warp Zone">
+		<year>1984</year>
+		<manufacturer>CSI</manufacturer>
+	</hash>
+	<hash crc32="ae79318e" name="Warrior Of Ras - Volume 1 - Dunzhin">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9c803fc8" name="Warrior Of Ras - Volume 2 - Kaiv">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ed4de4b8" name="Warsaw Robbo, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="23ea0025" name="Warsaw Tetris, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7a97f45a" name="Watch Diz! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c18bc229" name="Water Ski School">
+		<year>19??</year>
+	</hash>
+	<hash crc32="01543f12" name="Wave 256 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="98a09d19" name="Waves (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="200e55ad" name="Wavy Navy">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4be824a5" name="Wavy Navy">
+		<year>19??</year>
+		<manufacturer>Sirius</manufacturer>
+	</hash>
+	<hash crc32="a3273df3" name="Weakon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a9f969f4" name="What Have I Done To Deserve This - Pet Shop Boys (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d08d2ad6" name="Whiplash (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="26d343a4" name="Whirlinurd">
+		<year>1985</year>
+	</hash>
+	<hash crc32="954602fa" name="Whirlinurd [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1d1e037e" name="Whirlinurd">
+		<year>19??</year>
+	</hash>
+	<hash crc32="857f45ad" name="White House, The (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c8565735" name="Whiz Kids Spell">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b19bcd52" name="Whomper Stomper">
+		<year>1984</year>
+		<manufacturer>Adventure Intl</manufacturer>
+	</hash>
+	<hash crc32="9accd272" name="Whomper Stomper">
+		<year>19??</year>
+	</hash>
+	<hash crc32="91e42472" name="Whoops 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6af676a8" name="Windows (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f3c349c8" name="Windows 95 (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0df06585" name="Wing Wars [cr]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="712d12d8" name="Wing Wars">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0e1c6b05" name="Wing Wars [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="98900cbc" name="Winter Wally">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a73968be" name="Wirlit (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ffa4cf5b" name="Wisielec">
+		<year>19??</year>
+	</hash>
+	<hash crc32="898307a2" name="Witajcie Drogie Dziec!! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0de04ea2" name="Wizard Of Wor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="157ea2e4" name="Wladca">
+		<year>19??</year>
+	</hash>
+	<hash crc32="2f36e82c" name="Wladca [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e82d7610" name="Wloczykij">
+		<year>19??</year>
+	</hash>
+	<hash crc32="26c2981e" name="Wloczykij [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6f67be7c" name="World Soccer">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8fae01c5" name="Worm War">
+		<year>19??</year>
+	</hash>
+	<hash crc32="05da2c6b" name="Worms">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1cc4189e" name="Worms">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="7621b6ff" name="Worms (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ca05a334" name="WSL (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d045c4cd" name="Wumpus Hunter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="244623f3" name="Wumpus Hunter">
+		<status>OVERDUMP</status>
+	</hash>
+	<hash crc32="31f80936" name="Wyzle!">
+		<year>19??</year>
+	</hash>
+	<hash crc32="609f159d" name="X -! (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8b29d6d0" name="Xagon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3e74b2bd" name="Xagon [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0e6217e3" name="Xevious">
+		<year>1983</year>
+	</hash>
+	<hash crc32="95678ba0" name="Xevious">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0f0717bf" name="Xevious">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f810d3e4" name="Xevious [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3ace0533" name="Xpoker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="30532b16" name="XQB (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5ae49c02" name="Yahtzee">
+		<year>19??</year>
+	</hash>
+	<hash crc32="67918ef6" name="Yargos Dilemma - Part 1">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1a10086a" name="Yogi Bear And Friends In The Greed Monster">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1bd8092a" name="Yogi's Great Escape">
+		<year>19??</year>
+	</hash>
+	<hash crc32="42a94055" name="You've Got The Look (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9dfb89df" name="Your Body My Body (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a532aca2" name="Zahlen Raten">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fdbfcfd8" name="Zardon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="026d8c50" name="Zaxxon">
+		<year>19??</year>
+	</hash>
+	<hash crc32="27569852" name="Zaxxon [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b6899223" name="Zbir">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9278536c" name="Zdenek (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f68986b2" name="Zenji">
+		<year>19??</year>
+	</hash>
+	<hash crc32="73bfed2b" name="Zenji [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ef00679e" name="Zeppelin [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1c7899ae" name="Zeppelin">
+		<year>19??</year>
+	</hash>
+	<hash crc32="92469071" name="Zeppelin [a2]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="bbae3ece" name="Zero Free">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8c0980a0" name="Zeta Affair">
+		<year>19??</year>
+	</hash>
+	<hash crc32="800168ef" name="Zeus">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0b83d03f" name="Zombies">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4eeffbe7" name="Zombies [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5b88bc99" name="Zone Ranger">
+		<year>1984</year>
+	</hash>
+	<hash crc32="8c6412d6" name="Zone Ranger">
+		<year>1984</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="e57508c6" name="Zone Ranger">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d3604e5d" name="Zone Ranger [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1e3727ef" name="Zone X">
+		<year>19??</year>
+	</hash>
+	<hash crc32="08719dea" name="Zone X [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="592f61d4" name="Zorro">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3a068485" name="Zorro [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e29bf321" name="Zorro">
+		<year>19??</year>
+		<manufacturer>Alt</manufacturer>
+	</hash>
+	<hash crc32="7898c7e2" name="Zrebak III (demo) (19xx)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7645920a" name="Zybex">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d47df1e9" name="Zybex [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6474f349" name="ZZZ-UNK-ALLEYCAT-[B]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="204c7e9a" name="ZZZ-UNK-BERZERK 1-[B]">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="d9c1761f" name="ZZZ-UNK-COLOSSAL">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="cca8bd05" name="ZZZ-UNK-CRISISMO">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="6f0a0842" name="ZZZ-UNK-CRYSTALC">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="86399148" name="ZZZ-UNK-DAVIDSMI">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="a257fd0f" name="ZZZ-UNK-GALAXYDE">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="ae779723" name="ZZZ-UNK-GENE">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="7d72a0ab" name="ZZZ-UNK-HELL">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="d02559af" name="ZZZ-UNK-INFOCEDY [B]">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="1f987909" name="ZZZ-UNK-LONERAID">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="c208b534" name="ZZZ-UNK-LUNARLEE">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="a20a4dd7" name="ZZZ-UNK-MUADDIB">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="b533a3ba" name="ZZZ-UNK-MUZAK">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="d7b0d54c" name="ZZZ-UNK-OGLUSZ">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="eef7cc81" name="ZZZ-UNK-PERESTR">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="d18058a7" name="ZZZ-UNK-PLANETMI">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="dc5ac0ea" name="ZZZ-UNK-SRALA">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="c536a988" name="ZZZ-UNK-STOP">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="0941a229" name="ZZZ-UNK-SUPERZAX">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="af9b05ac" name="ZZZ-UNK-SWAMPCHO">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="901e3704" name="ZZZ-UNK-SWAMPCHO">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="960ec436" name="ZZZ-UNK-TETRIS3D-[B]">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="81138e6d" name="ZZZ-UNK-THEBEST">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="4be9c57f" name="ZZZ-UNK-TIMELESS">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="b57ff22a" name="ZZZ-UNK-TRACKING">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="82dd1320" name="ZZZ-UNK-ULTRA">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="250ddca9" name="ZZZ-UNK-VENGEANC">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="775a66ef" name="ZZZ-UNK-VENT12">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="c8e78638" name="ZZZ-UNK-VOYAGE">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+	<hash crc32="be15f830" name="ZZZ-UNK-WYMIAR">
+		<year>19??</year>
+		<manufacturer>19xx</manufacturer>
+	</hash>
+</hashfile>

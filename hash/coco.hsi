@@ -1,0 +1,170 @@
+<hashfile>
+	<!-- This MESS CRC file was generated from Cowering's Good databases (0.999.3 BETA) -->
+	<!-- Please keep this notice intact if editing this file -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="93ddfc53" type="cartridge" name="A Mazing World of Malcom Mortar (26-3160) (U)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="7d1cac0e" type="cartridge" name="Androne (26-3096) (U) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e79644a9" type="cartridge" name="Arkanoid (26-3043) (Taito) (U)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="16d2d946" type="cartridge" name="Audio Spectrum Analyzer (26-3156) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="3be0cf60" type="cartridge" name="Bingo Math (26-3150) (U) [!]">
+		<year>1980</year>
+	</hash>
+	<hash crc32="d6b940f1" type="cartridge" name="Bridge Tutor (26-3158) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="c7ed9d30" type="cartridge" name="Bustout (26-3056) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="aa214e43" type="cartridge" name="Canyon Climber (26-3089) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="8869eddc" type="cartridge" name="Castle Guard (26-3079) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="82929650" type="cartridge" name="Castle of Tharoggad (26-3159) (U) [!]">
+		<year>1988</year>
+	</hash>
+	<hash crc32="fe4c93e4" type="cartridge" name="Clowns &amp; Balloons (26-3087) (Radio Shack - Steve Bjork) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="ad1937c1" type="cartridge" name="Color Baseball (26-3095) [!]">
+		<year>1980</year>
+	</hash>
+	<hash crc32="0b9c5415" type="cartridge" name="Color Computer Controller (26-3022)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="f4be90bc" type="cartridge" name="Color Cubes (26-3075) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="d78be10a" type="cartridge" name="Color File (26-3103) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="3aca199b" type="cartridge" name="Color Scripsit (26-3105) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="7bffd03a" type="cartridge" name="Color Scripsit II (26-3109) (U)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="d990e1f9" type="cartridge" name="Deluxe RS-232 Program Pak (26-2226)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1199d27f" type="cartridge" name="Demolition Derby (26-3044) (U) [!]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d5257b50" type="cartridge" name="Diagnostics (26-3019) (U) [!]">
+		<year>1980</year>
+	</hash>
+	<hash crc32="667bc55d" type="cartridge" name="Direct Connect Modem Pak (26-2228)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4cc44337" type="cartridge" name="Doubleback (26-3091) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="d45e59e3" type="cartridge" name="Dungeons of Daggorath (26-3093) (DynaMicro) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="f4374a55" type="cartridge" name="EDTASM+ (26-3250) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="7a1c2f2d" type="cartridge" name="Facemaker (26-3166) (Spinnaker) (U) [!]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="984ee0d9" type="cartridge" name="Galactic Attack (26-3066) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="c858d1cf" type="cartridge" name="GFL Championship Football II (26-3172) (U) [!]">
+		<year>1988</year>
+	</hash>
+	<hash crc32="fd84fc5c" type="cartridge" name="Gomoku - Renju (26-3069) (Intelligent Software Ltd) (U) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b2e463b6" type="cartridge" name="Kids on Keys (26-3167) (U) [!]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="36eecac4" type="cartridge" name="Kindercomp (26-3168) (Spinnaker) (U) [!]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4cee1c54" type="cartridge" name="Mega-Bug (26-3076) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="d4320300" type="cartridge" name="Micro Painter (26-3077) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="8acd7ea2" type="cartridge" name="Microworks Forth (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="83bd6056" type="cartridge" name="Mind-Roll (26-3100) (EPYX) (U) [!]">
+		<year>1988</year>
+	</hash>
+	<hash crc32="9c241cdc" type="cartridge" name="Mind-Roll (26-3100) (EPYX) (U) [h1]">
+		<year>1988</year>
+	</hash>
+	<hash crc32="15fb39af" type="cartridge" name="Orchestra 90-CC (26-3143)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="73c41fde" type="cartridge" name="Personal Finance II (26-3106) (U) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f7dcc3bb" type="cartridge" name="Polaris (26-3065) (Radio Shack) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="770e5f3a" type="cartridge" name="Poltergeist (26-3073) (U) [!]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="7f507089" type="cartridge" name="Popcorn (26-3090) (Radio Shack - Steve Bjork) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="4ef9c448" type="cartridge" name="Popcorn (26-3090) (Radio Shack - Steve Bjork) (U) [o1]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="4123fb50" type="cartridge" name="Project Nebula (26-3063) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="3218e0f5" type="cartridge" name="Quasar Commander (26-3051) (U) [!]">
+		<year>1980</year>
+	</hash>
+	<hash crc32="fad4c7e3" type="cartridge" name="Reactoid (26-3092) (U) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3bf566bb" type="cartridge" name="Roman Checkers (26-3071) (The Image Producers) (U)">
+		<year>1981</year>
+	</hash>
+	<hash crc32="5a54973c" type="cartridge" name="Shanghai (26-3084) (U) [!]">
+		<year>1987</year>
+	</hash>
+	<hash crc32="1f1ba95d" type="cartridge" name="Shooting Gallery (26-3088) (DataSoft) (U)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="bed7dcde" type="cartridge" name="Silpheed (26-3054) (Sierra) (U)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="b98d5eaf" type="cartridge" name="Slay the Nereis (26-3086) (U) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="44390e55" type="cartridge" name="Soko-Ban (26-3161) (Spectral Associates) (U)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="f4700120" type="cartridge" name="Space Assault (26-3060) (U) [!]">
+		<year>1981</year>
+	</hash>
+	<hash crc32="36f31eb7" type="cartridge" name="Starblaze (26-3094) (U) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f4f2b0a0" type="cartridge" name="Temple of ROM (26-3045) (Rick Adams) (U) [!]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9fb1e7d9" type="cartridge" name="TRS-80 Color Logo (26-2722) (U) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ab96914a" type="cartridge" name="Wildcatting (26-3067) (U) [!]">
+		<year>1982</year>
+	</hash>
+</hashfile>

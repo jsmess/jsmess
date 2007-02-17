@@ -1,0 +1,166 @@
+<hashfile>
+	<hash crc32="ff4768b0" name="Videocart 01 - Tic-Tac-Toe &amp; Shooting Gallery &amp; Doodle &amp; Quadra-Doodle">
+		<year>1976</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="Luxor">Videocart 01 - Lerduveskytte &amp; Luffarschack &amp; Kaleidoskop &amp; Rita Själv</alt>
+	</hash>
+	<hash crc32="1570934b" name="Videocart 02 - Desert Fox &amp; Shooting Gallery">
+		<year>1976</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 02 - Wuestenfuchs &amp; Tontaubenschießen</alt>
+		<alt company="Luxor">Videocart 02 - Lerduveskytte &amp; Ökenkrig</alt>
+	</hash>
+	<hash crc32="e98d4456" name="Videocart 03 - Video Blackjack">
+		<year>1976</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 03 - Blackjack (17+4)</alt>
+		<alt company="Luxor">Videocart 03 - "21" 1 Eller 2 Spelare </alt>
+	</hash>
+	<hash crc32="5357c5f6" name="Videocart 04 - Spitfire">
+		<year>1976</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 04 - Luftkampf </alt>
+		<alt company="Luxor">Videocart 04 - Röde Baronen</alt>
+	</hash>
+	<hash crc32="22ef49e8" name="Videocart 05 - Space War">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 05 - Kampf Im Weltraum</alt>
+		<alt company="Luxor">Videocart 05 - Rymdkrig</alt>
+	</hash>
+	<hash crc32="bb4c24a2" name="Videocart 06 - Math Quiz I (Addition &amp; Subtraction)">
+		<year>1976</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="Luxor">Videocart 06 - Matematik</alt>
+	</hash>
+	<hash crc32="4aa7ea97" name="Videocart 07 - Math Quiz II (Multiplication &amp; Division)">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="Luxor">Videocart 07 - Matematik</alt>
+	</hash>
+	<hash crc32="24da0529" name="Videocart 08 - Magic Numbers &amp; Mind Reader &amp; Nim">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 06 - Magische Zahlen (Gedankenlesen &amp; Nim) </alt>
+		<alt company="Luxor">Videocart 08 - Master Mind (Magiska Tal)</alt>
+	</hash>
+	<hash crc32="6a64dda3" name="Videocart 09 - Drag Race">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 07 - Autorennen</alt>
+		<alt company="Luxor">Videocart 09 - Drag Race</alt>
+	</hash>
+	<hash crc32="0a948b61" name="Videocart 10 - Maze &amp; Jailbreak &amp; Blind-man's-bluff &amp; Trailblazer">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 08 - Labyrinth</alt>
+	</hash>
+	<hash crc32="4d42b296" name="Videocart 10 - Maze &amp; Jailbreak &amp; Blind-man's-bluff &amp; Trailblazer (newer)">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 08 - Labyrinth</alt>
+		<alt company="Luxor">Videocart 10 - Labyrint &amp; Rymning &amp; Blindbock &amp; Stigfinnare</alt>
+	</hash>
+	<hash crc32="a1731b52" name="Videocart 11 - Backgammon &amp; Acey-Ducey">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 09 - Backgammon</alt>
+		<alt company="Luxor">Videocart 11 - Brädspel &amp; Dus-Ess </alt>
+	</hash>
+	<hash crc32="01129bcd" name="Videocart 12 - Baseball">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 10 - Baseball</alt>
+		<alt company="Luxor">Videocart 12 - Baseball </alt>
+	</hash>
+	<hash crc32="38241e4f" name="Videocart 13 - Robot War &amp; Torpedo Alley">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 11 - Robot-Jagd &amp; Torpedo</alt>
+		<alt company="Luxor">Videocart 13 - Robotjakt &amp; Torpedskjutning</alt>
+	</hash>
+	<hash crc32="dbdc56bf" name="Videocart 14 - Sonar Search">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 12 - Sonar-Peilung</alt>
+		<alt company="Luxor">Videocart 14 - Sonar-sökning</alt>
+	</hash>
+	<hash crc32="104b5e18" name="Videocart 15 - Memory Match 1 &amp; 2">
+		<year>1978</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 13 - Memory </alt>
+		<alt company="Luxor">Videocart 15 - Minnestest 1 &amp; 2</alt>
+	</hash>
+	<hash crc32="e3c1811c" name="Videocart 16 - Dodge' It">
+		<year>1978</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 14 - Völkerball </alt>
+		<alt company="Luxor">Videocart 16 - Rymmare-Fasttagare </alt>
+	</hash>
+	<hash crc32="c610b330" name="Videocart 17 - Pinball Challenge">
+		<year>1978</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 15 - Barriere</alt>
+	</hash>
+	<hash crc32="9238d6ce" name="Videocart 18 - Hangman">
+		<year>1978</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="Luxor">Videocart 18 - Ordtävling </alt>
+	</hash>
+	<hash crc32="fdae7044" name="Videocart 19 - Checkers">
+		<manufacturer>Zircon</manufacturer>
+	</hash>
+	<hash crc32="65fdfe49" name="Videocart 20 - Video Whizball">
+		<year>197?</year>
+		<manufacturer>Fairchild</manufacturer>
+		<alt company="SABA">Videocart 17 - Kickball</alt>
+	</hash>
+	<hash crc32="94322c79" name="Videocart 21 - Bowling">
+		<year>1978</year>
+		<manufacturer>Fairchild/Zircon</manufacturer>
+		<alt company="SABA">Videocart 18 - Bowling</alt>
+		<alt company="Luxor">Videocart 21 - Bowling</alt>
+	</hash>
+	<hash crc32="b7eabd08" name="Videocart 22 - Slot Machine">
+		<manufacturer>Zircon</manufacturer>
+	</hash>
+	<hash crc32="c8ef3410" name="Videocart 23 - Galactic Space Wars">
+		<manufacturer>Zircon</manufacturer>
+		<alt company="SABA">Videocart 19 - Odyssee Im Weltraum"</alt>
+	</hash>
+	<hash crc32="a1ae99be" name="Videocart 24 - Pro Football">
+		<manufacturer>Zircon</manufacturer>
+	</hash>
+	<hash crc32="5aa30c12" name="Videocart 25 - Casino Poker ">
+		<manufacturer>Zircon</manufacturer>
+	</hash>
+	<hash crc32="85e00865" name="Videocart 26 - Alien Invasion">
+		<manufacturer>Zircon</manufacturer>
+	</hash>
+	<hash crc32="42727ad5" name="Democart 1">
+		<year>1977</year>
+		<manufacturer>Fairchild</manufacturer>
+	</hash>
+	<hash crc32="44cf1d89" name="Democart 2">
+		<manufacturer>Fairchild</manufacturer>
+	</hash>
+	<hash crc32="7124dc59" name="Videocart 01g - Mühle &amp; Tontauben-Schießen &amp; Kreatives Malspiel &amp; Videoscope ">
+		<year>1978</year>
+		<manufacturer>SABA</manufacturer>
+	</hash>
+	<hash crc32="87752425" name="Videocart 16g - Rat' mal">
+		<year>????</year>
+		<manufacturer>SABA</manufacturer>
+	</hash>
+	<hash crc32="04fb6dce" name="Videocart 20g - Schach">
+		<year>????</year>
+		<manufacturer>SABA</manufacturer>
+	</hash>
+	<!-- Fairchild (USA) -->
+	<!-- Zircon (USA) Released later games in US -->
+	<!-- Luxor (Sweden) Label swap of US releases -->
+	<!-- SABA (Germany) Label swaps over US releases with different cart numbers, 3 carts are originals -->
+	<!-- NordMende Teleplay (Germany) label swap of US releases -->
+	<!-- ITT Telematch processor (Germany) labelswap of SABA releases -->
+	<!-- Keyboard Videocart K-1 - Is not known to actually exist. Possibly a hoax. -->
+</hashfile>

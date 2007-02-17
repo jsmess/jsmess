@@ -1,0 +1,44 @@
+<hashfile>
+	<!-- Timex Sinclair TS-2068 cartridges CRC List -->
+	<!-- Compiled by Krzysztof Strzecha -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: strzecha@kis.p.lodz.pl -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<!-- DOCK cartridges -->
+	<!-- all of them were tested and work good with MESS -->
+	<hash crc32="ad8ae914" name="64kB RAM Expansion (DOCK)"/>
+	<hash crc32="ada25d7d" name="BASIC Toolkit EPROM (AROS)"/>
+	<hash crc32="30178d8c" name="Super Hot Z Disassembler (AROS) v2.51">
+		<year>1984</year>
+		<manufacturer>Ray Kingsley</manufacturer>
+	</hash>
+	<hash crc32="0e8be299" name="Zebra OS 64 (LROS)">
+		<year>1985</year>
+		<manufacturer>Zebra Systems Inc</manufacturer>
+	</hash>
+	<hash crc32="41ef3381" name="ZX Spectrum Emulator for TS-2068 (DOCK)"/>
+	<hash crc32="4bef7012" name="ZX Spectrum Emulator for UK-2086 (DOCK)">
+		<year>1986</year>
+		<manufacturer>S.P.M. &quot;Spektrum&quot;</manufacturer>
+	</hash>
+	<!-- EXROM cartridges -->
+	<!-- this type of cartridges are not supported in MESS -->
+	<hash crc32="6f5f0023" name="32kB RAM Expansion (EXROM)">
+		<status>Not supported</status>
+	</hash>
+	<hash crc32="3e69c1f0" name="Super Hot Z Disassembler (EXROM) v2.51">
+		<year>1984</year>
+		<manufacturer>Ray Kingsley</manufacturer>
+		<status>Not supported</status>
+	</hash>
+	<!-- HOME cartridges -->
+	<!-- all of them were made for Warajevo to expand its possibilities -->
+	<!-- they are totally useless in MESS -->
+	<hash crc32="b97eebd0" name="Modified Timex and Series 1 Interface ROMs (HOME)">
+		<manufacturer>Keith Watson</manufacturer>
+		<status>Useless</status>
+	</hash>
+	<hash crc32="13db21fc" name="Timex Sinclair 2048 Emulator (HOME)"/>
+</hashfile>

@@ -1,0 +1,921 @@
+<hashfile>
+	<!-- This MESS CRC file was generated from Cowering's Good databases (1.00) -->
+	<!-- Please keep this notice intact if editing this file -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="c575a831" name="2010 - The Graphic Action Game (Coleco)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="164c8c26" name="Adam's Musicbox Demo (Coleco)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="6cd063aa" name="Adventurium3 Demo (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="7c66aba6" name="Air Battle V0.4 by Daniel Bienvenu (July 10) (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="9cc3fabc" name="Alcazar - The Forgotten Fortress (Activision)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4ffb4e8c" name="Alphabet Zoo (Spinnaker)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="78a738af" name="Amazing Bumpman (Telegames)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="af01e7dd" name="Amazing Snake Beta 4 by Serge-Eric Tremblay (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="5ba1a6c8" name="Amazing Snake Beta 5 by Serge-Eric Tremblay (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="7da41b23" name="Amazing Snake Beta X by Serge-Eric Tremblay (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="a66e5ed1" name="Antarctic Adventure (Konami) (Prototype)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="275c800e" name="Antarctic Adventure (Konami)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="947437ec" name="Aquattack (Interphase) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="275a7013" name="Aquattack (Interphase)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="adfa09e2" name="Artillery Duel (Xonox)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4359a3e5" name="BC's Quest for Tires (Sierravision)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9ebe5d98" name="BC's Quest for Tires II - Grog's Revenge (24k) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0ea6a6fc" name="BC's Quest for Tires II - Grog's Revenge (32k)">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="d07d5e97" name="BC's Quest for Tires (Sierravision) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="518f84e8" name="Galaxian (Atarisoft) [a3]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ca7fe4ce" name="BC's Quest for Tires II - Grog's Revenge (32k)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2e8e9d42" name="Beamrider (Activision) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1ba0688f" name="Bejeweled Demo by Daniel Bienvenu (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="da29c284" name="Blockade Runner (Interphase)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1796de5e" name="Boulder Dash (Micro Fun)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6e5c4b11" name="Boulder Dash (Telegames) [t1] (50 Men)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5933ac18" name="Boulder Dash (Telegames) [t2] (9 Men)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="829c967d" name="Brain Strainers (Carousel)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b05fb3ec" name="Breakout by Daniel Bienvenu (Feb 02) (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="8fd90a28" name="Breakout Paddle Demo by Daniel Bienvenu (Feb 12) (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="2e63d09e" name="Buck Rogers - Planet of Zoom (Sega) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1baf661e" name="Buck Rogers - Planet of Zoom (Sega)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="002b22d4" name="Bump 'N' Jump (Data East)">
+		<year>1982-84</year>
+	</hash>
+	<hash crc32="eb498f97" name="Bump 'N' Jump (Mattel) (Prototype)">
+		<year>1982-84</year>
+	</hash>
+	<hash crc32="e5c5ea20" name="Burgertime (Mattel) (Prototype)">
+		<year>1982-83</year>
+	</hash>
+	<hash crc32="91346341" name="Burgertime (Data East)">
+		<year>1982-84</year>
+	</hash>
+	<hash crc32="c74766d8" name="BUsTin-Out Demo 0.5 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="edca3a1f" name="BUsTin-Out Volume 0 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="97b601a2" name="BUsTin-Out Volume 1 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="e12ccc1e" name="BUsTin-Out Volume 2 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="c3a925af" name="BUsTin-Out Volume 3 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="beacbff5" name="Cabbage Patch Kids - Adventure in the Park">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f9d56307" name="Cabbage Patch Kids - Adventures in the Park (Proto)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0c25ad84" name="Cabbage Patch Kids Picture Show">
+		<year>1984</year>
+	</hash>
+	<hash crc32="72aceac7" name="Campaign '84 (Sunrise)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d568c4c5" name="Carnival [a1]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="32bff3f3" name="Carnival">
+		<year>1982</year>
+	</hash>
+	<hash crc32="17edbfd4" name="Centipede (Atarisoft)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="43478adf" name="Chateau du Dragon, Le by Daniel Bienvenu (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="e7a1ff9f" name="Choplifter (Broderbund)">
+		<year>1982-84</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="030e0d48" name="Choplifter (Broderbund)">
+		<year>1982-84</year>
+	</hash>
+	<hash crc32="a23a566c" name="Christmas Demo by Daniel Bienvenu (Dec 25) (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="73e96e53" name="Chuck Norris - Super Kicks (Xonox)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="66cda476" name="ColecoVision BIOS [h1] (no title delay)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="39bb16fc" name="ColecoVision BIOS [h2] (different font)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="3aa93ef3" name="ColecoVision BIOS">
+		<year>1982</year>
+	</hash>
+	<hash crc32="71ae16ed" name="ColecoVision Monitor Test">
+		<year>1982</year>
+	</hash>
+	<hash crc32="95051633" name="ColecoVision Noise Generator by Marcel de Kogel (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="ddafb16f" name="Congo Bongo">
+		<year>1984</year>
+	</hash>
+	<hash crc32="39d4215b" name="Cosmic Avenger (Universal) [a1]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="14d6ced6" name="Cosmic Avenger (Universal)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="3a581cae" name="Cosmic Crisis (Bit Corp)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="43933306" name="Cosmo Challenge by Marcel de Kogel (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="55ee8840" name="Cosmo Challenge-Trainer Menu by Marcel de Kogel (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="d93a7dc2" name="Cosmo Fighter 2 by Marcel de Kogel (PD)">
+		<year>1996-97</year>
+	</hash>
+	<hash crc32="901c8512" name="Cosmo Fighter 3 Demo by Marcel de Kogel (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="7ba2f186" name="Cosmo Trainer by Marcel de Kogel (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="5e4b3e68" name="Dacman (Aug 01) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="3ee7a705" name="Dacman (Aug 08) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="9a46ef8d" name="Dacman (Aug 16) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="07c68567" name="Dacman (Jul 12) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="22f8a86b" name="Dacman (Jul 16) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="62cfdb1f" name="Dacman (Jul 17) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="02dd4c68" name="Dacman (Jul 18) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="cdc4a7cc" name="Dacman (Jul 19) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="c20fbf76" name="Dacman (Jul 22) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="a67f0339" name="Dacman (Jul 28) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="e829ef78" name="Dacman (Jul 29) by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="c75fad5a" name="Dam Busters, The">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bff86a98" name="Dance Fantasy (Fisher-Price)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="614bb621" name="Decathlon (Activision)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ffd16997" name="Defender (Atarisoft)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b3b3f3fe" name="Demon2 Demo by Yannick Proulx (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="56c358a6" name="Destructor (Coleco)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1fe02bbc" name="Dig Dug (Atarisoft) (Prototype) [o1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1038e0a1" name="Dig Dug (Atarisoft) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3c77198c" name="Donkey Kong">
+		<year>1982</year>
+	</hash>
+	<hash crc32="94c4cd4a" name="Donkey Kong for Adam">
+		<year>1982</year>
+	</hash>
+	<hash crc32="fd11508d" name="Donkey Kong Jr">
+		<year>1982-83</year>
+	</hash>
+	<hash crc32="109699e2" name="Dr. Seuss's Fix-Up The Mix-Up Puzzler (Coleco)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dcb8f9e8" name="DragonFire (Imagic)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4025ac94" name="Dukes of Hazzard, The (Warner Bros)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d3bd33e3" name="ELDCDBPAPP (Q-bert Hack)"/>
+	<hash crc32="3678ab6f" name="Escape From The Mind Master (Starpath) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="dff01cf7" name="Evolution (Sydney)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ec9dfb07" name="Facemaker (Spinnaker) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="448fed54" name="Facemaker (Spinnaker)">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="1bed9c5b" name="Fall Guy (20th Century Fox) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9eb58823" name="Fathom (Imagic)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="48ff87cf" name="Final Test Cartridge">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7e97a22e" name="Flipper Slipper (Spectravideo)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="65bbbcb4" name="Fortune Builder (Circuits and Systems)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="964db3bc" name="Fraction Fever (Spinnaker)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8615c6e8" name="Frantic Freddy (Spectravideo)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="960616af" name="Frenzy! [a1]">
+		<year>1982-83</year>
+	</hash>
+	<hash crc32="bf1ccf04" name="Frenzy!">
+		<year>1982-83</year>
+	</hash>
+	<hash crc32="32b95be0" name="Frogger (Parker Bros) [o1]">
+		<year>1982-83</year>
+	</hash>
+	<hash crc32="798002a2" name="Frogger (Parker Bros)">
+		<year>1982-83</year>
+	</hash>
+	<hash crc32="04405423" name="Frogger II - ThreeDeep! (Parker Bros)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="08990b8f" name="Frontline (Taito) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9c551386" name="Frontline (Taito)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="987bc7ac" name="Galaxian (Atarisoft) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6a7a162a" name="Galaxian (Atarisoft) [a2]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3f18ba6c" name="Galaxian (Atarisoft)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0726b64d" name="Gateway to Apshai (Epyx)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="074ea085" name="Gorf (Midway)">
+		<year>1981-83</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="ff46becc" name="Gorf (Midway)">
+		<year>1981-83</year>
+	</hash>
+	<hash crc32="f2cac67c" name="Gust Buster (Sunrise)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b4ef0f1f" name="Gyruss (Parker Bros)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="685ab9b5" name="H.E.R.O. (Activision)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="527ae3ac" name="Happy Halloween by Daniel Bienvenu (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="866849d1" name="Heist, The (Micro Fun) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bc3b9f78" name="Heist, The (Micro Fun) [t1] (50 Men)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b0f5dcb4" name="Heist, The (Micro Fun) [t2] (8 Men)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6f2e2d84" name="Heist, The (Micro Fun)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c9893041" name="Illusions (Nice Ideas)">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="2787516d" name="Illusions (Nice Ideas)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cc43ebf7" name="Its Only Rock 'N' Roll (Xonox)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3004a253" name="James Bond 007 (Parker Bros)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ba0434f1" name="JBulman Junior (Jumpman Jr. Hack) by Daniel Bienvenu">
+		<year>1997</year>
+	</hash>
+	<hash crc32="52228000" name="Joust (Atarisoft) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a5511418" name="Juke Box (Spinnaker)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9528949a" name="Jumpman Junior (Epyx) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="060c69e8" name="Jumpman Junior (Epyx)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e8858484" name="Jungle Hunt (Atarisoft)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1f5f8571" name="Ken Uston's Blackjack-Poker">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="8c7b7803" name="Ken Uston's Blackjack-Poker">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4e8dfc3c" name="Kevtris by Kevin Horton (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="819a06e5" name="Kevtris by Kevin Horton (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="fad8d414" name="Keystone Kapers (Activision)">
+		<year>1983-84</year>
+	</hash>
+	<hash crc32="d905c94b" name="Kill Barney in Tokyo by Daniel Bienvenu (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="58f10c63" name="Killer Instinct by Daniel Bienvenu (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="2c3097b8" name="Lady Bug (Universal)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="1641044f" name="Learning With Leeper (Sierravision) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="918f12c0" name="Linking Logic (Fisher-Price)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c28d7062" name="Logic Levels (Fisher-Price)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="472f8cf6" name="Looping (Venture Line)">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="6a2d637b" name="Looping (Venture Line)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fc95b302" name="M.A.S.H. (20th Century Fox) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="90007079" name="Matt Patrol (Atarisoft) (Prototype)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="861c9825" name="Memory Manor (Fisher-Price) [o1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bab520ea" name="Memory Manor (Fisher-Price)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3beffc06" name="Meteoric Shower (Bit Corp)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b24f10fd" name="Miner 2049er (Micro Fun) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a838c819" name="Miner 2049er (Micro Fun) [t1] (50 Men)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="223c4926" name="Miner 2049er (Micro Fun) [t2] (8 Men)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="71d1bd4d" name="Miner 2049er (Micro Fun)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d1e8df85" name="Monkey Academy (Konami) (Prototype)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="26fd822a" name="Monkey Academy (Konami) [o1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f06592bf" name="Monkey Academy (Konami)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0bd9d073" name="Montezuma's Revenge (Parker Bros)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c521bcad" name="Moonsweeper (Imagic) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8a303f5a" name="Moonsweeper (Imagic)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0f4d800a" name="Motocross Racer (Xonox) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="935ebe62" name="Motocross Racer (Xonox)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d8d73246" name="Mountain King (Sunrise) [!]">
+		<year>1983-84</year>
+	</hash>
+	<hash crc32="c173bbec" name="Mountain King (Sunrise) [a1]">
+		<year>1983-84</year>
+	</hash>
+	<hash crc32="fd8b79b3" name="Mousetrap (Exidy) [o1]">
+		<year>1982</year>
+	</hash>
+	<hash crc32="de47c29f" name="Mousetrap (Exidy)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="d53e4bdf" name="Mr. Do! (Universal) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="461ab6ad" name="Mr. Do! (Universal)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="546f2c54" name="Mr. Do's Castle (Parker Bros)">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="ef7e9562" name="Mr. Do's Castle (Parker Bros)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="dffd8cb4" name="Ms. Space Fury (Digital Press)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="0f3d9216" name="Music Vol 1 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="9b8f6dad" name="Nim by Daniel Bienvenu (Nov 03) (PD)">
+		<year>2000</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="9c059a51" name="Nim by Daniel Bienvenu (Nov 03) (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="ea06f585" name="Nova Blast (Imagic) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3af1b5f7" name="Nova Blast (Imagic) [a1][!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d2256b6c" name="Oil's Well (Sierravision)">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="add10242" name="Oil's Well (Sierravision)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9921ecb5" name="Omega Race (Midway)">
+		<year>1981-83</year>
+	</hash>
+	<hash crc32="17c77c3a" name="One on One Basketball (Micro Fun)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1c7c99d8" name="Pac-Man (Atarisoft) (Prototype) [o1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a40a07e8" name="Pac-Man (Atarisoft) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="53b85e20" name="Pepper II (Exidy)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3f84cc6c" name="Pere Noel by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="851a455f" name="Pitfall II - Lost Caverns (Activision)">
+		<year>1983-84</year>
+	</hash>
+	<hash crc32="d4f180df" name="Pitfall! (Activision) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="312ae55a" name="Pitfall! (Activision)">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="81be4f55" name="Pitstop (Epyx) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1e455299" name="Pitstop (Epyx) [a2]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e627fcf0" name="Pitstop (Epyx)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3ef1d0ee" name="Popeye (Parker Bros) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a095454d" name="Popeye (Parker Bros)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="46fc1c00" name="Porky's (20th Century Fox) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="caa61d8d" name="Power Lords - Quest for Volcan (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="137d6c4c" name="Purple Dinosaur Massacre by John Dondzila (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="13f06adc" name="Q-bert (Parker Bros) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="532f61ba" name="Q-bert (Parker Bros)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e45496d3" name="Q-bert II (Parker Bros)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2d32b1f0" name="Quest for Quintana Roo (Sunrise) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="eec81c42" name="Quest for Quintana Roo (Sunrise) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bbef9e8f" name="Reversi Demo by Daniel Bienvenu (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="fe897f9c" name="River Raid (Activision) [!]">
+		<year>1982-84</year>
+	</hash>
+	<hash crc32="0eb45d6e" name="Robin Hood (Xonox) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cdb8d3cf" name="Robin Hood (Xonox)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3caca004" name="Roc 'N Rope (Konami)">
+		<year>1983-84</year>
+	</hash>
+	<hash crc32="af49a0c3" name="Rock 'N' Bolt (Telegames) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="522b59b9" name="Rock 'N' Bolt (Telegames)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="046f4b70" name="Rocky Super-Action Boxing (Coleco)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e4585c0a" name="Rolloverture (Sunrise)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3563286b" name="Sammy Lightfoot (Sierravision) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c5f69a1b" name="Sammy Lightfoot (Sierravision)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8a46e5fa" name="Sector Alpha (Spectravideo) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ba14a83a" name="Sector Alpha (Spectravideo) [a2]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fe5f4602" name="Sector Alpha (Spectravideo)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="74057241" name="Sewer Sam (Interphase)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dd76775d" name="Sir Lancelot (Xonox) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b37d48bd" name="Skiing (Telegames)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="5cdb00d3" name="Slither (Century II) [o1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="53d2651c" name="Slither (Century II)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8871e9fd" name="Slurpy (Xonox)">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="27f5c0ad" name="Slurpy (Xonox)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="97c0382d" name="Smurf - Paint 'n Play Workshop">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d1a1fe0b" name="Smurf - Rescue in Gargamel's Castle">
+		<year>1982</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="42850379" name="Smurf - Rescue in Gargamel's Castle">
+		<year>1982</year>
+	</hash>
+	<hash crc32="0b619934" name="Sound FX Vol 1 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="040e3a9c" name="Sound FX Vol 2 by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="567be2b0" name="Space Fury (Sega) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="df8de30f" name="Space Fury (Sega)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="5191bba9" name="Space Invaders Collection Pack Demo (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="af9b178c" name="Space Invasion by John Dondzila (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="1328d5c4" name="Space Invasion Demo by John Dondzila (Feb 06) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="5bdf2997" name="Space Panic (Universal)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d5b4c25f" name="Spectank Demo by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="3564e134" name="Spectron (Spectravideo)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0b8db61e" name="Spy Hunter (Midway)">
+		<year>1983-84</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="36478923" name="Spy Hunter (Midway)">
+		<year>1983-84</year>
+	</hash>
+	<hash crc32="6c82e0cc" name="Squish 'Em Sam! (Interphase)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="83ec4f49" name="St-Valentine's Day (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="52961076" name="St-Valentine's Day (No Alien Head) (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="f7f18e6f" name="Star Fortress by John Dondzila (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="aff42aa9" name="Star Trek - Strategic Operations Simulator (Sega)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b8ea7b19" name="Star Trek - Strategic Operations Simulator (Sega)">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="0e75b3bf" name="Star Wars - The Arcade Game (Parker Bros)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="153ac4ef" name="Steamroller (Activision) (Prototype)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1d9082fb" name="Strike It! (Telegames) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d247a1c8" name="Strike It! (Telegames)">
+		<year>1983</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="2f9debf9" name="Stubby Demo by Yannick Proulx (PD) [a1]">
+		<year>2001</year>
+	</hash>
+	<hash crc32="26c348df" name="Stubby Demo by Yannick Proulx (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="2ecc2c3b" name="Subroc (Sega) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="509267f8" name="Subroc (Sega)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e1b8eb25" name="Super Action Baseball (Coleco) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="97217677" name="Super Action Baseball (Coleco)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="eb6cb4d8" name="Super Action Controller Test Cartridge (Nuvatec)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b00efd22" name="Super Action Football (Coleco) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="62619dc0" name="Super Action Football (Coleco)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="acac69dd" name="Super Action Soccer (Coleco)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f84622d2" name="Super Cobra (Parker Bros) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6cb5cb8f" name="Super Cobra (Parker Bros)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6c4ed807" name="Super Cross Force (Spectravideo) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8093b672" name="Super Cross Force (Spectravideo)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ef25af90" name="Super DK! (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c2e7f0e0" name="Super DK! Junior (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="038d4e15" name="Superpong Demo (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="7f0baa89" name="Tank Wars (Bit Corp) [!]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6eab5d44" name="Tapper (Midway)">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="8afd7db2" name="Tapper (Midway)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="eff35a70" name="Tarzan (Coleco)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c8bc1950" name="Telly Turtle (Carousel)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2f2df2ac" name="Tenchi Muyo Demo by Daniel Bienvenu (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="1593f7df" name="Threshold (Sierravision)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="969d77c8" name="Tic Tac Toe by Norman Nithman (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="9f22cd12" name="Tic Tac Toe by Norman Nithman (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="b3a1eacb" name="Time Pilot (Konami)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3fa0cdcb" name="Tomarc the Barbarian (Xonox)">
+		<year>1984</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="1e14397e" name="Tomarc the Barbarian (Xonox)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c1d5a702" name="Tournament Tennis (Imagic) [!]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4defcdfa" name="Tunnels &amp; Trolls Demo (Adam)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6ca80b63" name="Turbo (Sega)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="10cc33a3" name="Tutankham (Parker Bros) [o1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0408f58c" name="Tutankham (Parker Bros)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fdd52ca0" name="Up 'N Down (Sega)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3da70b52" name="Vampire (Venture Hack)"/>
+	<hash crc32="8e5a4aa3" name="Venture (Exidy)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="1d7eb7d1" name="Venture">
+		<year>1982</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="5f20bf49" name="Victory">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a9177b20" name="Video Hustler (Konami) (Prototype)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6e0150c1" name="War Games">
+		<year>1983-84</year>
+	</hash>
+	<hash crc32="261b7d56" name="War Room (Probe 2000) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="308a949b" name="War Room (Probe 2000)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="04eeef44" name="Wing War (Imagic)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="eaa5f606" name="Winky Trap by John Dondzila (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="b9ba2bb6" name="Wizard of Id's Wizmath (Sierravision)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9f49bed8" name="Word Feud (Xonox)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="997ad8de" name="Yolk's on You, The (20th Century Fox) (Prototype)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1f947468" name="Zaxxon (Sega)">
+		<year>1982</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="8cb0891a" name="Zaxxon (Sega)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="6e523e50" name="Zenji (Activision)">
+		<year>1984</year>
+	</hash>
+</hashfile>

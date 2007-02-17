@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Amstrad CPC - BIOS &amp; Utilities (TOSEC-v0.10) -->
+	<hash crc32="286b048a" name="Amram 2 - Sideways RAM toolkit ROM (AMRAM2.ROM)">
+		<year>19??</year>
+		<manufacturer>Silicon Systems</manufacturer>
+	</hash>
+	<hash crc32="d14f4918" name="Amsdos 720K (720KAMSD.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5047f37b" name="Amstrad Eprom Programmer (FLTEPRM.ROM)">
+		<year>19??</year>
+		<manufacturer>Fleet Microsystems Ltd &amp; F.Kup</manufacturer>
+	</hash>
+	<hash crc32="923477f7" name="Amstrad Toolkit v1.4 (TOOLKIT.ROM)">
+		<year>1986</year>
+		<manufacturer>Bee Bug Soft</manufacturer>
+	</hash>
+	<hash crc32="86687b14" name="Bos v2.1 (BOS21.ROM)">
+		<year>1987</year>
+		<manufacturer>Vortex Gmbh</manufacturer>
+	</hash>
+	<hash crc32="4b8f0e42" name="Cage Comms v1.1 (CAGE11.ROM)">
+		<year>19??</year>
+		<manufacturer>D. Gorski and I. Hoare</manufacturer>
+	</hash>
+	<hash crc32="d345187e" name="Communication Interface Unit Driver Softare 1.5 (PIADR.ROM)">
+		<year>1986</year>
+		<manufacturer>Panda Electronics Ltd</manufacturer>
+	</hash>
+	<hash crc32="ddcade50" name="Comstar v1.25 #1 (COMSTAR1.ROM)">
+		<year>1986</year>
+		<manufacturer>Honeysoft-Pace</manufacturer>
+	</hash>
+	<hash crc32="664e788c" name="Comstar v1.25 #2 (COMSTAR2.ROM)">
+		<year>1986</year>
+		<manufacturer>Honeysoft-Pace</manufacturer>
+	</hash>
+	<hash crc32="feeef4ee" name="Copy Lock v6.0 (COPYl60.ROM)">
+		<year>1988</year>
+		<manufacturer>Romantic Robot</manufacturer>
+	</hash>
+	<hash crc32="11633f36" name="Copymate + v3.2 (De)(COPYM32.ROM)">
+		<year>1990</year>
+		<manufacturer>Marco Vieth</manufacturer>
+	</hash>
+	<hash crc32="7d9a3bac" name="Cpc 464 Basic (BASIC.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad</manufacturer>
+	</hash>
+	<hash crc32="39185397" name="Cpc 464 Modified Os (Da)(CPC464DK.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="815752df" name="Cpc 464 Os (OS.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad</manufacturer>
+	</hash>
+	<hash crc32="c0cb1145" name="Cpc 464+ and 6128+ Basic (BASIC.ROM)">
+		<year>1991</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="bec456b1" name="Cpc 464+ and 6128+ Os (OS.ROM)">
+		<year>1991</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="f6159e18" name="Cpc 464+ Plus A2 (ROMPLUSADOS.ROM)">
+		<year>1991</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="4ff8190c" name="Cpc 6128 Basic (Fr)(FBASIC.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="b6e4acd2" name="Cpc 6128 Basic (Sp)(BASIC.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="ca6af63d" name="Cpc 6128 Basic (BASIC.ROM)">
+		<year>1986</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="cdb86700" name="Cpc 6128 Os (Fr)(F6128OS.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="0219bb74" name="Cpc 6128 Os (OS.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="a9937f75" name="Cpc 6128 Os (Sp)(S6128OS.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad-Locomotive</manufacturer>
+	</hash>
+	<hash crc32="1fe22ecd" name="Cpc 664 Amsdos (AMSDOS.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad</manufacturer>
+	</hash>
+	<hash crc32="32fee492" name="Cpc 664 Basic (BASIC.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad</manufacturer>
+	</hash>
+	<hash crc32="3f5a6dc4" name="Cpc 664 Os (OS.ROM)">
+		<year>1985</year>
+		<manufacturer>Amstrad</manufacturer>
+	</hash>
+	<hash crc32="3bdfdf2d" name="CPM Accessory Rom 1 (CPMACC1.ROM)">
+		<year>1988</year>
+		<manufacturer>Graduate Software</manufacturer>
+	</hash>
+	<hash crc32="92b01533" name="CPM+ #1 (CPM1.ROM)">
+		<year>1988</year>
+		<manufacturer>Graduate Software-Digital Research-Amstrad</manufacturer>
+	</hash>
+	<hash crc32="e0be4c83" name="CPM+ #2 (CPM2.ROM)">
+		<year>1988</year>
+		<manufacturer>Graduate Software-Digital Research-Amstrad</manufacturer>
+	</hash>
+	<hash crc32="3f8890d3" name="Disc Demon v1.1 (DDEMON.ROM)">
+		<year>1986</year>
+		<manufacturer>Bee Bug Soft</manufacturer>
+	</hash>
+	<hash crc32="1eb20f16" name="Disc Power (DISCPWR.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b5c23549" name="Discology Disccopier (DISCOLOG.ROM)">
+		<year>1987</year>
+		<manufacturer>Meridien Software</manufacturer>
+	</hash>
+	<hash crc32="b8cb15dc" name="Discology Filecopier (Fr)(DISCFILE.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="aa7b3c4f" name="Discology v6.0 (DOLOGY6.ROM)">
+		<year>19??</year>
+		<manufacturer>Meridien Software</manufacturer>
+	</hash>
+	<hash crc32="4957c2f5" name="Dk'Tronics Speech Rom v1.1 (DKSPEECH.ROM)">
+		<year>19??</year>
+		<manufacturer>Dk'Tronics</manufacturer>
+	</hash>
+	<hash crc32="c2d8629e" name="Dos Copy v1.3 and Crime v1.3 (DOSCRIME.ROM)[ROM v2.1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="decb0867" name="Dragon Breed Rom 1 (DBREED1.ROM)">
+		<year>19??</year>
+		<manufacturer>Dragon Breed</manufacturer>
+	</hash>
+	<hash crc32="8f6bbc26" name="Extended Basic v1.1 (EXBASIC.ROM)">
+		<year>1986</year>
+		<manufacturer>John Morrison</manufacturer>
+	</hash>
+	<hash crc32="fcde9bc6" name="Hack It-Le Hackeur (En-Fre)(HACKEUR.ROM)">
+		<year>19??</year>
+		<manufacturer>Siren Software</manufacturer>
+	</hash>
+	<hash crc32="9efcf13b" name="JL Utilities v1.2 (JLUTIL12.ROM)">
+		<year>19??</year>
+		<manufacturer>J0rn Lorentzen-JLCS</manufacturer>
+	</hash>
+	<hash crc32="96fe755c" name="JL Utilities v2.1 (JLUTIL21.ROM)">
+		<year>19??</year>
+		<manufacturer>J0rn Lorentzen-JLCS</manufacturer>
+	</hash>
+	<hash crc32="be46df40" name="Jm Eprom Programmer (JMPEPRM.ROM)">
+		<year>1985</year>
+		<manufacturer>John Morrison</manufacturer>
+	</hash>
+	<hash crc32="27fe1ded" name="Jm Maxidos v1.2 (MAXIDOS.ROM)">
+		<year>19??</year>
+		<manufacturer>Nemesis</manufacturer>
+	</hash>
+	<hash crc32="fff63bf0" name="K.D.S Serial Interface &amp; Comms Pack 5 v4.2B (KSERIAL.ROM)">
+		<year>19??</year>
+		<manufacturer>K.D.S. Electronics</manufacturer>
+	</hash>
+	<hash crc32="7d780ae2" name="Kns Rom 6128 v1.01 (KNSROM.ROM)">
+		<year>1989</year>
+		<manufacturer>MFW</manufacturer>
+	</hash>
+	<hash crc32="5084d920" name="Lock Smith (LOCKS.ROM)">
+		<year>1985</year>
+		<manufacturer>Bee Bug Software</manufacturer>
+	</hash>
+	<hash crc32="bfaa87c0" name="Master File 128 v2.2 (MFILE128.ROM)">
+		<year>19??</year>
+		<manufacturer>Campbell Systems and GoldMark</manufacturer>
+	</hash>
+	<hash crc32="323f210e" name="Master File 464 v1.1 (MFILE464.ROM)">
+		<year>1984</year>
+		<manufacturer>Campbell Systems and Amsoft</manufacturer>
+	</hash>
+	<hash crc32="1e4ea136" name="Micro Music Creator #1 (MMC1.ROM)">
+		<year>1988</year>
+		<manufacturer>First Byte</manufacturer>
+	</hash>
+	<hash crc32="6c7b343f" name="Micro Music Creator #2 (MMC2.ROM)">
+		<year>1988</year>
+		<manufacturer>First Byte</manufacturer>
+	</hash>
+	<hash crc32="6b5e3307" name="Micro Style Rom v2.11 (STYLE.ROM)">
+		<year>1989</year>
+		<manufacturer>Micro Style - PotPlant Systems</manufacturer>
+	</hash>
+	<hash crc32="f36086de" name="Multiface 2 (MULTFACE.ROM)">
+		<year>19??</year>
+		<manufacturer>Romantic Robot</manufacturer>
+	</hash>
+	<hash crc32="56fcfbdc" name="Nigdos 2.24 (NIGDOS.ROM)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="235120e2" name="Nirvana 1.1 (NIRVANA.ROM)">
+		<year>1990</year>
+		<manufacturer>GoldMark Systems</manufacturer>
+	</hash>
+	<hash crc32="fa0794ab" name="Nwc Utilities 1.1 (NWCUTIL.ROM)">
+		<year>19??</year>
+		<manufacturer>Nwc</manufacturer>
+	</hash>
+	<hash crc32="b2ba61be" name="Odd Job 2.2 (ODDJOB22.ROM)">
+		<year>1985</year>
+		<manufacturer>Pride Utilities-GoldMark</manufacturer>
+	</hash>
+	<hash crc32="6fc529a0" name="Pro Skey - Procopy v1.2 and Speed Key (PROSKEY.ROM)">
+		<year>1990</year>
+		<manufacturer>Nemesis</manufacturer>
+	</hash>
+	<hash crc32="2b880481" name="Programmer's Toolbox 1.0a (TOOLBOX.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="37f8dbcc" name="Programmers Tool Box v1.2a (PT12A.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="661333ea" name="Rodos v2.11 (RODOS211.ROM)">
+		<year>19??</year>
+		<manufacturer>Romantic Robot</manufacturer>
+	</hash>
+	<hash crc32="bceb038b" name="Rodos v2.15 (RODOS215.ROM)">
+		<year>19??</year>
+		<manufacturer>Romantic Robot</manufacturer>
+	</hash>
+	<hash crc32="cbabda8f" name="Rom Dos (ROMDOS.ROM)">
+		<year>1988</year>
+		<manufacturer>Kds Electronics</manufacturer>
+	</hash>
+	<hash crc32="8e59c39f" name="Rom Dos XL (ROMDOSXL.ROM)">
+		<year>1992</year>
+		<manufacturer>Siren Software Ltd - Kds Electronics</manufacturer>
+	</hash>
+	<hash crc32="4a2f7c9d" name="Rom Dos XL v4.88 (RDOSXL48.ROM)">
+		<year>1993</year>
+		<manufacturer>Siren Software Ltd</manufacturer>
+	</hash>
+	<hash crc32="0cc70138" name="Super Power Mailing List (MAIL.ROM)">
+		<year>1985</year>
+		<manufacturer>Micro Power Ltd</manufacturer>
+	</hash>
+	<hash crc32="2b146663" name="Super Rom v1.0 (SUPER.ROM)">
+		<year>1991</year>
+		<manufacturer>Vorax</manufacturer>
+	</hash>
+	<hash crc32="9e7ef185" name="Super Romplus - Auto Rom Control System 1.6 (ARCS16.ROM)">
+		<year>1986</year>
+		<manufacturer>Britannia Software Ltd</manufacturer>
+	</hash>
+	<hash crc32="eda5e818" name="System-X v2.1 (SYSX21.ROM)">
+		<year>1985</year>
+		<manufacturer>Pride Utilities</manufacturer>
+	</hash>
+	<hash crc32="6fdfe255" name="T3m Rom (T3MROM.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="38a5f5b3" name="Transmat v2.1 (TMAT21.ROM)">
+		<year>1985</year>
+		<manufacturer>Pride Utilities</manufacturer>
+	</hash>
+	<hash crc32="172c3349" name="UNCR v2.4 - Cruncher Accessory ROM for CPM (CPMCRCH.ROM)">
+		<year>1988</year>
+		<manufacturer>Graduate Software</manufacturer>
+	</hash>
+	<hash crc32="cef3de4e" name="Utility Suite (ROB3ROM.ROM)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f792e59d" name="Vorax's CPM Plus Rom #1 (CPM1.ROM)">
+		<year>19??</year>
+		<manufacturer>Graduate - Vorax</manufacturer>
+	</hash>
+	<hash crc32="05459a4c" name="Vortex Ram - Expansion Card ID (De)(VRAMID.ROM)">
+		<year>19??</year>
+		<manufacturer>Vortex</manufacturer>
+	</hash>
+	<hash crc32="d52ad1a8" name="X-Ddos (XDDOS111.ROM)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="507614b8" name="XROM Eprommer v1.16 (XROM.ROM)">
+		<year>1986</year>
+		<manufacturer>Timatic Systems</manufacturer>
+	</hash>
+</hashfile>

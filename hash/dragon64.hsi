@@ -1,0 +1,2771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Dragon 32 &amp; 64 - Bios Images - DGN -->
+	<hash crc32="dcab048d" md5="569bf519a68f2f5c30c60d05c4b38862" name="Dragon 32 - Color Basic [D32ROM.DGN]">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="615236cc" md5="6221d892ecd17d98d19dac60e2028eeb" name="Dragon 64 - 32Kb Mode [DRAGROM.DGN]">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="cedc6a52" md5="dd0c8bf446085859b60edd193ca80166" name="Dragon 64 - 64Kb Mode [D64ROM2.DGN]">
+		<year>1983</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<!-- Dragon 32 &amp; 64 - Bios Images - ROM -->
+	<hash crc32="e3879310" md5="3420b96031078a4ef408cad7bf21a33f" name="Dragon 32 - Color Basic [D32.ROM]">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="60a4634c" md5="5f0bee59710e55f5880e74890912ed78" name="Dragon 64 - 32Kb Mode [D64_1.ROM]">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="17893a42" md5="fd91edce7be5e7c2d88e46b76956a8aa" name="Dragon 64 - 64Kb Mode [D64_2.ROM]">
+		<year>1983</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<!-- Dragon 32 &amp; 64 - Cartridges - DGN -->
+	<hash crc32="864c799b" md5="bb37203f6484490e0fb9e6db40f9391a" name="6809 Editor Assembler">
+		<year>1983</year>
+		<manufacturer>M.J. Kerry</manufacturer>
+	</hash>
+	<hash crc32="b36899d8" md5="801a1c0b19338ad9b2b9277c263e61bf" name="Cumana Dos v2.0">
+		<year>1985</year>
+		<manufacturer>Cumana</manufacturer>
+	</hash>
+	<hash crc32="ee9e9448" md5="edbb190e55867134daa950b8ffab74dc" name="Delta System">
+		<year>1983</year>
+		<manufacturer>Premier Microsystems</manufacturer>
+	</hash>
+	<hash crc32="bd2bb1a0" md5="422904ee3f429c023b55e2550f77a9fe" name="Dragon Dos Plus v4.9b">
+		<year>1989</year>
+		<manufacturer>3S</manufacturer>
+	</hash>
+	<hash crc32="e537d1ef" md5="37a0a0570886d3d4eb372435d3b660f0" name="Dragon Dos v1.0">
+		<year>198?</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="561c27cc" md5="cd774ce049cab88033d2ecb47b65945d" name="Dragon Dos v4.0">
+		<year>1985</year>
+		<manufacturer>Eurohard, S.A</manufacturer>
+	</hash>
+	<hash crc32="51b7f83c" md5="336896e1e513163f32a27c0d5dfafb66" name="Edit Plus v2.0.1">
+		<year>1983</year>
+		<manufacturer>Compusense Ltd</manufacturer>
+	</hash>
+	<hash crc32="cef58ec3" md5="5f1de3df0330a34dfca272978f392aaf" name="Super Dos E6 v6.0">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<!-- Dragon 32 &amp; 64 - Cassettes - CAS -->
+	<hash crc32="ebb7cd5a" md5="4ecdf8f6328d3c46d4983d3cd31c269f" name="3D Lunattack">
+		<year>1984</year>
+		<manufacturer>Hewson Consultants</manufacturer>
+	</hash>
+	<hash crc32="c117ec3c" md5="2f62eadb5f1e17bc189fab6eab0383d2" name="4D Romik Cube">
+		<year>1983</year>
+		<manufacturer>D.M. Stewart</manufacturer>
+	</hash>
+	<hash crc32="4b8a7a74" md5="043c15b560d23146962f2937d1302498" name="6809 Editor Assembler">
+		<year>1983</year>
+		<manufacturer>M.J. Kerry</manufacturer>
+	</hash>
+	<hash crc32="b2b30c3f" md5="3580bfee0075318a844b163abbf7a7c6" name="6809 Editor Assembler [a]">
+		<year>1983</year>
+		<manufacturer>M.J. Kerry</manufacturer>
+	</hash>
+	<hash crc32="9eb144c9" md5="649c7bdb1aaff8a39a504047881a92ba" name="6809 Express">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="54e89016" md5="70843ae7d215ae55924d2171ef6d590c" name="747 Flight Simulator">
+		<year>1982</year>
+		<manufacturer>DACC Ltd</manufacturer>
+	</hash>
+	<hash crc32="cbb69c0e" md5="ffb33c23b34d0dd0378aba5b55d2226f" name="8 Ball Pool">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="643f0660" md5="37cd777386b499619cd3f4de344b8ed7" name="Adventure 2 - Jerusalem">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="a102bc02" md5="5183f183a7c9ac8c34c61f8ecada6417" name="Adventure 2000">
+		<year>1982</year>
+		<manufacturer>C.J. Coombs</manufacturer>
+	</hash>
+	<hash crc32="fe08fdd3" md5="ee2d7528d9eec4db248c04b1391325d9" name="Adventure 3 - Williamsburg">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="653dff5b" md5="f63580aeae6c0a404aef7dc53f0f9105" name="Adventure 4 - Ultimate">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="7cee0d37" md5="e9a9668a1cad921de46fdc90e63ddaf5" name="Adventure Writer - Extended">
+		<year>1986</year>
+		<manufacturer>Cowen Software</manufacturer>
+	</hash>
+	<hash crc32="def44582" md5="1f530003f943ccc39291ff81026d9fe7" name="Adventure Writer - Original">
+		<year>1984</year>
+		<manufacturer>Twom Software</manufacturer>
+	</hash>
+	<hash crc32="9dbbb47d" md5="b4da824e058de4c703aacb54cb162b64" name="Adventureland">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+	</hash>
+	<hash crc32="3310ff24" md5="096a0ee11f9cb21ce63c2efdd56b9e75" name="Air Assault">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="adc99809" md5="e2faf1e03c0bed28f47122774ed40332" name="Air Assault [a2]">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="b48ddac7" md5="acb853fb4ab9822fc88d6a3bcf74a3c3" name="Air Assault [a]">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="f0ce30e7" md5="0b11591f45ce1eca4e158b5e7a433b73" name="Airball">
+		<year>1987</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="ad704c6c" md5="dd3f01f9bfdb2a441560d57f196ff8e5" name="Alcatraz">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="fee967f4" md5="1171fd625583996279f202bca29b73b3" name="Alien">
+		<year>1983</year>
+		<manufacturer>Paul Stanley</manufacturer>
+	</hash>
+	<hash crc32="bda46875" md5="29811687bf7d56947ffadc453db020cc" name="Amazing">
+		<year>1982</year>
+		<manufacturer>Bamby Software</manufacturer>
+	</hash>
+	<hash crc32="6aa07470" md5="e35adb414fcfcaa43bedd411ae97ebea" name="Anagram Solver">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="fe0a532c" md5="e2204728e6ff32f05cad5e77a095d78e" name="And All Because">
+		<year>1983</year>
+		<manufacturer>B &amp; H Software</manufacturer>
+	</hash>
+	<hash crc32="0db1cbcf" md5="afeb07e649400c1636bc570364b89495" name="Android Attack v1.0">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="42cf3462" md5="f6efa4de4b7c8d21a54f8ae9db729e71" name="Anti Gravity">
+		<year>1985</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="06627586" md5="c20331a4543bdb98ed40918037077f78" name="Aquanaut 471">
+		<year>1984</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="5ff9db51" md5="19b0d629768d7c6d1f67dec5eb6060cd" name="Arcadia">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5cf338a4" md5="ca42d97cf7d81d2348d3efe8aa996fea" name="Astro Blast">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="9e20d094" md5="84c1ec758bfd8fe872a6b77c3b5c31a2" name="Athletyx">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="be712e43" md5="35e22775120396d6d958e056c26b1ad4" name="Atom Hunt">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="3d5d47b0" md5="d704c64b829d2a98e0217b20903c6d40" name="Atom Hunt">
+		<year>198?</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="9993e13c" md5="97e2767ef82076fbaf2804444b9e814d" name="Attack">
+		<year>198?</year>
+		<manufacturer>Alpha States</manufacturer>
+	</hash>
+	<hash crc32="fe495f1d" md5="a41af7746e697e39b897855a29002877" name="B.C. Bill">
+		<year>1984</year>
+		<manufacturer>Imagine Software</manufacturer>
+	</hash>
+	<hash crc32="7c87e0ab" md5="588778bdad4a0055aaed659db6b6f9cb" name="Backgammon">
+		<year>1983</year>
+		<manufacturer>A. McKnight</manufacturer>
+	</hash>
+	<hash crc32="255df0d3" md5="750f6055fb500031388a7cab148d3362" name="Backgammon">
+		<year>1983</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="50bf451f" md5="16f41d2b1e936714f2325ba1abfcb06c" name="Backtrack">
+		<year>198?</year>
+		<manufacturer>Incentive Software</manufacturer>
+	</hash>
+	<hash crc32="fa53723a" md5="e58304a025b8f67528868121e07ea618" name="Balldozer">
+		<year>1988</year>
+		<manufacturer>Kouga Software</manufacturer>
+	</hash>
+	<hash crc32="80ee4146" md5="92ad5fd8880ed643c39ef42fa43f6e94" name="Bandit">
+		<year>1983</year>
+		<manufacturer>R.K. Lowry</manufacturer>
+	</hash>
+	<hash crc32="13e0bf24" md5="ab83ce50a4698d052f08efbc35eea298" name="Bandito">
+		<year>1984</year>
+		<manufacturer>Pocket Money Software</manufacturer>
+	</hash>
+	<hash crc32="062e35ef" md5="719d8cc99a126160f3edf205723efb4e" name="Barmy Burgers">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="37c2df6d" md5="3c9483dd7eb6a041e543a48c53bdd185" name="Basic Tutorial Advanced - Part 1">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="bf1f1f65" md5="f0c8063e160f1c6c81915ccf0dfb1b46" name="Basic Tutorial Advanced - Part 2">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="daee7ca3" md5="81fa9515dff53ce7439c9075053fc924" name="Basic Tutorial Advanced - Part 3">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="b6d93241" md5="f0f69b6d5163d61eba366dc7a8520b07" name="Basic Tutorial Advanced - Practical">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="f58cfebb" md5="d70685b53eaefc47a6870dabe41677df" name="Basic Tutorial Beginners - Part 1">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="4982ecbf" md5="289839832b1ca07f8c1d791c56f19d7e" name="Basic Tutorial Beginners - Part 2">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="7ef751f8" md5="e38c867b8d1602489c10c74ad7dfe1ab" name="Basic Tutorial Beginners - Practical 1">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="6d1db922" md5="55f191faa4e84193ebfe9ae895343bc9" name="Basic Tutorial Beginners - Practical 2">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="7551b0ad" md5="2735b811832b289efed76aa04383096d" name="Beamrider">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="30a1f9d9" md5="89bb7daa72f44f5286570180c5b7e799" name="Beanstalker">
+		<year>1986</year>
+		<manufacturer>Microvision Software</manufacturer>
+	</hash>
+	<hash crc32="1842eba8" md5="e27043b10a0421f79a3ed06e191c84c5" name="Bells, The">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="d7acdfa2" md5="c3424e05e0a817122de8c2c2f85ed1cb" name="Big Characters">
+		<year>1987</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="a5bedb91" md5="e50c8f77ace72851cbe51e2d6c55d7d9" name="Black Jack">
+		<year>1982</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="fafb272e" md5="038f35c52c77d1e1f26e34f51d3ca8a6" name="Black Sanctum">
+		<year>1981</year>
+		<manufacturer>Mark Data Products</manufacturer>
+	</hash>
+	<hash crc32="3fe29786" md5="576f0a2462851c8a668f47a51853f0be" name="Black Sanctum [a]">
+		<year>1981</year>
+		<manufacturer>Mark Data Products</manufacturer>
+	</hash>
+	<hash crc32="7dae8d08" md5="13f82a099c5c20a27f5cfeb8ab2bcba3" name="Blochead">
+		<year>1983</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="dbe9b613" md5="83ad8bfd0cecd1a7d536438c7999fccd" name="Blockbuster Quiz">
+		<year>1985</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="94644d82" md5="e7a610fc29ae9427c779e89f7a7ea8be" name="Blockbuster Quiz 2">
+		<year>1986</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="07325e17" md5="fba5b23aed34797a3f0220466ddb6e41" name="Bomb, The">
+		<year>1988</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="0886e436" md5="aec86a3ad8eb102597db481190fccc26" name="Bonka">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="a7c4c53b" md5="c2e07149928d9e28c868abf391460a85" name="Bonka [a]">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="542b932b" md5="440bf7dddadb359e3610c2bb56ffa69f" name="Bopswizzle">
+		<year>1983</year>
+		<manufacturer>Bamby Software</manufacturer>
+	</hash>
+	<hash crc32="f011b070" md5="e7dea7b9a8c995b004987006c3f4b18f" name="Boris the Bold">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="d4ee7ff8" md5="fcf7ebafa67ec411d09c98bb8e804c7b" name="Boulder Crash 2 Plus">
+		<year>1988</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="ad7742e9" md5="7132181f96bb116b81747ae10df88245" name="Brain Ache">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="ce9dc2d5" md5="6a27765f17a94c01e0f54052a6d457fa" name="Bridge Master">
+		<year>1981</year>
+		<manufacturer>Philid Software</manufacturer>
+	</hash>
+	<hash crc32="f9afdff2" md5="7d6701a85587ee7468faeb0178e0cf61" name="Brock's Kingdom">
+		<year>1985</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="23e5fde5" md5="a3f7d263b36e591698693a7c9642cb44" name="Bubble Buster">
+		<year>1984</year>
+		<manufacturer>Pocket Money Software</manufacturer>
+	</hash>
+	<hash crc32="690f455b" md5="a192c0507e2369338e03fd1d295f6dbb" name="Bug Diver">
+		<year>198?</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="0512e46f" md5="3e3562fd8c5310c13bece1e9d59b0580" name="Bumpers">
+		<year>1983</year>
+		<manufacturer>Mark Data Products</manufacturer>
+	</hash>
+	<hash crc32="620a42d8" md5="1e1f1ec5a7ba83af9e4f237ea8630ad0" name="Bust Out!">
+		<year>1988</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="cc4875d5" md5="1cc16ac25e84fb3e4f323ce4bad387fe" name="Buzz">
+		<year>1983</year>
+		<manufacturer>R.A. Davis</manufacturer>
+	</hash>
+	<hash crc32="11b25a37" md5="d6773cf7586031eabcbad35c43177107" name="Buzzard Bait">
+		<year>1984</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="98d1e6bb" md5="0377d6db26dfec70fc2577a2fafaf021" name="Buzzard Bait [a]">
+		<year>1984</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="e3fad763" md5="a48591126eec16304073bc0dd4278d6e" name="Buzzing Bertie">
+		<year>1990</year>
+		<manufacturer>Duncan Bryan</manufacturer>
+	</hash>
+	<hash crc32="135865c1" md5="e3231ced2eed9f92b1f51e435a9ea1f1" name="Canyon Climber">
+		<year>1982</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="d26564e4" md5="40943a13b9362d62b3f0c891ab3fae1b" name="Capture the Flag!">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="3386d56e" md5="38c4bebcd18ca49c80d74dd381086c0f" name="Car Simulator">
+		<year>198?</year>
+		<manufacturer>Super Select Software</manufacturer>
+	</hash>
+	<hash crc32="a2f2f488" md5="3bde10c47a43f552f3ad88bb2f4c0814" name="Cashman">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="afae61f2" md5="17c7ca3dfe12e4ed1abe5a5f7f2f6d79" name="Cassette 50 - Part 1">
+		<year>1983</year>
+		<manufacturer>Cascade Games</manufacturer>
+	</hash>
+	<hash crc32="df3d6372" md5="087d108502edfb94cd192a0e83e58626" name="Cassette 50 - Part 2">
+		<year>1983</year>
+		<manufacturer>Cascade Games</manufacturer>
+	</hash>
+	<hash crc32="43aade07" md5="19ae89007a2854928900d8050e9a4354" name="Cassette Insert Card Designer">
+		<year>198?</year>
+		<manufacturer>P.J. Beed</manufacturer>
+	</hash>
+	<hash crc32="cc19e147" md5="36a5578cc2c1de9ca0ef34196bfb2849" name="Catalyst">
+		<year>1983</year>
+		<manufacturer>Factory Programming</manufacturer>
+	</hash>
+	<hash crc32="50e9a88f" md5="df94f1702d9278aad2729ad93a9277f9" name="Catch Phrase">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3ff69be1" md5="1bf16ee81ecb650b3212fb12e68eec99" name="Cave Fighter">
+		<year>1983</year>
+		<manufacturer>Cable Software</manufacturer>
+	</hash>
+	<hash crc32="5359f8a8" md5="1c85333d20c9a86cef8d63c15e8bb9c6" name="Cave Fighter [a]">
+		<year>1983</year>
+		<manufacturer>Cable Software</manufacturer>
+	</hash>
+	<hash crc32="51e17b97" md5="7a60c1c9a8377e6ffcdb9f0958b0b9f6" name="Caverns of Doom">
+		<year>1982</year>
+		<manufacturer>Premier Microsystems</manufacturer>
+	</hash>
+	<hash crc32="a8c4a16b" md5="1d367b5abfa4b048e0243ba495283bec" name="Caverns of Doom">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="467abd31" md5="deb150a7c3ddacbc1a9f0616e3fc798c" name="Cells &amp; Serpents">
+		<year>1983</year>
+		<manufacturer>ASP Software</manufacturer>
+	</hash>
+	<hash crc32="0396b32b" md5="e240838f6d7efbe64f7432999b746ae4" name="Centipede">
+		<year>1982</year>
+		<manufacturer>Intracolor</manufacturer>
+	</hash>
+	<hash crc32="0b99a25f" md5="a695837d89977febf3e32108da2c0a25" name="Chambers">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="15811550" md5="c672f86dfa967998e33f400b4a28e8b4" name="Champions!">
+		<year>1983</year>
+		<manufacturer>Peaksoft</manufacturer>
+	</hash>
+	<hash crc32="8e3eb24d" md5="1ff6269ab82b1ced1566c2ac7fba1df9" name="Championship Darts">
+		<year>198?</year>
+		<manufacturer>Shadow Software</manufacturer>
+	</hash>
+	<hash crc32="2cd9355e" md5="93fe64e910da5d4c7d804ba375f0127e" name="Chateau of Gold">
+		<year>198?</year>
+		<manufacturer>P. Allen</manufacturer>
+	</hash>
+	<hash crc32="eb57bdb6" md5="ac66712495fb7d8518426fc9e485c820" name="Chess v2.1">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="32031759" md5="b296f0f39d103b8217b7dd736a3f1ad6" name="Chocolate Factory, The">
+		<year>1983</year>
+		<manufacturer>Minits Ltd</manufacturer>
+	</hash>
+	<hash crc32="97e774a2" md5="0bad8313619dac62ba5a4b98e5e589c2" name="Christmas Eve">
+		<year>198?</year>
+		<manufacturer>Paul Stanley</manufacturer>
+	</hash>
+	<hash crc32="90d948ca" md5="e74c2de377831463af292b0c3f153bb9" name="Chuckie Egg">
+		<year>1983</year>
+		<manufacturer>A &amp; F Software</manufacturer>
+	</hash>
+	<hash crc32="024f54f5" md5="f8401c9ac0515ca6e74910d2e5a6bc68" name="Chuckie Egg Plus">
+		<year>1983</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="87eceaf1" md5="59fe5b6cbb94c6d0772036ca0e97d6bc" name="Circus Adventure">
+		<year>1982</year>
+		<manufacturer>B. Howarth</manufacturer>
+	</hash>
+	<hash crc32="18c029e1" md5="72a13626e10ee161a2e945132cfee38c" name="City Defence">
+		<year>1983</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="3c13a3fe" md5="424b365ce8b3a5dac45fa4f8edcb3806" name="Clowns - Catching">
+		<year>1983</year>
+		<manufacturer>Wizard Software</manufacturer>
+	</hash>
+	<hash crc32="8d5298bc" md5="e4e5141ac3d4b87fda844631debfad5d" name="Clowns - Juggling">
+		<year>1983</year>
+		<manufacturer>Wizard Software</manufacturer>
+	</hash>
+	<hash crc32="9001d558" md5="21a47bafb1b23edcf1e361fb413ac0ec" name="Color Golf">
+		<year>1982</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="2ed04a54" md5="52b06a58077025d6f04825851becfc45" name="Color Invaders">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="ef96497c" md5="1e0a22eefbaff558777e92b673eb3579" name="Color Invaders [a]">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="5c1fadc7" md5="8b5cbeacbacaf4c8c55f21b8c27f7edf" name="Color Planet Invasion v1.0">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="d6d2ab9e" md5="78599a51619a13693293fdb5feca85b5" name="Color Space War v1.6">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="ff7aa81b" md5="b584ca147681205d0de0cced9ba8cb91" name="Color Space War v1.6 [a]">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="0f9a548c" md5="d6ec3317117823236550d3ba63fdc4fb" name="Colossal Cave">
+		<year>1984</year>
+		<manufacturer>Twom Software</manufacturer>
+	</hash>
+	<hash crc32="21fa22ad" md5="5f06d19afa04cfe2924fc7780e1cd93b" name="Combat Air Patrol">
+		<year>1984</year>
+		<manufacturer>Vidipix</manufacturer>
+	</hash>
+	<hash crc32="5fb27aec" md5="a19c9eee21bd1c8492defa2514999fef" name="Computavoice">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="73b6cf5a" md5="b6b9c6940718aedb6efd1f36fd832faf" name="Computer Studies - Part 1">
+		<year>1984</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="cc9e9602" md5="246afd479bd779196f21deb092e1406a" name="Computer Studies - Part 2">
+		<year>1984</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="aeb1c943" md5="fb188288ed9ec473e46e106e171fffcf" name="Computer Studies - Part 3">
+		<year>1984</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="f9338430" md5="8e1e4b09daefa89775c733497d0aab10" name="Computer Studies - Part 4">
+		<year>1984</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="ba61410d" md5="df72cde568fadd62e22575d4d8275256" name="Convoy">
+		<year>198?</year>
+		<manufacturer>Vince Cockett</manufacturer>
+	</hash>
+	<hash crc32="7dad8c12" md5="ca4f527752d5ad5580671f6d89f645cc" name="Copier">
+		<year>1984</year>
+		<manufacturer>Microstar Software</manufacturer>
+	</hash>
+	<hash crc32="bcea7296" md5="6965e6cefe086c879b3c7b883b7826d8" name="Copta Snatch">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="93bb1436" md5="2e81b56ccaf53747a186a6b99bffe175" name="Copta Snatch">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="e3cd9685" md5="202704a6b58f08c58c6cde90b5c1b540" name="Copta Snatch">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="015c1c26" md5="bf3d443ff7591f175e6c41d0436c6951" name="Cosmic Clones">
+		<year>1983</year>
+		<manufacturer>Mark Data Products</manufacturer>
+	</hash>
+	<hash crc32="72de9946" md5="2ff85b268d0aabbc304561d82e960272" name="Cosmic Crusader">
+		<year>1984</year>
+		<manufacturer>D.K. Pridmore</manufacturer>
+	</hash>
+	<hash crc32="48293038" md5="c0e14730cd6b9ce8d46d9162b7156cf1" name="Cosmic Zap">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="8e23b5b4" md5="77a9eb158cff636a0ebb2b738452c179" name="Cranky">
+		<year>1983</year>
+		<manufacturer>Applied Systems Knowledge</manufacturer>
+	</hash>
+	<hash crc32="4862c6ee" md5="e5f460d4581316d867e8134ca3abd1db" name="Crazy Foota">
+		<year>1987</year>
+		<manufacturer>Computape</manufacturer>
+	</hash>
+	<hash crc32="f45c5e75" md5="4adcb1e76b14af2b1a1087672410b03a" name="Crazy Foota 2">
+		<year>198?</year>
+		<manufacturer>Computape</manufacturer>
+	</hash>
+	<hash crc32="5f6f86b8" md5="80aede6a5939b84ba9d09bbc1e81b0e4" name="Crazy Foota 2 [a]">
+		<year>198?</year>
+		<manufacturer>Computape</manufacturer>
+	</hash>
+	<hash crc32="68db1d18" md5="c2ce8e96a599b472030f875d30b15c3f" name="Crazy Painter">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="f0f6ed0d" md5="9d6ae0c934a674eab376a85348a5e8fb" name="Cribbage">
+		<year>1982</year>
+		<manufacturer>Premier Microsystems</manufacturer>
+	</hash>
+	<hash crc32="ae2d0850" md5="17c9ec9739c56558385f9a661c9acb9c" name="Cricklewood Incident, The">
+		<year>1984</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="915bece0" md5="3f863fd4b998a90313e62bc49db07377" name="Cruising">
+		<year>1983</year>
+		<manufacturer>Sunshine</manufacturer>
+	</hash>
+	<hash crc32="485b85fa" md5="6199b39caef2ad46269e7eaa91d18178" name="Crusader - An Arcade Adventure">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="54228af8" md5="7b88e88c98bac3daa2abd603ca00c3d3" name="Cuber">
+		<year>1983</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="f0595925" md5="9779d197375837edcebbd44220b84e1c" name="Cuthbert and the Golden Chalice">
+		<year>1986</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="4fb6df89" md5="575d5a9986224f9102e1946a04111eaa" name="Cuthbert Goes Digging">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="8a59726a" md5="fbb94989fc438fad1cc3dbe90348ce0c" name="Cuthbert Goes Walkabout">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="a388c1e3" md5="a6d6c9822f1e305898d9b0fd5ac4fa73" name="Cuthbert in Space">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="19160b5b" md5="f1faf0b173c145cee6f579747e9b4256" name="Cuthbert in the Cooler">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="2388e3b8" md5="a346c2a83796e638dd51c00f9e4e7565" name="Cuthbert in the Jungle">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="6066c37a" md5="f8d710dc1ee1995b2b1df6cd5c9e9f2e" name="Cuthbert in the Mine">
+		<year>198?</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="abfea4a1" md5="79394264240e0e38af641f32ebd825ae" name="Cyclops">
+		<year>1983</year>
+		<manufacturer>Romik Software</manufacturer>
+	</hash>
+	<hash crc32="b71eaa2d" md5="dea4df08285c8c0e5b69c38e4ed3eae2" name="Cyrus">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="33c0600a" md5="e4a4fc034b4181472b9fca64fca4b72b" name="Dancing Devil">
+		<year>1982</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="309c95ad" md5="87d0fdf45709c45eea61f2b6d5952880" name="Danger Island">
+		<year>1982</year>
+		<manufacturer>Software For All</manufacturer>
+	</hash>
+	<hash crc32="fdc78b24" md5="c716c2f84a4d36658db89909ab64dec5" name="Danger Ranger">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="5b2e4c77" md5="a4ca37d86e96c982a62fde3c4ce96085" name="Dark Pit, The">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="80a1a2b0" md5="c7121643485d19401f32b1b74c2bc22a" name="Database &amp; Beat the Dragon">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="386eeec6" md5="ac877430744aa9d1492c9d3957a63df4" name="Database">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="53653368" md5="21937dbd09ea76fedb03901cc9e02119" name="Datafall">
+		<year>1984</year>
+		<manufacturer>Pocket Money Software</manufacturer>
+	</hash>
+	<hash crc32="047a8cc9" md5="0d53f8690452f7ae2bfba0834effb0a4" name="Datapen">
+		<year>198?</year>
+		<manufacturer>Microtechnology Ltd</manufacturer>
+	</hash>
+	<hash crc32="be6951c5" md5="3a8ef8995c164c5a2e16ef2201aebf55" name="Dataplan">
+		<year>1982</year>
+		<manufacturer>Personal Software Services</manufacturer>
+	</hash>
+	<hash crc32="a039e3ea" md5="abf4e858a501c38640c5f0be7bac4a09" name="Death Cruise - 1 Player Version">
+		<year>1983</year>
+		<manufacturer>Virgin Games Ltd</manufacturer>
+	</hash>
+	<hash crc32="d7a90f73" md5="7d1f8e0c7d527a27eb1eafd0ea2d729a" name="Death Cruise - 4 Player Version">
+		<year>1983</year>
+		<manufacturer>Virgin Games Ltd</manufacturer>
+	</hash>
+	<hash crc32="5bde8f07" md5="368b6a14e7621a3f4a3a37fc3196f1c9" name="Death Valley">
+		<year>198?</year>
+		<manufacturer>Microdata Ltd</manufacturer>
+	</hash>
+	<hash crc32="29fa79d1" md5="7749a6c35b2e5b87023ad5cb03d2c85b" name="Defense">
+		<year>1982</year>
+		<manufacturer>Colorsoft</manufacturer>
+	</hash>
+	<hash crc32="58b878ba" md5="68915e3e6579be1a0497ba1c51abfacd" name="Delta Utility - Disk 2 Tape">
+		<year>199?</year>
+		<manufacturer>J.C. Bussell</manufacturer>
+	</hash>
+	<hash crc32="23364106" md5="8e8a4f7aff9b4d4685c19ad248b01d87" name="Delta Utility - File Address">
+		<year>199?</year>
+		<manufacturer>J.C. Bussell</manufacturer>
+	</hash>
+	<hash crc32="5327a008" md5="d04df10739a007e144c5588338af0eb3" name="Demolition Derby">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="99dceacf" md5="df6ea1a44a48aef4c1d78a828d4946dd" name="Demon Knight">
+		<year>1983</year>
+		<manufacturer>ASP Software</manufacturer>
+	</hash>
+	<hash crc32="1912b927" md5="e09e1573f86d1b68f91a9860349019a3" name="Desperado Dan">
+		<year>198?</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="e73511e1" md5="5af1a2d1e808a8e86664bb5e01d9697f" name="Detective">
+		<year>1982</year>
+		<manufacturer>ASP Software</manufacturer>
+	</hash>
+	<hash crc32="ee84d67f" md5="8f495a59e67bb901e60bfa7531b23858" name="Devil Assault">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="0b10deaa" md5="7e1827a21e5601bd7dde8eb5c480d7a4" name="Diffuse">
+		<year>1983</year>
+		<manufacturer>PSL Software</manufacturer>
+	</hash>
+	<hash crc32="100fb92d" md5="798338c66c2c12d84d3772d95dd72a75" name="Dino Wars">
+		<year>1980</year>
+		<manufacturer>R.G. Kilgus</manufacturer>
+	</hash>
+	<hash crc32="2d15a3a9" md5="5a37b31bc404b617ae6c9003da78c6f5" name="Dominoes">
+		<year>198?</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="4d5f1f63" md5="9f58601274a8882add49aab427f3781f" name="Dominoes [a]">
+		<year>198?</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="8fdf02ac" md5="a614fba144f232f0f4ab64444eeb3066" name="Donkey King">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="b3bce84b" md5="c90e9a2a27e20abc897efa01b0240ada" name="Doodle Bug">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="0eeb9ba1" md5="2b314f5b1fc721f89d38f0a8149d7410" name="Downland">
+		<year>1983</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="e11192a4" md5="72eaa8a619f15aeaa9b31894870f2ad2" name="Draconian">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="d9bb6f79" md5="8053628834b8e20944cc07591772b9df" name="Dragbug">
+		<year>1983</year>
+		<manufacturer>Personal Software Services</manufacturer>
+	</hash>
+	<hash crc32="f1972031" md5="cbf84e2d0561b7eb344cf4b71ac28a1c" name="Dragon Chess">
+		<year>1983</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="27ceaad2" md5="5d183820304f5909a0da1bd665e3dc20" name="Dragon Composer">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="6294ceb4" md5="cfb54d71e463f4ee432d0c39a943d74c" name="Dragon Darts">
+		<year>1983</year>
+		<manufacturer>K.M. Mayer</manufacturer>
+	</hash>
+	<hash crc32="1a9b451e" md5="f6e2a6b0d9dd05781d73f5d552379c1c" name="Dragon Fly">
+		<year>1982</year>
+		<manufacturer>Hewson Consultants</manufacturer>
+	</hash>
+	<hash crc32="c2991293" md5="0eae600efd4b8cc491c921ccbeed3fd4" name="Dragon Fly 2">
+		<year>1983</year>
+		<manufacturer>Hewson Consultants</manufacturer>
+	</hash>
+	<hash crc32="5d15db43" md5="30adb5b8cd0aecca9573259c4c2ea0d5" name="Dragon Fodder">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="142a2c78" md5="e653d565c773272f527b802a87efe524" name="Dragon Golf">
+		<year>198?</year>
+		<manufacturer>Audiogenic Ltd</manufacturer>
+	</hash>
+	<hash crc32="753c57a8" md5="0813296e4f6407bd204cdd9829b00e8b" name="Dragon Hawk">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="8b5c074f" md5="598dc14c309cc66a6ea07b72a4b33ef0" name="Dragon Invaders">
+		<year>1982</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="f733b07f" md5="0184cfdbb3fca56119ed31c3fcaf0e5c" name="Dragon Mountain">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="467581e2" md5="961f24b7c9b790808b4ac242c099c075" name="Dragon Selection No 1">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="5cad6cb7" md5="b0b70d84f47c0e769ae7a2d315642712" name="Dragon Selfrun">
+		<year>1985</year>
+		<manufacturer>K. Coleman</manufacturer>
+	</hash>
+	<hash crc32="db4e20ac" md5="1846b86862ff8afc444c5bcb851442f8" name="Dragon Slayer">
+		<year>1982</year>
+		<manufacturer>Saint George Software</manufacturer>
+	</hash>
+	<hash crc32="ec8737e2" md5="77bf175f94e765c8a0ad494a1180700f" name="Dragon Trek">
+		<year>1982</year>
+		<manufacturer>Wintersoft</manufacturer>
+	</hash>
+	<hash crc32="e05ec7d3" md5="65cb1e1b37ca4ff674a77144a0d17d9d" name="Dragon Trek">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="1c411cb3" md5="443938e84ec8e4c2fc9f7140fdab8902" name="Dragon Utilities No 1">
+		<year>198?</year>
+		<manufacturer>Hilton Computer Services</manufacturer>
+	</hash>
+	<hash crc32="be67f4e9" md5="029fd8cec9d08c6cfdd2a9047261343e" name="Dragrunner">
+		<year>1983</year>
+		<manufacturer>Cable Software</manufacturer>
+	</hash>
+	<hash crc32="99fb09c4" md5="61c7d65e4e4cb2076f752e1236f11346" name="Drawezee">
+		<year>1985</year>
+		<manufacturer>R. Davis</manufacturer>
+	</hash>
+	<hash crc32="f24e11b2" md5="3fa0de2e76a19cf70218170c868aff18" name="Dream Machine - Original">
+		<year>198?</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="2874e8d0" md5="6f03b4dc1b64320ea5493a85132848d5" name="Dream Machine - Special">
+		<year>1987</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="36879442" md5="00e5a47b72b699863b7bc37819e17b92" name="Drone Datatank">
+		<year>1983</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="c5764845" md5="13ebcbb5172aa7a4d588baf5fb50224f" name="Dungeon Adventure">
+		<year>1983</year>
+		<manufacturer>Rainbow Magazine</manufacturer>
+	</hash>
+	<hash crc32="f619244c" md5="0f1930861c74bbaef751c19ac836c20a" name="Dungeon Destiny">
+		<year>1986</year>
+		<manufacturer>Starship Software</manufacturer>
+	</hash>
+	<hash crc32="d14e3e0b" md5="332d8865c7647fa51d8f77a4caab8df7" name="Dungeons of Death">
+		<year>1982</year>
+		<manufacturer>Premier Microsystems</manufacturer>
+	</hash>
+	<hash crc32="ce09b5a9" md5="630ed351edd892c26b4738d220ad6f50" name="Dunkey Munkey">
+		<year>1992</year>
+		<manufacturer>Intellectronics</manufacturer>
+	</hash>
+	<hash crc32="4fe6e3d1" md5="0ca55c3da1550fa46fc5561a5d7a07b0" name="Duplicas v3.0">
+		<year>198?</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="7bdd5276" md5="84b44ff44080bb4264aa2828cff33fed" name="Duplicas v5.0">
+		<year>198?</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="6e20c4a9" md5="0562fe7637abe1c6c7b49d5e4ffd60ce" name="Duplidisk v1.0">
+		<year>1986</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="4f4e3c9d" md5="b312befac8961339798297fc5f4eafc0" name="Earth Rescue">
+		<year>198?</year>
+		<manufacturer>Abacus</manufacturer>
+	</hash>
+	<hash crc32="13e42f94" md5="8ea33197c836f87f1d377c7e10f1d7ca" name="Eddie Steady Go!">
+		<year>1984</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="6afaccf6" md5="eab978115ed4b73b7d36d383b7005075" name="Editor Assembler Monitor Disassembler">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="d5dfb42c" md5="0a354b7c1117041c82ea428ac28a209b" name="El Diablero">
+		<year>1982</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="6c265c28" md5="dc5deb5155e7c4e799f858837c9881f4" name="El Diablero">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="faec554f" md5="27c2968da3c2ba33034b74eb88155159" name="Electron">
+		<year>1984</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="bb16325d" md5="e191adccd5c63bd15d30100f175917fc" name="Electronic Author">
+		<year>1985</year>
+		<manufacturer>Smithson Computing</manufacturer>
+	</hash>
+	<hash crc32="0a31a028" md5="e3bee918076a874b543d7413dad93910" name="Empire">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="f9a650b0" md5="89a190916645171812caaa1648542432" name="Enhanced Character Interpreter">
+		<year>1997</year>
+		<manufacturer>Matthias Jaap</manufacturer>
+	</hash>
+	<hash crc32="6f937b36" md5="9fe60bab0bfb797e76d26cd5c401ad0c" name="Escape v1.0">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="91f250fe" md5="2830cfad3aa10d1982778b1561bac9ff" name="Everest">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="b97ca5c7" md5="cf0710f36324a0afcea4dd83496a47f5" name="Everest [a]">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="cd87cfbe" md5="608f425b3f555f2aa2e3d5c8599b12a1" name="Execution">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="1f49a44e" md5="283a274d2f967e733a7b60841316072f" name="Execution">
+		<year>198?</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="b5d96496" md5="9471a631a782af0f3f5938e6591d5e10" name="Face Maker">
+		<year>1983</year>
+		<manufacturer>Applied Systems Knowledge</manufacturer>
+	</hash>
+	<hash crc32="46e82d18" md5="0411d29c306c230f8f0c3250194db940" name="Family Accounts">
+		<year>198?</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="eaec37d5" md5="1be6a068dfb047f605474c19333717ce" name="Family Address">
+		<year>198?</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="b82e82b7" md5="2836f25f3594cbd8d1596cd490849fc2" name="Family Banker">
+		<year>198?</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="dfc0be55" md5="847d5a25fd89804fd3e74c53270a24b8" name="Family Budget">
+		<year>198?</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="ee174547" md5="6d946b5cc4b5cc5a02a11e926db4b38e" name="Fearless Freddy">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="cb485ccb" md5="3aeae13f7166889a78f6089d484744b0" name="File Master">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="933fe6ef" md5="1ddc7797773e98581e3fef26b6929765" name="Final Countdown, The">
+		<year>1983</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="26235f4f" md5="35a4e6faacc2581faf9a6d37b887a084" name="Final Countdown, The [a]">
+		<year>1983</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="8de49429" md5="af40e30dc62b3db4a14a0fe3b8571679" name="Fingers">
+		<year>1985</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="b764eb9b" md5="b86f83d076bb1577caba9121107060d0" name="Fire Force">
+		<year>198?</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="ff31136a" md5="88a289d852b0c1779d014f0b3989f5fb" name="Fire Force [a]">
+		<year>198?</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="7d5e5726" md5="40f8279861bb54eca8a7dd077251b058" name="Fireball">
+		<year>1983</year>
+		<manufacturer>M.C. Ironmonger</manufacturer>
+	</hash>
+	<hash crc32="8d2c233c" md5="30080a05c9bbf3ef83d4e6ef095649bb" name="Fishy Business">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="7fde006f" md5="754c3069bd95b1b5f6e7b039f1f6f2c7" name="Flag!">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="c50a4d66" md5="7123bf2877a4cbc497d2d103bb7f07f4" name="Flag! [a]">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="692fa215" md5="dd5b0352470ab2909880df216ff32c41" name="Flipper">
+		<year>1983</year>
+		<manufacturer>Colorsoft</manufacturer>
+	</hash>
+	<hash crc32="fb487a92" md5="8958e3a7b5fef603e09c0ff6adbc39f6" name="Folly Farm's Chicken Run">
+		<year>1984</year>
+		<manufacturer>Impsoft</manufacturer>
+	</hash>
+	<hash crc32="bcbe142d" md5="9b7a7e48acb5323fb02fd001d227eecc" name="Football Manager">
+		<year>1983</year>
+		<manufacturer>K. Hare</manufacturer>
+	</hash>
+	<hash crc32="02f22c99" md5="d2470b5e7ae4e70515dd0874132d1095" name="Football Manager">
+		<year>2000</year>
+		<manufacturer>Kevin Toms</manufacturer>
+	</hash>
+	<hash crc32="d87de204" md5="81603dd1504109b64825f6193f9e322c" name="Football Manager [a]">
+		<year>2000</year>
+		<manufacturer>Kevin Toms</manufacturer>
+	</hash>
+	<hash crc32="06687212" md5="a1cdb4c5a7aa48ed753a6990ad049ccb" name="Formula 1">
+		<year>1987</year>
+		<manufacturer>Pamcomms Ltd</manufacturer>
+	</hash>
+	<hash crc32="d48cb74b" md5="60b7fa4158702596f49c0bb05a928c65" name="Frankie">
+		<year>198?</year>
+		<manufacturer>Smithson Computing</manufacturer>
+	</hash>
+	<hash crc32="4a802247" md5="394ee4778153b57e7b862979336a0a84" name="Franklin in Wonderland">
+		<year>198?</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="8e931e5e" md5="6758e8c0d3ec1fca914c1a483482a646" name="Franklin's Tomb">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="3371bfda" md5="2a53ba14dd11b5dc14a492d0eeb93f52" name="Free Parking - Monopoly">
+		<year>198?</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="320f772b" md5="c52f2c6e8232db07c54287c4cbc4a11e" name="Frogger">
+		<year>1983</year>
+		<manufacturer>Cornsoft</manufacturer>
+	</hash>
+	<hash crc32="88fbd606" md5="7252fe29cd6034fc8c938f28e4aaa458" name="Fruity Machine, The">
+		<year>1983</year>
+		<manufacturer>Impsoft</manufacturer>
+	</hash>
+	<hash crc32="961d9e13" md5="11f8f67b5bf90a3186ac7beb289bff84" name="Fury">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="07b619af" md5="e17fc3f992735c7ced4ff0914b8cffab" name="Galactic Ambush">
+		<year>1982</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="5ce86984" md5="2e8215b9c10dde6163b338addca9889b" name="Galactic Gus">
+		<year>198?</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="75851dfb" md5="1062178b5ed272fa34879e53d952cea6" name="Galactic Gus [f]">
+		<year>198?</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="5b6c926d" md5="09450c33793d4620b9cfca896f4c3b7e" name="Galacticans">
+		<year>1984</year>
+		<manufacturer>Rainbow Software</manufacturer>
+	</hash>
+	<hash crc32="0bf5ebc1" md5="914641796b4ce4a2ff9e6d17facfc8cf" name="Galagon">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="04a2e2d3" md5="004acb959d661b42140ed3ce6c43dcaa" name="Galax Attax">
+		<year>1982</year>
+		<manufacturer>TDKL</manufacturer>
+	</hash>
+	<hash crc32="ee8853b9" md5="c1e1c3534d279e5d54d461ece665b01d" name="Galaxy Hitch Hike">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="cbf0bb87" md5="42b23366b7e4ab890fc6d672daa24cdd" name="Galleons">
+		<year>1982</year>
+		<manufacturer>Wizard Software</manufacturer>
+	</hash>
+	<hash crc32="21bba5a0" md5="1bb6ae1e3c7a762374806bbcfcc25f22" name="Ghost Attack">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="5178eb0b" md5="61ea0e7ec0b1924daa8c252e7f0958c8" name="Giant's Castle">
+		<year>1982</year>
+		<manufacturer>Mike Meineck</manufacturer>
+	</hash>
+	<hash crc32="e8f188b2" md5="258e027c9c0b37101728b00112c14bd3" name="Girlfriend Adventure 2">
+		<year>198?</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="71892d2c" md5="93041e0e64529adc4c785950c77c2d7a" name="Gis-A-Job">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="51f669dc" md5="31cc6d6862433593d6a9120b55a5c435" name="Glaxxons">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="63d8fe33" md5="27b63cc3b0a246956a64a110016c088d" name="Gnome Adventure">
+		<year>1987</year>
+		<manufacturer>Leversoft</manufacturer>
+	</hash>
+	<hash crc32="e268e899" md5="79b5a39023bfecc925af36460d7bd96e" name="Go Fish!">
+		<year>1982</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="b1dbbd10" md5="00192d6bcf936924919dd8796eb53044" name="Golden Oldies 2 - Various Utilities">
+		<year>1986</year>
+		<manufacturer>Pamcomms Ltd</manufacturer>
+	</hash>
+	<hash crc32="29f19832" md5="36f5bd5dce23f5f62994aa97113a7ecb" name="Golden Voyage">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+	</hash>
+	<hash crc32="c3b2426e" md5="5335d6ae8222818cf277d248fe93cd62" name="Golf">
+		<year>1982</year>
+		<manufacturer>Apex Trading</manufacturer>
+	</hash>
+	<hash crc32="b3b94d63" md5="fc5aa644f104ffdadab51ad528e81085" name="Golf">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="28af38c0" md5="7bb9491de966e4f0e98d0da58d413152" name="Golf">
+		<year>198?</year>
+		<manufacturer>Audiogenic Ltd</manufacturer>
+	</hash>
+	<hash crc32="f8837266" md5="f9bcef4f6ac4afe407bbcdfd09cc86c1" name="Golf">
+		<year>198?</year>
+		<manufacturer>Lord Edward Software</manufacturer>
+	</hash>
+	<hash crc32="96c244ec" md5="ef81501659bc1969c9b3dad8885b3aa8" name="Gordon Bennet">
+		<year>1986</year>
+		<manufacturer>Smithson Computing</manufacturer>
+	</hash>
+	<hash crc32="c149157d" md5="5361a83ad0ae77a685b280b8f458cbaa" name="Grabber">
+		<year>1983</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="f22d7a01" md5="a266ad3d5ef4f11531f97807a4b66d67" name="Grabber">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9fc7f139" md5="cdb9b594ed1328ee2697f3584e5d2c72" name="Grand Prix">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="bc0f82be" md5="8406e12907b9db7ee4065b6eb6314647" name="Graphic Animator">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="ba712db1" md5="ffa2bd8780133cf5d41ba0c208031ed4" name="Graphics System">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="7d13e706" md5="c781edba436a7a014497af27b3b9388d" name="Grid Runner">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="64284d60" md5="000accc7bcfe0f5bb3abf1ba9448a787" name="Hacker Utilities">
+		<year>1986</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="6e37f834" md5="049c57c94e30ff5baecb930861bc2e6c" name="Handicap Golf">
+		<year>1982</year>
+		<manufacturer>Computer Rentals Ltd</manufacturer>
+	</hash>
+	<hash crc32="b3eb9dfc" md5="835249876c564633e0a0c97f2dee93db" name="Handicap Golf [a]">
+		<year>1982</year>
+		<manufacturer>Computer Rentals Ltd</manufacturer>
+	</hash>
+	<hash crc32="4cf974e1" md5="ac1ab83ac1c5b6b2f2f0801167450355" name="Happy Birthday Dragon">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="281db88a" md5="3da4d6cd5468b0ef118cfdaa2b8bb035" name="Hareraiser - Finale">
+		<year>1984</year>
+		<manufacturer>Haresoft Ltd</manufacturer>
+	</hash>
+	<hash crc32="56b64698" md5="05728e2ca16d4028d3d6ebc4a18ab08b" name="Hareraiser - Prelude">
+		<year>1984</year>
+		<manufacturer>Haresoft Ltd</manufacturer>
+	</hash>
+	<hash crc32="d6e65d4c" md5="3823c77b28ee34b008098f044be2d23b" name="Haunted House Adventure">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="f9a39a56" md5="af4c8c3da169cdfd93e4f8722303fda6" name="Heimlich &amp; Co">
+		<year>1991</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="cbc1eaef" md5="4f1bb8e6dc2a55fc78d503faa5f96903" name="Hide &amp; Seek">
+		<year>1983</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="38005a90" md5="4adb51f000f4ae9ebd8265749ef63917" name="Hilo">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="810e811c" md5="8083a163731372401e7df1cc88f9156f" name="Hilo">
+		<year>198?</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="93c6f6b7" md5="a7dd1ac6f318df23bec907db2a269905" name="Hole!">
+		<year>1988</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="ce577e5c" md5="27462b25f3f15b07085fef79d04c2780" name="Home Base">
+		<year>1984</year>
+		<manufacturer>Cable Software</manufacturer>
+	</hash>
+	<hash crc32="a5de403a" md5="8a3665de7a2a529943bf1ff6527f4dee" name="Horace Goes Skiing">
+		<year>1984</year>
+		<manufacturer>Beam Software</manufacturer>
+	</hash>
+	<hash crc32="3e47aa2f" md5="f8a783702a2cfc7b1d84873240d08475" name="Hornets">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="5459e934" md5="58bc007f73b4274d4d625981469b1b3b" name="Horse Race">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="721d25ad" md5="403d1d4798db50bfa03bf270c97d6014" name="Hotel on Mayfair - Game">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="307c2e74" md5="7554ce90579d6858b7a9ec9d8124cb7f" name="Hotel on Mayfair - Instructions">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="2ef98292" md5="32d7950854b3d27a1676d6ea527b01a1" name="Hunchback">
+		<year>1983</year>
+		<manufacturer>Ocean</manufacturer>
+	</hash>
+	<hash crc32="c7077ca9" md5="02b4ab251b7e1a8dd89199b6b62ed658" name="Hungry Horace">
+		<year>1983</year>
+		<manufacturer>Beam Software</manufacturer>
+	</hash>
+	<hash crc32="82202804" md5="238e092fb0a28249646ea07863845c6f" name="I Ching">
+		<year>1983</year>
+		<manufacturer>Virgin Games Ltd</manufacturer>
+	</hash>
+	<hash crc32="dbd3db91" md5="8ba5660c4c1b1309834c0b9cebbf5f2c" name="Ice Castles">
+		<year>1984</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="d11cea6c" md5="350f1b905b6b9b3b8ffd65bb44e9b151" name="Ice Master">
+		<year>1983</year>
+		<manufacturer>Arcade Animation</manufacturer>
+	</hash>
+	<hash crc32="f7130f57" md5="832dfa659b4f059a44067d4eeac11d77" name="Immortal Strain, The">
+		<year>1987</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="5271753b" md5="139ddb146978e017c3cb69b64385feb4" name="Indoor Football">
+		<year>1987</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="ab8ba584" md5="3abbc8a5f72ac2be05b462fbbfe79642" name="Indoor Football [a]">
+		<year>1987</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="3674729c" md5="957ac5b6452d6f16cf86e15c0e4221bd" name="Inlay Card Printer v3.0">
+		<year>198?</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="4e0f160f" md5="b4cc2ffbb040b0ef0e551e73d0708d30" name="Intergalactic Force">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="5e83bea1" md5="86d8320e0b941f7367f4d7f8d170a042" name="Interplanetary Trader">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="6c09948b" md5="0a921b9eeecdb17446ca29b1cfea6fe2" name="Interplanetary Trader v2.6">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="c863dcf1" md5="c135567766bdf8e5f1f35ca19b6d0c69" name="Interplanetary Trader v2.6 [a]">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="a183b02d" md5="279eb0aee5131d5e175d008c00f78551" name="Invader Cube - 3D OXO">
+		<year>1983</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="1850cd22" md5="806cf4cd5bb4e179a970a287a8ec1d3a" name="Invader Cube - 3D OXO [a]">
+		<year>1983</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="3c0ea540" md5="fb502a8c16eb3afb80155e783f80634c" name="Invader's Revenge">
+		<year>1982</year>
+		<manufacturer>Med Systems</manufacturer>
+	</hash>
+	<hash crc32="f8f47d34" md5="457aeffee020584201a2157e13f3bfa1" name="Invoices and Statements - Editor">
+		<year>1982</year>
+		<manufacturer>MST Consultants</manufacturer>
+	</hash>
+	<hash crc32="0454422a" md5="16e1d1a8c3d79b9232e860558d40af61" name="Invoices and Statements - Viewer">
+		<year>1982</year>
+		<manufacturer>MST Consultants</manufacturer>
+	</hash>
+	<hash crc32="8d8a687b" md5="28169bdffbca8457d444596835d757b6" name="Islands">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4b0fbca8" md5="13bf488d46d45b8742a90aacf762426f" name="Jet Boot Colin">
+		<year>1985</year>
+		<manufacturer>Pocket Money Software</manufacturer>
+	</hash>
+	<hash crc32="56be392f" md5="72f12710d83d81286abefc1436a6c1a9" name="Jet Set Willy">
+		<year>1985</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="1c62e964" md5="c9ff92d52c2c44fa263e09ee76c45b6a" name="Jet Set Willy [a]">
+		<year>1985</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="ff306351" md5="ed94b3e1b6394cfb18cfebac3c26cf53" name="Jet Set Willy Utility">
+		<year>1985</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="fafeddd4" md5="832fd3f0cf14054d547ebbb9f6d7abc6" name="Jigsaw">
+		<year>198?</year>
+		<manufacturer>Vidipix</manufacturer>
+	</hash>
+	<hash crc32="a8d79555" md5="440db98b124d5cf70348d1956f0a077f" name="Journey to the Centre of Phobos">
+		<year>1985</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="4a07bd7f" md5="ad0418fc684bddbd7d57d3402a356af2" name="Joystick Test">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ad9af402" md5="7ea77dc71820f249a7db4339bd70f41e" name="Jukebox Demo">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9bad6f19" md5="87773f1359550e618938cbed9cc4720d" name="Jump Jet">
+		<year>1983</year>
+		<manufacturer>J.F. McGuire</manufacturer>
+	</hash>
+	<hash crc32="a4b3db58" md5="3dbfbd4fba85d45bdc667f5e80545f95" name="Junior's Revenge">
+		<year>1983</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="08e732b8" md5="fb8fdf2bbff01c7df4e7f57d142c21aa" name="Juxtaposition">
+		<year>1985</year>
+		<manufacturer>Wintersoft</manufacturer>
+	</hash>
+	<hash crc32="0d91ee14" md5="9c9ec8bcd529195a0343e47013d3df87" name="Kamacarzy">
+		<year>198?</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="17091a8c" md5="46da16e8354eefe938806d9bc469ec01" name="Katerpillar Attack">
+		<year>1982</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="72babb6d" md5="6100412d64b1750a4277a815538bffb6" name="Ket Trilogy, The - Final Mission">
+		<year>1985</year>
+		<manufacturer>Incentive Software</manufacturer>
+	</hash>
+	<hash crc32="c80b2700" md5="62de894b3c40d6649d00cf38524144f5" name="Ket Trilogy, The - Mountains of Ket">
+		<year>1985</year>
+		<manufacturer>Incentive Software</manufacturer>
+	</hash>
+	<hash crc32="a4a7d0ce" md5="8c3caf4b8f66fa63d24d8bfe351cfa92" name="Ket Trilogy, The - Mountains of Ket [a]">
+		<year>1985</year>
+		<manufacturer>Incentive Software</manufacturer>
+	</hash>
+	<hash crc32="9078c66b" md5="330cbbb720446098eb3a7f9df6be9052" name="Ket Trilogy, The - Temple of Vran">
+		<year>1985</year>
+		<manufacturer>Incentive Software</manufacturer>
+	</hash>
+	<hash crc32="84e9a29e" md5="e7128da40fd16126385b962c720d62f2" name="Keys of Roth, The">
+		<year>198?</year>
+		<manufacturer>Tony Nuttall</manufacturer>
+	</hash>
+	<hash crc32="ff6bc287" md5="ae34be7a4239d23da536f02dc2a73fec" name="Keys of the Wizard v1.2">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="bcfed6cd" md5="fe58aecb152af70915dbeb8ff14a1e5a" name="King Cuthbert">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="fea10285" md5="feb2fbfd20204d7791e0fc1af507590d" name="King Tut">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="458521ad" md5="83bdc88ec1f1430f31b00fbbda1e2c3c" name="Komet Kaze">
+		<year>1983</year>
+		<manufacturer>Thomas Czarnecki</manufacturer>
+	</hash>
+	<hash crc32="bbc500bf" md5="3fcff75c7338f2b259b29ed0c4b808ec" name="Kriegspiel">
+		<year>1983</year>
+		<manufacturer>Beyond Software</manufacturer>
+	</hash>
+	<hash crc32="3057670a" md5="df6fe46386ecdf6ea2eda861d8a15e90" name="Lancelot Adventure">
+		<year>1983</year>
+		<manufacturer>Rainbow Magazine</manufacturer>
+	</hash>
+	<hash crc32="e5cf3fd0" md5="5b2a35dd47371e21ee06184874bedad3" name="Larkspur Waldorf - Is Trapped">
+		<year>1987</year>
+		<manufacturer>HB &amp; JS</manufacturer>
+	</hash>
+	<hash crc32="bfa18b5a" md5="47d88aacb5c938b347ebd2aa8a542d48" name="Larkspur Waldorf - Journey Home">
+		<year>1987</year>
+		<manufacturer>HB &amp; JS</manufacturer>
+	</hash>
+	<hash crc32="bf2d8a2a" md5="583eee6307a273c8eccabd9f2bf0dc43" name="Laser Attack">
+		<year>198?</year>
+		<manufacturer>JamGee</manufacturer>
+	</hash>
+	<hash crc32="01717f0b" md5="f592fff90d11cecfd8e7da899ab2c8b4" name="Laser Run">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="5cb965ec" md5="68a134d8e0d4ce9ae9b005ff3c8dfa80" name="Laser Zone">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="6f8c0688" md5="49e15540a686eefa7de36b5aaf558514" name="Last Pirate, The">
+		<year>1982</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="1902d644" md5="5699e7c4a00327475cb2a7c1243c7f5b" name="Leggit!">
+		<year>1983</year>
+		<manufacturer>Imagine Software</manufacturer>
+	</hash>
+	<hash crc32="50a7a701" md5="431d2dadd0268473f3de0fd4b2463b15" name="Lion Heart">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="89139d61" md5="446fe36c9174acb4b05a8d97c38d5762" name="Load It v1.0">
+		<year>198?</year>
+		<manufacturer>KH</manufacturer>
+	</hash>
+	<hash crc32="9f1caabc" md5="74768e46a07ca5e0387f0a1b8647d0f7" name="Lord of the Dragons">
+		<year>1982</year>
+		<manufacturer>Item Ltd</manufacturer>
+	</hash>
+	<hash crc32="62a39ce4" md5="9b8319f35414cdce7ffbeb502729660c" name="Lost in Space v1.1">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="c0f65204" md5="db506bcd56b3b2aa7a4ac4c96fcc82f9" name="Lost in Space v1.1 [a]">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="9c96f16a" md5="580c6e491939714725507ffedff1def9" name="Lucifer's Kingdom">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8fed7a3a" md5="03225cf1de27e1e0b803f98c8947227a" name="Lunar Rover Patrol">
+		<year>1983</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="669c0a0c" md5="4556eb0e461a57bd541bfde770e89ef5" name="Lunar Rover Patrol">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="809d8288" md5="2d136ed19b2e89fa74ec4168e3c140ab" name="MacDougal's Last Stand">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="360c329f" md5="ee2e733f559b2e69a861a155ff9c19df" name="Madness &amp; Minotaur">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="2bc5d91c" md5="1de7171ccd832df01aefc53eeb47ca84" name="Mandragore [a]">
+		<year>198?</year>
+		<manufacturer>Kouga Software</manufacturer>
+	</hash>
+	<hash crc32="6ed8cd81" md5="d95863ff5d41d3813892016c6351fcd4" name="Mandragore">
+		<year>198?</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="d078ce20" md5="2d8a2dad7c17a5808391f520059cb9fb" name="Manic Miner">
+		<year>1984</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="011486be" md5="07f36a53c4ef01523d74c9624f42b0df" name="Manic Miner [a2]">
+		<year>1984</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="aff59a6f" md5="08d52ccfa2d6b87005cdae87a02dc04d" name="Manic Miner [a3]">
+		<year>1984</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="ece94b31" md5="b3a9127ad7cc2b056f8fab5ec497e323" name="Manic Miner [a]">
+		<year>1984</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="ff02bb66" md5="fe73f3ccbb6916fd0bb63eda73beec4f" name="Manic Miner Utility">
+		<year>1997</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="a91c750d" md5="189df5309edf26740133b6f5f39ef2ad" name="Mansion of Doom">
+		<year>1982</year>
+		<manufacturer>Pal Creations</manufacturer>
+	</hash>
+	<hash crc32="95feeb03" md5="80f1857dbe4aeebb318e0c6ade914443" name="Martian Crypt v1.0">
+		<year>1985</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="b2f65ecd" md5="18f6d1bd79f7454137c8b9ebb6b49489" name="Master, The">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="931e23c4" md5="9dcf243c6dd17db52dc8d9b742c83d43" name="Maths 0 Level Revision Course - Arithmetic 1">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="f4675d85" md5="1f432ef666226bfa3a04bb25d056647e" name="Maths 0 Level Revision Course - Arithmetic 2 &amp; Calculus 2">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="2c9f170a" md5="532fe68f6398fe7afe1cb93ecefe2d30" name="Maths 0 Level Revision Course - Calculus 1">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="406bf2b0" md5="67cecd7d45441a31880997bc4b29d7da" name="Maths 0 Level Revision Course - Construction">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="c7668680" md5="9238f922242334d9381c00fbf61d071e" name="Maths Level 2 - Excercises 1 to 4">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="d671aeef" md5="85a5d29722033dd9f3f4cf5cab72efcc" name="Maths Level 2 - Excercises 14 to 19">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="2f150efb" md5="1cbab8b0e9be68dcd00520b980e2c38e" name="Maths Level 2 - Excercises 5 to 8">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="16d2b4f8" md5="2c4f97a265c9ed15f872c9544930bbbe" name="Maths Level 2 - Excercises 9 to 13">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="6a4045c1" md5="8122b6182ed879de42a7b2937fa3c7e7" name="Maurice Minor - Driver">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="f669b027" md5="8926e6606909743e426a054ab8f41e12" name="Maurice Minor - Driver [a]">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="c4ba6365" md5="0f6642098f3dca7b345350ec314dee73" name="Medicalc Spreadsheet">
+		<year>1984</year>
+		<manufacturer>Kevin Powis</manufacturer>
+	</hash>
+	<hash crc32="a9f15bf8" md5="99987cf773f2b73fecfc1527d2e4186a" name="Megamaze">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ee9e9eb4" md5="5a8101a05cac1cfd2429e0b427a44ef1" name="Memory Builder, The">
+		<year>1982</year>
+		<manufacturer>J.J. Schmidt</manufacturer>
+	</hash>
+	<hash crc32="446509eb" md5="08066f86a10bc27a39cc28a52bd6b7ba" name="Millipede">
+		<year>1983</year>
+		<manufacturer>Dragon User Magazine</manufacturer>
+	</hash>
+	<hash crc32="956c02e2" md5="c882a75d04568d28239f412cb9cb58ae" name="Mined Out">
+		<year>1983</year>
+		<manufacturer>Quicksilva</manufacturer>
+	</hash>
+	<hash crc32="40623848" md5="5690121df200ed3b5842fa17e2cf2615" name="Miser's Dream">
+		<year>1984</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="c005c740" md5="dfd62b13c52510b37a108c81c17eac1c" name="Mission Attack">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="4e8b05df" md5="d35c1d47bec006b9e9f30868e41f170d" name="Monster Maths">
+		<year>198?</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="7f7ea4c0" md5="7d05e5e1873324dfff3fb900d21e565c" name="Monsters &amp; Magic">
+		<year>1983</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="e2692a32" md5="1f27a516c0157eb64d3f5772b5df7f58" name="Monsters">
+		<year>198?</year>
+		<manufacturer>Softek Software</manufacturer>
+	</hash>
+	<hash crc32="086ece9c" md5="6a90007d1a6d8928a320c54ef19c6238" name="Moon Cresta">
+		<year>1986</year>
+		<manufacturer>Incentive Software</manufacturer>
+	</hash>
+	<hash crc32="97f7f22b" md5="e2e37987618d16bf3811797624bb45bc" name="Moon Hopper">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9ada8d16" md5="2c418e5b316930baf9bd4a42cf81a5a5" name="Morbid Mansion">
+		<year>198?</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="7468bbdf" md5="33b6fc04c77476aa3246678803771c8d" name="Morocco Grand Prix">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="d2320abf" md5="02c0cdb777a054731be05e9ab75a941d" name="Morocco Grand Prix [a]">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="60403a48" md5="bb6ce2590bc6ab3b7247e6dc21a3b457" name="Movie Producer">
+		<year>1983</year>
+		<manufacturer>Silly Software</manufacturer>
+	</hash>
+	<hash crc32="6d5759bd" md5="dcf511c299c403a84df7304ae47a2f31" name="Mr. Dig">
+		<year>1984</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="2b5c4299" md5="8d987804c3548c011339f3c405a6e952" name="Mudpies">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="4ad839f0" md5="e621e6b6917f9d059265fdbc935a9406" name="Music">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="af539052" md5="de9a2b2dce02e1949d3716e424c336fe" name="Music Machine">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="21c0346e" md5="c85457ddcb63c0c9c556e7af11e77ebb" name="Music Maestro">
+		<year>1987</year>
+		<manufacturer>Preston Computer Games</manufacturer>
+	</hash>
+	<hash crc32="f02148bf" md5="815ec5dca223e6a8746280a647a9f7a5" name="Music Maker">
+		<year>1986</year>
+		<manufacturer>David Makin</manufacturer>
+	</hash>
+	<hash crc32="8a492295" md5="0a388b5018848567f8919913732604a3" name="Mysterious Adventures">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="db61965f" md5="a149a6f9fc811d2a6648f13b9753ba93" name="Mysterious Adventures [a]">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e1712bd0" md5="03dcc42338405694bfcfa74202c004d6" name="Mystery of the Java Star Part 1">
+		<year>1984</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="2a59ae97" md5="5420d2cd393c922e14544c26eb029c13" name="Mystery of the Java Star Part 2">
+		<year>1984</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="16ad719a" md5="36f5281be8c8d29a3ca1a45827e7d5d9" name="Mystery of the Java Star Part 3">
+		<year>1984</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="45ee8abc" md5="3fb2c96ab2aa17b633f581c9922810e4" name="Mystery of the Java Star Part 4">
+		<year>1984</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="0f87da64" md5="3c3774b0d04330008fd672c4bd23bf41" name="Nad the Necromancer">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="0ee0e4d0" md5="f142ccdb50ddd5a1d352f8de9c0a31ea" name="Nerble Force">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="623276af" md5="cdad2707d815c279ae02afc2e265dced" name="New Copy">
+		<year>199?</year>
+		<manufacturer>Stuart Mills</manufacturer>
+	</hash>
+	<hash crc32="e69dbc76" md5="4bac02e0915cf3e46efa93f67d10fb18" name="Night Driver">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="68ec30b6" md5="ffa5fba781e73373f63774772b04d9a0" name="Night Flight">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="1e944014" md5="875505b16420cee950f41cb33a8a76e8" name="North Sea Oil">
+		<year>1984</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="e45f480d" md5="3c75de41cff51171df17abae1e7e4362" name="Noughts and Crosses">
+		<year>198?</year>
+		<manufacturer>JamGee</manufacturer>
+	</hash>
+	<hash crc32="29251f8f" md5="8cf2baee776872636b43b387e3f39600" name="Nuclear Attack">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8f23ad31" md5="f975e54b5181c93755ac75e1163b0d4e" name="Number Chaser">
+		<year>1983</year>
+		<manufacturer>Applied Systems Knowledge</manufacturer>
+	</hash>
+	<hash crc32="26c9c0a0" md5="4a5cb6c5f8366579a83fa18098fdcaf1" name="Number Gulper">
+		<year>1983</year>
+		<manufacturer>Applied Systems Knowledge</manufacturer>
+	</hash>
+	<hash crc32="8cbde25b" md5="85f6074a3d37b9ba371bfda0faddb9ce" name="Number Puzzler">
+		<year>1983</year>
+		<manufacturer>Applied Systems Knowledge</manufacturer>
+	</hash>
+	<hash crc32="774acfd1" md5="19a2d05c1174fda8b21d7368c801b62e" name="Oil Recovery">
+		<year>1982</year>
+		<manufacturer>Premier Microsystems</manufacturer>
+	</hash>
+	<hash crc32="1007226e" md5="1ec6c46c0858a001767d3679930efeaa" name="Onyton Adventure">
+		<year>1987</year>
+		<manufacturer>Leversoft</manufacturer>
+	</hash>
+	<hash crc32="acf475e2" md5="ebf4d68300827618e97916628f0f636e" name="Ossie">
+		<year>198?</year>
+		<manufacturer>Peaksoft</manufacturer>
+	</hash>
+	<hash crc32="b0c2e6d4" md5="d4e955af1d0631d24b95cef954a602cf" name="Othello">
+		<year>1983</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="04dbad8e" md5="f5b792c54601519a7abd65caf1a58696" name="Pac Droids">
+		<year>1982</year>
+		<manufacturer>Programmers Guild</manufacturer>
+	</hash>
+	<hash crc32="e69d9945" md5="c6390bbc5089bb827b54ad039ede1f10" name="Password - Escape the Hangman">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b63254f8" md5="05f3f9bae8a7f673659afb7b53feecd3" name="Pedro">
+		<year>1984</year>
+		<manufacturer>Imagine Software</manufacturer>
+	</hash>
+	<hash crc32="f801dcae" md5="c643374e086927b4205631aa3a234f1d" name="Pedro">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="60786f29" md5="82f4f2f56acc21a9982531b3c187c1d5" name="Pengammon">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="b4d72772" md5="7f989751f43d01674e2e83e8fab16204" name="Pengon">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="11e4b318" md5="3c3ce7fd735a1f921cf7edeb24c14555" name="Perilous Pit">
+		<year>198?</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="61df1f7b" md5="4cdef927db62fd84dfaa478a677cca99" name="Perseus &amp; Andromeda">
+		<year>198?</year>
+		<manufacturer>Channel 8 Software</manufacturer>
+	</hash>
+	<hash crc32="51a300c8" md5="5c42f6f33b1a18b190a41a629e2d69ae" name="Pettigrew's Diary">
+		<year>1983</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="b32bae96" md5="0d80c82880087cc1cb14a057ed293e9a" name="Phantom Slayer, The">
+		<year>198?</year>
+		<manufacturer>Med Systems</manufacturer>
+	</hash>
+	<hash crc32="beec9922" md5="e4f3cb0e77a499c86bcca4d682f5008e" name="Phantom Slayer, The [a]">
+		<year>198?</year>
+		<manufacturer>Med Systems</manufacturer>
+	</hash>
+	<hash crc32="1227ac26" md5="10af0c6c7b2c60adfefe1fa3abefee79" name="Photo Finish">
+		<year>1983</year>
+		<manufacturer>Tony Evans</manufacturer>
+	</hash>
+	<hash crc32="7537c914" md5="28d2793cd7253e33295274bad08ed002" name="Picture Maker">
+		<year>1987</year>
+		<manufacturer>David Makin</manufacturer>
+	</hash>
+	<hash crc32="518136bc" md5="629559306a8bedcc5884894ee2ba8e53" name="Picture Puzzler">
+		<year>1983</year>
+		<manufacturer>Lyversoft</manufacturer>
+	</hash>
+	<hash crc32="df2acbb5" md5="252da3eeee4eb87bdbf3be77dabf249b" name="Pimania">
+		<year>198?</year>
+		<manufacturer>Automata UK Ltd</manufacturer>
+	</hash>
+	<hash crc32="2ad99a17" md5="95623fd24c0ef1fd67418d19f9b72ba5" name="Pinball">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="1ba6cd7c" md5="5e31338dd8250b842b2b8eed6222425a" name="Pit Fiend">
+		<year>1984</year>
+		<manufacturer>Pocket Money Software</manufacturer>
+	</hash>
+	<hash crc32="3c643777" md5="5d81e20da0f59b5952f208921b22fc30" name="Pixel Editor">
+		<year>1983</year>
+		<manufacturer>Applied Systems Knowledge</manufacturer>
+	</hash>
+	<hash crc32="f441c8b4" md5="9474275656f205ecaac406d5cc496b4a" name="Pixel Writer">
+		<year>1987</year>
+		<manufacturer>Pamcomms Ltd</manufacturer>
+	</hash>
+	<hash crc32="5eb2fcb9" md5="d4fb79dd77e9ffb4725deff8b25efa61" name="Pixel Writer Demo">
+		<year>1987</year>
+		<manufacturer>Pamcomms Ltd</manufacturer>
+	</hash>
+	<hash crc32="f741836a" md5="3543abe9dadc0cc9ce6c9c2fac266e55" name="Poseidon Adventure">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="30d6a46c" md5="aee9e816802cafb01774c8306bbf44bc" name="Printer Prompt v2.6">
+		<year>1986</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="afee9000" md5="d0646430d6388d00854e43476072b7ba" name="Program Pack 1">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="afdd2298" md5="b4083ce4fd29a317bc4b69081b2b5448" name="Program Pack 2">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="a99efe43" md5="2cee98f92ae7fff5f3630c8382a0c411" name="Program Pack 3">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="c0acfe31" md5="6ab662ed030e4fa831bc9d9cff278b2c" name="Program Pack 4">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="01bc6c87" md5="3026628cea11e76b5a2c9dec61d663ac" name="Program Pack 5">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9414b12b" md5="545a2614627627c8b3889c4595885ec2" name="Programmer Utilities">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="90af126e" md5="a032d163c01541a9db950b7fa6a116d4" name="Project Volcano - Mission 1">
+		<year>1984</year>
+		<manufacturer>Mission Software Ltd</manufacturer>
+	</hash>
+	<hash crc32="7cc46f47" md5="fd6e0b1ba7e4c12b4ffd7b9b2b010e50" name="Pterodactyl">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="fd8b78da" md5="34b9e8608c3acb6b976d1eee07bcdde6" name="Pterodactyl [a]">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="df542033" md5="18d7a407487e0a779557f99faca13bf3" name="Pub Crawl">
+		<year>198?</year>
+		<manufacturer>B &amp; H Software</manufacturer>
+	</hash>
+	<hash crc32="04853255" md5="02f5ffb250b73aea0584fdd3dc81f2c5" name="Pyradventure">
+		<year>1987</year>
+		<manufacturer>Tim Wheals</manufacturer>
+	</hash>
+	<hash crc32="489682a9" md5="7aa6ca7982d4729345f77069830c403c" name="Pyramid of Doom">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+	</hash>
+	<hash crc32="86c75702" md5="c314f7ffc8dae58bb1c16bf8c07c844e" name="Quest">
+		<year>1981</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="9af72c01" md5="ea2a005c0ac6612996c1200430a18e21" name="Quest, The">
+		<year>1983</year>
+		<manufacturer>Impact Software</manufacturer>
+	</hash>
+	<hash crc32="5b1328b0" md5="1a18165abc064b768b07e2d7e095f06e" name="Racer Ball">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="35511c8c" md5="837737ea22d1fc05e14d94129d21591f" name="Racer Ball">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="16efd516" md5="eb08e6a6699b2f41a7b7ec3aa31531ed" name="Raiders">
+		<year>1982</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="6441d4d8" md5="710c77cff5cc7521dc29a5f86f16274c" name="Rail Runner">
+		<year>1982</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="4b70ae14" md5="9334d022d6fb7535afe881989e7a198f" name="Rainbow Writer v1.3">
+		<year>1983</year>
+		<manufacturer>Rainbow Software</manufacturer>
+	</hash>
+	<hash crc32="7d262540" md5="7b40b8fa6968e8810fa63e9a79590b88" name="Red Alert">
+		<year>198?</year>
+		<manufacturer>Isaaman</manufacturer>
+	</hash>
+	<hash crc32="9d69e27d" md5="5fc8d594f57b5b390265827a5cbdcd5b" name="Red Meanies">
+		<year>1984</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="e64ee3cc" md5="f7bca2f32754b570e371670ea823fa75" name="Rescue From Death's Head Hole">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5fa6144f" md5="4b20ded7bd867fedb939dcf3dff373a6" name="Return of the Jet-I">
+		<year>1983</year>
+		<manufacturer>Thundervision</manufacturer>
+	</hash>
+	<hash crc32="a2dd1166" md5="a0fcb18cbaa0263b9980859a9e79e072" name="Ring of Darkness, The">
+		<year>1982</year>
+		<manufacturer>John F. Humphreys</manufacturer>
+	</hash>
+	<hash crc32="b4fe1515" md5="759ce006958e31fecbcb8222121a14b9" name="Ring of Darkness, The [a]">
+		<year>1982</year>
+		<manufacturer>John F. Humphreys</manufacturer>
+	</hash>
+	<hash crc32="5849def8" md5="e4b03be3d5a89f337ec5aa13c7609ea2" name="Robin Hood">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="30ad635f" md5="c162ce47e8a48b24ac4521e7bd8a99e8" name="Robotron">
+		<year>1983</year>
+		<manufacturer>Intracolor</manufacturer>
+	</hash>
+	<hash crc32="2a19298f" md5="6206ac11e301e2f313fe17cb1071619c" name="Rola Ball">
+		<year>1987</year>
+		<manufacturer>Starship Software</manufacturer>
+	</hash>
+	<hash crc32="6b0e4dd4" md5="d103b0f8d37df0bab2790ac9ad258f31" name="Roman Empire">
+		<year>1983</year>
+		<manufacturer>M.C. Lothlorien</manufacturer>
+	</hash>
+	<hash crc32="5250ebd7" md5="fb67bb217e1e57003a90828baa39fb87" name="Rommel 3D">
+		<year>1985</year>
+		<manufacturer>Michtron</manufacturer>
+	</hash>
+	<hash crc32="da9d2811" md5="d8166172c27f413c0d0053516d69e99e" name="Rommel's Revenge">
+		<year>1984</year>
+		<manufacturer>Design Design</manufacturer>
+	</hash>
+	<hash crc32="56bb98dd" md5="7db8f62d21138e3313e4557e2e2484d8" name="Rommel's Revenge [a]">
+		<year>1984</year>
+		<manufacturer>Design Design</manufacturer>
+	</hash>
+	<hash crc32="2f54076f" md5="9f298df8826ccc8b51f30604c017ea62" name="Rotabb">
+		<year>1989</year>
+		<manufacturer>Kouga Software</manufacturer>
+	</hash>
+	<hash crc32="4064082e" md5="1d5c16bdabe2720125a708a48ac915d8" name="Row of Four">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="b6c49f91" md5="cbbab368021dc8b789ce9907508f64eb" name="Ruby Robber">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="76742e57" md5="e247102882ab162c0c6817195aca8d28" name="Russian Roulette">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d54bde36" md5="c3b5ecbda60d2eb3ddf6e3681b79102e" name="Save the Whale">
+		<year>198?</year>
+		<manufacturer>JamGee</manufacturer>
+	</hash>
+	<hash crc32="55eec296" md5="91284b3ae39c0557be892e2cb21697a1" name="Scarfman">
+		<year>1982</year>
+		<manufacturer>Cornsoft</manufacturer>
+	</hash>
+	<hash crc32="a17995b2" md5="b148dd2fc087e0ae8457e2b9aa496101" name="Scarfman [f]">
+		<year>1982</year>
+		<manufacturer>Cornsoft</manufacturer>
+	</hash>
+	<hash crc32="e7611fc1" md5="41d48a7f5dd96e7a6ac078cf97380f4c" name="School Maze">
+		<year>1982</year>
+		<manufacturer>S. Blyn</manufacturer>
+	</hash>
+	<hash crc32="f2c6f0aa" md5="99f0a1154cc255e524eeebc1f5f72d19" name="Screaming Ab-Dabs, The">
+		<year>1984</year>
+		<manufacturer>A &amp; F Software</manufacturer>
+	</hash>
+	<hash crc32="f36cc9ca" md5="5e447f8da82b44197b8679ad0d156141" name="Script">
+		<year>1988</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="4ffb01dd" md5="3ed63d6672d92962f6231c5b41d61b5b" name="Sea Dragon">
+		<year>198?</year>
+		<manufacturer>Coniah Software</manufacturer>
+	</hash>
+	<hash crc32="daec4f29" md5="8565ca6cad65a7e1ffb867726f36aca6" name="Sea Dragon [a]">
+		<year>198?</year>
+		<manufacturer>Coniah Software</manufacturer>
+	</hash>
+	<hash crc32="3278c704" md5="43d5431e7c162af542fa3d9f8a151fa2" name="Secret Mission">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+	</hash>
+	<hash crc32="7540757c" md5="a3dd414bcb9de204940a4439fcd45ee2" name="Secret Mission [a]">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+	</hash>
+	<hash crc32="5fe37d46" md5="520f137df823d7453a40540d2ef7fef5" name="Seikosha Screen Dumper">
+		<year>1987</year>
+		<manufacturer>Dragonfire Software</manufacturer>
+	</hash>
+	<hash crc32="f97be2a9" md5="45456f0a03bea7d95549f0828b61c2e4" name="Sewer Rat">
+		<year>1984</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="ca11fd9f" md5="0467d124a3d989ba94804ddd35a64aba" name="Shaft">
+		<year>1983</year>
+		<manufacturer>Prickley Pear Software</manufacturer>
+	</hash>
+	<hash crc32="6034e94e" md5="d4934c5e21bee7640653cc7282666c29" name="Shanghai">
+		<year>1991</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="f2b51caf" md5="c21baf0557585812c0fede230918523c" name="Shaolin Master">
+		<year>1985</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="b3accb96" md5="c67d7bb63b35ed7ac565db62a0e11317" name="Shaolin Master Plus">
+		<year>1986</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="4f10601f" md5="caecb72cb80179fb28df19feb5486371" name="Shape Up">
+		<year>1983</year>
+		<manufacturer>Applied Systems Knowledge</manufacturer>
+	</hash>
+	<hash crc32="58269749" md5="bf384e85d26d0713ca536a661f9d32d2" name="Shark Treasure">
+		<year>1982</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="33dfc8cb" md5="673947ed359d25726db3291d4b3a4fd3" name="Shark Treasure">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="188291db" md5="a288ebd8bdf7a25563b288c3d79d7349" name="Shenanigans">
+		<year>1983</year>
+		<manufacturer>Mark Data Products</manufacturer>
+	</hash>
+	<hash crc32="d5183fac" md5="5ad3f1d7a02eb4b0080d89862a24ce6a" name="Shock Trooper">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="544ff332" md5="72569719c49e2a522910443855963cf7" name="Shock Trooper [a]">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="c8cebf69" md5="f985812bc4c61b2e8829785d15951158" name="Short Basic Program (PD)">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d6212114" md5="ff4d5ed94ac8d48b922e286523a381c5" name="Show Jump">
+		<year>198?</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="0ba8259f" md5="96de32f25192d54b7b44a915f948da00" name="Shuffle">
+		<year>198?</year>
+		<manufacturer>Phil Beistel</manufacturer>
+	</hash>
+	<hash crc32="44a560d3" md5="24eefb4a0470800666361d91c6a15234" name="Shuttle Silo Satellite">
+		<year>1983</year>
+		<manufacturer>J.F. McGuire</manufacturer>
+	</hash>
+	<hash crc32="3050e42b" md5="c1b2d30d2585591c7b54639e4d293523" name="Shuttle Simulator">
+		<year>1982</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="c0e0d964" md5="e78b5e618dcc031a6ef0ba734faad100" name="Simon Says">
+		<year>1982</year>
+		<manufacturer>Dragon Data Ltd</manufacturer>
+	</hash>
+	<hash crc32="f40902cd" md5="6667c9e71dd343a5dc9e5275a1a1ba4b" name="Skid Row">
+		<year>1985</year>
+		<manufacturer>Cuthbert Chronicle</manufacturer>
+	</hash>
+	<hash crc32="d17c6a4d" md5="336e33cf3ff3442a04a9c0f961da7640" name="Skramble">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="a9ddaa3c" md5="781ed4e3fafc85b6bdd06fe4fb296acf" name="Slide">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="bf727b7e" md5="fe1c585b40ed7bb1f0892a87f5ebf330" name="Sliding Picture Puzzles">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="59cd8af2" md5="213ea6524e00f4d63be259ed69f1e8a8" name="Smasher">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ba756e78" md5="3f6f15172b2e0d1a028d4b5ac47693c0" name="Snail Pace">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="dd1ee517" md5="1faad7d19432a940b827f5ec0d512edf" name="Snail Pace [a]">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="fa286471" md5="ffd1e31ac9fe068d57c68013dda1e4d5" name="Snail Pace">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="b0bda2d0" md5="97ce63f7b3b1b4b6d5e818c134212e9e" name="Snakes">
+		<year>1982</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="121f57c7" md5="e9ec84088fb06827ea254894eabf7ba0" name="Sniper">
+		<year>1983</year>
+		<manufacturer>R.K. Lowry</manufacturer>
+	</hash>
+	<hash crc32="777137bc" md5="b1e979d1ebc99d5b29c069901597b5ce" name="Solitaire">
+		<year>1982</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="6c48f3b1" md5="6174a1963b56999259f88e3ea6c56106" name="Solo Poker">
+		<year>1982</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="adcc4b4d" md5="3995665a2f2df53168218e4dfdd68165" name="Space Fighter">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9cee5f40" md5="d0dca5fb638d746564020ed89b296b0d" name="Space Invaders">
+		<year>1982</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="f83979c3" md5="d7f771ae9dad09c72b9fd8fa80d19df0" name="Space Invaders [a]">
+		<year>1982</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="d6b575f9" md5="7b3ee4e20095aedfa362b88b0c927c01" name="Space Monopoly">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9aeff0f4" md5="d9ca7b1367b24e7956b1bef8710dc26c" name="Space Race v1.1">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="1ac83a3a" md5="fe7b54437b4886720f1b1a9755644fc3" name="Space Raiders">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="53ac0d6e" md5="47f45580d8c1ae4dae20d311d1bc89af" name="Space Trek 1">
+		<year>1986</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="6ef6781d" md5="246db39077816920ada71a0d720a3ef3" name="Space Trek 1 - Disk Version">
+		<year>1986</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="0a953b59" md5="cf679f98e550f0bd12d6e802f5054c6f" name="Space Trek 2">
+		<year>1986</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="224e09ae" md5="19dfcd2cce27378a9511abdfbec5587a" name="Space Trek 2 - Disk Version">
+		<year>1986</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="4c699232" md5="c7ee328362447e6af481e9511942029e" name="Space Trek 3">
+		<year>1986</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="a52da24f" md5="f56dcc5fa452908fabd7e53c72866160" name="Space Wrek">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="907577e4" md5="8ed27b808edff97792171026375651a5" name="Special Air Sevice">
+		<year>198?</year>
+		<manufacturer>Peaksoft</manufacturer>
+	</hash>
+	<hash crc32="f6266ca9" md5="67d95a0a85da4b1bd4ea322110420862" name="Special Air Sevice [a]">
+		<year>198?</year>
+		<manufacturer>Peaksoft</manufacturer>
+	</hash>
+	<hash crc32="1a7a504a" md5="f3c7bc856eefa9371e4a90540f28ebbe" name="Speed Racer">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="d7de89b9" md5="df1bf51ce66ccdd3af76d8fee9ba1787" name="Speed Racer [a]">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="6e666d9b" md5="af95c4f152001d6fb236edde250b0ccb" name="Sporting Decathlon">
+		<year>198?</year>
+		<manufacturer>Paramount Software</manufacturer>
+	</hash>
+	<hash crc32="d50db6d1" md5="2854147078e942157b02a7f6c956342f" name="Spreadsheet Program">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="67c2668b" md5="d09f29c37e4d2e8c8db2290fe96cedeb" name="Sprite Magic v2.1">
+		<year>1984</year>
+		<manufacturer>Knight Software</manufacturer>
+	</hash>
+	<hash crc32="2a776d2e" md5="2fa41a50165b97815bf50a7b4327d39f" name="Star Spores">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="b4f19b69" md5="f80313625caaeadac2709cc6b93093e8" name="Star Trek">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="22cf4cee" md5="4d5d2b85e321bc6635429873a3fed8a0" name="Starfighter">
+		<year>198?</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="25a89d24" md5="e91b8877914ab84d125165d6eefce890" name="Starman Jones">
+		<year>198?</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="58914dce" md5="3ed34f599761d8ef325918df3777b5f2" name="Starship Chameleon">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="847967e0" md5="f0d4a7c037f90e93cd16993f454dfdc2" name="Stockmarket">
+		<year>1982</year>
+		<manufacturer>Bamby Software</manufacturer>
+	</hash>
+	<hash crc32="473b4b66" md5="af208cc94077701c6d5b6546432b97fa" name="Stockmarket [a]">
+		<year>1982</year>
+		<manufacturer>Bamby Software</manufacturer>
+	</hash>
+	<hash crc32="107ba438" md5="8ef27d3842977caf312f70470db0b00f" name="Stone Raider II">
+		<year>1986</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="730a267b" md5="8bb24bec61c5ed7542e90289748e6437" name="Storm">
+		<year>1982</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="5a66e423" md5="15637f467555af92cc09a9882833db7d" name="Storm Arrows">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="18559f5b" md5="a89ea3dc629f0c5770cd5dbce4565d77" name="Strategic Command">
+		<year>1982</year>
+		<manufacturer>Romik Software</manufacturer>
+	</hash>
+	<hash crc32="77e1bc0a" md5="8133530beaa0076870d4c3734092d512" name="Strategic Command [a]">
+		<year>1982</year>
+		<manufacturer>Romik Software</manufacturer>
+	</hash>
+	<hash crc32="a421a02f" md5="a2994d424d92088cdaf50a56d643b588" name="Supa Nova">
+		<year>1988</year>
+		<manufacturer>Orange Software</manufacturer>
+	</hash>
+	<hash crc32="86db0610" md5="f6c86f5494db2b517c05ebcdbf4633f2" name="Super Lander">
+		<year>1982</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="7a0ab4e5" md5="e8511b24c204070e9314b832fe6f05e5" name="Super Skill Hangman">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="862291a9" md5="0dd8a56aabc7420f587465e265aaecc5" name="Super Spy">
+		<year>1983</year>
+		<manufacturer>Richard Shepherd Software</manufacturer>
+	</hash>
+	<hash crc32="cbc362fb" md5="2a0398bba0498aabff07e74cfe5570db" name="Super Spy - Part 1">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="8dbafe41" md5="3ac3e20e14ddce70c1875b7c8f79b22f" name="Super Spy - Part 2">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="05d6f864" md5="348b9442baf56a68a37f881cf02b6da7" name="Super Spy - Part 3">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="c0164b4e" md5="d8e9c31df73baf25c49095be8982f07d" name="Super Spy - Secret Mission">
+		<year>1983</year>
+		<manufacturer>Ampalsoft</manufacturer>
+	</hash>
+	<hash crc32="fdf828af" md5="defd44cb0a48a9895cad81e29ec6847a" name="Superkid">
+		<year>1987</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="4de8a02b" md5="cf1516f280097ca871e13573a964d72b" name="Superkid [f]">
+		<year>1987</year>
+		<manufacturer>Quickbeam Software</manufacturer>
+	</hash>
+	<hash crc32="8de161b0" md5="b26ae3250d4824c27d8cd7809ed8157c" name="Surprise">
+		<year>1983</year>
+		<manufacturer>Bamby Software</manufacturer>
+	</hash>
+	<hash crc32="24f65153" md5="dca01747e86dfa72fc02d1e6b679c390" name="Synther 7">
+		<year>1983</year>
+		<manufacturer>Computerware</manufacturer>
+	</hash>
+	<hash crc32="8ebeeb20" md5="a4e2befc151db43e6e7a62f2a7cca000" name="Syzygy">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9516da44" md5="5f499422c39b05414e7f3a0ec646a3ef" name="Tape 2 Disk Transfer">
+		<year>1987</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="f22d189a" md5="d8ce2875c9c13a9d1c258cf824e9b003" name="Tape Copy">
+		<year>1982</year>
+		<manufacturer>Tom Mix Software</manufacturer>
+	</hash>
+	<hash crc32="1b7f9957" md5="d6f8acc981829f2f549e839534785165" name="Taskship">
+		<year>1983</year>
+		<manufacturer>Programmers Guild</manufacturer>
+	</hash>
+	<hash crc32="e68f4a1b" md5="c84aa3a566dfc9c0f0ac49722e20f0c9" name="Tele Forth - Programming Language">
+		<year>1982</year>
+		<manufacturer>Armadillo Software</manufacturer>
+	</hash>
+	<hash crc32="15d7f0d6" md5="ed7759d73293bd2bd292660f6c5083ae" name="Tele Mod - Tele Forth Addon">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="f5552c30" md5="f35fc1fa2ab0ce330dd73a230394f2b0" name="Telewriter">
+		<year>1981</year>
+		<manufacturer>Cognitec</manufacturer>
+	</hash>
+	<hash crc32="af9f37e0" md5="ac8ce8a7c3247341cd9a67f3eed72b18" name="Temple of Doom">
+		<year>1986</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="541bf580" md5="cc2a9f39660d577320734263cd5fadd0" name="Temple of Doom [a]">
+		<year>1986</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="beef5ae7" md5="42b9f2a8abc606c484181e037305e84b" name="Textstar">
+		<year>1982</year>
+		<manufacturer>Personal Software Services</manufacturer>
+	</hash>
+	<hash crc32="1a6cba07" md5="d41437947ab77388aca1126fcf49935e" name="Thirteenth Task, The">
+		<year>198?</year>
+		<manufacturer>ARC Software</manufacturer>
+	</hash>
+	<hash crc32="9283609d" md5="c395cfd205d766cfe60f7bfe450647c0" name="Tim Love's Cricket">
+		<year>198?</year>
+		<manufacturer>Peaksoft</manufacturer>
+	</hash>
+	<hash crc32="f116b98f" md5="be149df20ce05a3c4ebd6a93fac7ccaa" name="Time Bandit">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="854bc3bc" md5="8327c1179c0b61c2848b34bd0a706d61" name="Time Machine Search, The">
+		<year>1986</year>
+		<manufacturer>Broomsoft</manufacturer>
+	</hash>
+	<hash crc32="56aa345a" md5="62c172b0435d492fad450ab4afcfa86b" name="Timscript">
+		<year>1983</year>
+		<manufacturer>T.P. Goldingham</manufacturer>
+	</hash>
+	<hash crc32="1dd8690c" md5="2dc491c722f1ac0ee8e692215d552a20" name="Toppler">
+		<year>1984</year>
+		<manufacturer>Pocket Money Software</manufacturer>
+	</hash>
+	<hash crc32="dc02f783" md5="5040785962199ff12b87997951860db9" name="Torpedo Run">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="f4832292" md5="7b29b22da4a80563a6a0e3ce90ca9b73" name="Tosec Owns Us All v1.0">
+		<year>2003</year>
+		<manufacturer>Eldio</manufacturer>
+	</hash>
+	<hash crc32="c2461a33" md5="2f45cca746fe1ff166fa87164dfc293c" name="Total Eclipse v1.1">
+		<year>1985</year>
+		<manufacturer>Fenmar Limited</manufacturer>
+	</hash>
+	<hash crc32="ae67715b" md5="cc337ca5767d0db8d919147cd41014d5" name="Touch Typing Tutor">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="9e0540d0" md5="045a99abe8e22487a856c3422fbb1970" name="Towers of Death &amp; Ice Kingdom">
+		<year>198?</year>
+		<manufacturer>Peaksoft</manufacturer>
+	</hash>
+	<hash crc32="c0074337" md5="ecde9822f293b9057de4c10f9e454439" name="Trace Race - 1 Player Version">
+		<year>1983</year>
+		<manufacturer>Cable Software</manufacturer>
+	</hash>
+	<hash crc32="d2980d15" md5="0a0b690441855d0de4259f8e63779c98" name="Trace Race - 2 Player Version">
+		<year>1983</year>
+		<manufacturer>Cable Software</manufacturer>
+	</hash>
+	<hash crc32="f2b7ac0d" md5="11f1520a92c3899d0b2b432cf4afd36f" name="Trace Racers">
+		<year>1983</year>
+		<manufacturer>Cable Software</manufacturer>
+	</hash>
+	<hash crc32="1be417e7" md5="50c37bb75b416ac6ca48400f435d3ed4" name="Trader">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="fab29a21" md5="252f5af5a7742d617bdd8de64da507a3" name="Transylvanian Tower">
+		<year>1983</year>
+		<manufacturer>Richard Shepherd Software</manufacturer>
+	</hash>
+	<hash crc32="e04b6c04" md5="2da952437c5f565ccfe219ee58cbb70d" name="Transylvanian Tower [a]">
+		<year>1983</year>
+		<manufacturer>Richard Shepherd Software</manufacturer>
+	</hash>
+	<hash crc32="d6859c50" md5="9e2d067a36688e1b37c68e50df53178d" name="Trap Fall">
+		<year>198?</year>
+		<manufacturer>K. Kalish</manufacturer>
+	</hash>
+	<hash crc32="88211fc1" md5="7f32da649b99d10d9f128c56dd3b423e" name="Treasures of Barsoom">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="3a1dafb1" md5="31da6cb418db38d9ed3c6efa521e8311" name="Trekboer v1.1">
+		<year>1984</year>
+		<manufacturer>Mark Data Products</manufacturer>
+	</hash>
+	<hash crc32="6b7d8dce" md5="3191a90ac4a8d5f4b33d20ee4a2bb8b5" name="Trial of Arnold Blackwood, The">
+		<year>1984</year>
+		<manufacturer>Nemesis</manufacturer>
+	</hash>
+	<hash crc32="6f988d47" md5="3c2058690f71fd6f9e2194b715f3d99d" name="Triplet">
+		<year>1982</year>
+		<manufacturer>Wizard Software</manufacturer>
+	</hash>
+	<hash crc32="2c5c29fa" md5="350ef2755809745da5a4d87cc855a1f5" name="Trivial Crosswords">
+		<year>1986</year>
+		<manufacturer>H. Fowler</manufacturer>
+	</hash>
+	<hash crc32="07bb6d3c" md5="1667b16fd9ace1da679169c8bec5de88" name="Trojan Light Pen">
+		<year>1983</year>
+		<manufacturer>Trojan</manufacturer>
+	</hash>
+	<hash crc32="d2f563e3" md5="1e429bcd80ce398c3a099cce0074a35f" name="Tron Light Cycles">
+		<year>1983</year>
+		<manufacturer>Dragon User Magazine</manufacturer>
+	</hash>
+	<hash crc32="0cb40c37" md5="1b4038e5316e361e3dbaf068ac11da6f" name="Tropical Lanes">
+		<year>1982</year>
+		<manufacturer>T &amp; D Software</manufacturer>
+	</hash>
+	<hash crc32="ccd2928e" md5="72400a874a1f83e5c68515b7a6125cec" name="Trun">
+		<year>198?</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="d1b5c63c" md5="ad21c415b8d3514dcd64ef2999d7a953" name="Tube Way Army">
+		<year>1984</year>
+		<manufacturer>Rainbow Software</manufacturer>
+	</hash>
+	<hash crc32="c815fc41" md5="7e2e0b6c96c8f80baa150418ed6d19e1" name="Ugh!">
+		<year>1983</year>
+		<manufacturer>Softek Software</manufacturer>
+	</hash>
+	<hash crc32="ec58e5ff" md5="07bdb8db6bef6bc0c48011ab34f6d5d0" name="Ultrapede">
+		<year>1983</year>
+		<manufacturer>Rainbow Software</manufacturer>
+	</hash>
+	<hash crc32="05776ec5" md5="596bdd2de41f7441ec8408180df1dbf9" name="Underbeings of Croth">
+		<year>1985</year>
+		<manufacturer>Maridian</manufacturer>
+	</hash>
+	<hash crc32="6e214f89" md5="2116f3dbe76aac0441ab6b993d41c19f" name="Up Periscope">
+		<year>1983</year>
+		<manufacturer>Beyond Software</manufacturer>
+	</hash>
+	<hash crc32="ad34e3f4" md5="f9b44ec8e4bdd50980b5b57abf9e48c6" name="UXB">
+		<year>1983</year>
+		<manufacturer>Virgin Games Ltd</manufacturer>
+	</hash>
+	<hash crc32="a2fefb06" md5="39e414d6dfd1cfd26553dd78d0fa22c6" name="Variable List (PD)">
+		<year>1987</year>
+		<manufacturer>S. Orchard</manufacturer>
+	</hash>
+	<hash crc32="77f9223b" md5="a6d6cd97d169a02454f13d4ce81a516a" name="Various for the Dragon 32">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6f6e86ab" md5="7b1134c530022f935dd8f78a823bef75" name="Voodoo Castle">
+		<year>198?</year>
+		<manufacturer>Alexis Adams</manufacturer>
+	</hash>
+	<hash crc32="8aa04daa" md5="2696281a6c66dd70ceb9673d643ecdae" name="Vortex Factor">
+		<year>1985</year>
+		<manufacturer>Mark Data Products</manufacturer>
+	</hash>
+	<hash crc32="6f8daee3" md5="fb3a48dfc2afed057ddeed971007c006" name="Vulcanox">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="552ce4f4" md5="83c36498fb3376f1b183c6d381c5e8c0" name="Vultures">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="10097eb7" md5="9369be9e775424b2757ea22e89f6b850" name="War!">
+		<year>1982</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="518759fe" md5="136efaa2bc7f3134557700985ab22e94" name="Warlord">
+		<year>1982</year>
+		<manufacturer>M.C. Lothlorien</manufacturer>
+	</hash>
+	<hash crc32="df66a81e" md5="95bf201b519667fa006e380472a35f2f" name="Waxworks">
+		<year>1983</year>
+		<manufacturer>B. Howarth</manufacturer>
+	</hash>
+	<hash crc32="2700a04a" md5="a9a54640fc5e3435d8fcde56e16feacd" name="Waxworks [a]">
+		<year>1983</year>
+		<manufacturer>B. Howarth</manufacturer>
+	</hash>
+	<hash crc32="a0be5877" md5="af7d7a5152a21c78de6ee49af58453c4" name="Weetabix vs the Titchies">
+		<year>1984</year>
+		<manufacturer>Romik Software</manufacturer>
+	</hash>
+	<hash crc32="f34da46a" md5="14ac0ed128398ade6ffc38cfac9c40c8" name="Weirds of Kesh - Skulls &amp; Bones">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9c187407" md5="e3d6b2b7e2f32699978396513964f18d" name="Wheel of Fortune">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="06ccf148" md5="6af95563bb176b194dea7c9ae37e08f4" name="Whirlybird Run">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="55032264" md5="3a2e0b3a53a2711964d79a1f15ac2087" name="Whirlybird Run [a2]">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="5a926bfb" md5="ca31a5c32bb4f1c35dc0557eeff712a0" name="Whirlybird Run [a]">
+		<year>1982</year>
+		<manufacturer>Spectral Associates</manufacturer>
+	</hash>
+	<hash crc32="eb97877f" md5="eed053760012e7b438daf3e20479d717" name="White Barrows, The">
+		<year>1983</year>
+		<manufacturer>ASP Software</manufacturer>
+	</hash>
+	<hash crc32="af6a8423" md5="f634a8fce61df60c2b8369da00c47e5c" name="Willy's Revenge">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="431a2c9b" md5="6b061978a42d78f014509ac8db628ad3" name="Wipeout">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="d65e92a3" md5="419f3351501997e656bbcbf002400154" name="Wipeout [a]">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="74bd36ba" md5="e02acf9e0d5a66d331451b371a0638b1" name="Wipeout">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="bb69909b" md5="2907152a373cce579965bd9da6d7fc74" name="Wizard War">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="e74cfd85" md5="44779da7bb3fc38499437e887536cce2" name="Wizard's Lair">
+		<year>1985</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="a1ca5834" md5="a43876b5b27c572b97c45a9d88ccf491" name="Wizard's Quest">
+		<year>1986</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="42c5bca3" md5="24f58086598c98ade403bc68489e2be7" name="Word Wise">
+		<year>198?</year>
+		<manufacturer>Shards Software</manufacturer>
+	</hash>
+	<hash crc32="4eeda577" md5="b53df395788e127ff1d2aa3813ecb45d" name="World Boxing">
+		<year>1986</year>
+		<manufacturer>D.B. Software</manufacturer>
+	</hash>
+	<hash crc32="69f57b90" md5="7488954403d713fb3b67101486ae039b" name="World Cup Manager">
+		<year>1982</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ce583173" md5="4c0aacc75d0507147091ec757c3b65dd" name="Worlds of Flight">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="fedcec3c" md5="16ecf60c06974924bddcb23180ee365d" name="Wumpus Mansion">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="56778090" md5="a0e489a61ca0637e56936351d5189b07" name="Wumpus Mansion [a]">
+		<year>1982</year>
+		<manufacturer>Active Software</manufacturer>
+	</hash>
+	<hash crc32="2ebc1ea3" md5="88330f4395acb51c1d8a935f723fc2ae" name="Wumpus Mansion">
+		<year>1984</year>
+		<manufacturer>Datacom Publications</manufacturer>
+	</hash>
+	<hash crc32="48cd73b6" md5="481f3334a02e3f5cdc7a4e445abf6fe0" name="Yumping Yosser">
+		<year>198?</year>
+		<manufacturer>Knight Software</manufacturer>
+	</hash>
+	<hash crc32="f1093264" md5="f0f48b48cd959001d12267c47aba991d" name="Zak's Son">
+		<year>1984</year>
+		<manufacturer>Knight Software</manufacturer>
+	</hash>
+	<hash crc32="0d2d3500" md5="ef07aaa5c257e897fe33b555ce119fad" name="Zaxxon">
+		<year>1983</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+	<hash crc32="6028afa5" md5="366055b385991508f129f48912a7c522" name="Zorakk the Conqueror">
+		<year>1984</year>
+		<manufacturer>Icon Software</manufacturer>
+	</hash>
+	<hash crc32="544e4f05" md5="88d68eeaded0d3f875a3071220b61253" name="Zotoka - Game">
+		<year>1987</year>
+		<manufacturer>Preston Computer Games</manufacturer>
+	</hash>
+	<hash crc32="ab76471b" md5="202591cef8a81c78b0a17935ee9edec0" name="Zotoka - Instructions">
+		<year>1987</year>
+		<manufacturer>Preston Computer Games</manufacturer>
+	</hash>
+	<!-- Dragon 32 &amp; 64 - Diskettes - VDK -->
+	<hash crc32="071e515a" md5="8991a7f8d204f5765a2d515576597421" name="Blank Disk - 40 Track Double Sided">
+		<year>2003</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="160f5e06" md5="c3df76760a336328c0f5ed9bc6d7d939" name="Blank Disk - 40 Track Single Sided">
+		<year>2003</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7b0b10d9" md5="d53cc547ce1d16827a058f8335d00b80" name="Blank Disk - 80 Track Double Sided">
+		<year>2003</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7278e09b" md5="486d826d89532b7586164b46ba68a0ea" name="Blank Disk - 80 Track Single Sided">
+		<year>2003</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7a1266c4" md5="f2686e192f6a66810c522908e44af122" name="Cuthbert Goes Walkabout">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="fe9b1959" md5="c940b5e91804e553195ee68b5538a0ba" name="Disk Doctor">
+		<year>198?</year>
+		<manufacturer>Domino Computing</manufacturer>
+	</hash>
+	<hash crc32="366d9b1b" md5="9d56b132ecde249bf6ca824ecd469716" name="Dragon Graphics Studio">
+		<year>1989</year>
+		<manufacturer>Knight Software</manufacturer>
+	</hash>
+	<hash crc32="74d2dde3" md5="1c1b9df281183208938323783891963d" name="Dungeon Raid">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="d8d5abe9" md5="ff32a63081f902424177ffbf63ee9fb3" name="File Master">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="2f501850" md5="67553cd08d7a9081cdac5ba721f30f34" name="Rainbow Writer">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="ec98a1f4" md5="ac6122973a505111460ad3180a617eff" name="Speed Racer">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="da853ae0" md5="e29026f50bd488ccf8a550558f44804f" name="View Data Terminal">
+		<year>1986</year>
+		<manufacturer>Compusense</manufacturer>
+	</hash>
+	<!-- Dragon 32 &amp; 64 - Snapshots - PAK -->
+	<hash crc32="cbd91290" md5="a06d974e9c979b2e5d4789b6098286d6" name="3D Lunattack">
+		<year>1984</year>
+		<manufacturer>Hewson Consultants</manufacturer>
+	</hash>
+	<hash crc32="16829d6f" md5="440aa78d4e91dc80c8bf358f0d5da3b7" name="Airball">
+		<year>1987</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="a161a606" md5="63b1cebf93ce9d33a5436270d208b52f" name="Balldozer">
+		<year>1988</year>
+		<manufacturer>Kouga Software</manufacturer>
+	</hash>
+	<hash crc32="aae00d05" md5="b6a66abf2c92e72de433e01e50ed7497" name="Bonka">
+		<year>1983</year>
+		<manufacturer>J. Morrison Micros</manufacturer>
+	</hash>
+	<hash crc32="050cdd4b" md5="ef44c7dc6c5f7e64ba94eda2f96635a1" name="Bubble Buster">
+		<year>1984</year>
+		<manufacturer>Pocket Money Software</manufacturer>
+	</hash>
+	<hash crc32="03dd4762" md5="100f9a6a5566ad7e5082aecbdbfe0d8a" name="Chuckie Egg">
+		<year>1983</year>
+		<manufacturer>A &amp; F Software</manufacturer>
+	</hash>
+	<hash crc32="4fcf4144" md5="b38861c18d2bc36df3d96523a12d03ee" name="Doodle Bug">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="7022d324" md5="159dd178fcc3f2a4b355251803365745" name="Escape v1.0">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="b2a7ad4b" md5="fae327ded9d9184b86b3630a014b9512" name="Fruity Machine, The">
+		<year>1983</year>
+		<manufacturer>Impsoft</manufacturer>
+	</hash>
+	<hash crc32="10cc7758" md5="80d936d2caf958338c58ebcaf8483137" name="Grand Prix">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="662947a2" md5="95d336717d7dcf45d319f7ae4375d09c" name="Hunchback">
+		<year>1983</year>
+		<manufacturer>Ocean</manufacturer>
+	</hash>
+	<hash crc32="f11a67e0" md5="cb51ac241d3f97f66fbc77decb4279ce" name="Invader Cube - 3D OXO">
+		<year>198?</year>
+		<manufacturer>Oasis Software</manufacturer>
+	</hash>
+	<hash crc32="018e21dc" md5="b039552844e780e0d97c156e3c1e3560" name="Jet Set Willy">
+		<year>1985</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="af08aa14" md5="b02c50d814948982c487feb9993d8cae" name="Keys of the Wizard v1.2">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="acfee29c" md5="0cc3a6129d729286580a90fdcdcaab30" name="Lost in Space v1.1">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="d42c4be7" md5="3cefa520dd569b6e2493f46f24e1cdcc" name="Manic Miner">
+		<year>1984</year>
+		<manufacturer>Software Projects</manufacturer>
+	</hash>
+	<hash crc32="57e2f15b" md5="d2d33f4801fb1c7ff7b644de4a5027ec" name="Nerble Force">
+		<year>1985</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="bc3e19c4" md5="7af822f19bcee4abe75d6346cb6c9453" name="Ossie">
+		<year>198?</year>
+		<manufacturer>Peaksoft</manufacturer>
+	</hash>
+	<hash crc32="4763a9c9" md5="f8135fd792417bd8ddff9fc394cbae9f" name="Pinball">
+		<year>1982</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="752d753b" md5="31b38fee60bb767e61f518b334b509ee" name="Quest, The">
+		<year>1983</year>
+		<manufacturer>Impact Software</manufacturer>
+	</hash>
+	<hash crc32="84ba1855" md5="ff2cbf4d9e39ba187fac0c1dcb4de4be" name="Rommel's Revenge">
+		<year>1984</year>
+		<manufacturer>Design Design</manufacturer>
+	</hash>
+	<hash crc32="3592a8ce" md5="23174e3ee128f06f9f4ffb1459354aea" name="Rotabb">
+		<year>1989</year>
+		<manufacturer>Kouga Software</manufacturer>
+	</hash>
+	<hash crc32="16785f3c" md5="402d869e1d44031ea52ce11be6f6c2e4" name="Screaming Ab-Dabs, The">
+		<year>1984</year>
+		<manufacturer>A &amp; F Software</manufacturer>
+	</hash>
+	<hash crc32="fd6033c0" md5="ff0017413f3afae7763c11906b92c43f" name="Shanghai">
+		<year>1991</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="3bf54635" md5="145c430fc4825f9d054c3ca764644d7c" name="Shock Trooper">
+		<year>1984</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="c349d537" md5="4535be0031da4c02843b809c47c74cbf" name="Skramble">
+		<year>1983</year>
+		<manufacturer>Microdeal Software</manufacturer>
+	</hash>
+	<hash crc32="840f6000" md5="66f6158854ba5b129ee0c842d9bc430b" name="Tetras">
+		<year>1990</year>
+		<manufacturer>Paul Burgin</manufacturer>
+	</hash>
+	<hash crc32="a061167f" md5="64762c588fe9bc595445d2f6c68de4bc" name="Ultrapede">
+		<year>1983</year>
+		<manufacturer>Rainbow Software</manufacturer>
+	</hash>
+	<hash crc32="d2a86c08" md5="f88384e990b094fae5593e4fe7fc2443" name="Vulcanox">
+		<year>1983</year>
+		<manufacturer>Salamander Software</manufacturer>
+	</hash>
+	<hash crc32="afeb4564" md5="78bfac5527e2a60354106b03b648f810" name="Wizard's Lair">
+		<year>1985</year>
+		<manufacturer>Blaby Computer Games</manufacturer>
+	</hash>
+	<hash crc32="39b55dd2" md5="7b7eea2d22892389fdfb3b89c3d22dc1" name="Yumping Yosser">
+		<year>198?</year>
+		<manufacturer>Knight Software</manufacturer>
+	</hash>
+	<hash crc32="a253b472" md5="054d85f16d81b15ad70f3934ab8d21e5" name="Zaxxon">
+		<year>1983</year>
+		<manufacturer>Datasoft Inc</manufacturer>
+	</hash>
+</hashfile>
+

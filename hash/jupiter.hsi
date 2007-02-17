@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Jupiter Cantab Jupiter ACE (TOSEC-v0.11) -->
+	<hash crc32="f9282553" name="Ace-logo [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="fd3fc960" name="Atic Raid">
+		<year>1984</year>
+		<manufacturer>Boldfield Ltd.</manufacturer>
+	</hash>
+	<hash crc32="7dc04697" name="Bagpipes [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9a416b66" name="Banner">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ec520816" name="Black Island Adventure">
+		<year>1984</year>
+		<manufacturer>Boldfield Ltd.</manufacturer>
+	</hash>
+	<hash crc32="3e3ffb80" name="Bomber">
+		<year>19??</year>
+		<manufacturer>Paul Robson</manufacturer>
+	</hash>
+	<hash crc32="b5e91ad7" name="Centronic [util]">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="54eb5546" name="Character Set [util]">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="19c0c6c4" name="Copy [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ff0f890c" name="Frogger">
+		<year>1984</year>
+		<manufacturer>Boldfield Ltd.</manufacturer>
+	</hash>
+	<hash crc32="5183a818" name="I Print [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3f174d26" name="I Print 42 [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="15d5e373" name="Invert [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e88b1ffa" name="Jupiter [music demo]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e9298f7d" name="Lunar Lander">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4c67cba4" name="Mini Word Processor, The [util]">
+		<year>19??</year>
+		<manufacturer>Charles Wehner</manufacturer>
+	</hash>
+	<hash crc32="167c1b3a" name="Printline [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c83f0b99" name="Printscreen [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6d5bba35" name="RS232 [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="0da77372" name="Soundbox [util]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="c540cba5" name="Stack Demo">
+		<year>19??</year>
+	</hash>
+	<hash crc32="76f6d6fa" name="Turtle">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1b0ea860" name="Worms">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ed237c12" name="ZX Printer [util]">
+		<year>19??</year>
+	</hash>
+</hashfile>

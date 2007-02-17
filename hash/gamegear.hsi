@@ -1,0 +1,1102 @@
+<hashfile>
+	<!-- This MESS CRC file was generated from Cowering's Good databases (Goodgg_9996) -->
+	<!-- Game comments by Gerardo Jorrin and Chris Henry -->
+	<!-- Please keep this notice intact if editing this file -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="f85a8ce8" name="5 In 1 Funpak (UE) [!]">
+		<year>1994</year>
+		<manufacturer>Interplay</manufacturer>
+	</hash>
+	<hash crc32="1d17d2a0" name="A A Harimanada (J)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>Press Button B to Start Game</status>
+	</hash>
+	<hash crc32="1d01f999" name="Addams Family, The (UE) [!]"/>
+	<hash crc32="bb4f23ff" name="Adventures of Batman &amp; Robin, The (JUE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE (No Sprite Collision)</status>
+	</hash>
+	<hash crc32="899515d0" name="Aerial Assault (UE) [a1]">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="3e549b7a" name="Aerial Assault (UE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="488cda3c" name="Aladdin (J) [b1]"/>
+	<hash crc32="770e95e1" name="Aladdin (J)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="691bf489" name="Aladdin (UE) [T-Port]"/>
+	<hash crc32="7a41c1dc" name="Aladdin (UE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="1b80a75b" name="Aleste GG (J)">
+		<year>1991</year>
+		<manufacturer>Compile</manufacturer>
+	</hash>
+	<hash crc32="11a68c08" name="Alien 3 (JUE)">
+		<year>1992</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="ffe4ed47" name="Alien Syndrome (JUE)">
+		<year>1992</year>
+		<manufacturer>Sims Co. Ltd.</manufacturer>
+	</hash>
+	<hash crc32="46c9fa3e" name="Andre Agassi Tennis (UE) [!]"/>
+	<hash crc32="3deca813" name="Arcade Classics (UE) [!]">
+		<year>1996</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="f0204191" name="Arch Rivals (JUE)">
+		<year>1992</year>
+		<manufacturer>Acclaim</manufacturer>
+		<status>NOT PLAYABLE (Game Freezes upon Start)</status>
+	</hash>
+	<hash crc32="7cb3facf" name="Arena - Maze of Death (UE) [!]">
+		<year>1995</year>
+		<manufacturer>Sega/Eden Software</manufacturer>
+	</hash>
+	<hash crc32="78208b40" name="Asterix and the Great Rescue (UE)"/>
+	<hash crc32="1023ff26" name="Ax Battler - A Legend of Golden Axe (V1.5) (J)"/>
+	<hash crc32="663bcf8a" name="Ax Battler - A Legend of Golden Axe (V2.4) (J) [a1]"/>
+	<hash crc32="1a2d6e19" name="Ax Battler - A Legend of Golden Axe (V2.4) (J) [T-French]"/>
+	<hash crc32="dfcf555f" name="Ax Battler - A Legend of Golden Axe (V2.4) (J)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="10ac9374" name="Baku Baku Animals (UE) [!]"/>
+	<hash crc32="c0009274" name="Bart vs. The Space Mutants (JUE) [!]">
+		<year>1992</year>
+		<manufacturer>Flying Edge</manufacturer>
+	</hash>
+	<hash crc32="da7bd5c7" name="Bart vs. The World (JUE) [!]"/>
+	<hash crc32="18ba70d3" name="Bart vs. The World (JUE) [a1]"/>
+	<hash crc32="ffa447a9" name="Bartman Meets Radioactive Man (UE) [!]"/>
+	<hash crc32="6d3a10d3" name="Baseball '91 (J)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="618b19e2" name="Batman Forever (JUE)">
+		<year>1995</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="7ac4a3ca" name="Batman Returns (JUE) [!]">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="65e60dfe" name="Batman Returns (JUE) [a1]"/>
+	<hash crc32="16448209" name="Batter Up (UE) [!]">
+		<year>1991</year>
+		<manufacturer>Namcot</manufacturer>
+	</hash>
+	<hash crc32="c10946cb" name="Batter Up (UE) [b1]"/>
+	<hash crc32="fddd8cd9" name="Battleship (UE) [!]"/>
+	<hash crc32="163d81c1" name="Battleship (UE) [b1]"/>
+	<hash crc32="d8342782" name="Battleship (UE) [b1][o1]"/>
+	<hash crc32="53f37c4c" name="Battleship (UE) [o1]">
+		<year>1993</year>
+		<manufacturer>Mindscape</manufacturer>
+	</hash>
+	<hash crc32="e9987511" name="Battleship (UE) [o2]"/>
+	<hash crc32="cb3cd075" name="Battletoads (UE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="a6bf865e" name="Beavis and Butthead (U) [a1]"/>
+	<hash crc32="3858f14f" name="Beavis and Butthead (U)"/>
+	<hash crc32="a4bb9ffb" name="Berenstain Bears Camping Adventure (UE) [!]"/>
+	<hash crc32="325b1797" name="Berlin Wall (J)">
+		<year>1991</year>
+		<manufacturer>Kaneko</manufacturer>
+	</hash>
+	<hash crc32="7b7717b8" name="Big War (J)">
+		<year>1990</year>
+		<manufacturer>System Soft</manufacturer>
+	</hash>
+	<hash crc32="bfceba5f" name="Bonkers Wax Up! (UE) [!]">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NO SPRITE COLLISION</status>
+	</hash>
+	<hash crc32="69ebe5fa" name="Bram Stoker's Dracula (UE) [!]"/>
+	<hash crc32="fba338c5" name="Bubble Bobble (UE)">
+		<year>1994</year>
+		<manufacturer>Taito</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="5c34d9cd" name="Bugs Bunny in Double Trouble (UE) [!]">
+		<year>1996</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="c90f29ef" name="Bust-A-Move (UE) [!]">
+		<year>1995</year>
+		<manufacturer>Taito</manufacturer>
+	</hash>
+	<hash crc32="7cb079d0" name="Buster Ball (J)">
+		<year>1992</year>
+		<manufacturer>River Hill Soft</manufacturer>
+	</hash>
+	<hash crc32="a72a1753" name="Buster Fight (J)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="c53b60b8" name="Caesar's Palace (UE) [!]"/>
+	<hash crc32="5675dfdd" name="Captain America and the Avengers (UE)"/>
+	<hash crc32="dfc7adc8" name="Chakan (UE)">
+		<year>1992</year>
+		<manufacturer>Rak Graphics</manufacturer>
+	</hash>
+	<hash crc32="820ceb2c" name="Chaos 89 (PD)"/>
+	<hash crc32="44fbe8f6" name="Chase HQ (J) [!]"/>
+	<hash crc32="7bb81e3d" name="Chase HQ (J) [b1]"/>
+	<hash crc32="18086b70" name="Chase HQ (J) [o1]"/>
+	<hash crc32="3b627808" name="Chase HQ (J) [o1][b1]"/>
+	<hash crc32="da811ba6" name="Chessmaster, The (UE)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="6b0fcec3" name="Chicago Syndicate (JUE)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="c2e8a692" name="Choplifter 3 (UE) [!]"/>
+	<hash crc32="191b1ed8" name="Chuck Rock (JUE) [!]">
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="656708bf" name="Chuck Rock 2 (UE) [!]"/>
+	<hash crc32="bf75b153" name="Cliffhanger (UE) [!]"/>
+	<hash crc32="d228a467" name="Clutch Hitter (JUE) [!]">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="c7598b81" name="Coca Cola Kid (J)"/>
+	<hash crc32="f3ca6676" name="Columns (J)">
+		<year>1990</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="83fa26d9" name="Columns (UE) [!]"/>
+	<hash crc32="2c758fc8" name="Cool Spot (UE) [!]"/>
+	<hash crc32="03d28eab" name="Crayon Shin Chan (J)"/>
+	<hash crc32="529c864e" name="Crystal Warriors (JUE) [!]"/>
+	<hash crc32="6a24e47e" name="Cutthroat Island (UE) [!]">
+		<year>1995</year>
+		<manufacturer>Acclaim</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="aae268fc" name="Daffy Duck in Hollywood (UE) [!]">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="16abe1ee" name="Daffy Duck in Hollywood (UE) [b1]"/>
+	<hash crc32="4457e7c0" name="Deep Duck Trouble (J)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="e2791cc1" name="Defenders of Oasis (UE)"/>
+	<hash crc32="c2e111ac" name="Desert Speedtrap (JUE)"/>
+	<hash crc32="f6c400da" name="Desert Strike (JUE)">
+		<year>1992</year>
+		<manufacturer>Electronic Arts</manufacturer>
+	</hash>
+	<hash crc32="25db174f" name="Devilish (J)">
+		<year>1991</year>
+		<manufacturer>Genki</manufacturer>
+	</hash>
+	<hash crc32="c01293b0" name="Devilish (UE) [!]"/>
+	<hash crc32="9a8b2c16" name="Doraemon Nora No Suke No Yabou (J)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="1307a290" name="Double Dragon (UE) [!]">
+		<year>1993</year>
+		<manufacturer>Virgin</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="3c2d4f48" name="Dr. Robotnik's Mean Bean Machine (UE)">
+		<year>1993</year>
+		<manufacturer>Compile</manufacturer>
+	</hash>
+	<hash crc32="19e1cf2b" name="Dragon - The Bruce Lee Story (UE) [!]"/>
+	<hash crc32="89f12e1e" name="Dragon Crystal (J)">
+		<year>1990</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="0ef2ed93" name="Dragon Crystal (JUE)"/>
+	<hash crc32="abddf0eb" name="Dream Eleven (J) [!]">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="152f0dcc" name="Drop Zone (U) [!]"/>
+	<hash crc32="77ed48f5" name="Dunk Kids (J)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="fdc8fc18" name="Dynamite Headdy (JUE) [a1]"/>
+	<hash crc32="f6af4b6b" name="Dynamite Headdy (JUE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="5d3f23a9" name="Earthworm Jim (UE) [!]">
+		<year>1995</year>
+		<manufacturer>Playmates</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="5512780d" name="Earthworm Jim (UE) [t1]"/>
+	<hash crc32="982e7132" name="Ecco the Dolphin (JUE) [a1]"/>
+	<hash crc32="866c7113" name="Ecco the Dolphin (JUE) [b1]"/>
+	<hash crc32="2b60873e" name="Ecco the Dolphin (JUE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="e2f3b203" name="Ecco the Dolphin 2 - Tides of Time (UE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="04302bbd" name="Eternal Legend (J) [!]"/>
+	<hash crc32="36aaf536" name="Evander Holyfield's Boxing (UE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+		<status>Issue: Screen flickers</status>
+	</hash>
+	<hash crc32="aa140c9c" name="Excellent Dizzy (UE) [!]"/>
+	<hash crc32="8bdb0806" name="F-15 Strike Eagle (UE) [!]"/>
+	<hash crc32="aaf6f87d" name="Faceball 2000 (U) [!]"/>
+	<hash crc32="a1f2f4a1" name="Factory Panic (J)"/>
+	<hash crc32="59e3be92" name="Factory Panic (UE) [!]">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="c888222b" name="Fantastic Dizzy (UE) [!]"/>
+	<hash crc32="365b92cf" name="Fantasy Zone Gear (JUE) [a1]"/>
+	<hash crc32="d69097e8" name="Fantasy Zone Gear (JUE)">
+		<year>1991</year>
+		<manufacturer>Sanritsu</manufacturer>
+		<status>Issue: No Sprite Collision</status>
+	</hash>
+	<hash crc32="29b1df1a" name="Fatal Fury Special (UE) [a1]"/>
+	<hash crc32="449787e2" name="Fatal Fury Special (UE)">
+		<year>1994</year>
+		<manufacturer>Takara</manufacturer>
+	</hash>
+	<hash crc32="e632a3a2" name="FIFA International Soccer (JUE)"/>
+	<hash crc32="c379de95" name="FIFA Soccer 96 (UE) [!]"/>
+	<hash crc32="d46d5685" name="Foreman for Real (UE) [!]">
+		<year>1995</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="d0a93e00" name="Formula 1 (UE) [!]">
+		<year>1993</year>
+		<manufacturer>Domark</manufacturer>
+	</hash>
+	<hash crc32="c443c35c" name="Frank Thomas Big Hurt Baseball (U) [!]"/>
+	<hash crc32="46f40b9f" name="Fred Couples Golf (UE) [!]">
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="dbdb3a2e" name="Frogs by Charles Doty (PD)"/>
+	<hash crc32="0593ba24" name="Galaga '91 (J)">
+		<year>1990</year>
+		<manufacturer>Namcot</manufacturer>
+	</hash>
+	<hash crc32="09534742" name="Gamble Panic (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="423803a7" name="Gambler (J)"/>
+	<hash crc32="05c3f2df" name="Gamegear Text Demo (PD)"/>
+	<hash crc32="141aaf96" name="Gear (J)"/>
+	<hash crc32="0e300223" name="Gear Stadium (J)">
+		<year>1991</year>
+		<manufacturer>Namco</manufacturer>
+	</hash>
+	<hash crc32="a0530664" name="Gear Stadium Heiseiban (J) [!]"/>
+	<hash crc32="e9a2efb4" name="Gear Works (UE) [!]"/>
+	<hash crc32="58b44585" name="George Foreman KO Boxing (UE)"/>
+	<hash crc32="a1a19135" name="GG League 94 (J)"/>
+	<hash crc32="e0b5215a" name="GG Nibbles by Martin Konrad (v1) (PD)"/>
+	<hash crc32="2e6c15ab" name="GG Nibbles by Martin Konrad (v2) (PD)"/>
+	<hash crc32="8ca15176" name="GG Nibbles by Martin Konrad (v3) (PD)"/>
+	<hash crc32="68979cf6" name="GG Nibbles by Martin Konrad (v4) (PD)"/>
+	<hash crc32="51159f8f" name="GG Portrait - Akira (J) [!]"/>
+	<hash crc32="30f1c984" name="GG Shinobi (E) [!]"/>
+	<hash crc32="e8ae1c44" name="GG Shinobi (E) [b1]"/>
+	<hash crc32="83926bd1" name="GG Shinobi (J)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="c2d8fe07" name="GG Shinobi 2 (JUE) [a1]"/>
+	<hash crc32="b2adc6b4" name="GG Shinobi 2 (JUE) [b1]"/>
+	<hash crc32="1e03db14" name="GG Shinobi 2 (JUE) [b2]"/>
+	<hash crc32="6201c694" name="GG Shinobi 2 (JUE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="2333f615" name="G-Loc Air Battle (J) [!]">
+		<year>1990</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="33237f50" name="G-Loc Air Battle (J) [a1]">
+		<year>1990</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="18de59ed" name="G-Loc Air Battle (JUE) [!]">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="4cf97801" name="Godzilla (J) [!]"/>
+	<hash crc32="876e9b72" name="GP Rider (UE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="933e8d3a" name="Greendog (JUE) [a1]"/>
+	<hash crc32="c6b01820" name="Greendog (JUE) [b1]"/>
+	<hash crc32="f27925b0" name="Greendog (JUE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>GRAPHIC GLITCHES</status>
+	</hash>
+	<hash crc32="a93e8b0f" name="Griffin (J)">
+		<year>1991</year>
+		<manufacturer>Telenet Japan</manufacturer>
+	</hash>
+	<hash crc32="c3c52767" name="Gunstar Heroes (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+		<status>Issue: Graphic Glitches</status>
+	</hash>
+	<hash crc32="def5a5d0" name="Halley Wars (J)">
+		<year>1991</year>
+		<manufacturer>Taito</manufacturer>
+		<status>GRAPHIC GLITCHES</status>
+	</hash>
+	<hash crc32="069fb868" name="Head Buster (J) [b1]"/>
+	<hash crc32="7e689995" name="Head Buster (J)">
+		<year>1991</year>
+		<manufacturer>NCS</manufacturer>
+	</hash>
+	<hash crc32="dde29f74" name="Home Alone (JUE) [!]">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="f53ced2e" name="Hook (UE) [!]"/>
+	<hash crc32="57834c03" name="House of Tarot (J) [!]"/>
+	<hash crc32="0a25eec5" name="Hurricanes (UE) [!]"/>
+	<hash crc32="dab0f265" name="In the Wake of the Vampire (J)">
+		<year>1992</year>
+		<manufacturer>Sims</manufacturer>
+	</hash>
+	<hash crc32="087fc247" name="Incredible Crash Dummies, The (UE)">
+		<year>1993</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="d7055f88" name="Incredible Hulk, The (JUE)"/>
+	<hash crc32="8c048325" name="Indiana Jones and the Last Crusade (UE)">
+		<year>199?</year>
+		<manufacturer>Lucasfilm Games</manufacturer>
+	</hash>
+	<hash crc32="c1736457" name="Iron Man X-O Manowar in Heavy Metal (JUE) [b1]"/>
+	<hash crc32="8927b69b" name="Iron Man X-O Manowar in Heavy Metal (JUE)"/>
+	<hash crc32="44e7e2da" name="Itchy &amp; Scratchy (JUE) [!]">
+		<year>1994</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="881a4524" name="James Bond 007 - The Duel (UE) [!]"/>
+	<hash crc32="2dd850b7" name="Jeopardy! - Sports Edition (UE) [!]"/>
+	<hash crc32="d7820c21" name="Jeopardy! (UE) [!]"/>
+	<hash crc32="4a98678b" name="Joe Montana's Football (JUE)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="04d23fc4" name="Judge Dredd (JUE)">
+		<year>199?</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="a8ef36a7" name="Junction (JUE)">
+		<year>1991</year>
+		<manufacturer>Micronet</manufacturer>
+	</hash>
+	<hash crc32="30c09f31" name="Jungle Book, The (UE) [!]">
+		<year>1994</year>
+		<manufacturer>Virgin</manufacturer>
+	</hash>
+	<hash crc32="bd6f2321" name="Jurassic Park (E) [!]"/>
+	<hash crc32="2f536ae3" name="Jurassic Park (J)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="23f9150a" name="Kawasaki Superbike Challenge (U) [!]"/>
+	<hash crc32="808a71c3" name="Kinetic Connection (J) [o1]">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="4af7f2aa" name="Kinetic Connection (J)"/>
+	<hash crc32="9b40fc8e" name="Klax (UE) [!]"/>
+	<hash crc32="d01e784f" name="Krusty's Funhouse (JUE) [!]">
+		<year>1993</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="398f2358" name="Kuni Chan no Game Tengoku (J)"/>
+	<hash crc32="f3774c65" name="Kuni Chan no Game Tengoku 2 (J)">
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="937fd52b" name="Kyoto Saint Tale (J)"/>
+	<hash crc32="2d367c43" name="Last Action Hero (UE) [!]"/>
+	<hash crc32="4ec30806" name="Last Bible (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="2e4ec17b" name="Last Bible 2 (J)"/>
+	<hash crc32="51548f61" name="Lemmings (JUE) [a1][!]">
+		<year>1992</year>
+		<manufacturer>Psygnosis</manufacturer>
+	</hash>
+	<hash crc32="b316221e" name="Lemmings (JUE) [b1]"/>
+	<hash crc32="0fde7baa" name="Lemmings (JUE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="0cd9c20b" name="Lion King, The (UE) [!]"/>
+	<hash crc32="9808d7b3" name="Lion King, The (UE) [a1]">
+		<year>1994</year>
+		<manufacturer>Virgin</manufacturer>
+	</hash>
+	<hash crc32="97e3a18c" name="Little Mermaid, The (JUE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="2d98bd87" name="Lucky Dime Caper with Donald Duck (J)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="07a7815a" name="Lucky Dime Caper with Donald Duck (U) [!]"/>
+	<hash crc32="208f0f87" name="Lunar (J) [T-Eng_partial1]"/>
+	<hash crc32="4a934db5" name="Lunar (J) [T-Eng_partial2]"/>
+	<hash crc32="eaf5732a" name="Lunar (J) [T-Eng_partial3]"/>
+	<hash crc32="58459edd" name="Lunar (J)"/>
+	<hash crc32="75c71ebf" name="Madden NFL '95 (JUE)"/>
+	<hash crc32="75e273eb" name="Madden NFL '96 (UE) [!]"/>
+	<hash crc32="16ed3117" name="Madou Monogatari 1 (J) [b1]"/>
+	<hash crc32="00c34d94" name="Madou Monogatari 1 (J)"/>
+	<hash crc32="12eb2287" name="Madou Monogatari 2 (J)"/>
+	<hash crc32="0a634d79" name="Madou Monogatari 3 (J)"/>
+	<hash crc32="7ec95282" name="Madou Monogatari A - Doki Doki (J)"/>
+	<hash crc32="8f82a6b9" name="Magic Knight Rayearth (J)"/>
+	<hash crc32="1c2c2b04" name="Magic Knight Rayearth 2 (J)"/>
+	<hash crc32="cf6d7bc5" name="Magical Puzzle Popils (J)">
+		<year>199?</year>
+		<manufacturer>Tengen</manufacturer>
+	</hash>
+	<hash crc32="6e1cc23c" name="Magical Tarurutokun (J)">
+		<year>1991</year>
+		<manufacturer>Tsukuda Ideal</manufacturer>
+	</hash>
+	<hash crc32="0ebea9d4" name="Majesco Game Gear BIOS (U) [!]"/>
+	<hash crc32="36ebcd6d" name="Majors Pro Baseball (UE) [!]"/>
+	<hash crc32="d9a7f170" name="Man Overboard (UE) [!]"/>
+	<hash crc32="01d2dd2a" name="Mappy (J)">
+		<year>1991</year>
+		<manufacturer>Namcot</manufacturer>
+	</hash>
+	<hash crc32="94085b81" name="Marble Madness (JUE) [b1]"/>
+	<hash crc32="feb16091" name="Marble Madness (JUE) [o1]">
+		<year>1992</year>
+		<manufacturer>Tengen</manufacturer>
+	</hash>
+	<hash crc32="9559e339" name="Marble Madness (JUE)">
+		<year>1992</year>
+		<manufacturer>Tengen</manufacturer>
+	</hash>
+	<hash crc32="22c418bf" name="Marko's Magic Football (UE) [!]">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="6c8f46d6" name="Megaman (JUE) [b1]"/>
+	<hash crc32="1ace93af" name="Megaman (JUE)">
+		<year>1994</year>
+		<manufacturer>Capcom</manufacturer>
+	</hash>
+	<hash crc32="d2b6021e" name="Mick &amp; Mack as the Global Gladiators (UE)"/>
+	<hash crc32="9942b69b" name="Mickey Mouse - Castle of Illusion (J) [!]"/>
+	<hash crc32="5877b10d" name="Mickey Mouse - Castle of Illusion (J) [a1]"/>
+	<hash crc32="ce5ad8b7" name="Mickey Mouse - Land of Illusion (UE) [!]"/>
+	<hash crc32="0117c3df" name="Mickey Mouse in Land of Illusion (J)"/>
+	<hash crc32="52dbf3e1" name="Mickey Mouse in Land of Illusion (JUE) [!]">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="fe12a92f" name="Mickey Mouse in Legend of Illusion (J)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="eccf7a4f" name="Mickey's Ultimate Challenge (UE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="1ecf07b4" name="MLBPA Baseball (U) [!]"/>
+	<hash crc32="f84d8ca8" name="Mod2PSG V1.0 - Secret of Monkey Island (PD)"/>
+	<hash crc32="876555de" name="Mod2PSG V1.1 - Secret of Monkey Island (PD)"/>
+	<hash crc32="d5865194" name="Mod2PSG V1.2 - Secret of Monkey Island (PD)"/>
+	<hash crc32="465c8962" name="Mod2PSG V1.3 - Secret of Monkey Island (PD)"/>
+	<hash crc32="f998f57a" name="Mod2PSG V1.3 - Shadow of the Beast (PD)"/>
+	<hash crc32="57a86d22" name="Mod2PSG V1.5 - Secret of Monkey Island (PD)"/>
+	<hash crc32="4f65a708" name="Mod2PSG V1.5 - Shadow of the Beast (PD)"/>
+	<hash crc32="01903bbe" name="Mod2PSG V1.6 - Secret of Monkey Island (PD)"/>
+	<hash crc32="535f1b6c" name="Mod2PSG V1.6 - Shadow of the Beast (PD)"/>
+	<hash crc32="6ca4ba5e" name="Mod2PSG V1.7 - Secret of Monkey Island (PD)"/>
+	<hash crc32="2bff1bbb" name="Mod2PSG V1.7 - Shadow of the Beast (PD)"/>
+	<hash crc32="6d31cc7b" name="Mod2PSG V1.8 - Secret of Monkey Island (PD)"/>
+	<hash crc32="08cdc425" name="Mod2PSG V1.8 - Shadow of the Beast (PD)"/>
+	<hash crc32="4d5d15fb" name="Moldorian (J) [!]"/>
+	<hash crc32="453c5cec" name="Monster Truck Wars (JUE) [!]">
+		<year>1994</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="ea89e0e7" name="Monster World 2 (J)"/>
+	<hash crc32="fdef9b5a" name="Mortal Kombat (V2.6) (JUE) [b1]"/>
+	<hash crc32="07494f2a" name="Mortal Kombat (V2.6) (JUE)">
+		<year>1993</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="dbff0461" name="Mortal Kombat (V3.3) (JUE)"/>
+	<hash crc32="4b304e0f" name="Mortal Kombat 2 (JUE)">
+		<year>1994</year>
+		<manufacturer>Acclaim</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="c2be62bb" name="Mortal Kombat 3 (JUE) [!]"/>
+	<hash crc32="5ee88bd5" name="Ms. Pac-Man (UE) [!]"/>
+	<hash crc32="bcce5fd4" name="Nazo Puyo (J) [!]"/>
+	<hash crc32="73939de4" name="Nazo Puyo 2 (J) [!]"/>
+	<hash crc32="19030108" name="NBA Action (UE) [!]"/>
+	<hash crc32="a49e9033" name="NBA Jam (J)">
+		<year>1993</year>
+		<manufacturer>Acclaim</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="86c32e5b" name="NBA Jam Tournament Edition (JUE)">
+		<year>1994</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="dc5b0407" name="NFL 95 (UE) [!]"/>
+	<hash crc32="61785ed5" name="NFL Quarterback Club (JUE) [!]"/>
+	<hash crc32="c348e53a" name="NFL Quarterback Club '96 (JUE)"/>
+	<hash crc32="e4b5bb08" name="NHL All-Star Hockey (JUE) [b1]"/>
+	<hash crc32="4680c7aa" name="NHL All-Star Hockey (JUE)"/>
+	<hash crc32="658713a5" name="NHL Hockey (UE) [!]"/>
+	<hash crc32="20ef017a" name="Ninja Gaiden (J) [!]">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="4ed37a63" name="Ninja Gaiden (J) [b1]"/>
+	<hash crc32="c578756b" name="Ninja Gaiden (UE) [!]"/>
+	<hash crc32="36925f37" name="Ninja Gaiden (UE) [T-Port]"/>
+	<hash crc32="c3056e15" name="Ninku (J) [!]"/>
+	<hash crc32="a2f9c7af" name="Olympic Gold - Barcelona '92 (UE) [!]"/>
+	<hash crc32="1d93246e" name="Olympic Gold - Barcelona '92 (UE) [a1][!]"/>
+	<hash crc32="ce97efe8" name="Olympic Gold - Barcelona '92 (UE) [b1]"/>
+	<hash crc32="1e673168" name="Ottifants, The (UE)"/>
+	<hash crc32="d58cb27c" name="OutRun (JUE)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+		<status>Issue: Screen Flickering</status>
+	</hash>
+	<hash crc32="f037ec00" name="OutRun Europa (UE) [!]"/>
+	<hash crc32="2aa12d7e" name="OutRun Europa (UE) [b1]"/>
+	<hash crc32="9273ee2c" name="Pac-Attack (UE)">
+		<year>1994</year>
+		<manufacturer>Namco</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="a16c5e58" name="Pac-Man (J)">
+		<year>1990</year>
+		<manufacturer>Namcot</manufacturer>
+	</hash>
+	<hash crc32="e9783cea" name="Panzer Dragoon Mini (J) [!]">
+		<year>1996</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="a1365ae0" name="Paperboy (JUE) [t1]"/>
+	<hash crc32="f54b6803" name="Paperboy (JUE)">
+		<year>1992</year>
+		<manufacturer>Tengen</manufacturer>
+	</hash>
+	<hash crc32="ce863dba" name="Pengo (J)">
+		<year>1990</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="c1756bee" name="Pete Sampras Tennis (E) [!]"/>
+	<hash crc32="4e279baa" name="PGA Tour 2 (UE) [!]"/>
+	<hash crc32="b4921239" name="PGA Tour 2 (UE) [b1]"/>
+	<hash crc32="542b6d8e" name="PGA Tour 96 (JUE) [!]">
+		<year>1994</year>
+		<manufacturer>Polugames</manufacturer>
+	</hash>
+	<hash crc32="9700bb65" name="PGA Tour Golf (UE) [!]"/>
+	<hash crc32="f8f4b9a3" name="Phantasy Star Adventure (J) [b1]"/>
+	<hash crc32="42c98a68" name="Phantasy Star Adventure (J) [T-Eng_AGTP]"/>
+	<hash crc32="cee31405" name="Phantasy Star Adventure (J) [T-Eng_partial]"/>
+	<hash crc32="1a51579d" name="Phantasy Star Adventure (J)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="a942514a" name="Phantasy Star Gaiden (J) [!]"/>
+	<hash crc32="988daa36" name="Phantasy Star Gaiden (J) [T-Eng_partial1] (largefont)"/>
+	<hash crc32="93f3f062" name="Phantasy Star Gaiden (J) [T-Eng_partial1] (smallfont)"/>
+	<hash crc32="1c98154a" name="Phantasy Star Gaiden (J) [T-EngV1.0] (largefont)"/>
+	<hash crc32="17e64f1e" name="Phantasy Star Gaiden (J) [T-EngV1.0] (smallfont)"/>
+	<hash crc32="e9fb916b" name="Phantasy Star Gaiden (J) [T-EngV1.0_Magic_Trans] (largefont)"/>
+	<hash crc32="e285cb3f" name="Phantasy Star Gaiden (J) [T-EngV1.0_Magic_Trans] (smallfont)"/>
+	<hash crc32="d5ab83af" name="Phantasy Star Gaiden (J) [T-Port]"/>
+	<hash crc32="281b1c3a" name="Phantom 2040 (UE)"/>
+	<hash crc32="7c5cd4a4" name="Pokemon Legends (Eternal Legend Hack)"/>
+	<hash crc32="89d34067" name="Poker Faced Paul's Blackjack (UE)">
+		<year>1993</year>
+		<manufacturer>Adrenaline</manufacturer>
+	</hash>
+	<hash crc32="afd61b89" name="Poker Faced Paul's Gin (UE) [!]"/>
+	<hash crc32="03bb0668" name="Poker Faced Paul's Poker (UE)"/>
+	<hash crc32="0e9b0c0a" name="Poker Faced Paul's Solitaire (UE) [!]"/>
+	<hash crc32="71deba5a" name="Pop Breaker (J)">
+		<year>1990</year>
+		<manufacturer>Microcabin</manufacturer>
+		<status>NOT PLAYABLE (No Input)</status>
+	</hash>
+	<hash crc32="3ef66810" name="Popeye's Beach Volleyball (J)">
+		<year>1994</year>
+		<manufacturer>Technos</manufacturer>
+	</hash>
+	<hash crc32="b47c19e5" name="Power Rangers - The Movie (UE)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="9289dfcc" name="Power Rangers (JUE) [!]">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="92945480" name="Power Strike 2 (JUE) [b1]"/>
+	<hash crc32="09de1528" name="Power Strike 2 (JUE)">
+		<year>1993</year>
+		<manufacturer>Compile</manufacturer>
+	</hash>
+	<hash crc32="e5f789b9" name="Predator 2 (JUE) [!]"/>
+	<hash crc32="2a34b5c7" name="Primal Rage (JUE)">
+		<year>1995</year>
+		<manufacturer>Time Warner</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="311d2863" name="Prince of Persia (UE) [!]"/>
+	<hash crc32="45f058d6" name="Prince of Persia (UE) [a1][!]"/>
+	<hash crc32="e1109230" name="Psychic World (JUE) [o1]"/>
+	<hash crc32="afcc7828" name="Psychic World (JUE)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="407ac070" name="Putt and Putter (JUE)"/>
+	<hash crc32="3ab2393b" name="Puyo Puyo 2 (J) [!]">
+		<year>1994</year>
+		<manufacturer>Compile</manufacturer>
+	</hash>
+	<hash crc32="d173a06f" name="Puzlow Kids (Puyo Puyo) (J)">
+		<year>1993</year>
+		<manufacturer>Compile</manufacturer>
+	</hash>
+	<hash crc32="736cdb76" name="Quiz of Gears, The (J)"/>
+	<hash crc32="56201996" name="R.C. Grand Prix (UE) [!]"/>
+	<hash crc32="4902b7a2" name="R.C. Grand Prix (UE) [b1]"/>
+	<hash crc32="ef39f257" name="RBI Baseball 94 (UE) [b1]"/>
+	<hash crc32="6c451ee1" name="Ren &amp; Stimpy - Quest for the Shaven Yak, The (U) [!]"/>
+	<hash crc32="03e9c607" name="Revenge of Drancon (UE) [!]"/>
+	<hash crc32="a45fffb7" name="Riddick Bowe Boxing (J)">
+		<year>1993</year>
+		<manufacturer>Extreme</manufacturer>
+	</hash>
+	<hash crc32="100b77b2" name="Rise of the Robots (UE) [!]"/>
+	<hash crc32="efe65b3b" name="Ristar the Shooting Star (JUE)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="96045f76" name="Road Rash (JUE)"/>
+	<hash crc32="069a0704" name="Robocop 3 (UE)">
+		<year>1993</year>
+		<manufacturer>Acclaim</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="4ab7fa4e" name="Robocop vs. the Terminator (UE)">
+		<year>1993</year>
+		<manufacturer>Virgin</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="87b8b612" name="Ronald in the Magical World (JUE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="445d7cd2" name="Royal Stone (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="95efd52b" name="Ryu Kyu (J)">
+		<year>1991</year>
+		<manufacturer>Face</manufacturer>
+	</hash>
+	<hash crc32="ede33592" name="Sailor Moon S (J) [b1]"/>
+	<hash crc32="857c6d83" name="Sailor Moon S (J) [b2]"/>
+	<hash crc32="fe7374d2" name="Sailor Moon S (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="98171deb" name="Samurai Shodown (UE) [!]"/>
+	<hash crc32="236990e0" name="Samurai Spirits (J) [b1]"/>
+	<hash crc32="93fd73dc" name="Samurai Spirits (J)">
+		<year>1994</year>
+		<manufacturer>Takara</manufacturer>
+	</hash>
+	<hash crc32="ec0f2c72" name="Scratch Golf (UE) [!]"/>
+	<hash crc32="d9a69e9e" name="SD Gundam Winner's History (J) [T-Eng]"/>
+	<hash crc32="5e2b39b8" name="SD Gundam Winner's History (J)"/>
+	<hash crc32="d06136ac" name="Sega 4 in 1 Pack (UE) [b1]"/>
+	<hash crc32="0924d2ec" name="Sega 4 in 1 Pack (UE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="09f9ed60" name="Shadam Crusader (J) [!]">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="2ae8c75f" name="Shanghai 2 (J)">
+		<year>1990</year>
+		<manufacturer>Sunsoft</manufacturer>
+	</hash>
+	<hash crc32="6fcb8ab0" name="Shaq Fu (UE) [!]"/>
+	<hash crc32="30374681" name="Shining Force 2 - Sword of Haija (J)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="a6ca6fa9" name="Shining Force 2 - Sword of Haija (UE)"/>
+	<hash crc32="7bf365e1" name="Shining Force 3 - Final Conflict (J) [a1]"/>
+	<hash crc32="5356f6d7" name="Shining Force 3 - Final Conflict (J) [b1]"/>
+	<hash crc32="2a89aa37" name="Shining Force 3 - Final Conflict (J) [b2]"/>
+	<hash crc32="d8138501" name="Shining Force 3 - Final Conflict (J) [T-Eng]"/>
+	<hash crc32="6019fe5e" name="Shining Force 3 - Final Conflict (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="4d1f4699" name="Shining Force Gaiden (J) [!]">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="9c5c7f53" name="Sikin Jyo (J)">
+		<year>1991</year>
+		<manufacturer>Sunsoft</manufacturer>
+	</hash>
+	<hash crc32="786dd67b" name="Skweek (JUE)">
+		<year>1991</year>
+		<manufacturer>Victor</manufacturer>
+	</hash>
+	<hash crc32="751dad4c" name="Slam Dunk - Shouri he no Starting 5 (JUE) [!]">
+		<year>1994</year>
+		<manufacturer>Bandai</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="4dc6f555" name="Slider (UE)">
+		<year>1991</year>
+		<manufacturer>Victor</manufacturer>
+	</hash>
+	<hash crc32="1006e4e3" name="Smash TV (UE)">
+		<year>1992</year>
+		<manufacturer>Acclaim</manufacturer>
+	</hash>
+	<hash crc32="5aac063f" name="SMSC Gamegear Demo (PD) [b1]"/>
+	<hash crc32="354e1cbd" name="Smurfs, The (E) [!]">
+		<year>1994</year>
+		<manufacturer>Infogrames</manufacturer>
+	</hash>
+	<hash crc32="0f3e3840" name="Sokoban World (J)">
+		<year>1992</year>
+		<manufacturer>River Hill Soft</manufacturer>
+	</hash>
+	<hash crc32="f6f24b75" name="Solitaire Funpak (UE) [!]"/>
+	<hash crc32="06f2fc46" name="Solitaire Poker (UE) [!]"/>
+	<hash crc32="8ac0dade" name="Sonic &amp; Tails (J) [!]">
+		<year>199?</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="496bce64" name="Sonic &amp; Tails 2 (J)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="965705f1" name="Sonic Chaos (JUE) [b1]"/>
+	<hash crc32="663f2abb" name="Sonic Chaos (JUE)"/>
+	<hash crc32="68f0a776" name="Sonic Drift (J)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="7ca02906" name="Sonic Drift 2 (J) [b1]"/>
+	<hash crc32="d6e8a305" name="Sonic Drift 2 (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE (Severe Graphic Glitches)</status>
+	</hash>
+	<hash crc32="3ad79969" name="Sonic Labyrinth (JUE) [b1]"/>
+	<hash crc32="5550173b" name="Sonic Labyrinth (JUE)">
+		<year>199?</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="a9210434" name="Sonic Spinball (UE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="d23a2a93" name="Sonic the Hedgehog - Triple Trouble (UE)"/>
+	<hash crc32="3e31cb8c" name="Sonic the Hedgehog (JUE)">
+		<year>199?</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="95a18ec7" name="Sonic the Hedgehog 2 (JUE) [!]">
+		<year>199?</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="600c15b3" name="Space Harrier (JUE)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="bc240779" name="Spiderman - Return of the Sinister Six (JUE)">
+		<year>1992</year>
+		<manufacturer>Acclaim</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="742a372b" name="Spiderman &amp; X-Men - Arcade's Revenge (UE)"/>
+	<hash crc32="2651024e" name="Spider-man vs. the Kingpin (UE) [!]"/>
+	<hash crc32="de25e2d8" name="Sports Illustrated Football and Baseball (UE) [!]"/>
+	<hash crc32="5b5de94d" name="Sports Trivia - Championship Edition (JUE)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="a7af7ca9" name="Sports Trivia (JUE) [!]">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="087fc5f0" name="Star Trek Generations - Beyond the Nexus (UE) [!]"/>
+	<hash crc32="80156323" name="Star Trek TNG - Advanced Holodeck Tutorial (UE) [!]"/>
+	<hash crc32="0228769c" name="Star Wars (UE)">
+		<year>1993</year>
+		<manufacturer>Lucasfilm Games</manufacturer>
+	</hash>
+	<hash crc32="fc7c64e4" name="Stargate (JUE)"/>
+	<hash crc32="3d8bcf1d" name="Streets of Rage (JUE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="0b618409" name="Streets of Rage 2 (JUE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="1ebfa5ca" name="Strider Returns (JUE)">
+		<year>1990</year>
+		<manufacturer>Capcom</manufacturer>
+	</hash>
+	<hash crc32="8ba43af3" name="Super Columns (UE) [!]"/>
+	<hash crc32="528cbbce" name="Super Golf (J)">
+		<year>1991</year>
+		<manufacturer>Sigma</manufacturer>
+	</hash>
+	<hash crc32="10dbbef4" name="Super Kick Off (J) [!]"/>
+	<hash crc32="e30e7dc6" name="Super Monaco GP (J) [b1]"/>
+	<hash crc32="4f686c4a" name="Super Monaco GP (J)">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="346e1cf1" name="Super Monaco GP 2 (J) [b1]"/>
+	<hash crc32="661faeff" name="Super Monaco GP 2 (J)">
+		<status>GRAPHIC GLITCHES</status>
+	</hash>
+	<hash crc32="e8b42b1f" name="Super Off-Road (UE) [a1]">
+		<year>1992</year>
+		<manufacturer>Virgin</manufacturer>
+	</hash>
+	<hash crc32="a8432d2b" name="Super Off-Road (UE) [b1]"/>
+	<hash crc32="2e217fae" name="Super Off-Road (UE)"/>
+	<hash crc32="4a38b6b6" name="Super Return of the Jedi (UE) [!]"/>
+	<hash crc32="2d8e81bc" name="Super Space Invaders (JUE) [b1]"/>
+	<hash crc32="dfe38e24" name="Super Space Invaders (JUE)"/>
+	<hash crc32="73df5a15" name="Superman (UE) [!]"/>
+	<hash crc32="18deeec8" name="Surf Ninjas (UE) [b1]"/>
+	<hash crc32="284482a8" name="Surf Ninjas (UE) [b2]"/>
+	<hash crc32="2ea26930" name="Surf Ninjas (UE)"/>
+	<hash crc32="45ef2062" name="Sylvan Tale (J) [!]"/>
+	<hash crc32="58e56238" name="Sylvan Tale (J) [h1]"/>
+	<hash crc32="91197f9f" name="Sylvan Tale (J) [T-Eng_partial]"/>
+	<hash crc32="cb591501" name="Tails' Adventures (UE)"/>
+	<hash crc32="88618afa" name="Tails' Sky Patrol (J) [!]"/>
+	<hash crc32="db22f3cf" name="Tails' Sky Patrol (J) [T-Port]"/>
+	<hash crc32="cf9c607c" name="Taisen Mahjan HaoPai (J)">
+		<year>1990</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="20527530" name="Taisen Mahjan HaoPai 2 (J)"/>
+	<hash crc32="f1732ffe" name="Tale Spin (UE)"/>
+	<hash crc32="cea67b87" name="Tama &amp; Friends - Tamalympics (J) [b1]"/>
+	<hash crc32="dd1d2ebf" name="Tama &amp; Friends - Tamalympics (J)">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="09151743" name="Tanto-R (Puzzle and Action) (J)"/>
+	<hash crc32="7f278ab2" name="Taz in Escape from Mars (UE) (Star Wars Hack)"/>
+	<hash crc32="eebad66b" name="Taz in Escape from Mars (UE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NO SPRITE COLLISION</status>
+	</hash>
+	<hash crc32="36040c24" name="Taz-Mania - The Search for the Lost Seabirds (UE)"/>
+	<hash crc32="de466796" name="Tempo JR (JUE) [!]">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="1bd15773" name="Terminator 2 - Judgement Day (JUE)">
+		<year>1993</year>
+		<manufacturer>Acclaim</manufacturer>
+		<status>GRAPHIC AND SOUND GLITCHES</status>
+	</hash>
+	<hash crc32="6daad1a1" name="Terminator 2 - The Arcade Game (JUE) [b1]"/>
+	<hash crc32="9479c83a" name="Terminator 2 - The Arcade Game (JUE)"/>
+	<hash crc32="c029a5fd" name="Terminator, The (UE) [!]">
+		<year>1992</year>
+		<manufacturer>Virgin</manufacturer>
+	</hash>
+	<hash crc32="ca0e11cc" name="Tesserae (UE) [!]">
+		<year>1993</year>
+		<manufacturer>Gametek</manufacturer>
+	</hash>
+	<hash crc32="969cf389" name="Tintin au Tibet (E) [!]"/>
+	<hash crc32="5cd33ff2" name="Tom and Jerry - The Movie (JUE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="5173b02a" name="True Lies (JUE)">
+		<year>1994</year>
+		<manufacturer>Virgin</manufacturer>
+	</hash>
+	<hash crc32="820965a3" name="Ultimate Soccer (JUE)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="185e9fc1" name="Urban Strike (U) [!]"/>
+	<hash crc32="7ec64025" name="Vampire - Master of Darkness (UE) [!]"/>
+	<hash crc32="c05657f8" name="Virtua Fighter Mini (J) [!]"/>
+	<hash crc32="924ce5be" name="Virtua Fighters (J) [b1]"/>
+	<hash crc32="695cc120" name="Virtua Fighters Portrait - Pai Chen (J) [!]"/>
+	<hash crc32="dfa805a0" name="Volleyball (J)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="b0f22745" name="VR Troopers (UE) [!]">
+		<year>1995</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="231e5b78" name="VR Troopers (UE) [b1]"/>
+	<hash crc32="d5369192" name="Wakiyarando (Wagyan Land) (J) [a1]"/>
+	<hash crc32="f514358c" name="Wakiyarando (Wagyan Land) (J) [b1]"/>
+	<hash crc32="29e697b2" name="Wakiyarando (Wagyan Land) (J)">
+		<year>1991</year>
+		<manufacturer>Namco</manufacturer>
+	</hash>
+	<hash crc32="e91cdb2a" name="Wheel of Fortune (UE) [!]"/>
+	<hash crc32="f366b29d" name="Windows for GG by Victor Kemp (PD)"/>
+	<hash crc32="d5195a39" name="Winter Olympics - Lillehammer '94 (J)">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="d15d335b" name="Winter Olympics - Lillehammer '94 (UE) [!]"/>
+	<hash crc32="9e03f96c" name="Wizard Pinball (UE) [!]"/>
+	<hash crc32="840a8f8e" name="Wolfchild (U) [!]"/>
+	<hash crc32="9977fcb3" name="Wonderboy (J)">
+		<year>1990</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="db1b5b44" name="Wonderboy 3 - Dragon's Trap (UE)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="b74f3a4f" name="Woody Pop (JUE) [!]"/>
+	<hash crc32="9c0e5a04" name="Woody Pop (JUE) [a1]">
+		<year>1991</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="868fe528" name="World Class Leader Golf (U) [!]"/>
+	<hash crc32="d2bb3690" name="World Cup 94 (JUE) [!]"/>
+	<hash crc32="dd6d2e34" name="World Cup Soccer (UE)"/>
+	<hash crc32="1e81861f" name="World Derby (J)"/>
+	<hash crc32="3d8d0dd6" name="World Series Baseball (UE) [!]">
+		<year>1993</year>
+		<manufacturer>Sega</manufacturer>
+		<status>Dump ok?</status>
+	</hash>
+	<hash crc32="bb38cfd7" name="World Series Baseball (UE) [a1][!]"/>
+	<hash crc32="578a8a38" name="World Series Baseball '95 (UE) [!]"/>
+	<hash crc32="8dc68d92" name="WWF Raw (JUE) [!]"/>
+	<hash crc32="d29148a9" name="WWF Raw (JUE) [b1]"/>
+	<hash crc32="da8e95a9" name="WWF Steel Cage Challenge (JUE) [!]"/>
+	<hash crc32="dd03e6de" name="Xaropinho (Mappy Hack)"/>
+	<hash crc32="c169c344" name="X-Men - Gamemaster's Legacy (UE)">
+		<year>1994</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="c2cba9d7" name="X-Men - Mojo World (UE) [!]">
+		<year>1996</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="567a5ee6" name="X-Men (UE)"/>
+	<hash crc32="d9ce3f4c" name="Yaiba Adventures (J)"/>
+	<hash crc32="e678f264" name="Yogi Bear (UE) (proto) [!]">
+		<year>1994</year>
+		<manufacturer>GameTek</manufacturer>
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="42389270" name="Yokaru Yotantori (J)">
+		<year>1992</year>
+		<manufacturer>Sega</manufacturer>
+	</hash>
+	<hash crc32="88ebbf9e" name="Yuu Yuu Hakusho 1 (J)"/>
+	<hash crc32="dcbf3355" name="Yuu Yuu Hakusho 2 (J) [T-Eng]"/>
+	<hash crc32="46ae9159" name="Yuu Yuu Hakusho 2 (J)"/>
+	<hash crc32="e35ef7ed" name="Zool (J)">
+		<year>1993</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="f397f041" name="Zoop (UE) [!]">
+		<status>Demo?</status>
+	</hash>
+	<!-- Unknown Status -->
+	<hash crc32="655fb1f4" name="Bank Panic">
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="914514e3" name="Teni">
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="dfa2ae07" name="Enduro Racer">
+		<status>NO GOOD DUMP KNOWN</status>
+	</hash>
+	<!-- not in GoodGG .9996 -->
+	<hash crc32="eebad668" name="Taz in Escape from Mars"/>
+	<hash crc32="f514e58c" name="Wagyan Land"/>
+</hashfile>

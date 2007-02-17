@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- watara supervision -->
+	<!-- Based on GoodSV 2.01 with some additions -->
+	<hash crc32="8dbb2c53" name="Alien (199x) (Supervision)">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10010</status>
+	</hash>
+	<hash crc32="8188b755" name="Balloon Fight (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="7e05d84f" name="Block Buster &amp; Cross High (199x) (Supervision)">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10033</status>
+	</hash>
+	<hash crc32="0a3db285" name="Block Buster (199x) (Supervision)">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10001</status>
+	</hash>
+	<hash crc32="5e6706b9" name="Brain Power (199x) (Supervision)">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10023</status>
+	</hash>
+	<hash crc32="8847c439" name="Carrier (199x) (Travellmate) [o1]">
+		<status>Overdump, 1st half empty</status>
+	</hash>
+	<hash crc32="5ecfb674" name="Carrier (199x) (Travellmate)">
+		<year>199x</year>
+		<manufacturer>Travellmate</manufacturer>
+		<status>SV10004</status>
+	</hash>
+	<hash crc32="e0266ce7" name="Cave Wonders (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="c92382ce" name="Challenger Tank (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10017</status>
+	</hash>
+	<hash crc32="4a458aa8" name="Chimera (199x) (Supervision)">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10016</status>
+	</hash>
+	<hash crc32="b7d5db89" name="Chimera eprom read (scrambled)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="10dcc110" name="Crystball (1991) (Travellmate)">
+		<year>1991</year>
+		<manufacturer>Travellmate</manufacturer>
+	</hash>
+	<hash crc32="32ccdf89" name="Delta Hero (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10040</status>
+	</hash>
+	<hash crc32="62f39f8b" name="Delta Hero (1992) (Bon Treasure)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="01cb8364" name="Eagle Plan (1992) (GTC Inc)">
+		<year>1992</year>
+		<manufacturer>GTC Inc</manufacturer>
+		<status>SV10005</status>
+	</hash>
+	<hash crc32="a6cbb074" name="Earth Defender (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="917cab48" name="Fatal Craft (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="465d78cd" name="Final Combat (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="b494bc5c" name="Galactic Crusader (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10029</status>
+	</hash>
+	<hash crc32="581703be" name="Galaxy Fighter (1992) (Thin Chen Enterprise)">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+	</hash>
+	<hash crc32="cef3f295" name="Grand Prix (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10021</status>
+	</hash>
+	<hash crc32="112f5eed" name="Happy Pairs (1992) (Sachen)">
+		<year>1992</year>
+		<manufacturer>Sachen</manufacturer>
+	</hash>
+	<hash crc32="c1354952" name="Hash Blocks &amp; Eagle Plan (1992) (GTC Inc)">
+		<year>1992</year>
+		<manufacturer>GTC Inc</manufacturer>
+		<status>SV10024</status>
+	</hash>
+	<hash crc32="6bd7c885" name="Hash Blocks (1991) (GTC Inc)">
+		<year>1991</year>
+		<manufacturer>GTC Inc</manufacturer>
+		<status>SV10002</status>
+	</hash>
+	<hash crc32="25ddd6e1" name="Hero Kid (1992) (Hartung)">
+		<year>1992</year>
+		<manufacturer>Hartung</manufacturer>
+		<status>SV10011</status>
+	</hash>
+	<hash crc32="e856875a" name="Honey Bee (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10018</status>
+	</hash>
+	<hash crc32="7d8a607f" name="Jacky Lucky (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="aa4372d4" name="Jaguar Bomber (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10025</status>
+	</hash>
+	<hash crc32="e9ea3ae0" name="John Adventure (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10036</status>
+	</hash>
+	<hash crc32="32e68d6f" name="Juggler (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10043</status>
+	</hash>
+	<hash crc32="2bc03096" name="Kabi Island (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="6f8abaf9" name="Linear Racing (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10007</status>
+	</hash>
+	<hash crc32="e406a91c" name="Magincross (1992) (Thin Chen Enterprise)">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10039</status>
+	</hash>
+	<hash crc32="21864295" name="Matta Blatta (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10020</status>
+	</hash>
+	<hash crc32="85dc8111" name="Olympic Trials (1992) (Watara)">
+		<year>1992</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10019</status>
+	</hash>
+	<hash crc32="748f9dae" name="P-52 Sea Battle (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10006</status>
+	</hash>
+	<hash crc32="1a89ac88" name="PacBoy and Mouse (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10008</status>
+	</hash>
+	<hash crc32="17a4ca40" name="Penguin Hideout (1992) (Thin Chen Enterprise) [o1]">
+		<status>Overdump, 2 identical halves</status>
+	</hash>
+	<hash crc32="fe5f9774" name="Penguin Hideout (1992) (Thin Chen Enterprise)">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10032</status>
+	</hash>
+	<hash crc32="531f0b51" name="Police Bust (199x) (Bon Treasure)">
+		<year>199x</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10014</status>
+	</hash>
+	<hash crc32="e0bfe163" name="Pyramid (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="be9b6f10" name="SSSnake (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10009</status>
+	</hash>
+	<hash crc32="45204dc4" name="Soccer Champion (199x) (Hartung)">
+		<year>199x</year>
+		<manufacturer>Hartung</manufacturer>
+		<status>SV10034</status>
+	</hash>
+	<hash crc32="d46ab5e0" name="Super Block (1992) (Bon Treasure) [o1]">
+		<status>Overdump, 1st half empty</status>
+	</hash>
+	<hash crc32="02e2c7ad" name="Super Block (1992) (Bon Treasure)">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10022</status>
+	</hash>
+	<hash crc32="59c7ff64" name="Super Kong (1992) (Thin Chen Enterprise)">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10042</status>
+	</hash>
+	<hash crc32="3d5f3964" name="Tasac 2010 (1992) (Thin Chen Enterprise)">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10026</status>
+	</hash>
+	<hash crc32="bd004cb7" name="Tennis Pro '92 (1992) (B.I.T.S)">
+		<year>1992</year>
+		<manufacturer>B.I.T.S</manufacturer>
+		<status>SV10015</status>
+	</hash>
+	<hash crc32="db35b809" name="Treasure Hunter (199x) (Watara)">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<!-- watara supervision other -->
+	<!-- SV10012 MahJongg -->
+	<!-- SV10017 Space Fighter -->
+	<!-- SV10027 Happy Race -->
+	<!-- SV10028 Super Pang -->
+	<!-- SV10030 Dancing Blocks -->
+	<!-- SV10031 Final Combat -->
+	<!-- SV10035 Happy Pair -->
+	<!-- SV10037 PaPo Team -->
+	<!-- SV10038 Chinese Checkers -->
+	<!-- SV10041 Recycle Design -->
+	<!-- hash block, jacky lucky, challenger tank, brain power -->
+	<!-- b52 battle -->
+	<!-- Box Carrier -->
+	<!-- bubble world -->
+	<!-- classic casino -->
+	<!-- climber -->
+	<!-- Devil Paradise -->
+	<!-- dream world -->
+	<!-- hero hawk -->
+	<!-- money bee -->
+	<!-- jade legend -->
+	<!-- Jouney to the West -->
+	<!-- kitchen war -->
+	<!-- Kung Fu Street -->
+	<!-- Lucky Jack (Jacky Lucky clone or a name mistake?) -->
+	<!-- pacific battle -->
+	<!-- pyramid -->
+	<!-- scaffolder -->
+	<!-- sonny xpress -->
+	<!-- thunder shooting -->
+	<!-- untouchable -->
+	<!-- usa sea battle -->
+	<!-- witty kitty -->
+</hashfile>

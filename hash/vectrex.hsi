@@ -1,0 +1,263 @@
+<hashfile>
+	<!-- Vectrex Cartridge and Demo CRC List -->
+	<!-- Compiled by Ben Bruscella and Chris Henry -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<hash crc32="36daf32c" name="3D Demo">
+		<year>2000</year>
+		<manufacturer>Chris Salomon</manufacturer>
+	</hash>
+	<hash crc32="b2313487" name="3D Mine Storm">
+		<year>1984</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="5d7af9b8" name="4D Rotating Cube">
+		<year>1983?</year>
+		<manufacturer>GCE?</manufacturer>
+	</hash>
+	<hash crc32="e98ab5a2" name="All Good Things">
+		<year>1996</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="6f7a27b9" name="Alpha Test"/>
+	<hash crc32="9f62e167" name="Animaction">
+		<status>NOT PLAYABLE (Light Pen)</status>
+	</hash>
+	<hash crc32="5ec7d559" name="Anthem (music demo)"/>
+	<hash crc32="b7510971" name="Armor Attack">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="c8e2f247" name="Art Master">
+		<status>NOT PLAYABLE (Light Pen)</status>
+	</hash>
+	<hash crc32="309e6b20" name="BCOR-FTS Beta 1"/>
+	<hash crc32="a2fa649b" name="Bedlam">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="eafe2455" name="Berzerk">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="0f11ce0c" name="Blitz!">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="24e2f808" name="Bonnie (music demo)"/>
+	<hash crc32="f1b1de78" name="Clean Sweep">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="61bae868" name="Cologne Nightline Demo">
+		<year>1999</year>
+		<manufacturer>Martin Balazs</manufacturer>
+	</hash>
+	<hash crc32="6c1afa52" name="Cosmic Chasm">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="92709b11" name="Crazy Coaster"/>
+	<hash crc32="e818c1cd" name="Curved Lines Test"/>
+	<hash crc32="3947506a" name="Daisy (earlier)"/>
+	<hash crc32="ba7be9d3" name="Daisy"/>
+	<hash crc32="9dcfd5b7" name="Dark Tower">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+		<status>NOT PLAYABLE (Crashes)</status>
+	</hash>
+	<hash crc32="c99abda6" name="Digitized Sound Test"/>
+	<hash crc32="2e54332e" name="Disc Duel Demo"/>
+	<hash crc32="2fe6d308" name="Dual Vectrex Test (Ver. 1)"/>
+	<hash crc32="5b2d8391" name="Dual Vectrex Test (Ver. 2)"/>
+	<hash crc32="963062a6" name="Etch-A-Sketch"/>
+	<hash crc32="81f72997" name="Exec Rom Dump Monitor">
+		<year>1999</year>
+		<manufacturer>Rohen Habot</manufacturer>
+	</hash>
+	<hash crc32="068cd49f" name="Figgy"/>
+	<hash crc32="13a35c8a" name="Fortress Of Narzod">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="e61a7de3" name="Heads Up">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="4bb13472" name="Hyper Chase">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="05d5ea98" name="Labyrinth Demo">
+		<year>2000</year>
+		<manufacturer>Chris Salomon</manufacturer>
+	</hash>
+	<hash crc32="59181c32" name="Line Demo"/>
+	<hash crc32="01cd710b" name="Loader Test"/>
+	<hash crc32="67ed5845" name="Lunar Lander"/>
+	<hash crc32="afefa29c" name="Melody Master">
+		<status>NOT PLAYABLE</status>
+	</hash>
+	<hash crc32="c6ed30ab" name="Mike's Molecules"/>
+	<hash crc32="bcc59075" name="Mike's Molecules Demo"/>
+	<hash crc32="410d7d82" name="Minestorm (Lives and Bullets Hack)"/>
+	<hash crc32="fd74f4d6" name="Minestorm (Bullets Hack)"/>
+	<hash crc32="65d9ad00" name="Minestorm (Lives Hack)"/>
+	<hash crc32="f5b3b374" name="Mine Storm 2">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="8617c304" name="Moon Lander">
+		<year>1999</year>
+		<manufacturer>Clay Cowgill</manufacturer>
+	</hash>
+	<hash crc32="55a79111" name="Moon Lander (Beta 9)">
+		<year>1997</year>
+		<manufacturer>Clay Cowgill</manufacturer>
+	</hash>
+	<hash crc32="6397b8b6" name="Music Test"/>
+	<hash crc32="050bd949" name="Narrow Escape">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="1ae8e788" name="Omega Chase">
+		<year>1998</year>
+		<manufacturer>Christopher L. Tumber</manufacturer>
+	</hash>
+	<hash crc32="f0073328" name="Patriots">
+		<year>1996</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="a7471784" name="Polar Rescue">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="c10f37d8" name="Pole Position">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="c999f9c5" name="Pop (Demo)"/>
+	<hash crc32="34a98132" name="Rip Off">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="d1e0268f" name="Rockaroids Remix">
+		<year>1996</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="863b89e8" name="Rocket Sledge"/>
+	<hash crc32="81a2cff6" name="Saw Gallery"/>
+	<hash crc32="707c8ffe" name="Scramble">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="5c4611c8" name="Solar Quest">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="46779d76" name="Song Demo"/>
+	<hash crc32="8a0858e7" name="Sound Test 1"/>
+	<hash crc32="a3be5aff" name="Space Wars">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="62a61843" name="Spike">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="d17ddc97" name="Spike Goes Skiing">
+		<year>1998</year>
+	</hash>
+	<hash crc32="1c6b030e" name="Spike Hoppin'">
+		<year>1997</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="95188f66" name="Spike's Water Baloons (Analogue Version)">
+		<year>2000</year>
+		<manufacturer>John Dondzilla</manufacturer>
+		<status>NOT PLAYABLE (No analogue support)</status>
+	</hash>
+	<hash crc32="02f41733" name="Spin Ball">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="c9039623" name="Star Castle">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="4de1f06b" name="Star Hawk">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="3768d8c3" name="Star Trek: The Game">
+		<year>1982</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="7297e815" name="Test Revision 4"/>
+	<hash crc32="e2c6c910" name="Text Demo"/>
+	<hash crc32="0ccca430" name="The Star Wars Clone Demo">
+		<year>1998</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="0b833d2e" name="Vaboom (Demo Version)">
+		<year>2000</year>
+		<manufacturer>Rohen Habot</manufacturer>
+	</hash>
+	<hash crc32="0eeb4805" name="Vecmania Part 1">
+		<year>1999</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="8c915c4d" name="Vecmania Part 2">
+		<year>1999</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="9c5410be" name="Vectrex Frogger">
+		<year>1998</year>
+		<manufacturer>Chris Salomon</manufacturer>
+	</hash>
+	<hash crc32="8bd103c1" name="Vector Vaders">
+		<year>1996</year>
+		<manufacturer>John Dondzilla</manufacturer>
+	</hash>
+	<hash crc32="e50bb30d" name="Vectrace">
+		<year>2000</year>
+		<manufacturer>Rohen Habot</manufacturer>
+	</hash>
+	<hash crc32="05f67127" name="Vectrexians">
+		<year>1999</year>
+		<manufacturer>Kristof Tuts</manufacturer>
+	</hash>
+	<hash crc32="0a5ff28d" name="Vectrex Pong">
+		<year>1998</year>
+		<manufacturer>Chris Salomon</manufacturer>
+	</hash>
+	<hash crc32="2ee20103" name="Web Wars">
+		<year>1983</year>
+		<manufacturer>GCE</manufacturer>
+	</hash>
+	<hash crc32="8fdb6c3a" name="Well Tempered Clavichord: Bach Prelude #1"/>
+	<hash crc32="8fa4280e" name="YM Sound: Axel F"/>
+	<hash crc32="5ea65185" name="YM Sound: Dr. Who"/>
+	<hash crc32="e007d5f8" name="YM Sound: Horror Zombies"/>
+	<hash crc32="772945de" name="YM Sound: Jaws"/>
+	<hash crc32="6ecad660" name="YM Sound: Madonna - Get Into The Groove"/>
+	<hash crc32="7795c0ae" name="YM Sound: Misfits 1"/>
+	<hash crc32="e8e6fe06" name="YM Sound: Star Wars"/>
+	<hash crc32="4d467e41" name="Zzap Demo"/>
+	<!-- obsolete demos -->
+	<!-- These were removed from circulation by the authors, and replaced with newer versions. -->
+	<hash crc32="bd447845" name="3D Demo">
+		<year>2000</year>
+		<manufacturer>Chris Salomon</manufacturer>
+	</hash>
+	<hash crc32="7525e02a" name="Labyrinth Demo (first version)">
+		<year>2000</year>
+		<manufacturer>Chris Salomon</manufacturer>
+	</hash>
+	<hash crc32="6c327889" name="Vectrace">
+		<year>1999</year>
+		<manufacturer>Rohen Habot</manufacturer>
+	</hash>
+	<!-- [known_bad_dumps] -->
+</hashfile>

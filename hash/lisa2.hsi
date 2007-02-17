@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Apple Lisa (TOSEC-v0.10) -->
+	<hash crc32="86942a3c" name="Lisa Office System (Disk 1 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="842e1a13" name="Lisa Office System (Disk 2 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="ad85fa60" name="Lisa Office System (Disk 3 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="b0f082d3" name="Lisa Office System (Disk 4 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="3adcff78" name="Lisa Office System (Disk 5 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="303d4863" name="Lisa WorkShop (Disk 1 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="5f781ef1" name="Lisa WorkShop (Disk 2 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="c3eea30d" name="Lisa WorkShop (Disk 3 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="79e44adb" name="Lisa WorkShop (Disk 4 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="2d1ee31d" name="Lisa WorkShop (Disk 5 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="b3695774" name="Lisa WorkShop (Disk 6 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="172c5874" name="Lisa WorkShop (Disk 7 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="bc01ba32" name="Lisa WorkShop (Disk 8 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="5e8662da" name="Lisa WorkShop (Disk 9 of 9)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="a4bb179e" name="LisaCalc">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="299147e9" name="LisaDraw">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="e5c4bbce" name="LisaGraph">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="cb97c4a3" name="LisaGuide">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="53e861b0" name="LisaList">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="8ad3dc87" name="LisaOffice (Disk 1 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="1cd0ba39" name="LisaOffice (Disk 2 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="2586b54d" name="LisaOffice (Disk 3 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="1a32eeee" name="LisaOffice (Disk 4 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="9b60c010" name="LisaOffice (Disk 5 of 5)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="ab065b7d" name="LisaProject">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="e6239450" name="LisaTerminal">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="d8e1cf3a" name="LisaTest (Disk 1 of 2)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="197255c4" name="LisaTest (Disk 2 of 2)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="8288aa21" name="LisaWrite (Disk 1 of 2)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+	<hash crc32="2814fa31" name="LisaWrite (Disk 2 of 2)">
+		<year>1983-84</year>
+		<manufacturer>Apple Computer Inc.</manufacturer>
+	</hash>
+</hashfile>

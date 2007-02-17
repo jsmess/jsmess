@@ -1,0 +1,20 @@
+<hashfile>
+	<!-- ApexC CRC List -->
+	<!-- Compiled by Stefano 'JoJo' Priore -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- crc    = Game Name | Year | Manufacturer -->
+	<hash crc32="6ae5de89" name="Hello World 1.apc">
+		<year>2001</year>
+		<manufacturer>Raphael Nabet</manufacturer>
+	</hash>
+	<hash crc32="3cea42e3" name="Hello World 2.apc">
+		<year>2001</year>
+		<manufacturer>Raphael Nabet</manufacturer>
+	</hash>
+	<hash crc32="55d5ce7d" name="Hello World 3.apc">
+		<year>2001</year>
+		<manufacturer>Raphael Nabet</manufacturer>
+	</hash>
+</hashfile>

@@ -1,0 +1,39 @@
+<hashfile>
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="89cf714d" name="Ali Baba i 40 Razboinikov.lvt"/>
+	<hash crc32="4f507e47" name="Bear.lvt">
+		<year>1989</year>
+		<manufacturer>Sushiushi P. S.</manufacturer>
+	</hash>
+	<hash crc32="20b08b1a" name="Push.lvt">
+		<year>1990</year>
+		<manufacturer>Chistyakov A. S.</manufacturer>
+	</hash>
+	<hash crc32="f4678825" name="Boks.lvt"/>
+	<hash crc32="103fc796" name="Bombardir.lvt"/>
+	<hash crc32="58fed647" name="Bul-Bul.lvt"/>
+	<hash crc32="c7e5c14f" name="Cave.lvt"/>
+	<hash crc32="2b4fee2c" name="Shakmate-2 dlya Prodolzhayuschikh.lvt"/>
+	<hash crc32="3e504359" name="Shakmate-2 dlya Prodolzhayuschikh (Alternate).lvt"/>
+	<hash crc32="4315a4d6" name="Shakmate.lvt"/>
+	<hash crc32="9fa9c545" name="Popcorn.lvt"/>
+	<hash crc32="465d6f47" name="Digger.lvt"/>
+	<hash crc32="04692239" name="digger2.lvt"/>
+	<hash crc32="cfe81a9f" name="digger3.lvt"/>
+	<hash crc32="b485111a" name="f16.lvt"/>
+	<hash crc32="203e416a" name="gomoku.lvt"/>
+	<hash crc32="b89ef4da" name="jetman.lvt"/>
+	<hash crc32="8cb31c68" name="jump-2.lvt"/>
+	<hash crc32="6b936f02" name="jump_2.lvt"/>
+	<hash crc32="1a929698" name="kos_prog.lvt"/>
+	<hash crc32="2cd78f52" name="kosmos.lvt"/>
+	<hash crc32="c108aa3a" name="pacman.lvt"/>
+	<hash crc32="2dbdf549" name="patrol.lvt"/>
+	<hash crc32="431def76" name="pirog.lvt"/>
+	<hash crc32="119127a7" name="podz-2.lvt"/>
+	<hash crc32="fb1efafc" name="terror.lvt"/>
+	<hash crc32="4a3796b7" name="tigr.lvt"/>
+	<hash crc32="f4ad4f11" name="torpedos.lvt"/>
+	<hash crc32="20d8975b" name="xonix.lvt"/>
+	<hash crc32="14996712" name="zoo.lvt"/>
+</hashfile>

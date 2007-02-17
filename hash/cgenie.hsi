@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- EACA Colour Genie EG-2000 (TOSEC-v0.22) -->
+	<hash crc32="321710b8" name="Abenteuerland (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="917a2513" name="Adressdatei II (De)">
+		<year>19??</year>
+		<manufacturer>Alex D.</manufacturer>
+	</hash>
+	<hash crc32="ee642294" name="Adressen Verwaltung (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="355dd131" name="Africa (De)">
+		<year>1989</year>
+		<manufacturer>Marcus Schneider</manufacturer>
+	</hash>
+	<hash crc32="cb10616e" name="Andromeda (De)">
+		<year>1982</year>
+		<manufacturer>Juergen Buchmueller</manufacturer>
+	</hash>
+	<hash crc32="be51a28c" name="Andromeda (De)[a]">
+		<year>1982</year>
+		<manufacturer>Juergen Buchmueller</manufacturer>
+	</hash>
+	<hash crc32="7e57ada8" name="Astronaut">
+		<year>1984</year>
+		<manufacturer>N. A. Taylor</manufacturer>
+	</hash>
+	<hash crc32="3520e3d0" name="Backgammon">
+		<year>1983</year>
+		<manufacturer>JD Tronics</manufacturer>
+	</hash>
+	<hash crc32="b1074e77" name="BASIC Packer v2.13">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="9da86441" name="BasiCode">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="0f490f94" name="Benchmark Test">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a7855e2" name="Blues Maker">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f94afe05" name="Bumm Bumm (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d478a0bd" name="Chemie 1 (De)">
+		<year>1981</year>
+	</hash>
+	<hash crc32="9d90dddc" name="Chemie 2 (De)">
+		<year>1981</year>
+	</hash>
+	<hash crc32="ab3e1133" name="Chemie 4 (De)">
+		<year>1981</year>
+	</hash>
+	<hash crc32="190a67fb" name="Chopper [16K]">
+		<year>1983</year>
+		<manufacturer>Juergen Buchmueller</manufacturer>
+	</hash>
+	<hash crc32="5e13a90b" name="Chopper [32K]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9aca41aa" name="CIA Agent (De)">
+		<year>1985</year>
+		<manufacturer>Sven Schaffarzik</manufacturer>
+	</hash>
+	<hash crc32="2628fe32" name="Colour BASIC Compiler v3.05 (De)">
+		<year>1982</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="870865de" name="Colour BASIC Plus">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="021d8dae" name="Colour Datei (De)">
+		<year>19??</year>
+		<manufacturer>Jan Fischer</manufacturer>
+	</hash>
+	<hash crc32="3cade933" name="Colour Design v3.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4a8578a2" name="Colour DOS Interface">
+		<year>1997</year>
+		<manufacturer>Juergen Buchmueller</manufacturer>
+	</hash>
+	<hash crc32="a2f51fc0" name="Colour FORTH v2.0">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="628cc3ce" name="Colour FORTH v2.0 [a]">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="791aedf8" name="Colour Genie Demonstration (De)">
+		<year>19??</year>
+		<manufacturer>Carsten Schmidt</manufacturer>
+	</hash>
+	<hash crc32="57acc541" name="Colour Genie Demonstration 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f6ae6158" name="Colour Kong [16K]">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="83fba82e" name="Colour Kong [32K]">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="111deb80" name="Colour Kong [a][16K]">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="d2ee13b0" name="Colour Kopier">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ae8b9163" name="Colour Monitor v2.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8c96504c" name="Colour Monitor v2.0 [a]">
+		<year>19??</year>
+	</hash>
+	<hash crc32="51f27191" name="Colour Monitor v3.0">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="88fdad97" name="Colour Office Tape-Disk Converter v1.11">
+		<year>19??</year>
+	</hash>
+	<hash crc32="463af74d" name="Colour Pascal v2.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="d95dc066" name="Colour ROT (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="b21c8982" name="Colour Schach (De)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="997f5271" name="Colour Schach (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="741e6dfd" name="Colour Tune v2.1">
+		<year>1984</year>
+		<manufacturer>K. Baedker</manufacturer>
+	</hash>
+	<hash crc32="a0231790" name="Cosmic Attack">
+		<year>19??</year>
+		<manufacturer>Kansas Software</manufacturer>
+	</hash>
+	<hash crc32="75202477" name="Crazy Paint">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a21e5f61" name="Definierbare Zeichen Editor">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="dff8308e" name="Definierbare Zeichen Editor [a]">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="d675af8f" name="Definierbare Zeichen Editor (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6e658740" name="Definierbare Zeichen Editor (De)[a]"/>
+	<hash crc32="46431856" name="Deine Aufgabe (De)">
+		<year>1985</year>
+		<manufacturer>Sven Schaffarzik</manufacturer>
+	</hash>
+	<hash crc32="419b9810" name="Dezimal-Hexadezimal Umwandlung (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="382907d8" name="Die Berliner uhr (De)">
+		<year>19??</year>
+		<manufacturer>Wilhelm Toelke</manufacturer>
+	</hash>
+	<hash crc32="91699102" name="Die Juwelen des Grafen Dracula (De)(Part 1 of 2)">
+		<year>19??</year>
+		<manufacturer>Marcus Schneider</manufacturer>
+	</hash>
+	<hash crc32="1b9f9ac7" name="Die Juwelen des Grafen Dracula (De)(Part 2 of 2)">
+		<year>19??</year>
+		<manufacturer>Marcus Schneider</manufacturer>
+	</hash>
+	<hash crc32="b56cc12d" name="Die Physik des Transistors (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1526d46d" name="Disastrous Villa (De)">
+		<year>1985</year>
+		<manufacturer>Stephan Scholz</manufacturer>
+	</hash>
+	<hash crc32="3453cd15" name="Eagle (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="eaa18750" name="Eatman">
+		<year>1983</year>
+		<manufacturer>Computer Service</manufacturer>
+	</hash>
+	<hash crc32="4baa38a3" name="Egg Protect (De)">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="36ae9438" name="Eis (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="e1e5e436" name="Eliminator">
+		<year>1984</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="3e1415bf" name="Empire (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3a132301" name="FGR">
+		<year>19??</year>
+	</hash>
+	<hash crc32="a102563d" name="Firebird (De)">
+		<year>1983</year>
+		<manufacturer>Thomas M. Binzinger</manufacturer>
+	</hash>
+	<hash crc32="091cc8bd" name="Flugsimulator (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="92c71078" name="Glueckspilz (De)">
+		<year>1983</year>
+		<manufacturer>Udo Gronostay-Klaus Kunze</manufacturer>
+	</hash>
+	<hash crc32="7cbf2726" name="Grafik Editor (De)">
+		<year>1983</year>
+		<manufacturer>Udo Gerber</manufacturer>
+	</hash>
+	<hash crc32="5c046ce2" name="Helikopter (De)">
+		<year>1983</year>
+		<manufacturer>Thomas M. Binzinger</manufacturer>
+	</hash>
+	<hash crc32="7f01d3a9" name="Horror Castle">
+		<year>19??</year>
+		<manufacturer>Heiko Scholz</manufacturer>
+	</hash>
+	<hash crc32="60b6dc93" name="House of Death (De)">
+		<year>1985</year>
+		<manufacturer>Stephan &amp; Heiko Scholz</manufacturer>
+	</hash>
+	<hash crc32="4a107aaf" name="Im Reich aer Fraggles">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8fd27759" name="Invasion aus dem Weltraum (De)">
+		<year>1982</year>
+		<manufacturer>Harald Boegeholz</manufacturer>
+	</hash>
+	<hash crc32="883161e8" name="Jet Set Billy (Part 1 of 2)[16K]">
+		<year>1984</year>
+		<manufacturer>R.Hamilton</manufacturer>
+	</hash>
+	<hash crc32="98c7a0da" name="Jet Set Billy (Part 2 of 2)[16K]">
+		<year>1984</year>
+		<manufacturer>R.Hamilton</manufacturer>
+	</hash>
+	<hash crc32="5c47368d" name="King (De)">
+		<year>1983</year>
+		<manufacturer>Juergen Buchmueller</manufacturer>
+	</hash>
+	<hash crc32="376b6c9d" name="Kniffel (De)">
+		<year>1985</year>
+		<manufacturer>Alexander Drawe</manufacturer>
+	</hash>
+	<hash crc32="6df6d464" name="Las Vegas (De)">
+		<year>19??</year>
+		<manufacturer>Klaus Stuchlich</manufacturer>
+	</hash>
+	<hash crc32="18d97fe6" name="Life (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="002e74cc" name="Lineare Gleichungs Syeteme (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7441ec01" name="Listing Formatierer (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="916ceeb1" name="Lunar Lander">
+		<year>1983</year>
+		<manufacturer>Klaus Weber</manufacturer>
+	</hash>
+	<hash crc32="72d2610e" name="Machime Monitor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e6ffd933" name="Mampf Man II">
+		<year>1983</year>
+		<manufacturer>Klaus Weber</manufacturer>
+	</hash>
+	<hash crc32="38422db1" name="Marien Kaefer">
+		<year>1984</year>
+		<manufacturer>Klaus Weber</manufacturer>
+	</hash>
+	<hash crc32="5683a102" name="Meteor (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="820b662f" name="Monroe">
+		<year>19??</year>
+	</hash>
+	<hash crc32="7eb4a417" name="Mord im Zeppelin (De)">
+		<year>198?</year>
+		<manufacturer>Sven Schaffarzik</manufacturer>
+	</hash>
+	<hash crc32="fb5efa13" name="Motten (De)">
+		<year>1982</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="ac9a24d8" name="Musik Demo">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="57ebd9ba" name="Mysterious Tavern (De)">
+		<year>198?</year>
+		<manufacturer>Heiko Scholz</manufacturer>
+	</hash>
+	<hash crc32="63eac136" name="Netzo (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="515b36d4" name="Pac Boy (De)">
+		<year>1984</year>
+		<manufacturer>Spectra Games</manufacturer>
+	</hash>
+	<hash crc32="4665242c" name="Painter">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b5d90e32" name="Painter 2">
+		<year>19??</year>
+	</hash>
+	<hash crc32="6e397435" name="Plotter 2.5 (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="f7e91077" name="Point Chase">
+		<year>1983</year>
+		<manufacturer>ROL</manufacturer>
+	</hash>
+	<hash crc32="956a744d" name="Programm Modifizierer (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="402bba07" name="Roulette">
+		<year>1982</year>
+		<manufacturer>Christian Klein</manufacturer>
+	</hash>
+	<hash crc32="53f5b980" name="RS-232 Treiber Programm (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4d672a70" name="Santa Paravia (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="f477896c" name="Saug">
+		<year>1982</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="e0f2e0cb" name="Schiff des Grauens (De)">
+		<year>198?</year>
+		<manufacturer>Sven Schaffarzik-Heiko Scholz</manufacturer>
+	</hash>
+	<hash crc32="846841d3" name="Schnick Schnack Schnuck (De)">
+		<year>1986</year>
+		<manufacturer>Alexander Drawe</manufacturer>
+	</hash>
+	<hash crc32="d038dbb6" name="Screen Editor">
+		<year>19??</year>
+	</hash>
+	<hash crc32="ea427be8" name="Screen Printer">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="2fb32641" name="Scuttle (De)">
+		<year>1982</year>
+		<manufacturer>T. Schwertfeger</manufacturer>
+	</hash>
+	<hash crc32="2d67c6c1" name="Shape Table Editor (De)">
+		<year>1983</year>
+		<manufacturer>Udo Gerber</manufacturer>
+	</hash>
+	<hash crc32="249df317" name="Skramble">
+		<year>1983</year>
+		<manufacturer>Stuart Sampson</manufacturer>
+	</hash>
+	<hash crc32="bf667ec4" name="Sound Editor (De)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="8f1c0271" name="Space Attack">
+		<year>1984</year>
+		<manufacturer>A. Mueller</manufacturer>
+	</hash>
+	<hash crc32="3de8d663" name="Spaceman (De)">
+		<year>19??</year>
+		<manufacturer>Alexander Drawe</manufacturer>
+	</hash>
+	<hash crc32="97053bbe" name="Sprite Editor">
+		<year>1983</year>
+		<manufacturer>Patrick Thomas</manufacturer>
+	</hash>
+	<hash crc32="1da95676" name="Super BASIC (De)">
+		<year>19??</year>
+		<manufacturer>Heinz Huebben</manufacturer>
+	</hash>
+	<hash crc32="b2fa4ace" name="Super Hirn">
+		<year>1982</year>
+	</hash>
+	<hash crc32="5f49eda1" name="Super Plot (De)">
+		<year>1984</year>
+		<manufacturer>Ralf Steffenhagen</manufacturer>
+	</hash>
+	<hash crc32="0a6a362b" name="Super Star Trek (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1fa35da3" name="System Copy (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="41504360" name="Tausend Fuss (De)">
+		<year>1983</year>
+		<manufacturer>TCS</manufacturer>
+	</hash>
+	<hash crc32="e91c4c81" name="Toad Mania">
+		<year>1983</year>
+		<manufacturer>Gumboot Software</manufacturer>
+	</hash>
+	<hash crc32="6b0bf332" name="TraceMon">
+		<year>1983</year>
+		<manufacturer>Juergen Buchmueller</manufacturer>
+	</hash>
+	<hash crc32="1bbab68f" name="Triton Battle">
+		<year>19??</year>
+		<manufacturer>M. Gergeleit-H. C. Steinbeck</manufacturer>
+	</hash>
+	<hash crc32="5caa9b13" name="U Boot JagD (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="27938748" name="Uhr Copy (De)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1fdf77b8" name="Uhr Zeit (De)">
+		<year>19??</year>
+	</hash>
+</hashfile>

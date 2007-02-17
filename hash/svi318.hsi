@@ -1,0 +1,800 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Spectravideo SVI 318-328 - CAS (TOSEC-v0.01) -->
+	<hash crc32="c6c787de" name="Alien 8">
+		<year>1985</year>
+		<manufacturer>Ultimate</manufacturer>
+	</hash>
+	<hash crc32="117969bf" name="Arkanoid">
+		<year>19??</year>
+		<manufacturer>Taito</manufacturer>
+	</hash>
+	<hash crc32="a741a408" name="Armoured Assaut">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="e9e2f4ee" name="Basic Collection 01">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="918df490" name="Basic Collection 02">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="489edfff" name="Basic Collection 03">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6a6b4f28" name="Basic Collection 04">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="950205ca" name="Basic Collection 05">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4395d38c" name="Basic Tutorial">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="fe6eaa6c" name="Biorhythm">
+		<year>1983</year>
+		<manufacturer>SIL</manufacturer>
+	</hash>
+	<hash crc32="74e29dc3" name="Burken Soft Game Pac 01">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ffc0e62b" name="Burken Soft Game Pac 02">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="65844248" name="Burken Soft Game Pac 03">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3d623f84" name="Burken Soft Game Pac 04">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e192a52e" name="Burken Soft Game Pac 05">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="0b69eb3b" name="Burken Soft Game Pac 06">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="464eb2f1" name="Burken Soft Game Pac 07">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9eb45201" name="Burken Soft Game Pac 08">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9f129bc5" name="Burken Soft Game Pac 09">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="fda49c5d" name="Burken Soft Game Pac 10">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5e045561" name="Burken Soft Game Pac 11">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d7302b43" name="Burken Soft Game Pac 12">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="202e7ae5" name="Burken Soft Game Pac 13">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="1748aed7" name="Burken Soft Game Pac 14">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="db50d005" name="Burken Soft Game Pac 15">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="2c9c479c" name="Burken Soft Game Pac 16">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="67175a5d" name="Burken Soft Game Pac 17">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="db1927fa" name="Burken Soft Game Pac 18">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9f2a1df7" name="Burken Soft Game Pac 19">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="680293af" name="Burken Soft Game Pac 20">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4e564909" name="Burken Soft Game Pac 21">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="443eaea9" name="Burken Soft Game Pac 22">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6c65e500" name="Burken Soft Game Pac 23">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4de515fe" name="Burken Soft Game Pac 24">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4f34aca5" name="Burken Soft Game Pac 25">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a4514c93" name="Burken Soft Game Pac 26">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8eb80983" name="Burken Soft Game Pac 27">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="03321219" name="Burken Soft Game Pac 28">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="236ac892" name="Burken Soft Game Pac 29">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="52673b68" name="Burken Soft Game Pac 30">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="0d644ed0" name="Cabbage Patch Kids">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="b081916f" name="Cabbage Patch Kids">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="78260340" name="Candoo Ninja">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="3b677ae4" name="Chess">
+		<year>1986</year>
+		<manufacturer>JTM Software</manufacturer>
+	</hash>
+	<hash crc32="8a0baf6f" name="Circus Charlie">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="73565e52" name="Comic Bakery">
+		<year>19??</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="1ebede6d" name="Compatability">
+		<year>1983</year>
+		<manufacturer>SIL</manufacturer>
+	</hash>
+	<hash crc32="6fd31fc3" name="Cosmic Avenger">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="2913bce3" name="Crunch">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="fecfd38b" name="De Cathlon">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="2794d9f7" name="Deklarations-Program (Sw)">
+		<year>1985</year>
+		<manufacturer>Gite Sundberg</manufacturer>
+	</hash>
+	<hash crc32="3f4c0ab1" name="Demo 5 v3.1">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="a8d8ee21" name="Diamond Luis 1">
+		<year>1986</year>
+		<manufacturer>Ikesoft</manufacturer>
+	</hash>
+	<hash crc32="1ca9289b" name="Diamond Luis Editor">
+		<year>1986</year>
+		<manufacturer>Ikesoft</manufacturer>
+	</hash>
+	<hash crc32="411dc327" name="Donkey Kong">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="f61981c4" name="Emergency Landing">
+		<year>1984</year>
+		<manufacturer>John McLachlan</manufacturer>
+	</hash>
+	<hash crc32="4bc7fef2" name="Explorer 3 (Sw)">
+		<year>19??</year>
+		<manufacturer>Robert Lindh</manufacturer>
+	</hash>
+	<hash crc32="d2c16fea" name="Find It">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="54a94a93" name="First Steps">
+		<year>1983</year>
+		<manufacturer>Softy</manufacturer>
+	</hash>
+	<hash crc32="adeec6e7" name="Flipper Slipper">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="77c994d1" name="Fluffy">
+		<year>1987</year>
+		<manufacturer>JTM Software</manufacturer>
+	</hash>
+	<hash crc32="7aab6fae" name="Frantic Freddy">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="5bd12860" name="Frantic Freddy [a]">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="16336e30" name="Gateway To Apshai">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="31ba05de" name="Ghost Trap">
+		<year>19??</year>
+		<manufacturer>Yoga Computing</manufacturer>
+	</hash>
+	<hash crc32="33f59944" name="Goonies, The">
+		<year>1986</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="2a2f5665" name="Goonies, The [a]">
+		<year>1986</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="b6748d7a" name="Graph Master 2">
+		<year>1984</year>
+		<manufacturer>C.A.E.</manufacturer>
+	</hash>
+	<hash crc32="e5d5fd0a" name="Grave Digger">
+		<year>1984</year>
+		<manufacturer>J Pullen</manufacturer>
+	</hash>
+	<hash crc32="a886be3d" name="Gun Fright">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="aa8e08f8" name="Hero">
+		<year>1985</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="a8bb9f09" name="Hobbit, The">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="0bf03495" name="Horse Racing">
+		<year>1983</year>
+		<manufacturer>SIL</manufacturer>
+	</hash>
+	<hash crc32="88233a1b" name="Hyper Olympic 1">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="79120f6a" name="Hyper Olympic 2">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="600d9f1a" name="Hyper Rally">
+		<year>19??</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="9cce9640" name="Hyper Sports 1">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="24ee0086" name="Hyper Sports 2">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="ddc92a32" name="International Karate">
+		<year>1986</year>
+		<manufacturer>Darksloke</manufacturer>
+	</hash>
+	<hash crc32="2531bbd9" name="Jack The Nipper In Coconut Capers [t]">
+		<year>1987</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="45dd260b" name="Jet Alf">
+		<year>1984</year>
+		<manufacturer>ELS</manufacturer>
+	</hash>
+	<hash crc32="d063c059" name="Jet Alf And The Manic Masters Revenge">
+		<year>1984</year>
+		<manufacturer>ELS</manufacturer>
+	</hash>
+	<hash crc32="7b84ddb1" name="Joystick Nr 01 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="c220d3bd" name="Joystick Nr 02 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="8eb3baae" name="Joystick Nr 03 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="ae8d8e4b" name="Joystick Nr 04 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="23d02569" name="Joystick Nr 05 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="325aade5" name="Joystick Nr 06 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="53627b03" name="Joystick Nr 07 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="c0a94bd1" name="Joystick Nr 08 (Sw)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="f6c90712" name="Joystick Nr 09 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="dfe57e44" name="Joystick Nr 11 (Sw)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="9eec4622" name="Joystick Nr 15 (Sw)">
+		<year>1985</year>
+		<manufacturer>SAGA &amp; Joystick</manufacturer>
+	</hash>
+	<hash crc32="9e64abe3" name="Jumping Jack">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="f05fb9fc" name="Jungle Jim">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="024bd117" name="Juno Lander">
+		<year>1983</year>
+		<manufacturer>SIL</manufacturer>
+	</hash>
+	<hash crc32="1db067a3" name="JustWrite Jr">
+		<year>1984</year>
+		<manufacturer>Mass Tael</manufacturer>
+	</hash>
+	<hash crc32="cf81898b" name="Killer Car">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7bd249ea" name="Kiwi Country - South Island">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="23f20c14" name="Knightmare">
+		<year>1986</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="7e9afcb7" name="Konami's Baseball">
+		<year>19??</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="408f42c4" name="Konami's Boxing">
+		<year>1985</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="59d39bff" name="Konami's Ping Pong">
+		<year>19??</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="5c976cf3" name="Konami's Soccer">
+		<year>1985</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="073d2f2e" name="Konami's Tennis">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="5a3d35b3" name="Kung Fu Master">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="baca0c5b" name="Log It">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6e18978e" name="Looping">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="600d34b6" name="Magical Tree">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="6609db48" name="Megalone">
+		<year>1986</year>
+		<manufacturer>J&amp;D Team</manufacturer>
+	</hash>
+	<hash crc32="40ee709e" name="Megalone [a]">
+		<year>1986</year>
+		<manufacturer>J&amp;D Team</manufacturer>
+	</hash>
+	<hash crc32="c41818af" name="Memory Trainer">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="214a28c5" name="Mini Golf">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="7ee3f346" name="MKOD Collection 01">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e712815c" name="MKOD Collection 02">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9481191f" name="MKOD Collection 03">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="62932ab3" name="MKOD Collection 04">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5189a564" name="MKOD Collection 05">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e8565d26" name="MKOD Collection 06">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="982b1bf8" name="MKOD Collection 07">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="81a6781d" name="MKOD Collection 08">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e254b91a" name="MKOD Collection 09">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="53ed0e11" name="MKOD Collection 10">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="dbc9deb2" name="MKOD Collection 11">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9b0c7c31" name="MKOD Collection 12">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e064a7d8" name="MKOD Collection 13">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="1b836189" name="MKOD Collection 14">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="130c2615" name="MKOD Collection 15">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e2fc5ef9" name="MKOD Collection 16">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5806ec44" name="MKOD Collection 17">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="164ad74f" name="MKOD Collection 18">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="107983e9" name="MKOD Collection 19">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a92094e7" name="Moon Lander">
+		<year>1984</year>
+		<manufacturer>Ian McLachlan</manufacturer>
+	</hash>
+	<hash crc32="89890f20" name="Mopi Ranger">
+		<year>19??</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="06a0ca29" name="Mouse Trap">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="1635c81a" name="Mr Do">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="581497af" name="MSX v1.0">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ba202393" name="Munch-A-Math">
+		<year>1984</year>
+		<manufacturer>Spectravideo Israel</manufacturer>
+	</hash>
+	<hash crc32="13f99f21" name="Music Composer">
+		<year>1984</year>
+		<manufacturer>Ian McLachlan</manufacturer>
+	</hash>
+	<hash crc32="294ffa38" name="Music Demo 1 Arranged By Bach TP">
+		<year>19??</year>
+		<manufacturer>Bach TP</manufacturer>
+	</hash>
+	<hash crc32="d0d2e4bb" name="Music Demo 2 Arranged By Bach TP">
+		<year>19??</year>
+		<manufacturer>Bach TP</manufacturer>
+	</hash>
+	<hash crc32="c261f678" name="Music Demo 3 Arranged By Bach TP">
+		<year>19??</year>
+		<manufacturer>Bach TP</manufacturer>
+	</hash>
+	<hash crc32="126b5eec" name="Music Mentor">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="e6623f31" name="Music Mentor [h]">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="4e79dc11" name="New York Bomb Blitz">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="fb527eda" name="Nomis">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="7e78bd5c" name="O'Mac Farmer">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="eadc1154" name="Parachute Jumping">
+		<year>19??</year>
+		<manufacturer>Leo Soft</manufacturer>
+	</hash>
+	<hash crc32="44838eee" name="Pengwyn">
+		<year>19??</year>
+		<manufacturer>Postern</manufacturer>
+	</hash>
+	<hash crc32="a638f9b5" name="Pepper 2">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="ecd9c203" name="Perilous Journey">
+		<year>19??</year>
+		<manufacturer>PM Programs</manufacturer>
+	</hash>
+	<hash crc32="09447a47" name="Planet Patrol">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="6adb5186" name="Planet Patrol [a]">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="b7203e47" name="Punchy">
+		<year>19??</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="8143b755" name="Rambo 3">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="44b44122" name="Rambo 3">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="13c7106c" name="Rescue">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="e3fa4805" name="Road Fighter">
+		<year>19??</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="83c3ac0a" name="Robot Ball (Sw)">
+		<year>19??</year>
+		<manufacturer>Mirage Software</manufacturer>
+	</hash>
+	<hash crc32="4e2ab765" name="Roulette">
+		<year>1985</year>
+		<manufacturer>Intersoft</manufacturer>
+	</hash>
+	<hash crc32="5a5be05a" name="SASA">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="1ba3279a" name="Sector Alpha">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="b8225999" name="Sky Jaguar">
+		<year>1984</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="c32de9d6" name="Smurf">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="ab295b73" name="Spectra Break">
+		<year>1983</year>
+		<manufacturer>SIL</manufacturer>
+	</hash>
+	<hash crc32="409d2f40" name="Spectra Cryptic Cube">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="4d869288" name="Spectra Diary">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="d7c3928f" name="Spectra File Cabinet">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="71171e2e" name="Spectra Home Economist Coupon Management Program">
+		<year>1983</year>
+		<manufacturer>Intellisoft</manufacturer>
+	</hash>
+	<hash crc32="3649c94d" name="Spectra Home Economist Recipe Program">
+		<year>1983</year>
+		<manufacturer>Intellisoft</manufacturer>
+	</hash>
+	<hash crc32="d9f4646d" name="Spectra Trader">
+		<year>1984</year>
+		<manufacturer>A.C. Hunt</manufacturer>
+	</hash>
+	<hash crc32="dfc73d5f" name="Spectra-Font Editor">
+		<year>19??</year>
+		<manufacturer>Stephen Boal</manufacturer>
+	</hash>
+	<hash crc32="06fb22a3" name="Spectramind">
+		<year>1984</year>
+		<manufacturer>C.A.E.</manufacturer>
+	</hash>
+	<hash crc32="7c226ab8" name="Spectravideo Address Book System">
+		<year>1986</year>
+		<manufacturer>Greg L Weinstein</manufacturer>
+	</hash>
+	<hash crc32="922c81b8" name="Spectron">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="95c901db" name="Star Words">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="735d1bdd" name="Stockholm Adventure">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="669ad58c" name="Super Cross Force">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="9c3fe115" name="Swing Man">
+		<year>1983</year>
+		<manufacturer>Softy</manufacturer>
+	</hash>
+	<hash crc32="eec68527" name="Teeth">
+		<year>1984</year>
+		<manufacturer>Dan Haggren</manufacturer>
+	</hash>
+	<hash crc32="6585f71f" name="Tele Bunnie">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="3a05e2c8" name="Tetra Horror">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="deb48e14" name="Three Wall Smash">
+		<year>1984</year>
+		<manufacturer>Ian McLachlan</manufacturer>
+	</hash>
+	<hash crc32="490ea429" name="Time Trax">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="da238538" name="Track And Field 1">
+		<year>1985</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="efd7e88d" name="Treasure Chest">
+		<year>1984</year>
+		<manufacturer>Ian McLachlan</manufacturer>
+	</hash>
+	<hash crc32="a5b0364a" name="Turboat">
+		<year>1984</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="b2f00f4d" name="Typing Tutor v1.1">
+		<year>1983</year>
+		<manufacturer>S.G. Bright</manufacturer>
+	</hash>
+	<hash crc32="50e415be" name="Uncle Albert">
+		<year>1984</year>
+		<manufacturer>A.C. Hunt</manufacturer>
+	</hash>
+	<hash crc32="0be201a7" name="Wargames">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<hash crc32="b1a02c2c" name="Yie Ar Kung Fu">
+		<year>1985</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="19118024" name="Yie Ar Kung Fu 2 [t]">
+		<year>19??</year>
+		<manufacturer>Konami</manufacturer>
+	</hash>
+	<hash crc32="705882f2" name="Zakil Wood">
+		<year>1985</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="40e277a5" name="Zaxxon">
+		<year>19??</year>
+		<manufacturer>Buggy Software</manufacturer>
+	</hash>
+	<!-- Spectravideo SVI 318-328 - ROM (TOSEC-v0.01) -->
+	<hash crc32="f0c51214" name="Flipper Slipper">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="cb553ee5" name="Frantic Freddy">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="ba0c3d3c" name="Music Mentor">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="015f29ff" name="Sector Alpha">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="8d9d1db3" name="Super Cross Force">
+		<year>1983</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+	<hash crc32="943e70f2" name="Swedish Character Rom">
+		<year>19??</year>
+		<manufacturer>Spectravideo</manufacturer>
+	</hash>
+</hashfile>

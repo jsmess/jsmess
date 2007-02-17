@@ -1,0 +1,12 @@
+<hashfile>
+	<!-- ibm pc junior cartridges -->
+	<!-- partial crc (except the first 0x200 byte) would be better -->
+	<hash crc32="7cd8cf3f" name="scuba_adventure.jrc"/>
+	<hash crc32="3d3fc782" name="MINE_SHAFT.JRC"/>
+	<hash crc32="17fedf8d" name="MOUSER.JRC"/>
+	<hash crc32="9aff6bb4" name="BASIC.JRC"/>
+	<hash crc32="878952c0" name="crossfire.jrc"/>
+	<hash crc32="9e444889" name="colorpaint.jrc"/>
+	<!-- [bad dumps] -->
+	<hash crc32="c3bcb418" name="BASIC.JRC identical to 0x9aff6bb4, plain binary, 2 bytes too much"/>
+</hashfile>

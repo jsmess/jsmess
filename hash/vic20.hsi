@@ -1,0 +1,837 @@
+<hashfile>
+	<!-- Commodore VIC-20 Cartridge CRC List -->
+	<!-- Compiled by PeT and Chris Henry -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<!-- problem with file formats -->
+	<!-- prg are images, but startet with 2 bytes for its load address -->
+	<!-- so gives other crc then binary file -->
+	<!-- some roms check if they are run in ram, and stop working -->
+	<!-- MODULES not booting -->
+	<hash crc32="05acb7ab" name="adventure land (.40)(ad1)">
+		<year>1981</year>
+		<manufacturer>Scott Adams</manufacturer>
+		<status>Use sys 32592 to start</status>
+		<extrainfo>SYS32592</extrainfo>
+	</hash>
+	<hash crc32="7446c064" name="pirates cove (ad2)">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+		<status>Use sys 32592 to start</status>
+		<extrainfo>SYS32592</extrainfo>
+	</hash>
+	<hash crc32="b00c5afd" name="mission impossible (ad3)">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+		<status>Use sys 32592 to start</status>
+		<extrainfo>SYS32592</extrainfo>
+	</hash>
+	<hash crc32="05250278" name="voodoo castle (ad4)">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+		<status>Use sys 32592 to start</status>
+		<extrainfo>SYS32592</extrainfo>
+	</hash>
+	<hash crc32="144cf233" name="the count (ad5)">
+		<year>198?</year>
+		<manufacturer>Scott Adams</manufacturer>
+		<status>Use sys 32592 to start</status>
+		<extrainfo>SYS32592</extrainfo>
+	</hash>
+	<!-- extensions -->
+	<hash crc32="d37b6335" name="ieee488 interface">
+		<status>need special hardware emulation</status>
+		<extrainfo>SYS45065</extrainfo>
+	</hash>
+	<hash crc32="2d3a9984" name="Assam.prg">
+		<status>SYS700</status>
+	</hash>
+	<hash crc32="2aabd21b" name="basicv4.prg"/>
+	<hash crc32="a64b4973" name="BASIC V5.prg"/>
+	<hash crc32="d5abee97" name="Buti Toolkit.prg"/>
+	<hash crc32="ecd2d32a" name="Cassette Turbo.prg"/>
+	<hash crc32="9322c8f2" name="Combasic.prg"/>
+	<hash crc32="002add47" name="ExBASIC L2.prg"/>
+	<hash crc32="777e3915" name="Handy Toolkit.prg"/>
+	<hash crc32="f8568c38" name="HesMon-orig.prg"/>
+	<hash crc32="c0da0384" name="HesMon.prg">
+		<status>modified, rampatch?</status>
+	</hash>
+	<hash crc32="516b905f" name="Hires Toolkit.prg">
+		<status>SYS45056</status>
+	</hash>
+	<hash crc32="95ca1570" name="LADS-be01.prg">
+		<status>SYS48641</status>
+	</hash>
+	<hash crc32="f48e8526" name="Monitor-sys24576.prg">
+		<status>SYS24576</status>
+	</hash>
+	<hash crc32="78119709" name="PET Loader.prg">
+		<status>40columns, needs 8kb ram extension</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="a56ad011" name="Programmer's Aid-sys28681.prg"/>
+	<hash crc32="b3d7ddeb" name="Quick Brown Fox-sys32692.prg">
+		<status>cartridge problems?</status>
+	</hash>
+	<hash crc32="05f2f923" name="Screenmaster.prg"/>
+	<hash crc32="b86fed2f" name="smon">
+		<status>monitor program</status>
+		<extrainfo>SYS40960</extrainfo>
+	</hash>
+	<hash crc32="dbe58e31" name="Super Expander.prg">
+		<status>contains normally 3kb ram extension</status>
+	</hash>
+	<hash crc32="8fec9744" name="Turtle Graphics-2.prg"/>
+	<hash crc32="b135228f" name="Turtle Graphics.prg"/>
+	<hash crc32="4be0786c" name="VC-Extra.prg"/>
+	<hash crc32="af180441" name="Vic Forth 1.00.prg"/>
+	<hash crc32="dba0d25f" name="Vic Forth 1.10.prg"/>
+	<hash crc32="8ff6f576" name="Vic Graph.prg"/>
+	<hash crc32="997c989d" name="Vic Stat.prg"/>
+	<hash crc32="1e22a060" name="VicTool.prg">
+		<status>SYS45056</status>
+	</hash>
+	<hash crc32="852a908a" name="Vicmon-2-6000.prg">
+		<status>SYS24576</status>
+	</hash>
+	<hash crc32="7b5c0d14" name="Vicmon-2-b000.prg">
+		<status>SYS45056</status>
+	</hash>
+	<hash crc32="3cc5afce" name="Vicmon-2000.prg">
+		<status>SYS8192</status>
+	</hash>
+	<hash crc32="e238af6d" name="Vicmon-6000.prg">
+		<status>SYS24576</status>
+	</hash>
+	<hash crc32="11d8fd34" name="Vicmon-b000.prg">
+		<status>SYS45056</status>
+	</hash>
+	<hash crc32="e5878f34" name="Commodore Artist (.prg)">
+		<year>1982</year>
+		<manufacturer>Bubblesoft</manufacturer>
+		<status>Lightpen supported</status>
+	</hash>
+	<hash crc32="e91a402e" name="HesWriter.prg"/>
+	<hash crc32="9db30f5c" name="Household Finance.prg"/>
+	<hash crc32="276857e9" name="Personal Finance (.a0)">
+		<year>1982</year>
+		<manufacturer>Creative Software</manufacturer>
+	</hash>
+	<hash crc32="187884b5" name="Personal Finance.prg">
+		<status>same as 276857e9</status>
+	</hash>
+	<hash crc32="d22674a2" name="Synthesound.prg"/>
+	<hash crc32="4c10dfec" name="synthesong.prg"/>
+	<hash crc32="a763d8a7" name="themadboogy.prg"/>
+	<hash crc32="61054000" name="Wordcraft 20-6000.prg"/>
+	<hash crc32="0422a98d" name="Wordcraft 20-a000.prg"/>
+	<hash crc32="c8271475" name="Wordcraft-6000.prg">
+		<status>rampatch</status>
+	</hash>
+	<hash crc32="0422a98d" name="Wordcraft-a000.prg">
+		<status>rampatch</status>
+	</hash>
+	<hash crc32="d13a44ec" name="Wordcraft-orig-6000.prg"/>
+	<hash crc32="919e4337" name="Wordcraft-orig-a000.prg"/>
+	<hash crc32="09069642" name="Write Now-sys41000.prg"/>
+	<hash crc32="245eb63f" name="Victerm 40.prg">
+		<status>special hardware?userport?</status>
+	</hash>
+	<!-- autostart modules -->
+	<!-- work also in pal version -->
+	<hash crc32="6f4b76b6" name="Aggressor.prg"/>
+	<hash crc32="fb9daa7c" name="Amazing Maze-orig.prg"/>
+	<hash crc32="69e0b97a" name="Amok!.prg"/>
+	<hash crc32="480e2cce" name="Ape Escape.prg"/>
+	<hash crc32="e84462b1" name="Attack of the Mutant Camels.prg"/>
+	<hash crc32="d157701f" name="Bug Crusher-orig.prg"/>
+	<hash crc32="51873138" name="Cave-in.prg"/>
+	<hash crc32="c646168a" name="Computer War-orig.prg"/>
+	<hash crc32="18d44576" name="Cosmic Cruncher (.prg)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="e9d340f7" name="Cyclon.prg"/>
+	<hash crc32="a94fd714" name="Face Maker-orig.prg"/>
+	<hash crc32="c0e7308e" name="Fun with Music.prg"/>
+	<hash crc32="82f0866f" name="Galaxian.prg"/>
+	<hash crc32="8e556704" name="Gold Fever.prg"/>
+	<hash crc32="d9856e18" name="Kids on Keys.prg"/>
+	<hash crc32="b4dd5f5c" name="Medieval Joust-orig.prg"/>
+	<hash crc32="9cd79575" name="Menagerie.prg"/>
+	<hash crc32="02c22764" name="Monster Maze.prg"/>
+	<hash crc32="d0821322" name="Mutant Herd.prg"/>
+	<hash crc32="5a8ae3e6" name="Pac-Man.prg"/>
+	<hash crc32="6c5bc2cc" name="Paratrooper.prg"/>
+	<hash crc32="1706ca31" name="Protector.prg"/>
+	<hash crc32="ae663a23" name="River Rescue-orig.prg"/>
+	<hash crc32="ad92086f" name="Robot Panic.prg"/>
+	<hash crc32="351d78b0" name="Sir Lancelot.prg"/>
+	<hash crc32="9a3e2624" name="Space Snake.prg"/>
+	<hash crc32="8d728d99" name="Titan.prg"/>
+	<hash crc32="596809a8" name="Tomarc the Barbarian.prg"/>
+	<hash crc32="99fe46ea" name="Trashman.prg"/>
+	<hash crc32="805d555b" name="Tutankham.prg"/>
+	<hash crc32="9beef03e" name="Video Vermin.prg"/>
+	<hash crc32="e1b1950d" name="home_babysitter2.prg"/>
+	<hash crc32="80439200" name="Miner 2049'er (.a0)">
+		<year>1983</year>
+		<manufacturer>Reston Publishing</manufacturer>
+	</hash>
+	<hash crc32="e72d1852" name="raidonfortknow.prg"/>
+	<hash crc32="c4967f23" name="visible Solar System (.a0)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="5b8f0411" name="AE (.60)">
+		<year>198?</year>
+		<manufacturer>Br0derbund</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="05ae8278" name="AE (.a0)">
+		<year>198?</year>
+		<manufacturer>Br0derbund</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="ad217e63" name="Arachnoid (.60)">
+		<year>1982</year>
+		<manufacturer>Umi</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="ec43f977" name="Arachnoid (.a0)">
+		<year>1982</year>
+		<manufacturer>Umi</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="980ee881" name="Buck Rogers Planet of Zoom (.60)">
+		<year>1983</year>
+		<manufacturer>Sega</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="03bbef66" name="Buck Rogers Planet of Zoom (.a0)">
+		<year>1983</year>
+		<manufacturer>Sega</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="c5e2f1a0" name="Defender (.60)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="be501a8a" name="Defender (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="8a6fd10a" name="Kindercomp-6000.prg">
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="e7883426" name="Kindercomp-a000.prg">
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="320149be" name="Loderunner (.60)">
+		<year>1983</year>
+		<manufacturer>Br0derbund</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="38b757cd" name="Loderunner (.a0)">
+		<year>1983</year>
+		<manufacturer>Br0derbund</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="40ccc8e3" name="Mastertype-6000.prg">
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="738a0803" name="Mastertype-a000.prg">
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="c4ecf8cc" name="Pharaoh's Curse-6000-orig.prg">
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="6c694ba7" name="Pharaoh's Curse-a000-orig.prg">
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="be701896" name="Robotron 2084 (.60)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="3710f99e" name="Robotron 2084 (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="8817b702" name="Submarine Commander (.60)">
+		<year>1983</year>
+		<manufacturer>Thorn EMI</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="e402fb1d" name="Submarine Commander (.a0)">
+		<year>1983</year>
+		<manufacturer>Thorn EMI</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="2ee27715" name="Story Machine-6000-orig.prg">
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="a802e0ae" name="Story Machine-a000.prg">
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<!-- autostart modules ntsc required/better -->
+	<hash crc32="abaea029" name="Alien Blitz.prg"/>
+	<hash crc32="320106a4" name="Alien Sidestep.prg"/>
+	<hash crc32="6e0878de" name="Alien.prg"/>
+	<hash crc32="55cdfa8d" name="Apple Panic (.a0)">
+		<year>1982</year>
+		<manufacturer>Creative Software</manufacturer>
+	</hash>
+	<hash crc32="34b5db1d" name="Astroblitz.NTSC.prg"/>
+	<hash crc32="ef6cbf23" name="Atlantis.NTSC.prg"/>
+	<hash crc32="3efa3d06" name="Bandits.prg">
+		<status>graphics</status>
+	</hash>
+	<hash crc32="3edddd87" name="Black Hole.NTSC.prg"/>
+	<hash crc32="58371d11" name="Capture the Flag-orig.prg">
+		<status>graphics</status>
+	</hash>
+	<hash crc32="8fe265e0" name="Choplifter-orig.prg"/>
+	<hash crc32="132fa5dc" name="Chuck Norris Superkicks.prg"/>
+	<hash crc32="a6d0ebd5" name="Clowns (.a0)(joystick version)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="16b696e8" name="Clowns (.prg)(paddles version)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="f757cf4f" name="Congo Bongo.prg"/>
+	<hash crc32="aa0a7efd" name="Cosmic Jailbreak (.prg)">
+		<year>1982</year>
+		<manufacturer>Commodore UK</manufacturer>
+	</hash>
+	<hash crc32="43ae871f" name="Creepy Corridors.prg"/>
+	<hash crc32="5f5224ff" name="Crossfire.NTSC.prg"/>
+	<hash crc32="b67d37d3" name="Demon Attack.NTSC.prg"/>
+	<hash crc32="d9548319" name="Dot Gobbler-orig.prg"/>
+	<hash crc32="051bc0f7" name="Dragonfire.prg">
+		<status>graphics</status>
+	</hash>
+	<hash crc32="6622ef0c" name="Fast Eddie.prg"/>
+	<hash crc32="27c8a182" name="Final Orbit &amp; Bumper Bash-orig.prg"/>
+	<hash crc32="e55ada7e" name="Fourth Encounter.prg"/>
+	<hash crc32="c7ad5378" name="Frogger.prg"/>
+	<hash crc32="da01a054" name="Garden Wars (.prg)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="2b5d7c06" name="Ghost Manors.prg"/>
+	<hash crc32="00167fcb" name="Gorf (.prg)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="df20d5bb" name="Gridrunner.prg"/>
+	<hash crc32="a860a356" name="IFR (Flight Simulator).prg"/>
+	<hash crc32="ea9ffeaa" name="Jawbreaker II.NTSC.prg"/>
+	<hash crc32="e7bf5cbf" name="Jelly Monsters.prg"/>
+	<hash crc32="18e177f1" name="Jupiter Lander (.a0)">
+		<year>198?</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="3f2f8ed1" name="Maze.prg"/>
+	<hash crc32="6232aa40" name="Mine Madness.prg"/>
+	<hash crc32="9c2d1185" name="Mole Attack (.a0)">
+		<year>198?</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="2c20505c" name="Money War (.a0)">
+		<year>1982</year>
+		<manufacturer>Commodore &amp; Hal Labs.</manufacturer>
+	</hash>
+	<hash crc32="2748727e" name="Motocross Racer.prg"/>
+	<hash crc32="a3761fd8" name="Number Nabber / Shape Grabber (.prg)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="f2d3cddc" name="Omega Race (.prg)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="5a8ae3e6" name="PacMan (.prg)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="1beba5cf" name="Pipes.prg"/>
+	<hash crc32="a0f06e31" name="Poker.prg"/>
+	<hash crc32="aa2860f3" name="Polaris.prg"/>
+	<hash crc32="cc7a18a0" name="Predator.prg"/>
+	<hash crc32="44d180a8" name="Princess and Frog.prg"/>
+	<hash crc32="e557c145" name="Q-Bert.prg"/>
+	<hash crc32="32fd3657" name="Radar Rat Race (.prg)">
+		<year>1981</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="e72d1852" name="raid on fort knox.PRG"/>
+	<hash crc32="30793abe" name="Renaissance.prg"/>
+	<hash crc32="76fd9286" name="Road Race (.prg)">
+		<year>1981</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="91ed60f3" name="Robin Hood.prg"/>
+	<hash crc32="c8b92a7e" name="Sargon II (.prg)">
+		<year>1979</year>
+		<manufacturer>Hayden Book Co.</manufacturer>
+	</hash>
+	<hash crc32="41f7c57a" name="Satellite Patrol.prg"/>
+	<hash crc32="6770e9bb" name="Seawolf (.a0)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Uses Paddles</status>
+	</hash>
+	<hash crc32="305d2a91" name="Serpentine.NTSC.prg"/>
+	<hash crc32="1ef76efa" name="shamus.prg"/>
+	<hash crc32="f46561f7" name="Skibbereen.NTSC.prg"/>
+	<hash crc32="06d3756a" name="Snake Byte.prg"/>
+	<hash crc32="a002f34c" name="speedbingomath.a0"/>
+	<hash crc32="a002f34c" name="Speed Math / Bingo Math (.a0)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="a726fb8f" name="Spider City.NTSC.prg">
+		<status>graphics</status>
+	</hash>
+	<hash crc32="f0eb9d52" name="Spike's Peak.prg"/>
+	<hash crc32="c2c71111" name="Spills and Fills.prg"/>
+	<hash crc32="dd32d560" name="Star Battle.prg"/>
+	<hash crc32="34e894f9" name="Star Post (.a0)">
+		<year>198?</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Uses Paddles</status>
+	</hash>
+	<hash crc32="e3855353" name="Star Trek - S.O.S-orig.prg"/>
+	<hash crc32="e2d177c4" name="Super Amok.prg"/>
+	<hash crc32="272cdb3a" name="Super Slot.prg"/>
+	<hash crc32="58c3d41a" name="super_smash_ntsc.prg"/>
+	<hash crc32="20991751" name="The Sky is Falling (.prg)">
+		<year>1981</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Uses Paddles</status>
+	</hash>
+	<hash crc32="8364dbbd" name="Tooth Invaders (.a0)">
+		<year>1983</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="c33d17ec" name="Threshold.prg"/>
+	<hash crc32="b5758fdb" name="Topper.NTSC.prg"/>
+	<hash crc32="2ab29f62" name="Turmoil.prg"/>
+	<hash crc32="562c6b8e" name="Type Attack.prg"/>
+	<hash crc32="6aeb8a4e" name="Typo.prg"/>
+	<hash crc32="8a7c3a97" name="Vic Avenger (.a0)">
+		<year>1981</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="cd544b8d" name="vic_music_composer.prg"/>
+	<hash crc32="c7750bda" name="Vic Super Lander.prg"/>
+	<hash crc32="9277db98" name="Alphabet Zoo-6000-orig.prg"/>
+	<hash crc32="be529890" name="Alphabet Zoo-a000.prg"/>
+	<hash crc32="54cc4e6e" name="Artillery Duel (.60)">
+		<year>1983</year>
+		<manufacturer>Xonox</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="53c08b56" name="Artillery Duel (.a0)">
+		<year>1983</year>
+		<manufacturer>Xonox</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="4e071227" name="Battlezone (.60)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="1c5ad2c3" name="Battlezone (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="b1befa8a" name="Cannonball Blitz (.20)">
+		<year>1982</year>
+		<manufacturer>Sierra On-Line</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="0007facf" name="Cannonball Blitz (.a0)">
+		<year>1982</year>
+		<manufacturer>Sierra On-Line</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="76c930ed" name="Centipede (.20)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="845a3e3c" name="Centipede (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="a86f3072" name="Dancing Bear-2000.prg"/>
+	<hash crc32="4f758d9c" name="Dancing Bear-a000.prg"/>
+	<hash crc32="c41beb1f" name="Dig Dug (.20)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="fb8d109a" name="Dig Dug (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="471c04e4" name="Donkey Kong (.20)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="982523cc" name="Donkey Kong (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="d9579f2f" name="In the Chips-6000.prg"/>
+	<hash crc32="cb29a59d" name="In the Chips-a000.prg"/>
+	<hash crc32="52cf382e" name="Jungle Hunt (.60)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="c1114c57" name="Jungle Hunt (.a0)">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="86e49944" name="Lunar Leeper-2000.prg"/>
+	<hash crc32="90882c6e" name="Lunar Leeper-a000.prg"/>
+	<hash crc32="5a0b7e5d" name="Moon Patrol (.60)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="b47f9971" name="Moon Patrol (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="62efe05d" name="Mountain King (.60)">
+		<year>1983</year>
+		<manufacturer>E.F. Dreyer Inc.</manufacturer>
+		<status>Part 1 of 2 files; Issue: Flickering</status>
+	</hash>
+	<hash crc32="ad3ff0a4" name="Mountain King (.a0)">
+		<year>1983</year>
+		<manufacturer>E.F. Dreyer Inc.</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="45af030c" name="Ms. PacMan (.60)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="ffd1ab54" name="Ms. PacMan (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="5a6d36e0" name="Pinball 2 (.60) (Use Paddles)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="46cc3836" name="Pinball 2 (.a0) (Use Paddles)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="e0c6b380" name="Pole Position (.60)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="548c1ef9" name="Pole Position (.a0)">
+		<year>1983</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="3157c53a" name="Seafox-6000.prg"/>
+	<hash crc32="f151b7ad" name="Seafox-a000.prg"/>
+	<hash crc32="07cbdd86" name="Sky Blazer (.60)">
+		<year>1983</year>
+		<manufacturer>Br0derbund</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="c9c0b743" name="Sky Blazer (.a0)">
+		<year>1983</year>
+		<manufacturer>Br0derbund</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="afd4bc60" name="Springer-6000.prg"/>
+	<hash crc32="ba030d46" name="Springer-a000.prg"/>
+	<!-- autostart modules pal required/better -->
+	<hash crc32="b6b867f3" name="A World at War.prg"/>
+	<hash crc32="9eac9fab" name="Arcardia (.a0)">
+		<year>198?</year>
+		<manufacturer>Unknown</manufacturer>
+		<status>also sold as tape for gv!</status>
+	</hash>
+	<hash crc32="43f88f24" name="Catch a Snatch.prg"/>
+	<hash crc32="6557dd82" name="Cloudburst.prg"/>
+	<hash crc32="5b6dec8b" name="Deadly Duck.prg"/>
+	<hash crc32="70360801" name="Deadly Skies.prg"/>
+	<hash crc32="a9d493f4" name="Meteor Run.prg"/>
+	<hash crc32="b51a8a47" name="Mosquito Infestation.prg"/>
+	<hash crc32="86d8f968" name="Outworld.prg"/>
+	<hash crc32="a693e658" name="Quackers.prg"/>
+	<hash crc32="2d5394d9" name="Rat Hotel-orig.prg"/>
+	<hash crc32="cccbf367" name="Satellites and Meteorites.PAL.prg"/>
+	<hash crc32="f4d2edfd" name="Scorpion.prg"/>
+	<hash crc32="8174a8e9" name="Spiders of Mars.prg"/>
+	<hash crc32="46c9a46e" name="Sub Chase.prg"/>
+	<hash crc32="747d872b" name="Tank Atak.prg"/>
+	<hash crc32="16462e72" name="Terraguard.prg"/>
+	<hash crc32="fdb657d8" name="Videomania.prg"/>
+	<hash crc32="72ee00db" name="K-Razy Antiks (.60)">
+		<year>1982</year>
+		<manufacturer>CBS</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="324e2a30" name="K-Razy Antiks (.a0)">
+		<year>1982</year>
+		<manufacturer>CBS</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="2ffd2894" name="K-Star Patrol (.60)">
+		<year>1982</year>
+		<manufacturer>CBS</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="2fe93f44" name="K-Star Patrol (.a0)">
+		<year>1982</year>
+		<manufacturer>CBS</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<!-- [ alternate versions] -->
+	<hash crc32="eac0e4e4" name="vic_rat_race-vic_car_race.prg">
+		<status>cars instead of rat/cats</status>
+	</hash>
+	<!-- single rom versions exists (these are most likely older, when -->
+	<!-- a single 8kb rom was more expensive than 2 4kb roms or not available -->
+	<hash crc32="fc1005e5" name="Apple Panic-6000.prg"/>
+	<hash crc32="4ea8314d" name="Apple Panic-a000.prg"/>
+	<hash crc32="61a7ff89" name="Renaissance-6000.prg"/>
+	<hash crc32="5e900aba" name="Renaissance-a000.prg"/>
+	<hash crc32="44d68854" name="Spiders of Mars-6000.prg"/>
+	<hash crc32="af6029ad" name="Spiders of Mars-a000.prg"/>
+	<hash crc32="3398686d" name="Tank Atak-6000.prg"/>
+	<hash crc32="a5dcd7bd" name="Tank Atak-a000.prg"/>
+	<hash crc32="f7814d49" name="Trashman-6000.prg"/>
+	<hash crc32="08439b77" name="Trashman-a000.prg"/>
+	<hash crc32="489c90ba" name="outworld-ntsc-6000.prg">
+		<status>ntsc variant</status>
+		<extrainfo>NTSC</extrainfo>
+	</hash>
+	<hash crc32="e8e91f7e" name="outworld-ntsc-a000.prg">
+		<status>ntsc variant</status>
+		<extrainfo>NTSC</extrainfo>
+	</hash>
+	<hash crc32="ce7a2b6a" name="satellites_and_meteorites-ntsc-6000.prg">
+		<status>ntsc variant</status>
+		<extrainfo>NTSC</extrainfo>
+	</hash>
+	<hash crc32="a0aa3971" name="satellites_and_meteorites-ntsc-a000.prg">
+		<status>ntsc variant</status>
+		<extrainfo>NTSC</extrainfo>
+	</hash>
+	<hash crc32="b90028f7" name="aggressor_set2.prg"/>
+	<hash crc32="a3dee7bf" name="Jelly Monsters-v2.prg"/>
+	<hash crc32="7344efe7" name="poker_set2.prg"/>
+	<hash crc32="ffde52d7" name="radar_rat_race-set2.prg"/>
+	<hash crc32="5bc47b2d" name="super_slot_set2.prg"/>
+	<hash crc32="fd8ae97b" name="the_sky_is_falling_set2.prg"/>
+	<hash crc32="18e177f1" name="vic_super_lander-jupiter_lander.a0"/>
+	<hash crc32="358bd70a" name="visible_solar_system_set2.prg"/>
+	<hash crc32="d14da9cd" name="visible_solar_system_set3-solar_system.prg"/>
+	<hash crc32="11ff6aa8" name="Astroblitz.PAL.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="a68f3a00" name="Atlantis.PAL.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="d9bd6f6b" name="Black Hole.PAL.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="e9aec695" name="Crossfire.PAL.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="e3902433" name="Demon Attack.PAL.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="a92bfff2" name="Jaw Breaker 2 (.a0)">
+		<year>1983</year>
+		<manufacturer>Sierra On-Line</manufacturer>
+	</hash>
+	<hash crc32="af49f519" name="Serpentine.PAL.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="29f8ae4f" name="Skibbereen.PAL.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="ca77cc4d" name="super_smash_pal.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="faba62f1" name="pinball_spectacular-6000.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<hash crc32="213c2f7a" name="pinball_spectacular-a000.prg">
+		<status>pal variant</status>
+		<extrainfo>PAL</extrainfo>
+	</hash>
+	<!-- [modified] -->
+	<hash crc32="cea4b3ad" name="Pharaoh's Curse-6000.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="0e3e7b70" name="Pharaoh's Curse-a000.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="e582bc3b" name="Story Machine-6000.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="1bb72b23" name="Alphabet Zoo-6000.prg">
+		<status>modified</status>
+		<extrainfo>NTSC</extrainfo>
+	</hash>
+	<hash crc32="c9ef3486" name="amazing_maze-rampatch.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="f65d414d" name="Bug Crusher.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="1ba71e8a" name="Computer War.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="1c5be60a" name="Cosmic Cruncher-trained.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="9a5d8269" name="cosmiccruncher_varinitfix.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="62c18aa3" name="Face Maker.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="efc4664c" name="Jelly Monsters-fixed.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="f34199b9" name="Jelly Monsters-v2-fixed.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="1ac9702c" name="Medieval Joust.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="46de6452" name="omega_race-rampatch-trained.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="f2d3cddc" name="omega_race-rampatch.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="03a4a4ba" name="river_rescue-rampatch.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="ebc47838" name="shamus-rampatch.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="51d284f7" name="vic_music_composer_rampatch.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="86a118f0" name="Dot Gobbler.prg">
+		<status>modified</status>
+		<extrainfo>NTSC</extrainfo>
+	</hash>
+	<!-- ntsc? -->
+	<hash crc32="d999aa24" name="Capture the Flag.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="16765985" name="Choplifter.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="91b1528f" name="Final Orbit &amp; Bumper Bash.prg">
+		<status>modified</status>
+	</hash>
+	<hash crc32="da3972e1" name="Star Trek - S.O.S.prg">
+		<status>modified</status>
+	</hash>
+	<!-- pal? -->
+	<hash crc32="fa310373" name="rat_hotel-rampatch.prg">
+		<status>modified</status>
+	</hash>
+	<!-- no real differences -->
+	<hash crc32="ac77913d" name="cosmiccruncher_bd_fillbyte.prg">
+		<status>same as 18d44576</status>
+	</hash>
+	<!-- [format] -->
+	<!-- simply different file format, has the annoying header in it -->
+	<hash crc32="9f122010" name="Speed Math / Bingo Math (.prg)">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>same as a002f34c</status>
+	</hash>
+	<hash crc32="963b2cae" name="Jaw Breaker 2 (.prg)">
+		<year>1983</year>
+		<manufacturer>Sierra On-Line</manufacturer>
+		<status>pal variant, same as a92bfff2</status>
+		<extrainfo>&#220;A&#214;</extrainfo>
+	</hash>
+	<!-- [no cartridges] -->
+	<!-- most likely simple programs to be loaded into ram at 0xa000 -->
+	<!-- but somebody might thing these are real moduls -->
+	<hash crc32="3a8cacbc" name="colortest">
+		<extrainfo>RESET</extrainfo>
+	</hash>
+	<!-- needs ram at 0xa000 -->
+	<hash crc32="1c9e7282" name="bewitched">
+		<status>load program at 0xa000 ram, press restore</status>
+		<extrainfo>RESET</extrainfo>
+	</hash>
+	<hash crc32="bbfdc960" name="ET">
+		<status>load program at 0xa000 ram, press restore</status>
+		<extrainfo>RESET</extrainfo>
+	</hash>
+	<hash crc32="d1ad4e34" name="amidar">
+		<year>load program at 0xa000 ram, press restore</year>
+		<manufacturer>PAL,RESET</manufacturer>
+	</hash>
+	<hash crc32="2bc4b231" name="frantic">
+		<year>load program at 0xa000 ram, press restore</year>
+		<manufacturer>PAL,RESET</manufacturer>
+	</hash>
+	<hash crc32="89e49a93" name="inventions">
+		<status>load program at 0xa000 ram, press restore</status>
+		<extrainfo>RAM, RESET</extrainfo>
+	</hash>
+	<!-- converted to modules (without init of video chip) -->
+	<hash crc32="b5ce2d3a" name="FLIPPER1.PRG">
+		<status>load program at 0xa000 ram, press restore</status>
+		<extrainfo>NOTPOWERUP, RESET</extrainfo>
+	</hash>
+	<hash crc32="43e45c34" name="SCRAM20.PRG">
+		<status>load program at 0xa000 ram, press restore</status>
+		<extrainfo>NOTPOWERUP, RESET</extrainfo>
+	</hash>
+</hashfile>

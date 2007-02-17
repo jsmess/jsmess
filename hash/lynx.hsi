@@ -1,0 +1,747 @@
+<hashfile>
+	<!-- This MESS CRC file is based on a generated one from Cowering's Good databases -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status | MESS keywords -->
+	<!-- MESS keywords -->
+	<!-- ROTATE90DEGREE rotate display and pad 90 degree clockwise -->
+	<!-- ROTATE270DEGREE -->
+	<!-- redumps needed T-RES, TETRIS -->
+	<hash crc32="540e9bb7" name="Alien Vs Predator (Prototype) [!]">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="f6fb48fb" name="APB - All Points Bulletin">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="0483cd2a" name="Awesome Golf">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>rasterline, hanging</status>
+	</hash>
+	<hash crc32="033d5225" name="Baseball Heroes">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging </status>
+	</hash>
+	<hash crc32="4161bb4a" name="Basketbrawl">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="277f82c2" name="Batman Returns">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="779faece" name="Battle Wheels">
+		<year>1993</year>
+		<manufacturer>Beyond Games</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="30fee726" name="Battlezone 2000">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="143a313e" name="Bill &amp; Ted's Excellent Adventure">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3cd75df3" name="Block Out">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="daf587b1" name="Blue Lightning">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="bfe36525" name="Blue Lightning Demo">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+		<status>street graphics</status>
+	</hash>
+	<hash crc32="333daece" name="Bubble Trouble">
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+		<status>line glitch</status>
+	</hash>
+	<hash crc32="a08f0b59" name="California Games">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed,graphics </status>
+	</hash>
+	<hash crc32="97501709" name="Centipede (beta)">
+		<year>198?</year>
+		<manufacturer>Shadowsoft</manufacturer>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="19c5a7a5" name="Checkered Flag">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="6a5f53ed" name="Chip's Challenge">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b02821fa" name="Conquest of Zow">
+		<year>1996</year>
+		<status>speed</status>
+	</hash>
+	<hash crc32="aec474c8" name="Crystal Mines II">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b9ac1fe5" name="Desert Strike - Return to the Gulf">
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+		<status>line glitches</status>
+	</hash>
+	<hash crc32="2f54810d" name="Digidemo (PD)">
+		<year>199x</year>
+		<status>not working</status>
+	</hash>
+	<hash crc32="a8e505e5" name="Digidemo 2 (PD)">
+		<year>199x</year>
+		<status>not working</status>
+	</hash>
+	<hash crc32="50386cfa" name="Dinolympics">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>timer too fast</status>
+	</hash>
+	<hash crc32="d565fbb7" name="Dirty Larry - Renegade Cop">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="fbfc0f05" name="Double Dragon">
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="33bb74c7" name="Dracula - The Undead">
+		<year>1991</year>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="5598a4c9" name="Dragnet">
+		<year>1995</year>
+		<status>???</status>
+	</hash>
+	<hash crc32="bd97116b" name="Electrocop">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+		<status>graphics </status>
+	</hash>
+	<hash crc32="f83397f9" name="European Soccer Challenge">
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="6bceaa9c" name="Eye of the Beholder (beta1)">
+		<year>1990</year>
+		<manufacturer>NuFX</manufacturer>
+		<status>speed </status>
+	</hash>
+	<hash crc32="9034ee27" name="Fat Bobby">
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="7e4b5945" name="Fidelity Ultimate Chess Challenge">
+		<year>1991</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="494cc568" name="Gates of Zendocon, The">
+		<year>1989</year>
+		<status>graphics, sound</status>
+	</hash>
+	<hash crc32="7f0ec7ad" name="Gauntlet - The Third Encounter">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>graphics, line glitch, speed</status>
+		<extrainfo>ROTATE90DEGREE</extrainfo>
+	</hash>
+	<hash crc32="d20a85fc" name="Gordo 106 - The Mutated Lab Monkey">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="6df63834" name="Hard Drivin'">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+		<status>graphics</status>
+	</hash>
+	<hash crc32="e8b45707" name="Hockey">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="e3041c6c" name="Hydra">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>graphics</status>
+	</hash>
+	<!-- ####### = Hyperdrome | 1999 | Telegames | -->
+	<hash crc32="5cf8bbf0" name="Ishido - The Way of the Stones">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2455b6cf" name="Jimmy Conners Tennis">
+		<year>1991</year>
+		<status>speed</status>
+	</hash>
+	<hash crc32="5dba792a" name="Joust">
+		<year>1993</year>
+		<manufacturer>Williams</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="a53649f1" name="Klax">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+		<extrainfo>ROTATE90DEGREE</extrainfo>
+	</hash>
+	<hash crc32="bed5ba2b" name="Krazy Ace - Minature Golf">
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="cd1bd405" name="Kung Food">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="39b9b8cc" name="Lemmings">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+		<status>sound</status>
+	</hash>
+	<hash crc32="0271b6e9" name="Lexis">
+		<year>1999</year>
+		<manufacturer>Songbird Productions</manufacturer>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="b1c25ef1" name="Loopz (beta)">
+		<year>1992</year>
+		<manufacturer>HandMade Software</manufacturer>
+	</hash>
+	<hash crc32="1091a268" name="Lynx Casino">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="28ada019" name="Lynx Diagnostic Cart V0.02">
+		<year>1989?</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<!-- ####### = Lynx Othello | 1999 | Harry Dodgson -->
+	<hash crc32="aba6da3d" name="Malibu Bikini Volleyball">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="323af126" name="Marble Madness 0.999 (PD)">
+		<manufacturer>Matthias Domin</manufacturer>
+	</hash>
+	<hash crc32="c3fa0d4d" name="Marlboro Go! (beta)">
+		<year>1993</year>
+		<manufacturer>Digital Image</manufacturer>
+	</hash>
+	<hash crc32="7de3783a" name="Ms. Pac-Man">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="006fd398" name="NFL Football">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="22d47d51" name="Ninja Gaiden">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="f3e3f811" name="Ninja Gaiden III - The Ancient Ship of Doom">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="aa50dd22" name="Pac-Land">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="4cdfbd57" name="Paperboy">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="14d38ca7" name="Pinball Jam">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2393135f" name="Pit Fighter - The Ultimate Competition">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="99c42034" name="Power Factor">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="f6f43c87" name="Puzzler 2000">
+		<year>1998</year>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="b9881423" name="Qix">
+		<year>1991</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="bcd10c3a" name="Raiden">
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+		<status>hanging</status>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="b10b7c8e" name="Rampage">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="139f301d" name="Rampart">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="69959a3b" name="Road Riot 4WD (beta)">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="6867e80c" name="RoadBlasters">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="d1dff2b2" name="Robo-Squash">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="7a6049b5" name="Robotron 2084">
+		<year>1991</year>
+		<manufacturer>Williams</manufacturer>
+	</hash>
+	<hash crc32="67e5bdba" name="Rygar - Legendary Warrior">
+		<year>1990</year>
+	</hash>
+	<hash crc32="8595c40b" name="S.T.U.N. Runner">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="be166f3b" name="Scrapyard Dog">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="eb78baa3" name="Shadow of the Beast">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="192bcd04" name="Shanghai">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<!-- ####### = S.I.M.I.S. | 1998 | Self-published | -->
+	<!-- ####### = SokoMania | 1999 | MW Software | -->
+	<hash crc32="5b2308ed" name="Steel Talons">
+		<year>1991</year>
+		<status>graphics</status>
+	</hash>
+	<hash crc32="2da7e2a8" name="Super Asteroids &amp; Missile Command">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+		<status>invisible sprites in mc</status>
+	</hash>
+	<hash crc32="690caeb0" name="Super Off-Road">
+		<year>1996</year>
+		<manufacturer>Telegames</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="dfa61571" name="Super Skweek">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="13657705" name="Switchblade II">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="ae267e29" name="Todd's Adventure in Slime World">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="156a4a4c" name="Toki">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>too fast?</status>
+	</hash>
+	<hash crc32="0590a9e3" name="Tournament Cyberball 2072">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="a4b924d6" name="Turbo Sub">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="8d56828b" name="Viking Child">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b946ba49" name="Warbirds">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="91233794" name="World Class Soccer">
+		<year>1992</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="9bed736d" name="Xenophobe [a1]">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b5406a9a" name="Xenophobe">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<hash crc32="89e2a595" name="Xybots">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>speed</status>
+	</hash>
+	<hash crc32="cb27199d" name="Zarlor Mercenary">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>hanging</status>
+	</hash>
+	<!-- objects -->
+	<hash crc32="3469d418" name="loderunner.o"/>
+	<hash crc32="58d0fcfb" name="pong5.o">
+		<status>BS96 id, xhandy expects BS93</status>
+	</hash>
+	<hash crc32="8350df4d" name="Snakebyte.o (PD)">
+		<status>hanging</status>
+	</hash>
+	<hash crc32="2708643d" name="t_tris.o">
+		<status>hanging</status>
+	</hash>
+	<hash crc32="a261fcbc" name="t_tris_set2.o">
+		<status>hanging</status>
+	</hash>
+	<!-- overdumped -->
+	<hash crc32="d0ee9038" name="Basketbrawl">
+		<year>1992</year>
+	</hash>
+	<hash crc32="46729ae6" name="Battle Wheels [o1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="1ac56ac4" name="Block Out [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="2eaa9bfd" name="Blue Lightning">
+		<year>1989</year>
+	</hash>
+	<hash crc32="30becfcf" name="Blue Lightning Demo [o1]">
+		<year>1989</year>
+	</hash>
+	<hash crc32="fe50b5d0" name="California Games [o1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="0785c9f2" name="Chip's Challenge [o1]">
+		<year>1989</year>
+	</hash>
+	<hash crc32="a1973918" name="Crystal Mines II [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="44ee8069" name="Electrocop [o1]">
+		<year>1989</year>
+	</hash>
+	<hash crc32="49d2eb22" name="European Soccer Challenge [o1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="b8f9be69" name="Fidelity Ultimate Chess Challenge [o1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="d0514175" name="Gates of Zendocon, The [o1]">
+		<year>1989</year>
+	</hash>
+	<hash crc32="ac564baa" name="Gauntlet - The Third Encounter [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="6dcc5c79" name="Hard Drivin' [o1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="d80e7d52" name="Ishido - The Way of the Stones [o1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f4ae42a1" name="Joust [o1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="34f4b5ab" name="Ms. Pac-Man [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="769d9ed0" name="Pac-Land [o1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="c32dff68" name="Paperboy [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="9b5c4627" name="Qix [o1]">
+		<year>1991</year>
+	</hash>
+	<hash crc32="d8569327" name="Robo-Squash [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="6439a8ee" name="Shanghai [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="5a5e86cc" name="Super Asteroids &amp; Missile Command [o1]">
+		<year>1995</year>
+	</hash>
+	<hash crc32="02153c28" name="Todd's Adventure in Slime World [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="3450ab05" name="Warbirds [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="45edb4d7" name="Xenophobe alt [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e0a1eea3" name="Xenophobe [o1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="577eb5ae" name="Zarlor Mercenary [o1]">
+		<year>1990</year>
+	</hash>
+	<!-- bad dumps -->
+	<hash crc32="dfe41168" name="APB - All Points Bulletin">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="f8d32d28" name="Awesome Golf">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="ac082945" name="Baseball Heroes">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="f4348e05" name="Basketbrawl">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="b331e8ec" name="Batman Returns">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="dc1719c4" name="Bill &amp; Ted's Excellent Adventure">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="1d9d8a5c" name="Checkered Flag">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="0120eac4" name="Desert Strike - Return to the Gulf">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="ea6c6d7b" name="Dinolympics">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="7b641963" name="Dirty Larry - Renegade Cop">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="c18169f7" name="Double Dragon">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="761ccd17" name="Dracula - The Undead">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="eabd3210" name="Gordo 106 - The Mutated Lab Monkey">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="6d778383" name="Gordo 106 - The Mutated Lab Monkey">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="a96b08ba" name="Hockey">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="04eec3d9" name="Hydra">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="bc3b9bb7" name="Jimmy Conners Tennis">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="fb562789" name="Jimmy Conners Tennis">
+		<year>1991</year>
+		<status>Known Bad Dump, no lynx file</status>
+	</hash>
+	<hash crc32="03af03c6" name="Jimmy Conners Tennis">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="eebadbe6" name="Klax">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="967ca345" name="Krazy Ace - Minature Golf">
+		<year>1997</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="fb562789" name="Krazy Ace - Minature Golf">
+		<year>1997</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="542659fd" name="Kung Food">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="30f010ab" name="Lemmings">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="cfd6e1c8" name="Lynx Casino">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="9bae6929" name="Malibu Bikini Volleyball">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="685375cf" name="NFL Football">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="e54b48ba" name="Ninja Gaiden">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="995f1eb3" name="Ninja Gaiden III - The Ancient Ship of Doom">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="a955faef" name="Ninja Gaiden III - The Ancient Ship of Doom">
+		<year>1993</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="81da358f" name="Pinball Jam">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="6da7cc00" name="Pit Fighter - The Ultimate Competition">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="147fa7de" name="Power Factor">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="7f139864" name="Rampage">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="926a6f25" name="Rampart">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="1e9c3cd1" name="RoadBlasters">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="abcf7789" name="Rygar - Legendary Warrior">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="0cda1f28" name="S.T.U.N. Runner">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="3a215bf0" name="Scrapyard Dog">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="360a1ce9" name="Shadow of the Beast">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="4e22275f" name="Steel Talons">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="982cca4f" name="Super Skweek">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="5e4df4e4" name="Switchblade II">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="ec5bbc61" name="T-RES (title unknown)">
+		<year>199x</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="3ca0ed33" name="Tetris">
+		<year>1996</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="372d8895" name="Tetris">
+		<year>1996</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="663c01f2" name="Tetris">
+		<year>1996</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="c72fa98b" name="Toki">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="e7b83517" name="Tournament Cyberball 2072">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="6b6d9d30" name="Turbo Sub">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="39732e90" name="Viking Child">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="bc0bdbc3" name="World Class Soccer">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="dfa1293b" name="World Class Soccer">
+		<year>1992</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="e4f262f3" name="Xybots">
+		<year>1991</year>
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="1ae6e455" name="Zarlor Mercenary">
+		<year>1990</year>
+		<status>Known Bad Dump</status>
+	</hash>
+</hashfile>

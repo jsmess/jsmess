@@ -1,0 +1,185 @@
+<hashfile>
+	<!-- Texas Instruments TI-99/4A Command Module CRC List -->
+	<!-- Compiled by Chris Henry and Stefano &quot;JoJo&quot; Priore -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<!-- Notes for this System: Images of Command Modules (TI99 cartridges) are frequently -->
+	<!-- split into a GROM (image name ending in G), a ROM (Ending in C or CROM), and a Banked -->
+	<!-- Image (Ending in d or DROM). -->
+	<hash crc32="bd8addb9" name="Addatex Games -or- Super X Basic -or- TI Extended Basic (CROM)">
+		<status>Split Image/Requires GROM &amp; DROM</status>
+	</hash>
+	<hash crc32="d5a91251" name="Addatex Games -or- Super X Basic (DROM)">
+		<status>Split Image/Requires CROM and GROM</status>
+	</hash>
+	<hash crc32="07379908" name="Addatex Games (GROM)">
+		<status>Split Image/Requires DROM &amp; CROM</status>
+		<extrainfo>NOT PLAYABLE</extrainfo>
+	</hash>
+	<hash crc32="872738d4" name="Addition and Subtraction I  (GROM)"/>
+	<hash crc32="bae92e8f" name="Addition and Subtraction II (GROM)"/>
+	<hash crc32="9e2f66e3" name="Milliken Addition Sequence (GROM)"/>
+	<hash crc32="fb186f7b" name="Adventure (GROM)">
+		<year>198?</year>
+		<manufacturer>?</manufacturer>
+		<status>Requires a data disk image</status>
+	</hash>
+	<hash crc32="b890076f" name="A-maze-ing (GROM)"/>
+	<hash crc32="46a115d4" name="The Attack (GROM)"/>
+	<hash crc32="285954b4" name="Blackjack and Poker (GROM)"/>
+	<hash crc32="2a5882d7" name="Blasto (GROM)"/>
+	<hash crc32="8c1e3030" name="Burgertime (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="ed7ef022" name="Burgertime (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="a19f5140" name="Car Wars (GROM)"/>
+	<hash crc32="83c08f7b" name="Championship Baseball (GROM)">
+		<year>198?</year>
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="63a5574a" name="Championship Baseball (CROM)">
+		<year>198?</year>
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="b259f38d" name="Chisholm (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="6fd908cf" name="Chisholm (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="0cb4b327" name="Congo Bongo (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="478d9835" name="Congo Bongo (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="0a80afc7" name="Demon Attack (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="cadb08a6" name="Demon Attack (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="1e8fecb7" name="Demonstration (GROM)"/>
+	<hash crc32="e3ce581e" name="Diagnotics (GROM)"/>
+	<hash crc32="782dad02" name="Dig Dug (CROM)">
+		<status>Split Image/Requires DROM</status>
+	</hash>
+	<hash crc32="27a453ad" name="Dig Dug (DROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="05697f12" name="Disk Manager 1 (GROM)"/>
+	<hash crc32="3ebc8398" name="Disk Manager 2 (GROM)"/>
+	<hash crc32="67aaf792" name="Division I (GROM)"/>
+	<hash crc32="b05871e9" name="Milliken Division Sequence (GROM)"/>
+	<hash crc32="de8deb4d" name="Editor Assembler (GROM)">
+		<year>1981</year>
+		<manufacturer>Texas Instruments</manufacturer>
+		<status>Part 2 of 2 files</status>
+	</hash>
+	<hash crc32="d2e63192" name="Editor Assembler (GROM)">
+		<year>1981</year>
+		<manufacturer>Texas Instruments</manufacturer>
+		<status>Part 1 of 2 files</status>
+	</hash>
+	<hash crc32="b1ba3c6c" name="Early Learning Fun (GROM)"/>
+	<hash crc32="b8eebb05" name="Face Maker (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="7969b265" name="Face Maker (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="e423f735" name="Football (GROM)"/>
+	<hash crc32="7a5ac86f" name="Hangman (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="20832307" name="Hangman (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="15b29e69" name="Home Financial Decisions (GROM)"/>
+	<hash crc32="17cf25dd" name="Hopper -or- Sneggit (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="94710cfb" name="Hopper (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="4f06f1b8" name="Household Budget Management (GROM)">
+		<year>1979</year>
+		<manufacturer>Texas Instruments</manufacturer>
+	</hash>
+	<hash crc32="6a5a3f97" name="Hunt the Wumpus (GROM)"/>
+	<hash crc32="8e7d5b68" name="Hustle (GROM)"/>
+	<hash crc32="182d4f33" name="Jungle Hunt (CROM)">
+		<status>Split Image/Requires DROM</status>
+	</hash>
+	<hash crc32="61c2166f" name="Jungle Hunt (DROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="a123c577" name="Micro Surgeon (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="51b2a37f" name="Micro Surgeon (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="50400a10" name="Mind Challengers (GROM)"/>
+	<hash crc32="3e13163c" name="Mini Memory (GROM)">
+		<year>1981</year>
+		<manufacturer>Texas Instruments</manufacturer>
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="e0bc224d" name="Mini Memory (CROM)">
+		<year>1981</year>
+		<manufacturer>Texas Instruments</manufacturer>
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="421130b4" name="Mini Writer 2 (CROM)">
+		<year>1986</year>
+		<manufacturer>DataBioTics</manufacturer>
+	</hash>
+	<hash crc32="b6ed3371" name="Minus Mission (GROM)">
+		<year>1982</year>
+		<manufacturer>DLM and Texas Instruments</manufacturer>
+	</hash>
+	<hash crc32="036052c9" name="Moon Patrol (CROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="fba58be2" name="Moon Patrol (DROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="7318f573" name="Multiplan (v1.04) (GROM)">
+		<year>1981</year>
+		<manufacturer>Microsoft</manufacturer>
+		<status>Requires data disk image</status>
+	</hash>
+	<hash crc32="6ba9d602" name="Multiplication I (GROM)"/>
+	<hash crc32="a40fa3b7" name="Milliken Multiplication Sequence (GROM)"/>
+	<hash crc32="4890758f" name="Munchman (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="b60b0301" name="Munchman (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="eacf398c" name="Munch Mobile (GROM)">
+		<status>Split Image/Requires CROM</status>
+	</hash>
+	<hash crc32="2aba3240" name="Munch Mobile (CROM)">
+		<status>Split Image/Requires GROM</status>
+	</hash>
+	<hash crc32="f362f861" name="Music Maker (GROM)"/>
+	<hash crc32="8910b4df" name="Number Magic (GROM)"/>
+	<hash crc32="c37e0373" name="Numeration 2: At the Carnival (GROM)"/>
+	<hash crc32="4868b7d1" name="Personal Real Estate Investment (GROM)"/>
+	<hash crc32="d16853ee" name="Personal Record Keeping (GROM)"/>
+	<hash crc32="d9ba4b60" name="Soccer (GROM)"/>
+	<hash crc32="6a24d715" name="Speech Editor (GROM)"/>
+	<hash crc32="16369f1f" name="Statistics (GROM)"/>
+	<hash crc32="7a24106a" name="Milliken Subtraction Sequence (GROM)"/>
+	<hash crc32="0a7cdd26" name="TI Logo (GROM)"/>
+	<hash crc32="8489b5c7" name="Video Games 1 (GROM)"/>
+	<hash crc32="a8e6b0f7" name="Video Games 2 (GROM)"/>
+	<hash crc32="d974cd5a" name="Video Graphs (GROM)"/>
+	<!-- [known_bad_dumps] -->
+</hashfile>

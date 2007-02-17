@@ -1,0 +1,660 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- these results are based on a modified mess054 version -->
+	<!-- some programs will not work with your version (deskmate2, storm tandy mode, ...) -->
+	<!-- second field for hardware tokens -->
+	<!-- use ! for marking not supported features -->
+	<!-- system -->
+	<!-- SLOWPC -->
+	<!-- PC -->
+	<!-- AT -->
+	<!-- PS2 microchannel -->
+	<!-- cpu -->
+	<!-- 80186 needs 80186 type instructions (pusha, ... -->
+	<!-- V30 needs 70116 type instructions -->
+	<!-- 8080 needs V30 8080 emulation (not in V30MX) -->
+	<!-- 80286 needs 80286 type instructions (protected mode) -->
+	<!-- 80386 needs 80386 type instructions -->
+	<!-- operating system -->
+	<!-- IBMBIOS -->
+	<!-- BOOT game can be bootet -->
+	<!-- MSDOS game is a msdos program -->
+	<!-- video -->
+	<!-- MONO textmode at mono address -->
+	<!-- COLOR textmode at color address -->
+	<!-- CGA game supports cga graphics -->
+	<!-- PCJR game supports PCJR graphics (none CGA mode) -->
+	<!-- TANDY game supports (none CGA, PCJR mode) -->
+	<!-- PC1512 special 640x200x16 mode -->
+	<!-- PLANTRONICS special 320x200x16 mode -->
+	<!-- HERCULES games supports hercules graphics -->
+	<!-- EGA -->
+	<!-- MCGA -->
+	<!-- VGA -->
+	<!-- audio -->
+	<!-- PC -->
+	<!-- PCJR sn76496 sound generator -->
+	<!-- TANDY (SL,TL,HL series) PCJR+DAC -->
+	<!-- ROLAND wavetable synthesizer synthesizer -->
+	<!-- CMS creativ music system/gameblaster (2* saa1099 sound generators) -->
+	<!-- ADLIB ym3812/opl2 fm synthesizer -->
+	<!-- SB soundblaster adlib+dac; on some models CMS or socket for CMS chips -->
+	<!-- SB2 44100kHz mono -->
+	<!-- SBPRO 2* opl2 synthesizer; 2x22100kHz stereo -->
+	<!-- SBPRO2 opl3 synthesizer instead of 2* opl2 synthesizers -->
+	<!-- SB16 2x44100kHz stereo -->
+	<!-- inputs -->
+	<!-- PCKEYBOARD has keyboard repeating effect on newer ATs -->
+	<!-- TANDY keyboard -->
+	<!-- JOYSTICK -->
+	<!-- PC1512JOYSTICK -->
+	<!-- MOUSE -->
+	<!-- PS2MOUSE -->
+	<!-- BUSMOUSE -->
+	<!-- PC1512MOUSE -->
+	<hash crc32="79c8ef92" name="cpm86.dsk">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="bed9e4ea" name="cpm86v11.dsk"/>
+	<hash crc32="155314cd" name="cpm86v11.qm"/>
+	<hash crc32="ddfe9550" name="dos11.dsk">
+		<year>MSDOS</year>
+		<manufacturer>boot sector not IBMPC/MSDOS2? conform; not working</manufacturer>
+	</hash>
+	<!-- tandy1000hx non-manual rebooting problems -->
+	<hash crc32="60b41a4a" name="tandy1000hx_deskmate2.dsk">
+		<year>Tandy graphics</year>
+		<manufacturer>Tandy1000HX deskmate boot only</manufacturer>
+	</hash>
+	<hash crc32="7f7044b0" name="amstrad_pc1512_1of5.dsk (46001, msdos32, uk)"/>
+	<hash crc32="3fca05f1" name="amstrad_pc1512_1of5.cfi (46001)">
+		<year>CFI/FDCOPY format</year>
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="fb870594" name="amstrad_pc1512_4of5.dsk (46004, digital research dosplus)"/>
+	<hash crc32="e534bae7" name="amstrad_pc1512_4of5.cfi (46004)">
+		<year>CFI/FDCOPY format</year>
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="274129d5" name="amstrad_pc1640_1of4.dsk (47001, msdos32, uk)"/>
+	<hash crc32="24aceec4" name="amstrad_pc1640_1of4.cfi (47001)">
+		<year>CFI/FDCOPY format</year>
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="8d73042c" name="amstrad_ppc512_1of2.dsk (ppc640us1, msdos33)"/>
+	<hash crc32="256f7e2c" name="amstrad_ppc512_1of2.cfi (ppc640us1)">
+		<year>CFI/FDCOPY format</year>
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="4371334b" name="amstrad_ppc512_2of2.dsk (ppc640us2)"/>
+	<hash crc32="5cfb80f0" name="amstrad_ppc512_2of2.cfi (ppc640us2)">
+		<year>CFI/FDCOPY format</year>
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="7419e356" name="sinclair_pc200_reconstructed.dsk (msdos33)"/>
+	<!-- 354dd7a6 = pc200dos.zip = 7419e356 -->
+	<!-- d4f70142 = pc200dos.zip (info same as 7419e356)(not fitting on 1 720 kbyte disk) -->
+	<hash crc32="8f4aa272" name="europc.dsk, procomm, ... (schneiderv11/msdos330a)">
+		<manufacturer>problems in europc</manufacturer>
+	</hash>
+	<hash crc32="c13a98ca" name="nwdos_1of7.dsk (novelldos70 german)">
+		<year>LOAD-/SAVEDSKF format</year>
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="0c123641" name="pcdos_63.dsk (ibm pcdos 6.3)">
+		<year>LOAD-/SAVEDSKF format</year>
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="5126ecbb" name="os2_21german.dsk (os2 2)">
+		<year>80386</year>
+		<manufacturer>LOAD-/SAVEDSKF format</manufacturer>
+		<status>not supported</status>
+	</hash>
+	<hash crc32="f8a89442" name="os2warp30german_1of2.dsk (os2 2)">
+		<year>80386</year>
+		<manufacturer>LOAD-/SAVEDSKF format</manufacturer>
+		<status>not supported</status>
+	</hash>
+	<hash crc32="38506b7c" name="os2warp30german_2of2.dsk (os2 2)">
+		<year>80386</year>
+		<manufacturer>LOAD-/SAVEDSKF format</manufacturer>
+		<status>not supported</status>
+	</hash>
+	<hash crc32="3e4e049a" name="yggdrasil_35.exe (linux)">
+		<year>80386</year>
+		<manufacturer>disk express self extract image</manufacturer>
+		<status>not supported</status>
+	</hash>
+	<hash crc32="6ab3ccc1" name="yggdrasil_525.exe (linux)">
+		<year>80386</year>
+		<manufacturer>disk express self extract image</manufacturer>
+		<status>not supported</status>
+	</hash>
+	<hash crc32="08977fce" name="1on1new_cracked.img">
+		<year>CGA</year>
+		<manufacturer>t1000hx graphics pos</manufacturer>
+	</hash>
+	<!-- 1on1new.td0 -->
+	<hash crc32="a61cb787" name="1on1new.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="475920eb" name="3k_trivia.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="75827d32" name="five_a_side.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="0a4a81d7" name="seven_cities_of_gold_cracked.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="b3e24813" name="seven_cities_of_gold.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<!-- seven_cities_of_gold.td0 -->
+	<hash crc32="14f5c537" name="seven_cities_of_gold_historical_map.img"/>
+	<hash crc32="42d69292" name="seven_cities_of_gold_historical_map.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<!-- seven_cities_of_gold_historical_map.td0 -->
+	<hash crc32="23228e10" name="alleycat.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="484ebbbd" name="archon_cracked.img">
+		<manufacturer>hanging</manufacturer>
+	</hash>
+	<!-- archon.td0 -->
+	<hash crc32="775760b8" name="archon.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="6d3f174b" name="battle_zone.dsk">
+		<year>CGA</year>
+	</hash>
+	<!-- battle_zone.td0 -->
+	<hash crc32="c1cb107c" name="bcs_quest_for_tires.dsk">
+		<year>CGA</year>
+	</hash>
+	<!-- bedlam -->
+	<hash crc32="51776f1d" name="beyond_castle_wolfenstein.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="b5ed200c" name="big_top.dsk"/>
+	<!-- big top -->
+	<hash crc32="acce36e4" name="the_black_cauldron_v11k_1of2.img">
+		<year>CGA, PCJR, !EGA graphics; PCJR sound</year>
+	</hash>
+	<hash crc32="1ebf83e2" name="the_black_cauldron_v11k_2of2.img"/>
+	<hash crc32="fa24b4eb" name="the_black_cauldron_v11m_1of2.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="fdd97d57" name="the_black_cauldron_v11m_2of2.img"/>
+	<!-- 0552c2b2 = black_cauldron_1of2 | | protected -->
+	<!-- blackcauldron_1of2.td0 -->
+	<!-- b46666d6 = black_cauldron_2of2 -->
+	<hash crc32="ad364736" name="boulder_dash_cracked.dsk">
+		<year>CGA, !EGA</year>
+	</hash>
+	<hash crc32="f16bb596" name="boulder_dash_cracked_set2.dsk"/>
+	<!-- boulder_dash.td0 -->
+	<hash crc32="09b4eb1a" name="buck_rogers_planet_of_zoom.img">
+		<year>CGA</year>
+	</hash>
+	<!-- buck_rogers_planet_of_zoom.td0 -->
+	<hash crc32="fed8d765" name="centiped.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="400161de" name="commando.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="3c009966" name="conflict_in_vietnam.img">
+		<year>CGA, PCJR graphics</year>
+		<manufacturer>tandy graphics refresh</manufacturer>
+	</hash>
+	<hash crc32="efbf2c8a" name="congo_bongo.img">
+		<year>CGA, !PCJR graphics</year>
+	</hash>
+	<!-- congo_bongo.td0 -->
+	<hash crc32="bdbf6911" name="conquest.img">
+		<year>CGA, !PCJR</year>
+		<manufacturer>sound</manufacturer>
+	</hash>
+	<hash crc32="d7f44e44" name="cosmic_crusader.img">
+		<year>CGA, !PCJR graphics</year>
+	</hash>
+	<!-- cosmic_crusader -->
+	<!-- crazy_cars -->
+	<hash crc32="0550c8f1" name="czorian.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="886eef78" name="deadline.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="34435a3c" name="decathlon.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<!-- decathlon.td0 -->
+	<hash crc32="82caa523" name="defender.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="ee0aaa0a" name="digdug.img">
+		<manufacturer>hanging</manufacturer>
+	</hash>
+	<hash crc32="a983ea69" name="digger.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="88a1bd70" name="donald_ducks_playground.img">
+		<manufacturer>problems in t1000hx</manufacturer>
+	</hash>
+	<hash crc32="dffb898a" name="donkey_kong.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<!-- donkey_kong.td0 -->
+	<hash crc32="b9262dc3" name="dunzhin_cracked.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="13d252cc" name="enchant.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="bf4ed336" name="f15_strike_eagle_cga.img">
+		<year>CGA graphics</year>
+	</hash>
+	<hash crc32="a22616ed" name="f15_strike_eagle_ega.img">
+		<year>CGA, PCJR, EGA, PC1512</year>
+	</hash>
+	<hash crc32="86736968" name="FLEETSW.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="a7b4b916" name="fs105.img">
+		<manufacturer>graphics</manufacturer>
+	</hash>
+	<hash crc32="d9dbd43a" name="flight_simulator_v21_cracked.img"/>
+	<!-- flysim21.td0 -->
+	<hash crc32="39bf411c" name="flight_simulator_v212.img"/>
+	<hash crc32="1af20e34" name="flight_simulator_v213.img">
+		<year>CGA, !PCJR, !EGA</year>
+	</hash>
+	<hash crc32="728a8706" name="forge (dforge?).img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="e8413321" name="freddy.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="00886c06" name="frogger.img">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="abcd0f8e" name="frogger2_threeedeep.img">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="1e03e31a" name="GALAXIAN.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="e1e76736" name="GALAXian_TENgen.IMG">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="575b20a3" name="game_over2.dsk">
+		<year>CGA, HERCULES; PC1512 Joystick</year>
+		<manufacturer>11334 for 2nd world</manufacturer>
+	</hash>
+	<!-- gameover2.td0 -->
+	<hash crc32="fb1977f8" name="gamma_force.img">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="ebb63563" name="guerilla_war.img">
+		<year>PCJR</year>
+	</hash>
+	<hash crc32="1ddc6b5b" name="guerilla_war_1of2.img"/>
+	<hash crc32="19d3f409" name="guerilla_war_2of2.img"/>
+	<hash crc32="919b3aff" name="hard_hat_mack_cracked.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="60d86261" name="hard_hat_mack.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<!-- hard_hat_mack.td0 -->
+	<hash crc32="4cab2a01" name="hellcat_ace.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="83c27427" name="hitchhik.img">
+		<manufacturer>write protect?</manufacturer>
+	</hash>
+	<!-- jet.td0 -->
+	<hash crc32="3c45cfbb" name="ikari_warriors_1of2.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="a8ee4437" name="ikari_warriors_2of2.img"/>
+	<!-- ikari_warriors_1of2.td2 -->
+	<!-- ikari_warriors_2of2.td2 -->
+	<hash crc32="125dfecf" name="ikari_warriors_1of2.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="7ac9ba9e" name="ikari_warriors_2of2.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="67302d10" name="jhunt.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="6ca10992" name="jumpman.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="7ff4c263" name="karnov_1of2.img">
+		<year>PCJR</year>
+	</hash>
+	<hash crc32="8bf3bab8" name="karnov_2of2.img"/>
+	<hash crc32="a331a88b" name="kings_quest.img">
+		<year>CGA,!HERCULES</year>
+		<manufacturer>sound</manufacturer>
+	</hash>
+	<hash crc32="524c1991" name="kings_quest_pcjr.img">
+		<manufacturer>only text (in t1000hx)</manufacturer>
+	</hash>
+	<hash crc32="6c5508cb" name="kings_quest_tandy.img">
+		<year>Tandy graphics; PCJR sound</year>
+	</hash>
+	<hash crc32="b5569081" name="kings_quest2_v10w_1of2.dsk">
+		<year>CGA, !HERCULES, PCJR graphics; PCJR sound</year>
+	</hash>
+	<hash crc32="8e605724" name="kings_quest2_v10w_2of2.dsk"/>
+	<hash crc32="4107b044" name="kings_quest2_v11h_1of2.dsk"/>
+	<hash crc32="66d16848" name="kings_quest2_v11h_2of2.dsk"/>
+	<!-- ca44ddc6 = kings_quest2_1of2.dsk | | protected -->
+	<!-- 66d16848 = kings_quest2_2of2.dsk | -->
+	<!-- kings_quest2_1of2.td0 -->
+	<!-- kings_quest2_2of2.td0 -->
+	<hash crc32="3f32ce7e" name="kobayashi_naru.dsk">
+		<year>CGA, TANDY</year>
+	</hash>
+	<hash crc32="9f4d2299" name="lane_mastodon.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="48b01e7f" name="lock_on_1of2.dsk">
+		<year>CGA, EGA</year>
+	</hash>
+	<hash crc32="5e7df33e" name="lock_on_2of2.dsk"/>
+	<hash crc32="284b4c71" name="lode_runner.dsk">
+		<year>SLOWPC; CGA</year>
+		<manufacturer>a for digging</manufacturer>
+	</hash>
+	<hash crc32="256bcd8c" name="marble_madness_1of2.img">
+		<year>CGA, !PCJR, !EGA graphics; PCJR sound</year>
+	</hash>
+	<hash crc32="a7489b5e" name="marble_madness_2of2.img"/>
+	<!-- marble_madness_1of2.td0 -->
+	<hash crc32="b1bce76c" name="marble_madness_1of2.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="867b674d" name="metropolis_1of2.img">
+		<year>PCJR graphics</year>
+	</hash>
+	<hash crc32="8faedec3" name="metropolis_2of2.img"/>
+	<hash crc32="50e33532" name="mind_mirror_cracked.img">
+		<year>CGA</year>
+	</hash>
+	<!-- mind_mirror.td0 -->
+	<hash crc32="baa259ab" name="mind_mirror.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="b6838149" name="mine_shaft_pcjr_cartridge.img">
+		<year>hanging</year>
+	</hash>
+	<hash crc32="a6847754" name="montezumas_revenge.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="abba0f4a" name="moon_patrol.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="7148422b" name="msadvent.img">
+		<year>hanging</year>
+	</hash>
+	<hash crc32="29a7126d" name="ms_pacman_atari.img">
+		<manufacturer>interrupt</manufacturer>
+	</hash>
+	<hash crc32="565eef6c" name="ms_pacman_namco.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="7eacaab4" name="music_construction_set.img">
+		<year>CGA</year>
+	</hash>
+	<!-- music_contruction_set.td0 -->
+	<hash crc32="d719e5f6" name="music_contruction_set.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="f9bd3885" name="oils_well.img">
+		<manufacturer>error</manufacturer>
+	</hash>
+	<hash crc32="812d0781" name="PACMAN.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="3a3b51d5" name="pcpool.img">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="6460e995" name="pinball_construction_set_cracked.img">
+		<year>CGA</year>
+	</hash>
+	<!-- pinball_construction_set_fixed.td0 -->
+	<hash crc32="3b83c0c6" name="pinball_construction_set_fixed.cp2">
+		<manufacturer>not supported</manufacturer>
+	</hash>
+	<hash crc32="db732151" name="pirates 1of2">
+		<year>CGA, PCJR, EGA; PCJR sound</year>
+		<manufacturer>ignore handbook question</manufacturer>
+	</hash>
+	<hash crc32="964cb6c9" name="pirates 2of2"/>
+	<!-- pirates_1of2.td0 -->
+	<!-- pirates_2of2.td0(short) -->
+	<hash crc32="1313323e" name="PITSTOP2.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<!-- pool challenges -->
+	<hash crc32="76bc5d26" name="prowler.img">
+		<year>CGA, PCJR, EGA </year>
+	</hash>
+	<!-- psion_chess.td0 -->
+	<hash crc32="7f516928" name="RASTERSCan.IMg">
+		<year>CGA, PCJR, EGA</year>
+	</hash>
+	<hash crc32="b27e3691" name="ROBOTRON.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="3c981642" name="ROLLO_and_the_brush_bros.IMG">
+		<year>CGA</year>
+		<manufacturer>sound</manufacturer>
+	</hash>
+	<hash crc32="18190a62" name="SEASTALK.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="d05ae01e" name="SERENIA.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="a3970236" name="SHAMUS.IMG">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="00d5f3b5" name="silent_service.dsk">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="4cbe0758" name="silent_service_cracked.dsk"/>
+	<!-- silentservice.td0 -->
+	<hash crc32="89af96f6" name="SPACE_STRike.IMG">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="053759a8" name="SPIDERBoT.IMG">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="52fe8abc" name="SPITFIRE_ace.IMG">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="34d9574c" name="STORM.IMG">
+		<year>CGA, PCJR, EGA, PC1512</year>
+	</hash>
+	<hash crc32="3a26d545" name="styx.dsk">
+		<year>CGA</year>
+		<manufacturer>sound, t1000hx hanging</manufacturer>
+	</hash>
+	<hash crc32="a210eb97" name="summer_games2_amstrad_original.dsk">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="5b415b79" name="summer_games2_amstrad_original.vm ("/>
+	<hash crc32="6c86e370" name="summer_games2.dsk">
+		<year>CGA, !PCJR, !EGA</year>
+	</hash>
+	<hash crc32="a9ebb8f5" name="summer_games2_cracked.dsk"/>
+	<hash crc32="fc9cf67c" name="SUSPNDED.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="93ed4c56" name="TAG_TEAM_wrestling.IMG">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<!-- tapper.td0 -->
+	<hash crc32="87c26f8d" name="the_SLUGGER.IMG">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="80aba066" name="the_world_greatest_baseball_game.dsk">
+		<year>CGA, !PCJR</year>
+	</hash>
+	<hash crc32="0fbaedb6" name="TOUCHDWN.IMG">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="94a48b25" name="TRILOGY.IMG">
+		<year>CGA, PCJR, EGA</year>
+	</hash>
+	<hash crc32="51346a1f" name="TRIVIA_101.IMG">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="8879486a" name="trolls_tale.img">
+		<year>CGA, !PCJR graphics</year>
+	</hash>
+	<hash crc32="de4e13e8" name="tv_and_cinema_101.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="9bae2a6a" name="ulysses_and_the_golden_fleece_1of2.dsk">
+		<manufacturer>not working</manufacturer>
+	</hash>
+	<hash crc32="1158d503" name="ulysses_and_the_golden_fleece_2of2.dsk"/>
+	<hash crc32="da4e5f88" name="victory_road.img">
+		<year>PCJR</year>
+	</hash>
+	<hash crc32="3b900af8" name="winter_games.dsk">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="497d8e2a" name="winter_games_set2.dsk"/>
+	<hash crc32="e25283c2" name="winter_games_set3.dsk"/>
+	<hash crc32="2525eb36" name="witness.dsk">
+		<year>hanging</year>
+	</hash>
+	<hash crc32="9e782f77" name="wizardry_master.dsk">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="bd217834" name="wizardry_scenery.dsk"/>
+	<hash crc32="c0a04c32" name="wizardry_original_master.dsk"/>
+	<hash crc32="4235ab09" name="wizardry_original_scenery.dsk"/>
+	<hash crc32="d2c5ab5c" name="wizardry2_master.dsk"/>
+	<hash crc32="79c89e6a" name="wizardry2_scenery.dsk"/>
+	<hash crc32="5509a2d2" name="wizardry3_master.dsk"/>
+	<hash crc32="86ff176f" name="wizardry3_scenery.dsk"/>
+	<hash crc32="e33b0ade" name="wizardry4_master.dsk"/>
+	<hash crc32="a85a5459" name="wizardry5_master.dsk"/>
+	<!-- wizball -->
+	<hash crc32="6800b13d" name="world_games_cracked.dsk">
+		<year>CGA</year>
+	</hash>
+	<!-- world_games.td0 -->
+	<hash crc32="9dce18ed" name="world_karate_championship.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="07d22e2a" name="zaxxon.dsk">
+		<year>not working</year>
+	</hash>
+	<!-- zaxxon.td0 (short) -->
+	<hash crc32="05e849f6" name="zork1.img">
+		<year>hanging</year>
+	</hash>
+	<hash crc32="f996567f" name="zork3.img">
+		<year>hanging</year>
+	</hash>
+	<hash crc32="a3f35f67" name="zork_quest.img">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="77b62719" name="zork_quest2.img"/>
+	<hash crc32="2361a2ed" name="zyll.dsk">
+		<year>disk boot failure</year>
+	</hash>
+	<!-- fbac5e69=defender.com | 80386+ | defender of the crown (file game.dat 1d0ee2cb) starter | ignore &quot;insert real second disk&quot; -->
+	<hash crc32="1d0ee2cb" name="defender_of_the_crown.dsk("/>
+	<hash crc32="39d2730e" name="defender_of_the_crown_1of2.dsk (1st half of 0x1d0ee2cb)">
+		<year>CGA</year>
+	</hash>
+	<hash crc32="f47b29d8" name="defender_of_the_crown_2of2.dsk (2nd half of 0x1d0ee2cb)">
+		<year>PCJR, EGA graphics; PCJR sound</year>
+	</hash>
+	<!-- ultima5_1of4.td0| MSDOS -->
+	<hash crc32="aa522ee9" name="ultima5_2of4.dsk"/>
+	<hash crc32="ec90b6da" name="ultima5_3of4.dsk"/>
+	<hash crc32="7d2001bc" name="ultima5_4of4.dsk"/>
+	<!-- basic_stamp.td0 | MSDOS -->
+	<hash crc32="0bd2bbba" name="transylvania_1000.dsk">
+		<year>BOOT; MSDOS; PCJR graphics</year>
+		<manufacturer>t1000hx booting trouble</manufacturer>
+	</hash>
+	<!-- leisure suit larry in the land of the lounge lizards | CGA, HERCULES, PCJR, EGA graphics; PCJR sound | alt-x -->
+	<!-- leisure suit larry 3 | CMS, tandy1000 sl tl sound -->
+	<!-- thexder | CGA, TANDY, EGA graphics; PCJR sound -->
+	<!-- days of thunder | CGA, EGA, VGA, MCGA; ROLAND, ADLIB -->
+	<!-- commander keen episode 4 ega | EGA; ADLIB -->
+	<!-- grand prix circuit | CGA, HERCULES, PCJR, EGA | pc beeper -->
+	<!-- space quest 3 | CGA, PCJR EGA, TANDY graphics; ADLIB, PCJR, CMS, TANDY SL TL HL sound | pcjr graphics in t1000hx -->
+	<!-- bubble bobble | CGA, TANDY=&gt;PCJR graphics; ADLIB, CMS, TANDY=&gt;PCJR sound | original exe has speed problems on newer cpus (80486 cache trashing?) | adlib, cms speed -->
+	<!-- harmony | CGA, EGA, PCJR, VGA graphics; PCJR, CMS? sound| | pcjr sound thin, ega graphics, cms not recognized -->
+	<!-- jbird | CGA -->
+	<!-- space commanders | CGA -->
+	<!-- space commanders II | CGA -->
+	<!-- sokoban | CGA, PCJR graphics -->
+	<!-- mach3 | CGA | beeper speech! | audio -->
+	<!-- nebulus | EGA | keyboard, speed -->
+	<!-- arkanoid2_revenge_of_doh | CGA, Herkules, EGA, Tandy=&gt;PCJR graphics; Adlib, Tandy sound | -->
+	<!-- skyshark | CGA, EGA; Adlib -->
+	<!-- [at disks] -->
+	<!-- msdos&gt;=3.0? -->
+	<hash crc32="766e612c" name="ultima 5">
+		<year>MSDOS</year>
+		<manufacturer>CGA, EGA, PCJR graphics</manufacturer>
+	</hash>
+	<!-- chess_master_3000.td0 -->
+	<!-- overdumps -->
+	<hash crc32="c85598c1" name="deskmate_install_1of5">
+		<year>MSDOS</year>
+	</hash>
+	<hash crc32="9d14fc5c" name="deskmate_install_2of5">
+		<year>MSDOS</year>
+	</hash>
+	<hash crc32="0cbe386b" name="deskmate_install_3of5">
+		<year>MSDOS</year>
+	</hash>
+	<hash crc32="200dc9a3" name="deskmate_install_4of5">
+		<year>MSDOS</year>
+	</hash>
+	<hash crc32="c2ed638a" name="deskmate_install_5of5">
+		<year>MSDOS</year>
+	</hash>
+	<hash crc32="7e06b921" name="bardstale.dsk">
+		<year>MSDOS; CGA, EGA, PCJR graphics</year>
+	</hash>
+	<hash crc32="952eb63f" name="bardstale2_the_destiny_knight.dsk">
+		<year>MSDOS; CGA, EGA, PCJR graphics</year>
+	</hash>
+	<hash crc32="dae9ce4e" name="robot_odyssey.dsk, msdos,...">
+		<year>MSDOS</year>
+	</hash>
+	<hash crc32="4dffd95e" name="nightpin.dsk">
+		<year>MSDOS</year>
+		<manufacturer>only 60kbyte nightpin.exe interesting</manufacturer>
+	</hash>
+	<hash crc32="f1a072cd" name="fs2.dsk">
+		<year>MSDOS</year>
+		<manufacturer>only flysim21.td0 interesting</manufacturer>
+	</hash>
+	<!-- bad -->
+	<hash crc32="96e4d981" name="blues brothers">
+		<manufacturer>BAD (teledisk dumpproblem)</manufacturer>
+	</hash>
+	<hash crc32="d3210f8a" name="prehistorik1">
+		<manufacturer>BAD (teledisk dumpproblem)</manufacturer>
+	</hash>
+</hashfile>

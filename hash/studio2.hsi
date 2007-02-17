@@ -1,0 +1,67 @@
+<hashfile>
+	<!-- rca studio II -->
+	<hash crc32="d7fdedaa" name="Baseball"/>
+	<!-- Press key 0 on keyboard A -->
+	<!-- Player using Keyboard A bats first - Key 5 swings bat. -->
+	<!-- B player pitches: Key 2 inside curve, key 5 straight, key 8 outside curve. -->
+	<!-- Hold key down for 1/4 second for change up. -->
+	<!-- B player attempts to catch ball after it is hit by moving fielders with -->
+	<!-- key 2 up and key 8 down. -->
+	<!-- Keyboards change function every 1/2 inning. -->
+	<hash crc32="b30af7a9" name="Blackjack"/>
+	<!-- On Keyboard A press Key 1 for 1 player game; Key 2 for 2 player game -->
+	<!-- Cut: When &quot;Cut&quot; appears on screen, press Key 0 on either keyboard. -->
+	<!-- Bet : Each player bets from $1 (Key 1) to $10 (Key 0) on their keyboard -->
+	<!-- Hit:Key 1    * Double: Key 2     * Stand: Key 0 -->
+	<!-- Stakes: $200 * $999 breaks bank. -->
+	<hash crc32="a21590c8" name="Tennis"/>
+	<!-- Squash (1 player): Press key A1 to program -->
+	<!-- Tennis (2 players): Press Key A2 to program. -->
+	<!-- Racquet Size : Key #4 small;#5 medium ; #6 large -->
+	<!-- (B Keyboard only for squash) -->
+
+	<!-- Ball Speed and start game: Key A7, slow; A8,normal; A9,fast. -->
+	<!-- 2 &amp; 8 move paddles. -->
+	<hash crc32="021551f2" name="Spacewar"/>
+	<!-- Horizontal Intercept : Press Key A1 to prgram; -->
+	<!-- Key A2 Fires Rockets -->
+	<!-- Keys B4 and B6 Steer Rockets -->
+	<!-- Vertical Intercept   : Press Key A3 to program; -->
+	<!-- Keys A2 and B2 Fire Rockets -->
+	<hash crc32="a80379e2" name="Speedway"/>
+	<!-- Speedway (9 lap race): Press Key 1 on Keyboard A. Using both keyboards, -->
+	<!-- players use keys 2(up) 8 (down) 4 (left) and 6 (right) to control -->
+	<!-- car direction. -->
+	<!-- Tag: Press Key 2 on Keyboard A. Using both keyboards, players use keys -->
+	<!-- 2,4,6 and 8 to move spot. Spot with black marker chases solid white spot. -->
+	<!-- Each &quot;tag&quot; scores 10 points. Game lasts two minutes. -->
+	<hash crc32="5dd1c2e3" name="Hockey">
+		<year>2000</year>
+		<manufacturer>Paul Robson</manufacturer>
+	</hash>
+	<!-- Keys : -->
+	<!-- Up/Down         Key 8 and Key 2 on the appropriate pads -->
+	<!-- Serve           Either Key 0 -->
+
+	<!-- Start: -->
+	<!-- 1       Hockey (Sort of) -->
+	<!-- 2       Soccer (or doubles tennis ?) -->
+	<!-- 3       Pong -->
+	<!-- 4       Squash -->
+	<!-- then -->
+	<!-- 8       Easy -->
+	<!-- 9       Hard -->
+	<hash crc32="f5cf01fb" name="Invaders">
+		<year>2000</year>
+		<manufacturer>Paul Robson</manufacturer>
+	</hash>
+	<!-- There are 4 rows of 8 invaders ; and no mothership (due to screen space -->
+	<!-- restrictions (invader rows) and memory restrictions (mothership). -->
+
+	<!-- Keys : -->
+	<!-- Left    [4, Left  Pad] -->
+	<!-- Right   [6, Left  Pad] -->
+	<!-- Fire    [0, Right Pad] -->
+	<!-- Restart [0, Left  Pad] -->
+	<!-- [baddump] -->
+</hashfile>

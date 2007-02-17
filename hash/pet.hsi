@@ -1,0 +1,87 @@
+<hashfile>
+	<!-- Commodore PET series image CRC List -->
+	<!-- Compiled by Stefano &quot;JoJo&quot; Priore and Peter Trauner -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<!-- These programs have been tested and work -->
+	<hash crc32="4BEABA9C" name="17 Und 4.prg"/>
+	<hash crc32="79EF2618" name="3-D Irrgartengenerator.prg"/>
+	<hash crc32="4EBCCD65" name="3-D Tic-Tac-Toe.prg"/>
+	<hash crc32="1CD63912" name="4-Gewinnt.prg"/>
+	<hash crc32="7CBFB531" name="Bomberangriff.prg"/>
+	<hash crc32="069D7E20" name="Crash.prg"/>
+	<hash crc32="2AB2474B" name="Destruct.prg"/>
+	<hash crc32="13782695" name="Diktator.prg"/>
+	<hash crc32="069F8C8D" name="Dungeon.prg">
+		<year>1979</year>
+		<manufacturer>Brian Sawyer</manufacturer>
+	</hash>
+	<hash crc32="2E61376C" name="Fire!.prg">
+		<year>1980</year>
+		<manufacturer>Brian Sawyer</manufacturer>
+	</hash>
+	<hash crc32="954BF1A9" name="Flugzeuglandung.prg"/>
+	<hash crc32="F4BD75FF" name="Gnad'dir Gott.prg">
+		<manufacturer>Wilhelm J. Pentzel</manufacturer>
+	</hash>
+	<hash crc32="16AB25C1" name="Hit The Target.prg"/>
+	<hash crc32="DFCC03D4" name="Hockenheimrennen.prg"/>
+	<hash crc32="4C3F11E5" name="Kurvendiskussion.prg">
+		<status>Full of bugs!</status>
+	</hash>
+	<hash crc32="49B495E5" name="Microchess 2.0.prg">
+		<year>1978</year>
+		<manufacturer>Micro-ware Ltd</manufacturer>
+		<status>Bad Dump: 259 bytes scrap, missing load address!</status>
+	</hash>
+	<hash crc32="7FD98D6D" name="Miner!.prg">
+		<year>1980</year>
+		<manufacturer>Ron Longfellow</manufacturer>
+	</hash>
+	<hash crc32="4F488957" name="Nightmare Park.prg"/>
+	<hash crc32="CF5DD7BC" name="Ouranos!.prg">
+		<year>1980</year>
+		<manufacturer>Kathy Higby</manufacturer>
+	</hash>
+	<hash crc32="5BCEDBF5" name="Pac-Man.prg">
+		<manufacturer>Andr&#233; Fachat</manufacturer>
+	</hash>
+	<hash crc32="B9D7AF36" name="PET IEEE.prg"/>
+	<hash crc32="1A2FC765" name="Roboterjagd.prg"/>
+	<hash crc32="079AF1E5" name="Schlange.prg">
+		<status>(pad 2, pad 4, pad 6, pad 8)</status>
+	</hash>
+	<hash crc32="A53B0B5D" name="Space Invader.prg"/>
+	<hash crc32="AE18B292" name="Space Invaders.prg">
+		<status>(a, pad 4, pad 6)</status>
+	</hash>
+	<hash crc32="B7F6C737" name="Space War.prg">
+		<year>1981</year>
+		<manufacturer>Chris Mills</manufacturer>
+	</hash>
+	<hash crc32="2CB94CC2" name="Spukhaus.prg">
+		<year>1983</year>
+		<manufacturer>Martin Vitek, Andr&#233; Fachat &amp; Chris Mills</manufacturer>
+	</hash>
+	<hash crc32="6E307504" name="Star Wars.prg">
+		<year>1979</year>
+		<manufacturer>Astar</manufacturer>
+	</hash>
+	<hash crc32="1B58EE72" name="Sternenfalle.prg">
+		<status>(pad 1, pad 2)</status>
+	</hash>
+	<hash crc32="D9E0390F" name="Verfolg.prg"/>
+	<hash crc32="DBDD0850" name="Vokabeln.prg"/>
+	<hash crc32="557B5F62" name="Zombie.prg"/>
+	<!-- These programs show odd behaviour -->
+	<hash crc32="23B2FC19" name="Destruct (corrupted?).prg">
+		<status>Hangs after playground has been drawn</status>
+	</hash>
+	<hash crc32="D462318B" name="Flash Attack.prg">
+		<year>1980</year>
+		<manufacturer>Timothy Stryker, Kenneth Wasserman</manufacturer>
+		<status>Gets corrupted after RUN</status>
+	</hash>
+</hashfile>
