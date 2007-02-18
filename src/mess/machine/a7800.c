@@ -66,6 +66,8 @@ static struct R6532interface r6532_interface =
 
 static void a7800_driver_init(int ispal, int lines)
 {
+	r6532_init(0, &r6532_interface);
+
 	ROM = memory_region(REGION_CPU1);
 	a7800_ispal = ispal;
 	a7800_lines = lines;
@@ -103,8 +105,6 @@ DRIVER_INIT( a7800_pal )
 MACHINE_RESET( a7800 )
 {
 	UINT8 *memory;
-
-	r6532_init(0, &r6532_interface);
 
 	a7800_ctrl_lock = 0;
 	a7800_ctrl_reg = 0;

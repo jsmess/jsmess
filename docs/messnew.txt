@@ -8,6 +8,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [A7800] Fixed regression introduced in 0.112.  (bug #1064) [Dirk Best]
+
 - [CGENIE] Changed some variables to initialize at startup.  (bug #1055) [Nate
   Woods]
 
