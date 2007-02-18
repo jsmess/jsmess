@@ -256,8 +256,8 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 			//RS Standard is MAX_UINT, which seems not to be enough, so we use a higher Number...
 			SendMessage( hEdit, EM_EXLIMITTEXT, 0, MAX_TEXT );
 		}
-		SendDlgItemMessage(hDlg, IDC_ROMS_PROGRESS,    PBM_SETRANGE, 0, MAKELPARAM(0, GetNumGames()));
-		SendDlgItemMessage(hDlg, IDC_SAMPLES_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM(0, GetNumGames()));
+		SendDlgItemMessage(hDlg, IDC_ROMS_PROGRESS,    PBM_SETRANGE, 0, MAKELPARAM(0, driver_get_count()));
+		SendDlgItemMessage(hDlg, IDC_SAMPLES_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM(0, driver_get_count()));
 		bPaused = FALSE;
 		bCancel = FALSE;
 		rom_index = 0;
@@ -364,7 +364,7 @@ static void ProcessNextRom()
 	rom_index++;
 	SendDlgItemMessage(hAudit, IDC_ROMS_PROGRESS, PBM_SETPOS, rom_index, 0);
 
-	if (rom_index == GetNumGames())
+	if (rom_index == driver_get_count())
 	{
 		sample_index = 0;
 		rom_index = -1;
@@ -407,7 +407,7 @@ static void ProcessNextSample()
 	sample_index++;
 	SendDlgItemMessage(hAudit, IDC_SAMPLES_PROGRESS, PBM_SETPOS, sample_index, 0);
 	
-	if (sample_index == GetNumGames())
+	if (sample_index == driver_get_count())
 	{
 		DetailsPrintf("Audit complete.\n");
 		SendDlgItemMessage(hAudit, IDCANCEL, WM_SETTEXT, 0, (LPARAM)"Close");

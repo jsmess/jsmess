@@ -110,9 +110,9 @@ UI_RC = @windres --use-temp-file
 
 UI_RCDEFS = -DNDEBUG -D_WIN32_IE=0x0400
 
-UI_RCFLAGS = -O coff --include-dir src/ui
+UI_RCFLAGS = -O coff --include-dir $(WINUISRC)
 
-$(OBJ)/ui/%.res: src/ui/%.rc
+$(WINUIOBJ)/%.res: $(WINUISRC)/%.rc
 	@echo Compiling mame32 resources $<...
 	$(UI_RC) $(UI_RCDEFS) $(UI_RCFLAGS) -o $@ -i $<
 endif

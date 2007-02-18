@@ -533,7 +533,7 @@ BOOL OptionsInit()
 		return FALSE;
 #endif /* MAME_DEBUG */
 
-	num_games = GetNumGames();
+	num_games = driver_get_count();
 	code_init(NULL);
 	// Load all default settings
 	LoadDefaultOptions(&settings, regSettings);

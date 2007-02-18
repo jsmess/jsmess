@@ -47,7 +47,6 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd,char *filename, int filetype);
 
 HWND GetMainWindow(void);
 HWND GetTreeView(void);
-int GetNumGames(void);
 int GetNumOptionFolders(void);
 void SetNumOptionFolders(int count);
 void GetRealColumnOrder(int order[]);

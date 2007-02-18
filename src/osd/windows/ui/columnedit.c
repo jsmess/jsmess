@@ -25,6 +25,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 
+#include "osdcomm.h"
 #include "resource.h"
 #include "bitmask.h"
 #include "options.h"

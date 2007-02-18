@@ -32,6 +32,7 @@
 #include <windowsx.h>
 #include <commctrl.h>
 
+#include "osdcomm.h"
 #include "splitters.h"
 #include "bitmask.h"
 #include "options.h"

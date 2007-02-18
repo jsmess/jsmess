@@ -306,8 +306,8 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 	if (drivers_info == NULL)
 	{
 		int ndriver, i;
-		drivers_info = malloc(sizeof(struct DriversInfo) * GetNumGames());
-		for (ndriver = 0; ndriver < GetNumGames(); ndriver++)
+		drivers_info = malloc(sizeof(struct DriversInfo) * driver_get_count());
+		for (ndriver = 0; ndriver < driver_get_count(); ndriver++)
 		{
 			const game_driver *gamedrv = drivers[ndriver];
 			struct DriversInfo *gameinfo = &drivers_info[ndriver];

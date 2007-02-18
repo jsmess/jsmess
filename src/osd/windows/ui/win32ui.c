@@ -477,7 +477,6 @@ static HINSTANCE hInst = NULL;
 
 static HFONT hFont = NULL;     /* Font for list view */
 
-static int game_count = 0;
 static int optionfolder_count = 0;
 
 /* global data--know where to send messages */
@@ -1401,12 +1400,6 @@ HICON LoadIconFromFile(const char *iconname)
 	return hIcon;
 }
 
-/* Return the number of games currently displayed */
-int GetNumGames()
-{
-	return game_count;
-}
-
 /* Return the number of folders with options */
 int GetNumOptionFolders()
 {
@@ -1764,7 +1757,7 @@ int GetGameNameIndex(const char *name)
 	key.name = name;
 
 	// uses our sorted array of driver names to get the index in log time
-	driver_index_info = bsearch(&key,sorted_drivers,game_count,sizeof(driver_data_type),
+	driver_index_info = bsearch(&key,sorted_drivers,driver_get_count(),sizeof(driver_data_type),
 								DriverDataCompareFunc);
 
 	if (driver_index_info == NULL)
@@ -1887,29 +1880,22 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	argv[argc++] = name;
 	cli_frontend_init(argc, argv );
 
-
-
-	// Count the number of games
-	game_count = 0;
-	while (drivers[game_count] != 0)
-		game_count++;
-
 	/* custom per-game icons */
-	icon_index = auto_malloc(sizeof(int) * game_count);
+	icon_index = auto_malloc(sizeof(int) * driver_get_count());
 	if (!icon_index)
 		return FALSE;
-	ZeroMemory(icon_index,sizeof(int) * game_count);
+	ZeroMemory(icon_index,sizeof(int) * driver_get_count());
 
 	/* sorted list of drivers by name */
-	sorted_drivers = (driver_data_type *) auto_malloc(sizeof(driver_data_type) * game_count);
+	sorted_drivers = (driver_data_type *) auto_malloc(sizeof(driver_data_type) * driver_get_count());
 	if (!sorted_drivers)
 		return FALSE;
-	for (i=0;i<game_count;i++)
+	for (i=0;i<driver_get_count();i++)
 	{
 		sorted_drivers[i].name = drivers[i]->name;
 		sorted_drivers[i].index = i;
 	}
-	qsort(sorted_drivers,game_count,sizeof(driver_data_type),DriverDataCompareFunc );
+	qsort(sorted_drivers,driver_get_count(),sizeof(driver_data_type),DriverDataCompareFunc );
 
 	wndclass.style		   = CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc   = MameWindowProc;
@@ -2801,7 +2787,7 @@ static BOOL GameCheck(void)
 	if (game_index == 0)
 		ProgressBarShow();
 
-	if (game_index >= game_count)
+	if (game_index >= driver_get_count())
 	{
 		bDoGameCheck = FALSE;
 		ProgressBarHide();
@@ -2993,13 +2979,13 @@ static void ProgressBarShow()
 	RECT rect;
 	int  widths[2] = {150, -1};
 
-	if (game_count < 100)
-		progBarStep = 100 / game_count;
+	if (driver_get_count() < 100)
+		progBarStep = 100 / driver_get_count();
 	else
-		progBarStep = (game_count / 100);
+		progBarStep = (driver_get_count() / 100);
 
 	SendMessage(hStatusBar, SB_SETPARTS, (WPARAM)2, (LPARAM)(LPINT)widths);
-	SendMessage(hProgWnd, PBM_SETRANGE, 0, (LPARAM)MAKELONG(0, game_count));
+	SendMessage(hProgWnd, PBM_SETRANGE, 0, (LPARAM)MAKELONG(0, driver_get_count()));
 	SendMessage(hProgWnd, PBM_SETSTEP, (WPARAM)progBarStep, 0);
 	SendMessage(hProgWnd, PBM_SETPOS, 0, 0);
 
@@ -3084,7 +3070,7 @@ static void ProgressBarStepParam(int iGameIndex, int nGameCount)
 
 static void ProgressBarStep()
 {
-	ProgressBarStepParam(game_index, game_count);
+	ProgressBarStepParam(game_index, driver_get_count());
 }
 
 static HWND InitProgressBar(HWND hParent)
@@ -3949,7 +3935,7 @@ static void ResetListView()
 	ListView_DeleteAllItems(hwndList);
 
 	// hint to have it allocate it all at once
-	ListView_SetItemCount(hwndList,game_count);
+	ListView_SetItemCount(hwndList,driver_get_count());
 
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
 	lvi.stateMask = 0;
@@ -4000,7 +3986,7 @@ static void UpdateGameList(BOOL bUpdateRomAudit, BOOL bUpdateSampleAudit)
 {
 	int i;
 
-	for (i = 0; i < game_count; i++)
+	for (i = 0; i < driver_get_count(); i++)
 	{
 		if (bUpdateRomAudit && DriverUsesRoms(i))
 			SetRomAuditResults(i, UNKNOWN);
@@ -5035,7 +5021,7 @@ static void DestroyIcons(void)
 	if (icon_index != NULL)
 	{
 		int i;
-		for (i=0;i<game_count;i++)
+		for (i=0;i<driver_get_count();i++)
 			icon_index[i] = 0; // these are indices into hSmall
 	}
 
@@ -5064,7 +5050,7 @@ static void ReloadIcons(void)
 
 	if (icon_index != NULL)
 	{
-		for (i=0;i<game_count;i++)
+		for (i=0;i<driver_get_count();i++)
 			icon_index[i] = 0; // these are indices into hSmall
 	}
 

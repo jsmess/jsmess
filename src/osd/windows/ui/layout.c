@@ -27,6 +27,7 @@
 #include <stdlib.h> /* For malloc and free */
 #include <string.h>
 
+#include "osdcomm.h"
 #include "bitmask.h"
 #include "TreeView.h"
 #include "M32Util.h"

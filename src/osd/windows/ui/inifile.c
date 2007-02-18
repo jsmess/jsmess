@@ -174,7 +174,7 @@ static BOOL SettingsFileName(DWORD nSettingsFile, char *buffer, size_t bufsize)
 
 		case SETTINGS_FILE_SOURCEFILE:
 			assert(arg >= 0);
-			assert(arg < GetNumGames());
+			assert(arg < driver_get_count());
 
 			strcpy(title, GetDriverFilename(arg));
 

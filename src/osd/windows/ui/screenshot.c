@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <driver.h>
 #include <png.h>
-#include <osdepend.h>
+#include "osdcomm.h"
 #include "screenshot.h"
 #include "file.h"
 #include "bitmask.h"

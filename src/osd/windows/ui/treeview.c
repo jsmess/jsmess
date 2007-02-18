@@ -303,7 +303,7 @@ void ResetWhichGamesInFolders(void)
 {
 	UINT	i, jj, k;
 	BOOL b;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 
 	for (i = 0; i < numFolders; i++)
 	{
@@ -434,7 +434,7 @@ LPFILTER_ITEM GetFilterList(void)
 void CreateSourceFolders(int parent_index)
 {
 	int i,jj, k=0;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	int *redirect_arr = GetFolderOptionsRedirectArr();
@@ -495,7 +495,7 @@ void CreateSourceFolders(int parent_index)
 void CreateManufacturerFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
  	LPTREEFOLDER lpTemp;
@@ -876,7 +876,7 @@ static const char* TrimManufacturer(const char *s)
 void CreateCPUFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	int nFolder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	LPTREEFOLDER map[CPU_COUNT];
@@ -934,7 +934,7 @@ void CreateCPUFolders(int parent_index)
 void CreateSoundFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	int nFolder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	LPTREEFOLDER map[SOUND_COUNT];
@@ -988,7 +988,7 @@ void CreateSoundFolders(int parent_index)
 void CreateOrientationFolders(int parent_index)
 {
 	int jj;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
 	// create our two subfolders
@@ -1037,7 +1037,7 @@ void CreateOrientationFolders(int parent_index)
 void CreateDeficiencyFolders(int parent_index)
 {
 	int jj;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
 	// create our two subfolders
@@ -1173,7 +1173,7 @@ void CreateDumpingFolders(int parent_index)
 	int jj;
 	BOOL bBadDump  = FALSE;
 	BOOL bNoDump = FALSE;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 	const rom_entry *region, *rom;
 	const char *name;
@@ -1246,7 +1246,7 @@ void CreateDumpingFolders(int parent_index)
 void CreateYearFolders(int parent_index)
 {
 	int i,jj;
-	int nGames = GetNumGames();
+	int nGames = driver_get_count();
 	int start_folder = numFolders;
 	LPTREEFOLDER lpFolder = treeFolders[parent_index];
 
@@ -1516,7 +1516,7 @@ static LPTREEFOLDER NewFolder(const char *lpTitle,
 	memset(lpFolder, '\0', sizeof (TREEFOLDER));
 	lpFolder->m_lpTitle = (LPSTR)malloc(strlen(lpTitle) + 1);
 	strcpy((char *)lpFolder->m_lpTitle,lpTitle);
-	lpFolder->m_lpGameBits = NewBits(GetNumGames());
+	lpFolder->m_lpGameBits = NewBits(driver_get_count());
 	lpFolder->m_nFolderId = nFolderId;
 	lpFolder->m_nParent = nParent;
 	lpFolder->m_nIconId = nIconId;
@@ -2364,7 +2364,7 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 
 	   fprintf(fp,"\n[ROOT_FOLDER]\n");
 
-	   for (i=0;i<GetNumGames();i++)
+	   for (i=0;i<driver_get_count();i++)
 	   {
 		   int driver_index = GetIndexFromSortedIndex(i); 
 		   if (TestBit(folder_data->m_lpGameBits,driver_index))
@@ -2383,7 +2383,7 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 		   {
 			   fprintf(fp,"\n[%s]\n",folder_data->m_lpTitle);
 			   
-			   for (i=0;i<GetNumGames();i++)
+			   for (i=0;i<driver_get_count();i++)
 			   {
 				   int driver_index = GetIndexFromSortedIndex(i); 
 				   if (TestBit(folder_data->m_lpGameBits,driver_index))
