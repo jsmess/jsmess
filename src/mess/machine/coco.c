@@ -2893,6 +2893,7 @@ MACHINE_START( dragon32 )
 	machine_init_interface init;
 	
 	/* Setup machine initialization */
+	memset(&init, 0, sizeof(init));
 	init.piaintf		= dragon32_pia_intf;
 	init.cartinterface	= &cartridge_fdc_dragon;
 	init.cartcallback	= &coco_cartcallbacks;
@@ -2909,6 +2910,7 @@ MACHINE_START( dragon64 )
 	machine_init_interface init;
 	
 	/* Setup machine initialization */
+	memset(&init, 0, sizeof(init));
 	init.piaintf		= dragon64_pia_intf;
 	init.cartinterface	= &cartridge_fdc_dragon;
 	init.cartcallback	= &coco_cartcallbacks;
@@ -2930,6 +2932,7 @@ MACHINE_START( d64plus )
 	machine_init_interface init;
 	
 	/* Setup machine initialization */
+	memset(&init, 0, sizeof(init));
 	init.piaintf		= dragon64_pia_intf;
 	init.cartinterface	= &cartridge_fdc_dragon;
 	init.cartcallback	= &coco_cartcallbacks;
@@ -2953,8 +2956,9 @@ MACHINE_START( tanodr64 )
 	machine_init_interface init;
 	
 	/* Setup machine initialization */
+	memset(&init, 0, sizeof(init));
 	init.piaintf		= dragon64_pia_intf;
-	init.cartinterface	= &cartridge_fdc_dragon;
+	init.cartinterface	= &cartridge_fdc_coco;
 	init.cartcallback	= &coco_cartcallbacks;
 	init.recalc_interrupts_	= d_recalc_interrupts;
 	init.printer_out_	= printer_out_dragon;
@@ -2999,6 +3003,7 @@ MACHINE_START( coco )
 	machine_init_interface init;
 	
 	/* Setup machine initialization */
+	memset(&init, 0, sizeof(init));
 	init.piaintf		= coco_pia_intf;
 	init.cartinterface	= &cartridge_fdc_coco;
 	init.cartcallback	= &coco_cartcallbacks;
@@ -3015,6 +3020,7 @@ MACHINE_START( coco2 )
 	machine_init_interface init;
 	
 	/* Setup machine initialization */
+	memset(&init, 0, sizeof(init));
 	init.piaintf		= coco2_pia_intf;
 	init.cartinterface	= &cartridge_fdc_coco;
 	init.cartcallback	= &coco_cartcallbacks;
@@ -3063,6 +3069,7 @@ MACHINE_START( coco3 )
 	machine_init_interface init;
 	
 	/* Setup machine initialization */
+	memset(&init, 0, sizeof(init));
 	init.piaintf		= coco3_pia_intf;
 	init.cartinterface	= &cartridge_fdc_coco;
 	init.cartcallback	= &coco3_cartcallbacks;
