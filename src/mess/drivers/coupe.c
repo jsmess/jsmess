@@ -54,7 +54,7 @@ static INTERRUPT_GEN( coupe_line_interrupt )
 		{
 			/* No other interrupts can occur - NOT CORRECT!!! */
             STAT=0x1E;
-			cpunum_set_input_line(0, 0, PULSE_LINE);
+			cpunum_set_input_line(0, 0, HOLD_LINE);
 			interrupted=1;
 		}
 	}
@@ -88,7 +88,7 @@ static INTERRUPT_GEN( coupe_line_interrupt )
 		else
 			STAT=0x17;
 
-		cpunum_set_input_line(0, 0, PULSE_LINE);
+		cpunum_set_input_line(0, 0, HOLD_LINE);
 		interrupted=1;
 	}
 

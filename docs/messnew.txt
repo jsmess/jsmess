@@ -13,6 +13,8 @@ System Driver Changes:
 
 - [COCO3] Fixed a subtle GIME timer problem.  (bug #1065) [Nate Woods]
 
+- [COUPE] Fixed regression introduced in 0.112.  (bug #1062) [Nate Woods]
+
 - [GAMEBOY] Rewrote video hardware timing. Rewrote rendering code to support
   mid-scanline effects. [Wilbert Pol]
 
@@ -36,7 +38,8 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- The core is based on MAME 0.112u1.  This incorporates all features of the
+  update to this core.  [MAME team]
 
 
 
