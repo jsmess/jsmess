@@ -27,7 +27,7 @@ $(OBJ)/mess/tools/imgtool/$(MAMEOS)/%.res: mess/tools/imgtool/$(MAMEOS)/%.rc
 	@echo Compiling resources $<...
 	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir mess/tools/imgtool/$(MAMEOS) -o $@ -i $<
 	
-wimgtool$(EXE):	 $(WIMGTOOL_OBJS) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE)
+wimgtool$(EXE):	 $(WIMGTOOL_OBJS) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) -mwindows $^ $(LIBS) -o $@
 

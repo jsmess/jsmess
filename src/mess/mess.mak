@@ -1158,6 +1158,12 @@ include src/mess/tools/imgtool/imgtool.mak
 include src/mess/tools/messtest/messtest.mak
 include src/mess/tools/messdocs/messdocs.mak
 
+# include OS-specific MESS stuff
+ifeq ($(MAMEOS),windows)
+include $(SRC)/mess/osd/$(MAMEOS)/$(MAMEOS).mak
+include $(SRC)/mess/tools/imgtool/windows/wimgtool.mak
+endif
+
 # text files
 TEXTS = sysinfo.htm
 
@@ -1177,10 +1183,9 @@ sysinfo.htm: dat2html$(EXE)
 
 TOOLS += dat2html$(EXE) messtest$(EXE) messdocs$(EXE) imgtool$(EXE)
 
-# disabling for now
-#ifeq ($(MAMEOS),windows)
-#TOOLS += wimgtool$(EXE)
-#endif
+ifeq ($(MAMEOS),windows)
+TOOLS += wimgtool$(EXE)
+endif
 
 
 

@@ -315,6 +315,7 @@ LIBCPU = $(OBJ)/libcpu.a
 LIBSOUND = $(OBJ)/libsound.a
 LIBUTIL = $(OBJ)/libutil.a
 LIBOCORE = $(OBJ)/libocore.a
+LIBOCORE_NOMAIN = $(OBJ)/libocore_nomain.a
 LIBOSD = $(OBJ)/libosd.a
 
 VERSIONOBJ = $(OBJ)/version.o
@@ -365,12 +366,6 @@ all: maketree emulator tools
 
 # include OS-specific rules first
 include $(SRC)/osd/$(MAMEOS)/$(MAMEOS).mak
-
-# include OS-specific MESS stuff
-ifeq ($(MAMEOS),windows)
-include $(SRC)/mess/osd/$(MAMEOS)/$(MAMEOS).mak
-include $(SRC)/mess/tools/imgtool/windows/wimgtool.mak
-endif
 
 # then the various core pieces
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak
