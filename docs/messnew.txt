@@ -20,6 +20,8 @@ System Driver Changes:
 
 - [IP22] Fixed regression introduced in 0.112.  (bug #1045) [Nate Woods]
 
+- [MPF1] Fixed regression introduced in 0.112.  (bug #1077) [Nate Woods]
+
 - [SMS/GG] Improved PSG, FM, and CPU clock frequencies [Andre Cotrim, Wilbert Pol]
 
 
