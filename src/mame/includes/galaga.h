@@ -1,3 +1,5 @@
+#include "sound/discrete.h"
+
 /*----------- defined in video/bosco.c -----------*/
 
 extern UINT8 *bosco_videoram;
@@ -13,6 +15,12 @@ VIDEO_START( bosco );
 VIDEO_UPDATE( bosco );
 PALETTE_INIT( bosco );
 VIDEO_EOF( bosco );	/* update starfield */
+
+/*----------- defined in audio/galaga.c -----------*/
+
+extern discrete_sound_block bosco_discrete_interface[];
+extern discrete_sound_block galaga_discrete_interface[];
+
 
 /*----------- defined in video/galaga.c -----------*/
 

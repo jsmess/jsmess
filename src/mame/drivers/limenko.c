@@ -10,16 +10,15 @@
   - QDSP QS1000 Sound Hardware
 
   Games Supported:
+  - Dynamite Bomber (Korea) (Rev 1.5)
   - Legend of Heroes
   - Super Bubble 2003 (2 sets)
 
   Known Games Not Dumped:
-  - Dynamite Bomber
   - Happy Hunter (shooting themed prize game)
 
   To Do:
   - QDSP QS1000 sound core
-  - Dump QS1003 QDSP wavetable rom
   - Legend of Heroes link up, 2 cabinets can be linked for a 4 player game
 
 */
@@ -167,6 +166,8 @@ static void limenko_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	{
 		int x, width, flipx, y, height, flipy, code, color, pri;
 
+		if(~spriteram32[i] & 0x80000000) continue;
+
 		x = ((spriteram32[i] & 0x1ff0000) >> 16) - 1;
 		width = (((spriteram32[i] & 0xe000000) >> 25) + 1) * 8;
 		flipx = spriteram32[i] & 0x10000000;
@@ -180,8 +181,6 @@ static void limenko_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 			pri = 0xfffe; // below fg
 		else
 			pri = 0; // above everything
-
-		// spriteram32[i] & 0x80000000 it's always set -> sprite enabled?
 
 		gfxdata	= base_gfx + (64*8/8) * code;
 
@@ -345,8 +344,8 @@ INPUT_PORTS_START( sb2003 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
@@ -356,8 +355,8 @@ INPUT_PORTS_START( sb2003 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
@@ -404,7 +403,7 @@ static gfx_decode limenko_gfxdecodeinfo[] =
 
 
 static MACHINE_DRIVER_START( limenko )
-	MDRV_CPU_ADD(E132XT, 80000000)	//E132XN!
+	MDRV_CPU_ADD(E132XT, 20000000)	//E132XN!
 	MDRV_CPU_PROGRAM_MAP(limenko_map,0)
 	MDRV_CPU_IO_MAP(limenko_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq5_line_hold, 2)
@@ -434,6 +433,63 @@ MACHINE_DRIVER_END
   ROM LOADING
 *****************************************************************************************************/
 
+/*
+
+Dynamite Bomber
+Limenko
+
+The main board is identical to the one used on the other Limenko games.
+The ROM board is slightly different (much simpler)
+
+REV : LMSYS_B
+SEL : B1-06-00
+|-----------------------------------------------------------|
+|        U4+                 U20(DIP40)&                    |
+||-|                                           U19+&     |-||
+|| |                                                     | ||
+|| |                                                     | ||
+|| |     U3+                     U6+                     | ||
+|| |                                                     | ||
+|| |                                         U18(DIP32)  | ||
+|| |                             U5+                     | ||
+|| |     U2+                                             | ||
+|| |                                         U17(DIP32)  | ||
+|| |                                                     | ||
+|| |                                                     | ||
+||-|     U1+                                 U16(DIP32)  |-||
+|                                                           |
+|-----------------------------------------------------------|
+Notes:
+       + - These ROMs surface mounted, type MX29F1610 16MBit SOP44
+       & - These locations not populated
+
+*/
+
+ROM_START( dynabomb )
+	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD16_WORD_SWAP( "rom.u6", 0x000000, 0x200000, CRC(457e015d) SHA1(3afb56cdf903c9084c1f283dc50ec504ce3e199f) )
+
+	ROM_REGION32_BE( 0x400000, REGION_USER2, ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "rom.u5", 0x000000, 0x200000, CRC(7e837adf) SHA1(8613fa187b8d4574b3935aa439aec2515033d64c) )
+
+	ROM_REGION( 0x220000, REGION_CPU2, 0 ) /* sound cpu + data */
+	ROM_LOAD( "rom.u16", 0x000000, 0x020000, CRC(f66d7e4d) SHA1(44f1851405ba525f1ed53521f4de12545ea9c46a) )
+	ROM_LOAD( "rom.u17", 0x020000, 0x080000, CRC(20f2417c) SHA1(1bdc0b03215f5002eed4c25d670bbb5411189907) )
+	ROM_LOAD( "rom.u18", 0x020000, 0x080000, CRC(50d76732) SHA1(6179c7365b62df620a10a1253d524807408821de) )
+	// u19 empty
+
+	ROM_REGION( 0x800000, REGION_GFX1, 0 )
+	ROM_LOAD32_BYTE( "rom.u1", 0x000000, 0x200000, CRC(bf33eff6) SHA1(089b6d88d6d744bcfa036c6869f0444d6ceb26c9) )
+	ROM_LOAD32_BYTE( "rom.u2", 0x000001, 0x200000, CRC(790bbcd5) SHA1(fc52c15fffc77dc3b3bc89a9606223c4fbaa578c) )
+	ROM_LOAD32_BYTE( "rom.u3", 0x000002, 0x200000, CRC(ec094b12) SHA1(13c105df066ff308cc7e1842907644790946e5b5) )
+	ROM_LOAD32_BYTE( "rom.u4", 0x000003, 0x200000, CRC(88b24e3c) SHA1(5f267f08144b413b55ef5e15c52e9cda096b80e7) )
+
+	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
+
+	// u20 (S-ROM) empty
+ROM_END
+
 ROM_START( sb2003 ) /* No specific Country/Region */
 	ROM_REGION32_BE( 0x200000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD16_WORD_SWAP( "sb2003_05.u6", 0x00000000, 0x200000, CRC(8aec4554) SHA1(57a12b142eb7bf08dd1e78d3c79222001bbaa636) )
@@ -454,7 +510,7 @@ ROM_START( sb2003 ) /* No specific Country/Region */
 	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
 
 	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1003",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 
 	// u20 (S-ROM) empty
 ROM_END
@@ -479,7 +535,7 @@ ROM_START( sb2003a ) /* Asia Region */
 	ROM_LOAD32_BYTE( "04.u4", 0x000003, 0x200000, CRC(fc2222b9) SHA1(c7ee8cffbbee1673a9f107f3f163d029c3900230) )
 
 	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1003",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 
 	// u20 (S-ROM) empty
 ROM_END
@@ -589,9 +645,8 @@ ROM_START( legendoh )
 	ROM_LOAD( "sou_rom.08",   0x000000, 0x80000, CRC(42c32dd5) SHA1(4702771288ba40119de63feb67eed85667235d81) )
 
 	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1003",  0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 ROM_END
-
 
 static int irq_active(void)
 {
@@ -600,6 +655,19 @@ static int irq_active(void)
 		return 1;
 	else
 		return 0;
+}
+
+static READ32_HANDLER( dynabomb_speedup_r )
+{
+	if(activecpu_get_pc() == 0xc25b8)
+	{
+		if(irq_active())
+			cpu_spinuntil_int();
+		else
+			activecpu_eat_cycles(50);
+	}
+
+	return mainram[0xe2784/4];
 }
 
 static READ32_HANDLER( legendoh_speedup_r )
@@ -628,6 +696,11 @@ static READ32_HANDLER( sb2003_speedup_r )
 	return mainram[0x135800/4];
 }
 
+DRIVER_INIT( dynabomb )
+{
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
+}
+
 DRIVER_INIT( legendoh )
 {
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
@@ -638,6 +711,7 @@ DRIVER_INIT( sb2003 )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 }
 
-GAME( 2000, legendoh, 0,      limenko, legendoh, legendoh, ROT0, "Limenko", "Legend of Heroes",          GAME_NO_SOUND )
-GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World)", GAME_NO_SOUND )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia)",  GAME_NO_SOUND )
+GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea) (Rev 1.5)",   GAME_NO_SOUND )
+GAME( 2000, legendoh, 0,      limenko, legendoh, legendoh, ROT0, "Limenko", "Legend of Heroes",                    GAME_NO_SOUND )
+GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World) (Ver 1.0)", GAME_NO_SOUND )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia) (Ver 1.0)",  GAME_NO_SOUND )

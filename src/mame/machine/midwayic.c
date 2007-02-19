@@ -10,7 +10,6 @@
 #include "machine/idectrl.h"
 #include "audio/cage.h"
 #include "audio/dcs.h"
-#include <time.h>
 
 
 #define LOG_NVRAM			(0)

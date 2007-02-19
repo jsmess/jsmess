@@ -14,7 +14,7 @@
 
 #include <math.h>
 
-#include "mame.h"
+#include "sndintrf.h"
 #include "sidvoice.h"
 #include "sidenvel.h"
 #include "sid.h"

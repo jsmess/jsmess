@@ -310,7 +310,6 @@
 #define MASTER_CLOCK	10000000	/* 10MHz */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "video/crtc6845.h"
 #include "machine/6821pia.h"
 

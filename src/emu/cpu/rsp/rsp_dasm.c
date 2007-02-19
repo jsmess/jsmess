@@ -4,7 +4,7 @@
     Written by Ville Linde
 */
 
-#include "driver.h"
+#include "cpuintrf.h"
 #include <stdarg.h>
 
 static const char *reg[32] =

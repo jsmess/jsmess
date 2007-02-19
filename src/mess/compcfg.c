@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <assert.h>
-#include "mess.h"
+
+#include "mame.h"
+#include "driver.h"
 
 #define MAX_RAM_OPTIONS	16
 

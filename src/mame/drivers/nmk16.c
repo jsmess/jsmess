@@ -68,7 +68,7 @@ TODO:
 - Music timing in nouryoku is a little off.
 - In Bioship, there's an occasional flicker of one of the sprites composing big
   ships. Increasing CPU speed from 12 to 16 MHz improved it, but it's still not
-  100% fixed.
+  100% fixed. (but the CPU speed has been verified to be 10Mhz??)
 - Input ports in Bio-ship Paladin, Strahl
 - Sound communication in Mustang might be incorrectly implemented
 - Incorrect OKI samples banking in Rapid Hero
@@ -3090,10 +3090,60 @@ static MACHINE_DRIVER_START( mustangb )
 
 MACHINE_DRIVER_END
 
+/*
+
+S.B.S. Gomorrah
+UPL, 1993
+
+PCB Layout
+----------
+
+UPL-90062
+|-------------------------------------------------------------------------|
+| LA4460  4558  YM2203   6116       NMK004                   68000        |
+|         3014  M6295    6.IC120                                          |
+|               M6295               8MHz                 62256  10.IC15   |
+|        SBS-G_05.IC160                                                   |
+|               SBS-G_04.IC139                           62256  11.IC14   |
+|DSW2   DSW1             12MHz                                            |
+|                                   82S129.IC69                           |
+|    NMK005                                                               |
+|                           82S135.IC94                                   |
+|                                   NMK902                                |
+|J        6116                             NMK903     NMK901              |
+|A                                                                        |
+|M        6116                      7.IC46                                |
+|M           82S123.IC154     6116                 6264           NMK903  |
+|A                                                                        |
+|                     6116                         6264                   |
+|                             6116                            SBS-G_01.IC9|
+|                     6116                                                |
+|                                                                         |
+|                                                  NMK901                 |
+|                                                                         |
+|                                                                 NMK903  |
+|                                                                         |
+|                            62256    62256        8.IC27     SBS-G_02.IC4|
+|                                                                         |
+|                            62256    62256        9.IC26                 |
+|SBS-G_03.IC194                                                    10MHz  |
+|-------------------------------------------------------------------------|
+Notes:
+      680000 @ 10.0MHz
+      YM2203 @ 1.5MHz [12/8]
+      M6295 @ 4.0MHz [12/3], pin 7 HIGH
+      VSync 60Hz
+      HSync 15.27kHz
+
+*/
+
+#define BIOSHIP_CRYSTAL1 10000000
+#define BIOSHIP_CRYSTAL2 12000000
+
 static MACHINE_DRIVER_START( bioship )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000) /* 16 MHz ? */
+	MDRV_CPU_ADD(M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
 	MDRV_CPU_PROGRAM_MAP(bioship_readmem,bioship_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
@@ -3117,19 +3167,19 @@ static MACHINE_DRIVER_START( bioship )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, BIOSHIP_CRYSTAL2 / 8) /* 1.5 Mhz (verified) */
 	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, BIOSHIP_CRYSTAL2 / 3 ) /* 4.0 Mhz, Pin 7 High (verified) */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, BIOSHIP_CRYSTAL2 / 3 ) /* 4.0 Mhz, Pin 7 High (verified) */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 
@@ -3971,28 +4021,71 @@ ROM_START( bioship )
 	ROM_LOAD( "7",         0x000000, 0x10000, CRC(2f3f5a10) SHA1(c1006eb755eec75f69dc7972d78d0c59088eb140) ) /* Characters */
 
 	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "sbs-g.01",  0x000000, 0x80000, CRC(21302e78) SHA1(a17939c0529c8e9ec2a4edd5e6be4bcb67f86787) ) /* Foreground */
+	ROM_LOAD( "sbs-g_01.ic9",  0x000000, 0x80000, CRC(21302e78) SHA1(a17939c0529c8e9ec2a4edd5e6be4bcb67f86787) ) /* Foreground */
 
 	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )
-	ROM_LOAD( "sbs-g.03",  0x000000, 0x80000, CRC(60e00d7b) SHA1(36fd02a7842ce1e79b8c4cfbe9c97052bef4aa62) ) /* Sprites */
+	ROM_LOAD( "sbs-g_03.ic194",  0x000000, 0x80000, CRC(60e00d7b) SHA1(36fd02a7842ce1e79b8c4cfbe9c97052bef4aa62) ) /* Sprites */
 
 	ROM_REGION( 0x80000, REGION_GFX4, ROMREGION_DISPOSE )
-	ROM_LOAD( "sbs-g.02",  0x000000, 0x80000, CRC(f31eb668) SHA1(67d6d56ea203edfbae4db658399bf61f14134206) ) /* Background */
+	ROM_LOAD( "sbs-g_02.ic4",  0x000000, 0x80000, CRC(f31eb668) SHA1(67d6d56ea203edfbae4db658399bf61f14134206) ) /* Background */
 
 	ROM_REGION16_BE(0x20000, REGION_GFX5, 0 )	/* Background tilemaps (used at runtime) */
-	ROM_LOAD16_BYTE( "8",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
-	ROM_LOAD16_BYTE( "9",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
+	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
+	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "6",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
+	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
 
 	ROM_REGION(0xa0000, REGION_SOUND1, 0 )	/* Oki sample data */
-	ROM_LOAD( "sbs-g.04",    0x00000, 0x20000, CRC(7c74cc4e) SHA1(92097b372eacabdb9e8e261b0bc4223821ff9273) )
+	ROM_LOAD( "sbs-g_04.ic139",    0x00000, 0x20000, CRC(7c74cc4e) SHA1(92097b372eacabdb9e8e261b0bc4223821ff9273) )
 	ROM_CONTINUE(            0x40000, 0x60000 )	/* banked */
 
 	ROM_REGION(0xa0000, REGION_SOUND2, 0 )	/* Oki sample data */
-	ROM_LOAD( "sbs-g.05",    0x00000, 0x20000, CRC(f0a782e3) SHA1(d572226b8e597f1c34d246cb284e047a6e2d9290) )
+	ROM_LOAD( "sbs-g_05.ic160",    0x00000, 0x20000, CRC(f0a782e3) SHA1(d572226b8e597f1c34d246cb284e047a6e2d9290) )
 	ROM_CONTINUE(            0x40000, 0x60000 )	/* banked */
+
+	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_LOAD( "82s135.ic94", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )	/* V-sync hw (unused) */
+	ROM_LOAD( "82s129.ic69", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )	/* H-sync hw (unused) */
+	ROM_LOAD( "82s123.ic154",0x0200, 0x0020, CRC(0f789fc7) SHA1(31936c21720802da20e39b4cb030e448353e7f19) )	/* ?? */
+ROM_END
+
+ROM_START( sbsgomo )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "11.ic14",    0x00000, 0x20000, CRC(7916150b) SHA1(cbcc8918f35ded5130058860a7af6f1d3ecdbdd8) )
+	ROM_LOAD16_BYTE( "10.ic15",    0x00001, 0x20000, CRC(1d7accb8) SHA1(f80fb8748017e545c96bdc7d964aa18dcd42f528) )
+
+	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "7.ic46",         0x000000, 0x10000, CRC(f2b77f80) SHA1(6cb9e33994dc2741faef912416ebd57b654dfb36) ) /* Characters */
+
+	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "sbs-g_01.ic9",  0x000000, 0x80000, CRC(21302e78) SHA1(a17939c0529c8e9ec2a4edd5e6be4bcb67f86787) ) /* Foreground */
+
+	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "sbs-g_03.ic194",  0x000000, 0x80000, CRC(60e00d7b) SHA1(36fd02a7842ce1e79b8c4cfbe9c97052bef4aa62) ) /* Sprites */
+
+	ROM_REGION( 0x80000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_LOAD( "sbs-g_02.ic4",  0x000000, 0x80000, CRC(f31eb668) SHA1(67d6d56ea203edfbae4db658399bf61f14134206) ) /* Background */
+
+	ROM_REGION16_BE(0x20000, REGION_GFX5, 0 )	/* Background tilemaps (used at runtime) */
+	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
+	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
+
+	ROM_REGION(0xa0000, REGION_SOUND1, 0 )	/* Oki sample data */
+	ROM_LOAD( "sbs-g_04.ic139",    0x00000, 0x20000, CRC(7c74cc4e) SHA1(92097b372eacabdb9e8e261b0bc4223821ff9273) )
+	ROM_CONTINUE(            0x40000, 0x60000 )	/* banked */
+
+	ROM_REGION(0xa0000, REGION_SOUND2, 0 )	/* Oki sample data */
+	ROM_LOAD( "sbs-g_05.ic160",    0x00000, 0x20000, CRC(f0a782e3) SHA1(d572226b8e597f1c34d246cb284e047a6e2d9290) )
+	ROM_CONTINUE(            0x40000, 0x60000 )	/* banked */
+
+	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_LOAD( "82s135.ic94", 0x0000, 0x0100, CRC(98ed1c97) SHA1(f125ad05c3cbd1b1ab356161f9b1d814781d4c3b) )	/* V-sync hw (unused) */
+	ROM_LOAD( "82s129.ic69", 0x0100, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )	/* H-sync hw (unused) */
+	ROM_LOAD( "82s123.ic154",0x0200, 0x0020, CRC(0f789fc7) SHA1(31936c21720802da20e39b4cb030e448353e7f19) )	/* ?? */
 ROM_END
 
 ROM_START( blkheart )
@@ -4920,6 +5013,7 @@ GAME( 1990, mustang,  0,       mustang,  mustang,  mustang,  ROT0,   "UPL",					
 GAME( 1990, mustangs, mustang, mustang,  mustang,  mustang,  ROT0,   "UPL (Seoul Trading license)",	"US AAF Mustang (Seoul Trading)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ) // Playable but there are Still Protection Problems
 GAME( 1990, mustangb, mustang, mustangb, mustang,  mustang,  ROT0,   "bootleg",						"US AAF Mustang (bootleg)", GAME_UNEMULATED_PROTECTION ) // Playable but there are Still Protection Problems
 GAME( 1990, bioship,  0,       bioship,  bioship,  0,        ROT0,   "UPL (American Sammy license)",	"Bio-ship Paladin", GAME_IMPERFECT_SOUND )
+GAME( 1990, sbsgomo,  bioship, bioship,  bioship,  0,        ROT0,   "UPL",							"Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
 GAME( 1990, vandyke,  0,       vandyke,  vandyke,  0,        ROT270, "UPL",							"Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandyjal, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",           "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandyja2, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",           "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )

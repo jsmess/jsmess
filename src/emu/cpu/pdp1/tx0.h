@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "cpuintrf.h"
 
 
 /* register ids for tx0_get_reg/tx0_set_reg */

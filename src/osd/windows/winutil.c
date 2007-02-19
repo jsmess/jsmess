@@ -12,6 +12,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+// MAMEOS headers
 #include "winutil.h"
 #include "strconv.h"
 

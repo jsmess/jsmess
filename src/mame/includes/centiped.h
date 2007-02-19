@@ -18,6 +18,7 @@ VIDEO_START( warlords );
 VIDEO_START( bullsdrt );
 
 VIDEO_UPDATE( centiped );
+VIDEO_UPDATE( milliped );
 VIDEO_UPDATE( warlords );
 VIDEO_UPDATE( bullsdrt );
 

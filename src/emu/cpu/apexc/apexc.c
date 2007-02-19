@@ -323,7 +323,7 @@ field:      X address   D           Function    Y address   D (part 2)
       another track.
 */
 
-#include "driver.h"
+#include "cpuintrf.h"
 #include "apexc.h"
 #include "debugger.h"
 

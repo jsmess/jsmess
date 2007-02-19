@@ -142,7 +142,7 @@ struct _analog_port_info
 	UINT8				shift;			/* left shift to apply to the final result */
 	UINT8				bits;			/* how many bits of resolution are expected? */
 	UINT8				absolute;		/* is this an absolute or relative input? */
-	UINT8				positional;		/* is this a postional input? */
+	UINT8				wraps;			/* does the control wrap around? */
 	UINT8				one_of_x;		/* is this a 1 of X postional input? */
 	UINT8				autocenter;		/* autocenter this input? */
 	UINT8				interpolate;	/* should we do linear interpolation for mid-frame reads? */
@@ -497,9 +497,9 @@ static const input_port_default_entry default_ports_builtin[] =
 	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	JOYSTICKLEFT_DOWN,  "P2 Left/Down",			SEQ_DEF_0 )
 	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	JOYSTICKLEFT_LEFT,  "P2 Left/Left",			SEQ_DEF_0 )
 	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	JOYSTICKLEFT_RIGHT, "P2 Left/Right",		SEQ_DEF_0 )
-	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON1,			"P2 Button 1",			SEQ_DEF_3(KEYCODE_A, CODE_OR, JOYCODE_2_BUTTON1) )
-	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON2,			"P2 Button 2",			SEQ_DEF_3(KEYCODE_S, CODE_OR, JOYCODE_2_BUTTON2) )
-	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON3,			"P2 Button 3",			SEQ_DEF_3(KEYCODE_Q, CODE_OR, JOYCODE_2_BUTTON3) )
+	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON1,			"P2 Button 1",			SEQ_DEF_5(KEYCODE_A, CODE_OR, JOYCODE_2_BUTTON1, CODE_OR, MOUSECODE_2_BUTTON1) )
+	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON2,			"P2 Button 2",			SEQ_DEF_5(KEYCODE_S, CODE_OR, JOYCODE_2_BUTTON2, CODE_OR, MOUSECODE_2_BUTTON3) )
+	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON3,			"P2 Button 3",			SEQ_DEF_5(KEYCODE_Q, CODE_OR, JOYCODE_2_BUTTON3, CODE_OR, MOUSECODE_2_BUTTON2) )
 	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON4,			"P2 Button 4",			SEQ_DEF_3(KEYCODE_W, CODE_OR, JOYCODE_2_BUTTON4) )
 	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON5,			"P2 Button 5",			SEQ_DEF_1(JOYCODE_2_BUTTON5) )
 	INPUT_PORT_DIGITAL_DEF( 2, IPG_PLAYER2,	BUTTON6,			"P2 Button 6",			SEQ_DEF_1(JOYCODE_2_BUTTON6) )
@@ -1130,6 +1130,7 @@ static void input_port_postload(void)
 				info->minimum = ANALOG_VALUE_MIN;
 				info->maximum = ANALOG_VALUE_MAX;
 				info->interpolate = 1;
+				info->wraps = 0;
 
 				switch (port->type)
 				{
@@ -1172,16 +1173,17 @@ static void input_port_postload(void)
 						port->analog.max = (1 << info->bits) - 1;
 						info->minimum = 0;
 						info->maximum = port->analog.max * 512;
+						info->wraps = 1;
 						break;
 
 					case IPT_POSITIONAL:
 					case IPT_POSITIONAL_V:
-						info->positional = 1;
 						port->analog.min = 0;
 						port->analog.max--;
 						info->minimum = (0 - port->default_value) * 512;
 						info->maximum = (port->analog.max - port->default_value) * 512;
 						info->autocenter = !port->analog.wraps;
+						info->wraps = port->analog.wraps;
 						break;
 
 					default:
@@ -2801,7 +2803,7 @@ INLINE INT32 apply_analog_min_max(const analog_port_info *info, INT32 value)
 	adj1   = APPLY_INVERSE_SENSITIVITY(512, port->analog.sensitivity);
 
 	/* for absolute devices, clamp to the bounds absolutely */
-	if (info->absolute || !port->analog.wraps)
+	if (!info->wraps)
 	{
 		if (value > adjmax)
 			value = adjmax;

@@ -417,22 +417,44 @@ render_font *ui_get_font(void)
 
 float ui_get_line_height(void)
 {
-	INT32 fontheight = render_font_get_pixel_height(ui_font);
-	INT32 targetwidth, targetheight;
-	float pixheight, targetaspect;
-	INT32 scale;
+	INT32 raw_font_pixel_height = render_font_get_pixel_height(ui_font);
+	INT32 target_pixel_width, target_pixel_height;
+	float one_to_one_line_height;
+	float target_aspect;
+	float scale_factor;
 
 	/* get info about the UI target */
-	render_target_get_bounds(render_get_ui_target(), &targetwidth, &targetheight, &targetaspect);
+	render_target_get_bounds(render_get_ui_target(), &target_pixel_width, &target_pixel_height, &target_aspect);
 
-	/* compute pixel height at the nominal size */
-	pixheight = UI_TARGET_FONT_HEIGHT * targetheight;
-	scale = floor(pixheight / fontheight);
-	if (scale == 0)
-		scale = 1;
-	pixheight = scale * fontheight;
+	/* compute the font pixel height at the nominal size */
+	one_to_one_line_height = (float)raw_font_pixel_height / (float)target_pixel_height;
 
-	return (float)pixheight / (float)targetheight;
+	/* determine the scale factor */
+	scale_factor = UI_TARGET_FONT_HEIGHT / one_to_one_line_height;
+
+	/* if our font is small-ish, do integral scaling */
+	if (raw_font_pixel_height < 24)
+	{
+		/* do we want to scale smaller? only do so if we exceed the threshhold */
+		if (scale_factor <= 1.0f)
+		{
+			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT)
+				scale_factor = 1.0f;
+		}
+
+		/* otherwise, just ensure an integral scale factor */
+		else
+			scale_factor = floor(scale_factor);
+	}
+
+	/* otherwise, just make sure we hit an even number of pixels */
+	else
+	{
+		INT32 height = scale_factor * one_to_one_line_height * (float)target_pixel_height;
+		scale_factor = (float)height / (one_to_one_line_height * (float)target_pixel_height);
+	}
+
+	return scale_factor * one_to_one_line_height;
 }
 
 
@@ -1769,7 +1791,10 @@ static INT32 slider_crossscale(INT32 newval, char *buffer, int arg)
 	{
 		for (in = Machine->input_ports; in && in->type != IPT_END; in++)
 			if (in->analog.crossaxis == arg)
+			{
 				in->analog.crossscale = (float)newval * 0.001f;
+				break;
+			}
 		sprintf(buffer, "%s %s %1.3f", "Crosshair Scale", (in->analog.crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	}
 	for (in = Machine->input_ports; in && in->type != IPT_END; in++)
@@ -1794,7 +1819,10 @@ static INT32 slider_crossoffset(INT32 newval, char *buffer, int arg)
 	{
 		for (in = Machine->input_ports; in && in->type != IPT_END; in++)
 			if (in->analog.crossaxis == arg)
+			{
 				in->analog.crossoffset = (float)newval * 0.001f;
+				break;
+			}
 		sprintf(buffer, "%s %s %1.3f", "Crosshair Offset", (in->analog.crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	}
 	for (in = Machine->input_ports; in && in->type != IPT_END; in++)

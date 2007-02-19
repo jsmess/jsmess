@@ -13,7 +13,10 @@
 #include <winioctl.h>
 #include <tchar.h>
 
+// MAME headers
 #include "osdcore.h"
+
+// MAMEOS headers
 #include "strconv.h"
 
 

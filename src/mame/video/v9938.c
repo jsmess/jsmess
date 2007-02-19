@@ -15,7 +15,6 @@
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "v9938.h"
 
 typedef struct {

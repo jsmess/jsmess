@@ -29,7 +29,6 @@
 #include "video/vector.h"
 #include "render.h"
 #include "rendutil.h"
-#include "options.h"
 #include "ui.h"
 
 // MAMEOS headers
@@ -37,7 +36,6 @@
 #include "video.h"
 #include "window.h"
 #include "input.h"
-#include "options.h"
 #include "debugwin.h"
 #include "strconv.h"
 

@@ -3,7 +3,7 @@
 
 /*#define BIGCASE*/
 
-#include "mamecore.h"
+#include "cpuintrf.h"
 
 typedef UINT8 BOOLEAN;
 

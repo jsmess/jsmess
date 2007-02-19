@@ -59,9 +59,11 @@ To Do:
 
 - Find infos about the communication stuff (even if it won't be supported)
 
-[bonkadv]
+[bloodwar]
 
-- Bad tilemap colors in levels 2 and 3
+- bloodwar: protection data needs to be verified against real board (WIP)
+            errors in protection data causes the game to hang on some player
+            moves (see attract mode), some colors are wrong, ...
 
 ***************************************************************************/
 
@@ -575,7 +577,7 @@ static ADDRESS_MAP_START( bloodwar, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(MRA16_RAM, kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs)	// Sprites Regs
 	AM_RANGE(0x800000, 0x800001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x880000, 0x880001) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w)
-	AM_RANGE(0x900000, 0x90003f) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)	// WIP: more collision chip registers!
+	AM_RANGE(0x900000, 0x900039) AM_READWRITE(bloodwar_calc_r, bloodwar_calc_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(input_port_0_word_r)	// Inputs
 	AM_RANGE(0xb00002, 0xb00003) AM_READ(input_port_1_word_r)	//
@@ -2175,7 +2177,6 @@ static MACHINE_DRIVER_START( bakubrkr )
 	MDRV_SOUND_ADD(OKIM6295, 12000000/6)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2273,11 +2274,9 @@ static MACHINE_DRIVER_START( gtmr )
 	MDRV_SOUND_ADD(OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MDRV_SOUND_ADD(OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -2372,7 +2371,6 @@ static MACHINE_DRIVER_START( mgcrystl )
 
 	MDRV_SOUND_ADD(OKIM6295, 12000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2498,11 +2496,9 @@ static MACHINE_DRIVER_START( shogwarr )
 	MDRV_SOUND_ADD(OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD(OKIM6295, 1980000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3762,22 +3758,22 @@ DIP: 1 x 8 POSITION
 SW1 - PCB location for 2 position DIP but location is unpopulated.
 SW2:
 
-                    1   2   3   4   5   6   7   8
+                            1   2   3   4   5   6   7   8
 SCREEN FLIP     NORMAL      OFF
-            FLIP        ON
+                FLIP        ON
 MODE            NORMAL          OFF
-            TEST            ON
-SWITCH TEST [1]     NO              OFF
-            YES             ON
+                TEST            ON
+SWITCH TEST [1] NO                  OFF
+                YES                 ON
 POSITION #4     NOT USED                OFF
 COIN TYPE       LOCAL COIN                  OFF
-            COMMON COIN                 ON
+                COMMON COIN                 ON
 GAME TYPE       3 PLAYERS                       OFF
-            2 PLAYERS                       ON
-DIFFICULTY [2]      EASY                                ON  OFF
-            NORMAL                              OFF OFF
-            HARD                                OFF ON
-            VERY HARD                           ON  ON
+                2 PLAYERS                       ON
+DIFFICULTY [2]  EASY                                ON  OFF
+                NORMAL                              OFF OFF
+                HARD                                OFF ON
+                VERY HARD                           ON  ON
 
 [1] This additional test becomes available in test mode when this DIP is ON.
 [2] Additional settings available in test mode via another on-screen menu.
@@ -3966,9 +3962,6 @@ ROM_START( bonkadv )
 	ROM_LOAD( "pc601106.99",		 0x000000, 0x100000, CRC(a893651c) SHA1(d221ce89f19a76be497724f6c16fab82c8a52661) )
 	ROM_LOAD( "pc602107.100",		 0x100000, 0x100000, CRC(0fbb23aa) SHA1(69b620375c65246317d7105fbc414f3c36e02b2c) )
 	ROM_LOAD( "pc603108.102",		 0x200000, 0x100000, CRC(58458985) SHA1(9a846d604ba901eb2a59d2b6cd9c42e3b43adb6a) )
-
-	ROM_REGION16_BE( 0x0080, REGION_USER1, 0 )	/* EEPROM */
-	ROM_LOAD16_WORD( "eeprom.126",  0x0000, 0x0080, CRC(d04adc84) SHA1(85415062867605587b09a646ead4700014ebcb5c) )
 ROM_END
 
 /***************************************************************************
@@ -3991,7 +3984,8 @@ GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16,   ROT90, "Kaneko",
 GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16,   ROT90, "Kaneko", "Bakuretsu Breaker", 0 )
 GAME( 1992, sandscrp, 0,        sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (set 1)", 0 )
 GAME( 1992, sandscra, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (set 2)", 0 )
-GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  samplebank, ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  samplebank, ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", 0 )
+GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, samplebank, ROT0,  "Kaneko", "Blood Warrior", 0 )
 GAME( 1994, gtmr,     0,        gtmr,     gtmr,     samplebank, ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", 0 )
 GAME( 1994, gtmra,    gtmr,     gtmr,     gtmr,     samplebank, ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", 0 )
 GAME( 1994, gtmre,    gtmr,     gtmr,     gtmr,     samplebank, ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", 0 )
@@ -4005,4 +3999,3 @@ GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    samplebank, ROT0,  "Kaneko",
 GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors",         GAME_NOT_WORKING )
 GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NOT_WORKING )
 GAME( 1992, brapboys, 0,        shogwarr, shogwarr, 0,          ROT0,  "Kaneko", "B.Rap Boys",              GAME_NOT_WORKING )
-GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, samplebank, ROT0,  "Kaneko", "Blood Warrior",           GAME_NOT_WORKING )

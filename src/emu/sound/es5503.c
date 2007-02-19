@@ -31,7 +31,7 @@
 */
 
 #include <math.h>
-#include "driver.h"
+#include "sndintrf.h"
 #include "cpuintrf.h"
 #include "es5503.h"
 #include "streams.h"

@@ -14,8 +14,11 @@ Main  CPU   :   M68020
 ---------------------------------------------------------------------------
 Year + Game
 ---------------------------------------------------------------------------
-98  Asura Blade - Sword of Dynasty
-    Asura Buster - Eternal Warriors
+98  Asura Blade - Sword of Dynasty (Japan)
+00  Asura Buster - Eternal Warriors (Japan)
+
+English versions exist, but are not dumped
+
 ---------------------------------------------------------------------------
 
 --
@@ -84,6 +87,64 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 |--------------------------------|
 
 * = Not populated
+
+****************************************************************************
+
+Asura Buster
+Fuuki Co. Ltd.
+
+PCB Layout
+----------
+
+Top Board
+
+FG-3J MAIN-J Revision:1.1
+|-----------------------------------------------------|
+|  YAC516  YMF278 N341256(x4) N341028 (x4)    FI-002K |
+|  33.8688MHz                 N341512(x4)             |
+|   PAL N341256                                       |
+|   Z80                     N341256                   |
+|                           N341256                   |
+|J DSW1                                               |
+|A                                                    |
+|M       12MHz                   FI-003K  N341256(x2) |
+|M DSW2                N341256(x3)                    |
+|A               PAL                                  |
+|         40MHz  PAL                                  |
+|  DSW3          PAL  N341256                         |
+|         68020  PAL  N341256                         |
+|        N341256      28.432MHz    M60067-0901FP      |
+|  DSW4  N341256 PAL                                  |
+|-----------------------------------------------------|
+
+Notes:
+      68020 clock: 20.000MHz [40/2]
+        Z80 clock: 6.000MHz [12/2]
+      YM278 clock: 33.8688MHz
+            VSync: 60Hz
+            Hsync: 15.81kHz
+
+
+Bottom Board
+
+FG-3J ROM-J 507KA0301P04       Rev:1.3
+|--------------------------------|
+|                          SROM  |
+|                                |
+|  SP01       SP89         OPM   |
+|                                |
+|  SP23       SPAB               |
+|                                |
+|  SP45       SPCD         MAP   |
+|                                |
+|  SP67       SPEF         PGM3  |
+|                                |
+|                          PGM2  |
+|                                |
+|  BG2123     BG1113       PGM1  |
+|                                |
+|  BG2022     BG1012       PGM0  |
+|--------------------------------|
 
 ***************************************************************************/
 
@@ -164,7 +225,8 @@ FUUKI32_INPUT( 3 ) /* $890000.l More Dipswitches */
 /* Sound comms */
 static READ32_HANDLER( snd_020_r )
 {
-	return fuuki32_shared_ram[offset*2]<<16 | fuuki32_shared_ram[(offset*2)+1];
+	UINT32 retdata = fuuki32_shared_ram[offset*2]<<16 | fuuki32_shared_ram[(offset*2)+1];
+	return retdata;
 }
 
 static WRITE32_HANDLER( snd_020_w )
@@ -185,6 +247,7 @@ static WRITE32_HANDLER( snd_020_w )
 static ADDRESS_MAP_START( fuuki32_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_READ(MRA32_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(MRA32_RAM) // Work RAM
+	AM_RANGE(0x410000, 0x41ffff) AM_READ(MRA32_RAM) // Work RAM (used by asurabus)
 	AM_RANGE(0x500000, 0x501fff) AM_READ(MRA32_RAM) // Tilemap 1
 	AM_RANGE(0x502000, 0x503fff) AM_READ(MRA32_RAM) // Tilemap 2
 	AM_RANGE(0x504000, 0x505fff) AM_READ(MRA32_RAM) // Tilemap bg
@@ -212,6 +275,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fuuki32_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(MWA32_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(MWA32_RAM) // Work RAM
+	AM_RANGE(0x410000, 0x41ffff) AM_WRITE(MWA32_RAM) // Work RAM
 	AM_RANGE(0x500000, 0x501fff) AM_WRITE(fuuki32_vram_0_w) AM_BASE(&fuuki32_vram_0) // Tilemap 1
 	AM_RANGE(0x502000, 0x503fff) AM_WRITE(fuuki32_vram_1_w) AM_BASE(&fuuki32_vram_1) // Tilemap 2
 	AM_RANGE(0x504000, 0x505fff) AM_WRITE(fuuki32_vram_2_w) AM_BASE(&fuuki32_vram_2) // Tilemap bg
@@ -250,7 +314,8 @@ static WRITE8_HANDLER ( fuuki32_sound_bw_w )
 
 static READ8_HANDLER( snd_z80_r )
 {
-	return fuuki32_shared_ram[offset];
+	UINT8 retdata = fuuki32_shared_ram[offset];
+	return retdata;
 }
 
 static WRITE8_HANDLER( snd_z80_w )
@@ -603,6 +668,43 @@ ROM_START( asurabld )
 	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
 ROM_END
 
+ROM_START( asurabus )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* M68020 */
+	ROM_LOAD32_BYTE( "pgm3.u1", 0x000000, 0x80000, CRC(2c6b5271) SHA1(188371f1f003823ac719e962e048719d76696b2f) )
+	ROM_LOAD32_BYTE( "pgm2.u2", 0x000001, 0x80000, CRC(8f8694ec) SHA1(3334df4aecc5ab2f8914ef6748c027a99b39ce26) )
+	ROM_LOAD32_BYTE( "pgm1.u3", 0x000002, 0x80000, CRC(0a040f0f) SHA1(d5e86d33efcbbde7ee62cfc8dfe867f250a33415) )
+	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(9b71e9d8) SHA1(9b705b5b6fff549f5679890422b481b5cf1d7bd7) )
+
+	ROM_REGION( 0x090000, REGION_CPU2, 0 ) /* Z80 */
+	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
+	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
+
+	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
+	ROM_LOAD( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
+	ROM_LOAD( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
+	ROM_LOAD( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
+	ROM_LOAD( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
+	ROM_LOAD( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
+	ROM_LOAD( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
+	ROM_LOAD( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
+
+	ROM_REGION( 0x0800000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "bg1012.u22", 0x0000000, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
+	ROM_LOAD( "bg1113.u23", 0x0400000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
+
+	ROM_REGION( 0x0800000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "bg2022.u25", 0x0000000, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
+	ROM_LOAD( "bg2123.u24", 0x0400000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
+
+	ROM_REGION( 0x200000, REGION_GFX4, ROMREGION_DISPOSE ) // background tiles
+	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) // OPL4 samples
+	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
+ROM_END
+
+
 
 /***************************************************************************
 
@@ -613,3 +715,4 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1998, asurabld,	0, fuuki32, asurabld, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, asurabus,	0, fuuki32, asurabld, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) // sounds loop forever?

@@ -74,7 +74,6 @@
 #include "driver.h"
 #include "rendlay.h"
 #include "rescap.h"
-#include "timer.h"
 #include "mw8080bw.h"
 
 #include "clowns.lh"
@@ -2136,12 +2135,12 @@ static const UINT32 gray_code_6_bit[] =
 
 static INPUT_PORTS_START( spcenctr )
 	PORT_START_TAG("IN0")
-	PORT_BIT( 0x3f, 0x20, IPT_POSITIONAL ) PORT_POSITIONS(64) PORT_REMAP_TABLE(gray_code_6_bit) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE /* 6 bit horiz encoder */
+	PORT_BIT( 0x3f, 0x13, IPT_POSITIONAL ) PORT_POSITIONS(46) PORT_REMAP_TABLE(gray_code_6_bit) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE /* 6 bit horiz encoder */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x3f, 0x20, IPT_POSITIONAL_V ) PORT_POSITIONS(64) PORT_REMAP_TABLE(gray_code_6_bit) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) /* 6 bit vert encoder */
+	PORT_BIT( 0x3f, 0x16, IPT_POSITIONAL_V ) PORT_POSITIONS(42) PORT_REMAP_TABLE(gray_code_6_bit) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) /* 6 bit vert encoder */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  /* marked as COIN #2, but the software never reads it */
 

@@ -28,10 +28,7 @@
 // SJE: Fixed a mistake in tms70x0_pf_w where the wrong register was referenced
 // SJE: Implemented internal register file
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "cpuintrf.h"
-#include "state.h"
 #include "debugger.h"
 #include "tms7000.h"
 

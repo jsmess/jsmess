@@ -9,7 +9,6 @@ Driver by SMF & Guddler 04/02/2007
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/generic.h"
 
 #include "sidewndr.lh"
 

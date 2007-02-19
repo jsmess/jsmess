@@ -5,7 +5,6 @@
 */
 
 #include "driver.h"
-#include <time.h>
 
 static int m3_step;
 

@@ -35,10 +35,10 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <conio.h>
 #include <winioctl.h>
 
 // standard C headers
+#include <conio.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -125,6 +125,7 @@ struct _id_map_entry
 static int					ledmethod;
 static int					original_state;
 static int					current_state;
+static int					pause_state;
 static HANDLE				hKbdDev;
 
 static HWND					mame_target;
@@ -583,8 +584,20 @@ static void output_mame_stop(void)
 
 static void output_set_state(const char *outname, INT32 state)
 {
+	// look for pause state
+	if (strcmp(outname, "pause") == 0)
+	{
+		if (state)
+		{
+			pause_state = led_get_state();
+			led_set_state(original_state);
+		}
+		else
+			led_set_state(pause_state);
+
+	}
 	// look for LED0/LED1/LED2 states and update accordingly
-	if (strcmp(outname, "led0") == 0)
+	else if (strcmp(outname, "led0") == 0)
 		led_set_state((current_state & ~1) | (state & 1));
 	else if (strcmp(outname, "led1") == 0)
 		led_set_state((current_state & ~2) | ((state & 1) << 1));

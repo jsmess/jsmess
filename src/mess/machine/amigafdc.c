@@ -21,6 +21,7 @@
 #define MAX_MFM_TRACK_LEN		16384
 
 #include "mame.h"
+#include "driver.h"
 #include "amiga.h"
 #include "amigafdc.h"
 #include "machine/6526cia.h"

@@ -105,22 +105,128 @@ WRITE16_HANDLER(galpanib_calc_w)
 		case 0x10/2: hit.mult_a = data; break;
 		case 0x12/2: hit.mult_b = data; break;
 
-		// unknown (yet!), used by bloodwar
-		case 0x20/2:
-		case 0x22/2:
-		case 0x24/2:
-		case 0x26/2:
-		case 0x2c/2:
-		case 0x2e/2:
-		case 0x30/2:
-		case 0x32/2:
-		case 0x38/2:
+		default:
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",activecpu_get_pc(),offset<<1);
+	}
+}
+
+WRITE16_HANDLER(bloodwar_calc_w)
+{
+	switch (offset)
+	{
+		// p is position, s is size
+		case 0x20/2: hit.x1p = data; break;
+		case 0x22/2: hit.x1s = data; break;
+		case 0x24/2: hit.y1p = data; break;
+		case 0x26/2: hit.y1s = data; break;
+
+		case 0x2c/2: hit.x2p = data; break;
+		case 0x2e/2: hit.x2s = data; break;
+		case 0x30/2: hit.y2p = data; break;
+		case 0x32/2: hit.y2s = data; break;
+
+		case 0x38/2: memset(&hit, 0, sizeof(hit)); break;	// clear registers??? results AND inputs ???
 
 		default:
 			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",activecpu_get_pc(),offset<<1);
 	}
 }
 
+/*
+ collision detection: absolute "distance", negative if no overlap
+         [one inside other] | [ normal overlap ] | [   no overlap   ]
+  rect1   <-------------->  |  <----------->     |  <--->
+  rect2       <----->       |     <----------->  |             <--->
+  result      <---------->  |     <-------->     |       <---->
+*/
+INT16 calc_compute_x(void)
+{
+	INT16 x_coll;
+
+	// X distance
+	if ((hit.x2p >= hit.x1p) && (hit.x2p < (hit.x1p + hit.x1s)))		// x2p inside x1
+		x_coll = (hit.x1s - (hit.x2p - hit.x1p));
+	else if ((hit.x1p >= hit.x2p) && (hit.x1p < (hit.x2p + hit.x2s)))	// x1p inside x2
+		x_coll = (hit.x2s - (hit.x1p - hit.x2p));
+	else																// normal/no overlap
+	 	x_coll = ((hit.x1s + hit.x2s)/2) - abs((hit.x1p + hit.x1s/2) - (hit.x2p + hit.x2s/2));
+
+	return x_coll;
+}
+INT16 calc_compute_y(void)
+{
+	INT16 y_coll;
+
+	// Y distance
+	if ((hit.y2p >= hit.y1p) && (hit.y2p < (hit.y1p + hit.y1s)))		// y2p inside y1
+		y_coll = (hit.y1s - (hit.y2p - hit.y1p));
+	else if ((hit.y1p >= hit.y2p) && (hit.y1p < (hit.y2p + hit.y2s)))	// y1p inside y2
+		y_coll = (hit.y2s - (hit.y1p - hit.y2p));
+	else																// normal/no overlap
+		y_coll = ((hit.y1s + hit.y2s)/2) - abs((hit.y1p + hit.y1s/2) - (hit.y2p + hit.y2s/2));
+
+	return y_coll;
+}
+
+READ16_HANDLER(bloodwar_calc_r)
+{
+	UINT16 data = 0;
+	INT16 x_coll, y_coll;
+
+	x_coll = calc_compute_x();
+	y_coll = calc_compute_y();
+
+	switch (offset)
+	{
+		case 0x00/2: // X distance
+			return x_coll;
+
+		case 0x02/2: // Y distance
+			return y_coll;
+
+		case 0x04/2: // similar to the hit detection from SuperNova, but much simpler
+
+			// 4th nibble: Y Absolute Collision -> possible values = 9,8,4,3,2
+			if      (hit.y1p >  hit.y2p)	data |= 0x2000;
+			else if (hit.y1p == hit.y2p)	data |= 0x4000;
+			else if (hit.y1p <  hit.y2p)	data |= 0x8000;
+			if (y_coll<0) data |= 0x1000;
+
+			// 3rd nibble: X Absolute Collision -> possible values = 9,8,4,3,2
+			if      (hit.x1p >  hit.x2p)	data |= 0x0200;
+			else if (hit.x1p == hit.x2p)	data |= 0x0400;
+			else if (hit.x1p <  hit.x2p)	data |= 0x0800;
+			if (x_coll<0) data |= 0x0100;
+
+			// 2nd nibble: always set to 4
+			data |= 0x0040;
+
+			// 1st nibble: XY Overlap Collision -> possible values = 0,2,4,f
+			if (x_coll>=0) data |= 0x0004;
+			if (y_coll>=0) data |= 0x0002;
+			if ((x_coll>=0)&&(y_coll>=0)) data |= 0x000F;
+
+			return data;
+
+		case 0x14/2:
+			return (mame_rand(Machine) & 0xffff);
+
+		case 0x20/2: return hit.x1p;
+		case 0x22/2: return hit.x1s;
+		case 0x24/2: return hit.y1p;
+		case 0x26/2: return hit.y1s;
+
+		case 0x2c/2: return hit.x2p;
+		case 0x2e/2: return hit.x2s;
+		case 0x30/2: return hit.y2p;
+		case 0x32/2: return hit.y2s;
+
+		default:
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",activecpu_get_pc(),offset<<1);
+	}
+
+	return 0;
+}
 
 /***************************************************************************
                                 CALC3 MCU:
@@ -463,7 +569,7 @@ TOYBOX_MCU_COM_W(3)
 READ16_HANDLER( toybox_mcu_status_r )
 {
 	logerror("CPU #%d (PC=%06X) : read MCU status\n", cpu_getactivecpu(), activecpu_get_previouspc());
-	return 0;
+	return 0; // most games test bit 0 for failure
 }
 
 
@@ -474,32 +580,13 @@ READ16_HANDLER( toybox_mcu_status_r )
 void bloodwar_mcu_run(void)
 {
 	UINT16 mcu_command	=	mcu_ram[0x0010/2];
-	UINT16 mcu_offset		=	mcu_ram[0x0012/2] / 2;
+	UINT16 mcu_offset	=	mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	mcu_ram[0x0014/2];
 
 	logerror("CPU #0 (PC=%06X) : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
 
 	switch (mcu_command >> 8)
 	{
-#if 0
-		case 0x02:	// TEST
-		{
-			/* MCU writes the string " ATOP 1993.12 " to shared ram */
-			mcu_ram[mcu_offset + 0x70/2 + 0] = 0x2041;
-			mcu_ram[mcu_offset + 0x70/2 + 1] = 0x544F;
-			mcu_ram[mcu_offset + 0x70/2 + 2] = 0x5020;
-			mcu_ram[mcu_offset + 0x70/2 + 3] = 0x3139;
-			mcu_ram[mcu_offset + 0x70/2 + 4] = 0x3933;
-			mcu_ram[mcu_offset + 0x70/2 + 5] = 0x2E31;
-			mcu_ram[mcu_offset + 0x70/2 + 6] = 0x3220;
-			mcu_ram[mcu_offset + 0x70/2 + 7] = 0xff00;
-
-			mcu_ram[mcu_offset + 0x10/2 + 0] = 0x0000;
-			mcu_ram[mcu_offset + 0x12/2 + 0] = 0x0000;
-		}
-		break;
-#endif
-
 		case 0x02:	// Read from NVRAM
 		{
 			mame_file *f;
@@ -606,7 +693,7 @@ void bloodwar_mcu_run(void)
 void bonkadv_mcu_run(void)
 {
 	UINT16 mcu_command	=	mcu_ram[0x0010/2];
-	UINT16 mcu_offset		=	mcu_ram[0x0012/2] / 2;
+	UINT16 mcu_offset	=	mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	mcu_ram[0x0014/2];
 
 	switch (mcu_command >> 8)
@@ -620,8 +707,6 @@ void bonkadv_mcu_run(void)
 				mame_fread(f,&mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			else
-				memcpy(&mcu_ram[mcu_offset],memory_region(REGION_USER1),128);
 			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -638,10 +723,15 @@ void bonkadv_mcu_run(void)
 		}
 		break;
 
-		case 0x43:	// Restore Default Data Set
+		case 0x43:	// Initialize NVRAM - MCU writes Default Data Set directly to NVRAM
 		{
-			memcpy(&mcu_ram[mcu_offset],memory_region(REGION_USER1),128);
-			logerror("PC=%06X : MCU executed command: %04X %04X (restore default settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			mame_file *f;
+			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
+			{
+				mame_fwrite(f, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
+				mame_fclose(f);
+			}
+			logerror("PC=%06X : MCU executed command: %04X %04X (restore default NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -723,7 +813,7 @@ void bonkadv_mcu_run(void)
 void gtmr_mcu_run(void)
 {
 	UINT16 mcu_command	=	mcu_ram[0x0010/2];
-	UINT16 mcu_offset		=	mcu_ram[0x0012/2] / 2;
+	UINT16 mcu_offset	=	mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	mcu_ram[0x0014/2];
 
 	logerror("CPU #0 PC %06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);

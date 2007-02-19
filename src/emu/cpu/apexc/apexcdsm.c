@@ -7,7 +7,7 @@
 */
 
 
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 
 #include "apexc.h"

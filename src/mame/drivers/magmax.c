@@ -8,7 +8,6 @@ Additional tweaking by Jarek Burczynski
 
 ***************************************************************************/
 
-#include "state.h"
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ay8910.h"

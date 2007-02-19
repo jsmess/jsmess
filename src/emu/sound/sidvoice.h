@@ -1,7 +1,7 @@
 #ifndef __SIDVOICE_H_
 #define __SIDVOICE_H_
 
-#include "mame.h"
+#include "sndintrf.h"
 
 /*
   approximation of the sid6581 chip

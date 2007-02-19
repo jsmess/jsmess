@@ -205,8 +205,7 @@ DBGOBJS += $(CPUOBJ)/cdp1802/1802dasm.o
 endif
 
 $(CPUOBJ)/cdp1802/cdp1802.o:	$(CPUSRC)/cdp1802/cdp1802.c \
-								$(CPUSRC)/cdp1802/cdp1802.h \
-								$(CPUSRC)/cdp1802/1802tbl.c
+								$(CPUSRC)/cdp1802/cdp1802.h
 
 
 

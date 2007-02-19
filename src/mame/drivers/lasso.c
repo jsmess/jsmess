@@ -76,6 +76,12 @@ static WRITE8_HANDLER( sound_command_w )
 	cpunum_set_input_line( 1, 0, PULSE_LINE );
 }
 
+static WRITE8_HANDLER( pinbo_sound_command_w )
+{
+	soundlatch_w(offset,data);
+	cpunum_set_input_line( 1, 0, HOLD_LINE );
+}
+
 static READ8_HANDLER( sound_status_r )
 {
 	/*  0x01: chip#0 ready; 0x02: chip#1 ready */
@@ -193,7 +199,7 @@ static ADDRESS_MAP_START( pinbo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
 	AM_RANGE(0x0800, 0x0bff) AM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
 	AM_RANGE(0x2000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END

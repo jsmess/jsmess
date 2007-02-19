@@ -14,7 +14,7 @@
 // MAME headers
 #include "mamecore.h"
 
-// OSD headers
+// MAMEOS headers
 #include "window.h"
 
 

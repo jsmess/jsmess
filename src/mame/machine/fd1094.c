@@ -194,7 +194,7 @@ bad       11100000 10101011 10111001 (flaky 317-0049)
 0x1e7a,
 this only happens with 317-0162 so far; I assume it is a fault in the CPU.
 */
-static int masked_opcodes[] =
+static const UINT16 masked_opcodes[] =
 {
 	0x013a,0x033a,0x053a,0x073a,0x083a,0x093a,0x0b3a,0x0d3a,0x0f3a,
 
@@ -273,6 +273,9 @@ static int masked_opcodes[] =
 	0xde3a,0xde7a,0xdeba,0xdefa,	0xdffa
 };
 
+static UINT8 masked_opcodes_lookup[2][65536/8/2];
+static UINT8 masked_opcodes_created = FALSE;
+
 static int final_decrypt(int i,int moreffff)
 {
 	int j;
@@ -285,25 +288,24 @@ static int final_decrypt(int i,int moreffff)
 	if ((i & 0xb100) == 0x0000) dec ^= 0x4000;
 
 	/* mask out opcodes doing PC-relative addressing, replace them with FFFF */
-	for (j = 0;j < sizeof(masked_opcodes)/sizeof(masked_opcodes[0]);j++)
+	if (!masked_opcodes_created)
 	{
-		if ((dec & 0xfffe) == masked_opcodes[j])
+		masked_opcodes_created = TRUE;
+		for (j = 0; j < ARRAY_LENGTH(masked_opcodes); j++)
 		{
-			dec = 0xffff;
-			break;
+			UINT16 opcode = masked_opcodes[j];
+			masked_opcodes_lookup[0][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
+			masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
+		}
+		for (j = 0; j < 65536; j += 2)
+		{
+			if ((j & 0xff80) == 0x4e80 || (j & 0xf0f8) == 0x50c8 || (j & 0xf000) == 0x6000)
+				masked_opcodes_lookup[1][j >> 4] |= 1 << ((j >> 1) & 7);
 		}
 	}
 
-	/* optionally, even more values can be replaced with FFFF */
-	if (moreffff)
-	{
-		if ((dec & 0xff80) == 0x4e80)
-			dec = 0xffff;
-		else if ((dec & 0xf0f8) == 0x50c8)
-			dec = 0xffff;
-		else if ((dec & 0xf000) == 0x6000)
-			dec = 0xffff;
-	}
+	if ((masked_opcodes_lookup[moreffff][dec >> 4] >> ((dec >> 1) & 7)) & 1)
+		dec = 0xffff;
 
 	return dec;
 }
@@ -520,6 +522,5 @@ int fd1094_set_state(unsigned char *key,int state)
 		global_key3 ^= 0x02;	// key_0a invert
 		global_key3 ^= 0x40;	// global_swap3
 	}
-
 	return state & 0xff;
 }

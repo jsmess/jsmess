@@ -102,6 +102,11 @@
 #define CHDCOMPRESSION_NONE			0
 #define CHDCOMPRESSION_ZLIB			1
 #define CHDCOMPRESSION_ZLIB_PLUS	2
+#define CHDCOMPRESSION_AV			3
+
+/* A/V codec configuration parameters */
+#define AV_CODEC_COMPRESS_CONFIG	0
+#define AV_CODEC_DECOMPRESS_CONFIG	1
 
 /* metadata parameters */
 #define CHDMETATAG_WILDCARD			0
@@ -115,6 +120,10 @@
 #define CDROM_OLD_METADATA_TAG		0x43484344	/* 'CHCD' */
 #define CDROM_TRACK_METADATA_TAG	0x43485452	/* 'CHTR' */
 #define CDROM_TRACK_METADATA_FORMAT	"TRACK:%d TYPE:%s SUBTYPE:%s FRAMES:%d"
+
+/* standard A/V metadata */
+#define AV_METADATA_TAG				0x41564156	/* 'AVAV' */
+#define AV_METADATA_FORMAT			"FPS:%d.%06d WIDTH:%d HEIGHT:%d INTERLACED:%d CHANNELS:%d SAMPLERATE:%d META:%d"
 
 /* CHD open values */
 #define CHD_OPEN_READ				1
@@ -202,6 +211,18 @@ struct _chd_interface
 	UINT32 (*read)(chd_interface_file *file, UINT64 offset, UINT32 count, void *buffer);
 	UINT32 (*write)(chd_interface_file *file, UINT64 offset, UINT32 count, const void *buffer);
 	UINT64 (*length)(chd_interface_file *file);
+};
+
+
+/* A/V codec decompression configuration */
+typedef struct _av_codec_decompress_config av_codec_decompress_config;
+struct _av_codec_decompress_config
+{
+	UINT32	decode_mask;				/* decoding mask */
+	UINT8 *	video_buffer;				/* pointer to alternate video buffer */
+	UINT32	video_stride;				/* bytes between rows in video buffer */
+	UINT32	video_xor;					/* XOR to apply to bytes in video buffer */
+	UINT32	audio_xor;					/* XOR to apply to bytes in audio buffer */
 };
 
 

@@ -4,7 +4,6 @@ Atari Tank 8 driver
 
 ***************************************************************************/
 
-#include <time.h>
 #include "driver.h"
 #include "tank8.h"
 #include "sound/discrete.h"

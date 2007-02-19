@@ -6,6 +6,7 @@
 
 *********************************************************************/
 
+#include "driver.h"
 #include "sgi.h"
 
 #define VERBOSE_LEVEL ( 1 )
@@ -19,7 +20,7 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", activecpu_get_pc(), buf );
+		logerror( "%08x: %s", (unsigned) activecpu_get_reg(REG_PC), buf );
 	}
 }
 

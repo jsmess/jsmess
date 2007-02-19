@@ -7,9 +7,7 @@
 
 **********************************************************************/
 
-#include "mame.h"
-#include "timer.h"
-#include "state.h"
+#include "driver.h"
 #include "6526cia.h"
 
 

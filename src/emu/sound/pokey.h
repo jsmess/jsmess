@@ -17,7 +17,7 @@
 #ifndef _POKEYSOUND_H
 #define _POKEYSOUND_H
 
-#include "memory.h"
+#include "sndintrf.h"
 
 /* CONSTANT DEFINITIONS */
 

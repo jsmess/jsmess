@@ -1,27 +1,20 @@
 #include "driver.h"
-#include "video/generic.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1869.h"
 #include "sound/cdp1869.h"
 
-/*
-
-    RCA CDP1869/70/76 Video Interface System (VIS)
-
-    http://homepage.mac.com/ruske/cosmacelf/cdp1869.pdf
-
-*/
-
 typedef struct
 {
+	int ntsc_pal;
 	int dispoff;
 	int fresvert, freshorz;
 	int dblpage, line16, line9, cmem, cfc;
 	UINT8 col, bkg;
 	UINT16 pma, hma;
-	UINT8 cram[4096];
-	UINT8 pram[2048];
-	UINT8 pcb[2048];
+	UINT8 cram[CDP1869_CHARRAM_SIZE];
+	UINT8 pram[CDP1869_PAGERAM_SIZE];
+	UINT8 pcb[CDP1869_PAGERAM_SIZE];
+	int cramsize, pramsize;
 } CDP1869_VIDEO_CONFIG;
 
 static CDP1869_VIDEO_CONFIG cdp1869;
@@ -32,9 +25,9 @@ static void cdp1869_set_color(int i, int c, int l)
 {
 	int luma = 0, r, g, b;
 
-	luma += (l & 4) ? 30 : 0; // red
-	luma += (l & 1) ? 59 : 0; // green
-	luma += (l & 2) ? 11 : 0; // blue
+	luma += (l & 4) ? CDP1869_WEIGHT_RED : 0;
+	luma += (l & 1) ? CDP1869_WEIGHT_GREEN : 0;
+	luma += (l & 2) ? CDP1869_WEIGHT_BLUE : 0;
 
 	luma = (luma * 0xff) / 100;
 
@@ -87,7 +80,7 @@ static int cdp1869_get_cma(int offset)
 
 	if (offset & 0x08)
 	{
-		addr += 2048;
+		addr += (CDP1869_CHARRAM_SIZE / 2);
 	}
 
 	return addr;
@@ -113,7 +106,7 @@ READ8_HANDLER ( cdp1869_charram_r )
 	}
 	else
 	{
-		return 0;
+		return 0xff;
 	}
 }
 
@@ -165,6 +158,16 @@ static int cdp1869_get_lines(void)
 	}
 }
 
+static int cdp1869_get_pmemsize(int cols, int rows)
+{
+	int pmemsize = cols * rows;
+
+	if (cdp1869.dblpage) pmemsize *= 2;
+	if (cdp1869.line16) pmemsize *= 2;
+
+	return pmemsize;
+}
+
 static int cdp1869_get_color(int ccb0, int ccb1, int pcb)
 {
 	int r = 0, g = 0, b = 0, color;
@@ -195,7 +198,7 @@ static int cdp1869_get_color(int ccb0, int ccb1, int pcb)
 
 	if (cdp1869.cfc)
 	{
-		return color + (cdp1869.bkg * 8);
+		return color + ((cdp1869.bkg + 1) * 8);
 	}
 	else
 	{
@@ -212,7 +215,7 @@ static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int p
 
 	data <<= 2;
 
-	for (i = 0; i < CDP1870_CHAR_WIDTH; i++)
+	for (i = 0; i < CDP1869_CHAR_WIDTH; i++)
 	{
 		if (data & 0x80)
 		{
@@ -247,7 +250,7 @@ static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, int code, const
 	int i, addr, addr2, pcb, data;
 
 	addr = code * 8;
-	addr2 = addr + 2048;
+	addr2 = addr + (CDP1869_CHARRAM_SIZE / 2);
 
 	for (i = 0; i < cdp1869_get_lines(); i++)
 	{
@@ -273,7 +276,39 @@ static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, int code, const
 
 VIDEO_START( cdp1869 )
 {
+	state_save_register_item("cdp1869", 0, cdp1869.ntsc_pal);
+	state_save_register_item("cdp1869", 0, cdp1869.dispoff);
+	state_save_register_item("cdp1869", 0, cdp1869.fresvert);
+	state_save_register_item("cdp1869", 0, cdp1869.freshorz);
+	state_save_register_item("cdp1869", 0, cdp1869.dblpage);
+	state_save_register_item("cdp1869", 0, cdp1869.line16);
+	state_save_register_item("cdp1869", 0, cdp1869.line9);
+	state_save_register_item("cdp1869", 0, cdp1869.cmem);
+	state_save_register_item("cdp1869", 0, cdp1869.cfc);
+	state_save_register_item("cdp1869", 0, cdp1869.col);
+	state_save_register_item("cdp1869", 0, cdp1869.bkg);
+	state_save_register_item("cdp1869", 0, cdp1869.pma);
+	state_save_register_item("cdp1869", 0, cdp1869.hma);
+	state_save_register_item_array("cdp1869", 0, cdp1869.cram);
+	state_save_register_item_array("cdp1869", 0, cdp1869.pram);
+	state_save_register_item_array("cdp1869", 0, cdp1869.pcb);
+	state_save_register_item("cdp1869", 0, cdp1869_pcb);
+	state_save_register_item("cdp1869", 0, cdp1869.cramsize);
+	state_save_register_item("cdp1869", 0, cdp1869.pramsize);
+
 	return 0;
+}
+
+int cdp1869_read_pageram(int addr)
+{
+	if (addr >= cdp1869.pramsize)
+	{
+		return 0xff;
+	}
+	else
+	{
+		return cdp1869.pram[addr];
+	}
 }
 
 VIDEO_UPDATE( cdp1869 )
@@ -282,19 +317,29 @@ VIDEO_UPDATE( cdp1869 )
 
 	if (!cdp1869.dispoff)
 	{
-		int sx, sy, rows, cols, width, height, addr;
+		int sx, sy, rows, cols, width, height, addr, pramsize;
 		rectangle screen;
 
-		screen.min_x = CDP1870_SCREEN_START;
-		screen.max_x = CDP1870_SCREEN_END - 1;
-		screen.min_y = CPD1870_SCANLINE_DISPLAY_START_PAL;
-		screen.max_y = CPD1870_SCANLINE_DISPLAY_END_PAL - 1;
+		switch (cdp1869.ntsc_pal)
+		{
+		case CDP1869_NTSC:
+			screen.min_x = CDP1869_SCREEN_START_NTSC;
+			screen.max_x = CDP1869_SCREEN_END - 1;
+			screen.min_y = CDP1869_SCANLINE_DISPLAY_START_NTSC;
+			screen.max_y = CDP1869_SCANLINE_DISPLAY_END_NTSC - 1;
+			break;
+
+		case CDP1869_PAL:
+			screen.min_x = CDP1869_SCREEN_START_PAL;
+			screen.max_x = CDP1869_SCREEN_END - 1;
+			screen.min_y = CDP1869_SCANLINE_DISPLAY_START_PAL;
+			screen.max_y = CDP1869_SCANLINE_DISPLAY_END_PAL - 1;
+			break;
+		}
 
 		fillbitmap(bitmap, Machine->pens[cdp1869.bkg], &screen);
 
-		cols = cdp1869.freshorz ? 40 : 20;
-		rows = cdp1869.fresvert ? 25 : 12;
-		width = CDP1870_CHAR_WIDTH;
+		width = CDP1869_CHAR_WIDTH;
 		height = cdp1869_get_lines();
 
 		if (!cdp1869.freshorz)
@@ -307,6 +352,11 @@ VIDEO_UPDATE( cdp1869 )
 			height *= 2;
 		}
 
+		cols = cdp1869.freshorz ? CDP1869_COLUMNS_FULL : CDP1869_COLUMNS_HALF;
+		rows = (screen.max_y - screen.min_y + 1) / height;
+
+		pramsize = cdp1869_get_pmemsize(cols, rows);
+
 		addr = cdp1869.hma;
 
 		for (sy = 0; sy < rows; sy++)
@@ -315,13 +365,13 @@ VIDEO_UPDATE( cdp1869 )
 			{
 				int x = sx * width;
 				int y = sy * height;
-				int code = cdp1869.pram[addr];
+				int code = cdp1869_read_pageram(addr);
 
 				cdp1869_draw_char(bitmap, x, y, code, &screen);
 
 				addr++;
 
-				if (addr > 2048) addr = 0;
+				if (addr == pramsize) addr = 0;
 			}
 		}
 	}
@@ -444,7 +494,7 @@ static void cdp1869_out7_w(UINT16 data)
 	cdp1869.hma = data & 0x7fc;
 }
 
-WRITE8_HANDLER ( cdp1870_out3_w )
+WRITE8_HANDLER ( cdp1869_out3_w )
 {
 	/*
       bit   description
@@ -485,4 +535,17 @@ WRITE8_HANDLER ( cdp1869_out_w )
 		cdp1869_out7_w(word);
 		break;
 	}
+}
+
+void cdp1869_configure(const CDP1869_interface *intf)
+{
+	if (intf->charrom_region != REGION_INVALID)
+	{
+		UINT8 *memory = memory_region(intf->charrom_region);
+		memcpy(cdp1869.cram, memory, intf->charram_size);
+	}
+
+	cdp1869.ntsc_pal = intf->ntsc_pal;
+	cdp1869.cramsize = intf->charram_size;
+	cdp1869.pramsize = intf->pageram_size;
 }

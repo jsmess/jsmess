@@ -200,7 +200,6 @@
 */
 
 #include "driver.h"
-#include "state.h"
 #include "cdrom.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
@@ -212,7 +211,6 @@
 #include "machine/x76f041.h"
 #include "sound/psx.h"
 #include "sound/cdda.h"
-#include <time.h>
 
 #define VERBOSE_LEVEL ( 0 )
 

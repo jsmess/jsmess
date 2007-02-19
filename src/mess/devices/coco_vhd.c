@@ -36,6 +36,7 @@
 
  ***************************************************************************/
 
+#include "driver.h"
 #include "devices/coco_vhd.h"
 
 static long	logicalRecordNumber;

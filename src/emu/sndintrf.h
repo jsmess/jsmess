@@ -17,12 +17,13 @@
 #include "memory.h"
 #include "mame.h"
 #include "state.h"
-#include "timer.h"
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+#define MAX_SOUND 32
 
 /* Enum listing all the sound chips */
 enum
@@ -226,6 +227,9 @@ void sndti_set_info_fct(int sndtype, int sndindex, UINT32 state, genf *data);
 void sndti_reset(int type, int index);
 int sndti_clock(int sndtype, int sndindex);
 void *sndti_token(int sndtype, int sndindex);
+
+/* driver gain controls on chip outputs */
+void sndti_set_output_gain(int type, int index, int output, float gain);
 
 
 

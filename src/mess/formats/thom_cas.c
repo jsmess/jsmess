@@ -8,8 +8,8 @@
 
 #include <math.h>
 
-#include "timer.h"
-#include "state.h"
+#include "driver.h"
+#include "mame.h"
 #include "devices/cassette.h"
 #include "formats/cassimg.h"
 #include "machine/thomson.h"

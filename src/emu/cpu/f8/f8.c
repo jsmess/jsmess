@@ -27,8 +27,7 @@
  */
 
 #include <stdio.h>
-#include "driver.h"
-#include "state.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 #include "f8.h"
 

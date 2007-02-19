@@ -327,7 +327,6 @@ Notes:
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h83002.h"
 #include "sound/c352.h"
-#include <time.h>
 
 static int ss23_vstat = 0, hstat = 0, vstate = 0;
 static tilemap *bgtilemap;

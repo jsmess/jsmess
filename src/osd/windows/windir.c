@@ -7,14 +7,20 @@
 
 ***************************************************************************/
 
+// standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shlwapi.h>
-#include <stdio.h>
-#include <ctype.h>
 #include <tchar.h>
 
+// standard C headers
+#include <stdio.h>
+#include <ctype.h>
+
+// MAME headers
 #include "osdcore.h"
+
+// MAMEOS headers
 #include "strconv.h"
 #include "winutil.h"
 

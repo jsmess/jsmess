@@ -10,7 +10,7 @@
 #ifndef _34010OPS_H
 #define _34010OPS_H
 
-#include "mamecore.h"
+#include "cpuintrf.h"
 
 #ifndef INLINE
 #define INLINE static inline

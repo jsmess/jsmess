@@ -5,8 +5,7 @@
   timer shift register basically the same as in f3851!
 */
 
-#include "memory.h"
-#include "mess.h"
+#include "cpuintrf.h"
 
 typedef struct {
     int frequency;

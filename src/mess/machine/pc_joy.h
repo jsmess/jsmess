@@ -10,6 +10,7 @@
 #define PC_JOY_H
 
 #include "mame.h"
+#include "driver.h"
 
 READ8_HANDLER ( pc_JOY_r );
 WRITE8_HANDLER ( pc_JOY_w );

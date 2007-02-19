@@ -87,7 +87,6 @@ Other references can be found on spies.com:
 
 
 #include "cpuintrf.h"
-#include "timer.h"
 #include "debugger.h"
 #include "tms9900.h"
 #include <math.h>

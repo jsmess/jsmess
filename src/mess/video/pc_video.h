@@ -9,6 +9,7 @@
 #ifndef PC_VIDEO_H
 #define PC_VIDEO_H
 
+#include "driver.h"
 #include "includes/crtc6845.h"
 
 typedef void (*pc_video_update_proc)(mame_bitmap *bitmap,

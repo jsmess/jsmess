@@ -6,7 +6,6 @@
  Supported Games      PCB-ID
  ----------------------------------
  Mosaic               F-E1-32-009
- Wyvern Wings         F-E1-32-010-D
 
  driver by Pierpaolo Prazzoli
 
@@ -80,16 +79,6 @@ static WRITE32_HANDLER( eeprom_clock_line_w )
 	EEPROM_set_clock_line( (~data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static WRITE32_HANDLER( wyvernwg_eeprom_w )
-{
-	//check
-	EEPROM_write_bit(data & 0x01);
-	EEPROM_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-	EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
-
-	// data & 8? -> video disabled?
-}
-
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
@@ -112,12 +101,6 @@ static ADDRESS_MAP_START( mosaicf2_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x7400, 0x7403) AM_WRITE(eeprom_bit_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wyvernwg_io, ADDRESS_SPACE_IO, 32 )
-	AM_RANGE(0x2800, 0x2803) AM_READ(input_port_0_dword_r)
-	AM_RANGE(0x3000, 0x3003) AM_READ(input_port_1_dword_r)
-	AM_RANGE(0x7000, 0x7003) AM_WRITE(wyvernwg_eeprom_w)
-	AM_RANGE(0x7c00, 0x7c03) AM_READ(eeprom_r)
-ADDRESS_MAP_END
 
 INPUT_PORTS_START( mosaicf2 )
 	PORT_START
@@ -148,15 +131,6 @@ INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( wyvernwg )
-	PORT_START
-	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START
-	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mosaicf2 )
@@ -192,32 +166,6 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( wyvernwg )
-	MDRV_CPU_ADD_TAG("main", E132XT, 50000000) // E132T actually! /* 50 MHz */
-	MDRV_CPU_PROGRAM_MAP(common_map,0)
-	MDRV_CPU_IO_MAP(wyvernwg_io,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_pulse, 1)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
-	MDRV_NVRAM_HANDLER(93C46)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(512, 512)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MDRV_PALETTE_LENGTH(32768)
-
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
-
-	/* sound hardware */
-	// TODO
-MACHINE_DRIVER_END
-
 
 /*
 
@@ -294,89 +242,4 @@ ROM_START( mosaicf2 )
 	ROM_LOAD( "snd.bin",             0x000000, 0x040000, CRC(4584589c) SHA1(5f9824724f840767c3dc1dc04b203ddf3d78b84c) )
 ROM_END
 
-/*
-
-Wyvern Wings (c) 2001 Semicom, Game Vision License
-
-
-   CPU: Hyperstone E1-32T
- Video: 2 QuickLogic QL12x16B-XPL84 FPGA
- Sound: AdMOS QDSP1000 with QDSP QS1001A sample rom
-   OSC: 50MHz, 28MHz & 24MHz
-EEPROM: 93C46
-
-F-E1-32-010-D
-+------------------------------------------------------------------+
-|    VOL    +-------+  +---------+                                 |
-+-+         | QPSD  |  |  U15A   |      +---------+   +---------+  |
-  |         |QS1001A|  |         |      | ROMH00  |   | ROML00  |  |
-+-+         +-------+  +---------+      |         |   |         |  |
-|           +-------+                   +---------+   +---------+  |
-|           |QPSD   |   +----------+    +---------+   +---------+  |
-|           |QS1000 |   |    U7    |    | ROMH01  |   | ROML01  |  |
-|J   24MHz  +-------+   +----------+    |         |   |         |  |
-|A                                      +---------+   +---------+  |
-|M   50MHz           +-----+            +---------+   +---------+  |
-|M                   |DRAM2|            | ROMH02  |   | ROML02  |  |
-|A     +----------+  +-----+    +-----+ |         |   |         |  |
-|      |          |  +-----+    |93C46| +---------+   +---------+  |
-|C     |HyperStone|  |DRAM1|    +-----+ +---------+   +---------+  |
-|O     |  E1-32T  |  +-----+            | ROMH03  |   | ROML03  |  |
-|N     |          |              28MHz  |         |   |         |  |
-|N     +----------+                     +---------+   +---------+  |
-|E                                                                 |
-|C           +----------+           +------------+ +------------+  |
-|T           |   GAL1   |           | QuickLogic | | QuickLogic |  |
-|O           +----------+           | 0048 BH    | | 0048 BH    |  |
-|R           +----------+           | QL12X16B   | | QL12X16B   |  |
-|            |   ROM2   |           | -XPL84C    | | -XPL84C    |  |
-|            +----------+           +------------+ +------------+  |
-|            +----------+            +----+                        |
-|            |   ROM1   |            |MEM3|                        |
-+-++--+      +----------+            +----+                        |
-  ||S1|    +-----+                   |MEM2|                        |
-+-++--+    |CRAM2|                   +----+                        |
-|  +--+    +-----+                   |MEM7|                        |
-|  |S2|    |CRAM1|                   +----+                        |
-|  +--+    +-----+                   |MEM6|                        |
-+------------------------------------+----+------------------------+
-
-S1 is the setup button
-S2 is a reset button
-
-ROMH & ROML are all MX 29F1610MC-16 flash roms
-u15A is a MX 29F1610MC-16 flash rom
-u7 is a ST 27c1001
-ROM1 & ROM2 are both ST 27c4000D
-*/
-
-ROM_START( wyvernwg )
-	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "rom1.bin", 0x000000, 0x080000, CRC(66bf3a5c) SHA1(037d5e7a6ef6f5b4ac08a9c811498c668a9d2522) )
-	ROM_LOAD( "rom2.bin", 0x080000, 0x080000, CRC(fd9b5911) SHA1(a01e8c6e5a9009024af385268ba3ba90e1ebec50) )
-
-	ROM_REGION32_BE( 0x1000000, REGION_USER2, 0 )  /* gfx data */
-	ROM_LOAD32_WORD_SWAP( "romh00.bin", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD_SWAP( "roml00.bin", 0x000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD_SWAP( "romh01.bin", 0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD_SWAP( "roml01.bin", 0x400002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD_SWAP( "romh02.bin", 0x800000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD_SWAP( "roml02.bin", 0x800002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD_SWAP( "romh03.bin", 0xc00000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD_SWAP( "roml03.bin", 0xc00002, 0x200000, NO_DUMP )
-
-	ROM_REGION( 0x020000, REGION_CPU2, 0 ) /* QDSP ('51) Code */
-	ROM_LOAD( "u7", 0x0000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) )
-
-	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) /* Music data / QDSP samples (SFX)?? */
-	ROM_LOAD( "u15a", 0x00000, 0x200000, NO_DUMP )
-
-	ROM_REGION( 0x080000, REGION_SOUND2, ROMREGION_ERASEFF ) /* QDSP wavetable rom */
-	ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
-ROM_END
-
-
-
-
-GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, 0, ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE )
-GAME( 2001, wyvernwg, 0, wyvernwg, wyvernwg, 0, ROT0, "Semicom (Game Vision License)", "Wyvern Wings", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, 0,        ROT0, "F2 System", "Mosaic (F2 System)", GAME_SUPPORTS_SAVE )

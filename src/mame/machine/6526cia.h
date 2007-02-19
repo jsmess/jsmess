@@ -10,7 +10,7 @@
 #ifndef _6526CIA_H_
 #define _6526CIA_H_
 
-#include "memory.h"
+#include "driver.h"
 
 typedef enum
 {

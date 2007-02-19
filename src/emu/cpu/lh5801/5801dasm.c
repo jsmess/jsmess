@@ -19,8 +19,7 @@
  *
  *****************************************************************************/
 
-#include <stdio.h>
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 
 #include "lh5801.h"

@@ -1,8 +1,6 @@
 #ifndef sm8500_H
 #define sm8500_H
 #include "cpuintrf.h"
-#include "osd_cpu.h"
-#include "driver.h"
 
 typedef struct {
 	void (*handle_dma)(int cycles);

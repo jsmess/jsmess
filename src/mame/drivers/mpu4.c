@@ -1,6 +1,13 @@
 /***************************************************************************
 MPU4 highly preliminary driver by J.Wallace, and Anonymous.
 
+  17-02-2007: J Wallace: Added Deal 'Em - still needs some work.
+
+  10-02-2007: J Wallace: Improved input timing.
+              It appears Connect 4 uses a different sound mapping to regular Barcrest games.
+
+  30-01-2007: J Wallace: Characteriser rewritten to run the 'extra' data needed by some games.
+
   24-01-2007: J Wallace: With thanks to Canonman and HIGHWAYMAN, I was able to confirm a seemingly
               ghastly misuse of a PIA is actually on the real hardware. This fixes the meters.
 
@@ -61,7 +68,7 @@ licensed to other firms as a general purpose unit (even some old Photo-Me booths
 This original board uses a ~1.72 Mhz 6809B CPU, and a number of PIA6821 chips for multiplexing inputs and the like.
 
 A 6840PTM is used for internal timing, one of it's functions is to act with an AY8913 chip as a crude analogue sound device.
-(Data is transmitted through a PIA, with a square wave from the PTM being used as part of the filtering process)
+(Data is transmitted through a PIA, with a square wave from the PTM being used as the alarm sound generator)
 
 A MPU4 GAME CARD (cartridge) plugs into the MPU4 board containing the game, and a protection PAL (the 'characteriser').
 This PAL, as well as protecting the games, also controlled some of the lamp address matrix for many games, and acted as
@@ -84,10 +91,7 @@ There is a protection chip similar to and replacing the MPU4 Characteriser, whic
 (unknown how it works). In non-question cases, however, the protection chip works near identically to the original.
 
 A decent schematic for the MPU4 board, amongst other info is available,
-see http://www.mameworld.net/agemame/techinfo/mpu4.php .
-
-(This appears to have an error in it regarding the IRQ generation of the PIAs, as
-IC3 causes an infinite loop if IRQA is connected)
+see http://www.mameworld.net/agemame/techinfo/mpu4.php.
 
 No video card schematics ever left the PCB factory, but some decent scans of the board have been made,
 now also available for review.
@@ -159,7 +163,6 @@ IRQ line connected to CPU
            |   |                 |          port B Lamp Drives 10,11,12,13,14,15,16,17 (sic)(IC13)
            |   |                 |
            |   |                 |          CB2 => alpha reset (clock on Dutch systems)
-           |   |                 |          Schematic shows IRQ A and B connected, but program hangs?
            |   |                 |
 -----------+---+-----------------+--------------------------------------------------------------------------
  0B00-0B03 |R/W| D D D D D D D D | PIA6821 IC4 port A = data for 7seg leds (pins 10 - 17, via IC32)
@@ -233,9 +236,10 @@ IRQ line connected to CPU
            |   |                 |
            |   |                 |  port B
            |   |                 |
-           |   |                 |        PB0-PB7 OUTPUT mech meter or reel E + F
+           |   |                 |        PB0-PB6 OUTPUT mech meter 1-7 or reel E + F
+           |   |                 |        PB7     Voltage drop sensor
            |   |                 |        CB1     INPUT, not connected
-           |   |                 |        CB2     OUTPUT,enable mech meter latch
+           |   |                 |        CB2     OUTPUT,mech meter 8
            |   |                 |        IRQB , connected to IRQ CPU
            |   |                 |
 -----------+---+-----------------+--------------------------------------------------------------------------
@@ -275,6 +279,7 @@ IRQ line connected to CPU
 
 // MPU4
 #include "ui.h"
+#include "timer.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 //#include "video/awpvid.h"   // Fruit Machines Only
@@ -288,6 +293,9 @@ IRQ line connected to CPU
 #include "machine/mpu4.c"
 //#include "machine/74148.h"
 #include "sound/saa1099.h"
+
+//Deal 'Em
+#include "video/crtc6845.h"
 
 #ifdef MAME_DEBUG
 #define LOG(x)	logerror x
@@ -318,26 +326,31 @@ static int ay8910_address;
 static int serial_data;
 static int signal_50hz;
 static int ic4_input_b;
+static int IC23G1;
+static int IC23G2A;
+static int IC23G2B;
 static int IC23GC;
 static int IC23GB;
 static int IC23GA;
 static int prot_col;
-
+static int lamp_col;
+static int ic24_active;
+static mame_timer *ic24_timer;
+void ic24_timeout(int state);
 // user interface stuff ///////////////////////////////////////////////////
 
 static UINT8 Lamps[128];        // 128 multiplexed lamps  (2 8X8 matrices)
-//static UINT8 inputs[32];      // 32  multiplexed inputs - but a further 8 possible per AUX.
+								// 32  multiplexed inputs - but a further 8 possible per AUX.
 								// Two connectors 'orange' (sampled every 8ms) and 'black' (sampled every 16ms)
 								// Each connector carries two banks of eight inputs and two enable signals
 
 static int optic_pattern;
 static UINT16 lamp_strobe;
 static UINT8  lamp_data;
-
 static UINT8  yamdata;
 
-static UINT8 chr_data[128];
-static UINT16 chr16_data[128];
+static UINT8 chr_data[144];
+static UINT16 chr16_data[144];
 static UINT8 led_segs[8];
 
 /*
@@ -365,7 +378,6 @@ void draw_MPU4_led(UINT8 id, UINT8 value)
 }
 
 static int    input_strobe;	  // IC23 74LS138 A = CA2 IC7, B = CA2 IC4, C = CA2 IC8
-static int    output_strobe;  // same
 
 // Video
 
@@ -529,8 +541,12 @@ static MACHINE_RESET( mpu4 )
 	IC23GC    = 0;
 	IC23GB    = 0;
 	IC23GA    = 0;
-	prot_col  = 0;
+	IC23G1    = 1;
+	IC23G2A   = 0;
+	IC23G2B   = 0;
 
+	prot_col  = 0;
+	ic24_timer = timer_alloc(ic24_timeout);
 // init rom bank ////////////////////////////////////////////////////////
 
 	{
@@ -567,20 +583,25 @@ static MACHINE_RESET( mpu4_vid )
 	IC23GC    = 0;
 	IC23GB    = 0;
 	IC23GA    = 0;
+	IC23G1    = 1;
+	IC23G2A   = 0;
+	IC23G2B   = 0;
+
 	prot_col  = 0;
+	ic24_timer = timer_alloc(ic24_timeout);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 void cpu0_irq(int state)
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE, state? ASSERT_LINE:CLEAR_LINE);
+	cpunum_set_input_line(0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 int%d \n",state));
 }
 
 void cpu0_firq(int state)
 {
-	cpunum_set_input_line(0, M6809_FIRQ_LINE, state? ASSERT_LINE:CLEAR_LINE);
+	cpunum_set_input_line(0, M6809_FIRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 fint%d \n",state));
 }
 
@@ -600,7 +621,7 @@ static WRITE8_HANDLER( ic2_o1_callback )
 	// copy output value to IC2 c2
 	// this output is the clock for timer2,
 	// the output from timer2 is the input clock for timer3
-	// the output from timer3 is used as a square wave for the audio output (how?)
+	// the output from timer3 is used as a square wave for the alarm output
 	// and as an external clock source for timer 1!
 
 }
@@ -614,7 +635,6 @@ static WRITE8_HANDLER( ic2_o2_callback )
 static WRITE8_HANDLER( ic2_o3_callback )
 {
 	ptm6840_set_c1(   0, data); // copy output value to IC2 c1
-	//pia_set_input_a(3, data);
 }
 
 static const ptm6840_interface ptm_ic2_intf =
@@ -673,39 +693,88 @@ static const pia6821_interface pia_ic3_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ pia_ic3_porta_w, pia_ic3_portb_w, pia_ic3_ca2_w, pia_ic3_cb2_w,
-	/*irqs   : A/B             */ 0, 0
+	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
-static WRITE8_HANDLER( pia_ic4_porta_w )
+/*---------------------------------------
+   IC23 emulation
+  ---------------------------------------
+IC23 is a 74LS138 1-of-8 Decoder
+
+It is used as a multiplexer for the LEDs, lamp selects and inputs.
+
+*/
+
+static void ic23_update(void)
 {
-	if (!IC23GC)
+	LOGSTUFF(("G2A %d G2B %d G1 %d \n",IC23G2A,IC23G2B,IC23G1));
+	if (!IC23G2A)
 	{
-		if (!IC23GB)
+		if (!IC23G2B)
 		{
-			if (IC23GA)
+			if (IC23G1)
 			{
-				switch (input_strobe)
-				{
-					case 0x00:
-					led_segs[0] = data;
-					case 0x01:
-					led_segs[1] = data;
-					case 0x02:
-					led_segs[2] = data;
-					case 0x03:
-					led_segs[3] = data;
-					case 0x04:
-					led_segs[4] = data;
-					case 0x05:
-					led_segs[5] = data;
-					case 0x06:
-					led_segs[6] = data;
-					case 0x07:
-					led_segs[7] = data;
-				}
+				if ( IC23GA ) input_strobe |= 0x01;
+				else          input_strobe &= ~0x01;
+
+				if ( IC23GB ) input_strobe |= 0x02;
+				else          input_strobe &= ~0x02;
+
+				if ( IC23GC ) input_strobe |= 0x04;
+				else          input_strobe &= ~0x04;
 			}
 		}
 	}
+	else
+	if ((IC23G2A)||(IC23G2B))
+	{
+		input_strobe = 0x00;
+	}
+}
+/*---------------------------------------
+   IC24 emulation
+  ---------------------------------------
+IC24 is a 74LS122 pulse generator
+
+CLEAR and B2 are tied high and A1 and A2 tied low, meaning any pulse on B1 will give a low pulse.
+*/
+
+static void ic24_output(int data)
+{
+	IC23G2A = data;
+	ic23_update();
+}
+
+static void ic24_setup(void)
+{
+	if (IC23GA)
+	{
+		double duration = TIME_OF_74LS123((220*1000),(0.1*0.000001));
+		if (!ic24_active)
+		{
+			ic24_output(1);
+			timer_adjust(ic24_timer, duration, 0, 0);
+			ic24_active = 1;
+		}
+	}
+	else
+	{
+		if (ic24_active)
+		{
+			timer_adjust(ic24_timer, TIME_NOW, 0, 0);
+		}
+	}
+}
+
+void ic24_timeout(int dummy)
+{
+	ic24_active = 0;
+	ic24_output(0);
+}
+
+static WRITE8_HANDLER( pia_ic4_porta_w )
+{
+	led_segs[input_strobe] = data;
 	LOG(("%04x IC4 PIA Port A Set to %2x\n", activecpu_get_previouspc(),data));
 }
 
@@ -748,11 +817,8 @@ static WRITE8_HANDLER( pia_ic4_ca2_w )
 {
 	LOG_IC3(("%04x IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", activecpu_get_previouspc(),data&0xFF));
 
-	if ( data )  input_strobe |=  0x02;
-	else         input_strobe &= ~0x02;
-
-	output_strobe = input_strobe; // same strobe lines are used for input and output
 	IC23GB = data;
+	ic23_update();
 }
 
 // IC4, 7 seg leds, 50Hz timer reel sensors, current sensors
@@ -782,17 +848,11 @@ static WRITE8_HANDLER( pia_ic5_ca2_w )
 	serial_data = data;
 }
 
-static WRITE8_HANDLER( pia_ic5_cb2_w )
-{
-	LOG(("%04x IC5 PIA Write CB2 %2x\n",activecpu_get_previouspc(),data));
-	//ay8912 chipsel
-}
-
 static const pia6821_interface pia_ic5_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ pia_ic5_porta_r, pia_ic5_portb_r, 0, 0, 0, 0,//CB1 connected to PB7 Aux 2
-	/*outputs: A/B,CA/B2       */ 0, 0, pia_ic5_ca2_w,  pia_ic5_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq,cpu0_irq
+	/*outputs: A/B,CA/B2       */ 0, 0, pia_ic5_ca2_w,  0,
+	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
 /* ---------------------------------------
@@ -820,34 +880,37 @@ BDIR BC1       |
 
 static void update_yam(void)
 {
-	switch (ay8910_address)
+	if (pia_get_output_cb2(2));
 	{
-  		case 0x00:
+		switch (ay8910_address)
 		{
-			/* Inactive */
-			break;
-	    }
-	  	case 0x01:
-		{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
-			pia_set_input_a(3, AY8910_read_port_0_r(0));
-			LOG(("Yamaha Read \n"));
-			break;
-	  	}
-	  	case 0x02:
-		{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-	  		AY8910_write_port_0_w(0, pia_get_output_a(3));
-			LOG(("Yamaha Write \n"));
-			break;
-	  	}
-	  	case 0x03:
-		{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-	  		AY8910_control_port_0_w(0, pia_get_output_a(3));
-			LOG(("Yamaha Select \n"));
-			break;
-	  	}
-		default:
-		{
-			LOG(("Yamaha error \n"));
+  			case 0x00:
+			{
+				/* Inactive */
+				break;
+		    }
+		  	case 0x01:
+			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
+				pia_set_input_a(3, AY8910_read_port_0_r(0));
+				LOG(("Yamaha Read \n"));
+				break;
+		  	}
+		  	case 0x02:
+			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
+	  			AY8910_write_port_0_w(0, pia_get_output_a(3));
+				LOG(("Yamaha Write \n"));
+				break;
+	  		}
+		  	case 0x03:
+			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
+	  			AY8910_control_port_0_w(0, pia_get_output_a(3));
+				LOG(("Yamaha Select \n"));
+				break;
+	  		}
+			default:
+			{
+				LOG(("Yamaha error \n"));
+			}
 		}
 	}
 }
@@ -859,14 +922,13 @@ static WRITE8_HANDLER( pia_ic6_portb_w )
 	Stepper_update(0, (data >> 4) & 0x0F );
 	Stepper_update(1, data        & 0x0F );
 
-	if ( Stepper_optic_state(0) ) optic_pattern |=  0x01;
-	else                          optic_pattern &= ~0x01;
-	if ( Stepper_optic_state(1) ) optic_pattern |=  0x02;
-	else                          optic_pattern &= ~0x02;
-
-	if (!optic_pattern == 0)
-	pia_set_input_cb2(1,0);	// signal is connected to IC4 CB2
-	pia_set_input_cb2(1,1);
+	if ( pia_get_output_cb2(1))
+	{
+		if ( Stepper_optic_state(0) ) optic_pattern |=  0x01;
+		else                          optic_pattern &= ~0x01;
+		if ( Stepper_optic_state(1) ) optic_pattern |=  0x02;
+		else                          optic_pattern &= ~0x02;
+	}
 }
 
 static WRITE8_HANDLER( pia_ic6_porta_w )
@@ -900,7 +962,7 @@ static const pia6821_interface pia_ic6_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ pia_ic6_porta_w, pia_ic6_portb_w, pia_ic6_ca2_w, pia_ic6_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq,cpu0_irq
+	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
 static WRITE8_HANDLER( pia_ic7_porta_w )
@@ -909,6 +971,14 @@ static WRITE8_HANDLER( pia_ic7_porta_w )
 
 	Stepper_update(2, (data >> 4) & 0x0F );
 	Stepper_update(3, data        & 0x0F );
+
+	if ( pia_get_output_cb2(1))
+	{
+		if ( Stepper_optic_state(2) ) optic_pattern |=  0x04;
+		else                          optic_pattern &= ~0x04;
+		if ( Stepper_optic_state(3) ) optic_pattern |=  0x08;
+		else                          optic_pattern &= ~0x08;
+	}
 }
 
 static WRITE8_HANDLER( pia_ic7_portb_w )
@@ -948,12 +1018,9 @@ static WRITE8_HANDLER( pia_ic7_ca2_w )
 {
 	LOG(("%04x IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", activecpu_get_previouspc(),data));
 
-	if ( data ) input_strobe |=  0x01;
-	else        input_strobe &= ~0x01;
-
-	output_strobe = input_strobe; // same strobe lines are used for input and output
-
 	IC23GA = data;
+	ic24_setup();
+	ic23_update();
 }
 
 static WRITE8_HANDLER( pia_ic7_cb2_w )
@@ -978,15 +1045,51 @@ static const pia6821_interface pia_ic7_intf =
 
 static READ8_HANDLER( pia_ic8_porta_r )
 {
+	int input_read =0;
 	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n",activecpu_get_previouspc()));
-
-	// strobe
-	if (input_strobe & 0x06)
+// The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
+// This is achieved via connecting every input line to an AND gate, thus allowing two strobes
+// to represent each orange input bank (strobes are active low).
+	switch (input_strobe)
 	{
-		pia_set_input_cb1(2, (readinputportbytag("AUX2") & 0x80));
+		case 0:
+		case 4:
+		{
+			input_read = 0x00;
+			break;
+		}
+		case 1:
+		case 5:
+		{
+			input_read = 0x01;
+			break;
+		}
+		case 2:
+		{
+			input_read = 0x02;
+			break;
+		}
+		case 3:
+		{
+			input_read = 0x03;
+			break;
+		}
+		case 6:
+		{
+			input_read = 0x04;
+			break;
+		}
+		case 7:
+		{
+			input_read = 0x05;
+			break;
+		}
 	}
-	return readinputport(input_strobe);
+	pia_set_input_cb1(2, (readinputportbytag("AUX2") & 0x80));
+	popmessage("IC24 input %d\n",input_strobe);
+	return readinputport(input_read);
 }
+
 
 static WRITE8_HANDLER( pia_ic8_portb_w )
 {
@@ -997,12 +1100,8 @@ static WRITE8_HANDLER( pia_ic8_ca2_w )
 {
 	LOG_IC8(("%04x IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", activecpu_get_previouspc(), data & 0xFF));
 
-	if ( data ) input_strobe |=  0x04;
-	else        input_strobe &= ~0x04;
-
-	output_strobe = input_strobe; // same strobe lines are used for input and output
-
 	IC23GC = data;
+	ic23_update();
 }
 
 static WRITE8_HANDLER( pia_ic8_cb2_w )
@@ -1020,7 +1119,7 @@ static const pia6821_interface pia_ic8_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ pia_ic8_porta_r, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, pia_ic8_portb_w, pia_ic8_ca2_w, pia_ic8_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq,cpu0_irq
+	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
 // Video
@@ -1031,7 +1130,7 @@ static const pia6821_interface pia_ic8_intf =
  *
  *************************************/
 
-/* the interrupt system consists of a 74148 priority encoder
+/* The interrupt system consists of a 74148 priority encoder
    with the following interrupt priorites.  A lower number
    indicates a lower priority:
 
@@ -1789,6 +1888,7 @@ WRITE16_HANDLER( ef9369_address_w )
 }
 
 /*
+6850
 Status Register (R/O)
 
 hex  bit
@@ -1857,6 +1957,58 @@ INPUT_PORTS_START( mpu4 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("30")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("31")
 
+	PORT_START_TAG("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START_TAG("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
 	PORT_START_TAG("AUX1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
@@ -1880,12 +2032,11 @@ INPUT_PORTS_START( mpu4 )
 	PORT_DIPNAME( 0x08, 0x00, "100p Enable?" )
 	PORT_DIPSETTING(    0x00, "Enabled")
 	PORT_DIPSETTING(    0x08, "Disabled")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(100)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(100)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(100)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(100)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 
-	//2X8 dips
 INPUT_PORTS_END
 
 INPUT_PORTS_START( connect4 )
@@ -1915,9 +2066,9 @@ INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("18")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("19")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("20")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("21")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Switch")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Software Reset")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Back Door?")
 
 	PORT_START_TAG("IN2B")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Select")
@@ -1928,6 +2079,58 @@ INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("29")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("30")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Drop")
+
+	PORT_START_TAG("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "Invert Alpha?" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes  ) )
+
+	PORT_START_TAG("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START_TAG("AUX1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
@@ -1958,7 +2161,6 @@ INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 
-	//2X8 dips
 INPUT_PORTS_END
 
 INPUT_PORTS_START( crmaze )
@@ -2002,6 +2204,58 @@ INPUT_PORTS_START( crmaze )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Getout Red")//Labelled Escape on cabinet
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("100p Service?")PORT_IMPULSE(100)
 
+	PORT_START_TAG("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START_TAG("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
 	PORT_START_TAG("AUX1")//Presumed to be trackball
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
@@ -2025,10 +2279,132 @@ INPUT_PORTS_START( crmaze )
 	PORT_DIPNAME( 0x08, 0x00, "100p Enable?" )
 	PORT_DIPSETTING(    0x00, "Enabled")
 	PORT_DIPSETTING(    0x08, "Disabled")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(100)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(100)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(100)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(100)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+
+INPUT_PORTS_END
+
+INPUT_PORTS_START( dealem )
+	PORT_START_TAG("IN1A")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("05")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("06")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("07")
+
+	PORT_START_TAG("IN1B")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("08")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("09")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("11")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("12")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("13")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("14")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("15")
+
+	PORT_START_TAG("IN2A")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("16")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("17")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("18")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("19")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("20")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("21")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Software Reset")
+
+	PORT_START_TAG("IN2B")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("24")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("25")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("26")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("27")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("28")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("29")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("30")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("31")
+
+	PORT_START_TAG("DIL1")
+	PORT_DIPNAME( 0x0f, 0x00, "Cabinet Set Up Mode" ) PORT_DIPLOCATION("DIL1:01,02,03,04")
+	PORT_DIPSETTING(    0x00, "Stop The Clock" )
+	PORT_DIPSETTING(    0x01, "Hit the Top" )
+	PORT_DIPSETTING(    0x02, "Way In" )
+	PORT_DIPSETTING(    0x03, "Smash and Grab" )
+	PORT_DIPSETTING(    0x04, "Ready Steady Go-1" )
+	PORT_DIPSETTING(    0x05, "Ready Steady Go-2" )
+	PORT_DIPSETTING(    0x06, "Top Gears-1" )
+	PORT_DIPSETTING(    0x07, "Top Gears-2" )
+	PORT_DIPSETTING(    0x08, "Nifty Fifty" )
+	PORT_DIPSETTING(    0x09, "Super tubes" )
+	PORT_DIPNAME( 0x70, 0x00, "Target Payout Percentage" ) PORT_DIPLOCATION("DIL1:05,06,07")
+	PORT_DIPSETTING(    0x00, "72%" )
+	PORT_DIPSETTING(    0x10, "74%" )
+	PORT_DIPSETTING(    0x20, "76%" )
+	PORT_DIPSETTING(    0x30, "78%" )
+	PORT_DIPSETTING(    0x40, "80%" )
+	PORT_DIPSETTING(    0x50, "82%" )
+	PORT_DIPSETTING(    0x60, "84%" )
+	PORT_DIPSETTING(    0x70, "86%" )
+	PORT_DIPNAME( 0x80, 0x00, "Display Switch Settings on Monitor" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START_TAG("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "Payout Limit" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, "200p (All Cash)")
+	PORT_DIPSETTING(    0x01, "400p (Token)")
+	PORT_DIPNAME( 0x02, 0x00, "10p Payout Priority" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "Clear Credits and bank at power on?" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes  ) )
+	PORT_DIPNAME( 0x08, 0x00, "50p Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes  ) )
+	PORT_DIPNAME( 0x10, 0x00, "100p Payout Solenoid fitted?" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes  ) )
+	PORT_DIPNAME( 0x20, 0x00, "Coin alarm active?" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes  ) )
+	PORT_DIPNAME( 0x40, 0x00, "Stake" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, "10p 1 Game" )
+	PORT_DIPSETTING(    0x40, "10p 2 Games" )
+	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START_TAG("AUX1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("4")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("5")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("6")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("7")
+
+	PORT_START_TAG("AUX2")
+	PORT_DIPNAME( 0x01, 0x00, "10p Enable?" )
+	PORT_DIPSETTING(    0x00, "Enabled")
+	PORT_DIPSETTING(    0x01, "Disabled")
+	PORT_DIPNAME( 0x02, 0x00, "20p Enable?" )
+	PORT_DIPSETTING(    0x00, "Enabled")
+	PORT_DIPSETTING(    0x02, "Disabled")
+	PORT_DIPNAME( 0x04, 0x00, "50p Enable?" )
+	PORT_DIPSETTING(    0x00, "Enabled")
+	PORT_DIPSETTING(    0x04, "Disabled")
+	PORT_DIPNAME( 0x08, 0x00, "100p Enable?" )
+	PORT_DIPSETTING(    0x00, "Enabled")
+	PORT_DIPSETTING(    0x08, "Disabled")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 
 INPUT_PORTS_END
 
@@ -2044,7 +2420,7 @@ IRQ 4-7 Program Card
 INTERRUPT_GEN(mpu4_vid_irq)
 {
 //  if (cpu_getiloops()&1)
-//      cpunum_set_input_line(1, 1, HOLD_LINE);
+//      cpunum_set_input_line(1, 1, ASSERT_LINE);
 //  else
 //  LOGSTUFF(("scn2674_irq_mask %02x",scn2674_irq_mask));
 
@@ -2138,7 +2514,7 @@ static MACHINE_START( mpu4 )
 
 // setup the standard oki MSC1937 display ///////////////////////////////
 
-	vfd_init(0, VFDTYPE_MSC1937,0);	// does oldtimer use a OKI MSC1937 alpha display controller ?
+	vfd_init(0, VFDTYPE_MSC1937,0);
 
 	return 0;
 }
@@ -2152,75 +2528,87 @@ anything other than the CPU. However, the programmers decided to best use this p
 cycles, storing almost the entire 'hidden' data table in the ROMs in plain sight. Only later rebuilds by BwB
 avoided this 'feature' of the development kit, and as such, only low level access can defeat their protection.
 
-For most Barcrest games, though, the following can be used:
+This information has been used to generate the CHR tables loaded by the programs.
+
+For most Barcrest games, the following method was used:
 
 To calculate the values necessary to program the CHR, we must first find the version string,
-which starts at ff28 and terminates at ff2f. For Club Celebration  (an AWP) ff2f then represents the CHR address.
+which starts at ff28 and terminates at ff2f for club celebration (an AWP) ff2f then represents the CHR address.
 For some reason, the tables always seem to start and end with '00 00'.
 
 From that point on, every word represents a call and response pair, until we have generated 8 8 byte rows of data.
 
+The call values appear to be fixed, so it would be possible to make a switch statement, but I believe the emulated
+behaviour to be more likely.
+
 The initial 'PALTEST' routine as found in the Barcrest programs simply writes the first 'call' to the CHR space,
-to read back the 'response'. There is no attempt to alter the order or anything else of that matter, just
+to read back the 'response'. There is no attempt to alter the order or anything else, just
 a simple runthrough of the entire data table. The only 'catch' in this is to note that the CHR chip always scans
 through the table starting at the last accessed data value - there are duplications within the table to catch out
 the unwary.
 
 However, a final 8 byte row, that controls the lamp matrix is not tested - to date, no-one outside of Barcrest knows
 how this is generated, and currently trial and error is the only sensible method. It is noted that the default,
-of all 00, is sometimes the correct answer, particularly in non-Barcrest use of the CHR chip.
+of all 00, is sometimes the correct answer, particularly in non-Barcrest use of the CHR chip, though when used normally,
+there are again fixed call values.
 
-Despite the potential to radically overhaul the design, the video card version of the chip appears to just be a
-16-bit version of the previous design.It is unclear, however, if it has any capacity to affect lamp matrices in the same
-way as before. That said, the 'quiz' games on the board did use an address-scrambling PAL for encryption, and the very
-last mod had a characteriser capable of scrambling the ROM address lines.
+Despite the potential to radically overhaul the design, the 68k version of the chip appears to just be a
+16-bit version of the previous design, with some endian-swapping necessary. It is unclear, however, if it has any capacity
+to affect lamp matrices in the same way as before, as no software seen makes any request for the 'lamp' row.
+It has been left in the table, as it clearly exists, but is unused.
+The 'quiz' games on the board did use an address-scrambling PAL for encryption, and the very last mod had a characteriser capable
+of scrambling the ROM address lines.
 */
-
-static void character_generation_8(UINT16 address)
-{
-	int x;
-	UINT8 *rom;
-	rom = memory_region(REGION_CPU1);
-	for ( x = 0; x < 128; x++ )
-	{
-		chr_data[x] = rom[(address)+(x)];
-		LOG_CHR(("%02X",chr_data[x]));
-	}
-}
-
-static void character_generation_16(UINT16 address)
-{
-	int x;
-	UINT8 *rom;
-	rom = memory_region(REGION_CPU2);
-	for ( x = 0; x < 128; x++ )
-	{
-		chr16_data[x] = rom[(address)+(x)];
-		LOG_CHR(("%02X",chr16_data[x]));
-	}
-}
 
 static WRITE8_HANDLER( characteriser_w )
 {
 	int x;
 	int call=data;
-	LOG_CHR(("Characteriser write offset %02X data %02X\n",offset,data));
-	for ( x = prot_col; x < 128; x++ )
+	if (offset == 0)
 	{
-		if	((chr_data[(x)] == call) && ((x & 1) == 0))
+	LOG_CHR(("Characteriser write 0 data %02X\n",data));
+		for ( x = prot_col; x < 128; x++ )
 		{
-			prot_col = (x)+1;
-			LOG_CHR(("Characteriser find column %02X\n",prot_col));
-			break;
+			if	((chr_data[(x)] == call) && ((x & 1) == 0))
+			{
+				prot_col = (x)+1;
+				LOG_CHR(("Characteriser find column %02X\n",prot_col));
+				break;
+			}
+			if (prot_col > 126)
+			prot_col = 0;
+		}
+	}
+	else if (offset == 2)
+	{
+		LOG_CHR(("Characteriser write 2 data %02X\n",data));
+		for ( x = lamp_col; x < 16; x++ )
+		{
+			if	((chr_data[(128+x)] == call) && ((x & 1) == 0))
+			{
+				lamp_col = (x)+1;
+				LOG_CHR(("Characteriser find column %02X\n",prot_col));
+				break;
+			}
+			if (lamp_col > 15)
+			lamp_col = 0;
 		}
 	}
 }
 
 static READ8_HANDLER( characteriser_r )
 {
+	if (offset == 0)
+	{
+		return chr_data[prot_col];
+	}
+	if (offset == 3)
+	{
+		return chr_data[lamp_col+128];
+	}
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",chr_data[prot_col]));
-	return chr_data[prot_col];
+	return 0;
 }
 
 static WRITE16_HANDLER( characteriser16_w )
@@ -2236,6 +2624,8 @@ static WRITE16_HANDLER( characteriser16_w )
 			LOG_CHR(("Characteriser find column %02X\n",prot_col));
 			break;
 		}
+			if (prot_col+1 > 126)
+			prot_col = 0;
 	}
 }
 
@@ -2245,6 +2635,7 @@ static READ16_HANDLER( characteriser16_r )
 	LOG_CHR(("Characteriser read data %02X \n",chr16_data[prot_col]));
 	return chr16_data[prot_col];
 }
+
 // generate a 50 Hz signal (based on an RC time) //////////////////////////
 
 static INTERRUPT_GEN( gen_50hz )
@@ -2371,6 +2762,150 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
+//Deal 'Em was designed as an enhanced gamecard, to fit into an existing MPU4 card
+//It's an unoffical addon, and does all its work through the existing 6809 CPU
+
+static const gfx_layout dealemcharlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8
+};
+
+static const gfx_decode dealemgfxdecodeinfo[] =
+{
+	{ REGION_GFX1, 0x0000, &dealemcharlayout, 0, 16 },
+	{ -1 } /* end of array */
+};
+
+UINT8 *dealem_videoram,*dealem_charram;
+
+
+tilemap *dealem_tilemap;
+
+
+PALETTE_INIT(dealem)
+{
+	int i;
+	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+
+
+	for (i = 0;i < Machine->drv->total_colors;i++)
+	{
+		int bit0,bit1,bit2,r,g,b;
+
+
+		/* red component */
+		bit0 = (*color_prom >> 0) & 0x01;
+		bit1 = (*color_prom >> 1) & 0x01;
+		bit2 = (*color_prom >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (*color_prom >> 3) & 0x01;
+		bit1 = (*color_prom >> 4) & 0x01;
+		bit2 = (*color_prom >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* blue component */
+		bit0 = 0;
+		bit1 = (*color_prom >> 6) & 0x01;
+		bit2 = (*color_prom >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine,i,r,g,b);
+
+		color_prom++;
+	}
+
+	/* color_prom now points to the beginning of the lookup table */
+
+	/* characters */
+	for (i = 0;i < TOTAL_COLORS(0);i++)
+		COLOR(0,i) = (*(color_prom++) & 0x0f);
+}
+
+static void get_bg_tile_info(int tile_index)
+{
+	int tileno, colour;
+
+	tileno = dealem_videoram[tile_index*2];
+	colour = dealem_videoram[tile_index*2+1];
+
+	SET_TILE_INFO(0,tileno,colour,0)
+}
+
+VIDEO_START(dealem)
+{
+	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,64,32);
+
+	return 0;
+}
+
+
+WRITE8_HANDLER( dealem_videoram_w )
+{
+	if (dealem_videoram[offset] != data)
+	{
+		dealem_videoram[offset] = data;
+		tilemap_mark_tile_dirty(dealem_tilemap, offset);
+	}
+}
+
+VIDEO_UPDATE(dealem)
+{
+	tilemap_draw(bitmap,cliprect,dealem_tilemap,0,0);
+	return 0;
+}
+
+static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(crtc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+
+//  AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w) // write bank (rom page select)
+
+//  AM_RANGE(0x0880, 0x0883) AM_WRITE(pia_6_w)      // PIA6821 on game board
+//  AM_RANGE(0x0880, 0x0883) AM_READ( pia_6_r)
+
+//  AM_RANGE(0x08C0, 0x08C7) AM_READ( ptm6840_1_r)  // 6840PTM on game board
+//  AM_RANGE(0x08C0, 0x08C7) AM_WRITE(ptm6840_1_w)
+
+//  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
+//  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
+
+	AM_RANGE(0x0900, 0x0907) AM_READ( ptm6840_0_r)  // 6840PTM
+	AM_RANGE(0x0900, 0x0907) AM_WRITE(ptm6840_0_w)
+
+	AM_RANGE(0x0A00, 0x0A03) AM_WRITE(pia_0_w)		// PIA6821 IC3
+	AM_RANGE(0x0A00, 0x0A03) AM_READ( pia_0_r)
+
+	AM_RANGE(0x0B00, 0x0B03) AM_WRITE(pia_1_w)		// PIA6821 IC4
+	AM_RANGE(0x0B00, 0x0B03) AM_READ( pia_1_r)
+
+	AM_RANGE(0x0C00, 0x0C03) AM_WRITE(pia_2_w)		// PIA6821 IC5
+	AM_RANGE(0x0C00, 0x0C03) AM_READ( pia_2_r)
+
+	AM_RANGE(0x0D00, 0x0D03) AM_WRITE(pia_3_w)		// PIA6821 IC6
+	AM_RANGE(0x0D00, 0x0D03) AM_READ( pia_3_r)
+
+	AM_RANGE(0x0E00, 0x0E03) AM_WRITE(pia_4_w)		// PIA6821 IC7
+	AM_RANGE(0x0E00, 0x0E03) AM_READ( pia_4_r)
+
+	AM_RANGE(0x0F00, 0x0F03) AM_WRITE(pia_5_w)		// PIA6821 IC8
+	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
+
+	AM_RANGE(0x1000, 0x2fff) AM_WRITE(dealem_videoram_w) AM_BASE(&dealem_videoram)
+
+	AM_RANGE(0xBE00, 0xffff) AM_ROM	// 64k  paged ROM (4 pages)
+
+ADDRESS_MAP_END
+
 static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4 )
@@ -2440,14 +2975,76 @@ static MACHINE_DRIVER_START( mpu4 )
 
 MACHINE_DRIVER_END
 
+// machine driver for zenitone dealem board /////////////////////////////////
+
+static MACHINE_DRIVER_START( dealem )
+
+	MDRV_MACHINE_START(mpu4)							// main mpu4 board initialisation
+	MDRV_MACHINE_RESET(mpu4_vid)
+	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)// 6809 CPU
+	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)						// setup read and write memorymap
+
+	MDRV_CPU_PERIODIC_INT(gen_50hz, TIME_IN_HZ(50) )	// generate 50 hz signal
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(AY8910, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
+	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_VIDEO_START( dealem)
+	MDRV_GFXDECODE(dealemgfxdecodeinfo)
+	MDRV_VIDEO_UPDATE(dealem)
+
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_COLORTABLE_LENGTH(16)
+//  MDRV_PALETTE_INIT(dealem) Needs work, confirm PROM with CanonMan
+
+MACHINE_DRIVER_END
+
 DRIVER_INIT (crmaze)
 {
-	character_generation_16(0x04c6);
+	int x;
+	UINT16 chr_table[144]={	0x00,0x00,0x84,0x1A,0x94,0x04,0x3C,0x10,0xEC,0x18,0x5C,0x0F,0xEC,0x13,0x50,0x1B,
+							0x2C,0x03,0x68,0x07,0x60,0x17,0xAC,0x1D,0x74,0x36,0x00,0x35,0xAC,0x2B,0x58,0x28,
+							0xEC,0x39,0x7C,0x21,0xEC,0x22,0x58,0x25,0xE0,0x2C,0x90,0x29,0x18,0x31,0xEC,0x34,
+							0x54,0x0A,0x28,0x1F,0x68,0x06,0x44,0x0E,0x84,0x1C,0xB4,0x12,0x10,0x1E,0x20,0x0D,
+							0x84,0x14,0xBC,0x0A,0xE8,0x19,0x70,0x15,0x24,0x06,0x84,0x0F,0xB8,0x08,0xE0,0x1B,
+							0x94,0x1E,0x14,0x04,0x2C,0x01,0x64,0x0C,0x8C,0x18,0x50,0x1A,0x28,0x11,0x4C,0x0B,
+							0x6C,0x03,0x60,0x17,0xA0,0x10,0xBC,0x1D,0xCC,0x0E,0x78,0x07,0xE8,0x12,0x50,0x09,
+							0x20,0x0D,0xAC,0x1F,0x74,0x16,0x04,0x05,0xA4,0x13,0x94,0x1C,0x3C,0x02,0x00,0x00,
+
+							0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+	for (x=0; x < 144; x++)
+	{
+		chr16_data[(x)] = chr_table[(x)];
+	}
 }
 
 DRIVER_INIT (mating)
 {
-	character_generation_16(0x04f6);
+	int x;
+	UINT16 chr_table[144]={	0x00,0x00,0x18,0x1A,0xC8,0x04,0xA4,0x10,0x0C,0x18,0x80,0x0F,0x0C,0x13,0x90,0x1B,
+							0x34,0x03,0x30,0x07,0x00,0x17,0x58,0x1D,0xC8,0x36,0x84,0x35,0x4C,0x2B,0xA0,0x28,
+							0x4C,0x39,0xC0,0x21,0x3C,0x22,0xC8,0x25,0xA4,0x2C,0x4C,0x29,0x80,0x31,0x0C,0x34,
+							0x80,0x0A,0x0C,0x1F,0xE0,0x06,0x1C,0x0E,0x88,0x1C,0xA4,0x12,0x0C,0x1E,0xA0,0x0D,
+							0x0C,0x14,0x80,0x0A,0x4C,0x19,0xA0,0x15,0x3C,0x06,0x98,0x0F,0xEC,0x08,0x84,0x1B,
+							0x0C,0x1E,0xC0,0x04,0x1C,0x01,0xA8,0x0C,0x84,0x18,0x0C,0x1A,0xA0,0x11,0x5C,0x0B,
+							0xE8,0x03,0xA4,0x17,0x0C,0x10,0xD0,0x1D,0x04,0x0E,0x38,0x07,0xA8,0x12,0xC4,0x09,
+							0x2C,0x0D,0x90,0x1F,0x44,0x16,0x18,0x05,0xE8,0x13,0x84,0x1C,0x3C,0x02,0x00,0x00,
+
+							0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
+	for (x=0; x < 144; x++)
+	{
+		chr16_data[(x)] = chr_table[(x)];
+	}
 }
 
 /*
@@ -2613,10 +3210,28 @@ ROM_START( connect4 )
 	ROM_LOAD( "connect4.p1",  0xC000, 0x4000,  CRC(b1af50c0) )
 ROM_END
 
+ROM_START( dealem )
+	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00  )	/* 64k for code */
+	ROM_LOAD( "zenndlem.u6",  0x8000, 0x8000,  CRC(571e5c05) )
+
+	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "zenndlem.u24",	0x0000, 0x10000, CRC(3a1950c4) SHA1(7138346d4e8b3cffbd9751b4d7ebd367b9ad8da9) )    /* text layer */
+
+	ROM_REGION( 0x020, REGION_PROMS, 0 )
+	ROM_LOAD( "zenndlem.u22",		0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) )
+
+ROM_END
+
 /*    YEAR   NAME    PARENT   MACHINE   INPUT     INIT   MONITOR COMPANY            FULLNAME                                                            FLAGS (0 if none)  */
 
 GAME( 198?, connect4,0,       mpu4,     connect4, 0,		0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 199?, bctvidbs,0,       mpu4,		mpu4,	  0,     ROT0,   "Barcrest", 		"MPU4 Video Firmware",												NOT_A_DRIVER )
+
+//Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
+//and reel assembly with this kit and a supplied monitor.
+//The real Deal 'Em ran on Summit Coin hardware, and was made by someone else.
+//A further different release was made in 2000, running on the Barcrest MPU4 Video, rather than this one.
+GAME( 198?, dealem,0,		 dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em (MPU4 Conversion Kit)",									GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_WRONG_COLORS )
 
 GAME( 1994, crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1994, crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND )

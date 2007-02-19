@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 
+// MAME headers
 #include "osdepend.h"
 
 

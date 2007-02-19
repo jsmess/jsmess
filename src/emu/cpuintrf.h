@@ -14,15 +14,17 @@
 #ifndef __CPUINTRF_H__
 #define __CPUINTRF_H__
 
-#include "memory.h"
 #include "cpuint.h"
 #include "cpuexec.h"
+#include "mame.h"
 #include "state.h"
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
+
+#define MAX_CPU 8
 
 /* Enum listing all the CPUs */
 enum

@@ -335,9 +335,7 @@
 */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 #include "pdp1.h"
 

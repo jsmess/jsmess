@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include <stddef.h>
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 #include "tms34010.h"
 #include "34010ops.h"
@@ -1654,34 +1654,6 @@ int tms34020_get_DPYSTRT(int cpu)
 /***************************************************************************
     SAVE STATE
 ***************************************************************************/
-
-void tms34010_state_save(int cpunum, mame_file *f)
-{
-	tms34010_regs *context = FINDCONTEXT(cpunum);
-	mame_fwrite(f,context,sizeof(state));
-	mame_fwrite(f,&tms34010_ICount,sizeof(tms34010_ICount));
-	mame_fwrite(f,state.shiftreg,sizeof(SHIFTREG_SIZE));
-}
-
-
-void tms34010_state_load(int cpunum, mame_file *f)
-{
-	/* Don't reload the following */
-	UINT16 *shiftreg_save = state.shiftreg;
-	tms34010_regs *context = FINDCONTEXT(cpunum);
-
-	mame_fread(f,context,sizeof(state));
-	mame_fread(f,&tms34010_ICount,sizeof(tms34010_ICount));
-	change_pc(TOBYTE(PC));
-	SET_FW();
-	tms34010_io_register_w(REG_DPYINT,IOREG(REG_DPYINT),0);
-	set_raster_op();
-	set_pixel_function();
-
-	state.shiftreg      = shiftreg_save;
-
-	mame_fread(f,state.shiftreg,sizeof(SHIFTREG_SIZE));
-}
 
 static void tms34010_state_presave(void)
 {

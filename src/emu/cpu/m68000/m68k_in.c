@@ -6952,7 +6952,15 @@ M68KMAKE_OP(movec, 32, rc, .)
 			case 0x002:			   /* CACR */
 				if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
 				{
-					REG_CACR = REG_DA[(word2 >> 12) & 15];
+					if (CPU_TYPE_IS_040_PLUS(CPU_TYPE))
+					{
+						REG_CACR = REG_DA[(word2 >> 12) & 15];
+					}
+					else
+					{
+						/* non 68040 can only set the lower 4 bits (C,CE,F,E) */
+						REG_CACR = REG_DA[(word2 >> 12) & 15] & 0x0f;
+					}
 					return;
 				}
 				m68ki_exception_illegal();

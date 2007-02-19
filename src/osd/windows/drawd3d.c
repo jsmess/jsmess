@@ -21,7 +21,6 @@
 #include <tchar.h>
 #include <mmsystem.h>
 #include <d3d9.h>
-#include "d3dintf.h"
 
 // standard C headers
 #include <math.h>
@@ -31,7 +30,8 @@
 #include "rendutil.h"
 #include "options.h"
 
-// OSD headers
+// MAMEOS headers
+#include "d3dintf.h"
 #include "winmain.h"
 #include "window.h"
 

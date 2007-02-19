@@ -13,7 +13,6 @@
 #include "fileio.h"
 #include "utils.h"
 #include "opresolv.h"
-#include "driver.h"
 
 typedef enum
 {

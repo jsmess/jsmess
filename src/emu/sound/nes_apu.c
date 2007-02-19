@@ -44,7 +44,7 @@
 
  *****************************************************************************/
 
-#include "driver.h"
+#include "sndintrf.h"
 #include "streams.h"
 #include "nes_apu.h"
 #include "cpu/m6502/m6502.h"

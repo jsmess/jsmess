@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include "m68k.h"
 #include "m68000.h"
-#include "state.h"
 
 /* global access */
 

@@ -6,8 +6,6 @@
 */
 
 #include "f3853.h"
-#include "driver.h"
-#include "timer.h"
 
 /*
   the smi does not have DC0 and DC1, only DC0

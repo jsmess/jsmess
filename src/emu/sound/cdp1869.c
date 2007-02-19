@@ -8,7 +8,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "sndintrf.h"
 #include "sound/cdp1869.h"
 #include "streams.h"
 

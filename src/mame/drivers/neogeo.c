@@ -4825,7 +4825,8 @@ ROM_START( rbff2 )
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )
 	ROM_LOAD( "240-v1.bin", 0x000000, 0x400000, CRC(f796265a) SHA1(736dff37eb91fc856b4d189249fb0de9b6c0813a) )
 	ROM_LOAD( "240-v2.bin", 0x400000, 0x400000, CRC(2cb3f3bb) SHA1(697e677890892f4b028c9a27c66809ca0a8a9b18) )
-	ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(df77b7fa) SHA1(4df971ce20bdb8c1ce8cc1692a32ac69505ffa9a) )
+	//ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(df77b7fa) SHA1(4df971ce20bdb8c1ce8cc1692a32ac69505ffa9a) ) // bad?
+	ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(8fe1367a) SHA1(093d7a4ac2b54ad7ffb2dc316fe29415f7a99535) )
 	ROM_LOAD( "240-v4.bin", 0xc00000, 0x400000, CRC(33a356ee) SHA1(b2a08052be670f301f8d4903b36c70088d1a11da) )
 
 	NO_DELTAT_REGION
@@ -4851,7 +4852,8 @@ ROM_START( rbff2a )
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )
 	ROM_LOAD( "240-v1.bin", 0x000000, 0x400000, CRC(f796265a) SHA1(736dff37eb91fc856b4d189249fb0de9b6c0813a) )
 	ROM_LOAD( "240-v2.bin", 0x400000, 0x400000, CRC(2cb3f3bb) SHA1(697e677890892f4b028c9a27c66809ca0a8a9b18) )
-	ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(df77b7fa) SHA1(4df971ce20bdb8c1ce8cc1692a32ac69505ffa9a) )
+	//ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(df77b7fa) SHA1(4df971ce20bdb8c1ce8cc1692a32ac69505ffa9a) ) // bad?
+	ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(8fe1367a) SHA1(093d7a4ac2b54ad7ffb2dc316fe29415f7a99535) )
 	ROM_LOAD( "240-v4.bin", 0xc00000, 0x400000, CRC(33a356ee) SHA1(b2a08052be670f301f8d4903b36c70088d1a11da) )
 
 	NO_DELTAT_REGION
@@ -4877,7 +4879,8 @@ ROM_START( rbff2k )
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )
 	ROM_LOAD( "240-v1.bin", 0x000000, 0x400000, CRC(f796265a) SHA1(736dff37eb91fc856b4d189249fb0de9b6c0813a) )
 	ROM_LOAD( "240-v2.bin", 0x400000, 0x400000, CRC(2cb3f3bb) SHA1(697e677890892f4b028c9a27c66809ca0a8a9b18) )
-	ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(df77b7fa) SHA1(4df971ce20bdb8c1ce8cc1692a32ac69505ffa9a) )
+	//ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(df77b7fa) SHA1(4df971ce20bdb8c1ce8cc1692a32ac69505ffa9a) ) // bad?
+	ROM_LOAD( "240-v3.bin", 0x800000, 0x400000, CRC(8fe1367a) SHA1(093d7a4ac2b54ad7ffb2dc316fe29415f7a99535) )
 	ROM_LOAD( "240-v4.bin", 0xc00000, 0x400000, CRC(33a356ee) SHA1(b2a08052be670f301f8d4903b36c70088d1a11da) )
 
 	NO_DELTAT_REGION
@@ -5492,6 +5495,32 @@ ROM_START( garoup ) /* Prototype Version, seems genuine */
 	ROM_LOAD16_BYTE( "253-c7p.bin", 0x3000000, 0x800000, CRC(d68e806f) SHA1(92bfd9839115bd590972ae4ecc45ad35dce22387) ) /* Plane 0,1 */
 	ROM_LOAD16_BYTE( "253-c8p.bin", 0x3000001, 0x800000, CRC(f778fe99) SHA1(c963f6ba90a36d02991728b44ffcf174ca18268a) ) /* Plane 2,3 */
 ROM_END
+
+ROM_START( garoubl ) /* Bootleg of garoup */
+	ROM_REGION( 0x500000, REGION_CPU1, 0 )
+	ROM_LOAD16_WORD_SWAP( "253-p1bl.bin", 0x000000, 0x100000, CRC(fd446d59) SHA1(e37484673a935b2af76c84cd26977c751c0f8cff) )
+	ROM_LOAD16_WORD_SWAP( "253-p2bl.bin", 0x100000, 0x400000, CRC(3fb10a84) SHA1(4e4a4f4cd7f0ad2520c938c64c8910e6f8805eaf) )
+
+	NEO_SFIX_128K( "253-s1bl.bin", CRC(df720e33) SHA1(58d05002d4851682bd626241fa7b70f78f6f3bc8) )
+
+	NEO_BIOS_SOUND_512K( "253-m1bl.bin", CRC(7c51d002) SHA1(01ffba6cbc8da07804f7b21d8c71c39d64a1a4e2) )
+
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )
+	ROM_LOAD( "253-v1bl.bin", 0x000000, 0x400000, CRC(98d736e4) SHA1(3edda9a1d45b0e38a85156d24fc8ff2f0011239b) )
+	ROM_LOAD( "253-v2bl.bin", 0x400000, 0x400000, CRC(eb43c03f) SHA1(83c9c168b154e60a64f1033004b2d33e218bbb8b) )
+	ROM_LOAD( "253-v3bl.bin", 0x800000, 0x400000, CRC(10a0f814) SHA1(e86def80d6fb2a38ebc9f3338d22f28c15ce85da) )
+	ROM_LOAD( "253-v4bl.bin", 0xc00000, 0x400000, CRC(8918fdd3) SHA1(60ea2104a0f993341124728d8fde0e8e937c55ef) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x4000000, REGION_GFX3, 0 )
+	ROM_LOAD16_BYTE( "253-c1bl.bin", 0x0000000, 0x1000000, CRC(e2ac83fa) SHA1(186f88a85d80efbb0371bd42cca152b6b59817fb) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "253-c2bl.bin", 0x0000001, 0x1000000, CRC(7c344b24) SHA1(f8af62a917e0ce2bf8ae4f17736fdd84d55d0788) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "253-c3bl.bin", 0x2000000, 0x1000000, CRC(d3aec5a6) SHA1(c1a584909a8a1519f676aa49351742b87c18276d) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "253-c4bl.bin", 0x2000001, 0x1000000, CRC(e02a242d) SHA1(8a73826d14880303a7bea2a903e842c733178aca) ) /* Plane 2,3 */
+ROM_END
+
+
 
 ROM_START( s1945p ) /* Original Version, Encrypted GFX Roms */
 	ROM_REGION( 0x500000, REGION_CPU1, 0 )
@@ -7392,6 +7421,13 @@ DRIVER_INIT( garouo )
 	garouo_install_protection();
 }
 
+DRIVER_INIT( garoubl )
+{
+	neogeo_bootleg_sx_decrypt(2);
+	neogeo_bootleg_cx_decrypt();
+	init_neogeo(machine);
+}
+
 DRIVER_INIT( mslug3 )
 {
 	mslug3_decrypt_68k();
@@ -8052,6 +8088,7 @@ GAMEB( 1999, kof99p,   kof99,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK",
 GAMEB( 1999, garou,    neogeo,   neogeo, neogeo, neogeo,  garou,    ROT0, "SNK", "Garou - Mark of the Wolves (set 1)" , 0) /* Encrypted Code & GFX */
 GAMEB( 1999, garouo,   garou,    neogeo, neogeo, neogeo,  garouo,   ROT0, "SNK", "Garou - Mark of the Wolves (set 2)" , 0) /* Encrypted Code & GFX */
 GAMEB( 1999, garoup,   garou,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Garou - Mark of the Wolves (prototype)", 0 )
+GAMEB( 1999, garoubl,  garou,    neogeo, neogeo, neogeo,  garoubl,  ROT0, "bootleg", "Garou - Mark of the Wolves (bootleg)", 0 ) /* Bootleg of garoup */
 GAMEB( 2000, mslug3,   neogeo,   neogeo, neogeo, neogeo,  mslug3,   ROT0, "SNK", "Metal Slug 3" , 0) /* Encrypted Code & GFX */
 GAMEB( 2000, mslug3n,  mslug3,   neogeo, neogeo, neogeo,  mslug3n,  ROT0, "SNK", "Metal Slug 3 (not encrypted)" , 0) /* Encrypted GFX */
 GAMEB( 2000, mslug3b6, mslug3,   neogeo, neogeo, neogeo,  mslug3b6, ROT0, "bootleg", "Metal Slug 6 (Metal Slug 3 bootleg)", 0 ) /* real Metal Slug 6 is an Atomiswave HW game, see atomswav.c ;-) */

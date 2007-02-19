@@ -4,7 +4,7 @@
    Written by Ville Linde
 */
 
-#include "driver.h"
+#include "cpuintrf.h"
 #include "tms32051.h"
 #include "debugger.h"
 

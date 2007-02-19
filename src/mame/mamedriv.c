@@ -3585,6 +3585,7 @@ Sep.1994 Quiz Ghost Hunter
 	/* Step 2.0 */
 	DRIVER( vs2 )		/* 1997 */
 	DRIVER( harley )	/* 1997 */
+	DRIVER( skichamp )	/* 1998 */
 	DRIVER( srally2 )	/* 1998 */
 	DRIVER( sraly2dx )	/* 1998 */
 	DRIVER( von2 )		/* 1998 */
@@ -4393,6 +4394,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ssrdrjbd )	/* GX064 (c) 1991 (Japan) */
 	DRIVER( sunsetbl )	/* bootleg */
 	DRIVER( xmen )		/* GX065 (c) 1992 (US) */
+	DRIVER( xmenj )		/* GX065 (c) 1992 (Japan) */
 	DRIVER( xmen2p )	/* GX065 (c) 1992 (World) */
 	DRIVER( xmen2pj )	/* GX065 (c) 1992 (Japan) */
 	DRIVER( xmen6p )	/* GX065 (c) 1992 */
@@ -5317,6 +5319,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( garou )		/* 0253 (c) 1999 SNK */
 	DRIVER( garouo )	/* 0253 (c) 1999 SNK */
 	DRIVER( garoup )	/* 0253 (c) 1999 SNK */
+	DRIVER( garoubl )	/* bootleg */
 	DRIVER( s1945p )	/* 0254 (c) 1999 Psikyo */
 	DRIVER( preisle2 )	/* 0255 (c) 1999 Yumekobo */
 	DRIVER( mslug3 )	/* 0256 (c) 2000 SNK */
@@ -5570,6 +5573,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mustangs )	/* UPL-90058 (c) 1990 UPL + Seoul Trading */
 	DRIVER( mustangb )	/* bootleg */
 	DRIVER( bioship )	/* UPL-90062 (c) 1990 UPL + American Sammy license */
+	DRIVER( sbsgomo )	/* UPL-90062 (c) 1990 UPL */
 	DRIVER( vandyke )	/* UPL-90064 (c) UPL */
 	DRIVER( vandyjal )	/* UPL-90064 (c) Jaleco */
 	DRIVER( vandyja2 )	/* UPL-90064 (c) Jaleco */
@@ -6609,6 +6613,7 @@ Other Sun games
 	DRIVER( nmg5 )		/* (c) 1998 Yun Sung */
 	DRIVER( nmg5e )		/* (c) 1998 Yun Sung */
 	DRIVER( searchey )	/* (c) 1999 Yun Sung */
+	DRIVER( searchp2 )	/* (c) 1999 Yun Sung */
 	DRIVER( pclubys )	/* (c) 2000 Yun Sung */
 	DRIVER( pclubysa )	/* (c) 2000 Yun Sung */
 	DRIVER( garogun )	/* (c) 2000 Yun Sung */
@@ -6626,6 +6631,7 @@ Other Sun games
 
 	/* Fuuki FG-3 games */
 	DRIVER( asurabld )	/* (c) 1998 (Japan) */
+	DRIVER( asurabus )	/* (c) 2000 (Japan) */
 
 	/* Unico games */
 	DRIVER( drgnmst )	/* (c) 1994 */
@@ -6943,6 +6949,14 @@ Other Sun games
 	/* Other Amiga-based games */
 	DRIVER( upscope )	/* (c) 1986 Grand products */
 
+	DRIVER( cd32 )		/* (c) 1993 */
+	DRIVER( cndypuzl )	/* (c) 1995 */
+	DRIVER( haremchl )	/* (c) 1995 */
+	DRIVER( lsrquiz )	/* (c) 1995 */
+	DRIVER( lsrquiz2 )	/* (c) 1995 */
+	DRIVER( mgprem11 )	/* (c) 1995 */
+	DRIVER( lasstixx )	/* (c) 1995 */
+
 	/* American Laser Games */
 	DRIVER( alg_bios )
 	DRIVER( maddoga )	/* (c) 1990 */
@@ -6985,6 +6999,7 @@ Other Sun games
 
 	/* MPU4+Video Board Games */
 	DRIVER( bctvidbs )
+	DRIVER( dealem )
 	DRIVER( crmaze )	/* 1994 */
 	DRIVER( crmazea )	/* 1994 */
 	DRIVER( crmazeb )	/* 1994 */
@@ -7361,9 +7376,10 @@ Other Sun games
 	DRIVER( spinkick )	/* (c) 199? HEC */
 	DRIVER( 7mezzo )	/* (c) 198? Unknown */
 	DRIVER( magicfly )	/* (c) 198? P&A GAMES */
+	DRIVER( dynabomb )	/* (c) 2000 Limenko */
+	DRIVER( legendoh )	/* (c) 2000 Limenko */
 	DRIVER( sb2003 )	/* (c) 2003 Limenko */
 	DRIVER( sb2003a )	/* (c) 2003 Limenko */
-	DRIVER( legendoh )	/* (c) 2003 Limenko */
 	DRIVER( carrera )	/* (c) 19?? BS Electronics */
 	DRIVER( pmpoker )	/* (c) 198? PlayMan? */
 	DRIVER( goldnpkr )	/* (c) 198? Bonanza? */
@@ -7385,5 +7401,6 @@ Other Sun games
 	DRIVER( steaser )
 	DRIVER( pangofun )	/* (c) 1995 InfoCube */
 	DRIVER( 2mindril )	/* (c) 1993 Taito */
+	DRIVER( koikoi )	/* (c) 1983 Kiwako */
 
 #endif	/* DRIVER_RECURSIVE */

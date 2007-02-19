@@ -61,7 +61,6 @@ Technology = NMOS
 */
 
 #include "driver.h"
-#include "video/generic.h"
 #include "sound/ay8910.h"
 
 static tilemap *bg_tilemap;

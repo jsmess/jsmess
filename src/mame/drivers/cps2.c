@@ -18,12 +18,12 @@ Capcom, 1993-2004
 From 1993 to 2004 Capcom produced a generic system known as CPS2 (Capcom Play System 2). It
 comprises a base board (known as the A-Board) and a top board (known as the B-Board). Both were
 housed in separate plastic boxes and fitted together via four multi-pin connectors.
-The boxes are colour-coded for release in specific country regions:
-    Green  :  Japan
-    Blue   :  U.S.A. and Europe
-    Orange :  South America
-    Grey   :  Asia
-    Yellow :  All (Rent version; can be hired by operators for testing)
+The boxes are colour-coded for release in specific country regions....
+Green  - Japan
+Blue   - U.S.A. and Europe
+Orange - South America
+Grey   - Asia
+Yellow - All (Rent version; can be hired by operators for testing)
 
 Grey and orange B-Boards require an A-Board with a matching colour to work. Green A/B and Blue A/B
 boards are interchangeable. Yellow boards will fit any A-Board since they were used for renting to
@@ -45,7 +45,7 @@ some SRAM inside one of the custom IC's and powered by a battery. If the battery
 kills itself, showing only a blue or green screen on power-up. There are no known simple fixes so
 far so it is then unusable, but can be returned to Capcom for a repair, providing the security
 stickers have not been tampered with and the plastic box has not been opened.
-The encryption is so involved that there are no known bootlegs of any of the CPS2 games.
+The encryption is so involved that there were no known bootlegs of any of the CPS2 games.
 
 The sound CPU is a standard Z80. On some PCBs a custom Z80 is used instead (called a "Kabuki"). This
 is also encrypted and is powered by a battery. When this battery dies, the chip works as a regular
@@ -56,11 +56,11 @@ shorted, it sets a pin on the Kabuki to run in encrypted mode, but it has been f
 all CPS2 games so far. The Kabuki or a regular Z80 has been found in use for the sound CPU, so it
 is possible Capcom are using the Kabuki chips from old stock as regular Z80 CPUs.
 
-PCB Layout
-----------
+PCB Layouts
+-----------
 
 A-Board
-
+-------
 CAPCOM 93646A-6
    |----------------------------------------------------------------------------------------------|
    |SW3 SW2 SW1                    |-----------------------|     |-----------------------|        |
@@ -99,10 +99,10 @@ CAPCOM 93646A-6
   |- CNR                           |-----------------------|     |-----------------------|        |
    |----------------------------------------------------------------------------------------------|
 Notes:
-      5863      - Sony CXK5863BP-35 8K x8 SRAM (DIP28)
-      8464      - Fujitsu MB8464A-10L 8K x8 SRAM (SOP28)
-      HM514260  - Hitachi HM514260AJ8 256K x 16 DRAM (SOJ40)
-      HM658128  - Hitachi HM658128ADFP-10 128K x8 SRAM (SOP32)
+      5863      - Sony CXK5863BP-35 8k x8 SRAM (DIP28)
+      8464      - Fujitsu MB8464A-10L 8k x8 SRAM (SOP28)
+      HM514260  - Hitachi HM514260AJ8 256k x 16 DRAM (SOJ40)
+      HM658128  - Hitachi HM658128ADFP-10 128k x8 SRAM (SOP32)
       M5195B    - Mitsubishi Electric Corp. M5195B Voltage Detection and System Reset IC (SIP5)
       LM833     - National Semiconductor LM833 Dual Audio Operational Amplifier (DIP8)
       TDA1543   - Philips TDA1543 Dual 16-bit DAC (DIP8)
@@ -140,43 +140,43 @@ Notes:
 
       Connector Pinouts -
 
-                       JAMMA Connector                                       Extra Button Connector
-                       ---------------                                       ----------------------
-                    PART SIDE    SOLDER SIDE                                       TOP    BOTTOM
-                ----------------------------                               --------------------------
-                      GND  01    A  GND                                        GND  01    02  GND
-                      GND  02    B  GND                                        +5V  03    04  +5V
-                      +5V  03    C  +5V                                       +12V  05    06  +12V
-                      +5V  04    D  +5V                               Configurable  07    08  Configurable
-                       NC  05    E  NC                                Configurable  09    10  Configurable
-                     +12V  06    F  +12V                              Configurable  11    12  Configurable
-                           07    H                                    Configurable  13    14  Configurable
-           Coin Counter 1  08    J  NC                                Configurable  15    16  Configurable
-             Coin Lockout  09    K  Coin Lockout                      Configurable  17    18  Configurable
-               Speaker (+) 10    L  Speaker (-)                       Configurable  19    20  Configurable
-                       NC  11    M  NC                                Configurable  21    22  Configurable
-                Video Red  12    N  Video Green                       Configurable  23    24  Configurable
-               Video Blue  13    P  Video Composite Sync              Configurable  25    26  Configurable
-             Video Ground  14    R  Service Switch                    Configurable  27    28  Configurable
-                     Test  15    S  NC                                 Volume Down  29    30  Volume UP
-                   Coin A  16    T  Coin B                                     GND  31    32  GND
-           Player 1 Start  17    U  Player 2 Start                             GND  33    34  GND
+                       JAMMA Connector                                     Extra Button Connector
+                       ---------------                                     ----------------------
+                    PART SIDE    SOLDER SIDE                                     TOP    BOTTOM
+                ----------------------------                             --------------------------
+                      GND  01    A  GND                                      GND  01    02  GND
+                      GND  02    B  GND                                      +5V  03    04  +5V
+                      +5V  03    C  +5V                                     +12V  05    06  +12V
+                      +5V  04    D  +5V                             Configurable  07    08  Configurable
+                       NC  05    E  NC                              Configurable  09    10  Configurable
+                     +12V  06    F  +12V                            Configurable  11    12  Configurable
+                           07    H                                  Configurable  13    14  Configurable
+           Coin Counter 1  08    J  NC                              Configurable  15    16  Configurable
+             Coin Lockout  09    K  Coin Lockout                    Configurable  17    18  Configurable
+               Speaker (+) 10    L  Speaker (-)                     Configurable  19    20  Configurable
+                       NC  11    M  NC                              Configurable  21    22  Configurable
+                Video Red  12    N  Video Green                     Configurable  23    24  Configurable
+               Video Blue  13    P  Video Composite Sync            Configurable  25    26  Configurable
+             Video Ground  14    R  Service Switch                  Configurable  27    28  Configurable
+                     Test  15    S  NC                               Volume Down  29    30  Volume UP
+                   Coin A  16    T  Coin B                                   GND  31    32  GND
+           Player 1 Start  17    U  Player 2 Start                           GND  33    34  GND
               Player 1 Up  18    V  Player 2 Up
             Player 1 Down  19    W  Player 2 Down
-            Player 1 Left  20    X  Player 2 Left                  Pins 07 to 29 can be configured to anything
-           Player 1 Right  21    Y  Player 2 Right                 as games require. This includes coin inputs,
-        Player 1 Button 1  22    Z  Player 2 Button 1              coin lockouts, joysticks and buttons. There
-        Player 1 Button 2  23    a  Player 2 Button 2              are at least 2 known configurations seen in
-        Player 1 Button 3  24    b  Player 2 Button 3              CPS-2 games released so far (see below).
+            Player 1 Left  20    X  Player 2 Left                Pins 07 to 29 can be configured to anything
+           Player 1 Right  21    Y  Player 2 Right               as games require. This includes coin inputs,
+        Player 1 Button 1  22    Z  Player 2 Button 1            coin lockouts, joysticks and buttons. There
+        Player 1 Button 2  23    a  Player 2 Button 2            are at least 2 known configurations seen in
+        Player 1 Button 3  24    b  Player 2 Button 3            CPS-2 games released so far (see below).
         Player 1 Button 4  25    c  Player 2 Button 4
                        NC  26    d  NC
                       GND  27    e  GND
                       GND  28    f  GND
 
-      Note that only some games use the player 1 and 2 button 4 output on the JAMMA connector.
-      Most games that require the use of button 4 get it from the extra button connector.
+Note that only some games use the player 1 and 2 button 4 output on the JAMMA connector.
+Most games that require the use of button 4 get it from the extra button connector.
 
-      Known Extra Button Connector configurations -
+Known Extra Button Connector configurations -
 
              Most fighting type games                       More than 2 Player games
              ------------------------                       ------------------------
@@ -200,26 +200,23 @@ Notes:
                GND  31    32  GND                             GND  31    32  GND
                GND  33    34  GND                             GND  33    34  GND
 
-      Spinners -
-
-      There are 2 known games which use spinners, Puzz Loop 2 and Eco Fighters.
-
-      Puzz Loop 2 can come with an extra PCB that sits between the JAMMA harness and A-Board.
-      The spinners plug into this board and there is an option in the games settings to enable
-      it. If the extra PCB board is missing its not a problem because the game is still fully
-      playable using normal joysticks.
-
-      Eco Fighters has a special limited version of the game (not currently dumped) that uses
-      spinners. This version of the game did not support joysticks (only the normal version of
-      the game does). Not much more is known about how the spinners used here hook up to the
-      system or if the hardware required is the same as that used with Puzz Loop 2.
+Spinners -
+There are 2 known games which use spinners, Puzz Loop 2 and Eco Fighters.
+Puzz Loop 2 can come with an extra PCB that sits between the JAMMA harness and A-Board.
+The spinners plug into this board and there is an option in the games settings to enable
+it. If the extra PCB board is missing its not a problem because the game is still fully
+playable using normal joysticks.
+Eco Fighters has a special limited version of the game (not currently dumped) that uses
+spinners. This version of the game did not support joysticks (only the normal version of
+the game does). Not much more is known about how the spinners used here hook up to the
+system or if the hardware required is the same as that used with Puzz Loop 2.
 
 
-B-Board
-
+B-Boards
+--------
 CAPCOM 93646B-4  \  There are small variations between board revisions; changed
 CAPCOM 93646B-6   | PALs, alternative location for an EEPROM, extra connectors
-CAPCOM 93646B-7  /  (CN9) and other diferences also.
+CAPCOM 93646B-7  /  (CN9) and other minor diferences.
  |-------------------------------------------------------------------------|
  |       CN3|-----------------------|     |-----------------------|CN4     |
  |          |-----------------------|     |-----------------------|        |
@@ -257,7 +254,7 @@ CAPCOM 93646B-7  /  (CN9) and other diferences also.
  |          |-----------------------|     |-----------------------|        |
  |-------------------------------------------------------------------------|
 Notes:
-      8464      - Fujitsu MB8464A-10L 8K x8 SRAM (SOP28)
+      8464      - Fujitsu MB8464A-10L 8k x8 SRAM (SOP28)
       93C46     - Atmel 93C46 EEPROM (SOIC8, not populated on revision -7 board)
       CN1/2/3/4 - 96 Pin Connectors for connection to lower A-board (connectors below PCB)
       CN5/6     - 96 Pin Connectors for connection to optional daughter boards used by some games
@@ -284,32 +281,31 @@ Notes:
             requirements. The PCB is wired for certain sized ROMs by default, but via jumpers they
             can be reconfigured to allow accepting other sized devices.
 
-                                                                              Some example ROM names
-                                                                      (see the source below for full name details)
+                                                                           Some example ROM names
+                                                                  (see the source below for full name details)
                                                                          /---------------------------\
             Location  Device type and size               Use               XMen COTA    Puzz Loop 2
             ------------------------------------------------------------------------------------------
-            1.1A      27C010 (1M) or 27C1000 (1M)        Sound Program     XMN.01A      PL2.01
-            2.2A      27C010 (1M) or 27C1000 (1M)        Sound Program     XMN.02A      -
-            3.6A      27C4096 (4M)                       Main Program      XMNE.03E     PL2J.03A
-            4.7A      27C4096 (4M)                       Main Program      XMNE.04E     PL2J.04A
-            5.8A      27C4096 (4M)                       Main Program      XMNE.05A     PL2J.05A
-            6.9A      27C4096 (4M)                       Main Program      XMNE.06A     PL2J.06A
-            7.6D      27C4096 (4M)                       Main Program      XMNE.07A     -
-            8.7D      27C4096 (4M)                       Main Program      XMNE.08A     -
-            9.8D      27C4096 (4M)                       Main Program      XMNE.09A     -
-            10.9D     27C4096 (4M)                       Main Program      XMNE.10A     -
-            11.1E     HN624316 (16M) or KM23C32000 (32M) QSound Samples    XMN.11M
-            12.2E     HN624316 (16M) or KM23C32000 (32M) QSound Samples    XMN.12M      /
-            13.1J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.13M      |
-            14.2J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.14M      |
-            15.3J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.15M      |
-            16.4J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.16M      |  Located
-            17.1M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.17M      |  on SIMMs
-            18.2M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.18M      |
-            19.3M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.19M      |
-            20.4M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN.20M      /
-
+            1.1A      27C010 (1M) or 27C1000 (1M)        Sound Program     XMN_01.1A    PL2_01.1A
+            2.2A      27C010 (1M) or 27C1000 (1M)        Sound Program     XMN_02.2A    -
+            3.6A      27C4096 (4M)                       Main Program      XMNE_03E.6A  PL2J_03.6A
+            4.7A      27C4096 (4M)                       Main Program      XMNE_04E.7A  PL2J_04.7A
+            5.8A      27C4096 (4M)                       Main Program      XMNE_05.8A   PL2J_05.8A
+            6.9A      27C4096 (4M)                       Main Program      XMNE_06.9A   PL2J_06.9A
+            7.6D      27C4096 (4M)                       Main Program      XMNE_07.6D   -
+            8.7D      27C4096 (4M)                       Main Program      XMNE_08.7D   -
+            9.8D      27C4096 (4M)                       Main Program      XMNE_09.8D   -
+            10.9D     27C4096 (4M)                       Main Program      XMNE_10.9D   -
+            11.1E     HN624316 (16M) or KM23C32000 (32M) QSound Samples    XMN_11M.1E   \
+            12.2E     HN624316 (16M) or KM23C32000 (32M) QSound Samples    XMN_12M.2E   |
+            13.1J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_13M.1J   |
+            14.2J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_14M.2J   |
+            15.3J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_15M.3J   |
+            16.4J     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_16M.4J   |  Located
+            17.1M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_17M.1M   |  on SIMMs
+            18.2M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_18M.2M   |
+            19.3M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_19M.3M   |
+            20.4M     HN624316 (16M) or KM23C32000 (32M) Graphics          XMN_20M.4M   /
 
             Capcom have a unique ROM naming system for CPS-2 games as mentioned above. A typical ROM
             name is 'SSFA 03B' and is clearly printed on the sticker of each ROM. In most cases stickers
@@ -409,16 +405,16 @@ Notes:
 
 CAPCOM 00716C-3
 |-------------------------------------------------------------------------|
-|                                                                         |
+|                    CN1                            CN2                   |
 |          |-----------------------|     |-----------------------|        |
-|       CN1|-----------------------|     |-----------------------|CN2     |
+|          |-----------------------|     |-----------------------|        |
 |                                                                         |
-|                                                                         |
+|           74LS157   74LS157                                             |
 |                                                                         |
 |             SIMM5                                SIMM1                  |
 |                                                                         |
 |                                                  SIMM2                  |
-|                                                                         |
+|                              74LS04                                     |
 |                                                  SIMM3                  |
 |                                                                         |
 |             SIMM6            M51953              SIMM4                  |
@@ -426,29 +422,32 @@ CAPCOM 00716C-3
 |-------------------------------------------------------------------------|
 Notes:
       M5195B          - Mitsubishi Electric Corp. M5195B Voltage Detection & System Reset IC (SIP5)
-      CN1/2           - 96 Pin Connectors for connection to B-Board (the connectors are below the
-                        PCB)
+                        (May not be populated on some boards)
+      CN1/2           - 96 Pin Connectors for connection to B-Board (the connectors are below the PCB)
       SIMM1/2/3/4/5/6 - Generic 72-pin SIMM sockets (as used on early to mid 90's PC motherboards)
                         The SIMMs themselves are custom. They're not RAM sticks, but instead hold
                         16MBit FlashROMs of type Fujitsu 29F016 TSOP48. Some are standard pinout,
                         some are reverse pinout. This is done to allow for easy PCB wiring on the
-                        SIMMs.
-                        So far, only SIMMs 1, 3 & 5 are used. 1 & 3 are single sided, have 4
+                        SIMMs. So far, only SIMMs 1, 3 & 5 are used. 1 & 3 are single sided, have 4
                         FlashROMs on them and hold graphics data that was previously located on the
                         B-Board at locations 1J-4J & 1M-4M.
-                        SIMM 5 & 6 are double-sided (they can be populated with up to 8x 16MBit
-                        FlashROMs), but only have 2 FlashROMs on them and hold the QSound samples
-                        that were previously located on the B-Board at locations 1E & 2E.
-                        So far, the data held on the SIMMs is equal to or less than the ROM
-                        capacity of the sockets on the B-Board, so the use of SIMMs is a mystery.
-                        Some possible explanations are their use is a cost-cutting measure, or
-                        they're more easily sourced from the supplier rather than using older
-                        42-pin MASKROMs. Another possibility is they are being re-used from
-                        left-over CPS3 boards, since they're identical and are easily
-                        re-programmable. In comparision, the GFX SIMMs are the same type as used in
-                        CPS3 boards for the main program and the QSound SIMMs are the same type as
-                        used in CPS3 boards for the GFX data, but are only populated with 2
-                        FlashROMs.
+                        SIMM 5 & 6 can come in two varieties. The more common ones are double-sided
+                        and can be populated with up to 8x 16MBit TSOP48 FlashROMs, but only have 2
+                        FlashROMs on them (one on each side) and hold the QSound samples that were
+                        previously located on the B-Board at locations 1E & 2E.
+                        The other type is also double sided and holds up to 8x 16MBit TSOP56 FlashROMs,
+                        and again has only 2 positions populated (both on the same side). Either type
+                        of QSound SIMM can be used but the data is interleaved differently because of
+                        the position of the FlashROM on the SIMM.
+                        So far, the data held on the SIMMs is equal to or less than the ROM capacity of
+                        the sockets on the B-Board, so the use of SIMMs is a mystery.
+                        Some possible explanations are their use is a cost-cutting measure, or they're
+                        more easily sourced from the supplier rather than using older 42-pin MASKROMs.
+                        Another possibility is they are being re-used from left-over CPS3 boards, since
+                        they're identical and are easily re-programmable. In comparision, the GFX SIMMs
+                        are the same type as used in CPS3 boards for the main program and the QSound
+                        SIMMs are the same type as used in CPS3 boards for the GFX data, but are only
+                        populated with 2 FlashROMs.
 
                         Example SIMM Layout -
                           |----------------------------------------------------|
@@ -459,12 +458,15 @@ Notes:
                           |-                                                   |
                            |-------------------------/\------------------------|
                            Notes:
-                                  Flash_A & Flash_C and regular pinout (Fujitsu 29F016A-90PFTN)
+                                  Flash_A & Flash_C and regular pinout type Fujitsu 29F016A-90PFTN and
+                                  for the TSOP56 SIMMs, the FlashROMs are type HN98F1600T10
                                   Flash_B & Flash_D are reverse pinout (Fujitsu 29F016A-90PFTR)
-                                  and are mounted upside down also so that pin1 lines up with
-                                  the normal pinout of FlashROMs A & C.
-                                  For the QSound SIMMs, the 2 FlashROMs are populated at location D
-                                  and C only. C is located on the other side of the SIMM also.
+                                  and are mounted upside down also so that pin1 lines up with the normal
+                                  pinout of FlashROMs A & C.
+                                  For the TSOP48 QSound SIMMs, the 2 FlashROMs are populated at location D
+                                  and C only. C is also located on the other side of the SIMM.
+                                  For the TSOP56 QSound SIMMs, the 2 FlashROMs are populated at location A
+                                  and C only. Both FlashROMs are located on the same side of the SIMM.
 
 
 Communication Board
@@ -497,9 +499,9 @@ Notes:
       SCN1    - Network Data IN
       SCN2    - Network Data OUT
       SCN3    - 8 Pin location for a 'Register' device, not populated (possibly for an online
-                register of high scores etc)
+                register of high scores)
       CN1     - 64 Pin Connector for connection to B-Board
-      8464    - Fujitsu MB8464A-10L 8K x8 SRAM (SOP28)
+      8464    - Fujitsu MB8464A-10L 8k x8 SRAM (SOP28)
       MAX232  - Maxim MAX232CPE Dual EIA-232 Driver/Receiver (DIP16)
       PAL1    - MMI PAL16L8 (DIP20, stamped 'SFSRD')
       D71051C - NEC uPD71051C Serial Control Unit (DIP28)
@@ -537,11 +539,8 @@ Known problems with this driver.
 
 Driver Note:
 
-  - Further XOR based sets should not be added now that it is possible to support
-    full decryption table CHDs.  New sets should only be added if
-     a) there is a CHD available
-     b) they have not been decrypted at all
-     c) the decryption has been fully figured out
+  - New region sets will need full XOR tables dumped to extract the proper keys
+    or they will need to be brute forced
 
 ***************************************************************************/
 
@@ -1973,30 +1972,23 @@ ROM_START( choko )
 	ROM_LOAD16_WORD_SWAP( "tkoj.04", 0x080000, 0x80000, CRC(68655378) SHA1(a2d82996394cc28622e93f6c338f9b78aa798775) )
 
 	ROM_REGION( 0x1000000, REGION_GFX1, 0 )
-	ROMX_LOAD( "tko-simm.01c",   0x0000000, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "tko-simm.01d",   0x0000001, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "tko-simm.01a",   0x0000002, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "tko-simm.01b",   0x0000003, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "tko-simm.03c",   0x0000004, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "tko-simm.03d",   0x0000005, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "tko-simm.03a",   0x0000006, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "tko-simm.03b",   0x0000007, 0x200000, NO_DUMP, ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.01c",   0x0000000, 0x200000, CRC(6933377d) SHA1(a79e129e5faaadd401379905ac76a24fa616d736) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.01d",   0x0000001, 0x200000, CRC(7f668950) SHA1(247b2b3fa24afd43b0fe6cfb3df987a38c7385cf) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.01a",   0x0000002, 0x200000, CRC(cfb68ca9) SHA1(36460724b8df36a4ccf88228d9d5f027714c6628) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.01b",   0x0000003, 0x200000, CRC(437e21c5) SHA1(2c4ace6fa421c91effab8ab8db931b8451b8e6b1) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.03c",   0x0000004, 0x200000, CRC(a9e32b57) SHA1(0ddbfefa0cc110e46297ecbfbf4b8bc87ce43c95) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.03d",   0x0000005, 0x200000, CRC(b7ab9338) SHA1(0bb57640eed167e672b5f40cdff0a7b177ff2507) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.03a",   0x0000006, 0x200000, CRC(4d3f919a) SHA1(eb7f90415a263f0a2b94d9699d72c1d14b4fdaad) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-//  ROMX_LOAD( "tko-simm.03b",   0x0000007, 0x200000, CRC(cfef17ab) SHA1(1de738c1e537c3df80171e82bc1cc05a25d9cc13) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj1_d.simm1",   0x0000000, 0x200000, CRC(6933377d) SHA1(a79e129e5faaadd401379905ac76a24fa616d736) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj1_c.simm1",   0x0000001, 0x200000, CRC(7f668950) SHA1(247b2b3fa24afd43b0fe6cfb3df987a38c7385cf) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj1_b.simm1",   0x0000002, 0x200000, CRC(cfb68ca9) SHA1(36460724b8df36a4ccf88228d9d5f027714c6628) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj1_a.simm1",   0x0000003, 0x200000, CRC(437e21c5) SHA1(2c4ace6fa421c91effab8ab8db931b8451b8e6b1) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj3_d.simm3",   0x0000004, 0x200000, CRC(a9e32b57) SHA1(0ddbfefa0cc110e46297ecbfbf4b8bc87ce43c95) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj3_c.simm3",   0x0000005, 0x200000, CRC(b7ab9338) SHA1(0bb57640eed167e672b5f40cdff0a7b177ff2507) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj3_b.simm3",   0x0000006, 0x200000, CRC(4d3f919a) SHA1(eb7f90415a263f0a2b94d9699d72c1d14b4fdaad) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "tkoj3_a.simm3",   0x0000007, 0x200000, CRC(cfef17ab) SHA1(1de738c1e537c3df80171e82bc1cc05a25d9cc13) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
 
 	ROM_REGION( QSOUND_SIZE, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "tko.01",   0x00000, 0x08000, CRC(6eda50c2) SHA1(7e67c104094a3ced8b3fdd81f52ee42483b30fc5) )
 	ROM_CONTINUE(         0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* QSound samples */
-	ROM_LOAD16_WORD_SWAP( "tko-simm.05a",   0x000000, 0x200000, NO_DUMP ) // ROM on a simm
-	ROM_LOAD16_WORD_SWAP( "tko-simm.05b",   0x200000, 0x200000, NO_DUMP ) // ROM on a simm
+	ROM_LOAD16_BYTE( "tkoj5_a.simm5",   0x000000, 0x200000, CRC(ab45d509) SHA1(c58cf87d3828dfe0643cf4c58615f3352bd45508) ) // ROM on a simm
+	ROM_LOAD16_BYTE( "tkoj5_b.simm5",   0x000001, 0x200000, CRC(fa905c3d) SHA1(3eae65b01d50ec4ec4aeff49f434b9b88a50463c) ) // ROM on a simm
+	/* Same Content, different interleave */
 //  ROM_LOAD16_WORD_SWAP( "tko-simm.05a",   0x000000, 0x200000, CRC(a275a387) SHA1(32e6aa776058fc8f657f05a6291a8110b381c133) ) // ROM on a simm
 //  ROM_LOAD16_WORD_SWAP( "tko-simm.05b",   0x200000, 0x200000, CRC(cb686c23) SHA1(b53c180dc6576557ae5598c70c9a42e4eb89e987) ) // ROM on a simm
 ROM_END
@@ -3159,10 +3151,10 @@ ROM_START( hsf2 )
 	ROM_LOAD16_WORD_SWAP( "hs2.10",   0x380000, 0x80000, CRC(20d0f9e4) SHA1(80a5eeef9472e327b0d4ee26434bad109a9434ea) )
 
 	ROM_REGION( 0x2000000, REGION_GFX1, 0 )
-	ROMX_LOAD( "hs2.13",   0x0000000, 0x800000, CRC(a6ecab17) SHA1(6749a4c8dc81f4b10f910c31c82cf6674e2a44eb) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "hs2.15",   0x0000002, 0x800000, CRC(10a0ae4d) SHA1(701b4900fbc8bef20efa1a706891c8df4bf14641) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "hs2.17",   0x0000004, 0x800000, CRC(adfa7726) SHA1(8d36ec125a8c91abfe5213893d794f8bc11c8acd) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "hs2.19",   0x0000006, 0x800000, CRC(bb3ae322) SHA1(ecd289d7a0fe365fdd7c5527cb17796002beb553) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.13m",   0x0000000, 0x800000, CRC(a6ecab17) SHA1(6749a4c8dc81f4b10f910c31c82cf6674e2a44eb) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.15m",   0x0000002, 0x800000, CRC(10a0ae4d) SHA1(701b4900fbc8bef20efa1a706891c8df4bf14641) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.17m",   0x0000004, 0x800000, CRC(adfa7726) SHA1(8d36ec125a8c91abfe5213893d794f8bc11c8acd) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.19m",   0x0000006, 0x800000, CRC(bb3ae322) SHA1(ecd289d7a0fe365fdd7c5527cb17796002beb553) , ROM_GROUPWORD | ROM_SKIP(6) )
 
 	ROM_REGION( QSOUND_SIZE, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "hs2.01",   0x00000, 0x08000, CRC(c1a13786) SHA1(c7392c7efb15ea4042e75bd9007e974293d8935d) )
@@ -3170,7 +3162,7 @@ ROM_START( hsf2 )
 	ROM_LOAD( "hs2.02",   0x28000, 0x20000, CRC(2d8794aa) SHA1(c634affdc2568020cce6af97b4fa79925d9943f3) )
 
 	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) /* QSound samples */
-	ROM_LOAD16_WORD_SWAP( "hs2.11",   0x000000, 0x800000, CRC(0e15c359) SHA1(176108b0d76d821a849324680aba0cd04b5016c1) )
+	ROM_LOAD16_WORD_SWAP( "hs2.11m",   0x000000, 0x800000, CRC(0e15c359) SHA1(176108b0d76d821a849324680aba0cd04b5016c1) )
 ROM_END
 
 ROM_START( hsf2j )
@@ -3185,10 +3177,10 @@ ROM_START( hsf2j )
 	ROM_LOAD16_WORD_SWAP( "hs2.10",   0x380000, 0x80000, CRC(20d0f9e4) SHA1(80a5eeef9472e327b0d4ee26434bad109a9434ea) )
 
 	ROM_REGION( 0x2000000, REGION_GFX1, 0 )
-	ROMX_LOAD( "hs2.13",   0x0000000, 0x800000, CRC(a6ecab17) SHA1(6749a4c8dc81f4b10f910c31c82cf6674e2a44eb) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "hs2.15",   0x0000002, 0x800000, CRC(10a0ae4d) SHA1(701b4900fbc8bef20efa1a706891c8df4bf14641) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "hs2.17",   0x0000004, 0x800000, CRC(adfa7726) SHA1(8d36ec125a8c91abfe5213893d794f8bc11c8acd) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "hs2.19",   0x0000006, 0x800000, CRC(bb3ae322) SHA1(ecd289d7a0fe365fdd7c5527cb17796002beb553) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.13m",   0x0000000, 0x800000, CRC(a6ecab17) SHA1(6749a4c8dc81f4b10f910c31c82cf6674e2a44eb) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.15m",   0x0000002, 0x800000, CRC(10a0ae4d) SHA1(701b4900fbc8bef20efa1a706891c8df4bf14641) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.17m",   0x0000004, 0x800000, CRC(adfa7726) SHA1(8d36ec125a8c91abfe5213893d794f8bc11c8acd) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "hs2.19m",   0x0000006, 0x800000, CRC(bb3ae322) SHA1(ecd289d7a0fe365fdd7c5527cb17796002beb553) , ROM_GROUPWORD | ROM_SKIP(6) )
 
 	ROM_REGION( QSOUND_SIZE, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "hs2.01",   0x00000, 0x08000, CRC(c1a13786) SHA1(c7392c7efb15ea4042e75bd9007e974293d8935d) )
@@ -3196,7 +3188,7 @@ ROM_START( hsf2j )
 	ROM_LOAD( "hs2.02",   0x28000, 0x20000, CRC(2d8794aa) SHA1(c634affdc2568020cce6af97b4fa79925d9943f3) )
 
 	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) /* QSound samples */
-	ROM_LOAD16_WORD_SWAP( "hs2.11",   0x000000, 0x800000, CRC(0e15c359) SHA1(176108b0d76d821a849324680aba0cd04b5016c1) )
+	ROM_LOAD16_WORD_SWAP( "hs2.11m",   0x000000, 0x800000, CRC(0e15c359) SHA1(176108b0d76d821a849324680aba0cd04b5016c1) )
 ROM_END
 
 
@@ -3205,22 +3197,22 @@ ROM_START( jyangoku )
 	ROM_LOAD16_WORD_SWAP( "maj_j03.6a", 0x000000, 0x80000, CRC(4614a3b2) SHA1(f7226006feafaf561046ae7fce18bf62289d41df) )
 
 	ROM_REGION( 0x1000000, REGION_GFX1, 0 )
-	ROMX_LOAD( "maj-simm.01c",   0x0000000, 0x200000, NO_DUMP /*CRC(ba0fe27b) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "maj-simm.01d",   0x0000001, 0x200000, NO_DUMP /*CRC(2cd141bf) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "maj-simm.01a",   0x0000002, 0x200000, NO_DUMP /*CRC(e29e4c26) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "maj-simm.01b",   0x0000003, 0x200000, NO_DUMP /*CRC(7f68b88a) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "maj-simm.03c",   0x0000004, 0x200000, NO_DUMP /*CRC(3aaeb90b) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "maj-simm.03d",   0x0000005, 0x200000, NO_DUMP /*CRC(97894cea) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "maj-simm.03a",   0x0000006, 0x200000, NO_DUMP /*CRC(ec737d9d) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
-	ROMX_LOAD( "maj-simm.03b",   0x0000007, 0x200000, NO_DUMP /*CRC(c23b6f22) SHA1(1)*/ , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj1_d.simm1",   0x0000000, 0x200000, CRC(ba0fe27b) SHA1(60a4fdee8da663777af1e126a1aa6308c9d9a5a9) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj1_c.simm1",   0x0000001, 0x200000, CRC(2cd141bf) SHA1(57ec73ea24d594fc1e4d2d194a3c548a7043666e) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj1_b.simm1",   0x0000002, 0x200000, CRC(e29e4c26) SHA1(51e99536f40481c4c208695354e90fb3fe9416d5) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj1_a.simm1",   0x0000003, 0x200000, CRC(7f68b88a) SHA1(944bf34dc998dffe39b25c3e9fcec17ad421ce81) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj3_d.simm3",   0x0000004, 0x200000, CRC(3aaeb90b) SHA1(d426d5c7ae5ca99321ec1280abdd1fdfe4882829) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj3_c.simm3",   0x0000005, 0x200000, CRC(97894cea) SHA1(a501cd80e6da75409e3381d66bd0a13e021e89f3) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj3_b.simm3",   0x0000006, 0x200000, CRC(ec737d9d) SHA1(cfff42cc24ac011fab2670dec42cab16f4e0d84d) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
+	ROMX_LOAD( "maj3_a.simm3",   0x0000007, 0x200000, CRC(c23b6f22) SHA1(fb3120ea28c67ecb7c4a2b61a64feb62c033ef68) , ROM_GROUPBYTE | ROM_SKIP(7) ) // ROM on a simm
 
 	ROM_REGION(QSOUND_SIZE, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "maj_01.1a",  0x00000, 0x08000, CRC(1fe8c213) SHA1(e0045566337851d8261ed65d5bea483f09ae96b4) )
 	ROM_CONTINUE(         0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* QSound samples */
-	ROM_LOAD16_WORD_SWAP( "maj-simm.05a",   0x000000, 0x200000, NO_DUMP /*BAD_DUMP CRC(4cb79672) SHA1(1)*/ ) // ROM on a simm
-	ROM_LOAD16_WORD_SWAP( "maj-simm.05b",   0x200000, 0x200000, NO_DUMP /*         CRC(e5f2e14a) SHA1(1)*/ ) // ROM on a simm
+	ROM_LOAD16_BYTE( "maj5_a.simm5",   0x000000, 0x200000, CRC(5ad9ee53) SHA1(acfb7ec137209409c1a439ebc62d8fa3f87e7012) ) // ROM on a simm
+	ROM_LOAD16_BYTE( "maj5_b.simm5",   0x000001, 0x200000, CRC(efb3dbfb) SHA1(3b32b9890f79805b6a2e1ec63f2cadaca14cf11a) ) // ROM on a simm
 ROM_END
 
 ROM_START( megaman2 )
@@ -5684,9 +5676,6 @@ ROM_START( spf2t )
 	ROM_LOAD16_WORD_SWAP( "pzfu.03a", 0x000000, 0x80000, CRC(346e62ef) SHA1(9db5ea0aac2d459be957f8b6e2e0d18421587d4d) )
 	ROM_LOAD16_WORD_SWAP( "pzf.04",   0x080000, 0x80000, CRC(b80649e2) SHA1(5bfccd656aea7ff82e9a20bb5856f4ab99b5a007) )
 
-	ROM_REGION16_BE( CODE_SIZE, REGION_USER1, 0 )
-	ROM_LOAD16_WORD_SWAP( "pzfux.03a", 0x000000, 0x80000, CRC(200feea6) SHA1(6f549caa9d7456b8ddc59739be87a1b2c0cc844e) )
-
 	ROM_REGION( 0xC00000, REGION_GFX1, 0 )
 	ROM_FILL(             0x000000, 0x800000, 0 )
 	ROMX_LOAD( "pzf.14m",  0x800000, 0x100000, CRC(2d4881cb) SHA1(fd3baa183c25bed153b19c251980e2fb761600e2) , ROM_GROUPWORD | ROM_SKIP(6) )
@@ -5709,9 +5698,6 @@ ROM_START( spf2xj )
 	ROM_LOAD16_WORD_SWAP( "pzfj.03a", 0x000000, 0x80000, CRC(2070554a) SHA1(fa818e6bd2e11667345d3d8f2397b60802ef72f9) )
 	ROM_LOAD16_WORD_SWAP( "pzf.04",   0x080000, 0x80000, CRC(b80649e2) SHA1(5bfccd656aea7ff82e9a20bb5856f4ab99b5a007) )
 
-	ROM_REGION16_BE( CODE_SIZE, REGION_USER1, 0 )
-	ROM_LOAD16_WORD_SWAP( "pzfjx.03a", 0x000000, 0x80000, CRC(c2e3f231) SHA1(094054502e42c8a5347cc1d8d914bef786328b5a) )
-
 	ROM_REGION( 0xC00000, REGION_GFX1, 0 )
 	ROM_FILL(             0x000000, 0x800000, 0 )
 	ROMX_LOAD( "pzf.14m",  0x800000, 0x100000, CRC(2d4881cb) SHA1(fd3baa183c25bed153b19c251980e2fb761600e2) , ROM_GROUPWORD | ROM_SKIP(6) )
@@ -5733,9 +5719,6 @@ ROM_START( spf2ta )
 	ROM_REGION(CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pzfa.03",  0x000000, 0x80000, CRC(3cecfa78) SHA1(c315531de87f7dc579f744e84ad2dbf068e61f46) )
 	ROM_LOAD16_WORD_SWAP( "pzf.04",   0x080000, 0x80000, CRC(b80649e2) SHA1(5bfccd656aea7ff82e9a20bb5856f4ab99b5a007) )
-
-	ROM_REGION16_BE( CODE_SIZE, REGION_USER1, 0 )
-	ROM_LOAD16_WORD_SWAP( "pzfax.03", 0x000000, 0x80000, CRC(7d29dd83) SHA1(16d0b6980d47d140dbd8a870ecd37e2b29e17bb1) )
 
 	ROM_REGION( 0xC00000, REGION_GFX1, 0 )
 	ROM_FILL(             0x000000, 0x800000, 0 )
@@ -7074,7 +7057,7 @@ GAME( 1993, ddtodu,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons 
 GAME( 1993, ddtodur1, ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940113)", 0 )
 GAME( 1993, ddtodj,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Japan 940125)", 0 )
 GAME( 1993, ddtodjr1, ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Japan 940113)", 0 )
-GAME( 1993, ddtoda,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Asia 940113)", GAME_NOT_WORKING )	// no key
+GAME( 1993, ddtoda,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Asia 940113)", 0 )
 GAME( 1993, ddtodh,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Hispanic 940125)", 0 )
 GAME( 1993, ecofghtr, 0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Eco Fighters (World 931203)", 0 )
 GAME( 1993, ecofghtu, ecofghtr,cps2, sgemf,   cps2, ROT0,   "Capcom", "Eco Fighters (USA 931203)", 0 )
@@ -7087,7 +7070,7 @@ GAME( 1994, ssf2tur1, ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Str
 GAME( 1994, ssf2xj,   ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II X: Grand Master Challenge (Japan 940223)", 0 )
 GAME( 1994, xmcota,   0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950105)", 0 )
 GAME( 1994, xmcotau,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (USA 950105)", 0 )
-GAME( 1994, xmcotah,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950331)", GAME_NOT_WORKING )	// no key
+GAME( 1994, xmcotah,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950331)", 0 )
 GAME( 1994, xmcotaj,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941219)", 0 )
 GAME( 1994, xmcotaj1, xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941217)", 0 )
 GAME( 1994, xmcotajr, xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941208 rent version)", 0 )
@@ -7097,7 +7080,7 @@ GAME( 1994, armwarr1, armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Armored W
 GAME( 1994, armwaru,  armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Armored Warriors (USA 941024)", 0 )
 GAME( 1994, pgear,    armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 941024)", 0 )
 GAME( 1994, pgearr1,  armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 940916)", 0 )
-GAME( 1994, armwara,  armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Armored Warriors (Asia 940920)", GAME_NOT_WORKING )	// no key
+GAME( 1994, armwara,  armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Armored Warriors (Asia 940920)", 0 )
 GAME( 1994, avsp,     0,       cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (Euro 940520)", 0 )
 GAME( 1994, avspu,    avsp,    cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (USA 940520)", 0 )
 GAME( 1994, avspj,    avsp,    cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (Japan 940520)", 0 )
@@ -7134,15 +7117,15 @@ GAME( 1995, sfar1,    sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fi
 GAME( 1995, sfar2,    sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950627)", 0 )
 GAME( 1995, sfar3,    sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950605)", 0 )
 GAME( 1995, sfau,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (USA 950627)", 0 )
-GAME( 1995, sfza,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Asia 950627)", GAME_NOT_WORKING )	// no key
+GAME( 1995, sfza,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Asia 950627)", 0 )
 GAME( 1995, sfzj,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Japan 950727)", 0 )
 GAME( 1995, sfzjr1,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Japan 950627)", 0 )
 GAME( 1995, sfzjr2,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Japan 950605)", 0 )
-GAME( 1995, sfzh,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Hispanic 950627)", GAME_NOT_WORKING )	// no key
-GAME( 1995, sfzb,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 951109)", GAME_NOT_WORKING )	// no key
-GAME( 1995, sfzbr1,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 950727)", GAME_NOT_WORKING )	// no key
-GAME( 1995, mmancp2u, 0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man - The Power Battle (CPS2, USA 951006)", GAME_NOT_WORKING )	// no key
-GAME( 1995, rmancp2j, mmancp2u,cps2, sgemf,   cps2, ROT0,   "Capcom", "Rockman: The Power Battle (CPS2, Japan 950922)", GAME_NOT_WORKING )	// no key
+GAME( 1995, sfzh,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Hispanic 950627)", 0 )
+GAME( 1995, sfzb,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 951109)", 0 )
+GAME( 1995, sfzbr1,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 950727)", 0 )
+GAME( 1995, mmancp2u, megaman, cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man - The Power Battle (CPS2, USA 951006)", GAME_NOT_WORKING )	// no key
+GAME( 1995, rmancp2j, megaman, cps2, sgemf,   cps2, ROT0,   "Capcom", "Rockman: The Power Battle (CPS2, Japan 950922)", GAME_NOT_WORKING )	// no key
 GAME( 1996, 19xx,     0,       cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (USA 951207)", 0 )
 GAME( 1996, 19xxa,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Asia 951207)", 0 )
 GAME( 1996, 19xxj,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951225)", 0 )
@@ -7157,38 +7140,38 @@ GAME( 1996, ddsomur1, ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons 
 GAME( 1996, ddsomj,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960619)", 0 )
 GAME( 1996, ddsomjr1, ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960206)", 0 )
 GAME( 1996, ddsoma,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Asia 960619)", 0 )
-GAME( 1996, ddsomb,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Brazil 960223)", GAME_NOT_WORKING )	// no key
+GAME( 1996, ddsomb,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Brazil 960223)", 0 )
 GAME( 1996, megaman2, 0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man 2: The Power Fighters (USA 960708)", 0 )
-GAME( 1996, megamn2a, megaman2,cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", GAME_NOT_WORKING )	// no key
+GAME( 1996, megamn2a, megaman2,cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", 0 )
 GAME( 1996, rckman2j, megaman2,cps2, sgemf,   cps2, ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)", 0 )
 GAME( 1996, qndream,  0,       cps2, qndream, cps2, ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)", 0 )
 GAME( 1996, sfa2,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha 2 (USA 960306)", 0 )
 GAME( 1996, sfz2j,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Japan 960227)", 0 )
 GAME( 1996, sfz2a,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Asia 960227)", 0 )
-GAME( 1996, sfz2b,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960531)", GAME_NOT_WORKING )	// no key
-GAME( 1996, sfz2br1,  sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960304)", GAME_NOT_WORKING )	// no key
-GAME( 1996, sfz2h,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Hispanic 960304)", GAME_NOT_WORKING )	// no key
-GAME( 1996, sfz2n,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Oceania 960229)", GAME_NOT_WORKING )	// no key
+GAME( 1996, sfz2b,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960531)", 0 )
+GAME( 1996, sfz2br1,  sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960304)", 0 )
+GAME( 1996, sfz2h,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Hispanic 960304)", 0 )
+GAME( 1996, sfz2n,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Oceania 960229)", 0 )
 GAME( 1996, sfz2aj,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Japan 960805)", 0 )
-GAME( 1996, sfz2ah,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Hispanic 960813)", GAME_NOT_WORKING )	// no key
-GAME( 1996, sfz2ab,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Brazil 960813)", GAME_NOT_WORKING )	// no key
+GAME( 1996, sfz2ah,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Hispanic 960813)", 0 )
+GAME( 1996, sfz2ab,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Brazil 960813)", 0 )
 GAME( 1996, sfz2aa,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Asia 960826)", 0 )
 GAME( 1996, spf2t,    0,       cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (USA 960620)", 0 )
 GAME( 1996, spf2xj,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II X (Japan 960531)", 0 )
-GAME( 1996, spf2ta,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", 0 )
+GAME( 1996, spf2ta,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", GAME_NOT_WORKING )	// no key
 GAME( 1996, xmvsf,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)", 0 )
 GAME( 1996, xmvsfr1,  xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)", 0 )
 GAME( 1996, xmvsfu,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)", 0 )
 GAME( 1996, xmvsfur1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961004)", 0 )
-GAME( 1996, xmvsfj,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)", GAME_NOT_WORKING )	// no key
-GAME( 1996, xmvsfjr1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)", GAME_NOT_WORKING )	// no key
-GAME( 1996, xmvsfjr2, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)", GAME_NOT_WORKING )	// no key
-GAME( 1996, xmvsfa,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961023)", GAME_NOT_WORKING )	// no key
-GAME( 1996, xmvsfar1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)", GAME_NOT_WORKING )	// no key
-GAME( 1996, xmvsfh,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Hispanic 961004)", GAME_NOT_WORKING )	// no key
-GAME( 1996, xmvsfb,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Brazil 961023)", GAME_NOT_WORKING )	// no key
+GAME( 1996, xmvsfj,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)", 0 )
+GAME( 1996, xmvsfjr1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)", 0 )
+GAME( 1996, xmvsfjr2, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)", 0 )
+GAME( 1996, xmvsfa,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961023)", 0 )
+GAME( 1996, xmvsfar1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)", 0 )
+GAME( 1996, xmvsfh,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Hispanic 961004)", 0 )
+GAME( 1996, xmvsfb,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Brazil 961023)", 0 )
 GAME( 1997, batcir,   0,       cps2, batcir,  cps2, ROT0,   "Capcom", "Battle Circuit (Euro 970319)", 0 )
-GAME( 1997, batcira,  batcir,  cps2, batcir,  cps2, ROT0,   "Capcom", "Battle Circuit (Asia 970319)", GAME_NOT_WORKING )	// no key
+GAME( 1997, batcira,  batcir,  cps2, batcir,  cps2, ROT0,   "Capcom", "Battle Circuit (Asia 970319)", 0 )
 GAME( 1997, batcirj,  batcir,  cps2, batcir,  cps2, ROT0,   "Capcom", "Battle Circuit (Japan 970319)", 0 )
 GAME( 1997, csclub,   0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Capcom Sports Club (Euro 970722)", 0 )
 GAME( 1997, cscluba,  csclub,  cps2, sgemf,   cps2, ROT0,   "Capcom", "Capcom Sports Club (Asia 970722)", 0 )
@@ -7201,14 +7184,14 @@ GAME( 1997, mshvsfj,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Su
 GAME( 1997, mshvsfj1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970702)", 0 )
 GAME( 1997, mshvsfj2, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970625)", 0 )
 GAME( 1997, mshvsfh,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Hispanic 970625)", 0 )
-GAME( 1997, mshvsfa,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970625)", GAME_NOT_WORKING )	// no key
-GAME( 1997, mshvsfa1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970620)", GAME_NOT_WORKING )	// no key
+GAME( 1997, mshvsfa,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970625)", 0 )
+GAME( 1997, mshvsfa1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970620)", 0 )
 GAME( 1997, mshvsfb,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970827)", 0 )
 GAME( 1997, mshvsfb1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970625)", 0 )
 GAME( 1997, sgemf,    0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Super Gem Fighter Mini Mix (USA 970904)", 0 )
 GAME( 1997, pfghtj,   sgemf,   cps2, sgemf,   cps2, ROT0,   "Capcom", "Pocket Fighter (Japan 970904)", 0 )
 GAME( 1997, sgemfa,   sgemf,   cps2, sgemf,   cps2, ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Asia 970904)", 0 )
-GAME( 1997, sgemfh,   sgemf,   cps2, sgemf,   cps2, ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Hispanic 970904)", GAME_NOT_WORKING )	// no key
+GAME( 1997, sgemfh,   sgemf,   cps2, sgemf,   cps2, ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Hispanic 970904)", 0 )
 GAME( 1997, vhunt2,   0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970929)", 0 )
 GAME( 1997, vhunt2r1, vhunt2,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970913)", 0 )
 GAME( 1997, vsav,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Euro 970519)", 0 )
@@ -7233,15 +7216,15 @@ GAME( 1998, sfz3jr1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fi
 GAME( 1998, sfz3jr2,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980629)", 0 )
 GAME( 1998, sfz3a,    sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980904)", 0 )
 GAME( 1998, sfz3ar1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980701)", 0 )
-GAME( 1999, jyangoku, 0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Jyangokushi: Haoh no Saihai (Japan)", GAME_NOT_WORKING )	// working but no gfx/sound ROMs
+GAME( 1999, jyangoku, 0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Jyangokushi: Haoh no Saihai (Japan)", 0 )
 GAME( 2004, hsf2,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Asia 040202)", 0 )
-GAME( 2004, hsf2j,    hsf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Japan 031222)", GAME_NOT_WORKING )   // no key
+GAME( 2004, hsf2j,    hsf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Japan 031222)", 0 )
 
 /* Games released on CPS-2 hardware by Takumi */
 
 GAME( 1999, gigawing, 0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (USA 990222)", 0 )
 GAME( 1999, gwingj,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Japan 990223)", 0 )
-GAME( 1999, gwinga,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", GAME_NOT_WORKING )	// no key
+GAME( 1999, gwinga,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", 0 )
 GAME( 2000, mmatrix,  0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (USA 000412)", 0 )
 GAME( 2000, mmatrixj, mmatrix, cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (Japan 000412)", 0 )
 
@@ -7251,17 +7234,17 @@ GAME( 2000, mpang,    0,       cps2, ssf2,    cps2, ROT0,   "Mitchell, distribut
 GAME( 2000, mpangj,   mpang,   cps2, ssf2,    cps2, ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Japan 001011)", 0 )
 GAME( 2001, pzloop2,  0,       cps2, puzloop2,puzloop2,ROT0,"Mitchell, distributed by Capcom", "Puzz Loop 2 (Euro 010302)", 0 )
 GAME( 2001, pzloop2j, pzloop2, cps2, puzloop2,puzloop2,ROT0,"Mitchell, distributed by Capcom", "Puzz Loop 2 (Japan 010205)", 0 )
-GAME( 2001, choko,    0,       cps2, cps2,    cps2, ROT0,   "Mitchell, distributed by Capcom", "Choko (Japan 010820)", GAME_NOT_WORKING )	// working but no gfx/sound ROMs
+GAME( 2001, choko,    0,       cps2, cps2,    cps2, ROT0,   "Mitchell, distributed by Capcom", "Choko (Japan 010820)", 0 )
 
 /* Games released on CPS-2 hardware by Eighting/Raizing */
 
 GAME( 2000, dimahoo,  0,       cps2, sgemf,   cps2, ROT270, "Eighting/Raizing, distributed by Capcom", "Dimahoo (USA 000121)", 0 )
 GAME( 2000, gmahou,   dimahoo, cps2, sgemf,   cps2, ROT270, "Eighting/Raizing, distributed by Capcom", "Great Mahou Daisakusen (Japan 000121)", 0 )
 GAME( 2000, 1944,     0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (USA 000620)", 0 )
-GAME( 2000, 1944j,    1944,    cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (Japan 000620)", GAME_NOT_WORKING )
+GAME( 2000, 1944j,    1944,    cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (Japan 000620)", 0 )
 
 /* Games released on CPS-2 hardware by Cave */
 
 GAME( 2001, progear,  0,       cps2, sgemf,   cps2, ROT0,   "Capcom, supported by Cave", "Progear (USA 010117)", 0 )
 GAME( 2001, progearj, progear, cps2, sgemf,   cps2, ROT0,   "Capcom, supported by Cave", "Progear no Arashi (Japan 010117)", 0 )
-GAME( 2001, progeara, progear, cps2, sgemf,   cps2, ROT0,   "Capcom, supported by Cave", "Progear (Asia 010117)", GAME_NOT_WORKING )	// no key
+GAME( 2001, progeara, progear, cps2, sgemf,   cps2, ROT0,   "Capcom, supported by Cave", "Progear (Asia 010117)", 0 )

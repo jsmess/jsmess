@@ -167,45 +167,174 @@ Milipede:
 
 ****************************************************************************
 
-    Millipede memory map (preliminary)
+     Millipede driver by Ivan Mackintosh
 
-    driver by Ivan Mackintosh
+              Memory map for Millipede from the Atari schematics (SP-217 1982)
+              ----------------------------------------------------------------
 
-    0400-040F       POKEY 1
-    0800-080F       POKEY 2
-    1000-13BF       SCREEN RAM (8x8 TILES, 32x30 SCREEN)
-    13C0-13CF       SPRITE IMAGE OFFSETS
-    13D0-13DF       SPRITE HORIZONTAL OFFSETS
-    13E0-13EF       SPRITE VERTICAL OFFSETS
-    13F0-13FF       SPRITE COLOR OFFSETS
+     Address  R/W  D7 D6 D5 D4 D3 D2 D1 D0   Function
+    --------------------------------------------------------------------------------------
+    0000-03FF       D  D  D  D  D  D  D  D   RAM
+    --------------------------------------------------------------------------------------
+    0400-0410  R    D  D  D  D  D  D  D  D   I/OSO (0400-040F POKEY 1)
+    0408       R    D  D  D  D  D  D  D  D   Option Switch 0 (0 = On) (Bank at
+    --------------------------------------------------------------------------------------
+    0800-0810  R    D  D  D  D  D  D  D  D   I/OS1 (0800-080F POKEY 2)
+    0808       R    D  D  D  D  D  D  D  D   Option Switch 1 (0 = On) (Bank at
+    --------------------------------------------------------------------------------------
+    1000-13BF       D  D  D  D  D  D  D  D   Playfield RAM (8x8 TILES, 32x30 SCREEN)
+    13C0-13CF       D  D  D  D  D  D  D  D   Motion Object Picture
+    13D0-13DF       D  D  D  D  D  D  D  D   Motion Object Vert.
+    13E0-13EF       D  D  D  D  D  D  D  D   Motion Object Horiz.
+    13F0-13FF             D  D  D  D  D  D   Motion Object Color
+    --------------------------------------------------------------------------------------
+    2000       R    D                        Horizontal Mini-Track Ball HORIZ DIR
+               R       D                     VBLANK  (1 = VBlank)
+               R          D                  Player 1 Start
+               R             D               Player 1 Fire
+               R                D  D  D  D   Horizontal Mini-Track Ball HORIZ COUNT
+               R                D  D  D  D   Options Switch 2 (Bottom 4 switches at P8)
+    --------------------------------------------------------------------------------------
+    2001       R    D                        Horizontal Mini-Track Ball VERT DIR
+               R          D                  Player 2 Start
+               R             D               Player 2 Fire
+               R                D  D  D  D   Horizontal Mini-Track Ball VERT COUNT
+               R                D  D  D  D   Options Switch 2 (Top 4 switches at P8)
+    --------------------------------------------------------------------------------------
+    2010       R    D  D  D                  R,C,L Coin Switches (0 = On)
+               R             D               SLAM  (0 = On)
+               R                D  D  D  D   P1 Joystick Positions  (0 = On)
+    --------------------------------------------------------------------------------------
+    2011       R    D                        Self-Test Switch (0 = On)
+               R          D                  Cabinet Select  (1 = Upright, 0 = Cocktail)
+               R                D  D  D  D   P2 Joystick Positions  (Undocumented)
+    --------------------------------------------------------------------------------------
+    2030       R    D  D  D  D  D  D  D  D   EA ROM Read Data
+    --------------------------------------------------------------------------------------
+    2480-248F  W    D  D  D  D  D  D  D  D   STAMP COLOR RAM
+    2490-249F  W    D  D  D  D  D  D  D  D   MOTION OBJECT COLOR RAM
+    --------------------------------------------------------------------------------------
+    2501       W    D                        COIN CNTR L
+    2502       W    D                        COIN CNTR R
+    2503       W    D                        START LED 1
+    2504       W    D                        START LED 2
+    2505       W    D                        TRACKBALL ENABLE (TBEN)
+    2506       W    D                        VIDEO ROTATE (VIDROT)
+    2507       W    D                        CONTROL SELECT (CNTRLSEL) - (P1 = 1, P2 = 0?)
+    --------------------------------------------------------------------------------------
+    2600       W                             !IRQRES   - IRQ Acknowledge
+    2680       W                             !WATCHDOG - CLEAR WATCHDOG
+    2700       W                D  D  D  D   !EAROMCON - earom control
+    2780       W    D  D  D  D  D  D  D  D   !EAROMWR  - earom write
+    --------------------------------------------------------------------------------------
+    3000-3FFF  R    D  D  D  D  D  D  D  D   ROM (NOT USED) (Schems listed 300-3fff typo)
+    4000-7FFF  R    D  D  D  D  D  D  D  D   ROM            (Schems listed 400-4fff typo)
+    --------------------------------------------------------------------------------------
 
-    2000            BIT 1-4 trackball
-                    BIT 5 IS P1 FIRE
-                    BIT 6 IS P1 START
-                    BIT 7 IS VBLANK
+            Switch Settings for Millipede from the Atari schematics (TM-217 1982)
+            ---------------------------------------------------------------------
 
-    2001            BIT 1-4 trackball
-                    BIT 5 IS P2 FIRE
-                    BIT 6 IS P2 START
-                    BIT 7,8 (?)
+    Switch Settings for Price Options / 8-Toggle Switches on Millipede PCB (at B5)
+    --------------------------------------------------------------------------------------
+     8    7    6    5    4    3    2    1    Option
+    --------------------------------------------------------------------------------------
+    On   On                       Off  Off   Demonstration Mode
+    On   Off  On                             For every 3 coins inserted, game logic
+                                              adds 1 more coin
+    On   Off  Off                            For every 5 coins inserted, game logic
+                                              adds 1 more coin
+    Off  On   On                             For every 4 coins inserted, game logic
+                                              adds 2 more coin
+    Off  On   Off                            For every 4 coins inserted, game logic
+                                              adds 1 more coin
+    Off  Off  On                             For every 2 coins inserted, game logic
+                                              adds 1 more coin
+    Off  Off  Off                            No Bonus Coins $
+    --------------------------------------------------------------------------------------
+                   Off                       Left coin mech X 1 $
+                   On                        Left coin mech X 2
+    --------------------------------------------------------------------------------------
+                        Off  Off             Right coin mech X 1 $
+                        Off  On              Right coin mech X 4
+                        On   Off             Right coin mech X 5
+                        On   On              Right coin mech X 6
+    --------------------------------------------------------------------------------------
+                                  On   On    2 coins for 1 credit
+                                  On   Off   1 coin for 1 credit $
+                                  Off  On    1 coin for 2 credits
+                                  Off  Off   Free play
+    --------------------------------------------------------------------------------------
+    $ = Manufacturer's suggested settings
 
-    2010            BIT 1 IS P1 RIGHT
-                    BIT 2 IS P1 LEFT
-                    BIT 3 IS P1 DOWN
-                    BIT 4 IS P1 UP
-                    BIT 5 IS SLAM, LEFT COIN, AND UTIL COIN
-                    BIT 6,7 (?)
-                    BIT 8 IS RIGHT COIN
-    2030            earom read
-    2480-249F       COLOR RAM
-    2500-2502       Coin counters
-    2503-2504       LEDs
-    2505-2507       Coin door lights ??
-    2600            INTERRUPT ACKNOWLEDGE
-    2680            CLEAR WATCHDOG
-    2700            earom control
-    2780            earom write
-    4000-7FFF       GAME CODE
+
+    Switch Settings for Play Options / 8-Toggle Switches on Millipede PCB (at D5)
+    --------------------------------------------------------------------------------------
+
+     8    7    6    5    4    3    2    1    Option
+    --------------------------------------------------------------------------------------
+    Off                                      Select Mode $
+    On                                       No Select Mode
+         Off                                 Easy spider $
+         On                                  Hard spider
+    --------------------------------------------------------------------------------------
+              Off  Off                       Bonus life every 12,000 points
+              Off  On                        Bonus life every 15,000 points $
+              On   Off                       Bonus life every 20,000 points
+              On   On                        No bonus life
+    --------------------------------------------------------------------------------------
+                        Off  Off             2 lives per game
+                        Off  On              3 lives per game $
+                        On   Off             4 lives per game
+                        On   On              5 lives per game
+    --------------------------------------------------------------------------------------
+                                  Off        Easy beetle $
+                                  On         Hard beetle
+    --------------------------------------------------------------------------------------
+                                       Off   Easy millipede head $
+                                       On    Hard millipede head
+    --------------------------------------------------------------------------------------
+    $ = Manufacturer's suggested settings
+
+
+    Switch settings for Special Options / 8-Toggle Switches on Millipede PCB (at P8)
+    --------------------------------------------------------------------------------------
+
+     8    7    6    5    4    3    2    1    Option
+    --------------------------------------------------------------------------------------
+    On                                       1 coin counter
+    Off                                      2 coin counters
+    --------------------------------------------------------------------------------------
+         On                                  1 credit minimum $
+         Off                                 2 credit minimum
+    --------------------------------------------------------------------------------------
+         (Switches 5 and 6 unused)           Select Mode Starting Score
+                        On   On              0 points
+                        On   Off             0 and bonus life level
+                        Off  On              0, bonus life level, and 2x bonus life level $
+                        Off  Off             0, bonus life level, and 2x bonus life level,
+                                                and 3x bonus life level
+    --------------------------------------------------------------------------------------
+                                  On   On    English $
+                                  On   Off   German
+                                  Off  On    French
+                                  Off  Off   Spanish
+    --------------------------------------------------------------------------------------
+    $ = Manufacturer's suggested settings
+
+
+    Notes: 15 Feb 2007 - MSH
+        * Real Millipede boards do not have the Joystick circuit hooked up
+          to the card edge.
+        * The Joytick and T-Ball inputs are both swapped through LS157s by
+          the CNTRLSEL signal at 0x2507.
+        * How do we hookup TBEN signal at 0x2505?
+
+    Changes: 15 Feb 2007 - MSH
+        * Added corrected memory map and dip switch settings from Atari Manuals.
+        * Added Cocktail mode (based on v0.36.1 driver from Scott Brasington)
+        * Removed unused dip toggles, now set to IPT_UNKNOWN
+        * Hooked up 2nd trackball
+        * Map P2 Joy inputs to work correctly. (They don't work on a real board)
 
 ****************************************************************************
 
@@ -301,7 +430,7 @@ Milipede:
 
 static UINT8 oldpos[4];
 static UINT8 sign[4];
-static UINT8 dsw_select;
+static UINT8 dsw_select, control_select;
 static UINT8 *rambase;
 static mame_timer *interrupt_timer;
 
@@ -342,6 +471,7 @@ static MACHINE_RESET( centiped )
 	timer_adjust(interrupt_timer,cpu_getscanlinetime(0), 0, 0);
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	dsw_select = 0;
+	control_select = 0;
 }
 
 
@@ -427,12 +557,37 @@ static READ8_HANDLER( milliped_IN1_r )
 	return read_trackball(1, 1);
 }
 
+static READ8_HANDLER( milliped_IN2_r )
+{
+	UINT8 data = readinputport(2);
+
+	/* MSH - 15 Feb, 2007
+     * The P2 X Joystick inputs are not properly handled in
+     * the Milliped code, so we are forcing the P2 inputs
+     * into the P1 Joystick handler, this require remapping
+     * the inputs, and has the good side effect of disabling
+     * the actual Joy1 inputs while control_select is no zero.
+     */
+	if (0 != control_select) {
+		/* Bottom 4 bits is our joystick inputs */
+		UINT8 joy2data = readinputport(3) * 0x0f;
+		data = data & 0xf0; /* Keep the top 4 bits */
+		data |= (joy2data & 0x0a) >> 1; /* flip left and up */
+		data |= (joy2data & 0x05) << 1; /* flip right and down */
+	}
+	return data;
+}
 
 static WRITE8_HANDLER( input_select_w )
 {
 	dsw_select = (~data >> 7) & 1;
 }
 
+/* used P2 controls if 1, P1 controls if 0 */
+static WRITE8_HANDLER( control_select_w )
+{
+	control_select = (data >> 7) & 1;
+}
 
 static READ8_HANDLER( bullsdrt_data_port_r )
 {
@@ -445,8 +600,6 @@ static READ8_HANDLER( bullsdrt_data_port_r )
 
 	return 0;
 }
-
-
 
 /*************************************
  *
@@ -574,14 +727,15 @@ static ADDRESS_MAP_START( milliped_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
 	AM_RANGE(0x2001, 0x2001) AM_READ(milliped_IN1_r)
-	AM_RANGE(0x2010, 0x2010) AM_READ(input_port_2_r)
+	AM_RANGE(0x2010, 0x2010) AM_READ(milliped_IN2_r)
 	AM_RANGE(0x2011, 0x2011) AM_READ(input_port_3_r)
 	AM_RANGE(0x2030, 0x2030) AM_READ(atari_vg_earom_r)
 	AM_RANGE(0x2480, 0x249f) AM_WRITE(milliped_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x2500, 0x2502) AM_WRITE(coin_count_w)
 	AM_RANGE(0x2503, 0x2504) AM_WRITE(led_w)
-	AM_RANGE(0x2505, 0x2505) AM_WRITE(input_select_w)
-//  AM_RANGE(0x2506, 0x2507) AM_WRITE(MWA8_NOP) /* ? */
+	AM_RANGE(0x2505, 0x2505) AM_WRITE(input_select_w) /* TBEN */
+	AM_RANGE(0x2506, 0x2506) AM_WRITE(centiped_flip_screen_w)
+	AM_RANGE(0x2507, 0x2507) AM_WRITE(control_select_w) /* CNTRLSEL */
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2700, 0x2700) AM_WRITE(atari_vg_earom_ctrl_w)
@@ -690,54 +844,54 @@ INPUT_PORTS_START( GAMENAME )													\
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* trackball sign bit */	\
 																				\
 	PORT_START	/* IN3 */														\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL\
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL	\
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL	\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL\
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL\
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL	\
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL	\
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY					\
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY				\
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY				\
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY				\
 																				\
 	PORT_START	/* IN4 */														\
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )										\
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )										\
-	PORT_DIPSETTING(    0x01, DEF_STR( German ) )										\
-	PORT_DIPSETTING(    0x02, DEF_STR( French ) )										\
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )	PORT_DIPLOCATION("N9:1,2")	\
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )								\
+	PORT_DIPSETTING(    0x01, DEF_STR( German ) )								\
+	PORT_DIPSETTING(    0x02, DEF_STR( French ) )								\
 	PORT_DIPSETTING(    0x03, FOURTH_LANGUAGE )									\
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))									\
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))	PORT_DIPLOCATION("N9:3,4")		\
 	PORT_DIPSETTING(    0x00, "2" )												\
 	PORT_DIPSETTING(    0x04, "3" )												\
 	PORT_DIPSETTING(    0x08, "4" )												\
 	PORT_DIPSETTING(    0x0c, "5" )												\
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life ))							\
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life )) PORT_DIPLOCATION("N9:5,6")\
 	PORT_DIPSETTING(    0x00, "10000" )											\
 	PORT_DIPSETTING(    0x10, "12000" )											\
 	PORT_DIPSETTING(    0x20, "15000" )											\
 	PORT_DIPSETTING(    0x30, "20000" )											\
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ))							\
-	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )											\
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )											\
-	PORT_DIPNAME( 0x80, 0x00, "Credit Minimum" )								\
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty )) PORT_DIPLOCATION("N9:7")	\
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )									\
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )									\
+	PORT_DIPNAME( 0x80, 0x00, "Credit Minimum" ) PORT_DIPLOCATION("N9:8")		\
 	PORT_DIPSETTING(    0x00, "1" )												\
 	PORT_DIPSETTING(    0x80, "2" )												\
 																				\
 	PORT_START	/* IN5 */														\
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))								\
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage )) PORT_DIPLOCATION("N8:1,2")	\
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))									\
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))									\
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))									\
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ))								\
-	PORT_DIPNAME( 0x0c, 0x00, "Right Coin" )									\
+	PORT_DIPNAME( 0x0c, 0x00, "Right Coin" ) PORT_DIPLOCATION("N8:3,4")		\
 	PORT_DIPSETTING(    0x00, "*1" )											\
 	PORT_DIPSETTING(    0x04, "*4" )											\
 	PORT_DIPSETTING(    0x08, "*5" )											\
 	PORT_DIPSETTING(    0x0c, "*6" )											\
-	PORT_DIPNAME( 0x10, 0x00, "Left Coin" )										\
+	PORT_DIPNAME( 0x10, 0x00, "Left Coin" )	PORT_DIPLOCATION("N8:5")			\
 	PORT_DIPSETTING(    0x00, "*1" )											\
 	PORT_DIPSETTING(    0x10, "*2" )											\
-	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" )									\
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )											\
+	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("N8:6,7,8")		\
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )									\
 	PORT_DIPSETTING(    0x20, "3 credits/2 coins" )								\
 	PORT_DIPSETTING(    0x40, "5 credits/4 coins" )								\
 	PORT_DIPSETTING(    0x60, "6 credits/4 coins" )								\
@@ -792,35 +946,35 @@ INPUT_PORTS_START( centtime )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 
 	PORT_START	/* IN4 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Spanish ) )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ))
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives )) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life ))
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life )) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x10, "12000" )
 	PORT_DIPSETTING(    0x20, "15000" )
 	PORT_DIPSETTING(    0x30, "20000" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ))
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty )) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x00, "Credit Minimum" )
+	PORT_DIPNAME( 0x80, 0x00, "Credit Minimum" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 
 	PORT_START	/* IN5 */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage )) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Game_Time ) )
+	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW2:3,4,5")
 	PORT_DIPSETTING(    0x00, "Untimed" )
 	PORT_DIPSETTING(    0x04, "1 Minute" )
 	PORT_DIPSETTING(    0x08, "2 Minutes" )
@@ -829,7 +983,7 @@ INPUT_PORTS_START( centtime )
 	PORT_DIPSETTING(    0x14, "5 Minutes" )
 	PORT_DIPSETTING(    0x18, "6 Minutes" )
 	PORT_DIPSETTING(    0x1c, "7 Minutes" )
-	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" )
+	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "3 credits/2 coins" )
 	PORT_DIPSETTING(    0x40, "5 credits/4 coins" )
@@ -880,47 +1034,47 @@ INPUT_PORTS_START( magworm )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START	/* IN4 */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage )) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0c, 0x00, "Right Coin" )
+	PORT_DIPNAME( 0x0c, 0x00, "Right Coin" ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, "*3" )
 	PORT_DIPSETTING(    0x04, "*7" )
 	PORT_DIPSETTING(    0x08, "*1/2" )
 	PORT_DIPSETTING(    0x0c, "*6" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Spanish ) )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ))
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives )) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0xc0, "5" )
 
 	PORT_START	/* IN5 */
-	PORT_DIPNAME( 0x01, 0x00, "Left Coin" )
+	PORT_DIPNAME( 0x01, 0x00, "Left Coin" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x01, "*2" )
-	PORT_DIPNAME( 0x0e, 0x00, "Bonus Coins" )
+	PORT_DIPNAME( 0x0e, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("SW2:2,3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x02, "3 credits/2 coins" )
 	PORT_DIPSETTING(    0x04, "5 credits/4 coins" )
 	PORT_DIPSETTING(    0x06, "6 credits/4 coins" )
 	PORT_DIPSETTING(    0x08, "6 credits/5 coins" )
 	PORT_DIPSETTING(    0x0a, "4 credits/3 coins" )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life ))
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Bonus_Life )) PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x10, "12000" )
 	PORT_DIPSETTING(    0x20, "15000" )
 	PORT_DIPSETTING(    0x30, "20000" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ))
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty )) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x00, "Credit Minimum" )
+	PORT_DIPNAME( 0x80, 0x00, "Credit Minimum" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
 
@@ -940,12 +1094,12 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( milliped )
 	PORT_START	/* IN0 $2000 */ /* see port 6 for x trackball */
-	PORT_DIPNAME(0x03, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME(0x03, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("P8:1,2")
 	PORT_DIPSETTING(   0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(   0x01, DEF_STR( German ) )
 	PORT_DIPSETTING(   0x02, DEF_STR( French ) )
 	PORT_DIPSETTING(   0x03, DEF_STR( Spanish ) )
-	PORT_DIPNAME(0x0c, 0x04, "Bonus" )
+	PORT_DIPNAME(0x0c, 0x04, "Bonus" ) PORT_DIPLOCATION("P8:3,4")
 	PORT_DIPSETTING(   0x00, "0" )
 	PORT_DIPSETTING(   0x04, "0 1x" )
 	PORT_DIPSETTING(   0x08, "0 1x 2x" )
@@ -956,16 +1110,13 @@ INPUT_PORTS_START( milliped )
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* trackball sign bit */
 
 	PORT_START	/* IN1 $2001 */ /* see port 7 for y trackball */
-	PORT_DIPNAME(0x01, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x01, DEF_STR( On ))
-	PORT_DIPNAME(0x02, 0x00, DEF_STR( Unknown ))
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x02, DEF_STR( On ))
-	PORT_DIPNAME(0x04, 0x00, "Credit Minimum" )
+	/* these bits are unused */
+	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME(0x04, 0x00, "Credit Minimum" )  PORT_DIPLOCATION("P8:7")
 	PORT_DIPSETTING(   0x00, "1" )
 	PORT_DIPSETTING(   0x04, "2" )
-	PORT_DIPNAME(0x08, 0x00, "Coin Counters" )
+	PORT_DIPNAME(0x08, 0x00, "Coin Counters" )    PORT_DIPLOCATION("P8:8")
 	PORT_DIPSETTING(   0x00, "1" )
 	PORT_DIPSETTING(   0x08, "2" )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -984,67 +1135,76 @@ INPUT_PORTS_START( milliped )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START	/* IN3 $2011 */
+	/* Note, joystick X input for player 2 are bad in software */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME(0x20, 0x20, DEF_STR( Cabinet ))
+	PORT_DIPSETTING(   0x20, DEF_STR( Upright ))
+	PORT_DIPSETTING(   0x00, DEF_STR( Cocktail ))
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START	/* 4 */ /* DSW1 $0408 */
-	PORT_DIPNAME(0x01, 0x00, "Millipede Head" )
+	PORT_DIPNAME(0x01, 0x00, "Millipede Head" ) PORT_DIPLOCATION("D5:1")
 	PORT_DIPSETTING(   0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(   0x01, DEF_STR( Hard ) )
-	PORT_DIPNAME(0x02, 0x00, "Beetle" )
+	PORT_DIPNAME(0x02, 0x00, "Beetle" ) PORT_DIPLOCATION("D5:2")
 	PORT_DIPSETTING(   0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(   0x02, DEF_STR( Hard ) )
-	PORT_DIPNAME(0x0c, 0x04, DEF_STR( Lives ))
+	PORT_DIPNAME(0x0c, 0x04, DEF_STR( Lives )) PORT_DIPLOCATION("D5:3,4")
 	PORT_DIPSETTING(   0x00, "2" )
 	PORT_DIPSETTING(   0x04, "3" )
 	PORT_DIPSETTING(   0x08, "4" )
 	PORT_DIPSETTING(   0x0c, "5" )
-	PORT_DIPNAME(0x30, 0x10, DEF_STR( Bonus_Life ))
+	PORT_DIPNAME(0x30, 0x10, DEF_STR( Bonus_Life )) PORT_DIPLOCATION("D5:5,6")
 	PORT_DIPSETTING(   0x00, "12000" )
 	PORT_DIPSETTING(   0x10, "15000" )
 	PORT_DIPSETTING(   0x20, "20000" )
 	PORT_DIPSETTING(   0x30, DEF_STR( None ) )
-	PORT_DIPNAME(0x40, 0x00, "Spider" )
+	PORT_DIPNAME(0x40, 0x00, "Spider" )  PORT_DIPLOCATION("D5:7")
 	PORT_DIPSETTING(   0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(   0x40, DEF_STR( Hard ) )
-	PORT_DIPNAME(0x80, 0x00, "Starting Score Select" )
+	PORT_DIPNAME(0x80, 0x00, "Starting Score Select" ) PORT_DIPLOCATION("D5:8")
 	PORT_DIPSETTING(   0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 
 	PORT_START	/* 5 */ /* DSW2 $0808 */
-	PORT_DIPNAME(0x03, 0x02, DEF_STR( Coinage ))
+	PORT_DIPNAME(0x03, 0x02, DEF_STR( Coinage )) PORT_DIPLOCATION("B5:1,2")
 	PORT_DIPSETTING(   0x03, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(   0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(   0x01, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(   0x00, DEF_STR( Free_Play ))
-	PORT_DIPNAME(0x0c, 0x00, "Right Coin" )
+	PORT_DIPNAME(0x0c, 0x00, "Right Coin" ) PORT_DIPLOCATION("B5:3,4")
 	PORT_DIPSETTING(   0x00, "*1" )
 	PORT_DIPSETTING(   0x04, "*4" )
 	PORT_DIPSETTING(   0x08, "*5" )
 	PORT_DIPSETTING(   0x0c, "*6" )
-	PORT_DIPNAME(0x10, 0x00, "Left Coin" )
+	PORT_DIPNAME(0x10, 0x00, "Left Coin" ) PORT_DIPLOCATION("B5:5")
 	PORT_DIPSETTING(   0x00, "*1" )
 	PORT_DIPSETTING(   0x10, "*2" )
-	PORT_DIPNAME(0xe0, 0x00, "Bonus Coins" )
+	PORT_DIPNAME(0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("B5:6,7,8")
 	PORT_DIPSETTING(   0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(   0x20, "3 credits/2 coins" )
 	PORT_DIPSETTING(   0x40, "5 credits/4 coins" )
 	PORT_DIPSETTING(   0x60, "6 credits/4 coins" )
 	PORT_DIPSETTING(   0x80, "6 credits/5 coins" )
 	PORT_DIPSETTING(   0xa0, "4 credits/3 coins" )
-	PORT_DIPSETTING(   0xc0, "Demo mode" )
+	PORT_DIPSETTING(   0xc0, "Demo Mode" )
 
 	PORT_START	/* IN6, fake trackball input port. */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
 
 	PORT_START	/* IN7, fake trackball input port. */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	PORT_START	/* IN8, fake trackball input port. */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_COCKTAIL
+
+	PORT_START	/* IN9, fake trackball input port. */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
 
@@ -1071,35 +1231,35 @@ INPUT_PORTS_START( warlords )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START	/* IN2 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("J2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Spanish ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( German ) )
-	PORT_DIPNAME( 0x04, 0x00, "Music" )
+	PORT_DIPNAME( 0x04, 0x00, "Music" ) PORT_DIPLOCATION("J2:3")
 	PORT_DIPSETTING(    0x00, "End of game" )
 	PORT_DIPSETTING(    0x04, "High score only" )
-	PORT_BIT( 0xc8, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x30, 0x00, "Credits" )
+	PORT_BIT( 0xC8, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_DIPLOCATION("J2:4,7,8")
+	PORT_DIPNAME( 0x30, 0x00, "Credits" ) PORT_DIPLOCATION("J2:5,6")
 	PORT_DIPSETTING(    0x00, "1p/2p = 1 credit" )
 	PORT_DIPSETTING(    0x10, "1p = 1, 2p = 2" )
 	PORT_DIPSETTING(    0x20, "1p/2p = 2 credits" )
 
 	PORT_START	/* IN3 */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ))
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage )) PORT_DIPLOCATION("M2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ))
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ))
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0c, 0x00, "Right Coin" )
+	PORT_DIPNAME( 0x0c, 0x00, "Right Coin" ) PORT_DIPLOCATION("M2:3,4")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x04, "*4" )
 	PORT_DIPSETTING(    0x08, "*5" )
 	PORT_DIPSETTING(    0x0c, "*6" )
-	PORT_DIPNAME( 0x10, 0x00, "Left Coin" )
+	PORT_DIPNAME( 0x10, 0x00, "Left Coin" ) PORT_DIPLOCATION("M2:5")
 	PORT_DIPSETTING(    0x00, "*1" )
 	PORT_DIPSETTING(    0x10, "*2" )
-	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" )
+	PORT_DIPNAME( 0xe0, 0x00, "Bonus Coins" ) PORT_DIPLOCATION("M2:6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "3 credits/2 coins" )
 	PORT_DIPSETTING(    0x40, "5 credits/4 coins" )
@@ -1144,54 +1304,54 @@ INPUT_PORTS_START( bullsdrt )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* trackball sign bit */
 
 	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Award Free Game" )
+	PORT_DIPNAME( 0x02, 0x02, "Award Free Game" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1403,6 +1563,7 @@ static MACHINE_DRIVER_START( milliped )
 
 	MDRV_PALETTE_INIT(milliped)
 	MDRV_VIDEO_START(milliped)
+	MDRV_VIDEO_UPDATE(milliped)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", POKEY, 12096000/8)

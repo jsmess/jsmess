@@ -5,7 +5,6 @@
  *
  */
 
-#include <time.h>
 #include "driver.h"
 #include "machine/timekpr.h"
 

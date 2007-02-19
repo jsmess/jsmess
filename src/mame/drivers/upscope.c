@@ -24,7 +24,6 @@
 **********************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "includes/amiga.h"
 
 

@@ -32,6 +32,7 @@
 
 #include <stdio.h>
 #include "mame.h"
+#include "driver.h"
 #include "video/generic.h"
 #include "state.h"
 

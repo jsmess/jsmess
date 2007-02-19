@@ -16,7 +16,6 @@ Notes:
 
 #include "driver.h"
 #include "sound/okim6295.h"
-#include <time.h>
 
 
 WRITE16_HANDLER( othldrby_videoram_addr_w );

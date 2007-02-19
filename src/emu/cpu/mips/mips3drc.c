@@ -12,7 +12,7 @@
 ***************************************************************************/
 
 #include <stddef.h>
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 #include "mips3.h"
 #include "cpu/x86drc.h"

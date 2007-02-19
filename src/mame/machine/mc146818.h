@@ -14,7 +14,6 @@
 #ifndef MC146818_H
 #define MC146818_H
 
-#include <time.h>
 #include "driver.h"
 
 typedef enum

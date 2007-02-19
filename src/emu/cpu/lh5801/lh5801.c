@@ -17,9 +17,7 @@
  * based on info found on an artikel for the tandy trs80 pc2
  *
  *****************************************************************************/
-#include <stdio.h>
-#include "driver.h"
-#include "state.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 
 #include "lh5801.h"

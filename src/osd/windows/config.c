@@ -14,21 +14,18 @@
 // standard C headers
 #include <stdarg.h>
 #include <ctype.h>
-#include <time.h>
 
 // MAME headers
 #include "osdepend.h"
 #include "driver.h"
-#include "options.h"
-
-#include "winmain.h"
-#include "video.h"
 #include "render.h"
 #include "rendutil.h"
-#include "inptport.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
 
+// MAMEOS headers
+#include "winmain.h"
+#include "video.h"
 
 
 //============================================================

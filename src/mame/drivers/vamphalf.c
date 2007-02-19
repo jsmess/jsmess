@@ -13,6 +13,7 @@
     Super Lup Lup Puzzle     (c) 1999 Omega System       (version 4.0)
     Lup Lup Puzzle           (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang         (c) 1999 Omega System       (version 2.8)
+    Wyvern Wings             (c) 2001 Semicom
 
  Games Needed:
 
@@ -25,9 +26,14 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-static UINT16 *tiles, *wram;
+static UINT16 *tiles = NULL, *wram;
+static UINT32 *tiles32 = NULL, *wram32;
 static int flip_bit, flipscreen = 0;
 static int palshift;
+
+static int wyvernwg_prot_idx = 8;
+static int wyvernwg_prot_which = 0;
+static UINT16 wyvernwg_prot_data[2] = { 2, 1 };
 
 static READ16_HANDLER( oki_r )
 {
@@ -71,6 +77,11 @@ static READ16_HANDLER( eeprom_r )
 		return 0;
 }
 
+static READ32_HANDLER( eeprom32_r )
+{
+	return EEPROM_read_bit();
+}
+
 static WRITE16_HANDLER( eeprom_w )
 {
 	if(offset)
@@ -81,21 +92,62 @@ static WRITE16_HANDLER( eeprom_w )
 	}
 }
 
+static WRITE32_HANDLER( eeprom32_w )
+{
+	EEPROM_write_bit(data & 0x01);
+	EEPROM_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+	EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+}
+
 static WRITE16_HANDLER( flipscreen_w )
 {
 	if(offset)
 	{
-		if(data & flip_bit)
-			flipscreen = 1;
-		else
-			flipscreen = 0;
+		flipscreen = data & flip_bit;
 	}
+}
+
+static WRITE32_HANDLER( flipscreen32_w )
+{
+	flipscreen = data & flip_bit;
+}
+
+static WRITE32_HANDLER( paletteram32_w )
+{
+	UINT16 paldata;
+
+	COMBINE_DATA(&paletteram32[offset]);
+
+	paldata = paletteram32[offset] & 0xffff;
+	palette_set_color(Machine, offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+
+	paldata = (paletteram32[offset] >> 16) & 0xffff;
+	palette_set_color(Machine, offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+}
+
+static READ32_HANDLER( wyvernwg_prot_r )
+{
+	wyvernwg_prot_idx--;
+	return (wyvernwg_prot_data[wyvernwg_prot_which] & (1 << wyvernwg_prot_idx)) >> wyvernwg_prot_idx;
+}
+
+static WRITE32_HANDLER( wyvernwg_prot_w )
+{
+	wyvernwg_prot_which = data & 1;
+	wyvernwg_prot_idx = 8;
 }
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&wram)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&tiles)
 	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( common_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&wram32)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&tiles32)
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM AM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
 ADDRESS_MAP_END
 
@@ -137,6 +189,16 @@ static ADDRESS_MAP_START( suplup_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0c0, 0x0c3) AM_WRITE(ym2151_register_w)
 	AM_RANGE(0x0c4, 0x0c7) AM_READWRITE(ym2151_status_r, ym2151_data_w)
 	AM_RANGE(0x100, 0x103) AM_READ(eeprom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( wyvernwg_io, ADDRESS_SPACE_IO, 32 )
+	AM_RANGE(0x1800, 0x1803) AM_READWRITE(wyvernwg_prot_r, wyvernwg_prot_w)
+	AM_RANGE(0x2000, 0x2003) AM_WRITE(flipscreen32_w)
+	AM_RANGE(0x2800, 0x2803) AM_READ(input_port_0_dword_r)
+	AM_RANGE(0x3000, 0x3003) AM_READ(input_port_1_dword_r)
+	AM_RANGE(0x5400, 0x5403) AM_WRITENOP // soundlatch
+	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom32_w)
+	AM_RANGE(0x7c00, 0x7c03) AM_READ(eeprom32_r)
 ADDRESS_MAP_END
 
 /*
@@ -187,16 +249,38 @@ static void draw_sprites(mame_bitmap *bitmap)
 		for (cnt=0; cnt<0x800; cnt+=8)
 		{
 			offs = (block + cnt) / 2;
-			if(tiles[offs] & 0x0100) continue;
 
-			code  = tiles[offs+1];
-			color = (tiles[offs+2] >> palshift) & 0x7f;
+			// 16bit version
+			if(tiles != NULL)
+			{
+				if(tiles[offs] & 0x0100) continue;
 
-			x = tiles[offs+3] & 0x01ff;
-			y = 256 - (tiles[offs] & 0x00ff);
+				code  = tiles[offs+1];
+				color = (tiles[offs+2] >> palshift) & 0x7f;
 
-			fx = tiles[offs] & 0x8000;
-			fy = tiles[offs] & 0x4000;
+				x = tiles[offs+3] & 0x01ff;
+				y = 256 - (tiles[offs] & 0x00ff);
+
+				fx = tiles[offs] & 0x8000;
+				fy = tiles[offs] & 0x4000;
+
+			}
+			// 32bit version
+			else
+			{
+				offs /= 2;
+
+				if(tiles32[offs] & 0x01000000) continue;
+
+				code  = tiles32[offs] & 0xffff;
+				color = ((tiles32[offs+1] >> palshift) & 0x7f0000) >> 16;
+
+				x = tiles32[offs+1] & 0x01ff;
+				y = 256 - ((tiles32[offs] & 0x00ff0000) >> 16);
+
+				fx = tiles32[offs] & 0x80000000;
+				fy = tiles32[offs] & 0x40000000;
+			}
 
 			if(flipscreen)
 			{
@@ -392,6 +476,15 @@ static MACHINE_DRIVER_START( suplup )
 	MDRV_CPU_IO_MAP(suplup_io,0)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( wyvernwg )
+	MDRV_IMPORT_FROM(common)
+	MDRV_CPU_REPLACE("main", E132XT, 50000000)	/* 50 MHz */
+	MDRV_CPU_PROGRAM_MAP(common_32bit_map,0)
+	MDRV_CPU_IO_MAP(wyvernwg_io,0)
+
+	MDRV_IMPORT_FROM(sound_qs1000)
 MACHINE_DRIVER_END
 
 /*
@@ -660,10 +753,10 @@ ROM_START( puzlbang ) /* version 2.8 / 990106 */
 	ROM_LOAD( "pbb-rom2.v28", 0x80000, 0x80000, CRC(490ecaeb) SHA1(2b0f25e3d681ddf95b3c65754900c046b5b50b09) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "pbbang28-roml00", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "pbbang28-romu00", 0x000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "pbbang28-roml01", 0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "pbbang28-romu01", 0x400002, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "pbbang28-roml00", 0x000000, 0x200000, CRC(08b2aa75) SHA1(7577b3ab79c54980307a83186dd1500f044c1bc8) )
+	ROM_LOAD32_WORD( "pbbang28-romu00", 0x000002, 0x200000, CRC(b57f4ca5) SHA1(b968c44a0ceb3274e066fa1d057fb6b017bb3fd3) )
+	ROM_LOAD32_WORD( "pbbang28-roml01", 0x400000, 0x200000, CRC(41c7ca8c) SHA1(55704f9d54f31bbaa044cd9d10ac2d9cb5e8fb70) )
+	ROM_LOAD32_WORD( "pbbang28-romu01", 0x400002, 0x200000, CRC(16746158) SHA1(a5036a7aaa717fde89d62b7ff7a3fded8b7f5cda) )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
@@ -683,6 +776,88 @@ ROM_START( suplup )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
+ROM_END
+
+/*
+
+Wyvern Wings (c) 2001 Semicom, Game Vision License
+
+
+   CPU: Hyperstone E1-32T
+ Video: 2 QuickLogic QL12x16B-XPL84 FPGA
+ Sound: AdMOS QDSP1000 with QDSP QS1001A sample rom
+   OSC: 50MHz, 28MHz & 24MHz
+EEPROM: 93C46
+
+F-E1-32-010-D
++------------------------------------------------------------------+
+|    VOL    +-------+  +---------+                                 |
++-+         | QPSD  |  |  U15A   |      +---------+   +---------+  |
+  |         |QS1001A|  |         |      | ROMH00  |   | ROML00  |  |
++-+         +-------+  +---------+      |         |   |         |  |
+|           +-------+                   +---------+   +---------+  |
+|           |QPSD   |   +----------+    +---------+   +---------+  |
+|           |QS1000 |   |    U7    |    | ROMH01  |   | ROML01  |  |
+|J   24MHz  +-------+   +----------+    |         |   |         |  |
+|A                                      +---------+   +---------+  |
+|M   50MHz           +-----+            +---------+   +---------+  |
+|M                   |DRAM2|            | ROMH02  |   | ROML02  |  |
+|A     +----------+  +-----+    +-----+ |         |   |         |  |
+|      |          |  +-----+    |93C46| +---------+   +---------+  |
+|C     |HyperStone|  |DRAM1|    +-----+ +---------+   +---------+  |
+|O     |  E1-32T  |  +-----+            | ROMH03  |   | ROML03  |  |
+|N     |          |              28MHz  |         |   |         |  |
+|N     +----------+                     +---------+   +---------+  |
+|E                                                                 |
+|C           +----------+           +------------+ +------------+  |
+|T           |   GAL1   |           | QuickLogic | | QuickLogic |  |
+|O           +----------+           | 0048 BH    | | 0048 BH    |  |
+|R           +----------+           | QL12X16B   | | QL12X16B   |  |
+|            |   ROM2   |           | -XPL84C    | | -XPL84C    |  |
+|            +----------+           +------------+ +------------+  |
+|            +----------+            +----+                        |
+|            |   ROM1   |            |MEM3|                        |
++-++--+      +----------+            +----+                        |
+  ||S1|    +-----+                   |MEM2|                        |
++-++--+    |CRAM2|                   +----+                        |
+|  +--+    +-----+                   |MEM7|                        |
+|  |S2|    |CRAM1|                   +----+                        |
+|  +--+    +-----+                   |MEM6|                        |
++------------------------------------+----+------------------------+
+
+S1 is the setup button
+S2 is a reset button
+
+ROMH & ROML are all MX 29F1610MC-16 flash roms
+u15A is a MX 29F1610MC-16 flash rom
+u7 is a ST 27c1001
+ROM1 & ROM2 are both ST 27c4000D
+
+*/
+
+ROM_START( wyvernwg )
+	ROM_REGION32_BE( 0x100000, REGION_USER1, 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1.bin", 0x000000, 0x080000, CRC(66bf3a5c) SHA1(037d5e7a6ef6f5b4ac08a9c811498c668a9d2522) )
+	ROM_LOAD( "rom2.bin", 0x080000, 0x080000, CRC(fd9b5911) SHA1(a01e8c6e5a9009024af385268ba3ba90e1ebec50) )
+
+	ROM_REGION( 0x020000, REGION_CPU2, 0 ) /* QDSP ('51) Code */
+	ROM_LOAD( "u7", 0x0000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) )
+
+	ROM_REGION( 0x1000000, REGION_GFX1, ROMREGION_DISPOSE )  /* gfx data */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(fb3541b6) SHA1(4f569ac7bde92c5febf005ab73f76552421ec223) )
+	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(516aca48) SHA1(42cf5678eb4c0ee7da2ab0bd66e4e34b2735c75a) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1c764f95) SHA1(ba6ac1376e837b491bc0269f2a1d10577a3d40cb) )
+	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(fee42c63) SHA1(a27b5cbca0defa9be85fee91dde1273f445d3372) )
+	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(fc846707) SHA1(deaee15ab71927f644dcf576959e2ceaa55bfd44) )
+	ROM_LOAD32_WORD( "romh02", 0x800002, 0x200000, CRC(86141c7d) SHA1(22a82cc7d44d655b03867503a83e81f7c82d6c91) )
+	ROM_LOAD32_WORD( "roml03", 0xc00000, 0x200000, CRC(b10bf37c) SHA1(6af835b1e2573f0bb2c17057e016a7aecc8fcde8) )
+	ROM_LOAD32_WORD( "romh03", 0xc00002, 0x200000, CRC(e01c2a92) SHA1(f53c2db92d62f595d473b1835c46d426f0dbe6b3) )
+
+	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) /* Music data / QDSP samples (SFX) */
+	ROM_LOAD( "romsnd.u15a",  0x000000, 0x200000, CRC(fc89eedc) SHA1(2ce28bdb773cfa5b5660e4c0a9ef454cb658f2da) )
+
+	ROM_REGION( 0x080000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
 static int irq_active(void)
@@ -785,6 +960,20 @@ static READ16_HANDLER( puzlbang_speedup_r )
 	return wram[(0x113ecc/2)+offset];
 }
 
+static READ32_HANDLER( wyvernwg_speedup_r )
+{
+	if(activecpu_get_pc() == 0x10758 )
+	{
+		if(irq_active())
+			cpu_spinuntil_int();
+		else
+			activecpu_eat_cycles(50);
+	}
+
+	return wram32[0x00b56fc/4];
+}
+
+
 DRIVER_INIT( vamphalf )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x0004a6d0, 0x0004a6d3, 0, 0, vamphalf_speedup_r );
@@ -841,10 +1030,19 @@ DRIVER_INIT( puzlbang )
 	/* no flipscreen */
 }
 
-GAME( 1999, suplup,   0,      suplup,   common, suplup,   ROT0,  "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0) // also has 'Puzzle Bang Bang' title but it can't be selected
-GAME( 1999, luplup,   suplup, suplup,   common, luplup,   ROT0,  "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
-GAME( 1999, luplup29, suplup, suplup,   common, luplup29, ROT0,  "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", GAME_NOT_WORKING )
-GAME( 1999, puzlbang, suplup, suplup,   common, puzlbang, ROT0,  "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", GAME_NOT_WORKING ) // Korean only
-GAME( 1999, vamphalf, 0,      vamphalf, common, vamphalf, ROT0,  "Danbi & F2 System", "Vamp 1/2 (Korea version)", 0 )
-GAME( 2000, misncrft, 0,      misncrft, common, misncrft, ROT90, "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
-GAME( 1999, coolmini, 0,      coolmini, common, coolmini, ROT0,  "Semicom",           "Cool Minigame Collection", 0 )
+DRIVER_INIT( wyvernwg )
+{
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00b56fc, 0x00b56ff, 0, 0, wyvernwg_speedup_r );
+
+	palshift = 0;
+	flip_bit = 1;
+}
+
+GAME( 1999, coolmini, 0,      coolmini, common,   coolmini, ROT0,   "Semicom",           "Cool Minigame Collection", 0 )
+GAME( 1999, suplup,   0,      suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0) // also has 'Puzzle Bang Bang' title but it can't be selected
+GAME( 1999, luplup,   suplup, suplup,   common,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
+GAME( 1999, luplup29, suplup, suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", GAME_NOT_WORKING )
+GAME( 1999, puzlbang, suplup, suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 ) // Korean only
+GAME( 1999, vamphalf, 0,      vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamp 1/2 (Korea version)", 0 )
+GAME( 2000, misncrft, 0,      misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
+GAME( 2001, wyvernwg, 0,      wyvernwg, common,   wyvernwg, ROT270, "Semicom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )

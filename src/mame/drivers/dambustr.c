@@ -9,7 +9,6 @@ Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
 
 
 #include "driver.h"
-#include "video/generic.h"
 
 #include "cpu/z80/z80.h"
 #include "galaxian.h"

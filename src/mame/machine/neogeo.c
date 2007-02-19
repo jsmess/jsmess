@@ -1,7 +1,6 @@
 #include "driver.h"
 #include "machine/pd4990a.h"
 #include "neogeo.h"
-#include <time.h>
 #include "sound/2610intf.h"
 
 

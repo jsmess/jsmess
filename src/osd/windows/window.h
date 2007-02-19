@@ -10,7 +10,6 @@
 #ifndef __WIN_WINDOW__
 #define __WIN_WINDOW__
 
-#include "blit.h"
 #include "video.h"
 #include "render.h"
 

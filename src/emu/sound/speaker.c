@@ -7,7 +7,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "sndintrf.h"
 #include "streams.h"
 
 static INT16 default_levels[2] = {0,32767};

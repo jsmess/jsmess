@@ -811,7 +811,6 @@ Notes:
 #include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
-#include <time.h>
 
 #define VERBOSE_LEVEL ( 0 )
 

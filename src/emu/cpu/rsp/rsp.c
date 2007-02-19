@@ -4,7 +4,7 @@
     Written by Ville Linde
 */
 
-#include "driver.h"
+#include "cpuintrf.h"
 #include "rsp.h"
 #include "debugger.h"
 #include <math.h>	// sqrt

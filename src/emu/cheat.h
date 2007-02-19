@@ -14,6 +14,8 @@
 #ifndef __CHEAT_H__
 #define __CHEAT_H__
 
+#include "mamecore.h"
+
 void cheat_init(running_machine *machine);
 
 int cheat_menu(int selection);

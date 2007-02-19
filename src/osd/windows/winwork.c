@@ -17,6 +17,7 @@
 #include <stdint.h>
 #endif
 
+// MAME headers
 #include "osdcore.h"
 
 

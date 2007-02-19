@@ -50,7 +50,6 @@ The command format is very simple:
 
 #include "driver.h"
 #include "namco54.h"
-#include "sound/dac.h"
 #include "cpu/mb88xx/mb88xx.h"
 
 
@@ -74,18 +73,18 @@ static READ8_HANDLER( namco_54xx_R0_r )
 
 static WRITE8_HANDLER( namco_54xx_O_w )
 {
-	UINT8 out = (data & 0x0f) * 0x11;
+	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		DAC_1_data_w(0, out);
+		discrete_sound_w(NAMCO_54XX_1_DATA, out);
 	else
-		DAC_0_data_w(0, out);
+		discrete_sound_w(NAMCO_54XX_2_DATA, out);
 }
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
 {
-	UINT8 out = (data & 0x0f) * 0x11;
+	UINT8 out = (data & 0x0f);
 
-	DAC_2_data_w(0, out);
+		discrete_sound_w(NAMCO_54XX_0_DATA, out);
 }
 
 
@@ -120,7 +119,7 @@ void namco_54xx_write(UINT8 data)
 	int cpunum = mame_find_cpu_index(Machine, CPUTAG_54XX);
 
 	if (cpunum == -1)
-		fatalerror("CPU %s not found", CPUTAG_54XX);
+		return;
 
 	mame_timer_set(time_zero, data, namco_54xx_latch_callback);
 

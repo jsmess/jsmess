@@ -413,7 +413,7 @@ void dst_op_amp_filt_reset(node_description *node)
 		context->vRef = info->vRef;
 		/* Set the output max. */
 		context->vP =  info->vP - OP_AMP_VP_RAIL_OFFSET;
-		context->vN =  info->vN + OP_AMP_VP_RAIL_OFFSET;
+		context->vN =  info->vN;
 
 		/* Work out the input resistance.  It is all input and bias resistors in parallel. */
 		context->rTotal  = 1.0 / info->r1;			// There has to be an R1.  Otherwise the table is wrong.

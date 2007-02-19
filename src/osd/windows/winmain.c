@@ -15,13 +15,14 @@
 #include <mmsystem.h>
 #include <tchar.h>
 
-// standard includes
-#include <time.h>
+// standard C headers
 #include <ctype.h>
 #include <stdarg.h>
 
 // MAME headers
 #include "driver.h"
+
+// MAMEOS headers
 #include "window.h"
 #include "video.h"
 #include "input.h"

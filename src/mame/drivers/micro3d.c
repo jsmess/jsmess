@@ -22,7 +22,6 @@
 /*====================================================================*/
 
 #include "driver.h"
-#include <stdio.h>
 //#include "machine/ds1215.h"
 #include "includes/micro3d.h"
 #include "cpu/tms34010/tms34010.h"

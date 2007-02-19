@@ -115,7 +115,6 @@
 #include "machine/pc16552d.h"
 #include "sound/ymz280b.h"
 #include "sound/cdda.h"
-#include "state.h"
 #include "cdrom.h"
 #include "firebeat.lh"
 

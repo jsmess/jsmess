@@ -37,7 +37,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 #include "machine/eeprom.h"
 #include "cpu/z180/z180.h"
 #include "pacman.h"

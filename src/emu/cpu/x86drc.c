@@ -9,8 +9,7 @@
 
 ***************************************************************************/
 
-#include "osdepend.h"
-#include "driver.h"
+#include "cpuintrf.h"
 #include "x86drc.h"
 #include "debugger.h"
 

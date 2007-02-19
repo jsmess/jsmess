@@ -11,6 +11,9 @@ extern UINT16 *mcu_ram; /* for calc3 and toybox */
 READ16_HANDLER( galpanib_calc_r );
 WRITE16_HANDLER( galpanib_calc_w );
 
+READ16_HANDLER( bloodwar_calc_r );
+WRITE16_HANDLER( bloodwar_calc_w );
+
 void calc3_mcu_init(void);
 WRITE16_HANDLER( calc3_mcu_ram_w );
 WRITE16_HANDLER( calc3_mcu_com0_w );

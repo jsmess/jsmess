@@ -27,11 +27,11 @@
 // MAME headers
 #include "osdepend.h"
 #include "driver.h"
+
+// MAMEOS headers
 #include "window.h"
 #include "video.h"
-#include "blit.h"
 #include "input.h"
-#include "options.h"
 #include "debugwin.h"
 #include "strconv.h"
 

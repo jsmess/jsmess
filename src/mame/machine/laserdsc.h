@@ -14,7 +14,7 @@
 #ifndef __LASERDSC_H__
 #define __LASERDSC_H__
 
-#include "mamecore.h"
+#include "driver.h"
 
 
 

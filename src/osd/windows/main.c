@@ -13,7 +13,7 @@
 #include <windows.h>
 #include <tchar.h>
 
-// MAME headers
+// MAMEOS headers
 #include "strconv.h"
 
 extern int utf8_main(int argc, char **argv);

@@ -684,6 +684,13 @@ static INTERRUPT_GEN( s2650_interrupt )
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x03);
 }
 
+static WRITE8_HANDLER( porky_banking_w )
+{
+	int i;
+	for(i = 0; i < 4; i++)
+		memory_set_bank(i + 1, data & 1);
+}
+
 static READ8_HANDLER( drivfrcp_port1_r )
 {
 	switch (activecpu_get_pc())
@@ -981,9 +988,8 @@ static ADDRESS_MAP_START( vanvan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb87f) AM_WRITE(MWA8_NOP)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( s2650games_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROMBANK(1)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xe000) AM_WRITE(s2650games_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1400, 0x141f) AM_MIRROR(0xe000) AM_WRITE(s2650games_scroll_w)
 	AM_RANGE(0x1420, 0x148f) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM)
@@ -999,16 +1005,16 @@ static ADDRESS_MAP_START( s2650games_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1570, 0x157f) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0xe000) AM_WRITE(MWA8_NOP)
 	AM_RANGE(0x15c0, 0x15c0) AM_MIRROR(0xe000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x15c7, 0x15c7) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x15c7, 0x15c7) AM_MIRROR(0xe000) AM_WRITE(porky_banking_w)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0xe000) AM_READ(input_port_0_r)
 	AM_RANGE(0x1540, 0x1540) AM_MIRROR(0xe000) AM_READ(input_port_1_r)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0xe000) AM_READ(input_port_2_r)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_WRITE(s2650games_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1c00, 0x1fef) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1ff0, 0x1fff) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x8000) AM_ROM
+	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x8000) AM_ROMBANK(3)
+	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x8000) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
 
@@ -4748,15 +4754,15 @@ ROM_END
 
 
 ROM_START( porky )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
 	ROM_LOAD( "pp",           0x0000, 0x1000, CRC(00592624) SHA1(41e554178a89b95bed1f570fab28e2a04f7a68d6) )
 	ROM_CONTINUE(             0x2000, 0x1000 )
 	ROM_CONTINUE(             0x4000, 0x1000 )
 	ROM_CONTINUE(             0x6000, 0x1000 )
-
-	/* what is it used for ? */
-	ROM_REGION( 0x4000, REGION_USER1, 0 )
-	ROM_LOAD( "ps",           0x0000, 0x4000, CRC(2efb9861) SHA1(8c5a23ed15bd985af78a54d2121fe058e53703bb) )
+	ROM_LOAD( "ps",           0x8000, 0x1000, CRC(2efb9861) SHA1(8c5a23ed15bd985af78a54d2121fe058e53703bb) )
+	ROM_CONTINUE(             0xa000, 0x1000 )
+	ROM_CONTINUE(             0xc000, 0x1000 )
+	ROM_CONTINUE(             0xe000, 0x1000 )
 
 	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "pc",           0x0000, 0x1000, CRC(a20e3d39) SHA1(3762289a495d597d6b9540ea7fa663128a9d543c) )
@@ -4978,29 +4984,46 @@ static DRIVER_INIT( jumpshot )
 	jumpshot_decode();
 }
 
+static DRIVER_INIT( drivfrcp )
+{
+	UINT8 *ROM = memory_region(REGION_CPU1);
+	int i;
+
+	for( i = 0; i < 4; i++)
+		memory_set_bankptr(i + 1, &ROM[i * 0x2000]);
+}
+
 static DRIVER_INIT( 8bpm )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	int i;
 
 	/* Data lines D0 and D6 swapped */
 	for( i = 0; i < 0x8000; i++ )
 	{
-		RAM[i] = BITSWAP8(RAM[i],7,0,5,4,3,2,1,6);
+		ROM[i] = BITSWAP8(ROM[i],7,0,5,4,3,2,1,6);
 	}
+
+	for( i = 0; i < 4; i++)
+		memory_set_bankptr(i + 1, &ROM[i * 0x2000]);
 }
 
 static DRIVER_INIT( porky )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	int i;
 
 	/* Data lines D0 and D4 swapped */
-	for(i = 0; i < 0x8000; i++)
+	for(i = 0; i < 0x10000; i++)
 	{
-		RAM[i] = BITSWAP8(RAM[i],7,6,5,0,3,2,1,4);
+		ROM[i] = BITSWAP8(ROM[i],7,6,5,0,3,2,1,4);
 	}
 
+	for( i = 0; i < 4; i++)
+		memory_configure_bank(i + 1, 0, 2, &ROM[i * 0x2000], 0x8000);
+
+	for( i = 0; i < 4; i++)
+		memory_set_bankptr(i + 1, &ROM[i * 0x2000]);
 }
 
 static DRIVER_INIT( rocktrv2 )
@@ -5106,9 +5129,9 @@ GAME( 1983, theglobp, suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corp
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "Super Glob (Pac-Man hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, 0,        ROT90,  "Bootleg", "Super Glob (Pac-Man hardware) German", GAME_SUPPORTS_SAVE )
 GAME( 1984, beastf,   suprglob, theglobp, theglobp, 0,        ROT90,  "Epos Corporation", "Beastie Feastie", GAME_SUPPORTS_SAVE )
-GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, 0,        ROT90,  "Shinkai Inc. (Magic Eletronics Inc. licence)", "Driving Force (Pac-Man conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, drivfrcp, ROT90,  "Shinkai Inc. (Magic Eletronics Inc. licence)", "Driving Force (Pac-Man conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 8bpm,     8ballact, 8bpm,     8bpm,     8bpm,     ROT90,  "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (Pac-Man conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1985, porky,    0,        porky,    porky,    porky,    ROT90,  "Shinkai Inc. (Magic Eletronics Inc. licence)", "Porky", GAME_NO_SOUND )
+GAME( 1985, porky,    0,        porky,    porky,    porky,    ROT90,  "Shinkai Inc. (Magic Eletronics Inc. licence)", "Porky", GAME_SUPPORTS_SAVE )
 GAME( 1986, rocktrv2, 0,        rocktrv2, rocktrv2, rocktrv2, ROT90,  "Triumph Software Inc.", "MTV Rock-N-Roll Trivia (Part 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, bigbucks, 0,        bigbucks, bigbucks, 0,        ROT90,  "Dynasoft Inc.", "Big Bucks", GAME_SUPPORTS_SAVE )
 GAME( 1995, mschamp,  mspacman, mschamp,  mschamp,  0,        ROT90,  "hack", "Ms. Pacman Champion Edition / Super Zola Pac Gal", GAME_SUPPORTS_SAVE )

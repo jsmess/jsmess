@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/generic.h"
 
 UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 

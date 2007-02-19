@@ -19,9 +19,7 @@
  *   - This entire notice must remain in the source code.
  *
  *****************************************************************************/
-#include <stdio.h>
-#include "driver.h"
-#include "state.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 
 #include "saturn.h"

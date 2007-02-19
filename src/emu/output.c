@@ -63,6 +63,7 @@ static UINT32 uniqueid = 12345;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static void output_pause(running_machine *machine, int pause);
 static void output_exit(running_machine *machine);
 
 
@@ -145,12 +146,25 @@ INLINE output_item *create_new_item(const char *outname, INT32 value)
 
 void output_init(running_machine *machine)
 {
+	/* add pause callback */
+	add_pause_callback(machine, output_pause);
+
 	/* get a callback when done */
 	add_exit_callback(machine, output_exit);
 
 	/* reset the lists */
 	memset(itemtable, 0, sizeof(itemtable));
 	global_notifylist = NULL;
+}
+
+
+/*-------------------------------------------------
+    output_pause - send pause message
+-------------------------------------------------*/
+
+static void output_pause(running_machine *machine, int pause)
+{
+	output_set_value("pause", pause & 1);
 }
 
 
@@ -205,13 +219,19 @@ void output_set_value(const char *outname, INT32 value)
 	output_notify *notify;
 	INT32 oldval;
 
-	/* if no item of that name, create a new one */
+	/* if no item of that name, create a new one and send the item's state */
 	if (item == NULL)
+	{
 		item = create_new_item(outname, value);
+		oldval = value + 1;
+	}
 
-	/* set the new value */
-	oldval = item->value;
-	item->value = value;
+	else
+	{
+		/* set the new value */
+		oldval = item->value;
+		item->value = value;
+	}
 
 	/* if the value is different, signal the notifier */
 	if (oldval != value)

@@ -24,7 +24,7 @@
 #include "rendutil.h"
 #include "options.h"
 
-// OSD headers
+// MAMEOS headers
 #include "winmain.h"
 #include "window.h"
 

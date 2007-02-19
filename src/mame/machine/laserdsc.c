@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "laserdsc.h"
+#include "avcomp.h"
 #include "profiler.h"
 #include "streams.h"
 #include "sound/custom.h"
@@ -219,6 +220,7 @@ struct _laserdisc_info
 {
 	/* disc parameters */
 	chd_file *		disc;					/* handle to the disc itself */
+	av_codec_decompress_config avconfig;	/* decompression configuration */
 	UINT8			readpending;			/* true if a read is pending */
 	UINT8 *			framebuffer;			/* buffer to hold one frame */
 	UINT32			maxfractrack;			/* maximum track number */
@@ -674,9 +676,11 @@ INLINE void fillbitmap_yuy16(mame_bitmap *bitmap, UINT8 yval, UINT8 cr, UINT8 cb
 
 laserdisc_info *laserdisc_init(int type, chd_file *chd, int custom_index)
 {
-	int fps = 30, fpsfrac = 0, width = 720, height = 240, rate = 44100;
+	int fps = 30, fpsfrac = 0, width = 720, height = 240, interlaced = 1, channels = 2, rate = 44100, metabytes = 0;
 	UINT32 fps_times_1million, max_samples_per_track;
 	laserdisc_info *info;
+	char metadata[256];
+	chd_error err;
 
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call laserdisc_init at init time!");
 
@@ -687,7 +691,29 @@ laserdisc_info *laserdisc_init(int type, chd_file *chd, int custom_index)
 
 	/* get the disc metadata and extract the info */
 	info->disc = chd;
-	info->maxfractrack = INT_TO_FRAC(54000);
+	if (info->disc != NULL)
+	{
+		/* require the A/V codec */
+		if (chd_get_header(info->disc)->compression != CHDCOMPRESSION_AV)
+			fatalerror("Laserdisc video must be compressed with the A/V codec!");
+
+		/* read and extract the metadata */
+		err = chd_get_metadata(info->disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+		if (err != CHDERR_NONE)
+			fatalerror("Non-A/V CHD file specified");
+		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate, &metabytes) != 8)
+			fatalerror("Invalid metadata in CHD file");
+
+		/* require interlaced video */
+		if (!interlaced)
+			fatalerror("Laserdisc video must be interlaced!");
+
+		/* determine the maximum track and allocate a frame buffer */
+		info->maxfractrack = INT_TO_FRAC(chd_get_header(info->disc)->totalhunks / (interlaced + 1));
+		info->framebuffer = auto_malloc(chd_get_header(info->disc)->hunkbytes);
+	}
+	else
+		info->maxfractrack = INT_TO_FRAC(54000);
 
 	/* allocate video frames */
 	info->videoframe[0] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
@@ -1236,7 +1262,16 @@ static int update_position(laserdisc_info *info)
 
 static void read_track_data(laserdisc_info *info)
 {
+	UINT32 tracknum = FRAC_TO_INT(info->curfractrack);
 	UINT32 fieldnum = info->fieldnum & 1;
+	UINT32 chdhunk = (tracknum - 1) * 2 + fieldnum;
+	chd_error err;
+
+	/* initialize the decompression structure */
+	info->avconfig.decode_mask = AVCOMP_DECODE_META;
+	info->avconfig.video_buffer = NULL;
+	info->avconfig.video_xor = BYTE_XOR_LE(0);
+	info->avconfig.audio_xor = BYTE_XOR_BE(0);
 
 	/* if video is active, enable video decoding */
 	if (video_active(info))
@@ -1249,9 +1284,31 @@ static void read_track_data(laserdisc_info *info)
 			info->videoindex ^= 1;
 			info->videofields[info->videoindex] = 0;
 		}
+
+		/* enable video and configure it to read into the videoframe */
+		info->avconfig.decode_mask |= AVCOMP_DECODE_VIDEO;
+		info->avconfig.video_buffer = (UINT8 *)BITMAP_ADDR16(info->videoframe[info->videoindex], fieldnum, 0);
+		info->avconfig.video_stride = 4 * info->videoframe[info->videoindex]->rowpixels;
 	}
 	else
 		info->videofields[0] = info->videofields[1] = 0;
+
+	/* if audio is active, enable audio decoding */
+	if (audio_channel_active(info, 0))
+		info->avconfig.decode_mask |= AVCOMP_DECODE_AUDIO(0);
+	if (audio_channel_active(info, 1))
+		info->avconfig.decode_mask |= AVCOMP_DECODE_AUDIO(1);
+
+	/* configure the codec and then read */
+	if (info->disc != NULL)
+	{
+		err = chd_codec_config(info->disc, AV_CODEC_DECOMPRESS_CONFIG, &info->avconfig);
+		if (err == CHDERR_NONE)
+		{
+			err = chd_read_async(info->disc, chdhunk, info->framebuffer);
+			info->readpending = TRUE;
+		}
+	}
 }
 
 
@@ -1292,7 +1349,7 @@ static void process_track_data(laserdisc_info *info)
 		info->last_chapter = chapter;
 
 	/* update video info */
-	if (rawdata != NULL)
+	if (rawdata != NULL && (info->avconfig.decode_mask & AVCOMP_DECODE_VIDEO))
 	{
 		info->videofields[info->videoindex]++;
 		info->videoframenum[info->videoindex] = info->last_frame;

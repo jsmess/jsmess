@@ -9,6 +9,8 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __DRIVER_H__
 #define __DRIVER_H__
 
@@ -56,21 +58,16 @@
     INCLUDES
 ***************************************************************************/
 
-#include "mamecore.h"
-#include "memory.h"
-#include "mame.h"
-#include "fileio.h"
-#include "drawgfx.h"
-#include "video.h"
-#include "palette.h"
 #include "cpuintrf.h"
 #include "sndintrf.h"
+#include "fileio.h"
+#include "drawgfx.h"
+#include "palette.h"
 #include "sound.h"
 #include "input.h"
 #include "inptport.h"
 #include "output.h"
 #include "tilemap.h"
-#include "state.h"
 #include "romload.h"
 #include "machine/generic.h"
 #include "audio/generic.h"
@@ -88,8 +85,6 @@
 
 /* maxima */
 #define MAX_DRIVER_NAME_CHARS	8
-#define MAX_CPU					8
-#define MAX_SOUND				32
 #define MAX_SPEAKER 			4
 
 /* watchdog constants */

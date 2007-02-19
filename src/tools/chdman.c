@@ -9,6 +9,8 @@
 
 #include "osdcore.h"
 #include "chdcd.h"
+#include "aviio.h"
+#include "bitmap.h"
 #include "md5.h"
 #include "sha1.h"
 #include <stdarg.h>
@@ -202,9 +204,11 @@ static int usage(void)
 	printf("   or: chdman -createhd inputhd.raw output.chd [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
 	printf("   or: chdman -createblankhd output.chd cylinders heads sectors [sectorsize [hunksize]]\n");
 	printf("   or: chdman -createcd input.toc output.chd\n");
+	printf("   or: chdman -createav input.avi inputmeta.txt output.chd [firstframe [numframes]]\n");
 	printf("   or: chdman -copydata input.chd output.chd\n");
 	printf("   or: chdman -extract input.chd output.raw\n");
 	printf("   or: chdman -extractcd input.chd output.toc output.bin\n");
+	printf("   or: chdman -extractav input.chd output.avi outputmeta.txt [firstframe [numframes]]\n");
 	printf("   or: chdman -verify input.chd\n");
 	printf("   or: chdman -verifyfix input.chd\n");
 	printf("   or: chdman -update input.chd output.chd\n");
@@ -607,6 +611,331 @@ cleanup:
 		chdman_close(srcfile);
 	if (chd != NULL)
 		chd_close(chd);
+	if (err != CHDERR_NONE)
+		osd_rmfile(outputfile);
+	return (err != CHDERR_NONE);
+}
+
+
+/*-------------------------------------------------
+    read_avi_frame - read an AVI frame
+-------------------------------------------------*/
+
+static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bitmap_t *bitmap, int interlaced, UINT32 hunkbytes)
+{
+	const avi_movie_info *info = avi_get_movie_info(avi);
+	int interlace_factor = interlaced ? 2 : 1;
+	UINT32 first_sample, num_samples;
+	avi_error avierr = AVIERR_NONE;
+	int chnum, sampnum, x, y;
+	UINT8 *dest = cache;
+	INT16 *temp;
+
+	/* compute the number of samples in this frame */
+	first_sample = avi_first_sample_in_frame(avi, framenum / interlace_factor);
+	num_samples = avi_first_sample_in_frame(avi, framenum / interlace_factor + 1) - first_sample;
+	if (interlaced)
+	{
+		if (framenum % 2 == 0)
+			num_samples = (num_samples + 1) / 2;
+		else
+		{
+			first_sample += (num_samples + 1) / 2;
+			num_samples -= (num_samples + 1) / 2;
+		}
+	}
+
+	/* allocate a temporary buffer */
+	temp = malloc(num_samples * 2);
+	if (temp == NULL)
+		return AVIERR_NO_MEMORY;
+
+	/* update the header with the actual number of samples in the frame */
+	dest[6] = num_samples >> 8;
+	dest[7] = num_samples;
+	dest += 12 + dest[4];
+
+	/* loop over channels and read the samples */
+	for (chnum = 0; chnum < info->audio_channels; chnum++)
+	{
+		/* read the sound samples */
+		avierr = avi_read_sound_samples(avi, chnum, first_sample, num_samples, temp);
+		if (avierr != AVIERR_NONE)
+			goto cleanup;
+
+		/* store them big endian at the destination */
+		for (sampnum = 0; sampnum < num_samples; sampnum++)
+		{
+			INT16 sample = temp[sampnum];
+			*dest++ = sample >> 8;
+			*dest++ = sample;
+		}
+	}
+
+	/* read the video data when we hit a new frame */
+	if (framenum % interlace_factor == 0)
+	{
+		avierr = avi_read_video_frame_yuy16(avi, framenum / interlace_factor, bitmap);
+		if (avierr != AVIERR_NONE)
+			goto cleanup;
+	}
+
+	/* loop over the data and copy it to the cache */
+	for (y = framenum % interlace_factor; y < info->video_height; y += interlace_factor)
+	{
+		UINT16 *source = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+
+		for (x = 0; x < info->video_width; x++)
+		{
+			UINT16 pixel = *source++;
+			*dest++ = pixel;
+			*dest++ = pixel >> 8;
+		}
+	}
+
+	/* fill the rest with 0 */
+	while (dest < &cache[hunkbytes])
+		*dest++ = 0;
+
+cleanup:
+	free(temp);
+	return avierr;
+}
+
+
+/*-------------------------------------------------
+    do_createav - create a new A/V file from an
+    input AVI file and metadata
+-------------------------------------------------*/
+
+static int do_createav(int argc, char *argv[], int param)
+{
+	UINT32 fps_times_1million, width, height, interlaced, channels, rate, metabytes = 0, totalframes;
+	UINT32 max_samples_per_frame, bytes_per_frame, firstframe, numframes;
+	const char *inputfile, *metafile, *outputfile;
+	bitmap_t videobitmap = { 0 };
+	const avi_movie_info *info;
+	const chd_header *header;
+	char metadata[256];
+	chd_file *chd = NULL;
+	avi_file *avi = NULL;
+	UINT8 *cache = NULL;
+	double ratio = 1.0;
+	FILE *meta = NULL;
+	avi_error avierr;
+	chd_error err;
+	UINT32 framenum;
+
+	/* require 5-7 args total */
+	if (argc < 5 || argc > 7)
+		return usage();
+
+	/* extract the first few parameters */
+	inputfile = argv[2];
+	metafile = argv[3];
+	outputfile = argv[4];
+	firstframe = (argc > 5) ? atoi(argv[5]) : 0;
+	numframes = (argc > 6) ? atoi(argv[6]) : 1000000;
+
+	/* print some info */
+	printf("Input file:   %s\n", inputfile);
+	printf("Meta file:    %s\n", (metafile == NULL) ? "(none)" : metafile);
+	printf("Output file:  %s\n", outputfile);
+
+	/* open the meta file */
+	if (metafile != NULL)
+	{
+		meta = fopen(metafile, "r");
+		if (meta == NULL)
+		{
+			fprintf(stderr, "Error opening meta file\n");
+			err = CHDERR_INVALID_FILE;
+			goto cleanup;
+		}
+		if (fgets(metadata, sizeof(metadata), meta) == NULL || sscanf(metadata, "chdmeta %d\n", &metabytes) != 1)
+		{
+			fprintf(stderr, "Invalid data header in metafile\n");
+			err = CHDERR_INVALID_FILE;
+			goto cleanup;
+		}
+		if (metabytes > 255)
+		{
+			fprintf(stderr, "Metadata too large (255 bytes maximum)\n");
+			err = CHDERR_INVALID_FILE;
+			goto cleanup;
+		}
+	}
+
+	/* open the source file */
+	avierr = avi_open(inputfile, &avi);
+	if (avierr != AVIERR_NONE)
+	{
+		fprintf(stderr, "Error opening AVI file: %s\n", avi_error_string(avierr));
+		err = CHDERR_INVALID_FILE;
+		goto cleanup;
+	}
+
+	/* get the movie information */
+	info = avi_get_movie_info(avi);
+	fps_times_1million = (UINT64)info->video_timescale * 1000000 / info->video_sampletime;
+	width = info->video_width;
+	height = info->video_height;
+	interlaced = ((fps_times_1million / 1000000) <= 30) && (height % 2 == 0) && (height > 288);
+	channels = info->audio_channels;
+	rate = info->audio_samplerate;
+	totalframes = info->video_numsamples;
+	numframes = MIN(totalframes - firstframe, numframes);
+
+	/* allocate a video buffer */
+	videobitmap.base = malloc(width * height * 2);
+	if (videobitmap.base ==  NULL)
+	{
+		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
+		err = CHDERR_OUT_OF_MEMORY;
+		goto cleanup;
+	}
+	videobitmap.format = BITMAP_FORMAT_YUY16;
+	videobitmap.width = width;
+	videobitmap.height = height;
+	videobitmap.bpp = 16;
+	videobitmap.rowpixels = width;
+
+	/* print some of it */
+	printf("Use frames:   %d-%d\n", firstframe, firstframe + numframes - 1);
+	printf("Frame rate:   %d.%06d\n", fps_times_1million / 1000000, fps_times_1million % 1000000);
+	printf("Frame size:   %d x %d %s\n", width, height, interlaced ? "interlaced" : "non-interlaced");
+	printf("Audio:        %d channels at %d Hz\n", channels, rate);
+	printf("Metadata:     %d bytes/frame\n", metabytes);
+	printf("Total frames: %d (%02d:%02d:%02d)\n", totalframes,
+			(UINT32)((UINT64)totalframes * 1000000 / fps_times_1million / 60 / 60),
+			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million / 60) % 60),
+			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million) % 60));
+
+	/* adjust for interlacing */
+	if (interlaced)
+	{
+		fps_times_1million *= 2;
+		totalframes *= 2;
+		height /= 2;
+		firstframe *= 2;
+		numframes *= 2;
+	}
+
+	/* determine the number of bytes per frame */
+	max_samples_per_frame = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
+	bytes_per_frame = 12 + metabytes + channels * max_samples_per_frame * 2 + width * height * 2;
+
+	/* create the new CHD */
+	err = chd_create(outputfile, (UINT64)numframes * (UINT64)bytes_per_frame, bytes_per_frame, CHDCOMPRESSION_AV, NULL);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		goto cleanup;
+	}
+
+	/* open the new CHD */
+	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &chd);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		goto cleanup;
+	}
+	header = chd_get_header(chd);
+
+	/* write the metadata */
+	sprintf(metadata, AV_METADATA_FORMAT, fps_times_1million / 1000000, fps_times_1million % 1000000, width, height, interlaced, channels, rate, metabytes);
+	err = chd_set_metadata(chd, AV_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error adding AV metadata: %s\n", error_string(err));
+		goto cleanup;
+	}
+
+	/* allocate a cache */
+	cache = malloc(bytes_per_frame);
+	if (cache == NULL)
+	{
+		fprintf(stderr, "Out of memory allocating temporary buffer\n");
+		err = CHDERR_OUT_OF_MEMORY;
+		goto cleanup;
+	}
+
+	/* fill in the basic values */
+	cache[0] = 'c';
+	cache[1] = 'h';
+	cache[2] = 'a';
+	cache[3] = 'v';
+	cache[4] = metabytes;
+	cache[5] = channels;
+	cache[6] = max_samples_per_frame >> 8;
+	cache[7] = max_samples_per_frame;
+	cache[8] = width >> 8;
+	cache[9] = width;
+	cache[10] = (interlaced << 7) | (height >> 8);
+	cache[11] = height;
+
+	/* begin compressing */
+	err = chd_compress_begin(chd);
+	if (err != CHDERR_NONE)
+		goto cleanup;
+
+	/* loop over source hunks until we run out */
+	for (framenum = 0; framenum < numframes; framenum++)
+	{
+		/* progress */
+		progress(framenum == 0, "Compressing hunk %d/%d... (ratio=%d%%)  \r", framenum, header->totalhunks, (int)(100.0 * ratio));
+
+		/* read the metadata */
+		if (metabytes > 0)
+		{
+			memset(&cache[12], 0, metabytes);
+			if (meta != NULL && fgets(metadata, sizeof(metadata), meta) != NULL)
+			{
+				int metaoffs, stroffs, length = strlen(metadata);
+
+				for (metaoffs = stroffs = 0; metaoffs < metabytes && stroffs < length; metaoffs++, stroffs += 2)
+				{
+					int data;
+					if (sscanf(&metadata[stroffs], "%02X", &data) != 1)
+						break;
+					cache[12 + metaoffs] = data;
+				}
+			}
+		}
+
+		/* read the frame into its proper format in the cache */
+		avierr = read_avi_frame(avi, firstframe + framenum, cache, &videobitmap, interlaced, bytes_per_frame);
+		if (avierr != AVIERR_NONE)
+		{
+			fprintf(stderr, "Error reading frame %d from AVI file: %s\n", firstframe + framenum, avi_error_string(avierr));
+			err = CHDERR_COMPRESSION_ERROR;
+		}
+
+		/* append the data */
+		err = chd_compress_hunk(chd, cache, &ratio);
+		if (err != CHDERR_NONE)
+			goto cleanup;
+	}
+
+	/* finish compression */
+	err = chd_compress_finish(chd);
+	if (err != CHDERR_NONE)
+		goto cleanup;
+	else
+		progress(TRUE, "Compression complete ... final ratio = %d%%            \n", (int)(100.0 * ratio));
+
+cleanup:
+	/* close everything down */
+	if (avi != NULL)
+		avi_close(avi);
+	if (chd != NULL)
+		chd_close(chd);
+	if (meta != NULL)
+		fclose(meta);
+	if (cache != NULL)
+		free(cache);
+	if (videobitmap.base != NULL)
+		free(videobitmap.base);
 	if (err != CHDERR_NONE)
 		osd_rmfile(outputfile);
 	return (err != CHDERR_NONE);
@@ -1041,6 +1370,282 @@ cleanup:
 		chd_close(inputchd);
 	if (err != CHDERR_NONE)
 		osd_rmfile(outputfile);
+	return (err != CHDERR_NONE);
+}
+
+
+/*-------------------------------------------------
+    write_avi_frame - write an AVI frame
+-------------------------------------------------*/
+
+static avi_error write_avi_frame(avi_file *avi, UINT32 framenum, const UINT8 *buffer, bitmap_t *bitmap)
+{
+	const avi_movie_info *info = avi_get_movie_info(avi);
+	UINT32 channels, samples, width, height;
+	avi_error avierr = AVIERR_NONE;
+	int chnum, sampnum, x, y;
+	int interlace_factor;
+	INT16 *temp;
+
+	/* extract core data */
+	channels = buffer[5];
+	samples = (buffer[6] << 8) | buffer[7];
+	width = (buffer[8] << 8) | buffer[9];
+	height = (buffer[10] << 8) | buffer[11];
+	interlace_factor = (height & 0x8000) ? 2 : 1;
+	height &= 0x7fff;
+	height *= interlace_factor;
+	buffer += 12 + buffer[4];
+
+	/* make sure it makes sense */
+	if (width != info->video_width || height != info->video_height)
+		return AVIERR_INVALID_DATA;
+
+	/* allocate a temporary buffer */
+	temp = malloc(samples * 2);
+	if (temp == NULL)
+		return AVIERR_NO_MEMORY;
+
+	/* loop over audio channels */
+	for (chnum = 0; chnum < channels; chnum++)
+	{
+		/* extract samples */
+		for (sampnum = 0; sampnum < samples; sampnum++)
+		{
+			INT16 sample = *buffer++ << 8;
+			temp[sampnum] = sample | *buffer++;
+		}
+
+		/* write the samples */
+		avierr = avi_append_sound_samples(avi, chnum, temp, samples);
+		if (avierr != AVIERR_NONE)
+			goto cleanup;
+	}
+
+	/* loop over the data and copy it to the bitmap */
+	for (y = framenum % interlace_factor; y < height; y += interlace_factor)
+	{
+		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+
+		for (x = 0; x < width; x++)
+		{
+			UINT16 pixel = *buffer++;
+			*dest++ = pixel | *buffer++ << 8;
+		}
+	}
+
+	/* write the video data */
+	if (interlace_factor == 1 || framenum % 2 == 1)
+	{
+		avierr = avi_append_video_frame_yuy16(avi, bitmap);
+		if (avierr != AVIERR_NONE)
+			goto cleanup;
+	}
+
+cleanup:
+	free(temp);
+	return avierr;
+}
+
+
+/*-------------------------------------------------
+    do_extractav - extract an AVI file from a
+    CHD image
+-------------------------------------------------*/
+
+static int do_extractav(int argc, char *argv[], int param)
+{
+	int fps, fpsfrac, width, height, interlaced, channels, rate, metabytes, totalframes;
+	const char *inputfile, *metafile, *outputfile;
+	int firstframe, numframes;
+	bitmap_t videobitmap = { 0 };
+	UINT32 fps_times_1million;
+	const chd_header *header;
+	chd_file *chd = NULL;
+	avi_file *avi = NULL;
+	avi_movie_info info;
+	char metadata[256];
+	void *hunk = NULL;
+	FILE *meta = NULL;
+	avi_error avierr;
+	chd_error err;
+	int framenum;
+
+	/* require 5-7 args total */
+	if (argc < 5 || argc > 7)
+		return usage();
+
+	/* extract the data */
+	inputfile = argv[2];
+	outputfile = argv[3];
+	metafile = argv[4];
+	firstframe = (argc > 5) ? atoi(argv[5]) : 0;
+	numframes = (argc > 6) ? atoi(argv[6]) : 1000000;
+
+	/* print some info */
+	printf("Input file:   %s\n", inputfile);
+	printf("Output file:  %s\n", outputfile);
+	printf("Meta file:    %s\n", (metafile == NULL) ? "(none)" : metafile);
+
+	/* get the header */
+	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &chd);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, error_string(err));
+		goto cleanup;
+	}
+	header = chd_get_header(chd);
+
+	/* get the metadata */
+	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error getting A/V metadata: %s\n", error_string(err));
+		goto cleanup;
+	}
+
+	/* extract the info */
+	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate, &metabytes) != 8)
+	{
+		fprintf(stderr, "Improperly formatted metadata\n");
+		err = CHDERR_INVALID_METADATA;
+		goto cleanup;
+	}
+	fps_times_1million = fps * 1000000 + fpsfrac;
+	totalframes = header->totalhunks;
+
+	/* adjust for interlacing */
+	if (interlaced)
+	{
+		fps_times_1million /= 2;
+		height *= 2;
+	}
+	numframes = MIN(totalframes - firstframe, numframes);
+
+	/* allocate a video buffer */
+	videobitmap.base = malloc(width * height * 2);
+	if (videobitmap.base ==  NULL)
+	{
+		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
+		err = CHDERR_OUT_OF_MEMORY;
+		goto cleanup;
+	}
+	videobitmap.format = BITMAP_FORMAT_YUY16;
+	videobitmap.width = width;
+	videobitmap.height = height;
+	videobitmap.bpp = 16;
+	videobitmap.rowpixels = width;
+
+	/* print some of it */
+	printf("Use frames:   %d-%d\n", firstframe, firstframe + numframes - 1);
+	printf("Frame rate:   %d.%06d\n", fps_times_1million / 1000000, fps_times_1million % 1000000);
+	printf("Frame size:   %d x %d %s\n", width, height, interlaced ? "interlaced" : "non-interlaced");
+	printf("Audio:        %d channels at %d Hz\n", channels, rate);
+	printf("Metadata:     %d bytes/frame\n", metabytes);
+	printf("Total frames: %d (%02d:%02d:%02d)\n", totalframes,
+			(UINT32)((UINT64)totalframes * 1000000 / fps_times_1million / 60 / 60),
+			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million / 60) % 60),
+			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million) % 60));
+
+	if (metabytes > 0 && metafile == NULL)
+		fprintf(stderr, "Warning: per-frame metadata included but not extracted\n");
+
+	/* allocate memory to hold a hunk */
+	hunk = malloc(header->hunkbytes);
+	if (hunk == NULL)
+	{
+		fprintf(stderr, "Out of memory allocating hunk buffer!\n");
+		err = CHDERR_OUT_OF_MEMORY;
+		goto cleanup;
+	}
+
+	/* build up the movie info */
+	info.video_format = FORMAT_YUY2;
+	info.video_timescale = fps_times_1million;
+	info.video_sampletime = 1000000;
+	info.video_width = width;
+	info.video_height = height;
+	info.video_depth = 16;
+	info.audio_format = 0;
+	info.audio_timescale = rate;
+	info.audio_sampletime = 1;
+	info.audio_channels = channels;
+	info.audio_samplebits = 16;
+	info.audio_samplerate = rate;
+
+	/* create the output file */
+	avierr = avi_create(outputfile, &info, &avi);
+	if (avierr != AVIERR_NONE)
+	{
+		fprintf(stderr, "Error opening output file '%s': %s\n", outputfile, avi_error_string(avierr));
+		err = CHDERR_CANT_CREATE_FILE;
+		goto cleanup;
+	}
+
+	/* create the metadata file */
+	if (metafile != NULL && metabytes > 0)
+	{
+		meta = fopen(metafile, "w");
+		if (meta == NULL)
+		{
+			fprintf(stderr, "Error opening meta file '%s': %s\n", metafile, avi_error_string(avierr));
+			err = CHDERR_CANT_CREATE_FILE;
+			goto cleanup;
+		}
+		fprintf(meta, "chdmeta %d\n", metabytes);
+	}
+
+	/* loop over hunks, reading and writing */
+	for (framenum = 0; framenum < numframes; framenum++)
+	{
+		/* progress */
+		progress(framenum == 0, "Extracting hunk %d/%d...  \r", framenum, numframes);
+
+		/* read the hunk into a buffer */
+		err = chd_read(chd, firstframe + framenum, hunk);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", firstframe + framenum, error_string(err));
+			goto cleanup;
+		}
+
+		/* write the metadata */
+		if (meta != NULL)
+		{
+			int metaoffs;
+			for (metaoffs = 0; metaoffs < metabytes; metaoffs++)
+				fprintf(meta, "%02X", ((UINT8 *)hunk)[12 + metaoffs]);
+			fprintf(meta, "\n");
+		}
+
+		/* write the hunk to the file */
+		avierr = write_avi_frame(avi, framenum, hunk, &videobitmap);
+		if (avierr != AVIERR_NONE)
+		{
+			fprintf(stderr, "Error writing AVI frame: %s\n", avi_error_string(avierr));
+			err = CHDERR_DECOMPRESSION_ERROR;
+			goto cleanup;
+		}
+	}
+	progress(TRUE, "Extraction complete!                    \n");
+
+cleanup:
+	/* clean up our mess */
+	if (avi != NULL)
+		avi_close(avi);
+	if (hunk != NULL)
+		free(hunk);
+	if (videobitmap.base != NULL)
+		free(videobitmap.base);
+	if (chd != NULL)
+		chd_close(chd);
+	if (meta != NULL)
+		fclose(meta);
+	if (err != CHDERR_NONE)
+	{
+		osd_rmfile(outputfile);
+		osd_rmfile(metafile);
+	}
 	return (err != CHDERR_NONE);
 }
 
@@ -2223,9 +2828,11 @@ int CLIB_DECL main(int argc, char **argv)
 		{ "-createraw",		do_createraw, 0 },
 		{ "-createcd",		do_createcd, 0 },
 		{ "-createblankhd",	do_createblankhd, 0 },
+		{ "-createav",		do_createav, 0 },
 		{ "-copydata",		do_copydata, 0 },
 		{ "-extract",		do_extract, 0 },
 		{ "-extractcd",		do_extractcd, 0 },
+		{ "-extractav",		do_extractav, 0 },
 		{ "-verify",		do_verify, 0 },
 		{ "-verifyfix",		do_verify, 1 },
 		{ "-update",		do_merge_update_chomp, OPERATION_UPDATE },

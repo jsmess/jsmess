@@ -203,7 +203,6 @@ static const UINT8 uifontdata[] =
 ***************************************************************************/
 
 static void render_font_char_expand(render_font *font, render_font_char *ch);
-static void font_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
 static int render_font_load_cached_bdf(render_font *font, const char *filename);
 static int render_font_load_bdf(render_font *font);
 static int render_font_load_cached(render_font *font, const char *filename, UINT32 hash);
@@ -431,7 +430,7 @@ static void render_font_char_expand(render_font *font, render_font_char *ch)
 	}
 
 	/* wrap a texture around the bitmap */
-	ch->texture = render_texture_alloc(ch->bitmap, NULL, 0, TEXFORMAT_ARGB32, font_scale, NULL);
+	ch->texture = render_texture_alloc(ch->bitmap, NULL, 0, TEXFORMAT_ARGB32, render_texture_hq_scale, NULL);
 }
 
 
@@ -499,7 +498,7 @@ void render_font_get_scaled_bitmap_and_bounds(render_font *font, mame_bitmap *de
 	origheight = dest->height;
 	dest->width = bounds->max_x - bounds->min_x;
 	dest->height = bounds->max_y - bounds->min_y;
-	font_scale(dest, ch->bitmap, NULL, NULL);
+	render_texture_hq_scale(dest, ch->bitmap, NULL, NULL);
 	dest->width = origwidth;
 	dest->height = origheight;
 }
@@ -561,102 +560,6 @@ float render_font_get_utf8string_width(render_font *font, float height, float as
 
 	/* scale the final result based on height */
 	return (float)totwidth * font->scale * height * aspect;
-}
-
-
-/*-------------------------------------------------
-    font_scale - scale fonts
--------------------------------------------------*/
-
-static void font_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param)
-{
-	render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	int dheight = dest->height;
-	int dwidth = dest->width;
-	int dxoffs = 0, dyoffs = 0;
-
-#if 0
-	/* special casing for small fonts, which tend to look bad scaled to small sizes */
-	if (source->height <= 12)
-	{
-		/* clear the bitmap so that the areas that aren't drawn are transparent */
-		fillbitmap(dest, MAKE_ARGB(0x00,0xff,0xff,0xff), NULL);
-
-		/* if the target height is less than 1.0 of the source height, do some */
-		/* creative downscaling */
-		if (dheight < source->height)
-		{
-			UINT8 row[20], col[20];
-			int x, y;
-
-			/* if the width is larger, pad it */
-			if (dwidth >= source->width)
-			{
-				dxoffs = (dwidth - source->width + 1) / 2;
-				dwidth = source->width;
-			}
-
-			/* determine which rows/columns we will skip */
-			for (x = 0; x <= dwidth; x++)
-				col[x] = (x * source->width) / dwidth;
-			for (y = 0; y <= dheight; y++)
-				row[y] = (y * source->height) / dheight;
-
-			/* now map the pixels */
-			for (y = 0; y < dheight; y++)
-				for (x = 0; x < dwidth; x++)
-				{
-					int sx = col[x], nx = col[x+1];
-					int sy = row[y], ny = row[y+1];
-					UINT32 pix;
-
-					/* start with the selected pixel */
-					pix = *((UINT32 *)source->base + sy * source->rowpixels + sx);
-
-					/* if the next column isn't the next source pixel, OR in the source pixel to our right */
-					if (nx > sx + 1)
-					{
-						pix |= *((UINT32 *)source->base + sy * source->rowpixels + sx + 1);
-
-						/* if the next row isn't the next source pixel, OR in the source pixel to our bottom-right */
-						if (ny > sy + 1)
-							pix |= *((UINT32 *)source->base + (sy + 1) * source->rowpixels + sx + 1);
-					}
-
-					/* if the next row isn't the next source pixel, OR in the source pixel to our bottom-right */
-					if (ny > sy + 1)
-						pix |= *((UINT32 *)source->base + (sy + 1) * source->rowpixels + sx);
-
-					/* store the final result */
-					*((UINT32 *)dest->base + y * dest->rowpixels + x + dxoffs) = pix;
-				}
-
-			/* bail early as we've done all the work */
-			return;
-		}
-
-		/* if the target height is between 1.0 and 1.6667 of the source height, */
-		/* pad without scaling instead of scaling */
-#if 0
-		else if (dheight < source->height * 5 / 3)
-		{
-			dyoffs = (dheight - source->height + 1) / 2;
-			dheight = source->height;
-
-			/* same for the width unless it is at least 2x the original width */
-			if (dwidth >= source->width && dwidth < source->width * 2)
-			{
-				dxoffs = (dwidth - source->width + 1) / 2;
-				dwidth = source->width;
-			}
-		}
-#endif
-	}
-#endif
-
-	/* use the standard rescaling to do most of the work */
-	render_resample_argb_bitmap_hq((UINT32 *)dest->base + dyoffs * dest->rowpixels + dxoffs, dest->rowpixels, dwidth, dheight,
-			source, sbounds, &color);
 }
 
 

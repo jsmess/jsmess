@@ -14,6 +14,7 @@
 #ifndef __SOUND_H__
 #define __SOUND_H__
 
+#include "mamecore.h"
 
 /***************************************************************************
     CONSTANTS
@@ -79,9 +80,6 @@ void sound_set_user_gain(int index, float gain);
 float sound_get_user_gain(int index);
 float sound_get_default_gain(int index);
 const char *sound_get_user_gain_name(int index);
-
-/* driver gain controls on chip outputs */
-void sndti_set_output_gain(int type, int index, int output, float gain);
 
 /* misc helpers */
 int sound_find_sndnum_by_tag(const char *tag);

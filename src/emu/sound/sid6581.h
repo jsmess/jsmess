@@ -9,8 +9,7 @@
 #ifndef SID6581_H
 #define SID6581_H
 
-#include "mame.h"
-#include "memory.h"
+#include "sndintrf.h"
 
 typedef enum
 {

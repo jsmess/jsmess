@@ -33,7 +33,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "timer.h"
 #include "6840ptm.h"
 
 #ifdef MAME_DEBUG

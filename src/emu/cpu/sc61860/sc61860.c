@@ -26,9 +26,8 @@
  *         duration of one period is 512ms.
  *         Extended execute procudure with HLT-mode of CPU.
  *****************************************************************************/
-#include <stdio.h>
-#include "driver.h"
-#include "state.h"
+
+#include "cpuintrf.h"
 #include "debugger.h"
 
 #include "sc61860.h"

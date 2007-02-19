@@ -216,8 +216,8 @@ Notes:
 #include "sound/namco52.h"
 #include "sound/custom.h"
 #include "sound/samples.h"
-#include "rescap.h"
 #include "audio/namco54.h"
+#include "polepos.h"
 
 
 #define POLEPOS_TOGGLE	PORT_TOGGLE
@@ -865,18 +865,6 @@ static struct namco_52xx_interface namco_52xx_interface =
 	.5				/* Combined gain of both filters */
 };
 
-#if 0
-static struct namco_54xx_interface namco_54xx_interface =
-{
-	{ RES_K(22),	RES_K(15),		RES_K(22) },	/* R139, R133, R121 */
-	{ RES_K(22),	RES_K(15),		RES_K(12) },	/* R143, R137, R125 */
-	{ RES_K(180),	RES_K(120),		RES_K(120) },	/* R140, R134, R122 */
-	{ 470,			470,			470 },			/* R141, R135, R123 */
-	{ CAP_U(.047),	CAP_U(.022),	CAP_U(.0022) },	/* C33,  C29,  C27  */
-	{ CAP_U(.047),	CAP_U(.022),	CAP_U(.0022) },	/* C34,  C30,  C28  */
-};
-#endif
-
 static struct CustomSound_interface custom_interface =
 {
 	polepos_sh_start,
@@ -944,23 +932,17 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
 
-	// DAC outputs for the 54XX
-	MDRV_SOUND_ADD_TAG("54XX.0", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
+	/* discrete circuit on the 54XX outputs */
+	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_CONFIG(polepos_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.90)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90)
 
-	MDRV_SOUND_ADD_TAG("54XX.1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
-
-	MDRV_SOUND_ADD_TAG("54XX.2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
-
+	/* engine sound */
 	MDRV_SOUND_ADD(CUSTOM, 0)
 	MDRV_SOUND_CONFIG(custom_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.77)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.77)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.90 * 0.77)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90 * 0.77)
 MACHINE_DRIVER_END
 
 

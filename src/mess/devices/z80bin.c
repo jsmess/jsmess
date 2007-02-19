@@ -7,7 +7,8 @@
 
 *********************************************************************/
 
-#include "mess.h"
+#include "mame.h"
+#include "driver.h"
 #include "snapquik.h"
 #include "z80bin.h"
 

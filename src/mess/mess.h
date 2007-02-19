@@ -14,7 +14,6 @@
 struct SystemConfigurationParamBlock;
 
 #include "device.h"
-#include "driver.h"
 #include "image.h"
 #include "artworkx.h"
 

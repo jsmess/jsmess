@@ -24,11 +24,16 @@ OBJDIRS += \
 #-------------------------------------------------
 
 UTILOBJS = \
+	$(LIBOBJ)/util/avcomp.o \
+	$(LIBOBJ)/util/aviio.o \
 	$(LIBOBJ)/util/bitmap.o \
 	$(LIBOBJ)/util/cdrom.o \
 	$(LIBOBJ)/util/chd.o \
 	$(LIBOBJ)/util/corefile.o \
+	$(LIBOBJ)/util/corestr.o \
+	$(LIBOBJ)/util/coreutil.o \
 	$(LIBOBJ)/util/harddisk.o \
+	$(LIBOBJ)/util/huffman.o \
 	$(LIBOBJ)/util/jedparse.o \
 	$(LIBOBJ)/util/md5.o \
 	$(LIBOBJ)/util/png.o \

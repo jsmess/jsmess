@@ -8,7 +8,6 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include <stdio.h>
 
 int vb_scrollx_hi=0;
 int vb_scrollx_lo=0;

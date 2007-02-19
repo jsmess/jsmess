@@ -59,6 +59,13 @@ Stephh's notes (based on the games M68000 code and some tests) :
       * it is checked at address 0x00c382 when you quickly push the joystick left or right twice
     Any info is welcome !
 
+Versions known to exist but not dumped:
+  Pretty Soldier Sailor Moon (95/03/21)
+  Dodonpachi Campaign Version
+     Reportedly only 3 ever made, one was given out as a prize to a high score contest winner.  The other two
+     PCBs were shown running (and could be played) at a Cave fan show known as Cave Festival 2006. There are
+     videos of the game being played floating around the internet and on YouTube. AKA DDP-CV or DDP BLUE ROM
+
 ***************************************************************************/
 
 #include "driver.h"

@@ -41,7 +41,9 @@ static void milliped_get_tile_info(int tile_index)
 	int data = videoram[tile_index];
 	int bank = (data >> 6) & 1;
 	int color = (data >> 6) & 3;
-	SET_TILE_INFO(0, (data & 0x3f) + 0x40 + (bank * 0x80), color, 0);
+	/* Flip both x and y if flipscreen is non-zero */
+	int flip_tiles = (centiped_flipscreen) ? 0x03 : 0;
+	SET_TILE_INFO(0, (data & 0x3f) + 0x40 + (bank * 0x80), color, TILE_FLIPYX(flip_tiles));
 }
 
 
@@ -88,6 +90,7 @@ VIDEO_START( milliped )
 	bg_tilemap = tilemap_create(milliped_get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 32,32);
 
 	centiped_flipscreen = 0;
+	state_save_register_global(centiped_flipscreen);
 	return 0;
 }
 
@@ -481,3 +484,38 @@ VIDEO_UPDATE( bullsdrt )
 	}
 	return 0;
 }
+
+/*
+ * This varies from Centipede, in that flipx is not in
+ * the data, but is determined by VIDROT value at 0x2506.
+ */
+VIDEO_UPDATE( milliped )
+{
+	rectangle spriteclip = *cliprect;
+	int offs;
+
+	/* draw the background */
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+
+	/* apply the sprite clip */
+	if (centiped_flipscreen)
+		spriteclip.min_x += 8;
+	else
+		spriteclip.max_x -= 8;
+
+	/* draw the sprites */
+	for (offs = 0; offs < 0x10; offs++)
+	{
+		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6);
+		int color = spriteram[offs + 0x30];
+		int flipx = centiped_flipscreen;
+		int flipy = (spriteram[offs] & 0x80);
+		int x = spriteram[offs + 0x20];
+		int y = 240 - spriteram[offs + 0x10];
+
+		drawgfx(bitmap, Machine->gfx[1], code, color, flipx, flipy, x, y,
+				&spriteclip, TRANSPARENCY_PENS, penmask[color & 0x3f]);
+	}
+	return 0;
+}
+

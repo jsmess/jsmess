@@ -132,9 +132,18 @@ static const int fn2_groupB[8] = { 3, 5, 9, 10, 8, 15, 12, 11 };
 
 struct sbox
 {
-	const int table[64];
+	const UINT8 table[64];
 	const int inputs[6];		// positions of the inputs bits, -1 means no input except from key
 	const int outputs[2];		// positions of the output bits
+};
+
+// the above struct better defines how the hardware works, however
+// to speed up the decryption at run time we convert it to the
+// following one
+struct optimised_sbox
+{
+	UINT8 input_lookup[256];
+	UINT8 output[64];
 };
 
 
@@ -431,41 +440,18 @@ static const struct sbox fn2_r4_boxes[4] =
 /******************************************************************************/
 
 
-static int extract_inputs(unsigned int val, const int *inputs)
+static UINT8 fn(UINT8 in, const struct optimised_sbox *sboxes, UINT32 key)
 {
-	int i;
-	int res = 0;
+	const struct optimised_sbox *sbox1 = &sboxes[0];
+	const struct optimised_sbox *sbox2 = &sboxes[1];
+	const struct optimised_sbox *sbox3 = &sboxes[2];
+	const struct optimised_sbox *sbox4 = &sboxes[3];
 
-	for (i = 0; i < 6; ++i)
-	{
-		if (inputs[i] != -1)
-			res |= BIT(val, inputs[i]) << i;
-	}
-
-	return res;
-}
-
-
-
-static UINT8 fn(UINT8 in, const struct sbox *sboxes, UINT32 key)
-{
-	int box;
-	UINT8 res = 0;
-
-	for (box = 0; box < 4; ++box)
-	{
-		const struct sbox *sbox = &sboxes[box];
-		const unsigned int subkey = (key >> (6*box)) & 0x3f;
-
-		int out = sbox->table[extract_inputs(in, sbox->inputs) ^ subkey];
-
-		if (out & 1)
-			res |= 1 << sbox->outputs[0];
-		if (out & 2)
-			res |= 1 << sbox->outputs[1];
-	}
-
-	return res;
+	return
+		sbox1->output[sbox1->input_lookup[in] ^ ((key >>  0) & 0x3f)] |
+		sbox2->output[sbox2->input_lookup[in] ^ ((key >>  6) & 0x3f)] |
+		sbox3->output[sbox3->input_lookup[in] ^ ((key >> 12) & 0x3f)] |
+		sbox4->output[sbox4->input_lookup[in] ^ ((key >> 18) & 0x3f)];
 }
 
 
@@ -570,7 +556,7 @@ static void expand_subkey(UINT32* subkey, UINT16 seed)
 
 
 static UINT16 feistel(UINT16 val, const int *bitsA, const int *bitsB,
-		const struct sbox* boxes1, const struct sbox* boxes2, const struct sbox* boxes3, const struct sbox* boxes4,
+		const struct optimised_sbox* boxes1, const struct optimised_sbox* boxes2, const struct optimised_sbox* boxes3, const struct optimised_sbox* boxes4,
 		UINT32 key1, UINT32 key2, UINT32 key3, UINT32 key4)
 {
 	const UINT8 l0 = BITSWAP8(val, bitsB[7],bitsB[6],bitsB[5],bitsB[4],bitsB[3],bitsB[2],bitsB[1],bitsB[0]);
@@ -609,6 +595,51 @@ static UINT16 feistel(UINT16 val, const int *bitsA, const int *bitsB,
 
 
 
+static int extract_inputs(unsigned int val, const int *inputs)
+{
+	int i;
+	int res = 0;
+
+	for (i = 0; i < 6; ++i)
+	{
+		if (inputs[i] != -1)
+			res |= BIT(val, inputs[i]) << i;
+	}
+
+	return res;
+}
+
+
+
+static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
+{
+	int box;
+
+	for (box = 0; box < 4; ++box)
+	{
+		int i;
+
+		// precalculate the input lookup
+		for (i = 0; i < 256; ++i)
+		{
+			out[box].input_lookup[i] = extract_inputs(i, in[box].inputs);
+		}
+
+		// precalculate the output masks
+		for (i = 0; i < 64; ++i)
+		{
+			int o = in[box].table[i];
+
+			out[box].output[i] = 0;
+			if (o & 1)
+				out[box].output[i] |= 1 << in[box].outputs[0];
+			if (o & 2)
+				out[box].output[i] |= 1 << in[box].outputs[1];
+		}
+	}
+}
+
+
 static void cps2_decrypt(const UINT32 *master_key, unsigned int upper_limit)
 {
 	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
@@ -616,6 +647,18 @@ static void cps2_decrypt(const UINT32 *master_key, unsigned int upper_limit)
 	UINT16 *dec = auto_malloc(length);
 	int i;
 	UINT32 key1[4];
+	struct optimised_sbox sboxes1[4*4];
+	struct optimised_sbox sboxes2[4*4];
+
+
+	optimise_sboxes(&sboxes1[0*4], fn1_r1_boxes);
+	optimise_sboxes(&sboxes1[1*4], fn1_r2_boxes);
+	optimise_sboxes(&sboxes1[2*4], fn1_r3_boxes);
+	optimise_sboxes(&sboxes1[3*4], fn1_r4_boxes);
+	optimise_sboxes(&sboxes2[0*4], fn2_r1_boxes);
+	optimise_sboxes(&sboxes2[1*4], fn2_r2_boxes);
+	optimise_sboxes(&sboxes2[2*4], fn2_r3_boxes);
+	optimise_sboxes(&sboxes2[3*4], fn2_r4_boxes);
 
 
 	// expand master key to 1st FN 96-bit key
@@ -647,7 +690,7 @@ static void cps2_decrypt(const UINT32 *master_key, unsigned int upper_limit)
 
 		// pass the address through FN1
 		seed = feistel(i, fn1_groupA, fn1_groupB,
-				fn1_r1_boxes, fn1_r2_boxes, fn1_r3_boxes, fn1_r4_boxes,
+				&sboxes1[0*4], &sboxes1[1*4], &sboxes1[2*4], &sboxes1[3*4],
 				key1[0], key1[1], key1[2], key1[3]);
 
 
@@ -676,7 +719,7 @@ static void cps2_decrypt(const UINT32 *master_key, unsigned int upper_limit)
 		for (a = i; a < length/2 && a < upper_limit/2; a += 0x10000)
 		{
 			dec[a] = feistel(rom[a], fn2_groupA, fn2_groupB,
-				fn2_r1_boxes, fn2_r2_boxes, fn2_r3_boxes, fn2_r4_boxes,
+				&sboxes2[0*4], &sboxes2[1*4], &sboxes2[2*4], &sboxes2[3*4],
 				key2[0], key2[1], key2[2], key2[3]);
 		}
 		// copy the unencrypted part (not really needed)
@@ -689,19 +732,6 @@ static void cps2_decrypt(const UINT32 *master_key, unsigned int upper_limit)
 
 	memory_set_decrypted_region(0, 0x000000, length - 1, dec);
 	m68k_set_encrypted_opcode_range(0,0,length);
-
-#if 0
-{
-FILE *f;
-
-f = fopen("d:/s.rom","wb");
-fwrite(rom,1,0x100000,f);
-fclose(f);
-f = fopen("d:/s.dec","wb");
-fwrite(dec,1,0x100000,f);
-fclose(f);
-}
-#endif
 }
 
 
@@ -746,7 +776,7 @@ static const struct game_keys keys_table[] =
 	{ "ddtodur1", { 0x41e77fbe,0x30db090c }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ddtodj",   { 0x2f543984,0x1fa51d7a }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ddtodjr1", { 0x2f543984,0x1fa51d7a }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
-//  { "ddtoda",   {  /*not enough data*/  }, 0x180000 },    // 0C78 1019 4000  cmpi.w  #$1019,$4000
+	{ "ddtoda",   { 0xf501c8f8,0xd1800f40 }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ddtodh",   { 0x11e78b50,0x6429d20e }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ecofghtr", { 0xd2782128,0x4c8f96f4 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
 	{ "ecofghtu", { 0x97382d30,0x6dac12fa }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
@@ -759,7 +789,7 @@ static const struct game_keys keys_table[] =
 	{ "ssf2xj",   { 0x38b09823,0xd304e0c0 }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "xmcota",   { 0xe6017c4a,0xcddc1dd1 }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotau",  { 0xbfac7311,0x6ada1605 }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
-//  { "xmcotah",  {     /* MISSING */     }, 0x100000 },    // 0C80 1972 0301  cmpi.l  #$19720301,D0
+	{ "xmcotah",  { 0x64f0f4ed,0x54d3d882 }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotaj",  { 0xbb76009f,0xb38512d6 }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotaj1", { 0xbb76009f,0xb38512d6 }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotajr", { 0xbb76009f,0xb38512d6 }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
@@ -769,7 +799,7 @@ static const struct game_keys keys_table[] =
 	{ "armwaru",  { 0x0f2644f0,0x781abc8e }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "pgear",    { 0x1857a169,0x7f14a641 }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "pgearr1",  { 0x1857a169,0x7f14a641 }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
-//  { "armwara",  {     /* MISSING */     }, 0x100000 },    // 3039 0080 4020  move.w  $00804020,D0
+	{ "armwara",  { 0x882dd104,0xf5968af1 }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "avsp",     { 0x548e151d,0x56374bdc }, 0x100000 },	// 0C80 1234 5678  cmpi.l  #$12345678,D0
 	{ "avspu",    { 0x45a46977,0xd860d3ad }, 0x100000 },	// 0C80 1234 5678  cmpi.l  #$12345678,D0
 	{ "avspj",    { 0x4339cde4,0x0d7b6c29 }, 0x100000 },	// 0C80 1234 5678  cmpi.l  #$12345678,D0
@@ -806,15 +836,15 @@ static const struct game_keys keys_table[] =
 	{ "sfar2",    { 0xad2dff0f,0x14b2f040 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfar3",    { 0xad2dff0f,0x14b2f040 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfau",     { 0x0b80d40e,0x95d57df5 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
-//  { "sfza",     {  /*not enough data*/  }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
+	{ "sfza",     { 0x6dd4b3ad,0x106c887b }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzj",     { 0x54bd7724,0xb62d70b0 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzjr1",   { 0x54bd7724,0xb62d70b0 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
 	{ "sfzjr2",   { 0x54bd7724,0xb62d70b0 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
-//  { "sfzh",     {  /*not enough data*/  }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
-//  { "sfzb",     {     /* MISSING */     }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
-//  { "sfzbr1",   {  /*not enough data*/  }, 0x080000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0
-//  { "mmancp2u", {     /* MISSING */     },          },    // 0C80 0564 2194  cmpi.l  #$05642194,D0 (found in CPS1 version)
-//  { "rmancp2j", {     /* MISSING */     },          },    // 0C80 0564 2194  cmpi.l  #$05642194,D0 (found in CPS1 version)
+	{ "sfzh",     { 0x9486bf7e,0xb6390684 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
+	{ "sfzb",     { 0xf06b22f4,0x1e7126d6 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
+	{ "sfzbr1",   { 0xf06b22f4,0x1e7126d6 }, 0x080000 },	// 0C80 0564 2194  cmpi.l  #$05642194,D0
+//  { "mmancp2u", {     /* MISSING */     }, 0x100000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0 (found in CPS1 version)
+//  { "rmancp2j", {     /* MISSING */     }, 0x100000 },    // 0C80 0564 2194  cmpi.l  #$05642194,D0 (found in CPS1 version)
 	{ "19xx",     { 0xc0230312,0x91b3a797 }, 0x200000 },	// 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxa",    { 0x74c976fe,0xb9979591 }, 0x200000 },	// 0C81 0095 1101  cmpi.l  #$00951101,D1
 	{ "19xxj",    { 0x293c170d,0x081fc06e }, 0x200000 },	// 0C81 0095 1101  cmpi.l  #$00951101,D1
@@ -829,38 +859,38 @@ static const struct game_keys keys_table[] =
 	{ "ddsomj",   { 0xe6714024,0x9bdd8d22 }, 0x100000 },	// 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "ddsomjr1", { 0xe6714024,0x9bdd8d22 }, 0x100000 },	// 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "ddsoma",   { 0x8658a336,0x3fb81a72 }, 0x100000 },	// 0C81 1966 0419  cmpi.l  #$19660419,D1
-//  { "ddsomb",   {  /*not enough data*/  }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
+	{ "ddsomb",   { 0x1b56bac1,0x6f6afcd2 }, 0x100000 },    // 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "megaman2", { 0x50601dca,0x69ba5224 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
-//  { "megamn2a", {  /*not enough data*/  }, 0x100000 },    // 0C80 0164 7101  cmpi.l  #$01647101,D0
+	{ "megamn2a", { 0xc5152d1a,0x56743d31 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "rckman2j", { 0x6108e418,0xc659ed29 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "qndream",  { 0x3b4b2c9e,0x62353d11 }, 0x080000 },	// 0C81 1973 0827  cmpi.l  #$19730827,D1
 	{ "sfa2",     { 0xcaa1da01,0xec9b73f5 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
 	{ "sfz2j",    { 0xe7a0597c,0x2e335731 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
 	{ "sfz2a",    { 0xf61b4c61,0x9df58912 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
-//  { "sfz2b",    {     /* MISSING */     }, 0x100000 },    // 0C80 3039 9783  cmpi.l  #$30399783,D0
-//  { "sfz2br1",  {     /* MISSING */     }, 0x100000 },    // 0C80 3039 9783  cmpi.l  #$30399783,D0
-//  { "sfz2h",    {     /* MISSING */     }, 0x100000 },    // 0C80 3039 9783  cmpi.l  #$30399783,D0
-//  { "sfz2n",    {     /* MISSING */     }, 0x100000 },    // 0C80 3039 9783  cmpi.l  #$30399783,D0
+	{ "sfz2b",    { 0x68553b31,0xb96781ea }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
+	{ "sfz2br1",  { 0x68553b31,0xb96781ea }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
+	{ "sfz2h",    { 0x4f1fd8ad,0xc5742740 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
+	{ "sfz2n",    { 0xfbf2abae,0x8ddd1904 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
 	{ "sfz2aj",   { 0x1c551364,0x4c1e1001 }, 0x100000 },	// 0C80 8E73 9110  cmpi.l  #$8E739110,D0
-//  { "sfz2ah",   {     /* MISSING */     }, 0x100000 },    // 0C80 8E73 9110  cmpi.l  #$8E739110,D0
-//  { "sfz2ab",   {     /* MISSING */     }, 0x100000 },    // 0C80 8E73 9110  cmpi.l  #$8E739110,D0
+	{ "sfz2ah",   { 0x20fe4761,0x569d4060 }, 0x100000 },	// 0C80 8E73 9110  cmpi.l  #$8E739110,D0
+	{ "sfz2ab",   { 0xb954e7ce,0x67721693 }, 0x100000 },	// 0C80 8E73 9110  cmpi.l  #$8E739110,D0
 	{ "sfz2aa",   { 0x209a00e7,0xec434828 }, 0x100000 },	// 0C80 8E73 9110  cmpi.l  #$8E739110,D0
-//  { "spf2t",    {  /*not enough data*/  }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
-//  { "spf2xj",   {  /*not enough data*/  }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
-//  { "spf2ta",   {  /*not enough data*/  }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
+	{ "spf2t",    { 0x05da90c6,0xe3654e46 }, 0x040000 },	// 0C80 3039 9819  cmpi.l  #$30399819,D0
+	{ "spf2xj",   { 0x1ddaa129,0x476fba4d }, 0x040000 },	// 0C80 3039 9819  cmpi.l  #$30399819,D0
+//  { "spf2ta",   { /* not enough data */ }, 0x040000 },    // 0C80 3039 9819  cmpi.l  #$30399819,D0
 	{ "xmvsf",    { 0x5847db77,0xd54b0edb }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "xmvsfr1",  { 0x5847db77,0xd54b0edb }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "xmvsfu",   { 0x854feac0,0xbe2bf740 }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "xmvsfur1", { 0x854feac0,0xbe2bf740 }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
-//  { "xmvsfj",   {  /* search failed */  }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
-//  { "xmvsfjr1", {      /* TODO */       }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
-//  { "xmvsfjr2", {     /* MISSING */     }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
-//  { "xmvsfa",   {      /* TODO */       }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
-//  { "xmvsfar1", {     /* MISSING */     }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
-//  { "xmvsfh",   {      /* TODO */       }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
-//  { "xmvsfb",   {      /* TODO */       }, 0x100000 },    // 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfj",   { 0x0973e744,0xebc3886d }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfjr1", { 0x0973e744,0xebc3886d }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfjr2", { 0x0973e744,0xebc3886d }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfa",   { 0x33a69d8c,0x71d72ea6 }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfar1", { 0x33a69d8c,0x71d72ea6 }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfh",   { 0xc6388a6d,0xae2589bb }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
+	{ "xmvsfb",   { 0x91ebdb28,0x12183c0b }, 0x100000 },	// 0C81 1972 0327  cmpi.l  #$19720327,D1
 	{ "batcir",   { 0x66527aba,0x4c876eef }, 0x200000 },	// 0C81 0097 0131  cmpi.l  #$00970131,D1
-//  { "batcira",  {  /* search failed */  }, 0x200000 },    // 0C81 0097 0131  cmpi.l  #$00970131,D1
+	{ "batcira",  { 0x941fa351,0x580e3ea1 }, 0x200000 },	// 0C81 0097 0131  cmpi.l  #$00970131,D1
 	{ "batcirj",  { 0x288ed340,0x88190069 }, 0x200000 },	// 0C81 0097 0131  cmpi.l  #$00970131,D1
 	{ "csclub",   { 0xd4a2b480,0xba7a0857 }, 0x200000 },	// 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "cscluba",  { 0xe4b41d49,0xe6127e99 }, 0x200000 },	// 0C81 0097 0310  cmpi.l  #$00970310,D1
@@ -873,14 +903,14 @@ static const struct game_keys keys_table[] =
 	{ "mshvsfj1", { 0x017b4fce,0xdc03585e }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mshvsfj2", { 0x017b4fce,0xdc03585e }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mshvsfh",  { 0xbf195a84,0x7bd400fa }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
-//  { "mshvsfa",  {  /* search failed */  }, 0x100000 },    // 0C81 1972 1027  cmpi.l  #$19721027,D1
-//  { "mshvsfa1", {     /* MISSING */     }, 0x100000 },    // 0C81 1972 1027  cmpi.l  #$19721027,D1
+	{ "mshvsfa",  { 0xabae66da,0xe21e8b04 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
+	{ "mshvsfa1", { 0xabae66da,0xe21e8b04 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mshvsfb",  { 0xe589b9f4,0x43220fd6 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mshvsfb1", { 0xe589b9f4,0x43220fd6 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "sgemf",    { 0x299c262f,0xb0bfe65a }, 0x080000 },	// 0C80 1F74 0D12  cmpi.l  #$1F740D12,D0
 	{ "pfghtj",   { 0xb75a406d,0xde1ccce2 }, 0x080000 },	// 0C80 1F74 0D12  cmpi.l  #$1F740D12,D0
 	{ "sgemfa",   { 0x64078f0f,0xa4267146 }, 0x080000 },	// 0C80 1F74 0D12  cmpi.l  #$1F740D12,D0
-//  { "sgemfh",   {  /* search failed */  }, 0x080000 },    // 0C80 1F74 0D12  cmpi.l  #$1F740D12,D0
+	{ "sgemfh",   { 0x03d03376,0x8625eece }, 0x080000 },	// 0C80 1F74 0D12  cmpi.l  #$1F740D12,D0
 	{ "vhunt2",   { 0xfb446e5a,0x7a5028d0 }, 0x100000 },	// 0C80 0692 0760  cmpi.l  #$06920760,D0
 	{ "vhunt2r1", { 0xfb446e5a,0x7a5028d0 }, 0x100000 },	// 0C80 0692 0760  cmpi.l  #$06920760,D0
 	{ "vsav",     { 0x6064eafc,0x297e848b }, 0x100000 },	// 0C80 726A 4BAF  cmpi.l  #$726A4BAF,D0
@@ -907,10 +937,10 @@ static const struct game_keys keys_table[] =
 	{ "sfz3ar1",  { 0x18758a3b,0xc60a59c8 }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
 	{ "jyangoku", { 0x5e8d6c8c,0x3adaf591 },  /*?*/   },	// 0C80 3652 1573  cmpi.l  #$36521573,D0
 	{ "hsf2",     { 0x0ff5fe6c,0x42411399 }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000
-//  { "hsf2j",    {     /* MISSING */     }, 0x100000 },    // 0838 0007 2000  btst    #7,$2000
+	{ "hsf2j",    { 0x561cfcc1,0x1f7e96f0 }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "gigawing", { 0x3282aaa0,0x3f418f17 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "gwingj",   { 0x45fe0d0a,0xc41077d1 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
-//  { "gwinga",   {  /* search failed */  }, 0x100000 },    // 0C81 1972 1027  cmpi.l  #$19721027,D1
+	{ "gwinga",   { 0x5b482902,0xf47ba89b }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mmatrix",  { 0x1e3bf539,0xb17b4865 }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mmatrixj", { 0x05e5d8d1,0x1eb5c5ba }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mpang",    { 0x2dc8626f,0xdda27163 }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
@@ -921,10 +951,10 @@ static const struct game_keys keys_table[] =
 	{ "dimahoo",  { 0x56ca3bdc,0x16575de3 }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
 	{ "gmahou",   { 0x83ec7b61,0xf73b082f }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
 	{ "1944",     { 0x7bad8109,0xd78e933f }, 0x080000 },	// 0C86 7B5D 94F1  cmpi.l  #$7B5D94F1,D6
-//  { "1944j",    {  /*not enough data*/  }, 0x080000 },    // 0C86 7B5D 94F1  cmpi.l  #$7B5D94F1,D6
+	{ "1944j",    { 0x91707745,0xa57f38a1 }, 0x080000 },	// 0C86 7B5D 94F1  cmpi.l  #$7B5D94F1,D6
 	{ "progear",  { 0xf56ec08f,0xadf83a38 }, 0x400000 },	// 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
 	{ "progearj", { 0xf9fbb86d,0xf5952fad }, 0x400000 },	// 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
-//  { "progeara", {  /* search failed */  }, 0x400000 },    // 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
+	{ "progeara", { 0x4a74e58b,0xb56cdfc2 }, 0x400000 },	// 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
 
 	{ 0 }	// end of table
 };
@@ -941,42 +971,12 @@ DRIVER_INIT( cps2 )
 	{
 		if (strcmp(k->name, gamename) == 0)
 		{
+			// we have a proper key so use it to decrypt
+			cps2_decrypt(k->keys, k->upper_limit ? k->upper_limit : 0x400000);
+
 			break;
 		}
 		++k;
-	}
-
-	if (k->name)
-	{
-		// we have a proper key so use it to decrypt
-		cps2_decrypt(k->keys, k->upper_limit ? k->upper_limit : 0x400000);
-	}
-	else
-	{
-		// we don't have a proper key so use the XOR tables if available
-
-		UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
-		UINT16 *xor = (UINT16 *)memory_region(REGION_USER1);
-		int length = memory_region_length(REGION_CPU1);
-		int i;
-
-#if 0
-{
-FILE *f;
-
-f = fopen("d:/s.rom","wb");
-fwrite(rom,1,0x100000,f);
-fclose(f);
-}
-#endif
-		if (xor)
-		{
-			for (i = 0; i < length/2; i++)
-				xor[i] ^= rom[i];
-
-			memory_set_decrypted_region(0, 0x000000, length - 1, xor);
-			m68k_set_encrypted_opcode_range(0,0,length);
-		}
 	}
 
 	init_cps2_video(machine);

@@ -280,7 +280,6 @@
 #include "machine/midwayic.h"
 #include "machine/smc91c9x.h"
 #include "video/voodoo.h"
-#include <time.h>
 
 
 /*************************************

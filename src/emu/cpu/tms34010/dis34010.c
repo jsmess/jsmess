@@ -1,6 +1,6 @@
 /* This program is based on DIS68k by Aaron Giles */
 
-#include "mamecore.h"
+#include "cpuintrf.h"
 
 static UINT8 *filebuf;
 static UINT32 offset;

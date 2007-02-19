@@ -14,7 +14,7 @@
 #ifndef __X86DRC_H__
 #define __X86DRC_H__
 
-#include "mamecore.h"
+#include "cpuintrf.h"
 
 
 /***************************************************************************

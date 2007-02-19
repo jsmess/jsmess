@@ -1383,8 +1383,8 @@ static void execute_save(int ref, int params, const char *param[])
 
 	/* determine the addresses to write */
 	info = debug_get_cpu_info(cpunum);
-	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 	endoffset = ADDR2BYTE_MASKED(offset + length - 1, info, spacenum);
+	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 
 	/* open the file */
 	f = fopen(param[0], "wb");
@@ -1449,8 +1449,8 @@ static void execute_dump(int ref, int params, const char *param[])
 		debug_console_printf("Invalid width! (must be 1,2,4 or 8)\n");
 		return;
 	}
-	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 	endoffset = ADDR2BYTE_MASKED(offset + length - 1, info, spacenum);
+	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 
 	/* open the file */
 	f = fopen(param[0], "w");
@@ -1607,8 +1607,8 @@ static void execute_find(int ref, int params, const char *param[])
 		return;
 	}
 	info = debug_get_cpu_info(cpunum);
-	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 	endoffset = ADDR2BYTE_MASKED(offset + length - 1, info, spacenum);
+	offset = ADDR2BYTE_MASKED(offset, info, spacenum);
 	cur_data_size = ADDR2BYTE(1, info, spacenum);
 	if (cur_data_size == 0)
 		cur_data_size = 1;

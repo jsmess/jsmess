@@ -1,5 +1,4 @@
-#include "driver.h"
-#ifdef	MAME_DEBUG
+#include "cpuintrf.h"
 #include "debugger.h"
 #include "cp1610.h"
 
@@ -1487,5 +1486,3 @@ unsigned cp1610_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *o
 
 	return size;
 }
-
-#endif

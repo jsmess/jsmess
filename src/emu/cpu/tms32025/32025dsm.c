@@ -34,7 +34,6 @@
 #include <ctype.h>
 
 #ifdef MAME_DEBUG					/* Compile interface to MAME */
-#include "memory.h"
 #include "tms32025.h"
 #include "debugger.h"
 extern UINT16 *tms32025_pgmmap[0x200];

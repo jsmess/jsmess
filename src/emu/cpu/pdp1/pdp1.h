@@ -1,7 +1,7 @@
 #ifndef _PDP1_H
 #define _PDP1_H
 
-#include "driver.h"
+#include "cpuintrf.h"
 
 
 /* register ids for pdp1_get_reg/pdp1_set_reg */

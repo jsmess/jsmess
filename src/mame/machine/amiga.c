@@ -39,7 +39,7 @@
 #define AMIGA_IRQ_DELAY_CYCLES		24
 
 /* How many CPU cycles we wait until we process a blit when the blitter-nasty bit is set */
-#define BLITTER_NASTY_DELAY			8
+#define BLITTER_NASTY_DELAY			16
 
 
 /*************************************
@@ -949,7 +949,12 @@ static void blitter_setup(void)
 
 	/* if 'blitter-nasty' is set, then the blitter takes over the bus. Make the blit semi-immediate */
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
+	{
+		/* simulate the 68k not running while the blit is going */
+		activecpu_adjust_icount( -(blittime/2) );
+
 		blittime = BLITTER_NASTY_DELAY;
+	}
 
 	/* signal blitter busy */
  	CUSTOM_REG(REG_DMACON) |= 0x4000;

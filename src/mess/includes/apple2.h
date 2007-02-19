@@ -10,6 +10,7 @@
 #define APPLE2_H
 
 #include "mame.h"
+#include "driver.h"
 #include "machine/ay3600.h"
 
 /* -----------------------------------------------------------------------

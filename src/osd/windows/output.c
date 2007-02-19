@@ -15,7 +15,7 @@
 #include "osdepend.h"
 #include "driver.h"
 
-// Windows headers
+// MAMEOS headers
 #include "output.h"
 
 

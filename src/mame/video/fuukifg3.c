@@ -55,7 +55,27 @@ static UINT32 spr_buffered_tilebank[2];
 
 ***************************************************************************/
 
-#define LAYER( _N_ ) \
+#define LAYER_8BPP( _N_ ) \
+\
+static tilemap *tilemap_##_N_; \
+\
+static void get_tile_info_##_N_(int tile_index) \
+{ \
+	UINT16 code = (fuuki32_vram_##_N_[tile_index]&0xffff0000)>>16; \
+	UINT16 attr = (fuuki32_vram_##_N_[tile_index]&0x0000ffff); \
+	SET_TILE_INFO(1 + _N_, code, (attr & 0x3f)>>4,TILE_FLIPYX( (attr >> 6) & 3 )) \
+} \
+\
+WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
+{ \
+	if (fuuki32_vram_##_N_[offset] != data) \
+	{ \
+		COMBINE_DATA(&fuuki32_vram_##_N_[offset]); \
+		tilemap_mark_tile_dirty(tilemap_##_N_,offset); \
+	} \
+}
+
+#define LAYER_4BPP( _N_ ) \
 \
 static tilemap *tilemap_##_N_; \
 \
@@ -75,10 +95,11 @@ WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
 	} \
 }
 
-LAYER( 0 )
-LAYER( 1 )
-LAYER( 2 )
-LAYER( 3 )
+
+LAYER_8BPP( 0 )
+LAYER_8BPP( 1 )
+LAYER_4BPP( 2 )
+LAYER_4BPP( 3 )
 
 
 /***************************************************************************
@@ -111,8 +132,8 @@ VIDEO_START( fuuki32 )
 	tilemap_set_transparent_pen(tilemap_2,0x0f);	// 4 bits
 	tilemap_set_transparent_pen(tilemap_3,0x0f);	// 4 bits
 
-	Machine->gfx[1]->color_granularity=16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
-	Machine->gfx[2]->color_granularity=16;
+	//Machine->gfx[1]->color_granularity=16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
+	//Machine->gfx[2]->color_granularity=16;
 
 	return 0;
 }

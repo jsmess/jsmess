@@ -24,7 +24,7 @@
 		</screen>
 	</view>
 
-	<view name="Dual Under-Over (Gapless)">
+	<view name="Dual Under-Over">
 		<screen index="1">
 			<bounds x="0" y="-3.03" width="4" height="3" />
 		</screen>

@@ -11,10 +11,7 @@
  *
  */
 
-#include <stdio.h>
-#include <stdarg.h>
 #include "driver.h"
-#include "state.h"
 #include "machine/x76f041.h"
 
 #define VERBOSE_LEVEL ( 0 )

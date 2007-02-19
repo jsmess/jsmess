@@ -25,7 +25,6 @@
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
 #include "midvunit.h"
-#include <time.h>
 
 
 static UINT32 *ram_base;

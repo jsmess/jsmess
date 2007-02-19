@@ -1,8 +1,7 @@
 #ifndef z80gb_H
 #define z80gb_H
+
 #include "cpuintrf.h"
-#include "osd_cpu.h"
-#include "driver.h"
 
 extern int z80gb_ICount;
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   sc61860.c
+ *   scdasm.c
  *   portable sharp 61860 emulator interface
  *   (sharp pocket computers)
  *
@@ -20,9 +20,7 @@
  *
  *****************************************************************************/
 
-#include <stdio.h>
-#ifdef MAME_DEBUG
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 
 #include "sc61860.h"
@@ -220,6 +218,3 @@ unsigned sc61860_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	}
 	return oprom - base_oprom;
 }
-#endif	/* MAME_DEBUG */
-
-

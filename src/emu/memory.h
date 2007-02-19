@@ -200,7 +200,7 @@ typedef struct _data_accessors data_accessors;
 
 /* ----- banking constants ----- */
 #define MAX_BANKS				66						/* maximum number of banks */
-#define MAX_BANK_ENTRIES		64						/* maximum number of possible bank values */
+#define MAX_BANK_ENTRIES		255						/* maximum number of possible bank values */
 #define MAX_EXPLICIT_BANKS		32						/* maximum number of explicitly-defined banks */
 #define STATIC_BANKMAX			(STATIC_RAM - 1)		/* handler constant of last bank */
 

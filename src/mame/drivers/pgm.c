@@ -283,8 +283,6 @@ Notes:
 #include "driver.h"
 #include "sound/ics2115.h"
 #include "cpu/arm7/arm7core.h"
-#include <time.h>
-#include "timer.h"
 
 
 UINT16 *pgm_mainram, *pgm_bg_videoram, *pgm_tx_videoram, *pgm_videoregs, *pgm_rowscrollram;

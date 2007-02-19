@@ -8,9 +8,7 @@
     Raphael Nabet 2004
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 #include "tx0.h"
 

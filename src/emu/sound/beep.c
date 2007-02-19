@@ -11,7 +11,7 @@
 
 ****************************************************************************/
 
-#include "driver.h"
+#include "sndintrf.h"
 #include "sound/beep.h"
 #include "streams.h"
 

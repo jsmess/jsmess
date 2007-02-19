@@ -24,7 +24,7 @@
 #ifndef NES_APU_H
 #define NES_APU_H
 
-#include "driver.h"
+#include "sndintrf.h"
 
 /* AN EXPLANATION
  *

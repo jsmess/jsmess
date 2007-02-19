@@ -19,7 +19,7 @@
 
 //SJE: Changed all references to ICount to icount (to match MAME requirements)
 
-#include "cpuexec.h"
+#include "cpuintrf.h"
 
 static void illegal( void )
 {

@@ -19,9 +19,7 @@
  *
  *****************************************************************************/
 
-#include <stdio.h>
-#ifdef MAME_DEBUG
-#include "driver.h"
+#include "cpuintrf.h"
 #include "debugger.h"
 
 #include "cdp1802.h"
@@ -172,6 +170,4 @@ offs_t cdp1802_dasm(char *dst, offs_t oldpc, const UINT8 *oprom, const UINT8 *op
 
 	return (pc-oldpc) | flags | DASMFLAG_SUPPORTED;
 }
-#endif	/* MAME_DEBUG */
-
 

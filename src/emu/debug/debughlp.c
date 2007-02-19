@@ -10,6 +10,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "debughlp.h"
 #include <ctype.h>
 
 

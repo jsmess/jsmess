@@ -3126,10 +3126,10 @@ ROM_END
 
 ROM_START( vonusa )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // i960 program
-	ROM_LOAD32_WORD("vo-prog0.usa", 0x000000, 0x080000, CRC(6499cc59) SHA1(8289be295f021acbf0c903513ba97ae7de50dedb) )
-	ROM_LOAD32_WORD("vo-prog1.usa", 0x000002, 0x080000, CRC(0053b10f) SHA1(b89cc814b02b4ab5e37c75ee1a9cf57b88b63053) )
-	ROM_LOAD32_WORD("epr-18666.13", 0x100000, 0x080000, CRC(66edb432) SHA1(b67131b0158a58138380734dd5b9394b70010026) )
-	ROM_LOAD32_WORD("epr-18667.14", 0x100002, 0x080000, CRC(b593d31f) SHA1(1e9f23f4052ab1b0275307cc80e51352f13bc319) )
+	ROM_LOAD32_WORD("epr-18828b.15", 0x000000, 0x080000, CRC(6499cc59) SHA1(8289be295f021acbf0c903513ba97ae7de50dedb) )
+	ROM_LOAD32_WORD("epr-18829b.16", 0x000002, 0x080000, CRC(0053b10f) SHA1(b89cc814b02b4ab5e37c75ee1a9cf57b88b63053) )
+	ROM_LOAD32_WORD("epr-18666.13",  0x100000, 0x080000, CRC(66edb432) SHA1(b67131b0158a58138380734dd5b9394b70010026) )
+	ROM_LOAD32_WORD("epr-18667.14",  0x100002, 0x080000, CRC(b593d31f) SHA1(1e9f23f4052ab1b0275307cc80e51352f13bc319) )
 
 	ROM_REGION32_LE( 0x2000000, REGION_USER1, 0 ) // Data
 	ROM_LOAD32_WORD("mpr-18648.11", 0x000000, 0x400000, CRC(2edbe489) SHA1(ded2e4b295be08970d13c387818c570c3afe8109) )
@@ -3741,8 +3741,8 @@ GAME( 1996, lastbrnx,        0, model2b, model2, 0, ROT0, "Sega", "Last Bronx (E
 GAME( 1996, lastbrnj, lastbrnx, model2b, model2, 0, ROT0, "Sega", "Last Bronx (Japan, Rev A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,             0, model2b, model2, doa, ROT0, "Sega", "Dead or Alive (Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sgt24h,          0, model2b, model2, sgt24h, ROT0, "Jaleco", "Super GT 24h", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, von,             0, model2b, model2, 0, ROT0, "Sega", "Virtual On Cyber Troopers (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, vonusa,        von, model2b, model2, 0, ROT0, "Sega", "Virtual On Cyber Troopers (US)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, von,             0, model2b, model2, 0, ROT0, "Sega", "Virtual On Cyber Troopers (Japan, Rev B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, vonusa,        von, model2b, model2, 0, ROT0, "Sega", "Virtual On Cyber Troopers (US, Rev B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, dynabb,          0, model2b, model2, 0, ROT0, "Sega", "Dynamite Baseball '97", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogun,         0, model2b, model2, zerogun, ROT0, "Psikyo", "Zero Gunner (Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunj,  zerogun, model2b, model2, zerogun, ROT0, "Psikyo", "Zero Gunner (Japan Model 2B)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

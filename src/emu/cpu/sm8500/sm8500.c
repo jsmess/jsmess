@@ -9,11 +9,8 @@
   Code by Wilbert Pol
 */
 
-#include <stdio.h>
-#include <string.h>
 #include "sm8500.h"
 #include "debugger.h"
-//#include "state.h"
 
 #define FLAG_C	0x80
 #define FLAG_Z	0x40

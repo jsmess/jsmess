@@ -22,7 +22,11 @@ OBJDIRS += \
 # set of tool targets
 #-------------------------------------------------
 
-TOOLS += file2str$(EXE) romcmp$(EXE) chdman$(EXE) jedutil$(EXE)
+TOOLS += \
+	file2str$(EXE) \
+	romcmp$(EXE) \
+	chdman$(EXE) \
+	jedutil$(EXE) \
 
 
 

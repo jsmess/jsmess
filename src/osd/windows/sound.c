@@ -22,6 +22,8 @@
 #include "driver.h"
 #include "osdepend.h"
 #include "sound/wavwrite.h"
+
+// MAMEOS headers
 #include "winmain.h"
 #include "window.h"
 #include "video.h"

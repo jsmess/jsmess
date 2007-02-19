@@ -1,39 +1,37 @@
-/*****************************************************************************
- *
- *   cdp1802.h
- *   portable cosmac cdp1802 emulator interface
- *
- *   Copyright (c) 2000 Peter Trauner, all rights reserved.
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     peter.trauner@jk.uni-linz.ac.at
- *   - The author of this copywritten work reserves the right to change the
- *     terms of its usage and license at any time, including retroactively
- *   - This entire notice must remain in the source code.
- *
- *****************************************************************************/
-
 #ifndef _CDP1802_H
 #define _CDP1802_H
 
 #include "cpuintrf.h"
 
-#define CDP1802_INT_NONE	0
-#define CDP1802_IRQ			1
-
-// CDP1802 I/O Flags
+#define CDP1802_CYCLES_RESET 		1
+#define CDP1802_CYCLES_INIT			9
+#define CDP1802_CYCLES_FETCH		8
+#define CDP1802_CYCLES_EXECUTE		8
+#define CDP1802_CYCLES_DMA			1
+#define CDP1802_CYCLES_INTERRUPT	1
 
 enum {
-	EF1 = 1,
-	EF2	= 2,
-	EF3	= 4,
-	EF4 = 8
+	EF1 = 0x01,
+	EF2 = 0x02,
+	EF3 = 0x04,
+	EF4 = 0x08
+};
+
+enum {
+	CDP1802_STATE_0_FETCH,
+	CDP1802_STATE_1_RESET,
+	CDP1802_STATE_1_INIT,
+	CDP1802_STATE_1_EXECUTE,
+	CDP1802_STATE_2_DMA_IN,
+	CDP1802_STATE_2_DMA_OUT,
+	CDP1802_STATE_3_INT
+};
+
+enum {
+	CDP1802_MODE_LOAD,
+	CDP1802_MODE_RESET,
+	CDP1802_MODE_PAUSE,
+	CDP1802_MODE_RUN
 };
 
 // CDP1802 Registers
@@ -68,10 +66,13 @@ enum {
 	CDP1802_Q,		// Output Flip-Flop
 	CDP1802_N,		// Holds Low-Order Instruction Digit
 	CDP1802_I,		// Holds High-Order Instruction Digit
-	CDP1802_IRQ_STATE,
 };
 
-// CDP1802 Configuration
+void cdp1802_get_info(UINT32 state, cpuinfo *info);
+
+#ifdef MAME_DEBUG
+offs_t cdp1802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+#endif
 
 typedef struct {
 	/* called after execution of an instruction with cycles,
@@ -81,16 +82,9 @@ typedef struct {
 	int (*in_ef)(void);
 } CDP1802_CONFIG;
 
-
 void cdp1802_dma_write(UINT8 data);
 int cdp1802_dma_read(void);
 
-extern int cdp1802_icount;				// cycle count
-
-void cdp1802_get_info(UINT32 state, cpuinfo *info);
-
-#ifdef MAME_DEBUG
-offs_t cdp1802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+void cdp1802_set_mode(int mode);
 
 #endif

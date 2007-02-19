@@ -19,7 +19,8 @@
 #include <stdlib.h>
 #include "osdcomm.h"
 #include "bitmap.h"
-
+#include "coreutil.h"
+#include "corestr.h"
 
 
 /***************************************************************************
@@ -281,50 +282,15 @@ typedef union
 		 (BIT(val, B0) <<  0))
 
 
-
-/***************************************************************************
-    COMMON FUNCTIONS
-***************************************************************************/
-
-/* since stricmp is not part of the standard, we use this instead */
-int mame_stricmp(const char *s1, const char *s2);
-
-/* this macro prevents people from using stricmp directly */
-#undef stricmp
-#define stricmp !MUST_USE_MAME_STRICMP_INSTEAD!
-
-/* this macro prevents people from using strcasecmp directly */
-#undef strcasecmp
-#define strcasecmp !MUST_USE_MAME_STRICMP_INSTEAD!
-
-
-/* since strnicmp is not part of the standard, we use this instead */
-int mame_strnicmp(const char *s1, const char *s2, size_t n);
-
-/* this macro prevents people from using strnicmp directly */
-#undef strnicmp
-#define strnicmp !MUST_USE_MAME_STRNICMP_INSTEAD!
-
-/* this macro prevents people from using strncasecmp directly */
-#undef strncasecmp
-#define strncasecmp !MUST_USE_MAME_STRNICMP_INSTEAD!
-
-
-/* since strdup is not part of the standard, we use this instead */
-char *mame_strdup(const char *str);
-
-/* this macro prevents people from using strdup directly */
-#undef strdup
-#define strdup !MUST_USE_MAME_STRDUP_INSTEAD!
-
+#define mame_stricmp		core_stricmp
+#define mame_strnicmp		core_strnicmp
+#define mame_strdup		core_strdup
+#define mame_strwildcmp	core_strwildcmp
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* additional string compare helper */
-int mame_strwildcmp(const char *sp1, const char *sp2);
 
 /* Used by assert(), so definition here instead of mame.h */
 DECL_NORETURN void CLIB_DECL fatalerror(const char *text, ...) ATTR_PRINTF(1,2) ATTR_NORETURN;
@@ -423,73 +389,6 @@ INLINE INT32 fixed_mul_shift(INT32 val1, INT32 val2, UINT8 shift)
 }
 #endif
 
-
-
-/***************************************************************************
-    BINARY CODED DECIMAL HELPERS
-***************************************************************************/
-
-INLINE int bcd_adjust(int value)
-{
-	if ((value & 0xf) >= 0xa)
-		value = value + 0x10 - 0xa;
-	if ((value & 0xf0) >= 0xa0)
-		value = value - 0xa0 + 0x100;
-	return value;
-}
-
-
-INLINE UINT32 dec_2_bcd(UINT32 a)
-{
-	UINT32 result = 0;
-	int shift = 0;
-
-	while (a != 0)
-	{
-		result |= (a % 10) << shift;
-		a /= 10;
-		shift += 4;
-	}
-	return result;
-}
-
-
-INLINE UINT32 bcd_2_dec(UINT32 a)
-{
-	UINT32 result = 0;
-	UINT32 scale = 1;
-
-	while (a != 0)
-	{
-		result += (a & 0x0f) * scale;
-		a >>= 4;
-		scale *= 10;
-	}
-	return result;
-}
-
-
-
-/***************************************************************************
-    GREGORIAN CALENDAR HELPERS
-***************************************************************************/
-
-INLINE int gregorian_is_leap_year(int year)
-{
-	return !(year % 100 ? year % 4 : year % 400);
-}
-
-
-/* months are one counted */
-INLINE int gregorian_days_in_month(int month, int year)
-{
-	if (month == 2)
-		return gregorian_is_leap_year(year) ? 29 : 28;
-	else if (month == 4 || month == 6 || month == 9 || month == 11)
-		return 30;
-	else
-		return 31;
-}
 
 
 #endif	/* __MAMECORE_H__ */

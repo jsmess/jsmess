@@ -1839,18 +1839,6 @@ static struct namco_52xx_interface namco_52xx_interface =
 	.25				/* Combined gain of both filters */
 };
 
-#if 0
-static struct namco_54xx_interface namco_54xx_interface =
-{
-	{ RES_K(150),	RES_K(47),		RES_K(100) },	/* R42, R33, R24 */
-	{ RES_K(22),	RES_K(10),		RES_K(22) },	/* R41, R34, R23 */
-	{ RES_K(470),	RES_K(150),		RES_K(220) },	/* R40, R35, R22 */
-	{ RES_K(10),	RES_K(33),		RES_K(33)},		/* R37, R36, R21 */
-	{ CAP_U(.01),	CAP_U(.01),		CAP_U(.001) },	/* C27, C29, C31 */
-	{ CAP_U(.01),	CAP_U(.01),		CAP_U(.001) },	/* C26, C28, C30 */
-};
-#endif
-
 static const char *battles_sample_names[] =
 {
 	"*battles",
@@ -1919,15 +1907,10 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SOUND_CONFIG(namco_52xx_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	// DAC outputs for the 54XX
-	MDRV_SOUND_ADD_TAG("54XX.0", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD_TAG("54XX.1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD_TAG("54XX.2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	/* discrete circuit on the 54XX outputs */
+	MDRV_SOUND_ADD_TAG("Discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG(bosco_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
 
@@ -1979,15 +1962,10 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
-	// DAC outputs for the 54XX
-	MDRV_SOUND_ADD_TAG("54XX.0", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD_TAG("54XX.1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD_TAG("54XX.2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	/* discrete circuit on the 54XX outputs */
+	MDRV_SOUND_ADD_TAG("Discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG(galaga_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( galagab )
@@ -2001,9 +1979,7 @@ static MACHINE_DRIVER_START( galagab )
 	MDRV_CPU_PROGRAM_MAP(readmem4_galaga,writemem4_galaga)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("54XX.0")
-	MDRV_SOUND_REMOVE("54XX.1")
-	MDRV_SOUND_REMOVE("54XX.2")
+	MDRV_SOUND_REMOVE("Discrete")
 MACHINE_DRIVER_END
 
 
@@ -2054,15 +2030,10 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
-	// DAC outputs for the 54XX
-	MDRV_SOUND_ADD_TAG("54XX.0", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD_TAG("54XX.1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD_TAG("54XX.2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	/* discrete circuit on the 54XX outputs */
+	MDRV_SOUND_ADD_TAG("Discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG(galaga_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( battles )
@@ -2082,9 +2053,7 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_PALETTE_INIT(battles)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("54XX.0")
-	MDRV_SOUND_REMOVE("54XX.1")
-	MDRV_SOUND_REMOVE("54XX.2")
+	MDRV_SOUND_REMOVE("Discrete")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface_battles)
