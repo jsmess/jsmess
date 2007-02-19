@@ -635,7 +635,7 @@ static struct z80_irq_daisy_chain sord_m5_daisy_chain[] =
 static INTERRUPT_GEN( sord_interrupt )
 {
 	if (TMS9928A_interrupt())
-		cpunum_set_input_line(0, 0, PULSE_LINE);
+		cpunum_set_input_line(0, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( sord_m5 )

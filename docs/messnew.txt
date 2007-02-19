@@ -26,6 +26,9 @@ System Driver Changes:
 
 - [SMS/GG] Improved PSG, FM, and CPU clock frequencies [Andre Cotrim, Wilbert Pol]
 
+- [SORDM5] Fixed regression introduced in 0.112.  (bug #1082) [Nate Woods]
+
+
 
 User Interface Changes:
 -----------------------
