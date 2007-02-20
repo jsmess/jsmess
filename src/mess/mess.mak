@@ -395,7 +395,6 @@ DRVLIBS = \
 	$(MESSOBJ)/ti99.a \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/trs80.a \
-	$(MESSOBJ)/tutor.a \
 	$(MESSOBJ)/tx0.a \
 	$(MESSOBJ)/vc4000.a \
 	$(MESSOBJ)/veb.a \
@@ -460,7 +459,12 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/nec765.o   \
 	$(MESS_MACHINE)/wd17xx.o   \
 	$(MESS_MACHINE)/serial.o   \
-	$(MESS_FORMATS)/wavfile.o
+	$(MESS_FORMATS)/wavfile.o	\
+	$(MAME_MACHINE)/6526cia.o	\
+	$(MESS_FORMATS)/coco_cas.o	\
+	$(MESS_FORMATS)/coco_dsk.o	\
+	$(MESS_MACHINE)/mm58274c.o	\
+	$(MESS_DRIVERS)/tutor.o
 
 
 
@@ -543,13 +547,11 @@ $(MESSOBJ)/amiga.a: \
 	$(MAME_VIDEO)/amiga.o			\
 	$(MAME_MACHINE)/amiga.o			\
 	$(MAME_AUDIO)/amiga.o			\
-	$(MAME_MACHINE)/6526cia.o		\
 	$(MESS_MACHINE)/amigafdc.o	\
 	$(MESS_MACHINE)/amigakbd.o	\
 	$(MESS_DRIVERS)/amiga.o		\
 
 $(MESSOBJ)/cbmshare.a: \
-	$(MAME_MACHINE)/6526cia.o		\
 	$(MESS_MACHINE)/tpi6525.o	\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmdrive.o	\
@@ -593,20 +595,16 @@ $(MESSOBJ)/coco.a:   \
 	$(MESS_DRIVERS)/coco.o		\
 	$(MESS_VIDEO)/coco3.o		\
 	$(MESS_FORMATS)/cocopak.o	\
-	$(MESS_FORMATS)/coco_cas.o	\
-	$(MESS_FORMATS)/coco_dsk.o	\
 	$(MESS_DEVICES)/coco_vhd.o	\
 
 $(MESSOBJ)/mc10.a:	\
 	$(MESS_MACHINE)/mc10.o		\
 	$(MESS_DRIVERS)/mc10.o		\
-	$(MESS_FORMATS)/coco_cas.o	\
 
 $(MESSOBJ)/dgn_beta.a:	\
 	$(MESS_MACHINE)/dgn_beta.o	\
 	$(MESS_VIDEO)/dgn_beta.o	\
 	$(MESS_DRIVERS)/dgn_beta.o	\
-	$(MESS_FORMATS)/coco_dsk.o	\
 
 $(MESSOBJ)/trs80.a:    \
 	$(MESS_MACHINE)/trs80.o	 \
@@ -700,7 +698,6 @@ $(MESSOBJ)/ti99.a:	   \
 	$(MESS_MACHINE)/990_hd.o	\
 	$(MESS_MACHINE)/990_tap.o	\
 	$(MESS_MACHINE)/ti990.o		\
-	$(MESS_MACHINE)/mm58274c.o	\
 	$(MESS_MACHINE)/994x_ser.o	\
 	$(MESS_MACHINE)/at29040.o	\
 	$(MESS_MACHINE)/99_dsk.o	\
@@ -724,10 +721,6 @@ $(MESSOBJ)/ti99.a:	   \
 	$(MESS_VIDEO)/733_asr.o	\
 	$(MESS_DRIVERS)/ti990_10.o	\
 	$(MESS_DRIVERS)/ti99_2.o	\
-	$(MESS_DRIVERS)/tutor.o		\
-
-$(MESSOBJ)/tutor.a:   \
-	$(MESS_DRIVERS)/tutor.o
 
 $(MESSOBJ)/bally.a:    \
 	$(MESS_VIDEO)/astrocde.o \
@@ -1045,7 +1038,6 @@ $(MESSOBJ)/bandai.a:     \
 $(MESSOBJ)/compis.a:					\
 	$(MESS_DRIVERS)/compis.o	\
 	$(MESS_MACHINE)/compis.o	\
-	$(MESS_MACHINE)/mm58274c.o	\
 	$(MESS_FORMATS)/cpis_dsk.o	\
 	$(MESS_VIDEO)/i82720.o 
 
@@ -1134,7 +1126,6 @@ EMUOBJS +=							\
 	$(MESS_EMUOBJ)/mess.o				\
 	$(MESS_EMUOBJ)/mesvalid.o			\
 	$(MESS_EMUOBJ)/image.o				\
-	$(MESS_EMUOBJ)/messdriv.o			\
 	$(MESS_EMUOBJ)/device.o			\
 	$(MESS_EMUOBJ)/hashfile.o			\
 	$(MESS_EMUOBJ)/inputx.o			\
