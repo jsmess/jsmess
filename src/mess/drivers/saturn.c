@@ -2466,7 +2466,7 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY	FULLNAME */
 CONS(1994, saturn,	0,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (Japan v1.01)", GAME_NOT_WORKING)
-CONS(1994, saturnus,	0,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (US)", GAME_NOT_WORKING)
-CONS(1994, saturneu,	0,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (Europe)", GAME_NOT_WORKING)
+CONS(1994, saturnus,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (US)", GAME_NOT_WORKING)
+CONS(1994, saturneu,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (Europe)", GAME_NOT_WORKING)
 
 
