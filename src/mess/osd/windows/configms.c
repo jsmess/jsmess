@@ -313,9 +313,6 @@ void osd_begin_final_unloading(void)
 			opt++;
 		}
 	}
-
-	// free up all of the allocated options
-	pool_exit(&mess_options_pool);
 }
 
 

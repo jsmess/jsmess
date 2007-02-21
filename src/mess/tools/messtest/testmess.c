@@ -50,7 +50,8 @@ typedef enum
 	MESSTEST_COMMAND_VERIFY_MEMORY,
 	MESSTEST_COMMAND_VERIFY_IMAGE,
 	MESSTEST_COMMAND_TRACE,
-	MESSTEST_COMMAND_RESET
+	MESSTEST_COMMAND_SOFT_RESET,
+	MESSTEST_COMMAND_HARD_RESET
 } messtest_command_type_t;
 
 struct messtest_command
@@ -895,9 +896,16 @@ static void command_trace(void)
 
 
 
-static void command_reset(void)
+static void command_soft_reset(void)
 {
 	mame_schedule_soft_reset(Machine);
+}
+
+
+
+static void command_hard_reset(void)
+{
+	mame_schedule_hard_reset(Machine);
 }
 
 
@@ -934,7 +942,8 @@ static const struct command_procmap_entry commands[] =
 	{ MESSTEST_COMMAND_VERIFY_MEMORY,	command_verify_memory },
 	{ MESSTEST_COMMAND_VERIFY_IMAGE,	command_verify_image },
 	{ MESSTEST_COMMAND_TRACE,			command_trace },
-	{ MESSTEST_COMMAND_RESET,			command_reset },
+	{ MESSTEST_COMMAND_SOFT_RESET,		command_soft_reset },
+	{ MESSTEST_COMMAND_HARD_RESET,		command_hard_reset },
 	{ MESSTEST_COMMAND_END,				command_end }
 };
 
@@ -1437,11 +1446,26 @@ static void node_trace(xml_data_node *node)
 
 
 
-static void node_reset(xml_data_node *node)
+static void node_soft_reset(xml_data_node *node)
 {
-	/* <reset> - perform a reset */
+	/* <reset> - perform a soft reset */
 	memset(&new_command, 0, sizeof(new_command));
-	new_command.command_type = MESSTEST_COMMAND_RESET;
+	new_command.command_type = MESSTEST_COMMAND_SOFT_RESET;
+
+	if (!append_command())
+	{
+		error_outofmemory();
+		return;
+	}
+}
+
+
+
+static void node_hard_reset(xml_data_node *node)
+{
+	/* <hardreset> - perform a hard reset */
+	memset(&new_command, 0, sizeof(new_command));
+	new_command.command_type = MESSTEST_COMMAND_HARD_RESET;
 
 	if (!append_command())
 	{
@@ -1521,7 +1545,9 @@ void node_testmess(xml_data_node *node)
 			else if (!strcmp(child_node->name, "trace"))
 				node_trace(child_node);
 			else if (!strcmp(child_node->name, "reset"))
-				node_reset(child_node);
+				node_soft_reset(child_node);
+			else if (!strcmp(child_node->name, "hardreset"))
+				node_hard_reset(child_node);
 		}
 
 		memset(&new_command, 0, sizeof(new_command));

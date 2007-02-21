@@ -47,6 +47,11 @@ Source Changes:
 ----------------
 - The core is based on MAME 0.112u2.  This incorporates all features of the
   update to this core.  [MAME team]
+  
+- [Windows] Fixed a crash that can happen when doing a hard reset when devices
+  are mounted.  (bug #1084) [Nate Woods]
+
+- [Messtest] Added the ability to script hard resets.  [Nate Woods]
 
 
 
