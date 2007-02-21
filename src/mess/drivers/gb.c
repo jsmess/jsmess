@@ -285,6 +285,17 @@ HuC3 mapper
 Status: not supported yet.
 
 
+Wisdom Tree mapper
+==================
+
+The Wisdom Tree mapper is triggered by writes in the 0x0000-0x3FFF area. The
+address written to determines the bank to switch in. The banks to switch in,
+however, are number #1, #2, #3, etc. So, writing to address 0x000A switches
+in bank 0x0B, writing to address 0x0001 switches in bank 0x02.
+
+This behaviour still needs to be verified against a full dump.
+
+
 ***************************************************************************/
 #include "driver.h"
 #include "video/generic.h"

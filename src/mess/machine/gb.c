@@ -53,6 +53,7 @@ enum {
 	MBC_HUC1,		/*    ?? ROM,    ?? RAM - Hudson Soft Controller */
 	MBC_HUC3,		/*    ?? ROM,    ?? RAM - Hudson Soft Controller */
 	MBC_MBC7,		/*    ?? ROM,    ?? RAM                          */
+	MBC_WISDOM,		/*    ?? ROM,    ?? RAM - Wisdom tree controller */
 	MBC_MEGADUCK,	/* MEGADUCK style banking                        */
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
@@ -129,6 +130,7 @@ WRITE8_HANDLER( gb_ram_bank_select_mbc5 );
 WRITE8_HANDLER( gb_rom_bank_select_mbc7 );
 WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 );
 WRITE8_HANDLER( gb_ram_tama5 );
+WRITE8_HANDLER( gb_rom_bank_select_wisdom );
 
 #ifdef MAME_DEBUG
 /* #define V_GENERAL*/		/* Display general debug information */
@@ -206,6 +208,9 @@ static void gb_init(void) {
 			break;
 		case MBC_TAMA5:
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0xA000, 0xBFFF, 0, 0, gb_ram_tama5 );
+			break;
+		case MBC_WISDOM:
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, gb_rom_bank_select_wisdom );
 			break;
 		case MBC_MEGADUCK:
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0001, 0x0001, 0, 0, megaduck_rom_bank_select_type1 );
@@ -422,6 +427,13 @@ WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 ) {
 			break;
 		}
 	}
+}
+
+WRITE8_HANDLER( gb_rom_bank_select_wisdom ) {
+	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", activecpu_get_pc(), offset );
+	/* The address determines the bank to select */
+	ROMBank = ( offset + 1 ) & 0xFF;
+	memory_set_bankptr( 1, ROMMap[ ROMBank ] );
 }
 
 WRITE8_HANDLER( gb_ram_bank_select_mbc1 )
@@ -1426,6 +1438,17 @@ DEVICE_LOAD(gb_cart)
 	default:	MBCType = MBC_UNKNOWN;	CartType = UNKNOWN;			break;
 	}
 
+	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
+	if ( gb_cart[0x0147] == 0x00 ) {
+		int count = 0;
+		for( I = 0x0134; I <= 0x014C; I++ ) {
+			count += gb_cart[I];
+		}
+		if ( count == 0 ) {
+			MBCType = MBC_WISDOM;
+		}
+	}
+
 	if ( MBCType == MBC_UNKNOWN ) {
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type" );
 		return INIT_FAIL;
@@ -1466,7 +1489,7 @@ DEVICE_LOAD(gb_cart)
 		reported_rom_banks = 256;
 		break;
 	}
-	if ( ROMBanks != reported_rom_banks ) {
+	if ( ROMBanks != reported_rom_banks && MBCType != MBC_WISDOM ) {
 		logerror( "Warning loading cartridge: Filesize and reported ROM banks don't match.\n" );
 	}
 
