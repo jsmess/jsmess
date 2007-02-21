@@ -49,7 +49,7 @@ Source Changes:
   update to this core.  [MAME team]
   
 - [Windows] Fixed a crash that can happen when doing a hard reset when devices
-  are mounted.  (bug #1084) [Nate Woods]
+  are mounted.  (bugs #1036, #1084) [Nate Woods]
 
 - [Messtest] Added the ability to script hard resets.  [Nate Woods]
 
