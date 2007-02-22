@@ -37,11 +37,13 @@ int start_blanking;		/* when is the transition from bottom border area to blanki
 int start_top_border;		/* when is the transition from blanking area to top border area */
 int max_y_pixels;		/* full range of y counter */
 int vdp_mode;			/* current mode of the VDP: 0,1,2,3,4 */
+int bborder_192_y_pixels, bborder_224_y_pixels, bborder_240_y_pixels;
 
 mame_bitmap *prevBitMap;
 int prevBitMapSaved;
 
 UINT8 *vcnt_lookup;
+UINT8 *vcnt_192_lookup, *vcnt_224_lookup, *vcnt_240_lookup;
 
 /* NTSC 192 lines precalculated return values from the V counter */
 static UINT8 vcnt_ntsc_192[NTSC_Y_PIXELS] = {
@@ -214,38 +216,19 @@ static void set_display_settings( void ) {
 			logerror( "Unknown video mode detected (M1=%c, M2=%c, M3=%c, M4=%c)\n", M1 ? '1' : '0', M2 ? '1' : '0', M3 ? '1' : '0', M4 ? '1' : '0');
 		}
 	}
-	if ( IS_NTSC ) {
-		switch( y_pixels ) {
-		case 192:
-			vcnt_lookup = vcnt_ntsc_192;
-			start_blanking = y_pixels + NTSC_192_BBORDER_Y_PIXELS;
-			break;
-		case 224:
-			vcnt_lookup = vcnt_ntsc_224;
-			start_blanking = y_pixels + NTSC_224_BBORDER_Y_PIXELS;
-			break;
-		case 240:
-			vcnt_lookup = vcnt_ntsc_240;
-			start_blanking = y_pixels + 1;
-			break;
-		}
-		max_y_pixels = NTSC_Y_PIXELS;
-	} else {
-		switch( y_pixels ) {
-		case 192:
-			vcnt_lookup = vcnt_pal_192;
-			start_blanking = y_pixels + PAL_192_BBORDER_Y_PIXELS;
-			break;
-		case 224:
-			vcnt_lookup = vcnt_pal_224;
-			start_blanking = y_pixels + PAL_224_BBORDER_Y_PIXELS;
-			break;
-		case 240:
-			vcnt_lookup = vcnt_pal_240;
-			start_blanking = y_pixels + PAL_240_BBORDER_Y_PIXELS;
-			break;
-		}
-		max_y_pixels = PAL_Y_PIXELS;
+	switch( y_pixels ) {
+	case 192:
+		vcnt_lookup = vcnt_192_lookup;
+		start_blanking = y_pixels + bborder_192_y_pixels;
+		break;
+	case 224:
+		vcnt_lookup = vcnt_224_lookup;
+		start_blanking = y_pixels + bborder_224_y_pixels;
+		break;
+	case 240:
+		vcnt_lookup = vcnt_240_lookup;
+		start_blanking = y_pixels + bborder_240_y_pixels;
+		break;
 	}
 	start_top_border = start_blanking + 19;
 	if ( ! IS_GAMEGEAR ) {
@@ -258,7 +241,16 @@ static void set_display_settings( void ) {
 	return vcnt_lookup[currentLine];
 }
 
-VIDEO_START(sms) {
+int sms_video_init( int max_lines, int bborder_192, int bborder_224, int bborder_240, UINT8 *vcnt_192, UINT8 *vcnt_224, UINT8 *vcnt_240 ) {
+
+	max_y_pixels = max_lines;
+	bborder_192_y_pixels = bborder_192;
+	bborder_224_y_pixels = bborder_224;
+	bborder_240_y_pixels = bborder_240;
+	vcnt_192_lookup = vcnt_192;
+	vcnt_224_lookup = vcnt_224;
+	vcnt_240_lookup = vcnt_240;
+
 	/* Clear RAM */
 	memset(reg, 0, NUM_OF_REGISTER);
 	isCRAMDirty = 1;
@@ -277,28 +269,27 @@ VIDEO_START(sms) {
 	spriteCache = auto_malloc(MAX_X_PIXELS * 16);
 
 	/* Make temp bitmap for rendering */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
 	prevBitMapSaved = 0;
-	prevBitMap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	prevBitMap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
 	set_display_settings();
 
 	return (0);
 }
 
-INTERRUPT_GEN(sms) {
-	int maxLine;
+VIDEO_START(sms_pal) {
+	return sms_video_init( PAL_Y_PIXELS, PAL_192_BBORDER_Y_PIXELS, PAL_224_BBORDER_Y_PIXELS, PAL_240_BBORDER_Y_PIXELS, vcnt_pal_192, vcnt_pal_224, vcnt_pal_240 );
+}
 
-	/* Is it NTSC */
-	if (IS_NTSC) {
-		/* Bump scanline counter */
-		currentLine = (currentLine + 1) % NTSC_Y_PIXELS;
-	} else {
-		/* It must be PAL */
-		/* Bump scanline counter */
-		currentLine = (currentLine + 1) % PAL_Y_PIXELS;
-	}
+VIDEO_START(sms_ntsc) {
+	return sms_video_init( NTSC_Y_PIXELS, NTSC_192_BBORDER_Y_PIXELS, NTSC_224_BBORDER_Y_PIXELS, 1, vcnt_ntsc_192, vcnt_ntsc_224, vcnt_ntsc_240 );
+}
+
+INTERRUPT_GEN(sms) {
+	/* Bump scanline counter */
+	currentLine = (currentLine + 1) % max_y_pixels;
 
 	if (currentLine <= y_pixels) {
 		if (currentLine == y_pixels) {
@@ -355,9 +346,7 @@ INTERRUPT_GEN(sms) {
 #endif
 			}
 		} else {
-			maxLine = ((IS_NTSC) ? NTSC_Y_PIXELS : PAL_Y_PIXELS);
-
-			if (currentLine < maxLine) {
+			if (currentLine < max_y_pixels) {
 				sms_update_palette();
 #ifdef MAME_DEBUG
 				if (code_pressed(KEYCODE_T)) {

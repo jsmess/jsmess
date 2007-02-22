@@ -55,9 +55,6 @@ MACHINE_START(sms);
 MACHINE_RESET(sms);
 INTERRUPT_GEN(sms);
 
-#define IS_NTSC											(Machine->screen[0].refresh == 60)
-#define IS_PAL											(Machine->screen[0].refresh == 50)
-
 #define NTSC_X_PIXELS								(0x0156)				/* 342 pixels */
 #define NTSC_Y_PIXELS								(0x0106)				/* 262 lines */
 #define PAL_X_PIXELS								(NTSC_X_PIXELS)
@@ -106,7 +103,8 @@ INTERRUPT_GEN(sms);
 
 extern int currentLine;
 
-VIDEO_START(sms);
+VIDEO_START(sms_pal);
+VIDEO_START(sms_ntsc);
 VIDEO_UPDATE(sms);
  READ8_HANDLER(sms_vdp_curline_r);
  READ8_HANDLER(sms_vdp_data_r);
