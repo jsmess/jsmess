@@ -289,27 +289,28 @@ ROM_START(comquest)
 	ROM_REGION(0x100000,REGION_CPU1,0)
 	ROM_LOAD("comquest.bin", 0x00000, 0x80000, CRC(2bf4b1a8) SHA1(8d1821cbde37cca2055b18df001438f7d138a8c1))
 /*
-000 +16kbyte graphics data?
-040 16kbyte code
-080 8kbyte code
-0a0 8kbyte code
-0c0 16kbyte code
-100 16kbyte code
-140 16kbyte code
-180 16kbyte code
-1c0 16kbyte code
-200 16kbyte code
-240 8kkbyte
-260 16kbyte !
-2a0 8kbyte
-2c0 8kbyte
-2e0 8kbyte
-300 +text
+000 +16kbyte graphics data? (first bytes: 80 0d 04 00 00 08 04 00 0f 02 04 01 00 10 04 01)
+040 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 4f c7 f1 1d 4f)
+080 8kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 10 a9 4f c7 f1)
+0a0 8kbyte code (first bytes: 00 00 00 00 9a a6 00 c7 f5 ca cd 7c 9b cd 7c 98)
+0c0 16kbyte code (first bytes: 00 00 00 00 a6 0a cd 7c c8 cd 7c 9b cd 7c 98 a6)
+100 8kbyte code (first bytes: 00 00 00 00 a6 0a cd 7c c8 cd 7c 9b cd 7c 98 a6)
+120 8kbyte data
+140 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 a6 0d c7 fd 0f)
+180 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 a6 00 c7 f2 2c)
+1c0 16kbyte code (first bytes: 00 00 00 00 9a a6 00 c7 f3 00 c7 f3 02 a6 ff c7)
+200 16kbyte code (first bytes: 00 00 00 00 9a a6 0d c7 fd 0f cd 7c 92 cd 7c 9b)
+240 8kbyte code  (first bytes: 00 00 00 00 9d 9d 9d 9d 9d 9d 9d 9d cd 7c 9b cd)
+260 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 a6 00 b7 75 b7)
+2a0 8kbyte code  (first bytes: 00 00 00 00 a6 0a cd 7c c8 cd 7c 9b cd 7c 98 a6)
+2c0 8kbyte code  (first bytes: 00 00 00 00 a6 03 c7 fd 0f cd 7c 92 cd 7c 9b cd)
+2e0 8kbyte code? (first bytes: 00 00 00 00 a6 0d c7 fd 0f cd 7c 92 cc 80 f1 20)
+300 luts?+text   (first bytes: 60 02 fb 08 9a 11 a1 1f 75 26 dc 2f 6a 3b 26 46)
 720 empty
 740 empty
 760 empty
-780 16kb
-7c0 16kb
+780 16kbyte code (first bytes: 00 00 00 00 cd 7c 9b cd 7c 98 4f cd 7c ad a6 0a)
+7c0 16kbyte code (first bytes: 00 00 00 00 9a cd 7c 9b cd 7c 98 4f c7 f1 6e c7)
  */
 
 //	ROM_REGION(0x100,REGION_GFX1,0)
