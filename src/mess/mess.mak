@@ -395,6 +395,7 @@ DRVLIBS = \
 	$(MESSOBJ)/ti99.a \
 	$(MESSOBJ)/tiger.a \
 	$(MESSOBJ)/trs80.a \
+	$(MESSOBJ)/tutor.a \
 	$(MESSOBJ)/tx0.a \
 	$(MESSOBJ)/vc4000.a \
 	$(MESSOBJ)/veb.a \
@@ -463,8 +464,7 @@ $(MESSOBJ)/shared.a: \
 	$(MAME_MACHINE)/6526cia.o	\
 	$(MESS_FORMATS)/coco_cas.o	\
 	$(MESS_FORMATS)/coco_dsk.o	\
-	$(MESS_MACHINE)/mm58274c.o	\
-	$(MESS_DRIVERS)/tutor.o
+	$(MESS_MACHINE)/mm58274c.o
 
 
 
@@ -721,6 +721,9 @@ $(MESSOBJ)/ti99.a:	   \
 	$(MESS_VIDEO)/733_asr.o	\
 	$(MESS_DRIVERS)/ti990_10.o	\
 	$(MESS_DRIVERS)/ti99_2.o	\
+
+$(MESSOBJ)/tutor.a:	\
+	$(MESS_DRIVERS)/tutor.o
 
 $(MESSOBJ)/bally.a:    \
 	$(MESS_VIDEO)/astrocde.o \
