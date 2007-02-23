@@ -15,7 +15,7 @@
 
 #include "osdepend.h"
 #include "formats/flopimg.h"
-#include "pool.h"
+#include "tagpool.h"
 #include "utils.h"
 
 #define TRACK_LOADED		0x01

@@ -34,7 +34,7 @@ struct option_resolution_entry
 
 struct _option_resolution
 {
-	memory_pool pool;
+	memory_pool *pool;
 	const char *specification;
 	size_t option_count;
 	struct option_resolution_entry *entries;
@@ -217,12 +217,12 @@ option_resolution *option_resolution_create(const struct OptionGuide *guide, con
 	if (!resolution)
 		goto outofmemory;
 	memset(resolution, 0, sizeof(*resolution));
-	pool_init(&resolution->pool);
+	resolution->pool = pool_create(NULL);
 
 	/* set up the entries list */
 	resolution->option_count = option_count;
 	resolution->specification = specification;
-	resolution->entries = pool_malloc(&resolution->pool, sizeof(struct option_resolution_entry) * option_count);
+	resolution->entries = pool_malloc(resolution->pool, sizeof(struct option_resolution_entry) * option_count);
 	if (!resolution->entries)
 		goto outofmemory;
 	memset(resolution->entries, 0, sizeof(struct option_resolution_entry) * option_count);
@@ -289,7 +289,7 @@ optreserr_t option_resolution_add_param(option_resolution *resolution, const cha
 		break;
 
 	case OPTIONTYPE_STRING:
-		entry->u.str_value = pool_strdup(&resolution->pool, value);
+		entry->u.str_value = pool_strdup(resolution->pool, value);
 		if (!entry->u.str_value)
 		{
 			err = OPTIONRESOLUTION_ERROR_OUTOFMEMORY;
@@ -349,7 +349,7 @@ done:
 
 void option_resolution_close(option_resolution *resolution)
 {
-	pool_exit(&resolution->pool);
+	pool_free(resolution->pool);
 	free(resolution);
 }
 

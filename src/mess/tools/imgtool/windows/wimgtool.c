@@ -1061,15 +1061,15 @@ done:
 static void menu_new(HWND window)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	memory_pool pool;
+	memory_pool *pool;
 	OPENFILENAME ofn;
 	const imgtool_module *module;
 	char *filename = NULL;
 	option_resolution *resolution = NULL;
 
-	pool_init(&pool);
+	pool = pool_create(NULL);
 
-	err = setup_openfilename_struct(&ofn, &pool, window, TRUE);
+	err = setup_openfilename_struct(&ofn, pool, window, TRUE);
 	if (err)
 		goto done;
 	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK;
@@ -1099,7 +1099,8 @@ done:
 		option_resolution_close(resolution);
 	if (filename)
 		free(filename);
-	pool_exit(&pool);
+	if (pool)
+		pool_free(pool);
 }
 
 
@@ -1107,18 +1108,23 @@ done:
 static void menu_open(HWND window)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	memory_pool pool;
+	memory_pool *pool;
 	OPENFILENAME ofn;
 	const imgtool_module *module;
 	char *filename = NULL;
 	wimgtool_info *info;
 	int read_or_write;
 
-	pool_init(&pool);
+	pool = pool_create(NULL);
+	if (!pool)
+	{
+		err = IMGTOOLERR_OUTOFMEMORY;
+		goto done;
+	}
 
 	info = get_wimgtool_info(window);
 
-	err = setup_openfilename_struct(&ofn, &pool, window, FALSE);
+	err = setup_openfilename_struct(&ofn, pool, window, FALSE);
 	if (err)
 		goto done;
 	ofn.Flags |= OFN_FILEMUSTEXIST;
@@ -1143,7 +1149,8 @@ done:
 		wimgtool_report_error(window, err, filename, NULL);
 	if (filename)
 		free(filename);
-	pool_exit(&pool);
+	if (pool)
+		pool_free(pool);
 }
 
 

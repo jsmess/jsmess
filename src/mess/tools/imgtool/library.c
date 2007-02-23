@@ -17,7 +17,7 @@
 
 struct _imgtool_library
 {
-	memory_pool pool;
+	memory_pool *pool;
 	imgtool_module *first;
 	imgtool_module *last;
 };
@@ -33,7 +33,7 @@ imgtool_library *imgtool_library_create(void)
 		return NULL;
 	memset(library, 0, sizeof(*library));
 
-	pool_init(&library->pool);
+	library->pool = pool_create(NULL);
 	return library;
 }
 
@@ -41,7 +41,7 @@ imgtool_library *imgtool_library_create(void)
 
 void imgtool_library_close(imgtool_library *library)
 {
-	pool_exit(&library->pool);
+	pool_free(library->pool);
 	free(library);
 }
 
@@ -256,14 +256,14 @@ imgtool_module *imgtool_library_index(imgtool_library *library, int i)
 
 void *imgtool_library_alloc(imgtool_library *library, size_t mem)
 {
-	return pool_malloc(&library->pool, mem);
+	return pool_malloc(library->pool, mem);
 }
 
 
 
 char *imgtool_library_strdup(imgtool_library *library, const char *s)
 {
-	return s ? pool_strdup(&library->pool, s) : NULL;
+	return s ? pool_strdup(library->pool, s) : NULL;
 }
 
 

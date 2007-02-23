@@ -93,7 +93,7 @@ struct _dialog_box
 	DWORD style;
 	int combo_string_count;
 	int combo_default_value;
-	memory_pool mempool;
+	memory_pool *mempool;
 	struct dialog_object_pool *objpool;
 	const struct dialog_layout *layout;
 
@@ -498,7 +498,7 @@ static int dialog_add_trigger(struct _dialog_box *di, WORD dialog_item,
 	assert(di);
 	assert(trigger_flags);
 
-	trigger = (struct dialog_info_trigger *) pool_malloc(&di->mempool, sizeof(struct dialog_info_trigger));
+	trigger = (struct dialog_info_trigger *) pool_malloc(di->mempool, sizeof(struct dialog_info_trigger));
 	if (!trigger)
 		return 1;
 
@@ -533,7 +533,7 @@ static int dialog_add_object(dialog_box *di, HGDIOBJ obj)
 
 	if (!di->objpool)
 	{
-		objpool = pool_malloc(&di->mempool, sizeof(struct dialog_object_pool));
+		objpool = pool_malloc(di->mempool, sizeof(struct dialog_object_pool));
 		if (!objpool)
 			return 1;
 		memset(objpool, 0, sizeof(struct dialog_object_pool));
@@ -679,7 +679,7 @@ dialog_box *win_dialog_init(const char *title, const struct dialog_layout *layou
 	memset(di, 0, sizeof(*di));
 
 	di->layout = layout;
-	pool_init(&di->mempool);
+	di->mempool = pool_create(NULL);
 
 	memset(&dlg_template, 0, sizeof(dlg_template));
 	dlg_template.style = di->style = DIALOG_STYLE;
@@ -837,7 +837,7 @@ int win_dialog_add_combobox_item(dialog_box *dialog, const char *item_label, int
 	// create our own copy of the string
 	if (item_label)
 	{
-		item_label = pool_strdup(&dialog->mempool, item_label);
+		item_label = pool_strdup(dialog->mempool, item_label);
 		if (!item_label)
 			return 1;
 	}
@@ -1229,7 +1229,7 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 	if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_ENDELLIPSIS | ES_CENTER | SS_SUNKEN,
 			x, y, cx, cy, NULL, DLGITEM_EDIT, NULL))
 		return 1;
-	stuff = (struct seqselect_stuff *) pool_malloc(&di->mempool, sizeof(struct seqselect_stuff));
+	stuff = (struct seqselect_stuff *) pool_malloc(di->mempool, sizeof(struct seqselect_stuff));
 	if (!stuff)
 		return 1;
 	memset(stuff, 0, sizeof(*stuff));
@@ -1528,7 +1528,7 @@ void win_dialog_exit(dialog_box *dialog)
 
 	if (dialog->handle)
 		GlobalFree(dialog->handle);
-	pool_exit(&dialog->mempool);
+	pool_free(dialog->mempool);
 	free(dialog);
 }
 
@@ -1540,7 +1540,7 @@ void win_dialog_exit(dialog_box *dialog)
 
 void *win_dialog_malloc(dialog_box *dialog, size_t size)
 {
-	return pool_malloc(&dialog->mempool, size);
+	return pool_malloc(dialog->mempool, size);
 }
 
 
@@ -1551,7 +1551,7 @@ void *win_dialog_malloc(dialog_box *dialog, size_t size)
 
 char *win_dialog_strdup(dialog_box *dialog, const char *s)
 {
-	return pool_strdup(&dialog->mempool, s);
+	return pool_strdup(dialog->mempool, s);
 }
 
 
@@ -1562,7 +1562,7 @@ char *win_dialog_strdup(dialog_box *dialog, const char *s)
 
 WCHAR *win_dialog_wcsdup(dialog_box *dialog, const WCHAR *s)
 {
-	WCHAR *result = (WCHAR *) pool_malloc(&dialog->mempool, (wcslen(s) + 1) * sizeof(*s));
+	WCHAR *result = (WCHAR *) pool_malloc(dialog->mempool, (wcslen(s) + 1) * sizeof(*s));
 	if (result)
 		wcscpy(result, s);
 	return result;

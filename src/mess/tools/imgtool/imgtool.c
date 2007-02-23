@@ -26,7 +26,7 @@
 struct _imgtool_image
 {
 	const imgtool_module *module;
-	memory_pool pool;
+	memory_pool *pool;
 };
 
 struct _imgtool_partition
@@ -546,7 +546,7 @@ imgtoolerr_t imgtool_image_list_partitions(imgtool_image *image, imgtool_partiti
 
 void *imgtool_image_malloc(imgtool_image *image, size_t size)
 {
-	return pool_malloc(&image->pool, size);
+	return pool_malloc(image->pool, size);
 }
 
 
@@ -992,7 +992,7 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 		goto done;
 	}
 	memset(image, '\0', size);
-	pool_init(&image->pool);
+	image->pool = pool_create(NULL);
 	image->module = module;
 	
 	/* actually call create or open */
@@ -1064,7 +1064,7 @@ void imgtool_image_close(imgtool_image *image)
 {
 	if (image->module->close)
 		image->module->close(image);
-	pool_exit(&image->pool);
+	pool_free(image->pool);
 	free(image);
 }
 

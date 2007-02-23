@@ -16,7 +16,7 @@ struct messdocs_state
 	const char *title;
 	const char *default_topic;
 
-	memory_pool pool;
+	memory_pool *pool;
 	XML_Parser parser;
 	int depth;
 	int error;
@@ -229,7 +229,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 
 		title = find_attribute(attributes, "title");
 		if (title)
-			state->title = pool_strdup(&state->pool, title);
+			state->title = pool_strdup(state->pool, title);
 	}
 	else if (!strcmp(tagname, "topic"))
 	{
@@ -247,7 +247,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 		copy_file_to_dest(state->dest_dir, state->toc_dir, filepath);
 
 		if (!state->default_topic)
-			state->default_topic = pool_strdup(&state->pool, filepath);
+			state->default_topic = pool_strdup(state->pool, filepath);
 	}
 	else if (!strcmp(tagname, "folder"))
 	{
@@ -303,10 +303,10 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 					s = strchr(buf, '=');
 					s = s ? s + 1 : &buf[strlen(buf)];
 
-					sysinfo_array = pool_realloc(&state->pool, sysinfo_array, sizeof(*sysinfo_array) * (sys_count + 1));
+					sysinfo_array = pool_realloc(state->pool, sysinfo_array, sizeof(*sysinfo_array) * (sys_count + 1));
 					if (!sysinfo_array)
 						goto outofmemory;
-					sysinfo_array[sys_count].name = pool_strdup(&state->pool, s);
+					sysinfo_array[sys_count].name = pool_strdup(state->pool, s);
 					sysinfo_array[sys_count].desc = NULL;
 
 					sysname = sysinfo_array[sys_count].name;
@@ -344,7 +344,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 					fprintf(sysfile, "<p><i>(directory: %s)</i></p>\n", sysname);
 
 					if (!sysinfo_array[sys_count-1].desc)
-						sysinfo_array[sys_count-1].desc = pool_strdup(&state->pool, buf);
+						sysinfo_array[sys_count-1].desc = pool_strdup(state->pool, buf);
 				}
 				else if (buf[strlen(buf)-1] == ':')
 				{
@@ -466,7 +466,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	char *s;
 
 	memset(&state, 0, sizeof(state));
-	pool_init(&state.pool);
+	state.pool = pool_create(NULL);
 
 	/* open the DOC */
 	in = fopen(toc_filename, "r");
@@ -477,7 +477,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	}
 
 	/* figure out the TOC directory */
-	state.toc_dir = pool_strdup(&state.pool, toc_filename);
+	state.toc_dir = pool_strdup(state.pool, toc_filename);
 	if (!state.toc_dir)
 		goto outofmemory;
 	for (i = strlen(state.toc_dir) - 1; (i > 0) && !osd_is_path_separator(state.toc_dir[i]); i--)
@@ -488,7 +488,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	osd_mkdir(dest_dir);
 
 	/* create the help contents file */
-	s = pool_malloc(&state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
+	s = pool_malloc(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
 	if (!s)
 		goto outofmemory;
 	strcpy(s, dest_dir);
@@ -541,7 +541,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 
 
 	/* create the help project file */
-	s = pool_malloc(&state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
+	s = pool_malloc(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
 	if (!s)
 		goto outofmemory;
 	strcpy(s, dest_dir);
@@ -564,7 +564,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	fclose(chm_hhp);
 
 	/* finish up */
-	pool_exit(&state.pool);
+	pool_free(state.pool);
 	return state.error ? -1 : 0;
 
 outofmemory:

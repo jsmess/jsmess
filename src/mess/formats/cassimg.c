@@ -32,7 +32,7 @@ struct _cassette_image
 {
 	const struct CassetteFormat *format;
 	struct io_generic io;
-	memory_pool pool;
+	memory_pool *pool;
 
 	int channels;
 	int flags;
@@ -115,7 +115,7 @@ static cassette_image *cassette_init(const struct CassetteFormat *format, void *
 	cassette->io.file = file;
 	cassette->io.procs = procs;
 	cassette->flags = flags;
-	pool_init(&cassette->pool);
+	cassette->pool = pool_create(NULL);
 	return cassette;
 }
 
@@ -302,7 +302,7 @@ void cassette_close(cassette_image *cassette)
 {
 	if ((cassette->flags & CASSETTE_FLAG_DIRTY) && (cassette->flags & CASSETTE_FLAG_SAVEONEXIT))
 		cassette_save(cassette);
-	pool_exit(&cassette->pool);
+	pool_free(cassette->pool);
 	free(cassette);
 }
 
@@ -418,7 +418,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 
 		/* allocate new blocks */
 		new_block_count = sample_block + 1;
-		new_blocks = pool_realloc(&cassette->pool, cassette->blocks, new_block_count * sizeof(cassette->blocks[0]));
+		new_blocks = pool_realloc(cassette->pool, cassette->blocks, new_block_count * sizeof(cassette->blocks[0]));
 		if (!new_blocks)
 			return CASSETTE_ERROR_OUTOFMEMORY;
 
@@ -437,7 +437,7 @@ static casserr_t lookup_sample(cassette_image *cassette, int channel, size_t sam
 
 		new_block_sample_count = SAMPLES_PER_BLOCK;
 
-		new_block = pool_realloc(&cassette->pool, block->block, new_block_sample_count * sample_size);
+		new_block = pool_realloc(cassette->pool, block->block, new_block_sample_count * sample_size);
 		if (!new_block)
 			return CASSETTE_ERROR_OUTOFMEMORY;
 

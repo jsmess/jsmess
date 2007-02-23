@@ -17,7 +17,7 @@
 #include "unzip.h"
 #include "devices/flopdrv.h"
 #include "utils.h"
-#include "pool.h"
+#include "tagpool.h"
 #include "hashfile.h"
 #include "mamecore.h"
 
@@ -31,7 +31,7 @@ struct _mess_image
 {
 	/* variables that persist across image mounts */
 	tag_pool tagpool;
-	memory_pool mempool;
+	memory_pool *mempool;
 	const struct IODevice *dev;
 
 	/* error related info */
@@ -131,6 +131,8 @@ int image_init(void)
 	{
 		for (j = 0; j < Machine->devices[i].count; j++)
 		{
+			images[indx + j].mempool = pool_create(NULL);
+
 			/* setup the device */
 			tagpool_init(&images[indx + j].tagpool);
 			images[indx + j].dev = &Machine->devices[i];
@@ -203,7 +205,7 @@ static image_error_t set_image_filename(mess_image *image, const char *filename,
 	int pos;
 
 	/* create the directory string */
-	new_dir = image_strdup(image, filename);
+	new_dir = filename ? image_strdup(image, filename) : NULL;
 	for (pos = strlen(new_dir); (pos > 0); pos--)
 	{
 		if (strchr(":\\/", new_dir[pos - 1]))
@@ -652,7 +654,7 @@ static void image_clear(mess_image *image)
 		image->file = NULL;
 	}
 
-	pool_exit(&image->mempool);
+	pool_free(image->mempool);
 	image->writeable = 0;
 	image->created = 0;
 	image->name = NULL;
@@ -1230,7 +1232,7 @@ void *image_ptr(mess_image *image)
 void *image_malloc(mess_image *image, size_t size)
 {
 	assert(is_loaded(image) || image->is_loading);
-	return pool_malloc(&image->mempool, size);
+	return pool_malloc(image->mempool, size);
 }
 
 
@@ -1238,7 +1240,7 @@ void *image_malloc(mess_image *image, size_t size)
 void *image_realloc(mess_image *image, void *ptr, size_t size)
 {
 	assert(is_loaded(image) || image->is_loading);
-	return pool_realloc(&image->mempool, ptr, size);
+	return pool_realloc(image->mempool, ptr, size);
 }
 
 
@@ -1246,14 +1248,14 @@ void *image_realloc(mess_image *image, void *ptr, size_t size)
 char *image_strdup(mess_image *image, const char *src)
 {
 	assert(is_loaded(image) || image->is_loading);
-	return pool_strdup(&image->mempool, src);
+	return pool_strdup(image->mempool, src);
 }
 
 
 
 void image_freeptr(mess_image *image, void *ptr)
 {
-	pool_freeptr(&image->mempool, ptr);
+	pool_realloc(image->mempool, ptr, 0);
 }
 
 

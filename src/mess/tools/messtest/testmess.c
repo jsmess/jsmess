@@ -145,7 +145,7 @@ static render_target *target;
 
 /* command list */
 static mess_pile command_pile;
-static memory_pool command_pool;
+static memory_pool *command_pool;
 static int command_count;
 static struct messtest_command new_command;
 
@@ -1350,7 +1350,7 @@ static void node_memverify(xml_data_node *node)
 
 	pile_init(&pile);
 	messtest_get_data(node, &pile);
-	new_buffer = pool_malloc(&command_pool, pile_size(&pile));
+	new_buffer = pool_malloc(command_pool, pile_size(&pile));
 	memcpy(new_buffer, pile_getptr(&pile), pile_size(&pile));
 	new_command.u.verify_args.verify_data = new_buffer;
 	new_command.u.verify_args.verify_data_size = pile_size(&pile);
@@ -1397,7 +1397,7 @@ static void node_imageverify(xml_data_node *node)
 
 	pile_init(&pile);
 	messtest_get_data(node, &pile);
-	new_buffer = pool_malloc(&command_pool, pile_size(&pile));
+	new_buffer = pool_malloc(command_pool, pile_size(&pile));
 	memcpy(new_buffer, pile_getptr(&pile), pile_size(&pile));
 	new_command.u.verify_args.verify_data = new_buffer;
 	new_command.u.verify_args.verify_data_size = pile_size(&pile);
@@ -1415,7 +1415,7 @@ static void node_imageverify(xml_data_node *node)
 static void verify_end_handler(const void *buffer, size_t size)
 {
 	void *new_buffer;
-	new_buffer = pool_malloc(&command_pool, size);
+	new_buffer = pool_malloc(command_pool, size);
 	memcpy(new_buffer, buffer, size);
 
 	new_command.u.verify_args.verify_data = new_buffer;
@@ -1483,7 +1483,7 @@ void node_testmess(xml_data_node *node)
 	int result;
 
 	pile_init(&command_pile);
-	pool_init(&command_pool);
+	command_pool = pool_create(NULL);
 
 	memset(&new_command, 0, sizeof(new_command));
 	command_count = 0;
@@ -1569,5 +1569,5 @@ void node_testmess(xml_data_node *node)
 
 	report_testcase_ran(result);
 	pile_delete(&command_pile);
-	pool_exit(&command_pool);
+	pool_free(command_pool);
 }

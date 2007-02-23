@@ -1138,6 +1138,7 @@ EMUOBJS +=							\
 	$(MESS_EMUOBJ)/eventlst.o			\
 	$(MESS_EMUOBJ)/mscommon.o			\
 	$(MESS_EMUOBJ)/pool.o				\
+	$(MESS_EMUOBJ)/tagpool.o			\
 	$(MESS_EMUOBJ)/cheatms.o			\
 	$(MESS_EMUOBJ)/opresolv.o			\
 	$(MESS_EMUOBJ)/muitext.o			\

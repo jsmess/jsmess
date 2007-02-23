@@ -20,7 +20,7 @@
 struct _hash_file
 {
 	mame_file *file;
-	memory_pool pool;
+	memory_pool *pool;
 	unsigned int functions[IO_COUNT];
 
 	struct hash_info **preloaded_hashes;
@@ -200,12 +200,12 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			/* do we use this hash? */
 			if (!state->selector_proc || state->selector_proc(state->hashfile, state->param, name, hash_string))
 			{
-				hi = pool_malloc(&state->hashfile->pool, sizeof(struct hash_info));
+				hi = pool_malloc(state->hashfile->pool, sizeof(struct hash_info));
 				if (!hi)
 					return;
 				memset(hi, 0, sizeof(*hi));
 
-				hi->longname = pool_strdup(&state->hashfile->pool, name);
+				hi->longname = pool_strdup(state->hashfile->pool, name);
 				if (!hi->longname)
 					return;
 
@@ -275,7 +275,7 @@ static void data_handler(void *data, const XML_Char *s, int len)
 		text = *state->text_dest;
 
 		text_len = text ? strlen(text) : 0;
-		text = pool_realloc(&state->hashfile->pool, text, text_len + len + 1);
+		text = pool_realloc(state->hashfile->pool, text, text_len + len + 1);
 		if (!text)
 			return;
 
@@ -341,7 +341,7 @@ static void preload_use_proc(hash_file *hashfile, void *param, struct hash_info 
 {
 	struct hash_info **new_preloaded_hashes;
 
-	new_preloaded_hashes = pool_realloc(&hashfile->pool, hashfile->preloaded_hashes,
+	new_preloaded_hashes = pool_realloc(hashfile->pool, hashfile->preloaded_hashes,
 		(hashfile->preloaded_hash_count + 1) * sizeof(struct hash_info *));
 	if (!new_preloaded_hashes)
 		return;
@@ -363,7 +363,7 @@ hash_file *hashfile_open(const char *sysname, int is_preload,
 	if (!hashfile)
 		goto error;
 	memset(hashfile, 0, sizeof(*hashfile));
-	pool_init(&hashfile->pool);
+	hashfile->pool = pool_create(error_proc);
 	hashfile->error_proc = error_proc;
 
 	/* open a file */
@@ -389,7 +389,7 @@ error:
 
 void hashfile_close(hash_file *hashfile)
 {
-	pool_exit(&hashfile->pool);
+	pool_free(hashfile->pool);
 	if (hashfile->file)
 		mame_fclose(hashfile->file);
 	free(hashfile);

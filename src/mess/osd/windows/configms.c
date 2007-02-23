@@ -32,7 +32,7 @@ int win_write_config;
 
 static int added_device_options;
 static char *dev_dirs[IO_COUNT];
-static memory_pool mess_options_pool;
+static memory_pool *mess_options_pool;
 
 static const options_entry mess_opts[] =
 {
@@ -196,6 +196,7 @@ void win_add_mess_device_options(const game_driver *gamedrv)
 	options_entry *opts;
 	const char *dev_name;
 	const char *dev_short_name;
+	const char *dev_tag_original;
 	const char *dev_tag;
 	char dev_full_name[128];
 
@@ -215,14 +216,14 @@ void win_add_mess_device_options(const game_driver *gamedrv)
 	if (dev_count > 0)
 	{
 		// add a separator
-		opts = pool_malloc(&mess_options_pool, sizeof(*opts) * 2);
+		opts = pool_malloc(mess_options_pool, sizeof(*opts) * 2);
 		memset(opts, 0, sizeof(*opts) * 2);
 		opts[0].description = "MESS DEVICES";
 		opts[0].flags = OPTION_HEADER;
 		options_add_entries(opts);
 
 		// we need to save all options
-		device_options = pool_malloc(&mess_options_pool, sizeof(*device_options) * (dev_count + 1));
+		device_options = pool_malloc(mess_options_pool, sizeof(*device_options) * (dev_count + 1));
 		memset(device_options, 0, sizeof(*device_options) * (dev_count + 1));
 
 		// list all options
@@ -234,7 +235,8 @@ void win_add_mess_device_options(const game_driver *gamedrv)
 			// retrieve info about the device
 			devtype = (iodevice_t) (int) device_get_info_int(&devclass, DEVINFO_INT_TYPE);
 			count = (int) device_get_info_int(&devclass, DEVINFO_INT_COUNT);
-			dev_tag = pool_strdup(&mess_options_pool, device_get_info_string(&devclass, DEVINFO_STR_DEV_TAG));
+			dev_tag_original = device_get_info_string(&devclass, DEVINFO_STR_DEV_TAG);
+			dev_tag = dev_tag_original ? pool_strdup(mess_options_pool, dev_tag_original) : dev_tag_original;
 
 			device_options[dev].count = count;
 
@@ -247,11 +249,11 @@ void win_add_mess_device_options(const game_driver *gamedrv)
 					"%s;%s", dev_name, dev_short_name);
 
 				// dynamically allocate the option
-				dev_option = pool_malloc(&mess_options_pool, sizeof(*dev_option));
+				dev_option = pool_malloc(mess_options_pool, sizeof(*dev_option));
 				memset(dev_option, 0, sizeof(*dev_option));
 
 				// populate the options
-				dev_option->opts[0].name = pool_strdup(&mess_options_pool, dev_full_name);
+				dev_option->opts[0].name = pool_strdup(mess_options_pool, dev_full_name);
 				dev_option->devtype = devtype;
 				dev_option->tag = dev_tag;
 				dev_option->index = id;
@@ -299,7 +301,7 @@ void osd_begin_final_unloading(void)
 				filename_ptr = &device_options[opt].opts[i]->filename;
 				if (*filename_ptr)
 				{
-					pool_freeptr(&mess_options_pool, *filename_ptr);
+					pool_realloc(mess_options_pool, *filename_ptr, 0);
 					*filename_ptr = NULL;
 				}
 
@@ -308,7 +310,7 @@ void osd_begin_final_unloading(void)
 
 				// place new filename, if there
 				if (image)
-					*filename_ptr = pool_strdup(&mess_options_pool, image_filename(image));
+					*filename_ptr = pool_strdup(mess_options_pool, image_filename(image));
 			}
 			opt++;
 		}
@@ -382,7 +384,7 @@ void win_mess_extract_options(void)
 					options.image_files[options.image_count].device_type = dev_option->devtype;
 					options.image_files[options.image_count].device_tag = dev_option->tag;
 					options.image_files[options.image_count].device_index = dev_option->index;
-					options.image_files[options.image_count].name = pool_strdup(&mess_options_pool, filename);
+					options.image_files[options.image_count].name = pool_strdup(mess_options_pool, filename);
 					options.image_count++;
 				}
 			}
@@ -412,5 +414,5 @@ void win_mess_options_init(void)
 	added_device_options = FALSE;
 	options_add_entries(mess_opts);
 	options_set_option_callback(OPTION_UNADORNED(0), win_mess_driver_name_callback);
-	pool_init(&mess_options_pool);
+	mess_options_pool = pool_create(NULL);
 }

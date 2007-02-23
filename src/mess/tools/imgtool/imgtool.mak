@@ -5,6 +5,7 @@ IMGTOOL_LIB_OBJS =							\
 	$(OBJ)/version.o						\
 	$(OBJ)/mess/utils.o						\
 	$(OBJ)/mess/pool.o						\
+	$(OBJ)/mess/tagpool.o					\
 	$(OBJ)/mess/opresolv.o					\
 	$(OBJ)/mess/formats/ioprocs.o			\
 	$(OBJ)/mess/formats/flopimg.o			\
