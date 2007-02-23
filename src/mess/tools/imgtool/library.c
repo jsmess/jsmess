@@ -27,14 +27,28 @@ struct _imgtool_library
 imgtool_library *imgtool_library_create(void)
 {
 	imgtool_library *library;
+	memory_pool *pool;
 
-	library = malloc(sizeof(struct _imgtool_library));
+	/* create a memory pool */
+	pool = pool_create(NULL);
+	if (!pool)
+		goto error;
+
+	/* allocate the main structure */
+	library = pool_malloc(pool, sizeof(struct _imgtool_library));
 	if (!library)
-		return NULL;
-	memset(library, 0, sizeof(*library));
+		goto error;
 
-	library->pool = pool_create(NULL);
+	/* initialize the structure */
+	memset(library, 0, sizeof(*library));
+	library->pool = pool;
+
 	return library;
+
+error:
+	if (pool)
+		pool_free(pool);
+	return NULL;
 }
 
 

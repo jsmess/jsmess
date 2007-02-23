@@ -54,9 +54,7 @@ void artwork_use_device_art(mess_image *img, const char *defaultartfile)
 			len += strlen(strs[i]) + 1;
 	}
 
-	override_artfile = malloc(len);
-	if (!override_artfile)
-		return;
+	override_artfile = malloc_or_die(len);
 	override_artfile[len - 1] = '\0';
 
 	/* now actually concatenate the strings */

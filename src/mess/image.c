@@ -89,6 +89,17 @@ static void image_clear_error(mess_image *image);
 ***************************************************************************/
 
 /*-------------------------------------------------
+    memory_error - report a memory error
+-------------------------------------------------*/
+
+static void memory_error(const char *message)
+{
+	fatalerror("%s", message);
+}
+
+
+
+/*-------------------------------------------------
     image_init - initialize the core image system
 -------------------------------------------------*/
 
@@ -124,14 +135,13 @@ int image_init(void)
 		memset(images, 0, count * sizeof(*images));
 	}
 
-
 	/* initialize the devices */
 	indx = 0;
 	for (i = 0; Machine->devices[i].type < IO_COUNT; i++)
 	{
 		for (j = 0; j < Machine->devices[i].count; j++)
 		{
-			images[indx + j].mempool = pool_create(NULL);
+			images[indx + j].mempool = pool_create(memory_error);
 
 			/* setup the device */
 			tagpool_init(&images[indx + j].tagpool);
@@ -758,7 +768,7 @@ static void image_clear_error(mess_image *image)
 	image->err = IMAGE_ERROR_SUCCESS;
 	if (image->err_message)
 	{
-		free(image->err_message);
+		image_freeptr(image, image->err_message);
 		image->err_message = NULL;
 	}
 }
@@ -799,9 +809,7 @@ void image_seterror(mess_image *image, image_error_t err, const char *message)
 	image->err = err;
 	if (message)
 	{
-		image->err_message = malloc(strlen(message) + 1);
-		if (image->err_message)
-			strcpy(image->err_message, message);
+		image->err_message = image_strdup(image, message);
 	}
 }
 
@@ -869,7 +877,7 @@ done:
 
 
 
-static int run_hash(mess_image *image,
+static void run_hash(mess_image *image,
 	void (*partialhash)(char *, const unsigned char *, unsigned long, unsigned int),
 	char *dest, unsigned int hash_functions)
 {
@@ -879,9 +887,7 @@ static int run_hash(mess_image *image,
 	*dest = '\0';
 	size = (UINT32) image_length(image);
 
-	buf = (UINT8 *) malloc(size);
-	if (!buf)
-		return FALSE;
+	buf = (UINT8 *) malloc_or_die(size);
 
 	/* read the file */
 	image_fseek(image, 0, SEEK_SET);
@@ -893,10 +899,8 @@ static int run_hash(mess_image *image,
 		hash_compute(dest, buf, size, hash_functions);
 
 	/* cleanup */
-	if (buf)
-		free(buf);
+	free(buf);
 	image_fseek(image, 0, SEEK_SET);
-	return TRUE;
 }
 
 
@@ -922,12 +926,9 @@ static int image_checkhash(mess_image *image)
 		if (dev->type == IO_CDROM)
 			return FALSE;
 
-		if (!run_hash(image, dev->partialhash, hash_string, HASH_CRC | HASH_MD5 | HASH_SHA1))
-			return FALSE;
+		run_hash(image, dev->partialhash, hash_string, HASH_CRC | HASH_MD5 | HASH_SHA1);
 
 		image->hash = image_strdup(image, hash_string);
-		if (!image->hash)
-			return FALSE;
 
 		/* now read the hash file */
 		drv = Machine->gamedrv;
@@ -1199,8 +1200,6 @@ void *image_ptr(mess_image *image)
 
 		/* allocate the memory */
 		ptr = image_malloc(image, (UINT32) size);
-		if (!ptr)
-			return NULL;
 
 		/* save current position */
 		pos = image_ftell(image);

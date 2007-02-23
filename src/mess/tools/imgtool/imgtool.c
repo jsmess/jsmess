@@ -963,6 +963,7 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 	imgtoolerr_t err;
 	imgtool_stream *f = NULL;
 	imgtool_image *image = NULL;
+	memory_pool *pool = NULL;
 	size_t size;
 
 	if (outimg)
@@ -972,6 +973,14 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 	if ((read_or_write == OSD_FOPEN_RW_CREATE) ? !module->create : !module->open)
 	{
 		err = IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY;
+		goto done;
+	}
+
+	/* create a memory pool */
+	pool = pool_create(NULL);
+	if (!pool)
+	{
+		err = IMGTOOLERR_OUTOFMEMORY;
 		goto done;
 	}
 
@@ -985,14 +994,14 @@ static imgtoolerr_t internal_open(const imgtool_module *module, const char *fnam
 
 	/* setup the image structure */
 	size = sizeof(struct _imgtool_image) + module->image_extra_bytes;
-	image = (imgtool_image *) malloc(size);
+	image = (imgtool_image *) pool_malloc(pool, size);
 	if (!image)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
 		goto done;
 	}
 	memset(image, '\0', size);
-	image->pool = pool_create(NULL);
+	image->pool = pool;
 	image->module = module;
 	
 	/* actually call create or open */
@@ -1011,11 +1020,9 @@ done:
 	{
 		if (f)
 			stream_close(f);
-		if (image)
-		{
-			free(image);
-			image = NULL;
-		}
+		if (pool)
+			pool_free(pool);
+		image = NULL;
 	}
 
 	if (outimg)
@@ -1065,7 +1072,6 @@ void imgtool_image_close(imgtool_image *image)
 	if (image->module->close)
 		image->module->close(image);
 	pool_free(image->pool);
-	free(image);
 }
 
 

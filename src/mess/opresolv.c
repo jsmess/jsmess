@@ -206,18 +206,24 @@ option_resolution *option_resolution_create(const struct OptionGuide *guide, con
 	const struct OptionGuide *guide_entry;
 	int option_count;
 	int opt = -1;
+	memory_pool *pool;
 
 	assert(guide);
 
 	/* first count the number of options specified in the guide */
 	option_count = option_resolution_countoptions(guide, specification);
 
+	/* create a memory pool for this structure */
+	pool = pool_create(NULL);
+	if (!pool)
+		goto outofmemory;
+
 	/* allocate the main structure */
-	resolution = malloc(sizeof(option_resolution));
+	resolution = pool_malloc(pool, sizeof(option_resolution));
 	if (!resolution)
 		goto outofmemory;
 	memset(resolution, 0, sizeof(*resolution));
-	resolution->pool = pool_create(NULL);
+	resolution->pool = pool;
 
 	/* set up the entries list */
 	resolution->option_count = option_count;
@@ -350,7 +356,6 @@ done:
 void option_resolution_close(option_resolution *resolution)
 {
 	pool_free(resolution->pool);
-	free(resolution);
 }
 
 
