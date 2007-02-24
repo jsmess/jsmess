@@ -309,7 +309,7 @@ void osd_begin_final_unloading(void)
 				image = image_from_device_and_index(dev, i);
 
 				// place new filename, if there
-				if (image)
+				if (image_exists(image))
 					*filename_ptr = pool_strdup(mess_options_pool, image_filename(image));
 			}
 			opt++;
