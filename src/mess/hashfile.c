@@ -342,7 +342,7 @@ static void preload_use_proc(hash_file *hashfile, void *param, struct hash_info 
 	struct hash_info **new_preloaded_hashes;
 
 	new_preloaded_hashes = pool_realloc(hashfile->pool, hashfile->preloaded_hashes,
-		(hashfile->preloaded_hash_count + 1) * sizeof(struct hash_info *));
+		(hashfile->preloaded_hash_count + 1) * sizeof(*new_preloaded_hashes));
 	if (!new_preloaded_hashes)
 		return;
 

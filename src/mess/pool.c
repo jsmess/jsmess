@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include <stdarg.h>
+#include <stddef.h>
 #include "pool.h"
 #include "coreutil.h"
 
@@ -186,7 +187,7 @@ void *pool_realloc_file_line(memory_pool *pool, void *ptr, size_t size, const ch
 		}
 
 		/* reallocate the entry */
-		new_entry = realloc(*entry, sizeof(*entry) - sizeof((*entry)->buffer) + size);
+		new_entry = realloc(*entry, offsetof(pool_entry, buffer) + size);
 		if (!new_entry)
 		{
 			report_failure(pool, "Failure to realloc %u bytes", size);
