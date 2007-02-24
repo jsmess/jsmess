@@ -28,6 +28,8 @@ System Driver Changes:
 
 - [SORDM5] Fixed regression introduced in 0.112.  (bug #1082) [Nate Woods]
 
+- [SVISION] Many improvements and fixed.  [PeT]
+
 
 
 User Interface Changes:
