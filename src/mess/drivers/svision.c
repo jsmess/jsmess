@@ -368,13 +368,6 @@ static VIDEO_UPDATE( svision )
 	int x, y, i, j=XPOS/4+YPOS*0x30;
 	UINT8 *vram= videoram;
 
-	if (svision_channel->count)
-		svision_channel->count--;
-	if (svision_channel[1].count)
-		svision_channel[1].count--;  
-	if (svision_noise.count)
-		svision_noise.count--;
-
 	if (BANK&8)
 	{
 		for (y=0; y<160; y++)
@@ -406,13 +399,6 @@ static VIDEO_UPDATE( tvlink )
 	int x, y, i, j = XPOS/4+YPOS*0x30;
 	UINT8 *vram = videoram;
 
-	if (svision_channel->count)
-		svision_channel->count--;
-	if (svision_channel[1].count)
-		svision_channel[1].count--;  
-	if (svision_noise.count)
-		svision_noise.count--;
-
 	if (BANK & 8)
 	{
 		for (y = 0; y < 160; y++)
@@ -443,6 +429,13 @@ static INTERRUPT_GEN( svision_frame_int )
 {
 	if (BANK&1)
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+
+	if (svision_channel->count)
+		svision_channel->count--;
+	if (svision_channel[1].count)
+		svision_channel[1].count--;  
+	if (svision_noise.count)
+		svision_noise.count--;
 }
 
 static DRIVER_INIT( svision )
