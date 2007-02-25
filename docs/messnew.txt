@@ -2,7 +2,8 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- Sega Saturn (NTSC)  (not working) [R. Belmont]
+- Sega Saturn (PAL)  (not working) [R. Belmont]
 
 
 

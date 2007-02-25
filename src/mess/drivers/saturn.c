@@ -2412,19 +2412,18 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
+SYSTEM_BIOS_START( saturn )
+	SYSTEM_BIOS_ADD( 0, "japan", "Japan v1.01 (941228)" )
+	SYSTEM_BIOS_ADD( 1, "us", "US v1.00 (940921)" )
+	//SYSTEM_BIOS_ADD( 2, "us", "US ???" )
+SYSTEM_BIOS_END
+
 ROM_START(saturn)
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
-	ROM_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c))
-	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
-	ROM_COPY( REGION_CPU1,0,0,0x080000)
-	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
-	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* VDP2 GFX */
-	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* VDP1 GFX */
-ROM_END
-
-ROM_START(saturnus)
-	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
-	ROM_LOAD("sega_us.bin", 0x00000000, 0x00080000, CRC(f90f0089))
+	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(1))
+	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(2))
+	/* This ROM was in the TESTDRIVER, but isn't available anywhere? */
+	//ROMX_LOAD("sega_us.bin", 0x00000000, 0x00080000, CRC(f90f0089), ROM_BIOS(3))
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
@@ -2434,7 +2433,7 @@ ROM_END
 
 ROM_START(saturneu)
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
-	ROM_LOAD("sega_eu.bin", 0x00000000, 0x00080000, CRC(4afcf0fa))
+	ROM_LOAD("sega_eu.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3))
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
@@ -2465,8 +2464,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY	FULLNAME */
-CONS(1994, saturn,	0,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (Japan v1.01)", GAME_NOT_WORKING)
-CONS(1994, saturnus,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (US)", GAME_NOT_WORKING)
-CONS(1994, saturneu,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (Europe)", GAME_NOT_WORKING)
-
-
+CONSB(1994, saturn,	0,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (NTSC)", GAME_NOT_WORKING)
+CONS(1994, saturneu,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (PAL)", GAME_NOT_WORKING)

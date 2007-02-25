@@ -132,9 +132,8 @@ const game_driver *test_drivers[] =
 	DRIVER( gen_usa )	/* Sega Genesis/MegaDrive USA							*/
 	DRIVER( gen_eur )	/* Sega Genesis/MegaDrive Europe						*/
 	DRIVER( gen_jpn )	/* Sega Genesis/MegaDrive Japan						*/
-	DRIVER( saturn )	/* Sega Saturn (Japan v1.01)						*/
-	DRIVER( saturnus )	/* Sega Saturn (US)									*/
-	DRIVER( saturneu )	/* Sega Saturn (Europe)								*/
+	DRIVER( saturn )	/* Sega Saturn (NTSC)								*/
+	DRIVER( saturneu )	/* Sega Saturn (PAL)								*/
 
 	/* BALLY */
 	DRIVER( astrocde )	/* Bally Astrocade									*/
