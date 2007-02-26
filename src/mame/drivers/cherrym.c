@@ -1,8 +1,6 @@
 /*
 
-AGEMAME driver by Curt Coder
-
-Any fixes for this driver should be forwarded to AGEMAME at (http://www.mameworld.net/agemame)
+Driver by Curt Coder
 
 */
 
@@ -439,4 +437,4 @@ ROM_START( cmv801 )
 	ROM_LOAD( "prom3.287", 0x0200, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 ROM_END
 
-GAME( 198?, cmv801, 0, cmv801, cmv801, 0, ROT0, "Corsica", "Cherry Master (v8.01)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS|GAME_NOT_WORKING )
+GAME( 198?, cmv801, 0, cmv801, cmv801, 0, ROT0, "Corsica", "Cherry Master (v8.01)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )

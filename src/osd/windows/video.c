@@ -45,6 +45,14 @@
 
 
 //============================================================
+//  DEBUGGING
+//============================================================
+
+#define LOG_THROTTLE				(1)
+
+
+
+//============================================================
 //  CONSTANTS
 //============================================================
 
@@ -55,9 +63,20 @@
 #define PAUSED_REFRESH_RATE			60
 
 
+
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+typedef struct _throttle_info throttle_info;
+struct _throttle_info
+{
+	osd_ticks_t 		last_ticks;				/* last osd_ticks() value we read */
+	mame_time 			realtime;				/* current realtime */
+	mame_time 			emutime;				/* current emulated time */
+	UINT32				history;				/* history of in-time frames */
+};
+
 
 
 //============================================================
@@ -85,9 +104,7 @@ static osd_ticks_t fps_end_time;
 static int fps_frames_displayed;
 
 // throttling calculations
-static osd_ticks_t throttle_last_ticks;
-static mame_time throttle_realtime;
-static mame_time throttle_emutime;
+static throttle_info throttle;
 
 // frameskipping
 static int frameskip_counter;
@@ -110,22 +127,6 @@ static const int skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 	{ 0,1,1,1,1,1,1,1,1,1,1,1 }
 };
 
-static const int waittable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
-{
-	{ 1,1,1,1,1,1,1,1,1,1,1,1 },
-	{ 2,1,1,1,1,1,1,1,1,1,1,0 },
-	{ 2,1,1,1,1,0,2,1,1,1,1,0 },
-	{ 2,1,1,0,2,1,1,0,2,1,1,0 },
-	{ 2,1,0,2,1,0,2,1,0,2,1,0 },
-	{ 2,0,2,1,0,2,0,2,1,0,2,0 },
-	{ 2,0,2,0,2,0,2,0,2,0,2,0 },
-	{ 2,0,2,0,0,3,0,2,0,0,3,0 },
-	{ 3,0,0,3,0,0,3,0,0,3,0,0 },
-	{ 4,0,0,0,4,0,0,0,4,0,0,0 },
-	{ 6,0,0,0,0,0,6,0,0,0,0,0 },
-	{12,0,0,0,0,0,0,0,0,0,0,0 }
-};
-
 
 
 //============================================================
@@ -138,6 +139,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 static win_monitor_info *pick_monitor(int index);
 
 static void update_throttle(mame_time emutime);
+static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks);
 static void update_fps(mame_time emutime);
 static void update_autoframeskip(void);
 static void check_osd_inputs(void);
@@ -556,86 +558,196 @@ finishit:
 
 static void update_throttle(mame_time emutime)
 {
-	static double ticks_per_sleep_msec = 0;
-	osd_ticks_t target, curr, cps, diffticks;
-	int allowed_to_sleep;
-	subseconds_t subsecs_per_cycle;
-	int paused = mame_is_paused(Machine);
+	/*
 
-	// if we're only syncing to the refresh, bail now
+        Throttling theory:
+
+        This routine is called periodically with an up-to-date emulated time.
+        The idea is to synchronize real time with emulated time. We do this
+        by "throttling", or waiting for real time to catch up with emulated
+        time.
+
+        In an ideal world, it will take less real time to emulate and render
+        each frame than the emulated time, so we need to slow things down to
+        get both times in sync.
+
+        There are many complications to this model:
+
+            * some games run too slow, so each frame we get further and
+                further behind real time; our only choice here is to not
+                throttle
+
+            * some games have very uneven frame rates; one frame will take
+                a long time to emulate, and the next frame may be very fast
+
+            * we run on top of multitasking OSes; sometimes execution time
+                is taken away from us, and this means we may not get enough
+                time to emulate one frame
+
+            * we may be paused, and emulated time may not be marching
+                forward
+
+            * emulated time could jump due to resetting the machine or
+                restoring from a saved state
+
+    */
+	static const UINT8 popcount[256] =
+	{
+		0,1,1,2,1,2,2,3, 1,2,2,3,2,3,3,4, 1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5,
+		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
+		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
+		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
+		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
+		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
+		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
+		3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7, 4,5,5,6,5,6,6,7, 5,6,6,7,6,7,7,8
+	};
+	subseconds_t real_delta_subseconds;
+	subseconds_t emu_delta_subseconds;
+	subseconds_t real_is_ahead_subseconds;
+	subseconds_t subseconds_per_tick;
+	osd_ticks_t ticks_per_second;
+	osd_ticks_t target_ticks;
+	osd_ticks_t diff_ticks;
+
+	/* if we're only syncing to the refresh, bail now */
 	if (video_config.syncrefresh)
 		return;
 
-	// if we're paused, emutime will not advance; explicitly resync and set us backwards
-	// 1/60th of a second
-	if (paused)
-		throttle_realtime = throttle_emutime = sub_subseconds_from_mame_time(emutime, MAX_SUBSECONDS / PAUSED_REFRESH_RATE);
+	/* compute conversion factors up front */
+	ticks_per_second = osd_ticks_per_second();
+	subseconds_per_tick = MAX_SUBSECONDS / ticks_per_second;
 
-	// if time moved backwards (reset), or if it's been more than 1 second in emulated time, resync
-	if (compare_mame_times(emutime, throttle_emutime) < 0 || sub_mame_times(emutime, throttle_emutime).seconds > 0)
-		goto resync;
-
-	// get the current realtime; if it's been more than 1 second realtime, just resync
-	cps = osd_ticks_per_second();
-	diffticks = osd_ticks() - throttle_last_ticks;
-	throttle_last_ticks += diffticks;
-	if (diffticks >= cps)
-		goto resync;
-
-	// add the time that has passed to the real time
-	subsecs_per_cycle = MAX_SUBSECONDS / cps;
-	throttle_realtime = add_subseconds_to_mame_time(throttle_realtime, diffticks * subsecs_per_cycle);
-
-	// update the emulated time
-	throttle_emutime = emutime;
-
-	// if we're behind, just sync
-	if (compare_mame_times(throttle_emutime, throttle_realtime) <= 0)
-		goto resync;
-
-	// determine our target ticks value
-	target = throttle_last_ticks + sub_mame_times(throttle_emutime, throttle_realtime).subseconds / subsecs_per_cycle;
-
-	// initialize the ticks per sleep
-	if (ticks_per_sleep_msec == 0)
-		ticks_per_sleep_msec = (double)(cps / 1000);
-
-	// this counts as idle time
-	profiler_mark(PROFILER_IDLE);
-
-	// determine whether or not we are allowed to sleep
-	allowed_to_sleep = video_config.sleep && (!effective_autoframeskip() || effective_frameskip() == 0);
-
-	// sync
-	for (curr = osd_ticks(); curr - target < 0; curr = osd_ticks())
+	/* if we're paused, emutime will not advance; instead, we subtract a fixed
+       amount of time (1/60th of a second) from the emulated time that was passed in,
+       and explicitly reset our tracked real and emulated timers to that value ...
+       this means we pretend that the last update was exactly 1/60th of a second
+       ago, and was in sync in both real and emulated time */
+	if (mame_is_paused(Machine))
 	{
-		// if we have enough time to sleep, do it
-		// ...but not if we're autoframeskipping and we're behind
-		if (paused || (allowed_to_sleep && (target - curr) > (osd_ticks_t)(ticks_per_sleep_msec * 1.1)))
-		{
-			osd_ticks_t next;
-
-			// keep track of how long we actually slept
-			Sleep(1);
-			next = osd_ticks();
-			ticks_per_sleep_msec = (ticks_per_sleep_msec * 0.90) + ((double)(next - curr) * 0.10);
-		}
+		throttle.emutime = sub_subseconds_from_mame_time(emutime, MAX_SUBSECONDS / PAUSED_REFRESH_RATE);
+		throttle.realtime = throttle.emutime;
 	}
 
-	// idle time done
-	profiler_mark(PROFILER_END);
+	/* attempt to detect anomalies in the emulated time by subtracting the previously
+       reported value from our current value; this should be a small value somewhere
+       between 0 and 1/10th of a second ... anything outside of this range is obviously
+       wrong and requires a resync */
+	emu_delta_subseconds = mame_time_to_subseconds(sub_mame_times(emutime, throttle.emutime));
+	if (emu_delta_subseconds < 0 || emu_delta_subseconds > MAX_SUBSECONDS / 10)
+	{
+		if (LOG_THROTTLE)
+			logerror("Resync due to weird emutime delta: 0.%018I64d\n", emu_delta_subseconds);
+		goto resync;
+	}
 
-	// update realtime
-	diffticks = osd_ticks() - throttle_last_ticks;
-	throttle_last_ticks += diffticks;
-	throttle_realtime = add_subseconds_to_mame_time(throttle_realtime, diffticks * subsecs_per_cycle);
+	/* now determine the current real time in OSD-specified ticks; we have to be careful
+       here because counters can wrap, so we only use the difference between the last
+       read value and the current value in our computations */
+	diff_ticks = osd_ticks() - throttle.last_ticks;
+	throttle.last_ticks += diff_ticks;
+
+	/* if it has been more than a full second of real time since the last call to this
+       function, we just need to resynchronize */
+	if (diff_ticks >= ticks_per_second)
+	{
+		if (LOG_THROTTLE)
+			logerror("Resync due to real time advancing by more than 1 second\n");
+		goto resync;
+	}
+
+	/* convert this value into subseconds for easier comparison */
+	real_delta_subseconds = diff_ticks * subseconds_per_tick;
+
+	/* now update our real and emulated timers with the current values */
+	throttle.emutime = emutime;
+	throttle.realtime = add_subseconds_to_mame_time(throttle.realtime, real_delta_subseconds);
+
+	/* keep a history of whether or not emulated time beat real time over the last few
+       updates; this can be used for future heuristics */
+	throttle.history = (throttle.history << 1) | (emu_delta_subseconds > real_delta_subseconds);
+
+	/* determine how far ahead real time is versus emulated time; note that we use the
+       accumulated times for this instead of the deltas for the current update because
+       we want to track time over a longer duration than a single update */
+	real_is_ahead_subseconds = mame_time_to_subseconds(sub_mame_times(throttle.emutime, throttle.realtime));
+
+	/* if we're more than 1/10th of a second out, or if we are behind at all and emulation
+       is taking longer than the real frame, we just need to resync */
+	if (real_is_ahead_subseconds < -MAX_SUBSECONDS / 10 ||
+		(real_is_ahead_subseconds < 0 && popcount[throttle.history & 0xff] < 6))
+	{
+		if (LOG_THROTTLE)
+			logerror("Resync due to being behind: 0.%018I64d (history=%08X)\n", -real_is_ahead_subseconds, throttle.history);
+		goto resync;
+	}
+
+	/* if we're behind, it's time to just get out */
+	if (real_is_ahead_subseconds < 0)
+		return;
+
+	/* compute the target real time, in ticks, where we want to be */
+	target_ticks = throttle.last_ticks + real_is_ahead_subseconds / subseconds_per_tick;
+
+	/* throttle until we read the target, and update real time to match the final time */
+	diff_ticks = throttle_until_ticks(target_ticks) - throttle.last_ticks;
+	throttle.last_ticks += diff_ticks;
+	throttle.realtime = add_subseconds_to_mame_time(throttle.realtime, diff_ticks * subseconds_per_tick);
 	return;
 
 resync:
-	// reset realtime and emutime to the same value
-	throttle_realtime = throttle_emutime = emutime;
+	/* reset realtime and emutime to the same value */
+	throttle.realtime = throttle.emutime = emutime;
 }
 
+
+//============================================================
+//  throttle_until_ticks
+//============================================================
+
+static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks)
+{
+	static osd_ticks_t ticks_per_sleep_unit;
+	HANDLE current_thread = GetCurrentThread();
+	int old_priority = GetThreadPriority(current_thread);
+	osd_ticks_t current_ticks = osd_ticks();
+	osd_ticks_t new_ticks;
+	int allowed_to_sleep;
+
+	/* we're allowed to sleep via the OSD code only if we're configured to do so
+       and we're not frameskipping due to autoframeskip, or if we're paused */
+	allowed_to_sleep = (video_config.sleep && (!effective_autoframeskip() || effective_frameskip() == 0)) || mame_is_paused(Machine);
+
+	/* make sure we have a valid default ticks_per_sleep_unit */
+	if (ticks_per_sleep_unit == 0)
+		ticks_per_sleep_unit = osd_ticks_per_second() / 1000;
+
+	/* loop until we reach our target */
+	profiler_mark(PROFILER_IDLE);
+	while (current_ticks < target_ticks)
+	{
+		osd_ticks_t delta = target_ticks - current_ticks;
+		int slept = FALSE;
+
+		/* see if we can sleep */
+		if (allowed_to_sleep && delta < ticks_per_sleep_unit * 3 / 2)
+		{
+			/* boost our priority and sleep for 1ms */
+			SetThreadPriority(current_thread, old_priority + 1);
+			Sleep(1);
+			SetThreadPriority(current_thread, old_priority);
+			slept = TRUE;
+		}
+
+		/* read the new value */
+		new_ticks = osd_ticks();
+		if (slept)
+			ticks_per_sleep_unit = (ticks_per_sleep_unit * 9 + (new_ticks - current_ticks)) / 10;
+		current_ticks = new_ticks;
+	}
+
+	return current_ticks;
+}
 
 
 //============================================================

@@ -35,7 +35,8 @@ endif
 
 #-------------------------------------------------
 # specify operating system: windows, msdos, etc.
-# build rules will be includes from $(MAMEOS)/$(MAMEOS).mak
+# build rules will be includes from 
+# src/osd/$(MAMEOS)/$(MAMEOS).mak
 #-------------------------------------------------
 
 ifndef MAMEOS
@@ -272,20 +273,12 @@ endif
 
 
 #-------------------------------------------------
-# define the standard object directories
+# define the standard object directory; other
+# projects can add their object directories to
+# this variable
 #-------------------------------------------------
 
 OBJDIRS = $(OBJ)
-
-ifdef MESS
-OBJDIRS +=
-	$(OBJ)/mess \
-	$(OBJ)/mess/systems \
-	$(OBJ)/mess/machine \
-	$(OBJ)/mess/sndhrdw \
-	$(OBJ)/mess/vidhrdw \
-	$(OBJ)/mess/tools
-endif
 
 
 
@@ -376,6 +369,10 @@ clean:
 	$(RM) $(EMULATOR)
 	@echo Deleting $(TOOLS)...
 	$(RM) $(TOOLS)
+ifdef MAP
+	@echo Deleting $(FULLNAME).map...
+	$(RM) $(FULLNAME).map
+endif
 
 
 

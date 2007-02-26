@@ -350,6 +350,7 @@ static void render_font_char_expand(render_font *font, render_font_char *ch)
 
 	/* allocate a new bitmap of the size we need */
 	ch->bitmap = bitmap_alloc(ch->bmwidth, font->height, BITMAP_FORMAT_ARGB32);
+	fillbitmap(ch->bitmap, 0, NULL);
 
 	/* extract the data */
 	for (y = 0; y < ch->bmheight; y++)

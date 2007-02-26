@@ -118,29 +118,7 @@ const char *osd_get_fps_text(const performance_info *performance);
 
 ******************************************************************************/
 
-/*
-  osd_start_audio_stream() is called at the start of the emulation to initialize
-  the output stream, then osd_update_audio_stream() is called every frame to
-  feed new data. osd_stop_audio_stream() is called when the emulation is stopped.
-
-  The sample rate is fixed at Machine->sample_rate. Samples are 16-bit, signed.
-  When the stream is stereo, left and right samples are alternated in the
-  stream.
-
-  osd_start_audio_stream() and osd_update_audio_stream() must return the number
-  of samples (or couples of samples, when using stereo) required for next frame.
-  This will be around Machine->sample_rate / Machine->screen[0].refresh,
-  the code may adjust it by SMALL AMOUNTS to keep timing accurate and to
-  maintain audio and video in sync when using vsync. Note that sound emulation,
-  especially when DACs are involved, greatly depends on the number of samples
-  per frame to be roughly constant, so the returned value must always stay close
-  to the reference value of Machine->sample_rate / Machine->screen[0].refresh.
-  Of course that value is not necessarily an integer so at least a +/- 1
-  adjustment is necessary to avoid drifting over time.
-*/
-int osd_start_audio_stream(int stereo);
-int osd_update_audio_stream(INT16 *buffer);
-void osd_stop_audio_stream(void);
+void osd_update_audio_stream(INT16 *buffer, int samples_this_frame);
 
 /*
   control master volume. attenuation is the attenuation in dB (a negative
@@ -150,9 +128,6 @@ void osd_stop_audio_stream(void);
         volume /= 1.122018454;      //  = (10 ^ (1/20)) = 1dB
 */
 void osd_set_mastervolume(int attenuation);
-int osd_get_mastervolume(void);
-
-void osd_sound_enable(int enable);
 
 
 

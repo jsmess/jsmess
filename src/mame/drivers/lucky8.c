@@ -18,9 +18,7 @@
 
     ---
 
-    AGEMAME driver by Curt Coder
-
-Any fixes for this driver should be forwarded to AGEMAME forum at (http://www.mameworld.net/agemame)
+    Driver by Curt Coder
 
 */
 

@@ -37,6 +37,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/jedparse.o \
 	$(LIBOBJ)/util/md5.o \
 	$(LIBOBJ)/util/png.o \
+	$(LIBOBJ)/util/pool.o \
 	$(LIBOBJ)/util/sha1.o \
 	$(LIBOBJ)/util/unicode.o \
 	$(LIBOBJ)/util/unzip.o \

@@ -836,11 +836,24 @@ static int sharc_debug_read(int space, UINT32 offset, int size, UINT64 *value)
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
-		offset >>= 3;
+		int address = offset >> 3;
 
-		if (offset >= 0x20000 && offset < 0x30000)
+		if (address >= 0x20000 && address < 0x30000)
 		{
-			*value = pm_read48(offset);
+			switch (size)
+			{
+				case 1:
+				{
+					int frac = offset & 7;
+					*value = (pm_read48(offset >> 3) >> ((frac^7) * 8)) & 0xff;
+					break;
+				}
+				case 8:
+				{
+					*value = pm_read48(offset >> 3);
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -849,15 +862,33 @@ static int sharc_debug_read(int space, UINT32 offset, int size, UINT64 *value)
 	}
 	else if (space == ADDRESS_SPACE_DATA)
 	{
-		offset >>= 2;
-
-		if (offset >= 0x20000)
+		int address = offset >> 2;
+		if (address >= 0x20000)
 		{
-			*value = dm_read32(offset/4);
+			switch (size)
+			{
+				case 1:
+				{
+					int frac = offset & 3;
+					*value = (dm_read32(offset >> 2) >> ((frac^3) * 8)) & 0xff;
+					break;
+				}
+				case 2:
+				{
+					int frac = (offset >> 1) & 1;
+					*value = (dm_read32(offset >> 2) >> ((frac^1) * 16)) & 0xffff;
+					break;
+				}
+				case 4:
+				{
+					*value = dm_read32(offset >> 2);
+					break;
+				}
+			}
 		}
 		else
 		{
-			offset = 0;
+			*value = 0;
 		}
 	}
 	return 1;

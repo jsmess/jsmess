@@ -2615,6 +2615,98 @@ ROM_START( meikyuh )
 	ROM_LOAD( "dw19.10d", 0x0400, 0x0400, CRC(cc16f3fa) SHA1(4562106ff752f5fc5ae00ff098141e5d74fe4700)  )
 ROM_END
 
+/*
+
+Meikyuu Hunter G (Japan, set 2)
+
+set 2 - the code is very different, but is this an original board? it lacks original labels
+        and the IC positions are different on the sprite roms
+
+this version lacks the linescroll effects when starting the game / demoplay, but the demoplay seems
+more complete, whereas in set 1 the players appear to get stuck before reaching the boss
+
+also is 27512.15f a good dump? graphic roms usually match, might be a good idea to check 27512.6d too
+
+CPU
+---
+
+CPUs PCB (AT0789A):
+1x MC68B09EP (main)
+1x 8751H (missing, the socket is empty!)
+1x UM6502 (sound)
+1x YM2203 (sound)
+1x YM3526 (sound)
+2x Y3414B (sound)
+1x CA324E (sound)
+1x oscillator 8.0000MHz
+
+ROMs PCB (AT0789B):
+1x oscillator 12.000MHz
+
+
+ROMs
+----
+
+CPUs PCB (AT0789A):
+3x P27256
+2x TMM24512
+5x M27512ZB
+3x N82S137N (not dumped)
+
+ROMs PCB (AT0789B):
+8x M27512ZB
+3x PAL16R4ANC (not dumped)
+Note    CPUs PCB (AT0789A):
+1x 28x2 JAMMA edge connector
+1x trimmer (volume)
+2x 8 switches dip
+2x 50 pins flat cable connector to ROMs PCB
+
+ROMs PCB (AT0789B):
+2x 50 pins flat cable connector to CPUs PCB
+
+------------------------------------
+There is a small piggyback attached under CPUs PCB full of 74Sxx
+
+This boards looks like a legit PCB from Data East, even if a Data East logo is not present.
+
+ALL MEMORIES ARE MASKROMS!
+
+*/
+ROM_START( meikyuha )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )
+	ROM_LOAD( "27256.1d", 0x08000, 0x08000, CRC(d5b5e8a2) SHA1(0155d1d0ddbd764b960148c3c9ef34223e101659) ) // dw-01-5.1d matched 6.552124%
+	ROM_LOAD( "24512.3d", 0x10000, 0x10000, CRC(40c9b0b8) SHA1(81deb25e00eb4d4c5133ea42cda279c318ee771c) )
+	ROM_LOAD( "24512.4d", 0x20000, 0x10000, CRC(5606a8f4) SHA1(e46e887f13f648fe2162cb853b3c20fa60e3d215) )
+	ROM_LOAD( "27512.6d", 0x30000, 0x10000, CRC(8ca6055d) SHA1(37dc5d3b158dc5d7c9677fc4f82e10804181619f) ) // dw-04.6d matched 99.995422%
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64K for sound CPU */
+	ROM_LOAD( "27256.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
+
+	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )	/* characters */
+	ROM_LOAD( "27256.16b", 0x00000, 0x8000, CRC(3d25f15c) SHA1(590518460d069bc235b5efebec81731d7a2375de) )
+
+	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )	/* sprites */
+	ROM_LOAD( "92.6m", 0x00000, 0x10000, CRC(9b0dbfa9) SHA1(c9db6e70b217a34fbc2bf17da3f5ec6f0130514a) )
+	ROM_LOAD( "93.6o", 0x10000, 0x10000, CRC(95683fda) SHA1(aa91ad1cd685790e29e16d64bd75a5b4367cf87b) )
+	ROM_LOAD( "89.6i", 0x20000, 0x10000, CRC(1b1fcca7) SHA1(17e510c1b3efa0f6da49461c286b89295db6b9a6) )
+	ROM_LOAD( "91.6l", 0x30000, 0x10000, CRC(e7413056) SHA1(62048a9648cbb6b651e3409f77cee268822fd2e1) )
+	ROM_LOAD( "88.6h", 0x40000, 0x10000, CRC(57667546) SHA1(e7756997ea04204e62404ce8069f8cdb33cb4565) )
+	ROM_LOAD( "90.6k", 0x50000, 0x10000, CRC(4c548db8) SHA1(988411ab41884c926ca971e7b58f406f85be3b54) )
+	ROM_LOAD( "94.6p", 0x60000, 0x10000, CRC(e5bcf927) SHA1(b96bd4c124c9745fae1c1f35bdbbdec9f97ab4a5) )
+	ROM_LOAD( "95.6r", 0x70000, 0x10000, CRC(9e10f723) SHA1(159c5e3d821a10b64cd6d538d19063d0f5b057c0) )
+
+	ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE )	/* tiles */
+	ROM_LOAD( "27512.12f", 0x00000, 0x10000, CRC(b65e029d) SHA1(f8791d57f688f16e0f076361603510e7133f4e36) )
+	ROM_LOAD( "27512.14f", 0x10000, 0x10000, CRC(668d995d) SHA1(dc6221de6103168c8e19f2c6eb159b8989ca2208) )
+	ROM_LOAD( "27512.15f", 0x20000, 0x10000, CRC(547fe4e2) SHA1(f8406e7d2bbd2243fcfe27c7ba401f04536dadc9) ) // dw-08.15f matched 99.996948% (bad?)
+	ROM_LOAD( "27512.17f", 0x30000, 0x10000, CRC(6a528d13) SHA1(f1ef592f1efea637abde26bb8e3d02d552582a43) )
+
+	ROM_REGION( 0x0800, REGION_PROMS, 0 ) // taken from other set
+	ROM_LOAD( "dw18.9d",  0x0000, 0x0400, CRC(75f1945f) SHA1(6fa436ae21851ec30847d57c31bdd2fd695e08af)  )
+	ROM_LOAD( "dw19.10d", 0x0400, 0x0400, CRC(cc16f3fa) SHA1(4562106ff752f5fc5ae00ff098141e5d74fe4700)  )
+ROM_END
+
 ROM_START( srdarwin )
 	ROM_REGION( 0x28000, REGION_CPU1, 0 )
 	ROM_LOAD( "dy01-e.b14", 0x20000, 0x08000, CRC(176e9299) SHA1(20cd44ab610e384ab4f0172054c9adc432b12e9c) )
@@ -3176,7 +3268,8 @@ GAME( 1988, cobracom, 0,        cobracom, cobracom, 0,       ROT0,   "Data East 
 GAME( 1988, cobracmj, cobracom, cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (Japan)", 0 )
 GAME( 1987, ghostb,   0,        ghostb,   ghostb,   ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", 0 )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb,   ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", 0 )
-GAME( 1987, meikyuh,  ghostb,   ghostb,   meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan)", 0 )
+GAME( 1987, meikyuh,  ghostb,   ghostb,   meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", 0 )
+GAME( 1987, meikyuha, ghostb,   ghostb,   meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", 0 )
 GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (World)", 0 )
 GAME( 1987, srdarwnj, srdarwin, srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", 0 )
 GAME( 1987, gondo,    0,        gondo,    gondo,    0,       ROT270, "Data East USA", "Gondomania (US)", 0 )

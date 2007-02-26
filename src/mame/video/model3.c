@@ -37,7 +37,7 @@ typedef struct
 #define TRI_PARAM_TEXTURE_MIRROR_V		0x4
 #define TRI_PARAM_TEXTURE_ENABLE		0x8
 
-#define MAX_TRIANGLES		65536
+#define MAX_TRIANGLES		131072
 
 
 /* forward declarations */
@@ -106,6 +106,8 @@ static VECTOR3 parallel_light;
 static float parallel_light_intensity;
 static float ambient_light_intensity;
 
+static int list_depth = 0;
+
 
 #define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
 								((x >> 8) & 0xff00) | \
@@ -144,6 +146,11 @@ VIDEO_START( model3 )
 	culling_ram = auto_malloc(0x400000);
 	/* 4MB Polygon RAM */
 	polygon_ram = auto_malloc(0x400000);
+
+	memset(display_list_ram, 0, 0x100000);
+	memset(culling_ram, 0, 0x400000);
+	memset(polygon_ram, 0, 0x400000);
+	memset(texture_fifo, 0, 0x100000);
 
 	init_matrix_stack();
 
@@ -1341,7 +1348,7 @@ static void traverse_list4(UINT32 address)
 	UINT32 *list = get_memory_pointer(address);
 	UINT32 link = list[0];
 
-	if ((link & 0xffffff) > 0x100000)		/* VROM model */
+	if ((link & 0xffffff) >= 0x100000)		/* VROM model */
 	{
 		draw_model(&model3_vrom[link & 0xffffff]);
 	}
@@ -1357,6 +1364,11 @@ static void traverse_list(UINT32 address)
 	UINT32 *list = get_memory_pointer(address);
 	int end = 0;
 	int list_ptr = 0;
+
+	if (list_depth > 2)
+		return;
+
+	list_depth++;
 
 	/* TODO: traverse from end to beginning may be correct rendering order */
 
@@ -1375,6 +1387,8 @@ static void traverse_list(UINT32 address)
 			traverse_node(address);
 		}
 	};
+
+	list_depth--;
 }
 
 static void traverse_node(UINT32 address)
@@ -1429,7 +1443,7 @@ static void traverse_node(UINT32 address)
 
 					case 0x01:
 					case 0x03:		/* both of these link to models, is there any difference ? */
-						if ((link & 0xffffff) > 0x100000)		/* VROM model */
+						if ((link & 0xffffff) >= 0x100000)		/* VROM model */
 						{
 							draw_model(&model3_vrom[link & 0xffffff]);
 						}

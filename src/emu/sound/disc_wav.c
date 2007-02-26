@@ -70,6 +70,14 @@ struct dss_note_context
 
 struct dss_op_amp_osc_context
 {
+	const double *r1;		// pointers to resistor values
+	const double *r2;
+	const double *r3;
+	const double *r4;
+	const double *r5;
+	const double *r6;
+	const double *r7;
+	const double *r8;
 	int		flip_flop;		// flip/flop output state
 	int		flip_flopXOR;	// flip_flop ^ flip_flopXOR, 0 = discharge, 1 = charge
 	int		type;
@@ -79,7 +87,7 @@ struct dss_op_amp_osc_context
 	double	iCharge[2];		// charge/discharge currents
 	double	vCap;			// current capacitor voltage
 	double	rTotal;			// all input resistors in parallel
-	double	iFixed;			// fixed current athe the input
+	double	iFixed;			// fixed current at the input
 	double	temp1;			// Multi purpose
 	double	temp2;			// Multi purpose
 	double	temp3;			// Multi purpose
@@ -683,6 +691,21 @@ void dss_op_amp_osc_step(node_description *node)
 	/* work out the charge currents for the VCOs. */
 	switch (context->type)
 	{
+		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
+		{
+			double i1, i2;
+			/* Work out the charge rates. */
+			context->iCharge[0] = (info->vP - OP_AMP_NORTON_VBE) / *context->r1;
+			/* Output of the schmitt is vP - OP_AMP_NORTON_VBE */
+			context->iCharge[1] = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / *context->r2 - context->iCharge[0];
+			/* Work out the Inverting Schmitt thresholds. */
+			i1 = (info->vP - OP_AMP_NORTON_VBE) / *context->r5;
+			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / *context->r4;
+			context->thresholdLow = i1 * *context->r3 + OP_AMP_NORTON_VBE;
+			context->thresholdHigh = (i1 + i2) * *context->r3 + OP_AMP_NORTON_VBE;
+			break;
+		}
+
 		case DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON:
 			/* Millman the input voltages. */
 			if (info->r7 == 0)
@@ -790,9 +813,29 @@ void dss_op_amp_osc_reset(node_description *node)
 {
 	const discrete_op_amp_osc_info *info = node->custom;
 	struct dss_op_amp_osc_context *context = node->context;
+	const double *r_info_ptr;
+	const double **r_context_ptr;
+	int loop;
+	node_description *r_node;
 
 	double i1 = 0;	// inverting input current
 	double i2 = 0;	// non-inverting input current
+
+	/* link to resistor static or node values */
+	r_info_ptr = &info->r1;
+	r_context_ptr = &context->r1;
+	for (loop = 0; loop < 8; loop ++)
+	{
+		if IS_VALUE_A_NODE(*r_info_ptr)
+		{
+			r_node = discrete_find_node(NULL, *r_info_ptr);
+			*r_context_ptr = &(r_node->output);
+		}
+		else
+			*r_context_ptr = r_info_ptr;
+		r_info_ptr++;
+		r_context_ptr++;
+	}
 
 	context->is_squarewave = (info->type & DISC_OP_AMP_OSCILLATOR_OUT_SQW) * (info->vP - OP_AMP_NORTON_VBE);
 	context->type = info->type & DISC_OP_AMP_OSCILLATOR_TYPE_MASK;
@@ -800,17 +843,8 @@ void dss_op_amp_osc_reset(node_description *node)
 	switch (context->type)
 	{
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
-			/* Work out the charge rates. */
-			context->iCharge[0] = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
-			/* Output of the schmitt is vP - OP_AMP_NORTON_VBE */
-			context->iCharge[1] = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r2 - context->iCharge[0];
 			/* Charges while FlipFlop High */
 			context->flip_flopXOR = 0;
-			/* Work out the Inverting Schmitt thresholds. */
-			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
-			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
-			context->thresholdLow = i1 * info->r3 + OP_AMP_NORTON_VBE;
-			context->thresholdHigh = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			/* There is no charge on the cap so the schmitt inverter goes high at init. */
 			context->flip_flop = 1;
 			break;

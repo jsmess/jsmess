@@ -855,7 +855,7 @@ static MACHINE_DRIVER_START( zzzap )
 	MDRV_IMPORT_FROM(root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(zzzap_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555(RES_M(1), CAP_U(1)) ) /* 1.1s */
+	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_M(1), CAP_U(1)) ) /* 1.1s */
 
 	/* sound hardware */
 	/* MDRV_IMPORT_FROM(zzzap_sound) */
@@ -869,6 +869,42 @@ MACHINE_DRIVER_END
  *  Amazing Maze (PCB #611)
  *
  *************************************/
+
+/* schematic says 12.5 Hz, but R/C values shown give 8.5Hz */
+#define MAZE_555_B1_PERIOD		PERIOD_OF_555_ASTABLE(RES_K(33) /* R200 */, RES_K(68) /* R201 */, CAP_U(1) /* C201 */)
+
+/* output of IC C1, pin 5 */
+static UINT8 maze_tone_timing_state;
+
+
+static void maze_update_discrete(void)
+{
+	maze_write_discrete(maze_tone_timing_state);
+}
+
+
+static void maze_tone_timing_timer_callback(int param)
+{
+	maze_tone_timing_state = !maze_tone_timing_state;
+	maze_write_discrete(maze_tone_timing_state);
+}
+
+
+static MACHINE_START( maze )
+{
+	/* create asable timer for IC B1 */
+	mame_timer_pulse(double_to_mame_time(MAZE_555_B1_PERIOD), 0, maze_tone_timing_timer_callback);
+
+	/* Initialize state of Tone Timing FF, IC C1 */
+	maze_tone_timing_state = 0;
+
+	/* setup for save states */
+	state_save_register_global(maze_tone_timing_state);
+	state_save_register_func_postload(maze_update_discrete);
+
+	return machine_start_mw8080bw(machine);
+}
+
 
 static WRITE8_HANDLER( maze_coin_counter_w )
 {
@@ -930,10 +966,11 @@ static MACHINE_DRIVER_START( maze )
 	MDRV_IMPORT_FROM(root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(maze_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555(RES_K(270), CAP_U(10)) ) /* 2.97s */
+	MDRV_MACHINE_START(maze)
+	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
 
 	/* sound hardware */
-	/* MDRV_IMPORT_FROM(maze_sound) */
+	MDRV_IMPORT_FROM(maze_sound)
 
 MACHINE_DRIVER_END
 
@@ -1012,7 +1049,7 @@ static MACHINE_DRIVER_START( boothill )
 	MDRV_IMPORT_FROM(root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(boothill_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555(RES_K(270), CAP_U(10)) ) /* 2.97s */
+	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(boothill_sound)
@@ -1108,7 +1145,7 @@ static MACHINE_DRIVER_START( checkmat )
 	MDRV_IMPORT_FROM(root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(checkmat_io_map,0)
-	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555(RES_K(270), CAP_U(10)) ) /* 2.97s */
+	MDRV_WATCHDOG_TIME_INIT( TIME_OF_555_MONOSTABLE(RES_K(270), CAP_U(10)) ) /* 2.97s */
 
 	/* sound hardware */
 	/* MDRV_IMPORT_FROM(checkmat_sound) */
@@ -3059,7 +3096,7 @@ ROM_END
 /* 597 */ GAMEL(1975, gunfight, 0,      gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
 /* 605 */ GAME( 1976, tornbase, 0,      tornbase, tornbase, 0, ROT0,   "Midway", "Tornado Baseball", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 610 */ GAME( 1976, 280zzzap, 0,      zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
-/* 611 */ GAMEL(1976, maze,     0,      maze,     maze,     0, ROT0,   "Midway", "Amazing Maze", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_ho4f893d )
+/* 611 */ GAMEL(1976, maze,     0,      maze,     maze,     0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE , layout_ho4f893d )
 /* 612 */ GAME( 1977, boothill, 0,      boothill, boothill, 0, ROT0,   "Midway", "Boot Hill" , GAME_SUPPORTS_SAVE  )
 /* 615 */ GAME( 1977, checkmat, 0,      checkmat, checkmat, 0, ROT0,   "Midway", "Checkmate", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, desertgu, 0,      desertgu, desertgu, 0, ROT0,   "Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )

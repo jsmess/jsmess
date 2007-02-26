@@ -20,9 +20,10 @@ struct _cdda_info
 
 	UINT8 *				audio_cache;
 	UINT32				audio_samples;
-	INT16 *				audio_bptr;
+	UINT32				audio_bptr;
 };
 
+#define MAX_SECTORS ( 4 )
 
 static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample_t *bufR, UINT32 samples_wanted);
 
@@ -51,11 +52,20 @@ static void *cdda_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	/* allocate an audio cache */
-	info->audio_cache = auto_malloc(CD_MAX_SECTOR_DATA*4);
+	info->audio_cache = auto_malloc( CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
 	intf = config;
 
 	info->stream = stream_create(0, 2, 44100, info, cdda_update);
+
+	state_save_register_item( "CDDA", sndindex, info->audio_playing );
+	state_save_register_item( "CDDA", sndindex, info->audio_pause );
+	state_save_register_item( "CDDA", sndindex, info->audio_ended_normally );
+	state_save_register_item( "CDDA", sndindex, info->audio_lba );
+	state_save_register_item( "CDDA", sndindex, info->audio_length );
+	state_save_register_item_pointer( "CDDA", sndindex, info->audio_cache, CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	state_save_register_item( "CDDA", sndindex, info->audio_samples );
+	state_save_register_item( "CDDA", sndindex, info->audio_bptr );
 
 	return info;
 }
@@ -208,6 +218,7 @@ int cdda_audio_ended(int num)
 static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample_t *bufR, UINT32 samples_wanted)
 {
 	int i, sectoread, remaining;
+	INT16 *audio_cache = (INT16 *) info->audio_cache;
 
 	/* if no file, audio not playing, audio paused, or out of disc data,
        just zero fill */
@@ -229,8 +240,8 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 	{
 		for (i = 0; i < samples_wanted; i++)
 		{
-			*bufL++ = *info->audio_bptr++;
-			*bufR++ = *info->audio_bptr++;
+			*bufL++ = audio_cache[ info->audio_bptr++ ];
+			*bufR++ = audio_cache[ info->audio_bptr++ ];
 		}
 
 		info->audio_samples -= samples_wanted;
@@ -240,8 +251,8 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 	/* we don't have enough, so first feed what we've got */
 	for (i = 0; i < info->audio_samples; i++)
 	{
-		*bufL++ = *info->audio_bptr++;
-		*bufR++ = *info->audio_bptr++;
+		*bufL++ = audio_cache[ info->audio_bptr++ ];
+		*bufR++ = audio_cache[ info->audio_bptr++ ];
 	}
 
 	/* remember how much left for later */
@@ -249,9 +260,9 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 
 	/* reset the buffer and get what we can from the disc */
 	info->audio_samples = 0;
-	if (info->audio_length >= 4)
+	if (info->audio_length >= MAX_SECTORS)
 	{
-		sectoread = 4;
+		sectoread = MAX_SECTORS;
 	}
 	else
 	{
@@ -270,18 +281,14 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 
 	/* CD-DA data on the disc is big-endian, flip if we're not */
 	#ifdef LSB_FIRST
-	for (i = 0; i < info->audio_samples*4; i += 2)
+	for( i = 0; i < info->audio_samples * 2; i++ )
 	{
-		UINT8 tmp;
-
-		tmp = info->audio_cache[i+1];
-		info->audio_cache[i+1] = info->audio_cache[i];
-		info->audio_cache[i] = tmp;
+		audio_cache[ i ] = BIG_ENDIANIZE_INT16( audio_cache[ i ] );
 	}
 	#endif
 
 	/* reset feedout ptr */
-	info->audio_bptr = (INT16 *)info->audio_cache;
+	info->audio_bptr = 0;
 
 	/* we've got data, feed it out by calling ourselves recursively */
 	get_audio_data(info, bufL, bufR, remaining);

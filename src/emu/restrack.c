@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    restrack.h
+    restrack.c
 
     Core MAME resource tracking.
 
@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "restrack.h"
+#include "pool.h"
 
 
 
@@ -24,23 +25,14 @@ struct _callback_item
 	void			(*free_resources)(void);
 };
 
-typedef struct _malloc_entry malloc_entry;
-struct _malloc_entry
-{
-	void *memory;
-	size_t size;
-};
-
 
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* malloc tracking */
-static malloc_entry *malloc_list = NULL;
-static int malloc_list_index = 0;
-static int malloc_list_size = 0;
+/* pool list */
+static memory_pool *pools[64];
 
 /* resource tracking */
 int resource_tracking_tag = 0;
@@ -76,9 +68,7 @@ void *_malloc_or_die(size_t size, const char *file, int line)
 	if (result != NULL)
 	{
 #ifdef MAME_DEBUG
-		int i;
-		for (i = 0; i < size; i++)
-			((UINT8 *)result)[i] = rand();
+		rand_memory(result, size);
 #endif
 		return result;
 	}
@@ -122,55 +112,6 @@ static void free_callback_list(callback_item **cb)
 
 
 /*-------------------------------------------------
-    auto_malloc_add - add pointer to malloc list
--------------------------------------------------*/
-
-INLINE void auto_malloc_add(void *result, size_t size)
-{
-	/* make sure we have tracking space */
-	if (malloc_list_index == malloc_list_size)
-	{
-		malloc_entry *list;
-
-		/* if this is the first time, allocate 256 entries, otherwise double the slots */
-		if (malloc_list_size == 0)
-			malloc_list_size = 256;
-		else
-			malloc_list_size *= 2;
-
-		/* realloc the list */
-		list = realloc(malloc_list, malloc_list_size * sizeof(list[0]));
-		if (list == NULL)
-			fatalerror("Unable to extend malloc tracking array to %d slots", malloc_list_size);
-		malloc_list = list;
-	}
-	malloc_list[malloc_list_index].memory = result;
-	malloc_list[malloc_list_index].size = size;
-	malloc_list_index++;
-}
-
-
-/*-------------------------------------------------
-    auto_malloc_free - release auto_malloc'd memory
--------------------------------------------------*/
-
-static void auto_malloc_free(void)
-{
-	/* start at the end and free everything till you reach the sentinel */
-	while (malloc_list_index > 0 && malloc_list[--malloc_list_index].memory != NULL)
-		free(malloc_list[malloc_list_index].memory);
-
-	/* if we free everything, free the list */
-	if (malloc_list_index == 0)
-	{
-		free(malloc_list);
-		malloc_list = NULL;
-		malloc_list_size = 0;
-	}
-}
-
-
-/*-------------------------------------------------
     init_resource_tracking - initialize the
     resource tracking system
 -------------------------------------------------*/
@@ -178,7 +119,6 @@ static void auto_malloc_free(void)
 void init_resource_tracking(void)
 {
 	resource_tracking_tag = 0;
-	add_free_resources_callback(auto_malloc_free);
 }
 
 
@@ -196,14 +136,33 @@ void exit_resource_tracking(void)
 
 
 /*-------------------------------------------------
+    memory_error - report a memory error
+-------------------------------------------------*/
+
+static void memory_error(const char *message)
+{
+	fatalerror("%s", message);
+}
+
+
+
+/*-------------------------------------------------
     begin_resource_tracking - start tracking
     resources
 -------------------------------------------------*/
 
 void begin_resource_tracking(void)
 {
-	/* add a NULL as a sentinel */
-	auto_malloc_add(NULL, 0);
+	memory_pool *new_pool;
+
+	/* sanity check */
+	assert_always(resource_tracking_tag < ARRAY_LENGTH(pools), "Too many memory pools");
+
+	/* create a new pool */
+	new_pool = pool_create(memory_error);
+	if (!new_pool)
+		fatalerror("Failed to allocate new memory pool");
+	pools[resource_tracking_tag] = new_pool;
 
 	/* increment the tag counter */
 	resource_tracking_tag++;
@@ -225,6 +184,21 @@ void end_resource_tracking(void)
 
 	/* decrement the tag counter */
 	resource_tracking_tag--;
+
+	/* free the memory pool */
+	pool_free(pools[resource_tracking_tag]);
+	pools[resource_tracking_tag] = NULL;
+}
+
+
+/*-------------------------------------------------
+    current_pool - identifies the current memory
+    pool
+-------------------------------------------------*/
+
+static memory_pool *current_pool(void)
+{
+	return pools[resource_tracking_tag - 1];
 }
 
 
@@ -234,14 +208,17 @@ void end_resource_tracking(void)
 
 void *_auto_malloc(size_t size, const char *file, int line)
 {
-	void *result;
+	return pool_malloc_file_line(current_pool(), size, file, line);
+}
 
-	/* fail horribly if it doesn't work */
-	result = _malloc_or_die(size, file, line);
 
-	/* track this item in our list */
-	auto_malloc_add(result, size);
-	return result;
+/*-------------------------------------------------
+    auto_realloc - reallocate auto-freeing memory
+-------------------------------------------------*/
+
+void *_auto_realloc(void *ptr, size_t size, const char *file, int line)
+{
+	return pool_realloc_file_line(current_pool(), ptr, size, file, line);
 }
 
 
@@ -251,8 +228,7 @@ void *_auto_malloc(size_t size, const char *file, int line)
 
 char *_auto_strdup(const char *str, const char *file, int line)
 {
-	assert_always(str != NULL, "auto_strdup() requires non-NULL str");
-	return strcpy(_auto_malloc(strlen(str) + 1, file, line), str);
+	return pool_strdup_file_line(current_pool(), str, file, line);
 }
 
 
@@ -284,17 +260,6 @@ bitmap_t *auto_bitmap_alloc(int width, int height, bitmap_format format)
 
 
 /*-------------------------------------------------
-    pointer_in_block - returns whether a pointer
-    is within a memory block
--------------------------------------------------*/
-
-static int pointer_in_block(const UINT8 *ptr, const UINT8 *block, size_t block_size)
-{
-	return (ptr >= block) && (ptr < (block + block_size));
-}
-
-
-/*-------------------------------------------------
     validate_auto_malloc_memory - validate that a
     block of memory has been allocated by auto_malloc()
 -------------------------------------------------*/
@@ -302,37 +267,34 @@ static int pointer_in_block(const UINT8 *ptr, const UINT8 *block, size_t block_s
 void validate_auto_malloc_memory(void *memory, size_t memory_size)
 {
 	int i;
-	int tag = 0;
-	const UINT8 *this_memory = (const UINT8 *) memory;
-	size_t this_memory_size = memory_size;
+	memory_block_overlap overlap = OVERLAP_NONE;
+	void *block_base = NULL;
+	size_t block_size = 0;
 
-	assert(memory_size > 0);
-
-	for (i = 0; i < malloc_list_size; i++)
+	for (i = 0; (overlap == OVERLAP_NONE) && (i < resource_tracking_tag); i++)
 	{
-		if (malloc_list[i].memory != NULL)
-		{
-			const UINT8 *that_memory = (const UINT8 *) malloc_list[i].memory;
-			size_t that_memory_size = malloc_list[i].size;
-
-			if (pointer_in_block(this_memory, that_memory, that_memory_size))
-			{
-				if (!pointer_in_block(this_memory + this_memory_size - 1, that_memory, that_memory_size))
-					fatalerror("Memory block [0x%p-0x%p] partially overlaps with allocated block [0x%p-0x%p]", this_memory, this_memory + this_memory_size - 1, that_memory, that_memory + that_memory_size - 1);
-				return;
-			}
-			else if (pointer_in_block(that_memory, this_memory, this_memory_size))
-			{
-				if (!pointer_in_block(that_memory + that_memory_size - 1, this_memory, this_memory_size))
-					fatalerror("Memory block [0x%p-0x%p] partially overlaps with allocated block [0x%p-0x%p]", this_memory, this_memory + this_memory_size - 1, that_memory, that_memory + that_memory_size - 1);
-				return;
-			}
-		}
-		else
-		{
-			tag++;
-		}
+		overlap = pool_contains_block(pools[i], memory, memory_size,
+			&block_base, &block_size);
 	}
-	fatalerror("Memory block [0x%p-0x%p] not found", this_memory, this_memory + this_memory_size - 1);
-}
 
+	switch(overlap)
+	{
+		case OVERLAP_NONE:
+			fatalerror("Memory block [0x%p-0x%p] not found",
+				memory,
+				((UINT8 *) memory) + memory_size - 1);
+			break;
+
+		case OVERLAP_PARTIAL:
+			fatalerror("Memory block [0x%p-0x%p] partially overlaps with allocated block [0x%p-0x%p]",
+				memory,
+				((UINT8 *) memory) + memory_size - 1,
+				block_base,
+				((UINT8 *) block_base) + block_size - 1);
+			break;
+
+		case OVERLAP_FULL:
+			/* expected outcome */
+			break;
+	}
+}

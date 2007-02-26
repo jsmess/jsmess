@@ -77,3 +77,21 @@ int gregorian_days_in_month(int month, int year)
 	else
 		return 31;
 }
+
+
+/***************************************************************************
+    MISC
+***************************************************************************/
+
+void rand_memory(void *memory, size_t length)
+{
+	UINT8 *bytes = (UINT8 *) memory;
+	size_t i;
+
+	for (i = 0; i < length; i++)
+	{
+		bytes[i] = (UINT8) rand();
+	}
+
+}
+

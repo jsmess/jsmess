@@ -370,12 +370,183 @@ WRITE8_HANDLER( zzzap_sh_port_2_w )
  *
  *  Amazing Maze
  *
+ *  Discrete sound emulation: Feb 2007, D.R.
+ *
  *************************************/
+
+
+/* nodes - inputs */
+#define MAZE_P1_DATA			NODE_01
+#define MAZE_P2_DATA			NODE_02
+#define MAZE_TONE_TIMING		NODE_03
+#define MAZE_COIN				NODE_04
+
+/* nodes - other */
+#define MAZE_JOYSTICK_IN_USE	NODE_11
+#define MAZE_AUDIO_ENABLE		NODE_12
+#define MAZE_TONE_ENABLE		NODE_13
+#define MAZE_GAME_OVER			NODE_14
+#define MAZE_R305_306_308		NODE_15
+#define MAZE_R303_309			NODE_16
+#define MAZE_PLAYER_SEL			NODE_17
+
+/* nodes - sounds */
+#define MAZE_SND				NODE_18
+
+
+static const discrete_555_desc maze_555_F2 =
+{
+	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
+	5,				/* B+ voltage of 555 */
+	DEFAULT_555_VALUES
+};
+
+
+static const double maze_74147_table[] =
+{
+	3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 1, 1, 2, 3
+};
+
+
+static const discrete_comp_adder_table maze_r305_306_308 =
+{
+	DISC_COMP_P_RESISTOR,	/* type of circuit */
+	RES_K(100),				/* R308 */
+	2,						/* length */
+	{ RES_M(1.5),			/* R304 */
+	  RES_K(820) }			/* R304 */
+};
+
+
+static const discrete_comp_adder_table maze_r303_309 =
+{
+	DISC_COMP_P_RESISTOR,	/* type of circuit */
+	RES_K(330),				/* R309 */
+	1,						/* length */
+	{ RES_M(1) }			/* R303 */
+};
+
+
+static const discrete_op_amp_osc_info maze_op_amp_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON,	/* type */
+	RES_M(1),			/* r306 */
+	RES_K(430),			/* r307 */
+	MAZE_R305_306_308,	/* r304, r305, r308 switchable circuit */
+	MAZE_R303_309,		/* r303, r309 switchable circuit */
+	RES_K(330),			/* r310 */
+	0, 0, 0,			/* not used */
+	CAP_P(3300),		/* c300 */
+	5					/* vP */
+};
+
+static DISCRETE_SOUND_START(maze_discrete_interface)
+
+	/************************************************
+     * Input register mapping
+     ************************************************/
+	DISCRETE_INPUT_DATA (MAZE_P1_DATA)
+	DISCRETE_INPUT_DATA (MAZE_P2_DATA)
+	DISCRETE_INPUT_LOGIC(MAZE_TONE_TIMING)
+	DISCRETE_INPUT_LOGIC(MAZE_COIN)
+	DISCRETE_INPUT_LOGIC(MAZE_JOYSTICK_IN_USE)	/* IC D2, pin 8 */
+
+	DISCRETE_LOGIC_INVERT(NODE_20,				/* IC E2, pin 8 */
+					1,							/* ENAB */
+					MAZE_JOYSTICK_IN_USE)		/* IN0 */
+	DISCRETE_555_MSTABLE(MAZE_GAME_OVER,		/* IC F2, pin 3 */
+					1,							/* RESET */
+					NODE_20,					/* TRIG */
+					RES_K(270),					/* R203 */
+					CAP_U(100),					/* C204 */
+					&maze_555_F2)
+	DISCRETE_LOGIC_JKFLIPFLOP(MAZE_AUDIO_ENABLE,/* IC F1, pin 5 */
+					1,							/* ENAB */
+					MAZE_COIN,					/* RESET */
+					1,							/* SET */
+					MAZE_GAME_OVER,				/* CLK */
+					1,							/* J */
+					0)							/* K */
+	DISCRETE_LOGIC_INVERT(MAZE_TONE_ENABLE,		/* IC F1, pin 6 */
+					1,							/* ENAB */
+					MAZE_AUDIO_ENABLE)			/* IN0 */
+	DISCRETE_LOGIC_AND3(NODE_21,
+					1,							/* ENAB */
+					MAZE_JOYSTICK_IN_USE,		/* INP0 */
+					MAZE_TONE_ENABLE,			/* INP1 */
+					MAZE_TONE_TIMING)			/* INP2 */
+
+	DISCRETE_LOGIC_JKFLIPFLOP(MAZE_PLAYER_SEL,	/* IC C1, pin 3 */
+					1,							/* ENAB */
+					1,							/* RESET */
+					1,							/* SET */
+					MAZE_TONE_TIMING,			/* CLK */
+					1,							/* J */
+					1)							/* K */
+	DISCRETE_MULTIPLEX2(NODE_31,				/* IC D1 */
+					1,							/* ENAB */
+					MAZE_PLAYER_SEL,			/* ADDR */
+					MAZE_P1_DATA,				/* INP0 */
+					MAZE_P2_DATA)				/* INP1 */
+	DISCRETE_LOOKUP_TABLE(NODE_32,				/* IC E1 */
+					1,							/* ENAB */
+					NODE_31,					/* ADDR */
+					16,							/* SIZE */
+					&maze_74147_table)
+	DISCRETE_COMP_ADDER(MAZE_R305_306_308,		/* value of selected parallel circuit r305, r306, r308 */
+					1,							/* ENAB */
+					NODE_32,					/* DATA */
+					&maze_r305_306_308)
+	DISCRETE_COMP_ADDER(MAZE_R303_309,			/* value of selected parallel circuit r303, r309 */
+					1,							/* ENAB */
+					MAZE_PLAYER_SEL,			/* DATA */
+					&maze_r303_309)
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_36,			/* IC J1, pin 4 */
+					1,					/* ENAB */
+					&maze_op_amp_osc)
+
+	DISCRETE_CRFILTER(NODE_40,
+					NODE_21,					/* ENAB */
+					NODE_36,					/* IN0 */
+					RES_K(250),					/* r311, r312, r402, r403 in parallel */
+					CAP_U(0.01)	)				/* c401 */
+	DISCRETE_RCFILTER(NODE_41,
+					1		,					/* ENAB */
+					NODE_40,					/* IN0 */
+					RES_K(56),					/* r404 */
+					CAP_P(4700)	)				/* c400 */
+	DISCRETE_SWITCH(MAZE_SND,					/* H3 saturates op-amp J3 when enabled, disabling audio */
+					1,							/* ENAB */
+					MAZE_AUDIO_ENABLE,			/* SWITCH */
+					NODE_41,					/* INP0 */
+					0)							/* INP1 */
+
+	DISCRETE_OUTPUT(MAZE_SND, 36040)
+DISCRETE_SOUND_END
 
 
 MACHINE_DRIVER_START( maze_sound )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_CONFIG(maze_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+
+void maze_write_discrete(UINT8 maze_tone_timing_state)
+{
+	/* controls need to be active low */
+	int controls = ~readinputport(0) &0xff;
+
+	discrete_sound_w(MAZE_TONE_TIMING, maze_tone_timing_state);
+	discrete_sound_w(MAZE_P1_DATA, controls & 0x0f);
+	discrete_sound_w(MAZE_P2_DATA, (controls >> 4) & 0x0f);
+	discrete_sound_w(MAZE_JOYSTICK_IN_USE, controls != 0xff);
+
+	/* the coin line is connected directly to the discrete circuit */
+	/* we can't really do that, so updating it with the tone timing is close enough */
+	discrete_sound_w(MAZE_COIN, (~readinputport(1) >> 3) & 0x01);
+}
 
 
 
@@ -646,7 +817,7 @@ WRITE8_HANDLER( checkmat_sh_port_w )
 
 	sound_global_enable((data >> 3) & 0x01);
 
-	/* D4-D7  set TONE FREQ( data & 0xf0 ) */
+	/* D4-D7  set TONE FREQ( (data >> 4) & 0x0f ) */
 }
 
 

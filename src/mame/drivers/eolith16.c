@@ -12,6 +12,7 @@
 #include "driver.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
+#include "eolithsp.h"
 
 static UINT16 *vram;
 static int vbuffer = 0;
@@ -40,10 +41,13 @@ static WRITE16_HANDLER( eeprom_w )
 	//data & 0x100 and data & 0x004 always set
 }
 
-static READ16_HANDLER( eeprom_r )
+static READ16_HANDLER( eolith16_custom_r )
 {
+	eolith_speedup_read();
 	return (readinputport(0) & ~0x10) | (EEPROM_read_bit() << 4);
 }
+
+
 
 static WRITE16_HANDLER( vram_w )
 {
@@ -62,7 +66,7 @@ static ADDRESS_MAP_START( eolith16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION(REGION_USER2, 0)
 	AM_RANGE(0xffe40000, 0xffe40001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0xffe80000, 0xffe80001) AM_WRITE(eeprom_w)
-	AM_RANGE(0xffea0000, 0xffea0001) AM_READ(eeprom_r)
+	AM_RANGE(0xffea0000, 0xffea0001) AM_READ(eolith16_custom_r)
 	AM_RANGE(0xffea0002, 0xffea0003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xffec0000, 0xffec0001) AM_READNOP // not used?
 	AM_RANGE(0xffec0002, 0xffec0003) AM_READ(input_port_2_word_r)
@@ -72,7 +76,7 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( eolith16 )
 	PORT_START
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) // eeprom bit
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, 0)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
@@ -158,12 +162,15 @@ PALETTE_INIT( eolith16 )
 	}
 }
 
+
+
 static MACHINE_DRIVER_START( eolith16 )
 	MDRV_CPU_ADD(E116T, 60000000)		 /* 60 MHz */
 	MDRV_CPU_PROGRAM_MAP(eolith16_map,0)
+	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(0)
 
 	MDRV_NVRAM_HANDLER(eolith16_eeprom)
 
@@ -245,4 +252,9 @@ ROM_START( klondkp )
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 
-GAME( 1999, klondkp, 0, eolith16, eolith16, 0, ROT0, "Eolith", "KlonDike+", 0 )
+DRIVER_INIT( eolith16 )
+{
+	init_eolith_speedup(Machine);
+}
+
+GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16, ROT0, "Eolith", "KlonDike+", 0 )

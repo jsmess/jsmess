@@ -1238,25 +1238,13 @@ void cps1_build_palette(void)
 
 		if (palette != cps1_old_palette[offset])
 		{
-		   int red, green, blue, bright;
+		   	int red, green, blue, bright;
 
-			if (cps_version == 2)
-			{
-				bright = 0x10 + (palette>>12);
+			bright = 0x10 + (palette>>12);
 
-				red   = ((palette>>8)&0x0f) * bright * 0x11 / 0x1f;
-				green = ((palette>>4)&0x0f) * bright * 0x11 / 0x1f;
-				blue  = ((palette>>0)&0x0f) * bright * 0x11 / 0x1f;
-			}
-			else
-			{
-				bright = (palette>>12);
-				if (bright) bright += 2;
-
-				red   = ((palette>>8)&0x0f) * bright;
-				green = ((palette>>4)&0x0f) * bright;
-				blue  = ((palette>>0)&0x0f) * bright;
-			}
+			red   = ((palette>>8)&0x0f) * bright * 0x11 / 0x1f;
+			green = ((palette>>4)&0x0f) * bright * 0x11 / 0x1f;
+			blue  = ((palette>>0)&0x0f) * bright * 0x11 / 0x1f;
 
 			palette_set_color (Machine, offset, red, green, blue);
 			cps1_old_palette[offset] = palette;

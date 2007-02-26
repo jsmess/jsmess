@@ -242,7 +242,7 @@ void k051649_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_PTR_SET_INFO:						info->set_info = k051649_set_info;		break;
 		case SNDINFO_PTR_START:							info->start = k051649_start;			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							/* nothing */							break;
+		case SNDINFO_PTR_RESET:							info->reset = k051649_reset;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "K051649";					break;

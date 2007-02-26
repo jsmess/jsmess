@@ -18,11 +18,6 @@
 static int cdp1869_prd;
 extern int cdp1869_pcb;
 
-static void cidelsa_out_q(int level)
-{
-	cdp1869_pcb = level;
-}
-
 static int cidelsa_in_ef(void)
 {
 	/*
@@ -38,7 +33,7 @@ static int cidelsa_in_ef(void)
 static CDP1802_CONFIG cidelsa_cdp1802_config =
 {
 	NULL,
-	cidelsa_out_q,
+	NULL,
 	cidelsa_in_ef
 };
 
@@ -660,7 +655,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1980, destryer, 0, 		destryer, destryer, cidelsa, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // ok, but bad colours, some bad gfx (large enemies etc.)
-GAME( 1980, destryea, destryer, destryea, destryer, cidelsa, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // ok, but bad colours, some bad gfx (large enemies etc.)
-GAME( 1981, altair,   0, 		altair,   altair,   cidelsa, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // some bullets are invisible
-GAME( 1981, draco,    0, 		draco,    draco,    draco, 	 ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1980, destryer, 0, 		destryer, destryer, cidelsa, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1980, destryea, destryer, destryea, destryer, cidelsa, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1981, altair,   0, 		altair,   altair,   cidelsa, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_SOUND )
+GAME( 1981, draco,    0, 		draco,    draco,    draco, 	 ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )

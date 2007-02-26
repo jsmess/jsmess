@@ -138,8 +138,9 @@ typedef void (*output_callback)(void *param, const char *format, va_list argptr)
 
 
 /* forward type declarations */
-typedef struct _palette_private palette_private;
 typedef struct _mame_private mame_private;
+typedef struct _palette_private palette_private;
+typedef struct _streams_private streams_private;
 
 
 /* description of the currently-running machine */
@@ -180,11 +181,11 @@ struct _running_machine
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
+	streams_private *		streams_data;		/* internal data from streams.c */
 
 	/* driver-specific information */
 	void *					driver_data;		/* drivers can hang data off of here instead of using globals */
 };
-
 
 
 typedef struct _mame_system_tm mame_system_tm;
@@ -200,7 +201,6 @@ struct _mame_system_tm
 	UINT16 day;		/* day of year (0-365) */
 	UINT8 is_dst;	/* is this daylight savings? */
 };
-
 
 
 typedef struct _mame_system_time mame_system_time;

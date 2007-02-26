@@ -34,4 +34,11 @@ int gregorian_is_leap_year(int year);
 int gregorian_days_in_month(int month, int year);
 
 
+/***************************************************************************
+    MISC
+***************************************************************************/
+
+void rand_memory(void *memory, size_t length);
+
+
 #endif /* __COREUTIL_H__ */

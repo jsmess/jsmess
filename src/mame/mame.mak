@@ -696,6 +696,8 @@ $(MAMEOBJ)/edevices.a: \
 $(MAMEOBJ)/eolith.a: \
 	$(DRIVERS)/eolith.o $(VIDEO)/eolith.o \
 	$(DRIVERS)/eolith16.o \
+	$(DRIVERS)/eolithsp.o \
+	$(DRIVERS)/vegaeo.o \
 
 $(MAMEOBJ)/excelent.a: \
 	$(DRIVERS)/aquarium.o $(VIDEO)/aquarium.o \
@@ -862,7 +864,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/konamigv.o \
 	$(DRIVERS)/konamigx.o $(MACHINE)/konamigx.o $(VIDEO)/konamigx.o \
 	$(DRIVERS)/konamim2.o \
-	$(DRIVERS)/ksys573.o $(MACHINE)/x76f041.o $(MACHINE)/upd4701.o \
+	$(DRIVERS)/ksys573.o $(MACHINE)/x76f041.o $(MACHINE)/x76f100.o $(MACHINE)/zs01.o $(MACHINE)/ds2401.o $(MACHINE)/upd4701.o \
 	$(DRIVERS)/labyrunr.o $(VIDEO)/labyrunr.o \
 	$(DRIVERS)/lethal.o $(VIDEO)/lethal.o \
 	$(DRIVERS)/mainevt.o $(VIDEO)/mainevt.o \
@@ -1580,7 +1582,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ssfindo.o \
 	$(DRIVERS)/ssingles.o \
 	$(DRIVERS)/steaser.o \
-	$(DRIVERS)/starspnr.o \
 	$(DRIVERS)/statriv2.o \
 	$(DRIVERS)/supertnk.o \
 	$(DRIVERS)/tattack.o \

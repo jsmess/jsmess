@@ -20,9 +20,7 @@
 
     ---
 
-    AGEMAME driver by Curt Coder
-
-Any fixes for this driver should be forwarded to AGEMAME at (http://www.mameworld.net/agemame)
+    Driver by Curt Coder
 
 */
 
@@ -30,7 +28,6 @@ Any fixes for this driver should be forwarded to AGEMAME at (http://www.mameworl
 #include "sound/ay8910.h"
 /* video */
 
-#if 0 //Disabled
 static tilemap *bg_tilemap;
 
 static WRITE8_HANDLER( cm_videoram_w )
@@ -59,53 +56,37 @@ static void get_bg_tile_info(int tile_index)
 
 	SET_TILE_INFO(0, code, color, 0)
 }
-#endif
 
 VIDEO_START(cm2)
 {
-#if 0
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-#endif
 	return 0;
 }
 
 VIDEO_UPDATE(cm2)
 {
-//  tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+  tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }
 
 static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
-//  AM_RANGE(0x8000, 0xffff) AM_RAM
-#if 0
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xd3ff) AM_RAM
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_WRITE(cm_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_WRITE(cm_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
-#endif
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0x8000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-//  AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-//  AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-//  AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
-//  AM_RANGE(0x04, 0x04) AM_READ(input_port_0_r)
-//  AM_RANGE(0x09, 0x09) AM_READ(input_port_1_r)
-//  AM_RANGE(0x0a, 0x0a) AM_READ(input_port_2_r)
-
-//  AM_RANGE(0x02, 0x02) AM_WRITENOP
-//  AM_RANGE(0x03, 0x03) AM_WRITENOP
-//  AM_RANGE(0x07, 0x07) AM_WRITENOP
-//  AM_RANGE(0x0b, 0x0b) AM_WRITENOP
-//  AM_RANGE(0x10, 0x10) AM_WRITENOP
-//  AM_RANGE(0x12, 0x12) AM_WRITENOP
+  AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
+  AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
+  AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_0_w)
+  AM_RANGE(0x04, 0x04) AM_READ(input_port_0_r)
+  AM_RANGE(0x09, 0x09) AM_READ(input_port_1_r)
+  AM_RANGE(0x0a, 0x0a) AM_READ(input_port_2_r)
 ADDRESS_MAP_END
 
 INPUT_PORTS_START( cm2v841 )

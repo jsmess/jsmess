@@ -593,8 +593,10 @@ static void output_set_state(const char *outname, INT32 state)
 			led_set_state(original_state);
 		}
 		else
+		{
+			original_state = led_get_state();
 			led_set_state(pause_state);
-
+		}
 	}
 	// look for LED0/LED1/LED2 states and update accordingly
 	else if (strcmp(outname, "led0") == 0)

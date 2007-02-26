@@ -442,12 +442,20 @@ static void cdp1802_run(void)
 
 			case 0xa:
 				Q = 0;
-				cdp1802.config->out_q(Q);
+
+				if (cdp1802.config->out_q)
+				{
+					cdp1802.config->out_q(Q);
+				}
 				break;
 
 			case 0xb:
 				Q = 1;
-				cdp1802.config->out_q(Q);
+
+				if (cdp1802.config->out_q)
+				{
+					cdp1802.config->out_q(Q);
+				}
 				break;
 
 			case 0xc:

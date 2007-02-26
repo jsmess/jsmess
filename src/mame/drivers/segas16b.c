@@ -831,6 +831,7 @@ WW.B11    Object 5 - Even
 #include "driver.h"
 #include "system16.h"
 #include "machine/segaic16.h"
+#include "machine/fd1094.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
@@ -1000,6 +1001,16 @@ static void system16b_generic_init(int _rom_board)
 
 	/* init the FD1094 */
 	fd1094_driver_init();
+
+#ifdef MAME_DEBUG
+if (strcmp(Machine->gamedrv->name, "exctleag") == 0 ||
+	strcmp(Machine->gamedrv->name, "suprleag") == 0 ||
+	strcmp(Machine->gamedrv->name, "bullet") == 0 ||
+	strcmp(Machine->gamedrv->name, "altbeaj1") == 0)
+{
+	fd1094_find_global_keys((const UINT16 *)memory_region(REGION_CPU1), memory_region(REGION_USER1));
+}
+#endif
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;
@@ -4221,12 +4232,15 @@ ROM_END
 */
 ROM_START( exctleag )
 	ROM_REGION( 0x60000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr11937.a02", 0x00000, 0x10000, CRC(4ebda367) SHA1(ab4db50eb0d2e10a3b4b7fc0f4bdc82412379809) )
+	ROM_LOAD16_BYTE( "epr11939.a04", 0x00000, 0x10000, CRC(117dd98f) SHA1(0234c2cf3421849854bec3711ab64f50f12cc5dd) )
 	ROM_LOAD16_BYTE( "epr11936.a01", 0x00001, 0x10000, CRC(0863de60) SHA1(540a5cae2623bce296c07603239f737a782e3b0b) )
-	ROM_LOAD16_BYTE( "epr11939.a04", 0x20000, 0x10000, CRC(117dd98f) SHA1(0234c2cf3421849854bec3711ab64f50f12cc5dd) )
-	ROM_LOAD16_BYTE( "epr11938.a03", 0x20001, 0x10000, CRC(07c08d47) SHA1(47d3445cfa2514918206cd29a203837a9f434b42) )
+	ROM_LOAD16_BYTE( "epr11940.a05", 0x20000, 0x10000, CRC(dec83274) SHA1(85919bcd372fbfb9f06c34897b4d28d08ef3c9d1) )
+	ROM_LOAD16_BYTE( "epr11937.a02", 0x20001, 0x10000, CRC(4ebda367) SHA1(ab4db50eb0d2e10a3b4b7fc0f4bdc82412379809) )
 	ROM_LOAD16_BYTE( "epr11941.a06", 0x40000, 0x10000, CRC(4df2d451) SHA1(644541b20e034a0149117874021c158bd3759e35) )
-	ROM_LOAD16_BYTE( "epr11940.a05", 0x40001, 0x10000, CRC(dec83274) SHA1(85919bcd372fbfb9f06c34897b4d28d08ef3c9d1) )
+	ROM_LOAD16_BYTE( "epr11938.a03", 0x40001, 0x10000, CRC(07c08d47) SHA1(47d3445cfa2514918206cd29a203837a9f434b42) )
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
+	ROM_LOAD( "317-0079.key", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr11942.b09", 0x00000, 0x10000, CRC(eb70e827) SHA1(0617b4411a90087c277354c3653fe994bc4fc580) )
@@ -5238,12 +5252,15 @@ ROM_END
 */
 ROM_START( suprleag )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr11131.a02", 0x00000, 0x10000, CRC(9b78c2cc) SHA1(9a453dd999120590c52b17f8ff2b49fd2fde0b35) )
+	ROM_LOAD16_BYTE( "epr11133.a04", 0x00000, 0x10000, CRC(eed72f37) SHA1(80b68abdb90a63b30754dd031e85b1020dcc0cc4) )
 	ROM_LOAD16_BYTE( "epr11130.a01", 0x00001, 0x10000, CRC(e2451676) SHA1(d2f71d9fca933e63e2bd5ee48217801ab0cb049c) )
-	ROM_LOAD16_BYTE( "epr11133.a04", 0x20000, 0x10000, CRC(eed72f37) SHA1(80b68abdb90a63b30754dd031e85b1020dcc0cc4) )
-	ROM_LOAD16_BYTE( "epr11132.a03", 0x20001, 0x10000, CRC(ff199325) SHA1(2ece15b6b79ec3f948f7bec623e1df281cf89382) )
+	ROM_LOAD16_BYTE( "epr11134.a05", 0x20000, 0x10000, CRC(ccd857f5) SHA1(2566bb458bdd365db403e8229ecdad79e23076a1) )
+	ROM_LOAD16_BYTE( "epr11131.a02", 0x20001, 0x10000, CRC(9b78c2cc) SHA1(9a453dd999120590c52b17f8ff2b49fd2fde0b35) )
 	ROM_LOAD16_BYTE( "epr11135.a06", 0x40000, 0x10000, CRC(3735e0e1) SHA1(ae2910099909245993ee29e5a03a5591f20962c7) )
-	ROM_LOAD16_BYTE( "epr11134.a05", 0x40001, 0x10000, CRC(ccd857f5) SHA1(2566bb458bdd365db403e8229ecdad79e23076a1) )
+	ROM_LOAD16_BYTE( "epr11132.a03", 0x40001, 0x10000, CRC(ff199325) SHA1(2ece15b6b79ec3f948f7bec623e1df281cf89382) )
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
+	ROM_LOAD( "317-0045.key", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr11136.b09", 0x00000, 0x10000, CRC(c3860ce4) SHA1(af7618f3b5a0e8d6374877c7815ba69fff218a45) )
@@ -5984,7 +6001,6 @@ static DRIVER_INIT( snapper )
 
 #ifdef MAME_DEBUG
 #include "cpu/m68000/m68k.h"
-#include "machine/fd1094.h"
 static void test_key(int shift, UINT8 bindex, UINT32 seed, UINT32 global)
 {
 	extern unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);

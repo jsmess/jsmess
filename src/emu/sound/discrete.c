@@ -208,7 +208,9 @@ static discrete_module module_list[] =
 	{ DST_LOGIC_NOR   ,"DST_LOGIC_NOR"   ,0                                      ,NULL                  ,dst_logic_nor_step   },
 	{ DST_LOGIC_XOR   ,"DST_LOGIC_XOR"   ,0                                      ,NULL                  ,dst_logic_xor_step   },
 	{ DST_LOGIC_NXOR  ,"DST_LOGIC_NXOR"  ,0                                      ,NULL                  ,dst_logic_nxor_step  },
-	{ DST_LOGIC_DFF   ,"DST_LOGIC_DFF"   ,sizeof(struct dst_dflipflop_context)   ,dst_logic_dff_reset   ,dst_logic_dff_step   },
+	{ DST_LOGIC_DFF   ,"DST_LOGIC_DFF"   ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_dff_step   },
+	{ DST_LOGIC_JKFF  ,"DST_LOGIC_JKFF"  ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_jkff_step  },
+	{ DST_LOOKUP_TABLE,"DST_LOOKUP_TABLE",0                                      ,NULL                  ,dst_lookup_table_step},
 	{ DST_MULTIPLEX   ,"DST_MULTIPLEX"   ,sizeof(struct dst_size_context)        ,dst_multiplex_reset   ,dst_multiplex_step   },
 	{ DST_ONESHOT     ,"DST_ONESHOT"     ,sizeof(struct dst_oneshot_context)     ,dst_oneshot_reset     ,dst_oneshot_step     },
 	{ DST_RAMP        ,"DST_RAMP"        ,sizeof(struct dss_ramp_context)        ,dst_ramp_reset        ,dst_ramp_step        },
@@ -632,7 +634,7 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
 			int inputnode = block->input_node[inputnum];
 
 			/* if this input is node-based, find the node in the indexed list */
-			if ((inputnode > NODE_START) && (inputnode <= NODE_END))
+			if IS_VALUE_A_NODE(inputnode)
 			{
 				node_description *node_ref = info->indexed_node[inputnode - NODE_START];
 				if (!node_ref)

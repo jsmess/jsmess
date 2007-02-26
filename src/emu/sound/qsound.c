@@ -531,7 +531,7 @@ void qsound_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = qsound_set_info;		break;
 		case SNDINFO_PTR_START:							info->start = qsound_start;				break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
+		case SNDINFO_PTR_STOP:							info->stop = qsound_stop;				break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

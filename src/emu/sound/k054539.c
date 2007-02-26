@@ -59,7 +59,6 @@ CHANNEL_DEBUG enables the following keys:
 
 struct k054539_info {
 	const struct K054539interface *intf;
-	double freq_ratio;
 	double voltab[256];
 	double pantab[0xf];
 
@@ -167,7 +166,7 @@ static void K054539_update(void *param, stream_sample_t **inputs, stream_sample_
 			base2 = info->regs + 0x200 + 0x2*ch;
 			chan = info->channels + ch;
 //*
-			delta = info->freq_ratio * (base1[0x00] | (base1[0x01] << 8) | (base1[0x02] << 16));
+			delta = base1[0x00] | (base1[0x01] << 8) | (base1[0x02] << 16);
 
 			vol = base1[0x03];
 
@@ -199,7 +198,7 @@ else
 */
 			rdelta = (base1[6] | (base1[7] << 8)) >> 3;
 //          rdelta = (reverb_pos + (int)((rdelta - 0x2000) * info->freq_ratio)) & 0x3fff;
-			rdelta = (int)((double)rdelta / info->freq_ratio + reverb_pos) & 0x3fff;
+			rdelta = (int)(rdelta + reverb_pos) & 0x3fff;
 			revb = rbase + rdelta;
 
 			cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
@@ -447,7 +446,7 @@ static void K054539_irq(void *param)
 		info->intf->irq ();
 }
 
-static void K054539_init_chip(struct k054539_info *info, int sndindex)
+static void K054539_init_chip(struct k054539_info *info, int clock, int sndindex)
 {
 	int i;
 
@@ -476,7 +475,7 @@ static void K054539_init_chip(struct k054539_info *info, int sndindex)
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
 		timer_pulse_ptr(TIME_IN_HZ(480), info, K054539_irq);
 
-	info->stream = stream_create(0, 2, Machine->sample_rate, info, K054539_update);
+	info->stream = stream_create(0, 2, clock, info, K054539_update);
 
 	state_save_register_item_array("K054539", sndindex, info->regs);
 	state_save_register_item_pointer("K054539", sndindex, info->ram,  0x4000);
@@ -655,8 +654,6 @@ static void *k054539_start(int sndindex, int clock, const void *config)
 
 	info->intf = config;
 
-	info->freq_ratio = (double)(clock) / (double)(Machine->sample_rate);
-
 	/*
         I've tried various equations on volume control but none worked consistently.
         The upper four channels in most MW/GX games simply need a significant boost
@@ -679,7 +676,7 @@ static void *k054539_start(int sndindex, int clock, const void *config)
 	for(i=0; i<0xf; i++)
 		info->pantab[i] = sqrt(i) / sqrt(0xe);
 
-	K054539_init_chip(info, sndindex);
+	K054539_init_chip(info, clock, sndindex);
 
 	state_save_register_func_postload_ptr(reset_zones, info);
 	return info;

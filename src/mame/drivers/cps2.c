@@ -532,15 +532,15 @@ Known problems with this driver.
     in connetion with data registers only the code would end up running to slow.
 
   - Giga Wing's sprites are 1 frame out when compared to background scrolling. See
-    the explenation above for the most likley cause of this problem.
+    the explanation above for the most likley cause of this problem.
 
-  - Progear slows down more that it should when compared to real hardware. See
+  - Progear slows down more than it should when compared to real hardware. See
     the explanation above for the most likely cause of this problem.
 
 Driver Note:
 
-  - New region sets will need full XOR tables dumped to extract the proper keys
-    or they will need to be brute forced
+  - Any new region sets will need full encryption tables dumped to extract the proper
+    keys or they will need to be brute forced. XORs are no longer supported nor wanted.
 
 ***************************************************************************/
 
@@ -7158,7 +7158,7 @@ GAME( 1996, sfz2ab,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fi
 GAME( 1996, sfz2aa,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Asia 960826)", 0 )
 GAME( 1996, spf2t,    0,       cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (USA 960620)", 0 )
 GAME( 1996, spf2xj,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II X (Japan 960531)", 0 )
-GAME( 1996, spf2ta,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", GAME_NOT_WORKING )	// no key
+GAME( 1996, spf2ta,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", 0 )
 GAME( 1996, xmvsf,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)", 0 )
 GAME( 1996, xmvsfr1,  xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)", 0 )
 GAME( 1996, xmvsfu,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)", 0 )
@@ -7216,7 +7216,7 @@ GAME( 1998, sfz3jr1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fi
 GAME( 1998, sfz3jr2,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980629)", 0 )
 GAME( 1998, sfz3a,    sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980904)", 0 )
 GAME( 1998, sfz3ar1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980701)", 0 )
-GAME( 1999, jyangoku, 0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Jyangokushi: Haoh no Saihai (Japan)", 0 )
+GAME( 1999, jyangoku, 0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Jyangokushi: Haoh no Saihai (Japan 990527)", 0 )
 GAME( 2004, hsf2,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Asia 040202)", 0 )
 GAME( 2004, hsf2j,    hsf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Japan 031222)", 0 )
 

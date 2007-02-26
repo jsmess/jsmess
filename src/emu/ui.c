@@ -1555,10 +1555,10 @@ static INT32 slider_volume(INT32 newval, char *buffer, int arg)
 {
 	if (buffer != NULL)
 	{
-		osd_set_mastervolume(newval);
-		sprintf(buffer, "%s %3ddB", ui_getstring(UI_volume), osd_get_mastervolume());
+		sound_set_attenuation(newval);
+		sprintf(buffer, "%s %3ddB", ui_getstring(UI_volume), sound_get_attenuation());
 	}
-	return osd_get_mastervolume();
+	return sound_get_attenuation();
 }
 
 

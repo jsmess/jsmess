@@ -2796,10 +2796,11 @@ V-V                           TP-027
 	DRIVER( konam80k )	/* 1998 - Konami 80's AC Special (GC826 VER. KAA) */
 	DRIVER( dstage )	/* 1999 - Dancing Stage (GN845 VER. EAA) */
 	DRIVER( ddru )		/* 1999 - Dance Dance Revolution (GN845 VER. UAA) */
-	DRIVER( ddrj )		/* 1998 - Dance Dance Revolution (GC845 VER. JBA) */
+	DRIVER( ddrj )		/* 1998 - Dance Dance Revolution - Internet Ranking Ver (GC845 VER. JBA) */
+	DRIVER( ddrja )		/* 1998 - Dance Dance Revolution (GC845 VER. JAB) */
 	DRIVER( ddra )		/* 1999 - Dance Dance Revolution (GN845 VER. AAA) */
 	DRIVER( fbait2bc )	/* 1998 - Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB) */
-	DRIVER( ddr2ndl )	/* 1999 - Dance Dance Revolution 2nd Mix Link (GE885 VER. JAA) */
+	DRIVER( ddr2ml )	/* 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA) */
 	DRIVER( gtrfrks )	/* 1999 - Guitar Freaks (GQ886 VER. EAC) */
 	DRIVER( gtrfrksu )	/* 1999 - Guitar Freaks (GQ886 VER. UAC) */
 	DRIVER( gtrfrksj )	/* 1999 - Guitar Freaks (GQ886 VER. JAC) */
@@ -2808,7 +2809,29 @@ V-V                           TP-027
 	DRIVER( fbaitmcu )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. UA) */
 	DRIVER( fbaitmcj )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. JA) */
 	DRIVER( fbaitmca )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. AA) */
-	DRIVER( ddr2nd )	/* 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA) */
+	DRIVER( ddr2m )		/* 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA) */
+	DRIVER( dsftkd )	/* 1999 - Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA) */
+	DRIVER( ddrsbm )	/* 1999 - Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA) */
+	DRIVER( ddrs2k )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. AAA) */
+	DRIVER( ddrs2kj )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. JAA) */
+	DRIVER( ddr3mk )	/* 2000 - Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA) */
+	DRIVER( ddr3mka )	/* 2000 - Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA) */
+	DRIVER( ddr3ma )	/* 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. AAA) */
+	DRIVER( ddr3mj )	/* 1999 - Dance Dance Revolution 3rd Mix (GN887 VER. JAA) */
+	DRIVER( dncfrks )	/* 1999 - Dance Freaks (G*874 VER. KAA) */
+	DRIVER( drmn2m )	/* 1999 - DrumMania 2nd Mix (GE912 VER. JAA) */
+	DRIVER( ddr3mp )	/* 2000 - Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA) */
+	DRIVER( ddr4m )		/* 2000 - Dance Dance Revolution 4th Mix (G*A33 VER. AAA) */
+	DRIVER( ddr4ms )	/* 2000 - Dance Dance Revolution Solo 4th Mix (G*A33 VER. ABA) */
+	DRIVER( ddrusa )	/* 2000 - Dance Dance Revolution USA (G*A44 VER. UAA) */
+	DRIVER( ddr4mp )	/* 2000 - Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA) */
+	DRIVER( ddr4mps )	/* 2000 - Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA) */
+	DRIVER( dmx2m )		/* 2000 - Dance Maniax 2nd Mix (G*A39 VER. JAA) */
+	DRIVER( ddr5m )		/* 2001 - Dance Dance Revolution 5th Mix (G*A27 VER. JAA) */
+	DRIVER( dmx2majp )	/* 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA ) */
+	DRIVER( salarymc )	/* 2001 - Salary Man Champ (G*A18 VER. JAA) */
+	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
+	DRIVER( ddrmax2 )	/* 2002 - DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) */
 
 	/* Mitchell games */
 	DRIVER( mgakuen )	/* (c) 1988 Yuga */
@@ -3898,6 +3921,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ghostb )	/* (c) 1987 Data East USA (US) */
 	DRIVER( ghostb3 )	/* (c) 1987 Data East USA (US) */
 	DRIVER( meikyuh )	/* (c) 1987 Data East Corporation (Japan) */
+	DRIVER( meikyuha )	/* (c) 1987 Data East Corporation (Japan) */
 	DRIVER( srdarwin )	/* (c) 1987 Data East Corporation (World) */
 	DRIVER( srdarwnj )	/* (c) 1987 Data East Corporation (Japan) */
 	DRIVER( gondo )		/* (c) 1987 Data East USA (US) */
@@ -5242,7 +5266,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gowcaizr )	/* 0094 (c) 1995 Technos */
 	DRIVER( rbff1 )		/* 0095 (c) 1995 SNK */
 	DRIVER( aof3 )		/* 0096 (c) 1996 SNK */
-	DRIVER( aof3k )		/* Censored Korean release of rbff2 */
+	DRIVER( aof3k )		/* Censored Korean release of aof3 */
 	DRIVER( sonicwi3 )	/* 0097 (c) 1995 Video System Co. */
 				/* 0098 Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist) */
 				/* 0099 Neo Pool Masters */
@@ -5286,8 +5310,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kog )		/* bootleg of kof97 */
 	DRIVER( magdrop3 )	/* 0233 (c) 1997 Data East Corporation */
 	DRIVER( lastblad )	/* 0234 (c) 1997 SNK */
-	DRIVER( lastblda )	/* 0234 (c) 1997 SNK */
-	DRIVER( lastsold )	/* Censored Korean release of rbff2 */
+	DRIVER( lastbldh )	/* 0234 (c) 1997 SNK */
+	DRIVER( lastsold )	/* Censored Korean release of lastblad */
 	DRIVER( puzzldpr )	/* 0235 (c) 1997 Taito (Visco license) */
 	DRIVER( irrmaze )	/* 0236 (c) 1997 SNK / Saurus */
 	DRIVER( popbounc )	/* 0237 (c) 1997 Video System Co. */
@@ -5295,7 +5319,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( shocktra )	/* 0238 (c) 1997 Saurus */
 	DRIVER( blazstar )	/* 0239 (c) 1998 Yumekobo */
 	DRIVER( rbff2 )		/* 0240 (c) 1998 SNK */
-	DRIVER( rbff2a )	/* 0240 (c) 1998 SNK */
+	DRIVER( rbff2h )	/* 0240 (c) 1998 SNK */
 	DRIVER( rbff2k )	/* Censored Korean release of rbff2 */
 	DRIVER( mslug2 )	/* 0241 (c) 1998 SNK */
 	DRIVER( kof98 )		/* 0242 (c) 1998 SNK */
@@ -6903,6 +6927,7 @@ Other Sun games
 	DRIVER( dynamski )	/* (c) 1984 Taiyo */
 	DRIVER( chinhero )	/* (c) 1984 Taiyo */
 	DRIVER( chinher2 )	/* (c) 1984 Taiyo */
+	DRIVER( chinhert )	/* (c) 1984 Taiyo */
 	DRIVER( shangkid )	/* (c) 1985 Taiyo + Data East license */
 	DRIVER( hiryuken )	/* (c) 1985 Taito */
 
@@ -7222,6 +7247,7 @@ Other Sun games
 	DRIVER( fort2ba )	/* (c) 2001 Eolith */
 	DRIVER( klondkp )	/* (c) 1999 Eolith */
 	DRIVER( hidctch3 )	/* (c) 2000 Eolith */
+	DRIVER( crazywar )	/* (c) 2002 Eolith */
 	DRIVER( xfiles )	/* (c) 1999 dgPIX Entertainment Inc */
 	DRIVER( kdynastg )	/* (c) 1999 EZ Graphics */
 	DRIVER( fmaniac3 )	/* (c) 2002 Saero Entertainment */
@@ -7339,6 +7365,8 @@ Other Sun games
 	DRIVER( ampokr2b )	/* (c) 198? Novomatic */
 	DRIVER( ampokr2c )	/* (c) 198? Novomatic */
 	DRIVER( lucky8 )	/* (c) 1989 Falcon */
+	DRIVER( sidewndr )	/* (c) 1981? ACE */
+	DRIVER( spellbnd )	/* (c) 1981? ACE */
 	DRIVER( starspnr )	/* (c) 1982? ACE */
 	DRIVER( vp906iii )	/* (c) 1985 Casino Electronics Inc. */
 	DRIVER( attckufo )	/* (c) 1980 Ryoto Electric Co. */

@@ -29,15 +29,15 @@ typedef void (*stream_callback)(void *param, stream_sample_t **inputs, stream_sa
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int streams_init(void);
-void streams_set_tag(void *streamtag);
-void streams_frame_update(void);
+void streams_init(running_machine *machine, subseconds_t update_subseconds);
+void streams_set_tag(running_machine *machine, void *streamtag);
+void streams_update(running_machine *machine);
 
 /* core stream configuration and operation */
 sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *param, stream_callback callback);
 void stream_set_input(sound_stream *stream, int index, sound_stream *input_stream, int output_index, float gain);
-void stream_update(sound_stream *stream);	/* min_interval is in usec */
-stream_sample_t *stream_consume_output(sound_stream *stream, int output, int samples);
+void stream_update(sound_stream *stream);
+const stream_sample_t *stream_get_output_since_last_update(sound_stream *stream, int outputnum, int *numsamples);
 
 /* utilities for accessing a particular stream */
 sound_stream *stream_find_by_tag(void *streamtag, int streamindex);

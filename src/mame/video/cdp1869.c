@@ -59,7 +59,33 @@ PALETTE_INIT( cdp1869 )
 	}
 }
 
-static int cdp1869_get_pma(void)
+static int cdp1869_get_lines(void)
+{
+	if (cdp1869.line16 && !cdp1869.dblpage)
+	{
+		return 16;
+	}
+	else if (!cdp1869.line9)
+	{
+		return 9;
+	}
+	else
+	{
+		return 8;
+	}
+}
+
+static UINT16 cdp1869_get_pmemsize(int cols, int rows)
+{
+	int pmemsize = cols * rows;
+
+	if (cdp1869.dblpage) pmemsize *= 2;
+	if (cdp1869.line16) pmemsize *= 2;
+
+	return pmemsize;
+}
+
+static UINT16 cdp1869_get_pma(void)
 {
 	if (cdp1869.dblpage)
 	{
@@ -71,19 +97,43 @@ static int cdp1869_get_pma(void)
 	}
 }
 
-static int cdp1869_get_cma(int offset)
+static UINT16 cdp1869_get_cma(UINT16 offset)
 {
 	int column = cdp1869.pram[cdp1869_get_pma()];
 	int row = offset & 0x07;
 
-	int addr = (column * 8) + row;
+	int addr = (column << 3) + row;
 
-	if (offset & 0x08)
+	if ((offset & 0x08) && (cdp1869_get_lines() > 8))
 	{
 		addr += (CDP1869_CHARRAM_SIZE / 2);
 	}
 
 	return addr;
+}
+
+UINT8 cdp1869_read_pageram(UINT16 addr)
+{
+	if (addr >= cdp1869.pramsize)
+	{
+		return 0xff;
+	}
+	else
+	{
+		return cdp1869.pram[addr];
+	}
+}
+
+UINT8 cdp1869_read_charram(UINT16 addr)
+{
+	if (addr >= cdp1869.cramsize)
+	{
+		return 0xff;
+	}
+	else
+	{
+		return cdp1869.cram[addr];
+	}
 }
 
 WRITE8_HANDLER ( cdp1869_charram_w )
@@ -92,7 +142,7 @@ WRITE8_HANDLER ( cdp1869_charram_w )
 	{
 		int addr = cdp1869_get_cma(offset);
 		cdp1869.cram[addr] = data;
-		cdp1869.pcb[addr] = cdp1869_pcb;
+		cdp1869.pcb[addr] = activecpu_get_reg(CDP1802_Q);
 	}
 }
 
@@ -142,32 +192,6 @@ READ8_HANDLER ( cdp1869_pageram_r )
 	return cdp1869.pram[addr];
 }
 
-static int cdp1869_get_lines(void)
-{
-	if (cdp1869.line16 && !cdp1869.dblpage)
-	{
-		return 16;
-	}
-	else if (!cdp1869.line9)
-	{
-		return 9;
-	}
-	else
-	{
-		return 8;
-	}
-}
-
-static int cdp1869_get_pmemsize(int cols, int rows)
-{
-	int pmemsize = cols * rows;
-
-	if (cdp1869.dblpage) pmemsize *= 2;
-	if (cdp1869.line16) pmemsize *= 2;
-
-	return pmemsize;
-}
-
 static int cdp1869_get_color(int ccb0, int ccb1, int pcb)
 {
 	int r = 0, g = 0, b = 0, color;
@@ -206,12 +230,9 @@ static int cdp1869_get_color(int ccb0, int ccb1, int pcb)
 	}
 }
 
-static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int pcb)
+static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int color)
 {
 	int i;
-	int ccb0 = (data & 0x40) ? 1 : 0;
-	int ccb1 = (data & 0x80) ? 1 : 0;
-	int color = cdp1869_get_color(ccb0, ccb1, pcb);
 
 	data <<= 2;
 
@@ -245,24 +266,22 @@ static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int p
 	}
 }
 
-static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, int code, const rectangle *screenrect)
+static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, int pramaddr, const rectangle *screenrect)
 {
-	int i, addr, addr2, pcb, data;
-
-	addr = code * 8;
-	addr2 = addr + (CDP1869_CHARRAM_SIZE / 2);
+	int i;
+	int code = cdp1869_read_pageram(pramaddr);
+	int addr = code * 8;
+	int addr2 = addr + (CDP1869_CHARRAM_SIZE / 2);
 
 	for (i = 0; i < cdp1869_get_lines(); i++)
 	{
-		if (i == 8)
-		{
-			addr = addr2;
-		}
+		int data = cdp1869.cram[addr];
+		int ccb0 = (data & 0x40) ? 1 : 0;
+		int ccb1 = (data & 0x80) ? 1 : 0;
+		int pcb = cdp1869.pcb[addr];
+		int color = cdp1869_get_color(ccb0, ccb1, pcb);
 
-		data = cdp1869.cram[addr];
-		pcb = cdp1869.pcb[addr];
-
-		cdp1869_draw_line(bitmap, screenrect->min_x + x, screenrect->min_y + y, data, pcb);
+		cdp1869_draw_line(bitmap, screenrect->min_x + x, screenrect->min_y + y, data, color);
 
 		addr++;
 		y++;
@@ -270,6 +289,11 @@ static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, int code, const
 		if (!cdp1869.fresvert)
 		{
 			y++;
+		}
+
+		if (i == 7)
+		{
+			addr = addr2;
 		}
 	}
 }
@@ -299,25 +323,13 @@ VIDEO_START( cdp1869 )
 	return 0;
 }
 
-int cdp1869_read_pageram(int addr)
-{
-	if (addr >= cdp1869.pramsize)
-	{
-		return 0xff;
-	}
-	else
-	{
-		return cdp1869.pram[addr];
-	}
-}
-
 VIDEO_UPDATE( cdp1869 )
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
 	if (!cdp1869.dispoff)
 	{
-		int sx, sy, rows, cols, width, height, addr, pramsize;
+		int sx, sy, rows, cols, width, height, addr, pmemsize;
 		rectangle screen;
 
 		switch (cdp1869.ntsc_pal)
@@ -355,7 +367,7 @@ VIDEO_UPDATE( cdp1869 )
 		cols = cdp1869.freshorz ? CDP1869_COLUMNS_FULL : CDP1869_COLUMNS_HALF;
 		rows = (screen.max_y - screen.min_y + 1) / height;
 
-		pramsize = cdp1869_get_pmemsize(cols, rows);
+		pmemsize = cdp1869_get_pmemsize(cols, rows);
 
 		addr = cdp1869.hma;
 
@@ -365,13 +377,12 @@ VIDEO_UPDATE( cdp1869 )
 			{
 				int x = sx * width;
 				int y = sy * height;
-				int code = cdp1869_read_pageram(addr);
 
-				cdp1869_draw_char(bitmap, x, y, code, &screen);
+				cdp1869_draw_char(bitmap, x, y, addr, &screen);
 
 				addr++;
 
-				if (addr == pramsize) addr = 0;
+				if (addr == pmemsize) addr = 0;
 			}
 		}
 	}

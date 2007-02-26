@@ -71,6 +71,45 @@ void fd1094_setstate_and_decrypt(int state)
 		fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
 	}
 
+{
+	char filename[100];
+	FILE *f;
+	int keydex;
+	sprintf(filename, "%s-%02X.log", Machine->gamedrv->name, state);
+	f = fopen(filename, "w");
+	for (keydex = 0; keydex < 0x2000; keydex++)
+	{
+		int category[3] = { 0 };
+		int bit;
+
+		for (addr = keydex; addr < fd1094_cpuregionsize/2; addr += 0x2000)
+		{
+			UINT16 op = fd1094_cacheregion[fd1094_current_cacheposition][addr];
+			if ((op & 0xff80) == 0x4e80) category[0]++;
+			else if ((op & 0xf0f8) == 0x50c8) category[1]++;
+			else if ((op & 0xf000) == 0x6000) category[2]++;
+		}
+
+		bit = (fd1094_key[keydex] >> (keydex < 0x1000 ? 6 : 7)) & 1;
+		fprintf(f, "%04X: (%02X) %d%c %c%c%c ->",
+					keydex,
+					fd1094_key[keydex],
+					bit,
+					(bit == 0 && category[0] == 0 && category[1] == 0 && category[2] == 0) ? '?' : ' ',
+					category[0] ? '0' : '.',
+					category[1] ? '1' : '.',
+					category[2] ? '2' : '.'
+					);
+		for (addr = keydex; addr < fd1094_cpuregionsize/2; addr += 0x2000)
+		{
+			UINT16 op = fd1094_cacheregion[fd1094_current_cacheposition][addr];
+			fprintf(f, " %04X%c", op, ((op & 0xff80) == 0x4e80 || (op & 0xf0f8) == 0x50c8 || (op & 0xf000) == 0x6000) ? '*' : ' ');
+		}
+		fprintf(f, "\n");
+	}
+	fclose(f);
+}
+
 	/* copy newly decrypted data to user region */
 	fd1094_userregion=fd1094_cacheregion[fd1094_current_cacheposition];
 	memory_set_decrypted_region(0, 0, fd1094_cpuregionsize - 1, fd1094_userregion);

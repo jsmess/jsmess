@@ -656,7 +656,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 		goto done;
 	}
 	memset(p, 0, sizeof(*p) + partition_extra_bytes);
-	p->pool = NULL;
+	p->pool = pool;
 
 	/* fill out the structure */
 	p->image						= image;

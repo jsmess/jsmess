@@ -764,9 +764,6 @@ void video_frame_update(void)
 	/* only render sound and video if we're in the running phase */
 	if (phase == MAME_PHASE_RUNNING)
 	{
-		/* update sound */
-		sound_frame_update();
-
 		/* finish updating the screens */
 		for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
 			if (Machine->drv->screen[scrnum].tag != NULL)

@@ -5,8 +5,9 @@
 #include <assert.h>
 #include <math.h>
 
-#include "streams.h"
+#include "driver.h"
 #include "mame.h"
+#include "streams.h"
 #include "timer.h"
 
 #include "includes/lynx.h"

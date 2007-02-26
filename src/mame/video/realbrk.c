@@ -14,7 +14,7 @@
 
         -   0x300 sprites made of 16x16 tiles, both 256 or 16 colors
             per tile and from 1 to 32x32 (more?) tiles per sprite.
-            Sprites can zoom / shrink
+            Sprites can zoom / shrink / rotate
 
 
 ***************************************************************************/
@@ -23,6 +23,8 @@
 #include "realbrk.h"
 
 UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs;
+static mame_bitmap *tmpbitmap0 = NULL;
+static mame_bitmap *tmpbitmap1 = NULL;
 
 static int disable_video;
 
@@ -168,6 +170,13 @@ VIDEO_START(realbrk)
 	tilemap_set_transparent_pen(tilemap_1,0);
 	tilemap_set_transparent_pen(tilemap_2,0);
 
+	tmpbitmap0 = auto_bitmap_alloc(	32,
+									32,
+									Machine->screen[0].format);
+
+	tmpbitmap1 = auto_bitmap_alloc(	32,
+									32,
+									Machine->screen[0].format);
 	return 0;
 }
 
@@ -201,7 +210,8 @@ VIDEO_START(realbrk)
         8.w     fe-- ---- ---- ----
                 --d- ---- ---- ----     Flip Y
                 ---c ---- ---- ----     Flip X
-                ---- ba98 7654 3210     Priority?
+                ---- ---- --54 ----     Rotation
+                ---- ba98 76-- 3210     Priority?
 
         A.w     fedc b--- ---- ----
                 ---- -a98 7654 3210     Color
@@ -222,9 +232,15 @@ static void realbrk_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int max_x		=	Machine->screen[0].width;
 	int max_y		=	Machine->screen[0].height;
 
+	rectangle spritetile_clip;
+	spritetile_clip.min_x = 0;
+	spritetile_clip.min_y = 0;
+	spritetile_clip.max_x = 32;
+	spritetile_clip.max_y = 32;
+
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{
-		int sx, sy, dim, zoom, flip, color, attr, code, flipx, flipy, gfx;
+		int sx, sy, dim, zoom, flip, color, attr, code, flipx, flipy, gfx, rot;
 
 		int x, xdim, xnum, xstart, xend, xinc;
 		int y, ydim, ynum, ystart, yend, yinc;
@@ -249,6 +265,7 @@ static void realbrk_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 		flipx	=		flip & 0x0100;
 		flipy	=		flip & 0x0200;
+		rot		=		flip & 0x0030;
 
 		gfx		=		(attr & 0x0001) + 2;
 
@@ -267,6 +284,19 @@ static void realbrk_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
+
+		// The positioning of the rotated sprites makes it look as if
+		// the sprite source is scanned in a constant pattern left to right,
+		// top to bottom, and the destination plotting pattern is varied.
+		// copyrozbitmap works the other way.
+
+		// Rotating a sprite when drawgfxzoom draws a tile at a time means
+		// - rotating each sprite tile
+		// - transforming each tile position
+		// - compensating for the offset introduced by the difference in
+		//   scanning patterns between the original mechanism and copyrozbitmap
+
+
 		for (y = ystart; y != yend; y += yinc)
 		{
 			for (x = xstart; x != xend; x += xinc)
@@ -277,13 +307,84 @@ static void realbrk_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
 				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
 
-				drawgfxzoom(	bitmap,Machine->gfx[gfx],
-								code++,
-								color,
-								flipx, flipy,
-								currx, curry,
-								cliprect,TRANSPARENCY_PEN,0,
-								scalex << 12, scaley << 12);
+				// buffer the tile and rotate it into bitmap
+				if( rot )
+				{
+					fillbitmap( tmpbitmap0, Machine->pens[0], &spritetile_clip );
+					fillbitmap( tmpbitmap1, Machine->pens[0], &spritetile_clip );
+					drawgfxzoom(	tmpbitmap0,Machine->gfx[gfx],
+									code++,
+									color,
+									flipx, flipy,
+									0,0,
+									&spritetile_clip,TRANSPARENCY_PEN,0,
+									(rot & 1 ? scaley : scalex) << 12, (rot & 1 ? scalex : scaley) << 12);
+
+					// peek at the unrotated sprite
+					// copybitmap( bitmap,tmpbitmap0, 0,0, 50+(x * xdim/0x10000),50+(y * ydim/0x10000), cliprect, TRANSPARENCY_PEN, 0 );
+				}
+
+				switch( rot )
+				{
+					case 0x10: // rot 90
+						copyrozbitmap( tmpbitmap1, tmpbitmap0,
+							(UINT32)0<<16,
+							(UINT32)16<<16,
+							0 << 16,
+							-1 << 16,
+							1 << 16,
+							0 << 16,
+							0, cliprect, TRANSPARENCY_PEN, 0, 0 );
+
+							currx = (sx - (y+1) * ydim) / 0x10000;
+							curry = (sy + x * xdim) / 0x10000;
+
+							copybitmap( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, TRANSPARENCY_PEN, 0 );
+						break;
+
+					case 0x20: // rot 180
+						copyrozbitmap( tmpbitmap1, tmpbitmap0,
+							(UINT32)16<<16,
+							(UINT32)16<<16,
+							-1 << 16,
+							0 << 16,
+							0 << 16,
+							-1 << 16,
+							0, cliprect, TRANSPARENCY_PEN, 0, 0 );
+
+							currx = (sx - (x+1) * xdim) / 0x10000;
+							curry = (sy - (y+1) * ydim) / 0x10000;
+
+							copybitmap( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, TRANSPARENCY_PEN, 0 );
+						break;
+
+					case 0x30: // rot 270
+						copyrozbitmap( tmpbitmap1, tmpbitmap0,
+							(UINT32)16<<16,
+							(UINT32)0<<16,
+							0 << 16,
+							1 << 16,
+							-1 << 16,
+							0 << 16,
+							0, cliprect, TRANSPARENCY_PEN, 0, 0 );
+
+							currx = (sx + y * ydim) / 0x10000;
+							curry = (sy - (x+1) * xdim) / 0x10000;
+
+							copybitmap( bitmap,tmpbitmap1, 0,0, currx,curry, cliprect, TRANSPARENCY_PEN, 0 );
+						break;
+
+					default:
+						drawgfxzoom(	bitmap,Machine->gfx[gfx],
+										code++,
+										color,
+										flipx, flipy,
+										currx, curry,
+										cliprect,TRANSPARENCY_PEN,0,
+										scalex << 12, scaley << 12);
+						break;
+				}
+
 			}
 		}
 	}

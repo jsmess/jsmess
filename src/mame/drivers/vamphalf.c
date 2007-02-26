@@ -737,10 +737,10 @@ ROM_START( luplup29 ) /* version 2.9 / 990108 */
 	ROM_LOAD( "luplup-rom2.v29", 0x80000, 0x80000, CRC(50dac70f) SHA1(0e313114a988cb633a89508fda17eb09023827a2) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "luplup29-roml00", 0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "luplup29-romu00", 0x000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "luplup29-roml01", 0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "luplup29-romu01", 0x400002, 0x200000, NO_DUMP )
+	ROM_LOAD32_WORD( "luplup29-roml00", 0x000000, 0x200000, CRC(08b2aa75) SHA1(7577b3ab79c54980307a83186dd1500f044c1bc8) )
+	ROM_LOAD32_WORD( "luplup29-romu00", 0x000002, 0x200000, CRC(b57f4ca5) SHA1(b968c44a0ceb3274e066fa1d057fb6b017bb3fd3) )
+	ROM_LOAD32_WORD( "luplup29-roml01", 0x400000, 0x200000, CRC(41c7ca8c) SHA1(55704f9d54f31bbaa044cd9d10ac2d9cb5e8fb70) )
+	ROM_LOAD32_WORD( "luplup29-romu01", 0x400002, 0x200000, CRC(16746158) SHA1(a5036a7aaa717fde89d62b7ff7a3fded8b7f5cda) )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
@@ -1041,7 +1041,7 @@ DRIVER_INIT( wyvernwg )
 GAME( 1999, coolmini, 0,      coolmini, common,   coolmini, ROT0,   "Semicom",           "Cool Minigame Collection", 0 )
 GAME( 1999, suplup,   0,      suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0) // also has 'Puzzle Bang Bang' title but it can't be selected
 GAME( 1999, luplup,   suplup, suplup,   common,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
-GAME( 1999, luplup29, suplup, suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", GAME_NOT_WORKING )
+GAME( 1999, luplup29, suplup, suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
 GAME( 1999, puzlbang, suplup, suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 ) // Korean only
 GAME( 1999, vamphalf, 0,      vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamp 1/2 (Korea version)", 0 )
 GAME( 2000, misncrft, 0,      misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )

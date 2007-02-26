@@ -68,6 +68,7 @@ WRITE8_HANDLER( zzzap_sh_port_1_w );
 WRITE8_HANDLER( zzzap_sh_port_2_w );
 
 MACHINE_DRIVER_EXTERN( maze_sound );
+void maze_write_discrete(UINT8 maze_tone_timing_state);
 
 MACHINE_DRIVER_EXTERN( boothill_sound );
 WRITE8_HANDLER( boothill_sh_port_w );

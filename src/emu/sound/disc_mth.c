@@ -25,6 +25,8 @@
  * DST_LOGIC_XOR         - Logic XOR gate 2 input
  * DST_LOGIC_NXOR        - Logic NXOR gate 2 input
  * DST_LOGIC_DFF         - Logic D-type flip/flop
+ * DST_LOGIC_JKFF        - Logic JK-type flip/flop
+ * DST_LOOKUP_TABLE      - Return value from lookup table
  * DST_MIXER             - Final Mixer Stage
  * DST_MULTIPLEX         - 1 of x Multiplexer/switch
  * DST_ONESHOT           - One shot pulse generator
@@ -46,9 +48,9 @@ struct dst_dac_r1_context
 	double	rTotal;		// all resistors in parallel
 };
 
-struct dst_dflipflop_context
+struct dst_flipflop_context
 {
-	int lastClk;
+	int last_clk;
 };
 
 struct dst_integrate_context
@@ -765,12 +767,13 @@ void dst_logic_nxor_step(node_description *node)
 #define DST_LOGIC_DFF__ENABLE	 (*(node->input[0]))
 #define DST_LOGIC_DFF__RESET	!(*(node->input[1]))
 #define DST_LOGIC_DFF__SET		!(*(node->input[2]))
-#define DST_LOGIC_DFF__CLOCK	(int)(*(node->input[3]))
+#define DST_LOGIC_DFF__CLOCK	 (*(node->input[3]))
 #define DST_LOGIC_DFF__DATA 	 (*(node->input[4]))
 
 void dst_logic_dff_step(node_description *node)
 {
-	struct dst_dflipflop_context *context = node->context;
+	struct dst_flipflop_context *context = node->context;
+	int clk = (int)DST_LOGIC_DFF__CLOCK;
 
 	if (DST_LOGIC_DFF__ENABLE)
 	{
@@ -778,24 +781,112 @@ void dst_logic_dff_step(node_description *node)
 			node->output = 0;
 		else if (DST_LOGIC_DFF__SET)
 			node->output = 1;
-		else if (!context->lastClk && DST_LOGIC_DFF__CLOCK)
-{
+		else if (!context->last_clk && clk)	/* low to high */
+		{
 			node->output = DST_LOGIC_DFF__DATA;
-}
+		}
 	}
 	else
 	{
-		node->output=0.0;
+		node->output = 0;
 	}
-	context->lastClk = DST_LOGIC_DFF__CLOCK;
+	context->last_clk = clk;
 }
 
-void dst_logic_dff_reset(node_description *node)
+void dst_logic_ff_reset(node_description *node)
 {
-	struct dst_dflipflop_context *context = node->context;
-	context->lastClk = 0;
+	struct dst_flipflop_context *context = node->context;
+	context->last_clk = 0;
+	node->output = 0;
 }
 
+
+/************************************************************************
+ *
+ * DST_LOGIC_JKFF - Standard JK-type flip-flop implementation
+ *
+ * input[0]    - enable
+ * input[1]    - /Reset
+ * input[2]    - /Set
+ * input[3]    - clock
+ * input[4]    - J
+ * input[5]    - K
+ *
+ ************************************************************************/
+#define DST_LOGIC_JKFF__ENABLE	 (*(node->input[0]))
+#define DST_LOGIC_JKFF__RESET	!(*(node->input[1]))
+#define DST_LOGIC_JKFF__SET		!(*(node->input[2]))
+#define DST_LOGIC_JKFF__CLOCK	 (*(node->input[3]))
+#define DST_LOGIC_JKFF__J 		 (*(node->input[4]))
+#define DST_LOGIC_JKFF__K	 	 (*(node->input[5]))
+
+void dst_logic_jkff_step(node_description *node)
+{
+	struct dst_flipflop_context *context = node->context;
+	int clk = (int)DST_LOGIC_JKFF__CLOCK;
+	int j = (int)DST_LOGIC_JKFF__J;
+	int k = (int)DST_LOGIC_JKFF__K;
+
+	if (DST_LOGIC_JKFF__ENABLE)
+	{
+		if (DST_LOGIC_JKFF__RESET)
+			node->output = 0;
+		else if (DST_LOGIC_JKFF__SET)
+			node->output = 1;
+		else if (context->last_clk && !clk)	/* high to low */
+		{
+			if (!j)
+			{
+				/* J=0, K=0 - Hold */
+				if (k)
+					/* J=0, K=1 - Reset */
+					node->output = 0;
+			}
+			else
+			{
+				if (!k)
+					/* J=1, K=0 - Set */
+					node->output = 0;
+				else
+					/* J=1, K=1 - Toggle */
+					node->output = !(int)node->output;
+			}
+		}
+	}
+	else
+	{
+		node->output=0;
+	}
+	context->last_clk = clk;
+}
+
+
+/************************************************************************
+ *
+ * DST_LOOKUP_TABLE  - Return value from lookup table
+ *
+ * input[0]    - Enable input value
+ * input[1]    - Input 1
+ * input[2]    - Table size
+ *
+ * Also passed address of the lookup table
+ *
+ * Feb 2007, D Renaud.
+ ************************************************************************/
+#define DST_LOOKUP_TABLE__ENABLE	(*(node->input[0]))
+#define DST_LOOKUP_TABLE__IN		(*(node->input[1]))
+#define DST_LOOKUP_TABLE__SIZE		(*(node->input[2]))
+
+void dst_lookup_table_step(node_description *node)
+{
+	const double *table = node->custom;
+	int	addr = DST_LOOKUP_TABLE__IN;
+
+	if (!DST_LOOKUP_TABLE__ENABLE || addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
+		node->output = 0;
+	else
+		node->output = table[addr];
+}
 
 /************************************************************************
  *
@@ -1065,7 +1156,7 @@ void dst_multiplex_step(node_description *node)
 	if(DST_MULTIPLEX__ENABLE)
 	{
 		addr = DST_MULTIPLEX__ADDR;	// FP to INT
-		if ((addr >= 0)  && (addr < context->size))
+		if ((addr >= 0) && (addr < context->size))
 		{
 			node->output = DST_MULTIPLEX__INP(addr);
 		}

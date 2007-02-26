@@ -3212,7 +3212,7 @@ ROM_END
 
 ROM_START( dealem )
 	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00  )	/* 64k for code */
-	ROM_LOAD( "zenndlem.u6",  0x8000, 0x8000,  CRC(571e5c05) )
+	ROM_LOAD( "zenndlem.u6",	0x8000, 0x8000,  CRC(571e5c05) SHA1(89b4c331407a04eae34bb187b036791e0a671533) )
 
 	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "zenndlem.u24",	0x0000, 0x10000, CRC(3a1950c4) SHA1(7138346d4e8b3cffbd9751b4d7ebd367b9ad8da9) )    /* text layer */
@@ -3220,6 +3220,8 @@ ROM_START( dealem )
 	ROM_REGION( 0x020, REGION_PROMS, 0 )
 	ROM_LOAD( "zenndlem.u22",		0x000, 0x020, CRC(29988304) SHA1(42f61b8f9e1ee96b65db3b70833eb2f6e7a6ae0a) )
 
+	ROM_REGION( 0x200, REGION_PLDS, 0 )
+	ROM_LOAD( "zenndlem.u10",		0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
 ROM_END
 
 /*    YEAR   NAME    PARENT   MACHINE   INPUT     INIT   MONITOR COMPANY            FULLNAME                                                            FLAGS (0 if none)  */

@@ -103,78 +103,278 @@ key_0a invert;  bit 1
 key_4b invert;  bit 0
 
 
+Analysis of the data contained in the 8k key data indicates some regularities.
+To begin with, in all the keys seen so far, bit 7 ($80) in key values at
+addresses $0004-$0FFF is always set to 1. Similarly, bit 6 ($40) in key values
+at addresses $1000-$1FFF is always set to 1.
+
+Even more interesting, however, is that analyzing the low 6 bits of the key
+data reveals that a simple linear congruential generator has been used
+consistently to generate the key bits. The LCG is of the standard form:
+
+   val' = A * val + B
+
+and it appears to be calculated to at least 18 bits. In all cases seen so far,
+the value of 'A' is fixed at $10029, and the value of 'B' is selected to be one
+of four values: $1A019, $3E023, $52005, or $7600F. To generate the low 6 bits
+of the key, the result of the LCG is shifted a variable number of bits. This
+shift is generally a right shift of between 8 and 13 bits, though in one
+special case (317-0053), it is a left shift of 4 bits, filling the bottom 4
+bits with a fixed value of $D.
+
+The following pseudo-code will generate 7 of the 8 bits of the key data
+successfully for all known keys, given the values of the 'shift' and 'B'
+parameters, as well as an initial 'seed' for the generator:
+
+void genkey(int shift, UINT32 seed, UINT32 bindex, UINT8 *output)
+{
+    static const UINT32 bvals[] = { 0x1A019, 0x3E023, 0x52005, 0x7600F };
+    int bytenum;
+
+    for (bytenum = 4; bytenum < 8192; bytenum++)
+    {
+        UINT8 byteval = (((seed << 4) | 0x0d) >> (shift + 4)) & 0x3f;
+        byteval |= (bytenum < 0x1000) ? 0x80 : 0x40;
+        output[bytenum] = byteval;
+        seed = seed * 0x10029 + bvals[bindex];
+    }
+}
+
+This only leaves one bit per key value (and the global key) left to determine.
+It is worth pointing out that this remaining bit is the same bit that controls
+how many opcodes to blank to $FFFF: 0 means a smaller subset (~300), while 1
+indicates a much larger subset (~5000). Looking at the correlations between
+where the key has this bit set to 0, and the presence of opcodes that would
+be blanked as a result, seems to imply that the key is generated based on the
+plaintext. That is, this final bit is set to 1 by default (hence blanking
+more aggressively), and cleared to 0 if any plaintext words affected by the
+byte in question would be incorrectly blanked.
+
+
+
 summary of global keys:
 -----------------------
+
+          global01 global02 global03 LCGseed LCGb LCGsh
+          -------- -------- -------- ------- ---- -----
           .....    ..       ..
-0049      10101000 11110101 11100011
-0050      10101000 11110101 11100011
-0053      11111111 11111111 11111111
-0056      10101111 11111110 11101000
-0058-02C  10101111 11110101 11111000
-0058-03D  10101111 11110100 11100100
-0058-05C  10101110 11111001 11110010
-0058-09D  10101100 11111001 11100101
-0068      10101111 11111001 11110101
-0070      10101111 11110111 11111001
-0080      10101111 11110111 11100101
-0084      10101111 11110101 11100000
-0085      10101111 11110100 11110111
-0087      10101111 11110100 11110111
-0089      10101111 11110100 11100010
-0090      10101111 11111110 11100100
-0091      10101111 11110100 11100100
-0092      10101111 11110100 11100011
-0093      10101111 11110100 11100010
-0093A     11111101 11110110 11101110
-0096      10101111 11110100 11101010
-0102      10101111 11111101 11111100
-0110      10101110 11111100 11100010
-0115      11111011 11111010 11110100
-0116      11111100 11100001 11110110
-0118      10101110 11111100 11111000
-0120      10101110 11111100 11100010
-0121      10101110 11111100 11100010
-0122      10101110 11111011 11111011
-0124A     11111001 11101010 11110100
-0125A     11111001 11110000 11101111
-0126      11111010 11100011 11111110
-0126A     11111001 11101111 11110000
-0127A     10101110 11111000 11111001
-0128      11111111 11100011 11101011
-0129      11111111 11100011 11101011
-0130      11111111 11100011 11101100
-0134      10101110 11110100 11100001
-0136      10101110 11110100 11100010
-0139      11111100 11100110 11110000
-0142      11111110 11100111 11101110
-0143      11111101 11111101 11101101
-0144      11111101 11101000 11101101
-0146      11111011 11100101 11101110
-0147      11111011 11110001 11110001
-0148      11111011 11100101 11110000
+0049      10101000 11110101 11100011  $25C52   2    13
+0050      10101000 11110101 11100011  $25C52   2    13
+0053      11111111 11111111 11111111  $00002   3    -4
+0056      10101111 11111110 11101000  $17EE3   2    11
+0058-02C  10101111 11110101 11111000  $63520   2    13
+0058-03B  10101111 11110100 11100110  $5B3AE   3    13
+0058-03C  10101111 11110100 11100100  $07EDC   2    13
+0058-04B  11111100 11100100 11110001  $0A2FA   3    11
+0058-04D  11111100 11100100 11111001  $37ED4   0    12
+0058-05B  10101110 11111001 11110110  $7FB8D   1    13
+0058-05C  10101110 11111001 11110010  $5F372   0    13
+0058-06B  11111100 11110000 11110110  $01A00   3    13
+0058-08B  11111011 11101110 11110000  $037A4   0    12
+0058-09D  10101100 11111001 11100101  $0FDEC   0    10
+0060      10101111 11111100 11100001  $03512   1     9
+0068      10101111 11111001 11110101  $06E2A   1     9
+0070      10101111 11110111 11111001  $20C44   0    12
+0074      10101111 11110111 11111001  $20C44   0    12
+0080      10101111 11110111 11100101  $065B2   0    12
+0084      10101111 11110101 11100000  $0DFE0   1    13
+0085      10101111 11110100 11110111  $02632   1    10
+0087      10101111 11110100 11110111  $02632   1    10
+0089      10101111 11110100 11100010  $34A09   1    13
+0090      10101111 11111110 11100100  $583AE   0    13
+0091      10101111 11110100 11100100  $07EDC   2    13
+0092      10101111 11110100 11100011  $0BC8E   3    10
+0093      10101111 11110100 11100010  $34A09   1    13
+0093A     11111101 11110110 11101110  $1C00D   1    13
+0096      10101111 11110100 11101010  $01D52   1    13
+0102      10101111 11111101 11111100  $0102A   3    12
+0110      10101110 11111100 11100010  $0426B   0    12
+0115      11111011 11111010 11110100  $33164   1    13
+0116      11111100 11100001 11110110  $17C4D   1    13
+0118      10101110 11111100 11111000  $2ABDB   1    13
+0120      10101110 11111100 11100010  $0426B   0    12
+0121      10101110 11111100 11100010  $0426B   0    12
+0122      10101110 11111011 11111011  $07476   1    11
+0124A     11111001 11101010 11110100  $181B2   1    13
+0125A     11111001 11110000 11101111  $0BEA0   3    13
+0126      11111010 11100011 11111110  $0363E   3    10
+0126A     11111001 11101111 11110000  $3121B   0    12
+0127A     10101110 11111000 11111001  $2B0D4   0    12
+0128      11111111 11100011 11101011  $04ED2   3    10
+0129      11111111 11100011 11101011  $04ED2   3    10
+0130      11111111 11100011 11101100  $04ED2   3    10
+0134      10101110 11110100 11100001  $07F12   0     9
+0135      10101110 11110100 11100000  $556C0   1    13
+0136      10101110 11110100 11100010  $22A09   1    13
+0139      11111100 11100110 11110000  $493AE   3    13
+0142      11111110 11100111 11101110  $17805   1    11
+0143      11111101 11111101 11101101  $1FC76   1    12
+0144      11111101 11101000 11101101  $05CD8   0    10
+0146      11111011 11100101 11101110  $0B7F2   0    12
+0147      11111011 11110001 11110001  $012D2   3    11
+0148      11111011 11100101 11110000  $0B7F2   0    12
 0153      11111011 11110101 11110001
-0157      11111000 11101011 11110101
-0158      11111000 11110000 11110000
-0159      11111000 11101011 11110101
-0162      11111110 11110001 11110000
-0163      11111110 11110010 11110000
-0165      10101101 11110100 11100110
-0166      10101101 11110100 11101110
-0169B     11111001 11011100 11011111
-0175      10101100 11111100 11101001
-0176      10101100 11111100 11110001
-0179A     11111001 11001000 11101110
-0180      11111100 11001010 11111111
-0181A     11111001 11001000 11101110
-0184      11111000 11110011 11101111
-0186      10101100 11111000 11111110
-0196      11101011 11110011 11101001
-0197A     10101011 11111001 11101100
-5023      11111011 11101101 11111010
+0157      11111000 11101011 11110101  $00E97   1     8
+0158      11111000 11110000 11110000  $67580   3    13
+0159      11111000 11101011 11110101  $00E97   1     8
+0162      11111110 11110001 11110000  $10F6A   3    11
+0163      11111110 11110010 11110000  $6D812   0    13
+0165      10101101 11110100 11100110  $4B3AE   3    13
+0166      10101101 11110100 11101110  $1D385   1    11
+0169B     11111001 11011100 11011111  $597B2   3    13
+0175      10101100 11111100 11101001  $29154   1    12
+0176      10101100 11111100 11110001  $0651A   3    11
+0179A     11111001 11001000 11101110  $0E558   0    10
+0180      11111100 11001010 11111111  $36C44   0    13
+0181A     11111001 11001000 11101110  $0E558   0    10
+0182      11111000 11110011 11110001  $0EF16   1    13
+0184      11111000 11110011 11101111  $31AA4   1    12
+0186      10101100 11111000 11111110  $02C84   0     9
+0190      11111000 11101110 11101111  $1848B   0    12
+0196      11101011 11110011 11101001  $22CE0   0    13
+0197A     10101011 11111001 11101100  $336ED   1    12
+0197B     10101011 11111001 11101100  $336ED   1    12
+5023      11111011 11101101 11111010  $46E6E   2    13
           .....    ..       ..
-unknown   11111111 11110110 10111110 (Shinobi 16A, part no. unreadable, could be dead)
-dead      00001111 00001111 00001111 (Alien Storm CPU with no battery)
-bad       11100000 10101011 10111001 (flaky 317-0049)
+unknown   11111111 11110110 10111110  $22F12   0    13 (Shinobi 16A, part no. unreadable, could be dead)
+dead      00001111 00001111 00001111                   (Alien Storm CPU with no battery)
+bad       11100000 10101011 10111001                   (flaky 317-0049)
+
+----
+
+Notes:
+
+We start in state 0.
+Vectors are fetched:
+   SP.HI @ $000000 -> mainkey = key[0], globalkey = { $00, $00, $00 }, less aggressive blanking
+   SP.LO @ $000002 -> mainkey = key[1], globalkey = { $00, $00, $00 }, less aggressive blanking
+   PC.HI @ $000004 -> mainkey = key[2], globalkey = { key[1], $00, $00 }
+   PC.LO @ $000006 -> mainkey = key[3], globalkey = { key[1], key[2], $00 }
+
+driver    FD1094    SP plain  SP enc    PC plain  PC enc    States Used
+--------  --------  --------  --------  --------  --------  -----------
+aceattaa  317-0060  00000000  A711AF59  00000400  AF59EADD  00 17 31 45 90 FC
+altbeaj3  317-0068  FFFFFF00  B2F7F299  00000400  CCDDEF58  00 0F 18 20 93 A7 D8
+altbeaj1  317-0065            C9C5F299            CCDDECDD
+bayroute  317-0116  00504000  5EB40000  00001000  5533A184  00 04 11 18
+bayroutj  317-0115  00504000  56150000  00001000  85948DCF  00 05 12 16
+bullet    317-0041  00000000  57355D96  00001882  8DDC8CF4         (deduced, not 100% sure)
+cotton    317-0181a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
+cottonu   317-0180  00204000  5DB20000  00000716  A1840716  00 0E 73
+cottonj   317-0179a 00204000  5DB20000  00000716  CCDD0716  00 0E 73
+ddux      317-0096  00000000  5F94AF59  00000406  AF5987A0  00 21 28 70 D9
+eswat     317-0130  00000000  A711AF59  00000400  5533BC59  00 05 0C EC FA
+eswatu    317-0129  00000000  5537AF59  00000400  55334735  00 0A 12 C3 CC
+eswatj    317-0128  00000000  A711AF59  00000400  55334735  00 63 CB D5
+exctleag  317-0079? 00000000  5537AF59  00000410  83018384         (deduced, not 100% sure)
+fpoint    317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
+fpoint1   317-0127A 00000000  AF59AF59  00001A40  8DDC9960  00 15 35 5F 82 DB
+goldnaxu  317-0122  FFFFFF00  E53AF2B9  00000400  A184A196  00 03 51 72 99 F6
+goldnaxj  317-0121  FFFFFF00  C9D6F2B9  00000400  AF59A785  00 12 35 58 7A 9E
+goldnax3  317-0120  FFFFFF00  ED62F2B9  00000400  AF59A785  00 0A 0D 44 C7 EF
+goldnax1  317-0110  FFFFFF00  ED62F2B9  00000400  AF59A785  00 19 2E 31 48 5D
+mvp       317-0143  00000000  5F94A711  00000416  BD59DC5B  00 19 20 88 98
+mvpj      317-0142  00000000  5F94AF59  00000416  BD599C7D  00 19 35 91 DA
+passsht   317-0080  00000000  AF59AF59  00003202  C2003923  00 11 52 96 EE
+passshta  317-0074  00000000  AF59AF59  000031E4  C2003F8C  00 12 47 83 A7
+passshtj  317-0070  00000000  5D92AF59  000031E4  C2003F8C  00 12 59 83 FE
+ryukyu    317-5023  00203800  AF49D30B  0000042E  FC5863B5  00 DC EF
+shinobi2  317-0049  FFFFFF00  C9C5F25F  00000400  AF598395  00 53 88 9B 9C F1
+sonicbom  317-0053  00000000  5735AF59  00001000  FC587133  00
+suprleag  317-0045? 00000000  A711AF59            BD59CE5B
+tetris2   317-0092  00000000  5735AF59  00000410  AF598685  00 10 52 74 97 FC
+tetris1   317-0091  00000000  5D92AF59  00000410  AF59AE58  99 25 42 5B 68 FC
+wb34      317-0087  FFFFFF7E  B2978997  00000500  AF590500  00 11 64 69 82
+wb33      317-0089  FFFFFF7E  E5C78997  00000500  AF590500  00 23 40 52 71
+wb32      317-0085  FFFFFF7E  B2F78997  00000500  AF590500  00 10 13 26 77
+wrestwa2  317-0102  00000000  5D96AF59  00000414  EE588E5B  00 12 A7 AB CC F9 FC
+wrestwa1  317-0090  00000000  5D96AF59  00000414  8301AE18  00 12 A7 AB CC F9 FC
+
+suprleag pc possibilities:
+  101E -> follows an RTS
+  108E -> follows 3 NOPs
+  11C4
+  11C8
+  1212
+  1214
+  1218
+  1282
+  1284
+  1288
+  1342
+  1416
+  141C
+  1486
+  148C
+  1606
+  1E52
+  1E54
+
+bullet pc possibilities:
+  0822
+  0824
+  0882
+  0884
+  0C08
+  137C
+  1822
+  1824
+  1882
+  1884
+  1C08
+
+tetris1:
+  410: 4ff9 0000 0000  lea $0.l, a7
+  416: 46fc 2700       move #$2700, sr
+  41a: 0c80 005b ffff  cmpi.l #$5bffff, d0
+
+  400: 4e71            nop
+  402: 4e73            rte
+
+tetris2:
+  410: 4ff9 0000 0000  lea $0.l, a7
+  416: 46fc 2700       move #$2700, sr
+  41a: 0c80 0052 ffff  cmpi.l #$52ffff, d0
+
+  400: 4e71            nop
+  402: 4e73            rte
+
+wrestwa1:
+  414: 4ff8 0000       lea $0.w, a7
+  418: 46fc 2700       move #$2700, sr
+  41c: 0c80 00fc ffff  cmpi.l #$fcffff, d0
+
+mvp:
+  416: 4ff8 0000       lea $0.w, a7
+  41a: 46fc 2700       move #$2700, sr
+  41e: 7000            moveq #0, d0
+  420: 2200            move.l d0, d1
+  ...
+  42c: 2e00            move.l d0, d7
+  42e: 2040            movea.l d0, a0
+  ...
+  43a: 2c40            movea.l d0, a6
+  43c: 0c80 0098 ffff  cmpi.l #$98ffff, d0
+
+wb34:
+  500: 46fc 2700       move #$2700, sr
+  504: 0c80 0064 ffff  cmpi.l #$64ffff, d0
+
+goldnaxu:
+  400: 6000 000c       bra $40e
+  40e: 4ff8 ff00       lea $ff00.w, a7
+  412: 46fc 2700       move #$2700, sr
+  416: 0c80 0072 ffff  cmpi.l #$72ffff, d0
+
+ryukyu:
+  42e: 4e71            nop
+  ...
+  440: 0c80 00dc ffff  cmpi.l #$dcffff, d0
+
+eswat:
+  400: 4ff8 0000       lea $0.w, a7
+  404: 46fc 2700       move #$2700, sr
+  408: 0c80 000c ffff  cmpi.l #$cffff, d0
 
 *****************************************************************************/
 
@@ -524,3 +724,390 @@ int fd1094_set_state(unsigned char *key,int state)
 	}
 	return state & 0xff;
 }
+
+
+#ifdef MAME_DEBUG
+
+int fd1094_is_valid_prng_sequence(const UINT8 *base, int length, int *shiftptr, UINT32 *bptr, UINT32 *seedptr)
+{
+	static const UINT32 bvals[] = { 0x1A019, 0x3E023, 0x52005, 0x7600F };
+	static const int shiftvals[] = { -4, 8, 9, 10, 11, 12, 13 };
+	int shiftindex, bindex;
+
+	/* iterate over shift possibilities */
+	for (shiftindex = 0; shiftindex < ARRAY_LENGTH(shiftvals); shiftindex++)
+	{
+		int shift = shiftvals[shiftindex];
+		int seeds = (shift < 0) ? 1 : (1 << shift);
+
+		/* iterate over b possibilities */
+		for (bindex = 0; bindex < ARRAY_LENGTH(bvals); bindex++)
+		{
+			UINT32 b = bvals[bindex];
+			UINT32 seed;
+
+			/* iterate over seed possibilities */
+			for (seed = 0; seed < seeds; seed++)
+			{
+				UINT32 startval = (shift < 0) ? (base[0] >> -shift) : ((base[0] << shift) | seed);
+				UINT32 val = startval;
+				UINT32 i;
+
+				/* look starting with this seed for a continuous match */
+				for (i = 1; i < length; i++)
+				{
+					UINT8 predicted;
+
+					val = val * 0x10029 + b;
+					predicted = ((val << 4) | 0xd) >> (shift + 4);
+					if (((predicted ^ base[i]) & 0x3f) != 0)
+						break;
+				}
+
+				/* if we got one, we're done */
+				if (i == length)
+				{
+					*shiftptr = shift;
+					*bptr = b;
+					*seedptr = startval;
+					return TRUE;
+				}
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+
+UINT32 fd1094_find_global_key_matches(const UINT16 *encrypted, const UINT16 *desired, const UINT16 *desiredmask, UINT32 startwith, UINT16 *output)
+{
+	int key0, key1, key2, key3;
+	UINT8 key[4];
+
+	/* iterate over the first key byte, allowing all possible values */
+	for (key0 = (startwith >> 24) & 0xff; key0 < 256; key0++)
+	{
+		/* set the key and reset the fd1094 */
+		key[0] = key0;
+		startwith &= 0x00ffffff;
+		fd1094_set_state(key, FD1094_STATE_RESET);
+
+		/* if we match, iterate over the second key byte */
+		output[0] = fd1094_decode(0x000000, encrypted[0], key, TRUE);
+		if ((output[0] & desiredmask[0]) == desired[0])
+
+			/* iterate over the second key byte, limiting the scope to known valid keys */
+			for (key1 = (startwith >> 16) & 0xff; key1 < 256; key1++)
+				if ((key1 & 0xf8) == 0xa8 || (key1 & 0xf8) == 0xf8)
+				{
+					/* set the key and reset the fd1094 */
+					key[1] = key1;
+					startwith &= 0x0000ffff;
+					fd1094_set_state(key, FD1094_STATE_RESET);
+
+					/* if we match, iterate over the third key byte */
+					output[1] = fd1094_decode(0x000001, encrypted[1], key, TRUE);
+					if ((output[1] & desiredmask[1]) == desired[1])
+
+						/* iterate over the third key byte, limiting the scope to known valid keys */
+						for (key2 = (startwith >> 8) & 0xff; key2 < 256; key2++)
+							if ((key2 & 0xc0) == 0xc0)
+							{
+								/* set the key and reset the fd1094 */
+								key[2] = key2;
+								startwith &= 0x000000ff;
+								fd1094_set_state(key, FD1094_STATE_RESET);
+
+								/* if we match, iterate over the fourth key byte */
+								output[2] = fd1094_decode(0x000002, encrypted[2], key, TRUE);
+								if ((output[2] & desiredmask[2]) == desired[2])
+
+									/* iterate over the fourth key byte, limiting the scope to known valid keys */
+									for (key3 = (startwith >> 0) & 0xff; key3 < 256; key3++)
+										if ((key3 & 0xc0) == 0xc0)
+										{
+											/* set the key and reset the fd1094 */
+											key[3] = key3;
+											startwith = 0;
+											fd1094_set_state(key, FD1094_STATE_RESET);
+
+											/* if we match, return the value */
+											output[3] = fd1094_decode(0x000003, encrypted[3], key, TRUE);
+											if ((output[3] & desiredmask[3]) == desired[3])
+												return (key0 << 24) | (key1 << 16) | (key2 << 8) | key3;
+										}
+							}
+				}
+	}
+	return 0;
+}
+
+#if 0
+static int fd1094_find_opcode_sequence(int basepc, int pc, UINT8 *key, const UINT16 *base, const UINT16 *sequence, const UINT16 *seqmask, int seqlength, int quick)
+{
+	int found = FALSE;
+	UINT32 b, seed;
+	int shift;
+	int op;
+
+	if (seqlength == 0 && (quick || fd1094_is_valid_prng_sequence(&key[basepc/2], (pc - basepc) / 2, &shift, &b, &seed)))
+	{
+		if (!quick)
+		{
+			int curpc;
+			printf("  ->");
+			for (curpc = basepc; curpc < pc; curpc += 2)
+				printf(" %02X", key[curpc/2]);
+			printf("  (shift=%d b=%X seed=%X)\n", shift, b, seed);
+		}
+		return TRUE;
+	}
+
+	for (op = 0; op < 256; op++)
+	{
+		int addr = (pc / 2) & 0x1fff;
+		UINT16 result;
+
+		/* skip invalid keys */
+		if (addr >= 0x0004 && addr < 0x1004 && (op & 0x80) == 0)
+			continue;
+		if (addr >= 0x1000 && (op & 0x40) == 0)
+			continue;
+
+		key[addr] = op;
+		result = fd1094_decode(pc/2, base[pc/2], key, FALSE);
+
+		if ((result & *seqmask) == *sequence)
+		{
+			found |= fd1094_find_opcode_sequence(basepc, pc + 2, key, base, sequence + 1, seqmask + 1, seqlength - 1, quick);
+			if (found && quick)
+				return TRUE;
+		}
+	}
+
+	return found;
+}
+#endif
+
+static int fd1094_find_opcode_sequence(int basepc, UINT8 *key, const UINT16 *base, const UINT16 *sequence, const UINT16 *seqmask, int seqlength, int quick)
+{
+	static const UINT32 bvals[] = { 0x1A019, 0x3E023, 0x52005, 0x7600F };
+	static const int shiftvals[] = { -4, 8, 9, 10, 11, 12, 13 };
+	int found = FALSE;
+	int keybaseaddr;
+	int keyval;
+
+	/* predivide the PC by 2 */
+	basepc /= 2;
+	keybaseaddr = basepc & 0x1fff;
+
+	/* brute force search the first byte key of the key */
+	for (keyval = 0; keyval < 128; keyval++)
+	{
+		UINT8 keybyte = (keyval & 0x3f) | ((keybaseaddr < 0x1000) ? 0x80 : 0x40);
+		UINT16 decrypted;
+
+		/* set the high bit appropriately */
+		if (keyval >= 64)
+			keybyte |= (keybaseaddr < 0x1000) ? 0x40 : 0x80;
+
+		/* see if this works */
+		key[keybaseaddr] = keybyte;
+		decrypted = fd1094_decode(basepc, base[basepc], key, FALSE);
+
+		/* if we got a match, then iterate over all possible PRNG sequences starting with this */
+		if ((decrypted & seqmask[0]) == sequence[0])
+		{
+			int shiftindex, bindex;
+
+			/* iterate over shift possibilities */
+			for (shiftindex = 0; shiftindex < ARRAY_LENGTH(shiftvals); shiftindex++)
+			{
+				int shift = shiftvals[shiftindex];
+				int seeds = (shift < 0) ? 1 : (1 << shift);
+
+				/* iterate over b possibilities */
+				for (bindex = 0; bindex < ARRAY_LENGTH(bvals); bindex++)
+				{
+					UINT32 b = bvals[bindex];
+					UINT32 seed;
+
+					/* iterate over seed possibilities */
+					for (seed = 0; seed < seeds; seed++)
+					{
+						UINT32 startval = (shift < 0) ? (keybyte >> -shift) : ((keybyte << shift) | seed);
+						UINT32 val = startval;
+						UINT32 i, hibit;
+
+						/* generate data into the key */
+						for (i = 1; i < seqlength; i++)
+						{
+							int keyaddr = (keybaseaddr + i) & 0x1fff;
+							val = val * 0x10029 + b;
+							key[keyaddr] = (((val << 4) | 0xd) >> (shift + 4)) & 0x3f;
+							if ((keyaddr & 0x0ffc) != 0)
+								key[keyaddr] |= (keyaddr < 0x1000) ? 0x80 : 0x40;
+						}
+
+						/* iterate over high bits (1 per byte) */
+						for (hibit = 0; hibit < (1 << seqlength); hibit += 2)
+						{
+							/* set them */
+							for (i = 1; i < seqlength; i++)
+							{
+								int keyaddr = (keybaseaddr + i) & 0x1fff;
+								UINT8 bit = (keyaddr < 0x1000) ? 0x40 : 0x80;
+
+								/* set or clear the bit as appropriate */
+								if (hibit & (1 << i))
+									key[keyaddr] |= bit;
+								else
+									key[keyaddr] &= ~bit;
+
+								/* decrypt using this key; stop if we fail to match */
+								decrypted = fd1094_decode(basepc + i, base[basepc + i], key, FALSE);
+								if ((decrypted & seqmask[i]) != sequence[i])
+									break;
+							}
+
+							/* if the whole thing matched, record the match */
+							if (i == seqlength)
+							{
+								found = TRUE;
+								mame_printf_debug("  -> global = %02X%02X%02X%02X, PC = %04X, key = ", key[0], key[1], key[2], key[3], basepc * 2);
+								for (i = 0; i < seqlength; i++)
+									mame_printf_debug("%02X", key[(keybaseaddr + i) & 0x1fff]);
+								mame_printf_debug("  (shift=%d b=%X seed=%X)\n", shift, b, seed);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return found;
+}
+
+static int is_possible_pc(int pc, const UINT16 *base, UINT8 *key, UINT32 global)
+{
+	static const UINT16 leal_seq[]  = { 0x4ff9, 0x0000, 0x0000, 0x46fc, 0x2700, 0x0c80, 0x0000, 0xffff };
+	static const UINT16 leal_mask[] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xff00, 0xffff };
+	static const UINT16 leaw_seq[]  = { 0x4ff8, 0x0000, 0x46fc, 0x2700, 0x0c80, 0x0000, 0xffff };
+	static const UINT16 leaw_mask[] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xff00, 0xffff };
+	static const UINT16 clear_seq[] = { 0x4ff8, 0x0000, 0x46fc, 0x2700, 0x2200, 0x2400, 0x2600, 0x2800, 0x2a00, 0x2c00, 0x2e00 };
+	static const UINT16 clear_mask[] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
+
+	key[0] = global >> 24;
+	key[1] = global >> 16;
+	key[2] = global >> 8;
+	key[3] = global >> 0;
+
+	if (fd1094_find_opcode_sequence(pc, key, base, leal_seq, leal_mask, ARRAY_LENGTH(leal_seq), TRUE))
+		return TRUE;
+	if (fd1094_find_opcode_sequence(pc, key, base, leaw_seq, leaw_mask, ARRAY_LENGTH(leaw_seq), TRUE))
+		return TRUE;
+	if (fd1094_find_opcode_sequence(pc, key, base, clear_seq, clear_mask, ARRAY_LENGTH(clear_seq), TRUE))
+		return TRUE;
+/*  if (fd1094_find_opcode_sequence(pc, key, base, leal_seq, leal_mask, ARRAY_LENGTH(leal_seq) - 3, TRUE))
+        return TRUE;
+    if (fd1094_find_opcode_sequence(pc, key, base, leaw_seq, leaw_mask, ARRAY_LENGTH(leaw_seq) - 3, TRUE))
+        return TRUE;*/
+
+	return FALSE;
+}
+
+
+void fd1094_find_global_keys(const UINT16 *base, UINT8 *key)
+{
+	static const UINT16 stack00000000_data[] = { 0x0000, 0x0000, 0x0000, 0x0000 };
+	static const UINT16 stack00000000_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
+	static const UINT16 stackffffff00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
+	static const UINT16 stackffffff00_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
+	static const UINT16 stackffffff7e_data[] = { 0xffff, 0xff7e, 0x0000, 0x0000 };
+	static const UINT16 stackffffff7e_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
+	static const UINT16 stack00x0xx00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
+	static const UINT16 stack00x0xx00_mask[] = { 0xff8f, 0x87ff, 0xffff, 0xc001 };
+	static UINT8 pc[0x2000];
+	UINT16 output[4];
+	UINT32 global;
+	int i, count;
+
+	mame_printf_debug("Checking for stack == 0x00000000\n");
+	global = count = 0;
+	while (1)
+	{
+		global = fd1094_find_global_key_matches(base, stack00000000_data, stack00000000_mask, global + 1, output);
+		if (global == 0)
+			break;
+		if (is_possible_pc(output[3], base, key, global))
+		{
+			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
+			pc[output[3]] = 1;
+		}
+		count++;
+	}
+	if (count > 0)
+		mame_printf_debug("  Found %d possibilities\n", count);
+
+	mame_printf_debug("Checking for stack == 0xffffff00\n");
+	global = count = 0;
+	while (1)
+	{
+		global = fd1094_find_global_key_matches(base, stackffffff00_data, stackffffff00_mask, global + 1, output);
+		if (global == 0)
+			break;
+		if (is_possible_pc(output[3], base, key, global))
+		{
+			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
+			pc[output[3]] = 1;
+		}
+		count++;
+	}
+	if (count > 0)
+		mame_printf_debug("  Found %d possibilities\n", count);
+
+	mame_printf_debug("Checking for stack == 0xffffff7e\n");
+	global = count = 0;
+	while (1)
+	{
+		global = fd1094_find_global_key_matches(base, stackffffff7e_data, stackffffff7e_mask, global + 1, output);
+		if (global == 0)
+			break;
+		if (is_possible_pc(output[3], base, key, global))
+		{
+			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
+			pc[output[3]] = 1;
+		}
+		count++;
+	}
+	if (count > 0)
+		mame_printf_debug("  Found %d possibilities\n", count);
+
+	mame_printf_debug("Checking for stack == 0x00x0xx00\n");
+	global = count = 0;
+	while (1)
+	{
+		global = fd1094_find_global_key_matches(base, stack00x0xx00_data, stack00x0xx00_mask, global + 1, output);
+		if (global == 0)
+			break;
+		if (is_possible_pc(output[3], base, key, global))
+		{
+			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
+			pc[output[3]] = 1;
+		}
+		count++;
+	}
+	if (count > 0)
+		mame_printf_debug("  Found %d possibilities\n", count);
+
+	mame_printf_debug("Possible PCs:\n");
+	for (i = 0; i < 0x2000; i++)
+		if (pc[i])
+		{
+			mame_printf_debug("  %04X -> \n", i);
+		}
+}
+
+#endif

@@ -33,8 +33,8 @@
     analog device and scale that to a value between -65536 and +65536
     representing the position of the control. -65536 generally refers to
     the topmost or leftmost position, while +65536 refers to the bottommost
-    or rightmost position. Note that pedals are a special case here,
-    mapping only in one direction, with a range of 0 to +65536.
+    or rightmost position. Note that pedals are a special case here, the
+    OSD layer needs to return half axis as full -65536 to + 65536 range.
 
     Relative analog controls are analog as well, but are not physically
     bounded. They can be moved continually in one direction without limit.
@@ -132,19 +132,24 @@ struct _analog_port_info
 {
 	analog_port_info *	next;			/* linked list */
 	input_port_entry *	port;			/* pointer to the input port referenced */
-	INT32				accum;			/* accumulated value (including relative adjustments) */
-	INT32				previous;		/* previous adjusted value */
+	double				accum;			/* accumulated value (including relative adjustments) */
+	double				previous;		/* previous adjusted value */
+	INT32				previousanalog;	/* previous analog value */
 	INT32				minimum;		/* minimum adjusted value */
 	INT32				maximum;		/* maximum adjusted value */
+	INT32				center;			/* center adjusted value for autocentering */
 	double				scalepos;		/* scale factor to apply to positive adjusted values */
 	double				scaleneg;		/* scale factor to apply to negative adjusted values */
-	double				keyscale;		/* scale factor to apply to the key delta field */
+	double				keyscalepos;	/* scale factor to apply to the key delta field when pos */
+	double				keyscaleneg;	/* scale factor to apply to the key delta field when neg */
+	double				positionalscale;/* scale factor to divide a joystick into positions */
 	UINT8				shift;			/* left shift to apply to the final result */
 	UINT8				bits;			/* how many bits of resolution are expected? */
 	UINT8				absolute;		/* is this an absolute or relative input? */
 	UINT8				wraps;			/* does the control wrap around? */
 	UINT8				one_of_x;		/* is this a 1 of X postional input? */
 	UINT8				autocenter;		/* autocenter this input? */
+	UINT8				dual_scale;		/* scale joystick diferently if defaut is between min/max */
 	UINT8				interpolate;	/* should we do linear interpolation for mid-frame reads? */
 	UINT8				lastdigital;	/* was the last modification caused by a digital form? */
 	UINT32				crosshair_pos;	/* position of fake crosshair */
@@ -227,8 +232,8 @@ struct _input_port_init_params
 #define JOYSTICK_INFO_FOR_PORT(in)	(&joystick_info[(in)->player][((in)->type - __ipt_digital_joystick_start) / 4])
 #define JOYSTICK_DIR_FOR_PORT(in)	(((in)->type - __ipt_digital_joystick_start) % 4)
 
-#define APPLY_SENSITIVITY(x,s)		(((x) >= 0) ? (((INT64)(x) * (s)) / 100) : ((-(INT64)(x) * (s)) / -100))
-#define APPLY_INVERSE_SENSITIVITY(x,s) (((x) >= 0) ? (((INT64)(x) * 100) / (s)) : ((-(INT64)(x) * 100) / -(s)))
+#define APPLY_SENSITIVITY(x,s)		(((double)(x) * (s)) / 100)
+#define APPLY_INVERSE_SENSITIVITY(x,s) (((double)(x) * 100) / (s))
 
 
 
@@ -719,32 +724,32 @@ static const input_port_default_entry default_ports_builtin[] =
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_OTHER,   VOLUME_DOWN,		"Volume Down",     		SEQ_DEF_1(KEYCODE_MINUS) )
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_OTHER,   VOLUME_UP,			"Volume Up",     		SEQ_DEF_1(KEYCODE_EQUALS) )
 
-	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL,				"P1 Pedal 1",     		SEQ_DEF_3(JOYCODE_1_ANALOG_PEDAL1, CODE_OR, JOYCODE_1_ANALOG_Y), SEQ_DEF_3(KEYCODE_LCONTROL, CODE_OR, JOYCODE_1_BUTTON1), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL,				"P2 Pedal 1", 			SEQ_DEF_3(JOYCODE_2_ANALOG_PEDAL1, CODE_OR, JOYCODE_2_ANALOG_Y), SEQ_DEF_3(KEYCODE_A, CODE_OR, JOYCODE_2_BUTTON1), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL,				"P3 Pedal 1",			SEQ_DEF_3(JOYCODE_3_ANALOG_PEDAL1, CODE_OR, JOYCODE_3_ANALOG_Y), SEQ_DEF_3(KEYCODE_RCONTROL, CODE_OR, JOYCODE_3_BUTTON1), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL,				"P4 Pedal 1",			SEQ_DEF_3(JOYCODE_4_ANALOG_PEDAL1, CODE_OR, JOYCODE_4_ANALOG_Y), SEQ_DEF_3(KEYCODE_0_PAD, CODE_OR, JOYCODE_4_BUTTON1), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 5, IPG_PLAYER5,	PEDAL,				"P5 Pedal 1",			SEQ_DEF_3(JOYCODE_5_ANALOG_PEDAL1, CODE_OR, JOYCODE_5_ANALOG_Y), SEQ_DEF_1(JOYCODE_5_BUTTON1), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 6, IPG_PLAYER6,	PEDAL,				"P6 Pedal 1",			SEQ_DEF_3(JOYCODE_6_ANALOG_PEDAL1, CODE_OR, JOYCODE_6_ANALOG_Y), SEQ_DEF_1(JOYCODE_6_BUTTON1), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 7, IPG_PLAYER7,	PEDAL,				"P7 Pedal 1",			SEQ_DEF_3(JOYCODE_7_ANALOG_PEDAL1, CODE_OR, JOYCODE_7_ANALOG_Y), SEQ_DEF_1(JOYCODE_7_BUTTON1), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 8, IPG_PLAYER8,	PEDAL,				"P8 Pedal 1",			SEQ_DEF_3(JOYCODE_8_ANALOG_PEDAL1, CODE_OR, JOYCODE_8_ANALOG_Y), SEQ_DEF_1(JOYCODE_8_BUTTON1), SEQ_DEF_0 )
+	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL,				"P1 Pedal 1",     		SEQ_DEF_1(JOYCODE_1_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_LCONTROL, CODE_OR, JOYCODE_1_BUTTON1) )
+	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL,				"P2 Pedal 1", 			SEQ_DEF_1(JOYCODE_2_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_A, CODE_OR, JOYCODE_2_BUTTON1) )
+	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL,				"P3 Pedal 1",			SEQ_DEF_1(JOYCODE_3_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_RCONTROL, CODE_OR, JOYCODE_3_BUTTON1) )
+	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL,				"P4 Pedal 1",			SEQ_DEF_1(JOYCODE_4_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_0_PAD, CODE_OR, JOYCODE_4_BUTTON1) )
+	INPUT_PORT_ANALOG_DEF ( 5, IPG_PLAYER5,	PEDAL,				"P5 Pedal 1",			SEQ_DEF_1(JOYCODE_5_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_5_BUTTON1) )
+	INPUT_PORT_ANALOG_DEF ( 6, IPG_PLAYER6,	PEDAL,				"P6 Pedal 1",			SEQ_DEF_1(JOYCODE_6_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_6_BUTTON1) )
+	INPUT_PORT_ANALOG_DEF ( 7, IPG_PLAYER7,	PEDAL,				"P7 Pedal 1",			SEQ_DEF_1(JOYCODE_7_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_7_BUTTON1) )
+	INPUT_PORT_ANALOG_DEF ( 8, IPG_PLAYER8,	PEDAL,				"P8 Pedal 1",			SEQ_DEF_1(JOYCODE_8_ANALOG_X_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_8_BUTTON1) )
 
-	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL2,				"P1 Pedal 2",			SEQ_DEF_1(JOYCODE_1_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_LALT, CODE_OR, JOYCODE_1_BUTTON2), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL2,				"P2 Pedal 2",			SEQ_DEF_1(JOYCODE_2_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_S, CODE_OR, JOYCODE_2_BUTTON2), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL2,				"P3 Pedal 2",			SEQ_DEF_1(JOYCODE_3_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_RSHIFT, CODE_OR, JOYCODE_3_BUTTON2), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL2,				"P4 Pedal 2",			SEQ_DEF_1(JOYCODE_4_ANALOG_PEDAL2), SEQ_DEF_3(KEYCODE_DEL_PAD, CODE_OR, JOYCODE_4_BUTTON2), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 5, IPG_PLAYER5,	PEDAL2,				"P5 Pedal 2",			SEQ_DEF_1(JOYCODE_5_ANALOG_PEDAL2), SEQ_DEF_1(JOYCODE_5_BUTTON2), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 6, IPG_PLAYER6,	PEDAL2,				"P6 Pedal 2",			SEQ_DEF_1(JOYCODE_6_ANALOG_PEDAL2), SEQ_DEF_1(JOYCODE_6_BUTTON2), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 7, IPG_PLAYER7,	PEDAL2,				"P7 Pedal 2",			SEQ_DEF_1(JOYCODE_7_ANALOG_PEDAL2), SEQ_DEF_1(JOYCODE_7_BUTTON2), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 8, IPG_PLAYER8,	PEDAL2,				"P8 Pedal 2",			SEQ_DEF_1(JOYCODE_8_ANALOG_PEDAL2), SEQ_DEF_1(JOYCODE_8_BUTTON2), SEQ_DEF_0 )
+	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL2,				"P1 Pedal 2",			SEQ_DEF_1(JOYCODE_1_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_LALT, CODE_OR, JOYCODE_1_BUTTON2) )
+	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL2,				"P2 Pedal 2",			SEQ_DEF_1(JOYCODE_2_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_S, CODE_OR, JOYCODE_2_BUTTON2) )
+	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL2,				"P3 Pedal 2",			SEQ_DEF_1(JOYCODE_3_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_RSHIFT, CODE_OR, JOYCODE_3_BUTTON2) )
+	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL2,				"P4 Pedal 2",			SEQ_DEF_1(JOYCODE_4_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_DEL_PAD, CODE_OR, JOYCODE_4_BUTTON2) )
+	INPUT_PORT_ANALOG_DEF ( 5, IPG_PLAYER5,	PEDAL2,				"P5 Pedal 2",			SEQ_DEF_1(JOYCODE_5_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_5_BUTTON2) )
+	INPUT_PORT_ANALOG_DEF ( 6, IPG_PLAYER6,	PEDAL2,				"P6 Pedal 2",			SEQ_DEF_1(JOYCODE_6_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_6_BUTTON2) )
+	INPUT_PORT_ANALOG_DEF ( 7, IPG_PLAYER7,	PEDAL2,				"P7 Pedal 2",			SEQ_DEF_1(JOYCODE_7_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_7_BUTTON2) )
+	INPUT_PORT_ANALOG_DEF ( 8, IPG_PLAYER8,	PEDAL2,				"P8 Pedal 2",			SEQ_DEF_1(JOYCODE_8_ANALOG_Y_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_8_BUTTON2) )
 
-	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL3,				"P1 Pedal 3",			SEQ_DEF_1(JOYCODE_1_ANALOG_PEDAL3), SEQ_DEF_3(KEYCODE_SPACE, CODE_OR, JOYCODE_1_BUTTON3), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL3,				"P2 Pedal 3",			SEQ_DEF_1(JOYCODE_2_ANALOG_PEDAL3), SEQ_DEF_3(KEYCODE_Q, CODE_OR, JOYCODE_2_BUTTON3), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL3,				"P3 Pedal 3",			SEQ_DEF_1(JOYCODE_3_ANALOG_PEDAL3), SEQ_DEF_3(KEYCODE_ENTER, CODE_OR, JOYCODE_3_BUTTON3), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL3,				"P4 Pedal 3",			SEQ_DEF_1(JOYCODE_4_ANALOG_PEDAL3), SEQ_DEF_3(KEYCODE_ENTER_PAD, CODE_OR, JOYCODE_4_BUTTON3), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 5, IPG_PLAYER5,	PEDAL3,				"P5 Pedal 3",			SEQ_DEF_1(JOYCODE_5_ANALOG_PEDAL3), SEQ_DEF_1(JOYCODE_5_BUTTON3), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 6, IPG_PLAYER6,	PEDAL3,				"P6 Pedal 3",			SEQ_DEF_1(JOYCODE_6_ANALOG_PEDAL3), SEQ_DEF_1(JOYCODE_6_BUTTON3), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 7, IPG_PLAYER7,	PEDAL3,				"P7 Pedal 3",			SEQ_DEF_1(JOYCODE_7_ANALOG_PEDAL3), SEQ_DEF_1(JOYCODE_7_BUTTON3), SEQ_DEF_0 )
-	INPUT_PORT_ANALOG_DEF ( 8, IPG_PLAYER8,	PEDAL3,				"P8 Pedal 3",			SEQ_DEF_1(JOYCODE_8_ANALOG_PEDAL3), SEQ_DEF_1(JOYCODE_8_BUTTON3), SEQ_DEF_0 )
+	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PEDAL3,				"P1 Pedal 3",			SEQ_DEF_1(JOYCODE_1_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_SPACE, CODE_OR, JOYCODE_1_BUTTON3) )
+	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PEDAL3,				"P2 Pedal 3",			SEQ_DEF_1(JOYCODE_2_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_Q, CODE_OR, JOYCODE_2_BUTTON3) )
+	INPUT_PORT_ANALOG_DEF ( 3, IPG_PLAYER3,	PEDAL3,				"P3 Pedal 3",			SEQ_DEF_1(JOYCODE_3_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_ENTER, CODE_OR, JOYCODE_3_BUTTON3) )
+	INPUT_PORT_ANALOG_DEF ( 4, IPG_PLAYER4,	PEDAL3,				"P4 Pedal 3",			SEQ_DEF_1(JOYCODE_4_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_3(KEYCODE_ENTER_PAD, CODE_OR, JOYCODE_4_BUTTON3) )
+	INPUT_PORT_ANALOG_DEF ( 5, IPG_PLAYER5,	PEDAL3,				"P5 Pedal 3",			SEQ_DEF_1(JOYCODE_5_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_5_BUTTON3) )
+	INPUT_PORT_ANALOG_DEF ( 6, IPG_PLAYER6,	PEDAL3,				"P6 Pedal 3",			SEQ_DEF_1(JOYCODE_6_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_6_BUTTON3) )
+	INPUT_PORT_ANALOG_DEF ( 7, IPG_PLAYER7,	PEDAL3,				"P7 Pedal 3",			SEQ_DEF_1(JOYCODE_7_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_7_BUTTON3) )
+	INPUT_PORT_ANALOG_DEF ( 8, IPG_PLAYER8,	PEDAL3,				"P8 Pedal 3",			SEQ_DEF_1(JOYCODE_8_ANALOG_Z_NEG), SEQ_DEF_0, SEQ_DEF_1(JOYCODE_8_BUTTON3) )
 
 	INPUT_PORT_ANALOG_DEF ( 1, IPG_PLAYER1,	PADDLE,				"Paddle",   	    	SEQ_DEF_3(MOUSECODE_1_ANALOG_X, CODE_OR, JOYCODE_1_ANALOG_X), SEQ_DEF_3(KEYCODE_LEFT, CODE_OR, JOYCODE_1_LEFT), SEQ_DEF_3(KEYCODE_RIGHT, CODE_OR, JOYCODE_1_RIGHT) )
 	INPUT_PORT_ANALOG_DEF ( 2, IPG_PLAYER2,	PADDLE,				"Paddle 2",      		SEQ_DEF_3(MOUSECODE_2_ANALOG_X, CODE_OR, JOYCODE_2_ANALOG_X), SEQ_DEF_3(KEYCODE_D, CODE_OR, JOYCODE_2_LEFT), SEQ_DEF_3(KEYCODE_G, CODE_OR, JOYCODE_2_RIGHT) )
@@ -1130,23 +1135,22 @@ static void input_port_postload(void)
 				info->minimum = ANALOG_VALUE_MIN;
 				info->maximum = ANALOG_VALUE_MAX;
 				info->interpolate = 1;
-				info->wraps = 0;
 
 				switch (port->type)
 				{
-					/* pedals are absolute and get interpolation, but only range in the negative values */
+					/* pedals start at and autocenter to the min range*/
 					case IPT_PEDAL:
 					case IPT_PEDAL2:
 					case IPT_PEDAL3:
-						info->minimum = 0;
-						/* fall through... */
+						info->accum = info->center = ANALOG_VALUE_MIN;
+						/* fall through to complete setup */
 
 					/* pedals, paddles and analog joysticks are absolute and autocenter */
-					case IPT_PADDLE:
-					case IPT_PADDLE_V:
 					case IPT_AD_STICK_X:
 					case IPT_AD_STICK_Y:
 					case IPT_AD_STICK_Z:
+					case IPT_PADDLE:
+					case IPT_PADDLE_V:
 						info->absolute = 1;
 						info->autocenter = 1;
 						break;
@@ -1169,21 +1173,24 @@ static void input_port_postload(void)
 					case IPT_TRACKBALL_X:
 					case IPT_TRACKBALL_Y:
 						info->absolute = 0;
-						port->analog.min = 0;
+						info->minimum = port->analog.min = 0;
 						port->analog.max = (1 << info->bits) - 1;
-						info->minimum = 0;
 						info->maximum = port->analog.max * 512;
 						info->wraps = 1;
 						break;
 
+					/* positional devices are abolute, but can also wrap like relative devices */
+					/* set each position to be 512 units */
 					case IPT_POSITIONAL:
 					case IPT_POSITIONAL_V:
+						info->positionalscale = (double)(port->analog.max) / (ANALOG_VALUE_MAX - ANALOG_VALUE_MIN);
 						port->analog.min = 0;
 						port->analog.max--;
 						info->minimum = (0 - port->default_value) * 512;
 						info->maximum = (port->analog.max - port->default_value) * 512;
 						info->autocenter = !port->analog.wraps;
 						info->wraps = port->analog.wraps;
+						info->dual_scale = 1;
 						break;
 
 					default:
@@ -1194,24 +1201,35 @@ static void input_port_postload(void)
 				/* extremes can be signed or unsigned */
 				if (info->absolute)
 				{
-					if (port->analog.max > port->analog.min)
-					{
-						info->scalepos = (double)(port->analog.max - port->default_value) / (double)(ANALOG_VALUE_MAX - 0);
-						info->scaleneg = (double)(port->default_value - port->analog.min) / (double)(0 - ANALOG_VALUE_MIN);
-					}
+					/* if we are receiving data from the OSD input as absolute,
+                     * and the emulated port type is absolute,
+                     * and the default port value is between min/max,
+                     * we need to scale differently for the +/- directions.
+                     * All other absolute types use a 1:1 scale */
+					info->dual_scale = (port->default_value != port->analog.min) && (port->default_value != port->analog.max);
+
+					if (info->dual_scale)
+						if (port->analog.max > port->analog.min)
+						{
+							info->scalepos = (double)(port->analog.max - port->default_value) / (double)(ANALOG_VALUE_MAX - 0);
+							info->scaleneg = (double)(port->default_value - port->analog.min) / (double)(0 - ANALOG_VALUE_MIN);
+						}
+						else
+						{
+							info->scalepos = (double)((INT32)((port->analog.max - port->default_value) << (32 - info->bits)) >> (32 - info->bits)) / (double)(ANALOG_VALUE_MAX - 0);
+							info->scaleneg = (double)((INT32)((port->default_value - port->analog.min) << (32 - info->bits)) >> (32 - info->bits)) / (double)(0 - ANALOG_VALUE_MIN);
+						}
 					else
-					{
-						info->scalepos = (double)((INT32)((port->analog.max - port->default_value) << (32 - info->bits)) >> (32 - info->bits)) / (double)(ANALOG_VALUE_MAX - 0);
-						info->scaleneg = (double)((INT32)((port->default_value - port->analog.min) << (32 - info->bits)) >> (32 - info->bits)) / (double)(0 - ANALOG_VALUE_MIN);
-					}
+						info->scalepos = info->scaleneg = (double)(port->analog.max - port->analog.min) / (double)(ANALOG_VALUE_MAX - ANALOG_VALUE_MIN);
 				}
 
-				/* relative controls all map directly with a 512x scale factor */
+				/* relative and positional controls all map directly with a 512x scale factor */
 				else
 					info->scalepos = info->scaleneg = 1.0 / 512.0;
 
 				/* compute scale for keypresses */
-				info->keyscale = 1.0 / (0.5 * (info->scalepos + info->scaleneg));
+				info->keyscalepos = 1.0 / info->scalepos;
+				info->keyscaleneg = 1.0 / info->scaleneg;
 
 				/* hook in the list */
 				info->next = port_info[portnum].analoginfo;
@@ -2791,10 +2809,10 @@ static void update_digital_joysticks(void)
  *
  *************************************/
 
-INLINE INT32 apply_analog_min_max(const analog_port_info *info, INT32 value)
+INLINE INT32 apply_analog_min_max(const analog_port_info *info, double value)
 {
 	const input_port_entry *port = info->port;
-	INT32 adjmax, adjmin, adj1, adjdif;
+	double adjmax, adjmin, adj1, adjdif;
 
 	/* take the analog minimum and maximum values and apply the inverse of the */
 	/* sensitivity so that we can clamp against them before applying sensitivity */
@@ -2815,10 +2833,20 @@ INLINE INT32 apply_analog_min_max(const analog_port_info *info, INT32 value)
 	else
 	{
 		adjdif = adjmax - adjmin + adj1;
-		while (value > adjmax)
-			value -= adjdif;
-		while (value < adjmin)
-			value += adjdif;
+		if (port->analog.reverse)
+		{
+			while (value <= adjmin - adj1)
+				value += adjdif;
+			while (value > adjmax)
+				value -= adjdif;
+		}
+		else
+		{
+			while (value >= adjmax + adj1)
+				value -= adjdif;
+			while (value < adjmin)
+				value += adjdif;
+		}
 	}
 
 	return value;
@@ -2840,7 +2868,8 @@ static void update_analog_port(int portnum)
 	for (info = port_info[portnum].analoginfo; info != NULL; info = info->next)
 	{
 		input_port_entry *port = info->port;
-		INT32 delta = 0, rawvalue;
+		INT32 rawvalue;
+		double delta = 0, keyscale;
 		int analog_type, keypressed = 0;
 
 		/* clamp the previous value to the min/max range and remember it */
@@ -2848,6 +2877,47 @@ static void update_analog_port(int portnum)
 
 		/* get the new raw analog value and its type */
 		rawvalue = seq_analog_value(input_port_seq(port, SEQ_TYPE_STANDARD), &analog_type);
+
+		/* if we got an absolute input, it overrides everything else */
+		if (analog_type == ANALOG_TYPE_ABSOLUTE)
+		{
+			if (info->previousanalog != rawvalue)
+			{
+				/* only update if analog value changed */
+				info->previousanalog = rawvalue;
+				/* apply the inverse of the sensitivity to the raw value so that */
+				/* it will still cover the full min->max range requested after */
+				/* we apply the sensitivity adjustment */
+				if (info->absolute)
+				{
+					/* if port is absolute, then just return the absolute data supplied */
+					info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, port->analog.sensitivity);
+				}
+				else if (info->positionalscale != 0)
+				{
+					/* if port is positional, we will take the full analog control and divide it */
+					/* into positions, that way as the control is moved full scale, */
+					/* it moves through all the positions */
+					rawvalue = info->positionalscale * (rawvalue - ANALOG_VALUE_MIN);
+					/* clamp the high value so it does not roll over */
+					if (rawvalue > port->analog.max) rawvalue = port->analog.max;
+					info->accum = APPLY_INVERSE_SENSITIVITY((rawvalue * 512 + info->minimum), port->analog.sensitivity);
+				}
+				else
+					/* if port is relative, we use the value to simulate the speed of relative movement */
+					/* sensitivity adjustment is allowed for this mode */
+					info->accum += rawvalue;
+
+				info->lastdigital = 0;
+				/* do not bother with other control types if the analog data is changing */
+				return;
+			}
+			else
+			{
+				/* we still have to update fake relative from joystick control */
+				if (!info->absolute && info->positionalscale == 0) info->accum += rawvalue;
+			}
+		}
 
 		/* if we got it from a relative device, use that as the starting delta */
 		/* also note that the last input was not a digital one */
@@ -2857,6 +2927,8 @@ static void update_analog_port(int portnum)
 			info->lastdigital = 0;
 		}
 
+		keyscale = (info->accum >= 0) ? info->keyscalepos : info->keyscaleneg;
+
 		/* if the decrement code sequence is pressed, add the key delta to */
 		/* the accumulated delta; also note that the last input was a digital one */
 		if (seq_pressed(input_port_seq(info->port, SEQ_TYPE_DECREMENT)))
@@ -2864,7 +2936,7 @@ static void update_analog_port(int portnum)
 			keypressed = 1;
 			if (port->analog.delta)
 			{
-				delta -= (INT32)(port->analog.delta * info->keyscale);
+				delta -= port->analog.delta * keyscale;
 				info->lastdigital = 1;
 			}
 			else
@@ -2872,7 +2944,7 @@ static void update_analog_port(int portnum)
 				if (info->lastdigital != 2)
 				{
 					/* decrement only once when first pressed */
-					delta -= (INT32)(info->keyscale);
+					delta -= keyscale;
 					info->lastdigital = 2;
 				}
 			}
@@ -2886,7 +2958,7 @@ static void update_analog_port(int portnum)
 			keypressed = 1;
 			if (port->analog.delta)
 			{
-				delta += (INT32)(port->analog.delta * info->keyscale);
+				delta += port->analog.delta * keyscale;
 				info->lastdigital = 1;
 			}
 			else
@@ -2894,7 +2966,7 @@ static void update_analog_port(int portnum)
 				if (info->lastdigital != 3)
 				{
 					/* increment only once when first pressed */
-					delta += (INT32)(info->keyscale);
+					delta += keyscale;
 					info->lastdigital = 3;
 				}
 			}
@@ -2911,16 +2983,6 @@ static void update_analog_port(int portnum)
 		/* apply the delta to the accumulated value */
 		info->accum += delta;
 
-		/* if we got an absolute input, it overrides everything else */
-		if (analog_type == ANALOG_TYPE_ABSOLUTE)
-		{
-			/* apply the inverse of the sensitivity to the raw value so that */
-			/* it will still cover the full min->max range requested after */
-			/* we apply the sensitivity adjustment */
-			info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, port->analog.sensitivity);
-			info->lastdigital = 0;
-		}
-
 		/* if our last movement was due to a digital input, and if this control */
 		/* type autocenters, and if neither the increment nor the decrement seq */
 		/* was pressed, apply autocentering */
@@ -2929,12 +2991,12 @@ static void update_analog_port(int portnum)
 			if (info->lastdigital && !keypressed)
 			{
 				/* autocenter from positive values */
-				if (info->accum >= 0)
+				if (info->accum >= info->center)
 				{
-					info->accum -= (INT32)(port->analog.centerdelta * info->keyscale);
-					if (info->accum < 0)
+					info->accum -= port->analog.centerdelta * info->keyscalepos;
+					if (info->accum < info->center)
 					{
-						info->accum = 0;
+						info->accum = info->center;
 						info->lastdigital = 0;
 					}
 				}
@@ -2942,10 +3004,10 @@ static void update_analog_port(int portnum)
 				/* autocenter from negative values */
 				else
 				{
-					info->accum += (INT32)(port->analog.centerdelta * info->keyscale);
-					if (info->accum > 0)
+					info->accum += port->analog.centerdelta * info->keyscaleneg;
+					if (info->accum > info->center)
 					{
-						info->accum = 0;
+						info->accum = info->center;
 						info->lastdigital = 0;
 					}
 				}
@@ -2964,59 +3026,73 @@ static void update_analog_port(int portnum)
  *
  *************************************/
 
-static void interpolate_analog_port(int port)
+static void interpolate_analog_port(int portnum)
 {
 	analog_port_info *info;
 
 profiler_mark(PROFILER_INPUT);
 
 	/* set the default mask and value */
-	port_info[port].analogmask = 0;
-	port_info[port].analog = 0;
+	port_info[portnum].analogmask = 0;
+	port_info[portnum].analog = 0;
 
 	/* loop over all analog ports in this port number */
-	for (info = port_info[port].analoginfo; info != NULL; info = info->next)
+	for (info = port_info[portnum].analoginfo; info != NULL; info = info->next)
+	{
+		input_port_entry *port = info->port;
+
 		if (input_port_condition(info->port))
 		{
-			INT32 current;
+			double current;
 			INT32 value;
 
 			/* interpolate or not */
-			if (info->interpolate && !info->port->analog.reset)
+			if (info->interpolate && !port->analog.reset)
 				current = info->previous + cpu_scalebyfcount(info->accum - info->previous);
 			else
 				current = info->accum;
 
 			/* apply the min/max and then the sensitivity */
 			current = apply_analog_min_max(info, current);
-			current = APPLY_SENSITIVITY(current, info->port->analog.sensitivity);
+			current = APPLY_SENSITIVITY(current, port->analog.sensitivity);
 
 			/* apply reversal if needed */
-			if (info->port->analog.reverse)
-				current = info->maximum + info->minimum - current;
+			if (info->dual_scale)
+			{
+				if (port->analog.reverse)
+					current = info->maximum + info->minimum - current;
+			}
+			else
+			{
+				if (port->analog.reverse)
+					current = ANALOG_VALUE_MAX - current;
+				else
+					current -= ANALOG_VALUE_MIN;
+			}
 
 			/* map differently for positive and negative values */
-			if (current >= 0)
+			if (current >= 0 )
 				value = (INT32)(current * info->scalepos);
 			else
 				value = (INT32)(current * info->scaleneg);
-			value += info->port->default_value;
+			value += port->default_value;
 
 			/* store croshair position before any graycode conversion */
-			info->crosshair_pos = (INT32)value & (info->port->mask >> info->shift);
+			info->crosshair_pos = (INT32)value & (port->mask >> info->shift);
 
 			/* remap the value if needed */
-			if (info->port->analog.remap_table)
+			if (port->analog.remap_table)
 				value = info->port->analog.remap_table[value];
 
 			/* invert bits if needed */
-			if (info->port->analog.invert)
+			if (port->analog.invert)
 				value = ~value;
 
 			/* insert into the port */
-			port_info[port].analogmask |= info->port->mask;
-			port_info[port].analog = (port_info[port].analog & ~info->port->mask) | ((value << info->shift) & info->port->mask);
+			port_info[portnum].analogmask |= info->port->mask;
+			port_info[portnum].analog = (port_info[portnum].analog & ~port->mask) | ((value << info->shift) & port->mask);
 		}
+	}
 
 profiler_mark(PROFILER_END);
 }

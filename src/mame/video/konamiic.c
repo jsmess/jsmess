@@ -8104,7 +8104,6 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, pen_t *palette, UINT8 
 		dst_base = BITMAP_ADDR32(bitmap, dst_start, linepos + dst_offset);
 	}
 
-#if 0
 	// generalized
 	src_base = source;
 	src_x = 0;
@@ -8149,65 +8148,6 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, pen_t *palette, UINT8 
 		}
 		while (dst_offset += dst_adv);
 	}
-#else
-	// register efficient
-	pal_base = palette;
-	pri = (UINT8)priority;
-	dst_offset = -dst_offset; // negate target offset in order to terminated draw loop at zero condition
-
-// advance and convert source offset from fixed point to integer
-#define ADVANCE_SOURCE_OFFSET { src_x = src_fx; src_fx += src_fdx; src_x >>= FIXPOINT_PRECISION; }
-
-// draw non-zero pens and update priority bitmap
-#define DRAWPIXEL_PRIORITY { if (pix_data) { pix_data = pal_base[pix_data]; pri_base[dst_offset] = pri; dst_base[dst_offset] = pix_data; } }
-
-// draw non-zero pens but do not update priority bitmap
-#define DRAWPIXEL_NOPRIORITY { if (pix_data) dst_base[dst_offset] = pal_base[pix_data]; }
-
-	if (clipmask)
-	{
-		ADVANCE_SOURCE_OFFSET
-		src_base = source;
-
-		if (dst_adv == 1)
-		{
-			if (pri)
-				do { pix_data= src_base[src_x]; ADVANCE_SOURCE_OFFSET DRAWPIXEL_PRIORITY } while (++dst_offset);
-			else
-				do { pix_data= src_base[src_x]; ADVANCE_SOURCE_OFFSET DRAWPIXEL_NOPRIORITY } while (++dst_offset);
-		}
-		else
-		{
-			if (pri)
-				do { pix_data= src_base[src_x]; ADVANCE_SOURCE_OFFSET DRAWPIXEL_PRIORITY } while (dst_offset += (512+32));
-			else
-				do { pix_data= src_base[src_x]; ADVANCE_SOURCE_OFFSET DRAWPIXEL_NOPRIORITY } while (dst_offset += (512+32));
-		}
-	}
-	else
-	{
-		src_wrapmask = wrapmask << FIXPOINT_PRECISION | ((1<<FIXPOINT_PRECISION)-1);
-		src_fx &= src_wrapmask;
-		ADVANCE_SOURCE_OFFSET
-		src_base = source;
-		src_fx &= src_wrapmask;
-
-		if (dst_adv == 1)
-		{
-			if (pri)
-				do { pix_data = src_base[src_x]; ADVANCE_SOURCE_OFFSET src_fx &= src_wrapmask; DRAWPIXEL_PRIORITY } while (++dst_offset);
-			else
-				do { pix_data = src_base[src_x]; ADVANCE_SOURCE_OFFSET src_fx &= src_wrapmask; DRAWPIXEL_NOPRIORITY } while (++dst_offset);
-		}
-		else
-		{
-			if (pri)
-				do { pix_data = src_base[src_x]; ADVANCE_SOURCE_OFFSET src_fx &= src_wrapmask; DRAWPIXEL_PRIORITY } while (dst_offset += (512+32));
-			else
-				do { pix_data = src_base[src_x]; ADVANCE_SOURCE_OFFSET src_fx &= src_wrapmask; DRAWPIXEL_NOPRIORITY } while (dst_offset += (512+32));
-		}
-	}
-#endif
 
 #undef FIXPOINT_PRECISION
 #undef FIXPOINT_PRECISION_HALF

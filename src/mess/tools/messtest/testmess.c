@@ -139,7 +139,6 @@ static int screenshot_num;
 static int format_index;
 static UINT64 runtime_hash;
 static void *wavptr;
-static UINT32 samples_this_frame;
 static int seen_first_update;
 static render_target *target;
 
@@ -384,6 +383,7 @@ int osd_init(running_machine *machine)
 
 
 
+#if 0
 int osd_start_audio_stream(int stereo)
 {
 	char buf[256];
@@ -411,14 +411,14 @@ void osd_stop_audio_stream(void)
 		wavptr = NULL;
 	}
 }
+#endif
 
 
 
-int osd_update_audio_stream(INT16 *buffer)
+void osd_update_audio_stream(INT16 *buffer, int samples_this_frame)
 {
 	if (wavptr && (Machine->sample_rate != 0))
 		wav_add_data_16(wavptr, buffer, samples_this_frame * 2);
-	return samples_this_frame;
 }
 
 

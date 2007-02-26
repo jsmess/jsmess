@@ -936,16 +936,16 @@ INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START	/* IN2 - DSW 2 (options) - $140015.b */
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )	// single
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
+	PORT_DIPSETTING(    0x01, "KM" )
+	PORT_DIPSETTING(    0x00, "M.P.H." )
 	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )	// single (wheel related)
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Unknown 2-3&4" )
+	PORT_DIPNAME( 0x18, 0x18, "Unknown 2-3&4" )	// Most likely Difficulty
 	PORT_DIPSETTING(    0x18, "0" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x08, "8" )
@@ -957,7 +957,7 @@ INPUT_PORTS_START( hotchase )
 	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )	// single (wheel<->brake)
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )	// single
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 

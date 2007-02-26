@@ -1,10 +1,10 @@
 /*
 
-  Limenko POWERSYSTEM2
+  Limenko Power System 2
 
   driver by Pierpaolo Prazzoli and Tomasz Slanina
 
-  POWERSYSTEM2 General specs:
+  Power System 2 General specs:
   - Cartridge Based System
   - Hyperstone E1-32XN CPU
   - QDSP QS1000 Sound Hardware
@@ -711,7 +711,7 @@ DRIVER_INIT( sb2003 )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea) (Rev 1.5)",   GAME_NO_SOUND )
-GAME( 2000, legendoh, 0,      limenko, legendoh, legendoh, ROT0, "Limenko", "Legend of Heroes",                    GAME_NO_SOUND )
-GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World) (Ver 1.0)", GAME_NO_SOUND )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia) (Ver 1.0)",  GAME_NO_SOUND )
+GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_NO_SOUND )
+GAME( 2000, legendoh, 0,      limenko, legendoh, legendoh, ROT0, "Limenko", "Legend of Heroes",                   GAME_NO_SOUND )
+GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", GAME_NO_SOUND )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  GAME_NO_SOUND )

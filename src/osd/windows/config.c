@@ -252,7 +252,7 @@ static const options_entry windows_opts[] =
 	{ "sound",                    "1",        OPTION_BOOLEAN,    "enable sound output" },
 	{ "samplerate;sr",            "48000",    0,                 "set sound output sample rate" },
 	{ "samples",                  "1",        OPTION_BOOLEAN,    "enable the use of external samples if available" },
-	{ "volume",                   "0",        0,                 "sound volume in decibels (-32 min, 0 max)" },
+	{ "volume;vol",               "0",        0,                 "sound volume in decibels (-32 min, 0 max)" },
 	{ "audio_latency",            "1",        0,                 "set audio latency (increase to reduce glitches)" },
 
 	// input options
@@ -264,7 +264,8 @@ static const options_entry windows_opts[] =
 	{ "dual_lightgun;dual",       "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
 	{ "offscreen_reload;reload",  "0",        OPTION_BOOLEAN,    "offscreen shots reload" },
 	{ "steadykey;steady",         "0",        OPTION_BOOLEAN,    "enable steadykey support" },
-	{ "a2d_deadzone;a2d",         "0.3",      0,                 "minimal analog value for digital input" },
+	{ "joy_deadzone;jdz",         "0.3",      0,                 "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ "joy_saturation;jsat",      "0.85",     0,                 "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ "digital",                  "none",     0,                 "mark certain joysticks or axes as digital (none|all|j<N>*|j<N>a<M>[,...])" },
 
 	{ NULL,                       NULL,       OPTION_HEADER,     "AUTOMATIC DEVICE SELECTION OPTIONS" },

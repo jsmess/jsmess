@@ -688,6 +688,77 @@ ROM_START( chinher2 )
 	ROM_LOAD( "ic42",         0xa60, 0x020, CRC(2ccfe10a) SHA1(d89ea91e5da436805fca9ded9b33609f4a862724) ) /* sound cpu banking */
 ROM_END
 
+/*
+
+CPU
+Main cpu z80A x2
+Sound cpu z80A
+Sound chip AY-3-8910
+Other ics: on lower video board,one flat-pack and two smd types.I cannot read id code on them because it was been erased.
+Osc 18,432 Mhz
+
+ROMs
+chtaito1 to 4 main program
+chtaito5-6 sound program
+chtaito11 to 18 graphics
+
+All eproms are 27128,2764
+
+There are present 12 bipolar proms but i cannot dump them,but i think that code is identical to Taiyo set.
+
+Emulation Note:
+ this set has problems booting the first time in MAME, and the sound cpu crashes
+ leaving it with no samples, strange because the sound cpu code is the same. In
+ a debug build this causes MAME to crash.   Why does this happen?
+
+ */
+
+ROM_START( chinhert )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* Z80 code (main) */
+	ROM_LOAD( "chtaito1.bin",        0x0000, 0x4000, CRC(2bd64de0) SHA1(cce14f9779a830ed83fa185918d22de0658e40ea) )
+	ROM_LOAD( "chtaito2.bin",        0x4000, 0x4000, CRC(8fd04da9) SHA1(17f868c33ad01f0df96fe50e78dbde35ac8e2fe1) )
+	ROM_LOAD( "chtaito3.bin",        0x8000, 0x2000, CRC(cd6908e7) SHA1(0a9b1d91bf64e8722a4e9c89658f5d4ea96c07a4) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 code (coprocessor) */
+	ROM_LOAD( "chtaito4.bin",        0x0000, 0x4000, CRC(2a012614) SHA1(384575197f927a6acc8b77c3b3516e0d93e7784d) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Z80 code (sound) */
+	ROM_LOAD( "chtaito5.bin",        0x0000, 0x4000, CRC(4e4f3f92) SHA1(57d0485f8a0110f5448b554d2fab1caba52551fd) )
+	ROM_LOAD( "chtaito6.bin",        0x4000, 0x2000, CRC(8c0e43d1) SHA1(acaead801b4782875c8b6092e987b73f9973f8b0) )
+
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE|ROMREGION_INVERT ) /* tiles */
+	ROM_LOAD( "chtaito11.bin",      0x0000, 0x2000, CRC(3a37fb45) SHA1(4c631cf924f1e1dfea6db3f014ab7d9cb9f4b0c4) )
+	ROM_LOAD( "chtaito12.bin",      0x2000, 0x2000, CRC(bc21c002) SHA1(4fc5e4dfe8331a3feb1c370a8aca9c8303eb7b4e) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE|ROMREGION_INVERT ) /* sprites */
+	ROM_LOAD( "chtaito18.bin",     0x0000, 0x2000, CRC(fc4183a8) SHA1(4bc891a9e16cd84ce353180705cc8fcadf414a49) )
+	ROM_LOAD( "chtaito17.bin",     0x2000, 0x2000, CRC(d713d7fe) SHA1(8dd97f96a1190c5be5e19721227dd80adf060b4d) )
+	ROM_LOAD( "chtaito13.bin",     0x4000, 0x2000, CRC(a8e2a3f4) SHA1(db9f954d4b46660f5f1cb4122838e6418f92d0a3) )
+
+	ROM_REGION( 0x6000, REGION_GFX3, ROMREGION_DISPOSE|ROMREGION_INVERT ) /* sprites */
+	ROM_LOAD( "chtaito16.bin",     0x0000, 0x2000, CRC(dd5170ca) SHA1(e0a9d1dbc021a8ad84dd7d1bd7e390e51e6328b7) )
+	ROM_LOAD( "chtaito15.bin",     0x2000, 0x2000, CRC(20f6052e) SHA1(e22ddb3fb90ff8df5ce7fda6a26c1b9fce2f59ab) )
+	ROM_LOAD( "chtaito14.bin",     0x4000, 0x2000, CRC(9bc2d568) SHA1(a4ee8822709645b0dc088635c0a9c263fb5a2245) )
+
+	/* these were not dumped from this pcb */
+	ROM_REGION( 0xa80, REGION_PROMS, 0 )
+	ROM_LOAD( "v_ic36_r",     0x000, 0x100, CRC(16ae1692) SHA1(e287b96890da4815350af72e9f2189d0c72313b6) ) /* red */
+	ROM_LOAD( "v_ic35_g",     0x100, 0x100, CRC(b3d0a074) SHA1(e955fda8cb8df389507e17b7b4609e845e5ef0c4) ) /* green */
+	ROM_LOAD( "v_ic27_b",     0x200, 0x100, CRC(353a2d11) SHA1(76f21e3e092024592d9ccd33ae69c438254c5755) ) /* blue */
+
+	ROM_LOAD( "v_ic28_m",     0x300, 0x100, CRC(7ca273c1) SHA1(20d85547d96bea8b310c943c45e4978a7e5b5585) ) /* unknown */
+	ROM_LOAD( "v_ic69",       0x400, 0x200, CRC(410d6f86) SHA1(3cfaef3702dbda3e7c7eb84a93561e36778aec3e) ) /* zoom */
+	ROM_LOAD( "v_ic108",      0x600, 0x200, CRC(d33c02ae) SHA1(1a2146ae404a5e8a701e1d547a8409a376d4bee4) ) /* zoom */
+
+	ROM_LOAD( "v_ic12",       0x800, 0x100, CRC(0de07e89) SHA1(5655bce6ff3abad63f5b31add402cdbb51c323f0) ) /* tile pen priority */
+	ROM_LOAD( "v_ic15_p",     0x900, 0x100, CRC(7e0a0581) SHA1(e355a6ef21a65a1e828d7bd5b0f2224b06438b4a) ) /* sprite pen transparency */
+	ROM_LOAD( "v_ic8",        0xa00, 0x020, CRC(4c62974d) SHA1(fd5970b5ba1d9e986515ae06c2e83f8bf20b3cdc) )
+
+	ROM_LOAD( "ic8",          0xa20, 0x020, CRC(84bcd9af) SHA1(5a5afeb6aedb8ac6ac49fb8da62df57fbd8b1780) ) /* main CPU banking */
+	ROM_LOAD( "ic22",         0xa40, 0x020, CRC(84bcd9af) SHA1(5a5afeb6aedb8ac6ac49fb8da62df57fbd8b1780) ) /* coprocessor banking */
+	ROM_LOAD( "ic42",         0xa60, 0x020, CRC(2ccfe10a) SHA1(d89ea91e5da436805fca9ded9b33609f4a862724) ) /* sound cpu banking */
+ROM_END
+
 ROM_START( shangkid )
 	/* Main CPU - handles game logic */
 	ROM_REGION( 0x12000, REGION_CPU1, 0 ) /* Z80 (NEC D780C-1) code */
@@ -847,5 +918,6 @@ ROM_END
 GAME( 1984, dynamski, 0,        dynamski, dynamski, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
 GAME( 1984, chinhero, 0,        chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 )
 GAME( 1984, chinher2, chinhero, chinhero, chinhero, chinhero, ROT90, "Taiyo", "Chinese Hero (older)", 0 )
+GAME( 1984, chinhert, chinhero, chinhero, chinhero, chinhero, ROT90, "Taito", "Chinese Heroe (Taito)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL )
 GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid, ROT0,  "[Nihon Game] (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL )

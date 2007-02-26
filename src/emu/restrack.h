@@ -53,6 +53,10 @@ void *_malloc_or_die(size_t size, const char *file, int line) ATTR_MALLOC;
 #define auto_malloc(s)		_auto_malloc(s, __FILE__, __LINE__)
 void *_auto_malloc(size_t size, const char *file, int line) ATTR_MALLOC;
 
+/* allocate memory that will be freed at the next end_resource_tracking */
+#define auto_realloc(p, s)	_auto_realloc(p, s, __FILE__, __LINE__)
+void *_auto_realloc(void *ptr, size_t size, const char *file, int line) ATTR_MALLOC;
+
 /* allocate memory and duplicate a string that will be freed at the next end_resource_tracking */
 #define auto_strdup(s)		_auto_strdup(s, __FILE__, __LINE__)
 char *_auto_strdup(const char *str, const char *file, int line) ATTR_MALLOC;

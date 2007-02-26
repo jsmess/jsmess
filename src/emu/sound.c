@@ -23,10 +23,10 @@
 ***************************************************************************/
 
 #define VERBOSE			(0)
-#define MAKE_WAVS		(0)
+#define MAKE_WAVS		(1)
 
 #if VERBOSE
-#define VPRINTF(x) mame_printf_debug x
+#define VPRINTF(x)		mame_printf_debug x
 #else
 #define VPRINTF(x)
 #endif
@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #define MAX_MIXER_CHANNELS		100
+#define SOUND_UPDATE_FREQUENCY	MAME_TIME_IN_HZ(50)
 
 
 
@@ -101,7 +102,9 @@ static speaker_info speaker[MAX_SPEAKER];
 
 static INT16 *finalmix;
 static INT32 *leftmix, *rightmix;
-static int samples_this_frame;
+
+static int sound_enabled;
+static int sound_attenuation;
 static int global_sound_enabled;
 static int nosound_mode;
 
@@ -118,6 +121,7 @@ static void sound_pause(running_machine *machine, int pause);
 static void sound_exit(running_machine *machine);
 static void sound_load(int config_type, xml_data_node *parentnode);
 static void sound_save(int config_type, xml_data_node *parentnode);
+static void sound_update(int param);
 static int start_sound_chips(void);
 static int start_speakers(void);
 static int route_sound(void);
@@ -139,7 +143,7 @@ INLINE speaker_info *find_speaker_by_tag(const char *tag)
 
 	/* attempt to find the speaker in our list */
 	for (spknum = 0; spknum < totalspeakers; spknum++)
-		if (!strcmp(speaker[spknum].speaker->tag, tag))
+		if (strcmp(speaker[spknum].speaker->tag, tag) == 0)
 			return &speaker[spknum];
 	return NULL;
 }
@@ -172,6 +176,8 @@ INLINE sound_info *find_sound_by_tag(const char *tag)
 
 int sound_init(running_machine *machine)
 {
+	mame_time update_frequency = SOUND_UPDATE_FREQUENCY;
+
 	/* handle -nosound */
 	nosound_mode = (Machine->sample_rate == 0);
 	if (nosound_mode)
@@ -181,23 +187,18 @@ int sound_init(running_machine *machine)
 	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++) ;
 	VPRINTF(("total speakers = %d\n", totalspeakers));
 
-	/* initialize the OSD layer */
-	VPRINTF(("osd_start_audio_stream\n"));
-	samples_this_frame = osd_start_audio_stream(1);
-	if (!samples_this_frame)
-		return 1;
-
 	/* allocate memory for mix buffers */
 	leftmix = auto_malloc(Machine->sample_rate * sizeof(*leftmix));
 	rightmix = auto_malloc(Machine->sample_rate * sizeof(*rightmix));
 	finalmix = auto_malloc(Machine->sample_rate * sizeof(*finalmix));
 
 	/* allocate a global timer for sound timing */
-	sound_update_timer = mame_timer_alloc(NULL);
+	sound_update_timer = mame_timer_alloc(sound_update);
+	mame_timer_adjust(sound_update_timer, update_frequency, 0, update_frequency);
 
 	/* initialize the streams engine */
 	VPRINTF(("streams_init\n"));
-	streams_init();
+	streams_init(machine, update_frequency.subseconds);
 
 	/* now start up the sound chips and tag their streams */
 	VPRINTF(("start_sound_chips\n"));
@@ -219,6 +220,8 @@ int sound_init(running_machine *machine)
 
 	/* enable sound by default */
 	global_sound_enabled = TRUE;
+	sound_enabled = TRUE;
+	sound_set_attenuation(sound_attenuation);
 
 	/* register callbacks */
 	config_register("mixer", sound_load, sound_save);
@@ -238,7 +241,7 @@ static void sound_exit(running_machine *machine)
 {
 	int sndnum;
 
-	if (wavfile)
+	if (wavfile != NULL)
 		wav_close(wavfile);
 
 #ifdef MAME_DEBUG
@@ -259,9 +262,6 @@ static void sound_exit(running_machine *machine)
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
 		if (Machine->drv->sound[sndnum].sound_type != 0)
 			sndintrf_exit_sound(sndnum);
-
-	/* stop the OSD code */
-	osd_stop_audio_stream();
 
 	/* reset variables */
 	totalspeakers = 0;
@@ -311,7 +311,7 @@ static int start_sound_chips(void)
 		/* start the chip, tagging all its streams */
 		VPRINTF(("sndnum = %d -- sound_type = %d\n", sndnum, msound->sound_type));
 		num_regs = state_save_get_reg_count();
-		streams_set_tag(info);
+		streams_set_tag(Machine, info);
 		if (sndintrf_init_sound(sndnum, msound->sound_type, msound->clock, msound->config) != 0)
 			return 1;
 
@@ -384,7 +384,7 @@ static int start_speakers(void)
 		speaker_info *info;
 
 		/* stop when we hit an empty entry */
-		if (!mspeaker->tag)
+		if (mspeaker->tag == NULL)
 			break;
 
 		/* zap all the info */
@@ -426,11 +426,11 @@ static int route_sound(void)
 			sound = find_sound_by_tag(mroute->target);
 
 			/* if neither found, it's fatal */
-			if (!speaker && !sound)
+			if (speaker == NULL && sound == NULL)
 				fatalerror("Sound route \"%s\" not found!\n", mroute->target);
 
 			/* if we got a speaker, bump its input count */
-			if (speaker)
+			if (speaker != NULL)
 			{
 				if (mroute->output >= 0 && mroute->output < info->outputs)
 					speaker->inputs++;
@@ -441,11 +441,11 @@ static int route_sound(void)
 	}
 
 	/* now allocate the mixers and input data */
-	streams_set_tag(NULL);
+	streams_set_tag(Machine, NULL);
 	for (spknum = 0; spknum < totalspeakers; spknum++)
 	{
 		speaker_info *info = &speaker[spknum];
-		if (info->inputs)
+		if (info->inputs != 0)
 		{
 			info->mixer_stream = stream_create(info->inputs, 1, Machine->sample_rate, info, mixer_update);
 			info->input = auto_malloc(info->inputs * sizeof(*info->input));
@@ -472,7 +472,7 @@ static int route_sound(void)
 			sound = find_sound_by_tag(mroute->target);
 
 			/* if it's a speaker, set the input */
-			if (speaker)
+			if (speaker != NULL)
 			{
 				for (outputnum = 0; outputnum < info->outputs; outputnum++)
 					if (mroute->output == outputnum || mroute->output == ALL_OUTPUTS)
@@ -533,7 +533,30 @@ static void sound_reset(running_machine *machine)
 
 static void sound_pause(running_machine *machine, int pause)
 {
-	osd_sound_enable(!pause);
+	sound_enabled = !pause;
+	osd_set_mastervolume(sound_enabled ? sound_attenuation : -32);
+}
+
+
+/*-------------------------------------------------
+    sound_set_attenuation - set the global volume
+-------------------------------------------------*/
+
+void sound_set_attenuation(int attenuation)
+{
+	sound_attenuation = attenuation;
+	osd_set_mastervolume(sound_enabled ? sound_attenuation : -32);
+}
+
+
+/*-------------------------------------------------
+    sound_get_attenuation - return the global
+    volume
+-------------------------------------------------*/
+
+int sound_get_attenuation(void)
+{
+	return sound_attenuation;
 }
 
 
@@ -568,7 +591,7 @@ static void sound_load(int config_type, xml_data_node *parentnode)
 		return;
 
 	/* might not have any data */
-	if (!parentnode)
+	if (parentnode == NULL)
 		return;
 
 	/* iterate over channel nodes */
@@ -600,7 +623,7 @@ static void sound_save(int config_type, xml_data_node *parentnode)
 		return;
 
 	/* iterate over mixer channels */
-	if (parentnode)
+	if (parentnode != NULL)
 		for (mixernum = 0; mixernum < MAX_MIXER_CHANNELS; mixernum++)
 		{
 			float defvol = sound_get_default_gain(mixernum);
@@ -609,7 +632,7 @@ static void sound_save(int config_type, xml_data_node *parentnode)
 			if (defvol != newvol)
 			{
 				xml_data_node *channelnode = xml_add_child(parentnode, "channel", NULL);
-				if (channelnode)
+				if (channelnode != NULL)
 				{
 					xml_set_attribute_int(channelnode, "index", mixernum);
 					xml_set_attribute_float(channelnode, "defvol", defvol);
@@ -626,77 +649,84 @@ static void sound_save(int config_type, xml_data_node *parentnode)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    sound_frame_update - mix everything down to
+    sound_update - mix everything down to
     its final form and send it to the OSD layer
 -------------------------------------------------*/
 
-void sound_frame_update(void)
+static void sound_update(int param)
 {
+	int samples_this_update = 0;
 	int sample, spknum;
 
 	VPRINTF(("sound_frame_update\n"));
 
 	profiler_mark(PROFILER_SOUND);
 
-	/* reset the mixing streams */
-	memset(leftmix, 0, samples_this_frame * sizeof(*leftmix));
-	memset(rightmix, 0, samples_this_frame * sizeof(*rightmix));
-
-	/* if we're not paused, keep the sounds going */
-	if (!mame_is_paused(Machine))
+	/* force all the speaker streams to generate the proper number of samples */
+	for (spknum = 0; spknum < totalspeakers; spknum++)
 	{
-		/* force all the speaker streams to generate the proper number of samples */
-		for (spknum = 0; spknum < totalspeakers; spknum++)
-		{
-			speaker_info *spk = &speaker[spknum];
-			stream_sample_t *stream_buf;
+		speaker_info *spk = &speaker[spknum];
+		const stream_sample_t *stream_buf;
 
-			/* get the output buffer */
-			if (spk->mixer_stream)
+		/* get the output buffer */
+		if (spk->mixer_stream != NULL)
+		{
+			int numsamples;
+
+			/* update the stream, getting the start/end pointers around the operation */
+			stream_buf = stream_get_output_since_last_update(spk->mixer_stream, 0, &numsamples);
+
+			/* set or assert that all streams have the same count */
+			if (samples_this_update == 0)
 			{
-				stream_buf = stream_consume_output(spk->mixer_stream, 0, samples_this_frame);
+				samples_this_update = numsamples;
+
+				/* reset the mixing streams */
+				memset(leftmix, 0, samples_this_update * sizeof(*leftmix));
+				memset(rightmix, 0, samples_this_update * sizeof(*rightmix));
+			}
+			assert(samples_this_update == numsamples);
 
 #ifdef MAME_DEBUG
-				/* debug version: keep track of the maximum sample */
-				for (sample = 0; sample < samples_this_frame; sample++)
-				{
-					if (stream_buf[sample] > spk->max_sample)
-						spk->max_sample = stream_buf[sample];
-					else if (-stream_buf[sample] > spk->max_sample)
-						spk->max_sample = -stream_buf[sample];
-					if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
-						spk->clipped_samples++;
-					spk->total_samples++;
-				}
+			/* debug version: keep track of the maximum sample */
+			for (sample = 0; sample < samples_this_update; sample++)
+			{
+				if (stream_buf[sample] > spk->max_sample)
+					spk->max_sample = stream_buf[sample];
+				else if (-stream_buf[sample] > spk->max_sample)
+					spk->max_sample = -stream_buf[sample];
+				if (stream_buf[sample] > 32767 || stream_buf[sample] < -32768)
+					spk->clipped_samples++;
+				spk->total_samples++;
+			}
 #endif
 
-				/* mix if sound is enabled */
-				if (global_sound_enabled && !nosound_mode)
-				{
-					/* if the speaker is centered, send to both left and right */
-					if (spk->speaker->x == 0)
-						for (sample = 0; sample < samples_this_frame; sample++)
-						{
-							leftmix[sample] += stream_buf[sample];
-							rightmix[sample] += stream_buf[sample];
-						}
+			/* mix if sound is enabled */
+			if (global_sound_enabled && !nosound_mode)
+			{
+				/* if the speaker is centered, send to both left and right */
+				if (spk->speaker->x == 0)
+					for (sample = 0; sample < samples_this_update; sample++)
+					{
+						leftmix[sample] += stream_buf[sample];
+						rightmix[sample] += stream_buf[sample];
+					}
 
-					/* if the speaker is to the left, send only to the left */
-					else if (spk->speaker->x < 0)
-						for (sample = 0; sample < samples_this_frame; sample++)
-							leftmix[sample] += stream_buf[sample];
+				/* if the speaker is to the left, send only to the left */
+				else if (spk->speaker->x < 0)
+					for (sample = 0; sample < samples_this_update; sample++)
+						leftmix[sample] += stream_buf[sample];
 
-					/* if the speaker is to the right, send only to the right */
-					else
-						for (sample = 0; sample < samples_this_frame; sample++)
-							rightmix[sample] += stream_buf[sample];
-				}
+				/* if the speaker is to the right, send only to the right */
+				else
+					for (sample = 0; sample < samples_this_update; sample++)
+						rightmix[sample] += stream_buf[sample];
 			}
 		}
 	}
 
 	/* now downmix the final result */
-	for (sample = 0; sample < samples_this_frame; sample++)
+	for (sample = 0; sample < samples_this_update; sample++)
 	{
 		INT32 samp;
 
@@ -717,17 +747,16 @@ void sound_frame_update(void)
 		finalmix[sample*2+1] = samp;
 	}
 
-	if (wavfile && !mame_is_paused(Machine))
-		wav_add_data_16(wavfile, finalmix, samples_this_frame * 2);
-
 	/* play the result */
-	samples_this_frame = osd_update_audio_stream(finalmix);
+	if (samples_this_update > 0)
+	{
+		osd_update_audio_stream(finalmix, samples_this_update);
+		if (wavfile != NULL)
+			wav_add_data_16(wavfile, finalmix, samples_this_update * 2);
+	}
 
 	/* update the streamer */
-	streams_frame_update();
-
-	/* reset the timer to resync for this frame */
-	mame_timer_adjust(sound_update_timer, time_never, 0, time_never);
+	streams_update(Machine);
 
 	profiler_mark(PROFILER_END);
 }
@@ -763,29 +792,6 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 /***************************************************************************
     MISCELLANEOUS HELPERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    sound_scalebufferpos - compute the fractional
-    part of value based on how far along we are
-    within the current frame
--------------------------------------------------*/
-
-int sound_scalebufferpos(int value)
-{
-	mame_time elapsed = mame_timer_timeelapsed(sound_update_timer);
-	int result;
-
-	/* clamp to protect against negative time */
-	if (elapsed.seconds < 0)
-		elapsed = time_zero;
-	result = (int)((double)value * mame_time_to_double(elapsed) * Machine->screen[0].refresh);
-
-	if (value >= 0)
-		return (result < value) ? result : value;
-	else
-		return (result > value) ? result : value;
-}
-
 
 /*-------------------------------------------------
     sndti_set_output_gain - set the gain of a

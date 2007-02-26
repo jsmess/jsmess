@@ -1,9 +1,10 @@
 /***************************************************************************
 
-Ace Video Fuit Machine hardware
-(c)1981 ACE Leisure
+Ace Video Fruit Machine hardware
+(c)1981-1982 ACE Leisure
 
 Driver by SMF & Guddler 04/02/2007
+Inputs and Dip Switches by Stephh
 
 ***************************************************************************/
 
@@ -147,11 +148,49 @@ static UINT32 sidewndr_payout_r(void *param)
 	switch (bit_mask)
 	{
 		case 0x01:
-			return ((readinputportbytag("FAKE") & bit_mask) >> 0);
+			return ((readinputportbytag("PAYOUT") & bit_mask) >> 0);
 		case 0x02:
-			return ((readinputportbytag("FAKE") & bit_mask) >> 1);
+			return ((readinputportbytag("PAYOUT") & bit_mask) >> 1);
 		default:
 			logerror("sidewndr_payout_r : invalid %02X bit_mask\n",bit_mask);
+			return 0;
+	}
+}
+
+static UINT32 starspnr_coinage_r(void *param)
+{
+	int bit_mask = (int)param;
+
+	switch (bit_mask)
+	{
+		case 0x01:
+			return ((readinputportbytag("COINAGE") & bit_mask) >> 0);
+		case 0x02:
+			return ((readinputportbytag("COINAGE") & bit_mask) >> 1);
+		case 0x04:
+			return ((readinputportbytag("COINAGE") & bit_mask) >> 2);
+		case 0x08:
+			return ((readinputportbytag("COINAGE") & bit_mask) >> 3);
+		default:
+			logerror("starspnr_coinage_r : invalid %02X bit_mask\n",bit_mask);
+			return 0;
+	}
+}
+
+static UINT32 starspnr_payout_r(void *param)
+{
+	int bit_mask = (int)param;
+
+	switch (bit_mask)
+	{
+		case 0x01:
+			return ((readinputportbytag("PAYOUT") & bit_mask) >> 0);
+		case 0x02:
+			return ((readinputportbytag("PAYOUT") & bit_mask) >> 1);
+		case 0x04:
+			return ((readinputportbytag("PAYOUT") & bit_mask) >> 2);
+		default:
+			logerror("starspnr_payout_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
 	}
 }
@@ -257,7 +296,7 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( sidewndr )
 	PORT_START_TAG("IN0")	// 0
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Stop Nudge Random" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Stop Nudge/Nudge Up or Down" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )              /* "Cash in" */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK ) /* active low or high?? */
@@ -291,9 +330,9 @@ INPUT_PORTS_START( sidewndr )
 	PORT_DIPNAME( 0x02, 0x00, "Allow Clear Data" )          /* in "Accountancy System" mode */
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Set Lamp 0xa001-3" )         /* code at 0x173a - write lamp status at 0x01ed */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Lamp 11 always ON" )         /* code at 0x173a - write lamp status at 0x01ed */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x00, "Sounds" )                    /* data in 0x206b and 0x206c - out sound at 0x193e */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -323,7 +362,7 @@ INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("FAKE")	// fake port to handle settings via multiple input ports
+	PORT_START_TAG("PAYOUT")	// fake port to handle settings via multiple input ports
 	PORT_DIPNAME( 0x03, 0x00, "Payout %" )
 	PORT_DIPSETTING(    0x00, "74%" )
 	PORT_DIPSETTING(    0x02, "78%" )
@@ -331,7 +370,7 @@ INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x03, "86%" )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sidewnda )
+INPUT_PORTS_START( spellbnd )
 	PORT_INCLUDE(sidewndr)
 
 	PORT_MODIFY("IN0")
@@ -351,9 +390,9 @@ INPUT_PORTS_START( sidewnda )
 	PORT_MODIFY("IN4")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME( "Clear Data" )     /* in "Accountancy System" mode */
     /* Similar to 'sidewndr' but different addresses */
-	PORT_DIPNAME( 0x04, 0x00, "Set Lamp 0xa001-3" )         /* code at 0x072a - write lamp status at 0x00ff */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Lamp 11 always ON" )         /* code at 0x072a - write lamp status at 0x00ff */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
     /* Similar to 'sidewndr' but different addresses */
 	PORT_DIPNAME( 0x08, 0x00, "Sounds" )                    /* data in 0x2088 and 0x2089 - out sound at 0x012d */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -372,6 +411,110 @@ INPUT_PORTS_START( sidewnda )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+/* I've only mapped the known inputs after comparaison with 'spellbnd' and the ones known to do something */
+INPUT_PORTS_START( starspnr )
+	PORT_START_TAG("IN0")	// 0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	/* tested at 0xef77 after IN5 bit 1 and before IN2 bit 2 - after coins are tested - table at 0xefa5 (3 bytes) */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK ) /* active low or high?? */
+
+	PORT_START_TAG("IN1")	// 1
+	/* tested at 0xe77c - call from 0x012c */
+	/* tested at 0xeffb after IN6 bit 2 - invalid code after 0xf000 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect/Cancel" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
+	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_coinage_r, 0x08) /* to be confirmed */
+
+	PORT_START_TAG("IN2")	// 2
+	/* tested at 0xe83c */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0xe5ab - after "Collect" and "Gamble" buttons */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0xef82 after IN5 bit 1 and after IN1 bit 3 - after coins are tested - table at 0xefa8 (3 bytes) */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0xeeba with IN3 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
+	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_coinage_r, 0x02) /* to be confirmed */
+	/* tested at 0x1b0f */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN3")	// 3
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Hold 1" )
+	/* tested at 0xe8ea and 0xecbe */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0xeeba with IN2 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
+	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_coinage_r, 0x01) /* to be confirmed */
+	/* tested at 0x0178 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN4")	// 4
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Hold 2" )
+	/* tested at 0x064e */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0xed86 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
+	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_coinage_r, 0x04) /* to be confirmed */
+
+	PORT_START_TAG("IN5")	// 5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME( "Hold 3" )
+	/* tested at 0xef68 before IN1 bit 3 and before IN2 bit 2 - after coins are tested - table at 0xefa2 (3 bytes) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0xec6f */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0x1d60 with IN6 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
+	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_payout_r, 0x01) /* to be confirmed */
+	/* tested at 0xe312 and 0xe377 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN6")	// 6
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME( "Hold 4" )
+	/* tested at 0xee42, 0xee5e and 0xeff5 before IN1 bit 0 - invalid code after 0xf000 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0x1d60 with IN5 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
+	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_payout_r, 0x02) /* to be confirmed */
+	/* tested at 0xe8dd and 0xec1c */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN7")	// 7
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x02, 0x00, "Clear Credits on Reset" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* tested at 0xedcb */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* tested at 0x1d60 with IN5 bit 3 and IN6 bit 3 - table at 0x1d90 (8 * 3 bytes) */
+	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_payout_r, 0x04) /* to be confirmed */
+	/* tested at 0xec2a */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("COINAGE")	// fake port to handle settings via multiple input ports
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x02, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin/25 Credits" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x0c, "1 Coin/25 Credits" )
+
+	PORT_START_TAG("PAYOUT")	// fake port to handle settings via multiple input ports
+	PORT_DIPNAME( 0x07, 0x07, "Payout %" )
+	PORT_DIPSETTING(    0x00, "30%" )
+	PORT_DIPSETTING(    0x01, "40%" )
+	PORT_DIPSETTING(    0x02, "50%" )
+	PORT_DIPSETTING(    0x03, "55%" )
+	PORT_DIPSETTING(    0x04, "60%" )
+	PORT_DIPSETTING(    0x05, "70%" )
+	PORT_DIPSETTING(    0x06, "75%" )
+	PORT_DIPSETTING(    0x07, "80%" )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -474,7 +617,7 @@ ROM_START( sidewndr )
 	ROM_LOAD( "2_h08.bin",    0x001800, 0x000800, CRC(bd19a758) SHA1(3fa812742f34643f66c67cb9bdb1d4d732c4f44d) )
 ROM_END
 
-ROM_START( sidewnda )
+ROM_START( spellbnd )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
 	ROM_LOAD( "h9.bin",       0x000000, 0x000800, CRC(9919fcfa) SHA1(04167b12ee9e60ef891893a305a35d3f2eccb0bb) )
 	ROM_LOAD( "h10.bin",      0x000800, 0x000800, CRC(90502d00) SHA1(3bdd859d9146df2eb97b4517c446182569a55a46) )
@@ -488,5 +631,78 @@ ROM_START( sidewnda )
 	ROM_LOAD( "h8.bin",       0x001800, 0x000800, CRC(05da2b71) SHA1(3a263f605ecc9e4dca9ce0ba815af16e28bf9bc8) )
 ROM_END
 
-GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, sidewndr, ROT270, "ACE", "Sidewinder (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
-GAMEL( 1981?, sidewnda, sidewndr, acefruit, sidewnda, 0,        ROT270, "ACE", "Sidewinder (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
+/*
+Starspinner
+ACE, 1982?
+
+PCB Layout
+----------
+
+|---------------------------------------------------------------------------|
+|                                                                           |
+|   XTAL    BAT                2114                                         |
+|                                                                           |
+|                                                   14-1-102          P1    |
+|                                                                           |
+|                                                                           |
+|                                                                           |
+|                                                   14-1-102                |
+|                                                                           |
+|   5       2114                                                            |
+|                                                                           |
+|   6       2114                                    14-1-102                |
+|                                                                           |
+|   7                                                                       |
+|                                                                           |
+|   8       5501    5501                            14-1-102                |
+|                                                                           |
+|   h9                                              16-1-101                |
+|                                                                           |
+|   h10                                             16-1-101                |
+|                                                                           |
+|   h11         Z80                                 16-1-101                |
+|                                                                           |
+|   h12                                                               P2    |
+|                                                                           |
+|                                           DSWA    DSWB                    |
+|                                                                           |
+|---------------------------------------------------------------------------|
+
+Notes:
+    Z80  - NEC D780C running at ? MHz (DIP40)
+    5501 - Toshiba TC5501P 256 x4 SRAM (DIP22)
+    2114 - NEC uPD2114LC 1k x8 DRAM (DIP18)
+    XTAL - ? MHz
+    BAT  - VARTA Ni-Cd 3.6V 100 mAh
+    DSWA - 8-way DIP switch
+    DSWB - 8-way DIP switch
+    P1   - 4x10 pin connector to power supply
+    P2   - 4x10 pin connector to control panel
+*/
+
+ROM_START( starspnr )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_LOAD( "h9.h9",        0x00e000, 0x0800, CRC(083068aa) SHA1(160a5f3bf33d0a53354f98295cd67022762928b6) )
+	ROM_CONTINUE(             0x000000, 0x0800 )
+	ROM_LOAD( "h10.h10",      0x00e800, 0x0800, CRC(a0a96e55) SHA1(de4dc0da5a1f358085817690cc6bdc8d94a849f8) )
+	ROM_CONTINUE(             0x000800, 0x0800 )
+	ROM_LOAD( "h11.h11",      0x00f000, 0x0800, BAD_DUMP CRC(ab045396) SHA1(8b3aea0b0d55f62d5b6fbd39664beb93559d2213) ) /* bad dump : invalid code in both halves ! */
+	ROM_CONTINUE(             0x001000, 0x0800 )
+	ROM_LOAD( "h12.h12",      0x00f800, 0x0800, CRC(8571f3f5) SHA1(e8b60a604a4a0368b6063b15b328c68f351cb740) ) /* bad dump ? nothing of interest 0xf800-0xffff */
+	ROM_CONTINUE(             0x001800, 0x0800 )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE ) /* 8k for graphics */
+	ROM_LOAD( "5.h5",         0x000000, 0x000800, CRC(df49876f) SHA1(68077304f096491baeddc1d6b4dc62f90de71903) )
+	ROM_LOAD( "6.h6",         0x000800, 0x000800, CRC(d992e2f6) SHA1(7841efec7d81689c82b8da501cce743436e7e8d4) )
+	ROM_LOAD( "7.h7",         0x001000, 0x000800, CRC(d5a40e88) SHA1(5cac8d85123720cdbb8b4630b14a27cf0ceef33f) )
+	ROM_LOAD( "8.h8",         0x001800, 0x000800, CRC(0dd38c3c) SHA1(4da0cd00c76d3be2164f141ccd8c72dd9578ee61) )
+
+	ROM_REGION( 0x300, REGION_PROMS, 0 )
+	ROM_LOAD( "16-1-101.b9",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "16-1-101.b10", 0x0100, 0x0100, NO_DUMP )
+	ROM_LOAD( "16-1-101.b11", 0x0200, 0x0100, NO_DUMP )
+ROM_END
+
+GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, sidewndr, ROT270, "ACE", "Sidewinder", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
+GAMEL( 1981?, spellbnd, sidewndr, acefruit, spellbnd, 0,        ROT270, "ACE", "Spellbound", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
+GAME ( 1982?, starspnr, 0,        acefruit, starspnr, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", GAME_NOT_WORKING | GAME_NO_SOUND )

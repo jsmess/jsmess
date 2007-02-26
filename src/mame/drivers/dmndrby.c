@@ -2,8 +2,7 @@
 G4001
 Diamond Derby - Electrocoin on an SNK board
 
-this seems to be a gambling game, it will
-probably be removed once the driver works
+this seems to be a gambling game
 
 SNK/Electrocoin 1987
 

@@ -4,7 +4,6 @@ IMGTOOL_LIB_OBJS =							\
 	$(OBJ)/emu/mamecore.o					\
 	$(OBJ)/version.o						\
 	$(OBJ)/mess/utils.o						\
-	$(OBJ)/mess/pool.o						\
 	$(OBJ)/mess/tagpool.o					\
 	$(OBJ)/mess/opresolv.o					\
 	$(OBJ)/mess/formats/ioprocs.o			\

@@ -152,6 +152,7 @@
  * DISCRETE_DIVIDE(NODE,ENAB,IN0,IN1)
  * DISCRETE_GAIN(NODE,IN0,GAIN)
  * DISCRETE_INVERT(NODE,IN0)
+ * DISCRETE_LOOKUP_TABLE(NODE,ENAB,ADDR,SIZE,TABLE)
  * DISCRETE_MULTIPLY(NODE,ENAB,IN0,IN1)
  * DISCRETE_MULTADD(NODE,ENAB,INP0,INP1,INP2)
  * DISCRETE_ONESHOT(NODE,TRIG,AMPL,WIDTH,TYPE)
@@ -195,7 +196,8 @@
  * DISCRETE_LOGIC_NOR4(NODE,ENAB,INP0,INP1,INP2,INP3)
  * DISCRETE_LOGIC_XOR(NODE,ENAB,INP0,INP1)
  * DISCRETE_LOGIC_NXOR(NODE,ENAB,INP0,INP1)
- * DISCRETE_LOGIC_DFLIPFLOP(NODE,RESET,SET,CLK,INP)
+ * DISCRETE_LOGIC_DFLIPFLOP(NODE,ENAB,RESET,SET,CLK,INP)
+ * DISCRETE_LOGIC_JKFLIPFLOP(NODE,ENAB,RESET,SET,CLK,J,K)
  * DISCRETE_MULTIPLEX2(NODE,ENAB,ADDR,INP0,INP1)
  * DISCRETE_MULTIPLEX4(NODE,ENAB,ADDR,INP0,INP1,INP2,INP3)
  * DISCRETE_MULTIPLEX8(NODE,ENAB,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7)
@@ -717,7 +719,9 @@
  *             |                             |
  *             '-----------------------------'
  *
- * EXAMPLES: see Polaris
+ * Note: R1 - R5 can be nodes.
+ *
+ * EXAMPLES: see Polaris, Amazing Maze
  *
  ***********************************************************************
  *
@@ -1023,8 +1027,8 @@
  *                        .-----o------.
  *                        |            |
  *    DATA       -4 ----->|            |
- *                        |            |
- *                        |  FLIPFLOP  |---->    Netlist node
+ *                        |  FLIPFLOP  |
+ *                        |           Q|---->    Netlist node
  *                        |            |
  *    CLOCK      -3 ----->|            |
  *                        |            |
@@ -1049,6 +1053,49 @@
  *  NODE_13. A logic 1 on NODE_17 resets the output to 0.
  *
  * EXAMPLES: see Hit Me, Polaris
+ *
+ ***********************************************************************
+ *
+ * DISCRETE_LOGIC_JKFLIPFLOP - Standard JK-type flip-flop.
+ *                             Changes on falling edge of clock.
+ *
+ *    /SET       -2 ------------.
+ *                              v
+ *                        .-----o------.
+ *                        |            |
+ *    J          -4 ----->|            |
+ *                        |  FLIPFLOP  |
+ *    CLOCK      -3 ----->|           Q|---->    Netlist node
+ *                        |            |
+ *    K          -5 ----->|            |
+ *                        |            |
+ *                        '-----o------'
+ *                              ^
+ *    /RESET     -1 ------------'
+ *
+ *  Declaration syntax
+ *
+ *       DISCRETE_LOGIC_JKFLIPFLOP(name of node,
+ *                                 enable node or static value,
+ *                                 reset node or static value,
+ *                                 set node or static value,
+ *                                 clock node,
+ *                                 J node or static value,
+ *                                 K node or static value)
+ *
+ * EXAMPLES: see Amazing Maze
+ *
+ ***********************************************************************
+ *
+ * DISCRETE_LOOKUP_TABLE - returns the value in a table
+ *
+ *  Declaration syntax
+ *
+ *       DISCRETE_LOOKUP_TABLE(name of node,
+ *                             enable node or static value,
+ *                             address node,
+ *                             size of table static value,
+ *                             address of table of double values)
  *
  ***********************************************************************
  *
@@ -1283,14 +1330,14 @@
  *                         enable node or static value,
  *                         ctrl node or static value,
  *                         input node or static value,
- *                         threshold)
+ *                         threshold satic value )
  *
  *  Example config line
  *
  *     DISCRETE_ASWITCH(NODE_03,1,NODE_10,NODE_90, 2.73)
  *
  *  Always enabled, NODE_10 switches output to be either NODE_90 or
- *  constant value 5.0. Switch==0 inp0=output else inp1=output
+ *  constant value 0.0. Ctrl>2.73 output=NODE_90 else output=0
  *
  ***********************************************************************
  *
@@ -3179,6 +3226,8 @@ enum
 	DST_LOGIC_XOR,
 	DST_LOGIC_NXOR,
 	DST_LOGIC_DFF,
+	DST_LOGIC_JKFF,
+	DST_LOOKUP_TABLE,	/* return value from lookup table */
 	DST_MULTIPLEX,		/* 1 of x multiplexer */
 	DST_ONESHOT,		/* One-shot pulse generator */
 	DST_RAMP,			/* Ramp up/down simulation */
@@ -3305,6 +3354,8 @@ enum
 #define DISCRETE_LOGIC_XOR(NODE,ENAB,INP0,INP1)                         { NODE, DST_LOGIC_XOR   , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "Logic XOR (2inp)" },
 #define DISCRETE_LOGIC_NXOR(NODE,ENAB,INP0,INP1)                        { NODE, DST_LOGIC_NXOR  , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, NULL, "Logic NXOR (2inp)" },
 #define DISCRETE_LOGIC_DFLIPFLOP(NODE,ENAB,RESET,SET,CLK,INP)           { NODE, DST_LOGIC_DFF   , 5, { ENAB,RESET,SET,CLK,INP }, { ENAB,RESET,SET,CLK,INP }, NULL, "Logic DFlipFlop" },
+#define DISCRETE_LOGIC_JKFLIPFLOP(NODE,ENAB,RESET,SET,CLK,J,K)          { NODE, DST_LOGIC_JKFF  , 6, { ENAB,RESET,SET,CLK,J,K }, { ENAB,RESET,SET,CLK,J,K }, NULL, "Logic JKFlipFlop" },
+#define DISCRETE_LOOKUP_TABLE(NODE,ENAB,ADDR,SIZE,TABLE)                { NODE, DST_LOOKUP_TABLE, 3, { ENAB,ADDR,NODE_NC }, { ENAB,ADDR,SIZE }, TABLE, "Lookup Table" },
 #define DISCRETE_MULTIPLEX2(NODE,ENAB,ADDR,INP0,INP1)                   { NODE, DST_MULTIPLEX   , 4, { ENAB,ADDR,INP0,INP1 }, { ENAB,ADDR,INP0,INP1 }, NULL, "1 of 2 Multiplexer" },
 #define DISCRETE_MULTIPLEX4(NODE,ENAB,ADDR,INP0,INP1,INP2,INP3)         { NODE, DST_MULTIPLEX   , 6, { ENAB,ADDR,INP0,INP1,INP2,INP3 }, { ENAB,ADDR,INP0,INP1,INP2,INP3 }, NULL, "1 of 4 Multiplexer" },
 #define DISCRETE_MULTIPLEX8(NODE,ENAB,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7) { NODE, DST_MULTIPLEX, 10, { ENAB,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7 }, { ENAB,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7 }, NULL, "1 of 8 Multiplexer" },
@@ -3383,6 +3434,8 @@ enum
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "Output Node" },
 
 
+
+#define IS_VALUE_A_NODE(val)	(((val) > NODE_START) && ((val) <= NODE_END))
 
 /*************************************
  *

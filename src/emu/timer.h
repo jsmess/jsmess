@@ -46,23 +46,33 @@
 #define MAME_TIME_IN_CYCLES(c,cpu)	(make_mame_time((c) / cycles_per_second[cpu], (c) * subseconds_per_cycle[cpu]))
 
 /* useful macros for describing time using doubles */
-#define TIME_IN_HZ(hz)        (1.0 / (double)(hz))
-#define TIME_IN_CYCLES(c,cpu) ((double)(c) * cycles_to_sec[cpu])
-#define TIME_IN_SEC(s)        ((double)(s))
-#define TIME_IN_MSEC(ms)      ((double)(ms) * (1.0 / 1000.0))
-#define TIME_IN_USEC(us)      ((double)(us) * (1.0 / 1000000.0))
-#define TIME_IN_NSEC(us)      ((double)(us) * (1.0 / 1000000000.0))
+#define TIME_IN_HZ(hz)			(1.0 / (double)(hz))
+#define TIME_IN_CYCLES(c,cpu)	((double)(c) * cycles_to_sec[cpu])
+#define TIME_IN_SEC(s)			((double)(s))
+#define TIME_IN_MSEC(ms)		((double)(ms) * (1.0 / 1000.0))
+#define TIME_IN_USEC(us)		((double)(us) * (1.0 / 1000000.0))
+#define TIME_IN_NSEC(us)		((double)(us) * (1.0 / 1000000000.0))
+
+/* useful macros for describing mame_times */
+#define MAME_TIME_IN_HZ(hz)		make_mame_time(0, MAX_SUBSECONDS / (hz))
+#define MAME_TIME_IN_SEC(s)		make_mame_time((s), 0)
+#define MAME_TIME_IN_MSEC(ms)	make_mame_time((ms) / 1000, ((ms) % 1000) * (MAX_SUBSECONDS / 1000))
+#define MAME_TIME_IN_USEC(us)	make_mame_time((us) / 1000000, ((us) % 1000000) * (MAX_SUBSECONDS / 1000000))
+#define MAME_TIME_IN_NSEC(ns)	make_mame_time((ns) / 1000000000, ((ns) % 1000000000) * (MAX_SUBSECONDS / 1000000000))
 
 /* convert a double time to the number of cycles on a given CPU */
-#define TIME_TO_CYCLES(cpu,t) ((int)((t) * sec_to_cycles[cpu]))
+#define TIME_TO_CYCLES(cpu,t)	((int)((t) * sec_to_cycles[cpu]))
 
 /* macro for the RC time constant on a 74LS123 with C > 1000pF */
 /* R is in ohms, C is in farads */
-#define TIME_OF_74LS123(r,c)	(0.45 * (double)(r) * ((double)(c)))
+#define TIME_OF_74LS123(r,c)	(0.45 * (double)(r) * (double)(c))
 
-/* macro for the RC time constant on a 555 timer IC */
+/* macros for the RC time constant on a 555 timer IC */
 /* R is in ohms, C is in farads */
-#define TIME_OF_555(r,c)	(1.1 * (double)(r) * ((double)(c)))
+#define TIME_OF_555_MONOSTABLE(r,c)	(1.1 * (double)(r) * ((double)(c)))
+#define TIME_OF_555_ASTABLE_1(r1,r2,c)	(0.693 * ((double)(r1) + (double)(r2)) * (double)(c))
+#define TIME_OF_555_ASTABLE_0(r2,c)	(0.693 * (double)(r2) * (double)(c))
+#define PERIOD_OF_555_ASTABLE(r1,r2,c)	(0.693 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c))
 
 /* macros that map all allocations to provide file/line/functions to the callee */
 #define mame_timer_alloc(c)				_mame_timer_alloc(c, __FILE__, __LINE__, #c)
@@ -170,6 +180,32 @@ INLINE mame_time make_mame_time(seconds_t _secs, subseconds_t _subsecs)
 	result.seconds = _secs;
 	result.subseconds = _subsecs;
 	return result;
+}
+
+
+/*-------------------------------------------------
+    mame_time_to_subseconds - convert a mame_time
+    to subseconds, clamping to maximum positive/
+    negative values
+-------------------------------------------------*/
+
+INLINE subseconds_t mame_time_to_subseconds(mame_time _time)
+{
+	/* positive values between 0 and 1 second */
+	if (_time.seconds == 0)
+		return _time.subseconds;
+
+	/* negative values between -1 and 0 seconds */
+	else if (_time.seconds == -1)
+		return _time.subseconds - MAX_SUBSECONDS;
+
+	/* out-of-range positive values */
+	else if (_time.seconds > 0)
+		return MAX_SUBSECONDS;
+
+	/* out-of-range negative values */
+	else
+		return -MAX_SUBSECONDS;
 }
 
 

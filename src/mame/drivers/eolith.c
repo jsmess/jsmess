@@ -63,6 +63,8 @@ extern int eolith_buffer;
 
 static int coin_counter_bit = 0;
 
+#include "eolithsp.h"
+
 // It's configured for 512 bytes
 static struct EEPROM_interface eeprom_interface_93C66 =
 {
@@ -89,7 +91,7 @@ static NVRAM_HANDLER( eolith )
 }
 
 
-static READ32_HANDLER( eeprom_r )
+static READ32_HANDLER( eolith_custom_r )
 {
 	/*
         bit 3 = eeprom bit
@@ -99,6 +101,7 @@ static READ32_HANDLER( eeprom_r )
         bit 8 = ???
         bit 9 = ???
     */
+	eolith_speedup_read();
 
 	return (readinputport(0) & ~0x308) | (EEPROM_read_bit() << 3) | (mame_rand(Machine) & 0x300);
 }
@@ -116,11 +119,15 @@ static WRITE32_HANDLER( systemcontrol_w )
 	// bit 0x100 and 0x040 ?
 }
 
+
+
+
+
 static ADDRESS_MAP_START( eolith_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
 	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
 	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE(eolith_vram_r, eolith_vram_w)
-	AM_RANGE(0xfc000000, 0xfc000003) AM_READ(eeprom_r)
+	AM_RANGE(0xfc000000, 0xfc000003) AM_READ(eolith_custom_r)
 	AM_RANGE(0xfc400000, 0xfc400003) AM_WRITE(systemcontrol_w)
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITENOP // sound latch
 	AM_RANGE(0xfca00000, 0xfca00003) AM_READ(input_port_1_dword_r)
@@ -136,6 +143,8 @@ static ADDRESS_MAP_START( eolith_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION(REGION_CPU1, 0)
 ADDRESS_MAP_END
 
+
+
 static INPUT_PORTS_START( common )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
@@ -144,7 +153,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SPECIAL ) // eeprom bit
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, 0)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -243,14 +252,17 @@ INPUT_PORTS_START( puzzlekg )
 	PORT_BIT( 0xfffffff0, IP_ACTIVE_LOW, IPT_UNUSED	)
 INPUT_PORTS_END
 
+
+
 static MACHINE_DRIVER_START( eolith45 )
 	MDRV_CPU_ADD_TAG("cpu", E132N, 45000000)		 /* 45 MHz */
 	MDRV_CPU_PROGRAM_MAP(eolith_map,0)
+	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
 
 	/* sound cpu */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(0)
 
 	MDRV_NVRAM_HANDLER(eolith)
 
@@ -824,9 +836,15 @@ ROM_START( hidctch3 )
 	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
+static DRIVER_INIT( eolith )
+{
+	init_eolith_speedup(Machine);
+}
+
 static DRIVER_INIT( landbrk )
 {
 	coin_counter_bit = 0x1000;
+	init_eolith(Machine);
 }
 
 static DRIVER_INIT( landbrka )
@@ -838,6 +856,7 @@ static DRIVER_INIT( landbrka )
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	coin_counter_bit = 0x2000;
+	init_eolith(Machine);
 }
 
 static DRIVER_INIT( hidctch2 )
@@ -845,15 +864,16 @@ static DRIVER_INIT( hidctch2 )
 	//it fails compares in memory like in landbrka
 	UINT32 *rombase = (UINT32*)memory_region(REGION_CPU1);
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
+	init_eolith(Machine);
 }
 
-GAME( 1998, hidnctch, 0,       eolith45, hidnctch, 0,        ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,  0,       eolith45, raccoon,  0,        ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
-GAME( 1998, puzzlekg, 0,       eolith45, puzzlekg, 0,        ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
+GAME( 1998, hidnctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, raccoon,  0,       eolith45, raccoon,  eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
+GAME( 1998, puzzlekg, 0,       eolith45, puzzlekg, eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
 GAME( 1999, hidctch2, 0,       eolith50, hidnctch, hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03)", GAME_NO_SOUND )
 GAME( 1999, landbrk,  0,       eolith45, landbrk,  landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
 GAME( 1999, landbrka, landbrk, eolith45, landbrk,  landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
-GAME( 1999, nhidctch, 0,       eolith45, hidnctch, 0,        ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ) // or New Teurrin Geurim Chajgi '98
-GAME( 2000, hidctch3, 0,       eolith50, hidctch3, 0,        ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, fort2b,   0,       eolith50, common,   0,        ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND )
-GAME( 2001, fort2ba,  fort2b,  eolith50, common,   0,        ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND )
+GAME( 1999, nhidctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ) // or New Teurrin Geurim Chajgi '98
+GAME( 2000, hidctch3, 0,       eolith50, hidctch3, eolith,   ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001, fort2b,   0,       eolith50, common,   eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND )
+GAME( 2001, fort2ba,  fort2b,  eolith50, common,   eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND )

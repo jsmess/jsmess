@@ -5445,7 +5445,6 @@ DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 				x = sx;
 				cx = startx;
 				cy = starty;
-				dest = BITMAP_ADDR(bitmap, DATA_TYPE, sy, sx);
 				if (priority)
 				{
 					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
@@ -5458,6 +5457,7 @@ DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 
 							if (c != transparent_color)
 							{
+								dest = BITMAP_ADDR(bitmap, DATA_TYPE, sy, x);
 								*dest = c;
 								*pri |= priority;
 							}
@@ -5479,7 +5479,10 @@ DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 							int c = *BITMAP_ADDR(srcbitmap, DATA_TYPE, cy >> 16, cx >> 16);
 
 							if (c != transparent_color)
+							{
+								dest = BITMAP_ADDR(bitmap, DATA_TYPE, sy, x);
 								*dest = c;
+							}
 						}
 
 						cx += incxx;

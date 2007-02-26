@@ -52,7 +52,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.112u2.  This incorporates all features of the
+- The core is based on MAME 0.112u3.  This incorporates all features of the
   update to this core.  [MAME team]
   
 - [Windows] Fixed a crash that can happen when doing a hard reset when devices

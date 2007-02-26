@@ -27,6 +27,7 @@ TOOLS += \
 	romcmp$(EXE) \
 	chdman$(EXE) \
 	jedutil$(EXE) \
+	makemeta$(EXE) \
 
 
 
@@ -78,5 +79,18 @@ JEDUTILOBJS = \
 	$(TOOLSOBJ)/jedutil.o \
 
 jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+
+
+#-------------------------------------------------
+# makemeta
+#-------------------------------------------------
+
+MAKEMETAOBJS = \
+	$(TOOLSOBJ)/makemeta.o \
+
+makemeta$(EXE): $(MAKEMETAOBJS) $(LIBUTIL) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

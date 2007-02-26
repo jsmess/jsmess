@@ -4591,21 +4591,20 @@ ROM_START( magdrop3 )
 	ROM_LOAD16_BYTE( "233-c4.bin", 0x800001, 0x400000, CRC(70dbbd6d) SHA1(32dd6a04c6329e89f4878e7a56f0d172a6388eea) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( lastblad )
+ROM_START( lastblad ) /* MVS VERSION */
 	ROM_REGION( 0x500000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "234-p1.bin", 0x000000, 0x100000, CRC(cd01c06d) SHA1(d66142571afe07c6191b52f319f1bc8bc8541c14) )
+	ROM_LOAD16_WORD_SWAP( "234-p1.bin", 0x000000, 0x100000, CRC(e123a5a3) SHA1(a3ddabc00feeb54272b145246612ad4632b0e413) )
 	ROM_LOAD16_WORD_SWAP( "234-p2.bin", 0x100000, 0x400000, CRC(0fdc289e) SHA1(1ff31c0b0f4f9ddbedaf4bcf927faaae81892ec7) )
 
 	NEO_SFIX_128K( "234-s1.bin", CRC(95561412) SHA1(995de272f572fd08d909d3d0af4251b9957b3640) )
 
 	NEO_BIOS_SOUND_128K( "234-m1.bin", CRC(087628ea) SHA1(48dcf739bb16699af4ab8ed632b7dcb25e470e06) )
 
-	ROM_REGION( 0xe00000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )
 	ROM_LOAD( "234-v1.bin", 0x000000, 0x400000, CRC(ed66b76f) SHA1(8a05ff06d9b6f01c6c16b3026282eaabb0e25b44) )
 	ROM_LOAD( "234-v2.bin", 0x400000, 0x400000, CRC(a0e7f6e2) SHA1(753ff74fa9294f695aae511ae01ead119b114a57) )
 	ROM_LOAD( "234-v3.bin", 0x800000, 0x400000, CRC(a506e1e2) SHA1(b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74) )
-	ROM_LOAD( "234-v4.bin", 0xc00000, 0x200000, CRC(13583c4b) SHA1(8b84dd4117bb0d535f30531499621622967b2344) )
-	/* V4 is 32Mbits, needs redump */
+	ROM_LOAD( "234-v4.bin", 0xc00000, 0x400000, CRC(0e34157f) SHA1(20A1F4833E5E29BA0073C1712D7A17AB7A2A035C) )
 
 	NO_DELTAT_REGION
 
@@ -4618,9 +4617,9 @@ ROM_START( lastblad )
 	ROM_LOAD16_BYTE( "234-c6.bin", 0x2000001, 0x400000, CRC(beafd091) SHA1(55df9cc128eb0f00856de3996c946e3efe8f09a5) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( lastblda )
+ROM_START( lastbldh ) /* AES VERSION */
 	ROM_REGION( 0x500000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "234-p1.rom", 0x000000, 0x100000, CRC(e123a5a3) SHA1(a3ddabc00feeb54272b145246612ad4632b0e413) )
+	ROM_LOAD16_WORD_SWAP( "234-pg1.bin", 0x000000, 0x100000, CRC(cd01c06d) SHA1(d66142571afe07c6191b52f319f1bc8bc8541c14) )
 	ROM_LOAD16_WORD_SWAP( "234-p2.bin", 0x100000, 0x400000, CRC(0fdc289e) SHA1(1ff31c0b0f4f9ddbedaf4bcf927faaae81892ec7) )
 
 	NEO_SFIX_128K( "234-s1.bin", CRC(95561412) SHA1(995de272f572fd08d909d3d0af4251b9957b3640) )
@@ -4631,7 +4630,7 @@ ROM_START( lastblda )
 	ROM_LOAD( "234-v1.bin", 0x000000, 0x400000, CRC(ed66b76f) SHA1(8a05ff06d9b6f01c6c16b3026282eaabb0e25b44) )
 	ROM_LOAD( "234-v2.bin", 0x400000, 0x400000, CRC(a0e7f6e2) SHA1(753ff74fa9294f695aae511ae01ead119b114a57) )
 	ROM_LOAD( "234-v3.bin", 0x800000, 0x400000, CRC(a506e1e2) SHA1(b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74) )
-	ROM_LOAD( "lastblda_234-v4.bin", 0xc00000, 0x400000, CRC(0e34157f) SHA1(20A1F4833E5E29BA0073C1712D7A17AB7A2A035C) ) // this one is correct?
+	ROM_LOAD( "234-v4.bin", 0xc00000, 0x400000, CRC(0e34157f) SHA1(20A1F4833E5E29BA0073C1712D7A17AB7A2A035C) )
 
 	NO_DELTAT_REGION
 
@@ -4653,12 +4652,11 @@ ROM_START( lastsold )
 
 	NEO_BIOS_SOUND_128K( "234-m1.bin", CRC(087628ea) SHA1(48dcf739bb16699af4ab8ed632b7dcb25e470e06) )
 
-	ROM_REGION( 0xe00000, REGION_SOUND1, 0 )
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )
 	ROM_LOAD( "234-v1.bin", 0x000000, 0x400000, CRC(ed66b76f) SHA1(8a05ff06d9b6f01c6c16b3026282eaabb0e25b44) )
 	ROM_LOAD( "234-v2.bin", 0x400000, 0x400000, CRC(a0e7f6e2) SHA1(753ff74fa9294f695aae511ae01ead119b114a57) )
 	ROM_LOAD( "234-v3.bin", 0x800000, 0x400000, CRC(a506e1e2) SHA1(b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74) )
-	ROM_LOAD( "234-v4.bin", 0xc00000, 0x200000, CRC(13583c4b) SHA1(8b84dd4117bb0d535f30531499621622967b2344) )
-	/* V4 is 32Mbits, needs redump */
+	ROM_LOAD( "234-v4.bin", 0xc00000, 0x400000, CRC(0e34157f) SHA1(20A1F4833E5E29BA0073C1712D7A17AB7A2A035C) )
 
 	NO_DELTAT_REGION
 
@@ -4812,10 +4810,9 @@ ROM_START( blazstar )
 	ROM_LOAD16_BYTE( "239-c8.bin", 0x1800001, 0x400000, CRC(db60460e) SHA1(a5cb27c0983c8b400d96fd0828ef0639a66d4dba) ) /* Plane 2,3 */
 ROM_END
 
-
-ROM_START( rbff2 )
+ROM_START( rbff2 ) /* MVS VERSION */
 	ROM_REGION( 0x500000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "240-p1.bin", 0x000000, 0x100000, CRC(b6969780) SHA1(e3373d18e0f0724d69efb8024a27cca121f1b5b2) )
+	ROM_LOAD16_WORD_SWAP( "240-p1.bin", 0x000000, 0x100000, CRC(80e41205) SHA1(8f83eb8ff54be4ec40f8a0dd2cbe56c54908d00a) )
 	ROM_LOAD16_WORD_SWAP( "240-p2.bin", 0x100000, 0x400000, CRC(960aa88d) SHA1(3d9e785891871af90313f178dca2724633406674) )
 
 	NEO_SFIX_128K( "240-s1.bin",  CRC(da3b40de) SHA1(e6bf74e057ac6fe1f249a7547f13ba7fbc694561) )
@@ -4840,9 +4837,9 @@ ROM_START( rbff2 )
 	ROM_LOAD16_BYTE( "240-c6.bin", 0x2000001, 0x800000, CRC(4609e507) SHA1(bb17f50a377dddb77c1eeda5944a7bcbf0cca5f7) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( rbff2a )
+ROM_START( rbff2h ) /* AES VERSION */
 	ROM_REGION( 0x500000, REGION_CPU1, 0 )
-	ROM_LOAD16_WORD_SWAP( "240-p1.rom", 0x000000, 0x100000, CRC(80e41205) SHA1(8f83eb8ff54be4ec40f8a0dd2cbe56c54908d00a) )
+	ROM_LOAD16_WORD_SWAP( "240-pg1.bin", 0x000000, 0x100000, CRC(b6969780) SHA1(e3373d18e0f0724d69efb8024a27cca121f1b5b2) )
 	ROM_LOAD16_WORD_SWAP( "240-p2.bin", 0x100000, 0x400000, CRC(960aa88d) SHA1(3d9e785891871af90313f178dca2724633406674) )
 
 	NEO_SFIX_128K( "240-s1.bin",  CRC(da3b40de) SHA1(e6bf74e057ac6fe1f249a7547f13ba7fbc694561) )
@@ -8067,11 +8064,11 @@ GAMEB( 1997, kof97a,   kof97,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK",
 GAMEB( 1997, kof97pls, kof97,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", 0 )
 GAMEB( 1997, kog,      kof97,    neogeo, neogeo, kog,     kog,      ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", GAME_NOT_WORKING ) // protected bootleg
 GAMEB( 1997, lastblad, neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 1)", 0 )
-GAMEB( 1997, lastblda, lastblad, neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 2)", 0 )
+GAMEB( 1997, lastbldh, lastblad, neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 2)", 0 )
 GAMEB( 1997, lastsold, lastblad, neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", 0 )
 GAMEB( 1997, irrmaze,  neogeo,   neogeo, neogeo, irrmaze, neogeo,   ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", 0 )
 GAMEB( 1998, rbff2,    neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 1)", 0 )
-GAMEB( 1998, rbff2a,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 2)", 0 )
+GAMEB( 1998, rbff2h,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 2)", 0 )
 GAMEB( 1998, rbff2k,   rbff2,    neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", 0 ) // no Japanese title / mode
 GAMEB( 1998, mslug2,   neogeo,   neogeo, neogeo, neogeo,  neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II", 0 )
 GAMEB( 1998, kof98,    neogeo,   neogeo, neogeo, neogeo,  kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends", 0 )

@@ -820,7 +820,7 @@ void mame_debug_hook(void)
 		debug_refresh_display();
 
 		/* wait for the debugger; during this time, disable sound output */
-		osd_sound_enable(0);
+		sound_global_enable(FALSE);
 		while (execution_state == EXECUTION_STATE_STOPPED)
 		{
 			/* clear the memory modified flag and wait */
@@ -838,7 +838,7 @@ void mame_debug_hook(void)
 			if (mame_is_scheduled_event_pending(Machine))
 				execution_state = EXECUTION_STATE_RUNNING;
 		}
-		osd_sound_enable(1);
+		sound_global_enable(TRUE);
 
 		/* remember the last cpunum where we stopped */
 		last_stopped_cpunum = cpunum;
