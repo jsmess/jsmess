@@ -15,7 +15,6 @@ UINT8 ggCRAM[GG_CRAM_SIZE];
 UINT8 smsCRAM[SMS_CRAM_SIZE];
 UINT8 VRAM[VRAM_SIZE];
 UINT8 *lineCollisionBuffer;
-UINT8 *spriteCache;
 UINT8 reg9copy;
 
 int addr;
@@ -266,7 +265,6 @@ int sms_video_init( int max_lines, int bborder_192, int bborder_224, int bborder
 	currentLine = lineCountDownCounter = irqState = 0;
 
 	lineCollisionBuffer = auto_malloc(MAX_X_PIXELS);
-	spriteCache = auto_malloc(MAX_X_PIXELS * 16);
 
 	/* Make temp bitmap for rendering */
 	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
@@ -536,7 +534,7 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 	int xScroll, yScroll, xScrollStartColumn;
 	int spriteIndex;
 	int pixelX, pixelPlotX, prioritySelected[256];
-	int spriteX, spriteY, spriteLine, spriteTileSelected, spriteHeight;
+	int spriteX, spriteY, spriteLine, spriteTileSelected, spriteHeight, spriteZoom;
 	int spriteBuffer[8], spriteBufferCount, spriteBufferIndex;
 	int bitPlane0, bitPlane1, bitPlane2, bitPlane3;
 	UINT16 *nameTable = (UINT16 *) &(VRAM[(((reg[0x02] & 0x0E) << 10) & 0x3800) + ((((line + reg9copy) % 224) >> 3) << 6)]);
@@ -621,9 +619,10 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 
 	/* Draw sprite layer */
 	spriteHeight = (reg[0x01] & 0x02 ? 16 : 8);
+	spriteZoom = 1;
 	if (reg[0x01] & 0x01) {
-		/* sprite doubling */																/********* TODO: Need to emulate x pixel doubling bug	 (SMS Only) **********/
-		spriteHeight <<= 1;
+		/* sprite doubling */
+		spriteZoom = 2;
 	}
 	spriteBufferCount = 0;
 	for (spriteIndex = 0; (spriteIndex < 64) && (spriteTable[spriteIndex] != 0xD0 || y_pixels != 192) && (spriteBufferCount < 9); spriteIndex++) {
@@ -631,7 +630,7 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 		if (spriteY > 240) {
 			spriteY -= 256; /* wrap from top if y position is > 240 */
 		}
-		if ((line >= spriteY) && (line < (spriteY + spriteHeight))) {
+		if ((line >= spriteY) && (line < (spriteY + spriteHeight * spriteZoom))) {
 			if (spriteBufferCount < 8) {
 				spriteBuffer[spriteBufferCount] = spriteIndex;
 			} else {
@@ -644,7 +643,6 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 	if ( spriteBufferCount > 8 ) {
 		spriteBufferCount = 8;
 	}
-	/* Is it NTSC */
 	memset(lineCollisionBuffer, 0, MAX_X_PIXELS);
 	spriteBufferCount--;
 	for (spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex--) {
@@ -665,7 +663,7 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 		if (reg[0x01] & 0x02) {
 			spriteTileSelected &= 0x01FE; /* force even index */
 		}
-		spriteLine = line - spriteY;
+		spriteLine = ( line - spriteY ) / spriteZoom;
 
 		if (spriteLine > 0x07) {
 			spriteTileSelected += 1;
@@ -687,6 +685,10 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 
 			penSelected = (penBit3 << 3 | penBit2 << 2 | penBit1 << 1 | penBit0) | 0x10;
 
+			if ( penSelected == 0x10 ) {	/* Transparent palette so skip draw */
+				continue;
+			}
+
 			if (reg[0x01] & 0x01) {
 				/* sprite doubling is enabled */
 				pixelPlotX = spriteX + (pixelX << 1);
@@ -696,23 +698,15 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 					continue;
 				}
 
-				if (spriteLine < (spriteHeight >> 1)) {
-					spriteCache[pixelPlotX + ( MAX_X_PIXELS * spriteLine)] = penSelected;
-				}
-
-				penSelected = pixelPlotX + (MAX_X_PIXELS * ((spriteLine & 0xFE) >> 1));
-				if (spriteCache[penSelected] == 0x10) {		/* Transparent pallette so skip draw */
-					continue;
-				}
 				if ( ! ( prioritySelected[pixelPlotX] & PRIORITY_BIT ) ) {
-					plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[spriteCache[penSelected]]);
-					plot_pixel(bitmap, pixelOffsetX + pixelPlotX + 1, pixelPlotY, Machine->pens[spriteCache[penSelected]]);
+					plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected]);
+					plot_pixel(bitmap, pixelOffsetX + pixelPlotX + 1, pixelPlotY, Machine->pens[penSelected]);
 				} else {
 					if ( prioritySelected[pixelPlotX] == PRIORITY_BIT ) {
-						plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[spriteCache[penSelected]]);
+						plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected]);
 					}
 					if ( prioritySelected[pixelPlotX + 1] == PRIORITY_BIT ) {
-						plot_pixel(bitmap, pixelOffsetX + pixelPlotX + 1, pixelPlotY, Machine->pens[spriteCache[penSelected]]);
+						plot_pixel(bitmap, pixelOffsetX + pixelPlotX + 1, pixelPlotY, Machine->pens[penSelected]);
 					}
 				}
 				if (lineCollisionBuffer[pixelPlotX] != 1) {
@@ -728,10 +722,6 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 					statusReg |= STATUS_SPRCOL;
 				}
 			} else {
-				if (penSelected == 0x10) {		/* Transparent pallette so skip draw */
-					continue;
-				}
-
 				pixelPlotX = spriteX + pixelX;
 
 				/* check to prevent going outside of active display area */
