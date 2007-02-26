@@ -2412,17 +2412,35 @@ static MACHINE_DRIVER_START( saturn )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
-SYSTEM_BIOS_START( saturn )
-	SYSTEM_BIOS_ADD( 0, "japan", "Japan v1.01 (941228)" )
-	SYSTEM_BIOS_ADD( 1, "usa", "US v1.00 (940921)" )
-	SYSTEM_BIOS_ADD( 2, "us", "US v1.00 (941115)" )
+
+/* Japanese Saturn */
+SYSTEM_BIOS_START(saturnjp)
+	SYSTEM_BIOS_ADD(0, "101", "Japan v1.01 (941228)")
+	SYSTEM_BIOS_ADD(1, "100", "Japan v1.00 (940921)")
 SYSTEM_BIOS_END
 
-ROM_START(saturn)
+/* Overseas Saturn */
+SYSTEM_BIOS_START(saturn)
+	SYSTEM_BIOS_ADD(0, "101a", "Overseas v1.01a (941115)")
+	SYSTEM_BIOS_ADD(1, "100a", "Overseas v1.00a (941115)")
+SYSTEM_BIOS_END
+
+
+ROM_START(saturnjp)
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
 	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(1))
 	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(2))
-	ROMX_LOAD("sega_us.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(3))
+	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
+	ROM_COPY( REGION_CPU1,0,0,0x080000)
+	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
+	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* VDP2 GFX */
+	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* VDP1 GFX */
+ROM_END
+
+ROM_START(saturn)
+	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
+	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
@@ -2432,13 +2450,35 @@ ROM_END
 
 ROM_START(saturneu)
 	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
-	ROM_LOAD("sega_eu.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3))
+	ROMX_LOAD("sega_101a.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(1))
+	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(2))
 	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
 	ROM_COPY( REGION_CPU1,0,0,0x080000)
 	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
 	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* VDP2 GFX */
 	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* VDP1 GFX */
 ROM_END
+
+ROM_START(vsaturn)
+	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
+	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
+	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
+	ROM_COPY( REGION_CPU1,0,0,0x080000)
+	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
+	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* VDP2 GFX */
+	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* VDP1 GFX */
+ROM_END
+
+ROM_START(hisaturn)
+	ROM_REGION( 0x080000, REGION_CPU1, 0 ) /* SH2 code */
+	ROM_LOAD("hisaturn.bin", 0x00000000, 0x00080000, CRC(721e1b60) SHA1(49d8493008fa715ca0c94d99817a5439d6f2c796))
+	ROM_REGION( 0x080000, REGION_CPU2, 0 ) /* SH2 code */
+	ROM_COPY( REGION_CPU1,0,0,0x080000)
+	ROM_REGION( 0x100000, REGION_CPU3, 0 ) /* 68000 code */
+	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* VDP2 GFX */
+	ROM_REGION( 0x100000, REGION_GFX2, 0 ) /* VDP1 GFX */
+ROM_END
+
 
 static void saturn_chdcd_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -2462,6 +2502,9 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY	FULLNAME */
-CONSB(1994, saturn,	0,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (NTSC)", GAME_NOT_WORKING)
-CONS(1994, saturneu,	saturn,	0,	saturn,	saturn,	saturn,	saturn,	"Sega",	"Saturn (PAL)", GAME_NOT_WORKING)
+/*    YEAR  NAME      PARENT  BIOS      COMPAT  MACHINE INPUT   INIT    CONFIG  COMPANY    FULLNAME          FLAGS */
+CONSB(1994, saturn,        0,   saturn,      0, saturn, saturn, saturn, saturn, "Sega",    "Saturn (USA)",   GAME_NOT_WORKING)
+CONSB(1994, saturnjp, saturn, saturnjp,      0, saturn, saturn, saturn, saturn, "Sega",    "Saturn (Japan)", GAME_NOT_WORKING)
+CONSB(1994, saturneu, saturn,   saturn,      0, saturn, saturn, saturn, saturn, "Sega",    "Saturn (PAL)",   GAME_NOT_WORKING)
+CONS( 1995, vsaturn,  saturn,                0, saturn, saturn, saturn, saturn, "JVC",     "V-Saturn",       GAME_NOT_WORKING)
+CONS( 1995, hisaturn, saturn,                0, saturn, saturn, saturn, saturn, "Hitachi", "HiSaturn",       GAME_NOT_WORKING)
