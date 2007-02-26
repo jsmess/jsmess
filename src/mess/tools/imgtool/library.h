@@ -388,8 +388,9 @@ const imgtool_module *imgtool_library_findmodule(
 	imgtool_library *library, const char *module_name);
 
 /* memory allocators for pooled library memory */
-void *imgtool_library_alloc(imgtool_library *library, size_t mem);
+void *imgtool_library_malloc(imgtool_library *library, size_t mem);
 char *imgtool_library_strdup(imgtool_library *library, const char *s);
+char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s);
 
 imgtool_module *imgtool_library_iterate(
 	imgtool_library *library, const imgtool_module *module);

@@ -68,7 +68,7 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	size_t len;
 
 	/* allocate the module and place it in the chain */
-	module = auto_malloc(sizeof(*module));
+	module = imgtool_library_malloc(library, sizeof(*module));
 	memset(module, 0, sizeof(*module));
 	module->previous = library->last;
 	if (library->last)
@@ -80,7 +80,7 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	/* extensions have a weird format */
 	s1 = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_FILE_EXTENSIONS);
 	len = strlen(s1);;
-	s2 = auto_malloc(len + 2);
+	s2 = imgtool_library_malloc(library, len + 2);
 	strcpy(s2, s1);
 	s2[len + 1] = '\0';
 	while((s1 = strchr(s2, ',')) != NULL)
@@ -88,9 +88,9 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	module->extensions = s2;
 
 	module->imgclass					= *imgclass;
-	module->name						= auto_strdup(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME));
-	module->description					= auto_strdup(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION));
-	module->eoln						= auto_strdup_allow_null(imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN));
+	module->name						= imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME));
+	module->description					= imgtool_library_strdup(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_DESCRIPTION));
+	module->eoln						= imgtool_library_strdup_allow_null(library, imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_EOLN));
 	module->initial_path_separator		= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_INITIAL_PATH_SEPARATOR) ? 1 : 0;
 	module->open_is_strict				= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_OPEN_IS_STRICT) ? 1 : 0;
 	module->tracks_are_called_cylinders	= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_TRACKS_ARE_CALLED_CYLINDERS) ? 1 : 0;
@@ -109,7 +109,7 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 	module->list_partitions				= (imgtoolerr_t (*)(imgtool_image *, imgtool_partition_info *, size_t)) imgtool_get_info_fct(imgclass, IMGTOOLINFO_PTR_LIST_PARTITIONS);
 	module->block_size					= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_BLOCK_SIZE);
 	module->createimage_optguide		= (const struct OptionGuide *) imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_CREATEIMAGE_OPTGUIDE);
-	module->createimage_optspec			= auto_strdup_allow_null(imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
+	module->createimage_optspec			= imgtool_library_strdup_allow_null(library, imgtool_get_info_ptr(imgclass, IMGTOOLINFO_STR_CREATEIMAGE_OPTSPEC));
 	module->image_extra_bytes			+= imgtool_get_info_int(imgclass, IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES);
 }
 
@@ -268,7 +268,7 @@ imgtool_module *imgtool_library_index(imgtool_library *library, int i)
 
 
 
-void *imgtool_library_alloc(imgtool_library *library, size_t mem)
+void *imgtool_library_malloc(imgtool_library *library, size_t mem)
 {
 	return pool_malloc(library->pool, mem);
 }
@@ -277,7 +277,13 @@ void *imgtool_library_alloc(imgtool_library *library, size_t mem)
 
 char *imgtool_library_strdup(imgtool_library *library, const char *s)
 {
-	return s ? pool_strdup(library->pool, s) : NULL;
+	return pool_strdup(library->pool, s);
 }
 
+
+
+char *imgtool_library_strdup_allow_null(imgtool_library *library, const char *s)
+{
+	return s ? imgtool_library_strdup(library, s) : NULL;
+}
 

@@ -32,6 +32,7 @@ struct _imgtool_image
 struct _imgtool_partition
 {
 	imgtool_image *image;
+	memory_pool *pool;
 	int partition_index;
 	UINT64 base_block;
 	UINT64 block_count;
@@ -584,6 +585,13 @@ void *imgtool_image_extra_bytes(imgtool_image *image)
 
 ***************************************************************************/
 
+static char *pool_strdup_allow_null(memory_pool *pool, char *s)
+{
+	return s ? pool_strdup(pool, s) : NULL;
+}
+
+
+
 imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, imgtool_partition **partition)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
@@ -592,6 +600,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	imgtool_partition_info partition_info[32];
 	UINT64 base_block, block_count;
 	size_t partition_extra_bytes;
+	memory_pool *pool;
 	imgtoolerr_t (*open_partition)(imgtool_partition *partition, UINT64 first_block, UINT64 block_count);
 
 	if (image->module->list_partitions)
@@ -631,14 +640,23 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	/* does this partition type have extra bytes? */
 	partition_extra_bytes = imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_PARTITION_EXTRA_BYTES);
 
+	/* allocate the new memory pool */
+	pool = pool_create(NULL);
+	if (!pool)
+	{
+		err = IMGTOOLERR_OUTOFMEMORY;
+		goto done;
+	}
+
 	/* allocate the new partition object */
-	p = (imgtool_partition *) malloc(sizeof(*p) + partition_extra_bytes);
+	p = (imgtool_partition *) pool_malloc(pool, sizeof(*p) + partition_extra_bytes);
 	if (!p)
 	{
 		err = IMGTOOLERR_OUTOFMEMORY;
 		goto done;
 	}
 	memset(p, 0, sizeof(*p) + partition_extra_bytes);
+	p->pool = NULL;
 
 	/* fill out the structure */
 	p->image						= image;
@@ -671,7 +689,7 @@ imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, i
 	p->suggest_transfer				= (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
 	p->get_chain					= (imgtoolerr_t (*)(imgtool_partition *, const char *, imgtool_chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
 	p->writefile_optguide			= (const struct OptionGuide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
-	p->writefile_optspec			= auto_strdup_allow_null(imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC));
+	p->writefile_optspec			= pool_strdup_allow_null(p->pool, imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC));
 
 	/* mask out if writing is untested */
 	if (global_omit_untested && imgtool_get_info_int(&imgclass, IMGTOOLINFO_INT_WRITING_UNTESTED))
@@ -703,7 +721,7 @@ done:
 
 void imgtool_partition_close(imgtool_partition *partition)
 {
-	free(partition);
+	pool_free(partition->pool);
 }
 
 
