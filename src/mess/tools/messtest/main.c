@@ -121,14 +121,6 @@ int CLIB_DECL main(int argc, char *argv[])
 #ifdef WIN32
 	/* expand wildcards so '*' can be used; this is not UNIX */
 	win_expand_wildcards(&argc, &argv);
-#else
-	{
-		/* this is for XMESS */
-		extern const char *cheatfile;
-		extern const char *db_filename;
-
-		cheatfile = db_filename = NULL;
-	}
 #endif /* WIN32 */
 
 	test_count = 0;
