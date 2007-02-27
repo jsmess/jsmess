@@ -664,7 +664,7 @@ static void image_clear(mess_image *image)
 		image->file = NULL;
 	}
 
-	pool_free(image->mempool);
+	pool_clear(image->mempool);
 	image->writeable = 0;
 	image->created = 0;
 	image->name = NULL;
@@ -1255,7 +1255,7 @@ char *image_strdup(mess_image *image, const char *src)
 void image_freeptr(mess_image *image, void *ptr)
 {
 	/* should really do something better here */
-	pool_realloc(image->mempool, ptr, 1);
+	pool_realloc(image->mempool, ptr, 0);
 }
 
 
