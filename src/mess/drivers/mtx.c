@@ -57,10 +57,9 @@ static unsigned char * mtx_zero_mem = NULL;
 static char mtx_prt_strobe = 0;
 static char mtx_prt_data = 0;
 
-static unsigned char * mtx_loadbuffer = NULL;
-static unsigned char * mtx_savebuffer = NULL;
-static int mtx_loadsize;
-static int mtx_saveindex;
+static unsigned char * mtx_tape_buf = NULL;
+static int mtx_tape_index = 0;
+static char * mtx_tape_filename = NULL;
 
 
 static WRITE8_HANDLER ( mtx_cst_w )
@@ -411,54 +410,54 @@ static void mtx_poke (int vaddress, unsigned char data)
  */
 static void mtx_save_hack(int start, int length)
 {
-	int i;
-	int saved = 0;
+	mame_file * tape_file;
 	mame_file_error filerr;
-	mame_file *f;
-	static char filename[16] = "";
+	int bytes_saved;
+	int i;
+
+	assert(length <= 32768);
 
 //	logerror("mtx_save_hack: start=%#x  length=%#x (%d)  index=%#x (%d)\n",
-//			start, length, length, mtx_saveindex, mtx_saveindex);
+//			start, length, length, mtx_save_index, mtx_save_index);
 
-	if ((start > 0xc000) && (length == 20))
+	if ((start > 0xc000) && (length == 20))  /* Save the header segment */
 	{
 		for (i = 0; i < 18; i++)
-			mtx_savebuffer[i] = mtx_peek(start + i);
+			mtx_tape_buf[i] = mtx_peek(start + i);
+		length = 18;
 
-		mtx_saveindex = 18;
-
-		memcpy(filename, mtx_savebuffer + 1, 15);
-
-		for (i = 14; i > 0 && filename[i] == 0x20; i--)
+		memcpy(mtx_tape_filename, mtx_tape_buf + 1, 15);
+		for (i = 14; i > 0 && mtx_tape_filename[i] == 0x20; i--)
 			;
+		mtx_tape_filename[i + 1] = '\0';
+		mtx_tape_index = 0;
 
-		filename[i + 1] = '\0';
+		filerr = mame_fopen(SEARCHPATH_IMAGE, mtx_tape_filename,
+                        	OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, &tape_file);
+	}
+	else  /* Save system variable, body, or variable store segment */
+	{
+		for (i = 0; i < length; i++)
+			mtx_tape_buf[i] = mtx_peek(start + i);
+
+		filerr = mame_fopen(SEARCHPATH_IMAGE, mtx_tape_filename,
+    	                    OPEN_FLAG_WRITE, &tape_file);
+	}
+
+	if (filerr == FILERR_NONE)
+	{
+		mame_fseek(tape_file, mtx_tape_index, SEEK_SET);
+		bytes_saved = mame_fwrite(tape_file, mtx_tape_buf, length);
+		logerror("saved %d bytes from %d:%04x into '%s' at %d\n", bytes_saved,
+		         mtx_rampage, start, mtx_tape_filename, mtx_tape_index);
+		if (length > bytes_saved)
+			logerror("wrote too few bytes from '%s'\n", mtx_tape_filename);
+	
+		mame_fclose(tape_file);
+		mtx_tape_index += length;
 	}
 	else
-	{
-		if (mtx_saveindex + length > 65536)
-			length = 65536 - mtx_saveindex;
-
-		for (i = 0; i < length; i++)
-			mtx_savebuffer[mtx_saveindex + i] = mtx_peek(start + i);
-
-		mtx_saveindex += length;
-	}
-
-	if (start == 0xc000)
-	{
-		logerror("saving buffer into '%s', ", filename);
-
-		filerr = mame_fopen(SEARCHPATH_IMAGE, filename, OPEN_FLAG_WRITE, &f);
-		if (filerr == FILERR_NONE)
-		{
-			saved = mame_fwrite(f, mtx_savebuffer, mtx_saveindex);
-			mame_fclose(f);
-		}
-
-		logerror("saved %d bytes\n", saved);
-		filename[0] = '\0';
-	}
+		logerror("cannot open '%s' for saving\n", mtx_tape_filename);
 }
 
 /*
@@ -469,54 +468,46 @@ static void mtx_save_hack(int start, int length)
  */
 static void mtx_load_hack(int start, int length)
 {
-	int i;
-	int filesize;
+	mame_file * tape_file;
 	mame_file_error filerr;
-	mame_file *f;
-	static char filename[16] = "";
+	int bytes_loaded;
+	int i;
 
-//	logerror("mtx_load_hack: start=%#x  length=%#x (%d)  size=%#x (%d)\n",
-//			start, length, length, mtx_loadsize, mtx_loadsize);
+	assert(length <= 32768);
 
-	if ((start > 0xc000) && (length == 18) && (mtx_loadsize <= 0))
+//	logerror("mtx_load_hack: start=%#x  length=%#x (%d)\n", start, length, length);
+
+	if ((start > 0xc000) && (length == 18))
 	{
 		for (i = 0; i < 15; i++)
-			filename[i] = mtx_peek(start - 0xf + i);
+			mtx_tape_filename[i] = mtx_peek(start - 0xf + i);
 
-		for (i = 14; i > 0 && filename[i] == 0x20; i--)
+		for (i = 14; i > 0 && mtx_tape_filename[i] == 0x20; i--)
 			;
 
-		filename[i+1] = '\0';
-		logerror("loading '%s' into buffer, ", filename);
-		filerr = mame_fopen(SEARCHPATH_IMAGE, filename, OPEN_FLAG_READ, &f);
-		if (filerr == FILERR_NONE)
-		{
-			filesize = mame_fsize(f);
-			if (filesize > 65536)
-				filesize = 65536;
-
-			mtx_loadsize = mame_fread(f, mtx_loadbuffer, filesize);
-			mame_fclose(f);
-		}
-
-		logerror("loaded %d bytes\n", mtx_loadsize);
+		mtx_tape_filename[i+1] = '\0';
+		mtx_tape_index = 0;
 	}
 
-	if (mtx_loadsize > 0)
+	filerr = mame_fopen(SEARCHPATH_IMAGE, mtx_tape_filename, OPEN_FLAG_READ,
+	                    &tape_file);
+	if (filerr == FILERR_NONE)
 	{
-		if (length > mtx_loadsize)
-		{
-			logerror("file '%s' is too short\n", filename);
-			length = mtx_loadsize;
-		}
-
+		mame_fseek(tape_file, mtx_tape_index, SEEK_SET);
+		bytes_loaded = mame_fread(tape_file, mtx_tape_buf, length);
+		logerror("loaded %d bytes from '%s' at %d into %d:%04x\n", bytes_loaded,
+		         mtx_tape_filename, mtx_tape_index, mtx_rampage, start);
+		if (length > bytes_loaded)
+			logerror("read too few bytes from '%s'\n", mtx_tape_filename);
+	
 		for (i = 0; i < length; i++)
-			mtx_poke(start + i, mtx_loadbuffer[i]);
-
-		memcpy(mtx_loadbuffer, mtx_loadbuffer + length,
-				mtx_loadsize - length);
-		mtx_loadsize -= length;
+			mtx_poke(start + i, mtx_tape_buf[i]);
+	
+		mame_fclose(tape_file);
+		mtx_tape_index += length;
 	}
+	else
+		logerror("cannot open '%s' for loading\n", mtx_tape_filename);
 }
 
 static void mtx_verify_hack(int start, int length)
@@ -542,7 +533,7 @@ static WRITE8_HANDLER ( mtx_trap_write )
 		start = activecpu_get_reg(Z80_HL);
 		length = activecpu_get_reg(Z80_DE);
 
-		// logerror("PC %04x\nStart %04x, Length %04x, 0xFD67 %02x, 0xFD68 %02x index 0x%04x\n", pc, start, length, mess_ram[0xfd67], mess_ram[0xfd68], mtx_loadsize);
+		// logerror("PC %04x\nStart %04x, Length %04x, 0xFD67 %02x, 0xFD68 %02x index 0x%04x\n", pc, start, length, mess_ram[0xfd67], mess_ram[0xfd68], mtx_tape_size);
 
 		if(mtx_peek(0xfd68) == 0)
 			mtx_save_hack(start, length);
@@ -579,17 +570,13 @@ static MACHINE_START( mtx512 )
 	TMS9928A_configure(&tms9928a_interface);
 
 	mtx_null_mem = (unsigned char *) auto_malloc (16384);
-
 	mtx_zero_mem = (unsigned char *) auto_malloc (16384);
-
-	mtx_loadbuffer = (unsigned char *) auto_malloc (65536);
-
-	mtx_savebuffer = (unsigned char *) auto_malloc (65536);
-
-	memset (mtx_null_mem, 0, 16384);
 	memset (mtx_zero_mem, 0, 16384);
-	memset (mtx_loadbuffer, 0, 65536);
-	memset (mtx_savebuffer, 0, 65536);
+
+	mtx_tape_buf = auto_malloc (32768);
+	mtx_tape_index = 0;
+	mtx_tape_filename = auto_malloc (16);
+	mtx_tape_filename[0] = 0;
 
 	z80ctc_init(0, &mtx_ctc_intf);
 
@@ -607,8 +594,6 @@ static MACHINE_START( mtx512 )
 	mtx_set_bank_offsets (0, 0x2000, 0xa0000, 0x8000,
 			      0x6000, 0x4000, 0x2000, 0);
 
-	mtx_loadsize = 0;
-	mtx_saveindex = 0;
 	return 0;
 }
 
