@@ -1254,7 +1254,8 @@ char *image_strdup(mess_image *image, const char *src)
 
 void image_freeptr(mess_image *image, void *ptr)
 {
-	pool_realloc(image->mempool, ptr, 0);
+	/* should really do something better here */
+	pool_realloc(image->mempool, ptr, 1);
 }
 
 

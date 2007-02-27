@@ -56,7 +56,6 @@ error:
 void imgtool_library_close(imgtool_library *library)
 {
 	pool_free(library->pool);
-	free(library);
 }
 
 
