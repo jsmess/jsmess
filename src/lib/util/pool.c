@@ -179,6 +179,10 @@ void *pool_realloc_file_line(memory_pool *pool, void *ptr, size_t size, const ch
 			/* replace the entry with the new entry */
 			*entry = new_entry;
 
+			/* is this a final entry?  if so, update pool->lastptr */
+			if ((*entry)->next == NULL)
+				pool->lastptr = &(*entry)->next;
+
 			/* return a pointer to the new entry's buffer */
 			new_ptr = new_entry->buffer;
 		}
