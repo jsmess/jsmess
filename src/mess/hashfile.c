@@ -357,13 +357,22 @@ hash_file *hashfile_open(const char *sysname, int is_preload,
 {
 	mame_file_error filerr;
 	char *fname;
-	hash_file *hashfile;
-	
-	hashfile = malloc(sizeof(struct _hash_file));
+	hash_file *hashfile = NULL;
+	memory_pool *pool = NULL;
+
+	/* create a pool for this hash file */
+	pool = pool_create(error_proc);
+	if (!pool)
+		goto error;
+
+	/* allocate space for this hash file */	
+	hashfile = (hash_file *) pool_malloc(pool, sizeof(*hashfile));
 	if (!hashfile)
 		goto error;
+
+	/* set up the hashfile structure */
 	memset(hashfile, 0, sizeof(*hashfile));
-	hashfile->pool = pool_create(error_proc);
+	hashfile->pool = pool;
 	hashfile->error_proc = error_proc;
 
 	/* open a file */
@@ -389,10 +398,9 @@ error:
 
 void hashfile_close(hash_file *hashfile)
 {
-	pool_free(hashfile->pool);
 	if (hashfile->file)
 		mame_fclose(hashfile->file);
-	free(hashfile);
+	pool_free(hashfile->pool);
 }
 
 
