@@ -855,19 +855,22 @@ static int read_hash_config(const char *sysname, mess_image *image)
 	hash_file *hashfile = NULL;
 	const struct hash_info *info = NULL;
 
+	/* open the hash file */
 	hashfile = hashfile_open(sysname, FALSE, NULL);
 	if (!hashfile)
 		goto done;
 
+	/* look up this entry in the hash file */
 	info = hashfile_lookup(hashfile, image->hash);
 	if (!info)
 		goto done;
 
-	image->longname		= image_strdup(image, info->longname);
-	image->manufacturer	= image_strdup(image, info->manufacturer);
-	image->year			= image_strdup(image, info->year);
-	image->playable		= image_strdup(image, info->playable);
-	image->extrainfo	= image_strdup(image, info->extrainfo);
+	/* copy the relevant entries */
+	image->longname		= info->longname		? image_strdup(image, info->longname)		: NULL;
+	image->manufacturer	= info->manufacturer	? image_strdup(image, info->manufacturer)	: NULL;
+	image->year			= info->year			? image_strdup(image, info->year)			: NULL;
+	image->playable		= info->playable		? image_strdup(image, info->playable)		: NULL;
+	image->extrainfo	= info->extrainfo		? image_strdup(image, info->extrainfo)		: NULL;
 
 done:
 	if (hashfile)
