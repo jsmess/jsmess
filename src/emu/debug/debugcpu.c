@@ -820,7 +820,7 @@ void mame_debug_hook(void)
 		debug_refresh_display();
 
 		/* wait for the debugger; during this time, disable sound output */
-		sound_global_enable(FALSE);
+		sound_mute(TRUE);
 		while (execution_state == EXECUTION_STATE_STOPPED)
 		{
 			/* clear the memory modified flag and wait */
@@ -838,7 +838,7 @@ void mame_debug_hook(void)
 			if (mame_is_scheduled_event_pending(Machine))
 				execution_state = EXECUTION_STATE_RUNNING;
 		}
-		sound_global_enable(TRUE);
+		sound_mute(FALSE);
 
 		/* remember the last cpunum where we stopped */
 		last_stopped_cpunum = cpunum;

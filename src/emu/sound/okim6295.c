@@ -9,7 +9,7 @@
  *
  *   HJB 08/31/98
  *   modified to use an automatically selected oversampling factor
- *   for the current Machine->sample_rate
+ *   for the current sample rate
  *
  *   Mish 21/7/99
  *   Updated to allow multiple OKI chips with different sample rates

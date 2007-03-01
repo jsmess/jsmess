@@ -598,11 +598,16 @@ void video_screen_update_partial(int scrnum, int scanline)
 
 int video_screen_get_vpos(int scrnum)
 {
-	mame_time delta = sub_mame_times(mame_timer_get_time(), scrinfo[scrnum].vblank_time);
+	subseconds_t delta = mame_time_to_subseconds(sub_mame_times(mame_timer_get_time(), scrinfo[scrnum].vblank_time));
 	int vpos;
 
-	assert(delta.seconds == 0);
-	vpos = delta.subseconds / scrinfo[scrnum].scantime;
+	/* round to the nearest pixel */
+	delta += scrinfo[scrnum].pixeltime / 2;
+
+	/* compute the v position relative to the start of VBLANK */
+	vpos = delta / scrinfo[scrnum].scantime;
+
+	/* adjust for the fact that VBLANK starts at the bottom of the visible area */
 	return (Machine->screen[scrnum].visarea.max_y + 1 + vpos) % Machine->screen[scrnum].height;
 }
 
@@ -615,13 +620,20 @@ int video_screen_get_vpos(int scrnum)
 
 int video_screen_get_hpos(int scrnum)
 {
-	mame_time delta = sub_mame_times(mame_timer_get_time(), scrinfo[scrnum].vblank_time);
-	int vpos, hpos;
+	subseconds_t delta = mame_time_to_subseconds(sub_mame_times(mame_timer_get_time(), scrinfo[scrnum].vblank_time));
+	int vpos;
 
-	assert(delta.seconds == 0);
-	vpos = delta.subseconds / scrinfo[scrnum].scantime;
-	hpos = (delta.subseconds - (vpos * scrinfo[scrnum].scantime)) / scrinfo[scrnum].pixeltime;
-	return hpos;
+	/* round to the nearest pixel */
+	delta += scrinfo[scrnum].pixeltime / 2;
+
+	/* compute the v position relative to the start of VBLANK */
+	vpos = delta / scrinfo[scrnum].scantime;
+
+	/* subtract that from the total time */
+	delta -= vpos * scrinfo[scrnum].scantime;
+
+	/* return the pixel offset from the start of this scanline */
+	return delta / scrinfo[scrnum].pixeltime;
 }
 
 
@@ -657,10 +669,8 @@ int video_screen_get_hblank(int scrnum)
 
 mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 {
-	mame_time curdelta = sub_mame_times(mame_timer_get_time(), scrinfo[scrnum].vblank_time);
+	subseconds_t curdelta = mame_time_to_subseconds(sub_mame_times(mame_timer_get_time(), scrinfo[scrnum].vblank_time));
 	subseconds_t targetdelta;
-
-	assert(curdelta.seconds == 0);
 
 	/* since we measure time relative to VBLANK, compute the scanline offset from VBLANK */
 	vpos += Machine->screen[scrnum].height - (Machine->screen[scrnum].visarea.max_y + 1);
@@ -669,12 +679,12 @@ mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 	/* compute the delta for the given X,Y position */
 	targetdelta = (subseconds_t)vpos * scrinfo[scrnum].scantime + (subseconds_t)hpos * scrinfo[scrnum].pixeltime;
 
-	/* if we're past that time, head to the next frame */
-	if (targetdelta <= curdelta.subseconds)
+	/* if we're past that time (within 1/2 of a pixel), head to the next frame */
+	if (targetdelta <= curdelta + scrinfo[scrnum].pixeltime / 2)
 		targetdelta += DOUBLE_TO_SUBSECONDS(TIME_IN_HZ(Machine->screen[scrnum].refresh));
 
 	/* return the difference */
-	return make_mame_time(0, targetdelta - curdelta.subseconds);
+	return make_mame_time(0, targetdelta - curdelta);
 }
 
 

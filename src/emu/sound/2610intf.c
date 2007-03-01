@@ -124,7 +124,7 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM2610interface generic_2610 = { 0 };
 	const struct YM2610interface *intf = config ? config : &generic_2610;
-	int rate = Machine->sample_rate;
+	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
 	struct ym2610_info *info;
@@ -175,7 +175,7 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM2610interface generic_2610 = { 0 };
 	const struct YM2610interface *intf = config ? config : &generic_2610;
-	int rate = Machine->sample_rate;
+	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
 	struct ym2610_info *info;

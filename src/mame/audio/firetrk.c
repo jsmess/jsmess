@@ -215,10 +215,10 @@ DISCRETE_SOUND_START(firetrk_discrete_interface)
 	/* drive a modulo 12 counter, with div6 & div12 */
 	/* summed as the output of the circuit.         */
 	/************************************************/
-	DISCRETE_ADJUSTMENT(NODE_20, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_20, 1,
 				RES_K(260),	// R26 + R27 @ max
 				RES_K(10),	// R26 + R27 @ min
-				DISC_LOGADJ, 8)
+				DISC_LOGADJ, "R27")
 	DISCRETE_DAC_R1(NODE_21, 1,		// base of Q1
 			FIRETRUCK_MOTOR_DATA,	// IC F8, pins 2,5,6,9
 			DEFAULT_TTL_V_LOGIC_1,
@@ -419,10 +419,10 @@ DISCRETE_SOUND_START(superbug_discrete_interface)
 	/* latch (4 bit). This freqency is then used to */
 	/* drive a modulo 12 counter.                   */
 	/************************************************/
-	DISCRETE_ADJUSTMENT(NODE_20, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_20, 1,
 				RES_K(260),	// R12 + R62 @ max
 				RES_K(10),	// R12 + R62 @ min
-				DISC_LOGADJ, 8)
+				DISC_LOGADJ, "R62")
 	DISCRETE_DAC_R1(NODE_21, 1,		// base of Q1
 			SUPERBUG_SPEED_DATA,	// IC B5, pins 3, 14, 6, 11
 			DEFAULT_TTL_V_LOGIC_1,
@@ -604,10 +604,10 @@ DISCRETE_SOUND_START(montecar_discrete_interface)
 	/* driver a modulo 12 counter, with div6, 4 & 3 */
 	/* summed as the output of the circuit.         */
 	/************************************************/
-	DISCRETE_ADJUSTMENT(NODE_20, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_20, 1,
 				RES_K(260),	// R87 + R89 @ max
 				RES_K(10),	// R87 + R89 @ min
-				DISC_LOGADJ, 8)
+				DISC_LOGADJ, "R89")
 	DISCRETE_DAC_R1(NODE_21, 1,		// base of Q7
 			MONTECAR_MOTOR_DATA,	// IC H8, pins 5, 2, 9, 6
 			DEFAULT_TTL_V_LOGIC_1,
@@ -639,10 +639,10 @@ DISCRETE_SOUND_START(montecar_discrete_interface)
 	/************************************************/
 	DISCRETE_COMP_ADDER(NODE_30, 1, MONTECAR_DRONE_LOUD_DATA, &montecar_drone_vol_res)	// make sure to change the node value in the mixer table if you change this node number
 
-	DISCRETE_ADJUSTMENT(NODE_40, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_40, 1,
 				RES_K(260),	// R85 + R88 @ max
 				RES_K(10),	// R85 + R88 @ min
-				DISC_LOGADJ, 9)
+				DISC_LOGADJ, "R88")
 	DISCRETE_DAC_R1(NODE_41, 1,			// base of Q7
 			MONTECAR_DRONE_MOTOR_DATA,	// IC H8, pins 19, 16, 12, 15
 			DEFAULT_TTL_V_LOGIC_1,

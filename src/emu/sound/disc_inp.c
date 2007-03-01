@@ -141,7 +141,15 @@ void dss_adjustment_reset(node_description *node)
 	struct dss_adjustment_context *context = node->context;
 	double min, max;
 
-	context->port = DSS_ADJUSTMENT__PORT;
+	if (node->custom)
+	{
+		context->port = port_tag_to_index(node->custom);
+		if (context->port == -1)
+			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", node->node-NODE_00);
+	}
+	else
+		context->port = DSS_ADJUSTMENT__PORT;
+
 	context->lastpval = 0x7fffffff;
 	context->pmin = DSS_ADJUSTMENT__PMIN;
 	context->pscale = 1.0 / (double)(DSS_ADJUSTMENT__PMAX - DSS_ADJUSTMENT__PMIN);

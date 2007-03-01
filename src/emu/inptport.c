@@ -138,6 +138,7 @@ struct _analog_port_info
 	INT32				minimum;		/* minimum adjusted value */
 	INT32				maximum;		/* maximum adjusted value */
 	INT32				center;			/* center adjusted value for autocentering */
+	INT32				reverse_val;	/* value where we subract from to reverse directions */
 	double				scalepos;		/* scale factor to apply to positive adjusted values */
 	double				scaleneg;		/* scale factor to apply to negative adjusted values */
 	double				keyscalepos;	/* scale factor to apply to the key delta field when pos */
@@ -149,7 +150,7 @@ struct _analog_port_info
 	UINT8				wraps;			/* does the control wrap around? */
 	UINT8				one_of_x;		/* is this a 1 of X postional input? */
 	UINT8				autocenter;		/* autocenter this input? */
-	UINT8				dual_scale;		/* scale joystick diferently if defaut is between min/max */
+	UINT8				single_scale;	/* scale joystick diferently if default is between min/max */
 	UINT8				interpolate;	/* should we do linear interpolation for mid-frame reads? */
 	UINT8				lastdigital;	/* was the last modification caused by a digital form? */
 	UINT32				crosshair_pos;	/* position of fake crosshair */
@@ -1127,14 +1128,18 @@ static void input_port_postload(void)
 				for ( ; mask & 1; mask >>= 1)
 					info->bits++;
 
-				/* workaround: if bits < 8, clamp to 8; we will mask them at the end */
-				if (info->bits < 8)
-					info->bits = 8;
-
 				/* based on the port type determine if we need absolute or relative coordinates */
 				info->minimum = ANALOG_VALUE_MIN;
 				info->maximum = ANALOG_VALUE_MAX;
 				info->interpolate = 1;
+
+				/* adjust default, min, and max so they fall in the bitmask range */
+				port->default_value = (port->default_value & port->mask) >> info->shift;
+				if (!(port->type == IPT_POSITIONAL) && !(port->type == IPT_POSITIONAL_V))
+				{
+					port->analog.min = (port->analog.min & port->mask) >> info->shift;
+					port->analog.max = (port->analog.max & port->mask) >> info->shift;
+				}
 
 				switch (port->type)
 				{
@@ -1173,9 +1178,6 @@ static void input_port_postload(void)
 					case IPT_TRACKBALL_X:
 					case IPT_TRACKBALL_Y:
 						info->absolute = 0;
-						info->minimum = port->analog.min = 0;
-						port->analog.max = (1 << info->bits) - 1;
-						info->maximum = port->analog.max * 512;
 						info->wraps = 1;
 						break;
 
@@ -1184,13 +1186,11 @@ static void input_port_postload(void)
 					case IPT_POSITIONAL:
 					case IPT_POSITIONAL_V:
 						info->positionalscale = (double)(port->analog.max) / (ANALOG_VALUE_MAX - ANALOG_VALUE_MIN);
+						/* force to only use PORT_POSITIONS data */
 						port->analog.min = 0;
 						port->analog.max--;
-						info->minimum = (0 - port->default_value) * 512;
-						info->maximum = (port->analog.max - port->default_value) * 512;
 						info->autocenter = !port->analog.wraps;
 						info->wraps = port->analog.wraps;
-						info->dual_scale = 1;
 						break;
 
 					default:
@@ -1198,7 +1198,6 @@ static void input_port_postload(void)
 						break;
 				}
 
-				/* extremes can be signed or unsigned */
 				if (info->absolute)
 				{
 					/* if we are receiving data from the OSD input as absolute,
@@ -1206,26 +1205,71 @@ static void input_port_postload(void)
                      * and the default port value is between min/max,
                      * we need to scale differently for the +/- directions.
                      * All other absolute types use a 1:1 scale */
-					info->dual_scale = (port->default_value != port->analog.min) && (port->default_value != port->analog.max);
+					info->single_scale = (port->default_value == port->analog.min) || (port->default_value == port->analog.max);
 
-					if (info->dual_scale)
-						if (port->analog.max > port->analog.min)
+					if (!info->single_scale)
+					{
+						/* axis moves in both directions from the default value */
+
+						/* unsigned */
+						info->scalepos = ((double)port->analog.max - (double)port->default_value) / (double)(ANALOG_VALUE_MAX - 0);
+						info->scaleneg = ((double)port->default_value - (double)port->analog.min) / (double)(0 - ANALOG_VALUE_MIN);
+
+						if (port->analog.min > port->analog.max)
 						{
-							info->scalepos = (double)(port->analog.max - port->default_value) / (double)(ANALOG_VALUE_MAX - 0);
-							info->scaleneg = (double)(port->default_value - port->analog.min) / (double)(0 - ANALOG_VALUE_MIN);
+							/* signed */
+							info->scaleneg *= -1;
 						}
-						else
-						{
-							info->scalepos = (double)((INT32)((port->analog.max - port->default_value) << (32 - info->bits)) >> (32 - info->bits)) / (double)(ANALOG_VALUE_MAX - 0);
-							info->scaleneg = (double)((INT32)((port->default_value - port->analog.min) << (32 - info->bits)) >> (32 - info->bits)) / (double)(0 - ANALOG_VALUE_MIN);
-						}
+
+						/* reverse from center */
+						info->reverse_val = 0;
+					}
 					else
-						info->scalepos = info->scaleneg = (double)(port->analog.max - port->analog.min) / (double)(ANALOG_VALUE_MAX - ANALOG_VALUE_MIN);
+					{
+						/* single axis that increases from default */
+						info->scalepos = (double)(port->analog.max - port->analog.min) / (double)(ANALOG_VALUE_MAX - ANALOG_VALUE_MIN);
+
+						/* move from default */
+						if (port->default_value == port->analog.max)
+							info->scalepos *= -1;
+
+						/* make the scaling the same for easier coding when we need to scale */
+						info->scaleneg = info->scalepos;
+
+						/* reverse from max */
+						info->reverse_val = info->maximum;
+					}
 				}
 
 				/* relative and positional controls all map directly with a 512x scale factor */
 				else
-					info->scalepos = info->scaleneg = 1.0 / 512.0;
+				{
+					/* The relative code is set up to allow specifing PORT_MINMAX and default values. */
+					/* The validity checks are purposely set up to not allow you to use anything other */
+					/* a default of 0 and PORT_MINMAX(0,mask).  This is in case the need arises to use */
+					/* this feature in the future.  Keeping the code in does not hurt anything. */
+					if (port->analog.min > port->analog.max)
+						/* adjust for signed */
+						port->analog.min *= -1;
+
+					info->minimum = (port->analog.min - port->default_value) * 512;
+					info->maximum = (port->analog.max - port->default_value) * 512;
+
+					/* make the scaling the same for easier coding when we need to scale */
+					info->scaleneg = info->scalepos = 1.0 / 512.0;
+
+					if (port->analog.reset)
+						/* delta values reverse from center */
+						info->reverse_val = 0;
+					else
+					{
+						/* positional controls reverse from their max range */
+						info->reverse_val = info->maximum + info->minimum;
+
+						/* relative controls reverse from 1 past their max range */
+						if (info->positionalscale == 0) info->reverse_val += 512;
+					}
+				}
 
 				/* compute scale for keypresses */
 				info->keyscalepos = 1.0 / info->scalepos;
@@ -1389,7 +1433,8 @@ static int apply_config_to_current(xml_data_node *portnode, int type, int player
 		updateport = Machine->input_ports + (updateport - input_ports_default);
 
 		/* fill in the data from the attributes */
-		updateport->default_value = xml_get_attribute_int(portnode, "value", updateport->default_value);
+		if (!port_type_is_analog(updateport->type))
+			updateport->default_value = xml_get_attribute_int(portnode, "value", updateport->default_value);
 		updateport->analog.delta = xml_get_attribute_int(portnode, "keydelta", updateport->analog.delta);
 		updateport->analog.centerdelta = xml_get_attribute_int(portnode, "centerdelta", updateport->analog.centerdelta);
 		updateport->analog.sensitivity = xml_get_attribute_int(portnode, "sensitivity", updateport->analog.sensitivity);
@@ -1558,7 +1603,7 @@ static void save_game_inputs(xml_data_node *parentnode)
 
 		/* only save if something has changed and this port is a type we save */
 		if (save_this_port_type(defport->type) &&
-			((defport->default_value & defport->mask) != (curport->default_value & defport->mask) ||
+			((!port_type_is_analog(defport->type) && (defport->default_value & defport->mask) != (curport->default_value & defport->mask)) ||
 			 defport->analog.delta != curport->analog.delta ||
 			 defport->analog.centerdelta != curport->analog.centerdelta ||
 			 defport->analog.sensitivity != curport->analog.sensitivity ||
@@ -1578,7 +1623,7 @@ static void save_game_inputs(xml_data_node *parentnode)
 				xml_set_attribute_int(portnode, "defvalue", defport->default_value & defport->mask);
 
 				/* if the value has changed, add it as well */
-				if (defport->default_value != curport->default_value)
+				if (!port_type_is_analog(defport->type) && defport->default_value != curport->default_value)
 					xml_set_attribute_int(portnode, "value", curport->default_value & defport->mask);
 
 				/* add analog-specific attributes if they have changed */
@@ -2021,6 +2066,11 @@ input_port_entry *input_port_initialize(input_port_init_params *iip, UINT32 type
 	port->mask = mask;
 	port->default_value = defval;
 
+	/* default min to 0 and max to the mask value */
+	/* they can be overwritten by PORT_MINMAX */
+	if (port_type_is_analog(port->type) && !port->analog.min && !port->analog.max)
+		port->analog.max = port->mask;
+
 	/* sets up default port codes */
 	switch (port->type)
 	{
@@ -2217,6 +2267,12 @@ int input_port_active(const input_port_entry *port)
 int port_type_is_analog(int type)
 {
 	return (type >= __ipt_analog_start && type <= __ipt_analog_end);
+}
+
+
+int port_type_is_analog_absolute(int type)
+{
+	return (type >= __ipt_analog_absolute_start && type <= __ipt_analog_absolute_end);
 }
 
 
@@ -2885,10 +2941,11 @@ static void update_analog_port(int portnum)
 			{
 				/* only update if analog value changed */
 				info->previousanalog = rawvalue;
+
 				/* apply the inverse of the sensitivity to the raw value so that */
 				/* it will still cover the full min->max range requested after */
 				/* we apply the sensitivity adjustment */
-				if (info->absolute)
+				if (info->absolute || port->analog.reset)
 				{
 					/* if port is absolute, then just return the absolute data supplied */
 					info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, port->analog.sensitivity);
@@ -2898,10 +2955,11 @@ static void update_analog_port(int portnum)
 					/* if port is positional, we will take the full analog control and divide it */
 					/* into positions, that way as the control is moved full scale, */
 					/* it moves through all the positions */
-					rawvalue = info->positionalscale * (rawvalue - ANALOG_VALUE_MIN);
+					rawvalue = info->positionalscale * (rawvalue - ANALOG_VALUE_MIN) * 512  + info->minimum;
+
 					/* clamp the high value so it does not roll over */
-					if (rawvalue > port->analog.max) rawvalue = port->analog.max;
-					info->accum = APPLY_INVERSE_SENSITIVITY((rawvalue * 512 + info->minimum), port->analog.sensitivity);
+					if (rawvalue > info->maximum) rawvalue = info->maximum;
+					info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, port->analog.sensitivity);
 				}
 				else
 					/* if port is relative, we use the value to simulate the speed of relative movement */
@@ -3057,18 +3115,13 @@ profiler_mark(PROFILER_INPUT);
 			current = APPLY_SENSITIVITY(current, port->analog.sensitivity);
 
 			/* apply reversal if needed */
-			if (info->dual_scale)
-			{
-				if (port->analog.reverse)
-					current = info->maximum + info->minimum - current;
-			}
+			if (port->analog.reverse)
+					current = info->reverse_val - current;
 			else
-			{
-				if (port->analog.reverse)
-					current = ANALOG_VALUE_MAX - current;
-				else
-					current -= ANALOG_VALUE_MIN;
-			}
+			if (info->single_scale)
+				/* it's a pedal or the default value is equal to min/max */
+				/* so we need to adjust the center to the minimum */
+				current -= ANALOG_VALUE_MIN;
 
 			/* map differently for positive and negative values */
 			if (current >= 0 )
@@ -3077,7 +3130,7 @@ profiler_mark(PROFILER_INPUT);
 				value = (INT32)(current * info->scaleneg);
 			value += port->default_value;
 
-			/* store croshair position before any graycode conversion */
+			/* store croshair position before any remapping */
 			info->crosshair_pos = (INT32)value & (port->mask >> info->shift);
 
 			/* remap the value if needed */

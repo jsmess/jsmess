@@ -18,7 +18,7 @@ WRITE8_HANDLER( cchasm_snd_io_w );
 WRITE16_HANDLER( cchasm_io_w );
 READ16_HANDLER( cchasm_io_r );
 
-void *cchasm_sh_start(int clock, const struct CustomSound_interface *config);
+SOUND_START( cchasm );
 
 
 /*----------- defined in video/cchasm.c -----------*/

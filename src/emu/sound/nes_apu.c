@@ -60,11 +60,11 @@ struct nesapu_info
 {
 	apu_t   APU;			       /* Actual APUs */
 	float   apu_incsize;           /* Adjustment increment */
-	uint16  samps_per_sync;        /* Number of samples per vsync */
-	uint16  buffer_size;           /* Actual buffer size in bytes */
-	uint16  real_rate;             /* Actual playback rate */
+	uint32  samps_per_sync;        /* Number of samples per vsync */
+	uint32  buffer_size;           /* Actual buffer size in bytes */
+	uint32  real_rate;             /* Actual playback rate */
 	uint8   noise_lut[NOISE_LONG]; /* Noise sample lookup table */
-	uint16  vbl_times[0x20];       /* VBL durations in samples */
+	uint32  vbl_times[0x20];       /* VBL durations in samples */
 	uint32  sync_times1[SYNCS_MAX1]; /* Samples per sync table */
 	uint32  sync_times2[SYNCS_MAX2]; /* Samples per sync table */
 	sound_stream *stream;
@@ -74,7 +74,7 @@ struct nesapu_info
 /* INTERNAL FUNCTIONS */
 
 /* INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE */
-static void create_vbltimes(uint16 * table,const uint8 *vbl,unsigned int rate)
+static void create_vbltimes(uint32 * table,const uint8 *vbl,unsigned int rate)
 {
   int i;
 
@@ -669,16 +669,17 @@ static void *nesapu_start(int sndindex, int clock, const void *config)
 {
 	const struct NESinterface *intf = config;
 	struct nesapu_info *info;
+	int rate = clock / 4;
 	int i;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	/* Initialize global variables */
-	info->samps_per_sync = Machine->sample_rate / Machine->screen[0].refresh;
+	info->samps_per_sync = rate / Machine->screen[0].refresh;
 	info->buffer_size = info->samps_per_sync;
 	info->real_rate = info->samps_per_sync * Machine->screen[0].refresh;
-	info->apu_incsize = (float) (N2A03_DEFAULTCLOCK / (float) info->real_rate);
+	info->apu_incsize = (float) (clock / (float) info->real_rate);
 
 	/* Use initializer calls */
 	create_noise(info->noise_lut, 13, NOISE_LONG);
@@ -691,7 +692,7 @@ static void *nesapu_start(int sndindex, int clock, const void *config)
 	/* Initialize individual chips */
 	(info->APU.dpcm).cpu_mem=memory_region(intf->region);
 
-	info->stream = stream_create(0, 1, Machine->sample_rate, info, NESPSG_update_sound);
+	info->stream = stream_create(0, 1, rate, info, NESPSG_update_sound);
 
 	/* register for save */
 	for (i = 0; i < 2; i++)

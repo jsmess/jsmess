@@ -7,7 +7,6 @@
 #define VERBOSE 0
 
 #define NEW_LFO 0
-#define NEW_SHOOT 1
 
 #define XTAL		18432000
 
@@ -48,10 +47,8 @@ static void *noisetimer = 0;
 static INT32 noisevolume;
 static INT16 *noisewave;
 static INT16 *shootwave;
-#if NEW_SHOOT
 static INT32 shoot_length;
 static INT32 shoot_rate;
-#endif
 
 static UINT8 last_port2=0;
 
@@ -156,11 +153,7 @@ WRITE8_HANDLER( galaxian_shoot_enable_w )
 {
 	if( data & 1 && !(last_port2 & 1) )
 	{
-#if NEW_SHOOT
 		sample_start_raw(CHANNEL_SHOOT, shootwave, shoot_length, shoot_rate, 0);
-#else
-		sample_start_raw(CHANNEL_SHOOT, shootwave, SHOOT_LENGTH, 10*SHOOT_RATE, 0);
-#endif
 		sample_set_volume(CHANNEL_SHOOT,SHOOT_VOLUME);
 	}
 	last_port2=data;
@@ -179,14 +172,10 @@ static void galaxian_sh_start(void)
 
 	noisewave = auto_malloc(NOISE_LENGTH * sizeof(INT16));
 
-#if NEW_SHOOT
 #define SHOOT_SEC 2
 	shoot_rate = Machine->sample_rate;
 	shoot_length = SHOOT_SEC * shoot_rate;
 	shootwave = auto_malloc(shoot_length * sizeof(INT16));
-#else
-	shootwave = auto_malloc(SHOOT_LENGTH * sizeof(INT16));
-#endif
 
 	/*
      * The RNG shifter is clocked with RNG_RATE, bit 17 is
@@ -208,8 +197,6 @@ static void galaxian_sh_start(void)
 		}
 		noisewave[i] = ((generator >> 17) & 1) ? NOISE_AMPLITUDE : -NOISE_AMPLITUDE;
 	}
-
-#if NEW_SHOOT
 
 	/* dummy */
 	sweep = 100;
@@ -299,49 +286,6 @@ static void galaxian_sh_start(void)
 				IC8L3=IC8L3_H;
 		}
 	}
-#else
-	/*
-     * Ra is 10k, Rb is 22k, C is 0.01uF
-     * charge time t1 = 0.693 * (Ra + Rb) * C -> 221.76us
-     * discharge time t2 = 0.693 * (Rb) *  C -> 152.46us
-     * average period 374.22us -> 2672Hz
-     * I use an array of 10 values to define some points
-     * of the charge/discharge curve. The wave is modulated
-     * using the charge/discharge timing of C28, a 47uF capacitor,
-     * over a 2k2 resistor. This will change the frequency from
-     * approx. Favg-Favg/3 up to Favg+Favg/3 down to Favg-Favg/3 again.
-     */
-	sweep = 100;
-	charge = +2;
-	countdown = sweep / 2;
-	for( i = 0, j = 0; i < SHOOT_LENGTH; i++ )
-	{
-		#define AMP(n)	(n)*0x8000/100-0x8000
-		static const int charge_discharge[10] = {
-			AMP( 0), AMP(25), AMP(45), AMP(60), AMP(70), AMP(85),
-			AMP(70), AMP(50), AMP(25), AMP( 0)
-		};
-		shootwave[i] = charge_discharge[j];
-		LOG(("shoot[%5d] $%04x (sweep: %3d, j:%d)\n", i, shootwave[i] & 0xffff, sweep, j));
-		/*
-         * The current sweep and a 2200/10000 fraction (R45 and R48)
-         * of the noise are frequency modulating the NE555 chip.
-         */
-		countdown -= sweep + noisewave[i % NOISE_LENGTH] / (2200*NOISE_AMPLITUDE/10000);
-		while( countdown < 0 )
-		{
-			countdown += 100;
-			j = ++j % 10;
-		}
-		/* sweep from 100 to 133 and down to 66 over the time of SHOOT_LENGTH */
-		if( i % (SHOOT_LENGTH / 33 / 3 ) == 0 )
-		{
-			sweep += charge;
-			if( sweep >= 133 )
-				charge = -1;
-		}
-	}
-#endif
 
 	memset(tonewave, 0, sizeof(tonewave));
 

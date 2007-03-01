@@ -240,6 +240,10 @@ void streams_init(running_machine *machine, subseconds_t update_subseconds)
 
 	/* set the global pointer */
 	machine->streams_data = strdata;
+
+	/* register global states */
+	state_save_register_global(strdata->last_update.seconds);
+	state_save_register_global(strdata->last_update.subseconds);
 }
 
 
@@ -312,9 +316,24 @@ void streams_update(running_machine *machine)
 	for (stream = strdata->stream_head; stream != NULL; stream = stream->next)
 		if (stream->new_sample_rate != 0)
 		{
+			UINT32 old_rate = stream->sample_rate;
+			int outputnum;
+
+			/* update to the new rate and remember the old rate */
 			stream->sample_rate = stream->new_sample_rate;
 			stream->new_sample_rate = 0;
+
+			/* recompute all the data */
 			recompute_sample_rate_data(strdata, stream);
+
+			/* reset our sample indexes to the current time */
+			stream->output_sampindex = (INT64)stream->output_sampindex * (INT64)stream->sample_rate / old_rate;
+			stream->output_update_sampindex = (INT64)stream->output_update_sampindex * (INT64)stream->sample_rate / old_rate;
+			stream->output_base_sampindex = stream->output_sampindex - stream->max_samples_per_update;
+
+			/* clear out the buffer */
+			for (outputnum = 0; outputnum < stream->outputs; outputnum++)
+				memset(stream->output[outputnum].buffer, 0, stream->max_samples_per_update * sizeof(stream->output[outputnum].buffer[0]));
 		}
 }
 
@@ -458,6 +477,8 @@ void stream_update(sound_stream *stream)
 	INT32 update_sampindex = time_to_sampindex(strdata, stream, mame_timer_get_time());
 
 	/* generate samples to get us up to the appropriate time */
+	assert(stream->output_sampindex - stream->output_base_sampindex >= 0);
+	assert(update_sampindex - stream->output_base_sampindex < stream->output_bufalloc);
 	generate_samples(stream, update_sampindex - stream->output_sampindex);
 
 	/* remember this info for next time */
@@ -572,8 +593,21 @@ const stream_sample_t *stream_get_output_since_last_update(sound_stream *stream,
 
 static void stream_postload(void *param)
 {
+	streams_private *strdata = Machine->streams_data;
 	sound_stream *stream = param;
-	recompute_sample_rate_data(Machine->streams_data, stream);
+	int outputnum;
+
+	/* recompute the same rate information */
+	recompute_sample_rate_data(strdata, stream);
+
+	/* make sure our output buffers are fully cleared */
+	for (outputnum = 0; outputnum < stream->outputs; outputnum++)
+		memset(stream->output[outputnum].buffer, 0, stream->output_bufalloc * sizeof(stream->output[outputnum].buffer[0]));
+
+	/* recompute the sample indexes to make sense */
+	stream->output_sampindex = strdata->last_update.subseconds / stream->subseconds_per_sample;
+	stream->output_update_sampindex = stream->output_sampindex;
+	stream->output_base_sampindex = stream->output_sampindex - stream->max_samples_per_update;
 }
 
 

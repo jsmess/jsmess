@@ -733,14 +733,15 @@ void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sample_t**
 static void *msm5232_start(int sndindex, int clock, const void *config)
 {
 	const struct MSM5232interface *intf = config;
+	int rate = clock/16;
 	MSM5232 *chip;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	msm5232_init(chip, intf, clock, Machine->sample_rate);
+	msm5232_init(chip, intf, clock, rate);
 
-	chip->stream = stream_create(0,2,Machine->sample_rate,chip,MSM5232_update_one);
+	chip->stream = stream_create(0,2,rate,chip,MSM5232_update_one);
 	return chip;
 }
 

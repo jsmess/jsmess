@@ -10,6 +10,7 @@
 #include "machine/z80ctc.h"
 #include "cchasm.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 
 static int sound_flags;
 
@@ -127,7 +128,6 @@ READ16_HANDLER( cchasm_io_r )
 	}
 }
 
-static sound_stream * channel[2];
 static int channel_active[2];
 static int output[2];
 
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( ctc_timer_1_w )
     {
         output[0] ^= 0x7f;
         channel_active[0] = 1;
-        stream_update(channel[0]);
+        DAC_data_w(0, output[0]);
     }
 }
 
@@ -154,7 +154,7 @@ static WRITE8_HANDLER( ctc_timer_2_w )
     {
         output[1] ^= 0x7f;
         channel_active[1] = 1;
-        stream_update(channel[1]);
+        DAC_data_w(1, output[0]);
     }
 }
 
@@ -168,39 +168,23 @@ static z80ctc_interface ctc_intf =
 	ctc_timer_2_w      /* ZC/TO2 callback */
 };
 
-static void tone_update(void *param,stream_sample_t **inputs, stream_sample_t **outputs, int length)
-{
-	stream_sample_t *buffer = outputs[0];
-	int num = (int)param;
-	INT16 out = 0;
-
-	if (channel_active[num])
-		out = output[num] << 8;
-
-	while (length--) *(buffer++) = out;
-	channel_active[num] = 0;
-}
-
 void cchasm_sh_update(int param)
 {
     if ((input_port_3_r (0) & 0x70) != 0x70)
         z80ctc_0_trg0_w (0, 1);
 }
 
-void *cchasm_sh_start(int clock, const struct CustomSound_interface *config)
+SOUND_START( cchasm )
 {
     sound_flags = 0;
     output[0] = 0; output[1] = 0;
-
-    channel[0] = stream_create(0, 1, Machine->sample_rate, (void *)0, tone_update);
-    channel[1] = stream_create(0, 1, Machine->sample_rate, (void *)1, tone_update);
 
 	ctc_intf.baseclock = Machine->drv->cpu[1].cpu_clock;
 	z80ctc_init (0, &ctc_intf);
 
 	timer_pulse(TIME_IN_HZ(Machine->screen[0].refresh), 0, cchasm_sh_update);
 
-	return auto_malloc(1);
+	return 0;
 }
 
 

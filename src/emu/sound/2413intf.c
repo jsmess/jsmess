@@ -50,13 +50,11 @@ static void _stream_update(void *param, int interval)
 
 static void *ym2413_start(int sndindex, int clock, const void *config)
 {
-	int rate = Machine->sample_rate;
+	int rate = clock/72;
 	struct ym2413_info *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
-
-	rate = clock/72;
 
 	/* emulator create */
 	info->chip = YM2413Init(clock, rate);
@@ -87,7 +85,7 @@ static void *ym2413_start(int sndindex, int clock, const void *config)
 	{
 		ym2413_reset (i);
 
-		ym2413[i].DAC_stream = stream_create(0, 1, Machine->sample_rate, i, YM2413DAC_update);
+		ym2413[i].DAC_stream = stream_create(0, 1, clock/72, i, YM2413DAC_update);
 
 		if (ym2413[i].DAC_stream == -1)
 			return 1;

@@ -71,15 +71,13 @@ static void _stream_update(void *param, int interval)
 static void *ymf262_start(int sndindex, int clock, const void *config)
 {
 	static const struct YMF262interface dummy = { 0 };
-	int rate = Machine->sample_rate;
 	struct ymf262_info *info;
+	int rate = clock/288;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
-
-	rate = clock/288;
 
 	/* stream system initialize */
 	info->chip = YMF262Init(clock,rate);

@@ -15,6 +15,10 @@
 #include "sound/beep.h"
 #include "streams.h"
 
+
+#define BEEP_RATE			48000
+
+
 struct beep_sound
 {
 	sound_stream *stream; 	/* stream number */
@@ -37,7 +41,7 @@ static void beep_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 	struct beep_sound *bs = (struct beep_sound *) param;
 	stream_sample_t *buffer = _buffer[0];
 	INT16 signal = bs->signal;
-	int clock = 0, rate = Machine->sample_rate / 2;
+	int clock = 0, rate = BEEP_RATE / 2;
 
     /* get progress through wave */
 	int incr = bs->incr;
@@ -46,7 +50,7 @@ static void beep_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 		clock = bs->frequency;
 
 	/* if we're not enabled, just fill with 0 */
-	if ( !bs->enable || Machine->sample_rate == 0 || clock == 0 )
+	if ( !bs->enable || clock == 0 )
 	{
 		memset( buffer, 0, length * sizeof(*buffer) );
 		return;
@@ -84,7 +88,7 @@ static void *beep_start(int sndindex, int clock, const void *config)
 	pBeep = auto_malloc(sizeof(*pBeep));
 	memset(pBeep, 0, sizeof(*pBeep));
 
-	pBeep->stream = stream_create(0, 1, Machine->sample_rate, pBeep, beep_sound_update );
+	pBeep->stream = stream_create(0, 1, BEEP_RATE, pBeep, beep_sound_update );
 	pBeep->enable = 0;
 	pBeep->frequency = 3250;
 	pBeep->incr = 0;

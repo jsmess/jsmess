@@ -23,6 +23,8 @@ D0  explosion enable        gates a noise generator
 #include "bzone.h"
 #include "sound/custom.h"
 
+#define OUTPUT_RATE (6000*4)
+
 
 /* Statics */
 static INT16 *discharge = NULL;
@@ -79,7 +81,7 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 		{
 			int clock;
 
-			poly_counter += Machine->sample_rate;
+			poly_counter += OUTPUT_RATE;
 			if( ((poly_shift & 0x0008) == 0) == ((poly_shift & 0x4000) == 0) )
 				poly_shift = (poly_shift << 1) | 1;
 			else
@@ -123,8 +125,8 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 				explosion_amp_counter -= (int)(32767 / (0.23*4));
 				if( explosion_amp_counter < 0 )
 				{
-					int n = (-explosion_amp_counter / Machine->sample_rate) + 1;
-					explosion_amp_counter += n * Machine->sample_rate;
+					int n = (-explosion_amp_counter / OUTPUT_RATE) + 1;
+					explosion_amp_counter += n * OUTPUT_RATE;
 					if( (explosion_amp -= n) < 0 )
 						explosion_amp = 0;
 				}
@@ -156,8 +158,8 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 				shell_amp_counter -= (int)(32767 / (0.1081*4));
 				if( shell_amp_counter < 0 )
 				{
-					int n = (-shell_amp_counter / Machine->sample_rate) + 1;
-					shell_amp_counter += n * Machine->sample_rate;
+					int n = (-shell_amp_counter / OUTPUT_RATE) + 1;
+					shell_amp_counter += n * OUTPUT_RATE;
 					if( (shell_amp -= n) < 0 )
 						shell_amp = 0;
 				}
@@ -192,14 +194,14 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 				motor_rate_counter -= (int)((240 - 184) / 0.25);
 				while( motor_rate_counter <= 0 )
 				{
-					motor_rate_counter += Machine->sample_rate;
+					motor_rate_counter += OUTPUT_RATE;
 					motor_rate += (motor_rate < motor_rate_new) ? +1 : -1;
 				}
 			}
 			motor_counter -= motor_rate;
 			while( motor_counter <= 0 )
 			{
-				motor_counter += Machine->sample_rate;
+				motor_counter += OUTPUT_RATE;
 
 				r0 = 1.0/1e12;
 				r1 = 1.0/1e12;
@@ -243,8 +245,8 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 				motor_amp_counter -= motor_amp_step;
 				if( motor_amp_counter < 0 )
 				{
-					int n = (-motor_amp_counter / Machine->sample_rate) + 1;
-					motor_amp_counter += n * Machine->sample_rate;
+					int n = (-motor_amp_counter / OUTPUT_RATE) + 1;
+					motor_amp_counter += n * OUTPUT_RATE;
 					if( motor_amp > motor_amp_new )
 					{
 						motor_amp -= n;
@@ -277,7 +279,7 @@ void *bzone_sh_start(int clock, const struct CustomSound_interface *config)
     for( i = 0; i < 0x8000; i++ )
 		discharge[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	channel = stream_create(0, 1, Machine->sample_rate, 0, bzone_sound_update);
+	channel = stream_create(0, 1, OUTPUT_RATE, 0, bzone_sound_update);
 
     return auto_malloc(1);
 }

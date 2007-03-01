@@ -111,13 +111,12 @@ static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long 
 	signed short sample, nextsample;
 	signed short noisebuf;
 	UINT16 noisecnt;
-	float pbase = (float)info->sample_rate_base / (float)Machine->sample_rate;
 	INT32 frequency, delta, offset, cnt, flag;
 	UINT32 bank;
 	UINT32 pos;
 
 	frequency = info->c352_ch[ch].pitch;
-	delta=(long)((float)frequency * pbase);
+	delta=frequency;
 
 	pos = info->c352_ch[ch].current_addr;	// sample pointer
 	offset = info->c352_ch[ch].pos;	// 16.16 fixed-point offset into the sample
@@ -575,9 +574,9 @@ static void *c352_start(int sndindex, int clock, const void *config)
 	info->c352_rom_samples = memory_region(intf->region);
 	info->c352_region = intf->region;
 
-	info->stream = stream_create(0, 4, Machine->sample_rate, info, c352_update);
-
 	info->sample_rate_base = clock / 192;
+
+	info->stream = stream_create(0, 4, info->sample_rate_base, info, c352_update);
 
 	c352_init(info, sndindex);
 

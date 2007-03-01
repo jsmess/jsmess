@@ -67,7 +67,7 @@ bitmap_t *bitmap_alloc_custom(int width, int height, bitmap_format format, void 
 		return NULL;
 
 	/* round the width to a multiple of 8 and add some padding */
-	rowpixels = (width + BITMAP_SAFETY + 7) & ~7;
+	rowpixels = (width + 2 * BITMAP_SAFETY + 7) & ~7;
 
 	/* allocate memory */
 	allocbytes = sizeof(*bitmap) + rowpixels * (height + 2 * BITMAP_SAFETY) * bpp / 8;
@@ -78,13 +78,16 @@ bitmap_t *bitmap_alloc_custom(int width, int height, bitmap_format format, void 
 	if (bitmap == NULL)
 		return NULL;
 
+	/* clear to 0 by default */
+	memset(bitmap, 0, allocbytes);
+
 	/* fill in the data */
 	bitmap->format = format;
 	bitmap->width = width;
 	bitmap->height = height;
 	bitmap->bpp = bpp;
 	bitmap->rowpixels = rowpixels;
-	bitmap->base = (UINT8 *)bitmap + sizeof(*bitmap) + rowpixels * BITMAP_SAFETY + bpp * BITMAP_SAFETY;
+	bitmap->base = (UINT8 *)bitmap + sizeof(*bitmap) + rowpixels * BITMAP_SAFETY + (bpp / 8) * BITMAP_SAFETY;
 
 	return bitmap;
 }
@@ -158,6 +161,10 @@ void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 	/* if we have a cliprect, intersect with that */
 	if (cliprect != NULL)
 		sect_rect(&fill, cliprect);
+
+	/* early out if nothing to do */
+	if (fill.min_x > fill.max_x || fill.min_y > fill.max_y)
+		return;
 
 	/* based on the bpp go from there */
 	switch (dest->bpp)

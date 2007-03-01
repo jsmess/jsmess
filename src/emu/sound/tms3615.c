@@ -11,7 +11,7 @@ static int divisor[TONES] = { 478, 451, 426, 402, 379, 358, 338, 319, 301, 284, 
 
 struct TMS3615 {
 	sound_stream *channel;	/* returned by stream_create() */
-	int samplerate; 		/* from Machine->sample_rate */
+	int samplerate; 		/* output sample rate */
 	int basefreq;			/* chip's base frequency */
 	int counter8[TONES];	/* tone frequency counter for 8' */
 	int counter16[TONES];	/* tone frequency counter for 16'*/
@@ -84,8 +84,8 @@ static void *tms3615_start(int sndindex, int clock, const void *config)
 	tms = auto_malloc(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
-	tms->channel = stream_create(0, 2, Machine->sample_rate, tms, tms3615_sound_update);
-	tms->samplerate = Machine->sample_rate;
+	tms->channel = stream_create(0, 2, clock/8, tms, tms3615_sound_update);
+	tms->samplerate = clock/8;
 	tms->basefreq = clock;
 
     return tms;

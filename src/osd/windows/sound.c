@@ -103,6 +103,10 @@ int winsound_init(running_machine *machine)
 	sound_log = fopen("sound.log", "w");
 #endif
 
+	// if no sound, don't create anything
+	if (!options_get_bool("sound"))
+		return 0;
+
 	// ensure we get called on the way out
 	add_exit_callback(machine, sound_exit);
 
@@ -205,6 +209,10 @@ void osd_update_audio_stream(INT16 *buffer, int samples_this_frame)
 	DWORD play_position, write_position;
 	HRESULT result;
 
+	// if no sound, there is no buffer
+	if (stream_buffer == NULL)
+		return;
+
 	// determine the current play position
 	result = IDirectSoundBuffer_GetCurrentPosition(stream_buffer, &play_position, &write_position);
 	if (result == DS_OK)
@@ -266,7 +274,7 @@ void osd_set_mastervolume(int _attenuation)
 
 	// set the master volume
 	if (stream_buffer != NULL)
-		IDirectSoundBuffer_SetVolume(stream_buffer, attenuation * 100);
+		IDirectSoundBuffer_SetVolume(stream_buffer, (attenuation == -32) ? DSBVOLUME_MIN : attenuation * 100);
 }
 
 

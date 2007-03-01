@@ -115,21 +115,21 @@ WRITE8_HANDLER( stratvox_sn76477_w )
     /***************************************************************
      * AY8910 output bits are connected to...
      * 7    - direct: 5V * 30k/(100+30k) = 1.15V - via DAC??
-     * 6    - SN76477 mixer a
-     * 5    - SN76477 mixer b
-     * 4    - SN76477 mixer c
-     * 3    - SN76477 envelope 1
-     * 2    - SN76477 envelope 2
+     * 6    - SN76477 mixer C
+     * 5    - SN76477 mixer B
+     * 4    - SN76477 mixer A
+     * 3    - SN76477 envelope 2
+     * 2    - SN76477 envelope 1
      * 1    - SN76477 vco
      * 0    - SN76477 enable
      ***************************************************************/
-    SN76477_enable_w(0, data & 1);
+    SN76477_enable_w(0, (data >> 0) & 1);
     SN76477_vco_w(0, (data >> 1) & 1);
-	SN76477_envelope_2_w(0, (data >> 2) & 1);
-	SN76477_envelope_1_w(0, (data >> 3) & 1);
-    SN76477_mixer_c_w(0, (data >> 4) & 1);
+	SN76477_envelope_1_w(0, (data >> 2) & 1);
+	SN76477_envelope_2_w(0, (data >> 3) & 1);
+    SN76477_mixer_a_w(0, (data >> 4) & 1);
     SN76477_mixer_b_w(0, (data >> 5) & 1);
-    SN76477_mixer_a_w(0, (data >> 6) & 1);
+    SN76477_mixer_c_w(0, (data >> 6) & 1);
 }
 
 /***************************************************************************

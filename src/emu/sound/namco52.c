@@ -132,6 +132,7 @@ static void namco_52xx_reset(void *_chip)
 static void *namco_52xx_start(int sndindex, int clock, const void *config)
 {
 	struct namco_52xx *chip;
+	int rate = clock/32;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
@@ -143,17 +144,17 @@ static void *namco_52xx_start(int sndindex, int clock, const void *config)
 	if (chip->intf->play_rate == 0)
 	{
 		/* If play clock is 0 (grounded) then default to internal clock */
-		chip->n52_step = (double)clock / 384 / Machine->sample_rate;
+		chip->n52_step = (double)clock / 384 / rate;
 	}
 	else
 	{
-		chip->n52_step = chip->intf->play_rate / Machine->sample_rate;
+		chip->n52_step = chip->intf->play_rate / rate;
 	}
 	filter2_setup(FILTER_HIGHPASS, chip->intf->hp_filt_fc, Q_TO_DAMP(chip->intf->hp_filt_q), 1, &chip->n52_hp_filter);
 	filter2_setup(FILTER_LOWPASS,  chip->intf->lp_filt_fc, Q_TO_DAMP(chip->intf->lp_filt_q), chip->intf->filt_gain, &chip->n52_lp_filter);
 
 
-	chip->stream = stream_create(0, 1, Machine->sample_rate, chip, namco_52xx_stream_update_one);
+	chip->stream = stream_create(0, 1, rate, chip, namco_52xx_stream_update_one);
 
 	namco_52xx_reset(chip);
 

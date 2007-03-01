@@ -45,6 +45,7 @@ struct dsd_555_mstbl_context
 {
 	int		error;
 	int		trig_is_logic;
+	int		trig_discharges_cap;
 	int		output_type;
 	int		output_is_ac;
 	double	ac_shift;				// DC shift needed to make waveform ac
@@ -400,8 +401,6 @@ void dsd_555_mstbl_step(node_description *node)
 	double vC;	// Current voltage on capacitor, before dt
 	double vCnext = 0;	// Voltage on capacitor, after dt
 
-	int trigger;
-
 	if(DSD_555_MSTBL__RESET || context->error)
 	{
 		/* We are in RESET */
@@ -412,14 +411,21 @@ void dsd_555_mstbl_step(node_description *node)
 	}
 	else
 	{
-		trigger = (context->trig_is_logic && !DSD_555_MSTBL__TRIGGER) ||
-						(!context->trig_is_logic && (DSD_555_MSTBL__TRIGGER < context->trigger));
+		int trigger;
+
+		if (context->trig_is_logic)
+			trigger = !DSD_555_MSTBL__TRIGGER;
+		else
+			trigger = DSD_555_MSTBL__TRIGGER < context->trigger;
+
+		if (context->trig_discharges_cap && trigger)
+			context->cap_voltage = 0;
 
 		if (!context->flip_flop)
 		{
 			/* Wait for trigger */
 			if (trigger)
-			context->flip_flop = 1;
+				context->flip_flop = 1;
 		}
 		else
 		{
@@ -497,6 +503,7 @@ void dsd_555_mstbl_reset(node_description *node)
 	context->error = test_555(context->threshold, context->trigger, info->v555, node->node);
 
 	context->trig_is_logic = (info->options & DISC_555_TRIGGER_IS_VOLTAGE) ? 0: 1;
+	context->trig_discharges_cap = (info->options & DISC_555_TRIGGER_DISCHARGES_CAP) ? 1: 0;
 
 	context->flip_flop = 0;
 	context->cap_voltage = 0;

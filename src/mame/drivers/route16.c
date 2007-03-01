@@ -381,22 +381,29 @@ static struct AY8910interface ay8910_interface =
 
 static struct SN76477interface sn76477_interface =
 {
-	RES_K( 47)   ,		/*  4  noise_res         */
-	RES_K(150)   ,		/*  5  filter_res        */
-	CAP_U(0.001) ,		/*  6  filter_cap        */
-	RES_M(3.3)   ,		/*  7  decay_res         */
-	CAP_U(1.0)   ,		/*  8  attack_decay_cap  */
-	RES_K(4.7)   ,		/* 10  attack_res        */
-	RES_K(200)   ,		/* 11  amplitude_res     */
-	RES_K( 55)   ,		/* 12  feedback_res      */
-	5.0*2/(2+10) ,		/* 16  vco_voltage       */
-	CAP_U(0.022) ,		/* 17  vco_cap           */
-	RES_K(100)   ,		/* 18  vco_res           */
-	5.0		   ,		/* 19  pitch_voltage     */
-	RES_K( 75)   ,		/* 20  slf_res           */
-	CAP_U(1.0)   ,		/* 21  slf_cap           */
-	CAP_U(2.2)   ,		/* 23  oneshot_cap       */
-	RES_K(4.7)   		/* 24  oneshot_res       */
+	RES_K(47),		/*  4  noise_res                    */
+	RES_K(150),		/*  5  filter_res                   */
+	CAP_U(0.001),	/*  6  filter_cap                   */
+	RES_M(3.3),		/*  7  decay_res                    */
+	CAP_U(1),		/*  8  attack_decay_cap             */
+	RES_K(4.7),		/* 10  attack_res                   */
+	RES_K(200),		/* 11  amplitude_res                */
+	RES_K(55),		/* 12  feedback_res (5k + 100k pot) */
+	5.0*2/(2+10),	/* 16  vco_voltage                  */
+	CAP_U(0.022),	/* 17  vco_cap                      */
+	RES_K(100),		/* 18  vco_res                      */
+	5.0,			/* 19  pitch_voltage                */
+	RES_K(75),		/* 20  slf_res                      */
+	CAP_U(1.0),		/* 21  slf_cap                      */
+	CAP_U(2.2),		/* 23  oneshot_cap                  */
+	RES_K(4.7),		/* 24  oneshot_res                  */
+	0,			    /* 22  vco (variable)               */
+	0,			    /* 26  mixer A (variable)           */
+	0,			    /* 25  mixer B (variable)           */
+	0,			    /* 27  mixer C (variable)           */
+	0,			    /* 1   envelope 1 (variable)        */
+	0,			    /* 28  envelope 2 (variable)        */
+	1			    /* 9   enable (variable)            */
 };
 
 

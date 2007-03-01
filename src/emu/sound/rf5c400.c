@@ -10,8 +10,6 @@
 #include "rf5c400.h"
 #include <math.h>
 
-#define CLOCK (44100 * 384)	// = 16.9344 MHz
-
 struct rf5c400_info
 {
 	const struct RF5C400interface *intf;
@@ -154,7 +152,7 @@ static void rf5c400_update(void *param, stream_sample_t **inputs, stream_sample_
 	}
 }
 
-static void rf5c400_init_chip(struct rf5c400_info *info, int sndindex)
+static void rf5c400_init_chip(struct rf5c400_info *info, int sndindex, int clock)
 {
 	int i;
 
@@ -173,7 +171,7 @@ static void rf5c400_init_chip(struct rf5c400_info *info, int sndindex)
 		}
 	}
 
-	info->stream = stream_create(0, 2, Machine->sample_rate, info, rf5c400_update);
+	info->stream = stream_create(0, 2, clock/384, info, rf5c400_update);
 }
 
 
@@ -186,7 +184,7 @@ static void *rf5c400_start(int sndindex, int clock, const void *config)
 
 	info->intf = config;
 
-	rf5c400_init_chip(info, sndindex);
+	rf5c400_init_chip(info, sndindex, clock);
 
 	return info;
 }
@@ -275,10 +273,7 @@ static void rf5c400_w(int chipnum, int offset, UINT16 data)
 			}
 			case 0x02:		// sample playing frequency
 			{
-				double frequency = (double)(CLOCK/384) / 8;
-				int multiple = 1 << (data >> 13);
-				double rate = ((double)(data & 0x1fff) / 2048.0) * (double)multiple;
-				channel->step = (UINT64)((((double)(frequency) * rate) / (double)(Machine->sample_rate)) * 65536.0);
+				channel->step = ((data & 0x1fff) << (data >> 13)) * 4;
 				channel->freq = data;
 				break;
 			}

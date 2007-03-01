@@ -16,6 +16,10 @@ susume     Susume! Taisen Puzzle-Dama   ZV610          GV027   JAPAN 1.20   96.0
 btchamp    Beat the Champ               GV999          GV053   UAA01        ?
 kdeadeye   Dead Eye                     GV999          GV054   UA01         ?
 weddingr   Wedding Rhapsody             ?              GX624   JAA          97.05.29   9:12
+tokimosh   Tokimeki Memorial Oshiete    ?              GE755   JAA          97.08.06  11:52
+           Your Heart
+tokimosp   Tokimeki Memorial Oshiete    ?              GE756   JAB          97.09.27   9:10
+           Your Heart Seal version PLUS
 nagano98   Winter Olypmics in Nagano 98 GV999          GX720   EAA01 1.03   98.01.08  10:45
 simpbowl   Simpsons Bowling             ?              GQ829   UAA          ?
 
@@ -647,6 +651,40 @@ INPUT_PORTS_START( btchamp )
 	PORT_BIT( 0x7ff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+/* Tokimeki Memorial games - have a mouse and printer and who knows what else */
+
+static READ32_HANDLER( tokimeki_serial_r )
+{
+	// bits checked: 0x80 and 0x20 for periodic status (800b6968 and 800b69e0 in tokimosh)
+	// 0x08 for reading the serial device (8005e624)
+
+	return 0xffffffff;
+}
+
+static WRITE32_HANDLER( tokimeki_serial_w )
+{
+	/*
+        serial EEPROM-like device here: when mem_mask == 0xffffff00 only,
+
+        0x40 = chip enable
+        0x20 = clock
+        0x10 = data
+
+        tokimosh sends 6 bits: 110100 then reads 8 bits.
+        readback is bit 3 (0x08) of serial_r
+        This happens starting around 8005e580.
+    */
+
+}
+
+static DRIVER_INIT( tokimosh )
+{
+	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f680083, 0, 0, tokimeki_serial_r );
+	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f680090, 0x1f680093, 0, 0, tokimeki_serial_w );
+
+	init_konamigv(machine);
+}
+
 /*
 Dead Eye
 
@@ -822,6 +860,26 @@ ROM_START( nagano98 )
 	DISK_IMAGE_READONLY( "nagano98", 0, MD5(cbedbd2953b70f214e72179b2cc0dcd8) SHA1(21d14864cdd34c6e052f3577f8d805dce49fcab6) )
 ROM_END
 
+ROM_START( tokimosh )
+	GV_BIOS
+
+	ROM_REGION( 0x0000080, REGION_USER2, 0 ) /* default eeprom */
+        ROM_LOAD( "tokimosh.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "755jaa01", 0, MD5(221a0e871de10b50947c8fcd8820eafa) SHA1(d633937885b6f7c1615a9aa97f79cfc1f817c955) )
+ROM_END
+
+ROM_START( tokimosp )
+	GV_BIOS
+
+	ROM_REGION( 0x0000080, REGION_USER2, 0 ) /* default eeprom */
+	ROM_LOAD( "tokimosp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "756jab01", 0, MD5(3c814208a8d9aafdb4989369f4222dba) SHA1(3766e0750484cd5d9da0c570aee4639300da5399) )
+ROM_END
+
 /* BIOS placeholder */
 GAME( 1995, konamigv, 0, konamigv, konamigv, konamigv, ROT0, "Konami", "Baby Phoenix/GV System", NOT_A_DRIVER )
 
@@ -831,5 +889,8 @@ GAME( 1996, susume,   konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "S
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  btchamp,  ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, kdeadeye, ROT0, "Konami", "Dead Eye (GV054 UA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, weddingr, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, tokimosh, konamigv, konamigv, konamigv, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1997, tokimosp, konamigv, konamigv, konamigv, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+

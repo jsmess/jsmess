@@ -81,15 +81,13 @@ static void _stream_update_3812(void * param, int interval)
 static void *ym3812_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM3812interface dummy = { 0 };
-	int rate = Machine->sample_rate;
 	struct ym3812_info *info;
+	int rate = clock/72;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
-
-	rate = clock/72;
 
 	/* stream system initialize */
 	info->chip = YM3812Init(sndindex,clock,rate);
@@ -252,15 +250,13 @@ static void _stream_update_3526(void *param, int interval)
 static void *ym3526_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM3526interface dummy = { 0 };
-	int rate = Machine->sample_rate;
 	struct ym3526_info *info;
+	int rate = clock/72;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
-
-	rate = clock/72;
 
 	/* stream system initialize */
 	info->chip = YM3526Init(sndindex,clock,rate);
@@ -449,16 +445,14 @@ static void _stream_update_8950(void *param, int interval)
 static void *y8950_start(int sndindex, int clock, const void *config)
 {
 	static const struct Y8950interface dummy = { 0 };
-	int rate = Machine->sample_rate;
 	struct y8950_info *info;
+	int rate = clock/72;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
 	info->index = sndindex;
-
-	rate = clock/72;
 
 	/* stream system initialize */
 	info->chip = Y8950Init(sndindex,clock,rate);

@@ -521,7 +521,6 @@ void *tia_sound_init(int clock, int sample_rate, int gain)
     chip->Samp_n_cnt = chip->Samp_n_max;                     /* initialize all bits of the sample counter */
 
 	if (chip->Samp_n_max < 256) /* we need to use oversampling for sample_rate > clock_rate */
-	                      /* at the Machine->sample_rate for now */
 	{
     	chip->Samp_n_max = ((UINT16)(UINT32)sample_rate << 8) / clock;
 		chip->Samp_n_cnt = chip->Samp_n_max;

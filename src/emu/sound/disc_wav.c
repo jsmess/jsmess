@@ -501,34 +501,40 @@ void dss_noise_step(node_description *node)
 	if(DSS_NOISE__ENABLE)
 	{
 		/* Only sample noise on rollover to next cycle */
-		if(context->phase>(2.0*M_PI))
+		if(context->phase > (2.0*M_PI))
 		{
-			int newval=rand() & 0x7fff;
-			node->output=DSS_NOISE__AMP*(1-(newval/16384.0));
+			/* GCC's rand returns a RAND_MAX value of 0x7fff */
+			int newval = (rand() & 0x7fff) - 16384;
+
+			/* make sure the peak to peak values are the amplitude */
+			node->output = DSS_NOISE__AMP / 2;
+			if (newval > 0)
+				node->output *= ((double)newval / 16383);
+			else
+				node->output *= ((double)newval / 16384);
 
 			/* Add DC Bias component */
-			node->output=node->output+DSS_NOISE__BIAS;
+			node->output += DSS_NOISE__BIAS;
 		}
 	}
 	else
 	{
-		node->output=0;
+		node->output = 0;
 	}
 
-	/* Work out the phase step based on phase/freq & sample rate */
-	/* The enable input only curtails output, phase rotation     */
-	/* still occurs                                              */
-	/*     phase step = 2Pi/(output period/sample period)        */
-	/*                    boils out to                           */
-	/*     phase step = (2Pi*output freq)/sample freq)           */
-	/* Also keep the new phasor in the 2Pi range.                */
-	context->phase=fmod((context->phase+((2.0*M_PI*DSS_NOISE__FREQ)/discrete_current_context->sample_rate)),2.0*M_PI);
+	/* Keep the new phasor in the 2Pi range.*/
+	context->phase = fmod(context->phase, 2.0*M_PI);
+
+	/* The enable input only curtails output, phase rotation still occurs. */
+	/* We allow the phase to exceed 2Pi here, so we can tell when to sample the noise. */
+	context->phase += ((2.0*M_PI * DSS_NOISE__FREQ) / discrete_current_context->sample_rate);
 }
 
 
 void dss_noise_reset(node_description *node)
 {
 	struct dss_noise_context *context = node->context;
+
 	context->phase=0;
 	dss_noise_step(node);
 }

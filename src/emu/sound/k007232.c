@@ -323,7 +323,7 @@ static void *k007232_start(int sndindex, int clock, const void *config)
 
       for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-      info->stream = stream_create(0,2,Machine->sample_rate,info,KDAC_A_update);
+      info->stream = stream_create(0,2,(INT64)7850 * (INT64)clock / 4000000,info,KDAC_A_update);
 
   KDAC_A_make_fncode(info);
 
@@ -370,11 +370,7 @@ static void K007232_WriteReg( int r, int v, int chip )
 	logerror("%04x\n" ,data );
 #endif
 
-      info->step[reg_port] =
-	( (7850.0 / (float)Machine->sample_rate) ) *
-	info->fncode[data] *
-	( (float)info->clock / (float)4000000 ) *
-	(1<<BASE_SHIFT);
+      info->step[reg_port] = info->fncode[data] * (1<<BASE_SHIFT);
       break;
 
     case 0x02:

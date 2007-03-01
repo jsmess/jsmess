@@ -152,17 +152,6 @@ MACHINE_START( cchasm )
 	return 0;
 }
 
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
-
-static struct CustomSound_interface custom_interface =
-{
-	cchasm_sh_start
-};
-
 
 
 /*************************************
@@ -210,6 +199,8 @@ static MACHINE_DRIVER_START( cchasm )
 	MDRV_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
+	MDRV_SOUND_START(cchasm)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(AY8910, 1818182)
@@ -218,8 +209,10 @@ static MACHINE_DRIVER_START( cchasm )
 	MDRV_SOUND_ADD(AY8910, 1818182)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

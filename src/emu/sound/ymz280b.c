@@ -692,7 +692,7 @@ static void *ymz280b_start(int sndindex, int clock, const void *config)
 	state_save_register_func_postload_ptr(YMZ280B_state_save_update_step, chip);
 
 #if MAKE_WAVS
-	chip->wavresample = wav_open("resamp.wav", Machine->sample_rate, 2);
+	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);
 #endif
 
 	/* success */

@@ -396,7 +396,7 @@ WRITE8_HANDLER( zzzap_sh_port_2_w )
 
 static const discrete_555_desc maze_555_F2 =
 {
-	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
+	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC | DISC_555_TRIGGER_DISCHARGES_CAP,
 	5,				/* B+ voltage of 555 */
 	DEFAULT_555_VALUES
 };
@@ -430,15 +430,16 @@ static const discrete_comp_adder_table maze_r303_309 =
 static const discrete_op_amp_osc_info maze_op_amp_osc =
 {
 	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON,	/* type */
-	RES_M(1),			/* r306 */
-	RES_K(430),			/* r307 */
-	MAZE_R305_306_308,	/* r304, r305, r308 switchable circuit */
-	MAZE_R303_309,		/* r303, r309 switchable circuit */
-	RES_K(330),			/* r310 */
+	RES_M(1),			/* R306 */
+	RES_K(430),			/* R307 */
+	MAZE_R305_306_308,	/* R304, R305, R308 switchable circuit */
+	MAZE_R303_309,		/* R303, R309 switchable circuit */
+	RES_K(330),			/* R310 */
 	0, 0, 0,			/* not used */
-	CAP_P(3300),		/* c300 */
+	CAP_P(3300),		/* C300 */
 	5					/* vP */
 };
+
 
 static DISCRETE_SOUND_START(maze_discrete_interface)
 
@@ -451,6 +452,11 @@ static DISCRETE_SOUND_START(maze_discrete_interface)
 	DISCRETE_INPUT_LOGIC(MAZE_COIN)
 	DISCRETE_INPUT_LOGIC(MAZE_JOYSTICK_IN_USE)	/* IC D2, pin 8 */
 
+	/* The following circuits control when audio is heard. */
+	/* Basically there is sound for 30s after a coin is inserted. */
+	/* This time is extended whenever a control is pressed. */
+	/* After the 30s has expired, there is no sound until the next coin is inserted. */
+	/* There is also sound for the first 30s after power up even without a coin. */
 	DISCRETE_LOGIC_INVERT(NODE_20,				/* IC E2, pin 8 */
 					1,							/* ENAB */
 					MAZE_JOYSTICK_IN_USE)		/* IN0 */
@@ -476,6 +482,7 @@ static DISCRETE_SOUND_START(maze_discrete_interface)
 					MAZE_TONE_ENABLE,			/* INP1 */
 					MAZE_TONE_TIMING)			/* INP2 */
 
+	/* The following circuits use the control info to generate a tone. */
 	DISCRETE_LOGIC_JKFLIPFLOP(MAZE_PLAYER_SEL,	/* IC C1, pin 3 */
 					1,							/* ENAB */
 					1,							/* RESET */
@@ -493,35 +500,47 @@ static DISCRETE_SOUND_START(maze_discrete_interface)
 					NODE_31,					/* ADDR */
 					16,							/* SIZE */
 					&maze_74147_table)
-	DISCRETE_COMP_ADDER(MAZE_R305_306_308,		/* value of selected parallel circuit r305, r306, r308 */
+	DISCRETE_COMP_ADDER(MAZE_R305_306_308,		/* value of selected parallel circuit R305, R306, R308 */
 					1,							/* ENAB */
 					NODE_32,					/* DATA */
 					&maze_r305_306_308)
-	DISCRETE_COMP_ADDER(MAZE_R303_309,			/* value of selected parallel circuit r303, r309 */
+	DISCRETE_COMP_ADDER(MAZE_R303_309,			/* value of selected parallel circuit R303, R309 */
 					1,							/* ENAB */
 					MAZE_PLAYER_SEL,			/* DATA */
 					&maze_r303_309)
 	DISCRETE_OP_AMP_OSCILLATOR(NODE_36,			/* IC J1, pin 4 */
-					1,					/* ENAB */
+					1,							/* ENAB */
 					&maze_op_amp_osc)
 
-	DISCRETE_CRFILTER(NODE_40,
-					NODE_21,					/* ENAB */
+	/* The following circuits remove DC poping noises when the tone is switched in/out. */
+	DISCRETE_CRFILTER_VREF(NODE_40,
+					1,							/* ENAB */
 					NODE_36,					/* IN0 */
-					RES_K(250),					/* r311, r312, r402, r403 in parallel */
-					CAP_U(0.01)	)				/* c401 */
-	DISCRETE_RCFILTER(NODE_41,
-					1		,					/* ENAB */
-					NODE_40,					/* IN0 */
-					RES_K(56),					/* r404 */
-					CAP_P(4700)	)				/* c400 */
+					RES_K(250),					/* R311, R312, R402, R403 in parallel */
+					CAP_U(0.1),					/* c301 */
+					2.5)						/* center voltage of R311, R312 */
+	DISCRETE_SWITCH(NODE_41,					/* IC H3, pin 10 */
+					1,							/* ENAB */
+					NODE_21,					/* switch */
+					2.5,						/* INP0 - center voltage of R402, R403 */
+					NODE_40)					/* INP1 */
+	DISCRETE_CRFILTER(NODE_42,
+					1,							/* ENAB */
+					NODE_41,					/* IN0 */
+					RES_K(56 + 390),			/* R404 + R405 */
+					CAP_P(0.01)	)				/* C401 */
+	DISCRETE_RCFILTER(NODE_43,
+					1,							/* ENAB */
+					NODE_42,					/* IN0 */
+					RES_K(56),					/* R404 */
+					CAP_P(4700)	)				/* C400 */
 	DISCRETE_SWITCH(MAZE_SND,					/* H3 saturates op-amp J3 when enabled, disabling audio */
 					1,							/* ENAB */
 					MAZE_AUDIO_ENABLE,			/* SWITCH */
-					NODE_41,					/* INP0 */
+					NODE_43,					/* INP0 */
 					0)							/* INP1 */
 
-	DISCRETE_OUTPUT(MAZE_SND, 36040)
+	DISCRETE_OUTPUT(MAZE_SND, 1081000)
 DISCRETE_SOUND_END
 
 
@@ -536,15 +555,18 @@ MACHINE_DRIVER_END
 void maze_write_discrete(UINT8 maze_tone_timing_state)
 {
 	/* controls need to be active low */
-	int controls = ~readinputport(0) &0xff;
+	int controls = ~readinputport(0) & 0xff;
 
 	discrete_sound_w(MAZE_TONE_TIMING, maze_tone_timing_state);
 	discrete_sound_w(MAZE_P1_DATA, controls & 0x0f);
 	discrete_sound_w(MAZE_P2_DATA, (controls >> 4) & 0x0f);
 	discrete_sound_w(MAZE_JOYSTICK_IN_USE, controls != 0xff);
 
-	/* the coin line is connected directly to the discrete circuit */
-	/* we can't really do that, so updating it with the tone timing is close enough */
+	/* The coin line is connected directly to the discrete circuit. */
+	/* We can't really do that, so updating it with the tone timing is close enough. */
+	/* A better option might be to update it at vblank or set a timer to do it. */
+	/* The only noticeable difference doing it here, is that the controls don't */
+	/* imediately start making tones if pressed right after the coin is inserted. */
 	discrete_sound_w(MAZE_COIN, (~readinputport(1) >> 3) & 0x01);
 }
 
@@ -722,7 +744,7 @@ static DISCRETE_SOUND_START(boothill_discrete_interface)
 	/* The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways.
        This will give the control more apparent volume range.
        The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(BOOTHILL_MUSIC_ADJ, 1, RES_M(1), 75000, DISC_LOGADJ, 3)
+	DISCRETE_ADJUSTMENT_TAG(BOOTHILL_MUSIC_ADJ, 1, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Tone generator
@@ -802,22 +824,216 @@ WRITE8_HANDLER( boothill_sh_port_w )
  *************************************/
 
 
+/* nodes - inputs */
+#define CHECKMAT_BOOM_EN			NODE_01
+#define CHECKMAT_TONE_EN			NODE_02
+#define CHECKMAT_TONE_DATA_45		NODE_03
+#define CHECKMAT_TONE_DATA_67		NODE_04
+
+/* nodes - other */
+#define CHECKMAT_R401_402_400		NODE_06
+#define CHECKMAT_R407_406_410		NODE_07
+
+/* nodes - sounds */
+#define CHECKMAT_BOOM_SND			NODE_10
+#define CHECKMAT_TONE_SND			NODE_11
+#define CHECKMAT_FINAL_SND			NODE_12
+
+/* nodes - adjusters */
+#define CHECKMAT_R309				NODE_15
+#define CHECKMAT_R411				NODE_16
+
+
+static const discrete_comp_adder_table checkmat_r401_402_400 =
+{
+	DISC_COMP_P_RESISTOR,	/* type of circuit */
+	RES_K(100),				/* R401 */
+	2,						/* length */
+	{ RES_M(1.5),			/* R402 */
+	  RES_K(820) }			/* R400 */
+};
+
+
+static const discrete_comp_adder_table checkmat_r407_406_410 =
+{
+	DISC_COMP_P_RESISTOR,	/* type of circuit */
+	RES_K(330),				/* R407 */
+	2,						/* length */
+	{ RES_M(1),				/* R406 */
+	  RES_K(510) }			/* R410 */
+};
+
+
+static const discrete_op_amp_osc_info checkmat_op_amp_osc =
+{
+	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON,	/* type */
+	RES_M(1),				/* R403 */
+	RES_K(430),				/* R405 */
+	CHECKMAT_R401_402_400,	/* R401, R402, R400 switchable circuit */
+	CHECKMAT_R407_406_410,	/* R407, R406, R410 switchable circuit */
+	RES_K(330),				/* R404 */
+	0, 0, 0,				/* not used */
+	CAP_P(3300),			/* C400 */
+	5						/* vP */
+};
+
+
+static const discrete_op_amp_tvca_info checkmat_op_amp_tvca =
+{
+	RES_M(1.2),	/* R302 */
+	RES_M(1),	/* R305 */
+	0,			/* r3 - not used */
+	RES_M(1.2),	/* R304 */
+	RES_K(1),	/* M4 */
+	0,			/* r6 - not used */
+	RES_M(1),	/* R303 */
+	0,			/* r8 - not used */
+	0,			/* r9 - not used */
+	0,			/* r10 - not used */
+	0,			/* r11 - not used */
+	CAP_U(1),	/* C300 */
+	0,			/* c2 - not used */
+	0,			/* c3 - not used */
+	5,			/* vP */
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,	/* f0 - not used */
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,	/* f1 - not used */
+	DISC_OP_AMP_TRIGGER_FUNCTION_TRG0,	/* f2 */
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,	/* f3 - not used */
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,	/* f4 - not used */
+	DISC_OP_AMP_TRIGGER_FUNCTION_NONE,	/* f5 - not used */
+};
+
+
+static const discrete_mixer_desc checkmat_mixer =
+{
+	DISC_MIXER_IS_OP_AMP,	/* type */
+	{ RES_K(100),		/* R308 - VERIFY - can't read schematic */
+	  RES_K(56 + 47) },	/* R412 + R408 */
+	{ CHECKMAT_R309,	/* R309 */
+	  CHECKMAT_R411},	/* R411 */
+	{ CAP_U(10),		/* C305 */
+	  CAP_U(0.01) },	/* C401 */
+	0,					/* rI - not used */
+	RES_K(100),			/* R507 */
+	0,					/* cF - not used */
+	CAP_U(1),			/* C505 */
+	0,					/* vRef - GND */
+	1					/* gain */
+};
+
+static DISCRETE_SOUND_START(checkmat_discrete_interface)
+
+	/************************************************
+     * Input register mapping
+     ************************************************/
+	DISCRETE_INPUT_LOGIC(CHECKMAT_BOOM_EN)
+	DISCRETE_INPUT_LOGIC(CHECKMAT_TONE_EN)
+	DISCRETE_INPUT_DATA (CHECKMAT_TONE_DATA_45)
+	DISCRETE_INPUT_DATA (CHECKMAT_TONE_DATA_67)
+
+	/* The low value of the resistors are tweaked to give a good volume range. */
+	/* This is needed because the original controls are infinite, but the UI only gives 100 steps. */
+	/* Also real variable resistors never hit 0 ohms.  There is always some resistance. */
+	/* R309 mostly just increases the Boom clipping, making it sound bassier. */
+	DISCRETE_ADJUSTMENT_TAG(CHECKMAT_R309, 1, RES_K(100), 1000, DISC_LOGADJ, "R309")
+	DISCRETE_ADJUSTMENT_TAG(CHECKMAT_R411, 1, RES_M(1), 1000, DISC_LOGADJ, "R411")
+
+	/************************************************
+     * Boom Sound
+     *
+     * The zener diode noise source is hard to
+     * emulate.  Guess for now.
+     ************************************************/
+	/* FIX - find noise freq and amplitude */
+	DISCRETE_NOISE(NODE_20,
+					1,							/* ENAB */
+					2500,						/* FREQ */
+					4,							/* AMP */
+					4.0/2)						/* BIAS */
+	DISCRETE_OP_AMP_TRIG_VCA(NODE_21,
+					CHECKMAT_BOOM_EN,			/* TRG0 */
+					0,							/* TRG1 - not used */
+					0,							/* TRG2 - not used */
+					NODE_20,					/* IN0 */
+					0,							/* IN1 - not used */
+					&checkmat_op_amp_tvca)		/* INFO */
+	/* FIX - find noise filter freq */
+	DISCRETE_FILTER1(CHECKMAT_BOOM_SND,			/* IC Q2/3, pin 10 */
+					1,							/* ENAB */
+					NODE_21,					/* INP0 */
+					750,						/* FREQ */
+					DISC_FILTER_LOWPASS)		/* TYPE */
+
+	/************************************************
+     * Tone generator
+     ************************************************/
+	DISCRETE_COMP_ADDER(CHECKMAT_R401_402_400,	/* value of selected parallel circuit R401, R402, R400 */
+					1,							/* ENAB */
+					CHECKMAT_TONE_DATA_45,		/* DATA */
+					&checkmat_r401_402_400)
+	DISCRETE_COMP_ADDER(CHECKMAT_R407_406_410,	/* value of selected parallel circuit R407, R406, R410 */
+					1,							/* ENAB */
+					CHECKMAT_TONE_DATA_67,		/* DATA */
+					&checkmat_r407_406_410)
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_30,			/* IC N3/4, pin 4 */
+					1,							/* ENAB */
+					&checkmat_op_amp_osc)
+
+	/* The following circuits remove DC poping noises when the tone is switched in/out. */
+	DISCRETE_CRFILTER_VREF(NODE_31,
+					1,							/* ENAB */
+					NODE_30,					/* IN0 */
+					RES_K(250),					/* R409, R415, R414, R413 in parallel */
+					CAP_U(0.1),					/* c401 */
+					2.5)						/* center voltage of R409, R415 */
+	DISCRETE_SWITCH(NODE_32,					/* IC R3/4, pin 9 */
+					1,							/* ENAB */
+					CHECKMAT_TONE_EN,			/* switch */
+					2.5,						/* INP0 - center voltage of R413, R414 */
+					NODE_31)					/* INP1 */
+	DISCRETE_CRFILTER(NODE_33,
+					1,							/* ENAB */
+					NODE_32,					/* IN0 */
+					RES_K(56 + 47 + 200),		/* R412 + R408 + part of R411 */
+					CAP_P(0.01)	)				/* C404 */
+	DISCRETE_RCFILTER(CHECKMAT_TONE_SND,
+					1,							/* ENAB */
+					NODE_33,					/* IN0 */
+					RES_K(56),					/* R412 */
+					CAP_P(4700)	)				/* C403 */
+
+	/************************************************
+     * Final mix and output
+     ************************************************/
+	DISCRETE_MIXER2(CHECKMAT_FINAL_SND,
+					1,			/* ENAB */
+					CHECKMAT_BOOM_SND,			/* IN0 */
+					CHECKMAT_TONE_SND,			/* IN1 */
+					&checkmat_mixer)
+	DISCRETE_OUTPUT(CHECKMAT_FINAL_SND, 550000)
+DISCRETE_SOUND_END
+
+
 MACHINE_DRIVER_START( checkmat_sound )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_CONFIG(checkmat_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
 WRITE8_HANDLER( checkmat_sh_port_w )
 {
-	/* if (data & 0x01)  enable TONE */
+	discrete_sound_w(CHECKMAT_TONE_EN, data & 0x01);
 
-	/* if (data & 0x02)  enable BOOM sound */
+	discrete_sound_w(CHECKMAT_BOOM_EN, (data >> 1) & 0x01);
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
 	sound_global_enable((data >> 3) & 0x01);
 
-	/* D4-D7  set TONE FREQ( (data >> 4) & 0x0f ) */
+	discrete_sound_w(CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
+	discrete_sound_w(CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
 }
 
 
@@ -998,7 +1214,7 @@ static DISCRETE_SOUND_START(desertgu_discrete_interface)
 	/* The low value of the pot is set to 75000.  A real 1M pot will never go to 0 anyways. */
 	/* This will give the control more apparent volume range. */
 	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(DESERTGU_MUSIC_ADJ, 1, RES_M(1), 75000, DISC_LOGADJ, 3)
+	DISCRETE_ADJUSTMENT_TAG(DESERTGU_MUSIC_ADJ, 1, RES_M(1), 75000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Tone generator
@@ -1260,7 +1476,7 @@ static DISCRETE_SOUND_START(dplay_discrete_interface)
 	/* The low value of the pot is set to 1000.  A real 1M pot will never go to 0 anyways. */
 	/* This will give the control more apparent volume range. */
 	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(DPLAY_MUSIC_ADJ, 1, RES_M(1), 1000, DISC_LOGADJ, 3)
+	DISCRETE_ADJUSTMENT_TAG(DPLAY_MUSIC_ADJ, 1, RES_M(1), 1000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Music and Tone Generator
@@ -1686,7 +1902,7 @@ static DISCRETE_SOUND_START(clowns_discrete_interface)
 	/* The low value of the pot is set to 1000.  A real 1M pot will never go to 0 anyways. */
 	/* This will give the control more apparent volume range. */
 	/* The music way overpowers the rest of the sounds anyways. */
-	DISCRETE_ADJUSTMENT(CLOWNS_MUSIC_ADJ, 1, RES_M(1), 1000, DISC_LOGADJ, 3)
+	DISCRETE_ADJUSTMENT_TAG(CLOWNS_MUSIC_ADJ, 1, RES_M(1), 1000, DISC_LOGADJ, "MUSIC_ADJ")
 
 	/************************************************
      * Tone generator

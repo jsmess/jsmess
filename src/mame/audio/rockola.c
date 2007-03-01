@@ -25,7 +25,7 @@ extern WRITE8_HANDLER( rockola_flipscreen_w );
 #define TONE_VOLUME	50
 #define CHANNELS	3
 
-#define SAMPLE_RATE	(Machine->sample_rate)
+#define SAMPLE_RATE	(48000)
 #define FRAC_BITS	16
 #define FRAC_ONE	(1 << FRAC_BITS)
 #define FRAC_MASK	(FRAC_ONE - 1)

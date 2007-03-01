@@ -52,7 +52,6 @@ struct SN76496
 {
 	sound_stream * Channel;
 	int SampleRate;
-	unsigned int UpdateStep;
 	int VolTable[16];	/* volume table         */
 	INT32 Register[8];	/* registers */
 	INT32 LastRegister;	/* last register written */
@@ -87,8 +86,8 @@ static void SN76496Write(int chip,int data)
 			case 0:	/* tone 0 : frequency */
 			case 2:	/* tone 1 : frequency */
 			case 4:	/* tone 2 : frequency */
-				R->Period[c] = R->UpdateStep * R->Register[r];
-				if (R->Period[c] == 0) R->Period[c] = R->UpdateStep;
+				R->Period[c] = STEP * R->Register[r];
+				if (R->Period[c] == 0) R->Period[c] = STEP;
 				if (r == 4)
 				{
 					/* update noise shift frequency */
@@ -108,7 +107,7 @@ static void SN76496Write(int chip,int data)
 					R->NoiseFB = (n & 4) ? FB_WNOISE : FB_PNOISE;
 					n &= 3;
 					/* N/512,N/1024,N/2048,Tone #3 output */
-					R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (R->UpdateStep << (5+(n&3)));
+					R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (STEP << (5+(n&3)));
 
 					/* reset noise shifter */
 					R->RNG = NG_PRESET;
@@ -128,8 +127,8 @@ static void SN76496Write(int chip,int data)
 			case 2:	/* tone 1 : frequency */
 			case 4:	/* tone 2 : frequency */
 				R->Register[r] = (R->Register[r] & 0x0f) | ((data & 0x3f) << 4);
-				R->Period[c] = R->UpdateStep * R->Register[r];
-				if (R->Period[c] == 0) R->Period[c] = R->UpdateStep;
+				R->Period[c] = STEP * R->Register[r];
+				if (R->Period[c] == 0) R->Period[c] = STEP;
 				if (r == 4)
 				{
 					/* update noise shift frequency */
@@ -151,7 +150,7 @@ static void SN76496Write(int chip,int data)
 					R->NoiseFB = (n & 4) ? FB_WNOISE : FB_PNOISE;
 					n &= 3;
 					/* N/512,N/1024,N/2048,Tone #3 output */
-					R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (R->UpdateStep << (5+(n&3)));
+					R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (STEP << (5+(n&3)));
 
 					/* reset noise shifter */
 					R->RNG = NG_PRESET;
@@ -264,21 +263,6 @@ static void SN76496Update(void *param,stream_sample_t **inputs, stream_sample_t 
 
 
 
-static void SN76496_set_clock(struct SN76496 *R,int clock)
-{
-
-
-	/* the base clock for the tone generators is the chip clock divided by 16; */
-	/* for the noise generator, it is clock / 256. */
-	/* Here we calculate the number of steps which happen during one sample */
-	/* at the given sample rate. No. of events = sample rate / (clock/16). */
-	/* STEP is a multiplier used to turn the fraction into a fixed point */
-	/* number. */
-	R->UpdateStep = ((double)STEP * R->SampleRate * 16) / clock;
-}
-
-
-
 static void SN76496_set_gain(struct SN76496 *R,int gain)
 {
 	int i;
@@ -306,16 +290,14 @@ static void SN76496_set_gain(struct SN76496 *R,int gain)
 
 
 
-static int SN76496_init(struct SN76496 *R,int sndindex,int clock,int sample_rate)
+static int SN76496_init(struct SN76496 *R,int sndindex,int clock)
 {
+	int sample_rate = clock/16;
 	int i;
-
-	sample_rate = clock/16;
 
 	R->Channel = stream_create(0,1, sample_rate,R,SN76496Update);
 
 	R->SampleRate = sample_rate;
-	SN76496_set_clock(R,clock);
 
 	for (i = 0;i < 4;i++) R->Volume[i] = 0;
 
@@ -329,7 +311,7 @@ static int SN76496_init(struct SN76496 *R,int sndindex,int clock,int sample_rate
 	for (i = 0;i < 4;i++)
 	{
 		R->Output[i] = 0;
-		R->Period[i] = R->Count[i] = R->UpdateStep;
+		R->Period[i] = R->Count[i] = STEP;
 	}
 	R->RNG = NG_PRESET;
 	R->Output[3] = R->RNG & 1;
@@ -346,7 +328,7 @@ static void *sn76496_start(int sndindex, int clock, const void *config)
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	if (SN76496_init(chip,sndindex,clock,Machine->sample_rate) != 0)
+	if (SN76496_init(chip,sndindex,clock) != 0)
 		return NULL;
 	SN76496_set_gain(chip, 0);
 

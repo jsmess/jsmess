@@ -407,7 +407,7 @@ SelectWaveAndPlayNote(struct namcona *chip, struct sequence *pSequence, int chan
 	struct voice *pVoice = &chip->mVoice[pSequence->channel[chan]];
 	int bank = 0x20000 + pVoice->bank*0x20000;
 	int addr = ReadMetaDataWord(chip,4)+10*data;
-	float pbase = (float)SAMPLE_RATE_BASE / (float)Machine->sample_rate;
+	float pbase = (float)SAMPLE_RATE_BASE / (float)chip->mSampleRate;
 	INT32 frequency;
 
 	pVoice->flags    = ReadMetaDataWord(chip,addr+0*2);

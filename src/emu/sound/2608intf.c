@@ -124,7 +124,7 @@ static void *ym2608_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM2608interface generic_2608 = { 0 };
 	const struct YM2608interface *intf = config ? config : &generic_2608;
-	int rate = Machine->sample_rate;
+	int rate = clock/72;
 	void *pcmbufa;
 	int  pcmsizea;
 

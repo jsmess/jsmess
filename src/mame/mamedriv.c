@@ -2780,6 +2780,8 @@ V-V                           TP-027
 	DRIVER( susume )	/* GV027, Japan 1.20 */
 	DRIVER( btchamp )	/* GV053, UAA01 */
 	DRIVER( weddingr )	/* GX624, JAA */
+	DRIVER( tokimosh )	/* GE755, JAA */
+	DRIVER( tokimosp )	/* GE756, JAB */
 	DRIVER( nagano98 )	/* GX720, EAA */
 	DRIVER( simpbowl )	/* GQ829, UAA */
 

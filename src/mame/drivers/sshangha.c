@@ -272,14 +272,12 @@ INPUT_PORTS_START( sshangha )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 #if SSHANGHA_HACK
 	PORT_DIPNAME( 0x20, 0x20, "Debug Mode" )
-#else
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )		// See notes
-#endif
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+#else
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                   // See notes
+#endif
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x08, 0x08, "Tile Animation" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
@@ -440,5 +438,5 @@ static DRIVER_INIT( sshangha )
 }
 
 
-GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",   "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAME( 1992, sshangha, 0,        sshangha, sshangha, sshangha, ROT0, "Hot-B.",  "Super Shanghai Dragon's Eye (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
 GAME( 1992, sshanghb, sshangha, sshangha, sshangha, sshangha, ROT0, "bootleg", "Super Shanghai Dragon's Eye (World, bootleg)", GAME_NO_SOUND )

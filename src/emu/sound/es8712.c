@@ -20,10 +20,6 @@
 
 #define MAX_SAMPLE_CHUNK	10000
 
-#define FRAC_BITS			14
-#define FRAC_ONE			(1 << FRAC_BITS)
-#define FRAC_MASK			(FRAC_ONE - 1)
-
 
 /* struct describing a playing ADPCM chip */
 struct es8712
@@ -36,11 +32,6 @@ struct es8712
 
 	UINT32 signal;			/* current ADPCM signal */
 	UINT32 step;			/* current ADPCM step */
-
-	INT16 last_sample;		/* last sample output */
-	INT16 curr_sample;		/* current sample target */
-	UINT32 source_step;		/* step value for frequency conversion */
-	UINT32 source_pos;		/* current fractional position */
 
 	UINT32 start;			/* starting address for the next loop */
 	UINT32 end;				/* ending address for the next loop */
@@ -109,7 +100,7 @@ static void compute_tables(void)
 
 ***********************************************************************************************/
 
-static void generate_adpcm(struct es8712 *chip, INT16 *buffer, int samples)
+static void generate_adpcm(struct es8712 *chip, stream_sample_t *buffer, int samples)
 {
 	/* if this chip is active */
 	if (chip->playing)
@@ -182,70 +173,11 @@ static void generate_adpcm(struct es8712 *chip, INT16 *buffer, int samples)
 
 static void es8712_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
+	stream_sample_t *buffer = outputs[0];
 	struct es8712 *chip = param;
 
-	INT16 sample_data[MAX_SAMPLE_CHUNK], *curr_data = sample_data;
-	INT16 prev = chip->last_sample, curr = chip->curr_sample;
-	UINT32 final_pos;
-	UINT32 new_samples;
-	stream_sample_t *buffer = outputs[0];
-	int length = samples;
-
-	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
-
-
-	/* finish off the current sample */
-	if (chip->source_pos > 0)
-	{
-		/* interpolate */
-		while (length > 0 && chip->source_pos < FRAC_ONE)
-		{
-			*buffer++ += (((INT32)prev * (INT32)(FRAC_ONE - chip->source_pos)) + ((INT32)curr * (INT32)chip->source_pos)) >> FRAC_BITS;
-			chip->source_pos += chip->source_step;
-			length--;
-		}
-
-		/* if we're over, continue; otherwise, we're done */
-		if (chip->source_pos >= FRAC_ONE)
-			chip->source_pos -= FRAC_ONE;
-		else
-			return;
-	}
-
-	/* compute how many new samples we need */
-	final_pos = chip->source_pos + length * chip->source_step;
-	new_samples = (final_pos + FRAC_ONE - 1) >> FRAC_BITS;
-	if (new_samples > MAX_SAMPLE_CHUNK)
-		new_samples = MAX_SAMPLE_CHUNK;
-
 	/* generate them into our buffer */
-	generate_adpcm(chip, sample_data, new_samples);
-	prev = curr;
-	curr = *curr_data++;
-
-	/* then sample-rate convert with linear interpolation */
-	while (length > 0)
-	{
-		/* interpolate */
-		while (length > 0 && chip->source_pos < FRAC_ONE)
-		{
-			*buffer++ += (((INT32)prev * (INT32)(FRAC_ONE - chip->source_pos)) + ((INT32)curr * (INT32)chip->source_pos)) >> FRAC_BITS;
-			chip->source_pos += chip->source_step;
-			length--;
-		}
-
-		/* if we're over, grab the next samples */
-		if (chip->source_pos >= FRAC_ONE)
-		{
-			chip->source_pos -= FRAC_ONE;
-			prev = curr;
-			curr = *curr_data++;
-		}
-	}
-
-	/* remember the last samples */
-	chip->last_sample = prev;
-	chip->curr_sample = curr;
+	generate_adpcm(chip, buffer, samples);
 }
 
 
@@ -270,10 +202,6 @@ static void es8712_state_save_register(struct es8712 *chip, int sndindex)
 	state_save_register_item(buf, sndindex, chip->signal);
 	state_save_register_item(buf, sndindex, chip->step);
 
-	state_save_register_item(buf, sndindex, chip->last_sample);
-	state_save_register_item(buf, sndindex, chip->curr_sample);
-	state_save_register_item(buf, sndindex, chip->source_step);
-	state_save_register_item(buf, sndindex, chip->source_pos);
 	state_save_register_item(buf, sndindex, chip->base_offset);
 
 	state_save_register_item(buf, sndindex, chip->start);
@@ -307,11 +235,10 @@ static void *es8712_start(int sndindex, int clock, const void *config)
 	chip->region_base = memory_region(intf->region);
 
 	/* generate the name and create the stream */
-	chip->stream = stream_create(0, 1, Machine->sample_rate, chip, es8712_update);
+	chip->stream = stream_create(0, 1, clock, chip, es8712_update);
 
 	/* initialize the rest of the structure */
 	chip->signal = -2;
-	chip->source_step = (UINT32)((double)clock * (double)FRAC_ONE / (double)Machine->sample_rate);
 
 	es8712_state_save_register(chip, sndindex);
 
@@ -367,8 +294,7 @@ void ES8712_set_frequency(int which, int frequency)
 
 	/* update the stream and set the new base */
 	stream_update(chip->stream);
-
-	chip->source_step = (UINT32)((double)frequency * (double)FRAC_ONE / (double)Machine->sample_rate);
+	stream_set_sample_rate(chip->stream, frequency);
 }
 
 

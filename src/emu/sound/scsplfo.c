@@ -130,7 +130,7 @@ INLINE signed int ALFO_Step(struct _LFO *LFO)
 
 void LFO_ComputeStep(struct _LFO *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFOS,int ALFO)
 {
-    float step=(float) LFOFreq[LFOF]*256.0/(float)Machine->sample_rate;
+    float step=(float) LFOFreq[LFOF]*256.0/(float)44100;
     LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
     if(ALFO)
     {

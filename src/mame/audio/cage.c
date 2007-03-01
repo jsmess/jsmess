@@ -336,7 +336,7 @@ static void update_serial(void)
 	/* and times the number of bits per sample */
 	serial_time_per_word = bit_clock * 8.0 * (double)(((tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1);
 
-	/* compute the step value to stretch this to the Machine->sample_rate */
+	/* compute the step value to stretch this to the sample_rate */
 	dmadac_set_frequency(0, DAC_BUFFER_CHANNELS, 1.0 / (serial_time_per_word * DAC_BUFFER_CHANNELS));
 	dmadac_enable(0, DAC_BUFFER_CHANNELS, 1);
 }

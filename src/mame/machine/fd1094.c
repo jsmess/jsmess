@@ -110,33 +110,35 @@ at addresses $1000-$1FFF is always set to 1.
 
 Even more interesting, however, is that analyzing the low 6 bits of the key
 data reveals that a simple linear congruential generator has been used
-consistently to generate the key bits. The LCG is of the standard form:
+consistently to generate the key bits. The LCG is of the form:
 
-   val' = A * val + B
+    temp = A * val;
+    val' = temp + (temp << 16);
 
-and it appears to be calculated to at least 18 bits. In all cases seen so far,
-the value of 'A' is fixed at $10029, and the value of 'B' is selected to be one
-of four values: $1A019, $3E023, $52005, or $7600F. To generate the low 6 bits
-of the key, the result of the LCG is shifted a variable number of bits. This
-shift is generally a right shift of between 8 and 13 bits, though in one
-special case (317-0053), it is a left shift of 4 bits, filling the bottom 4
-bits with a fixed value of $D.
+and it appears to be calculated to at least 22 bits. In all cases seen so far,
+the value of 'A' is fixed at $29. To generate the low 6 bits of the key, the
+result of the LCG is shifted right 16 bits and inverted.
 
 The following pseudo-code will generate 7 of the 8 bits of the key data
 successfully for all known keys, given the values of the 'shift' and 'B'
 parameters, as well as an initial 'seed' for the generator:
 
-void genkey(int shift, UINT32 seed, UINT32 bindex, UINT8 *output)
+void genkey(UINT32 seed, UINT8 *output)
 {
     static const UINT32 bvals[] = { 0x1A019, 0x3E023, 0x52005, 0x7600F };
     int bytenum;
 
     for (bytenum = 4; bytenum < 8192; bytenum++)
     {
-        UINT8 byteval = (((seed << 4) | 0x0d) >> (shift + 4)) & 0x3f;
+        UINT8 byteval;
+
+        seed = seed * 0x29;
+        seed += seed << 16;
+
+        byteval = (~seed >> 16) & 0x3f;
         byteval |= (bytenum < 0x1000) ? 0x80 : 0x40;
+
         output[bytenum] = byteval;
-        seed = seed * 0x10029 + bvals[bindex];
     }
 }
 
@@ -155,90 +157,91 @@ byte in question would be incorrectly blanked.
 summary of global keys:
 -----------------------
 
-          global01 global02 global03 LCGseed LCGb LCGsh
-          -------- -------- -------- ------- ---- -----
+          global01 global02 global03 LCGseed
+          -------- -------- -------- -------
           .....    ..       ..
-0049      10101000 11110101 11100011  $25C52   2    13
-0050      10101000 11110101 11100011  $25C52   2    13
-0053      11111111 11111111 11111111  $00002   3    -4
-0056      10101111 11111110 11101000  $17EE3   2    11
-0058-02C  10101111 11110101 11111000  $63520   2    13
-0058-03B  10101111 11110100 11100110  $5B3AE   3    13
-0058-03C  10101111 11110100 11100100  $07EDC   2    13
-0058-04B  11111100 11100100 11110001  $0A2FA   3    11
-0058-04D  11111100 11100100 11111001  $37ED4   0    12
-0058-05B  10101110 11111001 11110110  $7FB8D   1    13
-0058-05C  10101110 11111001 11110010  $5F372   0    13
-0058-06B  11111100 11110000 11110110  $01A00   3    13
-0058-08B  11111011 11101110 11110000  $037A4   0    12
-0058-09D  10101100 11111001 11100101  $0FDEC   0    10
-0060      10101111 11111100 11100001  $03512   1     9
-0068      10101111 11111001 11110101  $06E2A   1     9
-0070      10101111 11110111 11111001  $20C44   0    12
-0074      10101111 11110111 11111001  $20C44   0    12
-0080      10101111 11110111 11100101  $065B2   0    12
-0084      10101111 11110101 11100000  $0DFE0   1    13
-0085      10101111 11110100 11110111  $02632   1    10
-0087      10101111 11110100 11110111  $02632   1    10
-0089      10101111 11110100 11100010  $34A09   1    13
-0090      10101111 11111110 11100100  $583AE   0    13
-0091      10101111 11110100 11100100  $07EDC   2    13
-0092      10101111 11110100 11100011  $0BC8E   3    10
-0093      10101111 11110100 11100010  $34A09   1    13
-0093A     11111101 11110110 11101110  $1C00D   1    13
-0096      10101111 11110100 11101010  $01D52   1    13
-0102      10101111 11111101 11111100  $0102A   3    12
-0110      10101110 11111100 11100010  $0426B   0    12
-0115      11111011 11111010 11110100  $33164   1    13
-0116      11111100 11100001 11110110  $17C4D   1    13
-0118      10101110 11111100 11111000  $2ABDB   1    13
-0120      10101110 11111100 11100010  $0426B   0    12
-0121      10101110 11111100 11100010  $0426B   0    12
-0122      10101110 11111011 11111011  $07476   1    11
-0124A     11111001 11101010 11110100  $181B2   1    13
-0125A     11111001 11110000 11101111  $0BEA0   3    13
-0126      11111010 11100011 11111110  $0363E   3    10
-0126A     11111001 11101111 11110000  $3121B   0    12
-0127A     10101110 11111000 11111001  $2B0D4   0    12
-0128      11111111 11100011 11101011  $04ED2   3    10
-0129      11111111 11100011 11101011  $04ED2   3    10
-0130      11111111 11100011 11101100  $04ED2   3    10
-0134      10101110 11110100 11100001  $07F12   0     9
-0135      10101110 11110100 11100000  $556C0   1    13
-0136      10101110 11110100 11100010  $22A09   1    13
-0139      11111100 11100110 11110000  $493AE   3    13
-0142      11111110 11100111 11101110  $17805   1    11
-0143      11111101 11111101 11101101  $1FC76   1    12
-0144      11111101 11101000 11101101  $05CD8   0    10
-0146      11111011 11100101 11101110  $0B7F2   0    12
-0147      11111011 11110001 11110001  $012D2   3    11
-0148      11111011 11100101 11110000  $0B7F2   0    12
+0049      10101000 11110101 11100011  0183D7
+0050      10101000 11110101 11100011  0183D7
+0053      11111111 11111111 11111111  020000
+0056      10101111 11111110 11101000  2E8A3C
+0058-02C  10101111 11110101 11111000  33E2E7
+0058-03B  10101111 11110100 11100110  178BC5
+0058-03C  10101111 11110100 11100100  35C807
+0058-04B  11111100 11100100 11110001  286194
+0058-04D  11111100 11100100 11111001  14BBC6
+0058-05B  10101110 11111001 11110110  05D529
+0058-05C  10101110 11111001 11110010  1D0273
+0058-06B  11111100 11110000 11110110  07DBB5
+0058-08B  11111011 11101110 11110000  07F6C6
+0058-09D  10101100 11111001 11100101  109918
+0060      10101111 11111100 11100001  085410
+0068      10101111 11111001 11110101  2EA810
+0070      10101111 11110111 11111001  13BCC6
+0074      10101111 11110111 11111001  13BCC6
+0080      10101111 11110111 11100101  3780E6
+0084      10101111 11110101 11100000  2ED451
+0085      10101111 11110100 11110111  012208
+0087      10101111 11110100 11110111  012208
+0089      10101111 11110100 11100010  140449
+0090      10101111 11111110 11100100  0FD393
+0091      10101111 11110100 11100100  35C807
+0092      10101111 11110100 11100011  24E628
+0093      10101111 11110100 11100010  140449
+0093A     11111101 11110110 11101110  345129
+0096      10101111 11110100 11101010  1B1341
+0102      10101111 11111101 11111100  0595CA
+0110      10101110 11111100 11100010  02DFD6
+0115      11111011 11111010 11110100  3BA531
+0116      11111100 11100001 11110110  313F29
+0118      10101110 11111100 11111000  0FD839
+0120      10101110 11111100 11100010  02DFD6
+0121      10101110 11111100 11100010  02DFD6
+0122      10101110 11111011 11111011  1DFC84
+0124A     11111001 11101010 11110100  30A841
+0125A     11111001 11110000 11101111  3B3EB5
+0126      11111010 11100011 11111110  1C5A28
+0126A     11111001 11101111 11110000  2A5CD6
+0127A     10101110 11111000 11111001  169BC6
+0128      11111111 11100011 11101011  36BD28
+0129      11111111 11100011 11101011  36BD28
+0130      11111111 11100011 11101100  36BD28
+0134      10101110 11110100 11100001  3ED730
+0135      10101110 11110100 11100000  2DF551
+0136      10101110 11110100 11100010  350449
+0139      11111100 11100110 11110000  388BC5
+0142      11111110 11100111 11101110  0E5DA4
+0143      11111101 11111101 11101101  2A7E42
+0144      11111101 11101000 11101101  0B5618
+0146      11111011 11100101 11101110  06FCE6
+0147      11111011 11110001 11110001  36DE94
+0148      11111011 11100101 11110000  06FCE6
 0153      11111011 11110101 11110001
-0157      11111000 11101011 11110101  $00E97   1     8
-0158      11111000 11110000 11110000  $67580   3    13
-0159      11111000 11101011 11110101  $00E97   1     8
-0162      11111110 11110001 11110000  $10F6A   3    11
-0163      11111110 11110010 11110000  $6D812   0    13
-0165      10101101 11110100 11100110  $4B3AE   3    13
-0166      10101101 11110100 11101110  $1D385   1    11
-0169B     11111001 11011100 11011111  $597B2   3    13
-0175      10101100 11111100 11101001  $29154   1    12
-0176      10101100 11111100 11110001  $0651A   3    11
-0179A     11111001 11001000 11101110  $0E558   0    10
-0180      11111100 11001010 11111111  $36C44   0    13
-0181A     11111001 11001000 11101110  $0E558   0    10
-0182      11111000 11110011 11110001  $0EF16   1    13
-0184      11111000 11110011 11101111  $31AA4   1    12
-0186      10101100 11111000 11111110  $02C84   0     9
-0190      11111000 11101110 11101111  $1848B   0    12
-0196      11101011 11110011 11101001  $22CE0   0    13
-0197A     10101011 11111001 11101100  $336ED   1    12
-0197B     10101011 11111001 11101100  $336ED   1    12
-5023      11111011 11101101 11111010  $46E6E   2    13
+0157      11111000 11101011 11110101  06AB20
+0158      11111000 11110000 11110000  005FB5
+0159      11111000 11101011 11110101  06AB20
+0162      11111110 11110001 11110000  0D8394
+0163      11111110 11110010 11110000  1E6573
+0165      10101101 11110100 11100110  1F8BC5
+0166      10101101 11110100 11101110  306DA4
+0169B     11111001 11011100 11011111  19E8A5
+0175      10101100 11111100 11101001  0D6362
+0176      10101100 11111100 11110001  39BD94
+0179A     11111001 11001000 11101110  363618
+0180      11111100 11001010 11111111  36DE63
+0181A     11111001 11001000 11101110  363618
+0182      11111000 11110011 11110001  1BB221
+0184      11111000 11110011 11101111  2AD662
+0186      10101100 11111000 11111110  0AC630
+0190      11111000 11101110 11101111  138DD6
+0196      11101011 11110011 11101001  37E483
+0197A     10101011 11111001 11101100  16E452
+0197B     10101011 11111001 11101100  16E452
+5023      11111011 11101101 11111010  1ADDF7
           .....    ..       ..
-unknown   11111111 11110110 10111110  $22F12   0    13 (Shinobi 16A, part no. unreadable, could be dead)
-dead      00001111 00001111 00001111                   (Alien Storm CPU with no battery)
-bad       11100000 10101011 10111001                   (flaky 317-0049)
+unknown   11111111 11110110 10111110  226D73    (Shinobi 16A, part no. unreadable, could be dead)
+unknown   10101011 11111000 11010101  07E7C4    (unknown ddcrewa key)
+dead      00001111 00001111 00001111            (Alien Storm CPU with no battery)
+bad       11100000 10101011 10111001            (flaky 317-0049)
 
 ----
 
@@ -728,51 +731,33 @@ int fd1094_set_state(unsigned char *key,int state)
 
 #ifdef MAME_DEBUG
 
-int fd1094_is_valid_prng_sequence(const UINT8 *base, int length, int *shiftptr, UINT32 *bptr, UINT32 *seedptr)
+int fd1094_is_valid_prng_sequence(const UINT8 *base, int length, UINT32 *seedptr)
 {
-	static const UINT32 bvals[] = { 0x1A019, 0x3E023, 0x52005, 0x7600F };
-	static const int shiftvals[] = { -4, 8, 9, 10, 11, 12, 13 };
-	int shiftindex, bindex;
+	UINT32 seedlow;
 
-	/* iterate over shift possibilities */
-	for (shiftindex = 0; shiftindex < ARRAY_LENGTH(shiftvals); shiftindex++)
+	/* iterate over seed possibilities */
+	/* note that only the low 16 bits matter; the upper 6 bits are known from the first value */
+	for (seedlow = 0; seedlow < (1 << 16); seedlow++)
 	{
-		int shift = shiftvals[shiftindex];
-		int seeds = (shift < 0) ? 1 : (1 << shift);
+		UINT32 seedstart = (~base[0] << 16) | seedlow;
+		UINT32 seed = seedstart;
+		UINT32 i;
 
-		/* iterate over b possibilities */
-		for (bindex = 0; bindex < ARRAY_LENGTH(bvals); bindex++)
+		/* look starting with this seed for a continuous match */
+		for (i = 1; i < length; i++)
 		{
-			UINT32 b = bvals[bindex];
-			UINT32 seed;
+			seed = seed * 0x29;
+			seed += seed << 16;
 
-			/* iterate over seed possibilities */
-			for (seed = 0; seed < seeds; seed++)
-			{
-				UINT32 startval = (shift < 0) ? (base[0] >> -shift) : ((base[0] << shift) | seed);
-				UINT32 val = startval;
-				UINT32 i;
+			if ((((~seed >> 16) ^ base[i]) & 0x3f) != 0)
+				break;
+		}
 
-				/* look starting with this seed for a continuous match */
-				for (i = 1; i < length; i++)
-				{
-					UINT8 predicted;
-
-					val = val * 0x10029 + b;
-					predicted = ((val << 4) | 0xd) >> (shift + 4);
-					if (((predicted ^ base[i]) & 0x3f) != 0)
-						break;
-				}
-
-				/* if we got one, we're done */
-				if (i == length)
-				{
-					*shiftptr = shift;
-					*bptr = b;
-					*seedptr = startval;
-					return TRUE;
-				}
-			}
+		/* if we got one, we're done */
+		if (i == length)
+		{
+			*seedptr = seedstart;
+			return TRUE;
 		}
 	}
 
@@ -847,11 +832,10 @@ UINT32 fd1094_find_global_key_matches(const UINT16 *encrypted, const UINT16 *des
 static int fd1094_find_opcode_sequence(int basepc, int pc, UINT8 *key, const UINT16 *base, const UINT16 *sequence, const UINT16 *seqmask, int seqlength, int quick)
 {
 	int found = FALSE;
-	UINT32 b, seed;
-	int shift;
+	UINT32 seed;
 	int op;
 
-	if (seqlength == 0 && (quick || fd1094_is_valid_prng_sequence(&key[basepc/2], (pc - basepc) / 2, &shift, &b, &seed)))
+	if (seqlength == 0 && (quick || fd1094_is_valid_prng_sequence(&key[basepc/2], (pc - basepc) / 2, &seed)))
 	{
 		if (!quick)
 		{
@@ -859,7 +843,7 @@ static int fd1094_find_opcode_sequence(int basepc, int pc, UINT8 *key, const UIN
 			printf("  ->");
 			for (curpc = basepc; curpc < pc; curpc += 2)
 				printf(" %02X", key[curpc/2]);
-			printf("  (shift=%d b=%X seed=%X)\n", shift, b, seed);
+			printf("  (seed=%06X)\n", seed);
 		}
 		return TRUE;
 	}
@@ -892,8 +876,6 @@ static int fd1094_find_opcode_sequence(int basepc, int pc, UINT8 *key, const UIN
 
 static int fd1094_find_opcode_sequence(int basepc, UINT8 *key, const UINT16 *base, const UINT16 *sequence, const UINT16 *seqmask, int seqlength, int quick)
 {
-	static const UINT32 bvals[] = { 0x1A019, 0x3E023, 0x52005, 0x7600F };
-	static const int shiftvals[] = { -4, 8, 9, 10, 11, 12, 13 };
 	int found = FALSE;
 	int keybaseaddr;
 	int keyval;
@@ -919,68 +901,57 @@ static int fd1094_find_opcode_sequence(int basepc, UINT8 *key, const UINT16 *bas
 		/* if we got a match, then iterate over all possible PRNG sequences starting with this */
 		if ((decrypted & seqmask[0]) == sequence[0])
 		{
-			int shiftindex, bindex;
+			UINT32 seedlow;
 
-			/* iterate over shift possibilities */
-			for (shiftindex = 0; shiftindex < ARRAY_LENGTH(shiftvals); shiftindex++)
+			/* iterate over seed possibilities */
+			for (seedlow = 0; seedlow < (1 << 16); seedlow++)
 			{
-				int shift = shiftvals[shiftindex];
-				int seeds = (shift < 0) ? 1 : (1 << shift);
+				UINT32 seedstart = (~keybyte << 16) | seedlow;
+				UINT32 seed = seedstart;
+				UINT32 i, hibit;
 
-				/* iterate over b possibilities */
-				for (bindex = 0; bindex < ARRAY_LENGTH(bvals); bindex++)
+				/* generate data into the key */
+				for (i = 1; i < seqlength; i++)
 				{
-					UINT32 b = bvals[bindex];
-					UINT32 seed;
+					int keyaddr = (keybaseaddr + i) & 0x1fff;
 
-					/* iterate over seed possibilities */
-					for (seed = 0; seed < seeds; seed++)
+					seed = seed * 0x29;
+					seed += seed << 16;
+
+					key[keyaddr] = (~seed >> 16) & 0x3f;
+					if ((keyaddr & 0x0ffc) != 0)
+						key[keyaddr] |= (keyaddr < 0x1000) ? 0x80 : 0x40;
+				}
+
+				/* iterate over high bits (1 per byte) */
+				for (hibit = 0; hibit < (1 << seqlength); hibit += 2)
+				{
+					/* set them */
+					for (i = 1; i < seqlength; i++)
 					{
-						UINT32 startval = (shift < 0) ? (keybyte >> -shift) : ((keybyte << shift) | seed);
-						UINT32 val = startval;
-						UINT32 i, hibit;
+						int keyaddr = (keybaseaddr + i) & 0x1fff;
+						UINT8 bit = (keyaddr < 0x1000) ? 0x40 : 0x80;
 
-						/* generate data into the key */
-						for (i = 1; i < seqlength; i++)
-						{
-							int keyaddr = (keybaseaddr + i) & 0x1fff;
-							val = val * 0x10029 + b;
-							key[keyaddr] = (((val << 4) | 0xd) >> (shift + 4)) & 0x3f;
-							if ((keyaddr & 0x0ffc) != 0)
-								key[keyaddr] |= (keyaddr < 0x1000) ? 0x80 : 0x40;
-						}
+						/* set or clear the bit as appropriate */
+						if (hibit & (1 << i))
+							key[keyaddr] |= bit;
+						else
+							key[keyaddr] &= ~bit;
 
-						/* iterate over high bits (1 per byte) */
-						for (hibit = 0; hibit < (1 << seqlength); hibit += 2)
-						{
-							/* set them */
-							for (i = 1; i < seqlength; i++)
-							{
-								int keyaddr = (keybaseaddr + i) & 0x1fff;
-								UINT8 bit = (keyaddr < 0x1000) ? 0x40 : 0x80;
+						/* decrypt using this key; stop if we fail to match */
+						decrypted = fd1094_decode(basepc + i, base[basepc + i], key, FALSE);
+						if ((decrypted & seqmask[i]) != sequence[i])
+							break;
+					}
 
-								/* set or clear the bit as appropriate */
-								if (hibit & (1 << i))
-									key[keyaddr] |= bit;
-								else
-									key[keyaddr] &= ~bit;
-
-								/* decrypt using this key; stop if we fail to match */
-								decrypted = fd1094_decode(basepc + i, base[basepc + i], key, FALSE);
-								if ((decrypted & seqmask[i]) != sequence[i])
-									break;
-							}
-
-							/* if the whole thing matched, record the match */
-							if (i == seqlength)
-							{
-								found = TRUE;
-								mame_printf_debug("  -> global = %02X%02X%02X%02X, PC = %04X, key = ", key[0], key[1], key[2], key[3], basepc * 2);
-								for (i = 0; i < seqlength; i++)
-									mame_printf_debug("%02X", key[(keybaseaddr + i) & 0x1fff]);
-								mame_printf_debug("  (shift=%d b=%X seed=%X)\n", shift, b, seed);
-							}
-						}
+					/* if the whole thing matched, record the match */
+					if (i == seqlength)
+					{
+						found = TRUE;
+						mame_printf_debug("  -> global = %02X%02X%02X%02X, PC = %04X, key = ", key[0], key[1], key[2], key[3], basepc * 2);
+						for (i = 0; i < seqlength; i++)
+							mame_printf_debug("%02X", key[(keybaseaddr + i) & 0x1fff]);
+						mame_printf_debug("  (seed=%06X)\n", seedstart);
 					}
 				}
 			}

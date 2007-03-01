@@ -116,6 +116,7 @@
  * DISCRETE_SOUND_END
  *
  * DISCRETE_ADJUSTMENT(NODE,ENAB,MIN,MAX,LOGLIN,PORT)
+ * DISCRETE_ADJUSTMENT_TAG(NODE,ENAB,MIN,MAX,LOGLIN,TAG)
  * DISCRETE_ADJUSTMENTX(NODE,ENAB,MIN,MAX,LOGLIN,PORT,PMIN,PMAX)
  * DISCRETE_CONSTANT(NODE,CONST0)
  * DISCRETE_INPUT_DATA(NODE)
@@ -239,7 +240,10 @@
  =======================================================================
  ***********************************************************************
  *
- * DISCRETE_ADJUSTMENT - Adjustable constant set by the UI [~] menu.
+ * DISCRETE_ADJUSTMENT     - Adjustable constant set by the UI [~] menu.
+ * DISCRETE_ADJUSTMENT_TAG - Same as above but referenced by a tag.
+ *
+ * Note: DISCRETE_ADJUSTMENT_TAG is prefered over DISCRETE_ADJUSTMENT.
  *
  *                        .----------.
  *                        |          |
@@ -253,7 +257,14 @@
  *                         static minimum value the node can take,
  *                         static maximum value the node can take,
  *                         log/linear scale 0=Linear !0=Logarithmic,
- *                         input port number of the potentiometer)
+ *                         input port number of the adjuster)
+ *
+ *     DISCRETE_ADJUSTMENT_TAG(name of node,
+ *                             enable node or static value,
+ *                             static minimum value the node can take,
+ *                             static maximum value the node can take,
+ *                             log/linear scale 0=Linear !0=Logarithmic,
+ *                             port tag name of the adjuster)
  *
  *  Note: When using DISC_LOGADJ, the min/max values must be > 0.
  *        If they are <=0, they will be forced to 1.
@@ -2379,6 +2390,11 @@
  *     DISC_555_TRIGGER_IS_VOLTAGE - Input is actual voltage.
  *                                   Voltage must drop below
  *                                   trigger555 to activate.
+ *     DISC_555_TRIGGER_DISCHARGES_CAP - some circuits connect an external
+ *                                       device (transistor) to the cap to
+ *                                       discharge it when the trigger is
+ *                                       enabled.  Thereby allowing the one-shot
+ *                                       to retrigger.
  *
  *  Output Types: (ORed with trigger types)
  *     DISC_555_OUT_DC - Output is actual DC. (DEFAULT)
@@ -2793,6 +2809,7 @@ enum
 
 #define DISC_555_TRIGGER_IS_LOGIC		0x00
 #define DISC_555_TRIGGER_IS_VOLTAGE		0x40
+#define DISC_555_TRIGGER_DISCHARGES_CAP	0x80
 
 #define DISC_555_OUT_SQW				0x00	/* Squarewave */
 #define DISC_555_OUT_CAP				0x01	/* Cap charge waveform */
@@ -3296,6 +3313,7 @@ enum
 
 /* from disc_inp.c */
 #define DISCRETE_ADJUSTMENT(NODE,ENAB,MIN,MAX,LOGLIN,PORT)              { NODE, DSS_ADJUSTMENT  , 7, { ENAB,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,MIN,MAX,LOGLIN,PORT,0   ,100  }, NULL  , "DISCRETE_ADJUSTMENT"  },
+#define DISCRETE_ADJUSTMENT_TAG(NODE,ENAB,MIN,MAX,LOGLIN,TAG)           { NODE, DSS_ADJUSTMENT  , 7, { ENAB,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,MIN,MAX,LOGLIN,0   ,0   ,100  }, TAG   , "DISCRETE_ADJUSTMENT_TAG" },
 #define DISCRETE_ADJUSTMENTX(NODE,ENAB,MIN,MAX,LOGLIN,PORT,PMIN,PMAX)   { NODE, DSS_ADJUSTMENT  , 7, { ENAB,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,MIN,MAX,LOGLIN,PORT,PMIN,PMAX }, NULL  , "DISCRETE_ADJUSTMENTX"  },
 #define DISCRETE_CONSTANT(NODE,CONST)                                   { NODE, DSS_CONSTANT    , 1, { NODE_NC }, { CONST } ,NULL  ,"Constant" },
 #define DISCRETE_INPUT_DATA(NODE)                                       { NODE, DSS_INPUT_DATA  , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,0 }, NULL, "Input Data" },

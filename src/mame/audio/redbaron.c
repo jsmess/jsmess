@@ -21,6 +21,8 @@
 #include "sound/custom.h"
 #include "sound/pokey.h"
 
+#define OUTPUT_RATE		(48000)
+
 /* Statics */
 static INT16 *vol_lookup = NULL;
 
@@ -71,7 +73,7 @@ static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_
 		poly_counter -= 12000;
 		while( poly_counter <= 0 )
 		{
-			poly_counter += Machine->sample_rate;
+			poly_counter += OUTPUT_RATE;
 			if( ((poly_shift & 0x0001) == 0) == ((poly_shift & 0x4000) == 0) )
 				poly_shift = (poly_shift << 1) | 1;
 			else
@@ -82,7 +84,7 @@ static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_
 		filter_counter -= 330;
 		while( filter_counter <= 0 )
 		{
-			filter_counter += Machine->sample_rate;
+			filter_counter += OUTPUT_RATE;
 			crash_amp = (poly_shift & 1) ? latch >> 4 : 0;
 		}
 		/* mix crash sound at 35% */
@@ -105,7 +107,7 @@ static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_
 				shot_amp_counter -= C32_DISCHARGE_TIME;
 				while( shot_amp_counter <= 0 )
 				{
-					shot_amp_counter += Machine->sample_rate;
+					shot_amp_counter += OUTPUT_RATE;
 					if( --shot_amp == 0 )
 						break;
 				}
@@ -128,7 +130,7 @@ static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_
 				squeal_amp_counter -= C5_CHARGE_TIME;
 				while( squeal_amp_counter <= 0 )
 				{
-					squeal_amp_counter += Machine->sample_rate;
+					squeal_amp_counter += OUTPUT_RATE;
 					if( ++squeal_amp == 32767 )
 						break;
 				}
@@ -144,7 +146,7 @@ static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_
 				squeal_off_counter -= (1134 + 1134 * squeal_amp / 32767) / 3;
 				while( squeal_off_counter <= 0 )
 				{
-					squeal_off_counter += Machine->sample_rate;
+					squeal_off_counter += OUTPUT_RATE;
 					squeal_out = 0;
 				}
 			}
@@ -153,7 +155,7 @@ static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_
 				squeal_on_counter -= 1134;
 				while( squeal_on_counter <= 0 )
 				{
-					squeal_on_counter += Machine->sample_rate;
+					squeal_on_counter += OUTPUT_RATE;
 					squeal_out = 1;
                 }
             }
@@ -205,7 +207,7 @@ void *redbaron_sh_start(int clock, const struct CustomSound_interface *config)
 		vol_crash[i] = 32767 * r0 / (r0 + r1);
     }
 
-	channel = stream_create(0, 1, Machine->sample_rate, 0, redbaron_sound_update);
+	channel = stream_create(0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
 
     return auto_malloc(1);
 }

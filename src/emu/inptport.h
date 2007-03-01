@@ -197,6 +197,7 @@ enum
 
 	/* analog inputs */
 #define __ipt_analog_start IPT_PADDLE
+#define __ipt_analog_absolute_start IPT_PADDLE
 	IPT_PADDLE,			/* absolute */
 	IPT_PADDLE_V,		/* absolute */
 	IPT_AD_STICK_X,		/* absolute */
@@ -209,6 +210,8 @@ enum
 	IPT_PEDAL3,			/* absolute */
 	IPT_POSITIONAL,		/* absolute */
 	IPT_POSITIONAL_V,	/* absolute */
+#define __ipt_analog_absolute_end IPT_POSITIONAL_V
+
 	IPT_DIAL,			/* relative */
 	IPT_DIAL_V,			/* relative */
 	IPT_TRACKBALL_X,	/* relative */
@@ -697,6 +700,7 @@ struct _inp_header
 	INPUT_PORT_UINT32(INPUT_TOKEN_UNUSED),
 
 /* analog settings */
+/* if this macro is not used, the minimum defaluts to 0 and maximum defaluts to the mask value */
 #define PORT_MINMAX(min_,max_) \
 	INPUT_PORT_UINT32(INPUT_TOKEN_MINMAX), INPUT_PORT_UINT32_PAIR(min_, max_),
 
@@ -839,6 +843,7 @@ const input_port_default_entry *get_input_port_list_defaults(void);
 
 int input_port_active(const input_port_entry *in);
 int port_type_is_analog(int type);
+int port_type_is_analog_absolute(int type);
 int port_type_in_use(int type);
 int port_type_to_group(int type, int player);
 int port_tag_to_index(const char *tag);

@@ -5,7 +5,7 @@
 
 
 /* default to 4x oversampling */
-#define DEFAULT_DAC_SAMPLE_RATE (44100 * 4)
+#define DEFAULT_SAMPLE_RATE (48000 * 4)
 
 
 struct dac_info
@@ -108,7 +108,7 @@ static void *dac_start(int sndindex, int clock, const void *config)
 
 	DAC_build_voltable(info);
 
-	info->channel = stream_create(0,1,clock ? clock : DEFAULT_DAC_SAMPLE_RATE,info,DAC_update);
+	info->channel = stream_create(0,1,clock ? clock : DEFAULT_SAMPLE_RATE,info,DAC_update);
 	info->output = 0;
 
 	state_save_register_item("dac", sndindex, info->output);

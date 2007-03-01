@@ -689,7 +689,7 @@ void *ay8910_start_ym(int chip_type, int sndindex, int clock, int streams,
 	info->streams = streams;
 
 	AY8910_init(info, streams, clock,
-			Machine->sample_rate,
+			clock/8,
 			portAread,portBread,
 			portAwrite,portBwrite);
 

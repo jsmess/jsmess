@@ -110,6 +110,7 @@ static void *ym2203_start(int sndindex, int clock, const void *config)
 	static const struct YM2203interface generic_2203 = { 0 };
 	const struct YM2203interface *intf = config ? config : &generic_2203;
 	struct ym2203_info *info;
+	int rate = clock/72; /* ??? */
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
@@ -123,10 +124,10 @@ static void *ym2203_start(int sndindex, int clock, const void *config)
 	info->timer[1] = timer_alloc_ptr(timer_callback_2203_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(0,1,Machine->sample_rate,info,ym2203_stream_update);
+	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
-	info->chip = YM2203Init(info,sndindex,clock,Machine->sample_rate,TimerHandler,IRQHandler,&psgintf);
+	info->chip = YM2203Init(info,sndindex,clock,rate,TimerHandler,IRQHandler,&psgintf);
 
 	state_save_register_func_postload_ptr(ym2203_postload, info);
 

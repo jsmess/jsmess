@@ -161,12 +161,12 @@ static void *k005289_start(int sndindex, int clock, const void *config)
 	voice = info->channel_list;
 
 	/* get stream channels */
-	info->stream = stream_create(0, 1, Machine->sample_rate, info, K005289_update);
+	info->rate = clock/16;
+	info->stream = stream_create(0, 1, info->rate, info, K005289_update);
 	info->mclock = clock;
-	info->rate = Machine->sample_rate;
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	info->mixer_buffer = auto_malloc(2 * sizeof(short) * Machine->sample_rate);
+	info->mixer_buffer = auto_malloc(2 * sizeof(short) * info->rate);
 
 	/* build the mixer table */
 	if (make_mixer_table(info, 2))

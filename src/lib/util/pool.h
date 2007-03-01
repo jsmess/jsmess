@@ -49,4 +49,6 @@ char *pool_strdup_file_line(memory_pool *pool, const char *str, const char *file
 memory_block_overlap pool_contains_block(memory_pool *pool, void *ptr, size_t size,
 	void **found_block, size_t *found_block_size);
 
+int test_memory_pools(void);
+
 #endif /* __POOL_H__ */

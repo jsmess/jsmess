@@ -8,7 +8,7 @@
  *
  *   HJB 08/31/98
  *   modified to use an automatically selected oversampling factor
- *   for the current Machine->sample_rate
+ *   for the current sample rate
  *
  *   01/06/99
  *  separate MSM5205 emulator form adpcm.c and some fix
@@ -183,7 +183,7 @@ static void *msm5205_start(int sndindex, int clock, const void *config)
 	ComputeTables (voice);
 
 	/* stream system initialize */
-	voice->stream = stream_create(0,1,Machine->sample_rate,voice,MSM5205_update);
+	voice->stream = stream_create(0,1,clock,voice,MSM5205_update);
 	voice->timer = timer_alloc_ptr(MSM5205_vclk_callback, voice);
 
 	/* initialize */

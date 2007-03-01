@@ -102,8 +102,8 @@ static void ym2612_postload(void *param)
 static void *ym2612_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM2612interface dummy = { 0 };
-	int rate = Machine->sample_rate;
 	struct ym2612_info *info;
+	int rate = clock/72;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));

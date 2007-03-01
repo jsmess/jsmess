@@ -150,7 +150,7 @@ struct upd7759_chip
 {
 	sound_stream *channel;					/* stream channel for playback */
 
-	/* internal clock to Machine->sample_rate mapping */
+	/* internal clock to output sample rate mapping */
 	UINT32		pos;						/* current output sample position */
 	UINT32		step;						/* step value per output sample */
 	double		clock_period;				/* clock period in seconds */
@@ -629,10 +629,10 @@ static void *upd7759_start(int sndindex, int clock, const void *config)
 	memset(chip, 0, sizeof(*chip));
 
 	/* allocate a stream channel */
-	chip->channel = stream_create(0, 1, Machine->sample_rate, chip, upd7759_update);
+	chip->channel = stream_create(0, 1, clock/4, chip, upd7759_update);
 
 	/* compute the stepping rate based on the chip's clock speed */
-	chip->step = ((INT64)clock * (INT64)FRAC_ONE) / Machine->sample_rate;
+	chip->step = 4 * FRAC_ONE;
 
 	/* compute the clock period */
 	chip->clock_period = TIME_IN_HZ(clock);

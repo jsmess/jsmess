@@ -785,7 +785,6 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 	int error = FALSE;
 	int coin_error = FALSE;
 	UINT32 crc;
-	int test;
 
 	/* skip if no ports */
 	if (!driver->ipt)
@@ -809,6 +808,99 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 		quark_entry *entry;
 		int strindex = 0;
 		UINT32 crc;
+
+		if (port_type_is_analog(inp->type))
+		{
+			INT32 analog_max = inp->analog.max;
+			INT32 analog_min = inp->analog.min;
+			int shift;
+
+			if (inp->type == IPT_POSITIONAL || inp->type == IPT_POSITIONAL_V)
+			{
+				for (shift = 0; (shift <= 31) && (~inp->mask & (1 << shift)); shift++);
+				/* convert the positional max value to be in the bitmask for testing */
+				analog_max = (analog_max - 1) << shift;
+
+				/* positional port size must fit in bits used */
+				if (((inp->mask >> shift) + 1) < inp->analog.max)
+				{
+					mame_printf_error("%s: %s has an analog port with a positional port size bigger then the mask size\n", driver->source_file, driver->name);
+					error = TRUE;
+				}
+			}
+
+			/* analog ports must have a valid sensitivity */
+			if (inp->analog.sensitivity == 0)
+			{
+				mame_printf_error("%s: %s has an analog port with zero sensitivity\n", driver->source_file, driver->name);
+				error = TRUE;
+			}
+
+			/* check that the default falls in the bitmask range */
+			if (inp->default_value & ~inp->mask)
+			{
+				mame_printf_error("%s: %s has an analog port with a default value out of the bitmask range\n", driver->source_file, driver->name);
+				error = TRUE;
+			}
+
+			/* tests for absolute devices */
+			if (port_type_is_analog_absolute(inp->type))
+			{
+				INT32 default_value = inp->default_value;
+
+				/* adjust for signed values */
+				if (analog_min > analog_max)
+				{
+					analog_min = -analog_min;
+					if (default_value > analog_max)
+						default_value = -default_value;
+				}
+
+				/* check that the default falls in the MINMAX range */
+				if (default_value < analog_min || default_value > analog_max)
+				{
+					mame_printf_error("%s: %s has an analog port with a default value out PORT_MINMAX range\n", driver->source_file, driver->name);
+					error = TRUE;
+				}
+
+				/* check that the MINMAX falls in the bitmask range */
+				/* we use the unadjusted min for testing */
+				if (inp->analog.min & ~inp->mask || analog_max & ~inp->mask)
+				{
+					mame_printf_error("%s: %s has an analog port with a PORT_MINMAX value out of the bitmask range\n", driver->source_file, driver->name);
+					error = TRUE;
+				}
+
+				/* absolute analog ports do not use PORT_RESET */
+				if (inp->analog.reset)
+				{
+					mame_printf_error("%s: %s - absolute ports no not use PORT_RESET\n", driver->source_file, driver->name);
+					error = TRUE;
+				}
+			}
+			else
+			/* tests for relative devices */
+			{
+/**** NOTE: THESE ARE DISABLED UNTIL ALL THE PROBLEMS FOUND BY THEM ARE FIXED ****/
+				/* tests for non IPT_POSITIONAL relative devices */
+				if (inp->type != IPT_POSITIONAL && inp->type != IPT_POSITIONAL_V)
+				{
+					/* relative device do not use PORT_MINMAX */
+					if (inp->analog.min || inp->analog.max != inp->mask)
+					{
+//                      mame_printf_error("%s: %s - relative ports no not use PORT_MINMAX\n", driver->source_file, driver->name);
+//                      error = TRUE;
+					}
+
+					/* relative device do not use a default value */
+					if (inp->default_value)
+					{
+//                      mame_printf_error("%s: %s - relative ports no not use default value other then 0\n", driver->source_file, driver->name);
+//                      error = TRUE;
+					}
+				}
+			}
+		}
 
 		/* clear the DIP switch tracking when we hit the first non-DIP entry */
 		if (last_dipname_entry && inp->type != IPT_DIPSWITCH_SETTING)
@@ -940,24 +1032,6 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 			if (last_dipname_entry->name == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
 			{
 				mame_printf_error("%s: %s has wrong Demo Sounds option %s (must be Off/On)\n", driver->source_file, driver->name, inp->name);
-				error = TRUE;
-			}
-		}
-
-		/* analog ports must have a valid sensitivity */
-		if (port_type_is_analog(inp->type) && inp->analog.sensitivity == 0)
-		{
-			mame_printf_error("%s: %s has an analog port with zero sensitivity\n", driver->source_file, driver->name);
-			error = TRUE;
-		}
-
-		/* positional port size must fit in bits used */
-		if (inp->type == IPT_POSITIONAL)
-		{
-			for (test = 0; (test <= 31) && (~inp->mask & (1 << test)); test++);
-			if (((inp->mask >> test) + 1) < inp->analog.max)
-			{
-				mame_printf_error("%s: %s has an positional port size bigger then the mask size\n", driver->source_file, driver->name);
 				error = TRUE;
 			}
 		}

@@ -86,6 +86,9 @@
 #include "sound/2151intf.h"
 
 
+#define OUTPUT_RATE			50000
+
+
 /*************************************
  *
  *  1st generation sound
@@ -510,14 +513,14 @@ void *leland_i186_sh_start(int clock, const struct CustomSound_interface *config
 			has_ym2151 = 1;
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
-	dma_stream = stream_create(0, 1, Machine->sample_rate, NULL, leland_i186_dma_update);
-	nondma_stream = stream_create(0, 1, Machine->sample_rate, NULL, leland_i186_dac_update);
+	dma_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_i186_dma_update);
+	nondma_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_i186_dac_update);
 
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (has_ym2151)
 	{
 		ext_base = memory_region(REGION_SOUND1);
-		extern_stream = stream_create(0, 1, Machine->sample_rate, NULL, leland_i186_extern_update);
+		extern_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_i186_extern_update);
 	}
 
 	/* by default, we're not redline racer */
@@ -1810,7 +1813,7 @@ static void set_dac_frequency(int which, int frequency)
 
 	/* set the frequency of the associated DAC */
 	d->frequency = frequency;
-	d->step = (int)((double)frequency * (double)(1 << 24) / (double)Machine->sample_rate);
+	d->step = (int)((double)frequency * (double)(1 << 24) / (double)OUTPUT_RATE);
 
 	/* also determine the target buffer size */
 	d->buftarget = dac[which].frequency / 60 + 50;

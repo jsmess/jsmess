@@ -159,9 +159,7 @@ INPUT_PORTS_START( bigstrkb )
 	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )			// 50
 	PORT_DIPSETTING(    0x10, "Fast" )				// 35
 	PORT_DIPSETTING(    0x00, "Fastest" )			// 25
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x40, "2 Players Game" )
 	PORT_DIPSETTING(    0x00, "1 Credit" )
 	PORT_DIPSETTING(    0x40, "2 Credits" )

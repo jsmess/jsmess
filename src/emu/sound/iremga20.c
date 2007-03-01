@@ -154,7 +154,7 @@ WRITE8_HANDLER( IremGA20_w )
 	break;
 
 	case 8:
-		chip->channel[channel].rate = (chip->sr_table[data]<<8) / Machine->sample_rate;
+		chip->channel[channel].rate = chip->sr_table[data];
 	break;
 
 	case 0xa: //AT: gain control
@@ -226,7 +226,7 @@ static void *iremga20_start(int sndindex, int clock, const void *config)
 	/* Initialize our pitch table */
 	for (i = 0; i < 255; i++)
 	{
-		chip->sr_table[i] = (clock / (256-i) / 4);
+		chip->sr_table[i] = 0x100 / (256 - i);
 	}
 
 	/* change signedness of PCM samples in advance */
@@ -236,9 +236,9 @@ static void *iremga20_start(int sndindex, int clock, const void *config)
 	iremga20_reset(chip);
 
 	for ( i = 0; i < 0x40; i++ )
-	chip->regs[i] = 0;
+		chip->regs[i] = 0;
 
-	chip->stream = stream_create( 0, 2, Machine->sample_rate, chip, IremGA20_update );
+	chip->stream = stream_create( 0, 2, clock/4, chip, IremGA20_update );
 
 	state_save_register_item_array("irem_ga20", sndindex, chip->regs);
 	for (i = 0; i < 4; i++)

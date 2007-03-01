@@ -373,3 +373,70 @@ static void report_failure(memory_pool *pool, const char *format, ...)
 		(*pool->fail)(message);
 	}
 }
+
+
+
+/***************************************************************************
+    TESTING FUNCTIONS
+***************************************************************************/
+
+static int has_memory_error;
+
+
+/*-------------------------------------------------
+    memory_error - report a memory error
+-------------------------------------------------*/
+
+static void memory_error(const char *message)
+{
+	printf("memory test failure: %s\n", message);
+	has_memory_error = TRUE;
+}
+
+
+/*-------------------------------------------------
+    test_memory_pools - unit tests for memory
+    pool behavior
+-------------------------------------------------*/
+
+int test_memory_pools(void)
+{
+	memory_pool *pool;
+	void *ptrs[16];
+	int i;
+
+	has_memory_error = FALSE;
+	pool = pool_create(memory_error);
+	memset(ptrs, 0, sizeof(ptrs));
+
+	ptrs[0] = pool_malloc(pool, 50);
+	ptrs[1] = pool_malloc(pool, 100);
+
+	ptrs[0] = pool_realloc(pool, ptrs[0], 150);
+	ptrs[1] = pool_realloc(pool, ptrs[1], 200);
+
+	ptrs[2] = pool_malloc(pool, 250);
+	ptrs[3] = pool_malloc(pool, 300);
+
+	ptrs[0] = pool_realloc(pool, ptrs[0], 350);
+	ptrs[1] = pool_realloc(pool, ptrs[1], 400);
+
+	ptrs[2] = pool_realloc(pool, ptrs[2], 450);
+	ptrs[3] = pool_realloc(pool, ptrs[3], 500);
+
+	ptrs[0] = pool_realloc(pool, ptrs[0], 0);
+	ptrs[1] = pool_realloc(pool, ptrs[1], 0);
+
+	ptrs[2] = pool_realloc(pool, ptrs[2], 550);
+	ptrs[3] = pool_realloc(pool, ptrs[3], 600);
+
+	/* some heavier stress tests */
+	for (i = 0; i < 512; i++)
+	{
+		ptrs[i % ARRAY_LENGTH(ptrs)] = pool_realloc(pool,
+			ptrs[i % ARRAY_LENGTH(ptrs)], rand() % 1000);
+	}
+
+	pool_free(pool);
+	return has_memory_error;
+}

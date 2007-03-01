@@ -68,7 +68,7 @@ struct dst_mixer_context
 	int	type;
 	int	size;
 	double	rTotal;
-	node_description * rNode[DISC_MIXER_MAX_INPS];	// Either pointer to input node OR NULL
+	double *rNode[DISC_MIXER_MAX_INPS];			// Either pointer to resistance node output OR NULL
 	double	exponent_rc[DISC_MIXER_MAX_INPS];	// For high pass filtering cause by cIn
 	double	vCap[DISC_MIXER_MAX_INPS];		// cap voltage of each input
 	double	exponent_cF;				// Low pass on mixed inputs
@@ -846,7 +846,7 @@ void dst_logic_jkff_step(node_description *node)
 			{
 				if (!k)
 					/* J=1, K=0 - Set */
-					node->output = 0;
+					node->output = 1;
 				else
 					/* J=1, K=1 - Toggle */
 					node->output = !(int)node->output;
@@ -963,19 +963,24 @@ void dst_mixer_step(node_description *node)
 			if (info->rNode[bit])
 			{
 				/* a node has the posibility of being disconnected from the circuit. */
-				if ((context->rNode[bit])->output == 0)
+				if (*context->rNode[bit] == 0)
 					connected = 0;
 				else
 				{
-					rTemp += (context->rNode[bit])->output;
+					rTemp += *context->rNode[bit];
 					rTotal += 1.0 / rTemp;
 					if (info->c[bit] != 0)
 					{
 						switch (context->type & DISC_MIXER_TYPE_MASK)
 						{
 							case DISC_MIXER_IS_RESISTOR:
-								rTemp2 = 1.0 / ((1.0 / rTemp) + (1.0 / info->rF));
-								break;
+								/* is there an rF? */
+								if (info->rF != 0)
+								{
+									rTemp2 = 1.0 / ((1.0 / rTemp) + (1.0 / info->rF));
+									break;
+								}
+								/* else, fall through and just use the resistor value */
 							case DISC_MIXER_IS_OP_AMP:
 								rTemp2 = rTemp;
 								break;
@@ -1043,15 +1048,26 @@ void dst_mixer_reset(node_description *node)
 {
 	const discrete_mixer_desc *info = node->custom;
 	struct dst_mixer_context *context = node->context;
+	node_description *r_node;
 
 	int	bit;
 	double	rTemp = 0;
+
+	/* link to rNode outputs */
+	for (bit = 0; bit < 8; bit ++)
+	{
+		r_node = discrete_find_node(NULL, info->rNode[bit]);
+		if (r_node)
+			context->rNode[bit] = &(r_node->output);
+		else
+			context->rNode[bit] = NULL;
+	}
 
 	context->size = node->active_inputs - 1;
 
 	/*
      * THERE IS NO ERROR CHECKING!!!!!!!!!
-     * If you are an idiot and pass a bad ladder table
+     * If you pass a bad ladder table
      * then you deserve a crash.
      */
 
@@ -1066,12 +1082,7 @@ void dst_mixer_reset(node_description *node)
 	for(bit=0; bit < context->size; bit++)
 	{
 		if (info->rNode[bit])
-		{
 			context->type = context->type | DISC_MIXER_HAS_R_NODE;
-			context->rNode[bit] = discrete_find_node(NULL, info->rNode[bit]);	// get node pointers
-		}
-		else
-			context->rNode[bit] = NULL;
 
 		if ((info->r[bit] != 0) && !info->rNode[bit] )
 		{
@@ -1085,8 +1096,13 @@ void dst_mixer_reset(node_description *node)
 			switch (context->type)
 			{
 				case DISC_MIXER_IS_RESISTOR:
-					rTemp = 1.0 / ((1.0 / info->r[bit]) + (1.0 / info->rF));
-					break;
+					/* is there an rF? */
+					if (info->rF != 0)
+					{
+						rTemp = 1.0 / ((1.0 / info->r[bit]) + (1.0 / info->rF));
+						break;
+					}
+					/* else, fall through and just use the resistor value */
 				case DISC_MIXER_IS_OP_AMP:
 					rTemp = info->r[bit];
 					break;

@@ -15,9 +15,14 @@
 #define MW8080BW_VBEND			(0)
 #define MW8080BW_VBSTART		(224)
 
+/* +4 is added to HBSTART because the hardware displays that many pixels after
+   setting HBLANK */
+#define MW8080BW_HPIXCOUNT		(MW8080BW_HBSTART + 4)
 
 
 /*----------- defined in drivers/mw8080bw.c -----------*/
+
+UINT8 mw8080bw_ram_r(offs_t offset);
 
 #define SEAWOLF_GUN_PORT_TAG			("GUN")
 

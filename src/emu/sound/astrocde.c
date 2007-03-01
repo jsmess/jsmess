@@ -25,8 +25,6 @@ struct astrocade_info
 {
 	const struct astrocade_interface *intf;
 
-	int div_by_N_factor;
-
 	INT32 current_count_A;
 	INT32 current_count_B;
 	INT32 current_count_C;
@@ -86,7 +84,7 @@ static void astrocade_update(void *param, stream_sample_t **inputs, stream_sampl
 			chip->randbyte = rand() & 0xff;
 		}
 
-		chip->current_size_V = 32768*chip->vibrato_speed/chip->div_by_N_factor;
+		chip->current_size_V = 32768*chip->vibrato_speed;
 
 		if (!chip->mux)
 		{
@@ -94,17 +92,17 @@ static void astrocade_update(void *param, stream_sample_t **inputs, stream_sampl
 				vib_plus_osc = (chip->master_osc-chip->vibrato)&0xff;
 			else
 				vib_plus_osc = chip->master_osc;
-			chip->current_size_A = vib_plus_osc*chip->freq_A/chip->div_by_N_factor;
-			chip->current_size_B = vib_plus_osc*chip->freq_B/chip->div_by_N_factor;
-			chip->current_size_C = vib_plus_osc*chip->freq_C/chip->div_by_N_factor;
+			chip->current_size_A = vib_plus_osc*chip->freq_A;
+			chip->current_size_B = vib_plus_osc*chip->freq_B;
+			chip->current_size_C = vib_plus_osc*chip->freq_C;
 		}
 		else
 		{
 			noise_plus_osc = ((chip->master_osc-(chip->vol_noise8&chip->randbyte)))&0xff;
-			chip->current_size_A = noise_plus_osc*chip->freq_A/chip->div_by_N_factor;
-			chip->current_size_B = noise_plus_osc*chip->freq_B/chip->div_by_N_factor;
-			chip->current_size_C = noise_plus_osc*chip->freq_C/chip->div_by_N_factor;
-			chip->current_size_N = 2*noise_plus_osc/chip->div_by_N_factor;
+			chip->current_size_A = noise_plus_osc*chip->freq_A;
+			chip->current_size_B = noise_plus_osc*chip->freq_B;
+			chip->current_size_C = noise_plus_osc*chip->freq_C;
+			chip->current_size_N = 2*noise_plus_osc;
 		}
 
 		data = (chip->current_state_A*chip->vol_A +
@@ -228,9 +226,7 @@ static void *astrocade_start(int sndindex, int clock, const void *config)
 
 	chip->intf = config;
 
-	chip->div_by_N_factor = clock/Machine->sample_rate;
-
-	chip->stream = stream_create(0,1,Machine->sample_rate,chip,astrocade_update);
+	chip->stream = stream_create(0,1,clock,chip,astrocade_update);
 
 	/* reset state */
 	astrocade_reset(chip);

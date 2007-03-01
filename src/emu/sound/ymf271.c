@@ -19,8 +19,6 @@
 
 #define VERBOSE		(1)
 
-#define CLOCK (44100 * 384)	// = 16.9344 MHz
-
 #define MAXOUT		(+32767)
 #define MINOUT		(-32768)
 
@@ -114,6 +112,7 @@ typedef struct
 	void (*irq_callback)(int);
 
 	int index;
+	UINT32 clock;
 	sound_stream * stream;
 } YMF271Chip;
 
@@ -311,7 +310,7 @@ static const double multiple_table[16] = { 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1
 
 static const double pow_table[16] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 0.5, 1, 2, 4, 8, 16, 32, 64 };
 
-static const int fs_frequency[4] = { (CLOCK/384), (CLOCK/384)/2, (CLOCK/384)/4, (CLOCK/384)/8 };
+static const double fs_frequency[4] = { 1.0/1.0, 1.0/2.0, 1.0/4.0, 1.0/8.0 };
 
 INLINE void calculate_step(YMF271Slot *slot)
 {
@@ -319,7 +318,7 @@ INLINE void calculate_step(YMF271Slot *slot)
 
 	if (slot->waveform == 7)	// external waveform (PCM)
 	{
-		st = (double)(2 * (slot->fns | 2048)) * pow_table[slot->block] * (double)(fs_frequency[slot->fs]);
+		st = (double)(2 * (slot->fns | 2048)) * pow_table[slot->block] * fs_frequency[slot->fs];
 		st = st * multiple_table[slot->multiple];
 
 		// LFO phase modulation
@@ -327,11 +326,11 @@ INLINE void calculate_step(YMF271Slot *slot)
 
 		st /= (double)(524288/65536);		// pre-multiply with 65536
 
-		slot->step = (UINT64)st / (UINT64)Machine->sample_rate;
+		slot->step = (UINT64)st;
 	}
 	else						// internal waveform (FM)
 	{
-		st = (double)(2 * slot->fns) * pow_table[slot->block] * (double)(CLOCK/384);
+		st = (double)(2 * slot->fns) * pow_table[slot->block];
 		st = st * multiple_table[slot->multiple] * (double)(SIN_LEN);
 
 		// LFO phase modulation
@@ -339,7 +338,7 @@ INLINE void calculate_step(YMF271Slot *slot)
 
 		st /= (double)(536870912/65536);	// pre-multiply with 65536
 
-		slot->step = (UINT64)st / (UINT64)Machine->sample_rate;
+		slot->step = (UINT64)st;
 	}
 }
 
@@ -1448,7 +1447,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					if (chip->irq_callback) chip->irq_callback(0);
 
 					//period = (double)(256.0 - chip->timerAVal ) * ( 384.0 * 4.0 / (double)CLOCK);
-					period = (384.0 * (1024.0 - chip->timerAVal)) / (double)CLOCK;
+					period = (384.0 * (1024.0 - chip->timerAVal)) / (double)chip->clock;
 
 					timer_adjust_ptr(chip->timA, TIME_IN_SEC(period), TIME_IN_SEC(period));
 				}
@@ -1459,7 +1458,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 
 					if (chip->irq_callback) chip->irq_callback(0);
 
-					period = 6144.0 * (256.0 - (double)chip->timerBVal) / (double)CLOCK;
+					period = 384.0 * 16.0 * (256.0 - (double)chip->timerBVal) / (double)chip->clock;
 
 					timer_adjust_ptr(chip->timB, TIME_IN_SEC(period), TIME_IN_SEC(period));
 				}
@@ -1742,11 +1741,12 @@ static void *ymf271_start(int sndindex, int clock, const void *config)
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 	chip->index = sndindex;
+	chip->clock = clock;
 
 	intf = config;
 
 	ymf271_init(chip, memory_region(intf->region), intf->irq_callback, intf->ext_read, intf->ext_write);
-	chip->stream = stream_create(0, 2, Machine->sample_rate, chip, ymf271_update);
+	chip->stream = stream_create(0, 2, clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)
 	{

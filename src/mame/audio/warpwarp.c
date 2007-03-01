@@ -144,7 +144,7 @@ static void warpwarp_sound_update(void *param, stream_sample_t **inputs, stream_
 		mcarry -= CLOCK_16H / (4 * (64 - music1_latch));
 		while( mcarry < 0 )
 		{
-			mcarry += Machine->sample_rate;
+			mcarry += CLOCK_16H;
 			mcount++;
 			music_signal = (mcount & ~music2_latch & 15) ? decay[music_volume] : 0;
 			/* override by noise gate? */
@@ -156,7 +156,7 @@ static void warpwarp_sound_update(void *param, stream_sample_t **inputs, stream_
 		vcarry -= CLOCK_1V;
         while (vcarry < 0)
         {
-            vcarry += Machine->sample_rate;
+            vcarry += CLOCK_16H;
             vcount++;
 
             /* noise is clocked with raising edge of 2V */
@@ -210,7 +210,7 @@ void *warpwarp_sh_start(int clock, const struct CustomSound_interface *config)
     for( i = 0; i < 0x8000; i++ )
 		decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	channel = stream_create(0, 1, Machine->sample_rate, NULL, warpwarp_sound_update);
+	channel = stream_create(0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
 	sound_volume_timer = timer_alloc(sound_volume_decay);
 	music_volume_timer = timer_alloc(music_volume_decay);

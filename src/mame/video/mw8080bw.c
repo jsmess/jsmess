@@ -40,7 +40,6 @@ VIDEO_UPDATE( mw8080bw )
 			for (i = 0; i < 4; i++)
 			{
 				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-
 				plot_pixel(bitmap, 256 + i, y - V_PIX_COUNT_START, col);
 
 				video_data = video_data >> 1;
@@ -60,7 +59,7 @@ VIDEO_UPDATE( mw8080bw )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = videoram[offs];
+			video_data = mw8080bw_ram_r(offs);
 		}
 	}
 
@@ -158,7 +157,6 @@ VIDEO_UPDATE( spcenctr )
 			for (i = 0; i < 4; i++)
 			{
 				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-
 				plot_pixel(bitmap, 256 + i, y - V_PIX_COUNT_START, col);
 
 				video_data = video_data >> 1;
@@ -166,7 +164,7 @@ VIDEO_UPDATE( spcenctr )
 
 			/* update the cloud control for the next line */
 			offs = ((offs_t)y << 5) | 0x1f;
-			trench_control = videoram[offs];
+			trench_control = mw8080bw_ram_r(offs);
 
 			if (trench_control & 0x40)  draw_trench = 1;
 			if (trench_control & 0x20)  draw_trench = 0;
@@ -202,7 +200,7 @@ VIDEO_UPDATE( spcenctr )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = videoram[offs];
+			video_data = mw8080bw_ram_r(offs);
 		}
 	}
 
@@ -303,7 +301,6 @@ VIDEO_UPDATE( phantom2 )
 			for (i = 0; i < 4; i++)
 			{
 				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-
 				plot_pixel(bitmap, 256 + i, y - V_PIX_COUNT_START, col);
 
 				video_data = video_data >> 1;
@@ -331,7 +328,7 @@ VIDEO_UPDATE( phantom2 )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = videoram[offs];
+			video_data = mw8080bw_ram_r(offs);
 		}
 	}
 
@@ -425,7 +422,7 @@ VIDEO_UPDATE( invaders )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = videoram[offs];
+			video_data = mw8080bw_ram_r(offs);
 		}
 	}
 

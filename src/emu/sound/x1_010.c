@@ -203,7 +203,7 @@ static void *x1_010_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	info->base_clock	= clock;
-	info->rate			= Machine->sample_rate;
+	info->rate			= clock / 1024;
 	info->address		= intf->adr;
 
 	for( i = 0; i < SETA_NUM_CHANNELS; i++ ) {

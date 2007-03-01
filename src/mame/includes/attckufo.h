@@ -17,7 +17,7 @@ void *attckufo_custom_start(int clock, const struct CustomSound_interface *confi
 extern unsigned char attckufo_palette[16 * 3];
 extern UINT8 attckufo_regs[16];
 
-VIDEO_START( attckufo );
+VIDEO_UPDATE( attckufo );
 
 WRITE8_HANDLER ( attckufo_port_w );
 READ8_HANDLER ( attckufo_port_r );

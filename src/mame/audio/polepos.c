@@ -16,6 +16,8 @@ static int sample_enable = 0;
 
 static sound_stream *stream;
 
+#define OUTPUT_RATE			24000
+
 #define POLEPOS_R166		1000.0
 #define POLEPOS_R167		2200.0
 #define POLEPOS_R168		4700.0
@@ -62,7 +64,7 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 
 	/* determine the effective clock rate */
 	clock = (Machine->drv->cpu[0].cpu_clock / 16) * ((sample_msb + 1) * 64 + sample_lsb + 1) / (64*64);
-	step = (clock << 12) / Machine->sample_rate;
+	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */
 	slot = (sample_msb >> 3) & 7;
@@ -99,7 +101,7 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 /************************************/
 void *polepos_sh_start(int clock, const struct CustomSound_interface *config)
 {
-	stream = stream_create(0, 1, Machine->sample_rate, NULL, engine_sound_update);
+	stream = stream_create(0, 1, OUTPUT_RATE, NULL, engine_sound_update);
 	sample_msb = sample_lsb = 0;
 	sample_enable = 0;
 

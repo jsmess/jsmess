@@ -51,7 +51,7 @@ file2str$(EXE): $(FILE2STROBJS) $(LIBOCORE)
 ROMCMPOBJS = \
 	$(TOOLSOBJ)/romcmp.o \
 
-romcmp$(EXE): $(ROMCMPOBJS) $(LIBUTIL) $(ZLIB) $(LIBOCORE)
+romcmp$(EXE): $(ROMCMPOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
@@ -65,7 +65,7 @@ CHDMANOBJS = \
 	$(TOOLSOBJ)/chdman.o \
 	$(TOOLSOBJ)/chdcd.o \
 
-chdman$(EXE): $(VERSIONOBJ) $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(LIBOCORE)
+chdman$(EXE): $(VERSIONOBJ) $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(EXPAT) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
@@ -78,7 +78,7 @@ chdman$(EXE): $(VERSIONOBJ) $(CHDMANOBJS) $(LIBUTIL) $(ZLIB) $(LIBOCORE)
 JEDUTILOBJS = \
 	$(TOOLSOBJ)/jedutil.o \
 
-jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE)
+jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
@@ -91,6 +91,6 @@ jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE)
 MAKEMETAOBJS = \
 	$(TOOLSOBJ)/makemeta.o \
 
-makemeta$(EXE): $(MAKEMETAOBJS) $(LIBUTIL) $(LIBOCORE)
+makemeta$(EXE): $(MAKEMETAOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

@@ -9,127 +9,10 @@
 
  The hardware similar to Knuckle Joe.
 
-        TODO - Sound
-           - YM2151 + YM 3012
-
-
-Toshiba T5182 die map, by Jonathan Gevaryahu AKA Lord Nightmare,
-with assistance from Kevin Horton.
-T5182 supplied by Tomasz 'Dox' Slanina
-
-Die Diagram:
-|------------------------|
-\ ROM  RAM  Z80    A     |
-/ B    C    D   E  F  G  |
-|------------------------|
-
-The ROM is a 23128 wired as a 2364 by tying a13 to /ce
-The RAM is a 2016
-The Z80 is a ...Z80. go figure.
-Subdie A is a 7408 quad AND gate
-Subdie B is a 74245 bidirectional bus transciever
-Subdie C is a 74245 bidirectional bus transciever
-Subdie D is a 74245 bidirectional bus transciever
-Subdie E is a 74138 1 to 8 decoder/demultiplexer with active low outputs
-Subdie F is a 74138 1 to 8 decoder/demultiplexer with active low outputs
-Subdie G is a 7408 quad AND gate
-Thanks to Kevin Horton for working out most of the logic gate types
-from the diagram.
-
-                       ______________________
-                     _|*                     |_
-               GND  |_|1                   50|_| Vcc
-                     _|                      |_
-                A8  |_|2                   49|_| A7
-                     _|                      |_
-                A9  |_|3                   48|_| A6
-                     _|                      |_
-               A10  |_|4                   47|_| A5
-                     _|                      |_
-               A11  |_|5                   46|_| A4
-                     _|       TOSHIBA        |_
-               A12  |_|6       T5182       45|_| A3
-                     _|                      |_
-               A13  |_|7                   44|_| A2
-                     _|     JAPAN  8612      |_
-               A14  |_|8                   43|_| A1
-                     _|                      |_
-               A15  |_|9                   42|_| A0
-                     _|                      |_
-                D4  |_|10                  41|_| D3
-                     _|                      |_
-                D5  |_|11                  40|_| D2
-                     _|                      |_
-                D6  |_|12                  39|_| D1
-                     _|                      |_
-                D7  |_|13                  38|_| D0
-                     _|                      |_
-         I/O /EN 2  |_|14                  37|_|  I/O /EN 1
-                     _|                      |_
-         I/O /EN 3  |_|15                  36|_|  I/O /EN 0
-                     _|                      |_
-         I/O /EN 4  |_|16                  35|_|  /EN 0x8000-0xFFFF
-                     _|                      |_
-         I/O /EN 5  |_|17                  34|_|  /EN 0x4000-0x7FFF
-                     _|                      |_
-  Z80 phi clock in  |_|18                  33|_|  N/C
-                     _|                      |_
-          Z80 /INT  |_|19                  32|_|  Z80 /RESET
-                     _|                      |_
-          Z80 /NMI  |_|20                  31|_|  Z80 /BUSRQ Test pin
-                     _|                      |_
- Shorted to pin 22  |_|21                  30|_|  74245 'A'+'B' DIR Test pin
-                     _|                      |_
- /EN 0x0000-0x1fff  |_|22                  29|_|  Z80 /BUSAK Test pin
-                     _|                      |_
-Z80 /MREQ Test pin  |_|23                  28|_|  Z80 /WR
-                     _|                      |_
-Z80 /IORQ Test pin  |_|24                  27|_|  Z80 /RD
-                     _|                      |_
-               GND  |_|25                  26|_|  Vcc
-                      |______________________|
-
-Based on sketch made by Tormod
-Note: all pins marked as 'Test pin' are disabled internally and cannot be used without removing the chip cover and soldering together test pads.
-Note: pins 21 and 22 are both shorted together, and go active (low) while the internal rom is being read. The internal rom can be disabled by pulling /IORQ or /MREQ low,
-      but both of those test pins are disabled, and also one would have to use the DIR test pin at the same time to feed the z80 a new internal rom (this is PROBABLY how
-      seibu prototyped the rom, they had an external rom connected to this enable, and the internal rom disabled somehow) This pin CAN however be used as an indicator as
-      to when the internal rom is being read, allowing one to snoop the address and data busses without fear of getting ram data as opposed to rom.
-
-Z80 Memory Map:
-0x0000-0x1FFF - Internal ROM, also external space 0 (which is effectively disabled)
-0x2000-0x3fff - Internal RAM, repeated/mirrored 4 times
-0x4000-0x7fff - external space 1 (used for communication shared memory?)
-0x8000-0xFFFF - external space 2 (used for sound rom)
-
-I/O map:
-FEDCBA9876543210
-xxxxxxxxx000xxxx i/o /EN 0 goes low
-xxxxxxxxx001xxxx i/o /EN 1 goes low
-xxxxxxxxx010xxxx i/o /EN 2 goes low
-xxxxxxxxx011xxxx i/o /EN 3 goes low
-xxxxxxxxx100xxxx i/o /EN 4 goes low
-xxxxxxxxx101xxxx i/o /EN 5 goes low
-xxxxxxxxx110xxxx i/o /EN 6\__ these two are unbonded pins, so are useless.
-xxxxxxxxx111xxxx i/o /EN 7/
-
-IMPORTANT: the data lines for the external rom on darkmist are scrambled on the SEI8608B board as such:
-CPU:     ROM:
-D0       D0
-D1       D6
-D2       D5
-D3       D4
-D4       D3
-D5       D2
-D6       D1
-D7       D7
-Only the data lines are scrambled, the address lines are not.
-These lines are NOT scrambled to the ym2151 or anything else, just the external rom.
-
-
 ***************************************************************************/
 #include "driver.h"
-#include "audio/seibu.h"
+#include "audio/seibu.h"	// for seibu_sound_decrypt on the MAIN cpu (not sound)
+#include "audio/t5182.h"
 
 WRITE8_HANDLER( mustache_videoram_w );
 WRITE8_HANDLER( mustache_scroll_w );
@@ -139,37 +22,35 @@ VIDEO_UPDATE( mustache );
 PALETTE_INIT( mustache );
 
 
-static int read_coins=0;
-
-READ8_HANDLER ( mustache_coin_hack_r )
+static READ8_HANDLER(t5182shared_r)
 {
-	return (read_coins)?((offset&1	)?(input_port_5_r(0)<<5)|(input_port_5_r(0)<<7):(input_port_5_r(0)<<4)):0;
+	return t5182_sharedram[offset];
+}
+
+static WRITE8_HANDLER(t5182shared_w)
+{
+	t5182_sharedram[offset] = data;
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(videoram_r)		/* videoram */
-	AM_RANGE(0xd001, 0xd001) AM_READ(MRA8_RAM) /* T5182 ? */
-	AM_RANGE(0xd400, 0xd4ff) AM_READ(MRA8_RAM) /* shared with T5182 ?*/
+static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(videoram_r, mustache_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(t5182_sound_irq_w)
+	AM_RANGE(0xd001, 0xd001) AM_READ(t5182_sharedram_semaphore_snd_r)
+	AM_RANGE(0xd002, 0xd002) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0xd003, 0xd003) AM_WRITE(t5182_sharedram_semaphore_main_release_w)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(t5182shared_r, t5182shared_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(input_port_0_r) /* IN 0 */
 	AM_RANGE(0xd801, 0xd801) AM_READ(input_port_1_r) /* IN 1 */
 	AM_RANGE(0xd802, 0xd802) AM_READ(input_port_2_r) /* IN 2 */
 	AM_RANGE(0xd803, 0xd803) AM_READ(input_port_3_r)	/* DSW A */
 	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_4_r)	/* DSW B */
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(mustache_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd003) AM_WRITE(MWA8_RAM) /* T5182 ? */
-	AM_RANGE(0xd400, 0xd4ff) AM_WRITE(MWA8_RAM) /* shared with T5182 ?*/
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(mustache_scroll_w)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(mustache_video_control_w)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -241,8 +122,9 @@ INPUT_PORTS_START( mustache )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_START_TAG(T5182COINPORT)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 
 INPUT_PORTS_END
 
@@ -278,7 +160,6 @@ static const gfx_decode gfxdecodeinfo[] =
 
 INTERRUPT_GEN( mustache_interrupt)
 {
-	read_coins^=1;
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 }
 
@@ -287,8 +168,12 @@ static MACHINE_DRIVER_START( mustache )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/4) /* maybe 12000000/3 - two xtals (18.432 and 12.xxx) near cpu*/
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_VBLANK_INT(mustache_interrupt,2)
+
+	MDRV_CPU_ADD_TAG(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
+	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)
+	MDRV_CPU_IO_MAP(t5182_io, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -304,6 +189,14 @@ static MACHINE_DRIVER_START( mustache )
 	MDRV_PALETTE_INIT(mustache)
 	MDRV_VIDEO_START(mustache)
 	MDRV_VIDEO_UPDATE(mustache)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM2151, 14318180/4)	/* 3.579545 MHz */
+	MDRV_SOUND_CONFIG(t5182_ym2151_interface)
+	MDRV_SOUND_ROUTE(0, "mono", 1.0)
+	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_DRIVER_END
 
 ROM_START( mustache )
@@ -311,8 +204,9 @@ ROM_START( mustache )
 	ROM_LOAD( "mustache.h18", 0x0000, 0x8000, CRC(123bd9b8) SHA1(33a7cba5c3a54b0b1a15dd1e24d298b6f7274321) )
 	ROM_LOAD( "mustache.h16", 0x8000, 0x4000, CRC(62552beb) SHA1(ee10991d7de0596608fa1db48805781cbfbbdb9f) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )  /* T5182 */
-	ROM_LOAD( "mustache.e5",0x0000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Toshiba T5182 module */
+	ROM_LOAD( "t5182.rom",   0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
+	ROM_LOAD( "mustache.e5", 0x8000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
 
 	ROM_REGION( 0x0c000, REGION_GFX1,0)	/* BG tiles  */
 	ROM_LOAD( "mustache.a13", 0x0000,  0x4000, CRC(9baee4a7) SHA1(31bcec838789462e67e54ebe7256db9fc4e51b69) )
@@ -379,9 +273,7 @@ static DRIVER_INIT( mustache )
 
 	free(buf);
 	seibu_sound_decrypt(REGION_CPU1,0x8000);
-
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd400, 0xd401, 0, 0, mustache_coin_hack_r);
 }
 
 
-GAME( 1987, mustache, 0, mustache, mustache, mustache, ROT90, "[Seibu Kaihatsu] (March license)", "Mustache Boy", GAME_NO_SOUND )
+GAME( 1987, mustache, 0, mustache, mustache, mustache, ROT90, "[Seibu Kaihatsu] (March license)", "Mustache Boy", 0 )

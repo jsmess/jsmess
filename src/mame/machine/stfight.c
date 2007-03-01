@@ -94,20 +94,21 @@ WRITE8_HANDLER( stfight_bank_w )
 	memory_set_bankptr( 1, &ROM2[data<<14] );
 }
 
+/*
+ *      CPU 1 timed interrupt - 60Hz???
+ */
+
+void stfight_interrupt_1(int param)
+{
+    // Do a RST08
+    cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xcf);
+}
+
 INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
     cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xd7);
-}
-
-/*
- *      CPU 1 timed interrupt - 30Hz???
- */
-
-INTERRUPT_GEN( stfight_interrupt_1 )
-{
-    // Do a RST08
-    cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xcf);
+   	timer_set(TIME_IN_HZ(120), 0, stfight_interrupt_1);
 }
 
 /*

@@ -20,7 +20,7 @@ struct TMS36XX {
 	char *subtype;		/* subtype name MM6221AA, TMS3615 or TMS3617 */
 	sound_stream * channel;	/* returned by stream_create() */
 
-	int samplerate; 	/* from Machine->sample_rate */
+	int samplerate; 	/* output sample rate */
 
 	int basefreq;		/* chip's base frequency */
 	int octave; 		/* octave select of the TMS3615 */
@@ -501,8 +501,8 @@ static void *tms36xx_start(int sndindex, int clock, const void *config)
 
 	tms->intf = config;
 
-   tms->channel = stream_create(0, 1, Machine->sample_rate, tms, tms36xx_sound_update);
-	tms->samplerate = Machine->sample_rate;
+   tms->channel = stream_create(0, 1, clock * 64, tms, tms36xx_sound_update);
+	tms->samplerate = clock * 64;
 	tms->basefreq = clock;
 	enable = 0;
    for (j = 0; j < 6; j++)

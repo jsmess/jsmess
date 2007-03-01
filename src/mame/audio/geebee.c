@@ -20,6 +20,7 @@ static int sound_latch = 0;
 static int sound_signal = 0;
 static int volume = 0;
 static int noise = 0;
+static int vcount = 0;
 
 static void volume_decay(int param)
 {
@@ -61,18 +62,13 @@ WRITE8_HANDLER( geebee_sound_w )
 
 static void geebee_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
 {
-    static int vcarry = 0;
-    static int vcount = 0;
     stream_sample_t *buffer = outputs[0];
 
     while (length--)
     {
 		*buffer++ = sound_signal;
 		/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
-		vcarry -= 18432000 / 3 / 2 / 384;
-        while (vcarry < 0)
         {
-            vcarry += Machine->sample_rate;
             vcount++;
 			/* noise clocked with raising edge of 2V */
 			if ((vcount & 3) == 2)
@@ -123,7 +119,9 @@ void *geebee_sh_start(int clock, const struct CustomSound_interface *config)
     for( i = 0; i < 0x8000; i++ )
 		decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	channel = stream_create(0, 1, Machine->sample_rate, NULL, geebee_sound_update);
+	/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */
+	channel = stream_create(0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
+	vcount = 0;
 
 	volume_timer = timer_alloc(volume_decay);
     return auto_malloc(1);

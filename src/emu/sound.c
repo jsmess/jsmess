@@ -23,7 +23,7 @@
 ***************************************************************************/
 
 #define VERBOSE			(0)
-#define MAKE_WAVS		(1)
+#define MAKE_WAVS		(0)
 
 #if VERBOSE
 #define VPRINTF(x)		mame_printf_debug x
@@ -103,7 +103,7 @@ static speaker_info speaker[MAX_SPEAKER];
 static INT16 *finalmix;
 static INT32 *leftmix, *rightmix;
 
-static int sound_enabled;
+static int sound_muted;
 static int sound_attenuation;
 static int global_sound_enabled;
 static int nosound_mode;
@@ -117,8 +117,8 @@ static wav_file *wavfile;
 ***************************************************************************/
 
 static void sound_reset(running_machine *machine);
-static void sound_pause(running_machine *machine, int pause);
 static void sound_exit(running_machine *machine);
+static void sound_pause(running_machine *machine, int pause);
 static void sound_load(int config_type, xml_data_node *parentnode);
 static void sound_save(int config_type, xml_data_node *parentnode);
 static void sound_update(int param);
@@ -220,7 +220,7 @@ int sound_init(running_machine *machine)
 
 	/* enable sound by default */
 	global_sound_enabled = TRUE;
-	sound_enabled = TRUE;
+	sound_muted = FALSE;
 	sound_set_attenuation(sound_attenuation);
 
 	/* register callbacks */
@@ -533,8 +533,25 @@ static void sound_reset(running_machine *machine)
 
 static void sound_pause(running_machine *machine, int pause)
 {
-	sound_enabled = !pause;
-	osd_set_mastervolume(sound_enabled ? sound_attenuation : -32);
+	if (pause)
+		sound_muted |= 0x02;
+	else
+		sound_muted &= ~0x02;
+	osd_set_mastervolume(sound_muted ? -32 : sound_attenuation);
+}
+
+
+/*-------------------------------------------------
+    sound_pause - pause sound output
+-------------------------------------------------*/
+
+void sound_mute(int mute)
+{
+	if (mute)
+		sound_muted |= 0x01;
+	else
+		sound_muted &= ~0x01;
+	osd_set_mastervolume(sound_muted ? -32 : sound_attenuation);
 }
 
 
@@ -545,7 +562,7 @@ static void sound_pause(running_machine *machine, int pause)
 void sound_set_attenuation(int attenuation)
 {
 	sound_attenuation = attenuation;
-	osd_set_mastervolume(sound_enabled ? sound_attenuation : -32);
+	osd_set_mastervolume(sound_muted ? -32 : sound_attenuation);
 }
 
 
@@ -658,7 +675,7 @@ static void sound_update(int param)
 	int samples_this_update = 0;
 	int sample, spknum;
 
-	VPRINTF(("sound_frame_update\n"));
+	VPRINTF(("sound_update\n"));
 
 	profiler_mark(PROFILER_SOUND);
 

@@ -455,10 +455,10 @@ static void K054539_init_chip(struct k054539_info *info, int clock, int sndindex
 	info->K054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
-	info->ram = auto_malloc(0x4000*2+48000/55*2);
+	info->ram = auto_malloc(0x4000*2+clock/50*2);
 	info->reverb_pos = 0;
 	info->cur_ptr = 0;
-	memset(info->ram, 0, 0x4000*2+48000/55*2);
+	memset(info->ram, 0, 0x4000*2+clock/50*2);
 
 	info->rom = memory_region(info->intf->region);
 	info->rom_size = memory_region_length(info->intf->region);

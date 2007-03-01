@@ -6,7 +6,6 @@ TODO:
 - there are 3 more bitplanes of tile graphics, but colors are correct as they are...
   what are they, priority info? Should they be mapped at 8000-bfff in memory?
 - problems with bg tilemaps reading (USER3 region)
-- sound
 
 --
 
@@ -14,17 +13,20 @@ Panic Road (JPN Ver.)
 (c)1986 Taito / Seibu
 SEI-8611M (M6100219A)
 
-CPU  : Sony CXQ70116D-8 (8086)
-Sound: YM2151,
 OSC  : 14.31818MHz,12.0000MHz,16.0000MHz
+CPU  : V20 (Sony CXQ70116D-8) @ 8.000MHz [16/2]
+       Toshiba T5182 @ 3.579545 (14.31818/4]
+Sound: YM2151 @ 3.579545 [14.31818/4]
+    VSync 60Hz
+    HSync 15.32kHz
 Other:
-    Toshiba T5182
     SEI0010BU(TC17G005AN-0025) x3
     SEI0021BU(TC17G008AN-0022)
     Toshiba(TC17G008AN-0024)
     SEI0030BU(TC17G005AN-0026)
     SEI0050BU(MA640 00)
-    SEI0040BU(TC15G008AN-0048)
+    SEI0040BU(TC15G008AN-0048) @ 6.00MHz [12/2]
+
 
 13F.BIN      [4e6b3c04]
 15F.BIN      [d735b572]
@@ -58,6 +60,7 @@ D.9B         [f99cac4b] /
 */
 
 #include "driver.h"
+#include "audio/t5182.h"
 
 static tilemap *bgtilemap, *txttilemap;
 static unsigned char *scrollram;
@@ -126,20 +129,38 @@ static void get_txttile_info(int tile_index)
 		0)
 }
 
+static READ8_HANDLER(t5182shared_r)
+{
+	if ((offset & 1) == 0)
+		return t5182_sharedram[offset/2];
+	else
+		return 0;
+}
+
+static WRITE8_HANDLER(t5182shared_w)
+{
+	if ((offset & 1) == 0)
+		t5182_sharedram[offset/2] = data;
+}
+
+
 static ADDRESS_MAP_START( panicr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE(&mainram)
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION(REGION_USER3, 0) //attribue map ?
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x0d000, 0x0d008) AM_RAM
-	AM_RANGE(0x0d200, 0x0d2ff) AM_RAM // t5182 (seibu sound system)
-	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE (&scrollram)
+	AM_RANGE(0x0d000, 0x0d000) AM_WRITE(t5182_sound_irq_w)
+	AM_RANGE(0x0d002, 0x0d002) AM_READ(t5182_sharedram_semaphore_snd_r)
+	AM_RANGE(0x0d004, 0x0d004) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0x0d006, 0x0d006) AM_WRITE(t5182_sharedram_semaphore_main_release_w)
+	AM_RANGE(0x0d200, 0x0d2ff) AM_READWRITE(t5182shared_r, t5182shared_w)
 	AM_RANGE(0x0d400, 0x0d400) AM_READ(input_port_0_r)
 	AM_RANGE(0x0d402, 0x0d402) AM_READ(input_port_1_r)
 	AM_RANGE(0x0d404, 0x0d404) AM_READ(input_port_2_r)
 	AM_RANGE(0x0d406, 0x0d406) AM_READ(input_port_3_r)
 	AM_RANGE(0x0d407, 0x0d407) AM_READ(input_port_4_r)
+	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE (&scrollram)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -176,11 +197,6 @@ static void draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect )
 
 VIDEO_UPDATE( panicr)
 {
-	if(input_port_5_r(0)&1)
-	{
-		mainram[0x4a2]++;
-	}
-
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 	tilemap_mark_all_tiles_dirty( txttilemap );
 	tilemap_set_scrollx( bgtilemap,0, ((scrollram[0x02]&0x0f)<<12)+((scrollram[0x02]&0xf0)<<4)+((scrollram[0x04]&0x7f)<<1)+((scrollram[0x04]&0x80)>>7) );
@@ -281,9 +297,9 @@ INPUT_PORTS_START( panicr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START_TAG("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-
+	PORT_START_TAG(T5182COINPORT)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 
 INPUT_PORTS_END
 
@@ -338,8 +354,11 @@ static const gfx_decode gfxdecodeinfo[] =
 static MACHINE_DRIVER_START( panicr )
 	MDRV_CPU_ADD(V20,16000000/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MDRV_CPU_PROGRAM_MAP(panicr_map,0)
-
 	MDRV_CPU_VBLANK_INT(panicr_interrupt,2)
+
+	MDRV_CPU_ADD_TAG(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
+	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)
+	MDRV_CPU_IO_MAP(t5182_io, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -355,6 +374,14 @@ static MACHINE_DRIVER_START( panicr )
 	MDRV_VIDEO_START(panicr)
 	MDRV_VIDEO_UPDATE(panicr)
 
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM2151, 14318180/4)	/* 3.579545 MHz */
+	MDRV_SOUND_CONFIG(t5182_ym2151_interface)
+	MDRV_SOUND_ROUTE(0, "mono", 1.0)
+	MDRV_SOUND_ROUTE(1, "mono", 1.0)
+
 MACHINE_DRIVER_END
 
 ROM_START( panicr )
@@ -362,9 +389,9 @@ ROM_START( panicr )
 	ROM_LOAD16_BYTE("2.19m",   0x0f0000, 0x08000, CRC(3d48b0b5) SHA1(a6e8b38971a8964af463c16f32bb7dbd301dd314) )
 	ROM_LOAD16_BYTE("1.19n",   0x0f0001, 0x08000, CRC(674131b9) SHA1(63499cd5ad39e79e70f3ba7060680f0aa133f095) )
 
-	ROM_REGION( 0x18000, REGION_CPU3, 0 )	//seibu sound system
-	ROM_LOAD( "t5182.bin", 0x0000, 0x2000, NO_DUMP )
-	ROM_LOAD( "22d.bin",   0x010000, 0x08000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) ) //banked?
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Toshiba T5182 module */
+	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
+	ROM_LOAD( "22d.bin",   0x8000, 0x8000, CRC(eb1a46e1) SHA1(278859ae4bca9f421247e646d789fa1206dcd8fc) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "13f.bin", 0x000000, 0x2000, CRC(4e6b3c04) SHA1(f388969d5d822df0eaa4d8300cbf9cee47468360) )
@@ -513,4 +540,4 @@ static DRIVER_INIT( panicr )
 }
 
 
-GAME( 1986, panicr,  0,       panicr,  panicr,  panicr, ROT270, "Seibu", "Panic Road", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1986, panicr,  0,       panicr,  panicr,  panicr, ROT270, "Taito", "Panic Road", GAME_NOT_WORKING )

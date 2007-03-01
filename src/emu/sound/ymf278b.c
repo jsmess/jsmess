@@ -173,10 +173,10 @@ static UINT32 ymf278_compute_decay_rate(int num)
 			samples += 2;
 	}
 
-	return ((UINT64)samples * Machine->sample_rate) / 44100;
+	return samples;
 }
 
-static void ymf278b_envelope_next(YMF278BSlot *slot, float clock_ratio)
+static void ymf278b_envelope_next(YMF278BSlot *slot)
 {
 	if(slot->env_step == 0)
 	{
@@ -197,12 +197,12 @@ static void ymf278b_envelope_next(YMF278BSlot *slot, float clock_ratio)
 		{
 			int rate = ymf278b_compute_rate(slot, slot->D1R);
 #ifdef VERBOSE
-			logerror("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0*clock_ratio/Machine->sample_rate);
+			logerror("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0);
 #endif
 			if(rate<4)
 				slot->env_vol_step = 0;
 			else
-				slot->env_vol_step = ((slot->DL*8)<<23) / (ymf278_compute_decay_rate(rate) * clock_ratio);
+				slot->env_vol_step = ((slot->DL*8)<<23) / ymf278_compute_decay_rate(rate);
 			slot->env_vol_lim = (slot->DL*8)<<23;
 			return;
 		}
@@ -212,12 +212,12 @@ static void ymf278b_envelope_next(YMF278BSlot *slot, float clock_ratio)
 		// Decay 2
 		int rate = ymf278b_compute_rate(slot, slot->D2R);
 #ifdef VERBOSE
-		logerror("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, current vol = %d\n", slot->D2R, rate, ymf278_compute_decay_rate(rate)*1000.0*clock_ratio/Machine->sample_rate, slot->env_vol >> 23);
+		logerror("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, current vol = %d\n", slot->D2R, rate, ymf278_compute_decay_rate(rate)*1000.0, slot->env_vol >> 23);
 #endif
 		if(rate<4)
 			slot->env_vol_step = 0;
 		else
-			slot->env_vol_step = ((256U-slot->DL*8)<<23) / (ymf278_compute_decay_rate(rate) * clock_ratio);
+			slot->env_vol_step = ((256U-slot->DL*8)<<23) / ymf278_compute_decay_rate(rate);
 		slot->env_vol_lim = 256U<<23;
 		slot->env_step++;
 		return;
@@ -239,12 +239,12 @@ static void ymf278b_envelope_next(YMF278BSlot *slot, float clock_ratio)
 		// Release
 		int rate = ymf278b_compute_rate(slot, slot->RR);
 #ifdef VERBOSE
-		logerror("YMF278B: Release, val = %d, rate = %d, delay = %g\n", slot->RR, rate, ymf278_compute_decay_rate(rate)*1000.0*clock_ratio/Machine->sample_rate);
+		logerror("YMF278B: Release, val = %d, rate = %d, delay = %g\n", slot->RR, rate, ymf278_compute_decay_rate(rate)*1000.0);
 #endif
 		if(rate<4)
 			slot->env_vol_step = 0;
 		else
-			slot->env_vol_step = ((256U<<23)-slot->env_vol) / (ymf278_compute_decay_rate(rate) * clock_ratio);
+			slot->env_vol_step = ((256U<<23)-slot->env_vol) / ymf278_compute_decay_rate(rate);
 		slot->env_vol_lim = 256U<<23;
 		slot->env_step++;
 		return;
@@ -329,7 +329,7 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 				// update envelope
 				slot->env_vol += slot->env_vol_step;
 				if(((INT32)(slot->env_vol - slot->env_vol_lim)) >= 0)
-			 		ymf278b_envelope_next(slot, chip->clock_ratio);
+			 		ymf278b_envelope_next(slot);
 			}
 		}
 	}
@@ -521,9 +521,9 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 					slot->step = 0;
 
 					step = (slot->FN | 1024) << (oct + 7);
-					slot->step = (UINT32) ((((INT64)step)*(44100/4)) / Machine->sample_rate * chip->clock_ratio);
+					slot->step = step / 4;
 
-					ymf278b_envelope_next(slot, chip->clock_ratio);
+					ymf278b_envelope_next(slot);
 
 #ifdef VERBOSE
 					logerror("YMF278B: slot %2d wave %3d lfo=%d vib=%d ar=%d d1r=%d dl=%d d2r=%d rc=%d rr=%d am=%d\n", snum, slot->wave,
@@ -539,7 +539,7 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 					if(slot->active)
 					{
 						slot->env_step = 4;
-						ymf278b_envelope_next(slot, chip->clock_ratio);
+						ymf278b_envelope_next(slot);
 					}
 				}
 				break;
@@ -683,7 +683,7 @@ static void *ymf278b_start(int sndindex, int clock, const void *config)
 	intf = config;
 
 	ymf278b_init(chip, memory_region(intf->region), intf->irq_callback, clock);
-	chip->stream = stream_create(0, 2, Machine->sample_rate, chip, ymf278b_pcm_update);
+	chip->stream = stream_create(0, 2, clock/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB
 	for(i = 0; i < 256; i++)

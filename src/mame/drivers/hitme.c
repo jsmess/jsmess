@@ -427,7 +427,7 @@ INPUT_PORTS_START( hitme )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* this is actually a variable resistor */
-	PORT_START
+	PORT_START_TAG("R3")
 	PORT_ADJUSTER(30, "Game Speed")
 
 	/* this is actually a variable resistor */

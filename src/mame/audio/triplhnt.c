@@ -131,10 +131,10 @@ DISCRETE_SOUND_START(triplhnt_discrete_interface)
 	/************************************************/
 	/* Bear Roar is a VCO with noise mixed in.      */
 	/************************************************/
-	DISCRETE_ADJUSTMENT(NODE_20, 1,
+	DISCRETE_ADJUSTMENT_TAG(NODE_20, 1,
 				10000,	// R86 + R88 @ 0
 				260000,	// R86 + R88 @ max
-				DISC_LOGADJ, 10)
+				DISC_LOGADJ, "BEAR")
 	DISCRETE_DAC_R1(NODE_21, 1,			// base of Q2
 			TRIPLHNT_BEAR_ROAR_DATA,	// IC B10, Q0-Q3
 			DEFAULT_TTL_V_LOGIC_1,		// TTL ON level

@@ -84,7 +84,7 @@ static void get_bg_tile_info(int tile_index)
 	int code = videoram[2 * tile_index] + ((attr & 0xe0) << 3) + ((control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO(0, code, color, 0)
+	SET_TILE_INFO(0, code, color, (attr & 0x10) ? TILE_FLIPX : 0)
 }
 
 VIDEO_START( mustache )

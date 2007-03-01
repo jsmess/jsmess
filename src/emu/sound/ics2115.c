@@ -111,7 +111,7 @@ static void update(void *param, stream_sample_t **inputs, stream_sample_t **buff
 			UINT32 end = (chip->voice[osc].endh << 16) | (chip->voice[osc].endl << 8);
 			UINT32 loop = (chip->voice[osc].strth << 16) | (chip->voice[osc].strtl << 8);
 			UINT32 badr = (chip->voice[osc].saddr << 20) & 0xffffff;
-			UINT32 delta = (chip->voice[osc].fc << 2)*(33075.0/44100.0);
+			UINT32 delta = chip->voice[osc].fc << 2;
 			UINT8 conf = chip->voice[osc].conf;
 			INT32 vol = chip->voice[osc].volacc;
 			vol = (((vol & 0xff0)|0x1000)<<(vol>>12))>>12;
@@ -461,7 +461,7 @@ static void *ics2115_start(int sndindex, int clock, const void *config)
 	chip->timer[0].timer = timer_alloc_ptr(timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc_ptr(timer_cb_1, chip);
 	chip->ulaw = auto_malloc(256*sizeof(INT16));
-	chip->stream = stream_create(0, 2, Machine->sample_rate, chip, update);
+	chip->stream = stream_create(0, 2, 33075, chip, update);
 
 	if(!chip->timer[0].timer || !chip->timer[1].timer)
 		return NULL;

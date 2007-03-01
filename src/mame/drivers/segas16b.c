@@ -2223,13 +2223,13 @@ static INPUT_PORTS_START( hwchamp )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 	PORT_START_TAG("MONITOR")	/* monitor */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
 
 	PORT_START_TAG("RIGHT")		/* right handle */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
 
 	PORT_START_TAG("LEFT")		/* left handle */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(70) PORT_KEYDELTA(32)
 INPUT_PORTS_END
 
 
@@ -5043,6 +5043,19 @@ ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
+
+Currently there is a bad dump (except for the sound CPU code) of the following set which needs redumping:
+
+    Shinobi, Sega System 16B
+    CPU: 68000 + MC8123B (317-0054)
+    Program roms: epr-11355.a5 & epr-11356.a7
+               Tiles: mpr-11363.a14, mpr-11364.a15 & mpr-11365.a16
+             Sprites: mpr-11366.b1, mpr-11367.b2, mpr-11368.b5 & mpr-11369.b6
+      Sound CPU Code: epr-11377.a10 (Sound CPU is MC8123B, 317-0054 | When decrypted it matches eprxxxxx.a10 of shinobi4)
+          Sound Data: mpr-11362.a11
+
+ **************************************************************************************************************************
+
     Shinobi, Sega System 16B
     CPU: 68000
     ROM Board: 171-5521
@@ -5075,7 +5088,7 @@ ROM_END
 
 /**************************************************************************************************************************
     Shinobi, Sega System 16B
-    CPU: 68000
+    CPU: 68000 + MC8123B (317-0054)
     ROM Board: 171-5358
 */
 ROM_START( shinobi3 )
@@ -5101,7 +5114,7 @@ ROM_START( shinobi3 )
 	ROM_LOAD16_BYTE( "epr11297.30", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
 
 	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* sound CPU */
-	ROM_LOAD( "shinobi.a7",  0x00000, 0x8000, CRC(2457a7cf) SHA1(ddfac640e442537acb015de8bb088659f5a217ee) )
+	ROM_LOAD( "epr11372.a7", 0x00000, 0x8000, CRC(0824269a) SHA1(501ab1b80c6e8a4b0ccda148c13fa96c71c7300d) )	// MC8123B (317-0054) encrypted version of epr11287.a7
 	ROM_LOAD( "epr11288.a8", 0x10000, 0x8000, CRC(c8df8460) SHA1(0aeb41a493df155edb5f600f53ec43b798927dff) )
 	ROM_LOAD( "epr11289.a9", 0x20000, 0x8000, CRC(e5a4cf30) SHA1(d1982da7a550c11ab2253f5d64ac6ab847da0a04) )
 ROM_END
@@ -5937,6 +5950,14 @@ static DRIVER_INIT( defense_5358 )
 }
 
 
+static DRIVER_INIT( shinobi3_5358 )
+{
+	extern void mc8123_decrypt_0054(void);
+	init_generic_5358(machine);
+	mc8123_decrypt_0054();
+}
+
+
 static DRIVER_INIT( sjryuko_5358 )
 {
 	void fd1089_decrypt_5021(void);
@@ -6098,7 +6119,7 @@ GAME( 1987, defense,  sdi,      system16b,      sdi,      defense_5358,  ROT0,  
 GAME( 1987, sdib,     sdi,      system16b,      sdi,      defense_5358,  ROT0,   "Sega",           "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdibl,    sdi,      system16b,      sdi,      sdi_5358,      ROT0,   "bootleg",        "SDI - Strategic Defense Initiative (bootleg)", 0 )
 GAME( 1987, shinobi4, shinobi,  system16b,      shinobi,  generic_5521,  ROT0,   "Sega",           "Shinobi (set 4, System 16B, unprotected)", 0 )
-GAME( 1987, shinobi3, shinobi,  system16b,      shinobi,  generic_5358,  ROT0,   "Sega",           "Shinobi (set 3, System 16B, unprotected)", 0 )
+GAME( 1987, shinobi3, shinobi,  system16b,      shinobi,  shinobi3_5358, ROT0,   "Sega",           "Shinobi (set 3, System 16B, MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi2, shinobi,  system16b,      shinobi,  generic_5358,  ROT0,   "Sega",           "Shinobi (set 2, System 16B, FD1094 317-0049)", 0 )
 GAME( 1987, sonicbom, 0,        system16b,      sonicbom, generic_5358,  ROT270, "Sega",           "Sonic Boom (FD1094 317-0053)", 0 )
 GAME( 1987, sjryuko,  0,        timescan,       sjryuko,  sjryuko_5358,  ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 2, System 16B, FD1089B 317-5021)", 0 )

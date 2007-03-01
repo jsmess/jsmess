@@ -40,9 +40,9 @@ struct K053260_chip_def {
 };
 
 
-static void InitDeltaTable( struct K053260_chip_def *ic, int clock ) {
+static void InitDeltaTable( struct K053260_chip_def *ic, int rate, int clock ) {
 	int		i;
-	double	base = ( double )Machine->sample_rate;
+	double	base = ( double )rate;
 	double	max = (double)(clock); /* Hz */
 	unsigned long val;
 
@@ -196,6 +196,7 @@ void K053260_update( void * param, stream_sample_t **inputs, stream_sample_t **b
 static void *k053260_start(int sndindex, int clock, const void *config)
 {
 	struct K053260_chip_def *ic;
+	int rate = clock / 32;
 	int i;
 
 	ic = auto_malloc(sizeof(*ic));
@@ -215,9 +216,9 @@ static void *k053260_start(int sndindex, int clock, const void *config)
 
 	ic->delta_table = ( unsigned long * )auto_malloc( 0x1000 * sizeof( unsigned long ) );
 
-	ic->channel = stream_create( 0, 2, Machine->sample_rate, ic, K053260_update );
+	ic->channel = stream_create( 0, 2, rate, ic, K053260_update );
 
-	InitDeltaTable( ic, clock );
+	InitDeltaTable( ic, rate, clock );
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )

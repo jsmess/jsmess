@@ -313,16 +313,17 @@ void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t **buffe
 
 static void *c6280_start(int sndindex, int clock, const void *config)
 {
+    int rate = clock/16;
     c6280_t *info;
 
     info = auto_malloc(sizeof(*info));
     memset(info, 0, sizeof(*info));
 
    /* Initialize PSG emulator */
-   c6280_init(info, clock, Machine->sample_rate);
+   c6280_init(info, clock, rate);
 
    /* Create stereo stream */
-   info->stream = stream_create(0, 2, Machine->sample_rate, info, c6280_update);
+   info->stream = stream_create(0, 2, rate, info, c6280_update);
 
     return info;
 }

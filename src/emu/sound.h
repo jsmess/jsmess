@@ -68,9 +68,9 @@ struct _speaker_config
 
 /* core interfaces */
 int sound_init(running_machine *machine);
-void sound_frame_update(void);
 
 /* global sound controls */
+void sound_mute(int mute);
 void sound_set_attenuation(int attenuation);
 int sound_get_attenuation(void);
 void sound_global_enable(int enable);

@@ -1362,22 +1362,21 @@ int seq_read_async(input_seq *seq, int first)
 			{
 				UINT32 joy_num = (record_seq[0] - JOYCODE_1_ANALOG_X) / 3;
 				input_code joy_code = JOYCODE_1_ANALOG_X + joy_num * 3;
-				int joy_full_axis = 0;
+				int joy_full_axis = 1;
 				int joy_axis_toggled = 0;
 
 				/* set to full axis if first code or last code was a part axis */
-				joy_full_axis = seqnum == 0;
 				if  (seqnum > 0)
 				{
 					input_code last_code = seq->code[seqnum - 1];
 
 					if (last_code == joy_code)
-						joy_axis_toggled = 1;
-					else if (last_code == (joy_code + 1) || last_code == (joy_code + 2))
 					{
 						joy_axis_toggled = 1;
-						joy_full_axis = 1;
+						joy_full_axis = 0;
 					}
+					else if (last_code == (joy_code + 1) || last_code == (joy_code + 2))
+						joy_axis_toggled = 1;
 				}
 
 				if (joy_full_axis) record_seq[0] = joy_code;

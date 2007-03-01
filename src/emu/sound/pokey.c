@@ -52,9 +52,6 @@
 #include "cpuintrf.h"
 #include "pokey.h"
 
-/* clear this to use Machine->sample_rate instead of the native rate */
-#define OUTPUT_NATIVE		1
-
 /*
  * Defining this produces much more (about twice as much)
  * but also more efficient code. Ideally this should be set
@@ -356,7 +353,6 @@ static void pokey_pot_trigger_7(void *param);
 
 #endif
 
-#if OUTPUT_NATIVE
 #define PROCESS_SAMPLE(chip)                                            \
     ADJUST_EVENT(chip);                                                 \
     /* adjust the sample position */                                    \
@@ -364,20 +360,6 @@ static void pokey_pot_trigger_7(void *param);
 	/* store sum of output signals into the buffer */					\
 	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;							\
 	length--
-#else
-#define PROCESS_SAMPLE(chip)                                            \
-    ADJUST_EVENT(chip);                                                 \
-    /* adjust the sample position */                                    \
-	chip->samplepos_fract += chip->samplerate_24_8; 					\
-	if( chip->samplepos_fract & 0xffffff00 )							\
-	{																	\
-		chip->samplepos_whole += chip->samplepos_fract>>8;				\
-		chip->samplepos_fract &= 0x000000ff;							\
-	}																	\
-	/* store sum of output signals into the buffer */					\
-	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;							\
-	length--
-#endif
 
 #if HEAVY_MACRO_USAGE
 
@@ -645,8 +627,8 @@ static void register_for_save(struct POKEYregisters *chip, int index)
 
 static void *pokey_start(int sndindex, int clock, const void *config)
 {
-	int sample_rate = OUTPUT_NATIVE ? clock : Machine->sample_rate;
 	struct POKEYregisters *chip;
+	int sample_rate = clock;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));

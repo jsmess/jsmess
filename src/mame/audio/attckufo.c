@@ -42,6 +42,8 @@
 #define NOISE_ON (attckufo_regs[0xd]&0x80)
 #define VOLUME (attckufo_regs[0xe]&0x0f)
 
+#define OUTPUT_RATE		(14318181/14/32)
+
 #define TONE_FREQUENCY_MIN  ((14318181/14)/256/128)
 #define TONE1_VALUE (8*(128-((attckufo_regs[0xa]+1)&0x7f)))
 #define TONE1_FREQUENCY ((14318181/14)/32/TONE1_VALUE)
@@ -75,7 +77,7 @@ void attckufo_soundport_w (int offset, int data)
 		if (!(old & 0x80) && TONE1_ON)
 		{
 			tone1pos = 0;
-			tone1samples = Machine->sample_rate / TONE1_FREQUENCY;
+			tone1samples = OUTPUT_RATE / TONE1_FREQUENCY;
 			if (tone1samples == 0)
 				tone1samples = 1;
 		}
@@ -86,7 +88,7 @@ void attckufo_soundport_w (int offset, int data)
 		if (!(old & 0x80) && TONE2_ON)
 		{
 			tone2pos = 0;
-			tone2samples = Machine->sample_rate / TONE2_FREQUENCY;
+			tone2samples = OUTPUT_RATE / TONE2_FREQUENCY;
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
@@ -97,7 +99,7 @@ void attckufo_soundport_w (int offset, int data)
 		if (!(old & 0x80) && TONE3_ON)
 		{
 			tone3pos = 0;
-			tone3samples = Machine->sample_rate / TONE3_FREQUENCY;
+			tone3samples = OUTPUT_RATE / TONE3_FREQUENCY;
 			if (tone2samples == 0)
 				tone2samples = 1;
 		}
@@ -107,7 +109,7 @@ void attckufo_soundport_w (int offset, int data)
 		attckufo_regs[offset] = data;
 		if (NOISE_ON)
 		{
-			noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * Machine->sample_rate
+			noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * OUTPUT_RATE
 								  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
 
 			if ((double) noisepos / noisesamples >= 1.0)
@@ -146,7 +148,7 @@ static void attckufo_update (void *param,stream_sample_t **inputs, stream_sample
 			if (tone1pos >= tone1samples)
 			{
 				tone1pos = 0;
-				tone1samples = Machine->sample_rate / TONE1_FREQUENCY;
+				tone1samples = OUTPUT_RATE / TONE1_FREQUENCY;
 				if (tone1samples == 0)
 					tone1samples = 1;
 			}
@@ -159,7 +161,7 @@ static void attckufo_update (void *param,stream_sample_t **inputs, stream_sample
 			if (tone2pos >= tone2samples)
 			{
 				tone2pos = 0;
-				tone2samples = Machine->sample_rate / TONE2_FREQUENCY;
+				tone2samples = OUTPUT_RATE / TONE2_FREQUENCY;
 				if (tone2samples == 0)
 					tone2samples = 1;
 			}
@@ -173,7 +175,7 @@ static void attckufo_update (void *param,stream_sample_t **inputs, stream_sample
 			if (tone3pos >= tone3samples)
 			{
 				tone3pos = 0;
-				tone3samples = Machine->sample_rate / TONE3_FREQUENCY;
+				tone3samples = OUTPUT_RATE / TONE3_FREQUENCY;
 				if (tone3samples == 0)
 					tone3samples = 1;
 			}
@@ -210,7 +212,7 @@ void *attckufo_custom_start(int clock, const struct CustomSound_interface *confi
 {
 	int i;
 
-	channel = stream_create(0, 1, Machine->sample_rate, 0, attckufo_update);
+	channel = stream_create(0, 1, OUTPUT_RATE, 0, attckufo_update);
 
 
 	/* buffer for fastest played sample for 5 second
@@ -247,7 +249,7 @@ void *attckufo_custom_start(int clock, const struct CustomSound_interface *confi
 				noiseshift <<= 1;
 		}
 	}
-	tonesize = Machine->sample_rate / TONE_FREQUENCY_MIN;
+	tonesize = OUTPUT_RATE / TONE_FREQUENCY_MIN;
 
 	tone = (INT16*) auto_malloc (tonesize * sizeof (tone[0]));
 

@@ -145,9 +145,7 @@ typedef struct {
 	UINT32	INTR;		/* vector for INTR */
 	UINT32	IRQ2;		/* scheduled interrupt address */
 	UINT32	IRQ1;		/* executed interrupt address */
-	INT8	nmi_state;
 	INT8	irq_state[4];
-	INT8	filler; /* align on dword boundary */
 	int 	(*irq_callback)(int);
 	void	(*sod_callback)(int state);
 }	i8085_Regs;
@@ -320,7 +318,6 @@ INLINE void execute_one(int opcode)
 				i8085_ICount -= 7;		/* RIM  */
 				I.AF.b.h = I.IM;
 				I.AF.b.h |= RIM_IEN; RIM_IEN = 0; //AT: read and clear IEN status latch
-/*              survival_prot ^= 0x01; */
 			} else {
 				i8085_ICount -= 4;		/* NOP undocumented */
 			}
@@ -1338,7 +1335,6 @@ static void i8085_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("i8085", index, I.INTR);
 	state_save_register_item("i8085", index, I.IRQ2);
 	state_save_register_item("i8085", index, I.IRQ1);
-	state_save_register_item("i8085", index, I.nmi_state);
 	state_save_register_item_array("i8085", index, I.irq_state);
 }
 
@@ -1499,7 +1495,6 @@ static void i8085_set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		I.nmi_state = state;
 		if( state != CLEAR_LINE )
 			i8085_set_TRAP(1);
 	}
@@ -1554,12 +1549,12 @@ void i8080_init(int index, int clock, const void *config, int (*irqcallback)(int
 	state_save_register_item("i8080", index, I.SP.w.l);
 	state_save_register_item("i8080", index, I.PC.w.l);
 	state_save_register_item("i8080", index, I.HALT);
+	state_save_register_item("i8085", index, I.IM);
 	state_save_register_item("i8080", index, I.IREQ);
 	state_save_register_item("i8080", index, I.ISRV);
 	state_save_register_item("i8080", index, I.INTR);
 	state_save_register_item("i8080", index, I.IRQ2);
 	state_save_register_item("i8080", index, I.IRQ1);
-	state_save_register_item("i8080", index, I.nmi_state);
 	state_save_register_item_array("i8080", index, I.irq_state);
 }
 
@@ -1567,7 +1562,8 @@ void i8080_set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		i8085_set_irq_line(irqline, state);
+		if( state != CLEAR_LINE )
+			i8085_set_TRAP(1);
 	}
 	else
 	{

@@ -59,21 +59,6 @@ static PALETTE_INIT( attckufo )
 	palette_set_colors(machine, 0, attckufo_palette, sizeof(attckufo_palette) / 3);
 }
 
-int attckufo_dma_read (int offset)
-{
-	if(offset<0x1000)
-		return mainram[offset];
-	if(offset>= 0x1c00 && offset<0x2000)
-		return tileram[offset-0x1c00];
-	if(offset>=0x2000 && offset <	0x2400)
-		return memory_region(REGION_USER1)[offset-0x2000];
-	return 0xff;
-}
-
-int attckufo_dma_read_color (int offset)
-{
-	return attckufo_dma_read(offset+0x400);
-}
 
 static READ8_HANDLER(attckufo_io_r)
 {
@@ -98,12 +83,12 @@ static WRITE8_HANDLER(attckufo_io_w)
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&mainram)
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(attckufo_port_r, attckufo_port_w)
 	AM_RANGE(0x1400, 0x1403) AM_READWRITE(attckufo_io_r, attckufo_io_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE(&tileram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 INPUT_PORTS_START( attckufo )
@@ -158,8 +143,7 @@ static MACHINE_DRIVER_START( attckufo )
 	MDRV_PALETTE_LENGTH(sizeof (attckufo_palette) / sizeof (attckufo_palette[0]) / 3)
 	MDRV_PALETTE_INIT( attckufo )
 
-	MDRV_VIDEO_START( attckufo )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( attckufo )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -169,7 +153,7 @@ static MACHINE_DRIVER_START( attckufo )
 MACHINE_DRIVER_END
 
 ROM_START( attckufo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x4000, REGION_CPU1, 0 )
 	ROM_LOAD( "1", 0x2000, 0x0400, CRC(b32a36ab) SHA1(4e64686d498f7a79f5213c42b7afbf35aac2b622) )
 	ROM_LOAD( "2", 0x2400, 0x0400, CRC(35fc8424) SHA1(d4926768f2e5b21476c7ec33743fe3e1c76662db) )
 	ROM_LOAD( "3", 0x2800, 0x0400, CRC(6341c8c4) SHA1(8647a4fabad0399769dd068d784be72e27afca35) )
@@ -178,7 +162,6 @@ ROM_START( attckufo )
 	ROM_LOAD( "6", 0x3400, 0x0400, CRC(8103e031) SHA1(86bc8dd6c74b84804ede31a8454b5b3d3e4d88b1) )
 	ROM_LOAD( "7", 0x3800, 0x0400, CRC(43a41012) SHA1(edd14f49dc9ae7a5a14583b9a92ebbbdd021d7b1) )
 	ROM_LOAD( "8", 0x3c00, 0x0400, CRC(9ce93eb0) SHA1(68753e88db4e920446b9582b5cb713b1beec3b27) )
-	ROM_RELOAD(    0xfc00, 0x0400 ) //vectors
 
 	ROM_REGION( 0x400, REGION_USER1, 0 )
 	ROM_COPY( REGION_CPU1, 0x02000, 0x00000, 0x400)

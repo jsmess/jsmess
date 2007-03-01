@@ -4,6 +4,10 @@
 #include <math.h>
 
 
+/* default to 4x oversampling */
+#define DEFAULT_SAMPLE_RATE (48000 * 4)
+
+
 #define	INTEGRATOR_LEAK_TC		0.001
 #define	FILTER_DECAY_TC			0.004
 #define	FILTER_CHARGE_TC		0.004
@@ -15,6 +19,8 @@
 struct hc55516_data
 {
 	sound_stream *channel;
+	int		sample_rate;
+
 	UINT8	last_clock;
 	UINT8	databit;
 	UINT8	shiftreg;
@@ -50,7 +56,8 @@ static void *hc55516_start(int sndindex, int clock, const void *config)
 	leak = pow(exp(-1), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
 	/* create the stream */
-	chip->channel = stream_create(0, 1, Machine->sample_rate, chip, hc55516_update);
+	chip->sample_rate = clock ? clock : DEFAULT_SAMPLE_RATE;
+	chip->channel = stream_create(0, 1, chip->sample_rate, chip, hc55516_update);
 
 	state_save_register_item("hc55516", sndindex, chip->last_clock);
 	state_save_register_item("hc55516", sndindex, chip->databit);
@@ -79,9 +86,9 @@ static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_
 
 	/* track how many samples we've updated without a clock */
 	chip->update_count += length;
-	if (chip->update_count > Machine->sample_rate / 32)
+	if (chip->update_count > chip->sample_rate / 32)
 	{
-		chip->update_count = Machine->sample_rate;
+		chip->update_count = chip->sample_rate;
 		chip->next_value = 0;
 	}
 

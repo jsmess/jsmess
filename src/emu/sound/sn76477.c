@@ -22,9 +22,6 @@
             * what happens if no vco_res
             * what happens if no vco_cap
 
-        * Noise
-            * the noise function (polynomial?), if any, is not known
-
         * Attack/Decay
             * get real formulas for a/d cap charging and discharging
 
@@ -256,6 +253,8 @@ struct SN76477
 	UINT32 noise_gen_count;				/* noise freq emulation */
 
 	double attack_decay_cap_voltage;	/* voltage on the attack/decay cap */
+
+	UINT32 rng;							/* current value of the random number generator */
 
 	/* others */
 	sound_stream *channel;				/* returned by stream_create() */
@@ -958,16 +957,23 @@ static void add_wav_data(struct SN76477 *sn, INT16 data_l, INT16 data_r)
 
 static void intialize_noise(struct SN76477 *sn)
 {
-	/* nothing to do - if we ever come up with the noise function, we may
-       initialize it here */
+	sn->rng = 0;
 }
 
 
 INLINE UINT32 generate_next_real_noise_bit(struct SN76477 *sn)
 {
-	/* real noise function is not known */
+	UINT32 out = ((sn->rng >> 28) & 1) ^ ((sn->rng >> 0) & 1);
 
-	return (mame_rand(Machine) >> 31) & 0x01;
+	 /* if bits 0-4 and 28 are all zero then force the output to 1 */
+	if ((sn->rng & 0x1000001f) == 0)
+	{
+		out = 1;
+	}
+
+	sn->rng = (sn->rng >> 1) | (out << 30);
+
+	return out;
 }
 
 
@@ -2390,6 +2396,8 @@ static void state_save_register(struct SN76477 *sn)
 	state_save_register_item("sn76744", sn->index, sn->noise_gen_count);
 
 	state_save_register_item("sn76744", sn->index, sn->attack_decay_cap_voltage);
+
+	state_save_register_item("sn76744", sn->index, sn->rng);
 }
 
 
@@ -2496,7 +2504,7 @@ void sn76477_get_info(void *token, UINT32 state, sndinfo *info)
 #endif
 	case SNDINFO_STR_NAME:			info->s = "SN76477"; break;
 	case SNDINFO_STR_CORE_FAMILY:	info->s = "Analog"; break;
-	case SNDINFO_STR_CORE_VERSION:	info->s = "2.0"; break;
+	case SNDINFO_STR_CORE_VERSION:	info->s = "2.1"; break;
 	case SNDINFO_STR_CORE_FILE:		info->s = __FILE__; break;
 	case SNDINFO_STR_CORE_CREDITS:	info->s = "Copyright (c) 2007, The MAME Team"; break;
 	}

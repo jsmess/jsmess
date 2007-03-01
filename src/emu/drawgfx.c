@@ -4870,6 +4870,7 @@ DECLARE(blockmove_NtoN_blend_remap,(
 		dstdata += dstmodulo;
 		srcheight--;
 	}
+
 })
 
 DECLARE(blockmove_NtoN_blend_remap_flipx,(
@@ -5466,7 +5467,6 @@ DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 						cx += incxx;
 						cy += incxy;
 						x++;
-						dest++;
 						pri++;
 					}
 				}
@@ -5488,7 +5488,6 @@ DECLARE(copyrozbitmap_core,(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 						cx += incxx;
 						cy += incxy;
 						x++;
-						dest++;
 					}
 				}
 				startx += incyx;

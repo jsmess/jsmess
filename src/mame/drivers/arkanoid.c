@@ -642,9 +642,7 @@ INPUT_PORTS_START( arkgcbl )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       /* Always 2C_1C - check code at 0x7d5e */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )               /* Always 2C_1C - check code at 0x7d5e */
 INPUT_PORTS_END
 
 INPUT_PORTS_START( paddle2 )
