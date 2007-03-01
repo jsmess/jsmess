@@ -33,7 +33,9 @@ System Driver Changes:
 
 - [SORDM5] Fixed regression introduced in 0.112.  (bug #1082) [Nate Woods]
 
-- [SVISION] Many improvements and fixed.  [PeT]
+- [SVISION] Many improvements and fixes.  [PeT]
+
+- [VECTREX] Fixed inadvertent marking as a raster driver.  (bug #1099) [Nate Woods]
 
 
 
