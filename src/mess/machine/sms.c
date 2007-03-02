@@ -129,12 +129,12 @@ WRITE8_HANDLER(sms_mapper_w)
 	if ( ROM ) {
 		SOURCE_CART = ROM + ( (smsRomPageCount > 0) ? data % smsRomPageCount : 0 ) * 0x4000;
 	} else {
-		SOURCE_CART = memory_region(REGION_CPU1);
+		SOURCE_CART = sms_banking_none[1];
 	}
 	if ( BIOS ) {
 		SOURCE_BIOS = BIOS + ( (smsBiosPageCount > 0) ? data % smsBiosPageCount : 0 ) * 0x4000;
 	} else {
-		SOURCE_BIOS = memory_region(REGION_CPU1);
+		SOURCE_BIOS = sms_banking_none[1];
 	}
 
 	if (biosPort & IO_BIOS_ROM || IS_GAMEGEAR )
@@ -281,15 +281,6 @@ WRITE8_HANDLER(sms_cartram_w) {
 		}
 	}
 }
-
-/*WRITE8_HANDLER(sms_ram_w) {
-	UINT8 *RAM = memory_region(REGION_CPU1);
-
-	RAM[0xC000 + (offset & 0x1FFF)] = data;
-	if ((offset & 0x1FFF) <= 0x1FFB) {
-		RAM[0xE000 + (offset & 0x1FFF)] = data;
-	}
-}*/
 
 WRITE8_HANDLER(gg_sio_w) {
 	logerror("*** write %02X to SIO register #%d\n", data, offset);
@@ -500,9 +491,9 @@ DEVICE_LOAD( sms_cart )
 
 static void setup_banks( void ) {
 	sms_banking_bios[1] = sms_banking_cart[1] = sms_banking_none[1] = memory_region(REGION_CPU1);
-	sms_banking_bios[2] = sms_banking_cart[2] = sms_banking_none[2] = memory_region(REGION_CPU1) + 0x0400;
-	sms_banking_bios[3] = sms_banking_cart[3] = sms_banking_none[3] = memory_region(REGION_CPU1) + 0x4000;
-	sms_banking_bios[4] = sms_banking_cart[4] = sms_banking_none[4] = memory_region(REGION_CPU1) + 0x8000;
+	sms_banking_bios[2] = sms_banking_cart[2] = sms_banking_none[2] = memory_region(REGION_CPU1);
+	sms_banking_bios[3] = sms_banking_cart[3] = sms_banking_none[3] = memory_region(REGION_CPU1);
+	sms_banking_bios[4] = sms_banking_cart[4] = sms_banking_none[4] = memory_region(REGION_CPU1);
 
 	BIOS = memory_region(REGION_USER1);
 	ROM = memory_region(REGION_USER2);
@@ -537,8 +528,6 @@ MACHINE_RESET(sms)
 	if ( HAS_FM ) {
 		smsFMDetect = 0x01;
 	}
-
-	memset( memory_region(REGION_CPU1), 0xff, 0x10000 );
 
 	sms_mapper_ram = memory_get_write_ptr( 0, ADDRESS_SPACE_PROGRAM, 0xDFFC );
 

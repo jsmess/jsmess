@@ -8,12 +8,13 @@
 #include "video/generic.h"
 #include "cpu/z80/z80.h"
 
+#define CRAM_SIZE		MAX_CRAM_SIZE
 #define PRIORITY_BIT		0x1000
 
 UINT8 reg[NUM_OF_REGISTER];
-UINT8 ggCRAM[GG_CRAM_SIZE];
-UINT8 smsCRAM[SMS_CRAM_SIZE];
-UINT8 VRAM[VRAM_SIZE];
+UINT8 *VRAM = NULL;
+UINT8 *CRAM = NULL;
+int CRAMMask;
 UINT8 *lineCollisionBuffer;
 UINT8 reg9copy;
 
@@ -25,8 +26,6 @@ int buffer;
 int statusReg;
 
 int isCRAMDirty;
-UINT8 isGGCRAMDirty[GG_CRAM_SIZE];
-UINT8 isSMSCRAMDirty[SMS_CRAM_SIZE];
 
 int currentLine;
 int lineCountDownCounter;
@@ -250,15 +249,24 @@ int sms_video_init( int max_lines, int bborder_192, int bborder_224, int bborder
 	vcnt_224_lookup = vcnt_224;
 	vcnt_240_lookup = vcnt_240;
 
+	/* Allocate video RAM
+	   In theory the driver could have a REGION_GFX1 and/or REGION_GFX2 memory region
+	   of it's own. So this code could potentially cause a clash.
+	*/
+	if ( VRAM == NULL ) {
+		VRAM = new_memory_region( Machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
+	}
+	if ( CRAM == NULL ) {
+		CRAM = new_memory_region( Machine, REGION_GFX2, CRAM_SIZE, ROM_REQUIRED );
+	}
 	/* Clear RAM */
 	memset(reg, 0, NUM_OF_REGISTER);
 	isCRAMDirty = 1;
-	memset(ggCRAM, 0, GG_CRAM_SIZE);
-	memset(isGGCRAMDirty, 1, GG_CRAM_SIZE);
-	memset(smsCRAM, 0, SMS_CRAM_SIZE);
-	memset(isSMSCRAMDirty, 1, SMS_CRAM_SIZE);
 	memset(VRAM, 0, VRAM_SIZE);
+	memset(CRAM, 0, CRAM_SIZE);
 	reg[0x02] = 0x0E;			/* power up default */
+
+	CRAMMask = IS_GAMEGEAR ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
 
 	/* Initialize VDP state variables */
 	addr = code = pending = latch = buffer = statusReg = \
@@ -411,32 +419,15 @@ WRITE8_HANDLER(sms_vdp_data_w) {
 		case 0x02: {
 			int address = (addr & 0x3FFF);
 
-			if (data != VRAM[address]) {
-				VRAM[address] = data;
-#ifdef LOG_REG
-				logerror("VRAM[%x] = %x\n", address, data);
-#endif
-			}
+			VRAM[address] = data;
 		}
 		break;
 		case 0x03: {
-			int address = IS_GAMEGEAR ? (addr & 0x3F) : (addr & 0x1F);
-			int _index	= IS_GAMEGEAR ? ((addr & 0x3E) >> 1) : (addr & 0x1F);
+			int address = addr & CRAMMask;
 
-#ifdef LOG_REG
-			logerror("CRAM[%x] = %x\n", address, data);
-#endif
-
-			if ( IS_GAMEGEAR ) {
-				if (data != ggCRAM[address]) {
-					ggCRAM[address] = data;
-					isGGCRAMDirty[_index] = isCRAMDirty = 1;
-				}
-			} else {
-				if (data != smsCRAM[address]) {
-					smsCRAM[address] = data;
-					isSMSCRAMDirty[_index] = isCRAMDirty = 1;
-				}
+			if (data != CRAM[address]) {
+				CRAM[address] = data;
+				isCRAMDirty = 1;
 			}
 		}
 		break;
@@ -976,9 +967,6 @@ void sms_update_palette(void) {
 	isCRAMDirty = 0;
 
 	if ( vdp_mode != 4 ) {
-#ifdef LOG_COLOR
-		logerror( "Switched palette to TMS9918 palette\n" );
-#endif
 		palette_set_color(Machine,  0,   0,   0,   0 );
 		palette_set_color(Machine,  1,   0,   0,   0 );
 		palette_set_color(Machine,  2,  33, 200,  66 );
@@ -999,32 +987,18 @@ void sms_update_palette(void) {
 	}
 
 	if ( IS_GAMEGEAR ) {
-		for (i = 0; i < (GG_CRAM_SIZE >> 1); i += 1) {
-			if (isGGCRAMDirty[i] == 1) {
-				isGGCRAMDirty[i] = 0;
-
-				r = ((ggCRAM[i * 2 + 0] >> 0) & 0x0F) << 4;
-				g = ((ggCRAM[i * 2 + 0] >> 4) & 0x0F) << 4;
-				b = ((ggCRAM[i * 2 + 1] >> 0) & 0x0F) << 4;
-				palette_set_color(Machine, i, r, g, b);
-#ifdef LOG_COLOR
-				logerror("pallette set for i %x r %x g %x b %x\n", i, r, g, b);
-#endif
-			}
+		for (i = 0; i < 32; i += 1) {
+			r = ((CRAM[i * 2 + 0] >> 0) & 0x0F) << 4;
+			g = ((CRAM[i * 2 + 0] >> 4) & 0x0F) << 4;
+			b = ((CRAM[i * 2 + 1] >> 0) & 0x0F) << 4;
+			palette_set_color(Machine, i, r, g, b);
 		}
 	} else {
-		for (i = 0; i < SMS_CRAM_SIZE; i += 1) {
-			if (isSMSCRAMDirty[i] == 1) {
-				isSMSCRAMDirty[i] = 0;
-
-				r = ((smsCRAM[i] >> 0) & 0x03) << 6;
-				g = ((smsCRAM[i] >> 2) & 0x03) << 6;
-				b = ((smsCRAM[i] >> 4) & 0x03) << 6;
-				palette_set_color(Machine, i, r, g, b);
-#ifdef LOG_COLOR
-				logerror("pallette set for i %x r %x g %x b %x\n", i, r, g, b);
-#endif
-			}
+		for (i = 0; i < 32; i += 1) {
+			r = ((CRAM[i] >> 0) & 0x03) << 6;
+			g = ((CRAM[i] >> 2) & 0x03) << 6;
+			b = ((CRAM[i] >> 4) & 0x03) << 6;
+			palette_set_color(Machine, i, r, g, b);
 		}
 	}
 }

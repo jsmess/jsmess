@@ -80,6 +80,7 @@ INTERRUPT_GEN(sms);
 
 #define GG_CRAM_SIZE				(0x40)	/* 32 colors x 2 bytes per color = 64 bytes */
 #define SMS_CRAM_SIZE				(0x20)	/* 32 colors x 1 bytes per color = 32 bytes */
+#define MAX_CRAM_SIZE				0x40
 
 #define VRAM_SIZE						(0x4000)
 
