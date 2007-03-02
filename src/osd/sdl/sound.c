@@ -372,28 +372,6 @@ void osd_sound_enable(int enable_it)
 	snd_enabled = enable_it;
 }
 
-
-
-//============================================================
-//	osd_opl_control
-//============================================================
-
-void osd_opl_control(int chip, int reg)
-{
-	// noop - not supported
-}
-
-
-
-//============================================================
-//	osd_opl_write
-//============================================================
-
-void osd_opl_write(int chip, int data)
-{
-	// noop - not supported
-}
-
 //============================================================
 //	sdl_callback
 //============================================================
@@ -469,9 +447,13 @@ static int sdl_init(void)
 	{
 		audio_latency = MAX_AUDIO_LATENCY;
 	}
+	else if (audio_latency < 1)
+	{
+		audio_latency = 1;
+	}
 
 	// compute the buffer sizes
-	stream_buffer_size = Machine->sample_rate * 2 * sizeof(INT16) * audio_latency / 10;
+	stream_buffer_size = Machine->sample_rate * 2 * sizeof(INT16) * audio_latency / MAX_AUDIO_LATENCY;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;
