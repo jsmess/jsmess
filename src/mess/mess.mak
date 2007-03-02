@@ -1153,8 +1153,8 @@ include src/mess/tools/messtest/messtest.mak
 include src/mess/tools/messdocs/messdocs.mak
 
 # include OS-specific MESS stuff
-ifeq ($(MAMEOS),windows)
 include $(SRC)/mess/osd/$(MAMEOS)/$(MAMEOS).mak
+ifeq ($(MAMEOS),windows)
 include $(SRC)/mess/tools/imgtool/windows/wimgtool.mak
 endif
 
