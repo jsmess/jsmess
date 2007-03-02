@@ -69,8 +69,6 @@
 #include "saa1099.h"
 #include <math.h>
 
-/* default to 4x oversampling */
-#define DEFAULT_SAMPLE_RATE (48000 * 4)
 
 #define LEFT	0x00
 #define RIGHT	0x01
@@ -320,7 +318,7 @@ static void *saa1099_start(int sndindex, int clock, const void *config)
 	memset(saa, 0, sizeof(*saa));
 
 	/* copy global parameters */
-	saa->sample_rate = clock ? (clock / 256) : DEFAULT_SAMPLE_RATE;
+	saa->sample_rate = clock / 256;
 
 	/* for each chip allocate one stream */
 	saa->stream = stream_create(0, 2, saa->sample_rate, saa, saa1099_update);
