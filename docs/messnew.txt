@@ -6,6 +6,7 @@ New System Drivers Supported (in no particular order):
 - Sega Saturn (PAL)  (not working) [R. Belmont]
 - JVC V-Saturn  (not working) [R. Belmont]
 - Hitachi HiSaturn  (not working) [R. Belmont]
+- Sega Gamegear (Japan) [Wilbert Pol]
 
 
 

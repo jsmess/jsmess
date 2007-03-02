@@ -125,6 +125,7 @@ const game_driver *test_drivers[] =
 
 	/* SEGA */
 	DRIVER( gamegear )	/* Sega GameGear									*/
+	DRIVER( gamegeaj )	/* Sega GameGear (Japan)						*/
 	DRIVER( sms )		/* Sega Master System (NTSC)						*/
 	DRIVER( smspal )	/* Sega Master System (PAL)							*/
 	DRIVER( smsj21 )	/* Sega Master System (PAL Japanese SMS BIOS v2.1)	*/
