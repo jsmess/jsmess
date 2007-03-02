@@ -298,10 +298,6 @@ INTERRUPT_GEN(sms) {
 	currentLine = (currentLine + 1) % max_y_pixels;
 
 	if (currentLine <= y_pixels) {
-		if (currentLine == y_pixels) {
-			statusReg |= STATUS_VINT;
-		}
-
 		/* We start a new frame, so reset line count down counter */
 		if (currentLine == 0x00) {
 			lineCountDownCounter = reg[0x0A];
@@ -324,6 +320,10 @@ INTERRUPT_GEN(sms) {
 			check_pause_button();
 		}
 	} else {
+		if ( currentLine == y_pixels + 1 ) {
+			statusReg |= STATUS_VINT;
+		}
+
 		lineCountDownCounter = reg[0x0A];
 
 		if ((statusReg & STATUS_VINT) && (reg[0x01] & 0x20)) {
@@ -378,9 +378,6 @@ INTERRUPT_GEN(sms) {
 
 	/* Return read buffer contents */
 	temp = buffer;
-#ifdef LOG_REG
-	logerror("VRAM[%x] = %x read\n", addr & 0x3FFF, temp);
-#endif
 
 	/* Load read buffer */
 	buffer = VRAM[(addr & 0x3FFF)];
@@ -395,9 +392,6 @@ INTERRUPT_GEN(sms) {
 
 	/* Clear pending write flag */
 	pending = 0;
-#ifdef LOG_REG
-	logerror("CTRL read\n");
-#endif
 
 	statusReg &= ~( STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL | STATUS_HINT );
 
@@ -453,9 +447,6 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 		code = (data >> 6) & 0x03;
 //		addr = ((data & 0x3F) << 8) | latch;
 		addr = ( addr & 0xff ) | ( data << 8 );
-#ifdef LOG_REG
-		logerror("code = %x, addr = %x\n", code, addr);
-#endif
 
 		/* Is it VDP register write - code 0x02 */
 		if (code == 0x02) {
@@ -469,9 +460,6 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 				set_display_settings();
 			}
 
-#ifdef LOG_REG
-			logerror("r%x = %x\n", regNum, latch);
-#endif
 			code = 0;
 		} else if (code == 0x00) {
 			buffer = VRAM[(addr & 0x3FFF)];
