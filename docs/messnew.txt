@@ -31,6 +31,7 @@ System Driver Changes:
 - [N64] Fixed start button mapping.  (bug #1050) [Justin Kerk]
 
 - [SMS/GG] Improved PSG, FM, and CPU clock frequencies [Andre Cotrim, Wilbert Pol]
+           Fixed triggering of the VBlank interrupt.  (bug #1097) [Wilbert Pol]
 
 - [SORDM5] Fixed regression introduced in 0.112.  (bug #1082) [Nate Woods]
 
