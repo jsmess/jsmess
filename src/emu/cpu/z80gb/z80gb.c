@@ -57,6 +57,7 @@ typedef struct {
 	int gb_speed_change_pending;
 	int enable;
 	int doHALTbug;
+	UINT8	features;
 	const Z80GB_CONFIG *config;
 } z80gb_16BitRegs;
 
@@ -180,6 +181,7 @@ static void z80gb_reset(void)
 	Regs.w.SP = 0x0000;
 	Regs.w.PC = 0x0000;
 	Regs.w.timer_callback = NULL;
+	Regs.w.features = Z80GB_FEATURE_HALT_BUG;
 	if (Regs.w.config)
 	{
 		if ( Regs.w.config->regs ) {
@@ -191,6 +193,7 @@ static void z80gb_reset(void)
 			Regs.w.PC = Regs.w.config->regs[5];
 		}
 		Regs.w.timer_callback = Regs.w.config->timer_callback;
+		Regs.w.features = Regs.w.config->features;
 	}
 	Regs.w.enable &= ~IME;
 	Regs.w.IE = 0;
@@ -239,7 +242,9 @@ INLINE void z80gb_ProcessInterrupts (void)
 						Regs.w.PC++;
 						if ( ! Regs.w.enable & IME ) {
 							/* check if the HALT bug should be performed */
-							Regs.w.doHALTbug = 1;
+							if ( Regs.w.features & Z80GB_FEATURE_HALT_BUG ) {
+								Regs.w.doHALTbug = 1;
+							}
 						}
 					}
 					if ( Regs.w.enable & IME ) {

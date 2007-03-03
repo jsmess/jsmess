@@ -7,6 +7,7 @@ extern int z80gb_ICount;
 
 typedef struct {
 	UINT16	*regs;
+	UINT8	features;
 	void	(*timer_callback)(int cycles);
 } Z80GB_CONFIG;
 
@@ -18,6 +19,8 @@ enum {
 	/* Pseudo register to change and check the cpu operating speed */
 	Z80GB_SPEED,
 };
+
+#define Z80GB_FEATURE_HALT_BUG	0x01
 
 /****************************************************************************/
 /* Return register contents                                                 */
