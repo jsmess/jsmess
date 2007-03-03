@@ -332,7 +332,8 @@ static const REG_OPTION regGameOpts[] =
 	//input
 	{ "mouse",                  RO_BOOL,    offsetof(options_type, use_mouse),                       "0" },
 	{ "joystick",               RO_BOOL,    offsetof(options_type, use_joystick),                    "0" },
-	{ "a2d",                    RO_DOUBLE,  offsetof(options_type, f_a2d),                           "0.3" },
+	{ "jdz",                    RO_DOUBLE,  offsetof(options_type, f_jdz),                           "0.3" },
+	{ "jsat",                    RO_DOUBLE,  offsetof(options_type, f_jsat),                           "0.85	" },
 	{ "steadykey",              RO_BOOL,    offsetof(options_type, steadykey),                       "0" },
 	{ "lightgun",               RO_BOOL,    offsetof(options_type, lightgun),                        "0" },
 	{ "dual_lightgun",          RO_BOOL,    offsetof(options_type, dual_lightgun),                   "0" },
@@ -2893,7 +2894,7 @@ BOOL GetFolderUsesDefaults(int folder_index, int driver_index)
 BOOL GetGameUsesDefaults(int driver_index)
 {
 	const options_type *opts = NULL;
-	int nParentIndex= -1;
+	int nParentIndex = -1;
 
 	if (driver_index < 0)
 	{
@@ -2919,7 +2920,7 @@ BOOL GetGameUsesDefaults(int driver_index)
 void SaveGameOptions(int driver_index)
 {
 	options_type Opts;
-	int nParentIndex= -1;
+	int nParentIndex = -1;
 	struct SettingsHandler handlers[3];
 	int setting;
 #ifdef MESS

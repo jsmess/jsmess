@@ -944,7 +944,7 @@ static void CreateCommandLine(int nGameIndex, char* pCmdLine)
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssound",                   pOpts->enable_sound ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -sr %d",                     pOpts->samplerate);
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssamples",                 pOpts->use_samples ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -volume %d",                    pOpts->attenuation);
+	sprintf(&pCmdLine[strlen(pCmdLine)], " -vol %d",                    pOpts->attenuation);
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -audio_latency %i",          pOpts->audio_latency);
 	/* input options*/
 	if (strlen(pOpts->ctrlr) > 0)
@@ -955,8 +955,10 @@ static void CreateCommandLine(int nGameIndex, char* pCmdLine)
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sdual",				pOpts->dual_lightgun ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sreload",				pOpts->offscreen_reload ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssteady",					pOpts->steadykey ? "" : "no");
-	if (pOpts->use_joystick)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -a2d %f",                pOpts->f_a2d);
+	if (pOpts->use_joystick){
+		sprintf(&pCmdLine[strlen(pCmdLine)], " -jdz %f",                pOpts->f_jdz);
+		sprintf(&pCmdLine[strlen(pCmdLine)], " -jsat %f",                pOpts->f_jsat);
+	}
 	if (strlen(pOpts->digital) > 0)
 		sprintf(&pCmdLine[strlen(pCmdLine)], " -digital \"%s\"",            pOpts->digital);
 	if (strlen(pOpts->paddle) > 0)
@@ -1752,7 +1754,7 @@ int GetParentRomSetIndex(const game_driver *driver)
 
 int GetGameNameIndex(const char *name)
 {
-    driver_data_type *driver_index_info;
+	driver_data_type *driver_index_info;
 	driver_data_type key;
 	key.name = name;
 

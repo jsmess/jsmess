@@ -105,7 +105,8 @@ static void PauseBrightSelectionChange(HWND hwnd);
 static void FullScreenGammaSelectionChange(HWND hwnd);
 static void FullScreenBrightnessSelectionChange(HWND hwnd);
 static void FullScreenContrastSelectionChange(HWND hwnd);
-static void A2DSelectionChange(HWND hwnd);
+static void JDZSelectionChange(HWND hwnd);
+static void JSATSelectionChange(HWND hwnd);
 static void RefreshSelectionChange(HWND hWnd, HWND hWndCtrl);
 static void VolumeSelectionChange(HWND hwnd);
 static void AudioLatencySelectionChange(HWND hwnd);
@@ -179,7 +180,8 @@ static int  g_nFullScreenBrightnessIndex = 0;
 static int  g_nFullScreenContrastIndex = 0;
 static int  g_nEffectIndex     = 0;
 static int  g_nBiosIndex     = 0;
-static int  g_nA2DIndex		   = 0;
+static int  g_nJDZIndex = 0;
+static int  g_nJSATIndex = 0;
 static int  g_nPaddleIndex = 0;
 static int  g_nADStickIndex = 0;
 static int  g_nPedalIndex = 0;
@@ -211,7 +213,7 @@ BOOL PropSheetFilter_Vector(const machine_config *drv, const game_driver *gamedr
 static DWORD dwHelpIDs[] =
 {
 	
-	IDC_A2D,				HIDC_A2D,
+	IDC_JDZ,				HIDC_JDZ,
 	IDC_ANTIALIAS,          HIDC_ANTIALIAS,
 	IDC_ARTWORK_CROP,		HIDC_ARTWORK_CROP,
 	IDC_ASPECTRATIOD,       HIDC_ASPECTRATIOD,
@@ -292,6 +294,7 @@ static DWORD dwHelpIDs[] =
 	IDC_LIGHTGUNDEVICE,		HIDC_LIGHTGUNDEVICE,
 	IDC_ENABLE_AUTOSAVE,    HIDC_ENABLE_AUTOSAVE,
 	IDC_MULTITHREAD_RENDERING,    HIDC_MULTITHREAD_RENDERING,
+	IDC_JSAT,				HIDC_JSAT,
 	0,                      0
 };
 
@@ -979,7 +982,7 @@ static char *GameInfoCloneOf(UINT nIndex)
 	if (DriverIsClone(nIndex))
 	{
 		nParentIndex = GetParentIndex(drivers[nIndex]);
-			sprintf(buf, "%s - \"%s\"",
+		sprintf(buf, "%s - \"%s\"",
 			ConvertAmpersandString(ModifyThe(drivers[nParentIndex]->description)),
 			drivers[nParentIndex]->name); 
 	}
@@ -1410,7 +1413,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 		break;
 	case WM_CTLCOLORSTATIC :
 	case WM_CTLCOLOREDIT :
-		if( g_nGame>=0)
+		if( g_nGame >= 0 )
 		{
 			if( DriverIsClone(g_nGame) )
 			{
@@ -1955,10 +1958,17 @@ static void OptionsToProp(HWND hWnd, options_type* o)
 	}
 
 	/* Input */
-	hCtrl = GetDlgItem(hWnd, IDC_A2DDISP);
+	hCtrl = GetDlgItem(hWnd, IDC_JDZDISP);
 	if (hCtrl)
 	{
-		sprintf(buf, "%03.2f", o->f_a2d);
+		sprintf(buf, "%03.2f", o->f_jdz);
+		Static_SetText(hCtrl, buf);
+	}
+
+	hCtrl = GetDlgItem(hWnd, IDC_JSATDISP);
+	if (hCtrl)
+	{
+		sprintf(buf, "%03.2f", o->f_jsat);
 		Static_SetText(hCtrl, buf);
 	}
 
@@ -2182,9 +2192,12 @@ static void SetPropEnabledControls(HWND hWnd)
 	joystick_attached = DIJoystick.Available();
 
 	Button_Enable(GetDlgItem(hWnd,IDC_JOYSTICK),		joystick_attached);
-	EnableWindow(GetDlgItem(hWnd, IDC_A2DTEXT),			joystick_attached);
-	EnableWindow(GetDlgItem(hWnd, IDC_A2DDISP),			joystick_attached);
-	EnableWindow(GetDlgItem(hWnd, IDC_A2D),				joystick_attached);
+	EnableWindow(GetDlgItem(hWnd, IDC_JDZTEXT),			joystick_attached);
+	EnableWindow(GetDlgItem(hWnd, IDC_JDZDISP),			joystick_attached);
+	EnableWindow(GetDlgItem(hWnd, IDC_JDZ),				joystick_attached);
+	EnableWindow(GetDlgItem(hWnd, IDC_JSATTEXT),			joystick_attached);
+	EnableWindow(GetDlgItem(hWnd, IDC_JSATDISP),			joystick_attached);
+	EnableWindow(GetDlgItem(hWnd, IDC_JSAT),				joystick_attached);
 	EnableWindow(GetDlgItem(hWnd, IDC_ANALOG_AXES),		joystick_attached);
 	EnableWindow(GetDlgItem(hWnd, IDC_ANALOG_AXES_TEXT),joystick_attached);
 	/* Trackball / Mouse options */
@@ -2343,11 +2356,15 @@ static void AssignFlicker(HWND hWnd)
 	pGameOpts->f_flicker = g_nFlickerIndex;
 }
 
-static void AssignA2D(HWND hWnd)
+static void AssignJDZ(HWND hWnd)
 {
-	pGameOpts->f_a2d = g_nA2DIndex / 20.0;
+	pGameOpts->f_jdz = g_nJDZIndex / 20.0;
 }
 
+static void AssignJSAT(HWND hWnd)
+{
+	pGameOpts->f_jsat = g_nJSATIndex / 20.0;
+}
 
 static void AssignRotate(HWND hWnd)
 {
@@ -2612,7 +2629,8 @@ static void ResetDataMap(void)
 	g_nPauseBrightIndex   	= (int)((pGameOpts->f_pause_bright   - 0.5) * 20.0 + 0.001);
 	g_nBeamIndex			= (int)((pGameOpts->f_beam           - 1.0) * 20.0 + 0.001);
 	g_nFlickerIndex			= (int)(pGameOpts->f_flicker);
-	g_nA2DIndex				= (int)(pGameOpts->f_a2d                    * 20.0 + 0.001);
+	g_nJDZIndex				= (int)(pGameOpts->f_jdz                    * 20.0 + 0.001);
+	g_nJSATIndex				= (int)(pGameOpts->f_jsat                    * 20.0 + 0.001);
 
 	// if no controller type was specified or it was standard
 	if (pGameOpts->ctrlr == NULL || mame_stricmp(pGameOpts->ctrlr,"Standard") == 0)
@@ -2793,8 +2811,10 @@ static void BuildDataMap(void)
 	DataMapAdd(IDC_DEFAULT_INPUT, DM_INT,  CT_COMBOBOX, &g_nInputIndex,            DM_STRING, &pGameOpts->ctrlr, 0, 0, AssignInput);
 	DataMapAdd(IDC_USE_MOUSE,     DM_BOOL, CT_BUTTON,   &pGameOpts->use_mouse,     DM_BOOL, &pGameOpts->use_mouse,     0, 0, 0);   
 	DataMapAdd(IDC_JOYSTICK,      DM_BOOL, CT_BUTTON,   &pGameOpts->use_joystick,  DM_BOOL, &pGameOpts->use_joystick,  0, 0, 0);
-	DataMapAdd(IDC_A2D,           DM_INT,  CT_SLIDER,   &g_nA2DIndex,              DM_DOUBLE, &pGameOpts->f_a2d, 0, 0, AssignA2D);
-	DataMapAdd(IDC_A2DDISP,       DM_NONE, CT_NONE,     NULL,  DM_DOUBLE, &pGameOpts->f_a2d, 0, 0, 0);
+	DataMapAdd(IDC_JDZ,           DM_INT,  CT_SLIDER,   &g_nJDZIndex,              DM_DOUBLE, &pGameOpts->f_jdz, 0, 0, AssignJDZ);
+	DataMapAdd(IDC_JDZDISP,       DM_NONE, CT_NONE,     NULL,  DM_DOUBLE, &pGameOpts->f_jdz, 0, 0, 0);
+	DataMapAdd(IDC_JSAT,           DM_INT,  CT_SLIDER,   &g_nJSATIndex,              DM_DOUBLE, &pGameOpts->f_jsat, 0, 0, AssignJSAT);
+	DataMapAdd(IDC_JSATDISP,       DM_NONE, CT_NONE,     NULL,  DM_DOUBLE, &pGameOpts->f_jsat, 0, 0, 0);
 	DataMapAdd(IDC_STEADYKEY,     DM_BOOL, CT_BUTTON,   &pGameOpts->steadykey,     DM_BOOL, &pGameOpts->steadykey,     0, 0, 0);   
 	DataMapAdd(IDC_LIGHTGUN,      DM_BOOL, CT_BUTTON,   &pGameOpts->lightgun,      DM_BOOL, &pGameOpts->lightgun,      0, 0, 0);
 	DataMapAdd(IDC_DUAL_LIGHTGUN, DM_BOOL, CT_BUTTON,   &pGameOpts->dual_lightgun, DM_BOOL, &pGameOpts->dual_lightgun,      0, 0, 0);
@@ -3070,7 +3090,11 @@ static void InitializeMisc(HWND hDlg)
 				(WPARAM)FALSE,
 				(LPARAM)MAKELONG(0, 38)); /* [0.10, 2.00] in .05 increments */
 
-	SendDlgItemMessage(hDlg, IDC_A2D, TBM_SETRANGE,
+	SendDlgItemMessage(hDlg, IDC_JDZ, TBM_SETRANGE,
+				(WPARAM)FALSE,
+				(LPARAM)MAKELONG(0, 20)); /* [0.00, 1.00] in .05 increments */
+
+	SendDlgItemMessage(hDlg, IDC_JSAT, TBM_SETRANGE,
 				(WPARAM)FALSE,
 				(LPARAM)MAKELONG(0, 20)); /* [0.00, 1.00] in .05 increments */
 
@@ -3157,9 +3181,14 @@ static void OptOnHScroll(HWND hwnd, HWND hwndCtl, UINT code, int pos)
 		VolumeSelectionChange(hwnd);
 	}
 	else
-	if (hwndCtl == GetDlgItem(hwnd, IDC_A2D))
+	if (hwndCtl == GetDlgItem(hwnd, IDC_JDZ))
 	{
-		A2DSelectionChange(hwnd);
+		JDZSelectionChange(hwnd);
+	}
+	else
+	if (hwndCtl == GetDlgItem(hwnd, IDC_JSAT))
+	{
+		JSATSelectionChange(hwnd);
 	}
 	else
 	if (hwndCtl == GetDlgItem(hwnd, IDC_AUDIO_LATENCY))
@@ -3353,21 +3382,38 @@ static void FullScreenContrastSelectionChange(HWND hwnd)
 	Static_SetText(GetDlgItem(hwnd, IDC_FSCONTRASTDISP), buf);
 }
 
-/* Handle changes to the A2D slider */
-static void A2DSelectionChange(HWND hwnd)
+/* Handle changes to the JDZ slider */
+static void JDZSelectionChange(HWND hwnd)
 {
 	char   buf[100];
 	UINT   nValue;
-	double dA2D;
+	double dJDZ;
 
 	/* Get the current value of the control */
-	nValue = SendDlgItemMessage(hwnd, IDC_A2D, TBM_GETPOS, 0, 0);
+	nValue = SendDlgItemMessage(hwnd, IDC_JDZ, TBM_GETPOS, 0, 0);
 
-	dA2D = nValue / 20.0;
+	dJDZ = nValue / 20.0;
 
 	/* Set the static display to the new value */
-	snprintf(buf,sizeof(buf), "%03.2f", dA2D);
-	Static_SetText(GetDlgItem(hwnd, IDC_A2DDISP), buf);
+	snprintf(buf,sizeof(buf), "%03.2f", dJDZ);
+	Static_SetText(GetDlgItem(hwnd, IDC_JDZDISP), buf);
+}
+
+/* Handle changes to the JSAT slider */
+static void JSATSelectionChange(HWND hwnd)
+{
+	char   buf[100];
+	UINT   nValue;
+	double dJSAT;
+
+	/* Get the current value of the control */
+	nValue = SendDlgItemMessage(hwnd, IDC_JSAT, TBM_GETPOS, 0, 0);
+
+	dJSAT = nValue / 20.0;
+
+	/* Set the static display to the new value */
+	snprintf(buf,sizeof(buf), "%03.2f", dJSAT);
+	Static_SetText(GetDlgItem(hwnd, IDC_JSATDISP), buf);
 }
 
 /* Handle changes to the Refresh drop down */

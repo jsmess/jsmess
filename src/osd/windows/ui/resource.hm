@@ -1,7 +1,6 @@
 // Microsoft Developer Studio generated Help ID include file.
 // Used by mame32.rc
 //
-#define HIDC_A2D                        0x809d0488    // IDD_PROP_INPUT [Englisch (USA)]
 #define HIDC_ADSTICK                    0x806a04d2    // IDD_PROP_CONTROLLER [Englisch (USA)]
 #define HIDC_ANALOG_AXES                0x809d04bf    // IDD_PROP_INPUT [Englisch (USA)]
 #define HIDC_ANTIALIAS                  0x809f0405    // IDD_PROP_VECTOR [Englisch (USA)]
@@ -47,8 +46,10 @@
 #define HIDC_HIGH_PRIORITY              0x809e049e    // IDD_PROP_MISC [Englisch (USA)]
 #define HIDC_HISTORY                    0x806504cb    // IDD_MAIN [Englisch (USA)]
 #define HIDC_HWSTRETCH                  0x809a046c    // IDD_PROP_DISPLAY [Englisch (USA)]
+#define HIDC_JDZ                        0x809d0488    // IDD_PROP_INPUT [Englisch (USA)]
 #define HIDC_JOYSTICK                   0x809d03eb    // IDD_PROP_INPUT [Englisch (USA)]
 #define HIDC_JOY_GUI                    0x80ad0485    // IDD_INTERFACE_OPTIONS [Englisch (USA)]
+#define HIDC_JSAT                       0x809d048c    // IDD_PROP_INPUT [Englisch (USA)]
 #define HIDC_KEEPASPECT                 0x809a0474    // IDD_PROP_DISPLAY [Englisch (USA)]
 #define HIDC_LANGUAGECHECK              0x80b204d1    // IDD_LANGUAGE [Englisch (USA)]
 #define HIDC_LANGUAGEEDIT               0x80b204d4    // IDD_LANGUAGE [Englisch (USA)]

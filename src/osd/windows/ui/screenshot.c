@@ -27,7 +27,7 @@
 #include <fcntl.h>
 #include <driver.h>
 #include <png.h>
-#include "osdcomm.h"
+#include <osdepend.h>
 #include "screenshot.h"
 #include "file.h"
 #include "bitmask.h"
@@ -183,11 +183,7 @@ BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 	char *fname;
 	BOOL success;
 	const char *zip_name = NULL;
-	char *pngfilename = NULL;
-	char tmp[MAX_PATH];
-	strcpy(tmp, filename);
-	strcat(tmp,  ".png");
-	pngfilename = mame_strdup(tmp);
+
 	switch (pic_type)
 	{
 	case TAB_SCREENSHOT :
@@ -224,18 +220,27 @@ BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 	}
 	
 	// look for the raw file
-	filerr = mame_fopen(SEARCHPATH_ARTWORK, pngfilename, OPEN_FLAG_READ, &mfile);
+	fname = assemble_2_strings(filename, ".png");
+	filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
+	free(fname);
 	if (filerr != FILERR_NONE)
 	{
 		// and look for the zip
-		fname = assemble_3_strings(zip_name, PATH_SEPARATOR, pngfilename);
+		fname = assemble_4_strings(zip_name, PATH_SEPARATOR, filename, ".png");
+		filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
+		free(fname);
+	}
+	if (filerr != FILERR_NONE)
+	{
+		// and look for the new format
+		fname = assemble_3_strings(filename, PATH_SEPARATOR, "0000.png");
 		filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
 		free(fname);
 	}
 	if (filerr != FILERR_NONE)
 		return FALSE;
 
-	success = png_read_bitmap(mfile, phDIB, pPal);
+	success = png_read_bitmap(mame_core_file(mfile), phDIB, pPal);
 
 	mame_fclose(mfile);
 

@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+//Microsoft Developer Studio generated resource script.
 //
 #include "resource.h"
 
@@ -24,7 +24,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// Englisch (USA) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -37,7 +37,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Menu
 //
 
-IDR_MAIN_MENU MENU 
+IDR_MAIN_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -53,7 +53,7 @@ BEGIN
     END
 END
 
-IDR_UI_MENU MENU 
+IDR_UI_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -168,7 +168,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_MENU MENU 
+IDR_CONTEXT_MENU MENU DISCARDABLE 
 BEGIN
     POPUP "Context Menu"
     BEGIN
@@ -197,7 +197,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_HEADER MENU 
+IDR_CONTEXT_HEADER MENU DISCARDABLE 
 BEGIN
     POPUP "Header Context Menu"
     BEGIN
@@ -208,7 +208,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_TREE MENU 
+IDR_CONTEXT_TREE MENU DISCARDABLE 
 BEGIN
     POPUP "Context Menu Tree"
     BEGIN
@@ -227,7 +227,7 @@ BEGIN
     END
 END
 
-IDR_CONTEXT_SCREENSHOT MENU 
+IDR_CONTEXT_SCREENSHOT MENU DISCARDABLE 
 BEGIN
     POPUP "Context Screen Shot"
     BEGIN
@@ -262,12 +262,12 @@ END
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "#define NOWINRES\r\n"
     "#include ""windows.h""\r\n"
@@ -275,7 +275,7 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE MOVEABLE PURE 
 BEGIN
     "\r\n"
     "\0"
@@ -284,6 +284,7 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
+#ifndef _MAC
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
@@ -324,7 +325,7 @@ BEGIN
             VALUE "OriginalFilename", "MESS.exe\0"
             VALUE "ProductName", "MESS\0"
 #else
-            VALUE "OriginalFilename", "MAME32.exe"
+            VALUE "OriginalFilename", "MAME32.exe\0"
             VALUE "ProductName", "MAME32"
 #endif
             VALUE "ProductVersion", "0, 113, 0, 0"
@@ -335,6 +336,8 @@ BEGIN
         VALUE "Translation", 0x409, 1200
     END
 END
+
+#endif    // !_MAC
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -347,41 +350,39 @@ END
 #ifdef MESS
 IDI_MAME32_ICON         ICON                    "res/mess.ico"
 #else
-IDI_MAME32_ICON         ICON                    "res/mame32.ico"
+IDI_MAME32_ICON         ICON    DISCARDABLE     "res\\mame32.ico"
 #endif
-IDI_WIN_ROMS            ICON                    "res/win_roms.ico"
-IDI_WIN_NOROMS          ICON                    "res/win_noro.ico"
+IDI_WIN_ROMS            ICON    DISCARDABLE     "res\\win_roms.ico"
+IDI_WIN_NOROMS          ICON    DISCARDABLE     "res\\win_noro.ico"
+IDI_WIN_UNKNOWN         ICON    DISCARDABLE     "res\\win_unkn.ico"
+IDI_WIN_CLONE           ICON    DISCARDABLE     "res\\win_clone.ico"
+IDI_WIN_REDX            ICON    DISCARDABLE     "res/win_redx.ico"
+IDI_FOLDER_AVAILABLE    ICON    DISCARDABLE     "res\\foldavail.ico"
+IDI_FOLDER              ICON    DISCARDABLE     "res\\folder.ico"
+IDI_FOLDER_MANUFACTURER ICON    DISCARDABLE     "res\\foldmanu.ico"
+IDI_FOLDER_OPEN         ICON    DISCARDABLE     "res\\foldopen.ico"
+IDI_FOLDER_UNAVAILABLE  ICON    DISCARDABLE     "res\\foldunav.ico"
+IDI_MANUFACTURER        ICON    DISCARDABLE     "res\\manufact.ico"
+IDI_FOLDER_YEAR         ICON    DISCARDABLE     "res\\foldyear.ico"
+IDI_FOLDER_SOURCE       ICON    DISCARDABLE     "Res\\foldsrc.ico"
+IDI_WORKING             ICON    DISCARDABLE     "res\\working.ico"
+IDI_NONWORKING          ICON    DISCARDABLE     "res\\nonwork.ico"
+IDI_YEAR                ICON    DISCARDABLE     "res\\year.ico"
+IDI_KEYBOARD            ICON    DISCARDABLE     "Res\\keyboard.ico"
+IDI_JOYSTICK            ICON    DISCARDABLE     "Res\\joystick.ico"
+IDI_CPU                 ICON    DISCARDABLE     "Res\\cpu.ico"
+IDI_SOUND               ICON    DISCARDABLE     "Res\\samples.ico"
+IDI_SOUNDTAB            ICON    DISCARDABLE     "res\\sound.ico"
+IDI_SOURCE              ICON    DISCARDABLE     "res\\source.ico"
+IDI_HARDDISK            ICON    DISCARDABLE     "res\\harddisk.ico"
+IDI_DISPLAY             ICON    DISCARDABLE     "Res\\display.ico"
+IDI_CHECKMARK           ICON    DISCARDABLE     "Res\\checkmark.ico"
+IDI_HEADER_UP           ICON    DISCARDABLE     "res\\header_up.ico"
+IDI_HEADER_DOWN         ICON    DISCARDABLE     "res\\header_down.ico"
+
 #ifdef MESS
 IDI_WIN_NOROMSNEEDED    ICON                    "res/win_nrnd.ico"
 IDI_WIN_MISSINGOPTROM	ICON	         		"res/win_noor.ico"
-#endif
-IDI_WIN_UNKNOWN         ICON                    "res/win_unkn.ico"
-IDI_WIN_CLONE           ICON                    "res/win_clone.ico"
-IDI_WIN_REDX            ICON                    "res/win_redx.ico"
-IDI_FOLDER_AVAILABLE    ICON                    "res\\foldavail.ico"
-IDI_FOLDER              ICON                    "res\\folder.ico"
-IDI_FOLDER_MANUFACTURER ICON                    "res\\foldmanu.ico"
-IDI_FOLDER_OPEN         ICON                    "res\\foldopen.ico"
-IDI_FOLDER_UNAVAILABLE  ICON                    "res\\foldunav.ico"
-IDI_MANUFACTURER        ICON                    "res\\manufact.ico"
-IDI_FOLDER_YEAR         ICON                    "res\\foldyear.ico"
-IDI_FOLDER_SOURCE       ICON                    "Res\\foldsrc.ico"
-IDI_WORKING             ICON                    "res\\working.ico"
-IDI_NONWORKING          ICON                    "res\\nonwork.ico"
-IDI_YEAR                ICON                    "res\\year.ico"
-IDI_KEYBOARD            ICON                    "Res\\keyboard.ico"
-IDI_JOYSTICK            ICON                    "Res\\joystick.ico"
-IDI_CPU                 ICON                    "Res\\cpu.ico"
-IDI_SOUND               ICON                    "Res\\samples.ico"
-IDI_SOUNDTAB            ICON                    "res\\sound.ico"
-IDI_SOURCE              ICON                    "res\\source.ico"
-IDI_HARDDISK            ICON                    "res\\harddisk.ico"
-IDI_DISPLAY             ICON                    "Res\\display.ico"
-IDI_CHECKMARK           ICON                    "Res\\checkmark.ico"
-IDI_HEADER_UP           ICON                    "res\\header_up.ico"
-IDI_HEADER_DOWN         ICON                    "res\\header_down.ico"
-
-#ifdef MESS
 IDI_WIN_FLOP            ICON    DISCARDABLE     "res/win_flop.ico"
 IDI_WIN_CASS            ICON    DISCARDABLE     "res/win_cass.ico"
 IDI_WIN_SERL            ICON    DISCARDABLE     "res/win_serl.ico"
@@ -399,14 +400,13 @@ IDI_WIN_PCRD            ICON    DISCARDABLE     "res/win_pcrd.ico"
 // Dialog
 //
 
-IDD_ABOUT DIALOG  0, 0, 296, 129
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_ABOUT DIALOG DISCARDABLE  0, 0, 296, 129
 #ifdef MESS
 CAPTION "About MESS"
 #else
 CAPTION "About MAME32"
 #endif
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "&OK",IDOK,200,109,50,14,WS_GROUP
 #ifdef MESS
@@ -444,14 +444,14 @@ BEGIN
     CONTROL         "",IDC_ABOUT,"Static",SS_BITMAP | SS_SUNKEN,7,7,16,14
 END
 
-IDD_DIRECTX DIALOG  0, 0, 236, 69
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIRECTX DIALOG DISCARDABLE  0, 0, 236, 69
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 #ifdef MESS
 CAPTION "MESS"
 #else
 CAPTION "MAME32"
 #endif
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     DEFPUSHBUTTON   "Go to Microsoft's DirectX Web Page",IDB_WEB_PAGE,48,52,
                     140,14
@@ -459,17 +459,17 @@ BEGIN
                     ES_AUTOHSCROLL | ES_READONLY
 END
 
-IDD_AUDIT DIALOG  0, 0, 283, 191
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_AUDIT DIALOG DISCARDABLE  0, 0, 283, 188
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "File Audit"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
-    PUSHBUTTON      "&Pause",IDPAUSE,99,170,40,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,143,170,40,14
+    PUSHBUTTON      "&Pause",IDPAUSE,98,168,40,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,144,168,40,14
     GROUPBOX        "ROMs",IDC_STATIC,6,4,132,65
     LTEXT           "Correct:",IDC_STATIC,51,28,32,8
     CONTROL         "Progress1",IDC_ROMS_PROGRESS,"msctls_progress32",
-                    WS_BORDER | 0x1,14,16,116,8
+                    PBS_SMOOTH | WS_BORDER,14,16,116,8
     LTEXT           "Incorrect:",IDC_STATIC,51,42,32,8
     LTEXT           "Total:",IDC_STATIC,51,56,32,8
     LTEXT           "0",IDC_ROMS_CORRECT,87,28,20,8
@@ -477,23 +477,23 @@ BEGIN
     LTEXT           "0",IDC_ROMS_TOTAL,87,56,20,8
     GROUPBOX        "Samples",IDC_STATIC,145,4,132,65
     CONTROL         "Progress1",IDC_SAMPLES_PROGRESS,"msctls_progress32",
-                    WS_BORDER | 0x1,153,16,116,8
+                    PBS_SMOOTH | WS_BORDER,153,16,116,8
     LTEXT           "Correct:",IDC_STATIC,191,28,33,8
     LTEXT           "Incorrect:",IDC_STATIC,191,42,33,8
     LTEXT           "Total:",IDC_STATIC,191,56,33,8
     LTEXT           "0",IDC_SAMPLES_CORRECT,227,28,20,8
     LTEXT           "0",IDC_SAMPLES_INCORRECT,227,42,20,8
     LTEXT           "0",IDC_SAMPLES_TOTAL,227,56,20,8
-    GROUPBOX        "Details",IDC_STATIC,6,73,271,90
-    EDITTEXT        IDC_AUDIT_DETAILS,12,83,259,74,ES_MULTILINE | 
+    GROUPBOX        "Details",IDC_STATIC,6,72,271,90
+    EDITTEXT        IDC_AUDIT_DETAILS,12,82,259,74,ES_MULTILINE | 
                     ES_AUTOVSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL | 
                     NOT WS_TABSTOP
 END
 
-IDD_DIRECTORIES DIALOG  0, 0, 230, 107
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIRECTORIES DIALOG DISCARDABLE  0, 0, 230, 107
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Directories"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     LTEXT           "Show directories for:",IDC_STATIC,6,6,67,10
     COMBOBOX        IDC_DIR_COMBO,6,18,160,79,CBS_DROPDOWNLIST | CBS_SORT | 
@@ -507,13 +507,13 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,173,26,50,14
     PUSHBUTTON      "Browse...",IDC_DIR_BROWSE,173,50,50,14
     PUSHBUTTON      "Insert",IDC_DIR_INSERT,173,68,50,14
-    PUSHBUTTON      "Delete",IDC_DIR_DELETE,173,86,50,14
+    PUSHBUTTON      "Delete",IDC_DIR_DELETE,173,87,50,14
 END
 
-IDD_COLUMNS DIALOG  0, 0, 302, 146
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_COLUMNS DIALOG DISCARDABLE  0, 0, 302, 145
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Customize Fields"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     LTEXT           "Available fields:",IDC_STATIC,6,6,80,10,SS_CENTERIMAGE
     CONTROL         "List1",IDC_LISTAVAILABLECOLUMNS,"SysListView32",
@@ -529,14 +529,14 @@ BEGIN
                     WS_BORDER | WS_HSCROLL | WS_TABSTOP,154,18,90,100
     PUSHBUTTON      "Move Up",IDC_BUTTONMOVEUP,250,18,46,14,WS_DISABLED
     PUSHBUTTON      "Move Down",IDC_BUTTONMOVEDOWN,250,36,46,14,WS_DISABLED
-    DEFPUSHBUTTON   "OK",IDOK,105,125,44,14
-    PUSHBUTTON      "Cancel",IDCANCEL,153,125,44,14
+    DEFPUSHBUTTON   "OK",IDOK,105,124,44,14
+    PUSHBUTTON      "Cancel",IDCANCEL,155,124,44,14
 END
 
-IDD_PROP_GAME DIALOG  0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_GAME DIALOG DISCARDABLE  0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "General"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_MAME32_ICON,IDC_GAME_ICON,20,10,20,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
@@ -565,19 +565,15 @@ BEGIN
     LTEXT           "Static",IDC_PROP_SOURCE,75,208,139,8
 END
 
-IDD_PROP_AUDIT DIALOG  0, 0, 220, 240
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_AUDIT DIALOG DISCARDABLE  0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Audit"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     ICON            IDI_CHECKMARK,IDC_STATIC,20,10,20,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
-#ifdef MESS
-    LTEXT           "BIOS check:",IDC_STATIC,10,40,50,8
-#else
     LTEXT           "ROM check:",IDC_STATIC,10,40,50,8
-#endif
     LTEXT           "Checking...",IDC_PROP_ROMS,66,40,139,8
     LTEXT           "Sample check:",IDC_STATIC,10,52,50,8
     LTEXT           "Checking...",IDC_PROP_SAMPLES,66,52,139,8
@@ -587,211 +583,216 @@ BEGIN
                     NOT WS_TABSTOP
 END
 
-IDD_PROP_DISPLAY DIALOGEX 0, 0, 230, 263
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_DISPLAY DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Display"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_DISPLAY,IDC_STATIC,20,10,20,20
-    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,54,9,169,25,
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,169,25,
                     SS_NOPREFIX
     CONTROL         "Run in a window",IDC_WINDOWED,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,10,40,69,9,0,HIDC_WINDOWED
+                    WS_TABSTOP,10,40,69,10,0,HIDC_WINDOWED
     CONTROL         "Start out maximized",IDC_MAXIMIZE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,52,74,9,0,HIDC_MAXIMIZE
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,52,74,10,0,HIDC_MAXIMIZE
     CONTROL         "Enforce aspect ratio",IDC_KEEPASPECT,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,64,77,9,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,64,77,10,0,
                     HIDC_KEEPASPECT
     CONTROL         "Throttle",IDC_THROTTLE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,10,76,39,9,0,HIDC_THROTTLE
-    GROUPBOX        "Rotation",IDC_STATIC,4,88,111,55
-    COMBOBOX        IDC_ROTATE,10,98,91,64,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP,10,76,39,10,0,HIDC_THROTTLE
+    GROUPBOX        "Bitmap prescaling",IDC_STATIC,4,89,103,24
+    CONTROL         "GammaSlider",IDC_PRESCALE,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,99,71,10,0,HIDC_PRESCALE
+    RTEXT           "1.00",IDC_PRESCALEDISP,84,98,14,11,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    GROUPBOX        "Gamma Correction",IDC_STATIC,4,115,103,24
+    CONTROL         "GammaSlider",IDC_GAMMA,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,125,71,10,0,HIDC_GAMMA
+    RTEXT           "2.00",IDC_GAMMADISP,84,124,14,10,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    GROUPBOX        "Brightness Correction",IDC_STATIC,4,141,103,24
+    CONTROL         "GammaSlider",IDC_BRIGHTCORRECT,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,10,151,71,10,0,
+                    HIDC_BRIGHTCORRECT
+    RTEXT           "1.00",IDC_BRIGHTCORRECTDISP,84,150,14,10,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Contrast Correction",IDC_STATIC,4,167,103,24
+    CONTROL         "GammaSlider",IDC_CONTRAST,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,176,71,10,0,HIDC_CONTRAST
+    RTEXT           "1.00",IDC_CONTRASTDISP,84,175,14,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Pause Brightness",IDC_STATIC,4,193,103,24
+    CONTROL         "Slider1",IDC_PAUSEBRIGHT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,203,71,10,0,HIDC_PAUSEBRIGHT
+    RTEXT           "0.65",IDC_PAUSEBRIGHTDISP,84,202,14,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Videomode",IDC_STATIC,113,40,102,28
+    COMBOBOX        IDC_VIDEO_MODE,119,50,90,50,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_VSCROLL | WS_TABSTOP,0,HIDC_VIDEO_MODE
+    GROUPBOX        "Rotation",IDC_STATIC,113,71,102,55
+    COMBOBOX        IDC_ROTATE,119,81,90,57,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP,0,HIDC_ROTATE
     CONTROL         "Flip screen upside-down",IDC_FLIPY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,115,91,10,0,HIDC_FLIPY
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,98,91,10,0,HIDC_FLIPY
     CONTROL         "Flip screen left-right",IDC_FLIPX,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,127,77,10,0,HIDC_FLIPX
-    GROUPBOX        "Gamma Correction",IDC_STATIC,121,103,102,24
-    CONTROL         "GammaSlider",IDC_GAMMA,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,125,113,71,10,0,HIDC_GAMMA
-    LTEXT           "2.00",IDC_GAMMADISP,199,113,15,10,SS_CENTERIMAGE | NOT 
-                    WS_GROUP
-    GROUPBOX        "Brightness Correction",IDC_STATIC,121,129,102,24
-    CONTROL         "GammaSlider",IDC_BRIGHTCORRECT,"msctls_trackbar32",
-                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,125,140,71,10,0,
-                    HIDC_BRIGHTCORRECT
-    LTEXT           "1.00",IDC_BRIGHTCORRECTDISP,199,137,15,10,
-                    SS_CENTERIMAGE | NOT WS_GROUP
-    GROUPBOX        "Pause Brightness",IDC_STATIC,121,180,102,24
-    CONTROL         "Slider1",IDC_PAUSEBRIGHT,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,125,191,71,10,0,
-                    HIDC_PAUSEBRIGHT
-    LTEXT           "0.65",IDC_PAUSEBRIGHTDISP,198,191,15,8
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,245,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,126,245,97,14,
-                    0,0,HIDC_USE_DEFAULT
-    GROUPBOX        "Videomode",IDC_STATIC,120,39,103,28
-    GROUPBOX        "Contrast Correction",IDC_STATIC,121,153,102,24
-    CONTROL         "GammaSlider",IDC_CONTRAST,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,125,164,71,10,0,HIDC_CONTRAST
-    LTEXT           "1.00",IDC_CONTRASTDISP,199,161,15,10,SS_CENTERIMAGE | 
-                    NOT WS_GROUP
-    GROUPBOX        "Bitmap prescaling",IDC_STATIC,121,73,102,24
-    CONTROL         "GammaSlider",IDC_PRESCALE,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,125,84,71,10,0,HIDC_PRESCALE
-    LTEXT           "1.00",IDC_PRESCALEDISP,199,84,15,10,SS_CENTERIMAGE | 
-                    NOT WS_GROUP
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,110,77,10,0,HIDC_FLIPX
+    GROUPBOX        "Direct3D",IDC_STATIC,113,128,102,57
     CONTROL         "Use Bilinear filtering",IDC_D3D_FILTER,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,160,85,11,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,138,85,10,0,
                     HIDC_D3D_FILTER
-    GROUPBOX        "Version",IDC_STATIC,12,174,97,28
-    COMBOBOX        IDC_D3D_VERSION,18,185,85,95,CBS_DROPDOWNLIST | 
+    GROUPBOX        "Version",IDC_STATIC,119,150,90,28
+    COMBOBOX        IDC_D3D_VERSION,125,160,78,95,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP,0,HIDC_D3D_VERSION
-    GROUPBOX        "Direct3D",IDC_STATIC,4,148,111,60
-    GROUPBOX        "DirectDraw",IDC_STATIC,4,211,110,29
+    GROUPBOX        "DirectDraw",IDC_STATIC,113,187,102,26
     CONTROL         "Stretch using hardware",IDC_HWSTRETCH,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,12,223,85,10,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,197,85,10,0,
                     HIDC_HWSTRETCH
-    COMBOBOX        IDC_VIDEO_MODE,123,48,94,50,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP,0,HIDC_VIDEO_MODE
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
+                    0,0,HIDC_USE_DEFAULT
 END
 
-IDD_PROP_SOUND DIALOGEX 0, 0, 220, 228
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_SOUND DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Sound"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_SOUNDTAB,IDC_STATIC,20,10,20,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
-    GROUPBOX        "",IDC_STATIC,4,40,211,136
+    GROUPBOX        "",IDC_STATIC,4,40,211,122
     CONTROL         "Enable sound and sound CPUs",IDC_USE_SOUND,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,40,112,10,0,
                     HIDC_USE_SOUND
     CONTROL         "Use samples",IDC_SAMPLES,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,10,52,55,10,0,HIDC_SAMPLES
-    GROUPBOX        "Sample rate",IDC_RATETEXT,60,78,100,28
-    COMBOBOX        IDC_SAMPLERATE,66,88,88,60,CBS_DROPDOWNLIST | 
+    GROUPBOX        "Sample rate",IDC_RATETEXT,60,65,100,28
+    COMBOBOX        IDC_SAMPLERATE,66,75,88,60,CBS_DROPDOWNLIST | 
                     CBS_UPPERCASE | WS_VSCROLL | WS_TABSTOP,0,
                     HIDC_SAMPLERATE
-    GROUPBOX        "Volume attenuation",IDC_STATIC,60,109,100,28
+    GROUPBOX        "Volume attenuation",IDC_STATIC,60,96,100,28
     CONTROL         "Slider1",IDC_VOLUME,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,66,122,68,10,0,HIDC_VOLUME
-    RTEXT           "0dB",IDC_VOLUMEDISP,132,121,20,10,SS_CENTERIMAGE
-    GROUPBOX        "Audio latency",IDC_AUDIO_LATENCY_TEXT,60,140,100,28
+                    TBS_NOTICKS | WS_TABSTOP,66,108,68,10,0,HIDC_VOLUME
+    RTEXT           "0dB",IDC_VOLUMEDISP,132,107,20,11,SS_CENTERIMAGE
+    GROUPBOX        "Audio latency",IDC_AUDIO_LATENCY_TEXT,60,127,100,28
     CONTROL         "Slider1",IDC_AUDIO_LATENCY,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,66,152,68,10,0,
+                    TBS_NOTICKS | WS_TABSTOP,66,139,68,10,0,
                     HIDC_AUDIO_LATENCY
-    RTEXT           "1/5",IDC_AUDIO_LATENCY_DISP,132,151,20,10,
+    RTEXT           "1/5",IDC_AUDIO_LATENCY_DISP,132,138,20,11,
                     SS_CENTERIMAGE
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,210,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,210,97,14,
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
                     0,0,HIDC_USE_DEFAULT
 END
 
-IDD_PROP_ADVANCED DIALOGEX 0, 0, 237, 218
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_ADVANCED DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Advanced"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_DISPLAY,IDC_STATIC,20,10,20,20
-    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,69,9,161,25,
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
     CONTROL         "Triple buffering",IDC_TRIPLE_BUFFER,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,52,93,10,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,93,10,0,
                     HIDC_TRIPLE_BUFFER
     CONTROL         "Sync to monitor refresh",IDC_SYNCREFRESH,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,65,93,10,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,52,93,10,0,
                     HIDC_SYNCREFRESH
     CONTROL         "Wait for vertical sync",IDC_WAITVSYNC,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,77,93,10,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,64,93,10,0,
                     HIDC_WAITVSYNC
-    GROUPBOX        "Full screen gamma",IDC_FSGAMMATEXT,113,52,96,28
-    CONTROL         "Slider1",IDC_FSGAMMA,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,119,64,64,10,0,HIDC_FSGAMMA
-    LTEXT           "2.00",IDC_FSGAMMADISP,186,64,15,10,SS_CENTERIMAGE | NOT 
-                    WS_GROUP
-    GROUPBOX        "Frame skipping",IDC_STATIC,7,104,102,43
+    GROUPBOX        "Frame skipping",IDC_STATIC,4,76,103,42
     CONTROL         "Automatic",IDC_AUTOFRAMESKIP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,115,77,10,0,HIDC_AUTOFRAMESKIP
-    COMBOBOX        IDC_FRAMESKIP,13,128,90,88,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP,10,86,77,10,0,HIDC_AUTOFRAMESKIP
+    COMBOBOX        IDC_FRAMESKIP,10,99,91,88,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP,0,HIDC_FRAMESKIP
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,7,197,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,115,197,97,14,
-                    0,0,HIDC_USE_DEFAULT
-    PUSHBUTTON      "Select Effect",IDC_SELECT_EFFECT,7,172,92,14,0,0,
-                    HIDC_SELECT_EFFECT
-    EDITTEXT        IDC_EFFECT,7,153,201,14,ES_AUTOHSCROLL | WS_DISABLED
-    GROUPBOX        "Full screen brightness",IDC_FSBRIGHTNESSTEXT,113,84,96,
-                    28
+    GROUPBOX        "Full screen gamma",IDC_FSGAMMATEXT,113,40,102,24
+    CONTROL         "Slider1",IDC_FSGAMMA,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,119,50,71,10,0,HIDC_FSGAMMA
+    RTEXT           "2.00",IDC_FSGAMMADISP,193,49,14,10,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    GROUPBOX        "Full screen brightness",IDC_FSBRIGHTNESSTEXT,113,67,102,
+                    24
     CONTROL         "Slider1",IDC_FSBRIGHTNESS,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,119,96,64,10,0,
+                    TBS_NOTICKS | WS_TABSTOP,119,77,71,10,0,
                     HIDC_FSBRIGHTNESS
-    LTEXT           "2.00",IDC_FSBRIGHTNESSDISP,186,96,15,10,SS_CENTERIMAGE | 
+    RTEXT           "2.00",IDC_FSBRIGHTNESSDISP,193,76,14,10,SS_CENTERIMAGE | 
                     NOT WS_GROUP
-    GROUPBOX        "Full screen contrast",IDC_FSCONTRASTTEXT,113,118,96,28
+    GROUPBOX        "Full screen contrast",IDC_FSCONTRASTTEXT,113,94,102,24
     CONTROL         "Slider1",IDC_FSCONTRAST,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,119,130,64,10,0,HIDC_FSCONTRAST
-    LTEXT           "2.00",IDC_FSCONTRASTDISP,186,130,15,10,SS_CENTERIMAGE | 
+                    TBS_NOTICKS | WS_TABSTOP,119,104,71,10,0,HIDC_FSCONTRAST
+    RTEXT           "2.00",IDC_FSCONTRASTDISP,193,103,14,11,SS_CENTERIMAGE | 
                     NOT WS_GROUP
-    PUSHBUTTON      "Reset Effect",IDC_RESET_EFFECT,115,172,50,14,0,0,
+    EDITTEXT        IDC_EFFECT,10,123,200,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Select Effect",IDC_SELECT_EFFECT,10,142,60,14,0,0,
+                    HIDC_SELECT_EFFECT
+    PUSHBUTTON      "Reset Effect",IDC_RESET_EFFECT,150,142,60,14,0,0,
                     HIDC_RESET_EFFECT
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
+                    0,0,HIDC_USE_DEFAULT
 END
 
-IDD_PROP_INPUT DIALOGEX 0, 0, 220, 228
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_INPUT DIALOGEX 0, 0, 220, 263
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Controllers"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg"
 BEGIN
-    ICON            IDI_JOYSTICK,IDC_STATIC,20,10,20,20
+    ICON            IDI_JOYSTICK,IDC_STATIC,20,10,21,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
-    GROUPBOX        "",IDC_STATIC,4,40,103,47
-    GROUPBOX        "",IDC_STATIC,4,89,103,39
-    CONTROL         "Enable joystick input",IDC_JOYSTICK,"Button",
-                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,10,40,78,10,0,
-                    HIDC_JOYSTICK
-    GROUPBOX        "Analog deadzone",IDC_A2DTEXT,10,52,91,28
-    CONTROL         "IntensitySlider",IDC_A2D,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,16,64,60,10,0,HIDC_A2D
-    LTEXT           "0.3",IDC_A2DDISP,78,64,16,10,SS_CENTERIMAGE | NOT 
-                    WS_GROUP
-    CONTROL         "Enable lightgun input",IDC_LIGHTGUN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,89,80,10,0,HIDC_LIGHTGUN
-    CONTROL         "Offscreen shots reload",IDC_RELOAD,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,101,86,10,0,HIDC_RELOAD
-    CONTROL         "Dual lightguns",IDC_DUAL_LIGHTGUN,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,10,113,86,10,0,
-                    HIDC_DUAL_LIGHTGUN
     CONTROL         "Enable mouse input",IDC_USE_MOUSE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,119,40,86,10,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,40,86,10,0,
                     HIDC_USE_MOUSE
     CONTROL         "Enable steadykey support",IDC_STEADYKEY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,119,52,95,10,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,10,52,95,10,0,
                     HIDC_STEADYKEY
-    GROUPBOX        "Default input layout",IDC_STATIC,113,64,102,28
-    COMBOBOX        IDC_DEFAULT_INPUT,119,74,90,53,CBS_DROPDOWNLIST | 
+    GROUPBOX        "",IDC_STATIC,4,64,103,74
+    CONTROL         "Enable joystick input",IDC_JOYSTICK,"Button",
+                    BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,10,64,78,10,0,
+                    HIDC_JOYSTICK
+    GROUPBOX        "Joystick deadzone",IDC_JDZTEXT,10,76,91,28
+    CONTROL         "IntensitySlider",IDC_JDZ,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,15,88,60,10,0,HIDC_JDZ
+    RTEXT           "0.3",IDC_JDZDISP,76,87,16,11,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    GROUPBOX        "Default input layout",IDC_STATIC,113,40,102,28
+    COMBOBOX        IDC_DEFAULT_INPUT,119,50,90,53,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP,0,HIDC_DEFAULT_INPUT
-    GROUPBOX        "Digital joystick axes",IDC_ANALOG_AXES_TEXT,4,131,211,
-                    73
+    GROUPBOX        "",IDC_STATIC,113,71,102,40
+    CONTROL         "Enable lightgun input",IDC_LIGHTGUN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,71,80,10,0,
+                    HIDC_LIGHTGUN
+    CONTROL         "Offscreen shots reload",IDC_RELOAD,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,83,86,10,0,HIDC_RELOAD
+    CONTROL         "Dual lightguns",IDC_DUAL_LIGHTGUN,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,96,86,10,0,
+                    HIDC_DUAL_LIGHTGUN
+    GROUPBOX        "Digital joystick axes",IDC_ANALOG_AXES_TEXT,4,145,211,
+                    90
     CONTROL         "List1",IDC_ANALOG_AXES,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOLABELWRAP | 
-                    WS_BORDER | WS_TABSTOP,10,141,199,57,WS_EX_CLIENTEDGE,
+                    WS_BORDER | WS_TABSTOP,10,156,199,74,WS_EX_CLIENTEDGE,
                     HIDC_ANALOG_AXES
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,210,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,210,97,14,
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,243,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,243,97,14,
                     0,0,HIDC_USE_DEFAULT
+    GROUPBOX        "Joystick saturation",IDC_JSATTEXT,10,106,91,28
+    CONTROL         "IntensitySlider",IDC_JSAT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,16,118,60,10,0,HIDC_JSAT
+    RTEXT           "0.85",IDC_JSATDISP,76,116,16,11,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
 END
 
-IDD_PROP_MISC DIALOGEX 0, 0, 220, 190
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_MISC DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Miscellaneous"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDI_MAME32_ICON,IDC_STATIC,20,10,20,20
+    ICON            IDI_MAME32_ICON,IDC_STATIC,20,10,21,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
-    GROUPBOX        "Artwork options",IDC_STATIC,113,40,102,68
 #ifdef MESS
     CONTROL         "Enable system cheats",IDC_CHEAT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,40,86,10,0,HIDC_CHEAT
 #else
@@ -817,30 +818,31 @@ BEGIN
     CONTROL         "Save game state on exit",IDC_ENABLE_AUTOSAVE,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,100,96,10,0,
                     HIDC_ENABLE_AUTOSAVE
-    CONTROL         "Backdrops",IDC_BACKDROPS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,119,52,86,10,0,HIDC_BACKDROPS
-    CONTROL         "Bezels",IDC_BEZELS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,119,64,86,10,0,HIDC_BEZELS
-    CONTROL         "Overlays",IDC_OVERLAYS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,119,76,86,10,0,HIDC_OVERLAYS
-    CONTROL         "Crop artwork",IDC_ARTWORK_CROP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,119,88,53,10,0,HIDC_ARTWORK_CROP
-    GROUPBOX        "BIOS",IDC_STATIC,113,112,100,28
-    COMBOBOX        IDC_BIOS,119,122,88,60,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP,0,HIDC_BIOS
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,7,161,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,121,161,97,14,
-                    0,0,HIDC_USE_DEFAULT
-    GROUPBOX        "Thread Priority",IDC_HIGH_PRIORITY_TEXT,7,112,96,32
-    CONTROL         "Slider1",IDC_HIGH_PRIORITY,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,10,121,67,10,0,
-                    HIDC_HIGH_PRIORITY
-    LTEXT           "idle",IDC_STATIC,10,130,12,8
-    LTEXT           "-15",IDC_HIGH_PRIORITYTXT,82,121,12,8
-    LTEXT           "real-time",IDC_STATIC,61,130,28,8
     CONTROL         "Multi-threaded rendering",IDC_MULTITHREAD_RENDERING,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,112,96,10,0,
                     HIDC_MULTITHREAD_RENDERING
+    GROUPBOX        "Thread Priority",IDC_HIGH_PRIORITY_TEXT,4,124,103,34
+    CONTROL         "Slider1",IDC_HIGH_PRIORITY,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,10,135,75,10,0,
+                    HIDC_HIGH_PRIORITY
+    LTEXT           "idle",IDC_STATIC,13,144,12,8
+    RTEXT           "-15",IDC_HIGH_PRIORITYTXT,84,134,14,10,SS_CENTERIMAGE
+    RTEXT           "real-time",IDC_STATIC,53,144,28,8
+    GROUPBOX        "Artwork options",IDC_STATIC,113,40,102,61
+    CONTROL         "Backdrops",IDC_BACKDROPS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,119,50,86,10,0,HIDC_BACKDROPS
+    CONTROL         "Bezels",IDC_BEZELS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,119,62,86,10,0,HIDC_BEZELS
+    CONTROL         "Overlays",IDC_OVERLAYS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,119,74,84,10,0,HIDC_OVERLAYS
+    CONTROL         "Crop artwork",IDC_ARTWORK_CROP,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,119,86,53,10,0,HIDC_ARTWORK_CROP
+    GROUPBOX        "BIOS",IDC_STATIC,113,104,102,28
+    COMBOBOX        IDC_BIOS,119,114,90,60,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP,0,HIDC_BIOS
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
+                    0,0,HIDC_USE_DEFAULT
 #ifdef MESS
     CONTROL         "Skip warnings",IDC_SKIP_WARNINGS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,180,86,10,0
@@ -849,10 +851,10 @@ BEGIN
 #endif
 END
 
-IDD_PROP_VECTOR DIALOGEX 0, 0, 220, 228
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_VECTOR DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Vector"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_MAME32_ICON,IDC_STATIC,20,10,20,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
@@ -860,31 +862,32 @@ BEGIN
     CONTROL         "Draw antialiased vectors",IDC_ANTIALIAS,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,40,92,10,0,
                     HIDC_ANTIALIAS
-    GROUPBOX        "Beam width",IDC_BEAMTEXT,60,66,100,28
+    GROUPBOX        "Beam width",IDC_BEAMTEXT,60,53,100,28
     CONTROL         "BeamSlider",IDC_BEAM,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,66,77,64,10,0,HIDC_BEAM
-    RTEXT           "16.00",IDC_BEAMDISP,132,77,20,10,SS_CENTERIMAGE
-    GROUPBOX        "Flicker",IDC_FLICKERTEXT,60,97,100,28
+                    TBS_NOTICKS | WS_TABSTOP,66,65,64,10,0,HIDC_BEAM
+    RTEXT           "16.00",IDC_BEAMDISP,132,64,20,11,SS_CENTERIMAGE
+    GROUPBOX        "Flicker",IDC_FLICKERTEXT,60,84,100,28
     CONTROL         "FlickerSlider",IDC_FLICKER,"msctls_trackbar32",TBS_BOTH | 
-                    TBS_NOTICKS | WS_TABSTOP,66,108,64,10,0,HIDC_FLICKER
-    RTEXT           "100.00",IDC_FLICKERDISP,128,108,24,10,SS_CENTERIMAGE | 
+                    TBS_NOTICKS | WS_TABSTOP,66,96,64,10,0,HIDC_FLICKER
+    RTEXT           "100.00",IDC_FLICKERDISP,128,95,24,11,SS_CENTERIMAGE | 
                     NOT WS_GROUP
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,210,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,210,97,14,
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
                     0,0,HIDC_USE_DEFAULT
 END
+
 
 #ifdef MESS
 IDD_MAIN DIALOGEX 0, 0, 364, 206
 #else
 IDD_MAIN DIALOGEX 0, 0, 304, 206
 #endif
-STYLE DS_SETFONT | DS_3DLOOK | DS_NOFAILCREATE | WS_MINIMIZEBOX | 
-    WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_3DLOOK | DS_NOFAILCREATE | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | 
+    WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 EXSTYLE WS_EX_CONTROLPARENT
 CAPTION "MAME32 - overwritten at runtime"
 CLASS "MainClass"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_DIVIDER,"Static",SS_ETCHEDHORZ,0,5,304,1
     CONTROL         "Tree1",IDC_TREE,"SysTreeView32",TVS_HASBUTTONS | 
@@ -921,16 +924,15 @@ BEGIN
 #endif
 END
 
-IDD_FILTERS DIALOGEX 0, 0, 190, 183
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+IDD_FILTERS DIALOGEX 0, 0, 190, 182
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 #ifdef MESS
 CAPTION "System Filters"
 #else
 CAPTION "Game Filters"
 #endif
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
 #ifdef MESS
     GROUPBOX        "System filters",IDC_STATIC,6,4,178,85
@@ -971,16 +973,15 @@ BEGIN
     GROUPBOX        "&Description filter",IDC_STATIC,6,122,178,33
     EDITTEXT        IDC_FILTER_EDIT,14,134,162,13,ES_AUTOHSCROLL,0,
                     HIDC_FILTER_EDIT
-    DEFPUSHBUTTON   "&OK",IDOK,43,162,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,97,162,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,42,161,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,98,161,50,14
 END
 
 IDD_RESET DIALOGEX 0, 0, 190, 122
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Reset Options"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "Categories",IDC_STATIC,6,4,178,70
     CONTROL         "&User Interface (Fonts, Colors, Sizes)",IDC_RESET_UI,
@@ -1002,34 +1003,32 @@ BEGIN
                     HIDC_RESET_FILTERS
     CTEXT           "Select the options to be restored to the default settings.\nThe options will be restored when MAME32 is run next.",
                     IDC_STATIC,6,79,178,20
-    DEFPUSHBUTTON   "&OK",IDOK,43,101,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,97,101,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,42,101,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,98,101,50,14
 END
 
-IDD_LOAD_PROGRESS DIALOGEX 0, 0, 267, 191
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+IDD_LOAD_PROGRESS DIALOGEX 0, 0, 260, 187
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTROLPARENT
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "Progress1",IDC_LOAD_PROGRESS,"msctls_progress32",
-                    WS_BORDER | 0x1,8,4,252,12
-    CTEXT           "",IDC_LOAD_ROMNAME,7,20,253,10,SS_CENTERIMAGE | NOT 
+                    PBS_SMOOTH | WS_BORDER,6,7,248,12
+    CTEXT           "",IDC_LOAD_ROMNAME,6,21,248,10,SS_CENTERIMAGE | NOT 
                     WS_GROUP
-    EDITTEXT        IDC_LOAD_STATUS,10,35,250,115,ES_MULTILINE | ES_READONLY | 
+    EDITTEXT        IDC_LOAD_STATUS,6,32,248,116,ES_MULTILINE | ES_READONLY | 
                     WS_VSCROLL
-    CTEXT           "",IDC_ERROR_TEXT,10,155,250,13,SS_NOPREFIX | 
+    CTEXT           "",IDC_ERROR_TEXT,6,150,248,13,SS_NOPREFIX | 
                     SS_CENTERIMAGE
-    PUSHBUTTON      "&OK",IDOK,85,175,50,14,WS_DISABLED
-    PUSHBUTTON      "&Cancel",IDCANCEL,145,175,50,14
+    PUSHBUTTON      "&OK",IDOK,77,166,50,14,WS_DISABLED
+    PUSHBUTTON      "&Cancel",IDCANCEL,133,166,50,14
 END
 
 IDD_INTERFACE_OPTIONS DIALOGEX 0, 0, 378, 225
-STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Interface Options"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
 #ifdef MESS
     GROUPBOX        "System Selection",IDC_STATIC,6,4,189,194
@@ -1096,16 +1095,15 @@ BEGIN
                     SS_CENTERIMAGE
     PUSHBUTTON      "Set Screenshot Border Color",IDC_SCREENSHOT_BORDERCOLOR,
                     210,176,154,14
-    DEFPUSHBUTTON   "&OK",IDOK,137,204,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,191,204,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,136,204,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,192,204,50,14
 END
 
 IDD_LANGUAGE DIALOGEX 0, 0, 190, 66
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Language"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,6,4,178,34
     CONTROL         "Use language file",IDC_LANGUAGECHECK,"Button",
@@ -1114,14 +1112,14 @@ BEGIN
     EDITTEXT        IDC_LANGUAGEEDIT,14,17,142,13,ES_AUTOHSCROLL,0,
                     HIDC_LANGUAGEEDIT
     PUSHBUTTON      "...",IDC_LANGUAGEBROWSE,162,17,14,13
-    DEFPUSHBUTTON   "OK",IDOK,43,45,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,97,45,50,14
+    DEFPUSHBUTTON   "OK",IDOK,42,45,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,98,45,50,14
 END
 
-IDD_CUSTOM_FILE DIALOG  0, 0, 190, 136
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_CUSTOM_FILE DIALOG DISCARDABLE  0, 0, 190, 135
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Add Game To Custom Folder"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Shell Dlg"
 BEGIN
     LTEXT           "",IDC_CUSTOMFILE_GAME,6,6,175,10,SS_NOPREFIX | 
                     SS_CENTERIMAGE
@@ -1129,14 +1127,14 @@ BEGIN
                     TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | 
                     TVS_DISABLEDRAGDROP | TVS_SHOWSELALWAYS | 
                     TVS_FULLROWSELECT | WS_BORDER | WS_TABSTOP,6,18,178,90
-    DEFPUSHBUTTON   "OK",IDOK,43,115,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,97,115,50,14
+    DEFPUSHBUTTON   "OK",IDOK,42,114,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,98,114,50,14
 END
 
-IDD_PROP_CONTROLLER DIALOGEX 0, 0, 220, 228
-STYLE DS_SETFONT | WS_CHILD | WS_DISABLED | WS_CAPTION
+IDD_PROP_CONTROLLER DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_DISABLED | WS_CAPTION
 CAPTION "Controller Mapping"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_JOYSTICK,IDC_STATIC,20,10,20,20
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
@@ -1159,59 +1157,57 @@ BEGIN
     GROUPBOX        "Lightgun device",IDC_STATIC,113,102,102,28
     COMBOBOX        IDC_LIGHTGUNDEVICE,119,112,90,62,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP,0,HIDC_LIGHTGUNDEVICE
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,210,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,210,97,14,
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
                     0,0,HIDC_USE_DEFAULT
 END
 
-IDD_PROP_SCREEN DIALOGEX 0, 0, 230, 202
-STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+IDD_PROP_SCREEN DIALOGEX 0, 0, 220, 240
+STYLE WS_CHILD | WS_CAPTION
 CAPTION "Screen"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_DISPLAY,IDC_STATIC,20,10,21,20
-    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,62,9,161,25,
+    LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
-    PUSHBUTTON      "Reset",IDC_PROP_RESET,7,179,97,14,0,0,HIDC_PROP_RESET
-    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,126,179,97,14,
-                    0,0,HIDC_USE_DEFAULT
-    GROUPBOX        "Screen",IDC_STATIC,4,63,103,28
-    COMBOBOX        IDC_SCREEN,10,73,91,64,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP,0,HIDC_SCREEN
-    GROUPBOX        "Resolution",IDC_STATIC,120,68,103,50,WS_GROUP
-    LTEXT           "Size",IDC_STATIC,126,80,28,10,SS_CENTERIMAGE | NOT 
+    GROUPBOX        "Number of screens",IDC_STATIC,4,40,103,24
+    CONTROL         "GammaSlider",IDC_NUMSCREENS,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,10,50,75,10,0,
+                    HIDC_NUMSCREENS
+    RTEXT           "1",IDC_NUMSCREENSDISP,84,49,14,10,SS_CENTERIMAGE | NOT 
                     WS_GROUP
-    COMBOBOX        IDC_SIZES,158,79,60,70,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP,0,HIDC_SIZES
-    LTEXT           "Refresh",IDC_REFRESHTEXT,126,98,28,10,SS_CENTERIMAGE | 
-                    NOT WS_GROUP
-    COMBOBOX        IDC_REFRESH,158,97,60,76,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP,0,HIDC_REFRESH
-    GROUPBOX        "",IDC_STATIC,4,95,103,28
-    LTEXT           "Aspect ratio",IDC_ASPECTRATIOTEXT,13,107,40,10,
-                    SS_CENTERIMAGE
-    EDITTEXT        IDC_ASPECTRATION,56,106,14,12,ES_RIGHT | ES_AUTOHSCROLL | 
+    GROUPBOX        "Screen",IDC_STATIC,4,66,103,29
+    COMBOBOX        IDC_SCREEN,10,76,91,64,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP,0,HIDC_SCREEN
+    GROUPBOX        "",IDC_STATIC,4,97,103,28
+    CONTROL         "Autoselect aspect",IDC_ASPECT,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,97,73,10,0,HIDC_ASPECT
+    LTEXT           "Aspect ratio",IDC_ASPECTRATIOTEXT,17,108,40,11,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    EDITTEXT        IDC_ASPECTRATION,60,108,14,12,ES_RIGHT | ES_AUTOHSCROLL | 
                     ES_NUMBER,0,HIDC_ASPECTRATION
-    LTEXT           ":",IDC_STATIC,72,107,8,10,SS_CENTERIMAGE | NOT WS_GROUP
-    EDITTEXT        IDC_ASPECTRATIOD,76,106,14,12,ES_RIGHT | ES_AUTOHSCROLL | 
+    LTEXT           ":",IDC_STATIC,76,108,8,10,SS_CENTERIMAGE | NOT WS_GROUP
+    EDITTEXT        IDC_ASPECTRATIOD,80,108,14,12,ES_RIGHT | ES_AUTOHSCROLL | 
                     ES_NUMBER,0,HIDC_ASPECTRATIOD
-    GROUPBOX        "View",IDC_STATIC,4,127,103,28
+    GROUPBOX        "View",IDC_STATIC,4,128,103,28
     COMBOBOX        IDC_VIEW,10,137,91,64,CBS_DROPDOWNLIST | WS_VSCROLL | 
                     WS_TABSTOP,0,HIDC_VIEW
-    GROUPBOX        "Screennumber",IDC_SCREENSELECTTEXT,120,33,103,28
-    COMBOBOX        IDC_SCREENSELECT,126,44,91,64,CBS_DROPDOWNLIST | 
+    GROUPBOX        "Screennumber",IDC_SCREENSELECTTEXT,113,40,102,28
+    COMBOBOX        IDC_SCREENSELECT,119,50,90,64,CBS_DROPDOWNLIST | 
                     WS_VSCROLL | WS_TABSTOP,0,HIDC_SCREENSELECT
-    CONTROL         "Autoselect aspect",IDC_ASPECT,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,95,73,10,0,HIDC_ASPECT
+    GROUPBOX        "Resolution",IDC_STATIC,113,71,102,76,WS_GROUP
+    GROUPBOX        "Size",IDC_STATIC,119,81,90,28,WS_GROUP
+    COMBOBOX        IDC_SIZES,126,91,77,70,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP,0,HIDC_SIZES
+    GROUPBOX        "Refresh",IDC_REFRESHTEXT,119,112,90,28,WS_GROUP
+    COMBOBOX        IDC_REFRESH,126,121,77,76,CBS_DROPDOWNLIST | WS_VSCROLL | 
+                    WS_TABSTOP,0,HIDC_REFRESH
     CONTROL         "Switch resolutions to fit",IDC_SWITCHRES,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,119,125,93,10,0,
+                    BS_AUTOCHECKBOX | WS_TABSTOP,119,151,93,10,0,
                     HIDC_SWITCHRES
-    GROUPBOX        "Number of screens",IDC_STATIC,4,34,111,27
-    CONTROL         "GammaSlider",IDC_NUMSCREENS,"msctls_trackbar32",
-                    TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,10,46,80,10,0,
-                    HIDC_NUMSCREENS
-    LTEXT           "1",IDC_NUMSCREENSDISP,94,46,15,10,SS_CENTERIMAGE | NOT 
-                    WS_GROUP
+    PUSHBUTTON      "Reset",IDC_PROP_RESET,4,222,97,14,0,0,HIDC_PROP_RESET
+    PUSHBUTTON      "Restore Default Settings",IDC_USE_DEFAULT,118,222,97,14,
+                    0,0,HIDC_USE_DEFAULT
 END
 
 
@@ -1220,7 +1216,7 @@ END
 // Accelerator
 //
 
-IDA_TAB_KEYS ACCELERATORS 
+IDA_TAB_KEYS ACCELERATORS MOVEABLE PURE 
 BEGIN
     "1",            ID_VIEW_TAB_SCREENSHOT, VIRTKEY, ALT, NOINVERT
     "2",            ID_VIEW_TAB_FLYER,      VIRTKEY, ALT, NOINVERT
@@ -1253,7 +1249,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO MOVEABLE PURE 
 BEGIN
     IDD_ABOUT, DIALOG
     BEGIN
@@ -1348,7 +1344,7 @@ BEGIN
         RIGHTMARGIN, 215
         VERTGUIDE, 50
         VERTGUIDE, 170
-        BOTTOMMARGIN, 198
+        BOTTOMMARGIN, 257
     END
 
     IDD_PROP_MISC, DIALOG
@@ -1360,7 +1356,7 @@ BEGIN
         VERTGUIDE, 104
         VERTGUIDE, 114
         VERTGUIDE, 204
-        BOTTOMMARGIN, 175
+        BOTTOMMARGIN, 183
     END
 
     IDD_PROP_VECTOR, DIALOG
@@ -1422,30 +1418,30 @@ END
 #ifdef MESS
 IDB_ABOUT               BITMAP  DISCARDABLE     "res\\about_mess.bmp"
 #else
-IDB_ABOUT               BITMAP                  "res\\about.bmp"
+IDB_ABOUT               BITMAP  MOVEABLE PURE   "res\\about.bmp"
 #endif
-IDB_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
+IDB_TOOLBAR             BITMAP  MOVEABLE PURE   "res\\toolbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Cursor
 //
 
-IDC_CURSOR_HSPLIT       CURSOR                  "Res\\Splith.cur"
+IDC_CURSOR_HSPLIT       CURSOR  DISCARDABLE     "Res\\Splith.cur"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// RT_MANIFEST
+// 24
 //
 
-1                       RT_MANIFEST             "res\\mame32.manifest"
+1                       24      MOVEABLE PURE   "res\\mame32.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_UI_FILE             "Contains commands for working with the selected items"
     IDS_UI_VIEW             "Contains commands for manupulating the view"
@@ -1453,7 +1449,7 @@ BEGIN
     IDS_UI_HELP             "Contains commands for displaying help"
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     IDS_UI_TOOLBAR          "Show or hide the toolbar"
     IDS_UI_STATUSBAR        "Show or hide the status bar"
@@ -1476,7 +1472,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_FILE_EXIT            "Exit the application"
 #ifdef MESS
@@ -1500,7 +1496,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
 #ifdef MESS
     ID_FILE_LOADSTATE       "Run a system starting with the given savestate"
@@ -1509,7 +1505,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
     ID_OPTIONS_RESET_DEFAULTS "Allow restoring options to 'sane' values."
     ID_OPTIONS_INTERFACE    "Customize interface options."
@@ -1540,7 +1536,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
 #ifdef MESS
     ID_CUSTOMIZE_FIELDS     "Customize which columns are used in the system list"
@@ -1560,7 +1556,7 @@ BEGIN
 #endif
 END
 
-STRINGTABLE 
+STRINGTABLE DISCARDABLE 
 BEGIN
 #ifdef MESS
     ID_VIEW_BYGAME          "Sort items by system"
@@ -1582,7 +1578,7 @@ BEGIN
     ID_SORT_DESCENDING      "Sort column in descending (Z-A) order"
 END
 
-#endif    // English (U.S.) resources
+#endif    // Englisch (USA) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

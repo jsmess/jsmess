@@ -17,6 +17,7 @@
 #include "ui/optionsms.h"
 #endif
 
+#include "osdcomm.h"
 #include "osd_cpu.h"
 #include "input.h" /* for input_seq definition */
 #include <video.h> /* for MAX_SCREENS Definition*/
@@ -138,7 +139,8 @@ typedef struct
 	/* input */
 	BOOL   use_mouse;
 	BOOL   use_joystick;
-	double f_a2d;
+	double f_jdz;
+	double f_jsat;
 	BOOL   steadykey;
 	BOOL   lightgun;
 	BOOL   dual_lightgun;

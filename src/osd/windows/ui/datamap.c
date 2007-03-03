@@ -9,7 +9,6 @@
 #include <math.h>
 #include <assert.h>
 
-#include "osdcomm.h"
 #include "resource.h"
 #include "m32util.h"
 #include "bitmask.h"

@@ -8,13 +8,21 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include "mame.h"
+#include "osdcomm.h"
+#include "osd_cpu.h"
 #include "driver.h"
 #include "datafile.h"
 
 /****************************************************************************
  *      token parsing constants
  ****************************************************************************/
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 #define CR      0x0d    /* '\n' and '\r' meanings are swapped in some */
 #define LF      0x0a    /*     compilers (e.g., Mac compilers) */
