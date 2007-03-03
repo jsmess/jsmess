@@ -32,6 +32,8 @@ System Driver Changes:
 
 - [SMS/GG] Improved PSG, FM, and CPU clock frequencies [Andre Cotrim, Wilbert Pol]
            Fixed triggering of the VBlank interrupt.  (bug #1097) [Wilbert Pol]
+           Added support for zoomed sprites and fixed VDP control/data port
+           behaviour.  (bug #794) [Wilbert Pol]
 
 - [SORDM5] Fixed regression introduced in 0.112.  (bug #1082) [Nate Woods]
 

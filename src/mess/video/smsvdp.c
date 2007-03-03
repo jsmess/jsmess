@@ -373,8 +373,14 @@ INTERRUPT_GEN(sms) {
  READ8_HANDLER(sms_vdp_data_r) {
 	int temp;
 
-	/* Clear pending write flag */
-	pending = 0;
+	/* SMS 2 & GG behaviour. Seems like the latched data is passed straight through */
+	/* to the address register when in the middle of doing a command.               */
+	/* Cosmic Spacehead needs this, among others                                    */
+	if ( pending ) {
+		addr = ( addr & 0xff00 ) | latch;
+		/* Clear pending write flag */
+		pending = 0;
+	}
 
 	/* Return read buffer contents */
 	temp = buffer;
@@ -404,8 +410,14 @@ INTERRUPT_GEN(sms) {
 }
 
 WRITE8_HANDLER(sms_vdp_data_w) {
-	/* Clear pending write flag */
-	pending = 0;
+	/* SMS 2 & GG behaviour. Seems like the latched data is passed straight through */
+	/* to the address register when in the middle of doing a command.               */
+        /* Cosmic Spacehead needs this, among others                                    */
+	if ( pending ) {
+		addr = ( addr & 0xff00 ) | latch;
+		/* Clear pending write flag */
+		pending = 0;
+	}
 
 	switch(code) {
 		case 0x00:
@@ -436,34 +448,35 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 
 	if (pending == 0) {
 		latch = data;
-		/* SMS 2 & GG behaviour. Seems like the latched data is passed straight through */
-                /* to the address register. Cosmic Spacehead needs this, among others */
-		addr = ( addr & 0xff00 ) | latch;
 		pending = 1;
 	} else {
 		/* Clear pending write flag */
 		pending = 0;
 
 		code = (data >> 6) & 0x03;
-//		addr = ((data & 0x3F) << 8) | latch;
-		addr = ( addr & 0xff ) | ( data << 8 );
-
-		/* Is it VDP register write - code 0x02 */
-		if (code == 0x02) {
+		switch( code ) {
+		case 0:		/* VRAM reading mode */
+			addr = ( data << 8 ) | latch;
+			buffer = VRAM[ addr & 0x3FFF ];
+			addr += 1;
+			break;
+		case 1:		/* VRAM writing mode */
+			addr = ( data << 8 ) | latch;
+			break;
+		case 2:		/* VDP register write */
 			regNum = data & 0x0F;
 			reg[regNum] = latch;
 			if (regNum == 0 && latch & 0x02) {
 				logerror("overscan enabled.\n");
 			}
-
 			if ( regNum == 0 || regNum == 1 ) {
 				set_display_settings();
 			}
-
 			code = 0;
-		} else if (code == 0x00) {
-			buffer = VRAM[(addr & 0x3FFF)];
-			addr += 1;
+			break;
+		case 3:		/* CRAM writing mode */
+			addr = ( data << 8 ) | latch;
+			break;
 		}
 	}
 }
