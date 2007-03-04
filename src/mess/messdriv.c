@@ -128,8 +128,8 @@ const game_driver *test_drivers[] =
 	DRIVER( gamegeaj )	/* Sega GameGear (Japan)						*/
 	DRIVER( sms )		/* Sega Master System (NTSC)						*/
 	DRIVER( smspal )	/* Sega Master System (PAL)							*/
-	DRIVER( smsj21 )	/* Sega Master System (PAL Japanese SMS BIOS v2.1)	*/
-	DRIVER( smsm3 )		/* Sega Mark III (PAL) Japanese SMS BIOS v2.1		*/
+	DRIVER( smsj21 )	/* Sega Master System (Japan) with FM Chip					*/
+	DRIVER( smsm3 )		/* Sega Mark III (Japan)							*/
 	DRIVER( gen_usa )	/* Sega Genesis/MegaDrive USA							*/
 	DRIVER( gen_eur )	/* Sega Genesis/MegaDrive Europe						*/
 	DRIVER( gen_jpn )	/* Sega Genesis/MegaDrive Japan						*/
