@@ -228,7 +228,13 @@ WRITE8_HANDLER(sms_mapper_w)
 				logerror("rom 2 paged in %x.\n", page);
 #endif
 				sms_banking_bios[4] = SOURCE_BIOS;
-				sms_banking_cart[4] = SOURCE_CART;
+				if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
+					if ( SOURCE == SOURCE_CART ) {
+						SOURCE = sms_banking_cart[4];
+					}
+				} else {
+					sms_banking_cart[4] = SOURCE_CART;
+				}
 				memory_set_bankptr( 4, SOURCE );
 			}
 			break;
@@ -523,6 +529,10 @@ static void setup_banks( void ) {
 		sms_banking_cart[2] = ROM + 0x0400;
 		sms_banking_cart[3] = ROM + ( ( 1 < smsRomPageCount ) ? 0x4000 : 0 );
 		sms_banking_cart[4] = ROM + ( ( 2 < smsRomPageCount ) ? 0x8000 : 0 );
+		/* Codemasters mapper points to bank 0 for page 2 */
+		if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
+			sms_banking_cart[4] = ROM;
+		}
 	}
 
 	if ( BIOS ) {
