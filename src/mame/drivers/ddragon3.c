@@ -710,33 +710,70 @@ ROM_END
 
 ROM_START( ctribe )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 64k for cpu code */
-	ROM_LOAD16_BYTE( "ic-26",      0x00001, 0x20000, CRC(c46b2e63) SHA1(86ace715dca48c78a46da1d102de47e5f948a86c) )
-	ROM_LOAD16_BYTE( "ic-25",      0x00000, 0x20000, CRC(3221c755) SHA1(0f6fe5cd6947f6547585eedb7fc5e6af8544b1f7) )
-	ROM_LOAD16_BYTE( "ct_ep2.rom", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(c46b2e63) SHA1(86ace715dca48c78a46da1d102de47e5f948a86c) )
+	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(3221c755) SHA1(0f6fe5cd6947f6547585eedb7fc5e6af8544b1f7) )
+	ROM_LOAD16_BYTE( "ct_ep2.ic104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound cpu code */
-	ROM_LOAD( "ct_ep4.rom",   0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
+	ROM_LOAD( "28a10-0.ic89", 0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "ct_mr7.rom",  0x000000, 0x40000, CRC(a8b773f1) SHA1(999e41dfeb3fb937da769c4a33bb29bf4076dc63) )    /* Background */
-	ROM_LOAD( "ct_mr6.rom",  0x040000, 0x40000, CRC(617530fc) SHA1(b9155ed0ae1437bf4d0b7a95e769bc05a820ecec) )
-	ROM_LOAD( "ct_mr5.rom",  0x080000, 0x40000, CRC(cef0a821) SHA1(c7a35048d5ebf3f09abf9d27f91d12adc03befeb) )
-	ROM_LOAD( "ct_mr4.rom",  0x0c0000, 0x40000, CRC(b84fda09) SHA1(3ae0c0ec6c398dea17e248b017ea3e2f6c3571e1) )
+	ROM_LOAD( "28j7-0.ic11",  0x000000, 0x40000, CRC(a8b773f1) SHA1(999e41dfeb3fb937da769c4a33bb29bf4076dc63) )    /* Background */
+	ROM_LOAD( "28j6-0.ic13",  0x040000, 0x40000, CRC(617530fc) SHA1(b9155ed0ae1437bf4d0b7a95e769bc05a820ecec) )
+	ROM_LOAD( "28j5-0.ic12",  0x080000, 0x40000, CRC(cef0a821) SHA1(c7a35048d5ebf3f09abf9d27f91d12adc03befeb) )
+	ROM_LOAD( "28j4-0.ic14",  0x0c0000, 0x40000, CRC(b84fda09) SHA1(3ae0c0ec6c398dea17e248b017ea3e2f6c3571e1) )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "ct_mr3.rom",  0x000000, 0x80000, CRC(1ac2a461) SHA1(17436f5dcf29041ca5f470dfae538e4fc12153cc) )    /* Sprites */
-	ROM_LOAD( "ct_ep5.rom",  0x080000, 0x10000, CRC(972faddb) SHA1(f2b211e8f8301667e6c9a3ce9612e39b16e66a67) )
-	ROM_LOAD( "ct_mr2.rom",  0x100000, 0x80000, CRC(8c796707) SHA1(7417ad0413083876ed65a8612845ccb0d2717530) )
-	ROM_LOAD( "ct_ep6.rom",  0x180000, 0x10000, CRC(eb3ab374) SHA1(db66cb7976c111fa76a3a211e96ad1d7b78ce0ad) )
-	ROM_LOAD( "ct_mr1.rom",  0x200000, 0x80000, CRC(1c9badbd) SHA1(d28f6d684d88448eaa3feae0bba2f5a836d89bd7) )
-	ROM_LOAD( "ct_ep7.rom",  0x280000, 0x10000, CRC(c602ac97) SHA1(44440739636b684c6dcac837f59664120c9ba5f3) )
-	ROM_LOAD( "ct_mr0.rom",  0x300000, 0x80000, CRC(ba73c49e) SHA1(830099027ede1f7c56bb0bf3cdef3018b92e0b87) )
-	ROM_LOAD( "ct_ep8.rom",  0x380000, 0x10000, CRC(4da1d8e5) SHA1(568e9e8d00f1b1ca27c28df5fc0ffc74ad91da7e) )
+	ROM_LOAD( "28j3-0.ic77",  0x000000, 0x80000, CRC(1ac2a461) SHA1(17436f5dcf29041ca5f470dfae538e4fc12153cc) )    /* Sprites */
+	ROM_LOAD( "28a14-0.ic60", 0x080000, 0x10000, CRC(972faddb) SHA1(f2b211e8f8301667e6c9a3ce9612e39b16e66a67) )
+	ROM_LOAD( "28j2-0.ic78",  0x100000, 0x80000, CRC(8c796707) SHA1(7417ad0413083876ed65a8612845ccb0d2717530) )
+	ROM_LOAD( "28a13-0.ic61", 0x180000, 0x10000, CRC(eb3ab374) SHA1(db66cb7976c111fa76a3a211e96ad1d7b78ce0ad) )
+	ROM_LOAD( "28j1-0.ic97",  0x200000, 0x80000, CRC(1c9badbd) SHA1(d28f6d684d88448eaa3feae0bba2f5a836d89bd7) )
+	ROM_LOAD( "28a12-0.ic85", 0x280000, 0x10000, CRC(c602ac97) SHA1(44440739636b684c6dcac837f59664120c9ba5f3) )
+	ROM_LOAD( "28j0-0.ic98",  0x300000, 0x80000, CRC(ba73c49e) SHA1(830099027ede1f7c56bb0bf3cdef3018b92e0b87) )
+	ROM_LOAD( "28a11-0.ic86", 0x380000, 0x10000, CRC(4da1d8e5) SHA1(568e9e8d00f1b1ca27c28df5fc0ffc74ad91da7e) )
 
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 )	/* ADPCM Samples */
-	ROM_LOAD( "ct_mr8.rom",   0x020000, 0x20000, CRC(9963a6be) SHA1(b09b8f52b7fe5ceac34bc7d70c235d60d808fcbf) )
-	ROM_CONTINUE(			  0x000000, 0x20000 )
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* ADPCM Samples */
+	ROM_LOAD( "28j9-0.ic83", 0x00000, 0x20000, CRC(f92a7f4a) SHA1(3717ef64876be9ada378b449749918ce9072073a) )
+	ROM_LOAD( "28j8-0.ic82", 0x20000, 0x20000, CRC(1a3a0b39) SHA1(8847530027cf4be03ffbc6d78dee97b459d03a04) )
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
+ROM_END
+
+ROM_START( ctribe1 )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 64k for cpu code */
+	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(f00f8443) SHA1(3c099b6bea9956cc60ce4a9a5d790ac2bf7d77bd) )
+	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(dd70079f) SHA1(321b523fefec2a962d0afa20b33428e7caea8958) )
+	ROM_LOAD16_BYTE( "ct_ep2.ic104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
+	/* No EVEN rom! */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound cpu code */
+	ROM_LOAD( "28a10-0.ic89", 0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "28j7-0.ic11",  0x000000, 0x40000, CRC(a8b773f1) SHA1(999e41dfeb3fb937da769c4a33bb29bf4076dc63) )    /* Background */
+	ROM_LOAD( "28j6-0.ic13",  0x040000, 0x40000, CRC(617530fc) SHA1(b9155ed0ae1437bf4d0b7a95e769bc05a820ecec) )
+	ROM_LOAD( "28j5-0.ic12",  0x080000, 0x40000, CRC(cef0a821) SHA1(c7a35048d5ebf3f09abf9d27f91d12adc03befeb) )
+	ROM_LOAD( "28j4-0.ic14",  0x0c0000, 0x40000, CRC(b84fda09) SHA1(3ae0c0ec6c398dea17e248b017ea3e2f6c3571e1) )
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "28j3-0.ic77",  0x000000, 0x80000, CRC(1ac2a461) SHA1(17436f5dcf29041ca5f470dfae538e4fc12153cc) )    /* Sprites */
+	ROM_LOAD( "28a14-0.ic60", 0x080000, 0x10000, CRC(972faddb) SHA1(f2b211e8f8301667e6c9a3ce9612e39b16e66a67) )
+	ROM_LOAD( "28j2-0.ic78",  0x100000, 0x80000, CRC(8c796707) SHA1(7417ad0413083876ed65a8612845ccb0d2717530) )
+	ROM_LOAD( "28a13-0.ic61", 0x180000, 0x10000, CRC(eb3ab374) SHA1(db66cb7976c111fa76a3a211e96ad1d7b78ce0ad) )
+	ROM_LOAD( "28j1-0.ic97",  0x200000, 0x80000, CRC(1c9badbd) SHA1(d28f6d684d88448eaa3feae0bba2f5a836d89bd7) )
+	ROM_LOAD( "28a12-0.ic85", 0x280000, 0x10000, CRC(c602ac97) SHA1(44440739636b684c6dcac837f59664120c9ba5f3) )
+	ROM_LOAD( "28j0-0.ic98",  0x300000, 0x80000, CRC(ba73c49e) SHA1(830099027ede1f7c56bb0bf3cdef3018b92e0b87) )
+	ROM_LOAD( "28a11-0.ic86", 0x380000, 0x10000, CRC(4da1d8e5) SHA1(568e9e8d00f1b1ca27c28df5fc0ffc74ad91da7e) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* ADPCM Samples */
+	ROM_LOAD( "28j9-0.ic83", 0x00000, 0x20000, CRC(f92a7f4a) SHA1(3717ef64876be9ada378b449749918ce9072073a) )
+	ROM_LOAD( "28j8-0.ic82", 0x20000, 0x20000, CRC(1a3a0b39) SHA1(8847530027cf4be03ffbc6d78dee97b459d03a04) )
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
 
 ROM_START( ctribeb )
@@ -772,8 +809,9 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1990, ddragon3, 0,		ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", 0 )
-GAME( 1990, ddrago3j, ddragon3,	ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (Japan)", 0 )
-GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", 0 )
-GAME( 1990, ctribe,   0,		ctribe,   ctribe,	0, ROT0, "Technos", "The Combatribes (US)", 0 )
-GAME( 1990, ctribeb,  ctribe,	ctribe,   ctribe,	0, ROT0, "bootleg", "The Combatribes (bootleg)", 0 )
+GAME( 1990, ddragon3, 0,		ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddrago3j, ddragon3,	ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe,   0,		ctribe,   ctribe,	0, ROT0, "Technos", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe1,  ctribe,	ctribe,   ctribe,	0, ROT0, "Technos", "The Combatribes (US) - Set 1?", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,  ctribe,	ctribe,   ctribe,	0, ROT0, "bootleg", "The Combatribes (bootleg)", GAME_SUPPORTS_SAVE )

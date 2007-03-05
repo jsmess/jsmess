@@ -169,7 +169,7 @@ VIDEO_START( amiga )
 
 UINT32 amiga_gethvpos(void)
 {
-	UINT32 hvpos = (last_scanline << 8) | (cpu_gethorzbeampos() >> 2);
+	UINT32 hvpos = (last_scanline << 8) | (video_screen_get_hpos(0) >> 2);
 	UINT32 latchedpos = readinputportbytag_safe("HVPOS", 0);
 
 	/* if there's no latched position, or if we are in the active display area */

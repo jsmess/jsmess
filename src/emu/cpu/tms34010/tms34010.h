@@ -66,6 +66,7 @@ struct tms34010_config
 	void	(*from_shiftreg)(offs_t, UINT16 *);/* shift register read */
 	void	(*display_addr_changed)(UINT32 offs, int rowbytes, int scanline);/* display address changed */
 	void	(*display_int_callback)(int scanline);/* display interrupt callback */
+	UINT8	scrnum;								/* the screen operated on */
 };
 
 

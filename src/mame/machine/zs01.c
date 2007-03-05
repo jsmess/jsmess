@@ -24,12 +24,10 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 		if( cpu_getactivecpu() != -1 )
 		{
 			logerror( "%08x: %s", activecpu_get_pc(), buf );
-			printf( "%08x: %s", activecpu_get_pc(), buf );
 		}
 		else
 		{
 			logerror( "(timer) : %s", buf );
-			printf( "(timer) : %s", buf );
 		}
 	}
 }

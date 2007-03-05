@@ -623,7 +623,7 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return cpu_irq_state;
 
 		case HC:
-			return cpu_gethorzbeampos() % (Machine->screen[0].width / 2);
+			return video_screen_get_hpos(0) % (Machine->screen[0].width / 2);
 
 		case VC:
 			return cpu_getscanline() * 2 + gpu_regs[VBE];

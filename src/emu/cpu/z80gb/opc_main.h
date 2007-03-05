@@ -770,9 +770,9 @@ case 0x75: /*      LD (HL),L */
   mem_WriteByte (Regs.w.HL, Regs.b.L);
   break;
 case 0x76: /*      HALT */
-  CheckInterrupts = 1;
-  Regs.w.enable |= HALTED;
-  Regs.w.PC--;
+	CheckInterrupts = 1;
+	Regs.w.enable |= HALTED;
+	Regs.w.PC--;
   break;
 case 0x77: /*      LD (HL),A */
 

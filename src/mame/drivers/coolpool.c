@@ -766,7 +766,8 @@ static struct tms34010_config tms_config =
 	coolpool_to_shiftreg,			/* write to shiftreg function */
 	coolpool_from_shiftreg,			/* read from shiftreg function */
 	NULL,							/* display address changed */
-	coolpool_dpyint_callback		/* display interrupt callback */
+	coolpool_dpyint_callback,		/* display interrupt callback */
+	0								/* the screen operated on */
 };
 
 

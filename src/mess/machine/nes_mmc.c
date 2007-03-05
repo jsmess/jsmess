@@ -638,7 +638,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 
 		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
 		{
-logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, cpu_getscanline(), cpu_gethorzbeampos());
+			logerror("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
 			cpunum_set_input_line (0, M6502_IRQ_LINE, HOLD_LINE);
 //			mame_timer_adjust(nes_irq_timer, MAME_TIME_IN_CYCLES(4, 0), 0, time_never);
 		}

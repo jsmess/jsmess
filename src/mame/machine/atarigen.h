@@ -221,7 +221,7 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
 ---------------------------------------------------------------*/
 
 void atarigen_scanline_timer_reset(atarigen_scanline_callback update_graphics, int frequency);
-int atarigen_get_hblank(void);
+int atarigen_get_hblank(int scrnum);
 WRITE16_HANDLER( atarigen_halt_until_hblank_0_w );
 WRITE16_HANDLER( atarigen_666_paletteram_w );
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );

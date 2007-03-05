@@ -1369,7 +1369,7 @@ static void wininput_exit(running_machine *machine)
 	// free allocated strings
 	for (i = 0; i < total_codes; i++)
 	{
-		free(codelist[i].name);
+		free((void *)codelist[i].name);
 		codelist[i].name = NULL;
 	}
 
@@ -2529,59 +2529,6 @@ static void poll_lightguns(void)
 		if (gun_axis[player][1] > ANALOG_VALUE_MAX) gun_axis[player][1] = ANALOG_VALUE_MAX;
 	}
 }
-
-
-
-//============================================================
-//  osd_joystick_needs_calibration
-//============================================================
-
-int osd_joystick_needs_calibration(void)
-{
-	return 0;
-}
-
-
-
-//============================================================
-//  osd_joystick_start_calibration
-//============================================================
-
-void osd_joystick_start_calibration(void)
-{
-}
-
-
-
-//============================================================
-//  osd_joystick_calibrate_next
-//============================================================
-
-const char *osd_joystick_calibrate_next(void)
-{
-	return 0;
-}
-
-
-
-//============================================================
-//  osd_joystick_calibrate
-//============================================================
-
-void osd_joystick_calibrate(void)
-{
-}
-
-
-
-//============================================================
-//  osd_joystick_end_calibration
-//============================================================
-
-void osd_joystick_end_calibration(void)
-{
-}
-
 
 
 //============================================================

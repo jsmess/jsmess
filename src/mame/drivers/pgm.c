@@ -2311,7 +2311,7 @@ static DRIVER_INIT( olds )
 
 /* The Bios - NOT A GAME */
 ROM_START( pgm )
-	ROM_REGION( 0x520000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_REGION( 0x600000, REGION_CPU1, 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x00000, 0x20000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
@@ -2321,6 +2321,10 @@ ROM_START( pgm )
 
 	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) )
+
+	ROM_REGION( 0x800000/5*8, REGION_GFX2, ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+
+	ROM_REGION( 0x1000000, REGION_GFX4, ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
 ROM_END
 
 ROM_START( orlegend )
@@ -4021,7 +4025,7 @@ ROM_END
 
 /*** GAME ********************************************************************/
 
-GAME( 1997, pgm,      0,          pgm, pgm,      0,          ROT0,   "IGS", "PGM (Polygame Master) System BIOS", NOT_A_DRIVER )
+GAME( 1997, pgm,      0,          pgm, pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", NOT_A_DRIVER )
 
 GAME( 1997, orlegend, pgm,        pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 126)", GAME_IMPERFECT_SOUND  )
 GAME( 1997, orlegnde, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 112)", GAME_IMPERFECT_SOUND  )

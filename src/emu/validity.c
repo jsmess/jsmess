@@ -76,7 +76,6 @@ static quark_table *description_table;
 static quark_table *roms_table;
 static quark_table *inputs_table;
 static quark_table *defstr_table;
-static int total_drivers;
 
 
 
@@ -227,7 +226,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 
 	/* if we have at least 100 drivers, validate the clone */
 	/* (100 is arbitrary, but tries to avoid tiny.mak dependencies) */
-	if (total_drivers > 100 && !clone_of && strcmp(driver->parent, "0"))
+	if (driver_get_count() > 100 && !clone_of && strcmp(driver->parent, "0"))
 	{
 		mame_printf_error("%s: %s is a non-existant clone\n", driver->source_file, driver->parent);
 		error = TRUE;
@@ -828,6 +827,16 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 					error = TRUE;
 				}
 			}
+			else
+			{
+				/* only positional controls use PORT_WRAPS */
+				if (inp->analog.wraps)
+				{
+					mame_printf_error("%s: %s only positional analog ports use PORT_WRAPS\n", driver->source_file, driver->name);
+					error = TRUE;
+				}
+			}
+
 
 			/* analog ports must have a valid sensitivity */
 			if (inp->analog.sensitivity == 0)
@@ -874,29 +883,29 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 				/* absolute analog ports do not use PORT_RESET */
 				if (inp->analog.reset)
 				{
-					mame_printf_error("%s: %s - absolute ports no not use PORT_RESET\n", driver->source_file, driver->name);
+					mame_printf_error("%s: %s - absolute analog ports do not use PORT_RESET\n", driver->source_file, driver->name);
 					error = TRUE;
 				}
 			}
 			else
 			/* tests for relative devices */
 			{
-/**** NOTE: THESE ARE DISABLED UNTIL ALL THE PROBLEMS FOUND BY THEM ARE FIXED ****/
 				/* tests for non IPT_POSITIONAL relative devices */
 				if (inp->type != IPT_POSITIONAL && inp->type != IPT_POSITIONAL_V)
 				{
-					/* relative device do not use PORT_MINMAX */
+					/* relative devices do not use PORT_MINMAX */
 					if (inp->analog.min || inp->analog.max != inp->mask)
 					{
-//                      mame_printf_error("%s: %s - relative ports no not use PORT_MINMAX\n", driver->source_file, driver->name);
-//                      error = TRUE;
+                      mame_printf_error("%s: %s - relative ports do not use PORT_MINMAX\n", driver->source_file, driver->name);
+                      error = TRUE;
 					}
 
-					/* relative device do not use a default value */
+					/* relative devices do not use a default value */
+					/* the counter is at 0 on power up */
 					if (inp->default_value)
 					{
-//                      mame_printf_error("%s: %s - relative ports no not use default value other then 0\n", driver->source_file, driver->name);
-//                      error = TRUE;
+                      mame_printf_error("%s: %s - relative ports do not use a default value other then 0\n", driver->source_file, driver->name);
+                      error = TRUE;
 					}
 				}
 			}
@@ -1171,10 +1180,6 @@ int mame_validitychecks(int game)
 	prep -= osd_profiling_ticks();
 	build_quarks();
 	prep += osd_profiling_ticks();
-
-	/* count drivers first */
-	for (drivnum = 0; drivers[drivnum]; drivnum++) ;
-	total_drivers = drivnum;
 
 	/* iterate over all drivers */
 	for (drivnum = 0; drivers[drivnum]; drivnum++)

@@ -142,7 +142,7 @@ typedef UINT32 os_code;
 typedef struct _os_code_info os_code_info;
 struct _os_code_info
 {
-	char *		name;			/* OS dependant name; 0 terminates the list */
+	const char *name;			/* OS dependant name; 0 terminates the list */
 	os_code		oscode;			/* OS dependant code */
 	input_code	inputcode;		/* CODE_xxx equivalent from input.h, or one of CODE_OTHER_* if n/a */
 };
@@ -169,20 +169,6 @@ INT32 osd_get_code_value(os_code oscode);
   Scan the list, and change the keys/joysticks you want.
 */
 void osd_customize_inputport_list(input_port_default_entry *defaults);
-
-
-/* Joystick calibration routines BW 19981216 */
-/* Do we need to calibrate the joystick at all? */
-int osd_joystick_needs_calibration(void);
-/* Preprocessing for joystick calibration. Returns 0 on success */
-void osd_joystick_start_calibration(void);
-/* Prepare the next calibration step. Return a description of this step. */
-/* (e.g. "move to upper left") */
-const char *osd_joystick_calibrate_next(void);
-/* Get the actual joystick calibration data for the current position */
-void osd_joystick_calibrate(void);
-/* Postprocessing (e.g. saving joystick data to config) */
-void osd_joystick_end_calibration(void);
 
 
 

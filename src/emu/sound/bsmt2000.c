@@ -1,10 +1,12 @@
-/**********************************************************************************************
- *
- *   Data East BSMT2000 driver
- *   by Aaron Giles
- *
- **********************************************************************************************/
+/***************************************************************************
 
+    bsmt2000.c
+
+    BSMT2000 sound emulator.
+
+    Copyright (c) Aaron Giles
+
+***************************************************************************/
 
 #include <math.h>
 
@@ -13,443 +15,480 @@
 #include "bsmt2000.h"
 
 
+/***************************************************************************
+    DEBUGGING/OPTIONS
+***************************************************************************/
 
-/**********************************************************************************************
-
-     CONSTANTS
-
-***********************************************************************************************/
+#define LOG_COMMANDS			0
 
 /* NOTE: the original chip did not support interpolation, but it sounds */
 /* nicer if you enable it. For accuracy's sake, we leave it off by default. */
 #define ENABLE_INTERPOLATION	0
 
-#define LOG_COMMANDS			0
-#define MAKE_WAVS				0
-
-#if MAKE_WAVS
-#include "wavwrite.h"
-#endif
 
 
-#define MAX_SAMPLE_CHUNK		10000
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
-#define FRAC_BITS				14
-#define FRAC_ONE				(1 << FRAC_BITS)
-#define FRAC_MASK				(FRAC_ONE - 1)
-
-#define REG_CURRPOS				0
-#define REG_UNKNOWN1			1
-#define REG_RATE				2
-#define REG_LOOPEND				3
-#define REG_LOOPSTART			4
-#define REG_BANK				5
-#define REG_RIGHTVOL			6
-#define REG_LEFTVOL				7
-#define REG_TOTAL				8
-
-#define REG_ALT_RIGHTVOL		8
+#define MAX_VOICES				(12+1)
+#define ADPCM_VOICE				12
 
 
 
-/**********************************************************************************************
-
-     INTERNAL DATA STRUCTURES
-
-***********************************************************************************************/
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 /* struct describing a single playing voice */
 typedef struct _bsmt2000_voice bsmt2000_voice;
 struct _bsmt2000_voice
 {
-	/* external state */
-	UINT16		reg[REG_TOTAL];			/* 9 registers */
-	UINT32		position;				/* current position */
-	UINT32		loop_start_position;	/* loop start position */
-	UINT32		loop_stop_position;		/* loop stop position */
-	UINT32		adjusted_rate;			/* adjusted rate */
+	UINT16		pos;					/* current position */
+	UINT16		rate;					/* stepping value */
+	UINT16		loopend;				/* loop end value */
+	UINT16		loopstart;				/* loop start value */
+	UINT16		bank;					/* bank number */
+	UINT16		leftvol;				/* left volume */
+	UINT16		rightvol;				/* right volume */
+	UINT16		fraction;				/* current fractional position */
 };
 
 typedef struct _bsmt2000_chip bsmt2000_chip;
 struct _bsmt2000_chip
 {
 	sound_stream *stream;				/* which stream are we using */
-	int			sample_rate;			/* output sample rate */
+	UINT8		last_register;			/* last register address written */
+
 	INT8 *		region_base;			/* pointer to the base of the region */
 	int			total_banks;			/* number of total banks in the region */
-	int			voices;					/* number of voices */
 
-	bsmt2000_voice *voice;				/* the voices */
-	bsmt2000_voice compressed;			/* the compressed voice */
+	bsmt2000_voice voice[MAX_VOICES];	/* the voices */
+	UINT16 *	regmap[128];			/* mapping of registers to voice params */
 
-	INT32 *		scratch;
+	UINT32		clock;					/* original clock on the chip */
+	UINT8		stereo;					/* stereo output? */
+	UINT8		voices;					/* number of voices */
+	UINT8		adpcm;					/* adpcm enabled? */
 
-#if MAKE_WAVS
-	void *		wavraw;					/* raw waveform */
-#endif
+	INT32		adpcm_current;			/* current ADPCM sample */
+	INT32		adpcm_delta_n;			/* current ADPCM scale factor */
 };
 
 
 
-/**********************************************************************************************
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
 
-     interpolate
-     backend_interpolate -- interpolate between two samples
-
-***********************************************************************************************/
-
-#define interpolate(sample1, sample2, accum)										\
-		(sample1 * (INT32)(0x10000 - (accum & 0xffff)) + 							\
-		 sample2 * (INT32)(accum & 0xffff)) >> 16;
-
-#define interpolate2(sample1, sample2, accum)										\
-		(sample1 * (INT32)(0x8000 - (accum & 0x7fff)) + 							\
-		 sample2 * (INT32)(accum & 0x7fff)) >> 15;
+const struct BSMT2000interface bsmt2000_interface_region_1 = { REGION_SOUND1 };
+const struct BSMT2000interface bsmt2000_interface_region_2 = { REGION_SOUND2 };
+const struct BSMT2000interface bsmt2000_interface_region_3 = { REGION_SOUND3 };
+const struct BSMT2000interface bsmt2000_interface_region_4 = { REGION_SOUND4 };
 
 
 
-/**********************************************************************************************
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
-     generate_samples -- generate samples for all voices at the chip's frequency
+/* core implementation */
+static void *bsmt2000_start(int sndindex, int clock, const void *config);
+static void bsmt2000_reset(void *_chip);
+static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
-***********************************************************************************************/
+/* read/write access */
+static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data);
 
-static void generate_samples(bsmt2000_chip *chip, INT32 *left, INT32 *right, int samples)
-{
-	bsmt2000_voice *voice;
-	int v;
-
-	/* skip if nothing to do */
-	if (!samples)
-		return;
-
-	/* clear out the accumulator */
-	memset(left, 0, samples * sizeof(left[0]));
-	memset(right, 0, samples * sizeof(right[0]));
-
-	/* loop over voices */
-	for (v = 0; v < chip->voices; v++)
-	{
-		voice = &chip->voice[v];
-
-		/* compute the region base */
-		if (voice->reg[REG_BANK] < chip->total_banks)
-		{
-			INT8 *base = &chip->region_base[voice->reg[REG_BANK] * 0x10000];
-			INT32 *lbuffer = left, *rbuffer = right;
-			UINT32 rate = voice->adjusted_rate;
-			UINT32 pos = voice->position;
-			INT32 lvol = voice->reg[REG_LEFTVOL];
-			INT32 rvol = voice->reg[REG_RIGHTVOL];
-			int remaining = samples;
-
-			/* loop while we still have samples to generate */
-			while (remaining--)
-			{
-#if ENABLE_INTERPOLATION
-				/* fetch two samples */
-				INT32 val1 = base[pos >> 16];
-				INT32 val2 = base[(pos >> 16) + 1];
-
-				/* interpolate */
-				val1 = interpolate(val1, val2, pos);
-#else
-				INT32 val1 = base[pos >> 16];
-#endif
-				pos += rate;
-
-				/* apply volumes and add */
-				*lbuffer++ += val1 * lvol;
-				*rbuffer++ += val1 * rvol;
-
-				/* check for loop end */
-				if (pos >= voice->loop_stop_position)
-					pos += voice->loop_start_position - voice->loop_stop_position;
-			}
-
-			/* update the position */
-			voice->position = pos;
-		}
-	}
-
-	/* compressed voice (11-voice model only) */
-	voice = &chip->compressed;
-	if (chip->voices == 11 && voice->reg[REG_BANK] < chip->total_banks)
-	{
-		INT8 *base = &chip->region_base[voice->reg[REG_BANK] * 0x10000];
-		INT32 *lbuffer = left, *rbuffer = right;
-		UINT32 rate = voice->adjusted_rate;
-		UINT32 pos = voice->position;
-		INT32 lvol = voice->reg[REG_LEFTVOL];
-		INT32 rvol = voice->reg[REG_RIGHTVOL];
-		int remaining = samples;
-
-		/* loop while we still have samples to generate */
-		while (remaining-- && pos < voice->loop_stop_position)
-		{
-#if ENABLE_INTERPOLATION
-			/* fetch two samples -- note: this is wrong, just a guess!!!*/
-			INT32 val1 = (INT8)((base[pos >> 16] << ((pos >> 13) & 4)) & 0xf0);
-			INT32 val2 = (INT8)((base[(pos + 0x8000) >> 16] << (((pos + 0x8000) >> 13) & 4)) & 0xf0);
-
-			/* interpolate */
-			val1 = interpolate2(val1, val2, pos);
-#else
-			INT32 val1 = (INT8)((base[pos >> 16] << ((pos >> 13) & 4)) & 0xf0);
-#endif
-			pos += rate;
-
-			/* apply volumes and add */
-			*lbuffer++ += val1 * lvol;
-			*rbuffer++ += val1 * rvol;
-		}
-
-		/* update the position */
-		voice->position = pos;
-	}
-}
+/* local functions */
+static void set_mode(bsmt2000_chip *chip);
+static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8 endbase, UINT8 loopbase, UINT8 bankbase, UINT8 rvolbase, UINT8 lvolbase);
 
 
 
-/**********************************************************************************************
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
 
-     bsmt2000_update -- update the sound chip so that it is in sync with CPU execution
-
-***********************************************************************************************/
-
-static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
-{
-	bsmt2000_chip *chip = param;
-	INT32 *lsrc = chip->scratch, *rsrc = chip->scratch;
-	stream_sample_t *ldest = buffer[0];
-	stream_sample_t *rdest = buffer[1];
-
-#if MAKE_WAVS
-	/* start the logging once we have a sample rate */
-	if (!chip->wavraw)
-		chip->wavraw = wav_open("raw.wav", chip->sample_rate, 2);
-#endif
-
-	/* loop until all samples are output */
-	while (length)
-	{
-		int samples = (length > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : length;
-		int samp;
-
-		/* determine left/right source data */
-		lsrc = chip->scratch;
-		rsrc = chip->scratch + samples;
-		generate_samples(chip, lsrc, rsrc, samples);
-
-		/* copy the data */
-		for (samp = 0; samp < samples; samp++)
-		{
-			*ldest++ = lsrc[samp] >> 9;
-			*rdest++ = rsrc[samp] >> 9;
-		}
-
-#if MAKE_WAVS
-		/* log the raw data */
-		if (chip->wavraw)
-			wav_add_data_32lr(chip->wavraw, lsrc, rsrc, samples, 4);
-#endif
-
-		/* account for these samples */
-		length -= samples;
-	}
-}
-
-
-
-/**********************************************************************************************
-
-     bsmt2000_start -- start emulation of the BSMT2000
-
-***********************************************************************************************/
-
-INLINE void init_voice(bsmt2000_voice *voice)
-{
-	memset(&voice->reg, 0, sizeof(voice->reg));
-	voice->position = 0;
-	voice->adjusted_rate = 0;
-	voice->reg[REG_LEFTVOL] = 0x7fff;
-	voice->reg[REG_RIGHTVOL] = 0x7fff;
-}
-
-
-INLINE void init_all_voices(bsmt2000_chip *chip)
-{
-	int i;
-
-	/* init the voices */
-	for (i = 0; i < chip->voices; i++)
-		init_voice(&chip->voice[i]);
-
-	/* init the compressed voice (runs at a fixed rate of ~8kHz?) */
-	init_voice(&chip->compressed);
-	chip->compressed.adjusted_rate = 0x02aa << 4;
-}
-
-
-static void register_voice_for_save(bsmt2000_voice *voice, int index)
-{
-	state_save_register_item_array("bsmt2000", index, voice->reg);
-	state_save_register_item("bsmt2000", index, voice->position);
-	state_save_register_item("bsmt2000", index, voice->loop_start_position);
-	state_save_register_item("bsmt2000", index, voice->loop_stop_position);
-	state_save_register_item("bsmt2000", index, voice->adjusted_rate);
-}
-
+/*-------------------------------------------------
+    bsmt2000_start - initialization callback
+-------------------------------------------------*/
 
 static void *bsmt2000_start(int sndindex, int clock, const void *config)
 {
 	const struct BSMT2000interface *intf = config;
 	bsmt2000_chip *chip;
-	int i;
+	int voicenum;
 
+	/* allocate the chip */
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	/* allocate the voices */
-	chip->voices = intf->voices;
-	chip->voice = auto_malloc(chip->voices * sizeof(bsmt2000_voice));
-
-	/* create the stream */
-	chip->sample_rate = clock / 1024;
-	chip->stream = stream_create(0, 2, chip->sample_rate, chip, bsmt2000_update);
+	/* create a stream at a nominal sample rate (real one specified later) */
+	chip->stream = stream_create(0, 2, clock / 1000, chip, bsmt2000_update);
+	chip->clock = clock;
 
 	/* initialize the regions */
 	chip->region_base = (INT8 *)memory_region(intf->region);
 	chip->total_banks = memory_region_length(intf->region) / 0x10000;
 
-	/* init the voices */
-	init_all_voices(chip);
+	/* register chip-wide data for save states */
+	state_save_register_item("bsmt2000", sndindex * 16, chip->last_register);
+	state_save_register_item("bsmt2000", sndindex * 16, chip->stereo);
+	state_save_register_item("bsmt2000", sndindex * 16, chip->voices);
+	state_save_register_item("bsmt2000", sndindex * 16, chip->adpcm);
+	state_save_register_item("bsmt2000", sndindex * 16, chip->adpcm_current);
+	state_save_register_item("bsmt2000", sndindex * 16, chip->adpcm_delta_n);
 
-	/* allocate memory */
-	chip->scratch = auto_malloc(sizeof(chip->scratch[0]) * 2 * MAX_SAMPLE_CHUNK);
+	/* register voice-specific data for save states */
+	for (voicenum = 0; voicenum < MAX_VOICES; voicenum++)
+	{
+		bsmt2000_voice *voice = &chip->voice[voicenum];
+		int index = sndindex * 16 + voicenum;
 
-	/* register for save states */
-	for (i = 0; i < chip->voices; i++)
-		register_voice_for_save(&chip->voice[i], sndindex * 32 + i);
-	register_voice_for_save(&chip->compressed, sndindex * 32 + 31);
+		state_save_register_item("bsmt2000", index, voice->pos);
+		state_save_register_item("bsmt2000", index, voice->rate);
+		state_save_register_item("bsmt2000", index, voice->loopend);
+		state_save_register_item("bsmt2000", index, voice->loopstart);
+		state_save_register_item("bsmt2000", index, voice->bank);
+		state_save_register_item("bsmt2000", index, voice->leftvol);
+		state_save_register_item("bsmt2000", index, voice->rightvol);
+		state_save_register_item("bsmt2000", index, voice->fraction);
+	}
 
-	/* success */
+	/* reset the chip -- this also configures the default mode */
+	bsmt2000_reset(chip);
 	return chip;
 }
 
 
-
-/**********************************************************************************************
-
-     bsmt2000_reset -- reset emulation of the BSMT2000
-
-***********************************************************************************************/
+/*-------------------------------------------------
+    bsmt2000_reset - chip reset callback
+-------------------------------------------------*/
 
 static void bsmt2000_reset(void *_chip)
 {
 	bsmt2000_chip *chip = _chip;
-	init_all_voices(chip);
+	int voicenum;
+
+	/* reset all the voice data */
+	for (voicenum = 0; voicenum < MAX_VOICES; voicenum++)
+	{
+		bsmt2000_voice *voice = &chip->voice[voicenum];
+		memset(voice, 0, sizeof(*voice));
+		voice->leftvol = 0x7fff;
+		voice->rightvol = 0x7fff;
+	}
+
+	/* recompute the mode */
+	set_mode(chip);
+}
+
+
+/*-------------------------------------------------
+    bsmt2000_update - update callback for
+    sample generation
+-------------------------------------------------*/
+
+static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+{
+	stream_sample_t *left = buffer[0];
+	stream_sample_t *right = buffer[1];
+	bsmt2000_chip *chip = param;
+	bsmt2000_voice *voice;
+	int samp, voicenum;
+
+	/* clear out the accumulator */
+	memset(left, 0, length * sizeof(left[0]));
+	memset(right, 0, length * sizeof(right[0]));
+
+	/* loop over voices */
+	for (voicenum = 0; voicenum < chip->voices; voicenum++)
+	{
+		voice = &chip->voice[voicenum];
+
+		/* compute the region base */
+		if (voice->bank < chip->total_banks)
+		{
+			INT8 *base = &chip->region_base[voice->bank * 0x10000];
+			UINT32 rate = voice->rate;
+			INT32 rvol = voice->rightvol;
+			INT32 lvol = chip->stereo ? voice->leftvol : rvol;
+			UINT16 pos = voice->pos;
+			UINT16 frac = voice->fraction;
+
+			/* loop while we still have samples to generate */
+			for (samp = 0; samp < length; samp++)
+			{
+#if ENABLE_INTERPOLATION
+				INT32 sample = (base[pos] * (0x800 - frac) + (base[pos + 1] * frac)) >> 11;
+#else
+				INT32 sample = base[pos];
+#endif
+				/* apply volumes and add */
+				left[samp] += sample * lvol;
+				right[samp] += sample * rvol;
+
+				/* update position */
+				frac += rate;
+				pos += frac >> 11;
+				frac &= 0x7ff;
+
+				/* check for loop end */
+				if (pos >= voice->loopend)
+					pos += voice->loopstart - voice->loopend;
+			}
+
+			/* update the position */
+			voice->pos = pos;
+			voice->fraction = frac;
+		}
+	}
+
+	/* compressed voice (11-voice model only) */
+	voice = &chip->voice[ADPCM_VOICE];
+	if (chip->adpcm && voice->bank < chip->total_banks && voice->rate)
+	{
+		INT8 *base = &chip->region_base[voice->bank * 0x10000];
+		INT32 rvol = voice->rightvol;
+		INT32 lvol = chip->stereo ? voice->leftvol : rvol;
+		UINT32 pos = voice->pos;
+		UINT32 frac = voice->fraction;
+
+		/* loop while we still have samples to generate */
+		for (samp = 0; samp < length && pos < voice->loopend; samp++)
+		{
+			/* apply volumes and add */
+			left[samp] += (chip->adpcm_current * lvol) >> 8;
+			right[samp] += (chip->adpcm_current * rvol) >> 8;
+
+			/* update position */
+			frac++;
+			if (frac == 6)
+			{
+				pos++;
+				frac = 0;
+			}
+
+			/* every 3 samples, we update the ADPCM state */
+			if (frac == 1 || frac == 4)
+			{
+				static const UINT8 delta_tab[] = { 58,58,58,58,77,102,128,154 };
+				int nibble = base[pos] >> ((frac == 1) ? 4 : 0);
+				int value = (INT8)(nibble << 4) >> 4;
+				int delta;
+
+				/* compute the delta for this sample */
+				delta = chip->adpcm_delta_n * value;
+				if (value > 0)
+					delta += chip->adpcm_delta_n >> 1;
+				else
+					delta -= chip->adpcm_delta_n >> 1;
+
+				/* add and clamp against the sample */
+				chip->adpcm_current += delta;
+				if (chip->adpcm_current >= 32767)
+					chip->adpcm_current = 32767;
+				else if (chip->adpcm_current <= -32768)
+					chip->adpcm_current = -32768;
+
+				/* adjust the delta multiplier */
+				chip->adpcm_delta_n = (chip->adpcm_delta_n * delta_tab[abs(value)]) >> 6;
+				if (chip->adpcm_delta_n > 2000)
+					chip->adpcm_delta_n = 2000;
+				else if (chip->adpcm_delta_n < 1)
+					chip->adpcm_delta_n = 1;
+			}
+		}
+
+		/* update the position */
+		voice->pos = pos;
+		voice->fraction = frac;
+
+		/* "rate" is a control register; clear it to 0 when done */
+		if (pos >= voice->loopend)
+			voice->rate = 0;
+	}
+
+	/* reduce the overall gain */
+	for (samp = 0; samp < length; samp++)
+	{
+		left[samp] >>= 9;
+		right[samp] >>= 9;
+	}
 }
 
 
 
-/**********************************************************************************************
+/***************************************************************************
+    READ/WRITE ACCESS
+***************************************************************************/
 
-     bsmt2000_reg_write -- handle a write to the selected BSMT2000 register
+/*-------------------------------------------------
+    bsmt2000_reg_write - handle a register write
+-------------------------------------------------*/
 
-***********************************************************************************************/
-
-static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data)
 {
-	bsmt2000_voice *voice = &chip->voice[offset % chip->voices];
-	int regindex = offset / chip->voices;
-
 #if LOG_COMMANDS
-	logerror("BSMT write: V%d R%d = %04X\n", offset % chip->voices, regindex, data);
+	mame_printf_debug("BSMT write: reg %02X = %04X\n", offset, data);
 #endif
 
+	/* remember the last write */
+	chip->last_register = offset;
+
 	/* update the register */
-	if (regindex < REG_TOTAL)
-		COMBINE_DATA(&voice->reg[regindex]);
-
-	/* force an update */
-	stream_update(chip->stream);
-
-	/* update parameters for standard voices */
-	switch (regindex)
+	if (offset < 0x80 && chip->regmap[offset] != NULL)
 	{
-		case REG_CURRPOS:
-			voice->position = voice->reg[REG_CURRPOS] << 16;
-			break;
+		UINT16 *dest = chip->regmap[offset];
 
-		case REG_RATE:
-			voice->adjusted_rate = voice->reg[REG_RATE] << 5;
-			break;
+		/* force an update, then write the data */
+		stream_update(chip->stream);
+		*dest = data;
 
-		case REG_LOOPSTART:
-			voice->loop_start_position = voice->reg[REG_LOOPSTART] << 16;
-			break;
-
-		case REG_LOOPEND:
-			voice->loop_stop_position = voice->reg[REG_LOOPEND] << 16;
-			break;
-
-		case REG_ALT_RIGHTVOL:
-			COMBINE_DATA(&voice->reg[REG_RIGHTVOL]);
-			break;
-	}
-
-	/* update parameters for compressed voice (11-voice model only) */
-	if (chip->voices == 11 && offset >= 0x6d)
-	{
-		voice = &chip->compressed;
-		switch (offset)
+		/* special case: reset ADPCM parameters when writing to the ADPCM position */
+		if (dest == &chip->voice[ADPCM_VOICE].rate)
 		{
-			case 0x6d:
-				COMBINE_DATA(&voice->reg[REG_LOOPEND]);
-				voice->loop_stop_position = voice->reg[REG_LOOPEND] << 16;
-				break;
-
-			case 0x6f:
-				COMBINE_DATA(&voice->reg[REG_BANK]);
-				break;
-
-			case 0x74:
-				COMBINE_DATA(&voice->reg[REG_RIGHTVOL]);
-				break;
-
-			case 0x75:
-				COMBINE_DATA(&voice->reg[REG_CURRPOS]);
-				voice->position = voice->reg[REG_CURRPOS] << 16;
-				break;
-
-			case 0x78:
-				COMBINE_DATA(&voice->reg[REG_LEFTVOL]);
-				break;
+			chip->adpcm_current = 0;
+			chip->adpcm_delta_n = 10;
 		}
 	}
 }
 
 
 
-/**********************************************************************************************
+/***************************************************************************
+    PER-CHIP READ/WRITE HANDLERS
+***************************************************************************/
 
-     BSMT2000_data_0_w -- handle a write to the current register
-
-***********************************************************************************************/
+/*-------------------------------------------------
+    BSMT2000_data_0_w - write to chip 0
+-------------------------------------------------*/
 
 WRITE16_HANDLER( BSMT2000_data_0_w )
 {
-	bsmt2000_reg_write(sndti_token(SOUND_BSMT2000, 0), offset, data, mem_mask);
+	bsmt2000_reg_write(sndti_token(SOUND_BSMT2000, 0), offset, data);
 }
 
 
 
+/***************************************************************************
+    LOCAL FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    set_mode - set the mode after reset
+-------------------------------------------------*/
+
+static void set_mode(bsmt2000_chip *chip)
+{
+	int sample_rate;
+
+	/* force an update */
+	stream_update(chip->stream);
+
+	/* the mode comes from the address of the last register accessed */
+	switch (chip->last_register)
+	{
+		/* mode 0: 24kHz, 12 channel PCM, 1 channel ADPCM, mono */
+		default:
+		case 0:
+			sample_rate = chip->clock / 1000;
+			chip->stereo = FALSE;
+			chip->voices = 12;
+			chip->adpcm = TRUE;
+			set_regmap(chip, 0x00, 0x18, 0x24, 0x30, 0x3c, 0x48, 0);
+			break;
+
+		/* mode 1: 24kHz, 11 channel PCM, 1 channel ADPCM, stereo */
+		case 1:
+			sample_rate = chip->clock / 1000;
+			chip->stereo = TRUE;
+			chip->voices = 11;
+			chip->adpcm = TRUE;
+			set_regmap(chip, 0x00, 0x16, 0x21, 0x2c, 0x37, 0x42, 0x4d);
+			break;
+
+		/* mode 5: 24kHz, 12 channel PCM, stereo */
+		case 5:
+			sample_rate = chip->clock / 1000;
+			chip->stereo = TRUE;
+			chip->voices = 12;
+			chip->adpcm = FALSE;
+			set_regmap(chip, 0x00, 0x18, 0x24, 0x30, 0x3c, 0x54, 0x60);
+			break;
+
+		/* mode 6: 34kHz, 8 channel PCM, stereo */
+		case 6:
+			sample_rate = chip->clock / 706;
+			chip->stereo = TRUE;
+			chip->voices = 8;
+			chip->adpcm = FALSE;
+			set_regmap(chip, 0x00, 0x10, 0x18, 0x20, 0x28, 0x38, 0x40);
+			break;
+
+		/* mode 7: 32kHz, 9 channel PCM, stereo */
+		case 7:
+			sample_rate = chip->clock / 750;
+			chip->stereo = TRUE;
+			chip->voices = 9;
+			chip->adpcm = FALSE;
+			set_regmap(chip, 0x00, 0x12, 0x1b, 0x24, 0x2d, 0x3f, 0x48);
+			break;
+	}
+
+	/* update the sample rate */
+	stream_set_sample_rate(chip->stream, sample_rate);
+}
 
 
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
+/*-------------------------------------------------
+    set_regmap - initialize the register mapping
+-------------------------------------------------*/
+
+static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8 endbase, UINT8 loopbase, UINT8 bankbase, UINT8 rvolbase, UINT8 lvolbase)
+{
+	int voice;
+
+	/* reset the map */
+	memset(chip->regmap, 0, sizeof(chip->regmap));
+
+	/* iterate over voices */
+	for (voice = 0; voice < chip->voices; voice++)
+	{
+		chip->regmap[posbase + voice] = &chip->voice[voice].pos;
+		chip->regmap[ratebase + voice] = &chip->voice[voice].rate;
+		chip->regmap[endbase + voice] = &chip->voice[voice].loopend;
+		chip->regmap[loopbase + voice] = &chip->voice[voice].loopstart;
+		chip->regmap[bankbase + voice] = &chip->voice[voice].bank;
+		chip->regmap[rvolbase + voice] = &chip->voice[voice].rightvol;
+		if (chip->stereo)
+			chip->regmap[lvolbase + voice] = &chip->voice[voice].leftvol;
+	}
+
+	/* set the ADPCM register */
+	if (chip->adpcm)
+	{
+		chip->regmap[0x6d] = &chip->voice[ADPCM_VOICE].loopend;
+		chip->regmap[0x6f] = &chip->voice[ADPCM_VOICE].bank;
+		chip->regmap[0x73] = &chip->voice[ADPCM_VOICE].rate;
+		chip->regmap[0x74] = &chip->voice[ADPCM_VOICE].rightvol;
+		chip->regmap[0x75] = &chip->voice[ADPCM_VOICE].pos;
+		if (chip->stereo)
+			chip->regmap[0x76] = &chip->voice[ADPCM_VOICE].leftvol;
+	}
+}
+
+
+
+/***************************************************************************
+    GET/SET INFO CALLBACKS
+***************************************************************************/
+
+/*-------------------------------------------------
+    bsmt2000_set_info - callback for setting chip
+    information
+-------------------------------------------------*/
 
 static void bsmt2000_set_info(void *token, UINT32 state, sndinfo *info)
 {
@@ -459,6 +498,11 @@ static void bsmt2000_set_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
+
+/*-------------------------------------------------
+    bsmt2000_get_info - callback for retrieving
+    chip information
+-------------------------------------------------*/
 
 void bsmt2000_get_info(void *token, UINT32 state, sndinfo *info)
 {
@@ -480,4 +524,3 @@ void bsmt2000_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004, The MAME Team"; break;
 	}
 }
-

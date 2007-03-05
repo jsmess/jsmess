@@ -966,6 +966,7 @@ VIDEO_START( captaven )
 	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,TILEMAP_TRANSPARENT,16,16,64,32);
 	pf3_tilemap = tilemap_create(get_ca_pf3_tile_info, tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
 	deco32_raster_display_list=auto_malloc(10 * 256);
+	memset(deco32_raster_display_list, 0, 10 * 256);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf1a_tilemap,0);
@@ -1037,6 +1038,7 @@ VIDEO_START( lockload )
 	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,TILEMAP_TRANSPARENT,16,16,64,32);
 	dirty_palette = auto_malloc(4096);
 	deco32_raster_display_list = auto_malloc(10 * 256);
+	memset(deco32_raster_display_list, 0, 10 * 256);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -1454,8 +1456,8 @@ static void mixDualAlphaSprites(mame_bitmap *bitmap, const gfx_element *gfx0, co
 			UINT16 priColAlphaPal1=sprite1[x];
 			UINT16 pri0=(priColAlphaPal0&0x6000)>>13;
 			UINT16 pri1=(priColAlphaPal1&0x6000)>>13;
-			UINT16 col0=(priColAlphaPal0&0x1f00)>>8;
-			UINT16 col1=(priColAlphaPal1&0x0f00)>>8;
+			UINT16 col0=((priColAlphaPal0&0x1f00)>>8) % gfx0->total_colors;
+			UINT16 col1=((priColAlphaPal1&0x0f00)>>8) % gfx1->total_colors;
 			UINT16 alpha1=priColAlphaPal1&0x8000;
 
 			// Apply sprite bitmap 0 according to priority rules

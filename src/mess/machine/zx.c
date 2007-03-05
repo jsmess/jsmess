@@ -92,7 +92,7 @@ WRITE8_HANDLER ( zx_io_w )
 		{
 			cpu_spinuntil_time(cpu_getscanlinetime(Machine->screen[0].height - 1));
 			ula_scanline_count = Machine->screen[0].height - 1;
-			logerror ("S: %d B: %d\n", cpu_getscanline(), cpu_gethorzbeampos());
+			logerror ("S: %d B: %d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		}
 
 		LOG_ZX81_IOW("ULA IRQs on");

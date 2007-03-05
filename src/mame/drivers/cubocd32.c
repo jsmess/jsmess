@@ -5,7 +5,7 @@
 
    Several of the games have Audio tracks, therefore the CRC / SHA1 information you get when
    reading your own CDs may not match those in the driver.  There is currently no 100% accurate
-   way to rip the audio data will full sub-track and offset information.
+   way to rip the audio data with full sub-track and offset information.
 
    CD32 Hardware Specs (from Wikipedia, http://en.wikipedia.org/wiki/Amiga_CD32)
     * Main Processor: Motorola 68EC020 at 14.3 MHz
@@ -26,6 +26,20 @@
       Add full AGA (68020 based systems, Amiga 1200 / CD32) support to Amiga driver
       Add CD Controller emulation for CD32.
       ... work from there
+
+
+   Known Games:
+   Title                | rev. | year
+   ----------------------------------------------
+   Candy Puzzle         |  1.0 | 1995
+   Harem Challenge      |      | 1995
+   Laser Quiz           |      | 1995
+   Laser Quiz 2 "Italy" |  1.0 | 1995
+   Laser Strixx         |      | 1995
+   Magic Premium        |  1.1 | 1996
+   Laser Quiz France    |  1.0 | 1995
+   Odeon Twister        |      | 199x
+   Odeon Twister 2      |202.19| 1999
 
 
 */
@@ -153,5 +167,5 @@ GAMEB( 1995, cndypuzl, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Candy 
 GAMEB( 1995, haremchl, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Harem Challenge", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAMEB( 1995, lsrquiz,  cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Laser Quiz", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAMEB( 1995, lsrquiz2, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Laser Quiz '2' Italy (v1.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAMEB( 1995, mgprem11, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAMEB( 1995, lasstixx, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Laser Stixx", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAMEB( 1996, mgprem11, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Magic Premium (v1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAMEB( 1995, lasstixx, cd32, cd32, cd32, cd32, 0,	   ROT0, "CD Express", "Laser Strixx", GAME_NOT_WORKING|GAME_NO_SOUND )

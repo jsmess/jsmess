@@ -181,7 +181,7 @@ CPUS += PENTIUM
 #CPUS += PPC403
 #CPUS += PPC602
 CPUS += PPC603
-# CPUS += MPC8240
+#CPUS += MPC8240
 #CPUS += SE3208
 #CPUS += MC68HC11
 #CPUS += ADSP21062
@@ -193,8 +193,8 @@ CPUS += CDP1802
 #CPUS += COP420
 #CPUS += COP410
 #CPUS += TLCS90
-# CPUS += MB8843
-# CPUS += MB8844
+#CPUS += MB8843
+#CPUS += MB8844
 CPUS += APEXC
 CPUS += CP1610
 CPUS += F8
@@ -214,6 +214,8 @@ CPUS += M68008
 CPUS += TMS99010
 CPUS += TX0
 CPUS += COP411
+
+
 
 #-------------------------------------------------
 # specify available sound cores; some of these are

@@ -203,12 +203,12 @@ double apple1_vh_dsp_time_to_ready (void)
 	cursor_hfrac = (175 + cursor_x * apple1_charlayout.width) / 455;
 
 	if (cpu_getscanline() == cursor_scanline) {
-		/* cpu_gethorzbeampos() doesn't account for the horizontal
+		/* video_screen_get_hpos() doesn't account for the horizontal
 		   blanking interval; it acts as if the scanline period is
 		   entirely composed of visible pixel times.  However, we can
 		   still use it to find what fraction of the current scanline
 		   period has elapsed. */
-		double current_hfrac = cpu_gethorzbeampos() /
+		double current_hfrac = video_screen_get_hpos(0) /
 							   Machine->screen[0].width;
 		if (current_hfrac < cursor_hfrac)
 			return scanline_period * (cursor_hfrac - current_hfrac);

@@ -1,4 +1,4 @@
-0.112.1
+0.113
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -58,7 +58,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.112u4.  This incorporates all features of the
+- The core is based on MAME 0.113.  This incorporates all features of the
   update to this core.  [MAME team]
   
 - [Windows] Fixed a crash that can happen when doing a hard reset when devices

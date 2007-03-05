@@ -48,8 +48,8 @@ void zx_ula_bkgnd(int color)
 		rectangle r;
 		mame_bitmap *bitmap = tmpbitmap;
 
-		new_y = cpu_getscanline();
-		new_x = cpu_gethorzbeampos();
+		new_y = video_screen_get_vpos(0);
+		new_x = video_screen_get_hpos(0);
 /*		logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", old_x, old_y, new_x, new_y);*/
 		y = old_y;
 		for (;;)

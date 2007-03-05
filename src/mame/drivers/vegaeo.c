@@ -14,11 +14,11 @@
 
 #include "driver.h"
 #include "machine/at28c16.h"
+#include "eolithsp.h"
 
 static UINT32 *vega_vram;
 static UINT8 vega_vbuffer = 0;
-static int vega_vblank = 0;
-static int vegoeo_scanline = 0;
+
 
 static WRITE32_HANDLER( vega_vram_w )
 {
@@ -72,20 +72,10 @@ static WRITE32_HANDLER( vega_misc_w )
 	vega_vbuffer = data & 1;
 }
 
-static UINT32 vega_get_vblank(void *param)
-{
-	return vega_vblank&1;
-}
-
 
 READ32_HANDLER( vegaeo_custom_read )
 {
-	if (activecpu_get_pc()==0x08cf8 && vega_vblank==0 && vegoeo_scanline < 230)
-	{
-		cpu_spinuntil_trigger(1000);
-		//printf("spinning\n");
-		//printf("%06x custom read data %02x\n",activecpu_get_pc(), vega_vblank);
-	}
+	eolith_speedup_read();
 	return readinputport(0);
 }
 static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -110,7 +100,7 @@ INPUT_PORTS_START( crazywar )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(vega_get_vblank, 0)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, 0)
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -171,30 +161,10 @@ VIDEO_UPDATE( vega )
 }
 
 
-static INTERRUPT_GEN( vegaeo_irq )
-{
-	vegoeo_scanline = 261 -  cpu_getiloops();
-
-	switch (vegoeo_scanline)
-	{
-		case 0:
-			vega_vblank = 0;
-			break;
-
-		case 230:
-			cpu_trigger(1000);
-			break;
-
-		case 240:
-			vega_vblank = 1;
-			break;
-	}
-}
-
 static MACHINE_DRIVER_START( vega )
 	MDRV_CPU_ADD_TAG("cpu", E132N, 55000000)		 /* 55 MHz (GMS30C2132 actually) */
 	MDRV_CPU_PROGRAM_MAP(vega_map,0)
-	MDRV_CPU_VBLANK_INT(vegaeo_irq,262)
+	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
 
 	/* sound cpu */
 
@@ -294,4 +264,9 @@ ROM_START( crazywar )
 	ROM_LOAD( "qs1001a.u86",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
-GAME( 2002, crazywar, 0, vega, crazywar, 0, ROT0, "Eolith", "Crazy War",  GAME_NO_SOUND )
+DRIVER_INIT( vegaeo )
+{
+	init_eolith_speedup(Machine);
+}
+
+GAME( 2002, crazywar, 0, vega, crazywar, vegaeo, ROT0, "Eolith", "Crazy War",  GAME_NO_SOUND )

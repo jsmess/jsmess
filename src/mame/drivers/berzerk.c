@@ -1,7 +1,8 @@
 /***************************************************************************
 
  Berzerk Driver by Zsolt Vasvari
- Sound Driver by Alex Judd
+ Original Sound Driver by Alex Judd
+ New Sound Driver by Aaron Giles, R. Belmont, and Lord Nightmare
 
 ***************************************************************************/
 
@@ -9,6 +10,10 @@
 #include "includes/berzerk.h"
 #include "includes/exidy.h"
 #include "sound/s14001a.h"
+
+#define MASTER_CLOCK                    10000000
+#define S14001A_CLOCK                   (MASTER_CLOCK/2)
+
 
 static ADDRESS_MAP_START( berzerk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
@@ -297,7 +302,7 @@ static struct CustomSound_interface custom_interface =
 static MACHINE_DRIVER_START( berzerk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 10000000/4)        /* 2.5 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)        /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(berzerk_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT(berzerk_interrupt,8)
@@ -323,7 +328,7 @@ static MACHINE_DRIVER_START( berzerk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(S14001A, 5000000)	/* CPU clock divided by 16 divided by a programmable TTL setup */
+	MDRV_SOUND_ADD(S14001A, S14001A_CLOCK)	/* CPU clock divided by 16 divided by a programmable TTL setup */
 	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -388,7 +393,11 @@ ROM_START( frenzy )
 
 	ROM_REGION( 0x01000, REGION_SOUND1, 0 ) /* voice data */
 	ROM_LOAD( "1c",           0x0000, 0x0800, CRC(2cfe825d) SHA1(f12fed8712f20fa8213f606c4049a8144bfea42e) )	/* VSU-1000 board */
-	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )
+	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )        /* ditto */
+
+	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_LOAD( "prom.6e",        0x0000, 0x0020, BAD_DUMP CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */ /* currently a copy of the moon war one, I suspect the real frenzy one is either the same or more likely has the first byte the same as the second byte */
+
 ROM_END
 
 /*
@@ -400,15 +409,24 @@ ROM_END
 */
 ROM_START( moonwarp )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "code_roms",         0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "1c",         0x0000, 0x1000, NO_DUMP )
+	/*ROM_LOAD( "3c",         0x?000, 0x?000, NO_DUMP ) */ /* likely unused */
+	ROM_LOAD( "1d",         0x1000, 0x1000, NO_DUMP )
+	ROM_LOAD( "3d",         0x2000, 0x1000, NO_DUMP )
+	ROM_LOAD( "5d",         0x3000, 0x1000, NO_DUMP )
+	ROM_LOAD( "6d",         0xc000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x01000, REGION_SOUND1, 0 ) /* voice data */
 	ROM_LOAD( "moonwar.1c.bin",           0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) )	/* VSU-1000 board */
-	ROM_LOAD( "moonwar.2c.bin",           0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) )
+	ROM_LOAD( "moonwar.2c.bin",           0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) )    /* ditto */
+
+	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */
+
 ROM_END
 
 
 GAME( 1980, berzerk,  0,       berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 1)", 0 )
 GAME( 1980, berzerk1, berzerk, berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 2)", 0 )
-GAME( 1982, frenzy,   0,       frenzy,  frenzy,  0, ROT0, "Stern", "Frenzy", 0 )
+GAME( 1981, frenzy,   0,       frenzy,  frenzy,  0, ROT0, "Stern", "Frenzy", 0 )
 GAME( 1981, moonwarp, 0,       frenzy,  frenzy,  0, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", GAME_NOT_WORKING )

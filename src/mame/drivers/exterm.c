@@ -447,7 +447,10 @@ static struct tms34010_config master_config =
 	0,							/* halt on reset */
 	NULL,						/* generate interrupt */
 	exterm_to_shiftreg_master,	/* write to shiftreg function */
-	exterm_from_shiftreg_master	/* read from shiftreg function */
+	exterm_from_shiftreg_master,/* read from shiftreg function */
+	NULL,						/* display address changed */
+	NULL,						/* display interrupt callback */
+	0							/* the screen operated on */
 };
 
 static struct tms34010_config slave_config =
@@ -455,7 +458,10 @@ static struct tms34010_config slave_config =
 	1,							/* halt on reset */
 	NULL,						/* generate interrupt */
 	exterm_to_shiftreg_slave,	/* write to shiftreg function */
-	exterm_from_shiftreg_slave	/* read from shiftreg function */
+	exterm_from_shiftreg_slave, /* read from shiftreg function */
+	NULL,						/* display address changed */
+	NULL,						/* display interrupt callback */
+	0							/* the screen operated on */
 };
 
 

@@ -849,7 +849,8 @@ static struct tms34010_config tms_config =
 	midyunit_to_shiftreg,			/* write to shiftreg function */
 	midyunit_from_shiftreg,			/* read from shiftreg function */
 	midyunit_display_addr_changed,	/* display address changed */
-	midyunit_display_interrupt		/* display interrupt callback */
+	midyunit_display_interrupt,		/* display interrupt callback */
+	0								/* the screen operated on */
 };
 
 

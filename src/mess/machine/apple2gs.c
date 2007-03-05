@@ -976,7 +976,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x2F:	/* C02F - HORIZCNT */
-			result = ((cpu_getscanline() & 0x01) << 7) | (cpu_gethorzbeampos() / 5);
+			result = ((video_screen_get_vpos(0) & 0x01) << 7) | (video_screen_get_hpos(0) / 5);
 			break;
 
 		case 0x31:	/* C031 - DISKREG */

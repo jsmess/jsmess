@@ -1118,7 +1118,7 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 2:
-						sprintf(dummy, "beamx:%3d", cpu_gethorzbeampos());
+						sprintf(dummy, "beamx:%3d", video_screen_get_hpos(0));
 						break;
 
 					case MAX_REGS + 3:

@@ -98,7 +98,14 @@ static void get_fg_tile_info(int tile_index)
 
 VIDEO_START( ddragon3 )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+    state_save_register_global(ddragon3_vreg);
+    state_save_register_global(ddragon3_bg_scrollx);
+    state_save_register_global(ddragon3_bg_scrolly);
+    state_save_register_global(ddragon3_fg_scrollx);
+    state_save_register_global(ddragon3_fg_scrolly);
+    state_save_register_global(ddragon3_bg_tilebase);
+
+    bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TRANSPARENT, 16, 16, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,

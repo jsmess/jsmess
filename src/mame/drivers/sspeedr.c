@@ -53,14 +53,6 @@ static PALETTE_INIT( sspeedr )
 }
 
 
-static READ8_HANDLER( sspeedr_steering_r )
-{
-	UINT8 val = readinputport(0);
-
-	return 0x3f ^ (val >> 2) ^ (val >> 3);
-}
-
-
 static WRITE8_HANDLER( sspeedr_int_ack_w )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
@@ -118,7 +110,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(sspeedr_steering_r)
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x03, 0x03) AM_READ(input_port_2_r)
 	AM_RANGE(0x04, 0x04) AM_READ(input_port_3_r)
@@ -147,13 +139,28 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static const UINT32 sspeedr_controller_table[] =
+{
+	0x3f, 0x3e, 0x3c, 0x3d, 0x39, 0x38, 0x3a, 0x3b,
+	0x33, 0x32, 0x30, 0x31, 0x35, 0x34, 0x36, 0x37,
+	0x27, 0x26, 0x24, 0x25, 0x21, 0x20, 0x22, 0x23,
+	0x2b, 0x2a, 0x28, 0x29, 0x2d, 0x2c, 0x2e, 0x2f,
+	0x0f, 0x0e, 0x0c, 0x0d, 0x09, 0x08, 0x0a, 0x0b,
+	0x03, 0x02, 0x00, 0x01, 0x05, 0x04, 0x06, 0x07,
+	0x17, 0x16, 0x14, 0x15, 0x11, 0x10, 0x12, 0x13,
+	0x1b, 0x1a, 0x18, 0x19, 0x1d, 0x1c, 0x1e, 0x1f
+};
+
+
 INPUT_PORTS_START( sspeedr )
 
 	PORT_START_TAG("IN0")
-	PORT_BIT( 0xff, 0x80, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_BIT( 0x3f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(64) PORT_REMAP_TABLE(sspeedr_controller_table) PORT_WRAPS PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_REVERSE
+	/* The gas pedal is adjusted physically so the encoder is at position 2 when the pedal is not pressed. */
+	/* It also only uses half of the encoder. */
+	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(30) PORT_REMAP_TABLE(sspeedr_controller_table + 2) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )

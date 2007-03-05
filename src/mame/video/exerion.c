@@ -232,7 +232,7 @@ READ8_HANDLER( exerion_video_timing_r )
 	/* bit 1 is VBLANK */
 	/* bit 0 is the SNMI signal, which is low for H >= 0x1c0 and /VBLANK */
 
-	int xbeam = cpu_gethorzbeampos();
+	int xbeam = video_screen_get_hpos(0);
 	int ybeam = cpu_getscanline();
 	UINT8 result = 0;
 

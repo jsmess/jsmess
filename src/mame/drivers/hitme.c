@@ -140,7 +140,7 @@ static UINT8 read_port_and_t0(int port)
 static UINT8 read_port_and_t0_and_hblank(int port)
 {
 	UINT8 val = read_port_and_t0(port);
-	if (cpu_gethorzbeampos() < (Machine->screen[0].width * 9 / 10))
+	if (video_screen_get_hpos(0) < (Machine->screen[0].width * 9 / 10))
 		val ^= 0x04;
 	return val;
 }
@@ -506,6 +506,10 @@ INPUT_PORTS_START( barricad )
 	PORT_DIPSETTING(    0x05, "3" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x07, "Slow Slow" )
+
+	/* this is actually a variable resistor */
+	PORT_START_TAG("R3")
+	PORT_ADJUSTER(30, "Tone")
 INPUT_PORTS_END
 
 

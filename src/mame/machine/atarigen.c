@@ -1301,9 +1301,9 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
     10% of the scanline period.
 ---------------------------------------------------------------*/
 
-int atarigen_get_hblank(void)
+int atarigen_get_hblank(int scrnum)
 {
-	return (cpu_gethorzbeampos() > (Machine->screen[0].width * 9 / 10));
+	return (video_screen_get_hpos(scrnum) > (Machine->screen[scrnum].width * 9 / 10));
 }
 
 
@@ -1315,7 +1315,7 @@ int atarigen_get_hblank(void)
 WRITE16_HANDLER( atarigen_halt_until_hblank_0_w )
 {
 	/* halt the CPU until the next HBLANK */
-	int hpos = cpu_gethorzbeampos();
+	int hpos = video_screen_get_hpos(0);	/* perhaps should support scrnum */
 	int hblank = Machine->screen[0].width * 9 / 10;
 	double fraction;
 

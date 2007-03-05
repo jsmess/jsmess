@@ -489,7 +489,7 @@ static void NeoMVSDrawGfxLine(UINT16 *base,int rowpixels,const gfx_element *gfx,
 	UINT8 *fspr = memory_region_gfx3;
 	const pen_t *paldata = &gfx->colortable[gfx->color_granularity * color];
 
-	if (sx <= -16) return;
+	if (sx <= -16 || no_of_tiles == 0) return;
 
 	/* Safety feature */
 	code %= no_of_tiles;

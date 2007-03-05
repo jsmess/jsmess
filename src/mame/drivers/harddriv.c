@@ -195,7 +195,8 @@ static struct tms34010_config gsp_config =
 	hdgsp_irq_gen,					/* generate interrupt */
 	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
 	hdgsp_read_from_shiftreg,		/* read from shiftreg function */
-	hdgsp_display_update			/* display offset update function */
+	hdgsp_display_update,			/* display offset update function */
+	0								/* the screen operated on */
 };
 
 
@@ -205,7 +206,8 @@ static struct tms34010_config msp_config =
 	hdmsp_irq_gen,					/* generate interrupt */
 	NULL,							/* write to shiftreg function */
 	NULL,							/* read from shiftreg function */
-	NULL							/* display offset update function */
+	NULL,							/* display offset update function */
+	0								/* the screen operated on */
 };
 
 
@@ -2899,6 +2901,23 @@ ROM_START( steeltal )
 	ROM_LOAD( "136087-5003.1n",  0x0a0000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x0c0000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )
 	ROM_LOAD( "136087-5005.1r",  0x0e0000, 0x020000, CRC(c029d037) SHA1(0ae736c0ca3a1974911464328dd5a6b41a939130) )
+
+    ROM_REGION( 0x015D, REGION_PLDS, 0 )
+    /* GAL's located on Sound board */
+    ROM_LOAD( "136085-1038.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2F */
+    ROM_LOAD( "136085-1039.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2L */
+
+    /* GAL's located on DSP Communications board */
+    ROM_LOAD( "136087-9005.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 4C */
+    ROM_LOAD( "136087-9006.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 8A */
+
+    /* GAL's located on DS III board */
+    ROM_LOAD( "136087-9004.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 1AB */
+    ROM_LOAD( "136087-9003.bin", 0x0000, 0x0157, CRC(c2e3d556) SHA1(f66363e8b9310660b2922ab2f9ae4d078a4d3074) ) /* GAL20V8A at location 6NP */
+    ROM_LOAD( "136087-9002.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL20V8A at location 6MN */
+
+    /* GAL's located on "Multisync" board */
+    ROM_LOAD( "136087-9001.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL6001 at location 200K (SLOOP) */
 ROM_END
 
 
@@ -2940,6 +2959,23 @@ ROM_START( steeltag )
 	ROM_LOAD( "136087-5003.1n",  0x0a0000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x0c0000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )
 	ROM_LOAD( "136087-5005.1r",  0x0e0000, 0x020000, CRC(c029d037) SHA1(0ae736c0ca3a1974911464328dd5a6b41a939130) )
+
+    ROM_REGION( 0x015D, REGION_PLDS, 0 )
+    /* GAL's located on Sound board */
+    ROM_LOAD( "136085-1038.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2F */
+    ROM_LOAD( "136085-1039.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2L */
+
+    /* GAL's located on DSP Communications board */
+    ROM_LOAD( "136087-9005.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 4C */
+    ROM_LOAD( "136087-9006.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 8A */
+
+    /* GAL's located on DS III board */
+    ROM_LOAD( "136087-9004.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 1AB */
+    ROM_LOAD( "136087-9003.bin", 0x0000, 0x0157, CRC(c2e3d556) SHA1(f66363e8b9310660b2922ab2f9ae4d078a4d3074) ) /* GAL20V8A at location 6NP */
+    ROM_LOAD( "136087-9002.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL20V8A at location 6MN */
+
+    /* GAL's located on "Multisync" board */
+    ROM_LOAD( "136087-9001.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL6001 at location 200K (SLOOP) */
 ROM_END
 
 
@@ -2981,6 +3017,23 @@ ROM_START( steelta1 )
 	ROM_LOAD( "136087-5003.1n",  0x0a0000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x0c0000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )
 	ROM_LOAD( "136087-5005.1r",  0x0e0000, 0x020000, CRC(c029d037) SHA1(0ae736c0ca3a1974911464328dd5a6b41a939130) )
+
+    ROM_REGION( 0x015D, REGION_PLDS, 0 )
+    /* GAL's located on Sound board */
+    ROM_LOAD( "136085-1038.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2F */
+    ROM_LOAD( "136085-1039.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2L */
+
+    /* GAL's located on DSP Communications board */
+    ROM_LOAD( "136087-9005.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 4C */
+    ROM_LOAD( "136087-9006.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 8A */
+
+    /* GAL's located on DS III board */
+    ROM_LOAD( "136087-9004.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 1AB */
+    ROM_LOAD( "136087-9003.bin", 0x0000, 0x0157, CRC(c2e3d556) SHA1(f66363e8b9310660b2922ab2f9ae4d078a4d3074) ) /* GAL20V8A at location 6NP */
+    ROM_LOAD( "136087-9002.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL20V8A at location 6MN */
+
+    /* GAL's located on "Multisync" board */
+    ROM_LOAD( "136087-9001.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL6001 at location 200K (SLOOP) */
 ROM_END
 
 
@@ -3022,6 +3075,23 @@ ROM_START( steeltap )
 	ROM_LOAD( "136087-5003.1n",  0x0a0000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x0c0000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )
 	ROM_LOAD( "136087-5005.1r",  0x0e0000, 0x020000, CRC(c029d037) SHA1(0ae736c0ca3a1974911464328dd5a6b41a939130) )
+
+    ROM_REGION( 0x015D, REGION_PLDS, 0 )
+    /* GAL's located on Sound board */
+    ROM_LOAD( "136085-1038.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2F */
+    ROM_LOAD( "136085-1039.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 2L */
+
+    /* GAL's located on DSP Communications board */
+    ROM_LOAD( "136087-9005.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 4C */
+    ROM_LOAD( "136087-9006.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 8A */
+
+    /* GAL's located on DS III board */
+    ROM_LOAD( "136087-9004.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8A at location 1AB */
+    ROM_LOAD( "136087-9003.bin", 0x0000, 0x0157, CRC(c2e3d556) SHA1(f66363e8b9310660b2922ab2f9ae4d078a4d3074) ) /* GAL20V8A at location 6NP */
+    ROM_LOAD( "136087-9002.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL20V8A at location 6MN */
+
+    /* GAL's located on "Multisync" board */
+    ROM_LOAD( "136087-9001.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL6001 at location 200K (SLOOP) */
 ROM_END
 
 

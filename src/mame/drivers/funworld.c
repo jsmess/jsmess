@@ -31,6 +31,7 @@
     * Joker Card (Ver.A267BC, encrypted),       Vesely Svet,        1993.
     * Mongolfier New (Italia),                  bootleg,            199?.
     * Soccer New (Italia),                      bootleg,            199?.
+    * Snooker 10 (Ver 1.11),                    Sandiy,             1998.
 
 
 ***********************************************************************************
@@ -155,12 +156,10 @@
     the supported set is the program rom that is double sized, having identical halves.
 
 
-
     - Jolly Card (Austria, Fun World, bootleg)
 
     This one seems to have normal RAM instead of NVRAM.
     Going through the code, there's not any NVRAM initialization routine through service 1 & 2.
-
 
 
     - Mongolfier New
@@ -175,6 +174,18 @@
     Each set has double sized ROMs. One half contains the proper set and the other half store
     a complete Royal Card set, so... Is possible the existence of a shortcut,'easter egg',
     simple hack or DIP switches combination to enable the Royal Card game.
+
+
+    - Snooker 10
+
+    This game is running in a complete different hardware.
+    2x MACH231-15, an AD-65 (equivalent to OKI6295), no AY-8910, no NVRAM, no PIAs, no CRTC,
+    different memory map, and an unknown DIP40 IC, that could be an extra CPU or MCU.
+    Tiles are flipped in X-axis respect to the normal funworld games, so need it's own GFX decode.
+    Also palette is stored in a normal 27C256 ROM, repeated 64 times.
+
+    This game should be moved to a new driver in a near future, as soon as we know a bit more
+    about it and start to implement the missing pieces for an accurate emulation.
 
 
 
@@ -559,6 +570,28 @@
     - 1x green led
 
 
+    Snooker 10 (Ver 1.11)
+    ---------------------
+
+    - 1x Unknown DIP40 (main)
+    - 1x AD-65 (equivalent to OKI6295)
+    - 1x LM358N (sound)
+    - 1x TDA2003 (sound)
+    - 2x MACH231-15-JC/1-18JI/1
+    - 1x oscillator 16.00MHz
+
+    - 2x TMS27C256 (1,2)
+    - 2x M27C256 (3,5)
+    - 1x M27C2001 (4)
+
+    - 1x JAMMA edge connector
+    - 1x 15 legs connector
+    - 1x trimmer (volume)
+    - 1x 8 DIP switches
+    - 1x battery
+
+
+
 ***********************************************************************************
 
 
@@ -655,6 +688,11 @@
     - Modified the refresh rate to 60 fps according to some video evidences.
     - Updated technical notes.
 
+    2007/02/25
+    - Added new game: Snooker 10 (Ver 1.11). Preliminary.
+        Properly decoded GFX
+        Proper colors decoded.
+    - Updated technical notes.
 
 
     *** TO DO ***
@@ -772,6 +810,16 @@ static ADDRESS_MAP_START( royalmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )	// RAM 64K (8K x 8),
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1000) AM_READNOP	// input port?
+	AM_RANGE(0x3000, 0x3004) AM_READNOP	// input port?
+	AM_RANGE(0x5000, 0x5001) AM_READNOP	// input port?
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1213,6 +1261,9 @@ INPUT_PORTS_START( cuoreuno )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( snookr10 )
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -1236,6 +1287,18 @@ static const gfx_layout charlayout =
 	8*4*2
 };
 
+static const gfx_layout sn10_charlayout =
+{
+	4,
+	8,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },
+	{ 0, 1, 2, 3 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*4*2
+};
+
 
 /******************************
 * Graphics Decode Information *
@@ -1244,6 +1307,12 @@ static const gfx_layout charlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &charlayout, 0, 16 },
+	{ -1 }
+};
+
+static const gfx_decode sn10_gfxdecodeinfo[] =
+{
+	{ REGION_GFX1, 0x0000, &sn10_charlayout, 0, 16 },
 	{ -1 }
 };
 
@@ -1374,6 +1443,31 @@ static MACHINE_DRIVER_START( royalmcu )
 
 	MDRV_CPU_REPLACE("main", M65SC02, MASTER_CLOCK/8)	// original cpu = R65C02P2 (2MHz)
 	MDRV_CPU_PROGRAM_MAP(royalmcu_map, 0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( snookr10 )
+	MDRV_CPU_ADD_TAG("main", M65SC02, MASTER_CLOCK/8)	// 2MHz
+	MDRV_CPU_PROGRAM_MAP(snookr10_map, 0)
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	// video hardware
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)
+
+	MDRV_GFXDECODE(sn10_gfxdecodeinfo)
+
+//  MDRV_DEFAULT_LAYOUT(layout_funworld)
+
+	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_COLORTABLE_LENGTH(0x200)
+	MDRV_PALETTE_INIT(funworld)
+	MDRV_VIDEO_START(funworld)
+	MDRV_VIDEO_UPDATE(funworld)
 MACHINE_DRIVER_END
 
 /*************************
@@ -1709,6 +1803,24 @@ ROM_START( soccernw )
 	ROM_LOAD( "palce16v8h_sn.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
+ROM_START( snookr10 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "1.u2", 0x8000, 0x8000, CRC(216ccb2d) SHA1(d86270cd03a08f6fd3e7b327b8173f66da28e5e8) )
+
+    /* the first 256 bytes looks as a color palette.
+       unknown code starting at 0x0400 */
+	ROM_REGION( 0x40000, REGION_CPU2, 0 )
+	ROM_LOAD( "4.u18", 0x00000, 0x40000 , CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
+
+	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "2.u22", 0x0000, 0x8000, CRC(a70d9c48) SHA1(3fa90190323526553866662afda4dbe1c94abeff) )
+	ROM_LOAD( "3.u25", 0x8000, 0x8000, CRC(3009faaa) SHA1(d1cda455b270cb9afa65b9701735a3a1f2a48df2) )
+
+    /* This should be changed because the palette is stored in a normal ROM instead of a color PROM */
+	ROM_REGION( 0x8000, REGION_PROMS, 0 )
+	ROM_LOAD( "5.u27", 0x0000, 0x8000, CRC(f3d7d640) SHA1(f78060f4603e316fa3c2ec4ba6d7edf261cf6d8a) )
+ROM_END
+
 
 /**************************
 *  Driver Initialization  *
@@ -1863,3 +1975,4 @@ GAME( 1996, magiccrd, 0,        magiccrd, magiccrd, funworld, ROT0, "Impera",   
 GAME( 1993, jokercrd, 0,        funworld, funworld, funworld, ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)", GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 199?, monglfir, 0,        royalmcu, royalcrd, funworld, ROT0, "bootleg",         "Mongolfier New (Italia)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 199?, soccernw, 0,        royalcrd, royalcrd, soccernw, ROT0, "bootleg",         "Soccer New (Italia)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1998, snookr10, 0,        snookr10, snookr10, 0,        ROT0, "Sandiy",          "Snooker 10 (Ver 1.11)", GAME_NO_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

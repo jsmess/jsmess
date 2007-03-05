@@ -1710,6 +1710,8 @@ const game_driver * const drivers[] =
 	DRIVER( plotting )	/* B96 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( plottinu )	/* B96 (c) 1989 Taito Corporation Japan (US) */
 	DRIVER( plottina )	/* B96 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( plottinb )	/* B96 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( flipull )	/* B96 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( champwr )	/* C01 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( champwru )	/* C01 (c) 1989 Taito America Corporation (US) */
 	DRIVER( champwrj )	/* C01 (c) 1989 Taito Corporation (Japan) */
@@ -2802,6 +2804,7 @@ V-V                           TP-027
 	DRIVER( ddrja )		/* 1998 - Dance Dance Revolution (GC845 VER. JAB) */
 	DRIVER( ddra )		/* 1999 - Dance Dance Revolution (GN845 VER. AAA) */
 	DRIVER( fbait2bc )	/* 1998 - Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB) */
+	DRIVER( drmn )		/* 1998 - DrumMania (GQ881 VER. JAD) */
 	DRIVER( ddr2ml )	/* 1999 - Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA) */
 	DRIVER( gtrfrks )	/* 1999 - Guitar Freaks (GQ886 VER. EAC) */
 	DRIVER( gtrfrksu )	/* 1999 - Guitar Freaks (GQ886 VER. UAC) */
@@ -2812,6 +2815,8 @@ V-V                           TP-027
 	DRIVER( fbaitmcj )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. JA) */
 	DRIVER( fbaitmca )	/* 1999 - Fisherman's Bait - Marlin Challenge (GX889 VER. AA) */
 	DRIVER( ddr2m )		/* 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA) */
+	DRIVER( ddr2mc )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA) */
+	DRIVER( ddr2mc2 )	/* 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA) */
 	DRIVER( dsftkd )	/* 1999 - Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA) */
 	DRIVER( ddrsbm )	/* 1999 - Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA) */
 	DRIVER( ddrs2k )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. AAA) */
@@ -2823,8 +2828,14 @@ V-V                           TP-027
 	DRIVER( dncfrks )	/* 1999 - Dance Freaks (G*874 VER. KAA) */
 	DRIVER( drmn2m )	/* 1999 - DrumMania 2nd Mix (GE912 VER. JAA) */
 	DRIVER( ddr3mp )	/* 2000 - Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA) */
+	DRIVER( pcnfrk3m )	/* 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA) */
+	DRIVER( drmn3m )	/* 2000 - DrumMania 3rd Mix (G*A23 VER. JAA) */
+	DRIVER( gtrfrk4m )	/* 2000 - Guitar Freaks 4th Mix (G*A24 VER. JAA) */
+	DRIVER( gtrfrk5m )	/* 2000 - Guitar Freaks 5th Mix (G*A26 VER. JAA) */
 	DRIVER( ddr4m )		/* 2000 - Dance Dance Revolution 4th Mix (G*A33 VER. AAA) */
+	DRIVER( ddr4mj )	/* 2000 - Dance Dance Revolution 4th Mix (G*A33 VER. JAA) */
 	DRIVER( ddr4ms )	/* 2000 - Dance Dance Revolution Solo 4th Mix (G*A33 VER. ABA) */
+	DRIVER( ddr4msj )	/* 2000 - Dance Dance Revolution Solo 4th Mix (G*A33 VER. JBA) */
 	DRIVER( ddrusa )	/* 2000 - Dance Dance Revolution USA (G*A44 VER. UAA) */
 	DRIVER( ddr4mp )	/* 2000 - Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA) */
 	DRIVER( ddr4mps )	/* 2000 - Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA) */
@@ -4231,7 +4242,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mrgoemon )	/* GX621 (c) 1986 (Japan) */
 	DRIVER( jailbrek )	/* GX507 (c) 1986 */
 	DRIVER( manhatan )	/* GX507 (c) 1986 (Japan) */
-	DRIVER( scotrsht )	/* GX545 (c) 1985 */
+   	DRIVER( jailbrkb )	/* bootleg */
+    DRIVER( scotrsht )	/* GX545 (c) 1985 */
 	DRIVER( finalizr )	/* GX523 (c) 1985 */
 	DRIVER( finalizb )	/* bootleg */
 	DRIVER( ironhors )	/* GX560 (c) 1986 */
@@ -4533,6 +4545,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bm1stmix )	/* GQ753 (c) 1997 (Japan) */
 	DRIVER( bm2ndmix )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bm2ndmxa )	/* GX853 (c) 1998 (Japan) */
+	DRIVER( bm3rdmix )	/* GX853 (c) 1998 (Japan) */
+	DRIVER( bm3rdmxa )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bmcompmx )	/* GX858 (c) 1999 (Japan) */
 	DRIVER( hmcompmx )	/* GX858 (c) 1999 */
 	DRIVER( bm4thmix )	/* GX847 (c) 1999 (Japan) */
@@ -4545,7 +4559,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Firebeat games */
 	DRIVER( ppp )		/* GQ977 (c) 2000 */
+	DRIVER( ppd )		/* GQ977 (c) 2000 (Korea) */
+	DRIVER( kbm )		/* GQ974 (c) 2000 */
+	DRIVER( kbm2nd )	/* GCA01 (c) 2000 */
 	DRIVER( kbm3rd )	/* GCA12 (c) 2001 */
+	DRIVER( popn7 )		/* not sure, doesn't boot yet (c) 2001 */
 
 	/* PowerPC based Konami games */
 	DRIVER( fiveside )	/*   479 (c)1995 */
@@ -5515,6 +5533,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tstrike )	/* Game Room */
 	DRIVER( tstrikea )	/* Game Room */
 	DRIVER( ctribe )	/* TA-0028 (c) 1990 (US) */
+	DRIVER( ctribe1 )	/* TA-0028 (c) 1990 (US) - Set 1? */
 	DRIVER( ctribeb )	/* bootleg */
 	DRIVER( blockout )	/* TA-0029 (c) 1989 + California Dreams */
 	DRIVER( blckout2 )	/* TA-0029 (c) 1989 + California Dreams */
@@ -7008,6 +7027,9 @@ Other Sun games
 	DRIVER( crysking )	/* 2001 Brezzasoft. Crystal of the kings */
 	DRIVER( evosocc )	/* 2001 Evoga. Evolution Soccer */
 
+	/* Bell Fruit Cobra Hardware */
+	DRIVER( qos )		/* 1992 BFM */
+
 	/* Scorpion 2+Video Board Games */
 	DRIVER( qntoondo )	/* 1993 */
 	DRIVER( quintoon )	/* 1993 */
@@ -7355,8 +7377,9 @@ Other Sun games
 	DRIVER( royalcdc )	/* (c) 199? Evona Electronic */
 	DRIVER( magiccrd )	/* (c) 1996 Impera */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
-	DRIVER( monglfir )	/* (c) 199? bootleg */
-	DRIVER( soccernw )	/* (c) 199? bootleg */
+	DRIVER( monglfir )	/* 199? bootleg */
+	DRIVER( soccernw )	/* 199? bootleg */
+	DRIVER( snookr10 )	/* (c) 1998 Sandiy */
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */

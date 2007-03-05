@@ -798,12 +798,21 @@ INPUT_PORTS_START( bm1stmix )
 	BEATMANIA_TURNTABLE		/* IN 6-7 */
 INPUT_PORTS_END
 
+
 INPUT_PORTS_START( bm2ndmix )
 	BEATMANIA_INPUT			/* IN 0-2 */
 	BEATMANIA_DSW1(0x00, 0xff)	/* IN 3 */
 	BEATMANIA_DSW2_OLD_LEVEL	/* IN 4 */
 	BM2NDMIX_DSW3			/* IN 5 */
 	BEATMANIA_TURNTABLE		/* IN 6-7 */
+INPUT_PORTS_END
+
+INPUT_PORTS_START( bm3rdmix )
+	BEATMANIA_INPUT			/* IN 0-2 */
+	BEATMANIA_DSW1(0x00, 0xff)	/* IN 3 */
+	BEATMANIA_DSW2	/* IN 4 */
+	BEATMANIA_DSW3			/* IN 5 */
+	BEATMANIA_TURNTABLE		/* IN 6 */
 INPUT_PORTS_END
 
 INPUT_PORTS_START( bmcompmx )
@@ -1047,6 +1056,50 @@ ROM_START( bm2ndmxa )
 
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "853jaa11", 0, MD5(37281741b748bea7dfa711a956649d1e) SHA1(03d6cc5aea5920163fbaba34c4f838ca605a87e3) )	/* ver 1.10 JA */
+ROM_END
+
+ROM_START( bm3rdmix )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "825jab01.6a", 0x000000, 0x80000, CRC(934FDCB2) SHA1(b88bada065b5464c579039c2e403c061e6eeb356) )
+	ROM_LOAD16_BYTE( "825jab02.8a", 0x000001, 0x80000, CRC(6012C488) SHA1(df32db41942c2fe2b2aa7439900372e22ea54c3c) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0)		/* SPRITE */
+	ROM_LOAD16_BYTE( "825jaa03.19a", 0x000000, 0x80000, CRC(ECD62652) SHA1(bceab4052dce2c843358f0a98aacc6e1124e3068) )
+	ROM_LOAD16_BYTE( "825jaa04.20a", 0x000001, 0x80000, CRC(437A576F) SHA1(f30fd15d4f0d776e9b29ccfcd6e26861fb42e51a) )
+	ROM_LOAD16_BYTE( "825jaa05.22a", 0x100000, 0x80000, CRC(9F9A3369) SHA1(d8b20127336af89b9e886289fb4f5a2e0db65f9b) )
+	ROM_LOAD16_BYTE( "825jaa06.24a", 0x100001, 0x80000, CRC(E7A3991A) SHA1(6c8cb481e721428e1365f784e97bb6f6d421ed5a) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, 0 )		/* TILEMAP */
+	ROM_LOAD16_BYTE( "825jab07.22d", 0x000000, 0x80000, CRC(1A515C82) SHA1(a0c908d449aa45cb3a90a42c97429f10873e884b) )
+	ROM_LOAD16_BYTE( "825jab08.23d", 0x000001, 0x80000, CRC(82731B07) SHA1(c0d391fcd94c6b2225fca338c0c5db5d35e2d8bc) )
+	ROM_LOAD16_BYTE( "825jab09.25d", 0x100000, 0x80000, CRC(1407BA5D) SHA1(e7a0d190326589f4d94e83cb7c85dd4e91f4efad) )
+	ROM_LOAD16_BYTE( "825jab10.27d", 0x100001, 0x80000, CRC(2AFD0A10) SHA1(1b8b868ac5720bb1b376f4eb8952efb190257bda) )
+
+	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
+//  DISK_IMAGE( "825jab11", 0, MD5(f4360da10a932ba90e93469df7426d1d) SHA1(1) )  /* ver 1.01 JA */
+	DISK_IMAGE( "825jab11", 0, NO_DUMP )	/* ver 1.01 JA */
+ROM_END
+
+ROM_START( bm3rdmxa )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "825jaa01.6a", 0x000000, 0x80000, CRC(CF7494A5) SHA1(994df0644817f44d135a16f04d8dae9ec73e3728) )
+	ROM_LOAD16_BYTE( "825jaa02.8a", 0x000001, 0x80000, CRC(5F787FE2) SHA1(5944da21141802d96594cf77880682e97d014ca1) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0)		/* SPRITE */
+	ROM_LOAD16_BYTE( "825jaa03.19a", 0x000000, 0x80000, CRC(ECD62652) SHA1(bceab4052dce2c843358f0a98aacc6e1124e3068) )
+	ROM_LOAD16_BYTE( "825jaa04.20a", 0x000001, 0x80000, CRC(437A576F) SHA1(f30fd15d4f0d776e9b29ccfcd6e26861fb42e51a) )
+	ROM_LOAD16_BYTE( "825jaa05.22a", 0x100000, 0x80000, CRC(9F9A3369) SHA1(d8b20127336af89b9e886289fb4f5a2e0db65f9b) )
+	ROM_LOAD16_BYTE( "825jaa06.24a", 0x100001, 0x80000, CRC(E7A3991A) SHA1(6c8cb481e721428e1365f784e97bb6f6d421ed5a) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, 0 )		/* TILEMAP */
+	ROM_LOAD16_BYTE( "825jaa07.22d", 0x000000, 0x80000, CRC(A96CF46C) SHA1(c8540b452dcb15f5873ca629fa62657a5a3bb02c) )
+	ROM_LOAD16_BYTE( "825jaa08.23d", 0x000001, 0x80000, CRC(06D56C3B) SHA1(19cd15ab0869773e6a16b1cad48c53bec2f60b0b) )
+	ROM_LOAD16_BYTE( "825jaa09.25d", 0x100000, 0x80000, CRC(D3E65669) SHA1(51abf452da60794fa47c05d11c08b203dde563ff) )
+	ROM_LOAD16_BYTE( "825jaa10.27d", 0x100001, 0x80000, CRC(44D184F3) SHA1(28f3ec33a29164a6531f53db071272ccf015f66d) )
+
+
+	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
+	DISK_IMAGE( "825jaa", 0, SHA1(dc10d8d281dd8153aeb620228e397aba0bbac198) MD5(3276e3ed57f1a6d9a18365054b0439ba) ) /* ver 1.00 JA */
 ROM_END
 
 ROM_START( bmcompmx )
@@ -1313,6 +1366,24 @@ static DRIVER_INIT( bm5thmix )
 	ide_set_user_password(0, bm5thmix_user_password);
 }
 
+static DRIVER_INIT( bmclubmx )
+{
+	static UINT8 bmclubmx_user_password[2 + 32] =
+	{
+		0x00, 0x00,
+		0x44, 0x20, 0x30, 0x57, 0x3c, 0x3f, 0x38, 0x32,
+		0x4f, 0x38, 0x74, 0x4c, 0x07, 0x61, 0x6c, 0x64,
+		0x76, 0x7d, 0x70, 0x16, 0x1f, 0x6f, 0x0c, 0x0f,
+		0x0a, 0x1a, 0x71, 0x07, 0x1e, 0x19, 0x7d, 0x02
+	};
+
+	init_beatmania(machine);
+
+	ide_set_master_password(0, beatmania_master_password);
+	ide_set_user_password(0, bmclubmx_user_password);
+}
+
+
 static DRIVER_INIT( bmcompm2 )
 {
 	static UINT8 bmcompm2_user_password[2 + 32] =
@@ -1398,6 +1469,39 @@ static DRIVER_INIT( bm6thmix )
 	ide_set_user_password(0, bm6thmix_user_password);
 }
 
+static DRIVER_INIT( bm7thmix )
+{
+	static UINT8 bm7thmix_user_password[2 + 32] =
+	{
+		0x00, 0x00,
+		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4e, 0x4a, 0x25,
+		0x5a, 0x52, 0x0c, 0x3e, 0x15, 0x04, 0x6f, 0x0a,
+		0x77, 0x71, 0x74, 0x16, 0x6d, 0x73, 0x0c, 0x0c,
+		0x0c, 0x06, 0x7c, 0x6e, 0x77, 0x74, 0x7d, 0x7a
+	};
+
+	init_beatmania(machine);
+
+	ide_set_master_password(0, beatmania_master_password);
+	ide_set_user_password(0, bm7thmix_user_password);
+}
+
+static DRIVER_INIT( bmfinal )
+{
+	static UINT8 bmfinal_user_password[2 + 32] =
+	{
+		0x00, 0x00,
+		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4f, 0x4a, 0x23,
+		0x5a, 0x52, 0x0c, 0x3e, 0x07, 0x04, 0x63, 0x7f,
+		0x76, 0x74, 0x6a, 0x64, 0x7e, 0x68, 0x0c, 0x0c,
+		0x0c, 0x06, 0x71, 0x6e, 0x77, 0x79, 0x7d, 0x7a
+	};
+
+	init_beatmania(machine);
+
+	ide_set_master_password(0, beatmania_master_password);
+	ide_set_user_password(0, bmfinal_user_password);
+}
 
 /*************************************
  *
@@ -1405,15 +1509,28 @@ static DRIVER_INIT( bm6thmix )
  *
  *************************************/
 
+// commented out games should also run on this driver
+
 GAME( 1997, bm1stmix, 0,        djmain,   bm1stmix,  beatmania, ROT0, "Konami", "beatmania (ver JA-B)", 0 )
 GAME( 1998, bm2ndmix, 0,        djmain,   bm2ndmix,  beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-B)", 0 )
 GAME( 1998, bm2ndmxa, bm2ndmix, djmain,   bm2ndmix,  beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", 0 )
+GAME( 1998, bm3rdmix, 0,        djmain,   bm3rdmix,  beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", GAME_NOT_WORKING ) // missing hd
+GAME( 1998, bm3rdmxa, bm3rdmix, djmain,   bm3rdmix,  beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", 0 )
 GAME( 1999, bmcompmx, 0,        djmain,   bmcompmx,  beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
 GAME( 1999, hmcompmx, bmcompmx, djmain,   bmcompmx,  hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
 GAME( 1999, bm4thmix, 0,        djmain,   bm4thmix,  bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )
 GAME( 1999, bm5thmix, 0,        djmain,   beatmania, bm5thmix,  ROT0, "Konami", "beatmania 5th MIX (ver JA-A)", 0 )
+//GAME( 2000, bmclubmx, 0,        djmain,   beatmania, bmclubmx,  ROT0, "Konami", "beatmania Club MIX (ver JA-A)" )
 GAME( 2000, bmcompm2, 0,        djmain,   beatmania, bmcompm2,  ROT0, "Konami", "beatmania complete MIX 2 (ver JA-A)", 0 )
 GAME( 2000, hmcompm2, bmcompm2, djmain,   hmcompm2,  hmcompm2,  ROT0, "Konami", "hiphopmania complete MIX 2 (ver UA-A)", 0 )
 GAME( 2000, bmdct,    0,        djmain,   bmdct,     bmdct,     ROT0, "Konami", "beatmania f. Dreams Come True (ver JA-A)", 0 )
 GAME( 2000, bmcorerm, 0,        djmain,   beatmania, bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", 0 )
 GAME( 2001, bm6thmix, 0,        djmain,   beatmania, bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", 0 )
+//GAME( 2001, bm7thmix, 0,        djmain,   beatmania, bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)" )
+//GAME( 2002, bmfinal,  0,        djmain,   beatmania, bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)" )
+
+//GAME( 1998, popn1,    0,        djmain,   popn1,     popnmusic, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)" )
+//GAME( 1998, popn2,    0,        djmain,   popnmusic, popnmusic, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)" )
+//GAME( 1999, popn3,    0,        djmain,   popnmusic, popnmusic, ROT0, "Konami", "Pop'n Music 3 (ver JA-A)" )
+
+//GAME( 1999, popnstex, 0,        djmain,   popnstage, popnstage, ROT0, "Konami", "Pop'n Stage EX (ver JB-A)" )

@@ -42,6 +42,7 @@ struct _png_private
 /* temporary */
 typedef UINT32 rgb_t;
 
+#define RGB_ALPHA(x)	(((x) >> 24) & 0xff)
 #define RGB_RED(x)		(((x) >> 16) & 0xff)
 #define RGB_GREEN(x)	(((x) >> 8) & 0xff)
 #define RGB_BLUE(x)		(((x) >> 0) & 0xff)
@@ -582,6 +583,86 @@ handle_error:
 
 
 /*-------------------------------------------------
+    png_read_bitmap - load a PNG file into a
+    bitmap_t
+-------------------------------------------------*/
+
+png_error png_read_bitmap(core_file *fp, bitmap_t **bitmap)
+{
+	png_error result;
+	png_info png;
+	UINT8 *src;
+	int x, y;
+
+	/* read the PNG data */
+	result = png_read_file(fp, &png);
+	if (result != PNGERR_NONE)
+		return result;
+
+	/* verify we can handle this PNG */
+	if (png.bit_depth > 8 || png.interlace_method != 0 ||
+		(png.color_type != 0 && png.color_type != 3 && png.color_type != 2 && png.color_type != 6))
+	{
+		png_free(&png);
+		return PNGERR_UNSUPPORTED_FORMAT;
+	}
+
+	/* if less than 8 bits, upsample */
+	png_expand_buffer_8bit(&png);
+
+	/* allocate a bitmap of the appropriate size and copy it */
+	*bitmap = bitmap_alloc(png.width, png.height, BITMAP_FORMAT_ARGB32);
+	if (*bitmap == NULL)
+	{
+		png_free(&png);
+		return PNGERR_OUT_OF_MEMORY;
+	}
+
+	/* handle 8bpp palettized case */
+	src = png.image;
+	if (png.color_type == 3)
+	{
+		/* loop over width/height */
+		for (y = 0; y < png.height; y++)
+			for (x = 0; x < png.width; x++, src++)
+			{
+				/* determine alpha and expand to 32bpp */
+				UINT8 alpha = (*src < png.num_trans) ? png.trans[*src] : 0xff;
+				*BITMAP_ADDR32(*bitmap, y, x) = (alpha << 24) | (png.palette[*src * 3] << 16) | (png.palette[*src * 3 + 1] << 8) | png.palette[*src * 3 + 2];
+			}
+	}
+
+	/* handle 8bpp grayscale case */
+	else if (png.color_type == 0)
+	{
+		for (y = 0; y < png.height; y++)
+			for (x = 0; x < png.width; x++, src++)
+				*BITMAP_ADDR32(*bitmap, y, x) = 0xff000000 | (*src << 16) | (*src << 8) | *src;
+	}
+
+	/* handle 32bpp non-alpha case */
+	else if (png.color_type == 2)
+	{
+		for (y = 0; y < png.height; y++)
+			for (x = 0; x < png.width; x++, src += 3)
+				*BITMAP_ADDR32(*bitmap, y, x) = 0xff000000 | (src[0] << 16) | (src[1] << 8) | src[2];
+	}
+
+	/* handle 32bpp alpha case */
+	else if (png.color_type == 6)
+	{
+		for (y = 0; y < png.height; y++)
+			for (x = 0; x < png.width; x++, src += 4)
+				*BITMAP_ADDR32(*bitmap, y, x) = (src[3] << 24) | (src[0] << 16) | (src[1] << 8) | src[2];
+	}
+
+	/* free our temporary data and return */
+	png_free(&png);
+	return PNGERR_NONE;
+}
+
+
+/*-------------------------------------------------
     png_expand_buffer_8bit - expand a buffer from
     sub 8-bit to 8-bit
 -------------------------------------------------*/
@@ -860,6 +941,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 
 static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *bitmap, int palette_length, const rgb_t *palette)
 {
+	int alpha = (bitmap->format == BITMAP_FORMAT_ARGB32);
 	int rowbytes;
 	int x, y;
 
@@ -867,8 +949,8 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 	pnginfo->width = bitmap->width;
 	pnginfo->height = bitmap->height;
 	pnginfo->bit_depth = 8;
-	pnginfo->color_type = 2;
-	rowbytes = pnginfo->width * 3;
+	pnginfo->color_type = alpha ? 6 : 2;
+	rowbytes = pnginfo->width * (alpha ? 4 : 3);
 
 	/* allocate memory for the image */
 	pnginfo->image = malloc(pnginfo->height * (rowbytes + 1));
@@ -918,6 +1000,19 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 				*dst++ = RGB_RED(raw);
 				*dst++ = RGB_GREEN(raw);
 				*dst++ = RGB_BLUE(raw);
+			}
+		}
+
+		/* 32-bit ARGB direct */
+		else if (bitmap->format == BITMAP_FORMAT_ARGB32)
+		{
+			for (x = 0; x < pnginfo->width; x++)
+			{
+				UINT32 raw = *src32++;
+				*dst++ = RGB_RED(raw);
+				*dst++ = RGB_GREEN(raw);
+				*dst++ = RGB_BLUE(raw);
+				*dst++ = RGB_ALPHA(raw);
 			}
 		}
 

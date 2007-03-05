@@ -880,7 +880,7 @@ READ8_HANDLER( snes_r_io )
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
-//          if (cpu_gethorzbeampos() >= 363) snes_ram[offset] |= 0x40;
+//          if (video_screen_get_hpos(0) >= 363) snes_ram[offset] |= 0x40;
 //              else snes_ram[offset] &= ~0x40;
 			return snes_ram[offset];
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */

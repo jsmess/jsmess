@@ -148,9 +148,6 @@ void cpu_boost_interleave(double timeslice_time, double boost_duration);
 /* Returns the number of cycles run so far this timeslice */
 int cycles_currently_ran(void);
 
-/* Returns the number of cycles left to run in this timeslice */
-int cycles_left_to_run(void);
-
 /* Returns the total number of CPU cycles */
 UINT32 activecpu_gettotalcycles(void);
 UINT64 activecpu_gettotalcycles64(void);
@@ -158,9 +155,6 @@ UINT64 activecpu_gettotalcycles64(void);
 /* Returns the total number of CPU cycles for a given CPU */
 UINT32 cpunum_gettotalcycles(int cpunum);
 UINT64 cpunum_gettotalcycles64(int cpunum);
-
-/* Returns the number of CPU cycles before the next interrupt handler call */
-int activecpu_geticount(void);
 
 /* Safely eats cycles so we don't cross a timeslice boundary */
 void activecpu_eat_cycles(int cycles);
@@ -197,9 +191,6 @@ double cpu_getscanlinetime(int scanline);
 /* Returns the duration of a single scanline */
 mame_time cpu_getscanlineperiod_mt(void);
 double cpu_getscanlineperiod(void);
-
-/* Returns the current horizontal beam position in pixels */
-int cpu_gethorzbeampos(void);
 
 /* Returns the current VBLANK state */
 int cpu_getvblank(void);

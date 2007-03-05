@@ -916,10 +916,10 @@ INPUT_PORTS_START(avigo)
 	/* these two ports are used to emulate the position of the pen/stylus on the screen */
 	/* a cursor is drawn to indicate the position, so when a click is done, it will occur in the correct place */
 	PORT_START /* Mouse - X AXIS */ 
-	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_MINMAX(0,0)  PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START /* Mouse - Y AXIS */
-	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_MINMAX(0,0) 	 PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 	
 INPUT_PORTS_END
 

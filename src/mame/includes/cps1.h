@@ -29,7 +29,7 @@ extern gfx_decode cps1_gfxdecodeinfo[];
 
 /*----------- defined in machine/cps2crpt.c -----------*/
 
-DRIVER_INIT( cps2 );
+DRIVER_INIT( cps2crpt );
 
 
 /*----------- defined in machine/kabuki.c -----------*/

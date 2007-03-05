@@ -478,7 +478,7 @@ void stream_update(sound_stream *stream)
 
 	/* generate samples to get us up to the appropriate time */
 	assert(stream->output_sampindex - stream->output_base_sampindex >= 0);
-	assert(update_sampindex - stream->output_base_sampindex < stream->output_bufalloc);
+	assert(update_sampindex - stream->output_base_sampindex <= stream->output_bufalloc);
 	generate_samples(stream, update_sampindex - stream->output_sampindex);
 
 	/* remember this info for next time */

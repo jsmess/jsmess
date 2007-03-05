@@ -1029,7 +1029,7 @@ static void set_raster_op(void)
 
 INLINE int scanline_to_vcount(int scanline)
 {
-	if (Machine->screen[0].visarea.min_y == 0)
+	if (Machine->screen[state.config->scrnum].visarea.min_y == 0)
 		scanline += SMART_IOREG(VEBLNK);
 	if (scanline > SMART_IOREG(VTOTAL))
 		scanline -= SMART_IOREG(VTOTAL);
@@ -1039,7 +1039,7 @@ INLINE int scanline_to_vcount(int scanline)
 
 INLINE int vcount_to_scanline(int vcount)
 {
-	if (Machine->screen[0].visarea.min_y == 0)
+	if (Machine->screen[state.config->scrnum].visarea.min_y == 0)
 		vcount -= SMART_IOREG(VEBLNK);
 	if (vcount < 0)
 		vcount += SMART_IOREG(VTOTAL);
@@ -1085,7 +1085,7 @@ static void update_display_address(int vcount)
 
 static void vsblnk_callback(int cpunum)
 {
-	double interval = TIME_IN_HZ(Machine->screen[0].refresh);
+	double interval = TIME_IN_HZ(Machine->screen[state.config->scrnum].refresh);
 
 	/* reset timer for next frame before going into the CPU context */
 	timer_adjust(vsblnk_timer[cpunum], interval, cpunum, 0);
@@ -1101,7 +1101,7 @@ static void vsblnk_callback(int cpunum)
 
 static void dpyint_callback(int cpunum)
 {
-	double interval = TIME_IN_HZ(Machine->screen[0].refresh);
+	double interval = TIME_IN_HZ(Machine->screen[state.config->scrnum].refresh);
 
 logerror("-- dpyint(%d) @ %d --\n", cpunum, cpu_getscanline());
 
@@ -1527,9 +1527,9 @@ READ16_HANDLER( tms34010_io_register_r )
 
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = cpu_gethorzbeampos();
+			result = video_screen_get_hpos(state.config->scrnum);
 			total = IOREG(REG_HTOTAL);
-			result = result * total / Machine->screen[0].width;
+			result = result * total / Machine->screen[state.config->scrnum].width;
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG_HEBLNK);
@@ -1576,9 +1576,9 @@ READ16_HANDLER( tms34020_io_register_r )
 
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = cpu_gethorzbeampos();
+			result = video_screen_get_hpos(state.config->scrnum);
 			total = IOREG(REG020_HTOTAL);
-			result = result * total / Machine->screen[0].width;
+			result = result * total / Machine->screen[state.config->scrnum].width;
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG020_HEBLNK);

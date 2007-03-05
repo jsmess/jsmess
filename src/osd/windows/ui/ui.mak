@@ -139,6 +139,6 @@ ifdef MESS
 
 $(MESS_WINUIOBJ)/mess32.res:	$(WINUISRC)/mame32.rc $(MESS_WINUISRC)/mess32.rc $(WINUISRC)/resource.h $(MESS_WINUISRC)/resourcems.h
 	@echo Compiling resources $<...
-	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WINUISRC) --include-dir $(MESS_WINUISRC) -o $@ -i $<
+	$(RC) $(RCDEFS) $(RCFLAGS) --include-dir $(WINUISRC) --include-dir $(MESS_WINUISRC) -o $@ -i $(MESS_WINUISRC)/mess32.rc
 
 endif

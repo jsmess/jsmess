@@ -880,7 +880,7 @@ void memory_set_bankptr(int banknum, void *base)
 		fatalerror("memory_set_bankptr called with invalid bank %d", banknum);
 	if (bankdata[banknum].dynamic)
 		fatalerror("memory_set_bankptr called with dynamic bank %d", banknum);
-	if (!base)
+	if (base == NULL)
 		fatalerror("memory_set_bankptr called NULL base");
 	if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
 		validate_auto_malloc_memory(base, bankdata[banknum].end - bankdata[banknum].base + 1);

@@ -1061,7 +1061,7 @@ static void antic_linerefresh(void)
 #if VERBOSE
 static int cycle(void)
 {
-	return cpu_gethorzbeampos() * CYCLES_PER_LINE / Machine->screen[0].width;
+	return video_screen_get_hpos(0) * CYCLES_PER_LINE / Machine->screen[0].width;
 }
 #endif
 

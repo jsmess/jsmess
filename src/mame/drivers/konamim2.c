@@ -1108,6 +1108,9 @@ ROM_START(totlvice)
 
 	ROM_REGION( 0x100000, REGION_USER2, 0 ) /* sound rom on sub board */
 	ROM_LOAD( "639jaa02.bin",  0x000000, 0x100000, CRC(c6163818) SHA1(b6f8f2d808b98610becc0a5be5443ece3908df0b) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE( "639jad01", 0, MD5(bc3156be374e7a99040763bf0cea7ad3) SHA1(c4503d9954c72dd8f70521f313f0338528116c26))
 ROM_END
 
 static DRIVER_INIT( m2 )
@@ -1127,7 +1130,7 @@ static DRIVER_INIT( btltryst )
 }
 
 GAME( 1997, polystar,	0,	m2, m2, polystar,		ROT0,	"Konami",	"Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1997, totlvice,	0,	m2, m2, m2,				ROT0,	"Konami",	"Total Vice (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvice,	0,	m2, m2, m2,				ROT0,	"Konami",	"Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, btltryst,	0,	m2,	m2,	btltryst,		ROT0,	"Konami",	"Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, heatof11,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1998, evilngt,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )

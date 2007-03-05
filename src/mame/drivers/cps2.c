@@ -571,7 +571,7 @@ WRITE16_HANDLER( cps2_qsound_sharedram_w )
 
 
 static int readpaddle;
-
+int cps2networkpresent;
 
 static INTERRUPT_GEN( cps2_interrupt )
 {
@@ -733,7 +733,7 @@ READ16_HANDLER( cps2_qsound_volume_r )
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */
 	/* Only game known to use both these so far is SSF2TB */
 
-	if(strcmp(Machine->gamedrv->name,"ssf2tb")==0)
+	if(cps2networkpresent)
 		return 0x2021;
 	else
 		return 0xe021;
@@ -7034,12 +7034,31 @@ ROM_END
 
 
 
+
+
+static DRIVER_INIT( cps2 )
+{
+	/* Decrypt the game - see machine/cps2crpt.c */
+	init_cps2crpt(machine);
+	cps2networkpresent = 0;
+}
+
+static DRIVER_INIT( ssf2tb )
+{
+	init_cps2(machine);
+	cps2networkpresent = 0;
+
+	/* we don't emulate the network board, so don't say it's present for now, otherwise the game will
+       attempt to boot in tournament mode and fail */
+	//cps2networkpresent = 1;
+
+}
+
 static DRIVER_INIT ( puzloop2 )
 {
 	init_cps2(machine);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, pl2_port_0_word_r);
 }
-
 
 GAME( 1993, ssf2,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (World 930911)", 0 )
 GAME( 1993, ssf2u,    ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (USA 930911)", 0 )
@@ -7048,9 +7067,9 @@ GAME( 1993, ssf2ar1,  ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Str
 GAME( 1993, ssf2j,    ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 931005)", 0 )
 GAME( 1993, ssf2jr1,  ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930911)", 0 )
 GAME( 1993, ssf2jr2,  ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930910)", 0 )
-GAME( 1993, ssf2tb,   ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 931119)", GAME_NOT_WORKING )	// works, but not in tournament mode
-GAME( 1993, ssf2tbr1, ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 930911)", 0 )
-GAME( 1993, ssf2tbj,  ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 930911)", 0 )
+GAME( 1993, ssf2tb,   ssf2,    cps2, ssf2,    ssf2tb, ROT0, "Capcom", "Super Street Fighter II: The Tournament Battle (World 931119)", 0 )	// works, but not in tournament mode
+GAME( 1993, ssf2tbr1, ssf2,    cps2, ssf2,    ssf2tb, ROT0, "Capcom", "Super Street Fighter II: The Tournament Battle (World 930911)", 0 )	// works, but not in tournament mode
+GAME( 1993, ssf2tbj,  ssf2,    cps2, ssf2,    ssf2tb, ROT0, "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 930911)", 0 )	// works, but not in tournament mode
 GAME( 1993, ddtod,    0,       cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940412)", 0 )
 GAME( 1993, ddtodr1,  ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940113)", 0 )
 GAME( 1993, ddtodu,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940125)", 0 )

@@ -911,10 +911,9 @@ void winwindow_ui_pause_from_main_thread(int pause)
 			// only call mame_pause if we weren't already paused due to some external reason
 			ui_temp_was_paused = mame_is_paused(Machine);
 			if (!ui_temp_was_paused)
-			{
 				mame_pause(Machine, TRUE);
-				SetEvent(ui_pause_event);
-			}
+
+			SetEvent(ui_pause_event);
 		}
 	}
 
@@ -926,10 +925,9 @@ void winwindow_ui_pause_from_main_thread(int pause)
 		{
 			// but only do it if we were the ones who initiated it
 			if (!ui_temp_was_paused)
-			{
 				mame_pause(Machine, FALSE);
-				ResetEvent(ui_pause_event);
-			}
+
+			ResetEvent(ui_pause_event);
 		}
 	}
 

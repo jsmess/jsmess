@@ -87,7 +87,7 @@ static READ16_HANDLER( special_port2_r )
 {
 	int result = readinputport(2);
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
-	if (!(result & 0x0080) || atarigen_get_hblank()) result ^= 0x0001;
+	if (!(result & 0x0080) || atarigen_get_hblank(0)) result ^= 0x0001;
 	return result;
 }
 

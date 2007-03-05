@@ -852,7 +852,7 @@ static void scanline_callback( int num )
 	/* increment our scanline count */
 	this_ppu->scanline++;
 
-//logerror("starting scanline %d (MAME %d, beam %d)\n", this_ppu->scanline, cpu_getscanline(), cpu_gethorzbeampos());
+//logerror("starting scanline %d (MAME %d, beam %d)\n", this_ppu->scanline, cpu_getscanline(), video_screen_get_hpos(0));
 
 	/* Note: this is called at the _end_ of each scanline */
 	if (this_ppu->scanline == PPU_VBLANK_FIRST_SCANLINE)
@@ -1100,7 +1100,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 #ifdef MAME_DEBUG
 	if (this_ppu->scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
-		logerror("  PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, cpu_getscanline(), cpu_gethorzbeampos());
+		logerror("  PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, cpu_getscanline(), video_screen_get_hpos(0));
 #endif
 
 	switch( offset & 7 )

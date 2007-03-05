@@ -962,7 +962,7 @@ static const struct game_keys keys_table[] =
 
 
 
-DRIVER_INIT( cps2 )
+DRIVER_INIT( cps2crpt )
 {
 	const char *gamename = machine->gamedrv->name;
 	const struct game_keys *k = &keys_table[0];

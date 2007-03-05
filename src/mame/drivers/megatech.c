@@ -493,7 +493,11 @@ MACHINE_DRIVER_END
 /* 12368-xx  xx is the game number? if so there are a _lot_ of carts, mt_beast is 01, mt_sonic is 52! */
 
 ROM_START( megatech )
-	ROM_REGION( 0x8000, REGION_USER1, 0 )
+	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, REGION_USER1, ROMREGION_ERASEFF ) /* Game Instructions */
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Bios */
 	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) )
 ROM_END
 

@@ -33,6 +33,8 @@
 #define MAMERR_MISSING_FILES	2		/* missing files */
 #define MAMERR_FATALERROR		3		/* some other fatal error */
 #define MAMERR_DEVICE			4		/* device initialization error (MESS-specific) */
+#define MAMERR_NO_SUCH_GAME		5		/* game was specified but doesn't exist */
+#define MAMERR_INVALID_CONFIG	6		/* some sort of error in configuration */
 
 
 /* program phases */

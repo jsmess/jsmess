@@ -589,7 +589,23 @@ static struct Samplesinterface custom_interface =
 	meadows_sh_start
 };
 
+static const char *bowl3d_sample_names[] =
+{
+	"*bowl3d",
+	"roll.wav",     /* "roll" */
+	"rollback.wav", /* "roll back" */
+	"sweep.wav",    /* "sweep" */
+	"footstep.wav", /* "foot sweep" */
+	"crash.wav",    /* "crash" */
+	"cheering.wav", /* "cheering" */
+    0	/* end of array */
+};
 
+static struct Samplesinterface bowl3d_samples_interface =
+{
+ 	1,	/* one channel */
+	bowl3d_sample_names
+};
 
 /*************************************
  *
@@ -664,6 +680,16 @@ static MACHINE_DRIVER_START( minferno )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( bowl3d )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(meadows)
+
+ 	/* video hardware */
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(bowl3d_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 
 /*************************************
  *
@@ -707,6 +733,11 @@ ROM_START( bowl3d )
 	ROM_LOAD( "b3d.h12",      0x1400, 0x0400, CRC(80a149d6) SHA1(ab4ca76d9f5aa5e02b9d5bf909af9548fe62f475) )
 	// h13 empty
 
+    /* Universal Game Logic according to schematics  */
+    ROM_REGION( 0x08000, REGION_CPU2, 0 ) 	/* 2650 CPU at j8 */
+	ROM_LOAD( "82s115.a6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
+	ROM_LOAD( "82s115.c6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
+
 	ROM_REGION( 0x0400, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "b3d.e15",      0x0000, 0x0400, CRC(4414e24f) SHA1(835c989143895848df7154c2d82a499dea79c1c5) )
 
@@ -721,9 +752,8 @@ ROM_START( bowl3d )
 	ROM_REGION( 0x0400, REGION_GFX5, ROMREGION_DISPOSE )
 	/* empty */
 
-	ROM_REGION( 0x08000, REGION_CPU2, 0 ) 	/* 32K for code for the sound cpu */
-	// not included in the romset
-	ROM_LOAD( "de_snd",       0x0000, 0x0400, BAD_DUMP CRC(c10a1b1a) SHA1(779ea261d23360634081295a164cacbd819d8719) )
+	ROM_REGION( 0x0001, REGION_PROMS, 0 )
+	ROM_LOAD( "82s123.r8",    0x0000, 0x0001, NO_DUMP ) /* 82s123 prom located on Universal Game Logic */
 ROM_END
 
 
@@ -822,6 +852,6 @@ static DRIVER_INIT( minferno )
  *************************************/
 
 GAMEL( 1978, deadeye,  0, meadows,  meadows,  0,        ROT0,  "Meadows", "Dead Eye", 0, layout_deadeye )
-GAME(  1978, bowl3d,   0, meadows,  meadows,  0,        ROT90, "Meadows", "Bowling 3D", GAME_NOT_WORKING )
+GAME(  1978, bowl3d,   0, bowl3d,   meadows,  0,        ROT90, "Meadows", "Bowling 3D", GAME_NOT_WORKING )
 GAMEL( 1978, gypsyjug, 0, meadows,  meadows,  gypsyjug, ROT0,  "Meadows", "Gypsy Juggler", 0, layout_gypsyjug )
 GAME ( 1978, minferno, 0, minferno, minferno, minferno, ROT0,  "Meadows", "Inferno (S2650)", GAME_NO_SOUND )

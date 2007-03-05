@@ -1522,7 +1522,7 @@ UINT16 genesis_vdp_control_read ( genvdp *current_vdp )
 	if (current_vdp->sline>=224) retvalue |= 0x0008;
 	if (current_vdp->sline>=224) retvalue |= 0x0080;
 
-	if (cpu_gethorzbeampos() > 0xc0) retvalue |= 0x0004; // ??
+	if (video_screen_get_hpos(0) > 0xc0) retvalue |= 0x0004; // ??
 	if (!genesis_is_ntsc) retvalue |= 0x0001;
 
 
@@ -1546,7 +1546,7 @@ UINT16 genesis_vdp_hvcounter_read ( genvdp *current_vdp )
 
 
 //	logerror("Read from HV Counters\n");
-	return (((vcnt))&0xff)<<8|(cpu_gethorzbeampos()&0xff);
+	return (((vcnt))&0xff)<<8|(video_screen_get_hpos(0)&0xff);
 }
 
 UINT16 genesis_vdp_read ( genvdp *current_vdp, offs_t offset, UINT16 mem_mask )

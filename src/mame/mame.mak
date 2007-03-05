@@ -394,6 +394,7 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/6526cia.o \
 	$(MACHINE)/6821pia.o \
 	$(MACHINE)/6840ptm.o \
+	$(MACHINE)/6850acia.o \
 	$(MACHINE)/7474.o \
 	$(MACHINE)/74123.o \
 	$(MACHINE)/74148.o \
@@ -528,7 +529,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/skydiver.o $(AUDIO)/skydiver.o $(VIDEO)/skydiver.o \
 	$(DRIVERS)/skyraid.o $(VIDEO)/skyraid.o \
 	$(DRIVERS)/sprint2.o $(AUDIO)/sprint2.o $(VIDEO)/sprint2.o \
-	$(DRIVERS)/sprint4.o $(AUDIO)/sprint4.o $(VIDEO)/sprint4.o \
+	$(DRIVERS)/sprint4.o $(VIDEO)/sprint4.o \
 	$(DRIVERS)/sprint8.o $(VIDEO)/sprint8.o \
 	$(DRIVERS)/starshp1.o $(VIDEO)/starshp1.o \
 	$(DRIVERS)/starwars.o $(MACHINE)/starwars.o $(AUDIO)/starwars.o \
@@ -540,6 +541,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/tourtabl.o $(VIDEO)/tia.o \
 	$(DRIVERS)/triplhnt.o $(AUDIO)/triplhnt.o $(VIDEO)/triplhnt.o \
 	$(DRIVERS)/tunhunt.o $(VIDEO)/tunhunt.o \
+	$(DRIVERS)/ultratnk.o $(AUDIO)/ultratnk.o \
 	$(DRIVERS)/videopin.o $(AUDIO)/videopin.o $(VIDEO)/videopin.o \
 	$(DRIVERS)/vindictr.o $(VIDEO)/vindictr.o \
 	$(DRIVERS)/wolfpack.o $(VIDEO)/wolfpack.o \
@@ -561,6 +563,7 @@ $(MAMEOBJ)/atlus.a: \
 	$(DRIVERS)/powerins.o $(VIDEO)/powerins.o \
 
 $(MAMEOBJ)/bfm.a: \
+	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
 	$(DRIVERS)/mpu4.o \
 	$(MACHINE)/lamps.o \

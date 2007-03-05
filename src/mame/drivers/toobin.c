@@ -96,7 +96,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 static READ16_HANDLER( special_port1_r )
 {
 	int result = readinputport(1);
-	if (atarigen_get_hblank()) result ^= 0x8000;
+	if (atarigen_get_hblank(0)) result ^= 0x8000;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x2000;
 	return result;
 }

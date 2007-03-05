@@ -1429,6 +1429,22 @@ ROM_START( hng64 )
 	ROM_REGION( 0x0100000, REGION_USER2, 0 ) /* unknown / unused bios roms */
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
 	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+
+	ROM_REGION32_LE( 0x2000000, REGION_USER3, ROMREGION_ERASEFF ) /* Program Code, mapped at ??? maybe banked?  LE? */
+
+	/* Scroll Characters 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+
+	/* Sprite Characters - 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+
+	/* Textures - 1024x1024x8 pages */
+	ROM_REGION( 0x1000000, REGION_GFX3, ROMREGION_ERASEFF )
+
+	/* X,Y,Z Vertex ROMs */
+	ROM_REGION16_BE( 0x0c00000, REGION_GFX4, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, REGION_SOUND1, ROMREGION_ERASEFF ) /* Sound Samples? */
 ROM_END
 
 /* roads edge might need a different bios (driving board bios?) */
@@ -1716,7 +1732,7 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,  0,        hng64, hng64, 0,     ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|NOT_A_DRIVER )
+GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoGeo 64 Bios", GAME_NOT_WORKING|GAME_NO_SOUND|NOT_A_DRIVER )
 
 /* Games */
 GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)", GAME_NOT_WORKING|GAME_NO_SOUND ) /* 001 */

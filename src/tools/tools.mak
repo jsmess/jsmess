@@ -22,12 +22,18 @@ OBJDIRS += \
 # set of tool targets
 #-------------------------------------------------
 
+# file2str is a build tool, so it is built into the $(OBJ)
+# directory; all other tools are output tools and get built
+# into the root
+FILE2STR = $(OBJ)/file2str$(EXE)
+
 TOOLS += \
-	file2str$(EXE) \
+	$(FILE2STR) \
 	romcmp$(EXE) \
 	chdman$(EXE) \
 	jedutil$(EXE) \
 	makemeta$(EXE) \
+	regrep$(EXE) \
 
 
 
@@ -38,7 +44,7 @@ TOOLS += \
 FILE2STROBJS = \
 	$(TOOLSOBJ)/file2str.o \
 
-file2str$(EXE): $(FILE2STROBJS) $(LIBOCORE)
+$(FILE2STR): $(FILE2STROBJS) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
@@ -92,5 +98,18 @@ MAKEMETAOBJS = \
 	$(TOOLSOBJ)/makemeta.o \
 
 makemeta$(EXE): $(MAKEMETAOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+
+
+#-------------------------------------------------
+# regrep
+#-------------------------------------------------
+
+REGREPOBJS = \
+	$(TOOLSOBJ)/regrep.o \
+
+regrep$(EXE): $(REGREPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@

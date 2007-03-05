@@ -127,21 +127,14 @@ static READ8_HANDLER( sound_data_ready_r )
  *
  *************************************/
 
-static INTERRUPT_GEN( sound_interrupt )
-{
-	if (sound_int_state & 0x80)
-	{
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
-		sound_int_state = 0x00;
-	}
-}
-
-
 static WRITE8_HANDLER( sound_int_state_w )
 {
+	/* top bit controls BSMT2000 reset */
 	if (!(sound_int_state & 0x80) && (data & 0x80))
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		sndti_reset(SOUND_BSMT2000, 0);
 
+	/* also clears interrupts */
+	cpunum_set_input_line(1, 0, CLEAR_LINE);
 	sound_int_state = data;
 }
 
@@ -315,22 +308,9 @@ static struct tms34010_config tms_config =
 	NULL,							/* generate interrupt */
 	btoads_to_shiftreg,				/* write to shiftreg function */
 	btoads_from_shiftreg,			/* read from shiftreg function */
-	0,								/* display address changed */
-	0								/* display interrupt callback */
-};
-
-
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-static struct BSMT2000interface bsmt2000_interface =
-{
-	12,
-	REGION_SOUND1
+	NULL,							/* display address changed */
+	NULL,							/* display interrupt callback */
+	0								/* the screen operated on */
 };
 
 
@@ -350,7 +330,7 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt,TIME_IN_HZ(183))
+	MDRV_CPU_PERIODIC_INT(irq0_line_assert,TIME_IN_HZ(183))
 
 	MDRV_MACHINE_RESET(btoads)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -371,7 +351,7 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(BSMT2000, 24000000)
-	MDRV_SOUND_CONFIG(bsmt2000_interface)
+	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

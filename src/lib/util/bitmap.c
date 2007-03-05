@@ -247,6 +247,3 @@ int bitmap_format_to_bpp(bitmap_format format)
 	}
 	return 0;
 }
-
-
-

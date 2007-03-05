@@ -137,7 +137,6 @@ static UINT32 menu_input_groups(UINT32 state);
 static UINT32 menu_input(UINT32 state);
 static UINT32 menu_switches(UINT32 state);
 static UINT32 menu_analog(UINT32 state);
-static UINT32 menu_joystick_calibrate(UINT32 state);
 #ifndef MESS
 static UINT32 menu_bookkeeping(UINT32 state);
 #endif
@@ -604,8 +603,6 @@ do { \
 #endif
 	if (has_analog)
 		ADD_MENU(UI_analogcontrols, menu_analog, 0);
-  	if (osd_joystick_needs_calibration())
-		ADD_MENU(UI_calibrate, menu_joystick_calibrate, 0);
 
 #ifndef MESS
   	/* add bookkeeping menu */
@@ -971,50 +968,6 @@ static UINT32 menu_analog(UINT32 state)
 			case ANALOG_ITEM_REVERSE:		selected_in->analog.reverse += delta;		break;
 			case ANALOG_ITEM_SENSITIVITY:	selected_in->analog.sensitivity += delta;	break;
 		}
-
-	return state;
-}
-
-
-/*-------------------------------------------------
-    menu_joystick_calibrate - display a menu for
-    calibrating analog joysticks
--------------------------------------------------*/
-
-static UINT32 menu_joystick_calibrate(UINT32 state)
-{
-	const char *msg;
-
-	/* two states */
-	switch (state)
-	{
-		/* state 0 is just starting */
-		case 0:
-			osd_joystick_start_calibration();
-			state++;
-			break;
-
-		/* state 1 is where we spend our time */
-		case 1:
-
-			/* get the message; if none, we're done */
-			msg = osd_joystick_calibrate_next();
-			if (msg == NULL)
-			{
-				osd_joystick_end_calibration();
-				return ui_menu_stack_pop();
-			}
-
-			/* display the message */
-			ui_draw_message_window(msg);
-
-			/* handle cancel and select */
-			if (input_ui_pressed(IPT_UI_CANCEL))
-				return ui_menu_stack_pop();
-			if (input_ui_pressed(IPT_UI_SELECT))
-				osd_joystick_calibrate();
-			break;
-	}
 
 	return state;
 }

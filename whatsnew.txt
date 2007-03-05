@@ -1,0 +1,763 @@
+0.113
+-----
+
+
+MAMETesters Bugs Fixed
+----------------------
+fastlane0112u4gra [Canim]
+diamond0112u4gra [Canim]
+calorie0112u4gra [Canim]
+qcrayon237b9gra [stephh]
+leftover0112u4ora [Aaron Giles]
+asserts0112u4ora [Aaron Giles, Derrick Renaud]
+nes0112u4red [Aaron Giles]
+
+
+
+Source Changes
+--------------
+Removed unnecessary idle skipping code from the m92 and deco32 
+drivers. This allows removal of a couple of now-unused functions
+from cpuexec. [Zsolt Vasvari]
+
+Minor cleanup of Berzerk driver. [Lord Nightmare]
+
+Removed cpu_gethorzbeampos() and replaced it with calls to 
+video_screen_get_hpos(). Also changed TMS34010 configuration to take 
+a screen number, and changed atarigen_get_hblank() to take a screen
+number as well. [Zsolt Vasvari]
+
+Fixed the model2.c ROM definitions for some games that weren't even 
+loading and made the infamous unknown z-sort mode not a fatal error.
+[R. Belmont]
+
+Fixed a number of BIOS-only drivers to not crash when run.
+[R. Belmont, Aaron Giles]
+
+Fixed bug where the window thread would stop processing events when 
+mame was paused. [BUT]
+
+Changed the 'Tournament' Street Fighter games to not have a network
+adapter present by default. [David Haywood]
+
+Fixed incorrect Eolith speedup patch from u3. [David Haywood]
+
+Fixed regressions in 3 of the discrete games from 0.112u4.
+[Derrick Renaud]
+
+Fixed all analog controls for the newly enabled validity checks 
+including the following: [Derrick Renaud]
+
+ * demndrgn - changed to proper IPT_AD_STICK controls.
+ * konamigt, hcrash, rf2 - set to proper PADDLE control and fixed mask.
+ * overdriv - changed to proper PADDLE control.
+ * sspeedr - changed to IPT_POSITIONAL with PORT_REMAP_TABLE controls 
+    for gas and steering fixing both.
+ * midvunit.c - changed games so the brake pedal shows on player1
+ * simpbowl - fixed port mask, now trackball works proper without 
+    glitching
+ * ssrj - fixed gas pedal
+ * namcos2 - fixed inputs on all games (may need to delete nv files)
+
+Added diplocations to the driver segas16a, segas16b, segas18, megaplay,
+news, ninjadks2 and nemesis drivers. In segas16b, added in SDI 
+allow_continue. In megaplay (Mazin Wars) updated the name of dip with 
+the real name from game setting. [Ruben]
+
+Actually included the RF5C400 changes mentioned for u4.
+[hoot development team]
+
+Split the sprint4 and ultratnk drivers again. Brought the Sprint 4
+driver up to date. [Stefan Jokisch]
+
+Added save state support to Combatribes and Jail Break. [Kevin Eshbach]
+
+Added preliminary sound to Destroyer and Altair. White noise is 
+missing, and Draco is still silent. [Curt Coder]
+
+Added tools to generate regression tests and mamedev.org-compatible
+reports. The report generator is cross-platform, but the test running
+code is Windows-only at the moment. [Aaron Giles]
+
+Fixed regression in Nintendo games that did not specify a clock for
+the NES APU. [Aaron Giles]
+
+Rewrote the BSMT2000 to be more accurate. Various modes are now
+software selected at startup based on the register value at reset
+time. Changed all existing drivers so they properly hooked up the
+reset line on the chip in order to make this control work. Also added 
+correct BSMT2000 ADPCM output. [Aaron Giles]
+
+Defined several new exit codes for "unknown game" and "invalid config"
+and changed the Windows OSD layer to output them. [Aaron Giles]
+
+Removed obsolete joystick calibration junk from the osdepend layer.
+If anyone needs this functionality, I will look into providing a way
+for the OSD code to add menus in the UI. [Aaron Giles]
+
+Changed file2str to be built into the obj directory. [Aaron Giles]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+beatmania 3rd MIX [Yasuhiro Ogawa]
+A Question of Sport [Philip Bennett]
+
+
+
+New clones added
+----------------
+Jail Break (Bootleg) [Kevin Eshbach]
+The Combatribes (US) - Set 1? [Kevin Eshbach]
+Plotting (World set 3, Earliest) [Stefan Lindberg]
+Flipull (Japan) [Stefan Lindberg]
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+DrumMania [smf]
+Percussion Freaks 3rd Mix [smf]
+Guitar Freaks 4th Mix [smf]
+Guitar Freaks 5th Mix [smf]
+Snooker 10 [Roberto Fresca]
+ParaParaDancing [Ian Patterson]
+Keyboardmania [Ian Patterson]
+Keyboardmania 2nd Mix [Ian Patterson]
+Pop n' Music 7 [Ian Patterson]
+
+
+
+0.112u4
+-------
+
+
+MAMETesters Bugs Fixed
+----------------------
+speakres0112yel [Zsolt Vasvari]
+minigolf0112u2gra [Derrick Renaud]
+empcity36finalyel [Aaron Giles]
+rdtsc0101u5yel [Aaron Giles]
+
+
+
+Source Changes
+--------------
+Discrete sound for Checkmate: [Derrick Renaud]
+ * new DISCRETE_ADJUSTMENT_TAG module that uses tags instead of port 
+   numbers. Updated all games to use it, because it is now the 
+   preferred method.
+ * added PORT_CROSSHAIRs to triplhnt.
+
+Minor Konami 573 system update: [smf]
+ * marks two games as working which were incorrectly tagged
+ * adds the correct hashes for 845jab02
+ * added NO_DUMP's for all the flash roms
+
+Fixed a number of issues related to the new streaming engine and
+sound code: [Aaron Giles]
+ * fixed crash when restoring from a save state
+ * fixed crash when running with -nosound
+ * fixed loud looping when halted in the debugger
+ * fixed crash when changing sample rates (YM2203 mainly)
+ * fixed crash in k054539 sound core
+
+Added SN76477 noise RNG polynomial. [Zsolt Vasvari, Derrick Renaud, 
+Jarek Burczynski]
+
+Midway 8080 driver updates: [Zsolt Vasvari]
+ * fixed bug where mw8080bw games would freeze after state load.
+ * corrected DIP SW order in M-4
+ * converted Dog Patch to PORT_POSITIONAL
+
+RF5C400 sound core improvements: [hoot development team]
+ * implemented volume envelopes
+ * ccorrected the channel volume calculation
+ * documented registers for reverb, chorus, and per-channel digital 
+    filter (actual effects are not implemented yet)
+
+Fixeed most Dip Switches and Inputs in the galspnbl driver.
+[stephh, Justin Szczap]
+
+Updated a number of drivers to use the new PORT_DIPUNUSED macros.
+[stephh]
+
+Improvements to the memory pool routines: [Nathan Woods]
+ - added a pool_clear() call, to clear out a memory pool without 
+    freeing the pool itself
+ - added support for pool_realloc() with a size of zero, which 
+    effectively frees a pointer within a pool
+ - added testing code to validate pool behavior
+
+Added support for more flexible word wrapping with CJK characters.
+Also added wrapping on hyphens. [MAME Plus! team, Aaron Giles]
+
+Added T5182 support, which gives sound to darkmist, mustache and 
+panicr. Also changed the YM2151 to prevent timer problems, and added
+the missing flip X in Mustache Boy. [Nicola Salmora, Lord Nightmare,
+Ernesto Corvi]
+
+More input fixes and improvements: [Derrick Renaud]
+ * fixed some obscure masking, shifting, overflow, and signed 
+    problems in the input system. Most noticeably this fixes the 
+    analog controls in sfootbal and stops the pedal in redlin2p from 
+    rotating through gas/no gas as the pedal is pressed.
+ * analog ports no longer save and load their default value from the 
+    config file. It should only ever use the value specified in the 
+    driver, and storing it can cause problems the more the game is 
+    restarted and the value starts to change.
+ * added a bunch of validity tests to the analog ports. Some are 
+    commented out until the problems they uncovered are fixed.
+ * analog ports now defalt to a PORT_MINMAX of (0,mask). This means 
+    you no longer have to specify PORT_MINMAX if you are not using 
+    any limits. Removed a bunch of no longer needed PORT_MINMAX 
+    entries.
+
+Bitmaps are now cleared to 0 by default. This fixes a number of random
+crashes in games. [Aaron Giles]
+
+Modified the raster position calculations to round to the nearest
+pixel which produces more consistent results. [Aaron Giles]
+
+Changed most sound cores to generate audio at their internal clock
+rates (or some multiple/divisor of them) rather than at the user
+specified output rate. This completes the second step of decoupling
+audio emulation from the user's sample rate choice. [Aaron Giles]
+
+Removed a big pile of goofiness from the DMA-driven DAC driver now
+that it is no longer necessary. [Aaron Giles]
+
+Removed custom sound code from cchasm and replaced it with a simple
+DAC implementation. [Aaron Giles]
+
+Cleaned up attckufo driver, making it perform like a 1MHz 6502 game
+once again. [Aaron Giles]
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+Tokimeki Memorial Oshiete Your Heart [R. Belmont]
+Tokimeki Memorial Oshiete Your Heart Seal version PLUS [R. Belmont]
+
+
+
+0.112u3
+-------
+
+
+MAMETesters Bugs Fixed
+----------------------
+ghouls097u4yel [MAME Italia Forum]
+hotchase0111u2gra [Brian Troha]
+bigtwin0111u4gra [Brian Troha]
+
+
+
+Source Changes
+--------------
+Modified ledutil to save the LED state when returning from pause.
+[Bob Seidel]
+
+Fixed the crashing in debug builds and added controls for Ski Champ.
+[Ville Linde]
+
+Updated makefile to remove the map file when making clean. [Dirk Best]
+
+Significant changes to the input system: [Derrick Renaud]
+ * Added the -vol shortcut to -volume to match the docs.
+ * Added new joystick options -joy_deadzone & -joy_saturation. 
+    Removed -a2d_deadzone. These now apply to the analog and 
+    digital-from-analog data. See windows.txt for more info.
+ * Analog joystick data is divided into chunks for IPT_POSITIONAL 
+    controls. e.g., for a 7 position emulated control, a joystick 
+    axis will move 3 positions each way from center + center = 
+    7 positions. One good use for this is 49way sticks. The driver 
+    input code just needs to be set to IPT_POSITIONAL 
+    PORT_POSITIONS(7) and use a PORT_REMAP_TABLE.
+ * IPT_PEDAL controls are now nothing special in the core. They can 
+    use any control like a paddle does. At the OS input level, the 
+    code has been changed to supply full joystick axis and the +/- 
+    axis. This means any half axis or full axis can be used for any 
+    emulated control. e.g., a pedal that only outputs Y- data can be 
+    used for the full range of the gun in boothill. Or a full axis 
+    slider on a joystick can be used in its full range as an emulated 
+    pedal. INC now increases the pedal value, not DEC.
+ * When seting up the player controls in the menu, the first time an 
+    analog joystick axis is selected it will use the full range. If 
+    you immediately select the same joystick axis it will toggle to 
+    the half +/- axis.
+ * Analog joysticks can now simulate relative devices such as a 
+    trackball. The further you move the joystick, the faster the 
+    trackball spins. Use the sensitivity setting to adjust.
+ * Added support for mouse +/- axis to be used as button input.
+ * Modified IPT_PADDLE and IPT_AD_STICK so they do not behave as 
+    pedals using half the joystick range if their default value is 
+    equal to one of the PORT_MINMAX values. Now you can select it as 
+    the full or +/- part axis.
+
+Updates to the acefruit driver: [stephh]
+ * added 'sidewndr' and 'spellbnd' (was 'sidewnda') which were missing 
+    in previous releases
+ * reorganised the layout to have all lamps and solenoids at the top 
+    (where there's nothing)
+ * also renamed some lamps and solenoids
+ * added 'starspnr' ... unfortunately, the game is not working due 
+    to a bad dump (H11)
+
+Updated the DISCRETE_OP_AMP_OSCILLATOR circuit to get it ready for a 
+future driver. It allows the DISC_OP_AMP_OSCILLATOR_1 | 
+DISC_OP_AMP_IS_NORTON oscillator to use nodes to adjust the 
+resistance values instead of only being static values.
+[Derrick Renaud]
+
+Fixed thrust control in Lunar Lander. [Derrick Renaud]
+
+Created new utility module pool.c for managing memory pools. Rebuilt
+auto_malloc on top of this concept. [Nathan Woods]
+
+Added speedups to many of the Eolith games. [David Haywood]
+
+Added sprite rotation to the realbrk driver. This fixes the jigging
+reels in the pachinko games and the cue position and orientation in
+the pool games.
+
+Added discrete sound for Amazing Maze. Also added new Discrete 
+modules: DISCRETE_LOOKUP_TABLE & DISCRETE_LOGIC_JKFLIPFLOP.
+[Derrick Renaud]
+
+Fixed the small graphic issues in the Cidelsa driver. Draco still has 
+imperfect colors. [Curt Coder]
+
+Fixed naming and identification of several Neo Geo ROMs. [JohnBoy]
+
+Fixed regression in the GeeBee driver. [David Haywood]
+
+Major update to the Konami System 573 driver: [smf]
+ * added state saving to emu\sound\cdda.c & mame\drivers\ksys573.c
+ * added DS2401 emulation
+ * added X76F100 emulation
+ * added ZS01 emulation (HLE of System 573 PIC)
+ * added write support to X76F041 emulation
+ * many new games partially supported
+
+Connected brightness support on the CPS1 board (not just CPS2) after
+verifying that the real board does support it. [MAME Italia forum]
+
+Improved the K001604 tilemap chip emulation. [Ville Linde]
+
+Fixed garbage in fonts on some systems. [Aaron Giles]
+
+Added new tool makemeta.exe, which can generate properly formatted
+metadata for laserdisc CHDs using either a specially captured AVI as
+input (preferred) or a hand-crafted set of encoded Philips codes.
+[Aaron Giles]
+
+Rewrote throttling code to be more forgiving of OSD-level glitches
+and uneven frame rates. [Aaron Giles]
+
+Changed sound streaming engine to be emulated time based instead of
+sample based. This means that emulation behavior is independent of
+the user-specified sample rate (except that some sound cores still
+use this value; to fixed in a future update). Also separated sound
+generation from video frame rate. Sound is now pushed to the OSD
+layer at a fixed rate of 50 updates per emulated second. This entailed
+a change in the way sound is handed to the OSD layer. Instead of the 
+OSD layer requesting arbitrary numbers of samples each frame, the
+core now pushes the appropriate number of samples based on the
+emulated time. [Aaron Giles]
+
+Simplified the OSD interface for sound. Removed osd_start_audio_stream
+and osd_stop_audio_stream; OSD initialization code is now responsible
+for initialization. Removed osd_get_mastervolume and osd_sound_enable,
+keeping management of the main volume in emu/sound.c. [Aaron Giles]
+
+Changed K054539 to run at native sample rate. [Aaron Giles]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+Crazy War [Pierpaolo Prazzoli]
+
+
+
+New clones added
+----------------
+Super Puzzle Fighter II Turbo (Asia 960529) [Nicola Salmoria]
+Meikyuu Hunter G (Japan, set 2) [David Haywood]
+Chinese Heroe (Taito) [David Haywood]
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+Dance Dance Revolution (GC845 VER. JAB) [smf]
+Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA) [smf]
+Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA) [smf]
+Dance Dance Revolution Solo 2000 (GC905 VER. AAA) [smf]
+Dance Dance Revolution 3rd Mix [smf]
+Dance Freaks (G*874 VER. KAA) [smf]
+DrumMania 2nd Mix (GE912 VER. JAA) [smf]
+Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA) [smf]
+Dance Dance Revolution 4th Mix (G*A33 VER. AAA) [smf]
+Dance Dance Revolution Solo 4th Mix (G*A33 VER. ABA) [smf]
+Dance Dance Revolution USA (G*A44 VER. UAA) [smf]
+Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA) [smf]
+Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA) [smf]
+Dance Maniax 2nd Mix (G*A39 VER. JAA) [smf]
+Dance Dance Revolution 5th Mix (G*A27 VER. JAA) [smf]
+Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA ) [smf]
+Salary Man Champ (G*A18 VER. JAA) [smf]
+DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) [smf]
+DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) [smf]
+
+
+
+0.112u2
+-------
+
+
+MAMETesters Bugs Fixed
+----------------------
+analog0112u1gra [Derrick Renaud]
+UItext0112u1yel [Aaron Giles]
+layout0112u1gre [Aaron Giles]
+pinbo0112u1gre [Aaron Giles]
+
+
+
+Source Changes
+--------------
+Improved the cidelsa driver: [Curt Coder]
+ - rewrote the cdp1802 cpu emulation as a state machine
+ - fixed Draco dips and inputs (what a strange game!)
+ - added NVRAM to Destroyer/Draco (Altair has no battery on the PCB)
+ - fixed some clocks
+
+Fixed mapping of spaceship controls in spcenctr. [Canim]
+
+Removed the inclusion of unnecessary header files across the project.
+[Atari Ace]
+
+Added discrete filters to the new Namco 54xx sound effects. Also
+implemented filters for the 52xx sound effects in preparation for
+future changes. [Derrick Renaud]
+
+Added pause support to the output system: [Bob Seidel]
+ - added "pause" message through the Output system to let clients 
+    know when MAME is paused
+ - the state of an item is now sent when the item is first created
+ - updated ledutil to use the pause state
+
+Added cocktail mode and DIP locations to the Millipede driver.
+[Mike Haaland]
+
+Many more CPS2 keys added. Removed all XORs and support for them from
+MAME. [Nicola Salmoria, Andreas Naive]
+
+Fixed regression in the ar_xeon driver sprites. [Ernesto Corvi]
+
+Kaneko driver improvements:
+ - bloodwar: [Gary Walkling, Sebastien Volpe]
+    * protection data extracted, still needs to be verified
+    * collision detection simulation thanks to tests on real board
+ - bonkadv: [Guru, Sebastien Volpe]
+    * protection data fully verified: corrects tilemap colors in levels 2 and 3
+    * correct implementation of MCU command 43
+
+Fixed behavior of MOVEC instruction on later 680x0 chips, and in the
+disassembler. [Ernesto Corvi]
+
+Properly idenitified sound ROMs for Altered Beast set 2. [Brian Troha]
+
+Fixed bad bits in a couple of FD1094 keys. [Aaron Giles]
+
+Fixed bug in debugger that caused incorrect end offsets to be 
+computed on CPUs with an address shift. [Ville Linde]
+
+Moved some additional pieces of core functionality in the the core
+utility library. [Nathan Woods]
+
+Added sound to porky. [Tomasz Slanina]
+
+Changed font scaling again. Fonts 24 pixels tall and above are scaled
+the old way. Fonts smaller than that are scaled via integral scale
+factors and adjusted the new way. [Aaron Giles]
+
+Added a small optimization to the FD1094 decoding step. [Aaron Giles]
+
+Added several new modules to the utility library libutil. First is a
+generic huffman encoding module. Second is a module that allows you to
+read/write AVI files in a platform-independent way. And third is a
+lossless A/V compression module. These three pieces together, plus
+some changes in the CHD code, allow for the creation of CHDs with
+compressed audio and video. [Aaron Giles]
+
+Added two new commands to chdman: -createav converts an AVI file in
+uncompressed YUY format or HuffYUV-compressed YUY format with "left"
+prediction into a CHD. And -extractav converts a CHD containing
+compressed audio & video into an uncompressed YUY format AVI file.
+[Aaron Giles]
+
+Finished hooking up laserdisc support to the new audio/video 
+compression. Note that we still do not have canonical CHDs of
+laserdisc data at the moment, but all the support is now present for
+when they start to appear. [Aaron Giles]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+Altair [Curt Coder]
+Draco [Curt Coder]
+Wyvern Wings [Pierpaolo Prazzoli]
+Choko [Guru]
+Asura Buster - Eternal Warriors (Japan) [David Haywood, Guru]
+Blood Warrior [Sebastien Volpe]
+Deal 'Em (MPU4 Conversion Kit) [James Wallace]
+Jyangokushi: Haoh no Saihai (Japan) [Guru]
+Dynamite Bomber (Korea) (Rev 1.5) [Guru, Pierpaolo Prazzoli]
+Search Eye 2 Plus V2.0 [Guru, David Haywood]
+
+
+
+New clones added
+----------------
+Dungeons & Dragons: Tower of Doom (Asia 940113) [Nicola Salmoria]
+X-Men: Children of the Atom (Hispanic 950331) [Nicola Salmoria]
+Armored Warriors (Asia 940920) [Nicola Salmoria]
+Street Fighter Zero (4 sets) [Nicola Salmoria]
+Dungeons & Dragons: Shadow over Mystara (Brazil 960223) [Nicola]
+Mega Man 2: The Power Fighters (Asia 960708) [Nicola Salmoria]
+Street Fighter Zero 2 (6 sets) [Nicola Salmoria]
+X-Men Vs. Street Fighter (7 sets) [Nicola Salmoria]
+Battle Circuit (Asia 970319) [Nicola Salmoria]
+Marvel Super Heroes Vs. Street Fighter (2 sets) [Nicola Salmoria]
+Super Gem Fighter: Mini Mix (Hispanic 970904) [Nicola Salmoria]
+Hyper Street Fighter 2 (Japan 031222) [Nicola Salmoria]
+Giga Wing (Asia 990222) [Nicola Salmoria]
+1944: The Loop Master (Japan 000620) [Nicola Salmoria]
+Progear (Asia 010117) [Nicola Salmoria]
+X-Men (4 Players ver JBA) [Brian Troha]
+Garou - Mark of the Wolves (bootleg) [David Haywood, JohnBoy]
+Puzzle Bang Bang (version 2.8 / 990106) [Guru]
+Space Battle Ship Gomorrah [Guru]
+
+
+
+New games marked as GAME_NOT_WORKING
+------------------------------------
+Candy Puzzle [David Haywood]
+Harem Challenge [David Haywood]
+Laser Quiz [David Haywood]
+Laser Quiz '2' Italy [David Haywood]
+Magic Premium [David Haywood]
+Laser Stixx [David Haywood]
+Koi Koi [David Haywood]
+Ski Champ [R. Belmont]
+
+
+
+0.112u1
+-------
+
+IMPORTANT: This release brings with it a major source code 
+reorganization. Because of this, there is no diff update, since the
+diff would be enormous.
+
+The new layout at a high level looks like this:
+
+makefile
+docs/
+src/
+  emu/        (generic emulation files from the old src/ directory)
+    cpu/      (CPU cores from src/cpu)
+    sound/    (sound cores from src/sound)
+    debug/    (debugger code from src/debug)
+    audio/    (generic audio files from src/sndhrdw)
+    layout/   (generic layout files from src/layout)
+    machine/  (generic machine files from src/machine)
+    video/    (generic video files from src/vidhrdw)
+
+  mame/       (MAME-specific drivers)
+    drivers/  (drivers from src/drivers)
+    includes/ (includes from src/includes)
+    layout/   (majority of files from src/layout)
+    machine/  (majority of files from src/machine)
+    audio/    (majority of files from src/sndhrdw)
+    video/    (majority of files from src/vidhrdw)
+    etc/      (misc files from src/etc)
+
+  lib/        (libraries)
+    util/     (various files with light dependencies from src)
+    zlib/     (zlib library)
+    expat/    (expat library)
+
+  osd/        (OS-dependent code)
+    osdmini/  (mini OS-dependent code)
+    windows/  (Windows OS-dependent code)
+
+  tools/      (misc tools)
+
+Along with these changes come a number of makefile alterations to
+better distribute the build knowledge within each major subdirectory.
+There may be some build issues or other interesting side effects to
+this change. Report them on MAMETesters and future updates will
+include fixes.
+
+
+
+MAMETesters Bugs Fixed
+----------------------
+m4_0111u4gra [Mike Ellery]
+mouser0112yel [Mamesick]
+bnj0111u5ora [Canim]
+
+
+
+Source Changes
+--------------
+Improvements to the Cidelsa driver: [Curt Coder]
+ - Fixed the disassembly of cdp1802 opcode LSKP
+ - Changed the cdp1802 opcode OUT to increment R(X) after calling the 
+    write handler
+ - Set cdp1869 display size and visible area according to data sheet
+ - Added cdp1869 CFC emulation (probably never used by anything but 
+   just for completeness' sake)
+ - Cleaned up driver
+
+Improvements to the M2 driver: [Ville Linde]
+ - Added preliminary CD controller emulation
+ - Hooked up some more multi-processor functionality and interrupts
+
+Improvements to C352 sound emulator: [cync, hoot development team]
+ - Rewrote loop and flag handling, added support for global key-on 
+    register
+ - Fixed state saving
+
+Worked around compilation error on MSVC that caused "Calendar error"
+in the Neo Geo games. [Atari Ace]
+
+Rewrote much of the RF5C400 sound emulator to support looping, stereo
+panning, and 8-bit sample support.
+[hoot development team, Ville Linde]
+
+Removed patch from mjleague now that it is not needed. 
+[Arenzo Fabrice]
+
+Fixed bubbletr crosshairs. [Canim]
+
+Cleaned up information in mamedriv.c. [Brian Troha]
+
+Added save state support for all games in gng.c, gunsmoke.c, lasso.c, 
+solomon.c and terracre.c. [Vas Crabb]
+
+Replaced implementation of Namco 54xx sound chip with new MB8844 CPU
+core running the original embedded ROM code. Removed old sound core.
+Pole Position and Bosconian no longer require samples as a result.
+[Nicola Salmora, Ernesto Corvi, Guru]
+
+Added new function driver_get_count() to return the number of drivers.
+[Nathan Woods]
+
+Added a bunch of new protection routines for SD Gundam & Heated 
+Barrel. [Angelo Salese]
+
+Input system changes: [Derrick Renaud]
+ - Added new IPT_POSITIONAL control type. This is for Ikari type 
+    rotary controls and gray-code devices like Seawolf. This makes 
+    rotary and gray-code controls easy to enter without custom 
+    handlers.
+ - Fixed some rounding and min/max errors in the core input code.
+ - Modified crosshair code to be based on real scaling, see Seawolf 
+    for an example. It can now also have multiple crosshairs on one 
+    input port if needed.
+ - Added back in the namcos2 crosshairs. Turns out they are needed 
+    for calibration.
+ - Removed the gwar control hack from the Ikari games that did not 
+    need it. Modified the gwar control hack so it is only used for 1 
+    frame, making it unnoticeable.
+ - Updated boothill, gunfight, seawolf, spcenctr to use the new 
+    PORT_REMAP_TABLE.
+
+Fixed the exidy/stern-sb1000 6840-based sound hardware to use what 
+is believed (based on the schematic) to be the proper LFSR/PRNG 
+waveform for its secondary clock source. [Lord Nightmare]
+
+Updated Dragon Bowl to use HOLD_LINE for sound IRQs. Also did the same
+for the following drivers: afega, ettrivia, funybubl, jack, mustache,
+seta, trvmadns, wink. [Pierpaolo Prazzoli]
+
+Changed 6809/6309 CPU cores to call the MAME debugger when CWAI/SYNC
+is used. [Nathan Woods]
+
+Fixed uninitialized use of video_dma_address to address the rfjet
+crash in 64-bit builds. [Ville Linde]
+
+Added support for the Motorola MPC8240 to the PowerPC core.
+[Ville Linde]
+
+Improved ZIP file searching to look first for name + CRC match, second
+for CRC-only match, and lastly for name-only match. [Ben Rudiak-Gould]
+
+Verified and improved stepper behavior based on comparison with a
+real machine. [James Wallace]
+
+Changed file2str to work for any binary file and output the data as
+an array of bytes rather than a string. [Aaron Giles]
+
+Made UI font size computations more flexible. This ensures that fonts
+are scaled vertically by an integral factor and should produce nice
+proportions for most fonts now. [Aaron Giles]
+
+Added new function sound_find_sndnum_by_tag() to look up a sound
+index by its tag. [Aaron Giles]
+
+Made osd_uchar_from_osdchar a member of the osdcore file library.
+[Aaron Giles]
+
+Created new generic bitmap management code with fewer dependencies on
+the rest of MAME so that it can be used by utility code. Changed 
+bitmap_alloc to always take a format parameter. Deprecated
+bitmap_alloc_format. Updated all drivers to pass an explicit format
+when allocating a bitmap. Changed auto_bitmap_alloc in the same
+fashion. [Aaron Giles]
+
+Split some functionality from fileio.c into new module corefile.c,
+which can be used by utilities to get unicode support and fopen-style
+file I/O built on top of the OSD routines. Rebuilt fileio.c on top of
+the core file code. Added mame_core_file() to get the underlying
+core_file object from a mame_file so it can be used with png and
+xmlfile code. [Aaron Giles]
+
+Changed the way the tiny build works. There is now the concept of a
+SUBTARGET. By default SUBTARGET is set equal to TARGET (which is mame)
+and everything builds as normal. The makefile that is included is now
+src/$(TARGET)/$(SUBTARGET).mak. Thus, to do a tiny build, you now
+have to specify "make SUBTARGET=tiny". This will produce an output 
+executable with a name $(TARGET)$(SUBTARGET) (mametiny in this case).
+[Aaron Giles]
+
+Turned ENABLE_BORDER_PIX back on, since so many people seem to be
+having trouble without it. [Aaron Giles]
+
+
+
+New games added or promoted from NOT_WORKING status
+---------------------------------------------------
+Cash Quiz [Pierpaolo Prazzoli]
+Sidewinder [smf]
+
+
+
+New clones added
+----------------
+Power Spikes (China) [Pierpaolo Prazzoli]
+Rastan Saga (Japan Rev 1) [Gerald Coy]
+Eco Fighters (USA 931203) [Nicola Salmoria]
+Ultimate Ecology (Japan 931203) [Nicola Salmoria]
+Eco Fighters (Asia 931203) [Nicola Salmoria]
+Night Warriors: Darkstalkers' Revenge (Hispanic 950403) [Nicola]
+Night Warriors: Darkstalkers' Revenge (Brazil 950403) [Nicola]

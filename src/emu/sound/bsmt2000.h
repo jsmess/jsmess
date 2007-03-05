@@ -1,6 +1,6 @@
 /**********************************************************************************************
  *
- *   Data East BSMT2000 driver
+ *   BSMT2000 driver
  *   by Aaron Giles
  *
  **********************************************************************************************/
@@ -10,10 +10,14 @@
 
 struct BSMT2000interface
 {
-	int voices;						/* number of voices (11 or 12) */
 	int region;						/* memory region where the sample ROM lives */
 };
 
 WRITE16_HANDLER( BSMT2000_data_0_w );
+
+extern const struct BSMT2000interface bsmt2000_interface_region_1;
+extern const struct BSMT2000interface bsmt2000_interface_region_2;
+extern const struct BSMT2000interface bsmt2000_interface_region_3;
+extern const struct BSMT2000interface bsmt2000_interface_region_4;
 
 #endif

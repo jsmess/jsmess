@@ -99,7 +99,6 @@ struct _cpuexec_data
 	INT32	vblankint_countdown;	/* number of vblank callbacks left until we interrupt */
 	INT32 	vblankint_multiplier;	/* number of vblank callbacks per interrupt */
 	void *	vblankint_timer;		/* reference to elapsed time counter */
-	mame_time vblankint_period;		/* timing period of the VBLANK interrupt */
 
 	void *	timedint_timer;			/* reference to this CPU's timer */
 	mame_time timedint_period; 		/* timing period of the timed interrupt */
@@ -798,21 +797,6 @@ int cycles_currently_ran(void)
 
 /*************************************
  *
- *  Return cycles remaining in this
- *  iteration
- *
- *************************************/
-
-int cycles_left_to_run(void)
-{
-	VERIFY_EXECUTINGCPU(cycles_left_to_run);
-	return activecpu_get_icount();
-}
-
-
-
-/*************************************
- *
  *  Return total number of CPU cycles
  *  for the active CPU or for a given CPU.
  *
@@ -867,25 +851,6 @@ UINT64 cpunum_gettotalcycles64(int cpunum)
 		return cpu[cpunum].totalcycles + cycles_currently_ran();
 	else
 		return cpu[cpunum].totalcycles;
-}
-
-
-
-/*************************************
- *
- *  Return cycles until next interrupt
- *  handler call
- *
- *************************************/
-
-int activecpu_geticount(void)
-{
-	int result;
-
-/* remove me - only used by mamedbg, m92 */
-	VERIFY_EXECUTINGCPU(cpu_geticount);
-	result = MAME_TIME_TO_CYCLES(activecpu, sub_mame_times(cpu[activecpu].vblankint_period, mame_timer_timeelapsed(cpu[activecpu].vblankint_timer)));
-	return (result < 0) ? 0 : result;
 }
 
 
@@ -1050,24 +1015,6 @@ mame_time cpu_getscanlineperiod_mt(void)
 double cpu_getscanlineperiod(void)
 {
 	return mame_time_to_double(scanline_period);
-}
-
-
-
-/*************************************
- *
- *  Returns a crude approximation
- *  of the horizontal position of the
- *  bream
- *
- *************************************/
-
-int cpu_gethorzbeampos(void)
-{
-	mame_time elapsed_time = mame_timer_timeelapsed(refresh_timer);
-	int scanline = elapsed_time.subseconds / scanline_period.subseconds;
-	mame_time time_since_scanline = sub_subseconds_from_mame_time(elapsed_time, scanline * scanline_period.subseconds);
-	return time_since_scanline.subseconds * Machine->screen[0].width / scanline_period.subseconds;
 }
 
 
@@ -1631,7 +1578,6 @@ static void cpu_inittimers(void)
 		/* compute the average number of cycles per interrupt */
 		if (ipf <= 0)
 			ipf = 1;
-		cpu[cpunum].vblankint_period = double_to_mame_time(1.0 / (Machine->screen[0].refresh * ipf));
 		cpu[cpunum].vblankint_timer = mame_timer_alloc(NULL);
 
 		/* see if we need to allocate a CPU timer */

@@ -40,6 +40,8 @@
 
 static UINT8 irq_state[5];
 static UINT8 soundlatch_full;
+static UINT8 sound_control;
+static UINT8 sound_msb_latch;
 
 
 
@@ -104,6 +106,8 @@ static MACHINE_START( dcheese )
 
 	state_save_register_global_array(irq_state);
 	state_save_register_global(soundlatch_full);
+	state_save_register_global(sound_control);
+	state_save_register_global(sound_msb_latch);
 
 	return 0;
 }
@@ -179,7 +183,13 @@ static READ8_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_control_w )
 {
+	UINT8 diff = data ^ sound_control;
+	sound_control = data;
+
 	/* bit 0x20 = LED */
+	/* bit 0x40 = BSMT2000 reset */
+	if ((diff & 0x40) && (data & 0x40))
+		sndti_reset(SOUND_BSMT2000, 0);
 	if (data != 0x40 && data != 0x60)
 		logerror("%04X:sound_control_w = %02X\n", activecpu_get_pc(), data);
 }
@@ -187,13 +197,11 @@ static WRITE8_HANDLER( sound_control_w )
 
 static WRITE8_HANDLER( bsmt_data_w )
 {
-	static UINT8 latch;
-
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)
-		latch = data;
+		sound_msb_latch = data;
 	else
-		BSMT2000_data_0_w(offset/2, (latch << 8) | data, 0);
+		BSMT2000_data_0_w(offset/2, (sound_msb_latch << 8) | data, 0);
 }
 
 
@@ -381,20 +389,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static struct BSMT2000interface bsmt2000_interface =
-{
-	11,
-	REGION_SOUND1
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -431,7 +425,7 @@ static MACHINE_DRIVER_START( dcheese )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(BSMT2000, SOUND_OSC)
-	MDRV_SOUND_CONFIG(bsmt2000_interface)
+	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.8)
 	MDRV_SOUND_ROUTE(1, "right", 1.8)
 MACHINE_DRIVER_END

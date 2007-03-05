@@ -387,7 +387,7 @@ READ16_HANDLER( genesis_vdp_r )
 		case 0x06:
 		case 0x07:
 		{
-			int xpos = cpu_gethorzbeampos();
+			int xpos = video_screen_get_hpos(0);
 			int ypos = cpu_getscanline();
 
 			/* adjust for the weird counting rules */
@@ -587,7 +587,7 @@ static void vdp_data_w(int data)
 
 static int vdp_control_r(void)
 {
-	int beampos = cpu_gethorzbeampos();
+	int beampos = video_screen_get_hpos(0);
 	int status = 0x3600; // wwally needs fifo empty set
 
 	/* kill 2nd write pending flag */

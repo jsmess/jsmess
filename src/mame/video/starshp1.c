@@ -86,7 +86,7 @@ VIDEO_START( starshp1 )
 
 READ8_HANDLER( starshp1_rng_r )
 {
-	int x = cpu_gethorzbeampos();
+	int x = video_screen_get_hpos(0);
 	int y = cpu_getscanline();
 
 	if (x > Machine->screen[0].width - 1)

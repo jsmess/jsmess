@@ -451,7 +451,9 @@ static struct tms34010_config tms_config =
 	m68k_gen_int,					/* generate interrupt */
 	artmagic_to_shiftreg,			/* write to shiftreg function */
 	artmagic_from_shiftreg,			/* read from shiftreg function */
-	0								/* display offset update function */
+	NULL,							/* display address changed */
+	NULL,							/* display interrupt callback */
+	0								/* the screen operated on */
 };
 
 

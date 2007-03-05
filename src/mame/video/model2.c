@@ -408,6 +408,8 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 		UINT16 s[4], t[4];
 		int polytype, linktype, tex_hdr_offset, zsort_type, texture_code;
 
+		s[3] = t[3] = 0;	// fix compiler "used uninitialized" warning
+
 		attr = object[address++];
 		polytype = attr & 0x3;
 
@@ -559,7 +561,9 @@ static void draw_object(UINT32 address, UINT32 num_polys, UINT32 tex_point_addr,
 					zvalue = MAX(zvalue, v[3].z);
 					break;
 				}
-				default:	fatalerror("draw_object: unknown zsort mode!\n");
+				default:	mame_printf_error("draw_object: unknown zsort mode %d!\n", zsort_type);
+					zvalue = previous_zvalue;	/* complete hack */
+					break;
 			}
 
 			previous_zvalue = zvalue;

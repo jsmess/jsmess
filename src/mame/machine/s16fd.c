@@ -71,6 +71,7 @@ void fd1094_setstate_and_decrypt(int state)
 		fd1094_cacheregion[fd1094_current_cacheposition][addr]=dat;
 	}
 
+#if 0
 {
 	char filename[100];
 	FILE *f;
@@ -109,6 +110,7 @@ void fd1094_setstate_and_decrypt(int state)
 	}
 	fclose(f);
 }
+#endif
 
 	/* copy newly decrypted data to user region */
 	fd1094_userregion=fd1094_cacheregion[fd1094_current_cacheposition];

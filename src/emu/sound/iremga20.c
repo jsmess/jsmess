@@ -38,6 +38,7 @@ struct IremGA20_channel_def
 	UINT32 size;
 	UINT32 start;
 	UINT32 pos;
+	UINT32 frac;
 	UINT32 end;
 	UINT32 volume;
 	UINT32 pan;
@@ -53,14 +54,13 @@ struct IremGA20_chip_def
 	sound_stream * stream;
 	INT32 regs[0x40];
 	struct IremGA20_channel_def channel[4];
-	INT32 sr_table[256];
 };
 
 void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
 {
 	struct IremGA20_chip_def *chip = param;
-	UINT32 rate[4], pos[4], end[4], vol[4], play[4];
-	INT8 *pSamples;
+	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];
+	UINT8 *pSamples;
 	stream_sample_t *outL, *outR;
 	int i, sampleout;
 
@@ -69,13 +69,14 @@ void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **b
 	{
 		rate[i] = chip->channel[i].rate;
 		pos[i] = chip->channel[i].pos;
-		end[i] = (chip->channel[i].end - 0x20) << 8;
+		frac[i] = chip->channel[i].frac;
+		end[i] = chip->channel[i].end - 0x20;
 		vol[i] = chip->channel[i].volume;
 		play[i] = chip->channel[i].play;
 	}
 
 	i = length;
-	pSamples = (INT8 *)chip->rom;
+	pSamples = chip->rom;
 	outL = buffer[0];
 	outR = buffer[1];
 
@@ -86,26 +87,34 @@ void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **b
 		// update the 4 channels inline
 		if (play[0])
 		{
-			sampleout += pSamples[pos[0]>>8] * vol[0];
-			pos[0] += rate[0];
+			sampleout += (pSamples[pos[0]] - 0x80) * vol[0];
+			frac[0] += rate[0];
+			pos[0] += frac[0] >> 24;
+			frac[0] &= 0xffffff;
 			play[0] = (pos[0] < end[0]);
 		}
 		if (play[1])
 		{
-			sampleout += pSamples[pos[1]>>8] * vol[1];
-			pos[1] += rate[1];
+			sampleout += (pSamples[pos[1]] - 0x80) * vol[1];
+			frac[1] += rate[1];
+			pos[1] += frac[1] >> 24;
+			frac[1] &= 0xffffff;
 			play[1] = (pos[1] < end[1]);
 		}
 		if (play[2])
 		{
-			sampleout += pSamples[pos[2]>>8] * vol[2];
-			pos[2] += rate[2];
+			sampleout += (pSamples[pos[2]] - 0x80) * vol[2];
+			frac[2] += rate[2];
+			pos[2] += frac[2] >> 24;
+			frac[2] &= 0xffffff;
 			play[2] = (pos[2] < end[2]);
 		}
 		if (play[3])
 		{
-			sampleout += pSamples[pos[3]>>8] * vol[3];
-			pos[3] += rate[3];
+			sampleout += (pSamples[pos[3]] - 0x80) * vol[3];
+			frac[3] += rate[3];
+			pos[3] += frac[3] >> 24;
+			frac[3] &= 0xffffff;
 			play[3] = (pos[3] < end[3]);
 		}
 
@@ -118,6 +127,7 @@ void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **b
 	for (i=0; i < 4; i++)
 	{
 		chip->channel[i].pos = pos[i];
+		chip->channel[i].frac = frac[i];
 		chip->channel[i].play = play[i];
 	}
 }
@@ -154,7 +164,7 @@ WRITE8_HANDLER( IremGA20_w )
 	break;
 
 	case 8:
-		chip->channel[channel].rate = chip->sr_table[data];
+		chip->channel[channel].rate = 0x1000000 / (256 - data);
 	break;
 
 	case 0xa: //AT: gain control
@@ -163,7 +173,8 @@ WRITE8_HANDLER( IremGA20_w )
 
 	case 0xc: //AT: this is always written 2(enabling both channels?)
 		chip->channel[channel].play = data;
-		chip->channel[channel].pos = chip->channel[channel].start << 8;
+		chip->channel[channel].pos = chip->channel[channel].start;
+		chip->channel[channel].frac = 0;
 	break;
 	}
 }
@@ -201,6 +212,7 @@ static void iremga20_reset( void *_chip )
 	chip->channel[i].size = 0;
 	chip->channel[i].start = 0;
 	chip->channel[i].pos = 0;
+	chip->channel[i].frac = 0;
 	chip->channel[i].end = 0;
 	chip->channel[i].volume = 0;
 	chip->channel[i].pan = 0;
@@ -222,16 +234,6 @@ static void *iremga20_start(int sndindex, int clock, const void *config)
 	chip->intf = config;
 	chip->rom = memory_region(chip->intf->region);
 	chip->rom_size = memory_region_length(chip->intf->region);
-
-	/* Initialize our pitch table */
-	for (i = 0; i < 255; i++)
-	{
-		chip->sr_table[i] = 0x100 / (256 - i);
-	}
-
-	/* change signedness of PCM samples in advance */
-	for (i=0; i<chip->rom_size; i++)
-		chip->rom[i] -= 0x80;
 
 	iremga20_reset(chip);
 

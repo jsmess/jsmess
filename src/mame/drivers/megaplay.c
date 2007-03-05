@@ -94,7 +94,7 @@ static MACHINE_RESET( megaplay )
 
 #define MEGAPLAY_DSWA \
 	PORT_START \
-	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) \
+	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4") \
     PORT_DIPSETTING( 0x07, DEF_STR( 4C_1C ) ) \
     PORT_DIPSETTING( 0x08, DEF_STR( 3C_1C ) ) \
     PORT_DIPSETTING( 0x09, DEF_STR( 2C_1C ) ) \
@@ -113,7 +113,7 @@ static MACHINE_RESET( megaplay )
     PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
 
 #define MEGAPLAY_DSWB \
-	PORT_DIPNAME( 0xf0, 0xf0, "Coin slot 2" ) \
+	PORT_DIPNAME( 0xf0, 0xf0, "Coin slot 2" ) PORT_DIPLOCATION("SW2:1,2,3,4")\
     PORT_DIPSETTING( 0x70, DEF_STR( 4C_1C ) ) \
     PORT_DIPSETTING( 0x80, DEF_STR( 3C_1C ) ) \
     PORT_DIPSETTING( 0x90, DEF_STR( 2C_1C ) ) \
@@ -149,13 +149,13 @@ INPUT_PORTS_START ( mp_sonic )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x03, 0x01, "Initial Players" )
+	PORT_DIPNAME( 0x03, 0x01, "Initial Players" ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
     PORT_DIPSETTING( 0x02, "2" )
     PORT_DIPSETTING( 0x03, "1" )
 
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:3,4")
     PORT_DIPSETTING( 0x00, DEF_STR( Hardest ) )
     PORT_DIPSETTING( 0x04, DEF_STR( Hard ) )
     PORT_DIPSETTING( 0x08, DEF_STR( Easy ) )
@@ -177,19 +177,19 @@ INPUT_PORTS_START ( mp_gaxe2 )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x00, DEF_STR( Hard ) )
 
-	PORT_DIPNAME( 0x02, 0x00, "Life" )
+	PORT_DIPNAME( 0x02, 0x00, "Life" ) PORT_DIPLOCATION("SW3:2")
     PORT_DIPSETTING( 0x02, "1" )
     PORT_DIPSETTING( 0x00, "2" )
 
-	PORT_DIPNAME( 0x04, 0x04, "Initial Players" )
+	PORT_DIPNAME( 0x04, 0x04, "Initial Players" ) PORT_DIPLOCATION("SW3:3")
     PORT_DIPSETTING( 0x00, "1" )
     PORT_DIPSETTING( 0x04, "2" )
 
-	PORT_DIPNAME( 0x08, 0x00, "Timer" )
+	PORT_DIPNAME( 0x08, 0x00, "Timer" ) PORT_DIPLOCATION("SW3:4")
     PORT_DIPSETTING( 0x08, DEF_STR( Off )  )
     PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
@@ -210,15 +210,15 @@ INPUT_PORTS_START ( mp_col3 )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( English ) )
     PORT_DIPSETTING( 0x00, DEF_STR( Japanese ) )
 
-	PORT_DIPNAME( 0x02, 0x02, "2P Mode Games" )
+	PORT_DIPNAME( 0x02, 0x02, "2P Mode Games" ) PORT_DIPLOCATION("SW3:2")
     PORT_DIPSETTING( 0x02, "1" )
     PORT_DIPSETTING( 0x00, "3" )
 
-	PORT_DIPNAME( 0x0c, 0x0c, "Speed / Difficulty" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Speed / Difficulty" ) PORT_DIPLOCATION("SW3:3,4")
     PORT_DIPSETTING( 0x08, "Slow"  )
     PORT_DIPSETTING( 0x0c, "Middle"  )
     PORT_DIPSETTING( 0x04, "Fast"  )
@@ -241,11 +241,11 @@ INPUT_PORTS_START ( mp_twc )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x01, 0x01, "Time" )
+	PORT_DIPNAME( 0x01, 0x01, "Time" ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x00, "Short" )
 
-	PORT_DIPNAME( 0x0e, 0x08, "Level" )
+	PORT_DIPNAME( 0x0e, 0x08, "Level" ) PORT_DIPLOCATION("SW3:2,3,4")
     PORT_DIPSETTING( 0x00, "0" )
     PORT_DIPSETTING( 0x02, "0" )
     PORT_DIPSETTING( 0x04, "5" )
@@ -266,13 +266,13 @@ INPUT_PORTS_START ( mp_sor2 )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
     PORT_DIPSETTING( 0x02, "2" )
     PORT_DIPSETTING( 0x03, "1" )
 
-	PORT_DIPNAME( 0xc, 0x0c, DEF_STR ( Difficulty ) )
+	PORT_DIPNAME( 0xc, 0x0c, DEF_STR ( Difficulty ) ) PORT_DIPLOCATION("SW3:3,4")
     PORT_DIPSETTING( 0x00, DEF_STR ( Hardest ) )
     PORT_DIPSETTING( 0x04, DEF_STR ( Hard ) )
     PORT_DIPSETTING( 0x08, DEF_STR ( Easy ) )
@@ -289,13 +289,13 @@ INPUT_PORTS_START ( mp_bio )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "5" )
     PORT_DIPSETTING( 0x01, "4" )
     PORT_DIPSETTING( 0x02, "2" )
     PORT_DIPSETTING( 0x03, "3" )
 
-	PORT_DIPNAME( 0xc, 0x0c, DEF_STR ( Difficulty ) )
+	PORT_DIPNAME( 0xc, 0x0c, DEF_STR ( Difficulty ) ) PORT_DIPLOCATION("SW3:3,4")
     PORT_DIPSETTING( 0x00, DEF_STR ( Hardest ) )
     PORT_DIPSETTING( 0x04, DEF_STR ( Hard ) )
     PORT_DIPSETTING( 0x08, DEF_STR ( Easy ) )
@@ -312,7 +312,7 @@ INPUT_PORTS_START ( mp_gslam )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x07, 0x04, DEF_STR ( Game_Time ) )
+	PORT_DIPNAME( 0x07, 0x04, DEF_STR ( Game_Time ) ) PORT_DIPLOCATION("SW3:1,2,3")
     PORT_DIPSETTING( 0x00, "5:00" )
     PORT_DIPSETTING( 0x01, "4:30" )
     PORT_DIPSETTING( 0x02, "4:00" )
@@ -323,7 +323,7 @@ INPUT_PORTS_START ( mp_gslam )
     PORT_DIPSETTING( 0x07, "1:30" )
 
 
-	PORT_DIPNAME( 0x08, 0x08, "2P-Play Continue" )
+	PORT_DIPNAME( 0x08, 0x08, "2P-Play Continue" ) PORT_DIPLOCATION("SW3:4")
     PORT_DIPSETTING( 0x00, "1 Credit" )
     PORT_DIPSETTING( 0x08, "2 Credits" )
 
@@ -338,21 +338,21 @@ INPUT_PORTS_START ( mp_mazin )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x01, 0x01, "DSW C-1" )
-    PORT_DIPSETTING( 0x01, DEF_STR ( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR ( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Initial Player" ) PORT_DIPLOCATION("SW3:1")
+    PORT_DIPSETTING( 0x01, "2" )
+    PORT_DIPSETTING( 0x00, "1" )
 
-	PORT_DIPNAME( 0x02, 0x02, "DSW C-2" )
-    PORT_DIPSETTING( 0x02, DEF_STR ( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR ( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Initial Player" ) PORT_DIPLOCATION("SW3:2")
+    PORT_DIPSETTING( 0x02, "1" )
+    PORT_DIPSETTING( 0x00, "4" )
 
-	PORT_DIPNAME( 0x04, 0x04, "DSW C-3" )
-    PORT_DIPSETTING( 0x04, DEF_STR ( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR ( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR ( Difficulty ) ) PORT_DIPLOCATION("SW3:3")
+    PORT_DIPSETTING( 0x04, DEF_STR ( Hard ) )
+    PORT_DIPSETTING( 0x00, DEF_STR ( Normal ) )
 
-	PORT_DIPNAME( 0x08, 0x08, "DSW C-4" )
-    PORT_DIPSETTING( 0x08, DEF_STR ( Off ) )
-    PORT_DIPSETTING( 0x00, DEF_STR ( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Title" ) PORT_DIPLOCATION("SW3:4")
+    PORT_DIPSETTING( 0x08, "EUROPE" )
+    PORT_DIPSETTING( 0x00, "U.S.A" )
 
 INPUT_PORTS_END
 
@@ -365,13 +365,13 @@ INPUT_PORTS_START ( mp_soni2 )
 
 	PORT_START
 	// DSW C  (per game settings)
-	PORT_DIPNAME( 0x03, 0x01, "Initial Players (Normal mode)" )
+	PORT_DIPNAME( 0x03, 0x01, "Initial Players (Normal mode)" ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
     PORT_DIPSETTING( 0x02, "2" )
     PORT_DIPSETTING( 0x03, "1" )
 
-	PORT_DIPNAME( 0x0c, 0x0c, "Initial Players (Dual mode)" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Initial Players (Dual mode)" ) PORT_DIPLOCATION("SW3:3,4")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x04, "2" )
     PORT_DIPSETTING( 0x08, "1" )
@@ -690,7 +690,11 @@ SYSTEM_BIOS_END
 	ROM_LOAD_BIOS( 1, "epr-a15294.ic2",0x000000, 0x20000, CRC(f97c68aa) SHA1(bcabc879950bca1ced11c550a484e697ec5706b2) ) \
 
 ROM_START( megaplay )
-	ROM_REGION( 0x20000, REGION_USER1, 0 )
+	ROM_REGION( 0x400000, REGION_CPU1, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, REGION_USER1, ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x28000, REGION_CPU3, 0 ) /* Bios */
 	MEGAPLAY_BIOS
 ROM_END
 

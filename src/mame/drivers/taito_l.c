@@ -2769,8 +2769,66 @@ ROM_START( kurikina )
 	ROM_LOAD( "kk_8-4h.rom", 0xe0000, 0x20000, CRC(117bde99) SHA1(fe0f56b6c840e35870639c4de129443e14720a7b) )
 ROM_END
 
+/************************************************************************
 
-ROM_START( plotting )
+  Plotting / Flipull rom numbering listed:
+
+   B96-01 - Japanese main program rom
+   B96-02 -  Original graphics rom
+   B96-03 -  Original graphics rom
+   B96-04 - PAL 16L8BCJ
+   B96-05 - US main program rom
+   B96-06 - Original World main program rom
+   B96-07 -  Revised graphics rom
+   B96-08 -  Revised graphics rom
+   B96-09 - Later World main program rom??
+   B96-10 - Later World main program rom??
+
+
+PCB number info:
+ K1100439A FLIPULL
+ K1100441A PLOTTING
+ J1100187A (US Plotting PCB ID#?)
+
+  +--------------------------+
+ _|    PAL           4 4 4 4 |
+|                    3 3 3 3 |
+|       VOL          2 2 2 2 |
+|                    5 5 5 5 |
+|                    6 6 6 6 |
+|                            |
+|J               +---------+ |
+|A          OSC  |         | |
+|M  YM3014       |TC0090LVC| |
+|M       MB3771  |         | |
+|A               +---------+ |
+|                            |
+|    +-------+      B  B  B  |
+|    |YM2203C|      9  9  9  |
+|    +-------+      6  6  6  |
+|_                  0  0  0  |
+  | DSB DSA         1  7  8  |
+  +--------------------------+
+
+OSC 13.33056MHz
+RAM uPD43256
+PAL 16L8BCJ (labeled as B96-04)
+CPU TC0090LVC (All in one Z80 & system controller??)
+
+************************************************************************/
+
+ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system, demo mode is 1 player */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_LOAD( "ic10",       0x00000, 0x10000, CRC(be240921) SHA1(f29f3a49b563f24aa6e3187ac4da1a8100cb02b5) )
+	ROM_RELOAD(             0x10000, 0x10000 )
+
+	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
+	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
+ROM_END
+
+
+ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo mode is 2 players */
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "plot01.bin", 0x00000, 0x10000, CRC(5b30bc25) SHA1(df8839a90da9e5122d75b6faaf97f59499dbd316) )
 	ROM_RELOAD(             0x10000, 0x10000 )
@@ -2780,7 +2838,17 @@ ROM_START( plotting )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 ROM_END
 
-ROM_START( plottinu )
+ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_LOAD( "b96-06.ic10",0x00000, 0x10000, CRC(f89a54b1) SHA1(19757b5fb61acdd6f5ae8e32a38ae54bfda0c522) )
+	ROM_RELOAD(             0x10000, 0x10000 )
+
+	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "b96-02.ic9", 0x00000, 0x10000, CRC(6e0bad2a) SHA1(73996688cd058a2f56f61ea60144b9c673919a58) )
+	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
+ROM_END
+
+ROM_START( plottinu ) /* The demo mode is 2 players */
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "b96-05.ic10",0x00000, 0x10000, CRC(afb99d1f) SHA1(a5cabc182d4f1d5709e6835d8b0a481dd0f9a563) )
 	ROM_RELOAD(             0x10000, 0x10000 )
@@ -2790,14 +2858,14 @@ ROM_START( plottinu )
 	ROM_LOAD( "b96-03.ic8", 0x10000, 0x10000, CRC(fb5f3ca4) SHA1(0c335acceea50133a6899f9e368cff5f61b55a96) )
 ROM_END
 
-ROM_START( plottina )
+ROM_START( flipull ) /* The demo mode is 1 player */
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
-	ROM_LOAD( "ic10",       0x00000, 0x10000, CRC(be240921) SHA1(f29f3a49b563f24aa6e3187ac4da1a8100cb02b5) )
+	ROM_LOAD( "b96-01.ic10",0x00000, 0x10000, CRC(65993978) SHA1(d14dc70f1b5e72b96ccc3fab61d7740f627bfea2) )
 	ROM_RELOAD(             0x10000, 0x10000 )
 
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "ic9",        0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
-	ROM_LOAD( "ic8",        0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
+	ROM_LOAD( "b96-07.ic9", 0x00000, 0x10000, CRC(0713a387) SHA1(0fc1242ce02a56279fa1d5270c905bba7cdcd072) )
+	ROM_LOAD( "b96-08.ic8", 0x10000, 0x10000, CRC(55b8e294) SHA1(14405638f751adfadb022bf7a0123a3972d4a617) )
 ROM_END
 
 ROM_START( puzznic )
@@ -2930,7 +2998,7 @@ ROM_END
 
 
 // bits 7..0 => bits 0..7
-static DRIVER_INIT( plotting )
+static DRIVER_INIT( plottina )
 {
 	unsigned char tab[256];
 	unsigned char *p;
@@ -2971,9 +3039,11 @@ GAME( 1988, kurikint, 0,        kurikint, kurikint, 0,        ROT0,   "Taito Cor
 GAME( 1988, kurikinu, kurikint, kurikint, kurikinj, 0,        ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
 GAME( 1988, kurikinj, kurikint, kurikint, kurikinj, 0,        ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
 GAME( 1988, kurikina, kurikint, kurikina, kurikina, 0,        ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
-GAME( 1989, plotting, 0,        plotting, plotting, plotting, ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
-GAME( 1989, plottinu, plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (US)", 0 )
-GAME( 1989, plottina, plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 2)", 0 )
+GAME( 1989, plotting, 0,        plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
+GAME( 1989, plottina, plotting, plotting, plotting, plottina, ROT0,   "Taito Corporation Japan", "Plotting (World set 2, Protected)", 0 )
+GAME( 1989, plottinb, plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 3, Earliest Version)", 0 )
+GAME( 1989, plottinu, plotting, plotting, plotting, 0,        ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
+GAME( 1989, flipull,  plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 GAME( 1989, puzznic,  0,        puzznic,  puzznic,  0,        ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicj, puzznic,  puzznic,  puzznic,  0,        ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
 GAME( 1990, horshoes, 0,        horshoes, horshoes, 0,        ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )

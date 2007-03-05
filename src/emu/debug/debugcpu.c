@@ -638,7 +638,7 @@ static UINT64 get_logunmap(UINT32 ref)
 
 static UINT64 get_beamx(UINT32 ref)
 {
-	return cpu_gethorzbeampos();
+	return video_screen_get_hpos(0);
 }
 
 

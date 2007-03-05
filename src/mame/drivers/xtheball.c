@@ -346,10 +346,10 @@ INPUT_PORTS_START( xtheball )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("ANALOGX")
-	PORT_BIT( 0x00ff, 0x0080, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START_TAG("ANALOGY")
-	PORT_BIT( 0x00ff, 0x0080, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -367,7 +367,8 @@ static struct tms34010_config tms_config =
 	xtheball_to_shiftreg,			/* write to shiftreg function */
 	xtheball_from_shiftreg,			/* read from shiftreg function */
 	xtheball_display_addr_changed,	/* display address changed */
-	0								/* display interrupt callback */
+	NULL,							/* display interrupt callback */
+	0								/* the screen operated on */
 };
 
 

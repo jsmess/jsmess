@@ -2144,234 +2144,7 @@ ROM_START( geostorm )
 	ROM_LOAD("a2_da.1l",  0x000000, 0x100000, CRC(3c8cdb6a) SHA1(d1f4186e8ddf99698443f8ee1c60a6e6bc367b09) )
 ROM_END
 
-/***************************************************************************/
 
-static READ8_HANDLER( lethalth_cycle_r )
-{
-	if (activecpu_get_pc()==0x1f4 && m92_ram[0x1e]==2 && offset==0)
-		cpu_spinuntil_int();
-
-	return m92_ram[0x1e + offset];
-}
-
-static READ8_HANDLER( hook_cycle_r )
-{
-	if (activecpu_get_pc()==0x55ba && m92_ram[0x12]==0 && m92_ram[0x13]==0 && offset==0)
-		cpu_spinuntil_int();
-
-	return m92_ram[0x12 + offset];
-}
-
-static READ8_HANDLER( bmaster_cycle_r )
-{
-	int d=activecpu_geticount();
-
-	/* If possible skip this cpu segment - idle loop */
-	if (d>159 && d<0xf0000000) {
-		if (activecpu_get_pc()==0x410 && m92_ram[0x6fde]==0 && m92_ram[0x6fdf]==0 && offset==0) {
-			/* Adjust in-game counter, based on cycles left to run */
-			int old;
-
-			old=m92_ram[0x74aa]+(m92_ram[0x74ab]<<8);
-			old=(old+d/25)&0xffff; /* 25 cycles per increment */
-			m92_ram[0x74aa]=old&0xff;
-			m92_ram[0x74ab]=old>>8;
-			cpu_spinuntil_int();
-		}
-	}
-	return m92_ram[0x6fde + offset];
-}
-
-static READ8_HANDLER( psoldier_cycle_r )
-{
-	int a=m92_ram[0]+(m92_ram[1]<<8);
-	int b=m92_ram[0x1aec]+(m92_ram[0x1aed]<<8);
-	int c=m92_ram[0x1aea]+(m92_ram[0x1aeb]<<8);
-
-	if (activecpu_get_pc()==0x2dae && b!=a && c!=a && offset==0)
-		cpu_spinuntil_int();
-
-	return m92_ram[0x1aec + offset];
-}
-
-static READ8_HANDLER( ssoldier_cycle_r )
-{
-	int a=m92_ram[0]+(m92_ram[1]<<8);
-	int b=m92_ram[0x1aec]+(m92_ram[0x1aed]<<8);
-	int c=m92_ram[0x1aea]+(m92_ram[0x1aeb]<<8);
-
-	if (activecpu_get_pc()==0x2e36 && b!=a && c!=a && offset==0)
-		cpu_spinuntil_int();
-
-	return m92_ram[0x1aec + offset];
-}
-
-static READ8_HANDLER( psoldier_snd_cycle_r )
-{
-	int a=m92_snd_ram[0xc34];
-//logerror("%08x: %d %d\n",activecpu_get_pc(),a,offset);
-	if (activecpu_get_pc()==0x8f0 && (a&0x80)!=0x80 && offset==0) {
-		cpu_spinuntil_int();
-	}
-
-	return m92_snd_ram[0xc34 + offset];
-}
-
-static READ8_HANDLER( inthunt_cycle_r )
-{
-	int d=activecpu_geticount();
-	int line = 256 - cpu_getiloops();
-
-	/* If possible skip this cpu segment - idle loop */
-	if (d>159 && d<0xf0000000 && line<247) {
-		if (activecpu_get_pc()==0x858 && m92_ram[0x25f]==0 && offset==1) { // 0x858
-			/* Adjust in-game counter, based on cycles left to run */
-			int old;
-
-			old=m92_ram[0xb892]+(m92_ram[0xb893]<<8);
-			old=(old+d/82)&0xffff; /* 82 cycles per increment */
-			m92_ram[0xb892]=old&0xff;
-			m92_ram[0xb893]=old>>8;
-
-			cpu_spinuntil_int();
-		}
-	}
-
-	return m92_ram[0x25e + offset];
-}
-
-static READ8_HANDLER( kaiteids_cycle_r ) // by bkc
-{
-	int d=activecpu_geticount();
-	int line = 256 - cpu_getiloops();
-
-	/* If possible skip this cpu segment - idle loop */
-	if (d>159 && d<0xf0000000 && line<247) {
-		if ((activecpu_get_pc()==0x885 || activecpu_get_pc()==0x8ac)
-			&& m92_ram[0x25f]==0 && offset==1) { // 0x8ac , 0x885
-			/* Adjust in-game counter, based on cycles left to run */
-			int old;
-
-			old=m92_ram[0xb898]+(m92_ram[0xb899]<<8);
-			old=(old+d/82)&0xffff; /* 82 cycles per increment */
-			m92_ram[0xb898]=old&0xff;
-			m92_ram[0xb899]=old>>8;
-
-			cpu_spinuntil_int();
-		}
-	}
-
-	return m92_ram[0x25e + offset];
-}
-
-
-static READ8_HANDLER( uccops_cycle_r )
-{
-	int a=m92_ram[0x3f28]+(m92_ram[0x3f29]<<8);
-	int b=m92_ram[0x3a00]+(m92_ram[0x3a01]<<8);
-	int c=m92_ram[0x3a02]+(m92_ram[0x3a03]<<8);
-	int d=activecpu_geticount();
-	int line = 256 - cpu_getiloops();
-
-	/* If possible skip this cpu segment - idle loop */
-	if (d>159 && d<0xf0000000 && line<247) {
-		if ((activecpu_get_pc()==0x900ff || activecpu_get_pc()==0x90103) && b==c && offset==1) {
-			cpu_spinuntil_int();
-			/* Update internal counter based on cycles left to run */
-			a=(a+d/127)&0xffff; /* 127 cycles per loop increment */
-			m92_ram[0x3f28]=a&0xff;
-			m92_ram[0x3f29]=a>>8;
-		}
-	}
-
-	return m92_ram[0x3a02 + offset];
-}
-
-static READ8_HANDLER( rtypeleo_cycle_r )
-{
-	if (activecpu_get_pc()==0x30791 && offset==0 && m92_ram[0x32]==2 && m92_ram[0x33]==0)
-		cpu_spinuntil_int();
-
-	return m92_ram[0x32 + offset];
-}
-
-static READ8_HANDLER( rtypelej_cycle_r )
-{
-	if (activecpu_get_pc()==0x307a3 && offset==0 && m92_ram[0x32]==2 && m92_ram[0x33]==0)
-		cpu_spinuntil_int();
-
-	return m92_ram[0x32 + offset];
-}
-
-static READ8_HANDLER( gunforce_cycle_r )
-{
-	int a=m92_ram[0x6542]+(m92_ram[0x6543]<<8);
-	int b=m92_ram[0x61d0]+(m92_ram[0x61d1]<<8);
-	int d=activecpu_geticount();
-	int line = 256 - cpu_getiloops();
-
-	/* If possible skip this cpu segment - idle loop */
-	if (d>159 && d<0xf0000000 && line<247) {
-		if (activecpu_get_pc()==0x40a && ((b&0x8000)==0) && offset==1) {
-			cpu_spinuntil_int();
-			/* Update internal counter based on cycles left to run */
-			a=(a+d/80)&0xffff; /* 80 cycles per loop increment */
-			m92_ram[0x6542]=a&0xff;
-			m92_ram[0x6543]=a>>8;
-		}
-	}
-
-	return m92_ram[0x61d0 + offset];
-}
-
-static READ8_HANDLER( dsccr94j_cycle_r )
-{
-	int a=m92_ram[0x965a]+(m92_ram[0x965b]<<8);
-	int d=activecpu_geticount();
-
-	if (activecpu_get_pc()==0x988 && m92_ram[0x8636]==0 && offset==0) {
-		cpu_spinuntil_int();
-
-		/* Update internal counter based on cycles left to run */
-		a=(a+d/56)&0xffff; /* 56 cycles per loop increment */
-		m92_ram[0x965a]=a&0xff;
-		m92_ram[0x965b]=a>>8;
-	}
-
-	return m92_ram[0x8636 + offset];
-}
-
-static READ8_HANDLER( gunforc2_cycle_r )
-{
-	int a=m92_ram[0x9fa0]+(m92_ram[0x9fa1]<<8);
-	int b=m92_ram[0x9fa2]+(m92_ram[0x9fa3]<<8);
-	int c=m92_ram[0xa6aa]+(m92_ram[0xa6ab]<<8);
-	int d=activecpu_geticount();
-
-	if (activecpu_get_pc()==0x510 && a==b && offset==0) {
-		cpu_spinuntil_int();
-
-		/* Update internal counter based on cycles left to run */
-		c=(c+d/62)&0xffff; /* 62 cycles per loop increment */
-		m92_ram[0xa6aa]=a&0xff;
-		m92_ram[0xa6ab]=a>>8;
-	}
-
-	return m92_ram[0x9fa0 + offset];
-}
-
-static READ8_HANDLER( gunforc2_snd_cycle_r )
-{
-	int a=m92_snd_ram[0xc31];
-
-	if (activecpu_get_pc()==0x8aa && a!=3 && offset==1) {
-		cpu_spinuntil_int();
-	}
-
-	return m92_snd_ram[0xc30 + offset];
-}
-
-/***************************************************************************/
 
 static void m92_startup(int hasbanks)
 {
@@ -2406,19 +2179,16 @@ static void init_m92(const unsigned char *decryption_table, int hasbanks)
 
 static DRIVER_INIT( bmaster )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe6fde, 0xe6fdf, 0, 0, bmaster_cycle_r);
 	init_m92(bomberman_decryption_table, 1);
 }
 
 static DRIVER_INIT( gunforce )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe61d0, 0xe61d1, 0, 0, gunforce_cycle_r);
 	init_m92(gunforce_decryption_table, 1);
 }
 
 static DRIVER_INIT( hook )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe0012, 0xe0013, 0, 0, hook_cycle_r);
 	init_m92(hook_decryption_table, 1);
 }
 
@@ -2429,20 +2199,17 @@ static DRIVER_INIT( mysticri )
 
 static DRIVER_INIT( uccops )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe3a02, 0xe3a03, 0, 0, uccops_cycle_r);
 	init_m92(dynablaster_decryption_table, 1);
 }
 
 static DRIVER_INIT( rtypeleo )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe0032, 0xe0033, 0, 0, rtypeleo_cycle_r);
 	init_m92(rtypeleo_decryption_table, 1);
 	m92_irq_vectorbase=0x20;
 }
 
 static DRIVER_INIT( rtypelej )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe0032, 0xe0033, 0, 0, rtypelej_cycle_r);
 	init_m92(rtypeleo_decryption_table, 1);
 	m92_irq_vectorbase=0x20;
 }
@@ -2460,20 +2227,17 @@ static DRIVER_INIT( majtitl2 )
 
 static DRIVER_INIT( kaiteids )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe025e, 0xe025f, 0, 0, kaiteids_cycle_r);
 	init_m92(inthunt_decryption_table, 1);
 }
 
 static DRIVER_INIT( inthunt )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe025e, 0xe025f, 0, 0, inthunt_cycle_r);
 	init_m92(inthunt_decryption_table, 1);
 }
 
 
 static DRIVER_INIT( lethalth )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe001e, 0xe001f, 0, 0, lethalth_cycle_r);
 	init_m92(lethalth_decryption_table, 0);
 	m92_irq_vectorbase=0x20;
 
@@ -2497,9 +2261,6 @@ static DRIVER_INIT( nbbatman )
 
 static DRIVER_INIT( ssoldier )
 {
- memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe1aec, 0xe1aed, 0, 0, ssoldier_cycle_r);
- memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0xa0c34, 0xa0c35, 0, 0, psoldier_snd_cycle_r);
-
  init_m92(psoldier_decryption_table, 1);
  m92_irq_vectorbase=0x20;
  /* main CPU expects an answer even before writing the first command */
@@ -2508,9 +2269,6 @@ static DRIVER_INIT( ssoldier )
 
 static DRIVER_INIT( psoldier )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe1aec, 0xe1aed, 0, 0, psoldier_cycle_r);
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0xa0c34, 0xa0c35, 0, 0, psoldier_snd_cycle_r);
-
 	init_m92(psoldier_decryption_table, 1);
 	m92_irq_vectorbase=0x20;
 	/* main CPU expects an answer even before writing the first command */
@@ -2519,7 +2277,6 @@ static DRIVER_INIT( psoldier )
 
 static DRIVER_INIT( dsccr94j )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe8636, 0xe8637, 0, 0, dsccr94j_cycle_r);
 	init_m92(dsoccr94_decryption_table, 1);
 }
 
@@ -2528,9 +2285,6 @@ static DRIVER_INIT( gunforc2 )
 	unsigned char *RAM = memory_region(REGION_CPU1);
 	init_m92(lethalth_decryption_table, 1);
 	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
-
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe9fa0, 0xe9fa1, 0, 0, gunforc2_cycle_r);
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0xa0c30, 0xa0c31, 0, 0, gunforc2_snd_cycle_r);
 }
 
 /***************************************************************************/

@@ -417,9 +417,9 @@ $(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 
-$(OBJ)/%.lh: $(SRC)/%.lay file2str$(EXE)
+$(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR)
 	@echo Converting $<...
-	@file2str$(EXE) $< $@ layout_$(basename $(notdir $<))
+	@$(FILE2STR) $< $@ layout_$(basename $(notdir $<))
 
 $(OBJ)/%.a:
 	@echo Archiving $@...

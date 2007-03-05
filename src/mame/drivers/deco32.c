@@ -1109,7 +1109,16 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static int bsmt_latch;
+static UINT8 bsmt_latch;
+static UINT8 bsmt_reset;
+
+static WRITE8_HANDLER(deco32_bsmt_reset_w)
+{
+	UINT8 diff = data ^ bsmt_reset;
+	bsmt_reset = data;
+	if ((diff & 0x80) && !(data & 0x80))
+		sndti_reset(SOUND_BSMT2000, 0);
+}
 
 static WRITE8_HANDLER(deco32_bsmt0_w)
 {
@@ -1155,7 +1164,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_tattass, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x2001) AM_WRITE(MWA8_NOP)	/* Reset BSMT? */
+	AM_RANGE(0x2000, 0x2001) AM_WRITE(deco32_bsmt_reset_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(deco32_bsmt0_w)
 	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(deco32_bsmt1_w)
 	AM_RANGE(0x2000, 0xffff) AM_WRITE(MWA8_ROM)
@@ -1806,12 +1815,6 @@ static struct YM2151interface ym2151_interface_nslasher =
 	sound_bankswitch_w
 };
 
-static struct BSMT2000interface bsmt2000_interface =
-{
-	11,
-	REGION_SOUND1
-};
-
 static const UINT8 tattass_default_eprom[0x160] =
 {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x4a,0x45,0x4b,0x19,
@@ -2144,7 +2147,7 @@ static MACHINE_DRIVER_START( tattass )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(BSMT2000, 24000000)
-	MDRV_SOUND_CONFIG(bsmt2000_interface)
+	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -2925,7 +2928,7 @@ ROM_START( tattassa )
 	ROM_LOAD32_WORD( "rev232a.001", 0x000002, 0x80000, CRC(550245d4) SHA1(c1b2b31768da9becebd907a8622d05aa68ecaa29) )
 
 	ROM_REGION(0x10000, REGION_CPU2, 0 ) /* Sound CPU */
-	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
+	ROM_LOAD( "s-wars.u7",  0x08000, 0x08000,  CRC(00000001) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "abak_b01.s02",  0x000000, 0x80000,  CRC(bc805680) SHA1(ccdbca23fc843ef82a3524020999542f43b3c618) )
@@ -3090,59 +3093,6 @@ ROM_START( nslashes )
 	ROM_LOAD( "mbh-11.16l", 0x000000,  0x80000,  CRC(0ec40b6b) SHA1(9fef44149608ae2a00f6a75a6f77f2efcab6e78e) )
 ROM_END
 
-/**********************************************************************************/
-
-static READ32_HANDLER( captaven_skip )
-{
-	UINT32 ret=deco32_ram[0x748c/4];
-
-	if (activecpu_get_pc()==0x39e8 && (ret&0xff)!=0) {
-//      logerror("CPU Spin - %d cycles left this frame ran %d (%d)\n",cycles_left_to_run(),cycles_currently_ran(),cycles_left_to_run()+cycles_currently_ran());
-		cpu_spinuntil_int();
-	}
-
-	return ret;
-}
-
-static READ32_HANDLER( dragngun_skip )
-{
-	UINT32 ret=deco32_ram[0x1f15c/4];
-
-	if (activecpu_get_pc()==0x628c && (ret&0xff)!=0) {
-		//logerror("%08x (%08x): CPU Spin - %d cycles left this frame ran %d (%d)\n",activecpu_get_pc(),ret,cycles_left_to_run(),cycles_currently_ran(),cycles_left_to_run()+cycles_currently_ran());
-		cpu_spinuntil_int();
-	}
-
-	return ret;
-}
-
-static READ32_HANDLER( tattass_skip )
-{
-	int left=cycles_left_to_run();
-	UINT32 ret=deco32_ram[0];
-
-	if (activecpu_get_pc()==0x1c5ec && left>32) {
-		//logerror("%08x (%08x): CPU Spin - %d cycles left this frame ran %d (%d)\n",activecpu_get_pc(),ret,cycles_left_to_run(),cycles_currently_ran(),cycles_left_to_run()+cycles_currently_ran());
-		cpu_spinuntil_int();
-	}
-
-	return ret;
-}
-
-static READ32_HANDLER( nslasher_skip )
-{
-	int left=cycles_left_to_run();
-	UINT32 ret=deco32_ram[0];
-
-	if (activecpu_get_pc()==0x9c8 && left>32 && (ret&0x80)) {
-		//logerror("%08x (%08x): CPU Spin - %d cycles left this frame ran %d (%d)\n",activecpu_get_pc(),ret,cycles_left_to_run(),cycles_currently_ran(),cycles_left_to_run()+cycles_currently_ran());
-		cpu_spinuntil_int();
-	}
-
-	return ret;
-}
-
-/**********************************************************************************/
 
 static DRIVER_INIT( captaven )
 {
@@ -3150,7 +3100,6 @@ static DRIVER_INIT( captaven )
 	deco56_decrypt(REGION_GFX2);
 
 	raster_offset=-1;
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x12748c, 0x12748f, 0, 0, captaven_skip);
 }
 
 static DRIVER_INIT( dragngun )
@@ -3169,7 +3118,6 @@ static DRIVER_INIT( dragngun )
 	ROM[0x1b32c/4]=0xe1a00000;//  NOP test switch lock
 
 	raster_offset=0;
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x11f15c, 0x11f15f, 0, 0, dragngun_skip);
 }
 
 static DRIVER_INIT( fghthist )
@@ -3217,8 +3165,6 @@ static DRIVER_INIT( tattass )
 
 	deco56_decrypt(REGION_GFX1); /* 141 */
 	deco56_decrypt(REGION_GFX2); /* 141 */
-
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100003, 0, 0, tattass_skip);
 }
 
 static DRIVER_INIT( nslasher )
@@ -3242,8 +3188,6 @@ static DRIVER_INIT( nslasher )
 	deco74_decrypt(REGION_GFX2);
 
 	decrypt156();
-
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100003, 0, 0, nslasher_skip);
 
 	soundlatch_setclearedvalue(0xff);
 

@@ -166,6 +166,8 @@ static READ32_HANDLER( port2_r )
 
 static WRITE32_HANDLER( control_w )
 {
+	UINT32 old = control_data;
+
 	// bit $80000000 = BSMT access/ROM read
 	// bit $20000000 = toggled every 64 IRQ4's
 	// bit $10000000 = ????
@@ -181,6 +183,13 @@ static WRITE32_HANDLER( control_w )
 		EEPROM_write_bit(data & 0x00800000);
 		EEPROM_set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
 		EEPROM_set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+	}
+
+	/* toggling BSMT off then on causes a reset */
+	if (!(old & 0x80000000) && (control_data & 0x80000000))
+	{
+		BSMT2000_data_0_w(bsmt_data_bank, 0, 0);
+		sndti_reset(SOUND_BSMT2000, 0);
 	}
 
 	/* log any unknown bits */
@@ -451,20 +460,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static struct BSMT2000interface bsmt2000_interface =
-{
-	11,
-	REGION_SOUND1
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -504,7 +499,7 @@ MACHINE_DRIVER_START( policetr )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(BSMT2000, MASTER_CLOCK/2)
-	MDRV_SOUND_CONFIG(bsmt2000_interface)
+	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

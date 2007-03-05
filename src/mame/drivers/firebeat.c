@@ -86,6 +86,7 @@
     GQ974      GCA01          2000    Keyboardmania 2nd Mix
     GQ974      GCA12          2001    Keyboardmania 3rd Mix
     GQ977      GQ977          2000    Para Para Paradise
+    GQ977(?)   GQ977          2000    Para Para Dancing
     GQ977(?)   ?              2000    Para Para Paradise 1.1
     GQ977      GQA11          2000    Para Para Paradise 1st Mix+
     ???        ?              2000    Pop n' Music 4
@@ -400,7 +401,9 @@ static void gcu_exec_display_list(int chip, mame_bitmap *bitmap, const rectangle
 				break;
 			}
 
-			default:	printf("Unknown command %08X %08X %08X %08X at %08X\n", cmd[0], cmd[1], cmd[2], cmd[3], i*4); break;
+			default:
+				//printf("Unknown command %08X %08X %08X %08X at %08X\n", cmd[0], cmd[1], cmd[2], cmd[3], i*4);
+				break;
 		}
 
 		i += 4;
@@ -446,9 +449,10 @@ static VIDEO_UPDATE(firebeat)
 		}
 
 		/*
-        if (code_pressed(KEYCODE_9))
+        if (code_pressed_memory(KEYCODE_9))
         {
             FILE *file = fopen("vram0.bin", "wb");
+            int i;
 
             for (i=0; i < 0x2000000/4; i++)
             {
@@ -533,7 +537,10 @@ static void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 				visarea.max_x = width-1;
 				visarea.max_y = height-1;
-				video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, Machine->screen[screen].refresh);
+
+				// only try and update the screen if the driver says we have one
+				if(Machine->drv->screen[screen].tag)
+					video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, Machine->screen[screen].refresh);
 			}
 			break;
 		}
@@ -1273,29 +1280,21 @@ static WRITE32_HANDLER( sound_w )
 }
 
 static int cab_data[2] = { 0x0, 0x8 };
-static int kbm3rd_cab_data[2] = { 0x2, 0x8 };
+static int kbm_cab_data[2] = { 0x2, 0x8 };
 static int cab_data_ptr = 0;
+static int * cur_cab_data = cab_data;
+
 static READ32_HANDLER( cabinet_r )
 {
-	int *data;
 	UINT32 r = 0;
 
 //  printf("cabinet_r: %08X, %08X\n", offset, mem_mask);
-
-	if (mame_stricmp(Machine->gamedrv->name, "kbm3rd") == 0)
-	{
-		data = kbm3rd_cab_data;
-	}
-	else
-	{
-		data = cab_data;
-	}
 
 	switch (offset)
 	{
 		case 0:
 		{
-			r = data[cab_data_ptr & 1] << 28;
+			r = cur_cab_data[cab_data_ptr & 1] << 28;
 			cab_data_ptr++;
 			return r;
 		}
@@ -1469,7 +1468,6 @@ static WRITE32_HANDLER( extend_board_irq_w )
 
 /*****************************************************************************/
 
-
 static WRITE32_HANDLER( lamp_output_w )
 {
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
@@ -1485,30 +1483,31 @@ static WRITE32_HANDLER( lamp_output_w )
 		output_set_value("status_led_7", (data & 0x80) ? 0 : 1);
 	}
 
-	// Keyboardmania lamps (active high)
-	// 0x10000000 Door Lamp
-	// 0x01000000 Start1P
-	// 0x02000000 Start2P
-	// 0x00000100 Lamp1
-	// 0x00000200 Lamp2
-	// 0x00000400 Lamp3
-	// 0x00000800 Neon
-	if (mame_stricmp(Machine->gamedrv->name, "kbm3rd") == 0)
+//  printf("lamp_output_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+}
+
+static WRITE32_HANDLER( lamp_output_kbm_w )
+{
+	lamp_output_w(offset, data, mem_mask);
+
+	if (!(mem_mask & 0xff000000))
 	{
-		if (!(mem_mask & 0xff000000))
-		{
-			output_set_value("door_lamp",	(data & 0x10000000) ? 1 : 0);
-			output_set_value("start1p",		(data & 0x01000000) ? 1 : 0);
-			output_set_value("start2p",		(data & 0x02000000) ? 1 : 0);
-		}
-		if (!(mem_mask & 0x0000ff00))
-		{
-			output_set_value("lamp1",		(data & 0x00000100) ? 1 : 0);
-			output_set_value("lamp2",		(data & 0x00000200) ? 1 : 0);
-			output_set_value("lamp3",		(data & 0x00000400) ? 1 : 0);
-			output_set_value("neon",		(data & 0x00000800) ? 1 : 0);
-		}
+		output_set_value("door_lamp",	(data & 0x10000000) ? 1 : 0);
+		output_set_value("start1p",		(data & 0x01000000) ? 1 : 0);
+		output_set_value("start2p",		(data & 0x02000000) ? 1 : 0);
 	}
+	if (!(mem_mask & 0x0000ff00))
+	{
+		output_set_value("lamp1",		(data & 0x00000100) ? 1 : 0);
+		output_set_value("lamp2",		(data & 0x00000200) ? 1 : 0);
+		output_set_value("lamp3",		(data & 0x00000400) ? 1 : 0);
+		output_set_value("neon",		(data & 0x00000800) ? 1 : 0);
+	}
+}
+
+static WRITE32_HANDLER( lamp_output_ppp_w )
+{
+	lamp_output_w(offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00000100 Left
@@ -1524,37 +1523,39 @@ static WRITE32_HANDLER( lamp_output_w )
 	// 0x00020000 Stage LED 5
 	// 0x00040000 Stage LED 6
 	// 0x00080000 Stage LED 7
-	if (mame_stricmp(Machine->gamedrv->name, "ppp") == 0)
+	if (!(mem_mask & 0x0000ff00))
 	{
-		if (!(mem_mask & 0x0000ff00))
-		{
-			output_set_value("left",			(data & 0x00000100) ? 1 : 0);
-			output_set_value("right",			(data & 0x00000200) ? 1 : 0);
-			output_set_value("door_lamp",		(data & 0x00000400) ? 1 : 0);
-			output_set_value("ok",				(data & 0x00000800) ? 1 : 0);
-			output_set_value("slim",			(data & 0x00008000) ? 1 : 0);
-		}
-		if (!(mem_mask & 0xff000000))
-		{
-			output_set_value("stage_led_0",		(data & 0x01000000) ? 1 : 0);
-			output_set_value("stage_led_1",		(data & 0x02000000) ? 1 : 0);
-			output_set_value("stage_led_2",		(data & 0x04000000) ? 1 : 0);
-			output_set_value("stage_led_3",		(data & 0x08000000) ? 1 : 0);
-		}
-		if (!(mem_mask & 0x00ff0000))
-		{
-			output_set_value("stage_led_4",		(data & 0x00010000) ? 1 : 0);
-			output_set_value("stage_led_5",		(data & 0x00020000) ? 1 : 0);
-			output_set_value("stage_led_6",		(data & 0x00040000) ? 1 : 0);
-			output_set_value("stage_led_7",		(data & 0x00080000) ? 1 : 0);
-		}
+		output_set_value("left",			(data & 0x00000100) ? 1 : 0);
+		output_set_value("right",			(data & 0x00000200) ? 1 : 0);
+		output_set_value("door_lamp",		(data & 0x00000400) ? 1 : 0);
+		output_set_value("ok",				(data & 0x00000800) ? 1 : 0);
+		output_set_value("slim",			(data & 0x00008000) ? 1 : 0);
 	}
-
-//  printf("lamp_output_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+	if (!(mem_mask & 0xff000000))
+	{
+		output_set_value("stage_led_0",		(data & 0x01000000) ? 1 : 0);
+		output_set_value("stage_led_1",		(data & 0x02000000) ? 1 : 0);
+		output_set_value("stage_led_2",		(data & 0x04000000) ? 1 : 0);
+		output_set_value("stage_led_3",		(data & 0x08000000) ? 1 : 0);
+	}
+	if (!(mem_mask & 0x00ff0000))
+	{
+		output_set_value("stage_led_4",		(data & 0x00010000) ? 1 : 0);
+		output_set_value("stage_led_5",		(data & 0x00020000) ? 1 : 0);
+		output_set_value("stage_led_6",		(data & 0x00040000) ? 1 : 0);
+		output_set_value("stage_led_7",		(data & 0x00080000) ? 1 : 0);
+	}
 }
 
 static WRITE32_HANDLER( lamp_output2_w )
 {
+//  printf("lamp_output2_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+}
+
+static WRITE32_HANDLER( lamp_output2_ppp_w )
+{
+	lamp_output2_w(offset, data, mem_mask);
+
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Top LED 0
 	// 0x00020000 Top LED 1
@@ -1564,46 +1565,43 @@ static WRITE32_HANDLER( lamp_output2_w )
 	// 0x00000002 Top LED 5
 	// 0x00000004 Top LED 6
 	// 0x00000008 Top LED 7
-	if (mame_stricmp(Machine->gamedrv->name, "ppp") == 0)
+	if (!(mem_mask & 0x00ff0000))
 	{
-		if (!(mem_mask & 0x00ff0000))
-		{
-			output_set_value("top_led_0",		(data & 0x00010000) ? 1 : 0);
-			output_set_value("top_led_1",		(data & 0x00020000) ? 1 : 0);
-			output_set_value("top_led_2",		(data & 0x00040000) ? 1 : 0);
-			output_set_value("top_led_3",		(data & 0x00080000) ? 1 : 0);
-		}
-		if (!(mem_mask & 0x000000ff))
-		{
-			output_set_value("top_led_4",		(data & 0x00000001) ? 1 : 0);
-			output_set_value("top_led_5",		(data & 0x00000002) ? 1 : 0);
-			output_set_value("top_led_6",		(data & 0x00000004) ? 1 : 0);
-			output_set_value("top_led_7",		(data & 0x00000008) ? 1 : 0);
-		}
+		output_set_value("top_led_0",		(data & 0x00010000) ? 1 : 0);
+		output_set_value("top_led_1",		(data & 0x00020000) ? 1 : 0);
+		output_set_value("top_led_2",		(data & 0x00040000) ? 1 : 0);
+		output_set_value("top_led_3",		(data & 0x00080000) ? 1 : 0);
 	}
-
-//  printf("lamp_output2_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+	if (!(mem_mask & 0x000000ff))
+	{
+		output_set_value("top_led_4",		(data & 0x00000001) ? 1 : 0);
+		output_set_value("top_led_5",		(data & 0x00000002) ? 1 : 0);
+		output_set_value("top_led_6",		(data & 0x00000004) ? 1 : 0);
+		output_set_value("top_led_7",		(data & 0x00000008) ? 1 : 0);
+	}
 }
 
 static WRITE32_HANDLER( lamp_output3_w )
 {
+//  printf("lamp_output3_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+}
+
+static WRITE32_HANDLER( lamp_output3_ppp_w )
+{
+	lamp_output3_w(offset, data, mem_mask);
+
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Lamp 0
 	// 0x00040000 Lamp 1
 	// 0x00100000 Lamp 2
 	// 0x00400000 Lamp 3
-	if (mame_stricmp(Machine->gamedrv->name, "ppp") == 0)
+	if (!(mem_mask & 0x00ff0000))
 	{
-		if (!(mem_mask & 0x00ff0000))
-		{
-			output_set_value("lamp_0",			(data & 0x00010000) ? 1 : 0);
-			output_set_value("lamp_1",			(data & 0x00040000) ? 1 : 0);
-			output_set_value("lamp_2",			(data & 0x00100000) ? 1 : 0);
-			output_set_value("lamp_3",			(data & 0x00400000) ? 1 : 0);
-		}
+		output_set_value("lamp_0",			(data & 0x00010000) ? 1 : 0);
+		output_set_value("lamp_1",			(data & 0x00040000) ? 1 : 0);
+		output_set_value("lamp_2",			(data & 0x00100000) ? 1 : 0);
+		output_set_value("lamp_3",			(data & 0x00400000) ? 1 : 0);
 	}
-
-//  printf("lamp_output3_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 }
 
 /*****************************************************************************/
@@ -1614,12 +1612,9 @@ static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
 	AM_RANGE(0x7000a000, 0x7000a003) AM_READ(extend_board_irq_r)
 	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
-	AM_RANGE(0x7d000320, 0x7d000323) AM_WRITE(lamp_output2_w)
-	AM_RANGE(0x7d000324, 0x7d000327) AM_WRITE(lamp_output3_w)
 	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
 	AM_RANGE(0x7d000400, 0x7d000403) AM_READWRITE(sound_r, sound_w)
 	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
-	AM_RANGE(0x7d000804, 0x7d000807) AM_WRITE(lamp_output_w)
 	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
 	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
 	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_READWRITE(comm_uart_r, comm_uart_w)
@@ -2059,6 +2054,17 @@ static void security_w(UINT8 data)
 
 /*****************************************************************************/
 
+static void init_lights(write32_handler out1, write32_handler out2, write32_handler out3)
+{
+	if(!out1) out1 = lamp_output_w;
+	if(!out2) out1 = lamp_output2_w;
+	if(!out3) out1 = lamp_output3_w;
+
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x7d000804, 0x7d000807, 0, 0, out1);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x7d000320, 0x7d000323, 0, 0, out2);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x7d000324, 0x7d000327, 0, 0, out3);
+}
+
 static DRIVER_INIT(firebeat)
 {
 	atapi_init();
@@ -2073,7 +2079,11 @@ static DRIVER_INIT(firebeat)
 	extend_board_irq_enable = 0x3f;
 	extend_board_irq_active = 0x00;
 
+	cur_cab_data = cab_data;
+
 	ppc403_install_spu_tx_handler(security_w);
+
+	init_lights(NULL, NULL, NULL);
 }
 
 static DRIVER_INIT(ppp)
@@ -2081,6 +2091,7 @@ static DRIVER_INIT(ppp)
 	UINT8 *rom = memory_region(REGION_USER2);
 
 	init_firebeat(machine);
+	init_lights(lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
 
 	set_ibutton(rom);
 }
@@ -2092,15 +2103,18 @@ static void init_keyboard(void)
 	timer_adjust(keyboard_timer, TIME_IN_MSEC(10), 0, TIME_IN_MSEC(10));
 }
 
-static DRIVER_INIT(kbm3rd)
+static DRIVER_INIT(kbm)
 {
 	UINT8 *rom = memory_region(REGION_USER2);
 
 	init_firebeat(machine);
+	init_lights(lamp_output_kbm_w, NULL, NULL);
 
 	set_ibutton(rom);
 
 	init_keyboard();
+
+	cur_cab_data = kbm_cab_data;
 }
 
 
@@ -2122,6 +2136,34 @@ ROM_START( ppp )
 	// TODO: the audio CD is not dumped
 ROM_END
 
+ROM_START( kbm )
+	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
+	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+
+	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
+	// TODO: needs fake data
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "974jac01", 0, SHA1(18179bf23519d5b0c82c72e8f47dfaa4d2c4a3e2) MD5(cb68cf69e55aa33429f149f474e2c96e) )
+	DISK_IMAGE_READONLY( "974jaa02", 1, SHA1(8d78a91d98967a232c4b98628e2db25df0a7f8bd) MD5(5cb0100791294559fedccc2a9a46fd86) )
+ROM_END
+
+ROM_START( kbm2nd )
+	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
+	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+
+	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
+	// TODO: needs fake data
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "a01jaa01", 0, SHA1(87c21dc6b9fe8d9f696985cfd9dc14a23f0932fe) MD5(0eff2ca8ebef1fd8815d1d7cb0c2383a) )
+	DISK_IMAGE_READONLY( "a01jaa02", 1, SHA1(fabfcc02f97c867c361df7b9539e6b77f369b73f) MD5(25679474e987d0dd83a0db2bad24bc14) )
+ROM_END
+
 ROM_START( kbm3rd )
 	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
 	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
@@ -2136,7 +2178,43 @@ ROM_START( kbm3rd )
 	DISK_IMAGE_READONLY( "a12jaa02", 1, MD5(10ff654cf3d9b833ecbe72a395e7bb60) SHA1(4adddc8e028111169889bfb99007238da5f4d330) )
 ROM_END
 
+ROM_START( popn7 )
+	// TODO: incorrect bios (should be a02jaa03)
+	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
+	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+
+	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
+	// TODO: needs fake data
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(7462586f67b5c3b015ac581ad0afc089fcd6f537) MD5(af9a249b23783d53ff27ea7dc7e6735c) )
+	DISK_IMAGE_READONLY( "b00jaa02", 1, SHA1(fea9439f14304d865830fb34f8781346d95a1df7) MD5(cf4c4f7c2321fcca6d86e8c144261752) )
+ROM_END
+
+ROM_START( ppd )
+	// TODO: incorrect bios (should be 977jaa03)
+	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
+	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+
+	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
+	// TODO: needs fake data
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "977kaa01", 0, SHA1(7069c1e42bf994ccdfcf6ff0dda9c5de94f1cc65) MD5(f499cb458d823200dc96fe9cef5c08c8) )
+	DISK_IMAGE_READONLY( "977kaa02", 1, SHA1(45d5cda77f789351260bbd6f9c47a5fa93998133) MD5(b58978a81931058fe28825b6147b1bed) )
+ROM_END
+
 /*****************************************************************************/
 
-GAME( 2000, ppp,	  0,       firebeat, ppp,     ppp,     ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING);
-GAMEL(2001, kbm3rd,   0,       firebeat2, kbm,    kbm3rd,  ROT270, "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat);
+GAME( 2000, ppp,	  0,       firebeat,  ppp,    ppp,     ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING);
+GAME( 2000, ppd,      0,       firebeat,  ppp,    ppp,     ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING);
+GAMEL(2000, kbm,      0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat);
+GAMEL(2000, kbm2nd,   0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat);
+GAMEL(2001, kbm3rd,   0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat);
+
+// TODO: very not working, needs different bios? - currently using ppp driver and layout so it attempts to boot
+GAMEL(2001, popn7,    0,       firebeat2, ppp,    ppp,     ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING, layout_firebeat);

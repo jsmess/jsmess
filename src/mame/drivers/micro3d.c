@@ -841,6 +841,9 @@ static struct tms34010_config vgb_config =
 	tms_interrupt,				/* Generate interrupt */
 	NULL,
 	NULL,
+	NULL,							/* display address changed */
+	NULL,							/* display interrupt callback */
+	0								/* the screen operated on */
 };
 
 

@@ -573,7 +573,7 @@ static void toaplan2_irq(int irq_line)
 	int vpos = cpu_getscanline();
 	if (vpos == 240) cpunum_set_input_line(0, irq_line, HOLD_LINE);
 	vblank_irq = 0; //Remove
-//  logerror("IRQ: scanline=%04x iloop=%04x beampos=%04x\n",vpos,cpu_getiloops(),cpu_gethorzbeampos());
+//  logerror("IRQ: scanline=%04x iloop=%04x beampos=%04x\n",vpos,cpu_getiloops(),video_screen_get_hpos(0));
 #else
 	if (cpu_getiloops() == 0) current_scanline = 255;
 
@@ -605,7 +605,7 @@ static READ16_HANDLER( video_count_r )
 	/*************** Control Signals are active low ***************/
 
 #if T2_VIDEO_CONTROL
-	int hpos = cpu_gethorzbeampos();
+	int hpos = video_screen_get_hpos(0);
 	int vpos = cpu_getscanline();
 	video_status = 0xff00;						/* Set signals inactive */
 
@@ -643,7 +643,7 @@ static READ16_HANDLER( video_count_r )
 	}
 	prev_scanline = current_scanline;
 
-//  logerror("Now VC=%04x  Vbl=%02x  VS=%04x  HS=%04x\n",video_status,vblank_irq,cpu_getscanline(),cpu_gethorzbeampos() );
+//  logerror("Now VC=%04x  Vbl=%02x  VS=%04x  HS=%04x\n",video_status,vblank_irq,cpu_getscanline(),video_screen_get_hpos(0) );
 #endif
 
 	return video_status;
