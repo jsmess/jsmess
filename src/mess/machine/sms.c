@@ -4,10 +4,14 @@
 #include "includes/sms.h"
 #include "sound/2413intf.h"
 
+#define CF_CODEMASTERS_MAPPER	0x01
+#define CF_DODGEBALLKING_MAPPER	0x02
+
 UINT8 smsRomPageCount;
 UINT8 smsBiosPageCount;
 UINT8 smsFMDetect;
 UINT8 smsVersion;
+UINT8 smsCartFeatures;
 int smsPaused;
 
 UINT8 biosPort;
@@ -250,7 +254,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 			smsNVRam[offset] = data;
 		}
 	} else {
-		if (offset == 0) { /* Codemasters mapper */
+		if (smsCartFeatures & CF_CODEMASTERS_MAPPER && offset == 0) { /* Codemasters mapper */
 			if (biosPort & IO_BIOS_ROM) {
 				page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
 			} else {
@@ -263,7 +267,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 #ifdef LOG_PAGING
 			logerror("rom 2 paged in %x codemasters.\n", page);
 #endif
-		} else if (offset == 0x2000) { /* Dodgeball King mapper */
+		} else if (smsCartFeatures & CF_DODGEBALLKING_MAPPER && offset == 0x2000) { /* Dodgeball King mapper */
 			if (biosPort & IO_BIOS_ROM) {
 				page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
 			} else {
@@ -440,6 +444,7 @@ static int sms_verify_cart(UINT8 *magic, int size) {
 
 DEVICE_INIT( sms_cart )
 {
+	smsCartFeatures = 0;
 	biosPort = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
 	if ( ! IS_GAMEGEAR && ! HAS_BIOS ) {
 		biosPort &= ~(IO_CARTRIDGE);
@@ -480,6 +485,18 @@ DEVICE_LOAD( sms_cart )
 	if ( ! HAS_BIOS ) {
 		if (sms_verify_cart(ROM, size) == IMAGE_VERIFY_FAIL) {
 			logerror("Warning loading image: sms_verify_cart failed\n");
+		}
+	}
+
+	/* Check for special cartridge features */
+	if ( size >= 0x8000 ) {
+		/* Check for Codemasters mapper */
+		if ( ROM[0x7fe3] == 0x93 ) {
+			smsCartFeatures |= CF_CODEMASTERS_MAPPER;
+		}
+		/* Check for Dodgeball King */
+		if ( ROM[0x7ff0] == 0x3e && ROM[0x7ff1] == 0x11 ) {
+			smsCartFeatures |= CF_DODGEBALLKING_MAPPER;
 		}
 	}
 
