@@ -20,6 +20,8 @@ SDLOBJ = $(OBJ)/osd/$(MAMEOS)
 
 OBJDIRS += $(SDLOBJ)
 
+SDLMAIN =
+
 #-------------------------------------------------
 # OSD core library
 #-------------------------------------------------
@@ -94,12 +96,17 @@ ifeq ($(SUBARCH),macosx)
 OSDOBJS += $(SDLOBJ)/SDLMain_tmpl.o
 LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread 
 
+SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
+
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
 ifdef DEBUG
 OSDOBJS += $(SDLOBJ)/debugosx.o
 LIBS += -framework Carbon
 endif	# DEBUG
 endif	# Mac OS X
+
+TOOLS += \
+	testkeys$(EXE)
 
 # drawSDL depends on the core software renderer, so make sure it exists
 $(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c $(SRC)/osd/sdl/yuv_blit.c
@@ -111,3 +118,19 @@ $(LIBOCORE): $(OSDCOREOBJS)
 $(LIBOSD): $(OSDOBJS)
 
 $(SDLOBJ)/scale2x.o: $(SDLSRC)/scale2x.c $(SDLSRC)/effect_func.h $(SDLSRC)/scale2x_core.c $(SDLSRC)/texsrc.h
+
+#-------------------------------------------------
+# testkeys
+#-------------------------------------------------
+
+$(SDLOBJ)/testkeys.o: $(SDLSRC)/testkeys.c 
+	@echo Compiling $<...
+	$(CC)  $(CFLAGS) -c $< -o $@
+	
+TESTKEYSOBJS = \
+	$(SDLOBJ)/testkeys.o \
+
+testkeys$(EXE): $(TESTKEYSOBJS) 
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(SDLMAIN) $(LIBS) -o $@
+	

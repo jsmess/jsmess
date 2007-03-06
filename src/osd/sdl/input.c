@@ -795,6 +795,382 @@ static int joy_trans_table[][2] =
 	{ JOYCODE(7, CODETYPE_GUNAXIS, 1),		GUNCODE_8_ANALOG_Y },
 };
 
+typedef struct _key_lookup_table key_lookup_table;
+
+struct _key_lookup_table 
+{
+	int code;
+	const char *name;
+};
+
+#define KE(x) { x, #x }
+
+static key_lookup_table sdl_lookup[] =
+{
+	KE(SDLK_UNKNOWN),
+	KE(SDLK_FIRST),
+	KE(SDLK_BACKSPACE),
+	KE(SDLK_TAB),
+	KE(SDLK_CLEAR),
+	KE(SDLK_RETURN),
+	KE(SDLK_PAUSE),
+	KE(SDLK_ESCAPE),
+	KE(SDLK_SPACE),
+	KE(SDLK_EXCLAIM),
+	KE(SDLK_QUOTEDBL),
+	KE(SDLK_HASH),
+	KE(SDLK_DOLLAR),
+	KE(SDLK_AMPERSAND),
+	KE(SDLK_QUOTE),
+	KE(SDLK_LEFTPAREN),
+	KE(SDLK_RIGHTPAREN),
+	KE(SDLK_ASTERISK),
+	KE(SDLK_PLUS),
+	KE(SDLK_COMMA),
+	KE(SDLK_MINUS),
+	KE(SDLK_PERIOD),
+	KE(SDLK_SLASH),
+	KE(SDLK_0),
+	KE(SDLK_1),
+	KE(SDLK_2),
+	KE(SDLK_3),
+	KE(SDLK_4),
+	KE(SDLK_5),
+	KE(SDLK_6),
+	KE(SDLK_7),
+	KE(SDLK_8),
+	KE(SDLK_9),
+	KE(SDLK_COLON),
+	KE(SDLK_SEMICOLON),
+	KE(SDLK_LESS),
+	KE(SDLK_EQUALS),
+	KE(SDLK_GREATER),
+	KE(SDLK_QUESTION),
+	KE(SDLK_AT),
+	KE(SDLK_LEFTBRACKET),
+	KE(SDLK_BACKSLASH),
+	KE(SDLK_RIGHTBRACKET),
+	KE(SDLK_CARET),
+	KE(SDLK_UNDERSCORE),
+	KE(SDLK_BACKQUOTE),
+	KE(SDLK_a),
+	KE(SDLK_b),
+	KE(SDLK_c),
+	KE(SDLK_d),
+	KE(SDLK_e),
+	KE(SDLK_f),
+	KE(SDLK_g),
+	KE(SDLK_h),
+	KE(SDLK_i),
+	KE(SDLK_j),
+	KE(SDLK_k),
+	KE(SDLK_l),
+	KE(SDLK_m),
+	KE(SDLK_n),
+	KE(SDLK_o),
+	KE(SDLK_p),
+	KE(SDLK_q),
+	KE(SDLK_r),
+	KE(SDLK_s),
+	KE(SDLK_t),
+	KE(SDLK_u),
+	KE(SDLK_v),
+	KE(SDLK_w),
+	KE(SDLK_x),
+	KE(SDLK_y),
+	KE(SDLK_z),
+	KE(SDLK_DELETE),
+	KE(SDLK_WORLD_0),
+	KE(SDLK_WORLD_1),
+	KE(SDLK_WORLD_2),
+	KE(SDLK_WORLD_3),
+	KE(SDLK_WORLD_4),
+	KE(SDLK_WORLD_5),
+	KE(SDLK_WORLD_6),
+	KE(SDLK_WORLD_7),
+	KE(SDLK_WORLD_8),
+	KE(SDLK_WORLD_9),
+	KE(SDLK_WORLD_10),
+	KE(SDLK_WORLD_11),
+	KE(SDLK_WORLD_12),
+	KE(SDLK_WORLD_13),
+	KE(SDLK_WORLD_14),
+	KE(SDLK_WORLD_15),
+	KE(SDLK_WORLD_16),
+	KE(SDLK_WORLD_17),
+	KE(SDLK_WORLD_18),
+	KE(SDLK_WORLD_19),
+	KE(SDLK_WORLD_20),
+	KE(SDLK_WORLD_21),
+	KE(SDLK_WORLD_22),
+	KE(SDLK_WORLD_23),
+	KE(SDLK_WORLD_24),
+	KE(SDLK_WORLD_25),
+	KE(SDLK_WORLD_26),
+	KE(SDLK_WORLD_27),
+	KE(SDLK_WORLD_28),
+	KE(SDLK_WORLD_29),
+	KE(SDLK_WORLD_30),
+	KE(SDLK_WORLD_31),
+	KE(SDLK_WORLD_32),
+	KE(SDLK_WORLD_33),
+	KE(SDLK_WORLD_34),
+	KE(SDLK_WORLD_35),
+	KE(SDLK_WORLD_36),
+	KE(SDLK_WORLD_37),
+	KE(SDLK_WORLD_38),
+	KE(SDLK_WORLD_39),
+	KE(SDLK_WORLD_40),
+	KE(SDLK_WORLD_41),
+	KE(SDLK_WORLD_42),
+	KE(SDLK_WORLD_43),
+	KE(SDLK_WORLD_44),
+	KE(SDLK_WORLD_45),
+	KE(SDLK_WORLD_46),
+	KE(SDLK_WORLD_47),
+	KE(SDLK_WORLD_48),
+	KE(SDLK_WORLD_49),
+	KE(SDLK_WORLD_50),
+	KE(SDLK_WORLD_51),
+	KE(SDLK_WORLD_52),
+	KE(SDLK_WORLD_53),
+	KE(SDLK_WORLD_54),
+	KE(SDLK_WORLD_55),
+	KE(SDLK_WORLD_56),
+	KE(SDLK_WORLD_57),
+	KE(SDLK_WORLD_58),
+	KE(SDLK_WORLD_59),
+	KE(SDLK_WORLD_60),
+	KE(SDLK_WORLD_61),
+	KE(SDLK_WORLD_62),
+	KE(SDLK_WORLD_63),
+	KE(SDLK_WORLD_64),
+	KE(SDLK_WORLD_65),
+	KE(SDLK_WORLD_66),
+	KE(SDLK_WORLD_67),
+	KE(SDLK_WORLD_68),
+	KE(SDLK_WORLD_69),
+	KE(SDLK_WORLD_70),
+	KE(SDLK_WORLD_71),
+	KE(SDLK_WORLD_72),
+	KE(SDLK_WORLD_73),
+	KE(SDLK_WORLD_74),
+	KE(SDLK_WORLD_75),
+	KE(SDLK_WORLD_76),
+	KE(SDLK_WORLD_77),
+	KE(SDLK_WORLD_78),
+	KE(SDLK_WORLD_79),
+	KE(SDLK_WORLD_80),
+	KE(SDLK_WORLD_81),
+	KE(SDLK_WORLD_82),
+	KE(SDLK_WORLD_83),
+	KE(SDLK_WORLD_84),
+	KE(SDLK_WORLD_85),
+	KE(SDLK_WORLD_86),
+	KE(SDLK_WORLD_87),
+	KE(SDLK_WORLD_88),
+	KE(SDLK_WORLD_89),
+	KE(SDLK_WORLD_90),
+	KE(SDLK_WORLD_91),
+	KE(SDLK_WORLD_92),
+	KE(SDLK_WORLD_93),
+	KE(SDLK_WORLD_94),
+	KE(SDLK_WORLD_95),
+	KE(SDLK_KP0),
+	KE(SDLK_KP1),
+	KE(SDLK_KP2),
+	KE(SDLK_KP3),
+	KE(SDLK_KP4),
+	KE(SDLK_KP5),
+	KE(SDLK_KP6),
+	KE(SDLK_KP7),
+	KE(SDLK_KP8),
+	KE(SDLK_KP9),
+	KE(SDLK_KP_PERIOD),
+	KE(SDLK_KP_DIVIDE),
+	KE(SDLK_KP_MULTIPLY),
+	KE(SDLK_KP_MINUS),
+	KE(SDLK_KP_PLUS),
+	KE(SDLK_KP_ENTER),
+	KE(SDLK_KP_EQUALS),
+	KE(SDLK_UP),
+	KE(SDLK_DOWN),
+	KE(SDLK_RIGHT),
+	KE(SDLK_LEFT),
+	KE(SDLK_INSERT),
+	KE(SDLK_HOME),
+	KE(SDLK_END),
+	KE(SDLK_PAGEUP),
+	KE(SDLK_PAGEDOWN),
+	KE(SDLK_F1),
+	KE(SDLK_F2),
+	KE(SDLK_F3),
+	KE(SDLK_F4),
+	KE(SDLK_F5),
+	KE(SDLK_F6),
+	KE(SDLK_F7),
+	KE(SDLK_F8),
+	KE(SDLK_F9),
+	KE(SDLK_F10),
+	KE(SDLK_F11),
+	KE(SDLK_F12),
+	KE(SDLK_F13),
+	KE(SDLK_F14),
+	KE(SDLK_F15),
+	KE(SDLK_NUMLOCK),
+	KE(SDLK_CAPSLOCK),
+	KE(SDLK_SCROLLOCK),
+	KE(SDLK_RSHIFT),
+	KE(SDLK_LSHIFT),
+	KE(SDLK_RCTRL),
+	KE(SDLK_LCTRL),
+	KE(SDLK_RALT),
+	KE(SDLK_LALT),
+	KE(SDLK_RMETA),
+	KE(SDLK_LMETA),
+	KE(SDLK_LSUPER),
+	KE(SDLK_RSUPER),
+	KE(SDLK_MODE),
+	KE(SDLK_COMPOSE),
+	KE(SDLK_HELP),
+	KE(SDLK_PRINT),
+	KE(SDLK_SYSREQ),
+	KE(SDLK_BREAK),
+	KE(SDLK_MENU),
+	KE(SDLK_POWER),
+	KE(SDLK_EURO),
+	KE(SDLK_UNDO),
+	KE(SDLK_LAST),
+	KE(-1)
+};
+
+static key_lookup_table mame_lookup[] =
+{
+	KE(KEYCODE_A),
+ 	KE(KEYCODE_B),
+ 	KE(KEYCODE_C),
+ 	KE(KEYCODE_D),
+ 	KE(KEYCODE_E),
+ 	KE(KEYCODE_F),
+	KE(KEYCODE_G),
+ 	KE(KEYCODE_H),
+ 	KE(KEYCODE_I),
+ 	KE(KEYCODE_J),
+ 	KE(KEYCODE_K),
+ 	KE(KEYCODE_L),
+	KE(KEYCODE_M),
+ 	KE(KEYCODE_N),
+ 	KE(KEYCODE_O),
+ 	KE(KEYCODE_P),
+ 	KE(KEYCODE_Q),
+ 	KE(KEYCODE_R),
+	KE(KEYCODE_S),
+ 	KE(KEYCODE_T),
+ 	KE(KEYCODE_U),
+ 	KE(KEYCODE_V),
+ 	KE(KEYCODE_W),
+ 	KE(KEYCODE_X),
+	KE(KEYCODE_Y),
+ 	KE(KEYCODE_Z),
+ 	KE(KEYCODE_0),
+ 	KE(KEYCODE_1),
+ 	KE(KEYCODE_2),
+ 	KE(KEYCODE_3),
+	KE(KEYCODE_4),
+ 	KE(KEYCODE_5),
+ 	KE(KEYCODE_6),
+ 	KE(KEYCODE_7),
+ 	KE(KEYCODE_8),
+ 	KE(KEYCODE_9),
+	KE(KEYCODE_F1),
+ 	KE(KEYCODE_F2),
+ 	KE(KEYCODE_F3),
+ 	KE(KEYCODE_F4),
+ 	KE(KEYCODE_F5),
+	KE(KEYCODE_F6),
+ 	KE(KEYCODE_F7),
+ 	KE(KEYCODE_F8),
+ 	KE(KEYCODE_F9),
+ 	KE(KEYCODE_F10),
+	KE(KEYCODE_F11),
+ 	KE(KEYCODE_F12),
+ 	KE(KEYCODE_F13),
+ 	KE(KEYCODE_F14),
+ 	KE(KEYCODE_F15),
+	KE(KEYCODE_ESC),
+ 	KE(KEYCODE_TILDE),
+ 	KE(KEYCODE_MINUS),
+ 	KE(KEYCODE_EQUALS),
+ 	KE(KEYCODE_BACKSPACE),
+	KE(KEYCODE_TAB),
+ 	KE(KEYCODE_OPENBRACE),
+ 	KE(KEYCODE_CLOSEBRACE),
+ 	KE(KEYCODE_ENTER),
+ 	KE(KEYCODE_COLON),
+	KE(KEYCODE_QUOTE),
+ 	KE(KEYCODE_BACKSLASH),
+ 	KE(KEYCODE_BACKSLASH2),
+ 	KE(KEYCODE_COMMA),
+ 	KE(KEYCODE_STOP),
+	KE(KEYCODE_SLASH),
+ 	KE(KEYCODE_SPACE),
+ 	KE(KEYCODE_INSERT),
+ 	KE(KEYCODE_DEL),
+	KE(KEYCODE_HOME),
+ 	KE(KEYCODE_END),
+ 	KE(KEYCODE_PGUP),
+ 	KE(KEYCODE_PGDN),
+	KE(KEYCODE_LEFT),
+	KE(KEYCODE_RIGHT),
+ 	KE(KEYCODE_UP),
+ 	KE(KEYCODE_DOWN),
+	KE(KEYCODE_0_PAD),
+ 	KE(KEYCODE_1_PAD),
+ 	KE(KEYCODE_2_PAD),
+ 	KE(KEYCODE_3_PAD),
+ 	KE(KEYCODE_4_PAD),
+	KE(KEYCODE_5_PAD),
+ 	KE(KEYCODE_6_PAD),
+ 	KE(KEYCODE_7_PAD),
+ 	KE(KEYCODE_8_PAD),
+ 	KE(KEYCODE_9_PAD),
+	KE(KEYCODE_SLASH_PAD),
+ 	KE(KEYCODE_ASTERISK),
+ 	KE(KEYCODE_MINUS_PAD),
+ 	KE(KEYCODE_PLUS_PAD),
+	KE(KEYCODE_DEL_PAD),
+ 	KE(KEYCODE_ENTER_PAD),
+ 	KE(KEYCODE_PRTSCR),
+ 	KE(KEYCODE_PAUSE),
+	KE(KEYCODE_LSHIFT),
+ 	KE(KEYCODE_RSHIFT),
+ 	KE(KEYCODE_LCONTROL),
+ 	KE(KEYCODE_RCONTROL),
+	KE(KEYCODE_LALT),
+ 	KE(KEYCODE_RALT),
+ 	KE(KEYCODE_SCRLOCK),
+ 	KE(KEYCODE_NUMLOCK),
+ 	KE(KEYCODE_CAPSLOCK),
+	KE(KEYCODE_LWIN),
+ 	KE(KEYCODE_RWIN),
+ 	KE(KEYCODE_MENU),
+ 	KE(-1)
+};
+
+static int lookup_key_code(const key_lookup_table *kt, char *kn)
+{
+	int i=0;
+	if (!kn)
+		return -1;
+	while (kt[i].code>=0)
+	{
+		if (!strcmp(kn, kt[i].name))
+			return kt[i].code;
+		i++;
+	}
+	return -1;
+}
+
 static int win_has_menu(void)
 {
 	return 0;
@@ -1210,12 +1586,13 @@ static void init_keycodes(void)
 {
 	int key = 0;
 	int (*key_trans_table)[4] = NULL;
+	char **ui_name = NULL;
 
 	if (options_get_bool("keymap"))
 	{
 		char *keymap_filename;
 		FILE *keymap_file;
-		int line = 0, rc;
+		int line = 1;
 
 		keymap_filename = (char *)options_get_string("keymap_file");
 		keymap_file = fopen(keymap_filename, "r");
@@ -1227,22 +1604,64 @@ static void init_keycodes(void)
 		}
 		else
 		{
-			do
+			int index,i, mk, sk, vk, ak;
+			char buf[256];
+			char mks[21];
+			char sks[21];
+			char kns[21];
+			
+			i=0;
+			while (def_key_trans_table[i][MAME_KEY]>=0 )
+				i++;
+			key_trans_table = malloc_or_die( sizeof(int) * 4 * (i+1));
+			memcpy(key_trans_table, def_key_trans_table, sizeof(int) * 4 * (i+1));
+			ui_name = malloc_or_die( sizeof(char *) * (i+1));
+			memset(ui_name, 0, sizeof(char *) * (i+1));
+			while (!feof(keymap_file))
 			{
-				key_trans_table = (int (*)[4])realloc( key_trans_table, sizeof(int) * 4 * ( line + 1));
-
-				rc = fscanf(keymap_file, "%x %x %x %x\n",
-				&key_trans_table[line][MAME_KEY],
-				&key_trans_table[line][SDL_KEY],
-				&key_trans_table[line][VIRTUAL_KEY],
-				&key_trans_table[line][ASCII_KEY]
-				);
-
+				fgets(buf, 255, keymap_file);
+				if (*buf && buf[0] && buf[0] != '#')
+				{
+					buf[255]=0;
+					i=strlen(buf);
+					if (i && buf[i-1] == '\n')
+						buf[i-1] = 0;
+					mks[0]=0;
+					sks[0]=0;
+					memset(kns, 0, 21);
+					sscanf(buf, "%20s %20s %x %x %20c\n",
+							mks, sks, &vk, &ak, kns);
+					index=-1;
+					i=0;
+					mk = lookup_key_code(mame_lookup, mks);
+					sk = lookup_key_code(sdl_lookup, sks);
+					if ( sk >= 0 && mk >=0) 
+					{
+						while (key_trans_table[i][MAME_KEY]>=0 )
+						{
+							if (key_trans_table[i][MAME_KEY]==mk)
+						  	{
+								index=i;
+							}	
+							i++;
+						}
+						printf("Index %d\n", index);
+						if (index>=0)
+						{
+							key_trans_table[index][SDL_KEY] = sk;
+							key_trans_table[index][VIRTUAL_KEY] = vk;
+							key_trans_table[index][ASCII_KEY] = ak;
+							ui_name[index] = auto_malloc(strlen(kns)+1);
+							strcpy(ui_name[index], kns);
+						}
+					}
+					else
+						fprintf(stderr,"Warning: Line %d: %s\n", line, buf);
+				}
 				line++;
 			}
-			while(rc != EOF);
-
 			fclose(keymap_file);
+			fprintf(stderr,"Processed %d lines\n", line);
 		}
 	}
 	else
@@ -1254,23 +1673,31 @@ static void init_keycodes(void)
 	while (key_trans_table[key][0] >= 0) 
 	{
 		// copy the name
-		char *namecopy = auto_malloc(strlen(key_name_table[key])+1);
 
-		if (namecopy)
+		char *namecopy;
+
+		input_code standardcode;
+		os_code code;
+
+		// compute the code, which encodes DirectInput, virtual, and ASCII codes
+		code = KEYCODE(key_trans_table[key][SDL_KEY], key_trans_table[key][VIRTUAL_KEY], key_trans_table[key][ASCII_KEY]);
+		standardcode = key_trans_table[key][MAME_KEY];
+
+		// fill in the key description
+		if (ui_name && ui_name[key] && *ui_name[key])
 		{
-			input_code standardcode;
-			os_code code;
-
-			// compute the code, which encodes DirectInput, virtual, and ASCII codes
-			code = KEYCODE(key_trans_table[key][SDL_KEY], key_trans_table[key][VIRTUAL_KEY], key_trans_table[key][ASCII_KEY]);
-			standardcode = key_trans_table[key][MAME_KEY];
-
-			// fill in the key description
-			codelist[total_codes].name = strcpy(namecopy, key_name_table[key]);
-			codelist[total_codes].oscode = code;
-			codelist[total_codes].inputcode = standardcode;
-			total_codes++;
+			printf("%d <%s>\n", key, ui_name[key]);
+			namecopy = ui_name[key];
 		}
+		else 
+		{
+			namecopy = auto_malloc(strlen(key_name_table[key])+1);
+			strcpy(namecopy, key_name_table[key]);
+		}
+		codelist[total_codes].name = namecopy;
+		codelist[total_codes].oscode = code;
+		codelist[total_codes].inputcode = standardcode;
+		total_codes++;
 
 		key++;
 	} 

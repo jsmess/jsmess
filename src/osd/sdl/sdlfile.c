@@ -138,6 +138,7 @@ mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UI
 	// does path start with an environment variable?
 	if (tmpstr[0] == '$')
 	{
+		char *envval;
 		envstr = malloc(strlen(tmpstr)+1); 
 
 		strcpy(envstr, tmpstr);
@@ -150,16 +151,22 @@ mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UI
 
 		envstr[i] = '\0';
 
-		j = strlen(getenv(&envstr[1])) + strlen(tmpstr) + 1;
-		free(tmpstr);
-		tmpstr = malloc(j);
-
-		// start with the value of $HOME
-		strcpy(tmpstr, getenv(&envstr[1]));
-		// replace the null with a path separator again
-		envstr[i] = PATHSEPCH;
-		// append it
-		strcat(tmpstr, &envstr[i]);
+		envval = getenv(&envstr[1]);
+		if (envval)
+		{
+			j = strlen(envval) + strlen(tmpstr) + 1;
+			free(tmpstr);
+			tmpstr = malloc(j);
+	
+			// start with the value of $HOME
+			strcpy(tmpstr, envval);
+			// replace the null with a path separator again
+			envstr[i] = PATHSEPCH;
+			// append it
+			strcat(tmpstr, &envstr[i]);
+		}
+		else
+			fprintf(stderr, "Warning: Environment variable %s not found.\n", envstr);
 		free(envstr);
 	}
 

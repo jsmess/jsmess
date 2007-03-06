@@ -12,6 +12,7 @@
 // standard sdl header
 #include <SDL/SDL.h>
 #include <unistd.h>
+#include <math.h>
 
 #ifdef SDLMAME_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -239,6 +240,21 @@ static void unlock_buffer(void)
 	#endif
 }
 
+//============================================================
+//	Apply attenuation
+//============================================================
+
+static void att_memcpy(void *dest, INT16 *data, int bytes_to_copy)
+{	
+	int level= (int) (pow(10.0, (float) attenuation / 20.0) * 128.0);
+	INT16 *d = dest;
+	int count = bytes_to_copy/2;
+	while (count>0)
+	{	
+		*d++ = *data++ * level/128;
+		count--;
+	}
+}
 
 //============================================================
 //	copy_sample_data
@@ -262,7 +278,7 @@ static void copy_sample_data(INT16 *data, int bytes_to_copy)
 
 	// copy the first chunk
 	cur_bytes = (bytes_to_copy > length1) ? length1 : bytes_to_copy;
-	memcpy(buffer1, data, cur_bytes);
+	att_memcpy(buffer1, data, cur_bytes);
 
 	// adjust for the number of bytes
 	bytes_to_copy -= cur_bytes;
@@ -272,7 +288,7 @@ static void copy_sample_data(INT16 *data, int bytes_to_copy)
 	if (bytes_to_copy != 0)
 	{
 		cur_bytes = (bytes_to_copy > length2) ? length2 : bytes_to_copy;
-		memcpy(buffer2, data, cur_bytes);
+		att_memcpy(buffer2, data, cur_bytes);
 	}
 
 	// unlock

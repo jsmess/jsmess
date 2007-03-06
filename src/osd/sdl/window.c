@@ -550,6 +550,11 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 				pick_best_mode(window, &tempwidth, &tempheight);
 				sdlwindow_resize(tempwidth, tempheight);
 			}
+
+			if (video_config.yuv_mode != VIDEO_YUV_MODE_NONE)
+			{
+				yuv_overlay_init(window);
+			}
 		}
 
 		// only block if we're throttled

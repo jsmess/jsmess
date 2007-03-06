@@ -321,6 +321,9 @@ endif
 
 CFLAGS += -O$(OPTIMIZE)
 
+# hack for Win32-specific directive in 0.113 core
+CFLAGS += -D__cdecl
+
 # extra options needed *only* for the osd files
 CFLAGSOSDEPEND = $(CFLAGS)
 
@@ -491,9 +494,9 @@ $(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 
-$(OBJ)/%.lh: $(SRC)/%.lay file2str$(EXE)
+$(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR)
 	@echo Converting $<...
-	@./file2str $< $@ layout_$(basename $(notdir $<))
+	@$(FILE2STR) $< $@ layout_$(basename $(notdir $<))
 
 $(OBJ)/%.a:
 	@echo Archiving $@...
