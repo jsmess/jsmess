@@ -367,7 +367,9 @@ void setup_rom(void)
 	}
 
 	/* 4. check and set up cartridge rom */
-	if ( ( !(biosPort & IO_CARTRIDGE) && (biosPort & IO_EXPANSION) && (biosPort & IO_CARD) ) || IS_GAMEGEAR ) {
+	/* if ( ( !(biosPort & IO_CARTRIDGE) && (biosPort & IO_EXPANSION) && (biosPort & IO_CARD) ) || IS_GAMEGEAR ) { */
+	/* Out Run Europa initially writes a value to port 3E where IO_CARTRIDGE, IO_EXPANSION and IO_CARD are reset */
+	if ( ( ! ( biosPort & IO_CARTRIDGE ) ) || IS_GAMEGEAR ) {
 		memory_set_bankptr( 1, sms_banking_cart[1] );
 		memory_set_bankptr( 2, sms_banking_cart[2] );
 		memory_set_bankptr( 3, sms_banking_cart[3] );
