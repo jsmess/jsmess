@@ -261,11 +261,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 		}
 	} else {
 		if (smsCartFeatures & CF_CODEMASTERS_MAPPER && offset == 0) { /* Codemasters mapper */
-			if (biosPort & IO_BIOS_ROM) {
-				page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
-			} else {
-				return;
-			}
+			page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
 			if ( ! ROM )
 				return;
 			sms_banking_cart[4] = ROM + page * 0x4000;
@@ -274,11 +270,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 			logerror("rom 2 paged in %x codemasters.\n", page);
 #endif
 		} else if (smsCartFeatures & CF_DODGEBALLKING_MAPPER && offset == 0x2000) { /* Dodgeball King mapper */
-			if (biosPort & IO_BIOS_ROM) {
-				page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
-			} else {
-				return;
-			}
+			page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
 			if ( ! ROM )
 				return;
 			sms_banking_cart[4] = ROM + page * 0x4000;
@@ -496,12 +488,31 @@ DEVICE_LOAD( sms_cart )
 
 	/* Check for special cartridge features */
 	if ( size >= 0x8000 ) {
-		/* Check for Codemasters mapper */
-		if ( ROM[0x7fe3] == 0x93 ) {
+		/* Check for Codemasters mapper
+		  0x7FE3 - 93 - sms Cosmis Spacehead
+		              - sms Dinobasher
+		              - sms The Excellent Dizzy Collection
+		              - sms Fantastic Dizzy
+		              - sms Micro Machines
+		              - gamegear Cosmic Spacehead
+		              - gamegear Micro Machines
+		         - 94 - gamegear Dropzone
+		              - gamegear Ernie Els Golf
+		              - gamegear Pete Sampras Tennis
+		              - gamegear S.S. Lucifer
+		         - 95 - gamegear Micro Machines 2 - Turbo Tournament
+		 */
+		if ( ( ROM[0x7fe3] == 0x93 ||
+		       ROM[0x7fe3] == 0x94 ||
+		       ROM[0x7fe3] == 0x95 ) && ROM[0x7fef] == 0x00 ) {
 			smsCartFeatures |= CF_CODEMASTERS_MAPPER;
 		}
-		/* Check for Dodgeball King */
-		if ( ROM[0x7ff0] == 0x3e && ROM[0x7ff1] == 0x11 ) {
+		/* Check for special Korean games mapper used by:
+		   - Dodgeball King/Dallyeora Pigu-Wang
+		   - Sangokushi 3
+		 */
+		if ( ( ROM[0x7ff0] == 0x3e && ROM[0x7ff1] == 0x11 ) ||  /* Dodgeball King */
+		     ( ROM[0x7ff0] == 0x41 && ROM[0x7ff1] == 0x48 ) ) { /* Sangokushi 3 */
 			smsCartFeatures |= CF_DODGEBALLKING_MAPPER;
 		}
 	}
