@@ -183,21 +183,21 @@ static INTERRUPT_GEN( studio2_frame_int )
 
 static int studio2_in_ef(void)
 {
-	int a=0;
-	if (studio2_get_vsync()) a|=1;
+	int a=0xff;
+	if (studio2_get_vsync()) a-=1;
 
-	if (readinputport(0)&(1<<keylatch)) a|=4;
-	if (readinputport(1)&(1<<keylatch)) a|=8;
+	if (readinputport(0)&(1<<keylatch)) a-=4;
+	if (readinputport(1)&(1<<keylatch)) a-=8;
 
 	return a;
 }
 
 static int vip_in_ef(void)
 {
-	int a=0;
-	if (studio2_get_vsync()) a|=1;
+	int a=0xff;
+	if (studio2_get_vsync()) a-=1;
 
-	if (readinputport(0)&(1<<keylatch)) a|=4;
+	if (readinputport(0)&(1<<keylatch)) a-=4;
 
 	return a;
 }

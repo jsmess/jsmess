@@ -300,7 +300,7 @@ SOUNDS += CDDA
 #SOUNDS += ES8712
 #SOUNDS += RF5C400
 SOUNDS += SPEAKER
-#SOUNDS += CDP1869
+SOUNDS += CDP1869
 #SOUNDS += S14001A
 SOUNDS += BEEP
 SOUNDS += WAVE
@@ -1052,6 +1052,8 @@ $(MESSOBJ)/multitch.a:					\
 $(MESSOBJ)/telmac.a:					\
 	$(MESS_DRIVERS)/telmac.o	\
 	$(MESS_VIDEO)/cdp186x.o	\
+	$(MESS_DRIVERS)/tmc600.o	\
+	$(MAME_VIDEO)/cdp1869.o	\
 
 $(MESSOBJ)/exeltel.a:					\
 	$(MESS_DRIVERS)/exelv.o		\
