@@ -678,6 +678,7 @@ static void image_clear(mess_image *image)
 	image->playable = NULL;
 	image->extrainfo = NULL;
 	image->basename_noext = NULL;
+	image->err_message = NULL;
 	image->ptr = NULL;
 }
 
