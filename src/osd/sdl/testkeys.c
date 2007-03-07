@@ -322,7 +322,11 @@ char *UNICODE_to_UTF8(char *utf8, int utf8_len, const wchar_t *unicode, int uni_
     return utf8;
 }
 
+#ifdef SDLMAME_WIN32
+int utf8_main(int argc, char *argv[])
+#else
 int main(int argc, char *argv[])
+#endif
 {
 	SDLKey key;
 	SDL_Event event;

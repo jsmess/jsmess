@@ -88,6 +88,8 @@ endif # FreeBSD
 # Win32: add the necessary libraries
 ifeq ($(SUBARCH),win32)
 OSDCOREOBJS += $(SDLOBJ)/main.o
+SDLMAIN = $(SDLOBJ)/main.o
+
 LIBS += -lmingw32 -lSDL -lopengl32
 endif	# Win32
 
@@ -132,5 +134,5 @@ TESTKEYSOBJS = \
 
 testkeys$(EXE): $(TESTKEYSOBJS) 
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(SDLMAIN) $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(SDLMAIN) $(SDLOBJ)/strconv.o $(LIBS) -o $@
 	
