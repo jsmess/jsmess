@@ -322,7 +322,9 @@ endif
 CFLAGS += -O$(OPTIMIZE)
 
 # hack for Win32-specific directive in 0.113 core
+ifneq ($(SUBARCH),win32)
 CFLAGS += -D__cdecl
+endif	#!win32
 
 # extra options needed *only* for the osd files
 CFLAGSOSDEPEND = $(CFLAGS)
