@@ -141,9 +141,9 @@ WRITE8_HANDLER(sms_mapper_w)
 		SOURCE_BIOS = sms_banking_none[1];
 	}
 
-	if (biosPort & IO_BIOS_ROM || IS_GAMEGEAR )
+	if (biosPort & IO_BIOS_ROM || ( IS_GAMEGEAR && BIOS == NULL ) )
 	{
-		if (!(biosPort & IO_CARTRIDGE) || IS_GAMEGEAR )
+		if (!(biosPort & IO_CARTRIDGE) || ( IS_GAMEGEAR && BIOS == NULL ) )
 		{
 			page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
 			if ( ! ROM )
@@ -211,6 +211,9 @@ WRITE8_HANDLER(sms_mapper_w)
 #endif
 			sms_banking_bios[2] = SOURCE_BIOS + 0x0400;
 			sms_banking_cart[2] = SOURCE_CART + 0x0400;
+			if ( IS_GAMEGEAR ) {
+				SOURCE = SOURCE_CART;
+			}
 			memory_set_bankptr( 2, SOURCE + 0x0400 );
 			break;
 		case 2: /* Select 16k ROM bank for 4000-7FFF */
@@ -219,6 +222,9 @@ WRITE8_HANDLER(sms_mapper_w)
 #endif
 			sms_banking_bios[3] = SOURCE_BIOS;
 			sms_banking_cart[3] = SOURCE_CART;
+			if ( IS_GAMEGEAR ) {
+				SOURCE = SOURCE_CART;
+			}
 			memory_set_bankptr( 3, SOURCE );
 			break;
 		case 3: /* Select 16k ROM bank for 8000-BFFF */
@@ -228,6 +234,9 @@ WRITE8_HANDLER(sms_mapper_w)
 				logerror("rom 2 paged in %x.\n", page);
 #endif
 				sms_banking_bios[4] = SOURCE_BIOS;
+				if ( IS_GAMEGEAR ) {
+					SOURCE = SOURCE_CART;
+				}
 				if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
 					if ( SOURCE == SOURCE_CART ) {
 						SOURCE = sms_banking_cart[4];
@@ -546,6 +555,11 @@ static void setup_banks( void ) {
 		if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
 			sms_banking_cart[4] = ROM;
 		}
+	}
+
+	if ( BIOS[0] == 0x00 ) {
+		BIOS = NULL;
+                biosPort |= IO_BIOS_ROM;
 	}
 
 	if ( BIOS ) {
