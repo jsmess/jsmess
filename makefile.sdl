@@ -372,6 +372,8 @@ VERSIONOBJ = $(OBJ)/version.o
 
 # start with an empty set of libs
 LIBS = 
+# and here's flags that are applied only to linking the main executable
+MAINLDFLAGS =
 
 # add expat XML library
 ifdef BUILD_EXPAT
@@ -408,7 +410,7 @@ endif
 
 ifeq ($(SUBARCH),macosx)
 CFLAGS += -DSDLMAME_MACOSX
-LDFLAGS += -Xlinker -all_load
+MAINLDFLAGS = -Xlinker -all_load
 endif
 
 
@@ -474,7 +476,7 @@ $(EMULATOR): $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU)  $(LIBCPU) $(LIBSOUND)
 # always recompile the version string
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@ $(MAPFLAGS)
+	$(LD) $(LDFLAGS) $(MAINLDFLAGS) $^ $(LIBS) -o $@ $(MAPFLAGS)
 
 #-------------------------------------------------
 # generic rules
