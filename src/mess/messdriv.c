@@ -496,26 +496,10 @@ TESTDRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 
 	DRIVER( avigo )     /*													*/
 
-/* TEXAS INSTRUMENTS CALCULATORS */
-/* TI-81 (Z80 2 MHz) */
-	DRIVER( ti81 )		/* TI 81 rom ver. 1.8								*/
-
-/* TI-85 (Z80 6MHz) */
-	DRIVER( ti85 )  	/* TI 85 rom ver. 3.0a								*/
-	DRIVER( ti85v40 )	/* TI 85 rom ver. 4.0								*/
-	DRIVER( ti85v50 )	/* TI 85 rom ver. 5.0								*/
-	DRIVER( ti85v60 )	/* TI 85 rom ver. 6.0								*/
-	DRIVER( ti85v80 )	/* TI 85 rom ver. 8.0								*/
-	DRIVER( ti85v90 )	/* TI 85 rom ver. 9.0								*/
-	DRIVER( ti85v100 )	/* TI 85 rom ver. 10.0								*/
-
-/* TI-86 (Z80 6 MHz) */
-	DRIVER( ti86 )		/* TI 86 rom ver. 1.2								*/
-	DRIVER( ti86v13 )	/* TI 86 rom ver. 1.3								*/
-	DRIVER( ti86v14 )	/* TI 86 rom ver. 1.4								*/
-TESTDRIVER( ti86v15 )	/* TI 86 rom ver. 1.5								*/
-	DRIVER( ti86v16 )	/* TI 86 rom ver. 1.6								*/
-	DRIVER( ti86grom )	/* TI 86 homebrew rom by Daniel Foesch				*/
+	/* TEXAS INSTRUMENTS CALCULATORS */
+	DRIVER( ti81 )		/* 1990 TI-81 (Z80 2 MHz)							*/
+	DRIVER( ti85 )		/* 1992 TI-85 (Z80 6 MHz)							*/
+	DRIVER( ti86 )		/* 1997 TI-86 (Z80 6 MHz)							*/
 
 	/* NEC */
 	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15KHz)		*/
