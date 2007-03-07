@@ -386,75 +386,51 @@ static MACHINE_DRIVER_START( ti86 )
 	MDRV_NVRAM_HANDLER( ti86 )
 MACHINE_DRIVER_END
 
+SYSTEM_BIOS_START( ti81 )
+	SYSTEM_BIOS_ADD( 0, "v18",  "V 1.8" )
+SYSTEM_BIOS_END
 
 ROM_START (ti81)
 	ROM_REGION (0x18000, REGION_CPU1,0)
-	ROM_LOAD ("ti81.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54))
+	ROMX_LOAD( "ti81v18.bin", 0x10000, 0x8000, CRC(94ac58e2) SHA1(ba915cfe2fe50a452ef8287db8f2244e29056d54), ROM_BIOS(1) )
 ROM_END
+
+SYSTEM_BIOS_START( ti85 )
+	SYSTEM_BIOS_ADD( 0, "v30a", "V 3.0A" )
+	SYSTEM_BIOS_ADD( 1, "v40",  "V 4.0" )
+	SYSTEM_BIOS_ADD( 2, "v50",  "V 5.0" )
+	SYSTEM_BIOS_ADD( 3, "v60",  "V 6.0" )
+	SYSTEM_BIOS_ADD( 4, "v80",  "V 8.0" )
+	SYSTEM_BIOS_ADD( 5, "v90",  "V 9.0" )
+	SYSTEM_BIOS_ADD( 6, "v100", "V 10.0" )
+SYSTEM_BIOS_END
 
 ROM_START (ti85)
 	ROM_REGION (0x30000, REGION_CPU1,0)
-	ROM_LOAD ("ti85v30a.bin", 0x10000, 0x20000, CRC(de4c0b1a) SHA1(f4cf4b8309372dbe26187bb279545f5d4bd48fc1))
+	ROMX_LOAD( "ti85v30a.bin", 0x10000, 0x20000, CRC(de4c0b1a) SHA1(f4cf4b8309372dbe26187bb279545f5d4bd48fc1), ROM_BIOS(1) )
+	ROMX_LOAD( "ti85v40.bin",  0x10000, 0x20000, CRC(a1723a17) SHA1(ff5866636bb3f206a6bf39cc9c9dc8308332aaf0), ROM_BIOS(2) )
+	ROMX_LOAD( "ti85v50.bin",  0x10000, 0x20000, CRC(781fa403) SHA1(bf20d520d8efd7e5ae269789ca4b3c71848ac32a), ROM_BIOS(3) )
+	ROMX_LOAD( "ti85v60.bin",  0x10000, 0x20000, CRC(b694a117) SHA1(36d58e2723e5ae4ffe0f8da691fa9a83bfe9e06b), ROM_BIOS(4) )
+	ROMX_LOAD( "ti85v80.bin",  0x10000, 0x20000, CRC(7f296338) SHA1(765d5c612b6ffc0d1ded8f79bcbe880b1b562a98), ROM_BIOS(5) )
+	ROMX_LOAD( "ti85v90.bin",  0x10000, 0x20000, CRC(6a0a94d0) SHA1(7742bf8a6929a21d06f306b494fc03b1fbdfe3e4), ROM_BIOS(6) )
+	ROMX_LOAD( "ti85v100.bin", 0x10000, 0x20000, CRC(053325b0) SHA1(36da1080c34e7b53cbe8463be5804e30e4a50dc8), ROM_BIOS(7) )
 ROM_END
 
-ROM_START (ti85v40)
-	ROM_REGION (0x30000, REGION_CPU1,0)
-	ROM_LOAD ("ti85v40.bin", 0x10000, 0x20000, CRC(a1723a17) SHA1(ff5866636bb3f206a6bf39cc9c9dc8308332aaf0))
-ROM_END
-
-ROM_START (ti85v50)
-	ROM_REGION (0x30000, REGION_CPU1,0)
-	ROM_LOAD ("ti85v50.bin", 0x10000, 0x20000, CRC(781fa403) SHA1(bf20d520d8efd7e5ae269789ca4b3c71848ac32a))
-ROM_END
-
-ROM_START (ti85v60)
-	ROM_REGION (0x30000, REGION_CPU1,0)
-	ROM_LOAD ("ti85v60.bin", 0x10000, 0x20000, CRC(b694a117) SHA1(36d58e2723e5ae4ffe0f8da691fa9a83bfe9e06b))
-ROM_END
-
-ROM_START (ti85v80)
-	ROM_REGION (0x30000, REGION_CPU1,0)
-	ROM_LOAD ("ti85v80.bin", 0x10000, 0x20000, CRC(7f296338) SHA1(765d5c612b6ffc0d1ded8f79bcbe880b1b562a98))
-ROM_END
-
-ROM_START (ti85v90)
-	ROM_REGION (0x30000, REGION_CPU1,0)
-	ROM_LOAD ("ti85v90.bin", 0x10000, 0x20000, CRC(6a0a94d0) SHA1(7742bf8a6929a21d06f306b494fc03b1fbdfe3e4))
-ROM_END
-
-ROM_START (ti85v100)
-	ROM_REGION (0x30000, REGION_CPU1,0)
-	ROM_LOAD ("ti85v100.bin", 0x10000, 0x20000, CRC(053325b0) SHA1(36da1080c34e7b53cbe8463be5804e30e4a50dc8))
-ROM_END
+SYSTEM_BIOS_START( ti86 )
+	SYSTEM_BIOS_ADD( 0, "v12", "V 1.2" )
+	SYSTEM_BIOS_ADD( 1, "v13", "V 1.3" )
+	SYSTEM_BIOS_ADD( 2, "v14", "V 1.4" )
+	SYSTEM_BIOS_ADD( 3, "v15", "V 1.5" )
+	SYSTEM_BIOS_ADD( 4, "v16", "V 1.6" )
+SYSTEM_BIOS_END
 
 ROM_START (ti86)
 	ROM_REGION (0x50000, REGION_CPU1,0)
-	ROM_LOAD ("ti86v12.bin", 0x10000, 0x40000, CRC(bdf16105) SHA1(e40b22421c31bf0af104518b748ae79cd21d9c57))
-ROM_END
-
-ROM_START (ti86v13)
-	ROM_REGION (0x50000, REGION_CPU1,0)
-	ROM_LOAD ("ti86v13.bin", 0x10000, 0x40000, CRC(073ef70f) SHA1(5702d4bb835bdcbfa8075ffd620fca0eaf3a1592))
-ROM_END
-
-ROM_START (ti86v14)
-	ROM_REGION (0x50000, REGION_CPU1,0)
-	ROM_LOAD ("ti86v14.bin", 0x10000, 0x40000, CRC(fe6e2986) SHA1(23e0fb9a1763d5b9a7b0e593f09c2ff30c760866))
-ROM_END
-
-ROM_START (ti86v15)
-	ROM_REGION (0x50000, REGION_CPU1,0)
-	ROM_LOAD ("ti86v15.bin", 0x10000, 0x40000, BAD_DUMP CRC(e6e10546))
-ROM_END
-
-ROM_START (ti86v16)
-	ROM_REGION (0x50000, REGION_CPU1,0)
-	ROM_LOAD ("ti86v16.bin", 0x10000, 0x40000, CRC(37e02acc) SHA1(b5ad204885e5dde23a22f18f8d5eaffca69d638d))
-ROM_END
-
-ROM_START (ti86grom)
-	ROM_REGION (0x50000, REGION_CPU1,0)
-	ROM_LOAD ("ti86grom.bin", 0x10000, 0x40000, CRC(d2c67280) SHA1(d5c41f6584fe209ed3c615bda58c35469782f3cd))
+	ROMX_LOAD( "ti86v12.bin", 0x10000, 0x40000, CRC(bdf16105) SHA1(e40b22421c31bf0af104518b748ae79cd21d9c57), ROM_BIOS(1) )
+	ROMX_LOAD( "ti86v13.bin", 0x10000, 0x40000, CRC(073ef70f) SHA1(5702d4bb835bdcbfa8075ffd620fca0eaf3a1592), ROM_BIOS(2) )
+	ROMX_LOAD( "ti86v14.bin", 0x10000, 0x40000, CRC(fe6e2986) SHA1(23e0fb9a1763d5b9a7b0e593f09c2ff30c760866), ROM_BIOS(3) )
+	ROMX_LOAD( "ti86v15.bin", 0x10000, 0x40000, BAD_DUMP CRC(e6e10546), ROM_BIOS(4) )
+	ROMX_LOAD( "ti86v16.bin", 0x10000, 0x40000, CRC(37e02acc) SHA1(b5ad204885e5dde23a22f18f8d5eaffca69d638d), ROM_BIOS(5) )
 ROM_END
 
 static void ti85_snapshot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
@@ -540,21 +516,8 @@ SYSTEM_CONFIG_START(ti86)
 	CONFIG_DEVICE(ti86_serial_getinfo)
 	CONFIG_DEVICE(ti86_snapshot_getinfo)
 SYSTEM_CONFIG_END
-                            
-/*    YEAR  NAME		PARENT	COMPAT	MACHINE INPUT	INIT	CONFIG	COMPANY        FULLNAME */
-COMP( 1990, ti81,          0,   0,		ti81,	ti81,	0,		NULL,	"Texas Instruments", "TI-81 Ver. 1.8" , 0)
 
-COMP( 1992, ti85,          0,   0,		ti85,	ti85,	0,		ti85,	"Texas Instruments", "TI-85 ver. 3.0a" , 0)
-COMP( 1992, ti85v40,    ti85,   0,		ti85,	ti85,	0,		ti85,	"Texas Instruments", "TI-85 ver. 4.0" , 0)
-COMP( 1992, ti85v50,    ti85,   0,		ti85,	ti85,	0,		ti85,	"Texas Instruments", "TI-85 ver. 5.0" , 0)
-COMP( 1992, ti85v60,    ti85,   0,		ti85,	ti85,	0,		ti85,	"Texas Instruments", "TI-85 ver. 6.0" , 0)
-COMP( 1992, ti85v80,    ti85,   0,		ti85,	ti85,	0,		ti85,	"Texas Instruments", "TI-85 ver. 8.0" , 0)
-COMP( 1992, ti85v90,    ti85,   0,		ti85,	ti85,	0,		ti85,	"Texas Instruments", "TI-85 ver. 9.0" , 0)
-COMP( 1992, ti85v100,   ti85,   0,		ti85,	ti85,	0,		ti85,	"Texas Instruments", "TI-85 ver. 10.0" , 0)
-
-COMP( 1997, ti86,   	   0,   0,		ti86,	ti85,	0,		ti86,	"Texas Instruments", "TI-86 ver. 1.2" , 0)
-COMP( 1997, ti86v13,   	ti86,   0,		ti86,	ti85,	0,		ti86,	"Texas Instruments", "TI-86 ver. 1.3" , 0)
-COMP( 1997, ti86v14,   	ti86,   0,		ti86,	ti85,	0,		ti86,	"Texas Instruments", "TI-86 ver. 1.4" , 0)
-COMP( 1997, ti86v15,   	ti86,   0,		ti86,	ti85,	0,		ti86,	"Texas Instruments", "TI-86 ver. 1.5" , 0)
-COMP( 1997, ti86v16,   	ti86,   0,		ti86,	ti85,	0,		ti86,	"Texas Instruments", "TI-86 ver. 1.6" , 0)
-COMP( 1997, ti86grom,   ti86,   0,		ti86,	ti85,	0,		ti86,	"Texas Instruments", "TI-86 homebrew rom by Daniel Foesch" , 0)
+/*     YEAR  NAME  PARENT	BIOS  COMPAT	MACHINE INPUT	INIT	CONFIG	COMPANY					FULLNAME */
+COMPB( 1990, ti81, 0,		ti81, 0,		ti81,	ti81,	0,		NULL,	"Texas Instruments",	"TI-81" , 0)
+COMPB( 1992, ti85, 0,		ti85, 0,		ti85,	ti85,	0,		ti85,	"Texas Instruments",	"TI-85" , 0)
+COMPB( 1997, ti86, 0,		ti86, 0,		ti86,	ti85,	0,		ti86,	"Texas Instruments",	"TI-86" , 0)
