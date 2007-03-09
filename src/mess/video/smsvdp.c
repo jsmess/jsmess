@@ -24,6 +24,7 @@ int pending;
 int latch;
 int buffer;
 int statusReg;
+int ggSmsMode;
 
 int isCRAMDirty;
 
@@ -38,6 +39,13 @@ int vdp_mode;			/* current mode of the VDP: 0,1,2,3,4 */
 int bborder_192_y_pixels, bborder_224_y_pixels, bborder_240_y_pixels;
 
 mame_bitmap *prevBitMap;
+
+/* lineBuffer will be used to hold 5 lines of line data. Line #0 is the regular blitting area.
+   Lines #1-#4 will be used as a kind of cache to be used for vertical scaling in the gamegear
+   sms compatibility mode.
+ */
+int *lineBuffer = NULL;
+int currentPalette[32];
 int prevBitMapSaved;
 
 UINT8 *vcnt_lookup;
@@ -199,9 +207,9 @@ static void set_display_settings( void ) {
 		}
 	} else {
 		/* original TMS9918 mode */
-//		if ( ! M1 && ! M2 && ! M3 ) {
-//			vdp_mode = 0;
-//		} else
+		if ( ! M1 && ! M2 && ! M3 ) {
+			vdp_mode = 0;
+		} else
 //		if ( M1 && ! M2 && ! M3 ) {
 //			vdp_mode = 1;
 //		} else
@@ -239,6 +247,10 @@ static void set_display_settings( void ) {
 	return vcnt_lookup[currentLine];
 }
 
+void sms_set_ggsmsmode( int mode ) {
+	ggSmsMode = mode;
+}
+
 int sms_video_init( int max_lines, int bborder_192, int bborder_224, int bborder_240, UINT8 *vcnt_192, UINT8 *vcnt_224, UINT8 *vcnt_240 ) {
 
 	max_y_pixels = max_lines;
@@ -259,6 +271,11 @@ int sms_video_init( int max_lines, int bborder_192, int bborder_224, int bborder
 	if ( CRAM == NULL ) {
 		CRAM = new_memory_region( Machine, REGION_GFX2, CRAM_SIZE, ROM_REQUIRED );
 	}
+	if ( lineBuffer == NULL ) {
+		lineBuffer = auto_malloc( 256 * 5 * sizeof(int) );
+		memset( lineBuffer, 0, 256 * 5 * sizeof(int) );
+	}
+
 	/* Clear RAM */
 	memset(reg, 0, NUM_OF_REGISTER);
 	isCRAMDirty = 1;
@@ -266,7 +283,7 @@ int sms_video_init( int max_lines, int bborder_192, int bborder_224, int bborder
 	memset(CRAM, 0, CRAM_SIZE);
 	reg[0x02] = 0x0E;			/* power up default */
 
-	CRAMMask = IS_GAMEGEAR ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
+	CRAMMask = ( IS_GAMEGEAR && ! ggSmsMode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
 
 	/* Initialize VDP state variables */
 	addr = code = pending = latch = buffer = statusReg = \
@@ -336,36 +353,9 @@ INTERRUPT_GEN(sms) {
 #ifdef LOG_CURLINE
 		logerror("l %04x, pc: %04x\n", currentLine, activecpu_get_pc());
 #endif
-		if ( IS_GAMEGEAR ) {
-			if ((currentLine >= Machine->screen[0].visarea.min_y) && (currentLine <= Machine->screen[0].visarea.max_y)) {
-				sms_update_palette();
-#ifdef MAME_DEBUG
-				if (code_pressed(KEYCODE_T)) {
-					sms_show_tile_line(tmpbitmap, currentLine, 0);
-				} else if (code_pressed(KEYCODE_Y)) {
-					sms_show_tile_line(tmpbitmap, currentLine, 1);
-				} else {
-#endif
-					sms_refresh_line(tmpbitmap, currentLine);
-#ifdef MAME_DEBUG
-				}
-#endif
-			}
-		} else {
-			if (currentLine < max_y_pixels) {
-				sms_update_palette();
-#ifdef MAME_DEBUG
-				if (code_pressed(KEYCODE_T)) {
-					sms_show_tile_line(tmpbitmap, currentLine - TBORDER_Y_PIXELS, 0);
-				} else if (code_pressed(KEYCODE_Y)) {
-					sms_show_tile_line(tmpbitmap, currentLine - TBORDER_Y_PIXELS, 1);
-				} else {
-#endif
-					sms_refresh_line(tmpbitmap, currentLine);
-#ifdef MAME_DEBUG
-				}
-#endif
-			}
+		if (currentLine < max_y_pixels) {
+			sms_update_palette();
+			sms_refresh_line(tmpbitmap, currentLine);
 		}
 	}
 }
@@ -481,47 +471,7 @@ WRITE8_HANDLER(sms_vdp_ctrl_w) {
 	}
 }
 
-#ifdef MAME_DEBUG
-void sms_show_tile_line(mame_bitmap *bitmap, int line, int palletteSelected) {
-	int tileColumn, tileRow;
-	int pixelX;
-	int bitPlane0, bitPlane1, bitPlane2, bitPlane3;
-
-	/* Draw background layer */
-	tileRow = line / 8;
-	for (tileColumn = 0; tileColumn < 32; tileColumn++) {
-		if ((tileColumn + (32 * tileRow)) > 448) {
-			for (pixelX = 0; pixelX < 8 ; pixelX++) {
-				plot_pixel(bitmap, LBORDER_X_PIXELS + (tileColumn << 3) + pixelX, line, Machine->pens[BACKDROP_COLOR]);
-			}
-		} else {
-			bitPlane0 = VRAM[(((tileColumn + (32 * tileRow)) << 5) + ((line & 0x07) << 2)) + 0x00];
-			bitPlane1 = VRAM[(((tileColumn + (32 * tileRow)) << 5) + ((line & 0x07) << 2)) + 0x01];
-			bitPlane2 = VRAM[(((tileColumn + (32 * tileRow)) << 5) + ((line & 0x07) << 2)) + 0x02];
-			bitPlane3 = VRAM[(((tileColumn + (32 * tileRow)) << 5) + ((line & 0x07) << 2)) + 0x03];
-
-			for (pixelX = 0; pixelX < 8 ; pixelX++) {
-				UINT8 penBit0, penBit1, penBit2, penBit3;
-				UINT8 penSelected;
-
-				penBit0 = (bitPlane0 >> (7 - pixelX)) & 0x01;
-				penBit1 = (bitPlane1 >> (7 - pixelX)) & 0x01;
-				penBit2 = (bitPlane2 >> (7 - pixelX)) & 0x01;
-				penBit3 = (bitPlane3 >> (7 - pixelX)) & 0x01;
-
-				penSelected = (penBit3 << 3 | penBit2 << 2 | penBit1 << 1 | penBit0);
-				if (palletteSelected) {
-					penSelected |= 0x10;
-				}
-
-				plot_pixel(bitmap, LBORDER_X_PIXELS + (tileColumn << 3) + pixelX, line, Machine->pens[penSelected]);
-			}
-		}
-	}
-}
-#endif
-
-void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int pixelOffsetX) {
+void sms_refresh_line_mode4(int *lineBuffer, int line) {
 	int tileColumn;
 	int xScroll, yScroll, xScrollStartColumn;
 	int spriteIndex;
@@ -603,7 +553,7 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 			pixelPlotX = (0 - (xScroll & 0x07) + (tileColumn << 3) + pixelPlotX);
 			if (pixelPlotX >= 0 && pixelPlotX < 256) {
 //				logerror("%x %x\n", pixelPlotX + pixelOffsetX, pixelPlotY);
-				plot_pixel(bitmap, pixelPlotX + pixelOffsetX, pixelPlotY, Machine->pens[penSelected]);
+				lineBuffer[pixelPlotX] = currentPalette[penSelected];
 				prioritySelected[pixelPlotX] = prioritySelect | ( penSelected & 0x0F );
 			}
 		}
@@ -691,14 +641,14 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 				}
 
 				if ( ! ( prioritySelected[pixelPlotX] & PRIORITY_BIT ) ) {
-					plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected]);
-					plot_pixel(bitmap, pixelOffsetX + pixelPlotX + 1, pixelPlotY, Machine->pens[penSelected]);
+					lineBuffer[pixelPlotX] = currentPalette[penSelected];
+					lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
 				} else {
 					if ( prioritySelected[pixelPlotX] == PRIORITY_BIT ) {
-						plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected]);
+						lineBuffer[pixelPlotX] = currentPalette[penSelected];
 					}
 					if ( prioritySelected[pixelPlotX + 1] == PRIORITY_BIT ) {
-						plot_pixel(bitmap, pixelOffsetX + pixelPlotX + 1, pixelPlotY, Machine->pens[penSelected]);
+						lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
 					}
 				}
 				if (lineCollisionBuffer[pixelPlotX] != 1) {
@@ -722,10 +672,10 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 				}
 
 				if ( ! ( prioritySelected[pixelPlotX] & PRIORITY_BIT ) ) {
-					plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected]);
+					lineBuffer[pixelPlotX] = currentPalette[penSelected];
 				} else {
 					if ( prioritySelected[pixelPlotX] == PRIORITY_BIT ) {
-						plot_pixel(bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected]);
+						lineBuffer[pixelPlotX] = currentPalette[penSelected];
 					}
 				}
 				if (lineCollisionBuffer[pixelPlotX] != 1) {
@@ -741,16 +691,19 @@ void sms_refresh_line_mode4(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 	/* Fill column 0 with overscan color from reg[0x07]	 (SMS Only) */
 	if ( ! IS_GAMEGEAR ) {
 		if (reg[0x00] & 0x20) {
-			rectangle rec;
-			rec.min_y = rec.max_y = pixelPlotY;
-			rec.min_x = LBORDER_X_PIXELS;
-			rec.max_x = rec.min_x + 7;
-			fillbitmap(bitmap, Machine->pens[BACKDROP_COLOR], &rec);
+			lineBuffer[0] = currentPalette[BACKDROP_COLOR];
+			lineBuffer[1] = currentPalette[BACKDROP_COLOR];
+			lineBuffer[2] = currentPalette[BACKDROP_COLOR];
+			lineBuffer[3] = currentPalette[BACKDROP_COLOR];
+			lineBuffer[4] = currentPalette[BACKDROP_COLOR];
+			lineBuffer[5] = currentPalette[BACKDROP_COLOR];
+			lineBuffer[6] = currentPalette[BACKDROP_COLOR];
+			lineBuffer[7] = currentPalette[BACKDROP_COLOR];
 		}
 	}
 }
 
-void sms_refresh_line_mode2(mame_bitmap *bitmap, int line, int pixelPlotY, int pixelOffsetX) {
+void sms_refresh_line_mode2(int *lineBuffer, int line) {
 	int tileColumn;
 	int pixelX, pixelPlotX;
 	int spriteHeight, spriteBufferCount, spriteIndex, spriteY, spriteBuffer[4], spriteBufferIndex;
@@ -770,7 +723,7 @@ void sms_refresh_line_mode2(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 		pattern = patternTable[ ( ( ( patternOffset + nameTable[tileColumn] ) & patternMask ) * 8 ) + ( line & 0x07 ) ];
 		colors = colorTable[ ( ( ( patternOffset + nameTable[tileColumn] ) & colorMask ) * 8 ) + ( line & 0x07 ) ];
 		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-			int penSelected;
+			UINT8 penSelected;
 			if ( pattern & ( 1 << ( 7 - pixelX ) ) ) {
 				penSelected = colors >> 4;
 			} else {
@@ -780,7 +733,152 @@ void sms_refresh_line_mode2(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 				penSelected = BACKDROP_COLOR;
 			}
 			pixelPlotX = ( tileColumn << 3 ) + pixelX;
-			plot_pixel( bitmap, pixelPlotX + pixelOffsetX, pixelPlotY, Machine->pens[penSelected] );
+			if ( IS_GAMEGEAR ) {
+				penSelected |= 0x10;
+			}
+			lineBuffer[pixelPlotX] = currentPalette[penSelected];
+		}
+	}
+
+	/* Draw sprite layer */
+	spriteTable = VRAM + ( ( reg[0x05] & 0x7F ) << 7 );
+	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
+	spriteHeight = ( reg[0x01] & 0x03 ? 16 : 8 ); /* check if either MAG or SI is set */
+	spriteBufferCount = 0;
+	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex * 4] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
+		spriteY = spriteTable[spriteIndex] + 1;
+		if ( spriteY > 240 ) {
+			spriteY -= 256;
+		}
+		if ( ( line >= spriteY ) && ( line < ( spriteY + spriteHeight ) ) ) {
+			if ( spriteBufferCount < 5 ) {
+				spriteBuffer[spriteBufferCount] = spriteIndex;
+			} else {
+				/* Too many sprites per line */
+				statusReg |= STATUS_SPROVR;
+			}
+			spriteBufferCount++;
+		}
+	}
+	if ( spriteBufferCount > 4 ) {
+		spriteBufferCount = 4;
+	}
+	memset( lineCollisionBuffer, 0, MAX_X_PIXELS );
+	spriteBufferCount--;
+	for ( spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex-- ) {
+		UINT8 penSelected;
+		int spriteLine, pixelX, spriteX, spriteTileSelected;
+		UINT8 pattern;
+		spriteIndex = spriteBuffer[ spriteBufferIndex ];
+		spriteY = spriteTable[ spriteIndex ] + 1;
+		if ( spriteY > 240 ) {
+			spriteY -= 256;
+		}
+		spriteX = spriteTable[ spriteIndex + 1 ];
+		penSelected = spriteTable[ spriteIndex + 3 ] & 0x0F;
+		if ( IS_GAMEGEAR ) {
+			penSelected |= 0x10;
+		}
+		if ( spriteTable[ spriteIndex + 3 ] & 0x80 ) {
+			spriteX -= 32;
+		}
+		spriteTileSelected = spriteTable[ spriteIndex + 2 ];
+		spriteLine = line - spriteY;
+		if ( reg[0x01] & 0x01 ) {
+			spriteLine >>= 1;
+		}
+		if ( reg[0x01] & 0x02 ) {
+			spriteTileSelected &= 0xFC;
+			if ( spriteLine > 0x07 ) {
+				spriteTileSelected += 1;
+				spriteLine -= 8;
+			}
+		}
+		pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
+		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+			if ( reg[0x01] & 0x01 ) {
+				pixelPlotX = spriteX + pixelX * 2;
+				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+					continue;
+				}
+				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+					lineBuffer[pixelPlotX] = currentPalette[penSelected];
+					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+						lineCollisionBuffer[pixelPlotX] = 1;
+					} else {
+						statusReg |= STATUS_SPRCOL;
+					}
+					lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
+					if ( lineCollisionBuffer[pixelPlotX + 1] != 1 ) {
+						lineCollisionBuffer[pixelPlotX + 1] = 1;
+					} else {
+						statusReg |= STATUS_SPRCOL;
+					}
+				}
+			} else {
+				pixelPlotX = spriteX + pixelX;
+				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+					continue;
+				}
+				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+					lineBuffer[pixelPlotX] = currentPalette[penSelected];
+					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+						lineCollisionBuffer[pixelPlotX] = 1;
+					} else {
+						statusReg |= STATUS_SPRCOL;
+					}
+				}
+			}
+		}
+		if ( reg[0x01] & 0x02 ) {
+			spriteTileSelected += 2;
+			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
+			spriteX += 8;
+			for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+				pixelPlotX = spriteX + pixelX;
+				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+					continue;
+				}
+				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+					lineBuffer[pixelPlotX] = currentPalette[penSelected];
+					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+						lineCollisionBuffer[pixelPlotX] = 1;
+					} else {
+						statusReg |= STATUS_SPRCOL;
+					}
+				}
+			}
+		}
+	}
+}
+
+void sms_refresh_line_mode0(int *lineBuffer, int line) {
+	int tileColumn;
+	int pixelX, pixelPlotX; 
+	int spriteHeight, spriteBufferCount, spriteIndex, spriteY, spriteBuffer[4], spriteBufferIndex;
+	UINT8 *nameTable, *colorTable, *patternTable, *spriteTable, *spritePatternTable;
+
+	/* Draw background layer */
+	nameTable = VRAM + ( ( reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
+	colorTable = VRAM + ( ( reg[0x03] << 6 ) & ( VRAM_SIZE - 1 ) );
+	patternTable = VRAM + ( ( reg[0x04] << 11 ) & ( VRAM_SIZE - 1 ) ); 
+	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
+		UINT8 pattern;
+		UINT8 colors;
+		pattern = patternTable[ ( nameTable[tileColumn] * 8 ) + ( line & 0x07 ) ];
+		colors = colorTable[ nameTable[tileColumn] >> 3 ];
+		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+			int penSelected;
+			if ( pattern & ( 1 << ( 7 - pixelX ) ) ) {
+				penSelected = colors >> 4;
+			} else {
+				penSelected = colors & 0x0F;
+			}
+			if ( IS_GAMEGEAR ) {
+				penSelected |= 0x10;
+			}
+			pixelPlotX = ( tileColumn << 3 ) + pixelX;
+			lineBuffer[pixelPlotX] = currentPalette[penSelected];
 		}
 	}
 
@@ -820,72 +918,76 @@ void sms_refresh_line_mode2(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 		}
 		spriteX = spriteTable[ spriteIndex + 1 ];
 		penSelected = spriteTable[ spriteIndex + 3 ] & 0x0F;
+		if ( IS_GAMEGEAR ) {
+			penSelected |= 0x10;
+		}
 		if ( spriteTable[ spriteIndex + 3 ] & 0x80 ) {
 			spriteX -= 32;
-		}
-		spriteTileSelected = spriteTable[ spriteIndex + 2 ];
-		spriteLine = line - spriteY;
-		if ( reg[0x01] & 0x01 ) {
-			spriteLine >>= 1;
-		}
-		if ( reg[0x01] & 0x02 ) {
-			spriteTileSelected &= 0xFC;
-			if ( spriteLine > 0x07 ) {
-				spriteTileSelected += 1;
-				spriteLine -= 8;
-			}
-		}
-		pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
-		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+			spriteTileSelected = spriteTable[ spriteIndex + 2 ];
+			spriteLine = line - spriteY;
 			if ( reg[0x01] & 0x01 ) {
-				pixelPlotX = spriteX + pixelX * 2;
-				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
-					continue;
+				spriteLine >>= 1;
+			}
+			if ( reg[0x01] & 0x02 ) {
+				spriteTileSelected &= 0xFC;
+				if ( spriteLine > 0x07 ) {
+					spriteTileSelected += 1;
+					spriteLine -= 8;
 				}
-				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					plot_pixel( bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected] );
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
+			}
+			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
+
+			for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+				if ( reg[0x01] & 0x01 ) {
+					pixelPlotX = spriteX + pixelX * 2;
+					if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+						continue;
 					}
-					plot_pixel( bitmap, pixelOffsetX + pixelPlotX + 1, pixelPlotY, Machine->pens[penSelected] );
-					if ( lineCollisionBuffer[pixelPlotX + 1] != 1 ) {
-						lineCollisionBuffer[pixelPlotX + 1] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
+					if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+						lineBuffer[pixelPlotX] = currentPalette[penSelected];
+						if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+							lineCollisionBuffer[pixelPlotX] = 1;
+						} else {
+							statusReg |= STATUS_SPRCOL;
+						}
+						lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
+						if ( lineCollisionBuffer[pixelPlotX + 1] != 1 ) {
+							lineCollisionBuffer[pixelPlotX + 1] = 1;
+						} else {
+							statusReg |= STATUS_SPRCOL;
+						}
 					}
-				}
-			} else {
-				pixelPlotX = spriteX + pixelX;
-				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
-					continue;
-				}
-				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					plot_pixel( bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected] );
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
+				} else {
+					pixelPlotX = spriteX + pixelX;
+					if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+						continue;
+					}
+					if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+						lineBuffer[pixelPlotX] = currentPalette[penSelected];
+						if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+							lineCollisionBuffer[pixelPlotX] = 1;
+						} else {
+							statusReg |= STATUS_SPRCOL;
+						}
 					}
 				}
 			}
-		}
-		if ( reg[0x01] & 0x02 ) {
-			spriteTileSelected += 2;
-			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
-			spriteX += 8;
-			for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-				pixelPlotX = spriteX + pixelX;
-				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
-					continue;
-				}
-				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					plot_pixel( bitmap, pixelOffsetX + pixelPlotX, pixelPlotY, Machine->pens[penSelected] );
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
+			if ( reg[0x01] & 0x02 ) {
+				spriteTileSelected += 2;
+				pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
+				spriteX += 8;
+				for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+					pixelPlotX = spriteX + pixelX;
+					if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+						continue;
+					}
+					if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+						lineBuffer[pixelPlotX] = currentPalette[penSelected];
+						if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+							lineCollisionBuffer[pixelPlotX] = 1;
+						} else {
+							statusReg |= STATUS_SPRCOL;
+						}
 					}
 				}
 			}
@@ -896,6 +998,8 @@ void sms_refresh_line_mode2(mame_bitmap *bitmap, int line, int pixelPlotY, int p
 void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 	int pixelPlotY = line;
 	int pixelOffsetX = 0;
+	int x;
+	int *blitLineBuffer = lineBuffer;
 
 	if ( ! IS_GAMEGEAR ) {
 		pixelPlotY += TBORDER_Y_PIXELS;
@@ -909,7 +1013,7 @@ void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 		rec.min_x = 0;
 		rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
 		rec.min_y = rec.max_y = pixelPlotY;
-		fillbitmap( bitmap, Machine->pens[BACKDROP_COLOR], &rec );
+		fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
 		return;
 	}
 
@@ -922,7 +1026,7 @@ void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 				rec.min_x = 0;
 				rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
 				rec.min_y = rec.max_y = pixelPlotY;
-				fillbitmap( bitmap, Machine->pens[BACKDROP_COLOR], &rec );
+				fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
 			}
 			return;
 		}
@@ -935,7 +1039,7 @@ void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 				rec.min_x = 0;
 				rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
 				rec.min_y = rec.max_y = 10 - ( line - start_top_border );
-				fillbitmap( bitmap, Machine->pens[BACKDROP_COLOR], &rec );
+				fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
 				return;
 			}
 		}
@@ -943,23 +1047,203 @@ void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 		rec.min_y = rec.max_y = pixelPlotY;
 		rec.min_x = 0;
 		rec.max_x = LBORDER_X_PIXELS - 1;
-		fillbitmap( bitmap, Machine->pens[BACKDROP_COLOR], &rec );
+		fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
 		/* Draw right border */
 		rec.min_y = rec.max_y = pixelPlotY;
 		rec.min_x = LBORDER_X_PIXELS + 256;
 		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( bitmap, Machine->pens[BACKDROP_COLOR], &rec );
+		fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+	} else {
+		if ( line >= y_pixels ) {
+			return;
+		}
 	}
 
-	if ( vdp_mode == 2 ) {
-		sms_refresh_line_mode2( bitmap, line, pixelPlotY, pixelOffsetX );
-	} else {
-		sms_refresh_line_mode4( bitmap, line, pixelPlotY, pixelOffsetX );
+	switch( vdp_mode ) {
+	case 0:
+		sms_refresh_line_mode0( blitLineBuffer, line );
+		break;
+	case 2:
+		sms_refresh_line_mode2( blitLineBuffer, line );
+		break;
+	case 4:
+	default:
+		sms_refresh_line_mode4( blitLineBuffer, line );
+		break;
+	}
+
+	if ( IS_GAMEGEAR && ggSmsMode ) {
+		int *combineLineBuffer = lineBuffer + ( ( line & 0x03 ) + 1 ) * 256;
+		int plotX = 48;
+
+		/* Do horizontal scaling */
+		for( x = 8; x < 248; ) {
+			int	combined;
+
+			/* Take red and green from first pixel, and blue from second pixel */
+			combined = ( blitLineBuffer[x] & 0x00FF ) | ( blitLineBuffer[x+1] & 0x0F00 );
+			combineLineBuffer[plotX] = combined;
+
+			/* Take red from second pixel, and green and blue from third pixel */
+			combined = ( blitLineBuffer[x+1] & 0x000F ) | ( blitLineBuffer[x+2] & 0x0FF0 );
+			combineLineBuffer[plotX+1] = combined;
+			x += 3;
+			plotX += 2;
+		}
+
+		/* Do vertical scaling for a screen with 192 lines
+		   GG lines 0-7 get set to the backdrop color
+		   GG lines 136-143 get set to the backdrop color
+		   The remaining 128 lines (8-135) get generated from the 192 SMS lines.
+		   We will calculate the gamegear lines as follows:
+		   GG_8  =                             5/6 * SMS_0 + 1/6 * SMS_1
+		   GG_9  = 1/3 * SMS_0 + 1/3 * SMS_1 + 1/3 * SMS_2
+		   GG_10 = 1/6 * SMS_1 + 1/3 * SMS_2 + 1/3 * SMS_3 + 1/6 * SMS_4
+		   GG_11 = 1/3 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5
+		   GG_12 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
+		   GG_13 = 1/3 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8
+		   GG_14 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
+		   .....
+		   GG_134 = 1/6 * SMS_187 + 1/3 * SMS_188 + 1/3 * SMS_189 + 1/6 * SMS_190
+		   GG_135 = 1/3 * SMS_189 + 1/3 * SMS_190 + 1/3 * SMS_191
+		*/
+		if ( y_pixels == 192 ) {
+			int ggLine;
+			int	*line1, *line2, *line3, *line4;
+
+			/* Check if we can draw the top border */
+			if ( line == 0 ) {
+				rectangle rec;
+				rec.min_y = 24;
+				rec.max_y = 31;
+				rec.min_x = 48;
+				rec.max_x = 48 + 160 - 1;
+				fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+			}
+
+			/* Check if we can draw the bottom border */
+			if ( line == y_pixels-1 ) {
+				rectangle rec;
+				rec.min_y = 24+136;
+				rec.max_y = 24+143;
+				rec.min_x = 48;
+				rec.max_x = 48 + 160 - 1;
+				fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+			}
+			/* Make sure we have enough data to draw a GG line */
+			if ( ( line % 3 ) == 0 ) {
+				return;
+			}
+			ggLine = 32 + ( line / 3 ) * 2;
+			/* Advance a GG line if we're on SMS line 2, 5, 8, 11, etc */
+			if ( ( line % 3 ) == 2 ) {
+				ggLine++;
+			}
+			pixelPlotY = ggLine;
+
+			/* Setup our source lines */
+			line1 = lineBuffer + ( ( ( line - 3 ) & 0x03 ) + 1 ) * 256;
+			line2 = lineBuffer + ( ( ( line - 2 ) & 0x03 ) + 1 ) * 256;
+			line3 = lineBuffer + ( ( ( line - 1 ) & 0x03 ) + 1 ) * 256;
+			line4 = lineBuffer + ( ( ( line - 0 ) & 0x03 ) + 1 ) * 256;
+
+			if ( ( line % 3 ) == 1 ) {
+				if ( line == 1 ) {
+					for( x = 0+48; x < 160+48; x++ ) {
+						rgb_t   c3 = Machine->pens[line3[x]];
+						rgb_t   c4 = Machine->pens[line4[x]];
+						plot_pixel( bitmap, pixelOffsetX + x, pixelPlotY,
+							MAKE_RGB( ( ( RGB_RED(c3) * 5 )/6 + RGB_RED(c4)/6 ),
+								( ( RGB_GREEN(c3) * 5 )/6 + RGB_GREEN(c4)/6 ),
+								( ( RGB_BLUE(c3) * 5 )/6 + RGB_BLUE(c4)/6 ) )
+						);
+					}
+				} else {
+					for( x = 0+48; x < 160+48; x++ ) {
+						rgb_t	c1 = Machine->pens[line1[x]];
+						rgb_t	c2 = Machine->pens[line2[x]];
+						rgb_t	c3 = Machine->pens[line3[x]];
+						rgb_t	c4 = Machine->pens[line4[x]];
+						plot_pixel( bitmap, pixelOffsetX + x, pixelPlotY,
+							MAKE_RGB( ( RGB_RED(c1)/6 + RGB_RED(c2)/3 + RGB_RED(c3)/3 + RGB_RED(c4)/6 ),
+								( RGB_GREEN(c1)/6 + RGB_GREEN(c2)/3 + RGB_GREEN(c3)/3 + RGB_GREEN(c4)/6 ),
+								( RGB_BLUE(c1)/6 + RGB_BLUE(c2)/3 + RGB_BLUE(c3)/3 + RGB_BLUE(c4)/6 ) )
+						);
+					}
+				}
+			} else {
+				for( x = 0+48; x < 160+48; x++ ) {
+					rgb_t	c2 = Machine->pens[line2[x]];
+					rgb_t	c3 = Machine->pens[line3[x]];
+					rgb_t	c4 = Machine->pens[line4[x]];
+					plot_pixel( bitmap, pixelOffsetX + x, pixelPlotY,
+						MAKE_RGB( ( RGB_RED(c2)/3 + RGB_RED(c3)/3 + RGB_RED(c4)/3 ),
+							( RGB_GREEN(c2)/3 + RGB_GREEN(c3)/3 + RGB_GREEN(c4)/3 ),
+							( RGB_BLUE(c2)/3 + RGB_BLUE(c3)/3 + RGB_BLUE(c4)/3 ) )
+					);
+				}
+			}
+			return;
+		}
+
+		/* Do vertical scaling for a screen with 224 lines
+		   Lines 0-2 and 221-223 have no effect on the output on the GG screen.
+		   We will calculate the gamegear lines as follows:
+		   GG_0 = 1/6 * SMS_3 + 1/3 * SMS_4 + 1/3 * SMS_5 + 1/6 * SMS_6
+		   GG_1 = 1/6 * SMS_4 + 1/3 * SMS_5 + 1/3 * SMS_6 + 1/6 * SMS_7
+		   GG_2 = 1/6 * SMS_6 + 1/3 * SMS_7 + 1/3 * SMS_8 + 1/6 * SMS_9
+		   GG_3 = 1/6 * SMS_7 + 1/3 * SMS_8 + 1/3 * SMS_9 + 1/6 * SMS_10
+		   GG_4 = 1/6 * SMS_9 + 1/3 * SMS_10 + 1/3 * SMS_11 + 1/6 * SMS_12
+		   .....
+		   GG_142 = 1/6 * SMS_216 + 1/3 * SMS_217 + 1/3 * SMS_218 + 1/6 * SMS_219
+		   GG_143 = 1/6 * SMS_217 + 1/3 * SMS_218 + 1/3 * SMS_219 + 1/6 * SMS_220
+		*/
+		if ( y_pixels == 224 ) {
+			int	ggLine;
+			int	*line1, *line2, *line3, *line4;
+
+			/* First make sure there's enough data to draw anything */
+			/* We need one more line of data if we're on line 8, 11, 14, 17, etc */
+			if ( line < 6 || line > 220 || ( ( line - 8 ) % 3 == 0 ) ) {
+				return;
+			}
+			ggLine = ( line / 3 ) * 2;
+			/* If we're on SMS line 7, 10, 13, etc we're on an odd GG line */
+			if ( line % 3 ) {
+				ggLine++;
+			}
+			/* Calculate the line we will be drawing on */
+			pixelPlotY = 24 + ggLine;
+
+			/* Setup our source lines */
+			line1 = lineBuffer + ( ( ( line - 3 ) & 0x03 ) + 1 ) * 256;
+			line2 = lineBuffer + ( ( ( line - 2 ) & 0x03 ) + 1 ) * 256;
+			line3 = lineBuffer + ( ( ( line - 1 ) & 0x03 ) + 1 ) * 256;
+			line4 = lineBuffer + ( ( ( line - 0 ) & 0x03 ) + 1 ) * 256;
+
+			for( x = 0+48; x < 160+48; x++ ) {
+				rgb_t	c1 = Machine->pens[line1[x]];
+				rgb_t	c2 = Machine->pens[line2[x]];
+				rgb_t	c3 = Machine->pens[line3[x]];
+				rgb_t	c4 = Machine->pens[line4[x]];
+				plot_pixel( bitmap, pixelOffsetX + x, pixelPlotY,
+					MAKE_RGB( ( RGB_RED(c1)/6 + RGB_RED(c2)/3 + RGB_RED(c3)/3 + RGB_RED(c4)/6 ),
+						( RGB_GREEN(c1)/6 + RGB_GREEN(c2)/3 + RGB_GREEN(c3)/3 + RGB_GREEN(c4)/6 ),
+						( RGB_BLUE(c1)/6 + RGB_BLUE(c2)/3 + RGB_BLUE(c3)/3 + RGB_BLUE(c4)/6 ) )
+				);
+			}
+			return;
+		}
+		blitLineBuffer = combineLineBuffer;
+	}
+
+	for( x = 0; x < 256; x++ ) {
+		plot_pixel( bitmap, pixelOffsetX + x, pixelPlotY, Machine->pens[blitLineBuffer[x]] );
 	}
 }
 
 void sms_update_palette(void) {
-	int i, r, g, b;
+	int i;
 
 	/* Exit if palette is has no changes */
 	if (isCRAMDirty == 0) {
@@ -967,39 +1251,26 @@ void sms_update_palette(void) {
 	}
 	isCRAMDirty = 0;
 
-	if ( vdp_mode != 4 ) {
-		palette_set_color(Machine,  0,   0,   0,   0 );
-		palette_set_color(Machine,  1,   0,   0,   0 );
-		palette_set_color(Machine,  2,  33, 200,  66 );
-		palette_set_color(Machine,  3,  94, 220, 120 );
-		palette_set_color(Machine,  4,  84,  85, 237 );
-		palette_set_color(Machine,  5, 125, 118, 252 );
-		palette_set_color(Machine,  6, 212,  82,  77 );
-		palette_set_color(Machine,  7,  66, 235, 245 );
-		palette_set_color(Machine,  8, 252,  85,  84 );
-		palette_set_color(Machine,  9, 255, 121, 120 );
-		palette_set_color(Machine, 10, 212, 193,  84 );
-		palette_set_color(Machine, 11, 230, 206, 128 );
-		palette_set_color(Machine, 12,  33, 176,  59 );
-		palette_set_color(Machine, 13, 201,  91, 186 );
-		palette_set_color(Machine, 14, 204, 204, 204 );
-		palette_set_color(Machine, 15, 255, 255, 255 );
+	if ( vdp_mode != 4 && ! IS_GAMEGEAR ) {
+		for( i = 0; i < 16; i++ ) {
+			currentPalette[i] = 64+i;
+		}
 		return;
 	}
 
 	if ( IS_GAMEGEAR ) {
-		for (i = 0; i < 32; i += 1) {
-			r = ((CRAM[i * 2 + 0] >> 0) & 0x0F) << 4;
-			g = ((CRAM[i * 2 + 0] >> 4) & 0x0F) << 4;
-			b = ((CRAM[i * 2 + 1] >> 0) & 0x0F) << 4;
-			palette_set_color(Machine, i, r, g, b);
+		if ( ggSmsMode ) {
+			for ( i = 0; i < 32; i++ ) {
+				currentPalette[i] = ( ( CRAM[i] & 0x30 ) << 6 ) | ( ( CRAM[i] & 0x0C ) << 4 ) | ( ( CRAM[i] & 0x03 ) << 2 );
+			}
+		} else {
+			for ( i = 0; i < 32; i++ ) {
+				currentPalette[i] = ( ( CRAM[i*2+1] << 8 ) | CRAM[i*2] ) & 0x0FFF;
+			}
 		}
 	} else {
-		for (i = 0; i < 32; i += 1) {
-			r = ((CRAM[i] >> 0) & 0x03) << 6;
-			g = ((CRAM[i] >> 2) & 0x03) << 6;
-			b = ((CRAM[i] >> 4) & 0x03) << 6;
-			palette_set_color(Machine, i, r, g, b);
+		for ( i = 0; i < 32; i++ ) {
+			currentPalette[i] = CRAM[i] & 0x3F;
 		}
 	}
 }

@@ -460,6 +460,9 @@ DEVICE_INIT( sms_cart )
 		biosPort |= IO_BIOS_ROM;
 	}
 
+	/* Initially set the vdp to not use sms compatibility mode for GG */
+	sms_set_ggsmsmode( 0 );
+
 	return INIT_PASS;
 }
 
@@ -525,6 +528,24 @@ DEVICE_LOAD( sms_cart )
 		if ( ( ROM[0x7ff0] == 0x3e && ROM[0x7ff1] == 0x11 ) ||  /* Dodgeball King */
 		     ( ROM[0x7ff0] == 0x41 && ROM[0x7ff1] == 0x48 ) ) { /* Sangokushi 3 */
 			smsCartFeatures |= CF_DODGEBALLKING_MAPPER;
+		}
+	}
+
+	/* Check for special SMS Compatibility mode gamegear cartridges */
+	if ( IS_GAMEGEAR ) {
+		const char *fname = image_filename( image );
+		int	len = strlen( fname );
+		const char *extrainfo = image_extrainfo( image );
+
+		if ( extrainfo && ! mame_stricmp( extrainfo, "GGSMS" ) ) {
+			sms_set_ggsmsmode( 1 );
+		}
+
+		/* Just in case someone passes us an sms file */
+		if ( len > 3 && ( fname[len-1] == 's' || fname[len-1] == 'S' ) &&
+		     ( fname[len-2] == 'm' || fname[len-2] == 'M' ) &&
+		     ( fname[len-3] == 's' || fname[len-3] == 'S' ) ) {
+			sms_set_ggsmsmode( 1 );
 		}
 	}
 

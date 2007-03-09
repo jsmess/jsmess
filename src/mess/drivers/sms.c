@@ -134,7 +134,42 @@ INPUT_PORTS_START( sms )
 
 INPUT_PORTS_END
 
+static PALETTE_INIT( sms ) {
+	int i;
+	for( i = 0; i < 64; i++ ) {
+		int r = i & 0x03;
+		int g = ( i & 0x0C ) >> 2;
+		int b = ( i & 0x30 ) >> 4;
+		palette_set_color(machine, i, r << 6, g << 6, b << 6 );
+	}
+	/* TMS9918 palette */
+	palette_set_color(machine, 64+ 0,   0,   0,   0 );
+	palette_set_color(machine, 64+ 1,   0,   0,   0 );
+	palette_set_color(machine, 64+ 2,  33, 200,  66 );
+	palette_set_color(machine, 64+ 3,  94, 220, 120 );
+	palette_set_color(machine, 64+ 4,  84,  85, 237 );
+	palette_set_color(machine, 64+ 5, 125, 118, 252 );
+	palette_set_color(machine, 64+ 6, 212,  82,  77 );
+	palette_set_color(machine, 64+ 7,  66, 235, 245 );
+	palette_set_color(machine, 64+ 8, 252,  85,  84 );
+	palette_set_color(machine, 64+ 9, 255, 121, 120 );
+	palette_set_color(machine, 64+10, 212, 193,  84 );
+	palette_set_color(machine, 64+11, 230, 206, 128 );
+	palette_set_color(machine, 64+12,  33, 176,  59 );
+	palette_set_color(machine, 64+13, 201,  91, 186 );
+	palette_set_color(machine, 64+14, 204, 204, 204 );
+	palette_set_color(machine, 64+15, 255, 255, 255 );
+}
 
+static PALETTE_INIT( gamegear ) {
+	int i;
+	for( i = 0; i < 4096; i++ ) {
+		int r = i & 0x000F;
+		int g = ( i & 0x00F0 ) >> 4;
+		int b = ( i & 0x0F00 ) >> 8;
+		palette_set_color(machine, i, r << 4, g << 4, b << 4 );
+	}
+}
 
 static MACHINE_DRIVER_START(sms)
 	/* basic machine hardware */
@@ -156,9 +191,9 @@ static MACHINE_DRIVER_START(sms)
 	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_NTSC/10, NTSC_X_PIXELS, LBORDER_X_PIXELS, LBORDER_X_PIXELS + 256, NTSC_Y_PIXELS, TBORDER_Y_PIXELS, TBORDER_Y_PIXELS + 240)
 
-	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_LENGTH(64+16)
 	MDRV_COLORTABLE_LENGTH(0)
-	/*MDRV_PALETTE_INIT(sms)*/
+	MDRV_PALETTE_INIT(sms)
 
 	MDRV_VIDEO_START(sms_ntsc)
 	MDRV_VIDEO_UPDATE(sms)
@@ -188,9 +223,9 @@ static MACHINE_DRIVER_START(smspal)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, PAL_X_PIXELS, LBORDER_X_PIXELS, LBORDER_X_PIXELS + 256, PAL_Y_PIXELS, TBORDER_Y_PIXELS, TBORDER_Y_PIXELS + 240)
 
-	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_LENGTH(64+16)
 	MDRV_COLORTABLE_LENGTH(0)
-	/*MDRV_PALETTE_INIT(sms)*/
+	MDRV_PALETTE_INIT(sms)
  
 	MDRV_VIDEO_START(sms_pal)
 	MDRV_VIDEO_UPDATE(sms)
@@ -227,8 +262,9 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(NTSC_X_PIXELS, NTSC_Y_PIXELS)
 	MDRV_SCREEN_VISIBLE_AREA(6*8, 26*8-1, 3*8, 21*8-1)
-	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_LENGTH(4096)
 	MDRV_COLORTABLE_LENGTH(0)
+	MDRV_PALETTE_INIT(gamegear)
 
 	MDRV_VIDEO_START(sms_ntsc)
 	MDRV_VIDEO_UPDATE(sms)
