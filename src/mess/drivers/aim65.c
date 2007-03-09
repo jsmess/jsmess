@@ -1,5 +1,12 @@
 /******************************************************************************
  PeT mess@utanet.at Nov 2000
+Updated by Dan Boris, 3/4/2007
+
+ToDo:
+	- Printer. Tried to implement this but it was not working, currently disabled.
+	- Artwork.
+	- Tape interface
+	- User VIA (not really necessary since it only interfaces to external devices)
 
 ******************************************************************************/
 
@@ -16,7 +23,7 @@ static ADDRESS_MAP_START( aim65_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x0fff) AM_RAM
 //	{ 0xa000, 0xa00f, via_1_r }, // user via
 	AM_RANGE( 0xa400, 0xa47f) AM_RAM // riot6532 ram
-	AM_RANGE( 0xa480, 0xa48f) AM_READWRITE( riot_0_r, riot_0_w )
+	AM_RANGE( 0xa480, 0xa49f) AM_READWRITE( riot_0_r, riot_0_w )
 	AM_RANGE( 0xa800, 0xa80f) AM_READWRITE( via_0_r, via_0_w )
 	AM_RANGE( 0xac00, 0xac03) AM_READWRITE( pia_0_r, pia_0_w )
 	AM_RANGE( 0xac04, 0xac43) AM_RAM
@@ -37,10 +44,10 @@ INPUT_PORTS_START( aim65 )
 	DIPS_HELPER( 0x0040, "7     '", KEYCODE_7, CODE_NONE)
 	DIPS_HELPER( 0x0080, "8     (", KEYCODE_8, CODE_NONE)
 	DIPS_HELPER( 0x0100, "9     )", KEYCODE_9, CODE_NONE)
-	DIPS_HELPER( 0x0200, "0", KEYCODE_0, CODE_NONE)
+	DIPS_HELPER( 0x0200, "0"      , KEYCODE_0, CODE_NONE)
 	DIPS_HELPER( 0x0400, ":     *", KEYCODE_MINUS, CODE_NONE)
-	DIPS_HELPER( 0x0800, "F3", KEYCODE_EQUALS, KEYCODE_F3)
-	DIPS_HELPER( 0x1000, "PRINT", KEYCODE_BACKSPACE, KEYCODE_PRTSCR)
+	DIPS_HELPER( 0x0800, "F3"     , KEYCODE_EQUALS, KEYCODE_F3)
+	DIPS_HELPER( 0x1000, "PRINT"  , KEYCODE_BACKSPACE, KEYCODE_PRTSCR)
 	PORT_START
 	DIPS_HELPER( 0x0001, "ESC", KEYCODE_TAB, KEYCODE_ESC)
 	DIPS_HELPER( 0x0002, "Q", KEYCODE_Q, CODE_NONE)
@@ -98,15 +105,15 @@ static gfx_layout aim65_charlayout =
         1,                      /* 1 bits per pixel */
         { 0,0 },                  /* no bitplanes; 1 bit per pixel */
         /* x offsets */
-        { 
+        {
 			7, 7, 7, 7,
-			6, 6, 6, 6, 
-			5, 5, 5, 5, 
-			4, 4, 4, 4, 
-			3, 3, 3, 3, 
-			2, 2, 2, 2, 
-			1, 1, 1, 1, 
-			0, 0, 0, 0 
+			6, 6, 6, 6,
+			5, 5, 5, 5,
+			4, 4, 4, 4,
+			3, 3, 3, 3,
+			2, 2, 2, 2,
+			1, 1, 1, 1,
+			0, 0, 0, 0
         },
         /* y offsets */
         { 0, 0 },
@@ -134,8 +141,8 @@ static MACHINE_DRIVER_START( aim65 )
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(600, 320)
-	MDRV_SCREEN_VISIBLE_AREA(0, 600-1, 0, 320-1)
+	MDRV_SCREEN_SIZE(800, 600)
+	MDRV_SCREEN_VISIBLE_AREA(0, 800-1, 0, 600-1)
 	MDRV_GFXDECODE( aim65_gfxdecodeinfo )
 	MDRV_PALETTE_LENGTH(242 + 32768)
 	MDRV_COLORTABLE_LENGTH(sizeof (aim65_colortable) / sizeof(aim65_colortable[0][0]))
@@ -143,17 +150,14 @@ static MACHINE_DRIVER_START( aim65 )
 
 	MDRV_VIDEO_START( aim65 )
 	MDRV_VIDEO_UPDATE( aim65 )
-
-	/* sound hardware */
-	// 300 hertz beeper
 MACHINE_DRIVER_END
 
 
 ROM_START(aim65)
 	ROM_REGION(0x10000,REGION_CPU1, 0)
-//	ROM_LOAD ("aim65bas.z26", 0xb000, 0x1000, CRC(36a61f39))
-//	ROM_LOAD ("aim65bas.z25", 0xc000, 0x1000, CRC(d7b42d2a))
-//	ROM_LOAD ("aim65ass.z24", 0xd000, 0x1000, CRC(0878b399))
+	ROM_LOAD_OPTIONAL ("aim65bas.z26", 0xb000, 0x1000, CRC(36a61f39))
+	ROM_LOAD_OPTIONAL ("aim65bas.z25", 0xc000, 0x1000, CRC(d7b42d2a))
+	ROM_LOAD_OPTIONAL ("aim65ass.z24", 0xd000, 0x1000, CRC(0878b399))
 	ROM_LOAD ("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c))
 	ROM_LOAD ("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf))
 	ROM_REGION(0x100,REGION_GFX1, 0)
@@ -163,4 +167,4 @@ SYSTEM_CONFIG_START(aim65)
 SYSTEM_CONFIG_END
 
 /*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
-COMP(197?,	aim65,	0,		0,		aim65,	aim65,	aim65,	aim65,	"Rockwell",	"AIM 65",	GAME_NOT_WORKING|GAME_NO_SOUND)
+COMP(197?,	aim65,	0,		0,		aim65,	aim65,	aim65,	aim65,	"Rockwell",	"AIM 65",0)
