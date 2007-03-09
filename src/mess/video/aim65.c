@@ -1,6 +1,7 @@
 /******************************************************************************
 
 	PeT mess@utanet.at Nov 2000
+	Updated by Dan Boris, 3/4/2007
 
 ******************************************************************************/
 
@@ -8,6 +9,14 @@
 #include "video/generic.h"
 
 #include "includes/aim65.h"
+
+static int printer_x;
+static int printer_y;
+static int printer_dir;
+static int flag_a;
+static int flag_b;
+
+UINT16 *printerRAM;
 
 typedef struct {
 	int digit[4]; // 16 segment digit, decoded from 7 bit data!
@@ -27,7 +36,6 @@ void dl1416a_write(int chip, int digit, int value, int cursor)
 	} else {
 		dl1416a[chip].digit[digit]=value;
 	}
-	logerror("dl1416a:%d digit:%d value:%.2x cursor:%d\n",chip,digit,value,cursor);
 }
 
 // aim 65 users guide table 7.6
@@ -40,7 +48,7 @@ static const int dl1416a_segments[0x80]={ // witch segments must be turned on fo
 	0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000,
-	0x0000, 0x1121, 0x0180, 0x0f3c, // 0x20   ! " # 
+	0x0000, 0x1121, 0x0180, 0x0f3c, // 0x20   ! " #
 	0x0fbb, 0xaf99, 0x5979, 0x2000, //      $ % & '
 	0x6000, 0x9000, 0xff00, 0x0f00, //      ( ) * +
 	0x8000, 0x0a00, 0x0020, 0xa000, //      , - . /
@@ -77,10 +85,70 @@ PALETTE_INIT( aim65 )
 	palette_set_colors(machine, 0, aim65_palette, sizeof(aim65_palette) / 3);
 }
 
+void aim65_printer_inc(void)
+{
+	if (printer_dir)
+	{
+		if (printer_x > 0) {
+			printer_x--;
+		}
+		else {
+			printer_dir = 0;
+			printer_x++;
+			printer_y++;
+		}
+	}
+	else
+	{
+		if (printer_x < 9) {
+			printer_x++;
+		}
+		else {
+			printer_dir = 1;
+			printer_x--;
+			printer_y++;
+		}
+	}
+
+	if (printer_y > 500) printer_y = 0;
+
+	flag_a=0;
+	flag_b=0;
+}
+
+void aim65_printer_cr(void) {
+	printer_x=0;
+	printer_y++;
+	if (printer_y > 500) printer_y = 0;
+	flag_a=flag_b=0;
+}
+
+void aim65_printer_data_a(UINT8 data) {
+/*	if (flag_a == 0) {
+		printerRAM[(printer_y * 20) + printer_x] |= data;
+		flag_a = 1;
+	}*/
+}
+
+void aim65_printer_data_b(UINT8 data) {
+/*	data &= 0x03;
+
+	if (flag_b == 0) {
+		printerRAM[(printer_y * 20) + printer_x ] |= (data << 8);
+		flag_b = 1;
+	}*/
+}
+
 VIDEO_START( aim65 )
 {
-    videoram_size = 6 * 2 + 24;
-    videoram = (UINT8*)auto_malloc (videoram_size);
+	videoram_size = 600 * 10 * 2;
+	printerRAM = (UINT16*)auto_malloc (videoram_size );
+	memset(printerRAM, 0, videoram_size);
+	printer_x = 0;
+	printer_y = 0;
+	printer_dir = 0;
+	flag_a=0;
+	flag_b=0;
 
 #if 0
 	{
@@ -90,33 +158,33 @@ VIDEO_START( aim65 )
 		backdrop_load(backdrop_name, 2);
 	}
 #endif
-    
+
 	return video_start_generic(machine);
 }
 
 static const char led[] = {
-	"      aaaaaaa    bbbbbb\r" 
-	"      aaaaaaa    bbbbbb\r"
-	"   hh         ii        cc\r"
-	"   hh mm      ii     nn cc\r"
-	"   hh  mm     ii    nn  cc\r" 
-	"   hh   mm    ii   nn   cc\r" 
-	"  hh    mm   ii   nn   cc\r" 
-	"  hh     mm  ii  nn    cc\r" 
-	"  hh      mm ii nn     cc\r" 
-	"  hh         ii        cc\r" 
-	"     lllllll    jjjjjj\r" 
-	"    lllllll    jjjjjj\r" 
-	" gg         kk        dd\r" 
-	" gg      pp kk oo     dd\r" 
-	" gg     pp  kk  oo    dd\r" 
-	" gg    pp   kk  oo    dd\r" 
-	"gg   pp    kk    oo  dd\r" 
-	"gg  pp     kk    oo  dd\r" 
-	"gg pp      kk     oo dd\r" 
-	"gg         kk        dd\r" 
-	"   fffffff    eeeeee\r" 
-	"   fffffff    eeeeee" 
+	"   aaaaaaa    bbbbbb\r"
+	"   aaaaaaa    bbbbbb\r"
+	"hh         ii        cc\r"
+	"hh mm      ii     nn cc\r"
+	"hh  mm     ii    nn  cc\r"
+	"hh   mm    ii   nn   cc\r"
+	"hh    mm   ii   nn   cc\r"
+	"hh     mm  ii  nn    cc\r"
+	"hh      mm ii nn     cc\r"
+	"hh         ii        cc\r"
+	"  lllllll    jjjjjj\r"
+	"  lllllll    jjjjjj\r"
+	"gg         kk        dd\r"
+	"gg      pp kk oo     dd\r"
+	"gg     pp  kk  oo    dd\r"
+	"gg    pp   kk  oo    dd\r"
+	"gg   pp    kk    oo  dd\r"
+	"gg  pp     kk    oo  dd\r"
+	"gg pp      kk     oo dd\r"
+	"gg         kk        dd\r"
+	"   fffffff    eeeeee\r"
+	"   fffffff    eeeeee"
 };
 
 static void aim65_draw_7segment(mame_bitmap *bitmap,int value, int x, int y)
@@ -145,7 +213,7 @@ static void aim65_draw_7segment(mame_bitmap *bitmap,int value, int x, int y)
 		case 'o': mask=0x4000; break;
 		case 'p': mask=0x8000; break;
 		}
-		
+
 		if (mask!=0) {
 			color=Machine->pens[(value&mask)?1:0];
 			plot_pixel(bitmap, x+xi, y+yi, color);
@@ -181,39 +249,14 @@ static const struct {
 	{570,0}
 };
 
-#if 0
-static const char* single_led=
-" 111\r"
-"11111\r"
-"11111\r"
-"11111\r"
-" 111"
-;
-
-static void aim65_draw_led(mame_bitmap *bitmap,INT16 color, int x, int y)
-{
-	int j, xi=0;
-	for (j=0; single_led[j]; j++) {
-		switch (single_led[j]) {
-		case '1': 
-			plot_pixel(bitmap, x+xi, y, color);
-			xi++;
-			break;
-		case ' ': 
-			xi++;
-			break;
-		case '\r':
-			xi=0;
-			y++;
-			break;				
-		};
-	}
-}
-#endif
 
 VIDEO_UPDATE( aim65 )
 {
 	int i, j;
+
+/*	int x,y,b,color;
+	int data;
+	int dir;*/
 
 	for (j=0; j<5; j++) {
 		for (i=0; i<4; i++) {
@@ -227,12 +270,34 @@ VIDEO_UPDATE( aim65 )
 		}
 	}
 
-#if 0
-	aim65_draw_led(bitmap, Machine->pens[1], 
-				 sym1_led_pos[6].x, sym1_led_pos[6].y);
-	aim65_draw_led(bitmap, Machine->pens[1], 
-				 sym1_led_pos[7].x, sym1_led_pos[7].y);
-#endif
+	/* Display printer output */
+/*	dir = 1;
+	for(y = 0; y<500;y++)
+	{
+		for(x = 0; x< 10; x++)
+		{
+			if (dir == 1) {
+				data = printerRAM[y * 10  + x];
+			}
+			else {
+				data = printerRAM[(y * 10) + (9 - x)];
+			}
+
+
+			for (b = 0; b<10; b++)
+			{
+				color=Machine->pens[(data & 0x1)?2:0];
+				plot_pixel(bitmap,700 - ((b * 10) + x), y,color);
+				data = data >> 1;
+			}
+		}
+
+		if (dir == 0)
+			dir = 1;
+		else
+			dir = 0;
+	} */
+
 	return 0;
 }
 
