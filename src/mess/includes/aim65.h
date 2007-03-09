@@ -9,6 +9,11 @@ extern PALETTE_INIT( aim65 );
 extern VIDEO_START( aim65 );
 extern VIDEO_UPDATE( aim65 );
 
+extern void aim65_printer_inc(void);
+extern void aim65_printer_data_a(UINT8 data);
+extern void aim65_printer_data_b(UINT8 data);
+extern void aim65_printer_cr(void);
+
 #define KEY_1 (readinputport(0)&1)
 #define KEY_2 (readinputport(0)&2)
 #define KEY_3 (readinputport(0)&4)
