@@ -21,7 +21,7 @@
 #endif
 
 
-/* 
+/*
 aim65 hardware documentation contains readable 6532 info
 
 Reg.    Name    Description
@@ -72,10 +72,10 @@ void riot_reset(int nr)
 	riot[nr].port_b.ddr=0;
 	if (riot[nr].config->port_b.output)
 		riot[nr].config->port_b.output(nr,0xff);
-	
+
 	riot[nr].irq=0;riot[nr].irqen=0;
-	if (riot[nr].config->irq_callback) 
-		riot[nr].config->irq_callback(nr, 0); 
+	if (riot[nr].config->irq_callback)
+		riot[nr].config->irq_callback(nr, 0);
 }
 
 int riot_r(int chip, int offset)
@@ -200,31 +200,30 @@ void riot_w(int chip, int offset, int data)
 		}
 		riot[chip].irqen = (offset & 8) ? 1 : 0;
 		riot[chip].irq =0;
-		
+
 		switch (offset&3) {
 		case 0: /* Timer 1 start */
 			LOG(("rriot(%d) TMR1  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(riot[chip].timer, TIME_IN_HZ( (data+1) / riot[chip].config->baseclock), 
+			timer_adjust(riot[chip].timer,  (double) (data+1) / riot[chip].config->baseclock,
 										  chip, 0);
 			riot[chip].state=Delay1;
 			break;
 		case 1: /* Timer 8 start */
 			LOG(("riot(%d) TMR8  write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(riot[chip].timer, TIME_IN_HZ( (data+1) * 8 / riot[chip].config->baseclock), 
+			timer_adjust(riot[chip].timer,  (double)(data+1) * 8 / riot[chip].config->baseclock,
 										  chip, 0);
 			riot[chip].state=Delay8;
 			break;
 		case 2: /* Timer 64 start */
 			LOG(("riot(%d) TMR64 write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-//			LOG(("riot(%d) TMR64 write: time is $%f\n", chip, (double)(64.0 * (data + 1) / riot[chip].clock)));
-			timer_adjust(riot[chip].timer, TIME_IN_HZ( (data+1) * 64 / riot[chip].config->baseclock), 
+			timer_adjust(riot[chip].timer,  (double)(data+1) * 64 / riot[chip].config->baseclock,
 										  chip, 0);
 			riot[chip].state=Delay64;
 			break;
 		case 3: /* Timer 1024 start */
 			LOG(("riot(%d) TMR1K write: $%02x%s\n", chip, data, (char*)((offset & 8) ? " (IRQ)":" ")));
-			timer_adjust(riot[chip].timer, TIME_IN_HZ( (data+1) * 1024 / riot[chip].config->baseclock), 
-										  chip, 0);
+			timer_adjust(riot[chip].timer, (double)(data+1) * 1024 / riot[chip].config->baseclock,chip, 0);
+
 			riot[chip].state=Delay1024;
 			break;
 		}
@@ -254,7 +253,7 @@ static void riot_a_w(int chip, int data)
 
 static void riot_b_w(int chip, int data)
 {
-	
+
 }
 
  READ8_HANDLER ( riot_0_r ) { return riot_r(0,offset); }
