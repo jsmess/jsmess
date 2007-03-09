@@ -948,7 +948,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x25:	/* C025 - KEYMODREG */
-			result = 0x00;
+			result = AY3600_keymod_r();
 			break;
 
 		case 0x26:	/* C026 - DATAREG */

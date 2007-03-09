@@ -251,6 +251,7 @@ static UINT8 keycode;
 static UINT8 keycode_unmodified;
 static UINT8 keywaiting;
 static UINT8 keystilldown;
+static UINT8 keymodreg;
 
 #define A2_KEY_NORMAL				0
 #define A2_KEY_CONTROL				1
@@ -261,7 +262,15 @@ static UINT8 keystilldown;
 #define AY3600_KEYS_LENGTH			128
 #define AY3600_KEYS_BASEPORT		0
 
-
+// IIgs keymod flags
+#define A2_KEYMOD_SHIFT		1
+#define A2_KEYMOD_CONTROL	2
+#define A2_KEYMOD_CAPSLOCK	4
+#define A2_KEYMOD_REPEAT	8
+#define A2_KEYMOD_KEYPAD	0x10
+#define A2_KEYMOD_MODLATCH	0x20
+#define A2_KEYMOD_COMMAND	0x40
+#define A2_KEYMOD_OPTION	0x80
 
 /***************************************************************************
   Helper Functions
@@ -315,6 +324,7 @@ int AY3600_init()
 	keywaiting = 0;
 	keycode = 0;
 	keystilldown = 0;
+	keymodreg = A2_KEYMOD_CAPSLOCK;	// caps lock on
 
 #ifdef MESS
 	inputx_setup_natural_keyboard(AY3600_keyboard_queue_chars,
@@ -357,22 +367,38 @@ static void AY3600_poll(int dummy)
 	{
 		caps_lock = 1;
 		set_led_status(1,1);
+		keymodreg |= A2_KEYMOD_CAPSLOCK;
 	}
 	else
 	{
 		caps_lock = 0;
 		set_led_status(1,0);
+		keymodreg &= ~A2_KEYMOD_CAPSLOCK;
 	}
 
 	switchkey = A2_KEY_NORMAL;
 
 	/* shift key check */
 	if (pressed_specialkey(SPECIALKEY_SHIFT))
+	{
 		switchkey |= A2_KEY_SHIFT;
+		keymodreg |= A2_KEYMOD_SHIFT;
+	}
+	else
+	{
+		keymodreg &= ~A2_KEYMOD_SHIFT;
+	}
 
 	/* control key check - only one control key on the left side on the Apple */
 	if (pressed_specialkey(SPECIALKEY_CONTROL))
+	{
 		switchkey |= A2_KEY_CONTROL;
+		keymodreg |= A2_KEYMOD_CONTROL;
+	}
+	else
+	{
+		keymodreg &= ~A2_KEYMOD_CONTROL;
+	}
 
 	/* reset key check */
 	if (pressed_specialkey(SPECIALKEY_RESET) &&
@@ -394,6 +420,8 @@ static void AY3600_poll(int dummy)
 	/* run through real keys and see what's being pressed */
 	num_ports = a2_has_keypad() ? 9 : 7;
 
+	keymodreg &= ~A2_KEYMOD_KEYPAD;
+
 	for (port = 0; port < num_ports; port++)
 	{
 		data = readinputport(AY3600_KEYS_BASEPORT + port);
@@ -409,6 +437,11 @@ static void AY3600_poll(int dummy)
 			if (data & (1 << bit))
 			{
 				any_key_pressed = 1;
+
+				if (port == 8)
+				{
+					keymodreg |= A2_KEYMOD_KEYPAD;
+				}
 
 				/* prevent overflow */
 				if (ay3600_keys[port*8+bit] < 65000)
@@ -428,6 +461,8 @@ static void AY3600_poll(int dummy)
 			}
 		}
 	}
+
+	keymodreg &= ~A2_KEYMOD_REPEAT;
 
 	if (!any_key_pressed)
 	{
@@ -450,6 +485,7 @@ static void AY3600_poll(int dummy)
 			keywaiting = 1;
 			keycode = last_key;
 			keycode_unmodified = last_key_unmodified;
+			keymodreg |= A2_KEYMOD_REPEAT;
 		}
 	}
 	keystilldown = (last_key_unmodified == keycode_unmodified);
@@ -485,6 +521,14 @@ int AY3600_anykey_clearstrobe_r(void)
 }
 
 
+/***************************************************************************
+  AY3600_keymod_r ($C025 - IIgs only)
+***************************************************************************/
+
+int AY3600_keymod_r(void)
+{
+	return keymodreg;
+}
 
 /***************************************************************************
   Natural keyboard support
