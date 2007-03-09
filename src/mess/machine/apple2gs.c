@@ -1133,7 +1133,7 @@ static WRITE8_HANDLER( apple2gs_c0xx_w )
 
 		case 0x36:	/* C036 - CYAREG */
 			apple2gs_cyareg = data & ~0x20;
-			cpunum_set_clockscale(0, (data & 0x80) ? 2.8 : 1.0);
+			cpunum_set_clock(0, (data & 0x80) ? APPLE2GS_14M/5 : APPLE2GS_7M/7);
 			break;
 
 		case 0x38:	/* C038 - SCCBREG */
