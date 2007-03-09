@@ -4,12 +4,13 @@
 #include "machine/6522via.h"
 #include "includes/riot6532.h"
 #include "includes/aim65.h"
+#include "cpu/m6502/m6502.h"
 
 static UINT8 pia_a, pia_b;
-/*
-  ef7b output char a at position x
 
- */
+static void *print_timer;
+static int printer_level;
+
 
 static void aim65_pia(void)
 {
@@ -76,7 +77,7 @@ static int aim65_riot_b_r(int chip)
 	}
 	if (!(a&4)) {
 		//right?
-		if (KEY_PRINT) data&=~2; // backslash 
+		if (KEY_PRINT) data&=~2; // backslash
 		if (KEY_P) data&=~4;
 		if (KEY_I) data&=~8;
 		if (KEY_Y) data&=~0x10;
@@ -116,7 +117,7 @@ static int aim65_riot_b_r(int chip)
 	}
 	if (!(a&0x40)) {
 		if (KEY_RIGHT_SHIFT) data&=~1;
-		// del 0x7f
+		if (KEY_DEL) data&=~2; //backspace 0x08
 		if (KEY_SEMICOLON) data&=~4;
 		if (KEY_K) data&=~8;
 		if (KEY_H) data&=~0x10;
@@ -125,8 +126,6 @@ static int aim65_riot_b_r(int chip)
 		if (KEY_F2) data&=~0x80;
 	}
 	if (!(a&0x80)) {
-		// nothing ?
-		//right?
 		if (KEY_SLASH) data&=~4;
 		if (KEY_COMMA) data&=~8;
 		if (KEY_N) data&=~0x10;
@@ -150,38 +149,64 @@ static RIOT_CONFIG riot={
   (pa0..pa7,pb0,pb1 1 heat element on)
 
   cb2 0 motor, heat elements on
-  cb1 output start!? 
+  cb1 output start!?
   ca1 input
 
-  normally printer 5x7 characters 
+  normally printer 5x7 characters
   (horizontal movement limits not known, normally 2 dots between characters)
 
   3 dots space between lines?
  */
-struct {
-	void *timer;
-	int level;
-} printer={ 0 };
 
 static void aim65_printer_timer(int param)
 {
-	// hack until printer? is emulated
-	via_0_cb1_w(0,printer.level);
-	via_0_ca1_w(0,printer.level);
-	printer.level^=1;
+	via_0_cb1_w(0,printer_level);
+	via_0_ca1_w(0,!printer_level);
+	printer_level = !printer_level;
+	aim65_printer_inc();
 }
 
 static WRITE8_HANDLER(aim65_printer_on)
 {
-	if (!data)
-		timer_adjust(printer.timer, 0, 0, 1000e-6);
+	if (!data) {
+		aim65_printer_cr();
+		timer_adjust(print_timer, 0, 0, .010);
+		via_0_cb1_w(0,0);
+		printer_level = 1;
+	}
 	else
-		timer_reset(printer.timer, TIME_NEVER);
+		timer_reset(print_timer, TIME_NEVER);
+}
+
+static WRITE8_HANDLER(aim65_via0_a_w)
+{
+	 aim65_printer_data_a(data);
+
+}
+
+static WRITE8_HANDLER(aim65_via0_b_w)
+{
+	aim65_printer_data_b(data);
+
 }
 
 static  READ8_HANDLER( aim65_via0_b_r)
 {
 	return readinputport(4);
+}
+
+static void aim65_via_irq_func(int state)
+{
+	if (state)
+	{
+		cpunum_set_input_line(0,M6502_IRQ_LINE, HOLD_LINE);
+	}
+	else
+	{
+		cpunum_set_input_line(0,M6502_IRQ_LINE, CLEAR_LINE);
+	}
+
+
 }
 
 static struct via6522_interface via0={
@@ -191,11 +216,13 @@ static struct via6522_interface via0={
 	0,//read8_handler in_cb1_func;
 	0,//read8_handler in_ca2_func;
 	0,//read8_handler in_cb2_func;
-	0,//write8_handler out_a_func;
-	0,//write8_handler out_b_func;
+	aim65_via0_a_w,	//write8_handler out_a_func;
+	aim65_via0_b_w, //write8_handler out_b_func;
+	0,//	write8_handler out_ca1_func;
+	0,//	write8_handler out_cb1_func;
 	0,//write8_handler out_ca2_func;
 	aim65_printer_on,//write8_handler out_cb2_func;
-	0,//void (*irq_func)(int state);
+	aim65_via_irq_func //void (*irq_func)(int state);
 };
 
 DRIVER_INIT( aim65 )
@@ -203,8 +230,14 @@ DRIVER_INIT( aim65 )
 	pia_config(0, PIA_STANDARD_ORDERING, &pia);
 	riot_init(0, &riot);
 	via_config(0,&via0);
+	via_reset();
+	via_0_cb1_w(1,1);
+	via_0_ca1_w(1,0);
 
-	printer.timer = timer_alloc(aim65_printer_timer);
+	print_timer = timer_alloc(aim65_printer_timer);
+
+	printer_level = 0;
+
 }
 
 
