@@ -371,38 +371,35 @@ MACHINE_DRIVER_END
 
 /* ROMs */
 
+SYSTEM_BIOS_START( ql )
+	SYSTEM_BIOS_ADD( 0, "fb", "v1.00 (FB)" )
+	SYSTEM_BIOS_ADD( 1, "pm", "v1.01 (PM)" )
+	SYSTEM_BIOS_ADD( 2, "ah", "v1.02 (AH)" )
+	SYSTEM_BIOS_ADD( 3, "jm", "v1.03 (JM)" )
+	SYSTEM_BIOS_ADD( 4, "tb", "v1.0? (TB)" )
+	SYSTEM_BIOS_ADD( 5, "js", "v1.10 (JS)" )
+SYSTEM_BIOS_END
+
 ROM_START( ql )
     ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "ah.ic33.1", 0x000000, 0x004000, CRC(a9b4d2df) SHA1(142d6f01a9621aff5e0ad678bd3cbf5cde0db801) )
-    ROM_LOAD16_WORD_SWAP( "ah.ic33.2", 0x004000, 0x004000, CRC(36488e4e) SHA1(ff6f597b30ea03ce480a3d6728fd1d858da34d6a) )
-    ROM_LOAD16_WORD_SWAP( "ah.ic34",   0x008000, 0x004000, CRC(61259d4c) SHA1(bdd10d111e7ba488551a27c8d3b2743917ff1307) )
+    ROMX_LOAD( "fb.ic33", 0x000000, 0x008000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
+    ROMX_LOAD( "fb.ic34", 0x008000, 0x004000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
 
-	ROM_REGION( 0x800, REGION_CPU2, 0 )
-	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
-ROM_END
+	ROMX_LOAD( "pm.ic33", 0x000000, 0x008000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
+    ROMX_LOAD( "pm.ic34", 0x008000, 0x004000, NO_DUMP, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
 
-ROM_START( ql_jm )
-    ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "jm.ic33", 0x000000, 0x008000, CRC(1f8e840a) SHA1(7929e716dfe88318bbe99e34f47d039957fe3cc0) )
-    ROM_LOAD16_WORD_SWAP( "jm.ic34", 0x008000, 0x004000, CRC(9168a2e9) SHA1(1e7c47a59fc40bd96dfefc2f4d86827c15f0199e) )
+	ROMX_LOAD( "ah.ic33.1", 0x000000, 0x004000, CRC(a9b4d2df) SHA1(142d6f01a9621aff5e0ad678bd3cbf5cde0db801), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3) )
+    ROMX_LOAD( "ah.ic33.2", 0x004000, 0x004000, CRC(36488e4e) SHA1(ff6f597b30ea03ce480a3d6728fd1d858da34d6a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3) )
+	ROMX_LOAD( "ah.ic34",   0x008000, 0x004000, CRC(61259d4c) SHA1(bdd10d111e7ba488551a27c8d3b2743917ff1307), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3) )
 
-	ROM_REGION( 0x800, REGION_CPU2, 0 )
-	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
-ROM_END
+	ROMX_LOAD( "jm.ic33", 0x000000, 0x008000, CRC(1f8e840a) SHA1(7929e716dfe88318bbe99e34f47d039957fe3cc0), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4) )
+    ROMX_LOAD( "jm.ic34", 0x008000, 0x004000, CRC(9168a2e9) SHA1(1e7c47a59fc40bd96dfefc2f4d86827c15f0199e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4) )
 
-ROM_START( ql_tb )
-    ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "tb.ic33", 0x000000, 0x008000, CRC(1c86d688) SHA1(7df8028e6671afc4ebd5f65bf6c2d6019181f239) )
-    ROM_LOAD16_WORD_SWAP( "tb.ic34", 0x008000, 0x004000, CRC(de7f9669) SHA1(9d6bc0b794541a4cec2203256ae92c7e68d1011d) )
+	ROMX_LOAD( "tb.ic33", 0x000000, 0x008000, CRC(1c86d688) SHA1(7df8028e6671afc4ebd5f65bf6c2d6019181f239), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(5) )
+    ROMX_LOAD( "tb.ic34", 0x008000, 0x004000, CRC(de7f9669) SHA1(9d6bc0b794541a4cec2203256ae92c7e68d1011d), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(5) )
 
-	ROM_REGION( 0x800, REGION_CPU2, 0 )
-	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
-ROM_END
-
-ROM_START( ql_js )
-    ROM_REGION( 0x400000, REGION_CPU1, 0 )
-    ROM_LOAD16_WORD_SWAP( "js.ic33", 0x000000, 0x008000, CRC(1bbad3b8) SHA1(59fd4372771a630967ee102760f4652904d7d5fa) )
-    ROM_LOAD16_WORD_SWAP( "js.ic34", 0x008000, 0x004000, CRC(c970800e) SHA1(b8c9203026a7de6a44bd0942ec9343e8b222cb41) )
+	ROMX_LOAD( "js.ic33", 0x000000, 0x008000, CRC(1bbad3b8) SHA1(59fd4372771a630967ee102760f4652904d7d5fa), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(6) )
+    ROMX_LOAD( "js.ic34", 0x008000, 0x004000, CRC(c970800e) SHA1(b8c9203026a7de6a44bd0942ec9343e8b222cb41), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(6) )
 
 	ROM_REGION( 0x800, REGION_CPU2, 0 )
 	ROM_LOAD( "ipc8049.ic24", 0x0000, 0x0800, CRC(6a0d1f20) SHA1(fcb1c97ee7c66e5b6d8fbb57c06fd2f6509f2e1b) )
@@ -480,17 +477,12 @@ SYSTEM_CONFIG_END
 
 /* Computer Drivers */
 
-/*     YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT  CONFIG	COMPANY	FULLNAME */
-//COMP( 1984, ql_fb,  0,  0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.00, FB)", GAME_NOT_WORKING )
-//COMP( 1984, ql_pm,  0,  0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.01, PM)", GAME_NOT_WORKING )
-COMP( 1984, ql,     0,  0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.02, AH)", GAME_NOT_WORKING )
-COMP( 1984, ql_jm,  ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.03, JM)", GAME_NOT_WORKING )
-COMP( 1984, ql_tb,  ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.0?, TB)", GAME_NOT_WORKING )
-COMP( 1985, ql_js,  ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.10, JS)", GAME_NOT_WORKING )
-COMP( 1985, ql_jsu, ql, 0, ql_ntsc, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.10, JSU) (NTSC)", GAME_NOT_WORKING )
-COMP( 1985, ql_mge, ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.13, MGE) (Spain)", GAME_NOT_WORKING )
-COMP( 1985, ql_mgf, ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.13, MGF) (France)", GAME_NOT_WORKING )
-COMP( 1985, ql_mgg, ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.13, MGG) (Germany)", GAME_NOT_WORKING )
-COMP( 1985, ql_mgi, ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.13, MGI) (Italy)", GAME_NOT_WORKING )
-COMP( 1985, ql_mgs, ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.13, MGS) (Sweden)", GAME_NOT_WORKING )
-COMP( 1985, ql_efp, ql, 0, ql, ql, 0, ql, "Sinclair Research Ltd", "QL (v1.13, EFP) (Mexico)", GAME_NOT_WORKING )
+/*     YEAR  NAME    PARENT	BIOS  COMPAT	MACHINE  INPUT	INIT	CONFIG	COMPANY					 FULLNAME */
+COMPB( 1984, ql,     0,		ql,	  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (UK)", GAME_NOT_WORKING )
+COMP ( 1985, ql_jsu, ql,		  0,		ql_ntsc, ql,	0,		ql,		"Sinclair Research Ltd", "QL (USA)", GAME_NOT_WORKING )
+COMP ( 1985, ql_mge, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Spain)", GAME_NOT_WORKING )
+COMP ( 1985, ql_mgf, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (France)", GAME_NOT_WORKING )
+COMP ( 1985, ql_mgg, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Germany)", GAME_NOT_WORKING )
+COMP ( 1985, ql_mgi, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Italy)", GAME_NOT_WORKING )
+COMP ( 1985, ql_mgs, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Sweden)", GAME_NOT_WORKING )
+COMP ( 1985, ql_efp, ql,		  0,		ql,		 ql,	0,		ql,		"Sinclair Research Ltd", "QL (Mexico)", GAME_NOT_WORKING )

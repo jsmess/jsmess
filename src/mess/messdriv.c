@@ -440,9 +440,6 @@ TESTDRIVER( tree4th )		/* Sinclair ZX-81 Tree-Forth by Tree Systems			*/
 	DRIVER( specp3es )	/* 2000 ZX Spectrum +3e (Spain)					*/
 
 	DRIVER( ql )		/* Sinclair QL							*/
-	DRIVER( ql_jm )
-	DRIVER( ql_tb )
-	DRIVER( ql_js )
 	DRIVER( ql_jsu )
 	DRIVER( ql_mge )
 	DRIVER( ql_mgf )
