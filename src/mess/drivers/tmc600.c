@@ -109,7 +109,7 @@ static int keylatch;
 
 static WRITE8_HANDLER( keyboard_latch_w )
 {
-	keylatch = data & 0x08;
+	keylatch = data;
 }
 
 static WRITE8_HANDLER( printer_w )
