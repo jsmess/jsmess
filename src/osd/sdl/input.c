@@ -1237,6 +1237,9 @@ int win_init_input(running_machine *machine)
 	// decode the options
 	extract_input_config();
 
+	// make sure we start at 0
+	total_codes = 0;
+	
 	init_keycodes();
 	memset(keyboard_state, 0, sizeof(keyboard_state));
 

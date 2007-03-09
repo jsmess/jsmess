@@ -824,13 +824,13 @@ static void update_fps(mame_time emutime)
 		{
 			mame_file_error filerr;
 			mame_file *fp;
-			char name[10];
+			char name[20];
 
 			// make a filename with an underscore prefix
-			sprintf(name, "_%.8s", Machine->gamedrv->name);
+			sprintf(name, "_%.8s.png", Machine->gamedrv->name);
 
 			// write out the screenshot
-			filerr = mame_fopen(SEARCHPATH_SCREENSHOT, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &fp);
+			filerr = mame_fopen(SEARCHPATH_SCREENSHOT, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
 			if (filerr == FILERR_NONE)
 			{
 				video_screen_save_snapshot(fp, 0);

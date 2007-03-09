@@ -31,6 +31,7 @@
 
 #ifndef SDLMAME_WIN32
 #define __USE_UNIX98	// to get PTHREAD_MUTEX_xxx types
+#define _GNU_SOURCE 	// fixes older Debian/Ubuntu/Slack systems
 #include <pthread.h>
 
 //============================================================

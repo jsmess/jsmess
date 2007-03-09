@@ -1,5 +1,14 @@
-
-/* Print out all the keysyms we have, just to verify them */
+//============================================================
+//
+//  testkey.c - A small utility to analyze SDL keycodes
+//
+//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+//  SDLMAME by Olivier Galibert and R. Belmont
+//  testkeys by couriersud
+//
+//============================================================
 
 #include <stdio.h>
 #include <ctype.h>
@@ -331,7 +340,7 @@ int main(int argc, char *argv[])
 	SDLKey key;
 	SDL_Event event;
 	int quit = 0;
-	unsigned short t;
+	char buf[20];
 	mbstate_t ps;
 
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
@@ -351,22 +360,13 @@ int main(int argc, char *argv[])
 				quit=1;
 			else
 			{
-				UNICODE_to_UTF8(&t, 2, &event.key.keysym.unicode, 1);
-				printf("KEYCODE_XY %s 0x%x 0x%x %c%c \n",
+				memset(buf, 0, 19);
+				UNICODE_to_UTF8(buf, 2, &event.key.keysym.unicode, 1);
+				printf("KEYCODE_XY %s 0x%x 0x%x %s \n",
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
 					(int) event.key.keysym.scancode, 
 					(int) event.key.keysym.unicode, 
-					t & 0xFF, t >> 8);
-#if 0
-				printf("Key #%d, 0x%4x (\'%c\'), 0x%4x, \'%s\'\n", 
-					(int) event.key.keysym.sym, 
-					(int) event.key.keysym.scancode, 
-					(unsigned char) event.key.keysym.scancode, 
-					(int) event.key.keysym.unicode, 
-					SDL_GetKeyName(event.key.keysym.sym) );
-				//ps = 0;
-				//wcsrtombs(&t, &event.key.keysym.unicode, 1, NULL);
-#endif
+					buf);
 			}
 			break;
 		}
