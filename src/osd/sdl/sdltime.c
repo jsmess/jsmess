@@ -11,6 +11,7 @@
 
 // standard sdl header
 #include <SDL/SDL.h>
+#include <unistd.h>
 
 #ifdef SDLMAME_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -50,7 +51,7 @@ static osd_ticks_t mach_cycle_counter(void);
 // global cycle_counter function and divider
 osd_ticks_t		(*cycle_counter)(void) = init_cycle_counter;
 osd_ticks_t		(*ticks_counter)(void) = init_cycle_counter;
-osd_ticks_t		cycles_per_sec;
+osd_ticks_t		ticks_per_second;
 int			sdl_use_rdtsc = 0;
 
 
@@ -87,7 +88,7 @@ static osd_ticks_t init_cycle_counter(void)
 		cycle_counter = performance_cycle_counter;
 		ticks_counter = rdtsc_cycle_counter;
 
-		cycles_per_sec = frequency.QuadPart;
+		ticks_per_second = frequency.QuadPart;
 
 		// return the current cycle count
 		return (*cycle_counter)();
@@ -121,7 +122,7 @@ static osd_ticks_t init_cycle_counter(void)
 	end = (*cycle_counter)();
 
 	// compute ticks_per_sec
-	cycles_per_sec = (end - start) * 4;
+	ticks_per_second = (end - start) * 4;
 
 	// restore our priority
 	SetThreadPriority(GetCurrentThread(), priority);
@@ -184,7 +185,7 @@ static osd_ticks_t init_cycle_counter(void)
 	end = (*cycle_counter)();
 
 	// compute ticks_per_sec
-	cycles_per_sec = (end - start) * 4;
+	ticks_per_second = (end - start) * 4;
 
 	// return the current cycle count
 	return (*cycle_counter)();
@@ -233,7 +234,7 @@ static osd_ticks_t init_cycle_counter(void)
 	end = (*cycle_counter)();
 
 	// compute ticks_per_sec
-	cycles_per_sec = (end - start) * 4;
+	ticks_per_second = (end - start) * 4;
 
 	// return the current cycle count
 	return (*cycle_counter)();
@@ -337,12 +338,12 @@ osd_ticks_t osd_ticks(void)
 
 
 //============================================================
-//  osd_cycles_per_second
+//  osd_ticks_per_second
 //============================================================
 
 osd_ticks_t osd_ticks_per_second(void)
 {
-	return cycles_per_sec;
+	return ticks_per_second;
 }
 
 
@@ -375,6 +376,34 @@ void sdl_timer_enable(int enabled)
 	{
 		suspend_adjustment += actual_cycles - suspend_time;
 		suspend_time = 0;
+	}
+}
+
+//============================================================
+//  osd_sleep
+//============================================================
+
+void osd_sleep(osd_ticks_t duration)
+{
+	UINT32 msec;
+
+	// make sure we've computed ticks_per_second
+	if (ticks_per_second == 0)
+		(void)osd_ticks();
+
+	// convert to milliseconds, rounding down
+	msec = (UINT32)(duration * 1000 / ticks_per_second);
+
+	// only sleep if at least 1 full millisecond
+	if (msec >= 2)
+	{
+		// take one more msec off the top for good measure
+		msec -= 2;
+		#ifdef SDLMAME_WIN32
+		Sleep(msec);
+		#else
+		usleep(msec*1000);
+		#endif
 	}
 }
 

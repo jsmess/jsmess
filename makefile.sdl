@@ -1,6 +1,6 @@
 ###########################################################################
 #
-#   makefile.sdl
+#   makefile
 #
 #   Core makefile for building SDLMAME and derivatives
 #
@@ -61,7 +61,7 @@ SUBARCH = linux
 #-------------------------------------------------
 
 # uncomment next line to include the debugger
-#DEBUG = 1    
+# DEBUG = 1    
  
 # uncomment next line to use DRC MIPS3 engine
 X86_MIPS3_DRC = 1
@@ -88,10 +88,10 @@ PM = 1
 # PTR64 = 1
 
 # uncomment next line to build expat as part of MAME build
-# BUILD_EXPAT = 1
+BUILD_EXPAT = 1
 
 # uncomment next line to build zlib as part of MAME build
-# BUILD_ZLIB = 1
+BUILD_ZLIB = 1
 
 # uncomment next line to include the symbols
 # SYMBOLS = 1
@@ -282,6 +282,7 @@ CFLAGS = \
 	-I$(SRC)/$(TARGET)/includes \
 	-I$(OBJ)/$(TARGET)/layout \
 	-I$(SRC)/emu \
+	-I$(OBJ)/emu \
 	-I$(OBJ)/emu/layout \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/osd \
@@ -320,11 +321,6 @@ CFLAGS += -DNDEBUG $(ARCH) -fno-strict-aliasing
 endif
 
 CFLAGS += -O$(OPTIMIZE)
-
-# hack for Win32-specific directive in 0.113 core
-ifneq ($(SUBARCH),win32)
-CFLAGS += -D__cdecl
-endif	#!win32
 
 # extra options needed *only* for the osd files
 CFLAGSOSDEPEND = $(CFLAGS)
@@ -377,8 +373,7 @@ MAINLDFLAGS =
 
 # add expat XML library
 ifdef BUILD_EXPAT
-CFLAGS += -Isrc/lib/expat
-OBJDIRS += $(OBJ)/lib/expat
+CFLAGS += -I$(SRC)/lib/expat
 EXPAT = $(OBJ)/libexpat.a
 else
 LIBS += -lexpat
@@ -387,8 +382,7 @@ endif
 
 # add ZLIB compression library
 ifdef BUILD_ZLIB
-CFLAGS += -Isrc/lib/zlib
-OBJDIRS += $(OBJ)/lib/zlib
+CFLAGS += -I$(SRC)/lib/zlib
 ZLIB = $(OBJ)/libz.a
 else
 LIBS += -lz
@@ -498,9 +492,14 @@ $(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
 
-$(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR)
+$(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR) 
 	@echo Converting $<...
-	@$(FILE2STR) $< $@ layout_$(basename $(notdir $<))
+	@$(FILE2STR)  $< $@ layout_$(basename $(notdir $<))
+
+$(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC)
+	@echo Converting $<...
+	@$(PNG2BDC) $< $(OBJ)/temp.bdc
+	@$(FILE2STR) $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
 
 $(OBJ)/%.a:
 	@echo Archiving $@...
