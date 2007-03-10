@@ -26,6 +26,8 @@ UINT8 *sms_banking_cart[5]; /* we are going to use 1-4, same as bank numbers */
 UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
 UINT8 smsNVRam[NVRAM_SIZE];
 int smsNVRAMSave = 0;
+UINT8 *sms_codemasters_ram; /* For the 64KB extra RAM used by Ernie Els Golf */
+UINT8 sms_codemasters_rampage;
 UINT8 ggSIO[5] = { 0x7F, 0xFF, 0x00, 0xFF, 0x00 };
 
 WRITE8_HANDLER(sms_fm_detect_w) {
@@ -183,6 +185,7 @@ WRITE8_HANDLER(sms_mapper_w)
 				sms_banking_bios[4] = SOURCE;
 				sms_banking_cart[4] = SOURCE;
 				memory_set_bankptr( 4, SOURCE );
+				memory_set_bankptr( 5, SOURCE + 0x2000 );
 			} else { /* it's rom */
 				if ( ROM ) {
 					SOURCE_CART = ROM + ( (smsRomPageCount > 0) ? sms_mapper[3] % smsRomPageCount : 0 ) * 0x4000;
@@ -203,6 +206,7 @@ WRITE8_HANDLER(sms_mapper_w)
 				logerror("rom 2 paged in %x.\n", page);
 #endif
 				memory_set_bankptr( 4, SOURCE );
+				memory_set_bankptr( 5, SOURCE );
 			}
 			break;
 		case 1: /* Select 16k ROM bank for 0400-3FFF */
@@ -245,8 +249,32 @@ WRITE8_HANDLER(sms_mapper_w)
 					sms_banking_cart[4] = SOURCE_CART;
 				}
 				memory_set_bankptr( 4, SOURCE );
+				memory_set_bankptr( 5, SOURCE + 0x2000 );
 			}
 			break;
+	}
+}
+
+WRITE8_HANDLER(sms_codemasters_page0_w) {
+	if ( ROM && smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
+		sms_banking_cart[1] = ROM + ( (smsRomPageCount > 0) ? data % smsRomPageCount : 0 ) * 0x4000;
+		sms_banking_cart[2] = sms_banking_cart[1] + 0x0400;
+		memory_set_bankptr( 1, sms_banking_cart[1] );
+		memory_set_bankptr( 2, sms_banking_cart[2] );
+	}
+}
+
+WRITE8_HANDLER(sms_codemasters_page1_w) {
+	if ( ROM && smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
+		/* Check if we need to switch in some RAM */
+		if ( data & 0x80 ) {
+			sms_codemasters_rampage = data & 0x07;
+			memory_set_bankptr( 5, sms_codemasters_ram + sms_codemasters_rampage * 0x2000 );
+		} else {
+			sms_banking_cart[3] = ROM + ( (smsRomPageCount > 0) ? data % smsRomPageCount : 0 ) * 0x4000;
+			memory_set_bankptr( 3, sms_banking_cart[3] );
+			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
+		}
 	}
 }
 
@@ -256,6 +284,20 @@ WRITE8_HANDLER(sms_bios_w) {
 	logerror("bios write %02x, pc: %04x\n", data, activecpu_get_pc());
 
 	setup_rom();
+}
+
+WRITE8_HANDLER(sms_cartram2_w) {
+	if (sms_mapper[0] & 0x08) {
+		logerror("write %02X to cartram at offset #%04X\n", data, offset + 0x2000);
+		if (sms_mapper[0] & 0x04) {
+			smsNVRam[offset + 0x6000] = data;
+		} else {
+			smsNVRam[offset + 0x2000] = data;
+		}
+	}
+	if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
+		sms_codemasters_ram[sms_codemasters_rampage * 0x2000 + offset] = data;
+	}
 }
 
 WRITE8_HANDLER(sms_cartram_w) {
@@ -275,6 +317,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 				return;
 			sms_banking_cart[4] = ROM + page * 0x4000;
 			memory_set_bankptr( 4, sms_banking_cart[4] );
+			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
 #ifdef LOG_PAGING
 			logerror("rom 2 paged in %x codemasters.\n", page);
 #endif
@@ -284,6 +327,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 				return;
 			sms_banking_cart[4] = ROM + page * 0x4000;
 			memory_set_bankptr( 4, sms_banking_cart[4] );
+			memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
 #ifdef LOG_PAGING
 			logerror("rom 2 paged in %x dodgeball king.\n", page);
 #endif
@@ -362,6 +406,7 @@ void setup_rom(void)
 	memory_set_bankptr( 2, sms_banking_none[2] );
 	memory_set_bankptr( 3, sms_banking_none[3] );
 	memory_set_bankptr( 4, sms_banking_none[4] );
+	memory_set_bankptr( 5, sms_banking_none[4] + 0x2000 );
 
 	/* 2. check and set up expansion port */
 	if (!(biosPort & IO_EXPANSION) && (biosPort & IO_CARTRIDGE) && (biosPort & IO_CARD)) {
@@ -383,6 +428,7 @@ void setup_rom(void)
 		memory_set_bankptr( 2, sms_banking_cart[2] );
 		memory_set_bankptr( 3, sms_banking_cart[3] );
 		memory_set_bankptr( 4, sms_banking_cart[4] );
+		memory_set_bankptr( 5, sms_banking_cart[4] + 0x2000 );
 		logerror( "Switched in cartridge rom.\n" );
 	}
 
@@ -404,6 +450,7 @@ void setup_rom(void)
 			memory_set_bankptr( 2, sms_banking_bios[2] );
 			memory_set_bankptr( 3, sms_banking_bios[3] );
 			memory_set_bankptr( 4, sms_banking_bios[4] );
+			memory_set_bankptr( 5, sms_banking_bios[4] + 0x2000 );
 			logerror( "Switched in full bios.\n" );
 		}
 	}
@@ -511,15 +558,20 @@ DEVICE_LOAD( sms_cart )
 		              - gamegear Cosmic Spacehead
 		              - gamegear Micro Machines
 		         - 94 - gamegear Dropzone
-		              - gamegear Ernie Els Golf
+		              - gamegear Ernie Els Golf (also has 64KB additional RAM on the cartridge)
 		              - gamegear Pete Sampras Tennis
 		              - gamegear S.S. Lucifer
 		         - 95 - gamegear Micro Machines 2 - Turbo Tournament
 		 */
-		if ( ( ROM[0x7fe0] & 0x0F <= 9 ) && ( ROM[0x7fe3] == 0x93 ||
-		       ROM[0x7fe3] == 0x94 ||
-		       ROM[0x7fe3] == 0x95 ) && ROM[0x7fef] == 0x00 ) {
+		if ( ( ( ROM[0x7fe0] & 0x0F ) <= 9 ) &&
+		     ( ROM[0x7fe3] == 0x93 || ROM[0x7fe3] == 0x94 || ROM[0x7fe3] == 0x95 ) &&
+                     ROM[0x7fef] == 0x00 ) {
 			smsCartFeatures |= CF_CODEMASTERS_MAPPER;
+			/* Install special memory handlers */
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
+			sms_codemasters_ram = auto_malloc( 0x10000 );
+			sms_codemasters_rampage = 0;
 		}
 		/* Check for special Korean games mapper used by:
 		   - Dodgeball King/Dallyeora Pigu-Wang
@@ -534,17 +586,15 @@ DEVICE_LOAD( sms_cart )
 	/* Check for special SMS Compatibility mode gamegear cartridges */
 	if ( IS_GAMEGEAR ) {
 		const char *fname = image_filename( image );
-		int	len = strlen( fname );
+		int	len = fname ? strlen( fname ) : 0;
 		const char *extrainfo = image_extrainfo( image );
 
-		if ( extrainfo && ! mame_stricmp( extrainfo, "GGSMS" ) ) {
+		if ( extrainfo && strcasestr( extrainfo, "GGSMS" ) ) {
 			sms_set_ggsmsmode( 1 );
 		}
 
 		/* Just in case someone passes us an sms file */
-		if ( len > 3 && ( fname[len-1] == 's' || fname[len-1] == 'S' ) &&
-		     ( fname[len-2] == 'm' || fname[len-2] == 'M' ) &&
-		     ( fname[len-3] == 's' || fname[len-3] == 'S' ) ) {
+		if ( len > 3 && ! mame_stricmp( fname-3, "sms" ) ) {
 			sms_set_ggsmsmode( 1 );
 		}
 	}

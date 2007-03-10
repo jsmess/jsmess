@@ -28,6 +28,7 @@
 /* Function prototypes */
 
 WRITE8_HANDLER(sms_cartram_w);
+WRITE8_HANDLER(sms_cartram2_w);
 WRITE8_HANDLER(sms_fm_detect_w);
  READ8_HANDLER(sms_fm_detect_r);
  READ8_HANDLER(sms_input_port_0_r);
