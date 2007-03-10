@@ -105,15 +105,15 @@ static void nmi_callback(int scanline)
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, nmi_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, nmi_callback);
 }
 
 
 static MACHINE_RESET( sprint4 )
 {
-	timer_set(cpu_getscanlinetime(32), 32, nmi_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, nmi_callback);
 
-	timer_pulse(TIME_IN_HZ(60), 0, input_callback);
+	mame_timer_pulse(video_screen_get_frame_period(0), 0, input_callback);
 }
 
 
@@ -358,7 +358,6 @@ static MACHINE_DRIVER_START( sprint4 )
 	MDRV_CPU_PROGRAM_MAP(sprint4_cpu_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE((double) PIXEL_CLOCK / HTOTAL / VTOTAL)
-	MDRV_SCREEN_VBLANK_TIME((double) HTOTAL * (VTOTAL - 224) / PIXEL_CLOCK)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_RESET(sprint4)
 

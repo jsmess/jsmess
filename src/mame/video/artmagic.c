@@ -304,7 +304,7 @@ static void execute_blit(void)
 	profiler_mark(PROFILER_END);
 
 #if (!INSTANT_BLIT)
-	blitter_busy_until = timer_get_time() + (w*h*TIME_IN_NSEC(20));
+	blitter_busy_until = mame_time_to_double(mame_timer_get_time()) + (w*h*TIME_IN_NSEC(20));
 #endif
 }
 
@@ -318,7 +318,7 @@ READ16_HANDLER( artmagic_blitter_r )
     */
 	UINT16 result = 0xffef | (blitter_page << 4);
 #if (!INSTANT_BLIT)
-	if (timer_get_time() < blitter_busy_until)
+	if (mame_time_to_double(mame_timer_get_time()) < blitter_busy_until)
 		result ^= 6;
 #endif
 	return result;
@@ -365,7 +365,7 @@ VIDEO_UPDATE( artmagic )
 		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 		return 0;
 	}
-	offset += cliprect->min_y * TOWORD(0x2000);
+	offset += (cliprect->min_y - Machine->screen[0].visarea.min_y) * TOWORD(0x2000);
 	offset += dpytap;
 
 	/* render the bitmap */

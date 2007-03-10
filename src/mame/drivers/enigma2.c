@@ -333,7 +333,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN( enigma2_interrupt )
 {
-	int vector = cpu_getvblank() ? 0xcf : 0xd7;
+	int vector = video_screen_get_vblank(0) ? 0xcf : 0xd7;
     cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, vector);
 }
 
@@ -389,7 +389,6 @@ static MACHINE_DRIVER_START( enigma2a )
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

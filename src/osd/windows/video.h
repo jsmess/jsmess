@@ -53,16 +53,6 @@ struct _win_window_config
 typedef struct _win_video_config win_video_config;
 struct _win_video_config
 {
-	// performance options
-	int					fastforward;				// fast forward?
-	int					autoframeskip;				// autoframeskip?
-	int					frameskip;					// explicit frameskip
-	int					throttle;					// throttle speed?
-	int					sleep;						// allow sleeping?
-
-	// misc options
-	int					framestorun;				// number of frames to run
-
 	// global configuration
 	int					windowed;					// start windowed?
 	int					prescale;					// prescale factor

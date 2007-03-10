@@ -425,7 +425,7 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 	if (result != DD_OK) verbose_printf("DirectDraw: Error %08X unlocking blit surface\n", (int)result);
 
 	// sync to VBLANK
-	if ((video_config.waitvsync || video_config.syncrefresh) && video_config.throttle && (!window->fullscreen || dd->back == NULL))
+	if ((video_config.waitvsync || video_config.syncrefresh) && video_get_throttle() && (!window->fullscreen || dd->back == NULL))
 	{
 		result = IDirectDraw7_WaitForVerticalBlank(dd->ddraw, DDWAITVB_BLOCKBEGIN, NULL);
 		if (result != DD_OK) verbose_printf("DirectDraw: Error %08X waiting for VBLANK\n", (int)result);

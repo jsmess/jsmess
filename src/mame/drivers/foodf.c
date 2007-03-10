@@ -136,7 +136,7 @@ static void scanline_update(int scanline)
 static MACHINE_RESET( foodf )
 {
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(scanline_update, 32);
+	atarigen_scanline_timer_reset(0, scanline_update, 32);
 }
 
 
@@ -350,7 +350,6 @@ static MACHINE_DRIVER_START( foodf )
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(foodf)
 	MDRV_NVRAM_HANDLER(generic_1fill)

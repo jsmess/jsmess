@@ -164,13 +164,13 @@ int audit_samples(int game, audit_record **audit)
 		{
 			struct Samplesinterface *intf = (struct Samplesinterface *)config.sound[sndnum].config;
 
-			if (intf->samplenames == NULL)
-				continue;
-
-			/* iterate over samples in this entry */
-			for (sampnum = 0; intf->samplenames[sampnum] != NULL; sampnum++)
-				if (intf->samplenames[sampnum][0] != '*')
-					records++;
+			if (intf->samplenames != NULL)
+			{
+				/* iterate over samples in this entry */
+				for (sampnum = 0; intf->samplenames[sampnum] != NULL; sampnum++)
+					if (intf->samplenames[sampnum][0] != '*')
+						records++;
+			}
 		}
 #endif
 
@@ -190,39 +190,42 @@ int audit_samples(int game, audit_record **audit)
 			struct Samplesinterface *intf = (struct Samplesinterface *)config.sound[sndnum].config;
 			const char *sharedname = NULL;
 
-			/* iterate over samples in this entry */
-			for (sampnum = 0; intf->samplenames[sampnum] != NULL; sampnum++)
-				if (intf->samplenames[sampnum][0] == '*')
-					sharedname = &intf->samplenames[sampnum][1];
-				else
-				{
-					mame_file_error filerr;
-					mame_file *file;
-					char *fname;
-
-					/* attempt to access the file from the game driver name */
-					fname = assemble_3_strings(gamedrv->name, PATH_SEPARATOR, intf->samplenames[sampnum]);
-					filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &file);
-					free(fname);
-
-					/* attempt to access the file from the shared driver name */
-					if (filerr != FILERR_NONE && sharedname != NULL)
+			if (intf->samplenames != NULL)
+			{
+				/* iterate over samples in this entry */
+				for (sampnum = 0; intf->samplenames[sampnum] != NULL; sampnum++)
+					if (intf->samplenames[sampnum][0] == '*')
+						sharedname = &intf->samplenames[sampnum][1];
+					else
 					{
-						fname = assemble_3_strings(sharedname, PATH_SEPARATOR, intf->samplenames[sampnum]);
+						mame_file_error filerr;
+						mame_file *file;
+						char *fname;
+
+						/* attempt to access the file from the game driver name */
+						fname = assemble_3_strings(gamedrv->name, PATH_SEPARATOR, intf->samplenames[sampnum]);
 						filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &file);
 						free(fname);
-					}
 
-					/* fill in the record */
-					record->type = AUDIT_FILE_SAMPLE;
-					record->name = intf->samplenames[sampnum];
-					if (filerr == FILERR_NONE)
-					{
-						set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD);
-						mame_fclose(file);
+						/* attempt to access the file from the shared driver name */
+						if (filerr != FILERR_NONE && sharedname != NULL)
+						{
+							fname = assemble_3_strings(sharedname, PATH_SEPARATOR, intf->samplenames[sampnum]);
+							filerr = mame_fopen(SEARCHPATH_SAMPLE, fname, OPEN_FLAG_READ, &file);
+							free(fname);
+						}
+
+						/* fill in the record */
+						record->type = AUDIT_FILE_SAMPLE;
+						record->name = intf->samplenames[sampnum];
+						if (filerr == FILERR_NONE)
+						{
+							set_status(record++, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD);
+							mame_fclose(file);
+						}
+						else
+							set_status(record++, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND);
 					}
-					else
-						set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND);
 				}
 		}
 

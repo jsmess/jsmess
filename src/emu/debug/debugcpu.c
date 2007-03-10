@@ -648,7 +648,7 @@ static UINT64 get_beamx(UINT32 ref)
 
 static UINT64 get_beamy(UINT32 ref)
 {
-	return cpu_getscanline();
+	return video_screen_get_vpos(0);
 }
 
 
@@ -741,9 +741,9 @@ void mame_debug_hook(void)
 		}
 
 		/* see if we hit a target time */
-		if (break_on_time && (compare_mame_times(mame_timer_get_time(), break_on_time_target) > 0))
+		if (break_on_time && compare_mame_times(mame_timer_get_time(), break_on_time_target) > 0)
 		{
-			debug_console_printf("Stopped at time interval %.1g\n", timer_get_time());
+			debug_console_printf("Stopped at time interval %.1g\n", mame_time_to_double(mame_timer_get_time()));
 			break_on_time = 0;
 			execution_state = EXECUTION_STATE_STOPPED;
 		}

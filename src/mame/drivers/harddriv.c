@@ -196,6 +196,7 @@ static struct tms34010_config gsp_config =
 	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
 	hdgsp_read_from_shiftreg,		/* read from shiftreg function */
 	hdgsp_display_update,			/* display offset update function */
+	NULL,							/* display interrupt callback */
 	0								/* the screen operated on */
 };
 
@@ -207,6 +208,7 @@ static struct tms34010_config msp_config =
 	NULL,							/* write to shiftreg function */
 	NULL,							/* read from shiftreg function */
 	NULL,							/* display offset update function */
+	NULL,							/* display interrupt callback */
 	0								/* the screen operated on */
 };
 
@@ -953,7 +955,6 @@ static MACHINE_DRIVER_START( driver_nomsp )
 	MDRV_CPU_CONFIG(gsp_config)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((1000000 * (416 - 384)) / (60 * 416)))
 	MDRV_INTERLEAVE(500)
 
 	MDRV_MACHINE_START(harddriv)
@@ -963,12 +964,11 @@ static MACHINE_DRIVER_START( driver_nomsp )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 384)
-	MDRV_SCREEN_VISIBLE_AREA(97, 596, 0, 383)
+	MDRV_SCREEN_SIZE(640, 416)
+	MDRV_SCREEN_VISIBLE_AREA(97, 596, 29, 412)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(harddriv)
-	MDRV_VIDEO_EOF(harddriv)
 	MDRV_VIDEO_UPDATE(harddriv)
 MACHINE_DRIVER_END
 
@@ -983,7 +983,7 @@ static MACHINE_DRIVER_START( driver_msp )
 	MDRV_CPU_CONFIG(msp_config)
 
 	/* video hardware */
-	MDRV_SCREEN_VISIBLE_AREA(89, 596, 0, 383)
+	MDRV_SCREEN_VISIBLE_AREA(89, 596, 29, 412)
 MACHINE_DRIVER_END
 
 
@@ -998,11 +998,9 @@ static MACHINE_DRIVER_START( multisync_nomsp )
 	MDRV_CPU_MODIFY("gsp")
 	MDRV_CPU_PROGRAM_MAP(multisync_gsp_map,0)
 
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((1000000 * (307 - 288)) / (60 * 307)))
-
 	/* video hardware */
-	MDRV_SCREEN_SIZE(640, 288)
-	MDRV_SCREEN_VISIBLE_AREA(109, 620, 0, 287)
+	MDRV_SCREEN_SIZE(640, 307)
+	MDRV_SCREEN_VISIBLE_AREA(109, 620, 17, 304)
 MACHINE_DRIVER_END
 
 
@@ -1192,11 +1190,9 @@ static MACHINE_DRIVER_START( stunrun )
 	MDRV_IMPORT_FROM( adsp )			/* ADSP board */
 	MDRV_IMPORT_FROM( jsa_ii_mono )		/* JSA II sound board */
 
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((1000000 * (261 - 240)) / (60 * 261)))
-
 	/* video hardware */
-	MDRV_SCREEN_SIZE(640, 240)
-	MDRV_SCREEN_VISIBLE_AREA(103, 614, 0, 239)
+	MDRV_SCREEN_SIZE(640, 261)
+	MDRV_SCREEN_VISIBLE_AREA(103, 614, 19, 258)
 MACHINE_DRIVER_END
 
 

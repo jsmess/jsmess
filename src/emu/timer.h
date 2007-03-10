@@ -55,7 +55,7 @@
 
 /* useful macros for describing mame_times */
 #define MAME_TIME_IN_HZ(hz)		make_mame_time(0, MAX_SUBSECONDS / (hz))
-#define MAME_TIME_IN_SEC(s)		make_mame_time((s), 0)
+#define MAME_TIME_IN_SEC(s)		make_mame_time((s)  / 1, (s) % 1 /* mod here errors on doubles, which is intended */)
 #define MAME_TIME_IN_MSEC(ms)	make_mame_time((ms) / 1000, ((ms) % 1000) * (MAX_SUBSECONDS / 1000))
 #define MAME_TIME_IN_USEC(us)	make_mame_time((us) / 1000000, ((us) % 1000000) * (MAX_SUBSECONDS / 1000000))
 #define MAME_TIME_IN_NSEC(ns)	make_mame_time((ns) / 1000000000, ((ns) % 1000000000) * (MAX_SUBSECONDS / 1000000000))

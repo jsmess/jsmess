@@ -70,9 +70,9 @@ static VIDEO_UPDATE( xtheball )
 			/* mode 0: foreground is the same as background */
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pix = src1[BYTE_XOR_LE((y * 0x200 + x) & 0x1ffff)];
+				int pix = src1[BYTE_XOR_LE(((y - Machine->screen[0].visarea.min_y) * 0x200 + x) & 0x1ffff)];
 				if (!pix)
-					pix = src0[BYTE_XOR_LE(y * 0x200 + x)];
+					pix = src0[BYTE_XOR_LE((y - Machine->screen[0].visarea.min_y) * 0x200 + x)];
 				dst[x] = pix;
 			}
 		}
@@ -83,9 +83,9 @@ static VIDEO_UPDATE( xtheball )
 			int srcbase = display_start / 16;
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pix = src1[BYTE_XOR_LE((srcbase + y * 0x100 + x/2) & 0x1ffff)];
+				int pix = src1[BYTE_XOR_LE((srcbase + (y - Machine->screen[0].visarea.min_y) * 0x100 + x/2) & 0x1ffff)];
 				if (!pix)
-					pix = src0[BYTE_XOR_LE(y * 0x200 + x)];
+					pix = src0[BYTE_XOR_LE((y - Machine->screen[0].visarea.min_y) * 0x200 + x)];
 				dst[x] = pix;
 			}
 		}
@@ -178,7 +178,7 @@ static WRITE16_HANDLER( bit_controls_w )
 					break;
 
 				case 0x13:
-					video_screen_update_partial(0, cpu_getscanline());
+					video_screen_update_partial(0, video_screen_get_vpos(0));
 					break;
 			}
 		}
@@ -388,14 +388,13 @@ static MACHINE_DRIVER_START( xtheball )
 
 	MDRV_MACHINE_RESET(xtheball)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((1000000 * (256 - 224)) / (60 * 256)))
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512,256)
-	MDRV_SCREEN_VISIBLE_AREA(0,511, 0,221)
+	MDRV_SCREEN_VISIBLE_AREA(0,511, 24,247)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_UPDATE(xtheball)

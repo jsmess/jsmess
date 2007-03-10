@@ -576,10 +576,10 @@ static void nomnlnd_draw_background(mame_bitmap *bitmap)
 
 
 		// this is obviously wrong
-		if (vb_)
-		{
+//      if (vb_)
+//      {
 			water++;
-		}
+//      }
 
 
 		y++;

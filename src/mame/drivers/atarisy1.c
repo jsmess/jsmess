@@ -186,7 +186,7 @@ static MACHINE_RESET( atarisy1 )
 
 	/* reset the joystick parameters */
 	joystick_value = 0;
-	joystick_timer = timer_alloc(delayed_joystick_int);
+	joystick_timer = mame_timer_alloc(delayed_joystick_int);
 	joystick_int = 0;
 	joystick_int_enable = 0;
 }
@@ -228,7 +228,7 @@ static READ16_HANDLER( joystick_r )
 
 	/* clear any existing interrupt and set a timer for a new one */
 	joystick_int = 0;
-	timer_adjust(joystick_timer, TIME_IN_USEC(50), newval, 0);
+	mame_timer_adjust(joystick_timer, MAME_TIME_IN_USEC(50), newval, time_zero);
 	atarigen_update_interrupts();
 
 	return joystick_value;
@@ -748,7 +748,6 @@ static MACHINE_DRIVER_START( atarisy1 )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(atarisy1)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -756,7 +755,8 @@ static MACHINE_DRIVER_START( atarisy1 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 30*8)
+	/* the vert size is copied from beathead.c.  Needs to be verified */
+	MDRV_SCREEN_SIZE(42*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)

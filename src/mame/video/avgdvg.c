@@ -28,8 +28,6 @@ UINT16 *quantum_colorram;
 
 UINT16 *quantum_vectorram;
 
-/* From vector.c */
-extern int vector_updates;
 
 
 /*************************************
@@ -754,7 +752,6 @@ static int avg_common_strobe2(vgdata *vg)
                  */
 
 				vector_clear_list();
-				vector_updates++;
 				vg_flush();
 			}
 		}
@@ -1230,7 +1227,6 @@ WRITE8_HANDLER( avgdvg_go_w )
          * why we ignore frames with less than 10 vectors.
          */
 		vector_clear_list();
-		vector_updates++;
 	}
 	vg_flush();
 

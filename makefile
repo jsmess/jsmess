@@ -227,6 +227,7 @@ CFLAGS = \
 	-I$(SRC)/$(TARGET)/includes \
 	-I$(OBJ)/$(TARGET)/layout \
 	-I$(SRC)/emu \
+	-I$(OBJ)/emu \
 	-I$(OBJ)/emu/layout \
 	-I$(SRC)/lib/util \
 	-I$(SRC)/osd \
@@ -420,6 +421,11 @@ $(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
 $(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR)
 	@echo Converting $<...
 	@$(FILE2STR) $< $@ layout_$(basename $(notdir $<))
+
+$(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC)
+	@echo Converting $<...
+	@$(PNG2BDC) $< $(OBJ)/temp.bdc
+	@$(FILE2STR) $(OBJ)/temp.bdc $@ font_$(basename $(notdir $<)) UINT8
 
 $(OBJ)/%.a:
 	@echo Archiving $@...

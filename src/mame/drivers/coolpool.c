@@ -81,7 +81,7 @@ static void nvram_write_timeout(int param);
 
 static VIDEO_UPDATE( amerdart )
 {
-	UINT16 *base = &vram_base[TOWORD(0x800) + cliprect->min_y * TOWORD(0x800)];
+	UINT16 *base = &vram_base[TOWORD(0x800) + (cliprect->min_y - Machine->screen[0].visarea.min_y) * TOWORD(0x800)];
 	int x, y;
 
 	/* if we're blank, just blank the screen */
@@ -159,8 +159,8 @@ static VIDEO_UPDATE( coolpool )
 	offset = (dpyadr << 4) + dpytap;
 
 	/* adjust for when DPYADR was written */
-	if (cliprect->min_y - scanoffs >= dpyadrscan)
-		offset += (cliprect->min_y - scanoffs - dpyadrscan) * dudate;
+	if (cliprect->min_y - Machine->screen[0].visarea.min_y - scanoffs >= dpyadrscan)
+		offset += (cliprect->min_y - Machine->screen[0].visarea.min_y - scanoffs - dpyadrscan) * dudate;
 
 	/* loop over scanlines */
 	for (y = startscan; y <= endscan; y++)
@@ -231,7 +231,7 @@ static void coolpool_reset_dpyadr(int param)
 	cpuintrf_pop_context();
 
 	/* come again next screen */
-	timer_set(cpu_getscanlinetime(0), 0, coolpool_reset_dpyadr);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, coolpool_reset_dpyadr);
 }
 
 
@@ -258,16 +258,16 @@ static WRITE16_HANDLER( coolpool_34010_io_register_w )
 static MACHINE_RESET( amerdart )
 {
 	nvram_write_enable = 0;
-	nvram_write_timer = timer_alloc(nvram_write_timeout);
+	nvram_write_timer = mame_timer_alloc(nvram_write_timeout);
 }
 
 
 static MACHINE_RESET( coolpool )
 {
-	timer_set(cpu_getscanlinetime(0), 0, coolpool_reset_dpyadr);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, coolpool_reset_dpyadr);
 	tlc34076_reset(6);
 	nvram_write_enable = 0;
-	nvram_write_timer = timer_alloc(nvram_write_timeout);
+	nvram_write_timer = mame_timer_alloc(nvram_write_timeout);
 }
 
 
@@ -294,7 +294,7 @@ static WRITE16_HANDLER( nvram_thrash_w )
 	if (!memcmp(nvram_unlock_seq, nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		nvram_write_enable = 1;
-		timer_adjust(nvram_write_timer, TIME_IN_MSEC(1000), 0, 0);
+		mame_timer_adjust(nvram_write_timer, MAME_TIME_IN_MSEC(1000), 0, time_zero);
 	}
 }
 
@@ -390,7 +390,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 {
 	logerror("%08x:IOP write %04x\n", activecpu_get_pc(), data);
 	COMBINE_DATA(&iop_cmd);
-	timer_set(TIME_IN_USEC(100), 0, amerdart_iop_response);
+	mame_timer_set(MAME_TIME_IN_USEC(100), 0, amerdart_iop_response);
 }
 
 
@@ -434,7 +434,7 @@ static void deferred_iop_w(int data)
 static WRITE16_HANDLER( coolpool_iop_w )
 {
 	logerror("%08x:IOP write %04x\n", activecpu_get_pc(), data);
-	timer_set(TIME_NOW, data, deferred_iop_w);
+	mame_timer_set(time_zero, data, deferred_iop_w);
 }
 
 
@@ -790,15 +790,14 @@ MACHINE_DRIVER_START( amerdart )
 	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_MACHINE_RESET(amerdart)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 261)	/* ??? */
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MDRV_SCREEN_SIZE(320, 261)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 17, 256)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_UPDATE(amerdart)
@@ -823,15 +822,14 @@ static MACHINE_DRIVER_START( coolpool )
 	MDRV_CPU_IO_MAP(dsp_io_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (261 - 240) / (261 * 60)))
 	MDRV_MACHINE_RESET(coolpool)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 261)	/* ??? */
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MDRV_SCREEN_SIZE(320, 261)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 17, 256)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_UPDATE(coolpool)

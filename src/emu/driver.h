@@ -419,6 +419,7 @@ struct _game_driver
 
 #define MDRV_SCREEN_VBLANK_TIME(time)									\
 	screen->defstate.vblank = (time);									\
+	screen->defstate.oldstyle_vblank_supplied = 1;						\
 
 #define MDRV_SCREEN_SIZE(_width, _height)								\
 	screen->defstate.width = (_width);									\

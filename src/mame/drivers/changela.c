@@ -808,7 +808,7 @@ static READ8_HANDLER( changela_2d_r )
 	/* the schems are unreadable - i'm not sure it is V8 (page 74, SOUND I/O BOARD SCHEMATIC 1 OF 2, FIGURE 24 - in the middle on the right side) */
 	int v8 = 0;
 
-	if ((cpu_getscanline() & 0xf8)==0xf8)
+	if ((video_screen_get_vpos(0) & 0xf8)==0xf8)
 		v8 = 1;
 
 	return (readinputport(6) & 0xe0) | (v8<<4);
@@ -1116,9 +1116,9 @@ static struct AY8910interface ay8910_interface_2 = {
 
 INTERRUPT_GEN( chl_interrupt )
 {
-	int vector = cpu_getvblank() ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
+	int vector = video_screen_get_vblank(0) ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
 
-//    video_screen_update_partial(0, cpu_getscanline());
+//    video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, vector);
 
@@ -1140,13 +1140,12 @@ static MACHINE_DRIVER_START( changela )
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(changela)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_SIZE(32*8, 262)  /* vert size is a guess */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(0x40)

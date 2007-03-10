@@ -81,7 +81,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 	if (oldword != newword)
 	{
 		interrupt_scan[offset] = newword;
-		atarigen_scanline_int_set(newword & 0x1ff);
+		atarigen_scanline_int_set(0, newword & 0x1ff);
 	}
 }
 
@@ -245,7 +245,6 @@ static MACHINE_DRIVER_START( toobin )
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(toobin)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -253,7 +252,8 @@ static MACHINE_DRIVER_START( toobin )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 48*8)
+	/* the vert size is copied from atarisy2.c.  Needs to be verified */
+	MDRV_SCREEN_SIZE(64*8, 420)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)

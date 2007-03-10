@@ -198,21 +198,20 @@ static READ32_HANDLER( decomlc_vbl_r )
 
 static READ32_HANDLER( mlc_scanline_r )
 {
-//  logerror("read scanline counter (%d)\n", cpu_getscanline());
-	return cpu_getscanline();
+//  logerror("read scanline counter (%d)\n", video_screen_get_vpos(0));
+	return video_screen_get_vpos(0);
 }
 
-static void interrupt_gen(int scanline)
+static void interrupt_gen(int param)
 {
-//  logerror("hit scanline IRQ %d (%08x)\n", scanline, info.i);
+//  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(0), info.i);
 	cpunum_set_input_line(0, mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
-	timer_adjust(raster_irq_timer,TIME_NEVER,0,0);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
 {
 	static int lastScanline[9]={ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	int scanline=cpu_getscanline();
+	int scanline=video_screen_get_vpos(0);
 	irq_ram[offset]=data&0xffff;
 
 	switch (offset*4)
@@ -222,8 +221,8 @@ static WRITE32_HANDLER( mlc_irq_w )
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */
-		timer_adjust(raster_irq_timer,cpu_getscanlinetime(irq_ram[0x14/4]),irq_ram[0x14/4],TIME_NEVER);
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], cpu_getscanline());
+		mame_timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, irq_ram[0x14/4], 0),0,time_never);
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(0));
 		return;
 		break;
 	case 0x18:
@@ -429,7 +428,7 @@ static const gfx_decode gfxdecodeinfo_6bpp[] =
 
 static MACHINE_RESET( mlc )
 {
-	raster_irq_timer = timer_alloc(interrupt_gen);
+	raster_irq_timer = mame_timer_alloc(interrupt_gen);
 }
 
 static struct YMZ280Binterface ymz280b_intf =
@@ -446,7 +445,6 @@ static MACHINE_DRIVER_START( avengrgs )
 
 	MDRV_MACHINE_RESET(mlc)
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_NVRAM_HANDLER(93C46) /* Actually 93c45 */
 
 	/* video hardware */
@@ -478,7 +476,6 @@ static MACHINE_DRIVER_START( mlc )
 
 	MDRV_MACHINE_RESET(mlc)
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_NVRAM_HANDLER(93C46) /* Actually 93c45 */
 
 	/* video hardware */

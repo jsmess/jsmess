@@ -30,7 +30,7 @@ static READ8_HANDLER( dorachan_protection_r )
 static READ8_HANDLER( dorachan_status_r )
 {
 /* to avoid resetting (when player 2 starts) bit 0 need to be reversed when screen is flipped */
-	return ((cpu_getscanline()>100)?1:0)^(dorachan_ctrl>>6);
+	return ((video_screen_get_vpos(0) >> 7) & 0x01)^(dorachan_ctrl>>6);
 }
 
 static WRITE8_HANDLER(dorachan_ctrl_w)
@@ -104,7 +104,6 @@ static MACHINE_DRIVER_START( dorachan )
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)

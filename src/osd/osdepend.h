@@ -100,15 +100,8 @@ void osd_wait_for_debugger(void);
 
 ******************************************************************************/
 
-int osd_update(mame_time emutime);
+void osd_update(int skip_redraw);
 
-
-/*
-  Returns a pointer to the text to display when the FPS display is toggled.
-  This normally includes information about the frameskip, FPS, and percentage
-  of full game speed.
-*/
-const char *osd_get_fps_text(const performance_info *performance);
 
 
 

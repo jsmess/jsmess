@@ -53,7 +53,7 @@ static void periodic_callback(int scanline)
 		{
 			if (mask[i] != 0)
 			{
-				timer_set(cpu_getscanlinetime(i), mask[i], pot_interrupt);
+				mame_timer_set(video_screen_get_time_until_pos(0, i, 0), mask[i], pot_interrupt);
 			}
 		}
 
@@ -67,7 +67,7 @@ static void periodic_callback(int scanline)
 		scanline = 0;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, periodic_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, periodic_callback);
 }
 
 
@@ -85,7 +85,7 @@ static PALETTE_INIT( boxer )
 
 static MACHINE_RESET( boxer )
 {
-	timer_set(cpu_getscanlinetime(0), 0, periodic_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, periodic_callback);
 
 	pot_latch = 0;
 }
@@ -95,7 +95,7 @@ static READ8_HANDLER( boxer_input_r )
 {
 	UINT8 val = readinputport(0);
 
-	if (readinputport(9) < cpu_getscanline())
+	if (readinputport(9) < video_screen_get_vpos(0))
 	{
 		val |= 0x02;
 	}
@@ -115,7 +115,7 @@ static READ8_HANDLER( boxer_misc_r )
 		break;
 
 	case 1:
-		val = cpu_getscanline();
+		val = video_screen_get_vpos(0);
 		break;
 
 	case 2:

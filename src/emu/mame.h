@@ -141,6 +141,7 @@ typedef void (*output_callback)(void *param, const char *format, va_list argptr)
 
 /* forward type declarations */
 typedef struct _mame_private mame_private;
+typedef struct _video_private video_private;
 typedef struct _palette_private palette_private;
 typedef struct _streams_private streams_private;
 
@@ -182,6 +183,7 @@ struct _running_machine
 
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
+	video_private *			video_data;			/* internal data from video.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
 	streams_private *		streams_data;		/* internal data from streams.c */
 

@@ -113,7 +113,7 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 
 	/* if something changed, force an update */
 	if (oldscroll != newscroll)
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* adjust the actual scrolls */
 	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, 2 * (newscroll >> 7));
@@ -127,7 +127,7 @@ WRITE16_HANDLER( skullxbo_xscroll_w )
 WRITE16_HANDLER( skullxbo_yscroll_w )
 {
 	/* combine data */
-	int scanline = cpu_getscanline();
+	int scanline = video_screen_get_vpos(0);
 	UINT16 oldscroll = *atarigen_yscroll;
 	UINT16 newscroll = oldscroll;
 	UINT16 effscroll;
@@ -160,7 +160,7 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 
 WRITE16_HANDLER( skullxbo_mobmsb_w )
 {
-	video_screen_update_partial(0, cpu_getscanline());
+	video_screen_update_partial(0, video_screen_get_vpos(0));
 	atarimo_set_bank(0, (offset >> 9) & 1);
 }
 

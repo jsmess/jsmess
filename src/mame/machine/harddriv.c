@@ -201,7 +201,7 @@ MACHINE_RESET( harddriv )
 	memset(duart_read_data, 0, sizeof(duart_read_data));
 	memset(duart_write_data, 0, sizeof(duart_write_data));
 	duart_output_port = 0;
-	duart_timer = timer_alloc(duart_callback);
+	duart_timer = mame_timer_alloc(duart_callback);
 
 	/* reset the ADSP/DSIII/DSIV boards */
 	adsp_halt = 1;
@@ -623,7 +623,7 @@ static void duart_callback(int param)
 		duart_irq_state = (duart_read_data[0x05] & duart_write_data[0x05]) != 0;
 		atarigen_update_interrupts();
 	}
-	timer_adjust(duart_timer, duart_clock_period() * 65536.0, 0, 0);
+	mame_timer_adjust(duart_timer, double_to_mame_time(duart_clock_period() * 65536.0), 0, time_zero);
 }
 
 
@@ -650,14 +650,14 @@ READ16_HANDLER( hd68k_duart_r )
 		case 0x0e:		/* Start-Counter Command 3 */
 		{
 			int reps = (duart_write_data[0x06] << 8) | duart_write_data[0x07];
-			timer_adjust(duart_timer, duart_clock_period() * (double)reps, 0, 0);
+			mame_timer_adjust(duart_timer, double_to_mame_time(duart_clock_period() * (double)reps), 0, time_zero);
 			logerror("DUART timer started (period=%f)\n", duart_clock_period() * (double)reps);
 			return 0x00ff;
 		}
 		case 0x0f:		/* Stop-Counter Command 3 */
 			{
-				int reps = timer_timeleft(duart_timer) / duart_clock_period();
-				timer_adjust(duart_timer, TIME_NEVER, 0, 0);
+				int reps = mame_time_to_double(mame_timer_timeleft(duart_timer)) / duart_clock_period();
+				mame_timer_adjust(duart_timer, time_never, 0, time_zero);
 				duart_read_data[0x06] = reps >> 8;
 				duart_read_data[0x07] = reps & 0xff;
 				logerror("DUART timer stopped (final count=%04X)\n", reps);
@@ -732,7 +732,7 @@ WRITE16_HANDLER( hdgsp_io_w )
 
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
 	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != tms34010_io_register_r(offset, 0))
-		video_screen_update_partial(0, cpu_getscanline() - 1);
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 
 	tms34010_io_register_w(offset, data, mem_mask);
 }
@@ -778,7 +778,7 @@ INLINE void stmsp_sync_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 
 	/* if being written from the 68000, synchronize on it */
 	if (hd34010_host_access)
-		timer_set(TIME_NOW, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
+		mame_timer_set(time_zero, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
 
 	/* otherwise, just update */
 	else
@@ -866,7 +866,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	if (offset == 0x1fff)
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", activecpu_get_previouspc(), data);
-		timer_set(TIME_NOW, 0, 0);
+		mame_timer_set(time_zero, 0, 0);
 		cpu_triggerint(hdcpu_adsp);
 	}
 	else
@@ -969,7 +969,7 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 
 		case 3:
 			logerror("ADSP bank = %d (deferred)\n", val);
-			timer_set(TIME_NOW, val, deferred_adsp_bank_switch);
+			mame_timer_set(time_zero, val, deferred_adsp_bank_switch);
 			break;
 
 		case 5:
@@ -1566,7 +1566,7 @@ WRITE32_HANDLER( rddsp32_sync0_w )
 		COMBINE_DATA(&newdata);
 		dataptr[next_msp_sync % MAX_MSP_SYNC] = dptr;
 		dataval[next_msp_sync % MAX_MSP_SYNC] = newdata;
-		timer_set(TIME_NOW, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		mame_timer_set(time_zero, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
 	}
 	else
 		COMBINE_DATA(&rddsp32_sync[0][offset]);
@@ -1582,7 +1582,7 @@ WRITE32_HANDLER( rddsp32_sync1_w )
 		COMBINE_DATA(&newdata);
 		dataptr[next_msp_sync % MAX_MSP_SYNC] = dptr;
 		dataval[next_msp_sync % MAX_MSP_SYNC] = newdata;
-		timer_set(TIME_NOW, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		mame_timer_set(time_zero, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
 	}
 	else
 		COMBINE_DATA(&rddsp32_sync[1][offset]);

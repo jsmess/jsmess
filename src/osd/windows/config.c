@@ -151,13 +151,7 @@ static const options_entry windows_opts[] =
 #endif
 
 	// performance options
-	{ NULL,                       NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
-	{ "autoframeskip;afs",        "0",        OPTION_BOOLEAN,    "enable automatic frameskip selection" },
-	{ "frameskip;fs",             "0",        0,                 "set frameskip to fixed value, 0-12 (autoframeskip must be disabled)" },
-	{ "frames_to_run;ftr",        "0",        0,                 "number of frames to run before automatically exiting" },
-	{ "throttle",                 "1",        OPTION_BOOLEAN,    "enable throttling to keep game running in sync with real time" },
-	{ "sleep",                    "1",        OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
-	{ "rdtsc",                    "0",        OPTION_BOOLEAN,    "use the RDTSC instruction for timing; faster but may result in uneven performance" },
+	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
 	{ "priority",                 "0",        0,                 "thread priority for the main game thread; range from -15 to 1" },
 	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
 

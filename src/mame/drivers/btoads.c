@@ -55,14 +55,14 @@ static void delayed_sound_w(int param)
 	cpu_triggerint(1);
 
 	/* use a timer to make long transfers faster */
-	timer_set(TIME_IN_USEC(50), 0, 0);
+	mame_timer_set(MAME_TIME_IN_USEC(50), 0, 0);
 }
 
 
 static WRITE16_HANDLER( main_sound_w )
 {
 	if (ACCESSING_LSB)
-		timer_set(TIME_NOW, data & 0xff, delayed_sound_w);
+		mame_timer_set(time_zero, data & 0xff, delayed_sound_w);
 }
 
 
@@ -334,14 +334,13 @@ static MACHINE_DRIVER_START( btoads )
 
 	MDRV_MACHINE_RESET(btoads)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((1000000 * (256 - 224)) / (60 * 256)))
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512,256)
-	MDRV_SCREEN_VISIBLE_AREA(0,511, 0,223)
+	MDRV_SCREEN_VISIBLE_AREA(0,511,24,247)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_START(btoads)

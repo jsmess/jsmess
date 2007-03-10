@@ -129,8 +129,6 @@ static UINT8 speech_write_buffer;
 static UINT8 speech_strobe_state;
 static UINT8 nvram_enabled;
 
-static mame_timer *interrupt_timer;
-
 
 /*************************************
  *
@@ -148,7 +146,7 @@ static void generate_interrupt(int scanline)
 	scanline += 32;
 	if (scanline > 256)
 		scanline = 32;
-	timer_adjust(interrupt_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, generate_interrupt);
 }
 
 
@@ -167,8 +165,7 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 static MACHINE_START( jedi )
 {
 	/* set a timer to run the interrupts */
-	interrupt_timer = timer_alloc(generate_interrupt);
-	timer_adjust(interrupt_timer, cpu_getscanlinetime(32), 32, 0);
+	mame_timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, generate_interrupt);
 
 	/* configure the banks */
 	memory_configure_bank(1, 0, 3, memory_region(REGION_CPU1) + 0x10000, 0x4000);
@@ -235,7 +232,7 @@ static void delayed_sound_latch_w(int data)
 
 static WRITE8_HANDLER( sound_latch_w )
 {
-	timer_set(TIME_NOW, data, delayed_sound_latch_w);
+	mame_timer_set(time_zero, data, delayed_sound_latch_w);
 }
 
 
@@ -524,7 +521,6 @@ static MACHINE_DRIVER_START( jedi )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(4)
 
 	MDRV_MACHINE_START(jedi)
@@ -534,7 +530,7 @@ static MACHINE_DRIVER_START( jedi )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(37*8, 30*8)
+	MDRV_SCREEN_SIZE(37*8, 262) /* verify vert size */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024+1)

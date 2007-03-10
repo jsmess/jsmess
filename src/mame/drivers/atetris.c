@@ -82,7 +82,7 @@ static void interrupt_gen(int scanline)
 	scanline += 32;
 	if (scanline >= 256)
 		scanline -= 256;
-	timer_set(cpu_getscanlinetime(scanline), scanline, interrupt_gen);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_gen);
 }
 
 
@@ -107,7 +107,7 @@ static MACHINE_RESET( atetris )
 	memcpy(slapstic_base, &slapstic_source[current_bank * 0x4000], 0x4000);
 
 	/* start interrupts going (32V clocked by 16V) */
-	timer_set(cpu_getscanlinetime(48), 48, interrupt_gen);
+	mame_timer_set(video_screen_get_time_until_pos(0, 48, 0), 48, interrupt_gen);
 }
 
 
@@ -334,7 +334,6 @@ static MACHINE_DRIVER_START( atetris )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(atetris)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -342,7 +341,8 @@ static MACHINE_DRIVER_START( atetris )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 30*8)
+	/* the vert size is copied from beathead.c.  Needs to be verified */
+	MDRV_SCREEN_SIZE(42*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
@@ -370,7 +370,6 @@ static MACHINE_DRIVER_START( atetrsb2 )
 	MDRV_CPU_PROGRAM_MAP(atetrsb2_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(atetris)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -378,7 +377,8 @@ static MACHINE_DRIVER_START( atetrsb2 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 30*8)
+	/* the vert size is copied from beathead.c.  Needs to be verified */
+	MDRV_SCREEN_SIZE(42*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)

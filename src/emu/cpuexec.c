@@ -136,7 +136,7 @@ static mame_time vblank_period;
 
 static mame_timer *update_timer;
 
-static mame_timer *refresh_timer;
+mame_timer *refresh_timer;	/* temporarily made non-static (for ccpu) */
 static mame_time refresh_period;
 
 static mame_timer *timeslice_timer;
@@ -197,6 +197,13 @@ static void watchdog_setup(int alloc_new);
 int cpuexec_init(running_machine *machine)
 {
 	int cpunum;
+
+	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
+       from the visible area */
+	if ((Machine->screen[0].vblank == 0) && !Machine->screen[0].oldstyle_vblank_supplied)
+	{
+		Machine->screen[0].vblank = ((float)(Machine->screen[0].height - (Machine->screen[0].visarea.max_y + 1 - Machine->screen[0].visarea.min_y)) / (float)Machine->screen[0].height * TIME_IN_HZ(Machine->screen[0].refresh));
+	}
 
 	/* allocate vblank and refresh timers, and compute the initial timing */
 	vblank_timer = mame_timer_alloc(cpu_vblankcallback);
@@ -1266,7 +1273,7 @@ static void cpu_vblankreset(void)
 	int cpunum;
 
 	/* notify the video system of a VBLANK start */
-	video_vblank_start();
+	video_vblank_start(Machine);
 
 	/* read keyboard & update the status of the input ports */
 	input_port_vblank_start();

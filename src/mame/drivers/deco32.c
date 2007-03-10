@@ -236,7 +236,7 @@ Notes:
 #include "sound/bsmt2000.h"
 
 static UINT32 *deco32_ram;
-static int raster_enable,raster_offset;
+static int raster_enable;
 static void *raster_irq_timer;
 static UINT8 nslasher_sound_irq;
 
@@ -244,21 +244,22 @@ extern void decrypt156(void);
 
 /**********************************************************************************/
 
-static void interrupt_gen(int scanline)
+static void interrupt_gen(int param)
 {
 	/* Save state of scroll registers before the IRQ */
-	deco32_raster_display_list[deco32_raster_display_position++]=scanline;
+	deco32_raster_display_list[deco32_raster_display_position++]=video_screen_get_vpos(0);
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[1]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[2]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[3]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[4]&0xffff;
 
 	cpunum_set_input_line(0, ARM_IRQ_LINE, HOLD_LINE);
-	timer_adjust(raster_irq_timer,TIME_NEVER,0,0);
 }
 
 static READ32_HANDLER( deco32_irq_controller_r )
 {
+	int vblank;
+
 	switch (offset) {
 	case 2: /* Raster IRQ ACK - value read is not used */
 		cpunum_set_input_line(0, ARM_IRQ_LINE, CLEAR_LINE);
@@ -275,11 +276,15 @@ static READ32_HANDLER( deco32_irq_controller_r )
         Bit 6:  Lightgun IRQ (on Lock N Load only)
         Bit 7:
         */
-		if (cpu_getvblank())
+
+        /* ZV03082007 - video_screen_get_vblank(0) doesn't work for Captain America, as it expects
+           that this bit is NOT set in rows 0-7. */
+        vblank = video_screen_get_vpos(0) > Machine->screen[0].visarea.max_y;
+		if (vblank)
 			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
 
-		return 0xffffff80 | cpu_getvblank() | (cpu_getiloops() ? 0x40 : 0x20);
-//      return 0xffffff80 | cpu_getvblank() | (0x40); //test for lock load guns
+		return 0xffffff80 | vblank | (cpu_getiloops() ? 0x40 : 0x20);
+//      return 0xffffff80 | vblank | (0x40); //test for lock load guns
 	}
 
 	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",activecpu_get_pc(),offset,mem_mask);
@@ -297,11 +302,11 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 		break;
 
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
-		scanline=(data&0xff)+raster_offset; /* Captain America seems to need (scanline-1), may be related to unemulated hblank? */
+		scanline=(data&0xff);
 		if (raster_enable && scanline>0 && scanline<240)
-			timer_adjust(raster_irq_timer,cpu_getscanlinetime(scanline),scanline,TIME_NEVER);
+			mame_timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, scanline-1, 320),0,time_never);
 		else
-			timer_adjust(raster_irq_timer,TIME_NEVER,0,0);
+			mame_timer_adjust(raster_irq_timer,time_never,0,time_zero);
 		break;
 	case 2: /* VBL irq ack */
 		break;
@@ -1864,7 +1869,7 @@ static NVRAM_HANDLER(tattass)
 
 static MACHINE_RESET( deco32 )
 {
-	raster_irq_timer = timer_alloc(interrupt_gen);
+	raster_irq_timer = mame_timer_alloc(interrupt_gen);
 }
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
@@ -1890,12 +1895,11 @@ static MACHINE_DRIVER_START( captaven )
 
 	MDRV_MACHINE_RESET(deco32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_captaven)
 	MDRV_PALETTE_LENGTH(2048)
@@ -1935,13 +1939,12 @@ static MACHINE_DRIVER_START( fghthist )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_fghthist)
 	MDRV_PALETTE_LENGTH(2048)
@@ -1979,13 +1982,12 @@ static MACHINE_DRIVER_START( fghthsta )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_fghthist)
 	MDRV_PALETTE_LENGTH(2048)
@@ -2025,13 +2027,12 @@ static MACHINE_DRIVER_START( dragngun )
 
 	MDRV_MACHINE_RESET(deco32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_dragngun)
 	MDRV_PALETTE_LENGTH(2048)
@@ -2077,13 +2078,12 @@ static MACHINE_DRIVER_START( lockload )
 
 	MDRV_MACHINE_RESET(deco32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_dragngun)
 	MDRV_PALETTE_LENGTH(2048)
@@ -2129,13 +2129,12 @@ static MACHINE_DRIVER_START( tattass )
 	MDRV_CPU_PERIODIC_INT(tattass_snd_interrupt,TIME_IN_HZ(489)) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(tattass)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_tattass)
 	MDRV_PALETTE_LENGTH(2048)
@@ -2164,13 +2163,12 @@ static MACHINE_DRIVER_START( nslasher )
 	MDRV_CPU_IO_MAP(nslasher_io_sound,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_SIZE(42*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo_nslasher)
 	MDRV_PALETTE_LENGTH(2048)
@@ -2928,7 +2926,7 @@ ROM_START( tattassa )
 	ROM_LOAD32_WORD( "rev232a.001", 0x000002, 0x80000, CRC(550245d4) SHA1(c1b2b31768da9becebd907a8622d05aa68ecaa29) )
 
 	ROM_REGION(0x10000, REGION_CPU2, 0 ) /* Sound CPU */
-	ROM_LOAD( "s-wars.u7",  0x08000, 0x08000,  CRC(00000001) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
+	ROM_LOAD( "u7.snd",  0x00000, 0x10000,  CRC(6947be8a) SHA1(4ac6c3c7f54501f23c434708cea6bf327bc8cf95) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "abak_b01.s02",  0x000000, 0x80000,  CRC(bc805680) SHA1(ccdbca23fc843ef82a3524020999542f43b3c618) )
@@ -3098,8 +3096,6 @@ static DRIVER_INIT( captaven )
 {
 	deco56_decrypt(REGION_GFX1);
 	deco56_decrypt(REGION_GFX2);
-
-	raster_offset=-1;
 }
 
 static DRIVER_INIT( dragngun )
@@ -3116,8 +3112,6 @@ static DRIVER_INIT( dragngun )
 	memcpy(DST_RAM+0x110000,SRC_RAM+0x10000,0x10000);
 
 	ROM[0x1b32c/4]=0xe1a00000;//  NOP test switch lock
-
-	raster_offset=0;
 }
 
 static DRIVER_INIT( fghthist )
@@ -3137,7 +3131,6 @@ static DRIVER_INIT( lockload )
 	deco74_decrypt(REGION_GFX2);
 	deco74_decrypt(REGION_GFX3);
 
-	raster_offset=0;
 	memcpy(RAM+0x300000,RAM+0x100000,0x100000);
 	memset(RAM+0x100000,0,0x100000);
 

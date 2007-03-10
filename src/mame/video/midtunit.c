@@ -827,13 +827,13 @@ skipdma:
 		else
 		{
 			cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
-			timer_set(TIME_IN_NSEC(41 * pixels), 0, dma_callback);
+			mame_timer_set(MAME_TIME_IN_NSEC(41 * pixels), 0, dma_callback);
 		}
 	}
 	else
 	{
 		cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
-		timer_set(TIME_IN_NSEC(41 * pixels), 0, dma_callback);
+		mame_timer_set(MAME_TIME_IN_NSEC(41 * pixels), 0, dma_callback);
 	}
 
 	profiler_mark(PROFILER_END);
@@ -875,7 +875,7 @@ VIDEO_UPDATE( midtunit )
 
 	/* adjust the offset */
 	offset += xoffs;
-	offset += 512 * cliprect->min_y;
+	offset += 512 * (cliprect->min_y - Machine->screen[0].visarea.min_y);
 	offset &= 0x3ffff;
 
 	/* loop over rows */

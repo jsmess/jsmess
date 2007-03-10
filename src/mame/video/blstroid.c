@@ -128,8 +128,8 @@ void blstroid_scanline_update(int scanline)
 
 			/* set a timer to turn the interrupt on at HBLANK of the 7th scanline */
 			/* and another to turn it off one scanline later */
-			timer_set(cpu_getscanlineperiod() * 7.9, 0, irq_on);
-			timer_set(cpu_getscanlineperiod() * 8.9, 0, irq_off);
+			mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * 7.9), 0, irq_on);
+			mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * 8.9), 0, irq_off);
 		}
 }
 

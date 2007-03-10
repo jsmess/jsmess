@@ -81,10 +81,12 @@ WRITE8_HANDLER( mustache_scroll_w )
 static void get_bg_tile_info(int tile_index)
 {
 	int attr = videoram[2 * tile_index + 1];
-	int code = videoram[2 * tile_index] + ((attr & 0xe0) << 3) + ((control_byte & 0x08) << 7);
+	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
-	SET_TILE_INFO(0, code, color, (attr & 0x10) ? TILE_FLIPX : 0)
+	SET_TILE_INFO(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   )
+
+
 }
 
 VIDEO_START( mustache )

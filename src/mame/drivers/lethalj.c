@@ -493,13 +493,12 @@ MACHINE_DRIVER_START( lethalj )
 	MDRV_CPU_PROGRAM_MAP(lethalj_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((1000000 * (258 - 236)) / (60 * 258)))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(512, 236)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 235)
+	MDRV_SCREEN_SIZE(512, 258)
+	MDRV_SCREEN_VISIBLE_AREA(0, 511, 18, 253)
 
 	MDRV_PALETTE_LENGTH(32768)
 
@@ -520,14 +519,6 @@ MACHINE_DRIVER_START( lethalj )
 	MDRV_SOUND_ADD(OKIM6295, 2000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_3_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( laigames )
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(lethalj)
-
-	MDRV_VIDEO_UPDATE(laigames)
 MACHINE_DRIVER_END
 
 
@@ -739,10 +730,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, lethalj,  0,        lethalj,  lethalj,  0, ROT0,  "The Game Room", "Lethal Justice", 0 )
-GAME( 1997, eggventr, 0,        lethalj,  eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggvent7, eggventr, lethalj,  eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggvntdx, eggventr, lethalj,  eggvntdx, 0, ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit, 0,        laigames, ripribit, 0, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", GAME_NOT_WORKING )
-GAME( 1999, cfarm,    0,        laigames, laigames, 0, ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", GAME_NOT_WORKING )
-GAME( 1999, cclown,   0,        laigames, laigames, 0, ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", GAME_NOT_WORKING )
+GAME( 1996, lethalj,  0,        lethalj, lethalj,  0, ROT0,  "The Game Room", "Lethal Justice", 0 )
+GAME( 1997, eggventr, 0,        lethalj, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggvent7, eggventr, lethalj, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggvntdx, eggventr, lethalj, eggvntdx, 0, ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1997, ripribit, 0,        lethalj, ripribit, 0, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", GAME_NOT_WORKING )
+GAME( 1999, cfarm,    0,        lethalj, laigames, 0, ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", GAME_NOT_WORKING )
+GAME( 1999, cclown,   0,        lethalj, laigames, 0, ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", GAME_NOT_WORKING )

@@ -128,6 +128,37 @@ osd_ticks_t osd_profiling_ticks(void)
 
 
 //============================================================
+//  osd_sleep
+//============================================================
+
+void osd_sleep(osd_ticks_t duration)
+{
+	DWORD msec;
+
+	// make sure we've computed ticks_per_second
+	if (ticks_per_second == 0)
+		(void)osd_ticks();
+
+	// convert to milliseconds, rounding down
+	msec = (DWORD)(duration * 1000 / ticks_per_second);
+
+	// only sleep if at least 1 full millisecond
+	if (msec >= 2)
+	{
+		HANDLE current_thread = GetCurrentThread();
+		int old_priority = GetThreadPriority(current_thread);
+
+		// take one more msec off the top for good measure
+		msec -= 2;
+
+		SetThreadPriority(current_thread, old_priority + 1);
+		Sleep(msec);
+		SetThreadPriority(current_thread, old_priority);
+	}
+}
+
+
+//============================================================
 //  win_timer_enable
 //============================================================
 

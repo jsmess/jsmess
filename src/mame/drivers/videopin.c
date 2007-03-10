@@ -14,8 +14,8 @@
 #include "videopin.h"
 #include "sound/discrete.h"
 
-static double time_pushed;
-static double time_released;
+static mame_time time_pushed;
+static mame_time time_released;
 
 static UINT8 prev = 0;
 static UINT8 mask = 0;
@@ -32,7 +32,7 @@ static void update_plunger(void)
 	{
 		if (val == 0)
 		{
-			time_released = timer_get_time();
+			time_released = mame_timer_get_time();
 
 			if (!mask)
 			{
@@ -41,7 +41,7 @@ static void update_plunger(void)
 		}
 		else
 		{
-			time_pushed = timer_get_time();
+			time_pushed = mame_timer_get_time();
 		}
 
 		prev = val;
@@ -62,13 +62,13 @@ static void interrupt_callback(int scanline)
 		scanline = 32;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( videopin )
 {
-	timer_set(cpu_getscanlinetime(32), 32, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, interrupt_callback);
 
 	/* both output latches are cleared on reset */
 
@@ -79,7 +79,7 @@ static MACHINE_RESET( videopin )
 
 static double calc_plunger_pos(void)
 {
-	return (timer_get_time() - time_released) * (time_released - time_pushed + 0.2);
+	return (mame_time_to_double(mame_timer_get_time()) - mame_time_to_double(time_released)) * (mame_time_to_double(time_released) - mame_time_to_double(time_pushed) + 0.2);
 }
 
 
@@ -113,7 +113,7 @@ static READ8_HANDLER( videopin_misc_r )
 
 static WRITE8_HANDLER( videopin_led_w )
 {
-	int i = (cpu_getscanline() >> 5) & 7;
+	int i = (video_screen_get_vpos(0) >> 5) & 7;
 	static const char* matrix[8][4] =
 	{
 		{ "LED26", "LED18", "LED11", "LED13" },
@@ -342,7 +342,6 @@ static MACHINE_DRIVER_START( videopin )
 	MDRV_CPU_PROGRAM_MAP(videopin_readmem, videopin_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(23. * 1000000 / 15750))
 	MDRV_MACHINE_RESET(videopin)
 
 	/* video hardware */

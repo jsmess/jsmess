@@ -1984,7 +1984,7 @@ static void execute_snap(int ref, int params, const char *param[])
 	/* if no params, use the default behavior */
 	if (params == 0)
 	{
-		video_save_active_screen_snapshots();
+		video_save_active_screen_snapshots(Machine);
 		debug_console_printf("Saved snapshot\n");
 	}
 
@@ -2015,7 +2015,7 @@ static void execute_snap(int ref, int params, const char *param[])
 			return;
 		}
 
-		video_screen_save_snapshot(fp, scrnum);
+		video_screen_save_snapshot(Machine, fp, scrnum);
 		mame_fclose(fp);
 		debug_console_printf("Saved screen #%d snapshot as '%s'\n", scrnum, filename);
 	}

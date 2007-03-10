@@ -75,7 +75,7 @@ static void interrupt_gen(int scanline)
 	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[4]&0xffff;
 
 	cpunum_set_input_line(0, (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
-	timer_adjust(raster_irq_timer,TIME_NEVER,0,0);
+	mame_timer_adjust(raster_irq_timer,time_never,0,time_zero);
 }
 
 static READ16_HANDLER( cninja_irq_r )
@@ -111,9 +111,9 @@ static WRITE16_HANDLER( cninja_irq_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		cninja_scanline=data&0xff;
 		if ((cninja_irq_mask&0x2)==0 && cninja_scanline>0 && cninja_scanline<240)
-			timer_adjust(raster_irq_timer,cpu_getscanlinetime(cninja_scanline),cninja_scanline,TIME_NEVER);
+			mame_timer_adjust(raster_irq_timer, video_screen_get_time_until_pos(0, cninja_scanline, 0), cninja_scanline, time_never);
 		else
-			timer_adjust(raster_irq_timer,TIME_NEVER,0,0);
+			mame_timer_adjust(raster_irq_timer,time_never,0,time_zero);
 		return;
 
 	case 2: /* VBL irq ack */
@@ -829,7 +829,7 @@ static const gfx_decode gfxdecodeinfo_mutantf[] =
 
 static MACHINE_RESET( cninja )
 {
-	raster_irq_timer = timer_alloc(interrupt_gen);
+	raster_irq_timer = mame_timer_alloc(interrupt_gen);
 	cninja_scanline=0;
 	cninja_irq_mask=0;
 }
@@ -876,7 +876,6 @@ static MACHINE_DRIVER_START( cninja )
 
 	MDRV_MACHINE_RESET(cninja)
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -923,7 +922,6 @@ static MACHINE_DRIVER_START( stoneage )
 
 	MDRV_MACHINE_RESET(cninja)
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -967,7 +965,6 @@ static MACHINE_DRIVER_START( edrandy )
 
 	MDRV_MACHINE_RESET(cninja)
 	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -1014,7 +1011,6 @@ static MACHINE_DRIVER_START( robocop2 )
 
 	MDRV_MACHINE_RESET(cninja)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)
@@ -1063,7 +1059,6 @@ static MACHINE_DRIVER_START( mutantf )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_mutantf,sound_writemem_mutantf)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM )

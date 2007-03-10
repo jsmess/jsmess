@@ -1203,8 +1203,10 @@ static UINT32 handler_ingame(UINT32 state)
 
 	/* first draw the FPS counter */
 	if (showfps || osd_ticks() < showfps_end)
-		ui_draw_text_full(osd_get_fps_text(mame_get_performance_info()), 0.0f, 0.0f, 1.0f,
+	{
+		ui_draw_text_full(video_get_speed_text(), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+	}
 	else
 		showfps_end = 0;
 
@@ -1279,7 +1281,7 @@ static UINT32 handler_ingame(UINT32 state)
 
 	/* handle a save snapshot request */
 	if (input_ui_pressed(IPT_UI_SNAPSHOT))
-		video_save_active_screen_snapshots();
+		video_save_active_screen_snapshots(Machine);
 
 	/* toggle pause */
 	if (input_ui_pressed(IPT_UI_PAUSE))
@@ -1297,14 +1299,14 @@ static UINT32 handler_ingame(UINT32 state)
 	/* toggle movie recording */
 	if (input_ui_pressed(IPT_UI_RECORD_MOVIE))
 	{
-		if (!video_is_movie_active())
+		if (!video_is_movie_active(Machine, 0))
 		{
-			video_movie_begin_recording(NULL);
+			video_movie_begin_recording(Machine, 0, NULL);
 			popmessage("REC START");
 		}
 		else
 		{
-			video_movie_end_recording();
+			video_movie_end_recording(Machine, 0);
 			popmessage("REC STOP");
 		}
 	}
@@ -1320,6 +1322,45 @@ static UINT32 handler_ingame(UINT32 state)
 	/* toggle crosshair display */
 	if (input_ui_pressed(IPT_UI_TOGGLE_CROSSHAIR))
 		video_crosshair_toggle();
+
+	/* increment frameskip? */
+	if (input_ui_pressed(IPT_UI_FRAMESKIP_INC))
+	{
+		/* get the current value and increment it */
+		int newframeskip = video_get_frameskip() + 1;
+		if (newframeskip > MAX_FRAMESKIP)
+			newframeskip = -1;
+		video_set_frameskip(newframeskip);
+
+		/* display the FPS counter for 2 seconds */
+		ui_show_fps_temp(2.0);
+	}
+
+	/* decrement frameskip? */
+	if (input_ui_pressed(IPT_UI_FRAMESKIP_DEC))
+	{
+		/* get the current value and decrement it */
+		int newframeskip = video_get_frameskip() - 1;
+		if (newframeskip < -1)
+			newframeskip = MAX_FRAMESKIP;
+		video_set_frameskip(newframeskip);
+
+		/* display the FPS counter for 2 seconds */
+		ui_show_fps_temp(2.0);
+	}
+
+	/* toggle throttle? */
+	if (input_ui_pressed(IPT_UI_THROTTLE))
+		video_set_throttle(!video_get_throttle());
+
+	/* check for fast forward */
+	if (input_port_type_pressed(IPT_OSD_3, 0))
+	{
+		video_set_fastforward(TRUE);
+		ui_show_fps_temp(0.5);
+	}
+	else
+		video_set_fastforward(FALSE);
 
 	return 0;
 }

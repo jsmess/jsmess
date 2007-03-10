@@ -59,7 +59,7 @@ static void update_interrupts(void)
 static MACHINE_RESET( thunderj )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(atarivc_eof_data, 2);
+	atarivc_reset(0, atarivc_eof_data, 2);
 	atarigen_interrupt_reset(update_interrupts);
 	atarijsa_reset();
 
@@ -102,7 +102,7 @@ static WRITE16_HANDLER( latch_w )
 		/* bits 2-5 are the alpha bank */
 		if (thunderj_alpha_tile_bank != ((data >> 2) & 7))
 		{
-			video_screen_update_partial(0, cpu_getscanline());
+			video_screen_update_partial(0, video_screen_get_vpos(0));
 			tilemap_mark_all_tiles_dirty(atarigen_alpha_tilemap);
 			thunderj_alpha_tile_bank = (data >> 2) & 7;
 		}
@@ -120,7 +120,7 @@ static WRITE16_HANDLER( latch_w )
 static void shared_sync_callback(int param)
 {
 	if (--param)
-		timer_set(TIME_IN_USEC(50), param, shared_sync_callback);
+		mame_timer_set(MAME_TIME_IN_USEC(50), param, shared_sync_callback);
 }
 
 
@@ -143,7 +143,7 @@ static READ16_HANDLER( shared_ram_r )
 			if ((opcode & 0xffc0) == 0x4ac0 ||
 				((opcode & 0xffc0) == 0x0080 && rom_base[cpunum][ppc / 2 + 1] == 7))
 			{
-				timer_set(TIME_NOW, 4, shared_sync_callback);
+				mame_timer_set(time_zero, 4, shared_sync_callback);
 			}
 		}
 	}
@@ -354,7 +354,6 @@ static MACHINE_DRIVER_START( thunderj )
 	MDRV_CPU_PROGRAM_MAP(extra_readmem,extra_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(thunderj)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -363,7 +362,8 @@ static MACHINE_DRIVER_START( thunderj )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 30*8)
+	/* the vert size is copied from beathead.c.  Needs to be verified */
+	MDRV_SCREEN_SIZE(42*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)

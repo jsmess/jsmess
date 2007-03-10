@@ -104,7 +104,7 @@ static void master_sound_nmi_callback(int param);
 
 static MACHINE_RESET( exterm )
 {
-	sound_nmi_timer = timer_alloc(master_sound_nmi_callback);
+	sound_nmi_timer = mame_timer_alloc(master_sound_nmi_callback);
 }
 
 
@@ -222,7 +222,7 @@ static void sound_delayed_w(int data)
 static WRITE16_HANDLER( sound_latch_w )
 {
 	if (ACCESSING_LSB)
-		timer_set(TIME_NOW, data & 0xff, sound_delayed_w);
+		mame_timer_set(time_zero, data & 0xff, sound_delayed_w);
 }
 
 
@@ -257,8 +257,8 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
 	double input_clock = TIME_IN_HZ(4000000/16);
-	double nmi_rate = input_clock * 256 * (256 - data);
-	timer_adjust(sound_nmi_timer, nmi_rate, 0, nmi_rate);
+	mame_time nmi_rate = double_to_mame_time(input_clock * 256 * (256 - data));
+	mame_timer_adjust(sound_nmi_timer, nmi_rate, 0, nmi_rate);
 }
 
 
@@ -490,7 +490,6 @@ static MACHINE_DRIVER_START( exterm )
 	MDRV_CPU_PROGRAM_MAP(sound_slave_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((1000000 * (263 - 240)) / (60 * 263)))
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET(exterm)
@@ -499,8 +498,8 @@ static MACHINE_DRIVER_START( exterm )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MDRV_SCREEN_SIZE(256, 263)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 255)
 	MDRV_PALETTE_LENGTH(4096+32768)
 
 	MDRV_PALETTE_INIT(exterm)

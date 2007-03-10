@@ -264,7 +264,7 @@ static void force_update(int scanline)
 	scanline += 64;
 	if (scanline >= Machine->screen[0].visarea.max_y)
 		scanline = 0;
-	timer_set(cpu_getscanlinetime(scanline), scanline, force_update);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, force_update);
 }
 
 /*---------------------------------------------------------------
@@ -385,7 +385,7 @@ int atarimo_init(int map, const struct atarimo_desc *desc)
 	init_gfxelement(mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
-	timer_set(cpu_getscanlinetime(0), 0, force_update);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, force_update);
 
 	logerror("atarimo_init:\n");
 	logerror("  width=%d (shift=%d),  height=%d (shift=%d)\n", mo->tilewidth, mo->tilexshift, mo->tileheight, mo->tileyshift);

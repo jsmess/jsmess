@@ -134,7 +134,7 @@ VIDEO_START( atarisy2 )
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* reset the statics */
-	yscroll_reset_timer = timer_alloc(reset_yscroll_callback);
+	yscroll_reset_timer = mame_timer_alloc(reset_yscroll_callback);
 	videobank = 0;
 	return 0;
 }
@@ -155,7 +155,7 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, newscroll >> 6);
@@ -186,13 +186,13 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - cpu_getscanline());
+		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(0));
 	else
-		timer_adjust(yscroll_reset_timer, cpu_getscanlinetime(0), newscroll >> 6, 0);
+		mame_timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll >> 6, time_zero);
 
 	/* update the playfield banking */
 	if (playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
@@ -297,7 +297,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	{
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
-			video_screen_update_partial(0, cpu_getscanline());
+			video_screen_update_partial(0, video_screen_get_vpos(0));
 		atarimo_0_spriteram_w(offs - 0x0c00, data, mem_mask);
 	}
 

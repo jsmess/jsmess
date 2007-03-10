@@ -685,8 +685,8 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 
 	for (i = 0; i < MAX_CPU; i++)
 	{
-		dpyint_timer[i] = timer_alloc(dpyint_callback);
-		vsblnk_timer[i] = timer_alloc(vsblnk_callback);
+		dpyint_timer[i] = mame_timer_alloc(dpyint_callback);
+		vsblnk_timer[i] = mame_timer_alloc(vsblnk_callback);
 	}
 
 	state.config = config;
@@ -1027,26 +1027,6 @@ static void set_raster_op(void)
     VIDEO TIMING HELPERS
 ***************************************************************************/
 
-INLINE int scanline_to_vcount(int scanline)
-{
-	if (Machine->screen[state.config->scrnum].visarea.min_y == 0)
-		scanline += SMART_IOREG(VEBLNK);
-	if (scanline > SMART_IOREG(VTOTAL))
-		scanline -= SMART_IOREG(VTOTAL);
-	return scanline;
-}
-
-
-INLINE int vcount_to_scanline(int vcount)
-{
-	if (Machine->screen[state.config->scrnum].visarea.min_y == 0)
-		vcount -= SMART_IOREG(VEBLNK);
-	if (vcount < 0)
-		vcount += SMART_IOREG(VTOTAL);
-	return vcount;
-}
-
-
 static void update_display_address(int vcount)
 {
 	UINT32 dpyadr = IOREG(REG_DPYADR) & 0xfffc;
@@ -1078,18 +1058,13 @@ static void update_display_address(int vcount)
 	if (state.config->display_addr_changed)
 	{
 		if (org != 0) dudate = -dudate;
-		(*state.config->display_addr_changed)(dpyadr & 0x00ffffff, (dudate << 8) / scans, vcount_to_scanline(vcount));
+		(*state.config->display_addr_changed)(dpyadr & 0x00ffffff, (dudate << 8) / scans, vcount);
 	}
 }
 
 
 static void vsblnk_callback(int cpunum)
 {
-	double interval = TIME_IN_HZ(Machine->screen[state.config->scrnum].refresh);
-
-	/* reset timer for next frame before going into the CPU context */
-	timer_adjust(vsblnk_timer[cpunum], interval, cpunum, 0);
-
 	/* set the CPU's context and update the display state */
 	cpuintrf_push_context(cpunum);
 	IOREG(REG_DPYADR) = IOREG(REG_DPYSTRT);
@@ -1101,20 +1076,13 @@ static void vsblnk_callback(int cpunum)
 
 static void dpyint_callback(int cpunum)
 {
-	double interval = TIME_IN_HZ(Machine->screen[state.config->scrnum].refresh);
-
-logerror("-- dpyint(%d) @ %d --\n", cpunum, cpu_getscanline());
-
-	/* reset timer for next frame before going into the CPU context */
-	timer_adjust(dpyint_timer[cpunum], interval, cpunum, 0);
-
 	/* set the CPU's context and queue an interrupt */
 	cpuintrf_push_context(cpunum);
-	timer_set(TIME_NOW, cpunum | (TMS34010_DI << 8), internal_interrupt_callback);
+	mame_timer_set(time_zero, cpunum | (TMS34010_DI << 8), internal_interrupt_callback);
 
 	/* allow a callback so we can update before they are likely to do nasty things */
 	if (state.config->display_int_callback)
-		(*state.config->display_int_callback)(vcount_to_scanline(IOREG(REG_DPYINT)));
+		(*state.config->display_int_callback)(IOREG(REG_DPYINT));
 
 	cpuintrf_pop_context();
 }
@@ -1127,8 +1095,10 @@ static void update_timers(void)
 	int vsblnk = SMART_IOREG(VSBLNK);
 
 	/* set new timers */
-	timer_adjust(dpyint_timer[cpunum], cpu_getscanlinetime(vcount_to_scanline(dpyint)), cpunum, 0);
-	timer_adjust(vsblnk_timer[cpunum], cpu_getscanlinetime(vcount_to_scanline(vsblnk)), cpunum, 0);
+	mame_time interval = video_screen_get_frame_period(state.config->scrnum);
+
+	mame_timer_adjust(dpyint_timer[cpunum], video_screen_get_time_until_pos(state.config->scrnum, dpyint, 0), cpunum, interval);
+	mame_timer_adjust(vsblnk_timer[cpunum], video_screen_get_time_until_pos(state.config->scrnum, vsblnk, 0), cpunum, interval);
 }
 
 
@@ -1204,25 +1174,25 @@ WRITE16_HANDLER( tms34010_io_register_w )
 		case REG_DPYCTL:
 			set_pixel_function();
 			if ((oldreg ^ data) & 0x03fc)
-				update_display_address(scanline_to_vcount(cpu_getscanline()));
+				update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG_DPYADR:
 			if (data != oldreg)
 			{
-				state.last_update_vcount = scanline_to_vcount(cpu_getscanline());
+				state.last_update_vcount = video_screen_get_vpos(state.config->scrnum);
 				update_display_address(state.last_update_vcount);
 			}
 			break;
 
 		case REG_DPYSTRT:
 			if (data != oldreg)
-				update_display_address(scanline_to_vcount(cpu_getscanline()));
+				update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG_DPYTAP:
 			if ((oldreg ^ data) & 0x3fff)
-				update_display_address(scanline_to_vcount(cpu_getscanline()));
+				update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG_HSTCTLH:
@@ -1233,7 +1203,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_set(TIME_NOW, cpunum | (TMS34010_NMI << 8), internal_interrupt_callback);
+				mame_timer_set(time_zero, cpunum | (TMS34010_NMI << 8), internal_interrupt_callback);
 			break;
 
 		case REG_HSTCTLL:
@@ -1253,7 +1223,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 				newreg |= data & 0x0008;
 			}
 			IOREG(offset) = newreg;
-logerror("oldreg=%04X newreg=%04X\n", oldreg, newreg);
+
 			/* the TMS34010 can set output interrupt? */
 			if (!(oldreg & 0x0080) && (newreg & 0x0080))
 			{
@@ -1268,7 +1238,7 @@ logerror("oldreg=%04X newreg=%04X\n", oldreg, newreg);
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_set(TIME_NOW, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
+				mame_timer_set(time_zero, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(REG_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1299,7 +1269,7 @@ logerror("oldreg=%04X newreg=%04X\n", oldreg, newreg);
 	}
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), cpu_getscanline());
+		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), video_screen_get_vpos(state.config->scrnum));
 }
 
 
@@ -1336,7 +1306,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(offset) = data;
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), cpu_getscanline());
+		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), video_screen_get_vpos(state.config->scrnum));
 
 	switch (offset)
 	{
@@ -1387,7 +1357,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 		case REG020_DPYCTL:
 			set_pixel_function();
 			if ((oldreg ^ data) & 0x03fc)
-				update_display_address(scanline_to_vcount(cpu_getscanline()));
+				update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG020_HSTCTLH:
@@ -1398,7 +1368,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_set(TIME_NOW, cpunum | (TMS34010_NMI << 8), internal_interrupt_callback);
+				mame_timer_set(time_zero, cpunum | (TMS34010_NMI << 8), internal_interrupt_callback);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1433,7 +1403,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_set(TIME_NOW, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
+				mame_timer_set(time_zero, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(REG020_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1499,7 +1469,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 		case REG020_DPYSTH:
 			if (data != oldreg)
 			{
-				state.last_update_vcount = scanline_to_vcount(cpu_getscanline());
+				state.last_update_vcount = video_screen_get_vpos(state.config->scrnum);
 				update_display_address(state.last_update_vcount);
 			}
 			break;
@@ -1523,7 +1493,7 @@ READ16_HANDLER( tms34010_io_register_r )
 	switch (offset)
 	{
 		case REG_VCOUNT:
-			return scanline_to_vcount(cpu_getscanline());
+			return video_screen_get_vpos(state.config->scrnum);
 
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
@@ -1540,7 +1510,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			return result;
 
 		case REG_DPYADR:
-			update_display_address(scanline_to_vcount(cpu_getscanline()));
+			update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG_REFCNT:
@@ -1552,7 +1522,8 @@ READ16_HANDLER( tms34010_io_register_r )
 			/* Cool Pool loops in mainline code on the appearance of the DI, even though they */
 			/* have an IRQ handler. For this reason, we return it signalled a bit early in order */
 			/* to make it past these loops. */
-			if (dpyint_timer[cpunum] && timer_timeleft(dpyint_timer[cpunum]) < 3 * TIME_IN_HZ(40000000/TMS34010_CLOCK_DIVIDER))
+			if (dpyint_timer[cpunum] &&
+			    compare_mame_times(mame_timer_timeleft(dpyint_timer[cpunum]), double_to_mame_time(3 * TIME_IN_HZ(40000000/TMS34010_CLOCK_DIVIDER))) == -1)
 				result |= TMS34010_DI;
 			return result;
 	}
@@ -1572,7 +1543,7 @@ READ16_HANDLER( tms34020_io_register_r )
 	switch (offset)
 	{
 		case REG020_VCOUNT:
-			return scanline_to_vcount(cpu_getscanline());
+			return video_screen_get_vpos(state.config->scrnum);
 
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
@@ -1589,7 +1560,7 @@ READ16_HANDLER( tms34020_io_register_r )
 			return result;
 
 		case REG020_DPYADR:
-			update_display_address(scanline_to_vcount(cpu_getscanline()));
+			update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG020_REFADR:

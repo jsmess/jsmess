@@ -26,7 +26,7 @@
 
 #define IR_CPU_STATE \
 	logerror(\
-			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), cpu_getscanline())
+			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), video_screen_get_vpos(0))
 
 
 UINT8 irvg_clear;
@@ -112,7 +112,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 		else
 			logerror("vg start [busy!] ");
 		IR_CPU_STATE;
-		timer_adjust(irvg_timer, TIME_IN_MSEC(10), 0, 0);
+		mame_timer_adjust(irvg_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
 #endif
 		irvg_running=1;
 	}
@@ -183,7 +183,7 @@ static void scanline_callback(int scanline)
     /* set a callback for the next 32-scanline increment */
     scanline += 32;
     if (scanline >= 256) scanline = 0;
-    timer_set(cpu_getscanlinetime(scanline), scanline, scanline_callback);
+    mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, scanline_callback);
 }
 
 static void irmb_done_callback (int param);
@@ -199,12 +199,12 @@ MACHINE_RESET( irobot )
 
 	irvg_vblank=0;
 	irvg_running = 0;
-	irvg_timer = timer_alloc(irvg_done_callback);
+	irvg_timer = mame_timer_alloc(irvg_done_callback);
 	irmb_running = 0;
-	irmb_timer = timer_alloc(irmb_done_callback);
+	irmb_timer = mame_timer_alloc(irmb_done_callback);
 
 	/* set an initial timer to go off on scanline 0 */
-	timer_set(cpu_getscanlinetime(0), 0, scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline_callback);
 
 	irobot_rom_banksel_w(0,0);
 	irobot_out0_w(0,0);
@@ -848,7 +848,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 #if IR_TIMING
 	if (irmb_running == 0)
 	{
-		timer_adjust(irmb_timer, TIME_IN_HZ(12000000) * icount, 0, 0);
+		mame_timer_adjust(irmb_timer, double_to_mame_time(TIME_IN_HZ(12000000) * icount), 0, time_zero);
 		logerror("mb start ");
 		IR_CPU_STATE;
 	}
@@ -856,7 +856,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 	{
 		logerror("mb start [busy!] ");
 		IR_CPU_STATE;
-		timer_adjust(irmb_timer, TIME_IN_NSEC(200) * icount, 0, 0);
+		mame_timer_adjust(irmb_timer, double_to_mame_time(TIME_IN_NSEC(200) * icount), 0, time_zero);
 	}
 #else
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);

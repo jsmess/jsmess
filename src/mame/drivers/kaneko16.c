@@ -30,11 +30,11 @@ Year + Game                 PCB         Notes
 92  Bakuretsu Breaker
     Blaze On                            2 Sprites Chips !?
     Sand Scorpion (by Face)             MCU protection (collision detection etc.)
-    Shogun Warriors                     MCU protection (68k code snippets, NOT WORKING)
+    Shogun Warriors                     MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
     B.Rap Boys                          MCU protection (not working, game can be
                                                         run on a shoggwar board ok)
 94  Great 1000 Miles Rally              MCU protection (EEPROM handling etc.)
-    Bonk's Adventure        Z09AF-003   MCU protection (EEPROM handling etc.)
+    Bonk's Adventure        Z09AF-003   MCU protection (EEPROM handling, 68k code snippet, data)
 95  Great 1000 Miles Rally 2            MCU protection (EEPROM handling etc.)
 ---------------------------------------------------------------------------
 
@@ -44,26 +44,16 @@ Note: Magic Crystals reports "TOYBOX SYSTEM Version 0.93B+"
 To Do:
 
 [gtmr]
-
 - Stage 4: The layers' scrolling is very jerky for a couple of seconds
   in the middle of this level (probably interrupt related)
-
 - The layers' colours are not initialised when showing the self test
   screen and the very first screen (with the Kaneko logo in the middle).
   They're probably supposed to be disabled in those occasions, but the
   relevant registers aren't changed throughout the game (?)
 
 [gtmr2]
-
 - Finish the Inputs (different wheels and pedals)
-
 - Find infos about the communication stuff (even if it won't be supported)
-
-[bloodwar]
-
-- bloodwar: protection data needs to be verified against real board (WIP)
-            errors in protection data causes the game to hang on some player
-            moves (see attract mode), some colors are wrong, ...
 
 ***************************************************************************/
 
@@ -2974,9 +2964,6 @@ ROM_START( bloodwar )
 
  	ROM_REGION( 0x020000, REGION_CPU2, 0 )			/* MCU Code */
 	ROM_LOAD( "dox3.124",  0x000000, 0x020000, CRC(399f2005) SHA1(ff0370724770c35963953fd9596d9f808ba87d8f) )
-
- 	ROM_REGION16_BE( 0x0080, REGION_USER1, 0 )			/* EEPROM */
-	ROM_LOAD16_WORD( "9346.126",  0x0000, 0x0080, CRC(1579db94) SHA1(acb842676946efea29b73bdc9ecb266f49d2f5a8) )
 
 	ROM_REGION( 0x1e00000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD       ( "2000201.8",   0x0000000, 0x200000, CRC(bba63025) SHA1(daec5285469ee953f6f838fe3cb3903524e9ac39) )

@@ -86,13 +86,13 @@
     GQ974      GCA01          2000    Keyboardmania 2nd Mix
     GQ974      GCA12          2001    Keyboardmania 3rd Mix
     GQ977      GQ977          2000    Para Para Paradise
-    GQ977(?)   GQ977          2000    Para Para Dancing
+    GQ977      GQ977          2000    Para Para Dancing
     GQ977(?)   ?              2000    Para Para Paradise 1.1
     GQ977      GQA11          2000    Para Para Paradise 1st Mix+
-    ???        ?              2000    Pop n' Music 4
+    GQA02(?)   ?              2000    Pop n' Music 4
     ???        ?              2000    Pop n' Music 5
     ???        ?              2001    Pop n' Music 6
-    ???        ?              2001    Pop n' Music 7
+    GQA02      GCB00          2001    Pop n' Music 7
     ???        ?              2002    Pop n' Music 8
     ???        ?              2000    Pop n' Music Animelo
     ???        ?              2001    Pop n' Music Animelo 2
@@ -354,7 +354,7 @@ static void gcu_exec_display_list(int chip, mame_bitmap *bitmap, const rectangle
 
 	int i = address / 4;
 	if (i < 0) i = 0;
-	while (!end && counter < 0x1000 && i < (0x1000000/4))
+	while (!end && counter < 0x1000 && i < (0x2000000/4))
 	{
 		int command;
 		UINT32 cmd[4];
@@ -433,6 +433,8 @@ static VIDEO_UPDATE(firebeat)
 	else if (layer == 1)
 	{
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x1d0800);
+
+		gcu_exec_display_list(chip, bitmap, cliprect, 0x1f80000);
 	}
 
 	tick++;
@@ -1281,6 +1283,7 @@ static WRITE32_HANDLER( sound_w )
 
 static int cab_data[2] = { 0x0, 0x8 };
 static int kbm_cab_data[2] = { 0x2, 0x8 };
+static int ppd_cab_data[2] = { 0x1, 0x9 };
 static int cab_data_ptr = 0;
 static int * cur_cab_data = cab_data;
 
@@ -2096,6 +2099,18 @@ static DRIVER_INIT(ppp)
 	set_ibutton(rom);
 }
 
+static DRIVER_INIT(ppd)
+{
+	UINT8 *rom = memory_region(REGION_USER2);
+
+	init_firebeat(machine);
+	init_lights(lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
+
+	set_ibutton(rom);
+
+	cur_cab_data = ppd_cab_data;
+}
+
 static void init_keyboard(void)
 {
 	// set keyboard timer
@@ -2157,7 +2172,7 @@ ROM_START( kbm2nd )
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
-	// TODO: needs fake data
+	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(2bda339d) SHA1(031cb3f44e7a89cd62a9ba948f3d19d53a325abd))
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "a01jaa01", 0, SHA1(87c21dc6b9fe8d9f696985cfd9dc14a23f0932fe) MD5(0eff2ca8ebef1fd8815d1d7cb0c2383a) )
@@ -2186,7 +2201,7 @@ ROM_START( popn7 )
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
-	// TODO: needs fake data
+	ROM_LOAD("gcb00-ja", 0x00, 0xc0, BAD_DUMP CRC(cc28625a) SHA1(e7de79ae72fdbd22328c9de74dfa17b5e6ae43b6))
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(7462586f67b5c3b015ac581ad0afc089fcd6f537) MD5(af9a249b23783d53ff27ea7dc7e6735c) )
@@ -2201,7 +2216,7 @@ ROM_START( ppd )
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
-	// TODO: needs fake data
+	ROM_LOAD("gq977-ko", 0x00, 0xc0, BAD_DUMP CRC(ee743323) SHA1(2042e45879795557ad3cc21b37962f6bf54da60d))
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "977kaa01", 0, SHA1(7069c1e42bf994ccdfcf6ff0dda9c5de94f1cc65) MD5(f499cb458d823200dc96fe9cef5c08c8) )
@@ -2211,10 +2226,8 @@ ROM_END
 /*****************************************************************************/
 
 GAME( 2000, ppp,	  0,       firebeat,  ppp,    ppp,     ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING);
-GAME( 2000, ppd,      0,       firebeat,  ppp,    ppp,     ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING);
+GAME( 2000, ppd,      0,       firebeat,  ppp,    ppd,     ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING);
 GAMEL(2000, kbm,      0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat);
 GAMEL(2000, kbm2nd,   0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat);
 GAMEL(2001, kbm3rd,   0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat);
-
-// TODO: very not working, needs different bios? - currently using ppp driver and layout so it attempts to boot
-GAMEL(2001, popn7,    0,       firebeat2, ppp,    ppp,     ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING, layout_firebeat);
+GAME( 2001, popn7,    0,       firebeat,  ppp,    ppp,     ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING);

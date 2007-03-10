@@ -25,6 +25,10 @@
 /* maximum number of screens for one game */
 #define MAX_SCREENS					8
 
+/* number of levels of frameskipping supported */
+#define FRAMESKIP_LEVELS			12
+#define MAX_FRAMESKIP				(FRAMESKIP_LEVELS - 2)
+
 
 
 /***************************************************************************
@@ -41,6 +45,7 @@ struct _screen_state
 	int				width, height;				/* total width/height (HTOTAL, VTOTAL) */
 	rectangle		visarea;					/* visible area (HBLANK end/start, VBLANK end/start) */
 	float			refresh;					/* refresh rate */
+	int				oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
 	double			vblank;						/* duration of a VBLANK */
 	bitmap_format	format;						/* bitmap format */
 };
@@ -60,48 +65,21 @@ struct _screen_config
 };
 
 
-/*-------------------------------------------------
-    performance_info - information about the
-    current performance
--------------------------------------------------*/
-
-/* In mamecore.h: typedef struct _performance_info performance_info; */
-struct _performance_info
-{
-	double			game_speed_percent;			/* % of full speed */
-	double			frames_per_second;			/* actual rendered fps */
-	int				vector_updates_last_second; /* # of vector updates last second */
-	int				partial_updates_this_frame; /* # of partial updates last frame */
-};
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* ----- screen rendering and management ----- */
+/* ----- core implementation ----- */
 
 /* core initialization */
 int video_init(running_machine *machine);
 
 /* core VBLANK callback */
-void video_vblank_start(void);
-
-/* reset the partial updating for a frame; generally only called by cpuexec.c */
-void video_reset_partial_updates(void);
-
-/* are we skipping the current frame? */
-int video_skip_this_frame(void);
-
-/* update the screen, handling frame skipping and rendering */
-void video_frame_update(void);
-
-/* return current performance data */
-const performance_info *mame_get_performance_info(void);
+void video_vblank_start(running_machine *machine);
 
 
-/* ----- screens ----- */
+/* ----- screen management ----- */
 
 /* set the resolution of a screen */
 void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, float refresh);
@@ -123,22 +101,58 @@ int video_screen_get_hblank(int scrnum);
 /* return the time when the beam will reach a particular H,V position */
 mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
 
+/* return the amount of time the beam takes to draw one scan line */
+mame_time video_screen_get_scan_period(int scrnum);
+
+/* return the amount of time the beam takes to draw one complete frame */
+mame_time video_screen_get_frame_period(int scrnum);
+
+
+/* ----- global rendering ----- */
+
+/* reset the partial updating for a frame; generally only called by cpuexec.c */
+void video_reset_partial_updates(void);
+
+/* update the screen, handling frame skipping and rendering */
+void video_frame_update(void);
+
+
+/* ----- throttling/frameskipping/performance ----- */
+
+/* are we skipping the current frame? */
+int video_skip_this_frame(void);
+
+/* return text to display about the current speed */
+const char *video_get_speed_text(void);
+
+/* get/set the current frameskip (-1 means auto) */
+int video_get_frameskip(void);
+void video_set_frameskip(int frameskip);
+
+/* get/set the current throttle */
+int video_get_throttle(void);
+void video_set_throttle(int throttle);
+
+/* get/set the current fastforward state */
+int video_get_fastforward(void);
+void video_set_fastforward(int fastforward);
+
 
 /* ----- snapshots ----- */
 
 /* save a snapshot of a given screen */
-void video_screen_save_snapshot(mame_file *fp, int scrnum);
+void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scrnum);
 
 /* save a snapshot of all the active screens */
-void video_save_active_screen_snapshots(void);
+void video_save_active_screen_snapshots(running_machine *machine);
 
 
 /* ----- movie recording ----- */
 
 /* Movie recording */
-int video_is_movie_active(void);
-void video_movie_begin_recording(const char *name);
-void video_movie_end_recording(void);
+int video_is_movie_active(running_machine *machine, int scrnum);
+void video_movie_begin_recording(running_machine *machine, int scrnum, const char *name);
+void video_movie_end_recording(running_machine *machine, int scrnum);
 
 
 /* ----- crosshair rendering ----- */

@@ -56,13 +56,13 @@ static int polycount, pixelcount, lastfps, framecount, totalframes;
 static void scanline_timer_cb(int scanline)
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	timer_adjust(scanline_timer, cpu_getscanlinetime(scanline + 1), scanline, 0);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline + 1, 0), scanline, time_zero);
 }
 
 
 VIDEO_START( midvunit )
 {
-	scanline_timer = timer_alloc(scanline_timer_cb);
+	scanline_timer = mame_timer_alloc(scanline_timer_cb);
 	return 0;
 }
 
@@ -1071,7 +1071,7 @@ WRITE32_HANDLER( midvunit_page_control_w )
 		polycount = pixelcount = 0;
 		framecount++;
 #endif
-		video_screen_update_partial(0, cpu_getscanline() - 1);
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 	}
 	page_control = data;
 }
@@ -1094,13 +1094,13 @@ WRITE32_HANDLER( midvunit_video_control_w )
 {
 	/* the only thing that matters is the vblank int */
 	if (offset == 0)
-		timer_adjust(scanline_timer, cpu_getscanlinetime((data & 0x1ff) + 1), data & 0x1ff, 0);
+		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, (data & 0x1ff) + 1, 0), data & 0x1ff, time_zero);
 }
 
 
 READ32_HANDLER( midvunit_scanline_r )
 {
-	return cpu_getscanline();
+	return video_screen_get_vpos(0);
 }
 
 
@@ -1197,7 +1197,7 @@ VIDEO_UPDATE( midvunit )
 
 	/* adjust the offset */
 	offset += xoffs;
-	offset += 512 * cliprect->min_y;
+	offset += 512 * (cliprect->min_y - Machine->screen[0].visarea.min_y);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)

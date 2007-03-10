@@ -77,7 +77,7 @@ WRITE16_HANDLER( btoads_display_control_w )
 	if (ACCESSING_MSB)
 	{
 		/* allow multiple changes during display */
-		video_screen_update_partial(0, cpu_getscanline() - 1);
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 
 		/* bit 15 controls which page is rendered and which page is displayed */
 		if (data & 0x8000)
@@ -107,7 +107,7 @@ WRITE16_HANDLER( btoads_display_control_w )
 WRITE16_HANDLER( btoads_scroll0_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_partial(0, cpu_getscanline() - 1);
+	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_MSB)
@@ -120,7 +120,7 @@ WRITE16_HANDLER( btoads_scroll0_w )
 WRITE16_HANDLER( btoads_scroll1_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_partial(0, cpu_getscanline() - 1);
+	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_MSB)
@@ -346,9 +346,9 @@ VIDEO_UPDATE( btoads )
 	/* loop over all scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *bg0_base = &btoads_vram_bg0[((y + yscroll0) & 0xff) * TOWORD(0x4000)];
-		UINT16 *bg1_base = &btoads_vram_bg1[((y + yscroll1) & 0xff) * TOWORD(0x4000)];
-		UINT8 *spr_base = &vram_fg_display[y * TOWORD(0x4000)];
+		UINT16 *bg0_base = &btoads_vram_bg0[((y - Machine->screen[0].visarea.min_y + yscroll0) & 0xff) * TOWORD(0x4000)];
+		UINT16 *bg1_base = &btoads_vram_bg1[((y - Machine->screen[0].visarea.min_y + yscroll1) & 0xff) * TOWORD(0x4000)];
+		UINT8 *spr_base = &vram_fg_display[(y - Machine->screen[0].visarea.min_y) * TOWORD(0x4000)];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 
 		/* for each scanline, switch off the render mode */

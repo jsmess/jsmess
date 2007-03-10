@@ -154,7 +154,7 @@ static void scanline_callback(int scanline)
 	update_interrupts();
 
 	/* set the timer for the next one */
-	timer_set(cpu_getscanlinetime(scanline) - hblank_offset, scanline, scanline_callback);
+	mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_time_until_pos(0, scanline, 0)) - hblank_offset), scanline, scanline_callback);
 }
 
 
@@ -170,8 +170,8 @@ static MACHINE_RESET( beathead )
 	memcpy(ram_base, rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	hblank_offset = cpu_getscanlineperiod() * ((455. - 336. - 25.) / 455.);
-	timer_set(cpu_getscanlinetime(0) - hblank_offset, 0, scanline_callback);
+	hblank_offset = mame_time_to_double(video_screen_get_scan_period(0)) * ((455. - 336. - 25.) / 455.);
+	mame_timer_set(double_to_mame_time(mame_time_to_double(video_screen_get_time_until_pos(0, 0, 0)) - hblank_offset), 0, scanline_callback);
 
 	/* reset IRQs */
 	irq_line_state = CLEAR_LINE;
@@ -431,7 +431,6 @@ static MACHINE_DRIVER_START( beathead )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int)(((262. - 240.) / 262.) * 1000000. / 60.)))
 
 	MDRV_MACHINE_RESET(beathead)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -439,7 +438,7 @@ static MACHINE_DRIVER_START( beathead )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 30*8)
+	MDRV_SCREEN_SIZE(42*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(32768)
 

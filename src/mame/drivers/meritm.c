@@ -245,6 +245,71 @@ ROM_START( megat5 )
 	ROM_LOAD( "megat5.u32",  0x00000, 0x80000, CRC(89932443) SHA1(68d2fbf2a5050fc5371595a105fe06f4276b0b67) )
 ROM_END
 
+/*
+
+Megatouch 6 - Merit 1998
+--------------------------------
+
+CPU:
+1 Z80
+1 8255
+1 16550
+2 x Z80 PIO
+2 x V9938
+
+Memory:
+2 x V53C8256HP45 256K X 8 Fast Page Mode CMOS DRAM
+1 DS1230 nv ram
+
+Sound:
+YM2149
+
+Actual rom labels:
+------------------
+9255-60-01
+ U32-R0      = 27C801
+C1997 MII
+
+QS9255-08
+ U36-R0      = 27C040
+C1998 MII
+
+QS9255-08
+ U37-R0      = 27C801
+C1998 MII
+
+9255-80-01
+ U36-R0      = 27C801
+C1998 MII
+
+PAL:
+SC39440A.u19 = PALCE22V10H-25PC/4
+SC3980.u40   = PALCE16V8H-25
+SC39810A.u15 = PALCE16V8H-25
+SC3943.u20   = ATF16V8B25PC
+
+*/
+
+ROM_START( megat6 )
+	ROM_REGION( 0x280000, REGION_CPU1, 0 )
+	ROM_LOAD( "u38-r0",  0x000000, 0x100000, CRC(3df6b840) SHA1(31ba1ac04eed3e76cdf637507dedcc5f7e22c919) )
+	ROM_LOAD( "u37-r0",  0x100000, 0x100000, CRC(5ba01949) SHA1(1598949ea18d07bbc78af0ddd279a687173c1229) )
+	ROM_LOAD( "u36-r0",  0x200000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) )
+
+	ROM_REGION( 0x100000, REGION_USER1, 0 ) // extra data / extra banks?
+	ROM_LOAD( "u32-r0",  0x00000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) )
+
+	ROM_REGION( 0x8000, REGION_USER2, 0 ) // DS1230 nv ram
+	ROM_LOAD( "ds1230y.u31",  0x00000, 0x8000, CRC(51b6da5c) SHA1(1d53af89d7867bb48b9d46feff6fc3b7e8e80ac8) )
+
+	ROM_REGION( 0x1000, REGION_USER3, 0 ) // PALs
+	ROM_LOAD( "sc3943.u20.bin", 0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.bin",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.bin",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc39810a.bin",   0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+
 
 /* Type 1 */
 GAME( 1988, pitboss2,  0,    meritm, meritm, 0, ROT0, "Merit", "Pitboss II", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -254,3 +319,4 @@ GAME( 1994, pitbossm,  0,    meritm, meritm, 0, ROT0, "Merit", "Pitboss Megastar
 /* Type 3 */
 GAME( 1995, megat3,    0,    meritm, meritm, 0, ROT0, "Merit", "Megatouch 3", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1997, megat5,    0,    meritm, meritm, 0, ROT0, "Merit", "Megatouch 5", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1998, megat6,    0,    meritm, meritm, 0, ROT0, "Merit", "Megatouch 6", GAME_NO_SOUND|GAME_NOT_WORKING )

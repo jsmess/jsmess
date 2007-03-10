@@ -129,6 +129,7 @@ static struct
 
 /***********************************************************************************/
 
+static void tilemap_exit( running_machine *machine );
 static void tilemap_dispose( tilemap *tmap );
 static void PenToPixel_Init( tilemap *tmap );
 static void PenToPixel_Term( tilemap *tmap );
@@ -739,23 +740,18 @@ INLINE tilemap_draw_func pick_draw_func( mame_bitmap *dest )
 
 /***********************************************************************************/
 
-int tilemap_init( running_machine *machine )
+void tilemap_init( running_machine *machine )
 {
 	screen_width	= Machine->screen[0].width;
 	screen_height	= Machine->screen[0].height;
 	first_tilemap	= NULL;
 
-	priority_bitmap = bitmap_alloc( screen_width, screen_height, BITMAP_FORMAT_INDEXED8 );
-	if( priority_bitmap )
-	{
-		priority_bitmap_pitch_line = priority_bitmap->rowpixels;
-		add_exit_callback(machine, tilemap_exit);
-		return 0;
-	}
-	return -1;
+	priority_bitmap = auto_bitmap_alloc( screen_width, screen_height, BITMAP_FORMAT_INDEXED8 );
+	priority_bitmap_pitch_line = priority_bitmap->rowpixels;
+	add_exit_callback(machine, tilemap_exit);
 }
 
-void tilemap_exit( running_machine *machine )
+static void tilemap_exit( running_machine *machine )
 {
 	tilemap *next;
 
@@ -765,7 +761,6 @@ void tilemap_exit( running_machine *machine )
 		tilemap_dispose( first_tilemap );
 		first_tilemap = next;
 	}
-	bitmap_free( priority_bitmap );
 }
 
 /***********************************************************************************/

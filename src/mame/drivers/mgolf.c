@@ -8,8 +8,8 @@
 
 static UINT8* mgolf_video_ram;
 
-static double time_pushed;
-static double time_released;
+static mame_time time_pushed;
+static mame_time time_released;
 
 static UINT8 prev = 0;
 static UINT8 mask = 0;
@@ -84,7 +84,7 @@ static void update_plunger(void)
 	{
 		if (val == 0)
 		{
-			time_released = timer_get_time();
+			time_released = mame_timer_get_time();
 
 			if (!mask)
 			{
@@ -93,7 +93,7 @@ static void update_plunger(void)
 		}
 		else
 		{
-			time_pushed = timer_get_time();
+			time_pushed = mame_timer_get_time();
 		}
 
 		prev = val;
@@ -114,19 +114,19 @@ static void interrupt_callback(int scanline)
 		scanline = 16;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_callback);
 }
 
 
 static double calc_plunger_pos(void)
 {
-	return (timer_get_time() - time_released) * (time_released - time_pushed + 0.2);
+	return (mame_time_to_double(mame_timer_get_time()) - mame_time_to_double(time_released)) * (mame_time_to_double(time_released) - mame_time_to_double(time_pushed) + 0.2);
 }
 
 
 static MACHINE_RESET( mgolf )
 {
-	timer_set(cpu_getscanlinetime(16), 16, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 16, 0), 16, interrupt_callback);
 }
 
 
@@ -307,7 +307,6 @@ static MACHINE_DRIVER_START( mgolf )
 	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(38 * 1000000 / 15750))
 	MDRV_MACHINE_RESET(mgolf)
 
 	/* video hardware */

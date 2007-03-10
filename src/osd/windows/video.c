@@ -45,41 +45,6 @@
 
 
 //============================================================
-//  DEBUGGING
-//============================================================
-
-#define LOG_THROTTLE				(1)
-
-
-
-//============================================================
-//  CONSTANTS
-//============================================================
-
-// frameskipping
-#define FRAMESKIP_LEVELS			12
-
-// refresh rate while paused
-#define PAUSED_REFRESH_RATE			60
-
-
-
-//============================================================
-//  TYPE DEFINITIONS
-//============================================================
-
-typedef struct _throttle_info throttle_info;
-struct _throttle_info
-{
-	osd_ticks_t 		last_ticks;				/* last osd_ticks() value we read */
-	mame_time 			realtime;				/* current realtime */
-	mame_time 			emutime;				/* current emulated time */
-	UINT32				history;				/* history of in-time frames */
-};
-
-
-
-//============================================================
 //  GLOBAL VARIABLES
 //============================================================
 
@@ -98,35 +63,6 @@ static win_monitor_info *primary_monitor;
 
 static mame_bitmap *effect_bitmap;
 
-// average FPS calculation
-static osd_ticks_t fps_start_time;
-static osd_ticks_t fps_end_time;
-static int fps_frames_displayed;
-
-// throttling calculations
-static throttle_info throttle;
-
-// frameskipping
-static int frameskip_counter;
-static int frameskipadjust;
-
-// frameskipping tables
-static const int skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
-{
-	{ 0,0,0,0,0,0,0,0,0,0,0,0 },
-	{ 0,0,0,0,0,0,0,0,0,0,0,1 },
-	{ 0,0,0,0,0,1,0,0,0,0,0,1 },
-	{ 0,0,0,1,0,0,0,1,0,0,0,1 },
-	{ 0,0,1,0,0,1,0,0,1,0,0,1 },
-	{ 0,1,0,0,1,0,1,0,0,1,0,1 },
-	{ 0,1,0,1,0,1,0,1,0,1,0,1 },
-	{ 0,1,0,1,1,0,1,0,1,1,0,1 },
-	{ 0,1,1,0,1,1,0,1,1,0,1,1 },
-	{ 0,1,1,1,0,1,1,1,0,1,1,1 },
-	{ 0,1,1,1,1,1,0,1,1,1,1,1 },
-	{ 0,1,1,1,1,1,1,1,1,1,1,1 }
-};
-
 
 
 //============================================================
@@ -138,39 +74,12 @@ static void init_monitors(void);
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(int index);
 
-static void update_throttle(mame_time emutime);
-static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks);
-static void update_fps(mame_time emutime);
-static void update_autoframeskip(void);
 static void check_osd_inputs(void);
 
 static void extract_video_config(void);
 static void load_effect_overlay(const char *filename);
 static float get_aspect(const char *name, int report_error);
 static void get_resolution(const char *name, win_window_config *config, int report_error);
-
-
-
-//============================================================
-//  INLINES
-//============================================================
-
-INLINE int effective_autoframeskip(void)
-{
-	return video_config.autoframeskip && !video_config.fastforward;
-}
-
-
-INLINE int effective_frameskip(void)
-{
-	return video_config.fastforward ? (FRAMESKIP_LEVELS - 1) : video_config.frameskip;
-}
-
-
-INLINE int effective_throttle(void)
-{
-	return !video_config.fastforward && (video_config.throttle || mame_is_paused(Machine) || ui_is_menu_active() || ui_is_slider_active());
-}
 
 
 
@@ -213,11 +122,7 @@ int winvideo_init(running_machine *machine)
 	// start recording movie
 	stemp = options_get_string("mngwrite");
 	if (stemp != NULL)
-		video_movie_begin_recording(stemp);
-
-	// if we're running < 5 minutes, allow us to skip warnings to facilitate benchmarking/validation testing
-	if (video_config.framestorun > 0 && video_config.framestorun < 60*60*5)
-		options.skip_warnings = options.skip_gameinfo = options.skip_disclaimer = TRUE;
+		video_movie_begin_recording(Machine, 0, stemp);
 
 	return 0;
 
@@ -249,13 +154,6 @@ static void video_exit(running_machine *machine)
 		win_monitor_info *temp = win_monitor_list;
 		win_monitor_list = temp->next;
 		free(temp);
-	}
-
-	// print a final result to the stdout
-	if (fps_frames_displayed != 0)
-	{
-		osd_ticks_t tps = osd_ticks_per_second();
-		mame_printf_info("Average FPS: %f (%d frames)\n", (double)tps / (fps_end_time - fps_start_time) * fps_frames_displayed, fps_frames_displayed);
 	}
 }
 
@@ -315,107 +213,22 @@ win_monitor_info *winvideo_monitor_from_handle(HMONITOR hmonitor)
 
 
 //============================================================
-//  winvideo_set_frameskip
-//============================================================
-
-void winvideo_set_frameskip(int value)
-{
-	if (value >= 0)
-	{
-		video_config.frameskip = value;
-		video_config.autoframeskip = 0;
-	}
-	else
-	{
-		video_config.frameskip = 0;
-		video_config.autoframeskip = 1;
-	}
-}
-
-
-
-//============================================================
-//  winvideo_get_frameskip
-//============================================================
-
-int winvideo_get_frameskip(void)
-{
-	return video_config.autoframeskip ? -1 : video_config.frameskip;
-}
-
-
-
-//============================================================
 //  osd_update
 //============================================================
 
-int osd_update(mame_time emutime)
+void osd_update(int skip_redraw)
 {
 	win_window_info *window;
 
-	// if we're throttling, paused, or if the UI is up, synchronize
-	if (effective_throttle())
-		update_throttle(emutime);
-
-	// update the FPS computations
-	update_fps(emutime);
-
-	// update all the windows, but only if we're not skipping this frame
-	if (!skiptable[effective_frameskip()][frameskip_counter])
-	{
-		profiler_mark(PROFILER_BLIT);
+	// if we're not skipping this redraw, update all windows
+	if (!skip_redraw)
 		for (window = win_window_list; window != NULL; window = window->next)
 			winwindow_video_window_update(window);
-		profiler_mark(PROFILER_END);
-	}
-
-	// if we're throttling and autoframeskip is on, adjust
-	if (effective_throttle() && effective_autoframeskip() && frameskip_counter == 0)
-		update_autoframeskip();
 
 	// poll the joystick values here
 	winwindow_process_events(TRUE);
 	wininput_poll();
 	check_osd_inputs();
-
-	// increment the frameskip counter
-	frameskip_counter = (frameskip_counter + 1) % FRAMESKIP_LEVELS;
-
-	// return whether or not to skip the next frame
-	return skiptable[effective_frameskip()][frameskip_counter];
-}
-
-
-
-//============================================================
-//  osd_get_fps_text
-//============================================================
-
-const char *osd_get_fps_text(const performance_info *performance)
-{
-	static char buffer[1024];
-	char *dest = buffer;
-
-	// if we're paused, display less info
-	if (mame_is_paused(Machine))
-		dest += sprintf(dest, "Paused");
-	else
-	{
-		dest += sprintf(dest, "%s%2d%4d%%%4d/%d fps",
-				effective_autoframeskip() ? "auto" : "fskp", effective_frameskip(),
-				(int)(performance->game_speed_percent + 0.5),
-				(int)(performance->frames_per_second + 0.5),
-				(int)(Machine->screen[0].refresh + 0.5));
-
-		/* for vector games, add the number of vector updates */
-		if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
-			dest += sprintf(dest, "\n %d vector updates", performance->vector_updates_last_second);
-		else if (performance->partial_updates_this_frame > 1)
-			dest += sprintf(dest, "\n %d partial updates", performance->partial_updates_this_frame);
-	}
-
-	/* return a pointer to the static buffer */
-	return buffer;
 }
 
 
@@ -553,366 +366,11 @@ finishit:
 
 
 //============================================================
-//  update_throttle
-//============================================================
-
-static void update_throttle(mame_time emutime)
-{
-	/*
-
-        Throttling theory:
-
-        This routine is called periodically with an up-to-date emulated time.
-        The idea is to synchronize real time with emulated time. We do this
-        by "throttling", or waiting for real time to catch up with emulated
-        time.
-
-        In an ideal world, it will take less real time to emulate and render
-        each frame than the emulated time, so we need to slow things down to
-        get both times in sync.
-
-        There are many complications to this model:
-
-            * some games run too slow, so each frame we get further and
-                further behind real time; our only choice here is to not
-                throttle
-
-            * some games have very uneven frame rates; one frame will take
-                a long time to emulate, and the next frame may be very fast
-
-            * we run on top of multitasking OSes; sometimes execution time
-                is taken away from us, and this means we may not get enough
-                time to emulate one frame
-
-            * we may be paused, and emulated time may not be marching
-                forward
-
-            * emulated time could jump due to resetting the machine or
-                restoring from a saved state
-
-    */
-	static const UINT8 popcount[256] =
-	{
-		0,1,1,2,1,2,2,3, 1,2,2,3,2,3,3,4, 1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5,
-		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
-		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
-		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
-		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
-		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
-		2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6, 3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7,
-		3,4,4,5,4,5,5,6, 4,5,5,6,5,6,6,7, 4,5,5,6,5,6,6,7, 5,6,6,7,6,7,7,8
-	};
-	subseconds_t real_delta_subseconds;
-	subseconds_t emu_delta_subseconds;
-	subseconds_t real_is_ahead_subseconds;
-	subseconds_t subseconds_per_tick;
-	osd_ticks_t ticks_per_second;
-	osd_ticks_t target_ticks;
-	osd_ticks_t diff_ticks;
-
-	/* if we're only syncing to the refresh, bail now */
-	if (video_config.syncrefresh)
-		return;
-
-	/* compute conversion factors up front */
-	ticks_per_second = osd_ticks_per_second();
-	subseconds_per_tick = MAX_SUBSECONDS / ticks_per_second;
-
-	/* if we're paused, emutime will not advance; instead, we subtract a fixed
-       amount of time (1/60th of a second) from the emulated time that was passed in,
-       and explicitly reset our tracked real and emulated timers to that value ...
-       this means we pretend that the last update was exactly 1/60th of a second
-       ago, and was in sync in both real and emulated time */
-	if (mame_is_paused(Machine))
-	{
-		throttle.emutime = sub_subseconds_from_mame_time(emutime, MAX_SUBSECONDS / PAUSED_REFRESH_RATE);
-		throttle.realtime = throttle.emutime;
-	}
-
-	/* attempt to detect anomalies in the emulated time by subtracting the previously
-       reported value from our current value; this should be a small value somewhere
-       between 0 and 1/10th of a second ... anything outside of this range is obviously
-       wrong and requires a resync */
-	emu_delta_subseconds = mame_time_to_subseconds(sub_mame_times(emutime, throttle.emutime));
-	if (emu_delta_subseconds < 0 || emu_delta_subseconds > MAX_SUBSECONDS / 10)
-	{
-		if (LOG_THROTTLE)
-			logerror("Resync due to weird emutime delta: 0.%018I64d\n", emu_delta_subseconds);
-		goto resync;
-	}
-
-	/* now determine the current real time in OSD-specified ticks; we have to be careful
-       here because counters can wrap, so we only use the difference between the last
-       read value and the current value in our computations */
-	diff_ticks = osd_ticks() - throttle.last_ticks;
-	throttle.last_ticks += diff_ticks;
-
-	/* if it has been more than a full second of real time since the last call to this
-       function, we just need to resynchronize */
-	if (diff_ticks >= ticks_per_second)
-	{
-		if (LOG_THROTTLE)
-			logerror("Resync due to real time advancing by more than 1 second\n");
-		goto resync;
-	}
-
-	/* convert this value into subseconds for easier comparison */
-	real_delta_subseconds = diff_ticks * subseconds_per_tick;
-
-	/* now update our real and emulated timers with the current values */
-	throttle.emutime = emutime;
-	throttle.realtime = add_subseconds_to_mame_time(throttle.realtime, real_delta_subseconds);
-
-	/* keep a history of whether or not emulated time beat real time over the last few
-       updates; this can be used for future heuristics */
-	throttle.history = (throttle.history << 1) | (emu_delta_subseconds > real_delta_subseconds);
-
-	/* determine how far ahead real time is versus emulated time; note that we use the
-       accumulated times for this instead of the deltas for the current update because
-       we want to track time over a longer duration than a single update */
-	real_is_ahead_subseconds = mame_time_to_subseconds(sub_mame_times(throttle.emutime, throttle.realtime));
-
-	/* if we're more than 1/10th of a second out, or if we are behind at all and emulation
-       is taking longer than the real frame, we just need to resync */
-	if (real_is_ahead_subseconds < -MAX_SUBSECONDS / 10 ||
-		(real_is_ahead_subseconds < 0 && popcount[throttle.history & 0xff] < 6))
-	{
-		if (LOG_THROTTLE)
-			logerror("Resync due to being behind: 0.%018I64d (history=%08X)\n", -real_is_ahead_subseconds, throttle.history);
-		goto resync;
-	}
-
-	/* if we're behind, it's time to just get out */
-	if (real_is_ahead_subseconds < 0)
-		return;
-
-	/* compute the target real time, in ticks, where we want to be */
-	target_ticks = throttle.last_ticks + real_is_ahead_subseconds / subseconds_per_tick;
-
-	/* throttle until we read the target, and update real time to match the final time */
-	diff_ticks = throttle_until_ticks(target_ticks) - throttle.last_ticks;
-	throttle.last_ticks += diff_ticks;
-	throttle.realtime = add_subseconds_to_mame_time(throttle.realtime, diff_ticks * subseconds_per_tick);
-	return;
-
-resync:
-	/* reset realtime and emutime to the same value */
-	throttle.realtime = throttle.emutime = emutime;
-}
-
-
-//============================================================
-//  throttle_until_ticks
-//============================================================
-
-static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks)
-{
-	static osd_ticks_t ticks_per_sleep_unit;
-	HANDLE current_thread = GetCurrentThread();
-	int old_priority = GetThreadPriority(current_thread);
-	osd_ticks_t current_ticks = osd_ticks();
-	osd_ticks_t new_ticks;
-	int allowed_to_sleep;
-
-	/* we're allowed to sleep via the OSD code only if we're configured to do so
-       and we're not frameskipping due to autoframeskip, or if we're paused */
-	allowed_to_sleep = (video_config.sleep && (!effective_autoframeskip() || effective_frameskip() == 0)) || mame_is_paused(Machine);
-
-	/* make sure we have a valid default ticks_per_sleep_unit */
-	if (ticks_per_sleep_unit == 0)
-		ticks_per_sleep_unit = osd_ticks_per_second() / 1000;
-
-	/* loop until we reach our target */
-	profiler_mark(PROFILER_IDLE);
-	while (current_ticks < target_ticks)
-	{
-		osd_ticks_t delta = target_ticks - current_ticks;
-		int slept = FALSE;
-
-		/* see if we can sleep */
-		if (allowed_to_sleep && delta < ticks_per_sleep_unit * 3 / 2)
-		{
-			/* boost our priority and sleep for 1ms */
-			SetThreadPriority(current_thread, old_priority + 1);
-			Sleep(1);
-			SetThreadPriority(current_thread, old_priority);
-			slept = TRUE;
-		}
-
-		/* read the new value */
-		new_ticks = osd_ticks();
-		if (slept)
-			ticks_per_sleep_unit = (ticks_per_sleep_unit * 9 + (new_ticks - current_ticks)) / 10;
-		current_ticks = new_ticks;
-	}
-
-	return current_ticks;
-}
-
-
-//============================================================
-//  update_fps
-//============================================================
-
-static void update_fps(mame_time emutime)
-{
-	osd_ticks_t curr = osd_ticks();
-
-	// update stats for the FPS average calculation
-	if (fps_start_time == 0)
-	{
-		// start the timer going 1 second into the game
-		if (emutime.seconds > 1)
-			fps_start_time = osd_ticks();
-	}
-	else
-	{
-		fps_frames_displayed++;
-		if (fps_frames_displayed == video_config.framestorun)
-		{
-			mame_file_error filerr;
-			mame_file *fp;
-			char name[20];
-
-			// make a filename with an underscore prefix
-			sprintf(name, "_%.8s.png", Machine->gamedrv->name);
-
-			// write out the screenshot
-			filerr = mame_fopen(SEARCHPATH_SCREENSHOT, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
-			if (filerr == FILERR_NONE)
-			{
-				video_screen_save_snapshot(fp, 0);
-				mame_fclose(fp);
-			}
-			mame_schedule_exit(Machine);
-		}
-		fps_end_time = curr;
-	}
-}
-
-
-
-//============================================================
-//  update_autoframeskip
-//============================================================
-
-static void update_autoframeskip(void)
-{
-	// skip if paused
-	if (mame_is_paused(Machine))
-		return;
-
-	// don't adjust frameskip if we're paused or if the debugger was
-	// visible this cycle or if we haven't run yet
-	if (cpu_getcurrentframe() > 2 * FRAMESKIP_LEVELS)
-	{
-		const performance_info *performance = mame_get_performance_info();
-
-		// if we're too fast, attempt to increase the frameskip
-		if (performance->game_speed_percent >= 99.5)
-		{
-			frameskipadjust++;
-
-			// but only after 3 consecutive frames where we are too fast
-			if (frameskipadjust >= 3)
-			{
-				frameskipadjust = 0;
-				if (video_config.frameskip > 0) video_config.frameskip--;
-			}
-		}
-
-		// if we're too slow, attempt to increase the frameskip
-		else
-		{
-			// if below 80% speed, be more aggressive
-			if (performance->game_speed_percent < 80)
-				frameskipadjust -= (90 - performance->game_speed_percent) / 5;
-
-			// if we're close, only force it up to frameskip 8
-			else if (video_config.frameskip < 8)
-				frameskipadjust--;
-
-			// perform the adjustment
-			while (frameskipadjust <= -2)
-			{
-				frameskipadjust += 2;
-				if (video_config.frameskip < FRAMESKIP_LEVELS - 1)
-					video_config.frameskip++;
-			}
-		}
-	}
-}
-
-
-
-//============================================================
 //  check_osd_inputs
 //============================================================
 
 static void check_osd_inputs(void)
 {
-	// increment frameskip?
-	if (input_ui_pressed(IPT_UI_FRAMESKIP_INC))
-	{
-		// if autoframeskip, disable auto and go to 0
-		if (video_config.autoframeskip)
-		{
-			video_config.autoframeskip = 0;
-			video_config.frameskip = 0;
-		}
-
-		// wrap from maximum to auto
-		else if (video_config.frameskip == FRAMESKIP_LEVELS - 1)
-		{
-			video_config.frameskip = 0;
-			video_config.autoframeskip = 1;
-		}
-
-		// else just increment
-		else
-			video_config.frameskip++;
-
-		// display the FPS counter for 2 seconds
-		ui_show_fps_temp(2.0);
-
-		// reset the frame counter so we'll measure the average FPS on a consistent status
-		fps_frames_displayed = 0;
-	}
-
-	// decrement frameskip?
-	if (input_ui_pressed(IPT_UI_FRAMESKIP_DEC))
-	{
-		// if autoframeskip, disable auto and go to max
-		if (video_config.autoframeskip)
-		{
-			video_config.autoframeskip = 0;
-			video_config.frameskip = FRAMESKIP_LEVELS-1;
-		}
-
-		// wrap from 0 to auto
-		else if (video_config.frameskip == 0)
-			video_config.autoframeskip = 1;
-
-		// else just decrement
-		else
-			video_config.frameskip--;
-
-		// display the FPS counter for 2 seconds
-		ui_show_fps_temp(2.0);
-
-		// reset the frame counter so we'll measure the average FPS on a consistent status
-		fps_frames_displayed = 0;
-	}
-
-	// toggle throttle?
-	if (input_ui_pressed(IPT_UI_THROTTLE))
-	{
-		video_config.throttle = !video_config.throttle;
-
-		// reset the frame counter so we'll measure the average FPS on a consistent status
-		fps_frames_displayed = 0;
-	}
-
 	// check for toggling fullscreen mode
 	if (input_ui_pressed(IPT_OSD_1))
 		winwindow_toggle_full_screen();
@@ -922,11 +380,6 @@ static void check_osd_inputs(void)
 	if (input_ui_pressed(IPT_OSD_2))
 		win_toggle_menubar();
 #endif
-
-	// check for fast forward
-	video_config.fastforward = input_port_type_pressed(IPT_OSD_3, 0);
-	if (video_config.fastforward)
-		ui_show_fps_temp(0.5);
 }
 
 
@@ -938,15 +391,6 @@ static void check_osd_inputs(void)
 static void extract_video_config(void)
 {
 	const char *stemp;
-
-	// performance options: extract the data
-	video_config.autoframeskip = options_get_bool("autoframeskip");
-	video_config.frameskip     = options_get_int_range("frameskip", 0, FRAMESKIP_LEVELS);
-	video_config.throttle      = options_get_bool("throttle");
-	video_config.sleep         = options_get_bool("sleep");
-
-	// misc options: extract the data
-	video_config.framestorun   = options_get_int("frames_to_run");
 
 	// global options: extract the data
 	video_config.windowed      = options_get_bool("window");
@@ -986,8 +430,8 @@ static void extract_video_config(void)
 	else if (strcmp(stemp, "none") == 0)
 	{
 		video_config.mode = VIDEO_MODE_NONE;
-		if (video_config.framestorun == 0)
-			fprintf(stderr, "Warning: -video none doesn't make much sense without -frames_to_run\n");
+		if (options_get_int(OPTION_SECONDS_TO_RUN) == 0)
+			fprintf(stderr, "Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else
 	{

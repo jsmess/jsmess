@@ -263,7 +263,7 @@ static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 
-	return (input_port_0_r(0) & 0xf0) | ((cpu_getscanline() & 0xf0) >> 4);
+	return (input_port_0_r(0) & 0xf0) | ((video_screen_get_vpos(0) & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot2_coinage_dip_r )
@@ -1005,7 +1005,6 @@ static MACHINE_DRIVER_START( cosmic )
 	MDRV_CPU_ADD_TAG("main", Z80,10816000/6)	/* 1.802 MHz*/
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -1076,7 +1075,6 @@ static MACHINE_DRIVER_START( cosmicg )
 	MDRV_CPU_VBLANK_INT(cosmicg_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

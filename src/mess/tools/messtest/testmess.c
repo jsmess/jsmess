@@ -193,7 +193,7 @@ static void dump_screenshot(int write_file)
 						break;
 				}
 
-				video_screen_save_snapshot(fp, scrnum);
+				video_screen_save_snapshot(Machine, fp, scrnum);
 				report_message(MSG_INFO, "Saved screenshot as %s", buf);
 			}
 			else
@@ -947,7 +947,7 @@ static const struct command_procmap_entry commands[] =
 	{ MESSTEST_COMMAND_END,				command_end }
 };
 
-int osd_update(mame_time emutime)
+void osd_update(int skip_redraw)
 {
 	int i;
 	double time_limit;
@@ -960,14 +960,14 @@ int osd_update(mame_time emutime)
 	if (!seen_first_update)
 	{
 		seen_first_update = TRUE;
-		goto done;
+		return;
 	}
 
 	/* if we have already aborted or completed, our work is done */
 	if ((state == STATE_ABORTED) || (state == STATE_DONE))
 	{
 		mame_schedule_exit(Machine);
-		goto done;
+		return;
 	}
 
 	/* have we hit the time limit? */
@@ -978,7 +978,7 @@ int osd_update(mame_time emutime)
 	{
 		state = STATE_ABORTED;
 		report_message(MSG_FAILURE, "Time limit of %.2f seconds exceeded", time_limit);
-		goto done;
+		return;
 	}
 
 	/* update the runtime hash */
@@ -1015,9 +1015,6 @@ int osd_update(mame_time emutime)
 
 		current_command++;
 	}
-
-done:
-	return FALSE;
 }
 
 

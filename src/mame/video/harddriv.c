@@ -62,8 +62,6 @@ static int gfx_offsetscan;
 static INT8 gfx_finescroll;
 static UINT8 gfx_palettebank;
 
-static int last_rendered_scanline;
-
 
 
 /*************************************
@@ -216,14 +214,19 @@ void hdgsp_read_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 
 void hdgsp_display_update(UINT32 offs, int rowbytes, int scanline)
 {
-	if (scanline == 0) scanline--;
-	if (scanline <= 0 && last_rendered_scanline < Machine->screen[0].visarea.max_y)
-		video_screen_update_partial(0, Machine->screen[0].visarea.max_y);
-	else
-		video_screen_update_partial(0, scanline);
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+
 	gfx_offset = offs >> hdgsp_multisync;
-	gfx_offsetscan = scanline + 1;
 	gfx_rowbytes = rowbytes >> hdgsp_multisync;
+
+	if (scanline == Machine->screen[0].visarea.min_y)
+	{
+		gfx_offsetscan = scanline;
+	}
+	else
+	{
+		gfx_offsetscan = scanline + 1;
+	}
 }
 
 
@@ -238,7 +241,7 @@ static void update_palette_bank(int newbank)
 {
 	if (gfx_palettebank != newbank)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		gfx_palettebank = newbank;
 	}
 }
@@ -303,7 +306,7 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 			data = data & (15 >> hdgsp_multisync);
 			if (gfx_finescroll != data)
 			{
-				video_screen_update_partial(0, cpu_getscanline() - 1);
+				video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 				gfx_finescroll = data;
 			}
 			break;
@@ -461,20 +464,6 @@ WRITE16_HANDLER( hdgsp_paletteram_hi_w )
 
 /*************************************
  *
- *  End of frame routine
- *
- *************************************/
-
-VIDEO_EOF( harddriv )
-{
-	/* reset the display offset */
-	gfx_offsetscan = 0;
-}
-
-
-
-/*************************************
- *
  *  Core refresh routine
  *
  *************************************/
@@ -486,8 +475,6 @@ VIDEO_UPDATE( harddriv )
 	offs_t adjusted_offs;
 	int start, end, x, y;
 	int lzero, rzero, draw;
-
-	last_rendered_scanline = cliprect->max_y;
 
 	/* check for disabled video */
 	if (tms34010_io_display_blanked(1))
@@ -534,6 +521,11 @@ VIDEO_UPDATE( harddriv )
 			*dest++ = pens[hdgsp_vram[BYTE_XOR_LE(offset++) & vram_mask]];
 		for (x = 0; x < rzero; x++)
 			*dest++ = black;
+	}
+
+	if (cliprect->max_y == Machine->screen[0].visarea.max_y)
+	{
+		gfx_offsetscan = 0;
 	}
 
 	/* update the speedup counts */

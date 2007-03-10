@@ -52,7 +52,7 @@ static MACHINE_RESET( blstroid )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(blstroid_scanline_update, 8);
+	atarigen_scanline_timer_reset(0, blstroid_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -201,7 +201,6 @@ static MACHINE_DRIVER_START( blstroid )
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(blstroid)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -209,7 +208,8 @@ static MACHINE_DRIVER_START( blstroid )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*16, 30*8)
+	/* the vert size is copied from beathead.c.  Needs to be verified */
+	MDRV_SCREEN_SIZE(40*16, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*16-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(512)

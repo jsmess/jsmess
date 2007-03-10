@@ -369,7 +369,7 @@ int atarirle_init(int map, const struct atarirle_desc *desc)
 void atarirle_control_w(int map, UINT8 bits)
 {
 	struct atarirle_data *mo = &atarirle[map];
-	int scanline = cpu_getscanline();
+	int scanline = video_screen_get_vpos(0);
 	int oldbits = mo->control_bits;
 
 //logerror("atarirle_control_w(%d)\n", bits);

@@ -30,13 +30,13 @@ static void dragrace_frame_callback(int dummy)
 	}
 
 	/* watchdog is disabled during service mode */
-		watchdog_enable(readinputport(0) & 0x20);
+	watchdog_enable(readinputport(0) & 0x20);
 }
 
 
 static MACHINE_RESET( dragrace )
 {
-	timer_pulse(cpu_getscanlinetime(0), 0, dragrace_frame_callback);
+	mame_timer_pulse(video_screen_get_frame_period(0), 0, dragrace_frame_callback);
 }
 
 static void dragrace_update_misc_flags(void)
@@ -164,7 +164,7 @@ READ8_HANDLER( dragrace_steering_r )
 
 READ8_HANDLER( dragrace_scanline_r )
 {
-	return (cpu_getscanline() ^ 0xf0) | 0x0f;
+	return (video_screen_get_vpos(0) ^ 0xf0) | 0x0f;
 }
 
 
@@ -331,14 +331,13 @@ static MACHINE_DRIVER_START( dragrace )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 4)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int) ((22. * 1000000) / (262. * 60) + 0.5)))
 
 	MDRV_MACHINE_RESET(dragrace)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 240)
+	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_GFXDECODE(dragrace_gfx_decode_info)
 	MDRV_PALETTE_LENGTH(16)

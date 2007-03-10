@@ -167,7 +167,7 @@ if(keyboard_pressed(KEYCODE_F1))
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT16 scanline[576];                             // Was 577
-                asrc = &micro3d_sprite_vram[offset + (512 * y)];     // Correct - there are 1024 bytes per line
+                asrc = &micro3d_sprite_vram[offset + (512 * (y - Machine->screen[0].visarea.min_y))];     // Correct - there are 1024 bytes per line
 
 			for (x = 0; x < 576; x+=2)               //Number of pixels.
 			{

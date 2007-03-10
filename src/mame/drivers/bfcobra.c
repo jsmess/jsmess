@@ -1173,6 +1173,21 @@ ROM_START( qos )
 	ROM_LOAD( "95000341.rm3", 0x180000, 0x80000, CRC(ef13658d) SHA1(240bc589900214eac79c91a531f254a9ac2f4ef6) )
 ROM_END
 
+ROM_START( qosa )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "95740599.bin", 0x08000, 0x8000, CRC(bf1e321f) SHA1(51f18620f22ba2a1b110954284ddf00614d51a0e) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD( "snd1_218.ic7", 0x00000, 0x10000, CRC(061f496d) SHA1(653d16454d909c034191813b37d14010da7258c6) )
+	ROM_LOAD( "snd2_219.ic8", 0x10000, 0x10000, CRC(d7874a47) SHA1(5bbd4040c7c0299e8cc135e6c6cd05370b260e9b) )
+
+	ROM_REGION( 0x200000, REGION_USER1, 0 )
+	ROM_LOAD( "0306.bin", 0x000000, 0x80000, CRC(c26c8f83) SHA1(6949027e1fe241cbb2e1cbbce18e47bcb0d84550) )
+	ROM_LOAD( "1307.bin", 0x080000, 0x80000, CRC(94611c03) SHA1(81f545ff96ff3d44285315400da94d870c89f896) )
+	ROM_LOAD( "2308.bin", 0x100000, 0x80000, CRC(f5572726) SHA1(e109265c5571d21213a6f405a13459e7bc6699bc) )
+	ROM_LOAD( "3309.bin", 0x180000, 0x80000, CRC(1b5edfa8) SHA1(348488debd4aa52f064e351ed0c082274da1db2b) )
+ROM_END
+
 #if 0
 /* This dump is crap */
 ROM_START( qosb )
@@ -1239,7 +1254,8 @@ ROM_START( trebltop )
 ROM_END
 #endif
 
-GAME( 1992, qos, 0, bfcobra, qos, bfcobra, ROT0, "BFM", "A Question of Sport", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,  0,   bfcobra, qos, bfcobra, ROT0, "BFM", "A Question of Sport (39-960-099)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa, qos, bfcobra, qos, bfcobra, ROT0, "BFM", "A Question of Sport (39-960-089)", GAME_IMPERFECT_GRAPHICS )
 
 //GAME( 1992, qosb, qos, bfcobra, qos, bfcobra, ROT0, "BFM", "A Question of Sport Set 2", GAME_NOT_WORKING )
 //GAME( 1989, inquiztr, 0, bfcobra, inquiztr, bfcobra, ROT0, "BFM", "Inquizitor", GAME_NOT_WORKING )

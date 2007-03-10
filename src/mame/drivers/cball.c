@@ -68,13 +68,13 @@ static void interrupt_callback(int scanline)
 		scanline = 16;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( cball )
 {
-	timer_set(cpu_getscanlinetime(16), 16, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 16, 0), 16, interrupt_callback);
 }
 
 
@@ -212,7 +212,6 @@ static MACHINE_DRIVER_START( cball )
 	MDRV_CPU_PROGRAM_MAP(cpu_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(38 * 1000000 / 15750))
 	MDRV_MACHINE_RESET(cball)
 
 	/* video hardware */

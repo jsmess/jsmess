@@ -183,7 +183,7 @@ static void mw8080bw_interrupt_callback(int param)
 
 static void mw8080bw_create_interrupt_timer(void)
 {
-	interrupt_timer = timer_alloc(mw8080bw_interrupt_callback);
+	interrupt_timer = mame_timer_alloc(mw8080bw_interrupt_callback);
 }
 
 
@@ -261,8 +261,10 @@ static MACHINE_DRIVER_START( root )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART) \
+	MDRV_SCREEN_RAW_PARAMS(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART)
 	MDRV_VIDEO_UPDATE(mw8080bw)
 
 MACHINE_DRIVER_END
@@ -2054,8 +2056,8 @@ static void spcenctr_strobe_timer_callback(int param)
 static MACHINE_START( spcenctr )
 {
 	/* create timers */
-	spcenctr_strobe_on_timer = timer_alloc(spcenctr_strobe_timer_callback);
-	spcenctr_strobe_off_timer = timer_alloc(spcenctr_strobe_timer_callback);
+	spcenctr_strobe_on_timer = mame_timer_alloc(spcenctr_strobe_timer_callback);
+	spcenctr_strobe_off_timer = mame_timer_alloc(spcenctr_strobe_timer_callback);
 
 	/* setup for save states */
 	state_save_register_global(spcenctr_strobe_state);

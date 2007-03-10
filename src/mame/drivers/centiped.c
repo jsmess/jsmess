@@ -432,7 +432,6 @@ static UINT8 oldpos[4];
 static UINT8 sign[4];
 static UINT8 dsw_select, control_select;
 static UINT8 *rambase;
-static mame_timer *interrupt_timer;
 
 
 /*************************************
@@ -452,7 +451,7 @@ static void generate_interrupt(int scanline)
 	if (scanline >= 256)
 		scanline = 0;
 
-	timer_adjust(interrupt_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, generate_interrupt);
 }
 
 
@@ -467,8 +466,7 @@ static MACHINE_START( centiped )
 
 static MACHINE_RESET( centiped )
 {
-	interrupt_timer=timer_alloc(generate_interrupt);
-	timer_adjust(interrupt_timer,cpu_getscanlinetime(0), 0, 0);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, generate_interrupt);
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	dsw_select = 0;
 	control_select = 0;
@@ -1484,7 +1482,6 @@ static MACHINE_DRIVER_START( centiped )
 	MDRV_CPU_PROGRAM_MAP(centiped_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1460))
 
 	MDRV_MACHINE_START(centiped)
 	MDRV_MACHINE_RESET(centiped)
@@ -1607,7 +1604,6 @@ static MACHINE_DRIVER_START( bullsdrt )
 	MDRV_CPU_IO_MAP(bullsdrt_port_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1460))
 
 	MDRV_NVRAM_HANDLER(atari_vg)
 

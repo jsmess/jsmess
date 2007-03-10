@@ -1122,7 +1122,7 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 3:
-						sprintf(dummy, "beamy:%3d", cpu_getscanline());
+						sprintf(dummy, "beamy:%3d", video_screen_get_vpos(0));
 						break;
 
 					case MAX_REGS + 4:

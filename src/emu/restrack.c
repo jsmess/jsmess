@@ -198,7 +198,11 @@ void end_resource_tracking(void)
 
 static memory_pool *current_pool(void)
 {
-	return pools[resource_tracking_tag - 1];
+	memory_pool *pool;
+	assert_always((resource_tracking_tag > 0) && (resource_tracking_tag <= ARRAY_LENGTH(pools)), "Invalid resource_tracking_tag");
+	pool = pools[resource_tracking_tag - 1];
+	assert_always(pool != NULL, "current_pool() is NULL");
+	return pool;
 }
 
 

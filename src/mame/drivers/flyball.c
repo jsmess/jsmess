@@ -49,14 +49,14 @@ static void flyball_quarter_callback(int scanline)
 	{
 		if (potsense[i] != 0)
 		{
-			timer_set(cpu_getscanlinetime(scanline + i), potsense[i], flyball_joystick_callback);
+			mame_timer_set(video_screen_get_time_until_pos(0, scanline + i, 0), potsense[i], flyball_joystick_callback);
 		}
 	}
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, flyball_quarter_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, flyball_quarter_callback);
 
 	flyball_potsense = 0;
 	flyball_potmask = 0;
@@ -74,7 +74,7 @@ static MACHINE_RESET( flyball )
 	for (i = 0; i < 0x1000; i++)
 		rombase[i] = ROM[i ^ 0x1ff];
 
-	timer_set(cpu_getscanlinetime(0), 0, flyball_quarter_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, flyball_quarter_callback);
 }
 
 
@@ -87,7 +87,7 @@ READ8_HANDLER( flyball_input_r )
 
 READ8_HANDLER( flyball_scanline_r )
 {
-	return cpu_getscanline() & 0x3f;
+	return video_screen_get_vpos(0) & 0x3f;
 }
 
 READ8_HANDLER( flyball_potsense_r )
@@ -265,14 +265,13 @@ static MACHINE_DRIVER_START( flyball )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int) ((22. * 1000000) / (262. * 60) + 0.5)))
 
 	MDRV_MACHINE_RESET(flyball)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 240)
+	MDRV_SCREEN_SIZE(256, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_GFXDECODE(flyball_gfx_decode_info)
 	MDRV_PALETTE_LENGTH(4)

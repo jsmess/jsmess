@@ -707,7 +707,7 @@ void winwindow_video_window_update(win_window_info *window)
 		mtlog_add("winwindow_video_window_update: try lock");
 
 		// only block if we're throttled
-		if (video_config.throttle || timeGetTime() - last_update_time > 250)
+		if (video_get_throttle() || timeGetTime() - last_update_time > 250)
 			osd_lock_acquire(window->render_lock);
 		else
 			got_lock = osd_lock_try(window->render_lock);

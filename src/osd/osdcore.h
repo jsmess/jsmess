@@ -28,6 +28,11 @@
     FILE I/O INTERFACES
 ***************************************************************************/
 
+/* Make sure we have a path separator (default to /) */
+#ifndef PATH_SEPARATOR
+#define PATH_SEPARATOR			"/"
+#endif
+
 /* flags controlling file access */
 #define OPEN_FLAG_READ			0x0001		/* open for read */
 #define OPEN_FLAG_WRITE			0x0002		/* open for write */
@@ -389,6 +394,31 @@ osd_ticks_t osd_ticks_per_second(void);
         On x86 system, this generally maps to an RDTSC instruction.
 -----------------------------------------------------------------------------*/
 osd_ticks_t osd_profiling_ticks(void);
+
+
+/*-----------------------------------------------------------------------------
+    osd_sleep: sleep for the specified time interval
+
+    Parameters:
+
+        duration - an osd_ticks_t value that specifies how long we should
+            sleep
+
+    Return value:
+
+        None
+
+    Notes:
+
+        The OSD layer should try to sleep for as close to the specified
+        duration as possible, or less. This is used as a mechanism to
+        "give back" unneeded time to other programs running in the system.
+        On a simple, non multitasking system, this routine can be a no-op.
+        If there is significant volatility in the amount of time that the
+        sleep occurs for, the OSD layer should strive to sleep for less time
+        than specified rather than sleeping too long.
+-----------------------------------------------------------------------------*/
+void osd_sleep(osd_ticks_t duration);
 
 
 

@@ -194,15 +194,15 @@ static READ8_HANDLER( sprint2_sync_r )
 	{
 		val |= 0x10;
 	}
-	if (cpu_getscanline() == 261)
+	if (video_screen_get_vpos(0) == 261)
 	{
 		val |= 0x20; /* VRESET */
 	}
-	if (cpu_getscanline() >= 224)
+	if (video_screen_get_vpos(0) >= 224)
 	{
 		val |= 0x40; /* VBLANK */
 	}
-	if (cpu_getscanline() >= 131)
+	if (video_screen_get_vpos(0) >= 131)
 	{
 		val |= 0x80; /* 60 Hz? */
 	}
@@ -539,7 +539,6 @@ static MACHINE_DRIVER_START( sprint2 )
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(38 * 1000000 / 15750))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

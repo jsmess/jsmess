@@ -150,7 +150,7 @@ static MACHINE_RESET( badlands )
 
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(scanline_update, 32);
+	atarigen_scanline_timer_reset(0, scanline_update, 32);
 
 	atarigen_sound_io_reset(1);
 	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
@@ -448,7 +448,6 @@ static MACHINE_DRIVER_START( badlands )
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(badlands)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -456,7 +455,8 @@ static MACHINE_DRIVER_START( badlands )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 30*8)
+	/* the vert size is copied from beathead.c.  Needs to be verified */
+	MDRV_SCREEN_SIZE(42*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)

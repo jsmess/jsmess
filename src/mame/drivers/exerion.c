@@ -32,17 +32,6 @@ static READ8_HANDLER( exerion_port01_r )
 }
 
 
-static READ8_HANDLER( exerion_port3_r )
-{
-	/* bit 0 is VBLANK, which we simulate manually */
-	int result = input_port_3_r(offset);
-	int ybeam = cpu_getscanline();
-	if (ybeam > Machine->screen[0].visarea.max_y)
-		result |= 1;
-	return result;
-}
-
-
 static INTERRUPT_GEN( exerion_interrupt )
 {
 	/* Exerion triggers NMIs on coin insertion */
@@ -105,7 +94,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8bff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_port01_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_2_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(exerion_port3_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_3_r)
 	AM_RANGE(0xd802, 0xd802) AM_READ(AY8910_read_port_1_r)
 ADDRESS_MAP_END
 
@@ -199,7 +188,7 @@ INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START_TAG("DSW1")      /* dip switches/VBLANK (0xb000) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )		/* VBLANK */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -307,20 +296,17 @@ static struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( exerion )
 
-	MDRV_CPU_ADD(Z80, 10000000/3)
+	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(exerion_interrupt,1)
 
-	MDRV_CPU_ADD(Z80, 10000000/3)
+	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cpu2_readmem,cpu2_writemem)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(12*8, 52*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(256*3)
@@ -332,10 +318,10 @@ static MACHINE_DRIVER_START( exerion )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 10000000/6)
+	MDRV_SOUND_ADD(AY8910, EXERION_AY8910_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 10000000/6)
+	MDRV_SOUND_ADD(AY8910, EXERION_AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

@@ -961,13 +961,15 @@ INPUT_PORTS_END
 static struct CCPUConfig config_nojmi =
 {
 	joystick_read,
-	cinemat_vector_callback
+	cinemat_vector_callback,
+	0
 };
 
 static struct CCPUConfig config_jmi =
 {
 	NULL,
-	cinemat_vector_callback
+	cinemat_vector_callback,
+	0
 };
 
 
@@ -989,6 +991,7 @@ static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 	MDRV_CPU_VBLANK_INT(check_coins,1)
 
 	MDRV_SCREEN_REFRESH_RATE(38)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_MACHINE_START(cinemat)
 	MDRV_MACHINE_RESET(cinemat)
 

@@ -92,12 +92,12 @@ static void periodic_callback(int scanline)
 
 	scanline += 32;
 
-	if (scanline > 256)
+	if (scanline > 262)
 	{
 		scanline = 0;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, periodic_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, periodic_callback);
 }
 
 
@@ -221,7 +221,7 @@ static void write_output(UINT8 flags)
 
 static MACHINE_RESET( firetrk )
 {
-	timer_pulse(1. / 60, 0, frame_callback);
+	mame_timer_pulse(video_screen_get_frame_period(0), 0, frame_callback);
 
 	if (GAME_IS_MONTECARLO)
 	{
@@ -236,7 +236,7 @@ static MACHINE_RESET( firetrk )
 		set_firetrk_service(last_service);
 	}
 
-	timer_set(0, 0, periodic_callback);
+	mame_timer_set(time_zero, 0, periodic_callback);
 }
 
 
@@ -1067,14 +1067,13 @@ static MACHINE_DRIVER_START( firetrk )
 	MDRV_WATCHDOG_VBLANK_INIT(5)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int) ((22. * 1000000) / (262. * 60) + 0.5)))
 
 	MDRV_MACHINE_RESET(firetrk)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 240)
+	MDRV_SCREEN_SIZE(320, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MDRV_GFXDECODE(firetrk_gfxdecodeinfo)
 

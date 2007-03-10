@@ -40,13 +40,13 @@ static void interrupt_callback(int scanline)
 		scanline = 16;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( runaway )
 {
-	timer_set(cpu_getscanlinetime(16), 16, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 16, 0), 16, interrupt_callback);
 }
 
 
@@ -361,7 +361,6 @@ static MACHINE_DRIVER_START( runaway )
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(23. * 1000000 / 15750))
 
 	MDRV_MACHINE_RESET(runaway)
 	MDRV_NVRAM_HANDLER(atari_vg)
@@ -369,7 +368,7 @@ static MACHINE_DRIVER_START( runaway )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 240)
+	MDRV_SCREEN_SIZE(256, 263)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_GFXDECODE(runaway_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(16)

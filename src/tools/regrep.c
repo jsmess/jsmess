@@ -144,7 +144,7 @@ static const char *status_color[] =
 static int read_summary_log(const char *filename, int index);
 static summary_file *parse_driver_tag(char *linestart, int index);
 static summary_file *get_file(const char *filename);
-static int __cdecl compare_file(const void *file0ptr, const void *file1ptr);
+static int CLIB_DECL compare_file(const void *file0ptr, const void *file1ptr);
 static summary_file *sort_file_list(void);
 
 /* HTML helpers */
@@ -179,7 +179,7 @@ INLINE const char *alloc_filename(const char *dirname, const char *remainder)
 	result = malloc(count);
 	if (result == NULL)
 		return NULL;
-	sprintf(result, "%s\\%s", dirname, remainder);
+	sprintf(result, "%s" PATH_SEPARATOR "%s", dirname, remainder);
 	return result;
 }
 
@@ -476,7 +476,7 @@ static summary_file *parse_driver_tag(char *linestart, int index)
     first by source filename, then by driver name
 -------------------------------------------------*/
 
-static int __cdecl compare_file(const void *file0ptr, const void *file1ptr)
+static int CLIB_DECL compare_file(const void *file0ptr, const void *file1ptr)
 {
 	summary_file *file0 = *(summary_file **)file0ptr;
 	summary_file *file1 = *(summary_file **)file1ptr;
@@ -805,12 +805,26 @@ static int compare_screenshots(summary_file *curfile)
 			core_file *file;
 
 			/* get the filename for the image */
-			sprintf(imgname, "snap\\_%s.png", curfile->name);
+			sprintf(imgname, "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
 			fullname = alloc_filename(lists[listnum].dir, imgname);
 
 			/* open the file */
 			filerr = core_fopen(fullname, OPEN_FLAG_READ, &file);
 			free((void *)fullname);
+
+			/* if that failed, look in the old location */
+			if (filerr != FILERR_NONE)
+			{
+				/* get the filename for the image */
+				sprintf(imgname, "snap" PATH_SEPARATOR "_%s.png", curfile->name);
+				fullname = alloc_filename(lists[listnum].dir, imgname);
+
+				/* open the file */
+				filerr = core_fopen(fullname, OPEN_FLAG_READ, &file);
+				free((void *)fullname);
+			}
+
+			/* if that worked, load the file */
 			if (filerr == FILERR_NONE)
 			{
 				png_error pngerr;
@@ -1026,7 +1040,7 @@ static void create_linked_file(const char *dirname, const summary_file *curfile,
 		int has_image = FALSE;
 
 		/* create a name for the image */
-		sprintf(srcimgname, "snap\\_%s.png", curfile->name);
+		sprintf(srcimgname, "snap%s%s%sfinal.png", PATH_SEPARATOR, curfile->name, PATH_SEPARATOR);
 		sprintf(dstimgname, "ss_%s_%s.png", curfile->name, lists[i].version);
 
 		/* copy the file */
@@ -1034,6 +1048,12 @@ static void create_linked_file(const char *dirname, const summary_file *curfile,
 		{
 			int result = generate_png_diff(lists[curfile->basebitmap].dir, lists[i].dir, srcimgname, dirname, dstimgname);
 			has_image = (result == 0);
+			if (!has_image)
+			{
+				sprintf(srcimgname, "snap%s_%s.png", PATH_SEPARATOR, curfile->name);
+				result = generate_png_diff(lists[curfile->basebitmap].dir, lists[i].dir, srcimgname, dirname, dstimgname);
+				has_image = (result == 0);
+			}
 		}
 
 		/* generate the HTML */

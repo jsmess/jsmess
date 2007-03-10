@@ -132,13 +132,13 @@ void data_from_i8031(int data)
 WRITE16_HANDLER( micro3d_34010_io_register_w )
 {
 	if (offset == REG_DPYADR || offset == REG_DPYTAP)
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 	tms34010_io_register_w(offset, data, mem_mask);
 
 	if (offset == REG_DPYADR)
 	{
 		dpyadr = ~data & 0xfffc;
-		dpyadrscan = cpu_getscanline() + 1;
+		dpyadrscan = video_screen_get_vpos(0) + 1;
 	}
 }
 
@@ -401,26 +401,26 @@ void micro3d_vblank(void)
 
 static void timera_int(int param)
 {
-//      timer_set(TIME_IN_SEC(((m68901_base[0xf]>>8) & 0xff)* 200/M68901_CLK),0,timera_int);     // Set the timer again.
-        timer_set(TIME_IN_USEC(1000),0,timera_int);     // Set the timer again.
+//      mame_timer_set(double_to_mame_time(TIME_IN_SEC(((m68901_base[0xf]>>8) & 0xff)* 200/M68901_CLK)),0,timera_int);     // Set the timer again.
+        mame_timer_set(MAME_TIME_IN_USEC(1000),0,timera_int);     // Set the timer again.
         m68901_int_gen(TMRA);           // Fire an interrupt.
 }
 
 static void timerb_int(int param)
 {
-        timer_set(TIME_IN_SEC(((m68901_base[0x10]>>8) & 0xff) * 200/M68901_CLK),0,timerb_int);
+        mame_timer_set(double_to_mame_time(TIME_IN_SEC(((m68901_base[0x10]>>8) & 0xff) * 200/M68901_CLK)),0,timerb_int);
         m68901_int_gen(TMRB);           // Fire an interrupt.
 }
 
 static void timerc_int(int param)
 {
-        timer_set(TIME_IN_SEC(((m68901_base[0x11]>>8) & 0xff)* 200/M68901_CLK),0,timerc_int);
+        mame_timer_set(double_to_mame_time(TIME_IN_SEC(((m68901_base[0x11]>>8) & 0xff)* 200/M68901_CLK)),0,timerc_int);
         m68901_int_gen(TMRC);           // Fire an interrupt.
 }
 
 static void timerd_int(int param)
 {
-        timer_set(TIME_IN_USEC(250),0,timerd_int);
+        mame_timer_set(MAME_TIME_IN_USEC(250),0,timerd_int);
         m68901_int_gen(TMRD);           // Fire an interrupt.
 }
 
@@ -467,19 +467,19 @@ switch(offset)
                       break;
 
         case 0x0f:    mame_printf_debug("Timer A Data:%4x\n",value);                                                       // Timer A Data Register
-                     timer_set(TIME_IN_USEC(1000),0,timera_int);
+                     mame_timer_set(MAME_TIME_IN_USEC(1000),0,timera_int);
                       break;
 
         case 0x10:    mame_printf_debug("Timer B Data:%4x\n",value);                                                           // Timer B Data Register
-//                    timer_set(TIME_IN_SEC(value * 200/M68901_CLK),0,timerb_int);
+//                    mame_timer_set(double_to_mame_time(TIME_IN_SEC(value * 200/M68901_CLK)),0,timerb_int);
                       break;
 
         case 0x11:    mame_printf_debug("Timer C Data:%4x\n",value);                                                        // Timer C Data Register
-//                      timer_set(TIME_IN_SEC(value * 200/M68901_CLK),0,timerc_int);
+//                      mame_timer_set(double_to_mame_time(TIME_IN_SEC(value * 200/M68901_CLK)),0,timerc_int);
                       break;
 
         case 0x12:    mame_printf_debug("Timer D Data:%4x\n",value);
-                      timer_set(TIME_IN_USEC(500),0,timerd_int);                 // Timer D Data Register
+                      mame_timer_set(MAME_TIME_IN_USEC(500),0,timerd_int);                 // Timer D Data Register
                       break;
 
 }
@@ -863,14 +863,13 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_CPU_IO_MAP(soundmem_io,0)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_MACHINE_RESET(micro3d)
 	MDRV_INTERLEAVE(50)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 575, 0, 399)
+	MDRV_SCREEN_SIZE(640, 433)
+	MDRV_SCREEN_VISIBLE_AREA(0, 575, 33, 432)
 
 	MDRV_PALETTE_LENGTH(32768)
 

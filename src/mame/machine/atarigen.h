@@ -99,7 +99,7 @@ extern struct atarivc_state_desc atarivc_state;
 void atarigen_interrupt_reset(atarigen_int_callback update_int);
 void atarigen_update_interrupts(void);
 
-void atarigen_scanline_int_set(int scanline);
+void atarigen_scanline_int_set(int scrnum, int scanline);
 INTERRUPT_GEN( atarigen_scanline_int_gen );
 WRITE16_HANDLER( atarigen_scanline_int_ack_w );
 WRITE32_HANDLER( atarigen_scanline_int_ack32_w );
@@ -183,8 +183,7 @@ void atarigen_set_oki6295_vol(int volume);
     VIDEO CONTROLLER
 ---------------------------------------------------------------*/
 
-void atarivc_reset(UINT16 *eof_data, int playfields);
-void atarivc_update(const UINT16 *data);
+void atarivc_reset(int scrnum, UINT16 *eof_data, int playfields);
 
 WRITE16_HANDLER( atarivc_w );
 READ16_HANDLER( atarivc_r );
@@ -220,7 +219,7 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
     VIDEO HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(atarigen_scanline_callback update_graphics, int frequency);
+void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update_graphics, int frequency);
 int atarigen_get_hblank(int scrnum);
 WRITE16_HANDLER( atarigen_halt_until_hblank_0_w );
 WRITE16_HANDLER( atarigen_666_paletteram_w );

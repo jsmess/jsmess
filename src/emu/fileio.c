@@ -160,6 +160,43 @@ mame_file_error mame_fopen_crc(const char *searchpath, const char *filename, UIN
 
 
 /*-------------------------------------------------
+    mame_fopen_ram - open a "file" which is
+    actually just an array of data in RAM
+-------------------------------------------------*/
+
+mame_file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mame_file **file)
+{
+	mame_file_error filerr;
+
+	/* allocate the file itself */
+	*file = malloc(sizeof(**file));
+	if (*file == NULL)
+		return FILERR_OUT_OF_MEMORY;
+
+	/* reset the file handle */
+	memset(*file, 0, sizeof(**file));
+	(*file)->openflags = openflags;
+#ifdef DEBUG_COOKIE
+	(*file)->debug_cookie = DEBUG_COOKIE;
+#endif
+
+	/* attempt to open the file directly */
+	filerr = core_fopen_ram(data, length, openflags, &(*file)->file);
+	if (filerr == FILERR_NONE)
+		goto error;
+
+	/* handle errors and return */
+error:
+	if (filerr != FILERR_NONE)
+	{
+		mame_fclose(*file);
+		*file = NULL;
+	}
+	return filerr;
+}
+
+
+/*-------------------------------------------------
     fopen_internal - open a file
 -------------------------------------------------*/
 

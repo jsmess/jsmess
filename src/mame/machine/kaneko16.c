@@ -125,7 +125,9 @@ WRITE16_HANDLER(bloodwar_calc_w)
 		case 0x30/2: hit.y2p = data; break;
 		case 0x32/2: hit.y2s = data; break;
 
-		case 0x38/2: memset(&hit, 0, sizeof(hit)); break;	// clear registers??? results AND inputs ???
+		// this register is set to zero before any computation,
+		// but it has no effect on inputs or result registers
+		case 0x38/2: break;
 
 		default:
 			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",activecpu_get_pc(),offset<<1);
@@ -583,8 +585,6 @@ void bloodwar_mcu_run(void)
 	UINT16 mcu_offset	=	mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	mcu_ram[0x0014/2];
 
-	logerror("CPU #0 (PC=%06X) : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
-
 	switch (mcu_command >> 8)
 	{
 		case 0x02:	// Read from NVRAM
@@ -595,8 +595,7 @@ void bloodwar_mcu_run(void)
 				mame_fread(f,&mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			else
-				memcpy(&mcu_ram[mcu_offset],memory_region(REGION_USER1),128);
+			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -608,20 +607,24 @@ void bloodwar_mcu_run(void)
 				mame_fwrite(f,&mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
+			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			mcu_ram[mcu_offset] = readinputport(4);
+			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+
 			switch(mcu_data)
 			{
-				// unknown data
+				// unknown purpose data
 				case 0x01: MCU_RESPONSE(bloodwar_mcu_4_01); break; // Warrior 1
 				case 0x02: MCU_RESPONSE(bloodwar_mcu_4_02); break; // Warrior 2
 				case 0x03: MCU_RESPONSE(bloodwar_mcu_4_03); break; // Warrior 3
@@ -675,13 +678,13 @@ void bloodwar_mcu_run(void)
 				case 0x2d: MCU_RESPONSE(bloodwar_mcu_4_2d); break; // Warrior 9
 
 				default:
-					logerror("UNKNOWN PARAMETER %02X TO COMMAND 4\n",mcu_data);
+					logerror(" (UNKNOWN PARAMETER %02X)\n", mcu_data);
 			}
 		}
 		break;
 
 		default:
-			logerror("UNKNOWN COMMAND\n");
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }

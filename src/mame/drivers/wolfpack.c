@@ -39,13 +39,13 @@ static void periodic_callback(int scanline)
 		scanline = 0;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, periodic_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, periodic_callback);
 }
 
 
 static MACHINE_RESET( wolfpack )
 {
-	timer_set(cpu_getscanlinetime(0), 0, periodic_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, periodic_callback);
 }
 
 
@@ -113,7 +113,7 @@ static READ8_HANDLER( wolfpack_misc_r )
 	{
 		val |= 0x10;
 	}
-	if (cpu_getscanline() >= 240)
+	if (video_screen_get_vpos(0) >= 240)
 	{
 		val |= 0x80;
 	}

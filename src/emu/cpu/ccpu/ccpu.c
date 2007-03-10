@@ -35,6 +35,7 @@ typedef struct
 
 	UINT8	(*external_input)(void);
 	void	(*vector_callback)(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
+	UINT8	scrnum;
 } ccpuRegs;
 
 
@@ -138,6 +139,7 @@ static void ccpu_init(int index, int clock, const void *_config, int (*irqcallba
 	state_save_register_item("ccpu", clock, ccpu.X);
 	state_save_register_item("ccpu", clock, ccpu.Y);
 	state_save_register_item("ccpu", clock, ccpu.T);
+	state_save_register_item("ccpu", clock, ccpu.scrnum);
 }
 
 
@@ -542,7 +544,19 @@ static int ccpu_execute(int cycles)
 			/* FRM */
 			case 0xe5:
 			case 0xf5:
-				cpu_spinuntil_time(cpu_getscanlinetime(0));
+/* FIXME: once vector game video system configuration is fixed,
+   remove section in brackets and uncomment line below.
+   Speed Freak should run nice and smooth, with no flickering. */
+{
+	mame_time scantime, abstime;
+	extern mame_timer *refresh_timer;
+	scantime = mame_timer_starttime(refresh_timer);
+	abstime = mame_timer_get_time();
+	while (compare_mame_times(abstime, scantime) >= 0)
+		scantime = add_mame_times(scantime, video_screen_get_frame_period(ccpu.scrnum));
+	cpu_spinuntil_time(mame_time_to_double(sub_mame_times(scantime, abstime)));
+}
+/*              cpu_spinuntil_time(mame_time_to_double(video_screen_get_time_until_pos(ccpu.scrnum, Machine->screen[ccpu.scrnum].visarea.max_y + 1, 0))); */
 				NEXT_ACC_A(); CYCLES(1);
 				break;
 

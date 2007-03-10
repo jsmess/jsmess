@@ -1199,14 +1199,10 @@ static void setup_joystick_menu(HMENU menu_bar)
 
 
 //============================================================
-//	is_throttled
 //	is_windowed
-//	set_throttle
 //============================================================
 
-static int is_throttled(void)	{ return video_config.throttle; }
 static int is_windowed(void)	{ return video_config.windowed; }
-static void set_throttle(int t)	{ video_config.throttle = t; }
 
 
 
@@ -1250,7 +1246,7 @@ static void prepare_menus(HWND wnd)
 		joystick_menu_setup = 1;
 	}
 
-	frameskip = winvideo_get_frameskip();
+	frameskip = video_get_frameskip();
 
 	orientation = render_target_get_orientation(window->target);
 
@@ -1274,7 +1270,7 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_EDIT_PASTE,				inputx_can_post()							? MFS_ENABLED : MFS_GRAYED);
 
 	set_command_state(menu_bar, ID_OPTIONS_PAUSE,			winwindow_ui_is_paused()					? MFS_CHECKED : MFS_ENABLED);
-	set_command_state(menu_bar, ID_OPTIONS_THROTTLE,		is_throttled()								? MFS_CHECKED : MFS_ENABLED);
+	set_command_state(menu_bar, ID_OPTIONS_THROTTLE,		video_get_throttle()								? MFS_CHECKED : MFS_ENABLED);
 	set_command_state(menu_bar, ID_OPTIONS_CONFIGURATION,	has_config									? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_DIPSWITCHES,		has_dipswitch								? MFS_ENABLED : MFS_GRAYED);
 	set_command_state(menu_bar, ID_OPTIONS_MISCINPUT,		has_misc									? MFS_ENABLED : MFS_GRAYED);
@@ -1659,7 +1655,7 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_FILE_SAVESCREENSHOT:
-			video_save_active_screen_snapshots();
+			video_save_active_screen_snapshots(Machine);
 			break;
 
 		case ID_FILE_EXIT:
@@ -1711,7 +1707,7 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_OPTIONS_THROTTLE:
-			set_throttle(!is_throttled());
+			video_set_throttle(!video_get_throttle());
 			break;
 
 #if HAS_PROFILER
@@ -1766,7 +1762,7 @@ static int invoke_command(HWND wnd, UINT command)
 #endif
 
 		case ID_FRAMESKIP_AUTO:
-			winvideo_set_frameskip(-1);
+			video_set_frameskip(-1);
 			break;
 
 		case ID_HELP_ABOUT:
@@ -1787,7 +1783,7 @@ static int invoke_command(HWND wnd, UINT command)
 			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + FRAMESKIP_LEVELS))
 			{
 				// change frameskip
-				winvideo_set_frameskip(command - ID_FRAMESKIP_0);
+				video_set_frameskip(command - ID_FRAMESKIP_0);
 			}
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (MAX_DEV_INSTANCES*IO_COUNT*DEVOPTION_MAX)))
 			{

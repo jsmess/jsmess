@@ -7,10 +7,8 @@
 #include "driver.h"
 #include "exerion.h"
 
-//#define DEBUG_SPRITES
 
 #define BACKGROUND_X_START		32
-#define BACKGROUND_X_START_FLIP	72
 
 #define VISIBLE_X_MIN			(12*8)
 #define VISIBLE_X_MAX			(52*8)
@@ -18,19 +16,13 @@
 #define VISIBLE_Y_MAX			(30*8)
 
 
-#ifdef DEBUG_SPRITES
-FILE	*sprite_log;
-#endif
-
 UINT8 exerion_cocktail_flip;
 
 static UINT8 char_palette, sprite_palette;
 static UINT8 char_bank;
 
-static UINT8 *background_latches;
 static UINT16 *background_gfx[4];
-static UINT8 current_latches[16];
-static int last_scanline_update;
+static UINT8 background_latches[13];
 
 static UINT8 *background_mixer;
 
@@ -114,15 +106,8 @@ VIDEO_START( exerion )
 	UINT8 *src;
 	int i, x, y;
 
-#ifdef DEBUG_SPRITES
-	sprite_log = fopen ("sprite.log","w");
-#endif
-
 	/* get pointers to the mixing and lookup PROMs */
 	background_mixer = memory_region(REGION_PROMS) + 0x320;
-
-	/* allocate memory to track the background latches */
-	background_latches = auto_malloc(Machine->screen[0].height * 16);
 
 	/* allocate memory for the decoded background graphics */
 	background_gfx[0] = auto_malloc(2 * 256 * 256 * 4);
@@ -191,7 +176,7 @@ VIDEO_START( exerion )
 
 WRITE8_HANDLER( exerion_videoreg_w )
 {
-	/* bit 0 = flip screen and joystick input multiplexor */
+	/* bit 0 = flip screen and joystick input multiplexer */
 	exerion_cocktail_flip = data & 1;
 
 	/* bits 1-2 char lookup table bank */
@@ -209,39 +194,26 @@ WRITE8_HANDLER( exerion_videoreg_w )
 
 WRITE8_HANDLER( exerion_video_latch_w )
 {
-	int ybeam = cpu_getscanline();
+	background_latches[offset] = data;
 
-	if (ybeam >= Machine->screen[0].height)
-		ybeam = Machine->screen[0].height - 1;
-
-	/* copy data up to and including the current scanline */
-	while (ybeam != last_scanline_update)
-	{
-		last_scanline_update = (last_scanline_update + 1) % Machine->screen[0].height;
-		memcpy(&background_latches[last_scanline_update * 16], current_latches, 16);
-	}
-
-	/* modify data on the current scanline */
-	if (offset != -1)
-		current_latches[offset] = data;
+	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 }
 
 
 READ8_HANDLER( exerion_video_timing_r )
 {
+	/* bit 0 is the SNMI signal, which is the negated value of H6, if H7=1 & H8=1 & VBLANK=0, otherwise 1 */
 	/* bit 1 is VBLANK */
-	/* bit 0 is the SNMI signal, which is low for H >= 0x1c0 and /VBLANK */
 
-	int xbeam = video_screen_get_hpos(0);
-	int ybeam = cpu_getscanline();
-	UINT8 result = 0;
+	UINT16 hcounter = video_screen_get_hpos(0) + EXERION_HCOUNT_START;
+	UINT8 snmi = 1;
 
-	if (ybeam >= VISIBLE_Y_MAX)
-		result |= 2;
-	if (xbeam < 0x1c0 && ybeam < VISIBLE_Y_MAX)
-		result |= 1;
+	if (((hcounter & 0x180) == 0x180) && !video_screen_get_vblank(0))
+	{
+		snmi = !((hcounter >> 6) & 0x01);
+	}
 
-	return result;
+	return (video_screen_get_vblank(0) << 1) | snmi;
 }
 
 
@@ -253,29 +225,28 @@ READ8_HANDLER( exerion_video_timing_r )
 
 static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	UINT8 *latches = &background_latches[cliprect->min_y * 16];
 	int x, y;
 
 	/* loop over all visible scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++, latches += 16)
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *src0 = &background_gfx[0][latches[1] * 256];
-		UINT16 *src1 = &background_gfx[1][latches[3] * 256];
-		UINT16 *src2 = &background_gfx[2][latches[5] * 256];
-		UINT16 *src3 = &background_gfx[3][latches[7] * 256];
-		int xoffs0 = latches[0];
-		int xoffs1 = latches[2];
-		int xoffs2 = latches[4];
-		int xoffs3 = latches[6];
-		int start0 = latches[8] & 0x0f;
-		int start1 = latches[9] & 0x0f;
-		int start2 = latches[10] & 0x0f;
-		int start3 = latches[11] & 0x0f;
-		int stop0 = latches[8] >> 4;
-		int stop1 = latches[9] >> 4;
-		int stop2 = latches[10] >> 4;
-		int stop3 = latches[11] >> 4;
-		UINT8 *mixer = &background_mixer[(latches[12] << 4) & 0xf0];
+		UINT16 *src0 = &background_gfx[0][background_latches[1] * 256];
+		UINT16 *src1 = &background_gfx[1][background_latches[3] * 256];
+		UINT16 *src2 = &background_gfx[2][background_latches[5] * 256];
+		UINT16 *src3 = &background_gfx[3][background_latches[7] * 256];
+		int xoffs0 = background_latches[0];
+		int xoffs1 = background_latches[2];
+		int xoffs2 = background_latches[4];
+		int xoffs3 = background_latches[6];
+		int start0 = background_latches[8] & 0x0f;
+		int start1 = background_latches[9] & 0x0f;
+		int start2 = background_latches[10] & 0x0f;
+		int start3 = background_latches[11] & 0x0f;
+		int stop0 = background_latches[8] >> 4;
+		int stop1 = background_latches[9] >> 4;
+		int stop2 = background_latches[10] >> 4;
+		int stop3 = background_latches[11] >> 4;
+		UINT8 *mixer = &background_mixer[(background_latches[12] << 4) & 0xf0];
 		UINT8 scanline[VISIBLE_X_MAX];
 		pen_t *pens;
 
@@ -356,7 +327,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 
 		/* draw the scanline */
-		pens = &Machine->remapped_colortable[0x200 + (latches[12] >> 4) * 16];
+		pens = &Machine->remapped_colortable[0x200 + (background_latches[12] >> 4) * 16];
 		draw_scanline8(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], pens, -1);
 	}
 }
@@ -372,26 +343,8 @@ VIDEO_UPDATE( exerion )
 {
 	int sx, sy, offs, i;
 
-	/* finish updating the scanlines */
-	exerion_video_latch_w(-1, 0);
-
 	/* draw background */
 	draw_background(bitmap, cliprect);
-
-#ifdef DEBUG_SPRITES
-	if (sprite_log)
-	{
-		int i;
-
-		for (i = 0; i < spriteram_size; i+= 4)
-		{
-			if (spriteram[i+2] == 0x02)
-			{
-				fprintf (sprite_log, "%02x %02x %02x %02x\n",spriteram[i], spriteram[i+1], spriteram[i+2], spriteram[i+3]);
-			}
-		}
-	}
-#endif
 
 	/* draw sprites */
 	for (i = 0; i < spriteram_size; i += 4)

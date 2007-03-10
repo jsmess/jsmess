@@ -32,11 +32,6 @@ mame_bitmap *osd_override_snapshot(mame_bitmap *bitmap, rectangle *bounds)
 	return NULL;
 }
 
-const char *osd_get_fps_text(const performance_info *performance)
-{
-	return NULL;
-}
-
 void osd_set_mastervolume(int attenuation)
 {
 }

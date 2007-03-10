@@ -152,7 +152,7 @@ VIDEO_START( atarig42 )
 
 WRITE16_HANDLER( atarig42_mo_control_w )
 {
-	logerror("MOCONT = %d (scan = %d)\n", data, cpu_getscanline());
+	logerror("MOCONT = %d (scan = %d)\n", data, video_screen_get_vpos(0));
 
 	/* set the control value */
 	COMBINE_DATA(&current_control);

@@ -233,7 +233,7 @@ static MACHINE_RESET( atarisy2 )
 	slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_sound_io_reset(1);
-	atarigen_scanline_timer_reset(scanline_update, 64);
+	atarigen_scanline_timer_reset(0, scanline_update, 64);
 	memory_set_opbase_handler(0, atarisy2_opbase_handler);
 
 	tms5220_data_strobe = 1;
@@ -285,7 +285,7 @@ static void delayed_int_enable_w(int data)
 static WRITE16_HANDLER( int_enable_w )
 {
 	if (offset == 0 && ACCESSING_LSB)
-		timer_set(TIME_NOW, data, delayed_int_enable_w);
+		mame_timer_set(time_zero, data, delayed_int_enable_w);
 }
 
 
@@ -1309,7 +1309,6 @@ static MACHINE_DRIVER_START( atarisy2 )
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen,TIME_IN_HZ((double)ATARI_CLOCK_20MHz/2/16/16/16/10))
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(atarisy2)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -1317,7 +1316,9 @@ static MACHINE_DRIVER_START( atarisy2 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 48*8)
+	/* 720 is sensitive to the VBLANK time, otherwise the mo's will clip or screw up,
+       This value seems to work ok, but needs to be verified */
+	MDRV_SCREEN_SIZE(64*8, 420)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)

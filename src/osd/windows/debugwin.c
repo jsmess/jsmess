@@ -1875,7 +1875,7 @@ static void memory_create_window(void)
 
 	// create a combo box
 	info->otherwnd[0] = CreateWindowEx(COMBO_BOX_STYLE_EX, TEXT("COMBOBOX"), NULL, COMBO_BOX_STYLE,
-			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
+			0, 0, 100, 1000, info->wnd, NULL, GetModuleHandle(NULL), NULL);
 	SetWindowLongPtr(info->otherwnd[0], GWLP_USERDATA, (UINT32)info);
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 

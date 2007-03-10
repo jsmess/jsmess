@@ -246,8 +246,11 @@
 
 #define PIXEL_CLOCK		(MASTER_CLOCK/2)
 #define HTOTAL			(320)
+#define HBSTART			(256)
+#define HBEND			(0)
 #define VTOTAL			(256)
-
+#define VBSTART			(256)
+#define VBEND			(25)	/* 24 causes a garbage line at the top of the screen */
 
 
 /*************************************
@@ -279,7 +282,7 @@ INLINE int scanline_to_v(int scanline)
 {
 	/* since the vertical sync counter counts backwards when flipped,
         this function returns the current effective V value, given
-        that cpu_getscanline() only counts forward */
+        that video_screen_get_vpos() only counts forward */
 	return flipscreen ? (256 - scanline) : scanline;
 }
 
@@ -384,11 +387,11 @@ static MACHINE_START( missile )
 	opcode_base = opcode_arg_base = videoram;
 
 	/* create a timer to speed/slow the CPU */
-	cpu_timer = timer_alloc(adjust_cpu_speed);
+	cpu_timer = mame_timer_alloc(adjust_cpu_speed);
 	mame_timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(0), 0), 0, time_zero);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(clock_irq);
+	irq_timer = mame_timer_alloc(clock_irq);
 	irq_state = 0;
 	schedule_next_irq(-32);
 
@@ -528,7 +531,6 @@ static UINT8 read_vram(offs_t address)
 
 VIDEO_UPDATE( missile )
 {
-	pen_t black = get_black_pen(machine);
 	int x, y;
 
 	/* draw the bitmap to the screen, looping over Y */
@@ -536,44 +538,25 @@ VIDEO_UPDATE( missile )
 	{
 		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 
-		/* if we're in the VBLANK region, just fill with black */
-		if (y < 24)
+		int effy = flipscreen ? ((256+24 - y) & 0xff) : y;
+		UINT8 *src = &videoram[effy * 64];
+		UINT8 *src3 = NULL;
+
+		/* compute the base of the 3rd pixel row */
+		if (effy >= 224)
+			src3 = &videoram[get_bit3_addr(effy << 8)];
+
+		/* loop over X */
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-				dst[x] = black;
-		}
+			UINT8 pix = src[x / 4] >> (x & 3);
+			pix = ((pix >> 2) & 4) | ((pix << 1) & 2);
 
-		/* non-VBLANK region: draw the bitmap */
-		else
-		{
-			int effy = flipscreen ? ((256+24 - y) & 0xff) : y;
-			UINT8 *src = &videoram[effy * 64];
-			UINT8 *src3 = NULL;
+			/* if we're in the lower region, get the 3rd bit */
+			if (src3 != NULL)
+				pix |= (src3[(x / 8) * 2] >> (x & 7)) & 1;
 
-			/* compute the base of the 3rd pixel row */
-			if (effy >= 224)
-				src3 = &videoram[get_bit3_addr(effy << 8)];
-
-			/* loop over X */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			{
-				/* if we're in the HBLANK region, just store black */
-				if (x >= 256)
-					dst[x] = black;
-
-				/* otherwise, process normally */
-				else
-				{
-					UINT8 pix = src[x / 4] >> (x & 3);
-					pix = ((pix >> 2) & 4) | ((pix << 1) & 2);
-
-					/* if we're in the lower region, get the 3rd bit */
-					if (src3 != NULL)
-						pix |= (src3[(x / 8) * 2] >> (x & 7)) & 1;
-
-					dst[x] = pix;
-				}
-			}
+			dst[x] = pix;
 		}
 	}
 	return 0;
@@ -916,10 +899,7 @@ static MACHINE_DRIVER_START( missile )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE((float)PIXEL_CLOCK / (float)VTOTAL / (float)HTOTAL)
-	MDRV_SCREEN_SIZE(HTOTAL, VTOTAL)
-	MDRV_SCREEN_VBLANK_TIME(0)			/* VBLANK is handled manually */
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 25, 255)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	MDRV_VIDEO_UPDATE(missile)
 

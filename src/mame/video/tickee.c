@@ -25,8 +25,8 @@ static void *setup_gun_timer;
 
 INLINE void get_crosshair_xy(int player, int *x, int *y)
 {
-	*x = ((readinputport(4 + player * 2) & 0xff) * Machine->screen[0].width) >> 8;
-	*y = ((readinputport(5 + player * 2) & 0xff) * Machine->screen[0].height) >> 8;
+	*x = (((readinputport(4 + player * 2) & 0xff) * (Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x)) >> 8) + Machine->screen[0].visarea.min_x;
+	*y = (((readinputport(5 + player * 2) & 0xff) * (Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y)) >> 8) + Machine->screen[0].visarea.min_y;
 }
 
 
@@ -54,10 +54,10 @@ static void clear_gun_interrupt(int which)
 static void setup_gun_interrupts(int param)
 {
 	int beamx, beamy;
-	double time;
+	mame_time time;
 
 	/* set a timer to do this again next frame */
-	timer_adjust(setup_gun_timer, cpu_getscanlinetime(0), 0, 0);
+	mame_timer_adjust(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 
 	/* only do work if the palette is flashed */
 	if (!tickee_control[2])
@@ -65,17 +65,17 @@ static void setup_gun_interrupts(int param)
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(0, &beamx, &beamy);
-	time = cpu_getscanlinetime(beamy);
-	time += cpu_getscanlineperiod() * (double)(beamx + 175) / (double)450;
-	timer_set(time, 0, trigger_gun_interrupt);
-	timer_set(time + cpu_getscanlineperiod(), 0, clear_gun_interrupt);
+	time = video_screen_get_time_until_pos(0, beamy, 0);
+	time = add_mame_times(time, double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * (double)(beamx + 175) / (double)450));
+	mame_timer_set(time, 0, trigger_gun_interrupt);
+	mame_timer_set(add_mame_times(time, video_screen_get_scan_period(0)), 0, clear_gun_interrupt);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(1, &beamx, &beamy);
-	time = cpu_getscanlinetime(beamy);
-	time += cpu_getscanlineperiod() * (double)(beamx + 175) / (double)450;
-	timer_set(time, 1, trigger_gun_interrupt);
-	timer_set(time + cpu_getscanlineperiod(), 1, clear_gun_interrupt);
+	time = video_screen_get_time_until_pos(0, beamy, 0);
+	time = add_mame_times(time, double_to_mame_time(mame_time_to_double(video_screen_get_scan_period(0)) * (double)(beamx + 175) / (double)450));
+	mame_timer_set(time, 1, trigger_gun_interrupt);
+	mame_timer_set(add_mame_times(time, video_screen_get_scan_period(0)), 1, clear_gun_interrupt);
 }
 
 
@@ -89,8 +89,8 @@ static void setup_gun_interrupts(int param)
 VIDEO_START( tickee )
 {
 	/* start a timer going on the first scanline of every frame */
-	setup_gun_timer = timer_alloc(setup_gun_interrupts);
-	timer_adjust(setup_gun_timer, cpu_getscanlinetime(0), 0, 0);
+	setup_gun_timer = mame_timer_alloc(setup_gun_interrupts);
+	mame_timer_adjust(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 
 	return 0;
 }
