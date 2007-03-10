@@ -589,7 +589,7 @@ DEVICE_LOAD( sms_cart )
 		int	len = fname ? strlen( fname ) : 0;
 		const char *extrainfo = image_extrainfo( image );
 
-		if ( extrainfo && strcasestr( extrainfo, "GGSMS" ) ) {
+		if ( extrainfo && strstr( extrainfo, "GGSMS" ) ) {
 			sms_set_ggsmsmode( 1 );
 		}
 
