@@ -516,7 +516,7 @@ DEVICE_LOAD( sms_cart )
 		              - gamegear S.S. Lucifer
 		         - 95 - gamegear Micro Machines 2 - Turbo Tournament
 		 */
-		if ( ( ROM[0x7fe3] == 0x93 ||
+		if ( ( ROM[0x7fe0] & 0x0F <= 9 ) && ( ROM[0x7fe3] == 0x93 ||
 		       ROM[0x7fe3] == 0x94 ||
 		       ROM[0x7fe3] == 0x95 ) && ROM[0x7fef] == 0x00 ) {
 			smsCartFeatures |= CF_CODEMASTERS_MAPPER;
