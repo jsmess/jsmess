@@ -1207,7 +1207,7 @@ void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 			if ( line < 6 || line > 220 || ( ( line - 8 ) % 3 == 0 ) ) {
 				return;
 			}
-			ggLine = ( line / 3 ) * 2;
+			ggLine = ( ( line - 6 ) / 3 ) * 2;
 			/* If we're on SMS line 7, 10, 13, etc we're on an odd GG line */
 			if ( line % 3 ) {
 				ggLine++;
