@@ -33,7 +33,7 @@ struct acia6850_interface
 };
 
 void acia6850_unconfig(void);
-void acia6850_config( int which, const struct acia6850_interface *intf);
+void acia6850_config_old( int which, const struct acia6850_interface *intf);
 void acia6850_reset(void);
 int acia6850_read( int which, int offset);
 void acia6850_write( int which, int offset, int data);

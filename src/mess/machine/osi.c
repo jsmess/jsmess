@@ -43,8 +43,8 @@ static struct acia6850_interface sb2m600_acia1 =
 
 DRIVER_INIT( sb2m600 )
 {
-	acia6850_config(0, &sb2m600_acia0);
-	acia6850_config(1, &sb2m600_acia1); // DISK CONTROLLER
+	acia6850_config_old(0, &sb2m600_acia0);
+	acia6850_config_old(1, &sb2m600_acia1); // DISK CONTROLLER
 }
 
 /* Cassette */

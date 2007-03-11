@@ -1100,7 +1100,8 @@ $(MESSOBJ)/thomson.a:			\
 	$(MESS_DEVICES)/thomflop.o \
 	$(MESS_FORMATS)/thom_dsk.o \
 	$(MESS_FORMATS)/thom_cas.o \
-	$(MESS_AUDIO)/mea8000.o
+	$(MESS_AUDIO)/mea8000.o		\
+	$(MAME_MACHINE)/6850acia.o
 
 $(MESSOBJ)/tiger.a:				\
 	$(MESS_DRIVERS)/gamecom.o	\

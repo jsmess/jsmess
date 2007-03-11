@@ -10,6 +10,9 @@ System Driver Changes:
 ----------------------
 - [GAMEGEAR] Added SMS compatibility mode.  [Wilbert Pol]
 
+- [THOMSON] Switch 6850 ACIA implementations to use the MAME version. [Antoine
+  Mine]
+
 
 
 User Interface Changes:

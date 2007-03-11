@@ -25,7 +25,7 @@ void acia6850_unconfig (void)
 	memset (&acia, 0, sizeof (acia));
 }
 
-void acia6850_config (int which, const struct acia6850_interface *intf)
+void acia6850_config_old(int which, const struct acia6850_interface *intf)
 {
 	if (which >= ACIA_6850_MAX) return;
 	acia[which].intf = intf;
