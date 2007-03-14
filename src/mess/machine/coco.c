@@ -305,14 +305,14 @@ static const pia6821_interface coco3_pia_intf[] =
 {
 	/* PIA 0 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ 0, d_pia1_pb_r_coco2, 0, 0, 0, 0,
+		/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 		/*outputs: A/B,CA/B2	   */ d_pia0_pa_w, d_pia0_pb_w, d_pia0_ca2_w, d_pia0_cb2_w,
 		/*irqs	 : A/B			   */ coco3_pia0_irq_a, coco3_pia0_irq_b
 	},
 
 	/* PIA 1 */
 	{
-		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, 0, 0, d_pia1_cb1_r, 0, 0,
+		/*inputs : A/B,CA/B1,CA/B2 */ d_pia1_pa_r, d_pia1_pb_r_coco2, 0, d_pia1_cb1_r, 0, 0,
 		/*outputs: A/B,CA/B2	   */ d_pia1_pa_w, d_pia1_pb_w, d_pia1_ca2_w, d_pia1_cb2_w,
 		/*irqs	 : A/B			   */ coco3_pia1_firq_a, coco3_pia1_firq_b
 	}
