@@ -131,6 +131,11 @@ WRITE8_HANDLER( gb_rom_bank_select_mbc7 );
 WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 );
 WRITE8_HANDLER( gb_ram_tama5 );
 WRITE8_HANDLER( gb_rom_bank_select_wisdom );
+WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w );
+WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w );
+WRITE8_HANDLER( gb_rom_bank_mmm01_2001_w );
+WRITE8_HANDLER( gb_rom_bank_mmm01_3fff_w );
+WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w );
 
 #ifdef MAME_DEBUG
 /* #define V_GENERAL*/		/* Display general debug information */
@@ -174,6 +179,13 @@ static void gb_init(void) {
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_ROM );
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, MWA8_ROM );
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_ROM );
+			break;
+		case MBC_MMM01:
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_rom_bank_mmm01_0000_w );
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, gb_rom_bank_mmm01_2000_w);
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2001, 0x3ffe, 0, 0, gb_rom_bank_mmm01_2001_w);
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x3fff, 0x3fff, 0, 0, gb_rom_bank_mmm01_3fff_w);
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, gb_rom_bank_mmm01_4000_w);
 			break;
 		case MBC_MBC1:
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable );	/* We don't emulate RAM enable yet */
@@ -577,6 +589,26 @@ WRITE8_HANDLER( gb_ram_tama5 ) {
 		gbLastTama5Command = data;
 		break;
 	}
+}
+
+WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w ) {
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset );
+}
+
+WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w ) {
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x2000 );
+}
+
+WRITE8_HANDLER( gb_rom_bank_mmm01_2001_w ) {
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x2001 );
+}
+
+WRITE8_HANDLER( gb_rom_bank_mmm01_3fff_w ) {
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x3fff );
+}
+
+WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w ) {
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x4000 );
 }
 
 WRITE8_HANDLER ( gb_io_w )
@@ -1454,8 +1486,8 @@ DEVICE_LOAD(gb_cart)
 		return INIT_FAIL;
 	}
 	if ( MBCType == MBC_MMM01 ) {
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet" );
-		return INIT_FAIL;
+//		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet" );
+//		return INIT_FAIL;
 	}
 	if ( MBCType == MBC_MBC4 ) {
 		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet" );

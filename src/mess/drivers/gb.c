@@ -273,6 +273,34 @@ At address 1A19:
 06 <- 05, 07 <- 02, followed by read 0C, if != 0F => OK, otherwise do something.
 
 
+MMM01 mapper
+============
+
+Status: not supported yet.
+
+Writes seen:
+3FFF <- 01 (and 1F)
+3FFF <- 00
+2000 <- 01
+
+When picking top option:
+3FFF <- 20
+5FFF <- 40
+7FFF <- 21
+1FFF <- 3A
+1FFF <- 7A
+
+When picking bottom option:
+3FFF <- 00
+5FFF <- 01
+7FFF <- 01
+1FFF <- 3A
+1FFF <- 7A
+
+1FFF - Enable RAM ???
+3FFF - xxxbbbbb - Bit0-5 of the rom bank to select at 0x4000-0x7FFF ?
+
+
 HuC1 mapper
 ===========
 
