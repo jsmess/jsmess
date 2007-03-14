@@ -249,15 +249,18 @@ static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int c
 
 			if (!cdp1869.freshorz)
 			{
-				x++;
-
-				plot_pixel(bitmap, x, y, Machine->pens[color]);
+				plot_pixel(bitmap, x + 1, y, Machine->pens[color]);
 
 				if (!cdp1869.fresvert)
 				{
-					plot_pixel(bitmap, x, y + 1, Machine->pens[color]);
+					plot_pixel(bitmap, x + 1, y + 1, Machine->pens[color]);
 				}
 			}
+		}
+
+		if (!cdp1869.freshorz)
+		{
+			x++;
 		}
 
 		x++;
