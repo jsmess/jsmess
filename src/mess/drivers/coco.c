@@ -849,7 +849,7 @@ ROM_START(tanodr64)
 	ROM_REGION(0x10000,REGION_CPU1,0)
 	ROM_LOAD(           "d64_1.rom",    0x0000,  0x4000, CRC(60a4634c) SHA1(f119506eaa3b4b70b9aa0dd83761e8cbe043d042))
 	ROM_LOAD(           "d64_2.rom",    0x8000,  0x4000, CRC(17893a42) SHA1(e3c8986bb1d44269c4587b04f1ca27a70b0aaa2e))
-	ROM_LOAD_OPTIONAL(  "sdtandy.rom",   0x4000,  0x2000, CRC(d4a9bfd1) SHA1(1db0ccaeb7ac63461f98ef091fa02ddd1fef9bac))
+	ROM_LOAD_OPTIONAL(  "sdtandy.rom",   0x4000,  0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
 ROM_END
 
 ROM_START(dgnalpha)

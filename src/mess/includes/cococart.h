@@ -27,6 +27,7 @@ struct cartridge_slot
 
 extern const struct cartridge_slot cartridge_fdc_coco;
 extern const struct cartridge_slot cartridge_fdc_dragon;
+extern const struct cartridge_slot cartridge_fdc_dragon_delta;
 extern const struct cartridge_slot cartridge_standard;
 extern const struct cartridge_slot cartridge_banks;
 extern const struct cartridge_slot cartridge_banks_mega;

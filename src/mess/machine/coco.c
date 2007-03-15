@@ -173,14 +173,17 @@ static UINT16 cart_bank_size;
 static int cart_autostart_enable;	 	/* Should the cart auto-start ?, set by dipswitch */
 static int cart_has_autostart;			/* Cart has autostart line, most do, but DOS does not */
 
+static int cart_crc(unsigned int *crc);		/* returns true if cart loaded & crc will be set, false otherwise */
 static int count_bank(void);
 static int is_Orch90(void);			/* Returns true if cart is orchestra 90 */
 static int is_megacart(void);			/* Returns true if cart contains megacart signature */
 static int is_doscart(void);			/* Returns true if cart contains 'DK' doscart signature */
+static int is_dragondos(void);		/* Returns true if DragonDos compatible cart inserted */
+static int is_deltados(void);			/* Returns true if DeltaDos compatible cart inserted */
+static int is_rsdos(void);			/* Returns true if RSDos compatible cart inserted */
 
 int cart_can_toggle(void);
 static void coco_cart_timerproc(int dummy);	// Note coco3 version in coc3 group above :)
-static mame_timer *cart_line_timer;
 static int cart_mem_offset;
 
 /* MegaCart CTRL reg, bit 1 selects 8K or 16K banking */
@@ -209,6 +212,7 @@ static void setup_memory_map(void);
 #define LOG_GIME		0
 #define LOG_MMU			0
 #define LOG_TIMER       0
+#define LOG_CART	1		/* Log cart type selections is_doscart and friends */
 
 #define GIME_TYPE_1987	0
 
@@ -629,8 +633,13 @@ static int generic_rom_load(mess_image *image, UINT8 *dest, UINT16 destlength)
 	}
 
 	if (romsize > destlength)
-		romsize = destlength;
-
+	{
+		if(is_megacart())
+			romsize=0x4000;			/* Only 16K ever visible */
+		else
+			romsize = destlength;
+	}
+	
 	image_fread(image, dest, romsize);
 
 	cart_inserted = 1;
@@ -2666,40 +2675,66 @@ static int count_bank(void)
 	}
 }
 
-/* This function, and all calls of it, are hacks for bankswitched games */
-static int is_Orch90(void)
+/* Check for a loaded cart and get it's crc, if the cart is loaded, then */
+/* cart_crc will return true, and crc will be the crc of the loaded cart */
+/* if the cart is not loaded, then cart_crc will return false and crc will */
+/* be unchanged */
+int cart_crc(unsigned int *crc)
 {
-	unsigned int crc;
 	mess_image *img;
 
 	img = cartslot_image();
 	if (!image_exists(img))
 		return FALSE;
+	else
+	{
+		*crc = image_crc(img);
+		return TRUE;
+	}
+}
 
-	crc = image_crc(img);
-	return crc == 0x15FB39AF;
+/* This function, and all calls of it, are hacks for bankswitched games */
+static int is_Orch90(void)
+{
+	unsigned int crc;
+	int result;
+
+	result=cart_crc(&crc);
+	if(result)
+		result=(crc == 0x15FB39AF);
+
+	if (LOG_CART)
+		logerror("is_orch90:%d\n",result);
+		
+	return result;
 }
 
 /* Detect Megacart code, looks for Megacart magic number at offset 4 in file */
 static int is_megacart(void)
 {
 	UINT32		Magic;
-	int		ret;
+	int		result;
 	mess_image 	*img;
+	UINT64		pos;
 
 	img = cartslot_image();
 	
 	if (image_exists(img))					// Check that  cart is mounted
 	{
-		image_fseek(cartslot_image(), 4, SEEK_SET);	// Mega cart magic no at offset 4
-		image_fread(cartslot_image(), &Magic, sizeof(Magic));	// 4 bytes long
+		pos=image_ftell(img);				// get current pointer
+		image_fseek(img, 4, SEEK_SET);			// Mega cart magic no at offset 4
+		image_fread(img, &Magic, sizeof(Magic));	// 4 bytes long
+		image_fseek(img,pos,SEEK_SET);			// restore pointer
 	
-		ret = (Magic == 0x12210968);			// return true if magic no found
+		result = (Magic == 0x12210968);		// return true if magic no found
 	}
 	else
-		ret = 0;					// Return 0 if image not open
+		result = 0;					// Return 0 if image not open
+
+	if (LOG_CART)
+		logerror("is_megacart:%d\n",result);
 		
-	return ret;
+	return result;
 }
 
 /* Detect a dos rom, returns true if found. 				      */
@@ -2711,16 +2746,95 @@ static int is_megacart(void)
 static int is_dosrom(void)
 {
 	UINT8 *rombase;
-	
+	int result;
+
 	/* get rom base address, for CoCo 1/2 & Dragons this will be 0x4000 */
 	/* for the CoCo3 this will bx 0xc000 */
 	rombase=&coco_rom[cart_mem_offset];
 	
 	if((rombase[0]=='D') && (rombase[1]=='K'))
-		return 1;
+		result=TRUE;
 	else
-		return 0;
+		result=FALSE;
+
+	if (LOG_CART)
+		logerror("is_dosrom:%d\n",result);
+		
+	return result;
 } 
+
+/* Returns true if inserted cartrige rom is compatible with the DragonDos hardware */
+/* currently this will be Dragon Data DragonDos v 1.0, Eurohard DragonDos 4.0,     */
+/* Cumana dos, DosPlus (DragonDos version)                                         */
+static int is_dragondos(void)
+{
+	unsigned int crc;
+	int result;
+	
+	result=cart_crc(&crc);
+	if(result==TRUE) 
+		switch(crc)
+		{
+			case 0xb44536f6	: result=TRUE; break; 	// Dragondos 1.0
+			case 0x14F4C54A	: result=TRUE; break;	// DragonDos 4.0
+			case 0x32910D47	: result=TRUE; break;	// Cumana Dos
+			case 0x8C1D6C45	: result=TRUE; break;	// Superdos E6
+			default	: result=FALSE; break;
+		}
+	else
+		result=FALSE;
+
+	if (LOG_CART)
+		logerror("is_dragondos:%d\n",result);
+		
+	return result;
+}
+
+/* Return true if deltados rom inserted, currently only the original delta rom is */
+/* detected, should an image of DosPlus for delta become available this will be */
+/* added here */
+static int is_deltados(void)
+{
+	unsigned int crc;
+	int result;
+
+	result=cart_crc(&crc);
+	if((result) &&
+	   (crc == 0x149EB4DD))		// Original Deltados
+		result=TRUE;
+	else
+		result=FALSE;
+
+	if (LOG_CART)
+		logerror("is_deltados:%d\n",result);
+		
+	return result;
+}
+
+/* Return true if RSDos rom is inserted, currently detects Tandy RSDos 1.0, 1.2 */
+/* and SuperDos E7T (used by Tano Dragon 64) */
+static int is_rsdos(void)
+{
+	unsigned int crc;
+	int result;
+
+	result=cart_crc(&crc);
+	if(result)
+		switch (crc)
+		{
+			case 0xb4f9968e: result=TRUE; break;	// RSDos 1.0
+			case 0x0b9c5415: result=TRUE; break;	// RSDos 1.1
+			case 0x5d7779b7: result=TRUE; break;	// SuperDos E7T
+			default	: result=FALSE; break;
+		}
+	else
+		result=FALSE;
+		
+	if (LOG_CART)
+		logerror("is_rsdos:%d\n",result);
+
+	return result;
+}
 
 static void generic_setcartbank(int bank, UINT8 *cartpos)
 {
@@ -2775,11 +2889,11 @@ static void coco_dragon_reset(running_machine *machine)
 {
 	
 	/* reset megacart regs on hw reset */
-	if(is_megacart())
-	{
-		coco_cartridge_w(0x10,0);	// Zero bank
-		coco_cartridge_w(0x12,0);	// Zero control
-	}
+//	if(is_megacart())
+//	{
+//		coco_cartridge_w(0x10,0);	// Zero bank
+//		coco_cartridge_w(0x12,0);	// Zero control
+//	}
 
 	common_reset(machine);
 }
@@ -2840,18 +2954,26 @@ static void generic_init_machine(running_machine *machine, machine_init_interfac
 	pia_config(2, PIA_STANDARD_ORDERING | PIA_8BIT, &init.piaintf[2]); /* Dragon Alpha 3rd pia */
 	pia_reset();
 
-	/* HACK for bankswitching carts */
+	/* Assume default cartslot type */
+	cartslottype = &cartridge_standard;
+
 	if( is_Orch90() )
-	{
-		cartslottype = &cartridge_Orch90;
-	}
-	else
-	{
-		if (is_megacart())
-			cartslottype = &cartridge_banks_mega;
-		else
-			cartslottype = (count_bank() > 0) ? &cartridge_banks : &cartridge_standard;
-	}
+		cartslottype = &cartridge_Orch90;		/* Orchestra 90 */
+		
+	else if (is_megacart())
+		cartslottype = &cartridge_banks_mega;		/* MegaCart */
+	
+	else if (count_bank() > 0)
+		cartslottype = &cartridge_banks;		/* Other bankswitched */
+
+	else if(is_dragondos())
+		cartslottype = &cartridge_fdc_dragon;		/* DragonDos compatible */
+	
+	else if(is_deltados())
+		cartslottype = &cartridge_fdc_dragon_delta;	/* DeltaDos compatible */
+			
+	else if(is_rsdos())
+		cartslottype = &cartridge_fdc_coco;		/* RSDos compatible */
 
 	coco_cartrige_init(cart_inserted ? cartslottype : init.cartinterface, init.cartcallback);
 
@@ -2887,6 +3009,8 @@ static void generic_coco12_dragon_init(running_machine *machine, machine_init_in
 	/* steal too much CPU time */
 	timer_pulse(1,0,coco_cart_timerproc); 	// 1Hz, seems to be fast enough.
 }
+
+/******* Machine Setups Dragons **********/
 
 MACHINE_START( dragon32 )
 {
@@ -2924,8 +3048,6 @@ MACHINE_START( dragon64 )
 		
 	return 0;
 }
-
-/******* Machine Setups Dragons **********/
 
 MACHINE_START( d64plus )
 {
@@ -3049,14 +3171,6 @@ static void coco3_machine_reset(running_machine *machine)
 
 	cart_has_autostart=0;
 	common_reset(machine);
-
-	/* If an auto-starting cart is inserted, start the cart_timer to toggle the */
-	/* cart line, this simulates the real toggling by Q, but slower so as not to */
-	/* steal too much CPU time */
-	if(cart_can_toggle())
-	{
-		timer_adjust(cart_line_timer,TIME_IN_MSEC(10),0,TIME_IN_MSEC(10));
-	}
 }
 
 static void coco3_state_postload(void)
@@ -3104,7 +3218,7 @@ MACHINE_START( coco3 )
 	/* If an auto-starting cart is inserted, start the cart_timer to toggle the */
 	/* cart line, this simulates the real toggling by Q, but slower so as not to */
 	/* steal too much CPU time */
-	timer_pulse(1,0,coco3_cart_timerproc); 	// 1Hz, seems to be fast enough.
+	timer_pulse(2,0,coco3_cart_timerproc); 	// 1Hz, seems to be fast enough.
 	
 	return 0;
 }

@@ -54,7 +54,32 @@ static const struct cartridge_callback *cartcallbacks;
  * Reading from $ff48-$ff4f clears bit 7
  * of DSKREG ($ff40)
  * ---------------------------------------------------------------------------
+ *
+ * 2007-02-22, P.Harvey-Smith 
+ * 
+ * Began implementing the Dragon Delta Dos controler, this was actually the first
+ * Dragon disk controler to market, beating Dragon Data's by a couple of months,
+ * it Is based around the WD2791 FDC, which is compatible with the WD1793/WD2797 used
+ * by the standard CoCo and Dragon disk controlers except that it used an inverted
+ * data bus, which is the reason the read/write handlers invert the data. This  
+ * controler like, the DragonDos WD2797 is mapped at $FF40-$FF43, in the normal
+ * register order.
+ *
+ * The Delta cart also has a register (74LS174 hex fliplop) at $FF44 encoded as 
+ * follows :-
+ * 	
+ * Bit
+ *	7 not used
+ *	6 not used
+ *	5 not used 
+ *	4 Single (0) / Double (1) density select 
+ *	3 5.25"(0) / 8"(1) Clock select
+ *	2 Side select
+ *	1 Drive select ms bit
+ *	0 Drive select ls bit
+ *
  */
+
 
 #define VERBOSE 0
 
@@ -67,6 +92,7 @@ static const struct cartridge_callback *cartcallbacks;
 static int	dskreg;
 static void	coco_fdc_callback(int event);
 static void	dragon_fdc_callback(int event);
+static void 	dragon_delta_fdc_callback(int event);
 static int	drq_state;
 static int	intrq_state;
 
@@ -98,6 +124,13 @@ static void dragon_fdc_init(const struct cartridge_callback *callbacks)
 	dskreg = 0;
 	cartcallbacks = callbacks;
 
+}
+
+static void dragon_delta_fdc_init(const struct cartridge_callback *callbacks)
+{
+    wd179x_init(WD_TYPE_179X,dragon_delta_fdc_callback);
+	dskreg = 0;
+	cartcallbacks = callbacks;
 }
 
 static void raise_nmi(int dummy)
@@ -165,6 +198,24 @@ static void dragon_fdc_callback(int event)
 	case WD179X_DRQ_SET:
 		LOG(("dragon_fdc_callback(): WD179X_DRQ_SET\n" ));
 		cartcallbacks->setcartline(CARTLINE_ASSERTED);
+		break;
+	}
+}
+
+static void dragon_delta_fdc_callback(int event)
+{
+	switch(event) {
+	case WD179X_IRQ_CLR:
+		LOG(("dragon_delta_fdc_callback(): WD179X_IRQ_CLR\n" ));
+		break;
+	case WD179X_IRQ_SET:
+		LOG(("dragon_delta_fdc_callback(): WD179X_IRQ_SET\n" ));
+		break;
+	case WD179X_DRQ_CLR:
+		LOG(("dragon_delta_fdc_callback(): WD179X_DRQ_CLR\n" ));
+		break;
+	case WD179X_DRQ_SET:
+		LOG(("dragon_delta_fdc_callback(): WD179X_DRQ_SET\n" ));
 		break;
 	}
 }
@@ -246,6 +297,28 @@ static void set_dragon_dskreg(int data)
 		wd179x_set_drive( data & 0x03 );
 
 	wd179x_set_density( (data & 0x08) ? DEN_FM_LO: DEN_MFM_LO );
+	dskreg = data;
+}
+
+static void set_dragon_delta_dskreg(int data)
+{
+	LOG(("set_dragon_delta_dskreg(): %c%c%c%c%c%c%c%c ($%02x)\n",
+								data & 0x80 ? 'X' : 'x',
+								data & 0x40 ? 'X' : 'x',
+								data & 0x20 ? 'X' : 'x',
+								data & 0x10 ? 'D' : 'S',
+								data & 0x08 ? '8' : '5',
+								data & 0x04 ? '1' : '0',
+								data & 0x02 ? '1' : '0',
+								data & 0x01 ? '1' : '0',
+								data ));
+
+	wd179x_set_drive( data & 0x03 );
+	
+	wd179x_set_side((data & 0x04) ? 1 : 0);
+
+	wd179x_set_density( (data & 0x10) ? DEN_MFM_HI: DEN_FM_LO );
+
 	dskreg = data;
 }
 
@@ -421,6 +494,58 @@ WRITE8_HANDLER(dragon_floppy_w)
 	};
 }
 
+READ8_HANDLER(dragon_delta_floppy_r)
+{
+	int result = 0;
+
+	switch(offset & 0xef) 
+	{
+	case 0:
+		result = wd179x_status_r(0);
+		break;
+	case 1:
+		result = wd179x_track_r(0);
+		break;
+	case 2:
+		result = wd179x_sector_r(0);
+		break;
+	case 3:
+		result = wd179x_data_r(0);
+		break;
+	default:
+		break;
+	}
+	
+	logerror("dragon_delta_floppy_r: %X %X\n",result,~result);
+	
+	return ~result;
+}
+
+WRITE8_HANDLER(dragon_delta_floppy_w)
+{
+	
+	logerror("dragon_delta_floppy_w: %X %X\n",data,~data);
+	
+	switch(offset & 0xef) 
+	{
+	case 0:
+		wd179x_command_w(0, ~data);
+		break;
+	case 1:
+		wd179x_track_w(0, ~data);
+		break;
+	case 2:
+		wd179x_sector_w(0, ~data);
+		break;
+	case 3:
+		wd179x_data_w(0, ~data);
+		break;
+	case 4:
+		set_dragon_delta_dskreg(data);
+		break;
+	};
+}
+
 /* ---------------------------------------------------- */
 
 const struct cartridge_slot cartridge_fdc_coco =
@@ -441,11 +566,27 @@ const struct cartridge_slot cartridge_fdc_dragon =
 	NULL
 };
 
+const struct cartridge_slot cartridge_fdc_dragon_delta =
+{
+	dragon_delta_fdc_init,
+	NULL,
+	dragon_delta_floppy_r,
+	dragon_delta_floppy_w,
+	NULL
+};
+
 /* ---------------------------------------------------- */
 
 static void cartidge_standard_init(const struct cartridge_callback *callbacks)
 {
 	cartcallbacks = callbacks;
+	cartcallbacks->setcartline(CARTLINE_Q);
+}
+
+static void cartidge_banks_init(const struct cartridge_callback *callbacks)
+{
+	cartcallbacks = callbacks;
+	cartcallbacks->setbank(0);		// Reset to bank 0
 	cartcallbacks->setcartline(CARTLINE_Q);
 }
 
@@ -476,6 +617,14 @@ extern int mega_ctrl;	// Control reg
 extern int mega_bank;	// Bank reg
 // Mega Cart, by PHS.
 // This could possibly be merged with normal bank.
+static void cartidge_mega_init(const struct cartridge_callback *callbacks)
+{
+	cartcallbacks = callbacks;
+	mega_ctrl=0;				// Reset control register
+	cartcallbacks->setbank(0);		// Reset to bank 0
+	cartcallbacks->setcartline(CARTLINE_Q);
+}
+
 static WRITE8_HANDLER(cartridge_banks_mega_io_w)
 {
 	switch (offset)
@@ -544,7 +693,7 @@ const struct cartridge_slot cartridge_standard =
 
 const struct cartridge_slot cartridge_banks =
 {
-	cartidge_standard_init,
+	cartidge_banks_init,
 	NULL,
 	cartridge_banks_io_r,
 	cartridge_banks_io_w,
@@ -553,7 +702,7 @@ const struct cartridge_slot cartridge_banks =
 
 const struct cartridge_slot cartridge_banks_mega =
 {
-	cartidge_standard_init,
+	cartidge_mega_init,
 	NULL,
 	cartridge_banks_mega_io_r,
 	cartridge_banks_mega_io_w,
