@@ -276,8 +276,11 @@ At address 1A19:
 MMM01 mapper
 ============
 
+Used by: Momotarou Collection 2, Taito Pack
+
 Status: not supported yet.
 
+Momotarou Collection 2:
 Writes seen:
 3FFF <- 01 (and 1F)
 3FFF <- 00
@@ -297,6 +300,34 @@ When picking bottom option:
 1FFF <- 3A
 1FFF <- 7A
 
+Taito Pack (MMM01+RAM, 512KB, 64KB RAM):
+1st option (BUBBLE BOBBLE, blocks 0x12 - 0x19, MBC1+RAM, 128KB, 8KB RAM):
+  2000 <- 70  01110000  => starting block, 10000 + 2
+  6000 <- 30  00110000  => 8 blocks
+  4000 <- 70  01110000  => ???
+  0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+2nd option (ELEVATOR ACTION, blocks 0x1A - 0x1D, MBC1, 64KB, 2KB RAM):
+  2000 <- 78  01111000  => starting block, 11000 + 2
+  6000 <- 38  00111000  => 4 blocks
+  4000 <- 70  01110000  => ???
+  0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+3rd option (CHASE HQ, blocks 0x0A - 0x11, MBC1+RAM, 128KB, 8KB RAM):
+  2000 <- 68  01101000  => starting block, 01000 + 2
+  6000 <- 30  00110000  => 8 blocks
+  4000 <- 70  01110000  => ???
+  0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+4th option (SAGAIA, blocks 0x02 - 0x09, MBC1+RAM, 128KB, 8KB RAM):
+  2000 <- 60  01100000  => starting block, 00000 + 2
+  6000 <- 30  00110000  => 8 blocks
+  4000 <- 70  01110000  => ???
+  0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
+
+0000-1FFF => bit6 set => perform mapping
+
+Possible mapping registers:
 1FFF - Enable RAM ???
 3FFF - xxxbbbbb - Bit0-5 of the rom bank to select at 0x4000-0x7FFF ?
 

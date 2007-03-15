@@ -133,9 +133,8 @@ WRITE8_HANDLER( gb_ram_tama5 );
 WRITE8_HANDLER( gb_rom_bank_select_wisdom );
 WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w );
 WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w );
-WRITE8_HANDLER( gb_rom_bank_mmm01_2001_w );
-WRITE8_HANDLER( gb_rom_bank_mmm01_3fff_w );
 WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w );
+WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w );
 
 #ifdef MAME_DEBUG
 /* #define V_GENERAL*/		/* Display general debug information */
@@ -182,10 +181,9 @@ static void gb_init(void) {
 			break;
 		case MBC_MMM01:
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_rom_bank_mmm01_0000_w );
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, gb_rom_bank_mmm01_2000_w);
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2001, 0x3ffe, 0, 0, gb_rom_bank_mmm01_2001_w);
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x3fff, 0x3fff, 0, 0, gb_rom_bank_mmm01_3fff_w);
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, gb_rom_bank_mmm01_4000_w);
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, gb_rom_bank_mmm01_2000_w);
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, gb_rom_bank_mmm01_4000_w);
+			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, gb_rom_bank_mmm01_6000_w);
 			break;
 		case MBC_MBC1:
 			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, gb_ram_enable );	/* We don't emulate RAM enable yet */
@@ -591,24 +589,46 @@ WRITE8_HANDLER( gb_ram_tama5 ) {
 	}
 }
 
+/* This mmm01 implementation is mostly guess work, no clue how correct it all is */
+
+UINT8 mmm01_bank_offset;
+UINT8 mmm01_bank;
+UINT8 mmm01_bank_mask;
+
 WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w ) {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset );
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x000 );
+	if ( data & 0x40 ) {
+		memory_set_bankptr( 5, ROMMap[ mmm01_bank_offset ] );
+		memory_set_bankptr( 10, ROMMap[ mmm01_bank_offset ] + 0x0100 );
+		memory_set_bankptr( 1, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
+	}
 }
 
 WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w ) {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x2000 );
-}
-
-WRITE8_HANDLER( gb_rom_bank_mmm01_2001_w ) {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x2001 );
-}
-
-WRITE8_HANDLER( gb_rom_bank_mmm01_3fff_w ) {
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x3fff );
+	if ( data & 0x60 ) {
+		mmm01_bank_offset = ( data & 0x1F ) + 2;
+		/* SRAM bank offset?? */
+		mmm01_bank = 1;
+	} else {
+		mmm01_bank = data & mmm01_bank_mask;
+		if ( mmm01_bank == 0 ) {
+			mmm01_bank = 1;
+		}
+		memory_set_bankptr( 1, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
+	}
 }
 
 WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w ) {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x4000 );
+}
+
+WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w ) {
+	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x6000 );
+	switch( data ) {
+	case 0x30:	mmm01_bank_mask = 0x07;	break;
+	case 0x38:	mmm01_bank_mask = 0x03;	break;
+	}
 }
 
 WRITE8_HANDLER ( gb_io_w )
