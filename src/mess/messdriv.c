@@ -748,20 +748,10 @@ TESTDRIVER( svi328c ) 	/* SVI-328 + 80 column card (Swedish)						*/
 	DRIVER( apexc )		/* 1951(?) APEXC: All-Purpose Electronic X-ray Computer */
 
 	/* Sony */
-	DRIVER( psx )
-	DRIVER( psxj11 )
-	DRIVER( psxe20 )
-	DRIVER( psxj21 )
-	DRIVER( psxa22 )
-	DRIVER( psxe22 )
-	DRIVER( psxj22 )
-	DRIVER( psxj30 )
-	DRIVER( psxe30 )
-	DRIVER( psxa30 )
-	DRIVER( psxj40 )
-	DRIVER( psxa41 )
-	DRIVER( psxe41 )
-	DRIVER( psxa45 )
+	DRIVER( psxj )		/* 1994 Sony PlayStation (Japan)					*/
+	DRIVER( psxu )		/* 1995 Sony PlayStation (USA)						*/
+	DRIVER( psxe )		/* 1995 Sony PlayStation (Europe)					*/
+	DRIVER( psxa )		/* 1995 Sony PlayStation (Asia-Pacific)				*/
 
 	/* Corvus */
 	DRIVER(concept)		/* 1982 Corvus Concept								*/
