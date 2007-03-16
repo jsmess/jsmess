@@ -833,76 +833,94 @@ static MACHINE_DRIVER_START( psxpal )
 	MDRV_SOUND_ROUTE( 1, "right", 1.00 )
 MACHINE_DRIVER_END
 
-ROM_START( psx )
+SYSTEM_BIOS_START( psxj )
+	SYSTEM_BIOS_ADD( 0, "scph1000", "SCPH-1000 (09/22/94)" )
+	SYSTEM_BIOS_ADD( 1, "scph3000", "SCPH-3000 (v1.1 01/22/95)" )
+	SYSTEM_BIOS_ADD( 2, "scph3500", "SCPH-3500 (v2.1 07/17/95)" )
+	SYSTEM_BIOS_ADD( 3, "scph5000", "SCPH-5000 (v2.2 12/04/95)" )
+	SYSTEM_BIOS_ADD( 4, "scph5500", "SCPH-5500 (v3.0 09/09/96)" )
+	SYSTEM_BIOS_ADD( 5, "scph7000", "SCPH-7000 (v4.0 08/18/97)" )
+	SYSTEM_BIOS_ADD( 6, "scph7500", "SCPH-7500" )
+	SYSTEM_BIOS_ADD( 7, "scph9000", "SCPH-9000" )
+	SYSTEM_BIOS_ADD( 8, "scph100",  "SCPH-100 (PS one)" )
+SYSTEM_BIOS_END
+
+SYSTEM_BIOS_START( psxu )
+	SYSTEM_BIOS_ADD( 0, "scph1001", "SCPH-1001/DTLH-3001 (v2.2 12/04/95)" )
+	SYSTEM_BIOS_ADD( 1, "scph5001", "SCPH-5001" )
+	SYSTEM_BIOS_ADD( 2, "scph5501", "SCPH-5501 (v3.0 11/18/96)" )
+	SYSTEM_BIOS_ADD( 3, "scph7001", "SCPH-7001 (v4.1 12/16/97)" )
+	SYSTEM_BIOS_ADD( 4, "scph7501", "SCPH-7501" )
+	SYSTEM_BIOS_ADD( 5, "scph9001", "SCPH-9001" )
+	SYSTEM_BIOS_ADD( 6, "scph101",  "SCPH-101 (v4.5 05/25/00) (PS one)" )
+SYSTEM_BIOS_END
+
+SYSTEM_BIOS_START( psxe )
+	SYSTEM_BIOS_ADD( 0, "scph1002", "SCPH-1002 (v2.0 05/10/95)" )
+	SYSTEM_BIOS_ADD( 1, "dtlh3002", "DTLH-3002 (v2.2 12/04/95)" )
+	SYSTEM_BIOS_ADD( 2, "scph5002", "SCPH-5002" )
+	SYSTEM_BIOS_ADD( 3, "scph5502", "SCPH-5502/SCPH-5552 (v3.0 01/06/97)" )
+	SYSTEM_BIOS_ADD( 4, "scph7002", "SCPH-7002" )
+	SYSTEM_BIOS_ADD( 5, "scph7502", "SCPH-7502 (v4.1 12/16/97)" )
+	SYSTEM_BIOS_ADD( 6, "scph9002", "SCPH-9002" )
+	SYSTEM_BIOS_ADD( 7, "scph102",  "SCPH-102 (PS one)" )
+SYSTEM_BIOS_END
+
+SYSTEM_BIOS_START( psxa )
+	SYSTEM_BIOS_ADD( 0, "scph5003", "SCPH-5003" )
+	SYSTEM_BIOS_ADD( 1, "scph5503", "SCPH-5503" )
+	SYSTEM_BIOS_ADD( 2, "scph5903", "SCPH-5903" )
+	SYSTEM_BIOS_ADD( 3, "scph7003", "SCPH-7003" )
+	SYSTEM_BIOS_ADD( 4, "scph7503", "SCPH-7503" )
+	SYSTEM_BIOS_ADD( 5, "scph9003", "SCPH-9003" )
+	SYSTEM_BIOS_ADD( 6, "scph103",  "SCPH-103 (PS one)" )
+SYSTEM_BIOS_END
+
+ROM_START( psxj )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph1000.bin",  0x0000000, 0x080000, CRC(3b601fc8) SHA1(343883a7b555646da8cee54aadd2795b6e7dd070) )
+	ROMX_LOAD( "scph1000.bin", 0x0000000, 0x080000, CRC(3b601fc8) SHA1(343883a7b555646da8cee54aadd2795b6e7dd070), ROM_BIOS(1) )
+	ROMX_LOAD( "scph3000.bin", 0x0000000, 0x080000, CRC(3539def6) SHA1(b06f4a861f74270be819aa2a07db8d0563a7cc4e), ROM_BIOS(2) )
+	ROMX_LOAD( "scph3500.bin", 0x0000000, 0x080000, CRC(bc190209) SHA1(e38466a4ba8005fba7e9e3c7b9efeba7205bee3f), ROM_BIOS(3) )
+	ROMX_LOAD( "scph5000.bin", 0x0000000, 0x080000, CRC(24fc7e17) SHA1(ffa7f9a7fb19d773a0c3985a541c8e5623d2c30d), ROM_BIOS(4) )
+	ROMX_LOAD( "scph5500.bin", 0x0000000, 0x080000, CRC(ff3eeb8c) SHA1(b05def971d8ec59f346f2d9ac21fb742e3eb6917), ROM_BIOS(5) )
+	ROMX_LOAD( "scph7000.bin", 0x0000000, 0x080000, CRC(ec541cd0) SHA1(77b10118d21ac7ffa9b35f9c4fd814da240eb3e9), ROM_BIOS(6) )
+	ROMX_LOAD( "scph7500.bin", 0x0000000, 0x080000, NO_DUMP, ROM_BIOS(7) )
+	ROMX_LOAD( "scph9000.bin", 0x0000000, 0x080000, NO_DUMP, ROM_BIOS(8) )
+	ROMX_LOAD( "scph100.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(9) )
 ROM_END
 
-ROM_START( psxj11 )
+ROM_START( psxu )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph3000.bin",  0x0000000, 0x080000, CRC(3539def6) SHA1(b06f4a861f74270be819aa2a07db8d0563a7cc4e) )
+	ROMX_LOAD( "scph1001.bin",  0x0000000, 0x080000, CRC(37157331) SHA1(10155d8d6e6e832d6ea66db9bc098321fb5e8ebf), ROM_BIOS(1) )
+	ROMX_LOAD( "scph5001.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "scph5501.bin",  0x0000000, 0x080000, CRC(8d8cb7e4) SHA1(0555c6fae8906f3f09baf5988f00e55f88e9f30b), ROM_BIOS(3) ) // was 7003
+	ROMX_LOAD( "scph7001.bin",  0x0000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9), ROM_BIOS(4) )
+	ROMX_LOAD( "scph7501.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "scph9001.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(6) )
+	ROMX_LOAD( "scph101.bin",   0x0000000, 0x080000, CRC(171bdcec) SHA1(dcffe16bd90a723499ad46c641424981338d8378), ROM_BIOS(7) )
 ROM_END
 
-ROM_START( psxe20 )
+ROM_START( psxe )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph1002.bin",  0x0000000, 0x080000, CRC(9bb87c4b) SHA1(20b98f3d80f11cbf5a7bfd0779b0e63760ecc62c) )
+	ROMX_LOAD( "scph1002.bin",  0x0000000, 0x080000, CRC(9bb87c4b) SHA1(20b98f3d80f11cbf5a7bfd0779b0e63760ecc62c), ROM_BIOS(1) )
+	ROMX_LOAD( "dtlh3002.bin",  0x0000000, 0x080000, CRC(1e26792f) SHA1(b6a11579caef3875504fcf3831b8e3922746df2c), ROM_BIOS(2) )
+	ROMX_LOAD( "scph5002.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "scph5552.bin",  0x0000000, 0x080000, CRC(d786f0b9) SHA1(f6bc2d1f5eb6593de7d089c425ac681d6fffd3f0), ROM_BIOS(4) )
+	ROMX_LOAD( "scph7002.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "scph7502.bin",  0x0000000, 0x080000, CRC(318178bf) SHA1(8d5de56a79954f29e9006929ba3fed9b6a418c1d), ROM_BIOS(6) )
+	ROMX_LOAD( "scph9002.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(7) )
+	ROMX_LOAD( "scph102.bin",   0x0000000, 0x080000, NO_DUMP, ROM_BIOS(8) )
 ROM_END
 
-ROM_START( psxj21 )
+ROM_START( psxa )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph3500.bin",  0x0000000, 0x080000, CRC(bc190209) SHA1(e38466a4ba8005fba7e9e3c7b9efeba7205bee3f) )
-ROM_END
-
-ROM_START( psxj22 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-/*	ROM_LOAD( "scph5000.bin",  0x0000000, 0x080000, BAD_DUMP CRC(8c93a399) SHA1(e340db2696274dda5fdc25e434a914db71e8b02b) ) */
-	ROM_LOAD( "scph5000.bin",  0x0000000, 0x080000, CRC(24fc7e17) SHA1(ffa7f9a7fb19d773a0c3985a541c8e5623d2c30d) )
-ROM_END
-
-ROM_START( psxa22 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph1001.bin",  0x0000000, 0x080000, CRC(37157331) SHA1(10155d8d6e6e832d6ea66db9bc098321fb5e8ebf) )
-ROM_END
-
-ROM_START( psxe22 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "dtlh3002.bin",  0x0000000, 0x080000, CRC(1e26792f) SHA1(b6a11579caef3875504fcf3831b8e3922746df2c) )
-ROM_END
-
-ROM_START( psxj30 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph5500.bin",  0x0000000, 0x080000, CRC(ff3eeb8c) SHA1(b05def971d8ec59f346f2d9ac21fb742e3eb6917) )
-ROM_END
-
-ROM_START( psxa30 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph7003.bin",  0x0000000, 0x080000, CRC(8d8cb7e4) SHA1(0555c6fae8906f3f09baf5988f00e55f88e9f30b) )
-ROM_END
-
-ROM_START( psxe30 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-/*	ROM_LOAD( "scph5502.bin",  0x0000000, 0x080000, BAD_DUMP CRC(4d9e7c86) SHA1(f8de9325fc36fcfa4b29124d291c9251094f2e54) ) */
-	ROM_LOAD( "scph5552.bin",  0x0000000, 0x080000, CRC(d786f0b9) SHA1(f6bc2d1f5eb6593de7d089c425ac681d6fffd3f0) )
-ROM_END
-
-ROM_START( psxj40 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph7000.bin",  0x0000000, 0x080000, CRC(ec541cd0) SHA1(77b10118d21ac7ffa9b35f9c4fd814da240eb3e9) )
-ROM_END
-
-ROM_START( psxa41 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph7001.bin",  0x0000000, 0x080000, CRC(502224b6) SHA1(14df4f6c1e367ce097c11deae21566b4fe5647a9) )
-ROM_END
-
-ROM_START( psxe41 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph7502.bin",  0x0000000, 0x080000, CRC(318178bf) SHA1(8d5de56a79954f29e9006929ba3fed9b6a418c1d) )
-ROM_END
-
-ROM_START( psxa45 )
-	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
-	ROM_LOAD( "scph101.bin",  0x0000000, 0x080000, CRC(171bdcec) SHA1(dcffe16bd90a723499ad46c641424981338d8378) )
+	ROMX_LOAD( "scph5003.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "scph5503.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(2) )
+	ROMX_LOAD( "scph5903.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "scph7003.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(4) )
+	ROMX_LOAD( "scph7503.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(5) )
+	ROMX_LOAD( "scph9003.bin",  0x0000000, 0x080000, NO_DUMP, ROM_BIOS(6) )
+	ROMX_LOAD( "scph103.bin",   0x0000000, 0x080000, NO_DUMP, ROM_BIOS(7) )
 ROM_END
 
 static void psx_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
@@ -941,23 +959,30 @@ missing:
 */
 
 /*     YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY   FULLNAME */
-/* PU-7/PU-8 */
+/*
+// PU-7/PU-8
 CONS( 1994, psx,    0,      0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph1000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1995, psxj11, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph3000 J v1.1 01/22/95)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1995, psxe20, psx,    0,      psxpal,  psx,   psx,  psx,    "Sony",   "Sony Playstation (scph1002 E v2.0 05/10/95)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1995, psxj21, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph3500 J v2.1 07/17/95)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1995, psxa22, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph1001/dtlh3000 A v2.2 12/04/95)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1995, psxe22, psx,    0,      psxpal,  psx,   psx,  psx,    "Sony",   "Sony Playstation (scph1002/dtlh3002 E v2.2 12/04/95)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-/* PU-18 */
+// PU-18
 CONS( 1995, psxj22, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph5000 J v2.2 12/04/95)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1996, psxj30, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph5500 J v3.0 09/09/96)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1997, psxe30, psx,    0,      psxpal,  psx,   psx,  psx,    "Sony",   "Sony Playstation (scph5502/scph5552 E v3.0 01/06/97)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-/* PU-20 */
+// PU-20
 CONS( 1996, psxa30, psx,    0,      psxpal,  psx,   psx,  psx,    "Sony",   "Sony Playstation (scph7003 A v3.0 11/18/96)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1997, psxj40, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph7000 J v4.0 08/18/97)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1997, psxa41, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph7001 A v4.1 12/16/97)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-/* PU-22 */
+// PU-22
 CONS( 1997, psxe41, psx,    0,      psxpal,  psx,   psx,  psx,    "Sony",   "Sony Playstation (scph7502 E v4.1 12/16/97)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-/* PU-23 */
-/* PM-41 */
+// PU-23
+// PM-41
 CONS( 2000, psxa45, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony PS one (scph101 A v4.5 05/25/00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+*/
+
+CONS( 1994, psxj,   0,      0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Japan)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psxe,   psxj,   0,      psxpal,  psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Europe)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psxu,   psxj,   0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (USA)",		    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psxa,   psxj,   0,      psxpal,  psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Asia-Pacific)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
