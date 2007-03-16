@@ -9,15 +9,13 @@
 //
 //============================================================
 
-#include <SDL/SDL.h>
-// on win32 this includes windows.h by itself and breaks us!
 #ifndef SDLMAME_WIN32
-#include <SDL/SDL_syswm.h>
+#define _GNU_SOURCE 	// for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
 #endif
 
+#include <SDL/SDL.h>
+
 #ifdef SDLMAME_WIN32
-// for multimonitor
-#define _WIN32_WINNT 0x501
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -30,8 +28,6 @@
 #include "osdcore.h"
 
 #ifndef SDLMAME_WIN32
-#define __USE_UNIX98	// to get PTHREAD_MUTEX_xxx types
-#define _GNU_SOURCE 	// fixes older Debian/Ubuntu/Slack systems
 #include <pthread.h>
 
 //============================================================

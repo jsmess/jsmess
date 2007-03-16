@@ -33,7 +33,7 @@
 //============================================================
 
 #define QUEUE_STATE_DOWORK			0
-#define QUEUE_STATE_WORK_COMPLETE	1
+#define QUEUE_STATE_WORK_COMPLETE		1
 #define QUEUE_STATE_EXIT			2
 
 struct _osd_work_queue
@@ -60,11 +60,13 @@ struct _osd_work_item
 	osd_work_item *		next;			// pointer to next item
 	osd_work_queue *	queue;			// pointer back to the owning queue
 	osd_work_callback	callback;		// callback function
-	void *				param;			// callback parameter
-	void *				result;			// callback result
+	void *	    		param;			// callback parameter
+	void *	    		result;			// callback result
 	volatile int		state;			// WORK_STATE_* above
 	pthread_mutex_t		statelock;		// lock for state data
 	pthread_cond_t		statecond;		// condition variable to wait for state change
+	UINT32			flags;	 		// creation flags
+	UINT32			complete;		// are we finished yet?
 };
 
 
@@ -73,6 +75,7 @@ struct _osd_work_item
 //============================================================
 
 static void * worker_thread_entry(void *param);
+static int execute_work_item(osd_work_item *item);
 
 
 
@@ -162,6 +165,8 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	else
 		queue->threads = (flags & WORK_QUEUE_FLAG_MULTI) ? processors : 1;
 
+	queue->state = QUEUE_STATE_WORK_COMPLETE;
+
 	// if we have threads, create them
 	if (queue->threads > 0)
 	{
@@ -231,6 +236,8 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 	{
 		struct timespec   ts;
 		struct timeval    tp;
+
+//		usleep(1000);
 
 		if ( queue->state == QUEUE_STATE_WORK_COMPLETE )
 		{
@@ -320,7 +327,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 //  osd_work_item_queue
 //============================================================
 
-osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param)
+osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
 {
 	osd_work_item *item;
 
@@ -351,15 +358,15 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 	item->callback = callback;
 	item->param = param;
 	item->result = NULL;
+	item->flags = flags;
 	item->queue = queue;
+	item->complete = FALSE;
 	item->state = WORK_STATE_INCOMPLETE;
 
 	// if no threads, just run it now
 	if (queue->threads == 0)
 	{
-		item->result = (*item->callback)(item->param);
-		item->state = WORK_STATE_COMPLETE;
-		return item;
+		return execute_work_item(item) ? item : NULL;
 	}
 
 	// otherwise, enqueue it
@@ -388,6 +395,10 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 
 int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 {
+	// if we're done already, just return
+	if (item->complete)
+		return TRUE;
+
 	// wait for the collection to be signalled
 	if ( pthread_mutex_lock(&item->statelock) != 0 )
 		return FALSE;
@@ -397,7 +408,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 		struct timespec   ts;
 		struct timeval    tp;
 
-		if ( item->state == WORK_STATE_COMPLETE )
+		if ( item->complete )
 		{
 			pthread_mutex_unlock(&item->statelock);
 			return TRUE;
@@ -412,7 +423,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 			return FALSE;
 	} while( 1 );
 
-	return FALSE;
+	return item->complete;
 }
 
 
@@ -435,15 +446,7 @@ void osd_work_item_release(osd_work_item *item)
 	osd_work_item *next;
 
 	// make sure we're done first
-	pthread_mutex_lock(&item->statelock);
-	
-	do
-	{
-		if ( item->state != WORK_STATE_COMPLETE )
-			pthread_cond_wait(&item->statecond, &item->statelock );
-	} while( 1 );
-
-	pthread_mutex_unlock(&item->statelock);
+	osd_work_item_wait(item, 100 * osd_ticks_per_second());
 
 	// release the mutexes and conditions
 	pthread_cond_destroy(&item->statecond);
@@ -498,13 +501,15 @@ static void *worker_thread_entry(void *param)
 			pthread_mutex_unlock(&queue->critsect);
 
 			// call the callback and signal its complete
-			item->result = (*item->callback)(item->param);
-			
-			pthread_mutex_lock(&item->statelock);
-			item->state = WORK_STATE_COMPLETE;
-			pthread_mutex_unlock(&item->statelock);
-			pthread_cond_broadcast(&item->statecond);
-
+			if (item)
+			{
+				// WARNING: if execute_work_item returns FALSE the item was
+				// auto-destroyed and it's statecond is a bad thing to touch!
+				if (execute_work_item(item))
+				{
+					pthread_cond_broadcast(&item->statecond);
+				}
+			}
 			pthread_mutex_lock(&queue->critsect);
 			// decrement the count
 			queue->items--;
@@ -524,6 +529,28 @@ static void *worker_thread_entry(void *param)
 	}
 
 	return 0;
+}
+
+//============================================================
+//  execute_work_item
+//============================================================
+
+static int execute_work_item(osd_work_item *item)
+{
+	// call the callback and stash the result
+	item->result = (*item->callback)(item->param);
+
+	// mark it complete (and signal the event?)
+	item->complete = TRUE;
+
+	// if it's an auto-release item, release it
+	if (item->flags & WORK_ITEM_FLAG_AUTO_RELEASE)
+	{
+		osd_work_item_release(item);
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 #endif	// SDLMAME_WIN32

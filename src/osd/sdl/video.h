@@ -125,6 +125,7 @@ struct _sdl_video_config
 	int					prescale_effect;
 
 	// vector options
+	int					isvector;				// 1 if vector, 0 if raster
 	float					beamwidth;				// beam width
 
 	// X11 options
@@ -141,8 +142,6 @@ struct _sdl_video_config
 //============================================================
 
 extern sdl_monitor_info *sdl_monitor_list;
-
-extern int video_orientation;
 
 
 extern sdl_video_config video_config;

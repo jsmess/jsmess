@@ -140,7 +140,7 @@ static void yuv_RGB_to_YV12X2(UINT16 *bitmap, int bw, sdl_window_info *window)
 	{
 		src=bitmap + (y * bw) ;
 
-		dest_y = window->yuvsurf->pixels[0] + 2*y * window->yuvsurf->pitches[0];
+		dest_y = (UINT16 *)(window->yuvsurf->pixels[0] + 2*y * window->yuvsurf->pitches[0]);
 		dest_v = window->yuvsurf->pixels[1] + y * window->yuvsurf->pitches[1];
 		dest_u = window->yuvsurf->pixels[2] + y * window->yuvsurf->pitches[2];
 		for(x=0;x<window->yuv_ovl_width;x++)

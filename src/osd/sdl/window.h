@@ -189,4 +189,12 @@ INLINE int sdl_has_menu(sdl_window_info *window)
 	return FALSE;
 }
 
+//============================================================
+//  multitasking
+//============================================================
+
+#define sdlwindow_sync() _sdlwindow_sync(__FILE__, __LINE__)
+
+void _sdlwindow_sync(const char *s, int line);
+
 #endif

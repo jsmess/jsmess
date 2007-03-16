@@ -495,7 +495,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	}
 
 	// only clear if the geometry changes (and for 2 frames afterward to clear double and triple buffers)
-	if (blittimer > 0)
+	if ((blittimer > 0) || (video_config.isvector))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 		blittimer--;
@@ -517,7 +517,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	// we're doing nothing 3d, so the Z-buffer is currently not interesting
 	glDisable(GL_DEPTH_TEST);
 
-	if (options.antialias)
+	if (options_get_bool(OPTION_ANTIALIAS))
 	{
 		// enable antialiasing for lines
 		glEnable(GL_LINE_SMOOTH);

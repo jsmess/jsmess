@@ -53,6 +53,7 @@ enum
 	ANALOG_TYPE_PEDAL,
 	ANALOG_TYPE_DIAL,
 	ANALOG_TYPE_TRACKBALL,
+	ANALOG_TYPE_POSITIONAL,
 #ifdef MESS
 	ANALOG_TYPE_MOUSE,
 #endif // MESS
@@ -1495,13 +1496,13 @@ static void extract_input_config(void)
 	use_joystick = options_get_bool("joystick");
 	steadykey = options_get_bool("steadykey");
 	a2d_deadzone = options_get_float("a2d_deadzone");
-	options.controller = options_get_string("ctrlr");
 	parse_analog_select(ANALOG_TYPE_PADDLE, "paddle_device");
 	parse_analog_select(ANALOG_TYPE_ADSTICK, "adstick_device");
 	parse_analog_select(ANALOG_TYPE_PEDAL, "pedal_device");
 	parse_analog_select(ANALOG_TYPE_DIAL, "dial_device");
 	parse_analog_select(ANALOG_TYPE_TRACKBALL, "trackball_device");
 	parse_analog_select(ANALOG_TYPE_LIGHTGUN, "lightgun_device");
+	parse_analog_select(ANALOG_TYPE_POSITIONAL, "positional_device");
 #ifdef MESS
 	parse_analog_select(ANALOG_TYPE_MOUSE, "mouse_device");
 #endif

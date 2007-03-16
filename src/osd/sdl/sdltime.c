@@ -394,10 +394,10 @@ void osd_sleep(osd_ticks_t duration)
 	// convert to milliseconds, rounding down
 	msec = (UINT32)(duration * 1000 / ticks_per_second);
 
-	// only sleep if at least 1 full millisecond
+	// only sleep if at least 2 full milliseconds
 	if (msec >= 2)
 	{
-		// take one more msec off the top for good measure
+		// take a couple of msecs off the top for good measure
 		msec -= 2;
 		#ifdef SDLMAME_WIN32
 		Sleep(msec);

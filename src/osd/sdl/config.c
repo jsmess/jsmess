@@ -60,9 +60,6 @@ void set_pathlist(int file_type, const char *new_rawpath);
 
 int win_erroroslog;
 
-// fix me - need to have the core call osd_set_mastervolume with this value
-// instead of relying on the name of an osd variable
-extern int attenuation;
 extern int audio_latency;
 extern const char *wavwrite;
 
@@ -72,12 +69,10 @@ extern const char *wavwrite;
 //  PROTOTYPES
 //============================================================
 
-static void extract_options(const game_driver *driver, machine_config *drv);
 static void parse_ini_file(const char *name);
 static void execute_simple_commands(void);
 static void execute_commands(const char *argv0);
 static void display_help(void);
-static void extract_options(const game_driver *driver, machine_config *drv);
 static void setup_playback(const char *filename, const game_driver *driver);
 static void setup_record(const char *filename, const game_driver *driver);
 static char *extract_base_name(const char *name, char *dest, int destsize);
@@ -120,34 +115,11 @@ static const options_entry sdl_opts[] =
 	// config options
 	{ NULL,                       NULL,       OPTION_HEADER,     "CONFIGURATION OPTIONS" },
 	{ "readconfig;rc",            "1",        OPTION_BOOLEAN,    "enable loading of configuration files" },
-	{ "skip_gameinfo",            "0",        OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
-
-	// misc options
-	{ NULL,                       NULL,       OPTION_HEADER,     "MISC OPTIONS" },
-	{ "bios",                     "default",  0,                 "select the system BIOS to use" },
-	{ "cheat;c",                  "0",        OPTION_BOOLEAN,    "enable cheat subsystem" },
-
-	// state/playback options
-	{ NULL,                       NULL,       OPTION_HEADER,     "STATE/PLAYBACK OPTIONS" },
-	{ "state",                    NULL,       0,                 "saved state to load" },
-	{ "autosave",                 "0",        OPTION_BOOLEAN,    "enable automatic restore at startup, and automatic save at exit time" },
-	{ "playback;pb",              NULL,       0,                 "playback an input file" },
-	{ "record;rec",               NULL,       0,                 "record an input file" },
-	{ "mngwrite",                 NULL,       0,                 "optional filename to write a MNG movie of the current session" },
-	{ "wavwrite",                 NULL,       0,                 "optional filename to write a WAV file of the current session" },
 
 	// debugging options
 	{ NULL,                       NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
-	{ "log",                      "0",        OPTION_BOOLEAN,    "generate an error.log file" },
 	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
 	{ "verbose;v",                "0",        OPTION_BOOLEAN,    "display additional diagnostic information" },
-#ifdef MAME_DEBUG
-	{ "debug;d",                  "1",        OPTION_BOOLEAN,    "enable/disable debugger" },
-	{ "debugscript",              NULL,       0,                 "script for debugger" },
-#else
-	{ "debug;d",                  "1",        OPTION_DEPRECATED, "(debugger-only command)" },
-	{ "debugscript",              NULL,       OPTION_DEPRECATED, "(debugger-only command)" },
-#endif
 
 	// performance options
 	{ NULL,                       NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
@@ -165,6 +137,7 @@ static const options_entry sdl_opts[] =
 	#if defined(SDLMAME_MACOSX) && !defined(X86_ASM)
 	{ "machtmr",                  "0",    OPTION_BOOLEAN, "use Mach timers for timing on PowerPC; alternative is SDL's built-in" },
 	#endif
+	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
 
 	// video options
 	{ NULL,                       NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
@@ -182,16 +155,6 @@ static const options_entry sdl_opts[] =
 	{ "waitvsync",                "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	#endif
 	{ "yuvmode;ym",               "none",     0,                 "YUV mode: none, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
-
-	// video rotation options
-	{ NULL,                       NULL,       OPTION_HEADER,     "VIDEO ROTATION OPTIONS" },
-	{ "rotate",                   "1",        OPTION_BOOLEAN,    "rotate the game screen according to the game's orientation needs it" },
-	{ "ror",                      "0",        OPTION_BOOLEAN,    "rotate screen clockwise 90 degrees" },
-	{ "rol",                      "0",        OPTION_BOOLEAN,    "rotate screen counterclockwise 90 degrees" },
-	{ "autoror",                  "0",        OPTION_BOOLEAN,    "automatically rotate screen clockwise 90 degrees if vertical" },
-	{ "autorol",                  "0",        OPTION_BOOLEAN,    "automatically rotate screen counterclockwise 90 degrees if vertical" },
-	{ "flipx",                    "0",        OPTION_BOOLEAN,    "flip screen left-right" },
-	{ "flipy",                    "0",        OPTION_BOOLEAN,    "flip screen upside-down" },
 
 	// OpenGL specific options
 	{ NULL,                       NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
@@ -254,15 +217,10 @@ static const options_entry sdl_opts[] =
 
 	// sound options
 	{ NULL,                       NULL,       OPTION_HEADER,     "SOUND OPTIONS" },
-	{ "sound",                    "1",        OPTION_BOOLEAN,    "enable sound output" },
-	{ "samplerate;sr",            "48000",    0,                 "set sound output sample rate" },
-	{ "samples",                  "1",        OPTION_BOOLEAN,    "enable the use of external samples if available" },
-	{ "volume",                   "0",        0,                 "sound volume in decibels (-32 min, 0 max)" },
 	{ "audio_latency",            "3",        0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// input options
 	{ NULL,                       NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ "ctrlr",                    NULL,       0,                 "preconfigure for specified controller" },
 	{ "mouse",                    "0",        OPTION_BOOLEAN,    "enable mouse input" },
 	{ "joystick;joy",             "0",        OPTION_BOOLEAN,    "enable joystick input" },
 	{ "steadykey;steady",         "0",        OPTION_BOOLEAN,    "enable steadykey support" },
@@ -276,6 +234,7 @@ static const options_entry sdl_opts[] =
 	{ "dial_device;dial",         "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a dial control is present" },
 	{ "trackball_device;trackball","keyboard", 0,                "enable (keyboard|mouse|joystick) if a trackball control is present" },
 	{ "lightgun_device",          "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a lightgun control is present" },
+	{ "positional_device",        "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a positional control is present" },
 #ifdef MESS
 	{ "mouse_device",             "mouse",    0,                 "enable (keyboard|mouse|joystick) if a mouse control is present" },
 #endif
@@ -445,8 +404,15 @@ int cli_frontend_init(int argc, char **argv)
 		}
 	}
 
-	// extract options information
-	extract_options(drivers[drvnum], &drv);
+#ifdef MESS
+	win_mess_extract_options();
+#endif /* MESS */
+
+{
+	extern int verbose;
+	verbose = options_get_bool("verbose");
+}
+
 	return drvnum;
 }
 
@@ -458,23 +424,6 @@ int cli_frontend_init(int argc, char **argv)
 
 void cli_frontend_exit(void)
 {
-	// close open files
-	if (options.logfile != NULL)
-		mame_fclose(options.logfile);
-	options.logfile = NULL;
-
-	if (options.playback != NULL)
-		mame_fclose(options.playback);
-	options.playback = NULL;
-
-	if (options.record != NULL)
-		mame_fclose(options.record);
-	options.record = NULL;
-
-	if (options.language_file != NULL)
-		mame_fclose(options.language_file);
-	options.language_file = NULL;
-
 	// free the options that we added previously
 	options_free_entries();
 }
@@ -487,7 +436,7 @@ void cli_frontend_exit(void)
 
 static void parse_ini_file(const char *name)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	char *fname;
 
@@ -575,7 +524,7 @@ static void execute_commands(const char *argv0)
 	{
 		char basename[128];
 		mame_file *file;
-		mame_file_error filerr;
+		file_error filerr;
 
 		// make the base name
 		extract_base_name(argv0, basename, ARRAY_LENGTH(basename) - 5);
@@ -638,150 +587,6 @@ static void display_help(void)
 	showmessinfo();
 #endif
 }
-
-
-
-//============================================================
-//  extract_options
-//============================================================
-
-static void extract_options(const game_driver *driver, machine_config *drv)
-{
-	const char *stemp;
-
-	// clear all core options
-	memset(&options, 0, sizeof(options));
-
-	// video options
-	video_orientation = ROT0;
-
-	// override if no rotation requested
-	if (!options_get_bool("rotate"))
-		video_orientation = orientation_reverse(driver->flags & ORIENTATION_MASK);
-
-	// rotate right
-	if (options_get_bool("ror") || (options_get_bool("autoror") && (driver->flags & ORIENTATION_SWAP_XY)))
-		video_orientation = orientation_add(ROT90, video_orientation);
-
-	// rotate left
-	if (options_get_bool("rol") || (options_get_bool("autorol") && (driver->flags & ORIENTATION_SWAP_XY)))
-		video_orientation = orientation_add(ROT270, video_orientation);
-
-	// flip X/Y
-	if (options_get_bool("flipx"))
-		video_orientation ^= ORIENTATION_FLIP_X;
-	if (options_get_bool("flipy"))
-		video_orientation ^= ORIENTATION_FLIP_Y;
-
-	// brightness
-	options.brightness = options_get_float_range("brightness", 0.1f, 2.0f);
-	options.contrast = options_get_float_range("contrast", 0.1f, 2.0f);
-	options.pause_bright = options_get_float_range("pause_brightness", 0.0f, 1.0f);
-	options.gamma = options_get_float_range("gamma", 0.1f, 3.0f);
-
-	// vector options
-	options.antialias = options_get_bool("antialias");
-	options.beam = (int)(options_get_float("beam") * 65536.0f);
-	options.vector_flicker = options_get_float("flicker");
-
-	// sound options
-	options.samplerate = options_get_bool("sound") ? options_get_int_range("samplerate", 1000, 1000000) : 0;
-	options.use_samples = options_get_bool("samples");
-	attenuation = options_get_int("volume");
-	audio_latency = options_get_int("audio_latency");
-	wavwrite = options_get_string("wavwrite");
-
-	// misc options
-	options.bios = (char *)options_get_string("bios");
-	options.cheat = options_get_bool("cheat");
-	options.skip_gameinfo = options_get_bool("skip_gameinfo");
-
-#ifdef MESS
-	win_mess_extract_options();
-#endif /* MESS */
-
-	// save states and input recording
-	stemp = options_get_string("playback");
-	if (stemp != NULL)
-		setup_playback(stemp, driver);
-	stemp = options_get_string("record");
-	if (stemp != NULL)
-		setup_record(stemp, driver);
-	options.savegame = options_get_string("state");
-	options.auto_save = options_get_bool("autosave");
-
-	// debugging options
-	if (options_get_bool("log"))
-	{
-		mame_file_error filerr = mame_fopen(SEARCHPATH_DEBUGLOG, "error.log", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &options.logfile);
-		assert_always(filerr == FILERR_NONE, "unable to open log file");
-	}
-	win_erroroslog = options_get_bool("oslog");
-{
-	extern int verbose;
-	verbose = options_get_bool("verbose");
-}
-#ifdef MAME_DEBUG
-	options.mame_debug = options_get_bool("debug");
-	stemp = options_get_string("debugscript");
-	if (stemp != NULL)
-		debug_source_script(stemp);
-#endif
-	}
-
-
-
-//============================================================
-//  setup_playback
-//============================================================
-
-static void setup_playback(const char *filename, const game_driver *driver)
-{
-	mame_file_error filerr;
-	inp_header inp_header;
-
-	// open the playback file
-	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_READ, &options.playback);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
-
-	// read playback header
-	mame_fread(options.playback, &inp_header, sizeof(inp_header));
-
-	// if the first byte is not alphanumeric, it's an old INP file with no header
-	if (!isalnum(inp_header.name[0]))
-		mame_fseek(options.playback, 0, SEEK_SET);
-
-	// else verify the header against the current game
-	else if (strcmp(driver->name, inp_header.name) != 0)
-		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", inp_header.name, driver->name);
-
-	// otherwise, print a message indicating what's happening
-	else
-		printf("Playing back previously recorded " GAMENOUN " %s\n", driver->name);
-}
-
-
-
-//============================================================
-//  setup_record
-//============================================================
-
-static void setup_record(const char *filename, const game_driver *driver)
-{
-	mame_file_error filerr;
-	inp_header inp_header;
-
-	// open the record file
-	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &options.record);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
-
-	// create a header
-	memset(&inp_header, '\0', sizeof(inp_header));
-	strcpy(inp_header.name, driver->name);
-	mame_fwrite(options.record, &inp_header, sizeof(inp_header));
-}
-
-
 
 //============================================================
 //  extract_base_name

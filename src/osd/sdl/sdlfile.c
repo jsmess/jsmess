@@ -50,11 +50,11 @@ struct _osd_file
 
 
 //============================================================
-//  error_to_mame_file_error
+//  error_to_file_error
 //  (does filling this out on non-Windows make any sense?)
 //============================================================
 
-static mame_file_error error_to_mame_file_error(UINT32 error)
+static file_error error_to_file_error(UINT32 error)
 {
 	switch (error)
 	{
@@ -86,7 +86,7 @@ static mame_file_error error_to_mame_file_error(UINT32 error)
 //  osd_open
 //============================================================
 
-mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
+file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
 	UINT32 access;
 	const char *src;
@@ -98,7 +98,7 @@ mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UI
 	#endif
 	char *tmpstr, *envstr;
 	int i, j;
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 
 	tmpstr = NULL;
 
@@ -213,7 +213,7 @@ mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UI
 			free(*file);
 			*file = NULL;
 			free(tmpstr);
-			return error_to_mame_file_error(errno);
+			return error_to_file_error(errno);
 		}
 	}
 
@@ -244,7 +244,7 @@ error:
 //  osd_read
 //============================================================
 
-mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
+file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
 	UINT32 result;
 
@@ -261,7 +261,7 @@ mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 cou
 #else
 #error Unknown SDL SUBARCH!
 #endif
-		return error_to_mame_file_error(errno);
+		return error_to_file_error(errno);
 	if (actual != NULL)
 		*actual = result;
 	return FILERR_NONE;
@@ -272,7 +272,7 @@ mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 cou
 //  osd_write
 //============================================================
 
-mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
+file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
 	UINT32 result;
 
@@ -289,7 +289,7 @@ mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UIN
 #else
 #error Unknown SDL SUBARCH!
 #endif
-		return error_to_mame_file_error(errno);
+		return error_to_file_error(errno);
 
 	if (actual != NULL)
 		*actual = result;
@@ -301,7 +301,7 @@ mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UIN
 //  osd_close
 //============================================================
 
-mame_file_error osd_close(osd_file *file)
+file_error osd_close(osd_file *file)
 {
 	// close the file handle and free the file structure
 	close(file->handle);
@@ -313,11 +313,11 @@ mame_file_error osd_close(osd_file *file)
 //  osd_rmfile
 //============================================================
 
-mame_file_error osd_rmfile(const char *filename)
+file_error osd_rmfile(const char *filename)
 {
 	if (unlink(filename) == -1)
 	{
-		return error_to_mame_file_error(errno);                                                
+		return error_to_file_error(errno);                                                
 	}
 
 	return FILERR_NONE;
@@ -330,7 +330,7 @@ mame_file_error osd_rmfile(const char *filename)
 static UINT32 create_path_recursive(char *path)
 {
 	char *sep = strrchr(path, PATHSEPCH);
-	mame_file_error filerr;
+	file_error filerr;
 	struct stat st;
 
 	// if there's still a separator, and it's not the root, nuke it and recurse
@@ -351,7 +351,7 @@ static UINT32 create_path_recursive(char *path)
 	#else
 	if (mkdir(path, 0777) != 0)
 	#endif
-		return error_to_mame_file_error(errno);
+		return error_to_file_error(errno);
 	return NO_ERROR;
 }
 
@@ -400,7 +400,7 @@ int osd_is_absolute_path(const char *path)
 //	osd_mkdir
 //============================================================
 
-mame_file_error osd_mkdir(const char *dir)
+file_error osd_mkdir(const char *dir)
 {
 	#ifdef SDLMAME_WIN32
 	if (mkdir(dir) != 0)
@@ -408,7 +408,7 @@ mame_file_error osd_mkdir(const char *dir)
 	if (mkdir(dir, 0666) != 0)
 	#endif
 	{
-		return error_to_mame_file_error(errno);
+		return error_to_file_error(errno);
 	}
 
 	return FILERR_NONE;
@@ -418,11 +418,11 @@ mame_file_error osd_mkdir(const char *dir)
 //	osd_rmdir
 //============================================================
 
-mame_file_error osd_rmdir(const char *dir)
+file_error osd_rmdir(const char *dir)
 {
 	if (rmdir(dir) != 0)
 	{
-		return error_to_mame_file_error(errno);
+		return error_to_file_error(errno);
 	}
 
 	return FILERR_NONE;
@@ -432,7 +432,7 @@ mame_file_error osd_rmdir(const char *dir)
 //	osd_copyfile
 //============================================================
 
-mame_file_error osd_copyfile(const char *destfile, const char *srcfile)
+file_error osd_copyfile(const char *destfile, const char *srcfile)
 {
 	char command[1024];
 

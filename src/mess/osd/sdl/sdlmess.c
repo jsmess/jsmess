@@ -13,9 +13,9 @@
 //	osd_getcurdir
 //============================================================
 
-mame_file_error osd_getcurdir(char *buffer, size_t buffer_len)
+file_error osd_getcurdir(char *buffer, size_t buffer_len)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 
 	if (getcwd(buffer, buffer_len) != 0)
 	{
@@ -29,9 +29,9 @@ mame_file_error osd_getcurdir(char *buffer, size_t buffer_len)
 //	osd_setcurdir
 //============================================================
 
-mame_file_error osd_setcurdir(const char *dir)
+file_error osd_setcurdir(const char *dir)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 
 	if (chdir(dir) != 0)
 	{
@@ -116,7 +116,7 @@ void osd_change_device(const char *device)
 //	osd_get_temp_filename
 //============================================================
 
-mame_file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
+file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
 {
 	char tempbuf[512];
 

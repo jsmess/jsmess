@@ -22,7 +22,6 @@
 // MAME headers
 #include "driver.h"
 #include "osdepend.h"
-#include "sound/wavwrite.h"
 #include "window.h"
 #include "video.h"
 
@@ -56,11 +55,8 @@ extern int verbose;
 //	GLOBAL VARIABLES
 //============================================================
 
-// global parameters
-int 					attenuation = 0;
-
+int	 				attenuation = 0;
 int		 			audio_latency;
-char *		 			wavwrite;
 
 //============================================================
 //	LOCAL VARIABLES
@@ -85,8 +81,6 @@ static int				buffer_overflows;
 #if LOG_SOUND
 #define sound_log stderr
 #endif
-
-static void *				wavptr;
 
 // sound enable
 static int snd_enabled;
@@ -120,17 +114,6 @@ void sdl_init_audio(void)
 		// set the startup volume
 		osd_set_mastervolume(attenuation);
 	}
-
-	// create wav file
-	if( wavwrite != NULL )
-	{
-		wavptr = wav_open( wavwrite, Machine->sample_rate, 2);
-	}
-	else
-	{
-		wavptr = NULL;
-	}
-
 	return;
 }
 
@@ -142,12 +125,6 @@ void sdl_init_audio(void)
 
 void sdl_cleanup_audio(void)
 {
-	if( wavptr != NULL )
-	{
-		wav_close( wavptr );
-		wavptr = NULL;
-	}
-
 	// if nothing to do, don't do it
 	if (Machine->sample_rate == 0)
 		return;
@@ -343,10 +320,6 @@ void osd_update_audio_stream(INT16 *buffer, int samples_this_frame)
 		// now we know where to copy; let's do it
 		stream_buffer_in = stream_in % stream_buffer_size;
 		copy_sample_data(buffer, bytes_this_frame);
-
-		// append to the wav file
-		if (wavptr != NULL)
-			wav_add_data_16(wavptr, buffer, samples_this_frame * 2);
 	}
 }
 
@@ -363,6 +336,7 @@ void osd_set_mastervolume(int _attenuation)
 		_attenuation = 0;
 	if (_attenuation < -32)
 		_attenuation = -32;
+
 	attenuation = _attenuation;
 }
 
