@@ -101,7 +101,7 @@ easier to manage.
 
 /*common vars/calls */
 static UINT8 *coco_rom;
-static int dclg_state;
+static int dclg_state, dclg_output_h, dclg_output_v, dclg_timer;
 static UINT8 (*update_keyboard)(void);
 static mame_timer *update_keyboard_timer;
 
@@ -1009,7 +1009,7 @@ static coco_input_device input_device(coco_input_port port)
 			/* "Diecom Light Gun Adaptor" */
 			switch(port)
 			{
-				case INPUTPORT_RIGHT_JOYSTICK:	result = INPUTDEVICE_HIRES_CC3MAX_INTERFACE; break;
+				case INPUTPORT_RIGHT_JOYSTICK:	result = INPUTDEVICE_DIECOM_LIGHTGUN; break;
 				case INPUTPORT_LEFT_JOYSTICK:	result = INPUTDEVICE_LEFT_JOYSTICK; break;
 				case INPUTPORT_SERIAL:			result = INPUTDEVICE_DIECOM_LIGHTGUN; break;
 				default:						result = INPUTDEVICE_NA; break;
@@ -1236,6 +1236,7 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 
 static WRITE8_HANDLER ( d_pia0_ca2_w )
 {
+	(*update_keyboard)();
 	soundmux_update();
 }
 
@@ -1243,6 +1244,7 @@ static WRITE8_HANDLER ( d_pia0_ca2_w )
 
 static WRITE8_HANDLER ( d_pia0_cb2_w )
 {
+	(*update_keyboard)();
 	soundmux_update();
 }
 
@@ -1267,10 +1269,11 @@ static UINT8 coco_update_keyboard(void)
 	UINT8 porta = 0x7F;
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
+	static const int dclg_table[] = {0, 14, 30, 49 };
+	mame_time dclg_time = time_zero;
 	UINT8 pia0_pb;
 	UINT8 dac = pia_get_output_a(1) & 0xFC;
 	int joystick_axis, joystick;
-	
 	pia0_pb = pia_get_output_b(0);
 	joystick_axis = pia_get_output_ca2(0);
 	joystick = pia_get_output_cb2(0);
@@ -1311,57 +1314,37 @@ static UINT8 coco_update_keyboard(void)
 			break;
 
 		case INPUTDEVICE_DIECOM_LIGHTGUN:
+			if( (cpu_getscanline() == readinputportbytag_safe("dclg_y", 0)) )
 			{
-				int dclg_output;
-				static const int dclg_table[] = {0, 14, 30, 49 };
-				static int dclg_timer;
-				
-				dclg_output = 0;
-				
-				/* Diecom light gun interface */
-				if (joystick_axis)
-				{
-					if (dclg_state == 15)
-						dclg_output |= 0x01;
-					
-					if (dclg_state == 7)
-					{	
-						if (cpu_getscanline() == readinputportbytag_safe("dclg_y", 0))
-						{
-							dclg_output |= 0x02;
-							dclg_timer = readinputportbytag_safe("dclg_x", 0) << 1;
-						}
-					}
-				}
-				else
-				{
-					if ((dclg_state > 7) && (dclg_state < 16 ))
-					{
-						/* bit shift timer data on state 8 thru 15 */
-						if (((dclg_timer >> (dclg_state-8+1)) & 0x01) == 1)
-							dclg_output |= 0x01;
-						
-						/* Bit 9 of timer is only avaiable if state == 8*/
-						if (dclg_state == 8)
-						{
-							if (((dclg_timer >> 9) & 0x01) == 1)
-								dclg_output |= 0x02;
-						}
-					}
-				}
-		 
-				if (dac <= dclg_table[dclg_output])
-					porta |= 0x80;
+				/* If gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
+				dclg_output_h |= 0x02;
+				dclg_timer = readinputportbytag_safe("dclg_x", 0) << 1;
 			}
+
+			if ( (dac >> 2) <= dclg_table[ (joystick_axis ? dclg_output_h : dclg_output_v) & 0x03 ])
+				porta |= 0x80;
+
+			if( (dclg_state == 7) )
+			{
+				/* While in state 7, prepare to chech next video frame for a hit */
+				dclg_time = cpu_getscanlinetime_mt( readinputportbytag_safe("dclg_y", 0));
+			}
+			
 			break;
 
 		default:
 			fatalerror("Invalid value returned by input_device");
 			break;
 	}
-
-	/* schedule hires joystick events, if necessary, if necessary */
+	
+	if( compare_mame_times(dclg_time, time_zero) )
 	{
+		/* schedule lightgun events */
+		mame_timer_reset(update_keyboard_timer, dclg_time );
+	}
+	else
+	{
+		/* schedule hires joystick events */
 		mame_time xtrans = get_relative_time(coco_hiresjoy_xtransitiontime);
 		mame_time ytrans = get_relative_time(coco_hiresjoy_ytransitiontime);
 
@@ -1506,10 +1489,6 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 	static int dclg_previous_bit;
 	
 	coco_sound_update();
-	(*update_keyboard)();
-
-	if (input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
-		coco_hiresjoy_w(dac >= 0x80);
 
 	if (input_device(INPUTPORT_SERIAL) == INPUTDEVICE_DIECOM_LIGHTGUN)
 	{
@@ -1522,15 +1501,45 @@ static WRITE8_HANDLER ( d_pia1_pa_w )
 				/* Clock Diecom Light gun interface on a high to low transistion */
 				dclg_state++;
 				dclg_state &= 0x0f;
+				
+				/* Clear hit bit for every transistion */
+				dclg_output_h &= ~0x02;				
+
+				if( dclg_state > 7 )
+				{
+					/* Bit shift timer data on state 8 thru 15 */
+					if (((dclg_timer >> (dclg_state-8+1)) & 0x01) == 1)
+						dclg_output_v |= 0x01;
+					else
+						dclg_output_v &= ~0x01;
+						
+					/* Bit 9 of timer is only avaiable if state == 8*/
+					if (dclg_state == 8 && (((dclg_timer >> 9) & 0x01) == 1) )
+						dclg_output_v |= 0x02;
+					else
+						dclg_output_v &= ~0x02;
+				}
+				
+				/* During state 15, this bit is high. */
+				if( dclg_state == 15 )
+					dclg_output_h |= 0x01;
+				else
+					dclg_output_h &= ~0x01;
 			}
 		}
 
 		dclg_previous_bit = dclg_this_bit;
+
 	}
 	else
 	{
 		cassette_output(cassette_device_image(), ((int) dac - 0x80) / 128.0);
 	}
+
+	(*update_keyboard)();
+
+	if (input_device(INPUTPORT_RIGHT_JOYSTICK) == INPUTDEVICE_HIRES_INTERFACE)
+		coco_hiresjoy_w(dac >= 0x80);
 
 	/* Handle printer output, serial for CoCos, Paralell for Dragons */
 	
