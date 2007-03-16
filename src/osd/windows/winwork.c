@@ -49,6 +49,8 @@ struct _osd_work_item
 	void *			param;			// callback parameter
 	void *			result;			// callback result
 	HANDLE			event;			// event signalled when complete
+	UINT32			flags;			// creation flags
+	UINT32			complete;		// are we finished yet?
 };
 
 
@@ -58,6 +60,7 @@ struct _osd_work_item
 //============================================================
 
 static void worker_thread_entry(void *param);
+static int execute_work_item(osd_work_item *item);
 
 
 
@@ -263,7 +266,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 //  osd_work_item_queue
 //============================================================
 
-osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param)
+osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
 {
 	osd_work_item *item;
 
@@ -280,14 +283,6 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 		item = malloc(sizeof(*item));
 		if (item == NULL)
 			return NULL;
-
-		// allocate an event to signal done
-		item->event = CreateEvent(NULL, TRUE, FALSE, NULL);		// manual reset, not signalled
-		if (item->event == NULL)
-		{
-			free(item);
-			return NULL;
-		}
 	}
 
 	// fill in the basics
@@ -295,16 +290,15 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 	item->callback = callback;
 	item->param = param;
 	item->result = NULL;
+	item->flags = flags;
 	item->queue = queue;
-	ResetEvent(item->event);
+	item->complete = FALSE;
+	if (item->event != NULL)
+		ResetEvent(item->event);
 
 	// if no threads, just run it now
 	if (queue->threads == 0)
-	{
-		item->result = (*item->callback)(item->param);
-		SetEvent(item->event);
-		return item;
-	}
+		return execute_work_item(item) ? item : NULL;
 
 	// otherwise, enqueue it
 	EnterCriticalSection(&queue->critsect);
@@ -328,7 +322,26 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 
 int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 {
-	return (WaitForSingleObject(item->event, timeout * 1000 / osd_ticks_per_second()) == WAIT_OBJECT_0);
+	// if we're done already, just return
+	if (item->complete)
+		return TRUE;
+
+	// if we don't have an event, create one
+	if (item->event == NULL)
+		item->event = CreateEvent(NULL, TRUE, FALSE, NULL);		// manual reset, not signalled
+
+	// if we don't have an event, we need to spin (shouldn't ever really happen)
+	if (item->event != NULL)
+	{
+		osd_ticks_t endtime = osd_ticks() + timeout;
+		while (!item->complete && endtime - osd_ticks() > 0) ;
+	}
+
+	// otherwise, block on the event until done
+	else if (!item->complete)
+		WaitForSingleObject(item->event, timeout * 1000 / osd_ticks_per_second());
+
+	return item->complete;
 }
 
 
@@ -351,7 +364,7 @@ void osd_work_item_release(osd_work_item *item)
 	osd_work_item *next;
 
 	// make sure we're done first
-	WaitForSingleObject(item->event, INFINITE);
+	osd_work_item_wait(item, 100 * osd_ticks_per_second());
 
 	// add us to the free list on our queue
 	do
@@ -386,6 +399,7 @@ static void worker_thread_entry(void *param)
 			break;
 
 		// loop until everything is processed
+//again:
 		while (queue->items != 0)
 		{
 			osd_work_item *item;
@@ -405,8 +419,7 @@ static void worker_thread_entry(void *param)
 			LeaveCriticalSection(&queue->critsect);
 
 			// call the callback and signal its event
-			item->result = (*item->callback)(item->param);
-			SetEvent(item->event);
+			execute_work_item(item);
 
 			// decrement the count
 			if (interlocked_decrement(&queue->items) == 0)
@@ -415,5 +428,37 @@ static void worker_thread_entry(void *param)
 			// decrement the live thread count
 			interlocked_decrement(&queue->livethreads);
 		}
+
+		// hard loop for a while
+/*{
+    int count = 0;
+        while (queue->items == 0 && count++ < 10000000) ;
+    if (queue->items != 0) goto again;
+}*/
 	}
+}
+
+
+//============================================================
+//  execute_work_item
+//============================================================
+
+static int execute_work_item(osd_work_item *item)
+{
+	// call the callback and stash the result
+	item->result = (*item->callback)(item->param);
+
+	// mark it complete and signal the event
+	item->complete = TRUE;
+	if (item->event != NULL)
+		SetEvent(item->event);
+
+	// if it's an auto-release item, release it
+	if (item->flags & WORK_ITEM_FLAG_AUTO_RELEASE)
+	{
+		osd_work_item_release(item);
+		return FALSE;
+	}
+
+	return TRUE;
 }

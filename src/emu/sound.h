@@ -67,7 +67,7 @@ struct _speaker_config
 ***************************************************************************/
 
 /* core interfaces */
-int sound_init(running_machine *machine);
+void sound_init(running_machine *machine);
 
 /* global sound controls */
 void sound_mute(int mute);

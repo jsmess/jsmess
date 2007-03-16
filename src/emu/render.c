@@ -488,9 +488,9 @@ void render_init(running_machine *machine)
 		{
 			screen_container[scrnum] = render_container_alloc();
 			render_container_set_orientation(screen_container[scrnum], Machine->gamedrv->flags & ORIENTATION_MASK);
-			render_container_set_brightness(screen_container[scrnum], options.brightness);
-			render_container_set_contrast(screen_container[scrnum], options.contrast);
-			render_container_set_gamma(screen_container[scrnum], options.gamma);
+			render_container_set_brightness(screen_container[scrnum], options_get_float_range(OPTION_BRIGHTNESS, 0.1f, 2.0f));
+			render_container_set_contrast(screen_container[scrnum], options_get_float_range(OPTION_CONTRAST, 0.1f, 2.0f));
+			render_container_set_gamma(screen_container[scrnum], options_get_float_range(OPTION_GAMMA, 0.1f, 3.0f));
 		}
 
 	/* register callbacks */
@@ -778,17 +778,17 @@ static void render_save(int config_type, xml_data_node *parentnode)
 				xml_set_attribute_int(screennode, "index", scrnum);
 
 				/* output the color controls */
-				if (container->brightness != options.brightness)
+				if (container->brightness != options_get_float_range(OPTION_BRIGHTNESS, 0.1f, 2.0f))
 				{
 					xml_set_attribute_float(screennode, "brightness", container->brightness);
 					changed = TRUE;
 				}
-				if (container->contrast != options.contrast)
+				if (container->contrast != options_get_float_range(OPTION_CONTRAST, 0.1f, 2.0f))
 				{
 					xml_set_attribute_float(screennode, "contrast", container->contrast);
 					changed = TRUE;
 				}
-				if (container->gamma != options.gamma)
+				if (container->gamma != options_get_float_range(OPTION_GAMMA, 0.1f, 3.0f))
 				{
 					xml_set_attribute_float(screennode, "gamma", container->gamma);
 					changed = TRUE;
@@ -943,10 +943,36 @@ render_target *render_target_alloc(const char *layoutfile, UINT32 flags)
 	target->pixel_aspect = 0.0f;
 	target->orientation = ROT0;
 	target->layerconfig = LAYER_CONFIG_DEFAULT;
-	target->base_orientation = -1;
-	target->base_layerconfig = -1;
 	target->maxtexwidth = 65536;
 	target->maxtexheight = 65536;
+
+	/* determine the base layer configuration based on options */
+	target->base_layerconfig = LAYER_CONFIG_DEFAULT;
+	if (!options_get_bool(OPTION_USE_BACKDROPS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP;
+	if (!options_get_bool(OPTION_USE_OVERLAYS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY;
+	if (!options_get_bool(OPTION_USE_BEZELS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL;
+	if (options_get_bool(OPTION_ARTWORK_CROP)) target->base_layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN;
+
+	/* determine the base orientation based on options */
+	target->orientation = ROT0;
+	if (!options_get_bool(OPTION_ROTATE))
+		target->base_orientation = orientation_reverse(Machine->gamedrv->flags & ORIENTATION_MASK);
+
+	/* rotate left/right */
+	if (options_get_bool(OPTION_ROR) || (options_get_bool(OPTION_AUTOROR) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+		target->base_orientation = orientation_add(ROT90, target->base_orientation);
+	if (options_get_bool(OPTION_ROL) || (options_get_bool(OPTION_AUTOROL) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+		target->base_orientation = orientation_add(ROT270, target->base_orientation);
+
+	/* flip X/Y */
+	if (options_get_bool(OPTION_FLIPX))
+		target->base_orientation ^= ORIENTATION_FLIP_X;
+	if (options_get_bool(OPTION_FLIPY))
+		target->base_orientation ^= ORIENTATION_FLIP_Y;
+
+	/* set the orientation and layerconfig equal to the base */
+	target->orientation = target->base_orientation;
+	target->layerconfig = target->base_layerconfig;
 
 	/* allocate a lock for the primitive list */
 	for (listnum = 0; listnum < NUM_PRIMLISTS; listnum++)
@@ -1336,10 +1362,6 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	/* remember the base values if this is the first frame */
 	if (target->base_view == NULL)
 		target->base_view = target->curview;
-	if (target->base_orientation == -1)
-		target->base_orientation = target->orientation;
-	if (target->base_layerconfig == -1)
-		target->base_layerconfig = target->layerconfig;
 
 	/* find a non-busy list to work with */
 	for (listnum = 0; listnum < NUM_PRIMLISTS; listnum++)

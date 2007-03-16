@@ -58,7 +58,7 @@ struct _internal_screen_info
 	UINT8					curbitmap;			/* current bitmap index */
 	bitmap_format			format;				/* format of bitmap for this screen */
 	UINT8					changed;			/* has this bitmap changed? */
-	UINT32					last_partial_scan;	/* scanline of last partial update */
+	INT32					last_partial_scan;	/* scanline of last partial update */
 
 	/* screen timing */
 	subseconds_t			scantime;			/* subseconds per scanline */
@@ -176,7 +176,7 @@ static void recompute_speed(mame_time emutime);
 
 /* screen snapshots */
 static mame_bitmap *get_snapshot_bitmap(running_machine *machine, int scrnum);
-static mame_file_error mame_fopen_next(const char *pathoption, const char *extension, mame_file **file);
+static file_error mame_fopen_next(const char *pathoption, const char *extension, mame_file **file);
 
 /* movie recording */
 static void movie_record_frame(running_machine *machine, int scrnum);
@@ -259,9 +259,10 @@ INLINE int effective_throttle(void)
     video_init - start up the video system
 -------------------------------------------------*/
 
-int video_init(running_machine *machine)
+void video_init(running_machine *machine)
 {
 	video_private *viddata;
+	const char *filename;
 	int scrnum;
 
 	/* reset our global state */
@@ -274,10 +275,6 @@ int video_init(running_machine *machine)
 	global.auto_frameskip = options_get_bool(OPTION_AUTOFRAMESKIP);
 	global.frameskip_level = options_get_int_range(OPTION_FRAMESKIP, 0, MAX_FRAMESKIP);
 	global.seconds_to_run = options_get_int(OPTION_SECONDS_TO_RUN);
-
-	/* if we're running < 5 minutes, allow us to skip warnings to facilitate benchmarking/validation testing */
-	if (global.seconds_to_run > 0 && global.seconds_to_run < 60*5)
-		options.skip_warnings = options.skip_gameinfo = options.skip_disclaimer = TRUE;
 
 	/* allocate memory for our private data */
 	viddata = machine->video_data = auto_malloc(sizeof(*viddata));
@@ -300,7 +297,7 @@ int video_init(running_machine *machine)
 			video_screen_configure(scrnum, info->state->width, info->state->height, &info->state->visarea, info->state->refresh);
 
 			/* reset VBLANK timing */
-			info->vblank_time = sub_mame_times(time_zero, double_to_mame_time(machine->screen[0].vblank));
+			info->vblank_time = sub_subseconds_from_mame_time(time_zero, machine->screen[0].vblank);
 
 			/* register for save states */
 			state_save_register_item("video", scrnum, info->vblank_time.seconds);
@@ -335,14 +332,17 @@ int video_init(running_machine *machine)
 		viddata->snap_target = render_target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
 		assert(viddata->snap_target != NULL);
 		if (viddata->snap_target == NULL)
-			return 1;
+			fatalerror("Unable to allocate snapshot render target\n");
 		render_target_set_layer_config(viddata->snap_target, 0);
 	}
 
 	/* create crosshairs */
 	crosshair_init(viddata);
 
-	return 0;
+	/* start recording movie if specified */
+	filename = options_get_string(OPTION_MNGWRITE);
+	if (filename != NULL)
+		video_movie_begin_recording(machine, 0, filename);
 }
 
 
@@ -409,7 +409,7 @@ void video_vblank_start(running_machine *machine)
 	/* kludge: we get called at time 0 to reset, but at that point,
        the time of last VBLANK is actually -vblank_duration */
 	if (curtime.seconds == 0 && curtime.subseconds == 0)
-		curtime = sub_mame_times(time_zero, double_to_mame_time(machine->screen[0].vblank));
+		curtime = sub_subseconds_from_mame_time(time_zero, machine->screen[0].vblank);
 
 	/* reset VBLANK timers for each screen -- fix me */
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
@@ -601,11 +601,10 @@ static void decode_graphics(const gfx_decode *gfxdecodeinfo)
     of a screen
 -------------------------------------------------*/
 
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, float refresh)
+void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, subseconds_t refresh)
 {
 	video_private *viddata = Machine->video_data;
 	internal_screen_info *info = &viddata->scrinfo[scrnum];
-	mame_time timeval;
 
 	/* reallocate bitmap if necessary */
 	if (!(Machine->drv->video_attributes & VIDEO_TYPE_VECTOR))
@@ -664,10 +663,8 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	info->state->refresh = refresh;
 
 	/* compute timing parameters */
-	timeval = double_to_mame_time(TIME_IN_HZ(refresh) / (double)height);
-	assert(timeval.seconds == 0);
-	info->scantime = timeval.subseconds;
-	info->pixeltime = timeval.subseconds / width;
+	info->scantime = refresh / height;
+	info->pixeltime = refresh / (height * width);
 
 	/* recompute scanline timing */
 	cpu_compute_scanline_timing();
@@ -745,6 +742,7 @@ void video_screen_update_partial(int scrnum, int scanline)
 
 		profiler_mark(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
+
 		flags = (*Machine->drv->video_update)(Machine, scrnum, info->bitmap[info->curbitmap], &clip);
 		global.partial_updates_this_frame++;
 		profiler_mark(PROFILER_END);
@@ -858,8 +856,8 @@ mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 	targetdelta = (subseconds_t)vpos * info->scantime + (subseconds_t)hpos * info->pixeltime;
 
 	/* if we're past that time (within 1/2 of a pixel), head to the next frame */
-	if (targetdelta <= curdelta + info->pixeltime / 2)
-		targetdelta += DOUBLE_TO_SUBSECONDS(TIME_IN_HZ(info->state->refresh));
+	while (targetdelta <= curdelta + info->pixeltime / 2)
+		targetdelta += info->state->refresh;
 
 	/* return the difference */
 	return make_mame_time(0, targetdelta - curdelta);
@@ -888,7 +886,7 @@ mame_time video_screen_get_scan_period(int scrnum)
 
 mame_time video_screen_get_frame_period(int scrnum)
 {
-	return MAME_TIME_IN_HZ(Machine->screen[scrnum].refresh);
+	return make_mame_time(0, Machine->screen[scrnum].refresh);
 }
 
 
@@ -910,7 +908,9 @@ void video_reset_partial_updates(void)
 	/* reset partial updates */
 	LOG_PARTIAL_UPDATES(("Partial: reset to 0\n"));
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
+	{
 		viddata->scrinfo[scrnum].last_partial_scan = 0;
+	}
 	global.partial_updates_this_frame = 0;
 }
 
@@ -926,17 +926,20 @@ void video_frame_update(void)
 	mame_time current_time = mame_timer_get_time();
 	int skipped_it = global.skipping_this_frame;
 	int phase = mame_get_phase(Machine);
-	int scrnum;
 
 	/* only render sound and video if we're in the running phase */
+#ifdef MAME_DEBUG
 	if (phase == MAME_PHASE_RUNNING)
+#else
+	if (phase == MAME_PHASE_RUNNING && !mame_is_paused(Machine))
+#endif
 		finish_screen_updates(Machine);
 
 	/* draw the user interface */
 	ui_update_and_render();
 
 	/* if we're throttling, synchronize before rendering */
-	if (effective_throttle())
+	if (!skipped_it && effective_throttle())
 		update_throttle(current_time);
 
 	/* ask the OSD to update */
@@ -950,11 +953,6 @@ void video_frame_update(void)
 	/* update speed computations */
 	if (!skipped_it)
 		recompute_speed(current_time);
-
-	/* empty the containers */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (Machine->drv->screen[scrnum].tag != NULL)
-			render_container_empty(render_container_get_screen(scrnum));
 
 	/* call the end-of-frame callback */
 	if (phase == MAME_PHASE_RUNNING)
@@ -994,15 +992,17 @@ static void finish_screen_updates(running_machine *machine)
 	livemask = render_get_live_screens_mask();
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
 	{
+		internal_screen_info *screen = &viddata->scrinfo[scrnum];
+
 		/* only update if live */
 		if (livemask & (1 << scrnum))
 		{
-			internal_screen_info *screen = &viddata->scrinfo[scrnum];
-
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
-			if (render_container_is_empty(render_container_get_screen(scrnum)) && !(machine->drv->video_attributes & VIDEO_TYPE_VECTOR))
+			if ((machine->drv->video_attributes & (VIDEO_TYPE_VECTOR | VIDEO_SELF_RENDER)) == 0)
 			{
 				mame_bitmap *bitmap = screen->bitmap[screen->curbitmap];
+
+				/* if we're not skipping the frame and if the screen actually changed, then update the texture */
 				if (!global.skipping_this_frame && screen->changed)
 				{
 					rectangle fixedvis = machine->screen[scrnum].visarea;
@@ -1011,6 +1011,9 @@ static void finish_screen_updates(running_machine *machine)
 					render_texture_set_bitmap(screen->texture, bitmap, &fixedvis, machine->drv->screen[scrnum].palette_base, screen->format);
 					screen->curbitmap = 1 - screen->curbitmap;
 				}
+
+				/* create an empty container with a single quad */
+				render_container_empty(render_container_get_screen(scrnum));
 				render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), screen->texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 			}
 
@@ -1020,7 +1023,7 @@ static void finish_screen_updates(running_machine *machine)
 		}
 
 		/* reset the screen changed flags */
-		viddata->scrinfo[scrnum].changed = 0;
+		screen->changed = FALSE;
 	}
 
 	/* draw any crosshairs */
@@ -1472,7 +1475,7 @@ static void recompute_speed(mame_time emutime)
 	if (global.seconds_to_run != 0 && emutime.seconds >= global.seconds_to_run)
 	{
 		const char *fname = assemble_2_strings(Machine->basename, PATH_SEPARATOR "final.png");
-		mame_file_error filerr;
+		file_error filerr;
 		mame_file *file;
 
 		/* create a final screenshot */
@@ -1541,7 +1544,7 @@ void video_save_active_screen_snapshots(running_machine *machine)
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
 		if (screenmask & (1 << scrnum))
 		{
-			mame_file_error filerr = mame_fopen_next(SEARCHPATH_SCREENSHOT, "png", &fp);
+			file_error filerr = mame_fopen_next(SEARCHPATH_SCREENSHOT, "png", &fp);
 			if (filerr == FILERR_NONE)
 			{
 				video_screen_save_snapshot(machine, fp, scrnum);
@@ -1602,9 +1605,9 @@ static mame_bitmap *get_snapshot_bitmap(running_machine *machine, int scrnum)
     numbering scheme
 -------------------------------------------------*/
 
-static mame_file_error mame_fopen_next(const char *pathoption, const char *extension, mame_file **file)
+static file_error mame_fopen_next(const char *pathoption, const char *extension, mame_file **file)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	char *fname;
 	int seq;
 
@@ -1657,7 +1660,7 @@ void video_movie_begin_recording(running_machine *machine, int scrnum, const cha
 {
 	video_private *viddata = machine->video_data;
 	internal_screen_info *info = &viddata->scrinfo[scrnum];
-	mame_file_error filerr;
+	file_error filerr;
 
 	/* close any existing movie file */
 	if (info->movie_file != NULL)
@@ -1729,7 +1732,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 			png_add_text(&pnginfo, "System", text);
 
 			/* start the capture */
-			error = mng_capture_start(mame_core_file(info->movie_file), bitmap, viddata->scrinfo[scrnum].state->refresh);
+			error = mng_capture_start(mame_core_file(info->movie_file), bitmap, SUBSECONDS_TO_HZ(viddata->scrinfo[scrnum].state->refresh));
 			if (error != PNGERR_NONE)
 			{
 				png_free(&pnginfo);

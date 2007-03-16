@@ -85,11 +85,11 @@ static UINT8 sound_data[24];
 	{
 		case 0x04:
 			if (data == 0xef && sound_data[offset] != 0xef)
-				sample_start(4, 2, 0);
+				sample_start(4, 1, 0);
 			else if (data != 0xef && sound_data[offset] == 0xef)
 				sample_stop(4);
 //          if (!(data & 0x01) && (sound_data[offset] & 0x01))
-//              sample_start(5, 2, 0);
+//              sample_start(5, 1, 0);
 //          else if ((data & 0x01) && !(sound_data[offset] & 0x01))
 //              sample_stop(5);
 			break;
@@ -99,7 +99,7 @@ static UINT8 sound_data[24];
 		case 0x0e:
 		case 0x0f:
 			if ((data & 1) && !(sound_data[offset] & 1))
-				sample_start(offset - 0x0c, 2 - sound_data[offset - 4], 0);
+				sample_start(offset - 0x0c, 1 - sound_data[offset - 4], 0);
 			else if (!(data & 1) && (sound_data[offset] & 1))
 				sample_stop(offset - 0x0c);
 			break;

@@ -80,7 +80,7 @@ static void update_scanline_irq(void)
 		/* determine the time; if it's in this scanline, bump to the next frame */
 		time = cpu_getscanlinetime(effscan);
 		if (time < cpu_getscanlineperiod())
-			time += TIME_IN_HZ(Machine->screen[0].refresh);
+			time += SUBSECONDS_TO_DOUBLE(Machine->screen[0].refresh);
 		timer_adjust(blitter_timer, time, 0, 0);
 	}
 }

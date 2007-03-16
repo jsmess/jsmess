@@ -185,7 +185,7 @@ const char *profiler_get_text(void)
 		}
 		if (computed || showdelay[i])
 		{
-			if (computed) showdelay[i] = Machine->screen[0].refresh;
+			if (computed) showdelay[i] = SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
 			showdelay[i]--;
 
 			if (i < PROFILER_PROFILER)

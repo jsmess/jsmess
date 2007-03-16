@@ -1181,6 +1181,7 @@ static int get_adapter_for_monitor(d3d_info *d3d, win_monitor_info *monitor)
 
 static void pick_best_mode(win_window_info *window)
 {
+	double target_refresh = SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
 	INT32 target_width, target_height;
 	d3d_info *d3d = window->drawdata;
 	INT32 minwidth, minheight;
@@ -1234,10 +1235,10 @@ static void pick_best_mode(win_window_info *window)
 			size_score = 2.0f;
 
 		// compute refresh score
-		refresh_score = 1.0f / (1.0f + fabs((double)mode.RefreshRate - Machine->screen[0].refresh));
+		refresh_score = 1.0f / (1.0f + fabs((double)mode.RefreshRate - target_refresh));
 
 		// if refresh is smaller than we'd like, it only scores up to 0.1
-		if ((double)mode.RefreshRate < Machine->screen[0].refresh)
+		if ((double)mode.RefreshRate < target_refresh)
 			refresh_score *= 0.1;
 
 		// if we're looking for a particular refresh, make sure it matches

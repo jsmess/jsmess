@@ -26,6 +26,15 @@ struct _callback_item
 };
 
 
+typedef struct _bitmap_item bitmap_item;
+struct _bitmap_item
+{
+	bitmap_item *	next;
+	mame_bitmap *	bitmap;
+	int				tag;
+};
+
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -33,12 +42,21 @@ struct _callback_item
 
 /* pool list */
 static memory_pool *pools[64];
+static bitmap_item *bitmaps[64];
 
 /* resource tracking */
 int resource_tracking_tag = 0;
 
 /* free resource callbacks */
 static callback_item *free_resources_callback_list;
+
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static void auto_bitmap_free(void);
 
 
 
@@ -119,6 +137,7 @@ static void free_callback_list(callback_item **cb)
 void init_resource_tracking(void)
 {
 	resource_tracking_tag = 0;
+	add_free_resources_callback(auto_bitmap_free);
 }
 
 
@@ -252,14 +271,45 @@ char *_auto_strdup_allow_null(const char *str, const char *file, int line)
     bitmap
 -------------------------------------------------*/
 
-static void *auto_bitmap_allocator(size_t size)
-{
-	return auto_malloc(size);
-}
-
 bitmap_t *auto_bitmap_alloc(int width, int height, bitmap_format format)
 {
-	return bitmap_alloc_custom(width, height, format, auto_bitmap_allocator);
+	bitmap_item *item = malloc_or_die(sizeof(*item));
+
+	assert_always(resource_tracking_tag > 0 && resource_tracking_tag <= ARRAY_LENGTH(bitmaps), "Invalid resource_tracking_tag");
+
+	/* fill in the data */
+	item->bitmap = bitmap_alloc(width, height, format);
+	if (item->bitmap == NULL)
+		memory_error("Unable to allocate bitmap");
+	item->tag = resource_tracking_tag;
+
+	/* link us in */
+	item->next = bitmaps[item->tag - 1];
+	bitmaps[item->tag - 1] = item;
+
+	/* return a pointer to the bitmap */
+	return item->bitmap;
+}
+
+
+/*-------------------------------------------------
+    auto_bitmap_free - automatically free bitmaps
+-------------------------------------------------*/
+
+static void auto_bitmap_free(void)
+{
+	bitmap_item *item, *next;
+
+	assert_always(resource_tracking_tag > 0 && resource_tracking_tag <= ARRAY_LENGTH(bitmaps), "Invalid resource_tracking_tag");
+
+	/* loop over items */
+	for (item = bitmaps[resource_tracking_tag - 1]; item != NULL; item = next)
+	{
+		next = item->next;
+		bitmap_free(item->bitmap);
+		free(item);
+	}
+	bitmaps[resource_tracking_tag - 1] = NULL;
 }
 
 

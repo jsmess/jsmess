@@ -80,9 +80,9 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "gridlee.h"
+#include "balsente.h"
 #include "sound/custom.h"
 #include "sound/samples.h"
-#include <math.h>
 
 
 /* constants */
@@ -119,15 +119,15 @@ static void irq_timer(int param)
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		timer_set(cpu_getscanlinetime(64), 64, irq_timer);
+		mame_timer_set(video_screen_get_time_until_pos(0, 64, 0), 64, irq_timer);
 	else
-		timer_set(cpu_getscanlinetime(param + 64), param + 64, irq_timer);
+		mame_timer_set(video_screen_get_time_until_pos(0, param + 64, 0), param + 64, irq_timer);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(cpu_getscanlineperiod() * 0.9, 0, irq_off);
+	mame_timer_set(video_screen_get_time_until_pos(0, param, BALSENTE_HBSTART), 0, irq_off);
 }
 
 
@@ -140,21 +140,21 @@ static void firq_off(int param)
 static void firq_timer(int param)
 {
 	/* same time next frame */
-	timer_set(cpu_getscanlinetime(FIRQ_SCANLINE), 0, firq_timer);
+	mame_timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, 0), 0, firq_timer);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(cpu_getscanlineperiod() * 0.9, 0, firq_off);
+	mame_timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, BALSENTE_HBSTART), 0, firq_off);
 }
 
 
 static MACHINE_RESET( gridlee )
 {
 	/* start timers to generate interrupts */
-	timer_set(cpu_getscanlinetime(0), 0, irq_timer);
-	timer_set(cpu_getscanlinetime(FIRQ_SCANLINE), 0, firq_timer);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, irq_timer);
+	mame_timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, 0), 0, firq_timer);
 
 	/* create the polynomial tables */
 	poly17_init();
@@ -433,20 +433,16 @@ static struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( gridlee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 5000000/4)
+	MDRV_CPU_ADD(M6809, BALSENTE_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(gridlee)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MDRV_SCREEN_RAW_PARAMS(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_PALETTE_INIT(gridlee)

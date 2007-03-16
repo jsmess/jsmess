@@ -348,7 +348,7 @@ void winwindow_process_events(int ingame)
 #if defined(MAME_DEBUG)
 	if (ingame)
 	{
-		is_debugger_visible = (options.mame_debug && debugwin_is_debugger_visible());
+		is_debugger_visible = (Machine != NULL && Machine->debug_mode && debugwin_is_debugger_visible());
 		debugwin_update_during_game();
 	}
 #endif
@@ -475,7 +475,7 @@ void winwindow_toggle_full_screen(void)
 
 #ifdef MAME_DEBUG
 	// if we are in debug mode, never go full screen
-	if (options.mame_debug)
+	if (options_get_bool(OPTION_DEBUG))
 		return;
 #endif
 
@@ -584,8 +584,6 @@ int winwindow_video_window_create(int index, win_monitor_info *monitor, const wi
 	window->target = render_target_alloc(NULL, 0);
 	if (window->target == NULL)
 		goto error;
-	render_target_set_orientation(window->target, video_orientation);
-	render_target_set_layer_config(window->target, video_config.layerconfig);
 
 	// set the specific view
 	sprintf(option, "view%d", index);

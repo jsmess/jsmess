@@ -32,10 +32,13 @@ static mame_bitmap *screenbits;
 static mame_bitmap *zbuffer;
 static UINT16 *palette;
 static UINT32 *polydata_buffer;
+static UINT32 polydata_start;
 static UINT32 polydata_count;
 
 static int polygons;
 static int lastscan;
+
+static osd_work_queue *work_queue;
 
 
 
@@ -45,6 +48,12 @@ static int lastscan;
  *
  *************************************/
 
+static void gaelco3d_exit(running_machine *machine)
+{
+	osd_work_queue_free(work_queue);
+}
+
+
 VIDEO_START( gaelco3d )
 {
 	screenbits = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
@@ -53,6 +62,9 @@ VIDEO_START( gaelco3d )
 
 	palette = auto_malloc(32768 * sizeof(palette[0]));
 	polydata_buffer = auto_malloc(MAX_POLYDATA * sizeof(polydata_buffer[0]));
+
+	work_queue = osd_work_queue_alloc(0);
+	add_exit_callback(machine, gaelco3d_exit);
 
 	return 0;
 }
@@ -102,8 +114,10 @@ static float dsp_to_float(UINT32 val)
  *
  *************************************/
 
-static int render_poly(UINT32 *polydata)
+static void *render_poly(void *param)
 {
+	UINT32 *polydata = param;
+
 	/* these three parameters combine via A * x + B * y + C to produce a 1/z value */
 	float ooz_dx = dsp_to_float(polydata[4]) * GAELCO3D_RESOLUTION_DIVIDE;
 	float ooz_dy = dsp_to_float(polydata[3]) * GAELCO3D_RESOLUTION_DIVIDE;
@@ -229,15 +243,15 @@ static int render_poly(UINT32 *polydata)
 							tf = f = (~u & 0xff) * (~v & 0xff);
 							r = (paldata & 0x7c00) * f; g = (paldata & 0x03e0) * f; b = (paldata & 0x001f) * f;
 
-							paldata = palette[color | gaelco3d_texture[pixeloffs + 1]];
+							paldata = palette[color | gaelco3d_texture[(pixeloffs + 1) & endmask]];
 							tf += f = (u & 0xff) * (~v & 0xff);
 							r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
-							paldata = palette[color | gaelco3d_texture[pixeloffs + 4096]];
+							paldata = palette[color | gaelco3d_texture[(pixeloffs + 4096) & endmask]];
 							tf += f = (~u & 0xff) * (v & 0xff);
 							r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
-							paldata = palette[color | gaelco3d_texture[pixeloffs + 4097]];
+							paldata = palette[color | gaelco3d_texture[(pixeloffs + 4097) & endmask]];
 							f = 0x10000 - tf;
 							r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
@@ -291,15 +305,15 @@ static int render_poly(UINT32 *polydata)
 									tf = f = (~u & 0xff) * (~v & 0xff);
 									r = (paldata & 0x7c00) * f; g = (paldata & 0x03e0) * f; b = (paldata & 0x001f) * f;
 
-									paldata = palette[color | gaelco3d_texture[pixeloffs + 1]];
+									paldata = palette[color | gaelco3d_texture[(pixeloffs + 1) & endmask]];
 									tf += f = (u & 0xff) * (~v & 0xff);
 									r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
-									paldata = palette[color | gaelco3d_texture[pixeloffs + 4096]];
+									paldata = palette[color | gaelco3d_texture[(pixeloffs + 4096) & endmask]];
 									tf += f = (~u & 0xff) * (v & 0xff);
 									r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
-									paldata = palette[color | gaelco3d_texture[pixeloffs + 4097]];
+									paldata = palette[color | gaelco3d_texture[(pixeloffs + 4097) & endmask]];
 									f = 0x10000 - tf;
 									r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
@@ -357,15 +371,15 @@ static int render_poly(UINT32 *polydata)
 									tf = f = (~u & 0xff) * (~v & 0xff);
 									r = (paldata & 0x7c00) * f; g = (paldata & 0x03e0) * f; b = (paldata & 0x001f) * f;
 
-									paldata = palette[color | gaelco3d_texture[pixeloffs + 1]];
+									paldata = palette[color | gaelco3d_texture[(pixeloffs + 1) & endmask]];
 									tf += f = (u & 0xff) * (~v & 0xff);
 									r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
-									paldata = palette[color | gaelco3d_texture[pixeloffs + 4096]];
+									paldata = palette[color | gaelco3d_texture[(pixeloffs + 4096) & endmask]];
 									tf += f = (~u & 0xff) * (v & 0xff);
 									r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
-									paldata = palette[color | gaelco3d_texture[pixeloffs + 4097]];
+									paldata = palette[color | gaelco3d_texture[(pixeloffs + 4097) & endmask]];
 									f = 0x10000 - tf;
 									r += (paldata & 0x7c00) * f; g += (paldata & 0x03e0) * f; b += (paldata & 0x001f) * f;
 
@@ -391,7 +405,7 @@ static int render_poly(UINT32 *polydata)
 	}
 
 	polygons++;
-	return i;
+	return NULL;
 }
 
 
@@ -404,12 +418,8 @@ static int render_poly(UINT32 *polydata)
 
 void gaelco3d_render(void)
 {
-	int i;
-
-	/* if frameskip is engaged, skip it */
-	if (!video_skip_this_frame())
-		for (i = 0; i < polydata_count; )
-			i += render_poly(&polydata_buffer[i]);
+	/* wait for any queued stuff to complete */
+	osd_work_queue_wait(work_queue, 100 * osd_ticks_per_second());
 
 #if DISPLAY_STATS
 {
@@ -418,7 +428,7 @@ void gaelco3d_render(void)
 }
 #endif
 
-	polydata_count = 0;
+	polydata_start = polydata_count = 0;
 	polygons = 0;
 	lastscan = -1;
 }
@@ -433,11 +443,22 @@ void gaelco3d_render(void)
 
 WRITE32_HANDLER( gaelco3d_render_w )
 {
-//logerror("%06X:gaelco3d_render_w(%d,%08X)\n", activecpu_get_pc(), offset, data);
-
+	/* append the data to our buffer */
 	polydata_buffer[polydata_count++] = data;
 	if (polydata_count >= MAX_POLYDATA)
 		fatalerror("Out of polygon buffer space!");
+
+	/* if we've accumulated a completed poly set of data, queue it */
+	if (!video_skip_this_frame())
+	{
+		int index = polydata_count - 1 - polydata_start;
+		if (index >= 17 && (index % 2) == 1 && IS_POLYEND(data))
+		{
+			osd_work_item_queue(work_queue, render_poly, &polydata_buffer[polydata_start], WORK_ITEM_FLAG_AUTO_RELEASE);
+			polydata_start += index + 2;
+		}
+	}
+
 #if DISPLAY_STATS
 	lastscan = cpu_getscanline();
 #endif

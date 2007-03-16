@@ -123,7 +123,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN( laserbas_interrupt )
 {
-	if(cpu_getvblank())
+	if(video_screen_get_vblank(0))
 		 cpunum_set_input_line(0, 0, HOLD_LINE);
 	else
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -136,7 +136,6 @@ static MACHINE_DRIVER_START( laserbas )
 	MDRV_CPU_VBLANK_INT(laserbas_interrupt,2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

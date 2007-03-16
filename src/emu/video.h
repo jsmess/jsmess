@@ -44,9 +44,9 @@ struct _screen_state
 {
 	int				width, height;				/* total width/height (HTOTAL, VTOTAL) */
 	rectangle		visarea;					/* visible area (HBLANK end/start, VBLANK end/start) */
-	float			refresh;					/* refresh rate */
-	int				oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
-	double			vblank;						/* duration of a VBLANK */
+	UINT8			oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
+	subseconds_t	refresh;					/* refresh period */
+	subseconds_t	vblank;						/* duration of a VBLANK */
 	bitmap_format	format;						/* bitmap format */
 };
 
@@ -73,7 +73,7 @@ struct _screen_config
 /* ----- core implementation ----- */
 
 /* core initialization */
-int video_init(running_machine *machine);
+void video_init(running_machine *machine);
 
 /* core VBLANK callback */
 void video_vblank_start(running_machine *machine);
@@ -82,7 +82,7 @@ void video_vblank_start(running_machine *machine);
 /* ----- screen management ----- */
 
 /* set the resolution of a screen */
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, float refresh);
+void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, subseconds_t refresh);
 
 /* set the visible area of a screen; this is a subset of video_screen_configure */
 void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int max_y);

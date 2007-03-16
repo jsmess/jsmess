@@ -245,7 +245,7 @@ static void crtc_interrupt_gen(int param)
 {
 	cpunum_set_input_line(1, 0, HOLD_LINE);
 	if (param != 0)
-		timer_adjust(crtc_timer, TIME_IN_HZ(Machine->screen[0].refresh * param), 0, TIME_IN_HZ(Machine->screen[0].refresh * param));
+		mame_timer_adjust(crtc_timer, make_mame_time(0, Machine->screen[0].refresh / param), 0, make_mame_time(0, Machine->screen[0].refresh / param));
 }
 
 

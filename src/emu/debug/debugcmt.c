@@ -428,7 +428,7 @@ int debug_comment_save(void)
 	/* flush the file */
 	if (total_comments > 0)
 	{
-		mame_file_error filerr;
+		file_error filerr;
 		char *fname;
  		mame_file *fp;
 
@@ -459,7 +459,7 @@ error:
 
 int debug_comment_load(void)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *fp;
 	char *fname;
 

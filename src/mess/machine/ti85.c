@@ -1075,7 +1075,7 @@ static void ti85_receive_variables (void)
 	static UINT8* var_file_data = NULL;
 	UINT8* temp;
 	static int var_file_size = 0;
-	mame_file_error filerr;
+	file_error filerr;
 
 	switch (ti85_serial_status)
 	{
@@ -1276,7 +1276,7 @@ static void ti85_receive_backup (void)
 	static int backup_variable_number = 0;
 	static int backup_data_size[3];
 
-	mame_file_error filerr;
+	file_error filerr;
 	static UINT8* backup_file_data = NULL;
 	static UINT32 backup_file_number = 0;
 	char backup_file_name[] = "00000000.85b";
@@ -1426,7 +1426,7 @@ static void ti85_receive_screen (void)
 {
 	static UINT32 image_file_number = 0;
 	char image_file_name[] = "00000000.85i";
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file * image_file;
 	UINT8 * image_file_data;
 

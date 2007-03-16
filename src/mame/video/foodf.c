@@ -7,8 +7,10 @@
 #include "driver.h"
 #include "machine/atarigen.h"
 #include "foodf.h"
+#include "res_net.h"
 
 
+static double rweights[3], gweights[3], bweights[2];
 static UINT8 playfield_flip;
 
 
@@ -37,12 +39,22 @@ static void get_playfield_tile_info(int tile_index)
 
 VIDEO_START( foodf )
 {
+	static const int resistances[3] = { 1000, 470, 220 };
+
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_cols, TILEMAP_OPAQUE, 8,8, 32,32);
+	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_cols, TILEMAP_TRANSPARENT, 8,8, 32,32);
+	tilemap_set_transparent_pen(atarigen_playfield_tilemap, 0);
 
 	/* adjust the playfield for the 8 pixel offset */
 	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, -8);
 	playfield_flip = 0;
+	state_save_register_global(playfield_flip);
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3,	&resistances[0], rweights, 0, 0,
+			3,	&resistances[0], gweights, 0, 0,
+			2,	&resistances[1], bweights, 0, 0);
 	return 0;
 }
 
@@ -83,17 +95,18 @@ WRITE16_HANDLER( foodf_paletteram_w )
 	bit0 = (newword >> 0) & 0x01;
 	bit1 = (newword >> 1) & 0x01;
 	bit2 = (newword >> 2) & 0x01;
-	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	r = combine_3_weights(rweights, bit0, bit1, bit2);
+
 	/* green component */
 	bit0 = (newword >> 3) & 0x01;
 	bit1 = (newword >> 4) & 0x01;
 	bit2 = (newword >> 5) & 0x01;
-	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	g = combine_3_weights(gweights, bit0, bit1, bit2);
+
 	/* blue component */
-	bit0 = 0;
-	bit1 = (newword >> 6) & 0x01;
-	bit2 = (newword >> 7) & 0x01;
-	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	bit0 = (newword >> 6) & 0x01;
+	bit1 = (newword >> 7) & 0x01;
+	b = combine_2_weights(bweights, bit0, bit1);
 
 	palette_set_color(Machine, offset, r, g, b);
 }
@@ -110,11 +123,15 @@ VIDEO_UPDATE( foodf )
 {
 	int offs;
 
-	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0,0);
+	/* first draw the playfield opaquely */
+	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
 
-	/* walk the motion object list. */
-	for (offs = 0; offs < spriteram_size / 4; offs += 2)
+	/* then draw the non-transparent parts with a priority of 1 */
+	fillbitmap(priority_bitmap, 0, 0);
+	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 1);
+
+	/* draw the motion objects front-to-back */
+	for (offs = 0x80-2; offs >= 0x20; offs -= 2)
 	{
 		int data1 = spriteram16[offs];
 		int data2 = spriteram16[offs+1];
@@ -125,13 +142,15 @@ VIDEO_UPDATE( foodf )
 		int ypos = (0xff - data2 - 16) & 0xff;
 		int hflip = (data1 >> 15) & 1;
 		int vflip = (data1 >> 14) & 1;
+		int pri = (data1 >> 13) & 1;
 
-		drawgfx(bitmap, Machine->gfx[1], pict, color, hflip, vflip,
-				xpos, ypos, cliprect, TRANSPARENCY_PEN, 0);
+		pdrawgfx(bitmap, Machine->gfx[1], pict, color, hflip, vflip,
+				xpos, ypos, cliprect, TRANSPARENCY_PEN, 0, pri * 2);
 
 		/* draw again with wraparound (needed to get the end of level animation right) */
-		drawgfx(bitmap, Machine->gfx[1], pict, color, hflip, vflip,
-				xpos - 256, ypos, cliprect, TRANSPARENCY_PEN, 0);
+		pdrawgfx(bitmap, Machine->gfx[1], pict, color, hflip, vflip,
+				xpos - 256, ypos, cliprect, TRANSPARENCY_PEN, 0, pri * 2);
 	}
+
 	return 0;
 }

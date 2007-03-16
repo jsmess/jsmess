@@ -194,16 +194,14 @@ static void watchdog_setup(int alloc_new);
  *
  *************************************/
 
-int cpuexec_init(running_machine *machine)
+void cpuexec_init(running_machine *machine)
 {
 	int cpunum;
 
 	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
        from the visible area */
-	if ((Machine->screen[0].vblank == 0) && !Machine->screen[0].oldstyle_vblank_supplied)
-	{
-		Machine->screen[0].vblank = ((float)(Machine->screen[0].height - (Machine->screen[0].visarea.max_y + 1 - Machine->screen[0].visarea.min_y)) / (float)Machine->screen[0].height * TIME_IN_HZ(Machine->screen[0].refresh));
-	}
+	if (machine->screen[0].vblank == 0 && !machine->screen[0].oldstyle_vblank_supplied)
+		machine->screen[0].vblank = (machine->screen[0].refresh / machine->screen[0].height) * (machine->screen[0].height - (machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y));
 
 	/* allocate vblank and refresh timers, and compute the initial timing */
 	vblank_timer = mame_timer_alloc(cpu_vblankcallback);
@@ -213,7 +211,7 @@ int cpuexec_init(running_machine *machine)
 	/* loop over all our CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		int cputype = Machine->drv->cpu[cpunum].cpu_type;
+		int cputype = machine->drv->cpu[cpunum].cpu_type;
 		int num_regs;
 
 		/* if this is a dummy, stop looking */
@@ -223,7 +221,7 @@ int cpuexec_init(running_machine *machine)
 		/* initialize the cpuinfo struct */
 		memset(&cpu[cpunum], 0, sizeof(cpu[cpunum]));
 		cpu[cpunum].suspend = SUSPEND_REASON_RESET;
-		cpu[cpunum].clock = Machine->drv->cpu[cpunum].cpu_clock;
+		cpu[cpunum].clock = machine->drv->cpu[cpunum].cpu_clock;
 		cpu[cpunum].clockscale = 1.0;
 		cpu[cpunum].localtime = time_zero;
 
@@ -253,8 +251,8 @@ int cpuexec_init(running_machine *machine)
 		/* initialize this CPU */
 		state_save_push_tag(cpunum + 1);
 		num_regs = state_save_get_reg_count();
-		if (cpuintrf_init_cpu(cpunum, cputype, cpu[cpunum].clock, Machine->drv->cpu[cpunum].reset_param, cpu_irq_callbacks[cpunum]))
-			return 1;
+		if (cpuintrf_init_cpu(cpunum, cputype, cpu[cpunum].clock, machine->drv->cpu[cpunum].reset_param, cpu_irq_callbacks[cpunum]))
+			fatalerror("Unable to initialize CPU #%d (%s)", cpunum, cputype_name(cputype));
 		num_regs = state_save_get_reg_count() - num_regs;
 		state_save_pop_tag();
 
@@ -262,7 +260,7 @@ int cpuexec_init(running_machine *machine)
 		if (num_regs == 0)
 		{
 			logerror("CPU #%d (%s) did not register any state to save!\n", cpunum, cputype_name(cputype));
-			if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
+			if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
 				fatalerror("CPU #%d (%s) did not register any state to save!", cpunum, cputype_name(cputype));
 		}
 	}
@@ -279,8 +277,6 @@ int cpuexec_init(running_machine *machine)
 	state_save_register_item("cpu", 0, watchdog_counter);
 	state_save_register_item("cpu", 0, vblank_countdown);
 	state_save_pop_tag();
-
-	return 0;
 }
 
 
@@ -402,7 +398,7 @@ static void watchdog_setup(int alloc_new)
              * The 3 seconds delay is targeted at qzshowby, which otherwise
              * would reset at the start of a game.
              */
-			watchdog_counter = 3 * Machine->screen[0].refresh;
+			watchdog_counter = 3 * SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
 		}
 	}
 }
@@ -917,11 +913,10 @@ int cpu_scalebyfcount(int value)
 
 void cpu_compute_scanline_timing(void)
 {
-	/* recompute the refresh period */
-	refresh_period = double_to_mame_time(1.0 / Machine->screen[0].refresh);
+	refresh_period = make_mame_time(0, Machine->screen[0].refresh);
 
 	/* recompute the vblank period */
-	vblank_period = double_to_mame_time(1.0 / (Machine->screen[0].refresh * (vblank_multiplier ? vblank_multiplier : 1)));
+	vblank_period = make_mame_time(0, Machine->screen[0].refresh / (vblank_multiplier ? vblank_multiplier : 1));
 	if (vblank_timer != NULL && mame_timer_enable(vblank_timer, FALSE))
 	{
 		mame_time remaining = mame_timer_timeleft(vblank_timer);
@@ -936,7 +931,7 @@ void cpu_compute_scanline_timing(void)
 	{
 		if (Machine->screen[0].vblank != 0)
 		{
-			scanline_period.subseconds -= DOUBLE_TO_SUBSECONDS(Machine->screen[0].vblank);
+			scanline_period.subseconds -= Machine->screen[0].vblank;
 			scanline_period.subseconds /= Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1;
 		}
 		else
@@ -1373,7 +1368,7 @@ static void cpu_vblankcallback(int param)
 			video_frame_update();
 
 		/* Set the timer to update the screen */
-		mame_timer_adjust(update_timer, double_to_mame_time(Machine->screen[0].vblank), 0, time_zero);
+		mame_timer_adjust(update_timer, make_mame_time(0, Machine->screen[0].vblank), 0, time_zero);
 
 		/* reset the globals */
 		cpu_vblankreset();
@@ -1517,7 +1512,7 @@ static void cpu_inittimers(void)
 	ipf = Machine->drv->cpu_slices_per_frame;
 	if (ipf <= 0)
 		ipf = 1;
-	timeslice_period = double_to_mame_time(1.0 / (Machine->screen[0].refresh * ipf));
+	timeslice_period = make_mame_time(0, Machine->screen[0].refresh / ipf);
 	timeslice_timer = mame_timer_alloc(cpu_timeslicecallback);
 	mame_timer_adjust(timeslice_timer, timeslice_period, 0, timeslice_period);
 
@@ -1566,7 +1561,7 @@ static void cpu_inittimers(void)
 	}
 
 	/* allocate a vblank timer at the frame rate * the LCD number of interrupts per frame */
-	vblank_period = double_to_mame_time(1.0 / (Machine->screen[0].refresh * vblank_multiplier));
+	vblank_period = make_mame_time(0, Machine->screen[0].refresh / vblank_multiplier);
 	vblank_countdown = vblank_multiplier;
 
 	/* allocate an update timer that will be used to time the actual screen updates */
@@ -1599,7 +1594,7 @@ static void cpu_inittimers(void)
 	/* note that since we start the first frame on the refresh, we can't pulse starting
        immediately; instead, we back up one VBLANK period, and inch forward until we hit
        positive time. That time will be the time of the first VBLANK timer callback */
-	first_time = sub_mame_times(vblank_period, double_to_mame_time(Machine->screen[0].vblank));
+	first_time = sub_subseconds_from_mame_time(vblank_period, Machine->screen[0].vblank);
 	while (compare_mame_times(first_time, time_zero) < 0)
 	{
 		cpu_vblankcallback(-1);

@@ -28,7 +28,7 @@ VIDEO_START( starfire )
 	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
 	/* make a dirty array */
-	scanline_dirty = auto_malloc(256);
+	scanline_dirty = auto_malloc(STARFIRE_VTOTAL);
 
 	/* reset videoram */
 	memset(starfire_videoram, 0, 0x2000);
@@ -235,7 +235,7 @@ void starfire_video_update(int scanline, int count)
 	for (x = 0; x < 256; x += 8)
 	{
 		for (y = 0; y < count; y++)
-			if (scanline_dirty[scanline + y])
+			if ((scanline + y) < STARFIRE_VTOTAL && scanline_dirty[scanline + y])
 			{
 				int data = pix[y];
 				int color = col[y];
@@ -256,7 +256,8 @@ void starfire_video_update(int scanline, int count)
 
 	/* mark them not dirty anymore */
 	for (y = 0; y < count; y++)
-		scanline_dirty[scanline + y] = 0;
+		if ((scanline + y) < STARFIRE_VTOTAL)
+			scanline_dirty[scanline + y] = 0;
 }
 
 

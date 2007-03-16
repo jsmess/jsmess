@@ -393,7 +393,7 @@ done:
 static image_error_t load_image_by_path(mess_image *image, const char *software_path,
 	const game_driver *gamedrv, UINT32 open_flags, const char *path)
 {
-	mame_file_error filerr = FILERR_NOT_FOUND;
+	file_error filerr = FILERR_NOT_FOUND;
 	image_error_t err = IMAGE_ERROR_FILENOTFOUND;
 	char *full_path = NULL;
 	const char *file_extension;
@@ -1323,9 +1323,9 @@ const char *image_extrainfo(mess_image *img)
 	NVRAM file for an image
 -------------------------------------------------*/
 
-static mame_file_error open_battery_file(mess_image *image, UINT32 openflags, mame_file **file)
+static file_error open_battery_file(mess_image *image, UINT32 openflags, mame_file **file)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	char *basename_noext;
 	char *fname;
 
@@ -1348,7 +1348,7 @@ static mame_file_error open_battery_file(mess_image *image, UINT32 openflags, ma
 
 void image_battery_load(mess_image *image, void *buffer, int length)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	int bytes_read = 0;
 
@@ -1375,7 +1375,7 @@ void image_battery_load(mess_image *image, void *buffer, int length)
 
 void image_battery_save(mess_image *image, const void *buffer, int length)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");

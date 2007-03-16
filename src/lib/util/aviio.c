@@ -472,7 +472,7 @@ INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 avi_error avi_open(const char *filename, avi_file **file)
 {
 	avi_file *newfile = NULL;
-	mame_file_error filerr;
+	file_error filerr;
 	avi_error avierr;
 	UINT64 length;
 
@@ -524,7 +524,7 @@ error:
 avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file **file)
 {
 	avi_file *newfile = NULL;
-	mame_file_error filerr;
+	file_error filerr;
 	avi_stream *stream;
 	avi_error avierr;
 	UINT64 length;
@@ -769,7 +769,7 @@ avi_error avi_read_video_frame_yuy16(avi_file *file, UINT32 framenum, bitmap_t *
 {
 	avi_error avierr = AVIERR_NONE;
 	UINT32 bytes_read, chunkid;
-	mame_file_error filerr;
+	file_error filerr;
 	avi_stream *stream;
 
 	/* get the video stream */
@@ -827,7 +827,7 @@ avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample
 {
 	avi_error avierr = AVIERR_NONE;
 	UINT32 bytes_per_sample;
-	mame_file_error filerr;
+	file_error filerr;
 	avi_stream *stream;
 	int offset;
 
@@ -994,7 +994,7 @@ avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *sam
 
 static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 **buffer)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	UINT32 bytes_read;
 
 	/* allocate memory for the data */
@@ -1116,7 +1116,7 @@ static avi_error find_next_list(avi_file *file, UINT32 findme, const avi_chunk *
 
 static avi_error get_next_chunk_internal(avi_file *file, const avi_chunk *parent, avi_chunk *newchunk, UINT64 offset)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	UINT8 buffer[12];
 	UINT32 bytesread;
 
@@ -1454,7 +1454,7 @@ static avi_error parse_indx_chunk(avi_file *file, avi_stream *stream, avi_chunk 
 		for (entry = 0; entry < entries; entry++)
 		{
 			const UINT8 *base = &chunkdata[24 + entry * 16];
-			mame_file_error filerr;
+			file_error filerr;
 			avi_chunk subchunk;
 			UINT32 bytes_read;
 			UINT8 buffer[8];
@@ -1563,7 +1563,7 @@ error:
 
 static avi_error chunk_open(avi_file *file, UINT32 type, UINT32 listtype, UINT32 estlength)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	avi_chunk *chunk;
 	UINT32 written;
 
@@ -1632,7 +1632,7 @@ static avi_error chunk_close(avi_file *file)
 	/* write the final size if it is different from the guess */
 	if (chunk->size != chunksize)
 	{
-		mame_file_error filerr;
+		file_error filerr;
 		UINT8 buffer[4];
 
 		put_32bits(&buffer[0], (UINT32)chunksize);
@@ -1654,7 +1654,7 @@ static avi_error chunk_close(avi_file *file)
 
 static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT32 length)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	avi_error avierr;
 	UINT32 written;
 

@@ -140,6 +140,23 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 
 	// TODO
 	*acia_p->tx_pin = 1;
+
+	state_save_register_item("acia6850", which, acia_p->ctrl);
+	state_save_register_item("acia6850", which, acia_p->status);
+	state_save_register_item("acia6850", which, acia_p->rx_clock);
+	state_save_register_item("acia6850", which, acia_p->tx_clock);
+	state_save_register_item("acia6850", which, acia_p->rx_shift);
+	state_save_register_item("acia6850", which, acia_p->tx_shift);
+	state_save_register_item("acia6850", which, acia_p->rdr);
+	state_save_register_item("acia6850", which, acia_p->tdr);
+	state_save_register_item("acia6850", which, acia_p->rx_bits);
+	state_save_register_item("acia6850", which, acia_p->tx_bits);
+	state_save_register_item("acia6850", which, acia_p->rx_parity);
+	state_save_register_item("acia6850", which, acia_p->tx_parity);
+
+	state_save_register_item("acia6850", which, acia_p->divide);
+	state_save_register_item("acia6850", which, acia_p->overrun);
+	state_save_register_item("acia6850", which, acia_p->reset);
 }
 
 /*
@@ -403,15 +420,49 @@ void receive_event(int which)
 WRITE8_HANDLER( acia6850_0_ctrl_w ) { acia6850_ctrl_w(0, data); }
 WRITE8_HANDLER( acia6850_1_ctrl_w ) { acia6850_ctrl_w(1, data); }
 WRITE8_HANDLER( acia6850_2_ctrl_w ) { acia6850_ctrl_w(2, data); }
+WRITE8_HANDLER( acia6850_3_ctrl_w ) { acia6850_ctrl_w(3, data); }
 
 WRITE8_HANDLER( acia6850_0_data_w ) { acia6850_data_w(0, data); }
 WRITE8_HANDLER( acia6850_1_data_w ) { acia6850_data_w(1, data); }
 WRITE8_HANDLER( acia6850_2_data_w ) { acia6850_data_w(2, data); }
+WRITE8_HANDLER( acia6850_3_data_w ) { acia6850_data_w(3, data); }
 
 READ8_HANDLER( acia6850_0_stat_r ) { return acia6850_stat_r(0); }
 READ8_HANDLER( acia6850_1_stat_r ) { return acia6850_stat_r(1); }
 READ8_HANDLER( acia6850_2_stat_r ) { return acia6850_stat_r(2); }
+READ8_HANDLER( acia6850_3_stat_r ) { return acia6850_stat_r(3); }
 
 READ8_HANDLER( acia6850_0_data_r ) { return acia6850_data_r(0); }
 READ8_HANDLER( acia6850_1_data_r ) { return acia6850_data_r(1); }
 READ8_HANDLER( acia6850_2_data_r ) { return acia6850_data_r(2); }
+READ8_HANDLER( acia6850_3_data_r ) { return acia6850_data_r(3); }
+
+READ16_HANDLER( acia6850_0_stat_16_r ) { return acia6850_stat_r(0); }
+READ16_HANDLER( acia6850_1_stat_16_r ) { return acia6850_stat_r(1); }
+READ16_HANDLER( acia6850_2_stat_16_r ) { return acia6850_stat_r(2); }
+READ16_HANDLER( acia6850_3_stat_16_r ) { return acia6850_stat_r(3); }
+
+READ16_HANDLER( acia6850_0_data_16_r ) { return acia6850_data_r(0); }
+READ16_HANDLER( acia6850_1_data_16_r ) { return acia6850_data_r(1); }
+READ16_HANDLER( acia6850_2_data_16_r ) { return acia6850_data_r(2); }
+READ16_HANDLER( acia6850_3_data_16_r ) { return acia6850_data_r(3); }
+
+WRITE16_HANDLER( acia6850_0_ctrl_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(0, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_1_ctrl_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(1, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_2_ctrl_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(2, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_3_ctrl_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(3, (data >> 8) & 0xff); }
+
+WRITE16_HANDLER( acia6850_0_ctrl_lsb_w ) { if (ACCESSING_LSB) acia6850_ctrl_w(0, data & 0xff); }
+WRITE16_HANDLER( acia6850_1_ctrl_lsb_w ) { if (ACCESSING_LSB) acia6850_ctrl_w(1, data & 0xff); }
+WRITE16_HANDLER( acia6850_2_ctrl_lsb_w ) { if (ACCESSING_LSB) acia6850_ctrl_w(2, data & 0xff); }
+WRITE16_HANDLER( acia6850_3_ctrl_lsb_w ) { if (ACCESSING_LSB) acia6850_ctrl_w(3, data & 0xff); }
+
+WRITE16_HANDLER( acia6850_0_data_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(0, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_1_data_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(1, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_2_data_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(2, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_3_data_msb_w ) { if (ACCESSING_MSB) acia6850_ctrl_w(3, (data >> 8) & 0xff); }
+
+WRITE16_HANDLER( acia6850_0_data_lsb_w ) { if (ACCESSING_LSB) acia6850_data_w(0, data & 0xff); }
+WRITE16_HANDLER( acia6850_1_data_lsb_w ) { if (ACCESSING_LSB) acia6850_data_w(1, data & 0xff); }
+WRITE16_HANDLER( acia6850_2_data_lsb_w ) { if (ACCESSING_LSB) acia6850_data_w(2, data & 0xff); }
+WRITE16_HANDLER( acia6850_3_data_lsb_w ) { if (ACCESSING_LSB) acia6850_data_w(3, data & 0xff); }

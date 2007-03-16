@@ -88,7 +88,7 @@ static WRITE8_HANDLER( saa5050_w )
 
 static READ8_HANDLER( fake_VRLE_r )
 {
-	return (s2636_1_ram[0xcb] & 0x3f) + (cpu_getvblank()*0x40);
+	return (s2636_1_ram[0xcb] & 0x3f) + (video_screen_get_vblank(0)*0x40);
 }
 
 static READ8_HANDLER( ram_mirror_r )
@@ -480,12 +480,12 @@ static MACHINE_DRIVER_START( malzak )
 	MDRV_CPU_IO_MAP(readport,writeport)
 
 	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(SAA5050_VBLANK))
+	//MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(SAA5050_VBLANK))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(240, 240)
+	MDRV_SCREEN_SIZE(240, 256)	/* vert size is a guess */
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 239)
 	MDRV_GFXDECODE(malzak_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(16)

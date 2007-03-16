@@ -1677,8 +1677,6 @@ static MACHINE_DRIVER_START( balsente )
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_io_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(10)
 
 	MDRV_MACHINE_RESET(balsente)
@@ -1687,8 +1685,7 @@ static MACHINE_DRIVER_START( balsente )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 240)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MDRV_SCREEN_RAW_PARAMS(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART)
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(balsente)
@@ -2468,6 +2465,6 @@ GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente
 GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente", "Spiker", GAME_SUPPORTS_SAVE )
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente", "Stompin'", GAME_SUPPORTS_SAVE )
 GAME( 1987, rescraid, 0,        balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider", GAME_SUPPORTS_SAVE )
-GAME( 1987, rescrdsa, rescraid, balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider (Stand-Alone)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rescrdsa, rescraid, balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider (stand-alone)", GAME_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge,   grudge,   ROT0, "Bally/Midway", "Grudge Match (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 198?, shrike,   0,        shrike,   shrike,   shrike,   ROT0, "Bally/Sente", "Shrike Avenger (prototype)", GAME_SUPPORTS_SAVE )

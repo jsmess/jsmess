@@ -101,7 +101,7 @@ void vdp_reload_counter(int scanline)
 		{
 			scanline_int = 1;
 			update_interrupts();
-			timer_set(cpu_getscanlinetime(scanline + 1), 0, vdp_int4_off);
+			mame_timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), 0, vdp_int4_off);
 		}
 
 	/* advance to the next scanline */
@@ -112,7 +112,7 @@ void vdp_reload_counter(int scanline)
 		scanline = 0;
 
 	/* set a timer */
-	timer_adjust(scan_timer, cpu_getscanlinetime(scanline) + cpu_getscanlineperiod() * (320. / 342.), scanline, 0);
+	mame_timer_adjust(scan_timer, video_screen_get_time_until_pos(0, scanline, 320), scanline, time_zero);
 }
 
 
@@ -132,7 +132,7 @@ INTERRUPT_GEN( genesis_vblank_interrupt )
 	update_interrupts();
 
 	/* set a timer to turn it off */
-	timer_set(cpu_getscanlineperiod() * (22. / 342.), 0, vdp_int6_off);
+	mame_timer_set(video_screen_get_time_until_pos(0, video_screen_get_vpos(0), 22), 0, vdp_int6_off);
 }
 
 
@@ -171,8 +171,8 @@ MACHINE_RESET( genesis )
 	logerror("Machine init\n");
 
 	/* set the first scanline 0 timer to go off */
-	scan_timer = timer_alloc(vdp_reload_counter);
-	timer_adjust(scan_timer, cpu_getscanlinetime(0) + cpu_getscanlineperiod() * (320. / 342.), 0, 0);
+	scan_timer = mame_timer_alloc(vdp_reload_counter);
+	mame_timer_adjust(scan_timer, video_screen_get_time_until_pos(0, 0, 320), 0, time_zero);
 }
 
 
@@ -793,7 +793,6 @@ static MACHINE_DRIVER_START( genesis_base )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1) /* from vdp at scanline 0xe0 */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int)(((262. - 224.) / 262.) * 1000000. / 60.)))
 
 	MDRV_INTERLEAVE(100)
 
@@ -803,7 +802,7 @@ static MACHINE_DRIVER_START( genesis_base )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320,224)
+	MDRV_SCREEN_SIZE(342,262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MDRV_PALETTE_LENGTH(2048)
 

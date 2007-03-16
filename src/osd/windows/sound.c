@@ -20,7 +20,6 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "osdepend.h"
-#include "sound/wavwrite.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -33,18 +32,6 @@
 //============================================================
 
 #define LOG_SOUND				0
-
-
-
-//============================================================
-//  GLOBAL VARIABLES
-//============================================================
-
-// global parameters
-int							attenuation = 0;
-
-int							audio_latency;
-char *						wavwrite;
 
 
 
@@ -76,8 +63,6 @@ static int					buffer_overflows;
 #if LOG_SOUND
 static FILE *				sound_log;
 #endif
-
-static void *				wavptr;
 
 
 
@@ -114,14 +99,6 @@ int winsound_init(running_machine *machine)
 	if (dsound_init() != DS_OK)
 		return 1;
 
-	// set the startup volume
-	sound_set_attenuation(attenuation);
-
-	// create wav file
-	wavptr = NULL;
-	if (wavwrite != NULL)
-		wavptr = wav_open(wavwrite, options.samplerate, 2);
-
 	// return the samples to play the first frame
 	return 0;
 }
@@ -133,12 +110,6 @@ int winsound_init(running_machine *machine)
 
 static void sound_exit(running_machine *machine)
 {
-	if (wavptr != NULL)
-	{
-		wav_close(wavptr);
-		wavptr = NULL;
-	}
-
 	// kill the buffers and dsound
 	dsound_destroy_buffers();
 	dsound_kill();
@@ -251,10 +222,6 @@ logerror("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, 
 		// now we know where to copy; let's do it
 		stream_buffer_in = stream_in % stream_buffer_size;
 		copy_sample_data(buffer, bytes_this_frame);
-
-		// append to the wav file
-		if (wavptr != NULL)
-			wav_add_data_16(wavptr, buffer, samples_this_frame * 2);
 	}
 }
 
@@ -263,14 +230,13 @@ logerror("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, 
 //  osd_set_mastervolume
 //============================================================
 
-void osd_set_mastervolume(int _attenuation)
+void osd_set_mastervolume(int attenuation)
 {
 	// clamp the attenuation to 0-32 range
-	if (_attenuation > 0)
-		_attenuation = 0;
-	if (_attenuation < -32)
-		_attenuation = -32;
-	attenuation = _attenuation;
+	if (attenuation > 0)
+		attenuation = 0;
+	if (attenuation < -32)
+		attenuation = -32;
 
 	// set the master volume
 	if (stream_buffer != NULL)
@@ -315,12 +281,12 @@ static HRESULT dsound_init(void)
 	stream_format.wBitsPerSample	= 16;
 	stream_format.wFormatTag		= WAVE_FORMAT_PCM;
 	stream_format.nChannels			= 2;
-	stream_format.nSamplesPerSec	= options.samplerate;
+	stream_format.nSamplesPerSec	= Machine->sample_rate;
 	stream_format.nBlockAlign		= stream_format.wBitsPerSample * stream_format.nChannels / 8;
 	stream_format.nAvgBytesPerSec	= stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
 	// compute the buffer size based on the output sample rate
-	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * audio_latency / 10;
+	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * options_get_int_range("audio_latency", 1, 5) / 10;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;

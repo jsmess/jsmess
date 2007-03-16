@@ -513,7 +513,7 @@ static void remap_dynamic_addresses(void);
 
 static VIDEO_START( vegas_voodoo2 )
 {
-	if (voodoo_start(0, VOODOO_2, 2, 4, 4))
+	if (voodoo_start(0, 0, VOODOO_2, 2, 4, 4))
 		return 1;
 
 	voodoo_set_vblank_callback(0, vblank_assert);
@@ -524,7 +524,7 @@ static VIDEO_START( vegas_voodoo2 )
 
 static VIDEO_START( vegas_voodoo_banshee )
 {
-	if (voodoo_start(0, VOODOO_BANSHEE, 16, 16, 0))
+	if (voodoo_start(0, 0, VOODOO_BANSHEE, 16, 16, 0))
 		return 1;
 
 	voodoo_set_vblank_callback(0, vblank_assert);
@@ -535,7 +535,7 @@ static VIDEO_START( vegas_voodoo_banshee )
 
 static VIDEO_START( vegas_voodoo3 )
 {
-	if (voodoo_start(0, VOODOO_3, 16, 16, 16))
+	if (voodoo_start(0, 0, VOODOO_3, 16, 16, 16))
 		return 1;
 
 	voodoo_set_vblank_callback(0, vblank_assert);
@@ -577,10 +577,10 @@ static MACHINE_RESET( vegas )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* allocate timers for the NILE */
-	timer[0] = timer_alloc(NULL);
-	timer[1] = timer_alloc(NULL);
-	timer[2] = timer_alloc(timer_callback);
-	timer[3] = timer_alloc(timer_callback);
+	timer[0] = mame_timer_alloc(NULL);
+	timer[1] = mame_timer_alloc(NULL);
+	timer[2] = mame_timer_alloc(timer_callback);
+	timer[3] = mame_timer_alloc(timer_callback);
 
 	/* reset dynamic addressing */
 	memset(nile_regs, 0, 0x1000);
@@ -963,7 +963,7 @@ static void timer_callback(int which)
 		double period = TIMER_CLOCK;
 		if (regs[1] & 2)
 			logerror("Unexpected value: timer %d is prescaled\n", which);
-		timer_adjust(timer[which], period * (regs[0] + 1), which, TIME_NEVER);
+		mame_timer_adjust(timer[which], double_to_mame_time(period * (regs[0] + 1)), which, time_never);
 	}
 
 	/* trigger the interrupt */
@@ -1047,7 +1047,7 @@ static READ32_HANDLER( nile_r )
 				double period = TIMER_CLOCK;
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				result = nile_regs[offset + 1] = timer_timeleft(timer[which]) / period;
+				result = nile_regs[offset + 1] = mame_time_to_double(mame_timer_timeleft(timer[which])) / period;
 			}
 
 			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", activecpu_get_pc(), which, offset*4, result);
@@ -1176,7 +1176,7 @@ static WRITE32_HANDLER( nile_w )
 				double period = TIMER_CLOCK;
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				timer_adjust(timer[which], period + period * nile_regs[offset + 1], which, TIME_NEVER);
+				mame_timer_adjust(timer[which], double_to_mame_time(period + period * nile_regs[offset + 1]), which, time_never);
 				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)(1.0 / (period + period * nile_regs[offset + 1])));
 			}
 
@@ -1186,8 +1186,8 @@ static WRITE32_HANDLER( nile_w )
 				double period = TIMER_CLOCK;
 				if (nile_regs[offset] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
-				nile_regs[offset + 1] = timer_timeleft(timer[which]) / period;
-				timer_adjust(timer[which], TIME_NEVER, which, TIME_NEVER);
+				nile_regs[offset + 1] = mame_time_to_double(mame_timer_timeleft(timer[which])) / period;
+				mame_timer_adjust(timer[which], time_never, which, time_never);
 			}
 			break;
 
@@ -1205,7 +1205,7 @@ static WRITE32_HANDLER( nile_w )
 				if (nile_regs[offset - 1] & 2)
 					logerror("Unexpected value: timer %d is prescaled\n", which);
 				period *= nile_regs[offset];
-				timer_adjust(timer[which], period, which, TIME_NEVER);
+				mame_timer_adjust(timer[which], double_to_mame_time(period), which, time_never);
 			}
 			break;
 
@@ -2220,7 +2220,6 @@ MACHINE_DRIVER_START( vegascore )
 	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb,0)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(vegas)
 	MDRV_NVRAM_HANDLER(timekeeper_save)

@@ -119,14 +119,7 @@ VIDEO_EOF( sprint4 )
 		rect.max_x = horz - 15 + Machine->gfx[1]->width - 1;
 		rect.max_y = vert - 15 + Machine->gfx[1]->height - 1;
 
-		if (rect.min_x < Machine->screen[0].visarea.min_x)
-			rect.min_x = Machine->screen[0].visarea.min_x;
-		if (rect.min_y < Machine->screen[0].visarea.min_y)
-			rect.min_y = Machine->screen[0].visarea.min_y;
-		if (rect.max_x > Machine->screen[0].visarea.max_x)
-			rect.max_x = Machine->screen[0].visarea.max_x;
-		if (rect.max_y > Machine->screen[0].visarea.max_y)
-			rect.max_y = Machine->screen[0].visarea.max_y;
+		sect_rect(&rect, &Machine->screen[0].visarea);
 
 		tilemap_draw(helper, &rect, playfield, 0, 0);
 
@@ -154,6 +147,13 @@ VIDEO_EOF( sprint4 )
 			}
 		}
 	}
+
+	/* update sound status */
+
+	// discrete_sound_w(SPRINT4_MOTOR1_DATA, ~videoram[0x391] & 15);
+	// discrete_sound_w(SPRINT4_MOTOR2_DATA, ~videoram[0x393] & 15);
+	// discrete_sound_w(SPRINT4_MOTOR3_DATA, ~videoram[0x395] & 15);
+	// discrete_sound_w(SPRINT4_MOTOR4_DATA, ~videoram[0x397] & 15);
 }
 
 

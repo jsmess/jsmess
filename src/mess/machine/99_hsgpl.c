@@ -209,7 +209,7 @@ static int ti99_hsgpl_get_dirty_flag(void)
 
 int ti99_hsgpl_load_memcard(void)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, "hsgpl.nv", OPEN_FLAG_READ, &file);
@@ -227,7 +227,7 @@ int ti99_hsgpl_load_memcard(void)
 
 int ti99_hsgpl_save_memcard(void)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	if (ti99_hsgpl_get_dirty_flag())

@@ -487,7 +487,7 @@ static void update_widget_irq(void);
 
 static VIDEO_START( seattle )
 {
-	if (voodoo_start(0, VOODOO_1, 2, 4, 0))
+	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0))
 		return 1;
 
 	voodoo_set_vblank_callback(0, vblank_assert);
@@ -499,7 +499,7 @@ static VIDEO_START( seattle )
 
 static VIDEO_START( flagstaff )
 {
-	if (voodoo_start(0, VOODOO_1, 2, 4, 4))
+	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 4))
 		return 1;
 
 	voodoo_set_vblank_callback(0, vblank_assert);
@@ -542,10 +542,10 @@ static MACHINE_RESET( seattle )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* allocate timers for the galileo */
-	galileo.timer[0].timer = timer_alloc(galileo_timer_callback);
-	galileo.timer[1].timer = timer_alloc(galileo_timer_callback);
-	galileo.timer[2].timer = timer_alloc(galileo_timer_callback);
-	galileo.timer[3].timer = timer_alloc(galileo_timer_callback);
+	galileo.timer[0].timer = mame_timer_alloc(galileo_timer_callback);
+	galileo.timer[1].timer = mame_timer_alloc(galileo_timer_callback);
+	galileo.timer[2].timer = mame_timer_alloc(galileo_timer_callback);
+	galileo.timer[3].timer = mame_timer_alloc(galileo_timer_callback);
 	galileo.dma_active = -1;
 
 	vblank_irq_num = 0;
@@ -915,7 +915,7 @@ static void galileo_timer_callback(int which)
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (galileo.reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		timer_adjust(timer->timer, TIMER_CLOCK * timer->count, which, 0);
+		mame_timer_adjust(timer->timer, double_to_mame_time(TIMER_CLOCK * timer->count), which, time_zero);
 	else
 		timer->active = timer->count = 0;
 
@@ -1095,7 +1095,7 @@ static READ32_HANDLER( galileo_r )
 			result = timer->count;
 			if (timer->active)
 			{
-				UINT32 elapsed = (UINT32)(timer_timeelapsed(timer->timer) / TIMER_CLOCK);
+				UINT32 elapsed = (UINT32)(mame_time_to_double(mame_timer_timeelapsed(timer->timer)) / TIMER_CLOCK);
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -1226,16 +1226,16 @@ static WRITE32_HANDLER( galileo_w )
 						if (which != 0)
 							timer->count &= 0xffffff;
 					}
-					timer_adjust(timer->timer, TIMER_CLOCK * timer->count, which, 0);
+					mame_timer_adjust(timer->timer, double_to_mame_time(TIMER_CLOCK * timer->count), which, time_zero);
 					if (LOG_TIMERS)
 						logerror("Adjusted timer to fire in %f secs\n", TIMER_CLOCK * timer->count);
 				}
 				else if (timer->active && !(data & mask))
 				{
-					UINT32 elapsed = (UINT32)(timer_timeelapsed(timer->timer) / TIMER_CLOCK);
+					UINT32 elapsed = (UINT32)(mame_time_to_double(mame_timer_timeelapsed(timer->timer)) / TIMER_CLOCK);
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
-					timer_adjust(timer->timer, TIME_NEVER, which, 0);
+					mame_timer_adjust(timer->timer, time_never, which, time_zero);
 					if (LOG_TIMERS)
 						logerror("Disabled timer\n");
 				}
@@ -2497,7 +2497,6 @@ MACHINE_DRIVER_START( seattle_common )
 	MDRV_CPU_PROGRAM_MAP(seattle_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(seattle)
 	MDRV_NVRAM_HANDLER(generic_1fill)

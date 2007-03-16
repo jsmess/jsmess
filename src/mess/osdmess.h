@@ -31,10 +31,10 @@ typedef struct _mess_image mess_image;
 
     Return value:
 
-        a mame_file_error describing any error that occurred while copying
+        a file_error describing any error that occurred while copying
         the file, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
-mame_file_error osd_copyfile(const char *destfile, const char *srcfile);
+file_error osd_copyfile(const char *destfile, const char *srcfile);
 
 
 /*-----------------------------------------------------------------------------
@@ -51,10 +51,10 @@ mame_file_error osd_copyfile(const char *destfile, const char *srcfile);
 
     Return value:
 
-        a mame_file_error describing any error that occurred while copying
+        a file_error describing any error that occurred while copying
         the file, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
-mame_file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename);
+file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename);
 
 
 /***************************************************************************
@@ -86,10 +86,10 @@ osd_directory_entry *osd_stat(const char *path);
 
     Return value:
 
-        a mame_file_error describing any error that occurred while creating
+        a file_error describing any error that occurred while creating
         the directory, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
-mame_file_error osd_mkdir(const char *dir);
+file_error osd_mkdir(const char *dir);
 
 
 /*-----------------------------------------------------------------------------
@@ -101,10 +101,10 @@ mame_file_error osd_mkdir(const char *dir);
 
     Return value:
 
-        a mame_file_error describing any error that occurred while deleting
+        a file_error describing any error that occurred while deleting
         the directory, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
-mame_file_error osd_rmdir(const char *dir);
+file_error osd_rmdir(const char *dir);
 
 
 /*-----------------------------------------------------------------------------
@@ -118,10 +118,10 @@ mame_file_error osd_rmdir(const char *dir);
 
     Return value:
 
-        a mame_file_error describing any error that occurred while deleting
+        a file_error describing any error that occurred while deleting
         the directory, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
-mame_file_error osd_getcurdir(char *buffer, size_t buffer_len);
+file_error osd_getcurdir(char *buffer, size_t buffer_len);
 
 
 /*-----------------------------------------------------------------------------
@@ -133,10 +133,10 @@ mame_file_error osd_getcurdir(char *buffer, size_t buffer_len);
 
     Return value:
 
-        a mame_file_error describing any error that occurred while deleting
+        a file_error describing any error that occurred while deleting
         the directory, or FILERR_NONE if no error occurred
 -----------------------------------------------------------------------------*/
-mame_file_error osd_setcurdir(const char *dir);
+file_error osd_setcurdir(const char *dir);
 
 
 /***************************************************************************

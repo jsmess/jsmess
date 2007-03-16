@@ -133,7 +133,7 @@ static READ8_HANDLER( pix_data_r )
 
 static INTERRUPT_GEN( sbw_interrupt )
 {
-	int vector = cpu_getvblank() ? 0xcf : 0xd7;	/* RST 08h/10h */
+	int vector = video_screen_get_vblank(0) ? 0xcf : 0xd7;	/* RST 08h/10h */
 
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, vector);
 }
@@ -335,13 +335,12 @@ static MACHINE_DRIVER_START( sbowling )
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT(sbw_interrupt, 2)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 32*8-1)
 	MDRV_PALETTE_LENGTH(0x400)
 	MDRV_PALETTE_INIT(sbowling)

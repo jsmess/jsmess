@@ -84,5 +84,5 @@ void senjyo_sh_start(void)
 	sample_set_volume(0,0);
 	sample_start_raw(0,_single,SINGLE_LENGTH,single_rate,1);
 
-	timer_pulse(TIME_IN_HZ(Machine->screen[0].refresh), 0, senjyo_sh_update);
+	mame_timer_pulse(make_mame_time(0, Machine->screen[0].refresh), 0, senjyo_sh_update);
 }

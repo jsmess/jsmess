@@ -23,7 +23,6 @@
 ***************************************************************************/
 
 #define VERBOSE			(0)
-#define MAKE_WAVS		(0)
 
 #if VERBOSE
 #define VPRINTF(x)		mame_printf_debug x
@@ -122,9 +121,9 @@ static void sound_pause(running_machine *machine, int pause);
 static void sound_load(int config_type, xml_data_node *parentnode);
 static void sound_save(int config_type, xml_data_node *parentnode);
 static void sound_update(int param);
-static int start_sound_chips(void);
-static int start_speakers(void);
-static int route_sound(void);
+static void start_sound_chips(void);
+static void start_speakers(void);
+static void route_sound(void);
 static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
 
@@ -174,12 +173,13 @@ INLINE sound_info *find_sound_by_tag(const char *tag)
     sound_init - start up the sound system
 -------------------------------------------------*/
 
-int sound_init(running_machine *machine)
+void sound_init(running_machine *machine)
 {
 	mame_time update_frequency = SOUND_UPDATE_FREQUENCY;
+	const char *filename;
 
 	/* handle -nosound */
-	nosound_mode = (Machine->sample_rate == 0);
+	nosound_mode = !options_get_bool(OPTION_SOUND);
 	if (nosound_mode)
 		Machine->sample_rate = 11025;
 
@@ -202,34 +202,31 @@ int sound_init(running_machine *machine)
 
 	/* now start up the sound chips and tag their streams */
 	VPRINTF(("start_sound_chips\n"));
-	if (start_sound_chips())
-		return 1;
+	start_sound_chips();
 
 	/* then create all the speakers */
 	VPRINTF(("start_speakers\n"));
-	if (start_speakers())
-		return 1;
+	start_speakers();
 
 	/* finally, do all the routing */
 	VPRINTF(("route_sound\n"));
-	if (route_sound())
-		return 1;
+	route_sound();
 
-	if (MAKE_WAVS)
-		wavfile = wav_open("finalmix.wav", Machine->sample_rate, 2);
+	/* open the output WAV file if specified */
+	filename = options_get_string(OPTION_WAVWRITE);
+	if (filename != NULL)
+		wavfile = wav_open(filename, machine->sample_rate, 2);
 
 	/* enable sound by default */
 	global_sound_enabled = TRUE;
 	sound_muted = FALSE;
-	sound_set_attenuation(sound_attenuation);
+	sound_set_attenuation(options_get_int(OPTION_VOLUME));
 
 	/* register callbacks */
 	config_register("mixer", sound_load, sound_save);
 	add_pause_callback(machine, sound_pause);
 	add_reset_callback(machine, sound_reset);
 	add_exit_callback(machine, sound_exit);
-
-	return 0;
 }
 
 
@@ -241,6 +238,7 @@ static void sound_exit(running_machine *machine)
 {
 	int sndnum;
 
+	/* close any open WAV file */
 	if (wavfile != NULL)
 		wav_close(wavfile);
 
@@ -281,7 +279,7 @@ static void sound_exit(running_machine *machine)
     and initialize them
 -------------------------------------------------*/
 
-static int start_sound_chips(void)
+static void start_sound_chips(void)
 {
 	int sndnum;
 
@@ -313,7 +311,7 @@ static int start_sound_chips(void)
 		num_regs = state_save_get_reg_count();
 		streams_set_tag(Machine, info);
 		if (sndintrf_init_sound(sndnum, msound->sound_type, msound->clock, msound->config) != 0)
-			return 1;
+			fatalerror("Sound chip #%d (%s) failed to initialize!", sndnum, sndnum_name(sndnum));
 
 		/* if no state registered for saving, we can't save */
 		num_regs = state_save_get_reg_count() - num_regs;
@@ -363,7 +361,6 @@ static int start_sound_chips(void)
 			}
 		}
 	}
-	return 0;
 }
 
 
@@ -372,7 +369,7 @@ static int start_sound_chips(void)
     initialize them
 -------------------------------------------------*/
 
-static int start_speakers(void)
+static void start_speakers(void)
 {
 	/* reset the speaker array */
 	memset(speaker, 0, sizeof(speaker));
@@ -396,7 +393,6 @@ static int start_speakers(void)
 		info->mixer_stream = NULL;
 		info->inputs = 0;
 	}
-	return 0;
 }
 
 
@@ -405,7 +401,7 @@ static int start_speakers(void)
     inputs
 -------------------------------------------------*/
 
-static int route_sound(void)
+static void route_sound(void)
 {
 	int sndnum, spknum, routenum, outputnum;
 
@@ -502,8 +498,6 @@ static int route_sound(void)
 			}
 		}
 	}
-
-	return 0;
 }
 
 

@@ -6,6 +6,9 @@
 
 #include "midwunit.h"
 
+#define MIDVUNIT_VIDEO_CLOCK	33000000
+
+
 
 /*----------- defined in video/midvunit.c -----------*/
 

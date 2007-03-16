@@ -11,7 +11,7 @@ UINT8 *homerun_videoram;
 
 WRITE8_HANDLER(homerun_banking_w)
 {
-	if(cpu_getscanline()>half_screen)
+	if(video_screen_get_vpos(0)>half_screen)
 		homerun_gc_down=data&3;
 	else
 		homerun_gc_up=data&3;

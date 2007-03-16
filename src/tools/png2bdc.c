@@ -104,7 +104,7 @@ INLINE int pixel_is_set(bitmap_t *bitmap, int y, int x)
 
 static int render_font_save_cached(render_font *font, const char *filename, UINT32 hash)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	render_font_char *ch;
 	UINT32 bytes_written;
 	UINT8 *tempbuffer;
@@ -254,7 +254,7 @@ error:
 
 int main(int argc, char *argv[])
 {
-	mame_file_error filerr;
+	file_error filerr;
 	const char *bdcname;
 	const char *pngname;
 	render_font *font;

@@ -494,7 +494,7 @@ void main()
 
 void Load(char *name,byte *buffer,int from, int length)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	filerr = mame_fopen(NULL, name, OPEN_FLAG_READ, &file);

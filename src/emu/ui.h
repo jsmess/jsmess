@@ -84,7 +84,7 @@ enum
 int ui_init(running_machine *machine);
 
 /* display the startup screens */
-int ui_display_startup_screens(int show_disclaimer, int show_warnings, int show_gameinfo);
+int ui_display_startup_screens(int show_disclaimer);
 
 /* set the current text to display at startup */
 void ui_set_startup_text(const char *text, int force);

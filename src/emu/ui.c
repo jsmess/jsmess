@@ -248,8 +248,8 @@ int ui_init(running_machine *machine)
 	add_exit_callback(machine, ui_exit);
 
 	/* load the localization file */
-	if (uistring_init(options.language_file) != 0)
-		fatalerror("uistring_init failed");
+	/* fix me -- need to find a real way to do this */
+	uistring_init(NULL);
 
 	/* allocate the font */
 	ui_font = render_font_alloc("ui.bdf");
@@ -308,13 +308,16 @@ static int rescale_notifier(running_machine *machine, int width, int height)
     various startup screens
 -------------------------------------------------*/
 
-int ui_display_startup_screens(int show_disclaimer, int show_warnings, int show_gameinfo)
+int ui_display_startup_screens(int show_disclaimer)
 {
 #ifdef MESS
 	const int maxstate = 4;
 #else
 	const int maxstate = 3;
 #endif
+	int str = options_get_int(OPTION_SECONDS_TO_RUN);
+	int show_gameinfo = (str > 0 && str < 60*5) ? FALSE : !options_get_bool(OPTION_SKIP_GAMEINFO);
+	int show_warnings = (str > 0 && str < 60*5) ? FALSE : TRUE;
 	int state;
 
 	/* initialize the on-screen display system */
@@ -405,7 +408,7 @@ void ui_update_and_render(void)
 	/* if we're paused, dim the whole screen */
 	if (mame_get_phase(Machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(Machine)))
 	{
-		int alpha = (1.0f - options.pause_bright) * 255.0f;
+		int alpha = (1.0f - options_get_float_range(OPTION_PAUSE_BRIGHTNESS, 0.0f, 1.0f)) * 255.0f;
 		if (alpha > 255)
 			alpha = 255;
 		if (alpha >= 0)
@@ -478,7 +481,7 @@ float ui_get_line_height(void)
 		/* do we want to scale smaller? only do so if we exceed the threshhold */
 		if (scale_factor <= 1.0f)
 		{
-			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT)
+			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT || raw_font_pixel_height < 12)
 				scale_factor = 1.0f;
 		}
 
@@ -1065,14 +1068,14 @@ int sprintf_game_info(char *buffer)
 
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
-			bufptr += sprintf(bufptr, "%dx", count);
+			bufptr += sprintf(bufptr, "%d" UTF8_MULTIPLY, count);
 		bufptr += sprintf(bufptr, "%s", cputype_name(type));
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)
-			bufptr += sprintf(bufptr, " %d.%06d MHz\n", clock / 1000000, clock % 1000000);
+			bufptr += sprintf(bufptr, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 		else
-			bufptr += sprintf(bufptr, " %d.%03d kHz\n", clock / 1000, clock % 1000);
+			bufptr += sprintf(bufptr, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 	}
 
 	/* append the Sound: string */
@@ -1092,14 +1095,14 @@ int sprintf_game_info(char *buffer)
 
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
-			bufptr += sprintf(bufptr, "%dx", count);
+			bufptr += sprintf(bufptr, "%d" UTF8_MULTIPLY, count);
 		bufptr += sprintf(bufptr, "%s", sndnum_name(sndnum));
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)
-			bufptr += sprintf(bufptr, " %d.%06d MHz\n", clock / 1000000, clock % 1000000);
+			bufptr += sprintf(bufptr, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 		else if (clock != 0)
-			bufptr += sprintf(bufptr, " %d.%03d kHz\n", clock / 1000, clock % 1000);
+			bufptr += sprintf(bufptr, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 		else
 			*bufptr++ = '\n';
 	}
@@ -1110,12 +1113,12 @@ int sprintf_game_info(char *buffer)
 
 	/* display screen resolution and refresh rate info for raster games */
 	else
-		bufptr += sprintf(bufptr,"\n%s:\n%d x %d (%s) %f Hz\n",
+		bufptr += sprintf(bufptr,"\n%s:\n%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 				ui_getstring(UI_screenres),
 				Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1,
 				Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1,
 				(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-				Machine->screen[0].refresh);
+				SUBSECONDS_TO_HZ(Machine->screen[0].refresh));
 	return bufptr - buffer;
 }
 
@@ -1215,7 +1218,7 @@ static UINT32 handler_ingame(UINT32 state)
 		ui_draw_text_full(profiler_get_text(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 
 	/* let the cheat engine display its stuff */
-	if (options.cheat)
+	if (options_get_bool(OPTION_CHEAT))
 		cheat_display_watches();
 
 	/* display any popup messages */
@@ -1530,7 +1533,7 @@ static void slider_init(void)
 		if ((in->type & 0xff) == IPT_ADJUSTER)
 			slider_config(&slider_list[slider_count++], 0, in->default_value >> 8, 100, 1, slider_adjuster, in - Machine->input_ports);
 
-	if (options.cheat)
+	if (options_get_bool(OPTION_CHEAT))
 	{
 		/* add CPU overclocking */
 		numitems = cpu_gettotalcpu();
@@ -1711,13 +1714,17 @@ static INT32 slider_overclock(INT32 newval, char *buffer, int arg)
 
 static INT32 slider_refresh(INT32 newval, char *buffer, int arg)
 {
+	double defrefresh = SUBSECONDS_TO_HZ(Machine->drv->screen[arg].defstate.refresh);
+	double refresh;
+
 	if (buffer != NULL)
 	{
 		screen_state *state = &Machine->screen[arg];
-		video_screen_configure(arg, state->width, state->height, &state->visarea, Machine->drv->screen[arg].defstate.refresh + (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_refresh_rate), Machine->screen[arg].refresh);
+		video_screen_configure(arg, state->width, state->height, &state->visarea, HZ_TO_SUBSECONDS(defrefresh + (double)newval * 0.001));
+		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_refresh_rate), SUBSECONDS_TO_HZ(Machine->screen[arg].refresh));
 	}
-	return floor((Machine->screen[arg].refresh - Machine->drv->screen[arg].defstate.refresh) * 1000.0f + 0.5f);
+	refresh = SUBSECONDS_TO_HZ(Machine->screen[arg].refresh);
+	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
 }
 
 

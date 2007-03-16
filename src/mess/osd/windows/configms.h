@@ -9,17 +9,12 @@
 
 #include "options.h"
 
-extern int win_write_config;
+void win_mess_config_init(running_machine *machine);
+void win_mess_options_init(void);
 
-void win_mess_extract_options(void);
-
-int write_config (const char* filename, const game_driver *gamedrv);
+// ugh hack
 const char *get_devicedirectory(int dev);
 void set_devicedirectory(int dev, const char *dir);
-
-void win_add_mess_device_options(const game_driver *gamedrv);
-void win_mess_options_init(void);
-void win_mess_config_init(running_machine *machine);
 
 #endif /* CONFIGMS_H */
 

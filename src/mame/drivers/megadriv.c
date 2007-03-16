@@ -4401,7 +4401,7 @@ int megadrive_z80irq_hpos = 320;
 	visarea.min_y = 0;
 	visarea.max_y = megadrive_visible_scanlines-1;
 
-	video_screen_configure(0, scr_width, megadrive_visible_scanlines, &visarea, megadriv_framerate);
+	video_screen_configure(0, scr_width, megadrive_visible_scanlines, &visarea, HZ_TO_SUBSECONDS(megadriv_framerate));
 
 #if 0
 {

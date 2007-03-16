@@ -48,7 +48,6 @@
 //  GLOBAL VARIABLES
 //============================================================
 
-int video_orientation;
 win_video_config video_config;
 
 
@@ -89,7 +88,6 @@ static void get_resolution(const char *name, win_window_config *config, int repo
 
 int winvideo_init(running_machine *machine)
 {
-	const char *stemp;
 	int index;
 
 	// ensure we get called on the way out
@@ -114,15 +112,10 @@ int winvideo_init(running_machine *machine)
 
 	// possibly create the debug window, but don't show it yet
 #ifdef MAME_DEBUG
-	if (options.mame_debug)
+	if (options_get_bool(OPTION_DEBUG))
 		if (debugwin_init_windows())
 			return 1;
 #endif
-
-	// start recording movie
-	stemp = options_get_string("mngwrite");
-	if (stemp != NULL)
-		video_movie_begin_recording(Machine, 0, stemp);
 
 	return 0;
 
@@ -144,7 +137,7 @@ static void video_exit(running_machine *machine)
 
 	// possibly kill the debug window
 #ifdef MAME_DEBUG
-	if (options.mame_debug)
+	if (options_get_bool(OPTION_DEBUG))
 		debugwin_destroy_windows();
 #endif
 
@@ -399,19 +392,12 @@ static void extract_video_config(void)
 	video_config.numscreens    = options_get_int_range("numscreens", 1, MAX_WINDOWS);
 #ifdef MAME_DEBUG
 	// if we are in debug mode, never go full screen
-	if (options.mame_debug)
+	if (options_get_bool(OPTION_DEBUG))
 		video_config.windowed = TRUE;
 #endif
 	stemp                      = options_get_string("effect");
 	if (stemp != NULL && strcmp(stemp, "none") != 0)
 		load_effect_overlay(stemp);
-
-	// configure layers
-	video_config.layerconfig = LAYER_CONFIG_DEFAULT;
-	if (!options_get_bool("use_backdrops")) video_config.layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP;
-	if (!options_get_bool("use_overlays")) video_config.layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY;
-	if (!options_get_bool("use_bezels")) video_config.layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL;
-	if (options_get_bool("artwork_crop")) video_config.layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN;
 
 	// per-window options: extract the data
 	get_resolution("resolution0", &video_config.window[0], TRUE);

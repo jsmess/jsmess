@@ -167,7 +167,7 @@ static const pia6821_interface pia1_intf =
 static void interrupt_gen(int scanline)
 {
 	cpunum_set_input_line(0, 0, HOLD_LINE);
-	timer_set(cpu_getscanlinetime(1), 0, interrupt_gen);
+	mame_timer_set(video_screen_get_frame_period(0), 0, interrupt_gen);
 }
 
 MACHINE_START( tugboat )
@@ -180,7 +180,7 @@ MACHINE_START( tugboat )
 MACHINE_RESET( tugboat )
 {
 	pia_reset();
-	timer_set(cpu_getscanlinetime(1), 0, interrupt_gen);
+	mame_timer_set(video_screen_get_time_until_pos(0, 30*8+4, 0), 0, interrupt_gen);
 }
 
 
@@ -379,14 +379,13 @@ static MACHINE_DRIVER_START( tugboat )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_START(tugboat)
 	MDRV_MACHINE_RESET(tugboat)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8,64*8)
+	MDRV_SCREEN_SIZE(32*8,32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)

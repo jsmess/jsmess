@@ -61,7 +61,7 @@ void expand_machine_driver(void (*constructor)(machine_config *), machine_config
 
 	/* if no screens, set a dummy refresh for the main screen */
 	if (output->screen[0].tag == NULL)
-		output->screen[0].defstate.refresh = 60;
+		output->screen[0].defstate.refresh = HZ_TO_SUBSECONDS(60);
 }
 
 

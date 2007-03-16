@@ -12,20 +12,18 @@
 #define RGB32_BLACK			(0x00000000)
 #define RGB32_WHITE			(0x00ffffff)
 
-#define V_PIX_COUNT_START	(0x20)
-
 
 VIDEO_UPDATE( mw8080bw )
 {
 	UINT8 x = 0;
-	UINT8 y = V_PIX_COUNT_START;
+	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
 
 	while (1)
 	{
 		/* plot the current pixel */
 		pen_t col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-		plot_pixel(bitmap, x, y - V_PIX_COUNT_START, col);
+		plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 
 		/* next pixel */
 		video_data = video_data >> 1;
@@ -40,7 +38,7 @@ VIDEO_UPDATE( mw8080bw )
 			for (i = 0; i < 4; i++)
 			{
 				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-				plot_pixel(bitmap, 256 + i, y - V_PIX_COUNT_START, col);
+				plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 
 				video_data = video_data >> 1;
 			}
@@ -89,7 +87,7 @@ VIDEO_UPDATE( spcenctr )
 	UINT8 width, floor_width, center;
 	UINT8 line_buf[256]; /* 256x1 bit RAM */
 	UINT8 x = 0;
-	UINT8 y = V_PIX_COUNT_START;
+	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
 
 	draw_line = 0;
@@ -135,7 +133,7 @@ VIDEO_UPDATE( spcenctr )
 			}
 		}
 
-		plot_pixel(bitmap, x, y - V_PIX_COUNT_START, col);
+		plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 
 		center = center + 1;
 		width = width + ((center & 0x80) ? -1 : 1);
@@ -157,7 +155,7 @@ VIDEO_UPDATE( spcenctr )
 			for (i = 0; i < 4; i++)
 			{
 				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-				plot_pixel(bitmap, 256 + i, y - V_PIX_COUNT_START, col);
+				plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 
 				video_data = video_data >> 1;
 			}
@@ -236,7 +234,7 @@ VIDEO_UPDATE( spcenctr )
 VIDEO_UPDATE( phantom2 )
 {
 	UINT8 x = 0;
-	UINT8 y = V_PIX_COUNT_START;
+	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
 	UINT8 cloud_data = 0;
 
@@ -263,7 +261,7 @@ VIDEO_UPDATE( phantom2 )
 			col = bit ? RGB32_WHITE : RGB32_BLACK;
 		}
 
-		plot_pixel(bitmap, x, y - V_PIX_COUNT_START, col);
+		plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 
 		/* move to next pixel -- if ripple carry is currently set,
            prepare for loading the shift register */
@@ -301,7 +299,7 @@ VIDEO_UPDATE( phantom2 )
 			for (i = 0; i < 4; i++)
 			{
 				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-				plot_pixel(bitmap, 256 + i, y - V_PIX_COUNT_START, col);
+				plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 
 				video_data = video_data >> 1;
 			}
@@ -364,7 +362,7 @@ VIDEO_EOF( phantom2 )
 VIDEO_UPDATE( invaders )
 {
 	UINT8 x = 0;
-	UINT8 y = V_PIX_COUNT_START;
+	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
 	UINT8 flip_screen = invaders_is_flip_screen();
 
@@ -375,11 +373,11 @@ VIDEO_UPDATE( invaders )
 
 		if (flip_screen)
 		{
-			plot_pixel(bitmap, MW8080BW_HBSTART + 4 - 1 - x, MW8080BW_VBSTART - 1 - (y - V_PIX_COUNT_START), col);
+			plot_pixel(bitmap, MW8080BW_HPIXCOUNT - 1 - x, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), col);
 		}
 		else
 		{
-			plot_pixel(bitmap, x, y - V_PIX_COUNT_START, col);
+			plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 		}
 
 		/* next pixel */
@@ -398,11 +396,11 @@ VIDEO_UPDATE( invaders )
 
 				if (flip_screen)
 				{
-					plot_pixel(bitmap, MW8080BW_HBSTART + 4 - 1 - (256 + i), MW8080BW_VBSTART - 1 - (y - V_PIX_COUNT_START), col);
+					plot_pixel(bitmap, MW8080BW_HPIXCOUNT - 1 - (256 + i), MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), col);
 				}
 				else
 				{
-					plot_pixel(bitmap, 256 + i, y - V_PIX_COUNT_START, col);
+					plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
 				}
 
 				video_data = video_data >> 1;

@@ -848,10 +848,16 @@ static void parse_display_list(void)
 					length		= model2_bufferram[dlptr++];
 
 					if (address > 0x1f)
-						fatalerror("texture_parameter_write: address = %08X\n", address);
+					{
+						mame_printf_debug("texture_parameter_write: address = %08X\n", address);
+						break;
+					}
 
 					if (length > 0x20)
-						fatalerror("texture_parameter_write: length = %08X\n", length);
+					{
+						mame_printf_debug("texture_parameter_write: length = %08X\n", length);
+						break;
+					}
 
 					for (i=0; i < length; i++)
 					{

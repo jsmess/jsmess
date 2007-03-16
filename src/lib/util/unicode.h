@@ -35,6 +35,10 @@
 #define UTF8_CHAR_MAX	6
 #define UTF16_CHAR_MAX	2
 
+/* these are UTF-8 encoded strings for common characters */
+#define UTF8_NBSP			"\xc2\xa0"			/* non-breaking space */
+#define UTF8_MULTIPLY		"\xc3\x97"			/* multiplication symbol */
+
 
 
 /***************************************************************************

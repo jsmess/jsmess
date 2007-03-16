@@ -239,7 +239,7 @@ MACHINE_RESET( system16a )
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
-		timer_set(TIME_NOW, 0, suspend_i8751);
+		mame_timer_set(time_zero, 0, suspend_i8751);
 }
 
 
@@ -284,7 +284,7 @@ static WRITE16_HANDLER( standard_io_w )
 			/* the port C handshaking signals control the Z80 NMI, */
 			/* so we have to sync whenever we access this PPI */
 			if (ACCESSING_LSB)
-				timer_set(TIME_NOW, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+				mame_timer_set(time_zero, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 			return;
 	}
 	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
@@ -1563,7 +1563,6 @@ static MACHINE_DRIVER_START( system16a )
 	MDRV_CPU_IO_MAP(n7751_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
 
 	MDRV_MACHINE_RESET(system16a)
 	MDRV_NVRAM_HANDLER(system16a)
@@ -1571,7 +1570,7 @@ static MACHINE_DRIVER_START( system16a )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 28*8)
+	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048*3)

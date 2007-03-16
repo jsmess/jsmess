@@ -276,8 +276,8 @@ int start_system18_vdp(void)
 /* set the display enable bit */
 void segac2_enable_display(int enable)
 {
-	if (!cpu_getvblank())
-		video_screen_update_partial(0, cpu_getscanline());
+	if (!video_screen_get_vblank(0))
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 	display_enable = enable;
 }
 
@@ -388,7 +388,7 @@ READ16_HANDLER( genesis_vdp_r )
 		case 0x07:
 		{
 			int xpos = video_screen_get_hpos(0);
-			int ypos = cpu_getscanline();
+			int ypos = video_screen_get_vpos(0);
 
 			/* adjust for the weird counting rules */
 			if (xpos > 0xe9) xpos -= (342 - 0x100);
@@ -508,10 +508,10 @@ static void vdp_data_w(int data)
 		case 0x01:		/* VRAM write */
 
 			/* if the hscroll RAM is changing during screen refresh, force an update */
-			if (!cpu_getvblank() &&
+			if (!video_screen_get_vblank(0) &&
 				vdp_address >= vdp_hscrollbase &&
 				vdp_address < vdp_hscrollbase + vdp_hscrollsize)
-				video_screen_update_partial(0, cpu_getscanline());
+				video_screen_update_partial(0, video_screen_get_vpos(0));
 
 			/* write to VRAM */
 			if (vdp_address & 1)
@@ -530,8 +530,8 @@ static void vdp_data_w(int data)
 		case 0x05:		/* VSRAM write */
 
 			/* if the vscroll RAM is changing during screen refresh, force an update */
-			if (!cpu_getvblank())
-				video_screen_update_partial(0, cpu_getscanline());
+			if (!video_screen_get_vblank(0))
+				video_screen_update_partial(0, video_screen_get_vpos(0));
 
 			/* write to VSRAM */
 			if (vdp_address & 1)
@@ -587,18 +587,17 @@ static void vdp_data_w(int data)
 
 static int vdp_control_r(void)
 {
-	int beampos = video_screen_get_hpos(0);
 	int status = 0x3600; // wwally needs fifo empty set
 
 	/* kill 2nd write pending flag */
 	vdp_cmdpart = 0;
 
 	/* set the VBLANK bit */
-	if (cpu_getvblank())
+	if (video_screen_get_vblank(0))
 		status |= 0x0008;
 
 	/* set the HBLANK bit */
-	if (beampos < Machine->screen[0].visarea.min_x || beampos > Machine->screen[0].visarea.max_x)
+	if (video_screen_get_hblank(0))
 		status |= 0x0004;
 
 	return (status);
@@ -612,7 +611,7 @@ static void vdp_control_w(int data)
 	{
 		/* if 10xxxxxx xxxxxxxx this is a register setting command */
 		if ((data & 0xc000) == 0x8000)
-			vdp_register_w(data, cpu_getvblank());
+			vdp_register_w(data, video_screen_get_vblank(0));
 
 		/* otherwise this is the First part of a mode setting command */
 		else
@@ -647,7 +646,7 @@ static void vdp_register_w(int data, int vblank)
 	/* these are mostly important writes; force an update if they */
 	/* are written during a screen refresh */
 	if (!vblank && is_important[regnum])
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* For quite a few of the registers its a good idea to set a couple of variable based
        upon the writes here */

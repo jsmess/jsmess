@@ -858,7 +858,7 @@ layout_file *layout_file_load(const char *dirname, const char *filename)
 	/* otherwise, assume it is a file */
 	else
 	{
-		mame_file_error filerr;
+		file_error filerr;
 		mame_file *layoutfile;
 		char *fname;
 

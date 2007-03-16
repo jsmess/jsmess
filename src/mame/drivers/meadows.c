@@ -157,7 +157,7 @@ static READ8_HANDLER( hsync_chain_r )
 static READ8_HANDLER( vsync_chain_hi_r )
 {
 	/* vertical sync divider chain */
-	UINT8 val = cpu_getscanline();
+	UINT8 val = video_screen_get_vpos(0);
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
@@ -165,7 +165,7 @@ static READ8_HANDLER( vsync_chain_hi_r )
 static READ8_HANDLER( vsync_chain_lo_r )
 {
 	/* vertical sync divider chain */
-	UINT8 val = cpu_getscanline();
+	UINT8 val = video_screen_get_vpos(0);
 	return val & 0x0f;
 }
 
@@ -626,7 +626,6 @@ static MACHINE_DRIVER_START( meadows )
 	MDRV_CPU_PERIODIC_INT(sound_interrupt,TIME_IN_HZ(38))	/* 5000000/131072 interrupts per frame */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(10)
 
 	/* video hardware */
@@ -662,7 +661,6 @@ static MACHINE_DRIVER_START( minferno )
 	MDRV_CPU_VBLANK_INT(minferno_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0)		/* VBLANK is defined by visible area */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

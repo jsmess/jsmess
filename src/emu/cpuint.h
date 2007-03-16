@@ -26,7 +26,7 @@
  *
  *************************************/
 
-int cpuint_init(running_machine *machine);
+void cpuint_init(running_machine *machine);
 
 void cpuint_reset(void);
 

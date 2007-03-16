@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(homerun_40_r)
 {
-	if(cpu_getscanline()>116)
+	if(video_screen_get_vpos(0)>116)
 		return input_port_0_r(0)|0x40;
 	else
 		return input_port_0_r(0);
@@ -197,7 +197,6 @@ static MACHINE_DRIVER_START( homerun )
 
 	/* video hardware */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

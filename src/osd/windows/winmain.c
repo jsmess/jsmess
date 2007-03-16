@@ -112,6 +112,24 @@ static void stop_profiler(void);
 
 
 //============================================================
+//  winui_output_error
+//============================================================
+
+static void winui_output_error(void *param, const char *format, va_list argptr)
+{
+	char buffer[1024];
+
+	// if we are in fullscreen mode, go to windowed mode
+	if (video_config.windowed == 0)
+		winwindow_toggle_full_screen();
+
+	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
+	win_message_box_utf8(win_window_list ? win_window_list->hwnd : NULL, buffer, APPNAME, MB_OK);
+}
+
+
+
+//============================================================
 //  utf8_main
 //============================================================
 
@@ -127,11 +145,17 @@ int utf8_main(int argc, char **argv)
 	// set up exception handling
 	pass_thru_filter = SetUnhandledExceptionFilter(exception_filter);
 
-#ifndef WINUI
-	// check for double-clicky starts
-	if (check_for_double_click_start(argc) != 0)
-		return 1;
-#endif
+	if (win_is_gui_application())
+	{
+		// if we are a GUI app, output errors to message boxes
+		mame_set_output_channel(OUTPUT_CHANNEL_ERROR, winui_output_error, NULL, NULL, NULL);
+	}
+	else
+	{
+		// check for double-clicky starts
+		if (check_for_double_click_start(argc) != 0)
+			return 1;
+	}
 
 	// soft-link optional functions
 	soft_link_functions();
@@ -196,9 +220,7 @@ int utf8_main(int argc, char **argv)
 
 static void output_oslog(running_machine *machine, const char *buffer)
 {
-	extern int win_erroroslog;
-	if (win_erroroslog)
-		win_output_debug_string_utf8(buffer);
+	win_output_debug_string_utf8(buffer);
 }
 
 
@@ -208,7 +230,6 @@ static void output_oslog(running_machine *machine, const char *buffer)
 
 int osd_init(running_machine *machine)
 {
-	extern int win_erroroslog;
 	int result = 0;
 
 	if (result == 0)
@@ -228,7 +249,7 @@ int osd_init(running_machine *machine)
 		result = win_parallel_init();
 #endif
 
-	if (win_erroroslog)
+	if (options_get_bool("oslog"))
 		add_logerror_callback(machine, output_oslog);
 
 	return result;

@@ -98,6 +98,7 @@
 #include "profiler.h"
 #include "ui.h"
 #include <math.h>
+#include <ctype.h>
 
 #ifdef MESS
 #include "inputx.h"
@@ -970,6 +971,9 @@ static int default_ports_lookup[__ipt_max][MAX_PLAYERS];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static void setup_playback(running_machine *machine);
+static void setup_record(running_machine *machine);
+static void input_port_exit(running_machine *machine);
 static void input_port_load(int config_type, xml_data_node *parentnode);
 static void input_port_save(int config_type, xml_data_node *parentnode);
 static void update_digital_joysticks(void);
@@ -988,9 +992,12 @@ static void interpolate_analog_port(int port);
  *
  *************************************/
 
-int input_port_init(running_machine *machine, const input_port_token *ipt)
+void input_port_init(running_machine *machine, const input_port_token *ipt)
 {
 	int ipnum, player;
+
+	/* add an exit callback */
+	add_exit_callback(machine, input_port_exit);
 
 	/* start with the raw defaults and ask the OSD to customize them in the backup array */
 	memcpy(default_ports_backup, default_ports_builtin, sizeof(default_ports_backup));
@@ -1010,20 +1017,16 @@ int input_port_init(running_machine *machine, const input_port_token *ipt)
 	memset(port_info, 0, sizeof(port_info));
 
 	/* if we have inputs, process them now */
-	if (ipt)
+	if (ipt != NULL)
 	{
 		input_port_entry *port;
 		int portnum;
 
 		/* allocate input ports */
 		Machine->input_ports = input_port_allocate(ipt, NULL);
-		if (!Machine->input_ports)
-			return 1;
 
 		/* allocate default input ports */
 		input_ports_default = input_port_allocate(ipt, NULL);
-		if (!input_ports_default)
-			return 1;
 
 		/* identify all the tagged ports up front so the memory system can access them */
 		portnum = 0;
@@ -1045,7 +1048,90 @@ int input_port_init(running_machine *machine, const input_port_token *ipt)
 	/* register callbacks for when we load configurations */
 	config_register("input", input_port_load, input_port_save);
 
-	return 0;
+	/* open playback and record files if specified */
+	setup_playback(machine);
+	setup_record(machine);
+}
+
+
+/*************************************
+ *
+ *  Set up for playback
+ *
+ *************************************/
+
+static void setup_playback(running_machine *machine)
+{
+	const char *filename = options_get_string(OPTION_PLAYBACK);
+	inp_header inp_header;
+	file_error filerr;
+
+	/* if no file, nothing to do */
+	if (filename == NULL || filename[0] == 0)
+		return;
+
+	/* open the playback file */
+	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_READ, &machine->playback_file);
+	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
+
+	/* read playback header */
+	mame_fread(machine->playback_file, &inp_header, sizeof(inp_header));
+
+	/* if the first byte is not alphanumeric, it's an old INP file with no header */
+	if (!isalnum(inp_header.name[0]))
+		mame_fseek(machine->playback_file, 0, SEEK_SET);
+
+	/* else verify the header against the current game */
+	else if (strcmp(machine->gamedrv->name, inp_header.name) != 0)
+		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", inp_header.name, machine->gamedrv->name);
+
+	/* otherwise, print a message indicating what's happening */
+	else
+		mame_printf_info("Playing back previously recorded " GAMENOUN " %s\n", machine->gamedrv->name);
+}
+
+
+/*************************************
+ *
+ *  Set up for recording
+ *
+ *************************************/
+
+static void setup_record(running_machine *machine)
+{
+	const char *filename = options_get_string(OPTION_RECORD);
+	inp_header inp_header;
+	file_error filerr;
+
+	/* if no file, nothing to do */
+	if (filename == NULL || filename[0] == 0)
+		return;
+
+	/* open the record file  */
+	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &machine->record_file);
+	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
+
+	/* create a header */
+	memset(&inp_header, 0, sizeof(inp_header));
+	strcpy(inp_header.name, machine->gamedrv->name);
+	mame_fwrite(machine->record_file, &inp_header, sizeof(inp_header));
+}
+
+
+
+/*************************************
+ *
+ *  Input port exit
+ *
+ *************************************/
+
+void input_port_exit(running_machine *machine)
+{
+	/* close any playback or recording files */
+	if (machine->playback_file != NULL)
+		mame_fclose(machine->playback_file);
+	if (machine->record_file != NULL)
+		mame_fclose(machine->record_file);
 }
 
 
@@ -2493,7 +2579,7 @@ profiler_mark(PROFILER_INPUT);
 		}
 
 		/* if this is an autorepeat case, set a 1x delay and leave pressed = 1 */
-		else if (++counter > keydelay * speed * Machine->screen[0].refresh / 60)
+		else if (++counter > keydelay * speed * SUBSECONDS_TO_HZ(Machine->screen[0].refresh) / 60)
 		{
 			keydelay = 1;
 			counter = 0;

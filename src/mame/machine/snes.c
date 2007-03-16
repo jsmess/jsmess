@@ -331,7 +331,7 @@ static void snes_init_ram(void)
 	has_dsp1 = ((snes_r_bank1(0xffd6) >= 3) && (snes_r_bank1(0xffd6) <= 5)) ? 1 : 0;
 
 	// init frame counter so first line is 0
-	if( Machine->screen[0].refresh == 60 )
+	if( SUBSECONDS_TO_HZ(Machine->screen[0].refresh) >= 59 )
 	{
 		snes_ppu.beam.current_vert = SNES_VTOTAL_NTSC;
 	}
@@ -375,7 +375,7 @@ MACHINE_RESET( snes )
 	snes_init_ram();
 
 	/* Set STAT78 to NTSC or PAL */
-	if( Machine->screen[0].refresh >= 59.0f )
+	if( SUBSECONDS_TO_HZ(Machine->screen[0].refresh) >= 59.0f )
 		snes_ram[STAT78] = SNES_NTSC;
 	else /* if( Machine->screen[0].refresh == 50 ) */
 		snes_ram[STAT78] = SNES_PAL;

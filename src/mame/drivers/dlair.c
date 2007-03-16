@@ -220,7 +220,8 @@ VIDEO_UPDATE( dlair )
 	last_seqid = seqid;
 
 	/* cover the whole screen with a quad */
-	render_screen_add_quad(0, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+	render_container_empty(render_container_get_screen(screen));
+	render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 	if (discinfo != NULL)
 		popmessage("%s", laserdisc_describe_state(discinfo));
@@ -253,10 +254,11 @@ VIDEO_UPDATE( dleuro )
 	last_seqid = seqid;
 
 	/* cover the whole screen with a quad */
+	render_container_empty(render_container_get_screen(screen));
 	if (last_misc & 0x02)
-		render_screen_add_quad(0, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 	else
-		render_screen_add_quad(0, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 	if (discinfo != NULL)
 		popmessage("%s", laserdisc_describe_state(discinfo));
@@ -815,7 +817,7 @@ static MACHINE_DRIVER_START( dlair )
 	MDRV_MACHINE_RESET(dlair)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_SELF_RENDER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(59.94)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "8080bw.h"
+#include "mw8080bw.h"
 
 static int screen_red;
 static int screen_red_enabled;		/* 1 for games that can turn the screen red */
@@ -73,7 +74,7 @@ DRIVER_INIT( schaser )
 	int i;
 	UINT8* promm = memory_region( REGION_PROMS );
 
-	schaser_effect_555_timer = timer_alloc(schaser_effect_555_cb);
+	schaser_effect_555_timer = mame_timer_alloc(schaser_effect_555_cb);
 
 	init_8080bw(machine);
 	videoram_w_p = schaser_videoram_w;
@@ -145,7 +146,7 @@ DRIVER_INIT( shuttlei )
 
 void c8080bw_flip_screen_w(int data)
 {
-	set_vh_global_attribute(&color_map_select, data);
+	color_map_select = data;
 
 	if (input_port_3_r(0) & 0x01)
 	{
@@ -158,7 +159,7 @@ void c8080bw_screen_red_w(int data)
 {
 	if (screen_red_enabled)
 	{
-		set_vh_global_attribute(&screen_red, data);
+		screen_red = data;
 	}
 }
 
@@ -169,28 +170,28 @@ INTERRUPT_GEN( polaris_interrupt )
 
 	cloud_speed++;
 
-	if (cloud_speed >= 8)	/* every 4 frames - this was verified against real machine */
+	if (cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
 	{
 		cloud_speed = 0;
 
 		cloud_pos++;
-
-		set_vh_global_attribute(NULL,0);
 	}
-
-	c8080bw_interrupt();
 }
 
 
 static void plot_pixel_8080(int x, int y, int col)
 {
-	if (flip_screen)
+	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
-		x = 255-x;
-		y = 255-y;
+		if (flip_screen)
+		{
+			plot_pixel(tmpbitmap, MW8080BW_HPIXCOUNT - 1 - x, MW8080BW_VTOTAL - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), Machine->pens[col]);
+		}
+		else
+		{
+			plot_pixel(tmpbitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, Machine->pens[col]);
+		}
 	}
-
-	plot_pixel(tmpbitmap,x,y,Machine->pens[col]);
 }
 
 INLINE void plot_byte(int x, int y, int data, int fore_color, int back_color)
@@ -345,28 +346,6 @@ static WRITE8_HANDLER( polaris_videoram_w )
 }
 
 
-WRITE8_HANDLER( schaser_colorram_w )
-{
-	int i;
-
-
-	offset &= 0x1f1f;
-
-	colorram[offset] = data;
-
-	/* redraw region with (possibly) changed color */
-	for (i = 0; i < 8; i++, offset += 0x20)
-	{
-		videoram_w_p(offset, videoram[offset]);
-	}
-}
-
-READ8_HANDLER( schaser_colorram_r )
-{
-	return colorram[offset & 0x1f1f];
-}
-
-
 static WRITE8_HANDLER( shuttlei_videoram_w )
 {
 	int x,y,i;
@@ -391,13 +370,10 @@ static WRITE8_HANDLER( shuttlei_videoram_w )
 
 VIDEO_UPDATE( 8080bw )
 {
-	if (get_vh_global_attribute_changed())
-	{
-		int offs;
+	int offs;
 
-		for (offs = 0;offs < videoram_size;offs++)
-			videoram_w_p(offs, videoram[offs]);
-	}
+	for (offs = 0;offs < videoram_size;offs++)
+		videoram_w_p(offs, videoram[offs]);
 
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	return 0;
@@ -473,21 +449,6 @@ PALETTE_INIT( cosmo )
 	for (i = 0;i < Machine->drv->total_colors;i++)
 	{
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
-	}
-}
-
-WRITE8_HANDLER( cosmo_colorram_w )
-{
-	int i;
-	int offs = ((offset>>5)<<8) | (offset&0x1f);
-
-	colorram[offset] = data;
-
-	/* redraw region with (possibly) changed color */
-	for (i=0; i<8; i++)
-	{
-		videoram_w_p(offs, videoram[offs]);
-		offs+= 0x20;
 	}
 }
 

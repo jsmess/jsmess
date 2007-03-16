@@ -799,7 +799,7 @@ static int compare_screenshots(summary_file *curfile)
 	for (listnum = 0; listnum < list_count; listnum++)
 		if (curfile->status[listnum] == STATUS_SUCCESS)
 		{
-			mame_file_error filerr;
+			file_error filerr;
 			const char *fullname;
 			char imgname[100];
 			core_file *file;
@@ -900,7 +900,7 @@ static int generate_png_diff(const char *srcdir1, const char *srcdir2, const cha
 	const char *dstfilename = alloc_filename(destdir, destname);
 	bitmap_t *bitmap1 = NULL, *bitmap2 = NULL, *finalbitmap = NULL;
 	int width, height, maxwidth;
-	mame_file_error filerr;
+	file_error filerr;
 	core_file *file = NULL;
 	png_error pngerr;
 	int error = -1;

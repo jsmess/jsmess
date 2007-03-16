@@ -106,7 +106,7 @@ static MACHINE_RESET( hangon )
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
-		timer_set(TIME_NOW, 0, suspend_i8751);
+		mame_timer_set(time_zero, 0, suspend_i8751);
 
 	/* reset global state */
 	adc_select = 0;
@@ -166,7 +166,7 @@ static WRITE16_HANDLER( hangon_io_w )
 			case 0x0000/2: /* PPI @ 4B */
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				timer_set(TIME_NOW, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+				mame_timer_set(time_zero, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
@@ -212,7 +212,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 			case 0x0000/2:
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				timer_set(TIME_NOW, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+				mame_timer_set(time_zero, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */
@@ -847,7 +847,6 @@ static MACHINE_DRIVER_START( hangon_base )
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
 
 	MDRV_MACHINE_RESET(hangon)
 	MDRV_INTERLEAVE(100)
@@ -855,7 +854,7 @@ static MACHINE_DRIVER_START( hangon_base )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 28*8)
+	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048*3)

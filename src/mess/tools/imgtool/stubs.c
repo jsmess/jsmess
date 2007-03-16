@@ -25,7 +25,7 @@ void CLIB_DECL logerror(const char *text,...)
 /* ----------------------------------------------------------------------- */
 /* total hack */
 
-mame_file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openflags, mame_file **file)
+file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openflags, mame_file **file)
 {
 	char buffer[2048];
 	snprintf(buffer, sizeof(buffer), "crc/%s", filename);

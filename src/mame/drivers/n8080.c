@@ -35,7 +35,7 @@ static READ8_HANDLER( n8080_shift_r )
 
 static INTERRUPT_GEN( interrupt )
 {
-	if (cpu_getvblank())
+	if (video_screen_get_vblank(0))
 	{
 		cpunum_set_input_line_and_vector(0, 0, PULSE_LINE, 0xcf);  /* RST $08 */
 	}
@@ -85,7 +85,6 @@ static MACHINE_DRIVER_START( spacefev )
 	MDRV_CPU_VBLANK_INT(interrupt, 2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -111,7 +110,6 @@ static MACHINE_DRIVER_START( sheriff )
 	MDRV_CPU_VBLANK_INT(interrupt, 2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -137,7 +135,6 @@ static MACHINE_DRIVER_START( helifire )
 	MDRV_CPU_VBLANK_INT(interrupt, 2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

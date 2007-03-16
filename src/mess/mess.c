@@ -287,7 +287,7 @@ void showmessinfo(void)
 
 void ram_dump(const char *filename)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	/* use a default filename */
@@ -304,16 +304,6 @@ void ram_dump(const char *filename)
 		/* close file */
 		mame_fclose(file);
 	}
-}
-
-
-
-void mess_config_init(running_machine *machine)
-{
-#ifdef WIN32
-	extern void win_mess_config_init(running_machine *machine);
-	win_mess_config_init(machine);
-#endif
 }
 
 

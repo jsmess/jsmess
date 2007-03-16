@@ -18,3 +18,15 @@
 /*----------- defined in sndhrdw/skydiver.c -----------*/
 
 extern discrete_sound_block ultratnk_discrete_interface[];
+
+
+/*----------- defined in video/ultratnk.c -----------*/
+
+int ultratnk_collision[4];
+
+PALETTE_INIT( ultratnk );
+VIDEO_START( ultratnk );
+VIDEO_UPDATE( ultratnk );
+VIDEO_EOF( ultratnk );
+
+WRITE8_HANDLER( ultratnk_video_ram_w );

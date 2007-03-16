@@ -263,7 +263,7 @@ INLINE void *nvram_select(void)
 
 mame_file *nvram_fopen(running_machine *machine, UINT32 openflags)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	char *fname;
 
@@ -386,7 +386,7 @@ INLINE void memcard_name(int index, char *buffer)
 
 int memcard_create(int index, int overwrite)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	char *fname;
 	char name[16];
@@ -430,7 +430,7 @@ int memcard_create(int index, int overwrite)
 
 int memcard_insert(int index)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	char name[16];
 	char *fname;
@@ -468,7 +468,7 @@ int memcard_insert(int index)
 
 void memcard_eject(running_machine *machine)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	char name[16];
 	char *fname;

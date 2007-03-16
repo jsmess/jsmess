@@ -897,7 +897,7 @@ DEVICE_LOAD( a800xl_cart )
 	UINT8 *mem = memory_region(REGION_CPU1);
 	char *fname;
 	mame_file *basic_fp;
-	mame_file_error filerr;
+	file_error filerr;
 	unsigned size;
 
 	fname = assemble_3_strings(Machine->gamedrv->name, PATH_SEPARATOR, "basic.rom");

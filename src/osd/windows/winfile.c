@@ -37,7 +37,7 @@ struct _osd_file
 //============================================================
 
 static DWORD create_path_recursive(TCHAR *path);
-static mame_file_error win_error_to_mame_file_error(DWORD error);
+static file_error win_error_to_file_error(DWORD error);
 
 
 
@@ -45,10 +45,10 @@ static mame_file_error win_error_to_mame_file_error(DWORD error);
 //  osd_open
 //============================================================
 
-mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
+file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
 	DWORD disposition, access, sharemode;
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 	const TCHAR *src;
 	DWORD upper;
 	TCHAR *t_path;
@@ -121,7 +121,7 @@ mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UI
 		// if we still failed, clean up and free
 		if ((*file)->handle == INVALID_HANDLE_VALUE)
 		{
-			filerr = win_error_to_mame_file_error(error);
+			filerr = win_error_to_file_error(error);
 			goto error;
 		}
 	}
@@ -146,7 +146,7 @@ error:
 //  osd_read
 //============================================================
 
-mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
+file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
 	LONG upper = offset >> 32;
 	DWORD result;
@@ -157,12 +157,12 @@ mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 len
 	{
 		DWORD error = GetLastError();
 		if (error != NO_ERROR)
-			return win_error_to_mame_file_error(error);
+			return win_error_to_file_error(error);
 	}
 
 	// then perform the read
 	if (!ReadFile(file->handle, buffer, length, &result, NULL))
-		return win_error_to_mame_file_error(GetLastError());
+		return win_error_to_file_error(GetLastError());
 	if (actual != NULL)
 		*actual = result;
 	return FILERR_NONE;
@@ -173,7 +173,7 @@ mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 len
 //  osd_write
 //============================================================
 
-mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
+file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
 	LONG upper = offset >> 32;
 	DWORD result;
@@ -184,12 +184,12 @@ mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UIN
 	{
 		DWORD error = GetLastError();
 		if (error != NO_ERROR)
-			return win_error_to_mame_file_error(error);
+			return win_error_to_file_error(error);
 	}
 
 	// then perform the read
 	if (!WriteFile(file->handle, buffer, length, &result, NULL))
-		return win_error_to_mame_file_error(GetLastError());
+		return win_error_to_file_error(GetLastError());
 	if (actual != NULL)
 		*actual = result;
 	return FILERR_NONE;
@@ -200,7 +200,7 @@ mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UIN
 //  osd_close
 //============================================================
 
-mame_file_error osd_close(osd_file *file)
+file_error osd_close(osd_file *file)
 {
 	// close the file handle and free the file structure
 	CloseHandle(file->handle);
@@ -213,9 +213,9 @@ mame_file_error osd_close(osd_file *file)
 //  osd_rmfile
 //============================================================
 
-mame_file_error osd_rmfile(const char *filename)
+file_error osd_rmfile(const char *filename)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 
 	TCHAR *tempstr = tstring_from_utf8(filename);
 	if (!tempstr)
@@ -226,7 +226,7 @@ mame_file_error osd_rmfile(const char *filename)
 
 	if (!DeleteFile(tempstr))
 	{
-		filerr = win_error_to_mame_file_error(GetLastError());
+		filerr = win_error_to_file_error(GetLastError());
 		goto done;
 	}
 
@@ -310,7 +310,7 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 static DWORD create_path_recursive(TCHAR *path)
 {
 	TCHAR *sep = _tcsrchr(path, '\\');
-	mame_file_error filerr;
+	file_error filerr;
 
 	// if there's still a separator, and it's not the root, nuke it and recurse
 	if (sep != NULL && sep > path && sep[0] != ':' && sep[-1] != '\\')
@@ -332,14 +332,14 @@ static DWORD create_path_recursive(TCHAR *path)
 
 
 //============================================================
-//  win_error_to_mame_file_error
+//  win_error_to_file_error
 //============================================================
 
-static mame_file_error win_error_to_mame_file_error(DWORD error)
+static file_error win_error_to_file_error(DWORD error)
 {
-	mame_file_error filerr;
+	file_error filerr;
 
-	// convert a Windows error to a mame_file_error
+	// convert a Windows error to a file_error
 	switch (error)
 	{
 		case ERROR_SUCCESS:

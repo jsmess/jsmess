@@ -498,7 +498,7 @@ void segaic16_set_display_enable(int enable)
 	enable = (enable != 0);
 	if (segaic16_display_enable != enable)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		segaic16_display_enable = enable;
 	}
 }
@@ -1179,14 +1179,14 @@ static void segaic16_tilemap_16b_latch_values(int param)
 	}
 
 	/* set a timer to do this again next frame */
-	timer_set(cpu_getscanlinetime(261), param, segaic16_tilemap_16b_latch_values);
+	mame_timer_set(video_screen_get_time_until_pos(0, 261, 0), param, segaic16_tilemap_16b_latch_values);
 }
 
 
 void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
-	timer_set(cpu_getscanlinetime(261), info->index, segaic16_tilemap_16b_latch_values);
+	mame_timer_set(video_screen_get_time_until_pos(0, 261, 0), info->index, segaic16_tilemap_16b_latch_values);
 }
 
 
@@ -1275,7 +1275,8 @@ int segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int num
 	tilemap_set_user_data(info->textmap, &info->textmap_info);
 	tilemap_set_palette_offset(info->textmap, colorbase);
 	tilemap_set_transparent_pen(info->textmap, 0);
-	tilemap_set_scrolldx(info->textmap, -24*8 + xoffs, -24*8 + xoffs);
+	tilemap_set_scrolldx(info->textmap, -192 + xoffs, -170 + xoffs);
+	tilemap_set_scrolldy(info->textmap, 0, 38);
 
 	/* create the tilemaps for the tile pages */
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1290,6 +1291,8 @@ int segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int num
 		tilemap_set_user_data(info->tilemaps[pagenum], &info->tilemap_info[pagenum]);
 		tilemap_set_palette_offset(info->tilemaps[pagenum], colorbase);
 		tilemap_set_transparent_pen(info->tilemaps[pagenum], 0);
+		tilemap_set_scrolldx(info->tilemaps[pagenum], 0, 22);
+		tilemap_set_scrolldy(info->tilemaps[pagenum], 0, 38);
 	}
 	return 0;
 }
@@ -1345,7 +1348,7 @@ void segaic16_tilemap_set_bank(int which, int banknum, int offset)
 
 	if (info->bank[banknum] != offset)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		info->bank[banknum] = offset;
 		tilemap_mark_all_tiles_dirty(NULL);
 	}
@@ -1367,7 +1370,7 @@ void segaic16_tilemap_set_flip(int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		info->flip = flip;
 		tilemap_set_flip(info->textmap, flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1390,7 +1393,7 @@ void segaic16_tilemap_set_rowscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		info->rowscroll = enable;
 	}
 }
@@ -1410,7 +1413,7 @@ void segaic16_tilemap_set_colscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		info->colscroll = enable;
 	}
 }
@@ -1434,7 +1437,7 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	COMBINE_DATA(&segaic16_textram_0[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap[0].textmap, offset);
@@ -2761,7 +2764,7 @@ void segaic16_sprites_set_bank(int which, int banknum, int offset)
 
 	if (info->bank[banknum] != offset)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		info->bank[banknum] = offset;
 	}
 }
@@ -2781,7 +2784,7 @@ void segaic16_sprites_set_flip(int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		info->flip = flip;
 	}
 }
@@ -2801,7 +2804,7 @@ void segaic16_sprites_set_shadow(int which, int shadow)
 	shadow = (shadow != 0);
 	if (info->shadow != shadow)
 	{
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 		info->shadow = shadow;
 	}
 }

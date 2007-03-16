@@ -218,6 +218,7 @@ const game_driver * const drivers[] =
 	DRIVER( tazzmang )	/* bootleg */
 	DRIVER( racknrol )	/* (c) 1986 Status (Shinkia license) (Senko Kit) */
 	DRIVER( hexpool )	/* (c) 1986 Shinkia (Senko Kit) */
+	DRIVER( hexpoola )	/* (c) 1986 Shinkia (Senko Kit) */
 	DRIVER( trvchlng )	/* [1985] Joyland (Senko license) */
 	DRIVER( luctoday )	/* 1980 Sigma */
 	DRIVER( chewing )	/* ?? unknown */
@@ -385,6 +386,7 @@ const game_driver * const drivers[] =
 	DRIVER( armedf )	/* (c) 1988 */
 	DRIVER( cclimbr2 )	/* (c) 1988 (Japan) */
 	DRIVER( cclmbr2a )	/* (c) 1988 (Japan) */
+	DRIVER( skyrobo )	/* (c) 1989 */
 	DRIVER( bigfghtr )	/* (c) 1989 */
 
 	/* Nichibutsu Mahjong games */
@@ -3555,6 +3557,7 @@ Sep.1994 Quiz Ghost Hunter
 
 	/* Model 2 (TGPs, Model 1 sound board) */
 	DRIVER( daytona )	/* 1993 */
+	DRIVER( daytonas )	/* 1993 */
 	DRIVER( daytonat )	/* 1993, hack */
 	DRIVER( daytonam )	/* 1993, hack */
 	DRIVER( desert )	/* 1994 */
@@ -3562,6 +3565,7 @@ Sep.1994 Quiz Ghost Hunter
 
 	/* Model 2A-CRX (TGPs, SCSP sound board) */
 	DRIVER( manxtt )	/* 1995 */
+	DRIVER( motoraid )	/* 1995 */
 	DRIVER( srallyc )	/* 1995 */
 	DRIVER( vf2 )		/* 1995 */
 	DRIVER( vf2b )		/* 1995 */
@@ -4027,6 +4031,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( captavne )	/* MAN (c) 1991 Data East Corporation (UK) */
 	DRIVER( captavnu )	/* MAN (c) 1991 Data East Corporation (US) */
 	DRIVER( captavuu )	/* MAN (c) 1991 Data East Corporation (US) */
+	DRIVER( captavua )	/* MAN (c) 1991 Data East Corporation (US) */
 	DRIVER( captavnj )	/* MAN (c) 1991 Data East Corporation (Japan) */
 				/* MAO ?? */
 	DRIVER( tumblep )	/* MAP (c) 1991 Data East Corporation (World) */
@@ -4550,16 +4555,25 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bmcompmx )	/* GX858 (c) 1999 (Japan) */
 	DRIVER( hmcompmx )	/* GX858 (c) 1999 */
 	DRIVER( bm4thmix )	/* GX847 (c) 1999 (Japan) */
-	DRIVER( bm5thmix )	/* GX981 (c) 1999 (Japan */
+	DRIVER( bm5thmix )	/* GX981 (c) 1999 (Japan) */
+	DRIVER( bmclubmx )	/*       (c) 2000 (Japan) */
 	DRIVER( bmcorerm )	/* GXA05 (c) 1999 (Japan) */
 	DRIVER( bmdct )		/* GX995 (c) 2000 (Japan) */
 	DRIVER( bmcompm2 )	/* GX988 (c) 2000 (Japan) */
 	DRIVER( hmcompm2 )	/* GX988 (c) 2000 */
 	DRIVER( bm6thmix )	/* GXA21 (c) 2001 (Japan) */
+	DRIVER( bm7thmix )	/*       (c) 2001 (Japan) */
+	DRIVER( bmfinal )	/*       (c) 2002 (Japan) */
+
+	DRIVER( popn1 )		/*       (c) 1998 (Japan) */
+	DRIVER( popn2 )		/*       (c) 1998 (Japan) */
+	DRIVER( popn3 )		/*       (c) 1999 (Japan) */
+	DRIVER( popnstex )	/*       (c) 1999 (Japan) */
 
 	/* Firebeat games */
 	DRIVER( ppp )		/* GQ977 (c) 2000 */
 	DRIVER( ppd )		/* GQ977 (c) 2000 (Korea) */
+	DRIVER( ppp11 )		/* GQ977 (c) 2000 */
 	DRIVER( kbm )		/* GQ974 (c) 2000 */
 	DRIVER( kbm2nd )	/* GCA01 (c) 2000 */
 	DRIVER( kbm3rd )	/* GCA12 (c) 2001 */

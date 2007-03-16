@@ -495,12 +495,12 @@ VIDEO_START( hornet )
 {
 	if (voodoo_version == 0)
 	{
-		if (voodoo_start(0, VOODOO_1, 2, 4, 0))
+		if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0))
 			return 1;
 	}
 	else
 	{
-		if (voodoo_start(0, VOODOO_2, 2, 4, 0))
+		if (voodoo_start(0, 0, VOODOO_2, 2, 4, 0))
 			return 1;
 	}
 
@@ -511,14 +511,14 @@ VIDEO_START( hornet_2board )
 {
 	if (voodoo_version == 0)
 	{
-		if (voodoo_start(0, VOODOO_1, 2, 4, 0) ||
-		    voodoo_start(1, VOODOO_1, 2, 4, 0))
+		if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0) ||
+		    voodoo_start(1, 1, VOODOO_1, 2, 4, 0))
 			return 1;
 	}
 	else
 	{
-		if (voodoo_start(0, VOODOO_2, 2, 4, 0) ||
-			voodoo_start(1, VOODOO_2, 2, 4, 0))
+		if (voodoo_start(0, 0, VOODOO_2, 2, 4, 0) ||
+			voodoo_start(1, 1, VOODOO_2, 2, 4, 0))
 			return 1;
 	}
 
@@ -834,7 +834,6 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_CPU_DATA_MAP(sharc0_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET( hornet )
 
@@ -907,14 +906,12 @@ static MACHINE_DRIVER_START( hornet_2board )
 	MDRV_SCREEN_ADD("left", 0x000)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 
 	MDRV_SCREEN_ADD("right", 0x000)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 MACHINE_DRIVER_END

@@ -65,7 +65,7 @@ enum
  *************************************/
 
 /* Prepare CPUs for execution */
-int cpuexec_init(running_machine *machine);
+void cpuexec_init(running_machine *machine);
 
 /* Execute for a single timeslice */
 void cpuexec_timeslice(void);

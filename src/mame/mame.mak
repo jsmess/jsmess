@@ -176,6 +176,7 @@ CPUS += COP410
 CPUS += TLCS90
 # CPUS += MB8843
 CPUS += MB8844
+# CPUS += SSP1610
 # CPUS += APEXC
 # CPUS += CP1610
 # CPUS += F8
@@ -409,6 +410,7 @@ $(MAMEOBJ)/shared.a: \
  	$(MACHINE)/idectrl.o \
  	$(MACHINE)/intelfsh.o \
 	$(MACHINE)/laserdsc.o \
+	$(MACHINE)/mb14241.o \
 	$(MACHINE)/mc146818.o \
 	$(MACHINE)/msm6242.o \
 	$(MACHINE)/nmk112.o \
@@ -541,7 +543,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/tourtabl.o $(VIDEO)/tia.o \
 	$(DRIVERS)/triplhnt.o $(AUDIO)/triplhnt.o $(VIDEO)/triplhnt.o \
 	$(DRIVERS)/tunhunt.o $(VIDEO)/tunhunt.o \
-	$(DRIVERS)/ultratnk.o $(AUDIO)/ultratnk.o \
+	$(DRIVERS)/ultratnk.o $(AUDIO)/ultratnk.o $(VIDEO)/ultratnk.o \
 	$(DRIVERS)/videopin.o $(AUDIO)/videopin.o $(VIDEO)/videopin.o \
 	$(DRIVERS)/vindictr.o $(VIDEO)/vindictr.o \
 	$(DRIVERS)/wolfpack.o $(VIDEO)/wolfpack.o \
@@ -933,9 +935,9 @@ $(MAMEOBJ)/midcoin.a: \
 	$(DRIVERS)/wink.o \
 
 $(MAMEOBJ)/midw8080.a: \
-	$(DRIVERS)/8080bw.o $(MACHINE)/8080bw.o $(AUDIO)/8080bw.o $(VIDEO)/8080bw.o \
+	$(DRIVERS)/8080bw.o $(AUDIO)/8080bw.o $(VIDEO)/8080bw.o \
 	$(DRIVERS)/m79amb.o $(VIDEO)/m79amb.o \
-	$(DRIVERS)/mw8080bw.o $(AUDIO)/mw8080bw.o $(VIDEO)/mw8080bw.o \
+	$(DRIVERS)/mw8080bw.o $(MACHINE)/mw8080bw.o $(AUDIO)/mw8080bw.o $(VIDEO)/mw8080bw.o \
 	$(DRIVERS)/rotaryf.o \
 	$(DRIVERS)/sspeedr.o $(VIDEO)/sspeedr.o \
 
@@ -1503,7 +1505,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
-	$(DRIVERS)/beaminv.o $(VIDEO)/beaminv.o \
+	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/bmcbowl.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \

@@ -102,7 +102,7 @@ error:
 
 imgtool_stream *stream_open(const char *fname, int read_or_write)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	const char *ext;
 	imgtool_stream *imgfile = NULL;
 	static const UINT32 write_modes[] =
@@ -254,7 +254,7 @@ void stream_close(imgtool_stream *s)
 
 UINT32 stream_read(imgtool_stream *stream, void *buf, UINT32 sz)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	UINT32 result = 0;
 
 	switch(stream->imgtype)
@@ -285,7 +285,7 @@ UINT32 stream_read(imgtool_stream *stream, void *buf, UINT32 sz)
 
 UINT32 stream_write(imgtool_stream *s, const void *buf, UINT32 sz)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	void *new_buffer;
 	UINT32 result = 0;
 

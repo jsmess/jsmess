@@ -262,7 +262,7 @@ static const raster_info predef_raster_table[] =
  *
  *************************************/
 
-int voodoo_start(int which, int type, int fbmem_in_mb, int tmem0_in_mb, int tmem1_in_mb)
+int voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in_mb, int tmem1_in_mb)
 {
 	void *fbmem, *tmumem[2];
 	voodoo_state *v;
@@ -343,7 +343,7 @@ int voodoo_start(int which, int type, int fbmem_in_mb, int tmem0_in_mb, int tmem
 	v->pci.fifo.size = 64*2;
 	v->pci.fifo.in = v->pci.fifo.out = 0;
 	v->pci.stall_state = NOT_STALLED;
-	v->pci.continue_timer = timer_alloc_ptr(stall_cpu_callback, v);
+	v->pci.continue_timer = mame_timer_alloc_ptr(stall_cpu_callback, v);
 
 	/* allocate memory */
 	if (type <= VOODOO_2)
@@ -746,7 +746,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	}
 
 	/* allocate a VBLANK timer */
-	f->vblank_timer = timer_alloc_ptr(vblank_callback, v);
+	f->vblank_timer = mame_timer_alloc_ptr(vblank_callback, v);
 	f->vblank = FALSE;
 
 	/* initialize the memory FIFO */
@@ -866,10 +866,10 @@ static void swap_buffers(voodoo_state *v)
 {
 	int count;
 
-	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", cpu_getscanline());
+	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", video_screen_get_vpos(v->scrnum));
 
 	/* force a partial update */
-	video_screen_update_partial(0, cpu_getscanline());
+	video_screen_update_partial(v->scrnum, video_screen_get_vpos(v->scrnum));
 
 	/* keep a history of swap intervals */
 	count = v->fbi.vblank_count;
@@ -925,7 +925,7 @@ static void swap_buffers(voodoo_state *v)
 	/* update the statistics (debug) */
 	if (v->stats.display)
 	{
-		int screen_area = (Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1) * (Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1);
+		int screen_area = (Machine->screen[v->scrnum].visarea.max_x - Machine->screen[v->scrnum].visarea.min_x + 1) * (Machine->screen[v->scrnum].visarea.max_y - Machine->screen[v->scrnum].visarea.min_y + 1);
 		int pixelcount = v->stats.total_pixels_out;
 		char *statsptr = v->stats.buffer;
 		int i;
@@ -973,6 +973,17 @@ static void swap_buffers(voodoo_state *v)
 }
 
 
+static void adjust_vblank_timer(voodoo_state *v)
+{
+	mame_time vblank_period = video_screen_get_time_until_pos(v->scrnum, v->fbi.height, 0);
+
+	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
+	if (compare_mame_times(vblank_period, time_zero) == 0)
+		vblank_period = video_screen_get_frame_period(v->scrnum);
+	mame_timer_adjust_ptr(v->fbi.vblank_timer, vblank_period, time_never);
+}
+
+
 static void vblank_off_callback(void *param)
 {
 	voodoo_state *v = param;
@@ -985,7 +996,7 @@ static void vblank_off_callback(void *param)
 		(*v->fbi.vblank_client)(FALSE);
 
 	/* go to the end of the next frame */
-	timer_adjust_ptr(v->fbi.vblank_timer, cpu_getscanlinetime(Machine->screen[0].visarea.max_y + 1), TIME_NEVER);
+	adjust_vblank_timer(v);
 }
 
 
@@ -1017,7 +1028,7 @@ static void vblank_callback(void *param)
 		swap_buffers(v);
 
 	/* set a timer for the next off state */
-	timer_set_ptr(cpu_getscanlinetime(0), v, vblank_off_callback);
+	mame_timer_set_ptr(video_screen_get_time_until_pos(v->scrnum, 0, 0), v, vblank_off_callback);
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
@@ -2476,8 +2487,8 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 				visarea.min_x = visarea.min_y = 0;
 				visarea.max_x = v->fbi.width - 1;
 				visarea.max_y = v->fbi.height - 1;
-				video_screen_configure(0, v->fbi.width, v->fbi.height, &visarea, Machine->screen[0].refresh);
-				timer_adjust_ptr(v->fbi.vblank_timer, cpu_getscanlinetime(v->fbi.height), TIME_NEVER);
+				video_screen_configure(v->scrnum, v->fbi.width, v->fbi.height, &visarea, Machine->screen[v->scrnum].refresh);
+				adjust_vblank_timer(v);
 				recompute_video_memory(v);
 			}
 			break;
@@ -2490,18 +2501,22 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 				v->reg[regnum].u = data;
 				if (v->reg[hSync].u != 0 && v->reg[vSync].u != 0)
 				{
-					float vtotal = (v->reg[vSync].u >> 16) + (v->reg[vSync].u & 0xffff);
-					float stdfps = 15750 / vtotal, stddiff = fabs(stdfps - Machine->screen[0].refresh);
-					float medfps = 25000 / vtotal, meddiff = fabs(medfps - Machine->screen[0].refresh);
-					float vgafps = 31500 / vtotal, vgadiff = fabs(vgafps - Machine->screen[0].refresh);
+					int vtotal = (v->reg[vSync].u >> 16) + (v->reg[vSync].u & 0xffff);
+					subseconds_t stdperiod = HZ_TO_SUBSECONDS(15750) * vtotal, stddiff = stdperiod - Machine->screen[0].refresh;
+					subseconds_t medperiod = HZ_TO_SUBSECONDS(25000) * vtotal, meddiff = medperiod - Machine->screen[0].refresh;
+					subseconds_t vgaperiod = HZ_TO_SUBSECONDS(31500) * vtotal, vgadiff = vgaperiod - Machine->screen[0].refresh;
 					screen_state *state = &Machine->screen[0];
 
+					if (stdperiod < 0) stdperiod = -stdperiod;
+					if (medperiod < 0) medperiod = -medperiod;
+					if (vgaperiod < 0) vgaperiod = -vgaperiod;
+
 					if (stddiff < meddiff && stddiff < vgadiff)
-						video_screen_configure(0, state->width, state->height, &state->visarea, stdfps);
+						video_screen_configure(v->scrnum, state->width, state->height, &state->visarea, stdperiod);
 					else if (meddiff < vgadiff)
-						video_screen_configure(0, state->width, state->height, &state->visarea, medfps);
+						video_screen_configure(v->scrnum, state->width, state->height, &state->visarea, medperiod);
 					else
-						video_screen_configure(0, state->width, state->height, &state->visarea, vgafps);
+						video_screen_configure(v->scrnum, state->width, state->height, &state->visarea, vgaperiod);
 				}
 			}
 			break;
@@ -3625,7 +3640,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 
 		/* return the current scanline for now */
 		case vRetrace:
-			result = cpu_getscanline();
+			result = video_screen_get_vpos(v->scrnum);
 			break;
 
 		/* reserved area in the TMU read by the Vegas startup sequence */
@@ -4308,8 +4323,8 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 				v->fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				v->fbi.height = (data >> 12) & 0xfff;
-			video_screen_set_visarea(0, 0, v->fbi.width - 1, 0, v->fbi.height - 1);
-			timer_adjust_ptr(v->fbi.vblank_timer, cpu_getscanlinetime(v->fbi.height), TIME_NEVER);
+			video_screen_set_visarea(v->scrnum, 0, v->fbi.width - 1, 0, v->fbi.height - 1);
+			adjust_vblank_timer(v);
 			if (LOG_REGISTERS)
 				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, ~mem_mask);
 			break;

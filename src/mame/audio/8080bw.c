@@ -2,6 +2,7 @@
  */
 #include "driver.h"
 #include "8080bw.h"
+#include "mw8080bw.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
 #include "sound/discrete.h"
@@ -75,6 +76,8 @@ MACHINE_RESET( sstrangr )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x42, 0x42, 0, 0, invadpt2_sh_port_1_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x44, 0x44, 0, 0, invadpt2_sh_port_2_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -103,6 +106,8 @@ MACHINE_RESET( spcewars )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, spcewars_sh_port3_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, invadpt2_sh_port_2_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -172,6 +177,8 @@ MACHINE_RESET( lrescue )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, lrescue_sh_port3_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, lrescue_sh_port5_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -216,6 +223,8 @@ MACHINE_RESET( ballbomb )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, ballbomb_sh_port3_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, ballbomb_sh_port5_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -301,6 +310,8 @@ MACHINE_RESET( indianbt )
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, indianbt_sh_port3_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, indianbt_sh_port5_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x07, 0x07, 0, 0, indianbt_sh_port7_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -672,6 +683,8 @@ MACHINE_RESET( polaris )
 	// It sounds better then the actual circuit used.
 	// Probably an unfinished feature.
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, watchdog_reset_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -924,6 +937,8 @@ MACHINE_RESET( schaser )
 	schaser_sh_port3_w(0, 0);
 	schaser_sh_port5_w(0, 0);
 	schaser_effect_555_time_remain = 0;
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -947,6 +962,8 @@ static WRITE8_HANDLER( rollingc_sh_port0_w )
 MACHINE_RESET( rollingc )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, rollingc_sh_port0_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -1001,6 +1018,8 @@ static WRITE8_HANDLER( invrvnge_sh_port3_w )
 MACHINE_RESET( invrvnge )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, invrvnge_sh_port3_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -1032,7 +1051,7 @@ static WRITE8_HANDLER( lupin3_sh_port5_w )
 	if (rising_bits & 0x02) sample_start(1, 2, 0);		/* deposit money, start intermission, end game */
 	if (rising_bits & 0x04) sample_start(2, 5, 0);		/* deposit money, start intermission, Slides down rope */
 	if (rising_bits & 0x08) sample_start(3, 0, 0);		/* start intermission, end game */
-	if (rising_bits & 0x10) sample_start(3, 9, 0);		/* Dog barking */
+	//if (rising_bits & 0x10) sample_start(3, 9, 0);        /* Dog barking */
 
 	c8080bw_flip_screen_w(data & 0x20);
 
@@ -1043,6 +1062,8 @@ MACHINE_RESET( lupin3 )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, lupin3_sh_port3_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, lupin3_sh_port5_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -1079,6 +1100,8 @@ MACHINE_RESET( schasrcv )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, schasrcv_sh_port3_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, schasrcv_sh_port5_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -1122,6 +1145,8 @@ MACHINE_RESET( yosakdon )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, yosakdon_sh_port3_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, yosakdon_sh_port5_w);
+
+	machine_reset_mw8080bw(machine);
 }
 
 
@@ -1170,4 +1195,6 @@ MACHINE_RESET( shuttlei )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfd, 0xfd, 0, 0, shuttlei_sh_portfd_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfe, 0xfe, 0, 0, shuttlei_sh_portfe_w);
+
+	machine_reset_mw8080bw(machine);
 }

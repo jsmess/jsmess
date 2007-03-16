@@ -108,8 +108,9 @@ static PALETTE_INIT( fgoal )
 }
 
 
-static void interrupt_callback(int scanline)
+static void interrupt_callback(int param)
 {
+	int scanline;
 	int coin = (readinputport(1) & 2);
 
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
@@ -121,20 +122,20 @@ static void interrupt_callback(int scanline)
 
 	prev_coin = coin;
 
-	scanline += 128;
+	scanline = video_screen_get_vpos(0) + 128;
 
 	if (scanline > 256)
 	{
 		scanline = 0;
 	}
 
-	timer_set(cpu_getscanlinetime(scanline), scanline, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), 0, interrupt_callback);
 }
 
 
 static MACHINE_RESET( fgoal )
 {
-	timer_set(cpu_getscanlinetime(0), 0, interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, interrupt_callback);
 }
 
 
@@ -152,7 +153,7 @@ static READ8_HANDLER( fgoal_analog_r )
 
 static READ8_HANDLER( fgoal_switches_r )
 {
-	if (cpu_getscanline() & 0x80)
+	if (video_screen_get_vpos(0) & 0x80)
 	{
 		return readinputport(1) | 0x80;
 	}
@@ -399,7 +400,6 @@ static MACHINE_DRIVER_START( fgoal )
 
 	MDRV_MACHINE_RESET(fgoal)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(24 * 1000000 / 15750))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -465,5 +465,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, 0, ROT90, "Taito", "Field Goal",             GAME_NO_SOUND )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, 0, ROT90, "Taito", "Field Goal", GAME_NO_SOUND )
 GAME( 1979, fgoala, fgoal, fgoal, fgoal, 0, ROT90, "Taito", "Field Goal (different)", GAME_NO_SOUND )

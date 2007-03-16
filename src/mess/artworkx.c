@@ -85,7 +85,7 @@ int artwork_get_inputscreen_customizations(png_info *png, int cust_type,
 	struct inputform_customization *customizations,
 	int customizations_length)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	char buffer[1000];
 	char current_section[64];

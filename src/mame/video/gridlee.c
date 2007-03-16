@@ -10,6 +10,7 @@
 
 #include "driver.h"
 #include "includes/gridlee.h"
+#include "includes/balsente.h"
 
 
 /*************************************
@@ -79,11 +80,7 @@ VIDEO_START( gridlee )
 
 WRITE8_HANDLER( gridlee_cocktail_flip_w )
 {
-	if (gridlee_cocktail_flip != (data & 1))
-	{
-		video_screen_update_partial(0, cpu_getscanline() - 1);
-		gridlee_cocktail_flip = data & 1;
-	}
+	gridlee_cocktail_flip = data & 1;
 }
 
 
@@ -116,7 +113,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 	/* update the scanline palette */
 	if (palettebank_vis != (data & 0x3f))
 	{
-		video_screen_update_partial(0, cpu_getscanline() - 1);
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1 + BALSENTE_VBEND);
 		palettebank_vis = data & 0x3f;
 	}
 }
@@ -129,6 +126,9 @@ WRITE8_HANDLER( gridlee_palette_select_w )
  *
  *************************************/
 
+/* all the BALSENTE_VBEND adjustments are needed because the hardware has a seperate counting chain
+   to address the video memory instead of using the video chain directly */
+
 VIDEO_UPDATE( gridlee )
 {
 	pen_t *pens = &Machine->pens[palettebank_vis * 32];
@@ -139,12 +139,12 @@ VIDEO_UPDATE( gridlee )
 	{
 		/* non-flipped: draw directly from the bitmap */
 		if (!gridlee_cocktail_flip)
-			draw_scanline8(bitmap, 0, y, 256, &local_videoram[y * 256], pens + 16, -1);
+			draw_scanline8(bitmap, 0, y, 256, &local_videoram[(y - BALSENTE_VBEND) * 256], pens + 16, -1);
 
 		/* flipped: x-flip the scanline into a temp buffer and draw that */
 		else
 		{
-			int srcy = 239 - y;
+			int srcy = BALSENTE_VBSTART - 1 - y;
 			UINT8 temp[256];
 			int xx;
 
@@ -160,7 +160,7 @@ VIDEO_UPDATE( gridlee )
 		UINT8 *sprite = spriteram + i * 4;
 		UINT8 *src;
 		int image = sprite[0];
-		int ypos = sprite[2] + 17;
+		int ypos = sprite[2] + 17 + BALSENTE_VBEND;
 		int xpos = sprite[3];
 
 		/* get a pointer to the source image */
@@ -174,11 +174,11 @@ VIDEO_UPDATE( gridlee )
 			/* adjust for flip */
 			if (gridlee_cocktail_flip)
 			{
-				ypos = 239 - ypos;
+				ypos = 271 - ypos;
 				currxor = 0xff;
 			}
 
-			if (ypos >= 16 && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
+			if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 			{
 				int currx = xpos;
 
@@ -205,7 +205,7 @@ VIDEO_UPDATE( gridlee )
 
 			/* de-adjust for flip */
 			if (gridlee_cocktail_flip)
-				ypos = 239 - ypos;
+				ypos = 271 - ypos;
 		}
 	}
 	return 0;

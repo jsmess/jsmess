@@ -152,7 +152,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 #include "sound/262intf.h"
 #include "sound/ymf278b.h"
 
-static int fuuki32_raster_enable = 1; /* Enabled by default */
+static mame_timer *raster_interrupt_timer;
 static UINT8 fuuki32_shared_ram[16];
 
 // Described in src/video/fuuki32.c
@@ -242,6 +242,18 @@ static WRITE32_HANDLER( snd_020_w )
 	}
 }
 
+static WRITE32_HANDLER( fuuki32_vregs_w )
+{
+	if (fuuki32_vregs[offset] != data)
+	{
+		COMBINE_DATA(&fuuki32_vregs[offset]);
+		if (offset == 0x1c/4)
+		{
+			mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, fuuki32_vregs[0x1c/4]>>16, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
+		}
+	}
+}
+
 // Lines with empty comment are for debug only
 
 static ADDRESS_MAP_START( fuuki32_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -288,7 +300,7 @@ static ADDRESS_MAP_START( fuuki32_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(MWA32_NOP) // Clear buffered inputs
 	AM_RANGE(0x810000, 0x810003) AM_WRITE(MWA32_NOP) // Clear buffered inputs
 
-	AM_RANGE(0x8c0000, 0x8c001f) AM_WRITE(MWA32_RAM) AM_BASE(&fuuki32_vregs)	// Video Registers
+	AM_RANGE(0x8c0000, 0x8c001f) AM_WRITE(fuuki32_vregs_w) AM_BASE(&fuuki32_vregs)	// Video Registers
 
 	AM_RANGE(0x8d0000, 0x8d0003) AM_WRITE(MWA32_RAM) // Flipscreen Related
 	AM_RANGE(0x8e0000, 0x8e0003) AM_WRITE(MWA32_RAM) AM_BASE(&fuuki32_priority) // Controls layer order
@@ -526,29 +538,43 @@ static const gfx_decode fuuki32_gfxdecodeinfo[] =
 
 ***************************************************************************/
 
-#define INTERRUPTS_NUM	(256-1) // Give much better results than 256..
-static INTERRUPT_GEN( fuuki32_interrupt )
+static void level_1_interrupt_callback(int param)
 {
-	if ( cpu_getiloops() == 1 )
-		cpunum_set_input_line(0, 1, PULSE_LINE);
-
-	if ( cpu_getiloops() == 0 )
-	{
-		cpunum_set_input_line(0, 3, PULSE_LINE);	// VBlank IRQ
-
-		if (code_pressed_memory(KEYCODE_F1))
-		{
-			fuuki32_raster_enable ^= 1;
-			popmessage("raster effects %sabled",fuuki32_raster_enable ? "en" : "dis");
-		}
-	}
-
-	if ( ((fuuki32_vregs[0x1c/4]>>16) & 0xff) == (INTERRUPTS_NUM-1 - cpu_getiloops()) )
-	{
-		cpunum_set_input_line(0, 5, PULSE_LINE);	// Raster Line IRQ
-		if(fuuki32_raster_enable) video_screen_update_partial(0, cpu_getscanline());
-	}
+	cpunum_set_input_line(0, 1, PULSE_LINE);
+	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
 }
+
+
+static void vblank_interrupt_callback(int param)
+{
+	cpunum_set_input_line(0, 3, PULSE_LINE);	// VBlank IRQ
+	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+}
+
+
+static void raster_interrupt_callback(int param)
+{
+	cpunum_set_input_line(0, 5, PULSE_LINE);	// Raster Line IRQ
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+	mame_timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, time_zero);
+}
+
+
+static MACHINE_START( fuuki32 )
+{
+	raster_interrupt_timer = mame_timer_alloc(raster_interrupt_callback);
+
+	return 0;
+}
+
+
+static MACHINE_RESET( fuuki32 )
+{
+	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, Machine->screen[0].visarea.max_x + 1), 0, time_zero);
+}
+
 
 static void irqhandler(int irq)
 {
@@ -570,14 +596,15 @@ static MACHINE_DRIVER_START( fuuki32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 20000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_readmem,fuuki32_writemem)
-	MDRV_CPU_VBLANK_INT(fuuki32_interrupt,INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 6000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_readmem,fuuki32_sound_writemem)
 	MDRV_CPU_IO_MAP(fuuki32_sound_readport,fuuki32_sound_writeport)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_MACHINE_START(fuuki32)
+	MDRV_MACHINE_RESET(fuuki32)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER) // | VIDEO_BUFFERS_SPRITERAM ) // Buffered by 2 frames

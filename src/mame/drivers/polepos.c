@@ -308,7 +308,7 @@ static READ8_HANDLER( polepos_ready_r )
 {
 	int ret = 0xff;
 
-	if (cpu_getscanline() >= 128)
+	if (video_screen_get_vpos(0) >= 128)
 		ret ^= 0x02;
 
 	ret ^= 0x08; /* ADC End Flag */

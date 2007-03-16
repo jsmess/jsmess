@@ -902,6 +902,27 @@ static ADDRESS_MAP_START( racknrol_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
+static READ8_HANDLER( hexpoola_data_port_r )
+{
+	switch (activecpu_get_pc())
+	{
+		case 0x0022:
+			return 0;
+
+		case 0x0031:
+			return 1;
+	}
+
+    return 0;
+}
+
+static ADDRESS_MAP_START( hexpoola_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READNOP
+	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_BASE(&racknrol_tiles_bank)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(hexpoola_data_port_r, SN76496_0_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
+ADDRESS_MAP_END
+
 #define GAL_IN0\
 	PORT_START_TAG("IN0")\
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )\
@@ -4224,6 +4245,35 @@ static MACHINE_DRIVER_START( racknrol )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( hexpoola )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(S2650, 18432000/6)
+	MDRV_CPU_PROGRAM_MAP(racknrol,0)
+	MDRV_CPU_IO_MAP(hexpoola_io,0)
+	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
+
+	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_PALETTE_LENGTH(32)
+	MDRV_COLORTABLE_LENGTH(8*4)
+	MDRV_GFXDECODE(galaxian_gfxdecodeinfo)
+
+	MDRV_PALETTE_INIT(rockclim)
+	MDRV_VIDEO_UPDATE(galaxian)
+	MDRV_VIDEO_START(racknrol)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SN76496, 18432000/6)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -6019,6 +6069,27 @@ ROM_START( hexpool )
 	ROM_LOAD( "82s147.bin",   0x0000, 0x0200, CRC(aace7fa5) SHA1(6761530bb3585d2eaa97b7ae77b52e96782ffe0a) )
 ROM_END
 
+ROM_START( hexpoola )
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_LOAD( "rom.4l",       0x0000, 0x1000, CRC(2ca8018d) SHA1(f0784d18bc7e77515bf2140d8993ae8178919853) )
+	ROM_CONTINUE(			  0x2000, 0x1000 )
+	ROM_CONTINUE(			  0x4000, 0x1000 )
+	ROM_CONTINUE(			  0x6000, 0x1000 )
+
+	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "rom.1m",       0x0000, 0x4000, CRC(7e257e80) SHA1(dabb10d076dc49fc130f58e6d1c4b04e6debce55) )
+	ROM_LOAD( "rom.1l",       0x4000, 0x4000, CRC(c5f0851e) SHA1(cedcdb29962c6cd65af9d57d0cb2533397d58f99) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "82s123.11r",   0x0000, 0x0020, CRC(deb2fcf4) SHA1(cdec737a9d9feae912f7cc04ca0adb48f859b5c2) )
+
+	ROM_REGION( 0x0200, REGION_USER1, 0 ) /* unknown */
+	ROM_LOAD( "82s147.5pr",   0x0000, 0x0200, CRC(cf496b1e) SHA1(5b5ca52b3cc46e18990dae53a98984aeaf264241) )
+
+	ROM_REGION( 0x00eb, REGION_PLDS, 0 )
+	ROM_LOAD( "82s153.6pr.bin", 0x0000, 0x00eb, CRC(bc07939a) SHA1(615b085575ad215662eab2777a2d8b9167c4b9c3) )
+ROM_END
+
 ROM_START( trvchlng )
 	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
 	ROM_LOAD( "senko11.bin",  0x0000, 0x1000, CRC(3657331d) SHA1(d9a9a4e4e2e696e70dfb888725c959ec8ce24e3d) )
@@ -6168,7 +6239,8 @@ GAME( 1983, hunchbkg, hunchbak,	hunchbkg, hunchbkg, 0,        ROT90,  "Century E
 GAME( 1983, harem,    0,        harem,    harem,    0,        ROT90,  "I.G.R.", "Harem", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1982, tazzmang, tazmania,	tazzmang, tazzmang, 0,        ROT90,  "bootleg", "Tazz-Mania (Galaxian Hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1986, racknrol, 0,        racknrol, racknrol, 0,	      ROT0,   "Status (Shinkai License)", "Rack + Roll", GAME_SUPPORTS_SAVE )
-GAME( 1986, hexpool,  racknrol, racknrol, racknrol, 0,	      ROT90,  "Shinkai", "Hex Pool", GAME_SUPPORTS_SAVE )
+GAME( 1986, hexpool,  racknrol, racknrol, racknrol, 0,	      ROT90,  "Shinkai", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE )
+GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, 0,	      ROT90,  "Senko", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
 GAME( 1985, trvchlng, 0,        racknrol, trvchlng, 0,	      ROT90,  "Joyland (Senko License)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1980, luctoday, 0,        galaxian, luctoday, 0,        ROT270, "Sigma", "Lucky Today",GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, chewing,  0,        galaxian, luctoday, 0,        ROT90,  "unknown", "Chewing Gum", GAME_SUPPORTS_SAVE )

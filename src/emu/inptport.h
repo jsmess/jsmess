@@ -831,7 +831,7 @@ struct _inp_header
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int input_port_init(running_machine *machine, const input_port_token *ipt);
+void input_port_init(running_machine *machine, const input_port_token *ipt);
 const char *input_port_string_from_token(const input_port_token token);
 
 input_port_entry *input_port_initialize(input_port_init_params *params, UINT32 type, const char *tag, UINT32 mask, UINT32 defval);

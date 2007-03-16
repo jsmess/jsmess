@@ -658,7 +658,7 @@ MSX_SLOT_WRITE(ascii8_sram)
 
 MSX_SLOT_LOADSRAM(ascii8_sram)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 
 	if (!state->sramfile) {
@@ -687,7 +687,7 @@ MSX_SLOT_LOADSRAM(ascii8_sram)
 
 MSX_SLOT_SAVESRAM(ascii8_sram)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 
 	if (!state->sramfile) {
@@ -815,7 +815,7 @@ MSX_SLOT_WRITE(ascii16_sram)
 
 MSX_SLOT_LOADSRAM(ascii16_sram)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 	UINT8 *p;
 
@@ -856,7 +856,7 @@ MSX_SLOT_LOADSRAM(ascii16_sram)
 
 MSX_SLOT_SAVESRAM(ascii16_sram)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 
 	if (!state->sramfile) {
@@ -1064,7 +1064,7 @@ MSX_SLOT_WRITE(gmaster2)
 
 MSX_SLOT_LOADSRAM(gmaster2)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 	UINT8 *p;
 
@@ -1092,7 +1092,7 @@ MSX_SLOT_LOADSRAM(gmaster2)
 
 MSX_SLOT_SAVESRAM(gmaster2)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, state->sramfile, OPEN_FLAG_WRITE, &f);
@@ -1569,7 +1569,7 @@ static char PAC_HEADER[] = "PAC2 BACKUP DATA";
 
 MSX_SLOT_LOADSRAM(fmpac)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 	char buf[PAC_HEADER_LEN];
 
@@ -1606,7 +1606,7 @@ MSX_SLOT_LOADSRAM(fmpac)
 
 MSX_SLOT_SAVESRAM(fmpac)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *f;
 
 	if (!state->cart.fmpac.sram_support || !state->sramfile) {

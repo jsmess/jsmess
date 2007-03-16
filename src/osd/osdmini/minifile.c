@@ -14,7 +14,7 @@
 //  osd_open
 //============================================================
 
-mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
+file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
 	const char *mode;
 	FILE *fileptr;
@@ -53,7 +53,7 @@ mame_file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UI
 //  osd_read
 //============================================================
 
-mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
+file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
 	size_t count;
 
@@ -73,7 +73,7 @@ mame_file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 len
 //  osd_write
 //============================================================
 
-mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
+file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 length, UINT32 *actual)
 {
 	size_t count;
 
@@ -93,7 +93,7 @@ mame_file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UIN
 //  osd_close
 //============================================================
 
-mame_file_error osd_close(osd_file *file)
+file_error osd_close(osd_file *file)
 {
 	// close the file handle
 	fclose((FILE *)file);

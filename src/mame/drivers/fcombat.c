@@ -31,6 +31,22 @@ inputs + notes by stephh
 
 #include "driver.h"
 #include "sound/ay8910.h"
+
+
+/* this is compied from Exerion, but it should be correct */
+#define FCOMBAT_MASTER_CLOCK	(20000000)
+#define FCOMBAT_CPU_CLOCK		(FCOMBAT_MASTER_CLOCK / 6)
+#define FCOMBAT_AY8910_CLOCK	(FCOMBAT_CPU_CLOCK / 2)
+#define FCOMBAT_PIXEL_CLOCK		(FCOMBAT_MASTER_CLOCK / 3)
+#define FCOMBAT_HCOUNT_START	(0x58)
+#define FCOMBAT_HTOTAL			(512-FCOMBAT_HCOUNT_START)
+#define FCOMBAT_HBEND			(12*8)	/* ?? */
+#define FCOMBAT_HBSTART			(52*8)	/* ?? */
+#define FCOMBAT_VTOTAL			(256)
+#define FCOMBAT_VBEND			(16)
+#define FCOMBAT_VBSTART			(240)
+
+
 PALETTE_INIT( fcombat );
 VIDEO_START( fcombat );
 VIDEO_UPDATE( fcombat );
@@ -86,7 +102,7 @@ INPUT_PORTS_START( fcombat )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START_TAG("DSW1")      /* dip switches/VBLANK (0xe200) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )		/* VBLANK */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )		// related to vblank
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -128,17 +144,6 @@ static READ8_HANDLER( fcombat_port01_r )
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
 	return fcombat_cocktail_flip ? input_port_1_r(offset) : input_port_0_r(offset);
-}
-
-
-static READ8_HANDLER( fcombat_port3_r )
-{
-	/* bit 0 is VBLANK, which we simulate manually */
-	int result = input_port_3_r(offset);
-	int ybeam = cpu_getscanline();
-	if (ybeam > Machine->screen[0].visarea.max_y)
-		result |= 1;
-	return result;
 }
 
 
@@ -191,7 +196,7 @@ static ADDRESS_MAP_START( fcombat_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
 	AM_RANGE(0xe100, 0xe100) AM_READ(input_port_2_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(fcombat_port3_r)
+	AM_RANGE(0xe200, 0xe200) AM_READ(input_port_3_r)
 	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
 	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
@@ -314,14 +319,10 @@ static MACHINE_DRIVER_START( fcombat )
 	MDRV_CPU_ADD(Z80, 10000000/3)
 	MDRV_CPU_PROGRAM_MAP(fcombat_readmem2,fcombat_writemem2)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(12*8, 52*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(FCOMBAT_PIXEL_CLOCK, FCOMBAT_HTOTAL, FCOMBAT_HBEND, FCOMBAT_HBSTART, FCOMBAT_VTOTAL, FCOMBAT_VBEND, FCOMBAT_VBSTART)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_COLORTABLE_LENGTH(256*3)

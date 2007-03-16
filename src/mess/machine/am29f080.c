@@ -137,7 +137,7 @@ void amd_flash_finish(int index1)
 
 void amd_flash_store(int index1, const char *flash_name)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	if (amd_flash[index1].base!=NULL)
@@ -155,7 +155,7 @@ void amd_flash_store(int index1, const char *flash_name)
 
 void amd_flash_restore(int index1, const char *flash_name)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	if (amd_flash[index1].base!=NULL)

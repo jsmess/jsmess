@@ -113,7 +113,8 @@ void config_register(const char *nodename, config_callback load, config_callback
 
 int config_load_settings(void)
 {
-	mame_file_error filerr;
+	const char *controller = options_get_string(OPTION_CTRLR);
+	file_error filerr;
 	config_type *type;
 	mame_file *file;
 	int loaded = 0;
@@ -124,19 +125,19 @@ int config_load_settings(void)
 		(*type->load)(CONFIG_TYPE_INIT, NULL);
 
 	/* now load the controller file */
-	if (options.controller != NULL)
+	if (controller != NULL && controller[0] != 0)
 	{
 		/* open the config file */
-		fname = assemble_2_strings(options.controller, ".cfg");
+		fname = assemble_2_strings(controller, ".cfg");
 		filerr = mame_fopen(SEARCHPATH_CTRLR, fname, OPEN_FLAG_READ, &file);
 		free(fname);
 
 		if (filerr != FILERR_NONE)
-			fatalerror("Could not load controller file %s.cfg", options.controller);
+			fatalerror("Could not load controller file %s.cfg", controller);
 
 		/* load the XML */
 		if (!config_load_xml(file, CONFIG_TYPE_CONTROLLER))
-			fatalerror("Could not load controller file %s.cfg", options.controller);
+			fatalerror("Could not load controller file %s.cfg", controller);
 		mame_fclose(file);
 	}
 
@@ -171,7 +172,7 @@ int config_load_settings(void)
 
 void config_save_settings(void)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	config_type *type;
 	mame_file *file;
 	char *fname;

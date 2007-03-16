@@ -345,7 +345,7 @@ void init_video(void)
 	
 #ifdef MAME_DEBUG
 	/* setup debug commands */
-	if (options.mame_debug)
+	if (Machine->debug_mode)
 	{
 		debug_console_register_command("beta_vid_log", CMDFLAG_NONE, 0, 0, 0,ToggleRegLog);
 		debug_console_register_command("beta_vid_fill", CMDFLAG_NONE, 0, 0, 0,FillScreen);

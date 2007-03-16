@@ -411,7 +411,7 @@ static float filecompare(const fileinfo *file1,const fileinfo *file2,int mode1,i
 
 static void readfile(const char *path,fileinfo *file)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	UINT64 filesize;
 	UINT32 actual;
 	char fullname[256];

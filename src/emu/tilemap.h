@@ -52,6 +52,7 @@ typedef struct _tilemap tilemap;
     available in alpha mode, ignore_transparency isn't.
 */
 
+typedef struct _tile_data tile_data;
 struct _tile_data
 {
 	/*
@@ -70,7 +71,6 @@ struct _tile_data
 	UINT8 *mask_data;		/* for TILEMAP_BITMASK */
 	void *user_data;		/* user-supplied tilemap-wide pointer */
 };
-typedef struct _tile_data tile_data;
 
 extern tile_data tile_info;
 

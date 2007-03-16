@@ -34,7 +34,7 @@ void mc10_init_machine(void)
 	/* Install DOS ROM ? */
 	if( readinputport(7) & 0x40 )
 	{
-		mame_file_error filerr;
+		file_error filerr;
 		mame_file *rom;
 
 		filerr = mame_fopen(SEARCHPATH_IMAGE, "mc10ext.rom", OPEN_FLAG_READ, &rom);

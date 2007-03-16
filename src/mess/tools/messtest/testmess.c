@@ -166,7 +166,7 @@ static char *assemble_software_path(const game_driver *gamedrv, const char *file
 
 static void dump_screenshot(int write_file)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *fp;
 	char buf[128];
 	int is_blank = 0;
@@ -298,17 +298,10 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	dirtybuffer = NULL;
 
 	/* set up options */
+	options_init(NULL);
 	memset(&options, 0, sizeof(options));
-	options.skip_disclaimer = 1;
-	options.skip_gameinfo = 1;
-	options.skip_warnings = 1;
-	options.disable_normal_ui = 1;
-	options.ram = current_testcase.ram;
-	options.samplerate = 44100;
-	options.mame_debug = 1;
-	options.brightness = 1.0;
-	options.contrast = 1.0;
-	options.gamma = 1.0;
+	options_set_bool("skip_gameinfo", TRUE);
+	options_set_int("ramsize", current_testcase.ram);
 
 	/* preload any needed images */
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)

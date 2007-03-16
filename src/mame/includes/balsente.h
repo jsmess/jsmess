@@ -6,6 +6,18 @@
 
 ***************************************************************************/
 
+
+#define BALSENTE_MASTER_CLOCK	(20000000)
+#define BALSENTE_CPU_CLOCK		(BALSENTE_MASTER_CLOCK / 16)
+#define BALSENTE_PIXEL_CLOCK	(BALSENTE_MASTER_CLOCK / 4)
+#define BALSENTE_HTOTAL			(0x140)
+#define BALSENTE_HBEND			(0x000)
+#define BALSENTE_HBSTART		(0x100)
+#define BALSENTE_VTOTAL			(0x108)
+#define BALSENTE_VBEND			(0x010)
+#define BALSENTE_VBSTART		(0x100)
+
+
 /*----------- defined in machine/balsente.c -----------*/
 
 extern UINT8 balsente_shooter;

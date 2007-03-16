@@ -84,8 +84,6 @@ struct _bitmap_t
 
 bitmap_t *bitmap_alloc(int width, int height, bitmap_format format);
 bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_format format);
-bitmap_t *bitmap_alloc_custom(int width, int height, bitmap_format format, void *(allocator)(size_t));
-bitmap_t *bitmap_wrap_custom(void *base, int width, int height, int rowpixels, bitmap_format format, void *(allocator)(size_t));
 void bitmap_free(bitmap_t *bitmap);
 
 

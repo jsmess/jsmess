@@ -22,17 +22,50 @@ void receive_event(int which);
 WRITE8_HANDLER( acia6850_0_ctrl_w );
 WRITE8_HANDLER( acia6850_1_ctrl_w );
 WRITE8_HANDLER( acia6850_2_ctrl_w );
+WRITE8_HANDLER( acia6850_3_ctrl_w );
 
 WRITE8_HANDLER( acia6850_0_data_w );
 WRITE8_HANDLER( acia6850_1_data_w );
 WRITE8_HANDLER( acia6850_2_data_w );
+WRITE8_HANDLER( acia6850_3_data_w );
 
 READ8_HANDLER( acia6850_0_stat_r );
 READ8_HANDLER( acia6850_1_stat_r );
 READ8_HANDLER( acia6850_2_stat_r );
+READ8_HANDLER( acia6850_3_stat_r );
 
 READ8_HANDLER( acia6850_0_data_r );
 READ8_HANDLER( acia6850_1_data_r );
 READ8_HANDLER( acia6850_2_data_r );
+READ8_HANDLER( acia6850_3_data_r );
 
+READ16_HANDLER( acia6850_0_stat_16_r );
+READ16_HANDLER( acia6850_1_stat_16_r );
+READ16_HANDLER( acia6850_2_stat_16_r );
+READ16_HANDLER( acia6850_3_stat_16_r );
+
+READ16_HANDLER( acia6850_0_data_16_r );
+READ16_HANDLER( acia6850_1_data_16_r );
+READ16_HANDLER( acia6850_2_data_16_r );
+READ16_HANDLER( acia6850_3_data_16_r );
+
+WRITE16_HANDLER( acia6850_0_ctrl_msb_w );
+WRITE16_HANDLER( acia6850_1_ctrl_msb_w );
+WRITE16_HANDLER( acia6850_2_ctrl_msb_w );
+WRITE16_HANDLER( acia6850_3_ctrl_msb_w );
+
+WRITE16_HANDLER( acia6850_0_ctrl_lsb_w );
+WRITE16_HANDLER( acia6850_1_ctrl_lsb_w );
+WRITE16_HANDLER( acia6850_2_ctrl_lsb_w );
+WRITE16_HANDLER( acia6850_3_ctrl_lsb_w );
+
+WRITE16_HANDLER( acia6850_0_data_msb_w );
+WRITE16_HANDLER( acia6850_1_data_msb_w );
+WRITE16_HANDLER( acia6850_2_data_msb_w );
+WRITE16_HANDLER( acia6850_3_data_msb_w );
+
+WRITE16_HANDLER( acia6850_0_data_lsb_w );
+WRITE16_HANDLER( acia6850_1_data_lsb_w );
+WRITE16_HANDLER( acia6850_2_data_lsb_w );
+WRITE16_HANDLER( acia6850_3_data_lsb_w );
 #endif

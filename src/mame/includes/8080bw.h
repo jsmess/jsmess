@@ -6,12 +6,6 @@
 
 #include "sound/discrete.h"
 
-/*----------- defined in machine/8080bw.c -----------*/
-
-WRITE8_HANDLER( c8080bw_shift_amount_w );
-WRITE8_HANDLER( c8080bw_shift_data_w );
-READ8_HANDLER( c8080bw_shift_data_r );
-INTERRUPT_GEN( c8080bw_interrupt );
 
 /*----------- defined in audio/8080bw.c -----------*/
 
@@ -63,9 +57,6 @@ void c8080bw_screen_red_w(int data);
 INTERRUPT_GEN( polaris_interrupt );
 
 WRITE8_HANDLER( c8080bw_videoram_w );
-WRITE8_HANDLER( schaser_colorram_w );
-READ8_HANDLER( schaser_colorram_r );
-WRITE8_HANDLER( cosmo_colorram_w );
 
 VIDEO_UPDATE( 8080bw );
 

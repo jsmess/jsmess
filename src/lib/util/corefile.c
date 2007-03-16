@@ -89,9 +89,9 @@ static UINT32 safe_buffer_copy(const void *source, UINT32 sourceoffs, UINT32 sou
     return an error code
 -------------------------------------------------*/
 
-mame_file_error core_fopen(const char *filename, UINT32 openflags, core_file **file)
+file_error core_fopen(const char *filename, UINT32 openflags, core_file **file)
 {
-	mame_file_error filerr = FILERR_NOT_FOUND;
+	file_error filerr = FILERR_NOT_FOUND;
 
 	/* allocate the file itself */
 	*file = malloc(sizeof(**file));
@@ -118,7 +118,7 @@ mame_file_error core_fopen(const char *filename, UINT32 openflags, core_file **f
     file-like access and return an error code
 -------------------------------------------------*/
 
-mame_file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, core_file **file)
+file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, core_file **file)
 {
 	/* can only do this for read access */
 	if ((openflags & OPEN_FLAG_WRITE) != 0)
@@ -240,7 +240,7 @@ UINT64 core_fsize(core_file *file)
 
 UINT32 core_fread(core_file *file, void *buffer, UINT32 length)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	UINT32 bytes_read = 0;
 
 	/* flush any buffered char */
@@ -491,7 +491,7 @@ char *core_fgets(char *s, int n, core_file *file)
 
 const void *core_fbuffer(core_file *file)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	UINT32 read_length;
 
 	/* if we already have data, just return it */
@@ -532,7 +532,7 @@ const void *core_fbuffer(core_file *file)
 UINT32 core_fwrite(core_file *file, const void *buffer, UINT32 length)
 {
 	UINT32 bytes_written = 0;
-	mame_file_error filerr;
+	file_error filerr;
 
 	/* can't write to RAM-based stuff */
 	if (file->data != NULL)

@@ -241,6 +241,11 @@ void debug_command_init(running_machine *machine)
 	}
 
 	add_exit_callback(machine, debug_command_exit);
+
+	/* set up the initial debugscript if specified */
+	name = options_get_string(OPTION_DEBUGSCRIPT);
+	if (name != NULL)
+		debug_source_script(name);
 }
 
 
@@ -1991,7 +1996,7 @@ static void execute_snap(int ref, int params, const char *param[])
 	/* otherwise, we have to open the file ourselves */
 	else
 	{
-		mame_file_error filerr;
+		file_error filerr;
 		mame_file *fp;
 		const char *filename = param[0];
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;

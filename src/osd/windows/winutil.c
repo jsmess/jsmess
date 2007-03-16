@@ -123,14 +123,37 @@ void win_output_debug_string_utf8(const char *string)
 
 
 //============================================================
-//  win_error_to_mame_file_error
+//  win_get_module_file_name_utf8
 //============================================================
 
-mame_file_error win_error_to_mame_file_error(DWORD error)
+DWORD win_get_module_file_name_utf8(HMODULE module, char *filename, DWORD size)
 {
-	mame_file_error filerr;
+	TCHAR t_filename[MAX_PATH];
+	char *utf8_filename;
 
-	// convert a Windows error to a mame_file_error
+	if (GetModuleFileName(module, t_filename, ARRAY_LENGTH(t_filename)))
+		return 0;
+
+	utf8_filename = utf8_from_tstring(t_filename);
+	if (!utf8_filename)
+		return 0;
+
+	size = (DWORD) snprintf(filename, size, "%s", utf8_filename);
+	free(utf8_filename);
+	return size;
+}
+
+
+
+//============================================================
+//  win_error_to_file_error
+//============================================================
+
+file_error win_error_to_file_error(DWORD error)
+{
+	file_error filerr;
+
+	// convert a Windows error to a file_error
 	switch (error)
 	{
 		case ERROR_SUCCESS:
@@ -175,4 +198,57 @@ osd_dir_entry_type win_attributes_to_entry_type(DWORD attributes)
 		return ENTTYPE_DIR;
 	else
 		return ENTTYPE_FILE;
+}
+
+
+
+//============================================================
+//  win_is_gui_application
+//============================================================
+
+BOOL win_is_gui_application(void)
+{
+	static BOOL is_gui_frontend;
+	static BOOL is_first_time = TRUE;
+	HMODULE module;
+	BYTE *image_ptr;
+	IMAGE_DOS_HEADER *dos_header;
+	IMAGE_NT_HEADERS *nt_headers;
+	IMAGE_OPTIONAL_HEADER *opt_header;
+
+	// is this the first time we've been ran?
+	if (is_first_time)
+	{
+		is_first_time = FALSE;
+
+		// get the current module
+		module = GetModuleHandle(NULL);
+		if (!module)
+			return FALSE;
+		image_ptr = (BYTE*) module;
+
+		// access the DOS header
+		dos_header = (IMAGE_DOS_HEADER *) image_ptr;
+		if (dos_header->e_magic != IMAGE_DOS_SIGNATURE)
+			return FALSE;
+
+		// access the NT headers
+		nt_headers = (IMAGE_NT_HEADERS *) ((BYTE*)(dos_header) + (DWORD)(dos_header->e_lfanew));
+		if (nt_headers->Signature != IMAGE_NT_SIGNATURE)
+			return FALSE;
+
+		// access the optional header
+		opt_header = &nt_headers->OptionalHeader;
+		switch (opt_header->Subsystem)
+		{
+			case IMAGE_SUBSYSTEM_WINDOWS_GUI:
+				is_gui_frontend = TRUE;
+				break;
+
+			case IMAGE_SUBSYSTEM_WINDOWS_CUI:
+				is_gui_frontend = FALSE;
+				break;
+		}
+	}
+	return is_gui_frontend;
 }

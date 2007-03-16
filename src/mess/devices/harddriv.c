@@ -182,7 +182,7 @@ static chd_interface mess_hard_disk_interface =
 
 static chd_interface_file *mess_chd_open(const char *filename, const char *mode)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mess_image *image = decode_image_ref(filename);
 
 	/* used when experimenting with CHDs */

@@ -136,7 +136,7 @@ INLINE render_font_char *get_char(render_font *font, unicode_char chnum)
 
 render_font *render_font_alloc(const char *filename)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *ramfile;
 	render_font *font;
 
@@ -417,7 +417,7 @@ float render_font_get_utf8string_width(render_font *font, float height, float as
 
 static int render_font_load_cached_bdf(render_font *font, const char *filename)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	char *cachedname = NULL;
 	char *data = NULL;
 	mame_file *cachefile;
@@ -695,7 +695,7 @@ error:
 
 static int render_font_save_cached(render_font *font, const char *filename, UINT32 hash)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	render_font_char *ch;
 	UINT32 bytes_written;
 	UINT8 *tempbuffer;

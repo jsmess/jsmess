@@ -34,7 +34,7 @@ WRITE8_HANDLER( svision_sounddma_w )
 			svision_dma.size = (data ? data : 0x100) * 32;
 			break;
 		case 3:
-			svision_dma.step = Machine->drv->cpu[0].cpu_clock / (256.0 * options.samplerate * (1 + (data & 3)));
+			svision_dma.step = Machine->drv->cpu[0].cpu_clock / (256.0 * Machine->sample_rate * (1 + (data & 3)));
 			svision_dma.right = data & 4;
 			svision_dma.left = data & 8;
 			svision_dma.ca14to16 = ((data & 0x70) >> 4) << 14;
@@ -57,7 +57,7 @@ WRITE8_HANDLER( svision_noise_w )
 	{
 		case 0:
 			svision_noise.volume=data&0xf;
-			svision_noise.step=Machine->drv->cpu[0].cpu_clock/(256.0*options.samplerate*(1+(data>>4)));
+			svision_noise.step=Machine->drv->cpu[0].cpu_clock/(256.0*Machine->sample_rate*(1+(data>>4)));
 			break;
 		case 1:
 			svision_noise.count = data + 1;
@@ -88,8 +88,8 @@ void svision_soundport_w (SVISION_CHANNEL *channel, int offset, int data)
 			size = channel->reg[0] | ((channel->reg[1] & 7) << 8);
 			if (size)
 			{
-				//	channel->size=(int)(options.samplerate*(size<<5)/4e6);
-				channel->size= (int) (options.samplerate * (size << 5) / Machine->drv->cpu[0].cpu_clock);
+				//	channel->size=(int)(Machine->sample_rate*(size<<5)/4e6);
+				channel->size= (int) (Machine->sample_rate * (size << 5) / Machine->drv->cpu[0].cpu_clock);
 			}
 			else
 			{
@@ -228,6 +228,6 @@ void *svision_custom_start(int clock, const struct CustomSound_interface *config
 	memset(&svision_noise, 0, sizeof(svision_noise));
 	memset(svision_channel, 0, sizeof(svision_channel));
 
-	mixer_channel = stream_create(0, 2, options.samplerate, 0, svision_update);
+	mixer_channel = stream_create(0, 2, Machine->sample_rate, 0, svision_update);
 	return (void *) ~0;
 }

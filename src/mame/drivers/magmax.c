@@ -66,13 +66,13 @@ static void scanline_callback(int scanline)
 	scanline += 128;
 	scanline &= 255;
 
-	timer_adjust(interrupt_timer, cpu_getscanlinetime( scanline ), scanline, 0);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 static MACHINE_START( magmax )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(scanline_callback);
+	interrupt_timer = mame_timer_alloc(scanline_callback);
 
 	/* Set up save state */
 	state_save_register_global(sound_latch);
@@ -85,7 +85,7 @@ static MACHINE_START( magmax )
 
 static MACHINE_RESET( magmax )
 {
-	timer_adjust(interrupt_timer, cpu_getscanlinetime(64), 64, 0);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64, time_zero);
 
 #if 0
 	{
@@ -374,7 +374,6 @@ static MACHINE_DRIVER_START( magmax )
 	MDRV_CPU_IO_MAP(magmax_soundreadport,magmax_soundwriteport)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(10)
 
 	MDRV_MACHINE_START(magmax)

@@ -125,7 +125,7 @@ static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buff
 zip_error zip_file_open(const char *filename, zip_file **zip)
 {
 	zip_error ziperr = ZIPERR_NONE;
-	mame_file_error filerr;
+	file_error filerr;
 	UINT32 read_length;
 	zip_file *newzip;
 	char *string;
@@ -418,7 +418,7 @@ static zip_error read_ecd(zip_file *zip)
 	/* we may need multiple tries */
 	while (buflen < 65536)
 	{
-		mame_file_error error;
+		file_error error;
 		UINT32 read_length;
 		INT32 offset;
 
@@ -486,7 +486,7 @@ static zip_error read_ecd(zip_file *zip)
 
 static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
 {
-	mame_file_error error;
+	file_error error;
 	UINT32 read_length;
 
 	/* make sure the file handle is open */
@@ -523,7 +523,7 @@ static zip_error get_compressed_data_offset(zip_file *zip, UINT64 *offset)
 
 static zip_error decompress_data_type_0(zip_file *zip, UINT64 offset, void *buffer, UINT32 length)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	UINT32 read_length;
 
 	/* the data is uncompressed; just read it */

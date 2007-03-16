@@ -106,6 +106,7 @@ struct _mode_enum_info
 	win_window_info *		window;
 	INT32 					minimum_width, minimum_height;
 	INT32 					target_width, target_height;
+	double					target_refresh;
 	float 					best_score;
 };
 
@@ -1252,10 +1253,10 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 		size_score = 2.0f;
 
 	// compute refresh score
-	refresh_score = 1.0f / (1.0f + fabs((double)desc->dwRefreshRate - Machine->screen[0].refresh));
+	refresh_score = 1.0f / (1.0f + fabs((double)desc->dwRefreshRate - einfo->target_refresh));
 
 	// if refresh is smaller than we'd like, it only scores up to 0.1
-	if ((double)desc->dwRefreshRate < Machine->screen[0].refresh)
+	if ((double)desc->dwRefreshRate < einfo->target_refresh)
 		refresh_score *= 0.1;
 
 	// if we're looking for a particular refresh, make sure it matches
@@ -1298,6 +1299,7 @@ static void pick_best_mode(win_window_info *window)
 	// use those as the target for now
 	einfo.target_width = einfo.minimum_width * MAX(1, video_config.prescale);
 	einfo.target_height = einfo.minimum_height * MAX(1, video_config.prescale);
+	einfo.target_refresh = SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
 
 	// if we're not stretching, allow some slop on the minimum since we can handle it
 	if (!video_config.hwstretch)

@@ -355,7 +355,7 @@ static void preload_use_proc(hash_file *hashfile, void *param, struct hash_info 
 hash_file *hashfile_open(const char *sysname, int is_preload,
 	void (*error_proc)(const char *message))
 {
-	mame_file_error filerr;
+	file_error filerr;
 	char *fname;
 	hash_file *hashfile = NULL;
 	memory_pool *pool = NULL;

@@ -178,7 +178,7 @@ void FreeScreenShot(void)
 
 BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *mfile = NULL;
 	char *fname;
 	BOOL success;

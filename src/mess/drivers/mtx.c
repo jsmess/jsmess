@@ -411,7 +411,7 @@ static void mtx_poke (int vaddress, unsigned char data)
 static void mtx_save_hack(int start, int length)
 {
 	mame_file * tape_file;
-	mame_file_error filerr;
+	file_error filerr;
 	int bytes_saved;
 	int i;
 
@@ -469,7 +469,7 @@ static void mtx_save_hack(int start, int length)
 static void mtx_load_hack(int start, int length)
 {
 	mame_file * tape_file;
-	mame_file_error filerr;
+	file_error filerr;
 	int bytes_loaded;
 	int i;
 

@@ -127,7 +127,7 @@ static void delayed_sound_data_w(int data)
 
 static void sound_data_w(UINT8 data)
 {
-	timer_set(TIME_NOW, data, delayed_sound_data_w);
+	mame_timer_set(time_zero, data, delayed_sound_data_w);
 }
 
 
@@ -211,7 +211,7 @@ static void scanline_callback(int scanline)
 		case 65:
 		case 129:
 		case 193:
-			timer_set(cpu_getscanlineperiod() * 0.9, 0, irq2_gen);
+			mame_timer_set(video_screen_get_time_until_pos(0, scanline, Machine->screen[0].visarea.max_x + 1), 0, irq2_gen);
 			next_scanline = scanline + 1;
 			break;
 
@@ -242,7 +242,7 @@ static void scanline_callback(int scanline)
 	update_main_irqs();
 
 	/* come back at the next targeted scanline */
-	timer_set(cpu_getscanlinetime(next_scanline), next_scanline, scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), next_scanline, scanline_callback);
 }
 
 
@@ -273,7 +273,7 @@ static MACHINE_RESET( outrun )
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
 
 	/* start timers to track interrupts */
-	timer_set(cpu_getscanlinetime(223), 223, scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 223, 0), 223, scanline_callback);
 }
 
 
@@ -825,7 +825,6 @@ static MACHINE_DRIVER_START( outrundx )
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
 
 	MDRV_MACHINE_RESET(outrun)
 	MDRV_INTERLEAVE(100)
@@ -833,7 +832,7 @@ static MACHINE_DRIVER_START( outrundx )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 28*8)
+	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(4096*3)

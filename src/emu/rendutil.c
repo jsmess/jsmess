@@ -559,7 +559,7 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
 mame_bitmap *render_load_png(const char *dirname, const char *filename, mame_bitmap *alphadest, int *hasalpha)
 {
 	mame_bitmap *bitmap = NULL;
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 	png_info png;
 	const char *fname;

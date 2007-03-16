@@ -4,15 +4,30 @@
 
 *************************************************************************/
 
+
+#define NEOGEO_MASTER_CLOCK		(24000000)
+#define NEOGEO_68K_CLOCK		(NEOGEO_MASTER_CLOCK / 2)
+#define NEOGEO_Z80_CLOCK		(NEOGEO_MASTER_CLOCK / 6)
+#define NEOGEO_YM2610_CLOCK		(NEOGEO_MASTER_CLOCK / 3)
+#define NEOGEO_PIXEL_CLOCK		(NEOGEO_MASTER_CLOCK / 4)
+#define NEOGEO_HTOTAL			(0x180)
+#define NEOGEO_HBEND			(0x000)		/* ?? */
+#define NEOGEO_HBSTART			(0x140)		/* ?? */
+#define NEOGEO_VTOTAL			(0x108)
+#define NEOGEO_VBEND			(0x010)
+#define NEOGEO_VBSTART			(0x0f0)
+
+
 /*----------- defined in drivers/neogeo.c -----------*/
 
-extern unsigned int neogeo_frame_counter;
-extern unsigned int neogeo_frame_counter_speed;
-extern int neogeo_has_trackball;
+extern UINT32 neogeo_animation_counter;
+extern UINT32 neogeo_has_trackball;
 
 void neogeo_set_cpu1_second_bank(UINT32 bankaddress);
 void neogeo_init_cpu2_setbank(void);
 void neogeo_register_main_savestate(void);
+void neogeo_create_timers(void);
+void neogeo_start_timers(void);
 
 /*----------- defined in machine/neogeo.c -----------*/
 

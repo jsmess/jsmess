@@ -751,7 +751,7 @@ int filemanager(int selected)
 		else
 		{
 			image = image_from_device_and_index(devices[sel], ids[sel]);
-			os_sel = osd_select_file(image, entered_filename);
+			os_sel = 0;
 		}
 
 		if (os_sel != 0)

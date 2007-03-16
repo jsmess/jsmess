@@ -128,6 +128,9 @@
 #define	VIDEO_UPDATE_BEFORE_VBLANK		0x0000
 #define	VIDEO_UPDATE_AFTER_VBLANK		0x0002
 
+/* indicates VIDEO_UPDATE will add container bits its */
+#define VIDEO_SELF_RENDER				0x0004
+
 /* automatically extend the palette creating a darker copy for shadows */
 #define VIDEO_HAS_SHADOWS				0x0010
 
@@ -405,8 +408,8 @@ struct _game_driver
 	screen->defstate.format = (_format);								\
 
 #define MDRV_SCREEN_RAW_PARAMS(pixclock, htotal, hbend, hbstart, vtotal, vbend, vbstart) \
-	screen->defstate.refresh = (float)(pixclock) / (float)(htotal) / (float)(vtotal); \
-	screen->defstate.vblank = ((float)((vtotal) - ((vbstart) - (vbend))) / (float)(vtotal) * TIME_IN_HZ(screen->defstate.refresh)); \
+	screen->defstate.refresh = HZ_TO_SUBSECONDS(pixclock) * (htotal) * (vtotal); \
+	screen->defstate.vblank = (screen->defstate.refresh / (vtotal)) * ((vtotal) - ((vbstart) - (vbend))); \
 	screen->defstate.width = (htotal);									\
 	screen->defstate.height = (vtotal);									\
 	screen->defstate.visarea.min_x = (hbend);							\
@@ -415,10 +418,10 @@ struct _game_driver
 	screen->defstate.visarea.max_y = (vbstart) - 1;						\
 
 #define MDRV_SCREEN_REFRESH_RATE(rate)									\
-	screen->defstate.refresh = (rate);									\
+	screen->defstate.refresh = HZ_TO_SUBSECONDS(rate);					\
 
 #define MDRV_SCREEN_VBLANK_TIME(time)									\
-	screen->defstate.vblank = (time);									\
+	screen->defstate.vblank = DOUBLE_TO_SUBSECONDS(time);				\
 	screen->defstate.oldstyle_vblank_supplied = 1;						\
 
 #define MDRV_SCREEN_SIZE(_width, _height)								\

@@ -181,7 +181,7 @@ struct loaded_samples *readsamples(const char **samplenames, const char *basenam
 	int i;
 
 	/* if the user doesn't want to use samples, bail */
-	if (!options.use_samples)
+	if (!options_get_bool(OPTION_SAMPLES))
 		return NULL;
 	if (samplenames == 0 || samplenames[0] == 0)
 		return NULL;
@@ -204,7 +204,7 @@ struct loaded_samples *readsamples(const char **samplenames, const char *basenam
 	for (i = 0; i < samples->total; i++)
 		if (samplenames[i+skipfirst][0])
 		{
-			mame_file_error filerr;
+			file_error filerr;
 			mame_file *f;
 			char *fname;
 

@@ -196,7 +196,7 @@ void flash_finish(int index1)
 
 void flash_store(int index1, const char *flash_name)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	if (flash[index1].base!=NULL)
@@ -216,7 +216,7 @@ void flash_store(int index1, const char *flash_name)
 
 void flash_restore(int index1, const char *flash_name)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	if (flash[index1].base!=NULL)

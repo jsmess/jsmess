@@ -371,7 +371,7 @@ static void galaxian_sh_start(void)
 	noisetimer = timer_alloc(noise_timer_cb);
 	lfotimer = timer_alloc(lfo_timer_cb);
 
-	timer_pulse(TIME_IN_HZ(Machine->screen[0].refresh), 0, galaxian_sh_update);
+	mame_timer_pulse(make_mame_time(0, Machine->screen[0].refresh), 0, galaxian_sh_update);
 
 	state_save_register_global(freq);
 	state_save_register_global(noisevolume);

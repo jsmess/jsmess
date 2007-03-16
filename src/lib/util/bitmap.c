@@ -35,28 +35,6 @@
 
 bitmap_t *bitmap_alloc(int width, int height, bitmap_format format)
 {
-	return bitmap_alloc_custom(width, height, format, NULL);
-}
-
-
-/*-------------------------------------------------
-    bitmap_wrap -- wrap an existing memory buffer
-    as a bitmap
--------------------------------------------------*/
-
-bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_format format)
-{
-	return bitmap_wrap_custom(base, width, height, rowpixels, format, NULL);
-}
-
-
-/*-------------------------------------------------
-    bitmap_alloc_custom -- allocate a bitmap
-    using a custom allocator
--------------------------------------------------*/
-
-bitmap_t *bitmap_alloc_custom(int width, int height, bitmap_format format, void *(allocator)(size_t))
-{
 	int bpp = bitmap_format_to_bpp(format);
 	size_t allocbytes;
 	bitmap_t *bitmap;
@@ -71,10 +49,7 @@ bitmap_t *bitmap_alloc_custom(int width, int height, bitmap_format format, void 
 
 	/* allocate memory */
 	allocbytes = sizeof(*bitmap) + rowpixels * (height + 2 * BITMAP_SAFETY) * bpp / 8;
-	if (allocator != NULL)
-		bitmap = (*allocator)(allocbytes);
-	else
-		bitmap = malloc(allocbytes);
+	bitmap = malloc(allocbytes);
 	if (bitmap == NULL)
 		return NULL;
 
@@ -94,11 +69,11 @@ bitmap_t *bitmap_alloc_custom(int width, int height, bitmap_format format, void 
 
 
 /*-------------------------------------------------
-    bitmap_wrap_custom -- wrap an existing memory
-    buffer as a bitmap using a custom allocator
+    bitmap_wrap -- wrap an existing memory buffer
+    as a bitmap
 -------------------------------------------------*/
 
-bitmap_t *bitmap_wrap_custom(void *base, int width, int height, int rowpixels, bitmap_format format, void *(allocator)(size_t))
+bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_format format)
 {
 	int bpp = bitmap_format_to_bpp(format);
 	bitmap_t *bitmap;
@@ -108,10 +83,7 @@ bitmap_t *bitmap_wrap_custom(void *base, int width, int height, int rowpixels, b
 		return NULL;
 
 	/* allocate memory */
-	if (allocator != NULL)
-		bitmap = (*allocator)(sizeof(*bitmap));
-	else
-		bitmap = malloc(sizeof(*bitmap));
+	bitmap = malloc(sizeof(*bitmap));
 	if (bitmap == NULL)
 		return NULL;
 

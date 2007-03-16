@@ -466,7 +466,7 @@ INLINE int queue_async_operation(chd_file *chd, osd_work_callback callback)
 		return FALSE;
 
 	/* create a new work item to run the job */
-	chd->workitem = osd_work_item_queue(chd->workqueue, callback, chd);
+	chd->workitem = osd_work_item_queue(chd->workqueue, callback, chd, 0);
 	if (chd->workitem == NULL)
 		return FALSE;
 

@@ -198,7 +198,7 @@ int audit_samples(int game, audit_record **audit)
 						sharedname = &intf->samplenames[sampnum][1];
 					else
 					{
-						mame_file_error filerr;
+						file_error filerr;
 						mame_file *file;
 						char *fname;
 
@@ -367,7 +367,7 @@ static int audit_one_rom(const rom_entry *rom, const game_driver *gamedrv, UINT3
 	/* find the file and checksum it, getting the file length along the way */
 	for (drv = gamedrv; drv != NULL; drv = driver_get_clone(drv))
 	{
-		mame_file_error filerr;
+		file_error filerr;
 		mame_file *file;
 		char *fname;
 
@@ -555,7 +555,7 @@ static chd_interface_file *audit_chd_open(const char *filename, const char *mode
 	/* attempt reading up the chain through the parents */
 	for (drv = chd_gamedrv; drv != NULL; drv = driver_get_clone(drv))
 	{
-		mame_file_error filerr;
+		file_error filerr;
 		mame_file *file;
 		char *fname;
 

@@ -178,10 +178,10 @@ float vector_get_beam(void)
 
 VIDEO_START( vector )
 {
-	beam_width = (float)options.beam / 65536.0f;
+	beam_width = options_get_float(OPTION_BEAM);
 
 	/* Grab the settings for this session */
-	vector_set_flicker(options.vector_flicker);
+	vector_set_flicker(options_get_float(OPTION_FLICKER));
 
 	vector_index = 0;
 
@@ -261,7 +261,7 @@ void vector_clear_list (void)
 
 VIDEO_UPDATE( vector )
 {
-	UINT32 flags = PRIMFLAG_ANTIALIAS(options.antialias ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
+	UINT32 flags = PRIMFLAG_ANTIALIAS(options_get_bool(OPTION_ANTIALIAS) ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
 	float xscale = 1.0f / (65536 * (Machine->screen[screen].visarea.max_x - Machine->screen[screen].visarea.min_x));
 	float yscale = 1.0f / (65536 * (Machine->screen[screen].visarea.max_y - Machine->screen[screen].visarea.min_y));
 	float xoffs = (float)Machine->screen[screen].visarea.min_x;
@@ -273,6 +273,7 @@ VIDEO_UPDATE( vector )
 
 	curpoint = vector_list;
 
+	render_container_empty(render_container_get_screen(screen));
 	render_screen_add_rect(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	clip.x0 = clip.y0 = 0.0f;

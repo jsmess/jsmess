@@ -133,8 +133,9 @@ VIDEO_UPDATE( cliff )
 			render_texture_set_bitmap(overlay_texture, bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
 
 		/* add both quads to the screen */
-		render_screen_add_quad(0, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-		render_screen_add_quad(0, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+		render_container_empty(render_container_get_screen(screen));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 	}
 
 	/* display disc information */
@@ -747,6 +748,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_IMPORT_FROM(tms9928a)
 
 	/* override video rendering and raw screen info */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_SELF_RENDER)
 	MDRV_VIDEO_UPDATE(cliff)
 	MDRV_SCREEN_RAW_PARAMS(13500000, 858, 0, 720, 262.5, 21, 262.5)
 

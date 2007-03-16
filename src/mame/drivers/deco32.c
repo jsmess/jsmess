@@ -2463,6 +2463,58 @@ ROM_START( captavuu )
 	ROM_LOAD( "man-11.16k",	0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
 ROM_END
 
+ROM_START( captavua )
+	ROM_REGION(0x100000, REGION_CPU1, 0 ) /* ARM 32 bit code */
+	ROM_LOAD32_BYTE( "hh_00-4.2e",   0x000000, 0x20000, CRC(0e1acc05) SHA1(7eb6206efad233f9f4ee51102f9fe6b58f0719ea) )
+	ROM_LOAD32_BYTE( "hh_01-4.2h",   0x000001, 0x20000, CRC(4ff0351d) SHA1(15fc2662ff0d32986c4d4d074b985ad853da34e1) )
+	ROM_LOAD32_BYTE( "hh_02-4.2k",   0x000002, 0x20000, CRC(e84c0665) SHA1(d846f04315af49abeca00314b3d23e1d8c638dcd) )
+	ROM_LOAD32_BYTE( "hh_03-4.2m",   0x000003, 0x20000, CRC(bc050740) SHA1(bee425e76734251444c9cfa9287e1eb9383625bc) )
+	ROM_LOAD32_BYTE( "man-12.3e",	0x080000, 0x20000, CRC(d6261e98) SHA1(f3707be37ca926d9a341b9253a6bb2f3de0e25f6) )
+	ROM_LOAD32_BYTE( "man-13.3h",	0x080001, 0x20000, CRC(40f0764d) SHA1(a6715c4a2accacf96f41c885579f314367c70dde) )
+	ROM_LOAD32_BYTE( "man-14.3k",	0x080002, 0x20000, CRC(7cb9a4bd) SHA1(0af1a7bf0fcfa3cc14b38d92f19e97ad6e5541dd) )
+	ROM_LOAD32_BYTE( "man-15.3m",	0x080003, 0x20000, CRC(c7854fe8) SHA1(ffa87dcda44fa0111de6ab317b77dd2bde015890) )
+
+	ROM_REGION(0x10000, REGION_CPU2, 0 ) /* Sound CPU */
+	ROM_LOAD( "hj_08.17k",	0x00000,  0x10000,  CRC(361fbd16) SHA1(c4bbaf74e09c263044be74bb2c98caf6cfcab618) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "man-00.8a",	0x000000,  0x80000,  CRC(7855a607) SHA1(fa0be080515482281e5a12fe172eeb9a21af0820) ) /* Encrypted tiles */
+
+	ROM_REGION( 0x500000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "man-05.16a",	0x000000,  0x40000,  CRC(d44d1995) SHA1(e88e1a59a4b24ad058f21538f6e9bbba94a166b4) ) /* Encrypted tiles */
+	ROM_CONTINUE( 			0x140000,  0x40000 )
+	ROM_CONTINUE( 			0x280000,  0x40000 )
+	ROM_CONTINUE( 			0x3c0000,  0x40000 )
+	ROM_LOAD( "man-04.14a",	0x040000,  0x40000,  CRC(541492a1) SHA1(2e0ab12555fc46001a815e76e3a0cd21f385f82a) ) /* Encrypted tiles */
+	ROM_CONTINUE( 			0x180000,  0x40000 )
+	ROM_CONTINUE( 			0x2c0000,  0x40000 )
+	ROM_CONTINUE( 			0x400000,  0x40000 )
+	ROM_LOAD( "man-03.12a",	0x080000,  0x40000,  CRC(2d9c52b2) SHA1(8f6f4fe4f1a63099f889068991b34f9432b04fd7) ) /* Encrypted tiles */
+	ROM_CONTINUE( 			0x1c0000,  0x40000 )
+	ROM_CONTINUE( 			0x300000,  0x40000 )
+	ROM_CONTINUE( 			0x440000,  0x40000 )
+	ROM_LOAD( "man-02.11a",	0x0c0000,  0x40000,  CRC(07674c05) SHA1(08b33721d7eba4a1ff2e282f77eeb56535a52923) ) /* Encrypted tiles */
+	ROM_CONTINUE( 			0x200000,  0x40000 )
+	ROM_CONTINUE( 			0x340000,  0x40000 )
+	ROM_CONTINUE( 			0x480000,  0x40000 )
+	ROM_LOAD( "man-01.10a",	0x100000,  0x40000,  CRC(ae714ada) SHA1(b4d5806265d422c8b837489afe93731f584e4adf) ) /* Encrypted tiles */
+	ROM_CONTINUE( 			0x240000,  0x40000 )
+	ROM_CONTINUE( 			0x380000,  0x40000 )
+	ROM_CONTINUE( 			0x4c0000,  0x40000 )
+
+	ROM_REGION( 0x400000, REGION_GFX3, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD16_BYTE( "man-06.17a",	0x000000,  0x100000,  CRC(a9a64297) SHA1(e4cb441207b1907461c90c32c05a461c9bd30756) )
+	ROM_LOAD16_BYTE( "man-07.18a",	0x000001,  0x100000,  CRC(b1db200c) SHA1(970bb15e90194dd285f53594aca5dec3405e75d5) )
+	ROM_LOAD16_BYTE( "man-08.17c",	0x200000,  0x100000,  CRC(28e98e66) SHA1(55dbbd945eada81f7dcc874fdcb0b9e62ea453f0) )
+	ROM_LOAD16_BYTE( "man-09.21c",	0x200001,  0x100000,  CRC(1921245d) SHA1(88d3b69a38c18c83d5658d057b95974f1bd371e6) )
+
+	ROM_REGION(0x80000, REGION_SOUND2, 0 )
+	ROM_LOAD( "man-10.14k",	0x000000,  0x80000,  CRC(0132c578) SHA1(70952f39508360bab51e1151531536f0ea6bbe06) )
+
+	ROM_REGION(0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "man-11.16k",	0x000000,  0x80000,  CRC(0dc60a4c) SHA1(4d0daa6a0272852a37f341a0cdc48baee0ad9dd8) )
+ROM_END
+
 ROM_START( captavnj )
 	ROM_REGION(0x100000, REGION_CPU1, 0 ) /* ARM 32 bit code */
 	ROM_LOAD32_BYTE( "hj_00-2.1e",	0x000000, 0x20000, CRC(10b1faaf) SHA1(9d76885200a846b4751c8d44ff591e2aff7c4148) )
@@ -3191,11 +3243,12 @@ static DRIVER_INIT( nslasher )
 
 /**********************************************************************************/
 
-GAME( 1991, captaven, 0,        captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.9)", 0 )
+GAME( 1991, captaven, 0,        captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.4)", 0 )
 GAME( 1991, captavna, captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (Asia Rev 1.0)", 0 )
 GAME( 1991, captavne, captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (UK Rev 1.4)", 0 )
 GAME( 1991, captavnu, captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.9)", 0 )
 GAME( 1991, captavuu, captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.6)", 0 )
+GAME( 1991, captavua, captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)", 0 )
 GAME( 1991, captavnj, captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)", 0 )
 GAME( 1993, dragngun, 0,        dragngun, dragngun, dragngun, ROT0, "Data East Corporation", "Dragon Gun (US)", GAME_IMPERFECT_GRAPHICS  )
 GAME( 1993, fghthist, 0,        fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (World ver 43-07)", 0 )

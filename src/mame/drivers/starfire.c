@@ -72,13 +72,13 @@ static void update_callback(int scanline)
 	scanline += SCANLINE_UPDATE_CHUNK;
 	if (scanline >= Machine->screen[0].height)
 		scanline = 32;
-	timer_set(cpu_getscanlinetime(scanline + SCANLINE_UPDATE_CHUNK - 1), scanline, update_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline + SCANLINE_UPDATE_CHUNK - 1, 0), scanline, update_callback);
 }
 
 
 MACHINE_RESET( starfire )
 {
-	timer_set(cpu_getscanlinetime(32 + SCANLINE_UPDATE_CHUNK - 1), 32, update_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 32 + SCANLINE_UPDATE_CHUNK - 1, 0), 32, update_callback);
 }
 
 
@@ -299,20 +299,16 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( starfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 2500000)
+	MDRV_CPU_ADD(Z80, STARFIRE_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(starfire)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 32, 256-1)
+	MDRV_SCREEN_RAW_PARAMS(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_START(starfire)

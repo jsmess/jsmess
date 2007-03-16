@@ -249,8 +249,6 @@ void neogeo_set_lower_resolution( void )
 				video_screen_set_visarea(0, 1*8,39*8-1,Machine->screen[0].visarea.min_y,Machine->screen[0].visarea.max_y);
 }
 
-extern unsigned int neogeo_frame_counter;
-
 int neogeo_fix_bank_type;
 
 
@@ -686,8 +684,8 @@ static void neogeo_draw_sprite( int my, int sx, int sy, int zx, int zy, int offs
 	if ( vhigh_tile && (tileatr & 0x20)) tileno+=0x20000;
 	if (vvhigh_tile && (tileatr & 0x40)) tileno+=0x40000;
 
-	if (tileatr & 0x08) tileno=(tileno&~7)|(neogeo_frame_counter&7);	/* fixed */
-	else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_frame_counter&3);	/* fixed */
+	if (tileatr & 0x08) tileno=(tileno&~7)|(neogeo_animation_counter&7);	/* fixed */
+	else if (tileatr & 0x04) tileno=(tileno&~3)|(neogeo_animation_counter&3);	/* fixed */
 
 	if (tileatr & 0x02) yoffs ^= 0x0f;	/* flip y */
 

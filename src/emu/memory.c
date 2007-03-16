@@ -370,10 +370,10 @@ const char *address_space_names[ADDRESS_SPACES] = { "program", "data", "I/O" };
     FUNCTION PROTOTYPES
 -------------------------------------------------*/
 
-static int init_cpudata(void);
-static int init_addrspace(UINT8 cpunum, UINT8 spacenum);
-static int preflight_memory(void);
-static int populate_memory(void);
+static void init_cpudata(void);
+static void init_addrspace(UINT8 cpunum, UINT8 spacenum);
+static void preflight_memory(void);
+static void populate_memory(void);
 static void install_mem_handler(addrspace_data *space, int iswrite, int databits, int ismatchmask, offs_t start, offs_t end, offs_t mask, offs_t mirror, genf *handler, int isfixed, const char *handler_name);
 static genf *assign_dynamic_bank(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mirror, int isfixed, int ismasked);
 static UINT8 get_handler_index(handler_data *table, genf *handler, const char *handler_name, offs_t start, offs_t end, offs_t mask);
@@ -385,11 +385,11 @@ static int merge_subtables(table_data *tabledata);
 static void release_subtable(table_data *tabledata, UINT8 subentry);
 static UINT8 *open_subtable(table_data *tabledata, offs_t l1index);
 static void close_subtable(table_data *tabledata, offs_t l1index);
-static int allocate_memory(void);
+static void allocate_memory(void);
 static void *allocate_memory_block(int cpunum, int spacenum, offs_t start, offs_t end, void *memory);
 static void register_for_save(int cpunum, int spacenum, offs_t start, void *base, size_t numbytes);
 static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t start, offs_t end, UINT8 *base);
-static int find_memory(void);
+static void find_memory(void);
 static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t offset);
 static genf *get_static_handler(int databits, int readorwrite, int spacenum, int which);
 
@@ -414,7 +414,7 @@ static void mem_dump(void)
     memory_init - initialize the memory system
 -------------------------------------------------*/
 
-int memory_init(running_machine *machine)
+void memory_init(running_machine *machine)
 {
 	int i;
 
@@ -434,29 +434,23 @@ int memory_init(running_machine *machine)
 	memory_block_count = 0;
 
 	/* init the CPUs */
-	if (!init_cpudata())
-		return 1;
+	init_cpudata();
 	add_exit_callback(machine, memory_exit);
 
 	/* preflight the memory handlers and check banks */
-	if (!preflight_memory())
-		return 1;
+	preflight_memory();
 
 	/* then fill in the tables */
-	if (!populate_memory())
-		return 1;
+	populate_memory();
 
 	/* allocate any necessary memory */
-	if (!allocate_memory())
-		return 1;
+	allocate_memory();
 
 	/* find all the allocated pointers */
-	if (!find_memory())
-		return 1;
+	find_memory();
 
 	/* dump the final memory configuration */
 	mem_dump();
-	return 0;
 }
 
 
@@ -1139,7 +1133,7 @@ address_map *construct_map_0(address_map *map)
     structure for each CPU
 -------------------------------------------------*/
 
-static int init_cpudata(void)
+static void init_cpudata(void)
 {
 	int cpunum, spacenum;
 
@@ -1159,11 +1153,9 @@ static int init_cpudata(void)
 		/* TODO: make this dynamic */
 		cpudata[cpunum].spacemask = 0;
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (!init_addrspace(cpunum, spacenum))
-				return 0;
+			init_addrspace(cpunum, spacenum);
 		cpudata[cpunum].op_mask = cpudata[cpunum].space[ADDRESS_SPACE_PROGRAM].mask;
 	}
-	return 1;
 }
 
 
@@ -1195,7 +1187,7 @@ INLINE void adjust_addresses(addrspace_data *space, int ismatchmask, offs_t *sta
     data structure
 -------------------------------------------------*/
 
-static int init_addrspace(UINT8 cpunum, UINT8 spacenum)
+static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	int cputype = Machine->drv->cpu[cpunum].cpu_type;
@@ -1219,7 +1211,7 @@ static int init_addrspace(UINT8 cpunum, UINT8 spacenum)
 
 	/* if there's nothing here, just punt */
 	if (space->abits == 0)
-		return 1;
+		return;
 	cpudata[cpunum].spacemask |= 1 << spacenum;
 
 	/* construct the combined memory map */
@@ -1302,7 +1294,6 @@ static int init_addrspace(UINT8 cpunum, UINT8 spacenum)
 	/* initialize everything to unmapped */
 	memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
 	memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-	return 1;
 }
 
 
@@ -1311,7 +1302,7 @@ static int init_addrspace(UINT8 cpunum, UINT8 spacenum)
     and track which banks are referenced
 -------------------------------------------------*/
 
-static int preflight_memory(void)
+static void preflight_memory(void)
 {
 	int cpunum, spacenum, entrynum;
 
@@ -1340,10 +1331,7 @@ static int preflight_memory(void)
 						{
 							val = (flags & AMEF_SPACE_MASK) >> AMEF_SPACE_SHIFT;
 							if (val != spacenum)
-							{
 								fatalerror("cpu #%d has address space %d handlers in place of address space %d handlers!", cpunum, val, spacenum);
-								return -1;
-							}
 						}
 
 						/* if we specify an databus width, make sure it matches the current address space's */
@@ -1352,10 +1340,7 @@ static int preflight_memory(void)
 							val = (flags & AMEF_DBITS_MASK) >> AMEF_DBITS_SHIFT;
 							val = (val + 1) * 8;
 							if (val != space->dbits)
-							{
 								fatalerror("cpu #%d uses wrong %d-bit handlers for address space %d (should be %d-bit)!", cpunum, val, spacenum, space->dbits);
-								return -1;
-							}
 						}
 
 						/* if we specify an addressbus width, adjust the mask */
@@ -1412,8 +1397,6 @@ static int preflight_memory(void)
 					space->write.handlers[entrynum].mask &= space->mask;
 				}
 			}
-
-	return 1;
 }
 
 
@@ -1422,7 +1405,7 @@ static int preflight_memory(void)
     tables with entries
 -------------------------------------------------*/
 
-static int populate_memory(void)
+static void populate_memory(void)
 {
 	int cpunum, spacenum;
 
@@ -1453,8 +1436,6 @@ static int populate_memory(void)
 						}
 				}
 			}
-
-	return 1;
 }
 
 
@@ -2033,7 +2014,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
     CPU address spaces
 -------------------------------------------------*/
 
-static int allocate_memory(void)
+static void allocate_memory(void)
 {
 	int cpunum, spacenum;
 
@@ -2118,8 +2099,6 @@ static int allocate_memory(void)
 					unassigned = assign_intersecting_blocks(space, curstart, curend, block);
 				}
 			}
-
-	return 1;
 }
 
 
@@ -2266,7 +2245,7 @@ static void reattach_banks(void)
     into the final allocated memory
 -------------------------------------------------*/
 
-static int find_memory(void)
+static void find_memory(void)
 {
 	int cpunum, spacenum, banknum;
 
@@ -2317,8 +2296,6 @@ static int find_memory(void)
 
 	/* request a callback to fix up the banks when done */
 	state_save_register_func_postload(reattach_banks);
-
-	return 1;
 }
 
 

@@ -591,7 +591,7 @@ static UINT8 record_analog;						/* are we recording an analog sequence? */
  *
  *************************************/
 
-int code_init(running_machine *machine)
+void code_init(running_machine *machine)
 {
 	const os_code_info *codelist = osd_get_code_list();
 	const os_code_info *info;
@@ -667,7 +667,6 @@ int code_init(running_machine *machine)
 			}
 		}
 	}
-	return 0;
 }
 
 
@@ -783,7 +782,7 @@ int code_pressed_memory_repeat(input_code code, int speed)
 		}
 
 		/* if this is an autorepeat case, set a 1x delay and leave pressed = 1 */
-		else if (++counter > keydelay * speed * Machine->screen[0].refresh / 60)
+		else if (++counter > keydelay * speed * SUBSECONDS_TO_HZ(Machine->screen[0].refresh) / 60)
 		{
 			keydelay = 1;
 			counter = 0;

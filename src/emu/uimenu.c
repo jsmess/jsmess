@@ -630,7 +630,7 @@ do { \
 	ADD_MENU(UI_video, menu_video, 1000 << 16);
 
 	/* add cheat menu */
-	if (options.cheat)
+	if (options_get_bool(OPTION_CHEAT))
 		ADD_MENU(UI_cheat, menu_cheat, 1);
 
 	/* add memory card menu */

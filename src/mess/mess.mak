@@ -195,6 +195,7 @@ CPUS += CDP1802
 #CPUS += TLCS90
 #CPUS += MB8843
 #CPUS += MB8844
+#CPUS += SSP1610
 CPUS += APEXC
 CPUS += CP1610
 CPUS += F8
@@ -1132,6 +1133,7 @@ MESS_EMUOBJ = $(OBJ)/mess
 # MESS specific core $(OBJ)s
 EMUOBJS +=							\
 	$(MESS_EMUOBJ)/mess.o				\
+	$(MESS_EMUOBJ)/messopts.o			\
 	$(MESS_EMUOBJ)/mesvalid.o			\
 	$(MESS_EMUOBJ)/image.o				\
 	$(MESS_EMUOBJ)/device.o			\

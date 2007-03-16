@@ -121,7 +121,7 @@ void ti99_ide_init(int in_tms9995_mode)
 
 int ti99_ide_load_memcard(void)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, "ide.nv", OPEN_FLAG_READ, &file);
@@ -139,7 +139,7 @@ int ti99_ide_load_memcard(void)
 
 int ti99_ide_save_memcard(void)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	mame_file *file;
 
 	/*if (ti99_ide_get_dirty_flag())*/

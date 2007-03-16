@@ -52,33 +52,135 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
-#include "beaminv.h"
 
 
-/****************************************************************
+static UINT8 controller_select;
+
+
+
+/*************************************
  *
- *  Special port handler - doesn't warrant its own 'machine file
+ *  Interrupt generation
  *
- ****************************************************************/
+ *************************************/
 
-int beaminv_controller_select;
+/* the interrupt scanlines are a guess */
+
+static mame_timer *interrupt_timer;
+
+
+static void beaminv_interrupt_callback(int param)
+{
+	int vpos = video_screen_get_vpos(0);
+
+	cpunum_set_input_line(0, 0, HOLD_LINE);
+
+	/* set up for next interrupt */
+	vpos = (vpos == 0x00) ? 0x80 : 0x00;
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
+}
+
+
+static void beaminv_create_interrupt_timer(void)
+{
+	interrupt_timer = mame_timer_alloc(beaminv_interrupt_callback);
+}
+
+
+static void beaminv_start_interrupt_timer(void)
+{
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+}
+
+
+static READ8_HANDLER( beaminv_v128_r )
+{
+	return (video_screen_get_vpos(0) >> 7) & 0x01;
+}
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( beaminv )
+{
+	beaminv_create_interrupt_timer();
+
+	/* setup for save states */
+	state_save_register_global(controller_select);
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Machine reset
+ *
+ *************************************/
+
+static MACHINE_RESET( beaminv )
+{
+	beaminv_start_interrupt_timer();
+}
+
+
+
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
+
+static WRITE8_HANDLER( beaminv_videoram_w )
+{
+	UINT8 x,y;
+	int i;
+
+
+	videoram[offset] = data;
+
+	y = ~(offset >> 8 << 3);
+	x = offset;
+
+	for (i = 0; i < 8; i++)
+	{
+		plot_pixel(tmpbitmap, x, y, data & 0x01);
+
+		y--;
+		data >>= 1;
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Controller
+ *
+ *************************************/
+
+#define P1_CONTROL_PORT_TAG	("CONTP1")
+#define P2_CONTROL_PORT_TAG	("CONTP2")
+
 
 static WRITE8_HANDLER( beaminv_controller_select_w )
 {
-	/* 1 player game : 0x01 - 2 players game : 0x01 (player 1) or 0x02 (player 2) */
-	beaminv_controller_select = data;
+	/* 0x01 (player 1) or 0x02 (player 2) */
+	controller_select = data;
 }
 
 
-static READ8_HANDLER( beaminv_input_port_2_r )
+static READ8_HANDLER( beaminv_controller_r )
 {
-	return (readinputport(2 + (beaminv_controller_select - 1)));
+	return readinputportbytag((controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
 }
 
-static READ8_HANDLER( beaminv_input_port_3_r )
-{
-	return (readinputportbytag("IN3") & 0xfe) | ((cpu_getscanline() >> 7) & 0x01);
-}
 
 
 /*************************************
@@ -92,8 +194,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2400, 0x2400) AM_READ(input_port_0_r)
 	AM_RANGE(0x2800, 0x28ff) AM_READ(input_port_1_r)
-	AM_RANGE(0x3400, 0x3400) AM_READ(beaminv_input_port_2_r)
-	AM_RANGE(0x3800, 0x3800) AM_READ(beaminv_input_port_3_r)
+	AM_RANGE(0x3400, 0x3400) AM_READ(beaminv_controller_r)
+	AM_RANGE(0x3800, 0x3800) AM_READ(beaminv_v128_r)
 	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
 ADDRESS_MAP_END
 
@@ -102,6 +204,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x4000, 0x5fff) AM_WRITE(beaminv_videoram_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -116,6 +219,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+
 /*************************************
  *
  *  Port definitions
@@ -123,26 +227,26 @@ ADDRESS_MAP_END
  *************************************/
 
 INPUT_PORTS_START( beaminv )
-	PORT_START                /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )       /* value at 0x183b in RAM - code at 0x01c8 */
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "1000" )
 	PORT_DIPSETTING(    0x04, "2000" )
 	PORT_DIPSETTING(    0x08, "3000" )
 	PORT_DIPSETTING(    0x0c, "4000" )
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x60, 0x00, "Faster Bombs At" )           /* table at 0x1777 in ROM - code at 0x16ac */
+	PORT_DIPNAME( 0x60, 0x00, "Faster Bombs At" )
 	PORT_DIPSETTING(    0x00, "49 Enemies" )
 	PORT_DIPSETTING(    0x20, "39 Enemies" )
 	PORT_DIPSETTING(    0x40, "29 Enemies" )
 	PORT_DIPSETTING(    0x60, "Never" )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START                /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -150,38 +254,39 @@ INPUT_PORTS_START( beaminv )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START                /* IN2 for player 1 */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
-	PORT_START                /* FAKE IN2 for player 2 */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
-
-	PORT_START_TAG("IN3")     /* IN3 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )  /* should be V128, using VBLANK slows game down */
+	PORT_START_TAG("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(beaminv_v128_r, 0)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG(P1_CONTROL_PORT_TAG)
+	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
+
+	PORT_START_TAG(P2_CONTROL_PORT_TAG)
+	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START( beaminva )
-	PORT_START                /* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )       /* value at 0x183a in RAM - code at 0x01bf */
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x04, "2000" )
 	PORT_DIPSETTING(    0x08, "2500" )
 	PORT_DIPSETTING(    0x0c, "3000" )
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x60, 0x00, "Faster Bombs At" )           /* table at 0x1777 in ROM - code at 0x166d */
+	PORT_DIPNAME( 0x60, 0x00, "Faster Bombs At" )
 	PORT_DIPSETTING(    0x00, "44 Enemies" )
 	PORT_DIPSETTING(    0x20, "39 Enemies" )
 	PORT_DIPSETTING(    0x40, "34 Enemies" )
 	PORT_DIPSETTING(    0x40, "29 Enemies" )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START                /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -189,20 +294,18 @@ INPUT_PORTS_START( beaminva )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START                /* IN2 for player 1 */
+	PORT_START_TAG(P1_CONTROL_PORT_TAG)
 	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
-	PORT_START                /* FAKE IN2 for player 2 */
-	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
-	PORT_START_TAG("IN3")     /* IN3 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )  /* should be V128, using VBLANK slows game down */
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START_TAG(P2_CONTROL_PORT_TAG)
+	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 INPUT_PORTS_END
+
 
 
 /*************************************
  *
- *  Machine drivers
+ *  Machine driver
  *
  *************************************/
 
@@ -212,10 +315,11 @@ static MACHINE_DRIVER_START( beaminv )
 	MDRV_CPU_ADD(Z80, 2000000)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(0,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
+
+	MDRV_MACHINE_START(beaminv)
+	MDRV_MACHINE_RESET(beaminv)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -227,6 +331,7 @@ static MACHINE_DRIVER_START( beaminv )
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 MACHINE_DRIVER_END
+
 
 
 /*************************************
@@ -256,11 +361,12 @@ ROM_START( beaminva )
 ROM_END
 
 
+
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAME( 19??, beaminv,  0      ,  beaminv,  beaminv,  0, ROT0, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND)
-GAME( 1979, beaminva, beaminv,  beaminv,  beaminva, 0, ROT0, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND) // what's the real title ?
+GAME( 19??, beaminv,  0,       beaminv, beaminv,  0, ROT0, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT0, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE) // what's the real title ?

@@ -61,6 +61,7 @@ MACHINE_RESET( neogeo )
 		memory_region(REGION_CPU1)[0x1FFFFC/2] = jumper;
 	}
 
+	neogeo_start_timers();
 }
 
 
@@ -167,6 +168,8 @@ DRIVER_INIT( neogeo )
 
 MACHINE_START( neogeo )
 {
+	neogeo_create_timers();
+
 	/* register state save */
 	neogeo_register_main_savestate();
 	neogeo_register_sub_savestate();

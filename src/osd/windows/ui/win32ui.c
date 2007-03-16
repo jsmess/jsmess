@@ -5598,7 +5598,7 @@ static void MamePlayBackGame()
 
 	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_INPUT_FILES))
 	{
-		mame_file_error fileerr;
+		file_error fileerr;
 		mame_file* pPlayBack;
 		char drive[_MAX_DRIVE];
 		char dir[_MAX_DIR];

@@ -229,7 +229,7 @@ static UINT64 get_file_size(const char *filename)
 {
 	osd_file *file;
 	UINT64 filesize = 0;
-	mame_file_error filerr;
+	file_error filerr;
 
 	filerr = osd_open(filename, OPEN_FLAG_READ, &file, &filesize);
 	if (filerr == FILERR_NONE)
@@ -2714,7 +2714,7 @@ cleanup:
 
 static chd_interface_file *chdman_open(const char *filename, const char *mode)
 {
-	mame_file_error filerr;
+	file_error filerr;
 	chd_interface_file *file;
 	UINT32 openflags = 0;
 

@@ -37,7 +37,7 @@ To Do:
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 
-static int fuuki16_raster_enable = 1; /* Enabled by default */
+static mame_timer *raster_interrupt_timer;
 
 /* Variables defined in video: */
 
@@ -62,6 +62,16 @@ VIDEO_UPDATE( fuuki16 );
 
 
 ***************************************************************************/
+
+static WRITE16_HANDLER( fuuki16_vregs_w )
+{
+	UINT16 old_data	=	fuuki16_vregs[offset];
+	UINT16 new_data	=	COMBINE_DATA(&fuuki16_vregs[offset]);
+	if ((offset == 0x1c/2) && old_data != new_data)
+	{
+		mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, new_data, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
+	}
+}
 
 static WRITE16_HANDLER( fuuki16_sound_command_w )
 {
@@ -100,7 +110,7 @@ static ADDRESS_MAP_START( fuuki16_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x601fff) AM_WRITE(spriteram16_w) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
 	AM_RANGE(0x608000, 0x609fff) AM_WRITE(spriteram16_w						)	// Sprites (? Mirror ?)
 	AM_RANGE(0x700000, 0x703fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x8c0000, 0x8c001f) AM_WRITE(MWA16_RAM) AM_BASE(&fuuki16_vregs			)	// Video Registers
+	AM_RANGE(0x8c0000, 0x8c001f) AM_WRITE(fuuki16_vregs_w) AM_BASE(&fuuki16_vregs )	// Video Registers
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(fuuki16_sound_command_w			)	// To Sound CPU
 	AM_RANGE(0x8d0000, 0x8d0003) AM_WRITE(MWA16_RAM) AM_BASE(&fuuki16_unknown		)	//
 	AM_RANGE(0x8e0000, 0x8e0001) AM_WRITE(MWA16_RAM) AM_BASE(&fuuki16_priority		)	//
@@ -512,39 +522,50 @@ static struct YM3812interface fuuki16_ym3812_intf =
             effects when you die and its clearing the blocks
             also used for water effects and titlescreen linescroll on gogomile
 */
-#define INTERRUPTS_NUM	(256-1) // Give much better results than 256..
-INTERRUPT_GEN( fuuki16_interrupt )
+
+static void level_1_interrupt_callback(int param)
 {
-	if ( cpu_getiloops() == 1 )
-		cpunum_set_input_line(0, 1, PULSE_LINE);
-
-//  if ( cpu_getiloops() == 2 ) /* Not used - Glitches hiscore table? */
-//      cpunum_set_input_line(0, 2, PULSE_LINE);
-
-	if ( cpu_getiloops() == 0 )
-	{
-		cpunum_set_input_line(0, 3, PULSE_LINE);	// VBlank IRQ
-
-		if (code_pressed_memory(KEYCODE_F1))
-		{
-			fuuki16_raster_enable ^= 1;
-			popmessage("raster effects %sabled",fuuki16_raster_enable ? "en" : "dis");
-		}
-	}
-
-	if ( (fuuki16_vregs[0x1c/2] & 0xff) == (INTERRUPTS_NUM-1 - cpu_getiloops()) )
-	{
-		cpunum_set_input_line(0, 5, PULSE_LINE);	// Raster Line IRQ
-		if(fuuki16_raster_enable) video_screen_update_partial(0, cpu_getscanline());
-	}
+	cpunum_set_input_line(0, 1, PULSE_LINE);
+	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
 }
+
+
+static void vblank_interrupt_callback(int param)
+{
+	cpunum_set_input_line(0, 3, PULSE_LINE);	// VBlank IRQ
+	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+}
+
+
+static void raster_interrupt_callback(int param)
+{
+	cpunum_set_input_line(0, 5, PULSE_LINE);	// Raster Line IRQ
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+	mame_timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, time_zero);
+}
+
+
+static MACHINE_START( fuuki16 )
+{
+	raster_interrupt_timer = mame_timer_alloc(raster_interrupt_callback);
+
+	return 0;
+}
+
+
+static MACHINE_RESET( fuuki16 )
+{
+	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, Machine->screen[0].visarea.max_x + 1), 0, time_zero);
+}
+
 
 static MACHINE_DRIVER_START( fuuki16 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(fuuki16_readmem,fuuki16_writemem)
-	MDRV_CPU_VBLANK_INT(fuuki16_interrupt,INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* ? */
@@ -552,7 +573,9 @@ static MACHINE_DRIVER_START( fuuki16 )
 	MDRV_CPU_IO_MAP(fuuki16_sound_readport,fuuki16_sound_writeport)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_MACHINE_START(fuuki16)
+	MDRV_MACHINE_RESET(fuuki16)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

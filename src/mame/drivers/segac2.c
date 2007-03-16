@@ -450,7 +450,7 @@ static WRITE16_HANDLER( io_chip_w )
 			newbank = data & 3;
 			if (newbank != palbank)
 			{
-				video_screen_update_partial(0, cpu_getscanline() + 1);
+				video_screen_update_partial(0, video_screen_get_vpos(0) + 1);
 				palbank = newbank;
 				recompute_palette_tables();
 			}
@@ -548,11 +548,11 @@ static WRITE16_HANDLER( prot_w )
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != sp_palbase || new_bg_palbase != bg_palbase)
 	{
-		video_screen_update_partial(0, cpu_getscanline() + 1);
+		video_screen_update_partial(0, video_screen_get_vpos(0) + 1);
 		sp_palbase = new_sp_palbase;
 		bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", bg_palbase, sp_palbase, cpu_getscanline());
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", bg_palbase, sp_palbase, video_screen_get_vpos(0));
 	}
 }
 
@@ -1297,7 +1297,6 @@ static MACHINE_DRIVER_START( segac )
 	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int)(((262. - 224.) / 262.) * 1000000. / 60.)))
 
 	MDRV_MACHINE_START(segac2)
 	MDRV_MACHINE_RESET(segac2)
@@ -1306,7 +1305,7 @@ static MACHINE_DRIVER_START( segac )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320,224)
+	MDRV_SCREEN_SIZE(342,262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MDRV_PALETTE_LENGTH(2048)
 

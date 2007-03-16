@@ -703,7 +703,7 @@ static void print_game_display(FILE* out, const game_driver* game)
 				fprintf(out, " height=\"%d\"", dy);
 			}
 
-			fprintf(out, " refresh=\"%f\"", driver.screen[scrnum].defstate.refresh);
+			fprintf(out, " refresh=\"%f\"", SUBSECONDS_TO_HZ(driver.screen[scrnum].defstate.refresh));
 
 			fprintf(out, " />\n");
 		}

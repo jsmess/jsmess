@@ -5,15 +5,21 @@
 ****************************************************************************/
 
 
-#define MW8080BW_MASTER_CLOCK	(19968000)
-#define MW8080BW_CPU_CLOCK		(MW8080BW_MASTER_CLOCK / 10)
-#define MW8080BW_PIXEL_CLOCK	(MW8080BW_MASTER_CLOCK / 4)
-#define MW8080BW_HTOTAL			(320)
-#define MW8080BW_VTOTAL			(262)
-#define MW8080BW_HBEND			(0)
-#define MW8080BW_HBSTART		(256)
-#define MW8080BW_VBEND			(0)
-#define MW8080BW_VBSTART		(224)
+#define MW8080BW_MASTER_CLOCK				(19968000)
+#define MW8080BW_CPU_CLOCK					(MW8080BW_MASTER_CLOCK / 10)
+#define MW8080BW_PIXEL_CLOCK				(MW8080BW_MASTER_CLOCK / 4)
+#define MW8080BW_HTOTAL						(0x140)
+#define MW8080BW_HBEND						(0x000)
+#define MW8080BW_HBSTART					(0x100)
+#define MW8080BW_VTOTAL						(0x106)
+#define MW8080BW_VBEND						(0x000)
+#define MW8080BW_VBSTART					(0x0e0)
+#define MW8080BW_VCOUNTER_START_NO_VBLANK	(0x020)
+#define MW8080BW_VCOUNTER_START_VBLANK		(0x0da)
+#define MW8080BW_INT_TRIGGER_COUNT_1		(0x080)
+#define MW8080BW_INT_TRIGGER_VBLANK_1		(0)
+#define MW8080BW_INT_TRIGGER_COUNT_2		MW8080BW_VCOUNTER_START_VBLANK
+#define MW8080BW_INT_TRIGGER_VBLANK_2		(1)
 
 /* +4 is added to HBSTART because the hardware displays that many pixels after
    setting HBLANK */
@@ -23,6 +29,9 @@
 /*----------- defined in drivers/mw8080bw.c -----------*/
 
 UINT8 mw8080bw_ram_r(offs_t offset);
+MACHINE_DRIVER_EXTERN( mw8080bw_root );
+MACHINE_DRIVER_EXTERN( invaders );
+extern const char layout_invaders[];
 
 #define SEAWOLF_GUN_PORT_TAG			("GUN")
 
@@ -50,6 +59,12 @@ void invaders_set_flip_screen(UINT8 data);
 int invaders_is_cabinet_cocktail(void);
 
 #define BLUESHRK_SPEAR_PORT_TAG			("SPEAR")
+
+
+/*----------- defined in machine/mw8080bw.c -----------*/
+
+MACHINE_START( mw8080bw );
+MACHINE_RESET( mw8080bw );
 
 
 /*----------- defined in audio/mw8080bw.c -----------*/

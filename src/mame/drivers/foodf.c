@@ -79,6 +79,8 @@
 #include "foodf.h"
 
 
+#define MASTER_CLOCK		12096000
+
 
 /*************************************
  *
@@ -86,6 +88,7 @@
  *
  *************************************/
 
+static mame_timer *scanline_timer;
 static UINT8 whichport = 0;
 
 
@@ -127,16 +130,36 @@ static void update_interrupts(void)
 
 static void scanline_update(int scanline)
 {
+	/* WARNING: the timing of this is not perfectly accurate; it should fire on
+       32V (i.e., on scanlines 32, 96, 160, and 224). However, due to the interrupt
+       structure, it cannot fire at the same time as VBLANK. I have not solved this
+       mystery yet */
+
 	/* INT 1 is on 32V */
-	if (scanline & 32)
-		atarigen_scanline_int_gen();
+	atarigen_scanline_int_gen();
+
+	/* advance to the next interrupt */
+	scanline += 64;
+	if (scanline > 192)
+		scanline = 0;
+
+	/* set a timer for it */
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
+}
+
+
+static MACHINE_START( foodf )
+{
+	state_save_register_global(whichport);
+	scanline_timer = mame_timer_alloc(scanline_update);
+	return 0;
 }
 
 
 static MACHINE_RESET( foodf )
 {
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, scanline_update, 32);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 }
 
 
@@ -153,10 +176,15 @@ static WRITE16_HANDLER( digital_w )
 	{
 		foodf_set_flip(data & 0x01);
 
+		/* bit 1 = UPDATE */
+
 		if (!(data & 0x04))
 			atarigen_scanline_int_ack_w(0,0,0);
 		if (!(data & 0x08))
 			atarigen_video_int_ack_w(0,0,0);
+
+		output_set_led_value(0, (data >> 4) & 1);
+		output_set_led_value(1, (data >> 5) & 1);
 
 		coin_counter_w(0, (data >> 6) & 1);
 		coin_counter_w(1, (data >> 7) & 1);
@@ -207,21 +235,21 @@ static WRITE16_HANDLER( pokey3_word_w ) { if (ACCESSING_LSB) pokey3_w(offset, da
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x014000, 0x01bfff) AM_RAM
-	AM_RANGE(0x01c000, 0x01cfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0x900000, 0x9001ff) AM_READWRITE(nvram_r, MWA16_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x940000, 0x940007) AM_READ(analog_r)
-	AM_RANGE(0x944000, 0x944007) AM_WRITE(analog_w)
-	AM_RANGE(0x948000, 0x948001) AM_READWRITE(input_port_4_word_r, digital_w)
-	AM_RANGE(0x94c000, 0x94c001) AM_READ(MRA16_NOP) /* Used from PC 0x776E */
-	AM_RANGE(0x950000, 0x9501ff) AM_WRITE(foodf_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x954000, 0x954001) AM_WRITENOP
-	AM_RANGE(0x958000, 0x958001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
-	AM_RANGE(0xa40000, 0xa4001f) AM_READWRITE(pokey2_word_r, pokey2_word_w)
-	AM_RANGE(0xa80000, 0xa8001f) AM_READWRITE(pokey1_word_r, pokey1_word_w)
-	AM_RANGE(0xac0000, 0xac001f) AM_READWRITE(pokey3_word_r, pokey3_word_w)
+	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x3e0000) AM_ROM
+	AM_RANGE(0x014000, 0x014fff) AM_MIRROR(0x3e3000) AM_RAM
+	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
+	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_READWRITE(MRA16_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_READWRITE(nvram_r, MWA16_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
+	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)
+	AM_RANGE(0x948000, 0x948001) AM_MIRROR(0x023ffe) AM_READWRITE(input_port_4_word_r, digital_w)
+	AM_RANGE(0x950000, 0x9501ff) AM_MIRROR(0x023e00) AM_WRITE(foodf_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x954000, 0x954001) AM_MIRROR(0x023ffe) AM_WRITENOP	/* RECALL */
+	AM_RANGE(0x958000, 0x958001) AM_MIRROR(0x023ffe) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
+	AM_RANGE(0xa40000, 0xa4001f) AM_MIRROR(0x03ffe0) AM_READWRITE(pokey2_word_r, pokey2_word_w)
+	AM_RANGE(0xa80000, 0xa8001f) AM_MIRROR(0x03ffe0) AM_READWRITE(pokey1_word_r, pokey1_word_w)
+	AM_RANGE(0xac0000, 0xac001f) AM_MIRROR(0x03ffe0) AM_READWRITE(pokey3_word_r, pokey3_word_w)
 ADDRESS_MAP_END
 
 
@@ -250,7 +278,7 @@ INPUT_PORTS_START( foodf )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
@@ -291,8 +319,8 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4 },
-	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP4(8*8,1), STEP4(0,1) },
+	{ STEP8(0,8) },
 	8*16
 };
 
@@ -303,16 +331,16 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,2),
 	2,
 	{ RGN_FRAC(1,2), 0 },
-	{ 8*16+0, 8*16+1, 8*16+2, 8*16+3, 8*16+4, 8*16+5, 8*16+6, 8*16+7, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(8*16,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	8*32
 };
 
 
 static const gfx_decode gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &charlayout,   0, 64 },	/* characters 8x8 */
-	{ REGION_GFX2, 0, &spritelayout, 0, 64 },	/* sprites & playfield */
+	{ REGION_GFX1, 0, &charlayout,   0, 64 },
+	{ REGION_GFX2, 0, &spritelayout, 0, 32 },
 	{ -1 }
 };
 
@@ -345,22 +373,23 @@ static struct POKEYinterface pokey_interface =
 static MACHINE_DRIVER_START( foodf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 6000000)
+	MDRV_CPU_ADD(M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-
+	MDRV_MACHINE_START(foodf)
 	MDRV_MACHINE_RESET(foodf)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
 
 	MDRV_VIDEO_START(foodf)
 	MDRV_VIDEO_UPDATE(foodf)
@@ -368,14 +397,14 @@ static MACHINE_DRIVER_START( foodf )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(POKEY, 600000)
+	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/2/10)
 	MDRV_SOUND_CONFIG(pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MDRV_SOUND_ADD(POKEY, 600000)
+	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/2/10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MDRV_SOUND_ADD(POKEY, 600000)
+	MDRV_SOUND_ADD(POKEY, MASTER_CLOCK/2/10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
@@ -404,6 +433,9 @@ ROM_START( foodf )
 	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "136020-110.4d",   0x000000, 0x002000, CRC(8870e3d6) SHA1(702007d3d543f872b5bf5d00b49f6e05b46d6600) )
 	ROM_LOAD( "136020-111.4e",   0x002000, 0x002000, CRC(84372edf) SHA1(9beef3ff3b28405c45d691adfbc233921073be47) )
+
+	ROM_REGION( 0x100, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
 ROM_END
 
 
@@ -424,6 +456,9 @@ ROM_START( foodf2 )
 	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "136020-110.4d",   0x000000, 0x002000, CRC(8870e3d6) SHA1(702007d3d543f872b5bf5d00b49f6e05b46d6600) )
 	ROM_LOAD( "136020-111.4e",   0x002000, 0x002000, CRC(84372edf) SHA1(9beef3ff3b28405c45d691adfbc233921073be47) )
+
+	ROM_REGION( 0x100, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
 ROM_END
 
 
@@ -444,6 +479,9 @@ ROM_START( foodfc )
 	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "136020-110.4d",   0x000000, 0x002000, CRC(8870e3d6) SHA1(702007d3d543f872b5bf5d00b49f6e05b46d6600) )
 	ROM_LOAD( "136020-111.4e",   0x002000, 0x002000, CRC(84372edf) SHA1(9beef3ff3b28405c45d691adfbc233921073be47) )
+
+	ROM_REGION( 0x100, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_LOAD( "136020-112.2p",   0x000000, 0x000100, CRC(0aa962d6) SHA1(efb51e4c95efb1b85206c416c1d6d35c6f4ff35c) )
 ROM_END
 
 
@@ -454,6 +492,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, foodf,  0,     foodf, foodf, 0, ROT0, "Atari", "Food Fight (rev 3)", 0 )
-GAME( 1982, foodf2, foodf, foodf, foodf, 0, ROT0, "Atari", "Food Fight (rev 2)", 0 )
-GAME( 1982, foodfc, foodf, foodf, foodf, 0, ROT0, "Atari", "Food Fight (cocktail)", 0 )
+GAME( 1982, foodf,  0,     foodf, foodf, 0, ROT0, "Atari", "Food Fight (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1982, foodf2, foodf, foodf, foodf, 0, ROT0, "Atari", "Food Fight (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, foodfc, foodf, foodf, foodf, 0, ROT0, "Atari", "Food Fight (cocktail)", GAME_SUPPORTS_SAVE )

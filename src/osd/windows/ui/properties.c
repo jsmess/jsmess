@@ -749,12 +749,12 @@ static char *GameInfoScreen(UINT nIndex)
 			sprintf(buf,"%d x %d (V) %f Hz",
 			drv.screen[0].defstate.visarea.max_y - drv.screen[0].defstate.visarea.min_y + 1,
 					drv.screen[0].defstate.visarea.max_x - drv.screen[0].defstate.visarea.min_x + 1,
-					drv.screen[0].defstate.refresh);
+					(float) drv.screen[0].defstate.refresh);
 		else
 			sprintf(buf,"%d x %d (H) %f Hz",
 					drv.screen[0].defstate.visarea.max_x - drv.screen[0].defstate.visarea.min_x + 1,
 					drv.screen[0].defstate.visarea.max_y - drv.screen[0].defstate.visarea.min_y + 1,
-					drv.screen[0].defstate.refresh);
+					(float) drv.screen[0].defstate.refresh);
 	}
 	return buf;
 }

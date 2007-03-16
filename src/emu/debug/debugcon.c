@@ -399,7 +399,7 @@ void debug_console_register_command(const char *command, UINT32 flags, int ref, 
 	debug_command *cmd;
 
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call debug_console_register_command() at init time!");
-	assert_always(options.mame_debug != 0, "Cannot call debug_console_register_command() when debugger is not running");
+	assert_always(Machine->debug_mode, "Cannot call debug_console_register_command() when debugger is not running");
 
 	cmd = auto_malloc(sizeof(*cmd));
 	memset(cmd, 0, sizeof(*cmd));

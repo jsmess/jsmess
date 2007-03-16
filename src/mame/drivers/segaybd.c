@@ -159,8 +159,7 @@ static void scanline_callback(int scanline)
 	update_main_irqs();
 
 	/* come back at the next appropriate scanline */
-	//timer_set(cpu_getscanlinetime(scanline), scanline, scanline_callback);
-	timer_adjust(interrupt_timer,cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -181,8 +180,9 @@ static void scanline_callback(int scanline)
 
 MACHINE_RESET( yboard )
 {
-    interrupt_timer = timer_alloc(scanline_callback);
-    timer_adjust(interrupt_timer,cpu_getscanlinetime(223), 223, 0);
+    interrupt_timer = mame_timer_alloc(scanline_callback);
+    mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223, time_zero);
+
 	state_save_register_global_array(misc_io_data);
 	state_save_register_global_array(analog_data);
 	state_save_register_global(vblank_irq_state);
@@ -213,7 +213,7 @@ static void delayed_sound_data_w(int data)
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_LSB)
-		timer_set(TIME_NOW, data & 0xff, delayed_sound_data_w);
+		mame_timer_set(time_zero, data & 0xff, delayed_sound_data_w);
 }
 
 
@@ -967,7 +967,6 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
 
 	MDRV_MACHINE_RESET(yboard)
 	MDRV_NVRAM_HANDLER(yboard)
@@ -976,7 +975,7 @@ static MACHINE_DRIVER_START( yboard )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 28*8)
+	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_PALETTE_LENGTH(8192*3)
 

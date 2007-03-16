@@ -34,10 +34,10 @@ typedef struct _core_file core_file;
 /* ----- file open/close ----- */
 
 /* open a file with the specified filename */
-mame_file_error core_fopen(const char *filename, UINT32 openflags, core_file **file);
+file_error core_fopen(const char *filename, UINT32 openflags, core_file **file);
 
 /* open a RAM-based "file" using the given data and length (read-only) */
-mame_file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, core_file **file);
+file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, core_file **file);
 
 /* close an open file */
 void core_fclose(core_file *file);

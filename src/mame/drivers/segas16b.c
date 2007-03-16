@@ -1052,7 +1052,7 @@ static MACHINE_RESET( system16b )
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
-		timer_set(TIME_NOW, 0, suspend_i8751);
+		mame_timer_set(time_zero, 0, suspend_i8751);
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)
@@ -1069,7 +1069,7 @@ static void atomicp_sound_irq(int param)
 static MACHINE_RESET( atomicp )
 {
 	machine_reset_system16b(machine);
-	timer_pulse(TIME_IN_HZ(atomicp_sound_rate), 0, atomicp_sound_irq);
+	mame_timer_pulse(MAME_TIME_IN_HZ(atomicp_sound_rate), 0, atomicp_sound_irq);
 }
 
 
@@ -3008,7 +3008,6 @@ static MACHINE_DRIVER_START( system16b )
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
 
 	MDRV_MACHINE_RESET(system16b)
 	MDRV_NVRAM_HANDLER(system16b)
@@ -3016,7 +3015,7 @@ static MACHINE_DRIVER_START( system16b )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 28*8)
+	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048*3)

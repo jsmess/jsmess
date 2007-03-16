@@ -110,7 +110,7 @@ static int (*drv_irq_callbacks[MAX_CPU])(int);
  *
  *************************************/
 
-int cpuint_init(running_machine *machine)
+void cpuint_init(running_machine *machine)
 {
 	int cpunum;
 	int line;
@@ -137,8 +137,6 @@ int cpuint_init(running_machine *machine)
 	state_save_register_item_2d_array("cpu", 0, input_line_state);
 	state_save_register_item_2d_array("cpu", 0, input_line_vector);
 	state_save_pop_tag();
-
-	return 0;
 }
 
 

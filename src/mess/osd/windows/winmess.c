@@ -9,17 +9,50 @@
 #include "strconv.h"
 
 //============================================================
-//  FUNCTION PROTOTYPES
+//  win_error_to_mame_file_error
 //============================================================
 
-extern mame_file_error win_error_to_mame_file_error(DWORD error);
+static file_error win_error_to_mame_file_error(DWORD error)
+{
+	file_error filerr;
+
+	// convert a Windows error to a file_error
+	switch (error)
+	{
+		case ERROR_SUCCESS:
+			filerr = FILERR_NONE;
+			break;
+
+		case ERROR_OUTOFMEMORY:
+			filerr = FILERR_OUT_OF_MEMORY;
+			break;
+
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+			filerr = FILERR_NOT_FOUND;
+			break;
+
+		case ERROR_ACCESS_DENIED:
+			filerr = FILERR_ACCESS_DENIED;
+			break;
+
+		case ERROR_SHARING_VIOLATION:
+			filerr = FILERR_ALREADY_OPEN;
+			break;
+
+		default:
+			filerr = FILERR_FAILURE;
+			break;
+	}
+	return filerr;
+}
 
 
 //============================================================
 //	osd_get_temp_filename
 //============================================================
 
-mame_file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
+file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const char *basename)
 {
 	TCHAR tempbuf[MAX_PATH];
 	TCHAR *t_filename;
@@ -46,9 +79,9 @@ mame_file_error osd_get_temp_filename(char *buffer, size_t buffer_len, const cha
 //	osd_copyfile
 //============================================================
 
-mame_file_error osd_copyfile(const char *destfile, const char *srcfile)
+file_error osd_copyfile(const char *destfile, const char *srcfile)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 	TCHAR *t_destfile = tstring_from_utf8(destfile);
 	TCHAR *t_srcfile = tstring_from_utf8(srcfile);
 
@@ -185,9 +218,9 @@ char *osd_basename(char *filename)
 //	osd_mkdir
 //============================================================
 
-mame_file_error osd_mkdir(const char *dir)
+file_error osd_mkdir(const char *dir)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 
 	TCHAR *tempstr = tstring_from_utf8(dir);
 	if (!tempstr)
@@ -213,9 +246,9 @@ done:
 //	osd_rmdir
 //============================================================
 
-mame_file_error osd_rmdir(const char *dir)
+file_error osd_rmdir(const char *dir)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 
 	TCHAR *tempstr = tstring_from_utf8(dir);
 	if (!tempstr)
@@ -241,9 +274,9 @@ done:
 //	osd_getcurdir
 //============================================================
 
-mame_file_error osd_getcurdir(char *buffer, size_t buffer_len)
+file_error osd_getcurdir(char *buffer, size_t buffer_len)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 	char *tempstr = NULL;
 	TCHAR path[_MAX_PATH];
 
@@ -272,9 +305,9 @@ done:
 //	osd_setcurdir
 //============================================================
 
-mame_file_error osd_setcurdir(const char *dir)
+file_error osd_setcurdir(const char *dir)
 {
-	mame_file_error filerr = FILERR_NONE;
+	file_error filerr = FILERR_NONE;
 
 	TCHAR *tempstr = tstring_from_utf8(dir);
 	if (!tempstr)

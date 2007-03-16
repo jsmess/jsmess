@@ -17,6 +17,9 @@
 #define LOG_DMA				(0)
 
 
+#define DMA_CLOCK			40000000
+
+
 #if KEEP_STATISTICS
 #define ADD_TO_PIXEL_COUNT(a)	do { if ((a) > 0) pixelcount += (a); } while (0)
 #else
@@ -33,6 +36,7 @@
 UINT16 *midvunit_videoram;
 UINT32 *midvunit_textureram;
 
+static UINT16 video_regs[16];
 static UINT16 dma_data[16];
 static UINT8 dma_data_index;
 static UINT16 page_control;
@@ -1092,9 +1096,27 @@ READ32_HANDLER( midvunit_page_control_r )
 
 WRITE32_HANDLER( midvunit_video_control_w )
 {
-	/* the only thing that matters is the vblank int */
+	UINT16 old = video_regs[offset];
+
+	/* update the data */
+	COMBINE_DATA(&video_regs[offset]);
+
+	/* update the scanline timer */
 	if (offset == 0)
 		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, (data & 0x1ff) + 1, 0), data & 0x1ff, time_zero);
+
+	/* if something changed, update our parameters */
+	if (old != video_regs[offset] && video_regs[6] != 0 && video_regs[11] != 0)
+	{
+		rectangle visarea;
+
+		/* derive visible area from blanking */
+		visarea.min_x = 0;
+		visarea.max_x = (video_regs[6] + video_regs[2] - video_regs[5]) % video_regs[6];
+		visarea.min_y = 0;
+		visarea.max_y = (video_regs[11] + video_regs[7] - video_regs[10]) % video_regs[11];
+		video_screen_configure(0, video_regs[6], video_regs[11], &visarea, HZ_TO_SUBSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * video_regs[6] * video_regs[11]);
+	}
 }
 
 

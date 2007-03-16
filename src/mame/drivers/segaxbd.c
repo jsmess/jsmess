@@ -149,7 +149,7 @@ static void scanline_callback(int scanline)
 		update_main_irqs();
 
 	/* come back in 2 scanlines */
-	timer_set(cpu_getscanlinetime(next_scanline), next_scanline, scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), next_scanline, scanline_callback);
 }
 
 
@@ -177,7 +177,7 @@ static void delayed_sound_data_w(int data)
 
 static void sound_data_w(UINT8 data)
 {
-	timer_set(TIME_NOW, data, delayed_sound_data_w);
+	mame_timer_set(time_zero, data, delayed_sound_data_w);
 }
 
 
@@ -221,7 +221,7 @@ MACHINE_RESET( xboard )
 	segaic16_compare_timer_init(1, NULL, NULL);
 
 	/* start timers to track interrupts */
-	timer_set(cpu_getscanlinetime(1), 1, scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 1, 0), 1, scanline_callback);
 }
 
 
@@ -1119,7 +1119,6 @@ static MACHINE_DRIVER_START( xboard )
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
 
 	MDRV_MACHINE_RESET(xboard)
 	MDRV_NVRAM_HANDLER(xboard)
@@ -1128,7 +1127,7 @@ static MACHINE_DRIVER_START( xboard )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 28*8)
+	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(8192*3)

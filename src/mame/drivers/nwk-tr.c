@@ -542,7 +542,7 @@ READ32_HANDLER(K001604_reg_r)
 
 VIDEO_START( nwktr )
 {
-	if (voodoo_start(0, VOODOO_1, 2, 4, 0))
+	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0))
 		return 1;
 
 	return K001604_vh_start(0);
@@ -831,7 +831,6 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
 
 	MDRV_MACHINE_RESET(nwktr)
 	MDRV_NVRAM_HANDLER( timekeeper_0 )

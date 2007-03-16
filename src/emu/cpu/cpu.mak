@@ -1287,6 +1287,23 @@ $(CPUOBJ)/mips/psx.o:	$(CPUSRC)/mips/psx.c \
 
 
 #-------------------------------------------------
+# SSP1610
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_SSP1610=$(if $(filter SSP1610,$(CPUS)),1,0)
+
+ifneq ($(filter SSP1610,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ssp1610
+CPUOBJS += $(CPUOBJ)/ssp1610/ssp1610.o
+DBGOBJS += $(CPUOBJ)/ssp1610/ssp1610d.o
+endif
+
+$(CPUOBJ)/ssp1610/ssp1610.o:	$(CPUSRC)/mips/ssp1610.c \
+								$(CPUSRC)/mips/ssp1610.h
+
+
+
+#-------------------------------------------------
 # Texas Instruments TMS7000 series
 #-------------------------------------------------
 

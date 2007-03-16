@@ -2117,7 +2117,7 @@ static void stars_scroll_callback(int param)
 
 static void start_stars_scroll_timer()
 {
-	timer_adjust(stars_scroll_timer, TIME_IN_HZ(Machine->screen[0].refresh), 0, TIME_IN_HZ(Machine->screen[0].refresh));
+	mame_timer_adjust(stars_scroll_timer, make_mame_time(0, Machine->screen[0].refresh), 0, make_mame_time(0, Machine->screen[0].refresh));
 }
 
 

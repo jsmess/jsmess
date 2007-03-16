@@ -84,10 +84,6 @@ struct _win_video_config
 //============================================================
 
 extern win_monitor_info *win_monitor_list;
-
-extern int video_orientation;
-
-
 extern win_video_config video_config;
 
 

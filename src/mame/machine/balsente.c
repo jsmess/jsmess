@@ -111,15 +111,15 @@ static void interrupt_timer(int param)
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		timer_adjust(scanline_timer, cpu_getscanlinetime(64), 64, 0);
+		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 64, 0), 64, time_zero);
 	else
-		timer_adjust(scanline_timer, cpu_getscanlinetime(param + 64), param + 64, 0);
+		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, param + 64, 0), param + 64, time_zero);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(cpu_getscanlineperiod() * 0.9, 0, irq_off);
+	mame_timer_set(video_screen_get_time_until_pos(0, param, BALSENTE_HBSTART), 0, irq_off);
 
 	/* if this is Grudge Match, update the steering */
 	if (grudge_steering_result & 0x80)
@@ -155,14 +155,14 @@ MACHINE_RESET( balsente )
 
 	/* reset counters; counter 2's gate is tied high */
 	memset(counter, 0, sizeof(counter));
-	counter[1].timer = timer_alloc(counter_callback);
-	counter[2].timer = timer_alloc(counter_callback);
+	counter[1].timer = mame_timer_alloc(counter_callback);
+	counter[2].timer = mame_timer_alloc(counter_callback);
 	counter[2].gate = 1;
 
 	/* reset the manual counter 0 clock */
 	counter_control = 0x00;
 	counter_0_ff = 0;
-	counter_0_timer = timer_alloc(clock_counter_0_ff);
+	counter_0_timer = mame_timer_alloc(clock_counter_0_ff);
 	counter_0_timer_active = 0;
 
 	/* reset the ADC states */
@@ -191,8 +191,8 @@ MACHINE_RESET( balsente )
 	memory_set_bank(2, 0);
 
 	/* start a timer to generate interrupts */
-	scanline_timer = timer_alloc(interrupt_timer);
-	timer_adjust(scanline_timer, cpu_getscanlinetime(0), 0, 0);
+	scanline_timer = mame_timer_alloc(interrupt_timer);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 
 	/* register for saving */
 	for (i = 0; i < 3; i++)
@@ -536,7 +536,7 @@ static void m6850_w_callback(int param)
 
 	/* set a timer for 500usec later to actually transmit the data */
 	/* (this is very important for several games, esp Snacks'n Jaxson) */
-	timer_set(TIME_IN_USEC(500), param, m6850_data_ready_callback);
+	mame_timer_set(MAME_TIME_IN_USEC(500), param, m6850_data_ready_callback);
 }
 
 
@@ -553,7 +553,7 @@ WRITE8_HANDLER( balsente_m6850_w )
 
 	/* output register is at offset 1; set a timer to synchronize the CPUs */
 	else
-		timer_set(TIME_NOW, data, m6850_w_callback);
+		mame_timer_set(time_zero, data, m6850_w_callback);
 }
 
 
@@ -670,7 +670,7 @@ WRITE8_HANDLER( balsente_adc_select_w )
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
 logerror("adc_select %d\n", offset & 7);
-	timer_set(TIME_IN_USEC(50), offset & 7, adc_finished);
+	mame_timer_set(MAME_TIME_IN_USEC(50), offset & 7, adc_finished);
 }
 
 
@@ -692,7 +692,7 @@ INLINE void counter_start(int which)
 		if (counter[which].gate && !counter[which].timer_active)
 		{
 			counter[which].timer_active = 1;
-			timer_adjust(counter[which].timer, TIME_IN_HZ(2000000) * (double)counter[which].count, which, 0);
+			mame_timer_adjust(counter[which].timer, double_to_mame_time(TIME_IN_HZ(2000000) * (double)counter[which].count), which, time_zero);
 		}
 	}
 }
@@ -702,7 +702,7 @@ INLINE void counter_stop(int which)
 {
 	/* only stop the timer if it exists */
 	if (counter[which].timer_active)
-		timer_adjust(counter[which].timer, TIME_NEVER, 0, 0);
+		mame_timer_adjust(counter[which].timer, time_never, 0, time_zero);
 	counter[which].timer_active = 0;
 }
 
@@ -713,7 +713,7 @@ INLINE void counter_update_count(int which)
 	if (counter[which].timer_active)
 	{
 		/* determine how many 2MHz cycles are remaining */
-		int count = (int)(timer_timeleft(counter[which].timer) / TIME_IN_HZ(2000000));
+		int count = (int)(mame_time_to_double(mame_timer_timeleft(counter[which].timer)) / TIME_IN_HZ(2000000));
 		counter[which].count = (count < 0) ? 0 : count;
 	}
 }
@@ -941,7 +941,7 @@ static void update_counter_0_timer(void)
 
 	/* if there's already a timer, remove it */
 	if (counter_0_timer_active)
-		timer_adjust(counter_0_timer, TIME_NEVER, 0, 0);
+		mame_timer_adjust(counter_0_timer, time_never, 0, time_zero);
 	counter_0_timer_active = 0;
 
 	/* find the counter with the maximum frequency */
@@ -966,7 +966,7 @@ static void update_counter_0_timer(void)
 	if (maxfreq > 0.0)
 	{
 		counter_0_timer_active = 1;
-		timer_adjust(counter_0_timer, TIME_IN_HZ(maxfreq), 0, TIME_IN_HZ(maxfreq));
+		mame_timer_adjust(counter_0_timer, MAME_TIME_IN_HZ(maxfreq), 0, MAME_TIME_IN_HZ(maxfreq));
 	}
 }
 
@@ -1015,7 +1015,7 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	/* if we gate off, remove the timer */
 	else if (counter[0].gate && !(data & 0x02) && counter_0_timer_active)
 	{
-		timer_adjust(counter_0_timer, TIME_NEVER, 0, 0);
+		mame_timer_adjust(counter_0_timer, time_never, 0, time_zero);
 		counter_0_timer_active = 0;
 	}
 
@@ -1213,7 +1213,7 @@ static void update_grudge_steering(void)
 
 READ8_HANDLER( grudge_steering_r )
 {
-	logerror("%04X:grudge_steering_r(@%d)\n", activecpu_get_pc(), cpu_getscanline());
+	logerror("%04X:grudge_steering_r(@%d)\n", activecpu_get_pc(), video_screen_get_vpos(0));
 	grudge_steering_result |= 0x80;
 	return grudge_steering_result;
 }

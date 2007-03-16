@@ -87,7 +87,7 @@
     GQ974      GCA12          2001    Keyboardmania 3rd Mix
     GQ977      GQ977          2000    Para Para Paradise
     GQ977      GQ977          2000    Para Para Dancing
-    GQ977(?)   ?              2000    Para Para Paradise 1.1
+    GQ977      GC977          2000    Para Para Paradise 1.1
     GQ977      GQA11          2000    Para Para Paradise 1st Mix+
     GQA02(?)   ?              2000    Pop n' Music 4
     ???        ?              2000    Pop n' Music 5
@@ -347,6 +347,54 @@ static void gcu_fill_rect(mame_bitmap *bitmap, const rectangle *cliprect, UINT32
 	}
 }
 
+static void gcu_draw_character(int chip, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *cmd)
+{
+	// 0x00: xxx----- -------- -------- --------   command type
+	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   character data address in vram
+
+	// 0x01: -------- -------- ------xx xxxxxxxx   character x
+	// 0x01: -------- ----xxxx xxxxxx-- --------   character y
+
+	// 0x02: xxxxxxxx xxxxxxxx -------- --------   color 0
+	// 0x02: -------- -------- xxxxxxxx xxxxxxxx   color 1
+
+	// 0x03: xxxxxxxx xxxxxxxx -------- --------   color 2
+	// 0x03: -------- -------- xxxxxxxx xxxxxxxx   color 3
+
+	int i, j;
+	int x				= cmd[1] & 0x3ff;
+	int y				= (cmd[1] >> 10) & 0x3ff;
+	UINT32 address		= cmd[0] & 0xffffff;
+	UINT16 color[4];
+
+	UINT16 *vr = (UINT16*)gcu[chip].vram;
+
+	color[0] = (cmd[2] >> 16) & 0xffff;
+	color[1] = (cmd[2] >>  0) & 0xffff;
+	color[2] = (cmd[3] >> 16) & 0xffff;
+	color[3] = (cmd[3] >>  0) & 0xffff;
+
+
+	if (y > cliprect->max_y || x > cliprect->max_x) {
+		return;
+	}
+
+
+	for (j=0; j < 8; j++)
+	{
+		UINT16 *d = BITMAP_ADDR16(bitmap, y+j, x);
+		UINT16 line = vr[address^1];
+
+		address += 4;
+
+		for (i=0; i < 8; i++)
+		{
+			int pix = (line >> ((7-i) * 2)) & 3;
+			d[i] = color[pix];
+		}
+	}
+}
+
 static void gcu_exec_display_list(int chip, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 address)
 {
 	int counter = 0;
@@ -401,6 +449,12 @@ static void gcu_exec_display_list(int chip, mame_bitmap *bitmap, const rectangle
 				break;
 			}
 
+			case 0x7:		// Draw 8x8 Character (2-bits per pixel)
+			{
+				gcu_draw_character(chip, bitmap, cliprect, cmd);
+				break;
+			}
+
 			default:
 				//printf("Unknown command %08X %08X %08X %08X at %08X\n", cmd[0], cmd[1], cmd[2], cmd[3], i*4);
 				break;
@@ -422,17 +476,21 @@ static VIDEO_UPDATE(firebeat)
 
 	if (layer >= 2)
 	{
-		gcu_exec_display_list(chip, bitmap, cliprect, 0x0000);
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x8000);
+		gcu_exec_display_list(chip, bitmap, cliprect, 0x0000);
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x10000);
 	}
 	else if (layer == 0)
 	{
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x200000);
+
+		//gcu_exec_display_list(chip, bitmap, cliprect, 0x186040);
 	}
 	else if (layer == 1)
 	{
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x1d0800);
+
+		gcu_exec_display_list(chip, bitmap, cliprect, 0x1a9440);
 
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x1f80000);
 	}
@@ -609,9 +667,13 @@ static READ32_HANDLER(input_r)
 	{
 		r |= (readinputport(0) & 0xff) << 24;
 	}
+	if (!(mem_mask & 0x0000ff00))
+	{
+		r |= (readinputport(1) & 0xff) << 8;
+	}
 	if (!(mem_mask & 0x000000ff))
 	{
-		r |= (readinputport(1) & 0xff);
+		r |= (readinputport(2) & 0xff);
 	}
 
 	return r;
@@ -621,11 +683,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return readinputport(2) | 0x01000100;
+		return readinputport(3) | 0x01000100;
 	}
 	else
 	{
-		return readinputport(3) | 0x01000100;
+		return readinputport(4) | 0x01000100;
 	}
 }
 
@@ -1314,11 +1376,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return readinputport(2) << 24;
+		return readinputport(3) << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return readinputport(3) << 24;
+		return readinputport(4) << 24;
 	}
 
 	return 0;
@@ -1402,7 +1464,7 @@ static void keyboard_timer_callback(int value)
 
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = readinputport(4 + keyboard);
+		UINT32 kbstate = readinputport(5 + keyboard);
 		int uart_channel = kb_uart_channel[keyboard];
 
 		if (kbstate != keyboard_state[keyboard])
@@ -1614,6 +1676,7 @@ static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
 	AM_RANGE(0x7000a000, 0x7000a003) AM_READ(extend_board_irq_r)
+	AM_RANGE(0x74000000, 0x740003ff) AM_RAM									// SPU shared RAM
 	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
 	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
 	AM_RANGE(0x7d000400, 0x7d000403) AM_READWRITE(sound_r, sound_w)
@@ -1693,6 +1756,9 @@ INPUT_PORTS_START(ppp)
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Dip switches */
 
 	// ParaParaParadise has 24 sensors, grouped into groups of 3 for each sensor bar
@@ -1722,6 +1788,10 @@ INPUT_PORTS_START(kbm)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )			// e-Amusement
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Dip switches */
 
 	PORT_START_TAG("WHEEL_P1")			// Keyboard modulation wheel (P1)
@@ -1781,6 +1851,32 @@ INPUT_PORTS_START(kbm)
 	PORT_BIT( 0x200000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x400000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 A2#") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x800000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 B2") PORT_CODE(KEYCODE_N)
+
+INPUT_PORTS_END
+
+INPUT_PORTS_START(popn)
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )			// Switch 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )			// Switch 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )			// Switch 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )			// Switch 4
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )			// Switch 5
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )			// Switch 6
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )			// Switch 7
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )			// Switch 8
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )			// Switch 9
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )				// Coin
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW)			// Test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_7)		// Service
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Dip switches */
 
 INPUT_PORTS_END
 
@@ -2070,12 +2166,15 @@ static void init_lights(write32_handler out1, write32_handler out2, write32_hand
 
 static DRIVER_INIT(firebeat)
 {
+	UINT8 *rom = memory_region(REGION_USER2);
+
 	atapi_init();
 	intelflash_init(0, FLASH_FUJITSU_29F016A, NULL);
 	intelflash_init(1, FLASH_FUJITSU_29F016A, NULL);
 	intelflash_init(2, FLASH_FUJITSU_29F016A, NULL);
 
 	rtc65271_init(xram, NULL);
+
 	pc16552d_init(0, 19660800, comm_uart_irq_callback);		// Network UART
 	pc16552d_init(1, 24000000, midi_uart_irq_callback);		// MIDI UART
 
@@ -2086,27 +2185,21 @@ static DRIVER_INIT(firebeat)
 
 	ppc403_install_spu_tx_handler(security_w);
 
+	set_ibutton(rom);
+
 	init_lights(NULL, NULL, NULL);
 }
 
 static DRIVER_INIT(ppp)
 {
-	UINT8 *rom = memory_region(REGION_USER2);
-
 	init_firebeat(machine);
 	init_lights(lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
-
-	set_ibutton(rom);
 }
 
 static DRIVER_INIT(ppd)
 {
-	UINT8 *rom = memory_region(REGION_USER2);
-
 	init_firebeat(machine);
 	init_lights(lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
-
-	set_ibutton(rom);
 
 	cur_cab_data = ppd_cab_data;
 }
@@ -2120,12 +2213,8 @@ static void init_keyboard(void)
 
 static DRIVER_INIT(kbm)
 {
-	UINT8 *rom = memory_region(REGION_USER2);
-
 	init_firebeat(machine);
 	init_lights(lamp_output_kbm_w, NULL, NULL);
-
-	set_ibutton(rom);
 
 	init_keyboard();
 
@@ -2158,7 +2247,7 @@ ROM_START( kbm )
 	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
-	// TODO: needs fake data
+	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4578f29b) SHA1(faaeaf6357c1e86e898e7017566cfd2fc7ee3d6f))
 
 	DISK_REGION( REGION_DISKS )
 	DISK_IMAGE_READONLY( "974jac01", 0, SHA1(18179bf23519d5b0c82c72e8f47dfaa4d2c4a3e2) MD5(cb68cf69e55aa33429f149f474e2c96e) )
@@ -2223,11 +2312,27 @@ ROM_START( ppd )
 	DISK_IMAGE_READONLY( "977kaa02", 1, SHA1(45d5cda77f789351260bbd6f9c47a5fa93998133) MD5(b58978a81931058fe28825b6147b1bed) )
 ROM_END
 
+ROM_START( ppp11 )
+	// TODO: incorrect bios (should be 977jaa03)
+	ROM_REGION32_BE(0x80000, REGION_USER1, 0)
+	ROM_LOAD16_WORD_SWAP("974a03.e21", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
+
+	ROM_REGION(0x400000, REGION_SOUND1, ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, REGION_USER2, ROMREGION_ERASE00)	// Security dongle
+	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(aa43526971dad6502e4b9583d8f5c18d93ced820) MD5(161ab0096d8def5ef133eec872afc645) )
+	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(4a0edf424e091c33db91b00edf7c7246754cc8bb) MD5(9cb7cb79d2f0a47e994cfb91847ca190) )
+ROM_END
+
 /*****************************************************************************/
 
-GAME( 2000, ppp,	  0,       firebeat,  ppp,    ppp,     ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING);
-GAME( 2000, ppd,      0,       firebeat,  ppp,    ppd,     ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING);
-GAMEL(2000, kbm,      0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat);
-GAMEL(2000, kbm2nd,   0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat);
-GAMEL(2001, kbm3rd,   0,       firebeat2, kbm,    kbm,   ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat);
-GAME( 2001, popn7,    0,       firebeat,  ppp,    ppp,     ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING);
+GAME( 2000, ppp,	  0,       firebeat,  ppp,    ppp,      ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING);
+GAME( 2000, ppd,      0,       firebeat,  ppp,    ppd,      ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING);
+GAME( 2000, ppp11,	  0,       firebeat,  ppp,    ppp,      ROT0,   "Konami",  "ParaParaParadise v1.1", GAME_NOT_WORKING);
+GAMEL(2000, kbm,      0,       firebeat2, kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat);
+GAMEL(2000, kbm2nd,   0,       firebeat2, kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat);
+GAMEL(2001, kbm3rd,   0,       firebeat2, kbm,    kbm,    ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat);
+GAME( 2001, popn7,    0,       firebeat,  popn,   ppp,      ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING);

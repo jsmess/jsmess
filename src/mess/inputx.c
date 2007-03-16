@@ -622,7 +622,7 @@ void inputx_init(void)
 	keybuffer = NULL;
 
 #ifdef MAME_DEBUG
-	if (options.mame_debug)
+	if (Machine->debug_mode)
 		debug_console_register_command("input", CMDFLAG_NONE, 0, 1, 1, execute_input);
 #endif /* MAME_DEBUG */
 

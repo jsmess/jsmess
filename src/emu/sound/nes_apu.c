@@ -676,9 +676,9 @@ static void *nesapu_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	/* Initialize global variables */
-	info->samps_per_sync = rate / Machine->screen[0].refresh;
+	info->samps_per_sync = rate / SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
 	info->buffer_size = info->samps_per_sync;
-	info->real_rate = info->samps_per_sync * Machine->screen[0].refresh;
+	info->real_rate = info->samps_per_sync * SUBSECONDS_TO_HZ(Machine->screen[0].refresh);
 	info->apu_incsize = (float) (clock / (float) info->real_rate);
 
 	/* Use initializer calls */

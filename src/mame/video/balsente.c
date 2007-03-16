@@ -17,14 +17,10 @@
  *************************************/
 
 static UINT8 *local_videoram;
-static UINT8 *scanline_dirty;
-static UINT8 *scanline_palette;
 static UINT8 *sprite_data;
 static UINT32 sprite_mask;
 static UINT8 *sprite_bank[2];
 
-static UINT8 last_scanline_palette;
-static UINT8 screen_refresh_counter;
 static UINT8 palettebank_vis;
 
 
@@ -35,12 +31,6 @@ static UINT8 palettebank_vis;
  *
  *************************************/
 
-static void balsente_postload(void)
-{
-	memset(scanline_dirty, 1, 256);
-}
-
-
 VIDEO_START( balsente )
 {
 	/* reset the system */
@@ -48,24 +38,8 @@ VIDEO_START( balsente )
 	sprite_bank[0] = memory_region(REGION_GFX1);
 	sprite_bank[1] = memory_region(REGION_GFX1) + 0x10000;
 
-	/* allocate a bitmap */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-
 	/* allocate a local copy of video RAM */
 	local_videoram = auto_malloc(256 * 256);
-
-	/* allocate a scanline dirty array */
-	scanline_dirty = auto_malloc(256);
-
-	/* allocate a scanline palette array */
-	scanline_palette = auto_malloc(256);
-
-	/* mark everything dirty to start */
-	memset(scanline_dirty, 1, 256);
-
-	/* reset the scanline palette */
-	memset(scanline_palette, 0, 256);
-	last_scanline_palette = 0;
 
 	/* determine sprite size */
 	sprite_data = memory_region(REGION_GFX1);
@@ -73,11 +47,7 @@ VIDEO_START( balsente )
 
 	/* register for saving */
 	state_save_register_global_pointer(local_videoram, 256 * 256);
-	state_save_register_global_pointer(scanline_palette, 256);
-	state_save_register_global(last_scanline_palette);
-	state_save_register_global(screen_refresh_counter);
 	state_save_register_global(palettebank_vis);
-	state_save_register_func_postload(balsente_postload);
 
 	return 0;
 }
@@ -97,9 +67,6 @@ WRITE8_HANDLER( balsente_videoram_w )
 	/* expand the two pixel values into two bytes */
 	local_videoram[offset * 2 + 0] = data >> 4;
 	local_videoram[offset * 2 + 1] = data & 15;
-
-	/* mark the scanline dirty */
-	scanline_dirty[offset / 128] = 1;
 }
 
 
@@ -110,54 +77,17 @@ WRITE8_HANDLER( balsente_videoram_w )
  *
  *************************************/
 
-static void update_palette(void)
-{
-	int scanline = cpu_getscanline(), i;
-	if (scanline > 255) scanline = 0;
-
-	/* special case: the scanline is the same as last time, but a screen refresh has occurred */
-	if (scanline == last_scanline_palette && screen_refresh_counter)
-	{
-		for (i = 0; i < 256; i++)
-		{
-			/* mark the scanline dirty if it was a different palette */
-			if (scanline_palette[i] != palettebank_vis)
-				scanline_dirty[i] = 1;
-			scanline_palette[i] = palettebank_vis;
-		}
-	}
-
-	/* fill in the scanlines up till now */
-	else
-	{
-		for (i = last_scanline_palette; i != scanline; i = (i + 1) & 255)
-		{
-			/* mark the scanline dirty if it was a different palette */
-			if (scanline_palette[i] != palettebank_vis)
-				scanline_dirty[i] = 1;
-			scanline_palette[i] = palettebank_vis;
-		}
-
-		/* remember where we left off */
-		last_scanline_palette = scanline;
-	}
-
-	/* reset the screen refresh counter */
-	screen_refresh_counter = 0;
-}
-
-
 WRITE8_HANDLER( balsente_palette_select_w )
 {
 	/* only update if changed */
 	if (palettebank_vis != (data & 3))
 	{
 		/* update the scanline palette */
-		update_palette();
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1 + BALSENTE_VBEND);
 		palettebank_vis = data & 3;
 	}
 
-	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, cpu_getscanline());
+	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, video_screen_get_vpos(0));
 }
 
 
@@ -177,8 +107,11 @@ WRITE8_HANDLER( balsente_paletteram_w )
 	r = paletteram[(offset & ~3) + 0];
 	g = paletteram[(offset & ~3) + 1];
 	b = paletteram[(offset & ~3) + 2];
+
 	palette_set_color(Machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
+
+
 
 /*************************************
  *
@@ -188,14 +121,17 @@ WRITE8_HANDLER( balsente_paletteram_w )
 
 WRITE8_HANDLER( shrike_sprite_select_w )
 {
-  if( sprite_data != sprite_bank[ (data & 0x80 >> 7) ^ 1 ] )
-  {
-  	logerror( "shrike_sprite_select_w( 0x%02x )\n", data );
-  	sprite_data = sprite_bank[ (data & 0x80 >> 7) ^ 1 ];
-  }
+	if( sprite_data != sprite_bank[(data & 0x80 >> 7) ^ 1 ])
+	{
+		logerror( "shrike_sprite_select_w( 0x%02x )\n", data );
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1 + BALSENTE_VBEND);
+		sprite_data = sprite_bank[(data & 0x80 >> 7) ^ 1];
+	}
 
-  shrike_shared_6809_w( 1, data );
+	shrike_shared_6809_w( 1, data );
 }
+
+
 
 /*************************************
  *
@@ -205,18 +141,12 @@ WRITE8_HANDLER( shrike_sprite_select_w )
 
 static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sprite)
 {
-	rectangle finalclip = *cliprect;
 	int flags = sprite[0];
 	int image = sprite[1] | ((flags & 7) << 8);
-	int ypos = sprite[2] + 17;
+	int ypos = sprite[2] + 17 + BALSENTE_VBEND;
 	int xpos = sprite[3];
 	UINT8 *src;
 	int x, y;
-
-	if (finalclip.min_y < 16)
-		finalclip.min_y = 16;
-	if (finalclip.max_y > 240)
-		finalclip.max_y = 240;
 
 	/* get a pointer to the source image */
 	src = &sprite_data[(64 * image) & sprite_mask];
@@ -225,10 +155,10 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 	/* loop over y */
 	for (y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
 	{
-		if (ypos >= finalclip.min_y && ypos <= finalclip.max_y)
+		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 		{
-			UINT32 *pens = &Machine->pens[scanline_palette[y] * 256];
-			UINT8 *old = &local_videoram[ypos * 256 + xpos];
+			UINT32 *pens = &Machine->pens[palettebank_vis * 256];
+			UINT8 *old = &local_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
 			/* standard case */
@@ -242,12 +172,12 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 					int right = (ipixel << 4) & 0xf0;
 
 					/* left pixel, combine with the background */
-					if (left && currx >= finalclip.min_x && currx <= finalclip.max_x)
+					if (left && currx >= 0 && currx < 256)
 						plot_pixel(bitmap, currx, ypos, pens[left | old[0]]);
 					currx++;
 
 					/* right pixel, combine with the background */
-					if (right && currx >= finalclip.min_x && currx <= finalclip.max_x)
+					if (right && currx >= 0 && currx < 256)
 						plot_pixel(bitmap, currx, ypos, pens[right | old[1]]);
 					currx++;
 				}
@@ -266,12 +196,12 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 					int right = ipixel & 0xf0;
 
 					/* left pixel, combine with the background */
-					if (left && currx >= finalclip.min_x && currx <= finalclip.max_x)
+					if (left && currx >= 0 && currx < 256)
 						plot_pixel(bitmap, currx, ypos, pens[left | old[0]]);
 					currx++;
 
 					/* right pixel, combine with the background */
-					if (right && currx >= finalclip.min_x && currx <= finalclip.max_x)
+					if (right && currx >= 0 && currx < 256)
 						plot_pixel(bitmap, currx, ypos, pens[right | old[1]]);
 					currx++;
 				}
@@ -294,25 +224,18 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 
 VIDEO_UPDATE( balsente )
 {
-	int update_all = get_vh_global_attribute_changed();
+	pen_t *pens = &Machine->pens[palettebank_vis * 256];
 	int y, i;
 
-	/* update the remaining scanlines */
-	screen_refresh_counter++;
-	update_palette();
-
-	/* draw any dirty scanlines from the VRAM directly */
+	/* draw scanlines from the VRAM directly */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		if (scanline_dirty[y] || update_all)
-		{
-			pen_t *pens = &Machine->pens[scanline_palette[y] * 256];
-			draw_scanline8(tmpbitmap, 0, y, 256, &local_videoram[y * 256], pens, -1);
-			scanline_dirty[y] = 0;
-		}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	{
+		draw_scanline8(bitmap, 0, y, 256, &local_videoram[(y - BALSENTE_VBEND) * 256], pens, -1);
+	}
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)
 		draw_one_sprite(bitmap, cliprect, &spriteram[(0xe0 + i * 4) & 0xff]);
+
 	return 0;
 }
