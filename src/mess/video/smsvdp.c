@@ -745,7 +745,7 @@ void sms_refresh_line_mode2(int *lineBuffer, int line) {
 	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
 	spriteHeight = ( reg[0x01] & 0x03 ? 16 : 8 ); /* check if either MAG or SI is set */
 	spriteBufferCount = 0;
-	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex * 4] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
+	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
 		spriteY = spriteTable[spriteIndex] + 1;
 		if ( spriteY > 240 ) {
 			spriteY -= 256;
@@ -884,6 +884,8 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 
 	/* Draw sprite layer */
 	spriteTable = VRAM + ( ( reg[0x05] & 0x7F ) << 7 );
+logerror("Doing sprites for line %d, 0x%02X\n", line, line );
+logerror("Using sprite table at 0x%04X\n", spriteTable - VRAM );
 	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
 	spriteHeight = 8;
 	if ( reg[0x01] & 0x02 )				/* Check if SI is set */
@@ -891,13 +893,14 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	if ( reg[0x01] & 0x01 )				/* Check if MAG is set */
 		spriteHeight = spriteHeight * 2;
 	spriteBufferCount = 0;
-	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex * 4] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
+	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
 		int spriteY = spriteTable[spriteIndex] + 1;
 		if ( spriteY > 240 ) {
 			spriteY -= 256;
 		}
 		if ( ( line >= spriteY ) && ( line < ( spriteY + spriteHeight ) ) ) {
 			if ( spriteBufferCount < 5 ) {
+logerror("Selected sprite at index 0x%02X\n", spriteIndex );
 				spriteBuffer[spriteBufferCount] = spriteIndex;
 			} else {
 				/* Too many sprites per line */
