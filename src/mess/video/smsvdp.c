@@ -855,7 +855,7 @@ void sms_refresh_line_mode2(int *lineBuffer, int line) {
 void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	int tileColumn;
 	int pixelX, pixelPlotX; 
-	int spriteHeight, spriteBufferCount, spriteIndex, spriteY, spriteBuffer[4], spriteBufferIndex;
+	int spriteHeight, spriteBufferCount, spriteIndex, spriteBuffer[4], spriteBufferIndex;
 	UINT8 *nameTable, *colorTable, *patternTable, *spriteTable, *spritePatternTable;
 
 	/* Draw background layer */
@@ -885,10 +885,14 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	/* Draw sprite layer */
 	spriteTable = VRAM + ( ( reg[0x05] & 0x7F ) << 7 );
 	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
-	spriteHeight = ( reg[0x01] & 0x03 ? 16 : 8 ); /* check if either MAG or SI is set */
+	spriteHeight = 8;
+	if ( reg[0x01] & 0x02 )				/* Check if SI is set */
+		spriteHeight = spriteHeight * 2;
+	if ( reg[0x01] & 0x01 )				/* Check if MAG is set */
+		spriteHeight = spriteHeight * 2;
 	spriteBufferCount = 0;
 	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex * 4] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
-		spriteY = spriteTable[spriteIndex] + 1;
+		int spriteY = spriteTable[spriteIndex] + 1;
 		if ( spriteY > 240 ) {
 			spriteY -= 256;
 		}
@@ -910,6 +914,7 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	for ( spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex-- ) {
 		int penSelected;
 		int spriteLine, pixelX, spriteX, spriteTileSelected;
+		int spriteY;
 		UINT8 pattern;
 		spriteIndex = spriteBuffer[ spriteBufferIndex ];
 		spriteY = spriteTable[ spriteIndex ] + 1;
@@ -923,20 +928,61 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 		}
 		if ( spriteTable[ spriteIndex + 3 ] & 0x80 ) {
 			spriteX -= 32;
-			spriteTileSelected = spriteTable[ spriteIndex + 2 ];
-			spriteLine = line - spriteY;
-			if ( reg[0x01] & 0x01 ) {
-				spriteLine >>= 1;
+		}
+		spriteTileSelected = spriteTable[ spriteIndex + 2 ];
+		spriteLine = line - spriteY;
+		if ( reg[0x01] & 0x01 ) {
+			spriteLine >>= 1;
+		}
+		if ( reg[0x01] & 0x02 ) {
+			spriteTileSelected &= 0xFC;
+			if ( spriteLine > 0x07 ) {
+				spriteTileSelected += 1;
+				spriteLine -= 8;
 			}
-			if ( reg[0x01] & 0x02 ) {
-				spriteTileSelected &= 0xFC;
-				if ( spriteLine > 0x07 ) {
-					spriteTileSelected += 1;
-					spriteLine -= 8;
+		}
+		pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
+
+		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+			if ( reg[0x01] & 0x01 ) {
+				pixelPlotX = spriteX + pixelX * 2;
+				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+					continue;
+				}
+				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+					lineBuffer[pixelPlotX] = currentPalette[penSelected];
+					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+						lineCollisionBuffer[pixelPlotX] = 1;
+					} else {
+						statusReg |= STATUS_SPRCOL;
+					}
+					lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
+					if ( lineCollisionBuffer[pixelPlotX + 1] != 1 ) {
+						lineCollisionBuffer[pixelPlotX + 1] = 1;
+					} else {
+						statusReg |= STATUS_SPRCOL;
+					}
+				}
+			} else {
+				pixelPlotX = spriteX + pixelX;
+				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
+					continue;
+				}
+				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
+					lineBuffer[pixelPlotX] = currentPalette[penSelected];
+					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
+						lineCollisionBuffer[pixelPlotX] = 1;
+					} else {
+						statusReg |= STATUS_SPRCOL;
+					}
 				}
 			}
-			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
+		}
 
+		if ( reg[0x01] & 0x02 ) {
+			spriteTileSelected += 2;
+			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
+			spriteX += ( reg[0x01] & 0x01 ? 16 : 8 );
 			for ( pixelX = 0; pixelX < 8; pixelX++ ) {
 				if ( reg[0x01] & 0x01 ) {
 					pixelPlotX = spriteX + pixelX * 2;
@@ -958,25 +1004,6 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 						}
 					}
 				} else {
-					pixelPlotX = spriteX + pixelX;
-					if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
-						continue;
-					}
-					if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-						lineBuffer[pixelPlotX] = currentPalette[penSelected];
-						if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-							lineCollisionBuffer[pixelPlotX] = 1;
-						} else {
-							statusReg |= STATUS_SPRCOL;
-						}
-					}
-				}
-			}
-			if ( reg[0x01] & 0x02 ) {
-				spriteTileSelected += 2;
-				pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
-				spriteX += 8;
-				for ( pixelX = 0; pixelX < 8; pixelX++ ) {
 					pixelPlotX = spriteX + pixelX;
 					if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
 						continue;
