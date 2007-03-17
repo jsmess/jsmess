@@ -282,12 +282,12 @@ INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-static const char *dgnbeta_floppy_getname(const struct IODevice *dev, int id, char *buf, size_t bufsize)
-{
-	/* Dragon people like their floppy drives zero counted */
-	snprintf(buf, bufsize, "Floppy #%d", id);
-	return buf;
-}
+//static const char *dgnbeta_floppy_getname(const struct IODevice *dev, int id, char *buf, size_t bufsize)
+//{
+//	/* Dragon people like their floppy drives zero counted */
+//	snprintf(buf, bufsize, "Floppy #%d", id);
+//	return buf;
+//}
 
 static void dgnbeta_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -295,10 +295,10 @@ static void dgnbeta_floppy_getinfo(const device_class *devclass, UINT32 state, u
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 4; break;
+		case DEVINFO_INT_COUNT:			info->i = 4; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_PTR_FLOPPY_OPTIONS:				info->p = (void *) floppyoptions_coco; break;
+		case DEVINFO_PTR_FLOPPY_OPTIONS:	info->p = (void *) floppyoptions_coco; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME+0:		strcpy(info->s = device_temp_str(), "floppydisk0"); break;

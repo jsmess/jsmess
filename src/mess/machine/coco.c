@@ -177,7 +177,7 @@ static int cart_crc(unsigned int *crc);		/* returns true if cart loaded & crc wi
 static int count_bank(void);
 static int is_Orch90(void);			/* Returns true if cart is orchestra 90 */
 static int is_megacart(void);			/* Returns true if cart contains megacart signature */
-static int is_doscart(void);			/* Returns true if cart contains 'DK' doscart signature */
+static int is_dosrom(void);			/* Returns true if cart contains 'DK' doscart signature */
 static int is_dragondos(void);		/* Returns true if DragonDos compatible cart inserted */
 static int is_deltados(void);			/* Returns true if DeltaDos compatible cart inserted */
 static int is_rsdos(void);			/* Returns true if RSDos compatible cart inserted */
@@ -212,7 +212,7 @@ static void setup_memory_map(void);
 #define LOG_GIME		0
 #define LOG_MMU			0
 #define LOG_TIMER       0
-#define LOG_CART	1		/* Log cart type selections is_doscart and friends */
+#define LOG_CART	1		/* Log cart type selections is_dosrom and friends */
 
 #define GIME_TYPE_1987	0
 
