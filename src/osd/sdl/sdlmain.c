@@ -212,12 +212,14 @@ int osd_init(running_machine *machine)
 		exit(-1);
 	}
 
+	// must be before sdlvideo_init!
+	add_exit_callback(machine, osd_exit);
+
 	sdlvideo_init(machine);
 	if (getenv("SDLMAME_UNSUPPORTED"))
 		led_init();
 
 	result = win_init_input(machine);
-	add_exit_callback(machine, osd_exit);
 
 	sdl_init_audio();
 
