@@ -3,9 +3,11 @@
 #include "image.h"
 #include "includes/sms.h"
 #include "sound/2413intf.h"
+#include "machine/eeprom.h"
 
 #define CF_CODEMASTERS_MAPPER	0x01
-#define CF_DODGEBALLKING_MAPPER	0x02
+#define CF_KOREAN_MAPPER	0x02
+#define CF_93C46_EEPROM		0x04
 
 UINT8 smsRomPageCount;
 UINT8 smsBiosPageCount;
@@ -182,20 +184,10 @@ WRITE8_HANDLER(sms_mapper_w)
 #endif
 					SOURCE = smsNVRam;
 				}
-				sms_banking_bios[4] = SOURCE;
-				sms_banking_cart[4] = SOURCE;
 				memory_set_bankptr( 4, SOURCE );
 				memory_set_bankptr( 5, SOURCE + 0x2000 );
 			} else { /* it's rom */
-				if ( ROM ) {
-					SOURCE_CART = ROM + ( (smsRomPageCount > 0) ? sms_mapper[3] % smsRomPageCount : 0 ) * 0x4000;
-					sms_banking_cart[4] = SOURCE_CART;
-				}
-				if ( BIOS ) {
-					SOURCE_BIOS = BIOS + ( (smsBiosPageCount > 0) ? sms_mapper[3] % smsBiosPageCount : 0 ) * 0x4000;
-					sms_banking_bios[4] = SOURCE_BIOS;
-				}
-				if (biosPort & IO_BIOS_ROM) {
+				if ( biosPort & IO_BIOS_ROM || ! HAS_BIOS ) {
 					page = (smsRomPageCount > 0) ? sms_mapper[3] % smsRomPageCount : 0;
 					SOURCE = sms_banking_cart[4];
 				} else {
@@ -206,7 +198,7 @@ WRITE8_HANDLER(sms_mapper_w)
 				logerror("rom 2 paged in %x.\n", page);
 #endif
 				memory_set_bankptr( 4, SOURCE );
-				memory_set_bankptr( 5, SOURCE );
+				memory_set_bankptr( 5, SOURCE + 0x2000 );
 			}
 			break;
 		case 1: /* Select 16k ROM bank for 0400-3FFF */
@@ -232,22 +224,21 @@ WRITE8_HANDLER(sms_mapper_w)
 			memory_set_bankptr( 3, SOURCE );
 			break;
 		case 3: /* Select 16k ROM bank for 8000-BFFF */
-			/* Is it ram or rom? */
-			if (!(sms_mapper[0] & 0x08)) { /* it's rom */
+			sms_banking_bios[4] = SOURCE_BIOS;
+			if ( IS_GAMEGEAR ) {
+				SOURCE = SOURCE_CART;
+			}
+			if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
+				if ( SOURCE == SOURCE_CART ) {
+					SOURCE = sms_banking_cart[4];
+				}
+			} else {
+				sms_banking_cart[4] = SOURCE_CART;
+			}
+			if ( ! ( sms_mapper[0] & 0x08 ) ) { /* is RAM disabled? */
 #ifdef LOG_PAGING
 				logerror("rom 2 paged in %x.\n", page);
 #endif
-				sms_banking_bios[4] = SOURCE_BIOS;
-				if ( IS_GAMEGEAR ) {
-					SOURCE = SOURCE_CART;
-				}
-				if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
-					if ( SOURCE == SOURCE_CART ) {
-						SOURCE = sms_banking_cart[4];
-					}
-				} else {
-					sms_banking_cart[4] = SOURCE_CART;
-				}
 				memory_set_bankptr( 4, SOURCE );
 				memory_set_bankptr( 5, SOURCE + 0x2000 );
 			}
@@ -321,7 +312,7 @@ WRITE8_HANDLER(sms_cartram_w) {
 #ifdef LOG_PAGING
 			logerror("rom 2 paged in %x codemasters.\n", page);
 #endif
-		} else if (smsCartFeatures & CF_DODGEBALLKING_MAPPER && offset == 0x2000) { /* Dodgeball King mapper */
+		} else if (smsCartFeatures & CF_KOREAN_MAPPER && offset == 0x2000) { /* Dodgeball King mapper */
 			page = (smsRomPageCount > 0) ? data % smsRomPageCount : 0;
 			if ( ! ROM )
 				return;
@@ -515,10 +506,10 @@ DEVICE_INIT( sms_cart )
 
 DEVICE_LOAD( sms_cart )
 {
-	int size;
-
-	/* Get file size */
-	size = image_length(image);
+	int size = image_length(image);
+	const char *fname = image_filename( image );
+	int fname_len = fname ? strlen( fname ) : 0;
+	const char *extrainfo = image_extrainfo( image );
 
 	/* Check for 512-byte header */
 	if ((size / 512) & 1)
@@ -547,55 +538,67 @@ DEVICE_LOAD( sms_cart )
 		}
 	}
 
-	/* Check for special cartridge features */
-	if ( size >= 0x8000 ) {
-		/* Check for Codemasters mapper
-		  0x7FE3 - 93 - sms Cosmis Spacehead
-		              - sms Dinobasher
-		              - sms The Excellent Dizzy Collection
-		              - sms Fantastic Dizzy
-		              - sms Micro Machines
-		              - gamegear Cosmic Spacehead
-		              - gamegear Micro Machines
-		         - 94 - gamegear Dropzone
-		              - gamegear Ernie Els Golf (also has 64KB additional RAM on the cartridge)
-		              - gamegear Pete Sampras Tennis
-		              - gamegear S.S. Lucifer
-		         - 95 - gamegear Micro Machines 2 - Turbo Tournament
-		 */
-		if ( ( ( ROM[0x7fe0] & 0x0F ) <= 9 ) &&
-		     ( ROM[0x7fe3] == 0x93 || ROM[0x7fe3] == 0x94 || ROM[0x7fe3] == 0x95 ) &&
-                     ROM[0x7fef] == 0x00 ) {
+	smsCartFeatures = 0;
+	/* Detect special features from the extrainfo field */
+	if ( extrainfo ) {
+		/* Check for codemasters mapper */
+		if ( strstr( extrainfo, "CODEMASTERS" ) ) {
 			smsCartFeatures |= CF_CODEMASTERS_MAPPER;
-			/* Install special memory handlers */
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
-			memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
-			sms_codemasters_ram = auto_malloc( 0x10000 );
-			sms_codemasters_rampage = 0;
 		}
-		/* Check for special Korean games mapper used by:
-		   - Dodgeball King/Dallyeora Pigu-Wang
-		   - Sangokushi 3
-		 */
-		if ( ( ROM[0x7ff0] == 0x3e && ROM[0x7ff1] == 0x11 ) ||  /* Dodgeball King */
-		     ( ROM[0x7ff0] == 0x41 && ROM[0x7ff1] == 0x48 ) ) { /* Sangokushi 3 */
-			smsCartFeatures |= CF_DODGEBALLKING_MAPPER;
+
+		/* Check for korean mapper */
+		if ( strstr( extrainfo, "KOREAN" ) ) {
+			smsCartFeatures |= CF_KOREAN_MAPPER;
 		}
-	}
 
-	/* Check for special SMS Compatibility mode gamegear cartridges */
-	if ( IS_GAMEGEAR ) {
-		const char *fname = image_filename( image );
-		int	len = fname ? strlen( fname ) : 0;
-		const char *extrainfo = image_extrainfo( image );
-
-		if ( extrainfo && strstr( extrainfo, "GGSMS" ) ) {
+		/* Check for special SMS Compatibility mode gamegear cartridges */
+		if ( IS_GAMEGEAR && strstr( extrainfo, "GGSMS" ) ) {
 			sms_set_ggsmsmode( 1 );
 		}
 
-		/* Just in case someone passes us an sms file */
-		if ( len > 3 && ! mame_stricmp( fname-3, "sms" ) ) {
-			sms_set_ggsmsmode( 1 );
+		/* Check for 93C46 eeprom */
+		if ( strstr( extrainfo, "93C46" ) ) {
+			smsCartFeatures |= CF_93C46_EEPROM;
+		}
+	} else {
+		/* If no extrainfo information is available try to find special information out on our own */
+		/* Check for special cartridge features */
+		if ( size >= 0x8000 ) {
+			/* Check for Codemasters mapper
+			  0x7FE3 - 93 - sms Cosmis Spacehead
+			              - sms Dinobasher
+			              - sms The Excellent Dizzy Collection
+			              - sms Fantastic Dizzy
+			              - sms Micro Machines
+			              - gamegear Cosmic Spacehead
+			              - gamegear Micro Machines
+			         - 94 - gamegear Dropzone
+			              - gamegear Ernie Els Golf (also has 64KB additional RAM on the cartridge)
+			              - gamegear Pete Sampras Tennis
+			              - gamegear S.S. Lucifer
+			         - 95 - gamegear Micro Machines 2 - Turbo Tournament
+			 */
+			if ( ( ( ROM[0x7fe0] & 0x0F ) <= 9 ) &&
+			     ( ROM[0x7fe3] == 0x93 || ROM[0x7fe3] == 0x94 || ROM[0x7fe3] == 0x95 ) &&
+			     ROM[0x7fef] == 0x00 ) {
+				smsCartFeatures |= CF_CODEMASTERS_MAPPER;
+			}
+			/* Check for special Korean games mapper used by:
+			   - Dodgeball King/Dallyeora Pigu-Wang
+			   - Sangokushi 3
+			 */
+			if ( ( ROM[0x7ff0] == 0x3e && ROM[0x7ff1] == 0x11 ) ||  /* Dodgeball King */
+			     ( ROM[0x7ff0] == 0x41 && ROM[0x7ff1] == 0x48 ) ) { /* Sangokushi 3 */
+				smsCartFeatures |= CF_KOREAN_MAPPER;
+			}
+		}
+
+		/* Check for special SMS Compatibility mode gamegear cartridges */
+		if ( IS_GAMEGEAR ) {
+			/* Just in case someone passes us an sms file */
+			if ( fname_len > 3 && ! mame_stricmp( fname-3, "sms" ) ) {
+				sms_set_ggsmsmode( 1 );
+			}
 		}
 	}
 
@@ -655,6 +658,14 @@ MACHINE_RESET(sms)
 	}
 
 	sms_mapper_ram = memory_get_write_ptr( 0, ADDRESS_SPACE_PROGRAM, 0xDFFC );
+
+	if ( smsCartFeatures & CF_CODEMASTERS_MAPPER ) {
+		/* Install special memory handlers */
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x0000, 0, 0, sms_codemasters_page0_w );
+		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, sms_codemasters_page1_w );
+		sms_codemasters_ram = auto_malloc( 0x10000 );
+		sms_codemasters_rampage = 0;
+	}
 
 	/* Initialize SIO stuff for GG */
 	ggSIO[0] = 0x7F;
