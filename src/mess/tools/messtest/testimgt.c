@@ -269,8 +269,7 @@ static void append_to_list(char *buf, size_t buflen, const char *entry)
 {
 	size_t pos;
 	pos = strlen(buf);
-	snprintf(buf + pos, buflen - pos,
-		(pos > 0) ? ", %s" : "%s", entry);
+	snprintf(buf + pos, buflen - pos - 1, (pos > 0) ? ", %s" : "%s", entry);
 }
 
 
@@ -280,8 +279,8 @@ static void node_checkdirectory(struct imgtooltest_state *state, xml_data_node *
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	imgtool_directory *imageenum;
 	imgtool_dirent ent;
-	char expected_listing[128];
-	char actual_listing[128];
+	char expected_listing[1024];
+	char actual_listing[1024];
 	int i, actual_count;
 	int mismatch;
 	xml_attribute_node *attr_node;

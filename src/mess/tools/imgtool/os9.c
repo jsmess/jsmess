@@ -116,11 +116,25 @@ static void place_string(void *ptr, size_t offset, size_t length, const char *s)
 
 
 
+static os9_diskinfo *os9_get_diskinfo(imgtool_image *image)
+{
+	return (os9_diskinfo *) imgtool_floppy_extrabytes(image);
+}
+
+
+
+static struct os9_direnum *os9_get_dirinfo(imgtool_directory *directory)
+{
+	return (struct os9_direnum *) imgtool_directory_extrabytes(directory);
+}
+
+
+
 static imgtoolerr_t os9_locate_lsn(imgtool_image *image, UINT32 lsn, UINT32 *head, UINT32 *track, UINT32 *sector)
 {
 	const os9_diskinfo *disk_info;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 	if (lsn > disk_info->total_sectors)
 		return IMGTOOLERR_CORRUPTIMAGE;
 
@@ -177,7 +191,7 @@ static UINT32 os9_lookup_lsn(imgtool_image *img,
 	UINT32 lsn;
 	const os9_diskinfo *disk_info;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(img);
+	disk_info = os9_get_diskinfo(img);
 	lsn = *index / disk_info->sector_size;
 
 	i = 0;
@@ -220,6 +234,11 @@ static int os9_interpret_dirent(void *entry, char **filename, UINT32 *lsn, int *
 
 
 
+/*-------------------------------------------------
+    os9_decode_file_header - reads a file/directory
+	entry from an LSN, and decodes it
+-------------------------------------------------*/
+
 static imgtoolerr_t os9_decode_file_header(imgtool_image *image,
 	int lsn, struct os9_fileinfo *info)
 {
@@ -229,7 +248,7 @@ static imgtoolerr_t os9_decode_file_header(imgtool_image *image,
 	const os9_diskinfo *disk_info;
 	UINT8 header[256];
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 
 	err = os9_read_lsn(image, lsn, 0, header, sizeof(header));
 	if (err)
@@ -278,7 +297,7 @@ static imgtoolerr_t os9_allocate_lsn(imgtool_image *image, UINT32 *lsn)
 	os9_diskinfo *disk_info;
 	UINT8 b, mask;
 
-	disk_info = (os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 
 	for (i = 0; i < disk_info->total_sectors; i++)
 	{
@@ -302,7 +321,7 @@ static imgtoolerr_t os9_deallocate_lsn(imgtool_image *image, UINT32 lsn)
 	UINT8 mask;
 	os9_diskinfo *disk_info;
 
-	disk_info = (os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 	mask = 1 << (7 - (lsn % 8));
 	disk_info->allocation_bitmap[lsn / 8] &= ~mask;
 	return os9_write_lsn(image, 1, 0, disk_info->allocation_bitmap, disk_info->allocation_bitmap_bytes);
@@ -316,7 +335,7 @@ static UINT32 os9_get_free_lsns(imgtool_image *image)
 	UINT32 i, free_lsns;
 	UINT8 b;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 	free_lsns = 0;
 
 	for (i = 0; i < disk_info->total_sectors; i++)
@@ -357,7 +376,7 @@ static imgtoolerr_t os9_set_file_size(imgtool_image *image,
 	if (file_info->file_size == new_size)
 		return IMGTOOLERR_SUCCESS;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 
 	free_lsns = os9_get_free_lsns(image);
 	current_lsn_count = (file_info->file_size + disk_info->sector_size - 1) / disk_info->sector_size;
@@ -456,6 +475,12 @@ static imgtoolerr_t os9_set_file_size(imgtool_image *image,
 
 
 
+/*-------------------------------------------------
+    os9_lookup_path - walks an OS-9 directory
+	structure to find a file, or optionally, create
+	a file
+-------------------------------------------------*/
+
 static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 	creation_policy_t create, struct os9_fileinfo *file_info,
 	UINT32 *parent_lsn, UINT32 *dirent_lsn, UINT32 *dirent_index)
@@ -471,17 +496,19 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 	char *filename;
 	const os9_diskinfo *disk_info;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(img);
+	disk_info = os9_get_diskinfo(img);
 	current_lsn = disk_info->root_dir_lsn;
 
 	if (parent_lsn)
 		*parent_lsn = 0;
 
+	/* we have to transverse each path element */
 	while(*path)
 	{
 		if (parent_lsn)
 			*parent_lsn = current_lsn;
 
+		/* decode the directory header of this directory */
 		err = os9_decode_file_header(img, current_lsn, &dir_info);
 		if (err)
 			goto done;
@@ -494,6 +521,7 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 			goto done;
 		}
 
+		/* walk the directory */
 		for (index = 0; index < dir_size; index += 32)
 		{
 			entry_index = index;
@@ -513,12 +541,15 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 		/* at the end of the file? */
 		if (index >= dir_size)
 		{
+			/* if we're not creating, or we are creating but we have not fully
+			 * transversed the directory, error out */
 			if (!create || path[strlen(path) + 1])
 			{
 				err = IMGTOOLERR_PATHNOTFOUND;
 				goto done;
 			}
 
+			/* allocate a new LSN */
 			err = os9_allocate_lsn(img, &allocated_lsn);
 			if (err)
 				goto done;
@@ -584,7 +615,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool_image *image, imgtool_stream *str
 	UINT32 allocation_bitmap_lsns;
 	UINT8 b, mask;
 
-	info = (os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	info = os9_get_diskinfo(image);
 
 	ferr = floppy_read_sector(imgtool_floppy(image), 0, 0, 1, 0, header, sizeof(header));
 	if (ferr)
@@ -790,7 +821,7 @@ static imgtoolerr_t os9_diskimage_beginenum(imgtool_directory *enumeration, cons
 	imgtool_image *image;
 
 	image = imgtool_directory_image(enumeration);
-	os9enum = (struct os9_direnum *) imgtool_directory_extrabytes(enumeration);
+	os9enum = os9_get_dirinfo(enumeration);
 
 	err = os9_lookup_path(image, path, CREATE_NONE, &os9enum->dir_info, NULL, NULL, NULL);
 	if (err)
@@ -820,7 +851,7 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 	imgtool_image *image;
 
 	image = imgtool_directory_image(enumeration);
-	os9enum = (struct os9_direnum *) imgtool_directory_extrabytes(enumeration);
+	os9enum = os9_get_dirinfo(enumeration);
 
 	do
 	{
@@ -831,9 +862,9 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 			return IMGTOOLERR_SUCCESS;
 		}
 
+		/* locate the LSN and offset for this directory entry */
 		index = os9enum->index;
 		lsn = os9_lookup_lsn(image, &os9enum->dir_info, &index);
-		os9enum->index += 32;
 
 		/* read the directory entry out of the lSN */
 		err = os9_read_lsn(image, lsn, index, dir_entry, sizeof(dir_entry));
@@ -848,7 +879,7 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 			/* we have certain expectations of the directory contents; the
 			 * first directory entry should be "..", the second ".", and
 			 * subsequent entries should never be "." or ".." */
-			switch(index)
+			switch(os9enum->index)
 			{
 				case 0:
 					if (strcmp(filename, ".."))
@@ -865,12 +896,21 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 						imgtool_warn("Directory entry %d should not be \"%s\"", index / 32, filename);
 					break;
 			}
+
+			/* if the filename is ".", the file should point to the current directory */
+			if (!strcmp(filename, ".") && (pick_integer_be(dir_entry, 29, 3) != os9enum->dir_info.lsn))
+			{
+				imgtool_warn("Directory \".\" does not point back to same directory");
+			}
 		}
 		else
 		{
 			/* no more directory entries */
 			filename[0] = '\0';
 		}
+
+		/* move on to the next directory entry */
+		os9enum->index += 32;
 	}
 	while(!filename[0] || !strcmp(filename, ".") || !strcmp(filename, ".."));
 
@@ -906,7 +946,7 @@ static imgtoolerr_t os9_diskimage_freespace(imgtool_partition *partition, UINT64
 	const os9_diskinfo *disk_info;
 	UINT32 free_lsns;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 	free_lsns = os9_get_free_lsns(image);
 
 	*size = free_lsns * disk_info->sector_size;
@@ -926,7 +966,7 @@ static imgtoolerr_t os9_diskimage_readfile(imgtool_partition *partition, const c
 	UINT32 file_size;
 	UINT32 used_size;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(img);
+	disk_info = os9_get_diskinfo(img);
 
 	err = os9_lookup_path(img, filename, CREATE_NONE, &file_info, NULL, NULL, NULL);
 	if (err)
@@ -966,7 +1006,7 @@ static imgtoolerr_t os9_diskimage_writefile(imgtool_partition *partition, const 
 	UINT32 sz;
 	const os9_diskinfo *disk_info;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 
 	buf = malloc(disk_info->sector_size);
 	if (!buf)
@@ -1027,7 +1067,7 @@ static imgtoolerr_t os9_diskimage_delete(imgtool_partition *partition, const cha
 	UINT32 i, j, lsn;
 	UINT8 b;
 
-	disk_info = (const os9_diskinfo *) imgtool_floppy_extrabytes(image);
+	disk_info = os9_get_diskinfo(image);
 
 	err = os9_lookup_path(image, path, CREATE_NONE, &file_info, NULL, &dirent_lsn, &dirent_index);
 	if (err)

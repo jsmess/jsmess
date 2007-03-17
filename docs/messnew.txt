@@ -30,6 +30,9 @@ Imgtool Changes:
 - Added the ability for modules to "warn" the core of inconsistencies.  These
   warnings will cause failues in Imgtool test cases.  [Nate Woods]
 
+- [OS9] Fixed some bugs that could cause corruption on OS-9 disk images.  (bug
+  #1122 [tim lindner, Nate Woods]
+
 
 
 Source Changes:
