@@ -604,7 +604,9 @@ void sdlwindow_update_cursor_state(void)
 {
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
+	#ifdef MAME_DEBUG
 	if (!options_get_bool(OPTION_DEBUG))
+	#endif
 	{
 		if (video_config.windowed && !sdl_is_mouse_captured())
 		{
