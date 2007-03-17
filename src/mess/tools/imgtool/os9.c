@@ -489,6 +489,7 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 	struct os9_fileinfo dir_info;
 	UINT32 index, current_lsn, dir_size;
 	UINT32 entry_index = 0;
+	UINT32 free_entry_index = 0xffffffff;
 	UINT32 entry_lsn = 0;
 	UINT32 allocated_lsn = 0;
 	UINT8 entry[32];
@@ -531,11 +532,19 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 			if (err)
 				goto done;
 
+			/* remember first free entry found */
+			if( free_entry_index == 0xffffffff )
+			{
+				if( entry[0] == 0 )
+					free_entry_index = index;
+			}
+
 			if (os9_interpret_dirent(entry, &filename, &current_lsn, NULL))
 			{
 				if (!strcmp(path, filename))
 					break;
 			}
+			
 		}
 
 		/* at the end of the file? */
@@ -560,11 +569,17 @@ static imgtoolerr_t os9_lookup_path(imgtool_image *img, const char *path,
 			err = os9_write_lsn(img, allocated_lsn, 0, block, sizeof(block));
 			if (err)
 				goto done;
-
-			/* expand the directory to hold the new entry */
-			err = os9_set_file_size(img, &dir_info, dir_size + 32);
-			if (err)
-				goto done;
+			
+			if( free_entry_index == 0xffffffff )
+			{
+				/* expand the directory to hold the new entry */
+				err = os9_set_file_size(img, &dir_info, dir_size + 32);
+				if (err)
+					goto done;
+			}
+			else
+				/* use first unused entry in directory */
+				dir_size = free_entry_index;
 
 			/* now prepare the directory entry */
 			memset(entry, 0, sizeof(entry));

@@ -33,7 +33,8 @@ Imgtool Changes:
 - [OS9] Fixed some bugs that could cause corruption on OS-9 disk images.  (bug
   #1122 [tim lindner, Nate Woods]
 
-
+- [OS9] Put will now use free entries in the directory file before expanding
+  it. [tim lindner]
 
 Source Changes:
 ----------------
