@@ -1,9 +1,9 @@
 /*
 
-  ES5503 - Ensoniq ES5503 "DOC" emulator v0.2
+  ES5503 - Ensoniq ES5503 "DOC" emulator v0.3
   By R. Belmont.
 
-  Copyright (c) 2005-2006 R. Belmont.
+  Copyright (c) 2005-2007 R. Belmont.
 
   This software is dual-licensed: it may be used in MAME and properly licensed
   MAME derivatives under the terms of the MAME license.  For use outside of
@@ -27,7 +27,7 @@
 
   Changes:
   0.2 (RB) - improved behavior for volumes > 127, fixes missing notes in Nucleus & missing voices in Thexder
-
+  0.3 (RB) - fixed extraneous clicking, improved timing behavior for e.g. Music Construction Set & Music Studio
 */
 
 #include <math.h>
@@ -44,6 +44,8 @@
 
 typedef struct
 {
+	void *chip;
+
 	UINT16 freq;
 	UINT16 wtsize;
 	UINT8  control;
@@ -55,6 +57,7 @@ typedef struct
 
 	UINT32 accumulator;
 	UINT8  irqpend;
+	mame_timer *timer;
 } ES5503Osc;
 
 typedef struct
@@ -91,10 +94,10 @@ enum
 };
 
 // halt_osc: handle halting an oscillator
-// chip = chip #
+// chip = chip ptr
 // onum = oscillator #
 // type = 1 for 0 found in sample data, 0 for hit end of table size
-static void halt_osc(ES5503Chip *chip, int onum, int type)
+static void es5503_halt_osc(ES5503Chip *chip, int onum, int type)
 {
 	ES5503Osc *pOsc = &chip->oscillators[onum];
 	ES5503Osc *pPartner = &chip->oscillators[onum^1];
@@ -127,6 +130,14 @@ static void halt_osc(ES5503Chip *chip, int onum, int type)
 			chip->irq_callback(1);
 		}
 	}
+}
+
+static void es5503_timer_cb(void *param)
+{
+	ES5503Osc *osc = param;
+	ES5503Chip *chip = (ES5503Chip *)osc->chip;
+
+	stream_update(chip->stream);
 }
 
 static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
@@ -172,28 +183,28 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 
 				data = (INT32)chip->docram[ramptr + wtptr] ^ 0x80;
 
-				if (pOsc->control & 0x10)
-				{
-					*mixp++ += (data * vol);
-					mixp++;
-				}
-				else
-				{
-					mixp++;
-					*mixp++ += (data * vol);
-				}
-
 				if (chip->docram[ramptr + wtptr] == 0x00)
 				{
 //                          mame_printf_debug("[%d] osc %d hit zero @ %x (mode %d pmode %d)\n", chip->frames, osc, ramptr + wtptr, (pOsc->control>>1)&3, (chip->oscillators[osc^1].control>>1)&3);
-					halt_osc(chip, osc, 1);
+					es5503_halt_osc(chip, osc, 1);
 					acc = 0;
 				}
 				else
 				{
+					if (pOsc->control & 0x10)
+					{
+						*mixp++ += (data * vol);
+						mixp++;
+					}
+					else
+					{
+						mixp++;
+						*mixp++ += (data * vol);
+					}
+
 					if (ramptr >= wtsize)
 					{
-						halt_osc(chip, osc, 0);
+						es5503_halt_osc(chip, osc, 0);
 						acc = 0;
 					}
 				}
@@ -245,6 +256,9 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 		chip->oscillators[osc].data = 0x80;
 		chip->oscillators[osc].irqpend = 0;
 		chip->oscillators[osc].accumulator = 0;
+
+		chip->oscillators[osc].timer = timer_alloc_ptr(es5503_timer_cb, &chip->oscillators[osc]);
+		chip->oscillators[osc].chip = (void *)chip;
 	}
 
 	chip->oscsenabled = 1;
@@ -259,6 +273,8 @@ READ8_HANDLER(ES5503_reg_0_r)
 	UINT8 retval;
 	int i;
 	ES5503Chip *chip = sndti_token(SOUND_ES5503, 0);
+
+	stream_update(chip->stream);
 
 	if (offset < 0xe0)
 	{
@@ -356,6 +372,8 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 {
 	ES5503Chip *chip = sndti_token(SOUND_ES5503, 0);
 
+	stream_update(chip->stream);
+
 	if (offset < 0xe0)
 	{
 		int osc = offset & 0x1f;
@@ -389,7 +407,51 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 				{
 //                  mame_printf_debug("[%d] %02x to control for voice %02d (wtptr %x vol %x wts %d res %d)\n", chip->frames, data, osc, chip->oscillators[osc].wavetblpointer, chip->oscillators[osc].vol, chip->oscillators[osc].wavetblsize, chip->oscillators[osc].resolution);
 					chip->oscillators[osc].accumulator = 0;
+
+					// this is a timer, now simulate playing it
+					if ((chip->oscillators[osc].vol == 0) && (chip->oscillators[osc].freq > 0))
+					{
+						UINT32 length, run;
+						UINT32 wtptr = chip->oscillators[osc].wavetblpointer & wavemasks[chip->oscillators[osc].wavetblsize];
+						UINT32 acc = 0;
+						UINT16 wtsize = chip->oscillators[osc].wtsize-1;
+						UINT16 freq = chip->oscillators[osc].freq;
+						INT8 data = -128;
+						int resshift = resshifts[chip->oscillators[osc].resolution] - chip->oscillators[osc].wavetblsize;
+						UINT32 sizemask = accmasks[chip->oscillators[osc].wavetblsize];
+						UINT32 ramptr;
+						double rate;
+
+						run = 1;
+						length = 0;
+						while (run)
+						{
+							ramptr = (acc >> resshift) & sizemask;
+							acc += freq;
+							data = (INT32)chip->docram[ramptr + wtptr];
+							
+							if ((data == 0) || (ramptr >= wtsize))
+							{
+								run = 0;
+							}
+							else
+							{
+								length++;
+							}
+						}
+
+						// ok, we run at this many hz.
+						rate = 26320.0 / (double)length;
+
+						timer_adjust_ptr(chip->oscillators[osc].timer, TIME_IN_HZ(rate), TIME_IN_HZ(rate));
+					}
 				}
+				else if (!(chip->oscillators[osc].control & 1) && (data&1))
+				{
+					// key off
+					timer_adjust_ptr(chip->oscillators[osc].timer, TIME_NEVER, TIME_NEVER);
+				}
+
 				chip->oscillators[osc].control = data;
 				break;
 
@@ -468,9 +530,9 @@ void es5503_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "ES5503";						break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq ES550x";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "0.2";						break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "0.3";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2005-2006 R. Belmont"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2005-2007 R. Belmont"; break;
 	}
 }
 
