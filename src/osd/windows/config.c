@@ -328,10 +328,6 @@ int cli_frontend_init(int argc, char **argv)
 		}
 	}
 
-#ifdef MESS
-	win_mess_extract_options();
-#endif /* MESS */
-
 	// debugging options
 {
 	extern int verbose;
