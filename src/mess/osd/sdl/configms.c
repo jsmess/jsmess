@@ -23,7 +23,7 @@ static char *dev_dirs[IO_COUNT];
 
 static const options_entry win_mess_opts[] =
 {
-	{ NULL,							NULL,   OPTION_HEADER,		"WINDOWS MESS SPECIFIC OPTIONS" },
+	{ NULL,							NULL,   OPTION_HEADER,		"SDL MESS SPECIFIC OPTIONS" },
 //	{ "newui;nu",                   "1",    OPTION_BOOLEAN,		"use the new MESS UI" },
 	{ "threads;thr",				"0",	0,					"number of threads to use for parallel operations" },
 	{ "natural;nat",				"0",	OPTION_BOOLEAN,		"specifies whether to use a natural keyboard or not" },
@@ -85,12 +85,14 @@ void device_dirs_save(int config_type, xml_data_node *parentnode)
 void win_mess_options_init(void)
 {
 	options_add_entries(win_mess_opts);
-
-	win_task_count = options_get_int("threads");
-	win_use_natural_keyboard = options_get_bool("natural");
 }
 
 
+void win_mess_options_parse(void)
+{
+	win_task_count = options_get_int("threads");
+	win_use_natural_keyboard = options_get_bool("natural");
+}
 
 void win_mess_config_init(running_machine *machine)
 {

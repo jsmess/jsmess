@@ -21,6 +21,9 @@
 #include "options.h"
 #include "input.h"
 
+#ifdef MESS
+#include "inputx.h"
+#endif
 
 //============================================================
 //	IMPORTS
@@ -1158,6 +1161,52 @@ static key_lookup_table mame_lookup[] =
  	KE(-1)
 };
 
+#ifdef MESS
+extern int win_use_natural_keyboard;
+static const INT32 mess_keytrans[][2] =
+{
+	{ SDLK_ESCAPE,	UCHAR_MAMEKEY(ESC) },
+	{ SDLK_F1,		UCHAR_MAMEKEY(F1) },
+	{ SDLK_F2,		UCHAR_MAMEKEY(F2) },
+	{ SDLK_F3,		UCHAR_MAMEKEY(F3) },
+	{ SDLK_F4,		UCHAR_MAMEKEY(F4) },
+	{ SDLK_F5,		UCHAR_MAMEKEY(F5) },
+	{ SDLK_F6,		UCHAR_MAMEKEY(F6) },
+	{ SDLK_F7,		UCHAR_MAMEKEY(F7) },
+	{ SDLK_F8,		UCHAR_MAMEKEY(F8) },
+	{ SDLK_F9,		UCHAR_MAMEKEY(F9) },
+	{ SDLK_F10,		UCHAR_MAMEKEY(F10) },
+	{ SDLK_F11,		UCHAR_MAMEKEY(F11) },
+	{ SDLK_F12,		UCHAR_MAMEKEY(F12) },
+	{ SDLK_NUMLOCK,	UCHAR_MAMEKEY(F12) },
+	{ SDLK_SCROLLOCK,	UCHAR_MAMEKEY(F12) },
+	{ SDLK_KP0,	UCHAR_MAMEKEY(0_PAD) },
+	{ SDLK_KP1,	UCHAR_MAMEKEY(1_PAD) },
+	{ SDLK_KP2,	UCHAR_MAMEKEY(2_PAD) },
+	{ SDLK_KP3,	UCHAR_MAMEKEY(3_PAD) },
+	{ SDLK_KP4,	UCHAR_MAMEKEY(4_PAD) },
+	{ SDLK_KP5,	UCHAR_MAMEKEY(5_PAD) },
+	{ SDLK_KP6,	UCHAR_MAMEKEY(6_PAD) },
+	{ SDLK_KP7,	UCHAR_MAMEKEY(7_PAD) },
+	{ SDLK_KP8,	UCHAR_MAMEKEY(8_PAD) },
+	{ SDLK_KP9,	UCHAR_MAMEKEY(9_PAD) },
+	{ SDLK_KP_PERIOD,	UCHAR_MAMEKEY(DEL_PAD) },
+	{ SDLK_KP_PLUS,		UCHAR_MAMEKEY(PLUS_PAD) },
+	{ SDLK_KP_MINUS,	UCHAR_MAMEKEY(MINUS_PAD) },
+	{ SDLK_INSERT,	UCHAR_MAMEKEY(INSERT) },
+	{ SDLK_DELETE,	UCHAR_MAMEKEY(DEL) },
+	{ SDLK_HOME,		UCHAR_MAMEKEY(HOME) },
+	{ SDLK_END,		UCHAR_MAMEKEY(END) },
+	{ SDLK_PAGEUP,		UCHAR_MAMEKEY(PGUP) },
+	{ SDLK_PAGEDOWN, 	UCHAR_MAMEKEY(PGDN) },
+	{ SDLK_UP,		UCHAR_MAMEKEY(UP) },
+	{ SDLK_DOWN,		UCHAR_MAMEKEY(DOWN) },
+	{ SDLK_LEFT,		UCHAR_MAMEKEY(LEFT) },
+	{ SDLK_RIGHT,		UCHAR_MAMEKEY(RIGHT) },
+	{ SDLK_PAUSE,		UCHAR_MAMEKEY(PAUSE) },
+};
+#endif
+
 static int lookup_key_code(const key_lookup_table *kt, char *kn)
 {
 	int i=0;
@@ -1345,6 +1394,9 @@ void win_process_events(void)
 {
 	SDL_Event event;
 	int i;
+	#ifdef MESS
+	int translated;
+	#endif
 	for (i=0;i<MAX_JOYSTICKS;i++)
 	{
 	        mouse_state[i].lX = 0;
@@ -1356,6 +1408,25 @@ void win_process_events(void)
 			mame_schedule_exit(Machine);
 			break;
 		case SDL_KEYDOWN:
+			#ifdef MESS
+			if (win_use_natural_keyboard)
+			{
+				translated = 0;
+				for (i = 0; i < sizeof(mess_keytrans) / sizeof(mess_keytrans[0]); i++)
+				{
+					if (event.key.keysym.sym == mess_keytrans[i][0])
+					{
+						translated = 1;
+						inputx_postc(mess_keytrans[i][1]);
+					}
+				}
+
+				if (!translated)
+				{
+					inputx_postc(event.key.keysym.sym);
+				}
+			}
+			#endif
 			keyboard_state[event.key.keysym.sym] = 1;
 			updatekeyboard();
 			break;

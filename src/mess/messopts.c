@@ -11,10 +11,7 @@
 #include "config.h"
 #include "xmlfile.h"
 
-#ifdef WIN32
 #include "osd/windows/configms.h"
-#endif
-
 
 
 /***************************************************************************
@@ -196,9 +193,7 @@ static void mess_exit(running_machine *machine)
 
 void mess_config_init(running_machine *machine)
 {
-#ifdef WIN32
 	win_mess_config_init(machine);
-#endif
 	add_exit_callback(machine, mess_exit);
 }
 
@@ -260,10 +255,18 @@ void win_mess_extract_options(void)
 		}
 	}
 
+	#ifdef WIN32
 	options.disable_normal_ui = options_get_bool("newui");
+	#else
+	options.disable_normal_ui = 0;
+	#endif
 	options.ram = specified_ram;
+	#ifdef WIN32
 	options.min_width = options_get_int("min_width");
 	options.min_height = options_get_int("min_height");
+	#else
+	options.min_width = options.min_height = 0;
+	#endif
 
 	mess_write_config = options_get_bool("writeconfig");
 
