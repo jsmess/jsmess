@@ -183,6 +183,9 @@
 		<entry name="8.TXT"/>
 		<entry name="9.TXT"/>
 	</checkdirectory>
+  <checkdirectory path="/">
+    <entry name="FOO"/>
+  </checkdirectory>
 </imgtooltest>
 
 <imgtooltest name="coco_os9_006">
