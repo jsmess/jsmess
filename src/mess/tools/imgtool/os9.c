@@ -1125,7 +1125,7 @@ static imgtoolerr_t os9_diskimage_createdir(imgtool_partition *partition, const 
 	place_string(dir_data,   0, 32, "..");
 	place_integer_be(dir_data, 29,  3, parent_lsn);
 	place_string(dir_data,  32, 32, ".");
-	place_integer_be(dir_data, 29,  3, file_info.lsn);
+	place_integer_be(dir_data, 61,  3, file_info.lsn);
 
 	err = os9_write_lsn(image, file_info.sector_map[0].lsn, 0, dir_data, sizeof(dir_data));
 	if (err)
