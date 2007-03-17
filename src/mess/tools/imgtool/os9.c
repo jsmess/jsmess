@@ -835,14 +835,42 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool_directory *enumeration, imgto
 		lsn = os9_lookup_lsn(image, &os9enum->dir_info, &index);
 		os9enum->index += 32;
 
+		/* read the directory entry out of the lSN */
 		err = os9_read_lsn(image, lsn, index, dir_entry, sizeof(dir_entry));
 		if (err)
 			return err;
 
 		if (dir_entry[0])
+		{
+			/* read the file or directory name */
 			pick_string(dir_entry, 0, 28, filename);
+
+			/* we have certain expectations of the directory contents; the
+			 * first directory entry should be "..", the second ".", and
+			 * subsequent entries should never be "." or ".." */
+			switch(index)
+			{
+				case 0:
+					if (strcmp(filename, ".."))
+						imgtool_warn("First entry in directory should be \"..\" and not \"%s\"", filename);
+					break;
+
+				case 32:
+					if (strcmp(filename, "."))
+						imgtool_warn("Second entry in directory should be \".\" and not \"%s\"", filename);
+					break;
+
+				default:
+					if (!strcmp(filename, ".") || !strcmp(filename, ".."))
+						imgtool_warn("Directory entry %d should not be \"%s\"", index / 32, filename);
+					break;
+			}
+		}
 		else
+		{
+			/* no more directory entries */
 			filename[0] = '\0';
+		}
 	}
 	while(!filename[0] || !strcmp(filename, ".") || !strcmp(filename, ".."));
 
@@ -1092,11 +1120,12 @@ static imgtoolerr_t os9_diskimage_createdir(imgtool_partition *partition, const 
 	if (err)
 		goto done;
 
+	/* create intial directories */
 	memset(dir_data, 0, sizeof(dir_data));
-	place_string(dir_data,   0, 32, ".");
-	place_integer_be(dir_data, 29,  3, file_info.lsn);
-	place_string(dir_data,  32, 32, "..");
+	place_string(dir_data,   0, 32, "..");
 	place_integer_be(dir_data, 29,  3, parent_lsn);
+	place_string(dir_data,  32, 32, ".");
+	place_integer_be(dir_data, 29,  3, file_info.lsn);
 
 	err = os9_write_lsn(image, file_info.sector_map[0].lsn, 0, dir_data, sizeof(dir_data));
 	if (err)

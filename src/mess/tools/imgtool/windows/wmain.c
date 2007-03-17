@@ -13,6 +13,7 @@
 #include "hexview.h"
 #include "../modules.h"
 #include "strconv.h"
+#include "winutil.h"
 
 int WINAPI _tWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	LPTSTR command_line, int cmd_show)
@@ -33,7 +34,7 @@ int WINAPI _tWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 		goto done;
 
 	// initialize the Imgtool library
-	imgtool_init(TRUE);
+	imgtool_init(TRUE, win_output_debug_string_utf8);
 
 	// create the window
 	window = CreateWindow(wimgtool_class, NULL, WS_OVERLAPPEDWINDOW | WS_VISIBLE,

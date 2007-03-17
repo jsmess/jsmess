@@ -943,7 +943,7 @@ int CLIB_DECL main(int argc, char *argv[])
 					goto cmderror;
 
 				/* initialize the imgtool core */
-				imgtool_init(TRUE);
+				imgtool_init(TRUE, NULL);
 
 				if (c->lastargrepeats && (argc > c->maxargs))
 				{

@@ -95,7 +95,18 @@
 	<putfile name="7.TXT"/>
 	<putfile name="8.TXT"/>
 	<putfile name="9.TXT"/>
-	<checkdirectory>
+  <putfile name="10.TXT"/>
+  <putfile name="11.TXT"/>
+  <putfile name="12.TXT"/>
+  <putfile name="13.TXT"/>
+  <putfile name="14.TXT"/>
+  <putfile name="15.TXT"/>
+  <putfile name="16.TXT"/>
+  <putfile name="17.TXT"/>
+  <putfile name="18.TXT"/>
+  <putfile name="19.TXT"/>
+  <putfile name="20.TXT"/>
+  <checkdirectory>
 		<entry name="1.TXT"/>
 		<entry name="2.TXT"/>
 		<entry name="3.TXT"/>
@@ -105,7 +116,18 @@
 		<entry name="7.TXT"/>
 		<entry name="8.TXT"/>
 		<entry name="9.TXT"/>
-	</checkdirectory>
+    <entry name="10.TXT"/>
+    <entry name="11.TXT"/>
+    <entry name="12.TXT"/>
+    <entry name="13.TXT"/>
+    <entry name="14.TXT"/>
+    <entry name="15.TXT"/>
+    <entry name="16.TXT"/>
+    <entry name="17.TXT"/>
+    <entry name="18.TXT"/>
+    <entry name="19.TXT"/>
+    <entry name="20.TXT"/>
+  </checkdirectory>
 </imgtooltest>
 
 <imgtooltest name="coco_os9_004">

@@ -661,13 +661,20 @@ static void node_checkattr(struct imgtooltest_state *state, xml_data_node *node)
 
 
 
+static void messtest_warn(const char *message)
+{
+	report_message(MSG_FAILURE, "%s", message);
+}
+
+
+
 void node_testimgtool(xml_data_node *node)
 {
 	xml_data_node *child_node;
 	xml_attribute_node *attr_node;
 	struct imgtooltest_state state;
 
-	imgtool_init(FALSE);
+	imgtool_init(FALSE, messtest_warn);
 
 	attr_node = xml_get_attribute(node, "name");
 	report_testcase_begin(attr_node ? attr_node->value : NULL);

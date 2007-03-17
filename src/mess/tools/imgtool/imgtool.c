@@ -85,6 +85,7 @@ struct _imgtool_directory
 imgtool_library *global_imgtool_library;
 
 static int global_omit_untested;
+static void (*global_warn)(const char *message);
 
 
 
@@ -142,7 +143,7 @@ static void internal_error(const imgtool_module *module, const char *message)
     imgtool_init - initializes the imgtool core
 -------------------------------------------------*/
 
-void imgtool_init(int omit_untested)
+void imgtool_init(int omit_untested, void (*warn)(const char *message))
 {
 	imgtoolerr_t err;
 	err = imgtool_create_cannonical_library(omit_untested, &global_imgtool_library);
@@ -152,6 +153,7 @@ void imgtool_init(int omit_untested)
 		imgtool_library_sort(global_imgtool_library, ITLS_DESCRIPTION);
 	}
 	global_omit_untested = omit_untested;
+	global_warn = warn;
 }
 
 
@@ -167,6 +169,7 @@ void imgtool_exit(void)
 		imgtool_library_close(global_imgtool_library);
 		global_imgtool_library = NULL;
 	}
+	global_warn = NULL;
 }
 
 
@@ -202,6 +205,26 @@ imgtool_module_features imgtool_get_module_features(const imgtool_module *module
 	if (module->write_sector)
 		features.supports_writesector = 1;
 	return features;
+}
+
+
+
+/*-------------------------------------------------
+    imgtool_warn - issues a warning
+-------------------------------------------------*/
+
+void imgtool_warn(const char *format, ...)
+{
+	va_list va;
+	char buffer[2000];
+
+	if (global_warn)
+	{
+		va_start(va, format);
+		vsprintf(buffer, format, va);
+		va_end(va);
+		global_warn(buffer);
+	}
 }
 
 
@@ -595,7 +618,7 @@ static char *pool_strdup_allow_null(memory_pool *pool, char *s)
 imgtoolerr_t imgtool_partition_open(imgtool_image *image, int partition_index, imgtool_partition **partition)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	imgtool_partition *p;
+	imgtool_partition *p = NULL;
 	imgtool_class imgclass;
 	imgtool_partition_info partition_info[32];
 	UINT64 base_block, block_count;
@@ -825,7 +848,7 @@ int imgtool_validitychecks(void)
 
 	if (!global_imgtool_library)
 	{
-		imgtool_init(FALSE);
+		imgtool_init(FALSE, NULL);
 		created_library = TRUE;
 	}
 

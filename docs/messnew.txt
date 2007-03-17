@@ -27,7 +27,8 @@ User Interface Changes:
 
 Imgtool Changes:
 ----------------
-(none)
+- Added the ability for modules to "warn" the core of inconsistencies.  These
+  warnings will cause failues in Imgtool test cases.  [Nate Woods]
 
 
 
