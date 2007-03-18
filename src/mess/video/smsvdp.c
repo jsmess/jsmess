@@ -890,8 +890,6 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 
 	/* Draw sprite layer */
 	spriteTable = VRAM + ( ( reg[0x05] & 0x7F ) << 7 );
-logerror("Doing sprites for line %d, 0x%02X\n", line, line );
-logerror("Using sprite table at 0x%04X\n", spriteTable - VRAM );
 	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
 	spriteHeight = 8;
 	if ( reg[0x01] & 0x02 )				/* Check if SI is set */
@@ -906,7 +904,6 @@ logerror("Using sprite table at 0x%04X\n", spriteTable - VRAM );
 		}
 		if ( ( line >= spriteY ) && ( line < ( spriteY + spriteHeight ) ) ) {
 			if ( spriteBufferCount < 5 ) {
-logerror("Selected sprite at index 0x%02X\n", spriteIndex );
 				spriteBuffer[spriteBufferCount] = spriteIndex;
 			} else {
 				/* Too many sprites per line */
