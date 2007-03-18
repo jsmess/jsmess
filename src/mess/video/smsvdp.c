@@ -237,7 +237,13 @@ static void set_display_settings( void ) {
 		break;
 	}
 	start_top_border = start_blanking + 19;
-	if ( ! IS_GAMEGEAR ) {
+	if ( IS_GAMEGEAR ) {
+		if ( vdp_mode == 4 && y_pixels != 192 ) {
+			video_screen_set_visarea( 0, 6*8, 26*8 - 1, 5*8, 23*8 - 1 );
+		} else {
+			video_screen_set_visarea( 0, 6*8, 26*8 - 1, 3*8, 21*8 - 1 );
+		}
+	} else {
 		video_screen_set_visarea( 0, LBORDER_X_PIXELS, LBORDER_X_PIXELS + 255, TBORDER_Y_PIXELS, TBORDER_Y_PIXELS + y_pixels - 1 );
 	}
 	isCRAMDirty = 1;
