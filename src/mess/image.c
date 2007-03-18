@@ -172,6 +172,7 @@ int image_init(void)
 static void image_exit(running_machine *machine)
 {
 	int i, j, indx;
+	mess_image *image;
 
 	/* unload all devices */
 	image_unload_all(FALSE);
@@ -185,11 +186,19 @@ static void image_exit(running_machine *machine)
 		{
 			for (j = 0; j < Machine->devices[i].count; j++)
 			{
+				/* identify the image */
+				image = &images[indx + j];
+
 				/* call the exit handler if appropriate */
 				if (Machine->devices[i].exit)
-					Machine->devices[i].exit(&images[indx + j]);
+					Machine->devices[i].exit(image);
 
+				/* free the tagpool */
 				tagpool_exit(&images[indx + j].tagpool);
+
+				/* free the memory pool */
+				pool_free(image->mempool);
+				image->mempool = NULL;
 			}
 			indx += Machine->devices[i].count;
 		}
