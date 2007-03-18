@@ -13,6 +13,8 @@
 
 int mess_ui_active(void);
 void mess_ui_update(void);
+int mess_use_new_ui(void);
+int mess_disable_builtin_ui(void);
 
 /* image info screen */
 int ui_sprintf_image_info(char *buf);

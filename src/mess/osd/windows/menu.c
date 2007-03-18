@@ -1970,7 +1970,7 @@ int win_create_menu(HMENU *menus)
 	HMENU menu_bar = NULL;
 	HMODULE module;
 	
-	if (options.disable_normal_ui)
+	if (options_get_bool("newui"))
 	{
 		module = win_resource_module();
 		menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));

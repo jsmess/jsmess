@@ -42,6 +42,10 @@
 #include "video.h"
 #include "strconv.h"
 
+#ifdef MESS
+#include "uimess.h"
+#endif
+
 // set to 1 if you want to use the built-in DX handling
 // for joystick range, deadzone and saturation
 // the non-DX code is mainly a reference for porting to another OS
@@ -2613,7 +2617,7 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 
 #ifdef MESS
 			case IPT_OSD_2:
-				if (options.disable_normal_ui)
+				if (mess_use_new_ui())
 				{
 					idef->token = "TOGGLE_MENUBAR";
 					idef->name = "Toggle Menubar";

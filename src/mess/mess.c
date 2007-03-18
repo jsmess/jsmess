@@ -18,6 +18,7 @@
 #include "image.h"
 #include "inputx.h"
 #include "hash.h"
+#include "messopts.h"
 
 /* Globals */
 const char *mess_path;
@@ -32,11 +33,21 @@ static void ram_init(const game_driver *gamedrv)
 	int i;
 	char buffer[1024];
 	char *s;
+	const char *ramsize_string;
+	UINT32 specified_ram = 0;
 
-	/* validate RAM option */
-	if (options.ram != 0)
+	/* parse RAM option */
+	ramsize_string = options_get_string(OPTION_RAMSIZE);
+	if (ramsize_string != NULL)
 	{
-		if (!ram_is_valid_option(gamedrv, options.ram))
+		specified_ram = ram_parse_string(ramsize_string);
+		if (specified_ram == 0)
+		{
+			fatalerror_exitcode(MAMERR_DEVICE, "Cannot recognize the RAM option %s\n", ramsize_string);
+		}
+
+		/* is this option actually valid? */
+		if (!ram_is_valid_option(gamedrv, specified_ram))
 		{
 			char buffer2[RAM_STRING_BUFLEN];
 			int opt_count;
@@ -51,20 +62,21 @@ static void ram_init(const game_driver *gamedrv)
 			{
 				s = buffer;
 				s += sprintf(s, "%s is not a valid RAM option for driver '%s' (valid choices are ",
-					ram_string(buffer2, options.ram), gamedrv->name);
+					ram_string(buffer2, specified_ram), gamedrv->name);
 				for (i = 0; i < opt_count; i++)
 					s += sprintf(s, "%s%s",  i ? " or " : "", ram_string(buffer2, ram_option(gamedrv, i)));
 				s += sprintf(s, ")\n");
 				fatalerror_exitcode(MAMERR_DEVICE, "%s", buffer);
 			}
 		}
-		mess_ram_size = options.ram;
+		mess_ram_size = specified_ram;
 	}
 	else
 	{
 		/* none specified; chose default */
 		mess_ram_size = ram_default(gamedrv);
 	}
+
 	/* if we have RAM, allocate it */
 	if (mess_ram_size > 0)
 	{
@@ -102,17 +114,12 @@ static void devices_exit(running_machine *machine)
 
 void devices_init(running_machine *machine)
 {
-	int i;
 	const struct IODevice *dev;
 	int id;
 	int result = INIT_FAIL;
-	int devcount;
-	int *allocated_slots;
 	const char *image_name;
+	const char *dev_name;
 	mess_image *image;
-	iodevice_t devtype;
-	const char *devtag;
-	int devindex;
 
 	/* convienient place to call this */
 	{
@@ -130,117 +137,49 @@ void devices_init(running_machine *machine)
 		fatalerror_exitcode(MAMERR_DEVICE, "devices_allocate() failed");
 	add_exit_callback(machine, devices_exit);
 
-	/* Check that the driver supports all devices requested (options struct)*/
-	for( i = 0; i < options.image_count; i++ )
-	{
-		if (options.image_files[i].device_tag)
-			dev = device_find_tag(machine->devices, options.image_files[i].device_tag);
-		else
-			dev = device_find(machine->devices, options.image_files[i].device_type);
-
-		if (!dev)
-			fatalerror_exitcode(MAMERR_DEVICE, " ERROR: Device [%s] is not supported by this system\n", device_typename(options.image_files[i].device_type));
-	}
-
 	/* initialize RAM code */
 	ram_init(machine->gamedrv);
 
 	/* init all devices */
 	image_init();
 
-	/* count number of devices, and record a list of allocated slots */
-	devcount = 0;
+	/* make sure that any required devices have been allocated */
 	for (dev = machine->devices; dev->type < IO_COUNT; dev++)
-		devcount++;
-	if (devcount > 0)
 	{
-		allocated_slots = malloc_or_die(devcount * sizeof(*allocated_slots));
-		memset(allocated_slots, 0, devcount * sizeof(*allocated_slots));
-	}
-	else
-	{
-		allocated_slots = NULL;
-	}
-
-	/* distribute images to appropriate devices */
-	for (i = 0; i < options.image_count; i++)
-	{
-		/* get the image type and filename */
-		image_name = options.image_files[i].name;
-		image_name = (image_name && image_name[0]) ? image_name : NULL;
-		devtype = options.image_files[i].device_type;
-		devtag = options.image_files[i].device_tag;
-		devindex = options.image_files[i].device_index;
-
-		assert(devtype >= 0);
-		assert(devtype < IO_COUNT);
-
-		image = NULL;
-
-		/* search for a matching device */
-		for (dev = machine->devices; dev->type < IO_COUNT; dev++)
+		for (id = 0; id < dev->count; id++)
 		{
-			if ((dev->type == devtype) && (!devtag || !strcmp(dev->tag, devtag)))
-				break;
-		}
+			/* identify the image */
+			image = image_from_device_and_index(dev, id);
 
-		/* did we find the device? */
-		if (dev->type < IO_COUNT)
-		{
-			/* device has been found; now identify the precise slot */
-			if (devindex >= 0)
-				id = devindex;
-			else
-				id = allocated_slots[dev - machine->devices]++;
+			/* identify the option name */
+			dev_name = device_instancename(&dev->devclass, id);
 
-			/* check to see if we loaded too many devices */
-			if (id >= dev->count)
-			{
-				if (allocated_slots)
-					free(allocated_slots);
-				fatalerror_exitcode(MAMERR_DEVICE, "Too many devices of type %d\n", devtype);
-			}
-
-			/* only load the image if image_name is specified */
-			if (image_name)
+			/* is an image specified for this image */
+			image_name = options_get_string(dev_name);
+			if (image_name != NULL)
 			{
 				/* try to load this image */
-				image = image_from_device_and_index(dev, id);
 				result = image_load(image, image_name);
 
 				/* did the image load fail? */
 				if (result)
 				{
-					if (allocated_slots)
-						free(allocated_slots);
 					fatalerror_exitcode(MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
-						device_typename(devtype),
+						device_typename(dev->type),
 						osd_basename((char *) image_name),
 						image_error(image));
 				}
 			}
-		}
-	}
-
-	/* make sure that any required devices have been allocated */
-	for (dev = machine->devices; dev->type < IO_COUNT; dev++)
-	{
-		if (dev->must_be_loaded)
-		{
-			for (id = 0; id < dev->count; id++)
+			else
 			{
-				image = image_from_device_and_index(dev, id);
-				if (!image_exists(image))
+				/* no image... must this device be loaded? */
+				if (dev->must_be_loaded)
 				{
-					if (allocated_slots)
-						free(allocated_slots);
 					fatalerror_exitcode(MAMERR_DEVICE, "Driver requires that device %s must have an image to load\n", device_typename(dev->type));
 				}
 			}
 		}
 	}
-	if (allocated_slots)
-		free(allocated_slots);
 }
 
 

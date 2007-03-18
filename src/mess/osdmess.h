@@ -240,9 +240,4 @@ int osd_num_devices(void);
 const char *osd_get_device_name(int i);
 void osd_change_device(const char *vol);
 
-void osd_begin_final_unloading(void);
-
-/* used to notify osd code of the load status of an image */
-void osd_image_load_status_changed(mess_image *img, int is_final_unload);
-
 #endif /* __OSDMESS_H__ */

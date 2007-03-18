@@ -20,6 +20,7 @@
 #include "tagpool.h"
 #include "hashfile.h"
 #include "mamecore.h"
+#include "messopts.h"
 
 
 
@@ -531,9 +532,6 @@ static int image_load_internal(mess_image *image, const char *path,
 	if (image->err)
 		goto done;
 
-	/* tell the OSD layer that this is changing */
-	osd_image_load_status_changed(image, 0);
-
 	/* do we need to reset the CPU? */
 	if ((timer_get_time() > 0) && image->dev->reset_on_load)
 		mame_schedule_soft_reset(Machine);
@@ -701,7 +699,6 @@ static void image_unload_internal(mess_image *image, int is_final_unload)
 
 	image_clear(image);
 	image_clear_error(image);
-	osd_image_load_status_changed(image, is_final_unload);
 }
 
 
@@ -728,7 +725,7 @@ void image_unload_all(int ispreload)
 	mess_image *image;
 
 	if (!ispreload)
-		osd_begin_final_unloading();
+		mess_options_extract();
 
 	/* normalize ispreload */
 	ispreload = ispreload ? 1 : 0;

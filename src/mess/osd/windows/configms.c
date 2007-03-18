@@ -119,19 +119,3 @@ void set_devicedirectory(int dev, const char *dir)
 		free(dev_dirs[dev]);
 	dev_dirs[dev] = mame_strdup(dir);
 }
-
-
-
-void osd_begin_final_unloading(void)
-{
-	extern void mess_begin_final_unloading(void);
-	mess_begin_final_unloading();
-}
-
-
-
-/* used to notify osd code of the load status of an image */
-void osd_image_load_status_changed(mess_image *img, int is_final_unload)
-{
-}
-

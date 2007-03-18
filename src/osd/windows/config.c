@@ -235,9 +235,6 @@ int cli_frontend_init(int argc, char **argv)
 
 	// initialize the options manager
 	options_init(windows_opts);
-#ifdef MESS
-	win_mess_options_init();
-#endif // MESS
 
 	// parse the command line first; if we fail here, we're screwed
 	if (options_parse_command_line(argc, argv))

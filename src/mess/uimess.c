@@ -109,10 +109,10 @@ int ui_sprintf_image_info(char *buf)
 
 	dst += sprintf(dst, "%s\n\n", Machine->gamedrv->description);
 
-	if (options.ram)
+	if (mess_ram_size > 0)
 	{
 		char buf2[RAM_STRING_BUFLEN];
-		dst += sprintf(dst, "RAM: %s\n\n", ram_string(buf2, options.ram));
+		dst += sprintf(dst, "RAM: %s\n\n", ram_string(buf2, mess_ram_size));
 	}
 
 	for (dev = Machine->devices; dev->type < IO_COUNT; dev++)
@@ -186,4 +186,22 @@ UINT32 ui_menu_image_info(UINT32 state)
 	/* handle the keys */
 	ui_menu_generic_keys(&selected, 1);
 	return selected;
+}
+
+
+
+int mess_use_new_ui(void)
+{
+#ifdef WIN32
+	if (options_get_bool("newui"))
+		return TRUE;
+#endif
+	return FALSE;
+}
+
+
+
+int mess_disable_builtin_ui(void)
+{
+	return mess_use_new_ui() || ((Machine->gamedrv->flags & GAME_COMPUTER) && !mess_ui_active());
 }

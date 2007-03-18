@@ -1235,7 +1235,7 @@ static UINT32 handler_ingame(UINT32 state)
 	}
 
 #ifdef MESS
-	if (options.disable_normal_ui || ((Machine->gamedrv->flags & GAME_COMPUTER) && !mess_ui_active()))
+	if (mess_disable_builtin_ui())
 		return 0;
 #endif
 

@@ -299,7 +299,6 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 
 	/* set up options */
 	options_init(NULL);
-	memset(&options, 0, sizeof(options));
 	options_set_bool("skip_gameinfo", TRUE);
 	options_set_int("ramsize", current_testcase.ram);
 
@@ -307,10 +306,12 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)
 	{
 		fullpath = assemble_software_path(drivers[driver_num], current_command->u.image_args.filename);
+/*
 		options.image_files[options.image_count].name = fullpath;
 		options.image_files[options.image_count].device_type = current_command->u.image_args.device_type;
 		options.image_files[options.image_count].device_index = -1;
 		options.image_count++;
+*/
 		current_command++;
 	}
 
