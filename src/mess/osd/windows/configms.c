@@ -85,7 +85,7 @@ void device_dirs_save(int config_type, xml_data_node *parentnode)
 
 
 
-void win_mess_options_init(void)
+void osd_mess_options_init(void)
 {
 	options_add_entries(win_mess_opts);
 
@@ -95,7 +95,7 @@ void win_mess_options_init(void)
 
 
 
-void win_mess_config_init(running_machine *machine)
+void osd_mess_config_init(running_machine *machine)
 {
 	config_register("device_directories", device_dirs_load, device_dirs_save);
 }

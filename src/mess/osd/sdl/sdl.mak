@@ -11,6 +11,9 @@ MESS_SDLOBJ = $(OBJ)/mess/osd/sdl
 
 OBJDIRS += $(MESS_SDLOBJ)
 
+OSDOBJS += \
+	$(MESS_SDLOBJ)/sdlutil.o
+
 OSDCOREOBJS += \
 	$(MESS_SDLOBJ)/configms.o	\
 	$(MESS_SDLOBJ)/sdlmess.o	\

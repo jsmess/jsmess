@@ -48,8 +48,7 @@ int frontend_isknown(FILE *output);
 
 #ifdef MESS
 int frontend_listdevices(FILE *output);
-void win_mess_options_init(void);
-void win_mess_options_parse(void);
+void sdl_mess_options_parse(void);
 #endif /* MESS */
 
 void set_pathlist(int file_type, const char *new_rawpath);
@@ -285,9 +284,6 @@ int cli_frontend_init(int argc, char **argv)
 
 	// initialize the options manager
 	options_init(sdl_opts);
-#ifdef MESS
-	win_mess_options_init();
-#endif // MESS
 	if (getenv("SDLMAME_UNSUPPORTED"))
 		options_add_entries(config_unsupported_opts);
 
@@ -311,7 +307,7 @@ int cli_frontend_init(int argc, char **argv)
 		exit(1);
 
 #ifdef MESS
-	win_mess_options_parse();
+	sdl_mess_options_parse();
 #endif
 
 	// parse the simple commmands before we go any further
@@ -408,10 +404,6 @@ int cli_frontend_init(int argc, char **argv)
 			free(newpath);
 		}
 	}
-
-#ifdef MESS
-	win_mess_extract_options();
-#endif /* MESS */
 
 {
 	extern int verbose;

@@ -229,7 +229,6 @@ void _sdlwindow_sync(const char *s, int line)
 		//while ( !osd_work_queue_wait(work_queue, 1000 * osd_ticks_per_second()) )
 		while ( (i=osd_work_queue_items(work_queue)) )
 		{
-			printf("Waiting for queue: %s -- %d\n", s, line);
 			usleep(100);
 		}
 	}
@@ -706,12 +705,10 @@ static void *sdlwindow_video_window_destroy_wt(void *param)
 	sdl_window_info *window = wp->window;
 
 	ASSERT_WINDOW_THREAD();
-	printf("wt\n");
 
 	// free the textures etc
 
 	(*draw.window_destroy)(window);
-	printf("wt\n");
 
 	return NULL;
 }
@@ -726,6 +723,8 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 	{
 		sdlwindow_sync();
 	}
+
+	osd_lock_acquire(window->render_lock);
 
 	// remove us from the list
 	for (prevptr = &sdl_window_list; *prevptr != NULL; prevptr = &(*prevptr)->next)
@@ -745,10 +744,9 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 	{
 		osd_work_item_queue(work_queue, &sdlwindow_video_window_destroy_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
 		sdlwindow_sync();
-		printf("wtready\n");
 	}
 	else
-		sdlwindow_video_window_destroy((void *) wp);
+		sdlwindow_video_window_destroy_wt((void *) wp);
 
 	// free the lock
 	osd_lock_free(window->render_lock);

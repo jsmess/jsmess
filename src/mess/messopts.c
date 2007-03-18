@@ -12,9 +12,7 @@
 #include "xmlfile.h"
 #include "messopts.h"
 
-#ifdef WIN32
 #include "osd/windows/configms.h"
-#endif
 
 
 
@@ -46,9 +44,7 @@ static const options_entry mess_opts[] =
 
 void mess_config_init(running_machine *machine)
 {
-#ifdef WIN32
-	win_mess_config_init(machine);
-#endif
+	osd_mess_config_init(machine);
 }
 
 
@@ -168,10 +164,8 @@ void mess_options_init(void)
 	/* add MESS-specific options */
 	options_add_entries(mess_opts);
 
-#ifdef WIN32
-	/* add Win32-MESS specific options (hack!) */
-	win_mess_options_init();
-#endif
+	/* add OSD-MESS specific options (hack!) */
+	osd_mess_options_init();
 
 	/* hacky global variable to track whether we have added device options */
 	added_device_options = FALSE;

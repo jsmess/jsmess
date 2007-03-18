@@ -9,8 +9,8 @@
 
 #include "options.h"
 
-void win_mess_config_init(running_machine *machine);
-void win_mess_options_init(void);
+void osd_mess_config_init(running_machine *machine);
+void osd_mess_options_init(void);
 
 // ugh hack
 const char *get_devicedirectory(int dev);

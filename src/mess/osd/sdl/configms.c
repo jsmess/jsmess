@@ -82,19 +82,19 @@ void device_dirs_save(int config_type, xml_data_node *parentnode)
 
 
 
-void win_mess_options_init(void)
+void osd_mess_options_init(void)
 {
 	options_add_entries(win_mess_opts);
 }
 
 
-void win_mess_options_parse(void)
+void sdl_mess_options_parse(void)
 {
 	win_task_count = options_get_int("threads");
 	win_use_natural_keyboard = options_get_bool("natural");
 }
 
-void win_mess_config_init(running_machine *machine)
+void osd_mess_config_init(running_machine *machine)
 {
 	config_register("device_directories", device_dirs_load, device_dirs_save);
 }
@@ -119,27 +119,4 @@ void set_devicedirectory(int dev, const char *dir)
 	dev_dirs[dev] = mame_strdup(dir);
 }
 
-
-
-void osd_begin_final_unloading(void)
-{
-	extern void mess_begin_final_unloading(void);
-	mess_begin_final_unloading();
-}
-
-
-
-/* used to notify osd code of the load status of an image */
-void osd_image_load_status_changed(mess_image *img, int is_final_unload)
-{
-}
-
-//============================================================
-//	osd_keyboard_disabled
-//============================================================
-
-int osd_keyboard_disabled(void)
-{
-	return win_use_natural_keyboard;
-}
 

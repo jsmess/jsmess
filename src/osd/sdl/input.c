@@ -244,7 +244,7 @@ const int def_key_trans_table[][4] =
 	{ KEYCODE_STOP, 		SDLK_PERIOD, 		0xbe,	'.' },
 	{ KEYCODE_SLASH, 		SDLK_SLASH, 	     	0xbf,	'/' },
 	{ KEYCODE_RSHIFT, 		SDLK_RSHIFT, 		0, 	0 },
-	{ KEYCODE_ASTERISK, 		SDLK_ASTERISK, 		'*',	'*' },
+	{ KEYCODE_ASTERISK, 		SDLK_KP_MULTIPLY,    	'*',	'*' },
 	{ KEYCODE_LALT, 		SDLK_LALT, 		0, 	0 },
 	{ KEYCODE_SPACE, 		SDLK_SPACE, 		' ',	' ' },
 	{ KEYCODE_CAPSLOCK, 		SDLK_CAPSLOCK, 	     	0, 	0 },
