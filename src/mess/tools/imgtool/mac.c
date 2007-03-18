@@ -5239,7 +5239,6 @@ static void mac_image_exit(imgtool_image *img);
 static void mac_image_info(imgtool_image *img, char *string, size_t len);
 static imgtoolerr_t mac_image_beginenum(imgtool_directory *enumeration, const char *path);
 static imgtoolerr_t mac_image_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent);
-static void mac_image_closeenum(imgtool_directory *enumeration);
 static imgtoolerr_t mac_image_freespace(imgtool_partition *partition, UINT64 *size);
 static imgtoolerr_t mac_image_readfile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf);
 static imgtoolerr_t mac_image_writefile(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions);
