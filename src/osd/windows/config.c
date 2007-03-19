@@ -46,7 +46,6 @@ int frontend_isknown(FILE *output);
 
 #ifdef MESS
 int frontend_listdevices(FILE *output);
-void win_mess_options_parse(void)
 #endif /* MESS */
 
 void set_pathlist(int file_type, const char *new_rawpath);
@@ -240,10 +239,6 @@ int cli_frontend_init(int argc, char **argv)
 	// parse the command line first; if we fail here, we're screwed
 	if (options_parse_command_line(argc, argv))
 		exit(MAMERR_INVALID_CONFIG);
-
-	#ifdef MESS
-	win_mess_options_parse();
-	#endif
 
 	// parse the simple commmands before we go any further
 	execute_simple_commands();

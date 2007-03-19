@@ -10,6 +10,7 @@
 #define __OSDMESS_H__
 
 #include "osdcore.h"
+#include "mamecore.h"
 
 struct _mame_file;
 typedef struct _mess_image mess_image;
@@ -239,5 +240,8 @@ void osd_parallelize(void (*task)(void *param, int task_num, int task_count), vo
 int osd_num_devices(void);
 const char *osd_get_device_name(int i);
 void osd_change_device(const char *vol);
+
+void osd_mess_config_init(running_machine *machine);
+void osd_mess_options_init(void);
 
 #endif /* __OSDMESS_H__ */

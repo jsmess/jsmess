@@ -11,8 +11,7 @@
 #include "config.h"
 #include "xmlfile.h"
 #include "messopts.h"
-
-#include "osd/windows/configms.h"
+#include "osdmess.h"
 
 
 

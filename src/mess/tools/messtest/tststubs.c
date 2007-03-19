@@ -221,3 +221,13 @@ int osd_is_bad_read_ptr(const void *ptr, size_t size)
 	return !ptr;
 #endif
 }
+
+
+void osd_mess_options_init(void)
+{
+}
+
+
+void osd_mess_config_init(running_machine *machine)
+{
+}
