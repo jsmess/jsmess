@@ -56,28 +56,26 @@ MACHINE_START(sms);
 MACHINE_RESET(sms);
 INTERRUPT_GEN(sms);
 
-#define NTSC_X_PIXELS								(0x0156)				/* 342 pixels */
-#define NTSC_Y_PIXELS								(0x0106)				/* 262 lines */
-#define PAL_X_PIXELS								(NTSC_X_PIXELS)
-#define PAL_Y_PIXELS								(0x0139)				/* 313 lines */
-#define LBORDER_X_PIXELS						(0x0D)					/* 13 pixels */
-#define RBORDER_X_PIXELS						(0x0F)					/* 15 pixels */
-#define NTSC_192_TBORDER_Y_PIXELS		(0x1B)					/* 27 lines */
-#define NTSC_192_BBORDER_Y_PIXELS		(0x18)					/* 24 lines */
-#define NTSC_224_TBORDER_Y_PIXELS		(0x0B)					/* 11 lines */
-#define NTSC_224_BBORDER_Y_PIXELS		(0x08)					/* 8 lines */
-#define PAL_192_TBORDER_Y_PIXELS		(0x36)					/* 54 lines */
-#define PAL_192_BBORDER_Y_PIXELS		(0x30)					/* 48 lines */
-#define PAL_224_TBORDER_Y_PIXELS		(0x26)					/* 38 lines */
-#define PAL_224_BBORDER_Y_PIXELS		(0x20)					/* 32 lines */
-#define PAL_240_TBORDER_Y_PIXELS		(0x1E)					/* 30 lines */
-#define PAL_240_BBORDER_Y_PIXELS		(0x18)					/* 24 lines */
+#define SMS_X_PIXELS				342				/* 342 pixels */
+#define NTSC_Y_PIXELS				262				/* 262 lines */
+#define PAL_Y_PIXELS				313				/* 313 lines */
+#define LBORDER_X_PIXELS			(0x0D)				/* 13 pixels */
+#define RBORDER_X_PIXELS			(0x0F)				/* 15 pixels */
+#define NTSC_192_TBORDER_Y_PIXELS		(0x1B)				/* 27 lines */
+#define NTSC_192_BBORDER_Y_PIXELS		(0x18)				/* 24 lines */
+#define NTSC_224_TBORDER_Y_PIXELS		(0x0B)				/* 11 lines */
+#define NTSC_224_BBORDER_Y_PIXELS		(0x08)				/* 8 lines */
+#define PAL_192_TBORDER_Y_PIXELS		(0x36)				/* 54 lines */
+#define PAL_192_BBORDER_Y_PIXELS		(0x30)				/* 48 lines */
+#define PAL_224_TBORDER_Y_PIXELS		(0x26)				/* 38 lines */
+#define PAL_224_BBORDER_Y_PIXELS		(0x20)				/* 32 lines */
+#define PAL_240_TBORDER_Y_PIXELS		(0x1E)				/* 30 lines */
+#define PAL_240_BBORDER_Y_PIXELS		(0x18)				/* 24 lines */
 
 /* Hard coded top and bottom borders for ease of reference */
 /* using 11 works for both NTSC and PAL */
 #define TBORDER_Y_PIXELS			(0x0B)					/* 11 lines */
 #define BBORDER_Y_PIXELS			(0x0B)					/* 11 lines */
-#define MAX_X_PIXELS				(PAL_X_PIXELS > NTSC_X_PIXELS ? PAL_X_PIXELS : NTSC_X_PIXELS)
 
 #define GG_CRAM_SIZE				(0x40)	/* 32 colors x 2 bytes per color = 64 bytes */
 #define SMS_CRAM_SIZE				(0x20)	/* 32 colors x 1 bytes per color = 32 bytes */

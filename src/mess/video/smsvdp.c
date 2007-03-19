@@ -272,9 +272,9 @@ static void set_display_settings( void ) {
 	start_top_border = start_blanking + 19;
 	if ( IS_GAMEGEAR ) {
 		if ( vdp_mode == 4 && y_pixels != 192 ) {
-			video_screen_set_visarea( 0, 6*8, 26*8 - 1, 5*8, 23*8 - 1 );
+			video_screen_set_visarea( 0, LBORDER_X_PIXELS + 6*8, LBORDER_X_PIXELS + 26*8 - 1, TBORDER_Y_PIXELS + 5*8, TBORDER_Y_PIXELS + 23*8 - 1 );
 		} else {
-			video_screen_set_visarea( 0, 6*8, 26*8 - 1, 3*8, 21*8 - 1 );
+			video_screen_set_visarea( 0, LBORDER_X_PIXELS + 6*8, LBORDER_X_PIXELS + 26*8 - 1, TBORDER_Y_PIXELS + 3*8, TBORDER_Y_PIXELS + 21*8 - 1 );
 		}
 	} else {
 		video_screen_set_visarea( 0, LBORDER_X_PIXELS, LBORDER_X_PIXELS + 255, TBORDER_Y_PIXELS, TBORDER_Y_PIXELS + y_pixels - 1 );
@@ -328,7 +328,7 @@ int sms_video_init( int max_lines, int bborder_192, int bborder_224, int bborder
 	addr = code = pending = latch = buffer = statusReg = \
 	currentLine = lineCountDownCounter = irqState = 0;
 
-	lineCollisionBuffer = auto_malloc(MAX_X_PIXELS);
+	lineCollisionBuffer = auto_malloc(SMS_X_PIXELS);
 
 	/* Make temp bitmap for rendering */
 	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
@@ -624,7 +624,7 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 	if ( spriteBufferCount > 8 ) {
 		spriteBufferCount = 8;
 	}
-	memset(lineCollisionBuffer, 0, MAX_X_PIXELS);
+	memset(lineCollisionBuffer, 0, SMS_X_PIXELS);
 	spriteBufferCount--;
 	for (spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex--) {
 		spriteIndex = spriteBuffer[spriteBufferIndex];
@@ -802,7 +802,7 @@ void sms_refresh_line_mode2(int *lineBuffer, int line) {
 	if ( spriteBufferCount > 4 ) {
 		spriteBufferCount = 4;
 	}
-	memset( lineCollisionBuffer, 0, MAX_X_PIXELS );
+	memset( lineCollisionBuffer, 0, SMS_X_PIXELS );
 	spriteBufferCount--;
 	for ( spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex-- ) {
 		UINT8 penSelected;
@@ -948,7 +948,7 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	if ( spriteBufferCount > 4 ) {
 		spriteBufferCount = 4;
 	}
-	memset( lineCollisionBuffer, 0, MAX_X_PIXELS );
+	memset( lineCollisionBuffer, 0, SMS_X_PIXELS );
 	spriteBufferCount--;
 	for ( spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex-- ) {
 		int penSelected;
@@ -1065,16 +1065,14 @@ void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 	int pixelPlotY = line;
 	int pixelOffsetX = 0;
 	int x;
+	rectangle rec;
 	int *blitLineBuffer = lineBuffer;
 
-	if ( ! IS_GAMEGEAR ) {
-		pixelPlotY += TBORDER_Y_PIXELS;
-		pixelOffsetX = LBORDER_X_PIXELS;
-	}
+	pixelPlotY += TBORDER_Y_PIXELS;
+	pixelOffsetX = LBORDER_X_PIXELS;
 
 	/* Check if display is disabled */
 	if ( ! ( reg[0x01] & 0x40 ) ) {
-		rectangle rec;
 		/* set whole line to backdrop color */
 		rec.min_x = 0;
 		rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
@@ -1083,47 +1081,39 @@ void sms_refresh_line( mame_bitmap *bitmap, int line ) {
 		return;
 	}
 
-	/* Only SMS has border */
-	if ( ! IS_GAMEGEAR ) {
-		rectangle rec;
-		if ( line >= y_pixels && line < start_blanking ) {
-			/* Bottom border; draw no more than 11 lines */
-			if ( line - y_pixels < 11 ) {
-				rec.min_x = 0;
-				rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
-				rec.min_y = rec.max_y = pixelPlotY;
-				fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
-			}
-			return;
+	if ( line >= y_pixels && line < start_blanking ) {
+		/* Bottom border; draw no more than 11 lines */
+		if ( line - y_pixels < 11 ) {
+			rec.min_x = 0;
+			rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
+			rec.min_y = rec.max_y = pixelPlotY;
+			fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
 		}
-		if ( line >= start_blanking && line < start_top_border ) {
-			return;
-		}
-		if ( line >= start_top_border && line < max_y_pixels ) {
-			/* Top border; draw no more than 11 lines */
-			if ( line - start_top_border < 11 ) {
-				rec.min_x = 0;
-				rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
-				rec.min_y = rec.max_y = 10 - ( line - start_top_border );
-				fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
-				return;
-			}
-		}
-		/* Draw left border */
-		rec.min_y = rec.max_y = pixelPlotY;
-		rec.min_x = 0;
-		rec.max_x = LBORDER_X_PIXELS - 1;
-		fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
-		/* Draw right border */
-		rec.min_y = rec.max_y = pixelPlotY;
-		rec.min_x = LBORDER_X_PIXELS + 256;
-		rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
-		fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
-	} else {
-		if ( line >= y_pixels ) {
+		return;
+	}
+	if ( line >= start_blanking && line < start_top_border ) {
+		return;
+	}
+	if ( line >= start_top_border && line < max_y_pixels ) {
+		/* Top border; draw no more than 11 lines */
+		if ( line - start_top_border < 11 ) {
+			rec.min_x = 0;
+			rec.max_x = LBORDER_X_PIXELS + 255 + RBORDER_X_PIXELS;
+			rec.min_y = rec.max_y = 10 - ( line - start_top_border );
+			fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
 			return;
 		}
 	}
+	/* Draw left border */
+	rec.min_y = rec.max_y = pixelPlotY;
+	rec.min_x = 0;
+	rec.max_x = LBORDER_X_PIXELS - 1;
+	fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
+	/* Draw right border */
+	rec.min_y = rec.max_y = pixelPlotY;
+	rec.min_x = LBORDER_X_PIXELS + 256;
+	rec.max_x = rec.min_x + RBORDER_X_PIXELS - 1;
+	fillbitmap( bitmap, Machine->pens[currentPalette[BACKDROP_COLOR]], &rec );
 
 	switch( vdp_mode ) {
 	case 0:
