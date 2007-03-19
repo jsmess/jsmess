@@ -8810,18 +8810,18 @@ $end
 
 #---------------------------------------------------------------------------------------------#
 
-$info=tmc600
+$info=tmc600s2
 $bio
 Telmac TMC-600
 
 
 History and Trivia:
 
-Telmac TMC-600 is the only microcomputer ever designed and manufactured in Finland. Only 600 units were produced, hence the model name. The computer casing was available in both black and brown. The computer is believed to be designed by T.V. and H.P. Two versions were released, the new version allowing the connection of multiple peripherals simultaneously.
+Telmac TMC-600 is the only microcomputer ever designed and manufactured in Finland. Only 600 units were produced, hence the model name. The computer casing was available in both black and brown. The computer was designed by T.V. and H. Peiponen. Two versions were released, the new version allowing the connection of multiple peripherals simultaneously.
 
 The TMC-700 expansion added support for Centronics printers albeit with a non-standard connector, an RF modulator for hooking up the computer to a TV set, and a real-time clock. 5.25" and 8" floppy disk drives were available via an external controller card. Other add-ons included memory expansions (both RAM and ROM), I/O and A/D cards, an RS-232C controller, a B/W 132-character display controller, and a parallel/serial slave computer. The TMC-600 was designed to be used also in industrial process control, so BASIC ROMs with user-customized keywords were sold.
 
-The manufacturer, Telercas Oy, was the Finnish distributor of RCA semiconductors. Telercas Oy was merged with the Finnish electronics retailer Yleiselektroniikka Oy in the early 1990s. The original documentation and hardware have "disappeared" and cannot be located as of 2003. So, if anybody has access to schematics for any Telmac computers, please contact the author of the driver at trollvm@hotmail.com.
+The manufacturer, Telercas Oy, was the Finnish distributor of RCA semiconductors. Telercas Oy was merged with the Finnish electronics retailer Yleiselektroniikka Oy in 1988. The original documentation and hardware seem to have disappeared.
 
 
 Features:
@@ -8837,7 +8837,6 @@ Connectors: Tape recorder (DIN), EURO expansion bus, composite video, Centronics
 
 Known Issues:
 
-- keyboard repeat delay varies, natural keyboard may help
 - white noise is not emulated
 - real-time clock is not emulated
 
