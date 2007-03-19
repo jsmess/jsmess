@@ -960,12 +960,20 @@ static int image_checkhash(mess_image *image)
   These provide information about the device; and about the mounted image
 ****************************************************************************/
 
+/*-------------------------------------------------
+    image_device
+-------------------------------------------------*/
+
 const struct IODevice *image_device(mess_image *img)
 {
 	return img->dev;
 }
 
 
+
+/*-------------------------------------------------
+    image_exists
+-------------------------------------------------*/
 
 int image_exists(mess_image *img)
 {
@@ -974,12 +982,20 @@ int image_exists(mess_image *img)
 
 
 
+/*-------------------------------------------------
+    image_slotexists
+-------------------------------------------------*/
+
 int image_slotexists(mess_image *img)
 {
 	return image_index_in_device(img) < image_device(img)->count;
 }
 
 
+
+/*-------------------------------------------------
+    image_filename
+-------------------------------------------------*/
 
 const char *image_filename(mess_image *img)
 {
@@ -988,12 +1004,20 @@ const char *image_filename(mess_image *img)
 
 
 
+/*-------------------------------------------------
+    image_basename
+-------------------------------------------------*/
+
 const char *image_basename(mess_image *img)
 {
 	return osd_basename((char *) image_filename(img));
 }
 
 
+
+/*-------------------------------------------------
+    image_basename_noext
+-------------------------------------------------*/
 
 const char *image_basename_noext(mess_image *img)
 {
@@ -1016,6 +1040,10 @@ const char *image_basename_noext(mess_image *img)
 
 
 
+/*-------------------------------------------------
+    image_filetype
+-------------------------------------------------*/
+
 const char *image_filetype(mess_image *img)
 {
 	const char *s;
@@ -1027,12 +1055,20 @@ const char *image_filetype(mess_image *img)
 
 
 
+/*-------------------------------------------------
+    image_filedir
+-------------------------------------------------*/
+
 const char *image_filedir(mess_image *image)
 {
 	return image->dir;
 }
 
 
+
+/*-------------------------------------------------
+    image_typename_id
+-------------------------------------------------*/
 
 const char *image_typename_id(mess_image *image)
 {
@@ -1047,12 +1083,20 @@ const char *image_typename_id(mess_image *image)
 
 
 
+/*-------------------------------------------------
+    image_length
+-------------------------------------------------*/
+
 UINT64 image_length(mess_image *img)
 {
 	return img->length;
 }
 
 
+
+/*-------------------------------------------------
+    image_hash
+-------------------------------------------------*/
 
 const char *image_hash(mess_image *img)
 {
@@ -1061,6 +1105,10 @@ const char *image_hash(mess_image *img)
 }
 
 
+
+/*-------------------------------------------------
+    image_crc
+-------------------------------------------------*/
 
 UINT32 image_crc(mess_image *img)
 {
@@ -1076,12 +1124,20 @@ UINT32 image_crc(mess_image *img)
 
 
 
+/*-------------------------------------------------
+    image_is_writable
+-------------------------------------------------*/
+
 int image_is_writable(mess_image *img)
 {
 	return img->writeable;
 }
 
 
+
+/*-------------------------------------------------
+    image_has_been_created
+-------------------------------------------------*/
 
 int image_has_been_created(mess_image *img)
 {
@@ -1090,12 +1146,20 @@ int image_has_been_created(mess_image *img)
 
 
 
+/*-------------------------------------------------
+    image_make_readonly
+-------------------------------------------------*/
+
 void image_make_readonly(mess_image *img)
 {
 	img->writeable = 0;
 }
 
 
+
+/*-------------------------------------------------
+    image_fread
+-------------------------------------------------*/
 
 UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
 {
@@ -1113,6 +1177,10 @@ UINT32 image_fread(mess_image *image, void *buffer, UINT32 length)
 }
 
 
+
+/*-------------------------------------------------
+    image_fwrite
+-------------------------------------------------*/
 
 UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
 {
@@ -1150,6 +1218,10 @@ UINT32 image_fwrite(mess_image *image, const void *buffer, UINT32 length)
 
 
 
+/*-------------------------------------------------
+    image_fseek
+-------------------------------------------------*/
+
 int image_fseek(mess_image *image, INT64 offset, int whence)
 {
 	switch(whence)
@@ -1171,12 +1243,20 @@ int image_fseek(mess_image *image, INT64 offset, int whence)
 
 
 
+/*-------------------------------------------------
+    image_ftell
+-------------------------------------------------*/
+
 UINT64 image_ftell(mess_image *image)
 {
 	return image->pos;
 }
 
 
+
+/*-------------------------------------------------
+    image_fgetc
+-------------------------------------------------*/
 
 int image_fgetc(mess_image *image)
 {
@@ -1188,12 +1268,20 @@ int image_fgetc(mess_image *image)
 
 
 
+/*-------------------------------------------------
+    image_feof
+-------------------------------------------------*/
+
 int image_feof(mess_image *image)
 {
 	return image->pos >= image->length;
 }
 
 
+
+/*-------------------------------------------------
+    image_ptr
+-------------------------------------------------*/
 
 void *image_ptr(mess_image *image)
 {
