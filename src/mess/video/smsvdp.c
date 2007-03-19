@@ -1,6 +1,39 @@
 /*
-		For more information, please see:
-		http://www.emucamp.com/cgfm2/smsvdp.txt
+	For more information, please see:
+	- http://cgfm2.emuviews.com/txt/msvdp.txt
+	- http://www.smspower.org/forums/viewtopic.php?p=44198
+
+A scanline contains the following sections:
+  - horizontal sync     1  ED
+  - left blanking       2  ED-EE
+  - color burst        14  EE-EF
+  - left blanking       8  F5-F9
+  - left border        13  F9-FF
+  - active display    256  00-7F
+  - right border       15  80-87
+  - right blanking      8  87-8B
+  - horizontal sync    25  8B-97
+
+
+NTSC frame timing
+                       256x192         256x224        256x240 (doesn't work on real hardware)
+  - vertical blanking   3  D5-D7        3  E5-E7       3  EE-F0
+  - top blanking       13  D8-E4       13  E8-F4      13  F1-FD
+  - top border         27  E5-FF       11  F5-FF       3  FD-FF
+  - active display    192  00-BF      224  00-DF     240  00-EF
+  - bottom border      24  C0-D7        8  E0-E7       0  F0-F0
+  - bottom blanking     3  D8-DA        3  E8-EA       3  F0-F2
+
+
+PAL frame timing
+                       256x192         256x224        256x240
+  - vertical blanking   3  BA-BC        3  CA-CC       3  D2-D4
+  - top blanking       13  BD-C9       13  CD-D9      13  D5-E1
+  - top border         54  CA-FF       38  DA-FF      30  E2-FF
+  - active display    192  00-BF      224  00-DF     240  00-EF
+  - bottom border      48  C0-EF       32  E0-FF      24  F0-07
+  - bottom blanking     3  F0-F2        3  00-02       3  08-0A
+
 */
 
 #include "driver.h"
