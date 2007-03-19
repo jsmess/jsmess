@@ -78,17 +78,20 @@ Notes:
 
 /* Read/Write Handlers */
 
-static int vismac_latch;
+static int vismac_reg_latch;
 static int vismac_color_latch;
+static int vismac_bkg_latch;
+static int vismac_blink;
+static UINT8 vismac_colorram[0x400]; // 1024x4 bit color ram (0x08 = blink)
 
 static WRITE8_HANDLER( vismac_register_w )
 {
-	vismac_latch = data;
+	vismac_reg_latch = data;
 }
 
 static WRITE8_HANDLER( vismac_data_w )
 {
-	switch (vismac_latch)
+	switch (vismac_reg_latch)
 	{
 	case 0x20:
 		// set character color
@@ -96,13 +99,20 @@ static WRITE8_HANDLER( vismac_data_w )
 		break;
 	case 0x30:
 		// write cdp1869 command on the data bus
+		vismac_bkg_latch = data & 0x07;
 		cdp1869_out3_w(0, data);
 		break;
 	default:
 		// write cdp1869 command using the address bus bits as data
-		cdp1869_out_w((vismac_latch >> 4) - 4, 0);
+		cdp1869_out_w((vismac_reg_latch >> 4) - 4, 0);
 		break;
 	}
+}
+
+static WRITE8_HANDLER( vismac_pageram_w )
+{
+	cdp1869_pageram_w( offset, data );
+	vismac_colorram[offset] = vismac_color_latch;
 }
 
 static int keylatch;
@@ -115,14 +125,6 @@ static WRITE8_HANDLER( keyboard_latch_w )
 static WRITE8_HANDLER( printer_w )
 {
 	printer_output(image_from_devtype_and_index(IO_PRINTER, 0), data);
-}
-
-UINT8 tmc600_colorram[0x400] = {0}; // 1024x4 bit color ram (0x08 = blink)
-
-static WRITE8_HANDLER( vismac_pageram_w )
-{
-	cdp1869_pageram_w( offset, data );
-	tmc600_colorram[offset] = vismac_color_latch;
 }
 
 /* Memory Maps */
@@ -264,6 +266,11 @@ static CDP1802_CONFIG tmc600_cdp1802_config =
 	tmc600_in_ef
 };
 
+static INTERRUPT_GEN( vismac_blink_int )
+{
+	vismac_blink = !vismac_blink;
+}
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( tmc600 )
@@ -274,6 +281,7 @@ static MACHINE_DRIVER_START( tmc600 )
 	MDRV_CPU_PROGRAM_MAP(tmc600_map, 0)
 	MDRV_CPU_IO_MAP(tmc600_io_map, 0)
 	MDRV_CPU_CONFIG(tmc600_cdp1802_config)
+	MDRV_CPU_PERIODIC_INT(vismac_blink_int, TIME_IN_HZ(2))
 
 	// video hardware
 
@@ -409,12 +417,27 @@ SYSTEM_CONFIG_START( tmc600 )
 	CONFIG_DEVICE(tmc600_quickload_getinfo)
 SYSTEM_CONFIG_END
 
+static UINT8 tmc600_get_color_bits(UINT8 cramdata, UINT16 cramaddr, UINT16 pramaddr)
+{
+	UINT8 color = vismac_colorram[pramaddr];
+
+	if ((color & 0x08) && vismac_blink)
+	{
+		return vismac_bkg_latch;
+	}
+	else
+	{
+		return color;
+	}
+}
+
 static const CDP1869_interface tmc600_CDP1869_interface =
 {
 	CDP1869_PAL,
 	REGION_GFX1,
-	0x1000,			// charrom size
-	0x400			// pageram size
+	0x1000,					// charrom size
+	0x400,					// pageram size
+	tmc600_get_color_bits	// color bit callback
 };
 
 static DRIVER_INIT( tmc600 )
@@ -425,6 +448,6 @@ static DRIVER_INIT( tmc600 )
 /* System Drivers */
 
 //    YEAR  NAME 	  PARENT    COMPAT   MACHINE   INPUT     INIT	 CONFIG    COMPANY 	      FULLNAME
-COMP( 1982, tmc600s1, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja I)",	GAME_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)",	GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-COMP( 1982, tmc600as, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 AS",			GAME_NOT_WORKING )
+COMP( 1982, tmc600s1, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
+COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1982, tmc600as, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 AS",		   GAME_NOT_WORKING )

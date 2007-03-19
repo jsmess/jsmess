@@ -13,13 +13,11 @@ typedef struct
 	UINT16 pma, hma;
 	UINT8 cram[CDP1869_CHARRAM_SIZE];
 	UINT8 pram[CDP1869_PAGERAM_SIZE];
-	UINT8 pcb[CDP1869_PAGERAM_SIZE];
 	int cramsize, pramsize;
+	UINT8 (*color_callback)(UINT8 cramdata, UINT16 cramaddr, UINT16 pramaddr);
 } CDP1869_VIDEO_CONFIG;
 
 static CDP1869_VIDEO_CONFIG cdp1869;
-
-int cdp1869_pcb = 0;
 
 static void cdp1869_set_color(int i, int c, int l)
 {
@@ -97,7 +95,7 @@ static UINT16 cdp1869_get_pma(void)
 	}
 }
 
-static UINT16 cdp1869_get_cma(UINT16 offset)
+UINT16 cdp1869_get_cma(UINT16 offset)
 {
 	int column = cdp1869.pram[cdp1869_get_pma()];
 	int row = offset & 0x07;
@@ -142,7 +140,6 @@ WRITE8_HANDLER ( cdp1869_charram_w )
 	{
 		int addr = cdp1869_get_cma(offset);
 		cdp1869.cram[addr] = data;
-		cdp1869.pcb[addr] = activecpu_get_reg(CDP1802_Q);
 	}
 }
 
@@ -151,7 +148,6 @@ READ8_HANDLER ( cdp1869_charram_r )
 	if (cdp1869.cmem)
 	{
 		int addr = cdp1869_get_cma(offset);
-		cdp1869_pcb = cdp1869.pcb[addr];
 		return cdp1869.cram[addr];
 	}
 	else
@@ -269,19 +265,23 @@ static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int c
 	}
 }
 
-static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, int pramaddr, const rectangle *screenrect)
+static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, UINT16 pramaddr, const rectangle *screenrect)
 {
 	int i;
-	int code = cdp1869_read_pageram(pramaddr);
-	int addr = code * 8;
-	int addr2 = addr + (CDP1869_CHARRAM_SIZE / 2);
+	UINT8 code = cdp1869_read_pageram(pramaddr);
+	UINT16 addr = code * 8;
+	UINT16 addr2 = addr + (CDP1869_CHARRAM_SIZE / 2);
 
 	for (i = 0; i < cdp1869_get_lines(); i++)
 	{
-		int data = cdp1869.cram[addr];
-		int ccb0 = (data & 0x40) ? 1 : 0;
-		int ccb1 = (data & 0x80) ? 1 : 0;
-		int pcb = cdp1869.pcb[addr];
+		UINT8 data = cdp1869.cram[addr];
+		
+		UINT8 colorbits = cdp1869.color_callback(data, addr, pramaddr);
+
+		int pcb = colorbits & 0x01;
+		int ccb1 = (colorbits & 0x02) >> 1;
+		int ccb0 = (colorbits & 0x04) >> 2;
+
 		int color = cdp1869_get_color(ccb0, ccb1, pcb);
 
 		cdp1869_draw_line(bitmap, screenrect->min_x + x, screenrect->min_y + y, data, color);
@@ -318,8 +318,6 @@ VIDEO_START( cdp1869 )
 	state_save_register_item("cdp1869", 0, cdp1869.hma);
 	state_save_register_item_array("cdp1869", 0, cdp1869.cram);
 	state_save_register_item_array("cdp1869", 0, cdp1869.pram);
-	state_save_register_item_array("cdp1869", 0, cdp1869.pcb);
-	state_save_register_item("cdp1869", 0, cdp1869_pcb);
 	state_save_register_item("cdp1869", 0, cdp1869.cramsize);
 	state_save_register_item("cdp1869", 0, cdp1869.pramsize);
 
@@ -562,4 +560,5 @@ void cdp1869_configure(const CDP1869_interface *intf)
 	cdp1869.ntsc_pal = intf->ntsc_pal;
 	cdp1869.cramsize = intf->charram_size;
 	cdp1869.pramsize = intf->pageram_size;
+	cdp1869.color_callback = intf->get_color_bits;
 }
