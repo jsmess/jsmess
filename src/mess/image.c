@@ -60,6 +60,9 @@ struct _mess_image
 	char *playable;
 	char *extrainfo;
 
+	/* working directory; persists across mounts */
+	char *working_directory;
+
 	/* pointer */
 	void *ptr;
 };
@@ -222,6 +225,7 @@ static image_error_t set_image_filename(mess_image *image, const char *filename,
 	char *alloc_filename = NULL;
 	char *new_name;
 	char *new_dir;
+	char *new_working_directory;
 	int pos;
 
 	/* create the directory string */
@@ -250,13 +254,24 @@ static image_error_t set_image_filename(mess_image *image, const char *filename,
 		goto done;
 	}
 
+	/* copy the working directory */
+	new_working_directory = image_strdup(image, new_dir);
+	if (!new_working_directory)
+	{
+		err = IMAGE_ERROR_OUTOFMEMORY;
+		goto done;
+	}
+
 	/* set the new name and dir */
 	if (image->name)
 		image_freeptr(image, image->name);
 	if (image->dir)
 		image_freeptr(image, image->dir);
+	if (image->working_directory)
+		image_freeptr(image, image->working_directory);
 	image->name = new_name;
 	image->dir = new_dir;
+	image->working_directory = new_working_directory;
 
 done:
 	if (alloc_filename)
@@ -1314,6 +1329,125 @@ void *image_ptr(mess_image *image)
 		image->ptr = ptr;
 	}
 	return image->ptr;
+}
+
+
+
+/***************************************************************************
+    WORKING DIRECTORIES
+***************************************************************************/
+
+/*-------------------------------------------------
+    try_change_working_directory - tries to change
+	the working directory, but only if the directory
+	actually exists
+-------------------------------------------------*/
+
+static int try_change_working_directory(mess_image *image, const char *subdir)
+{
+	osd_directory *directory;
+	const osd_directory_entry *entry;
+	int success = FALSE;
+	int done = FALSE;
+	char *new_working_directory;
+
+	directory = osd_opendir(image->working_directory);
+	if (directory != NULL)
+	{
+		while(!done && (entry = osd_readdir(directory)) != NULL)
+		{
+			if (!mame_stricmp(subdir, entry->name))
+			{
+				done = TRUE;
+				success = entry->type == ENTTYPE_DIR;
+			}
+		}
+
+		osd_closedir(directory);
+	}
+
+	/* did we successfully identify the directory? */
+	if (success)
+	{
+		new_working_directory = pool_malloc(image->mempool, strlen(image->working_directory)
+			+ strlen(PATH_SEPARATOR) + strlen(subdir) + strlen(PATH_SEPARATOR) + 1);
+		strcpy(new_working_directory, image->working_directory);
+
+		/* remove final path separator, if present */
+		if ((strlen(new_working_directory) >= strlen(PATH_SEPARATOR))
+			&& !strcmp(new_working_directory + strlen(new_working_directory) - strlen(PATH_SEPARATOR), PATH_SEPARATOR))
+		{
+			new_working_directory[strlen(new_working_directory) - strlen(PATH_SEPARATOR)] = '\0';
+		}
+
+		strcat(new_working_directory, PATH_SEPARATOR);
+		strcat(new_working_directory, subdir);
+		strcat(new_working_directory, PATH_SEPARATOR);
+
+		pool_realloc(image->mempool, image->working_directory, 0);
+		image->working_directory = new_working_directory;
+	}
+	return success;
+}
+
+
+
+/*-------------------------------------------------
+    setup_working_directory - sets up the working
+	directory according to a few defaults
+-------------------------------------------------*/
+
+static void setup_working_directory(mess_image *image)
+{
+	char mess_directory[1024];
+	const game_driver *gamedrv;
+
+	/* first set up the working directory to be the MESS directory */
+	osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
+	image->working_directory = pool_strdup(image->mempool, mess_directory);
+	
+	/* now try browsing down to "software" */
+	if (try_change_working_directory(image, "software"))
+	{
+		/* now down to a directory for this computer */
+		gamedrv = Machine->gamedrv;
+		while(gamedrv && !try_change_working_directory(image, gamedrv->name))
+		{
+			gamedrv = mess_next_compatible_driver(gamedrv);
+		}
+	}
+}
+
+
+
+/*-------------------------------------------------
+    image_working_directory - returns the working
+	directory to use for this image; this is
+	valid even if not mounted
+-------------------------------------------------*/
+
+const char *image_working_directory(mess_image *image)
+{
+	/* check to see if we've never initialized the working directory */
+	if (image->working_directory == NULL)
+		setup_working_directory(image);
+
+	return image->working_directory;
+}
+
+
+
+/*-------------------------------------------------
+    image_set_working_directory - sets the working
+	directory to use for this image
+-------------------------------------------------*/
+
+void image_set_working_directory(mess_image *image, const char *working_directory)
+{
+	char *new_working_directory = pool_strdup(image->mempool, working_directory);
+	if (image->working_directory)
+		pool_realloc(image->mempool, image->working_directory, 0);
+	image->working_directory = new_working_directory;
 }
 
 

@@ -131,7 +131,7 @@ DWORD win_get_module_file_name_utf8(HMODULE module, char *filename, DWORD size)
 	TCHAR t_filename[MAX_PATH];
 	char *utf8_filename;
 
-	if (GetModuleFileName(module, t_filename, ARRAY_LENGTH(t_filename)))
+	if (GetModuleFileName(module, t_filename, ARRAY_LENGTH(t_filename)) == 0)
 		return 0;
 
 	utf8_filename = utf8_from_tstring(t_filename);

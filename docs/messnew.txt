@@ -34,13 +34,16 @@ Imgtool Changes:
   #1122 [tim lindner, Nate Woods]
 
 - [OS9] Put will now use free entries in the directory file before expanding
-  it. [tim lindner]
+  it.  (bug #1125) [tim lindner]
+
+
 
 Source Changes:
 ----------------
 - The core is based on MAME 0.113u2.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- Moved per-image working directory handling into the MESS core.  [Nate Woods]
 
 
 

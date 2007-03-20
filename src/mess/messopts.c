@@ -37,18 +37,6 @@ static const options_entry mess_opts[] =
 ***************************************************************************/
 
 /*-------------------------------------------------
-    mess_config_init - sets up MESS specific
-	options on config files
--------------------------------------------------*/
-
-void mess_config_init(running_machine *machine)
-{
-	osd_mess_config_init(machine);
-}
-
-
-
-/*-------------------------------------------------
     enumerate_devices - runs a specified proc
 	for all devices on a driver
 -------------------------------------------------*/

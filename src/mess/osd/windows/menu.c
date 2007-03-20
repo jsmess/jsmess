@@ -836,7 +836,6 @@ static void change_device(HWND wnd, mess_image *img, int is_save)
 	char filter[2048];
 	char filename[MAX_PATH];
 	char buffer[512];
-	char *s;
 	const struct IODevice *dev = image_device(img);
 	const char *initial_dir;
 	BOOL result;
@@ -859,10 +858,8 @@ static void change_device(HWND wnd, mess_image *img, int is_save)
 	}
 
 	// use image directory, if it is there
-	if (image_exists(img))
-		initial_dir = image_filedir(img);
-	else
-		initial_dir = get_devicedirectory(dev->type);
+	get_devicedirectory(dev->type);
+	initial_dir = image_working_directory(img);
 
 	// add custom dialog elements, if appropriate
 	if (is_save && dev->createimage_optguide && dev->createimage_options[0].optspec)
@@ -882,14 +879,6 @@ static void change_device(HWND wnd, mess_image *img, int is_save)
 		dialog, filter, initial_dir, filename, sizeof(filename) / sizeof(filename[0]));
 	if (result)
 	{
-		// get the filename
-		s = osd_dirname(filename);
-		if (s)
-		{
-			set_devicedirectory(dev->type, s);
-			free(s);
-		}
-
 		// mount the image
 		if (is_save)
 			err = image_create(img, filename, create_format, create_args);

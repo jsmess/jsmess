@@ -145,6 +145,18 @@ file_error osd_setcurdir(const char *dir);
 ***************************************************************************/
 
 /*-----------------------------------------------------------------------------
+    osd_get_emulator_directory: returns the path containing the emulator
+
+    Parameters:
+
+		dir - space to output directory
+		dir_size - size of path
+
+-----------------------------------------------------------------------------*/
+
+void osd_get_emulator_directory(char *dir, size_t dir_size);
+
+/*-----------------------------------------------------------------------------
     osd_is_path_separator: returns whether a character is a path separator
 
     Parameters:
@@ -241,7 +253,6 @@ int osd_num_devices(void);
 const char *osd_get_device_name(int i);
 void osd_change_device(const char *vol);
 
-void osd_mess_config_init(running_machine *machine);
 void osd_mess_options_init(void);
 
 #endif /* __OSDMESS_H__ */

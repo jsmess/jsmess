@@ -111,6 +111,8 @@ const char *image_basename(mess_image *image);
 const char *image_basename_noext(mess_image *image);
 const char *image_filetype(mess_image *image);
 const char *image_filedir(mess_image *image);
+const char *image_working_directory(mess_image *image);
+void image_set_working_directory(mess_image *image, const char *working_directory);
 UINT64 image_length(mess_image *image);
 const char *image_hash(mess_image *image);
 UINT32 image_crc(mess_image *image);

@@ -1134,6 +1134,7 @@ MESS_EMUOBJ = $(OBJ)/mess
 EMUOBJS +=							\
 	$(MESS_EMUOBJ)/mess.o				\
 	$(MESS_EMUOBJ)/messopts.o			\
+	$(MESS_EMUOBJ)/configms.o			\
 	$(MESS_EMUOBJ)/mesvalid.o			\
 	$(MESS_EMUOBJ)/image.o				\
 	$(MESS_EMUOBJ)/device.o			\

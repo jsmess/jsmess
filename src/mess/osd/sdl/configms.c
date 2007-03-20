@@ -19,8 +19,6 @@
 //	LOCAL VARIABLES
 //============================================================
 
-static char *dev_dirs[IO_COUNT];
-
 static const options_entry win_mess_opts[] =
 {
 	{ NULL,							NULL,   OPTION_HEADER,		"SDL MESS SPECIFIC OPTIONS" },
@@ -34,54 +32,6 @@ int win_use_natural_keyboard;
 
 //============================================================
 
-void device_dirs_load(int config_type, xml_data_node *parentnode)
-{
-	iodevice_t dev;
-
-	// on init, reset the directories
-	if (config_type == CONFIG_TYPE_INIT)
-		memset(dev_dirs, 0, sizeof(dev_dirs));
-
-	// only care about game-specific data
-	if (config_type != CONFIG_TYPE_GAME)
-		return;
-
-	// might not have any data
-	if (!parentnode)
-		return;
-
-	for (dev = 0; dev < IO_COUNT; dev++)
-	{
-	}
-}
-
-
-
-void device_dirs_save(int config_type, xml_data_node *parentnode)
-{
-	xml_data_node *node;
-	iodevice_t dev;
-
-	// only care about game-specific data
-	if (config_type != CONFIG_TYPE_GAME)
-		return;
-
-	for (dev = 0; dev < IO_COUNT; dev++)
-	{
-		if (dev_dirs[dev])
-		{
-			node = xml_add_child(parentnode, "device", NULL);
-			if (node)
-			{
-				xml_set_attribute(node, "type", device_typename(dev));
-				xml_set_attribute(node, "directory", dev_dirs[dev]);
-			}
-		}
-	}
-}
-
-
-
 void osd_mess_options_init(void)
 {
 	options_add_entries(win_mess_opts);
@@ -92,31 +42,6 @@ void sdl_mess_options_parse(void)
 {
 	win_task_count = options_get_int("threads");
 	win_use_natural_keyboard = options_get_bool("natural");
-}
-
-void osd_mess_config_init(running_machine *machine)
-{
-	config_register("device_directories", device_dirs_load, device_dirs_save);
-}
-
-
-
-const char *get_devicedirectory(int dev)
-{
-	assert(dev >= 0);
-	assert(dev < IO_COUNT);
-	return dev_dirs[dev];
-}
-
-
-
-void set_devicedirectory(int dev, const char *dir)
-{
-	assert(dev >= 0);
-	assert(dev < IO_COUNT);
-	if (dev_dirs[dev])
-		free(dev_dirs[dev]);
-	dev_dirs[dev] = mame_strdup(dir);
 }
 
 
