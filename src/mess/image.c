@@ -199,6 +199,13 @@ static void image_exit(running_machine *machine)
 				/* free the tagpool */
 				tagpool_exit(&images[indx + j].tagpool);
 
+				/* free the working directory */
+				if (image->working_directory)
+				{
+					free(image->working_directory);
+					image->working_directory = NULL;
+				}
+
 				/* free the memory pool */
 				pool_free(image->mempool);
 				image->mempool = NULL;
@@ -255,7 +262,7 @@ static image_error_t set_image_filename(mess_image *image, const char *filename,
 	}
 
 	/* copy the working directory */
-	new_working_directory = image_strdup(image, new_dir);
+	new_working_directory = mame_strdup(new_dir);
 	if (!new_working_directory)
 	{
 		err = IMAGE_ERROR_OUTOFMEMORY;
@@ -268,7 +275,7 @@ static image_error_t set_image_filename(mess_image *image, const char *filename,
 	if (image->dir)
 		image_freeptr(image, image->dir);
 	if (image->working_directory)
-		image_freeptr(image, image->working_directory);
+		free(image->working_directory);
 	image->name = new_name;
 	image->dir = new_dir;
 	image->working_directory = new_working_directory;
@@ -1369,7 +1376,7 @@ static int try_change_working_directory(mess_image *image, const char *subdir)
 	/* did we successfully identify the directory? */
 	if (success)
 	{
-		new_working_directory = pool_malloc(image->mempool, strlen(image->working_directory)
+		new_working_directory = malloc_or_die(strlen(image->working_directory)
 			+ strlen(PATH_SEPARATOR) + strlen(subdir) + strlen(PATH_SEPARATOR) + 1);
 		strcpy(new_working_directory, image->working_directory);
 
@@ -1384,7 +1391,7 @@ static int try_change_working_directory(mess_image *image, const char *subdir)
 		strcat(new_working_directory, subdir);
 		strcat(new_working_directory, PATH_SEPARATOR);
 
-		pool_realloc(image->mempool, image->working_directory, 0);
+		free(image->working_directory);
 		image->working_directory = new_working_directory;
 	}
 	return success;
@@ -1404,7 +1411,7 @@ static void setup_working_directory(mess_image *image)
 
 	/* first set up the working directory to be the MESS directory */
 	osd_get_emulator_directory(mess_directory, ARRAY_LENGTH(mess_directory));
-	image->working_directory = pool_strdup(image->mempool, mess_directory);
+	image->working_directory = mame_strdup(mess_directory);
 	
 	/* now try browsing down to "software" */
 	if (try_change_working_directory(image, "software"))
@@ -1444,9 +1451,9 @@ const char *image_working_directory(mess_image *image)
 
 void image_set_working_directory(mess_image *image, const char *working_directory)
 {
-	char *new_working_directory = pool_strdup(image->mempool, working_directory);
+	char *new_working_directory = mame_strdup(working_directory);
 	if (image->working_directory)
-		pool_realloc(image->mempool, image->working_directory, 0);
+		free(image->working_directory);
 	image->working_directory = new_working_directory;
 }
 
