@@ -28,15 +28,10 @@ struct call_data
 static void win_parallel_exit(running_machine *machine);
 
 //============================================================
-//	GLOBAL VARIABLES
-//============================================================
-
-int win_task_count;
-
-//============================================================
 //	LOCAL VARIABLES
 //============================================================
 
+static int win_task_count;
 static struct task_data *tasks;
 static int currently_parallel;
 
@@ -134,6 +129,9 @@ int win_parallel_init(void)
 	tasks = NULL;
 	currently_parallel = 0;
 	processor_count = get_processor_count();
+
+	// retrieve the option
+	win_task_count = options_get_int("threads");
 
 	// if we didn't specify the amount of tasks, use the processor count
 	if (win_task_count == 0)

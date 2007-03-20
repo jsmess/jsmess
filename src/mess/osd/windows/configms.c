@@ -40,9 +40,6 @@ static const options_entry win_mess_opts[] =
 void osd_mess_options_init(void)
 {
 	options_add_entries(win_mess_opts);
-
-	win_task_count = options_get_int("threads");
-	win_use_natural_keyboard = options_get_bool("natural");
 }
 
 

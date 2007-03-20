@@ -30,6 +30,7 @@
 #include "inptport.h"
 #include "devices/cassette.h"
 #include "windows/window.h"
+#include "uimess.h"
 
 #ifdef UNDER_CE
 #include "invokegx.h"
@@ -101,16 +102,10 @@ enum
 #endif
 
 //============================================================
-//	GLOBAL VARIABLES
-//============================================================
-
-int win_use_natural_keyboard;
-
-
-//============================================================
 //	LOCAL VARIABLES
 //============================================================
 
+static int win_use_natural_keyboard;
 static HICON device_icons[IO_COUNT];
 static int use_input_categories;
 static int joystick_menu_setup;
@@ -1958,8 +1953,11 @@ int win_create_menu(HMENU *menus)
 {
 	HMENU menu_bar = NULL;
 	HMODULE module;
-	
-	if (options_get_bool("newui"))
+
+	// determine whether we are using the natural keyboard or not
+	win_use_natural_keyboard = options_get_bool("natural");
+
+	if (mess_use_new_ui())
 	{
 		module = win_resource_module();
 		menu_bar = LoadMenu(module, MAKEINTRESOURCE(IDR_RUNTIME_MENU));
