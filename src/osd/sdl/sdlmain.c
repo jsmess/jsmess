@@ -29,6 +29,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef MESS
+static char cwd[512];
+#endif
+
 // from config.c
 int  cli_frontend_init (int argc, char **argv);
 void cli_frontend_exit (void);
@@ -130,6 +134,10 @@ int SDL_main(int argc, char **argv)
 	int game_index;
 	int res = 0;
 
+	#ifdef MESS
+	getcwd(cwd, 511);
+	#endif
+
 	// parse config and cmdline options
 	game_index = cli_frontend_init (argc, argv);
 
@@ -229,4 +237,9 @@ int osd_init(running_machine *machine)
 	return result;
 }
 
-
+#ifdef MESS
+char *osd_get_startup_cwd(void)
+{
+	return cwd;
+}
+#endif

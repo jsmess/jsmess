@@ -11,10 +11,10 @@ MESS_SDLOBJ = $(OBJ)/mess/osd/sdl
 
 OBJDIRS += $(MESS_SDLOBJ)
 
-OSDOBJS += \
-	$(MESS_SDLOBJ)/sdlutil.o
+#OSDOBJS += \
 
 OSDCOREOBJS += \
+	$(MESS_SDLOBJ)/sdlutil.o	\
 	$(MESS_SDLOBJ)/configms.o	\
 	$(MESS_SDLOBJ)/sdlmess.o	\
 	$(MESS_SDLOBJ)/parallel.o	

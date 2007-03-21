@@ -29,6 +29,7 @@ static const options_entry win_mess_opts[] =
 };
 
 int win_use_natural_keyboard;
+extern char *osd_get_startup_cwd(void);
 
 //============================================================
 
@@ -44,4 +45,8 @@ void sdl_mess_options_parse(void)
 	win_use_natural_keyboard = options_get_bool("natural");
 }
 
+void osd_get_emulator_directory(char *dir, size_t dir_size)
+{
+	strncpy(dir, osd_get_startup_cwd(), dir_size);
+}
 
