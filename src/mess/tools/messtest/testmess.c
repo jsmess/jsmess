@@ -150,6 +150,15 @@ static struct messtest_command new_command;
 
 static struct messtest_testcase current_testcase;
 
+static const options_entry win_mess_opts[] =
+{
+	{ NULL,							NULL,   OPTION_HEADER,		"WINDOWS MESS SPECIFIC OPTIONS" },
+	{ "newui;nu",                   "1",    OPTION_BOOLEAN,		"use the new MESS UI" },
+	{ "threads;thr",				"0",	0,					"number of threads to use for parallel operations" },
+	{ "natural;nat",				"0",	OPTION_BOOLEAN,		"specifies whether to use a natural keyboard or not" },
+	{ NULL }
+};
+
 
 
 static char *assemble_software_path(const game_driver *gamedrv, const char *filename)
@@ -270,6 +279,8 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	clock_t begin_time;
 	double real_run_time;
 	char *fullpath = NULL;
+	const char *device_opt;
+	const char *fake_argv[2];
 
 	/* lookup driver */
 	for (driver_num = 0; drivers[driver_num]; driver_num++)
@@ -298,20 +309,36 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	dirtybuffer = NULL;
 
 	/* set up options */
-	options_init(NULL);
-	options_set_bool("skip_gameinfo", TRUE);
-	options_set_int("ramsize", current_testcase.ram);
+	options_init(win_mess_opts);
+	options_set_bool(OPTION_SKIP_GAMEINFO, TRUE);
+	options_set_bool(OPTION_THROTTLE, FALSE);
+	if (current_testcase.ram != 0)
+	{
+		options_set_int("ramsize", current_testcase.ram);
+	}
+
+	/* ugh... hideous ugly fake arguments */
+	fake_argv[0] = "MESSTEST";
+	fake_argv[1] = drivers[driver_num]->name;
+	options_parse_command_line(ARRAY_LENGTH(fake_argv), (char **) fake_argv);
 
 	/* preload any needed images */
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)
 	{
+		/* get the path */
 		fullpath = assemble_software_path(drivers[driver_num], current_command->u.image_args.filename);
-/*
-		options.image_files[options.image_count].name = fullpath;
-		options.image_files[options.image_count].device_type = current_command->u.image_args.device_type;
-		options.image_files[options.image_count].device_index = -1;
-		options.image_count++;
-*/
+
+		/* get the option name */
+		device_opt = device_typename(current_command->u.image_args.device_type);
+
+		/* set the option */
+		options_set_string(device_opt, fullpath);
+
+		/* cleanup */
+		free(fullpath);
+		fullpath = NULL;
+
+		/* next command */
 		current_command++;
 	}
 
@@ -361,8 +388,6 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 		results->rc = rc;
 		results->runtime_hash = runtime_hash;
 	}
-	if (fullpath)
-		free(fullpath);
 	return rc;
 }
 
