@@ -8,6 +8,7 @@
 #define CF_CODEMASTERS_MAPPER	0x01
 #define CF_KOREAN_MAPPER	0x02
 #define CF_93C46_EEPROM		0x04
+#define CF_ONCART_RAM		0x08
 
 UINT8 smsRomPageCount;
 UINT8 smsBiosPageCount;
@@ -28,6 +29,7 @@ UINT8 *sms_banking_cart[5]; /* we are going to use 1-4, same as bank numbers */
 UINT8 *sms_banking_none[5]; /* we are going to use 1-4, same as bank numbers */
 UINT8 smsNVRam[NVRAM_SIZE];
 int smsNVRAMSave = 0;
+UINT16 smsOnCartRAMMask = 0;
 UINT8 *sms_codemasters_ram; /* For the 64KB extra RAM used by Ernie Els Golf */
 UINT8 sms_codemasters_rampage;
 UINT8 ggSIO[5] = { 0x7F, 0xFF, 0x00, 0xFF, 0x00 };
@@ -322,6 +324,8 @@ WRITE8_HANDLER(sms_cartram_w) {
 #ifdef LOG_PAGING
 			logerror("rom 2 paged in %x dodgeball king.\n", page);
 #endif
+		} else if ( smsCartFeatures & CF_ONCART_RAM ) {
+			smsNVRam[offset & smsOnCartRAMMask] = data;
 		} else {
 			logerror("INVALID write %02X to cartram at offset #%04X\n", data, offset);
 		}
@@ -445,6 +449,11 @@ void setup_rom(void)
 			logerror( "Switched in full bios.\n" );
 		}
 	}
+
+	if ( smsCartFeatures & CF_ONCART_RAM ) {
+		memory_set_bankptr( 4, smsNVRam );
+		memory_set_bankptr( 5, smsNVRam );
+	}
 }
 
 static int sms_verify_cart(UINT8 *magic, int size) {
@@ -559,6 +568,12 @@ DEVICE_LOAD( sms_cart )
 		/* Check for 93C46 eeprom */
 		if ( strstr( extrainfo, "93C46" ) ) {
 			smsCartFeatures |= CF_93C46_EEPROM;
+		}
+
+		/* Check for 8KB on-cart RAM */
+		if ( strstr( extrainfo, "8KB_CART_RAM" ) ) {
+			smsCartFeatures |= CF_ONCART_RAM;
+			smsOnCartRAMMask = 0x1FFF;
 		}
 	} else {
 		/* If no extrainfo information is available try to find special information out on our own */
