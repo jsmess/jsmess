@@ -631,7 +631,7 @@ static void setup_banks( void ) {
 		}
 	}
 
-	if ( BIOS[0] == 0x00 ) {
+	if ( BIOS == NULL || BIOS[0] == 0x00 ) {
 		BIOS = NULL;
                 biosPort |= IO_BIOS_ROM;
 	}
