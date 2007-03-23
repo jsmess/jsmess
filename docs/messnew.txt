@@ -14,6 +14,11 @@ System Driver Changes:
 
 - [GAMEGEAR] Added SMS compatibility mode.  [Wilbert Pol]
 
+- [SMS] Drivers have been split up to support specific hardware versions:
+  sms and smspal still exist; smsj21 has been renamed to smsj; sms1,
+  sms1pal, and sg1000m3 have been added. Support for the prototype bios has
+  also been added  [Wilbert Pol]
+
 - [THOMSON] Switch 6850 ACIA implementations to use the MAME version. [Antoine
   Mine]
 
