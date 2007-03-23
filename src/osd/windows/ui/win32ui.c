@@ -868,7 +868,7 @@ static void CreateCommandLine(int nGameIndex, char* pCmdLine)
 	/* Performance Options */
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%safs",                     pOpts->autoframeskip   ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -fs %d",						pOpts->frameskip );
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -ftr %d",					pOpts->frames_to_display);
+	sprintf(&pCmdLine[strlen(pCmdLine)], " -str %d",					pOpts->seconds_to_display);
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sthrottle",				pOpts->throttle   ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssleep",					pOpts->sleep   ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%srdtsc",					pOpts->old_timing ? "" : "no");
@@ -5710,7 +5710,7 @@ static void MameLoadState()
 				MameMessageBox("'%s' is not a valid savestate file for game '%s'.", filename, selected_filename);
 				return;
 			}
-			options_set_string(OPTION_STATE_DIRECTORY, path);
+			options_set_string(mame_options(), OPTION_STATE_DIRECTORY, path);
 			state_fname = fname;
 		}
 #endif // MESS

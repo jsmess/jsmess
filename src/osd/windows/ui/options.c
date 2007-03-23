@@ -472,7 +472,6 @@ const char* image_tabs_short_name[MAX_TAB_TYPES] =
 };
 
 
-static int  num_games = 0;
 static BOOL save_gui_settings = TRUE;
 static BOOL save_default_options = TRUE;
 
@@ -534,7 +533,6 @@ BOOL OptionsInit()
 		return FALSE;
 #endif /* MAME_DEBUG */
 
-	num_games = driver_get_count();
 	code_init(NULL);
 	// Load all default settings
 	LoadDefaultOptions(&settings, regSettings);
@@ -599,15 +597,15 @@ BOOL OptionsInit()
 
 
 	// game_options[x] is valid iff game_variables[i].options_loaded == true
-	game_options = (options_type *)malloc(num_games * sizeof(options_type));
-	game_variables = (game_variables_type *)malloc(num_games * sizeof(game_variables_type));
+	game_options = (options_type *)malloc(driver_get_count() * sizeof(options_type));
+	game_variables = (game_variables_type *)malloc(driver_get_count() * sizeof(game_variables_type));
 
 	if (!game_options || !game_variables)
 		return FALSE;
 
-	memset(game_options, 0, num_games * sizeof(options_type));
-	memset(game_variables, 0, num_games * sizeof(game_variables_type));
-	for (i = 0; i < num_games; i++)
+	memset(game_options, 0, driver_get_count() * sizeof(options_type));
+	memset(game_variables, 0, driver_get_count() * sizeof(game_variables_type));
+	for (i = 0; i < driver_get_count(); i++)
 	{
 		game_variables[i].play_count = 0;
 		game_variables[i].play_time = 0;
@@ -651,7 +649,7 @@ void OptionsExit(void)
 {
 	int i;
 
-	for (i=0;i<num_games;i++)
+	for (i=0;i<driver_get_count();i++)
 	{
 		FreeGameOptions(&game_options[i]);
 	}
@@ -794,7 +792,7 @@ options_type * GetDefaultOptions(int iProperty, BOOL bVectorFolder )
 	}
 	else
 	{
-		assert(0 <= iProperty && iProperty < num_games);
+		assert(0 <= iProperty && iProperty < driver_get_count());
 		return GetSourceOptions( iProperty );
 	}
 }
@@ -849,7 +847,7 @@ options_type * GetSourceOptions(int driver_index )
 {
 	static options_type source_opts;
 
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 	//initialize source_opts with global settings, we accumulate all settings there and copy them 
 	//to game_options[driver_index] in the end
 	CopyGameOptions(&global, &source_opts);
@@ -871,7 +869,7 @@ options_type * GetGameOptions(int driver_index, int folder_index )
 	int parent_index, setting;
 	struct SettingsHandler handlers[3];
 
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	CopyGameOptions(&global, &game_options[driver_index]);
 	
@@ -1719,7 +1717,7 @@ void SetMAMEInfoFileName(const char* path)
 
 void ResetGameOptions(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	// make sure it's all loaded up.
 	GetGameOptions(driver_index, GLOBAL_OPTIONS);
@@ -1744,7 +1742,7 @@ void ResetAllGameOptions(void)
 	int i;
 	int redirect_value = 0;
 
-	for (i = 0; i < num_games; i++)
+	for (i = 0; i < driver_get_count(); i++)
 	{
 		ResetGameOptions(i);
 	}
@@ -1764,35 +1762,35 @@ void ResetAllGameOptions(void)
 
 int GetRomAuditResults(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	return game_variables[driver_index].rom_audit_results;
 }
 
 void SetRomAuditResults(int driver_index, int audit_results)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	game_variables[driver_index].rom_audit_results = audit_results;
 }
 
 int  GetSampleAuditResults(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	return game_variables[driver_index].samples_audit_results;
 }
 
 void SetSampleAuditResults(int driver_index, int audit_results)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	game_variables[driver_index].samples_audit_results = audit_results;
 }
 
 void IncrementPlayCount(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	game_variables[driver_index].play_count++;
 
@@ -1802,7 +1800,7 @@ void IncrementPlayCount(int driver_index)
 
 int GetPlayCount(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	return game_variables[driver_index].play_count;
 }
@@ -1810,11 +1808,11 @@ int GetPlayCount(int driver_index)
 void ResetPlayCount(int driver_index)
 {
 	int i = 0;
-	assert(driver_index < num_games);
+	assert(driver_index < driver_get_count());
 	if( driver_index < 0 )
 	{
 		//All games
-		for( i= 0; i< num_games; i++ )
+		for( i= 0; i< driver_get_count(); i++ )
 		{
 			game_variables[i].play_count = 0;
 		}
@@ -1828,11 +1826,11 @@ void ResetPlayCount(int driver_index)
 void ResetPlayTime(int driver_index)
 {
 	int i = 0;
-	assert(driver_index < num_games);
+	assert(driver_index < driver_get_count());
 	if( driver_index < 0 )
 	{
 		//All games
-		for( i= 0; i< num_games; i++ )
+		for( i= 0; i< driver_get_count(); i++ )
 		{
 			game_variables[i].play_time = 0;
 		}
@@ -1845,14 +1843,14 @@ void ResetPlayTime(int driver_index)
 
 int GetPlayTime(int driver_index)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	return game_variables[driver_index].play_time;
 }
 
 void IncrementPlayTime(int driver_index,int playtime)
 {
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 	game_variables[driver_index].play_time += playtime;
 }
 
@@ -1861,7 +1859,7 @@ void GetTextPlayTime(int driver_index,char *buf)
 	int hour, minute, second;
 	int temp = game_variables[driver_index].play_time;
 
-	assert(0 <= driver_index && driver_index < num_games);
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
 	hour = temp / 3600;
 	temp = temp - 3600*hour;
@@ -2780,7 +2778,7 @@ static void EmitGameVariables(DWORD nSettingsFile, void (*emit_callback)(void *p
 	char value_str[32];
 	void *pv;
 
-	for (i = 0; i < num_games; i++)
+	for (i = 0; i < driver_get_count(); i++)
 	{
 		driver_index = GetIndexFromSortedIndex(i); 
 

@@ -265,7 +265,6 @@
 #define IDC_ENABLE_AUTOSAVE             1177
 #define IDC_SKIP_GAME_INFO              1178
 #define IDC_PROP_SOURCE                 1179
-#define IDC_OLD_TIMING                  1180
 #define IDC_PAUSEBRIGHT                 1181
 #define IDC_PAUSEBRIGHTDISP             1182
 #define IDC_HIGH_PRIORITY               1183

@@ -275,7 +275,6 @@ static DWORD dwHelpIDs[] =
 	IDC_PAUSEBRIGHT,        HIDC_PAUSEBRIGHT,
 	IDC_LIGHTGUN,           HIDC_LIGHTGUN,
 	IDC_STEADYKEY,          HIDC_STEADYKEY,
-	IDC_OLD_TIMING,         HIDC_OLD_TIMING,
 	IDC_JOY_GUI,            HIDC_JOY_GUI,
 	IDC_RANDOM_BG,          HIDC_RANDOM_BG,
 	IDC_SKIP_GAME_INFO,     HIDC_SKIP_GAME_INFO,
@@ -749,12 +748,12 @@ static char *GameInfoScreen(UINT nIndex)
 			sprintf(buf,"%d x %d (V) %f Hz",
 			drv.screen[0].defstate.visarea.max_y - drv.screen[0].defstate.visarea.min_y + 1,
 					drv.screen[0].defstate.visarea.max_x - drv.screen[0].defstate.visarea.min_x + 1,
-					(float) drv.screen[0].defstate.refresh);
+					SUBSECONDS_TO_HZ(drv.screen[0].defstate.refresh));
 		else
 			sprintf(buf,"%d x %d (H) %f Hz",
 					drv.screen[0].defstate.visarea.max_x - drv.screen[0].defstate.visarea.min_x + 1,
 					drv.screen[0].defstate.visarea.max_y - drv.screen[0].defstate.visarea.min_y + 1,
-					(float) drv.screen[0].defstate.refresh);
+					SUBSECONDS_TO_HZ(drv.screen[0].defstate.refresh));
 	}
 	return buf;
 }
@@ -2872,7 +2871,6 @@ static void BuildDataMap(void)
 /*	DataMapAdd(IDC_DEBUG,         DM_BOOL, CT_BUTTON,   &pGameOpts->mame_debug,    DM_BOOL, &pGameOpts->mame_debug,    0, 0, 0);*/
 	DataMapAdd(IDC_LOG,           DM_BOOL, CT_BUTTON,   &pGameOpts->errorlog,      DM_BOOL, &pGameOpts->errorlog,      0, 0, 0);
 	DataMapAdd(IDC_SLEEP,         DM_BOOL, CT_BUTTON,   &pGameOpts->sleep,         DM_BOOL, &pGameOpts->sleep,         0, 0, 0);
-	DataMapAdd(IDC_OLD_TIMING,    DM_BOOL, CT_BUTTON,   &pGameOpts->old_timing,    DM_BOOL, &pGameOpts->old_timing,    0, 0, 0);
 	DataMapAdd(IDC_HIGH_PRIORITY, DM_INT, CT_SLIDER,   &g_nPriorityIndex, DM_INT, &pGameOpts->priority, 0, 0, AssignPriority);
 	DataMapAdd(IDC_HIGH_PRIORITYTXT, DM_NONE,  CT_NONE,   NULL, DM_INT, &pGameOpts->priority, 0, 0, 0);
 	DataMapAdd(IDC_SKIP_GAME_INFO, DM_BOOL, CT_BUTTON,  &pGameOpts->skip_gameinfo, DM_BOOL, &pGameOpts->skip_gameinfo, 0, 0, 0);
