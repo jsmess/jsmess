@@ -306,7 +306,7 @@ static const REG_OPTION regGameOpts[] =
 	{ "full_screen_gamma",		RO_DOUBLE,  offsetof(options_type, gfx_gamma),		                 "1.0" },
 	{ "full_screen_brightness", RO_DOUBLE,  offsetof(options_type, gfx_brightness),                  "1.0" },
 	{ "full_screen_contrast",   RO_DOUBLE,  offsetof(options_type, gfx_contrast),	                 "1.0" },
-	{ "frames_to_run",          RO_INT,     offsetof(options_type, frames_to_display),               "0" },
+	{ "seconds_to_run",          RO_INT,     offsetof(options_type, seconds_to_display),               "0" },
 	// per screen parameters
 	{ "screen0",				RO_STRING,  offsetof(options_type, screen_params[0].screen),         "auto" },
 	{ "aspect0",                RO_STRING,  offsetof(options_type, screen_params[0].aspect),         "auto" },

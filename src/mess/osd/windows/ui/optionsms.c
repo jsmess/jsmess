@@ -174,7 +174,7 @@ void SetExtraSoftwarePaths(int driver_index, const char *extra_paths)
 	char *new_extra_paths = NULL;
 
 	assert(driver_index >= 0);
-	assert(driver_index < num_games);
+	assert(driver_index < driver_get_count());
 
 	if (extra_paths && *extra_paths)
 	{
@@ -191,7 +191,7 @@ const char *GetExtraSoftwarePaths(int driver_index)
 	const char *paths;
 
 	assert(driver_index >= 0);
-	assert(driver_index < num_games);
+	assert(driver_index < driver_get_count());
 
 	paths = game_variables[driver_index].mess.extra_software_paths;
 	return paths ? paths : "";
