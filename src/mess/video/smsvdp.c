@@ -52,7 +52,7 @@ PAL frame timing
 #define CRAM_SIZE		MAX_CRAM_SIZE
 #define PRIORITY_BIT		0x1000
 
-#define BACKDROP_COLOR		(0x10 + (reg[0x07] & 0x0F))
+#define BACKDROP_COLOR		( ( vdp_mode == 4 ? 0x10 : 0x00 ) + (reg[0x07] & 0x0F))
 
 #define INIT_VCOUNT		0
 #define VERTICAL_BLANKING	1
