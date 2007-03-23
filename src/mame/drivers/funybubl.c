@@ -2,18 +2,45 @@
 
 Funny Bubble ...
 
-It's a puzzloop rip-off .. but with two Z80 CPUs
-the program roms say omega 1997
-the gfx roms say 1999
-title screen has no date
+It's a Puzzloop (Lup Lup Puzzle) rip-off .. but with two Z80 CPUs
+
+The program roms say omega 1997
+  Omega made Super Lup Lup Puzzle/Lup Lup Puzzle/Puzzle Bang Bang see vamphalf.c
+  These games copy the game play of Puzzloop but add adult picture backgrounds.
+
+The gfx roms say 1999
+Title screen has no date
 
 ( a z80 as the main cpu in 1999 ??! )
 
-todo :
-Funny Bubble has three clocks, 8 mhz, 12 mhz and 30 mhz
-8 mhz is near to roms 1/3/4, 30 mhz near to rom 2 (and the z80), 12 mhz is near to the gfx roms (7-10)
+Did In Chang Electronic Co do the "original" version of Funny Bubble?
+ Comad either hacked or licensed it.  As "In Chang Electronic" are
+ spelled out in the default high score table ;-)
 
-convert to tilemaps
+todo :
+   convert to tilemaps
+
+
+ +-----------------------------------------+
+ |    8MHz    M6295    SU12   UG1      UG3 |
+ |                     SU13   UG2      UG4 |
+++    6116           Z80                   |
+|     SU6                                  |
+|J    6116                            6116 |
+|A    6116                    A1020B  6116 |
+|M    6116         UM6264             6116 |
+|M                                         |
+|A                                         |
+|                                          |
+|  SW1                       UG13     UG16 |
+++       UB16                UH13     UG16 |
+ |       UM6264              UG15     UG17 |
+ |       Z80  30MHz  12MHZ   UH15     UH17 |
+ +-----------------------------------------+
+
+   Z80: ZiLOG Z0840006PSC (6MHz rated) - Both Z80s
+A1020B: Actel A1020B PL84C
+ M6295: OKI M6295 (badged as AD-65)
 
 */
 
@@ -219,12 +246,12 @@ DRIVER_INIT( funybubl )
 
 static MACHINE_DRIVER_START( funybubl )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,8000000/2)		 /* 4 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(soundreadmem,soundwritemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -255,35 +282,66 @@ MACHINE_DRIVER_END
 
 ROM_START( funybubl )
 	ROM_REGION( 0x50000, REGION_CPU1, 0 ) /* main z80, lots of banked data */
-	ROM_LOAD( "2.bin", 0x00000, 0x40000, CRC(d684c13f) SHA1(6a58b44dd775f374d6fd476a8fd175c28a83a495)  )
+	ROM_LOAD( "a.ub16", 0x00000, 0x40000, CRC(4e799cdd) SHA1(c6474fd2f621c27224e847ecb88a1ae17a0dbaf9)  )
 	ROM_RELOAD ( 0x10000, 0x40000 )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT  ) // bg gfx 8x8x8
-	ROM_LOAD( "7.bin", 0x000000, 0x40000, CRC(87603d7b) SHA1(21aec4cd011691f8608c3ddab83697bd89634fc8) )
-	ROM_LOAD( "8.bin", 0x040000, 0x40000, CRC(ab6031bd) SHA1(557793817f98c07c82caab4293aed7dffa4dbf7b) )
-	ROM_LOAD( "9.bin", 0x080000, 0x40000, CRC(0e8352ff) SHA1(29679a7ece2585e1a66296439b68bd56c937e313) )
-	ROM_LOAD( "10.bin",0x0c0000, 0x40000, CRC(df7dd356) SHA1(13b9f40714dfa7b8cebc0191dcdde88b51f5e78c) )
-	ROM_LOAD( "13.bin",0x100000, 0x40000, CRC(9f57bdd5) SHA1(6fd60da5f5eee0251e3a08957952ed9f037eeaec) )
-	ROM_LOAD( "14.bin",0x140000, 0x40000, CRC(2ac15ea3) SHA1(de5be6378b4b6eee6faf532c9ef14bd609041cb3) )
-	ROM_LOAD( "15.bin",0x180000, 0x40000, CRC(9a5e66a6) SHA1(cbe727e4f1e9a7072520d2e30eb0047cc67bff1b) )
-	ROM_LOAD( "16.bin",0x1c0000, 0x40000, CRC(218060b3) SHA1(35124afce7f0f998b5c4761bbc888235de4e56ef) )
+	ROM_LOAD( "f.ug13", 0x000000, 0x40000, CRC(64d7163d) SHA1(2619ac96e05779ea23c7f0f71665d284c79ba72f) )
+	ROM_LOAD( "g.uh13", 0x040000, 0x40000, CRC(6891e2b8) SHA1(ca711019e5c330759d2a90024dbc0e6731b6227f) )
+	ROM_LOAD( "h.ug15", 0x080000, 0x40000, CRC(ca7f7528) SHA1(6becfe8fabd19443a13b948838f41e10e5c9dc87) )
+	ROM_LOAD( "i.uh15", 0x0c0000, 0x40000, CRC(23608ec6) SHA1(1c0a5d6e300f9a1abfda73d6a6a31e29a42b30ad) )
+	ROM_LOAD( "l.ug16", 0x100000, 0x40000, CRC(0acf8143) SHA1(f49f45496b870d1f51f09a4dda8c5bb7763c40d3) )
+	ROM_LOAD( "m.uh16", 0x140000, 0x40000, CRC(55ed8d9c) SHA1(f17bb4d02d4eedc2f297bb008be2fa340bc321d2) )
+	ROM_LOAD( "n.ug17", 0x180000, 0x40000, CRC(52398b68) SHA1(522baa8123998e9161fa1ccaf760ac006c5be2dd) )
+	ROM_LOAD( "o.uh17", 0x1c0000, 0x40000, CRC(446e31b2) SHA1(7f37a7090c83f2c9b07f1993707540fb32bbed35) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE | ROMREGION_INVERT )
-	ROM_LOAD( "5.bin", 0x000000, 0x80000, CRC(b7ebbc00) SHA1(92520fda2f8f242b8cd49aeaac21b279f48276bf) )
-	ROM_LOAD( "6.bin", 0x080000, 0x80000, CRC(28afc396) SHA1(555d51948ffb237311112dcfd0516a43f603ff03) )
-	ROM_LOAD( "11.bin",0x100000, 0x80000, CRC(9e8687cd) SHA1(42fcba2532ae5028fcfc1df50750d99ad2586820) )
-	ROM_LOAD( "12.bin",0x180000, 0x80000, CRC(63f0e810) SHA1(5c7ed32ee8dc1d9aabc8d136ec370471096356c2) )
+	ROM_LOAD( "d.ug1", 0x000000, 0x80000, CRC(b7ebbc00) SHA1(92520fda2f8f242b8cd49aeaac21b279f48276bf) ) /* Same as below, different labels */
+	ROM_LOAD( "e.ug2", 0x080000, 0x80000, CRC(28afc396) SHA1(555d51948ffb237311112dcfd0516a43f603ff03) )
+	ROM_LOAD( "j.ug3", 0x100000, 0x80000, CRC(9e8687cd) SHA1(42fcba2532ae5028fcfc1df50750d99ad2586820) )
+	ROM_LOAD( "k.ug4", 0x180000, 0x80000, CRC(63f0e810) SHA1(5c7ed32ee8dc1d9aabc8d136ec370471096356c2) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* sound z80 (not much code here ..) */
-	ROM_LOAD( "1.bin", 0x00000,  0x10000, CRC(b8b5b675) SHA1(0a02ccd09bb2ae20efe49e3ca2006331aea0e2a7) )
-	ROM_FILL(          0x08000,  0x08000, 0x00 )
+	ROM_REGION( 0x08000, REGION_CPU2, 0 ) /* sound z80 (not much code here ..) */
+	ROM_LOAD( "p.su6", 0x00000,  0x08000, CRC(33169d4d) SHA1(0ebc932d15b6df022c7e1f44df884e64b25ba745) ) /* Same as below, different label */
 
 	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
-	ROM_LOAD( "3.bin", 0x00000,  0x20000, CRC(a2d780f4) SHA1(bebba3db21ab9ddde8c6f19db3b67c869df582eb) )
-	ROM_RELOAD(        0x40000,  0x20000 )
-	ROM_LOAD( "4.bin", 0x20000,  0x20000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) )
-	ROM_CONTINUE(      0x60000,  0x20000 )
+	ROM_LOAD( "b.su12", 0x00000,  0x20000, CRC(a2d780f4) SHA1(bebba3db21ab9ddde8c6f19db3b67c869df582eb) ) /* Same as below, different label */
+	ROM_RELOAD(         0x40000,  0x20000 )
+	ROM_LOAD( "c.su13", 0x20000,  0x20000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) ) /* Same as below, different label */
+	ROM_CONTINUE(       0x60000,  0x20000 )
+ROM_END
+
+ROM_START( funybubc )
+	ROM_REGION( 0x50000, REGION_CPU1, 0 ) /* main z80, lots of banked data */
+	ROM_LOAD( "2.ub16", 0x00000, 0x40000, CRC(d684c13f) SHA1(6a58b44dd775f374d6fd476a8fd175c28a83a495)  )
+	ROM_RELOAD ( 0x10000, 0x40000 )
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_INVERT  ) // bg gfx 8x8x8
+	ROM_LOAD( "7.ug12",  0x000000, 0x40000, CRC(87603d7b) SHA1(21aec4cd011691f8608c3ddab83697bd89634fc8) )
+	ROM_LOAD( "8.uh13",  0x040000, 0x40000, CRC(ab6031bd) SHA1(557793817f98c07c82caab4293aed7dffa4dbf7b) )
+	ROM_LOAD( "9.ug15",  0x080000, 0x40000, CRC(0e8352ff) SHA1(29679a7ece2585e1a66296439b68bd56c937e313) )
+	ROM_LOAD( "10.uh15", 0x0c0000, 0x40000, CRC(df7dd356) SHA1(13b9f40714dfa7b8cebc0191dcdde88b51f5e78c) )
+	ROM_LOAD( "13.ug16", 0x100000, 0x40000, CRC(9f57bdd5) SHA1(6fd60da5f5eee0251e3a08957952ed9f037eeaec) )
+	ROM_LOAD( "14.uh16", 0x140000, 0x40000, CRC(2ac15ea3) SHA1(de5be6378b4b6eee6faf532c9ef14bd609041cb3) )
+	ROM_LOAD( "15.ug17", 0x180000, 0x40000, CRC(9a5e66a6) SHA1(cbe727e4f1e9a7072520d2e30eb0047cc67bff1b) )
+	ROM_LOAD( "16.uh17", 0x1c0000, 0x40000, CRC(218060b3) SHA1(35124afce7f0f998b5c4761bbc888235de4e56ef) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_LOAD( "5.ug1",  0x000000, 0x80000, CRC(b7ebbc00) SHA1(92520fda2f8f242b8cd49aeaac21b279f48276bf) )
+	ROM_LOAD( "6.ug2",  0x080000, 0x80000, CRC(28afc396) SHA1(555d51948ffb237311112dcfd0516a43f603ff03) )
+	ROM_LOAD( "11.ug3", 0x100000, 0x80000, CRC(9e8687cd) SHA1(42fcba2532ae5028fcfc1df50750d99ad2586820) )
+	ROM_LOAD( "12.ug4", 0x180000, 0x80000, CRC(63f0e810) SHA1(5c7ed32ee8dc1d9aabc8d136ec370471096356c2) )
+
+	ROM_REGION( 0x08000, REGION_CPU2, 0 ) /* sound z80 (not much code here ..) */
+	ROM_LOAD( "1.su6", 0x00000,  0x08000, CRC(33169d4d) SHA1(0ebc932d15b6df022c7e1f44df884e64b25ba745) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "3.su12", 0x00000,  0x20000, CRC(a2d780f4) SHA1(bebba3db21ab9ddde8c6f19db3b67c869df582eb) )
+	ROM_RELOAD(         0x40000,  0x20000 )
+	ROM_LOAD( "4.su13", 0x20000,  0x20000, CRC(1f7e9269) SHA1(5c16b49a4e94aec7606d088c2d45a77842ab565b) )
+	ROM_CONTINUE(       0x60000,  0x20000 )
 ROM_END
 
 
-GAME( 1999, funybubl, 0, funybubl, funybubl, funybubl, ROT0, "Comad", "Funny Bubble", 0 )
+GAME( 1999, funybubl, 0,        funybubl, funybubl, funybubl, ROT0, "In Chang Electronic Co", "Funny Bubble", 0 )
+GAME( 1999, funybubc, funybubl, funybubl, funybubl, funybubl, ROT0, "Comad Industry Co Ltd", "Funny Bubble (Comad version)", 0 )

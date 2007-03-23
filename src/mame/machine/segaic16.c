@@ -19,7 +19,7 @@ extern void *fd1094_get_decrypted_base(void);
  *
  *************************************/
 
-#define LOG_MEMORY_MAP	(0)
+#define LOG_MEMORY_MAP	(1)
 #define LOG_MULTIPLY	(0)
 #define LOG_DIVIDE		(0)
 #define LOG_COMPARE		(0)
@@ -159,6 +159,41 @@ void segaic16_memory_mapper_config(const UINT8 *map_data)
 	/* zap to 0 and remap everything */
 	memcpy(&chip->regs[0x10], map_data, 0x10);
 	update_memory_mapping(chip);
+}
+
+
+void segaic16_memory_mapper_set_decrypted(UINT8 *decrypted)
+{
+	struct memory_mapper_chip *chip = &memory_mapper;
+	offs_t romsize = memory_region_length(REGION_CPU1 + chip->cpunum);
+	int rgnum;
+
+	/* loop over the regions */
+	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
+	{
+		static const offs_t region_size_map[4] = { 0x00ffff, 0x01ffff, 0x07ffff, 0x1fffff };
+		const struct segaic16_memory_map_entry *rgn = &chip->map[rgnum];
+		offs_t region_size = region_size_map[chip->regs[rgn->regbase] & 3];
+		offs_t region_base = (chip->regs[rgn->regbase + 1] << 16) & ~region_size;
+		offs_t region_start = region_base + (rgn->regoffs & region_size);
+		read16_handler read = rgn->read;
+		int banknum = 0;
+
+		/* skip non-ROM regions */
+		if (read == NULL || rgn->romoffset == ~0)
+			continue;
+
+		/* check for mapping to banks */
+		if ((FPTR)read >= STATIC_BANK1 && (FPTR)read <= STATIC_BANKMAX)
+			banknum = ((FPTR)read - STATIC_BANK1) + 1;
+
+		/* skip any mappings beyond the ROM size */
+		if (region_start >= romsize)
+			continue;
+
+		memory_configure_bank_decrypted(banknum, 0, 1, decrypted + rgn->romoffset, 0);
+		memory_set_bank(banknum, 0);
+	}
 }
 
 
@@ -349,9 +384,9 @@ static void update_memory_mapping(struct memory_mapper_chip *chip)
 				if (!decrypted)
 					decrypted = fd1089_get_decrypted_base();
 
-				memory_configure_bank(banknum, 0, 1, memory_region(REGION_CPU1 + chip->cpunum) + region_start, 0);
+				memory_configure_bank(banknum, 0, 1, memory_region(REGION_CPU1 + chip->cpunum) + rgn->romoffset, 0);
 				if (decrypted)
-					memory_configure_bank_decrypted(banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
+					memory_configure_bank_decrypted(banknum, 0, 1, decrypted ? (decrypted + rgn->romoffset) : 0, 0);
 				memory_set_bank(banknum, 0);
 			}
 		}

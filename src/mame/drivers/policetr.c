@@ -128,7 +128,7 @@ static void irq5_gen(int param)
 static INTERRUPT_GEN( irq4_gen )
 {
 	cpunum_set_input_line(0, R3000_IRQ4, ASSERT_LINE);
-	timer_set(cpu_getscanlinetime(0), 0, irq5_gen);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, irq5_gen);
 }
 
 
@@ -481,14 +481,13 @@ MACHINE_DRIVER_START( policetr )
 	MDRV_CPU_VBLANK_INT(irq4_gen,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_NVRAM_HANDLER(policetr)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 240)
+	MDRV_SCREEN_SIZE(400, 262)	/* needs to be verified */
 	MDRV_SCREEN_VISIBLE_AREA(0, 393, 0, 239)
 	MDRV_PALETTE_LENGTH(256)
 

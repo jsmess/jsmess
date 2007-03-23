@@ -417,7 +417,7 @@ static void texture_update(d3d_info *d3d, const render_primitive *prim);
 
 int drawd3d_init(win_draw_callbacks *callbacks)
 {
-	int version = options_get_int("d3dversion");
+	int version = options_get_int(mame_options(), "d3dversion");
 	d3dintf = NULL;
 
 	// try Direct3D 9 if requested
@@ -723,9 +723,9 @@ try_again:
 	if (window->fullscreen)
 	{
 		// only set the gamma if it's not 1.0f
-		float brightness = options_get_float("full_screen_brightness");
-		float contrast = options_get_float("full_screen_contrast");
-		float gamma = options_get_float("full_screen_gamma");
+		float brightness = options_get_float(mame_options(), "full_screen_brightness");
+		float contrast = options_get_float(mame_options(), "full_screen_contrast");
+		float gamma = options_get_float(mame_options(), "full_screen_gamma");
 		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
 		{
 			// warn if we can't do it

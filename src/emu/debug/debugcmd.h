@@ -20,4 +20,7 @@
 /* initialization */
 void				debug_command_init(running_machine *machine);
 
+/*  parameter validation */
+int					debug_command_parameter_number(const char *param, UINT64 *result);
+
 #endif

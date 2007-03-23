@@ -129,6 +129,9 @@ OSC3: 48.384MHz
 #include "cpu/i960/i960.h"
 #include "audio/namcoc7x.h"
 
+
+static mame_timer *raster_interrupt_timer;
+
 VIDEO_START( namcofl );
 VIDEO_UPDATE( namcofl );
 
@@ -170,7 +173,21 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 	}
 }
 
-static ADDRESS_MAP_START( sysfl_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static WRITE32_HANDLER( namcofl_paletteram_w )
+{
+	COMBINE_DATA(&paletteram32[offset]);
+
+	if ((offset == 0x1808/4) && ACCESSING_MSW32)
+	{
+		UINT16 v = paletteram32[offset] >> 16;
+		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
+
+		mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0, time_zero);
+	}
+}
+
+
+static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_READWRITE(MRA32_BANK1, MWA32_BANK1)
 	AM_RANGE(0x10000000, 0x100fffff) AM_READWRITE(MRA32_BANK2, MWA32_BANK2)
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION(REGION_USER1, 0)	/* data */
@@ -179,7 +196,7 @@ static ADDRESS_MAP_START( sysfl_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x30284000, 0x3028bfff) AM_RAM	AM_BASE(&namcofl_mcuram) /* shared RAM with C75 MCU */
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
 	AM_RANGE(0x30380000, 0x303800ff) AM_READ( fl_network_r )	/* network registers */
-	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM AM_BASE(&paletteram32)
+	AM_RANGE(0x30400000, 0x3040ffff) AM_READWRITE(MRA32_RAM, namcofl_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
 	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
 	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE(namco_rozvideoram32_le_r,namco_rozvideoram32_le_w)
@@ -190,7 +207,7 @@ static ADDRESS_MAP_START( sysfl_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffffffc, 0xffffffff) AM_READ( fl_unk1_r )
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( sysfl )
+INPUT_PORTS_START( namcofl )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -296,47 +313,62 @@ static const gfx_decode gfxdecodeinfo2[] =
 };
 
 
-static INTERRUPT_GEN(namcofl_interrupt)
+static void network_interrupt_callback(int param)
 {
-	int currentscanline=224-cpu_getiloops();
-	int v=(paletteram32[0x1808/4]>>16)&0xffff;
-	int triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
-
-	if (triggerscanline==currentscanline)
-	{
-		video_screen_update_partial(0, currentscanline);
-		cpunum_set_input_line(0, I960_IRQ1, ASSERT_LINE);
-	}
-
-
-	switch (cpu_getiloops())
-	{
-		case 0:
-			cpunum_set_input_line(0, I960_IRQ2, ASSERT_LINE); //VSYNC
-			break;
-		case 2:
-			cpunum_set_input_line(0, I960_IRQ0, ASSERT_LINE); //Network
-			break;
-	}
+	cpunum_set_input_line(0, I960_IRQ0, ASSERT_LINE);
+	mame_timer_set(video_screen_get_frame_period(0), 0, network_interrupt_callback);
 }
+
+
+static void vblank_interrupt_callback(int param)
+{
+	cpunum_set_input_line(0, I960_IRQ2, ASSERT_LINE);
+	mame_timer_set(video_screen_get_frame_period(0), 0, vblank_interrupt_callback);
+}
+
+
+static void raster_interrupt_callback(int param)
+{
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+	cpunum_set_input_line(0, I960_IRQ1, ASSERT_LINE);
+	mame_timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, time_zero);
+}
+
+
+static MACHINE_START( namcofl )
+{
+	raster_interrupt_timer = mame_timer_alloc(raster_interrupt_callback);
+
+	return 0;
+}
+
+
+static MACHINE_RESET( namcofl )
+{
+	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 3, 0), 0, network_interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+}
+
+
+
 NAMCO_C7X_HARDWARE
 
-static MACHINE_DRIVER_START( sysfl )
+static MACHINE_DRIVER_START( namcofl )
 	MDRV_CPU_ADD(I960, 20000000)	// i80960KA-20 == 20 MHz part
-	MDRV_CPU_PROGRAM_MAP(sysfl_mem, 0)
-	MDRV_CPU_VBLANK_INT(namcofl_interrupt, 224)
+	MDRV_CPU_PROGRAM_MAP(namcofl_mem, 0)
 
 	NAMCO_C7X_MCU_SHARED( 16384000 )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
+	MDRV_MACHINE_START(namcofl)
+	MDRV_MACHINE_RESET(namcofl)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_AFTER_VBLANK/* | */)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(NAMCONB1_COLS*8, NAMCONB1_ROWS*8) /* 288x224 pixels */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, NAMCONB1_COLS*8-1, 0*8, NAMCONB1_ROWS*8-1)
+	MDRV_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
+	MDRV_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
 	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_GFXDECODE(gfxdecodeinfo2)
@@ -522,7 +554,7 @@ static DRIVER_INIT(finalapr)
 	namcos2_gametype = NAMCOFL_FINAL_LAP_R;
 }
 
-GAME( 1995, speedrcr,        0, sysfl, sysfl, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapr,        0, sysfl, sysfl, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapb, finalapr, sysfl, sysfl, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", GAME_IMPERFECT_SOUND )
-GAME( 1995, finalapo, finalapr, sysfl, sysfl, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND )
+GAME( 1995, speedrcr,        0, namcofl, namcofl, speedrcr, ROT0, "Namco", "Speed Racer", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1995, finalapr,        0, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Japan Rev. C)", GAME_IMPERFECT_SOUND )
+GAME( 1995, finalapb, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R (Rev. B)", GAME_IMPERFECT_SOUND )
+GAME( 1995, finalapo, finalapr, namcofl, namcofl, finalapr, ROT0, "Namco", "Final Lap R", GAME_IMPERFECT_SOUND )

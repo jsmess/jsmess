@@ -488,9 +488,9 @@ void render_init(running_machine *machine)
 		{
 			screen_container[scrnum] = render_container_alloc();
 			render_container_set_orientation(screen_container[scrnum], Machine->gamedrv->flags & ORIENTATION_MASK);
-			render_container_set_brightness(screen_container[scrnum], options_get_float_range(OPTION_BRIGHTNESS, 0.1f, 2.0f));
-			render_container_set_contrast(screen_container[scrnum], options_get_float_range(OPTION_CONTRAST, 0.1f, 2.0f));
-			render_container_set_gamma(screen_container[scrnum], options_get_float_range(OPTION_GAMMA, 0.1f, 3.0f));
+			render_container_set_brightness(screen_container[scrnum], options_get_float_range(mame_options(), OPTION_BRIGHTNESS, 0.1f, 2.0f));
+			render_container_set_contrast(screen_container[scrnum], options_get_float_range(mame_options(), OPTION_CONTRAST, 0.1f, 2.0f));
+			render_container_set_gamma(screen_container[scrnum], options_get_float_range(mame_options(), OPTION_GAMMA, 0.1f, 3.0f));
 		}
 
 	/* register callbacks */
@@ -778,17 +778,17 @@ static void render_save(int config_type, xml_data_node *parentnode)
 				xml_set_attribute_int(screennode, "index", scrnum);
 
 				/* output the color controls */
-				if (container->brightness != options_get_float_range(OPTION_BRIGHTNESS, 0.1f, 2.0f))
+				if (container->brightness != options_get_float_range(mame_options(), OPTION_BRIGHTNESS, 0.1f, 2.0f))
 				{
 					xml_set_attribute_float(screennode, "brightness", container->brightness);
 					changed = TRUE;
 				}
-				if (container->contrast != options_get_float_range(OPTION_CONTRAST, 0.1f, 2.0f))
+				if (container->contrast != options_get_float_range(mame_options(), OPTION_CONTRAST, 0.1f, 2.0f))
 				{
 					xml_set_attribute_float(screennode, "contrast", container->contrast);
 					changed = TRUE;
 				}
-				if (container->gamma != options_get_float_range(OPTION_GAMMA, 0.1f, 3.0f))
+				if (container->gamma != options_get_float_range(mame_options(), OPTION_GAMMA, 0.1f, 3.0f))
 				{
 					xml_set_attribute_float(screennode, "gamma", container->gamma);
 					changed = TRUE;
@@ -948,26 +948,26 @@ render_target *render_target_alloc(const char *layoutfile, UINT32 flags)
 
 	/* determine the base layer configuration based on options */
 	target->base_layerconfig = LAYER_CONFIG_DEFAULT;
-	if (!options_get_bool(OPTION_USE_BACKDROPS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP;
-	if (!options_get_bool(OPTION_USE_OVERLAYS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY;
-	if (!options_get_bool(OPTION_USE_BEZELS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL;
-	if (options_get_bool(OPTION_ARTWORK_CROP)) target->base_layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN;
+	if (!options_get_bool(mame_options(), OPTION_USE_BACKDROPS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP;
+	if (!options_get_bool(mame_options(), OPTION_USE_OVERLAYS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY;
+	if (!options_get_bool(mame_options(), OPTION_USE_BEZELS)) target->base_layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL;
+	if (options_get_bool(mame_options(), OPTION_ARTWORK_CROP)) target->base_layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN;
 
 	/* determine the base orientation based on options */
 	target->orientation = ROT0;
-	if (!options_get_bool(OPTION_ROTATE))
+	if (!options_get_bool(mame_options(), OPTION_ROTATE))
 		target->base_orientation = orientation_reverse(Machine->gamedrv->flags & ORIENTATION_MASK);
 
 	/* rotate left/right */
-	if (options_get_bool(OPTION_ROR) || (options_get_bool(OPTION_AUTOROR) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(mame_options(), OPTION_ROR) || (options_get_bool(mame_options(), OPTION_AUTOROR) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
 		target->base_orientation = orientation_add(ROT90, target->base_orientation);
-	if (options_get_bool(OPTION_ROL) || (options_get_bool(OPTION_AUTOROL) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(mame_options(), OPTION_ROL) || (options_get_bool(mame_options(), OPTION_AUTOROL) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
 		target->base_orientation = orientation_add(ROT270, target->base_orientation);
 
 	/* flip X/Y */
-	if (options_get_bool(OPTION_FLIPX))
+	if (options_get_bool(mame_options(), OPTION_FLIPX))
 		target->base_orientation ^= ORIENTATION_FLIP_X;
-	if (options_get_bool(OPTION_FLIPY))
+	if (options_get_bool(mame_options(), OPTION_FLIPY))
 		target->base_orientation ^= ORIENTATION_FLIP_Y;
 
 	/* set the orientation and layerconfig equal to the base */

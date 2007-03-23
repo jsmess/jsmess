@@ -2507,9 +2507,9 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					subseconds_t vgaperiod = HZ_TO_SUBSECONDS(31500) * vtotal, vgadiff = vgaperiod - Machine->screen[0].refresh;
 					screen_state *state = &Machine->screen[0];
 
-					if (stdperiod < 0) stdperiod = -stdperiod;
-					if (medperiod < 0) medperiod = -medperiod;
-					if (vgaperiod < 0) vgaperiod = -vgaperiod;
+					if (stddiff < 0) stddiff = -stddiff;
+					if (meddiff < 0) meddiff = -meddiff;
+					if (vgadiff < 0) vgadiff = -vgadiff;
 
 					if (stddiff < meddiff && stddiff < vgadiff)
 						video_screen_configure(v->scrnum, state->width, state->height, &state->visarea, stdperiod);

@@ -194,6 +194,24 @@ static ADDRESS_MAP_START( pspikesb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( pallavol_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0xffc000, 0xffcbff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	//AM_RANGE(0xffd200, 0xffd201) AM_WRITE(pspikesb_gfxbank_w)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r) AM_WRITE(pspikes_gfxbank_w)
+	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
+	AM_RANGE(0xfff004, 0xfff005) AM_WRITE(aerofgt_bg1scrolly_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_NOP
+	AM_RANGE(0xc04000, 0xc04001) AM_WRITENOP
+	AM_RANGE(0xfff006, 0xfff007) AM_NOP
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( pspikesc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
@@ -1231,6 +1249,20 @@ static const gfx_layout aerofgt_spritelayout =
 	128*8
 };
 
+static const gfx_layout pallavol_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
+
+
 static const gfx_layout aerfboot_spritelayout =
 {
 	16,16,
@@ -1273,6 +1305,14 @@ static const gfx_decode pspikesb_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &pspikesb_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
 	{ -1 } /* end of array */
 };
+
+static const gfx_decode pallavol_gfxdecodeinfo[] =
+{
+	{ REGION_GFX1, 0, &pspikesb_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
+	{ REGION_GFX2, 0, &pallavol_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
+	{ -1 } /* end of array */
+};
+
 
 static const gfx_decode turbofrc_gfxdecodeinfo[] =
 {
@@ -1373,6 +1413,38 @@ static MACHINE_DRIVER_START( pspikes )
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pallavol )
+
+/* basic machine hardware */
+	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
+	MDRV_CPU_PROGRAM_MAP(pallavol_map,0)
+	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
+
+	/* + Z80 for sound */
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
+	MDRV_GFXDECODE(pallavol_gfxdecodeinfo)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_START(pspikes)
+	MDRV_VIDEO_UPDATE(pspikesb)
+
+	/* sound hardware */
+	/* the sound hardware is completely different on this:
+        1x YM2151 (sound)(ic150)
+        1x OKI M5205 (sound)(ic145)
+        2x LM324N (sound)(ic152, ic153)
+    */
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( pspikesb )
 
@@ -1809,6 +1881,87 @@ ROM_START( pspikesb )
 	ROM_COPY( REGION_USER1, 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( REGION_USER1, 0x060000, 0x0e0000, 0x020000)
 ROM_END
+
+/*
+
+Pallavolo (Italian Power Spikes bootleg)
+
+Anno    1991
+Produttore
+N.revisione PX012-30
+
+CPU
+
+1x MC68000P10 (main)(ic1)
+1x Z8400BB1 (sound)(ic139)
+1x YM2151 (sound)(ic150)
+1x OKI M5205 (sound)(ic145)
+2x LM324N (sound)(ic152, ic153)
+1x TDA2003 (sound)(ic154)
+1x oscillator 20.000 (xtal1)
+1x oscillator 24.000 (xtal2)
+1x blu crystal POE400B (xtal3)(sound)
+
+ROMs
+2x AM27C512 (1,2)(sound)
+4x M27C1001 (3,4,5,6)
+2x D27C010 (7,8) (main prg)
+2x D27C512 (9,10) (gfx)
+4x AM27C020 (11,12,13,14) (gfx)
+1x EP910PC (ic7)
+2x GAL16V8 (ic147, ic94)(not dumped)
+
+Note
+1x 28x2 JAMMA edge connector
+1x trimmer (volume)
+2x 8 switches dip
+--------------------------------
+
+This is a clone of "Power Spikes" with Italian language.
+It was rather famous in Italy
+
+--------------------------------
+
+This bootleg is very ugly, for example it has 'bad' looking tiles
+instead of the video system background on the intro screens.
+This appears to be correct as the same behavior can be seen on the
+real PCB and in MAME.
+
+Sprite, and sound hardware are also modified when compared to the
+original game
+
+*/
+
+ROM_START( pallavol )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "7.ic2",    0x00001, 0x20000, CRC(41e38d7e) SHA1(d0c226a8b61a2311c781ed5747d78b8dbddbc7ef) )
+	ROM_LOAD16_BYTE( "8.ic3",    0x00000, 0x20000, CRC(9c488daa) SHA1(8336fec855786c6cc6a836d86b74e130d60013b7) )
+
+	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "3.ic76",   0x00000, 0x20000, CRC(ab451eee) SHA1(439c5f46b4d8e66610417369bd0b2bf5568936cb) )
+	ROM_LOAD( "4.ic75",   0x20000, 0x20000, CRC(fe857bbd) SHA1(669151cf28f87cc494883dc537881d86887d08b9) )
+	ROM_LOAD( "5.ic74",   0x40000, 0x20000, CRC(d7fcd97c) SHA1(eb7c8ac111f5916350aae0ee3edc019207fef654) )
+	ROM_LOAD( "6.ic73",   0x60000, 0x20000, CRC(e6b9107f) SHA1(aaab2f2dfb85ee764091253c9a4ab89bc51d7518) )
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "11.ic118",   0x00000, 0x40000, CRC(6e65b4b2) SHA1(5296e8095ec60f79a5cd3f9db829c7d491670282) )
+	ROM_LOAD( "12.ic119",   0x40000, 0x40000, CRC(60e0d3e0) SHA1(93efc58b03610e7f18ff076ac985428a446454f9) )
+	ROM_LOAD( "13.ic120",   0x80000, 0x40000, CRC(89213a8c) SHA1(8524d5c14669d9b03f1fe050c4318d4111bc8ef7) )
+	ROM_LOAD( "14.ic121",   0xc0000, 0x40000, CRC(468cbf5b) SHA1(60fbc2771e40f8de51a51891b8ddcc14e2b1e52c) )
+
+	ROM_REGION( 0x020000, REGION_USER1, 0 ) /* ??? Unknown, interleaved - near sprite roms, lookup tables? */
+	ROM_LOAD( "10.ic104",   0x00000, 0x10000, CRC(769ade77) SHA1(9cb581d02592c69f37d4b5a902d3515f40915ec4) )
+	ROM_LOAD( "9.ic103",    0x10000, 0x10000, CRC(201cb748) SHA1(f78d384e4e9c5996a278f76fb4d5f28812a27de5) )
+
+	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* Z80 Sound CPU + M5205 Samples */
+	ROM_LOAD( "1.ic140",   0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) )
+	ROM_LOAD( "2.ic141",   0x10000, 0x10000, CRC(5dd8bf22) SHA1(d1a12894fe8ca47e47b4a1e911cabf20dd41eda4) )
+
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) /* ? */
+	ROM_LOAD( "ep910pc.ic7",   0x00000, 0x884, CRC(e7a3913a) SHA1(6f18f55ecdc94a416baecd16fe7c6698b1ec9d87) )
+ROM_END
+
+/* this is a bootleg / chinese hack of power spikes */
 
 ROM_START( pspikesc )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 code */
@@ -2304,6 +2457,7 @@ GAME( 1991, pspikes,  0,        pspikes,  pspikes,  0, ROT0,   "Video System Co.
 GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_NO_COCKTAIL )
 GAME( 1991, svolly91, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Super Volley '91 (Japan)", GAME_NO_COCKTAIL )
 GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1991, pallavol, pspikes,  pallavol, pspikes, 0, ROT0,    "bootleg",          "Pallavolo (Italian Power Spikes bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_NO_COCKTAIL )
 GAME( 1991, pspikesc, pspikes,  pspikesc, pspikes,  0, ROT0,   "bootleg",          "Power Spikes (China)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World?)", GAME_NO_COCKTAIL )
 GAME( 1991, karatblu, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_NO_COCKTAIL )

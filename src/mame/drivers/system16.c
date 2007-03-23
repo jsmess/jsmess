@@ -157,7 +157,7 @@ Notes:
 #include "sound/upd7759.h"
 
 void fd1094_machine_init(void);
-void fd1094_driver_init(void);
+void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
 static void sys16_video_config(void (*update)(void), int sprxoffs, int *bank)
 {

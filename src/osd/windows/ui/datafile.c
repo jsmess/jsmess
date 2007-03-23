@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <windows.h>
 #include "osdcomm.h"
 #include "osd_cpu.h"
 #include "driver.h"

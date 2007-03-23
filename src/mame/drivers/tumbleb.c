@@ -314,6 +314,9 @@ VIDEO_START( suprtrio );
 VIDEO_UPDATE( suprtrio );
 VIDEO_START( pangpang );
 VIDEO_UPDATE( pangpang );
+VIDEO_UPDATE( sdfight );
+
+
 
 WRITE16_HANDLER( tumblepb_pf1_data_w );
 WRITE16_HANDLER( tumblepb_pf2_data_w );
@@ -1626,6 +1629,88 @@ INPUT_PORTS_START( semibase )
 	PORT_DIPSETTING(    0x80, "6 Credits" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( sdfight )
+	PORT_START	/* Player 1 controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START	/* Player 2 controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START	/* Credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	// to be confirmed
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
+	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:8" )
+    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
+    PORT_DIPNAME( 0x01, 0x01, "0" )
+    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( dquizgo )
 	PORT_START	/* Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -2088,6 +2173,12 @@ MACHINE_DRIVER_START( semibase )
 	MDRV_IMPORT_FROM(bcstory)
 	MDRV_VIDEO_UPDATE(semibase )
 MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( sdfight )
+	MDRV_IMPORT_FROM(bcstory)
+	MDRV_VIDEO_UPDATE(sdfight )
+MACHINE_DRIVER_END
+
 
 MACHINE_DRIVER_START( metlsavr )
 	MDRV_IMPORT_FROM(cookbib)
@@ -2839,6 +2930,164 @@ ROM_START( pangpang )
 	ROM_RELOAD(0x80000,0x80000)
 ROM_END
 
+/*
+
+
+PCB Layout
+----------
+
+YMET 961023
+
++------------------------------------------+
+| M6295  UC1                               |
+|                              5.uj2 11.uk2|
+|       YM3012 YM2151          6.uj3 12.uk3|
+|4.096MHZ  Z80  UA7 pLSI1032   7.uj4 13.uk4|
+|J                             8.uj5 14.uk5|
+|A                                         |
+|M                  pLSI1032   9.uj2 15.uk2|
+|M                            10.uj2 16.uk2|
+|A     68000  UM61256         UM6164       |
+|DSW1          U818                        |
+|    87C52    UM61256         UM6164       |
+|DSW2          U817                        |
+| 15.00MHz                                 |
++------------------------------------------+
+
+Motorola MC68000P10
+ZiLOG Z0840006PSC
+Intel P87C52 MCU
+
+Lattice pLSI 1032 (x2)
+BS901, KA12 & AD-65 (YM2151, YM3012 & OKI M6295)
+
+OSC: 4.096MHz, 15.000MHz
+
+*/
+
+ROM_START( sdfight )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "u818",  0xc0001, 0x20000, CRC(a60e5b22) SHA1(eda1a5de881718f78a45720c3ca43a6288a0e65d) )
+	ROM_CONTINUE( 0x80001, 0x20000)
+	ROM_CONTINUE( 0x40001, 0x20000)
+	ROM_CONTINUE( 0x00001, 0x20000)
+	ROM_LOAD16_BYTE( "u817",  0xc0000, 0x20000, CRC(9f284f4d) SHA1(f4a471fb09c2fd73692ddaa03083644493256aae) )
+	ROM_CONTINUE( 0x80000, 0x20000)
+	ROM_CONTINUE( 0x40000, 0x20000)
+	ROM_CONTINUE( 0x00000, 0x20000)
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "ua7", 0x00000, 0x10000 , CRC(c3d36da4) SHA1(7290a977bfa9a3d5e0c98a0f589d877e38aa10a1) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, REGION_USER1, ROMREGION_ERASE00 ) /* Data from Shared RAM */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(efb8b822) SHA1(139c39771c057ae322d3601f7e0a58b43fa8860a) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "uc1", 0x00000, 0x40000, CRC(535cae2c) SHA1(e9d59ab23cbbc0375987ea68e170ddb1cc75cff8) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* Tiles */
+	ROM_LOAD16_BYTE( "9.ug11", 0x000001, 0x20000, CRC(bf809ccd) SHA1(4d648d7cdeb5ce4a918b8372dbd33c2fbf307dc0) ) // tiles a plane 0
+	ROM_CONTINUE ( 0x100001,0x20000) // tiles a plane 1
+	ROM_CONTINUE ( 0x040001,0x20000) // tiles b plane 0
+	ROM_CONTINUE ( 0x140001,0x20000) // tiles b plane 1
+	ROM_LOAD16_BYTE( "10.ug12", 0x000000, 0x20000, CRC(a5a3bfa2) SHA1(9b0d791f80f4cba14b7fab1aa7550784d6c4c4f7) ) // tiles a plane 2
+	ROM_CONTINUE ( 0x100000,0x20000) // tiles a plane 3
+	ROM_CONTINUE ( 0x040000,0x20000) // tiles b plane 2
+	ROM_CONTINUE ( 0x140000,0x20000) // tiles b plane 3
+	ROM_LOAD16_BYTE( "15.ui11", 0x080001, 0x20000, CRC(3bc8aa6d) SHA1(a8983957da5e286ec437f2fc83dfabf81fe56ca2) ) // tiles c plane 0
+	ROM_CONTINUE ( 0x180001,0x20000) // tiles c plane 1
+	ROM_CONTINUE ( 0x0c0001,0x20000) // tiles d plane 0
+	ROM_CONTINUE ( 0x1c0001,0x20000) // tiles d plane 1
+	ROM_LOAD16_BYTE( "16.ui12", 0x080000, 0x20000, CRC(71e6b78d) SHA1(a676395b2357093c4800d8520df10f7ef17cb3ee) ) // tiles c plane 2
+	ROM_CONTINUE ( 0x180000,0x20000) // tiles c plane 3
+	ROM_CONTINUE ( 0x0c0000,0x20000) // tiles d plane 2
+	ROM_CONTINUE ( 0x1c0000,0x20000) // tiles d plane 3
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD16_BYTE( "11.uk2", 0x000000, 0x80000, CRC(d006fadc) SHA1(79014bc0c7909763829ba02d5434d4543b4b80e5) ) // b
+	ROM_LOAD16_BYTE( "12.uk3", 0x000001, 0x80000, CRC(2a2f4153) SHA1(d86692ee17ad052fdd8fccded57e3e30012026f6) ) // b
+	ROM_LOAD16_BYTE( "5.uj2",  0x100000, 0x80000, CRC(f1246cbf) SHA1(de80a8f0d29ee76e11f38d9982ffcb4fd228153a) ) // b
+	ROM_LOAD16_BYTE( "6.uj3",  0x100001, 0x80000, CRC(d346878c) SHA1(93174f6f6cc797323c5e429bf324d4ffe081f072) ) // b
+	ROM_LOAD16_BYTE( "13.uk4", 0x200000, 0x80000, CRC(9bc40774) SHA1(b56c57258ec9c07c7efff9c0c632390d2d5ce4e2) ) // a
+	ROM_LOAD16_BYTE( "14.uk5", 0x200001, 0x80000, CRC(a1e61674) SHA1(a5a50f479a019b39082429fa3425a95480838f84) ) // a
+	ROM_LOAD16_BYTE( "7.uj4",  0x300000, 0x80000, CRC(dbdece8a) SHA1(20199cc915a1f8088372682c054cac69bc3b4918) ) // a
+	ROM_LOAD16_BYTE( "8.uj5",  0x300001, 0x80000, CRC(60be7dd1) SHA1(d212dee3acf696cac0843e968a71ec1fb9b16dc9) ) // a
+ROM_END
+
+/*
+
+
+PCB Layout
+----------
+
+950522
+
++------------------------------------------+
+| M6295  UC1  4.096MHz                     |
+|                                     UDR1 |
+| YM3012 YM2151  UA7                  UDR2 |
+|               Z80                   UDR3 |
+|J                                    UDR4 |
+|A                                         |
+|M                                         |
+|M            15.000MHz       SROM5        |
+|A DSW1                       SROM6        |
+|       68000 HY62256         HY6284A      |
+|  DSW2       HY62256         HY6284A      |
+|              U818                        |
+|    87C52     U817              TCP1020AFN|
++------------------------------------------+
+
+Motorola MC68000P10
+ZiLOG Z0840006PSC
+Philips P87C52IBPN MCU
+
+TI TPC1020AFN-084C
+BS901, BS902 & AD-65 (YM2151, YM3012 & OKI M6295)
+
+OSC: 4.096MHz, 15.000MHz
+
+*/
+
+ROM_START( wlstar )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "n-3.u818",     0x00001, 0x40000, CRC(f01bc623) SHA1(ef9d32071bd259fad8243ff4622a82062e67c196) )
+	ROM_LOAD16_BYTE( "n-4.u817",     0x00000, 0x40000, CRC(fc3e829b) SHA1(736835766f2b534c4ea3081f7a715a09a068a9f6) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "ua7",    0x00000, 0x10000, CRC(90cafa5f) SHA1(2d2ba8e395544e49899cac662d87585592b12040) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x400, REGION_USER1, ROMREGION_ERASE00 ) /* Data from Shared RAM */
+	//ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(1) SHA1(1) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "ua1",    0x00000, 0x40000,  CRC(de217d30) SHA1(5d7a6f82b106dd1185c7dcde193177cc46c4782f) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "5.srom5", 0x00001, 0x20000, CRC(f7f8c859) SHA1(28b21abfaff2b0502459d1e219c4397ca78a1495) )
+	ROM_CONTINUE ( 0x100001,0x20000)
+	ROM_CONTINUE ( 0x040001,0x20000)
+	ROM_CONTINUE ( 0x140001,0x20000)
+	ROM_LOAD16_BYTE( "6.srom6", 0x00000, 0x20000, CRC(34ace2a8) SHA1(f4ab3eceaacf65b5417edbb74b719f2993fa53ef) )
+	ROM_CONTINUE ( 0x100000,0x20000)
+	ROM_CONTINUE ( 0x040000,0x20000)
+	ROM_CONTINUE ( 0x140000,0x20000)
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD16_BYTE( "7.udr1",  0x000000, 0x80000, CRC(6e47c31d) SHA1(c9c2d798197e6fc16d7750391c13506a87f8a49b) )
+	ROM_LOAD16_BYTE( "8.udr2",  0x000001, 0x80000, CRC(09c5d57c) SHA1(0c53b90be28636008fa3f590b6a851022316f2e8) )
+	ROM_LOAD16_BYTE( "9.udr3",  0x100000, 0x80000, CRC(3ec064f0) SHA1(642c49acfe8388717666d423ae94789eb61105a6) )
+	ROM_LOAD16_BYTE( "10.udr4", 0x100001, 0x80000, CRC(b4693cdd) SHA1(031290586321b95436b30a3339a10dd8df12b245) )
+ROM_END
+
+
+
 /******************************************************************************/
 
 void tumblepb_patch_code(UINT16 offset)
@@ -3262,3 +3511,5 @@ GAME( 1997, semibase, 0,       semibase,  semibase, bcstory,  ROT0, "SemiCom", "
 GAME( 1998, dquizgo,  0,       cookbib,   chokchok, dquizgo, ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS) // check layer offsets
 GAME( 2001, jumppop,  0,       jumppop,   jumppop,  0, ORIENTATION_FLIP_X, "ESD", "Jumping Pop", 0 )
 GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND ) // PIC is protected, sound simulation not 100%
+GAME( 1996, sdfight,  0,       sdfight,   sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighter (Korea)", 0)
+GAME( 199?, wlstar,   0,       semibase,  semibase, bcstory,  ROT0, "SemiCom", "WonderLeague Star", GAME_NOT_WORKING) // need protection data

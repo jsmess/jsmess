@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "unzip.h"
+#include "bitmask.h"
 #include "screenshot.h"
 #include "sound/samples.h"
 #include "MAME32.h"

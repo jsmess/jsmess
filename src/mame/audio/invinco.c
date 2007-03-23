@@ -20,7 +20,7 @@
 
 
 /* sample file names */
-const char *invinco_sample_names[] =
+static const char *invinco_sample_names[] =
 {
 	"*invinco",
 	"saucer.wav",
@@ -34,7 +34,22 @@ const char *invinco_sample_names[] =
 	0
 };
 
-/* sample sound IDs - must match sample file name table above */
+
+static struct Samplesinterface invinco_samples_interface =
+{
+	8,
+	invinco_sample_names
+};
+
+
+MACHINE_DRIVER_START( invinco_audio )
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(invinco_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_DRIVER_END
+
+
+/* sample IDs - must match sample file name table above */
 enum
 {
 	SND_SAUCER = 0,
@@ -48,7 +63,7 @@ enum
 };
 
 
-WRITE8_HANDLER( invinco_sh_port2_w )
+WRITE8_HANDLER( invinco_audio_w )
 {
 	static int port2State = 0;
 	int bitsChanged;

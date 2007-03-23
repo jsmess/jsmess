@@ -11,7 +11,6 @@
 
     Known bugs:
         * EEPROM interface not right
-        * sound not hooked up
 
 ***************************************************************************
 
@@ -173,7 +172,6 @@ static void adsp_tx_callback(int port, INT32 data);
 static void adsp_autobuffer_irq(int state);
 
 
-
 /*************************************
  *
  *  Machine init
@@ -201,10 +199,21 @@ static void init_machine_common(void)
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq);
 
-	memory_set_bankptr(1, &src[0x0000]);
+	memory_configure_bank(1, 0, 256, memory_region(REGION_USER1), 0x4000);
+	memory_set_bank(1, 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+
+	/* Save state support */
+	state_save_register_global(sound_data);
+	state_save_register_global(sound_status);
+	state_save_register_global_array(analog_ports);
+	state_save_register_global(framenum);
+	state_save_register_global(adsp_ireg);
+	state_save_register_global(adsp_ireg_base);
+	state_save_register_global(adsp_incs);
+	state_save_register_global(adsp_size);
 }
 
 
@@ -212,6 +221,7 @@ static MACHINE_RESET( gaelco3d )
 {
 	init_machine_common();
 	tms_offset_xor = 0;
+	state_save_register_global(tms_offset_xor);
 }
 
 
@@ -219,6 +229,7 @@ static MACHINE_RESET( gaelco3d2 )
 {
 	init_machine_common();
 	tms_offset_xor = BYTE_XOR_BE(0);
+	state_save_register_global(tms_offset_xor);
 }
 
 
@@ -569,7 +580,7 @@ static WRITE16_HANDLER( adsp_control_w )
 static WRITE16_HANDLER( adsp_rombank_w )
 {
 	logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
-	memory_set_bankptr(1, &memory_region(REGION_USER1)[((offset & 1) * 0x80 + (data & 0x7f)) * 0x4000]);
+	memory_set_bank(1, (offset & 1) * 0x80 + (data & 0x7f));
 }
 
 
@@ -1165,6 +1176,6 @@ static DRIVER_INIT( gaelco3d )
  *
  *************************************/
 
-GAME( 1996, speedup,  0,        gaelco3d,  speedup,  gaelco3d, ROT0, "Gaelco", "Speed Up", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, surfplnt, 0,        gaelco3d,  surfplnt, gaelco3d, ROT0, "Gaelco", "Surf Planet", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, radikalb, 0,        gaelco3d2, radikalb, gaelco3d, ROT0, "Gaelco", "Radikal Bikers", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, speedup,  0,        gaelco3d,  speedup,  gaelco3d, ROT0, "Gaelco", "Speed Up", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1997, surfplnt, 0,        gaelco3d,  surfplnt, gaelco3d, ROT0, "Gaelco", "Surf Planet", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 1998, radikalb, 0,        gaelco3d2, radikalb, gaelco3d, ROT0, "Gaelco", "Radikal Bikers", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)

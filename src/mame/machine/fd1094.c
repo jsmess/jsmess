@@ -125,7 +125,6 @@ parameters, as well as an initial 'seed' for the generator:
 
 void genkey(UINT32 seed, UINT8 *output)
 {
-    static const UINT32 bvals[] = { 0x1A019, 0x3E023, 0x52005, 0x7600F };
     int bytenum;
 
     for (bytenum = 4; bytenum < 8192; bytenum++)
@@ -157,86 +156,92 @@ byte in question would be incorrectly blanked.
 summary of global keys:
 -----------------------
 
-          global01 global02 global03 LCGseed
-          -------- -------- -------- -------
+          global01 global02 global03 LCGseed   Game
+          -------- -------- -------- ------- --------
           .....    ..       ..
-0049      10101000 11110101 11100011  0183D7
-0050      10101000 11110101 11100011  0183D7
-0053      11111111 11111111 11111111  020000
-0056      10101111 11111110 11101000  2E8A3C
-0058-02C  10101111 11110101 11111000  33E2E7
-0058-03B  10101111 11110100 11100110  178BC5
-0058-03C  10101111 11110100 11100100  35C807
-0058-04B  11111100 11100100 11110001  286194
-0058-04D  11111100 11100100 11111001  14BBC6
-0058-05B  10101110 11111001 11110110  05D529
-0058-05C  10101110 11111001 11110010  1D0273
-0058-06B  11111100 11110000 11110110  07DBB5
-0058-08B  11111011 11101110 11110000  07F6C6
-0058-09D  10101100 11111001 11100101  109918
-0060      10101111 11111100 11100001  085410
-0068      10101111 11111001 11110101  2EA810
-0070      10101111 11110111 11111001  13BCC6
-0074      10101111 11110111 11111001  13BCC6
-0080      10101111 11110111 11100101  3780E6
-0084      10101111 11110101 11100000  2ED451
-0085      10101111 11110100 11110111  012208
-0087      10101111 11110100 11110111  012208
-0089      10101111 11110100 11100010  140449
-0090      10101111 11111110 11100100  0FD393
-0091      10101111 11110100 11100100  35C807
-0092      10101111 11110100 11100011  24E628
-0093      10101111 11110100 11100010  140449
-0093A     11111101 11110110 11101110  345129
-0096      10101111 11110100 11101010  1B1341
-0102      10101111 11111101 11111100  0595CA
-0110      10101110 11111100 11100010  02DFD6
-0115      11111011 11111010 11110100  3BA531
-0116      11111100 11100001 11110110  313F29
-0118      10101110 11111100 11111000  0FD839
-0120      10101110 11111100 11100010  02DFD6
-0121      10101110 11111100 11100010  02DFD6
-0122      10101110 11111011 11111011  1DFC84
-0124A     11111001 11101010 11110100  30A841
-0125A     11111001 11110000 11101111  3B3EB5
-0126      11111010 11100011 11111110  1C5A28
-0126A     11111001 11101111 11110000  2A5CD6
-0127A     10101110 11111000 11111001  169BC6
-0128      11111111 11100011 11101011  36BD28
-0129      11111111 11100011 11101011  36BD28
-0130      11111111 11100011 11101100  36BD28
-0134      10101110 11110100 11100001  3ED730
-0135      10101110 11110100 11100000  2DF551
-0136      10101110 11110100 11100010  350449
-0139      11111100 11100110 11110000  388BC5
-0142      11111110 11100111 11101110  0E5DA4
-0143      11111101 11111101 11101101  2A7E42
-0144      11111101 11101000 11101101  0B5618
-0146      11111011 11100101 11101110  06FCE6
-0147      11111011 11110001 11110001  36DE94
-0148      11111011 11100101 11110000  06FCE6
+0041                                         bullet
+0045                                         suprleag
+0049      10101000 11110101 11100011  0183D7 shinobi2
+0050      10101000 11110101 11100011  0183D7 shinobi1
+0053      11111111 11111111 11111111  020000 sonicbom
+0056      10101111 11111110 11101000  2E8A3C thndrbld
+0058-02C  10101111 11110101 11111000  33E2E7 sspirtfc
+0058-03B  10101111 11110100 11100110  178BC5 ggroundj
+0058-03C  10101111 11110100 11100100  35C807 gground
+0058-04B  11111100 11100100 11110001  286194 crkdownj
+0058-04D  11111100 11100100 11111001  14BBC6 crkdown
+0058-05B  10101110 11111001 11110110  05D529 sgmastj
+0058-05C  10101110 11111001 11110010  1D0273 sgmastc
+0058-05D?                                    sgmast
+0058-06B  11111100 11110000 11110110  07DBB5 roughrac
+0058-08B  11111011 11101110 11110000  07F6C6 qsww
+0058-09D  10101100 11111001 11100101  109918 dcclubfd
+0059                                         aceattac
+0060      10101111 11111100 11100001  085410 aceattaa
+0065                                         altbeaj1
+0068      10101111 11111001 11110101  2EA810 altbeaj3
+0070      10101111 11110111 11111001  13BCC6 passshtj
+0074      10101111 11110111 11111001  13BCC6 passshta
+0079?                                        exctleag
+0080      10101111 11110111 11100101  3780E6 passsht
+0084      10101111 11110101 11100000  2ED451 wb31
+0085      10101111 11110100 11110111  012208 wb32
+0087      10101111 11110100 11110111  012208 wb34
+0089      10101111 11110100 11100010  140449 wb33
+0090      10101111 11111110 11100100  0FD393 wrestwa1
+0091      10101111 11110100 11100100  35C807 tetris1
+0092      10101111 11110100 11100011  24E628 tetris2
+0093      10101111 11110100 11100010  140449 tetris
+0093A     11111101 11110110 11101110  345129 tetris3
+0096      10101111 11110100 11101010  1B1341 ddux
+0102      10101111 11111101 11111100  0595CA wrestwa2
+0110      10101110 11111100 11100010  02DFD6 goldnax1
+0115      11111011 11111010 11110100  3BA531 bayroutj
+0116      11111100 11100001 11110110  313F29 bayroute
+0118      10101110 11111100 11111000  0FD839 toutrun
+0120      10101110 11111100 11100010  02DFD6 goldnax3
+0121      10101110 11111100 11100010  02DFD6 goldnaxj
+0122      10101110 11111011 11111011  1DFC84 goldnaxu
+0124A     11111001 11101010 11110100  30A841 smgpj
+0125A     11111001 11110000 11101111  3B3EB5 smgpu, smgpu3, smgpu2, smgpu1
+0126      11111010 11100011 11111110  1C5A28 smgp5
+0126A     11111001 11101111 11110000  2A5CD6 smgp, smgp6
+0127A     10101110 11111000 11111001  169BC6 fpoint, fpoint1
+0128      11111111 11100011 11101011  36BD28 eswatj
+0129      11111111 11100011 11101011  36BD28 eswatu
+0130      11111111 11100011 11101100  36BD28 eswat
+0134      10101110 11110100 11100001  3ED730 loffirej
+0135      10101110 11110100 11100000  2DF551 loffireu
+0136      10101110 11110100 11100010  350449 loffire
+0139      11111100 11100110 11110000  388BC5 bloxeed
+0142      11111110 11100111 11101110  0E5DA4 mvpj
+0143      11111101 11111101 11101101  2A7E42 mvp
+0144      11111101 11101000 11101101  0B5618 rachero
+0146      11111011 11100101 11101110  06FCE6 astormj
+0147      11111011 11110001 11110001  36DE94 astormu
+0148      11111011 11100101 11110000  06FCE6 astorm3
 0153      11111011 11110101 11110001
-0157      11111000 11101011 11110101  06AB20
-0158      11111000 11110000 11110000  005FB5
-0159      11111000 11101011 11110101  06AB20
-0162      11111110 11110001 11110000  0D8394
-0163      11111110 11110010 11110000  1E6573
-0165      10101101 11110100 11100110  1F8BC5
-0166      10101101 11110100 11101110  306DA4
-0169B     11111001 11011100 11011111  19E8A5
-0175      10101100 11111100 11101001  0D6362
-0176      10101100 11111100 11110001  39BD94
-0179A     11111001 11001000 11101110  363618
-0180      11111100 11001010 11111111  36DE63
-0181A     11111001 11001000 11101110  363618
-0182      11111000 11110011 11110001  1BB221
-0184      11111000 11110011 11101111  2AD662
-0186      10101100 11111000 11111110  0AC630
-0190      11111000 11101110 11101111  138DD6
-0196      11101011 11110011 11101001  37E483
-0197A     10101011 11111001 11101100  16E452
-0197B     10101011 11111001 11101100  16E452
-5023      11111011 11101101 11111010  1ADDF7
+0157      11111000 11101011 11110101  06AB20 mwalkj
+0158      11111000 11110000 11110000  005FB5 mwalku
+0159      11111000 11101011 11110101  06AB20 mwalk
+0162      11111110 11110001 11110000  0D8394 gprider1
+0163      11111110 11110010 11110000  1E6573 gprider
+0165      10101101 11110100 11100110  1F8BC5 lghostu
+0166      10101101 11110100 11101110  306DA4 lghost
+0169B     11111001 11011100 11011111  19E8A5 abcop
+0175      10101100 11111100 11101001  0D6362 cltchtrj
+0176      10101100 11111100 11110001  39BD94 cltchitr
+0179A     11111001 11001000 11101110  363618 cottonj
+0180      11111100 11001010 11111111  36DE63 cottonu
+0181A     11111001 11001000 11101110  363618 cotton
+0182      11111000 11110011 11110001  1BB221 ddcrewj
+0184      11111000 11110011 11101111  2AD662 ddcrew2
+0186      10101100 11111000 11111110  0AC630 ddcrewu
+0190      11111000 11101110 11101111  138DD6 ddcrew
+0196      11101011 11110011 11101001  37E483 desertbr
+0197A     10101011 11111001 11101100  16E452 wwallyja
+0197B     10101011 11111001 11101100  16E452 wwallyj
+5023      11111011 11101101 11111010  1ADDF7 ryukyu
           .....    ..       ..
 unknown   11111111 11110110 10111110  226D73    (Shinobi 16A, part no. unreadable, could be dead)
 unknown   10101011 11111000 11010101  07E7C4    (unknown ddcrewa key)
@@ -508,7 +513,7 @@ static int final_decrypt(int i,int moreffff)
 	}
 
 	if ((masked_opcodes_lookup[moreffff][dec >> 4] >> ((dec >> 1) & 7)) & 1)
-		dec = 0xffff;
+		dec = -1;
 
 	return dec;
 }
@@ -648,6 +653,9 @@ int fd1094_set_state(unsigned char *key,int state)
 
 	if (!key) return 0;
 
+	if (state == -1)
+		state = selected_state;
+
 	switch (state & 0x300)
 	{
 		case 0x0000:				// 0x00xx: select state xx
@@ -731,354 +739,437 @@ int fd1094_set_state(unsigned char *key,int state)
 
 #ifdef MAME_DEBUG
 
-int fd1094_is_valid_prng_sequence(const UINT8 *base, int length, UINT32 *seedptr)
+/*
+
+    static const UINT16 stack00000000_data[] = { 0x0000, 0x0000, 0x0000, 0x0000 };
+    static const UINT16 stack00000000_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
+    static const UINT16 stackffffff00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
+    static const UINT16 stackffffff00_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
+    static const UINT16 stackffffff7e_data[] = { 0xffff, 0xff7e, 0x0000, 0x0000 };
+    static const UINT16 stackffffff7e_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
+    static const UINT16 stack00x0xx00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
+    static const UINT16 stack00x0xx00_mask[] = { 0xff8f, 0x87ff, 0xffff, 0xc001 };
+
+// Possible: global=3CFEFFD8 seed=127114 pc=108E
+static const fd1094_constraint suprleag_constraints[] =
 {
-	UINT32 seedlow;
+    // main entry point
+    { 0x001092, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
+    { 0x001094, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
+    { 0x001096, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
+    { 0x001098, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
+    { 0x00109a, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
 
-	/* iterate over seed possibilities */
-	/* note that only the low 16 bits matter; the upper 6 bits are known from the first value */
-	for (seedlow = 0; seedlow < (1 << 16); seedlow++)
-	{
-		UINT32 seedstart = (~base[0] << 16) | seedlow;
-		UINT32 seed = seedstart;
-		UINT32 i;
+    // IRQ4 entry point -- this is very similar to fpoint
+    { 0x00042e, FD1094_STATE_IRQ   | 0x00, 0x40d7, 0xffff },    // move    sr,(a7)
+    { 0x000430, FD1094_STATE_IRQ   | 0x00, 0x1ebc, 0xffff },    // move.b  #23,(a7)
+    { 0x000432, FD1094_STATE_IRQ   | 0x00, 0x0023, 0xffff },
+    { 0x000434, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
+    { 0x000436, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
+    // this part is a guess based on the fpoint IRQ handler; it is needed
+    // to further constrain valid results down to a single one
+//  { 0x000438, FD1094_STATE_IRQ   | 0x00, 0x13f8, 0xffff },    // move.b  $xxxx.w,$c40001.l
+//  { 0x00043c, FD1094_STATE_IRQ   | 0x00, 0x00c4, 0xffff },
+//  { 0x00043e, FD1094_STATE_IRQ   | 0x00, 0x0001, 0xffff },
 
-		/* look starting with this seed for a continuous match */
-		for (i = 1; i < length; i++)
-		{
-			seed = seed * 0x29;
-			seed += seed << 16;
+    // IRQ4 exit points (2 of them!)
+    { 0x0004ea, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
+    { 0x0004ec, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
+    { 0x0004ee, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
+    { 0x0004f4, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
+    { 0x0004f6, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
+    { 0x0004f8, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
+    { 0 }
+};
 
-			if ((((~seed >> 16) ^ base[i]) & 0x3f) != 0)
-				break;
-		}
-
-		/* if we got one, we're done */
-		if (i == length)
-		{
-			*seedptr = seedstart;
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
-
-UINT32 fd1094_find_global_key_matches(const UINT16 *encrypted, const UINT16 *desired, const UINT16 *desiredmask, UINT32 startwith, UINT16 *output)
+// Possible: global=98AFF6FA seed=31DDC6 pc=0410
+static const fd1094_constraint exctleag_constraints[] =
 {
-	int key0, key1, key2, key3;
-	UINT8 key[4];
+    // main entry point
+    { 0x000410, FD1094_STATE_RESET | 0x00, 0x4ff9, 0xffff },    // lea     $0.l,a7
+    { 0x000412, FD1094_STATE_RESET | 0x00, 0x0000, 0xffff },
+    { 0x000414, FD1094_STATE_RESET | 0x00, 0x0000, 0xffff },
+    { 0x000416, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
+    { 0x000418, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
+    { 0x00041a, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
+    { 0x00041c, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
+    { 0x00041e, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
 
-	/* iterate over the first key byte, allowing all possible values */
-	for (key0 = (startwith >> 24) & 0xff; key0 < 256; key0++)
-	{
-		/* set the key and reset the fd1094 */
-		key[0] = key0;
-		startwith &= 0x00ffffff;
-		fd1094_set_state(key, FD1094_STATE_RESET);
+    // IRQ4 entry point -- this is very similar to fpoint
+    { 0x000f9e, FD1094_STATE_IRQ   | 0x00, 0x40d7, 0xffff },    // move    sr,(a7)
+    { 0x000fa0, FD1094_STATE_IRQ   | 0x00, 0x1ebc, 0xffff },    // move.b  #23,(a7)
+    { 0x000fa2, FD1094_STATE_IRQ   | 0x00, 0x0023, 0xffff },
+    { 0x000fa4, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
+    { 0x000fa6, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
+    // this part is a guess based on the fpoint IRQ handler; it is needed
+    // to further constrain valid results down to a single one
+    { 0x000fa8, FD1094_STATE_IRQ   | 0x00, 0x13f8, 0xffff },    // move.b  $xxxx.w,$c40001.l
+    { 0x000fac, FD1094_STATE_IRQ   | 0x00, 0x00c4, 0xffff },
+    { 0x000fae, FD1094_STATE_IRQ   | 0x00, 0x0001, 0xffff },
 
-		/* if we match, iterate over the second key byte */
-		output[0] = fd1094_decode(0x000000, encrypted[0], key, TRUE);
-		if ((output[0] & desiredmask[0]) == desired[0])
+    // IRQ4 exit points (2 of them!)
+    { 0x001060, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
+    { 0x001062, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
+    { 0x001064, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
+    { 0x001070, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
+    { 0x001072, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
+    { 0x001074, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
+    { 0 }
+};
 
-			/* iterate over the second key byte, limiting the scope to known valid keys */
-			for (key1 = (startwith >> 16) & 0xff; key1 < 256; key1++)
-				if ((key1 & 0xf8) == 0xa8 || (key1 & 0xf8) == 0xf8)
-				{
-					/* set the key and reset the fd1094 */
-					key[1] = key1;
-					startwith &= 0x0000ffff;
-					fd1094_set_state(key, FD1094_STATE_RESET);
-
-					/* if we match, iterate over the third key byte */
-					output[1] = fd1094_decode(0x000001, encrypted[1], key, TRUE);
-					if ((output[1] & desiredmask[1]) == desired[1])
-
-						/* iterate over the third key byte, limiting the scope to known valid keys */
-						for (key2 = (startwith >> 8) & 0xff; key2 < 256; key2++)
-							if ((key2 & 0xc0) == 0xc0)
-							{
-								/* set the key and reset the fd1094 */
-								key[2] = key2;
-								startwith &= 0x000000ff;
-								fd1094_set_state(key, FD1094_STATE_RESET);
-
-								/* if we match, iterate over the fourth key byte */
-								output[2] = fd1094_decode(0x000002, encrypted[2], key, TRUE);
-								if ((output[2] & desiredmask[2]) == desired[2])
-
-									/* iterate over the fourth key byte, limiting the scope to known valid keys */
-									for (key3 = (startwith >> 0) & 0xff; key3 < 256; key3++)
-										if ((key3 & 0xc0) == 0xc0)
-										{
-											/* set the key and reset the fd1094 */
-											key[3] = key3;
-											startwith = 0;
-											fd1094_set_state(key, FD1094_STATE_RESET);
-
-											/* if we match, return the value */
-											output[3] = fd1094_decode(0x000003, encrypted[3], key, TRUE);
-											if ((output[3] & desiredmask[3]) == desired[3])
-												return (key0 << 24) | (key1 << 16) | (key2 << 8) | key3;
-										}
-							}
-				}
-	}
-	return 0;
-}
-
-#if 0
-static int fd1094_find_opcode_sequence(int basepc, int pc, UINT8 *key, const UINT16 *base, const UINT16 *sequence, const UINT16 *seqmask, int seqlength, int quick)
+// Possible: global=12A8F8E5 seed=0AD691 pc=1882
+// Possible: global=12AAF8E5 seed=0AD691 pc=1882
+// Possible: global=82A8F8EC seed=24921C pc=1882
+// Possible: global=82AAF8EC seed=24921C pc=1882
+// Possible: global=92A8F8EC seed=3D5C17 pc=1882
+// Possible: global=92AAF8EC seed=3D5C17 pc=1882
+static const fd1094_constraint bullet_constraints[] =
 {
-	int found = FALSE;
-	UINT32 seed;
-	int op;
+    // main entry point
+    { 0x001882, FD1094_STATE_RESET | 0x00, 0x4ff8, 0xffff },    // lea     $0.w,a7
+    { 0x001884, FD1094_STATE_RESET | 0x00, 0x0000, 0xffff },
+    { 0x001886, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
+    { 0x001888, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
+    { 0x00188a, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
+    { 0x00188c, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
+    { 0x00188e, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
 
-	if (seqlength == 0 && (quick || fd1094_is_valid_prng_sequence(&key[basepc/2], (pc - basepc) / 2, &seed)))
-	{
-		if (!quick)
-		{
-			int curpc;
-			printf("  ->");
-			for (curpc = basepc; curpc < pc; curpc += 2)
-				printf(" %02X", key[curpc/2]);
-			printf("  (seed=%06X)\n", seed);
-		}
-		return TRUE;
-	}
+    // IRQ4 entry point
+    { 0x000418, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
+    { 0x00041a, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
 
-	for (op = 0; op < 256; op++)
-	{
-		int addr = (pc / 2) & 0x1fff;
-		UINT16 result;
+    // IRQ4 exit points
+    { 0x000612, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
+    { 0x000614, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
+    { 0x000616, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
+    { 0 }
+};
 
-		/* skip invalid keys */
-		if (addr >= 0x0004 && addr < 0x1004 && (op & 0x80) == 0)
-			continue;
-		if (addr >= 0x1000 && (op & 0x40) == 0)
-			continue;
-
-		key[addr] = op;
-		result = fd1094_decode(pc/2, base[pc/2], key, FALSE);
-
-		if ((result & *seqmask) == *sequence)
-		{
-			found |= fd1094_find_opcode_sequence(basepc, pc + 2, key, base, sequence + 1, seqmask + 1, seqlength - 1, quick);
-			if (found && quick)
-				return TRUE;
-		}
-	}
-
-	return found;
-}
-#endif
-
-static int fd1094_find_opcode_sequence(int basepc, UINT8 *key, const UINT16 *base, const UINT16 *sequence, const UINT16 *seqmask, int seqlength, int quick)
+// Possible: global=FCAFF9F9 seed=177AC6 pc=0400
+static const fd1094_constraint altbeaj1_constraints[] =
 {
-	int found = FALSE;
-	int keybaseaddr;
-	int keyval;
+    // main entry point
+    { 0x000400, FD1094_STATE_RESET | 0x00, 0x6000, 0xffff },    // bra     $40e
+    { 0x000402, FD1094_STATE_RESET | 0x00, 0x000c, 0xffff },
+    { 0x00040e, FD1094_STATE_RESET | 0x00, 0x4ff8, 0xffff },    // lea     $ff00.w,a7
+    { 0x000410, FD1094_STATE_RESET | 0x00, 0xff00, 0xffff },
+    { 0x000412, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
+    { 0x000414, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
+    { 0x000416, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
+    { 0x000418, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
+    { 0x00041a, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
 
-	/* predivide the PC by 2 */
-	basepc /= 2;
-	keybaseaddr = basepc & 0x1fff;
+    // IRQ4 entry point
+    { 0x000404, FD1094_STATE_IRQ   | 0x00, 0x6000, 0xffff },    // bra     $2ac4
+    { 0x000406, FD1094_STATE_IRQ   | 0x00, 0x26be, 0xffff },
+    { 0x002ac4, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
+    { 0x002ac6, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
 
-	/* brute force search the first byte key of the key */
-	for (keyval = 0; keyval < 128; keyval++)
-	{
-		UINT8 keybyte = (keyval & 0x3f) | ((keybaseaddr < 0x1000) ? 0x80 : 0x40);
-		UINT16 decrypted;
+    // IRQ4 exit points
+    { 0x002ca4, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
+    { 0x002ca6, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
+    { 0x002ca8, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
+    { 0x002cc4, FD1094_STATE_IRQ   | 0x00, 0x3f3c, 0xffff },    // move    #$2300,-(a7)
+    { 0x002cc6, FD1094_STATE_IRQ   | 0x00, 0x2300, 0xffff },
+    { 0x002cc8, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
 
-		/* set the high bit appropriately */
-		if (keyval >= 64)
-			keybyte |= (keybaseaddr < 0x1000) ? 0x40 : 0x80;
+    // other IRQ entry points
+    { 0x000408, FD1094_STATE_IRQ   | 0x00, 0x6000, 0xffff },    // bra     $40c
+    { 0x00040a, FD1094_STATE_IRQ   | 0x00, 0x0002, 0xffff },
+    { 0x00040c, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
 
-		/* see if this works */
-		key[keybaseaddr] = keybyte;
-		decrypted = fd1094_decode(basepc, base[basepc], key, FALSE);
-
-		/* if we got a match, then iterate over all possible PRNG sequences starting with this */
-		if ((decrypted & seqmask[0]) == sequence[0])
-		{
-			UINT32 seedlow;
-
-			/* iterate over seed possibilities */
-			for (seedlow = 0; seedlow < (1 << 16); seedlow++)
-			{
-				UINT32 seedstart = (~keybyte << 16) | seedlow;
-				UINT32 seed = seedstart;
-				UINT32 i, hibit;
-
-				/* generate data into the key */
-				for (i = 1; i < seqlength; i++)
-				{
-					int keyaddr = (keybaseaddr + i) & 0x1fff;
-
-					seed = seed * 0x29;
-					seed += seed << 16;
-
-					key[keyaddr] = (~seed >> 16) & 0x3f;
-					if ((keyaddr & 0x0ffc) != 0)
-						key[keyaddr] |= (keyaddr < 0x1000) ? 0x80 : 0x40;
-				}
-
-				/* iterate over high bits (1 per byte) */
-				for (hibit = 0; hibit < (1 << seqlength); hibit += 2)
-				{
-					/* set them */
-					for (i = 1; i < seqlength; i++)
-					{
-						int keyaddr = (keybaseaddr + i) & 0x1fff;
-						UINT8 bit = (keyaddr < 0x1000) ? 0x40 : 0x80;
-
-						/* set or clear the bit as appropriate */
-						if (hibit & (1 << i))
-							key[keyaddr] |= bit;
-						else
-							key[keyaddr] &= ~bit;
-
-						/* decrypt using this key; stop if we fail to match */
-						decrypted = fd1094_decode(basepc + i, base[basepc + i], key, FALSE);
-						if ((decrypted & seqmask[i]) != sequence[i])
-							break;
-					}
-
-					/* if the whole thing matched, record the match */
-					if (i == seqlength)
-					{
-						found = TRUE;
-						mame_printf_debug("  -> global = %02X%02X%02X%02X, PC = %04X, key = ", key[0], key[1], key[2], key[3], basepc * 2);
-						for (i = 0; i < seqlength; i++)
-							mame_printf_debug("%02X", key[(keybaseaddr + i) & 0x1fff]);
-						mame_printf_debug("  (seed=%06X)\n", seedstart);
-					}
-				}
-			}
-		}
-	}
-
-	return found;
-}
-
-static int is_possible_pc(int pc, const UINT16 *base, UINT8 *key, UINT32 global)
-{
-	static const UINT16 leal_seq[]  = { 0x4ff9, 0x0000, 0x0000, 0x46fc, 0x2700, 0x0c80, 0x0000, 0xffff };
-	static const UINT16 leal_mask[] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xff00, 0xffff };
-	static const UINT16 leaw_seq[]  = { 0x4ff8, 0x0000, 0x46fc, 0x2700, 0x0c80, 0x0000, 0xffff };
-	static const UINT16 leaw_mask[] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xff00, 0xffff };
-	static const UINT16 clear_seq[] = { 0x4ff8, 0x0000, 0x46fc, 0x2700, 0x2200, 0x2400, 0x2600, 0x2800, 0x2a00, 0x2c00, 0x2e00 };
-	static const UINT16 clear_mask[] = { 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff };
-
-	key[0] = global >> 24;
-	key[1] = global >> 16;
-	key[2] = global >> 8;
-	key[3] = global >> 0;
-
-	if (fd1094_find_opcode_sequence(pc, key, base, leal_seq, leal_mask, ARRAY_LENGTH(leal_seq), TRUE))
-		return TRUE;
-	if (fd1094_find_opcode_sequence(pc, key, base, leaw_seq, leaw_mask, ARRAY_LENGTH(leaw_seq), TRUE))
-		return TRUE;
-	if (fd1094_find_opcode_sequence(pc, key, base, clear_seq, clear_mask, ARRAY_LENGTH(clear_seq), TRUE))
-		return TRUE;
-/*  if (fd1094_find_opcode_sequence(pc, key, base, leal_seq, leal_mask, ARRAY_LENGTH(leal_seq) - 3, TRUE))
-        return TRUE;
-    if (fd1094_find_opcode_sequence(pc, key, base, leaw_seq, leaw_mask, ARRAY_LENGTH(leaw_seq) - 3, TRUE))
-        return TRUE;*/
-
-	return FALSE;
-}
+    { 0 }
+};
 
 
-void fd1094_find_global_keys(const UINT16 *base, UINT8 *key)
-{
-	static const UINT16 stack00000000_data[] = { 0x0000, 0x0000, 0x0000, 0x0000 };
-	static const UINT16 stack00000000_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
-	static const UINT16 stackffffff00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
-	static const UINT16 stackffffff00_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
-	static const UINT16 stackffffff7e_data[] = { 0xffff, 0xff7e, 0x0000, 0x0000 };
-	static const UINT16 stackffffff7e_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
-	static const UINT16 stack00x0xx00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
-	static const UINT16 stack00x0xx00_mask[] = { 0xff8f, 0x87ff, 0xffff, 0xc001 };
-	static UINT8 pc[0x2000];
-	UINT16 output[4];
-	UINT32 global;
-	int i, count;
 
-	mame_printf_debug("Checking for stack == 0x00000000\n");
-	global = count = 0;
-	while (1)
-	{
-		global = fd1094_find_global_key_matches(base, stack00000000_data, stack00000000_mask, global + 1, output);
-		if (global == 0)
-			break;
-		if (is_possible_pc(output[3], base, key, global))
-		{
-			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
-			pc[output[3]] = 1;
-		}
-		count++;
-	}
-	if (count > 0)
-		mame_printf_debug("  Found %d possibilities\n", count);
+bullet:
+  Possible: 1882 with global 02A8F0E4, seed = 009B40 <==========
+  Possible: 1882 with global 02A8F0E4, seed = 127003 <==========
+  Possible: 1882 with global 02A8F0EC, seed = 06CE55 <==========
+  Possible: 1882 with global 02A8F0EC, seed = 0A6C55 <==========
+  Possible: 1882 with global 02A8F0EC, seed = 21024A <==========
+  Possible: 1882 with global 02A8F0EC, seed = 23185D <==========
+  Possible: 1882 with global 02A8F0EC, seed = 32750F <==========
+  Possible: 1882 with global 02A8F0ED, seed = 0A6C55 <==========
+  Possible: 1882 with global 02A8F1E4, seed = 263713 <==========
+  Possible: 1882 with global 02A8F1E4, seed = 362509 <==========
+  Possible: 1882 with global 02A8F1E5, seed = 362509 <==========
+  Possible: 1882 with global 02A8F1EC, seed = 3CEB46 <==========
+  Possible: 1882 with global 02A8F1ED, seed = 269D25 <==========
+  Possible: 1882 with global 02A8F8E4, seed = 2CAFF4 <==========
+  Possible: 1882 with global 02A8F8E5, seed = 00A73C <==========
+  Possible: 1882 with global 02A8F8E5, seed = 04453C <==========
+  Possible: 1882 with global 02A8F8E5, seed = 0941D0 <==========
+  Possible: 1882 with global 02A8F8E5, seed = 1CF144 <==========
+  Possible: 1882 with global 02A8F8E5, seed = 284DA2 <==========
+  Possible: 1882 with global 02A8F8E5, seed = 2EC607 <==========
+  Possible: 1882 with global 02A8F8EC, seed = 328B43 <==========
+  Possible: 1882 with global 02A8F8ED, seed = 15F967 <==========
+  Possible: 1882 with global 02A8F8ED, seed = 222689 <==========
+  Possible: 1882 with global 02A8F8ED, seed = 3B1B9F <==========
+  Possible: 1882 with global 02A8F9E4, seed = 39E7F5 <==========
+  Possible: 1882 with global 02A8F9E5, seed = 010848 <==========
+  Possible: 1882 with global 02A8F9EC, seed = 34AFF4 <==========
+  Possible: 1882 with global 02A8F9ED, seed = 0101CE <==========
+  Possible: 1882 with global 02A8F9ED, seed = 12D691 <==========
+  Possible: 1882 with global 02A8F9ED, seed = 283BA8 <==========
+  Possible: 1882 with global 02A8F9ED, seed = 313890 <==========
+  Possible: 1882 with global 02AAF0E4, seed = 009B40 <==========
+  Possible: 1882 with global 02AAF0E4, seed = 127003 <==========
+  Possible: 1882 with global 02AAF0EC, seed = 06CE55 <==========
+  Possible: 1882 with global 02AAF0EC, seed = 0A6C55 <==========
+  Possible: 1882 with global 02AAF0EC, seed = 21024A <==========
+  Possible: 1882 with global 02AAF0EC, seed = 23185D <==========
+  Possible: 1882 with global 02AAF0EC, seed = 32750F <==========
+  Possible: 1882 with global 02AAF0ED, seed = 0A6C55 <==========
+  Possible: 1882 with global 02AAF1E4, seed = 263713 <==========
+  Possible: 1882 with global 02AAF1E4, seed = 362509 <==========
+  Possible: 1882 with global 02AAF1E5, seed = 362509 <==========
+  Possible: 1882 with global 02AAF1EC, seed = 3CEB46 <==========
+  Possible: 1882 with global 02AAF1ED, seed = 269D25 <==========
+  Possible: 1882 with global 02AAF8E4, seed = 2CAFF4 <==========
+  Possible: 1882 with global 02AAF8E5, seed = 00A73C <==========
+  Possible: 1882 with global 02AAF8E5, seed = 04453C <==========
+  Possible: 1882 with global 02AAF8E5, seed = 0941D0 <==========
+  Possible: 1882 with global 02AAF8E5, seed = 1CF144 <==========
+  Possible: 1882 with global 02AAF8E5, seed = 284DA2 <==========
+  Possible: 1882 with global 02AAF8E5, seed = 2EC607 <==========
+  Possible: 1882 with global 02AAF8EC, seed = 328B43 <==========
+  Possible: 1882 with global 02AAF8ED, seed = 15F967 <==========
+  Possible: 1882 with global 02AAF8ED, seed = 222689 <==========
+  Possible: 1882 with global 02AAF8ED, seed = 3B1B9F <==========
+  Possible: 1882 with global 02AAF9E4, seed = 39E7F5 <==========
+  Possible: 1882 with global 02AAF9E5, seed = 010848 <==========
+  Possible: 1882 with global 02AAF9EC, seed = 34AFF4 <==========
+  Possible: 1882 with global 02AAF9ED, seed = 0101CE <==========
+  Possible: 1882 with global 02AAF9ED, seed = 12D691 <==========
+  Possible: 1882 with global 02AAF9ED, seed = 283BA8 <==========
+  Possible: 1882 with global 02AAF9ED, seed = 313890 <==========
+  Possible: 1882 with global 12A8F0E4, seed = 34B5F2 <==========
+  Possible: 1882 with global 12A8F0EC, seed = 3E2509 <==========
+  Possible: 1882 with global 12A8F0ED, seed = 3E2509 <==========
+  Possible: 1882 with global 12A8F1E5, seed = 0EC259 <==========
+  Possible: 1882 with global 12A8F1E5, seed = 231B9F <==========
+  Possible: 1882 with global 12A8F1EC, seed = 0E9727 <==========
+  Possible: 1882 with global 12A8F1EC, seed = 134BE7 <==========
+  Possible: 1882 with global 12A8F1EC, seed = 1A7003 <==========
+  Possible: 1882 with global 12A8F1EC, seed = 3CB5F2 <==========
+  Possible: 1882 with global 12A8F8E5, seed = 04B5F2 <==========
+  Possible: 1882 with global 12A8F8E5, seed = 0AD691 <==========
+  Possible: 1882 with global 12A8F8E5, seed = 169727 <==========
+  Possible: 1882 with global 12A8F8E5, seed = 1B4BE7 <==========
+  Possible: 1882 with global 12A8F8E5, seed = 203BA8 <==========
+  Possible: 1882 with global 12A8F8EC, seed = 037E9A <==========
+  Possible: 1882 with global 12A8F8EC, seed = 2BE952 <==========
+  Possible: 1882 with global 12A8F8EC, seed = 3D5C17 <==========
+  Possible: 1882 with global 12A8F8ED, seed = 129C21 <==========
+  Possible: 1882 with global 12A8F8ED, seed = 21DEB5 <==========
+  Possible: 1882 with global 12A8F8ED, seed = 2BE952 <==========
+  Possible: 1882 with global 12A8F9E4, seed = 084554 <==========
+  Possible: 1882 with global 12A8F9E4, seed = 1EC259 <==========
+  Possible: 1882 with global 12A8F9E4, seed = 331B9F <==========
+  Possible: 1882 with global 12A8F9E5, seed = 05CD43 <==========
+  Possible: 1882 with global 12A8F9E5, seed = 084554 <==========
+  Possible: 1882 with global 12A8F9E5, seed = 0A9C21 <==========
+  Possible: 1882 with global 12A8F9EC, seed = 1B1FC3 <==========
+  Possible: 1882 with global 12A8F9EC, seed = 2CF486 <==========
+  Possible: 1882 with global 12A8F9ED, seed = 0CB5F2 <==========
+  Possible: 1882 with global 12A8F9ED, seed = 0F9E58 <==========
+  Possible: 1882 with global 12A8F9ED, seed = 117724 <==========
+  Possible: 1882 with global 12A8F9ED, seed = 1E9727 <==========
+  Possible: 1882 with global 12A8F9ED, seed = 234BE7 <==========
+  Possible: 1882 with global 12A8F9ED, seed = 2AE901 <==========
+  Possible: 1882 with global 12A8F9ED, seed = 33C0DC <==========
+  Possible: 1882 with global 12AAF0E4, seed = 34B5F2 <==========
+  Possible: 1882 with global 12AAF0EC, seed = 3E2509 <==========
+  Possible: 1882 with global 12AAF0ED, seed = 3E2509 <==========
+  Possible: 1882 with global 12AAF1E5, seed = 0EC259 <==========
+  Possible: 1882 with global 12AAF1E5, seed = 231B9F <==========
+  Possible: 1882 with global 12AAF1EC, seed = 0E9727 <==========
+  Possible: 1882 with global 12AAF1EC, seed = 134BE7 <==========
+  Possible: 1882 with global 12AAF1EC, seed = 1A7003 <==========
+  Possible: 1882 with global 12AAF1EC, seed = 3CB5F2 <==========
+  Possible: 1882 with global 12AAF8E5, seed = 04B5F2 <==========
+  Possible: 1882 with global 12AAF8E5, seed = 0AD691 <==========
+  Possible: 1882 with global 12AAF8E5, seed = 169727 <==========
+  Possible: 1882 with global 12AAF8E5, seed = 1B4BE7 <==========
+  Possible: 1882 with global 12AAF8E5, seed = 203BA8 <==========
+  Possible: 1882 with global 12AAF8EC, seed = 037E9A <==========
+  Possible: 1882 with global 12AAF8EC, seed = 2BE952 <==========
+  Possible: 1882 with global 12AAF8EC, seed = 3D5C17 <==========
+  Possible: 1882 with global 12AAF8ED, seed = 129C21 <==========
+  Possible: 1882 with global 12AAF8ED, seed = 21DEB5 <==========
+  Possible: 1882 with global 12AAF8ED, seed = 2BE952 <==========
+  Possible: 1882 with global 12AAF9E4, seed = 084554 <==========
+  Possible: 1882 with global 12AAF9E4, seed = 1EC259 <==========
+  Possible: 1882 with global 12AAF9E4, seed = 331B9F <==========
+  Possible: 1882 with global 12AAF9E5, seed = 05CD43 <==========
+  Possible: 1882 with global 12AAF9E5, seed = 084554 <==========
+  Possible: 1882 with global 12AAF9E5, seed = 0A9C21 <==========
+  Possible: 1882 with global 12AAF9EC, seed = 1B1FC3 <==========
+  Possible: 1882 with global 12AAF9EC, seed = 2CF486 <==========
+  Possible: 1882 with global 12AAF9ED, seed = 0CB5F2 <==========
+  Possible: 1882 with global 12AAF9ED, seed = 0F9E58 <==========
+  Possible: 1882 with global 12AAF9ED, seed = 117724 <==========
+  Possible: 1882 with global 12AAF9ED, seed = 1E9727 <==========
+  Possible: 1882 with global 12AAF9ED, seed = 234BE7 <==========
+  Possible: 1882 with global 12AAF9ED, seed = 2AE901 <==========
+  Possible: 1882 with global 12AAF9ED, seed = 33C0DC <==========
+  Possible: 1882 with global 82A8F0E4, seed = 009B40 <==========
+  Possible: 1882 with global 82A8F0E4, seed = 127003 <==========
+  Possible: 1882 with global 82A8F0E5, seed = 1E5551 <==========
+  Possible: 1882 with global 82A8F0E5, seed = 32AE97 <==========
+  Possible: 1882 with global 82A8F0EC, seed = 06CE55 <==========
+  Possible: 1882 with global 82A8F0EC, seed = 0A6C55 <==========
+  Possible: 1882 with global 82A8F0EC, seed = 21024A <==========
+  Possible: 1882 with global 82A8F0EC, seed = 23185D <==========
+  Possible: 1882 with global 82A8F0EC, seed = 32750F <==========
+  Possible: 1882 with global 82A8F1E4, seed = 263713 <==========
+  Possible: 1882 with global 82A8F1E4, seed = 362509 <==========
+  Possible: 1882 with global 82A8F1EC, seed = 3CEB46 <==========
+  Possible: 1882 with global 82A8F1ED, seed = 265551 <==========
+  Possible: 1882 with global 82A8F1ED, seed = 2B51E5 <==========
+  Possible: 1882 with global 82A8F1ED, seed = 3AAE97 <==========
+  Possible: 1882 with global 82A8F1ED, seed = 3CEB46 <==========
+  Possible: 1882 with global 82A8F8E4, seed = 04453C <==========
+  Possible: 1882 with global 82A8F8E4, seed = 0941D0 <==========
+  Possible: 1882 with global 82A8F8E4, seed = 12A29B <==========
+  Possible: 1882 with global 82A8F8E4, seed = 26FBE1 <==========
+  Possible: 1882 with global 82A8F8E5, seed = 00A73C <==========
+  Possible: 1882 with global 82A8F8E5, seed = 04453C <==========
+  Possible: 1882 with global 82A8F8E5, seed = 0941D0 <==========
+  Possible: 1882 with global 82A8F8E5, seed = 1CF144 <==========
+  Possible: 1882 with global 82A8F8E5, seed = 284DA2 <==========
+  Possible: 1882 with global 82A8F8E5, seed = 2EC607 <==========
+  Possible: 1882 with global 82A8F8EC, seed = 15F967 <==========
+  Possible: 1882 with global 82A8F8EC, seed = 24921C <==========
+  Possible: 1882 with global 82A8F8EC, seed = 2D8EAF <==========
+  Possible: 1882 with global 82A8F8EC, seed = 3B1B9F <==========
+  Possible: 1882 with global 82A8F8ED, seed = 15F967 <==========
+  Possible: 1882 with global 82A8F8ED, seed = 222689 <==========
+  Possible: 1882 with global 82A8F8ED, seed = 3B1B9F <==========
+  Possible: 1882 with global 82A8F9E5, seed = 010848 <==========
+  Possible: 1882 with global 82A8F9EC, seed = 1AA29B <==========
+  Possible: 1882 with global 82A8F9EC, seed = 2EFBE1 <==========
+  Possible: 1882 with global 82A8F9ED, seed = 0101CE <==========
+  Possible: 1882 with global 82A8F9ED, seed = 12D691 <==========
+  Possible: 1882 with global 82A8F9ED, seed = 283BA8 <==========
+  Possible: 1882 with global 82A8F9ED, seed = 313890 <==========
+  Possible: 1882 with global 82AAF0E4, seed = 009B40 <==========
+  Possible: 1882 with global 82AAF0E4, seed = 127003 <==========
+  Possible: 1882 with global 82AAF0E5, seed = 1E5551 <==========
+  Possible: 1882 with global 82AAF0E5, seed = 32AE97 <==========
+  Possible: 1882 with global 82AAF0EC, seed = 06CE55 <==========
+  Possible: 1882 with global 82AAF0EC, seed = 0A6C55 <==========
+  Possible: 1882 with global 82AAF0EC, seed = 21024A <==========
+  Possible: 1882 with global 82AAF0EC, seed = 23185D <==========
+  Possible: 1882 with global 82AAF0EC, seed = 32750F <==========
+  Possible: 1882 with global 82AAF1E4, seed = 263713 <==========
+  Possible: 1882 with global 82AAF1E4, seed = 362509 <==========
+  Possible: 1882 with global 82AAF1EC, seed = 3CEB46 <==========
+  Possible: 1882 with global 82AAF1ED, seed = 265551 <==========
+  Possible: 1882 with global 82AAF1ED, seed = 2B51E5 <==========
+  Possible: 1882 with global 82AAF1ED, seed = 3AAE97 <==========
+  Possible: 1882 with global 82AAF1ED, seed = 3CEB46 <==========
+  Possible: 1882 with global 82AAF8E4, seed = 04453C <==========
+  Possible: 1882 with global 82AAF8E4, seed = 0941D0 <==========
+  Possible: 1882 with global 82AAF8E4, seed = 12A29B <==========
+  Possible: 1882 with global 82AAF8E4, seed = 26FBE1 <==========
+  Possible: 1882 with global 82AAF8E5, seed = 00A73C <==========
+  Possible: 1882 with global 82AAF8E5, seed = 04453C <==========
+  Possible: 1882 with global 82AAF8E5, seed = 0941D0 <==========
+  Possible: 1882 with global 82AAF8E5, seed = 1CF144 <==========
+  Possible: 1882 with global 82AAF8E5, seed = 284DA2 <==========
+  Possible: 1882 with global 82AAF8E5, seed = 2EC607 <==========
+  Possible: 1882 with global 82AAF8EC, seed = 15F967 <==========
+  Possible: 1882 with global 82AAF8EC, seed = 24921C <==========
+  Possible: 1882 with global 82AAF8EC, seed = 2D8EAF <==========
+  Possible: 1882 with global 82AAF8EC, seed = 3B1B9F <==========
+  Possible: 1882 with global 82AAF8ED, seed = 15F967 <==========
+  Possible: 1882 with global 82AAF8ED, seed = 222689 <==========
+  Possible: 1882 with global 82AAF8ED, seed = 3B1B9F <==========
+  Possible: 1882 with global 82AAF9E5, seed = 010848 <==========
+  Possible: 1882 with global 82AAF9EC, seed = 1AA29B <==========
+  Possible: 1882 with global 82AAF9EC, seed = 2EFBE1 <==========
+  Possible: 1882 with global 82AAF9ED, seed = 0101CE <==========
+  Possible: 1882 with global 82AAF9ED, seed = 12D691 <==========
+  Possible: 1882 with global 82AAF9ED, seed = 283BA8 <==========
+  Possible: 1882 with global 82AAF9ED, seed = 313890 <==========
+  Possible: 1882 with global 92A8F0E4, seed = 3590EE <==========
+  Possible: 1882 with global 92A8F0EC, seed = 08D5B0 <==========
+  Possible: 1882 with global 92A8F0EC, seed = 3700ED <==========
+  Possible: 1882 with global 92A8F0ED, seed = 3E2509 <==========
+  Possible: 1882 with global 92A8F1E4, seed = 00D5B0 <==========
+  Possible: 1882 with global 92A8F1E4, seed = 0EC259 <==========
+  Possible: 1882 with global 92A8F1E4, seed = 231B9F <==========
+  Possible: 1882 with global 92A8F1E4, seed = 2F00ED <==========
+  Possible: 1882 with global 92A8F1E5, seed = 0EC259 <==========
+  Possible: 1882 with global 92A8F1E5, seed = 231B9F <==========
+  Possible: 1882 with global 92A8F1EC, seed = 089B40 <==========
+  Possible: 1882 with global 92A8F8E5, seed = 293890 <==========
+  Possible: 1882 with global 92A8F8E5, seed = 3C89CE <==========
+  Possible: 1882 with global 92A8F8EC, seed = 037E9A <==========
+  Possible: 1882 with global 92A8F8EC, seed = 2BE952 <==========
+  Possible: 1882 with global 92A8F8EC, seed = 3D5C17 <==========
+  Possible: 1882 with global 92A8F8ED, seed = 037E9A <==========
+  Possible: 1882 with global 92A8F8ED, seed = 0700ED <==========
+  Possible: 1882 with global 92A8F8ED, seed = 10A98C <==========
+  Possible: 1882 with global 92A8F8ED, seed = 3D5C17 <==========
+  Possible: 1882 with global 92A8F8ED, seed = 3FE09A <==========
+  Possible: 1882 with global 92A8F9E4, seed = 084554 <==========
+  Possible: 1882 with global 92A8F9E4, seed = 1EC259 <==========
+  Possible: 1882 with global 92A8F9E4, seed = 331B9F <==========
+  Possible: 1882 with global 92A8F9E5, seed = 10D5B0 <==========
+  Possible: 1882 with global 92A8F9E5, seed = 142AA2 <==========
+  Possible: 1882 with global 92A8F9E5, seed = 1EC259 <==========
+  Possible: 1882 with global 92A8F9E5, seed = 2146DC <==========
+  Possible: 1882 with global 92A8F9E5, seed = 331B9F <==========
+  Possible: 1882 with global 92A8F9E5, seed = 3F00ED <==========
+  Possible: 1882 with global 92A8F9EC, seed = 1B1FC3 <==========
+  Possible: 1882 with global 92A8F9EC, seed = 2CF486 <==========
+  Possible: 1882 with global 92A8F9ED, seed = 0489CE <==========
+  Possible: 1882 with global 92A8F9ED, seed = 189B40 <==========
+  Possible: 1882 with global 92A8F9ED, seed = 1B1FC3 <==========
+  Possible: 1882 with global 92A8F9ED, seed = 2CF486 <==========
+  Possible: 1882 with global 92AAF0E4, seed = 3590EE <==========
+  Possible: 1882 with global 92AAF0EC, seed = 08D5B0 <==========
+  Possible: 1882 with global 92AAF0EC, seed = 3700ED <==========
+  Possible: 1882 with global 92AAF0ED, seed = 3E2509 <==========
+  Possible: 1882 with global 92AAF1E4, seed = 00D5B0 <==========
+  Possible: 1882 with global 92AAF1E4, seed = 0EC259 <==========
+  Possible: 1882 with global 92AAF1E4, seed = 231B9F <==========
+  Possible: 1882 with global 92AAF1E4, seed = 2F00ED <==========
+  Possible: 1882 with global 92AAF1E5, seed = 0EC259 <==========
+  Possible: 1882 with global 92AAF1E5, seed = 231B9F <==========
+  Possible: 1882 with global 92AAF1EC, seed = 089B40 <==========
+  Possible: 1882 with global 92AAF8E5, seed = 293890 <==========
+  Possible: 1882 with global 92AAF8E5, seed = 3C89CE <==========
+  Possible: 1882 with global 92AAF8EC, seed = 037E9A <==========
+  Possible: 1882 with global 92AAF8EC, seed = 2BE952 <==========
+  Possible: 1882 with global 92AAF8EC, seed = 3D5C17 <==========
+  Possible: 1882 with global 92AAF8ED, seed = 037E9A <==========
+  Possible: 1882 with global 92AAF8ED, seed = 0700ED <==========
+  Possible: 1882 with global 92AAF8ED, seed = 10A98C <==========
+  Possible: 1882 with global 92AAF8ED, seed = 3D5C17 <==========
+  Possible: 1882 with global 92AAF8ED, seed = 3FE09A <==========
+  Possible: 1882 with global 92AAF9E4, seed = 084554 <==========
+  Possible: 1882 with global 92AAF9E4, seed = 1EC259 <==========
+  Possible: 1882 with global 92AAF9E4, seed = 331B9F <==========
+  Possible: 1882 with global 92AAF9E5, seed = 10D5B0 <==========
+  Possible: 1882 with global 92AAF9E5, seed = 142AA2 <==========
+  Possible: 1882 with global 92AAF9E5, seed = 1EC259 <==========
+  Possible: 1882 with global 92AAF9E5, seed = 2146DC <==========
+  Possible: 1882 with global 92AAF9E5, seed = 331B9F <==========
+  Possible: 1882 with global 92AAF9E5, seed = 3F00ED <==========
+  Possible: 1882 with global 92AAF9EC, seed = 1B1FC3 <==========
+  Possible: 1882 with global 92AAF9EC, seed = 2CF486 <==========
+  Possible: 1882 with global 92AAF9ED, seed = 0489CE <==========
+  Possible: 1882 with global 92AAF9ED, seed = 189B40 <==========
+  Possible: 1882 with global 92AAF9ED, seed = 1B1FC3 <==========
+  Possible: 1882 with global 92AAF9ED, seed = 2CF486 <==========
 
-	mame_printf_debug("Checking for stack == 0xffffff00\n");
-	global = count = 0;
-	while (1)
-	{
-		global = fd1094_find_global_key_matches(base, stackffffff00_data, stackffffff00_mask, global + 1, output);
-		if (global == 0)
-			break;
-		if (is_possible_pc(output[3], base, key, global))
-		{
-			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
-			pc[output[3]] = 1;
-		}
-		count++;
-	}
-	if (count > 0)
-		mame_printf_debug("  Found %d possibilities\n", count);
 
-	mame_printf_debug("Checking for stack == 0xffffff7e\n");
-	global = count = 0;
-	while (1)
-	{
-		global = fd1094_find_global_key_matches(base, stackffffff7e_data, stackffffff7e_mask, global + 1, output);
-		if (global == 0)
-			break;
-		if (is_possible_pc(output[3], base, key, global))
-		{
-			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
-			pc[output[3]] = 1;
-		}
-		count++;
-	}
-	if (count > 0)
-		mame_printf_debug("  Found %d possibilities\n", count);
-
-	mame_printf_debug("Checking for stack == 0x00x0xx00\n");
-	global = count = 0;
-	while (1)
-	{
-		global = fd1094_find_global_key_matches(base, stack00x0xx00_data, stack00x0xx00_mask, global + 1, output);
-		if (global == 0)
-			break;
-		if (is_possible_pc(output[3], base, key, global))
-		{
-			mame_printf_debug("  Possible: %04X with global %08X\n", output[3], global);
-			pc[output[3]] = 1;
-		}
-		count++;
-	}
-	if (count > 0)
-		mame_printf_debug("  Found %d possibilities\n", count);
-
-	mame_printf_debug("Possible PCs:\n");
-	for (i = 0; i < 0x2000; i++)
-		if (pc[i])
-		{
-			mame_printf_debug("  %04X -> \n", i);
-		}
-}
+*/
 
 #endif

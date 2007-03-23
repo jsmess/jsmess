@@ -1072,6 +1072,7 @@ static void registers_update(debug_view *view)
 	debug_view_registers *regdata = view->extra_data;
 	debug_view_char *dest = view->viewdata;
 	UINT32 row, i;
+	int scrnum = 0;
 
 	/* cannot update if no active CPU */
 	if (cpu_getactivecpu() < 0)
@@ -1118,11 +1119,13 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 2:
-						sprintf(dummy, "beamx:%3d", video_screen_get_hpos(0));
+						if (video_screen_exists(scrnum))
+							sprintf(dummy, "beamx:%3d", video_screen_get_hpos(scrnum));
 						break;
 
 					case MAX_REGS + 3:
-						sprintf(dummy, "beamy:%3d", video_screen_get_vpos(0));
+						if (video_screen_exists(scrnum))
+							sprintf(dummy, "beamy:%3d", video_screen_get_vpos(scrnum));
 						break;
 
 					case MAX_REGS + 4:
@@ -2027,6 +2030,29 @@ static void	disasm_setprop(debug_view *view, UINT32 property, debug_property_inf
 }
 
 
+/*-------------------------------------------------
+    debug_disasm_update_all - force all disasm
+    views to update
+-------------------------------------------------*/
+
+void debug_disasm_update_all(void)
+{
+	debug_view *view;
+
+	/* this is brute force */
+	for (view = first_view; view != NULL; view = view->next)
+		if (view->type == DVT_DISASSEMBLY)
+		{
+			debug_view_disasm *dasmdata = view->extra_data;
+			debug_view_begin_update(view);
+			view->update_pending = TRUE;
+			dasmdata->recompute = TRUE;
+			dasmdata->last_pcbyte = ~0;
+			debug_view_end_update(view);
+		}
+}
+
+
 
 /***************************************************************************
 
@@ -2348,6 +2374,17 @@ static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 dat
 	if (offs >= memdata->raw_length)
 		return;
 	*((UINT8 *)memdata->raw_base + offs) = data;
+
+/* hack for FD1094 editing */
+#ifdef MAME_DEBUG
+#ifndef MESS
+	if (memdata->raw_base == memory_region(REGION_USER2))
+	{
+		extern void fd1094_regenerate_key(void);
+		fd1094_regenerate_key();
+	}
+#endif /* MESS */
+#endif /* MAME_DEBUG */
 }
 
 

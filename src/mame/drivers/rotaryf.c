@@ -142,7 +142,7 @@ static MACHINE_DRIVER_START( rotaryf )
 	MDRV_VIDEO_UPDATE(8080bw)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_sound)
+	MDRV_IMPORT_FROM(invaders_audio)
 
 MACHINE_DRIVER_END
 

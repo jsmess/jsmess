@@ -6,6 +6,7 @@ Atari Ultra Tank driver
 
 #include "driver.h"
 #include "ultratnk.h"
+#include "audio/sprint4.h"
 
 #define MASTER_CLOCK    12096000
 
@@ -132,11 +133,11 @@ static WRITE8_HANDLER( ultratnk_lockout_w )
 
 static WRITE8_HANDLER( ultratnk_fire_1_w )
 {
-	discrete_sound_w(ULTRATNK_FIRE1_EN, offset & 1);
+	discrete_sound_w(ULTRATNK_FIRE_EN_1, offset & 1);
 }
 static WRITE8_HANDLER( ultratnk_fire_2_w )
 {
-	discrete_sound_w(ULTRATNK_FIRE2_EN, offset & 1);
+	discrete_sound_w(ULTRATNK_FIRE_EN_2, offset & 1);
 }
 static WRITE8_HANDLER( ultratnk_attract_w )
 {
@@ -229,12 +230,6 @@ INPUT_PORTS_START( ultratnk )
 	PORT_DIPSETTING(	0xc0, "75 Points" )
 	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
 
-	PORT_START_TAG("MOTOR1")
-	PORT_ADJUSTER( 60, "Motor 1 RPM" )
-
-	PORT_START_TAG("MOTOR2")
-	PORT_ADJUSTER( 40, "Motor 2 RPM" )
-
 	PORT_START_TAG("ANALOG")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM( get_joystick, "JOY-W" )
@@ -260,6 +255,12 @@ INPUT_PORTS_START( ultratnk )
 	PORT_START_TAG("JOY-Z")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(2)
+
+	PORT_START_TAG("MOTOR1")
+	PORT_ADJUSTER( 35, "Motor 1 RPM" )
+
+	PORT_START_TAG("MOTOR2")
+	PORT_ADJUSTER( 40, "Motor 2 RPM" )
 
 INPUT_PORTS_END
 

@@ -729,6 +729,10 @@ void mame_debug_hook(void)
 	if (info->trace.file)
 		perform_trace(info);
 
+	/* per-instruction hook? */
+	if (info->instrhook != NULL && (*info->instrhook)(curpc))
+		execution_state = EXECUTION_STATE_STOPPED;
+
 	/* check for execution breakpoints */
 	if (execution_state != EXECUTION_STATE_STOPPED)
 	{
@@ -1107,6 +1111,17 @@ void debug_get_memory_hooks(int cpunum, debug_hook_read_ptr *read, debug_hook_wr
 		*write = standard_debug_hook_write;
 	else
 		*write = NULL;
+}
+
+
+/*-------------------------------------------------
+    debug_set_instruction_hook - set a hook to
+    be called on each instruction for a given CPU
+-------------------------------------------------*/
+
+void debug_set_instruction_hook(int cpunum, int (*hook)(offs_t pc))
+{
+	debug_cpuinfo[cpunum].instrhook = hook;
 }
 
 

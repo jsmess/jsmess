@@ -6,8 +6,10 @@ extern UINT32 *namconb1_tilebank32;
 
 /*----------- defined in video/namconb1.c -----------*/
 
-#define NAMCONB1_COLS		36
-#define NAMCONB1_ROWS		28
+#define NAMCONB1_HTOTAL		(288)	/* wrong */
+#define NAMCONB1_HBSTART	(288)
+#define NAMCONB1_VTOTAL		(262)	/* needs to be checked */
+#define NAMCONB1_VBSTART	(224)
 
 #define NAMCONB1_TILEMASKREGION		REGION_GFX1
 #define NAMCONB1_TILEGFXREGION		REGION_GFX2

@@ -1500,20 +1500,23 @@ static void sharcop_compute_dm_to_dreg_immmod(void)
 	int mod = SIGN_EXTEND6((sharc.opcode >> 27) & 0x3f);
 	int compute = sharc.opcode & 0x7fffff;
 
-	if (IF_CONDITION_CODE(cond) && compute != 0)
+	if (IF_CONDITION_CODE(cond))
 	{
-		COMPUTE(compute);
-	}
+		if (compute != 0)
+		{
+			COMPUTE(compute);
+		}
 
-	if (u)		/* post-modify with update */
-	{
-		REG(dreg) = dm_read32(DM_REG_I(i));
-		DM_REG_I(i) += mod;
-		UPDATE_CIRCULAR_BUFFER_DM(i);
-	}
-	else		/* pre-modify, no update */
-	{
-		REG(dreg) = dm_read32(DM_REG_I(i) + mod);
+		if (u)		/* post-modify with update */
+		{
+			REG(dreg) = dm_read32(DM_REG_I(i));
+			DM_REG_I(i) += mod;
+			UPDATE_CIRCULAR_BUFFER_DM(i);
+		}
+		else		/* pre-modify, no update */
+		{
+			REG(dreg) = dm_read32(DM_REG_I(i) + mod);
+		}
 	}
 }
 
@@ -1531,20 +1534,23 @@ static void sharcop_compute_dreg_to_dm_immmod(void)
 	/* because the shift operation may change it */
 	UINT32 parallel_dreg = REG(dreg);
 
-	if (IF_CONDITION_CODE(cond) && compute != 0)
+	if (IF_CONDITION_CODE(cond))
 	{
-		COMPUTE(compute);
-	}
+		if (compute != 0)
+		{
+			COMPUTE(compute);
+		}
 
-	if (u)		/* post-modify with update */
-	{
-		dm_write32(DM_REG_I(i), parallel_dreg);
-		DM_REG_I(i) += mod;
-		UPDATE_CIRCULAR_BUFFER_DM(i);
-	}
-	else		/* pre-modify, no update */
-	{
-		dm_write32(DM_REG_I(i) + mod, parallel_dreg);
+		if (u)		/* post-modify with update */
+		{
+			dm_write32(DM_REG_I(i), parallel_dreg);
+			DM_REG_I(i) += mod;
+			UPDATE_CIRCULAR_BUFFER_DM(i);
+		}
+		else		/* pre-modify, no update */
+		{
+			dm_write32(DM_REG_I(i) + mod, parallel_dreg);
+		}
 	}
 }
 
@@ -1558,20 +1564,23 @@ static void sharcop_compute_pm_to_dreg_immmod(void)
 	int mod = SIGN_EXTEND6((sharc.opcode >> 27) & 0x3f);
 	int compute = sharc.opcode & 0x7fffff;
 
-	if (IF_CONDITION_CODE(cond) && compute != 0)
+	if (IF_CONDITION_CODE(cond))
 	{
-		COMPUTE(compute);
-	}
+		if (compute != 0)
+		{
+			COMPUTE(compute);
+		}
 
-	if (u)		/* post-modify with update */
-	{
-		REG(dreg) = pm_read32(PM_REG_I(i));
-		PM_REG_I(i) += mod;
-		UPDATE_CIRCULAR_BUFFER_PM(i);
-	}
-	else		/* pre-modify, no update */
-	{
-		REG(dreg) = pm_read32(PM_REG_I(i) + mod);
+		if (u)		/* post-modify with update */
+		{
+			REG(dreg) = pm_read32(PM_REG_I(i));
+			PM_REG_I(i) += mod;
+			UPDATE_CIRCULAR_BUFFER_PM(i);
+		}
+		else		/* pre-modify, no update */
+		{
+			REG(dreg) = pm_read32(PM_REG_I(i) + mod);
+		}
 	}
 }
 
@@ -1589,20 +1598,23 @@ static void sharcop_compute_dreg_to_pm_immmod(void)
 	/* because the compute operation may change it */
 	UINT32 parallel_dreg = REG(dreg);
 
-	if (IF_CONDITION_CODE(cond) && compute != 0)
+	if (IF_CONDITION_CODE(cond))
 	{
-		COMPUTE(compute);
-	}
+		if (compute != 0)
+		{
+			COMPUTE(compute);
+		}
 
-	if (u)		/* post-modify with update */
-	{
-		pm_write32(PM_REG_I(i), parallel_dreg);
-		PM_REG_I(i) += mod;
-		UPDATE_CIRCULAR_BUFFER_PM(i);
-	}
-	else		/* pre-modify, no update */
-	{
-		pm_write32(PM_REG_I(i) + mod, parallel_dreg);
+		if (u)		/* post-modify with update */
+		{
+			pm_write32(PM_REG_I(i), parallel_dreg);
+			PM_REG_I(i) += mod;
+			UPDATE_CIRCULAR_BUFFER_PM(i);
+		}
+		else		/* pre-modify, no update */
+		{
+			pm_write32(PM_REG_I(i) + mod, parallel_dreg);
+		}
 	}
 }
 
@@ -1617,16 +1629,19 @@ static void sharcop_compute_ureg_to_ureg(void)
 	int cond = (sharc.opcode >> 31) & 0x1f;
 	int compute = sharc.opcode & 0x7fffff;
 
-	/* due to parallelity issues, source UREG must be saved */
-	/* because the compute operation may change it */
-	UINT32 parallel_ureg = GET_UREG(src_ureg);
-
-	if (IF_CONDITION_CODE(cond) && compute != 0)
+	if (IF_CONDITION_CODE(cond))
 	{
-		COMPUTE(compute);
-	}
+		/* due to parallelity issues, source UREG must be saved */
+		/* because the compute operation may change it */
+		UINT32 parallel_ureg = GET_UREG(src_ureg);
 
-	SET_UREG(dst_ureg, parallel_ureg);
+		if (compute != 0)
+		{
+			COMPUTE(compute);
+		}
+
+		SET_UREG(dst_ureg, parallel_ureg);
+	}
 }
 
 /*****************************************************************************/

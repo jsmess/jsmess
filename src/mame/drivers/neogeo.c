@@ -296,6 +296,7 @@ static WRITE16_HANDLER( interrupt_ack_w )
 
 static void vblank_interrupt_callback(int param)
 {
+logerror("+++ VBLANK @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 	/* add a timer tick to the pd4990a */
 	pd4990a_addretrace();
 
@@ -304,7 +305,7 @@ static void vblank_interrupt_callback(int param)
 	update_interrupts();
 
 	/* set timer for next VBLANK */
-	mame_timer_adjust(vblank_interrupt_timer, video_screen_get_frame_period(0), 0, time_zero);
+	mame_timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, time_zero);
 
 	if (scanline_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
@@ -316,9 +317,10 @@ static void vblank_interrupt_callback(int param)
 
 static void scanline_interrupt_callback(int param)
 {
+logerror("--- Scanline @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 	if (scanline_interrupt_control & IRQ2CTRL_ENABLE)
 	{
-		//logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+		logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		scanline_interrupt_pending = 1;
 
 		update_interrupts();
@@ -326,7 +328,7 @@ static void scanline_interrupt_callback(int param)
 
 	if (scanline_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
 	{
-		//logerror("AUTOLOAD_REPEAT ");
+		logerror("AUTOLOAD_REPEAT ");
 		adjust_scanline_timer();
 	}
 }
@@ -353,6 +355,7 @@ void neogeo_create_timers(void)
 
 void neogeo_start_timers(void)
 {
+logerror("Starting timers @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 	mame_timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, time_zero);
 	adjust_animation_timer();
 }
@@ -745,50 +748,36 @@ For and example of this see routine at 0xb013c in kof2002
 
 /* Mirroring information thanks to Razoola */
 
-static ADDRESS_MAP_START( neogeo_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)							/* Rom bank 1 */
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_BANK1) AM_MIRROR(0x0f0000)	/* Ram bank 1 (mirrored to 0x1fffff) */
-	AM_RANGE(0x200000, 0x2fffff) AM_READ(MRA16_BANK4)						/* Rom bank 2 */
+static ADDRESS_MAP_START( neogeo_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM										/* Rom bank 1 */
+	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAMBANK(1)			/* WORK RAM (mirrored to 0x1fffff) */
+	/* Some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the rom is read here too */
+	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK(4)								/* Rom bank 2 */
+	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(neo_bankswitch_w)					/* Bankswitch for standard games */
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(controller1and4_16_r)				/* Inputs */
+	AM_RANGE(0x300000, 0x31ffff) AM_WRITE(watchdog_reset16_w)				/* Watchdog, NOTE, odd addresses only! */
 	AM_RANGE(0x320000, 0x33ffff) AM_READ(timer16_r)							/* Coins, Calendar, Z80 communication */
+	AM_RANGE(0x320000, 0x33ffff) AM_WRITE(neo_z80_w)						/* Sound CPU  EVEN BYTES only!*/
 	AM_RANGE(0x340000, 0x35ffff) AM_READ(controller2_16_r)					/* Inputs */
 	AM_RANGE(0x380000, 0x39ffff) AM_READ(controller3_16_r)					/* Inputs */
-	AM_RANGE(0x3c0000, 0x3dffff) AM_READ(neogeo_video_r)					/* Video Hardware */
-	AM_RANGE(0x400000, 0x7fffff) AM_READ(neogeo_paletteram16_r)				/* Palette */
-	AM_RANGE(0x800000, 0x800fff) AM_READ(neogeo_memcard16_r)				/* Memory Card */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READ(MRA16_BANK3) AM_MIRROR(0x0e0000)	/* Bios rom (mirrored every 128k for standard bios) */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_READ(neogeo_sram16_r) AM_MIRROR(0x0f0000)	/* 64k battery backed SRAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( neogeo_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)	  /* ghost pilots writes to ROM */
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_BANK1) AM_MIRROR(0x0f0000)	/* WORK RAM (mirrored to 0x1fffff) */
-	/* Some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the rom is read here too */
-	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(neo_bankswitch_w)			/* Bankswitch for standard games */
-	AM_RANGE(0x300000, 0x31ffff) AM_WRITE(watchdog_reset16_w)		/* Watchdog, NOTE, odd addresses only! */
-	AM_RANGE(0x320000, 0x33ffff) AM_WRITE(neo_z80_w)				/* Sound CPU  EVEN BYTES only!*/
-	AM_RANGE(0x380000, 0x39ffff) AM_WRITE(neogeo_syscontrol_w)		/* Coin Counters, LEDs, Clock etc. */
-	AM_RANGE(0x3a0000, 0x3affff) AM_WRITE(neogeo_syscontrol2_w)		/* BIOS / Game select etc. */
-	AM_RANGE(0x3c0000, 0x3dffff) AM_WRITE(neogeo_video_w)			/* Video Hardware */
-	AM_RANGE(0x400000, 0x4fffff) AM_WRITE(neogeo_paletteram16_w)	/* Palettes */
-	AM_RANGE(0x800000, 0x800fff) AM_WRITE(neogeo_memcard16_w)		/* Memory card */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_WRITE(neogeo_sram16_w) AM_BASE(&neogeo_sram16) AM_MIRROR(0x0f0000)	/* 64k battery backed SRAM */
+	AM_RANGE(0x380000, 0x39ffff) AM_WRITE(neogeo_syscontrol_w)				/* Coin Counters, LEDs, Clock etc. */
+	AM_RANGE(0x3a0000, 0x3affff) AM_WRITE(neogeo_syscontrol2_w)				/* BIOS / Game select etc. */
+	AM_RANGE(0x3c0000, 0x3dffff) AM_READWRITE(neogeo_video_r, neogeo_video_w) /* Video Hardware */
+	AM_RANGE(0x400000, 0x7fffff) AM_MIRROR(0x3fe000) AM_READWRITE(neogeo_paletteram16_r, neogeo_paletteram16_w)	/* Palette */
+	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(neogeo_memcard16_r, neogeo_memcard16_w)/* Memory Card */
+	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROMBANK(3)			/* Bios rom (mirrored every 128k for standard bios) */
+	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_READWRITE(neogeo_sram16_r, neogeo_sram16_w) AM_BASE(&neogeo_sram16) /* 64k battery backed SRAM */
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK5)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK6)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_BANK7)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_BANK8)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xf7ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(5)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(6)
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(7)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(8)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -1340,11 +1329,10 @@ static MACHINE_DRIVER_START( neogeo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, NEOGEO_68K_CLOCK) /* verified */
-	MDRV_CPU_PROGRAM_MAP(neogeo_readmem,neogeo_writemem)
+	MDRV_CPU_PROGRAM_MAP(neogeo_map,0)
 
 	MDRV_CPU_ADD(Z80, NEOGEO_Z80_CLOCK) /* verified */
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(neo_readio,neo_writeio)
 
 	MDRV_WATCHDOG_TIME_INIT(TIME_IN_SEC(0.128762))
@@ -6226,7 +6214,7 @@ ROM_START( matrim ) /* Encrypted Set */
 ROM_END
 
 
-ROM_START( pnyaa ) /* Encrypted Set */
+ROM_START( pnyaa ) /* Encrypted Set, MVS VERSION */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )
 	ROM_LOAD16_WORD_SWAP( "267-p1.bin", 0x000000, 0x100000, CRC(112fe2c0) SHA1(01420e051f0bdbd4f68ce306a3738161b96f8ba8) )
 
@@ -6250,8 +6238,8 @@ ROM_START( pnyaa ) /* Encrypted Set */
 
 	ROM_REGION( 0x1000000, REGION_GFX3, 0 )
 	/* Encrypted */
-	ROM_LOAD16_BYTE( "267-c1.bin", 0x0000000, 0x800000, BAD_DUMP CRC(2e20617a) SHA1(ed73724377a321aa024a5886eb148c416d4451aa) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "267-c2.bin", 0x0000001, 0x800000, BAD_DUMP CRC(4edfa720) SHA1(1407a1d0d44f73c1a196c95d368d6451b17f6176) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "267-c1.bin", 0x0000000, 0x800000, CRC(5eebee65) SHA1(7eb3eefdeb24e19831d0f51d4ea07a0292c25ab6) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "267-c2.bin", 0x0000001, 0x800000, CRC(2b67187b) SHA1(149c3efd3c444fd0d35a97fa2268102bf76be3ed) ) /* Plane 2,3 */
 ROM_END
 
 ROM_START( mslug5 ) /* Encrypted Set */
@@ -6439,8 +6427,8 @@ ROM_END
 
 ROM_START( svc ) /* Encrypted Set, MVS Set */
 	ROM_REGION( 0x800000, REGION_CPU1, 0 )
-	ROM_LOAD32_WORD_SWAP( "269-p1c.bin", 0x000000, 0x400000, CRC(38e2005e) SHA1(1b902905916a30969282f1399a756e32ff069097) )
-	ROM_LOAD32_WORD_SWAP( "269-p2c.bin", 0x000002, 0x400000, CRC(6d13797c) SHA1(3cb71a95cea6b006b44cac0f547df88aec0007b7) )
+	ROM_LOAD32_WORD_SWAP( "269-p1.bin", 0x000000, 0x400000, CRC(38e2005e) SHA1(1b902905916a30969282f1399a756e32ff069097) )
+	ROM_LOAD32_WORD_SWAP( "269-p2.bin", 0x000002, 0x400000, CRC(6d13797c) SHA1(3cb71a95cea6b006b44cac0f547df88aec0007b7) )
 
 	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* larger char set */
@@ -6450,25 +6438,25 @@ ROM_START( svc ) /* Encrypted Set, MVS Set */
 
 	ROM_REGION( 0x80000, REGION_USER4, 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
-	ROM_LOAD( "269-m1c.bin", 0x00000, 0x20000, CRC(7d337756) SHA1(205b8b5be7acc8d564fe17835795f25b13c27d7a) )
+	ROM_LOAD( "269-m1.bin", 0x00000, 0x20000, CRC(7d337756) SHA1(205b8b5be7acc8d564fe17835795f25b13c27d7a) )
 	/* Decrypted */
 	NEO_BIOS_SOUND_128K( "269-m1_decrypted.bin", CRC(447b3123) SHA1(a09adc2c0ee2ee0f01287ceb97474a1a58093bd2) )
 
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )
 	/* Encrypted */
-	ROM_LOAD( "269-v1c.bin", 0x000000, 0x800000, CRC(c659b34c) SHA1(1931e8111ef43946f68699f8707334c96f753a1e) )
-	ROM_LOAD( "269-v2c.bin", 0x800000, 0x800000, CRC(dd903835) SHA1(e58d38950a7a8697bb22a1cc7a371ae6664ae8f9) )
+	ROM_LOAD( "269-v1.bin", 0x000000, 0x800000, CRC(c659b34c) SHA1(1931e8111ef43946f68699f8707334c96f753a1e) )
+	ROM_LOAD( "269-v2.bin", 0x800000, 0x800000, CRC(dd903835) SHA1(e58d38950a7a8697bb22a1cc7a371ae6664ae8f9) )
 
 	ROM_REGION( 0x4000000, REGION_GFX3, 0 )
 	/* Encrypted */
-	ROM_LOAD16_BYTE( "269-c1c.bin", 0x0000000, 0x800000, CRC(887b4068) SHA1(227cdcf7a10a415f1e3afe7ae97acc9afc2cc8e1) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "269-c2c.bin", 0x0000001, 0x800000, CRC(4e8903e4) SHA1(31daaa4fd6c23e8f0a8428931c513d97d2eee1bd) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "269-c3c.bin", 0x1000000, 0x800000, CRC(7d9c55b0) SHA1(1f94a948b3e3c31b3ff05518ef525031a3cb2c62) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "269-c4c.bin", 0x1000001, 0x800000, CRC(8acb5bb6) SHA1(2c27d6e309646d7b84da85f78c06e4aaa74e844b) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "269-c5c.bin", 0x2000000, 0x800000, CRC(097a4157) SHA1(54d839f55d27f68c704a94ea3c63c644ffc22ca4) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "269-c6c.bin", 0x2000001, 0x800000, CRC(e19df344) SHA1(20448add53ab25dd3a8f0b681131ad3b9c68acc9) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "269-c7c.bin", 0x3000000, 0x800000, CRC(d8f0340b) SHA1(43114af7557361a8903bb8cf8553f602946a9220) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "269-c8c.bin", 0x3000001, 0x800000, CRC(2570b71b) SHA1(99266e1c2ffcf324793fb5c55325fbc7e6265ac0) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "269-c1r.bin", 0x0000000, 0x800000, CRC(887b4068) SHA1(227cdcf7a10a415f1e3afe7ae97acc9afc2cc8e1) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "269-c2r.bin", 0x0000001, 0x800000, CRC(4e8903e4) SHA1(31daaa4fd6c23e8f0a8428931c513d97d2eee1bd) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "269-c3r.bin", 0x1000000, 0x800000, CRC(7d9c55b0) SHA1(1f94a948b3e3c31b3ff05518ef525031a3cb2c62) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "269-c4r.bin", 0x1000001, 0x800000, CRC(8acb5bb6) SHA1(2c27d6e309646d7b84da85f78c06e4aaa74e844b) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "269-c5r.bin", 0x2000000, 0x800000, CRC(097a4157) SHA1(54d839f55d27f68c704a94ea3c63c644ffc22ca4) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "269-c6r.bin", 0x2000001, 0x800000, CRC(e19df344) SHA1(20448add53ab25dd3a8f0b681131ad3b9c68acc9) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "269-c7r.bin", 0x3000000, 0x800000, CRC(d8f0340b) SHA1(43114af7557361a8903bb8cf8553f602946a9220) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "269-c8r.bin", 0x3000001, 0x800000, CRC(2570b71b) SHA1(99266e1c2ffcf324793fb5c55325fbc7e6265ac0) ) /* Plane 2,3 */
 ROM_END
 
 
@@ -6632,7 +6620,7 @@ ROM_START( svcsplus )
 	ROM_LOAD16_BYTE( "svc-c8.bin", 0x3000001, 0x800000, CRC(366deee5) SHA1(d477ad7a5987fd6c7ef2c1680fbb7c884654590e) )
 ROM_END
 
-ROM_START( samsho5 ) /* Encrypted Set */
+ROM_START( samsho5 ) /* Encrypted Set, MVS VERSION */
 	ROM_REGION( 0x800000, REGION_CPU1, 0 )
 	ROM_LOAD16_WORD_SWAP( "270-p1.bin", 0x000000, 0x400000, CRC(4a2a09e6) SHA1(2644de02cdab8ccc605488a7c76b8c9cd1d5bcb9) )
 	ROM_LOAD16_WORD_SWAP( "270-p2.bin", 0x400000, 0x400000, CRC(e0c74c85) SHA1(df24a4ee76438e40c2f04a714175a7f85cacdfe0) )
@@ -6645,7 +6633,7 @@ ROM_START( samsho5 ) /* Encrypted Set */
 
 	ROM_REGION( 0x80000, REGION_USER4, 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
-	ROM_LOAD( "270-m1.bin", 0x00000, 0x40000, CRC(e4a5ab0c) SHA1(dcf74be51593a9c96607f3f776a1210b43df4ac9) )
+	ROM_LOAD( "270-m1.bin", 0x00000, 0x80000, CRC(49c9901a) SHA1(2623e9765a0eba58fee2de72851e9dc502344a3d) )
 	/* Decrypted */
 	NEO_BIOS_SOUND_256K( "270-m1_decrypted.bin", CRC(e94a5e2b) SHA1(53ef2ad6583060af69fdde73576e09ba88affa55) ) /* not a 100% match for encrypted version */
 
@@ -6681,7 +6669,7 @@ ROM_START( samsho5h ) /* Encrypted Set, Alternate Set */
 
 	ROM_REGION( 0x80000, REGION_USER4, 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
-	ROM_LOAD( "270-m1.bin", 0x00000, 0x40000, CRC(e4a5ab0c) SHA1(dcf74be51593a9c96607f3f776a1210b43df4ac9) )
+	ROM_LOAD( "270-m1.bin", 0x00000, 0x80000, CRC(49c9901a) SHA1(2623e9765a0eba58fee2de72851e9dc502344a3d) )
 	/* Decrypted */
 	NEO_BIOS_SOUND_256K( "270-m1_decrypted.bin", CRC(e94a5e2b) SHA1(53ef2ad6583060af69fdde73576e09ba88affa55) ) /* not a 100% match for encrypted version */
 
@@ -6717,7 +6705,7 @@ ROM_START( samsho5b )
 
 	ROM_REGION( 0x80000, REGION_USER4, 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
-	ROM_LOAD( "270-m1.bin", 0x00000, 0x40000, CRC(e4a5ab0c) SHA1(dcf74be51593a9c96607f3f776a1210b43df4ac9) )
+	ROM_LOAD( "270-m1.bin", 0x00000, 0x80000, CRC(49c9901a) SHA1(2623e9765a0eba58fee2de72851e9dc502344a3d) )
 	/* Decrypted */
 	NEO_BIOS_SOUND_256K( "270-m1_decrypted.bin", CRC(e94a5e2b) SHA1(53ef2ad6583060af69fdde73576e09ba88affa55) ) /* not a 100% match for encrypted version */
 

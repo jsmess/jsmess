@@ -677,6 +677,32 @@ VIDEO_UPDATE( semibase )
 	return 0;
 }
 
+VIDEO_UPDATE( sdfight )
+{
+	int offs,offs2;
+
+	flipscreen=tumblepb_control_0[0]&0x80;
+	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	offs=-1;
+	offs2=-5; // foreground scroll..
+
+	/* sprites need an offset too */
+
+	tilemap_set_scrollx( pf1_tilemap,0, tumblepb_control_0[1]+offs2 );
+	tilemap_set_scrolly( pf1_tilemap,0, tumblepb_control_0[2]-16 ); // needed for the ground ...
+	tilemap_set_scrollx( pf1_alt_tilemap,0, tumblepb_control_0[1]+offs2 );
+	tilemap_set_scrolly( pf1_alt_tilemap,0, tumblepb_control_0[2]-16 );
+	tilemap_set_scrollx( pf2_tilemap,0, tumblepb_control_0[3]+offs );
+	tilemap_set_scrolly( pf2_tilemap,0, tumblepb_control_0[4]-16 );
+
+	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
+	if (tumblepb_control_0[6]&0x80)
+		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
+	else
+		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
+	jumpkids_drawsprites(bitmap,cliprect);
+	return 0;
+}
 
 
 

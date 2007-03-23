@@ -41,8 +41,8 @@ static const options_entry mess_opts[] =
 	for all devices on a driver
 -------------------------------------------------*/
 
-static void enumerate_devices(const game_driver *gamedrv, void (*proc)(const game_driver *gamedrv,
-	const device_class *devclass, int device_index, int global_index))
+static void enumerate_devices(core_options *opts, const game_driver *gamedrv,
+	void (*proc)(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index))
 {
 	struct SystemConfigurationParamBlock cfg;
 	device_getinfo_handler handlers[64];
@@ -73,7 +73,7 @@ static void enumerate_devices(const game_driver *gamedrv, void (*proc)(const gam
 		/* loop on each device instance */
 		for (j = 0; j < count; j++)
 		{
-			proc(gamedrv, &devclass, j, index++);
+			proc(opts, gamedrv, &devclass, j, index++);
 		}
 	}
 }
@@ -85,10 +85,10 @@ static void enumerate_devices(const game_driver *gamedrv, void (*proc)(const gam
 	for this device on a driver
 -------------------------------------------------*/
 
-static void add_device_options_for_device(const game_driver *gamedrv, const device_class *devclass,
-	int device_index, int global_index)
+static void add_device_options_for_device(core_options *opts, const game_driver *gamedrv,
+	const device_class *devclass, int device_index, int global_index)
 {
-	options_entry opts[2];
+	options_entry this_entry[2];
 	const char *dev_name;
 	const char *dev_short_name;
 	char dev_full_name[128];
@@ -96,10 +96,10 @@ static void add_device_options_for_device(const game_driver *gamedrv, const devi
 	/* first device? add the header as to be pretty */
 	if (global_index == 0)
 	{
-		memset(opts, 0, sizeof(opts));
-		opts[0].description = "MESS DEVICES";
-		opts[0].flags = OPTION_HEADER;
-		options_add_entries(opts);
+		memset(this_entry, 0, sizeof(this_entry));
+		this_entry[0].description = "MESS DEVICES";
+		this_entry[0].flags = OPTION_HEADER;
+		options_add_entries(opts, this_entry);
 	}
 
 	/* retrieve info about the device instance */
@@ -109,9 +109,9 @@ static void add_device_options_for_device(const game_driver *gamedrv, const devi
 		"%s;%s", dev_name, dev_short_name);
 
 	/* add the option */
-	memset(opts, 0, sizeof(opts));
-	opts[0].name = dev_full_name;
-	options_add_entries(opts);
+	memset(this_entry, 0, sizeof(this_entry));
+	this_entry[0].name = dev_full_name;
+	options_add_entries(opts, this_entry);
 }
 
 
@@ -122,7 +122,7 @@ static void add_device_options_for_device(const game_driver *gamedrv, const devi
 	specific to that driver
 -------------------------------------------------*/
 
-static void mess_driver_name_callback(const char *arg)
+static void mess_driver_name_callback(core_options *opts, const char *arg)
 {
 	int drvnum;
 
@@ -133,7 +133,7 @@ static void mess_driver_name_callback(const char *arg)
 		if (drvnum >= 0)
 		{
 			/* add all of the device options for this driver */
-			enumerate_devices(drivers[drvnum], add_device_options_for_device);
+			enumerate_devices(opts, drivers[drvnum], add_device_options_for_device);
 		}
 		added_device_options = TRUE;
 	}
@@ -149,7 +149,7 @@ static void mess_driver_name_callback(const char *arg)
 void mess_options_init(void)
 {
 	/* add MESS-specific options */
-	options_add_entries(mess_opts);
+	options_add_entries(mame_options(), mess_opts);
 
 	/* add OSD-MESS specific options (hack!) */
 	osd_mess_options_init();
@@ -158,7 +158,7 @@ void mess_options_init(void)
 	added_device_options = FALSE;
 
 	/* we need to dynamically add options when the device name is parsed */
-	options_set_option_callback(OPTION_UNADORNED(0), mess_driver_name_callback);
+	options_set_option_callback(mame_options(), OPTION_UNADORNED(0), mess_driver_name_callback);
 }
 
 
@@ -168,8 +168,8 @@ void mess_options_init(void)
 	options for this device on a driver
 -------------------------------------------------*/
 
-static void extract_device_options_for_device(const game_driver *gamedrv, const device_class *devclass,
-	int device_index, int global_index)
+static void extract_device_options_for_device(core_options *opts, const game_driver *gamedrv,
+	const device_class *devclass, int device_index, int global_index)
 {
 	mess_image *image;
 	iodevice_t dev_type;
@@ -196,7 +196,7 @@ static void extract_device_options_for_device(const game_driver *gamedrv, const 
 	dev_name = device_instancename(devclass, device_index);
 
 	/* and set the option */
-	options_set_string(dev_name, filename ? filename : "");
+	options_set_string(opts, dev_name, filename ? filename : "");
 }
 
 
@@ -223,7 +223,7 @@ static int write_config(const char *filename, const game_driver *gamedrv)
 	if (filerr != FILERR_NONE)
 		goto done;
 
-	options_output_ini_mame_file(f);
+	options_output_ini_file(mame_options(), mame_core_file(f));
 	retval = 0;
 
 done:
@@ -241,9 +241,9 @@ done:
 
 void mess_options_extract(void)
 {
-	enumerate_devices(Machine->gamedrv, extract_device_options_for_device);
+	enumerate_devices(mame_options(), Machine->gamedrv, extract_device_options_for_device);
 
-	if (options_get_bool(OPTION_WRITECONFIG))
+	if (options_get_bool(mame_options(), OPTION_WRITECONFIG))
 	{
 		write_config(NULL, Machine->gamedrv);
 	}

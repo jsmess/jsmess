@@ -1,5 +1,5 @@
 /*
- *  Depth Charge sound routines
+ *  Depth Charge audio routines
  */
 
 #include "driver.h"
@@ -18,29 +18,42 @@
 
 
 /* sample file names */
-const char *depthch_sample_names[] =
+static const char *depthch_sample_names[] =
 {
 	"*depthch",
 	"longex.wav",
 	"shortex.wav",
 	"spray.wav",
 	"sonar.wav",
-	"sonarena.wav",	/* currently not used */
 	0
 };
 
-/* sample sound IDs - must match sample file name table above */
+
+static struct Samplesinterface depthch_samples_interface =
+{
+	4,
+	depthch_sample_names
+};
+
+
+MACHINE_DRIVER_START( depthch_audio )
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(depthch_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_DRIVER_END
+
+
+/* sample IDs - must match sample file name table above */
 enum
 {
 	SND_LONGEXPL = 0,
 	SND_SHRTEXPL,
 	SND_SPRAY,
 	SND_SONAR,
-	SND_SONARENA
 };
 
 
-WRITE8_HANDLER( depthch_sh_port1_w )
+WRITE8_HANDLER( depthch_audio_w )
 {
 	static int port1State = 0;
 	int bitsChanged;

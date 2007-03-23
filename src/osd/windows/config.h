@@ -12,14 +12,18 @@
 
 
 //============================================================
-//  TYPE DEFINITIONS
+//  GLOBALS
 //============================================================
 
+extern const options_entry mame_win_options[];
 
 
 //============================================================
 //  PROTOTYPES
 //============================================================
+
+// Initializes Win32 MAME options
+void win_options_init(void);
 
 // Initializes and exits the configuration system
 int  cli_frontend_init (int argc, char **argv);

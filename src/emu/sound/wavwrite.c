@@ -96,6 +96,8 @@ void wav_close(wav_file *wav)
 	UINT32 total = ftell(wav->file);
 	UINT32 temp32;
 
+	if (!wav) return;
+
 	/* update the total file size */
 	fseek(wav->file, wav->total_offs, SEEK_SET);
 	temp32 = total - (wav->total_offs + 4);
@@ -115,6 +117,8 @@ void wav_close(wav_file *wav)
 
 void wav_add_data_16(wav_file *wav, INT16 *data, int samples)
 {
+	if (!wav) return;
+
 	/* just write and flush the data */
 	fwrite(data, 2, samples, wav->file);
 	fflush(wav->file);
@@ -125,6 +129,8 @@ void wav_add_data_32(wav_file *wav, INT32 *data, int samples, int shift)
 {
 	INT16 *temp;
 	int i;
+
+	if (!wav) return;
 
 	/* allocate temp memory */
 	temp = malloc(samples * sizeof(temp[0]));
@@ -152,6 +158,8 @@ void wav_add_data_16lr(wav_file *wav, INT16 *left, INT16 *right, int samples)
 	INT16 *temp;
 	int i;
 
+	if (!wav) return;
+
 	/* allocate temp memory */
 	temp = malloc(samples * 2 * sizeof(temp[0]));
 	if (!temp)
@@ -174,6 +182,8 @@ void wav_add_data_32lr(wav_file *wav, INT32 *left, INT32 *right, int samples, in
 {
 	INT16 *temp;
 	int i;
+
+	if (!wav) return;
 
 	/* allocate temp memory */
 	temp = malloc(samples * 2 * sizeof(temp[0]));

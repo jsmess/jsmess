@@ -8,9 +8,15 @@
 #include "sound/discrete.h"
 
 
-/************************************************************************/
-/* sprint4 Sound System Analog emulation                                */
-/************************************************************************/
+/************************************************************************
+ * sprint4 Sound System Analog emulation
+ *
+ * R/C labels in the comments are from the player 1 circuits of Sprint 4.
+ *
+ * Mar 2007, D.R.
+ ************************************************************************/
+
+#define SPRINT4_2V	(15750.0/4)
 
 static const discrete_lfsr_desc sprint4_lfsr =
 {
@@ -27,195 +33,275 @@ static const discrete_lfsr_desc sprint4_lfsr =
 	15                  /* Output bit */
 };
 
-/* Nodes - Sounds */
-#define SPRINT4_MOTORSND1   NODE_20
-#define SPRINT4_MOTORSND2   NODE_21
-#define SPRINT4_MOTORSND3   NODE_22
-#define SPRINT4_MOTORSND4   NODE_23
-#define SPRINT4_CRASHSND    NODE_24
-#define SPRINT4_SKIDSND1    NODE_25
-#define SPRINT4_SKIDSND2    NODE_26
-#define SPRINT4_SKIDSND3    NODE_27
-#define SPRINT4_SKIDSND4    NODE_28
-#define SPRINT4_NOISE       NODE_29
+
+static const discrete_dac_r1_ladder sprint4_motor_freq_DAC =
+{
+	4,					/* size */
+	{ RES_M(2.2),		/* R20 */
+	  RES_M(1),			/* R23 */
+	  RES_K(470),		/* R22 */
+	  RES_K(220) },		/* R21 */
+	5.0 - 0.6,			/* 5V - CR1 junction voltage */
+	RES_K(68),			/* R24 */
+	0,					/* no rGnd */
+	CAP_U(2.2)			/* C28 */
+};
+
+
+#define SPRINT4_MOTOR_OUT_RES	(1.0 / (1.0 / RES_K(10) + 1.0 / RES_K(10) + 1.0 / RES_K(10)))
+static const discrete_dac_r1_ladder sprint4_motor_out_DAC =
+{
+	4,					/* size */
+	{ RES_K(10),		/* R76 */
+	  0,				/* not connected */
+	  RES_K(10),		/* R77 */
+	  RES_K(10) },		/* R75 */
+	0,					/* no vBias */
+	0,					/* no rBias */
+	0,					/* no rGnd */
+	CAP_U(0.1)			/* C47 */
+};
+
+
+#define SPRINT4_BANG_RES	(1.0 / (1.0 / RES_K(8.2) + 1.0 / RES_K(3.9) + 1.0 / RES_K(2.2) + 1.0 / RES_K(1)))
+static const discrete_dac_r1_ladder sprint4_bang_DAC =
+{
+	4,					/* size */
+	{ RES_K(8.2),		/* R19 */
+	  RES_K(3.9),		/* R18 */
+	  RES_K(2.2),		/* R17 */
+	  RES_K(1) },		/* R16 */
+	0,					/* no vBias */
+	0,					/* no rBias */
+	0,					/* no rGnd */
+	CAP_U(0.1)			/* C32 */
+};
+
+
+static const discrete_555_cc_desc sprint4_motor_vco =
+{
+	DISC_555_OUT_DC | DISC_555_OUT_SQW,
+	5,					// B+ voltage of 555
+	DEFAULT_555_VALUES,
+	5,					// B+ voltage of the Constant Current source
+	0.7					// Q1 junction voltage
+};
+
+
+/* this will make 4 slightly different screech circuits due to part tolerance */
+/* otherwise they would all sound identical */
+#define SPRINT4_SCREECH_CIRCUIT(_plr)								\
+static const discrete_schmitt_osc_desc sprint4_screech_osc_##_plr = \
+{                                                                   \
+	RES_K(1),							/* R65 */                   \
+	100,								/* R64 */                   \
+	CAP_U(10) + CAP_U((_plr-2) * .2),	/* C44 */                   \
+	DEFAULT_7414_VALUES,                                            \
+	DISC_SCHMITT_OSC_IN_IS_LOGIC | DISC_SCHMITT_OSC_ENAB_IS_AND     \
+};
+SPRINT4_SCREECH_CIRCUIT(1)
+SPRINT4_SCREECH_CIRCUIT(2)
+SPRINT4_SCREECH_CIRCUIT(3)
+SPRINT4_SCREECH_CIRCUIT(4)
+
+
+static const discrete_mixer_desc sprint4_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{ RES_K(10) + SPRINT4_MOTOR_OUT_RES,	/* R105 */
+	  RES_K(10) + SPRINT4_MOTOR_OUT_RES,	/* R106 */
+	  RES_K(10) + SPRINT4_BANG_RES,			/* R104 */
+	  RES_K(47),							/* R102 */
+	  RES_K(47) },							/* R103 */
+	{ 0 },									/* no rNode{} */
+	{ 0 },									/* no c{} */
+	0,										/* no rI */
+	RES_K(5),								/* R109 */
+	0,										/* no cF */
+	CAP_U(0.1),								/* C51 */
+	0,										/* vRef = Gnd */
+	1										/* gain */
+};
+
+
+/* discrete sound output nodes */
+#define SPRINT4_MOTOR_SND_1			NODE_11
+#define SPRINT4_MOTOR_SND_2			NODE_12
+#define SPRINT4_MOTOR_SND_3			NODE_13
+#define SPRINT4_MOTOR_SND_4			NODE_14
+#define SPRINT4_SCREECH_SND_1		NODE_15
+#define SPRINT4_SCREECH_SND_2		NODE_16
+#define SPRINT4_SCREECH_SND_3		NODE_17
+#define SPRINT4_SCREECH_SND_4		NODE_18
+#define SPRINT4_BANG_SND			NODE_19
+#define SPRINT4_NOISE				NODE_20
+#define SPRINT4_FINAL_MIX_1_2		NODE_21
+#define SPRINT4_FINAL_MIX_3_4		NODE_22
+
+#define SPRINT4_ATTRACT_INV			NODE_23
+
+
+/* setup the attract input and it's inverse */
+#define SPRINT4_ATTRACT                                                 \
+	DISCRETE_INPUT_NOT(SPRINT4_ATTRACT_EN)                              \
+	DISCRETE_LOGIC_INVERT(SPRINT4_ATTRACT_INV, 1, SPRINT4_ATTRACT_EN)
+
+
+/* port tags used for the discrete adjusters */
+#define SPRINT4_MOTOR_TAG_1		"MOTOR1"
+#define SPRINT4_MOTOR_TAG_2		"MOTOR2"
+#define SPRINT4_MOTOR_TAG_3		"MOTOR3"
+#define SPRINT4_MOTOR_TAG_4		"MOTOR4"
+
+
+/* used to offset the motor nodes based on the player so the nodes do not overlap */
+/* _plr must be 1, 2, 3, or 4 */
+/* so it uses NODES_30 to NODE_69 */
+#define SPRINT4_PLAYER_MOTOR_NODE(_node, _plr)		NODE_20 + 10 * _plr + _node
+
+
+/************************************************
+ * Motor sound
+ *
+ * complete motor effects for each player
+ * _plr must be 1, 2, 3, or 4
+ ************************************************/
+#define SPRINT4_PLAYER_MOTOR(_plr)																	\
+	DISCRETE_INPUTX_DATA(SPRINT4_MOTOR_DATA_##_plr,                                                 \
+					-1, 0x0f, 0)	/* latch IC D8 inverts the data */                              \
+	DISCRETE_DAC_R1(SPRINT4_PLAYER_MOTOR_NODE(1, _plr),                                             \
+					1,											/* ENAB */                          \
+					SPRINT4_MOTOR_DATA_##_plr,					/* DATA */                          \
+					DEFAULT_TTL_V_LOGIC_1,						/* VDATA */                         \
+					&sprint4_motor_freq_DAC)					/* LADDER */                        \
+	DISCRETE_ADJUSTMENT_TAG(SPRINT4_PLAYER_MOTOR_NODE(2, _plr),                                     \
+					1,											/* ENAB */                          \
+					RES_K(10) + RES_K(250),						/* MIN */                           \
+					RES_K(10),									/* MAX */                           \
+					DISC_LOGADJ,								/* LOGLIN */                        \
+					SPRINT4_MOTOR_TAG_##_plr)					/* PORT TAG */                      \
+	DISCRETE_555_CC(SPRINT4_PLAYER_MOTOR_NODE(3, _plr),			/* IC D8, pin 3 */                  \
+					1,											/* RESET */                         \
+					SPRINT4_PLAYER_MOTOR_NODE(1, _plr),			/* VIN */                           \
+					SPRINT4_PLAYER_MOTOR_NODE(2, _plr),			/* R */                             \
+					CAP_U(0.01),								/* C34 */                           \
+					RES_M(3.3),									/* R42 */                           \
+					0,											/* no RGND */                       \
+					0,											/* no RDIS */                       \
+					&sprint4_motor_vco)							/* OPTIONS */                       \
+	DISCRETE_COUNTER_7492(SPRINT4_PLAYER_MOTOR_NODE(4, _plr),	/* IC D9, pins 11,9,8 */            \
+					1,											/* ENAB */                          \
+					SPRINT4_ATTRACT_EN,							/* RESET */                         \
+					SPRINT4_PLAYER_MOTOR_NODE(3, _plr))			/* CLK */                           \
+	DISCRETE_TRANSFORM3(SPRINT4_PLAYER_MOTOR_NODE(5, _plr),		/* IC B10, pin 3 */                 \
+					1,											/* ENAB */                          \
+					SPRINT4_PLAYER_MOTOR_NODE(4, _plr),			/* INP0 */                          \
+					0x01,										/* INP1 */                          \
+					0x04,										/* INP2 */                          \
+					"01&02&2/^")								/* XOR QA and QC */                 \
+	DISCRETE_COUNTER(SPRINT4_PLAYER_MOTOR_NODE(6, _plr),		/* IC D9, pin 12 */                 \
+					1,											/* ENAB */                          \
+					SPRINT4_ATTRACT_EN,							/* RESET */                         \
+					SPRINT4_PLAYER_MOTOR_NODE(5, _plr),			/* CLK */                           \
+					1,											/* MAX */                           \
+					DISC_COUNT_UP,								/* DIR */                           \
+					0,											/* INIT0 */                         \
+					DISC_CLK_ON_F_EDGE)							/* CLKTYPE */                       \
+	DISCRETE_TRANSFORM3(SPRINT4_PLAYER_MOTOR_NODE(7, _plr),		/*  */                              \
+					1,											/* ENAB */                          \
+					SPRINT4_PLAYER_MOTOR_NODE(4, _plr),			/* INP0 */                          \
+					SPRINT4_PLAYER_MOTOR_NODE(6, _plr),			/* INP1 */                          \
+					0x08,										/* INP2 */                          \
+					"012*+")									/* join 7492 bits together */       \
+	DISCRETE_DAC_R1(SPRINT4_MOTOR_SND_##_plr,           		                                    \
+					1,											/* ENAB */                          \
+					SPRINT4_PLAYER_MOTOR_NODE(7, _plr),			/* DATA */                          \
+					DEFAULT_TTL_V_LOGIC_1,						/* VDATA */                         \
+					&sprint4_motor_out_DAC)						/* LADDER */
+
+
+/************************************************
+ * Bang sound
+ ************************************************/
+#define SPRINT4_BANG													\
+	DISCRETE_LFSR_NOISE(SPRINT4_NOISE,                                  \
+					1,									/* ENAB */      \
+					SPRINT4_ATTRACT_INV,				/* RESET */     \
+					SPRINT4_2V,							/* CLK */       \
+					1,									/* AMPL */      \
+					0,									/* FEED */      \
+					1.0/2,								/* BIAS */      \
+					&sprint4_lfsr)						/* LFSRTB */    \
+	DISCRETE_INPUT_DATA(SPRINT4_BANG_DATA)								\
+	DISCRETE_ONOFF(NODE_70,								/* IC F7 */     \
+					SPRINT4_NOISE,						/* ENAB */      \
+					SPRINT4_BANG_DATA)					/* INP0 */      \
+	DISCRETE_DAC_R1(SPRINT4_BANG_SND,                                   \
+					1,									/* ENAB */      \
+					NODE_70,							/* DATA */      \
+					DEFAULT_TTL_V_LOGIC_1,				/* VDATA */     \
+					&sprint4_bang_DAC)					/* LADDER */
+
+
+/************************************************
+ * Screech sound
+ *
+ * Complete screech effects for each player.
+ * This must follow the Bang sound code because
+ * it uses the bang noise source.
+ * _plr must be 1, 2, 3, or 4
+ ************************************************/
+#define SPRINT4_PLAYER_SCREECH(_plr)									\
+	DISCRETE_INPUT_LOGIC(SPRINT4_SCREECH_EN_##_plr)						\
+	DISCRETE_SCHMITT_OSCILLATOR(SPRINT4_SCREECH_SND_##_plr,         	\
+					SPRINT4_SCREECH_EN_##_plr,			/* ENAB */  	\
+					SPRINT4_NOISE,						/* INP0 */  	\
+					DEFAULT_TTL_V_LOGIC_1,				/* AMPL */  	\
+					&sprint4_screech_osc_##_plr)		/* TABLE */
+
+
+/************************************************
+ * Final mixer
+ * _plr_a must be 1 and _plr_b must be 2
+ * or
+ * _plr_a must be 3 and _plr_b must be 4
+ ************************************************/
+#define SPRINT4_MIXER(_plr_a, _plr_b, _gain)							\
+	DISCRETE_MIXER5(SPRINT4_FINAL_MIX_##_plr_a##_##_plr_b,              \
+					1,									/* ENAB */      \
+					SPRINT4_MOTOR_SND_##_plr_a,			/* IN0 */       \
+					SPRINT4_MOTOR_SND_##_plr_b,			/* IN1 */       \
+					SPRINT4_BANG_SND,					/* IN2 */       \
+					SPRINT4_SCREECH_SND_##_plr_a,		/* IN3 */       \
+					SPRINT4_SCREECH_SND_##_plr_b,		/* IN4 */       \
+					&sprint4_mixer)						/* INFO */      \
+	DISCRETE_OUTPUT(SPRINT4_FINAL_MIX_##_plr_a##_##_plr_b, _gain)
+
+
+
 
 DISCRETE_SOUND_START(sprint4_discrete_interface)
-	/************************************************/
-	/* sprint4 sound system: 5 sources per speaker  */
-	/*                     Relative Volume          */
-	/*    1/2) motor           77.72%               */
-	/*      3) crash          100.00%               */
-	/*    4/5) skid            29.89%               */
-	/* Relative volumes calculated from resitor     */
-	/* network in combiner circuit                  */
-	/*                                              */
-	/************************************************/
+	SPRINT4_ATTRACT
+	SPRINT4_PLAYER_MOTOR(1)
+	SPRINT4_PLAYER_MOTOR(2)
+	SPRINT4_PLAYER_MOTOR(3)
+	SPRINT4_PLAYER_MOTOR(4)
+	SPRINT4_BANG
+	SPRINT4_PLAYER_SCREECH(1)
+	SPRINT4_PLAYER_SCREECH(2)
+	SPRINT4_PLAYER_SCREECH(3)
+	SPRINT4_PLAYER_SCREECH(4)
+	SPRINT4_MIXER(1, 2, 30000)
+	SPRINT4_MIXER(3, 4, 30000)
+DISCRETE_SOUND_END
 
-	/************************************************/
-	/* Input register mapping for sprint4           */
-	/************************************************/
-	/*                   NODE                GAIN    OFFSET  INIT */
-	DISCRETE_INPUT_LOGIC(SPRINT4_SKID1_EN)
-	DISCRETE_INPUT_LOGIC(SPRINT4_SKID2_EN)
-	DISCRETE_INPUT_LOGIC(SPRINT4_SKID3_EN)
-	DISCRETE_INPUT_LOGIC(SPRINT4_SKID4_EN)
-	DISCRETE_INPUTX_DATA(SPRINT4_MOTOR1_DATA, -1, 0x0f, 0)
-	DISCRETE_INPUTX_DATA(SPRINT4_MOTOR2_DATA, -1, 0x0f, 0)
-	DISCRETE_INPUTX_DATA(SPRINT4_MOTOR3_DATA, -1, 0x0f, 0)
-	DISCRETE_INPUTX_DATA(SPRINT4_MOTOR4_DATA, -1, 0x0f, 0)
-	DISCRETE_INPUTX_DATA(SPRINT4_CRASH_DATA, 1000.0/15.0, 0,  0.0)
-	DISCRETE_INPUT_LOGIC(SPRINT4_ATTRACT_EN)
 
-	/************************************************/
-	/* Motor sound circuit is based on a 556 VCO    */
-	/* with the input frequency set by the MotorSND */
-	/* latch (4 bit). This freqency is then used to */
-	/* driver a modulo 12 counter, with div6, 4 & 3 */
-	/* summed as the output of the circuit.         */
-	/* VCO Output is Sq wave = 27-382Hz             */
-	/*  F1 freq - (Div6)                            */
-	/*  F2 freq = (Div4)                            */
-	/*  F3 freq = (Div3) 33.3% duty, 33.3 deg phase */
-	/* To generate the frequency we take the freq.  */
-	/* diff. and /15 to get all the steps between   */
-	/* 0 - 15.  Then add the low frequency and send */
-	/* that value to a squarewave generator.        */
-	/* Also as the frequency changes, it ramps due  */
-	/* to a 2.2uf capacitor on the R-ladder.        */
-	/* Note the VCO freq. is controlled by a 250k   */
-	/* pot.  The freq. used here is for the pot set */
-	/* to 125k.  The low freq is allways the same.  */
-	/* This adjusts the high end.                   */
-	/* 0k = 214Hz.   250k = 4416Hz                  */
-	/************************************************/
-	DISCRETE_RCFILTER(NODE_40, 1, SPRINT4_MOTOR1_DATA, 123000, 2.2e-6)
-	DISCRETE_ADJUSTMENT_TAG(NODE_41, 1, (214.0-27.0)/12/15, (4416.0-27.0)/12/15, DISC_LOGADJ, "MOTOR1")
-	DISCRETE_MULTIPLY(NODE_42, 1, NODE_40, NODE_41)
-
-	DISCRETE_MULTADD(NODE_43, 1, NODE_42, 2, 27.0/6)	/* F1 = /12*2 = /6 */
-	DISCRETE_SQUAREWAVE(NODE_44, 1, NODE_43, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_45, 1, NODE_44, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_46, 1, NODE_42, 3, 27.0/4)	/* F2 = /12*3 = /4 */
-	DISCRETE_SQUAREWAVE(NODE_47, 1, NODE_46, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_48, 1, NODE_47, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_49, 1, NODE_42, 4, 27.0/3)	/* F3 = /12*4 = /3 */
-	DISCRETE_SQUAREWAVE(NODE_50, 1, NODE_49, (777.2/3), 100.0/3, 0, 360.0/3)
-	DISCRETE_RCFILTER(NODE_51, 1, NODE_50, 10000, 1e-7)
-
-	DISCRETE_ADDER3(SPRINT4_MOTORSND1, SPRINT4_ATTRACT_EN, NODE_45, NODE_48, NODE_51)
-
-	/******************/
-	/* motor sound #2 */
-	/******************/
-	DISCRETE_RCFILTER(NODE_60, 1, SPRINT4_MOTOR2_DATA, 123000, 2.2e-6)
-	DISCRETE_ADJUSTMENT_TAG(NODE_61, 1, (214.0-27.0)/12/15, (4416.0-27.0)/12/15, DISC_LOGADJ, "MOTOR2")
-	DISCRETE_MULTIPLY(NODE_62, 1, NODE_60, NODE_61)
-
-	DISCRETE_MULTADD(NODE_63, 1, NODE_62, 2, 27.0/6)	/* F1 = /12*2 = /6 */
-	DISCRETE_SQUAREWAVE(NODE_64, 1, NODE_63, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_65, 1, NODE_64, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_66, 1, NODE_62, 3, 27.0/4)	/* F2 = /12*3 = /4 */
-	DISCRETE_SQUAREWAVE(NODE_67, 1, NODE_66, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_68, 1, NODE_67, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_69, 1, NODE_62, 4, 27.0/3)	/* F3 = /12*4 = /3 */
-	DISCRETE_SQUAREWAVE(NODE_70, 1, NODE_69, (777.2/3), 100.0/3, 0, 360.0/3)
-	DISCRETE_RCFILTER(NODE_71, 1, NODE_70, 10000, 1e-7)
-
-	DISCRETE_ADDER3(SPRINT4_MOTORSND2, SPRINT4_ATTRACT_EN, NODE_65, NODE_68, NODE_71)
-
-	/******************/
-	/* motor sound #3 */
-	/******************/
-	DISCRETE_RCFILTER(NODE_80, 1, SPRINT4_MOTOR3_DATA, 123000, 2.2e-6)
-	DISCRETE_ADJUSTMENT_TAG(NODE_81, 1, (214.0-27.0)/12/15, (4416.0-27.0)/12/15, DISC_LOGADJ, "MOTOR3")
-	DISCRETE_MULTIPLY(NODE_82, 1, NODE_80, NODE_81)
-
-	DISCRETE_MULTADD(NODE_83, 1, NODE_82, 2, 27.0/6)	/* F1 = /12*2 = /6 */
-	DISCRETE_SQUAREWAVE(NODE_84, 1, NODE_83, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_85, 1, NODE_84, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_86, 1, NODE_82, 3, 27.0/4)	/* F2 = /12*3 = /4 */
-	DISCRETE_SQUAREWAVE(NODE_87, 1, NODE_86, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_88, 1, NODE_87, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_89, 1, NODE_82, 4, 27.0/3)	/* F3 = /12*4 = /3 */
-	DISCRETE_SQUAREWAVE(NODE_90, 1, NODE_89, (777.2/3), 100.0/3, 0, 360.0/3)
-	DISCRETE_RCFILTER(NODE_91, 1, NODE_90, 10000, 1e-7)
-
-	DISCRETE_ADDER3(SPRINT4_MOTORSND3, SPRINT4_ATTRACT_EN, NODE_85, NODE_88, NODE_91)
-
-	/******************/
-	/* motor sound #4 */
-	/******************/
-	DISCRETE_RCFILTER(NODE_100, 1, SPRINT4_MOTOR4_DATA, 123000, 2.2e-6)
-	DISCRETE_ADJUSTMENT_TAG(NODE_101, 1, (214.0-27.0)/12/15, (4416.0-27.0)/12/15, DISC_LOGADJ, "MOTOR4")
-	DISCRETE_MULTIPLY(NODE_102, 1, NODE_100, NODE_101)
-
-	DISCRETE_MULTADD(NODE_103, 1, NODE_102, 2, 27.0/6)	/* F1 = /12*2 = /6 */
-	DISCRETE_SQUAREWAVE(NODE_104, 1, NODE_103, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_105, 1, NODE_104, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_106, 1, NODE_102, 3, 27.0/4)	/* F2 = /12*3 = /4 */
-	DISCRETE_SQUAREWAVE(NODE_107, 1, NODE_106, (777.2/3), 50.0, 0, 0)
-	DISCRETE_RCFILTER(NODE_108, 1, NODE_107, 10000, 1e-7)
-
-	DISCRETE_MULTADD(NODE_109, 1, NODE_102, 4, 27.0/3)	/* F3 = /12*4 = /3 */
-	DISCRETE_SQUAREWAVE(NODE_110, 1, NODE_109, (777.2/3), 100.0/3, 0, 360.0/3)
-	DISCRETE_RCFILTER(NODE_111, 1, NODE_110, 10000, 1e-7)
-
-	DISCRETE_ADDER3(SPRINT4_MOTORSND4, SPRINT4_ATTRACT_EN, NODE_105, NODE_108, NODE_111)
-
-	/************************************************/
-	/* Crash circuit is built around a noise        */
-	/* generator built from 2 shift registers that  */
-	/* are clocked by the 2V signal.                */
-	/* 2V = HSYNC/4                                 */
-	/*    = 15750/4                                 */
-	/* Output is binary weighted with 4 bits of     */
-	/* crash volume.                                */
-	/************************************************/
-	DISCRETE_LFSR_NOISE(SPRINT4_NOISE, SPRINT4_ATTRACT_EN, SPRINT4_ATTRACT_EN, 15750.0/4, 1.0, 0, 0, &sprint4_lfsr)
-
-	DISCRETE_MULTIPLY(NODE_120, 1, SPRINT4_NOISE, SPRINT4_CRASH_DATA)
-	DISCRETE_RCFILTER(SPRINT4_CRASHSND, 1, NODE_120, 545, 1e-7)
-
-	/************************************************/
-	/* Skid circuit takes the noise output from     */
-	/* the crash circuit and applies +ve feedback   */
-	/* to cause oscillation. There is also an RC    */
-	/* filter on the input to the feedback circuit. */
-	/* RC is 1K & 10uF                              */
-	/* Feedback cct is modelled by using the RC out */
-	/* as the frequency input on a VCO,             */
-	/* breadboarded freq range as:                  */
-	/*  0 = 940Hz, 34% duty                         */
-	/*  1 = 630Hz, 29% duty                         */
-	/*  the duty variance is so small we ignore it  */
-	/************************************************/
-	DISCRETE_INVERT(NODE_130, SPRINT4_NOISE)
-	DISCRETE_MULTADD(NODE_131, 1, NODE_130, 940.0-630.0, ((940.0-630.0)/2)+630.0)
-	DISCRETE_RCFILTER(NODE_132, 1, NODE_131, 1000, 1e-5)
-	DISCRETE_SQUAREWAVE(NODE_133, 1, NODE_132, 407.8, 31.5, 0, 0.0)
-	DISCRETE_ONOFF(SPRINT4_SKIDSND1, SPRINT4_SKID1_EN, NODE_133)
-	DISCRETE_ONOFF(SPRINT4_SKIDSND2, SPRINT4_SKID2_EN, NODE_133)
-	DISCRETE_ONOFF(SPRINT4_SKIDSND3, SPRINT4_SKID3_EN, NODE_133)
-	DISCRETE_ONOFF(SPRINT4_SKIDSND4, SPRINT4_SKID4_EN, NODE_133)
-
-	/************************************************/
-	/* Combine 5 sound sources.per speaker          */
-	/* Add some final gain to get to a good sound   */
-	/* level.                                       */
-	/************************************************/
-	DISCRETE_ADDER3(NODE_140, 1, SPRINT4_MOTORSND1, SPRINT4_CRASHSND, SPRINT4_SKIDSND1)
-	DISCRETE_ADDER3(NODE_141, 1, NODE_140, SPRINT4_MOTORSND2, SPRINT4_SKIDSND2)
-
-	DISCRETE_ADDER3(NODE_150, 1, SPRINT4_MOTORSND3, SPRINT4_CRASHSND, SPRINT4_SKIDSND3)
-	DISCRETE_ADDER3(NODE_151, 1, NODE_150, SPRINT4_MOTORSND4, SPRINT4_SKIDSND4)
-
-	DISCRETE_OUTPUT(NODE_141, 65534.0/(777.2+777.2+1000.0+298.9+298.9))
-	DISCRETE_OUTPUT(NODE_151, 65534.0/(777.2+777.2+1000.0+298.9+298.9))
+DISCRETE_SOUND_START(ultratnk_discrete_interface)
+	SPRINT4_ATTRACT
+	SPRINT4_PLAYER_MOTOR(1)
+	SPRINT4_PLAYER_MOTOR(2)
+	SPRINT4_BANG
+	SPRINT4_PLAYER_SCREECH(1)
+	SPRINT4_PLAYER_SCREECH(2)
+	SPRINT4_MIXER(1, 2, 30000)
 DISCRETE_SOUND_END

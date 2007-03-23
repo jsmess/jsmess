@@ -2886,6 +2886,32 @@ ROM_START( lhb )
 	ROM_CONTINUE(          0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 ROM_END
 
+ROM_START( lhba )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_LOAD( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	// identical to 040-c3c2.snd
+	ROM_LOAD( "igs_m0202.u39", 0x00000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // 2 banks
+
+ROM_END
+
+ROM_START( dbc )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_LOAD( "maj-h_v027h.u30", 0x00000, 0x80000, CRC(5d5ccd5b) SHA1(7a1223923f9a5825fd919ae9a36912284e705382) )
+
+	ROM_REGION( 0x300000, REGION_GFX1, 0 )
+	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
+	ROM_LOAD( "maj-h_cg.u8",  0x200000, 0x080000, CRC(ee45cc46) SHA1(ed011f758a02026222994aaea0677a4e9580fbda) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "igs_m0202.u39", 0x00000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // 2 banks
+
+ROM_END
+
 
 
 /*
@@ -2984,6 +3010,9 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1995, lhb,      0,        lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang",                    0 )
+// the screenshot in the zip shows a 1995 copyright, but only 199 is displayed in MAME?  todo: verify protection patch is correct for this set
+GAME( 1995, lhba,     lhb,      lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang (set 2)",            0 )
+GAME( 199?, dbc,      0,        lhb,      lhb,      0,        ROT0, "IGS",        "Da Ban Cheng",                    GAME_NOT_WORKING ) // needs decrypting / prot patches
 GAME( 1995, chindrag, drgnwrld, chindrag, chindrag, chindrag, ROT0, "IGS / ALTA", "Zhong Guo Long (Japan, V021J)",   0 )
 GAME( 1995, chugokur, drgnwrld, chindrag, chindrag, chugokur, ROT0, "IGS / ALTA", "Zhong Guo Long (Japan, V020J)",   0 )
 GAME( 1996, chmplst2, 0,        chmplst2, chmplst2, chmplst2, ROT0, "IGS",        "Long Hu Bang II",                 GAME_IMPERFECT_GRAPHICS )

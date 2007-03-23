@@ -23,6 +23,7 @@ static unsigned char *system1_ram;
 #include "video/system1.h"
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
+#include "machine/mc8123.h"
 #include "sound/sn76496.h"
 
 static MACHINE_RESET( system1 )
@@ -147,7 +148,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blockgal_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( blckgalb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM) // ROM
@@ -181,6 +182,7 @@ static ADDRESS_MAP_START( wbml_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM) // ROM
 	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(MWA8_RAM) // mirror?
 	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(wbml_paged_videoram_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
@@ -230,6 +232,7 @@ static ADDRESS_MAP_START( nobo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xeffe, 0xefff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) /* joy1 */
@@ -240,6 +243,10 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0d, 0x0d) AM_READ(input_port_4_r) /* DIP1 some games read it from here... */
 	AM_RANGE(0x10, 0x10) AM_READ(input_port_4_r) /* DIP1 ... and some others from here */
 									/* but there are games which check BOTH! */
+
+	AM_RANGE(0x11, 0x11) AM_READ(input_port_3_r) /* DIP2 ... blockgal */
+
+
 	AM_RANGE(0x15, 0x15) AM_READ(system1_videomode_r)
 	AM_RANGE(0x19, 0x19) AM_READ(system1_videomode_r)    /* mirror address */
 ADDRESS_MAP_END
@@ -2059,7 +2066,7 @@ a "feature" of the bootleg :
 Bits 2 and 6 of DSW0 aren't tested in the game (I can't tell about the "test mode")
 
 
-Useful addresses (to unprotect 'blockgal' ?) :
+Useful addresses:
 
   - 0xc040 : credits (0x00-0x09)
   - 0xc019 : player 1 lives
@@ -2572,12 +2579,12 @@ static MACHINE_DRIVER_START( noboranb )
 
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( blockgal )
+static MACHINE_DRIVER_START( blckgalb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(readmem,blockgal_writemem)
+	MDRV_CPU_PROGRAM_MAP(readmem,blckgalb_writemem)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(blockgal)
@@ -4146,6 +4153,9 @@ ROM_START( blockgal )
 	ROM_LOAD( "bg.109",       0x4000, 0x4000, CRC(a6b573d5) SHA1(33547a3895bbe65d5a6c40453eeb93e1fedad6de) ) /* encrypted */
 	/* 0x8000-0xbfff empty (was same as My Hero) */
 
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0029.key",  0x0000, 0x2000, CRC(350d7f93) SHA1(7ef12d63b2c7150f8e74f65ec8340471d72b1c03) )
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for sound cpu */
 	ROM_LOAD( "bg.120",       0x0000, 0x2000, CRC(d848faff) SHA1(5974cc0c3090800ca79f580a620f5b6615f5d039) )
 
@@ -4163,7 +4173,7 @@ ROM_START( blockgal )
 	ROM_LOAD( "bg.110",       0x8000, 0x4000, CRC(064c812c) SHA1(673790dc5131fd280333386a0e9915fb94e9f3e1) )
 	ROM_LOAD( "bg.05",        0xc000, 0x4000, CRC(02e0b040) SHA1(fb626fc31dfe25bf9fac0c8d76d5041609b06e82) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER2, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4226,6 +4236,9 @@ ROM_START( wbml )
 	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
 	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
 
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for sound cpu */
 	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
@@ -4252,6 +4265,9 @@ ROM_START( wbmljo )
 	ROM_LOAD( "epr11031.90",  0x00000, 0x8000, CRC(497ebfb4) SHA1(d90872c7d5285c85b05879bc67638f640e0339d5) ) /* encrypted */
 	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
 	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for sound cpu */
 	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
@@ -4370,6 +4386,9 @@ ROM_START( dakkochn )
 	ROM_LOAD( "epr11225.91",  0x10000, 0x8000, CRC(c540f9e2) SHA1(dbda9355e8b796bcfaee2789714d248c4d7ad58c) ) /* encrypted */
 	/* 18000-1ffff empty */
 
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0014.key",  0x0000, 0x2000, CRC(bb9df5ad) SHA1(7e7b7255149ae01d19883ecf4a88989f8a9bf4c6) )
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for sound cpu */
 	ROM_LOAD( "epr11229.126", 0x0000, 0x8000, CRC(c11648d0) SHA1(c2df3d767d497c3365ae70748c4790f4ee394958) )
 
@@ -4396,6 +4415,9 @@ ROM_START( ufosensi )
 	ROM_LOAD( "epr11661.90",  0x00000, 0x8000, CRC(f3e394e2) SHA1(a295a2aa80a164a548995822c46f32fd9fad7a0b) ) /* encrypted */
 	ROM_LOAD( "epr11662.91",  0x10000, 0x8000, CRC(0c2e4120) SHA1(d81fbefa95868e3efd29ef3bacf108329781ca17) ) /* encrypted */
 	ROM_LOAD( "epr11663.92",  0x18000, 0x8000, CRC(4515ebae) SHA1(9b823f10999746292762c2f0a1ca9039efa22506) ) /* encrypted */
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0064.key",  0x0000, 0x2000, CRC(da326f36) SHA1(0871b351379a094ac578e0eca5cb17797f9085aa) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for sound cpu */
 	ROM_LOAD( "epr11667.126", 0x0000, 0x8000, CRC(110baba9) SHA1(e14cf5af11ac9691eca897bbae7c238665cd2a4d) )
@@ -4506,11 +4528,46 @@ static DRIVER_INIT( wboy2 )		{ wboy2_decode(); }
 static DRIVER_INIT( gardia )	{ gardia_decode(); }
 static DRIVER_INIT( gardiab )	{ gardiab_decode(); }
 
-void mc8123_decrypt_0043(void);
-static DRIVER_INIT( wbml )		{ mc8123_decrypt_0043(); }
 
-void mc8123_decrypt_0064(void);
-static DRIVER_INIT( ufosensi )  { mc8123_decrypt_0064(); }
+
+static DRIVER_INIT( blockgal )	{ mc8123_decrypt_rom(0, memory_region(REGION_USER1), 0, 0); }
+static DRIVER_INIT( wbml )		{ mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 4); }
+static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 4); }
+
+static UINT8 dakkochn_control;
+
+READ8_HANDLER( dakkochn_port_00_r )
+{
+	return 0x00;
+}
+
+READ8_HANDLER( dakkochn_port_03_r )
+{
+	return 0x00;
+}
+
+READ8_HANDLER( dakkochn_port_04_r )
+{
+	return 0x00;
+}
+
+WRITE8_HANDLER( dakkochn_port_15_w )
+{
+	dakkochn_control = data; // check if any control multiplex bits are in here!
+	chplft_videomode_w(offset,data);
+}
+
+static DRIVER_INIT( dakkochn )
+{
+	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 4);
+
+	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+
+}
 
 
 static DRIVER_INIT( myherok )
@@ -4595,66 +4652,66 @@ static DRIVER_INIT( bootlegb )
 
 GAME( 1983, starjack, 0,        small,    starjack, 0,        ROT270, "Sega", 			 	   "Star Jacker (Sega)", GAME_SUPPORTS_SAVE )
 GAME( 1983, starjacs, starjack, small,    starjacs, 0,        ROT270, "Stern",			  	   "Star Jacker (Stern)", GAME_SUPPORTS_SAVE )
-GAME( 1983, regulus,  0,        small,	  regulus,  regulus,  ROT270, "Sega", 			 	   "Regulus (New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1983, reguluso, regulus,  small,	  reguluso, regulus,  ROT270, "Sega", 			 	   "Regulus (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1983, regulus,  0,        small,	  regulus,  regulus,  ROT270, "Sega", 			 	   "Regulus (315-5033, New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1983, reguluso, regulus,  small,	  reguluso, regulus,  ROT270, "Sega", 			 	   "Regulus (315-5033, Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1983, regulusu, regulus,  small,	  regulus,  0,        ROT270, "Sega", 			 	   "Regulus (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1983, upndown,  0,        system1,  upndown,  nprinces, ROT270, "Sega", 			 	   "Up'n Down", GAME_SUPPORTS_SAVE )
+GAME( 1983, upndown,  0,        system1,  upndown,  nprinces, ROT270, "Sega", 			 	   "Up'n Down (315-5030)", GAME_SUPPORTS_SAVE )
 GAME( 1983, upndownu, upndown,  system1,  upndown,  0,        ROT270, "Sega", 			 	   "Up'n Down (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, mrviking, 0,        small,    mrviking, mrviking, ROT270, "Sega", 			 	   "Mister Viking", GAME_SUPPORTS_SAVE )
-GAME( 1984, mrvikngj, mrviking, small,    mrvikngj, mrviking, ROT270, "Sega", 			 	   "Mister Viking (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, swat,     0,        system1,  swat,     swat,     ROT270, "Coreland / Sega", 	   "SWAT", GAME_SUPPORTS_SAVE )
-GAME( 1984, flicky,   0,        system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (128k Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flickyo,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (64k Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, wmatch,   0,        small, 	  wmatch,   wmatch,   ROT270, "Sega", 			 	   "Water Match", GAME_SUPPORTS_SAVE )
-GAME( 1984, bullfgt,  0,        system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "Bullfight", GAME_SUPPORTS_SAVE )
-GAME( 1984, thetogyu, bullfgt,  system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "The Togyu (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, mrviking, 0,        small,    mrviking, mrviking, ROT270, "Sega", 			 	   "Mister Viking (315-5041)", GAME_SUPPORTS_SAVE )
+GAME( 1984, mrvikngj, mrviking, small,    mrvikngj, mrviking, ROT270, "Sega", 			 	   "Mister Viking (315-5041, Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, swat,     0,        system1,  swat,     swat,     ROT270, "Coreland / Sega", 	   "SWAT (315-5048)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flicky,   0,        system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (315-5051, 128k Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flickyo,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (315-5051, 64k Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, wmatch,   0,        small, 	  wmatch,   wmatch,   ROT270, "Sega", 			 	   "Water Match (315-5064)", GAME_SUPPORTS_SAVE )
+GAME( 1984, bullfgt,  0,        system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "Bullfight (315-5065)", GAME_SUPPORTS_SAVE )
+GAME( 1984, thetogyu, bullfgt,  system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "The Togyu (315-5065, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, spatter,  0,        small,    spatter,  spatter,  ROT0,   "Sega", 			 	   "Spatter", GAME_SUPPORTS_SAVE )
 GAME( 1984, ssanchan, spatter,  small,    spatter,  spatter,  ROT0,   "Sega", 			 	   "Sanrin San Chan (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pitfall2, 0,        pitfall2, pitfall2, pitfall2, ROT0,   "Sega", 			 	   "Pitfall II", GAME_SUPPORTS_SAVE )
+GAME( 1985, pitfall2, 0,        pitfall2, pitfall2, pitfall2, ROT0,   "Sega", 			 	   "Pitfall II (315-5093)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pitfallu, pitfall2, pitfall2, pitfallu, 0,        ROT0,   "Sega", 			 	   "Pitfall II (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, seganinj, 0,        system1,  seganinj, seganinj, ROT0,   "Sega", 			 	   "Sega Ninja", GAME_SUPPORTS_SAVE )
+GAME( 1985, seganinj, 0,        system1,  seganinj, seganinj, ROT0,   "Sega", 			 	   "Sega Ninja (315-5102)", GAME_SUPPORTS_SAVE )
 GAME( 1985, seganinu, seganinj, system1,  seganinj, 0,        ROT0,   "Sega", 			 	   "Sega Ninja (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, ninja,    seganinj, system1,  seganinj, seganinj, ROT0,   "Sega", 				   "Ninja", GAME_SUPPORTS_SAVE )
-GAME( 1985, nprinces, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?", 		 	   "Ninja Princess (64k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1985, nprincso, seganinj, system1,  seganinj, nprinces, ROT0,   "Sega", 			 	   "Ninja Princess (128k Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1985, ninja,    seganinj, system1,  seganinj, seganinj, ROT0,   "Sega", 				   "Ninja (315-5102)", GAME_SUPPORTS_SAVE )
+GAME( 1985, nprinces, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?", 		 	   "Ninja Princess (315-5051, 64k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1985, nprincso, seganinj, system1,  seganinj, nprinces, ROT0,   "Sega", 			 	   "Ninja Princess (315-5098, 128k Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, nprincsu, seganinj, system1,  seganinj, 0,        ROT0,   "Sega", 			 	   "Ninja Princess (64k Ver. not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, nprincsb, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?", 		 	   "Ninja Princess (128k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1985, imsorry,  0,        system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", 	   "I'm Sorry (US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, imsorryj, imsorry,  system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", 	   "Gonbee no I'm Sorry (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, teddybb,  0,        system1,  teddybb,  teddybb,  ROT0,   "Sega", 			 	   "TeddyBoy Blues (New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1985, teddybbo, teddybb,  system1,  teddybb,  teddybb,  ROT0,   "Sega", 			 	   "TeddyBoy Blues (Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1985, hvymetal, 0,        hvymetal, hvymetal, hvymetal, ROT0,   "Sega", 			 	   "Heavy Metal", GAME_SUPPORTS_SAVE )
-GAME( 1985, myhero,   0,        system1,  myhero,   0,        ROT0,   "Sega", 			 	   "My Hero (US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, sscandal, myhero,   system1,  myhero,   myheroj,  ROT0,   "Coreland / Sega", 	   "Seishun Scandal (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, nprincsb, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?", 		 	   "Ninja Princess (315-5051?, 128k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1985, imsorry,  0,        system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", 	   "I'm Sorry (315-5110, US)", GAME_SUPPORTS_SAVE )
+GAME( 1985, imsorryj, imsorry,  system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", 	   "Gonbee no I'm Sorry (315-5110, Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, teddybb,  0,        system1,  teddybb,  teddybb,  ROT0,   "Sega", 			 	   "TeddyBoy Blues (315-5115, New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1985, teddybbo, teddybb,  system1,  teddybb,  teddybb,  ROT0,   "Sega", 			 	   "TeddyBoy Blues (315-5115, Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1985, myhero,   0,        system1,  myhero,   0,        ROT0,   "Sega", 			 	   "My Hero (US, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, sscandal, myhero,   system1,  myhero,   myheroj,  ROT0,   "Coreland / Sega", 	   "Seishun Scandal (315-5132, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, myherok,  myhero,   system1,  myhero,   myherok,  ROT0,   "Coreland / Sega", 	   "My Hero (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1985, hvymetal, 0,        hvymetal, hvymetal, hvymetal, ROT0,   "Sega", 			 	   "Heavy Metal (315-5135)", GAME_SUPPORTS_SAVE )
 GAME( 1985, shtngmst, 0,        shtngmst, shtngmst, 0,        ROT0,   "Sega", 			 	   "Shooting Master", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
-GAME( 1985, shtngmsa, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega [EVG]",	   "Shooting Master (EVG)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
+GAME( 1985, shtngmsa, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega [EVG]",			   "Shooting Master (EVG)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
 GAME( 1985, chplft,   0,        chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection */
 GAME( 1985, chplftb,  chplft,   chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter (alternate)", GAME_SUPPORTS_SAVE )
 GAME( 1985, chplftbl, chplft,   chplft,   chplft,   0,        ROT0,   "bootleg", 		 	   "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1985, 4dwarrio, 0,        system1,  4dwarrio, 4dwarrio, ROT0,   "Coreland / Sega", 	   "4-D Warriors", GAME_SUPPORTS_SAVE )
+GAME( 1985, 4dwarrio, 0,        system1,  4dwarrio, 4dwarrio, ROT0,   "Coreland / Sega", 	   "4-D Warriors (315-5162)", GAME_SUPPORTS_SAVE )
 GAME( 1986, brain,    0,        brain,    brain,    0,        ROT0,   "Coreland / Sega", 	   "Brain", GAME_SUPPORTS_SAVE )
-GAME( 1986, raflesia, 0,        system1,  raflesia, 4dwarrio, ROT270, "Coreland / Sega", 	   "Rafflesia", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy,     0,        system1,  wboy,     wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, new encryption)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboyo,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, old encryption)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy2,    wboy,     system1,  wboy,     wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy2u,   wboy,     system1,  wboy,     0,        ROT0,   "Sega (Escape license)", "Wonder Boy (set 2 not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy3,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy4,    wboy,     system1,  wboy,     4dwarrio, ROT0,   "Sega (Escape license)", "Wonder Boy (set 4)", GAME_SUPPORTS_SAVE )
+GAME( 1986, raflesia, 0,        system1,  raflesia, 4dwarrio, ROT270, "Coreland / Sega", 	   "Rafflesia (315-5162)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy,     0,        system1,  wboy,     wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, 315-5177)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboyo,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, 315-5135)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy2,    wboy,     system1,  wboy,     wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy2u,   wboy,     system1,  wboy,     0,        ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy3,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy4,    wboy,     system1,  wboy,     4dwarrio, ROT0,   "Sega (Escape license)", "Wonder Boy (set 4, 315-5162)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboyu,    wboy,     system1,  wboyu,    0,        ROT0,   "Sega (Escape license)", "Wonder Boy (not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboysys2, wboy,     wbml,     wboysys2, wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe, wboy,     system1,  wbdeluxe, 0,        ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1986, gardia,   0,        brain,    gardia,   gardia,   ROT270, "Sega / Coreland", 	   "Gardia", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1986, gardiab,  gardia,   brain,    gardia,   gardiab,  ROT270, "bootleg", 		 	   "Gardia (bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, gardia,   0,        brain,    gardia,   gardia,   ROT270, "Sega / Coreland", 	   "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1986, gardiab,  gardia,   brain,    gardia,   gardiab,  ROT270, "bootleg", 		 	   "Gardia (317-0007?, bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1986, noboranb, 0,        noboranb, noboranb, noboranb, ROT270, "bootleg", 		 	   "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, blockgal, 0,        blockgal, blockgal, 0,        ROT90,  "Sega / Vic Tokai",	   "Block Gal", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, blckgalb, blockgal, blockgal, blockgal, bootleg,  ROT90,  "bootleg", 		 	   "Block Gal (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, blockgal, 0,        system1,  blockgal, blockgal, ROT90,  "Sega / Vic Tokai",	   "Block Gal (MC-8123B, 317-0029)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1987, blckgalb, blockgal, blckgalb, blockgal, bootleg,  ROT90,  "bootleg", 		 	   "Block Gal (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, tokisens, 0,        wbml,     tokisens, 0,        ROT90,  "Sega", 			 	   "Toki no Senshi - Chrono Soldier", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbml,     0,        wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  	   "Wonder Boy in Monster Land (Japan New Ver.)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmljo,   wbml,     wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  	   "Wonder Boy in Monster Land (Japan Old Ver.)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, wbml,     0,        wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  	   "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmljo,   wbml,     wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  	   "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmljb,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg", 		 	   "Wonder Boy in Monster Land (Japan not encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmlb,    wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg", 		 	   "Wonder Boy in Monster Land (English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
 GAME( 1987, wbmlbg,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg", 		 	   "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, dakkochn, 0,        chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "DakkoChan Jansoh", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, ufosensi, 0,        ufosensi, ufosensi, ufosensi, ROT0,   "Sega", 			 	   "Ufo Senshi Yohko Chan", GAME_SUPPORTS_SAVE )
+GAME( 1987, dakkochn, 0,        wbml,     wbml,     dakkochn, ROT0,   "Whiteboard",		 	   "DakkoChan House (MC-8123, 317-0014)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, ufosensi, 0,        ufosensi, ufosensi, ufosensi, ROT0,   "Sega", 			 	   "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensb, ufosensi, ufosensi, ufosensi, bootlegb, ROT0,   "bootleg", 			   "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )

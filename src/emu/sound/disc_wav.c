@@ -48,6 +48,8 @@ struct dss_lfsr_context
 	double			sampleStep;
 	double			shiftStep;
 	double			t;
+	UINT8			reset_on_high;
+	UINT8			invert_output;
 };
 
 struct dss_noise_context
@@ -374,7 +376,7 @@ void dss_lfsr_step(node_description *node)
 	}
 
 	/* Reset everything if necessary */
-	if((DSS_LFSR_NOISE__RESET ? 1 : 0) == ((lfsr_desc->flags & DISC_LFSR_FLAG_RESET_TYPE_H) ? 1 : 0))
+	if((DSS_LFSR_NOISE__RESET ? 1 : 0) == context->reset_on_high)
 	{
 		dss_lfsr_reset(node);
 		return;
@@ -430,7 +432,7 @@ void dss_lfsr_step(node_description *node)
 		node->output=((context->lfsr_reg)>>(lfsr_desc->output_bit))&0x01;
 
 		/* Final inversion if required */
-		if(lfsr_desc->flags & DISC_LFSR_FLAG_OUT_INVERT) node->output=(node->output)?0.0:1.0;
+		if(context->invert_output) node->output=(node->output)?0.0:1.0;
 
 		/* Gain stage */
 		node->output=(node->output)?(DSS_LFSR_NOISE__AMP)/2:-(DSS_LFSR_NOISE__AMP)/2;
@@ -449,6 +451,9 @@ void dss_lfsr_reset(node_description *node)
 	const discrete_lfsr_desc *lfsr_desc = node->custom;
 	struct dss_lfsr_context *context = node->context;
 	int fb0,fb1,fbresult;
+
+	context->reset_on_high = (lfsr_desc->flags & DISC_LFSR_FLAG_RESET_TYPE_H) ? 1 : 0;
+	context->invert_output = lfsr_desc->flags & DISC_LFSR_FLAG_OUT_INVERT;
 
 	if ((lfsr_desc->clock_type < DISC_CLK_ON_F_EDGE) || (lfsr_desc->clock_type > DISC_CLK_IS_FREQ))
 		discrete_log("Invalid clock type passed in NODE_%d\n", node->node - NODE_START);

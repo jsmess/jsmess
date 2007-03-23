@@ -5615,7 +5615,7 @@ static void MamePlayBackGame()
 		if (path[strlen(path)-1] == '\\')
 			path[strlen(path)-1] = 0; // take off trailing back slash
 
-		options_set_string(SEARCHPATH_INPUTLOG, path);
+		options_set_string(mame_options(), SEARCHPATH_INPUTLOG, path);
 		fileerr = mame_fopen(SEARCHPATH_INPUTLOG, fname, OPEN_FLAG_READ, &pPlayBack);
 		if (fileerr != FILERR_NONE)
 		{

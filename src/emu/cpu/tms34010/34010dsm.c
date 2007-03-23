@@ -15,8 +15,8 @@
 #else
 #define PC __pc
 #define OP_WORD(v) { v = rombase[(__pc - pcbase) >> 3] | (rombase[(__pc + 8 - pcbase) >> 3] << 8); _pc += 16; }
-#define PARAM_WORD(v) { v = rambase[(__pc - pcbase) >> 3] | (rambase[(__pc + 8 - pcbase) >> 3] << 8); _pc += 16; }
-#define PARAM_LONG(v) { v = rambase[(__pc - pcbase) >> 3] | (rambase[(__pc + 8 - pcbase) >> 3] << 8) | (rambase[(__pc + 16 - pcbase) >> 3] << 16) | (rambase[(__pc + 24 - pcbase) >> 3] << 24); _pc += 32; }
+#define PARAM_WORD(v) { v = rambase[(__pc + 16 - pcbase) >> 3] | (rambase[(__pc + 24 - pcbase) >> 3] << 8); _pc += 16; }
+#define PARAM_LONG(v) { v = rambase[(__pc + 16 - pcbase) >> 3] | (rambase[(__pc + 24 - pcbase) >> 3] << 8) | (rambase[(__pc + 32 - pcbase) >> 3] << 16) | (rambase[(__pc + 40 - pcbase) >> 3] << 24); _pc += 32; }
 #endif
 
 static UINT8 rf;

@@ -5,6 +5,7 @@ Atari Sprint 4 driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "audio/sprint4.h"
 
 #define MASTER_CLOCK    12096000
 
@@ -196,21 +197,41 @@ static WRITE8_HANDLER( sprint4_lockout_w )
 }
 
 
-static WRITE8_HANDLER( sprint4_screech_1_w ) { /* offset & 1 */ }
-static WRITE8_HANDLER( sprint4_screech_2_w ) { /* offset & 1 */ }
-static WRITE8_HANDLER( sprint4_screech_3_w ) { /* offset & 1 */ }
-static WRITE8_HANDLER( sprint4_screech_4_w ) { /* offset & 1 */ }
+static WRITE8_HANDLER( sprint4_screech_1_w )
+{
+	discrete_sound_w(SPRINT4_SCREECH_EN_1, offset & 1);
+}
+
+
+static WRITE8_HANDLER( sprint4_screech_2_w )
+{
+	discrete_sound_w(SPRINT4_SCREECH_EN_2, offset & 1);
+}
+
+
+static WRITE8_HANDLER( sprint4_screech_3_w )
+{
+	discrete_sound_w(SPRINT4_SCREECH_EN_3, offset & 1);
+}
+
+
+static WRITE8_HANDLER( sprint4_screech_4_w )
+{
+	discrete_sound_w(SPRINT4_SCREECH_EN_4, offset & 1);
+}
+
+
 
 
 static WRITE8_HANDLER( sprint4_bang_w )
 {
-	/* data & 15 */
+	discrete_sound_w(SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
 static WRITE8_HANDLER( sprint4_attract_w )
 {
-	/* data & 1 */
+	discrete_sound_w(SPRINT4_ATTRACT_EN, data & 1);
 }
 
 
@@ -339,6 +360,18 @@ INPUT_PORTS_START( sprint4 )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Player 4 Gear 3") PORT_PLAYER(3)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Player 4 Gear 4") PORT_PLAYER(3)
 
+	PORT_START_TAG("MOTOR1")
+	PORT_ADJUSTER( 35, "Motor 1 RPM" )
+
+	PORT_START_TAG("MOTOR2")
+	PORT_ADJUSTER( 40, "Motor 2 RPM" )
+
+	PORT_START_TAG("MOTOR3")
+	PORT_ADJUSTER( 35, "Motor 3 RPM" )
+
+	PORT_START_TAG("MOTOR4")
+	PORT_ADJUSTER( 40, "Motor 4 RPM" )
+
 INPUT_PORTS_END
 
 
@@ -391,6 +424,14 @@ static MACHINE_DRIVER_START( sprint4 )
 	MDRV_VIDEO_UPDATE(sprint4)
 	MDRV_VIDEO_EOF(sprint4)
 
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG(sprint4_discrete_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
 MACHINE_DRIVER_END
 
 
@@ -434,5 +475,5 @@ ROM_START( sprint4a )
 ROM_END
 
 
-GAME( 1977, sprint4,  0,       sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 1)", GAME_NO_SOUND ) /* large cars */
-GAME( 1977, sprint4a, sprint4, sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 2)", GAME_NO_SOUND ) /* small cars */
+GAME( 1977, sprint4,  0,       sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 1)", 0 ) /* large cars */
+GAME( 1977, sprint4a, sprint4, sprint4,  sprint4,  0, ROT180, "Atari", "Sprint 4 (set 2)", 0 ) /* small cars */

@@ -38,6 +38,7 @@ TODO:
 
 #include "driver.h"
 #include "machine/8255ppi.h"
+#include "machine/mc8123.h"
 #include "sound/sn76496.h"
 
 
@@ -100,9 +101,14 @@ static READ8_HANDLER( gigas_spinner_r )
 	return readinputport( spinner );
 }
 
+static MACHINE_RESET( pbillrd )
+{
+	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+}
+
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
 {
-	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x10000 + 0x4000 * (data & 1));
+	memory_set_bank(1, data & 1);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
@@ -654,7 +660,7 @@ static const gfx_decode gfxdecodeinfo[] =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( pbillrd )
+static MACHINE_DRIVER_START( base )
 	MDRV_CPU_ADD_TAG("main",Z80, 18432000/6)	//confirmed
 	MDRV_CPU_PROGRAM_MAP(pbillrd_readmem,pbillrd_writemem)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(50*3)) //??
@@ -691,8 +697,14 @@ static MACHINE_DRIVER_START( pbillrd )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( pbillrd )
+	MDRV_IMPORT_FROM(base)
+
+	MDRV_MACHINE_RESET(pbillrd)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( freekckb )
-	MDRV_IMPORT_FROM(pbillrd)
+	MDRV_IMPORT_FROM(base)
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(freekckb_readmem,freekckb_writemem)
@@ -704,7 +716,7 @@ static MACHINE_DRIVER_START( freekckb )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gigas )
-	MDRV_IMPORT_FROM(pbillrd)
+	MDRV_IMPORT_FROM(base)
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(gigas_readmem,gigas_writemem)
@@ -755,10 +767,13 @@ ROM_END
 
 ROM_START( pbillrds )
 	ROM_REGION( 0x18000, REGION_CPU1, 0 ) /* Z80 Code */
-	ROM_LOAD( "10627.10n",   0x00000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) )	/* encrypted */
+	ROM_LOAD( "10626.8n",    0x00000, 0x4000, CRC(51d725e6) SHA1(d7007c983530780e7fa3686cb7a6d7c382c802fa) )	/* encrypted */
 	ROM_LOAD( "10625.8r",    0x04000, 0x4000, CRC(8977c724) SHA1(f00835a04dc6fa7d8c1e382dace515f2aa7d6f44) )	/* encrypted */
 	ROM_CONTINUE(            0x10000, 0x4000 )
-	ROM_LOAD( "10626.8n",    0x14000, 0x4000, CRC(51d725e6) SHA1(d7007c983530780e7fa3686cb7a6d7c382c802fa) )	/* encrypted */
+	ROM_LOAD( "10627.10n",   0x14000, 0x4000, CRC(2335e6dd) SHA1(82352b6f4abea88aad3a96ca63cccccb6e278f48) )	/* encrypted */
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0030.key",  0x0000, 0x2000, CRC(9223f06d) SHA1(51a22a4c80fe273526bde68918c13c6476cec383) )
 
 	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE ) /* GFX */
 	ROM_LOAD( "10622.3h",    0x000000, 0x04000, CRC(23b864ac) SHA1(5a13ad6f2278761967269eed8c07077293c921d6) )
@@ -1018,6 +1033,12 @@ static DRIVER_INIT(gigas)
 }
 
 
+static DRIVER_INIT( pbillrds )
+{
+	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 2);
+}
+
+
 
 /*************************************
  *
@@ -1025,13 +1046,13 @@ static DRIVER_INIT(gigas)
  *
  *************************************/
 
-GAME( 1986, gigasb,   0,        gigas,    gigas,    gigas, ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1986, oigas,    gigasb,   oigas,    gigas,    gigas, ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1986, gigasm2b, 0,        gigas,    gigasm2,  gigas, ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1987, pbillrd,  0,        pbillrd,  pbillrd,  0,     ROT0,   "Nihon System", "Perfect Billiard", 0 )
-GAME( 1987, pbillrds, pbillrd,  pbillrd,  pbillrd,  0,     ROT0,   "Nihon System", "Perfect Billiard (Sega)", GAME_UNEMULATED_PROTECTION )	// encrypted
-GAME( 1987, freekick, 0,        freekckb, freekck,  0,     ROT270, "Nihon System (Sega license)", "Free Kick", GAME_NOT_WORKING )
-GAME( 1987, freekckb, freekick, freekckb, freekck,  0,     ROT270, "bootleg", "Free Kick (bootleg)", 0 )
-GAME( 1988, countrun, 0,        freekckb, countrun, 0,     ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NOT_WORKING )
-GAME( 1988, countrnb, countrun, freekckb, countrun, 0,     ROT0,   "bootleg", "Counter Run (bootleg set 1)", 0 )
-GAME( 1988, countrb2, countrun, freekckb, countrun, 0,     ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NOT_WORKING )
+GAME( 1986, gigasb,   0,        gigas,    gigas,    gigas,    ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, oigas,    gigasb,   oigas,    gigas,    gigas,    ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, gigasm2b, 0,        gigas,    gigasm2,  gigas,    ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL )
+GAME( 1987, pbillrd,  0,        pbillrd,  pbillrd,  0,        ROT0,   "Nihon System", "Perfect Billiard", 0 )
+GAME( 1987, pbillrds, pbillrd,  pbillrd,  pbillrd,  pbillrds, ROT0,   "Nihon System", "Perfect Billiard (MC-8123, 317-0030)", 0 )
+GAME( 1987, freekick, 0,        freekckb, freekck,  0,        ROT270, "Nihon System (Sega license)", "Free Kick", GAME_NOT_WORKING )
+GAME( 1987, freekckb, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg)", 0 )
+GAME( 1988, countrun, 0,        freekckb, countrun, 0,        ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NOT_WORKING )
+GAME( 1988, countrnb, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 1)", 0 )
+GAME( 1988, countrb2, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NOT_WORKING )

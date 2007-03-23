@@ -9646,7 +9646,7 @@ static void LoadCheatDatabase(void)
 	int			first = 1;
 	char		data;
 
-	cheatfile = options_get_string(OPTION_CHEAT_FILE);
+	cheatfile = options_get_string(mame_options(), OPTION_CHEAT_FILE);
 
 	/* ----- set default database name as "cheat.dat" ----- */
 	if(!cheatfile)

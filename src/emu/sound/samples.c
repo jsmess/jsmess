@@ -181,7 +181,7 @@ struct loaded_samples *readsamples(const char **samplenames, const char *basenam
 	int i;
 
 	/* if the user doesn't want to use samples, bail */
-	if (!options_get_bool(OPTION_SAMPLES))
+	if (!options_get_bool(mame_options(), OPTION_SAMPLES))
 		return NULL;
 	if (samplenames == 0 || samplenames[0] == 0)
 		return NULL;

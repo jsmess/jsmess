@@ -1,6 +1,6 @@
 /*************************************************************************
 
-    audio\vicdual.c
+    VIC Dual Game board
 
 *************************************************************************/
 
@@ -14,6 +14,9 @@
  * frogs Sound System Analog emulation
  * Oct 2004, Derrick Renaud
  ************************************************************************/
+
+static mame_timer *frogs_croak_timer;
+
 
 /* Discrete Sound Input Nodes */
 #define FROGS_FLY_EN		NODE_01
@@ -58,7 +61,7 @@ static const discrete_mixer_desc frogsMixer =
 	0, RES_K(56), 0, CAP_U(0.1), 0, 10000
 };
 
-DISCRETE_SOUND_START(frogs_discrete_interface)
+static DISCRETE_SOUND_START(frogs_discrete_interface)
 	/************************************************
      * Input register mapping for frogs
      *
@@ -110,18 +113,39 @@ static const char *frogs_sample_names[] =
 	0       /* end of array */
 };
 
-struct Samplesinterface frogs_samples_interface =
+static struct Samplesinterface frogs_samples_interface =
 {
 	5,	/* 5 channels */
 	frogs_sample_names
 };
 
-void croak_callback(int param)
+
+MACHINE_DRIVER_START( frogs_audio )
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(frogs_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+
+	MDRV_SOUND_ADD(DISCRETE, 0)
+	MDRV_SOUND_CONFIG(frogs_discrete_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+static void frogs_croak_callback(int param)
 {
 	sample_stop(2);
 }
 
-WRITE8_HANDLER( frogs_sh_port2_w )
+
+MACHINE_START( frogs_audio )
+{
+	frogs_croak_timer = mame_timer_alloc(frogs_croak_callback);
+
+	return 0;
+}
+
+
+WRITE8_HANDLER( frogs_audio_w )
 {
 	static int last_croak = 0;
 	static int last_buzzz = 0;
@@ -146,7 +170,7 @@ WRITE8_HANDLER( frogs_sh_port2_w )
 		if (last_croak)
 		{
 			/* The croak will keep playing until .429s after being disabled */
-			timer_adjust(croak_timer, 1.1 * RES_K(390) * CAP_U(1), 0, 0);
+			mame_timer_adjust(frogs_croak_timer, double_to_mame_time(1.1 * RES_K(390) * CAP_U(1)), 0, time_zero);
 		}
 	}
 	if (new_buzzz)

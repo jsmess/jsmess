@@ -158,6 +158,7 @@ void				debug_view_update_type(int type);
 
 /* misc stuff */
 void				debug_view_add_to_errorlog(const char *text);
+void				debug_disasm_update_all(void);
 
 
 

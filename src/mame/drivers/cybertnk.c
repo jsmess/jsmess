@@ -4,18 +4,69 @@ Cyber Tank HW (c) 1987 Coreland Technology
 
 WIP driver by Angelo Salese
 
+- Communications
+Master slave comms looks like shared RAM.
+The slave tests these RAM banks all using the same routine at 0x000006E6
+There are also routines for clearing each bank of RAM after POST,
+including the shared RAM (0x).
+The amount cleared in each bank is different than the amount tested.
+
+IC20 (7D0*2 bytes starting @ 0x080000, code at 0x00000684) \ Tested as 0xFA0 (4000) bytes.
+IC21 (7D0*2 bytes starting @ 0x080001, code at 0x00000690) / Cleared at 0x0000042a as 0x1000 bytes.
+IC22 (1F4*2 bytes starting @ 0x0c0000, code at 0x0000069E) \ Tested as 0x3e8 (1000) bytes.
+IC23 (1F4*2 bytes starting @ 0x0c0001, code at 0x000006AA) / Cleared at 0x00000440 as 0x4000 bytes.
+IC24 (1F4*2 bytes starting @ 0x100001, code at 0x000006B8) > Shared RAM
+
+The shared ram is tested and cleared almost the same as the other RAM,
+and is mapped into the master at E0000. Only every odd byte is used.
+
+The first 0x10 bytes are used heavily as registers
+during the POST, key ones are
+    share_0001 hold - slave waits for this to be cleared.
+    share_0009 master cmd to slave
+    share_0011 slave status
+    share_000b bit mask of failed ICs returned to master, defaults to all failed.
+
+There are also block writes carried out by the slave every
+second irq 3. The data transfer area appears to start at 0x100021.
+Master reads at 0x00005E3C
+
+It is tested as every odd byte from 0x100021 to 0x1003e8,
+and cleared as every odd byte from 0x100021 up to 0x100fff)
+
+- Missing ROM data
+IC03 and IC04 are missing from the set.
+These look like "logical" ICs rather that physical ones.
+The main program code is dumped as 2x128k files p1a and p2a.
+The checksum routine does 4x64k checks, going by the routine.
+IC01 is the first half of p1a, IC02 is the first half of p2a,
+IC03 is the second half of p1a and IC04 is the second half of p2a.
+
+IC01 FEFF bytes @ 0x00200 code at 0x000019FE CHKSUM A5 (00200 offset is just after where the checksum is recorded)
+IC02 FEFF bytes @ 0x00201 code at 0x00001A24 CHKSUM 87
+IC03 FFFF bytes @ 0x20000 code at 0x00001A46 CHKSUM 61
+IC04 FFFF bytes @ 0x20001 code at 0x00001A6A CHKSUM E0
+
+Unfortunately the second half of p1a and p2a are empty, all 0xff.
+No other ROMs in the entire set match the checksums used in the POST.
+I am guessing they are bad dumps.
+
+- Unmapped reads/writes
+CPU1 reads at 0x07fff8 and 0x07fffa are the slave reading validation values
+to compare to slave program ROM checksums.
+The test will never fail, the results of the comparison are ignored by the code,
+so there may never have been an implementation.
+
+CPU1 unmapped read at 0x20000 is a checksum overrun by a single loop iteration.
+See loop at 0x000006D2, it's a "do while" loop that tests loop after testing ROM.
+
+Unmapped read/write by CPU2 of 0xa005, 0xa006 This looks like loop overrun too,
+or maybe caused by the initial base offset which is the same as the loop increments it.
+Sub at CPU2:01B7, the block process starts at base 8020h and increments by 20h each time.
+It overruns the top of RAM on the last iteration.
+
 TODO:
--Understand the communication between Master & Slave CPUs.
--Fix the "USP" bug,which causes IC03 & IC04 to fail the self test.
- For now:
- Set a breakpoint at 1732
- Modify the USP register to 0
- Update: it reads from ROM 0x102 & 0x103,at PC 1a58 & 1a7c,it expects to read 0x61 & 0xe0.
- It seems to be a rom check at 0x20000 (odd & even bytes),but I don't know what rom is
- needed on it.
 -Rom "SS5" is missing?Or it's a sound chip that's labelled SS5?
--Rom not yet hooked up?Or a left-over?
- cpu #1 (PC=000006D8): unmapped program memory word read from 00020000 & FF00
 -Paletteram is likely to be buffered,the two banks are really similar.
 
 ============================================================================================
@@ -123,12 +174,11 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 
 static tilemap *tx_tilemap;
 static UINT16 *tx_vram;
-static UINT16 *slave_data;
-static UINT16 *com_ram;
-//static UINT16 mux_data;
+static UINT16 *shared_ram;
+static UINT16 *io_ram;
 
-#define MASTER_CPU (cpu_getactivecpu() == 0)
-#define SLAVE_CPU (cpu_getactivecpu() == 1)
+#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU%d:%08x  0x%08x 0x%04x & 0x%04x\n", cpu_getactivecpu(), activecpu_get_pc(), offset*2, data, mem_mask);
+#define IGNORE_MISSING_ROM 1
 
 static void get_tx_tile_info(int tile_index)
 {
@@ -153,6 +203,19 @@ VIDEO_UPDATE( cybertnk )
 	return 0;
 }
 
+DRIVER_INIT( cybertnk )
+{
+#ifdef IGNORE_MISSING_ROM
+	UINT16 *ROM = (UINT16*)memory_region(REGION_CPU1);
+
+	/* nop the rom checksum branch */
+	ROM[0x1546/2] = 0x4e71;
+	ROM[0x1548/2] = 0x4e71;
+	ROM[0x154a/2] = 0x4e71;
+	ROM[0x154c/2] = 0x4e71;
+#endif
+}
+
 static WRITE16_HANDLER( tx_vram_w )
 {
 	int oldword = tx_vram[offset];
@@ -166,70 +229,151 @@ static WRITE16_HANDLER( tx_vram_w )
 	}
 }
 
-static UINT16 master_cmd;
-
-static WRITE16_HANDLER( master_send )
+static WRITE16_HANDLER( share_w )
 {
-	COMBINE_DATA(&master_cmd);
+	COMBINE_DATA(&shared_ram[offset]);
 }
 
-static READ16_HANDLER( slave_receive )
+static READ16_HANDLER( share_r )
 {
-	popmessage("CPU #1 (PC=%06x) CMD = %04x",activecpu_get_pc(),master_cmd);
-	return master_cmd;
+	return shared_ram[offset];
 }
 
-static READ16_HANDLER( master_receive )
+static READ16_HANDLER( io_r )
 {
-	popmessage("CPU #0 (PC=%06x) CMD = %04x",activecpu_get_pc(),slave_data[0x10/2]);
-	return slave_data[0x10/2];
-}
-
-/*WRONG*/
-static READ8_HANDLER( master_to_sound )
-{
- 	switch(offset & 1)
- 	{
-		case 0: return ((master_cmd & 0x00ff) >> 0);
-		case 1: return ((master_cmd & 0xff00) >> 8);
-	}
-
-	return 0;//make the compiler happy...
-}
-
-/*I think this is the Network communication*/
-static UINT8 master_tx,slave_tx;
-
-static READ16_HANDLER( network_r )
-{
-	logerror("(PC=%06x) Read to input area [%04x]\n",activecpu_get_pc(),offset*2);
-
-	switch(offset)
+	switch( offset )
 	{
-		case 0x002/2:
-			//mame_printf_debug("read at %06x %01x\n",activecpu_get_pc(),cpu_getactivecpu());
-			if(MASTER_CPU)
-				return slave_tx;//master RX
-			else if(SLAVE_CPU)
-				return master_tx;//slave RX
-	}
+		case 2/2:
+			return ( (readinputportbytag("DSW1") << 8) | readinputportbytag("DSW2") );
 
-	return com_ram[offset];
+		// 0x00110007 is controller device select
+		// 0x001100D5 is controller data
+		// 0x00110004 low is controller data ready
+		case 4/2:
+			switch( (io_ram[7/2]) & 0xff )
+			{
+				case 0:
+					io_ram[0xd5/2] = readinputportbytag("TRAVERSE");
+					break;
+
+				case 0x20:
+					io_ram[0xd5/2] = readinputportbytag("ELEVATE");
+					break;
+
+				case 0x40:
+					io_ram[0xd5/2] = readinputportbytag("ACCEL");
+					break;
+
+				case 0x42:
+					// only once I think, during init at 0x00000410
+					// controller return value is stored in $42(a6)
+					// but I don't see it referenced again.
+					popmessage("unknown controller device 0x42");
+					io_ram[0xd5/2] = 0;
+					break;
+
+				case 0x60:
+					io_ram[0xd5/2] = readinputportbytag("HANDLE");
+					break;
+
+				default:
+					popmessage("unknown controller device");
+			}
+			return 0;
+
+		case 6/2:
+			return readinputportbytag("IN0"); // high half
+
+		case 9/2:
+			return readinputportbytag("IN0"); // low half
+
+		case 0xb/2:
+			return readinputportbytag("DSW3");
+
+		case 0xd5/2:
+			return io_ram[offset]; // controller data
+
+		default:
+		{
+			popmessage("unknown io read 0x%08x", offset);
+			return io_ram[offset];
+		}
+	}
 }
 
-static WRITE16_HANDLER( network_w )
+static WRITE16_HANDLER( io_w )
 {
-	COMBINE_DATA(&com_ram[offset]);
+	COMBINE_DATA(&io_ram[offset]);
 
-	switch(offset)
+	switch( offset*2 )
 	{
-		case 0x002/2:
-			if(ACCESSING_LSB && MASTER_CPU)
-				master_tx = ((data & 0xff) << 8); //master TX
-			if(ACCESSING_MSB && SLAVE_CPU)
-				slave_tx = ((data & 0xff00) >> 8); //slave TX
+		case 0:
+			// sound data
+			if (ACCESSING_LSB)
+				cpunum_set_input_line(2, 0, HOLD_LINE);
+			else
+				LOG_UNKNOWN_WRITE
+			break;
+
+		case 2:
+			if (ACCESSING_LSB)
+				;//watchdog ? written in similar context to CPU1 @ 0x140002
+			else
+				LOG_UNKNOWN_WRITE
+			break;
+
+		case 6:
+			if (ACCESSING_LSB)
+				;//select controller device
+			else
+				;//blank inputs
+			break;
+
+		case 8:
+			if (ACCESSING_MSB)
+				;//blank inputs
+			else
+				LOG_UNKNOWN_WRITE
+			break;
+
+		case 0xc:
+			if (ACCESSING_LSB)
+				// This seems to only be written after each irq1 and irq2
+				logerror("irq wrote %04x\n", data);
+			else
+				LOG_UNKNOWN_WRITE
+			break;
+
+		case 0xd4:
+			if ( ACCESSING_LSB )
+				;// controller device data
+			else
+				LOG_UNKNOWN_WRITE
+			break;
+
+		// Cabinet pictures show dials and gauges
+		// Maybe this is for lamps and stuff, or
+		// maybe just debug.
+		// They are all written in a block at 0x00000944
+		case 0x42:
+		case 0x44:
+		case 0x48:
+		case 0x4a:
+		case 0x4c:
+		case 0x80:
+		case 0x82:
+		case 0x84:
+			break;
+
+		default:
+			LOG_UNKNOWN_WRITE
 			break;
 	}
+}
+
+static READ8_HANDLER( soundport_r )
+{
+	return io_ram[0] & 0xff;
 }
 
 static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -238,51 +382,61 @@ static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(MRA16_RAM, tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0c4000, 0x0cffff) AM_RAM
-	AM_RANGE(0x0e0008, 0x0e0009) AM_WRITE(master_send) /*Master->Slave*/
-//  AM_RANGE(0x0e000a, 0x0e000b) AM_READ(master_receive_2)
-	AM_RANGE(0x0e0010, 0x0e0011) AM_READ(master_receive) /*Slave->Master*/
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(share_r, share_w) AM_BASE(&shared_ram)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(network_r,network_w) AM_BASE(&com_ram)
+	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE(&io_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x07fff8, 0x07fff9) AM_READ(slave_receive) /*Master->Slave*/
-	AM_RANGE(0x07fffa, 0x07fffb) AM_READ(slave_receive) /*Mirror?*/
-	AM_RANGE(0x080000, 0x083fff) AM_RAM/*Work RAM*/
+	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&slave_data)
-	AM_RANGE(0x110000, 0x1101ff) AM_RAM
-	AM_RANGE(0x140000, 0x1401ff) AM_READWRITE(network_r,network_w) AM_BASE(&com_ram)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(share_r, share_w)
+	AM_RANGE(0x140002, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
-/*WRONG*/
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
 	AM_RANGE(0xa000, 0xa000 ) AM_READWRITE(Y8950_status_port_0_r,Y8950_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001 ) AM_WRITE(Y8950_write_port_0_w)
-	AM_RANGE(0xa005, 0xa006 ) AM_READ(master_to_sound)
+	AM_RANGE(0xa001, 0xa001 ) AM_READWRITE(soundport_r,Y8950_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000 ) AM_READWRITE(Y8950_status_port_1_r,Y8950_control_port_1_w)
 	AM_RANGE(0xc001, 0xc001 ) AM_WRITE(Y8950_write_port_1_w)
 ADDRESS_MAP_END
 
 INPUT_PORTS_START( cybertnk )
-	/*Some inputs maps directly in ram,current implementation doesn't use it ATM*/
-	PORT_START_TAG("HAND1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // MG 1
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // Cannon 1
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // MG 2
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // Cannon 2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("HAND2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+	PORT_START_TAG("TRAVERSE")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
 
-	PORT_START_TAG("HAND3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+	PORT_START_TAG("ELEVATE")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
 
-	PORT_START_TAG("HAND4")
-	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_START_TAG("ACCEL")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
+
+	PORT_START_TAG("HANDLE")
+	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(1)
 
 
-	PORT_START_TAG("DSW1-2")
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -307,29 +461,31 @@ INPUT_PORTS_START( cybertnk )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Test ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START_TAG("DSW3")
@@ -357,6 +513,7 @@ INPUT_PORTS_START( cybertnk )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
 	PORT_BIT( 	  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -465,8 +622,8 @@ MACHINE_DRIVER_END
 
 ROM_START( cybertnk )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )
-	ROM_LOAD16_BYTE( "p1a",   0x00000, 0x20000, CRC(de7ff83a) SHA1(64a34443b532db24ec2c86f0e288eaf12a2212af) )
-	ROM_LOAD16_BYTE( "p2a",   0x00001, 0x20000, CRC(9b6afa26) SHA1(387a6eb6e5da9752869fcc6433cc7516a28d6d30) )
+	ROM_LOAD16_BYTE( "p1a",   0x00000, 0x20000, BAD_DUMP CRC(de7ff83a) SHA1(64a34443b532db24ec2c86f0e288eaf12a2212af) )
+	ROM_LOAD16_BYTE( "p2a",   0x00001, 0x20000, BAD_DUMP CRC(9b6afa26) SHA1(387a6eb6e5da9752869fcc6433cc7516a28d6d30) )
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 )
 	ROM_LOAD16_BYTE( "subl",   0x00000, 0x10000, CRC(3814a2eb) SHA1(252800b21f5cfada34ef5208cda33088daab132b) )
@@ -541,4 +698,4 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
 
-GAME( 1990, cybertnk,  0,       cybertnk,  cybertnk,  0, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1990, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NO_SOUND|GAME_NOT_WORKING )

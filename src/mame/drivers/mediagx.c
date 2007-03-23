@@ -305,7 +305,7 @@ static READ32_HANDLER( disp_ctrl_r )
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (cpu_getscanline() >= frame_height)
+			if (video_screen_get_vpos(0) >= frame_height)
 			{
 				r &= ~0x40000000;
 			}
@@ -593,7 +593,7 @@ static UINT32 ad1847_sample_rate;
 static void sound_timer_callback(int num)
 {
 	ad1847_sample_counter = 0;
-	timer_adjust(sound_timer, TIME_IN_MSEC(10), 0, 0);
+	mame_timer_adjust(sound_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
 
 	dmadac_transfer(0, 1, 0, 1, dacl_ptr, dacl);
 	dmadac_transfer(1, 1, 0, 1, dacr_ptr, dacr);
@@ -769,8 +769,8 @@ static MACHINE_RESET(mediagx)
 	dacl = auto_malloc(65536 * sizeof(INT16));
 	dacr = auto_malloc(65536 * sizeof(INT16));
 
-	sound_timer = timer_alloc(sound_timer_callback);
-	timer_adjust(sound_timer, TIME_IN_MSEC(10), 0, 0);
+	sound_timer = mame_timer_alloc(sound_timer_callback);
+	mame_timer_adjust(sound_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
 
 	dmadac_enable(0, 2, 1);
 }
@@ -783,7 +783,6 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_CPU_IO_MAP(mediagx_io, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(mediagx)
 

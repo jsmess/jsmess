@@ -75,7 +75,7 @@ static UINT8 lghost_value, lghost_select;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void);
+extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
@@ -175,7 +175,7 @@ static void system18_generic_init(int _rom_board)
 	segaic16_memory_mapper_init(0, region_info_list[rom_board], sound_w, sound_r);
 
 	/* init the FD1094 */
-	fd1094_driver_init();
+	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;

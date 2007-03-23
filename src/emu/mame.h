@@ -15,6 +15,7 @@
 #include "mamecore.h"
 #include "video.h"
 #include "restrack.h"
+#include "options.h"
 #include <stdarg.h>
 
 #ifdef MESS
@@ -53,6 +54,7 @@
 /* MESS vs. MAME abstractions */
 #ifndef MESS
 #define APPNAME					"MAME"
+#define APPNAME_LOWER			"mame"
 #define CONFIGNAME				"mame"
 #define APPLONGNAME				"M.A.M.E."
 #define CAPGAMENOUN				"GAME"
@@ -62,6 +64,7 @@
 #define HISTORYNAME				"History"
 #else
 #define APPNAME					"MESS"
+#define APPNAME_LOWER			"mess"
 #define CONFIGNAME				"mess"
 #define APPLONGNAME				"M.E.S.S."
 #define CAPGAMENOUN				"SYSTEM"
@@ -218,48 +221,8 @@ struct _mame_system_time
 
 
 /***************************************************************************
-    OPTIONS PASSED FROM THE FRONTEND
-***************************************************************************/
-
-#ifdef MESS
-/*
- * This is a filename and it's associated peripheral type
- * The types are defined in device.h (IO_...)
- */
-struct ImageFile
-{
-	const char *name;
-	iodevice_t device_type;
-	const char *device_tag;
-	int device_index;
-};
-#endif /* MESS */
-
-
-/* The host platform should fill these fields with the preferences specified in the GUI */
-/* or on the commandline. */
-#ifdef MESS
-typedef struct _global_options global_options;
-struct _global_options
-{
-	UINT32	ram;
-	struct ImageFile image_files[32];
-	int		image_count;
-	int		disable_normal_ui;
-	int		min_width;		/* minimum width for the display */
-	int		min_height;		/* minimum height for the display */
-};
-#endif /* MESS */
-
-
-
-/***************************************************************************
     GLOBALS
 ***************************************************************************/
-
-#ifdef MESS
-extern global_options options;
-#endif
 
 extern running_machine *Machine;
 extern const char *mame_disclaimer;

@@ -275,7 +275,7 @@ static void cdp1869_draw_char(mame_bitmap *bitmap, int x, int y, UINT16 pramaddr
 	for (i = 0; i < cdp1869_get_lines(); i++)
 	{
 		UINT8 data = cdp1869.cram[addr];
-		
+
 		UINT8 colorbits = cdp1869.color_callback(data, addr, pramaddr);
 
 		int pcb = colorbits & 0x01;

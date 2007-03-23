@@ -37,7 +37,7 @@ static void ram_init(const game_driver *gamedrv)
 	UINT32 specified_ram = 0;
 
 	/* parse RAM option */
-	ramsize_string = options_get_string(OPTION_RAMSIZE);
+	ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
 	if (ramsize_string != NULL)
 	{
 		specified_ram = ram_parse_string(ramsize_string);
@@ -155,7 +155,7 @@ void devices_init(running_machine *machine)
 			dev_name = device_instancename(&dev->devclass, id);
 
 			/* is an image specified for this image */
-			image_name = options_get_string(dev_name);
+			image_name = options_get_string(mame_options(), dev_name);
 			if (image_name != NULL)
 			{
 				/* try to load this image */

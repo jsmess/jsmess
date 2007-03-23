@@ -9,6 +9,7 @@
  Puzzle Club (set 1)            (c) 2000 Yun Sung    YS-2113
  Puzzle Club (set 2)            (c) 2000 Yun Sung    YS-2111
  Garogun Seroyang               (c) 2000 Yun Sung    YS-2111
+ 7 Ordi                         (c) 2002 Yun Sung    YS-2118B
  Wonder Stick                   (c) ???? Yun Sung    YS-2320
 
  driver by Pierpaolo Prazzoli
@@ -172,7 +173,45 @@ Stephh's notes (based on the games M68000 code and some tests) :
        * level 3 : +1
        * level 5 : +2
 
-7) 'wondstck'
+7) '7ordi'
+
+  - Here are what the buttons do in "Test Mode" :
+      * START1   : back
+      * BUTTON1  : left
+      * BUTTON2  : right
+      * BUTTON3  : fire
+      * BUTTON4  : down
+      * BUTTON5  : up
+  - Here are what the buttons do outside "Test Mode" :
+      * COIN1    : adds 50 to 1000 credits depending on "Coinage" settings
+      * SERVICE1 : adds 10000 credits
+      * SERVICE2 : reset game AND number of credits
+                   (but Dip Switches aren't read again)
+  - Here are what the buttons do when the cards are just drawn :
+      * BUTTON1  : select card 1
+      * BUTTON2  : select card 2
+      * BUTTON3  : select card 3
+  - Here are what the buttons do when in-game :
+      * BUTTON1  : die
+      * BUTTON2  : check/call
+      * BUTTON3  : bet/raise
+  - Here are what the buttons do when you win a hand :
+      * BUTTON2  : bonus game
+      * BUTTON3  : take
+  - Here are what the buttons do when you play bonus game :
+      * START1   : pool
+      * BUTTON1  : low (Ace, 2, 3, 4, 5, 6)
+      * BUTTON6  : high (8, 9, 10, Jack, Queen, King)
+  - Here are what the buttons do when you collect and
+    "Winnings" Dip Switch set to "Medals and Credits"
+    ("do you want to draw a medal ?" question) :
+      * BUTTON5 : Yes
+      * BUTTON6 : No
+  - As hopper and other mecanisms aren't emulated, you can't
+    draw a medal (winnings are always converted to credits).
+    I hope that someone will be able to fix that as I can't do it.
+
+8) 'wondstck'
 
   - Here are what the buttons do :
       * BUTTON1 : trace
@@ -476,17 +515,6 @@ INPUT_PORTS_START( searchp2 )
 	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW2:8" )
 	PORT_DIPNAME( 0x0600, 0x0600, "Lucky Chance" )          PORT_DIPLOCATION("SW2:7,6")   // See notes
 	PORT_DIPSETTING(      0x0600, "Table 1" )
-
-
-
-
-
-
-
-
-
-
-
 	PORT_DIPSETTING(      0x0400, "Table 2" )
 	PORT_DIPSETTING(      0x0200, "Table 3" )
 	PORT_DIPSETTING(      0x0000, "Table 4" )
@@ -638,6 +666,75 @@ INPUT_PORTS_START( garogun )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xff40, IP_ACTIVE_LOW, IPT_UNUSED )           // tested in service mode
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( 7ordi )
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "High-Low Error" )        PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0001, "-500" )
+	PORT_DIPSETTING(      0x0000, "Lose All" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Minimum Credits" )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0002, "300" )
+	PORT_DIPSETTING(      0x0000, "500" )
+	PORT_DIPNAME( 0x000c, 0x0000, "Credit Limit" )          PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(      0x000c, "10000" )
+	PORT_DIPSETTING(      0x0008, "30000" )
+	PORT_DIPSETTING(      0x0004, "50000" )
+	PORT_DIPSETTING(      0x0000, "100000" )
+	PORT_DIPNAME( 0x0030, 0x0030, "Bet" )                   PORT_DIPLOCATION("SW1:4,3")
+	PORT_DIPSETTING(      0x0030, "50 Credits" )
+	PORT_DIPSETTING(      0x0020, "100 Credits" )
+	PORT_DIPSETTING(      0x0010, "150 Credits" )
+	PORT_DIPSETTING(      0x0000, "200 Credits" )
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(      0x00c0, "1 Coin 50 Credits" )
+	PORT_DIPSETTING(      0x0080, "1 Coin 100 Credits" )
+	PORT_DIPSETTING(      0x0040, "1 Coin 500 Credits" )
+	PORT_DIPSETTING(      0x0000, "1 Coin 1000 Credits" )
+	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW2:8" )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")     // Not even sure it is used
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, "Winnings" )              PORT_DIPLOCATION("SW2:6")     // See notes
+	PORT_DIPSETTING(      0x0400, "Medals and Credits" )
+	PORT_DIPSETTING(      0x0000, "Credits only" )
+	PORT_DIPNAME( 0x1800, 0x1800, "Medals Table" )          PORT_DIPLOCATION("SW2:5,4")   // To be confirmed
+	PORT_DIPSETTING(      0x1800, "x1.0" )                  /*  50  35  25  15   5 */
+	PORT_DIPSETTING(      0x1000, "x1.4" )                  /*  70  50  35  20   7 */
+	PORT_DIPSETTING(      0x0800, "x2.0" )                  /* 100  70  50  30  10 */
+	PORT_DIPSETTING(      0x0000, "x3.0" )                  /* 150 100  75  45  15 */
+	PORT_DIPNAME( 0xe000, 0xe000, "Payout %" )              PORT_DIPLOCATION("SW2:3,2,1")
+	PORT_DIPSETTING(      0xe000, "90%" )
+	PORT_DIPSETTING(      0xc000, "85%" )
+	PORT_DIPSETTING(      0xa000, "80%" )
+	PORT_DIPSETTING(      0x8000, "75%" )
+	PORT_DIPSETTING(      0x6000, "70%" )
+	PORT_DIPSETTING(      0x4000, "65%" )
+	PORT_DIPSETTING(      0x2000, "60%" )
+	PORT_DIPSETTING(      0x0000, "55%" )
+
+	PORT_START	/* Coins */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0xfffe, IP_ACTIVE_LOW,  IPT_UNUSED )          // tested in service mode
+
+	PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME( "Reset Credits" )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( wondstck )
@@ -926,7 +1023,7 @@ static MACHINE_DRIVER_START( nmg5 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 3579545) /* 14.31818MHz OSC divided by 4 */
+	MDRV_SOUND_ADD(YM3812, 4000000) /* 4MHz */
 	MDRV_SOUND_CONFIG(ym3812_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -967,6 +1064,14 @@ static MACHINE_DRIVER_START( searchp2 )
 	MDRV_SCREEN_REFRESH_RATE(55) // !
 
 	MDRV_GFXDECODE(pclubys_gfxdecodeinfo)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( 7ordi )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(nmg5)
+
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
 MACHINE_DRIVER_END
 
 
@@ -1103,8 +1208,8 @@ YS-1905
 |----------------------------------------------------|
 |  U128       U137      U7       62256        U97    |
 |  6116   Z80  M6295    U2       62256               |
-|  U6612              PAL                     U96    |
-| U6614        16MHz  PAL   PAL                      |
+|  YM3812             PAL                     U96    |
+| YM3014       16MHz  PAL   PAL                      |
 | 324                  |-----|                U105   |
 |         62256        |68000|                       |
 |J        62256 6116   |     |                U83    |
@@ -1125,12 +1230,12 @@ YS-1905
 |----------------------------------------------------|
 
 Notes:
-      68000 @ 16MHz
-      Z80   @ 4.0MHz [16/4]
-      U6612 @ 4.0MHz [16/4]
-      M6295 @ 1.0MHz [16/16]. Pin 7 HIGH
-      VSync   55Hz
-      HSync   25.0kHz (!)
+      68000  @ 16MHz
+      Z80    @ 4.0MHz [16/4]
+      YM3812 @ 4.0MHz [16/4] (badged as U6612 & U6614 for YM3014)
+      M6295  @ 1.0MHz [16/16]. Pin 7 HIGH
+      VSync    55Hz
+      HSync    25.0kHz (!)
 
 */
 
@@ -1306,6 +1411,78 @@ ROM_START( garogun )
 	ROM_LOAD( "s.u137", 0x00000, 0x80000, CRC(3eadc21a) SHA1(b1c131c3f59adbc370696b277f8f04681212761d) )
 ROM_END
 
+/*
+
+7 Ordi
+Yunsung, 2002 (Sticker is printed 2002. 1. 05)
+
+PCB Layout
+----------
+
+YS-2118B
++----------------------------------------------+
+|  5.u128   3.u137   p1.u7  62256   1.u97      |
+|  6116   Z80  6295  p2.u2  62256   2.u95      |
+|  YM3812   16MHz     PAL           3.u105     |
+|  YM3014             PAL  PAL      4.u83      |
+|          62256    68000 BAT       5.u82      |
+|          62256                    14.38383MHz|
+|                           6116  PAL     PAL  |
+|J           6116           6116  PAL          |
+|A           6116  A40MX04-F      PAL          |
+|M           6116                 PAL          |
+|M           6116                 PAL          |
+|A DIP1 DIP2                                   |
+|            62256  QL12X16B                   |
+|            62256                             |
+|                                              |
+|     6.u64 10.u69  A40MX04-F                  |
+|     7.u74 11.u68                             |
+| SW1 8.u63 12.u80  A40MX04-F    PAL           |
+|     9.u73 13.u79               PAL           |
++----------------------------------------------+
+
+Notes (originaly for YS-2113, but should apply):
+      68000 clock : 16.000MHz
+      Z80 clock   : 4.000MHz (16/4)
+      M6295 clock : 1.000MHz (16/16). Sample Rate = 1000000 / 132
+      YM3812 clock: 4.000MHz (16/4). (badged as U6612 and U6614 for the YM3014)
+      VSync       : 60Hz
+
+*/
+
+ROM_START( 7ordi )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "p1.u7", 0x000000, 0x20000, CRC(ebf21862) SHA1(ffbea41adb3f2ab276b2785bd6f98bb6ac622edd) )
+	ROM_LOAD16_BYTE( "p2.u2", 0x000001, 0x20000, CRC(f7943a6a) SHA1(1d36d92c0d349394ba71929215b704d34e5be87e) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_LOAD( "4.u128", 0x00000, 0x10000, CRC(ed73b565) SHA1(cb473b2b4ca9b9facf3bcb033f1ca9667bb5c587) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE ) /* 8x8x8 */
+	ROM_LOAD( "8.u63",  0x000000, 0x80000, CRC(ed8dfe5d) SHA1(a4ac6bf80682b978158c44a62c8abb117f25c4db) )
+	ROM_LOAD( "11.u68", 0x080000, 0x80000, CRC(742764a7) SHA1(c38a7ea76034d5c34d30f6caa6dc12b1253de2a8) )
+	ROM_LOAD( "9.u73",  0x100000, 0x80000, CRC(2b76efd0) SHA1(3ae0b708a94ed04516f451be833ea02d9ee8d645) )
+	ROM_LOAD( "13.u79", 0x180000, 0x80000, CRC(3892b356) SHA1(2be4479bdce2cbff6cfa26ab1d58aef2923614cd) )
+	ROM_LOAD( "6.u64",  0x200000, 0x80000, CRC(5c0b0838) SHA1(f91be789ea90c64871a09ca246dcd680fe986ef1) )
+	ROM_LOAD( "10.u69", 0x280000, 0x80000, CRC(c15db1a4) SHA1(3377c2ffd46ac5e3b4e7852a43aa9eaad3b0b8f8) )
+	ROM_LOAD( "7.u74",  0x300000, 0x80000, CRC(6910f754) SHA1(b0c29a205e66f21ff1bebac79505d1d3170d923f) )
+	ROM_LOAD( "12.u80", 0x380000, 0x80000, CRC(4c5dd9ef) SHA1(e22b2d5652ad97c8d84168f8c4851437e3f07c97) )
+
+	ROM_REGION( 0x280000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x5 */
+	ROM_LOAD( "4.u83",  0x000000, 0x80000, CRC(a2569cf4) SHA1(7f65a0ea79c38aa89d06466b0ce5e3846073c676) )
+	ROM_LOAD( "5.u82",  0x080000, 0x80000, CRC(045e548e) SHA1(7135ce56c3987f3d7e0514670836603fc95dfc84) )
+	ROM_LOAD( "3.u105", 0x100000, 0x80000, CRC(04c1dbf9) SHA1(afca98aeac6095992611eaaa958952a40a0ffd23) )
+	ROM_LOAD( "2.u96",  0x180000, 0x80000, CRC(11fa7de8) SHA1(a5a29589f37899720901c6f802390f91ce308d87) )
+	ROM_LOAD( "1.u97",  0x200000, 0x80000, CRC(cd1ffe88) SHA1(f5dfc119f2811e7cae920637a24c25f9d1f7e8df) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "3.u137", 0x00000, 0x20000, CRC(669ed310) SHA1(f93dc3c20f86bd6a0bff9947d805358c82a04c97) )
+	ROM_RELOAD(0x20000,0x20000)
+	ROM_RELOAD(0x40000,0x20000) // it attempts to bank the sample rom even tho there is only 1 bank
+	ROM_RELOAD(0x60000,0x20000)
+ROM_END
+
 DRIVER_INIT( prot_val_00 )
 {
 	prot_val = 0x00;
@@ -1314,6 +1491,11 @@ DRIVER_INIT( prot_val_00 )
 DRIVER_INIT( prot_val_10 )
 {
 	prot_val = 0x10;
+}
+
+DRIVER_INIT( prot_val_20 )
+{
+	prot_val = 0x20;
 }
 
 DRIVER_INIT( prot_val_40 )
@@ -1328,4 +1510,5 @@ GAME( 1999, searchp2, 0,       searchp2, searchp2, prot_val_10, ROT0, "Yun Sung"
 GAME( 2000, pclubys,  0,       pclubys,  pclubys,  prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 2000, pclubysa, pclubys, pclubys,  pclubys,  prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 2000, garogun,  0,       garogun,  garogun,  prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 2002, 7ordi,    0,       7ordi,    7ordi,    prot_val_20, ROT0, "Yun Sung", "7 Ordi", GAME_SUPPORTS_SAVE )
 GAME( ????, wondstck, 0,       nmg5,     wondstck, prot_val_00, ROT0, "Yun Sung", "Wonder Stick", GAME_SUPPORTS_SAVE )

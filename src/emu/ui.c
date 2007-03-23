@@ -315,10 +315,14 @@ int ui_display_startup_screens(int show_disclaimer)
 #else
 	const int maxstate = 3;
 #endif
-	int str = options_get_int(OPTION_SECONDS_TO_RUN);
-	int show_gameinfo = (str > 0 && str < 60*5) ? FALSE : !options_get_bool(OPTION_SKIP_GAMEINFO);
-	int show_warnings = (str > 0 && str < 60*5) ? FALSE : TRUE;
+	int str = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
+	int show_gameinfo = !options_get_bool(mame_options(), OPTION_SKIP_GAMEINFO);
+	int show_warnings = TRUE;
 	int state;
+
+	/* disable everything if we are using -str */
+	if (str > 0 && str < 60*5)
+		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
 	/* initialize the on-screen display system */
 	slider_init();
@@ -408,7 +412,7 @@ void ui_update_and_render(void)
 	/* if we're paused, dim the whole screen */
 	if (mame_get_phase(Machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(Machine)))
 	{
-		int alpha = (1.0f - options_get_float_range(OPTION_PAUSE_BRIGHTNESS, 0.0f, 1.0f)) * 255.0f;
+		int alpha = (1.0f - options_get_float_range(mame_options(), OPTION_PAUSE_BRIGHTNESS, 0.0f, 1.0f)) * 255.0f;
 		if (alpha > 255)
 			alpha = 255;
 		if (alpha >= 0)
@@ -1218,7 +1222,7 @@ static UINT32 handler_ingame(UINT32 state)
 		ui_draw_text_full(profiler_get_text(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 
 	/* let the cheat engine display its stuff */
-	if (options_get_bool(OPTION_CHEAT))
+	if (options_get_bool(mame_options(), OPTION_CHEAT))
 		cheat_display_watches();
 
 	/* display any popup messages */
@@ -1533,7 +1537,7 @@ static void slider_init(void)
 		if ((in->type & 0xff) == IPT_ADJUSTER)
 			slider_config(&slider_list[slider_count++], 0, in->default_value >> 8, 100, 1, slider_adjuster, in - Machine->input_ports);
 
-	if (options_get_bool(OPTION_CHEAT))
+	if (options_get_bool(mame_options(), OPTION_CHEAT))
 	{
 		/* add CPU overclocking */
 		numitems = cpu_gettotalcpu();

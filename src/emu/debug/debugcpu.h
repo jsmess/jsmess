@@ -126,6 +126,7 @@ struct _debug_cpu_info
 	int 			(*read)(int space, UINT32 offset, int size, UINT64 *value); /* memory read routine */
 	int				(*write)(int space, UINT32 offset, int size, UINT64 value); /* memory write routine */
 	int				(*readop)(UINT32 offset, int size, UINT64 *value);	/* opcode read routine */
+	int				(*instrhook)(offs_t pc);	/* per-instruction callback hook */
 };
 
 
@@ -184,6 +185,7 @@ void				debug_flush_traces(void);
 void				debug_vblank_hook(void);
 void				debug_interrupt_hook(int cpunum, int irqline);
 void				debug_get_memory_hooks(int cpunum, debug_hook_read_ptr *read, debug_hook_write_ptr *write);
+void				debug_set_instruction_hook(int cpunum, int (*hook)(offs_t pc));
 
 /* execution control */
 void				debug_cpu_single_step(int numsteps);

@@ -176,6 +176,7 @@ CPUS += COP410
 CPUS += TLCS90
 # CPUS += MB8843
 CPUS += MB8844
+CPUS += MB86233
 # CPUS += SSP1610
 # CPUS += APEXC
 # CPUS += CP1610
@@ -531,7 +532,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/skydiver.o $(AUDIO)/skydiver.o $(VIDEO)/skydiver.o \
 	$(DRIVERS)/skyraid.o $(VIDEO)/skyraid.o \
 	$(DRIVERS)/sprint2.o $(AUDIO)/sprint2.o $(VIDEO)/sprint2.o \
-	$(DRIVERS)/sprint4.o $(VIDEO)/sprint4.o \
+	$(DRIVERS)/sprint4.o $(VIDEO)/sprint4.o $(AUDIO)/sprint4.o \
 	$(DRIVERS)/sprint8.o $(VIDEO)/sprint8.o \
 	$(DRIVERS)/starshp1.o $(VIDEO)/starshp1.o \
 	$(DRIVERS)/starwars.o $(MACHINE)/starwars.o $(AUDIO)/starwars.o \
@@ -543,7 +544,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/tourtabl.o $(VIDEO)/tia.o \
 	$(DRIVERS)/triplhnt.o $(AUDIO)/triplhnt.o $(VIDEO)/triplhnt.o \
 	$(DRIVERS)/tunhunt.o $(VIDEO)/tunhunt.o \
-	$(DRIVERS)/ultratnk.o $(AUDIO)/ultratnk.o $(VIDEO)/ultratnk.o \
+	$(DRIVERS)/ultratnk.o $(VIDEO)/ultratnk.o \
 	$(DRIVERS)/videopin.o $(AUDIO)/videopin.o $(VIDEO)/videopin.o \
 	$(DRIVERS)/vindictr.o $(VIDEO)/vindictr.o \
 	$(DRIVERS)/wolfpack.o $(VIDEO)/wolfpack.o \
@@ -759,8 +760,13 @@ $(MAMEOBJ)/greyhnd.a: \
 
 $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/csk.o $(VIDEO)/csk.o \
+	$(DRIVERS)/ddz.o \
+	$(DRIVERS)/dunhuang.o \
 	$(DRIVERS)/goldstar.o $(VIDEO)/goldstar.o \
 	$(DRIVERS)/igs_blit.o \
+	$(DRIVERS)/igs_180.o \
+	$(DRIVERS)/igs_m027.o \
+	$(DRIVERS)/igs_m68.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
@@ -1164,7 +1170,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segas16b.o $(VIDEO)/segas16b.o \
 	$(DRIVERS)/segas18.o $(VIDEO)/segas18.o \
 	$(DRIVERS)/segas32.o $(MACHINE)/segas32.o $(VIDEO)/segas32.o \
-	$(DRIVERS)/segasyse.o $(VIDEO)/segasyse.o \
+	$(DRIVERS)/segae.o $(DRIVERS)/segasyse.o $(VIDEO)/segasyse.o \
 	$(DRIVERS)/segaxbd.o $(VIDEO)/segaxbd.o \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/ssf2md.o \
@@ -1182,6 +1188,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/zaxxon.o $(AUDIO)/zaxxon.o $(VIDEO)/zaxxon.o \
 	$(MACHINE)/fd1089.o \
 	$(MACHINE)/fd1094.o \
+	$(MACHINE)/fddebug.o \
 	$(MACHINE)/mc8123.o \
 	$(MACHINE)/s16fd.o \
 	$(MACHINE)/s24fd.o \
@@ -1533,6 +1540,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/go2000.o \
+	$(DRIVERS)/good.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
 	$(DRIVERS)/gunpey.o \

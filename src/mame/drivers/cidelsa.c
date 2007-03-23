@@ -16,7 +16,8 @@
 /* CDP1802 Interface */
 
 static int cdp1869_prd;
-extern int cdp1869_pcb;
+static int cdp1869_pcb;
+static UINT8 cidelsa_pcb[0x800];  // 2048x1 bit PCB ram
 
 static int cidelsa_in_ef(void)
 {
@@ -183,6 +184,20 @@ WRITE8_HANDLER ( draco_out1_w )
     draco_sound = (data & 0xe0) >> 5;
 }
 
+WRITE8_HANDLER ( cidelsa_charram_w )
+{
+	int addr = cdp1869_get_cma(offset);
+	cidelsa_pcb[addr] = activecpu_get_reg(CDP1802_Q);
+	cdp1869_charram_w(offset, data);
+}
+
+READ8_HANDLER ( cidelsa_charram_r )
+{
+	int addr = cdp1869_get_cma(offset);
+	cdp1869_pcb = cidelsa_pcb[addr];
+	return cdp1869_charram_r(offset);
+}
+
 /* Memory Maps */
 
 // Destroyer
@@ -190,14 +205,14 @@ WRITE8_HANDLER ( draco_out1_w )
 static ADDRESS_MAP_START( destryer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cidelsa_charram_r, cidelsa_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( destryea_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cidelsa_charram_r, cidelsa_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
@@ -213,7 +228,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( altair_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM
-	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cidelsa_charram_r, cidelsa_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
@@ -230,7 +245,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( draco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cdp1869_charram_r, cdp1869_charram_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_READWRITE(cidelsa_charram_r, cidelsa_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
 
@@ -568,12 +583,22 @@ MACHINE_DRIVER_END
 
 /* Driver Initialization */
 
+static UINT8 cidelsa_get_color_bits(UINT8 cramdata, UINT16 cramaddr, UINT16 pramaddr)
+{
+	int ccb0 = (cramdata & 0x40) >> 4;
+	int ccb1 = (cramdata & 0x80) >> 6;
+	int pcb = cidelsa_pcb[cramaddr];
+
+	return ccb0 + ccb1 + pcb;
+}
+
 static const CDP1869_interface destryer_CDP1869_interface =
 {
 	CDP1869_PAL,
 	REGION_INVALID,
 	0x800,
-	0x400
+	0x400,
+	cidelsa_get_color_bits
 };
 
 DRIVER_INIT( cidelsa )
@@ -586,7 +611,8 @@ static const CDP1869_interface draco_CDP1869_interface =
 	CDP1869_PAL,
 	REGION_INVALID,
 	0x800,
-	0x800
+	0x800,
+	cidelsa_get_color_bits
 };
 
 DRIVER_INIT( draco )

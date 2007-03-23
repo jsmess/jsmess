@@ -159,8 +159,13 @@ static int K001005_fifo_write_ptr = 0;
 static UINT32 *K001005_3d_fifo;
 static int K001005_3d_fifo_ptr = 0;
 
+static int tex_mirror_table[4][128];
+
+static int update_30fps;
+
 int K001005_init(void)
 {
+	int i;
 	K001005_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
 	K001005_zbuffer = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
@@ -173,6 +178,14 @@ int K001005_init(void)
 	K001005_fifo = auto_malloc(0x800 * sizeof(UINT32));
 
 	K001005_3d_fifo = auto_malloc(0x10000 * sizeof(UINT32));
+
+	for (i=0; i < 128; i++)
+	{
+		tex_mirror_table[0][i] = i & 0x3f;
+		tex_mirror_table[1][i] = i & 0x3f;
+		tex_mirror_table[2][i] = ((i & 0x3f) >= 0x20) ? (0x1f - (i & 0x1f)) : i & 0x1f;
+		tex_mirror_table[3][i] = ((i & 0x7f) >= 0x40) ? (0x3f - (i & 0x3f)) : i & 0x3f;
+	}
 
 	return 0;
 }
@@ -284,8 +297,6 @@ READ32_HANDLER( K001005_r )
 	return 0;
 }
 
-static UINT32 poly_r, poly_g, poly_b;
-
 WRITE32_HANDLER( K001005_w )
 {
 	switch(offset)
@@ -342,9 +353,9 @@ WRITE32_HANDLER( K001005_w )
 
 		case 0x100: break;
 
-		case 0x10a:		poly_r = data & 0xff; break;
-		case 0x10b:		poly_g = data & 0xff; break;
-		case 0x10c:		poly_b = data & 0xff; break;
+	//  case 0x10a:     poly_r = data & 0xff; break;
+	//  case 0x10b:     poly_g = data & 0xff; break;
+	//  case 0x10c:     poly_b = data & 0xff; break;
 
 		case 0x11a:
 			K001005_status = data;
@@ -395,13 +406,11 @@ static void draw_triangle(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
 	cliprect.max_x = Machine->screen[0].width-1;
 	cliprect.max_y = Machine->screen[0].height-1;
 
-	vert[0].x = v1.x;	vert[0].y = v1.y;	vert[0].p[0] = (INT32)(v1.z);
-	vert[1].x = v2.x;	vert[1].y = v2.y;	vert[1].p[0] = (INT32)(v2.z);
-	vert[2].x = v3.x;	vert[2].y = v3.y;	vert[2].p[0] = (INT32)(v3.z);
+	vert[0].x = v1.x;	vert[0].y = v1.y;	vert[0].p[0] = (UINT32)(v1.z);
+	vert[1].x = v2.x;	vert[1].y = v2.y;	vert[1].p[0] = (UINT32)(v2.z);
+	vert[2].x = v3.x;	vert[2].y = v3.y;	vert[2].p[0] = (UINT32)(v3.z);
 
 	scans = setup_triangle_1(&vert[0], &vert[1], &vert[2], &cliprect);
-
-	color |= 0xff000000;
 
 	if (scans)
 	{
@@ -418,28 +427,23 @@ static void draw_triangle(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
 
 			x1 = scan->sx;
 			x2 = scan->ex;
-			/*if (x1 < cliprect.min_x)
-                x1 = cliprect.min_x;
-            if (x2 > cliprect.max_x)
-                x2 = cliprect.max_x;
-            */
 
 			z = scans->scanline[y - scans->sy].p[0];
 
-			//if (x1 < cliprect.max_x && x2 > cliprect.min_x)
+			for (x = x1; x <= x2; x++)
 			{
-				for (x = x1; x <= x2; x++)
-				{
-					UINT32 iz = (UINT64)(z) >> 16;
+				UINT32 iz = (UINT64)(z) >> 16;
 
-					if (iz < zb[x])
+				if (iz <= zb[x])
+				{
+					if (color & 0xff000000)
 					{
 						fb[x] = color;
 						zb[x] = iz;
 					}
-
-					z += dz;
 				}
+
+				z += dz;
 			}
 		}
 	}
@@ -448,12 +452,21 @@ static void draw_triangle(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
 static int texture_x, texture_y;
 static int texture_page;
 static int texture_palette;
+static int texture_mirror_x;
+static int texture_mirror_y;
+
+#define ZBUFFER_SCALE		16777216.0
+#define ZDIVIDE_SHIFT		24
 
 static void draw_triangle_tex(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
 {
+	double z1, z2, z3;
+	double w1, w2, w3;
 	int x, y;
 	struct poly_vertex vert[3];
 	const struct poly_scanline_data *scans;
+
+	float maxz;
 
 	UINT8 *texrom = memory_region(REGION_GFX1) + (texture_page * 0x40000);
 	int pal_chip = (texture_palette & 0x8) ? 1 : 0;
@@ -464,75 +477,115 @@ static void draw_triangle_tex(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
 	cliprect.min_y = 0;
 	cliprect.max_x = Machine->screen[0].width-1;
 	cliprect.max_y = Machine->screen[0].height-1;
+/*
+    vert[0].x    = v1.x;    vert[0].y    = v1.y;
+    vert[0].p[0] = v1.u;    vert[0].p[1] = v1.v;    vert[0].p[2] = (INT32)(v1.z);
+    vert[1].x    = v2.x;    vert[1].y    = v2.y;
+    vert[1].p[0] = v2.u;    vert[1].p[1] = v2.v;    vert[1].p[2] = (INT32)(v2.z);
+    vert[2].x    = v3.x;    vert[2].y    = v3.y;
+    vert[2].p[0] = v3.u;    vert[2].p[1] = v3.v;    vert[2].p[2] = (INT32)(v3.z);
+*/
+	maxz = 0.0;
+	maxz = MAX(maxz, v1.z);
+	maxz = MAX(maxz, v2.z);
+	maxz = MAX(maxz, v3.z);
+
+	z1 = (double)(v1.z) / maxz;
+	z2 = (double)(v2.z) / maxz;
+	z3 = (double)(v3.z) / maxz;
+
+	w1 = (1.0 / z1) * ZBUFFER_SCALE;
+	w2 = (1.0 / z2) * ZBUFFER_SCALE;
+	w3 = (1.0 / z3) * ZBUFFER_SCALE;
+	v1.u = (INT32)((INT64)(v1.u * w1) >> ZDIVIDE_SHIFT);
+	v1.v = (INT32)((INT64)(v1.v * w1) >> ZDIVIDE_SHIFT);
+	v2.u = (INT32)((INT64)(v2.u * w2) >> ZDIVIDE_SHIFT);
+	v2.v = (INT32)((INT64)(v2.v * w2) >> ZDIVIDE_SHIFT);
+	v3.u = (INT32)((INT64)(v3.u * w3) >> ZDIVIDE_SHIFT);
+	v3.v = (INT32)((INT64)(v3.v * w3) >> ZDIVIDE_SHIFT);
 
 	vert[0].x    = v1.x;	vert[0].y    = v1.y;
-	vert[0].p[0] = v1.u;	vert[0].p[1] = v1.v;	vert[0].p[2] = (INT32)(v1.z);
+	vert[0].p[0] = v1.u;	vert[0].p[1] = v1.v;	vert[0].p[2] = (UINT32)(w1);	vert[0].p[3] = (UINT32)(v1.z);
 	vert[1].x    = v2.x;	vert[1].y    = v2.y;
-	vert[1].p[0] = v2.u;	vert[1].p[1] = v2.v;	vert[1].p[2] = (INT32)(v2.z);
+	vert[1].p[0] = v2.u;	vert[1].p[1] = v2.v;	vert[1].p[2] = (UINT32)(w2);	vert[1].p[3] = (UINT32)(v2.z);
 	vert[2].x    = v3.x;	vert[2].y    = v3.y;
-	vert[2].p[0] = v3.u;	vert[2].p[1] = v3.v;	vert[2].p[2] = (INT32)(v3.z);
+	vert[2].p[0] = v3.u;	vert[2].p[1] = v3.v;	vert[2].p[2] = (UINT32)(w3);	vert[2].p[3] = (UINT32)(v3.z);
 
-	scans = setup_triangle_3(&vert[0], &vert[1], &vert[2], &cliprect);
+
+	scans = setup_triangle_4(&vert[0], &vert[1], &vert[2], &cliprect);
 
 	if (scans)
 	{
-		INT64 du, dv, dz;
+		INT64 du, dv, dz, dw;
 		du = scans->dp[0];
 		dv = scans->dp[1];
-		dz = scans->dp[2];
+		dw = scans->dp[2];
+		dz = scans->dp[3];
 
 		for (y = scans->sy; y <= scans->ey; y++)
 		{
 			int x1, x2;
-			INT64 u, v, z;
+			INT64 u, v, z, w;
 			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
 			UINT32 *fb = BITMAP_ADDR32(K001005_bitmap, y, 0);
 			UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, y, 0);
 
 			x1 = scan->sx;
 			x2 = scan->ex;
-			//if (x1 < cliprect.min_x)
-			//  x1 = cliprect.min_x;
-			//if (x2 > cliprect.max_x)
-			//  x2 = cliprect.max_x;
 
 			u = scans->scanline[y - scans->sy].p[0];
 			v = scans->scanline[y - scans->sy].p[1];
-			z = scans->scanline[y - scans->sy].p[2];
+			w = scans->scanline[y - scans->sy].p[2];
+			z = scans->scanline[y - scans->sy].p[3];
 
-			//if (x1 < cliprect.max_x && x2 > cliprect.min_x)
+			for (x = x1; x <= x2; x++)
 			{
-				for (x = x1; x <= x2; x++)
+				UINT32 iz = (UINT64)(z) >> 16;
+				//int iu = u >> 16;
+				//int iv = v >> 16;
+
+				if (iz < zb[x])
 				{
-					UINT32 iz = (UINT64)(z) >> 16;
-					int iu = u >> 16;
-					int iv = v >> 16;
+					UINT32 color;
+					int iu, iv;
+					int iiv, iiu, texel;
 
-					if (iz < zb[x])
+					UINT32 iw = (UINT64)(w) >> 16;
+
+					if (iw)
 					{
-						int iiu = texture_x + ((iu >> 4) & 0x3f);
-						int iiv = texture_y + ((iv >> 4) & 0x3f);
-
-						int texel = texrom[((iiv & 0x1ff) * 512) + (iiu & 0x1ff)];
-						UINT32 color = K001006_palette[pal_chip][palette_index + texel];
-
-						if (color & 0xff000000)
-						{
-							fb[x] = color;
-							zb[x] = iz;
-						}
+						iu = (INT64)(u << 8) / (INT64)iw;
+						iv = (INT64)(v << 8) / (INT64)iw;
+					}
+					else
+					{
+						iu = 0;
+						iv = 0;
 					}
 
-					u += du;
-					v += dv;
-					z += dz;
+					iiu = texture_x + tex_mirror_table[texture_mirror_x][(iu >> 4) & 0x7f];
+					iiv = texture_y + tex_mirror_table[texture_mirror_y][(iv >> 4) & 0x7f];
+					texel = texrom[((iiv & 0x1ff) * 512) + (iiu & 0x1ff)];
+					color = K001006_palette[pal_chip][palette_index + texel];
+
+					if (color & 0xff000000)
+					{
+						fb[x] = color;
+						zb[x] = iz;
+					}
 				}
+
+				u += du;
+				v += dv;
+				z += dz;
+				w += dw;
 			}
 		}
 	}
 }
 
 static VERTEX prev_v[4];
+static int prev_poly_type;
 
 static void render_polygons(void)
 {
@@ -545,131 +598,148 @@ static void render_polygons(void)
 		if (K001005_3d_fifo[i] == 0x80000003)
 		{
 			VERTEX v[4];
-			int x[4], y[4];
-			int r = K001005_3d_fifo[i+6] & 0xff;
-			int g = (K001005_3d_fifo[i+6] >> 8) & 0xff;
-			int b = (K001005_3d_fifo[i+6] >> 16) & 0xff;
-			UINT32 color = (r << 16) | (g << 8) | (b);
+			int r, g, b, a;
+			UINT32 color;
+			int index = i;
+
+			++index;
 
 			for (j=0; j < 4; j++)
 			{
-				x[j] = ((K001005_3d_fifo[i+1+j] >> 0) & 0x1fff);
-				y[j] = ((K001005_3d_fifo[i+1+j] >> 16) & 0x1fff);
+				int x, y;
 
-				if (x[j] & 0x1000)
-					x[j] |= 0xffffe000;
-				if (y[j] & 0x1000)
-					y[j] |= 0xffffe000;
+				x = ((K001005_3d_fifo[index] >>  0) & 0x3fff);
+				y = ((K001005_3d_fifo[index] >> 16) & 0x1fff);
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
+				++index;
 
-				y[j] = -y[j];
-
-				x[j] += 4096;
-				y[j] += 3072;
-
-				x[j] /= 16;
-				y[j] /= 16;
-
-				v[j].x = x[j];
-				v[j].y = y[j];
+				v[j].x = ((float)(x) / 16.0f) + 256.0f;
+				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
 			}
+
+			++index;
+
+			r = (K001005_3d_fifo[index] >>  0) & 0xff;
+			g = (K001005_3d_fifo[index] >>  8) & 0xff;
+			b = (K001005_3d_fifo[index] >> 16) & 0xff;
+			a = (K001005_3d_fifo[index] >> 24) & 0xff;
+			color = (a << 24) | (r << 16) | (g << 8) | (b);
+			++index;
 
 			draw_triangle(v[0], v[1], v[2], color);
 			draw_triangle(v[0], v[2], v[3], color);
 
-			//plot_box(K001005_bitmap, x[0], y[1], x[2]-x[0], y[0]-y[1], color);
+			i = index - 1;
 		}
 		else if (K001005_3d_fifo[i] == 0x800000ae || K001005_3d_fifo[i] == 0x8000008e ||
-				 K001005_3d_fifo[i] == 0x80000096 || K001005_3d_fifo[i] == 0x800000b6)
+				 K001005_3d_fifo[i] == 0x80000096 || K001005_3d_fifo[i] == 0x800000b6 ||
+				 K001005_3d_fifo[i] == 0x8000002e || K001005_3d_fifo[i] == 0x8000000e ||
+				 K001005_3d_fifo[i] == 0x80000016 || K001005_3d_fifo[i] == 0x80000036 ||
+				 K001005_3d_fifo[i] == 0x800000aa || K001005_3d_fifo[i] == 0x800000a8 ||
+				 K001005_3d_fifo[i] == 0x800000b2)
 		{
-			UINT32 color;
-			UINT32 hdr;
+			// 0x00: xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx    Command
+			//
+			// 0x01: xxxx---- -------- -------- --------    Texture palette
+			// 0x01: -------- -------x xxxx---- --------    Texture page
+			// 0x01: -------- -------- ----x-x- x-x-x-x-    Texture X / 8
+			// 0x01: -------- -------- -----x-x -x-x-x-x    Texture Y / 8
+
+
 			VERTEX v[4];
-			int x[4], y[4];
-			int num_verts = 0;
 			int tx, ty;
+			UINT32 color = 0;
+			UINT32 header;
+			UINT32 command;
+			int num_verts = 0;
+			int index = i;
+			int poly_type = 0;
 
-			hdr = K001005_3d_fifo[i+1];
-
-		//  mame_printf_debug("Poly: %08X, %08X\n", K001005_3d_fifo[i], K001005_3d_fifo[i+1]);
+			command = K001005_3d_fifo[index++];
+			header = K001005_3d_fifo[index++];
 
 			for (j=0; j < 4; j++)
 			{
-				UINT32 z;
-				x[j] = ((K001005_3d_fifo[i+2+(j*3)] >> 0) & 0x1fff);
-				y[j] = ((K001005_3d_fifo[i+2+(j*3)] >> 16) & 0x1fff);
+				INT16 u2, v2;
+				int x, y, z;
+				int end = 0;
 
-				if (x[j] & 0x1000)
-					x[j] |= 0xffffe000;
-				if (y[j] & 0x1000)
-					y[j] |= 0xffffe000;
+				x = ((K001005_3d_fifo[index] >>  0) & 0x3fff);
+				y = ((K001005_3d_fifo[index] >> 16) & 0x1fff);
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
 
-				y[j] = -y[j];
+				poly_type = K001005_3d_fifo[index] & 0x4000;
+				end = K001005_3d_fifo[index] & 0x8000;
+				++index;
 
-				x[j] += 4096;
-				y[j] += 3072;
+				z = K001005_3d_fifo[index];
+				++index;
 
-				x[j] /= 16;
-				y[j] /= 16;
-
-				z = K001005_3d_fifo[i+2+(j*3)+1];
-
-		//      mame_printf_debug("V%d: X: %d, Y: %d, Z: %f\n", j, x[j], y[j], *(float*)&z);
-
-				v[j].x = x[j];
-				v[j].y = y[j];
-				v[j].z = (*(float*)&z);
-
-				num_verts++;
-
-				if (K001005_3d_fifo[i+2+(j*3)] & 0x8000)
+				if (end)
 				{
-					break;
+					color = K001005_3d_fifo[index];
+					++index;
+
+					u2 = (K001005_3d_fifo[index] >> 16) & 0xffff;
+					v2 = (K001005_3d_fifo[index] >>  0) & 0xffff;
+					++index;
 				}
-			}
+				else
+				{
+					u2 = (K001005_3d_fifo[index] >> 16) & 0xffff;
+					v2 = (K001005_3d_fifo[index] >>  0) & 0xffff;
+					++index;
+				}
 
-			for (j=0; j < num_verts-1; j++)
-			{
-				INT16 u2 = (K001005_3d_fifo[i+4+(j*3)] >> 16) & 0xffff;
-				INT16 v2 = (K001005_3d_fifo[i+4+(j*3)] >> 0) & 0xffff;
-
+				v[j].x = ((float)(x) / 16.0f) + 256.0f;
+				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+				v[j].z = *(float*)(&z);
 				v[j].u = u2;
 				v[j].v = v2;
+
+				++num_verts;
+
+				if (end)
+					break;
 			}
 
-			{
-				INT16 u2 = (K001005_3d_fifo[i+4+((num_verts-1)*3)+1] >> 16) & 0xffff;
-				INT16 v2 = (K001005_3d_fifo[i+4+((num_verts-1)*3)+1] >> 0) & 0xffff;
+			ty = ((header & 0x400) >> 5) |
+				 ((header & 0x100) >> 4) |
+				 ((header & 0x040) >> 3) |
+				 ((header & 0x010) >> 2) |
+				 ((header & 0x004) >> 1) |
+				 ((header & 0x001) >> 0);
 
-				v[num_verts-1].u = u2;
-				v[num_verts-1].v = v2;
-
-				color = K001005_3d_fifo[i+4+((num_verts-1)*3)];
-			}
-
-			ty = ((hdr & 0x400) >> 5) |
-				 ((hdr & 0x100) >> 4) |
-				 ((hdr & 0x040) >> 3) |
-				 ((hdr & 0x010) >> 2) |
-				 ((hdr & 0x004) >> 1) |
-				 ((hdr & 0x001) >> 0);
-
-			tx = ((hdr & 0x800) >> 6) |
-				 ((hdr & 0x200) >> 5) |
-				 ((hdr & 0x080) >> 4) |
-				 ((hdr & 0x020) >> 3) |
-				 ((hdr & 0x008) >> 2) |
-				 ((hdr & 0x002) >> 1);
+			tx = ((header & 0x800) >> 6) |
+				 ((header & 0x200) >> 5) |
+				 ((header & 0x080) >> 4) |
+				 ((header & 0x020) >> 3) |
+				 ((header & 0x008) >> 2) |
+				 ((header & 0x002) >> 1);
 
 			texture_x = tx * 8;
 			texture_y = ty * 8;
 
-			texture_page = (hdr >> 12) & 0x1f;
-			texture_palette = (hdr >> 28) & 0xf;
+			texture_page = (header >> 12) & 0x1f;
+			texture_palette = (header >> 28) & 0xf;
+
+			texture_mirror_x = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
+			texture_mirror_y = ((command & 0x10) ? 0x2 : 0) | ((header & 0x00400000) ? 0x1 : 0);
 
 			if (num_verts < 3)
 			{
-				draw_triangle_tex(prev_v[2], prev_v[3], v[0], color);
 				draw_triangle_tex(prev_v[2], v[0], v[1], color);
+				if (prev_poly_type)
+				{
+					draw_triangle_tex(prev_v[2], prev_v[3], v[0], color);
+				}
+
+				memcpy(&prev_v[0], &prev_v[2], sizeof(VERTEX));
+				memcpy(&prev_v[1], &prev_v[3], sizeof(VERTEX));
+				memcpy(&prev_v[2], &v[0], sizeof(VERTEX));
+				memcpy(&prev_v[3], &v[1], sizeof(VERTEX));
 			}
 			else
 			{
@@ -678,181 +748,197 @@ static void render_polygons(void)
 				{
 					draw_triangle_tex(v[2], v[3], v[0], color);
 				}
+
+				memcpy(prev_v, v, sizeof(VERTEX) * 4);
 			}
 
-			memcpy(prev_v, v, sizeof(VERTEX) * 4);
-		}
-		else if (K001005_3d_fifo[i] == 0x80000006/* || K001005_3d_fifo[i] == 0x80000026*/)
-		{
-			VERTEX v[4];
-			int x[4], y[4];
-			int r,g,b;
-			UINT32 color;
+			prev_poly_type = poly_type;
 
-			int num_verts = 0;
-
-			for (j=0; j < 4; j++)
-			{
-				UINT32 z;
-				x[j] = ((K001005_3d_fifo[i+1+(j*2)] >> 0) & 0x1fff);
-				y[j] = ((K001005_3d_fifo[i+1+(j*2)] >> 16) & 0x1fff);
-
-				if (x[j] & 0x1000)
-					x[j] |= 0xffffe000;
-				if (y[j] & 0x1000)
-					y[j] |= 0xffffe000;
-
-				y[j] = -y[j];
-
-				x[j] += 4096;
-				y[j] += 3072;
-
-				x[j] /= 16;
-				y[j] /= 16;
-
-				z = K001005_3d_fifo[i+1+(j*2)+1];
-
-				v[j].x = x[j];
-				v[j].y = y[j];
-				v[j].z = (*(float*)&z);
-				num_verts++;
-
-				if (K001005_3d_fifo[i+1+(j*2)] & 0x8000)
-				{
-					break;
-				}
-			}
-
-			if (num_verts > 3)
-			{
-				r = K001005_3d_fifo[i+9] & 0xff;
-				g = (K001005_3d_fifo[i+9] >> 8) & 0xff;
-				b = (K001005_3d_fifo[i+9] >> 16) & 0xff;
-				color = (r << 16) | (g << 8) | (b);
-			}
-			else
-			{
-				r = K001005_3d_fifo[i+7] & 0xff;
-				g = (K001005_3d_fifo[i+7] >> 8) & 0xff;
-				b = (K001005_3d_fifo[i+7] >> 16) & 0xff;
-				color = (r << 16) | (g << 8) | (b);
-			}
-
-			draw_triangle(v[0], v[1], v[2], color);
-			if (num_verts > 3)
-			{
-				draw_triangle(v[2], v[3], v[0], color);
-			}
-		}
-		else if (K001005_3d_fifo[i] == 0x80000026)
-		{
-			VERTEX v[6];
-			int x[4], y[4];
-			int r,g,b;
-			UINT32 color;
-
-			int num_verts = 0;
-
-			for (j=0; j < 4; j++)
-			{
-				UINT32 z;
-				x[j] = ((K001005_3d_fifo[i+1+(j*2)] >> 0) & 0x1fff);
-				y[j] = ((K001005_3d_fifo[i+1+(j*2)] >> 16) & 0x1fff);
-
-				if (x[j] & 0x1000)
-					x[j] |= 0xffffe000;
-				if (y[j] & 0x1000)
-					y[j] |= 0xffffe000;
-
-				y[j] = -y[j];
-
-				x[j] += 4096;
-				y[j] += 3072;
-
-				x[j] /= 16;
-				y[j] /= 16;
-
-				z = K001005_3d_fifo[i+1+(j*2)+1];
-
-				v[j].x = x[j];
-				v[j].y = y[j];
-				v[j].z = (*(float*)&z);
-				num_verts++;
-
-				if (K001005_3d_fifo[i+1+(j*2)] & 0x8000)
-				{
-					break;
-				}
-			}
-
-			if (num_verts > 3)
-			{
-				r = K001005_3d_fifo[i+9] & 0xff;
-				g = (K001005_3d_fifo[i+9] >> 8) & 0xff;
-				b = (K001005_3d_fifo[i+9] >> 16) & 0xff;
-				color = (r << 16) | (g << 8) | (b);
-			}
-			else
-			{
-				r = K001005_3d_fifo[i+7] & 0xff;
-				g = (K001005_3d_fifo[i+7] >> 8) & 0xff;
-				b = (K001005_3d_fifo[i+7] >> 16) & 0xff;
-				color = (r << 16) | (g << 8) | (b);
-			}
-
-			draw_triangle(v[0], v[1], v[2], color);
-			if (num_verts > 3)
-			{
-				draw_triangle(v[2], v[3], v[0], color);
-			}
-
-			if ((K001005_3d_fifo[i+2+(num_verts*2)] & 0xffffff00) != 0x80000000)
+			while ((K001005_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < K001005_3d_fifo_ptr)
 			{
 				int new_verts = 0;
 
-				for (j=0; j < 2; j++)
+				if (poly_type)
 				{
-					UINT32 z;
-					x[j] = ((K001005_3d_fifo[i+2+(num_verts*2)+(j*2)] >> 0) & 0x1fff);
-					y[j] = ((K001005_3d_fifo[i+2+(num_verts*2)+(j*2)] >> 16) & 0x1fff);
-
-					if (x[j] & 0x1000)
-						x[j] |= 0xffffe000;
-					if (y[j] & 0x1000)
-						y[j] |= 0xffffe000;
-
-					y[j] = -y[j];
-
-					x[j] += 4096;
-					y[j] += 3072;
-
-					x[j] /= 16;
-					y[j] /= 16;
-
-					z = K001005_3d_fifo[i+2+(num_verts*2)+(j*2)+1];
-
-					v[j+4].x = x[j];
-					v[j+4].y = y[j];
-					v[j+4].z = (*(float*)&z);
-					new_verts++;
-
-					if (K001005_3d_fifo[i+2+(num_verts*2)+(j*2)] & 0x8000)
-					{
-						break;
-					}
+					memcpy(&v[0], &prev_v[2], sizeof(VERTEX));
+					memcpy(&v[1], &prev_v[3], sizeof(VERTEX));
+				}
+				else
+				{
+					memcpy(&v[0], &prev_v[1], sizeof(VERTEX));
+					memcpy(&v[1], &prev_v[2], sizeof(VERTEX));
 				}
 
-				r = K001005_3d_fifo[i+2+(num_verts*2)+4] & 0xff;
-				g = (K001005_3d_fifo[i+2+(num_verts*2)+4] >> 8) & 0xff;
-				b = (K001005_3d_fifo[i+2+(num_verts*2)+4] >> 16) & 0xff;
-				color = (r << 16) | (g << 8) | (b);
+				for (j=2; j < 4; j++)
+				{
+					INT16 u2, v2;
+					int x, y, z;
+					int end = 0;
 
-				draw_triangle(v[2], v[3], v[4], color);
+					x = ((K001005_3d_fifo[index] >>  0) & 0x3fff);
+					y = ((K001005_3d_fifo[index] >> 16) & 0x1fff);
+					x |= ((x & 0x2000) ? 0xffffc000 : 0);
+					y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+					poly_type = K001005_3d_fifo[index] & 0x4000;
+					end = K001005_3d_fifo[index] & 0x8000;
+					++index;
+
+					z = K001005_3d_fifo[index];
+					++index;
+
+					if (end)
+					{
+						color = K001005_3d_fifo[index];
+						++index;
+
+						u2 = (K001005_3d_fifo[index] >> 16) & 0xffff;
+						v2 = (K001005_3d_fifo[index] >>  0) & 0xffff;
+						++index;
+					}
+					else
+					{
+						u2 = (K001005_3d_fifo[index] >> 16) & 0xffff;
+						v2 = (K001005_3d_fifo[index] >>  0) & 0xffff;
+						++index;
+					}
+
+					v[j].x = ((float)(x) / 16.0f) + 256.0f;
+					v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+					v[j].z = *(float*)(&z);
+					v[j].u = u2;
+					v[j].v = v2;
+
+					++new_verts;
+
+					if (end)
+						break;
+				}
+
+				draw_triangle_tex(v[0], v[1], v[2], color);
 				if (new_verts > 1)
 				{
-					draw_triangle(v[2], v[4], v[5], color);
+					draw_triangle_tex(v[2], v[3], v[0], color);
 				}
+
+				memcpy(prev_v, v, sizeof(VERTEX) * 4);
+			};
+
+			i = index - 1;
+		}
+		else if (K001005_3d_fifo[i] == 0x80000006 || K001005_3d_fifo[i] == 0x80000026 ||
+				 K001005_3d_fifo[i] == 0x80000020 || K001005_3d_fifo[i] == 0x80000022)
+		{
+			VERTEX v[4];
+			int r, g, b, a;
+			UINT32 color;
+			int num_verts = 0;
+			int index = i;
+			int poly_type = 0;
+
+			++index;
+
+			for (j=0; j < 4; j++)
+			{
+				int x, y, z;
+				int end = 0;
+
+				x = ((K001005_3d_fifo[index] >>  0) & 0x3fff);
+				y = ((K001005_3d_fifo[index] >> 16) & 0x1fff);
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+				poly_type = K001005_3d_fifo[index] & 0x4000;
+				end = K001005_3d_fifo[index] & 0x8000;
+				++index;
+
+				z = K001005_3d_fifo[index];
+				++index;
+
+				v[j].x = ((float)(x) / 16.0f) + 256.0f;
+				v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+				v[j].z = *(float*)(&z);
+
+				++num_verts;
+
+				if (end)
+					break;
 			}
+
+			r = (K001005_3d_fifo[index] >>  0) & 0xff;
+			g = (K001005_3d_fifo[index] >>  8) & 0xff;
+			b = (K001005_3d_fifo[index] >> 16) & 0xff;
+			a = (K001005_3d_fifo[index] >> 24) & 0xff;
+			color = (a << 24) | (r << 16) | (g << 8) | (b);
+			index++;
+
+			draw_triangle(v[0], v[1], v[2], color);
+			if (num_verts > 3)
+			{
+				draw_triangle(v[2], v[3], v[0], color);
+			}
+
+			memcpy(prev_v, v, sizeof(VERTEX) * 4);
+
+			while ((K001005_3d_fifo[index] & 0xffffff00) != 0x80000000 && index < K001005_3d_fifo_ptr)
+			{
+				int new_verts = 0;
+
+				if (poly_type)
+				{
+					memcpy(&v[0], &prev_v[2], sizeof(VERTEX));
+					memcpy(&v[1], &prev_v[3], sizeof(VERTEX));
+				}
+				else
+				{
+					memcpy(&v[0], &prev_v[1], sizeof(VERTEX));
+					memcpy(&v[1], &prev_v[2], sizeof(VERTEX));
+				}
+
+				for (j=2; j < 4; j++)
+				{
+					int x, y, z;
+					int end = 0;
+
+					x = ((K001005_3d_fifo[index] >>  0) & 0x3fff);
+					y = ((K001005_3d_fifo[index] >> 16) & 0x1fff);
+					x |= ((x & 0x2000) ? 0xffffc000 : 0);
+					y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+					poly_type = K001005_3d_fifo[index] & 0x4000;
+					end = K001005_3d_fifo[index] & 0x8000;
+					++index;
+
+					z = K001005_3d_fifo[index];
+					++index;
+
+					v[j].x = ((float)(x) / 16.0f) + 256.0f;
+					v[j].y = ((float)(-y) / 16.0f) + 192.0f;
+					v[j].z = *(float*)(&z);
+
+					++new_verts;
+
+					if (end)
+						break;
+				}
+
+				r = (K001005_3d_fifo[index] >>  0) & 0xff;
+				g = (K001005_3d_fifo[index] >>  8) & 0xff;
+				b = (K001005_3d_fifo[index] >> 16) & 0xff;
+				a = (K001005_3d_fifo[index] >> 24) & 0xff;
+				color = (a << 24) | (r << 16) | (g << 8) | (b);
+				index++;
+
+				draw_triangle(v[0], v[1], v[2], color);
+				if (new_verts > 1)
+				{
+					draw_triangle(v[0], v[2], v[3], color);
+				}
+
+				memcpy(prev_v, v, sizeof(VERTEX) * 4);
+			};
+
+			i = index - 1;
 		}
 		else if (K001005_3d_fifo[i] == 0x80000000)
 		{
@@ -860,7 +946,8 @@ static void render_polygons(void)
 		}
 		else if ((K001005_3d_fifo[i] & 0xffffff00) == 0x80000000)
 		{
-			/*mame_printf_debug("Unknown polygon type %08X:\n", K001005_3d_fifo[i]);
+			/*
+            mame_printf_debug("Unknown polygon type %08X:\n", K001005_3d_fifo[i]);
             for (j=0; j < 0x20; j++)
             {
                 mame_printf_debug("  %02X: %08X\n", j, K001005_3d_fifo[i+1+j]);
@@ -894,7 +981,7 @@ void K001005_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 void K001005_swap_buffers(void)
 {
-	if (K001005_status == 2)
+	//if (K001005_status == 2)
 	{
 		fillbitmap(K001005_bitmap, Machine->remapped_colortable[0], &K001005_cliprect);
 		fillbitmap(K001005_zbuffer, 0xffffffff, &K001005_cliprect);
@@ -908,6 +995,10 @@ VIDEO_START( gticlub )
 	if (K001005_init() != 0)
 		return 1;
 
+	if (mame_stricmp(Machine->gamedrv->name, "gticlub") == 0 ||
+		mame_stricmp(Machine->gamedrv->name, "thunderh") == 0)
+		update_30fps = 1;
+
 	return K001604_vh_start(0);
 }
 
@@ -915,13 +1006,19 @@ static int tick = 0;
 static int debug_tex_page = 0;
 static int debug_tex_palette = 0;
 
+static int frame = 0;
+
 VIDEO_UPDATE( gticlub )
 {
 	K001604_tile_update(0);
 	K001604_draw_back_layer(0, bitmap, cliprect);
 
 	K001005_draw(bitmap, cliprect);
-	K001005_swap_buffers();
+	if (!update_30fps || K001005_status == 2)
+	{
+		K001005_swap_buffers();
+	}
+	frame++;
 
 	K001604_draw_front_layer(0, bitmap, cliprect);
 
@@ -951,27 +1048,29 @@ VIDEO_UPDATE( gticlub )
 			debug_tex_palette = 0;
 	}
 
-	if (debug_tex_page > 0)
-	{
-		char string[200];
-		int x,y;
-		int index = (debug_tex_page - 1) * 0x40000;
-		int pal = debug_tex_palette & 7;
-		int tp = (debug_tex_palette >> 3) & 1;
-		UINT8 *rom = memory_region(REGION_GFX1);
+	/*
+    if (debug_tex_page > 0)
+    {
+        char string[200];
+        int x,y;
+        int index = (debug_tex_page - 1) * 0x40000;
+        int pal = debug_tex_palette & 7;
+        int tp = (debug_tex_palette >> 3) & 1;
+        UINT8 *rom = memory_region(REGION_GFX1);
 
-		for (y=0; y < 512; y++)
-		{
-			for (x=0; x < 512; x++)
-			{
-				UINT8 pixel = rom[index + (y*512) + x];
-				plot_pixel(bitmap, x, y, K001006_palette[tp][(pal * 256) + pixel]);
-			}
-		}
+        for (y=0; y < 384; y++)
+        {
+            for (x=0; x < 512; x++)
+            {
+                UINT8 pixel = rom[index + (y*512) + x];
+                plot_pixel(bitmap, x, y, K001006_palette[tp][(pal * 256) + pixel]);
+            }
+        }
 
-		sprintf(string, "Texture page %d\nPalette %d", debug_tex_page, debug_tex_palette);
-		//popmessage("%s", string);
-	}
+        sprintf(string, "Texture page %d\nPalette %d", debug_tex_page, debug_tex_palette);
+        //popmessage("%s", string);
+    }
+    */
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);

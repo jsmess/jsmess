@@ -113,7 +113,7 @@ void config_register(const char *nodename, config_callback load, config_callback
 
 int config_load_settings(void)
 {
-	const char *controller = options_get_string(OPTION_CTRLR);
+	const char *controller = options_get_string(mame_options(), OPTION_CTRLR);
 	file_error filerr;
 	config_type *type;
 	mame_file *file;

@@ -354,6 +354,8 @@ static void tms32031_set_context(void *src)
 static void tms32031_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
 	const struct tms32031_config *config = _config;
+	int i;
+	char namebuf[30];
 
 	tms32031.irq_callback = irqcallback;
 
@@ -365,6 +367,22 @@ static void tms32031_init(int index, int clock, const void *_config, int (*irqca
 		tms32031.xf1_w = config->xf1_w;
 		tms32031.iack_w = config->iack_w;
 	}
+
+	state_save_register_item("tms32031", index, tms32031.pc);
+	for (i=0;i<36;i++)
+	{
+		sprintf(namebuf,"tms32031.r[%d]",i);
+		state_save_register_generic("tms32031", index, namebuf, tms32031.r[i].i8, sizeof(UINT8), 8);
+	}
+	state_save_register_item("tms32031", index, tms32031.bkmask);
+	state_save_register_item("tms32031", index, tms32031.ppc);
+	state_save_register_item("tms32031", index, tms32031.op);
+	state_save_register_item("tms32031", index, tms32031.delayed);
+	state_save_register_item("tms32031", index, tms32031.irq_pending);
+	state_save_register_item("tms32031", index, tms32031.mcu_mode);
+	state_save_register_item("tms32031", index, tms32031.is_idling);
+	state_save_register_item("tms32031", index, tms32031.interrupt_cycles);
+
 }
 
 static void tms32031_reset(void)

@@ -187,31 +187,31 @@ BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 	switch (pic_type)
 	{
 	case TAB_SCREENSHOT :
-		options_set_string(SEARCHPATH_ARTWORK,GetImgDir());
+		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetImgDir());
 		zip_name = "snap";
 		break;
 	case TAB_FLYER :
-		options_set_string(SEARCHPATH_ARTWORK,GetFlyerDir());
+		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetFlyerDir());
 		zip_name = "flyers";
 		break;
 	case TAB_CABINET :
-		options_set_string(SEARCHPATH_ARTWORK,GetCabinetDir());
+		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetCabinetDir());
 		zip_name = "cabinets";
 		break;
 	case TAB_MARQUEE :
-		options_set_string(SEARCHPATH_ARTWORK,GetMarqueeDir());
+		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetMarqueeDir());
 		zip_name = "marquees";
 		break;
 	case TAB_TITLE :
-		options_set_string(SEARCHPATH_ARTWORK,GetTitlesDir());
+		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetTitlesDir());
 		zip_name = "titles";
 		break;
 	case TAB_CONTROL_PANEL :
-		options_set_string(SEARCHPATH_ARTWORK,GetControlPanelDir());
+		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetControlPanelDir());
 		zip_name = "cpanel";
 		break;
 	case BACKGROUND :
-		options_set_string(SEARCHPATH_ARTWORK,GetBgDir());
+		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetBgDir());
 		zip_name = "bkground";
 		break;
 	default :

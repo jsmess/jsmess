@@ -17,6 +17,7 @@
 #include "sound/wavwrite.h"
 #include "video/generic.h"
 #include "render.h"
+#include "messopts.h"
 
 #ifdef WIN32
 #include "parallel.h"
@@ -309,18 +310,18 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	dirtybuffer = NULL;
 
 	/* set up options */
-	options_init(win_mess_opts);
-	options_set_bool(OPTION_SKIP_GAMEINFO, TRUE);
-	options_set_bool(OPTION_THROTTLE, FALSE);
+	mame_options_init(win_mess_opts);
+	options_set_bool(mame_options(), OPTION_SKIP_GAMEINFO, TRUE);
+	options_set_bool(mame_options(), OPTION_THROTTLE, FALSE);
 	if (current_testcase.ram != 0)
 	{
-		options_set_int("ramsize", current_testcase.ram);
+		options_set_int(mame_options(), OPTION_RAMSIZE, current_testcase.ram);
 	}
 
 	/* ugh... hideous ugly fake arguments */
 	fake_argv[0] = "MESSTEST";
 	fake_argv[1] = drivers[driver_num]->name;
-	options_parse_command_line(ARRAY_LENGTH(fake_argv), (char **) fake_argv);
+	options_parse_command_line(mame_options(), ARRAY_LENGTH(fake_argv), (char **) fake_argv);
 
 	/* preload any needed images */
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)
@@ -332,7 +333,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 		device_opt = device_typename(current_command->u.image_args.device_type);
 
 		/* set the option */
-		options_set_string(device_opt, fullpath);
+		options_set_string(mame_options(), device_opt, fullpath);
 
 		/* cleanup */
 		free(fullpath);

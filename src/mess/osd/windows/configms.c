@@ -39,7 +39,7 @@ static const options_entry win_mess_opts[] =
 
 void osd_mess_options_init(void)
 {
-	options_add_entries(win_mess_opts);
+	options_add_entries(mame_options(), win_mess_opts);
 }
 
 

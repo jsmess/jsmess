@@ -60,7 +60,7 @@ static UINT16 *backupram1, *backupram2;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void);
+extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
 
 
@@ -73,7 +73,7 @@ extern void fd1094_driver_init(void);
 static void xboard_generic_init(void)
 {
 	/* init the FD1094 */
-	fd1094_driver_init();
+	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
 
 	/* set the default road priority */
 	xboard_set_road_priority(1);

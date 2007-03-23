@@ -189,6 +189,8 @@ static UINT32 debug_font_ascent;
 static UINT32 hscroll_height;
 static UINT32 vscroll_width;
 
+static DWORD last_debugger_update;
+
 static int temporarily_fake_that_we_are_not_visible;
 
 
@@ -263,6 +265,7 @@ void osd_wait_for_debugger(void)
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
+	last_debugger_update = GetTickCount();
 
 	switch (message.message)
 	{
@@ -1092,6 +1095,17 @@ static void debug_view_update(debug_view *view)
 				smart_set_window_bounds(info->hscroll, info->wnd, &hscroll_bounds);
 			smart_show_window(info->hscroll, show_hscroll);
 		}
+
+		// if we're in some tight busy loop, handle messages to keep ourselves alive
+/*      if (GetTickCount() - last_debugger_update > 1000)
+        {
+            MSG message;
+            while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+            {
+                TranslateMessage(&message);
+                DispatchMessage(&message);
+            }
+        }*/
 	}
 }
 

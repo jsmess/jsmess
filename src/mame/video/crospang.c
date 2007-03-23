@@ -6,15 +6,51 @@
  -- this seems to be the same as the tumblepop bootleg based hardware
     in tumbleb.c
 
- previously the driver used alpha, now we do a flicker effect like
- tumblep.c instead..  I think the flicker effect is more correct
 
 */
 
 #include "driver.h"
 
+static int xsproff, ysproff; // sprite offsets
 static tilemap *bg_layer,*fg_layer;
 UINT16 *crospang_bg_videoram,*crospang_fg_videoram;
+static int bestri_tilebank;
+WRITE16_HANDLER( bestri_tilebank_w)
+{
+	bestri_tilebank = (data>>10) & 0xf;
+	//printf("bestri %04x\n", data);
+
+	tilemap_mark_all_tiles_dirty(fg_layer);
+	tilemap_mark_all_tiles_dirty(bg_layer);
+}
+
+
+WRITE16_HANDLER ( bestri_bg_scrolly_w )
+{
+	/* Very Strange */
+	int scroll =  (data&0x3ff)^ 0x0155;
+	tilemap_set_scrolly(bg_layer,0,-scroll+7);
+}
+
+WRITE16_HANDLER ( bestri_fg_scrolly_w )
+{
+	/* Very Strange */
+	int scroll = (data&0x3ff)^ 0x00ab;
+	tilemap_set_scrolly(fg_layer,0,-scroll+7);
+}
+
+WRITE16_HANDLER ( bestri_fg_scrollx_w )
+{
+//  printf("fg_layer x %04x\n",data);
+	tilemap_set_scrollx(fg_layer,0,data+32);
+}
+
+WRITE16_HANDLER ( bestri_bg_scrollx_w )
+{
+//  printf("bg_layer x %04x\n",data);
+	tilemap_set_scrollx(bg_layer,0,data-60);
+}
+
 
 WRITE16_HANDLER ( crospang_fg_scrolly_w )
 {
@@ -36,6 +72,7 @@ WRITE16_HANDLER ( crospang_bg_scrollx_w )
 	tilemap_set_scrollx(bg_layer,0,data+4);
 }
 
+
 WRITE16_HANDLER ( crospang_fg_videoram_w )
 {
 	COMBINE_DATA(&crospang_fg_videoram[offset]);
@@ -54,7 +91,7 @@ static void get_bg_tile_info(int tile_index)
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO(1,tile,color + 0x20,0)
+	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x20,0)
 }
 
 static void get_fg_tile_info(int tile_index)
@@ -63,7 +100,7 @@ static void get_fg_tile_info(int tile_index)
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO(1,tile,color + 0x10,0)
+	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x10,0)
 }
 
 /*
@@ -143,7 +180,7 @@ static void crospang_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x-4,y-7 + mult * multi,
+					x-xsproff,y-ysproff + mult * multi,
 					cliprect,TRANSPARENCY_PEN,0);
 
 			multi--;
@@ -157,8 +194,11 @@ VIDEO_START( crospang )
 	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_layer,0);
-
-//  alpha_set_level(0x80);
+	bestri_tilebank = 0;
+//  xsproff = 4;
+//  ysproff = 7;
+	xsproff = 5;
+	ysproff = 7;
 
 	return 0;
 }

@@ -5,6 +5,34 @@
 
  Driver by David Haywood and Pierpaolo Prazzoli
 
+PCB has D.G.R.M. silkscreened on it.  Dated 1997.4.11
+
++----------------------------------+
+|  YM3014 YM3812  Z80   24MHz      |
+|   M6295 sample  sound_prog       |
+|                 6116       3_grfx|
+|J       6116                      |
+|A COR_B 6116                4_grfx|
+|M COR_G                           |
+|M COR_R       A1020B              |
+|A                           5_grfx|
+|DSW   62256         6264          |
+|     main_prog                    |
+|DSW   Z80  4MHz                   |
++----------------------------------+
+
+Goldstar Z8400A PS (4 MHz rated) both CPUs
+Actel A1020B PL84C
+YM3812/YM3014 (badged as UA011 & UA010)
+OKI M6295
+
+ main_prog 27c010
+    x_grfx 27c040
+    sample 27c020
+sound_prog 27512
+
+COR_x are LN60G resitor packs
+
 */
 
 #include "driver.h"
@@ -217,12 +245,12 @@ static struct YM3812interface ym3812_interface =
 
 static MACHINE_DRIVER_START( onetwo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	MDRV_CPU_IO_MAP(sound_cpu_io,0)
@@ -244,7 +272,7 @@ static MACHINE_DRIVER_START( onetwo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 8000000)
+	MDRV_SOUND_ADD(YM3812, 4000000)
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -255,18 +283,35 @@ MACHINE_DRIVER_END
 
 ROM_START( onetwo )
 	ROM_REGION( 0x30000, REGION_CPU1, 0 ) /* main z80 */
-	ROM_LOAD( "am27c010.0", 0x10000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
+	ROM_LOAD( "main", 0x10000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* sound z80 */
-	ROM_LOAD( "s27c512.2",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
+	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
 	ROM_REGION( 0x180000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "m27c4000.3", 0x000000, 0x80000, CRC(c72ff3a0) SHA1(17394d8a8b5ef4aee9522d87ba92ef1285f4d76a) )
-	ROM_LOAD( "m27c4000.4", 0x080000, 0x80000, CRC(0ca40557) SHA1(ca2db57d64ece90f2066f15b276c8d5827dcb4fa) )
-	ROM_LOAD( "zr040p.5",   0x100000, 0x80000, CRC(664b6679) SHA1(f9f78bd34fb58e24f890a540382392e1c9d01220) )
+	ROM_LOAD( "3_graphics", 0x000000, 0x80000, CRC(c72ff3a0) SHA1(17394d8a8b5ef4aee9522d87ba92ef1285f4d76a) )
+	ROM_LOAD( "4_graphics", 0x080000, 0x80000, CRC(0ca40557) SHA1(ca2db57d64ece90f2066f15b276c8d5827dcb4fa) )
+	ROM_LOAD( "5_graphics",   0x100000, 0x80000, CRC(664b6679) SHA1(f9f78bd34fb58e24f890a540382392e1c9d01220) )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
-	ROM_LOAD( "tm27c020.1", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
+	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
 ROM_END
 
-GAME( 1997, onetwo, 0, onetwo, onetwo, 0, ROT0, "Barko", "One + Two", 0 )
+ROM_START( onetwoe )
+	ROM_REGION( 0x30000, REGION_CPU1, 0 ) /* main z80 */
+	ROM_LOAD( "main_prog", 0x10000,  0x20000, CRC(6c1936e9) SHA1(d8fb3056299c9b45e0b537e77dc0d633882705dd) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* sound z80 */
+	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
+
+	ROM_REGION( 0x180000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "3_grfx", 0x000000, 0x80000, CRC(0f9f39ff) SHA1(85d107306c8c5718da3b751221791404cfe12a3d) )
+	ROM_LOAD( "4_grfx", 0x080000, 0x80000, CRC(2b0e0564) SHA1(092bf0bb7be12ed1aa8a4ed1e88143ea88819497) )
+	ROM_LOAD( "5_grfx", 0x100000, 0x80000, CRC(69807a9b) SHA1(6c1d79e86e3575da29bc299670e38019eef53493) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
+ROM_END
+
+GAME( 1997, onetwo,       0, onetwo, onetwo, 0, ROT0, "Barko", "One + Two", GAME_IMPERFECT_COLORS )
+GAME( 1997, onetwoe, onetwo, onetwo, onetwo, 0, ROT0, "Barko", "One + Two (earlier)", GAME_IMPERFECT_COLORS )

@@ -169,6 +169,7 @@
     TYPE DEFINITIONS
 -------------------------------------------------*/
 
+typedef struct _memory_block memory_block;
 struct _memory_block
 {
 	UINT8					cpunum;					/* which CPU are we associated with? */
@@ -177,8 +178,8 @@ struct _memory_block
 	offs_t 					start, end;				/* start/end or match/mask for verifying a match */
     UINT8 *					data;					/* pointer to the data for this block */
 };
-typedef struct _memory_block memory_block;
 
+typedef struct _bank_data bank_data;
 struct _bank_data
 {
 	UINT8 					used;					/* is this bank used? */
@@ -189,20 +190,20 @@ struct _bank_data
 	UINT8 					write;					/* is this bank used for writes? */
 	offs_t 					base;					/* the base offset */
 	offs_t 					end;					/* the end offset */
-	UINT8					curentry;				/* current entry */
+	UINT16					curentry;				/* current entry */
 	void *					entry[MAX_BANK_ENTRIES];/* array of entries for this bank */
 	void *					entryd[MAX_BANK_ENTRIES];/* array of decrypted entries for this bank */
 };
-typedef struct _bank_data bank_data;
 
+typedef union _rwhandlers rwhandlers;
 union _rwhandlers
 {
 	genf *					generic;				/* generic handler void */
 	read_handlers			read;					/* read handlers */
 	write_handlers			write;					/* write handlers */
 };
-typedef union _rwhandlers rwhandlers;
 
+/* In memory.h: typedef struct _handler_data handler_data */
 struct _handler_data
 {
 	rwhandlers				handler;				/* function pointer for handler */
@@ -211,16 +212,16 @@ struct _handler_data
 	offs_t					mask;					/* mask against the final address */
 	const char *			name;					/* name of the handler */
 };
-/* In memory.h: typedef struct _handler_data handler_data */
 
+typedef struct _subtable_data subtable_data;
 struct _subtable_data
 {
 	UINT8					checksum_valid;			/* is the checksum valid */
 	UINT32					checksum;				/* checksum over all the bytes */
 	UINT32					usecount;				/* number of times this has been used */
 };
-typedef struct _subtable_data subtable_data;
 
+typedef struct _table_data table_data;
 struct _table_data
 {
 	UINT8 *					table;					/* pointer to base of table */
@@ -228,8 +229,8 @@ struct _table_data
 	subtable_data			subtable[SUBTABLE_COUNT]; /* info about each subtable */
 	handler_data			handlers[ENTRY_COUNT];	/* array of user-installed handlers */
 };
-typedef struct _table_data table_data;
 
+typedef struct _addrspace_data addrspace_data;
 struct _addrspace_data
 {
 	UINT8					cpunum;					/* CPU index */
@@ -246,8 +247,8 @@ struct _addrspace_data
 	address_map *			map;					/* original memory map */
 	address_map *			adjmap;					/* adjusted memory map */
 };
-typedef struct _addrspace_data addrspace_data;
 
+typedef struct _cpu_data cpu_data;
 struct _cpu_data
 {
 	opbase_handler 			opbase;					/* opcode base handler */
@@ -262,7 +263,6 @@ struct _cpu_data
 	UINT8					spacemask;				/* mask of which address spaces are used */
 	addrspace_data		 	space[ADDRESS_SPACES];	/* info about each address space */
 };
-typedef struct _cpu_data cpu_data;
 
 
 /*-------------------------------------------------

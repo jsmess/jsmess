@@ -29,17 +29,22 @@
 /*      Revision history                                                     */
 /*      ================                                                     */
 /*                                                                           */
-/*      Date    Vsn.    Initials        Description                          */
-/*      ~~~~    ~~~~    ~~~~~~~~        ~~~~~~~~~~~                          */
+/*         Date     Vsn.  Initials   Description                             */
+/*         ~~~~     ~~~~  ~~~~~~~~   ~~~~~~~~~~~                             */
+/*      03/20/2007  1.1      ZV      Moved structures from driver to make    */
+/*                                   file more self contained.               */
 /*                                                                           */
 /*****************************************************************************/
 
 #include "driver.h"
+#include "cpu/i8039/i8039.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "includes/vicdual.h"
 
-#define CPU_MUSIC_ID            1       /* music CPU id number */
+
+#define	PSG_CLOCK		(3579545 / 3)	/* Hz */
+#define CPU_MUSIC_ID    (1)       		/* music CPU id number */
 
 
 /* output port 0x01 definitions - sound effect drive outputs */
@@ -76,7 +81,7 @@
 
 
 /* sample file names */
-const char *carnival_sample_names[] =
+static const char *carnival_sample_names[] =
 {
 	"*carnival",
 	"bear.wav",
@@ -92,7 +97,15 @@ const char *carnival_sample_names[] =
 	0
 };
 
-/* sample sound IDs - must match sample file name table above */
+
+static struct Samplesinterface carnival_samples_interface =
+{
+	10,
+	carnival_sample_names
+};
+
+
+/* sample IDs - must match sample file name table above */
 enum
 {
 	SND_BEAR = 0,
@@ -112,7 +125,7 @@ static int port2State = 0;
 static int psgData = 0;
 
 
-WRITE8_HANDLER( carnival_sh_port1_w )
+WRITE8_HANDLER( carnival_audio_1_w )
 {
 	static int port1State = 0;
 	int bitsChanged;
@@ -191,7 +204,7 @@ WRITE8_HANDLER( carnival_sh_port1_w )
 }
 
 
-WRITE8_HANDLER( carnival_sh_port2_w )
+WRITE8_HANDLER( carnival_audio_2_w )
 {
 	int bitsChanged;
 	int bitsGoneHigh;
@@ -232,20 +245,20 @@ WRITE8_HANDLER( carnival_sh_port2_w )
 }
 
 
-READ8_HANDLER( carnival_music_port_t1_r )
+static READ8_HANDLER( carnival_music_port_t1_r )
 {
 	/* note: 8039 T1 signal is inverted on music board */
 	return ( port2State & OUT_PORT_2_MUSIC_T1 ) ? 0 : 1;
 }
 
 
-WRITE8_HANDLER( carnival_music_port_1_w )
+static WRITE8_HANDLER( carnival_music_port_1_w )
 {
 	psgData = data;
 }
 
 
-WRITE8_HANDLER( carnival_music_port_2_w )
+static WRITE8_HANDLER( carnival_music_port_2_w )
 {
 	static int psgSelect = 0;
 	int newSelect;
@@ -275,3 +288,30 @@ WRITE8_HANDLER( carnival_music_port_2_w )
 		}
 	}
 }
+
+
+static ADDRESS_MAP_START( carnival_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( carnival_audio_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(I8039_t1, I8039_t1) AM_READ(carnival_music_port_t1_r)
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(carnival_music_port_1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(carnival_music_port_2_w)
+ADDRESS_MAP_END
+
+
+MACHINE_DRIVER_START( carnival_audio )
+	MDRV_CPU_ADD(I8039,( ( 3579545 / 5 ) / 3 ))
+	MDRV_CPU_PROGRAM_MAP(carnival_audio_map,0)
+	MDRV_CPU_IO_MAP(carnival_audio_io_map,0)
+
+	MDRV_INTERLEAVE(10)
+
+	MDRV_SOUND_ADD(AY8910, PSG_CLOCK)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(carnival_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END

@@ -25,6 +25,11 @@ typedef struct
 	UINT32 flags;
 } TRIANGLE;
 
+typedef struct {
+	float x,y,z,d;
+} PLANE;
+
+
 typedef struct
 {
 	UINT32 diffuse;
@@ -293,48 +298,119 @@ static void render_triangles(mame_bitmap *bitmap, const rectangle *cliprect)
 		if (rect.max_y < cliprect->min_y)	rect.max_y = cliprect->min_y;
 		if (rect.max_y > cliprect->max_y)	rect.max_y = cliprect->max_y;
 
-		if (tribuffer[i].v[0].z >= 0 && tribuffer[i].v[1].z >= 0 && tribuffer[i].v[2].z >= 0)
+		if (tribuffer[i].flags & TRI_FLAG_TEXTURE)
 		{
-			if (tribuffer[i].flags & TRI_FLAG_TEXTURE)
-			{
-				//draw_textured_triangle(bitmap, &rect, &tribuffer[i]);
-				draw_solid_triangle(bitmap, &rect, &tribuffer[i]);
-			}
-			else
-			{
-				draw_solid_triangle(bitmap, &rect, &tribuffer[i]);
-			}
+			//draw_textured_triangle(bitmap, &rect, &tribuffer[i]);
+			draw_solid_triangle(bitmap, &rect, &tribuffer[i]);
+		}
+		else
+		{
+			draw_solid_triangle(bitmap, &rect, &tribuffer[i]);
 		}
 	}
 }
 
+INLINE int is_point_inside(float x, float y, float z, PLANE cp)
+{
+	float s = (x * cp.x) + (y * cp.y) + (z * cp.z) + cp.d;
+	if (s >= 0.0f)
+		return 1;
+	else
+		return 0;
+}
+
+INLINE float line_plane_intersection(VERTEX *v1, VERTEX *v2, PLANE cp)
+{
+	float x = v1->x - v2->x;
+	float y = v1->y - v2->y;
+	float z = v1->z - v2->z;
+	float t = ((cp.x * v1->x) + (cp.y * v1->y) + (cp.z * v1->z)) / ((cp.x * x) + (cp.y * y) + (cp.z * z));
+	return t;
+}
+
+static int clip_polygon(VERTEX *v, int num_vertices, PLANE cp, VERTEX *vout)
+{
+	VERTEX clipv[10];
+	int clip_verts = 0;
+	float t;
+	int i;
+
+	int pv = num_vertices - 1;
+
+	for (i=0; i < num_vertices; i++)
+	{
+		int v1_in = is_point_inside(v[i].x, v[i].y, v[i].z, cp);
+		int v2_in = is_point_inside(v[pv].x, v[pv].y, v[pv].z, cp);
+
+		if (v1_in && v2_in)			/* edge is completely inside the volume */
+		{
+			memcpy(&clipv[clip_verts], &v[i], sizeof(VERTEX));
+			++clip_verts;
+		}
+		else if (!v1_in && v2_in)	/* edge is entering the volume */
+		{
+			/* insert vertex at intersection point */
+			t = line_plane_intersection(&v[i], &v[pv], cp);
+			clipv[clip_verts].x = v[i].x + ((v[pv].x - v[i].x) * t);
+			clipv[clip_verts].y = v[i].y + ((v[pv].y - v[i].y) * t);
+			clipv[clip_verts].z = v[i].z + ((v[pv].z - v[i].z) * t);
+			clipv[clip_verts].u = (UINT32)((float)v[i].u + (((float)v[pv].u - (float)v[i].u) * t));
+			clipv[clip_verts].v = (UINT32)((float)v[i].v + (((float)v[pv].v - (float)v[i].v) * t));
+			++clip_verts;
+		}
+		else if (v1_in && !v2_in)	/* edge is leaving the volume */
+		{
+			/* insert vertex at intersection point */
+			t = line_plane_intersection(&v[i], &v[pv], cp);
+			clipv[clip_verts].x = v[i].x + ((v[pv].x - v[i].x) * t);
+			clipv[clip_verts].y = v[i].y + ((v[pv].y - v[i].y) * t);
+			clipv[clip_verts].z = v[i].z + ((v[pv].z - v[i].z) * t);
+			clipv[clip_verts].u = (UINT32)((float)v[i].u + (((float)v[pv].u - (float)v[i].u) * t));
+			clipv[clip_verts].v = (UINT32)((float)v[i].v + (((float)v[pv].v - (float)v[i].v) * t));
+			++clip_verts;
+
+			/* insert the existing vertex */
+			memcpy(&clipv[clip_verts], &v[i], sizeof(VERTEX));
+			++clip_verts;
+		}
+
+		pv = i;
+	}
+	memcpy(&vout[0], &clipv[0], sizeof(VERTEX) * clip_verts);
+	return clip_verts;
+}
+
 static void push_triangle(TRIANGLE *tri)
 {
-	int i;
-	TRIANGLE *dt = &tribuffer[tribuffer_pos];
+	int i, j;
+	int clipped_verts;
+	VERTEX verts[10];
+	PLANE clip_plane = { 0.0f, 0.0f, 1.0f, -1.0f };
+	clipped_verts = clip_polygon(tri->v, 3, clip_plane, verts);
 
-	/*if (tri->v[0].z <= 0 || tri->v[1].z <= 0 || tri->v[2].z <= 0)
-    {
-        return;
-    }*/
-
-	if (tri->z <= 0)
-		return;
-
-	memcpy(dt, tri, sizeof(TRIANGLE));
-	memcpy(&dt->window, &window, sizeof(WINDOW));
-
-	for (i=0; i < 3; i++)
+	for (i=2; i < clipped_verts; i++)
 	{
-		float ooz = 1.0f / -dt->v[i].z;
-		dt->v[i].x = ((dt->v[i].x * ooz) * focus_x) + (float)(window.x + (window.width / 2));
-		dt->v[i].y = ((dt->v[i].y * ooz) * focus_y) + (float)(window.y + (window.height / 2));
-	}
+		TRIANGLE *dt = &tribuffer[tribuffer_pos];
 
-	tribuffer_pos++;
-	if (tribuffer_pos >= TRIBUFFER_SIZE)
-	{
-		fatalerror("push_triangle: tribuffer overflow");
+		memcpy(dt, tri, sizeof(TRIANGLE));
+
+		memcpy(&dt->v[0], &verts[0], sizeof(VERTEX));
+		memcpy(&dt->v[1], &verts[i-1], sizeof(VERTEX));
+		memcpy(&dt->v[2], &verts[i], sizeof(VERTEX));
+		memcpy(&dt->window, &window, sizeof(WINDOW));
+
+		for (j=0; j < 3; j++)
+		{
+			float ooz = 1.0f / -dt->v[j].z;
+			dt->v[j].x = -((dt->v[j].x * ooz) * focus_x) + (float)(window.x + (window.width / 2));
+			dt->v[j].y = ((dt->v[j].y * ooz) * focus_y) + (float)(window.y + (window.height / 2));
+		}
+
+		tribuffer_pos++;
+		if (tribuffer_pos >= TRIBUFFER_SIZE)
+		{
+			fatalerror("push_triangle: tribuffer overflow");
+		}
 	}
 }
 

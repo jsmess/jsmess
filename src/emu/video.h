@@ -107,6 +107,10 @@ mame_time video_screen_get_scan_period(int scrnum);
 /* return the amount of time the beam takes to draw one complete frame */
 mame_time video_screen_get_frame_period(int scrnum);
 
+/* returns whether a given screen exists */
+int video_screen_exists(int scrnum);
+
+
 
 /* ----- global rendering ----- */
 

@@ -627,11 +627,11 @@ BOOL OptionsInit()
 	LoadOptionsAndSettings();
 
 	// have our mame core (file code) know about our rom path
-	options_add_entries(windows_opts);
-	options_set_string(SEARCHPATH_ROM, settings.romdirs);
-	options_set_string(SEARCHPATH_SAMPLE, settings.sampledirs);
+	options_add_entries(mame_options(), windows_opts);
+	options_set_string(mame_options(), SEARCHPATH_ROM, settings.romdirs);
+	options_set_string(mame_options(), SEARCHPATH_SAMPLE, settings.sampledirs);
 #ifdef MESS
-	options_set_string(SEARCHPATH_HASH, settings.mess.hashdir);
+	options_set_string(mame_options(), SEARCHPATH_HASH, settings.mess.hashdir);
 #endif // MESS
 	return TRUE;
 
@@ -1408,7 +1408,7 @@ void SetRomDirs(const char* paths)
 		settings.romdirs = mame_strdup(paths);
 
 		// have our mame core (file code) know about it
-		options_set_string(SEARCHPATH_ROM, settings.romdirs);
+		options_set_string(mame_options(), SEARCHPATH_ROM, settings.romdirs);
 	}
 }
 
@@ -1426,7 +1426,7 @@ void SetSampleDirs(const char* paths)
 		settings.sampledirs = mame_strdup(paths);
 		
 		// have our mame core (file code) know about it
-		options_set_string(SEARCHPATH_SAMPLE, settings.sampledirs);
+		options_set_string(mame_options(), SEARCHPATH_SAMPLE, settings.sampledirs);
 	}
 
 }

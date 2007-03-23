@@ -673,7 +673,7 @@ static int validate_gfx(int drivnum, const machine_config *drv, const UINT32 *re
 			int len, avail, plane, start;
 
 			/* determine which plane is the largest */
- 			start = 0;
+			start = 0;
 			for (plane = 0; plane < MAX_GFX_PLANES; plane++)
 				if (gfx->gfxlayout->planeoffset[plane] > start)
 					start = gfx->gfxlayout->planeoffset[plane];
@@ -896,16 +896,16 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 					/* relative devices do not use PORT_MINMAX */
 					if (inp->analog.min || inp->analog.max != inp->mask)
 					{
-                      mame_printf_error("%s: %s - relative ports do not use PORT_MINMAX\n", driver->source_file, driver->name);
-                      error = TRUE;
+					  mame_printf_error("%s: %s - relative ports do not use PORT_MINMAX\n", driver->source_file, driver->name);
+					  error = TRUE;
 					}
 
 					/* relative devices do not use a default value */
 					/* the counter is at 0 on power up */
 					if (inp->default_value)
 					{
-                      mame_printf_error("%s: %s - relative ports do not use a default value other then 0\n", driver->source_file, driver->name);
-                      error = TRUE;
+					  mame_printf_error("%s: %s - relative ports do not use a default value other then 0\n", driver->source_file, driver->name);
+					  error = TRUE;
 					}
 				}
 			}

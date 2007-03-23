@@ -5,6 +5,7 @@ Atari Sprint 4 video emulation
 ***************************************************************************/
 
 #include "driver.h"
+#include "audio/sprint4.h"
 
 static tilemap* playfield;
 
@@ -150,10 +151,10 @@ VIDEO_EOF( sprint4 )
 
 	/* update sound status */
 
-	// discrete_sound_w(SPRINT4_MOTOR1_DATA, ~videoram[0x391] & 15);
-	// discrete_sound_w(SPRINT4_MOTOR2_DATA, ~videoram[0x393] & 15);
-	// discrete_sound_w(SPRINT4_MOTOR3_DATA, ~videoram[0x395] & 15);
-	// discrete_sound_w(SPRINT4_MOTOR4_DATA, ~videoram[0x397] & 15);
+	discrete_sound_w(SPRINT4_MOTOR_DATA_1, videoram[0x391] & 15);
+	discrete_sound_w(SPRINT4_MOTOR_DATA_2, videoram[0x393] & 15);
+	discrete_sound_w(SPRINT4_MOTOR_DATA_3, videoram[0x395] & 15);
+	discrete_sound_w(SPRINT4_MOTOR_DATA_4, videoram[0x397] & 15);
 }
 
 

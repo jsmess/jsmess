@@ -687,8 +687,8 @@ The ICB set may also be known as the M105 set as some label sets included that n
 
 ROM_START( gepoker ) /* v50.02 with most roms for ICB dated 8-16-84 */
 	ROM_REGION( 0x1b000, REGION_CPU1, ROMREGION_ERASEFF )
-	ROM_LOAD( "control_icb_8-16",  0x00000, 0x2000, CRC(0103963d) SHA1(9bc646e721048b84111e0686eaca23bc24eee3e2) )
-	ROM_LOAD( "high_icb_6-25",     0x0e000, 0x2000, CRC(dfb6592e) SHA1(d68de9f537d3c14279dc576424d195bb266e3897) )
+	ROM_LOAD( "control_icb_8-16",    0x00000, 0x2000, CRC(0103963d) SHA1(9bc646e721048b84111e0686eaca23bc24eee3e2) )
+	ROM_LOAD( "high_icb_6-25-85-5",  0x0e000, 0x2000, CRC(dfb6592e) SHA1(d68de9f537d3c14279dc576424d195bb266e3897) )
 	/* Banked roms */
 	ROM_LOAD( "jokerpoker_icb_8-16-84",    0x10000, 0x2000, CRC(0834a1e6) SHA1(663e6f4e0586eb9b84d3098aef8c596585c27304) )
 	ROM_LOAD( "blackjack_icb_8-16-84",     0x12000, 0x2000, CRC(cff27ffd) SHA1(fd85b54400b2f22ae92042b01a2c162e64d2d066) )
@@ -711,11 +711,13 @@ ROM_END
 
 ROM_START( gepoker2 ) /* v50.02 with roms for ICB dated 9-30-86 */
 	ROM_REGION( 0x1b000, REGION_CPU1, ROMREGION_ERASEFF )
-	ROM_LOAD( "control_icb_9-30",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
-	ROM_LOAD( "high_icb_6-25a",    0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
+	ROM_LOAD( "control_icb_9-30",    0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
+	ROM_LOAD( "high_icb_6-25-85-5a", 0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
 	/* Banked roms */
 	ROM_LOAD( "jokerpoker_icb_9-30-86",    0x10000, 0x2000, CRC(a1473367) SHA1(9b37ccafc02704e8f1d61150326494e86148d84e) )
-	ROM_LOAD( "casinoslots_icb_9-30-86",   0x12000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
+	ROM_LOAD( "blackjack_icb_9-30-86",     0x12000, 0x2000, CRC(82804184) SHA1(2e2e6a80c99c8eb226dc54c1d32d0bf24de300a4) )
+	ROM_LOAD( "casinoslots_icb_9-30-86",   0x14000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
+	ROM_LOAD( "instantbingo_t24_10-07-86", 0x16000, 0x2000, CRC(de87ed0a) SHA1(4a26d93368c1a39dd38aabe450c34203101f0ef7) ) /* Found with this set, is it compatible or an operater swap? */
 ROM_END
 
 ROM_START( gepoker3 ) /* v50.02 with control dated 9-30-84 */

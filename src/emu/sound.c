@@ -179,7 +179,7 @@ void sound_init(running_machine *machine)
 	const char *filename;
 
 	/* handle -nosound */
-	nosound_mode = !options_get_bool(OPTION_SOUND);
+	nosound_mode = !options_get_bool(mame_options(), OPTION_SOUND);
 	if (nosound_mode)
 		Machine->sample_rate = 11025;
 
@@ -213,14 +213,14 @@ void sound_init(running_machine *machine)
 	route_sound();
 
 	/* open the output WAV file if specified */
-	filename = options_get_string(OPTION_WAVWRITE);
+	filename = options_get_string(mame_options(), OPTION_WAVWRITE);
 	if (filename != NULL)
 		wavfile = wav_open(filename, machine->sample_rate, 2);
 
 	/* enable sound by default */
 	global_sound_enabled = TRUE;
 	sound_muted = FALSE;
-	sound_set_attenuation(options_get_int(OPTION_VOLUME));
+	sound_set_attenuation(options_get_int(mame_options(), OPTION_VOLUME));
 
 	/* register callbacks */
 	config_register("mixer", sound_load, sound_save);

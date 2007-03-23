@@ -6,6 +6,7 @@ Atari Ultra Tank video emulation
 
 #include "driver.h"
 #include "ultratnk.h"
+#include "audio/sprint4.h"
 
 static tilemap* playfield;
 
@@ -153,8 +154,8 @@ VIDEO_EOF( ultratnk )
 
 	/* update sound status */
 
-	discrete_sound_w(ULTRATNK_MOTOR1_DATA, ~videoram[0x391] & 15);
-	discrete_sound_w(ULTRATNK_MOTOR2_DATA, ~videoram[0x393] & 15);
+	discrete_sound_w(ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
+	discrete_sound_w(ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 }
 
 

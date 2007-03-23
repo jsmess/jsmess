@@ -183,6 +183,7 @@ struct _SCSP
 	signed short RINGBUF[64];
 	unsigned char BUFPTR;
 	unsigned char *SCSPRAM;
+	UINT32 SCSPRAM_LENGTH;
 	char Master;
 	void (*Int68kCB)(int irq);
 	sound_stream * stream;
@@ -459,7 +460,9 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf)
 		if (intf->region)
 		{
 			SCSP->SCSPRAM = memory_region(intf->region);
+			SCSP->SCSPRAM_LENGTH = memory_region_length(intf->region);
 			SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
+			SCSP->DSP.SCSPRAM_LENGTH =  memory_region_length(intf->region)/2;
 			SCSP->SCSPRAM += intf->roffset;
 		}
 	}

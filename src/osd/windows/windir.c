@@ -132,7 +132,7 @@ void osd_closedir(osd_directory *dir)
 	if (dir->entry.name != NULL)
 		free((void *)dir->entry.name);
 	if (dir->find != INVALID_HANDLE_VALUE)
-		CloseHandle(dir->find);
+		FindClose(dir->find);
 	free(dir);
 }
 

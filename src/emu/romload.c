@@ -159,7 +159,7 @@ void CLIB_DECL debugload(const char *string, ...)
 
 int determine_bios_rom(const bios_entry *bios)
 {
-	const char *specbios = options_get_string(OPTION_BIOS);
+	const char *specbios = options_get_string(mame_options(), OPTION_BIOS);
 	const bios_entry *firstbios = bios;
 
 	/* set to default */

@@ -1,53 +1,72 @@
 /*************************************************************************
 
-    vicdual.h
+    VIC Dual Game board
 
 *************************************************************************/
 
 #include "sound/discrete.h"
 
+
+#define VICDUAL_MASTER_CLOCK				(15468480)
+#define VICDUAL_MAIN_CPU_CLOCK				(VICDUAL_MASTER_CLOCK/8)
+#define VICDUAL_PIXEL_CLOCK					(VICDUAL_MASTER_CLOCK/3)
+#define VICDUAL_HTOTAL						(0x148)
+#define VICDUAL_HBEND						(0x000)
+#define VICDUAL_HBSTART						(0x100)
+#define VICDUAL_HSSTART						(0x110)
+#define VICDUAL_HSEND						(0x130)
+#define VICDUAL_VTOTAL						(0x106)
+#define VICDUAL_VBEND						(0x000)
+#define VICDUAL_VBSTART						(0x0e0)
+#define VICDUAL_VSSTART						(0x0ec)
+#define VICDUAL_VSEND						(0x0f0)
+
+
 /*----------- defined in drivers/vicdual.c -----------*/
 
-extern mame_timer *croak_timer;
+UINT8 vicdual_videoram_r(offs_t offset);
+UINT8 vicdual_characterram_r(offs_t offset);
+
+int vicdual_is_cabinet_color(void);
+
 
 /*----------- defined in video/vicdual.c -----------*/
 
-extern unsigned char *vicdual_characterram;
-PALETTE_INIT( vicdual );
-WRITE8_HANDLER( vicdual_characterram_w );
-READ8_HANDLER( vicdual_characterram_r );
 WRITE8_HANDLER( vicdual_palette_bank_w );
-VIDEO_UPDATE( vicdual );
 
-/*----------- defined in audio/carnival.c -----------*/
+VIDEO_UPDATE( vicdual_bw );
+VIDEO_UPDATE( vicdual_color );
+VIDEO_UPDATE( vicdual_bw_or_color );
 
-extern const char *carnival_sample_names[];
-WRITE8_HANDLER( carnival_sh_port1_w );
-WRITE8_HANDLER( carnival_sh_port2_w );
-READ8_HANDLER( carnival_music_port_t1_r );
-WRITE8_HANDLER( carnival_music_port_1_w );
-WRITE8_HANDLER( carnival_music_port_2_w );
-
-/*----------- defined in audio/depthch.c -----------*/
-
-extern const char *depthch_sample_names[];
-WRITE8_HANDLER( depthch_sh_port1_w );
-
-/*----------- defined in audio/invinco.c -----------*/
-
-extern const char *invinco_sample_names[];
-WRITE8_HANDLER( invinco_sh_port2_w );
-
-/*----------- defined in audio/pulsar.c -----------*/
-
-extern const char *pulsar_sample_names[];
-WRITE8_HANDLER( pulsar_sh_port1_w );
-WRITE8_HANDLER( pulsar_sh_port2_w );
 
 /*----------- defined in audio/vicdual.c -----------*/
 
-WRITE8_HANDLER( frogs_sh_port2_w );
-void croak_callback(int param);
+MACHINE_START( frogs_audio );
+MACHINE_DRIVER_EXTERN( frogs_audio );
+WRITE8_HANDLER( frogs_audio_w );
 
-extern struct Samplesinterface frogs_samples_interface;
-extern discrete_sound_block frogs_discrete_interface[];
+
+/*----------- defined in audio/depthch.c -----------*/
+
+MACHINE_DRIVER_EXTERN( depthch_audio );
+WRITE8_HANDLER( depthch_audio_w );
+
+
+/*----------- defined in audio/carnival.c -----------*/
+
+MACHINE_DRIVER_EXTERN( carnival_audio );
+WRITE8_HANDLER( carnival_audio_1_w );
+WRITE8_HANDLER( carnival_audio_2_w );
+
+
+/*----------- defined in audio/invinco.c -----------*/
+
+MACHINE_DRIVER_EXTERN( invinco_audio );
+WRITE8_HANDLER( invinco_audio_w );
+
+
+/*----------- defined in audio/pulsar.c -----------*/
+
+MACHINE_DRIVER_EXTERN( pulsar_audio );
+WRITE8_HANDLER( pulsar_audio_1_w );
+WRITE8_HANDLER( pulsar_audio_2_w );

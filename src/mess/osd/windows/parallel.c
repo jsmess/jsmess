@@ -131,7 +131,7 @@ int win_parallel_init(void)
 	processor_count = get_processor_count();
 
 	// retrieve the option
-	win_task_count = options_get_int("threads");
+	win_task_count = options_get_int(mame_options(), "threads");
 
 	// if we didn't specify the amount of tasks, use the processor count
 	if (win_task_count == 0)

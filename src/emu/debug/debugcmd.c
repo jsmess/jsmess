@@ -243,7 +243,7 @@ void debug_command_init(running_machine *machine)
 	add_exit_callback(machine, debug_command_exit);
 
 	/* set up the initial debugscript if specified */
-	name = options_get_string(OPTION_DEBUGSCRIPT);
+	name = options_get_string(mame_options(), OPTION_DEBUGSCRIPT);
 	if (name != NULL)
 		debug_source_script(name);
 }
@@ -350,11 +350,11 @@ static void global_set(UINT32 ref, UINT64 value)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    validate_parameter_number - validates a
+    debug_command_parameter_number - validates a
     number parameter
 -------------------------------------------------*/
 
-static int validate_parameter_number(const char *param, UINT64 *result)
+int debug_command_parameter_number(const char *param, UINT64 *result)
 {
 	EXPRERR err = expression_evaluate(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, result);
 	if (err == EXPRERR_NONE)
@@ -367,11 +367,11 @@ static int validate_parameter_number(const char *param, UINT64 *result)
 
 
 /*-------------------------------------------------
-    validate_parameter_expression - validates an
-    expression parameter
+    debug_command_parameter_expression - validates
+    an expression parameter
 -------------------------------------------------*/
 
-static int validate_parameter_expression(const char *param, parsed_expression **result)
+static int debug_command_parameter_expression(const char *param, parsed_expression **result)
 {
 	EXPRERR err = expression_parse(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, result);
 	if (err == EXPRERR_NONE)
@@ -384,11 +384,11 @@ static int validate_parameter_expression(const char *param, parsed_expression **
 
 
 /*-------------------------------------------------
-    validate_parameter_command - validates a
+    debug_command_parameter_command - validates a
     command parameter
 -------------------------------------------------*/
 
-static int validate_parameter_command(const char *param)
+static int debug_command_parameter_command(const char *param)
 {
 	CMDERR err = debug_console_validate_command(param);
 	if (err == CMDERR_NONE)
@@ -431,7 +431,7 @@ static void execute_print(int ref, int params, const char *param[])
 
 	/* validate the other parameters */
 	for (i = 0; i < params; i++)
-		if (!validate_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(param[i], &values[i]))
 			return;
 
 	/* then print each one */
@@ -552,7 +552,7 @@ static void execute_printf(int ref, int params, const char *param[])
 
 	/* validate the other parameters */
 	for (i = 1; i < params; i++)
-		if (!validate_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(param[i], &values[i]))
 			return;
 
 	/* then do a printf */
@@ -573,7 +573,7 @@ static void execute_logerror(int ref, int params, const char *param[])
 
 	/* validate the other parameters */
 	for (i = 1; i < params; i++)
-		if (!validate_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(param[i], &values[i]))
 			return;
 
 	/* then do a printf */
@@ -599,7 +599,7 @@ static void execute_tracelog(int ref, int params, const char *param[])
 
 	/* validate the other parameters */
 	for (i = 1; i < params; i++)
-		if (!validate_parameter_number(param[i], &values[i]))
+		if (!debug_command_parameter_number(param[i], &values[i]))
 			return;
 
 	/* then do a printf */
@@ -625,7 +625,7 @@ static void execute_quit(int ref, int params, const char *param[])
 static void execute_do(int ref, int params, const char *param[])
 {
 	UINT64 dummy;
-	validate_parameter_number(param[0], &dummy);
+	debug_command_parameter_number(param[0], &dummy);
 }
 
 
@@ -638,7 +638,7 @@ static void execute_step(int ref, int params, const char *param[])
 	UINT64 steps = 1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !validate_parameter_number(param[0], &steps))
+	if (params > 0 && !debug_command_parameter_number(param[0], &steps))
 		return;
 
 	debug_cpu_single_step(steps);
@@ -654,7 +654,7 @@ static void execute_over(int ref, int params, const char *param[])
 	UINT64 steps = 1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !validate_parameter_number(param[0], &steps))
+	if (params > 0 && !debug_command_parameter_number(param[0], &steps))
 		return;
 
 	debug_cpu_single_step_over(steps);
@@ -680,7 +680,7 @@ static void execute_go(int ref, int params, const char *param[])
 	UINT64 addr = ~0;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !validate_parameter_number(param[0], &addr))
+	if (params > 0 && !debug_command_parameter_number(param[0], &addr))
 		return;
 
 	debug_cpu_go(addr);
@@ -707,7 +707,7 @@ static void execute_go_interrupt(int ref, int params, const char *param[])
 	UINT64 irqline = -1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !validate_parameter_number(param[0], &irqline))
+	if (params > 0 && !debug_command_parameter_number(param[0], &irqline))
 		return;
 
 	debug_cpu_go_interrupt(irqline);
@@ -723,7 +723,7 @@ static void execute_go_time(int ref, int params, const char *param[])
 	UINT64 milliseconds = -1;
 
 	/* if we have a parameter, use it instead */
-	if (params > 0 && !validate_parameter_number(param[0], &milliseconds))
+	if (params > 0 && !debug_command_parameter_number(param[0], &milliseconds))
 		return;
 
 	debug_cpu_go_milliseconds(milliseconds);
@@ -750,7 +750,7 @@ static void execute_focus(int ref, int params, const char *param[])
 	int cpunum;
 
 	/* validate params */
-	if (!validate_parameter_number(param[0], &cpuwhich))
+	if (!debug_command_parameter_number(param[0], &cpuwhich))
 		return;
 	if (cpuwhich >= cpu_gettotalcpu())
 	{
@@ -811,7 +811,7 @@ static void execute_ignore(int ref, int params, const char *param[])
 		/* validate parameters */
 		for (paramnum = 0; paramnum < params; paramnum++)
 		{
-			if (!validate_parameter_number(param[paramnum], &cpuwhich[paramnum]))
+			if (!debug_command_parameter_number(param[paramnum], &cpuwhich[paramnum]))
 				return;
 			if (cpuwhich[paramnum] >= cpu_gettotalcpu())
 			{
@@ -882,7 +882,7 @@ static void execute_observe(int ref, int params, const char *param[])
 		/* validate parameters */
 		for (paramnum = 0; paramnum < params; paramnum++)
 		{
-			if (!validate_parameter_number(param[paramnum], &cpuwhich[paramnum]))
+			if (!debug_command_parameter_number(param[paramnum], &cpuwhich[paramnum]))
 				return;
 			if (cpuwhich[paramnum] >= cpu_gettotalcpu())
 			{
@@ -910,7 +910,7 @@ static void execute_comment(int ref, int params, const char *param[])
 	UINT64 address;
 
 	/* param 1 is the address for the comment */
-	if (!validate_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(param[0], &address))
 		return;
 
 	/* make sure param 2 exists */
@@ -935,7 +935,7 @@ static void execute_comment_del(int ref, int params, const char *param[])
 	UINT64 address;
 
 	/* param 1 can either be a command or the address for the comment */
-	if (!validate_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(param[0], &address))
 		return;
 
 	/* If it's a number, it must be an address */
@@ -976,15 +976,15 @@ static void execute_bpset(int ref, int params, const char *param[])
 	}
 
 	/* param 1 is the address */
-	if (!validate_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(param[0], &address))
 		return;
 
 	/* param 2 is the condition */
-	if (params > 1 && !validate_parameter_expression(param[1], &condition))
+	if (params > 1 && !debug_command_parameter_expression(param[1], &condition))
 		return;
 
 	/* param 3 is the action */
-	if (params > 2 && !validate_parameter_command(action = param[2]))
+	if (params > 2 && !debug_command_parameter_command(action = param[2]))
 		return;
 
 	/* set the breakpoint */
@@ -1021,7 +1021,7 @@ static void execute_bpclear(int ref, int params, const char *param[])
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!validate_parameter_number(param[0], &bpindex))
+	else if (!debug_command_parameter_number(param[0], &bpindex))
 		return;
 	else
 	{
@@ -1065,7 +1065,7 @@ static void execute_bpdisenable(int ref, int params, const char *param[])
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!validate_parameter_number(param[0], &bpindex))
+	else if (!debug_command_parameter_number(param[0], &bpindex))
 		return;
 	else
 	{
@@ -1133,11 +1133,11 @@ static void execute_wpset(int ref, int params, const char *param[])
 	int wpnum;
 
 	/* param 1 is the address */
-	if (!validate_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(param[0], &address))
 		return;
 
 	/* param 2 is the length */
-	if (!validate_parameter_number(param[1], &length))
+	if (!debug_command_parameter_number(param[1], &length))
 		return;
 
 	/* param 3 is the type */
@@ -1154,11 +1154,11 @@ static void execute_wpset(int ref, int params, const char *param[])
 	}
 
 	/* param 4 is the condition */
-	if (params > 3 && !validate_parameter_expression(param[3], &condition))
+	if (params > 3 && !debug_command_parameter_expression(param[3], &condition))
 		return;
 
 	/* param 5 is the action */
-	if (params > 4 && !validate_parameter_command(action = param[4]))
+	if (params > 4 && !debug_command_parameter_command(action = param[4]))
 		return;
 
 	/* set the watchpoint */
@@ -1200,7 +1200,7 @@ static void execute_wpclear(int ref, int params, const char *param[])
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!validate_parameter_number(param[0], &wpindex))
+	else if (!debug_command_parameter_number(param[0], &wpindex))
 		return;
 	else
 	{
@@ -1249,7 +1249,7 @@ static void execute_wpdisenable(int ref, int params, const char *param[])
 	}
 
 	/* otherwise, clear the specific one */
-	else if (!validate_parameter_number(param[0], &wpindex))
+	else if (!debug_command_parameter_number(param[0], &wpindex))
 		return;
 	else
 	{
@@ -1351,11 +1351,11 @@ static void execute_hotspot(int ref, int params, const char *param[])
 	cpunum = cpu_getactivecpu();
 	count = 64;
 	threshhold = 250;
-	if (params > 0 && !validate_parameter_number(param[0], &cpunum))
+	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
 		return;
-	if (params > 1 && !validate_parameter_number(param[1], &count))
+	if (params > 1 && !debug_command_parameter_number(param[1], &count))
 		return;
-	if (params > 2 && !validate_parameter_number(param[2], &threshhold))
+	if (params > 2 && !debug_command_parameter_number(param[2], &threshhold))
 		return;
 
 	/* attempt to install */
@@ -1379,11 +1379,11 @@ static void execute_save(int ref, int params, const char *param[])
 	UINT64 i;
 
 	/* validate parameters */
-	if (!validate_parameter_number(param[1], &offset))
+	if (!debug_command_parameter_number(param[1], &offset))
 		return;
-	if (!validate_parameter_number(param[2], &length))
+	if (!debug_command_parameter_number(param[2], &length))
 		return;
-	if (params > 3 && !validate_parameter_number(param[3], &cpunum))
+	if (params > 3 && !debug_command_parameter_number(param[3], &cpunum))
 		return;
 
 	/* determine the addresses to write */
@@ -1427,15 +1427,15 @@ static void execute_dump(int ref, int params, const char *param[])
 	UINT64 i, j;
 
 	/* validate parameters */
-	if (!validate_parameter_number(param[1], &offset))
+	if (!debug_command_parameter_number(param[1], &offset))
 		return;
-	if (!validate_parameter_number(param[2], &length))
+	if (!debug_command_parameter_number(param[2], &length))
 		return;
-	if (params > 3 && !validate_parameter_number(param[3], &width))
+	if (params > 3 && !debug_command_parameter_number(param[3], &width))
 		return;
-	if (params > 4 && !validate_parameter_number(param[4], &ascii))
+	if (params > 4 && !debug_command_parameter_number(param[4], &ascii))
 		return;
-	if (params > 5 && !validate_parameter_number(param[5], &cpunum))
+	if (params > 5 && !debug_command_parameter_number(param[5], &cpunum))
 		return;
 
 	/* further validation */
@@ -1600,9 +1600,9 @@ static void execute_find(int ref, int params, const char *param[])
 	UINT64 i, j;
 
 	/* validate parameters */
-	if (!validate_parameter_number(param[0], &offset))
+	if (!debug_command_parameter_number(param[0], &offset))
 		return;
-	if (!validate_parameter_number(param[1], &length))
+	if (!debug_command_parameter_number(param[1], &length))
 		return;
 
 	/* further validation */
@@ -1648,7 +1648,7 @@ static void execute_find(int ref, int params, const char *param[])
 				data_size[data_count++] |= 0x10;
 
 			/* otherwise, validate as a number */
-			else if (!validate_parameter_number(pdata, &data_to_find[data_count++]))
+			else if (!debug_command_parameter_number(pdata, &data_to_find[data_count++]))
 				return;
 		}
 	}
@@ -1702,13 +1702,13 @@ static void execute_dasm(int ref, int params, const char *param[])
 	int i, j;
 
 	/* validate parameters */
-	if (!validate_parameter_number(param[1], &offset))
+	if (!debug_command_parameter_number(param[1], &offset))
 		return;
-	if (!validate_parameter_number(param[2], &length))
+	if (!debug_command_parameter_number(param[2], &length))
 		return;
-	if (params > 3 && !validate_parameter_number(param[3], &bytes))
+	if (params > 3 && !debug_command_parameter_number(param[3], &bytes))
 		return;
-	if (params > 4 && !validate_parameter_number(param[4], &cpunum))
+	if (params > 4 && !debug_command_parameter_number(param[4], &cpunum))
 		return;
 
 	/* further validation */
@@ -1850,9 +1850,9 @@ static void execute_trace_internal(int ref, int params, const char *param[], int
 	cpunum = cpu_getactivecpu();
 
 	/* validate parameters */
-	if (params > 1 && !validate_parameter_number(param[1], &cpunum))
+	if (params > 1 && !debug_command_parameter_number(param[1], &cpunum))
 		return;
-	if (params > 2 && !validate_parameter_command(action = param[2]))
+	if (params > 2 && !debug_command_parameter_command(action = param[2]))
 		return;
 
 	/* further validation */
@@ -1937,9 +1937,9 @@ static void execute_history(int ref, int params, const char *param[])
 	cpunum = cpu_getactivecpu();
 
 	/* validate parameters */
-	if (params > 0 && !validate_parameter_number(param[0], &cpunum))
+	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
 		return;
-	if (params > 1 && !validate_parameter_number(param[1], &count))
+	if (params > 1 && !debug_command_parameter_number(param[1], &count))
 		return;
 
 	/* further validation */
@@ -2049,7 +2049,7 @@ static void execute_map(int ref, int params, const char *param[])
 	offs_t taddress;
 
 	/* validate parameters */
-	if (!validate_parameter_number(param[0], &address))
+	if (!debug_command_parameter_number(param[0], &address))
 		return;
 	info = debug_get_cpu_info(cpunum);
 
@@ -2115,7 +2115,7 @@ static void execute_symlist(int ref, int params, const char **param)
 	int symnum, count = 0;
 
 	/* validate parameters */
-	if (params > 0 && !validate_parameter_number(param[0], &cpunum))
+	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
 		return;
 	if (cpunum != 100000 && cpunum >= cpu_gettotalcpu())
 	{

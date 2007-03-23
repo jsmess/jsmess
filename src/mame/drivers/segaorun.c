@@ -55,7 +55,7 @@ static const UINT8 *custom_map;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void);
+extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
@@ -152,7 +152,7 @@ static void outrun_generic_init(void)
 	segaic16_memory_mapper_init(0, outrun_info, sound_data_w, NULL);
 
 	/* init the FD1094 */
-	fd1094_driver_init();
+	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
 
 	/* configure the 8255 interface */
 	ppi8255_init(&single_ppi_intf);

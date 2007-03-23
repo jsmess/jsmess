@@ -358,8 +358,8 @@ void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cli
 	{
 		int reg = (layer == 0) ? 0x00 : 0x08;
 
-		INT32 x  = (INT16)((K001604_reg[chip][reg+0] >>  0) & 0xffff);
-		INT32 y  = (INT16)((K001604_reg[chip][reg+0] >> 16) & 0xffff);
+		INT32 x  = (INT16)((K001604_reg[chip][reg+0] >> 16) & 0xffff);
+		INT32 y  = (INT16)((K001604_reg[chip][reg+0] >>  0) & 0xffff);
 		INT32 xx = (INT16)((K001604_reg[chip][reg+1] >>  0) & 0xffff);
 		INT32 xy = (INT16)((K001604_reg[chip][reg+1] >> 16) & 0xffff);
 		INT32 yx = (INT16)((K001604_reg[chip][reg+2] >>  0) & 0xffff);
@@ -368,8 +368,8 @@ void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cli
 		x  = (x) * 256;
 		y  = (y) * 256;
 		xx = (xx);
-		xy = (xy);
-		yx = (yx);
+		xy = (-xy);
+		yx = (-yx);
 		yy = (yy);
 
 		if ((K001604_reg[chip][0x6c/4] & (0x02 >> layer)) == 0)

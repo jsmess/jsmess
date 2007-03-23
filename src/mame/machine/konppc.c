@@ -196,7 +196,7 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 			{
 				if (data & 0x03)
 				{
-					//cpunum_set_input_line(2, INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpunum_set_input_line(2, INPUT_LINE_IRQ2, ASSERT_LINE);
 				}
 			}
 			break;

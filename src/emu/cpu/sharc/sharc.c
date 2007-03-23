@@ -169,6 +169,8 @@ int interrupt_active = 0;
 						((UINT64)(sharc.internal_ram[((pc-0x20000) * 3) + 1]) << 16) | \
 						((UINT64)(sharc.internal_ram[((pc-0x20000) * 3) + 2]) << 0)
 
+static UINT32 delay_slot1, delay_slot2;
+
 INLINE void CHANGE_PC(UINT32 newpc)
 {
 	sharc.pc = newpc;
@@ -185,6 +187,9 @@ INLINE void CHANGE_PC(UINT32 newpc)
 INLINE void CHANGE_PC_DELAYED(UINT32 newpc)
 {
 	sharc.nfaddr = newpc;
+
+	delay_slot1 = sharc.pc;
+	delay_slot2 = sharc.daddr;
 }
 
 
@@ -519,7 +524,8 @@ void sharc_set_flag_input(int flag_num, int state)
 static void check_interrupts(void)
 {
 	int i;
-	if ((sharc.imask & sharc.irq_active) && (sharc.mode1 & MODE1_IRPTEN) && !interrupt_active)
+	if ((sharc.imask & sharc.irq_active) && (sharc.mode1 & MODE1_IRPTEN) && !interrupt_active &&
+		sharc.pc != delay_slot1 && sharc.pc != delay_slot2)
 	{
 		int which = 0;
 		for (i=0; i < 32; i++)
@@ -548,6 +554,7 @@ static void check_interrupts(void)
 		}
 
 		CHANGE_PC(0x20000 + (which * 0x4));
+
 		/* TODO: alter IMASKP */
 
 		sharc.active_irq_num = which;
@@ -556,6 +563,10 @@ static void check_interrupts(void)
 		interrupt_active = 1;
 	}
 }
+
+static UINT32 astat_old;
+static UINT32 astat_old_old;
+static UINT32 astat_old_old_old;
 
 static int sharc_execute(int cycles)
 {
@@ -605,6 +616,10 @@ static int sharc_execute(int cycles)
 		sharc.faddr = sharc.nfaddr;
 		sharc.nfaddr++;
 
+		astat_old_old_old = astat_old_old;
+		astat_old_old = astat_old;
+		astat_old = sharc.astat;
+
 		sharc.decode_opcode = sharc.fetch_opcode;
 
 		// fetch next instruction
@@ -621,6 +636,14 @@ static int sharc_execute(int cycles)
 				{
 					int condition = (sharc.laddr >> 24) & 0x1f;
 
+					{
+						UINT32 looptop = TOP_PC();
+						if (sharc.pc - looptop > 2)
+						{
+							sharc.astat = astat_old_old_old;
+						}
+					}
+
 					if (DO_CONDITION_CODE(condition))
 					{
 						POP_LOOP();
@@ -630,6 +653,8 @@ static int sharc_execute(int cycles)
 					{
 						CHANGE_PC(TOP_PC());
 					}
+
+					sharc.astat = astat_old;
 					break;
 				}
 				case 1:		// counter-based, length 1
@@ -702,8 +727,6 @@ static int sharc_execute(int cycles)
 				}
 			}
 		}
-
-
 
 		--sharc_icount;
 	};

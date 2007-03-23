@@ -832,6 +832,7 @@ WW.B11    Object 5 - Even
 #include "system16.h"
 #include "machine/segaic16.h"
 #include "machine/fd1094.h"
+#include "machine/mc8123.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
@@ -883,7 +884,7 @@ static const UINT8 *i8751_initial_config;
  *************************************/
 
 extern void fd1094_machine_init(void);
-extern void fd1094_driver_init(void);
+extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
@@ -1000,17 +1001,7 @@ static void system16b_generic_init(int _rom_board)
 	segaic16_memory_mapper_init(0, region_info_list[rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
-	fd1094_driver_init();
-
-#ifdef MAME_DEBUG
-if (strcmp(Machine->gamedrv->name, "exctleag") == 0 ||
-	strcmp(Machine->gamedrv->name, "suprleag") == 0 ||
-	strcmp(Machine->gamedrv->name, "bullet") == 0 ||
-	strcmp(Machine->gamedrv->name, "altbeaj1") == 0)
-{
-	fd1094_find_global_keys((const UINT16 *)memory_region(REGION_CPU1), memory_region(REGION_USER1));
-}
-#endif
+	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;
@@ -3090,7 +3081,7 @@ MACHINE_DRIVER_END
     ROM Board: 171-5358
 */
 ROM_START( aceattac )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_REGION( 0x040000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr11491.a4", 0x000000, 0x10000, CRC(f3c19c36) SHA1(e45ca6d1d943d6cc140867055033884c738e2ac2) )
 	ROM_LOAD16_BYTE( "epr11489.a1", 0x000001, 0x10000, CRC(bbe623c5) SHA1(6d047699c7b6df7ebb7a3c9bee032e2536eed84c) )
 	ROM_LOAD16_BYTE( "epr11492.a5", 0x020000, 0x10000, CRC(d8bd3139) SHA1(54915d4e8a616e0e54135ca34daf4357b8bfa068) )
@@ -3098,6 +3089,8 @@ ROM_START( aceattac )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
 	ROM_LOAD( "317-0059.key", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x040000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr11493.b9",  0x00000, 0x10000, CRC(654485d9) SHA1(b431270564c4e33fd70c8c85af1fcbff8b59ba49) )
@@ -3367,6 +3360,9 @@ ROM_START( altbeas4 )
 	ROM_LOAD( "epr-11686.a10",    0x00000, 0x08000, CRC(828a45b3) SHA1(df921701b411afac1b6716b6798a1bffc2180133) )	// encrypted
 	ROM_LOAD( "opr-11672.a11",    0x10000, 0x20000, CRC(bbd7f460) SHA1(bbc5c2219cb3a827d84062b19affd9780da2a3cf) )
 	ROM_LOAD( "opr-11673.a12",    0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
+
+	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0066.key",  0x0000, 0x2000, CRC(ed85a054) SHA1(dcc84ec077a8a489f45abfd2bf4a9ba377da28a5) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3441,6 +3437,9 @@ ROM_START( altbeas2 )
 	ROM_LOAD( "epr-11686.a10",    0x00000, 0x08000, CRC(828a45b3) SHA1(df921701b411afac1b6716b6798a1bffc2180133) )	// encrypted
 	ROM_LOAD( "opr-11672.a11",    0x10000, 0x20000, CRC(bbd7f460) SHA1(bbc5c2219cb3a827d84062b19affd9780da2a3cf) )
 	ROM_LOAD( "opr-11673.a12",    0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
+
+	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0066.key",  0x0000, 0x2000, CRC(ed85a054) SHA1(dcc84ec077a8a489f45abfd2bf4a9ba377da28a5) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3455,6 +3454,8 @@ ROM_START( altbeaj1 )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
 	ROM_LOAD( "317-0065.key", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x040000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
 
 	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "opr-11674.a14", 0x00000, 0x20000, CRC(a57a66d5) SHA1(5103583d48997abad12a0c5fee26431c486ced52) )
@@ -3807,6 +3808,8 @@ ROM_START( bullet )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
 	ROM_LOAD( "317-0041.key", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x040000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr10994.b9",  0x00000, 0x10000, CRC(3035468a) SHA1(778366815a2a74188d72d64c5e1e95215bc4ca81) )
@@ -4243,6 +4246,8 @@ ROM_START( exctleag )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
 	ROM_LOAD( "317-0079.key", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x060000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr11942.b09", 0x00000, 0x10000, CRC(eb70e827) SHA1(0617b4411a90087c277354c3653fe994bc4fc580) )
@@ -5119,6 +5124,9 @@ ROM_START( shinobi3 )
 	ROM_LOAD( "epr11372.a7", 0x00000, 0x8000, CRC(0824269a) SHA1(501ab1b80c6e8a4b0ccda148c13fa96c71c7300d) )	// MC8123B (317-0054) encrypted version of epr11287.a7
 	ROM_LOAD( "epr11288.a8", 0x10000, 0x8000, CRC(c8df8460) SHA1(0aeb41a493df155edb5f600f53ec43b798927dff) )
 	ROM_LOAD( "epr11289.a9", 0x20000, 0x8000, CRC(e5a4cf30) SHA1(d1982da7a550c11ab2253f5d64ac6ab847da0a04) )
+
+	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0054.key",  0x0000, 0x2000, CRC(39fd4535) SHA1(93bbb139d2d5acc6a1e338d92077e79a5e880b2e) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -5266,7 +5274,7 @@ ROM_END
     ROM Board: 171-5358
 */
 ROM_START( suprleag )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_REGION( 0x060000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr11133.a04", 0x00000, 0x10000, CRC(eed72f37) SHA1(80b68abdb90a63b30754dd031e85b1020dcc0cc4) )
 	ROM_LOAD16_BYTE( "epr11130.a01", 0x00001, 0x10000, CRC(e2451676) SHA1(d2f71d9fca933e63e2bd5ee48217801ab0cb049c) )
 	ROM_LOAD16_BYTE( "epr11134.a05", 0x20000, 0x10000, CRC(ccd857f5) SHA1(2566bb458bdd365db403e8229ecdad79e23076a1) )
@@ -5276,6 +5284,8 @@ ROM_START( suprleag )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
 	ROM_LOAD( "317-0045.key", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x060000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr11136.b09", 0x00000, 0x10000, CRC(c3860ce4) SHA1(af7618f3b5a0e8d6374877c7815ba69fff218a45) )
@@ -5875,9 +5885,8 @@ static DRIVER_INIT( altbeas5_5521 )
 
 static DRIVER_INIT( altbeas4_5521 )
 {
-	extern void mc8123_decrypt_0066(void);
 	init_generic_5521(machine);
-	mc8123_decrypt_0066();
+	mc8123_decrypt_rom(1, memory_region(REGION_USER2), 0, 0);
 }
 
 
@@ -5954,9 +5963,8 @@ static DRIVER_INIT( defense_5358 )
 
 static DRIVER_INIT( shinobi3_5358 )
 {
-	extern void mc8123_decrypt_0054(void);
 	init_generic_5358(machine);
-	mc8123_decrypt_0054();
+	mc8123_decrypt_rom(1, memory_region(REGION_USER2), 0, 0);
 }
 
 

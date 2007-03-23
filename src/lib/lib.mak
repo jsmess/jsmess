@@ -36,6 +36,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/huffman.o \
 	$(LIBOBJ)/util/jedparse.o \
 	$(LIBOBJ)/util/md5.o \
+	$(LIBOBJ)/util/options.o \
 	$(LIBOBJ)/util/png.o \
 	$(LIBOBJ)/util/pool.o \
 	$(LIBOBJ)/util/sha1.o \

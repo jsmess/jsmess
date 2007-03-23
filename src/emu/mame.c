@@ -174,11 +174,6 @@ struct _mame_private
 /* the active machine */
 running_machine *Machine;
 
-#ifdef MESS
-/* various game options filled in by the OSD */
-global_options options;
-#endif
-
 /* output channels */
 static output_callback output_cb[OUTPUT_CHANNEL_COUNT];
 static void *output_cb_param[OUTPUT_CHANNEL_COUNT];
@@ -309,7 +304,7 @@ int run_game(int game)
 
 			/* if we have a logfile, set up the callback */
 			mame->logerror_callback_list = NULL;
-			if (options_get_bool(OPTION_LOG))
+			if (options_get_bool(mame_options(), OPTION_LOG))
 			{
 				file_error filerr = mame_fopen(SEARCHPATH_DEBUGLOG, "error.log", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &mame->logfile);
 				assert_always(filerr == FILERR_NONE, "unable to open log file");
@@ -489,7 +484,7 @@ void mame_schedule_exit(running_machine *machine)
 	mame->exit_pending = TRUE;
 
 	/* if we're autosaving on exit, schedule a save as well */
-	if (options_get_bool(OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
+	if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
 		mame_schedule_save(machine, machine->gamedrv->name);
 }
 
@@ -1142,8 +1137,8 @@ static running_machine *create_machine(int game)
 		machine->screen[scrnum] = machine->drv->screen[scrnum].defstate;
 
 	/* convert some options into live state */
-	machine->sample_rate = options_get_int_range(OPTION_SAMPLERATE, 1000, 1000000);
-	machine->debug_mode = options_get_bool(OPTION_DEBUG);
+	machine->sample_rate = options_get_int_range(mame_options(), OPTION_SAMPLERATE, 1000, 1000000);
+	machine->debug_mode = options_get_bool(mame_options(), OPTION_DEBUG);
 
 	return machine;
 
@@ -1238,6 +1233,12 @@ static void init_machine(running_machine *machine)
 	devices_init(machine);
 #endif
 
+#ifdef MAME_DEBUG
+	/* initialize the debugger */
+	if (machine->debug_mode)
+		mame_debug_init(machine);
+#endif
+
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
 	/* so this location in the init order is important */
@@ -1264,14 +1265,8 @@ static void init_machine(running_machine *machine)
 
 	/* initialize miscellaneous systems */
 	saveload_init(machine);
-	if (options_get_bool(OPTION_CHEAT))
+	if (options_get_bool(mame_options(), OPTION_CHEAT))
 		cheat_init(machine);
-
-#ifdef MAME_DEBUG
-	/* initialize the debugger */
-	if (machine->debug_mode)
-		mame_debug_init(machine);
-#endif
 }
 
 
@@ -1354,7 +1349,7 @@ static void free_callback_list(callback_item **cb)
 
 static void saveload_init(running_machine *machine)
 {
-	const char *savegame = options_get_string(OPTION_STATE);
+	const char *savegame = options_get_string(mame_options(), OPTION_STATE);
 
 	/* if we're coming in with a savegame request, process it now */
 	if (savegame != NULL && savegame[0] != 0)
@@ -1371,7 +1366,7 @@ static void saveload_init(running_machine *machine)
 	}
 
 	/* if we're in autosave mode, schedule a load */
-	else if (options_get_bool(OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
+	else if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
 		mame_schedule_load(machine, machine->gamedrv->name);
 }
 

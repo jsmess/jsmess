@@ -112,7 +112,7 @@ int winvideo_init(running_machine *machine)
 
 	// possibly create the debug window, but don't show it yet
 #ifdef MAME_DEBUG
-	if (options_get_bool(OPTION_DEBUG))
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		if (debugwin_init_windows())
 			return 1;
 #endif
@@ -137,7 +137,7 @@ static void video_exit(running_machine *machine)
 
 	// possibly kill the debug window
 #ifdef MAME_DEBUG
-	if (options_get_bool(OPTION_DEBUG))
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		debugwin_destroy_windows();
 #endif
 
@@ -310,9 +310,9 @@ static win_monitor_info *pick_monitor(int index)
 	float aspect;
 
 	// get the screen option
-	scrname = options_get_string("screen");
+	scrname = options_get_string(mame_options(), "screen");
 	sprintf(option, "screen%d", index);
-	scrname2 = options_get_string(option);
+	scrname2 = options_get_string(mame_options(), option);
 
 	// decide which one we want to use
 	if (scrname2 != NULL && strcmp(scrname2, "auto") != 0)
@@ -386,16 +386,16 @@ static void extract_video_config(void)
 	const char *stemp;
 
 	// global options: extract the data
-	video_config.windowed      = options_get_bool("window");
-	video_config.prescale      = options_get_int("prescale");
-	video_config.keepaspect    = options_get_bool("keepaspect");
-	video_config.numscreens    = options_get_int_range("numscreens", 1, MAX_WINDOWS);
+	video_config.windowed      = options_get_bool(mame_options(), "window");
+	video_config.prescale      = options_get_int(mame_options(), "prescale");
+	video_config.keepaspect    = options_get_bool(mame_options(), "keepaspect");
+	video_config.numscreens    = options_get_int_range(mame_options(), "numscreens", 1, MAX_WINDOWS);
 #ifdef MAME_DEBUG
 	// if we are in debug mode, never go full screen
-	if (options_get_bool(OPTION_DEBUG))
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		video_config.windowed = TRUE;
 #endif
-	stemp                      = options_get_string("effect");
+	stemp                      = options_get_string(mame_options(), "effect");
 	if (stemp != NULL && strcmp(stemp, "none") != 0)
 		load_effect_overlay(stemp);
 
@@ -406,7 +406,7 @@ static void extract_video_config(void)
 	get_resolution("resolution3", &video_config.window[3], TRUE);
 
 	// video options: extract the data
-	stemp = options_get_string("video");
+	stemp = options_get_string(mame_options(), "video");
 	if (strcmp(stemp, "d3d") == 0)
 		video_config.mode = VIDEO_MODE_D3D;
 	else if (strcmp(stemp, "ddraw") == 0)
@@ -416,7 +416,7 @@ static void extract_video_config(void)
 	else if (strcmp(stemp, "none") == 0)
 	{
 		video_config.mode = VIDEO_MODE_NONE;
-		if (options_get_int(OPTION_SECONDS_TO_RUN) == 0)
+		if (options_get_int(mame_options(), OPTION_SECONDS_TO_RUN) == 0)
 			fprintf(stderr, "Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else
@@ -424,16 +424,16 @@ static void extract_video_config(void)
 		fprintf(stderr, "Invalid video value %s; reverting to gdi\n", stemp);
 		video_config.mode = VIDEO_MODE_GDI;
 	}
-	video_config.waitvsync     = options_get_bool("waitvsync");
-	video_config.syncrefresh   = options_get_bool("syncrefresh");
-	video_config.triplebuf     = options_get_bool("triplebuffer");
-	video_config.switchres     = options_get_bool("switchres");
+	video_config.waitvsync     = options_get_bool(mame_options(), "waitvsync");
+	video_config.syncrefresh   = options_get_bool(mame_options(), "syncrefresh");
+	video_config.triplebuf     = options_get_bool(mame_options(), "triplebuffer");
+	video_config.switchres     = options_get_bool(mame_options(), "switchres");
 
 	// ddraw options: extract the data
-	video_config.hwstretch     = options_get_bool("hwstretch");
+	video_config.hwstretch     = options_get_bool(mame_options(), "hwstretch");
 
 	// d3d options: extract the data
-	video_config.filter        = options_get_bool("filter");
+	video_config.filter        = options_get_bool(mame_options(), "filter");
 	if (video_config.prescale == 0)
 		video_config.prescale = 1;
 
@@ -442,11 +442,11 @@ static void extract_video_config(void)
 	// per-window options: sanity check values
 
 	// d3d options: sanity check values
-	options_get_int_range("d3dversion", 8, 9);
+	options_get_int_range(mame_options(), "d3dversion", 8, 9);
 
-	options_get_float_range("full_screen_brightness", 0.1f, 2.0f);
-	options_get_float_range("full_screen_contrast", 0.1f, 2.0f);
-	options_get_float_range("full_screen_gamma", 0.1f, 3.0f);
+	options_get_float_range(mame_options(), "full_screen_brightness", 0.1f, 2.0f);
+	options_get_float_range(mame_options(), "full_screen_contrast", 0.1f, 2.0f);
+	options_get_float_range(mame_options(), "full_screen_gamma", 0.1f, 3.0f);
 }
 
 
@@ -493,8 +493,8 @@ static void load_effect_overlay(const char *filename)
 
 static float get_aspect(const char *name, int report_error)
 {
-	const char *defdata = options_get_string("aspect");
-	const char *data = options_get_string(name);
+	const char *defdata = options_get_string(mame_options(), "aspect");
+	const char *data = options_get_string(mame_options(), name);
 	int num = 0, den = 1;
 
 	if (strcmp(data, "auto") == 0)
@@ -516,8 +516,8 @@ static float get_aspect(const char *name, int report_error)
 
 static void get_resolution(const char *name, win_window_config *config, int report_error)
 {
-	const char *defdata = options_get_string("resolution");
-	const char *data = options_get_string(name);
+	const char *defdata = options_get_string(mame_options(), "resolution");
+	const char *data = options_get_string(mame_options(), name);
 
 	config->width = config->height = config->refresh = 0;
 	if (strcmp(data, "auto") == 0)

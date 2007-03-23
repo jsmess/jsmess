@@ -221,6 +221,7 @@ The first sprite data is located at fa0b,then fa1b and so on.
 #include "driver.h"
 #include "sound/2203intf.h"
 #include "sound/samples.h"
+#include "machine/mc8123.h"
 
 extern WRITE8_HANDLER( ninjakd2_bgvideoram_w );
 extern WRITE8_HANDLER( ninjakd2_fgvideoram_w );
@@ -521,6 +522,9 @@ ROM_START( ninjakd2 )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "nk2_06.rom",   0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // sound z80 code encrypted
 
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "nk2_11.rom",   0x00000, 0x4000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )	/* background tiles */
 	ROM_CONTINUE(             0x10000, 0x4000)
@@ -646,6 +650,9 @@ ROM_START( rdaction )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "nk2_06.rom",   0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )  // sound z80 code encrypted
 
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* MC8123 key */
+	ROM_LOAD( "ninjakd2.key",  0x0000, 0x2000, CRC(ec25318f) SHA1(619da3f69f9919e1457f79ee1d38e7ec80c4ebb0) )
+
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "nk2_11.rom",   0x00000, 0x4000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )	/* background tiles */
 	ROM_CONTINUE(             0x10000, 0x4000)
@@ -678,11 +685,9 @@ ROM_END
 
 
 
-void mc8123_decrypt_ninjakid2(void);
-
 static DRIVER_INIT( ninjakd2 )
 {
-	mc8123_decrypt_ninjakid2();
+	mc8123_decrypt_rom(1, memory_region(REGION_USER1), 0, 0);
 }
 
 static DRIVER_INIT( bootleg )

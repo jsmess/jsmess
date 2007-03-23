@@ -10,7 +10,7 @@
 
 #include "core.h"
 #include "hashfile.h"
-#include "options.h"
+#include "emuopts.h"
 #include "../imgtool/imgtool.h"
 
 #ifdef WIN32
@@ -74,7 +74,7 @@ static const options_entry messtest_opts[] =
  *
  *************************************/
 
-static void handle_arg(const char *arg)
+static void handle_arg(core_options *copts, const char *arg)
 {
 	int this_test_count;
 	int this_failure_count;
@@ -83,9 +83,9 @@ static void handle_arg(const char *arg)
 	/* setup options */
 	memset(&opts, 0, sizeof(opts));
 	opts.script_filename = arg;
-	if (options_get_bool("preservedir"))
+	if (options_get_bool(copts, "preservedir"))
 		opts.preserve_directory = 1;
-	if (options_get_bool("dumpscreenshots"))
+	if (options_get_bool(copts, "dumpscreenshots"))
 		opts.dump_screenshots = 1;
 
 	if (messtest(&opts, &this_test_count, &this_failure_count))
@@ -139,10 +139,9 @@ int CLIB_DECL main(int argc, char *argv[])
 	sndintrf_init(NULL);
 	
 	/* register options */
-	options_init(NULL);
-	options_free_entries();
-	options_add_entries(messtest_opts);
-	options_set_option_callback(OPTION_UNADORNED(0), handle_arg);
+	mame_options_init(NULL);
+	options_add_entries(mame_options(), messtest_opts);
+	options_set_option_callback(mame_options(), OPTION_UNADORNED(0), handle_arg);
 
 	/* run MAME's validity checks; if these fail cop out now */
 	/* NPW 16-Sep-2006 - commenting this out because this cannot be run outside of MAME */
@@ -155,7 +154,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	begin_time = clock();
 
 	/* parse the commandline */
-	if (options_parse_command_line(argc, argv))
+	if (options_parse_command_line(mame_options(), argc, argv))
 	{
 		fprintf(stderr, "Error while parsing cmdline\n");
 		goto done;

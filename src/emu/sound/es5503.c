@@ -429,7 +429,7 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 							ramptr = (acc >> resshift) & sizemask;
 							acc += freq;
 							data = (INT32)chip->docram[ramptr + wtptr];
-							
+
 							if ((data == 0) || (ramptr >= wtsize))
 							{
 								run = 0;

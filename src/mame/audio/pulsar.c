@@ -33,7 +33,7 @@
 
 
 /* sample file names */
-const char *pulsar_sample_names[] =
+static const char *pulsar_sample_names[] =
 {
 	"*pulsar",
 	"clang.wav",
@@ -51,7 +51,22 @@ const char *pulsar_sample_names[] =
 	0
 };
 
-/* sample sound IDs - must match sample file name table above */
+
+static struct Samplesinterface pulsar_samples_interface =
+{
+	12,
+	pulsar_sample_names
+};
+
+
+MACHINE_DRIVER_START( pulsar_audio )
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(pulsar_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_DRIVER_END
+
+
+/* sample IDs - must match sample file name table above */
 enum
 {
 	SND_CLANG = 0,
@@ -71,7 +86,7 @@ enum
 
 static int port1State = 0;
 
-WRITE8_HANDLER( pulsar_sh_port1_w )
+WRITE8_HANDLER( pulsar_audio_1_w )
 {
 	int bitsChanged;
 	int bitsGoneHigh;
@@ -121,7 +136,7 @@ WRITE8_HANDLER( pulsar_sh_port1_w )
 }
 
 
-WRITE8_HANDLER( pulsar_sh_port2_w )
+WRITE8_HANDLER( pulsar_audio_2_w )
 {
 	static int port2State = 0;
 	int bitsChanged;

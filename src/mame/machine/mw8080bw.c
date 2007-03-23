@@ -13,8 +13,6 @@
  *
  *  Interrupt generation
  *
- *  see the detailed description in the header section
- *
  *************************************/
 
 static mame_timer *interrupt_timer;
@@ -64,12 +62,11 @@ static void mw8080bw_interrupt_callback(int param)
 	int next_vpos;
 	int next_vblank;
 
-	/* compute vector and pulse the interrupt line to emulate the CPU clearing
-       it shortly after it was asserted. */
+	/* compute vector and set the interrupt line */
 	int vpos = video_screen_get_vpos(0);
 	UINT8 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
-	cpunum_set_input_line_and_vector(0, 0, PULSE_LINE, vector);
+	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
 	if (counter == MW8080BW_INT_TRIGGER_COUNT_1)

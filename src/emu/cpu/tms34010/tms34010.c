@@ -598,6 +598,7 @@ static void check_interrupt(void)
 
 		/* ack the NMI */
 		IOREG(REG_INTPEND) &= ~TMS34010_NMI;
+		IOREG(REG_HSTCTLH) &= ~0x0100;
 
 		/* handle NMI mode bit */
 		if (!(IOREG(REG_HSTCTLH) & 0x0200))

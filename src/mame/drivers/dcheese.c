@@ -13,6 +13,13 @@
         * Test/tilt buttons seem to be swapped compared to test mode
         * Don't know what the opto switches do
 
+    [dcheese]
+    * you can not spin the wheel by using the inc/dec buttons unless you
+      switch back and forth between them.  The game seems to check for a
+      constant turn rate and constant acceleration/deceleration, then not
+      allow the wheel to start spinning.  This is most likely to stop
+      people from rigging the game.
+
     [fredmem]
     * Controls are set up as a 3 x 3 matrix of buttons that match the 9
       positions on the screen.
@@ -284,16 +291,16 @@ INPUT_PORTS_START( dcheese )
 
 	PORT_START	/* 2a0002 */
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )	// read as a unit
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	// opto 1
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	// opto 2
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 )	// opto 1
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 )	// opto 2
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START	/* 2a000e */
-	PORT_BIT( 0x00ff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 

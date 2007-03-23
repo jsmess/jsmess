@@ -1,167 +1,154 @@
 /***************************************************************************
 
-  video.c
+    VIC Dual Game board
 
-  Functions to emulate the video hardware of the machine.
-
-***************************************************************************/
+****************************************************************************/
 
 #include "driver.h"
 #include "includes/vicdual.h"
 
 
-
-unsigned char *vicdual_characterram;
-static unsigned char dirtycharacter[256];
-
-static int palette_bank;
+static UINT8 palette_bank;
 
 
+#define RGB32_BLACK		(0x00000000)
+#define RGB32_WHITE		(0x00ffffff)
 
-/***************************************************************************
-
-  Convert the color PROMs into a more useable format.
-
-  The VIC dual game board has one 32x8 palette PROM. The color code is taken
-  from the three most significant bits of the character code, plus two
-  additional palette bank bits.
-  The palette PROM is connected to the RGB output this way:
-
-  bit 7 -- 22 ohm resistor  -- RED   \
-        -- 22 ohm resistor  -- BLUE  |  foreground
-        -- 22 ohm resistor  -- GREEN /
-        -- Unused
-        -- 22 ohm resistor  -- RED   \
-        -- 22 ohm resistor  -- BLUE  |  background
-        -- 22 ohm resistor  -- GREEN /
-  bit 0 -- Unused
-
-***************************************************************************/
-PALETTE_INIT( vicdual )
+static pen_t colors_from_color_prom[] =
 {
-	int i;
-	/* for b&w games we'll use the Head On PROM */
-	static unsigned char bw_color_prom[] =
-	{
-		/* for b/w games, let's use the Head On PROM */
-		0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,
-		0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,0xE1,
-	};
+	0x00000000,
+	0x0000ff00,
+	0x000000ff,
+	0x0000ffff,
+	0x00ff0000,
+	0x00ffff00,
+	0x00ff00ff,
+	0x00ffffff
+};
 
-
-	if (color_prom == 0) color_prom = bw_color_prom;
-
-	for (i = 0;i < Machine->drv->total_colors / 2;i++)
-	{
-		/* background components */
-		palette_set_color(machine,2*i,pal1bit(color_prom[i] >> 3),pal1bit(color_prom[i] >> 1),pal1bit(color_prom[i] >> 2));
-
-		/* foreground components */
-		palette_set_color(machine,2*i+1,pal1bit(color_prom[i] >> 7),pal1bit(color_prom[i] >> 5),pal1bit(color_prom[i] >> 6));
-	}
-
-	palette_bank = 0;
-
-	{
-		/* Heiankyo Alien doesn't write to port 0x40, it expects it to default to 3 */
-		if (strcmp(Machine->gamedrv->name, "heiankyo") == 0)
-			palette_bank = 3;
-
-		/* and many others expect it to default to 1 */
-		if (strcmp(Machine->gamedrv->name, "invinco") == 0 ||
-				strcmp(Machine->gamedrv->name, "digger") == 0 ||
-				strcmp(Machine->gamedrv->name, "tranqgun") == 0)
-			palette_bank = 1;
-	}
-}
-
-
-
-WRITE8_HANDLER( vicdual_characterram_w )
-{
-	if (vicdual_characterram[offset] != data)
-	{
-		dirtycharacter[(offset / 8) & 0xff] = 1;
-
-		vicdual_characterram[offset] = data;
-	}
-}
-
-READ8_HANDLER( vicdual_characterram_r )
-{
-	return vicdual_characterram[offset];
-}
 
 WRITE8_HANDLER( vicdual_palette_bank_w )
 {
-	if (palette_bank != (data & 3))
-	{
-		palette_bank = data & 3;
-		memset(dirtybuffer,1,videoram_size);
-	}
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+
+	palette_bank = data & 3;
 }
 
 
-
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-VIDEO_UPDATE( vicdual )
+VIDEO_UPDATE( vicdual_bw )
 {
-	int offs;
+	UINT8 x = 0;
+	UINT8 y = cliprect->min_y;
+	UINT8 video_data = 0;
 
-
-	if (get_vh_global_attribute_changed())
+	while (1)
 	{
-		memset(dirtybuffer,1,videoram_size);
-	}
+		pen_t col;
 
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
-	{
-		int charcode;
-
-
-		charcode = videoram[offs];
-
-		if (dirtybuffer[offs] || dirtycharacter[charcode])
+		if ((x & 0x07) == 0)
 		{
-			int sx,sy;
+			offs_t offs;
+			UINT8 char_code;
 
+			/* read the character code */
+			offs = (y >> 3 << 5) | (x >> 3);
+			char_code = vicdual_videoram_r(offs);
 
-			/* decode modified characters */
-			if (dirtycharacter[charcode] == 1)
+			/* read the appropriate line of the character ram */
+			offs = (char_code << 3) | (y & 0x07);
+			video_data = vicdual_characterram_r(offs);
+		}
+
+		/* plot the current pixel */
+		col = (video_data & 0x80) ? RGB32_WHITE : RGB32_BLACK;
+		plot_pixel(bitmap, x, y, col);
+
+		/* next pixel */
+		video_data = video_data << 1;
+		x = x + 1;
+
+		/* end of line? */
+		if (x == 0)
+		{
+			/* end of region to update? */
+			if (y == cliprect->max_y)
 			{
-				decodechar(Machine->gfx[0],charcode,vicdual_characterram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
-				dirtycharacter[charcode] = 2;
+				break;
 			}
 
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					charcode,
-					(charcode >> 5) + 8 * palette_bank,
-					0,0,
-					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-
+			/* next row */
+			y = y + 1;
 		}
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+
+	return 0;
+}
 
 
-	for (offs = 0;offs < 256;offs++)
+VIDEO_UPDATE( vicdual_color )
+{
+	UINT8 *color_prom = (UINT8 *)memory_region(REGION_PROMS);
+	UINT8 x = 0;
+	UINT8 y = cliprect->min_y;
+	UINT8 video_data = 0;
+	pen_t back_color = 0;
+	pen_t fore_color = 0;
+
+	while (1)
 	{
-		if (dirtycharacter[offs] == 2) dirtycharacter[offs] = 0;
+		pen_t col;
+
+		if ((x & 0x07) == 0)
+		{
+			offs_t offs;
+			UINT8 char_code;
+
+			/* read the character code */
+			offs = (y >> 3 << 5) | (x >> 3);
+			char_code = vicdual_videoram_r(offs);
+
+			/* read the appropriate line of the character ram */
+			offs = (char_code << 3) | (y & 0x07);
+			video_data = vicdual_characterram_r(offs);
+
+			/* get the foreground and background colors from the PROM */
+			offs = (char_code >> 5) | (palette_bank << 3);
+			back_color = colors_from_color_prom[(color_prom[offs] >> 1) & 0x07];
+			fore_color = colors_from_color_prom[(color_prom[offs] >> 5) & 0x07];
+		}
+
+		/* plot the current pixel */
+		col = (video_data & 0x80) ? fore_color : back_color;
+		plot_pixel(bitmap, x, y, col);
+
+		/* next pixel */
+		video_data = video_data << 1;
+		x = x + 1;
+
+		/* end of line? */
+		if (x == 0)
+		{
+			/* end of region to update? */
+			if (y == cliprect->max_y)
+			{
+				break;
+			}
+
+			/* next row */
+			y = y + 1;
+		}
 	}
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( vicdual_bw_or_color )
+{
+	if (vicdual_is_cabinet_color())
+		video_update_vicdual_color(machine, screen, bitmap, cliprect);
+	else
+		video_update_vicdual_bw(machine, screen, bitmap, cliprect);
+
 	return 0;
 }

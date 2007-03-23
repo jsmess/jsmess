@@ -1877,6 +1877,21 @@ ROM_START( honeydol )
 ROM_END
 
 /*
+
++--------------------------------+
+|      Z80A                      |
+|GL324  6116                     |
+|M6295 uh15  HY6264              |
+|J     sra   HY6264              |
+|A     srb   84256               |
+|M           84256               |
+|M           84256    CY7C384A   |
+|A           84256               |
+| SWA1       uh12                |
+|      68000 84256               |
+| SWA2       ui12  12MHz 16MHz   |
++--------------------------------+
+
 Produttore: Barko
 N.revisione: S16K951102
 CPU
@@ -1908,12 +1923,31 @@ ROM_START( twinadv )
 	ROM_LOAD16_BYTE( "12.ui12",  0x00000, 0x20000, CRC(d8776495) SHA1(15b93ded80bf9f240faef2d89b6076f33f1f4ece) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for z80 sound code */
-	ROM_LOAD( "uh15.bin",   0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
+	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
 
 	ROM_REGION( 0x180000, REGION_GFX1, ROMREGION_DISPOSE ) /* 4bpp gfx */
-	ROM_LOAD( "16.ua4",          0x000000, 0x80000, CRC(f491e171) SHA1(f31b945b0c4b30d1b3dc6c5928b77aad4e956bc7) )
-	ROM_LOAD( "15.ua5",          0x080000, 0x80000, CRC(79a08b8d) SHA1(034c0a3b9e27ac174092d265b32fb82d6ee45d47) )
-	ROM_LOAD( "14.ua6",          0x100000, 0x80000, CRC(79faee0b) SHA1(7421a5fa038d01658ba5ac1f65ea87b97ac25c36) )
+	ROM_LOAD( "16.ua4", 0x000000, 0x80000, CRC(f491e171) SHA1(f31b945b0c4b30d1b3dc6c5928b77aad4e956bc7) )
+	ROM_LOAD( "15.ua5", 0x080000, 0x80000, CRC(79a08b8d) SHA1(034c0a3b9e27ac174092d265b32fb82d6ee45d47) )
+	ROM_LOAD( "14.ua6", 0x100000, 0x80000, CRC(79faee0b) SHA1(7421a5fa038d01658ba5ac1f65ea87b97ac25c36) )
+
+	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples - both banks are almost the same */
+	/* todo, check bank ordering .. */
+	ROM_LOAD( "sra.bin", 0x00000, 0x40000, CRC(82f452c4) SHA1(95ad6ede87ceafb045ed7df40496baf96190b97f) ) // bank 1
+	ROM_LOAD( "srb.bin", 0x40000, 0x40000, CRC(109e51e6) SHA1(3344c68d63bbad4a02b47143b2d2f72ce9bcb4bb) ) // bank 2
+ROM_END
+
+ROM_START( twinadvk )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e0bcc738) SHA1(7fc6a793fcdd80122c0ac6409ae4cac5597b7b5a) )
+	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(a3ee6451) SHA1(9c0b415a2f325513739f2047780c2a56df350aa5) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for z80 sound code */
+	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
+
+	ROM_REGION( 0x180000, REGION_GFX1, ROMREGION_DISPOSE ) /* 4bpp gfx */
+	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(a5aff49b) SHA1(ee162281ba643729ee007f9634c21fadd3c1cb48) )
+	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(f83b3b97) SHA1(2e967d49ef411d164a0b6cf32444f60fcd8068a9) )
+	ROM_LOAD( "ua6", 0x100000, 0x80000, CRC(4dfcffb9) SHA1(c157e031acbb321b9435389f9fc4e1ffebca106d) )
 
 	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples - both banks are almost the same */
 	/* todo, check bank ordering .. */
@@ -2676,7 +2710,8 @@ GAME( 1990, snowbroj, snowbros, snowbros, snowbroj, 0, ROT0, "Toaplan", "Snow Br
 GAME( 1990, wintbob,  snowbros, wintbob,  snowbros, 0, ROT0, "bootleg", "The Winter Bobble", 0 )
 
 GAME( 1995, honeydol, 0,        honeydol, honeydol, 0, ROT0, "Barko Corp.", "Honey Dolls", 0 ) // based on snowbros code..
-GAME( 1995, twinadv,  0,        twinadv,  twinadv,  0, ROT0, "Barko Corp.", "Twin Adventure", 0 )
+GAME( 1995, twinadv,  0,        twinadv,  twinadv,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", 0 )
+GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", 0 )
 GAME( 1995, hyperpac, 0,        semicom,  hyperpac, hyperpac, ROT0, "SemiCom", "Hyper Pacman", 0 )
 GAME( 1995, hyperpcb, hyperpac, semicom,  hyperpac, 0,        ROT0, "bootleg", "Hyper Pacman (bootleg)", 0 )
 GAME( 1996, cookbib2, 0,        semiprot, cookbib2, cookbib2, ROT0, "SemiCom", "Cookie & Bibi 2", 0 )

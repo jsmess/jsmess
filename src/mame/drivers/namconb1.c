@@ -345,9 +345,9 @@ static INTERRUPT_GEN( namconb2_interrupt )
 	{
 		scanline = 0;
 	}
-	if( scanline < NAMCONB1_ROWS*8 )
+	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( cpu_getscanlinetime(scanline), scanline, namconb2_TriggerPOSIRQ );
+		mame_timer_set( video_screen_get_time_until_pos(0, scanline, 0), scanline, namconb2_TriggerPOSIRQ );
 	}
 } /* namconb2_interrupt */
 static INTERRUPT_GEN( namconb1_interrupt )
@@ -393,9 +393,9 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	{
 		scanline = 0;
 	}
-	if( scanline < NAMCONB1_ROWS*8 )
+	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( cpu_getscanlinetime(scanline), scanline, namconb1_TriggerPOSIRQ );
+		mame_timer_set( video_screen_get_time_until_pos(0, scanline, 0), scanline, namconb1_TriggerPOSIRQ );
 	}
 } /* namconb1_interrupt */
 
@@ -761,12 +761,11 @@ static MACHINE_DRIVER_START( namconb1 )
 	NAMCO_C7X_MCU(MASTER_CLOCK_HZ/3)
 
 	MDRV_SCREEN_REFRESH_RATE(59.7)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_NVRAM_HANDLER(namconb1)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER|VIDEO_HAS_SHADOWS)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(NAMCONB1_COLS*8, NAMCONB1_ROWS*8) /* 288x224 pixels */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, NAMCONB1_COLS*8-1, 0*8, NAMCONB1_ROWS*8-1)
+	MDRV_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
+	MDRV_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(0x2000)
 	MDRV_VIDEO_START(namconb1)
@@ -783,12 +782,11 @@ static MACHINE_DRIVER_START( namconb2 )
 	NAMCO_C7X_MCU(MASTER_CLOCK_HZ/3)
 
 	MDRV_SCREEN_REFRESH_RATE(59.7)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_NVRAM_HANDLER(namconb1)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER|VIDEO_HAS_SHADOWS)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(NAMCONB1_COLS*8, NAMCONB1_ROWS*8) /* 288x224 pixels */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, NAMCONB1_COLS*8-1, 0*8, NAMCONB1_ROWS*8-1)
+	MDRV_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
+	MDRV_SCREEN_VISIBLE_AREA(0, NAMCONB1_HBSTART-1, 0, NAMCONB1_VBSTART-1)
 	MDRV_GFXDECODE(gfxdecodeinfo2)
 	MDRV_PALETTE_LENGTH(0x2000)
 	MDRV_VIDEO_START(namconb2)
@@ -1415,4 +1413,4 @@ GAME( 1994, vshoot,   0,        namconb1, namconb1, vshoot,   ROT0,  "Namco", "J
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
 GAME( 1994, outfxies, 0,	 namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies", GAME_IMPERFECT_SOUND )
 GAME( 1994, outfxesj, outfxies, namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1995, machbrkr, 0,	 namconb2, namconb1, machbrkr, ROT0, "Namco", "Mach Breakers (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1995, machbrkr, 0,	 namconb2, namconb1, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan)", GAME_IMPERFECT_SOUND )

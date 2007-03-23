@@ -1228,7 +1228,7 @@ out_of_joysticks:
 
 int wininput_init(running_machine *machine)
 {
-	const char *controller = options_get_string(OPTION_CTRLR);
+	const char *controller = options_get_string(mame_options(), OPTION_CTRLR);
 	const input_port_entry *inp;
 	HRESULT result;
 
@@ -1602,7 +1602,7 @@ int win_is_mouse_captured(void)
 
 static void parse_analog_select(int type, const char *option)
 {
-	const char *stemp = options_get_string(option);
+	const char *stemp = options_get_string(mame_options(), option);
 
 	if (strcmp(stemp, "keyboard") == 0)
 		analog_type[type] = SELECT_TYPE_KEYBOARD;
@@ -1626,7 +1626,7 @@ static void parse_analog_select(int type, const char *option)
 
 static void parse_digital(const char *option)
 {
-	const char *soriginal = options_get_string(option);
+	const char *soriginal = options_get_string(mame_options(), option);
 	const char *stemp = soriginal;
 
 	if (strcmp(stemp, "none") == 0)
@@ -1711,14 +1711,15 @@ usage:
 static void extract_input_config(void)
 {
 	// extract boolean options
-	win_use_mouse = options_get_bool("mouse");
-	use_joystick = options_get_bool("joystick");
-	use_lightgun = options_get_bool("lightgun");
-	use_lightgun_dual = options_get_bool("dual_lightgun");
-	use_lightgun_reload = options_get_bool("offscreen_reload");
-	steadykey = options_get_bool("steadykey");
-	joy_deadzone = options_get_float("joy_deadzone");
-	joy_saturation = options_get_float("joy_saturation");
+	win_use_mouse = options_get_bool(mame_options(), "mouse");
+	use_joystick = options_get_bool(mame_options(), "joystick");
+	use_lightgun = options_get_bool(mame_options(), "lightgun");
+	use_lightgun_dual = options_get_bool(mame_options(), "dual_lightgun");
+	use_lightgun_reload = options_get_bool(mame_options(), "offscreen_reload");
+	steadykey = options_get_bool(mame_options(), "steadykey");
+	joy_deadzone = options_get_float(mame_options(), "joy_deadzone");
+	joy_saturation = options_get_float(mame_options(), "joy_saturation");
+
 	parse_analog_select(ANALOG_TYPE_PADDLE, "paddle_device");
 	parse_analog_select(ANALOG_TYPE_ADSTICK, "adstick_device");
 	parse_analog_select(ANALOG_TYPE_PEDAL, "pedal_device");

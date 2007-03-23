@@ -89,7 +89,7 @@ int winsound_init(running_machine *machine)
 #endif
 
 	// if no sound, don't create anything
-	if (!options_get_bool("sound"))
+	if (!options_get_bool(mame_options(), "sound"))
 		return 0;
 
 	// ensure we get called on the way out
@@ -286,7 +286,7 @@ static HRESULT dsound_init(void)
 	stream_format.nAvgBytesPerSec	= stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
 	// compute the buffer size based on the output sample rate
-	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * options_get_int_range("audio_latency", 1, 5) / 10;
+	stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * options_get_int_range(mame_options(), "audio_latency", 1, 5) / 10;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;

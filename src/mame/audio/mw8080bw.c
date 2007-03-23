@@ -118,7 +118,7 @@ static struct Samplesinterface seawolf_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( seawolf_sound )
+MACHINE_DRIVER_START( seawolf_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(seawolf_samples_interface)
@@ -126,7 +126,7 @@ MACHINE_DRIVER_START( seawolf_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( seawolf_sh_port_w )
+WRITE8_HANDLER( seawolf_audio_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -177,7 +177,7 @@ static struct Samplesinterface gunfight_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( gunfight_sound )
+MACHINE_DRIVER_START( gunfight_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -190,7 +190,7 @@ MACHINE_DRIVER_START( gunfight_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( gunfight_sh_port_w )
+WRITE8_HANDLER( gunfight_audio_w )
 {
 	/* D0 and D1 are connected to something, most likely lights */
 	/* the schematic shows them just tied to 1k resistors */
@@ -284,7 +284,7 @@ static DISCRETE_SOUND_START(tornbase_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( tornbase_sound )
+MACHINE_DRIVER_START( tornbase_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
 	MDRV_SOUND_CONFIG(tornbase_discrete_interface)
@@ -292,7 +292,7 @@ MACHINE_DRIVER_START( tornbase_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( tornbase_sh_port_w )
+WRITE8_HANDLER( tornbase_audio_w )
 {
 	discrete_sound_w(TORNBASE_TONE_240_EN, (data >> 0) & 0x01);
 
@@ -329,12 +329,12 @@ WRITE8_HANDLER( tornbase_sh_port_w )
  *************************************/
 
 
-MACHINE_DRIVER_START( zzzap_sound )
+MACHINE_DRIVER_START( zzzap_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( zzzap_sh_port_1_w )
+WRITE8_HANDLER( zzzap_audio_1_w )
 {
 	/* set ENGINE SOUND FREQ(data & 0x0f)  the value written is
                                            the gas pedal position */
@@ -347,7 +347,7 @@ WRITE8_HANDLER( zzzap_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( zzzap_sh_port_2_w )
+WRITE8_HANDLER( zzzap_audio_2_w )
 {
 	/* if (data & 0x01)  enable BOOM sound */
 
@@ -544,7 +544,7 @@ static DISCRETE_SOUND_START(maze_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( maze_sound )
+MACHINE_DRIVER_START( maze_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
 	MDRV_SOUND_CONFIG(maze_discrete_interface)
@@ -789,7 +789,7 @@ static DISCRETE_SOUND_START(boothill_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( boothill_sound )
+MACHINE_DRIVER_START( boothill_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG(boothill_discrete_interface)
@@ -798,7 +798,7 @@ MACHINE_DRIVER_START( boothill_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( boothill_sh_port_w )
+WRITE8_HANDLER( boothill_audio_w )
 {
 	/* D0 and D1 are not connected */
 
@@ -1014,7 +1014,7 @@ static DISCRETE_SOUND_START(checkmat_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( checkmat_sound )
+MACHINE_DRIVER_START( checkmat_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
 	MDRV_SOUND_CONFIG(checkmat_discrete_interface)
@@ -1022,7 +1022,7 @@ MACHINE_DRIVER_START( checkmat_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( checkmat_sh_port_w )
+WRITE8_HANDLER( checkmat_audio_w )
 {
 	discrete_sound_w(CHECKMAT_TONE_EN, data & 0x01);
 
@@ -1266,7 +1266,7 @@ static DISCRETE_SOUND_START(desertgu_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( desertgu_sound )
+MACHINE_DRIVER_START( desertgu_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG(desertgu_discrete_interface)
@@ -1274,7 +1274,7 @@ MACHINE_DRIVER_START( desertgu_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( desertgu_sh_port_1_w )
+WRITE8_HANDLER( desertgu_audio_1_w )
 {
 	/* D0 and D1 are not connected */
 
@@ -1292,7 +1292,7 @@ WRITE8_HANDLER( desertgu_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( desertgu_sh_port_2_w )
+WRITE8_HANDLER( desertgu_audio_2_w )
 {
 	discrete_sound_w(DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
 
@@ -1516,7 +1516,7 @@ static DISCRETE_SOUND_START(dplay_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( dplay_sound )
+MACHINE_DRIVER_START( dplay_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG(dplay_discrete_interface)
@@ -1524,7 +1524,7 @@ MACHINE_DRIVER_START( dplay_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( dplay_sh_port_w )
+WRITE8_HANDLER( dplay_audio_w )
 {
 	discrete_sound_w(DPLAY_TONE_ON_EN, (data >> 0) & 0x01);
 
@@ -1566,7 +1566,7 @@ static struct Samplesinterface gmissile_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( gmissile_sound )
+MACHINE_DRIVER_START( gmissile_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -1579,7 +1579,7 @@ MACHINE_DRIVER_START( gmissile_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( gmissile_sh_port_1_w )
+WRITE8_HANDLER( gmissile_audio_1_w )
 {
 	/* note that the schematics shows the left and right explosions
        reversed (D5=R, D7=L), but the software confirms that
@@ -1611,7 +1611,7 @@ WRITE8_HANDLER( gmissile_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( gmissile_sh_port_2_w )
+WRITE8_HANDLER( gmissile_audio_2_w )
 {
 	/* set AIRPLANE/COPTER/JET PAN(data & 0x07) */
 
@@ -1621,7 +1621,7 @@ WRITE8_HANDLER( gmissile_sh_port_2_w )
 }
 
 
-WRITE8_HANDLER( gmissile_sh_port_3_w )
+WRITE8_HANDLER( gmissile_audio_3_w )
 {
 	/* if (data & 0x01)  enable AIRPLANE (bi-plane) sound (goes to AIRPLANE/COPTER/JET panning circuit) */
 
@@ -1663,7 +1663,7 @@ static struct Samplesinterface m4_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( m4_sound )
+MACHINE_DRIVER_START( m4_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -1676,7 +1676,7 @@ MACHINE_DRIVER_START( m4_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( m4_sh_port_1_w )
+WRITE8_HANDLER( m4_audio_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -1702,7 +1702,7 @@ WRITE8_HANDLER( m4_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( m4_sh_port_2_w )
+WRITE8_HANDLER( m4_audio_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -1959,7 +1959,7 @@ static struct Samplesinterface clowns_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( clowns_sound )
+MACHINE_DRIVER_START( clowns_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -1972,7 +1972,7 @@ MACHINE_DRIVER_START( clowns_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( clowns_sh_port_1_w )
+WRITE8_HANDLER( clowns_audio_1_w )
 {
 	coin_counter_w(0, (data >> 0) & 0x01);
 
@@ -1982,7 +1982,7 @@ WRITE8_HANDLER( clowns_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( clowns_sh_port_2_w )
+WRITE8_HANDLER( clowns_audio_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -2014,12 +2014,12 @@ WRITE8_HANDLER( clowns_sh_port_2_w )
 /* Noise clock was breadboarded and measured at 1210Hz */
 
 
-MACHINE_DRIVER_START( shuffle_sound )
+MACHINE_DRIVER_START( shuffle_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( shuffle_sh_port_1_w )
+WRITE8_HANDLER( shuffle_audio_1_w )
 {
 	/* if (data & 0x01)  enable CLICK (balls collide) sound */
 
@@ -2034,7 +2034,7 @@ WRITE8_HANDLER( shuffle_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( shuffle_sh_port_2_w )
+WRITE8_HANDLER( shuffle_audio_2_w )
 {
 	/* if (data & 0x01)  enable FOUL sound */
 
@@ -2098,7 +2098,7 @@ static DISCRETE_SOUND_START(dogpatch_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( dogpatch_sound )
+MACHINE_DRIVER_START( dogpatch_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
 	MDRV_SOUND_CONFIG(dogpatch_discrete_interface)
@@ -2106,7 +2106,7 @@ MACHINE_DRIVER_START( dogpatch_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( dogpatch_sh_port_w )
+WRITE8_HANDLER( dogpatch_audio_w )
 {
 	/* D0 and D1 are most likely not used */
 
@@ -2178,7 +2178,7 @@ static struct Samplesinterface spcenctr_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( spcenctr_sound )
+MACHINE_DRIVER_START( spcenctr_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SN76477, 0)
@@ -2192,7 +2192,7 @@ MACHINE_DRIVER_END
 
 
 
-WRITE8_HANDLER( spcenctr_sh_port_1_w )
+WRITE8_HANDLER( spcenctr_audio_1_w )
 {
 	sound_global_enable((data >> 0) & 0x01);
 
@@ -2205,7 +2205,7 @@ WRITE8_HANDLER( spcenctr_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( spcenctr_sh_port_2_w )
+WRITE8_HANDLER( spcenctr_audio_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -2223,7 +2223,7 @@ WRITE8_HANDLER( spcenctr_sh_port_2_w )
 }
 
 
-WRITE8_HANDLER( spcenctr_sh_port_3_w )
+WRITE8_HANDLER( spcenctr_audio_3_w )
 {
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
@@ -2265,7 +2265,7 @@ static struct Samplesinterface phantom2_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( phantom2_sound )
+MACHINE_DRIVER_START( phantom2_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(phantom2_samples_interface)
@@ -2273,7 +2273,7 @@ MACHINE_DRIVER_START( phantom2_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( phantom2_sh_port_1_w )
+WRITE8_HANDLER( phantom2_audio_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -2294,7 +2294,7 @@ WRITE8_HANDLER( phantom2_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( phantom2_sh_port_2_w )
+WRITE8_HANDLER( phantom2_audio_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -2319,12 +2319,12 @@ WRITE8_HANDLER( phantom2_sh_port_2_w )
  *************************************/
 
 
-MACHINE_DRIVER_START( bowler_sound )
+MACHINE_DRIVER_START( bowler_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( bowler_sh_port_1_w )
+WRITE8_HANDLER( bowler_audio_1_w )
 {
 	/* D0 - selects controller on the cocktail PCB */
 
@@ -2344,7 +2344,7 @@ WRITE8_HANDLER( bowler_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( bowler_sh_port_2_w )
+WRITE8_HANDLER( bowler_audio_2_w )
 {
 	/* set BALL ROLLING SOUND FREQ(data & 0x0f)
        0, if no rolling, 0x08 used during ball return */
@@ -2358,28 +2358,28 @@ WRITE8_HANDLER( bowler_sh_port_2_w )
 }
 
 
-WRITE8_HANDLER( bowler_sh_port_3_w )
+WRITE8_HANDLER( bowler_audio_3_w )
 {
 	/* regardless of the data, enable BALL HITS PIN 1 sound
        (top circuit on the schematics) */
 }
 
 
-WRITE8_HANDLER( bowler_sh_port_4_w )
+WRITE8_HANDLER( bowler_audio_4_w )
 {
 	/* regardless of the data, enable BALL HITS PIN 2 sound
        (bottom circuit on the schematics) */
 }
 
 
-WRITE8_HANDLER( bowler_sh_port_5_w )
+WRITE8_HANDLER( bowler_audio_5_w )
 {
 	/* not sure, appears to me trigerred alongside the two
        BALL HITS PIN sounds */
 }
 
 
-WRITE8_HANDLER( bowler_sh_port_6_w )
+WRITE8_HANDLER( bowler_audio_6_w )
 {
 	/* D0 is not connected */
 
@@ -2463,7 +2463,7 @@ static struct Samplesinterface invaders_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( invaders_sound )
+MACHINE_DRIVER_START( invaders_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SN76477, 0)
@@ -2476,7 +2476,7 @@ MACHINE_DRIVER_START( invaders_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( invaders_sh_port_1_w )
+WRITE8_HANDLER( invaders_audio_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -2502,7 +2502,7 @@ WRITE8_HANDLER( invaders_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( invaders_sh_port_2_w )
+WRITE8_HANDLER( invaders_audio_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -2641,7 +2641,7 @@ static DISCRETE_SOUND_START(blueshrk_discrete_interface)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( blueshrk_sound )
+MACHINE_DRIVER_START( blueshrk_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DISCRETE, 0)
 	MDRV_SOUND_CONFIG(blueshrk_discrete_interface)
@@ -2649,7 +2649,7 @@ MACHINE_DRIVER_START( blueshrk_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( blueshrk_sh_port_w )
+WRITE8_HANDLER( blueshrk_audio_w )
 {
 	discrete_sound_w(BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
 
@@ -2763,7 +2763,7 @@ static struct Samplesinterface invad2ct_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( invad2ct_sound )
+MACHINE_DRIVER_START( invad2ct_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("#1", "#2")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -2784,7 +2784,7 @@ MACHINE_DRIVER_START( invad2ct_sound )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( invad2ct_sh_port_1_w )
+WRITE8_HANDLER( invad2ct_audio_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -2810,7 +2810,7 @@ WRITE8_HANDLER( invad2ct_sh_port_1_w )
 }
 
 
-WRITE8_HANDLER( invad2ct_sh_port_2_w )
+WRITE8_HANDLER( invad2ct_audio_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -2829,7 +2829,7 @@ WRITE8_HANDLER( invad2ct_sh_port_2_w )
 }
 
 
-WRITE8_HANDLER( invad2ct_sh_port_3_w )
+WRITE8_HANDLER( invad2ct_audio_3_w )
 {
 	UINT8 rising_bits = data & ~port_3_last;
 
@@ -2853,7 +2853,7 @@ WRITE8_HANDLER( invad2ct_sh_port_3_w )
 }
 
 
-WRITE8_HANDLER( invad2ct_sh_port_4_w )
+WRITE8_HANDLER( invad2ct_audio_4_w )
 {
 	UINT8 rising_bits = data & ~port_4_last;
 

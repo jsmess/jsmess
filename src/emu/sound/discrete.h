@@ -387,7 +387,7 @@
  *
  *     DISCRETE_COUNTER(name of node,
  *                      enable node or static value,
- *                      reset node or static value,
+ *                      reset node or static value, (reset when TRUE)
  *                      clock node or static value,
  *                      max count static value,
  *                      direction node or static value,
@@ -423,11 +423,15 @@
  *                         bias node or static value,
  *                         LFSR noise descriptor structure)
  *
- *     discrete_lfsr_desc = {clock type,  (see DISCRETE_COUNTER)
+ *     discrete_lfsr_desc = {clock type,  (see DISCRETE_COUNTER),
  *                           bitlength, reset_value,
  *                           feedback_bitsel0, feedback_bitsel1,
  *                           feedback_function0, feedback_function1, feedback_function2,
  *                           feedback_function2_mask, flags, output_bit}
+ *
+ *     flags: DISC_LFSR_FLAG_OUT_INVERT     - invert output
+ *            DISC_LFSR_FLAG_RESET_TYPE_L   - reset when LOW (Defalut)
+ *            DISC_LFSR_FLAG_RESET_TYPE_H   - reset when HIGH
  *
  *  The diagram below outlines the structure of the LFSR model.
  *

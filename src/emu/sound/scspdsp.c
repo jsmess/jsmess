@@ -265,14 +265,14 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 				if(NOFL)
 					MEMVAL=DSP->SCSPRAM[ADDR]<<8;
 				else
-					MEMVAL=UNPACK(DSP->SCSPRAM[ADDR]);
+					MEMVAL=UNPACK(DSP->SCSPRAM[ADDR%DSP->SCSPRAM_LENGTH]);
 			}
 			if(MWT && (step&1))
 			{
 				if(NOFL)
 					DSP->SCSPRAM[ADDR]=SHIFTED>>8;
 				else
-					DSP->SCSPRAM[ADDR]=PACK(SHIFTED);
+					DSP->SCSPRAM[ADDR%DSP->SCSPRAM_LENGTH]=PACK(SHIFTED);
 			}
 		}
 

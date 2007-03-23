@@ -782,7 +782,7 @@ static int path_iterator_init(path_iterator *iterator, const char *searchpath)
 
 	/* reset the structure */
 	memset(iterator, 0, sizeof(*iterator));
-	iterator->base = (searchpath != NULL) ? options_get_string(searchpath) : "";
+	iterator->base = (searchpath != NULL) ? options_get_string(mame_options(), searchpath) : "";
 	iterator->cur = iterator->base;
 
 	/* determine the maximum path embedded here */

@@ -66,6 +66,19 @@ VIDEO_START( gaelco3d )
 	work_queue = osd_work_queue_alloc(0);
 	add_exit_callback(machine, gaelco3d_exit);
 
+	/* save states */
+
+	state_save_register_global_pointer(palette, 32768);
+	state_save_register_global_pointer(polydata_buffer, MAX_POLYDATA);
+	state_save_register_global(polydata_start);
+	state_save_register_global(polydata_count);
+
+	state_save_register_global(polygons);
+	state_save_register_global(lastscan);
+
+	state_save_register_bitmap("video", 0, "screenbits", screenbits);
+	state_save_register_bitmap("video", 0, "zbuffer", zbuffer);
+
 	return 0;
 }
 
