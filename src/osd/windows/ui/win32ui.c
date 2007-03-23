@@ -871,7 +871,6 @@ static void CreateCommandLine(int nGameIndex, char* pCmdLine)
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -str %d",					pOpts->seconds_to_display);
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sthrottle",				pOpts->throttle   ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssleep",					pOpts->sleep   ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%srdtsc",					pOpts->old_timing ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -priority %d",				pOpts->priority);
 	/* video */
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -video %s",                  pOpts->videomode );

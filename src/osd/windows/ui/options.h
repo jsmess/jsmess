@@ -131,7 +131,7 @@ typedef struct
 	double gfx_gamma;
 	double gfx_brightness;
 	double gfx_contrast;
-	int    frames_to_display;
+	int seconds_to_display;
 	ScreenParams screen_params[MAX_SCREENS];
 
 	// d3d
