@@ -985,4 +985,4 @@ CONS( 2000, psxa45, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Son
 CONS( 1994, psxj,   0,      0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Japan)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1995, psxe,   psxj,   0,      psxpal,  psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Europe)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 CONS( 1995, psxu,   psxj,   0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (USA)",		    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psxa,   psxj,   0,      psxpal,  psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Asia-Pacific)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psxa,   psxj,   0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Asia-Pacific)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
