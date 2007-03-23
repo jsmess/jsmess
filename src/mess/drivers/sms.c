@@ -32,6 +32,7 @@
 	Jun 25, 02 - Added border emulation (ML)
 	Jun 27, 02 - Version bits for Game Gear (bits 6 of port 00) (ML)
 	Nov-Dec, 05 - Numerous cleanups, fixes, updates (WP)
+	Mar, 07 - More cleanups, fixes, mapper additions, etc (WP)
 
  ******************************************************************************/
 
@@ -172,15 +173,13 @@ static PALETTE_INIT( gamegear ) {
 	}
 }
 
-static MACHINE_DRIVER_START(sms)
+static MACHINE_DRIVER_START(sms1ntsc)
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_NTSC/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(sms_io, 0)
 	MDRV_CPU_VBLANK_INT(sms, NTSC_Y_PIXELS)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START(sms)
@@ -190,14 +189,13 @@ static MACHINE_DRIVER_START(sms)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_ADD("main",0)
-//	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_NTSC/10, SMS_X_PIXELS, LBORDER_X_PIXELS, LBORDER_X_PIXELS + 256, NTSC_Y_PIXELS, TBORDER_Y_PIXELS, TBORDER_Y_PIXELS + 240)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_NTSC/10, SMS_X_PIXELS, LBORDER_START + LBORDER_X_PIXELS - 2, LBORDER_START + LBORDER_X_PIXELS + 256 + 10, NTSC_Y_PIXELS, TBORDER_START + NTSC_224_TBORDER_Y_PIXELS, TBORDER_START + NTSC_224_TBORDER_Y_PIXELS + 224)
 
 	MDRV_PALETTE_LENGTH(64+16)
 	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(sms)
 
-	MDRV_VIDEO_START(sms_ntsc)
+	MDRV_VIDEO_START(sega_315_5124)
 	MDRV_VIDEO_UPDATE(sms)
 
 	/* sound hardware */
@@ -206,15 +204,18 @@ static MACHINE_DRIVER_START(sms)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START(smspal)
+static MACHINE_DRIVER_START(sms2ntsc)
+	MDRV_IMPORT_FROM(sms1ntsc)
+	MDRV_VIDEO_START(sega_315_5246)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START(sms1pal)
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_PAL/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(sms_io, 0)
 	MDRV_CPU_VBLANK_INT(sms, PAL_Y_PIXELS)
 
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
         
 	MDRV_MACHINE_START(sms)
@@ -223,14 +224,14 @@ static MACHINE_DRIVER_START(smspal)
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-//	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, SMS_X_PIXELS, LBORDER_X_PIXELS, LBORDER_X_PIXELS + 256, PAL_Y_PIXELS, TBORDER_Y_PIXELS, TBORDER_Y_PIXELS + 240)
+	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_PAL/10, SMS_X_PIXELS, LBORDER_START + LBORDER_X_PIXELS - 2, LBORDER_START + LBORDER_X_PIXELS + 256 + 10, PAL_Y_PIXELS, TBORDER_START + PAL_240_TBORDER_Y_PIXELS, TBORDER_START + PAL_240_TBORDER_Y_PIXELS + 240)
 
 	MDRV_PALETTE_LENGTH(64+16)
 	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(sms)
  
-	MDRV_VIDEO_START(sms_pal)
+	MDRV_VIDEO_START(sega_315_5124)
 	MDRV_VIDEO_UPDATE(sms)
  
 	/* sound hardware */
@@ -239,8 +240,13 @@ static MACHINE_DRIVER_START(smspal)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START(sms2pal)
+	MDRV_IMPORT_FROM(sms1pal)
+	MDRV_VIDEO_START(sega_315_5246)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START(smsfm)
-	MDRV_IMPORT_FROM(sms)
+	MDRV_IMPORT_FROM(sms1ntsc)
 
 	MDRV_SOUND_ADD(YM2413, MASTER_CLOCK_NTSC/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -253,8 +259,6 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_CPU_IO_MAP(gg_io, 0)
 	MDRV_CPU_VBLANK_INT(sms, NTSC_Y_PIXELS)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_START(sms)
@@ -263,12 +267,13 @@ static MACHINE_DRIVER_START(gamegear)
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_ADD("main",0)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_NTSC/10, SMS_X_PIXELS, LBORDER_START + LBORDER_X_PIXELS + 6*8, LBORDER_START + LBORDER_X_PIXELS + 26*8, NTSC_Y_PIXELS, TBORDER_START + NTSC_192_TBORDER_Y_PIXELS + 3*8, TBORDER_START + NTSC_192_TBORDER_Y_PIXELS + 21*8 )
 	MDRV_PALETTE_LENGTH(4096)
 	MDRV_COLORTABLE_LENGTH(0)
 	MDRV_PALETTE_INIT(gamegear)
 
-	MDRV_VIDEO_START(sms_ntsc)
+	MDRV_VIDEO_START(sega_315_5378)
 	MDRV_VIDEO_UPDATE(sms)
 
 	/* sound hardware */
@@ -277,60 +282,81 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
-SYSTEM_BIOS_START( sms )
-	SYSTEM_BIOS_ADD( 0, "bios13", "US/European BIOS v1.3 (1986)" ) /* smsu13 */
-/*	SYSTEM_BIOS_ADD( 1, "missiled", "US/European BIOS with Missile Defense 3D (1986)" ) smsumd3d */
-	SYSTEM_BIOS_ADD( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" ) /* smsuhs24 */
-	SYSTEM_BIOS_ADD( 2, "hangon", "US/European BIOS v3.4 with Hang On (1988)" ) /* smseh34 */
+SYSTEM_BIOS_START( sms1 )
+	SYSTEM_BIOS_ADD( 0, "bios13", "US/European BIOS v1.3 (1986)" )
+	SYSTEM_BIOS_ADD( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
+	SYSTEM_BIOS_ADD( 2, "hangon", "US/European BIOS v3.4 with Hang On (1988)" )
 	SYSTEM_BIOS_ADD( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-	SYSTEM_BIOS_ADD( 4, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" ) /* smsuam */
+	SYSTEM_BIOS_ADD( 4, "proto", "US Master System Prototype BIOS" )
+SYSTEM_BIOS_END
+
+SYSTEM_BIOS_START( sms2 )
+	SYSTEM_BIOS_ADD( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
 SYSTEM_BIOS_END
 
 SYSTEM_BIOS_START( smsj )
-        SYSTEM_BIOS_ADD( 0, "jbios21", "Sega Mark III/Sega Master System/Samsung Gamboy - Japanese SMS BIOS v2.1" ) /* smsj21 (+fm) (1985), smsm3 (1984), smsss (+fm) (198?) */
+        SYSTEM_BIOS_ADD( 0, "jbios21", "Japanese BIOS v2.1 (1987)" )
 SYSTEM_BIOS_END
 
-SYSTEM_BIOS_START( smspal )
-        SYSTEM_BIOS_ADD( 0, "bios13", "Sega Master System - US/European BIOS v1.3 (1986)" ) /* smse13 */
-/*	SYSTEM_BIOS_ADD( 1, "missiled", "US/European BIOS with Missile Defense 3D (1986)" ) smsemd3d */
-	SYSTEM_BIOS_ADD( 1, "hangonsh", "Sega Master System Plus - US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" ) /* smsehs24 */
-	SYSTEM_BIOS_ADD( 2, "hangon", "Sega Master System - US/European BIOS v3.4 with Hang On (1988)" ) /* smseh34 */
+SYSTEM_BIOS_START( sms1pal )
+        SYSTEM_BIOS_ADD( 0, "bios13", "US/European BIOS v1.3 (1986)" )
+	SYSTEM_BIOS_ADD( 1, "hangonsh", "US/European BIOS v2.4 with Hang On and Safari Hunt (1988)" )
+	SYSTEM_BIOS_ADD( 2, "hangon", "Sega Master System - US/European BIOS v3.4 with Hang On (1988)" )
 	SYSTEM_BIOS_ADD( 3, "missiled", "US/European BIOS v4.4 with Missile Defense 3D (1988)" )
-        SYSTEM_BIOS_ADD( 4, "alexkidd", "Sega Master System II - US/European BIOS with Alex Kidd in Miracle World (1990)" ) /* smseam */
-        SYSTEM_BIOS_ADD( 5, "sonic", "Sega Master System II/Tec Toy Master System III Compact (Brazil) - European/Brazilian BIOS with Sonic the Hedgehog (1991)" ) /* smsesh, smsbsh */
 SYSTEM_BIOS_END
 
-ROM_START(sms)
+SYSTEM_BIOS_START( sms2pal )
+	SYSTEM_BIOS_ADD( 0, "alexkidd", "US/European BIOS with Alex Kidd in Miracle World (1990)" )
+	SYSTEM_BIOS_ADD( 1, "sonic", "European/Brazilian BIOS with Sonic the Hedgehog (1991)" )
+SYSTEM_BIOS_END
+
+ROM_START(sms1)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
-	ROM_REGION(0x40000, REGION_USER1, 0)
+	ROM_REGION(0x20000, REGION_USER1, 0)
 	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ED54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
 	ROMX_LOAD("hshbios.rom", 0x0000, 0x20000, CRC(91E93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
 	ROMX_LOAD("hangbios.rom", 0x0000, 0x20000, CRC(8EDF7AC6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
 	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(E79BB689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
-	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(5))
+	ROMX_LOAD("m404prot.rom", 0x0000, 0x2000, CRC(1a15dfcc) SHA1(4a06c8e66261611dce0305217c42138b71331701), ROM_BIOS(5))
+ROM_END
+
+ROM_START(sms)
+	ROM_REGION(0x4000, REGION_CPU1, 0)
+	ROM_FILL(0x0000,0x4000,0xFF)
+	ROM_REGION(0x20000, REGION_USER1, 0)
+	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
+ROM_END
+
+ROM_START(sms1pal)
+	ROM_REGION(0x4000, REGION_CPU1, 0)
+	ROM_FILL(0x0000,0x4000,0xFF)
+	ROM_REGION(0x20000, REGION_USER1, 0)
+	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ED54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
+	ROMX_LOAD("hshbios.rom", 0x0000, 0x20000, CRC(91E93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
+	ROMX_LOAD("hangbios.rom", 0x0000, 0x20000, CRC(8EDF7AC6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
+	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(E79BB689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
 ROM_END
 
 ROM_START(smspal)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x40000, REGION_USER1, 0)
-	ROMX_LOAD("bios13fx.rom", 0x0000, 0x2000, CRC(0072ED54) SHA1(c315672807d8ddb8d91443729405c766dd95cae7), ROM_BIOS(1))
-	ROMX_LOAD("hshbios.rom", 0x0000, 0x20000, CRC(91E93385) SHA1(9e179392cd416af14024d8f31c981d9ee9a64517), ROM_BIOS(2))
-	ROMX_LOAD("hangbios.rom", 0x0000, 0x20000, CRC(8EDF7AC6) SHA1(51fd6d7990f62cd9d18c9ecfc62ed7936169107e), ROM_BIOS(3))
-	ROMX_LOAD("missiled.rom", 0x0000, 0x20000, CRC(E79BB689) SHA1(aa92ae576ca670b00855e278378d89e9f85e0351), ROM_BIOS(4))
-	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(5))
-	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81C3476B) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(6))
+	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
+	ROMX_LOAD("sonbios.rom", 0x0000, 0x40000, CRC(81C3476B) SHA1(6aca0e3dffe461ba1cb11a86cd4caf5b97e1b8df), ROM_BIOS(2))
 ROM_END
 
-ROM_START(smsm3)
+ROM_START(sg1000m3)
+	ROM_REGION(0x4000, REGION_CPU1, 0)
+	ROM_FILL(0x0000,0x4000,0xFF)
+ROM_END
+
+ROM_START(smsj)
 	ROM_REGION(0x4000, REGION_CPU1, 0)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x4000, REGION_USER1, 0)
 	ROMX_LOAD("jbios21.rom", 0x0000, 0x2000, CRC(48D44A13) SHA1(a8c1b39a2e41137835eda6a5de6d46dd9fadbaf2), ROM_BIOS(1))
 ROM_END
-
-#define rom_smsj21 rom_smsm3
 
 SYSTEM_BIOS_START( gamegear )
 	SYSTEM_BIOS_ADD( 0, "none", "No BIOS" ) /* gamegear */
@@ -370,6 +396,18 @@ SYSTEM_CONFIG_START(sms)
 	CONFIG_DEVICE(sms_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
+static void sg1000_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
+	/* cartslot */
+	switch(state) {
+		case DEVINFO_INT_MUST_BE_LOADED:		info->i = 1; break;
+		default:					sms_cartslot_getinfo(devclass, state, info); break;
+	}
+}
+
+SYSTEM_CONFIG_START(sg1000)
+	CONFIG_DEVICE(sg1000_cartslot_getinfo)
+SYSTEM_CONFIG_END
+
 static void gamegear_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
@@ -391,13 +429,51 @@ SYSTEM_CONFIG_END
 
   Game driver(s)
 
+  US
+   - Sega Master System I (sms1)
+     - prototype bios - 1986
+     - without built-in game v1.3 - 1986
+     - built-in Hang On/Safari Hunt v2.4 - 1988
+     - built-in Hang On v3.4 - 1988
+     - built-in Missile Defense 3-D v4.4 - 1988
+     - built-in Hang On/Astro Warrior ????
+   - Sega Master System II (sms/sms2)
+     - built-in Alex Kidd in Miracle World - 1990
+
+  JP
+   - Sega SG-1000 Mark III (smsm3)
+     - no bios
+   - Sega Master System (I) (smsj)
+     - without built-in game v2.1 - 1987
+
+  EU
+   - Sega Master System I (sms1pal)
+     - without built-in game v1.3 - 1986
+     - built-in Hang On/Safari Hunt v2.4 - 1988
+     - built-in Hang On v3.4 - 1988
+     - built-in Missile Defense 3-D v4.4 - 1988
+     - built-in Hang On/Astro Warrior ????
+   - Sega Master System II (sms2pal)
+     - built-in Alex Kidd in Miracle World - 1990
+     - built-in Sonic the Hedgehog - 1991
+
+  BR
+   - Sega Master System I - 1987
+   - Sega Master System II???
+   - Sega Master System III - Tec Toy, 1987
+   - Sega Master System Compact - Tec Toy, 1992
+   - Sega Master System Girl - Tec Toy, 1992
+
 ***************************************************************************/
 
 /*		YEAR	NAME		PARENT		COMPATIBLE	MACHINE		INPUT	INIT	CONFIG		COMPANY			FULLNAME */
-CONSB(	1986,	sms,	0, sms,			0,			sms,		sms,	0,		sms,		"Sega",			"Sega Master System/Sega Master System Plus/Sega Master System II" , FLAG_BIOS_FULL )
-CONSB(	1986,	smspal,	sms, smspal,	0,			smspal,		sms,	0,		sms,		"Sega",			"Sega Master System/Sega Master System Plus/Sega Master System II/Tec Toy Master System III Compact (Brazil)" , FLAG_BIOS_FULL )
-CONSB(  1984,   smsm3,	0, smsj,              0,                      sms,            sms,    0,              sms,            "Sega",                 "Sega Mark III" , FLAG_REGION_JAPAN | FLAG_BIOS_2000 )
-CONSB(	1985,	smsj21,		smsm3, smsj,		0,			smsfm,		sms,	0,		sms,		"Sega",			"Sega Master System/Samsung Gamboy" , FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
+CONSB(	1986,      sms,   0,    sms2, 0, sms2ntsc, sms, 0,    sms, "Sega", "Master System II", FLAG_BIOS_FULL )
+CONSB(  1986,     sms1, sms,    sms1, 0, sms1ntsc, sms, 0,    sms, "Sega", "Master System I", FLAG_BIOS_FULL )
+
+CONSB(	1986,  sms1pal, sms, sms1pal, 0,  sms1pal, sms, 0,    sms, "Sega", "Master System I (PAL)" , FLAG_BIOS_FULL )
+CONSB(  1990,   smspal, sms, sms2pal, 0,  sms2pal, sms, 0,    sms, "Sega", "Master System II (PAL)", FLAG_BIOS_FULL )
+CONS(   1984, sg1000m3, sms,          0,    smsfm, sms, 0, sg1000, "Sega", "SG-1000 Mark III" , FLAG_REGION_JAPAN | FLAG_FM )
+CONSB(	1987,     smsj, sms,    smsj, 0,    smsfm, sms, 0,    sms, "Sega", "Master System (Japan)" , FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
 
 CONSB(	1990,	gamegear,	0, gamegear,			sms,		gamegear,	sms,	0,		gamegear,	"Sega",			"Sega Game Gear - European/American" , FLAG_GAMEGEAR )
 CONSB(	1990,	gamegeaj,	gamegear, gamegear,	0,			gamegear,	sms,	0,		gamegear,	"Sega",			"Sega Game Gear - Japanese" , FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )

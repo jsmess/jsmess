@@ -94,14 +94,11 @@ INTERRUPT_GEN(sms);
 #define IO_BIOS_ROM					(0x08)	/* BIOS ROM disabled (1= disabled, 0= enabled) */
 #define IO_CHIP							(0x04)	/* I/O chip disabled (1= disabled, 0= enabled) */
 
-#define BACKDROP_COLOR			(0x10 + (reg[0x07] & 0x0F))
-
 /* Function prototypes */
 
-extern int currentLine;
-
-VIDEO_START(sms_pal);
-VIDEO_START(sms_ntsc);
+VIDEO_START(sega_315_5124);
+VIDEO_START(sega_315_5246);
+VIDEO_START(sega_315_5378);
 VIDEO_UPDATE(sms);
  READ8_HANDLER(sms_vdp_curline_r);
  READ8_HANDLER(sms_vdp_data_r);

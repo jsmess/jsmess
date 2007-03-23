@@ -126,10 +126,12 @@ const game_driver *test_drivers[] =
 	/* SEGA */
 	DRIVER( gamegear )	/* Sega GameGear									*/
 	DRIVER( gamegeaj )	/* Sega GameGear (Japan)						*/
-	DRIVER( sms )		/* Sega Master System (NTSC)						*/
-	DRIVER( smspal )	/* Sega Master System (PAL)							*/
-	DRIVER( smsj21 )	/* Sega Master System (Japan) with FM Chip					*/
-	DRIVER( smsm3 )		/* Sega Mark III (Japan)							*/
+	DRIVER( sms )		/* Sega Master System II (NTSC)						*/
+	DRIVER( sms1 )		/* Sega Master System I (NTSC)						*/
+	DRIVER( sms1pal )	/* Sega Master System I (PAL)						*/
+	DRIVER( smspal )	/* Sega Master System II (PAL)						*/
+	DRIVER( smsj )		/* Sega Master System (Japan) with FM Chip				*/
+	DRIVER( sg1000m3 )	/* Sega SG-1000 Mark III (Japan)					*/
 	DRIVER( gen_usa )	/* Sega Genesis/MegaDrive USA							*/
 	DRIVER( gen_eur )	/* Sega Genesis/MegaDrive Europe						*/
 	DRIVER( gen_jpn )	/* Sega Genesis/MegaDrive Japan						*/

@@ -41,8 +41,18 @@ PAL frame timing
 #include "video/generic.h"
 #include "cpu/z80/z80.h"
 
+#define FLAG_315_5124		0x0001
+#define FLAG_315_5246		0x0002
+#define FLAG_315_5378		0x0004
+
+#define IS_SMS1_VDP		( features & FLAG_315_5124 )
+#define IS_SMS2_VDP		( features & FLAG_315_5246 )
+#define IS_GAMEGEAR_VDP		( features & FLAG_315_5378 )
+
 #define CRAM_SIZE		MAX_CRAM_SIZE
 #define PRIORITY_BIT		0x1000
+
+#define BACKDROP_COLOR		(0x10 + (reg[0x07] & 0x0F))
 
 #define INIT_VCOUNT		0
 #define VERTICAL_BLANKING	1
@@ -60,7 +70,6 @@ static UINT8 sms_pal_224[7]  = { 0xCA, 3, 13, 38, 224, 32, 3 };
 static UINT8 sms_pal_240[7]  = { 0xD2, 3, 13, 30, 240, 24, 3 };
 
 UINT8 *sms_frame_timing;
-UINT8 *sms_frame_timing_192, *sms_frame_timing_224, *sms_frame_timing_240;
 
 UINT8 reg[NUM_OF_REGISTER];
 UINT8 *VRAM = NULL;
@@ -76,13 +85,13 @@ int latch;
 int buffer;
 int statusReg;
 int ggSmsMode;
+UINT32 features;
 
 int isCRAMDirty;
 
 int lineCountDownCounter;
 int irqState;			/* The status of the IRQ line, as seen by the VDP */
 int y_pixels;			/* 192, 224, 240 */
-int max_y_lines;
 int vdp_mode;			/* current mode of the VDP: 0,1,2,3,4 */
 
 mame_bitmap *prevBitMap;
@@ -108,7 +117,7 @@ static void set_display_settings( void ) {
 	if ( M4 ) {
 		/* mode 4 */
 		vdp_mode = 4;
-		if ( M2 ) {
+		if ( M2 && IS_SMS2_VDP ) {
 			/* Is it 224-line display */
 			if ( M1 && ! M3 ) {
 				y_pixels = 224;
@@ -136,13 +145,13 @@ static void set_display_settings( void ) {
 	}
 	switch( y_pixels ) {
 	case 192:
-		sms_frame_timing = sms_frame_timing_192;
+		sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_192 : sms_ntsc_192;
 		break;
 	case 224:
-		sms_frame_timing = sms_frame_timing_224;
+		sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_224 : sms_ntsc_224;
 		break;
 	case 240:
-		sms_frame_timing = sms_frame_timing_240;
+		sms_frame_timing = ( Machine->screen[0].height == PAL_Y_PIXELS ) ? sms_pal_240 : sms_ntsc_240;
 		break;
 	}
 	isCRAMDirty = 1;
@@ -156,12 +165,9 @@ void sms_set_ggsmsmode( int mode ) {
 	ggSmsMode = mode;
 }
 
-int sms_video_init( UINT8 *timing_192, UINT8 *timing_224, UINT8 *timing_240 ) {
+int sms_video_init( UINT32 flags ) {
 
-	max_y_lines = Machine->screen[0].height;
-	sms_frame_timing_192 = timing_192;
-	sms_frame_timing_224 = timing_224;
-	sms_frame_timing_240 = timing_240;
+	features = flags;
 
 	/* Allocate video RAM
 	   In theory the driver could have a REGION_GFX1 and/or REGION_GFX2 memory region
@@ -185,7 +191,7 @@ int sms_video_init( UINT8 *timing_192, UINT8 *timing_224, UINT8 *timing_240 ) {
 	memset(CRAM, 0, CRAM_SIZE);
 	reg[0x02] = 0x0E;			/* power up default */
 
-	CRAMMask = ( IS_GAMEGEAR && ! ggSmsMode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
+	CRAMMask = ( IS_GAMEGEAR_VDP && ! ggSmsMode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
 
 	/* Initialize VDP state variables */
 	addr = code = pending = latch = buffer = statusReg = \
@@ -204,12 +210,16 @@ int sms_video_init( UINT8 *timing_192, UINT8 *timing_224, UINT8 *timing_240 ) {
 	return (0);
 }
 
-VIDEO_START(sms_pal) {
-	return sms_video_init( sms_pal_192, sms_pal_224, sms_pal_240 );
+VIDEO_START(sega_315_5124) {
+	return sms_video_init( FLAG_315_5124 );
 }
 
-VIDEO_START(sms_ntsc) {
-	return sms_video_init( sms_ntsc_192, sms_ntsc_224, sms_ntsc_240 );
+VIDEO_START(sega_315_5246) {
+	return sms_video_init( FLAG_315_5246 );
+}
+
+VIDEO_START(sega_315_5378) {
+	return sms_video_init( FLAG_315_5378 );
 }
 
 INTERRUPT_GEN(sms) {
@@ -260,7 +270,7 @@ INTERRUPT_GEN(sms) {
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - ( vpos_limit - sms_frame_timing[ACTIVE_DISPLAY_V] ) );
+		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit - sms_frame_timing[ACTIVE_DISPLAY_V], vpos - ( vpos_limit - sms_frame_timing[ACTIVE_DISPLAY_V] ) );
 		return;
 	}
 
@@ -326,7 +336,7 @@ INTERRUPT_GEN(sms) {
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit, vpos - ( vpos_limit + sms_frame_timing[TOP_BORDER] ) );
+		sms_refresh_line( tmpbitmap, LBORDER_START + LBORDER_X_PIXELS, vpos_limit + sms_frame_timing[TOP_BORDER], vpos - ( vpos_limit + sms_frame_timing[TOP_BORDER] ) );
 		return;
 	}
 }
@@ -450,22 +460,29 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 	int spriteX, spriteY, spriteLine, spriteTileSelected, spriteHeight, spriteZoom;
 	int spriteBuffer[8], spriteBufferCount, spriteBufferIndex;
 	int bitPlane0, bitPlane1, bitPlane2, bitPlane3;
-	UINT16 *nameTable = (UINT16 *) &(VRAM[(((reg[0x02] & 0x0E) << 10) & 0x3800) + ((((line + reg9copy) % 224) >> 3) << 6)]);
-	UINT8 *spriteTable = (UINT8 *) &(VRAM[(reg[0x05] << 7) & 0x3F00]);
+	UINT16 nameTableAddress;
+	UINT8 *nameTable;
+	UINT8 *spriteTable = &VRAM[(reg[0x05] << 7) & 0x3F00];
 
 	if ( y_pixels != 192 ) {
-		nameTable = (UINT16 *) &(VRAM[(((reg[0x02] & 0x0C) << 10) | 0x0700) + ((((line + reg9copy) % 256) >> 3 ) << 6)]);
+		nameTableAddress = (((reg[0x02] & 0x0C) << 10) | 0x0700) + ((((line + reg9copy) % 256) >> 3) << 6);
+	} else {
+		nameTableAddress = ((reg[0x02] << 10) & 0x3800) + ((((line + reg9copy) % 224) >> 3) << 6);
 	}
+	if ( IS_SMS1_VDP ) {
+		nameTableAddress = nameTableAddress & (((reg[0x02] & 0x01) << 10) | 0x3BFF);
+	}
+	nameTable = VRAM + nameTableAddress;
 
 	/* if top 2 rows of screen not affected by horizontal scrolling, then xScroll = 0 */
 	/* else xScroll = reg[0x08] (SMS Only)                                            */
-	if ( IS_GAMEGEAR ) {
+	if ( IS_GAMEGEAR_VDP ) {
 		xScroll = 0x0100 - reg[0x08];
 	} else {
 		xScroll = (((reg[0x00] & 0x40) && (line < 16)) ? 0 : 0x0100 - reg[0x08]);
 	}
 
-	xScrollStartColumn = (xScroll >> 3);							 /* x starting column tile */
+	xScrollStartColumn = (xScroll >> 3);			 /* x starting column tile */
 
 	/* Draw background layer */
 	for (tileColumn = 0; tileColumn < 33; tileColumn++) {
@@ -475,17 +492,14 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 
 		/* Rightmost 8 columns for SMS (or 2 columns for GG) not affected by */
 		/* vertical scrolling when bit 7 of reg[0x00] is set */
-		if ( IS_GAMEGEAR ) {
+		if ( IS_GAMEGEAR_VDP ) {
 			yScroll = (((reg[0x00] & 0x80) && (tileColumn > 29)) ? 0 : (reg9copy) % 224);
 		} else {
 			yScroll = (((reg[0x00] & 0x80) && (tileColumn > 23)) ? 0 : (reg9copy) % 224);
 		}
 
-		#ifndef LSB_FIRST
-		tileData = ((nameTable[((tileColumn + xScrollStartColumn) & 0x1F)] & 0xFF) << 8) | (nameTable[((tileColumn + xScrollStartColumn) & 0x1F)] >> 8);
-		#else
-		tileData = nameTable[((tileColumn + xScrollStartColumn) & 0x1F)];
-		#endif
+		tileLine = ( ( tileColumn + xScrollStartColumn ) & 0x1F ) * 2;
+		tileData = nameTable[ tileLine ] | ( nameTable[ tileLine + 1 ] << 8 );
 
 		tileSelected = (tileData & 0x01FF);
 		prioritySelect = tileData & PRIORITY_BIT;
@@ -659,207 +673,31 @@ void sms_refresh_line_mode4(int *lineBuffer, int line) {
 		}
 	}
 
-	/* Fill column 0 with overscan color from reg[0x07]	 (SMS Only) */
-	if ( ! IS_GAMEGEAR ) {
-		if (reg[0x00] & 0x20) {
-			lineBuffer[0] = currentPalette[BACKDROP_COLOR];
-			lineBuffer[1] = currentPalette[BACKDROP_COLOR];
-			lineBuffer[2] = currentPalette[BACKDROP_COLOR];
-			lineBuffer[3] = currentPalette[BACKDROP_COLOR];
-			lineBuffer[4] = currentPalette[BACKDROP_COLOR];
-			lineBuffer[5] = currentPalette[BACKDROP_COLOR];
-			lineBuffer[6] = currentPalette[BACKDROP_COLOR];
-			lineBuffer[7] = currentPalette[BACKDROP_COLOR];
-		}
+	/* Fill column 0 with overscan color from reg[0x07] */
+	if (reg[0x00] & 0x20) {
+		lineBuffer[0] = currentPalette[BACKDROP_COLOR];
+		lineBuffer[1] = currentPalette[BACKDROP_COLOR];
+		lineBuffer[2] = currentPalette[BACKDROP_COLOR];
+		lineBuffer[3] = currentPalette[BACKDROP_COLOR];
+		lineBuffer[4] = currentPalette[BACKDROP_COLOR];
+		lineBuffer[5] = currentPalette[BACKDROP_COLOR];
+		lineBuffer[6] = currentPalette[BACKDROP_COLOR];
+		lineBuffer[7] = currentPalette[BACKDROP_COLOR];
 	}
 }
 
-void sms_refresh_line_mode2(int *lineBuffer, int line) {
-	int tileColumn;
-	int pixelX, pixelPlotX;
-	int spriteHeight, spriteBufferCount, spriteIndex, spriteY, spriteBuffer[4], spriteBufferIndex;
-	UINT8 *nameTable, *colorTable, *patternTable, *spriteTable, *spritePatternTable;
-	int patternMask, colorMask, patternOffset;
-
-	/* Draw background layer */
-	nameTable = VRAM + ( ( reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
-	colorTable = VRAM + ( ( reg[0x03] & 0x80 ) << 6 );
-	colorMask = ( ( reg[0x03] & 0x7F ) << 3 ) | 0x07;
-	patternTable = VRAM + ( ( reg[0x04] & 0x04 ) << 11 );
-	patternMask = ( ( reg[0x04] & 0x03 ) << 8 ) | 0xFF;
-	patternOffset = ( line & 0xC0 ) << 2;
-	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
-		UINT8 pattern;
-		UINT8 colors;
-		pattern = patternTable[ ( ( ( patternOffset + nameTable[tileColumn] ) & patternMask ) * 8 ) + ( line & 0x07 ) ];
-		colors = colorTable[ ( ( ( patternOffset + nameTable[tileColumn] ) & colorMask ) * 8 ) + ( line & 0x07 ) ];
-		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-			UINT8 penSelected;
-			if ( pattern & ( 1 << ( 7 - pixelX ) ) ) {
-				penSelected = colors >> 4;
-			} else {
-				penSelected = colors & 0x0F;
-			} 
-			if ( ! penSelected ) {
-				penSelected = BACKDROP_COLOR;
-			}
-			pixelPlotX = ( tileColumn << 3 ) + pixelX;
-			if ( IS_GAMEGEAR ) {
-				penSelected |= 0x10;
-			}
-			lineBuffer[pixelPlotX] = currentPalette[penSelected];
-		}
-	}
-
-	/* Draw sprite layer */
-	spriteTable = VRAM + ( ( reg[0x05] & 0x7F ) << 7 );
-	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
-	spriteHeight = ( reg[0x01] & 0x03 ? 16 : 8 ); /* check if either MAG or SI is set */
-	spriteBufferCount = 0;
-	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
-		spriteY = spriteTable[spriteIndex] + 1;
-		if ( spriteY > 240 ) {
-			spriteY -= 256;
-		}
-		if ( ( line >= spriteY ) && ( line < ( spriteY + spriteHeight ) ) ) {
-			if ( spriteBufferCount < 5 ) {
-				spriteBuffer[spriteBufferCount] = spriteIndex;
-			} else {
-				/* Too many sprites per line */
-				statusReg |= STATUS_SPROVR;
-			}
-			spriteBufferCount++;
-		}
-	}
-	if ( spriteBufferCount > 4 ) {
-		spriteBufferCount = 4;
-	}
-	memset( lineCollisionBuffer, 0, SMS_X_PIXELS );
-	spriteBufferCount--;
-	for ( spriteBufferIndex = spriteBufferCount; spriteBufferIndex >= 0; spriteBufferIndex-- ) {
-		UINT8 penSelected;
-		int spriteLine, pixelX, spriteX, spriteTileSelected;
-		UINT8 pattern;
-		spriteIndex = spriteBuffer[ spriteBufferIndex ];
-		spriteY = spriteTable[ spriteIndex ] + 1;
-		if ( spriteY > 240 ) {
-			spriteY -= 256;
-		}
-		spriteX = spriteTable[ spriteIndex + 1 ];
-		penSelected = spriteTable[ spriteIndex + 3 ] & 0x0F;
-		if ( IS_GAMEGEAR ) {
-			penSelected |= 0x10;
-		}
-		if ( spriteTable[ spriteIndex + 3 ] & 0x80 ) {
-			spriteX -= 32;
-		}
-		spriteTileSelected = spriteTable[ spriteIndex + 2 ];
-		spriteLine = line - spriteY;
-		if ( reg[0x01] & 0x01 ) {
-			spriteLine >>= 1;
-		}
-		if ( reg[0x01] & 0x02 ) {
-			spriteTileSelected &= 0xFC;
-			if ( spriteLine > 0x07 ) {
-				spriteTileSelected += 1;
-				spriteLine -= 8;
-			}
-		}
-		pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
-		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-			if ( reg[0x01] & 0x01 ) {
-				pixelPlotX = spriteX + pixelX * 2;
-				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
-					continue;
-				}
-				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					lineBuffer[pixelPlotX] = currentPalette[penSelected];
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
-					}
-					lineBuffer[pixelPlotX+1] = currentPalette[penSelected];
-					if ( lineCollisionBuffer[pixelPlotX + 1] != 1 ) {
-						lineCollisionBuffer[pixelPlotX + 1] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
-					}
-				}
-			} else {
-				pixelPlotX = spriteX + pixelX;
-				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
-					continue;
-				}
-				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					lineBuffer[pixelPlotX] = currentPalette[penSelected];
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
-					}
-				}
-			}
-		}
-		if ( reg[0x01] & 0x02 ) {
-			spriteTileSelected += 2;
-			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
-			spriteX += 8;
-			for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-				pixelPlotX = spriteX + pixelX;
-				if ( pixelPlotX < 0 || pixelPlotX > 255 ) {
-					continue;
-				}
-				if ( penSelected && ( pattern & ( 1 << ( 7 - pixelX ) ) ) ) {
-					lineBuffer[pixelPlotX] = currentPalette[penSelected];
-					if ( lineCollisionBuffer[pixelPlotX] != 1 ) {
-						lineCollisionBuffer[pixelPlotX] = 1;
-					} else {
-						statusReg |= STATUS_SPRCOL;
-					}
-				}
-			}
-		}
-	}
-}
-
-void sms_refresh_line_mode0(int *lineBuffer, int line) {
-	int tileColumn;
-	int pixelX, pixelPlotX; 
+void sms_refresh_tms9918_sprites(int *lineBuffer, int line) {
+	int pixelPlotX;
 	int spriteHeight, spriteBufferCount, spriteIndex, spriteBuffer[4], spriteBufferIndex;
-	UINT8 *nameTable, *colorTable, *patternTable, *spriteTable, *spritePatternTable;
-
-	/* Draw background layer */
-	nameTable = VRAM + ( ( reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
-	colorTable = VRAM + ( ( reg[0x03] << 6 ) & ( VRAM_SIZE - 1 ) );
-	patternTable = VRAM + ( ( reg[0x04] << 11 ) & ( VRAM_SIZE - 1 ) ); 
-	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
-		UINT8 pattern;
-		UINT8 colors;
-		pattern = patternTable[ ( nameTable[tileColumn] * 8 ) + ( line & 0x07 ) ];
-		colors = colorTable[ nameTable[tileColumn] >> 3 ];
-		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
-			int penSelected;
-			if ( pattern & ( 1 << ( 7 - pixelX ) ) ) {
-				penSelected = colors >> 4;
-			} else {
-				penSelected = colors & 0x0F;
-			}
-			if ( IS_GAMEGEAR ) {
-				penSelected |= 0x10;
-			}
-			pixelPlotX = ( tileColumn << 3 ) + pixelX;
-			lineBuffer[pixelPlotX] = currentPalette[penSelected];
-		}
-	}
+	UINT8 *spriteTable, *spritePatternTable;
 
 	/* Draw sprite layer */
 	spriteTable = VRAM + ( ( reg[0x05] & 0x7F ) << 7 );
 	spritePatternTable = VRAM + ( ( reg[0x06] & 0x07 ) << 11 );
 	spriteHeight = 8;
-	if ( reg[0x01] & 0x02 )				/* Check if SI is set */
+	if ( reg[0x01] & 0x02 )                         /* Check if SI is set */
 		spriteHeight = spriteHeight * 2;
-	if ( reg[0x01] & 0x01 )				/* Check if MAG is set */
+	if ( reg[0x01] & 0x01 )                         /* Check if MAG is set */
 		spriteHeight = spriteHeight * 2;
 	spriteBufferCount = 0;
 	for ( spriteIndex = 0; (spriteIndex < 32*4 ) && ( spriteTable[spriteIndex] != 0xD0 ) && ( spriteBufferCount < 5); spriteIndex+= 4 ) {
@@ -894,7 +732,7 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 		}
 		spriteX = spriteTable[ spriteIndex + 1 ];
 		penSelected = spriteTable[ spriteIndex + 3 ] & 0x0F;
-		if ( IS_GAMEGEAR ) {
+		if ( IS_GAMEGEAR_VDP ) {
 			penSelected |= 0x10;
 		}
 		if ( spriteTable[ spriteIndex + 3 ] & 0x80 ) {
@@ -949,7 +787,7 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 				}
 			}
 		}
-
+	
 		if ( reg[0x01] & 0x02 ) {
 			spriteTileSelected += 2;
 			pattern = spritePatternTable[ spriteTileSelected * 8 + spriteLine ];
@@ -993,10 +831,84 @@ void sms_refresh_line_mode0(int *lineBuffer, int line) {
 	}
 }
 
+void sms_refresh_line_mode2(int *lineBuffer, int line) {
+	int tileColumn;
+	int pixelX, pixelPlotX;
+	UINT8 *nameTable, *colorTable, *patternTable;
+	int patternMask, colorMask, patternOffset;
+
+	/* Draw background layer */
+	nameTable = VRAM + ( ( reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
+	colorTable = VRAM + ( ( reg[0x03] & 0x80 ) << 6 );
+	colorMask = ( ( reg[0x03] & 0x7F ) << 3 ) | 0x07;
+	patternTable = VRAM + ( ( reg[0x04] & 0x04 ) << 11 );
+	patternMask = ( ( reg[0x04] & 0x03 ) << 8 ) | 0xFF;
+	patternOffset = ( line & 0xC0 ) << 2;
+	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
+		UINT8 pattern;
+		UINT8 colors;
+		pattern = patternTable[ ( ( ( patternOffset + nameTable[tileColumn] ) & patternMask ) * 8 ) + ( line & 0x07 ) ];
+		colors = colorTable[ ( ( ( patternOffset + nameTable[tileColumn] ) & colorMask ) * 8 ) + ( line & 0x07 ) ];
+		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+			UINT8 penSelected;
+			if ( pattern & ( 1 << ( 7 - pixelX ) ) ) {
+				penSelected = colors >> 4;
+			} else {
+				penSelected = colors & 0x0F;
+			} 
+			if ( ! penSelected ) {
+				penSelected = BACKDROP_COLOR;
+			}
+			pixelPlotX = ( tileColumn << 3 ) + pixelX;
+			if ( IS_GAMEGEAR_VDP ) {
+				penSelected |= 0x10;
+			}
+			lineBuffer[pixelPlotX] = currentPalette[penSelected];
+		}
+	}
+
+	/* Draw sprite layer */
+	sms_refresh_tms9918_sprites( lineBuffer, line );
+}
+
+void sms_refresh_line_mode0(int *lineBuffer, int line) {
+	int tileColumn;
+	int pixelX, pixelPlotX; 
+	UINT8 *nameTable, *colorTable, *patternTable;
+
+	/* Draw background layer */
+	nameTable = VRAM + ( ( reg[0x02] & 0x0F ) << 10 ) + ( ( line >> 3 ) * 32 );
+	colorTable = VRAM + ( ( reg[0x03] << 6 ) & ( VRAM_SIZE - 1 ) );
+	patternTable = VRAM + ( ( reg[0x04] << 11 ) & ( VRAM_SIZE - 1 ) ); 
+	for ( tileColumn = 0; tileColumn < 32; tileColumn++ ) {
+		UINT8 pattern;
+		UINT8 colors;
+		pattern = patternTable[ ( nameTable[tileColumn] * 8 ) + ( line & 0x07 ) ];
+		colors = colorTable[ nameTable[tileColumn] >> 3 ];
+		for ( pixelX = 0; pixelX < 8; pixelX++ ) {
+			int penSelected;
+			if ( pattern & ( 1 << ( 7 - pixelX ) ) ) {
+				penSelected = colors >> 4;
+			} else {
+				penSelected = colors & 0x0F;
+			}
+			if ( IS_GAMEGEAR_VDP ) {
+				penSelected |= 0x10;
+			}
+			pixelPlotX = ( tileColumn << 3 ) + pixelX;
+			lineBuffer[pixelPlotX] = currentPalette[penSelected];
+		}
+	}
+
+	/* Draw sprite layer */
+	sms_refresh_tms9918_sprites( lineBuffer, line );
+}
+
 void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, int line ) {
 	int x;
 	int *blitLineBuffer = lineBuffer;
 
+logerror( "pixelPlotY = %d, line = %d\n", pixelPlotY, line );
 	if ( line >= 0 && line < sms_frame_timing[ACTIVE_DISPLAY_V] ) {
 		switch( vdp_mode ) {
 		case 0:
@@ -1016,7 +928,7 @@ void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, in
 		}
 	}
 
-	if ( IS_GAMEGEAR && ggSmsMode ) {
+	if ( IS_GAMEGEAR_VDP && ggSmsMode ) {
 		int *combineLineBuffer = lineBuffer + ( ( line & 0x03 ) + 1 ) * 256;
 		int plotX = 48;
 
@@ -1101,14 +1013,14 @@ void sms_update_palette(void) {
 	}
 	isCRAMDirty = 0;
 
-	if ( vdp_mode != 4 && ! IS_GAMEGEAR ) {
+	if ( vdp_mode != 4 && ! IS_GAMEGEAR_VDP ) {
 		for( i = 0; i < 16; i++ ) {
 			currentPalette[i] = 64+i;
 		}
 		return;
 	}
 
-	if ( IS_GAMEGEAR ) {
+	if ( IS_GAMEGEAR_VDP ) {
 		if ( ggSmsMode ) {
 			for ( i = 0; i < 32; i++ ) {
 				currentPalette[i] = ( ( CRAM[i] & 0x30 ) << 6 ) | ( ( CRAM[i] & 0x0C ) << 4 ) | ( ( CRAM[i] & 0x03 ) << 2 );
