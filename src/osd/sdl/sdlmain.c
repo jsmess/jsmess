@@ -144,13 +144,13 @@ int SDL_main(int argc, char **argv)
 	#ifdef SDLMAME_MACOSX
 
 	#ifdef X86_ASM	// Intel OS X only
-	sdl_use_rdtsc = options_get_bool("rdtsc");
+	sdl_use_rdtsc = options_get_bool(mame_options(), "rdtsc");
 	#else
-	sdl_use_rdtsc = options_get_bool("machtmr");
+	sdl_use_rdtsc = options_get_bool(mame_options(), "machtmr");
 	#endif	// X86_ASM
 	#else	// MACOSX
 	#ifdef X86_ASM	// Intel only
-	sdl_use_rdtsc = options_get_bool("rdtsc");
+	sdl_use_rdtsc = options_get_bool(mame_options(), "rdtsc");
 	#endif
 	#endif
 
@@ -161,8 +161,6 @@ int SDL_main(int argc, char **argv)
 		res = -1;
 
 	cli_frontend_exit();
-
-	options_free_entries();
 
 #ifdef MALLOC_DEBUG
 	{
@@ -230,6 +228,10 @@ int osd_init(running_machine *machine)
 	result = win_init_input(machine);
 
 	sdl_init_audio();
+
+	#ifdef MESS
+	SDL_EnableUNICODE(1);
+        #endif
 
 	if(win_erroroslog)
 		add_logerror_callback(machine, output_oslog);

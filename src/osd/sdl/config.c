@@ -20,14 +20,12 @@
 // MAME headers
 #include "osdepend.h"
 #include "driver.h"
-#include "options.h"
-
 #include "video.h"
 #include "render.h"
 #include "rendutil.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"
-
+#include "emuopts.h"
 
 
 //============================================================
@@ -73,8 +71,6 @@ static void parse_ini_file(const char *name);
 static void execute_simple_commands(void);
 static void execute_commands(const char *argv0);
 static void display_help(void);
-static void setup_playback(const char *filename, const game_driver *driver);
-static void setup_record(const char *filename, const game_driver *driver);
 static char *extract_base_name(const char *name, char *dest, int destsize);
 static char *extract_path(const char *name, char *dest, int destsize);
 
@@ -269,6 +265,15 @@ INLINE int is_directory_separator(char c)
 }
 
 
+//============================================================
+//  sdl_options_init
+//============================================================
+
+static void sdl_options_init(void)
+{
+	mame_options_init(sdl_opts);
+}
+
 
 //============================================================
 //  cli_frontend_init
@@ -283,27 +288,27 @@ int cli_frontend_init(int argc, char **argv)
 	int drvnum = -1;
 
 	// initialize the options manager
-	options_init(sdl_opts);
+	sdl_options_init();
 	if (getenv("SDLMAME_UNSUPPORTED"))
-		options_add_entries(config_unsupported_opts);
+		options_add_entries(mame_options(),config_unsupported_opts);
 
 	// override the default inipath with more appropriate values for SDLMAME
 #if defined(SDLMAME_WIN32) || defined(SDLMAME_MACOSX)
-	options_set_option_default_value("inipath", ".;ini");
+	options_set_option_default_value(mame_options(),"inipath", ".;ini");
 #else
 #if defined(INI_PATH)
-	options_set_option_default_value("inipath", INI_PATH);
+	options_set_option_default_value(mame_options(),"inipath", INI_PATH);
 #else
 #ifdef MESS
-	options_set_option_default_value("inipath", "$HOME/.mess;.;ini");
+	options_set_option_default_value(mame_options(),"inipath", "$HOME/.mess;.;ini");
 #else
-	options_set_option_default_value("inipath", "$HOME/.mame;.;ini");
+	options_set_option_default_value(mame_options(),"inipath", "$HOME/.mame;.;ini");
 #endif // MESS
 #endif // INI_PATH
 #endif // MACOSX
 
 	// parse the command line first; if we fail here, we're screwed
-	if (options_parse_command_line(argc, argv))
+	if (options_parse_command_line(mame_options(), argc, argv))
 		exit(1);
 
 #ifdef MESS
@@ -314,7 +319,7 @@ int cli_frontend_init(int argc, char **argv)
 	execute_simple_commands();
 
 	// find out what game we might be referring to
-	gamename = options_get_string(OPTION_GAMENAME);
+	gamename = options_get_string(mame_options(),OPTION_GAMENAME);
 	if (gamename != NULL)
 		drvnum = driver_get_index(extract_base_name(gamename, basename, ARRAY_LENGTH(basename)));
 
@@ -352,8 +357,8 @@ int cli_frontend_init(int argc, char **argv)
 
 	// reparse the command line to ensure its options override all
 	// note that we re-fetch the gamename here as it will get overridden
-	options_parse_command_line(argc, argv);
-	gamename = options_get_string(OPTION_GAMENAME);
+	options_parse_command_line(mame_options(),argc, argv);
+	gamename = options_get_string(mame_options(),OPTION_GAMENAME);
 
 	// execute any commands specified
 	execute_commands(argv[0]);
@@ -393,21 +398,21 @@ int cli_frontend_init(int argc, char **argv)
 	if (buffer[0] != 0)
 	{
 		// okay, we got one; prepend it to the rompath
-		const char *rompath = options_get_string("rompath");
+		const char *rompath = options_get_string(mame_options(),"rompath");
 		if (rompath == NULL)
-			options_set_string("rompath", buffer);
+			options_set_string(mame_options(),"rompath", buffer);
 		else
 		{
 			char *newpath = malloc_or_die(strlen(rompath) + strlen(buffer) + 2);
 			sprintf(newpath, "%s;%s", buffer, rompath);
-			options_set_string("rompath", newpath);
+			options_set_string(mame_options(),"rompath", newpath);
 			free(newpath);
 		}
 	}
 
 {
 	extern int verbose;
-	verbose = options_get_bool("verbose");
+	verbose = options_get_bool(mame_options(),"verbose");
 }
 
 	return drvnum;
@@ -422,7 +427,7 @@ int cli_frontend_init(int argc, char **argv)
 void cli_frontend_exit(void)
 {
 	// free the options that we added previously
-	options_free_entries();
+	options_free(mame_options());
 }
 
 
@@ -438,7 +443,7 @@ static void parse_ini_file(const char *name)
 	char *fname;
 
 	// don't parse if it has been disabled
-	if (!options_get_bool("readconfig"))
+	if (!options_get_bool(mame_options(),"readconfig"))
 		return;
 
 	// open the file; if we fail, that's ok
@@ -449,12 +454,22 @@ static void parse_ini_file(const char *name)
 		return;
 
 	// parse the file and close it
-	options_parse_ini_file(file);
+	options_parse_ini_file(mame_options(), mame_core_file(file));
 	mame_fclose(file);
 }
 
 
 
+//============================================================
+//  mame_puts_info
+//============================================================
+
+static void mame_puts_info(const char *s)
+{
+	mame_printf_info("%s", s);
+}
+
+	
 //============================================================
 //  execute_simple_commands
 //============================================================
@@ -462,22 +477,22 @@ static void parse_ini_file(const char *name)
 static void execute_simple_commands(void)
 {
 	// help?
-	if (options_get_bool("help"))
+	if (options_get_bool(mame_options(),"help"))
 	{
 		display_help();
 		exit(0);
 	}
 
 	// showusage?
-	if (options_get_bool("showusage"))
+	if (options_get_bool(mame_options(),"showusage"))
 	{
 		printf("Usage: mame [game] [options]\n\nOptions:\n");
-		options_output_help();
+			options_output_help(mame_options(), mame_puts_info);
 		exit(0);
 	}
 
 	// validate?
-	if (options_get_bool("validate"))
+	if (options_get_bool(mame_options(),"validate"))
 	{
 		extern int mame_validitychecks(int game);
 		exit(mame_validitychecks(-1));
@@ -517,7 +532,7 @@ static void execute_commands(const char *argv0)
 	int i;
 
 	// createconfig?
-	if (options_get_bool("createconfig"))
+	if (options_get_bool(mame_options(),"createconfig"))
 	{
 		char basename[128];
 		mame_file *file;
@@ -536,21 +551,21 @@ static void execute_commands(const char *argv0)
 		}
 
 		// output the configuration and exit cleanly
-		options_output_ini_mame_file(file);
+		options_output_ini_file(mame_options(), mame_core_file(file));
 		mame_fclose(file);
 		exit(0);
 	}
 
 	// showconfig?
-	if (options_get_bool("showconfig"))
+	if (options_get_bool(mame_options(),"showconfig"))
 	{
-		options_output_ini_file(stdout);
+		options_output_ini_stdfile(mame_options(), stdout);
 		exit(0);
 	}
 
 	// frontend options?
 	for (i = 0; i < ARRAY_LENGTH(frontend_options); i++)
-		if (options_get_bool(frontend_options[i].option))
+		if (options_get_bool(mame_options(),frontend_options[i].option))
 		{
 			int result;
 

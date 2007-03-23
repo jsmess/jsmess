@@ -296,6 +296,7 @@ const int def_key_trans_table[][4] =
 	{ KEYCODE_LWIN, 		SDLK_LSUPER,		0,     	0 },
 	{ KEYCODE_RWIN, 		SDLK_RSUPER,		0,     	0 },
 	{ KEYCODE_MENU, 		SDLK_MENU,		0,     	0 },
+	{ KEYCODE_BACKSLASH2,           SDLK_HASH,              0xdc,   '\\' },
 	{ -1, -1, -1, -1 }
 };
 
@@ -407,6 +408,7 @@ static const char *key_name_table[] =
 	"LWIN",
 	"RWIN",
 	"MENU",
+	"\\2",
 	" ",
 };
 
@@ -1178,8 +1180,11 @@ static const INT32 mess_keytrans[][2] =
 	{ SDLK_F10,		UCHAR_MAMEKEY(F10) },
 	{ SDLK_F11,		UCHAR_MAMEKEY(F11) },
 	{ SDLK_F12,		UCHAR_MAMEKEY(F12) },
-	{ SDLK_NUMLOCK,	UCHAR_MAMEKEY(F12) },
-	{ SDLK_SCROLLOCK,	UCHAR_MAMEKEY(F12) },
+	{ SDLK_LCTRL,	        UCHAR_MAMEKEY(LCONTROL) },
+	{ SDLK_RCTRL,	        UCHAR_MAMEKEY(RCONTROL) },
+	{ SDLK_NUMLOCK,	        UCHAR_MAMEKEY(NUMLOCK) },
+	{ SDLK_CAPSLOCK,	UCHAR_MAMEKEY(CAPSLOCK) },
+	{ SDLK_SCROLLOCK,	UCHAR_MAMEKEY(SCRLOCK) },
 	{ SDLK_KP0,	UCHAR_MAMEKEY(0_PAD) },
 	{ SDLK_KP1,	UCHAR_MAMEKEY(1_PAD) },
 	{ SDLK_KP2,	UCHAR_MAMEKEY(2_PAD) },
@@ -1223,7 +1228,11 @@ static int lookup_key_code(const key_lookup_table *kt, char *kn)
 
 static int win_has_menu(void)
 {
-	return 0;
+#ifdef MESS
+       return mess_ui_active() || ui_is_menu_active();
+#else
+       return ui_is_menu_active();;
+#endif
 }
 
 //============================================================
@@ -1397,12 +1406,30 @@ void win_process_events(void)
 	#ifdef MESS
 	int translated;
 	#endif
+	
+	//FIXME: wpe is called in window_thread to get events
+	//       from SDL. To be thread-clean, these have to be
+	//       buffered and be processed in the main thread!
+	
 	for (i=0;i<MAX_JOYSTICKS;i++)
 	{
 	        mouse_state[i].lX = 0;
 	        mouse_state[i].lY = 0;
 	}
+	if (keyboard_state[SDLK_CAPSLOCK]) 
+	{
+		/* auto key-up caps-lock */
+		keyboard_state[SDLK_CAPSLOCK] = 0;
+		updatekeyboard();
+	}
+
 	while(SDL_PollEvent(&event)) {
+		if (event.type == SDL_KEYUP && 
+		    event.key.keysym.sym == SDLK_CAPSLOCK)
+		{
+			/* more caps-lock hack */
+			event.type = SDL_KEYDOWN;
+		}
 		switch(event.type) {
 		case SDL_QUIT:
 			mame_schedule_exit(Machine);
@@ -1423,7 +1450,7 @@ void win_process_events(void)
 
 				if (!translated)
 				{
-					inputx_postc(event.key.keysym.sym);
+					inputx_postc(event.key.keysym.unicode);
 				}
 			}
 			#endif
@@ -1464,7 +1491,7 @@ void win_process_events(void)
 
 static void parse_analog_select(int type, const char *option)
 {
-	const char *stemp = options_get_string(option);
+	const char *stemp = options_get_string(mame_options(), option);
 
 	if (strcmp(stemp, "keyboard") == 0)
 		analog_type[type] = SELECT_TYPE_KEYBOARD;
@@ -1482,7 +1509,7 @@ static void parse_analog_select(int type, const char *option)
 
 static void parse_digital(const char *option)
 {
-	const char *soriginal = options_get_string(option);
+	const char *soriginal = options_get_string(mame_options(), option);
 	const char *stemp = soriginal;
 
 	if (strcmp(stemp, "none") == 0)
@@ -1563,10 +1590,10 @@ usage:
 static void extract_input_config(void)
 {
 	// extract boolean options
-	win_use_mouse = options_get_bool("mouse");
-	use_joystick = options_get_bool("joystick");
-	steadykey = options_get_bool("steadykey");
-	a2d_deadzone = options_get_float("a2d_deadzone");
+	win_use_mouse = options_get_bool(mame_options(), "mouse");
+	use_joystick = options_get_bool(mame_options(), "joystick");
+	steadykey = options_get_bool(mame_options(), "steadykey");
+	a2d_deadzone = options_get_float(mame_options(), "a2d_deadzone");
 	parse_analog_select(ANALOG_TYPE_PADDLE, "paddle_device");
 	parse_analog_select(ANALOG_TYPE_ADSTICK, "adstick_device");
 	parse_analog_select(ANALOG_TYPE_PEDAL, "pedal_device");
@@ -1591,7 +1618,7 @@ void win_clear_keyboard(void)
 
 int sdl_is_mouse_captured(void)
 {
-	return (!input_paused && mouse_active && win_use_mouse); // && !win_has_menu());
+	return (!input_paused && mouse_active && win_use_mouse && !win_has_menu());
 }
 
 
@@ -1663,13 +1690,13 @@ static void init_keycodes(void)
 	int (*key_trans_table)[4] = NULL;
 	char **ui_name = NULL;
 
-	if (options_get_bool("keymap"))
+	if (options_get_bool(mame_options(), "keymap"))
 	{
 		char *keymap_filename;
 		FILE *keymap_file;
 		int line = 1;
 
-		keymap_filename = (char *)options_get_string("keymap_file");
+		keymap_filename = (char *)options_get_string(mame_options(), "keymap_file");
 		keymap_file = fopen(keymap_filename, "r");
 
 		if (keymap_file == NULL)

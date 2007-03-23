@@ -49,8 +49,8 @@ extern int drawogl_init(sdl_draw_callbacks *callbacks);
 //============================================================
 
 #if 1
-//#define ASSERT_USE(x)	assert_always(SDL_ThreadID() == x, "Wrong Thread")
-#define ASSERT_USE(x)
+#define ASSERT_USE(x)	assert_always(SDL_ThreadID() == x, "Wrong Thread")
+//#define ASSERT_USE(x)
 #else
 #define ASSERT_USE(x)	assert(SDL_ThreadID() == x)
 #endif
@@ -58,7 +58,7 @@ extern int drawogl_init(sdl_draw_callbacks *callbacks);
 #ifndef SDLMAME_WIN32
 #define NOT_WIN32 (1)
 #else
-#define NOT_WIN32 (0)
+#define NOT_WIN32 (1)
 #endif
 
 #if NOT_WIN32
@@ -160,6 +160,13 @@ void yuv_lookup_init(sdl_window_info *window);
 void *sdlwindow_thread_id(void *param)
 {
 	window_threadid = SDL_ThreadID();
+
+	#ifdef SDLMAME_WIN32
+	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+		fprintf(stderr, "Could not initialize SDL: %s.\n", SDL_GetError());
+		exit(-1);
+	}
+	#endif
 	return NULL;
 }
 
@@ -171,7 +178,7 @@ void *sdlwindow_thread_id(void *param)
 int sdlwindow_init(running_machine *machine)
 {
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool("multithreading");
+	multithreading_enabled = options_get_bool(mame_options(), "multithreading");
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
@@ -195,7 +202,8 @@ int sdlwindow_init(running_machine *machine)
 	else
 	{
 		// otherwise, treat the window thread as the main thread
-		window_threadid = main_threadid;
+		//window_threadid = main_threadid;
+		sdlwindow_thread_id(NULL);
 	}
 
 	// initialize the drawers
@@ -229,7 +237,12 @@ void _sdlwindow_sync(const char *s, int line)
 		//while ( !osd_work_queue_wait(work_queue, 1000 * osd_ticks_per_second()) )
 		while ( (i=osd_work_queue_items(work_queue)) )
 		{
+//			printf("Waiting for queue: %s -- %d\n", s, line);
+			#ifndef SDLMAME_WIN32
 			usleep(100);
+			#else
+			Sleep(1000);
+			#endif
 		}
 	}
 }
@@ -248,7 +261,7 @@ static void sdlwindow_exit(running_machine *machine)
 	{
 		sdlwindow_sync();
 	}
-	
+
 	// free all the windows
 	while (sdl_window_list != NULL)
 	{
@@ -338,12 +351,12 @@ static void *sdlwindow_resize_wt(void *param)
 	drawsdl_destroy_all_textures(window->dxdata);
 #endif
 #endif
+	SDL_FreeSurface(window->sdlsurf);
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
 		window->sdlsurf = SDL_SetVideoMode(wp->resize_new_width, wp->resize_new_height, 0, SDL_SWSURFACE |
 			SDL_DOUBLEBUF | SDL_ANYFORMAT | window->extra_flags);
 	else
 	{
-		SDL_FreeSurface(window->sdlsurf);
 		window->sdlsurf = SDL_SetVideoMode(wp->resize_new_width, wp->resize_new_height, 0, SDL_HWSURFACE |
 			SDL_DOUBLEBUF | SDL_ANYFORMAT | window->extra_flags);
 		yuv_overlay_init(window);
@@ -364,7 +377,8 @@ void sdlwindow_resize(INT32 width, INT32 height)
 	sdl_window_info *window = sdl_window_list;
 	worker_param *wp;
 
-	ASSERT_MAIN_THREAD();
+	//May be called from input_processing
+	//ASSERT_MAIN_THREAD();
 
 	if (width == window->sdlsurf->w && height == window->sdlsurf->h)
 		return;
@@ -372,14 +386,15 @@ void sdlwindow_resize(INT32 width, INT32 height)
 	wp = (worker_param *) malloc(sizeof(worker_param));
 	wp->resize_new_width = width;
 	wp->resize_new_height = height;
-	if (multithreading_enabled && NOT_WIN32)
+	if (multithreading_enabled && NOT_WIN32 && (SDL_ThreadID() == main_threadid) )
 	{
 		osd_work_item_queue(work_queue, &sdlwindow_resize_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
 		sdlwindow_sync();
 	}
 	else
 	{
-		sdlwindow_sync();
+		if (SDL_ThreadID() == main_threadid)
+			sdlwindow_sync();
 		sdlwindow_resize_wt((void *) wp);
 	}
 }
@@ -398,7 +413,7 @@ static void *sdlwindow_toggle_full_screen_wt(void *param)
 
 #ifdef MAME_DEBUG
 	// if we are in debug mode, never go full screen
-	if (options_get_bool(OPTION_DEBUG))
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		return;
 #endif
 
@@ -604,7 +619,7 @@ void sdlwindow_update_cursor_state(void)
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
 	#ifdef MAME_DEBUG
-	if (!options_get_bool(OPTION_DEBUG))
+	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 	#endif
 	{
 		if (video_config.windowed && !sdl_is_mouse_captured())
@@ -664,7 +679,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 
 	// set the specific view
 	sprintf(option, "view%d", index);
-	set_starting_view(index, window, options_get_string(option));
+	set_starting_view(index, window, options_get_string(mame_options(), option));
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -995,10 +1010,10 @@ static void *complete_create_wt(void *param)
 	{
 		window->extra_flags |= SDL_OPENGL;
 
-		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
+ 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+		
 		#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
-		if (options_get_bool("waitvsync"))
+		if (options_get_bool(mame_options(), "waitvsync"))
 		{
 			SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
 		}
@@ -1082,7 +1097,12 @@ static void *complete_create_wt(void *param)
 			}
 		}
 		#endif
-
+		
+		if (getenv("SDLMAME_VMWARE"))
+		{
+			sdl->usetexturerect = 1;
+			sdl->forcepoweroftwo = 1;
+		}
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &sdl->texture_max_width);
 		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &sdl->texture_max_height);
 		if (!shown_video_info)
@@ -1120,6 +1140,9 @@ static void *draw_video_contents_wt(void * param)
 	int 	update = 	1;
 	
 	ASSERT_REDRAW_THREAD();
+	#ifdef SDLMAME_WIN32
+	win_process_events();
+	#endif
 
 	window->primlist = wp->list;
 	osd_lock_acquire(window->render_lock);

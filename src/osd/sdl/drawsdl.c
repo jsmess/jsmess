@@ -517,7 +517,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	// we're doing nothing 3d, so the Z-buffer is currently not interesting
 	glDisable(GL_DEPTH_TEST);
 
-	if (options_get_bool(OPTION_ANTIALIAS))
+	if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
 	{
 		// enable antialiasing for lines
 		glEnable(GL_LINE_SMOOTH);
@@ -695,6 +695,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 	osd_lock_release(window->primlist->lock);
 
+	//FIXME: If there is a crash, it is here
 	SDL_GL_SwapBuffers();
 	return 0;
 }

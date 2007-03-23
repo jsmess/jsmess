@@ -160,7 +160,7 @@ int sdlvideo_init(running_machine *machine)
 	init_monitors();
 
 	// we need the beam width in a float, contrary to what the core does.
-	video_config.beamwidth = options_get_float("beam");
+	video_config.beamwidth = options_get_float(mame_options(), "beam");
 
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
 	{
@@ -372,7 +372,9 @@ void osd_update(int skip_redraw)
 	}
 
 	// poll the joystick values here
+	#ifndef SDLMAME_WIN32
 	win_process_events();
+	#endif
 	check_osd_inputs();
 
 #ifdef MAME_DEBUG
@@ -488,7 +490,7 @@ static sdl_monitor_info *pick_monitor(int index)
 	// get the screen option
 	#if SDL_MULTIMON || defined(SDLMAME_WIN32)
 	sprintf(option, "screen%d", index);
-	scrname = options_get_string(option);
+	scrname = options_get_string(mame_options(), option);
 	#endif
 
 	// get the aspect ratio
@@ -578,30 +580,30 @@ static void extract_video_config(void)
 	const char *stemp;
 
 	// performance options: extract the data
-	video_config.autoframeskip = options_get_bool("autoframeskip");
-	video_config.frameskip     = options_get_int("frameskip");
-	video_config.throttle      = options_get_bool("throttle");
-	video_config.sleep         = options_get_bool("sleep");
+	video_config.autoframeskip = options_get_bool(mame_options(), "autoframeskip");
+	video_config.frameskip     = options_get_int(mame_options(), "frameskip");
+	video_config.throttle      = options_get_bool(mame_options(), "throttle");
+	video_config.sleep         = options_get_bool(mame_options(), "sleep");
 
 	// misc options: extract the data
-	video_config.framestorun   = options_get_int("frames_to_run");
+	video_config.framestorun   = options_get_int(mame_options(), "frames_to_run");
 
 	// global options: extract the data
-	video_config.windowed      = options_get_bool("window");
-	video_config.keepaspect    = options_get_bool("keepaspect");
-	video_config.numscreens    = options_get_int("numscreens");
-	video_config.fullstretch   = options_get_bool("unevenstretch");
+	video_config.windowed      = options_get_bool(mame_options(), "window");
+	video_config.keepaspect    = options_get_bool(mame_options(), "keepaspect");
+	video_config.numscreens    = options_get_int(mame_options(), "numscreens");
+	video_config.fullstretch   = options_get_bool(mame_options(), "unevenstretch");
 	#ifdef SDLMAME_LINUX
-	video_config.restrictonemonitor = !options_get_bool("useallheads");
+	video_config.restrictonemonitor = !options_get_bool(mame_options(), "useallheads");
 	#endif
 
 
 #ifdef MAME_DEBUG
 	// if we are in debug mode, never go full screen
-	if (options_get_bool(OPTION_DEBUG))
+	if (options_get_bool(mame_options(), OPTION_DEBUG))
 		video_config.windowed = TRUE;
 #endif
-	stemp                      = options_get_string("effect");
+	stemp                      = options_get_string(mame_options(), "effect");
 	if (stemp != NULL && strcmp(stemp, "none") != 0)
 		load_effect_overlay(stemp);
 
@@ -615,7 +617,7 @@ static void extract_video_config(void)
 	video_config.novideo = 0;
 
 	// d3d options: extract the data
-	stemp = options_get_string("video");
+	stemp = options_get_string(mame_options(), "video");
 	if (strcmp(stemp, "opengl") == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
 	else if (strcmp(stemp, "soft") == 0)
@@ -634,13 +636,13 @@ static void extract_video_config(void)
 		video_config.mode = VIDEO_MODE_SOFT;
 	}
 	
-	video_config.switchres     = options_get_bool("switchres");
-	video_config.filter        = options_get_bool("filter");
-	video_config.centerh       = options_get_bool("centerh");
-	video_config.centerv       = options_get_bool("centerv");
-	video_config.prescale      = options_get_int_range("prescale", 1, 3);
+	video_config.switchres     = options_get_bool(mame_options(), "switchres");
+	video_config.filter        = options_get_bool(mame_options(), "filter");
+	video_config.centerh       = options_get_bool(mame_options(), "centerh");
+	video_config.centerv       = options_get_bool(mame_options(), "centerv");
+	video_config.prescale      = options_get_int_range(mame_options(), "prescale", 1, 3);
 	if (getenv("SDLMAME_UNSUPPORTED"))
-		video_config.prescale_effect = options_get_int_range("prescale_effect", 0, 1);
+		video_config.prescale_effect = options_get_int_range(mame_options(), "prescale_effect", 0, 1);
 	else
 		video_config.prescale_effect = 0;
 
@@ -661,7 +663,7 @@ static void extract_video_config(void)
 	}
 
 	// yuv settings ...
-	stemp = options_get_string("yuvmode");
+	stemp = options_get_string(mame_options(), "yuvmode");
 	if (strcmp(stemp, "none") == 0)
 		video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
 	else if (strcmp(stemp, "yv12") == 0)
@@ -727,7 +729,7 @@ static void load_effect_overlay(const char *filename)
 
 static float get_aspect(const char *name, int report_error)
 {
-	const char *data = options_get_string(name);
+	const char *data = options_get_string(mame_options(), name);
 	int num = 0, den = 1;
 
 	if (strcmp(data, "auto") == 0)
@@ -745,7 +747,7 @@ static float get_aspect(const char *name, int report_error)
 
 static void get_resolution(const char *name, sdl_window_config *config, int report_error)
 {
-	const char *data = options_get_string(name);
+	const char *data = options_get_string(mame_options(), name);
 
 	config->width = config->height = config->depth = config->refresh = 0;
 	if (strcmp(data, "auto") == 0)
