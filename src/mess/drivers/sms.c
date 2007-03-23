@@ -467,14 +467,14 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*		YEAR	NAME		PARENT		COMPATIBLE	MACHINE		INPUT	INIT	CONFIG		COMPANY			FULLNAME */
-CONSB(	1986,      sms,   0,    sms2, 0, sms2ntsc, sms, 0,    sms, "Sega", "Master System II", FLAG_BIOS_FULL )
-CONSB(  1986,     sms1, sms,    sms1, 0, sms1ntsc, sms, 0,    sms, "Sega", "Master System I", FLAG_BIOS_FULL )
+CONSB(	1986,      sms,   0,    sms2, 0, sms2ntsc, sms, 0,    sms, "Sega", "Sega Master System II", FLAG_BIOS_FULL )
+CONSB(  1986,     sms1, sms,    sms1, 0, sms1ntsc, sms, 0,    sms, "Sega", "Sega Master System I", FLAG_BIOS_FULL )
 
-CONSB(	1986,  sms1pal, sms, sms1pal, 0,  sms1pal, sms, 0,    sms, "Sega", "Master System I (PAL)" , FLAG_BIOS_FULL )
-CONSB(  1990,   smspal, sms, sms2pal, 0,  sms2pal, sms, 0,    sms, "Sega", "Master System II (PAL)", FLAG_BIOS_FULL )
-CONS(   1984, sg1000m3, sms,          0,    smsfm, sms, 0, sg1000, "Sega", "SG-1000 Mark III" , FLAG_REGION_JAPAN | FLAG_FM )
-CONSB(	1987,     smsj, sms,    smsj, 0,    smsfm, sms, 0,    sms, "Sega", "Master System (Japan)" , FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
+CONSB(	1986,  sms1pal, sms, sms1pal, 0,  sms1pal, sms, 0,    sms, "Sega", "Sega Master System I (PAL)" , FLAG_BIOS_FULL )
+CONSB(  1990,   smspal, sms, sms2pal, 0,  sms2pal, sms, 0,    sms, "Sega", "Sega Master System II (PAL)", FLAG_BIOS_FULL )
+CONS(   1984, sg1000m3, sms,          0,    smsfm, sms, 0, sg1000, "Sega", "Sega SG-1000 Mark III" , FLAG_REGION_JAPAN | FLAG_FM )
+CONSB(	1987,     smsj, sms,    smsj, 0,    smsfm, sms, 0,    sms, "Sega", "Sega Master System (Japan)" , FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
 
-CONSB(	1990,	gamegear,	0, gamegear,			sms,		gamegear,	sms,	0,		gamegear,	"Sega",			"Sega Game Gear - European/American" , FLAG_GAMEGEAR )
-CONSB(	1990,	gamegeaj,	gamegear, gamegear,	0,			gamegear,	sms,	0,		gamegear,	"Sega",			"Sega Game Gear - Japanese" , FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )
+CONSB(	1990, gamegear,        0, gamegear, sms, gamegear, sms, 0, gamegear, "Sega", "Sega Game Gear - European/American" , FLAG_GAMEGEAR )
+CONSB(	1990, gamegeaj, gamegear, gamegear,   0, gamegear, sms, 0, gamegear, "Sega", "Sega Game Gear - Japanese" , FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )
 

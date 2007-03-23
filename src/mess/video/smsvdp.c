@@ -117,7 +117,7 @@ static void set_display_settings( void ) {
 	if ( M4 ) {
 		/* mode 4 */
 		vdp_mode = 4;
-		if ( M2 && IS_SMS2_VDP ) {
+		if ( M2 && ( IS_SMS2_VDP || IS_GAMEGEAR_VDP ) ) {
 			/* Is it 224-line display */
 			if ( M1 && ! M3 ) {
 				y_pixels = 224;
