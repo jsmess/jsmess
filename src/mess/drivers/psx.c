@@ -982,7 +982,7 @@ CONS( 1997, psxe41, psx,    0,      psxpal,  psx,   psx,  psx,    "Sony",   "Son
 CONS( 2000, psxa45, psx,    0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony PS one (scph101 A v4.5 05/25/00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 */
 
-CONS( 1994, psxj,   0,      0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Japan)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psxe,   psxj,   0,      psxpal,  psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Europe)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psxu,   psxj,   0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (USA)",		    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psxa,   psxj,   0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Asia-Pacific)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONSB( 1994, psxj,   0,      psxj,	0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Japan)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONSB( 1995, psxe,   psxj,   psxe,	0,      psxpal,  psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Europe)",	    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONSB( 1995, psxu,   psxj,   psxu,	0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (USA)",		    GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONSB( 1995, psxa,   psxj,   psxa,	0,      psxntsc, psx,   psx,  psx,    "Sony Computer Entertainment", "Sony PlayStation (Asia-Pacific)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
