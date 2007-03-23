@@ -908,7 +908,6 @@ void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, in
 	int x;
 	int *blitLineBuffer = lineBuffer;
 
-logerror( "pixelPlotY = %d, line = %d\n", pixelPlotY, line );
 	if ( line >= 0 && line < sms_frame_timing[ACTIVE_DISPLAY_V] ) {
 		switch( vdp_mode ) {
 		case 0:
