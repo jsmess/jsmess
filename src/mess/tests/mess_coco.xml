@@ -82,4 +82,10 @@
 	<memverify start="0x480" end="0x481">"OK"</memverify>
 </test>
 
+<test name="coco_bug1131" driver="coco2b">
+  <wait time="2"/>
+  <hardreset/>
+  <wait time="2"/>
+</test>
+
 </tests>

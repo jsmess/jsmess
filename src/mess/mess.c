@@ -156,7 +156,7 @@ void devices_init(running_machine *machine)
 
 			/* is an image specified for this image */
 			image_name = options_get_string(mame_options(), dev_name);
-			if (image_name != NULL)
+			if ((image_name != NULL) && (image_name[0] != '\0'))
 			{
 				/* try to load this image */
 				result = image_load(image, image_name);
