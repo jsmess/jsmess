@@ -390,6 +390,8 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 		results->rc = rc;
 		results->runtime_hash = runtime_hash;
 	}
+
+	options_free(mame_options());
 	return rc;
 }
 
