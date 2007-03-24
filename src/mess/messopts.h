@@ -11,8 +11,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define OPTION_RAMSIZE		"ramsize"
-#define OPTION_WRITECONFIG	"writeconfig"
+#define OPTION_RAMSIZE			"ramsize"
+#define OPTION_WRITECONFIG		"writeconfig"
+#define OPTION_SKIP_WARNINGS	"skip_warnings"
 
 
 

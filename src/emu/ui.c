@@ -25,6 +25,7 @@
 #include "mess.h"
 #include "uimess.h"
 #include "inputx.h"
+#include "messopts.h"
 #endif
 
 #include <ctype.h>
@@ -319,6 +320,10 @@ int ui_display_startup_screens(int show_disclaimer)
 	int show_gameinfo = !options_get_bool(mame_options(), OPTION_SKIP_GAMEINFO);
 	int show_warnings = TRUE;
 	int state;
+
+#ifdef MESS
+	show_warnings = !options_get_bool(mame_options(), OPTION_SKIP_WARNINGS);
+#endif /* MESS */
 
 	/* disable everything if we are using -str */
 	if (str > 0 && str < 60*5)

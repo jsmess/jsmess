@@ -22,49 +22,15 @@ extern int mame_validitychecks(int game);
 
 static int test_count, failure_count;
 
-static const options_entry messtest_opts[] =
+static const options_entry messtest_option_entries[] =
 {
 	{ "<UNADORNED0>",              NULL,        OPTION_REPEATS,    NULL },
 	{ "" },
 	{ "dumpscreenshots;ds",		"0",	OPTION_BOOLEAN,	"always dump screenshots" },
 	{ "preservedir;pd",			"0",	OPTION_BOOLEAN,	"preserve current directory" },
-	{ "rdtsc",					"0",	OPTION_BOOLEAN, "use the RDTSC instruction for timing; faster but may result in uneven performance" },
-	{ "priority",				"0",	0,				"thread priority for the main game thread; range from -15 to 1" },
-
-	// file and directory options
-	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
-	{ "rompath;rp;biospath;bp",      "roms",      0,                 "path to ROMsets and hard disk images" },
-#ifdef MESS
-	{ "hashpath;hash_directory;hash","hash",      0,                 "path to hash files" },
-#endif /* MESS */
-	{ "samplepath;sp",               "samples",   0,                 "path to samplesets" },
-	{ "artpath;artwork_directory",   "artwork",   0,                 "path to artwork files" },
-	{ "ctrlrpath;ctrlr_directory",   "ctrlr",     0,                 "path to controller definitions" },
-	{ "inipath",                     ".;ini",     0,                 "path to ini files" },
-	{ "fontpath",                    ".",         0,                 "path to font files" },
-
-	{ NULL,                          NULL,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
-	{ "cfg_directory",               "cfg",       0,                 "directory to save configurations" },
-	{ "nvram_directory",             "nvram",     0,                 "directory to save nvram contents" },
-	{ "memcard_directory",           "memcard",   0,                 "directory to save memory card contents" },
-	{ "input_directory",             "inp",       0,                 "directory to save input device logs" },
-	{ "state_directory",             "sta",       0,                 "directory to save states" },
-	{ "snapshot_directory",          "snap",      0,                 "directory to save screenshots" },
-	{ "diff_directory",              "diff",      0,                 "directory to save hard drive image difference files" },
-	{ "comment_directory",           "comments",  0,                 "directory to save debugger comments" },
-
-	{ NULL,                          NULL,        OPTION_HEADER,     "CORE FILENAME OPTIONS" },
-	{ "cheat_file",                  "cheat.dat", 0,                 "cheat filename" },
-
-	{ NULL,                          NULL,        OPTION_HEADER,     "CORE PERFORMANCE OPTIONS" },
-	{ "autoframeskip;afs",           "0",         OPTION_BOOLEAN,    "enable automatic frameskip selection" },
-	{ "frameskip;fs",                "0",         0,                 "set frameskip to fixed value, 0-12 (autoframeskip must be disabled)" },
-	{ "seconds_to_run;str",          "0",         0,                 "number of emulated seconds to run before automatically exiting" },
-	{ "throttle",                    "0",         OPTION_BOOLEAN,    "enable throttling to keep game running in sync with real time" },
-	{ "sleep",                       "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
-
 	{ NULL }
 };
+
 
 
 
@@ -97,6 +63,14 @@ static void handle_arg(core_options *copts, const char *arg)
 
 
 
+static void messtest_fail(const char *message)
+{
+	fprintf(stderr, "%s", message);
+	exit(1);
+}
+
+
+
 #ifdef WIN32
 static void win_expand_wildcards(int *argc, char **argv[])
 {
@@ -124,6 +98,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	int result = -1;
 	clock_t begin_time;
 	double elapsed_time;
+	core_options *messtest_options = NULL;
 
 #ifdef WIN32
 	/* expand wildcards so '*' can be used; this is not UNIX */
@@ -132,6 +107,7 @@ int CLIB_DECL main(int argc, char *argv[])
 
 	test_count = 0;
 	failure_count = 0;
+	messtest_options = NULL;
 
 	/* since the cpuintrf and sndintrf structures are filled dynamically now, we
 	 * have to init first */
@@ -139,9 +115,9 @@ int CLIB_DECL main(int argc, char *argv[])
 	sndintrf_init(NULL);
 	
 	/* register options */
-	mame_options_init(NULL);
-	options_add_entries(mame_options(), messtest_opts);
-	options_set_option_callback(mame_options(), OPTION_UNADORNED(0), handle_arg);
+	messtest_options = options_create(messtest_fail);
+	options_add_entries(messtest_options, messtest_option_entries);
+	options_set_option_callback(messtest_options, OPTION_UNADORNED(0), handle_arg);
 
 	/* run MAME's validity checks; if these fail cop out now */
 	/* NPW 16-Sep-2006 - commenting this out because this cannot be run outside of MAME */
@@ -154,7 +130,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	begin_time = clock();
 
 	/* parse the commandline */
-	if (options_parse_command_line(mame_options(), argc, argv))
+	if (options_parse_command_line(messtest_options, argc, argv))
 	{
 		fprintf(stderr, "Error while parsing cmdline\n");
 		goto done;
@@ -174,6 +150,8 @@ int CLIB_DECL main(int argc, char *argv[])
 	result = failure_count;
 
 done:
+	if (messtest_options)
+		options_free(messtest_options);
 	return result;
 }
 

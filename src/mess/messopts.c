@@ -26,7 +26,7 @@ static const options_entry mess_opts[] =
 	{ NULL,							NULL,   OPTION_HEADER,		"MESS SPECIFIC OPTIONS" },
     { "ramsize;ram",				NULL,	0,					"size of RAM (if supported by driver)" },
 	{ "writeconfig;wc",				"0",	OPTION_BOOLEAN,		"writes configuration to (driver).ini on exit" },
-	{ "skip_warnings",				"0",    OPTION_BOOLEAN,		"skip displaying the warnings screen" },
+	{ OPTION_SKIP_WARNINGS,			"0",    OPTION_BOOLEAN,		"skip displaying the warnings screen" },
 	{ NULL }
 };
 

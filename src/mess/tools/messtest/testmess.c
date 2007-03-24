@@ -313,6 +313,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	mame_options_init(win_mess_opts);
 	options_set_bool(mame_options(), OPTION_SKIP_GAMEINFO, TRUE);
 	options_set_bool(mame_options(), OPTION_THROTTLE, FALSE);
+	options_set_bool(mame_options(), OPTION_SKIP_WARNINGS, TRUE);
 	if (current_testcase.ram != 0)
 	{
 		options_set_int(mame_options(), OPTION_RAMSIZE, current_testcase.ram);
