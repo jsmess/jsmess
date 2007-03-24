@@ -400,6 +400,26 @@ static void AY3600_poll(int dummy)
 		keymodreg &= ~A2_KEYMOD_CONTROL;
 	}
 
+	/* apple key check */
+	if (pressed_specialkey(SPECIALKEY_BUTTON0))
+	{
+		keymodreg |= A2_KEYMOD_COMMAND;
+	}
+	else
+	{
+		keymodreg &= ~A2_KEYMOD_COMMAND;
+	}
+
+	/* option key check */
+	if (pressed_specialkey(SPECIALKEY_BUTTON1))
+	{
+		keymodreg |= A2_KEYMOD_OPTION;
+	}
+	else
+	{
+		keymodreg &= ~A2_KEYMOD_OPTION;
+	}
+
 	/* reset key check */
 	if (pressed_specialkey(SPECIALKEY_RESET) &&
 		(a2_no_ctrl_reset() || switchkey & A2_KEY_CONTROL)) {
