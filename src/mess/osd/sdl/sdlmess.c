@@ -10,21 +10,28 @@
 #include "utils.h"
 
 //============================================================
-//	osd_getcurdir
+//   osd_getcurdir
 //============================================================
 
 file_error osd_getcurdir(char *buffer, size_t buffer_len)
 {
 	file_error filerr = FILERR_NONE;
 
-	if (getcwd(buffer, buffer_len) != 0)
+	if (getcwd(buffer, buffer_len) == 0)
 	{
 		filerr = FILERR_FAILURE;
 	}
 
+	if( filerr != FILERR_FAILURE )
+	{
+		if( strcmp( &buffer[strlen(buffer)-1], PATH_SEPARATOR ) != 0 )
+		{
+		        strncat( buffer, PATH_SEPARATOR, buffer_len );
+		}
+	}
+
 	return filerr;
 }
-
 //============================================================
 //	osd_setcurdir
 //============================================================
