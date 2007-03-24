@@ -323,6 +323,8 @@ int ui_display_startup_screens(int show_disclaimer)
 
 #ifdef MESS
 	show_warnings = !options_get_bool(mame_options(), OPTION_SKIP_WARNINGS);
+	if (!show_warnings)
+		show_disclaimer = FALSE;
 #endif /* MESS */
 
 	/* disable everything if we are using -str */
