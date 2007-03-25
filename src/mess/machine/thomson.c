@@ -29,7 +29,7 @@
 
 #define VERBOSE       0
 #define VERBOSE_IRQ   0
-#define VERBOSE_KBD   0 /* TO8 / TO9 / TO9+ keyboard */
+#define VERBOSE_KBD   0  /* TO8 / TO9 / TO9+ keyboard */
 #define VERBOSE_BANK  0 
 #define VERBOSE_VIDEO 0  /* video & lightpen */
 #define VERBOSE_IO    0  /* serial & parallel I/O */
@@ -107,19 +107,19 @@ static void thom_irq_init ( void )
 
 static void thom_irq_0  ( int state ) { thom_set_irq  ( 0, state ); }
 static void thom_irq_1  ( int state ) { thom_set_irq  ( 1, state ); }
-static void thom_irq_2  ( int state ) { thom_set_irq  ( 2, state ); }
 static void thom_irq_3  ( int state ) { thom_set_irq  ( 3, state ); }
-static void thom_irq_4  ( int state ) { thom_set_irq  ( 4, state ); }
-static void thom_firq_0 ( int state ) { thom_set_firq ( 0, state ); }
 static void thom_firq_1 ( int state ) { thom_set_firq ( 1, state ); }
 static void thom_firq_2 ( int state ) { thom_set_firq ( 2, state ); }
-static void thom_firq_3 ( int state ) { thom_set_firq ( 3, state ); }
+#ifdef CHARDEV
+static void thom_irq_4  ( int state ) { thom_set_irq  ( 4, state ); }
+#endif
 
 /* 
    line 0 => 6846 interrupt
    line 1 => 6821 interrupt (shared for all 6821)
    line 2 => TO8 lightpen interrupt (from gate-array)
    line 3 => TO9 keyboard interrupt (from 6850 ACIA)
+   line 4 => MIDI interrupt (from 6850 ACIA)
 */
 
 

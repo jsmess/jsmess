@@ -19,8 +19,8 @@ System Driver Changes:
   sms1pal, and sg1000m3 have been added. Support for the prototype bios has
   also been added  [Wilbert Pol]
 
-- [THOMSON] Switch 6850 ACIA implementations to use the MAME version. [Antoine
-  Mine]
+- [THOMSON] Switch 6850 ACIA implementations to use the MAME version, and
+  added natural keyboard support. [Antoine Mine]
 
 
 
