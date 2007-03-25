@@ -1,6 +1,6 @@
 /*
 
-  ES5503 - Ensoniq ES5503 "DOC" emulator v0.3
+  ES5503 - Ensoniq ES5503 "DOC" emulator v0.4
   By R. Belmont.
 
   Copyright (c) 2005-2007 R. Belmont.
@@ -28,6 +28,7 @@
   Changes:
   0.2 (RB) - improved behavior for volumes > 127, fixes missing notes in Nucleus & missing voices in Thexder
   0.3 (RB) - fixed extraneous clicking, improved timing behavior for e.g. Music Construction Set & Music Studio
+  0.4 (RB) - major fixes to IRQ semantics and end-of-sample handling.
 */
 
 #include <math.h>
@@ -35,8 +36,6 @@
 #include "cpuintrf.h"
 #include "es5503.h"
 #include "streams.h"
-
-#define VERBOSE	(1)
 
 #define GS_28M (28636360)	// IIGS master clock
 #define GS_7M  (GS_28M/4)	// DOC clock (7.159 MHz)
@@ -73,8 +72,6 @@ typedef struct
 
 	read8_handler adc_read;		// callback for the 5503's built-in analog to digital converter
 
-	UINT8 irqpending;		// irq pending register
-	UINT8 lastirqosc;		// last oscillator that caused an IRQ
 	INT8  oscsenabled;		// # of oscillators enabled
 
 	UINT32 frames;			// frame #
@@ -97,27 +94,28 @@ enum
 // chip = chip ptr
 // onum = oscillator #
 // type = 1 for 0 found in sample data, 0 for hit end of table size
-static void es5503_halt_osc(ES5503Chip *chip, int onum, int type)
+static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumulator)
 {
 	ES5503Osc *pOsc = &chip->oscillators[onum];
 	ES5503Osc *pPartner = &chip->oscillators[onum^1];
 	int mode = (pOsc->control>>1) & 3;
 
-//  mame_printf_debug("halt_osc %d, control %02x, mode = %d, type = %d\n", onum, pOsc->control, mode, type);
-
 	// if 0 found in sample data or mode is not free-run, halt this oscillator
-	if ((type) || (mode > 0))
+	if ((type != MODE_FREE) || (mode > 0))
 	{
-//      mame_printf_debug("stopping\n");
 		pOsc->control |= 1;
+	}
+	else
+	{
+		// reset the accumulator if not halting
+		*accumulator = 0;
 	}
 
 	// if swap mode, start the partner
 	if (mode == MODE_SWAP)
 	{
-//          mame_printf_debug("swap mode, starting partner\n");
 		pPartner->control &= ~1;	// clear the halt bit
-		pPartner->accumulator = 0;	// make sure it's at the beginning
+		pPartner->accumulator = 0;	// and make sure it starts from the top
 	}
 
 	// IRQ enabled for this voice?
@@ -148,8 +146,6 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 	UINT32 ramptr;
 	ES5503Chip *chip = param;
 
-//  mame_printf_debug("5503_pcm_update: %d oscs\n", ES5503[num].oscsenabled);
-
 	memset(mix, 0, sizeof(mix));
 
 	for (osc = 0; osc < (chip->oscsenabled+1); osc++)
@@ -160,9 +156,9 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 
 		if (!(pOsc->control & 1))
 		{
-			UINT32 wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize];
+			UINT32 wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize], altram;
 			UINT32 acc = pOsc->accumulator;
-			UINT16 wtsize = pOsc->wtsize-1;
+			UINT16 wtsize = pOsc->wtsize - 1;
 			UINT8 ctrl = pOsc->control;
 			UINT16 freq = pOsc->freq;
 			INT16 vol = pOsc->vol;
@@ -170,24 +166,18 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 			int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
 			UINT32 sizemask = accmasks[pOsc->wavetblsize];
 
-//              mame_printf_debug("Acc: %08x => %08x\n", acc, (acc>>resshift) & sizemask);
-//              mame_printf_debug("Ch [%02d]: wtptr: %04x (wtsize %d, ptr %x) acc %x shift %d\n", osc, wtptr, pOsc->wavetblsize, pOsc->wavetblpointer, acc, resshift);
-
 			for (snum = 0; snum < length; snum++)
 			{
 				ramptr = (acc >> resshift) & sizemask;
+				altram = acc >> resshift;
 
 				acc += freq;
-
-//                  mame_printf_debug("[%02d] Acc: %08x  Frq: %04x  RAMptr: %08x WTsize: %04x (wtsize %d res %d)\n", osc, acc, freq, ramptr, wtsize, pOsc->wavetblsize, pOsc->resolution);
 
 				data = (INT32)chip->docram[ramptr + wtptr] ^ 0x80;
 
 				if (chip->docram[ramptr + wtptr] == 0x00)
 				{
-//                          mame_printf_debug("[%d] osc %d hit zero @ %x (mode %d pmode %d)\n", chip->frames, osc, ramptr + wtptr, (pOsc->control>>1)&3, (chip->oscillators[osc^1].control>>1)&3);
-					es5503_halt_osc(chip, osc, 1);
-					acc = 0;
+					es5503_halt_osc(chip, osc, 1, &acc);
 				}
 				else
 				{
@@ -202,10 +192,9 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 						*mixp++ += (data * vol);
 					}
 
-					if (ramptr >= wtsize)
+					if (altram >= wtsize)
 					{
-						es5503_halt_osc(chip, osc, 0);
-						acc = 0;
+						es5503_halt_osc(chip, osc, 0, &acc);
 					}
 				}
 
@@ -248,8 +237,6 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;
-
-	chip->irqpending = 0x80;
 
 	for (osc = 0; osc < 32; osc++)
 	{
@@ -324,7 +311,7 @@ READ8_HANDLER(ES5503_reg_0_r)
 		switch (offset)
 		{
 			case 0xe0:	// interrupt status
-				retval = 0x80 | chip->lastirqosc;
+				retval = 0x80;	// negative if no IRQ
 
 				// scan all oscillators
 				for (i = 0; i < chip->oscsenabled+1; i++)
@@ -333,11 +320,10 @@ READ8_HANDLER(ES5503_reg_0_r)
 					{
 						// signal this oscillator has an interrupt
 						retval = i<<1;
-						chip->lastirqosc = retval;
-						retval |= 1;
+						retval |= 0x1;
 
 						// and clear its flag
-						chip->oscillators[i].irqpend = 0;
+						chip->oscillators[i].irqpend--;
 
 						if (chip->irq_callback)
 						{
@@ -347,7 +333,18 @@ READ8_HANDLER(ES5503_reg_0_r)
 					}
 				}
 
-//              mame_printf_debug("Read e0 = %02x, PC = %x\n", retval, activecpu_get_pc());
+				// if any oscillators still need to be serviced, assert IRQ again immediately
+				for (i = 0; i < chip->oscsenabled+1; i++)
+				{
+					if (chip->oscillators[i].irqpend)
+					{
+						if (chip->irq_callback)
+						{
+							chip->irq_callback(1);
+						}
+						break;
+					}
+				}
 
 				return retval;
 				break;
@@ -405,11 +402,10 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 				// if a fresh key-on, reset the ccumulator
 				if ((chip->oscillators[osc].control & 1) && (!(data&1)))
 				{
-//                  mame_printf_debug("[%d] %02x to control for voice %02d (wtptr %x vol %x wts %d res %d)\n", chip->frames, data, osc, chip->oscillators[osc].wavetblpointer, chip->oscillators[osc].vol, chip->oscillators[osc].wavetblsize, chip->oscillators[osc].resolution);
 					chip->oscillators[osc].accumulator = 0;
 
-					// this is a timer, now simulate playing it
-					if ((chip->oscillators[osc].vol == 0) && (chip->oscillators[osc].freq > 0))
+					// if this voice generates interrupts, set a timer to make sure we service it on time
+					if (((data & 0x09) == 0x08) && (chip->oscillators[osc].freq > 0))
 					{
 						UINT32 length, run;
 						UINT32 wtptr = chip->oscillators[osc].wavetblpointer & wavemasks[chip->oscillators[osc].wavetblsize];
@@ -419,7 +415,7 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 						INT8 data = -128;
 						int resshift = resshifts[chip->oscillators[osc].resolution] - chip->oscillators[osc].wavetblsize;
 						UINT32 sizemask = accmasks[chip->oscillators[osc].wavetblsize];
-						UINT32 ramptr;
+						UINT32 ramptr, altram;
 						double rate;
 
 						run = 1;
@@ -427,10 +423,11 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 						while (run)
 						{
 							ramptr = (acc >> resshift) & sizemask;
+							altram = (acc >> resshift);
 							acc += freq;
 							data = (INT32)chip->docram[ramptr + wtptr];
 
-							if ((data == 0) || (ramptr >= wtsize))
+							if ((data == 0) || (altram >= wtsize))
 							{
 								run = 0;
 							}
@@ -530,7 +527,7 @@ void es5503_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "ES5503";						break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq ES550x";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "0.3";						break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "0.4";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2005-2007 R. Belmont"; break;
 	}
