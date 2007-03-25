@@ -104,6 +104,9 @@ static UINT8 *coco_rom;
 static int dclg_state, dclg_output_h, dclg_output_v, dclg_timer;
 static UINT8 (*update_keyboard)(void);
 static mame_timer *update_keyboard_timer;
+static mame_timer *mux_sel1_timer;
+static mame_timer *mux_sel2_timer;
+static UINT8 mux_sel1, mux_sel2;
 
 static WRITE8_HANDLER ( d_pia1_pb_w );
 static WRITE8_HANDLER ( d_pia1_pa_w );
@@ -1131,9 +1134,9 @@ static int get_soundmux_status(void)
 	int soundmux_status = 0;
 	if (pia_get_output_cb2(1))
 		soundmux_status |= SOUNDMUX_STATUS_ENABLE;
-	if (pia_get_output_ca2(0))
+	if (mux_sel1)
 		soundmux_status |= SOUNDMUX_STATUS_SEL1;
-	if (pia_get_output_cb2(0))
+	if (mux_sel2)
 		soundmux_status |= SOUNDMUX_STATUS_SEL2;
 	return soundmux_status;
 }
@@ -1236,18 +1239,27 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 
 static WRITE8_HANDLER ( d_pia0_ca2_w )
 {
+	mame_timer_adjust(mux_sel1_timer, MAME_TIME_IN_USEC(16), data, time_never);
+}
+
+static void coco_update_sel1_timerproc(int data)
+{
+	mux_sel1 = data;
 	(*update_keyboard)();
 	soundmux_update();
 }
-
-
 
 static WRITE8_HANDLER ( d_pia0_cb2_w )
 {
+	mame_timer_adjust(mux_sel2_timer, MAME_TIME_IN_USEC(16), data, time_never);
+}
+
+static void coco_update_sel2_timerproc(int data)
+{
+	mux_sel2 = data;
 	(*update_keyboard)();
 	soundmux_update();
 }
-
 
 
 static mame_time get_relative_time(mame_time absolute_time)
@@ -1275,8 +1287,8 @@ static UINT8 coco_update_keyboard(void)
 	UINT8 dac = pia_get_output_a(1) & 0xFC;
 	int joystick_axis, joystick;
 	pia0_pb = pia_get_output_b(0);
-	joystick_axis = pia_get_output_ca2(0);
-	joystick = pia_get_output_cb2(0);
+	joystick_axis = mux_sel1;
+	joystick = mux_sel2;
 
 	/* poll keyoard keys */
 	if ((input_port_0_r(0) | pia0_pb) != 0xff) porta &= ~0x01;
@@ -2938,6 +2950,10 @@ static void generic_init_machine(running_machine *machine, machine_init_interfac
 
 	/* this timer is used to schedule keyboard updating */
 	update_keyboard_timer = mame_timer_alloc(coco_update_keyboard_timerproc);
+	
+	/* these are the timers to delay the MUX switching */
+	mux_sel1_timer = mame_timer_alloc(coco_update_sel1_timerproc);
+	mux_sel2_timer = mame_timer_alloc(coco_update_sel2_timerproc);
 
 	/* setup ROM */
 	coco_rom = memory_region(REGION_CPU1);
@@ -2994,6 +3010,9 @@ static void generic_init_machine(running_machine *machine, machine_init_interfac
 #endif
 
 	add_exit_callback(machine, coco_machine_stop);
+
+	state_save_register_global(mux_sel1);
+	state_save_register_global(mux_sel2);
 }
 
 /* Setup for hardware common to CoCo 1/2 & Dragon machines, calls genertic_init_machine, to process */
