@@ -1746,16 +1746,6 @@ static void execute_dumpscanline(int ref, int params, const char **param)
  *
  *************************************/
 
-static subseconds_t double_to_subseconds(double d)
-{
-	mame_time t;
-	t = double_to_mame_time(d);
-	assert_always(t.seconds == 0, "double_to_subseconds(): period exceeds one second");
-	return t.subseconds;
-}
-
-
-
 static const UINT8 *find_char(const m6847_variant *v,
 	UINT8 byte, UINT8 attr, int *fg, int *bg)
 {
