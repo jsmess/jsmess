@@ -828,6 +828,9 @@ void m37710i_update_irqs(void)
 	{
 		if (INT_ACK) INT_ACK(wantedIRQ);
 
+		// make sure we're running to service the interrupt
+		CPU_STOPPED &= ~STOP_LEVEL_WAI;
+
 		// indicate we're servicing it now
 		if (m37710_irq_levels[wantedIRQ])
 		{
