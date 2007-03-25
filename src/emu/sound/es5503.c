@@ -29,6 +29,7 @@
   0.2 (RB) - improved behavior for volumes > 127, fixes missing notes in Nucleus & missing voices in Thexder
   0.3 (RB) - fixed extraneous clicking, improved timing behavior for e.g. Music Construction Set & Music Studio
   0.4 (RB) - major fixes to IRQ semantics and end-of-sample handling.
+  0.5 (RB) - more flexible wave memory hookup (incl. banking) and save state support.
 */
 
 #include <math.h>
@@ -36,6 +37,7 @@
 #include "cpuintrf.h"
 #include "es5503.h"
 #include "streams.h"
+#include "state.h"
 
 #define GS_28M (28636360)	// IIGS master clock
 #define GS_7M  (GS_28M/4)	// DOC clock (7.159 MHz)
@@ -63,7 +65,7 @@ typedef struct
 {
 	ES5503Osc oscillators[32];
 
-	UINT8 docram[(128*1024) + 16];	// total size available to a DOC plus 16 bytes for "stop" zeros
+	UINT8 *docram;
 
 	int index;
 	sound_stream * stream;
@@ -73,8 +75,6 @@ typedef struct
 	read8_handler adc_read;		// callback for the 5503's built-in analog to digital converter
 
 	INT8  oscsenabled;		// # of oscillators enabled
-
-	UINT32 frames;			// frame #
 } ES5503Chip;
 
 static UINT16 wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
@@ -218,8 +218,6 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 		outputs[0][i] = (*mixp++)>>1;
 		outputs[1][i] = (*mixp++)>>1;
 	}
-
-	chip->frames++;
 }
 
 
@@ -237,9 +235,24 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;
+	chip->docram = intf->wave_memory;
 
 	for (osc = 0; osc < 32; osc++)
 	{
+		char sname[32];
+		sprintf(sname, "SCSP %d osc %d", sndindex, osc);
+
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].freq);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].wtsize);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].control);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].vol);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].data);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].wavetblpointer);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].wavetblsize);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].resolution);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].accumulator);
+		state_save_register_item(sname, sndindex, chip->oscillators[osc].irqpend);
+
 		chip->oscillators[osc].data = 0x80;
 		chip->oscillators[osc].irqpend = 0;
 		chip->oscillators[osc].accumulator = 0;
@@ -485,18 +498,11 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 	}
 }
 
-READ8_HANDLER(ES5503_ram_0_r)
+void ES5503_set_base_0(UINT8 *wavemem)
 {
 	ES5503Chip *chip = sndti_token(SOUND_ES5503, 0);
 
-	return chip->docram[offset];
-}
-
-WRITE8_HANDLER(ES5503_ram_0_w)
-{
-	ES5503Chip *chip = sndti_token(SOUND_ES5503, 0);
-
-	chip->docram[offset] = data;
+	chip->docram = wavemem;
 }
 
 /**************************************************************************
@@ -527,7 +533,7 @@ void es5503_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "ES5503";						break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq ES550x";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "0.4";						break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "0.5";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2005-2007 R. Belmont"; break;
 	}

@@ -13,6 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "state.h"
 #include "inputx.h"
 #include "video/generic.h"
 #include "includes/apple2.h"
@@ -75,6 +76,8 @@ static const unsigned char apple2gs_palette[] =
 	0xF0, 0xF0, 0xF0	/* White */
 };
 
+UINT8 apple2gs_docram[64*1024];
+
 MACHINE_DRIVER_EXTERN( apple2e );
 INPUT_PORTS_EXTERN( apple2ep );
 
@@ -109,7 +112,8 @@ static READ8_HANDLER( apple2gs_adc_read )
 static struct ES5503interface es5503_interface = 
 {
 	apple2gs_doc_irq,
-	apple2gs_adc_read
+	apple2gs_adc_read,
+	apple2gs_docram
 };
 
 static MACHINE_DRIVER_START( apple2gs )
@@ -225,7 +229,10 @@ static void apple2gs_floppy525_getinfo(const device_class *devclass, UINT32 stat
 	}
 }
 
-
+static DRIVER_INIT(apple2gs)
+{
+	state_save_register_global_array(apple2gs_docram);
+}
 
 /* ----------------------------------------------------------------------- */
 
@@ -237,6 +244,6 @@ SYSTEM_CONFIG_START(apple2gs)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      CONFIG		COMPANY            FULLNAME */
-COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   0,        apple2gs,	"Apple Computer", "Apple IIgs (ROM03)",			GAME_NOT_WORKING )
-COMP( 1987, apple2g1, apple2gs, 0,      apple2gs, apple2gs,   0,        apple2gs,	"Apple Computer", "Apple IIgs (ROM01)",			GAME_NOT_WORKING )
-COMP( 1986, apple2g0, apple2gs, 0,      apple2gs, apple2gs,   0,        apple2gs,	"Apple Computer", "Apple IIgs (ROM00)",			GAME_NOT_WORKING )
+COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03)",			GAME_NOT_WORKING )
+COMP( 1987, apple2g1, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)",			GAME_NOT_WORKING )
+COMP( 1986, apple2g0, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)",			GAME_NOT_WORKING )

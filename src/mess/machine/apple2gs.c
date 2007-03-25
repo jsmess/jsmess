@@ -852,7 +852,7 @@ static READ8_HANDLER( gssnd_r )
 
 			if (sndglu_ctrl & 0x40)	// docram access
 			{
-				ret = ES5503_ram_0_r(sndglu_addr);
+				ret = apple2gs_docram[sndglu_addr];
 			}
 			else
 			{
@@ -891,7 +891,7 @@ static WRITE8_HANDLER( gssnd_w )
 		case 1:	// data write
 			if (sndglu_ctrl & 0x40)	// docram access
 			{
-				ES5503_ram_0_w(sndglu_addr, data);
+				apple2gs_docram[sndglu_addr] = data;
 			}
 			else
 			{
