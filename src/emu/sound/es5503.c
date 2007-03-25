@@ -1,6 +1,6 @@
 /*
 
-  ES5503 - Ensoniq ES5503 "DOC" emulator v0.4
+  ES5503 - Ensoniq ES5503 "DOC" emulator v1.0
   By R. Belmont.
 
   Copyright (c) 2005-2007 R. Belmont.
@@ -18,7 +18,7 @@
   similar architecture.
 
   Bugs: On the real silicon, oscillators 30 and 31 have random volume fluctuations and are
-  unusable for playback.  We don't attempt to emulate that :-)
+  unusable for playback.  We don't attempt to emulate that. :-)
 
   Additionally, in "swap" mode, there's one cycle when the switch takes place where the
   oscillator's output is 0x80 (centerline) regardless of the sample data.  This can
@@ -30,6 +30,7 @@
   0.3 (RB) - fixed extraneous clicking, improved timing behavior for e.g. Music Construction Set & Music Studio
   0.4 (RB) - major fixes to IRQ semantics and end-of-sample handling.
   0.5 (RB) - more flexible wave memory hookup (incl. banking) and save state support.
+  1.0 (RB) - properly respects the input clock
 */
 
 #include <math.h>
@@ -38,10 +39,6 @@
 #include "es5503.h"
 #include "streams.h"
 #include "state.h"
-
-#define GS_28M (28636360)	// IIGS master clock
-#define GS_7M  (GS_28M/4)	// DOC clock (7.159 MHz)
-#define GS_O8  (GS_7M/8)	// final value to determine the DOC's fundamental sample rate (see page 47-10 of the Apple IIgs Toolbox Reference, Volume 3)
 
 typedef struct
 {
@@ -75,6 +72,9 @@ typedef struct
 	read8_handler adc_read;		// callback for the 5503's built-in analog to digital converter
 
 	INT8  oscsenabled;		// # of oscillators enabled
+
+	UINT32 clock;
+	UINT32 output_rate;
 } ES5503Chip;
 
 static UINT16 wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
@@ -236,11 +236,12 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;
 	chip->docram = intf->wave_memory;
+	chip->clock = clock;
 
 	for (osc = 0; osc < 32; osc++)
 	{
 		char sname[32];
-		sprintf(sname, "SCSP %d osc %d", sndindex, osc);
+		sprintf(sname, "ES5503 %d osc %d", sndindex, osc);
 
 		state_save_register_item(sname, sndindex, chip->oscillators[osc].freq);
 		state_save_register_item(sname, sndindex, chip->oscillators[osc].wtsize);
@@ -263,7 +264,8 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 
 	chip->oscsenabled = 1;
 
-	chip->stream = stream_create(0, 2, 26320, chip, es5503_pcm_update);
+	chip->output_rate = (clock/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
+	chip->stream = stream_create(0, 2, chip->output_rate, chip, es5503_pcm_update);
 
 	return chip;
 }
@@ -451,7 +453,7 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 						}
 
 						// ok, we run at this many hz.
-						rate = 26320.0 / (double)length;
+						rate = (double)chip->output_rate / (double)length;
 
 						timer_adjust_ptr(chip->oscillators[osc].timer, TIME_IN_HZ(rate), TIME_IN_HZ(rate));
 					}
@@ -490,6 +492,9 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 
 			case 0xe1:	// oscillator enable
 				chip->oscsenabled = (data>>1);
+
+				chip->output_rate = (chip->clock/8)/(2+chip->oscsenabled);
+				stream_set_sample_rate(chip->stream, chip->output_rate);
 				break;
 
 			case 0xe2:	// A/D converter
@@ -533,7 +538,7 @@ void es5503_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "ES5503";						break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq ES550x";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "0.5";						break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2005-2007 R. Belmont"; break;
 	}
