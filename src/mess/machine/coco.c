@@ -3206,6 +3206,11 @@ static void coco3_state_postload(void)
 	coco3_mmu_update(0, 8);
 }
 
+static UINT32 crosshairs_get_screen(int player)
+{
+	return readinputportbytag_safe("joystick_mode", 0x00) == 0x40 ? 0x03 : 0x00;
+}
+
 MACHINE_START( coco3 )
 {
 	machine_init_interface init;
@@ -3240,6 +3245,8 @@ MACHINE_START( coco3 )
 	state_save_register_global(gime_irq);
 	state_save_register_global(gime_firq);
 	state_save_register_func_postload(coco3_state_postload);
+
+	video_crosshair_set_screenmask_callback(Machine, crosshairs_get_screen);
 
 	add_reset_callback(machine, coco3_machine_reset);
 

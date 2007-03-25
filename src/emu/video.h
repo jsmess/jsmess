@@ -162,5 +162,6 @@ void video_movie_end_recording(running_machine *machine, int scrnum);
 /* ----- crosshair rendering ----- */
 
 void video_crosshair_toggle(void);
+void video_crosshair_set_screenmask_callback(running_machine *machine, UINT32 (*get_screen_mask)(int player));
 
 #endif	/* __VIDEO_H__ */

@@ -86,6 +86,7 @@ struct _video_private
 	UINT8 					crosshair_animate;	/* animation frame index */
 	UINT8 					crosshair_visible;	/* crosshair visible mask */
 	UINT8 					crosshair_needed;	/* crosshair needed mask */
+	UINT32					(*crosshair_get_screen_mask)(int player);	/* crosshair get screen callback */
 };
 
 
@@ -1934,6 +1935,19 @@ void video_crosshair_toggle(void)
 
 
 /*-------------------------------------------------
+    video_crosshair_set_screenmask_callback -
+	install a callback to determine to which screen
+	crosshairs should be rendered
+-------------------------------------------------*/
+
+void video_crosshair_set_screenmask_callback(running_machine *machine, UINT32 (*get_screen_mask)(int player))
+{
+	video_private *viddata = machine->video_data;
+	viddata->crosshair_get_screen_mask = get_screen_mask;
+}
+
+
+/*-------------------------------------------------
     crosshair_render - render the crosshairs
 -------------------------------------------------*/
 
@@ -1997,12 +2011,25 @@ static void crosshair_render(video_private *viddata)
 	for (player = 0; player < MAX_PLAYERS; player++)
 		if (viddata->crosshair_visible & (1 << player))
 		{
-			/* add a quad assuming a 4:3 screen (this is not perfect) */
-			render_screen_add_quad(0,
-						x[player] - 0.03f, y[player] - 0.04f,
-						x[player] + 0.03f, y[player] + 0.04f,
-						MAKE_ARGB(0xc0, tscale, tscale, tscale),
-						viddata->crosshair_texture[player], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			int scrnum;
+			UINT32 scrmask = 1;
+
+			/* is there a custom callback to get the screen number? */
+			if (viddata->crosshair_get_screen_mask)
+				scrmask = viddata->crosshair_get_screen_mask(player);
+
+			for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
+			{
+				if (scrmask & (1 << scrnum))
+				{
+					/* add a quad assuming a 4:3 screen (this is not perfect) */
+					render_screen_add_quad(scrnum,
+								x[player] - 0.03f, y[player] - 0.04f,
+								x[player] + 0.03f, y[player] + 0.04f,
+								MAKE_ARGB(0xc0, tscale, tscale, tscale),
+								viddata->crosshair_texture[player], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				}
+			}
 		}
 }
 
