@@ -442,7 +442,7 @@ WRITE8_HANDLER( gb_rom_bank_unknown_mbc7 ) {
 WRITE8_HANDLER( gb_rom_bank_select_wisdom ) {
 	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", activecpu_get_pc(), offset );
 	/* The address determines the bank to select */
-	ROMBank = ( offset << 2 ) & 0x1FF;
+	ROMBank = ( offset << 1 ) & 0x1FF;
 	memory_set_bankptr( 5, ROMMap[ ROMBank ] );
 	memory_set_bankptr( 10, ROMMap[ ROMBank ] + 0x0100 );
 	memory_set_bankptr( 1, ROMMap[ ROMBank + 1 ] );
