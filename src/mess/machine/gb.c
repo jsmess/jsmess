@@ -319,6 +319,7 @@ MACHINE_RESET( gbc )
 	gb_init_regs();
 
 	memory_set_bankptr(5, ROMMap[0] ? ROMMap[0] : gb_dummy_rom_bank );
+	memory_set_bankptr(10, ROMMap[0] ? ROMMap[0] + 0x0100 : gb_dummy_rom_bank + 0x0100);
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ ) {

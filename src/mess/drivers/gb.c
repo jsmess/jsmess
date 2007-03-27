@@ -349,7 +349,7 @@ Wisdom Tree mapper
 
 The Wisdom Tree mapper is triggered by writes in the 0x0000-0x3FFF area. The
 address written to determines the bank to switch in in the 0x000-0x7FFF address
-space. This mapper banks in 32KB size banks!
+space. This mapper uses 32KB sized banks.
 
 
 ***************************************************************************/
@@ -393,7 +393,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sgb_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
+	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
+	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_WRITE( gb_vram_w ) AM_BASE(&gb_vram)	/* 8k VRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (cartridge) */
@@ -410,7 +411,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gbc_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
+	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK(5)					/* 16k fixed ROM bank */
+	AM_RANGE(0x0100, 0x3fff) AM_ROMBANK(10)					/* ROM bank */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)					/* 16k switched ROM bank */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(4) AM_WRITE( gbc_vram_w )		/* 8k switched VRAM bank */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(2)					/* 8k switched RAM bank (on cartridge) */
