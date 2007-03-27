@@ -272,6 +272,8 @@ MACHINE_RESET( sgb )
 
 	/* Initialize the Sound Registers */
 	gb_sound_w(0x16,0xF0);	/* F0 for SGB */
+	gb_sound_w(0x15,0xF3);
+	gb_sound_w(0x14,0x77);
 
 	sgb_window_mask = 0;
 	memset( sgb_pal_map, 0, 20*18 );
@@ -296,6 +298,11 @@ MACHINE_RESET( gbpocket )
 
 	gb_init_regs();
 
+	/* Initialize the Sound registers */
+	gb_sound_w(0x16,0x80);
+	gb_sound_w(0x15,0xF3);
+	gb_sound_w(0x14,0x77);
+
 	/* Enable BIOS rom if we have one */
 	memory_set_bankptr(5, ROMMap[0] ? ROMMap[0] : gb_dummy_rom_bank );
 	memory_set_bankptr(10, ROMMap[0] ? ROMMap[0] + 0x0100 : gb_dummy_rom_bank + 0x0100);
@@ -317,6 +324,11 @@ MACHINE_RESET( gbc )
 	gbc_video_init();
 
 	gb_init_regs();
+
+	/* Initialize the Sound registers */
+	gb_sound_w(0x16, 0x80);
+	gb_sound_w(0x15, 0xF3);
+	gb_sound_w(0x14, 0x77);
 
 	memory_set_bankptr(5, ROMMap[0] ? ROMMap[0] : gb_dummy_rom_bank );
 	memory_set_bankptr(10, ROMMap[0] ? ROMMap[0] + 0x0100 : gb_dummy_rom_bank + 0x0100);
