@@ -19,6 +19,156 @@ typedef struct
 
 static CDP1869_VIDEO_CONFIG cdp1869;
 
+static UINT16 cdp1802_get_r_x(void)
+{
+	return activecpu_get_reg(CDP1802_R0 + activecpu_get_reg(CDP1802_X));
+}
+
+WRITE8_HANDLER ( cdp1869_out3_w )
+{
+	/*
+      bit   description
+
+        0   bkg green
+        1   bkg blue
+        2   bkg red
+        3   cfc
+        4   disp off
+        5   colb0
+        6   colb1
+        7   fres horz
+    */
+
+	cdp1869.bkg = (data & 0x07);
+	cdp1869.cfc = (data & 0x08) >> 3;
+	cdp1869.dispoff = (data & 0x10) >> 4;
+	cdp1869.col = (data & 0x60) >> 5;
+	cdp1869.freshorz = (data & 0x80) >> 7;
+}
+
+WRITE8_HANDLER ( cdp1869_out4_w )
+{
+	UINT16 word = cdp1802_get_r_x();
+
+	/*
+      bit   description
+
+        0   tone amp 2^0
+        1   tone amp 2^1
+        2   tone amp 2^2
+        3   tone amp 2^3
+        4   tone freq sel0
+        5   tone freq sel1
+        6   tone freq sel2
+        7   tone off
+        8   tone / 2^0
+        9   tone / 2^1
+       10   tone / 2^2
+       11   tone / 2^3
+       12   tone / 2^4
+       13   tone / 2^5
+       14   tone / 2^6
+       15   always 0
+    */
+
+	cdp1869_set_toneamp(0, word & 0x0f);
+	cdp1869_set_tonefreq(0, (word & 0x70) >> 4);
+	cdp1869_set_toneoff(0, (word & 0x80) >> 7);
+	cdp1869_set_tonediv(0, (word & 0x7f00) >> 8);
+}
+
+WRITE8_HANDLER ( cdp1869_out5_w )
+{
+	UINT16 word = cdp1802_get_r_x();
+
+	/*
+      bit   description
+
+        0   cmem access mode
+        1   x
+        2   x
+        3   9-line
+        4   x
+        5   16 line hi-res
+        6   double page
+        7   fres vert
+        8   wn amp 2^0
+        9   wn amp 2^1
+       10   wn amp 2^2
+       11   wn amp 2^3
+       12   wn freq sel0
+       13   wn freq sel1
+       14   wn freq sel2
+       15   wn off
+    */
+
+	cdp1869.cmem = (word & 0x01);
+	cdp1869.line9 = (word & 0x08) >> 3;
+	cdp1869.line16 = (word & 0x20) >> 5;
+	cdp1869.dblpage = (word & 0x40) >> 6;
+	cdp1869.fresvert = (word & 0x80) >> 7;
+
+	cdp1869_set_wnamp(0, (word & 0x0f00) >> 8);
+	cdp1869_set_wnfreq(0, (word & 0x7000) >> 12);
+	cdp1869_set_wnoff(0, (word & 0x8000) >> 15);
+}
+
+WRITE8_HANDLER ( cdp1869_out6_w )
+{
+	UINT16 word = cdp1802_get_r_x();
+
+	/*
+      bit   description
+
+        0   pma0 reg
+        1   pma1 reg
+        2   pma2 reg
+        3   pma3 reg
+        4   pma4 reg
+        5   pma5 reg
+        6   pma6 reg
+        7   pma7 reg
+        8   pma8 reg
+        9   pma9 reg
+       10   pma10 reg
+       11   x
+       12   x
+       13   x
+       14   x
+       15   x
+    */
+
+	cdp1869.pma = word & 0x7ff;
+}
+
+WRITE8_HANDLER ( cdp1869_out7_w )
+{
+	UINT16 word = cdp1802_get_r_x();
+
+	/*
+      bit   description
+
+        0   x
+        1   x
+        2   hma2 reg
+        3   hma3 reg
+        4   hma4 reg
+        5   hma5 reg
+        6   hma6 reg
+        7   hma7 reg
+        8   hma8 reg
+        9   hma9 reg
+       10   hma10 reg
+       11   x
+       12   x
+       13   x
+       14   x
+       15   x
+    */
+
+	cdp1869.hma = word & 0x7fc;
+}
+
 static void cdp1869_set_color(int i, int c, int l)
 {
 	int luma = 0, r, g, b;
@@ -40,12 +190,14 @@ PALETTE_INIT( cdp1869 )
 {
 	int i, c, l;
 
+	// color-on-color display (CFC=0)
+
 	for (i = 0; i < 8; i++)
 	{
 		cdp1869_set_color(i, i, i);
 	}
 
-	// HACK for tone-on-tone display (CFC=1)
+	// tone-on-tone display (CFC=1)
 
 	for (c = 0; c < 8; c++)
 	{
@@ -138,7 +290,7 @@ WRITE8_HANDLER ( cdp1869_charram_w )
 {
 	if (cdp1869.cmem)
 	{
-		int addr = cdp1869_get_cma(offset);
+		UINT16 addr = cdp1869_get_cma(offset);
 		cdp1869.cram[addr] = data;
 	}
 }
@@ -147,7 +299,7 @@ READ8_HANDLER ( cdp1869_charram_r )
 {
 	if (cdp1869.cmem)
 	{
-		int addr = cdp1869_get_cma(offset);
+		UINT16 addr = cdp1869_get_cma(offset);
 		return cdp1869.cram[addr];
 	}
 	else
@@ -158,7 +310,7 @@ READ8_HANDLER ( cdp1869_charram_r )
 
 WRITE8_HANDLER ( cdp1869_pageram_w )
 {
-	int addr;
+	UINT16 addr;
 
 	if (cdp1869.cmem)
 	{
@@ -174,7 +326,7 @@ WRITE8_HANDLER ( cdp1869_pageram_w )
 
 READ8_HANDLER ( cdp1869_pageram_r )
 {
-	int addr;
+	UINT16 addr;
 
 	if (cdp1869.cmem)
 	{
@@ -330,7 +482,8 @@ VIDEO_UPDATE( cdp1869 )
 
 	if (!cdp1869.dispoff)
 	{
-		int sx, sy, rows, cols, width, height, addr, pmemsize;
+		int sx, sy, rows, cols, width, height;
+		UINT16 addr, pmemsize;
 		rectangle screen;
 
 		switch (cdp1869.ntsc_pal)
@@ -389,164 +542,6 @@ VIDEO_UPDATE( cdp1869 )
 	}
 
 	return 0;
-}
-
-static void cdp1869_out4_w(UINT16 data)
-{
-	/*
-      bit   description
-
-        0   tone amp 2^0
-        1   tone amp 2^1
-        2   tone amp 2^2
-        3   tone amp 2^3
-        4   tone freq sel0
-        5   tone freq sel1
-        6   tone freq sel2
-        7   tone off
-        8   tone / 2^0
-        9   tone / 2^1
-       10   tone / 2^2
-       11   tone / 2^3
-       12   tone / 2^4
-       13   tone / 2^5
-       14   tone / 2^6
-       15   always 0
-    */
-
-	cdp1869_set_toneamp(0, data & 0x0f);
-	cdp1869_set_tonefreq(0, (data & 0x70) >> 4);
-	cdp1869_set_toneoff(0, (data & 0x80) >> 7);
-	cdp1869_set_tonediv(0, (data & 0x7f00) >> 8);
-}
-
-static void cdp1869_out5_w(UINT16 data)
-{
-	/*
-      bit   description
-
-        0   cmem access mode
-        1   x
-        2   x
-        3   9-line
-        4   x
-        5   16 line hi-res
-        6   double page
-        7   fres vert
-        8   wn amp 2^0
-        9   wn amp 2^1
-       10   wn amp 2^2
-       11   wn amp 2^3
-       12   wn freq sel0
-       13   wn freq sel1
-       14   wn freq sel2
-       15   wn off
-    */
-
-	cdp1869.cmem = (data & 0x01);
-	cdp1869.line9 = (data & 0x08) >> 3;
-	cdp1869.line16 = (data & 0x20) >> 5;
-	cdp1869.dblpage = (data & 0x40) >> 6;
-	cdp1869.fresvert = (data & 0x80) >> 7;
-
-	cdp1869_set_wnamp(0, (data & 0x0f00) >> 8);
-	cdp1869_set_wnfreq(0, (data & 0x7000) >> 12);
-	cdp1869_set_wnoff(0, (data & 0x8000) >> 15);
-}
-
-static void cdp1869_out6_w(UINT16 data)
-{
-	/*
-      bit   description
-
-        0   pma0 reg
-        1   pma1 reg
-        2   pma2 reg
-        3   pma3 reg
-        4   pma4 reg
-        5   pma5 reg
-        6   pma6 reg
-        7   pma7 reg
-        8   pma8 reg
-        9   pma9 reg
-       10   pma10 reg
-       11   x
-       12   x
-       13   x
-       14   x
-       15   x
-    */
-
-	cdp1869.pma = data & 0x7ff;
-}
-
-static void cdp1869_out7_w(UINT16 data)
-{
-	/*
-      bit   description
-
-        0   x
-        1   x
-        2   hma2 reg
-        3   hma3 reg
-        4   hma4 reg
-        5   hma5 reg
-        6   hma6 reg
-        7   hma7 reg
-        8   hma8 reg
-        9   hma9 reg
-       10   hma10 reg
-       11   x
-       12   x
-       13   x
-       14   x
-       15   x
-    */
-
-	cdp1869.hma = data & 0x7fc;
-}
-
-WRITE8_HANDLER ( cdp1869_out3_w )
-{
-	/*
-      bit   description
-
-        0   bkg green
-        1   bkg blue
-        2   bkg red
-        3   cfc
-        4   disp off
-        5   colb0
-        6   colb1
-        7   fres horz
-    */
-
-	cdp1869.bkg = (data & 0x07);
-	cdp1869.cfc = (data & 0x08) >> 3;
-	cdp1869.dispoff = (data & 0x10) >> 4;
-	cdp1869.col = (data & 0x60) >> 5;
-	cdp1869.freshorz = (data & 0x80) >> 7;
-}
-
-WRITE8_HANDLER ( cdp1869_out_w )
-{
-	UINT16 word = activecpu_get_reg(CDP1802_R0 + activecpu_get_reg(CDP1802_X));
-
-	switch (offset)
-	{
-	case 0:
-		cdp1869_out4_w(word);
-		break;
-	case 1:
-		cdp1869_out5_w(word);
-		break;
-	case 2:
-		cdp1869_out6_w(word);
-		break;
-	case 3:
-		cdp1869_out7_w(word);
-		break;
-	}
 }
 
 void cdp1869_configure(const CDP1869_interface *intf)

@@ -84,8 +84,6 @@
 
 	Built from Telmac 2000 series cards. Huge metal box.
 
-
-
 */
 
 /*
@@ -113,22 +111,11 @@
 
 */
 
-/*
-
-	TODO:
-
-	- tmc1800: monitor rom
-	- tmc2000t: tool2000 rom
-	- tmc2000e: sbasic roms
-	- schematics for all machines
-
-*/
-
 #include "driver.h"
 #include "inputx.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/generic.h"
-#include "video/cdp186x.h"
+#include "video/cdp1864.h"
 #include "devices/printer.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
@@ -137,62 +124,6 @@
 
 /* Read/Write Handlers */
 
-static  READ8_HANDLER( vismac_r )
-{
-	return 0;
-}
-
-static WRITE8_HANDLER( vismac_w )
-{
-}
-
-static  READ8_HANDLER( floppy_r )
-{
-	return 0;
-}
-
-static WRITE8_HANDLER( floppy_w )
-{
-}
-
-static  READ8_HANDLER( ascii_keyboard_r )
-{
-	return 0;
-}
-
-static  READ8_HANDLER( io_r )
-{
-	return 0;
-}
-
-static WRITE8_HANDLER( io_w )
-{
-}
-
-static WRITE8_HANDLER( io_select_w )
-{
-}
-
-static WRITE8_HANDLER( tmc2000_bankswitch_w )
-{
-	if (data & 0x01)
-	{
-		// enable Color RAM
-		memory_install_read8_handler(  0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0, MRA8_RAM );
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0, MWA8_RAM );
-		memory_set_bankptr(1, &colorram);
-	}
-	else
-	{
-		// enable ROM
-		memory_install_read8_handler(  0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0, MRA8_ROM );
-		memory_install_write8_handler( 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x81ff, 0, 0, MWA8_ROM );
-		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x8000);
-	}
-
-	cdp1864_tone_divisor_latch_w(0, data);
-}
-
 static int keylatch;
 
 static WRITE8_HANDLER( keyboard_latch_w )
@@ -200,14 +131,20 @@ static WRITE8_HANDLER( keyboard_latch_w )
 	keylatch = data;
 }
 
+static WRITE8_HANDLER( tmc2000_bankswitch_w )
+{
+	memory_set_bank(1, data & 0x01);
+
+	cdp1864_tone_divisor_latch_w(0, data);
+}
+
 /* Memory Maps */
 
 // Telmac 1800
 
 static ADDRESS_MAP_START( tmc1800_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM									// Work RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM									// Expanded RAM
-	AM_RANGE(0x8000, 0x81ff) AM_ROM									// Monitor ROM
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x8000, 0x81ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc1800_io_map, ADDRESS_SPACE_IO, 8 )
@@ -217,9 +154,8 @@ ADDRESS_MAP_END
 // Telmac 2000
 
 static ADDRESS_MAP_START( tmc2000_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM									// Work RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM									// Expanded RAM
-	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(MRA8_BANK1, MWA8_BANK1)	// Monitor ROM / Color RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x8000, 0x81ff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000_io_map, ADDRESS_SPACE_IO, 8 )
@@ -231,33 +167,14 @@ ADDRESS_MAP_END
 // Telmac 2000 (TOOL-2000)
 
 static ADDRESS_MAP_START( tmc2000t_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM									// Work RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM									// Expanded RAM
-	AM_RANGE(0x8000, 0x87ff) AM_ROM									// TOOL-2000 ROM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x8000, 0x87ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000t_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1864_audio_enable_r, cdp1864_step_background_color_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(cdp1864_audio_disable_r, cdp1864_tone_divisor_latch_w)
-ADDRESS_MAP_END
-
-// Telmac 2000E
-
-static ADDRESS_MAP_START( tmc2000e_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM									// Work RAM
-	AM_RANGE(0xc000, 0xdfff) AM_ROM									// Monitor ROM
-	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE(&colorram)				// Color RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tmc2000e_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_WRITE(cdp1864_tone_divisor_latch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(cdp1864_step_background_color_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(ascii_keyboard_r, keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(vismac_r, vismac_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(floppy_r, floppy_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(input_port_8_r, io_select_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -282,55 +199,6 @@ INPUT_PORTS_START( tmc1800 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-INPUT_PORTS_END
-
-INPUT_PORTS_START( tmc2000e )
-	PORT_START_TAG("DSW0")	// System Configuration DIPs
-	PORT_DIPNAME( 0x80, 0x00, "Keyboard Type" )
-	PORT_DIPSETTING(    0x00, "ASCII" )
-	PORT_DIPSETTING(    0x80, "Matrix" )
-	PORT_DIPNAME( 0x40, 0x00, "Operating System" )
-	PORT_DIPSETTING(    0x00, "TOOL" )
-	PORT_DIPSETTING(    0x40, "Floppy" )
-	PORT_DIPNAME( 0x30, 0x00, "Display Interface" )
-	PORT_DIPSETTING(    0x00, "PAL" )
-	PORT_DIPSETTING(    0x10, "CDG-80" )
-	PORT_DIPSETTING(    0x20, "VISMAC" )
-	PORT_DIPSETTING(    0x30, "UART" )
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START
-	// ram placement 0000-0fff ... f000-ffff
-
-	PORT_START
-	PORT_CONFNAME( 0xf000, 0xc000, "ROM Address" )
-	PORT_CONFSETTING(      0x0000, "0000-1FFF" )
-	PORT_CONFSETTING(      0x2000, "2000-3FFF" )
-	PORT_CONFSETTING(      0x4000, "4000-5FFF" )
-	PORT_CONFSETTING(      0x6000, "6000-7FFF" )
-	PORT_CONFSETTING(      0x8000, "8000-9FFF" )
-	PORT_CONFSETTING(      0xa000, "A000-BFFF" )
-	PORT_CONFSETTING(      0xc000, "C000-DFFF" )
-	PORT_CONFSETTING(      0xe000, "E000-FFFF" )
-
-	PORT_START
-	PORT_CONFNAME( 0xf000, 0xc000, "Startup Address" )
-	PORT_CONFSETTING(      0x0000, "0000" )
-	PORT_CONFSETTING(      0x1000, "1000" )
-	PORT_CONFSETTING(      0x2000, "2000" )
-	PORT_CONFSETTING(      0x3000, "3000" )
-	PORT_CONFSETTING(      0x4000, "4000" )
-	PORT_CONFSETTING(      0x5000, "5000" )
-	PORT_CONFSETTING(      0x6000, "6000" )
-	PORT_CONFSETTING(      0x7000, "7000" )
-	PORT_CONFSETTING(      0x8000, "8000" )
-	PORT_CONFSETTING(      0x9000, "9000" )
-	PORT_CONFSETTING(      0xa000, "A000" )
-	PORT_CONFSETTING(      0xb000, "B000" )
-	PORT_CONFSETTING(      0xc000, "C000" )
-	PORT_CONFSETTING(      0xd000, "D000" )
-	PORT_CONFSETTING(      0xe000, "E000" )
-	PORT_CONFSETTING(      0xf000, "F000" )
 INPUT_PORTS_END
 
 /* CDP1802 Interfaces */
@@ -390,13 +258,13 @@ static int tmc2000_in_ef(void)
 
 	/*
 		EF1		?
-		EF2		?
-		EF3		keyboard
+		EF2		keyboard
+		EF3		?
 		EF4		?
 	*/
 
 	// keyboard
-	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags |= EF3;
+	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags |= EF2;
 
 	return flags;
 }
@@ -408,75 +276,30 @@ static CDP1802_CONFIG tmc2000_config =
 	tmc2000_in_ef
 };
 
-// Telmac 2000E
-
-static void tmc2000e_video_dma(int cycles)
-{
-}
-
-static void tmc2000e_out_q(int level)
-{
-	// CDP1864 sound generator on/off
-	cdp1864_audio_output_w(level);
-
-	// set Q led status
-	// leds: Wait, Q, Power
-	set_led_status(1, level);
-
-	// tape control
-	// floppy control (FDC-6)
-}
-
-static int tmc2000e_in_ef(void)
-{
-	int flags = 0;
-
-	/*
-		EF1		CDP1864
-		EF2		tape, floppy
-		EF3		keyboard
-		EF4		I/O port
-	*/
-
-	// keyboard
-	if (~readinputport(keylatch / 8) & (1 << (keylatch % 8))) flags |= EF3;
-
-	return flags;
-}
-
-static CDP1802_CONFIG tmc2000e_config =
-{
-	tmc2000e_video_dma,
-	tmc2000e_out_q,
-	tmc2000e_in_ef
-};
-
-/* Interrupt Generators */
-
-static INTERRUPT_GEN( telmac_frame_int )
-{
-}
-
 /* Machine Initialization */
+
+static MACHINE_START( tmc2000 )
+{
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+	memory_configure_bank(1, 1, 1, &colorram, 0);
+
+	return 0;
+}
 
 static MACHINE_RESET( tmc2000 )
 {
 	// set program counter to 0x8000
 }
 
-static MACHINE_RESET( tmc2000e )
-{
-	// set program counter to selected value
-}
-
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( tmc1800 )
+	
 	// basic system hardware
+
 	MDRV_CPU_ADD(CDP1802, 1750000)	// 1.75 MHz
 	MDRV_CPU_PROGRAM_MAP(tmc1800_map, 0)
 	MDRV_CPU_IO_MAP(tmc1800_io_map, 0)
-	MDRV_CPU_VBLANK_INT(telmac_frame_int, 1)
 	MDRV_CPU_CONFIG(tmc1800_config)
 
 	MDRV_SCREEN_REFRESH_RATE(CDP1864_FPS)	//
@@ -486,24 +309,28 @@ static MACHINE_DRIVER_START( tmc1800 )
 	MDRV_PALETTE_LENGTH(2)
 
 	// video hardware
+
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tmc2000 )
+	
 	// basic system hardware
+
 	MDRV_CPU_ADD_TAG("main", CDP1802, CDP1864_CLK_FREQ)	// 1.75 MHz
 	MDRV_CPU_PROGRAM_MAP(tmc2000_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000_io_map, 0)
-	MDRV_CPU_VBLANK_INT(telmac_frame_int, 1)
 	MDRV_CPU_CONFIG(tmc2000_config)
 
+	MDRV_MACHINE_START(tmc2000)
 	MDRV_MACHINE_RESET(tmc2000)
 
 	MDRV_SCREEN_REFRESH_RATE(CDP1864_FPS)	// 50.08 Hz
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	// video hardware
+
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(360, 312)
@@ -515,30 +342,21 @@ static MACHINE_DRIVER_START( tmc2000 )
 	MDRV_VIDEO_UPDATE(cdp1864)
 
 	// sound hardware
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tmc2000t )
+
 	MDRV_IMPORT_FROM(tmc2000)
 
 	// basic system hardware
+
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(tmc2000t_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000t_io_map, 0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( tmc2000e )
-	MDRV_IMPORT_FROM(tmc2000)
-
-	MDRV_MACHINE_RESET(tmc2000e)
-
-	// basic system hardware
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(tmc2000e_map, 0)
-	MDRV_CPU_IO_MAP(tmc2000e_io_map, 0)
-	MDRV_CPU_CONFIG(tmc2000e_config)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -556,14 +374,6 @@ ROM_END
 ROM_START( tmc2000t )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tool2000",	0x8000, 0x0800, NO_DUMP )
-ROM_END
-
-ROM_START( tmc2000e )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "1",			0xc000, 0x0800, NO_DUMP )
-	ROM_LOAD( "2",			0xc800, 0x0800, NO_DUMP )
-	ROM_LOAD( "3",			0xd000, 0x0800, NO_DUMP )
-	ROM_LOAD( "4",			0xd800, 0x0800, NO_DUMP )
 ROM_END
 
 /* System Configuration */
@@ -604,24 +414,6 @@ SYSTEM_CONFIG_START( tmc2000 )
 	CONFIG_DEVICE(tmc2000_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-static void tmc2000e_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
-{
-	/* cassette */
-	switch(state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		default:										cassette_device_getinfo(devclass, state, info); break;
-	}
-}
-
-SYSTEM_CONFIG_START( tmc2000e )
-	CONFIG_RAM_DEFAULT	( 8 * 1024)
-	CONFIG_DEVICE(tmc2000e_cassette_getinfo)
-SYSTEM_CONFIG_END
-
-
 static void setup_beep(int dummy)
 {
 	beep_set_volume(0, 0);
@@ -639,4 +431,3 @@ static DRIVER_INIT( telmac )
 COMP( 1977, tmc1800,  0,       0,	    tmc1800,  tmc1800,  telmac, tmc1800,  "Telercas Oy", "Telmac 1800", 			GAME_NOT_WORKING )
 COMP( 1980, tmc2000,  0,       0, 		tmc2000,  tmc1800,  telmac, tmc2000,  "Telercas Oy", "Telmac 2000", 			GAME_NOT_WORKING )
 COMP( 1980, tmc2000t, tmc2000, 0, 		tmc2000t, tmc1800,  telmac, tmc2000,  "Telercas Oy", "Telmac 2000 (TOOL-2000)", GAME_NOT_WORKING )
-COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, telmac, tmc2000e, "Telercas Oy", "Telmac 2000E", 			GAME_NOT_WORKING )

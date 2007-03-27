@@ -32,7 +32,8 @@ HP14782-1
 |-------------------------------------------------------------------------------------------|
 
 Notes:
-	All IC's shown.
+	All IC's shown. TMCP-300 and TMC-700 expansions have been installed.
+
 	ROM0-5	- Toshiba TMM2732DI 4Kx8 EPROM
 	ROM6	- Hitachi HN462732G 4Kx8 EPROM
 	5114	- RCA MWS5114E1 1024-Word x 4-Bit LSI Static RAM
@@ -43,25 +44,25 @@ Notes:
 	CDP1856	- RCA CDP1856CE 4-Bit Memory Buffer
 	CDP1869	- RCA CDP1869CE Video Interface System (VIS) Address and Sound Generator
 	CDP1870	- RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
-	CN1		- RF connector
-	CN2		- printer connector
+	CN1		- RF connector (TMC-700)
+	CN2		- printer connector (TMC-700)
 	CN3		- EURO connector
 	CN4		- tape connector
 	CN5		- video connector
 	CN6		- power connector
-	CN7		- audio connector
+	CN7		- audio connector (TMCP-300)
 	CN8		- keyboard connector
 	SW1		- RUN/STOP switch
 	SW2		- internal speaker/external audio switch
 	P1		- color phase lock adjustment
 	C1		- dot oscillator adjustment
 	C2		- chrom oscillator adjustment
-	T1		- RF signal strength adjustment
+	T1		- RF signal strength adjustment (TMC-700)
 	T2		- tape recording level adjustment (0.57 Vpp)
 	T3		- video output level adjustment (1 Vpp)
 	T4		- video synchronization pulse adjustment
-	K1		- RF signal quality adjustment
-	K2		- RF channel adjustment (VHF I)
+	K1		- RF signal quality adjustment (TMC-700)
+	K2		- RF channel adjustment (VHF I) (TMC-700)
 	LS1		- loudspeaker
 
 */
@@ -97,14 +98,27 @@ static WRITE8_HANDLER( vismac_data_w )
 		// set character color
 		vismac_color_latch = data;
 		break;
+	
 	case 0x30:
 		// write cdp1869 command on the data bus
 		vismac_bkg_latch = data & 0x07;
 		cdp1869_out3_w(0, data);
 		break;
-	default:
-		// write cdp1869 command using the address bus bits as data
-		cdp1869_out_w((vismac_reg_latch >> 4) - 4, 0);
+	
+	case 0x40:
+		cdp1869_out4_w(0, data);
+		break;
+	
+	case 0x50:
+		cdp1869_out5_w(0, data);
+		break;
+	
+	case 0x60:
+		cdp1869_out6_w(0, data);
+		break;
+	
+	case 0x70:
+		cdp1869_out7_w(0, data);
 		break;
 	}
 }
@@ -307,10 +321,10 @@ MACHINE_DRIVER_END
 
 ROM_START( tmc600s1 )
 	ROM_REGION( 0x5000, REGION_CPU1, 0 )
-	ROM_LOAD( "1",			0x0000, 0x1000, NO_DUMP )
-	ROM_LOAD( "2",			0x1000, 0x1000, NO_DUMP )
-	ROM_LOAD( "3",			0x2000, 0x1000, NO_DUMP )
-	ROM_LOAD( "4",			0x3000, 0x1000, NO_DUMP )
+	ROM_LOAD( "sb20",		0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "sb21",		0x1000, 0x1000, NO_DUMP )
+	ROM_LOAD( "sb22",		0x2000, 0x1000, NO_DUMP )
+	ROM_LOAD( "sb23",		0x3000, 0x1000, NO_DUMP )
 	ROM_LOAD( "190482_2",	0x4000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -319,10 +333,10 @@ ROM_END
 
 ROM_START( tmc600s2 )
 	ROM_REGION( 0x5000, REGION_CPU1, 0 )
-	ROM_LOAD( "1",			0x0000, 0x1000, CRC(95d1292a) SHA1(1fa52d59d3005f8ac74a32c2164fdb22947c2748) )
-	ROM_LOAD( "2",			0x1000, 0x1000, CRC(2c8f3d17) SHA1(f14e8adbcddeaeaa29b1e7f3dfa741f4e230f599) )
-	ROM_LOAD( "3",			0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
-	ROM_LOAD( "4",			0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
+	ROM_LOAD( "sb30",		0x0000, 0x1000, CRC(95d1292a) SHA1(1fa52d59d3005f8ac74a32c2164fdb22947c2748) )
+	ROM_LOAD( "sb31",		0x1000, 0x1000, CRC(2c8f3d17) SHA1(f14e8adbcddeaeaa29b1e7f3dfa741f4e230f599) )
+	ROM_LOAD( "sb32",		0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
+	ROM_LOAD( "sb33",		0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
 	ROM_LOAD( "151182",		0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -450,4 +464,3 @@ static DRIVER_INIT( tmc600 )
 //    YEAR  NAME 	  PARENT    COMPAT   MACHINE   INPUT     INIT	 CONFIG    COMPANY 	      FULLNAME
 COMP( 1982, tmc600s1, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
 COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-COMP( 1982, tmc600as, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 AS",		   GAME_NOT_WORKING )

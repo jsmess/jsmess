@@ -775,7 +775,6 @@ TESTDRIVER(tmc2000t)	/* 1980 Telmac 2000 (TOOL-2000)						*/
 TESTDRIVER(tmc2000e)	/* 1980 Telmac 2000E								*/
 TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER(tmc600s2)	/* 1982 Telmac TMC-600 (Series II)					*/
-TESTDRIVER(tmc600as)	/* 1982 Telmac TMC-600 AS							*/
 
 	/* MIT */
 	DRIVER( tx0_64kw )	/* April 1956 MIT TX-0 (64kw RAM)                   */

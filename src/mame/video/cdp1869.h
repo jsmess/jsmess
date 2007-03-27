@@ -107,7 +107,10 @@ typedef struct CDP1869_interface
 } CDP1869_interface;
 
 WRITE8_HANDLER ( cdp1869_out3_w );
-WRITE8_HANDLER ( cdp1869_out_w );
+WRITE8_HANDLER ( cdp1869_out4_w );
+WRITE8_HANDLER ( cdp1869_out5_w );
+WRITE8_HANDLER ( cdp1869_out6_w );
+WRITE8_HANDLER ( cdp1869_out7_w );
 
 PALETTE_INIT( cdp1869 );
 VIDEO_START( cdp1869 );

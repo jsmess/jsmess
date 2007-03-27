@@ -1053,8 +1053,9 @@ $(MESSOBJ)/multitch.a:					\
 
 $(MESSOBJ)/telmac.a:					\
 	$(MESS_DRIVERS)/telmac.o	\
-	$(MESS_VIDEO)/cdp186x.o	\
+	$(MESS_VIDEO)/cdp1864.o	\
 	$(MESS_DRIVERS)/tmc600.o	\
+	$(MESS_DRIVERS)/tmc2000e.o	\
 	$(MAME_VIDEO)/cdp1869.o	\
 
 $(MESSOBJ)/exeltel.a:					\
