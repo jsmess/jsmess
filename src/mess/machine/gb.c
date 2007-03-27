@@ -609,12 +609,14 @@ WRITE8_HANDLER( gb_ram_tama5 ) {
 /* This mmm01 implementation is mostly guess work, no clue how correct it all is */
 
 UINT8 mmm01_bank_offset;
+UINT8 mmm01_reg1;
 UINT8 mmm01_bank;
 UINT8 mmm01_bank_mask;
 
 WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w ) {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x000 );
 	if ( data & 0x40 ) {
+		mmm01_bank_offset = mmm01_reg1;
 		memory_set_bankptr( 5, ROMMap[ mmm01_bank_offset ] );
 		memory_set_bankptr( 10, ROMMap[ mmm01_bank_offset ] + 0x0100 );
 		memory_set_bankptr( 1, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
@@ -623,17 +625,13 @@ WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w ) {
 
 WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w ) {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x2000 );
-	if ( data & 0x60 ) {
-		mmm01_bank_offset = data & 0x1F;
-		/* SRAM bank offset?? */
+
+	mmm01_reg1 = data & ROMMask;
+	mmm01_bank = mmm01_reg1 & mmm01_bank_mask;
+	if ( mmm01_bank == 0 ) {
 		mmm01_bank = 1;
-	} else {
-		mmm01_bank = data & mmm01_bank_mask;
-		if ( mmm01_bank == 0 ) {
-			mmm01_bank = 1;
-		}
-		memory_set_bankptr( 1, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
 	}
+	memory_set_bankptr( 1, ROMMap[ mmm01_bank_offset + mmm01_bank ] );
 }
 
 WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w ) {
@@ -642,9 +640,12 @@ WRITE8_HANDLER( gb_rom_bank_mmm01_4000_w ) {
 
 WRITE8_HANDLER( gb_rom_bank_mmm01_6000_w ) {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x6000 );
+	/* Not sure if this is correct, Taito Variety Pack sets these values */
+	/* Momotarou Collection 2 writes 01 and 21 here */
 	switch( data ) {
 	case 0x30:	mmm01_bank_mask = 0x07;	break;
 	case 0x38:	mmm01_bank_mask = 0x03;	break;
+	default:	mmm01_bank_mask = 0xFF; break;
 	}
 }
 
@@ -1493,6 +1494,7 @@ DEVICE_LOAD(gb_cart)
 		}
 		if ( bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D ) {
 			ROMBank00 = ( filesize / 0x4000 ) - 2;
+			mmm01_bank_offset = ROMBank00;
 		} else {
 			gb_header = gb_cart;
 		}
