@@ -325,6 +325,9 @@ Taito Pack (MMM01+RAM, 512KB, 64KB RAM):
   4000 <- 70  01110000  => ???
   0000 <- 40  01000000  => upper 3 bits determine lower 3 bits of starting block?
 
+Known:
+The last 2 banks in a MMM01 dump are actually the starting banks for a MMM01 image.
+
 0000-1FFF => bit6 set => perform mapping
 
 Possible mapping registers:

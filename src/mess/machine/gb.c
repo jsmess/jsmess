@@ -77,6 +77,7 @@ static UINT16 MBCType;				   /* MBC type: 0 for none                        */
 static UINT8 CartType;				   /* Cart Type (battery, ram, timer etc)         */
 static UINT8 *ROMMap[MAX_ROMBANK];		   /* Addresses of ROM banks                      */
 static UINT16 ROMBank;				   /* Number of ROM bank currently used           */
+static UINT16 ROMBank00;			   /* Number of ROM bank currently used at 0000-3FFF */
 static UINT8 ROMMask;				   /* Mask for the ROM bank number                */
 static UINT16 ROMBanks;				   /* Total number of ROM banks                   */
 static UINT8 *RAMMap[MAX_RAMBANK];		   /* Addresses of RAM banks                      */
@@ -161,7 +162,7 @@ static void gb_init(void) {
 	/* Initialize the memory banks */
 	MBC1Mode = 0;
 	MBC3RTCBank = 0;
-	ROMBank = 1;
+	ROMBank = ROMBank00 + 1;
 	RAMBank = 0;
 	memory_set_bankptr (1, ROMMap[ROMBank] ? ROMMap[ROMBank] : gb_dummy_rom_bank);
 	if ( MBCType != MBC_MEGADUCK ) {
@@ -252,7 +253,7 @@ MACHINE_RESET( gb )
 
         /* Enable BIOS rom */
         memory_set_bankptr(5, memory_region(REGION_CPU1) );
-        memory_set_bankptr(10, ROMMap[0] + 0x0100 );
+        memory_set_bankptr(10, ROMMap[ROMBank00] + 0x0100 );
 }
 
 MACHINE_RESET( sgb )
@@ -263,7 +264,8 @@ MACHINE_RESET( sgb )
 
 	gb_init_regs();
 
-	memory_set_bankptr(5, ROMMap[0] ? ROMMap[0] : gb_dummy_rom_bank );
+	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
+	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100 );
 
 	if ( sgb_tile_data == NULL ) {
 		sgb_tile_data = auto_malloc( 0x2000 );
@@ -304,8 +306,8 @@ MACHINE_RESET( gbpocket )
 	gb_sound_w(0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
-	memory_set_bankptr(5, ROMMap[0] ? ROMMap[0] : gb_dummy_rom_bank );
-	memory_set_bankptr(10, ROMMap[0] ? ROMMap[0] + 0x0100 : gb_dummy_rom_bank + 0x0100);
+	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
+	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
 }
 
 MACHINE_RESET( gbc )
@@ -330,8 +332,8 @@ MACHINE_RESET( gbc )
 	gb_sound_w(0x15, 0xF3);
 	gb_sound_w(0x14, 0x77);
 
-	memory_set_bankptr(5, ROMMap[0] ? ROMMap[0] : gb_dummy_rom_bank );
-	memory_set_bankptr(10, ROMMap[0] ? ROMMap[0] + 0x0100 : gb_dummy_rom_bank + 0x0100);
+	memory_set_bankptr(5, ROMMap[ROMBank00] ? ROMMap[ROMBank00] : gb_dummy_rom_bank );
+	memory_set_bankptr(10, ROMMap[ROMBank00] ? ROMMap[ROMBank00] + 0x0100 : gb_dummy_rom_bank + 0x0100);
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ ) {
@@ -622,7 +624,7 @@ WRITE8_HANDLER( gb_rom_bank_mmm01_0000_w ) {
 WRITE8_HANDLER( gb_rom_bank_mmm01_2000_w ) {
 	logerror( "0x%04X: write 0x%02X to 0x%04X\n", activecpu_get_pc(), data, offset+0x2000 );
 	if ( data & 0x60 ) {
-		mmm01_bank_offset = ( data & 0x1F ) + 2;
+		mmm01_bank_offset = data & 0x1F;
 		/* SRAM bank offset?? */
 		mmm01_bank = 1;
 	} else {
@@ -700,7 +702,7 @@ WRITE8_HANDLER ( gb_io2_w )
 {
 	if ( offset == 0x10 ) {
 		/* disable BIOS ROM */
-		memory_set_bankptr(5, ROMMap[0]);
+		memory_set_bankptr(5, ROMMap[ROMBank00]);
 	} else {
 		gb_video_w( offset, data );
 	}
@@ -1304,6 +1306,7 @@ DEVICE_INIT(gb_cart)
 	for(I = 0; I < MAX_RAMBANK; I++) {
 		RAMMap[I] = gb_dummy_ram_bank;
 	}
+	ROMBank00 = 0;
 	ROMBanks = 0;
 	RAMBanks = 0;
 	MBCType = MBC_NONE;
@@ -1443,6 +1446,7 @@ DEVICE_LOAD(gb_cart)
 
 	int Checksum, I, J, filesize;
 	UINT16 reported_rom_banks;
+	UINT8	*gb_header;
 	int rambanks[8] = {0, 1, 1, 4, 16, 8, 0, 0};
 
 	filesize = image_length(image);
@@ -1470,8 +1474,32 @@ DEVICE_LOAD(gb_cart)
 		return INIT_FAIL;
 	}
 
+	gb_header = gb_cart;
+	ROMBank00 = 0;
+
+	/* Check for presence of MMM01 mapper */
+	if ( filesize >= 0x8000 ) {
+		static const UINT8 nintendo_logo[0x18] = {
+			0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
+			0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
+			0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E
+		};
+		int	bytes_matched = 0;
+		gb_header = gb_cart + filesize - 0x8000;
+		for ( I = 0; I < 0x18; I++ ) {
+			if ( gb_header[0x0104 + I] == nintendo_logo[I] ) {
+				bytes_matched++;
+			}
+		}
+		if ( bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D ) {
+			ROMBank00 = ( filesize / 0x4000 ) - 2;
+		} else {
+			gb_header = gb_cart;
+		}
+	}
+
 	/* Fill in our cart details */
-	switch( gb_cart[0x0147] ) {
+	switch( gb_header[0x0147] ) {
 	case 0x00:	MBCType = MBC_NONE;	CartType = 0;				break;
 	case 0x01:	MBCType = MBC_MBC1;	CartType = 0;				break;
 	case 0x02:	MBCType = MBC_MBC1;	CartType = RAM;				break;
@@ -1506,10 +1534,10 @@ DEVICE_LOAD(gb_cart)
 	}
 
 	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
-	if ( gb_cart[0x0147] == 0x00 ) {
+	if ( gb_header[0x0147] == 0x00 ) {
 		int count = 0;
 		for( I = 0x0134; I <= 0x014C; I++ ) {
-			count += gb_cart[I];
+			count += gb_header[I];
 		}
 		if ( count == 0 ) {
 			MBCType = MBC_WISDOM;
@@ -1537,7 +1565,7 @@ DEVICE_LOAD(gb_cart)
 #endif
 
 	ROMBanks = filesize / 0x4000;
-	switch( gb_cart[0x0148] ) {
+	switch( gb_header[0x0148] ) {
 	case 0x52:
 		reported_rom_banks = 72;
 		break;
@@ -1549,7 +1577,7 @@ DEVICE_LOAD(gb_cart)
 		break;
 	case 0x00: case 0x01: case 0x02: case 0x03:
 	case 0x04: case 0x05: case 0x06: case 0x07:
-		reported_rom_banks = 2 << gb_cart[0x0148];
+		reported_rom_banks = 2 << gb_header[0x0148];
 		break;
 	default:
 		logerror( "Warning loading cartridge: Unknown ROM size in header.\n" );
@@ -1560,11 +1588,11 @@ DEVICE_LOAD(gb_cart)
 		logerror( "Warning loading cartridge: Filesize and reported ROM banks don't match.\n" );
 	}
 
-        RAMBanks = rambanks[gb_cart[0x0149] & 7];
+        RAMBanks = rambanks[gb_header[0x0149] & 7];
 
 	/* Calculate and check checksum */
-        Checksum = ((UINT16) gb_cart[0x014E] << 8) + gb_cart[0x014F];
-        Checksum += gb_cart[0x014E] + gb_cart[0x014F];
+        Checksum = ((UINT16) gb_header[0x014E] << 8) + gb_header[0x014F];
+        Checksum += gb_header[0x014E] + gb_header[0x014F];
         for (I = 0; I < filesize; I++)
         {
                 Checksum -= gb_cart[I];
@@ -1607,27 +1635,27 @@ DEVICE_LOAD(gb_cart)
 		int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
 
-		strncpy (S, (char *)&gb_cart[0x0134], 16);
+		strncpy (S, (char *)&gb_header[0x0134], 16);
 		S[16] = '\0';
 		logerror("Cart Information\n");
 		logerror("\tName:             %s\n", S);
-		logerror("\tType:             %s [0x%2X]\n", CartTypes[gb_cart[0x0147]], gb_cart[0x0147] );
-		logerror("\tGameBoy:          %s\n", (gb_cart[0x0143] == 0xc0) ? "No" : "Yes" );
-		logerror("\tSuper GB:         %s [0x%2X]\n", (gb_cart[0x0146] == 0x03) ? "Yes" : "No", gb_cart[0x0146] );
-		logerror("\tColor GB:         %s [0x%2X]\n", (gb_cart[0x0143] == 0x80 || gb_cart[0x0143] == 0xc0) ? "Yes" : "No", gb_cart[0x0143] );
-		logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", ROMBanks, gb_cart[0x0148]);
-		logerror("\tRAM Size:         %d kB [0x%2X]\n", ramsize[ gb_cart[0x0149] & 0x07 ], gb_cart[0x0149]);
-		logerror("\tLicense code:     0x%2X%2X\n", gb_cart[0x0145], gb_cart[0x0144] );
-		J = ((UINT16) gb_cart[0x014B] << 8) + gb_cart[0x014A];
+		logerror("\tType:             %s [0x%2X]\n", CartTypes[gb_header[0x0147]], gb_header[0x0147] );
+		logerror("\tGameBoy:          %s\n", (gb_header[0x0143] == 0xc0) ? "No" : "Yes" );
+		logerror("\tSuper GB:         %s [0x%2X]\n", (gb_header[0x0146] == 0x03) ? "Yes" : "No", gb_header[0x0146] );
+		logerror("\tColor GB:         %s [0x%2X]\n", (gb_header[0x0143] == 0x80 || gb_header[0x0143] == 0xc0) ? "Yes" : "No", gb_cart[0x0143] );
+		logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", ROMBanks, gb_header[0x0148]);
+		logerror("\tRAM Size:         %d kB [0x%2X]\n", ramsize[ gb_header[0x0149] & 0x07 ], gb_header[0x0149]);
+		logerror("\tLicense code:     0x%2X%2X\n", gb_header[0x0145], gb_header[0x0144] );
+		J = ((UINT16) gb_header[0x014B] << 8) + gb_header[0x014A];
 		for (I = 0, P = NULL; !P && Companies[I].Name; I++)
 			if (J == Companies[I].Code)
 				P = Companies[I].Name;
 		logerror("\tManufacturer ID:  0x%2X", J);
 		logerror(" [%s]\n", P ? P : "?");
-		logerror("\tVersion Number:   0x%2X\n", gb_cart[0x014C]);
-		logerror("\tComplement Check: 0x%2X\n", gb_cart[0x014D]);
-		logerror("\tChecksum:         0x%2X\n", ( ( gb_cart[0x014E] << 8 ) + gb_cart[0x014F] ) );
-		J = ((UINT16) gb_cart[0x0103] << 8) + gb_cart[0x0102];
+		logerror("\tVersion Number:   0x%2X\n", gb_header[0x014C]);
+		logerror("\tComplement Check: 0x%2X\n", gb_header[0x014D]);
+		logerror("\tChecksum:         0x%2X\n", ( ( gb_header[0x014E] << 8 ) + gb_header[0x014F] ) );
+		J = ((UINT16) gb_header[0x0103] << 8) + gb_header[0x0102];
 		logerror("\tStart Address:    0x%2X\n", J);
 	}
 
