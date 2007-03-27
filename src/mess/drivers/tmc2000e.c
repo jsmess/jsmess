@@ -5,7 +5,7 @@
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "video/generic.h"
-#include "video/cdp186x.h"
+#include "video/cdp1864.h"
 #include "sound/beep.h"
 
 /* Read/Write Handlers */
