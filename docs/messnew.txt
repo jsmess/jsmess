@@ -8,6 +8,11 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [APPLE2GS] Major fixes to the quality and accuracy of the ES5503 
+  sound emulation. [R. Belmont]
+
+- [APPLE2GS, SNES] Fixed some 65816 core bugs.  (bug #661) [R. Belmont]
+
 - [COCO] Fixed PIA misconfiguration.  (bug #1115) [tim lindner]
 
 - [COCO] Fixed Lightgun emulation. [tim lindner]
