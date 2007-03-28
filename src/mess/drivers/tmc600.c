@@ -44,25 +44,25 @@ Notes:
 	CDP1856	- RCA CDP1856CE 4-Bit Memory Buffer
 	CDP1869	- RCA CDP1869CE Video Interface System (VIS) Address and Sound Generator
 	CDP1870	- RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
-	CN1		- RF connector (TMC-700)
-	CN2		- printer connector (TMC-700)
+	CN1		- RF connector [TMC-700]
+	CN2		- printer connector [TMC-700]
 	CN3		- EURO connector
 	CN4		- tape connector
 	CN5		- video connector
 	CN6		- power connector
-	CN7		- audio connector (TMCP-300)
+	CN7		- audio connector [TMCP-300]
 	CN8		- keyboard connector
 	SW1		- RUN/STOP switch
-	SW2		- internal speaker/external audio switch
+	SW2		- internal speaker/external audio switch [TMCP-300]
 	P1		- color phase lock adjustment
 	C1		- dot oscillator adjustment
 	C2		- chrom oscillator adjustment
-	T1		- RF signal strength adjustment (TMC-700)
+	T1		- RF signal strength adjustment [TMC-700]
 	T2		- tape recording level adjustment (0.57 Vpp)
 	T3		- video output level adjustment (1 Vpp)
 	T4		- video synchronization pulse adjustment
-	K1		- RF signal quality adjustment (TMC-700)
-	K2		- RF channel adjustment (VHF I) (TMC-700)
+	K1		- RF signal quality adjustment [TMC-700]
+	K2		- RF channel adjustment (VHF I) [TMC-700]
 	LS1		- loudspeaker
 
 */
