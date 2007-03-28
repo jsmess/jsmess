@@ -343,19 +343,6 @@ ROM_START( tmc600s2 )
 	ROM_LOAD( "chargen",	0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
 ROM_END
 
-ROM_START( tmc600as )
-	ROM_REGION( 0x5000, REGION_CPU1, 0 )
-	ROM_LOAD( "1",			0x0000, 0x1000, NO_DUMP )
-	ROM_LOAD( "2",			0x1000, 0x1000, NO_DUMP )
-	ROM_LOAD( "3",			0x2000, 0x1000, NO_DUMP )
-	ROM_LOAD( "4",			0x3000, 0x1000, NO_DUMP )
-	ROM_LOAD( "5",			0x4000, 0x1000, NO_DUMP )
-	ROM_LOAD( "6",			0x5000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "chargen",	0x0000, 0x1000, NO_DUMP )
-ROM_END
-
 /* System Configuration */
 
 QUICKLOAD_LOAD( tmc600 )
@@ -423,8 +410,9 @@ static void tmc600_quickload_getinfo(const device_class *devclass, UINT32 state,
 }
 
 SYSTEM_CONFIG_START( tmc600 )
-	CONFIG_RAM_DEFAULT	( 9 * 1024)
-	CONFIG_RAM			(30 * 1024)
+	CONFIG_RAM_DEFAULT	( 8 * 1024)
+	CONFIG_RAM			(16 * 1024)
+	CONFIG_RAM			(24 * 1024)
 	CONFIG_DEVICE(tmc600_cassette_getinfo)
 	CONFIG_DEVICE(tmc600_floppy_getinfo)
 	CONFIG_DEVICE(tmc600_printer_getinfo)
@@ -463,4 +451,4 @@ static DRIVER_INIT( tmc600 )
 
 //    YEAR  NAME 	  PARENT    COMPAT   MACHINE   INPUT     INIT	 CONFIG    COMPANY 	      FULLNAME
 COMP( 1982, tmc600s1, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_SOUND )

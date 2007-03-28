@@ -227,6 +227,7 @@ static void tmc2000e_printer_getinfo(const device_class *devclass, UINT32 state,
 
 SYSTEM_CONFIG_START( tmc2000e )
 	CONFIG_RAM_DEFAULT	( 8 * 1024)
+	CONFIG_RAM			(40 * 1024)
 	CONFIG_DEVICE(tmc2000e_cassette_getinfo)
 	CONFIG_DEVICE(tmc2000e_floppy_getinfo)
 	CONFIG_DEVICE(tmc2000e_printer_getinfo)

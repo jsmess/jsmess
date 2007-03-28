@@ -155,26 +155,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x8000, 0x81ff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x87ff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1864_audio_enable_r, cdp1864_step_background_color_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(cdp1864_audio_disable_r, tmc2000_bankswitch_w)
-ADDRESS_MAP_END
-
-// Telmac 2000 (TOOL-2000)
-
-static ADDRESS_MAP_START( tmc2000t_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tmc2000t_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1864_audio_enable_r, cdp1864_step_background_color_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(keyboard_latch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(cdp1864_audio_disable_r, cdp1864_tone_divisor_latch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -318,7 +305,7 @@ static MACHINE_DRIVER_START( tmc2000 )
 	
 	// basic system hardware
 
-	MDRV_CPU_ADD_TAG("main", CDP1802, CDP1864_CLK_FREQ)	// 1.75 MHz
+	MDRV_CPU_ADD(CDP1802, CDP1864_CLK_FREQ)	// 1.75 MHz
 	MDRV_CPU_PROGRAM_MAP(tmc2000_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000_io_map, 0)
 	MDRV_CPU_CONFIG(tmc2000_config)
@@ -344,19 +331,9 @@ static MACHINE_DRIVER_START( tmc2000 )
 	// sound hardware
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( tmc2000t )
-
-	MDRV_IMPORT_FROM(tmc2000)
-
-	// basic system hardware
-
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(tmc2000t_map, 0)
-	MDRV_CPU_IO_MAP(tmc2000t_io_map, 0)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -366,14 +343,15 @@ ROM_START( tmc1800 )
 	ROM_LOAD( "monitor",	0x8000, 0x0200, NO_DUMP )
 ROM_END
 
+SYSTEM_BIOS_START( tmc2000 )
+	SYSTEM_BIOS_ADD( 0, "monitor",  "Monitor" )
+	SYSTEM_BIOS_ADD( 1, "tool2000", "TOOL-2000" )
+SYSTEM_BIOS_END
+
 ROM_START( tmc2000 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "200.m5",		0x8000, 0x0200, CRC(7f8e7ce4) SHA1(3302628f9a57ce456347f37c9a970be6390465e7) )
-ROM_END
-
-ROM_START( tmc2000t )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "tool2000",	0x8000, 0x0800, NO_DUMP )
+	ROMX_LOAD( "200.m5",	0x8000, 0x0200, CRC(7f8e7ce4) SHA1(3302628f9a57ce456347f37c9a970be6390465e7), ROM_BIOS(1) )
+	ROMX_LOAD( "tool2000",	0x8000, 0x0800, NO_DUMP, ROM_BIOS(2) )
 ROM_END
 
 /* System Configuration */
@@ -427,7 +405,6 @@ static DRIVER_INIT( telmac )
 
 /* System Drivers */
 
-//     YEAR  NAME 	   PARENT   COMPAT  MACHINE   INPUT     INIT	 CONFIG    COMPANY 	      FULLNAME
-COMP( 1977, tmc1800,  0,       0,	    tmc1800,  tmc1800,  telmac, tmc1800,  "Telercas Oy", "Telmac 1800", 			GAME_NOT_WORKING )
-COMP( 1980, tmc2000,  0,       0, 		tmc2000,  tmc1800,  telmac, tmc2000,  "Telercas Oy", "Telmac 2000", 			GAME_NOT_WORKING )
-COMP( 1980, tmc2000t, tmc2000, 0, 		tmc2000t, tmc1800,  telmac, tmc2000,  "Telercas Oy", "Telmac 2000 (TOOL-2000)", GAME_NOT_WORKING )
+//    YEAR  NAME 	  PARENT   COMPAT   MACHINE   INPUT     INIT	CONFIG    COMPANY 	     FULLNAME
+COMP( 1977, tmc1800,  0,       0,	    tmc1800,  tmc1800,  telmac, tmc1800,  "Telercas Oy", "Telmac 1800", GAME_NOT_WORKING )
+COMPB( 1980, tmc2000,  0,       tmc2000, 0, 		tmc2000,  tmc1800,  telmac, tmc2000,  "Telercas Oy", "Telmac 2000",	GAME_NOT_WORKING )

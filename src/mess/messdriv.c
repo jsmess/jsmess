@@ -771,7 +771,6 @@ TESTDRIVER( svi328c ) 	/* SVI-328 + 80 column card (Swedish)						*/
 	/* Telmac */
 TESTDRIVER(tmc1800)		/* 1977 Telmac 1800									*/
 TESTDRIVER(tmc2000)		/* 1980 Telmac 2000									*/
-TESTDRIVER(tmc2000t)	/* 1980 Telmac 2000 (TOOL-2000)						*/
 TESTDRIVER(tmc2000e)	/* 1980 Telmac 2000E								*/
 TESTDRIVER(tmc600s1)	/* 1982 Telmac TMC-600 (Series I)					*/
 	DRIVER(tmc600s2)	/* 1982 Telmac TMC-600 (Series II)					*/
