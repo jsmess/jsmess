@@ -73,6 +73,8 @@ typedef struct
 
 	INT8  oscsenabled;		// # of oscillators enabled
 
+	int   rege0;			// contents of register 0xe0
+
 	UINT32 clock;
 	UINT32 output_rate;
 } ES5503Chip;
@@ -238,6 +240,8 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 	chip->docram = intf->wave_memory;
 	chip->clock = clock;
 
+	chip->rege0 = 0x80;
+
 	for (osc = 0; osc < 32; osc++)
 	{
 		char sname[32];
@@ -326,7 +330,7 @@ READ8_HANDLER(ES5503_reg_0_r)
 		switch (offset)
 		{
 			case 0xe0:	// interrupt status
-				retval = 0x80;	// negative if no IRQ
+				retval = chip->rege0;
 
 				// scan all oscillators
 				for (i = 0; i < chip->oscsenabled+1; i++)
@@ -335,7 +339,8 @@ READ8_HANDLER(ES5503_reg_0_r)
 					{
 						// signal this oscillator has an interrupt
 						retval = i<<1;
-						retval |= 0x1;
+
+						chip->rege0 = retval | 0x80;
 
 						// and clear its flag
 						chip->oscillators[i].irqpend--;
