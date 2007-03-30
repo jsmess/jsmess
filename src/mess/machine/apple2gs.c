@@ -844,19 +844,15 @@ static READ8_HANDLER( gssnd_r )
 			ret = sndglu_ctrl;
 			break;
 		case 1:	// data read
-			if (sndglu_dummy_read)
-			{
-				sndglu_dummy_read = 0;
-				return 0;
-			}
+			ret = sndglu_dummy_read;
 
 			if (sndglu_ctrl & 0x40)	// docram access
 			{
-				ret = apple2gs_docram[sndglu_addr];
+				sndglu_dummy_read = apple2gs_docram[sndglu_addr];
 			}
 			else
 			{
-				ret = ES5503_reg_0_r(sndglu_addr);
+				sndglu_dummy_read = ES5503_reg_0_r(sndglu_addr);
 			}
 
 			if (sndglu_ctrl & 0x20)	// auto-increment
@@ -906,12 +902,10 @@ static WRITE8_HANDLER( gssnd_w )
 		case 2:	// addr l
 			sndglu_addr &= 0xff00;
 			sndglu_addr |= data;
-			sndglu_dummy_read = 1;
 			break;
 		case 3: // addr h
 			sndglu_addr &= 0x00ff;
 			sndglu_addr |= data<<8;
-			sndglu_dummy_read = 1;
 			break;
 	}
 }
