@@ -1,14 +1,42 @@
 /***************************************************************************
 
 	systems/apple2gs.c
-
 	Apple IIgs
+	Driver by Nathan Woods and R. Belmont
 	
     TODO:
-    - Fix spurrious interrupt problem
+    - Fix spurious interrupt problem
     - Fix 5.25" disks
     - Optimize video code
     - More RAM configurations
+
+    NOTES:
+
+    Video timing and the h/vcount registers:
+    						      VCounts
+    HCounts go like this:				      0xfa (start of frame, still in vblank)
+    0 0x40 0x41 0x58 (first visible pixel)        0x7f
+                 ____________________________________     0x100 (first visible scan line)
+                |                                    |
+                |                                    |
+                |                                    |
+                |                                    |
+                |                                    |
+    HBL region  |                                    |
+                |                                    |
+                |                                    |
+                |                                    |
+                |                                    |
+                |                                    |   0x1ba (first line of Vblank, c019 and heartbeat trigger here, only true VBL if in A2 classic modes) 
+                |                                    |
+                 ____________________________________    0x1c8 (actual start of vblank in IIgs modes)
+    
+    						     0x1ff (end of frame, in vblank)
+    
+    There are 64 HCounts total, and 704 pixels total, so HCounts do not map to the pixel clock.
+    VCounts do map directly to scanlines however, and count 262 of them.
+
+=================================================================
 
 ***************************************************************************/
 
@@ -122,8 +150,8 @@ static MACHINE_DRIVER_START( apple2gs )
 
 	MDRV_CPU_VBLANK_INT(apple2gs_interrupt, 200/8)
 
-	MDRV_SCREEN_SIZE(640, 200)
-	MDRV_SCREEN_VISIBLE_AREA(0,639,0,199)
+	MDRV_SCREEN_SIZE(704, 262)	// 640+32+32 for the borders
+	MDRV_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MDRV_PALETTE_LENGTH( 16+256 )
 	MDRV_GFXDECODE( apple2gs_gfxdecodeinfo )
 
