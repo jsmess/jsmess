@@ -611,7 +611,7 @@ DEVICE_LOAD( sms_cart )
 		/* Check for special SMS Compatibility mode gamegear cartridges */
 		if ( IS_GAMEGEAR ) {
 			/* Just in case someone passes us an sms file */
-			if ( fname_len > 3 && ! mame_stricmp( fname-3, "sms" ) ) {
+			if ( fname_len > 3 && ! mame_stricmp( fname + fname_len - 3, "sms" ) ) {
 				sms_set_ggsmsmode( 1 );
 			}
 		}
