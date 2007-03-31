@@ -14,6 +14,7 @@ MESSOBJ = $(OBJ)/mess
 MAME_AUDIO = $(MAMEOBJ)/audio
 MAME_MACHINE = $(MAMEOBJ)/machine
 MAME_VIDEO = $(MAMEOBJ)/video
+MAME_DRIVERS = $(MAMEOBJ)/drivers
 
 MESS_AUDIO = $(MESSOBJ)/audio
 MESS_DEVICES = $(MESSOBJ)/devices
@@ -496,7 +497,6 @@ $(MESSOBJ)/arcadia.a:  \
 	$(MESS_VIDEO)/arcadia.o	\
 
 $(MESSOBJ)/sega.a:						\
-	$(MESS_MACHINE)/genesis.o	\
 	$(MESS_DRIVERS)/genesis.o	\
 	$(MESS_DRIVERS)/saturn.o	\
 	$(MAME_MACHINE)/stvcd.o			\
@@ -505,7 +505,8 @@ $(MESSOBJ)/sega.a:						\
 	$(MAME_VIDEO)/stvvdp2.o		\
 	$(MESS_VIDEO)/smsvdp.o	\
 	$(MESS_MACHINE)/sms.o		\
-	$(MESS_DRIVERS)/sms.o
+	$(MESS_DRIVERS)/sms.o		\
+	$(MAME_DRIVERS)/megadriv.o
 
 $(MESSOBJ)/atari.a:						\
 	$(MAME_VIDEO)/tia.o			\
