@@ -21,6 +21,10 @@ System Driver Changes:
 
 - [GAMEGEAR] Added SMS compatibility mode.  [Wilbert Pol]
 
+- [GENESIS/MEGADRIVE] New emulation engine from HazeMD, improves
+  compatibility and accuracy plus supports the 6-button pad and
+  the Super Street Fighter 2 mapper.  [R. Belmont, David Haywood]
+
 - [MSX] Fixed MSX visible area.  [MJSTY]
 
 - [SMS] Drivers have been split up to support specific hardware versions:
