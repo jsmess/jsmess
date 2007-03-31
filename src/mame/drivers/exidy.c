@@ -831,18 +831,14 @@ static struct CustomSound_interface exidy_custom_interface =
 static MACHINE_DRIVER_START( targ )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 11289000/16)
+	MDRV_CPU_ADD_TAG("main", M6502, EXIDY_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(common_map,targ_map)
 	MDRV_CPU_VBLANK_INT(exidy_vblank_interrupt,1)
-
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
 	MDRV_GFXDECODE(gfxdecodeinfo_1bpp)
 	MDRV_PALETTE_LENGTH(PALETTE_LEN)
 	MDRV_COLORTABLE_LENGTH(COLORTABLE_LEN)
@@ -1474,5 +1470,5 @@ GAME( 1981, venture4, venture, venture, venture,  venture,  ROT0, "Exidy", "Vent
 GAME( 1982, teetert,  0,       teetert, teetert,  teetert,  ROT0, "Exidy", "Teeter Torture (prototype)", 0 )
 GAME( 1982, pepper2,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", 0 )
 GAME( 1982, hardhat,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", 0 )
-GAME( 1983, fax,      0,       fax,     fax,      fax,      ROT0, "Exidy", "Fax", 0 )
-GAME( 1983, faxa,     fax,     fax,     fax,      fax,      ROT0, "Exidy", "Fax (alt. questions)", 0 )
+GAME( 1983, fax,      0,       fax,     fax,      fax,      ROT0, "Exidy", "FAX", 0 )
+GAME( 1983, faxa,     fax,     fax,     fax,      fax,      ROT0, "Exidy", "FAX (alt. questions)", 0 )

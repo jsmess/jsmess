@@ -158,8 +158,64 @@ static void eeprom_handler(mame_file *file, int read_or_write)
 
 static UINT8 inputport2 = 0xff;
 
-static int counter = 0;
-static int adc_bit = 0;
+static int adc1038_cycle;
+static int adc1038_clk;
+static int adc1038_adr;
+static int adc1038_data_in;
+static int adc1038_data_out;
+static int adc1038_adc_data;
+
+static int adc1038_do_r(void)
+{
+	return adc1038_data_out & 1;
+}
+
+static void adc1038_di_w(int bit)
+{
+	adc1038_data_in = bit & 1;
+}
+
+static void adc1038_clk_w(int bit)
+{
+	if (adc1038_clk == 0 && bit == 0)
+	{
+		adc1038_cycle = 0;
+
+		switch (adc1038_adr)
+		{
+			case 0: adc1038_adc_data = readinputport(4); break;
+			case 1: adc1038_adc_data = readinputport(5); break;
+			case 2: adc1038_adc_data = readinputport(6); break;
+			case 3: adc1038_adc_data = readinputport(7); break;
+			case 4: adc1038_adc_data = 0x000; break;
+			case 5: adc1038_adc_data = 0x000; break;
+			case 6: adc1038_adc_data = 0x000; break;
+			case 7: adc1038_adc_data = 0x000; break;
+		}
+	}
+	else if (bit == 1)
+	{
+		if (adc1038_cycle == 0)			// A2
+		{
+			adc1038_adr = 0;
+			adc1038_adr |= (adc1038_data_in << 2);
+		}
+		else if (adc1038_cycle == 1)	// A1
+		{
+			adc1038_adr |= (adc1038_data_in << 1);
+		}
+		else if (adc1038_cycle == 2)	// A0
+		{
+			adc1038_adr |= (adc1038_data_in << 0);
+		}
+
+		adc1038_data_out = (adc1038_adc_data & (1 << (9 - adc1038_cycle))) ? 1 : 0;
+
+		adc1038_cycle++;
+	}
+
+	adc1038_clk = bit;
+}
 
 //UINT32 eeprom_bit = 0;
 static READ32_HANDLER( sysreg_r )
@@ -197,7 +253,8 @@ static READ32_HANDLER( sysreg_r )
 			// e = EEPROM data out
 
 			UINT32 eeprom_bit = (EEPROM_read_bit() << 1);
-			r |= (eeprom_bit | (adc_bit << 2)) << 24;
+			UINT32 adc_bit = (adc1038_do_r() << 2);
+			r |= (eeprom_bit | adc_bit) << 24;
 		}
 		else
 		{
@@ -240,37 +297,13 @@ static WRITE32_HANDLER( sysreg_w )
 				cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 
-			//adc083x_clk_write(0, ( data >> 25 ) & 1);
-			//adc083x_di_write(0, ( data >> 24 ) & 1);
-			//adc083x_cs_write(0, ( data >> 26 ) & 1);
-			if (data & 0x01000000)
-			{
-				counter = 0;
-			}
-			if (data & 0x02000000)
-			{
-				adc_bit = (0x3fff >> counter) & 1;
-				counter++;
-			}
+			adc1038_di_w((data >> 24) & 1);
+			adc1038_clk_w((data >> 25) & 1);
 
 			set_cgboard_id((data >> 28) & 0x3);
 		}
 		return;
 	}
-}
-
-double adc083x_callback( int input )
-{
-	switch( input )
-	{
-	case ADC083X_CH0:
-		return ( (double)5 * readinputport(4) ) / 255; // steer
-	case ADC083X_CH1:
-		return ( (double)5 * readinputport(5) ) / 255; // gas
-	case ADC083X_VREF:
-		return 5;
-	}
-	return 0;
 }
 
 /* Konami K056230 (LANC) */
@@ -502,27 +535,29 @@ INPUT_PORTS_START( gticlub )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x08, 0x08, "DIP3" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP2" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Network ID1" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "Network ID2" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, "Network ID" )
+	PORT_DIPSETTING( 0x03, "1" )
+	PORT_DIPSETTING( 0x02, "2" )
+	PORT_DIPSETTING( 0x01, "3" )
+	PORT_DIPSETTING( 0x00, "4" )
+	PORT_DIPNAME( 0x04, 0x04, "DIP3" )
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4" )
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START /* mask default type                     sens delta min max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 INPUT_PORTS_END
 
@@ -547,18 +582,24 @@ INPUT_PORTS_START( slrasslt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x08, 0x08, "DIP3" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP2" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP1" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "DIP0" )
+	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIP2" )
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIP3" )
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4" )
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	PORT_START
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 INPUT_PORTS_END
 
@@ -591,18 +632,18 @@ INPUT_PORTS_START( thunderh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x08, 0x08, "DIP3" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP2" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP1" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x00, "DIP0" )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "DIP1" )
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIP2" )
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIP3" )
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4" )
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 INPUT_PORTS_END
 
@@ -958,8 +999,6 @@ static DRIVER_INIT(gticlub)
 	K001005_preprocess_texture_data(memory_region(REGION_GFX1), memory_region_length(REGION_GFX1));
 
 	K056800_init(sound_irq_callback);
-
-	adc083x_init(0, ADC0838, adc083x_callback);
 }
 
 static DRIVER_INIT(hangplt)

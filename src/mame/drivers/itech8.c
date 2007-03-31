@@ -585,7 +585,7 @@ static INTERRUPT_GEN( generate_nmi )
 	itech8_update_interrupts(1, -1, -1);
 	itech8_update_interrupts(0, -1, -1);
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", cpu_getscanline());
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(0));
 }
 
 
@@ -609,9 +609,22 @@ static void generate_sound_irq(int state)
  *
  *************************************/
 
+static void behind_the_beam_update(int scanline_plus_interval);
+
+
 static MACHINE_START( itech8 )
 {
 	pia_config(0, PIA_STANDARD_ORDERING, &pia_interface);
+	return 0;
+}
+
+static MACHINE_START( sstrike )
+{
+	machine_start_itech8(machine);
+
+	/* we need to update behind the beam as well */
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 32, behind_the_beam_update);
+
 	return 0;
 }
 
@@ -664,7 +677,7 @@ static void behind_the_beam_update(int scanline_plus_interval)
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	timer_set(cpu_getscanlinetime(scanline), (scanline << 8) + interval, behind_the_beam_update);
+	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), (scanline << 8) + interval, behind_the_beam_update);
 }
 
 
@@ -776,7 +789,7 @@ static void delayed_sound_data_w(int data)
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	timer_set(TIME_NOW, data, delayed_sound_data_w);
+	mame_timer_set(time_zero, data, delayed_sound_data_w);
 }
 
 
@@ -787,7 +800,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	timer_set(TIME_NOW, data, delayed_sound_data_w);
+	mame_timer_set(time_zero, data, delayed_sound_data_w);
 }
 
 
@@ -1757,7 +1770,6 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 	MDRV_CPU_VBLANK_INT(generate_nmi,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int)(((263. - 240.) / 263.) * 1000000. / 60.)))
 
 	MDRV_MACHINE_START(itech8)
 	MDRV_MACHINE_RESET(itech8)
@@ -1910,6 +1922,15 @@ static MACHINE_DRIVER_START( slikshot_lo_noz80 )
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( sstrike )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(slikshot_lo)
+	MDRV_MACHINE_START(sstrike)
+
 MACHINE_DRIVER_END
 
 
@@ -2622,9 +2643,6 @@ static DRIVER_INIT( sstrike )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
 
 	slikshot_set_crosshair_range(186 - 40, 186 + 40);
-
-	/* we need to update behind the beam as well */
-	timer_set(cpu_getscanlinetime(0), 32, behind_the_beam_update);
 }
 
 
@@ -2696,7 +2714,7 @@ GAME( 1990, slikshot, 0,        slikshot_hi,       slikshot, slikshot, ROT90,  "
 GAME( 1990, sliksh17, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.7)", 0 )
 GAME( 1990, sliksh16, slikshot, slikshot_hi,       slikshot, slikshot, ROT90,  "Grand Products/Incredible Technologies", "Slick Shot (V1.6)", 0 )
 GAME( 1990, dynobop,  0,        slikshot_hi,       dynobop,  slikshot, ROT90,  "Grand Products/Incredible Technologies", "Dyno Bop", 0 )
-GAME( 1990, sstrike,  0,        slikshot_lo,       sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 )
+GAME( 1990, sstrike,  0,        sstrike,           sstrike,  sstrike,  ROT270, "Strata/Incredible Technologies", "Super Strike Bowling", 0 )
 GAME( 1991, pokrdice, 0,        slikshot_lo_noz80, pokrdice, 0,        ROT90,  "Strata/Incredible Technologies", "Poker Dice", 0 )
 
 /* Hot Shots Tennis-style PCB */

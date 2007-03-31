@@ -78,7 +78,7 @@ READ8_HANDLER( primo_be_1_r )
 	// bit 7, 6 - not used
 
 	// bit 5 - VBLANK
-	data |= (cpu_getvblank()) ? 0x20 : 0x00;
+	data |= (video_screen_get_vblank(0)) ? 0x20 : 0x00;
 
 	// bit 4 - I4 (external bus)
 

@@ -34,7 +34,7 @@ void s24_fd1094_setstate_and_decrypt(int state)
 	cpunum_set_info_int(1, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the s24_fd1094 state ready to decrypt.. */
-	state = fd1094_set_state(s24_fd1094_key,state);
+	state = fd1094_set_state(s24_fd1094_key,state) & 0xff;
 
 	/* first check the cache, if its cached we don't need to decrypt it, just copy */
 	for (i=0;i<S16_NUMCACHE;i++)

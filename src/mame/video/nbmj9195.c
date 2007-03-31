@@ -131,8 +131,7 @@ void nbmj9195_blitter_w(int vram, int offset, int data)
 					break;
 		case 0x01:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
-					new_line = cpu_getscanline();
-					if (new_line > SCANLINE_MAX) new_line = SCANLINE_MAX;
+					new_line = video_screen_get_vpos(0);
 					if (nbmj9195_flipscreen[vram])
 					{
 						for ( ; nbmj9195_scanline[vram] < new_line; nbmj9195_scanline[vram]++)
@@ -381,7 +380,9 @@ static void nbmj9195_gfxdraw(int vram)
 	}
 
 	nb19010_busyflag = 0;
-	timer_set((double)nb19010_busyctr * TIME_IN_NSEC(1650), 0, blitter_timer_callback);
+
+	/* 1650ns per count */
+	mame_timer_set(make_mame_time(0, nb19010_busyctr * 1650 * (MAX_SUBSECONDS / 1000000000)), 0, blitter_timer_callback);
 }
 
 /******************************************************************************

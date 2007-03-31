@@ -272,7 +272,7 @@ static void leland_vram_port_w(int offset, int data, int num)
 	/* if we're writing "behind the beam", make sure we've cached what was there */
 	if (addr < 0xf000)
 	{
-		int cur_scanline = cpu_getscanline();
+		int cur_scanline = video_screen_get_vpos(0);
 		int mod_scanline = addr / 256;
 
 		if (cur_scanline != next_update_scanline && mod_scanline < cur_scanline)
@@ -367,7 +367,7 @@ WRITE8_HANDLER( leland_mvram_port_w )
 {
 	if (sync_next_write)
 	{
-		timer_set(TIME_NOW, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+		mame_timer_set(time_zero, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
 		sync_next_write = 0;
 	}
 	else
@@ -418,7 +418,7 @@ WRITE8_HANDLER( ataxx_mvram_port_w )
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
 	if (sync_next_write)
 	{
-		timer_set(TIME_NOW, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
+		mame_timer_set(time_zero, 0x00000 | (offset << 8) | data, leland_delayed_mvram_w);
 		sync_next_write = 0;
 	}
 	else
@@ -477,7 +477,7 @@ VIDEO_EOF( leland )
 	update_for_scanline(VIDEO_HEIGHT * 8);
 
 	/* set a timer to go off at the top of the frame */
-	timer_set(cpu_getscanlinetime(0), 0, scanline_reset);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline_reset);
 }
 
 

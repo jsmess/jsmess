@@ -693,6 +693,14 @@ int scsicd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			break;
 
 		case SCSIOP_DELETE_INSTANCE:
+			instance = (SCSICd *)file;
+			if( instance->cdrom )
+			{
+			#ifndef MESS
+				cdrom_close(instance->cdrom);
+			#endif
+				instance->cdrom = (cdrom_file *)NULL;
+			}
 			free(file);
 			break;
 

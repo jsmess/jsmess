@@ -28,11 +28,23 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* forward reference */
 typedef struct _options_data options_data;
+
+typedef struct _options_data_link options_data_link;
+struct _options_data_link
+{
+	options_data_link *		next;				/* link to the next data */
+	const char *			name;				/* name under the current link */
+	options_data *			data;				/* link to actual data */
+};
+
+
+
 struct _options_data
 {
-	options_data *			next;				/* link to the next data */
 	const char *			names[MAX_ENTRY_NAMES]; /* array of possible names */
+	options_data *			next;				/* link to the next data */
 	UINT32					flags;				/* flags from the entry */
 	UINT32					seqid;				/* sequence ID; bumped on each change */
 	int						error_reported;		/* have we reported an error on this option yet? */
@@ -40,6 +52,17 @@ struct _options_data
 	const char *			defdata;			/* default data for this item */
 	const char *			description;		/* description for this item */
 	void					(*callback)(core_options *opts, const char *arg);	/* callback to be invoked when parsing */
+	options_data_link		links[MAX_ENTRY_NAMES]; /* array of links */
+};
+
+
+
+typedef struct _options_hash_header options_hash_header;
+struct _options_hash_header
+{
+	/* linked list containing option data */
+	options_data_link *datalist;
+	options_data_link **datalist_nextptr;
 };
 
 
@@ -49,9 +72,12 @@ struct _core_options
 	memory_pool *pool;
 	void (*output[OPTMSG_COUNT])(const char *s);
 
-	/* linked list containing option data */
+	/* linked list, for sequential iteration */
 	options_data *datalist;
 	options_data **datalist_nextptr;
+
+	/* hashtable, for fast lookup */
+	options_hash_header hashtable[101];
 };
 
 
@@ -112,6 +138,23 @@ static void message(core_options *opts, options_message msgtype, const char *for
 
 		opts->output[msgtype](buf);
 	}
+}
+
+
+
+/*-------------------------------------------------
+    hash_value - computes the hash value for a string
+-------------------------------------------------*/
+
+static UINT32 hash_value(core_options *opts, const char *str)
+{
+    UINT32 hash = 5381;
+    int c;
+
+    while((c = *str++) != '\0')
+        hash = ((hash << 5) + hash) + c;
+
+    return hash % ARRAY_LENGTH(opts->hashtable);
 }
 
 
@@ -198,6 +241,7 @@ core_options *options_create(void (*fail)(const char *message))
 {
 	memory_pool *pool;
 	core_options *opts;
+	int i;
 
 	/* create a pool for this option block */
 	pool = pool_create(fail);
@@ -213,6 +257,8 @@ core_options *options_create(void (*fail)(const char *message))
 	memset(opts, '\0', sizeof(*opts));
 	opts->pool = pool;
 	opts->datalist_nextptr = &opts->datalist;
+	for (i = 0; i < ARRAY_LENGTH(opts->hashtable); i++)
+		opts->hashtable[i].datalist_nextptr = &opts->hashtable[i].datalist;
 	return opts;
 
 error:
@@ -303,9 +349,29 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 			data->defdata = copy_string(opts, entrylist->defvalue, NULL);
 			data->description = entrylist->description;
 
-			/* fill it in and add to the end of the list */
+			/* fill it in and add to the end of each of the lists */
 			*(opts->datalist_nextptr) = data;
 			opts->datalist_nextptr = &data->next;
+			for (i = 0; i < ARRAY_LENGTH(data->names); i++)
+			{
+				if (data->names[i] != NULL)
+				{
+					int hash_entry;
+					options_hash_header *header;
+
+					/* set up link */
+					data->links[i].data = data;
+					data->links[i].name = data->names[i];
+
+					/* identify hash header */
+					hash_entry = hash_value(opts, data->names[i]);
+					header = &opts->hashtable[hash_entry];
+
+					/* and link in the link */
+					*(header->datalist_nextptr) = &data->links[i];
+					header->datalist_nextptr = &data->links[i].next;
+				}
+			}
 		}
 	}
 	return TRUE;
@@ -860,24 +926,30 @@ void options_set_float(core_options *opts, const char *name, float value)
 
 static options_data *find_entry_data(core_options *opts, const char *string, int is_command_line)
 {
-	options_data *data;
-	int has_no_prefix;
+	int hash_entry;
+	options_hash_header *header;
+	options_data_link *link;
 
-	/* determine up front if we should look for "no" boolean options */
-	has_no_prefix = (is_command_line && string[0] == 'n' && string[1] == 'o');
+	/* determine which hash entry we should be looking up under */
+	hash_entry = hash_value(opts, string);
+	header = &opts->hashtable[hash_entry];
 
 	/* scan all entries */
-	for (data = opts->datalist; data != NULL; data = data->next)
-		if (!(data->flags & OPTION_HEADER))
+	for (link = header->datalist; link != NULL; link = link->next)
+		if (!(link->data->flags & OPTION_HEADER))
 		{
-			const char *compareme = (has_no_prefix && (data->flags & OPTION_BOOLEAN)) ? &string[2] : &string[0];
-			int namenum;
-
-			/* loop over names */
-			for (namenum = 0; namenum < ARRAY_LENGTH(data->names); namenum++)
-				if (data->names[namenum] != NULL && strcmp(compareme, data->names[namenum]) == 0)
-					return data;
+			/* compare name */
+			if ((link->name != NULL) && strcmp(string, link->name) == 0)
+				return link->data;
 		}
+
+	/* havn't found it?  if we are prefixed with "no", then try to search for that */
+	if (is_command_line && string[0] == 'n' && string[1] == 'o')
+	{
+		options_data *data = find_entry_data(opts, &string[2], FALSE);
+		if ((data != NULL) && (data->flags & OPTION_BOOLEAN))
+			return data;
+	}
 
 	/* didn't find it at all */
 	return NULL;

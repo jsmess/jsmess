@@ -245,7 +245,7 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 	for (osc = 0; osc < 32; osc++)
 	{
 		char sname[32];
-		sprintf(sname, "ES5503 %d osc %d", sndindex, osc);
+		sprintf(sname, "SCSP %d osc %d", sndindex, osc);
 
 		state_save_register_item(sname, sndindex, chip->oscillators[osc].freq);
 		state_save_register_item(sname, sndindex, chip->oscillators[osc].wtsize);

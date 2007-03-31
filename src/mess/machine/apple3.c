@@ -257,8 +257,8 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 INTERRUPT_GEN( apple3_interrupt )
 {
 	via_set_input_ca2(1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
-	via_set_input_cb1(1, cpu_getvblank());
-	via_set_input_cb2(1, cpu_getvblank());
+	via_set_input_cb1(1, video_screen_get_vblank(0));
+	via_set_input_cb2(1, video_screen_get_vblank(0));
 }
 
 

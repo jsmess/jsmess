@@ -175,25 +175,11 @@ int cpu_scalebyfcount(int value);
 /***** video_screen_* functions in video.c for newer driviers. */
 /***** These functions may eventually go away. */
 
-/* Recomputes the scanling timing after, e.g., a visible area change */
-void cpu_compute_scanline_timing(void);
+/* Recomputes the VBLANK timing after, e.g., a visible area change */
+void cpu_compute_vblank_timing(void);
 
 /* Returns the number of the video frame we are currently playing */
 int cpu_getcurrentframe(void);
-
-/* Returns the current scanline number */
-int cpu_getscanline(void);
-
-/* Returns the amount of time until a given scanline */
-mame_time cpu_getscanlinetime_mt(int scanline);
-double cpu_getscanlinetime(int scanline);
-
-/* Returns the duration of a single scanline */
-mame_time cpu_getscanlineperiod_mt(void);
-double cpu_getscanlineperiod(void);
-
-/* Returns the current VBLANK state */
-int cpu_getvblank(void);
 
 
 

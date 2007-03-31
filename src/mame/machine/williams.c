@@ -255,7 +255,7 @@ static void williams_va11_callback(int scanline)
 	/* set a timer for the next update */
 	scanline += 8;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust(scanline_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -272,10 +272,10 @@ static void williams_count240_callback(int param)
 	pia_1_ca1_w(0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(cpu_getscanlinetime(0), 0, williams_count240_off_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, williams_count240_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust(scan240_timer, cpu_getscanlinetime(240), 0, 0);
+	mame_timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, time_zero);
 }
 
 
@@ -316,12 +316,12 @@ static void williams_common_init(void)
 	ticket_dispenser_init(70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(williams_va11_callback);
-	timer_adjust(scanline_timer, cpu_getscanlinetime(0), 0, 0);
+	scanline_timer = mame_timer_alloc(williams_va11_callback);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 
 	/* also set a timer to go off on scanline 240 */
-	scan240_timer = timer_alloc(williams_count240_callback);
-	timer_adjust(scan240_timer, cpu_getscanlinetime(240), 0, 0);
+	scan240_timer = mame_timer_alloc(williams_count240_callback);
+	mame_timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, time_zero);
 
 	state_save_register_global(vram_bank);
 }
@@ -356,7 +356,7 @@ static void williams2_va11_callback(int scanline)
 	/* set a timer for the next update */
 	scanline += 8;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust(scanline_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -373,10 +373,10 @@ static void williams2_endscreen_callback(int param)
 	pia_0_ca1_w(0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(cpu_getscanlinetime(8), 0, williams2_endscreen_off_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 8, 0), 0, williams2_endscreen_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust(scan254_timer, cpu_getscanlinetime(254), 0, 0);
+	mame_timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, time_zero);
 }
 
 
@@ -406,12 +406,12 @@ MACHINE_RESET( williams2 )
 	williams2_bank_select_w(0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(williams2_va11_callback);
-	timer_adjust(scanline_timer, cpu_getscanlinetime(0), 0, 0);
+	scanline_timer = mame_timer_alloc(williams2_va11_callback);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 
 	/* also set a timer to go off on scanline 254 */
-	scan254_timer = timer_alloc(williams2_endscreen_callback);
-	timer_adjust(scan254_timer, cpu_getscanlinetime(254), 0, 0);
+	scan254_timer = mame_timer_alloc(williams2_endscreen_callback);
+	mame_timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, time_zero);
 
 	state_save_register_global(vram_bank);
 	state_save_register_func_postload(williams2_postload);
@@ -486,12 +486,12 @@ static void williams_deferred_snd_cmd_w(int param)
 WRITE8_HANDLER( williams_snd_cmd_w )
 {
 	/* the high two bits are set externally, and should be 1 */
-	timer_set(TIME_NOW, data | 0xc0, williams_deferred_snd_cmd_w);
+	mame_timer_set(time_zero, data | 0xc0, williams_deferred_snd_cmd_w);
 }
 
 WRITE8_HANDLER( playball_snd_cmd_w )
 {
-	timer_set(TIME_NOW, data, williams_deferred_snd_cmd_w);
+	mame_timer_set(time_zero, data, williams_deferred_snd_cmd_w);
 }
 
 
@@ -502,7 +502,7 @@ static void williams2_deferred_snd_cmd_w(int param)
 
 static WRITE8_HANDLER( williams2_snd_cmd_w )
 {
-	timer_set(TIME_NOW, data, williams2_deferred_snd_cmd_w);
+	mame_timer_set(time_zero, data, williams2_deferred_snd_cmd_w);
 }
 
 
@@ -912,5 +912,5 @@ static WRITE8_HANDLER( joust2_snd_cmd_w )
 {
 	joust2_current_sound_data = (joust2_current_sound_data & ~0xff) | (data & 0xff);
 	williams_cvsd_data_w(joust2_current_sound_data);
-	timer_set(TIME_NOW, joust2_current_sound_data, joust2_deferred_snd_cmd_w);
+	mame_timer_set(time_zero, joust2_current_sound_data, joust2_deferred_snd_cmd_w);
 }

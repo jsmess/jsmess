@@ -29,14 +29,14 @@ static UINT8 video_control;
 /* microcode state */
 static struct
 {
-	UINT16	i;
-	UINT16	pc;
-	UINT8	r,g,b;
-	UINT8	x,xp,y,yp;
-	UINT8	cmd,cmdlo;
-	void *	timer;
-	UINT8	timer_active;
-	double	endtime;
+	UINT16		i;
+	UINT16		pc;
+	UINT8		r,g,b;
+	UINT8		x,xp,y,yp;
+	UINT8		cmd,cmdlo;
+	void *		timer;
+	UINT8		timer_active;
+	mame_time	endtime;
 } micro;
 
 
@@ -44,7 +44,7 @@ static struct
 /* from what I can tell, this should be divided by 32, not 8  */
 /* but the interrupt test does some precise timing, and fails */
 /* if it's not 8 */
-#define MICRO_STATE_CLOCK_PERIOD	TIME_IN_HZ(11827000/8)
+#define MICRO_STATE_CLOCK_PERIOD	MAME_TIME_IN_HZ(11827000/8)
 
 
 /* debugging constants */
@@ -97,7 +97,7 @@ VIDEO_START( victory )
 	update_complete = 0;
 	video_control = 0;
 	memset(&micro, 0, sizeof(micro));
-	micro.timer = timer_alloc(NULL);
+	micro.timer = mame_timer_alloc(NULL);
 
 	return 0;
 }
@@ -223,12 +223,12 @@ READ8_HANDLER( victory_video_control_r )
 			// D5 = 5VIRQ
 			// D4 = 5BCIRQ (3B1)
 			// D3 = SL256
-			if (micro.timer_active && timer_timeelapsed(micro.timer) < micro.endtime)
+			if (micro.timer_active && compare_mame_times(mame_timer_timeelapsed(micro.timer), micro.endtime) < 0)
 				result |= 0x80;
 			result |= (~fgcoll & 1) << 6;
 			result |= (~vblank_irq & 1) << 5;
 			result |= (~bgcoll & 1) << 4;
-			result |= (cpu_getscanline() & 0x100) >> 5;
+			result |= (video_screen_get_vpos(0) & 0x100) >> 5;
 			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", activecpu_get_previouspc(), result);
 			return result;
 
@@ -557,20 +557,22 @@ Registers:
 
 INLINE void count_states(int states)
 {
+	mame_time state_time = make_mame_time(0, mame_time_to_subseconds(MICRO_STATE_CLOCK_PERIOD) * states);
+
 	if (!micro.timer)
 	{
-		timer_adjust(micro.timer, TIME_NEVER, 0, 0);
+		mame_timer_adjust(micro.timer, time_never, 0, time_zero);
 		micro.timer_active = 1;
-		micro.endtime = (double)states * MICRO_STATE_CLOCK_PERIOD;
+		micro.endtime = state_time;
 	}
-	else if (timer_timeelapsed(micro.timer) > micro.endtime)
+	else if (compare_mame_times(mame_timer_timeelapsed(micro.timer), micro.endtime) > 0)
 	{
-		timer_adjust(micro.timer, TIME_NEVER, 0, 0);
+		mame_timer_adjust(micro.timer, time_never, 0, time_zero);
 		micro.timer_active = 1;
-		micro.endtime = (double)states * MICRO_STATE_CLOCK_PERIOD;
+		micro.endtime = state_time;
 	}
 	else
-		micro.endtime += (double)states * MICRO_STATE_CLOCK_PERIOD;
+		micro.endtime = add_mame_times(micro.endtime, state_time);
 }
 
 
@@ -1133,21 +1135,6 @@ static void update_foreground(void)
 }
 
 
-/*************************************
- *
- *  Determine the time when the beam
- *  will intersect a given pixel
- *
- *************************************/
-
-static double pixel_time(int x, int y)
-{
-	/* assuming this is called at refresh time, compute how long until we
-     * hit the given x,y position */
-	return cpu_getscanlinetime(y) + (cpu_getscanlineperiod() * (double)x * (1.0 / 256.0));
-}
-
-
 static void bgcoll_irq_callback(int param)
 {
 	bgcollx = param & 0xff;
@@ -1195,7 +1182,7 @@ VIDEO_EOF( victory )
 			int fpix = *fg++;
 			int bpix = bg[(x + scrollx) & 255];
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				timer_set(pixel_time(x, y), x | (y << 8), bgcoll_irq_callback);
+				mame_timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
 		}
 	}
 }
@@ -1233,7 +1220,7 @@ VIDEO_UPDATE( victory )
 			int bpix = bg[(x + scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				timer_set(pixel_time(x, y), x | (y << 8), bgcoll_irq_callback);
+				mame_timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
 		}
 
 		/* draw the scanline */

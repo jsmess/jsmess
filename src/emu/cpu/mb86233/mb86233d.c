@@ -1,9 +1,13 @@
-#include "mb86233.h"
 #include "debugger.h"
+#include "mb86233.h"
 
 static char * COND(unsigned int cond)
 {
-	static char buf[256];
+	static char bufs[4][256];
+	static int bufindex = 0;
+	char *buf = &bufs[bufindex++][0];
+
+	bufindex &= 3;
 
     switch(cond)
     {
@@ -16,11 +20,11 @@ static char * COND(unsigned int cond)
 			return buf;
 
 		case 0x01:
-			sprintf(buf,"le");
+			sprintf(buf,"ge");
 			return buf;
 
 		case 0x02:
-			sprintf(buf,"ge");
+			sprintf(buf,"le");
 			return buf;
 
 		case 0x06:
@@ -32,11 +36,7 @@ static char * COND(unsigned int cond)
 			return buf;
 
 		case 0x11:
-			sprintf(buf,"gt");
-			return buf;
-
-		case 0x12:
-			sprintf(buf,"lt");
+			sprintf(buf,"(--r13)!=0");
 			return buf;
     }
 
@@ -46,8 +46,12 @@ static char * COND(unsigned int cond)
 
 static char * REGS( UINT32 reg, int IsSource )
 {
-	static char buf[256];
-    int			mode = (reg >> 6 ) & 0x07;
+	static char bufs[4][256];
+	static int bufindex = 0;
+	char *buf = &bufs[bufindex++][0];
+	int			mode = (reg >> 6 ) & 0x07;
+
+	bufindex &= 3;
 
 	reg &= 0x3f;
 
@@ -101,8 +105,20 @@ static char * REGS( UINT32 reg, int IsSource )
 				sprintf(buf,"p");
 			break;
 
+			case 0x1d:
+				sprintf(buf,"p.e");
+			break;
+
+			case 0x1e:
+				sprintf(buf,"p.m");
+			break;
+
 			case 0x1f:
 				sprintf(buf,"shift");
+			break;
+
+			case 0x20:
+				sprintf(buf,"parport");
 			break;
 
 			case 0x21:
@@ -177,8 +193,12 @@ static char * REGS( UINT32 reg, int IsSource )
 
 static char * INDIRECT( UINT32 reg, int IsSource )
 {
-    static char buf[256];
+    static char bufs[4][256];
+	static int bufindex = 0;
+	char *buf = &bufs[bufindex++][0];
 	int			mode = ( reg >> 6 ) & 0x07;
+
+	bufindex &= 3;
 
     if ( mode == 0 || mode == 3 || mode == 1)
     {
@@ -192,14 +212,14 @@ static char * INDIRECT( UINT32 reg, int IsSource )
 
 		if ( IsSource )
 		{
-			if ( reg & 0x80 )
+			if ( !(reg & 0x20) )
 				p += sprintf(p,"r0+");
 
 			p += sprintf(p,"r2");
 		}
 		else
 		{
-			if ( reg & 0x80 )
+			if ( !(reg & 0x20) )
 				p += sprintf(p,"r1+");
 
 			p += sprintf(p,"r3");
@@ -240,11 +260,15 @@ static char * INDIRECT( UINT32 reg, int IsSource )
 
 static char * ALU( UINT32 alu)
 {
-	 static char buf[256];
+	static char bufs[4][256];
+	static int bufindex = 0;
+	char *buf = &bufs[bufindex++][0];
+
+	bufindex &= 3;
 
     switch( alu )
     {
-		case 0x0:	//nop
+		case 0x0:
 			buf[0] = 0;
 	    break;
 
@@ -254,6 +278,10 @@ static char * ALU( UINT32 alu)
 
 		case 0x2:
 			sprintf(buf,"d=d|a");
+	    break;
+
+	    case 0x3:
+			sprintf(buf,"d=d^a");
 	    break;
 
 		case 0x5:
@@ -308,20 +336,24 @@ static char * ALU( UINT32 alu)
 			sprintf(buf,"d=-d");
 	    break;
 
+	    case 0x13:
+			sprintf(buf,"d=a+b");
+	    break;
+
 		case 0x14:
 			sprintf(buf,"d=b-a");
 	    break;
 
 		case 0x16:
-			sprintf(buf,"d=d>>shft ??");
+			sprintf(buf,"d=(lsr d,shift)");
 	    break;
 
 		case 0x17:
-			sprintf(buf,"d=d<<shft");
+			sprintf(buf,"d=(lsl d,shift)");
 	    break;
 
 		case 0x18:
-			sprintf(buf,"d=d>>shft (ex)");
+			sprintf(buf,"d=(asr d,shift)");
 	    break;
 
 		case 0x1a:
@@ -340,29 +372,34 @@ static char * ALU( UINT32 alu)
 	return buf;
 }
 
-offs_t dasm_mb86233(char *buffer, UINT32 opcode )
+unsigned dasm_mb86233(char *buffer, UINT32 opcode )
 {
 	char *p = buffer;
 	UINT32	grp = ( opcode >> 26 ) & 0x3f;
 
 	switch( grp )
 	{
-		case 0x0:	//Dual move
+		case 0x0:	/* Dual move */
 		{
 			UINT32 r1=opcode & 0x1ff;
 			UINT32 r2=(opcode>>9) & 0x7f;
 			UINT32 alu=(opcode>>21) & 0x1f;
 			UINT32 op=(opcode>>16) & 0x1f;
 
-			p += sprintf(p, "%s, ", ALU(alu) );
+			if ( alu != 0 )
+				p += sprintf(p, "%s, ", ALU(alu) );
 
 			switch( op )
 			{
-				case 0xc:	/* a = RAM[addr], b = BRAM[addr] */
+				case 0x0c:	/* a = RAM[addr], b = BRAM[addr] */
 					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(0x%x)->b",r1,r2);
 				break;
 
-				case 0xf:	/* a = RAM[addr], b = BRAM[reg] */
+				case 0x0d:	/* a = RAM[addr], b = BRAM[addr] */
+					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(2<<6),0));
+				break;
+
+				case 0x0f:	/* a = RAM[addr], b = BRAM[reg] */
 					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(6<<6),0));
 				break;
 
@@ -377,17 +414,20 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 		}
 		break;
 
-	    case 0x7:	// LD/MOV
+	    case 0x7:	/* LD/MOV */
 		{
 		    UINT32 r1=opcode & 0x1ff;
 			UINT32 r2=(opcode>>9) & 0x7f;
 			UINT32 alu=(opcode>>21) & 0x1f;
 			UINT32 op=(opcode>>16) & 0x1f;
 
-			p += sprintf(p, "%s", ALU(alu) );
+			if ( alu != 0 )
+			{
+				p += sprintf(p, "%s", ALU(alu) );
 
-			if ( !(op == 0x1f && r1 == 0x10 && r2 == 0x0f) )
-				p += sprintf(p, ", ");
+				if ( !(op == 0x1f && r1 == 0x10 && r2 == 0x0f) )
+					p += sprintf(p, ", ");
+			}
 
 		    switch(op)
 		    {
@@ -411,18 +451,8 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 
 				case 0x08:	/* External->RAM */
 				{
-					int mode = ( r1 >> 6 ) & 0x07;
-
 					p += sprintf(p,"MOV EXT(EB+");
-
-					if ( mode == 0 || mode == 3 || mode == 1 )
-						p += sprintf(p,"RAM(");
-
 					p += sprintf(p,"%s",INDIRECT(r1,1));
-
-					if ( mode == 0 || mode == 3 || mode == 1)
-						p += sprintf(p,")");
-
 				    p += sprintf(p,")->RAM(0x%x)",r2);
 				}
 			    break;
@@ -453,7 +483,7 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 					p += sprintf(p,"MOV RAM(%s)->BRAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
 				break;
 
-				case 0x10:	//MOV BRAMInd->RAM
+				case 0x10:	/* MOV BRAMInd->RAM */
 					p += sprintf(p,"MOV BRAM(%s)->RAM(0x%x)",INDIRECT(r1,1),r2);
 				break;
 
@@ -462,42 +492,40 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 				break;
 
 				case 0x1c:  /* MOV Reg->RAMInd */
-					p += sprintf(p,"MOV %s->RAM(%s)",REGS(r2,1),INDIRECT(r1,0));
+					if ( ( r2 >> 6 ) & 0x01)
+					{
+						p += sprintf(p,"MOV %s->EXT(EB+%s)",REGS(r2,1),INDIRECT(r1,0));
+					}
+					else
+					{
+						p += sprintf(p,"MOV %s->RAM(%s)",REGS(r2,1),INDIRECT(r1,0));
+					}
 			    break;
 
 				case 0x1d:	/* MOV RAM->Reg */
+				{
 					if ( r1 & 0x180 )
 					{
-						p += sprintf(p,"MOV RAM(%s)->%s",REGS(r1,1),REGS(r2,0));
+						p += sprintf(p,"MOV RAM(%s)->%s",REGS(r1,0),REGS(r2,0));
 					}
 					else
 					{
 						p += sprintf(p,"MOV RAM(0x%x)->%s",r1,REGS(r2,0));
 					}
+				}
 			    break;
 
 				case 0x1e:	/* External->Reg */
 				{
-					int mode = ( r1 >> 6 ) & 0x07;
-
-					p += sprintf(p,"MOV EXT(EB+");
-
-					if ( mode == 0 || mode == 3 || mode == 1 )
-						p += sprintf(p,"RAM(");
-
-					p += sprintf(p,"%s",INDIRECT(r1,1));
-
-					if ( mode == 0 || mode == 3 || mode == 1)
-						p += sprintf(p,")");
-
-					p += sprintf(p,")->%s",REGS(r2,0));
+					int		mode2 = (r2 >> 6) & 1;
+					p += sprintf(p,"MOV EXT(EB+%s)->%s",INDIRECT(r1,mode2),REGS(r2,0));
 				}
 			    break;
 
 				case 0x1f:	/* MOV Reg->Reg */
 					if ( !(r1 == 0x10 && r2 == 0x0f) )
 					{
-						p += sprintf(p,"MOV %s->%s",REGS(r1,1),REGS(2,0));
+						p += sprintf(p,"MOV %s->%s",REGS(r1,1),REGS(r2,0));
 					}
 				break;
 
@@ -519,7 +547,11 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 
 		case 0x0f:	/* repeat */
 		{
-			UINT32	sub2 = ( opcode >> 16 ) & 0xf;
+			UINT32	alu = ( opcode >> 20 ) & 0x1f;
+			UINT32	sub2 = ( opcode >> 16 ) & 0x0f;
+
+			if ( alu != 0 )
+				p += sprintf(p, "%s, ", ALU(alu) );
 
 			if ( sub2 == 0x00 )
 			{
@@ -535,7 +567,12 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 			else if ( sub2 == 0x02 )
 				p += sprintf(p,"CLRFLAG 0x%x",opcode&0xffff);
 			else if ( sub2==0x4 )
-				p += sprintf(p,"REP 0x%x",opcode&0xfff);
+			{
+				if ( (opcode & 0xff) == 0 )
+					p += sprintf(p,"REP 0x100");
+				else
+					p += sprintf(p,"REP 0x%x",opcode&0xff);
+			}
 			else if ( sub2 == 0x06 )
 				p += sprintf(p,"SETFLAG 0x%x",opcode&0xffff);
 		}
@@ -560,6 +597,7 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 		    p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
 
 			if ( sub == 0 ) p += sprintf(p,"r12");
+			else if ( sub == 1 ) p += sprintf(p,"r13");
 			else p += sprintf(p,"UNKREG(%x)", sub);
 		}
 		break;
@@ -729,5 +767,5 @@ offs_t dasm_mb86233(char *buffer, UINT32 opcode )
 		break;
 	}
 
-	return (4 | DASMFLAG_SUPPORTED);
+	return (1 | DASMFLAG_SUPPORTED);
 }

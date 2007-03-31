@@ -127,13 +127,13 @@ static void capbowl_update(int scan)
 	video_screen_update_partial(0, scan - 1);
 	scan += 32;
 	if (scan > 240) scan = 32;
-	timer_set(cpu_getscanlinetime(scan), scan, capbowl_update);
+	mame_timer_set(video_screen_get_time_until_pos(0, scan, 0), scan, capbowl_update);
 }
 
 
 static MACHINE_RESET( capbowl )
 {
-	timer_set(cpu_getscanlinetime(32), 32, capbowl_update);
+	mame_timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, capbowl_update);
 }
 
 
@@ -356,7 +356,6 @@ static MACHINE_DRIVER_START( capbowl )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(5000))
 
 	MDRV_MACHINE_RESET(capbowl)
 	MDRV_NVRAM_HANDLER(capbowl)

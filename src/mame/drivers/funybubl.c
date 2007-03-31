@@ -30,9 +30,9 @@ todo :
 |A    6116                    A1020B  6116 |
 |M    6116         UM6264             6116 |
 |M                                         |
-|A                                         |
+|A SW2* SW4*                               |
 |                                          |
-|  SW1                       UG13     UG16 |
+|  SW1  SW3*                 UG13     UG16 |
 ++       UB16                UH13     UG16 |
  |       UM6264              UG15     UG17 |
  |       Z80  30MHz  12MHZ   UH15     UH17 |
@@ -41,6 +41,8 @@ todo :
    Z80: ZiLOG Z0840006PSC (6MHz rated) - Both Z80s
 A1020B: Actel A1020B PL84C
  M6295: OKI M6295 (badged as AD-65)
+
+Note: SW2, SW3 & SW4 not populated
 
 */
 
@@ -196,8 +198,6 @@ INPUT_PORTS_START( funybubl )
 	PORT_DIPNAME( 0x80, 0x00, "Nudity" )
 	PORT_DIPSETTING(    0x80, "Semi" )
 	PORT_DIPSETTING(    0x00, "Full" )
-
-	/* Looks like the PCB shows an empty DSW 2 location */
 INPUT_PORTS_END
 
 

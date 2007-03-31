@@ -94,7 +94,23 @@ static READ16_HANDLER( es5503_word_lsb_r )
 static WRITE16_HANDLER( es5503_word_lsb_w )
 {
 	if (ACCESSING_LSB)
+	{
+		// 5503 ROM is banked by the output channel (it's a handy 4-bit output from the 5503)
+		if (offset < 0xe0)
+		{
+			// if it's an oscillator control register
+			if ((offset & 0xe0) == 0xa0)
+			{
+				// if not writing a "halt", set the bank
+				if (!(data & 1))
+				{
+					ES5503_set_base_0(memory_region(REGION_SOUND1) + ((data>>4)*0x10000));
+				}
+			}
+		}
+
 		ES5503_reg_0_w(offset, data);
+	}
 }
 
 
@@ -312,10 +328,18 @@ static struct CustomSound_interface amiga_custom_interface =
 static struct ES5503interface es5503_intf =
 {
 	NULL,
+	NULL,
 	NULL
 };
 
 
+static MACHINE_RESET(mquake)
+{
+	/* set ES5503 wave memory (this is banked in 64k increments) */
+	ES5503_set_base_0(memory_region(REGION_SOUND1));
+
+	machine_reset_amiga(machine);
+}
 
 /*************************************
  *
@@ -333,7 +357,7 @@ static MACHINE_DRIVER_START( mquake )
 	MDRV_SCREEN_REFRESH_RATE(59.997)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
 
-	MDRV_MACHINE_RESET(amiga)
+	MDRV_MACHINE_RESET(mquake)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
     /* video hardware */
@@ -357,9 +381,11 @@ static MACHINE_DRIVER_START( mquake )
 	MDRV_SOUND_ROUTE(2, "right", 0.50)
 	MDRV_SOUND_ROUTE(3, "left", 0.50)
 
-	MDRV_SOUND_ADD(ES5503, 7159090)
+	MDRV_SOUND_ADD(ES5503, 7159090)		/* ES5503 is likely mono due to channel strobe used as bank select */
 	MDRV_SOUND_CONFIG(es5503_intf)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
+	MDRV_SOUND_ROUTE(0, "right", 0.50)
+	MDRV_SOUND_ROUTE(1, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END
 

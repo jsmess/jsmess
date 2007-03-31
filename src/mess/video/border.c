@@ -65,7 +65,7 @@ void draw_border(mame_bitmap *bitmap,
 	if (NumItems)
 	{
 			int CyclesPerFrame = (int)(Machine->drv->cpu[0].cpu_clock / Machine->screen[0].refresh);
-			logerror ("Event count = %d, curr cycle = %ld, total cycles = %ld \n", (int) NumItems, (long) TIME_TO_CYCLES(0,cpu_getscanline()*cpu_getscanlineperiod()), (long) CyclesPerFrame);
+			logerror ("Event count = %d, curr cycle = %ld, total cycles = %ld \n", (int) NumItems, (long) TIME_TO_CYCLES(0,video_screen_get_vpos(0)*mame_time_to_double(video_screen_get_scan_period(0))), (long) CyclesPerFrame);
 	}
 	for (Count = 0; Count < NumItems; Count++)
 	{
@@ -346,5 +346,5 @@ void draw_border(mame_bitmap *bitmap,
 
 	/* Assume all other routines have processed their data from the list */
 	EventList_Reset();
-	EventList_SetOffsetStartTime ( TIME_TO_CYCLES(0,cpu_getscanline()*cpu_getscanlineperiod()) );
+	EventList_SetOffsetStartTime ( TIME_TO_CYCLES(0,video_screen_get_vpos(0)*mame_time_to_double(video_screen_get_scan_period(0))) );
 }

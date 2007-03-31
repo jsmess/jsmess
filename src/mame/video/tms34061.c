@@ -117,7 +117,7 @@ int tms34061_start(struct tms34061_interface *interface)
 	tms34061.regs[TMS34061_VERCOUNTER]   = 0x0000;
 
 	/* start vertical interrupt timer */
-	tms34061.timer = timer_alloc(tms34061_interrupt);
+	tms34061.timer = mame_timer_alloc(tms34061_interrupt);
 	return 0;
 }
 
@@ -143,27 +143,10 @@ INLINE void update_interrupts(void)
 }
 
 
-INLINE double get_verint_scanline_time(void)
-{
-	int scanline = tms34061.regs[TMS34061_VERINT] - tms34061.regs[TMS34061_VERENDBLNK];
-	double result;
-
-	if (scanline < 0)
-		scanline += tms34061.regs[TMS34061_VERTOTAL];
-
-	/* we fire at the HBLANK signal */
-	result = cpu_getscanlinetime(scanline) + cpu_getscanlineperiod() * 0.9;
-	if (result < cpu_getscanlineperiod() * 10)
-		result += SUBSECONDS_TO_DOUBLE(Machine->screen[0].refresh);
-
-	return result;
-}
-
-
 static void tms34061_interrupt(int param)
 {
 	/* set timer for next frame */
-	timer_adjust(tms34061.timer, get_verint_scanline_time(), 0, 0);
+	mame_timer_adjust(tms34061.timer, video_screen_get_frame_period(tms34061.intf.scrnum), 0, time_zero);
 
 	/* set the interrupt bit in the status reg */
 	tms34061.regs[TMS34061_STATUS] |= 1;
@@ -182,12 +165,13 @@ static void tms34061_interrupt(int param)
 
 static WRITE8_HANDLER( register_w )
 {
+	int scanline;
 	int regnum = offset >> 2;
 
 	/* certain registers affect the display directly */
 	if ((regnum >= TMS34061_HORENDSYNC && regnum <= TMS34061_DISPSTART) ||
 		(regnum == TMS34061_CONTROL2))
-		video_screen_update_partial(0, cpu_getscanline());
+		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* store the hi/lo half */
 	if (offset & 0x02)
@@ -196,14 +180,19 @@ static WRITE8_HANDLER( register_w )
 		tms34061.regs[regnum] = (tms34061.regs[regnum] & 0xff00) | data;
 
 	/* log it */
-	if (VERBOSE) logerror("%04X:tms34061 %s = %04X\n", activecpu_get_pc(), regnames[regnum], tms34061.regs[regnum]);
+	if (VERBOSE) logerror("%04X:tms34061 %s = %04x\n", activecpu_get_pc(), regnames[regnum], tms34061.regs[regnum]);
 
 	/* update the state of things */
 	switch (regnum)
 	{
 		/* vertical interrupt: adjust the timer */
 		case TMS34061_VERINT:
-			timer_adjust(tms34061.timer, get_verint_scanline_time(), 0, 0);
+			scanline = tms34061.regs[TMS34061_VERINT] - tms34061.regs[TMS34061_VERENDBLNK];
+
+			if (scanline < 0)
+				scanline += tms34061.regs[TMS34061_VERTOTAL];
+
+			mame_timer_adjust(tms34061.timer, video_screen_get_time_until_pos(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0, time_zero);
 			break;
 
 		/* XY offset: set the X and Y masks */
@@ -261,7 +250,7 @@ static READ8_HANDLER( register_r )
 
 		/* vertical count register: return the current scanline */
 		case TMS34061_VERCOUNTER:
-			result = (cpu_getscanline() + tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
+			result = (video_screen_get_vpos(0)+ tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
 			break;
 	}
 

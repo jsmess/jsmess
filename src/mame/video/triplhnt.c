@@ -132,7 +132,7 @@ static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect
 
 	if (hit_line != 999 && hit_code != 999)
 	{
-		timer_set(cpu_getscanlinetime(hit_line), hit_code, triplhnt_hit_callback);
+		mame_timer_set(video_screen_get_time_until_pos(0, hit_line, 0), hit_code, triplhnt_hit_callback);
 	}
 }
 

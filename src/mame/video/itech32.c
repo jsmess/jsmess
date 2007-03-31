@@ -231,7 +231,7 @@ VIDEO_START( itech32 )
 	/* reset statics */
 	memset(itech32_video, 0, 0x80);
 
-	scanline_timer = timer_alloc(scanline_interrupt);
+	scanline_timer = mame_timer_alloc(scanline_interrupt);
 	enable_latch[0] = 1;
 	enable_latch[1] = (itech32_planes > 1) ? 1 : 0;
 
@@ -479,10 +479,10 @@ static void update_interrupts(int fast)
 static void scanline_interrupt(int param)
 {
 	/* set timer for next frame */
-	timer_adjust(scanline_timer, cpu_getscanlinetime(VIDEO_INTSCANLINE), 0, 0);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, time_zero);
 
 	/* set the interrupt bit in the status reg */
-	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", cpu_getscanline());
+	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", video_screen_get_vpos(0));
 	VIDEO_INTSTATE |= VIDEOINT_SCANLINE;
 
 	/* update the interrupt state */
@@ -1285,6 +1285,8 @@ static void handle_video_command(void)
 
 WRITE16_HANDLER( itech32_video_w )
 {
+	rectangle visarea;
+
 	int old = itech32_video[offset];
 	COMBINE_DATA(&itech32_video[offset]);
 
@@ -1345,7 +1347,40 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x2c/2:	/* VIDEO_INTSCANLINE */
-			timer_adjust(scanline_timer, cpu_getscanlinetime(VIDEO_INTSCANLINE), 0, 0);
+			mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, time_zero);
+			break;
+
+		case 0x32/2:	/* VIDEO_VTOTAL */
+		case 0x36/2:	/* VIDEO_VBLANK_START */
+		case 0x38/2:	/* VIDEO_VBLANK_END */
+		case 0x3a/2:	/* VIDEO_HTOTAL */
+		case 0x3e/2:	/* VIDEO_HBLANK_START */
+		case 0x40/2:	/* VIDEO_HBLANK_END */
+			/* do some sanity checks first */
+			if ((VIDEO_HTOTAL > 0) && (VIDEO_VTOTAL > 0) &&
+			    (VIDEO_VBLANK_START != VIDEO_VBLANK_END) &&
+			    (VIDEO_HBLANK_START != VIDEO_HBLANK_END) &&
+			    (VIDEO_HBLANK_START < VIDEO_HTOTAL) &&
+			    (VIDEO_HBLANK_END < VIDEO_HTOTAL) &&
+			    (VIDEO_VBLANK_START < VIDEO_VTOTAL) &&
+			    (VIDEO_VBLANK_END < VIDEO_VTOTAL))
+			{
+				visarea.min_x = visarea.min_y = 0;
+
+				if (VIDEO_HBLANK_START > VIDEO_HBLANK_END)
+					visarea.max_x = VIDEO_HBLANK_START - VIDEO_HBLANK_END - 1;
+				else
+					visarea.max_x = VIDEO_HTOTAL - VIDEO_HBLANK_END + VIDEO_HBLANK_START - 1;
+
+				if (VIDEO_VBLANK_START > VIDEO_VBLANK_END)
+					visarea.max_y = VIDEO_VBLANK_START - VIDEO_VBLANK_END - 1;
+				else
+					visarea.max_y = VIDEO_VTOTAL - VIDEO_VBLANK_END + VIDEO_VBLANK_START - 1;
+
+				logerror("Configure Screen: HTOTAL: %x  HBSTART: %x  HBEND: %x  VTOTAL: %x  VBSTART: %x  VBEND: %x\n",
+					VIDEO_HTOTAL, VIDEO_HBLANK_START, VIDEO_HBLANK_END, VIDEO_VTOTAL, VIDEO_VBLANK_START, VIDEO_VBLANK_END);
+				video_screen_configure(0, VIDEO_HTOTAL, VIDEO_VTOTAL, &visarea, Machine->screen[0].refresh);
+			}
 			break;
 	}
 }
@@ -1359,7 +1394,7 @@ READ16_HANDLER( itech32_video_r )
 	}
 	else if (offset == 3)
 	{
-		return 0xef;/*cpu_getscanline() - 1;*/
+		return 0xef;/*video_screen_get_vpos(0) - 1;*/
 	}
 
 	return itech32_video[offset];

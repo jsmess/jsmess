@@ -186,7 +186,9 @@ void stvcd_reset(void)
 	// open device
 	if (cdrom)
 	{
+#ifndef MESS
 		cdrom_close(cdrom);
+#endif
 		cdrom = (cdrom_file *)NULL;
 	}
 

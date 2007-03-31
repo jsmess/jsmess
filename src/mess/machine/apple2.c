@@ -756,7 +756,7 @@ void apple2_interrupt(void)
 
 	profiler_mark(PROFILER_A2INT);
 
-	scanline = cpu_getscanline();
+	scanline = video_screen_get_vpos(0);
 
 	if (scanline > 190)
 	{
@@ -882,7 +882,7 @@ READ8_HANDLER ( apple2_c01x_r )
 		case 0x06:			result |= (a2 & VAR_ALTZP)		? 0x80 : 0x00;	break;
 		case 0x07:			result |= (a2 & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
 		case 0x08:			result |= (a2 & VAR_80STORE)	? 0x80 : 0x00;	break;
-		case 0x09:			result |= !cpu_getvblank()		? 0x80 : 0x00;	break;
+		case 0x09:			result |= !video_screen_get_vblank(0)		? 0x80 : 0x00;	break;
 		case 0x0A:			result |= (a2 & VAR_TEXT)		? 0x80 : 0x00;	break;
 		case 0x0B:			result |= (a2 & VAR_MIXED)		? 0x80 : 0x00;	break;
 		case 0x0C:			result |= (a2 & VAR_PAGE2)		? 0x80 : 0x00;	break;

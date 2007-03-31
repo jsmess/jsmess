@@ -902,6 +902,42 @@ static ADDRESS_MAP_START( racknrol_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( ckongg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+
+	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x9000, 0x93ff) AM_READ(galaxian_videoram_r)
+	AM_RANGE(0x9800, 0x98ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)
+	AM_RANGE(0xc400, 0xc400) AM_READ(input_port_1_r)
+	AM_RANGE(0xc800, 0xc800) AM_READ(input_port_2_r)
+	AM_RANGE(0xcc00, 0xcc00) AM_READ(watchdog_reset_r)
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ckongg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x9000, 0x93ff) AM_WRITE(galaxian_videoram_w) AM_BASE(&galaxian_videoram)
+	AM_RANGE(0x9800, 0x983f) AM_WRITE(galaxian_attributesram_w) AM_BASE(&galaxian_attributesram)
+	AM_RANGE(0x9840, 0x985f) AM_WRITE(MWA8_RAM) AM_BASE(&galaxian_spriteram) AM_SIZE(&galaxian_spriteram_size)
+	AM_RANGE(0x9860, 0x987f) AM_WRITE(MWA8_RAM) AM_BASE(&galaxian_bulletsram) AM_SIZE(&galaxian_bulletsram_size)
+	AM_RANGE(0x9880, 0x98ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xc001) AM_WRITE(galaxian_leds_w)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE(galaxian_coin_lockout_w)
+	AM_RANGE(0xc003, 0xc003) AM_WRITE(galaxian_coin_counter_w)
+	AM_RANGE(0xc004, 0xc007) AM_WRITE(galaxian_lfo_freq_w)
+	AM_RANGE(0xc400, 0xc402) AM_WRITE(galaxian_background_enable_w)
+	AM_RANGE(0xc403, 0xc403) AM_WRITE(galaxian_noise_enable_w)
+	AM_RANGE(0xc405, 0xc405) AM_WRITE(galaxian_shoot_enable_w)
+	AM_RANGE(0xc406, 0xc407) AM_WRITE(galaxian_vol_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(galaxian_nmi_enable_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(MWA8_NOP) // link cut
+	AM_RANGE(0xc806, 0xc806) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0xc807, 0xc807) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(galaxian_pitch_w)
+ADDRESS_MAP_END
+
 static READ8_HANDLER( hexpoola_data_port_r )
 {
 	switch (activecpu_get_pc())
@@ -3510,6 +3546,44 @@ INPUT_PORTS_START( luctoday )
    PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( ckongg )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+//      PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ) )
+
+	PORT_START_TAG("DSW0")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x08, "500000" )
+	PORT_DIPSETTING(    0x00, "750000" )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 static const gfx_layout galaxian_charlayout =
 {
@@ -4243,6 +4317,19 @@ static MACHINE_DRIVER_START( racknrol )
 
 	MDRV_SOUND_ADD(SN76496, 18432000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( ckongg )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(galaxian)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(ckongg_readmem,ckongg_writemem)
+
+	MDRV_GFXDECODE(gmgalax_gfxdecodeinfo)
+
+	MDRV_VIDEO_START(ckongs)
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hexpoola )
@@ -6152,6 +6239,38 @@ ROM_START( catacomb )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( ckongg )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_LOAD( "ck1.bin",       0x2400, 0x0400, CRC(a4323b94) SHA1(1fed47e1df5efa8f40585bedab07b60067edc2bb) )
+	ROM_CONTINUE(              0x1C00, 0x0400)
+	ROM_CONTINUE(              0x4800, 0x0400)
+	ROM_CONTINUE(              0x0C00, 0x0400)
+	ROM_LOAD( "ck2.bin",       0x4400, 0x0400, CRC(1e532996) SHA1(fe1feeca347fccd266925614a46c98cff683f5d3) )
+	ROM_CONTINUE(              0x0000, 0x0400)
+	ROM_CONTINUE(              0x1800, 0x0400)
+	ROM_CONTINUE(              0x2800, 0x0400)
+	ROM_LOAD( "ck3.bin",       0x3400, 0x0400, CRC(65157cde) SHA1(572b9bd56894600e21220356d0bf193c7920672c) )
+	ROM_CONTINUE(              0x4c00, 0x0400)
+	ROM_CONTINUE(              0x5000, 0x0400)
+	ROM_CONTINUE(              0x0400, 0x0400)
+	ROM_LOAD( "ck4.bin",       0x2000, 0x0400, CRC(43827bc6) SHA1(a2ca9afff0dd1bdcfc3a6ead9ff30b7c91caa7ea) )
+	ROM_CONTINUE(              0x3800, 0x0400)
+	ROM_CONTINUE(              0x1000, 0x0400)
+	ROM_CONTINUE(              0x4000, 0x0400)
+	ROM_LOAD( "ck5.bin",       0x0800, 0x0400, CRC(a74ed96e) SHA1(1e845d693a728fea9d52953b5493ec98fdec63e3) )
+	ROM_CONTINUE(              0x5400, 0x0400)  // fill
+	ROM_CONTINUE(              0x2c00, 0x0400)
+	ROM_CONTINUE(              0x1400, 0x0400)
+	ROM_LOAD( "ck7.bin",       0x3000, 0x0400, CRC(2c4d8129) SHA1(ab1708ff72ee027106fe8da0caea03a796b3212b) )
+	ROM_CONTINUE(              0x3c00, 0x0400)
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "ckvid10.bin",   0x0000, 0x1000, CRC(7866d2cb) SHA1(62dd8b80bc0459c7337d8a8cb83e53b999e7f4a9) )
+	ROM_LOAD( "ckvid7.bin",    0x1000, 0x1000, CRC(7311a101) SHA1(49d54c8b94cae4ba81d7a7684eaa4e87815bb4da) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "ck_cp.bin",     0x0000, 0x0020, CRC(7e0b79cb) SHA1(72ef3eb5f09e10c13dcf6fd568a6d16658055a16) )
+ROM_END
 
 GAME( 1979, galaxian, 0,        galaxian, galaxian, 0,        ROT90,  "Namco", "Galaxian (Namco set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxiaj, galaxian, galaxian, superg,   0,        ROT90,  "Namco", "Galaxian (Namco set 2)", GAME_SUPPORTS_SAVE )
@@ -6245,3 +6364,4 @@ GAME( 1985, trvchlng, 0,        racknrol, trvchlng, 0,	      ROT90,  "Joyland (S
 GAME( 1980, luctoday, 0,        galaxian, luctoday, 0,        ROT270, "Sigma", "Lucky Today",GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, chewing,  0,        galaxian, luctoday, 0,        ROT90,  "unknown", "Chewing Gum", GAME_SUPPORTS_SAVE )
 GAME( 1982, catacomb, 0,        galaxian, catacomb, 0,        ROT90,  "MTM Games", "Catacomb", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1981, ckongg,   0,        ckongg  , ckongg,   0,        ROT90,  "bootleg", "Crazy Kong (galaxian)", GAME_SUPPORTS_SAVE )

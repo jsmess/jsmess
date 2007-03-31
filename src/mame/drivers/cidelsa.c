@@ -220,7 +220,10 @@ static ADDRESS_MAP_START( destryer_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(cidelsa_input_port_0_r, destryer_out1_w)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
 	AM_RANGE(0x03, 0x03) AM_WRITE(cdp1869_out3_w)
-	AM_RANGE(0x04, 0x07) AM_WRITE(cdp1869_out_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(cdp1869_out4_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(cdp1869_out5_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(cdp1869_out6_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(cdp1869_out7_w)
 ADDRESS_MAP_END
 
 // Altair
@@ -236,8 +239,10 @@ static ADDRESS_MAP_START( altair_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(cidelsa_input_port_0_r, altair_out1_w)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
 	AM_RANGE(0x03, 0x03) AM_WRITE(cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_2_r)
-	AM_RANGE(0x04, 0x07) AM_WRITE(cdp1869_out_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_2_r, cdp1869_out4_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(cdp1869_out5_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(cdp1869_out6_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(cdp1869_out7_w)
 ADDRESS_MAP_END
 
 // Draco
@@ -253,8 +258,10 @@ static ADDRESS_MAP_START( draco_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(cidelsa_input_port_0_r, draco_out1_w)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
 	AM_RANGE(0x03, 0x03) AM_WRITE(cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_2_r)
-	AM_RANGE(0x04, 0x07) AM_WRITE(cdp1869_out_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_2_r, cdp1869_out4_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(cdp1869_out5_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(cdp1869_out6_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(cdp1869_out7_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

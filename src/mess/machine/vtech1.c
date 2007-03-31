@@ -483,7 +483,7 @@ READ8_HANDLER(vtech1_keyboard_r)
 			data &= readinputportbytag(portname);
 	}
 	
-    if (cpu_getscanline() >= 16*12)
+    if (video_screen_get_vpos(0) >= 16*12)
         data &= ~0x80;
 
 	/* cassette input is bit 5 (0x40) */

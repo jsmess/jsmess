@@ -477,9 +477,7 @@ READ32_HANDLER( n64_vi_reg_r )
 			return vi_intr;
 
 		case 0x10/4:		// VI_CURRENT_REG
-		{
-			return cpu_getscanline();
-		}
+			return video_screen_get_vpos(0);
 
 		case 0x14/4:		// VI_BURST_REG
 			return vi_burst;

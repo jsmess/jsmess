@@ -18,7 +18,7 @@ WRITE8_HANDLER( mcr_ipu_sio_transmit );
 
 /*----------- defined in machine/mcr.c -----------*/
 
-extern double mcr68_timing_factor;
+extern mame_time mcr68_timing_factor;
 
 extern struct z80_irq_daisy_chain mcr_daisy_chain[];
 extern struct z80_irq_daisy_chain mcr_ipu_daisy_chain[];

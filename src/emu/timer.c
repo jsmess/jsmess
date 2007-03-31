@@ -749,6 +749,23 @@ int mame_timer_enable(mame_timer *which, int enable)
 }
 
 
+/*-------------------------------------------------
+    timer_get_param
+    timer_get_param_ptr - returns the callback
+    parameter of a timer
+-------------------------------------------------*/
+
+int mame_timer_get_param(mame_timer *which)
+{
+	return which->callback_param;
+}
+
+
+void *mame_timer_get_param_ptr(mame_timer *which)
+{
+	return which->callback_ptr_param;
+}
+
 
 /***************************************************************************
     TIMING FUNCTIONS

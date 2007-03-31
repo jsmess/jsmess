@@ -17,7 +17,6 @@ UINT8 *tubep_backgroundram;
 UINT8 *tubep_sprite_colorsharedram;
 
 static UINT8 *spritemap;
-static UINT8 *dirtybuff;
 static UINT8 prom2[32];
 
 /* Globals */
@@ -447,24 +446,12 @@ PALETTE_INIT( tubep )
 }
 
 
-static void tubep_postload(void)
-{
-	memset(dirtybuff,1,0x800/2);
-}
-
-
 VIDEO_START( tubep )
 {
-	dirtybuff = auto_malloc(0x800/2);
-	memset(dirtybuff,1,0x800/2);
-
 	spritemap = auto_malloc(256*256*2);
 	memset(spritemap,0,256*256*2);
 
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-
 	/* Set up save state */
-	state_save_register_func_postload(tubep_postload);
 	state_save_register_global(romD_addr);
 	state_save_register_global(romEF_addr);
 	state_save_register_global(E16_add_b);
@@ -492,11 +479,7 @@ VIDEO_START( tubep )
 
 WRITE8_HANDLER( tubep_textram_w )
 {
-	if (tubep_textram[offset] != data)
-	{
-		dirtybuff[offset/2] = 1;
-		tubep_textram[offset] = data;
-	}
+	tubep_textram[offset] = data;
 }
 
 
@@ -509,11 +492,7 @@ WRITE8_HANDLER( tubep_background_romselect_w )
 
 WRITE8_HANDLER( tubep_colorproms_A4_line_w )
 {
-	if (color_A4 != ((data & 1)<<4))
-	{
-		color_A4 = (data & 1)<<4;
-		memset(dirtybuff,1,0x800/2);
-	}
+	color_A4 = (data & 1)<<4;
 }
 
 
@@ -685,28 +664,6 @@ VIDEO_UPDATE( tubep )
 {
 	int offs;
 
-	for (offs = 0;offs < 0x800; offs+=2)
-	{
-		if (dirtybuff[offs/2])
-		{
-			int sx,sy;
-
-			dirtybuff[offs/2] = 0;
-
-			sx = (offs/2) % 32;
-			//if (flipscreen[0]) sx = 31 - sx;
-			sy = (offs/2) / 32;
-			//if (flipscreen[1]) sy = 31 - sy;
-
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					tubep_textram[offs],
-					((tubep_textram[offs+1]) & 0x0f) | color_A4,
-					0,0, /*flipscreen[0],flipscreen[1],*/
-					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		}
-	}
-
 	/* draw background ram */
 	{
 		pen_t *pens = &Machine->pens[ 32 ]; //change it later
@@ -778,8 +735,24 @@ VIDEO_UPDATE( tubep )
 		}
 	}
 
-	/* copy the character mapped graphics */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0] );
+	/* draw the character mapped graphics */
+	for (offs = 0;offs < 0x800; offs+=2)
+	{
+		int sx,sy;
+
+		sx = (offs/2) % 32;
+		//if (flipscreen[0]) sx = 31 - sx;
+		sy = (offs/2) / 32;
+		//if (flipscreen[1]) sy = 31 - sy;
+
+		drawgfx(bitmap,Machine->gfx[0],
+				tubep_textram[offs],
+				((tubep_textram[offs+1]) & 0x0f) | color_A4,
+				0,0, /*flipscreen[0],flipscreen[1],*/
+				8*sx,8*sy,
+				&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0]);
+	}
+
 	return 0;
 }
 
@@ -804,29 +777,6 @@ WRITE8_HANDLER( rjammer_background_page_w )
 VIDEO_UPDATE( rjammer )
 {
 	int offs;
-
-	for (offs = 0;offs < 0x800; offs+=2)
-	{
-		if (dirtybuff[offs/2])
-		{
-			int sx,sy;
-
-			dirtybuff[offs/2] = 0;
-
-			sx = (offs/2) % 32;
-			//if (flipscreen[0]) sx = 31 - sx;
-			sy = (offs/2) / 32;
-			//if (flipscreen[1]) sy = 31 - sy;
-
-			drawgfx(tmpbitmap,Machine->gfx[0],
-					tubep_textram[offs],
-					(tubep_textram[offs+1]) & 0x0f,
-					0,0, /*flipscreen[0],flipscreen[1],*/
-					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		}
-	}
-
 
 	/* draw background ram */
 	{
@@ -948,8 +898,23 @@ VIDEO_UPDATE( rjammer )
 		}
 	}
 
-	/* copy the character mapped graphics */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0] );
+	/* draw the character mapped graphics */
+	for (offs = 0;offs < 0x800; offs+=2)
+	{
+		int sx,sy;
+
+		sx = (offs/2) % 32;
+		//if (flipscreen[0]) sx = 31 - sx;
+		sy = (offs/2) / 32;
+		//if (flipscreen[1]) sy = 31 - sy;
+
+		drawgfx(bitmap,Machine->gfx[0],
+				tubep_textram[offs],
+				(tubep_textram[offs+1]) & 0x0f,
+				0,0, /*flipscreen[0],flipscreen[1],*/
+				8*sx,8*sy,
+				&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0]);
+	}
 
 	return 0;
 }

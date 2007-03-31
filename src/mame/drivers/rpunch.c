@@ -187,7 +187,7 @@ static void sound_command_w_callback(int data)
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_LSB)
-		timer_set(TIME_NOW, data & 0xff, sound_command_w_callback);
+		mame_timer_set(time_zero, data & 0xff, sound_command_w_callback);
 }
 
 
@@ -625,7 +625,6 @@ static MACHINE_DRIVER_START( rpunch )
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(rpunch)
 

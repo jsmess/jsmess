@@ -28,6 +28,7 @@ static void generate_interrupt(int state)
 
 static struct tms34061_interface tms34061intf =
 {
+	0,						/* the screen we are acting on */
 	8,						/* VRAM address is (row << rowshift) | col */
 	0x10000,				/* size of video RAM */
 	generate_interrupt		/* interrupt gen callback */

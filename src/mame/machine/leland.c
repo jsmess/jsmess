@@ -361,7 +361,7 @@ MACHINE_START( leland )
 	battery_ram = auto_malloc(LELAND_BATTERY_RAM_SIZE);
 
 	/* start scanline interrupts going */
-	master_int_timer = timer_alloc(leland_interrupt_callback);
+	master_int_timer = mame_timer_alloc(leland_interrupt_callback);
 
 	return 0;
 }
@@ -369,7 +369,7 @@ MACHINE_START( leland )
 
 MACHINE_RESET( leland )
 {
-	timer_adjust(master_int_timer, cpu_getscanlinetime(8), 8, 0);
+	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, time_zero);
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
@@ -416,7 +416,7 @@ MACHINE_START( ataxx )
 	extra_tram = auto_malloc(ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
-	master_int_timer = timer_alloc(ataxx_interrupt_callback);
+	master_int_timer = mame_timer_alloc(ataxx_interrupt_callback);
 
 	return 0;
 }
@@ -425,7 +425,7 @@ MACHINE_START( ataxx )
 MACHINE_RESET( ataxx )
 {
 	memset(extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
-	timer_adjust(master_int_timer, cpu_getscanlinetime(8), 8, 0);
+	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, time_zero);
 
 	/* initialize the XROM */
 	xrom_length = memory_region_length(REGION_USER1);
@@ -478,7 +478,7 @@ static void leland_interrupt_callback(int scanline)
 	scanline += 16;
 	if (scanline > 248)
 		scanline = 8;
-	timer_adjust(master_int_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -491,7 +491,7 @@ static void ataxx_interrupt_callback(int scanline)
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	timer_adjust(master_int_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -1276,7 +1276,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x08:	/*  */
-			timer_adjust(master_int_timer, cpu_getscanlinetime(data + 1), data + 1, 0);
+			mame_timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, data + 1, 0), data + 1, time_zero);
 			break;
 
 		default:
@@ -1466,8 +1466,7 @@ WRITE8_HANDLER( ataxx_slave_banksw_w )
 
 READ8_HANDLER( leland_raster_r )
 {
-	int scanline = cpu_getscanline();
-	return (scanline < 255) ? scanline : 255;
+	return video_screen_get_vpos(0);
 }
 
 

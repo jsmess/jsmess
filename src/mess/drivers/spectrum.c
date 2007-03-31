@@ -192,7 +192,7 @@ static WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		EventList_AddItemOffset(0x0fe, data & 0x07, TIME_TO_CYCLES(0,cpu_getscanline()*cpu_getscanlineperiod()));
+		EventList_AddItemOffset(0x0fe, data & 0x07, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*mame_time_to_double(video_screen_get_scan_period(0))));
 	}
 
 	if ((Changed & (1<<4))!=0)
@@ -332,7 +332,7 @@ static  READ8_HANDLER ( spectrum_port_r )
 		if ((offset & 0xff)==0xdf)
 			return spectrum_port_df_r(offset);
 
-		return cpu_getscanline()<193 ? spectrum_colorram[(cpu_getscanline()&0xf8)<<2]:0xff;
+		return video_screen_get_vpos(0)<193 ? spectrum_colorram[(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
 }
 
 static WRITE8_HANDLER ( spectrum_port_w )
@@ -475,7 +475,7 @@ static  READ8_HANDLER ( spectrum_128_port_r )
 	 if ((offset & 0xff)==0xdf)
 		 return spectrum_port_df_r(offset);
 
-	 return cpu_getscanline()<193 ? spectrum_128_screen_location[0x1800|(cpu_getscanline()&0xf8)<<2]:0xff;
+	 return video_screen_get_vpos(0)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
 }
 
 static WRITE8_HANDLER ( spectrum_128_port_w )
@@ -761,7 +761,7 @@ static  READ8_HANDLER ( spectrum_plus3_port_r )
 		 }
 	 }
 
-	 return cpu_getscanline()<193 ? spectrum_128_screen_location[0x1800|(cpu_getscanline()&0xf8)<<2]:0xff;
+	 return video_screen_get_vpos(0)<193 ? spectrum_128_screen_location[0x1800|(video_screen_get_vpos(0)&0xf8)<<2]:0xff;
 }
 
 static WRITE8_HANDLER ( spectrum_plus3_port_w )

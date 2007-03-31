@@ -279,10 +279,10 @@ WRITE8_HANDLER ( videoULA_w )
 
 	// emulation refresh optimisation
 	video_refresh=1;
-	video_screen_update_partial(0, cpu_getscanline() - 1);
+	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 
 //	logerror("setting videoULA %s at %.4x size:%.4x\n",image_filename(image), addr, size);
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,cpu_getscanline() );
+	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,video_screen_get_vpos(0) );
 
 
 	switch (offset&0x01)

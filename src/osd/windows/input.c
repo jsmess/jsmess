@@ -41,6 +41,7 @@
 #include "debugwin.h"
 #include "video.h"
 #include "strconv.h"
+#include "config.h"
 
 #ifdef MESS
 #include "uimess.h"
@@ -1711,24 +1712,24 @@ usage:
 static void extract_input_config(void)
 {
 	// extract boolean options
-	win_use_mouse = options_get_bool(mame_options(), "mouse");
-	use_joystick = options_get_bool(mame_options(), "joystick");
-	use_lightgun = options_get_bool(mame_options(), "lightgun");
-	use_lightgun_dual = options_get_bool(mame_options(), "dual_lightgun");
-	use_lightgun_reload = options_get_bool(mame_options(), "offscreen_reload");
-	steadykey = options_get_bool(mame_options(), "steadykey");
-	joy_deadzone = options_get_float(mame_options(), "joy_deadzone");
-	joy_saturation = options_get_float(mame_options(), "joy_saturation");
+	win_use_mouse = options_get_bool(mame_options(), WINOPTION_MOUSE);
+	use_joystick = options_get_bool(mame_options(), WINOPTION_JOYSTICK);
+	use_lightgun = options_get_bool(mame_options(), WINOPTION_LIGHTGUN);
+	use_lightgun_dual = options_get_bool(mame_options(), WINOPTION_DUAL_LIGHTGUN);
+	use_lightgun_reload = options_get_bool(mame_options(), WINOPTION_OFFSCREEN_RELOAD);
+	steadykey = options_get_bool(mame_options(), WINOPTION_STEADYKEY);
+	joy_deadzone = options_get_float(mame_options(), WINOPTION_JOY_DEADZONE);
+	joy_saturation = options_get_float(mame_options(), WINOPTION_JOY_SATURATION);
 
-	parse_analog_select(ANALOG_TYPE_PADDLE, "paddle_device");
-	parse_analog_select(ANALOG_TYPE_ADSTICK, "adstick_device");
-	parse_analog_select(ANALOG_TYPE_PEDAL, "pedal_device");
-	parse_analog_select(ANALOG_TYPE_DIAL, "dial_device");
-	parse_analog_select(ANALOG_TYPE_TRACKBALL, "trackball_device");
-	parse_analog_select(ANALOG_TYPE_LIGHTGUN, "lightgun_device");
-	parse_analog_select(ANALOG_TYPE_POSITIONAL, "positional_device");
+	parse_analog_select(ANALOG_TYPE_PADDLE, WINOPTION_PADDLE_DEVICE);
+	parse_analog_select(ANALOG_TYPE_ADSTICK, WINOPTION_ADSTICK_DEVICE);
+	parse_analog_select(ANALOG_TYPE_PEDAL, WINOPTION_PEDAL_DEVICE);
+	parse_analog_select(ANALOG_TYPE_DIAL, WINOPTION_DIAL_DEVICE);
+	parse_analog_select(ANALOG_TYPE_TRACKBALL, WINOPTION_TRACKBALL_DEVICE);
+	parse_analog_select(ANALOG_TYPE_LIGHTGUN, WINOPTION_LIGHTGUN_DEVICE);
+	parse_analog_select(ANALOG_TYPE_POSITIONAL, WINOPTION_POSITIONAL_DEVICE);
 #ifdef MESS
-	parse_analog_select(ANALOG_TYPE_MOUSE, "mouse_device");
+	parse_analog_select(ANALOG_TYPE_MOUSE, WINOPTION_MOUSE_DEVICE);
 #endif
 	parse_digital("digital");
 

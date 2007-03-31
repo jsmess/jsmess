@@ -275,7 +275,7 @@ static void vi_callback(int scanline)
 {
 	cpu_irq_state |= 1;
 	update_cpu_irq();
-	timer_adjust(vi_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -626,7 +626,8 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return video_screen_get_hpos(0) % (Machine->screen[0].width / 2);
 
 		case VC:
-			return cpu_getscanline() * 2 + gpu_regs[VBE];
+			return video_screen_get_vpos(0) * 2 + gpu_regs[VBE];
+
 	}
 
 	return gpu_regs[offset];
@@ -645,7 +646,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 		{
 			case VI:
 				scanline = (gpu_regs[VI] - gpu_regs[VBE]) / 2;
-				timer_adjust(vi_timer, cpu_getscanlinetime(scanline), scanline, 0);
+				mame_timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 				break;
 
 			case INT1:
@@ -732,7 +733,7 @@ VIDEO_START( cojag )
 
 	pen_table = auto_malloc(65536 * sizeof(pen_t));
 
-	vi_timer = timer_alloc(vi_callback);
+	vi_timer = mame_timer_alloc(vi_callback);
 
 	state_save_register_global_pointer(pen_table, 65536);
 	state_save_register_global_array(blitter_regs);

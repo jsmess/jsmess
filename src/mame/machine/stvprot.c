@@ -25,6 +25,9 @@
  The protection addresses are in the A-Bus area, this should map to the cartridge slot,
  is there something special in these game cartridges?
 
+ Astra Superstars data were extracted from Saturn version of the game. It is not known if
+ protection device has data stored inside, or they are read from roms (using decryption/decompression)
+
 */
 
 /****************************************************************************************
@@ -286,6 +289,40 @@ void install_standard_protection(void)
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x04fffff0, 0x04ffffff, 0, 0, a_bus_ctrl_w);
 }
 
+READ32_HANDLER(astrass_prot_r)
+{
+	if ( offset == 3 && ctrl_index != -1 )
+	{
+		UINT32 data = 0;
+		UINT32 *prot_data = (UINT32 *)memory_region(REGION_USER2);
+
+		data = prot_data[ctrl_index++];
+
+		if ( ctrl_index >= memory_region_length(REGION_USER2)/4 )
+		{
+			ctrl_index = -1;
+		}
+
+		return data;
+	}
+	return a_bus[offset];
+}
+
+WRITE32_HANDLER(astrass_prot_w)
+{
+	COMBINE_DATA(&a_bus[0 + offset]);
+	if ( offset == 3 )
+	{
+		ctrl_index = 0;
+	}
+}
+
+void install_astrass_protection(void)
+{
+	ctrl_index = -1;
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x4fffff0, 0x4ffffff, 0, 0, astrass_prot_r);
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x04fffff0, 0x04ffffff, 0, 0, astrass_prot_w);
+}
 
 
 /* Decathlete seems to be a variation on this ... not understood */

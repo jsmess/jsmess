@@ -595,7 +595,7 @@ INTERRUPT_GEN( namcos2_68k_master_vblank )
 	if( namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] )
 	{
 		int scanline = GetPosIRQScanline();
-		timer_set( cpu_getscanlinetime(scanline), scanline, namcos2_68k_master_posirq );
+		mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_master_posirq );
 	}
 	cpunum_set_input_line( CPU_MASTER, namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
@@ -611,7 +611,7 @@ INTERRUPT_GEN( namcos2_68k_slave_vblank )
 	if( namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] )
 	{
 		int scanline = GetPosIRQScanline();
-		timer_set( cpu_getscanlinetime(scanline), scanline, namcos2_68k_slave_posirq );
+		mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_slave_posirq );
 	}
 	cpunum_set_input_line( CPU_SLAVE, namcos2_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }

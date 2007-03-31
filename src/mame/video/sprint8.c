@@ -150,9 +150,7 @@ VIDEO_EOF( sprint8 )
 		{
 			if (p1[x] != 16 && p2[x] != 16)
 			{
-				double time = cpu_getscanlinetime(y + 24) + x / 11055000.0;
-
-				timer_set(time, p1[x], sprint8_collision_callback);
+				mame_timer_set(video_screen_get_time_until_pos(0, y + 24, x), p1[x], sprint8_collision_callback);
 			}
 		}
 	}

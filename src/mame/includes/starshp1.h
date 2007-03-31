@@ -1,3 +1,32 @@
+/*
+ *  The schematics don't seem to make a lot of sense when it
+ *  comes to the video timing chain::
+ *
+ *    * there are clear typos -- what is H132???
+ *    * there are two HBLANK/HSYNC periods as the horizontal
+ *      chain is drawn, which would give an alternating long
+ *      line followed by a much shorter one.  This cannot be right
+ *    * the carry-out/load circuit on LS161@J8 is superflous
+ *
+ *  These values also give a frame rate of about 45Hz, which is
+ *  probably too low.  I suspect that screen is not really
+ *  512 pixels wide -- most likely 384, which would give 60Hz
+ *
+ *  Some of the graphics, like the starfield, is clocked with the
+ *  12MHz signal, effecitvely doubling the horizontal resolution
+ */
+
+#define STARSHP1_MASTER_CLOCK		(12096000)
+#define STARSHP1_CPU_CLOCK			(STARSHP1_MASTER_CLOCK / 16)
+#define STARSHP1_PIXEL_CLOCK		(STARSHP1_MASTER_CLOCK / 2)
+#define STARSHP1_HTOTAL				(0x200)
+#define STARSHP1_HBEND				(0x000)
+#define STARSHP1_HBSTART			(0x200)
+#define STARSHP1_VTOTAL				(0x106)
+#define STARSHP1_VBEND				(0x000)
+#define STARSHP1_VBSTART			(0x0f0)
+
+
 /*----------- defined in drivers/starshp1.c -----------*/
 
 extern int starshp1_attract;

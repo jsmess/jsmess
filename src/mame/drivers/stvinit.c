@@ -796,7 +796,7 @@ DRIVER_INIT( astrass )
 
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0608e4d8, 0x0608e4db, 0, 0, astrass_speedup_r );
 
-	install_standard_protection();
+	install_astrass_protection();
 
 	init_ic13(machine);
 }

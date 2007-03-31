@@ -13,8 +13,6 @@ static tilemap *background_layer,*foreground_layer,*text_layer;
 UINT16 *toki_background1_videoram16;
 UINT16 *toki_background2_videoram16;
 UINT16 *toki_scrollram16;
-static unsigned int toki_background_xscroll[256];
-static unsigned int toki_foreground_xscroll[256];
 
 /*************************************************************************
                     RASTER EFFECTS
@@ -34,37 +32,13 @@ remove all the code writing the $a0000 area.)
 
 WRITE16_HANDLER( toki_control_w )
 {
-	int currline = cpu_getscanline();
-
 	COMBINE_DATA(&toki_scrollram16[offset]);
 
-	/* Keep a per-scanline record of X scroll offsets */
-	if (offset==0x15 || offset==0x16)
-		toki_foreground_xscroll[currline%256]=((toki_scrollram16[0x16] &0x7f) << 1)
-								 |((toki_scrollram16[0x16] &0x80) >> 7)
-								 |((toki_scrollram16[0x15] &0x10) << 4);
-
-	if (offset==0x05 || offset==0x06)
-		toki_background_xscroll[currline%256]=((toki_scrollram16[0x06] &0x7f) << 1)
-								 |((toki_scrollram16[0x06] &0x80) >> 7)
-								 |((toki_scrollram16[0x05] &0x10) << 4);
+	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 }
 
-/* At EOF clear the previous frames scroll registers */
 VIDEO_EOF( toki )
 {
-	int i;
-
-	toki_background_xscroll[0]=((toki_scrollram16[0x16] &0x7f) << 1)
-								 |((toki_scrollram16[0x16] &0x80) >> 7)
-								 |((toki_scrollram16[0x15] &0x10) << 4);
-	toki_foreground_xscroll[0]=((toki_scrollram16[0x06] &0x7f) << 1)
-								 |((toki_scrollram16[0x06] &0x80) >> 7)
-								 |((toki_scrollram16[0x05] &0x10) << 4);
-
-	for (i=1; i<256; i++)
-		toki_background_xscroll[i]=toki_foreground_xscroll[i]=0xffff;
-
 	buffer_spriteram16_w(0,0,0);
 }
 
@@ -131,8 +105,6 @@ VIDEO_START( toki )
 	tilemap_set_transparent_pen(text_layer,15);
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
-	tilemap_set_scroll_rows(foreground_layer,512);
-	tilemap_set_scroll_rows(background_layer,512);
 
 	return 0;
 }
@@ -302,24 +274,23 @@ void tokib_draw_sprites (mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_UPDATE( toki )
 {
-	int i,background_y_scroll,foreground_y_scroll,latch1,latch2;
+	int background_y_scroll,foreground_y_scroll,background_x_scroll,foreground_x_scroll;
 
+	background_x_scroll=((toki_scrollram16[0x06] &0x7f) << 1)
+								 |((toki_scrollram16[0x06] &0x80) >> 7)
+								 |((toki_scrollram16[0x05] &0x10) << 4);
 	background_y_scroll=((toki_scrollram16[0x0d]&0x10)<<4)+((toki_scrollram16[0x0e]&0x7f)<<1)+((toki_scrollram16[0x0e]&0x80)>>7);
-	foreground_y_scroll=((toki_scrollram16[0x1d]&0x10)<<4)+((toki_scrollram16[0x1e]&0x7f)<<1)+((toki_scrollram16[0x1e]&0x80)>>7);
+
+	tilemap_set_scrollx( background_layer, 0, background_x_scroll );
 	tilemap_set_scrolly( background_layer, 0, background_y_scroll );
+
+	foreground_x_scroll= ((toki_scrollram16[0x16] &0x7f) << 1)
+								 |((toki_scrollram16[0x16] &0x80) >> 7)
+								 |((toki_scrollram16[0x15] &0x10) << 4);
+	foreground_y_scroll=((toki_scrollram16[0x1d]&0x10)<<4)+((toki_scrollram16[0x1e]&0x7f)<<1)+((toki_scrollram16[0x1e]&0x80)>>7);
+
+	tilemap_set_scrollx( foreground_layer, 0, foreground_x_scroll );
 	tilemap_set_scrolly( foreground_layer, 0, foreground_y_scroll );
-
-	latch1=toki_background_xscroll[0];
-	latch2=toki_foreground_xscroll[0];
-	for (i=0; i<256; i++) {
-		if (toki_background_xscroll[i]!=0xffff)
-			latch1=toki_background_xscroll[i];
-		if (toki_foreground_xscroll[i]!=0xffff)
-			latch2=toki_foreground_xscroll[i];
-
-		tilemap_set_scrollx( background_layer, (i+background_y_scroll)%512, latch1 );
-		tilemap_set_scrollx( foreground_layer, (i+foreground_y_scroll)%512, latch2 );
-	}
 
 	flip_screen_set((toki_scrollram16[0x28]&0x8000)==0);
 

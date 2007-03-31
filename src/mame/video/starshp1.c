@@ -87,8 +87,10 @@ VIDEO_START( starshp1 )
 READ8_HANDLER( starshp1_rng_r )
 {
 	int x = video_screen_get_hpos(0);
-	int y = cpu_getscanline();
+	int y = video_screen_get_vpos(0);
 
+	/* the LFSR is only running in the non-blank region
+       of the screen, so this is not quite right */
 	if (x > Machine->screen[0].width - 1)
 		x = Machine->screen[0].width - 1;
 	if (y > Machine->screen[0].height - 1)

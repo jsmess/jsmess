@@ -867,7 +867,7 @@ static void coco3_raise_interrupt(UINT8 mask, int state)
 			coco3_recalc_irq();
 
 			if (LOG_INT_COCO3)
-				logerror("CoCo3 Interrupt: Raising IRQ; scanline=%i\n", cpu_getscanline());
+				logerror("CoCo3 Interrupt: Raising IRQ; scanline=%i\n", video_screen_get_vpos(0));
 		}
 		if ((coco3_gimereg[0] & 0x10) && (coco3_gimereg[3] & mask))
 		{
@@ -875,7 +875,7 @@ static void coco3_raise_interrupt(UINT8 mask, int state)
 			coco3_recalc_firq();
 
 			if (LOG_INT_COCO3)
-				logerror("CoCo3 Interrupt: Raising FIRQ; scanline=%i\n", cpu_getscanline());
+				logerror("CoCo3 Interrupt: Raising FIRQ; scanline=%i\n", video_screen_get_vpos(0));
 		}
 	}
 }
@@ -1326,7 +1326,7 @@ static UINT8 coco_update_keyboard(void)
 			break;
 
 		case INPUTDEVICE_DIECOM_LIGHTGUN:
-			if( (cpu_getscanline() == readinputportbytag_safe("dclg_y", 0)) )
+			if( (video_screen_get_vpos(0) == readinputportbytag_safe("dclg_y", 0)) )
 			{
 				/* If gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				dclg_output_h |= 0x02;
@@ -1339,7 +1339,7 @@ static UINT8 coco_update_keyboard(void)
 			if( (dclg_state == 7) )
 			{
 				/* While in state 7, prepare to chech next video frame for a hit */
-				dclg_time = cpu_getscanlinetime_mt( readinputportbytag_safe("dclg_y", 0));
+				dclg_time = video_screen_get_time_until_pos(0, readinputportbytag_safe("dclg_y", 0), 0);
 			}
 			
 			break;

@@ -6,6 +6,22 @@
 
 #include "sound/custom.h"
 
+
+#define EXIDY_MASTER_CLOCK				(11289000)
+#define EXIDY_CPU_CLOCK					(EXIDY_MASTER_CLOCK / 16)
+#define EXIDY_PIXEL_CLOCK				(EXIDY_MASTER_CLOCK / 2)
+#define EXIDY_HTOTAL					(0x150)
+#define EXIDY_HBEND						(0x000)
+#define EXIDY_HBSTART					(0x100)
+#define EXIDY_HSEND						(0x140)
+#define EXIDY_HSSTART					(0x120)
+#define EXIDY_VTOTAL					(0x118)
+#define EXIDY_VBEND						(0x000)
+#define EXIDY_VBSTART					(0x100)
+#define EXIDY_VSEND						(0x108)
+#define EXIDY_VSSTART					(0x100)
+
+
 /*----------- defined in audio/exidy.c -----------*/
 
 void *exidy_sh_start(int clock, const struct CustomSound_interface *config);

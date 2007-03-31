@@ -38,7 +38,7 @@ VIDEO_UPDATE( apple2gs )
 	const UINT8 *vram;
 	UINT16 *scanline;
 	UINT8 scb, b;
-	int i, j, row, col, palette;
+	int i, row, col, palette;
 	UINT16 last_pixel = 0, pixel;
 	rectangle new_cliprect;
 

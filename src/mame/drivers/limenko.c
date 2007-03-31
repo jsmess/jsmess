@@ -24,6 +24,7 @@
 */
 
 #include "driver.h"
+#include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
 static tilemap *bg_tilemap, *md_tilemap, *fg_tilemap;
@@ -96,6 +97,11 @@ static WRITE32_HANDLER( fg_videoram_w )
 		tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
+static WRITE32_HANDLER( spotty_soundlatch_w )
+{
+	soundlatch_w(0, (data >> 16) & 0xff);
+}
+
 /*****************************************************************************************************
   MEMORY MAPS
 *****************************************************************************************************/
@@ -124,6 +130,43 @@ static ADDRESS_MAP_START( limenko_io_map, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x5000, 0x5003) AM_WRITENOP // sound latch
 ADDRESS_MAP_END
 
+
+/* Spotty memory map */
+
+static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(&mainram)
+	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM AM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(&spriteram32_2)
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM AM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
+	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
+	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITENOP // video reg? background pen?
+	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spotty_io_map, ADDRESS_SPACE_IO, 32 )
+	AM_RANGE(0x0000, 0x0003) AM_READ(input_port_0_dword_r)
+	AM_RANGE(0x0800, 0x0803) AM_READ(input_port_1_dword_r)
+	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
+	AM_RANGE(0x1000, 0x1003) AM_READ(port2_r)
+	AM_RANGE(0x4800, 0x4803) AM_WRITE(eeprom_w)
+	AM_RANGE(0x5000, 0x5003) AM_WRITE(spotty_soundlatch_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spotty_sound_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0001, 0x0001) AM_READ(soundlatch_r)
+	AM_RANGE(0x0003, 0x0003) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x0003, 0x0003) AM_WRITENOP
+ADDRESS_MAP_END
 
 /*****************************************************************************************************
   VIDEO HARDWARE EMULATION
@@ -374,6 +417,44 @@ INPUT_PORTS_START( sb2003 )
 	PORT_BIT( 0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( spotty )
+	PORT_START
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("Hold 1")
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Hold 2")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Hold 3")
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Hold 4")
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet")
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop")
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Change")
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Prize Hopper 1")
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Prize Hopper 2")
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Prize Hopper 3")
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_SPECIAL ) //eeprom
+	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x20000000, DEF_STR( On ) )
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 /*****************************************************************************************************
   GRAPHICS DECODES
 *****************************************************************************************************/
@@ -403,10 +484,10 @@ static gfx_decode limenko_gfxdecodeinfo[] =
 
 
 static MACHINE_DRIVER_START( limenko )
-	MDRV_CPU_ADD(E132XT, 20000000)	//E132XN!
+	MDRV_CPU_ADD(E132XT, 80000000)	//E132XN!
 	MDRV_CPU_PROGRAM_MAP(limenko_map,0)
 	MDRV_CPU_IO_MAP(limenko_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold, 2)
+	MDRV_CPU_VBLANK_INT(irq5_line_hold, 1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -426,6 +507,42 @@ static MACHINE_DRIVER_START( limenko )
 	MDRV_VIDEO_UPDATE(limenko)
 
 	/* sound hardware */
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( spotty )
+	MDRV_CPU_ADD(E132XT, 80000000)	//E132XN!
+	MDRV_CPU_PROGRAM_MAP(spotty_map,0)
+	MDRV_CPU_IO_MAP(spotty_io_map,0)
+	MDRV_CPU_VBLANK_INT(irq5_line_hold, 1)
+
+	MDRV_CPU_ADD(I8051, 4000000)	/* 4 MHz? */
+	MDRV_CPU_PROGRAM_MAP(spotty_sound_prg_map, 0)
+	MDRV_CPU_DATA_MAP(0, 0)
+	MDRV_CPU_IO_MAP(spotty_sound_io_map,0)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_NVRAM_HANDLER(93C46)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(384, 240)
+	MDRV_SCREEN_VISIBLE_AREA(0, 383, 0, 239)
+
+	MDRV_GFXDECODE(limenko_gfxdecodeinfo)
+	MDRV_PALETTE_LENGTH(0x1000)
+
+	MDRV_VIDEO_START(limenko)
+	MDRV_VIDEO_UPDATE(limenko)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(OKIM6295, 4000000 / 4 ) //?
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -487,7 +604,7 @@ ROM_START( dynabomb )
 	ROM_REGION( 0x200000, REGION_SOUND2, 0 ) /* QDSP wavetable rom */
 	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 
-	// u20 (S-ROM) empty
+	// u20 empty
 ROM_END
 
 ROM_START( sb2003 ) /* No specific Country/Region */
@@ -648,6 +765,52 @@ ROM_START( legendoh )
 	ROM_LOAD( "qs1003.u4",    0x000000, 0x200000, CRC(19e4b469) SHA1(9460e5b6a0fbf3fdd6a9fa0dcbf5062a2e07fe02) )
 ROM_END
 
+/*
+
+Spotty
+
++---------------------------------+
+|               GMS30C2232  16256 |
+|                           16256 |
+|J        M6295 SOU_ROM1 20MHz    |
+|A             AT89C4051          |
+|M       GAL      4MHz  SYS_ROM1* |
+|M 93C46                SYS_ROM2  |
+|A        16256x3       CG_ROM1   |
+|          L2DHYP       CG_ROM2*  |
+| SW1 SW2         32MHz CG_ROM3   |
++---------------------------------+
+
+Hyundia GMS30C2232 (Hyperstone core)
+Atmel AT89C4051 (8051 MCU with internal code)
+SYS L2D HYP Ver 1.0 ASIC Express
+EEPROM 93C46
+SW1 = Test
+SW2 = Reset
+* Unpopulated
+
+*/
+
+ROM_START( spotty )
+	ROM_REGION32_BE( 0x100000, REGION_USER1, ROMREGION_ERASEFF ) /* Hyperstone CPU Code */
+	/* sys_rom1 empty */
+	ROM_LOAD16_WORD_SWAP( "sys_rom2",     0x080000, 0x80000, CRC(6ded8d9b) SHA1(547c532f4014d818c4412244b60dbc439496de20) )
+
+	ROM_REGION( 0x01000, REGION_CPU2, 0 )
+	ROM_LOAD( "at89c4051.mcu", 0x000000, 0x01000, CRC(82ceab26) SHA1(9bbc454bdcbc70dc01f10a13c9fc01c884918fe8) )
+
+	/* Expand the gfx roms here */
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x200000, REGION_USER2, ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "gc_rom1",      0x000000, 0x80000, CRC(ea03f9c5) SHA1(5038c03c519c774da253f9ae4fa205e7eeaa2780) )
+	ROM_LOAD32_BYTE( "gc_rom3",      0x000001, 0x80000, CRC(0ddac0b9) SHA1(f4ac8e6dd7f1cbdeb97139008982e6c17a3d18b9) )
+	/* gc_rom2 empty */
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_LOAD( "sou_rom1",     0x000000, 0x40000, CRC(5791195b) SHA1(de0df8f89f395cbf3508b01aeea05675e110ad04) )
+ROM_END
+
 static int irq_active(void)
 {
 	UINT32 FCR = activecpu_get_reg(27);
@@ -696,6 +859,19 @@ static READ32_HANDLER( sb2003_speedup_r )
 	return mainram[0x135800/4];
 }
 
+static READ32_HANDLER( spotty_speedup_r )
+{
+	if(activecpu_get_pc() == 0x8560)
+	{
+		if(irq_active())
+			cpu_spinuntil_int();
+		else
+			activecpu_eat_cycles(50);
+	}
+
+	return mainram[0x6626c/4];
+}
+
 DRIVER_INIT( dynabomb )
 {
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
@@ -711,7 +887,28 @@ DRIVER_INIT( sb2003 )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 }
 
+DRIVER_INIT( spotty )
+{
+	UINT8 *dst    = memory_region(REGION_GFX1);
+	UINT8 *src    = memory_region(REGION_USER2);
+	int x;
+
+	/* expand 4bpp roms to 8bpp space */
+	for (x=0; x<0x200000;x+=4)
+	{
+		dst[x+1] = (src[x+0]&0xf0) >> 4;
+		dst[x+0] = (src[x+0]&0x0f) >> 0;
+		dst[x+3] = (src[x+1]&0xf0) >> 4;
+		dst[x+2] = (src[x+1]&0x0f) >> 0;
+	}
+
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
+}
+
 GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_NO_SOUND )
 GAME( 2000, legendoh, 0,      limenko, legendoh, legendoh, ROT0, "Limenko", "Legend of Heroes",                   GAME_NO_SOUND )
 GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", GAME_NO_SOUND )
 GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  GAME_NO_SOUND )
+
+// this game only use the same graphics chip used in limenko's system
+GAME( 2001, spotty,   0,      spotty,  spotty,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",              GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )

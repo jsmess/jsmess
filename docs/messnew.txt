@@ -54,7 +54,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.113u3.  This incorporates all features of the
+- The core is based on MAME 0.113u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Moved per-image working directory handling into the MESS core.  [Nate Woods]

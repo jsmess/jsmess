@@ -852,7 +852,7 @@ static void scanline_callback( int num )
 	/* increment our scanline count */
 	this_ppu->scanline++;
 
-//logerror("starting scanline %d (MAME %d, beam %d)\n", this_ppu->scanline, cpu_getscanline(), video_screen_get_hpos(0));
+//logerror("starting scanline %d (MAME %d, beam %d)\n", this_ppu->scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
 
 	/* Note: this is called at the _end_ of each scanline */
 	if (this_ppu->scanline == PPU_VBLANK_FIRST_SCANLINE)
@@ -922,7 +922,7 @@ logerror("vlbank ending\n");
 	mame_timer_adjust(this_ppu->hblank_timer, MAME_TIME_IN_CYCLES(86.67, 0), num, time_never); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
-	mame_timer_adjust(this_ppu->scanline_timer, cpu_getscanlinetime_mt( next_scanline * this_ppu->scan_scale), num, make_mame_time(0,0));
+	mame_timer_adjust(this_ppu->scanline_timer, video_screen_get_time_until_pos(0, next_scanline * this_ppu->scan_scale, 0), num, time_zero);
 }
 
 /*************************************
@@ -953,7 +953,7 @@ void ppu2c0x_reset( int num, int scan_scale )
 	mame_timer_adjust(chips[num].hblank_timer, MAME_TIME_IN_CYCLES(86.67, 0), num, time_never); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// Call us back at the start of the next scanline
-	mame_timer_adjust(chips[num].scanline_timer, cpu_getscanlinetime_mt(1), num, make_mame_time(0,0));
+	mame_timer_adjust(chips[num].scanline_timer, video_screen_get_time_until_pos(0, 1, 0), num, time_zero);
 
 	/* reset the callbacks */
 	chips[num].scanline_callback_proc = 0;
@@ -1100,7 +1100,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 #ifdef MAME_DEBUG
 	if (this_ppu->scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
-		logerror("  PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, cpu_getscanline(), video_screen_get_hpos(0));
+		logerror("  PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, video_screen_get_vpos(0), video_screen_get_hpos(0));
 #endif
 
 	switch( offset & 7 )

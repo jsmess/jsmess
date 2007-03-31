@@ -34,6 +34,7 @@
 #include "input.h"
 #include "debugwin.h"
 #include "strconv.h"
+#include "config.h"
 
 #ifdef MESS
 #include "menu.h"
@@ -199,7 +200,7 @@ int winwindow_init(running_machine *machine)
 	size_t temp;
 
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(mame_options(), "multithreading");
+	multithreading_enabled = options_get_bool(mame_options(), WINOPTION_MULTITHREADING);
 
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();
@@ -601,7 +602,7 @@ int winwindow_video_window_create(int index, win_monitor_info *monitor, const wi
 		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", Machine->gamedrv->description, Machine->gamedrv->name, index);
 
 	// set the initial maximized state
-	window->startmaximized = options_get_bool(mame_options(), "maximize");
+	window->startmaximized = options_get_bool(mame_options(), WINOPTION_MAXIMIZE);
 
 	// finish the window creation on the window thread
 	if (multithreading_enabled)
@@ -812,7 +813,7 @@ static int create_window_class(void)
 
 static void set_starting_view(int index, win_window_info *window, const char *view)
 {
-	const char *defview = options_get_string(mame_options(), "view");
+	const char *defview = options_get_string(mame_options(), WINOPTION_VIEW);
 	int viewindex = -1;
 
 	assert(GetCurrentThreadId() == main_threadid);

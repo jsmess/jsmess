@@ -378,7 +378,7 @@ char eaglshot_dirty, *eaglshot_dirty_tile;
 
 READ16_HANDLER( ssv_vblank_r )
 {
-	if (cpu_getvblank())
+	if (video_screen_get_vblank(0))
 		return 0x2000 | 0x1000;
 	else
 		return 0x0000;

@@ -5,24 +5,28 @@
     driver by Alex Pasadyn, Zsolt Vasvari, Kurt Mahan, Ernesto Corvi,
     and Aaron Giles
 
-    Games supported:
+    Games supported (prototype and release versions):
         * Narc
-        * Trog (prototype and release versions)
+        * Trog
         * Strike Force
         * Smash TV
-        * Hi Impact Football
-        * Super Hi Impact
+        * High Impact Football
+        * Super High Impact
         * Terminator 2
         * Mortal Kombat (Y-unit versions)
         * Total Carnage
 
     Known bugs:
-        * Super Hi Impact freaks out during play
         * when the Porsche spins in Narc, the wheels are missing for
             a single frame (may be an original bug)
         * Terminator 2 freezes while playing the movies after destroying
             skynet. Currently we have a hack in which prevents the freeze,
             but we really should eventually figure it out for real
+
+    Notes:
+        * Super Hi Impact Proto V4.0: You need to at least reset the high score
+            table from the UTILITIES menu.  It's best to do a FULL FACTORY RESTORE
+
 
 **************************************************************************/
 
@@ -1243,8 +1247,8 @@ ROM_START( trog )
 	ROM_RELOAD(                0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "trogu105.bin",  0xc0000, 0x20000, CRC(e6095189) SHA1(a2caaf64e371050b37c63d9608ba5d289cf3cd91) )
-	ROM_LOAD16_BYTE( "trogu89.bin",   0xc0001, 0x20000, CRC(fdd7cc65) SHA1(bfc4339953c122bca968f9cfa3a82df3584a3727) )
+	ROM_LOAD16_BYTE( "u105-la4",  0xc0000, 0x20000, CRC(e6095189) SHA1(a2caaf64e371050b37c63d9608ba5d289cf3cd91) )
+	ROM_LOAD16_BYTE( "u89-la4",   0xc0001, 0x20000, CRC(fdd7cc65) SHA1(bfc4339953c122bca968f9cfa3a82df3584a3727) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "trogu111.bin",  0x000000, 0x20000, CRC(9ded08c1) SHA1(bbf069f218e3f3d67e45fa2229a471451b3a8f96) )
@@ -1303,8 +1307,8 @@ ROM_START( trogpa6 )
 	ROM_RELOAD(                0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "trog_pa6.105",  0xc0000, 0x20000, CRC(71ad1903) SHA1(e7ff1344a7bdc3b90f09ce8251ebcd25012be602) )
-	ROM_LOAD16_BYTE( "trog_pa6.89",   0xc0001, 0x20000, CRC(04473da8) SHA1(47d9e918fba93b4af1e3cacbac9df843e6a10091) )
+	ROM_LOAD16_BYTE( "u105-pa6",  0xc0000, 0x20000, CRC(71ad1903) SHA1(e7ff1344a7bdc3b90f09ce8251ebcd25012be602) )
+	ROM_LOAD16_BYTE( "u89-pa6",   0xc0001, 0x20000, CRC(04473da8) SHA1(47d9e918fba93b4af1e3cacbac9df843e6a10091) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "trogu111.bin",  0x000000, 0x20000, CRC(9ded08c1) SHA1(bbf069f218e3f3d67e45fa2229a471451b3a8f96) )
@@ -1363,8 +1367,8 @@ ROM_START( smashtv )
 	ROM_RELOAD(           0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "u105.l8",  0xc0000, 0x20000, CRC(48cd793f) SHA1(7d0d9edccf0610f57e40934ab33e32315369656d) )
-	ROM_LOAD16_BYTE( "u89.l8",   0xc0001, 0x20000, CRC(8e7fe463) SHA1(629332be706cda26f8b170b8e2877355230119ee) )
+	ROM_LOAD16_BYTE( "u105-la8",  0xc0000, 0x20000, CRC(48cd793f) SHA1(7d0d9edccf0610f57e40934ab33e32315369656d) )
+	ROM_LOAD16_BYTE( "u89-la8",   0xc0001, 0x20000, CRC(8e7fe463) SHA1(629332be706cda26f8b170b8e2877355230119ee) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "u111.gam",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
@@ -1391,8 +1395,8 @@ ROM_START( smashtv6 )
 	ROM_RELOAD(           0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "la6-u105",  0xc0000, 0x20000, CRC(f1666017) SHA1(2283e71ad55a7cd3bc97bd6b20aebb90ad618bf8) )
-	ROM_LOAD16_BYTE( "la6-u89",   0xc0001, 0x20000, CRC(908aca5d) SHA1(c97f05ecb8d96306fecef40330331e279d29f78d) )
+	ROM_LOAD16_BYTE( "u105-la6",  0xc0000, 0x20000, CRC(f1666017) SHA1(2283e71ad55a7cd3bc97bd6b20aebb90ad618bf8) )
+	ROM_LOAD16_BYTE( "u89-la6",   0xc0001, 0x20000, CRC(908aca5d) SHA1(c97f05ecb8d96306fecef40330331e279d29f78d) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "u111.gam",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
@@ -1419,8 +1423,8 @@ ROM_START( smashtv5 )
 	ROM_RELOAD(           0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "u105-v5",  0xc0000, 0x20000, CRC(81f564b9) SHA1(5bddcda054be6766b40af88ae2519b3a87c33667) )
-	ROM_LOAD16_BYTE( "u89-v5",   0xc0001, 0x20000, CRC(e5017d25) SHA1(27e544efa7f5cbe6ed3fc3211b12694c15a316c7) )
+	ROM_LOAD16_BYTE( "u105-la5",  0xc0000, 0x20000, CRC(81f564b9) SHA1(5bddcda054be6766b40af88ae2519b3a87c33667) )
+	ROM_LOAD16_BYTE( "u89-la5",   0xc0001, 0x20000, CRC(e5017d25) SHA1(27e544efa7f5cbe6ed3fc3211b12694c15a316c7) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "u111.gam",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
@@ -1447,8 +1451,8 @@ ROM_START( smashtv4 )
 	ROM_RELOAD(           0x60000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "la4-u105",  0xc0000, 0x20000, CRC(a50ccb71) SHA1(414dfe355e314f6460ce07edbdd5e4b801451cf8) )
-	ROM_LOAD16_BYTE( "la4-u89",   0xc0001, 0x20000, CRC(ef0b0279) SHA1(baad5a2a8d51d007e365f378f3214bbd2ea9699c) )
+	ROM_LOAD16_BYTE( "u105-la4",  0xc0000, 0x20000, CRC(a50ccb71) SHA1(414dfe355e314f6460ce07edbdd5e4b801451cf8) )
+	ROM_LOAD16_BYTE( "u89-la4",   0xc0001, 0x20000, CRC(ef0b0279) SHA1(baad5a2a8d51d007e365f378f3214bbd2ea9699c) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "u111.gam",  0x000000, 0x20000, CRC(72f0ba84) SHA1(2e925b3cdd3c8e14046b3948d82f0f3cde3c22c5) )
@@ -1472,8 +1476,8 @@ ROM_START( hiimpact )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "la4u105.bin",  0xc0000, 0x20000, CRC(5f67f823) SHA1(4171b6949682d1b2180e39d44c4e0033c4c07149) )
-	ROM_LOAD16_BYTE( "la4u89.bin",   0xc0001, 0x20000, CRC(404d260b) SHA1(46bb44b3f1895d3424dba7664f198bce7dee911d) )
+	ROM_LOAD16_BYTE( "u105-la4",  0xc0000, 0x20000, CRC(5f67f823) SHA1(4171b6949682d1b2180e39d44c4e0033c4c07149) )
+	ROM_LOAD16_BYTE( "u89-la4",   0xc0001, 0x20000, CRC(404d260b) SHA1(46bb44b3f1895d3424dba7664f198bce7dee911d) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "la1u111.bin",  0x000000, 0x20000, CRC(49560560) SHA1(03d51e6019afa9a396c91a484969be4922fa4c99) )
@@ -1507,8 +1511,8 @@ ROM_START( hiimpac3 )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "la3u105.bin",  0xc0000, 0x20000, CRC(b9190c4a) SHA1(adcf1023d62f67fbde7a7a7aeeda068d7711f7cf) )
-	ROM_LOAD16_BYTE( "la3u89.bin",   0xc0001, 0x20000, CRC(1cbc72a5) SHA1(ba0b4b54453fcd1888d40690848e0ee4150bb8e1) )
+	ROM_LOAD16_BYTE( "u105-la3",  0xc0000, 0x20000, CRC(b9190c4a) SHA1(adcf1023d62f67fbde7a7a7aeeda068d7711f7cf) )
+	ROM_LOAD16_BYTE( "u89-la3",   0xc0001, 0x20000, CRC(1cbc72a5) SHA1(ba0b4b54453fcd1888d40690848e0ee4150bb8e1) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "la1u111.bin",  0x000000, 0x20000, CRC(49560560) SHA1(03d51e6019afa9a396c91a484969be4922fa4c99) )
@@ -1542,8 +1546,8 @@ ROM_START( hiimpacp )
 	ROM_LOAD ( "sl1u20.bin", 0x50000, 0x20000, CRC(4e747ab5) SHA1(82040f40aac7dae577376a742eadaaa9644500c1) )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "pa1u105.bin",  0xc0000, 0x20000, CRC(79ef9a35) SHA1(200d50b108401e889b6200c53c203ee5041d1423) )
-	ROM_LOAD16_BYTE( "pa1u89.bin",   0xc0001, 0x20000, CRC(2bd3de30) SHA1(ee3615c1cc5b948731eb258887641f059b942b25) )
+	ROM_LOAD16_BYTE( "u105-pa1",  0xc0000, 0x20000, CRC(79ef9a35) SHA1(200d50b108401e889b6200c53c203ee5041d1423) )
+	ROM_LOAD16_BYTE( "u89-pa1",   0xc0001, 0x20000, CRC(2bd3de30) SHA1(ee3615c1cc5b948731eb258887641f059b942b25) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "la1u111.bin",  0x000000, 0x20000, CRC(49560560) SHA1(03d51e6019afa9a396c91a484969be4922fa4c99) )
@@ -1577,8 +1581,8 @@ ROM_START( shimpact )
 	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "shiu105.bin",  0xc0000, 0x20000, CRC(f2cf8de3) SHA1(97428d05208c18a9fcf8f2e3c6ed2bf6441350c3) )
-	ROM_LOAD16_BYTE( "shiu89.bin",   0xc0001, 0x20000, CRC(f97d9b01) SHA1(d5f39d6a5db23f5efd123cf9da0d09c84893b9c4) )
+	ROM_LOAD16_BYTE( "u105-la1",  0xc0000, 0x20000, CRC(f2cf8de3) SHA1(97428d05208c18a9fcf8f2e3c6ed2bf6441350c3) )
+	ROM_LOAD16_BYTE( "u89-la1",   0xc0001, 0x20000, CRC(f97d9b01) SHA1(d5f39d6a5db23f5efd123cf9da0d09c84893b9c4) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "shiu111.bin",  0x000000, 0x40000, CRC(80ae2a86) SHA1(1ff76e3064c7636f6877e426f4a88c094d1a6325) )
@@ -1605,11 +1609,39 @@ ROM_START( shimpacp )
 	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "shiu105.pa5",  0xc0000, 0x20000, CRC(4342cd45) SHA1(a8e8609efbd67a957104316a0fd4824802134290) )
-	ROM_LOAD16_BYTE( "shiu89.pa5",   0xc0001, 0x20000, CRC(cda47b73) SHA1(9b51f7d0cd6ffa07a5880e4cc8a855c2f7616c22) )
+	ROM_LOAD16_BYTE( "u105-pa5",  0xc0000, 0x20000, CRC(4342cd45) SHA1(a8e8609efbd67a957104316a0fd4824802134290) )
+	ROM_LOAD16_BYTE( "u89-pa5",   0xc0001, 0x20000, CRC(cda47b73) SHA1(9b51f7d0cd6ffa07a5880e4cc8a855c2f7616c22) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "shiu111.bin",  0x000000, 0x40000, CRC(80ae2a86) SHA1(1ff76e3064c7636f6877e426f4a88c094d1a6325) )
+	ROM_LOAD ( "shiu112.bin",  0x040000, 0x40000, CRC(3ffc27e9) SHA1(ec337629c17daaa2445fb344e08243de7f09536e) )
+	ROM_LOAD ( "shiu113.bin",  0x080000, 0x40000, CRC(01549d00) SHA1(40604e949cef056f90031850bdb91782135e7ec2) )
+	ROM_LOAD ( "shiu114.pa3",  0x0c0000, 0x40000, CRC(56f96a67) SHA1(070ba9c34c23b3037e91c2a7e0a85093c95def69) )
+
+	ROM_LOAD (  "shiu95.bin",  0x200000, 0x40000, CRC(e8f56ef5) SHA1(7cb0b6bad3f0be822ef9b92e6523572e45776969) )
+	ROM_LOAD (  "shiu96.bin",  0x240000, 0x40000, CRC(24ed04f9) SHA1(f4e91640713c0c376861652f3f0db33bff32656d) )
+	ROM_LOAD (  "shiu97.bin",  0x280000, 0x40000, CRC(dd7f41a9) SHA1(a14a285ccc593f8f1d50b0d5574af4845a1e287e) )
+	ROM_LOAD (  "shiu98.pa3",  0x2c0000, 0x40000, CRC(28418723) SHA1(d4eef3131c82f1ecb65d6623b195c4f76010aa1b) )
+
+	ROM_LOAD ( "shiu106.bin",  0x400000, 0x40000, CRC(6f5bf337) SHA1(5b1a0d927302c7e1727976c2d8c612a80b8f1484) )
+	ROM_LOAD ( "shiu107.bin",  0x440000, 0x40000, CRC(a8815dad) SHA1(627d916a4b0ab03a943d123ca0eabd514634ad30) )
+	ROM_LOAD ( "shiu108.bin",  0x480000, 0x40000, CRC(d39685a3) SHA1(84e5da34a9946b954635befd37760683850d310b) )
+	ROM_LOAD ( "shiu109.pa3",  0x4c0000, 0x40000, CRC(58f71141) SHA1(f7143bdaa7325b88e01a1d6be3aeb1d69cf0672b) )
+ROM_END
+
+
+ROM_START( shimpap4 ) /* You must manualy reset the high score table or game will hang after initial demo screen, it's best to do a "Full Factory Restore" */
+	ROM_REGION( 0x90000, REGION_CPU2, 0 )	/* sound CPU */
+	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
+	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
+	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
+
+	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "u105-pa4",  0xc0000, 0x20000, CRC(770b31ce) SHA1(d0bc2ed0f6134afb0dd53236377044a122e7f181) ) /* Both program roms had a "PROTO4" sticker */
+	ROM_LOAD16_BYTE( "u89-pa4",   0xc0001, 0x20000, CRC(96b622a5) SHA1(6d21c69ad1b0990679b616a79ba698772c8d98ff) )
+
+	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD ( "shiu111.bin",  0x000000, 0x40000, CRC(80ae2a86) SHA1(1ff76e3064c7636f6877e426f4a88c094d1a6325) ) /* All graphic roms had a "PROTO3" sticker */
 	ROM_LOAD ( "shiu112.bin",  0x040000, 0x40000, CRC(3ffc27e9) SHA1(ec337629c17daaa2445fb344e08243de7f09536e) )
 	ROM_LOAD ( "shiu113.bin",  0x080000, 0x40000, CRC(01549d00) SHA1(40604e949cef056f90031850bdb91782135e7ec2) )
 	ROM_LOAD ( "shiu114.pa3",  0x0c0000, 0x40000, CRC(56f96a67) SHA1(070ba9c34c23b3037e91c2a7e0a85093c95def69) )
@@ -1866,8 +1898,8 @@ ROM_START( term2 )
 	ROM_RELOAD(             0xc0000, 0x40000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "t2.105",  0x00000, 0x80000, CRC(34142b28) SHA1(985fd169b3d62c4197fe4c6f11055a6c17872899) )
-	ROM_LOAD16_BYTE( "t2.89",   0x00001, 0x80000, CRC(5ffea427) SHA1(c6f65bc57b33ae1a123f610c635e0d65663e54da) )
+	ROM_LOAD16_BYTE( "t2-la3.105",  0x00000, 0x80000, CRC(34142b28) SHA1(985fd169b3d62c4197fe4c6f11055a6c17872899) )
+	ROM_LOAD16_BYTE( "t2-la3.89",   0x00001, 0x80000, CRC(5ffea427) SHA1(c6f65bc57b33ae1a123f610c635e0d65663e54da) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "t2.111",  0x000000, 0x80000, CRC(916d0197) SHA1(3b53d3770955b10cc6002e3d3bf0f71429667af0) )
@@ -1899,8 +1931,8 @@ ROM_START( term2la2 )
 	ROM_RELOAD(             0xc0000, 0x40000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "t2la2.105",  0x00000, 0x80000, CRC(7177de98) SHA1(0987be413d6cb5ded7059ad6ebbca49331b046b2) )
-	ROM_LOAD16_BYTE( "t2la2.89",   0x00001, 0x80000, CRC(14d7b9f5) SHA1(b8676d21d53fd3c8492d8911e749d74df1c66b1d) )
+	ROM_LOAD16_BYTE( "t2-la2.105",  0x00000, 0x80000, CRC(7177de98) SHA1(0987be413d6cb5ded7059ad6ebbca49331b046b2) )
+	ROM_LOAD16_BYTE( "t2-la2.89",   0x00001, 0x80000, CRC(14d7b9f5) SHA1(b8676d21d53fd3c8492d8911e749d74df1c66b1d) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "t2.111",  0x000000, 0x80000, CRC(916d0197) SHA1(3b53d3770955b10cc6002e3d3bf0f71429667af0) )
@@ -1932,8 +1964,8 @@ ROM_START( term2la1 )
 	ROM_RELOAD(             0xc0000, 0x40000 )
 
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "t2la1.105", 0x00000, 0x80000, CRC(ca52a8b0) SHA1(20b91bdd9fe8e7be6a3c3cb9684769733d66d401) )
-	ROM_LOAD16_BYTE( "t2la1.89", 0x00001, 0x80000, CRC(08535210) SHA1(a7986541bc504294bd6523ce691e19e496f8be7c) )
+	ROM_LOAD16_BYTE( "t2-la1.105", 0x00000, 0x80000, CRC(ca52a8b0) SHA1(20b91bdd9fe8e7be6a3c3cb9684769733d66d401) )
+	ROM_LOAD16_BYTE( "t2-la1.89", 0x00001, 0x80000, CRC(08535210) SHA1(a7986541bc504294bd6523ce691e19e496f8be7c) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD ( "t2.111", 0x000000, 0x80000, CRC(916d0197) SHA1(3b53d3770955b10cc6002e3d3bf0f71429667af0) )
@@ -2042,8 +2074,9 @@ GAME( 1990, smashtv4, smashtv, smashtv,  smashtv, smashtv,  ROT0, "Williams", "S
 GAME( 1990, hiimpact, 0,       hiimpact, trog,    hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", 0 )
 GAME( 1990, hiimpac3, hiimpact,hiimpact, trog,    hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", 0 )
 GAME( 1990, hiimpacp, hiimpact,hiimpact, trog,    hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", 0 )
-GAME( 1991, shimpact, 0,       hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", GAME_NOT_WORKING )
-GAME( 1991, shimpacp, shimpact,hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_NOT_WORKING )
+GAME( 1991, shimpact, 0,       hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", 0 )
+GAME( 1991, shimpacp, shimpact,hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", 0 )
+GAME( 1991, shimpap4, shimpact,hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", 0 ) /* See notes about factory restore above */
 
 GAME( 1991, term2,    0,       term2,    term2,   term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", 0 )
 GAME( 1991, term2la2, term2,   term2,    term2,   term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", 0 )

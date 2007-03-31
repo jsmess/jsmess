@@ -3264,6 +3264,8 @@ UINT32 readinputport(int port)
 		/* toggle VBLANK if we're in a VBLANK state */
 		if (Machine->screen[0].oldstyle_vblank_supplied)
 		{
+			int cpu_getvblank(void);
+
 			if (cpu_getvblank())
 				result ^= portinfo->vblank;
 		}

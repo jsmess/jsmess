@@ -78,6 +78,7 @@ static struct v60info {
 } v60;
 
 static int v60_ICount;
+static int v60_stall_io;
 
 /*
  * Prevent warnings on NetBSD.  All identifiers beginning with an underscore
@@ -298,6 +299,7 @@ static int v60_default_irq_cb(int irqline)
 
 static void base_init(const char *type, int index, int (*irqcallback)(int))
 {
+	v60_stall_io = 0;
 	v60.irq_cb = irqcallback;
 	v60.irq_line = CLEAR_LINE;
 	v60.nmi_line = CLEAR_LINE;
@@ -350,6 +352,10 @@ static void v60_exit(void)
 {
 }
 
+void v60_stall(void)
+{
+	v60_stall_io = 1;
+}
 
 static void v60_do_irq(int vector)
 {

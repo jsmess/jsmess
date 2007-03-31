@@ -38,10 +38,17 @@ struct _pool_entry
 };
 
 
-struct _memory_pool
+typedef struct _pool_hash_entry pool_hash_entry;
+struct _pool_hash_entry
 {
 	pool_entry *	first;
 	pool_entry **	lastptr;
+};
+
+
+struct _memory_pool
+{
+	pool_hash_entry hashtable[3797];
 	void (*fail)(const char *message);
 };
 
@@ -51,8 +58,8 @@ struct _memory_pool
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static pool_entry *alloc_entry(memory_pool *pool, size_t buffer_size, const char *file, int line);
 static void report_failure(memory_pool *pool, const char *format, ...);
+static int hash_value(memory_pool *pool, void *ptr);
 
 
 
@@ -67,6 +74,7 @@ static void report_failure(memory_pool *pool, const char *format, ...);
 memory_pool *pool_create(void (*fail)(const char *message))
 {
 	memory_pool *pool;
+	int i;
 
 	/* allocate memory for the pool itself */
 	pool = malloc(sizeof(*pool));
@@ -74,9 +82,12 @@ memory_pool *pool_create(void (*fail)(const char *message))
 		return NULL;
 
 	/* initialize the data structures */
-	pool->first = NULL;
-	pool->lastptr = &pool->first;
 	pool->fail = fail;
+	for (i = 0; i < ARRAY_LENGTH(pool->hashtable); i++)
+	{
+		pool->hashtable[i].first = NULL;
+		pool->hashtable[i].lastptr = &pool->hashtable[i].first;
+	}
 
 	return pool;
 }
@@ -91,17 +102,21 @@ void pool_clear(memory_pool *pool)
 {
 	pool_entry *next_entry;
 	pool_entry *entry;
+	int i;
 
 	/* free all data in the pool */
-	for (entry = pool->first; entry != NULL; entry = next_entry)
+	for (i = 0; i < ARRAY_LENGTH(pool->hashtable); i++)
 	{
-		next_entry = entry->next;
-		free(entry);
-	}
+		for (entry = pool->hashtable[i].first; entry != NULL; entry = next_entry)
+		{
+			next_entry = entry->next;
+			free(entry);
+		}
 
-	/* reinitialize the data structures */
-	pool->first = NULL;
-	pool->lastptr = &pool->first;
+		/* reinitialize the data structures */
+		pool->hashtable[i].first = NULL;
+		pool->hashtable[i].lastptr = &pool->hashtable[i].first;
+	}
 }
 
 
@@ -135,15 +150,15 @@ void *pool_malloc_file_line(memory_pool *pool, size_t size, const char *file, in
 
 void *pool_realloc_file_line(memory_pool *pool, void *ptr, size_t size, const char *file, int line)
 {
-	pool_entry *new_entry;
-	void *new_ptr;
-	void *free_block;
+	pool_entry *new_entry = NULL;
+	pool_entry **entry = NULL;
+	pool_hash_entry *hash_entry = NULL;
+	pool_entry *old_entry;
 
 	/* if we're resizing or freeing a pointer, find the existing entry */
 	if (ptr != NULL)
 	{
 		pool_entry *orig_entry;
-		pool_entry **entry;
 
 		/* recover the pool from the pointer (ignoring the specified pool) */
 		orig_entry = (pool_entry *)((UINT8 *)ptr - offsetof(pool_entry, buffer));
@@ -155,7 +170,8 @@ void *pool_realloc_file_line(memory_pool *pool, void *ptr, size_t size, const ch
 		pool = orig_entry->pool;
 
 		/* find the entry that this block is referring to */
-		for (entry = &pool->first; *entry != NULL; entry = &(*entry)->next)
+		hash_entry = &pool->hashtable[hash_value(pool, ptr)];
+		for (entry = &hash_entry->first; *entry != NULL; entry = &(*entry)->next)
 			if ((*entry)->buffer == ptr)
 				break;
 
@@ -176,43 +192,77 @@ void *pool_realloc_file_line(memory_pool *pool, void *ptr, size_t size, const ch
 				return NULL;
 			}
 
-			/* replace the entry with the new entry */
+			/* keep the newly reallocated entry in the linked list */
 			*entry = new_entry;
-
-			/* is this a final entry?  if so, update pool->lastptr */
-			if ((*entry)->next == NULL)
-				pool->lastptr = &(*entry)->next;
-
-			/* return a pointer to the new entry's buffer */
-			new_ptr = new_entry->buffer;
-		}
-		else
-		{
-			free_block = *entry;
-
-			/* unlink this entry */
-			*entry = (*entry)->next;
-			if (*entry == NULL)
-				pool->lastptr = entry;
-
-			/* free the block */
-			free(free_block);
-			new_ptr = NULL;
+			if (new_entry->next == NULL)
+				hash_entry->lastptr = &new_entry->next;
 		}
 	}
-
-	/* if we don't have a pointer, just allocate a new entry */
-	else
+	else if (size != 0)
 	{
-		new_entry = alloc_entry(pool, size, file, line);
+		/* allocate new entry */
+		new_entry = malloc(offsetof(pool_entry, buffer) + size);
 		if (new_entry == NULL)
+		{
+			report_failure(pool, "pool_realloc: Failure to malloc %u bytes", size);
 			return NULL;
+		}
 
-		/* return a pointer to the new entry's buffer */
-		new_ptr = new_entry->buffer;
+		/* a new entry, set up magic values */
+		new_entry->pool = pool;
+		new_entry->cookie = MAGIC_COOKIE;
 	}
 
-	return new_ptr;
+	/* track the old entry, if any, because we're about to mess with the chain */
+	old_entry = (entry && *entry) ? *entry : NULL;
+
+	/* if we have a new entry, perform activities done when allocating and reallocating */
+	if (new_entry != NULL)
+	{
+		size_t old_size;
+
+		/* specify the new entry's size */
+		new_entry->size = size;
+
+		/* did the memory block grow? */
+		old_size = (old_entry != NULL) ? old_entry->size : 0;
+		if (size > old_size)
+		{
+#ifdef MAME_DEBUG
+			/* randomize memory for debugging */
+			rand_memory(new_entry->buffer + old_size, size - old_size);
+#endif
+		}
+	}
+
+	/* the memory allocation (if any) has succeeded, now we need to relink
+	 * under the (presumably) new hash value */
+	if (entry != NULL)
+	{
+		/* unlink this entry from the link list with the old hash value */
+		*entry = (*entry)->next;
+		if (*entry == NULL)
+			hash_entry->lastptr = entry;
+	}
+
+	/* if we allocated memory, we now have to add this entry to the new chain */
+	if (new_entry != NULL)
+	{
+		/* identify the new hash entry */
+		hash_entry = &pool->hashtable[hash_value(pool, new_entry->buffer)];
+
+		/* add this entry to the new hash entry's linked list */
+		*hash_entry->lastptr = new_entry;
+		hash_entry->lastptr = &new_entry->next;
+		new_entry->next = NULL;
+	}
+	else if (old_entry != NULL)
+	{
+		/* looks like we're freeing the entry */
+		free(old_entry);
+	}
+
+	return (new_entry != NULL) ? new_entry->buffer : NULL;
 }
 
 
@@ -248,10 +298,14 @@ static int pointer_in_block(const UINT8 *ptr, const UINT8 *block, size_t block_s
 
 int pool_owns_pointer(memory_pool *pool, void *ptr)
 {
+	pool_hash_entry *hash_entry;
 	pool_entry *entry;
 
+	/* identify the hash header */
+	hash_entry = &pool->hashtable[hash_value(pool, ptr)];
+
 	/* find the entry that this block is referring to */
-	for (entry = pool->first; entry != NULL; entry = entry->next)
+	for (entry = hash_entry->first; entry != NULL; entry = entry->next)
 		if (entry->buffer == ptr)
 			return TRUE;
 
@@ -267,6 +321,7 @@ int pool_owns_pointer(memory_pool *pool, void *ptr)
 memory_block_overlap pool_contains_block(memory_pool *pool, void *ptr, size_t size,
 	void **found_block, size_t *found_block_size)
 {
+	int i;
 	memory_block_overlap overlap = OVERLAP_NONE;
 	const UINT8 *this_memory = (const UINT8 *) ptr;
 	size_t this_memory_size = size;
@@ -275,31 +330,34 @@ memory_block_overlap pool_contains_block(memory_pool *pool, void *ptr, size_t si
 	size_t that_memory_size = 0;
 
 	/* loop through the memory blocks in this pool */
-	for (entry = pool->first; entry != NULL; entry = entry->next)
+	for (i = 0; i < ARRAY_LENGTH(pool->hashtable); i++)
 	{
-		that_memory = (const UINT8 *) entry->buffer;
-		that_memory_size = entry->size;
-
-		/* check for overlap */
-		if (pointer_in_block(this_memory, that_memory, that_memory_size))
+		for (entry = pool->hashtable[i].first; entry != NULL; entry = entry->next)
 		{
-			if (pointer_in_block(this_memory + this_memory_size - 1, that_memory, that_memory_size))
-				overlap = OVERLAP_FULL;
-			else
-				overlap = OVERLAP_PARTIAL;
-			break;
-		}
-		else if (pointer_in_block(that_memory, this_memory, this_memory_size))
-		{
-			if (pointer_in_block(that_memory + that_memory_size - 1, this_memory, this_memory_size))
-				overlap = OVERLAP_FULL;
-			else
-				overlap = OVERLAP_PARTIAL;
-			break;
-		}
+			that_memory = (const UINT8 *) entry->buffer;
+			that_memory_size = entry->size;
 
-		that_memory = NULL;
-		that_memory_size = 0;
+			/* check for overlap */
+			if (pointer_in_block(this_memory, that_memory, that_memory_size))
+			{
+				if (pointer_in_block(this_memory + this_memory_size - 1, that_memory, that_memory_size))
+					overlap = OVERLAP_FULL;
+				else
+					overlap = OVERLAP_PARTIAL;
+				break;
+			}
+			else if (pointer_in_block(that_memory, this_memory, this_memory_size))
+			{
+				if (pointer_in_block(that_memory + that_memory_size - 1, this_memory, this_memory_size))
+					overlap = OVERLAP_FULL;
+				else
+					overlap = OVERLAP_PARTIAL;
+				break;
+			}
+
+			that_memory = NULL;
+			that_memory_size = 0;
+		}
 	}
 
 	if (found_block != NULL)
@@ -314,42 +372,6 @@ memory_block_overlap pool_contains_block(memory_pool *pool, void *ptr, size_t si
 /***************************************************************************
     INTERNAL FUNCTIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    alloc_entry - allocate an entry for a pool
--------------------------------------------------*/
-
-static pool_entry *alloc_entry(memory_pool *pool, size_t buffer_size, const char *file, int line)
-{
-	pool_entry *entry;
-
-	/* allocate the new entry */
-	entry = malloc(offsetof(pool_entry, buffer) + buffer_size);
-	if (entry == NULL)
-	{
-		/* failure */
-		report_failure(pool, "alloc_entry: Failed to allocate %u bytes (%s:%d)", buffer_size, file, line);
-		return NULL;
-	}
-
-	/* set up the new entry */
-	memset(entry, 0, offsetof(pool_entry, buffer));
-	entry->pool = pool;
-	entry->size = buffer_size;
-	entry->cookie = MAGIC_COOKIE;
-
-	/* add this entry to the linked list */
-	*pool->lastptr = entry;
-	pool->lastptr = &entry->next;
-
-#ifdef MAME_DEBUG
-	/* randomize memory for debugging */
-	rand_memory(entry->buffer, buffer_size);
-#endif
-
-	return entry;
-}
-
 
 /*-------------------------------------------------
     report_failure - report a failure to the
@@ -372,6 +394,19 @@ static void report_failure(memory_pool *pool, const char *format, ...)
 		/* call the callback with the message */
 		(*pool->fail)(message);
 	}
+}
+
+
+
+/*-------------------------------------------------
+    hash_value - returns the hash value for a
+    pointer
+-------------------------------------------------*/
+
+static int hash_value(memory_pool *pool, void *ptr)
+{
+	UINT64 ptr_int = (UINT64) (size_t) ptr;
+	return (int) ((ptr_int ^ (ptr_int >> 3)) % ARRAY_LENGTH(pool->hashtable));
 }
 
 

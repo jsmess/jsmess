@@ -2432,8 +2432,10 @@ INLINE UINT32 READ_RDP_DATA(UINT32 address)
 	}
 }
 
+#if LOG_RDP_EXECUTION
 static const char *image_format[] = { "RGBA", "YUV", "CI", "IA", "I", "???", "???", "???" };
 static const char *image_size[] = { "4-bit", "8-bit", "16-bit", "32-bit" };
+#endif
 
 static const int rdp_command_length[64] =
 {
@@ -2503,6 +2505,7 @@ static const int rdp_command_length[64] =
 	8			// 0x3f, Set_Color_Image
 };
 
+#if LOG_RDP_EXECUTION
 static int rdp_dasm(char *buffer)
 {
 	int i;
@@ -2809,6 +2812,7 @@ static int rdp_dasm(char *buffer)
 
 	return rdp_command_length[command];
 }
+#endif
 
 /*****************************************************************************/
 

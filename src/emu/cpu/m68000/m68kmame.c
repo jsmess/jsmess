@@ -1093,6 +1093,7 @@ void m68ec020_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
+#if HAS_M68040
 static void m68040_set_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
@@ -1144,7 +1145,6 @@ static void m68040_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-#if HAS_M68040
 void m68040_get_info(UINT32 state, cpuinfo *info)
 {
 	int sr;

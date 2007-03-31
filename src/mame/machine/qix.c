@@ -10,7 +10,6 @@
 #include "qix.h"
 #include "6821pia.h"
 #include "cpu/m6800/m6800.h"
-#include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 
@@ -225,7 +224,7 @@ MACHINE_START( qix )
 MACHINE_RESET( qix )
 {
 	/* set a timer for the first scanline */
-	timer_set(cpu_getscanlinetime(0), 0, qix_scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, qix_scanline_callback);
 
 	/* reset the PIAs */
 	pia_reset();
@@ -247,7 +246,7 @@ MACHINE_START( qixmcu )
 MACHINE_RESET( qixmcu )
 {
 	/* set a timer for the first scanline */
-	timer_set(cpu_getscanlinetime(0), 0, qix_scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, qix_scanline_callback);
 
 	/* reset the PIAs */
 	pia_reset();
@@ -271,7 +270,7 @@ MACHINE_START( slither )
 MACHINE_RESET( slither )
 {
 	/* set a timer for the first scanline */
-	timer_set(cpu_getscanlinetime(0), 0, qix_scanline_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, qix_scanline_callback);
 
 	/* reset the PIAs */
 	pia_reset();
@@ -294,7 +293,7 @@ static void vblank_stop(int param)
 INTERRUPT_GEN( qix_vblank_start )
 {
 	pia_3_cb1_w(0, 1);
-	timer_set(cpu_getscanlinetime(0), 0, vblank_stop);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, vblank_stop);
 }
 
 
@@ -420,7 +419,7 @@ static void deferred_pia_4_porta_w(int data)
 static WRITE8_HANDLER( sync_pia_4_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	timer_set(TIME_NOW, data, deferred_pia_4_porta_w);
+	mame_timer_set(time_zero, data, deferred_pia_4_porta_w);
 }
 
 
@@ -562,7 +561,7 @@ WRITE8_HANDLER( qix_pia_0_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	timer_set(TIME_NOW, data | (offset << 8), pia_0_w_callback);
+	mame_timer_set(time_zero, data | (offset << 8), pia_0_w_callback);
 }
 
 

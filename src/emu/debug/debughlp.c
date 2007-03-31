@@ -28,12 +28,12 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _help_item help_item;
 struct _help_item
 {
 	const char *		tag;
 	const char *		help;
 };
-typedef struct _help_item help_item;
 
 
 

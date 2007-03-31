@@ -120,7 +120,7 @@ static void winui_output_error(void *param, const char *format, va_list argptr)
 	char buffer[1024];
 
 	// if we are in fullscreen mode, go to windowed mode
-	if (video_config.windowed == 0)
+	if ((video_config.windowed == 0) && (win_window_list != NULL))
 		winwindow_toggle_full_screen();
 
 	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
@@ -429,6 +429,13 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 	if (already_hit)
 		ExitProcess(100);
 	already_hit = 1;
+
+#ifdef MAME_DEBUG
+{
+extern void debug_flush_traces(void);
+debug_flush_traces();
+}
+#endif
 
 	// find our man
 	for (i = 0; exception_table[i].code != 0; i++)

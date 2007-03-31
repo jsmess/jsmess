@@ -154,7 +154,7 @@ static void delayed_command_w(int data)
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	timer_set(TIME_NOW, data, delayed_command_w);
+	mame_timer_set(time_zero, data, delayed_command_w);
 }
 
 
@@ -333,16 +333,13 @@ static MACHINE_DRIVER_START( victory )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
+	/* using the standard Exidy video parameters for now, needs to be confirmed */
+	MDRV_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_START(victory)

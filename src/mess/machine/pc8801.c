@@ -221,7 +221,7 @@ WRITE8_HANDLER(pc88sr_outport_40)
   r = pc8801_is_24KHz ? 0x00 : 0x02;
   r |= use_5FD ? 0x00 : 0x08;
   r |= calender_data() ? 0x10 : 0x00;
-  if(cpu_getvblank()) r|=0x20;
+  if(video_screen_get_vblank(0)) r|=0x20;
   return r|0xc0;
 }
 

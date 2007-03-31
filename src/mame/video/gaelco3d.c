@@ -436,7 +436,7 @@ void gaelco3d_render(void)
 
 #if DISPLAY_STATS
 {
-	int scan = cpu_getscanline();
+	int scan = video_screen_get_vpos(0);
 	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - Machine->screen[0].visarea.max_y)));
 }
 #endif
@@ -473,7 +473,7 @@ WRITE32_HANDLER( gaelco3d_render_w )
 	}
 
 #if DISPLAY_STATS
-	lastscan = cpu_getscanline();
+	lastscan = video_screen_get_vpos(0);
 #endif
 }
 

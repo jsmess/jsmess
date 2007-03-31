@@ -161,6 +161,8 @@ void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(int), con
 void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(void *), const char *file, int line, const char *func);
 void mame_timer_reset(mame_timer *which, mame_time duration);
 int mame_timer_enable(mame_timer *which, int enable);
+int mame_timer_get_param(mame_timer *which);
+void *mame_timer_get_param_ptr(mame_timer *which);
 mame_time mame_timer_timeelapsed(mame_timer *which);
 mame_time mame_timer_timeleft(mame_timer *which);
 mame_time mame_timer_get_time(void);

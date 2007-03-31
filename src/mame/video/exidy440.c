@@ -8,8 +8,6 @@
 #include "exidy440.h"
 
 #define SPRITE_COUNT		40
-#define SPRITERAM_SIZE		(SPRITE_COUNT * 4)
-#define MAX_SCANLINE		240
 
 
 /* globals */
@@ -165,7 +163,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
      * caused by collision or beam, ORed together with CHRCLK,
      * which probably goes off once per scanline; for now, we just
      * always return the current scanline */
-	result = cpu_getscanline();
+	result = video_screen_get_vpos(0);
 	return (result < 255) ? result : 255;
 }
 
@@ -179,7 +177,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
 
 WRITE8_HANDLER( exidy440_spriteram_w )
 {
-	video_screen_update_partial(0, cpu_getscanline());
+	video_screen_update_partial(0, video_screen_get_vpos(0));
 	spriteram[offset] = data;
 }
 
@@ -301,22 +299,6 @@ void collide_firq_callback(int param)
 
 /*************************************
  *
- *  Determine the time when the beam
- *  will intersect a given pixel
- *
- *************************************/
-
-double compute_pixel_time(int x, int y)
-{
-	/* assuming this is called at refresh time, compute how long until we
-     * hit the given x,y position */
-	return cpu_getscanlinetime(y) + (cpu_getscanlineperiod() * (double)x * (1.0 / 320.0));
-}
-
-
-
-/*************************************
- *
  *  Sprite drawing
  *
  *************************************/
@@ -358,10 +340,10 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 		for (y = 0; y < 16; y++, yoffs--, sy--)
 		{
 			/* wrap at the top and bottom of the screen */
-			if (sy >= 240)
-				sy -= 240;
-			else if (sy < 0)
-				sy += 240;
+			if (sy >= EXIDY440_VBSTART)
+				sy -= (EXIDY440_VBSTART - EXIDY440_VBEND);
+			else if (sy < EXIDY440_VBEND)
+				sy += (EXIDY440_VBSTART - EXIDY440_VBEND);
 
 			/* stop if we get before the current scanline */
 			if (yoffs < cliprect->min_y)
@@ -382,7 +364,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 					int pen;
 
 					/* left pixel */
-					if (left && currx >= 0 && currx < 320)
+					if (left && EXIDY440_HBEND >= 0 && currx < EXIDY440_HBSTART)
 					{
 						/* combine with the background */
 						pen = left | old[0];
@@ -390,12 +372,12 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
-							timer_set(compute_pixel_time(currx, yoffs), currx, collide_firq_callback);
+							mame_timer_set(video_screen_get_time_until_pos(0, yoffs, currx), currx, collide_firq_callback);
 					}
 					currx++;
 
 					/* right pixel */
-					if (right && currx >= 0 && currx < 320)
+					if (right && EXIDY440_HBEND >= 0 && currx < EXIDY440_HBSTART)
 					{
 						/* combine with the background */
 						pen = right | old[1];
@@ -403,7 +385,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
-							timer_set(compute_pixel_time(currx, yoffs), currx, collide_firq_callback);
+							mame_timer_set(video_screen_get_time_until_pos(0, yoffs, currx), currx, collide_firq_callback);
 					}
 					currx++;
 				}
@@ -431,13 +413,13 @@ static void update_screen(mame_bitmap *bitmap, const rectangle *cliprect, int sc
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++, sy++)
 	{
 		/* wrap at the bottom of the screen */
-		if (sy >= 240)
-			sy -= 240;
+		if (sy >= EXIDY440_VBSTART)
+			sy -= (EXIDY440_VBSTART - EXIDY440_VBEND);
 
 		/* only redraw if dirty */
 		if (scanline_dirty[sy])
 		{
-			draw_scanline8(tmpbitmap, 0, y, 320, &local_videoram[sy * 512], Machine->pens, -1);
+			draw_scanline8(tmpbitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], Machine->pens, -1);
 			scanline_dirty[sy] = 0;
 		}
 	}
@@ -496,12 +478,13 @@ VIDEO_EOF( exidy440 )
 	/* generate an interrupt once/frame for the beam */
 	if (!exidy440_topsecret)
 	{
-		double time, increment;
+		mame_time time;
+		subseconds_t increment;
 		int beamx, beamy;
 		int i;
 
-		beamx = ((input_port_4_r(0) & 0xff) * 320) >> 8;
-		beamy = ((input_port_5_r(0) & 0xff) * 240) >> 8;
+		beamx = ((input_port_4_r(0) & 0xff) * (EXIDY440_HBSTART - EXIDY440_HBEND)) >> 8;
+		beamy = ((input_port_5_r(0) & 0xff) * (EXIDY440_VBSTART - EXIDY440_VBEND)) >> 8;
 
 		/* The timing of this FIRQ is very important. The games look for an FIRQ
             and then wait about 650 cycles, clear the old FIRQ, and wait a
@@ -509,9 +492,12 @@ VIDEO_EOF( exidy440 )
             From this, it appears that they are expecting to get beams over
             a 12 scanline period, and trying to pick roughly the middle one.
             This is how it is implemented. */
-		increment = cpu_getscanlineperiod();
-		time = compute_pixel_time(beamx, beamy) - increment * 6;
-		for (i = 0; i <= 12; i++, time += increment)
-			timer_set(time, beamx, beam_firq_callback);
+		increment =  mame_time_to_subseconds(video_screen_get_scan_period(0));
+		time = sub_mame_times(video_screen_get_time_until_pos(0, beamy, beamx), make_mame_time(0, increment * 6));
+		for (i = 0; i <= 12; i++)
+		{
+			mame_timer_set(time, beamx, beam_firq_callback);
+			time = add_mame_times(time, make_mame_time(0, increment));
+		}
 	}
 }

@@ -1,22 +1,28 @@
 /*
 
-  Cross Pang (c)1998 F2 System
+      F2 System
+         "bootleg tumble pop" hardware (like tumbleb.c)
 
-  No Copyright Notice is displayed in the game however the following page
+  Driver by Pierpaolo Prazzoli with some bits by David Haywood
+
+
+  Cross Pang        (c)1998 F2 System
+  Heuk Sun Baek Sa  (c)199? Oksan / F2 System
+  Bestri            (c)199? F2 System
+
+  Cross Pang New - Is snown on the website but is not currently dumped
+
+  No Copyright Notice is displayed for Cross Pang however the following page
   lists it as being by F2 System, Released April 1998
-  http://www.f2.co.kr/eng/f2system/intro5.asp
+  http://www.f2.co.kr/eng/f2system/intro5.asp (page no longer valid, check www.f2.co.kr)
 
-  The sample rom says 'Oksan' (Oksan made Pass, its unclear how they are
-  related to this game)
 
-  The game uses an U6612 sound chip which is YM3812 compatible.
-
-  Audio Test isn't correct when a sound is tested, instead musics are right.
-
-  This is 'bootleg tumble pop' hardware (like tumbleb.c)
-
-driver by Pierpaolo Prazzoli
-some bits by David Haywood
+  Cross Pang:
+    Audio Test isn't correct when a sound is tested, instead musics are right.
+    The sample rom says 'Oksan' (Oksan made Pass, its unclear how they are
+    related to Cross Pang)
+  Bestri:
+    Bestri includes Heuk San Baek Sa as one of it's three sub games.
 
 */
 
@@ -211,7 +217,7 @@ INPUT_PORTS_START( crospang )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( heuksua )
+INPUT_PORTS_START( heuksun )
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	 ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	 ) PORT_4WAY PORT_PLAYER(1)
@@ -498,13 +504,14 @@ ROM_START( crospang )
 	ROM_LOAD16_BYTE( "rom6.bin", 0x100001, 0x80000, CRC(9c633082) SHA1(18b8591b695ee429c9c9855d8cbba6249a4bd809) )
 ROM_END
 
+
 /*
-Heuk Sua Baek Sa
+Heuk Sun Baek Sa
 
 +----------------------------------+
 |  YM3014 YM3812  M6295 us08       |
 |        6116                  uc07|
-|      us02  Z80               uc07|
+|      us02  Z80               uc08|
 |J  6116                       ud14|
 |A  6116                       ud15|
 |M    62256 62256 6264         ud16|
@@ -523,9 +530,7 @@ OKI M6295
 
 */
 
-
-
-ROM_START( heuksua )
+ROM_START( heuksun )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.j3", 0x00001, 0x80000, CRC(db2b9c8e) SHA1(aa37e3a056957a12888e2e3112fe78a6bff7d76f) )
 	ROM_LOAD16_BYTE( "ua03.j5", 0x00000, 0x80000, CRC(de9f01e8) SHA1(3ee9206e7c3c7bebd7cde6f201c2fa7f9f6553b7) )
@@ -554,8 +559,8 @@ ROM_START( heuksua )
 	ROM_LOAD16_BYTE( "ud17.j11", 0x80001, 0x40000, CRC(c6b04171) SHA1(4d142cad4e0d62764144784634fabeef97d07630) )
 ROM_END
 
-/*
 
+/*
 
 Bestri
 
@@ -582,7 +587,6 @@ Yamaha YM3812/YM3014
 OKI M6295
 
 
-
 ua02.i3 (Odd)
 ua03.i5 (even)
 
@@ -597,13 +601,8 @@ ud14.j12 A
 ud15.h12 B
 ud16.g12 C
 ud17.e12 D
-uc07 p12 NO MATCH
 
 */
-
-
-
-
 
 ROM_START( bestri )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
@@ -671,5 +670,5 @@ DRIVER_INIT( crospang )
 }
 
 GAME( 1998, crospang, 0, crospang, crospang, crospang, ROT0, "F2 System", "Cross Pang", 0 )
-GAME( 199?, heuksua,  0, crospang, heuksua,  crospang, ROT0, "Oksan / F2 System", "Heuk Sua Baek Sa", 0 )
-GAME( 199?, bestri,   0, bestri,   bestri,   crospang, ROT0, "F2 System", "Bestri", 0 )
+GAME( 199?, heuksun,  0, crospang, heuksun,  crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", 0 )
+GAME( 199?, bestri,   0, bestri,   bestri,   crospang, ROT0, "F2 System", "Bestri (Korea)", 0 )

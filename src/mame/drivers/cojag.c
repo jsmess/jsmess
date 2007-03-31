@@ -429,7 +429,7 @@ static void gpu_sync_timer(int param)
 {
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
 	if (gpu_command_pending && param < 1000)
-		timer_set(TIME_IN_USEC(50), ++param, gpu_sync_timer);
+		mame_timer_set(MAME_TIME_IN_USEC(50), ++param, gpu_sync_timer);
 }
 
 
@@ -443,7 +443,7 @@ static WRITE32_HANDLER( gpu_jump_w )
 	jaguar_gpu_resume();
 
 	/* start the sync timer going, and note that there is a command pending */
-	timer_set(TIME_NOW, 0, gpu_sync_timer);
+	mame_timer_set(time_zero, 0, gpu_sync_timer);
 	gpu_command_pending = 1;
 }
 
@@ -955,7 +955,6 @@ MACHINE_DRIVER_START( cojagr3k )
 	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(cojag)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -963,7 +962,7 @@ MACHINE_DRIVER_START( cojagr3k )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 30*8)
+	MDRV_SCREEN_SIZE(42*8, 262)	  /* guess -- TOM registers should be used to configure screen */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(65534)
 
@@ -1004,7 +1003,6 @@ MACHINE_DRIVER_START( cojag68k )
 	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(cojag)
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -1012,7 +1010,7 @@ MACHINE_DRIVER_START( cojag68k )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 30*8)
+	MDRV_SCREEN_SIZE(42*8, 262)	  /* guess -- TOM registers should be used to configure screen */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(65534)
 

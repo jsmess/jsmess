@@ -1190,7 +1190,7 @@ static READ8_HANDLER(mac_via_in_b)
 	int val = 0;
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (cpu_getvblank())
+	if (video_screen_get_vblank(0))
 		val |= 0x40;
 
 	if (has_adb())
@@ -1446,7 +1446,7 @@ INTERRUPT_GEN( mac_interrupt )
 
 	mac_sh_updatebuffer();
 
-	scanline = cpu_getscanline();
+	scanline = video_screen_get_vpos(0);
 	if (scanline == 342)
 		mac_vblank_irq();
 

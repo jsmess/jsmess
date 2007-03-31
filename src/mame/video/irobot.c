@@ -9,7 +9,6 @@
 
 #define BITMAP_WIDTH	256
 static UINT8 *polybitmap1,*polybitmap2;
-static UINT8 *polybitmap;
 
 static int ir_xmin, ir_ymin, ir_xmax, ir_ymax; /* clipping area */
 
@@ -47,11 +46,6 @@ PALETTE_INIT( irobot )
 	int i;
 	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
 	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
-	/* the palette will be initialized by the game. We just set it to some */
-	/* pre-cooked values so the startup copyright notice can be displayed. */
-	for (i = 0;i < 64;i++)
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 
 	/* Convert the color prom for the text palette */
 	for (i = 0;i < 32;i++)
@@ -102,6 +96,18 @@ WRITE8_HANDLER( irobot_paletteram_w )
 }
 
 
+static void _irobot_poly_clear(UINT8 *bitmap_base)
+{
+	memset(bitmap_base, 0, BITMAP_WIDTH * Machine->screen[0].height);
+}
+
+void irobot_poly_clear(void)
+{
+	UINT8 *bitmap_base = irobot_bufsel ? polybitmap2 : polybitmap1;
+	_irobot_poly_clear(bitmap_base);
+}
+
+
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -112,6 +118,10 @@ VIDEO_START( irobot )
 	/* Setup 2 bitmaps for the polygon generator */
 	polybitmap1 = auto_malloc(BITMAP_WIDTH * Machine->screen[0].height);
 	polybitmap2 = auto_malloc(BITMAP_WIDTH * Machine->screen[0].height);
+
+	/* clear the bitmaps so we start with valid palette look-up values for drawing */
+	_irobot_poly_clear(polybitmap1);
+	_irobot_poly_clear(polybitmap2);
 
 	/* Set clipping */
 	ir_xmin = ir_ymin = 0;
@@ -163,12 +173,6 @@ VIDEO_START( irobot )
 
 ***************************************************************************/
 
-void irobot_poly_clear(void)
-{
-	UINT8 *bitmap_base = irobot_bufsel ? polybitmap2 : polybitmap1;
-	memset(bitmap_base, 0, BITMAP_WIDTH * Machine->screen[0].height);
-}
-
 #define draw_pixel(x,y,c)		polybitmap[(y) * BITMAP_WIDTH + (x)] = (c)
 #define fill_hline(x1,x2,y,c)	memset(&polybitmap[(y) * BITMAP_WIDTH + (x1)], (c), (x2) - (x1) + 1)
 
@@ -178,7 +182,7 @@ void irobot_poly_clear(void)
      modified from a routine written by Andrew Caldwell
  */
 
-static void draw_line (int x1, int y1, int x2, int y2, int col)
+static void draw_line (UINT8 *polybitmap, int x1, int y1, int x2, int y2, int col)
 {
     int dx,dy,sx,sy,cx,cy;
 
@@ -228,6 +232,7 @@ static void draw_line (int x1, int y1, int x2, int y2, int col)
 
 void irobot_run_video(void)
 {
+	UINT8 *polybitmap;
 	UINT16 *combase16 = (UINT16 *)irobot_combase;
 	int sx,sy,ex,ey,sx2,ey2;
 	int color;
@@ -282,7 +287,7 @@ void irobot_run_video(void)
 				sx = combase16[spnt+3];
 				word1 = (INT16)combase16[spnt+2];
 				ex = sx + word1 * (ey - sy + 1);
-				draw_line(ROUND_TO_PIXEL(sx),sy,ROUND_TO_PIXEL(ex),ey,color);
+				draw_line(polybitmap, ROUND_TO_PIXEL(sx),sy,ROUND_TO_PIXEL(ex),ey,color);
 				spnt+=4;
 			}//while object
 		}//if line
@@ -373,7 +378,7 @@ VIDEO_UPDATE( irobot )
 	int x, y, offs;
 
 	/* copy the polygon bitmap */
-	for (y = Machine->screen[0].visarea.min_y; y <= Machine->screen[0].visarea.max_y; y++)
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], Machine->pens, -1);
 
 	/* redraw the non-zero characters in the alpha layer */
@@ -389,7 +394,7 @@ VIDEO_UPDATE( irobot )
 						code, color,
 						0,0,
 						8*x,8*y,
-						&Machine->screen[0].visarea,TRANSPARENCY_COLOR,transp);
+						cliprect,TRANSPARENCY_COLOR,transp);
 			}
 	return 0;
 }

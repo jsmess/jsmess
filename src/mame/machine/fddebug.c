@@ -124,17 +124,58 @@
 
 #define KEY_SIZE			8192
 #define MAX_CONSTRAINTS		100
+#define MAX_SEARCH_DEPTH	10000
 
 /* status byte breakdown */
 #define STATE_MASK			0xff00
 #define HIBITS_MASK			0x00c0
-#define STATUS_MASK			0x003f
+#define SEARCH_MASK			0x0020
+#define STATUS_MASK			0x001f
 
 /* possible status values */
 #define STATUS_UNVISITED	0x00
 #define STATUS_LOCKED		0x01
 #define STATUS_NOCHANGE		0x02
 #define STATUS_GUESS		0x03
+
+/* sizes for the opcode table */
+#define SIZE_BYTE			1		/* single byte */
+#define SIZE_WORD			2		/* single word */
+#define SIZE_LONG			3		/* single long */
+#define SIZE_BIT			4		/* single byte, limited to bit sizes (0-7) */
+#define SIZE_MASK			7
+
+/* operand sizes */
+#define OF_SIZEMASK			(SIZE_MASK << 0)
+#define OF_BYTE				(SIZE_BYTE << 0)	/* byte size operation */
+#define OF_WORD				(SIZE_WORD << 0)	/* word size operation */
+#define OF_LONG				(SIZE_LONG << 0)	/* long size operation */
+
+/* immediate sizes */
+#define OF_ISIZEMASK 		(SIZE_MASK << 3)
+#define OF_IMMB				(SIZE_BYTE << 3)	/* immediate byte follows */
+#define OF_IMMW				(SIZE_WORD << 3)	/* immediate word follows */
+#define OF_IMML				(SIZE_LONG << 3)	/* immediate long follows */
+#define OF_IMMBIT			(SIZE_BIT << 3)		/* immediate byte follows */
+
+/* other opcode flags */
+#define OF_EASRC			0x00000040			/* standard EA is source */
+#define OF_EADST			0x00000080			/* standard EA is destination */
+#define OF_EADREG			0x00000100			/* EA with data register is allowed */
+#define OF_EAAREG			0x00000200			/* EA with address register is allowed */
+#define OF_EAA				0x00000400			/* EA with (An) is allowed */
+#define OF_EAPLUS			0x00000800			/* EA with (An)+ is allowed */
+#define OF_EAMINUS			0x00001000			/* EA with -(An) is allowed */
+#define OF_EADISP			0x00002000			/* EA with (D,An) displacement is allowed */
+#define OF_EAABS			0x00004000			/* EA with absolute (both word and long) is allowed */
+#define OF_EAIMM			0x00008000			/* EA with immediate is allowed */
+#define OF_EAPCR			0x00010000			/* EA with PC-relative addressing is allowed */
+#define OF_RARE				0x00080000			/* opcode is not commonly used */
+#define OF_BRANCH			0x00100000			/* opcode represents a branch */
+#define OF_JMP				0x00200000			/* opcode represents a jmp/jsr */
+#define OF_MOVE				0x00400000			/* opcode has MOVE semantics */
+#define OF_LENMASK			0xf0000000			/* opcode length mask */
+#define OF_INVALID			0xffffffff			/* invalid opcode */
 
 
 
@@ -150,7 +191,16 @@ struct _fd1094_possibility
 	int			length;				/* number of words */
 	UINT8		instrbuffer[10];	/* instruction data for disassembler */
 	UINT8		keybuffer[10];		/* array of key values to produce the instruction data */
+	UINT8		iffy;				/* is this an iffy possibility? */
 	char		dasm[256];			/* disassembly */
+};
+
+/* an entry in the opcode table */
+typedef struct _optable_entry optable_entry;
+struct _optable_entry
+{
+	UINT32			flags;			/* per-opcode flags */
+	const char *	string;			/* identifying string */
 };
 
 
@@ -161,9 +211,10 @@ struct _fd1094_possibility
 
 /* array of PCs not to stop at */
 static UINT8 *				ignorepc;
+static UINT8				ignore_all;
 
-/* array of instruction lengths per opcode */
-static UINT8 *				oplength;
+/* array of information about each opcode */
+static optable_entry *		optable;
 
 /* buffer for undoing operations */
 static UINT8 *				undobuff;
@@ -178,6 +229,10 @@ static UINT32 *				possible_seed;
 /* array of constraints */
 static fd1094_constraint	constraints[MAX_CONSTRAINTS];
 static int					constcount;
+
+/* stack of search addresses */
+static UINT32				searchstack[MAX_SEARCH_DEPTH];
+static int					searchsp;
 
 /* current key generation parameters */
 static UINT32				fd1094_global;
@@ -208,12 +263,18 @@ void fd1094_regenerate_key(void);
 static int instruction_hook(offs_t curpc);
 
 static void execute_fdsave(int ref, int params, const char **param);
+static void execute_fdoutput(int ref, int params, const char **param);
 static void execute_fdseed(int ref, int params, const char **param);
 static void execute_fdlockguess(int ref, int params, const char **param);
+static void execute_fdeliminate(int ref, int params, const char **param);
 static void execute_fdunlock(int ref, int params, const char **param);
 static void execute_fdignore(int ref, int params, const char **param);
 static void execute_fdundo(int ref, int params, const char **param);
 static void execute_fdstatus(int ref, int params, const char **param);
+static void execute_fdstate(int ref, int params, const char **param);
+static void execute_fdpc(int ref, int params, const char **param);
+static void execute_fdsearch(int ref, int params, const char **param);
+static void execute_fddasm(int ref, int params, const char **param);
 static void execute_fdcset(int ref, int params, const char **param);
 static void execute_fdclist(int ref, int params, const char **param);
 static void execute_fdcsearch(int ref, int params, const char **param);
@@ -226,6 +287,11 @@ static UINT32 find_global_key_matches(UINT32 startwith, UINT16 *output);
 static int find_constraint_sequence(UINT32 global, int quick);
 static int does_key_work_for_constraints(const UINT16 *base, UINT8 *key);
 static UINT32 reconstruct_base_seed(int keybaseaddr, UINT32 startseed);
+
+static void build_optable(void);
+static int validate_ea(UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
+static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords);
+
 
 
 
@@ -327,22 +393,8 @@ INLINE void generate_key_bytes(UINT8 *dest, UINT32 keyoffs, UINT32 count, UINT32
 
 INLINE UINT8 get_opcode_length(UINT16 opcode)
 {
-	/* if we don't know the length yet, figure it out */
-	if (oplength[opcode] == 0)
-	{
-		char dummybuffer[256];
-		UINT8 instrbuffer[10];
-
-		/* build up the first word of an instruction */
-		instrbuffer[0] = opcode >> 8;
-		instrbuffer[1] = opcode;
-
-		/* disassembling that gives us the length */
-		oplength[opcode] = (m68k_disassemble_raw(dummybuffer, 0, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000) & 0xff) / 2;
-	}
-
 	/* return the length from the table */
-	return oplength[opcode];
+	return optable[opcode].flags >> 28;
 }
 
 
@@ -357,6 +409,63 @@ INLINE void set_constraint(fd1094_constraint *constraint, UINT32 pc, UINT16 stat
 	constraint->state = state;
 	constraint->value = value & mask;
 	constraint->mask = mask;
+}
+
+/*-----------------------------------------------
+    print_possibilities - print possibilities
+    for a given address
+-----------------------------------------------*/
+
+INLINE void print_possibilities(void)
+{
+	int i;
+
+	debug_console_printf("Possibilities @ %06X:\n", posslist[0].basepc);
+	for (i = 0; i < posscount; i++)
+		debug_console_printf(" %c%2x: %s\n", posslist[i].iffy ? ' ' : '*', i, posslist[i].dasm);
+}
+
+
+/*-----------------------------------------------
+    pc_is_valid - is a given PC value valid?
+    0=no, 1=yes, 2=unlikely
+-----------------------------------------------*/
+
+INLINE int pc_is_valid(UINT32 pc, UINT32 flags)
+{
+	/* if we're odd or out of range, fail */
+	if ((pc & 1) == 1)
+		return 0;
+	if (pc & 0xff000000)
+		return 0;
+	if (memory_get_op_ptr(cpu_getactivecpu(), pc, 0) == NULL)
+		return 0;
+	return 1;
+}
+
+
+/*-----------------------------------------------
+    addr_is_valid - is a given address value
+    valid? 0=no, 1=yes, 2=unlikely
+-----------------------------------------------*/
+
+INLINE int addr_is_valid(UINT32 addr, UINT32 flags)
+{
+	/* if this a JMP, the address is a PC */
+	if (flags & OF_JMP)
+		return pc_is_valid(addr, flags);
+
+	/* if we're odd or out of range, fail */
+	if ((flags & OF_SIZEMASK) != OF_BYTE && (addr & 1) == 1)
+		return 0;
+	if ((addr & 0xff000000) != 0 && (addr & 0xff000000) != 0xff000000)
+		return 0;
+
+	/* if we're invalid, fail */
+	if (strcmp(memory_get_handler_string(0, cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, addr), "segaic16_memory_mapper_lsb_r") == 0)
+		return 2;
+
+	return 1;
 }
 
 
@@ -382,10 +491,6 @@ void fd1094_init_debugging(int cpureg, int keyreg, int statreg, void (*changed)(
 	keystatus_words = memory_region_length(statreg) / 2;
 	assert(coderegion_words == keystatus_words);
 
-	/* allocate memory for the opcode length table */
-	oplength = auto_malloc(65536);
-	memset(oplength, 0, 65536);
-
 	/* allocate memory for the ignore table */
 	ignorepc = auto_malloc(1 << 23);
 	memset(ignorepc, 0, 1 << 23);
@@ -396,6 +501,9 @@ void fd1094_init_debugging(int cpureg, int keyreg, int statreg, void (*changed)(
 
 	/* allocate memory for the possible seeds array */
 	possible_seed = auto_malloc(65536 * sizeof(possible_seed[0]));
+
+	/* build the opcode table */
+	build_optable();
 
 	/* set up default constraints */
 	constcount = 0;
@@ -412,13 +520,19 @@ void fd1094_init_debugging(int cpureg, int keyreg, int statreg, void (*changed)(
 
 	/* add some commands */
 	debug_console_register_command("fdsave", CMDFLAG_NONE, 0, 0, 0, execute_fdsave);
+	debug_console_register_command("fdoutput", CMDFLAG_NONE, 0, 1, 1, execute_fdoutput);
 	debug_console_register_command("fdseed", CMDFLAG_NONE, 0, 2, 2, execute_fdseed);
 	debug_console_register_command("fdguess", CMDFLAG_NONE, STATUS_GUESS, 1, 1, execute_fdlockguess);
 	debug_console_register_command("fdlock", CMDFLAG_NONE, STATUS_LOCKED, 1, 1, execute_fdlockguess);
+	debug_console_register_command("fdeliminate", CMDFLAG_NONE, 0, 1, 10, execute_fdeliminate);
 	debug_console_register_command("fdunlock", CMDFLAG_NONE, 0, 1, 1, execute_fdunlock);
 	debug_console_register_command("fdignore", CMDFLAG_NONE, 0, 0, 1, execute_fdignore);
 	debug_console_register_command("fdundo", CMDFLAG_NONE, 0, 0, 0, execute_fdundo);
 	debug_console_register_command("fdstatus", CMDFLAG_NONE, 0, 0, 0, execute_fdstatus);
+	debug_console_register_command("fdstate", CMDFLAG_NONE, 0, 0, 1, execute_fdstate);
+	debug_console_register_command("fdpc", CMDFLAG_NONE, 0, 0, 1, execute_fdpc);
+	debug_console_register_command("fdsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdsearch);
+	debug_console_register_command("fddasm", CMDFLAG_NONE, 0, 1, 1, execute_fddasm);
 	debug_console_register_command("fdcset", CMDFLAG_NONE, 0, 2, 4, execute_fdcset);
 	debug_console_register_command("fdclist", CMDFLAG_NONE, 0, 0, 0, execute_fdclist);
 	debug_console_register_command("fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
@@ -447,7 +561,7 @@ static void set_default_key_params(void)
 	} default_keys[] =
 	{
 		{ "altbeaj1", 0xFCAFF9F9, 0x177AC6 },
-		{ "bullet",   0x12A8F8E5, 0x0AD691 },
+		{ "bullet",   0x12A8F9EC, 0x1B1FC3 },
 		{ "exctleag", 0x98AFF6FA, 0x31DDC6 },
 		{ "suprleag", 0x3CFEFFD8, 0x127114 },
 //      { "suprleag", 0x2CFEFFF9, 0x027114 },
@@ -478,36 +592,17 @@ static void load_overlay_file(void)
 	mame_file *file;
 	int pcaddr;
 
-	/* determin the filename and open the file */
+	/* determine the filename and open the file */
 	sprintf(filename, "%s.kov", Machine->gamedrv->name);
 	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
-		int bytes = mame_fread(file, keystatus, keystatus_words * 2);
+		mame_fread(file, keystatus, keystatus_words * 2);
 		mame_fclose(file);
-
-		/* temporary hack */
-		if (bytes == keystatus_words)
-		{
-			int reps = keystatus_words / KEY_SIZE, repnum;
-			UINT8 *src = malloc_or_die(keystatus_words);
-			memcpy(src, keystatus, keystatus_words);
-			for (pcaddr = 0; pcaddr < KEY_SIZE; pcaddr++)
-				for (repnum = 0; repnum < reps; repnum++)
-				{
-					UINT8 srcdata = src[repnum * KEY_SIZE + pcaddr];
-					keystatus[repnum * KEY_SIZE + pcaddr] = srcdata & STATUS_MASK;
-					keystatus[pcaddr] |= srcdata & HIBITS_MASK;
-				}
-			free(src);
-		}
-		else
-		{
 
 		/* convert from big-endian */
 		for (pcaddr = 0; pcaddr < keystatus_words; pcaddr++)
-			keystatus[pcaddr] = BIG_ENDIANIZE_INT16(keystatus[pcaddr]);
-		}
+			keystatus[pcaddr] = BIG_ENDIANIZE_INT16(keystatus[pcaddr]) & ~SEARCH_MASK;
 	}
 
 	/* mark the key dirty */
@@ -568,14 +663,18 @@ void fd1094_regenerate_key(void)
 	generate_key_bytes(keyregion, 4, 8192 - 4, fd1094_seed);
 
 	/* apply the overlay */
-	for (keyaddr = 0; keyaddr < KEY_SIZE; keyaddr++)
+	for (keyaddr = 4; keyaddr < KEY_SIZE; keyaddr++)
 	{
 		keyregion[keyaddr] |= keystatus[keyaddr] & HIBITS_MASK;
 
 		/* if we're locked, propogate that info to all our reps */
 		if ((keystatus[keyaddr] & STATUS_MASK) == STATUS_LOCKED)
 			for (repnum = 1; repnum < reps; repnum++)
+			{
 				keystatus[repnum * KEY_SIZE + keyaddr] = (keystatus[repnum * KEY_SIZE + keyaddr] & ~STATUS_MASK) | STATUS_LOCKED;
+				if ((keyaddr & 0x1ffc) == 0x1000)
+					keystatus[repnum * KEY_SIZE + keyaddr - 0x1000] = (keystatus[repnum * KEY_SIZE + keyaddr - 0x1000] & ~STATUS_MASK) | STATUS_LOCKED;
+			}
 	}
 
 	/* update the key with the current fd1094 manager */
@@ -602,7 +701,7 @@ static int instruction_hook(offs_t curpc)
 	int i, keystat;
 
 	/* quick exit if we're ignoring */
-	if (ignorepc != NULL && ignorepc[curpc/2])
+	if (ignore_all || ignorepc[curpc/2])
 		return 0;
 
 	/* quick exit if we're already locked */
@@ -640,10 +739,7 @@ static int instruction_hook(offs_t curpc)
 	}
 
 	/* print possibilities and break */
-	debug_console_printf("Possibilities:\n");
-	for (i = 0; i < posscount; i++)
-		debug_console_printf("%2x: %s\n", i, posslist[i].dasm);
-
+	print_possibilities();
 	return 1;
 }
 
@@ -656,6 +752,31 @@ static void execute_fdsave(int ref, int params, const char **param)
 {
 	save_overlay_file();
 	debug_console_printf("File saved\n");
+}
+
+
+/*-----------------------------------------------
+    execute_fdoutput - output the current key
+    to a file
+-----------------------------------------------*/
+
+static void execute_fdoutput(int ref, int params, const char **param)
+{
+	file_error filerr;
+	mame_file *file;
+
+	/* make sure we're up-to-date */
+	if (keydirty)
+		fd1094_regenerate_key();
+
+	/* determin the filename and open the file */
+	filerr = mame_fopen(SEARCHPATH_RAW, param[0], OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	if (filerr == FILERR_NONE)
+	{
+		mame_fwrite(file, keyregion, KEY_SIZE);
+		mame_fclose(file);
+	}
+	debug_console_printf("File '%s' saved\n", param[0]);
 }
 
 
@@ -676,6 +797,11 @@ static void execute_fdseed(int ref, int params, const char **param)
 	/* set the global and seed, and then regenerate the key */
 	fd1094_global = num1;
 	fd1094_seed = num2;
+
+	/* clear out our buffer */
+	memset(keystatus, 0, keystatus_words * sizeof(keystatus[0]));
+
+	/* regenerate the key and reset the 68000 */
 	fd1094_regenerate_key();
 }
 
@@ -706,12 +832,57 @@ static void execute_fdlockguess(int ref, int params, const char **param)
 	/* tag this possibility as indicated by the ref parameter, and then regenerate the key */
 	tag_possibility(&posslist[num1], ref);
 	fd1094_regenerate_key();
+}
 
-	/* tell the user what happened */
-	if (ref == STATUS_LOCKED)
-		debug_console_printf("Locked possibility %x\n", (int)num1);
-	else
-		debug_console_printf("Guessing possibility %x\n", (int)num1);
+
+/*-----------------------------------------------
+    execute_fdeliminate - handle the
+    'fdeliminate' command
+-----------------------------------------------*/
+
+static void execute_fdeliminate(int ref, int params, const char **param)
+{
+	int pnum, posssrc, possdst;
+	int plist[10];
+
+	/* extract parameters */
+	for (pnum = 0; pnum < params; pnum++)
+	{
+		UINT64 num1;
+
+		/* extract the parameters */
+		if (!debug_command_parameter_number(param[pnum], &num1))
+			return;
+
+		/* make sure it is within range of our recent possibilities */
+		if (num1 >= posscount)
+		{
+			debug_console_printf("Possibility %x of out range (%x max)\n", (int)num1, posscount);
+			return;
+		}
+
+		/* set the entry */
+		plist[pnum] = num1;
+	}
+
+	/* loop over parameters */
+	for (posssrc = possdst = 0; posssrc < posscount; posssrc++)
+	{
+		/* is the current pnum in our list to delete? */
+		for (pnum = 0; pnum < params; pnum++)
+			if (plist[pnum] == posssrc)
+				break;
+
+		/* if not, copy to the dest */
+		if (pnum == params)
+			posslist[possdst++] = posslist[posssrc];
+	}
+
+	/* set the final count */
+	posscount = possdst;
+
+	/* reprint the possibilities */
+	print_possibilities();
 }
 
 
@@ -739,7 +910,15 @@ static void execute_fdunlock(int ref, int params, const char **param)
 	{
 		UINT16 *dest = &keystatus[repnum * KEY_SIZE + keyaddr];
 		if ((*dest & STATUS_MASK) == STATUS_LOCKED)
-			*dest &= STATE_MASK;
+			*dest &= ~STATUS_MASK & ~HIBITS_MASK;
+
+		/* unlock the duplicate key bytes as well */
+		if ((keyaddr & 0x1ffc) == 0x1000)
+		{
+			dest = &keystatus[repnum * KEY_SIZE + keyaddr - 0x1000];
+			if ((*dest & STATUS_MASK) == STATUS_LOCKED)
+				*dest &= ~STATUS_MASK & ~HIBITS_MASK;
+		}
 	}
 }
 
@@ -754,6 +933,12 @@ static void execute_fdignore(int ref, int params, const char **param)
 	UINT64 offset;
 
 	/* support 0 or 1 parameters */
+	if (params == 1 && strcmp(param[0], "all") == 0)
+	{
+		ignore_all = TRUE;
+		debug_console_printf("Ignoring all unknown opcodes\n");
+		return;
+	}
 	if (params != 1 || !debug_command_parameter_number(param[0], &offset))
  		offset = activecpu_get_pc();
  	offset /= 2;
@@ -792,14 +977,316 @@ static void execute_fdundo(int ref, int params, const char **param)
 
 static void execute_fdstatus(int ref, int params, const char **param)
 {
-	int locked = 4;
+	int numreps = keystatus_words / KEY_SIZE;
+	int locked = 4, nomatter = 0, guesses = 0;
 	int keyaddr;
 
 	/* count how many locked keys we have */
 	for (keyaddr = 4; keyaddr < KEY_SIZE; keyaddr++)
-		if ((keystatus[keyaddr] & STATUS_MASK) == STATUS_LOCKED)
+	{
+		int count[STATUS_MASK + 1] = { 0 };
+		int repnum;
+
+		for (repnum = 0; repnum < numreps; repnum++)
+			count[keystatus[repnum * KEY_SIZE + keyaddr] & STATUS_MASK]++;
+		if (count[STATUS_LOCKED] > 0)
 			locked++;
-	debug_console_printf("%d/%d keys locked (%d%%)\n", locked, KEY_SIZE, locked * 100 / KEY_SIZE);
+		else if (count[STATUS_GUESS] > 0)
+			guesses++;
+		else
+			nomatter++;
+	}
+	debug_console_printf("%4d/%4d keys locked (%d%%)\n", locked, KEY_SIZE, locked * 100 / KEY_SIZE);
+	debug_console_printf("%4d/%4d keys guessed (%d%%)\n", guesses, KEY_SIZE, guesses * 100 / KEY_SIZE);
+	debug_console_printf("%4d/%4d keys don't matter (%d%%)\n", nomatter, KEY_SIZE, nomatter * 100 / KEY_SIZE);
+}
+
+
+/*-----------------------------------------------
+    execute_fdstate - handle the 'fdstate'
+    command
+-----------------------------------------------*/
+
+static void execute_fdstate(int ref, int params, const char **param)
+{
+	UINT64 newstate;
+
+	/* set the new state if we got a parameter */
+	if (params > 0)
+	{
+		if (!debug_command_parameter_number(param[0], &newstate))
+			return;
+		fd1094_set_state(keyregion, newstate);
+		fd1094_regenerate_key();
+		debug_view_update_type(DVT_MEMORY);
+		debug_disasm_update_all();
+	}
+
+	/* 0 parameters displays the current state */
+	debug_console_printf("FD1094 state = %X\n", fd1094_set_state(keyregion, -1));
+}
+
+
+/*-----------------------------------------------
+    execute_fdpc - handle the 'fdpc'
+    command
+-----------------------------------------------*/
+
+static void execute_fdpc(int ref, int params, const char **param)
+{
+	UINT64 newpc;
+
+	/* support 0 or 1 parameters */
+	if (!debug_command_parameter_number(param[0], &newpc))
+ 		newpc = activecpu_get_pc();
+
+ 	/* set the new PC */
+ 	activecpu_set_reg(REG_PC, newpc);
+
+ 	/* recompute around that */
+ 	instruction_hook(newpc);
+}
+
+
+/*-----------------------------------------------
+    execute_fdsearch - handle the 'fdsearch'
+    command
+-----------------------------------------------*/
+
+static void execute_fdsearch(int ref, int params, const char **param)
+{
+	int pc = activecpu_get_pc();
+	int length, first = TRUE;
+	UINT8 instrdata[2];
+	UINT16 decoded;
+
+	/* if we don't match, reset the stack */
+	if (searchsp == 0 || searchstack[searchsp-1] != pc)
+	{
+		int pcaddr;
+		debug_console_printf("Starting new search at PC=%06X\n", pc);
+		searchsp = 0;
+		for (pcaddr = 0; pcaddr < coderegion_words; pcaddr++)
+			keystatus[pcaddr] &= ~SEARCH_MASK;
+	}
+	else
+	{
+		debug_console_printf("Resuming search at PC=%06X\n", pc);
+		searchsp--;
+	}
+
+	/* loop while we don't need to break */
+	while (1)
+	{
+		int newpc;
+
+		/* for each PC after the first, do some extra work */
+		if (!first)
+		{
+			/* if we've hit this PC already, stop and back off */
+			while ((keystatus[pc/2] & SEARCH_MASK) != 0 && searchsp > 0)
+				pc = searchstack[--searchsp];
+			if ((keystatus[pc/2] & SEARCH_MASK) != 0)
+			{
+				debug_console_printf("Search stack exhausted\n");
+				break;
+			}
+
+			/* set this as our current PC and run the instruction hook */
+			activecpu_set_reg(REG_PC, pc);
+			if (instruction_hook(pc))
+				break;
+		}
+		keystatus[pc/2] |= SEARCH_MASK;
+		first = FALSE;
+
+		/* decode the first word */
+		decoded = fd1094_decode(pc/2, coderegion[pc/2], keyregion, 0);
+		instrdata[0] = decoded >> 8;
+		instrdata[1] = decoded;
+
+		/* get the opcode */
+		length = validate_opcode(pc, instrdata, 1);
+		if (length < 0)
+			length = -length;
+		if (length == 0)
+		{
+			debug_console_printf("Invalid opcode; unable to advance\n");
+			break;
+		}
+
+		/* advance to the new PC */
+		newpc = pc + length * 2;
+
+		/* handle branches */
+		if (optable[decoded].flags & OF_BRANCH)
+		{
+			int deltapc = (INT8)decoded;
+			int targetpc;
+
+			/* extract the delta PC */
+			if ((optable[decoded].flags & OF_ISIZEMASK) == OF_IMMW)
+				deltapc = (INT16)fd1094_decode((pc+2)/2, coderegion[(pc+2)/2], keyregion, 0);
+			else if ((optable[decoded].flags & OF_ISIZEMASK) == OF_IMML)
+				deltapc = (INT32)(fd1094_decode((pc+2)/2, coderegion[(pc+2)/2], keyregion, 0) << 16) + fd1094_decode((pc+4)/2, coderegion[(pc+4)/2], keyregion, 0);
+
+			/* for everything but unconditional branches, push the target on the stack; else just go there */
+			targetpc = (pc + 2 + deltapc) & 0xffffff;
+			if ((decoded & 0xff00) != 0x6000)
+				searchstack[searchsp++] = targetpc;
+			else
+				newpc = targetpc;
+		}
+
+		/* handle jumps */
+		if (optable[decoded].flags & OF_JMP)
+		{
+			int targetpc;
+
+			/* if we're not an absolute address, skip it */
+			if ((decoded & 0x3e) != 0x38)
+				continue;
+
+			/* determine the target PC */
+			if ((decoded & 0x3f) == 0x38)
+				targetpc = (INT16)fd1094_decode((pc+2)/2, coderegion[(pc+2)/2], keyregion, 0);
+			else
+				targetpc = (INT32)(fd1094_decode((pc+2)/2, coderegion[(pc+2)/2], keyregion, 0) << 16) + fd1094_decode((pc+4)/2, coderegion[(pc+4)/2], keyregion, 0);
+
+			/* for jsr's, add a stack entry to explore the destination; else just go there */
+			if ((decoded & 0xffc0) == 0x4e80)
+				searchstack[searchsp++] = targetpc;
+			else
+				newpc = targetpc;
+		}
+
+		/* if we hit RTS/RTE, stop here */
+		if (decoded == 0x4e73 || decoded == 0x4e75)
+			continue;
+
+		/* set the new PC */
+		pc = newpc;
+	}
+
+	/* push the current PC on the stack */
+	searchstack[searchsp++] = pc;
+}
+
+
+/*-----------------------------------------------
+    execute_fddasm - handle the 'fddasm'
+    command
+-----------------------------------------------*/
+
+static void execute_fddasm(int ref, int params, const char **param)
+{
+	int origstate = fd1094_set_state(keyregion, -1);
+	const char *filename;
+	int skipped = FALSE;
+	file_error filerr;
+	mame_file *file;
+	UINT32 pcaddr;
+
+	/* extract the parameters */
+	filename = param[0];
+
+	/* open the file */
+	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	if (filerr != FILERR_NONE)
+	{
+		debug_console_printf("Unable to create file '%s'\n", filename);
+		return;
+	}
+
+	/* now do the disassembly */
+	for (pcaddr = 0; pcaddr < coderegion_words; )
+	{
+		UINT8 instrbuffer[10];
+		int unknowns = FALSE;
+		int length, pcoffs;
+		char disasm[256];
+		UINT16 decoded;
+		int pnum;
+
+		/* if we haven't visited this word, go to the next */
+		if ((keystatus[pcaddr] & STATE_MASK) == 0)
+		{
+			pcaddr++;
+			skipped = TRUE;
+			continue;
+		}
+
+		/* get the opcode */
+		fd1094_set_state(keyregion, FD1094_STATE_RESET | (keystatus[pcaddr] >> 8));
+		decoded = fd1094_decode(pcaddr, coderegion[pcaddr], keyregion, 0);
+		length = optable[decoded].flags >> 28;
+		if (optable[decoded].flags == OF_INVALID)
+			length = 1;
+
+		/* decode the remaining words */
+		instrbuffer[0] = decoded >> 8;
+		instrbuffer[1] = decoded;
+		for (pcoffs = 1; pcoffs < length; pcoffs++)
+		{
+			if ((keystatus[pcaddr + pcoffs] & STATUS_MASK) == STATUS_UNVISITED)
+			{
+				pcaddr++;
+				skipped = TRUE;
+				continue;
+			}
+			decoded = fd1094_decode(pcaddr + pcoffs, coderegion[pcaddr + pcoffs], keyregion, 0);
+			instrbuffer[pcoffs*2+0] = decoded >> 8;
+			instrbuffer[pcoffs*2+1] = decoded;
+		}
+
+		/* disassemble the instruction */
+		m68k_disassemble_raw(disasm, pcaddr * 2, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000);
+
+		/* print the line */
+		if (skipped)
+			mame_fprintf(file, "\n");
+		skipped = FALSE;
+		mame_fprintf(file, " %02X %06X:", keystatus[pcaddr] >> 8, pcaddr * 2);
+		for (pcoffs = 0; pcoffs < 5; pcoffs++)
+		{
+			if (pcoffs < length)
+			{
+				static const char statchar[] = "? =?";
+				int keystat = keystatus[pcaddr + pcoffs] & STATUS_MASK;
+				if (keystat != STATUS_LOCKED && keystat != STATUS_NOCHANGE)
+					unknowns = TRUE;
+				mame_fprintf(file, " %02X%02X%c", instrbuffer[pcoffs*2+0], instrbuffer[pcoffs*2+1], statchar[keystat]);
+			}
+			else
+				mame_fprintf(file, "      ");
+		}
+		mame_fprintf(file, "%s\n", disasm);
+
+		/* if we have unknowns, display them as well */
+		if (unknowns > 0)
+		{
+			UINT8 keybuffer[5];
+			int posscount = try_all_possibilities(pcaddr * 2, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+			for (pnum = 0; pnum < posscount; pnum++)
+				if (strcmp(disasm, posslist[pnum].dasm) != 0)
+				{
+					mame_fprintf(file, "          :");
+					for (pcoffs = 0; pcoffs < 5; pcoffs++)
+						if (pcoffs < posslist[pnum].length)
+							mame_fprintf(file, " %02X%02X ", posslist[pnum].instrbuffer[pcoffs*2+0], posslist[pnum].instrbuffer[pcoffs*2+1]);
+						else
+							mame_fprintf(file, "      ");
+					mame_fprintf(file, "%s\n", posslist[pnum].dasm);
+				}
+		}
+
+		/* advance */
+		pcaddr += length;
+	}
+
+	/* close the file */
+	mame_fclose(file);
+	fd1094_set_state(keyregion, origstate);
 }
 
 
@@ -933,7 +1420,7 @@ static fd1094_possibility *try_all_possibilities(int basepc, int offset, int len
 			if ((hibit & keymask) == keymask)
 			{
 				/* set the key and decode this word */
-				keyregion[keyaddr] = (origkey & STATUS_MASK) | hibit;
+				keyregion[keyaddr] = (origkey & ~HIBITS_MASK) | hibit;
 				decoded = fd1094_decode(pcaddr, coderegion[pcaddr], keyregion, 0);
 
 				/* see if we already got that value */
@@ -974,16 +1461,12 @@ static fd1094_possibility *try_all_possibilities(int basepc, int offset, int len
 			/* first make sure we are a valid instruction */
 			if ((possvalue[i] & 0xf000) == 0xa000 || (possvalue[i] & 0xf000) == 0xf000)
 				continue;
-			if (!m68k_is_valid_instruction(possvalue[i], M68K_CPU_TYPE_68000))
+			length = validate_opcode(basepc, instrbuffer, 1);
+			if (length == 0)
 				continue;
-
-			/* determine the length by disassembling the incomplete instruction */
-			length = get_opcode_length(possvalue[i]);
+			if (length < 0)
+				length = -length;
 		}
-
-		/* if our offset is 1, and the previous instruction is a word-sized branch, make sure */
-		/* we're not odd */
-//      if (offset == 1 &&
 
 		/* if we're not at our target length, recursively call ourselves */
 		if (offset < length - 1)
@@ -992,9 +1475,26 @@ static fd1094_possibility *try_all_possibilities(int basepc, int offset, int len
 		/* otherwise, output what we have */
 		else
 		{
-			possdata->basepc = basepc;
-			possdata->length = length;
+			int tlen, inoffs;
+
+			/* do the disassembly, and make sure we don't get an invalid result */
 			m68k_disassemble_raw(possdata->dasm, basepc, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000);
+
+			/* validate the opcode */
+			tlen = validate_opcode(basepc, instrbuffer, length);
+			if (tlen == 0)
+			{
+				printf("Eliminated: %s [", possdata->dasm);
+				for (inoffs = 0; inoffs < length; inoffs++)
+					printf("%04X ", (instrbuffer[inoffs*2+0] << 8) | instrbuffer[inoffs*2+1]);
+				printf("]\n");
+				continue;
+			}
+
+			/* copy the rest of the data and increment the pointer */
+			possdata->basepc = basepc;
+			possdata->length = (tlen < 0) ? -tlen : tlen;
+			possdata->iffy = (tlen < 0);
 			memcpy(possdata->instrbuffer, instrbuffer, sizeof(possdata->instrbuffer));
 			memcpy(possdata->keybuffer, keybuffer, sizeof(possdata->keybuffer));
 			possdata++;
@@ -1013,7 +1513,29 @@ static fd1094_possibility *try_all_possibilities(int basepc, int offset, int len
 static void tag_possibility(fd1094_possibility *possdata, UINT8 status)
 {
 	int curfdstate = fd1094_set_state(keyregion, -1);
+	int nomatter = 0, locked = 0, guessed = 0;
+	int reps = keystatus_words / KEY_SIZE;
+	UINT8 newstat[5];
 	int pcoffs;
+
+	/* determine the new status for each word */
+	for (pcoffs = 0; pcoffs < possdata->length; pcoffs++)
+	{
+		int pnum;
+
+		/* default to setting the requested status */
+		newstat[pcoffs] = status;
+
+		/* see if the current word was the same across all possibilities */
+		for (pnum = 0; pnum < posscount; pnum++)
+			if (posslist[pnum].instrbuffer[pcoffs*2+0] != possdata->instrbuffer[pcoffs*2+0] ||
+				posslist[pnum].instrbuffer[pcoffs*2+1] != possdata->instrbuffer[pcoffs*2+1])
+				break;
+
+		/* if so, lock, don't guess */
+		if (pnum == posscount)
+			newstat[pcoffs] = STATUS_LOCKED;
+	}
 
 	/* iterate over words in the opcode */
 	for (pcoffs = 0; pcoffs < possdata->length; pcoffs++)
@@ -1021,17 +1543,38 @@ static void tag_possibility(fd1094_possibility *possdata, UINT8 status)
 		int pcaddr = possdata->basepc/2 + pcoffs;
 		int keyaddr = addr_to_keyaddr(pcaddr);
 		int keystat = keystatus[pcaddr] & STATUS_MASK;
+		int repnum;
 
 		/* if the status doesn't match and isn't "no change", then set the status */
-		if (keystat != STATUS_NOCHANGE && keystat != status)
+		if (keystat != STATUS_NOCHANGE)
 		{
 			keystatus[keyaddr] = (keystatus[keyaddr] & ~HIBITS_MASK) | (possdata->keybuffer[pcoffs] & HIBITS_MASK);
-			keystatus[pcaddr] = (curfdstate << 8) | (keystatus[pcaddr] & HIBITS_MASK) | status;
+			keystatus[pcaddr] = (keystatus[pcaddr] & ~STATE_MASK & ~STATUS_MASK) | (curfdstate << 8) | newstat[pcoffs];
 			keydirty = TRUE;
 		}
 		else
-			keystatus[pcaddr] = (curfdstate << 8) | (keystatus[pcaddr] & ~STATE_MASK);
+			keystatus[pcaddr] = (keystatus[pcaddr] & ~STATE_MASK) | (curfdstate << 8);
+
+		/* if we're now locked, propogate across all reps */
+		keystat = keystatus[pcaddr] & STATUS_MASK;
+		if (keystat == STATUS_LOCKED)
+			for (repnum = 0; repnum < reps; repnum++)
+			{
+				keystatus[repnum * KEY_SIZE + keyaddr] = (keystatus[repnum * KEY_SIZE + keyaddr] & ~STATUS_MASK) | STATUS_LOCKED;
+				if ((keyaddr & 0x1ffc) == 0x1000)
+					keystatus[repnum * KEY_SIZE + keyaddr - 0x1000] = (keystatus[repnum * KEY_SIZE + keyaddr - 0x1000] & ~STATUS_MASK) | STATUS_LOCKED;
+			}
+
+		/* update the final key status */
+		if (keystat == STATUS_LOCKED)
+			locked++;
+		else if (keystat == STATUS_GUESS)
+			guessed++;
+		else if (keystat == STATUS_NOCHANGE)
+			nomatter++;
 	}
+
+	debug_console_printf("PC=%06X: locked %d, guessed %d, nochange %d\n", possdata->basepc, locked, guessed, nomatter);
 }
 
 
@@ -1350,6 +1893,538 @@ static UINT32 reconstruct_base_seed(int keybaseaddr, UINT32 startseed)
 
     /* return the value from the window at that location */
     return window[index % ARRAY_LENGTH(window)] & 0x3fffff;
+}
+
+
+/*-----------------------------------------------
+    Table of opcode parameters
+-----------------------------------------------*/
+
+#define ENTRY(a,b,c,d)		{ #a, #b, c, d },
+
+static const struct
+{
+	const char *	bitstring;
+	const char *	eastring;
+	UINT32			flags;
+	const char *	instring;
+} instr_table[] =
+{
+	ENTRY(1100...100000..., ........., OF_BYTE | OF_RARE, "ABCD Dn,Dm")
+	ENTRY(1100...100001..., ........., OF_BYTE | OF_RARE, "ABCD -(An),-(Am)")
+	ENTRY(1101...000......, d.A+-DBIP, OF_BYTE | OF_EASRC, "ADD.B <ea>,Dn")
+	ENTRY(1101...001......, daA+-DBIP, OF_WORD | OF_EASRC, "ADD.W <ea>,Dn")
+	ENTRY(1101...010......, daA+-DBIP, OF_LONG | OF_EASRC, "ADD.L <ea>,Dn")
+	ENTRY(1101...011......, daA+-DBIP, OF_WORD | OF_EASRC, "ADDA.W <ea>,An")
+	ENTRY(1101...100......, ..A+-DB.., OF_BYTE | OF_EADST, "ADD.B Dn,<ea>")
+	ENTRY(1101...101......, ..A+-DB.., OF_WORD | OF_EADST, "ADD.W Dn,<ea>")
+	ENTRY(1101...110......, ..A+-DB.., OF_LONG | OF_EADST, "ADD.L Dn,<ea>")
+	ENTRY(1101...111......, daA+-DBIP, OF_LONG | OF_EASRC, "ADDA.L <ea>,An")
+	ENTRY(0000011000......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMB, "ADDI.B #x,<ea>")
+	ENTRY(0000011001......, d.A+-DB.., OF_WORD | OF_EADST | OF_IMMW, "ADDI.W #x,<ea>")
+	ENTRY(0000011010......, d.A+-DB.., OF_LONG | OF_EADST | OF_IMML, "ADDI.L #x,<ea>")
+	ENTRY(0101...000......, d.A+-DB.., OF_BYTE | OF_EADST, "ADDQ.B #x,<ea>")
+	ENTRY(0101...001......, daA+-DB.., OF_WORD | OF_EADST, "ADDQ.W #x,<ea>")
+	ENTRY(0101...010......, daA+-DB.., OF_LONG | OF_EADST, "ADDQ.L #x,<ea>")
+	ENTRY(1101...10000...., ........., OF_BYTE | OF_RARE, "ADDX.B")
+	ENTRY(1101...10100...., ........., OF_WORD | OF_RARE, "ADDX.W")
+	ENTRY(1101...11000...., ........., OF_LONG | OF_RARE, "ADDX.L")
+	ENTRY(1100...000......, d.A+-DBIP, OF_BYTE | OF_EASRC, "AND.B <ea>,Dn")
+	ENTRY(1100...001......, d.A+-DBIP, OF_WORD | OF_EASRC, "AND.W <ea>,Dn")
+	ENTRY(1100...010......, d.A+-DBIP, OF_LONG | OF_EASRC, "AND.L <ea>,Dn")
+	ENTRY(1100...100......, ..A+-DB.., OF_BYTE | OF_EADST, "AND.B Dn,<ea>")
+	ENTRY(1100...101......, ..A+-DB.., OF_WORD | OF_EADST, "AND.W Dn,<ea>")
+	ENTRY(1100...110......, ..A+-DB.., OF_LONG | OF_EADST, "AND.L Dn,<ea>")
+	ENTRY(0000001000111100, ........., OF_BYTE | OF_IMMB | OF_RARE, "ANDI #x,CCR")
+	ENTRY(0000001000......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMB, "ANDI.B #x,<ea>")
+	ENTRY(0000001001......, d.A+-DB.., OF_WORD | OF_EADST | OF_IMMW, "ANDI.W #x,<ea>")
+	ENTRY(0000001010......, d.A+-DB.., OF_LONG | OF_EADST | OF_IMML, "ANDI.L #x,<ea>")
+	ENTRY(1110....00.00..., ........., OF_BYTE, "ASL/ASR.B")
+	ENTRY(1110....01.00..., ........., OF_WORD, "ASL/ASR.W")
+	ENTRY(1110....10.00..., ........., OF_LONG, "ASL/ASR.L")
+	ENTRY(1110000.11......, ..A+-DB.., OF_WORD | OF_EADST, "ASL/ASR.W <ea>")
+	ENTRY(0110000000000000, ........., OF_WORD | OF_IMMW | OF_BRANCH, "BRA.W <dst>")
+	ENTRY(01100000.......0, ........., OF_BYTE | OF_BRANCH, "BRA.B <dst>")
+	ENTRY(0110000100000000, ........., OF_WORD | OF_IMMW | OF_BRANCH, "BSR.W <dst>")
+	ENTRY(01100001.......0, ........., OF_BYTE | OF_BRANCH, "BSR.B <dst>")
+	ENTRY(0110....00000000, ........., OF_WORD | OF_IMMW | OF_BRANCH, "Bcc.W <dst>")
+	ENTRY(0110...........0, ........., OF_BYTE | OF_BRANCH, "Bcc.B <dst>")
+	ENTRY(0000...101......, d.A+-DB.., OF_BYTE | OF_EADST, "BCHG Dn,<ea>")
+	ENTRY(0000100001......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMBIT, "BCHG #x,<ea>")
+	ENTRY(0000...110......, d.A+-DB.., OF_BYTE | OF_EADST, "BCLR Dn,<ea>")
+	ENTRY(0000100010......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMBIT, "BCLR #x,<ea>")
+	ENTRY(0000...111......, d.A+-DB.., OF_BYTE | OF_EADST, "BSET Dn,<ea>")
+	ENTRY(0000100011......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMBIT, "BSET #x,<ea>")
+	ENTRY(0000...100......, d.A+-DBIP, OF_BYTE | OF_EADST, "BTST Dn,<ea>")
+	ENTRY(0000100000......, d.A+-DB.P, OF_BYTE | OF_EADST | OF_IMMBIT, "BTST #x,<ea>")
+	ENTRY(0100...110......, d.A+-DBIP, OF_WORD | OF_EADST | OF_RARE, "CHK.W <ea>,Dn")
+	ENTRY(0100001000......, d.A+-DB.., OF_BYTE | OF_EADST, "CLR.B <ea>")
+	ENTRY(0100001001......, d.A+-DB.., OF_WORD | OF_EADST, "CLR.W <ea>")
+	ENTRY(0100001010......, d.A+-DB.., OF_LONG | OF_EADST, "CLR.L <ea>")
+	ENTRY(1011...000......, d.A+-DBIP, OF_BYTE | OF_EASRC, "CMP.B <ea>,Dn")
+	ENTRY(1011...001......, daA+-DBIP, OF_WORD | OF_EASRC, "CMP.W <ea>,Dn")
+	ENTRY(1011...010......, daA+-DBIP, OF_LONG | OF_EASRC, "CMP.L <ea>,Dn")
+	ENTRY(1011...011......, daA+-DBIP, OF_WORD | OF_EASRC, "CMPA.W <ea>,Dn")
+	ENTRY(1011...111......, daA+-DBIP, OF_LONG | OF_EASRC, "CMPA.L <ea>,Dn")
+	ENTRY(0000110000......, d.A+-DB.., OF_BYTE | OF_EASRC | OF_IMMB, "CMPI.B #x,<ea>")
+	ENTRY(0000110001......, d.A+-DB.., OF_WORD | OF_EASRC | OF_IMMW, "CMPI.W #x,<ea>")
+	ENTRY(0000110010......, d.A+-DB.., OF_LONG | OF_EASRC | OF_IMML, "CMPI.L #x,<ea>")
+	ENTRY(1011...100001..., ........., OF_BYTE | OF_RARE, "CMPM.B")
+	ENTRY(1011...101001..., ........., OF_WORD | OF_RARE, "CMPM.W")
+	ENTRY(1011...110001..., ........., OF_LONG | OF_RARE, "CMPM.L")
+	ENTRY(0101....11001..., ........., OF_WORD | OF_IMMW | OF_BRANCH, "DBcc.W <dst>")
+	ENTRY(1000...111......, d.A+-DBIP, OF_WORD | OF_EASRC, "DIVS.W <ea>,Dn")
+	ENTRY(1000...011......, d.A+-DBIP, OF_WORD | OF_EASRC, "DIVU.W <ea>,Dn")
+	ENTRY(1011...100......, d.A+-DB.., OF_BYTE | OF_EADST, "EOR.B Dn,<ea>")
+	ENTRY(1011...101......, d.A+-DB.., OF_WORD | OF_EADST, "EOR.W Dn,<ea>")
+	ENTRY(1011...110......, d.A+-DB.., OF_LONG | OF_EADST, "EOR.L Dn,<ea>")
+	ENTRY(0000101000111100, ........., OF_BYTE | OF_IMMB | OF_RARE, "EORI #x,CCR")
+	ENTRY(0000101000......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMB, "EORI.B #x,<ea>")
+	ENTRY(0000101001......, d.A+-DB.., OF_WORD | OF_EADST | OF_IMMW, "EORI.W #x,<ea>")
+	ENTRY(0000101010......, d.A+-DB.., OF_LONG | OF_EADST | OF_IMML, "EORI.L #x,<ea>")
+	ENTRY(1100...101000..., ........., OF_LONG, "EXG Dn,Dn")
+	ENTRY(1100...101001..., ........., OF_LONG, "EXG An,An")
+	ENTRY(1100...110001..., ........., OF_LONG, "EXG Dn,An")
+	ENTRY(0100100010000..., ........., OF_WORD, "EXT.W Dn")
+	ENTRY(0100100011000..., ........., OF_WORD, "EXT.L Dn")
+	ENTRY(0100111011......, ..A..DB.P, OF_WORD | OF_EASRC | OF_JMP, "JMP <ea>")
+	ENTRY(0100111010......, ..A..DB.P, OF_WORD | OF_EASRC | OF_JMP, "JSR <ea>")
+	ENTRY(0100...111......, ..A..DB.P, OF_BYTE | OF_EASRC, "LEA <ea>,An")
+	ENTRY(0100111001010..., ........., OF_WORD | OF_IMMW | OF_RARE, "LINK An,#x")
+	ENTRY(1110....00.01..., ........., OF_BYTE, "LSL/LSR.B Dn")
+	ENTRY(1110....01.01..., ........., OF_WORD, "LSL/LSR.W Dn")
+	ENTRY(1110....10.01..., ........., OF_LONG, "LSL/LSR.L Dn")
+	ENTRY(1110001.11......, ..A+-DB.., OF_WORD | OF_EADST, "LSL/LSR.W <ea>")
+	ENTRY(0001............, d.A+-DBIP, OF_BYTE | OF_EASRC | OF_MOVE, "MOVE.B <ea>,<ea>")
+	ENTRY(0011............, daA+-DBIP, OF_WORD | OF_EASRC | OF_MOVE, "MOVE.W <ea>,<ea>")
+	ENTRY(0010............, daA+-DBIP, OF_LONG | OF_EASRC | OF_MOVE, "MOVE.L <ea>,<ea>")
+	ENTRY(0011...001......, daA+-DBIP, OF_WORD | OF_EASRC, "MOVEA.W <ea>,An")
+	ENTRY(0010...001......, daA+-DBIP, OF_LONG | OF_EASRC, "MOVEA.L <ea>,An")
+	ENTRY(0100010011......, d.A+-DBIP, OF_WORD | OF_EASRC | OF_RARE, "MOVE <ea>,CCR")
+	ENTRY(0100000011......, d.A+-DB.., OF_WORD | OF_EADST | OF_RARE, "MOVE SR,<ea>")
+	ENTRY(0100100010......, ..A.-DB.., OF_WORD | OF_EADST | OF_IMMW, "MOVEM.W <regs>,<ea>")
+	ENTRY(0100100011......, ..A.-DB.., OF_LONG | OF_EADST | OF_IMMW, "MOVEM.L <regs>,<ea>")
+	ENTRY(0100110010......, ..A+.DB.P, OF_WORD | OF_EASRC | OF_IMMW, "MOVEM.W <ea>,<regs>")
+	ENTRY(0100110011......, ..A+.DB.P, OF_LONG | OF_EASRC | OF_IMMW, "MOVEM.L <ea>,<regs>")
+	ENTRY(0000...100001..., ........., OF_WORD | OF_IMMW | OF_RARE, "MOVEP.W (d16,Ay),Dn")
+	ENTRY(0000...101001..., ........., OF_LONG | OF_IMMW | OF_RARE, "MOVEP.L (d16,Ay),Dn")
+	ENTRY(0000...110001..., ........., OF_WORD | OF_IMMW | OF_RARE, "MOVEP.W Dn,(d16,Ay)")
+	ENTRY(0000...111001..., ........., OF_LONG | OF_IMMW | OF_RARE, "MOVEP.L Dn,(d16,Ay)")
+	ENTRY(0111...0........, ........., OF_LONG, "MOVEQ #x,Dn")
+	ENTRY(1100...111......, d.A+-DBIP, OF_WORD | OF_EASRC, "MULS.W <ea>,Dn")
+	ENTRY(1100...011......, d.A+-DBIP, OF_WORD | OF_EASRC, "MULU.W <ea>,Dn")
+	ENTRY(0100100000......, d.A+-DB.., OF_BYTE | OF_EADST | OF_RARE, "NBCD <ea>")
+	ENTRY(0100010000......, d.A+-DB.., OF_BYTE | OF_EADST, "NEG.B <ea>")
+	ENTRY(0100010001......, d.A+-DB.., OF_WORD | OF_EADST, "NEG.W <ea>")
+	ENTRY(0100010010......, d.A+-DB.., OF_LONG | OF_EADST, "NEG.L <ea>")
+	ENTRY(0100000000......, d.A+-DB.., OF_BYTE | OF_EADST | OF_RARE, "NEGX.B <ea>")
+	ENTRY(0100000001......, d.A+-DB.., OF_WORD | OF_EADST | OF_RARE, "NEGX.W <ea>")
+	ENTRY(0100000010......, d.A+-DB.., OF_LONG | OF_EADST | OF_RARE, "NEGX.L <ea>")
+	ENTRY(0100111001110001, ........., 0, "NOP")
+	ENTRY(0100011000......, d.A+-DB.., OF_BYTE | OF_EADST, "NOT.B <ea>")
+	ENTRY(0100011001......, d.A+-DB.., OF_WORD | OF_EADST, "NOT.W <ea>")
+	ENTRY(0100011010......, d.A+-DB.., OF_LONG | OF_EADST, "NOT.L <ea>")
+	ENTRY(1000...000......, d.A+-DBIP, OF_BYTE | OF_EASRC, "OR.B <ea>,Dn")
+	ENTRY(1000...001......, d.A+-DBIP, OF_WORD | OF_EASRC, "OR.W <ea>,Dn")
+	ENTRY(1000...010......, d.A+-DBIP, OF_LONG | OF_EASRC, "OR.L <ea>,Dn")
+	ENTRY(1000...100......, ..A+-DB.., OF_BYTE | OF_EADST, "OR.B Dn,<ea>")
+	ENTRY(1000...101......, ..A+-DB.., OF_WORD | OF_EADST, "OR.W Dn,<ea>")
+	ENTRY(1000...110......, ..A+-DB.., OF_LONG | OF_EADST, "OR.L Dn,<ea>")
+	ENTRY(0000000000111100, ........., OF_BYTE | OF_IMMB | OF_RARE, "ORI #x,CCR")
+	ENTRY(0000000000......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMB, "ORI.B #x,<ea>")
+	ENTRY(0000000001......, d.A+-DB.., OF_WORD | OF_EADST | OF_IMMW, "ORI.W #x,<ea>")
+	ENTRY(0000000010......, d.A+-DB.., OF_LONG | OF_EADST | OF_IMML, "ORI.L #x,<ea>")
+	ENTRY(0100100001......, ..A..DB.P, OF_BYTE | OF_EADST | OF_RARE, "PEA <ea>")
+	ENTRY(1110....00.11..., ........., OF_BYTE, "ROL/ROR.B Dn")
+	ENTRY(1110....01.11..., ........., OF_WORD, "ROL/ROR.W Dn")
+	ENTRY(1110....10.11..., ........., OF_LONG, "ROL/ROR.L Dn")
+	ENTRY(1110011.11......, ..A+-DB.., OF_WORD | OF_EADST, "ROL/ROR.W <ea>")
+	ENTRY(1110....00.10..., ........., OF_BYTE | OF_RARE, "ROXL/ROXR.B Dn")
+	ENTRY(1110....01.10..., ........., OF_WORD | OF_RARE, "ROXL/ROXR.W Dn")
+	ENTRY(1110....10.10..., ........., OF_LONG | OF_RARE, "ROXL/ROXR.L Dn")
+	ENTRY(1110010.11......, ..A+-DB.., OF_WORD | OF_EADST | OF_RARE, "ROXL/ROXR.W <ea>")
+	ENTRY(0100111001110111, ........., OF_RARE, "RTR")
+	ENTRY(0100111001110101, ........., OF_RARE, "RTS")
+	ENTRY(1000...100000..., ........., OF_BYTE | OF_RARE, "SBCD Dn,Dm")
+	ENTRY(1000...100001..., ........., OF_BYTE | OF_RARE, "SBCD -(An),-(Am)")
+	ENTRY(0101....11......, d.A+-DB.., OF_BYTE | OF_EADST | OF_RARE, "Scc <ea>")
+	ENTRY(1001...000......, d.A+-DBIP, OF_BYTE | OF_EASRC, "SUB.B <ea>,Dn")
+	ENTRY(1001...001......, daA+-DBIP, OF_WORD | OF_EASRC, "SUB.W <ea>,Dn")
+	ENTRY(1001...010......, daA+-DBIP, OF_LONG | OF_EASRC, "SUB.L <ea>,Dn")
+	ENTRY(1001...011......, daA+-DBIP, OF_WORD | OF_EASRC, "SUBA.W <ea>,An")
+	ENTRY(1001...100......, ..A+-DB.., OF_BYTE | OF_EADST, "SUB.B Dn,<ea>")
+	ENTRY(1001...101......, ..A+-DB.., OF_WORD | OF_EADST, "SUB.W Dn,<ea>")
+	ENTRY(1001...110......, ..A+-DB.., OF_LONG | OF_EADST, "SUB.L Dn,<ea>")
+	ENTRY(1001...111......, daA+-DBIP, OF_LONG | OF_EASRC, "SUBA.L <ea>,An")
+	ENTRY(0000010000......, d.A+-DB.., OF_BYTE | OF_EADST | OF_IMMB, "SUBI.B #x,<ea>")
+	ENTRY(0000010001......, d.A+-DB.., OF_WORD | OF_EADST | OF_IMMW, "SUBI.W #x,<ea>")
+	ENTRY(0000010010......, d.A+-DB.., OF_LONG | OF_EADST | OF_IMML, "SUBI.L #x,<ea>")
+	ENTRY(0101...100......, d.A+-DB.., OF_BYTE | OF_EADST, "SUBQ.B #x,<ea>")
+	ENTRY(0101...101......, daA+-DB.., OF_WORD | OF_EADST, "SUBQ.W #x,<ea>")
+	ENTRY(0101...110......, daA+-DB.., OF_LONG | OF_EADST, "SUBQ.L #x,<ea>")
+	ENTRY(1001...10000...., ........., OF_BYTE | OF_RARE, "SUBX.B")
+	ENTRY(1001...10100...., ........., OF_WORD | OF_RARE, "SUBX.W")
+	ENTRY(1001...11000...., ........., OF_LONG | OF_RARE, "SUBX.L")
+	ENTRY(0100100001000..., ........., OF_LONG | OF_RARE, "SWAP Dn")
+	ENTRY(0100101011......, d.A+-DB.., OF_BYTE | OF_EASRC | OF_RARE, "TAS <ea>")
+	ENTRY(010011100100...., ........., OF_RARE, "TRAP #x")
+	ENTRY(0100111001110110, ........., OF_RARE, "TRAPV")
+	ENTRY(0100101000......, d.A+-DB.., OF_BYTE | OF_EASRC, "TST.B <ea>")
+	ENTRY(0100101001......, d.A+-DB.., OF_WORD | OF_EASRC, "TST.W <ea>")
+	ENTRY(0100101010......, d.A+-DB.., OF_LONG | OF_EASRC, "TST.L <ea>")
+	ENTRY(0100111001011..., ........., OF_RARE, "UNLK")
+	ENTRY(0000001001111100, ........., OF_WORD | OF_IMMW | OF_RARE, "ANDI #x,SR")
+	ENTRY(0000101001111100, ........., OF_WORD | OF_IMMW | OF_RARE, "EORI #x,SR")
+	ENTRY(0100000011......, d.A+-DB.., OF_WORD | OF_EADST | OF_RARE, "MOVE SR,<ea>")
+	ENTRY(0100011011......, d.A+-DBIP, OF_WORD | OF_EASRC | OF_RARE, "MOVE <ea>,SR")
+	ENTRY(010011100110...., ........., OF_LONG | OF_RARE, "MOVE USP")
+	ENTRY(0000000001111100, ........., OF_WORD | OF_IMMW | OF_RARE, "ORI #x,SR")
+	ENTRY(0100111001110000, ........., OF_RARE, "RESET")
+	ENTRY(0100111001110011, ........., OF_RARE, "RTE")
+	ENTRY(0100111001110010, ........., OF_WORD | OF_IMMW | OF_RARE, "STOP #x")
+};
+
+
+/*-----------------------------------------------
+    build_optable - build up the opcode table
+-----------------------------------------------*/
+
+static void build_optable(void)
+{
+	int opnum, inum;
+
+	/* allocate and initialize the opcode table */
+	optable = auto_malloc(65536 * sizeof(optable[0]));
+	for (opnum = 0; opnum < 65536; opnum++)
+	{
+		optable[opnum].flags = OF_INVALID;
+		optable[opnum].string = NULL;
+	}
+
+	/* now iterate over entries in our intruction table */
+	for (inum = 0; inum < ARRAY_LENGTH(instr_table); inum++)
+	{
+		const char *bitstring = instr_table[inum].bitstring;
+		const char *eastring = instr_table[inum].eastring;
+		const char *instring = instr_table[inum].instring;
+		UINT32 flags = instr_table[inum].flags;
+		UINT8 ea_allowed[64], ea2_allowed[64];
+		int bitnum, step, eanum, ea2num;
+		UINT16 mask = 0, value = 0;
+
+		/* build up the mask and value from the bitstring */
+		for (bitnum = 0; bitnum < 16; bitnum++)
+		{
+			assert(bitstring[bitnum] == '0' || bitstring[bitnum] == '1' || bitstring[bitnum] == '.');
+			mask <<= 1;
+			value <<= 1;
+			if (bitstring[bitnum] != '.')
+			{
+				mask |= 1;
+				value |= (bitstring[bitnum] == '1');
+			}
+		}
+
+		/* if we have an EA, fill in the EA bits */
+		memset(ea_allowed, 0, sizeof(ea_allowed));
+		if (flags & (OF_EASRC | OF_EADST))
+		{
+			assert((mask & 0x003f) == 0);
+			assert(eastring[0] == 'd' || eastring[0] == '.');
+			if (eastring[0] == 'd') memset(&ea_allowed[0x00], 1, 8);
+			assert(eastring[1] == 'a' || eastring[1] == '.');
+			if (eastring[1] == 'a') memset(&ea_allowed[0x08], 1, 8);
+			assert(eastring[2] == 'A' || eastring[2] == '.');
+			if (eastring[2] == 'A') memset(&ea_allowed[0x10], 1, 8);
+			assert(eastring[3] == '+' || eastring[3] == '.');
+			if (eastring[3] == '+') memset(&ea_allowed[0x18], 1, 8);
+			assert(eastring[4] == '-' || eastring[4] == '.');
+			if (eastring[4] == '-') memset(&ea_allowed[0x20], 1, 8);
+			assert(eastring[5] == 'D' || eastring[5] == '.');
+			if (eastring[5] == 'D') memset(&ea_allowed[0x28], 1, 16);
+			assert(eastring[6] == 'B' || eastring[6] == '.');
+			if (eastring[6] == 'B') memset(&ea_allowed[0x38], 1, 2);
+			assert(eastring[7] == 'I' || eastring[7] == '.');
+			if (eastring[7] == 'I') ea_allowed[0x3c] = 1;
+			assert(eastring[8] == 'P' || eastring[8] == '.');
+			if (eastring[8] == 'P') memset(&ea_allowed[0x3a], 1, 2);
+			step = 0x40;
+		}
+		else
+		{
+			assert(strcmp(eastring, ".........") == 0);
+			ea_allowed[0] = 1;
+			step = 1;
+		}
+
+		/* if we're a move instruction, fill in the EA2 bits */
+		memset(ea2_allowed, 0, sizeof(ea2_allowed));
+		if (flags & OF_MOVE)
+		{
+			assert((mask & 0x0fc0) == 0);
+			memset(&ea2_allowed[0x00], 1, 8);
+			memset(&ea2_allowed[0x10], 1, 42);
+			step = 0x1000;
+		}
+		else
+			ea2_allowed[0] = 1;
+
+		/* iterate over allowed EAs and fill in the opcode entries */
+		for (ea2num = 0; ea2num < 64; ea2num++)
+			if (ea2_allowed[ea2num])
+				for (eanum = 0; eanum < 64; eanum++)
+					if (ea_allowed[eanum])
+					{
+						UINT16 eabits = ((ea2num & 0x38) << 3) | ((ea2num & 0x07) << 9) | eanum;
+
+						/* iterate over opcode entries */
+						for (opnum = 0; opnum <= mask; opnum += step)
+							if ((opnum & mask) == value)
+							{
+								int length = 1;
+
+								/* skip if we've already populated */
+								if (optable[opnum | eabits].flags != OF_INVALID)
+									continue;
+
+								/* determine the length of the opcode */
+								if (flags & OF_ISIZEMASK)
+									length += ((flags & OF_ISIZEMASK) == OF_IMML) ? 2 : 1;
+								if ((eanum >= 0x28 && eanum <= 0x38) || eanum == 0x3a || eanum == 0x3b)
+									length += 1;
+								else if (eanum == 0x39)
+									length += 2;
+								else if (eanum == 0x3c)
+									length += ((flags & OF_SIZEMASK) == OF_LONG) ? 2 : 1;
+								if ((ea2num >= 0x28 && ea2num <= 0x38) || ea2num == 0x3a || ea2num == 0x3b)
+									length += 1;
+								else if (ea2num == 0x39)
+									length += 2;
+								else if (ea2num == 0x3c)
+									length += ((flags & OF_SIZEMASK) == OF_LONG) ? 2 : 1;
+
+								/* make sure we match the disassembler */
+								{
+									char dummybuffer[256];
+									UINT8 instrbuffer[10];
+									instrbuffer[0] = (opnum | eabits) >> 8;
+									instrbuffer[1] = (opnum | eabits);
+									assert(length == (m68k_disassemble_raw(dummybuffer, 0, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000) & 0xff) / 2);
+								}
+
+								/* set the value of the entry in the table */
+								optable[opnum | eabits].flags = flags | (length << 28);
+								optable[opnum | eabits].string = instring;
+							}
+					}
+	}
+}
+
+
+/*-----------------------------------------------
+    validate_ea - determine whether an EA is
+    valid or not, and return the length
+-----------------------------------------------*/
+
+static int validate_ea(UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
+{
+	UINT32 addr;
+	int valid;
+
+	/* switch off of the mode */
+	switch ((modereg >> 3) & 7)
+	{
+		case 0:		/* Dn -- always good */
+		case 1:		/* An -- always good */
+		case 2:		/* (An) -- always good */
+		case 3:		/* (An)+ -- always good */
+		case 4:		/* -(An) -- always good */
+			return 0;
+
+		case 5:		/* (d16,An) -- always good, but odd displacements are a warning for word/long */
+			if ((flags & OF_SIZEMASK) != OF_BYTE && (parambase[1] & 1) == 1)
+				return -1;
+			return 1;
+
+		case 6:		/* (d8,An,Xn)  -- always good, but odd displacements are a warning for word/long */
+			/* also look for invalid extension words */
+			if ((parambase[0] & 7) != 0)
+				return 1000;
+			if ((flags & OF_SIZEMASK) != OF_BYTE && (parambase[1] & 1) == 1)
+				return -1;
+			return 1;
+
+		case 7:
+			switch (modereg & 7)
+			{
+				case 0:	/* (xxx).W -- make sure it is not odd for word/long */
+					addr = (INT16)((parambase[0] << 8) | parambase[1]);
+					valid = addr_is_valid(addr & 0xffffff, flags);
+					return (valid == 0) ? 1000 : (valid == 2) ? -1 : 1;
+
+				case 1:	/* (xxx).L -- make sure it is not odd for word/long, and make sure upper byte of addr is 0 */
+					valid = addr_is_valid((parambase[0] << 24) | (parambase[1] << 16) | (parambase[2] << 8) | parambase[3], flags);
+					return (valid == 0) ? 1000 : (valid == 2) ? -2 : 2;
+
+				case 2:	/* (d16,PC) -- make sure it is not odd for word/long */
+					valid = addr_is_valid(pc + (INT16)((parambase[0] << 8) | parambase[1]), flags);
+					return (valid == 0) ? 1000 : (valid == 2) ? -1 : 1;
+
+				case 3:	/* (d8,PC,Xn) -- odd displacements are a warning for word/long */
+					if ((parambase[0] & 7) != 0)
+						return 1000;
+					if ((flags & OF_SIZEMASK) != OF_BYTE && (parambase[1] & 1) == 1)
+						return -1;
+					return 1;
+
+				case 4:	/* immediate -- check high byte if byte-sized */
+					if ((flags & OF_SIZEMASK) == OF_BYTE && parambase[0] != 0)
+						return 1000;
+					return ((flags & OF_SIZEMASK) == SIZE_LONG) ? 2 : 1;
+			}
+			break;
+	}
+
+	/* should never get here */
+	assert(FALSE);
+	return 0;
+}
+
+
+/*-----------------------------------------------
+    validate_opcode - validate an opcode up to
+    the length specified
+-----------------------------------------------*/
+
+static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords)
+{
+	UINT32 immvalue = 0;
+	int iffy = FALSE;
+	int offset = 0;
+	UINT16 opcode;
+	UINT32 flags;
+	int oplength;
+
+	assert(maxwords >= 1);
+
+	/* extract the opcode and look it up in our table */
+	opcode = (opdata[offset*2+0] << 8) | opdata[offset*2+1];
+	flags = optable[opcode].flags;
+	oplength = flags >> 28;
+
+	/* weed out invalid opcodes immediately */
+	offset++;
+	if (flags == OF_INVALID)
+		return 0;
+	iffy = ((flags & OF_RARE) != 0);
+
+	/* if we're done, or if we don't have enough words, stop now */
+	if (offset == oplength || maxwords < oplength)
+		return iffy ? -oplength : oplength;
+
+	/* if the opcode has an immediate, process that */
+	if (flags & OF_ISIZEMASK)
+	{
+		int neededwords = ((flags & OF_ISIZEMASK) == OF_IMML) ? 2 : 1;
+
+		/* extract the immediate value */
+		immvalue = (opdata[offset*2+0] << 8) | opdata[offset*2+1];
+		if ((flags & OF_ISIZEMASK) == OF_IMML)
+			immvalue = (immvalue << 16) | (opdata[offset*2+2] << 8) | opdata[offset*2+3];
+
+		/* if it's a byte immediate, ensure the upper bits are 0 (except for -1) */
+		if ((flags & OF_ISIZEMASK) == OF_IMMB && immvalue > 0xff && immvalue != 0xffff)
+			return 0;
+
+		/* if it's a bit immediate, ensure all but the lower 3 bits are 0 */
+		if ((flags & OF_ISIZEMASK) == OF_IMMBIT)
+		{
+			/* registers can do up to 32 bits */
+			if ((opcode & 0x3f) < 8)
+			{
+				if (immvalue > 31)
+					return 0;
+			}
+
+			/* memory operands can do up to 8 bits */
+			else
+			{
+				if (immvalue > 7)
+					return 0;
+			}
+		}
+
+		/* advance past the immedate */
+		offset += neededwords;
+	}
+
+	/* if we're a branch, validate the immediate value */
+	if (flags & OF_BRANCH)
+	{
+		int valid;
+
+		/* first adjust the PC based on the size of the branch */
+		pc += 2;
+		if ((flags & OF_SIZEMASK) == OF_BYTE)
+			pc += (INT8)opcode;
+		else if ((flags & OF_SIZEMASK) == OF_WORD)
+			pc += (INT16)immvalue;
+		else
+			pc += immvalue;
+
+		/* if we're odd or out of range, fail */
+		valid = pc_is_valid(pc, flags);
+		if (valid == 0)
+			return 0;
+		if (valid == 2)
+			iffy = TRUE;
+	}
+
+	/* process the EA, if present */
+	if (flags & (OF_EASRC | OF_EADST))
+	{
+		int modereg = opcode & 0x003f;
+		int ealen = validate_ea(pc + offset*2, modereg, &opdata[offset*2], flags);
+
+		/* if the ea was invalid, forward that result */
+		if (ealen == 1000)
+			return 0;
+
+		/* if the ea was iffy, indicate that */
+		if (ealen < 0)
+		{
+			ealen = -ealen;
+			iffy = TRUE;
+		}
+
+		/* advance past the ea */
+		offset += ealen;
+	}
+
+	/* process the move EA, if present */
+	if (flags & OF_MOVE)
+	{
+		int modereg = ((opcode & 0x01c0) >> 3) | ((opcode & 0x0e00) >> 9);
+		int ealen = validate_ea(pc + offset*2, modereg, &opdata[offset*2], flags);
+
+		/* if the ea was invalid, forward that result */
+		if (ealen == 1000)
+			return 0;
+
+		/* if the ea was iffy, indicate that */
+		if (ealen < 0)
+		{
+			ealen = -ealen;
+			iffy = TRUE;
+		}
+
+		/* advance past the ea */
+		offset += ealen;
+	}
+
+	/* at this point we should be at the end */
+	assert(offset == oplength);
+	return iffy ? -oplength : oplength;
 }
 
 #endif

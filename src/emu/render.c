@@ -147,6 +147,7 @@ struct _render_target
 	layout_file *		filelist;			/* list of layout files */
 	UINT32				flags;				/* creation flags */
 	render_primitive_list primlist[NUM_PRIMLISTS];/* list of primitives */
+	int					listindex;			/* index of next primlist to use */
 	INT32				width;				/* width in pixels */
 	INT32				height;				/* height in pixels */
 	render_bounds		bounds;				/* bounds of the target */
@@ -1363,15 +1364,10 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	if (target->base_view == NULL)
 		target->base_view = target->curview;
 
-	/* find a non-busy list to work with */
-	for (listnum = 0; listnum < NUM_PRIMLISTS; listnum++)
-		if (osd_lock_try(target->primlist[listnum].lock))
-			break;
-	if (listnum == NUM_PRIMLISTS)
-	{
-		listnum = 0;
-		osd_lock_acquire(target->primlist[listnum].lock);
-	}
+	/* switch to the next primitive list */
+	listnum = target->listindex;
+	target->listindex = (target->listindex + 1) % NUM_PRIMLISTS;
+	osd_lock_acquire(target->primlist[listnum].lock);
 
 	/* free any previous primitives */
 	release_render_list(&target->primlist[listnum]);

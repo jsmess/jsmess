@@ -142,8 +142,6 @@ static mame_time refresh_period;
 static mame_timer *timeslice_timer;
 static mame_time timeslice_period;
 
-static mame_time scanline_period;
-
 static mame_timer *interleave_boost_timer;
 static mame_timer *interleave_boost_timer_end;
 static mame_time perfect_interleave;
@@ -206,7 +204,7 @@ void cpuexec_init(running_machine *machine)
 	/* allocate vblank and refresh timers, and compute the initial timing */
 	vblank_timer = mame_timer_alloc(cpu_vblankcallback);
 	refresh_timer = mame_timer_alloc(NULL);
-	cpu_compute_scanline_timing();
+	cpu_compute_vblank_timing();
 
 	/* loop over all our CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -376,8 +374,8 @@ static void watchdog_setup(int alloc_new)
 		{
 			/* Start a time based watchdog. */
 			if (alloc_new)
-				watchdog_timer = timer_alloc(watchdog_callback);
-			timer_adjust(watchdog_timer, Machine->drv->watchdog_time, 0, 0);
+				watchdog_timer = mame_timer_alloc(watchdog_callback);
+			mame_timer_adjust(watchdog_timer, double_to_mame_time(Machine->drv->watchdog_time), 0, time_zero);
 			watchdog_counter = WATCHDOG_IS_TIMER_BASED;
 		}
 		else if (watchdog_counter == WATCHDOG_IS_INVALID)
@@ -415,7 +413,7 @@ void watchdog_reset(void)
 {
 	if (watchdog_counter == WATCHDOG_IS_TIMER_BASED)
 	{
-		timer_reset(watchdog_timer, Machine->drv->watchdog_time);
+		mame_timer_reset(watchdog_timer, double_to_mame_time(Machine->drv->watchdog_time));
 	}
 	else
 	{
@@ -907,11 +905,11 @@ int cpu_scalebyfcount(int value)
 
 /*************************************
  *
- *  Computes the scanline timing
+ *  Computes the VBLANK timing
  *
  *************************************/
 
-void cpu_compute_scanline_timing(void)
+void cpu_compute_vblank_timing(void)
 {
 	refresh_period = make_mame_time(0, Machine->screen[0].refresh);
 
@@ -925,98 +923,7 @@ void cpu_compute_scanline_timing(void)
 		mame_timer_adjust(vblank_timer, remaining, 0, vblank_period);
 	}
 
-	/* recompute the scanline period */
-	scanline_period = refresh_period;
-	if (Machine->drv->screen[0].tag != NULL)
-	{
-		if (Machine->screen[0].vblank != 0)
-		{
-			scanline_period.subseconds -= Machine->screen[0].vblank;
-			scanline_period.subseconds /= Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1;
-		}
-		else
-			scanline_period.subseconds /= Machine->screen[0].height;
-	}
-
-	LOG(("cpu_compute_scanline_timing: refresh=%.9f vblank=%.9f scanline=%.9f\n", mame_time_to_double(refresh_period), mame_time_to_double(vblank_period), mame_time_to_double(scanline_period)));
-}
-
-
-
-/*************************************
- *
- *  Returns the current scanline
- *
- *************************************/
-
-/*--------------------------------------------------------------
-
-    Note: cpu_getscanline() counts from 0, 0 being the first
-    visible line. You might have to adjust this value to match
-    the hardware, since in many cases the first visible line
-    is >0.
-
---------------------------------------------------------------*/
-
-int cpu_getscanline(void)
-{
-	mame_time elapsed = mame_timer_timeelapsed(refresh_timer);
-	return (int)(elapsed.subseconds / scanline_period.subseconds);
-}
-
-
-
-/*************************************
- *
- *  Returns time until given scanline
- *
- *************************************/
-
-mame_time cpu_getscanlinetime_mt(int scanline)
-{
-	mame_time scantime, abstime;
-
-	/* compute the target time */
-	scantime = add_subseconds_to_mame_time(mame_timer_starttime(refresh_timer), scanline * (scanline_period.subseconds + 1));
-
-	/* get the current absolute time */
-	abstime = mame_timer_get_time();
-
-	/* if we're already past the computed time, count it for the next frame */
-	while (compare_mame_times(abstime, scantime) >= 0)
-		scantime = add_mame_times(scantime, refresh_period);
-
-	/* compute how long from now until that time */
-	return sub_mame_times(scantime, abstime);
-}
-
-
-
-
-double cpu_getscanlinetime(int scanline)
-{
-	mame_time t = cpu_getscanlinetime_mt(scanline);
-	return mame_time_to_double(t);
-}
-
-
-
-/*************************************
- *
- *  Returns time for one scanline
- *
- *************************************/
-
-mame_time cpu_getscanlineperiod_mt(void)
-{
-	return scanline_period;
-}
-
-
-
-double cpu_getscanlineperiod(void)
-{
-	return mame_time_to_double(scanline_period);
+	LOG(("cpu_compute_vblank_timing: refresh=%.9f vblank=%.9f\n", mame_time_to_double(refresh_period), mame_time_to_double(vblank_period)));
 }
 
 

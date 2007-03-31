@@ -63,7 +63,7 @@ static void interrupt_timer(int param)
 
 	param = (param + 0x10) & 0xff;
 
-	timer_adjust(int_timer, cpu_getscanlinetime(param), param, 0);
+	mame_timer_adjust(int_timer, video_screen_get_time_until_pos(0, param, 0), param, time_zero);
 
 	TTL7474_update(0);
 }
@@ -84,8 +84,8 @@ static void machine_reset_common( int line )
 	TTL7474_preset_w(1, 0);
 
 	/* start a timer to generate interrupts */
-	int_timer = timer_alloc(interrupt_timer);
-	timer_adjust(int_timer, cpu_getscanlinetime(0), 0, 0);
+	int_timer = mame_timer_alloc(interrupt_timer);
+	mame_timer_adjust(int_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 }
 
 MACHINE_RESET( galaxian )

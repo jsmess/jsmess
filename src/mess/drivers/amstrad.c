@@ -880,7 +880,7 @@ Bit Value Function
 0   x     |*/
   	case 0x01: {
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
-    EventList_AddItemOffset((EVENT_LIST_CODE_GA_COLOUR<<6) | PenIndex, AmstradCPC_PenColours[PenIndex], TIME_TO_CYCLES(0,cpu_getscanline()*cpu_getscanlineperiod()));
+    EventList_AddItemOffset((EVENT_LIST_CODE_GA_COLOUR<<6) | PenIndex, AmstradCPC_PenColours[PenIndex], TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #else
       amstrad_vh_update_colour(amstrad_GateArray_PenSelected, (dataToGateArray & 0x1F));
 #endif
@@ -951,7 +951,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 /* b1b0 mode change? */
   			if (((amstrad_GateArray_ModeAndRomConfiguration & 0x03)^(Previous_GateArray_ModeAndRomConfiguration & 0x03)) != 0) {
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
-          EventList_AddItemOffset((EVENT_LIST_CODE_GA_MODE<<6) , amstrad_GateArray_ModeAndRomConfiguration & 0x03, TIME_TO_CYCLES(0,cpu_getscanline()*cpu_getscanlineperiod()));
+          EventList_AddItemOffset((EVENT_LIST_CODE_GA_MODE<<6) , amstrad_GateArray_ModeAndRomConfiguration & 0x03, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #else
   				amstrad_vh_update_mode(amstrad_GateArray_ModeAndRomConfiguration & 0x03);
 #endif
@@ -1144,7 +1144,7 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
 		switch ((offset & 0x0300) >> 8) { // r1r0
   		case 0x00: {/* Select internal 6845 register Write Only */
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
-  			EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_INDEX_WRITE<<6), data, TIME_TO_CYCLES(0,cpu_getscanline()*cpu_getscanlineperiod()));
+  			EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_INDEX_WRITE<<6), data, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #endif
         crtc6845_address_w(0,data);
 		if(amstrad_system_type == SYSTEM_PLUS)
@@ -1153,7 +1153,7 @@ static WRITE8_HANDLER ( AmstradCPC_WritePortHandler )
       } break;
   		case 0x01: {/* Write to selected internal 6845 register Write Only */
 #ifdef AMSTRAD_VIDEO_EVENT_LIST
-				EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_WRITE<<6), data, TIME_TO_CYCLES(0,cpu_getscanline()*cpu_getscanlineperiod()));
+				EventList_AddItemOffset((EVENT_LIST_CODE_CRTC_WRITE<<6), data, TIME_TO_CYCLES(0,video_screen_get_vpos(0)*video_screen_get_scan_period(0)));
 #endif
 //       	  logerror("crtc6845 register (%02d : %04x)\n", selected_crtc6845_address, (data&0x3F));
         crtc6845_register_w(0,data);

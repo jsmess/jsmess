@@ -253,7 +253,7 @@ static void scanline_callback(int scanline)
 	scanline += 128;
 	scanline &= 255;
 
-	timer_adjust(interrupt_timer, cpu_getscanlinetime(scanline), scanline, 0);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -269,7 +269,7 @@ static void tubep_setup_save_state(void)
 static MACHINE_START( tubep )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(scanline_callback);
+	interrupt_timer = mame_timer_alloc(scanline_callback);
 
 	tubep_setup_save_state();
 
@@ -278,7 +278,7 @@ static MACHINE_START( tubep )
 
 static MACHINE_RESET( tubep )
 {
-	timer_adjust(interrupt_timer, cpu_getscanlinetime(64), 64, 0);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64, time_zero);
 }
 
 
@@ -750,7 +750,6 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_START(tubep)
@@ -811,7 +810,6 @@ static MACHINE_DRIVER_START( rjammer )
 
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_START(rjammer)

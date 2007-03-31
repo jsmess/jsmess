@@ -325,21 +325,6 @@ static void update_background(void)
 
 
 
-/*************************************
- *
- *  Determine the time when the beam
- *  will intersect a given pixel
- *
- *************************************/
-
-static double pixel_time(int x, int y)
-{
-	/* assuming this is called at refresh time, compute how long until we
-     * hit the given x,y position */
-	return cpu_getscanlinetime(y) + (cpu_getscanlineperiod() * (double)x * (1.0 / 256.0));
-}
-
-
 static void collision_irq_callback(int param)
 {
 	/* latch the collision bits */
@@ -460,14 +445,14 @@ VIDEO_EOF( exidy )
 
 				/* if we got one, trigger an interrupt */
 				if ((collision_mask & exidy_collision_mask) && count++ < 128)
-					timer_set(pixel_time(org_1_x + sx, org_1_y + sy), collision_mask, collision_irq_callback);
+					mame_timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), collision_mask, collision_irq_callback);
             }
             if (read_pixel(motion_object_2_vid, sx, sy) != pen0)
     		{
                 /* check for background collision (M2CHAR) */
 				if (read_pixel(tmpbitmap, org_2_x + sx, org_2_y + sy) != pen0)
 					if ((exidy_collision_mask & 0x08) && count++ < 128)
-						timer_set(pixel_time(org_2_x + sx, org_2_y + sy), 0x08, collision_irq_callback);
+						mame_timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), 0x08, collision_irq_callback);
             }
 		}
 }

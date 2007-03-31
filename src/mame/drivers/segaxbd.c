@@ -73,7 +73,7 @@ extern void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 static void xboard_generic_init(void)
 {
 	/* init the FD1094 */
-	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
+	fd1094_driver_init(NULL);
 
 	/* set the default road priority */
 	xboard_set_road_priority(1);

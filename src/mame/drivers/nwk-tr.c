@@ -356,7 +356,7 @@ void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cli
 
 	for (layer=0; layer < 2; layer++)
 	{
-		int reg = (layer == 0) ? 0x00 : 0x08;
+		int reg = 0x08;
 
 		INT32 x  = (INT16)((K001604_reg[chip][reg+0] >> 16) & 0xffff);
 		INT32 y  = (INT16)((K001604_reg[chip][reg+0] >>  0) & 0xffff);
@@ -365,14 +365,14 @@ void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cli
 		INT32 yx = (INT16)((K001604_reg[chip][reg+2] >>  0) & 0xffff);
 		INT32 yy = (INT16)((K001604_reg[chip][reg+2] >> 16) & 0xffff);
 
-		x  = (x) * 256;
-		y  = (y) * 256;
+		x  = (x + 320) * 256;
+		y  = (y + 208) * 256;
 		xx = (xx);
 		xy = (-xy);
 		yx = (-yx);
 		yy = (yy);
 
-		if ((K001604_reg[chip][0x6c/4] & (0x02 >> layer)) == 0)
+		if ((K001604_reg[chip][0x6c/4] & (0x08 >> layer)) != 0)
 		{
 			tilemap_draw_roz(bitmap, cliprect, K001604_layer_roz[chip][layer],
 							 x << 5, y << 5, xx << 5, xy << 5, yx << 5, yy << 5, 1, 0, 0);

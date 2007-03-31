@@ -241,7 +241,7 @@ static void m6545_update_strobe(int param)
 
  READ8_HANDLER ( m6545_status_r )
 {
-	int data = 0, y = cpu_getscanline();
+	int data = 0, y = video_screen_get_vpos(0);
 
 	if( y < Machine->screen[0].visarea.min_y ||
 		y > Machine->screen[0].visarea.max_y )

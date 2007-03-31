@@ -246,8 +246,8 @@ static MACHINE_RESET( system32 )
 	memset(v60_irq_control, 0xff, sizeof(v60_irq_control));
 
 	/* allocate timers */
-	v60_irq_timer[0] = timer_alloc(signal_v60_irq);
-	v60_irq_timer[1] = timer_alloc(signal_v60_irq);
+	v60_irq_timer[0] = mame_timer_alloc(signal_v60_irq);
+	v60_irq_timer[1] = mame_timer_alloc(signal_v60_irq);
 
 	/* clear IRQ lines */
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
@@ -327,7 +327,10 @@ static void int_control_w(int offset, UINT8 data)
 			v60_irq_control[offset] = data;
 			duration = v60_irq_control[8] + ((v60_irq_control[9] << 8) & 0xf00);
 			if (duration)
-				timer_adjust(v60_irq_timer[0], TIME_IN_HZ(TIMER_0_CLOCK) * duration, MAIN_IRQ_TIMER0, TIME_NEVER);
+			{
+				mame_time period = make_mame_time(0, mame_time_to_subseconds(MAME_TIME_IN_HZ(TIMER_0_CLOCK)) * duration);
+				mame_timer_adjust(v60_irq_timer[0], period, MAIN_IRQ_TIMER0, time_never);
+			}
 			break;
 
 		case 10:
@@ -335,7 +338,10 @@ static void int_control_w(int offset, UINT8 data)
 			v60_irq_control[offset] = data;
 			duration = v60_irq_control[10] + ((v60_irq_control[11] << 8) & 0xf00);
 			if (duration)
-				timer_adjust(v60_irq_timer[1], TIME_IN_HZ(TIMER_1_CLOCK) * duration, MAIN_IRQ_TIMER1, TIME_NEVER);
+			{
+				mame_time period = make_mame_time(0, mame_time_to_subseconds(MAME_TIME_IN_HZ(TIMER_1_CLOCK)) * duration);
+				mame_timer_adjust(v60_irq_timer[1], period, MAIN_IRQ_TIMER1, time_never);
+			}
 			break;
 
 		case 12:
@@ -413,7 +419,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	timer_set(cpu_getscanlinetime(0), 0, end_of_vblank_int);
+	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)();
 }
@@ -2052,8 +2058,7 @@ static MACHINE_DRIVER_START( system32 )
 	MDRV_SCREEN_ADD("main", 0x000)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
-	MDRV_SCREEN_SIZE(52*8, 28*8)
+	MDRV_SCREEN_SIZE(52*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
 	MDRV_VIDEO_START(system32)
@@ -2109,15 +2114,13 @@ static MACHINE_DRIVER_START( multi32 )
 	MDRV_SCREEN_ADD("left", 0x000)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
-	MDRV_SCREEN_SIZE(52*8, 28*8)
+	MDRV_SCREEN_SIZE(52*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
 	MDRV_SCREEN_ADD("right", 0x000)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(1000000 * (262 - 224) / (262 * 60)))
-	MDRV_SCREEN_SIZE(52*8, 28*8)
+	MDRV_SCREEN_SIZE(52*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
 	MDRV_VIDEO_START(multi32)

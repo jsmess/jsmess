@@ -89,41 +89,36 @@ static WRITE8_HANDLER( toki_adpcm_data_w )
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( toki_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x060000, 0x06d7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06d800, 0x06dfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06e000, 0x06e7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06e800, 0x06efff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06f800, 0x06ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x080000, 0x08000d) AM_READ(seibu_main_word_r)
+static ADDRESS_MAP_START( toki_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
+	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
+	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x06e000, 0x06e7ff) AM_READWRITE(MRA16_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x06e800, 0x06efff) AM_READWRITE(MRA16_RAM, toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
+	AM_RANGE(0x06f000, 0x06f7ff) AM_READWRITE(MRA16_RAM, toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
+	AM_RANGE(0x06f800, 0x06ffff) AM_READWRITE(MRA16_RAM, toki_foreground_videoram16_w) AM_BASE(&videoram16)
+	AM_RANGE(0x080000, 0x08000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_BASE(&toki_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ(input_port_3_word_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toki_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x060000, 0x06d7ff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x06d800, 0x06dfff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x06e000, 0x06e7ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x06e800, 0x06efff) AM_WRITE(toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_WRITE(toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_WRITE(toki_foreground_videoram16_w) AM_BASE(&videoram16)
-	AM_RANGE(0x080000, 0x08000d) AM_WRITE(seibu_main_word_w)
-	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_BASE(&toki_scrollram16)
-ADDRESS_MAP_END
-
 /* In the bootleg, sound and sprites are remapped to 0x70000 */
-static ADDRESS_MAP_START( tokib_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x060000, 0x06dfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06e000, 0x06e7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06e800, 0x06efff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x06f800, 0x06ffff) AM_READ(MRA16_RAM)
+static ADDRESS_MAP_START( tokib_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
+	AM_RANGE(0x060000, 0x06dfff) AM_RAM
+	AM_RANGE(0x06e000, 0x06e7ff) AM_READWRITE(MRA16_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x06e800, 0x06efff) AM_READWRITE(MRA16_RAM, toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
+	AM_RANGE(0x06f000, 0x06f7ff) AM_READWRITE(MRA16_RAM, toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
+	AM_RANGE(0x06f800, 0x06ffff) AM_READWRITE(MRA16_RAM, toki_foreground_videoram16_w) AM_BASE(&videoram16)
+	AM_RANGE(0x071000, 0x071001) AM_WRITE(MWA16_NOP)	/* sprite related? seems another scroll register */
+				/* gets written the same value as 75000a (bg2 scrollx) */
+	AM_RANGE(0x071804, 0x071807) AM_WRITE(MWA16_NOP)	/* sprite related, always 01be0100 */
+	AM_RANGE(0x07180e, 0x071e45) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
+	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
+	AM_RANGE(0x075004, 0x07500b) AM_WRITE(MWA16_RAM) AM_BASE(&toki_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ(input_port_2_word_r)
@@ -132,40 +127,20 @@ static ADDRESS_MAP_START( tokib_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 				/* sound CPU often misses the command. */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokib_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x060000, 0x06dfff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x06e000, 0x06e7ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x06e800, 0x06efff) AM_WRITE(toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_WRITE(toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_WRITE(toki_foreground_videoram16_w) AM_BASE(&videoram16)
-	AM_RANGE(0x071000, 0x071001) AM_WRITE(MWA16_NOP)	/* sprite related? seems another scroll register */
-				/* gets written the same value as 75000a (bg2 scrollx) */
-	AM_RANGE(0x071804, 0x071807) AM_WRITE(MWA16_NOP)	/* sprite related, always 01be0100 */
-	AM_RANGE(0x07180e, 0x071e45) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
-	AM_RANGE(0x075004, 0x07500b) AM_WRITE(MWA16_RAM) AM_BASE(&toki_scrollram16)
-ADDRESS_MAP_END
-
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( tokib_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokib_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xec00, 0xec00) AM_READ(YM3812_status_port_0_r)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tokib_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0xec08, 0xec08) AM_WRITE(YM3812_control_port_0_w)	/* mirror address, it seems */
 	AM_RANGE(0xec09, 0xec09) AM_WRITE(YM3812_write_port_0_w)	/* mirror address, it seems */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -453,13 +428,12 @@ static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2) 	/* 10 MHz Toshiba TMP68000P-10 */
-	MDRV_CPU_PROGRAM_MAP(toki_readmem,toki_writemem)
+	MDRV_CPU_PROGRAM_MAP(toki_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* VBL */
 
 	SEIBU_SOUND_SYSTEM_CPU(20000000/5)	/* 4MHz Zilog Z0840004PSC */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_MACHINE_RESET(seibu_sound_1)
 
 	/* video hardware */
@@ -483,15 +457,14 @@ static MACHINE_DRIVER_START( tokib )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 10MHz causes bad slowdowns with monkey machine rd1 */
-	MDRV_CPU_PROGRAM_MAP(tokib_readmem,tokib_writemem)
+	MDRV_CPU_PROGRAM_MAP(tokib_map,0)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL (could be level1, same vector) */
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* verified with PCB */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(tokib_sound_readmem,tokib_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(tokib_audio_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_BUFFERS_SPRITERAM)

@@ -34,6 +34,7 @@
 #include "d3dintf.h"
 #include "winmain.h"
 #include "window.h"
+#include "config.h"
 
 
 
@@ -417,7 +418,7 @@ static void texture_update(d3d_info *d3d, const render_primitive *prim);
 
 int drawd3d_init(win_draw_callbacks *callbacks)
 {
-	int version = options_get_int(mame_options(), "d3dversion");
+	int version = options_get_int(mame_options(), WINOPTION_D3DVERSION);
 	d3dintf = NULL;
 
 	// try Direct3D 9 if requested
@@ -723,9 +724,9 @@ try_again:
 	if (window->fullscreen)
 	{
 		// only set the gamma if it's not 1.0f
-		float brightness = options_get_float(mame_options(), "full_screen_brightness");
-		float contrast = options_get_float(mame_options(), "full_screen_contrast");
-		float gamma = options_get_float(mame_options(), "full_screen_gamma");
+		float brightness = options_get_float(mame_options(), WINOPTION_FULLSCREENBRIGHTNESS);
+		float contrast = options_get_float(mame_options(), WINOPTION_FULLLSCREENCONTRAST);
+		float gamma = options_get_float(mame_options(), WINOPTION_FULLSCREENGAMMA);
 		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
 		{
 			// warn if we can't do it
@@ -1805,6 +1806,353 @@ static void texture_compute_size(d3d_info *d3d, int texwidth, int texheight, tex
 
 
 //============================================================
+//  copyline_palette16
+//============================================================
+
+INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	if (borderpix)
+		*dst++ = 0xff000000 | palette[*src];
+	for (x = 0; x < width; x++)
+		*dst++ = 0xff000000 | palette[*src++];
+	if (borderpix)
+		*dst++ = 0xff000000 | palette[*--src];
+}
+
+
+
+//============================================================
+//  copyline_palettea16
+//============================================================
+
+INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	if (borderpix)
+		*dst++ = palette[*src];
+	for (x = 0; x < width; x++)
+		*dst++ = palette[*src++];
+	if (borderpix)
+		*dst++ = palette[*--src];
+}
+
+
+
+//============================================================
+//  copyline_rgb15
+//============================================================
+
+INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (borderpix)
+		{
+			UINT16 pix = *src;
+			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT16 pix = *src++;
+			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
+		}
+		if (borderpix)
+		{
+			UINT16 pix = *--src;
+			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (borderpix)
+		{
+			UINT16 pix = *src;
+			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
+			*dst++ = 0xff000000 | color | ((color >> 5) & 0x070707);
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT16 pix = *src++;
+			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
+			*dst++ = 0xff000000 | color | ((color >> 5) & 0x070707);
+		}
+		if (borderpix)
+		{
+			UINT16 pix = *--src;
+			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
+			*dst++ = 0xff000000 | color | ((color >> 5) & 0x070707);
+		}
+	}
+}
+
+
+
+//============================================================
+//  copyline_rgb32
+//============================================================
+
+INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (borderpix)
+		{
+			UINT32 srcpix = *src;
+			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT32 srcpix = *src++;
+			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+		}
+		if (borderpix)
+		{
+			UINT32 srcpix = *--src;
+			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (borderpix)
+			*dst++ = 0xff000000 | *src;
+		for (x = 0; x < width; x++)
+			*dst++ = 0xff000000 | *src++;
+		if (borderpix)
+			*dst++ = 0xff000000 | *--src;
+	}
+}
+
+
+
+//============================================================
+//  copyline_argb32
+//============================================================
+
+INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (borderpix)
+		{
+			UINT32 srcpix = *src;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT32 srcpix = *src++;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+		}
+		if (borderpix)
+		{
+			UINT32 srcpix = *--src;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (borderpix)
+			*dst++ = *src;
+		for (x = 0; x < width; x++)
+			*dst++ = *src++;
+		if (borderpix)
+			*dst++ = *--src;
+	}
+}
+
+
+
+//============================================================
+//  copyline_yuy16_to_yuy2
+//============================================================
+
+INLINE void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (borderpix)
+		{
+			UINT16 srcpix = *src;
+			*dst++ = palette[0x000 + (srcpix >> 8)] | (srcpix << 8);
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT16 srcpix = *src++;
+			*dst++ = palette[0x000 + (srcpix >> 8)] | (srcpix << 8);
+		}
+		if (borderpix)
+		{
+			UINT16 srcpix = *--src;
+			*dst++ = palette[0x000 + (srcpix >> 8)] | (srcpix << 8);
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (borderpix)
+		{
+			UINT16 srcpix = *src;
+			*dst++ = (srcpix >> 8) | (srcpix << 8);
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT16 srcpix = *src++;
+			*dst++ = (srcpix >> 8) | (srcpix << 8);
+		}
+		if (borderpix)
+		{
+			UINT16 srcpix = *--src;
+			*dst++ = (srcpix >> 8) | (srcpix << 8);
+		}
+	}
+}
+
+
+
+//============================================================
+//  copyline_yuy16_to_uyvy
+//============================================================
+
+INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (borderpix)
+		{
+			UINT16 srcpix = *src;
+			*dst++ = palette[0x100 + (srcpix >> 8)] | (srcpix & 0xff);
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT16 srcpix = *src++;
+			*dst++ = palette[0x100 + (srcpix >> 8)] | (srcpix & 0xff);
+		}
+		if (borderpix)
+		{
+			UINT16 srcpix = *--src;
+			*dst++ = palette[0x100 + (srcpix >> 8)] | (srcpix & 0xff);
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (borderpix)
+		{
+			UINT16 srcpix = *src;
+			*dst++ = (srcpix >> 8) | (srcpix << 8);
+		}
+		for (x = 0; x < width; x++)
+		{
+			UINT16 srcpix = *src++;
+			*dst++ = (srcpix >> 8) | (srcpix << 8);
+		}
+		if (borderpix)
+		{
+			UINT16 srcpix = *--src;
+			*dst++ = (srcpix >> 8) | (srcpix << 8);
+		}
+	}
+}
+
+
+
+//============================================================
+//  copyline_yuy16_to_argb
+//============================================================
+
+INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+{
+	int x;
+
+	// palette (really RGB map) case
+	if (palette != NULL)
+	{
+		if (borderpix)
+		{
+			UINT16 srcpix0 = src[0];
+			UINT16 srcpix1 = src[1];
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+		}
+		for (x = 0; x < width / 2; x++)
+		{
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src++;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+		}
+		if (borderpix)
+		{
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+		}
+	}
+
+	// direct case
+	else
+	{
+		if (borderpix)
+		{
+			UINT16 srcpix0 = src[0];
+			UINT16 srcpix1 = src[1];
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+		}
+		for (x = 0; x < width / 2; x++)
+		{
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src++;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+		}
+		if (borderpix)
+		{
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			UINT8 cb = srcpix0 & 0xff;
+			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+		}
+	}
+}
+
+
+
+//============================================================
 //  texture_set_data
 //============================================================
 
@@ -1812,8 +2160,8 @@ static void texture_set_data(d3d_info *d3d, texture_info *texture, const render_
 {
 	D3DLOCKED_RECT rect;
 	HRESULT result;
-	UINT32 *dst32;
-	int x, y;
+	int miny, maxy;
+	int dsty;
 
 	// lock the texture
 	switch (texture->type)
@@ -1826,186 +2174,50 @@ static void texture_set_data(d3d_info *d3d, texture_info *texture, const render_
 	if (result != D3D_OK)
 		return;
 
-	// always fill non-wrapping textures with an extra pixel on the top
-	if (texture->borderpix)
-	{
-		dst32 = (UINT32 *)((BYTE *)rect.pBits + 0 * rect.Pitch);
-		for (x = 0; x < texsource->width + 2; x++)
-			*dst32++ = 0;
-	}
-
 	// loop over Y
-	for (y = 0; y < texsource->height; y++)
+	miny = 0 - texture->borderpix;
+	maxy = texsource->height + texture->borderpix;
+	for (dsty = miny; dsty < maxy; dsty++)
 	{
-		UINT32 *src32;
-		UINT16 *src16;
-		UINT16 *dst16;
-
-		// always fill non-wrapping textures with an extra pixel on the left
-		if (texture->borderpix)
-		{
-			dst32 = (UINT32 *)((BYTE *)rect.pBits + (y + 1) * rect.Pitch);
-			*dst32++ = 0;
-		}
-		else
-			dst32 = (UINT32 *)((BYTE *)rect.pBits + y * rect.Pitch);
+		int srcy = (dsty < 0) ? 0 : (dsty >= texsource->height) ? texsource->height - 1 : dsty;
+		void *dst = (BYTE *)rect.pBits + (dsty + texture->borderpix) * rect.Pitch;
 
 		// switch off of the format and
 		switch (PRIMFLAG_GET_TEXFORMAT(flags))
 		{
 			case TEXFORMAT_PALETTE16:
-				src16 = (UINT16 *)texsource->base + y * texsource->rowpixels;
-				for (x = 0; x < texsource->width; x++)
-					*dst32++ = 0xff000000 | texsource->palette[*src16++];
+				copyline_palette16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
 				break;
 
 			case TEXFORMAT_PALETTEA16:
-				src16 = (UINT16 *)texsource->base + y * texsource->rowpixels;
-				for (x = 0; x < texsource->width; x++)
-					*dst32++ = texsource->palette[*src16++];
+				copyline_palettea16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
 				break;
 
 			case TEXFORMAT_RGB15:
-				src16 = (UINT16 *)texsource->base + y * texsource->rowpixels;
-				if (texsource->palette != NULL)
-				{
-					for (x = 0; x < texsource->width; x++)
-					{
-						UINT16 pix = *src16++;
-						*dst32++ = 0xff000000 | texsource->palette[0x40 + ((pix >> 10) & 0x1f)] | texsource->palette[0x20 + ((pix >> 5) & 0x1f)] | texsource->palette[0x00 + ((pix >> 0) & 0x1f)];
-					}
-				}
-				else
-				{
-					for (x = 0; x < texsource->width; x++)
-					{
-						UINT16 pix = *src16++;
-						UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
-						*dst32++ = 0xff000000 | color | ((color >> 5) & 0x070707);
-					}
-				}
+				copyline_rgb15(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
 				break;
 
 			case TEXFORMAT_RGB32:
-				src32 = (UINT32 *)texsource->base + y * texsource->rowpixels;
-				if (texsource->palette != NULL)
-				{
-					for (x = 0; x < texsource->width; x++)
-					{
-						UINT32 srcpix = *src32++;
-						*dst32++ = 0xff000000 | texsource->palette[0x200 + RGB_RED(srcpix)] | texsource->palette[0x100 + RGB_GREEN(srcpix)] | texsource->palette[RGB_BLUE(srcpix)];
-					}
-				}
-				else
-				{
-					for (x = 0; x < texsource->width; x++)
-						*dst32++ = 0xff000000 | *src32++;
-				}
+				copyline_rgb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
 				break;
 
 			case TEXFORMAT_ARGB32:
-				src32 = (UINT32 *)texsource->base + y * texsource->rowpixels;
-				if (texsource->palette != NULL)
-				{
-					for (x = 0; x < texsource->width; x++)
-					{
-						UINT32 srcpix = *src32++;
-						*dst32++ = (srcpix & 0xff000000) | texsource->palette[0x200 + RGB_RED(srcpix)] | texsource->palette[0x100 + RGB_GREEN(srcpix)] | texsource->palette[RGB_BLUE(srcpix)];
-					}
-				}
-				else
-				{
-					for (x = 0; x < texsource->width; x++)
-						*dst32++ = *src32++;
-				}
+				copyline_argb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
 				break;
 
 			case TEXFORMAT_YUY16:
-				src16 = (UINT16 *)texsource->base + y * texsource->rowpixels;
-				dst16 = (UINT16 *)dst32;
-				if (texsource->palette != NULL)
-				{
-					switch (d3d->yuv_format)
-					{
-						case D3DFMT_YUY2:
-							for (x = 0; x < texsource->width; x++)
-							{
-								UINT16 srcpix = *src16++;
-								*dst16++ = texsource->palette[0x000 + (srcpix >> 8)] | (srcpix << 8);
-							}
-							break;
-
-						case D3DFMT_UYVY:
-							for (x = 0; x < texsource->width; x++)
-							{
-								UINT16 srcpix = *src16++;
-								*dst16++ = texsource->palette[0x100 + (srcpix >> 8)] | (srcpix & 0xff);
-							}
-							break;
-
-						default:
-						case D3DFMT_A8R8G8B8:
-							for (x = 0; x < texsource->width / 2; x++)
-							{
-								UINT16 srcpix0 = *src16++;
-								UINT16 srcpix1 = *src16++;
-								UINT8 cb = srcpix0 & 0xff;
-								UINT8 cr = srcpix1 & 0xff;
-								*dst32++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix0 >> 8)], cb, cr);
-								*dst32++ = ycc_to_rgb(texsource->palette[0x000 + (srcpix1 >> 8)], cb, cr);
-							}
-							break;
-					}
-				}
+				if (d3d->yuv_format == D3DFMT_YUY2)
+					copyline_yuy16_to_yuy2(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+				else if (d3d->yuv_format == D3DFMT_UYVY)
+					copyline_yuy16_to_uyvy(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
 				else
-				{
-					switch (d3d->yuv_format)
-					{
-						case D3DFMT_YUY2:
-							for (x = 0; x < texsource->width; x++)
-							{
-								UINT16 srcpix = *src16++;
-								*dst16++ = (srcpix >> 8) | (srcpix << 8);
-							}
-							break;
-
-						case D3DFMT_UYVY:
-							for (x = 0; x < texsource->width; x++)
-								*dst16++ = *src16++;
-							break;
-
-						default:
-						case D3DFMT_A8R8G8B8:
-							for (x = 0; x < texsource->width / 2; x++)
-							{
-								UINT16 srcpix0 = *src16++;
-								UINT16 srcpix1 = *src16++;
-								UINT8 cb = srcpix0 & 0xff;
-								UINT8 cr = srcpix1 & 0xff;
-								*dst32++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
-								*dst32++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
-							}
-							break;
-					}
-				}
+					copyline_yuy16_to_argb(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
 				break;
 
 			default:
 				fprintf(stderr, "Unknown texture blendmode=%d format=%d\n", PRIMFLAG_GET_BLENDMODE(flags), PRIMFLAG_GET_TEXFORMAT(flags));
 				break;
 		}
-
-		// always fill non-wrapping textures with an extra pixel on the right
-		if (texture->borderpix)
-			*dst32++ = 0;
-	}
-
-	// always fill non-wrapping textures with an extra pixel on the bottom
-	if (texture->borderpix)
-	{
-		dst32 = (UINT32 *)((BYTE *)rect.pBits + (texsource->height + 1) * rect.Pitch);
-		for (x = 0; x < texsource->width + 2; x++)
-			*dst32++ = 0;
 	}
 
 	// unlock

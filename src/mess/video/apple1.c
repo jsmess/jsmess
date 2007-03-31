@@ -183,7 +183,7 @@ double apple1_vh_dsp_time_to_ready (void)
 {
 	int cursor_x, cursor_y;
 	int cursor_scanline;
-	double scanline_period = cpu_getscanlineperiod();
+	double scanline_period = mame_time_to_double(video_screen_get_scan_period(0));
 	double cursor_hfrac;
 
 	/* The video hardware refreshes the screen by reading the
@@ -202,7 +202,7 @@ double apple1_vh_dsp_time_to_ready (void)
 	   for the visible part of the scanline. */
 	cursor_hfrac = (175 + cursor_x * apple1_charlayout.width) / 455;
 
-	if (cpu_getscanline() == cursor_scanline) {
+	if (video_screen_get_vpos(0) == cursor_scanline) {
 		/* video_screen_get_hpos() doesn't account for the horizontal
 		   blanking interval; it acts as if the scanline period is
 		   entirely composed of visible pixel times.  However, we can
@@ -214,7 +214,7 @@ double apple1_vh_dsp_time_to_ready (void)
 			return scanline_period * (cursor_hfrac - current_hfrac);
 	}
 
-	return cpu_getscanlinetime(cursor_scanline) + 
+	return mame_time_to_double(video_screen_get_time_until_pos(0, cursor_scanline, 0)) + 
 		   scanline_period * cursor_hfrac;
 }
 

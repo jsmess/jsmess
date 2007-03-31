@@ -55,6 +55,7 @@
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68k.h"
 #include "cpu/sharc/sharc.h"
+#include "cpu/mb86233/mb86233.h"
 #include "sound/scsp.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
@@ -73,21 +74,35 @@ static int      model2_timerrun[4];
 static void    *model2_timers[4];
 static int model2_ctrlmode;
 
+static UINT32 *tgp_program;
+
+enum {
+	DSP_TYPE_TGP	= 1,
+	DSP_TYPE_SHARC	= 2,
+	DSP_TYPE_TGPX4	= 3,
+} DSP_TYPE;
+
+static int dsp_type;
+
 
 
 #define COPRO_FIFOIN_SIZE	32000
 static int copro_fifoin_rpos, copro_fifoin_wpos;
 static UINT32 copro_fifoin_data[COPRO_FIFOIN_SIZE];
 static int copro_fifoin_num = 0;
-static UINT32 copro_fifoin_pop(void)
+static int copro_fifoin_pop(UINT32 *result)
 {
 	UINT32 r;
-	//if (copro_fifoin_wpos == copro_fifoin_rpos)
+
 	if (copro_fifoin_num == 0)
 	{
+		if (dsp_type == DSP_TYPE_TGP)
+			return 0;
+
 		fatalerror("Copro FIFOIN underflow (at %08X)", activecpu_get_pc());
 		return 0;
 	}
+
 	r = copro_fifoin_data[copro_fifoin_rpos++];
 
 	if (copro_fifoin_rpos == COPRO_FIFOIN_SIZE)
@@ -96,29 +111,29 @@ static UINT32 copro_fifoin_pop(void)
 	}
 
 	copro_fifoin_num--;
-	if (copro_fifoin_num == 0)
+	if (dsp_type == DSP_TYPE_SHARC)
 	{
-		cpuintrf_push_context(2);
-		sharc_set_flag_input(0, ASSERT_LINE);
-		cpuintrf_pop_context();
-
-		//cpunum_set_input_line(2, SHARC_INPUT_FLAG0, ASSERT_LINE);
+		if (copro_fifoin_num == 0)
+		{
+			cpuintrf_push_context(2);
+			sharc_set_flag_input(0, ASSERT_LINE);
+			cpuintrf_pop_context();
+		}
+		else
+		{
+			cpuintrf_push_context(2);
+			sharc_set_flag_input(0, CLEAR_LINE);
+			cpuintrf_pop_context();
+		}
 	}
-	else
-	{
-		cpuintrf_push_context(2);
-		sharc_set_flag_input(0, CLEAR_LINE);
-		cpuintrf_pop_context();
 
-		//cpunum_set_input_line(2, SHARC_INPUT_FLAG0, CLEAR_LINE);
-	}
+	*result = r;
 
-	return r;
+	return 1;
 }
 
 static void copro_fifoin_push(UINT32 data)
 {
-	//if (copro_fifoin_wpos == copro_fifoin_rpos)
 	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
 		fatalerror("Copro FIFOIN overflow (at %08X)", activecpu_get_pc());
@@ -133,14 +148,15 @@ static void copro_fifoin_push(UINT32 data)
 		copro_fifoin_wpos = 0;
 	}
 
-
 	copro_fifoin_num++;
-	// clear FIFO empty flag on SHARC
-	cpuintrf_push_context(2);
-	sharc_set_flag_input(0, CLEAR_LINE);
-	cpuintrf_pop_context();
 
-	//cpunum_set_input_line(2, SHARC_INPUT_FLAG0, CLEAR_LINE);
+	// clear FIFO empty flag on SHARC
+	if (dsp_type == DSP_TYPE_SHARC)
+	{
+		cpuintrf_push_context(2);
+		sharc_set_flag_input(0, CLEAR_LINE);
+		cpuintrf_pop_context();
+	}
 }
 
 
@@ -151,37 +167,38 @@ static int copro_fifoout_num = 0;
 static UINT32 copro_fifoout_pop(void)
 {
 	UINT32 r;
-	//if (copro_fifoout_wpos == copro_fifoout_rpos)
+
 	if (copro_fifoout_num == 0)
 	{
 		// Reading from empty FIFO causes the i960 to enter wait state
 		i960_stall();
 		return 0;
 	}
+
 	r = copro_fifoout_data[copro_fifoout_rpos++];
 
 	if (copro_fifoout_rpos == COPRO_FIFOOUT_SIZE)
 	{
 		copro_fifoout_rpos = 0;
 	}
+
 	copro_fifoout_num--;
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
-	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+	if (dsp_type == DSP_TYPE_SHARC)
 	{
-		cpuintrf_push_context(2);
-		sharc_set_flag_input(1, ASSERT_LINE);
-		cpuintrf_pop_context();
-
-		//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, ASSERT_LINE);
-	}
-	else
-	{
-		cpuintrf_push_context(2);
-		sharc_set_flag_input(1, CLEAR_LINE);
-		cpuintrf_pop_context();
-
-		//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+		{
+			cpuintrf_push_context(2);
+			sharc_set_flag_input(1, ASSERT_LINE);
+			cpuintrf_pop_context();
+		}
+		else
+		{
+			cpuintrf_push_context(2);
+			sharc_set_flag_input(1, CLEAR_LINE);
+			cpuintrf_pop_context();
+		}
 	}
 
 	return r;
@@ -207,21 +224,24 @@ static void copro_fifoout_push(UINT32 data)
 	copro_fifoout_num++;
 
 	// set SHARC flag 1: 0 if space available, 1 if FIFO full
-	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+	if (dsp_type == DSP_TYPE_SHARC)
 	{
-		cpuintrf_push_context(2);
-		sharc_set_flag_input(1, ASSERT_LINE);
-		cpuintrf_pop_context();
+		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
+		{
+			cpuintrf_push_context(2);
+			sharc_set_flag_input(1, ASSERT_LINE);
+			cpuintrf_pop_context();
 
-		//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, ASSERT_LINE);
-	}
-	else
-	{
-		cpuintrf_push_context(2);
-		sharc_set_flag_input(1, CLEAR_LINE);
-		cpuintrf_pop_context();
+			//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+		}
+		else
+		{
+			cpuintrf_push_context(2);
+			sharc_set_flag_input(1, CLEAR_LINE);
+			cpuintrf_pop_context();
 
-		//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+			//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+		}
 	}
 }
 
@@ -329,6 +349,11 @@ static MACHINE_RESET(model2o)
 	timer_adjust(model2_timers[1], TIME_NEVER, 0, 0);
 	timer_adjust(model2_timers[2], TIME_NEVER, 0, 0);
 	timer_adjust(model2_timers[3], TIME_NEVER, 0, 0);
+
+	// hold TGP in halt until we have code
+	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+
+	dsp_type = DSP_TYPE_TGP;
 }
 
 static MACHINE_RESET(model2)
@@ -340,6 +365,8 @@ static MACHINE_RESET(model2)
 
 	// copy the 68k vector table into RAM
 	memcpy(memory_region(REGION_CPU2), memory_region(REGION_CPU2)+0x80000, 16);
+
+	dsp_type = DSP_TYPE_TGP;
 }
 
 static MACHINE_RESET(model2b)
@@ -353,6 +380,15 @@ static MACHINE_RESET(model2b)
 	cpunum_set_input_line(2, SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
 	cpunum_set_input_line(2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+
+	dsp_type = DSP_TYPE_SHARC;
+}
+
+static MACHINE_RESET(model2c)
+{
+	machine_reset_model2(machine);
+
+	dsp_type = DSP_TYPE_TGPX4;
 }
 
 static void chcolor(pen_t color, UINT16 data)
@@ -476,27 +512,7 @@ static WRITE32_HANDLER( copro_ctl1_w )
 		else
 		{
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
-		}
-	}
-
-	model2_coproctl = data;
-}
-
-static WRITE32_HANDLER( copro_sharc_ctl1_w )
-{
-	// did hi bit change?
-	if ((data ^ model2_coproctl) == 0x80000000)
-	{
-		if (data & 0x80000000)
-		{
-			logerror("Start copro upload\n");
-			model2_coprocnt = 0;
-		}
-		else
-		{
-			logerror("Boot copro, %d dwords\n", model2_coprocnt);
 			cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
-			//cpu_spinuntil_time(TIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
 		}
 	}
 
@@ -513,7 +529,7 @@ static WRITE32_HANDLER(copro_function_port_w)
 	copro_fifoin_push(d);
 }
 
-static READ32_HANDLER(copro_sharc_fifo_r)
+static READ32_HANDLER(copro_fifo_r)
 {
 	if ((strcmp(Machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(Machine->gamedrv->name, "srallyc" ) == 0))
 	{
@@ -526,13 +542,20 @@ static READ32_HANDLER(copro_sharc_fifo_r)
 	}
 }
 
-static WRITE32_HANDLER(copro_sharc_fifo_w)
+static WRITE32_HANDLER(copro_fifo_w)
 {
 	if (model2_coproctl & 0x80000000)
 	{
-		cpuintrf_push_context(2);
-		sharc_external_dma_write(model2_coprocnt, data & 0xffff);
-		cpuintrf_pop_context();
+		if (dsp_type == DSP_TYPE_SHARC)
+		{
+			cpuintrf_push_context(2);
+			sharc_external_dma_write(model2_coprocnt, data & 0xffff);
+			cpuintrf_pop_context();
+		}
+		else if (dsp_type == DSP_TYPE_TGP)
+		{
+			tgp_program[model2_coprocnt] = data;
+		}
 
 		model2_coprocnt++;
 	}
@@ -1213,7 +1236,10 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00220000, 0x0023ffff) AM_ROM AM_REGION(REGION_CPU1, 0x20000)
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_prg_r, copro_prg_w)
+
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
+	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_WRITE( copro_ctl1_w )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
@@ -1233,7 +1259,10 @@ static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_prg_r, copro_prg_w)
+
+	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
+	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_WRITE( copro_ctl1_w )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
@@ -1258,10 +1287,10 @@ static ADDRESS_MAP_START( model2b_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	//AM_RANGE(0x00840000, 0x00840fff) AM_WRITE(geo_sharc_iop_w)
 
 	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_sharc_fifo_r, copro_sharc_fifo_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 	AM_RANGE(0x008c0000, 0x008c0fff) AM_WRITE(copro_sharc_iop_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE( copro_sharc_ctl1_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE( copro_ctl1_w )
 
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_sharc_ctl1_w )
@@ -1611,11 +1640,16 @@ static struct MultiPCM_interface m1_multipcm_interface_2 =
 
 
 
+/*****************************************************************************/
+// SHARC memory maps
 
 static READ32_HANDLER(copro_sharc_input_fifo_r)
 {
+	UINT32 result;
 	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", activecpu_get_pc());
-	return copro_fifoin_pop();
+
+	copro_fifoin_pop(&result);
+	return result;
 }
 
 static WRITE32_HANDLER(copro_sharc_output_fifo_w)
@@ -1645,7 +1679,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( geo_sharc_map, ADDRESS_SPACE_DATA, 32 )
 ADDRESS_MAP_END
 
+/*****************************************************************************/
+// TGP memory maps
 
+static ADDRESS_MAP_START( copro_tgp_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE(&tgp_program)
+	AM_RANGE(0xff800000, 0xff9fffff) AM_ROM AM_REGION(REGION_CPU3, 0)
+ADDRESS_MAP_END
+
+/*****************************************************************************/
+
+static struct mb86233_config tgp_config =
+{
+	copro_fifoin_pop,
+	copro_fifoout_push,
+};
 
 
 
@@ -1657,6 +1705,10 @@ static MACHINE_DRIVER_START( model2o )
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
+
+	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_CONFIG(tgp_config)
+	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -1698,6 +1750,10 @@ static MACHINE_DRIVER_START( model2a )
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
+
+	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_CONFIG(tgp_config)
+	MDRV_CPU_PROGRAM_MAP(copro_tgp_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -1782,7 +1838,7 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_MACHINE_RESET(model2)
+	MDRV_MACHINE_RESET(model2c)
 	MDRV_NVRAM_HANDLER( model2 )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_AFTER_VBLANK )
@@ -2106,7 +2162,7 @@ ROM_START( srallyc )
 	ROM_LOAD32_WORD( "mpr-17884.bin", 0x800000, 0x200000, CRC(4cfc95e1) SHA1(81d927b8c4f9d0c4c5e29d676b30f30f83751fdc) )
 	ROM_LOAD32_WORD( "mpr-17885.bin", 0x800002, 0x200000, CRC(a08d2467) SHA1(9449ac8f8f9ce8d8e536b05a91e46841fed7f2d0) )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD( "mpr-17754.bin", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) )
 	ROM_LOAD32_WORD( "mpr-17755.bin", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) )
 
@@ -2167,7 +2223,7 @@ ROM_START( manxtt )
 	ROM_LOAD32_WORD( "mpr-18755.bin", 0x000000, 0x200000, CRC(fd1fa53c) SHA1(d8dabbd6efcc2752879cce3df2cb99b65e043eca) )
 	ROM_LOAD32_WORD( "mpr-18758.bin", 0x800002, 0x200000, CRC(1b5473d0) SHA1(658e33503f6990f4d9a954c63efad5f53d15f3a4) )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD( "mpr-18761.bin", 0x000000, 0x200000, CRC(4e39ec05) SHA1(50696cd320f1a6492e0c193713acbce085d959cd) )
 	ROM_LOAD32_WORD( "mpr-18762.bin", 0x000002, 0x200000, CRC(4ab165d8) SHA1(7ff42a4c7236fec76f94f2d0c5537e503bcc98e5) )
 
@@ -2218,7 +2274,7 @@ ROM_START( motoraid )
 	ROM_LOAD32_WORD( "mpr-20025", 0x1000000, 0x400000, CRC(d4ecd0be) SHA1(9df0d1db32b818dad28f9eeab3bc19c56d27ec6d) )
 	ROM_LOAD32_WORD( "mpr-20028", 0x1000002, 0x400000, CRC(3147e0e1) SHA1(9aa0e13c8dc5073a603279a538cc7662531dfd19) )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD( "epr20012", 0x000000, 0x100000, CRC(f53db4e3) SHA1(4474610eed52248e5e36be438eff5d39f076b134) )
 	ROM_LOAD32_WORD( "epr20011", 0x000002, 0x100000, CRC(794c026c) SHA1(85abd667491fd019ee18ba256fd580356f4e1fe9) )
 
@@ -2348,6 +2404,8 @@ ROM_START( dynamcop )
 	ROM_LOAD32_WORD("mpr-20794.7",  0x1000002, 0x400000, CRC(8e5cd1db) SHA1(d90e86d38bda12f2d0f99e23a42928f05bde3ea8) )
 	ROM_LOAD32_WORD("mpr-20791.4",  0x1800000, 0x400000, CRC(4883d0df) SHA1(b98af63e81f6c1b2766d7e96acbd1821bba000d4) )
 	ROM_LOAD32_WORD("mpr-20792.5",  0x1800002, 0x400000, CRC(47becfa2) SHA1(a333885872a64b322f3cb464a70352d73654b1b3) )
+
+	ROM_REGION( 0x800000, REGION_CPU3, ROMREGION_ERASE00 ) // TGP data (COPRO sockets)
 
 	ROM_REGION( 0x2000000, REGION_USER2, 0 ) // Models
 	ROM_LOAD32_WORD("mpr-20799.16", 0x0000000, 0x400000, CRC(424571bf) SHA1(18a4e8d0e968fff3b645b59a0023b0ef38d51924) )
@@ -2541,7 +2599,7 @@ ROM_START( stcc )
 	ROM_COPY(REGION_USER1, 0x800000, 0xe00000, 0x100000)
 	ROM_COPY(REGION_USER1, 0x800000, 0xf00000, 0x100000)
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19255.29", 0x000000, 0x200000, CRC(d78bf030) SHA1(e6b3d8422613d22db50cf6c251f9a21356d96653) )
 	ROM_LOAD32_WORD("mpr-19256.30", 0x000002, 0x200000, CRC(cb2b2d9e) SHA1(86b2b8bb6074352f72eb81e616093a1ba6f5163f) )
 
@@ -2639,7 +2697,7 @@ ROM_START( hotd )
 	ROM_COPY( REGION_USER1, 0x1800000, 0x1f00000, 0x100000 )
 
 
-	ROM_REGION( 0x100000, REGION_CPU3, 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("epr-19707.29",  0x000000, 0x080000, CRC(384fd133) SHA1(6d060378d0f801b04d12e7ee874f2fa0572992d9) )
 	ROM_LOAD32_WORD("epr-19706.30",  0x000002, 0x080000, CRC(1277531c) SHA1(08d3e733ba9989fcd32290634171c73f26ab6e2b) )
 
@@ -2869,7 +2927,7 @@ ROM_START( bel )
 	ROM_LOAD32_WORD("mpr-20227.5",    0xc00000, 0x200000, CRC(1277686e) SHA1(fff27006659458300001425261b944e690f1d494) )
 	ROM_LOAD32_WORD("mpr-20228.6",    0xc00002, 0x200000, CRC(49cb5568) SHA1(ee3273302830f3499c7d4e548b629c51e0369e8a) )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-20236.29",   0x000000, 0x200000, CRC(8de9a3c2) SHA1(e7fde1fd509531e1002ff813163067dc0d134536) )
 	ROM_LOAD32_WORD("mpr-20235.30",   0x000002, 0x200000, CRC(78fa11ef) SHA1(a60deabb662e9c09f5d6342dc1a1c6045744d93f) )
 
@@ -2939,7 +2997,7 @@ ROM_START( topskatr )
 	ROM_LOAD32_WORD("mpr-19737.9",   0x800000, 0x400000, CRC(281a7dde) SHA1(71d5ba434328a81969bfdc71ac1160c5ff3ae9d3) )
 	ROM_LOAD32_WORD("mpr-19738.10",  0x800002, 0x400000, CRC(f688327e) SHA1(68c9db242ef7e8f98979e968a09e4b093bc5d470) )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGPx4 program
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGPx4 program
 	ROM_LOAD32_WORD("mpr-19743.29",  0x000000, 0x200000, CRC(d41a41bf) SHA1(a5f6b24e6526d0d2ef9c526c273c018d1e0fed59) )
 	ROM_LOAD32_WORD("mpr-19744.30",  0x000002, 0x200000, CRC(84f203bf) SHA1(4952b764e6bf6cd735018738c5eff08781ee2315) )
 
@@ -3354,7 +3412,7 @@ ROM_START( daytona )
 	ROM_COPY( REGION_USER1, 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( REGION_USER1, 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD("mpr-16537.ic28", 0x000000, 0x200000, CRC(36b7c35a) SHA1(b32fd1d3fc8983fb5f2a7b236b665a8c9b52769f) )
 	ROM_LOAD32_WORD("mpr-16536.ic29", 0x000002, 0x200000, CRC(6d6afed9) SHA1(2018468d7d849854b3d0cfbcd217317e2fc93555) )
 
@@ -3417,7 +3475,7 @@ ROM_START( daytonas )
 	ROM_COPY( REGION_USER1, 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( REGION_USER1, 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD("mpr-16537.ic28", 0x000000, 0x200000, CRC(36b7c35a) SHA1(b32fd1d3fc8983fb5f2a7b236b665a8c9b52769f) )
 	ROM_LOAD32_WORD("mpr-16536.ic29", 0x000002, 0x200000, CRC(6d6afed9) SHA1(2018468d7d849854b3d0cfbcd217317e2fc93555) )
 
@@ -3478,7 +3536,7 @@ ROM_START( daytonat )
 	ROM_COPY( REGION_USER1, 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( REGION_USER1, 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD("mpr-16537.ic28", 0x000000, 0x200000, CRC(36b7c35a) SHA1(b32fd1d3fc8983fb5f2a7b236b665a8c9b52769f) )
 	ROM_LOAD32_WORD("mpr-16536.ic29", 0x000002, 0x200000, CRC(6d6afed9) SHA1(2018468d7d849854b3d0cfbcd217317e2fc93555) )
 
@@ -3540,7 +3598,7 @@ ROM_START( daytonam )
 	ROM_COPY( REGION_USER1, 0x800000, 0xe00000, 0x100000 )
 	ROM_COPY( REGION_USER1, 0x800000, 0xf00000, 0x100000 )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD("mpr-16537.ic28", 0x000000, 0x200000, CRC(36b7c35a) SHA1(b32fd1d3fc8983fb5f2a7b236b665a8c9b52769f) )
 	ROM_LOAD32_WORD("mpr-16536.ic29", 0x000002, 0x200000, CRC(6d6afed9) SHA1(2018468d7d849854b3d0cfbcd217317e2fc93555) )
 
@@ -3596,7 +3654,7 @@ ROM_START( vcop )
 	ROM_LOAD32_WORD( "epr-17168a.006", 0x800000, 0x080000, CRC(59091a37) SHA1(14591c7015aaf126755be584aa94c04e6de222fa) )
 	ROM_LOAD32_WORD( "epr-17169a.007", 0x800002, 0x080000, CRC(0495808d) SHA1(5b86a9a68c2b52f942aa8d858ee7a491f546a921) )
 
-	ROM_REGION( 0x400000, REGION_CPU3, ROMREGION_ERASE00 ) // TGP program
+	ROM_REGION( 0x800000, REGION_CPU3, ROMREGION_ERASE00 ) // TGP program
 
 	ROM_REGION( 0x1000000, REGION_USER2, 0 ) // Models
 	ROM_LOAD32_WORD( "mpr-17159.016", 0x000000, 0x200000, CRC(e218727d) SHA1(1458d01d49936a0b8d497b62ff9ea940ca753b37) )
@@ -3639,7 +3697,7 @@ ROM_START( desert )
 	ROM_LOAD32_WORD("epr-16978.6",  0x800000, 0x080000, CRC(38b3e574) SHA1(a1133df608b0fbb9c53bbeb29138650c87845d2c) )
 	ROM_LOAD32_WORD("epr-16979.7",  0x800002, 0x080000, CRC(c314eb8b) SHA1(0c851dedd5c42b026195faed7d028924698a8b27) )
 
-	ROM_REGION( 0x400000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
+	ROM_REGION( 0x800000, REGION_CPU3, 0 ) // TGP program? (COPRO socket)
 	ROM_LOAD32_WORD("epr-16981.28", 0x000000, 0x080000, CRC(ae847571) SHA1(32d0f9e685667ae9fddacea0b9f4ad6fb3a6fdad) )
 	ROM_LOAD32_WORD("epr-16980.29", 0x000002, 0x080000, CRC(5239b864) SHA1(e889556e0f1ea80de52afff563b0923f87cef7ab) )
 

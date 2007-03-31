@@ -759,6 +759,7 @@ static void dsp_loop( void )
 	}
 }
 
+#if DEBUG_DSP
 static void dsp_dump_mem( FILE *f )
 {
     UINT16 i;
@@ -785,6 +786,7 @@ static void dsp_dump_mem( FILE *f )
 	}
 	fprintf( f, "}\n" );
 }
+#endif
 
 void dsp_execute_program()
 {

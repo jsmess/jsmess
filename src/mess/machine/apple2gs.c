@@ -771,7 +771,7 @@ INTERRUPT_GEN( apple2gs_interrupt )
 	
 	/* TODO: This handler should be called every scanline; that crappyness on
 	 * the VBL handler is a consequence of not doing so */
-	scanline = cpu_getscanline();
+	scanline = video_screen_get_vpos(0);
 	if (last_scanline != scanline)
 	{
 		if (scanline == 0)
@@ -821,7 +821,7 @@ INTERRUPT_GEN( apple2gs_interrupt )
 	adb_check_mouse();
 
 	/* call Apple II interrupt handler */
-	if ((cpu_getscanline() % 8) == 7)
+	if ((video_screen_get_vpos(0) % 8) == 7)
 		apple2_interrupt();
 }
 
@@ -925,7 +925,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 	switch(offset)
 	{
 		case 0x19:	/* C019 - RDVBLBAR */
-			result = (cpu_getscanline() >= 192) ? 0x80 : 0x00;
+			result = (video_screen_get_vpos(0) >= 192) ? 0x80 : 0x00;
 			break;
 			
 		case 0x22:	/* C022 - TBCOLOR */
@@ -966,7 +966,7 @@ static READ8_HANDLER( apple2gs_c0xx_r )
 			break;
 
 		case 0x2E:	/* C02E - VERTCNT */
-			result = cpu_getscanline() + 55;
+			result = video_screen_get_vpos(0) + 55;
 			break;
 
 		case 0x2F:	/* C02F - HORIZCNT */

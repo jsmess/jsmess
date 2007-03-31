@@ -7,11 +7,14 @@
   Tumblepop             (c) 1991 Data East Corporation (Bootleg 2)
   Jump Kids             (c) 1993 Comad
   Metal Saver           (c) 1994 First Amusement
+  Pang Pang             (c) 1994 Dong Gue La Mi Ltd.
   Super Trio[1]         (c) 1994 GameAce
   Fancy World           (c) 1995 Unico
   Choky! Choky!         (c) 1995 SemiCom
   Hatch Catch           (c) 1995 SemiCom
   Cookie & Bibi[2]      (c) 1995 SemiCom
+  WonderLeague Star     (c) 1995 Mijin   (Korea Only) - SemiCom used the name Mijin up to 1995
+  SD Fighters           (c) 1996 SemiCom (Korea Only)
   B.C. Story            (c) 1997 SemiCom
   MuHanSeungBu          (c) 1997 SemiCom (Korea Only)
   Date Quiz Go Go       (c) 1998 SemiCom (Korea Only)
@@ -217,42 +220,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
   - The game needs more investigation to get similar infos to "Tumble Pop" bootlegs/ripoffs.
 
 
-Hatch Catch
-Semicom, 1995
-
-PCB Layout
-----------
-
-|---------------------------------------------|
-|       M6295  0.UC1  4.096MHz      PAL  6.OR1|
-|YM3016 YM2151 6116                      7.OR2|
-|uPC1241H  PAL 1.UA7                     8.OR3|
-|         Z80B        6116               9.OR4|
-|                     6116             6116   |
-|                    PAL               6116   |
-|J                   PAL               PAL    |
-|A  PAL                                       |
-|M  6116                                   PAL|
-|M  6116                                      |
-|A  PAL PAL                                   |
-|   PAL                        4.M5           |
-|DSW1                          5.M6           |
-|             15MHz                           |
-|DSW2           62256          6264           |
-|               62256          6264    ACTEL  |
-|        68000  2.B16          PAL     A1020B |
-|87C52          3.B17                 (PLCC84)|
-|---------------------------------------------|
-
-Notes:
-        68k clock: 15MHz
-        Z80 clock: 3.42719MHz  <-- strange clock, but verified correct.
-      M6295 clock: 1.024MHz, sample rate = /132
-      87C52 clock: 15MHz
-     YM2151 clock: 3.42719MHz
-            VSync: 60Hz
-
-
  MuHanSeungBu
  ------------
 
@@ -285,6 +252,11 @@ Notes:
  sounds which are not mapped.  As the board does not work the accuracy
  of the sound simulation cannot be verified.
 
+ SD Fighters
+ -----------
+
+ "Time" and "Rounds to Win" Dip Switches aren't visible in "Test Mode".
+
 
 ***************************************************************************/
 
@@ -301,6 +273,7 @@ Notes:
 VIDEO_START( tumblepb );
 VIDEO_START( fncywld );
 VIDEO_START( jumppop );
+VIDEO_START( sdfight );
 VIDEO_UPDATE( tumblep );
 VIDEO_UPDATE( tumblepb );
 VIDEO_UPDATE( jumpkids );
@@ -330,6 +303,7 @@ WRITE16_HANDLER( pangpang_pf2_data_w );
 extern WRITE16_HANDLER( bcstory_tilebank_w );
 extern WRITE16_HANDLER( suprtrio_tilebank_w );
 extern WRITE16_HANDLER( chokchok_tilebank_w );
+extern WRITE16_HANDLER( wlstar_tilebank_w );
 
 extern UINT16 *tumblepb_pf1_data,*tumblepb_pf2_data;
 UINT16* tumblepb_mainram;
@@ -340,7 +314,18 @@ UINT16* suprtrio_control;
 
 static WRITE16_HANDLER( tumblepb_oki_w )
 {
-	OKIM6295_data_0_w(0,data&0xff);
+
+
+	if (mem_mask==0x0000)
+	{
+		OKIM6295_data_0_w(0,data&0xff);
+		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
+	}
+	else
+	{
+		OKIM6295_data_0_w(0,(data>>8)&0xff);
+		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
+	}
     /* STUFF IN OTHER BYTE TOO..*/
 }
 
@@ -755,7 +740,7 @@ static ADDRESS_MAP_START( htchctch_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(MWA16_NOP)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
+	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
 	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
 	AM_RANGE(0x341000, 0x342fff) AM_WRITE(MWA16_RAM) // extra ram?
 ADDRESS_MAP_END
@@ -1661,6 +1646,87 @@ INPUT_PORTS_START( sdfight )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
+	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:8" ) /* These dips were done from the Test mode screens */
+	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,6,5")
+	PORT_DIPSETTING(    0x04, "Level 1" )
+	PORT_DIPSETTING(    0x08, "Level 2" )
+	PORT_DIPSETTING(    0x00, "Level 3" )
+	PORT_DIPSETTING(    0x0e, "Level 4" )
+	PORT_DIPSETTING(    0x06, "Level 5" )
+	PORT_DIPSETTING(    0x0a, "Level 6" )
+	PORT_DIPSETTING(    0x02, "Level 7" )
+	PORT_DIPSETTING(    0x0c, "Level 8" )
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4,3,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:8") /* Only Free Play shows in Test Mode */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Rounds to Win" ) PORT_DIPLOCATION("SW2:5") /* Does not show up in Test Mode screen */
+	PORT_DIPSETTING(    0x08, "2 Rounds" )
+	PORT_DIPSETTING(    0x00, "3 Rounds" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Time" ) PORT_DIPLOCATION("SW2:2,1") /* Does not show up in Test Mode screen */
+	PORT_DIPSETTING(    0x40, "30" )
+	PORT_DIPSETTING(    0x80, "50" )
+	PORT_DIPSETTING(    0xc0, "70" )
+	PORT_DIPSETTING(    0x00, "90" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( wlstar )
+	PORT_START	/* Player 1 controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START	/* Player 2 controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START	/* Credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	// to be confirmed
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:8" )
     PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
@@ -2176,7 +2242,8 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( sdfight )
 	MDRV_IMPORT_FROM(bcstory)
-	MDRV_VIDEO_UPDATE(sdfight )
+	MDRV_VIDEO_START(sdfight)
+	MDRV_VIDEO_UPDATE(sdfight)
 MACHINE_DRIVER_END
 
 
@@ -2399,390 +2466,75 @@ ROM_START( fncywld )
 	ROM_LOAD( "00_fw01.bin", 0x000000, 0x040000, CRC(b395fe01) SHA1(ac7f2e21413658f8d2a1abf3a76b7817a4e050c9) )
 ROM_END
 
-/* Hatch Catch
-Interrupts
+ROM_START( suprtrio )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "rom2",  0x00000, 0x40000, CRC(4102e59d) SHA1(f06f1273dbbb91fa61d84541aa124d9c88ee94c1) )
+	ROM_LOAD16_BYTE( "rom1",  0x00001, 0x40000, CRC(cc3a83c3) SHA1(6f8b1b6b666ce11c02e9defcba751d88621e572d) )
 
-Lev 1 0x64 0000 00c0 <- just reset .. not used
-Lev 2 0x68 0000 00c0  ""
-Lev 3 0x6c 0000 00c0  ""
-Lev 4 0x70 0000 00c0  ""
-Lev 5 0x74 0000 00c0  ""
-Lev 6 0x78 0012 0000 <- RAM shared with protection device (first 0x200 bytes?)
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 */
+	ROM_LOAD( "rom4l", 0x000000, 0x10000, CRC(466aa96d) SHA1(37f1ba148dbad27ed8e71a0b3434ff970fcb519f) )
 
-*/
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* bg tiles */
+	ROM_LOAD( "rom4",  0x00000, 0x20000, CRC(cd2dfae4) SHA1(1d872b5abaf72d34bd4a45f6be69aa6474887b4b) )
+	ROM_CONTINUE(      0x40000, 0x20000 )
+	ROM_CONTINUE(      0x20000, 0x20000 )
+	ROM_CONTINUE(      0x60000, 0x20000 )
+	ROM_LOAD( "rom5",  0x80000, 0x20000, CRC(4e64da64) SHA1(f2518b3d83d7fd46000ca982b2d91ce75034b411) )
+	ROM_CONTINUE(      0xc0000, 0x20000 )
+	ROM_CONTINUE(      0xa0000, 0x20000 )
+	ROM_CONTINUE(      0xe0000, 0x20000 )
 
-ROM_START( htchctch )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "p03.b16",  0x00001, 0x20000, CRC(eff14c40) SHA1(8fdda1fb859546c16f940e51f7e126768205154c) )
-	ROM_LOAD16_BYTE( "p04.b17",  0x00000, 0x20000, CRC(6991483a) SHA1(c8d868ef1f87655c37f0b1efdbb71cd26918f270) )
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD16_BYTE( "rom9l", 0x00000, 0x40000, CRC(cc45f437) SHA1(fa735c3b3f96266ddfb611af6908abe72d5ae9d9) )
+	ROM_LOAD16_BYTE( "rom8l", 0x00001, 0x40000, CRC(9bc90169) SHA1(3bc0d34911f063ff79c529346f41695376428f75) )
+	ROM_LOAD16_BYTE( "rom7l", 0x80000, 0x40000, CRC(bfc7c756) SHA1(e533f633dec63c27ac78f170e222e590e815a022) )
+	ROM_LOAD16_BYTE( "rom6l", 0x80001, 0x40000, CRC(bb3499af) SHA1(1a0a6a63227e8ad28aa23afc6d076037518b4802) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "p02.b5", 0x00000, 0x10000 , CRC(c5a03186) SHA1(42561ab36e6d7a43828d3094e64bd1229ab893ba) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-       shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(5b27adb6) SHA1(a0821093d8c73765ff15767bdfc0afa95aa1371d) )
-
-	ROM_REGION( 0x020000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "p01.c1", 0x00000, 0x20000, CRC(18c06829) SHA1(46b180319ed33abeaba70d2cc61f17639e59bfdb) )
-
-	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* Sprites */
-	ROM_LOAD16_BYTE( "p06srom5.bin", 0x00001, 0x40000, CRC(3d2cbb0d) SHA1(bc80be594a40989e3c23539fc2021de65a2444c5) )
-	ROM_LOAD16_BYTE( "p07srom6.bin", 0x00000, 0x40000, CRC(0207949c) SHA1(84b4dcd27fe89a5350b6642ef99719bb85514174) )
-
-	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE ) /* GFX */
-	ROM_LOAD16_BYTE( "p08uor1.bin",  0x00000, 0x20000, CRC(6811e7b6) SHA1(8157f92a3168ffbac86cd8c6294b9c0f3ee0835d) )
-	ROM_LOAD16_BYTE( "p09uor2.bin",  0x00001, 0x20000, CRC(1c6549cf) SHA1(c05aba9b744144db4537e472842b0d53325aa78f) )
-	ROM_LOAD16_BYTE( "p10uor3.bin",  0x40000, 0x20000, CRC(6462e6e0) SHA1(0d107214dfb257e15931701bad6b42c6aadd8a18) )
-	ROM_LOAD16_BYTE( "p11uor4.bin",  0x40001, 0x20000, CRC(9c511d98) SHA1(6615cbb125bd1e1b4da400ec4c4a0f4df8f6fa75) )
-ROM_END
-
-/* Cookie & Bibi */
-
-ROM_START( cookbib )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "prg1.ub16",  0x00001, 0x20000, CRC(cda6335f) SHA1(34a57785a458d3e9a66c91734b4511fbc9f3455c) )
-	ROM_LOAD16_BYTE( "prg2.ub17",  0x00000, 0x20000, CRC(2664a335) SHA1(8d1c4825720a09db6156599ab905292640b04cba) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "prg-s.ub5", 0x00000, 0x10000 , CRC(547d6ea3) SHA1(42929e453c4f1c90c29197a9bed953139cfe2873) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-       shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(a77d13f4) SHA1(13db72f5b171b0c1226e97ea98d9edd7144d56d9) )
-
-	ROM_REGION( 0x020000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "sound.uc1", 0x00000, 0x20000, CRC(545e19b6) SHA1(ef518bbe44b22e7ef77ee6af337ebcad9b2674e0) )
-
-	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* */
-	ROM_LOAD16_BYTE( "srom5.bin", 0x00001, 0x40000, CRC(73a46e43) SHA1(054fac2dc5dffcbb9d81600689c07774d2e200b6) )
-	ROM_LOAD16_BYTE( "srom6.bin", 0x00000, 0x40000, CRC(ade2dbec) SHA1(12d385d22307d8251e711788dff2e503c8f8ca7c) )
-
-	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE ) /* GFX */
-	ROM_LOAD16_BYTE( "uor1.bin",  0x00000, 0x20000, CRC(a7d91f23) SHA1(eb9694e05b8a04ed1cdbb834e1bf745a2b0260be) )
-	ROM_LOAD16_BYTE( "uor2.bin",  0x00001, 0x20000, CRC(9aacbec2) SHA1(c1cfe243a7d51c950785073f235d72cc01724cdb) )
-	ROM_LOAD16_BYTE( "uor3.bin",  0x40000, 0x20000, CRC(3fee0c3c) SHA1(c71439ba8033c549e40522db5270caf4a297fb99) )
-	ROM_LOAD16_BYTE( "uor4.bin",  0x40001, 0x20000, CRC(bed9ed2d) SHA1(7103b99cd0d54df864ea4a0f269011e30ad29ed7) )
-ROM_END
-
-
-/* Choky Choky */
-
-ROM_START( chokchok )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "ub18.bin",  0x00001, 0x40000, CRC(b183852a) SHA1(fd50c6d91dba64b936ac367e5e5235d09ed60fdd) )
-	ROM_LOAD16_BYTE( "ub17.bin",  0x00000, 0x40000, CRC(ecdb45ca) SHA1(03eb2d27ae4de25aa15477135d3b4de8b3b7f7f0) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "ub5.bin", 0x00000, 0x10000 , CRC(30c2171d) SHA1(3954e286d57b955af6ba9b1a0b49c442d7f295ae) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-       shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(0bd39834) SHA1(2860c2b7fcb74546afde11a59d4b359612ab6e68) )
-
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "uc1.bin", 0x00000, 0x40000, CRC(f3f57abd) SHA1(601dc669020ef9156fa221e768be9b88454e3f55) )
-
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "srom5.bin", 0x00001, 0x20000, CRC(836608b8) SHA1(7aa624274efee0a7affb6a1a417752b5ce116c04) )
-	ROM_CONTINUE ( 0x100001,0x20000)
-	ROM_CONTINUE ( 0x040001,0x20000)
-	ROM_CONTINUE ( 0x140001,0x20000)
-	ROM_LOAD16_BYTE( "srom6.bin", 0x00000, 0x20000, CRC(31d5715d) SHA1(32612464124290b273c4b1a8b571291f9aeff01c) )
-	ROM_CONTINUE ( 0x100000,0x20000)
-	ROM_CONTINUE ( 0x040000,0x20000)
-	ROM_CONTINUE ( 0x140000,0x20000)
-
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
-	ROM_LOAD16_BYTE( "uor1.bin",  0x000000, 0x80000, CRC(ded6642a) SHA1(357c836ebe62e0f7f9e7afdf7428f42d827ede06) )
-	ROM_LOAD16_BYTE( "uor2.bin",  0x000001, 0x80000, CRC(493f9516) SHA1(2e1d38493558dc79cd4d232ac421cd5649f4119a) )
-	ROM_LOAD16_BYTE( "uor3.bin",  0x100000, 0x80000, CRC(e2dc3e12) SHA1(9e2571f93d27b9048fe8e42d3f13a8e509b3adca) )
-	ROM_LOAD16_BYTE( "uor4.bin",  0x100001, 0x80000, CRC(6f377530) SHA1(1367987e3af0baa8e22f09d1b40ad838f33371bc) )
+	ROM_REGION( 0xb0000, REGION_SOUND1, 0 ) /* samples */
+	ROM_LOAD( "rom3h", 0x00000, 0x30000, CRC(34ea7ec9) SHA1(1f80a2c7ed4fb13610731732b11268d1d7be5bb2) )
+	ROM_CONTINUE(      0x40000, 0x50000 )
+	ROM_LOAD( "rom3l", 0x90000, 0x20000, CRC(1b73233b) SHA1(5d82bbdc31d99f8d77bdb5c2f6e5e23037b4bca0) )
 ROM_END
 
 /*
 
-Metal Saver By First Amusement (1994)
-
-The pcb is identical to Final Tetris pcb
- (strange, final tetris is based on snowbros logic)
-
-1x 68k
-1x z80
-1x CA101 (probably an Ym2151)
-1x Oki 6295
-1x OSC 14mhz (near 68k)
-1x OSC 3.579545 (near z80)
-1x FPGA Actel 1020A PL84C
-1x unknown MCU (very similar to tyical Semicom mcu)
-2x banks of Dipswitch
-
-First Amusement logo is almost identical to Semicom logo.
+1x MC68000P10 (main)
+1x PIC16C57
+1x OKI M6295
+1x oscillator 8.000MHz (close to OKI)
+1x oscillator 14.000MHz
+1x oscillator 12.000000MHz
 
 */
 
+ROM_START( pangpang )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE ("2.bin", 0x00000, 0x40000, CRC(45436666) SHA1(a319d27320d74266b5e5af7eb1452ecc0b158318) )
+	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x40000, CRC(2725cbe7) SHA1(3ce2d8b1460a26ac0d982103d8796cdc296a64e1) )
 
-ROM_START( metlsavr )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "first-3.ub18",     0x00001, 0x40000, CRC(87bf4ed2) SHA1(ee1a23232bc37d95dca6d612b4e22ed2b723bd01) )
-	ROM_LOAD16_BYTE( "first-4.ub17",     0x00000, 0x40000, CRC(667a494d) SHA1(282391ed7fa994ec51d39c6b086a808ee43e8af1) )
+	ROM_REGION( 0x2d4c, REGION_CPU2, 0 ) /* PIC16c57 */
+	ROM_LOAD( "pic_16c57", 0x00000, 0x2d4c, BAD_DUMP CRC(1ca515b4) SHA1(b2d302a7e45ac5b783d408584b93b534eaee6523) ) // protected :-(
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "first-2.ua7",    0x00000, 0x10000, CRC(49505edf) SHA1(ea3007f1adbe8e2597ee6201bbd5d07fa9f7c733) )
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) // PF1 tilemap
+	ROM_LOAD16_BYTE( "11.bin", 0x00000, 0x20000, CRC(a2b9fec8) SHA1(121771466c288e132cdcf6abdc3bbe2578de9260) )
+	ROM_CONTINUE(0x80000,0x20000)
+	ROM_LOAD16_BYTE( "10.bin", 0x00001, 0x20000, CRC(4f59d7b9) SHA1(a0eabb44ecb6922f656a5032c0ab757813b9cc13) )
+	ROM_CONTINUE(0x80001,0x20000)
+	ROM_LOAD16_BYTE( "6.bin", 0x40000, 0x20000, CRC(1ebbc4f1) SHA1(6fb745ebe7ee8ecf5036ac0c4a5dda71cbb40063) )
+	ROM_CONTINUE(0xc0000,0x20000)
+	ROM_LOAD16_BYTE( "7.bin", 0x40001, 0x20000, CRC(cd544173) SHA1(b929d771040a48356b449458d3125142b9bfc365) )
+	ROM_CONTINUE(0xc0001,0x20000)
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+ 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "8.bin",   0x00000, 0x40000, CRC(ea0fa1e0) SHA1(1f2f6264097d15339782c2e399d125c3835fd852) )
+	ROM_LOAD16_BYTE( "9.bin",   0x00001, 0x40000, CRC(1da5fe49) SHA1(338be1a9f8c42e685e1cefb12b2d169b7560e5f7) )
+	ROM_LOAD16_BYTE( "4.bin",   0x80000, 0x40000, CRC(4f282eb1) SHA1(3731045a500082d37588edf7cbb0c0ebae566aab) )
+	ROM_LOAD16_BYTE( "5.bin",   0x80001, 0x40000, CRC(00694df9) SHA1(f07373c7ef379daa4e788c169579e23a1133d884) )
 
-	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-       shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(17aa17a9) SHA1(5b83159c62473f79e7fced0d86acfaf697ad5537) )
-
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "first-1.uc1",    0x00000, 0x40000, CRC(e943dacb) SHA1(65a786467fc9efe503aad4e183df352e52143fc2) )
-
-	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "first-5.rom5",     0x00001, 0x40000, CRC(dd4af746) SHA1(185a8080173b3c05fcc5f5ee2f71606987826e79) )
-	ROM_LOAD16_BYTE( "first-6.rom6",     0x00000, 0x40000, CRC(808b0e0b) SHA1(f4913e135986b28b4e56bdcc4fd7dd5aad9aa467) )
-
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
-	ROM_LOAD16_BYTE( "first-7.uor1",     0x000000, 0x80000, CRC(a6816747) SHA1(0ec288a1e23bb78de0e284b759a5e83304744960) )
-	ROM_LOAD16_BYTE( "first-8.uor2",     0x000001, 0x80000, CRC(377020e5) SHA1(490dd2383a49554f2c5d65df798a3933f5c5a62e) )
-	ROM_LOAD16_BYTE( "first-9.uor3",     0x100000, 0x80000, CRC(fccf1bb7) SHA1(12cb397fd6438068558ec4d64298cfbe4f9e0e7e) )
-	ROM_LOAD16_BYTE( "first-10.uor4",    0x100001, 0x80000, CRC(a22b587b) SHA1(e2f6785eb17f66a8b4fc102524b5013e72f1a0f3) )
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Oki samples */
+	ROM_LOAD( "1.bin", 0x00000, 0x80000, CRC(e722bb02) SHA1(ebb8c87d32dccbebf6d8a47703ac12be984f4a3d) )
+	ROM_RELOAD(0x80000,0x80000)
 ROM_END
-
-/* BC Story */
-
-ROM_START( bcstry )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "bcstry_u.35",  0x40001, 0x20000, CRC(d25b80a4) SHA1(6ea1c28cf508b856e93a06063e634a09291cb32c) )
-	ROM_CONTINUE ( 0x00001, 0x20000)
-	ROM_LOAD16_BYTE( "bcstry_u.62",  0x40000, 0x20000, CRC(7f7aa244) SHA1(ee9bb2bf22d16f06d7935168e2bd09296fba3abc) )
-	ROM_CONTINUE ( 0x00000, 0x20000)
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "bcstry_u.21", 0x04000, 0x4000 , CRC(3ba072d4) SHA1(8b64d3ab4c63132f2f77b2cf38a88eea1a8f11e0) )
-	ROM_CONTINUE( 0x0000, 0x4000 )
-	ROM_CONTINUE( 0xc000, 0x4000 )
-	ROM_CONTINUE( 0x8000, 0x4000 )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-       shared ram, the MCU puts it there */
-	/* taken from other set, check... */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(e84e328c) SHA1(ce21988980654acb573bfb7396fd2f536204ecf0) )
-
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "bcstry_u.64", 0x00000, 0x40000, CRC(23f0e0fe) SHA1(a8c3cbb6378797db353ca2873e73ff157a6f8a3c) )
-
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* Tiles */
-	ROM_LOAD16_BYTE( "bcstry_u.109", 0x000000, 0x20000, CRC(eb04d37a) SHA1(818dc7aafac577920d94c65e47d965dc0474d92c) ) // tiles a plane 0
-	ROM_CONTINUE ( 0x100000,0x20000) // tiles a plane 1
-	ROM_CONTINUE ( 0x040000,0x20000) // tiles b plane 0
-	ROM_CONTINUE ( 0x140000,0x20000) // tiles b plane 1
-	ROM_LOAD16_BYTE( "bcstry_u.113", 0x000001, 0x20000, CRC(746ecdd7) SHA1(afb6dbc0fb94e7ce96a9b219f5f7cd3721d1c1c4) ) // tiles a plane 2
-	ROM_CONTINUE ( 0x100001,0x20000) // tiles a plane 3
-	ROM_CONTINUE ( 0x040001,0x20000) // tiles b plane 2
-	ROM_CONTINUE ( 0x140001,0x20000) // tiles b plane 3
-	ROM_LOAD16_BYTE( "bcstry_u.110", 0x080000, 0x20000, CRC(1bfe65c3) SHA1(27dec16b271866ff336d8b25d352977ca80c35bf) ) // tiles c plane 0
-	ROM_CONTINUE ( 0x180000,0x20000) // tiles c plane 1
-	ROM_CONTINUE ( 0x0c0000,0x20000) // tiles d plane 0
-	ROM_CONTINUE ( 0x1c0000,0x20000) // tiles d plane 1
-	ROM_LOAD16_BYTE( "bcstry_u.111", 0x080001, 0x20000, CRC(c8bf3a3c) SHA1(604fc57c4d3a581016aa2516236c568488d23c77) ) // tiles c plane 2
-	ROM_CONTINUE ( 0x180001,0x20000) // tiles c plane 3
-	ROM_CONTINUE ( 0x0c0001,0x20000) // tiles d plane 2
-	ROM_CONTINUE ( 0x1c0001,0x20000) // tiles d plane 3
-
-	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD16_BYTE( "bcstry_u.100", 0x000000, 0x80000, CRC(8c11cbed) SHA1(e04e53af4fe732bf9d20a9ae5c2a90b576ee0b83) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.106", 0x000001, 0x80000, CRC(5219bcbf) SHA1(4b88eab7ffc2dc1de451ae4ee52f1536e179ea13) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.99",  0x100000, 0x80000, CRC(cdb1af87) SHA1(df1fbda5c7ce4fbd64d6db9eb80946e06119f096) ) // a
-	ROM_LOAD16_BYTE( "bcstry_u.105", 0x100001, 0x80000, CRC(8166b596) SHA1(cbf6f5cec5f6991bb1d4ec0ea03cd617ff38fc3b) ) // a
-	ROM_LOAD16_BYTE( "bcstry_u.104", 0x200000, 0x80000, CRC(377c0c71) SHA1(77efa9530b1c311d93c84dd8452701414f740269) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.108", 0x200001, 0x80000, CRC(442307ed) SHA1(71b7f19af64d9961f0f9205b86b4b0ebc13fddda) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.102", 0x300000, 0x80000, CRC(71b40ece) SHA1(1a13dfd7615a6f61851897ebcb10fa69bc8ae525) ) // a
-	ROM_LOAD16_BYTE( "bcstry_u.107", 0x300001, 0x80000, CRC(ab3c923a) SHA1(aaca1d2ed7b53e0933e0bd94a19458dd1598f204) ) // a
-ROM_END
-
-ROM_START( bcstrya )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "prg1.ic35",  0x40001, 0x20000, CRC(2c55100a) SHA1(bc98a0015c99ef84ebd3fc3f7b7a3bdfd700e1da) )
-	ROM_CONTINUE ( 0x00001, 0x20000)
-	ROM_LOAD16_BYTE( "prg2.ic62",  0x40000, 0x20000, CRC(f54c0a96) SHA1(79a3635792a23f47fc914d1d5e118b5a643ca100) )
-	ROM_CONTINUE ( 0x00000, 0x20000)
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "bcstry_u.21", 0x04000, 0x4000 , CRC(3ba072d4) SHA1(8b64d3ab4c63132f2f77b2cf38a88eea1a8f11e0) )
-	ROM_CONTINUE( 0x0000, 0x4000 )
-	ROM_CONTINUE( 0xc000, 0x4000 )
-	ROM_CONTINUE( 0x8000, 0x4000 )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-       shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(e84e328c) SHA1(ce21988980654acb573bfb7396fd2f536204ecf0) )
-
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "bcstry_u.64", 0x00000, 0x40000, CRC(23f0e0fe) SHA1(a8c3cbb6378797db353ca2873e73ff157a6f8a3c) )
-
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* Tiles */
-	ROM_LOAD16_BYTE( "bcstry_u.109", 0x000000, 0x20000, CRC(eb04d37a) SHA1(818dc7aafac577920d94c65e47d965dc0474d92c) ) // tiles a plane 0
-	ROM_CONTINUE ( 0x100000,0x20000) // tiles a plane 1
-	ROM_CONTINUE ( 0x040000,0x20000) // tiles b plane 0
-	ROM_CONTINUE ( 0x140000,0x20000) // tiles b plane 1
-	ROM_LOAD16_BYTE( "bcstry_u.113", 0x000001, 0x20000, CRC(746ecdd7) SHA1(afb6dbc0fb94e7ce96a9b219f5f7cd3721d1c1c4) ) // tiles a plane 2
-	ROM_CONTINUE ( 0x100001,0x20000) // tiles a plane 3
-	ROM_CONTINUE ( 0x040001,0x20000) // tiles b plane 2
-	ROM_CONTINUE ( 0x140001,0x20000) // tiles b plane 3
-	ROM_LOAD16_BYTE( "bcstry_u.110", 0x080000, 0x20000, CRC(1bfe65c3) SHA1(27dec16b271866ff336d8b25d352977ca80c35bf) ) // tiles c plane 0
-	ROM_CONTINUE ( 0x180000,0x20000) // tiles c plane 1
-	ROM_CONTINUE ( 0x0c0000,0x20000) // tiles d plane 0
-	ROM_CONTINUE ( 0x1c0000,0x20000) // tiles d plane 1
-	ROM_LOAD16_BYTE( "bcstry_u.111", 0x080001, 0x20000, CRC(c8bf3a3c) SHA1(604fc57c4d3a581016aa2516236c568488d23c77) ) // tiles c plane 2
-	ROM_CONTINUE ( 0x180001,0x20000) // tiles c plane 3
-	ROM_CONTINUE ( 0x0c0001,0x20000) // tiles d plane 2
-	ROM_CONTINUE ( 0x1c0001,0x20000) // tiles d plane 3
-
-	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD16_BYTE( "bcstry_u.100", 0x000000, 0x80000, CRC(8c11cbed) SHA1(e04e53af4fe732bf9d20a9ae5c2a90b576ee0b83) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.106", 0x000001, 0x80000, CRC(5219bcbf) SHA1(4b88eab7ffc2dc1de451ae4ee52f1536e179ea13) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.99",  0x100000, 0x80000, CRC(cdb1af87) SHA1(df1fbda5c7ce4fbd64d6db9eb80946e06119f096) ) // a
-	ROM_LOAD16_BYTE( "bcstry_u.105", 0x100001, 0x80000, CRC(8166b596) SHA1(cbf6f5cec5f6991bb1d4ec0ea03cd617ff38fc3b) ) // a
-	ROM_LOAD16_BYTE( "bcstry_u.104", 0x200000, 0x80000, CRC(377c0c71) SHA1(77efa9530b1c311d93c84dd8452701414f740269) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.108", 0x200001, 0x80000, CRC(442307ed) SHA1(71b7f19af64d9961f0f9205b86b4b0ebc13fddda) ) // b
-	ROM_LOAD16_BYTE( "bcstry_u.102", 0x300000, 0x80000, CRC(71b40ece) SHA1(1a13dfd7615a6f61851897ebcb10fa69bc8ae525) ) // a
-	ROM_LOAD16_BYTE( "bcstry_u.107", 0x300001, 0x80000, CRC(ab3c923a) SHA1(aaca1d2ed7b53e0933e0bd94a19458dd1598f204) ) // a
-ROM_END
-
-/* Semicom Baseball */
-
-/*
-
-SemiCom Baseball (MuHanSeungBu)
-
-MC68HC000P10 & Z80
-QuickLogic QL2007-XPQ208C
-BS901, BS902 & AD-65 (YM2151, YM3012 & OKI M6295)
-P87C52EBPN MCU
-OSC: 4.096MHz, 15.000MHz
-Ram:
- UM62256E-70LL x 2 (by 68000)
- HY6264A LP-70 x 2 (by QuickLogic QL2007)
- Temic HM3-65738BK-5 (by Z80)
- Temic HM3-65738BK-5 x 2
- Sony CXK5814P-35L x 2
-
-No roms had any labels, I used the IC position and
-logical use (IE:z80 for the Z80 program rom)
-
-*/
-
-ROM_START( semibase )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "ic35.68k",  0x40001, 0x20000, CRC(d2249605) SHA1(ab3faa832f14f799e4a975673495d30160c6eae5) )
-	ROM_CONTINUE ( 0x00001, 0x20000)
-	ROM_LOAD16_BYTE( "ic62.68k",  0x40000, 0x20000, CRC(85ea81c3) SHA1(7e97316f5f373b98fa4063acd74f784b312a1cc4) )
-	ROM_CONTINUE ( 0x00000, 0x20000)
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "ic21.z80", 0x04000, 0x4000 , CRC(d95c64d0) SHA1(1b239e8b23b820610dbf67cbd525d4a6c956ba35) )
-	ROM_CONTINUE( 0x0000, 0x4000 )
-	ROM_CONTINUE( 0xc000, 0x4000 )
-	ROM_CONTINUE( 0x8000, 0x4000 )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
-	/* once the game has decrypted this it's almost identical to bcstory with several ram addresses being 0x4 higher than in bcstory
-     and 1200FE: andi.b  #$f, D1  instead of #$3  (unless bcstory data is wrong?) */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(ecbf2163) SHA1(634b366a8c4ba8699851861bf935b55850f93a7f) )
-
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "ic64.snd", 0x00000, 0x40000, CRC(8a60649c) SHA1(aeb266436f6af4173b84dbb19362563b6c5db507) )
-
-	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* Tiles */
-	ROM_LOAD16_BYTE( "ic109.gfx", 0x000000, 0x20000, CRC(2b86e983) SHA1(f625da05d68c78173e346f9c60ab4b0672b9f357) ) // tiles a plane 0
-	ROM_CONTINUE ( 0x100000,0x20000) // tiles a plane 1
-	ROM_CONTINUE ( 0x040000,0x20000) // tiles b plane 0
-	ROM_CONTINUE ( 0x140000,0x20000) // tiles b plane 1
-	ROM_LOAD16_BYTE( "ic113.gfx", 0x000001, 0x20000, CRC(e39b6610) SHA1(604f876f0bf9ed70f627944397e78ee16869d0ba) ) // tiles a plane 2
-	ROM_CONTINUE ( 0x100001,0x20000) // tiles a plane 3
-	ROM_CONTINUE ( 0x040001,0x20000) // tiles b plane 2
-	ROM_CONTINUE ( 0x140001,0x20000) // tiles b plane 3
-	ROM_LOAD16_BYTE( "ic110.gfx", 0x080000, 0x20000, CRC(bba4a015) SHA1(4e03585ff493148b9eeaaabb8d37630962ab6c74) ) // tiles c plane 0
-	ROM_CONTINUE ( 0x180000,0x20000) // tiles c plane 1
-	ROM_CONTINUE ( 0x0c0000,0x20000) // tiles d plane 0
-	ROM_CONTINUE ( 0x1c0000,0x20000) // tiles d plane 1
-	ROM_LOAD16_BYTE( "ic111.gfx", 0x080001, 0x20000, CRC(61133b63) SHA1(8820c88297fbcf5e1102c01245391f49a9c63186) ) // tiles c plane 2
-	ROM_CONTINUE ( 0x180001,0x20000) // tiles c plane 3
-	ROM_CONTINUE ( 0x0c0001,0x20000) // tiles d plane 2
-	ROM_CONTINUE ( 0x1c0001,0x20000) // tiles d plane 3
-
-	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
-	ROM_LOAD16_BYTE( "ic100.gfx", 0x000000, 0x80000, CRC(01c3d12a) SHA1(128c21b18f73445a8e77fe5dd3072c1b1e20c47a) ) // b
-	ROM_LOAD16_BYTE( "ic106.gfx", 0x000001, 0x80000, CRC(db282ac2) SHA1(127637967e7620cd7e81aff268fb776d0211e58a) ) // b
-	ROM_LOAD16_BYTE( "ic99.gfx",  0x100000, 0x80000, CRC(349df821) SHA1(34af8b748aad5807300f8e76eb8a99366878004b) ) // a
-	ROM_LOAD16_BYTE( "ic105.gfx", 0x100001, 0x80000, CRC(f7caa81c) SHA1(2270d133c7b116d66581fc688086dd331b811478) ) // a
-	ROM_LOAD16_BYTE( "ic104.gfx", 0x200000, 0x80000, CRC(51a5d38a) SHA1(0258ae29779f7f1246845622a579d37dca64fb2f) ) // b
-	ROM_LOAD16_BYTE( "ic108.gfx", 0x200001, 0x80000, CRC(b253d60e) SHA1(aca2f6c2233372841908377407068c5d45f5f9c4) ) // b
-	ROM_LOAD16_BYTE( "ic102.gfx", 0x300000, 0x80000, CRC(3caefe97) SHA1(e60c6ef9e1dd6abdd763648dbcebefa4f19364c4) ) // a
-	ROM_LOAD16_BYTE( "ic107.gfx", 0x300001, 0x80000, CRC(68109898) SHA1(dbc0d431da33e22b8d0f918b9c8a3c1667bc4f8e) ) // a
-ROM_END
-
-
-ROM_START( dquizgo )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "ub18",     0x00001, 0x80000, CRC(07f869f2) SHA1(1e69f8a6ce3bcf0feaeb43cc7c0fc3fa324466b2) )
-	ROM_LOAD16_BYTE( "ub17",     0x00000, 0x80000, CRC(0b96ab14) SHA1(fc132118eaa938c85d210713320b0a04425f48de) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "ub5",    0x00000, 0x10000, CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
-
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x400, REGION_USER1, ROMREGION_ERASE00 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-       shared ram, the MCU puts it there */
-    /* It seems to put some data at 0x000-0x1ff too, but it looks like garbage, and doesn't appear to be used */
-	ROM_LOAD16_WORD( "protdata.bin", 0x200, 0x200 , CRC(6064b9e0) SHA1(546bd8f9201427118940de2d1916b258b60710c6) )
-
-	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "uc1",    0x00000, 0x40000, CRC(d0f4c4ba) SHA1(669a04a977e98d8a594cc1621cbb9526c9081ec0) )
-
-	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "srom5",     0x00001, 0x40000, CRC(f1cdd21d) SHA1(0bfc09abce40712c4e95f13ad0d4b78684e44630) )
-	ROM_IGNORE(0x40000)
-	ROM_LOAD16_BYTE( "srom6",     0x00000, 0x40000, CRC(f848939e) SHA1(bf5e62300dd13a37f4715c67a2eec88034a94311) )
-	ROM_IGNORE(0x40000)
-
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
-	ROM_LOAD16_BYTE( "uor1",     0x000000, 0x80000, CRC(b4912bf6) SHA1(ef827adba58470a201f3c1ecc3286d728a753eff) )
-	ROM_LOAD16_BYTE( "uor2",     0x000001, 0x80000, CRC(b011cf93) SHA1(b993df91511ac17d5bf8e688333f2953b87d5be4) )
-	ROM_LOAD16_BYTE( "uor3",     0x100000, 0x80000, CRC(d96c3582) SHA1(6b313462fd8985fae60bc59cd9c99c97ab70fdcc) )
-	ROM_LOAD16_BYTE( "uor4",     0x100001, 0x80000, CRC(77ff23eb) SHA1(7fc891810591458fd62f3d4b9b4c966662e90403) )
-ROM_END
-
 
 /*
 
@@ -2859,79 +2611,362 @@ ROM_START( jumppop )
 	ROM_LOAD( "samples.bin", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) )
 ROM_END
 
+/**************************************
 
-ROM_START( suprtrio )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68k */
-	ROM_LOAD16_BYTE( "rom2",  0x00000, 0x40000, CRC(4102e59d) SHA1(f06f1273dbbb91fa61d84541aa124d9c88ee94c1) )
-	ROM_LOAD16_BYTE( "rom1",  0x00001, 0x40000, CRC(cc3a83c3) SHA1(6f8b1b6b666ce11c02e9defcba751d88621e572d) )
+            SemiCom Games
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 */
-	ROM_LOAD( "rom4l", 0x000000, 0x10000, CRC(466aa96d) SHA1(37f1ba148dbad27ed8e71a0b3434ff970fcb519f) )
+ Uses simular hardware with 87c52 MCU for protection
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* bg tiles */
-	ROM_LOAD( "rom4",  0x00000, 0x20000, CRC(cd2dfae4) SHA1(1d872b5abaf72d34bd4a45f6be69aa6474887b4b) )
-	ROM_CONTINUE(      0x40000, 0x20000 )
-	ROM_CONTINUE(      0x20000, 0x20000 )
-	ROM_CONTINUE(      0x60000, 0x20000 )
-	ROM_LOAD( "rom5",  0x80000, 0x20000, CRC(4e64da64) SHA1(f2518b3d83d7fd46000ca982b2d91ce75034b411) )
-	ROM_CONTINUE(      0xc0000, 0x20000 )
-	ROM_CONTINUE(      0xa0000, 0x20000 )
-	ROM_CONTINUE(      0xe0000, 0x20000 )
+ SemiCom used the name "Mijin" in 1995
 
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
-	ROM_LOAD16_BYTE( "rom9l", 0x00000, 0x40000, CRC(cc45f437) SHA1(fa735c3b3f96266ddfb611af6908abe72d5ae9d9) )
-	ROM_LOAD16_BYTE( "rom8l", 0x00001, 0x40000, CRC(9bc90169) SHA1(3bc0d34911f063ff79c529346f41695376428f75) )
-	ROM_LOAD16_BYTE( "rom7l", 0x80000, 0x40000, CRC(bfc7c756) SHA1(e533f633dec63c27ac78f170e222e590e815a022) )
-	ROM_LOAD16_BYTE( "rom6l", 0x80001, 0x40000, CRC(bb3499af) SHA1(1a0a6a63227e8ad28aa23afc6d076037518b4802) )
 
-	ROM_REGION( 0xb0000, REGION_SOUND1, 0 ) /* samples */
-	ROM_LOAD( "rom3h", 0x00000, 0x30000, CRC(34ea7ec9) SHA1(1f80a2c7ed4fb13610731732b11268d1d7be5bb2) )
-	ROM_CONTINUE(      0x40000, 0x50000 )
-	ROM_LOAD( "rom3l", 0x90000, 0x20000, CRC(1b73233b) SHA1(5d82bbdc31d99f8d77bdb5c2f6e5e23037b4bca0) )
-ROM_END
+**************************************/
+
 
 /*
 
-1x MC68000P10 (main)
-1x PIC16C57
-1x OKI M6295
-1x oscillator 8.000MHz (close to OKI)
-1x oscillator 14.000MHz
-1x oscillator 12.000000MHz
+Metal Saver By First Amusement (1994)
+
+The pcb is identical to Final Tetris pcb
+ (strange, final tetris is based on snowbros logic)
+
+1x 68k
+1x z80
+1x CA101 (compatible to YM2151)
+1x Oki 6295
+1x OSC 14mhz (near 68k)
+1x OSC 3.579545 (near z80)
+1x FPGA Actel 1020A PL84C
+1x 87c52 based MCU (very similar to tyical Semicom mcu)
+2x banks of Dipswitch
+
+First Amusement logo is almost identical to Semicom logo.
+
+There is a PC version of Metal Saver, so did SemiCom do
+the arcade version on SemiCom type hardware?
 
 */
 
-ROM_START( pangpang )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE ("2.bin", 0x00000, 0x40000, CRC(45436666) SHA1(a319d27320d74266b5e5af7eb1452ecc0b158318) )
-	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x40000, CRC(2725cbe7) SHA1(3ce2d8b1460a26ac0d982103d8796cdc296a64e1) )
+ROM_START( metlsavr )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "first-3.ub18", 0x00001, 0x40000, CRC(87bf4ed2) SHA1(ee1a23232bc37d95dca6d612b4e22ed2b723bd01) )
+	ROM_LOAD16_BYTE( "first-4.ub17", 0x00000, 0x40000, CRC(667a494d) SHA1(282391ed7fa994ec51d39c6b086a808ee43e8af1) )
 
-	ROM_REGION( 0x2d4c, REGION_CPU2, 0 ) /* PIC16c57 */
-	ROM_LOAD( "pic_16c57", 0x00000, 0x2d4c, BAD_DUMP CRC(1ca515b4) SHA1(b2d302a7e45ac5b783d408584b93b534eaee6523) ) // protected :-(
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "first-2.ua7", 0x00000, 0x10000, CRC(49505edf) SHA1(ea3007f1adbe8e2597ee6201bbd5d07fa9f7c733) )
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) // PF1 tilemap
-	ROM_LOAD16_BYTE( "11.bin", 0x00000, 0x20000, CRC(a2b9fec8) SHA1(121771466c288e132cdcf6abdc3bbe2578de9260) )
-	ROM_CONTINUE(0x80000,0x20000)
-	ROM_LOAD16_BYTE( "10.bin", 0x00001, 0x20000, CRC(4f59d7b9) SHA1(a0eabb44ecb6922f656a5032c0ab757813b9cc13) )
-	ROM_CONTINUE(0x80001,0x20000)
-	ROM_LOAD16_BYTE( "6.bin", 0x40000, 0x20000, CRC(1ebbc4f1) SHA1(6fb745ebe7ee8ecf5036ac0c4a5dda71cbb40063) )
-	ROM_CONTINUE(0xc0000,0x20000)
-	ROM_LOAD16_BYTE( "7.bin", 0x40001, 0x20000, CRC(cd544173) SHA1(b929d771040a48356b449458d3125142b9bfc365) )
-	ROM_CONTINUE(0xc0001,0x20000)
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
- 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "8.bin",   0x00000, 0x40000, CRC(ea0fa1e0) SHA1(1f2f6264097d15339782c2e399d125c3835fd852) )
-	ROM_LOAD16_BYTE( "9.bin",   0x00001, 0x40000, CRC(1da5fe49) SHA1(338be1a9f8c42e685e1cefb12b2d169b7560e5f7) )
-	ROM_LOAD16_BYTE( "4.bin",   0x80000, 0x40000, CRC(4f282eb1) SHA1(3731045a500082d37588edf7cbb0c0ebae566aab) )
-	ROM_LOAD16_BYTE( "5.bin",   0x80001, 0x40000, CRC(00694df9) SHA1(f07373c7ef379daa4e788c169579e23a1133d884) )
+	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(17aa17a9) SHA1(5b83159c62473f79e7fced0d86acfaf697ad5537) )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Oki samples */
-	ROM_LOAD( "1.bin", 0x00000, 0x80000, CRC(e722bb02) SHA1(ebb8c87d32dccbebf6d8a47703ac12be984f4a3d) )
-	ROM_RELOAD(0x80000,0x80000)
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "first-1.uc1", 0x00000, 0x40000, CRC(e943dacb) SHA1(65a786467fc9efe503aad4e183df352e52143fc2) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "first-5.rom5", 0x00001, 0x40000, CRC(dd4af746) SHA1(185a8080173b3c05fcc5f5ee2f71606987826e79) )
+	ROM_LOAD16_BYTE( "first-6.rom6", 0x00000, 0x40000, CRC(808b0e0b) SHA1(f4913e135986b28b4e56bdcc4fd7dd5aad9aa467) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD16_BYTE( "first-7.uor1",  0x000000, 0x80000, CRC(a6816747) SHA1(0ec288a1e23bb78de0e284b759a5e83304744960) )
+	ROM_LOAD16_BYTE( "first-8.uor2",  0x000001, 0x80000, CRC(377020e5) SHA1(490dd2383a49554f2c5d65df798a3933f5c5a62e) )
+	ROM_LOAD16_BYTE( "first-9.uor3",  0x100000, 0x80000, CRC(fccf1bb7) SHA1(12cb397fd6438068558ec4d64298cfbe4f9e0e7e) )
+	ROM_LOAD16_BYTE( "first-10.uor4", 0x100001, 0x80000, CRC(a22b587b) SHA1(e2f6785eb17f66a8b4fc102524b5013e72f1a0f3) )
+ROM_END
+
+/* BC Story */
+
+ROM_START( bcstry )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "bcstry_u.35",  0x40001, 0x20000, CRC(d25b80a4) SHA1(6ea1c28cf508b856e93a06063e634a09291cb32c) )
+	ROM_CONTINUE ( 0x00001, 0x20000)
+	ROM_LOAD16_BYTE( "bcstry_u.62",  0x40000, 0x20000, CRC(7f7aa244) SHA1(ee9bb2bf22d16f06d7935168e2bd09296fba3abc) )
+	ROM_CONTINUE ( 0x00000, 0x20000)
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "bcstry_u.21", 0x04000, 0x4000 , CRC(3ba072d4) SHA1(8b64d3ab4c63132f2f77b2cf38a88eea1a8f11e0) )
+	ROM_CONTINUE( 0x0000, 0x4000 )
+	ROM_CONTINUE( 0xc000, 0x4000 )
+	ROM_CONTINUE( 0x8000, 0x4000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	/* taken from other set, check... */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(e84e328c) SHA1(ce21988980654acb573bfb7396fd2f536204ecf0) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "bcstry_u.64", 0x00000, 0x40000, CRC(23f0e0fe) SHA1(a8c3cbb6378797db353ca2873e73ff157a6f8a3c) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* Tiles */
+	ROM_LOAD16_BYTE( "bcstry_u.109", 0x000000, 0x20000, CRC(eb04d37a) SHA1(818dc7aafac577920d94c65e47d965dc0474d92c) ) // tiles a plane 0
+	ROM_CONTINUE ( 0x100000,0x20000) // tiles a plane 1
+	ROM_CONTINUE ( 0x040000,0x20000) // tiles b plane 0
+	ROM_CONTINUE ( 0x140000,0x20000) // tiles b plane 1
+	ROM_LOAD16_BYTE( "bcstry_u.113", 0x000001, 0x20000, CRC(746ecdd7) SHA1(afb6dbc0fb94e7ce96a9b219f5f7cd3721d1c1c4) ) // tiles a plane 2
+	ROM_CONTINUE ( 0x100001,0x20000) // tiles a plane 3
+	ROM_CONTINUE ( 0x040001,0x20000) // tiles b plane 2
+	ROM_CONTINUE ( 0x140001,0x20000) // tiles b plane 3
+	ROM_LOAD16_BYTE( "bcstry_u.110", 0x080000, 0x20000, CRC(1bfe65c3) SHA1(27dec16b271866ff336d8b25d352977ca80c35bf) ) // tiles c plane 0
+	ROM_CONTINUE ( 0x180000,0x20000) // tiles c plane 1
+	ROM_CONTINUE ( 0x0c0000,0x20000) // tiles d plane 0
+	ROM_CONTINUE ( 0x1c0000,0x20000) // tiles d plane 1
+	ROM_LOAD16_BYTE( "bcstry_u.111", 0x080001, 0x20000, CRC(c8bf3a3c) SHA1(604fc57c4d3a581016aa2516236c568488d23c77) ) // tiles c plane 2
+	ROM_CONTINUE ( 0x180001,0x20000) // tiles c plane 3
+	ROM_CONTINUE ( 0x0c0001,0x20000) // tiles d plane 2
+	ROM_CONTINUE ( 0x1c0001,0x20000) // tiles d plane 3
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD16_BYTE( "bcstry_u.100", 0x000000, 0x80000, CRC(8c11cbed) SHA1(e04e53af4fe732bf9d20a9ae5c2a90b576ee0b83) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.106", 0x000001, 0x80000, CRC(5219bcbf) SHA1(4b88eab7ffc2dc1de451ae4ee52f1536e179ea13) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.99",  0x100000, 0x80000, CRC(cdb1af87) SHA1(df1fbda5c7ce4fbd64d6db9eb80946e06119f096) ) // a
+	ROM_LOAD16_BYTE( "bcstry_u.105", 0x100001, 0x80000, CRC(8166b596) SHA1(cbf6f5cec5f6991bb1d4ec0ea03cd617ff38fc3b) ) // a
+	ROM_LOAD16_BYTE( "bcstry_u.104", 0x200000, 0x80000, CRC(377c0c71) SHA1(77efa9530b1c311d93c84dd8452701414f740269) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.108", 0x200001, 0x80000, CRC(442307ed) SHA1(71b7f19af64d9961f0f9205b86b4b0ebc13fddda) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.102", 0x300000, 0x80000, CRC(71b40ece) SHA1(1a13dfd7615a6f61851897ebcb10fa69bc8ae525) ) // a
+	ROM_LOAD16_BYTE( "bcstry_u.107", 0x300001, 0x80000, CRC(ab3c923a) SHA1(aaca1d2ed7b53e0933e0bd94a19458dd1598f204) ) // a
+ROM_END
+
+ROM_START( bcstrya )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "prg1.ic35",  0x40001, 0x20000, CRC(2c55100a) SHA1(bc98a0015c99ef84ebd3fc3f7b7a3bdfd700e1da) )
+	ROM_CONTINUE ( 0x00001, 0x20000)
+	ROM_LOAD16_BYTE( "prg2.ic62",  0x40000, 0x20000, CRC(f54c0a96) SHA1(79a3635792a23f47fc914d1d5e118b5a643ca100) )
+	ROM_CONTINUE ( 0x00000, 0x20000)
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "bcstry_u.21", 0x04000, 0x4000 , CRC(3ba072d4) SHA1(8b64d3ab4c63132f2f77b2cf38a88eea1a8f11e0) )
+	ROM_CONTINUE( 0x0000, 0x4000 )
+	ROM_CONTINUE( 0xc000, 0x4000 )
+	ROM_CONTINUE( 0x8000, 0x4000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(e84e328c) SHA1(ce21988980654acb573bfb7396fd2f536204ecf0) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "bcstry_u.64", 0x00000, 0x40000, CRC(23f0e0fe) SHA1(a8c3cbb6378797db353ca2873e73ff157a6f8a3c) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* Tiles */
+	ROM_LOAD16_BYTE( "bcstry_u.109", 0x000000, 0x20000, CRC(eb04d37a) SHA1(818dc7aafac577920d94c65e47d965dc0474d92c) ) // tiles a plane 0
+	ROM_CONTINUE ( 0x100000,0x20000) // tiles a plane 1
+	ROM_CONTINUE ( 0x040000,0x20000) // tiles b plane 0
+	ROM_CONTINUE ( 0x140000,0x20000) // tiles b plane 1
+	ROM_LOAD16_BYTE( "bcstry_u.113", 0x000001, 0x20000, CRC(746ecdd7) SHA1(afb6dbc0fb94e7ce96a9b219f5f7cd3721d1c1c4) ) // tiles a plane 2
+	ROM_CONTINUE ( 0x100001,0x20000) // tiles a plane 3
+	ROM_CONTINUE ( 0x040001,0x20000) // tiles b plane 2
+	ROM_CONTINUE ( 0x140001,0x20000) // tiles b plane 3
+	ROM_LOAD16_BYTE( "bcstry_u.110", 0x080000, 0x20000, CRC(1bfe65c3) SHA1(27dec16b271866ff336d8b25d352977ca80c35bf) ) // tiles c plane 0
+	ROM_CONTINUE ( 0x180000,0x20000) // tiles c plane 1
+	ROM_CONTINUE ( 0x0c0000,0x20000) // tiles d plane 0
+	ROM_CONTINUE ( 0x1c0000,0x20000) // tiles d plane 1
+	ROM_LOAD16_BYTE( "bcstry_u.111", 0x080001, 0x20000, CRC(c8bf3a3c) SHA1(604fc57c4d3a581016aa2516236c568488d23c77) ) // tiles c plane 2
+	ROM_CONTINUE ( 0x180001,0x20000) // tiles c plane 3
+	ROM_CONTINUE ( 0x0c0001,0x20000) // tiles d plane 2
+	ROM_CONTINUE ( 0x1c0001,0x20000) // tiles d plane 3
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD16_BYTE( "bcstry_u.100", 0x000000, 0x80000, CRC(8c11cbed) SHA1(e04e53af4fe732bf9d20a9ae5c2a90b576ee0b83) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.106", 0x000001, 0x80000, CRC(5219bcbf) SHA1(4b88eab7ffc2dc1de451ae4ee52f1536e179ea13) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.99",  0x100000, 0x80000, CRC(cdb1af87) SHA1(df1fbda5c7ce4fbd64d6db9eb80946e06119f096) ) // a
+	ROM_LOAD16_BYTE( "bcstry_u.105", 0x100001, 0x80000, CRC(8166b596) SHA1(cbf6f5cec5f6991bb1d4ec0ea03cd617ff38fc3b) ) // a
+	ROM_LOAD16_BYTE( "bcstry_u.104", 0x200000, 0x80000, CRC(377c0c71) SHA1(77efa9530b1c311d93c84dd8452701414f740269) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.108", 0x200001, 0x80000, CRC(442307ed) SHA1(71b7f19af64d9961f0f9205b86b4b0ebc13fddda) ) // b
+	ROM_LOAD16_BYTE( "bcstry_u.102", 0x300000, 0x80000, CRC(71b40ece) SHA1(1a13dfd7615a6f61851897ebcb10fa69bc8ae525) ) // a
+	ROM_LOAD16_BYTE( "bcstry_u.107", 0x300001, 0x80000, CRC(ab3c923a) SHA1(aaca1d2ed7b53e0933e0bd94a19458dd1598f204) ) // a
 ROM_END
 
 /*
 
+Hatch Catch
+Semicom, 1995
+
+PCB Layout
+----------
+
+|---------------------------------------------|
+|       M6295  0.UC1  4.096MHz      PAL  6.OR1|
+|YM3016 YM2151 6116                      7.OR2|
+|uPC1241H  PAL 1.UA7                     8.OR3|
+|         Z80B        6116               9.OR4|
+|                     6116             6116   |
+|                    PAL               6116   |
+|J                   PAL               PAL    |
+|A  PAL                                       |
+|M  6116                                   PAL|
+|M  6116                                      |
+|A  PAL PAL                                   |
+|   PAL                        4.M5           |
+|DSW1                          5.M6           |
+|             15MHz                           |
+|DSW2           62256          6264           |
+|               62256          6264    ACTEL  |
+|        68000  2.B16          PAL     A1020B |
+|87C52          3.B17                 (PLCC84)|
+|---------------------------------------------|
+
+Notes:
+        68k clock: 15MHz
+        Z80 clock: 3.42719MHz  <-- strange clock, but verified correct.
+      M6295 clock: 1.024MHz, sample rate = /132
+      87C52 clock: 15MHz
+     YM2151 clock: 3.42719MHz
+            VSync: 60Hz
+
+Interrupts:
+
+Lev 1 0x64 0000 00c0 <- just reset .. not used
+Lev 2 0x68 0000 00c0  ""
+Lev 3 0x6c 0000 00c0  ""
+Lev 4 0x70 0000 00c0  ""
+Lev 5 0x74 0000 00c0  ""
+Lev 6 0x78 0012 0000 <- RAM shared with protection device (first 0x200 bytes?)
+
+*/
+
+ROM_START( htchctch )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "p03.b16",  0x00001, 0x20000, CRC(eff14c40) SHA1(8fdda1fb859546c16f940e51f7e126768205154c) )
+	ROM_LOAD16_BYTE( "p04.b17",  0x00000, 0x20000, CRC(6991483a) SHA1(c8d868ef1f87655c37f0b1efdbb71cd26918f270) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "p02.b5", 0x00000, 0x10000 , CRC(c5a03186) SHA1(42561ab36e6d7a43828d3094e64bd1229ab893ba) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(5b27adb6) SHA1(a0821093d8c73765ff15767bdfc0afa95aa1371d) )
+
+	ROM_REGION( 0x020000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "p01.c1", 0x00000, 0x20000, CRC(18c06829) SHA1(46b180319ed33abeaba70d2cc61f17639e59bfdb) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "p06srom5.bin", 0x00001, 0x40000, CRC(3d2cbb0d) SHA1(bc80be594a40989e3c23539fc2021de65a2444c5) )
+	ROM_LOAD16_BYTE( "p07srom6.bin", 0x00000, 0x40000, CRC(0207949c) SHA1(84b4dcd27fe89a5350b6642ef99719bb85514174) )
+
+	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE ) /* GFX */
+	ROM_LOAD16_BYTE( "p08uor1.bin",  0x00000, 0x20000, CRC(6811e7b6) SHA1(8157f92a3168ffbac86cd8c6294b9c0f3ee0835d) )
+	ROM_LOAD16_BYTE( "p09uor2.bin",  0x00001, 0x20000, CRC(1c6549cf) SHA1(c05aba9b744144db4537e472842b0d53325aa78f) )
+	ROM_LOAD16_BYTE( "p10uor3.bin",  0x40000, 0x20000, CRC(6462e6e0) SHA1(0d107214dfb257e15931701bad6b42c6aadd8a18) )
+	ROM_LOAD16_BYTE( "p11uor4.bin",  0x40001, 0x20000, CRC(9c511d98) SHA1(6615cbb125bd1e1b4da400ec4c4a0f4df8f6fa75) )
+ROM_END
+
+/* Cookie & Bibi */
+
+ROM_START( cookbib )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "prg1.ub16",  0x00001, 0x20000, CRC(cda6335f) SHA1(34a57785a458d3e9a66c91734b4511fbc9f3455c) )
+	ROM_LOAD16_BYTE( "prg2.ub17",  0x00000, 0x20000, CRC(2664a335) SHA1(8d1c4825720a09db6156599ab905292640b04cba) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "prg-s.ub5", 0x00000, 0x10000 , CRC(547d6ea3) SHA1(42929e453c4f1c90c29197a9bed953139cfe2873) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(a77d13f4) SHA1(13db72f5b171b0c1226e97ea98d9edd7144d56d9) )
+
+	ROM_REGION( 0x020000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "sound.uc1", 0x00000, 0x20000, CRC(545e19b6) SHA1(ef518bbe44b22e7ef77ee6af337ebcad9b2674e0) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* */
+	ROM_LOAD16_BYTE( "srom5.bin", 0x00001, 0x40000, CRC(73a46e43) SHA1(054fac2dc5dffcbb9d81600689c07774d2e200b6) )
+	ROM_LOAD16_BYTE( "srom6.bin", 0x00000, 0x40000, CRC(ade2dbec) SHA1(12d385d22307d8251e711788dff2e503c8f8ca7c) )
+
+	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE ) /* GFX */
+	ROM_LOAD16_BYTE( "uor1.bin",  0x00000, 0x20000, CRC(a7d91f23) SHA1(eb9694e05b8a04ed1cdbb834e1bf745a2b0260be) )
+	ROM_LOAD16_BYTE( "uor2.bin",  0x00001, 0x20000, CRC(9aacbec2) SHA1(c1cfe243a7d51c950785073f235d72cc01724cdb) )
+	ROM_LOAD16_BYTE( "uor3.bin",  0x40000, 0x20000, CRC(3fee0c3c) SHA1(c71439ba8033c549e40522db5270caf4a297fb99) )
+	ROM_LOAD16_BYTE( "uor4.bin",  0x40001, 0x20000, CRC(bed9ed2d) SHA1(7103b99cd0d54df864ea4a0f269011e30ad29ed7) )
+ROM_END
+
+/* Choky Choky */
+
+ROM_START( chokchok )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "ub18.bin",  0x00001, 0x40000, CRC(b183852a) SHA1(fd50c6d91dba64b936ac367e5e5235d09ed60fdd) )
+	ROM_LOAD16_BYTE( "ub17.bin",  0x00000, 0x40000, CRC(ecdb45ca) SHA1(03eb2d27ae4de25aa15477135d3b4de8b3b7f7f0) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "ub5.bin", 0x00000, 0x10000 , CRC(30c2171d) SHA1(3954e286d57b955af6ba9b1a0b49c442d7f295ae) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(0bd39834) SHA1(2860c2b7fcb74546afde11a59d4b359612ab6e68) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "uc1.bin", 0x00000, 0x40000, CRC(f3f57abd) SHA1(601dc669020ef9156fa221e768be9b88454e3f55) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "srom5.bin", 0x00001, 0x20000, CRC(836608b8) SHA1(7aa624274efee0a7affb6a1a417752b5ce116c04) )
+	ROM_CONTINUE ( 0x100001,0x20000)
+	ROM_CONTINUE ( 0x040001,0x20000)
+	ROM_CONTINUE ( 0x140001,0x20000)
+	ROM_LOAD16_BYTE( "srom6.bin", 0x00000, 0x20000, CRC(31d5715d) SHA1(32612464124290b273c4b1a8b571291f9aeff01c) )
+	ROM_CONTINUE ( 0x100000,0x20000)
+	ROM_CONTINUE ( 0x040000,0x20000)
+	ROM_CONTINUE ( 0x140000,0x20000)
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD16_BYTE( "uor1.bin",  0x000000, 0x80000, CRC(ded6642a) SHA1(357c836ebe62e0f7f9e7afdf7428f42d827ede06) )
+	ROM_LOAD16_BYTE( "uor2.bin",  0x000001, 0x80000, CRC(493f9516) SHA1(2e1d38493558dc79cd4d232ac421cd5649f4119a) )
+	ROM_LOAD16_BYTE( "uor3.bin",  0x100000, 0x80000, CRC(e2dc3e12) SHA1(9e2571f93d27b9048fe8e42d3f13a8e509b3adca) )
+	ROM_LOAD16_BYTE( "uor4.bin",  0x100001, 0x80000, CRC(6f377530) SHA1(1367987e3af0baa8e22f09d1b40ad838f33371bc) )
+ROM_END
+
+/* Date Quiz Go Go */
+
+ROM_START( dquizgo )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "ub18",     0x00001, 0x80000, CRC(07f869f2) SHA1(1e69f8a6ce3bcf0feaeb43cc7c0fc3fa324466b2) )
+	ROM_LOAD16_BYTE( "ub17",     0x00000, 0x80000, CRC(0b96ab14) SHA1(fc132118eaa938c85d210713320b0a04425f48de) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "ub5",    0x00000, 0x10000, CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x400, REGION_USER1, ROMREGION_ERASE00 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	/* It seems to put some data at 0x000-0x1ff too, but it looks like garbage, and doesn't appear to be used */
+	ROM_LOAD16_WORD( "protdata.bin", 0x200, 0x200 , CRC(6064b9e0) SHA1(546bd8f9201427118940de2d1916b258b60710c6) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "uc1",    0x00000, 0x40000, CRC(d0f4c4ba) SHA1(669a04a977e98d8a594cc1621cbb9526c9081ec0) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "srom5",     0x00001, 0x40000, CRC(f1cdd21d) SHA1(0bfc09abce40712c4e95f13ad0d4b78684e44630) )
+	ROM_IGNORE(0x40000)
+	ROM_LOAD16_BYTE( "srom6",     0x00000, 0x40000, CRC(f848939e) SHA1(bf5e62300dd13a37f4715c67a2eec88034a94311) )
+	ROM_IGNORE(0x40000)
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD16_BYTE( "uor1",     0x000000, 0x80000, CRC(b4912bf6) SHA1(ef827adba58470a201f3c1ecc3286d728a753eff) )
+	ROM_LOAD16_BYTE( "uor2",     0x000001, 0x80000, CRC(b011cf93) SHA1(b993df91511ac17d5bf8e688333f2953b87d5be4) )
+	ROM_LOAD16_BYTE( "uor3",     0x100000, 0x80000, CRC(d96c3582) SHA1(6b313462fd8985fae60bc59cd9c99c97ab70fdcc) )
+	ROM_LOAD16_BYTE( "uor4",     0x100001, 0x80000, CRC(77ff23eb) SHA1(7fc891810591458fd62f3d4b9b4c966662e90403) )
+ROM_END
+
+/*
+
+SD Fighters (c) 1996 SemiCom
+
+Game released 1996-09-13
 
 PCB Layout
 ----------
@@ -2959,7 +2994,8 @@ ZiLOG Z0840006PSC
 Intel P87C52 MCU
 
 Lattice pLSI 1032 (x2)
-BS901, KA12 & AD-65 (YM2151, YM3012 & OKI M6295)
+Yamaha YM2151 & YM3012 (badged as BS901 & KA12)
+OKI M6295 (badged as AD-65)
 
 OSC: 4.096MHz, 15.000MHz
 
@@ -2967,11 +3003,11 @@ OSC: 4.096MHz, 15.000MHz
 
 ROM_START( sdfight )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "u818",  0xc0001, 0x20000, CRC(a60e5b22) SHA1(eda1a5de881718f78a45720c3ca43a6288a0e65d) )
+	ROM_LOAD16_BYTE( "u818", 0xc0001, 0x20000, CRC(a60e5b22) SHA1(eda1a5de881718f78a45720c3ca43a6288a0e65d) )
 	ROM_CONTINUE( 0x80001, 0x20000)
 	ROM_CONTINUE( 0x40001, 0x20000)
 	ROM_CONTINUE( 0x00001, 0x20000)
-	ROM_LOAD16_BYTE( "u817",  0xc0000, 0x20000, CRC(9f284f4d) SHA1(f4a471fb09c2fd73692ddaa03083644493256aae) )
+	ROM_LOAD16_BYTE( "u817", 0xc0000, 0x20000, CRC(9f284f4d) SHA1(f4a471fb09c2fd73692ddaa03083644493256aae) )
 	ROM_CONTINUE( 0x80000, 0x20000)
 	ROM_CONTINUE( 0x40000, 0x20000)
 	ROM_CONTINUE( 0x00000, 0x20000)
@@ -2983,6 +3019,7 @@ ROM_START( sdfight )
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, REGION_USER1, ROMREGION_ERASE00 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
 	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(efb8b822) SHA1(139c39771c057ae322d3601f7e0a58b43fa8860a) )
 
 	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
@@ -3019,6 +3056,9 @@ ROM_END
 
 /*
 
+Wonderleague Star (c) 1995 Mijin  (Semicom traded under the Mijin name until 1995)
+
+Game released 1995-07-07
 
 PCB Layout
 ----------
@@ -3046,28 +3086,37 @@ ZiLOG Z0840006PSC
 Philips P87C52IBPN MCU
 
 TI TPC1020AFN-084C
-BS901, BS902 & AD-65 (YM2151, YM3012 & OKI M6295)
+Yamaha YM2151 & YM3012 (badged as BS901 & BS902)
+OKI M6295 (badged AD-65)
 
 OSC: 4.096MHz, 15.000MHz
+
+Second in a series of Baseball games:
+
+1. Magicball Fighting (1994)
+2. Wonder League Star (1995)
+3. Wonder League 96 (1996)
+4. MuHanSeungBu (1997)
 
 */
 
 ROM_START( wlstar )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "n-3.u818",     0x00001, 0x40000, CRC(f01bc623) SHA1(ef9d32071bd259fad8243ff4622a82062e67c196) )
-	ROM_LOAD16_BYTE( "n-4.u817",     0x00000, 0x40000, CRC(fc3e829b) SHA1(736835766f2b534c4ea3081f7a715a09a068a9f6) )
+	ROM_LOAD16_BYTE( "n-3.u818", 0x00001, 0x40000, CRC(f01bc623) SHA1(ef9d32071bd259fad8243ff4622a82062e67c196) )
+	ROM_LOAD16_BYTE( "n-4.u817", 0x00000, 0x40000, CRC(fc3e829b) SHA1(736835766f2b534c4ea3081f7a715a09a068a9f6) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
-	ROM_LOAD( "ua7",    0x00000, 0x10000, CRC(90cafa5f) SHA1(2d2ba8e395544e49899cac662d87585592b12040) )
+	ROM_LOAD( "ua7", 0x00000, 0x10000, CRC(90cafa5f) SHA1(2d2ba8e395544e49899cac662d87585592b12040) )
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x400, REGION_USER1, ROMREGION_ERASE00 ) /* Data from Shared RAM */
-	//ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(1) SHA1(1) )
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(b7ffde5b) SHA1(6c370199e5df9c2e03293d0259612c5c4a9061cf) )
 
 	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "ua1",    0x00000, 0x40000,  CRC(de217d30) SHA1(5d7a6f82b106dd1185c7dcde193177cc46c4782f) )
+	ROM_LOAD( "ua1", 0x00000, 0x40000,  CRC(de217d30) SHA1(5d7a6f82b106dd1185c7dcde193177cc46c4782f) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* tiles */
 	ROM_LOAD16_BYTE( "5.srom5", 0x00001, 0x20000, CRC(f7f8c859) SHA1(28b21abfaff2b0502459d1e219c4397ca78a1495) )
@@ -3086,6 +3135,111 @@ ROM_START( wlstar )
 	ROM_LOAD16_BYTE( "10.udr4", 0x100001, 0x80000, CRC(b4693cdd) SHA1(031290586321b95436b30a3339a10dd8df12b245) )
 ROM_END
 
+/*
+
+SemiCom Baseball (MuHanSeungBu)
+
+PCB Layout
+----------
+
++----------------------------------+
+|       65728 4.096MHz M6295  ic99 |
+|         ic2                 ic100|
+|  YM3012 Z80          ic64   ic102|
+|  YM2151        5814         ic104|
+|J               5814         ic105|
+|A               6264  QL2007 ic106|
+|M      65728    6264         ic107|
+|M      65728                 ic108|
+|A DSW1                       ic109|
+|        87c52        65728   ic110|
+|  DSW2               65728   ic111|
+|          ic35  ic62 68000   ic113|
+|         62256 62256 15MHz        |
++----------------------------------+
+
+Motorola MC68HC000P10
+Goldstar Z8400B PS
+Philips P87C52EBPN MCU
+
+QuickLogic QL2007-XPQ208C
+Yamaha YM2151 & YM3012 (badged as BS901 & BS902)
+OKI M6295 (badged AD-65)
+
+OSC: 4.096MHz, 15.000MHz
+
+Ram:
+ UM62256E-70LL x 2 (by 68000)
+ HY6264A LP-70 x 2 (by QuickLogic QL2007)
+ Temic HM3-65728BK-5 (by Z80)
+ Temic HM3-65728BK-5 x 2
+ Sony CXK5814P-35L x 2
+
+No roms had any labels, the IC position and
+logical use (IE:z80 for the Z80 program rom)
+
+Fourth in a series of Baseball games:
+
+1. Magicball Fighting (1994)
+2. Wonder League Star (1995)
+3. Wonder League 96 (1996)
+4. MuHanSeungBu (1997)
+
+*/
+
+ROM_START( semibase )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "ic35.68k",  0x40001, 0x20000, CRC(d2249605) SHA1(ab3faa832f14f799e4a975673495d30160c6eae5) )
+	ROM_CONTINUE ( 0x00001, 0x20000)
+	ROM_LOAD16_BYTE( "ic62.68k",  0x40000, 0x20000, CRC(85ea81c3) SHA1(7e97316f5f373b98fa4063acd74f784b312a1cc4) )
+	ROM_CONTINUE ( 0x00000, 0x20000)
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "ic21.z80", 0x04000, 0x4000 , CRC(d95c64d0) SHA1(1b239e8b23b820610dbf67cbd525d4a6c956ba35) )
+	ROM_CONTINUE( 0x0000, 0x4000 )
+	ROM_CONTINUE( 0xc000, 0x4000 )
+	ROM_CONTINUE( 0x8000, 0x4000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x200, REGION_USER1, 0 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	/* once the game has decrypted this it's almost identical to bcstory with several ram addresses being 0x4 higher than in bcstory
+     and 1200FE: andi.b  #$f, D1  instead of #$3  (unless bcstory data is wrong?) */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(ecbf2163) SHA1(634b366a8c4ba8699851861bf935b55850f93a7f) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "ic64.snd", 0x00000, 0x40000, CRC(8a60649c) SHA1(aeb266436f6af4173b84dbb19362563b6c5db507) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* Tiles */
+	ROM_LOAD16_BYTE( "ic109.gfx", 0x000000, 0x20000, CRC(2b86e983) SHA1(f625da05d68c78173e346f9c60ab4b0672b9f357) ) // tiles a plane 0
+	ROM_CONTINUE ( 0x100000,0x20000) // tiles a plane 1
+	ROM_CONTINUE ( 0x040000,0x20000) // tiles b plane 0
+	ROM_CONTINUE ( 0x140000,0x20000) // tiles b plane 1
+	ROM_LOAD16_BYTE( "ic113.gfx", 0x000001, 0x20000, CRC(e39b6610) SHA1(604f876f0bf9ed70f627944397e78ee16869d0ba) ) // tiles a plane 2
+	ROM_CONTINUE ( 0x100001,0x20000) // tiles a plane 3
+	ROM_CONTINUE ( 0x040001,0x20000) // tiles b plane 2
+	ROM_CONTINUE ( 0x140001,0x20000) // tiles b plane 3
+	ROM_LOAD16_BYTE( "ic110.gfx", 0x080000, 0x20000, CRC(bba4a015) SHA1(4e03585ff493148b9eeaaabb8d37630962ab6c74) ) // tiles c plane 0
+	ROM_CONTINUE ( 0x180000,0x20000) // tiles c plane 1
+	ROM_CONTINUE ( 0x0c0000,0x20000) // tiles d plane 0
+	ROM_CONTINUE ( 0x1c0000,0x20000) // tiles d plane 1
+	ROM_LOAD16_BYTE( "ic111.gfx", 0x080001, 0x20000, CRC(61133b63) SHA1(8820c88297fbcf5e1102c01245391f49a9c63186) ) // tiles c plane 2
+	ROM_CONTINUE ( 0x180001,0x20000) // tiles c plane 3
+	ROM_CONTINUE ( 0x0c0001,0x20000) // tiles d plane 2
+	ROM_CONTINUE ( 0x1c0001,0x20000) // tiles d plane 3
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD16_BYTE( "ic100.gfx", 0x000000, 0x80000, CRC(01c3d12a) SHA1(128c21b18f73445a8e77fe5dd3072c1b1e20c47a) ) // b
+	ROM_LOAD16_BYTE( "ic106.gfx", 0x000001, 0x80000, CRC(db282ac2) SHA1(127637967e7620cd7e81aff268fb776d0211e58a) ) // b
+	ROM_LOAD16_BYTE( "ic99.gfx",  0x100000, 0x80000, CRC(349df821) SHA1(34af8b748aad5807300f8e76eb8a99366878004b) ) // a
+	ROM_LOAD16_BYTE( "ic105.gfx", 0x100001, 0x80000, CRC(f7caa81c) SHA1(2270d133c7b116d66581fc688086dd331b811478) ) // a
+	ROM_LOAD16_BYTE( "ic104.gfx", 0x200000, 0x80000, CRC(51a5d38a) SHA1(0258ae29779f7f1246845622a579d37dca64fb2f) ) // b
+	ROM_LOAD16_BYTE( "ic108.gfx", 0x200001, 0x80000, CRC(b253d60e) SHA1(aca2f6c2233372841908377407068c5d45f5f9c4) ) // b
+	ROM_LOAD16_BYTE( "ic102.gfx", 0x300000, 0x80000, CRC(3caefe97) SHA1(e60c6ef9e1dd6abdd763648dbcebefa4f19364c4) ) // a
+	ROM_LOAD16_BYTE( "ic107.gfx", 0x300001, 0x80000, CRC(68109898) SHA1(dbc0d431da33e22b8d0f918b9c8a3c1667bc4f8e) ) // a
+ROM_END
 
 
 /******************************************************************************/
@@ -3488,6 +3642,14 @@ DRIVER_INIT( chokchok )
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
 }
 
+DRIVER_INIT( wlstar )
+{
+	init_htchctch(machine);
+
+	/* slightly different banking */
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
+}
+
 static DRIVER_INIT ( dquizgo )
 {
 	tumblepb_gfx1_rearrange();
@@ -3500,16 +3662,16 @@ GAME( 1991, tumbleb,  tumblep, tumblepb,  tumblepb, tumblepb, ROT0, "bootleg", "
 GAME( 1991, tumbleb2, tumblep, tumbleb2,  tumblepb, tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg set 2)", GAME_IMPERFECT_SOUND ) // PIC is protected, sound simulation not 100%
 GAME( 1993, jumpkids, 0,       jumpkids,  tumblepb, jumpkids, ROT0, "Comad", "Jump Kids", 0 )
 GAME( 1994, metlsavr, 0,       metlsavr,  metlsavr, chokchok, ROT0, "First Amusement", "Metal Saver", 0 )
+GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND ) // PIC is protected, sound simulation not 100%
 GAME( 1994, suprtrio, 0,       suprtrio,  suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", 0 )
 GAME( 1995, htchctch, 0,       htchctch,  htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , 0 ) // not 100% sure about gfx offsets
 GAME( 1995, cookbib,  0,       cookbib,   cookbib,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , 0 ) // not 100% sure about gfx offsets
 GAME( 1995, chokchok, 0,       cookbib,   chokchok, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS ) // corruption during attract mode (tmap disable?)
+GAME( 1995, wlstar,   0,       cookbib,   wlstar,   wlstar,   ROT0, "Mijin", "Wonder League Star (Korea)", 0) // there are semicom logos on the advert boards.
 GAME( 1996, fncywld,  0,       fncywld,   fncywld,  fncywld,  ROT0, "Unico", "Fancy World - Earth of Crisis" , 0 ) // game says 1996, testmode 1995?
+GAME( 1996, sdfight,  0,       sdfight,   sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", 0)
 GAME( 1997, bcstry,   0,       bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS) // gfx offsets?
 GAME( 1997, bcstrya,  bcstry,  bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 2)", GAME_IMPERFECT_GRAPHICS) // gfx offsets?
 GAME( 1997, semibase, 0,       semibase,  semibase, bcstory,  ROT0, "SemiCom", "MuHanSeungBu (SemiCom Baseball) (Korea)", GAME_IMPERFECT_GRAPHICS)// sprite offsets..
-GAME( 1998, dquizgo,  0,       cookbib,   chokchok, dquizgo, ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS) // check layer offsets
+GAME( 1998, dquizgo,  0,       cookbib,   chokchok, dquizgo,  ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS) // check layer offsets
 GAME( 2001, jumppop,  0,       jumppop,   jumppop,  0, ORIENTATION_FLIP_X, "ESD", "Jumping Pop", 0 )
-GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND ) // PIC is protected, sound simulation not 100%
-GAME( 1996, sdfight,  0,       sdfight,   sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighter (Korea)", 0)
-GAME( 199?, wlstar,   0,       semibase,  semibase, bcstory,  ROT0, "SemiCom", "WonderLeague Star", GAME_NOT_WORKING) // need protection data

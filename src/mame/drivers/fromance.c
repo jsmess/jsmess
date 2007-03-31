@@ -99,14 +99,14 @@ static void deferred_commanddata_w(int data)
 static WRITE8_HANDLER( fromance_commanddata_w )
 {
 	/* do this on a timer to let the slave CPU synchronize */
-	timer_set(TIME_NOW, data, deferred_commanddata_w);
+	mame_timer_set(time_zero, data, deferred_commanddata_w);
 }
 
 
 static READ8_HANDLER( fromance_busycheck_main_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_set(TIME_NOW, 0, NULL);
+	mame_timer_set(time_zero, 0, NULL);
 
 	if (!fromance_directionflag) return 0x00;		// standby
 	else return 0xff;								// busy
@@ -1068,7 +1068,6 @@ static MACHINE_DRIVER_START( nekkyoku )
 	MDRV_CPU_IO_MAP(nekkyoku_readport_sub,nekkyoku_writeport_sub)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(fromance)
 
@@ -1107,7 +1106,6 @@ static MACHINE_DRIVER_START( idolmj )
 	MDRV_CPU_IO_MAP(fromance_readport_sub,idolmj_writeport_sub)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(fromance)
 
@@ -1146,7 +1144,6 @@ static MACHINE_DRIVER_START( fromance )
 	MDRV_CPU_IO_MAP(fromance_readport_sub,fromance_writeport_sub)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(fromance)
 

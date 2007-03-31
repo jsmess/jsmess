@@ -206,7 +206,7 @@ void ppu2c03b_init( const ppu2c03b_interface *interface )
 	for( i = 0; i < intf->num; i++ )
 	{
 		/* initialize the scanline handling portion */
-		chips[i].scanline_timer = timer_alloc(scanline_callback);
+		chips[i].scanline_timer = mame_timer_alloc(scanline_callback);
 		chips[i].scanline = 0;
 		chips[i].scan_scale = 1;
 
@@ -767,7 +767,7 @@ static void scanline_callback( int num )
 	}
 
 	/* setup our next stop here */
-	timer_adjust(chips[num].scanline_timer, cpu_getscanlinetime( chips[num].scanline * chips[num].scan_scale ), num, 0);
+	mame_timer_adjust(chips[num].scanline_timer, video_screen_get_time_until_pos(0, chips[num].scanline * chips[num].scan_scale, 0), num, 0);
 }
 
 /*************************************
@@ -793,7 +793,7 @@ void ppu2c03b_reset( int num, int scan_scale )
 	chips[num].scan_scale = scan_scale;
 
 	/* allocate the scanline timer - start at scanline 0 */
-	timer_adjust(chips[num].scanline_timer, cpu_getscanlinetime(0), num, 0);
+	mame_timer_adjust(chips[num].scanline_timer, video_screen_get_time_until_pos(0, 0, 0), num, 0);
 
 	/* reset the callbacks */
 	chips[num].scanline_callback_proc = 0;

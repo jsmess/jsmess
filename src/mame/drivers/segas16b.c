@@ -844,11 +844,12 @@ WW.B11    Object 5 - Even
  *
  *************************************/
 
-#define ROM_BOARD_171_5358		(0)		/* 171-5358 */
-#define ROM_BOARD_171_5521		(1)		/* 171-5521 */
-#define ROM_BOARD_171_5704		(1)		/* 171-5704 - don't know any diff between this and 171-5521 */
-#define ROM_BOARD_ATOMICP		(2)		/* (custom Korean) */
-#define ROM_BOARD_171_5797		(3)		/* 171-5797 */
+#define ROM_BOARD_171_5358_SMALL (0)	/* 171-5358 with smaller ROMs */
+#define ROM_BOARD_171_5358		(1)		/* 171-5358 */
+#define ROM_BOARD_171_5521		(2)		/* 171-5521 */
+#define ROM_BOARD_171_5704		(2)		/* 171-5704 - don't know any diff between this and 171-5521 */
+#define ROM_BOARD_ATOMICP		(3)		/* (custom Korean) */
+#define ROM_BOARD_171_5797		(4)		/* 171-5797 */
 
 
 
@@ -902,6 +903,20 @@ static WRITE16_HANDLER( atomicp_sound_w );
  *  Memory mapping tables
  *
  *************************************/
+
+static const struct segaic16_memory_map_entry rom_171_5358_info_small[] =
+{
+	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
+	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK11,          segaic16_tileram_0_w,  &segaic16_tileram_0,   "tile RAM" },
+	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK12,          segaic16_textram_0_w,  &segaic16_textram_0,   "text RAM" },
+	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, MRA16_BANK13,          MWA16_BANK13,          &segaic16_spriteram_0, "object RAM" },
+	{ 0x2d/2, 0x00000, 0x04000, 0xffc000,      ~0, MRA16_BANK14,          MWA16_BANK14,          &workram,              "work RAM" },
+	{ 0x29/2, 0x00000, 0x20000, 0xfe0000, 0x20000, MRA16_BANK15,          MWA16_ROM,             NULL,                  "ROM 2" },
+	{ 0x25/2, 0x00000, 0x20000, 0xfe0000, 0x10000, MRA16_BANK16,          MWA16_ROM,             NULL,                  "ROM 1" },
+	{ 0x21/2, 0x00000, 0x20000, 0xfe0000, 0x00000, MRA16_BANK17,          MWA16_ROM,             NULL,                  "ROM 0" },
+	{ 0 }
+};
 
 static const struct segaic16_memory_map_entry rom_171_5358_info[] =
 {
@@ -961,6 +976,7 @@ static const struct segaic16_memory_map_entry rom_171_5797_info[] =
 
 static const struct segaic16_memory_map_entry *region_info_list[] =
 {
+	&rom_171_5358_info_small[0],
 	&rom_171_5358_info[0],
 	&rom_171_5704_info[0],
 	&rom_atomicp_info[0],
@@ -1047,7 +1063,7 @@ static MACHINE_RESET( system16b )
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)
-		segaic16_sprites_set_bank(0, i, (rom_board == ROM_BOARD_171_5358) ? alternate_banklist[i] : default_banklist[i]);
+		segaic16_sprites_set_bank(0, i, (rom_board == ROM_BOARD_171_5358 || rom_board == ROM_BOARD_171_5358_SMALL) ? alternate_banklist[i] : default_banklist[i]);
 }
 
 
@@ -1226,6 +1242,7 @@ static WRITE8_HANDLER( upd7759_control_w )
 		switch (rom_board)
 		{
 			case ROM_BOARD_171_5358:
+			case ROM_BOARD_171_5358_SMALL:
 				/*
                     D5 : /CS for ROM at A11
                     D4 : /CS for ROM at A10
@@ -1996,6 +2013,55 @@ static INPUT_PORTS_START( bayroute )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( bullet )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(1)
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(3)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED( 0x01, 0x01 )	/* 2p vs. 3p */
+	PORT_DIPUNUSED( 0x02, 0x02 )
+	PORT_DIPUNUSED( 0x04, 0x04 )
+	PORT_DIPUNUSED( 0x08, 0x08 )
+	PORT_DIPUNUSED( 0x10, 0x10 )
+	PORT_DIPUNUSED( 0x20, 0x20 )
+	PORT_DIPUNUSED( 0x40, 0x40 )
+	PORT_DIPUNUSED( 0x80, 0x80 )
 INPUT_PORTS_END
 
 
@@ -3806,8 +3872,8 @@ ROM_START( bullet )
 	ROM_LOAD16_BYTE( "epr11012.a6",  0x020000, 0x08000, CRC(3992f159) SHA1(50686b394693ab01cbd159ae661f326c8eee50b8) )
 	ROM_LOAD16_BYTE( "epr11009.a3",  0x020001, 0x08000, CRC(df199999) SHA1(2669e923aa4f1bedc788401f44ad19c318658f00) )
 
-	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
-	ROM_LOAD( "317-0041.key", 0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key -- still WIP */
+	ROM_LOAD( "317-0041.key", 0x0000, 0x2000, BAD_DUMP CRC(d9a9ea36) SHA1(cbaf5170352e4d2a78644f228a2c0e9ea1a51d71) )
 
 	ROM_REGION16_BE( 0x040000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
 
@@ -5823,6 +5889,12 @@ ROM_END
  *
  *************************************/
 
+static DRIVER_INIT( generic_5358_small )
+{
+	system16b_generic_init(ROM_BOARD_171_5358_SMALL);
+}
+
+
 static DRIVER_INIT( generic_5358 )
 {
 	system16b_generic_init(ROM_BOARD_171_5358);
@@ -6030,50 +6102,6 @@ static DRIVER_INIT( snapper )
 }
 
 
-#ifdef MAME_DEBUG
-#include "cpu/m68000/m68k.h"
-static void test_key(int shift, UINT8 bindex, UINT32 seed, UINT32 global)
-{
-	extern unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
-	extern unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cpu_type);
-	static const UINT32 bvals[4] = { 0x52005, 0x7600F, 0x1A019, 0x3E023 };
-	int length = memory_region_length(REGION_CPU1);
-	static UINT16 *decrypted;
-	UINT8 testkey[0x2000];
-	int score = 0;
-	int pc, i;
-
-	if (decrypted == NULL)
-		decrypted = malloc_or_die(length);
-
-	testkey[0] = global >> 24;
-	testkey[1] = global >> 16;
-	testkey[2] = global >> 8;
-	testkey[3] = global;
-	for (i = 4; i < 0x2000; i++)
-	{
-		UINT8 byteval = ((seed << 4) | 0xd) >> (shift + 4);
-		byteval |= 0xc0;//(i < 0x1000) ? 0x40 : 0x80;
-		testkey[i] = byteval;
-		seed = seed * 0x10029 + bvals[bindex];
-	}
-
-	for (pc = 0x400; pc < 0x10000; )
-	{
-		UINT16 curop = decrypted[pc/2];
-		if (m68k_is_valid_instruction(curop, M68K_CPU_TYPE_68000))
-		{
-			char dummybuf[100];
-			score++;
-			pc += m68k_disassemble_raw(dummybuf, pc, (UINT8 *)&decrypted[pc/2], (UINT8 *)&decrypted[pc/2], M68K_CPU_TYPE_68000);
-		}
-		else
-			pc += 2;
-	}
-}
-#endif
-
-
 
 /*************************************
  *
@@ -6097,7 +6125,7 @@ GAME( 1990, aurailj,  aurail,   system16b,      aurail,   aurailj_5704,  ROT0,  
 GAME( 1989, bayroute, 0,        system16b,      bayroute, generic_5704,  ROT0,   "Sunsoft / Sega", "Bay Route (set 3, World, FD1094 317-0116)", 0 )
 GAME( 1989, bayroutj, bayroute, system16b,      bayroute, generic_5704,  ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan, FD1094 317-0115)", 0 )
 GAME( 1989, bayrout1, bayroute, system16b,      bayroute, generic_5358,  ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US, unprotected)", 0 )
-GAME( 1987, bullet,   0,        system16b,      generic,  generic_5358,  ROT0,   "Sega",           "Bullet (FD1094 317-0041)", GAME_NOT_WORKING )
+GAME( 1987, bullet,   0,        system16b,      bullet,   generic_5358_small,  ROT0,   "Sega",           "Bullet (FD1094 317-0041)", GAME_UNEMULATED_PROTECTION )
 /* Charon */
 GAME( 1991, cotton,   0,        system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 3, World, FD1094 317-0181a)", 0 )
 GAME( 1991, cottonu,  cotton,   system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 2, US, FD1094 317-0180)", 0 )

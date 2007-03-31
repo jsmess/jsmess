@@ -77,6 +77,7 @@ enum {
 
 extern const char *v60_reg_names[];
 void v60_dasm_init(void);
+void v60_stall(void);
 
 #if HAS_V60
 void v60_get_info(UINT32 state, cpuinfo *info);

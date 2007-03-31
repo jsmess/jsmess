@@ -23,6 +23,9 @@ static int flipscreen;
 extern UINT16* jumppop_control;
 static UINT16 bcstory_tilebank;
 extern UINT16* suprtrio_control;
+static int sprite_xoffset;
+static int sprite_yoffset;
+
 
 /******************************************************************************/
 
@@ -80,7 +83,7 @@ static void tumblepb_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x,y + mult * multi,
+					sprite_xoffset + x,sprite_yoffset + y + mult * multi,
 					cliprect,TRANSPARENCY_PEN,0);
 
 			multi--;
@@ -142,7 +145,7 @@ static void jumpkids_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x-1,y + mult * multi, // x-1 for bcstory .. realign other layers?
+					sprite_xoffset+x,sprite_yoffset + y + mult * multi, // x-1 for bcstory .. realign other layers?
 					cliprect,TRANSPARENCY_PEN,0);
 
 			multi--;
@@ -204,7 +207,7 @@ static void fncywld_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 					sprite - multi * inc,
 					colour,
 					fx,fy,
-					x,y + mult * multi,
+					sprite_xoffset+x,sprite_yoffset+ y + mult * multi,
 					cliprect,TRANSPARENCY_PEN,15);
 
 			multi--;
@@ -225,6 +228,15 @@ WRITE16_HANDLER( bcstory_tilebank_w )
 WRITE16_HANDLER( chokchok_tilebank_w )
 {
 	bcstory_tilebank = data<<1;
+	tilemap_mark_all_tiles_dirty(pf1_tilemap);
+	tilemap_mark_all_tiles_dirty(pf1_alt_tilemap);
+	tilemap_mark_all_tiles_dirty(pf2_tilemap);
+}
+
+WRITE16_HANDLER( wlstar_tilebank_w )
+{
+	/* it just writes 0000 or ffff */
+	bcstory_tilebank = data&0x4000;
 	tilemap_mark_all_tiles_dirty(pf1_tilemap);
 	tilemap_mark_all_tiles_dirty(pf1_alt_tilemap);
 	tilemap_mark_all_tiles_dirty(pf2_tilemap);
@@ -299,7 +311,7 @@ WRITE16_HANDLER( tumblepb_control_0_w )
 static UINT32 tumblep_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 {
 	/* logical (col,row) -> memory offset */
-	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
+	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
 INLINE void get_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
@@ -471,6 +483,9 @@ VIDEO_START( pangpang )
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
 	bcstory_tilebank = 0;
 
+	sprite_xoffset = -1;
+	sprite_yoffset = 0;
+
 	return 0;
 }
 
@@ -485,6 +500,26 @@ VIDEO_START( tumblepb )
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
 	bcstory_tilebank = 0;
 
+	sprite_xoffset = -1;
+	sprite_yoffset = 0;
+
+	return 0;
+}
+
+VIDEO_START( sdfight )
+{
+	pf1_tilemap =     tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,64,64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
+	pf1_alt_tilemap = tilemap_create(get_bg1_tile_info,tumblep_scan,TILEMAP_TRANSPARENT,16,16,64,32);
+	pf2_tilemap =     tilemap_create(get_bg2_tile_info,tumblep_scan,TILEMAP_OPAQUE,     16,16,64,32);
+
+	tilemap_set_transparent_pen(pf1_tilemap,0);
+	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
+	bcstory_tilebank = 0;
+
+	/* aligned to monitor test */
+	sprite_xoffset = 0;
+	sprite_yoffset = 1;
+
 	return 0;
 }
 
@@ -497,6 +532,9 @@ VIDEO_START( fncywld )
 	tilemap_set_transparent_pen(pf1_tilemap,15);
 	tilemap_set_transparent_pen(pf1_alt_tilemap,15);
 	bcstory_tilebank = 0;
+
+	sprite_xoffset = -1;
+	sprite_yoffset = 0;
 
 	return 0;
 }
@@ -516,6 +554,9 @@ VIDEO_START( jumppop )
 	tilemap_set_flip(pf2_tilemap, TILEMAP_FLIPX);
 	tilemap_set_flip(pf2_alt_tilemap, TILEMAP_FLIPX);
 	bcstory_tilebank = 0;
+
+	sprite_xoffset = -1;
+	sprite_yoffset = 0;
 
 	return 0;
 }
@@ -693,7 +734,7 @@ VIDEO_UPDATE( sdfight )
 	tilemap_set_scrollx( pf1_alt_tilemap,0, tumblepb_control_0[1]+offs2 );
 	tilemap_set_scrolly( pf1_alt_tilemap,0, tumblepb_control_0[2]-16 );
 	tilemap_set_scrollx( pf2_tilemap,0, tumblepb_control_0[3]+offs );
-	tilemap_set_scrolly( pf2_tilemap,0, tumblepb_control_0[4]-16 );
+	tilemap_set_scrolly( pf2_tilemap,0, tumblepb_control_0[4] );
 
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 	if (tumblepb_control_0[6]&0x80)

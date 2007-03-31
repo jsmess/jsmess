@@ -733,7 +733,7 @@ int fd1094_set_state(unsigned char *key,int state)
 		global_key3 ^= 0x02;	// key_0a invert
 		global_key3 ^= 0x40;	// global_swap3
 	}
-	return state & 0xff;
+	return (state & 0xff) | (irq_mode ? FD1094_STATE_IRQ : FD1094_STATE_RESET);
 }
 
 
