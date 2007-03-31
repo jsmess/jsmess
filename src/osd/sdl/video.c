@@ -372,9 +372,7 @@ void osd_update(int skip_redraw)
 	}
 
 	// poll the joystick values here
-	#ifndef SDLMAME_WIN32
 	win_process_events();
-	#endif
 	check_osd_inputs();
 
 #ifdef MAME_DEBUG

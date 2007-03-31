@@ -41,8 +41,7 @@ void cli_frontend_exit (void);
 extern int sdl_use_rdtsc;
 
 // from sound.c
-int sdl_init_audio(void);
-void sdl_cleanup_audio(void);
+int sdl_init_audio(running_machine *machine);
 
 //============================================================
 //	GLOBAL VARIABLES
@@ -195,9 +194,10 @@ static void output_oslog(running_machine *machine, const char *buffer)
 
 static void osd_exit(running_machine *machine)
 {
-	sdl_cleanup_audio();
 
+	#ifndef SDLMAME_WIN32
 	SDL_Quit();
+	#endif
 }
 
 
@@ -213,11 +213,12 @@ int osd_init(running_machine *machine)
 	extern int win_erroroslog;
 	int result;
 
-	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
+	#ifndef SDLMAME_WIN32
+	if (SDL_Init(SDL_INIT_TIMER|SDL_INIT_AUDIO| SDL_INIT_VIDEO| SDL_INIT_JOYSTICK|SDL_INIT_NOPARACHUTE)) {
 		fprintf(stderr, "Could not initialize SDL: %s.\n", SDL_GetError());
 		exit(-1);
 	}
-
+	#endif
 	// must be before sdlvideo_init!
 	add_exit_callback(machine, osd_exit);
 
@@ -227,11 +228,11 @@ int osd_init(running_machine *machine)
 
 	result = win_init_input(machine);
 
-	sdl_init_audio();
+	sdl_init_audio(machine);
 
 	#ifdef MESS
 	SDL_EnableUNICODE(1);
-        #endif
+	#endif
 
 	if(win_erroroslog)
 		add_logerror_callback(machine, output_oslog);

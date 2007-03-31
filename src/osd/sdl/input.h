@@ -48,6 +48,10 @@ typedef struct _KEYBOARD_INDICATOR_PARAMETERS {
 extern const int win_key_trans_table[][4];
 extern int win_use_mouse;
 
+#ifdef SDLMAME_WIN32
+void win_process_events_buf(void);
+#endif
+
 void win_process_events(void);
 void start_led(void);
 void stop_led(void);

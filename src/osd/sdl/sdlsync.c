@@ -29,13 +29,11 @@
 
 #ifndef SDLMAME_WIN32
 #include <pthread.h>
+#include <errno.h>
 
 typedef struct _hidden_mutex_t hidden_mutex_t;
 struct _hidden_mutex_t {
 	pthread_mutex_t id;
-	pthread_mutex_t auxid;
-	volatile int recursive;
-	volatile pthread_t owner;
 };
 
 //============================================================
@@ -50,12 +48,8 @@ osd_lock *osd_lock_alloc(void)
 	mutex = (hidden_mutex_t *)calloc(1, sizeof(hidden_mutex_t));
 
 	pthread_mutexattr_init(&mtxattr);
-	//pthread_mutexattr_settype(mtxattr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutexattr_settype(&mtxattr, PTHREAD_MUTEX_RECURSIVE);
 	pthread_mutex_init(&mutex->id, &mtxattr);
-
-	pthread_mutexattr_init(&mtxattr);
-	//pthread_mutexattr_settype(mtxattr, PTHREAD_MUTEX_RECURSIVE);
-	pthread_mutex_init(&mutex->auxid, &mtxattr);
 
 	return (osd_lock *)mutex;
 }
@@ -67,22 +61,12 @@ osd_lock *osd_lock_alloc(void)
 void osd_lock_acquire(osd_lock *lock)
 {
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
-	pthread_t this_thread;
-
-	this_thread = pthread_self();
-	pthread_mutex_lock(&mutex->auxid);
-	if ( mutex->owner == this_thread ) 
-	{
-		++mutex->recursive;
-		pthread_mutex_unlock(&mutex->auxid);
-	}
-	else
-	{
-		pthread_mutex_unlock(&mutex->auxid);
-		pthread_mutex_lock(&mutex->id);
-		mutex->owner = this_thread;
-		mutex->recursive = 0;
-	}
+	int r;
+	
+	r =	pthread_mutex_lock(&mutex->id);
+	if (r==0)
+		return;
+	fprintf(stderr, "Error on lock: %d\n", r);
 }
 
 //============================================================
@@ -92,27 +76,13 @@ void osd_lock_acquire(osd_lock *lock)
 int osd_lock_try(osd_lock *lock)
 {
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
-	pthread_t this_thread;
-	/* not really safe - we need a mutex to access mutex->owner */
-
-	this_thread = pthread_self();
-	pthread_mutex_lock(&mutex->auxid);
-	if ( mutex->owner == 0 )
-	{
-		pthread_mutex_lock(&mutex->id);
-		mutex->owner = this_thread;
-		mutex->recursive = 0;
-		pthread_mutex_unlock(&mutex->auxid);
+	int r;
+	
+	r = pthread_mutex_trylock(&mutex->id);
+	if (r==0)
 		return 1;
-	}	 
-	if ( mutex->owner == this_thread ) 
-	{
-		++mutex->recursive;
-		pthread_mutex_unlock(&mutex->auxid);
-		return 1;
-	}
-
-	pthread_mutex_unlock(&mutex->auxid);
+	if (r!=EBUSY)
+		fprintf(stderr, "Error on trylock: %d\n", r);
 	return 0;
 }
 
@@ -124,24 +94,7 @@ void osd_lock_release(osd_lock *lock)
 {
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
 
-	pthread_mutex_lock(&mutex->auxid);
-	if ( pthread_self() == mutex->owner ) 
-	{
-		if ( mutex->recursive > 0) 
-		{
-			--mutex->recursive;
-		}
-		else
-		{
-			mutex->owner = 0;
-			pthread_mutex_unlock(&mutex->id);
-		}
-	} 
-	else
-	{
-		printf("mutex not owned by this thread\n");
-	}
-	pthread_mutex_unlock(&mutex->auxid);
+	pthread_mutex_unlock(&mutex->id);
 }
 
 //============================================================
@@ -153,9 +106,9 @@ void osd_lock_free(osd_lock *lock)
 	hidden_mutex_t *mutex = (hidden_mutex_t *) lock;
 
 	pthread_mutex_destroy(&mutex->id);
-	pthread_mutex_destroy(&mutex->auxid);
 	free(mutex);
 }
 #else	// SDLMAME_WIN32
 #include "../windows/winsync.c"
 #endif
+

@@ -201,10 +201,10 @@ static void yuv_RGB_to_YUY2X2(UINT16 *bitmap, int bw, sdl_window_info *window)
 		end=src+window->yuv_ovl_width;
 
 		dest = (UINT32 *) window->yuvsurf->pixels[0];
-		dest += (y<<1) * yuv_pitch;
+		dest += (y * yuv_pitch);
 		for(; src<end; src++)
 		{
-			dest[0] = dest[yuv_pitch]  = lookup[src[0]];
+			dest[0] = lookup[src[0]];
 			dest++;
 		}
 	}

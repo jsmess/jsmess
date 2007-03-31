@@ -55,21 +55,9 @@ extern int drawogl_init(sdl_draw_callbacks *callbacks);
 #define ASSERT_USE(x)	assert(SDL_ThreadID() == x)
 #endif
 
-#ifndef SDLMAME_WIN32
-#define NOT_WIN32 (1)
-#else
-#define NOT_WIN32 (1)
-#endif
-
-#if NOT_WIN32
 #define ASSERT_REDRAW_THREAD() ASSERT_USE(window_threadid)
 #define ASSERT_WINDOW_THREAD() ASSERT_USE(window_threadid)
 #define ASSERT_MAIN_THREAD() ASSERT_USE(main_threadid)
-#else
-#define ASSERT_REDRAW_THREAD() ASSERT_USE(window_threadid)
-#define ASSERT_WINDOW_THREAD() ASSERT_USE(main_threadid)
-#define ASSERT_MAIN_THREAD() ASSERT_USE(main_threadid)
-#endif
 
 // minimum window dimension
 #define MIN_WINDOW_DIM					200
@@ -137,6 +125,7 @@ struct _worker_param {
 static void sdlwindow_exit(running_machine *machine);
 static void sdlwindow_video_window_destroy(sdl_window_info *window);
 static void *draw_video_contents_wt(void *param);
+static void *sdlwindow_video_window_destroy_wt(void *param);
 static void *sdlwindow_resize_wt(void *param);
 static void *sdlwindow_toggle_full_screen_wt(void *param);
 #if USE_OPENGL
@@ -151,6 +140,37 @@ extern int sdl_is_mouse_captured(void);
 
 /* in drawsdl.c */
 void yuv_lookup_init(sdl_window_info *window);
+
+
+//============================================================
+//  execute_async
+//============================================================
+
+INLINE void execute_async(osd_work_callback callback, worker_param *wp)
+{
+	worker_param *wp_temp = NULL;
+	
+	if (wp)
+	{
+		wp_temp = (worker_param *) malloc(sizeof(worker_param));
+		*wp_temp = *wp;
+	}
+	if (multithreading_enabled)
+	{
+		osd_work_item_queue(work_queue, callback, (void *) wp_temp, WORK_ITEM_FLAG_AUTO_RELEASE);
+	} else
+		callback((void *) wp_temp);
+}
+
+//============================================================
+//  execute_async_wait
+//============================================================
+
+INLINE void execute_async_wait(osd_work_callback callback, worker_param *wp)
+{
+	execute_async(callback, wp);
+	sdlwindow_sync();
+}
 
 //============================================================
 //  sdlwindow_thread_id
@@ -234,14 +254,13 @@ void _sdlwindow_sync(const char *s, int line)
 	if (multithreading_enabled)
 	{
 		int i;
-		//while ( !osd_work_queue_wait(work_queue, 1000 * osd_ticks_per_second()) )
 		while ( (i=osd_work_queue_items(work_queue)) )
 		{
 //			printf("Waiting for queue: %s -- %d\n", s, line);
 			#ifndef SDLMAME_WIN32
 			usleep(100);
 			#else
-			Sleep(1000);
+			Sleep(10);
 			#endif
 		}
 	}
@@ -251,6 +270,14 @@ void _sdlwindow_sync(const char *s, int line)
 //  sdlwindow_exit
 //  (main thread)
 //============================================================
+
+#ifdef SDLMAME_WIN32
+static void *sdlwindow_exit_wt(void *param)
+{
+	SDL_Quit();
+	return NULL;
+}
+#endif
 
 static void sdlwindow_exit(running_machine *machine)
 {
@@ -270,15 +297,17 @@ static void sdlwindow_exit(running_machine *machine)
 		sdlwindow_video_window_destroy(temp);
 	}
 
+	// kill the drawers
+	(*draw.exit)();
+
+	#ifdef SDLMAME_WIN32
+	execute_async_wait(&sdlwindow_exit_wt, NULL);
+	#endif
 	if (multithreading_enabled)
 	{
-		sdlwindow_sync();
 		osd_work_queue_wait(work_queue, 100000);
 		osd_work_queue_free(work_queue);
 	}
-
-	// kill the drawers
-	(*draw.exit)();
 
 }
 
@@ -375,28 +404,17 @@ static void *sdlwindow_resize_wt(void *param)
 void sdlwindow_resize(INT32 width, INT32 height)
 {
 	sdl_window_info *window = sdl_window_list;
-	worker_param *wp;
+	worker_param wp;
 
-	//May be called from input_processing
-	//ASSERT_MAIN_THREAD();
+	ASSERT_MAIN_THREAD();
 
 	if (width == window->sdlsurf->w && height == window->sdlsurf->h)
 		return;
 	
-	wp = (worker_param *) malloc(sizeof(worker_param));
-	wp->resize_new_width = width;
-	wp->resize_new_height = height;
-	if (multithreading_enabled && NOT_WIN32 && (SDL_ThreadID() == main_threadid) )
-	{
-		osd_work_item_queue(work_queue, &sdlwindow_resize_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
-		sdlwindow_sync();
-	}
-	else
-	{
-		if (SDL_ThreadID() == main_threadid)
-			sdlwindow_sync();
-		sdlwindow_resize_wt((void *) wp);
-	}
+	wp.resize_new_width = width;
+	wp.resize_new_height = height;
+	
+	execute_async_wait(&sdlwindow_resize_wt, &wp);
 }
 
 //============================================================
@@ -427,8 +445,6 @@ static void *sdlwindow_toggle_full_screen_wt(void *param)
 	// toggle the window mode
 	video_config.windowed ^= 1;
 
-	SDL_FreeSurface(window->sdlsurf);
-	window->sdlsurf = NULL;
 	(*draw.window_destroy)(window);
 
 	window->fullscreen = !video_config.windowed;
@@ -440,23 +456,14 @@ static void *sdlwindow_toggle_full_screen_wt(void *param)
 
 void sdlwindow_toggle_full_screen(void)
 {
-	worker_param *wp = (worker_param *) malloc(sizeof(worker_param));
+	worker_param wp;
 	sdl_window_info *window = sdl_window_list;
 
 	ASSERT_MAIN_THREAD();
 
-	wp->window = window;
-	if (multithreading_enabled && NOT_WIN32) 
-	{
-		osd_work_item_queue(work_queue, &sdlwindow_toggle_full_screen_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
-		sdlwindow_sync();
-	}
-	else
-	{
-		sdlwindow_sync();
-		sdlwindow_toggle_full_screen_wt((void *) wp);
-	}
-
+	wp.window = window;
+	
+	execute_async_wait(&sdlwindow_toggle_full_screen_wt, &wp);
 }
 
 void sdlwindow_modify_yuv(int dir)
@@ -472,32 +479,37 @@ void sdlwindow_modify_yuv(int dir)
 	
 	if (new_yuv_mode != video_config.yuv_mode)
 	{
-		worker_param *wp = (worker_param *) malloc(sizeof(worker_param));
+		worker_param wp;
+		wp.window = window;
 
-		if (multithreading_enabled && NOT_WIN32)
-			sdlwindow_sync();
-		SDL_FreeSurface(window->sdlsurf);
-		window->sdlsurf = NULL;
-		(*draw.window_destroy)(window);
-		
+		execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
+			
 		video_config.yuv_mode = new_yuv_mode;
 
-		wp->window = window;
-		if (multithreading_enabled && NOT_WIN32)
-		{
-			osd_work_item_queue(work_queue, &complete_create_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
-			sdlwindow_sync();
-		}
-		else
-			complete_create_wt((void *) wp);
+		execute_async_wait(&complete_create_wt, &wp);
+
 		ui_popup_time(1, "YUV mode %s", yuv_names[video_config.yuv_mode]);
 	}
+}
+
+static void *destroy_all_textures_wt(void *param)
+{
+	worker_param *wp = (worker_param *) param;
+	sdl_window_info *window = wp->window;
+
+	drawsdl_destroy_all_textures(window->dxdata);
+	
+	free(wp);
+	return NULL;
 }
 
 void sdlwindow_modify_prescale(int dir)
 {
 	sdl_window_info *window = sdl_window_list;
+	worker_param wp;
 	int new_prescale = video_config.prescale;
+
+	wp.window = window;
 
 	if (dir > 0 && video_config.prescale < 3)
 		new_prescale = video_config.prescale + 1;
@@ -508,28 +520,17 @@ void sdlwindow_modify_prescale(int dir)
 	{
 		if (!video_config.windowed && video_config.switchres)
 		{
-			//FIXME: This will not work and must be done in complete_create
-			// Alternatively move the whole function into window thread ... 
-			worker_param *wp = (worker_param *) malloc(sizeof(worker_param));
-			SDL_FreeSurface(window->sdlsurf);
-			window->sdlsurf = NULL;
-			(*draw.window_destroy)(window);
+			execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 			
 			video_config.prescale = new_prescale;
 
-			wp->window = window;
-			if (multithreading_enabled && NOT_WIN32)
-			{
-				osd_work_item_queue(work_queue, &complete_create_wt, (void *) wp, 0);
-				sdlwindow_sync();
-			}
-			else
-				complete_create_wt((void *) wp);
+			execute_async_wait(&complete_create_wt, &wp);
+
 		}
 		else
 		{
 #if USE_OPENGL
-			drawsdl_destroy_all_textures(window->dxdata);
+			execute_async_wait(destroy_all_textures_wt, &wp);
 #endif
 			video_config.prescale = new_prescale;
 		}
@@ -540,6 +541,7 @@ void sdlwindow_modify_prescale(int dir)
 void sdlwindow_modify_effect(int dir)
 {
 #if USE_OPENGL
+	worker_param wp;
 	sdl_window_info *window = sdl_window_list;
 #endif
 	int new_prescale_effect = video_config.prescale_effect;
@@ -559,7 +561,8 @@ void sdlwindow_modify_effect(int dir)
 	if (new_prescale_effect != video_config.prescale_effect)
 	{
 #if USE_OPENGL
-		drawsdl_destroy_all_textures(window->dxdata);
+		wp.window = window;
+		execute_async_wait(destroy_all_textures_wt, &wp);
 #endif
 		video_config.prescale_effect = new_prescale_effect;
 		ui_popup_time(1, "Effect: %s", effect_names[video_config.prescale_effect]);
@@ -569,21 +572,18 @@ void sdlwindow_modify_effect(int dir)
 void sdlwindow_toggle_draw(void)
 {
 	sdl_window_info *window = sdl_window_list;
-	worker_param *wp = (worker_param *) malloc(sizeof(worker_param));
+	worker_param wp;
 
 	// If we are not fullscreen (windowed) remember our windowed size
-	if (multithreading_enabled && NOT_WIN32)
-		sdlwindow_sync();
-
 	if (!window->fullscreen)
 	{
 		window->windowed_width = window->sdlsurf->w;
 		window->windowed_height = window->sdlsurf->h;
 	}
 
-	SDL_FreeSurface(window->sdlsurf);
-	window->sdlsurf = NULL;
-	(*draw.window_destroy)(window);
+	wp.window = window;
+	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
+
 	video_config.yuv_mode = VIDEO_YUV_MODE_NONE;
 
 	if (video_config.mode == VIDEO_MODE_OPENGL)
@@ -599,14 +599,7 @@ void sdlwindow_toggle_draw(void)
 		ui_popup_time(1, "Using OpenGL rendering");
 	}
 
-	wp->window = window;
-	if (multithreading_enabled && NOT_WIN32)
-	{
-		osd_work_item_queue(work_queue, &complete_create_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
-		sdlwindow_sync();
-	}
-	else
-		complete_create_wt((void *) wp);
+	execute_async_wait(&complete_create_wt, &wp);
 }
 
 //============================================================
@@ -649,7 +642,7 @@ void sdlwindow_update_cursor_state(void)
 int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sdl_window_config *config)
 {
 	sdl_window_info *window;
-	worker_param *wp = (worker_param *) malloc(sizeof(worker_param));
+	worker_param *wp = malloc(sizeof(worker_param));
 	char option[20];
 	int *result;
 
@@ -688,7 +681,7 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", Machine->gamedrv->description, Machine->gamedrv->name, index);
 
 	wp->window = window;
-	if (multithreading_enabled && NOT_WIN32)
+	if (multithreading_enabled)
 	{
 		osd_work_item *wi;		
 		wi = osd_work_item_queue(work_queue, &complete_create_wt, (void *) wp, 0);
@@ -721,17 +714,23 @@ static void *sdlwindow_video_window_destroy_wt(void *param)
 
 	ASSERT_WINDOW_THREAD();
 
-	// free the textures etc
+	if (window->sdlsurf)
+	{
+		SDL_FreeSurface(window->sdlsurf);
+		window->sdlsurf = NULL;
+	}
 
+	// free the textures etc
 	(*draw.window_destroy)(window);
 
+	free(wp);
 	return NULL;
 }
 
 static void sdlwindow_video_window_destroy(sdl_window_info *window)
 {
 	sdl_window_info **prevptr;
-	worker_param *wp = (worker_param *) malloc(sizeof(worker_param));
+	worker_param wp;
 
 	ASSERT_MAIN_THREAD();
 	if (multithreading_enabled)
@@ -754,14 +753,8 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 		render_target_free(window->target);
 
 	// free the textures etc
-	wp->window = window;
-	if (multithreading_enabled && NOT_WIN32)
-	{
-		osd_work_item_queue(work_queue, &sdlwindow_video_window_destroy_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
-		sdlwindow_sync();
-	}
-	else
-		sdlwindow_video_window_destroy_wt((void *) wp);
+	wp.window = window;
+	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 
 	// free the lock
 	osd_lock_free(window->render_lock);
@@ -826,7 +819,7 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 		// only render if we were able to get the lock
 		if (got_lock)
 		{
-			worker_param *wp = (worker_param *) malloc(sizeof(worker_param));
+			worker_param wp;
 			const render_primitive_list *primlist;
 
 			// don't hold the lock; we just used it to see if rendering was still happening
@@ -837,18 +830,10 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 
 			// and redraw now
 			last_update_time = SDL_GetTicks();
-			wp->list = primlist;
-			wp->window = window;
-			if (multithreading_enabled)
-			{
-				// start draw_video_contents
-				osd_work_item_queue(work_queue, &draw_video_contents_wt, (void *) wp, WORK_ITEM_FLAG_AUTO_RELEASE);
-			}
-			else
-			{
-				window->primlist = primlist;
-				draw_video_contents_wt((void *) wp);
-			}
+			wp.list = primlist;
+			wp.window = window;
+
+			execute_async(&draw_video_contents_wt, &wp);
 		}
 	}
 }
@@ -1141,7 +1126,7 @@ static void *draw_video_contents_wt(void * param)
 	
 	ASSERT_REDRAW_THREAD();
 	#ifdef SDLMAME_WIN32
-	win_process_events();
+	win_process_events_buf();
 	#endif
 
 	window->primlist = wp->list;

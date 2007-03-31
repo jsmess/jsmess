@@ -98,6 +98,18 @@ int						win_use_mouse;
 static os_code_info	codelist[MAX_KEYS+MAX_JOY];
 static int					total_codes;
 
+#ifdef SDLMAME_WIN32
+
+// input lock
+static osd_lock				*input_lock;
+
+// input buffer
+#define MAX_BUF_EVENTS 		(100)
+static SDL_Event			event_buf[MAX_BUF_EVENTS];
+static int					event_buf_count;
+
+#endif
+
 // global states
 static int					input_paused;
 
@@ -1231,7 +1243,7 @@ static int win_has_menu(void)
 #ifdef MESS
        return mess_ui_active() || ui_is_menu_active();
 #else
-       return ui_is_menu_active();;
+       return ui_is_menu_active();
 #endif
 }
 
@@ -1278,6 +1290,18 @@ void sdl_pause_input(running_machine *machine, int paused)
 {
 	input_paused = paused;
 }
+
+//============================================================
+//	win_exit_input
+//============================================================
+
+#ifdef SDLMAME_WIN32
+static void win_exit_input(running_machine *machine)
+{
+	osd_lock_free(input_lock);
+	event_buf_count = 0;
+}
+#endif
 
 //============================================================
 //	win_init_input
@@ -1388,7 +1412,12 @@ int win_init_input(running_machine *machine)
 			}
 		}
 	}
-
+	
+	#ifdef SDLMAME_WIN32
+	input_lock = osd_lock_alloc();
+	add_exit_callback(machine, win_exit_input);
+	#endif
+	
 	return 0;
 }
 
@@ -1399,17 +1428,31 @@ int win_init_input(running_machine *machine)
 
 void sdlwindow_resize(INT32 width, INT32 height);
 
+#ifdef SDLMAME_WIN32
+void win_process_events_buf(void)
+{
+	SDL_Event event;
+
+	osd_lock_acquire(input_lock);
+	while(SDL_PollEvent(&event)) 
+	{
+		if (event_buf_count < MAX_BUF_EVENTS)
+			event_buf[event_buf_count++] = event;
+		else
+			fprintf(stderr, "Event Buffer Overflow!\n");	
+	}
+	osd_lock_release(input_lock);
+}
+#endif
+
 void win_process_events(void)
 {
 	SDL_Event event;
 	int i;
+	int bufp;
 	#ifdef MESS
 	int translated;
 	#endif
-	
-	//FIXME: wpe is called in window_thread to get events
-	//       from SDL. To be thread-clean, these have to be
-	//       buffered and be processed in the main thread!
 	
 	for (i=0;i<MAX_JOYSTICKS;i++)
 	{
@@ -1423,7 +1466,14 @@ void win_process_events(void)
 		updatekeyboard();
 	}
 
+#ifdef SDLMAME_WIN32
+	osd_lock_acquire(input_lock);
+	bufp = 0;
+	while (bufp < event_buf_count) {
+		event = event_buf[bufp++];
+#else
 	while(SDL_PollEvent(&event)) {
+#endif
 		if (event.type == SDL_KEYUP && 
 		    event.key.keysym.sym == SDLK_CAPSLOCK)
 		{
@@ -1483,6 +1533,10 @@ void win_process_events(void)
 			break;
 		}
 	}
+#ifdef SDLMAME_WIN32
+	event_buf_count = 0;
+	osd_lock_release(input_lock);
+#endif
 }
 
 //============================================================

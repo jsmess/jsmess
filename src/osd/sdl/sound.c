@@ -93,12 +93,13 @@ static int			sdl_init(void);
 static void			sdl_kill(void);
 static int			sdl_create_buffers(void);
 static void			sdl_destroy_buffers(void);
+static void			sdl_cleanup_audio(running_machine *machine);
 
 
 //============================================================
 //	osd_start_audio_stream
 //============================================================
-void sdl_init_audio(void)
+void sdl_init_audio(running_machine *machine)
 {
 #if LOG_SOUND
 	sound_log = fopen("sound.log", "w");
@@ -111,6 +112,7 @@ void sdl_init_audio(void)
 		if (sdl_init())
 			return;
 
+		add_exit_callback(machine, sdl_cleanup_audio);
 		// set the startup volume
 		osd_set_mastervolume(attenuation);
 	}
@@ -123,7 +125,7 @@ void sdl_init_audio(void)
 //	osd_stop_audio_stream
 //============================================================
 
-void sdl_cleanup_audio(void)
+static void sdl_cleanup_audio(running_machine *machine)
 {
 	// if nothing to do, don't do it
 	if (Machine->sample_rate == 0)
