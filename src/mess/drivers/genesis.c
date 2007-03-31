@@ -129,112 +129,6 @@ static int genesis_isSMD(unsigned char *buf,unsigned int len)
 }
 
 
-
-static int genesis_isfunkyBIN(unsigned char *buf,unsigned int len)
-{
-	/* all the special cases for crappy headered roms */
-	/* aq quiz */
-	if (!strncmp("QUIZ (G-3051", (const char *) &buf[0x1e0], 12))
-		return 1;
-
-	/* phelios USA redump */
-	/* target earth */
-	/* klax namcot */
-	if (buf[0x0104] == 'A' && buf[0x0101] == 'S' && buf[0x0102] == 'E' && buf[0x0103] == 'G')
-		return 1;
-
-    /* jap baseball 94 */
-	if (!strncmp("WORLD PRO-B", (const char *) &buf[0x1e0], 11))
-		return 1;
-
-    /* devlish mahj tower */
-	if (!strncmp("DEVILISH MAH", (const char *) &buf[0x120], 12))
-		return 1;
-
-    /* golden axe 2 beta */
-	if ((len >= 0xe40a+4) && !strncmp("SEGA", (const char *) &buf[0xe40a], 4))
-		return 1;
-
-    /* omega race */
-	if (!strncmp(" OMEGA RAC", (const char *) &buf[0x120], 10))
-		return 1;
-
-    /* budokan beta */
-	if ((len >= 0x4e18+8) && !strncmp("BUDOKAN.", (const char *) &buf[0x4e18], 8))
-		return 1;
-
-    /* cdx 1.8 bios */
-	if ((len >= 0x588+8) && !strncmp(" CDX PRO", (const char *) &buf[0x588], 8))
-		return 1;
-
-    /* ishido (hacked) */
-	if (!strncmp("Ishido - ", (const char *) &buf[0x120], 9))
-		return 1;
-
-    /* onslaught */
-	if (!strncmp("(C)ACLD 1991", (const char *) &buf[0x118], 12))
-		return 1;
-
-    /* trampoline terror pirate */
-	if ((len >= 0x2c70+9) && !strncmp("DREAMWORK", (const char *) &buf[0x2c70], 9))
-		return 1;
-
-    /* breath of fire 3 chinese */
-	if (buf[0x000f] == 0x1c && buf[0x0010] == 0x00 && buf[0x0011] == 0x0a && buf[0x0012] == 0x5c)
-		return 1;
-
-    /* tetris pirate */
-	if ((len >= 0x397f+6) && !strncmp("TETRIS", (const char *) &buf[0x397f], 6))
-		return 1;
-
-    /* Ghostbusters (JUE) (REV 00) [p1] and similar */
-    if ((len == 524288) && !strncmp("GHOSTBUSTERS", (const char *)&buf[0x18020], 12))
-    		return 1;
-
-    /* generic BIN, part 1 */
-    if ((buf[0] == 00) && (buf[1] == 0xff) && (buf[0x100] == 0x20) && (buf[0x200] == 0x4e) && (buf[0x201] == 0x71))
-		return 1;
-
-    /* generic BIN, part 2 */
-    if ((buf[4] == 0x00) && (buf[5] == 0x00) && (buf[6] == 0x02))
-    		return 1;
-
-    return 0;
-}
-
-
-
-static int genesis_isBIN(unsigned char *buf,unsigned int len)
-{
-	if (buf[0x0100] == 'S' && buf[0x0101] == 'E' && buf[0x0102] == 'G' && buf[0x0103] == 'A')
-		return 1;
-	return genesis_isfunkyBIN(buf,len);
-}
-
-
-
-static int genesis_verify_cart(unsigned char *temp,unsigned int len)
-{
-	int retval = IMAGE_VERIFY_FAIL;
-
-	/* is this an SMD file..? */
-	if (genesis_isSMD(&temp[0x200],len))
-		retval = IMAGE_VERIFY_PASS;
-
-	/* How about a BIN file..? */
-	if ((retval == IMAGE_VERIFY_FAIL) && genesis_isBIN(&temp[0],len))
-		retval = IMAGE_VERIFY_PASS;
-
-	/* maybe a .md file? (rare) */
-	if ((retval == IMAGE_VERIFY_FAIL) && (temp[0x080] == 'E') && (temp[0x081] == 'A') && (temp[0x082] == 'M' || temp[0x082] == 'G'))
-		retval = IMAGE_VERIFY_PASS;
-
-	if (retval == IMAGE_VERIFY_FAIL)
-		logerror("Invalid Image!\n");
-
-	return retval;
-}
-
 int device_load_genesis_cart(mess_image *image)
 {
 	unsigned char *tmpROMnew, *tmpROM;
@@ -250,18 +144,8 @@ int device_load_genesis_cart(mess_image *image)
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
 
-        length = image_fread(image, rawROM + 0x2000, 0x500200);
+        length = image_fread(image, rawROM + 0x2000, 0x600000);
 	logerror("image length = 0x%x\n", length);
-
-	if (length < 1024 + 512)
-	{
-		goto bad;						/* smallest known rom is 1.7K */
-	}
-
-	if (genesis_verify_cart(&rawROM[0x2000],(unsigned)length) == IMAGE_VERIFY_FAIL)
-	{
-		goto bad;
-	}
 
 	if (genesis_isSMD(&rawROM[0x2200],(unsigned)length))	/* is this a SMD file..? */
 	{
