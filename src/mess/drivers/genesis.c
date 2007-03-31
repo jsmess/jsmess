@@ -56,6 +56,8 @@ MESS adaptation by R. Belmont
 #include "inputx.h"
 #include "../../mame/drivers/megadriv.h"
 
+static int is_ssf2 = 0;
+
 /* code taken directly from GoodGEN by Cowering */
 static int genesis_isfunkySMD(unsigned char *buf,unsigned int len)
 {
@@ -231,10 +233,12 @@ int device_load_genesis_cart(mess_image *image)
 	int ptr, x;
 	unsigned char *ROM;
 
+	is_ssf2 = 0;
+
 	rawROM = memory_region(REGION_CPU1);
         ROM = rawROM /*+ 512 */;
 
-        length = image_fread(image, rawROM + 0x2000, 0x400200);
+        length = image_fread(image, rawROM + 0x2000, 0x500200);
 	logerror("image length = 0x%x\n", length);
 
 	if (length < 1024 + 512)
@@ -245,7 +249,6 @@ int device_load_genesis_cart(mess_image *image)
 
 	if (genesis_isSMD(&rawROM[0x2200],(unsigned)length))	/* is this a SMD file..? */
 	{
-
 		tmpROMnew = ROM;
 		tmpROM = ROM + 0x2000 + 512;
 
@@ -267,7 +270,6 @@ int device_load_genesis_cart(mess_image *image)
 		(rawROM[0x2081] == 'A') &&
 		(rawROM[0x2082] == 'M' || rawROM[0x2082] == 'G'))  /* is this a MD file..? */
 	{
-
 		tmpROMnew = malloc(length);
 		secondhalf = &tmpROMnew[length >> 1];
 
@@ -293,11 +295,16 @@ int device_load_genesis_cart(mess_image *image)
 	/* BIN it is, then */
 	{
 		relocate = 0x2000;
+
+		if (!strncmp((char *)&ROM[0x2120], "SUPER STREET FIGHTER2", 20))
+		{
+			is_ssf2 = 1;
+		}		
 	}
 
 	ROM = memory_region(REGION_CPU1);	/* 68000 ROM region */
 
-	for (ptr = 0; ptr < 0x402000; ptr += 2)		/* mangle bytes for littleendian machines */
+ 	for (ptr = 0; ptr < 0x502000; ptr += 2)		/* mangle bytes for littleendian machines */
 	{
 #ifdef LSB_FIRST
 		int temp = ROM[relocate + ptr];
@@ -310,6 +317,14 @@ int device_load_genesis_cart(mess_image *image)
 #endif
 	}
 
+	if (is_ssf2)
+	{
+		tmpROM = malloc(0x500000);
+		memcpy(tmpROM, &ROM[0], 0x500000);
+		memcpy(&ROM[0x400000], tmpROM, 0x500000);
+		free(tmpROM);
+	}
+
 	return INIT_PASS;
 
 bad:
@@ -318,18 +333,18 @@ bad:
 
 /* we don't use the bios rom (its not needed and only provides security on early models) */
 
-ROM_START(gen_usa)
-	ROM_REGION(0x415000, REGION_CPU1, 0)
+ROM_START(genesis)
+	ROM_REGION(0x1415000, REGION_CPU1, 0)
 	ROM_REGION( 0x10000, REGION_CPU2, 0)
 ROM_END
 
-ROM_START(gen_eur)
-	ROM_REGION(0x415000, REGION_CPU1, 0)
+ROM_START(megadriv)
+	ROM_REGION(0x1415000, REGION_CPU1, 0)
 	ROM_REGION( 0x10000, REGION_CPU2, 0)
 ROM_END
 
-ROM_START(gen_jpn)
-	ROM_REGION(0x415000, REGION_CPU1, 0)
+ROM_START(megadrij)
+	ROM_REGION(0x1415000, REGION_CPU1, 0)
 	ROM_REGION( 0x10000, REGION_CPU2, 0)
 ROM_END
 
@@ -357,6 +372,65 @@ SYSTEM_CONFIG_START(genesis)
 	CONFIG_DEVICE(genesis_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
+WRITE16_HANDLER( genesis_ssf2_bank_w )
+{
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
+	switch (offset<<1)
+	{
+		case 0x00: // write protect register
+			break;
+		case 0x02: /* 0x080000 - 0x0FFFFF */
+			memcpy(ROM + 0x080000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+			break;
+		case 0x04: /* 0x100000 - 0x17FFFF */
+			memcpy(ROM + 0x100000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+			break;
+		case 0x06: /* 0x180000 - 0x1FFFFF */
+			memcpy(ROM + 0x180000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+			break;
+		case 0x08: /* 0x200000 - 0x27FFFF */
+			memcpy(ROM + 0x200000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+			break;
+		case 0x0a: /* 0x280000 - 0x2FFFFF */
+			memcpy(ROM + 0x280000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+			break;
+		case 0x0c: /* 0x300000 - 0x37FFFF */
+			memcpy(ROM + 0x300000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+			break;
+		case 0x0e: /* 0x380000 - 0x3FFFFF */
+			memcpy(ROM + 0x380000, ROM + 0x400000+((data&0xf)*0x080000), 0x080000);
+			break;
+
+	}
+}
+
+static DRIVER_INIT( gencommon )
+{
+	if (is_ssf2)
+	{
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, genesis_ssf2_bank_w);
+	}
+}
+
+static DRIVER_INIT( genusa )
+{
+	init_gencommon(machine);
+	init_megadriv(machine);
+}
+
+static DRIVER_INIT( geneur )
+{
+	init_gencommon(machine);
+	init_megadrie(machine);
+}
+
+static DRIVER_INIT( genjpn )
+{
+	init_gencommon(machine);
+	init_megadrij(machine);
+}
+
 /***************************************************************************
 
   Game driver(s)
@@ -364,6 +438,6 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT	CONFIG	 COMPANY   FULLNAME */
-CONS( 1988, gen_usa,  0,	0,	megadriv,  megadri6, megadriv,	genesis, "Sega",   "Genesis (USA, NTSC)" , 0)
-CONS( 1988, gen_eur,  gen_usa,	0,	megadriv,  megadri6, megadrie,	genesis, "Sega",   "Megadrive (Europe, PAL)" , 0)
-CONS( 1988, gen_jpn,  gen_usa,	0,	megadriv,  megadri6, megadrij,	genesis, "Sega",   "Megadrive (Japan, NTSC)" , 0)
+CONS( 1988, genesis,  0,	0,	megadriv,  megadri6, genusa,	genesis, "Sega",   "Genesis (USA, NTSC)" , 0)
+CONS( 1988, megadriv,  genesis,	0,	megadriv,  megadri6, geneur,	genesis, "Sega",   "Megadrive (Europe, PAL)" , 0)
+CONS( 1988, megadrij,  genesis,	0,	megadriv,  megadri6, genjpn,	genesis, "Sega",   "Megadrive (Japan, NTSC)" , 0)
