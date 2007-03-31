@@ -364,6 +364,6 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     INIT	CONFIG	 COMPANY   FULLNAME */
-CONS( 1988, gen_usa,  0,	0,	megadriv,  megadriv, megadriv,	genesis, "Sega",   "Genesis (USA, NTSC)" , 0)
-CONS( 1988, gen_eur,  gen_usa,	0,	megadriv,  megadriv, megadrie,	genesis, "Sega",   "Megadrive (Europe, PAL)" , 0)
-CONS( 1988, gen_jpn,  gen_usa,	0,	megadriv,  megadriv, megadrij,	genesis, "Sega",   "Megadrive (Japan, NTSC)" , 0)
+CONS( 1988, gen_usa,  0,	0,	megadriv,  megadri6, megadriv,	genesis, "Sega",   "Genesis (USA, NTSC)" , 0)
+CONS( 1988, gen_eur,  gen_usa,	0,	megadriv,  megadri6, megadrie,	genesis, "Sega",   "Megadrive (Europe, PAL)" , 0)
+CONS( 1988, gen_jpn,  gen_usa,	0,	megadriv,  megadri6, megadrij,	genesis, "Sega",   "Megadrive (Japan, NTSC)" , 0)
