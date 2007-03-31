@@ -187,6 +187,18 @@ static int genesis_isfunkyBIN(unsigned char *buf,unsigned int len)
 	if ((len >= 0x397f+6) && !strncmp("TETRIS", (const char *) &buf[0x397f], 6))
 		return 1;
 
+    /* Ghostbusters (JUE) (REV 00) [p1] and similar */
+    if ((len == 524288) && !strncmp("GHOSTBUSTERS", (const char *)&buf[0x18020], 12))
+    		return 1;
+
+    /* generic BIN, part 1 */
+    if ((buf[0] == 00) && (buf[1] == 0xff) && (buf[0x100] == 0x20) && (buf[0x200] == 0x4e) && (buf[0x201] == 0x71))
+		return 1;
+
+    /* generic BIN, part 2 */
+    if ((buf[4] == 0x00) && (buf[5] == 0x00) && (buf[6] == 0x02))
+    		return 1;
+
     return 0;
 }
 
@@ -242,10 +254,14 @@ int device_load_genesis_cart(mess_image *image)
 	logerror("image length = 0x%x\n", length);
 
 	if (length < 1024 + 512)
+	{
 		goto bad;						/* smallest known rom is 1.7K */
+	}
 
 	if (genesis_verify_cart(&rawROM[0x2000],(unsigned)length) == IMAGE_VERIFY_FAIL)
+	{
 		goto bad;
+	}
 
 	if (genesis_isSMD(&rawROM[0x2200],(unsigned)length))	/* is this a SMD file..? */
 	{
