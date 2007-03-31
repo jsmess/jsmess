@@ -31,6 +31,8 @@ System Driver Changes:
 - [THOMSON] Switch 6850 ACIA implementations to use the MAME version, and
   added natural keyboard support. [Antoine Mine]
 
+- [TI99] Fixed assertion failure.  (bug #1129) [Nate Woods]
+
 
 
 User Interface Changes:
