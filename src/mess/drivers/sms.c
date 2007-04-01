@@ -34,6 +34,30 @@
 	Nov-Dec, 05 - Numerous cleanups, fixes, updates (WP)
 	Mar, 07 - More cleanups, fixes, mapper additions, etc (WP)
 
+SMS Store Unit memory map for the second CPU:
+
+0000-3FFF - BIOS
+4000-47FF - RAM
+8000      - System Control Register (R/W)
+            Reading:
+            bit7      - ready (0 = ready, 1 = not ready)
+            bit6-bit5 - unknown
+            bit4-bit3 - timer selection bit switches
+            bit2-bit0 - unknown
+            Writing:
+            bit7-bit4 - unknown, maybe led of selected game to set?
+            bit3      - unknown, 1 seems to be written all the time
+            bit2      - unknown, 1 seems to be written all the time
+            bit1      - reset signal for sms cpu, 0 = reset low, 1 = reset high
+            bit0      - which cpu receives interrupt signals, 0 = sms cpu, 1 = controlling cpu
+C000      - Card/Cartridge selction register (W)
+            bit7-bit4 - slot to select
+            bit3      - slot type (0 = cartridge, 1 = card ?)
+            bit2-bit0 - unknown
+C400      - ???? (used once)
+D800      - Selection buttons #1, 1-8 (R)
+DC00      - Selection buttons #2, 9-16 (R)
+
  ******************************************************************************/
 
 #include "driver.h"
