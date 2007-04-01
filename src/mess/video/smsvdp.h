@@ -41,4 +41,4 @@ WRITE8_HANDLER(sms_vdp_data_w);
 WRITE8_HANDLER(sms_vdp_ctrl_w);
 void sms_set_ggsmsmode(int mode);
 
-#endif _VIDEO_SMSVDP_H_
+#endif /* _VIDEO_SMSVDP_H_ */
