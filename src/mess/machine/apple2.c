@@ -724,8 +724,14 @@ static void apple2_reset(running_machine *machine)
 	need_intcxrom = !strcmp(Machine->gamedrv->name, "apple2c")
 		|| !strcmp(Machine->gamedrv->name, "apple2c0")
 		|| !strcmp(Machine->gamedrv->name, "apple2c3")
-		|| !strcmp(Machine->gamedrv->name, "apple2cp");
+		|| !strcmp(Machine->gamedrv->name, "apple2cp")
+		|| !strncmp(Machine->gamedrv->name, "apple2g", 7);
 	apple2_setvar(need_intcxrom ? VAR_INTCXROM : 0, ~0);
+
+	if (!strncmp(Machine->gamedrv->name, "apple2g", 7))
+	{
+		apple2_setvar(VAR_LCRAM2, VAR_LCRAM2);
+	}
 
 	a2_speaker_state = 0;
 

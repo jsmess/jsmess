@@ -1687,14 +1687,14 @@ MACHINE_START( apple2gs )
 	apple2gs_cyareg = 0x80;
 	apple2gs_inten = 0x00;
 	apple2gs_intflag = 0x00;
-	apple2gs_shadow = 0x08;
+	apple2gs_shadow = 0x00;
 	apple2gs_pending_irqs = 0x00;
 	apple2gs_mouse_x = 0x00;
 	apple2gs_mouse_y = 0x00;
 	apple2gs_mouse_dx = 0x00;
 	apple2gs_mouse_dy = 0x00;
 	adb_state = ADBSTATE_IDLE;
-	adb_kmstatus = 0x10;
+	adb_kmstatus = 0x00;
 	adb_command = 0;
 	adb_mode = 0;
 	adb_latent_result = 0;
