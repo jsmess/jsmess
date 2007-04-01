@@ -34,7 +34,8 @@ typedef struct smsvdp_configuration {
 
 int smsvdp_video_init( const smsvdp_configuration *config );
 VIDEO_UPDATE(sms);
- READ8_HANDLER(sms_vdp_curline_r);
+ READ8_HANDLER(sms_vdp_vcount_r);
+ READ8_HANDLER(sms_vdp_hcount_r);
  READ8_HANDLER(sms_vdp_data_r);
 WRITE8_HANDLER(sms_vdp_data_w);
  READ8_HANDLER(sms_vdp_ctrl_r);

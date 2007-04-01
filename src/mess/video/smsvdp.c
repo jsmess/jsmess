@@ -168,8 +168,12 @@ static void set_display_settings( void ) {
 	isCRAMDirty = 1;
 }
 
- READ8_HANDLER(sms_vdp_curline_r) {
+ READ8_HANDLER(sms_vdp_vcount_r) {
 	return ( sms_frame_timing[ INIT_VCOUNT ] + video_screen_get_vpos(0) ) & 0xFF;
+}
+
+READ8_HANDLER(sms_vdp_hcount_r) {
+	return video_screen_get_hpos(0) >> 1;
 }
 
 void sms_set_ggsmsmode( int mode ) {

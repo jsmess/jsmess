@@ -87,6 +87,15 @@ WRITE8_HANDLER(sms_version_w) {
 	return (temp);
 }
 
+READ8_HANDLER(sms_count_r) {
+	if ( offset & 0x01 ) {
+		return sms_vdp_hcount_r(offset);
+	} else {
+		/* VCount read */
+		return sms_vdp_vcount_r(offset);
+	}
+}
+
 void check_pause_button( void ) {
 	if ( ! IS_GAMEGEAR ) {
 		if ( ! (readinputport(2) & 0x80) ) {

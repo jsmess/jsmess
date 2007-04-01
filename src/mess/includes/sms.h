@@ -36,6 +36,7 @@ WRITE8_HANDLER(sms_YM2413_register_port_0_w);
 WRITE8_HANDLER(sms_YM2413_data_port_0_w);
 WRITE8_HANDLER(sms_version_w);
  READ8_HANDLER(sms_version_r);
+ READ8_HANDLER(sms_count_r);
 WRITE8_HANDLER(sms_mapper_w);
  READ8_HANDLER(sms_mapper_r);
 WRITE8_HANDLER(sms_bios_w);
