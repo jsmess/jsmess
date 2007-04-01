@@ -11,6 +11,12 @@ System Driver Changes:
 - [APPLE2GS] Major fixes to the quality and accuracy of the ES5503 
   sound emulation. [R. Belmont]
 
+- [APPLE2GS] First pass at proper raster timing.  FTA XMAS DEMO now runs,
+  no border f/x yet though.  [R. Belmont]
+
+- [APPLE2GS] Fixed scanline interrupts to work properly.  Fixed Cavern 
+  Cobra, FTA Modulae demo, probably more.  (bug #673)  [R. Belmont]
+
 - [APPLE2GS, SNES] Fixed some 65816 core bugs.  (bug #661) [R. Belmont]
 
 - [COCO] Fixed PIA misconfiguration.  (bug #1115) [tim lindner]

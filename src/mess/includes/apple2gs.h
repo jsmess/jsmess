@@ -23,6 +23,7 @@ extern UINT8 apple2gs_docram[64*1024];
 INTERRUPT_GEN( apple2gs_interrupt );
 
 MACHINE_START( apple2gs );
+MACHINE_RESET( apple2gs );
 VIDEO_START( apple2gs );
 VIDEO_UPDATE( apple2gs );
 

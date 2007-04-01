@@ -148,14 +148,13 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_IMPORT_FROM( apple2e )
 	MDRV_CPU_REPLACE("main", G65816, APPLE2GS_14M/5)
 
-	MDRV_CPU_VBLANK_INT(apple2gs_interrupt, 200/8)
-
 	MDRV_SCREEN_SIZE(704, 262)	// 640+32+32 for the borders
 	MDRV_SCREEN_VISIBLE_AREA(0,703,0,230)
 	MDRV_PALETTE_LENGTH( 16+256 )
 	MDRV_GFXDECODE( apple2gs_gfxdecodeinfo )
 
 	MDRV_MACHINE_START( apple2gs )
+	MDRV_MACHINE_RESET( apple2gs )
 
 	MDRV_PALETTE_INIT( apple2gs )
 	MDRV_VIDEO_START( apple2gs )
@@ -272,6 +271,6 @@ SYSTEM_CONFIG_START(apple2gs)
 SYSTEM_CONFIG_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      CONFIG		COMPANY            FULLNAME */
-COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03)",			GAME_NOT_WORKING )
-COMP( 1987, apple2g1, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)",			GAME_NOT_WORKING )
+COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03)", 0 )
+COMP( 1987, apple2g1, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)", 0 )
 COMP( 1986, apple2g0, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)",			GAME_NOT_WORKING )
