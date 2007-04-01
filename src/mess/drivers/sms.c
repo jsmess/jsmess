@@ -41,6 +41,7 @@
 #include "sound/2413intf.h"
 #include "video/generic.h"
 #include "includes/sms.h"
+#include "video/smsvdp.h"
 #include "devices/cartslot.h"
 
 #define MASTER_CLOCK_NTSC	53693175
@@ -55,6 +56,16 @@ static ADDRESS_MAP_START( sms_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xC000, 0xDFFB) AM_MIRROR(0x2000) AM_RAM			/* RAM (mirror at 0xE000) */
 	AM_RANGE(0xDFFC, 0xDFFF) AM_RAM						/* RAM "underneath" frame registers */
 	AM_RANGE(0xFFFC, 0xFFFF) AM_READWRITE(sms_mapper_r, sms_mapper_w)	/* Bankswitch control */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sms_store_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3FFF) AM_ROM						/* BIOS */
+	AM_RANGE(0x4000, 0x47FF) AM_RAM						/* RAM */
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(10)					/* Cartridge/card peek area */
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sms_store_control_r, sms_store_control_w)	/* Control */
+	AM_RANGE(0xC000, 0xC000) AM_READWRITE(sms_store_cart_select_r, sms_store_cart_select_w) 	/* cartridge/card slot selector */
+	AM_RANGE(0xD800, 0xD800) AM_READ(sms_store_select1)			/* Game selector port #1 */
+	AM_RANGE(0xDC00, 0xDC00) AM_READ(sms_store_select2)			/* Game selector port #2 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_io, ADDRESS_SPACE_IO, 8 )
@@ -134,6 +145,18 @@ INPUT_PORTS_START( sms )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START ) /* Game Gear START */
 
+	PORT_START	/* IN3 - Light phaser X - player 1 */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START	/* IN4 - Light phaser Y - player 1 */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START	/* IN5 - Light phaser X - player 2 */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEUDELTA(15) PORT_PLAYER(2)
+
+	PORT_START	/* IN6 - Light phaser Y - player 2 */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_PLAYER(2)
+
 INPUT_PORTS_END
 
 static PALETTE_INIT( sms ) {
@@ -173,12 +196,32 @@ static PALETTE_INIT( gamegear ) {
 	}
 }
 
+const smsvdp_configuration config_315_5124 = { MODEL_315_5124, sms_int_callback };
+const smsvdp_configuration config_315_5246 = { MODEL_315_5246, sms_int_callback };
+const smsvdp_configuration config_315_5378 = { MODEL_315_5378, sms_int_callback };
+const smsvdp_configuration config_store = { MODEL_315_5124, sms_store_int_callback };
+
+VIDEO_START(sega_315_5124) {
+	return smsvdp_video_init( &config_315_5124 );
+}
+
+VIDEO_START(sega_315_5246) {
+	return smsvdp_video_init( &config_315_5246 );
+}
+
+VIDEO_START(sega_315_5378) {
+	return smsvdp_video_init( &config_315_5378 );
+}
+
+VIDEO_START(sega_store_315_5124) {
+	return smsvdp_video_init( &config_store );
+}
+
 static MACHINE_DRIVER_START(sms1ntsc)
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_NTSC/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(sms_io, 0)
-	MDRV_CPU_VBLANK_INT(sms, NTSC_Y_PIXELS)
 
 	MDRV_INTERLEAVE(1)
 
@@ -209,12 +252,23 @@ static MACHINE_DRIVER_START(sms2ntsc)
 	MDRV_VIDEO_START(sega_315_5246)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START(smssdisp)
+	MDRV_IMPORT_FROM(sms1ntsc)
+
+	MDRV_VIDEO_START(sega_store_315_5124)
+
+	MDRV_CPU_ADD_TAG("control", Z80, MASTER_CLOCK_NTSC/15)
+	MDRV_CPU_PROGRAM_MAP(sms_store_mem, 0)
+	/* Both CPUs seem to communicate with the VDP etc? */
+	MDRV_CPU_IO_MAP(sms_io, 0)
+
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START(sms1pal)
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_PAL/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(sms_io, 0)
-	MDRV_CPU_VBLANK_INT(sms, PAL_Y_PIXELS)
 
 	MDRV_INTERLEAVE(1)
         
@@ -249,7 +303,7 @@ static MACHINE_DRIVER_START(smsfm)
 	MDRV_IMPORT_FROM(sms1ntsc)
 
 	MDRV_SOUND_ADD(YM2413, MASTER_CLOCK_NTSC/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(gamegear)
@@ -257,7 +311,6 @@ static MACHINE_DRIVER_START(gamegear)
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_NTSC/15)
 	MDRV_CPU_PROGRAM_MAP(sms_mem, 0)
 	MDRV_CPU_IO_MAP(gg_io, 0)
-	MDRV_CPU_VBLANK_INT(sms, NTSC_Y_PIXELS)
 
 	MDRV_INTERLEAVE(1)
 
@@ -326,6 +379,15 @@ ROM_START(sms)
 	ROM_FILL(0x0000,0x4000,0xFF)
 	ROM_REGION(0x20000, REGION_USER1, 0)
 	ROMX_LOAD("akbios.rom", 0x0000, 0x20000, CRC(CF4A09EA) SHA1(3af7b66248d34eb26da40c92bf2fa4c73a46a051), ROM_BIOS(1))
+ROM_END
+
+ROM_START(smssdisp)
+	ROM_REGION(0x4000, REGION_CPU1, 0)
+	ROM_FILL(0x0000,0x4000,0xFF)
+	ROM_REGION(0x4000, REGION_USER1, 0)
+	ROM_FILL(0x0000,0x4000,0xFF)
+	ROM_REGION(0x4000, REGION_CPU2, 0)
+	ROM_LOAD("smssdisp.rom", 0x0000, 0x4000, CRC(ee2c29ba) SHA1(fc465122134d95363112eb51b9ab71db3576cefd))
 ROM_END
 
 ROM_START(sms1pal)
@@ -408,6 +470,17 @@ SYSTEM_CONFIG_START(sg1000)
 	CONFIG_DEVICE(sg1000_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
+static void smssdisp_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info) {
+	switch(state) {
+		case DEVINFO_INT_COUNT:				info->i = 5; break;
+		default:					sms_cartslot_getinfo(devclass, state, info); break;
+	}
+}
+
+SYSTEM_CONFIG_START(smssdisp)
+	CONFIG_DEVICE(smssdisp_cartslot_getinfo)
+SYSTEM_CONFIG_END
+
 static void gamegear_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	switch(state)
@@ -474,6 +547,8 @@ CONSB(	1986,  sms1pal, sms, sms1pal, 0,  sms1pal, sms, 0,    sms, "Sega", "Sega 
 CONSB(  1990,   smspal, sms, sms2pal, 0,  sms2pal, sms, 0,    sms, "Sega", "Sega Master System II (PAL)", FLAG_BIOS_FULL )
 CONS(   1984, sg1000m3, sms,          0,    smsfm, sms, 0, sg1000, "Sega", "Sega SG-1000 Mark III" , FLAG_REGION_JAPAN | FLAG_FM )
 CONSB(	1987,     smsj, sms,    smsj, 0,    smsfm, sms, 0,    sms, "Sega", "Sega Master System (Japan)" , FLAG_REGION_JAPAN | FLAG_BIOS_2000 | FLAG_FM )
+
+CONSB(  1986, smssdisp, sms, sms2, 0, smssdisp, sms, 0, smssdisp, "Sega", "Sega Master System Store Display", GAME_NOT_WORKING )
 
 CONSB(	1990, gamegear,        0, gamegear, sms, gamegear, sms, 0, gamegear, "Sega", "Sega Game Gear - European/American" , FLAG_GAMEGEAR )
 CONSB(	1990, gamegeaj, gamegear, gamegear,   0, gamegear, sms, 0, gamegear, "Sega", "Sega Game Gear - Japanese" , FLAG_REGION_JAPAN | FLAG_GAMEGEAR | FLAG_BIOS_0400 )

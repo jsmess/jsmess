@@ -37,22 +37,30 @@ PAL frame timing
 */
 
 #include "driver.h"
+#include "video/smsvdp.h"
 #include "includes/sms.h"
 #include "video/generic.h"
 #include "cpu/z80/z80.h"
 
-#define FLAG_315_5124		0x0001
-#define FLAG_315_5246		0x0002
-#define FLAG_315_5378		0x0004
+#define IS_SMS1_VDP		( features & MODEL_315_5124 )
+#define IS_SMS2_VDP		( features & MODEL_315_5246 )
+#define IS_GAMEGEAR_VDP		( features & MODEL_315_5378 )
 
-#define IS_SMS1_VDP		( features & FLAG_315_5124 )
-#define IS_SMS2_VDP		( features & FLAG_315_5246 )
-#define IS_GAMEGEAR_VDP		( features & FLAG_315_5378 )
+#define STATUS_VINT		(0x80)	/* Pending vertical interrupt flag */
+#define STATUS_SPROVR		(0x40)	/* Sprite overflow flag */
+#define STATUS_SPRCOL		(0x20)	/* Object collision flag */
+#define STATUS_HINT		(0x02)	/* Pending horizontal interrupt flag */
 
-#define CRAM_SIZE		MAX_CRAM_SIZE
+#define GG_CRAM_SIZE		(0x40)	/* 32 colors x 2 bytes per color = 64 bytes */
+#define SMS_CRAM_SIZE		(0x20)	/* 32 colors x 1 bytes per color = 32 bytes */
+#define MAX_CRAM_SIZE		0x40
+
+#define VRAM_SIZE		(0x4000)
+
 #define PRIORITY_BIT		0x1000
-
 #define BACKDROP_COLOR		( ( vdp_mode == 4 ? 0x10 : 0x00 ) + (reg[0x07] & 0x0F))
+
+#define NUM_OF_REGISTER		(0x10)  /* 16 registers */
 
 #define INIT_VCOUNT		0
 #define VERTICAL_BLANKING	1
@@ -103,7 +111,10 @@ mame_bitmap *prevBitMap;
 int *lineBuffer = NULL;
 int currentPalette[32];
 int prevBitMapSaved;
+void (*int_callback)(int);
+mame_timer *smsvdp_display_timer = NULL;
 
+void smsvdp_display_callback( int param );
 void sms_refresh_line(mame_bitmap *bitmap, int offsetx, int offsety, int line);
 void sms_update_palette(void);
 
@@ -165,9 +176,10 @@ void sms_set_ggsmsmode( int mode ) {
 	ggSmsMode = mode;
 }
 
-int sms_video_init( UINT32 flags ) {
+int smsvdp_video_init( const smsvdp_configuration *config ) {
 
-	features = flags;
+	features = config->model;
+	int_callback = config->int_callback;
 
 	/* Allocate video RAM
 	   In theory the driver could have a REGION_GFX1 and/or REGION_GFX2 memory region
@@ -177,7 +189,7 @@ int sms_video_init( UINT32 flags ) {
 		VRAM = new_memory_region( Machine, REGION_GFX1, VRAM_SIZE, ROM_REQUIRED );
 	}
 	if ( CRAM == NULL ) {
-		CRAM = new_memory_region( Machine, REGION_GFX2, CRAM_SIZE, ROM_REQUIRED );
+		CRAM = new_memory_region( Machine, REGION_GFX2, MAX_CRAM_SIZE, ROM_REQUIRED );
 	}
 	if ( lineBuffer == NULL ) {
 		lineBuffer = auto_malloc( 256 * 5 * sizeof(int) );
@@ -188,7 +200,8 @@ int sms_video_init( UINT32 flags ) {
 	memset(reg, 0, NUM_OF_REGISTER);
 	isCRAMDirty = 1;
 	memset(VRAM, 0, VRAM_SIZE);
-	memset(CRAM, 0, CRAM_SIZE);
+	memset(CRAM, 0, MAX_CRAM_SIZE);
+	reg[0x01] |= 0x20;
 	reg[0x02] = 0x0E;			/* power up default */
 
 	CRAMMask = ( IS_GAMEGEAR_VDP && ! ggSmsMode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
@@ -207,22 +220,14 @@ int sms_video_init( UINT32 flags ) {
 
 	set_display_settings();
 
+	if ( smsvdp_display_timer == NULL ) {
+		smsvdp_display_timer = mame_timer_alloc( smsvdp_display_callback );
+	}
+	mame_timer_adjust( smsvdp_display_timer, video_screen_get_time_until_pos( 0, 0, 0 ), 0, video_screen_get_scan_period( 0 ) );
 	return (0);
 }
 
-VIDEO_START(sega_315_5124) {
-	return sms_video_init( FLAG_315_5124 );
-}
-
-VIDEO_START(sega_315_5246) {
-	return sms_video_init( FLAG_315_5246 );
-}
-
-VIDEO_START(sega_315_5378) {
-	return sms_video_init( FLAG_315_5378 );
-}
-
-INTERRUPT_GEN(sms) {
+void smsvdp_display_callback( int param ) {
 	rectangle rec;
 	int vpos = video_screen_get_vpos(0);
 	int vpos_limit = sms_frame_timing[VERTICAL_BLANKING] + sms_frame_timing[TOP_BLANKING]
@@ -248,11 +253,26 @@ INTERRUPT_GEN(sms) {
 
 	/* Check if we're in the bottom border area */
 	if ( vpos >= vpos_limit ) {
+		if ( vpos == vpos_limit ) {
+			if ( lineCountDownCounter == 0x00 ) {
+				lineCountDownCounter = reg[0x0A];
+				statusReg |= STATUS_HINT;
+				irqState = 1;
+				if ( reg[0x00] & 0x10 ) {
+					if ( int_callback ) {
+						int_callback( ASSERT_LINE );
+					}
+				}
+			}
+
+		}
 		if ( vpos == vpos_limit + 1 ) {
 			statusReg |= STATUS_VINT;
+			irqState = 1;
 			if ( reg[0x01] & 0x20 ) {
-				irqState = 1;
-				cpunum_set_input_line( 0, 0, ASSERT_LINE );
+				if ( int_callback ) {
+					int_callback( ASSERT_LINE );
+				}
 			}
 		}
 		if ( video_skip_this_frame() ) {
@@ -285,9 +305,11 @@ INTERRUPT_GEN(sms) {
 		if ( lineCountDownCounter == 0x00 ) {
 			lineCountDownCounter = reg[0x0A];
 			statusReg |= STATUS_HINT;
+			irqState = 1;
 			if ( reg[0x00] & 0x10 ) {
-				irqState = 1;
-				cpunum_set_input_line( 0, 0, ASSERT_LINE );
+				if ( int_callback ) {
+					int_callback( ASSERT_LINE );
+				}
 			}
 		} else {
 			lineCountDownCounter -= 1;
@@ -374,7 +396,9 @@ INTERRUPT_GEN(sms) {
 
 	if (irqState == 1) {
 		irqState = 0;
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		if ( int_callback ) {
+			int_callback( CLEAR_LINE );
+		}
 	}
 
 	return (temp);

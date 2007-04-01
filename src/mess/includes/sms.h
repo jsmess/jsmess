@@ -54,38 +54,15 @@ DEVICE_LOAD( sms_cart );
 
 MACHINE_START(sms);
 MACHINE_RESET(sms);
-INTERRUPT_GEN(sms);
 
-#define SMS_X_PIXELS				342				/* 342 pixels */
-#define NTSC_Y_PIXELS				262				/* 262 lines */
-#define PAL_Y_PIXELS				313				/* 313 lines */
-#define LBORDER_START				( 1 + 2 + 14 + 8 )
-#define LBORDER_X_PIXELS			(0x0D)				/* 13 pixels */
-#define RBORDER_X_PIXELS			(0x0F)				/* 15 pixels */
-#define TBORDER_START				( 3 + 13 )
-#define NTSC_192_TBORDER_Y_PIXELS		(0x1B)				/* 27 lines */
-#define NTSC_192_BBORDER_Y_PIXELS		(0x18)				/* 24 lines */
-#define NTSC_224_TBORDER_Y_PIXELS		(0x0B)				/* 11 lines */
-#define NTSC_224_BBORDER_Y_PIXELS		(0x08)				/* 8 lines */
-#define PAL_192_TBORDER_Y_PIXELS		(0x36)				/* 54 lines */
-#define PAL_192_BBORDER_Y_PIXELS		(0x30)				/* 48 lines */
-#define PAL_224_TBORDER_Y_PIXELS		(0x26)				/* 38 lines */
-#define PAL_224_BBORDER_Y_PIXELS		(0x20)				/* 32 lines */
-#define PAL_240_TBORDER_Y_PIXELS		(0x1E)				/* 30 lines */
-#define PAL_240_BBORDER_Y_PIXELS		(0x18)				/* 24 lines */
-
-#define GG_CRAM_SIZE				(0x40)	/* 32 colors x 2 bytes per color = 64 bytes */
-#define SMS_CRAM_SIZE				(0x20)	/* 32 colors x 1 bytes per color = 32 bytes */
-#define MAX_CRAM_SIZE				0x40
-
-#define VRAM_SIZE						(0x4000)
-
-#define NUM_OF_REGISTER			(0x10)	/* 16 registers */
-
-#define STATUS_VINT					(0x80)	/* Pending vertical interrupt flag */
-#define STATUS_SPROVR					(0x40)	/* Sprite overflow flag */
-#define STATUS_SPRCOL					(0x20)	/* Object collision flag */
-#define STATUS_HINT					(0x02)	/* Pending horizontal interrupt flag */
+READ8_HANDLER(sms_store_cart_select_r);
+WRITE8_HANDLER(sms_store_cart_select_w);
+READ8_HANDLER(sms_store_select1);
+READ8_HANDLER(sms_store_select2);
+READ8_HANDLER(sms_store_control_r);
+WRITE8_HANDLER(sms_store_control_w);
+void sms_int_callback( int state );
+void sms_store_int_callback( int state );
 
 #define IO_EXPANSION				(0x80)	/* Expansion slot enable (1= disabled, 0= enabled) */
 #define IO_CARTRIDGE				(0x40)	/* Cartridge slot enable (1= disabled, 0= enabled) */
@@ -93,19 +70,6 @@ INTERRUPT_GEN(sms);
 #define IO_WORK_RAM					(0x10)	/* Work RAM disabled (1= disabled, 0= enabled) */
 #define IO_BIOS_ROM					(0x08)	/* BIOS ROM disabled (1= disabled, 0= enabled) */
 #define IO_CHIP							(0x04)	/* I/O chip disabled (1= disabled, 0= enabled) */
-
-/* Function prototypes */
-
-VIDEO_START(sega_315_5124);
-VIDEO_START(sega_315_5246);
-VIDEO_START(sega_315_5378);
-VIDEO_UPDATE(sms);
- READ8_HANDLER(sms_vdp_curline_r);
- READ8_HANDLER(sms_vdp_data_r);
-WRITE8_HANDLER(sms_vdp_data_w);
- READ8_HANDLER(sms_vdp_ctrl_r);
-WRITE8_HANDLER(sms_vdp_ctrl_w);
-void sms_set_ggsmsmode(int mode);
 
 #endif /* _SMS_H_ */
 

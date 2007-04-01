@@ -132,6 +132,7 @@ const game_driver *test_drivers[] =
 	DRIVER( smspal )	/* Sega Master System II (PAL)						*/
 	DRIVER( smsj )		/* Sega Master System (Japan) with FM Chip				*/
 	DRIVER( sg1000m3 )	/* Sega SG-1000 Mark III (Japan)					*/
+	DRIVER( smssdisp )	/* Sega Master System Store Display Unit				*/
 	DRIVER( genesis )	/* Sega Genesis/MegaDrive USA							*/
 	DRIVER( megadriv )	/* Sega Genesis/MegaDrive Europe						*/
 	DRIVER( megadrij )	/* Sega Genesis/MegaDrive Japan						*/
