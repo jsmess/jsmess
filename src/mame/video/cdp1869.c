@@ -503,7 +503,7 @@ VIDEO_UPDATE( cdp1869 )
 			break;
 		}
 
-		fillbitmap(bitmap, Machine->pens[cdp1869.bkg], &screen);
+		fillbitmap(bitmap, machine->pens[cdp1869.bkg], &screen);
 
 		width = CDP1869_CHAR_WIDTH;
 		height = cdp1869_get_lines();

@@ -5,6 +5,7 @@
 #define CGBOARD_TYPE_GTICLUB	1
 #define CGBOARD_TYPE_NWKTR		2
 #define CGBOARD_TYPE_HORNET		3
+#define CGBOARD_TYPE_HANGPLT	4
 
 void init_konami_cgboard(int board_id, int type);
 void set_cgboard_id(int board_id);
@@ -25,6 +26,7 @@ WRITE32_HANDLER( cgboard_1_comm_sharc_w );
 READ32_HANDLER( cgboard_1_shared_sharc_r );
 WRITE32_HANDLER( cgboard_1_shared_sharc_w );
 
+void K033906_init(void);
 READ32_HANDLER(K033906_0_r);
 WRITE32_HANDLER(K033906_0_w);
 READ32_HANDLER(K033906_1_r);
@@ -34,6 +36,8 @@ WRITE32_HANDLER(nwk_fifo_0_w);
 WRITE32_HANDLER(nwk_fifo_1_w);
 READ32_HANDLER(nwk_voodoo_0_r);
 READ32_HANDLER(nwk_voodoo_1_r);
+WRITE32_HANDLER(nwk_voodoo_0_w);
+WRITE32_HANDLER(nwk_voodoo_1_w);
 
 void draw_7segment_led(mame_bitmap *bitmap, int x, int y, UINT8 value);
 

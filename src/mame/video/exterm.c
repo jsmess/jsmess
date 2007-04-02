@@ -80,11 +80,11 @@ VIDEO_UPDATE( exterm )
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *bgsrc = &exterm_master_videoram[256 * (y - Machine->screen[0].visarea.min_y)];
+		UINT16 *bgsrc = &exterm_master_videoram[256 * (y - machine->screen[0].visarea.min_y)];
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 
 		/* on the top/bottom of the screen, it's all background */
-		if ((y - Machine->screen[0].visarea.min_y) < 40 || (y - Machine->screen[0].visarea.min_y) > 238)
+		if ((y - machine->screen[0].visarea.min_y) < 40 || (y - machine->screen[0].visarea.min_y) > 238)
 			for (x = 0; x < 256; x++)
 			{
 				UINT16 bgdata = *bgsrc++;
@@ -94,7 +94,7 @@ VIDEO_UPDATE( exterm )
 		/* elsewhere, we have to blend foreground and background */
 		else
 		{
-			UINT16 *fgsrc = (tms34010_get_DPYSTRT(1) & 0x800) ? &exterm_slave_videoram[(y - Machine->screen[0].visarea.min_y) * 128] : &exterm_slave_videoram[(256 + y - Machine->screen[0].visarea.min_y) * 128];
+			UINT16 *fgsrc = (tms34010_get_DPYSTRT(1) & 0x800) ? &exterm_slave_videoram[(y - machine->screen[0].visarea.min_y) * 128] : &exterm_slave_videoram[(256 + y - machine->screen[0].visarea.min_y) * 128];
 
 			for (x = 0; x < 256; x += 2)
 			{

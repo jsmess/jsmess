@@ -16,7 +16,7 @@ PALETTE_INIT( tagteam )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -189,7 +189,7 @@ static void tagteam_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( tagteam )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	tagteam_draw_sprites(bitmap);
 	return 0;
 }

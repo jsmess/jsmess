@@ -450,20 +450,20 @@ VIDEO_START( st0016 )
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 
 	if (gfx_index == MAX_GFX_ELEMENTS)
 		return 1;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	Machine->gfx[gfx_index] = allocgfx(&charlayout);
-	if (!Machine->gfx[gfx_index])
+	machine->gfx[gfx_index] = allocgfx(&charlayout);
+	if (!machine->gfx[gfx_index])
 		return 1;
 
 	/* set the color information */
-	Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
-	Machine->gfx[gfx_index]->total_colors = 0x40;
+	machine->gfx[gfx_index]->colortable = machine->remapped_colortable;
+	machine->gfx[gfx_index]->total_colors = 0x40;
 	st0016_ramgfx = gfx_index;
 
 	switch(st0016_game&0x3f)
@@ -633,7 +633,7 @@ VIDEO_UPDATE( st0016 )
 		}
 	}
 
-	fillbitmap(bitmap,Machine->pens[UNUSED_PEN],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[UNUSED_PEN],&machine->screen[0].visarea);
 	drawbgmap(bitmap,cliprect,0);
  	drawsprites(bitmap,cliprect);
 	drawbgmap(bitmap,cliprect,1);

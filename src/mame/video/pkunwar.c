@@ -49,17 +49,17 @@ VIDEO_UPDATE( pkunwar )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					videoram[offs] + ((colorram[offs] & 0x07) << 8),
 					(colorram[offs] & 0xf0) >> 4,
 					flipscreen[0],flipscreen[1],
 					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		}
 	}
 
 	/* copy the character mapped graphics */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 
 	/* Draw the sprites. */
@@ -83,12 +83,12 @@ VIDEO_UPDATE( pkunwar )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				((spriteram[offs] & 0xfc) >> 2) + ((spriteram[offs + 3] & 0x07) << 6),
 				(spriteram[offs + 3] & 0xf0) >> 4,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -105,12 +105,12 @@ VIDEO_UPDATE( pkunwar )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					videoram[offs] + ((colorram[offs] & 0x07) << 8),
 					(colorram[offs] & 0xf0) >> 4,
 					flipscreen[0],flipscreen[1],
 					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 		}
 	}
 	return 0;

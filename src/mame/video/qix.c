@@ -234,7 +234,7 @@ WRITE8_HANDLER( qix_palettebank_w )
 
 VIDEO_UPDATE( qix )
 {
-	pen_t *pens = &Machine->pens[qix_palettebank * 256];
+	pen_t *pens = &machine->pens[qix_palettebank * 256];
 	UINT8 *vram;
 	UINT8 scanline[256];
 	int x,y;

@@ -704,7 +704,7 @@ VIDEO_UPDATE( mbmj8688 )
 	}
 	else
 	{
-		fillbitmap(bitmap, Machine->pens[0], 0);
+		fillbitmap(bitmap, machine->pens[0], 0);
 	}
 	return 0;
 }

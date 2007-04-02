@@ -30,8 +30,8 @@ VIDEO_START( buggychl )
 {
 	dirtybuffer = auto_malloc(videoram_size);
 	dirtychar = auto_malloc(256 * sizeof(*dirtychar));
-	tmpbitmap1 = auto_bitmap_alloc(256,256,Machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(256,256,Machine->screen[0].format);
+	tmpbitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	tmpbitmap2 = auto_bitmap_alloc(256,256,machine->screen[0].format);
 
 	memset(dirtybuffer,1,videoram_size);
 	memset(dirtychar,0xff,256 * sizeof(*dirtychar));
@@ -255,13 +255,13 @@ VIDEO_UPDATE( buggychl )
 	if (sky_on)
 		draw_sky(bitmap);
 	else
-		fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 	/* decode modified characters */
 	for (code = 0;code < 256;code++)
 	{
 		if (dirtychar[code])
-			decodechar(Machine->gfx[0],code,buggychl_character_ram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],code,buggychl_character_ram,machine->drv->gfxdecodeinfo[0].gfxlayout);
 	}
 
 	if (bg_on)

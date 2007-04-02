@@ -92,12 +92,12 @@ PALETTE_INIT( carpolo )
 
 
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	/* the -1 is for the fake score color */
-	for (i = 0; i < Machine->drv->total_colors - 1; i++)
+	for (i = 0; i < machine->drv->total_colors - 1; i++)
 	{
 		UINT8 r,g,b;
 		int bit0,bit1,bit2;
@@ -174,13 +174,13 @@ PALETTE_INIT( carpolo )
 
 VIDEO_START( carpolo )
 {
-	sprite_sprite_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH*2,SPRITE_HEIGHT*2,Machine->screen[0].format);
-	sprite_sprite_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH*2,SPRITE_HEIGHT*2,Machine->screen[0].format);
+	sprite_sprite_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH*2,SPRITE_HEIGHT*2,machine->screen[0].format);
+	sprite_sprite_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH*2,SPRITE_HEIGHT*2,machine->screen[0].format);
 
-	sprite_goal_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH,SPRITE_HEIGHT+GOAL_HEIGHT,Machine->screen[0].format);
-	sprite_goal_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH,SPRITE_HEIGHT+GOAL_HEIGHT,Machine->screen[0].format);
+	sprite_goal_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH,SPRITE_HEIGHT+GOAL_HEIGHT,machine->screen[0].format);
+	sprite_goal_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH,SPRITE_HEIGHT+GOAL_HEIGHT,machine->screen[0].format);
 
-	sprite_border_collision_bitmap = auto_bitmap_alloc(SPRITE_WIDTH,SPRITE_HEIGHT,Machine->screen[0].format);
+	sprite_border_collision_bitmap = auto_bitmap_alloc(SPRITE_WIDTH,SPRITE_HEIGHT,machine->screen[0].format);
 
 	return 0;
 }
@@ -258,10 +258,10 @@ VIDEO_UPDATE( carpolo )
 	/* draw the playfield elements, in the correct priority order */
 
 	/* score area - position determined by bit 4 of the vertical timing PROM */
-	plot_box(bitmap,0,0,RIGHT_BORDER+1,TOP_BORDER,Machine->pens[BACKGROUND_COLOR]);
+	plot_box(bitmap,0,0,RIGHT_BORDER+1,TOP_BORDER,machine->pens[BACKGROUND_COLOR]);
 
 	/* field */
-	plot_box(bitmap,0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,Machine->pens[FIELD_COLOR]);
+	plot_box(bitmap,0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,machine->pens[FIELD_COLOR]);
 
 	/* car 1 */
 	draw_sprite(bitmap, cliprect,
@@ -269,10 +269,10 @@ VIDEO_UPDATE( carpolo )
 				0, carpolo_spriteram[0x0c] & 0x0f, CAR1_COLOR);
 
 	/* border - position determined by bit 4 and 7 of the vertical timing PROM */
-	plot_box(bitmap,0,TOP_BORDER,   RIGHT_BORDER+1,1,Machine->pens[LINE_COLOR]);
-	plot_box(bitmap,0,BOTTOM_BORDER,RIGHT_BORDER+1,1,Machine->pens[LINE_COLOR]);
-	plot_box(bitmap,LEFT_BORDER,TOP_BORDER, 1,BOTTOM_BORDER-TOP_BORDER+1,Machine->pens[LINE_COLOR]);
-	plot_box(bitmap,RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,Machine->pens[LINE_COLOR]);
+	plot_box(bitmap,0,TOP_BORDER,   RIGHT_BORDER+1,1,machine->pens[LINE_COLOR]);
+	plot_box(bitmap,0,BOTTOM_BORDER,RIGHT_BORDER+1,1,machine->pens[LINE_COLOR]);
+	plot_box(bitmap,LEFT_BORDER,TOP_BORDER, 1,BOTTOM_BORDER-TOP_BORDER+1,machine->pens[LINE_COLOR]);
+	plot_box(bitmap,RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,machine->pens[LINE_COLOR]);
 
 	/* car 4 */
 	draw_sprite(bitmap, cliprect,
@@ -296,7 +296,7 @@ VIDEO_UPDATE( carpolo )
 
 	/* left goal - position determined by bit 6 of the
        horizontal and vertical timing PROMs */
-	drawgfxzoom(bitmap,Machine->gfx[1],
+	drawgfxzoom(bitmap,machine->gfx[1],
 				0,0,
 				0,0,
 				LEFT_GOAL_X,GOAL_Y,
@@ -304,7 +304,7 @@ VIDEO_UPDATE( carpolo )
 				0x20000,0x20000);
 
 	/* right goal */
-	drawgfxzoom(bitmap,Machine->gfx[1],
+	drawgfxzoom(bitmap,machine->gfx[1],
 				0,1,
 				1,0,
 				RIGHT_GOAL_X,GOAL_Y,

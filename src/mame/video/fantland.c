@@ -126,7 +126,7 @@ static void fantland_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_UPDATE( fantland )
 {
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	fantland_draw_sprites(bitmap,cliprect);
 
 	return 0;

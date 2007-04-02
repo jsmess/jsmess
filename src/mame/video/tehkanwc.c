@@ -201,10 +201,10 @@ static void tehkanwc_draw_sprites( mame_bitmap *bitmap )
 VIDEO_UPDATE( tehkanwc )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, scroll_x[0] + 256 * scroll_x[1]);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 	tehkanwc_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 1, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 1, 0);
 	gridiron_drawled(bitmap, led0, 0);
 	gridiron_drawled(bitmap, led1, 1);
 	return 0;

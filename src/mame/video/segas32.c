@@ -2486,50 +2486,50 @@ VIDEO_UPDATE( system32 )
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
-		for (y = Machine->screen[screen].visarea.min_y; y <= Machine->screen[screen].visarea.max_y; y++)
+		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_SPRITES, y);
-			for (x = Machine->screen[screen].visarea.min_x; x <= Machine->screen[screen].visarea.max_x; x++)
+			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg0.txt", "w");
-		for (y = Machine->screen[screen].visarea.min_y; y <= Machine->screen[screen].visarea.max_y; y++)
+		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG0, y);
-			for (x = Machine->screen[screen].visarea.min_x; x <= Machine->screen[screen].visarea.max_x; x++)
+			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg1.txt", "w");
-		for (y = Machine->screen[screen].visarea.min_y; y <= Machine->screen[screen].visarea.max_y; y++)
+		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG1, y);
-			for (x = Machine->screen[screen].visarea.min_x; x <= Machine->screen[screen].visarea.max_x; x++)
+			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg2.txt", "w");
-		for (y = Machine->screen[screen].visarea.min_y; y <= Machine->screen[screen].visarea.max_y; y++)
+		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG2, y);
-			for (x = Machine->screen[screen].visarea.min_x; x <= Machine->screen[screen].visarea.max_x; x++)
+			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg3.txt", "w");
-		for (y = Machine->screen[screen].visarea.min_y; y <= Machine->screen[screen].visarea.max_y; y++)
+		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG3, y);
-			for (x = Machine->screen[screen].visarea.min_x; x <= Machine->screen[screen].visarea.max_x; x++)
+			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
@@ -2590,12 +2590,12 @@ for (showclip = 0; showclip < 4; showclip++)
 					}
 					else
 					{
-						rect.max_x = (Machine->screen[screen].visarea.max_x + 1) - (system32_videoram[0x1ff60/2 + i * 4] & 0x1ff);
-						rect.max_y = (Machine->screen[screen].visarea.max_y + 1) - (system32_videoram[0x1ff62/2 + i * 4] & 0x0ff);
-						rect.min_x = (Machine->screen[screen].visarea.max_x + 1) - ((system32_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
-						rect.min_y = (Machine->screen[screen].visarea.max_y + 1) - ((system32_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
+						rect.max_x = (machine->screen[screen].visarea.max_x + 1) - (system32_videoram[0x1ff60/2 + i * 4] & 0x1ff);
+						rect.max_y = (machine->screen[screen].visarea.max_y + 1) - (system32_videoram[0x1ff62/2 + i * 4] & 0x0ff);
+						rect.min_x = (machine->screen[screen].visarea.max_x + 1) - ((system32_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
+						rect.min_y = (machine->screen[screen].visarea.max_y + 1) - ((system32_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
 					}
-					sect_rect(&rect, &Machine->screen[screen].visarea);
+					sect_rect(&rect, &machine->screen[screen].visarea);
 
 					if (rect.min_y <= rect.max_y && rect.min_x <= rect.max_x)
 					{
@@ -2667,10 +2667,10 @@ VIDEO_UPDATE( multi32 )
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
-		for (y = Machine->screen[screen].visarea.min_y; y <= Machine->screen[screen].visarea.max_y; y++)
+		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_SPRITES, y);
-			for (x = Machine->screen[screen].visarea.min_x; x <= Machine->screen[screen].visarea.max_x; x++)
+			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}

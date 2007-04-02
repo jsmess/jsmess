@@ -470,7 +470,7 @@ WRITE16_HANDLER( hdgsp_paletteram_hi_w )
 
 VIDEO_UPDATE( harddriv )
 {
-	pen_t *pens = &Machine->pens[gfx_palettebank * 256];
+	pen_t *pens = &machine->pens[gfx_palettebank * 256];
 	pen_t black = get_black_pen(machine);
 	offs_t adjusted_offs;
 	int start, end, x, y;
@@ -523,7 +523,7 @@ VIDEO_UPDATE( harddriv )
 			*dest++ = black;
 	}
 
-	if (cliprect->max_y == Machine->screen[0].visarea.max_y)
+	if (cliprect->max_y == machine->screen[0].visarea.max_y)
 	{
 		gfx_offsetscan = 0;
 	}

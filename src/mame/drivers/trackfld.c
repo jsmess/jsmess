@@ -68,7 +68,7 @@ static NVRAM_HANDLER( trackfld )
 
 			/* find the dip switch which resets the high score table, and set it */
 			/* back to off. */
-			in = Machine->input_ports;
+			in = machine->input_ports;
 
 			while (in->type != IPT_END)
 			{
@@ -99,7 +99,7 @@ static NVRAM_HANDLER( trackfld )
 
 
 			/* find the dip switch which resets the high score table, and set it on */
-			in = Machine->input_ports;
+			in = machine->input_ports;
 
 			while (in->type != IPT_END)
 			{

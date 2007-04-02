@@ -108,7 +108,7 @@ VIDEO_UPDATE( meadows )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	if (Machine->gfx[1])
+	if (machine->gfx[1])
 		draw_sprites(bitmap, cliprect);
 	return 0;
 }

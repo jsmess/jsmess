@@ -191,8 +191,8 @@ VIDEO_UPDATE( redalert )
 			/* decode modified background */
 			if (redalert_dirtyback[offs] == 1)
 			{
-				decodechar(Machine->gfx[0],offs,redalert_backram,
-							Machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0],offs,redalert_backram,
+							machine->drv->gfxdecodeinfo[0].gfxlayout);
 				redalert_dirtyback[offs] = 2;
 			}
 
@@ -200,18 +200,18 @@ VIDEO_UPDATE( redalert )
 			if (redalert_dirtycharacter[charcode] == 1)
 			{
 				if (charcode < 0x80)
-					decodechar(Machine->gfx[1],charcode,redalert_characterram,
-								Machine->drv->gfxdecodeinfo[1].gfxlayout);
+					decodechar(machine->gfx[1],charcode,redalert_characterram,
+								machine->drv->gfxdecodeinfo[1].gfxlayout);
 				else
-					decodechar(Machine->gfx[2],charcode-0x80,redalert_spriteram1,
-								Machine->drv->gfxdecodeinfo[2].gfxlayout);
+					decodechar(machine->gfx[2],charcode-0x80,redalert_spriteram1,
+								machine->drv->gfxdecodeinfo[2].gfxlayout);
 				redalert_dirtycharacter[charcode] = 2;
 			}
 
 			if (redalert_dirtycharacter2[charcode] == 1)
 			{
-				decodechar(Machine->gfx[3],charcode-0x80,redalert_spriteram3,
-							Machine->drv->gfxdecodeinfo[3].gfxlayout);
+				decodechar(machine->gfx[3],charcode-0x80,redalert_spriteram3,
+							machine->drv->gfxdecodeinfo[3].gfxlayout);
 				redalert_dirtycharacter2[charcode] = 2;
 			}
 
@@ -229,60 +229,60 @@ VIDEO_UPDATE( redalert )
 
 				color = color_lookup[charcode];
 
-				drawgfx(tmpbitmap,Machine->gfx[2],
+				drawgfx(tmpbitmap,machine->gfx[2],
 						charcode-0x80,
 						color,
 						0,0,
 						8*sx,8*sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+						&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 				if( redalert_dirtycharacter2[charcode] != 0 )
-					drawgfx(tmpbitmap,Machine->gfx[3],
+					drawgfx(tmpbitmap,machine->gfx[3],
 							charcode-0x80,
 							color,
 							0,0,
 							8*sx,8*sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+							&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 
 			}
 
 			/* Second layer - background */
 			color = redalert_backcolor[offs];
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					offs,
 					color,
 					0,0,
 					8*sx,8*sy,
-					&Machine->screen[0].visarea,stat_transparent,0);
+					&machine->screen[0].visarea,stat_transparent,0);
 
 			/* Third layer - alphanumerics & sprites */
 			if (charcode < 0x80)
 			{
 				color = color_lookup[charcode];
-				drawgfx(tmpbitmap,Machine->gfx[1],
+				drawgfx(tmpbitmap,machine->gfx[1],
 						charcode,
 						color,
 						0,0,
 						8*sx,8*sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+						&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 			}
 			else if (charcode < 0xC0)
 			{
 				color = color_lookup[charcode];
-				drawgfx(tmpbitmap,Machine->gfx[2],
+				drawgfx(tmpbitmap,machine->gfx[2],
 						charcode-0x80,
 						color,
 						0,0,
 						8*sx,8*sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+						&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 
 				if( redalert_dirtycharacter2[charcode] != 0 )
-					drawgfx(tmpbitmap,Machine->gfx[3],
+					drawgfx(tmpbitmap,machine->gfx[3],
 							charcode-0x80,
 							color,
 							0,0,
 							8*sx,8*sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+							&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 
 			}
 
@@ -305,7 +305,7 @@ VIDEO_UPDATE( redalert )
 	}
 
 	/* copy the character mapped graphics */
-	copybitmap(bitmap,tmpbitmap,flip,flip,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,flip,flip,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	return 0;
 }

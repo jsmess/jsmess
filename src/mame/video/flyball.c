@@ -75,8 +75,8 @@ VIDEO_UPDATE( flyball )
 
 	/* draw pitcher */
 
-	drawgfx(bitmap, Machine->gfx[1], flyball_pitcher_pic ^ 0xf,
-		0, 1, 0, pitcherx, pitchery, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 1);
+	drawgfx(bitmap, machine->gfx[1], flyball_pitcher_pic ^ 0xf,
+		0, 1, 0, pitcherx, pitchery, &machine->screen[0].visarea, TRANSPARENCY_PEN, 1);
 
 	/* draw ball */
 
@@ -84,12 +84,12 @@ VIDEO_UPDATE( flyball )
 	{
 		for (x = ballx; x < ballx + 2; x++)
 		{
-			if (x >= Machine->screen[0].visarea.min_x &&
-			    x <= Machine->screen[0].visarea.max_x &&
-			    y >= Machine->screen[0].visarea.min_y &&
-			    y <= Machine->screen[0].visarea.max_y)
+			if (x >= machine->screen[0].visarea.min_x &&
+			    x <= machine->screen[0].visarea.max_x &&
+			    y >= machine->screen[0].visarea.min_y &&
+			    y <= machine->screen[0].visarea.max_y)
 			{
-				plot_pixel(bitmap, x, y, Machine->pens[1]);
+				plot_pixel(bitmap, x, y, machine->pens[1]);
 			}
 		}
 	}

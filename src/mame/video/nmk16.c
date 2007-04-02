@@ -94,7 +94,7 @@ VIDEO_START( bioship )
 	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
 	spriteram_old = auto_malloc(spriteram_size);
 	spriteram_old2 = auto_malloc(spriteram_size);
-	background_bitmap = auto_bitmap_alloc(8192,512,Machine->screen[0].format);
+	background_bitmap = auto_bitmap_alloc(8192,512,machine->screen[0].format);
 
 	tilemap_set_transparent_pen(bg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);
@@ -842,7 +842,7 @@ VIDEO_UPDATE( bioship )
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				drawgfx(background_bitmap,Machine->gfx[3],
+				drawgfx(background_bitmap,machine->gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -852,7 +852,7 @@ VIDEO_UPDATE( bioship )
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				drawgfx(background_bitmap,Machine->gfx[3],
+				drawgfx(background_bitmap,machine->gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */

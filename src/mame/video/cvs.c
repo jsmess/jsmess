@@ -70,8 +70,8 @@ PALETTE_INIT( cvs )
 {
 	int attr,col,map;
 
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
     /* Colour Mapping Prom */
 
@@ -406,15 +406,15 @@ VIDEO_START( cvs )
 
 	/* Need 3 bitmaps for 2636 chips */
 
-	s2636_1_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-	s2636_2_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-	s2636_3_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	s2636_1_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	s2636_2_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	s2636_3_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 
 	/* 3 bitmaps for collision detection */
 
-	collision_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-	collision_background = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-	scrolled_background = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	collision_background = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	scrolled_background = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 
 	return 0;
 }
@@ -478,7 +478,7 @@ VIDEO_UPDATE( cvs )
                 if(dirty_character[character]==1)
                 {
                 	dirty_character[character]=2;
-		   			decodechar(Machine->gfx[1],character,character_1_ram-1024,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+		   			decodechar(machine->gfx[1],character,character_1_ram-1024,machine->drv->gfxdecodeinfo[1].gfxlayout);
                 }
 
             	character_bank=1;
@@ -490,7 +490,7 @@ VIDEO_UPDATE( cvs )
 
             /* Main Screen */
 
- 			drawgfx(tmpbitmap,Machine->gfx[character_bank],
+ 			drawgfx(tmpbitmap,machine->gfx[character_bank],
 				    character,
 					colorram[offs],
 				    0,0,
@@ -512,7 +512,7 @@ VIDEO_UPDATE( cvs )
             }
 
             if(forecolor)
- 			    drawgfx(collision_background,Machine->gfx[character_bank],
+ 			    drawgfx(collision_background,machine->gfx[character_bank],
 				        character,
 					    forecolor,
 				        0,0,
@@ -528,8 +528,8 @@ VIDEO_UPDATE( cvs )
 
     /* Update screen - 8 regions, fixed scrolling area */
 
-	copyscrollbitmap(bitmap,tmpbitmap,0,0,8,scroll,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	copyscrollbitmap(scrolled_background,collision_background,0,0,8,scroll,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,0,0,8,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(scrolled_background,collision_background,0,0,8,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
     /* 2636's */
 
@@ -567,11 +567,11 @@ VIDEO_UPDATE( cvs )
 
                 if((CollisionRegister & 0x80) == 0)
                 {
-					if (read_pixel(scrolled_background, bx, offs) != Machine->pens[0])
+					if (read_pixel(scrolled_background, bx, offs) != machine->pens[0])
                     	CollisionRegister |= 0x80;
                 }
 
-	            plot_pixel(bitmap,bx,offs,Machine->pens[7]);
+	            plot_pixel(bitmap,bx,offs,machine->pens[7]);
             }
         }
     }
@@ -600,18 +600,18 @@ VIDEO_UPDATE( cvs )
                  if(pen)
                  {
              	    UINT16 *address = (UINT16 *)dst;
-				    if (pen & 0xff000000) address[BL3] = Machine->pens[(pen >> 24) & 15];
-				    if (pen & 0x00ff0000) address[BL2] = Machine->pens[(pen >> 16) & 15];
-				    if (pen & 0x0000ff00) address[BL1] = Machine->pens[(pen >>  8) & 15];
-				    if (pen & 0x000000ff) address[BL0] = Machine->pens[(pen & 15)];
+				    if (pen & 0xff000000) address[BL3] = machine->pens[(pen >> 24) & 15];
+				    if (pen & 0x00ff0000) address[BL2] = machine->pens[(pen >> 16) & 15];
+				    if (pen & 0x0000ff00) address[BL1] = machine->pens[(pen >>  8) & 15];
+				    if (pen & 0x000000ff) address[BL0] = machine->pens[(pen & 15)];
 
                     /* Collision Detection */
 
                     SB = 0;
-				    if (spb[BL3] != Machine->pens[0]) SB =  0x08000000;
-				    if (spb[BL2] != Machine->pens[0]) SB |= 0x00080000;
-				    if (spb[BL1] != Machine->pens[0]) SB |= 0x00000800;
-				    if (spb[BL0] != Machine->pens[0]) SB |= 0x00000008;
+				    if (spb[BL3] != machine->pens[0]) SB =  0x08000000;
+				    if (spb[BL2] != machine->pens[0]) SB |= 0x00080000;
+				    if (spb[BL1] != machine->pens[0]) SB |= 0x00000800;
+				    if (spb[BL0] != machine->pens[0]) SB |= 0x00000008;
 
        	            if (S1 & S2) CollisionRegister |= 1;
        	            if (S2 & S3) CollisionRegister |= 2;
@@ -643,8 +643,8 @@ VIDEO_UPDATE( cvs )
 			x = ((stars[offs].x + stars_scroll) % 512) / 2;
 			y = (stars[offs].y + (stars_scroll + stars[offs].x) / 512) % 256;
 
-			if (y >= Machine->screen[0].visarea.min_y &&
-				y <= Machine->screen[0].visarea.max_y)
+			if (y >= machine->screen[0].visarea.min_y &&
+				y <= machine->screen[0].visarea.max_y)
 			{
 				if ((y & 1) ^ ((x >> 4) & 1))
 				{

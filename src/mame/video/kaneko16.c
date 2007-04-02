@@ -154,11 +154,11 @@ VIDEO_START( kaneko16_1xVIEW2 )
 
 	kaneko16_tmap_3 = 0;
 
-	sprites_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	{
-		int dx, xdim = Machine->screen[0].width;
-		int dy, ydim = Machine->screen[0].height;
+		int dx, xdim = machine->screen[0].width;
+		int dy, ydim = machine->screen[0].height;
 
 		switch (xdim)
 		{
@@ -166,7 +166,7 @@ VIDEO_START( kaneko16_1xVIEW2 )
 			case 256:	dx = 0x5b;	break;
 			default:	dx = 0;
 		}
-		switch (Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1)
+		switch (machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1)
 		{
 			case 240- 8:	dy = +0x08;	break;	/* blazeon */
 			case 240-16:	dy = -0x08;	break;	/* berlwall, bakubrk */
@@ -200,8 +200,8 @@ VIDEO_START( kaneko16_2xVIEW2 )
 										TILEMAP_TRANSPARENT, 16,16, 0x20,0x20	);
 
 	{
-		int dx, xdim = Machine->screen[0].width;
-		int dy, ydim = Machine->screen[0].height;
+		int dx, xdim = machine->screen[0].width;
+		int dy, ydim = machine->screen[0].height;
 
 		switch (xdim)
 		{
@@ -209,7 +209,7 @@ VIDEO_START( kaneko16_2xVIEW2 )
 			case 256:	dx = 0x5b;	break;
 			default:	dx = 0;
 		}
-		switch (Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1)
+		switch (machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1)
 		{
 			case 240- 8:	dy = +0x08;	break;
 			case 240-16:	dy = -0x08;	break;
@@ -298,7 +298,7 @@ VIDEO_START( berlwall )
 
 			plot_pixel( kaneko16_bg15_bitmap,
 						sx * 256 + x, y,
-						Machine->pens[2048 + ((g << 10) | (r << 5) | b)] );
+						machine->pens[2048 + ((g << 10) | (r << 5) | b)] );
 	  }
 
 	return video_start_kaneko16_1xVIEW2(machine);

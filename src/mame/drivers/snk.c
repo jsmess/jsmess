@@ -4427,7 +4427,7 @@ static DRIVER_INIT( tdfever ){
 	snk_io = tdfever_io;
 	hard_flags = 0;
 	videoram = snk_rambase + 0x800;
-	snk_gamegroup = (!strcmp(Machine->gamedrv->name,"tdfeverj")) ? 5 : 3;
+	snk_gamegroup = (!strcmp(machine->gamedrv->name,"tdfeverj")) ? 5 : 3;
 	snk_irq_delay = 1000;
 }
 
@@ -4436,7 +4436,7 @@ static DRIVER_INIT( tdfever2 ){
 	snk_io = tdfever_io;
 	hard_flags = 0;
 	videoram = snk_rambase + 0x800;
-	snk_gamegroup = (!strcmp(Machine->gamedrv->name,"tdfeverj")) ? 5 : 3;
+	snk_gamegroup = (!strcmp(machine->gamedrv->name,"tdfeverj")) ? 5 : 3;
 	snk_irq_delay = 1000;
 }
 

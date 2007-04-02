@@ -21,11 +21,11 @@ static int flipscreen;
 PALETTE_INIT( wiping )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -117,15 +117,15 @@ VIDEO_UPDATE( wiping )
 				sy = 27 - sy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					videoram[offs],
 					colorram[offs] & 0x3f,
 					flipscreen,flipscreen,
 					sx*8,sy*8,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
         	}
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	/* Note, we're counting up on purpose ! */
 	/* This way the vacuum cleaner is always on top */
@@ -147,12 +147,12 @@ VIDEO_UPDATE( wiping )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			(spriteram[offs] & 0x3f) + 64 * otherbank,
 			spriteram[offs+1] & 0x3f,
 			flipx,flipy,
 			sx,sy,
-			&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0x1f);
+			&machine->screen[0].visarea,TRANSPARENCY_COLOR,0x1f);
 	}
 
 	/* redraw high priority chars */
@@ -187,12 +187,12 @@ VIDEO_UPDATE( wiping )
 				sy = 27 - sy;
 			}
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					videoram[offs],
 					colorram[offs] & 0x3f,
 					flipscreen,flipscreen,
 					sx*8,sy*8,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
         	}
 	}
 

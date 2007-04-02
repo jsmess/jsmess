@@ -182,7 +182,7 @@ VIDEO_UPDATE( bfcobra )
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			*dest++ = Machine->pens[*src++];
+			*dest++ = machine->pens[*src++];
 		}
 	}
 

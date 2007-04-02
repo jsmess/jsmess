@@ -31,7 +31,7 @@ VIDEO_UPDATE( spcforce )
 
 	/* draw the characters as sprites because they could be overlapping */
 
-	fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 
 	for (offs = 0; offs < videoram_size; offs++)
@@ -51,11 +51,11 @@ VIDEO_UPDATE( spcforce )
 			sy = 248 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				code, col,
 				flip_screen, flip_screen,
 				sx, sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

@@ -1460,9 +1460,17 @@ static void update_frameskip(void)
 
 static void recompute_speed(mame_time emutime)
 {
-	subseconds_t delta_emutime = mame_time_to_subseconds(sub_mame_times(emutime, global.speed_last_emutime));
+	subseconds_t delta_emutime;
+
+	/* if we don't have a starting time yet, or if we're paused, reset our starting point */
+	if (global.speed_last_realtime == 0 || mame_is_paused(Machine))
+	{
+		global.speed_last_realtime = osd_ticks();
+		global.speed_last_emutime = emutime;
+	}
 
 	/* if it has been more than the update interval, update the time */
+	delta_emutime = mame_time_to_subseconds(sub_mame_times(emutime, global.speed_last_emutime));
 	if (delta_emutime > SUBSECONDS_PER_SPEED_UPDATE)
 	{
 		osd_ticks_t realtime = osd_ticks();
@@ -1477,7 +1485,7 @@ static void recompute_speed(mame_time emutime)
 		global.speed_last_emutime = emutime;
 
 		/* if we're throttled, this time period counts for overall speed; otherwise, we reset the counter */
-		if (!global.fastforward && !mame_is_paused(Machine))
+		if (!global.fastforward)
 			global.overall_valid_counter++;
 		else
 			global.overall_valid_counter = 0;

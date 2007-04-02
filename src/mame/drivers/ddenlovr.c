@@ -149,7 +149,7 @@ VIDEO_START(ddenlovr)
 	for (i = 0; i < 8; i++)
 		pixmap[i] = auto_malloc(512*512);
 
-	framebuffer = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	framebuffer = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	extra_layers = 0;
 
@@ -1303,7 +1303,7 @@ if (code_pressed(KEYCODE_Z))
 	if (code_pressed_memory(KEYCODE_F)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	fillbitmap(framebuffer,dynax_bgcolor,&Machine->screen[0].visarea);
+	fillbitmap(framebuffer,dynax_bgcolor,&machine->screen[0].visarea);
 
 #ifdef MAME_DEBUG
 	if (code_pressed(KEYCODE_Z))
@@ -1343,10 +1343,10 @@ if (code_pressed(KEYCODE_Z))
 			pri = 0;
 		}
 
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][0]);
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][1]);
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][2]);
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][3]);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][0]);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][1]);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][2]);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][3]);
 
 	if (extra_layers)
 	{
@@ -1358,10 +1358,10 @@ if (code_pressed(KEYCODE_Z))
 			pri = 0;
 		}
 
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][0]+4);
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][1]+4);
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][2]+4);
-		copylayer(framebuffer,&Machine->screen[0].visarea,order[pri][3]+4);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][0]+4);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][1]+4);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][2]+4);
+		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][3]+4);
 	}
 
 	dynax_layer_enable = enab;

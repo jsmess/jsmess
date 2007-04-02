@@ -31,11 +31,11 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( gaplus )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -327,7 +327,7 @@ VIDEO_UPDATE( gaplus )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(gaplus_spriteram[0x1f7f-0x800] & 1);
 
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	starfield_render(bitmap);
 
@@ -348,8 +348,8 @@ VIDEO_EOF( gaplus )	/* update starfields */
 	int i;
 	int width, height;
 
-	width = Machine->screen[0].width;
-	height = Machine->screen[0].height;
+	width = machine->screen[0].width;
+	height = machine->screen[0].height;
 
 	/* check if we're running */
 	if ( ( gaplus_starfield_control[0] & 1 ) == 0 )

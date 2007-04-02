@@ -534,11 +534,11 @@ VIDEO_UPDATE( combasc )
 
 		clip = *cliprect;
 		clip.max_x = clip.min_x + 7;
-		fillbitmap(bitmap,Machine->pens[0],&clip);
+		fillbitmap(bitmap,machine->pens[0],&clip);
 
 		clip = *cliprect;
 		clip.min_x = clip.max_x - 7;
-		fillbitmap(bitmap,Machine->pens[0],&clip);
+		fillbitmap(bitmap,machine->pens[0],&clip);
 	}
 	return 0;
 }

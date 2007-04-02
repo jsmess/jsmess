@@ -129,7 +129,7 @@ PALETTE_INIT( madalien )
 {
 	int i, j, n, bit0, bit1, r, g, b;
 
-	n = Machine->drv->total_colors / 2;
+	n = machine->drv->total_colors / 2;
 
 	for (i = 0; i < n; i++)
 	{
@@ -235,17 +235,17 @@ VIDEO_START( madalien )
 
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
 
-	bg_tilemap_l_clip = Machine->screen[0].visarea;
-	bg_tilemap_l_clip.max_y = Machine->screen[0].height / 2;
+	bg_tilemap_l_clip = machine->screen[0].visarea;
+	bg_tilemap_l_clip.max_y = machine->screen[0].height / 2;
 
-	bg_tilemap_r_clip = Machine->screen[0].visarea;
-	bg_tilemap_r_clip.min_y = Machine->screen[0].height / 2;
+	bg_tilemap_r_clip = machine->screen[0].visarea;
+	bg_tilemap_r_clip.min_y = machine->screen[0].height / 2;
 
 	tilemap_set_flip(bg_tilemap_r, TILEMAP_FLIPY);
 
-	headlight_bitmap = auto_bitmap_alloc(128, 128, Machine->screen[0].format);
+	headlight_bitmap = auto_bitmap_alloc(128, 128, machine->screen[0].format);
 
-	flip_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	flip_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	madalien_bgram = auto_malloc(0x1000);	/* ficticiuos background RAM for empty tile */
 
@@ -285,9 +285,9 @@ VIDEO_UPDATE( madalien )
 	int i, yh, x, y, xp, yp, color;
 
 	for (i=0; i<256; i++)
-		decodechar(Machine->gfx[0], i, madalien_charram, Machine->drv->gfxdecodeinfo[0].gfxlayout);
+		decodechar(machine->gfx[0], i, madalien_charram, machine->drv->gfxdecodeinfo[0].gfxlayout);
 
-	decodechar(Machine->gfx[1], 16, madalien_bgram, Machine->drv->gfxdecodeinfo[1].gfxlayout); /* empty tile */
+	decodechar(machine->gfx[1], 16, madalien_bgram, machine->drv->gfxdecodeinfo[1].gfxlayout); /* empty tile */
 
 	tilemap_set_scrolly( bg_tilemap_l, 0, madalien_scroll_l );
 	tilemap_set_scrollx( bg_tilemap_l, 0, madalien_scroll_v );
@@ -303,7 +303,7 @@ VIDEO_UPDATE( madalien )
 	sect_rect(&clip, cliprect);
 	tilemap_draw(bitmap, &clip, bg_tilemap_r, 0, 0);
 
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 
 	/* Draw headlight area using lighter colors: */
 	if (madalien_headlight_on && (madalien_bg_map_selector & 1))
@@ -326,21 +326,21 @@ VIDEO_UPDATE( madalien )
 				{
 					xp = x;
 					yp = yh + y;
-					if( xp >= Machine->screen[0].visarea.min_x &&
-					    yp >= Machine->screen[0].visarea.min_y &&
-					    xp <= Machine->screen[0].visarea.max_x &&
-					    yp <= Machine->screen[0].visarea.max_y )
+					if( xp >= machine->screen[0].visarea.min_x &&
+					    yp >= machine->screen[0].visarea.min_y &&
+					    xp <= machine->screen[0].visarea.max_x &&
+					    yp <= machine->screen[0].visarea.max_y )
 					{
 						color = read_pixel(headlight_bitmap, x, y);
-						plot_pixel( bitmap, xp, yp, Machine->pens[color+8] );
+						plot_pixel( bitmap, xp, yp, machine->pens[color+8] );
 					}
 				}
 	};
 
 	/* Flip screen (cocktail mode): */
 	if (madalien_flip_screen) {
-		copybitmap(flip_bitmap, bitmap, 1, 1, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-		copybitmap(bitmap, flip_bitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(flip_bitmap, bitmap, 1, 1, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, flip_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	};
 	return 0;
 }

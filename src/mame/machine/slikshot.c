@@ -613,7 +613,7 @@ VIDEO_UPDATE( slikshot )
 	/* draw a crosshair (rotated) */
 	if (crosshair_vis)
 	{
-//      if ((Machine->gamedrv->flags & ORIENTATION_MASK) == ROT90)
+//      if ((machine->gamedrv->flags & ORIENTATION_MASK) == ROT90)
 //          draw_crosshair(bitmap, 256 - 48, (crosshair_min + crosshair_max) / 2 - (curxpos * (crosshair_max - crosshair_min) / 0x100), cliprect, 0);
 //      else
 //          draw_crosshair(bitmap, 48, (crosshair_min + crosshair_max) / 2 + (curxpos * (crosshair_max - crosshair_min) / 0x100), cliprect, 0);

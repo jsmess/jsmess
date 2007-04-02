@@ -80,13 +80,13 @@ struct dss_op_amp_osc_context
 	const double *r6;
 	const double *r7;
 	const double *r8;
-	int		flip_flop;		// flip/flop output state
-	int		flip_flopXOR;	// flip_flop ^ flip_flopXOR, 0 = discharge, 1 = charge
 	int		type;
-	int		is_squarewave;
+	UINT8	flip_flop;		// flip/flop output state
+	UINT8	flip_flopXOR;	// flip_flop ^ flip_flopXOR, 0 = discharge, 1 = charge
+	UINT8	is_squarewave;
+	double	high_out_V;
 	double	thresholdLow;	// falling threshold
 	double	thresholdHigh;	// rising threshold
-	double	iCharge[2];		// charge/discharge currents
 	double	vCap;			// current capacitor voltage
 	double	rTotal;			// all input resistors in parallel
 	double	iFixed;			// fixed current at the input
@@ -109,6 +109,8 @@ struct dss_schmitt_osc_context
 	double	rc;				// r*c
 	double	exponent;
 	int		state;			// state of the output
+	int		enable_type;
+	UINT8	input_is_voltage;
 };
 
 struct dss_sinewave_context
@@ -684,6 +686,11 @@ void dss_note_reset(node_description *node)
 #define DSS_OP_AMP_OSC__VMOD1	(*(node->input[1]))
 #define DSS_OP_AMP_OSC__VMOD2	(*(node->input[2]))
 
+/* The inputs on a norton op-amp are (info->vP - OP_AMP_NORTON_VBE) */
+/* which is the same as the output high voltage.  We will define them */
+/* the same to save a calculation step */
+#define DSS_OP_AMP_OSC_NORTON_VP_IN		context->high_out_V
+
 void dss_op_amp_osc_step(node_description *node)
 {
 	const discrete_op_amp_osc_info *info = node->custom;
@@ -695,6 +702,9 @@ void dss_op_amp_osc_step(node_description *node)
 	double dt;			// change in time
 	double vC;			// Current voltage on capacitor, before dt
 	double vCnext = 0;	// Voltage on capacitor, after dt
+	double iCharge[2];
+	UINT8 force_charge = 0;
+	UINT8 enable = DSS_OP_AMP_OSC__ENABLE;
 
 	dt = discrete_current_context->sample_time;	// Change in time
 	vC = context->vCap;	// Set to voltage before change
@@ -702,16 +712,23 @@ void dss_op_amp_osc_step(node_description *node)
 	/* work out the charge currents for the VCOs. */
 	switch (context->type)
 	{
+		case DISC_OP_AMP_OSCILLATOR_VCO_1:
+			/* Work out the charge rates. */
+			i = DSS_OP_AMP_OSC__VMOD1 * context->temp1;		// i is not a current.  It is being used as a temp variable.
+			iCharge[0] = (DSS_OP_AMP_OSC__VMOD1 - i) / info->r1;
+			iCharge[1] = (i - (DSS_OP_AMP_OSC__VMOD1 * context->temp2)) / context->temp3;
+			break;
+
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
 		{
+			/* resistors can be nodes, so everything needs updating */
 			double i1, i2;
 			/* Work out the charge rates. */
-			context->iCharge[0] = (info->vP - OP_AMP_NORTON_VBE) / *context->r1;
-			/* Output of the schmitt is vP - OP_AMP_NORTON_VBE */
-			context->iCharge[1] = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / *context->r2 - context->iCharge[0];
+			iCharge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r1;
+			iCharge[1] = (context->high_out_V - OP_AMP_NORTON_VBE) / *context->r2 - iCharge[0];
 			/* Work out the Inverting Schmitt thresholds. */
-			i1 = (info->vP - OP_AMP_NORTON_VBE) / *context->r5;
-			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / *context->r4;
+			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r5;
+			i2 = (context->high_out_V - OP_AMP_NORTON_VBE) / *context->r4;
 			context->thresholdLow = i1 * *context->r3 + OP_AMP_NORTON_VBE;
 			context->thresholdHigh = (i1 + i2) * *context->r3 + OP_AMP_NORTON_VBE;
 			break;
@@ -735,58 +752,92 @@ void dss_op_amp_osc_step(node_description *node)
 			}
 
 			/* Work out the charge rates. */
-			context->iCharge[0] = (v - OP_AMP_NORTON_VBE) / info->r1;
-			context->iCharge[1] = (v - OP_AMP_NORTON_VBE) / info->r2 - context->iCharge[0];
+			v -= OP_AMP_NORTON_VBE;
+			if (v < 0) v = 0;
+			iCharge[0] = v / info->r1;
+			iCharge[1] = v / info->r2 - iCharge[0];
+
+			/* use the real enable circuit */
+			force_charge = !enable;
+			enable = 1;
 			break;
 
-		case DISC_OP_AMP_OSCILLATOR_VCO_1:
+		case DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON:
 			/* Work out the charge rates. */
-			i = DSS_OP_AMP_OSC__VMOD1 * context->temp1;		// i is not a current.  It is being used as a temp variable.
-			context->iCharge[0] = (DSS_OP_AMP_OSC__VMOD1 - i) / info->r1;
-			context->iCharge[1] = (i - (DSS_OP_AMP_OSC__VMOD1 * context->temp2)) / context->temp3;
+			i = DSS_OP_AMP_OSC__VMOD1 / info->r1;
+			iCharge[0] = i - context->temp1;
+			iCharge[1] = context->temp2 - i;
+			/* if the negative pin current is less then the positive pin current, */
+			/* then the osc is disabled and the cap keeps charging */
+			if (iCharge[0] < 0)
+			{
+				force_charge = 1;
+				iCharge[0] *= -1;
+			}
+			break;
+
+		case DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON:
+			/* we need to mix any bias and all modulation voltages together. */
+			iCharge[0] = context->iFixed;
+			v = DSS_OP_AMP_OSC__VMOD1 - OP_AMP_NORTON_VBE;
+			if (v < 0) v = 0;
+			iCharge[0] += v / info->r1;
+			if (info->r6 != 0)
+			{
+				v = DSS_OP_AMP_OSC__VMOD2 - OP_AMP_NORTON_VBE;
+				if (v < 0) v = 0;
+				iCharge[0] += v / info->r6;
+			}
+			iCharge[1] = context->temp1 - iCharge[0];
 			break;
 	}
 
-	if (DSS_OP_AMP_OSC__ENABLE)
+	if (enable)
 	{
+		int toggled = 0;
 		/* Keep looping until all toggling in time sample is used up. */
 		do
 		{
-			if (context->flip_flop ^ context->flip_flopXOR)
+			if ((context->flip_flop ^ context->flip_flopXOR) || force_charge)
 			{
 				/* Charging */
 				/* iC=C*dv/dt  works out to dv=iC*dt/C */
-				vCnext = vC + (context->iCharge[1] * dt / info->c);
+				vCnext = vC + (iCharge[1] * dt / info->c);
 				dt = 0;
 
 				/* has it charged past upper limit? */
-				if (vCnext >= context->thresholdHigh)
+				if (vCnext > context->thresholdHigh)
 				{
-					if (vCnext > context->thresholdHigh)
+					context->flip_flop = context->flip_flopXOR;
+					toggled++;
+					if (force_charge)
+					{
+						/* we need to keep charging the cap to the max thereby disabling the circuit */
+						if (vCnext > context->high_out_V)
+							vCnext = context->high_out_V;
+					}
+					else
 					{
 						/* calculate the overshoot time */
-						dt = info->c * (vCnext - context->thresholdHigh) / context->iCharge[1];
+						dt = info->c * (vCnext - context->thresholdHigh) / iCharge[1];
+						vC = context->thresholdHigh;
 					}
-					vC = context->thresholdHigh;
-					context->flip_flop = !context->flip_flop;
 				}
 			}
 			else
 			{
 				/* Discharging */
-				vCnext = vC - (context->iCharge[0] * dt / info->c);
+				vCnext = vC - (iCharge[0] * dt / info->c);
 				dt = 0;
 
 				/* has it discharged past lower limit? */
-				if (vCnext <= context->thresholdLow)
+				if (vCnext < context->thresholdLow)
 				{
-					if (vCnext < context->thresholdLow)
-					{
-						/* calculate the overshoot time */
-						dt = info->c * (context->thresholdLow - vCnext) / context->iCharge[0];
-					}
+					context->flip_flop = !context->flip_flopXOR;
+					toggled++;
+					/* calculate the overshoot time */
+					dt = info->c * (context->thresholdLow - vCnext) / iCharge[0];
 					vC = context->thresholdLow;
-					context->flip_flop = !context->flip_flop;
 				}
 			}
 		} while(dt);
@@ -794,28 +845,22 @@ void dss_op_amp_osc_step(node_description *node)
 		context->vCap = vCnext;
 
 		if (context->is_squarewave)
-			node->output = (info->vP - (context->type == DISC_OP_AMP_OSCILLATOR_VCO_1) ? OP_AMP_VP_RAIL_OFFSET : OP_AMP_NORTON_VBE) * context->flip_flop;
+		{
+			if (toggled == 2)
+				/* Some oscillators have rapid rise or fall times causing 1 part of the */
+				/* squarewave to happen in the sample time causing it to be missed. */
+				/* If we toggle 2 states we force the missed output for 1 sample. */
+				/* If more then 2 states happen, there is no hope, the sample rate is just too low. */
+				node->output = context->high_out_V * (context->flip_flop ? 0 : 1);
+			else
+				node->output = context->high_out_V * context->flip_flop;
+		}
 		else
 			node->output = context->vCap;
 	}
 	else
 	{
-		/* we are disabled */
-		if (context->type & DISC_OP_AMP_OSCILLATOR_VCO_MASK)
-		{
-			context->flip_flop = (context->type == DISC_OP_AMP_OSCILLATOR_VCO_1) ? 1 : 0;
-			/* if we get disabled, then the cap keeps discharging to 0. */
-			if (context->is_squarewave)
-				node->output = 0;
-			else
-			{
-				context->vCap = vC - (context->iCharge[0] * dt / info->c);
-				if (context->vCap < 0) context->vCap = 0;
-				node->output = context->vCap;
-			}
-		}
-		else
-			/* we will just output 0 for the regular oscilators because they have no real disable. */
+			/* we will just output 0 for oscillators that have no real enable. */
 			node->output = 0;
 	}
 }
@@ -848,41 +893,11 @@ void dss_op_amp_osc_reset(node_description *node)
 		r_context_ptr++;
 	}
 
-	context->is_squarewave = (info->type & DISC_OP_AMP_OSCILLATOR_OUT_SQW) * (info->vP - OP_AMP_NORTON_VBE);
+	context->is_squarewave = (info->type & DISC_OP_AMP_OSCILLATOR_OUT_SQW);
 	context->type = info->type & DISC_OP_AMP_OSCILLATOR_TYPE_MASK;
 
 	switch (context->type)
 	{
-		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
-			/* Charges while FlipFlop High */
-			context->flip_flopXOR = 0;
-			/* There is no charge on the cap so the schmitt inverter goes high at init. */
-			context->flip_flop = 1;
-			break;
-
-		case DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON:
-			/* The charge rates vary depending on vMod so they are not precalculated. */
-			/* But we can precalculate the fixed currents. */
-			context->iFixed = 0;
-			if (info->r6 != 0) context->iFixed += info->vP / info->r6;
-			context->iFixed += OP_AMP_NORTON_VBE / info->r1;
-			context->iFixed += OP_AMP_NORTON_VBE / info->r2;
-			/* Work out the input resistance to be used later to calculate the Millman voltage. */
-			context->rTotal = 1.0 / info->r1 + 1.0 / info->r2 + 1.0 / info->r7;
-			if (info->r6) context->rTotal += 1.0 / info->r6;
-			if (info->r8) context->rTotal += 1.0 / info->r8;
-			context->rTotal = 1.0 / context->rTotal;
-			/* Charges while FlipFlop Low */
-			context->flip_flopXOR = 1;
-			/* Work out the Non-inverting Schmitt thresholds. */
-			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
-			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
-			context->thresholdLow = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
-			context->thresholdHigh = i1 * info->r3 + OP_AMP_NORTON_VBE;
-			/* There is no charge on the cap so the schmitt goes low at init. */
-			context->flip_flop = 0;
-			break;
-
 		case DISC_OP_AMP_OSCILLATOR_VCO_1:
 			/* The charge rates vary depending on vMod so they are not precalculated. */
 			/* Charges while FlipFlop High */
@@ -900,8 +915,71 @@ void dss_op_amp_osc_reset(node_description *node)
 			context->temp2 = info->r6 / (info->r1 + info->r6);			// voltage ratio across r6
 			context->temp3 = 1.0 / (1.0 / info->r1 + 1.0 / info->r6);	// input resistance when r6 switched in
 			break;
+
+		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
+			/* Charges while FlipFlop High */
+			context->flip_flopXOR = 0;
+			/* There is no charge on the cap so the schmitt inverter goes high at init. */
+			context->flip_flop = 1;
+			break;
+
+		case DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON:
+			/* Charges while FlipFlop Low */
+			context->flip_flopXOR = 1;
+			/* There is no charge on the cap so the schmitt goes low at init. */
+			context->flip_flop = 0;
+			/* The charge rates vary depending on vMod so they are not precalculated. */
+			/* But we can precalculate the fixed currents. */
+			context->iFixed = 0;
+			if (info->r6 != 0) context->iFixed += info->vP / info->r6;
+			context->iFixed += OP_AMP_NORTON_VBE / info->r1;
+			context->iFixed += OP_AMP_NORTON_VBE / info->r2;
+			/* Work out the input resistance to be used later to calculate the Millman voltage. */
+			context->rTotal = 1.0 / info->r1 + 1.0 / info->r2 + 1.0 / info->r7;
+			if (info->r6) context->rTotal += 1.0 / info->r6;
+			if (info->r8) context->rTotal += 1.0 / info->r8;
+			context->rTotal = 1.0 / context->rTotal;
+			/* Work out the Non-inverting Schmitt thresholds. */
+			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
+			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
+			context->thresholdLow = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
+			context->thresholdHigh = i1 * info->r3 + OP_AMP_NORTON_VBE;
+			break;
+
+		case DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON:
+			/* Charges while FlipFlop High */
+			context->flip_flopXOR = 0;
+			/* There is no charge on the cap so the schmitt inverter goes high at init. */
+			context->flip_flop = 1;
+			/* Work out the charge rates. */
+			context->temp1 = (info->vP - OP_AMP_NORTON_VBE) / info->r2;
+			context->temp2 = (info->vP - OP_AMP_NORTON_VBE) * (1.0 / info->r2 + 1.0 / info->r6);
+			/* Work out the Inverting Schmitt thresholds. */
+			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
+			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
+			context->thresholdLow = i1 * info->r3 + OP_AMP_NORTON_VBE;
+			context->thresholdHigh = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
+			break;
+
+		case DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON:
+			/* Charges while FlipFlop High */
+			context->flip_flopXOR = 0;
+			/* There is no charge on the cap so the schmitt inverter goes high at init. */
+			context->flip_flop = 1;
+			/* Work out the charge rates. */
+			/* The charge rates vary depending on vMod so they are not precalculated. */
+			/* But we can precalculate the fixed currents. */
+			if (info->r7 != 0) context->iFixed = (info->vP - OP_AMP_NORTON_VBE) / info->r7;
+			context->temp1 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r2;
+			/* Work out the Inverting Schmitt thresholds. */
+			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
+			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
+			context->thresholdLow = i1 * info->r3 + OP_AMP_NORTON_VBE;
+			context->thresholdHigh = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
+			break;
 	}
 
+	context->high_out_V = info->vP - ((context->type & DISC_OP_AMP_IS_NORTON) ? OP_AMP_NORTON_VBE : OP_AMP_VP_RAIL_OFFSET);
 	context->vCap = 0;
 
 	dss_op_amp_osc_step(node);
@@ -1008,24 +1086,20 @@ void dss_schmitt_osc_step(node_description *node)
          * use vGate as its voltage.  Note that ratioIn is just the ratio of the total
          * voltage and needs to be multipled by the input voltage.  ratioFeedback has
          * already been multiplied by vGate to save time because that voltage never changes. */
-		supply = (info->options & DISC_SCHMITT_OSC_IN_IS_VOLTAGE) ? context->ratioIn * DSS_SCHMITT_OSC__VIN : (DSS_SCHMITT_OSC__VIN ? context->ratioIn * info->vGate : 0);
+		supply = context->input_is_voltage ? context->ratioIn * DSS_SCHMITT_OSC__VIN : (DSS_SCHMITT_OSC__VIN ? context->ratioIn * info->vGate : 0);
 		supply += (context->state ? context->ratioFeedback : 0);
 		new_vCap = vCap + ((supply - vCap) * exponent);
 		if (context->state)
 		{
 			/* Charging */
 			/* has it charged past upper limit? */
-			if (new_vCap >= info->trshRise)
+			if (new_vCap > info->trshRise)
 			{
-				if (new_vCap > info->trshRise)
-				{
-					/* calculate the overshoot time */
-					t = context->rc * log(1.0 / (1.0 - ((new_vCap - info->trshRise) / (info->vGate - vCap))));
-					/* calculate new exponent because of reduced time */
-					exponent = 1.0 - exp(-t / context->rc);
-				}
-				vCap = info->trshRise;
-				new_vCap = info->trshRise;
+				/* calculate the overshoot time */
+				t = context->rc * log(1.0 / (1.0 - ((new_vCap - info->trshRise) / (info->vGate - vCap))));
+				/* calculate new exponent because of reduced time */
+				exponent = 1.0 - exp(-t / context->rc);
+				vCap = new_vCap = info->trshRise;
 				context->state = 0;
 			}
 		}
@@ -1033,17 +1107,13 @@ void dss_schmitt_osc_step(node_description *node)
 		{
 			/* Discharging */
 			/* has it discharged past lower limit? */
-			if (new_vCap <= info->trshFall)
+			if (new_vCap < info->trshFall)
 			{
-				if (new_vCap < info->trshFall)
-				{
-					/* calculate the overshoot time */
-					t = context->rc * log(1.0 / (1.0 - ((info->trshFall - new_vCap) / vCap)));
-					/* calculate new exponent because of reduced time */
-					exponent = 1.0 - exp(-t / context->rc);
-				}
-				vCap = info->trshFall;
-				new_vCap = info->trshFall;
+				/* calculate the overshoot time */
+				t = context->rc * log(1.0 / (1.0 - ((info->trshFall - new_vCap) / vCap)));
+				/* calculate new exponent because of reduced time */
+				exponent = 1.0 - exp(-t / context->rc);
+				vCap = new_vCap = info->trshFall;
 				context->state = 1;
 			}
 		}
@@ -1051,7 +1121,7 @@ void dss_schmitt_osc_step(node_description *node)
 
 	context->vCap = new_vCap;
 
-	switch (info->options & DISC_SCHMITT_OSC_ENAB_MASK)
+	switch (context->enable_type)
 	{
 		case DISC_SCHMITT_OSC_ENAB_IS_AND:
 			node->output = DSS_SCHMITT_OSC__ENABLE && context->state;
@@ -1066,7 +1136,7 @@ void dss_schmitt_osc_step(node_description *node)
 			node->output = !(DSS_SCHMITT_OSC__ENABLE || context->state);
 			break;
 	}
-	node->output = node->output * DSS_SCHMITT_OSC__AMP;
+	node->output *= DSS_SCHMITT_OSC__AMP;
 }
 
 void dss_schmitt_osc_reset(node_description *node)
@@ -1074,6 +1144,9 @@ void dss_schmitt_osc_reset(node_description *node)
 	const discrete_schmitt_osc_desc *info = node->custom;
 	struct dss_schmitt_osc_context *context = node->context;
 	double rSource;
+
+	context->enable_type = info->options & DISC_SCHMITT_OSC_ENAB_MASK;
+	context->input_is_voltage = (info->options & DISC_SCHMITT_OSC_IN_IS_VOLTAGE) ? 1 : 0;
 
 	/* The 2 resistors make a voltage divider, so their ratios add together
      * to make the charging voltage. */

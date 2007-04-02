@@ -35,6 +35,6 @@ VIDEO_START( blockade )
 
 VIDEO_UPDATE( blockade )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	return 0;
 }

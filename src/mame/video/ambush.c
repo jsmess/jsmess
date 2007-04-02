@@ -24,7 +24,7 @@ PALETTE_INIT( ambush )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors; i++)
+	for (i = 0;i < machine->drv->total_colors; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -103,7 +103,7 @@ VIDEO_UPDATE( ambush )
 	int offs;
 
 
-	fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 
 	/* Draw the background priority characters */
@@ -167,11 +167,11 @@ VIDEO_UPDATE( ambush )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
+		drawgfx(bitmap,machine->gfx[gfx],
 				code, col | ((*ambush_colorbank & 0x03) << 4),
 				flipx, flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 

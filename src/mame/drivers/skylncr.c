@@ -85,7 +85,7 @@ VIDEO_START( skylncr )
 
 VIDEO_UPDATE( skylncr )
 {
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	tilemap_draw(bitmap,cliprect, tmap2, 0, 0);
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;

@@ -835,7 +835,7 @@ static DRIVER_INIT( hyprduel )
 	blitter_bit = 2;
 	*hypr_irq_enable = 0xff;
 
-	int_num = strcmp(Machine->gamedrv->name, "magerror")?2:1;
+	int_num = strcmp(machine->gamedrv->name, "magerror")?2:1;
 }
 
 

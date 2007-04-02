@@ -19,16 +19,16 @@ VIDEO_UPDATE( beezer )
 	int x, y;
 
 	if (get_vh_global_attribute_changed())
-		for (y = Machine->screen[0].visarea.min_y; y <= Machine->screen[0].visarea.max_y; y+=2)
+		for (y = machine->screen[0].visarea.min_y; y <= machine->screen[0].visarea.max_y; y+=2)
 		{
-			for (x = Machine->screen[0].visarea.min_x; x <= Machine->screen[0].visarea.max_x; x++)
+			for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
 			{
-				plot_pixel (tmpbitmap, x, y+1, Machine->pens[videoram[0x80*y+x] & 0x0f]);
-				plot_pixel (tmpbitmap, x, y, Machine->pens[(videoram[0x80*y+x] >> 4)& 0x0f]);
+				plot_pixel (tmpbitmap, x, y+1, machine->pens[videoram[0x80*y+x] & 0x0f]);
+				plot_pixel (tmpbitmap, x, y, machine->pens[(videoram[0x80*y+x] >> 4)& 0x0f]);
 			}
 		}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

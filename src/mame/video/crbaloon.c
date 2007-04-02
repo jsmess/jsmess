@@ -30,11 +30,11 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( crbaloon )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int intensity,r,g,b;
 
@@ -102,7 +102,7 @@ VIDEO_START( crbaloon )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_flip_xy,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	state_save_register_global_array(spritectrl);
 	state_save_register_global(crbaloon_collision);
@@ -169,7 +169,7 @@ static void crbaloon_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( crbaloon )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	crbaloon_draw_sprites(bitmap);
 	return 0;
 }

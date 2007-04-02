@@ -157,9 +157,9 @@ VIDEO_START( exidy )
 	if (video_start_generic(machine))
 		return 1;
 
-	motion_object_1_vid = auto_bitmap_alloc(16, 16, Machine->screen[0].format);
-	motion_object_2_vid = auto_bitmap_alloc(16, 16, Machine->screen[0].format);
-	motion_object_2_clip = auto_bitmap_alloc(16, 16, Machine->screen[0].format);
+	motion_object_1_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
+	motion_object_2_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
+	motion_object_2_clip = auto_bitmap_alloc(16, 16, machine->screen[0].format);
 
 	return 0;
 }
@@ -370,7 +370,7 @@ VIDEO_EOF( exidy )
 {
 	UINT8 enable_set = ((sprite_enable & 0x20) != 0);
     static const rectangle clip = { 0, 15, 0, 15 };
-    int pen0 = Machine->pens[0];
+    int pen0 = machine->pens[0];
     int org_1_x = 0, org_1_y = 0;
     int org_2_x = 0, org_2_y = 0;
     int sx, sy;
@@ -397,7 +397,7 @@ VIDEO_EOF( exidy )
 	{
 		org_1_x = 236 - sprite1_xpos - 4;
 		org_1_y = 244 - sprite1_ypos - 4;
-		drawgfx(motion_object_1_vid, Machine->gfx[1],
+		drawgfx(motion_object_1_vid, machine->gfx[1],
 			(spriteno & 0x0f) + 16 * enable_set, 0,
 			0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
 	}
@@ -409,7 +409,7 @@ VIDEO_EOF( exidy )
 	{
 		org_2_x = 236 - sprite2_xpos - 4;
 		org_2_y = 244 - sprite2_ypos - 4;
-		drawgfx(motion_object_2_vid, Machine->gfx[1],
+		drawgfx(motion_object_2_vid, machine->gfx[1],
 			((spriteno >> 4) & 0x0f) + 32, 0,
 			0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
 	}
@@ -422,7 +422,7 @@ VIDEO_EOF( exidy )
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
-		drawgfx(motion_object_2_clip, Machine->gfx[1],
+		drawgfx(motion_object_2_clip, machine->gfx[1],
 			((spriteno >> 4) & 0x0f) + 32, 0,
 			0, 0, sx, sy, &clip, TRANSPARENCY_NONE, 0);
 	}
@@ -479,7 +479,7 @@ VIDEO_UPDATE( exidy )
 		sx = 236 - sprite2_xpos - 4;
 		sy = 244 - sprite2_ypos - 4;
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			((spriteno >> 4) & 0x0f) + 32, 1,
 			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 	}
@@ -494,7 +494,7 @@ VIDEO_UPDATE( exidy )
 
 		if (sy < 0) sy = 0;
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			(spriteno & 0x0f) + 16 * enable_set, 0,
 			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 	}

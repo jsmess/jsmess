@@ -49,8 +49,8 @@ static int flipscreen;
 PALETTE_INIT( mrdo )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	const int R1 = 150;
 	const int R2 = 120;
@@ -240,7 +240,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_UPDATE( mrdo )
 {
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	draw_sprites(bitmap,cliprect);

@@ -44,21 +44,21 @@ VIDEO_START( jedi )
 	memset(fgdirty, 1, videoram_size);
 
 	/* allocate an 8bpp bitmap for the raw foreground characters */
-	fgbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	fgbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* allocate an 8bpp bitmap for the motion objects */
-	mobitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	fillbitmap(mobitmap, 0, &Machine->screen[0].visarea);
+	mobitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	fillbitmap(mobitmap, 0, &machine->screen[0].visarea);
 
 	/* allocate dirty buffer for the background characters */
 	bgdirty = auto_malloc(jedi_backgroundram_size);
 	memset(bgdirty, 1, jedi_backgroundram_size);
 
 	/* the background area is 256x256, doubled by the hardware*/
-	bgbitmap = auto_bitmap_alloc(256, 256, Machine->screen[0].format);
+	bgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
 
 	/* the expanded background area is 512x512 */
-	bgexbitmap = auto_bitmap_alloc(512, 512, Machine->screen[0].format);
+	bgexbitmap = auto_bitmap_alloc(512, 512, machine->screen[0].format);
 
 	/* reserve color 1024 for black (disabled display) */
 	palette_set_color(machine, 1024, 0, 0, 0);
@@ -278,7 +278,7 @@ VIDEO_UPDATE( jedi )
 	/* if no video, clear it all to black */
 	if (video_off)
 	{
-		fillbitmap(bitmap, Machine->pens[1024], &Machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[1024], &machine->screen[0].visarea);
 		return 0;
 	}
 
@@ -298,8 +298,8 @@ VIDEO_UPDATE( jedi )
 
 			fgdirty[offs] = 0;
 
-			drawgfx(fgbitmap, Machine->gfx[0], videoram[offs] + jedi_alpha_bank,
-					0, 0, 0, 8*sx, 8*sy, &Machine->screen[0].visarea, TRANSPARENCY_NONE_RAW, 0);
+			drawgfx(fgbitmap, machine->gfx[0], videoram[offs] + jedi_alpha_bank,
+					0, 0, 0, 8*sx, 8*sy, &machine->screen[0].visarea, TRANSPARENCY_NONE_RAW, 0);
 		}
 
 	/* reset the expanded dirty array */
@@ -327,7 +327,7 @@ VIDEO_UPDATE( jedi )
 				bgexdirty[sy][1] = sx;
 			bgexdirty[sy][0] = sx;
 
-			drawgfx(bgbitmap, Machine->gfx[1], code,
+			drawgfx(bgbitmap, machine->gfx[1], code,
 					0, bank & 0x04, 0, 8*sx, 8*sy, 0, TRANSPARENCY_NONE_RAW, 0);
 		}
 
@@ -358,22 +358,22 @@ VIDEO_UPDATE( jedi )
 			code |= 1;
 
 		/* draw motion object */
-		drawgfx(mobitmap, Machine->gfx[2], code,
-				0, flipx, flipy, x, y, &Machine->screen[0].visarea, TRANSPARENCY_PEN_RAW, 0);
+		drawgfx(mobitmap, machine->gfx[2], code,
+				0, flipx, flipy, x, y, &machine->screen[0].visarea, TRANSPARENCY_PEN_RAW, 0);
 
 		/* handle double-height */
 		if (tall)
-			drawgfx(mobitmap, Machine->gfx[2], code - 1,
-					0, flipx, flipy, x, y - 16, &Machine->screen[0].visarea, TRANSPARENCY_PEN_RAW, 0);
+			drawgfx(mobitmap, machine->gfx[2], code - 1,
+					0, flipx, flipy, x, y - 16, &machine->screen[0].visarea, TRANSPARENCY_PEN_RAW, 0);
     }
 
 	/* compose the three layers */
 	{
 		int xscroll = -jedi_hscroll;
 		int yscroll = -jedi_vscroll;
-		copyscrollbitmap(bitmap, bgexbitmap, 1, &xscroll, 1, &yscroll, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-		copybitmap(bitmap, mobitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_BLEND_RAW, 4);
-		copybitmap(bitmap, fgbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_BLEND, 8);
+		copyscrollbitmap(bitmap, bgexbitmap, 1, &xscroll, 1, &yscroll, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, mobitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_BLEND_RAW, 4);
+		copybitmap(bitmap, fgbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_BLEND, 8);
 	}
 
 	/* erase the motion objects */

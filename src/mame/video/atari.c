@@ -751,7 +751,7 @@ VIDEO_START( atari )
 
 	/* reset the ANTIC color tables */
 	for( i = 0; i < 256; i ++ )
-        antic.color_lookup[i] = (Machine->pens[0] << 8) + Machine->pens[0];
+        antic.color_lookup[i] = (machine->pens[0] << 8) + machine->pens[0];
 
 	LOG(("atari cclk_init\n"));
     cclk_init();
@@ -764,7 +764,7 @@ VIDEO_START( atari )
 	LOG(("atari prio_init\n"));
     prio_init();
 
-	for( i = 0; i < Machine->screen[0].height; i++ )
+	for( i = 0; i < machine->screen[0].height; i++ )
     {
 		antic.video[i] = auto_malloc(sizeof(VIDEO));
 		memset(antic.video[i], 0, sizeof(VIDEO));

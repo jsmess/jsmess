@@ -197,7 +197,7 @@ VIDEO_UPDATE( crshrace )
 		return 0;
 	}
 
-	fillbitmap(bitmap,Machine->pens[0x1ff],cliprect);
+	fillbitmap(bitmap,machine->pens[0x1ff],cliprect);
 
 	switch (gfxctrl & 0xfb)
 	{

@@ -224,7 +224,7 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 
 VIDEO_UPDATE( balsente )
 {
-	pen_t *pens = &Machine->pens[palettebank_vis * 256];
+	pen_t *pens = &machine->pens[palettebank_vis * 256];
 	int y, i;
 
 	/* draw scanlines from the VRAM directly */

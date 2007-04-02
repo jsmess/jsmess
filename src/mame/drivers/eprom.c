@@ -69,6 +69,8 @@ static MACHINE_RESET( eprom )
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(0, eprom_scanline_update, 8);
 	atarijsa_reset();
+	atarigen_init_save_state();
+	state_save_register_global_pointer(sync_data, 2);
 }
 
 
@@ -586,7 +588,7 @@ static DRIVER_INIT( klaxp )
  *
  *************************************/
 
-GAME( 1989, eprom,  0,     eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", 0 )
-GAME( 1989, eprom2, eprom, eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", 0 )
-GAME( 1989, klaxp1, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 1)", 0 )
-GAME( 1989, klaxp2, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 2)", 0 )
+GAME( 1989, eprom,  0,     eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, eprom2, eprom, eprom, eprom, eprom, ROT0, "Atari Games", "Escape from the Planet of the Robot Monsters (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, klaxp1, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, klaxp2, klax,  klaxp, klaxp, klaxp, ROT0, "Atari Games", "Klax (prototype set 2)", GAME_SUPPORTS_SAVE )

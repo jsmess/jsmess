@@ -375,9 +375,9 @@ MACHINE_RESET( snes )
 	snes_init_ram();
 
 	/* Set STAT78 to NTSC or PAL */
-	if( SUBSECONDS_TO_HZ(Machine->screen[0].refresh) >= 59.0f )
+	if( SUBSECONDS_TO_HZ(machine->screen[0].refresh) >= 59.0f )
 		snes_ram[STAT78] = SNES_NTSC;
-	else /* if( Machine->screen[0].refresh == 50 ) */
+	else /* if( machine->screen[0].refresh == 50 ) */
 		snes_ram[STAT78] = SNES_PAL;
 
 	// reset does this to these registers

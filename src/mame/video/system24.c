@@ -41,7 +41,7 @@ VIDEO_UPDATE(system24)
 	sys24_tile_update();
 
 	fillbitmap(priority_bitmap, 0, 0);
-	fillbitmap(bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 
 	for(i=0; i<12; i++)
 		order[i] = i;

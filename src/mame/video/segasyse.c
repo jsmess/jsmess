@@ -83,7 +83,7 @@ VIDEO_UPDATE( segae )
 	/*- Draw from cache_bitmap to screen -*/
 
 	for (i = 0;i < 192;i++)
-		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&Machine->pens[segasyse_palettebase],15);
+		draw_scanline8(bitmap,0,i,256,&cache_bitmap[i * (16+256+16) +16],&machine->pens[segasyse_palettebase],15);
 	return 0;
 }
 

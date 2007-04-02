@@ -269,7 +269,7 @@ VIDEO_START( skyskipr )
 {
 	popeye_bitmapram = auto_malloc(popeye_bitmapram_size);
 
-	tmpbitmap2 = auto_bitmap_alloc(1024,1024,Machine->screen[0].format);	/* actually 1024x512 but not rolling over vertically? */
+	tmpbitmap2 = auto_bitmap_alloc(1024,1024,machine->screen[0].format);	/* actually 1024x512 but not rolling over vertically? */
 
 	bitmap_type = TYPE_SKYSKIPR;
 
@@ -285,7 +285,7 @@ VIDEO_START( popeye )
 {
 	popeye_bitmapram = auto_malloc(popeye_bitmapram_size);
 
-	tmpbitmap2 = auto_bitmap_alloc(512,512,Machine->screen[0].format);
+	tmpbitmap2 = auto_bitmap_alloc(512,512,machine->screen[0].format);
 
 	bitmap_type = TYPE_POPEYE;
 

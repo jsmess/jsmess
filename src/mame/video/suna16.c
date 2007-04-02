@@ -211,7 +211,7 @@ static void suna16_draw_sprites(mame_bitmap *bitmap)
 VIDEO_UPDATE( suna16 )
 {
 	/* Suna Quiz indicates the background is the last pen */
-	fillbitmap(bitmap,Machine->pens[0xff],cliprect);
+	fillbitmap(bitmap,machine->pens[0xff],cliprect);
 	suna16_draw_sprites(bitmap);
 	return 0;
 }

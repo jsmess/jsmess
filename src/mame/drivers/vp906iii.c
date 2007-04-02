@@ -66,7 +66,7 @@ static tilemap *bg_tilemap;
 
 PALETTE_INIT( vp906iii )
 {
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	int i;
 
@@ -77,7 +77,7 @@ PALETTE_INIT( vp906iii )
 	}
 
 #if 0
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 

@@ -23,8 +23,8 @@ static UINT8 *mjsister_videoram0, *mjsister_videoram1;
 
 VIDEO_START( mjsister )
 {
-	mjsister_tmpbitmap0 = auto_bitmap_alloc(256,256,Machine->screen[0].format);
-	mjsister_tmpbitmap1 = auto_bitmap_alloc(256,256,Machine->screen[0].format);
+	mjsister_tmpbitmap0 = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	mjsister_tmpbitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
 	mjsister_videoram0 = auto_malloc(0x8000);
 	mjsister_videoram1 = auto_malloc(0x8000);
 
@@ -101,13 +101,13 @@ VIDEO_UPDATE( mjsister )
 		for (i=0; i<256; i++)
 		{
 			for (j=0; j<4; j++)
-				plot_pixel(bitmap, 256+j, i, Machine->pens[mjsister_colorbank * 0x20] );
+				plot_pixel(bitmap, 256+j, i, machine->pens[mjsister_colorbank * 0x20] );
 		}
 
 		copybitmap(bitmap,mjsister_tmpbitmap0,f,f,0,0,cliprect,TRANSPARENCY_NONE,0);
 		copybitmap(bitmap,mjsister_tmpbitmap1,f,f,2,0,cliprect,TRANSPARENCY_PEN,0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), &Machine->screen[0].visarea);
+		fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
 	return 0;
 }

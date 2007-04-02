@@ -32,7 +32,7 @@ PALETTE_INIT( epos )
 {
 	int i;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -114,6 +114,6 @@ VIDEO_UPDATE( epos )
 			epos_videoram_w(offs, videoram[offs]);
 		}
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }

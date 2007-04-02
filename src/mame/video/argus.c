@@ -334,7 +334,7 @@ VIDEO_START( valtric )
 
 	tilemap_set_transparent_pen( bg1_tilemap, 15 );
 	tilemap_set_transparent_pen( tx_tilemap,  15 );
-	mosaicbitmap=auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	mosaicbitmap=auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	jal_blend_table = auto_malloc(0xc00);
 	memset(jal_blend_table,0,0xc00) ;
 
@@ -1554,7 +1554,7 @@ VIDEO_UPDATE( argus )
 	/* scroll BG0 and render tile at proper position */
 	argus_bg0_scroll_handle();
 
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 	argus_draw_sprites(bitmap, cliprect, 0);
@@ -1566,7 +1566,7 @@ VIDEO_UPDATE( argus )
 
 VIDEO_UPDATE( valtric )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	if(valtric_mosaic==0)
 	{
@@ -1580,19 +1580,19 @@ VIDEO_UPDATE( valtric )
 			UINT32 *dest;
 			int x,y,xx,yy;
 			if(valtric_mosaic<0)step*=-1;
-			for(y=0;y<Machine->screen[0].width+step;y+=step)
-				for(x=0;x<Machine->screen[0].height+step;x+=step)
+			for(y=0;y<machine->screen[0].width+step;y+=step)
+				for(x=0;x<machine->screen[0].height+step;x+=step)
 				{
 					static int c=0;
 
-					if(y<Machine->screen[0].height && x< Machine->screen[0].width)
+					if(y<machine->screen[0].height && x< machine->screen[0].width)
 					{
 						c=*BITMAP_ADDR32(mosaicbitmap, y, x);
 					}
 
 					if(valtric_mosaic<0)
 					{
-						if(y+step-1<Machine->screen[0].height && x+step-1< Machine->screen[0].width)
+						if(y+step-1<machine->screen[0].height && x+step-1< machine->screen[0].width)
 						{
 							c = *BITMAP_ADDR32(mosaicbitmap, y+step-1, x+step-1);
 						}
@@ -1600,7 +1600,7 @@ VIDEO_UPDATE( valtric )
 					for(yy=0;yy<step;yy++)
 					 for(xx=0;xx<step;xx++)
 					 {
-							if(xx+x < Machine->screen[0].width && yy+y<Machine->screen[0].height)
+							if(xx+x < machine->screen[0].width && yy+y<machine->screen[0].height)
 							{
 					 			dest=BITMAP_ADDR32(bitmap, y+yy, x+xx);
 								*dest=c;
@@ -1617,7 +1617,7 @@ VIDEO_UPDATE( valtric )
 
 VIDEO_UPDATE( butasan )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
@@ -1633,7 +1633,7 @@ VIDEO_UPDATE( butasan )
 
 VIDEO_UPDATE( bombsa )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 //  tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 //  valtric_draw_sprites(bitmap, cliprect);

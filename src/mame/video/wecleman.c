@@ -954,7 +954,7 @@ VIDEO_START( wecleman )
 	tilemap_set_scrolly(txt_tilemap, 0, -BMP_PAD );
 
 	// patches out a mysterious pixel floating in the sky (tile decoding bug?)
-	*(Machine->gfx[0]->gfxdata + (Machine->gfx[0]->char_modulo*0xaca+7)) = 0;
+	*(machine->gfx[0]->gfxdata + (machine->gfx[0]->char_modulo*0xaca+7)) = 0;
 
 	return 0;
 }
@@ -1027,7 +1027,7 @@ VIDEO_UPDATE ( wecleman )
 	int cloud_sx, cloud_sy;
 	int i, j, k;
 
-	mrct = Machine->remapped_colortable;
+	mrct = machine->remapped_colortable;
 
 	video_on = wecleman_irqctrl & 0x40;
 
@@ -1075,7 +1075,7 @@ VIDEO_UPDATE ( wecleman )
 
 		if (video_on) wecleman_draw_cloud(
 			bitmap,
-			Machine->gfx[0],
+			machine->gfx[0],
 			wecleman_pageram+0x1800,
 			BMP_PAD, BMP_PAD,
 			41, 20,

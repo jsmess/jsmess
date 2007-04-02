@@ -241,7 +241,7 @@ VIDEO_UPDATE( dleuro )
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
-			drawgfx(overlay_bitmap, Machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y, cliprect, TRANSPARENCY_NONE, 0);
+			drawgfx(overlay_bitmap, machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y, cliprect, TRANSPARENCY_NONE, 0);
 		}
 
 	/* update the overlay */
@@ -284,8 +284,8 @@ static MACHINE_START( dlair )
 static MACHINE_START( dleuro )
 {
 	/* initialize the CTC and SIO peripherals */
-	ctc_intf.baseclock = Machine->drv->cpu[0].cpu_clock;
-	sio_intf.baseclock = Machine->drv->cpu[0].cpu_clock;
+	ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
+	sio_intf.baseclock = machine->drv->cpu[0].cpu_clock;
 	z80ctc_init(0, &ctc_intf);
 	z80sio_init(0, &sio_intf);
 

@@ -56,9 +56,9 @@ static void gaelco3d_exit(running_machine *machine)
 
 VIDEO_START( gaelco3d )
 {
-	screenbits = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	screenbits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	zbuffer = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
 	palette = auto_malloc(32768 * sizeof(palette[0]));
 	polydata_buffer = auto_malloc(MAX_POLYDATA * sizeof(polydata_buffer[0]));

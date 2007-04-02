@@ -355,10 +355,10 @@ static void seta2_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_START( seta2 )
 {
-	Machine->gfx[2]->color_granularity = 16;
-	Machine->gfx[3]->color_granularity = 16;
-	Machine->gfx[4]->color_granularity = 16;
-	Machine->gfx[5]->color_granularity = 16;
+	machine->gfx[2]->color_granularity = 16;
+	machine->gfx[3]->color_granularity = 16;
+	machine->gfx[4]->color_granularity = 16;
+	machine->gfx[5]->color_granularity = 16;
 
 	buffered_spriteram16 = auto_malloc(spriteram_size);
 
@@ -377,7 +377,7 @@ VIDEO_START( seta2_offset )
 VIDEO_UPDATE( seta2 )
 {
 	/* Black or pens[0]? */
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	if (seta2_vregs[0x30/2] & 1)	return 0;		// BLANK SCREEN
 

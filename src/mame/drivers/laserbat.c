@@ -533,7 +533,7 @@ VIDEO_START( laserbat )
 	videoram = (UINT8 *)auto_malloc(0x400);
 	colorram = (UINT8 *)auto_malloc(0x400);
 
-	collision_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 
 	s2636_x_offset = -19;
 
@@ -549,7 +549,7 @@ VIDEO_UPDATE( laserbat )
 	Update_Bitmap(bitmap,s2636_3_ram,s2636_3_dirty,3,collision_bitmap);
 
 	if(sprite_info.enable)
-		drawgfx(bitmap,Machine->gfx[4],
+		drawgfx(bitmap,machine->gfx[4],
 		        sprite_info.code,
 				sprite_info.color,
 				0,0,

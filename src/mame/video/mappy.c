@@ -41,7 +41,7 @@ PALETTE_INIT( superpac )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -75,7 +75,7 @@ PALETTE_INIT( mappy )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -101,7 +101,7 @@ PALETTE_INIT( mappy )
 		colortable[i] = (color_prom[i^3] & 0x0f) + 0x10;
 
 	/* sprites */
-	for (i = 64*4;i < Machine->drv->color_table_len;i++)
+	for (i = 64*4;i < machine->drv->color_table_len;i++)
 		colortable[i] = color_prom[i] & 0x0f;
 }
 
@@ -120,10 +120,10 @@ PALETTE_INIT( mappy )
 PALETTE_INIT( phozon )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0; i < Machine->drv->total_colors; i++){
+	for (i = 0; i < machine->drv->total_colors; i++){
 		int bit0,bit1,bit2,bit3,r,g,b;
 
 		/* red component */
@@ -248,7 +248,7 @@ static void mappy_get_tile_info(int tile_index)
 VIDEO_START( superpac )
 {
 	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,TILEMAP_TRANSPARENT_COLOR,8,8,36,28);
-	sprite_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	tilemap_set_transparent_pen(bg_tilemap, 31);
 

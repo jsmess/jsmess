@@ -65,6 +65,6 @@ VIDEO_START( sichuan2 )
 
 VIDEO_UPDATE( sichuan2 )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	return 0;
 }

@@ -156,7 +156,7 @@ MACHINE_START( genesis )
 MACHINE_RESET( genesis )
 {
 	/* C2 doesn't have a Z80, so we can't just assume */
-	if (Machine->drv->cpu[1].cpu_type == CPU_Z80)
+	if (machine->drv->cpu[1].cpu_type == CPU_Z80)
 	{
 	    /* the following ensures that the Z80 begins without running away from 0 */
 		/* 0x76 is just a forced 'halt' as soon as the CPU is initially run */

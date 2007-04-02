@@ -1064,9 +1064,9 @@ VIDEO_START( nslasher )
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
-	sprite0_mix_bitmap=auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
-	sprite1_mix_bitmap=auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
-	tilemap_alpha_bitmap=auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	sprite0_mix_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	sprite1_mix_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	tilemap_alpha_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -1419,7 +1419,7 @@ VIDEO_UPDATE( fghthist )
 	/* Draw screen */
 	deco16_clear_sprite_priority_bitmap();
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[0x000],cliprect); // Palette index not confirmed
+	fillbitmap(bitmap,machine->pens[0x000],cliprect); // Palette index not confirmed
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,4);
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,16);
@@ -1614,7 +1614,7 @@ VIDEO_UPDATE( nslasher )
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(tilemap_alpha_bitmap,0,cliprect);
 	if ((deco32_pf34_control[5]&0x8000)==0)
-		fillbitmap(bitmap,Machine->pens[0x200],cliprect);
+		fillbitmap(bitmap,machine->pens[0x200],cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
 	nslasher_drawsprites(sprite0_mix_bitmap,buffered_spriteram32,3);
@@ -1651,7 +1651,7 @@ VIDEO_UPDATE( nslasher )
 		}
 	}
 
-	mixDualAlphaSprites(bitmap, Machine->gfx[3], Machine->gfx[4], alphaTilemap);
+	mixDualAlphaSprites(bitmap, machine->gfx[3], machine->gfx[4], alphaTilemap);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;

@@ -30,7 +30,7 @@ static tilemap *bg_tilemap, *fg_tilemap;
 PALETTE_INIT( timelimt ) {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -162,10 +162,10 @@ VIDEO_UPDATE( timelimt )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, scrollx);
 	tilemap_set_scrolly(bg_tilemap, 0, scrolly);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 
 	drawsprites( bitmap );
 
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 	return 0;
 }

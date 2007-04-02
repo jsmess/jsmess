@@ -43,7 +43,7 @@ PALETTE_INIT( nova2001 )
 	int i,j;
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int intensity,r,g,b;
 
@@ -201,8 +201,8 @@ static void nova2001_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( nova2001 )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	nova2001_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 	return 0;
 }

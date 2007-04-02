@@ -48,8 +48,8 @@ PALETTE_INIT( namcos86 )
 	int totcolors,totlookup;
 
 
-	totcolors = Machine->drv->total_colors;
-	totlookup = Machine->drv->color_table_len;
+	totcolors = machine->drv->total_colors;
+	totlookup = machine->drv->color_table_len;
 
 	for (i = 0;i < totcolors;i++)
 	{
@@ -373,7 +373,7 @@ VIDEO_UPDATE( namcos86 )
 
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	fillbitmap(bitmap,Machine->gfx[0]->colortable[8*backcolor+7],cliprect);
+	fillbitmap(bitmap,machine->gfx[0]->colortable[8*backcolor+7],cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{

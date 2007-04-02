@@ -306,9 +306,9 @@ VIDEO_START( liberatr )
     liberatr_planet_segs[1] = 0;
 
     /* allocate a tmpbitmap */
-    tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+    tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	liberatr_videoram = auto_malloc(Machine->screen[0].width * Machine->screen[0].height);
+	liberatr_videoram = auto_malloc(machine->screen[0].width * machine->screen[0].height);
 
 	/* allocate the planet descriptor structure */
 	liberatr_planet_segs[0] = auto_malloc(sizeof(Liberator_Planet));
@@ -386,9 +386,9 @@ VIDEO_UPDATE( liberatr )
 		UINT8 liberatr_x_save = *liberatr_x;
 
 		/* redraw bitmap */
-		for (*liberatr_y = Machine->screen[0].visarea.min_y; *liberatr_y < Machine->screen[0].visarea.max_y; (*liberatr_y)++)
+		for (*liberatr_y = machine->screen[0].visarea.min_y; *liberatr_y < machine->screen[0].visarea.max_y; (*liberatr_y)++)
 		{
-			for (*liberatr_x = Machine->screen[0].visarea.min_x; *liberatr_x < Machine->screen[0].visarea.max_x; (*liberatr_x)++)
+			for (*liberatr_x = machine->screen[0].visarea.min_x; *liberatr_x < machine->screen[0].visarea.max_x; (*liberatr_x)++)
 			{
 				liberatr_bitmap_xy_w(0, liberatr_bitmap_xy_r(0));
 			}
@@ -397,7 +397,7 @@ VIDEO_UPDATE( liberatr )
 		*liberatr_y = liberatr_y_save;
 		*liberatr_x = liberatr_x_save;
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	/* draw the planet */
 	liberatr_draw_planet(bitmap);

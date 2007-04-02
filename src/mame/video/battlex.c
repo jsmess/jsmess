@@ -119,7 +119,7 @@ static void battlex_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect 
 VIDEO_UPDATE(battlex)
 {
 	tilemap_set_scrollx(bg_tilemap, 0, battlex_scroll_lsb | (battlex_scroll_msb << 8));
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
-	battlex_drawsprites(bitmap, &Machine->screen[0].visarea);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	battlex_drawsprites(bitmap, &machine->screen[0].visarea);
 	return 0;
 }

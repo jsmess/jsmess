@@ -108,7 +108,7 @@ static VIDEO_UPDATE( alg )
 	if (!video_skip_this_frame())
 	{
 		mame_bitmap *vidbitmap;
-		rectangle fixedvis = Machine->screen[screen].visarea;
+		rectangle fixedvis = machine->screen[screen].visarea;
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 

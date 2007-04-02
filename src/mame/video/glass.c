@@ -136,7 +136,7 @@ VIDEO_START( glass )
 {
 	pant[0] = tilemap_create(get_tile_info_glass_screen0,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
 	pant[1] = tilemap_create(get_tile_info_glass_screen1,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
-	screen_bitmap = auto_bitmap_alloc (320, 200, Machine->screen[0].format);
+	screen_bitmap = auto_bitmap_alloc (320, 200, machine->screen[0].format);
 
 	tilemap_set_transparent_pen(pant[0],0);
 	tilemap_set_transparent_pen(pant[1],0);
@@ -207,7 +207,7 @@ VIDEO_UPDATE( glass )
 	tilemap_set_scrollx(pant[1], 0, glass_vregs[3]);
 
 	/* draw layers + sprites */
-	fillbitmap(bitmap, get_black_pen(machine), &Machine->screen[0].visarea);
+	fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
 	copybitmap(bitmap,screen_bitmap,0,0,0x18,0x24,cliprect,TRANSPARENCY_NONE,0);
 	tilemap_draw(bitmap,cliprect,pant[1],0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],0,0);

@@ -177,7 +177,7 @@ VIDEO_UPDATE( cbasebal )
 	if (bg_on)
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	else
-		fillbitmap(bitmap,Machine->pens[768],cliprect);
+		fillbitmap(bitmap,machine->pens[768],cliprect);
 
 	if (obj_on)
 		draw_sprites(bitmap,cliprect);

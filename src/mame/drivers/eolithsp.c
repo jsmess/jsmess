@@ -63,7 +63,7 @@ DRIVER_INIT( eolith_speedup )
 
 	while( eolith_speedup_table[ n_game ].s_name != NULL )
 	{
-		if( strcmp( Machine->gamedrv->name, eolith_speedup_table[ n_game ].s_name ) == 0 )
+		if( strcmp( machine->gamedrv->name, eolith_speedup_table[ n_game ].s_name ) == 0 )
 		{
 			eolith_speedup_address = eolith_speedup_table[ n_game ].speedup_address;
 			eolith_speedup_resume_scanline = eolith_speedup_table[ n_game ].speedup_resume_scanline;

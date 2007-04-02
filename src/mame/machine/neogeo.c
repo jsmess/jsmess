@@ -49,13 +49,13 @@ MACHINE_RESET( neogeo )
 
 	/* not ideal having these here, but they need to be checked every reset at least */
 	/* the rom banking is tied directly to the dipswitch?, or is there a bank write somewhere? */
-	if (!strcmp(Machine->gamedrv->name,"svcpcb"))
+	if (!strcmp(machine->gamedrv->name,"svcpcb"))
 	{
 		int harddip3 = readinputportbytag("HARDDIP")&1;
 		memcpy(memory_region( REGION_USER1 ),memory_region( REGION_USER1 )+0x20000+harddip3*0x20000, 0x20000);
 	}
 	/* a jumper pad on th PCB acts as a ROM overlay and is used to select the game language as opposed to the BIOS */
-	if (!strcmp(Machine->gamedrv->name,"kog"))
+	if (!strcmp(machine->gamedrv->name,"kog"))
 	{
 		int jumper = readinputportbytag("JUMPER");
 		memory_region(REGION_CPU1)[0x1FFFFC/2] = jumper;
@@ -153,7 +153,7 @@ DRIVER_INIT( neogeo )
 
 
 	/* irritating maze uses a trackball */
-	if (!strcmp(Machine->gamedrv->name,"irrmaze"))
+	if (!strcmp(machine->gamedrv->name,"irrmaze"))
 		neogeo_has_trackball = 1;
 	else
 		neogeo_has_trackball = 0;

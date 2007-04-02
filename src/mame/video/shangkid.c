@@ -182,16 +182,16 @@ VIDEO_UPDATE( shangkid )
 PALETTE_INIT( dynamski )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int data = color_prom[i] + 256 * color_prom[i+32];
 		palette_set_color(machine,i,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 	}
 
-	color_prom += 2*Machine->drv->total_colors;
+	color_prom += 2*machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup table */
 
 	/* sprites */

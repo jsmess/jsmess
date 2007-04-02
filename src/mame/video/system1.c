@@ -120,7 +120,7 @@ VIDEO_START( system1 )
 	bg_dirtybuffer = auto_malloc(1024);
 	memset(bg_dirtybuffer,1,1024);
 
-	tmp_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmp_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	state_save_register_func_postload(system1_postload);
 	state_save_register_global(system1_background_memory);
@@ -141,7 +141,7 @@ VIDEO_START( wbml )
 	wbml_paged_videoram = auto_malloc(0x4000);	/* Allocate 16k for background banked ram */
 	memset(wbml_paged_videoram,0,0x4000);
 
-	tmp_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmp_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	system1_sprite_xoffset = 1+7*2;
 
@@ -537,7 +537,7 @@ VIDEO_UPDATE( system1 )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 	return 0;
 }
 
@@ -678,7 +678,7 @@ VIDEO_UPDATE( choplifter )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 
 #ifdef MAME_DEBUG
@@ -809,7 +809,7 @@ VIDEO_UPDATE( wbml )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 	return 0;
 }
 
@@ -879,7 +879,7 @@ VIDEO_UPDATE( ufosensi )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 	return 0;
 }
 
@@ -900,7 +900,7 @@ VIDEO_UPDATE( blockgal )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 	blockgal_kludgeoffset = 0;
 	return 0;

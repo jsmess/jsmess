@@ -65,8 +65,8 @@ VIDEO_START( pang )
 	/*
         Palette RAM
     */
-	paletteram = auto_malloc(2*Machine->drv->total_colors);
-	memset(paletteram, 0, 2*Machine->drv->total_colors);
+	paletteram = auto_malloc(2*machine->drv->total_colors);
+	memset(paletteram, 0, 2*machine->drv->total_colors);
 
 	return 0;
 }
@@ -289,7 +289,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_UPDATE( pang )
 {
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(bitmap,cliprect);
 	return 0;

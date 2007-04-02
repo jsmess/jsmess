@@ -29,7 +29,7 @@ PALETTE_INIT( 1943 )
 {
 	int i;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -40,24 +40,24 @@ PALETTE_INIT( 1943 )
 
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
 
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + 2*Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + 2*machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[i + 2*machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[i + 2*machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[i + 2*machine->drv->total_colors] >> 3) & 0x01;
 
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine, i, r, g, b);
 	}
 
-	color_prom += 3*Machine->drv->total_colors;
+	color_prom += 3*machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup table */
 
 	/* characters use colors 64-79 */
@@ -69,7 +69,7 @@ PALETTE_INIT( 1943 )
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
 		/* color 0 MUST map to pen 0 in order for transparency to work */
-		if (i % Machine->gfx[1]->color_granularity == 0)
+		if (i % machine->gfx[1]->color_granularity == 0)
 			COLOR(1,i) = 0;
 		else
 			COLOR(1,i) = color_prom[0] + 16 * (color_prom[256] & 0x03);

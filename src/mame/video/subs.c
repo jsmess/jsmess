@@ -83,14 +83,14 @@ VIDEO_UPDATE( subs )
 		{
 			if ((left_enable || left_sonar_window) && (!right_sonar_window))
 			{
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						charcode, 1,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
 			}
 			else
 			{
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						0, 1,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
@@ -102,14 +102,14 @@ VIDEO_UPDATE( subs )
 		{
 			if ((right_enable || right_sonar_window) && (!left_sonar_window))
 			{
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						charcode, 0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
 			}
 			else
 			{
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						0, 0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
@@ -141,7 +141,7 @@ VIDEO_UPDATE( subs )
 		{
 			if ((offs!=0) || (sub_enable))
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,
@@ -155,7 +155,7 @@ VIDEO_UPDATE( subs )
 		{
 			if ((offs!=1) || (sub_enable))
 			{
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,

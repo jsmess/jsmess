@@ -331,7 +331,7 @@ static void register_savestate(void)
 
 VIDEO_START( neogeo_mvs )
 {
-	no_of_tiles=Machine->gfx[2]->total_elements;
+	no_of_tiles=machine->gfx[2]->total_elements;
 	if (no_of_tiles>0x10000) high_tile=1; else high_tile=0;
 	if (no_of_tiles>0x20000) vhigh_tile=1; else vhigh_tile=0;
 	if (no_of_tiles>0x40000) vvhigh_tile=1; else vvhigh_tile=0;
@@ -799,7 +799,7 @@ VIDEO_UPDATE( neogeo )
 	char fullmode = 0;
 	int scan;
 
-	fillbitmap(bitmap,Machine->pens[4095],cliprect);
+	fillbitmap(bitmap,machine->pens[4095],cliprect);
 
 	for (scan = cliprect->min_y; scan <= cliprect->max_y ; scan++)
 	{

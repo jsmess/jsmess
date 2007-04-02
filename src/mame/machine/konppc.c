@@ -22,6 +22,18 @@ static UINT32 pci_bridge_enable[MAX_CG_BOARDS];
 static UINT32 nwk_device_sel[MAX_CG_BOARDS];
 static int texture_bank[MAX_CG_BOARDS];
 
+static int nwk_fifo_half_full_r;
+static int nwk_fifo_half_full_w;
+static int nwk_fifo_full;
+static int nwk_fifo_mask;
+
+
+static UINT32 *nwk_fifo[MAX_CG_BOARDS];
+static int nwk_fifo_read_ptr[MAX_CG_BOARDS];
+static int nwk_fifo_write_ptr[MAX_CG_BOARDS];
+
+static UINT32 *nwk_ram[MAX_CG_BOARDS];
+
 /*****************************************************************************/
 
 void init_konami_cgboard(int num_boards, int type)
@@ -37,8 +49,31 @@ void init_konami_cgboard(int num_boards, int type)
 
 		dsp_state[i] = 0x80;
 		texture_bank[i] = -1;
+
+		pci_bridge_enable[i] = 0;
+		nwk_device_sel[i] = 0;
+		nwk_fifo_read_ptr[i] = 0;
+		nwk_fifo_write_ptr[i] = 0;
+
+		nwk_fifo[i] = auto_malloc(sizeof(UINT32) * 0x800);
+		nwk_ram[i] = auto_malloc(sizeof(UINT32) * 0x2000);
 	}
 	cgboard_type = type;
+
+	if (type == CGBOARD_TYPE_NWKTR)
+	{
+		nwk_fifo_half_full_r = 0x100;
+		nwk_fifo_half_full_w = 0xff;
+		nwk_fifo_full = 0x1ff;
+		nwk_fifo_mask = 0x1ff;
+	}
+	if (type == CGBOARD_TYPE_HANGPLT)
+	{
+		nwk_fifo_half_full_r = 0x3ff;
+		nwk_fifo_half_full_w = 0x400;
+		nwk_fifo_full = 0x7ff;
+		nwk_fifo_mask = 0x7ff;
+	}
 }
 
 void set_cgboard_id(int board_id)
@@ -203,17 +238,19 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 		}
 
 		case CGBOARD_TYPE_NWKTR:
+		case CGBOARD_TYPE_HANGPLT:
 		{
-			nwk_device_sel[board] = data;
-
-			if (data & 0x01)
-			{
-				cpuintrf_push_context((board == 0) ? 2 : 3);
-				sharc_set_flag_input(1, ASSERT_LINE);
-				cpuintrf_pop_context();
-			}
 			if (offset == 1)
 			{
+				nwk_device_sel[board] = data;
+
+				if (data & 0x01)
+				{
+					cpuintrf_push_context((board == 0) ? 2 : 3);
+					sharc_set_flag_input(1, ASSERT_LINE);
+					cpuintrf_pop_context();
+				}
+
 				if (texture_bank[board] != -1)
 				{
 					int offset = (data & 0x08) ? 1 : 0;
@@ -315,16 +352,12 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 
 /*****************************************************************************/
 
-static UINT32 nwk_fifo[2][0x800];
-static int nwk_fifo_read_ptr[2] = {0, 0};
-static int nwk_fifo_write_ptr[2] = {0, 0};
-
 UINT32 nwk_fifo_r(int board)
 {
 	int cpu = (board == 0) ? 2 : 3;
 	UINT32 data;
 
-	if (nwk_fifo_read_ptr[board] < 0x3ff)
+	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
 		cpuintrf_push_context(cpu);
 		sharc_set_flag_input(1, CLEAR_LINE);
@@ -337,7 +370,7 @@ UINT32 nwk_fifo_r(int board)
 		cpuintrf_pop_context();
 	}
 
-	if (nwk_fifo_read_ptr[board] < 0x7ff)
+	if (nwk_fifo_read_ptr[board] < nwk_fifo_full)
 	{
 		cpuintrf_push_context(cpu);
 		sharc_set_flag_input(2, ASSERT_LINE);
@@ -352,7 +385,7 @@ UINT32 nwk_fifo_r(int board)
 
 	data = nwk_fifo[board][nwk_fifo_read_ptr[board]];
 	nwk_fifo_read_ptr[board]++;
-	nwk_fifo_read_ptr[board] &= 0x7ff;
+	nwk_fifo_read_ptr[board] &= nwk_fifo_mask;
 
 	return data;
 }
@@ -361,7 +394,7 @@ void nwk_fifo_w(int board, UINT32 data)
 {
 	int cpu = (board == 0) ? 2 : 3;
 
-	if (nwk_fifo_write_ptr[board] < 0x400)
+	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
 		cpuintrf_push_context(cpu);
 		sharc_set_flag_input(1, ASSERT_LINE);
@@ -380,7 +413,7 @@ void nwk_fifo_w(int board, UINT32 data)
 
 	nwk_fifo[board][nwk_fifo_write_ptr[board]] = data;
 	nwk_fifo_write_ptr[board]++;
-	nwk_fifo_write_ptr[board] &= 0x7ff;
+	nwk_fifo_write_ptr[board] &= nwk_fifo_mask;
 }
 
 /*****************************************************************************/
@@ -389,9 +422,18 @@ void nwk_fifo_w(int board, UINT32 data)
 
 #define MAX_K033906_CHIPS	2
 
-static UINT32 K033906_reg[MAX_K033906_CHIPS][256];
+static UINT32 *K033906_reg[MAX_K033906_CHIPS];
+static UINT32 *K033906_ram[MAX_K033906_CHIPS];
 
-static UINT32 K033906_ram[MAX_K033906_CHIPS][32768];
+void K033906_init(void)
+{
+	int i;
+	for (i=0; i < MAX_K033906_CHIPS; i++)
+	{
+		K033906_reg[i] = auto_malloc(sizeof(UINT32) * 256);
+		K033906_ram[i] = auto_malloc(sizeof(UINT32) * 32768);
+	}
+}
 
 static UINT32 K033906_r(int chip, int reg)
 {
@@ -519,8 +561,6 @@ WRITE32_HANDLER(K033906_1_w)
 
 /*****************************************************************************/
 
-static UINT32 nwk_ram[2][0x2000];
-
 WRITE32_HANDLER(nwk_fifo_0_w)
 {
 	if (nwk_device_sel[0] & 0x01)
@@ -568,6 +608,40 @@ READ32_HANDLER(nwk_voodoo_1_r)
 	else
 	{
 		return voodoo_1_r(offset, mem_mask);
+	}
+}
+
+WRITE32_HANDLER(nwk_voodoo_0_w)
+{
+	if (nwk_device_sel[0] & 0x01)
+	{
+		nwk_fifo_w(0, data);
+	}
+	else if (nwk_device_sel[0] & 0x02)
+	{
+		int addr = ((offset >> 8) << 9) | (offset & 0xff);
+		nwk_ram[0][addr] = data;
+	}
+	else
+	{
+		voodoo_0_w(offset, data, mem_mask);
+	}
+}
+
+WRITE32_HANDLER(nwk_voodoo_1_w)
+{
+	if (nwk_device_sel[1] & 0x01)
+	{
+		nwk_fifo_w(1, data);
+	}
+	else if (nwk_device_sel[1] & 0x02)
+	{
+		int addr = ((offset >> 8) << 9) | (offset & 0xff);
+		nwk_ram[1][addr] = data;
+	}
+	else
+	{
+		voodoo_1_w(offset, data, mem_mask);
 	}
 }
 

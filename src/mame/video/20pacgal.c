@@ -52,7 +52,7 @@ PALETTE_INIT( 20pacgal )
 
 VIDEO_START( 20pacgal )
 {
-	chr_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	chr_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	return 0;
 }
@@ -175,7 +175,7 @@ VIDEO_UPDATE( 20pacgal )
 
 			if (active_game)
 			{
-				drawgfx(chr_bitmap,Machine->gfx[0],
+				drawgfx(chr_bitmap,machine->gfx[0],
 						pacgal_videoram2[y*32 + x] + 0xa00,
 						(pacgal_videoram2[0x400 + y*32 + x] & 0x3f) * 4,
 						0,0,
@@ -184,7 +184,7 @@ VIDEO_UPDATE( 20pacgal )
 			}
 			else
 			{
-				drawgfx(chr_bitmap,Machine->gfx[0],
+				drawgfx(chr_bitmap,machine->gfx[0],
 						pacgal_videoram[y*32 + x] + 0xa00,
 						(pacgal_videoram[0x400 + y*32 + x] & 0x3f) * 4,
 						0,0,

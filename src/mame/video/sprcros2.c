@@ -14,7 +14,7 @@ PALETTE_INIT( sprcros2 )
 {
 	int i,bit0,bit1,bit2,r,g,b;
 
-	for (i = 0;i < Machine->drv->total_colors; i++)
+	for (i = 0;i < machine->drv->total_colors; i++)
 	{
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;

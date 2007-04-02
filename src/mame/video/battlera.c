@@ -34,8 +34,8 @@ VIDEO_START( battlera )
 	memset(sprite_dirty,1,0x400);
 	memset(vram_dirty,1,0x1000);
 
-	tile_bitmap=auto_bitmap_alloc(512,512,Machine->screen[0].format);
-	front_bitmap=auto_bitmap_alloc(512,512,Machine->screen[0].format);
+	tile_bitmap=auto_bitmap_alloc(512,512,machine->screen[0].format);
+	front_bitmap=auto_bitmap_alloc(512,512,machine->screen[0].format);
 
 	vram_ptr=0;
 	inc_value=1;

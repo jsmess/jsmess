@@ -35,6 +35,8 @@
  * DST_SWITCH            - Switch implementation
  * DST_ASWITCH           - Analog switch
  * DST_TRANSFORM         - Multiple math functions
+ * DST_OP_AMP            - Op Amp circuits
+ * DST_OP_AMP_1SHT       - Op Amp One Shot
  * DST_TVCA_OP_AMP       - Triggered op amp voltage controlled amplifier
  *
  ************************************************************************/
@@ -101,6 +103,29 @@ struct dst_samphold_context
 struct dst_size_context
 {
 	int size;
+};
+
+struct dst_op_amp_context
+{
+	UINT8	has_cap;
+	UINT8	has_r1;
+	UINT8	has_r4;
+	double	vMax;
+	double	iFixed;
+	double	vCap;
+	double	exponent;
+};
+
+struct dst_op_amp_1sht_context
+{
+	double	iFixed;
+	double	vMax;
+	double	r34ratio;
+	double	vCap1;
+	double	vCap2;
+	double	exponent1c;
+	double	exponent1d;
+	double	exponent2;
 };
 
 struct dst_tvca_op_amp_context
@@ -548,7 +573,7 @@ void dst_integrate_reset(node_description *node)
 	{
 		context->vMaxOut = info->vP - OP_AMP_NORTON_VBE;
 		context->vMaxIn  = info->v1 - OP_AMP_NORTON_VBE;
-		context->vMaxInD = context->vMaxIn - 0.6;
+		context->vMaxInD = context->vMaxIn - OP_AMP_NORTON_VBE;
 	}
 	else
 	{
@@ -1621,7 +1646,184 @@ void dst_transform_step(node_description *node)
 
 /************************************************************************
  *
- * DST_TVCA_OP_AMP - Programmable math module with enable function
+ * DST_OP_AMP - op amp circuits
+ *
+ * input[0] - Enable
+ * input[1] - Input 0
+ * input[2] - Input 1
+ *
+ * also passed discrete_op_amp_info structure
+ *
+ * Mar 2007, D Renaud.
+ ************************************************************************/
+#define DST_OP_AMP__ENABLE	(*(node->input[0]))
+#define DST_OP_AMP__INP0	(*(node->input[1]))
+#define DST_OP_AMP__INP1	(*(node->input[2]))
+
+void dst_op_amp_step(node_description *node)
+{
+	const discrete_op_amp_info *info = node->custom;
+	struct dst_op_amp_context *context = node->context;
+
+	double iPos = 0;
+	double iNeg = 0;
+	double i = 0;
+
+	if (DST_OP_AMP__ENABLE)
+	{
+		switch (info->type)
+		{
+			case DISC_OP_AMP_IS_NORTON:
+				/* work out neg pin current */
+				if  (context->has_r1)
+				{
+					iNeg = (DST_OP_AMP__INP0 - OP_AMP_NORTON_VBE) / info->r1;
+					if (iNeg < 0) iNeg = 0;
+				}
+				iNeg += context->iFixed;
+
+				/* work out neg pin current */
+				iPos = (DST_OP_AMP__INP1 - OP_AMP_NORTON_VBE) / info->r2;
+				if (iPos < 0) iPos = 0;
+
+				/* work out current across r4 */
+				i = iPos - iNeg;
+
+				if (context->has_cap)
+				{
+					if (context->has_r4)
+					{
+						/* voltage across r4 charging cap */
+						i *= info->r4;
+						/* exponential charge */
+						context->vCap += (i - context->vCap) * context->exponent;
+					}
+					else
+						/* linear charge */
+						context->vCap += i / context->exponent;
+					node->output = context->vCap;
+				}
+				else
+					node->output = i * info->r4;
+
+				/* clamp output */
+				if (node->output > context->vMax) node->output = context->vMax;
+				else if (node->output < info->vN) node->output = info->vN;
+				context->vCap = node->output;
+				break;
+
+			default:
+				node->output = 0;
+		}
+	}
+	else
+		node->output = 0;
+}
+
+void dst_op_amp_reset(node_description *node)
+{
+	const discrete_op_amp_info *info = node->custom;
+	struct dst_op_amp_context *context = node->context;
+
+	context->has_r1 = info->r1 > 0;
+	context->has_r4 = info->r4 > 0;
+
+	context->vMax = info->vP - OP_AMP_NORTON_VBE;
+
+	context->vCap = 0;
+	if (info->c > 0)
+	{
+		context->has_cap = 1;
+		/* Setup filter constants */
+		if (context->has_r4)
+		{
+			/* exponential charge */
+			context->exponent = -1.0 / (info->r4 * info->c  * discrete_current_context->sample_rate);
+			context->exponent = 1.0 - exp(context->exponent);
+		}
+		else
+			/* linear charge */
+			context->exponent = discrete_current_context->sample_rate * info->c;
+	}
+
+	if (info->r3 >= 0)
+		context->iFixed = (info->vP - OP_AMP_NORTON_VBE) / info->r3;
+}
+
+
+/************************************************************************
+ *
+ * DST_OP_AMP_1SHT - op amp one shot circuits
+ *
+ * input[0] - Trigger
+ *
+ * also passed discrete_op_amp_1sht_info structure
+ *
+ * Mar 2007, D Renaud.
+ ************************************************************************/
+#define DST_OP_AMP_1SHT__TRIGGER	(*(node->input[0]))
+
+void dst_op_amp_1sht_step(node_description *node)
+{
+	const discrete_op_amp_1sht_info *info = node->custom;
+	struct dst_op_amp_1sht_context *context = node->context;
+
+	double iPos;
+	double iNeg;
+	double v;
+
+	/* update trigger circuit */
+	iPos = (DST_OP_AMP_1SHT__TRIGGER - context->vCap2) / info->r2;
+	iPos += node->output / info->r5;
+	context->vCap2 += (DST_OP_AMP_1SHT__TRIGGER - context->vCap2) * context->exponent2;
+
+	/* calculate currents and output */
+	iNeg = (context->vCap1 - OP_AMP_NORTON_VBE) / info->r3;
+	if (iNeg < 0) iNeg = 0;
+	iNeg += context->iFixed;
+
+	if (iPos > iNeg) node->output = context->vMax;
+	else node->output = info->vN;
+
+	/* update c1 */
+	/* rough value of voltage at anode of diode if discharging */
+	v = node->output + 0.6;
+	if (context->vCap1 > node->output)
+	{
+		/* discharge */
+		if (context->vCap1 > v)
+			/* immediate discharge through diode */
+			context->vCap1 = v;
+		else
+			/* discharge through r4 */
+			context->vCap1 += (node->output - context->vCap1) * context->exponent1d;
+	}
+	else
+		/* charge */
+		context->vCap1 += ((node->output - OP_AMP_NORTON_VBE) * context->r34ratio + OP_AMP_NORTON_VBE - context->vCap1) * context->exponent1c;
+}
+
+void dst_op_amp_1sht_reset(node_description *node)
+{
+	const discrete_op_amp_1sht_info *info = node->custom;
+	struct dst_op_amp_1sht_context *context = node->context;
+
+	context->exponent1c = -1.0 / ((1.0 / (1.0 / info->r3 + 1.0 / info->r4)) * info->c1  * discrete_current_context->sample_rate);
+	context->exponent1c = 1.0 - exp(context->exponent1c);
+	context->exponent1d = -1.0 / (info->r4 * info->c1  * discrete_current_context->sample_rate);
+	context->exponent1d = 1.0 - exp(context->exponent1d);
+	context->exponent2 = -1.0 / (info->r2 * info->c2  * discrete_current_context->sample_rate);
+	context->exponent2 = 1.0 - exp(context->exponent2);
+	context->iFixed = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
+	context->vCap1 = context->vCap2 = 0;
+	context->vMax = info->vP - OP_AMP_NORTON_VBE;
+	context->r34ratio = info->r3 / (info->r3 + info->r4);
+}
+
+
+/************************************************************************
+ *
+ * DST_TVCA_OP_AMP - trigged op-amp VCA
  *
  * input[0] - Trigger 0
  * input[1] - Trigger 1
@@ -1646,7 +1848,7 @@ void dst_tvca_op_amp_step(node_description *node)
 
 	int		trig0, trig1, trig2, f3;
 	double	i2 = 0;		// current through r2
-	double	i3 = 0;		// current through r2
+	double	i3 = 0;		// current through r3
 	double	iNeg = 0;	// current into - input
 	double	iPos = 0;	// current into + input
 	double	iOut = 0;	// current at output
@@ -1685,10 +1887,8 @@ void dst_tvca_op_amp_step(node_description *node)
 		/* F2 is at ground.  The diode blocks this so F2 and r5 are out of circuit.
          * So now the discharge rate is dependent upon F3.
          * If F3 is at ground then we discharge to 0V through r6.
-         * If F3 is out of circuit then we discharge to OP_AMP_NORTON_VBE through r6+r7.
-         * Also we don't go lower then OP_AMP_NORTON_VBE unless F3 is at ground. */
-		if (!(f3 && (context->vCap1 <= OP_AMP_NORTON_VBE)))
-			context->vCap1 += ((f3 ? OP_AMP_NORTON_VBE : 0.0) - context->vCap1) * context->exponentD[f3];
+         * If F3 is out of circuit then we discharge to OP_AMP_NORTON_VBE through r6+r7. */
+ 		context->vCap1 += ((f3 ? OP_AMP_NORTON_VBE : 0.0) - context->vCap1) * context->exponentD[f3];
 	}
 
 	/* Calculate c1 current going in to + input. */
@@ -1699,16 +1899,16 @@ void dst_tvca_op_amp_step(node_description *node)
 	if (info->r9 != 0)
 	{
 		f3 = dst_trigger_function(trig0, trig1, trig2, info->f4);
-		context->vCap2 += ((f3 ? context->vTrig2 : OP_AMP_NORTON_VBE) - context->vCap2) * context->exponent2[f3];
-		iPos += (context->vCap2 - OP_AMP_NORTON_VBE) / info->r9;
+		context->vCap2 += ((f3 ? context->vTrig2 : 0) - context->vCap2) * context->exponent2[f3];
+		iPos += context->vCap2 / info->r9;
 	}
 
 	/* Update the c3 cap voltage and current. */
 	if (info->r11 != 0)
 	{
 		f3 = dst_trigger_function(trig0, trig1, trig2, info->f5);
-		context->vCap3 += ((f3 ? context->vTrig3 : OP_AMP_NORTON_VBE) - context->vCap3) * context->exponent3[f3];
-		iPos += (context->vCap3 - OP_AMP_NORTON_VBE) / info->r11;
+		context->vCap3 += ((f3 ? context->vTrig3 : 0) - context->vCap3) * context->exponent3[f3];
+		iPos += context->vCap3 / info->r11;
 	}
 
 
@@ -1731,8 +1931,8 @@ void dst_tvca_op_amp_reset(node_description *node)
 	context->vOutMax = info->vP - OP_AMP_NORTON_VBE;
 	/* This is probably overkill because R5 is usually much lower then r6 or r7,
      * but it is better to play it safe. */
-	context->vTrig[0] = (info->vP - 0.6) * (info->r6 / (info->r6 + info->r5));
-	context->vTrig[1] = (info->vP - 0.6 - OP_AMP_NORTON_VBE) * (context->r67 / (context->r67 + info->r5)) + OP_AMP_NORTON_VBE;
+	context->vTrig[0] = (info->v1 - 0.6) * (info->r6 / (info->r6 + info->r5));
+	context->vTrig[1] = (info->v1 - 0.6 - OP_AMP_NORTON_VBE) * (context->r67 / (context->r67 + info->r5)) + OP_AMP_NORTON_VBE;
 	context->iFixed = context->vOutMax / info->r1;
 
 	context->vCap1 = 0;
@@ -1752,13 +1952,13 @@ void dst_tvca_op_amp_reset(node_description *node)
 		context->exponentD[0] = 1.0 - exp(context->exponentD[0]);
 	}
 	context->vCap2 = 0;
-	context->vTrig2 = (info->vP - 0.6) * (info->r9 / (info->r8 + info->r9));
+	context->vTrig2 = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * (info->r9 / (info->r8 + info->r9));
 	context->exponent2[0] = -1.0 / (info->r9 * info->c2 * discrete_current_context->sample_rate);
 	context->exponent2[0] = 1.0 - exp(context->exponent2[0]);
 	context->exponent2[1] = -1.0 / ((1.0 / (1.0 / info->r8 + 1.0 / info->r9)) * info->c2 * discrete_current_context->sample_rate);
 	context->exponent2[1] = 1.0 - exp(context->exponent2[1]);
 	context->vCap3 = 0;
-	context->vTrig3 = (info->vP - 0.6) * (info->r11 / (info->r10 + info->r11));
+	context->vTrig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * (info->r11 / (info->r10 + info->r11));
 	context->exponent3[0] = -1.0 / (info->r11 * info->c3 * discrete_current_context->sample_rate);
 	context->exponent3[0] = 1.0 - exp(context->exponent3[0]);
 	context->exponent3[1] = -1.0 / ((1.0 / (1.0 / info->r10 + 1.0 / info->r11)) * info->c3 * discrete_current_context->sample_rate);

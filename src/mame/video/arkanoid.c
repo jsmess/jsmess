@@ -125,7 +125,7 @@ static void arkanoid_draw_sprites( mame_bitmap *bitmap )
 ***************************************************************************/
 VIDEO_UPDATE( arkanoid )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	arkanoid_draw_sprites(bitmap);
 	return 0;
 }

@@ -201,8 +201,8 @@ PALETTE_INIT( pwrinst2 )
 		for( pen = 0; pen < 16; pen++ )
 			colortable[color * 256 + pen] = color * 16 + pen;
 
-	for( color = 0x8000; color < Machine->drv->color_table_len; color++ )
-			colortable[color] = (color - 0x8000) % Machine->drv->total_colors;
+	for( color = 0x8000; color < machine->drv->color_table_len; color++ )
+			colortable[color] = (color - 0x8000) % machine->drv->total_colors;
 }
 
 PALETTE_INIT( korokoro )

@@ -158,12 +158,12 @@ VIDEO_UPDATE( calorie )
 		if( calorie_sprites[x+1] & 0x10 )
 		{
 			 /* 32x32 sprites */
-			drawgfx(bitmap,Machine->gfx[3],tileno | 0x40,color,flipx,flipy,xpos,ypos - 31,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,machine->gfx[3],tileno | 0x40,color,flipx,flipy,xpos,ypos - 31,cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
 		{
 			/* 16x16 sprites */
-			drawgfx(bitmap,Machine->gfx[2],tileno,color,flipx,flipy,xpos,ypos - 15,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,machine->gfx[2],tileno,color,flipx,flipy,xpos,ypos - 15,cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 	return 0;

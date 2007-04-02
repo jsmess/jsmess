@@ -89,9 +89,9 @@ static void tank8_get_tile_info2(int tile_index)
 
 VIDEO_START( tank8 )
 {
-	helper1 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	helper2 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	helper3 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper3 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	tilemap1 = tilemap_create(tank8_get_tile_info1, tilemap_scan_rows, TILEMAP_OPAQUE, 16, 16, 32, 32);
 	tilemap2 = tilemap_create(tank8_get_tile_info2, tilemap_scan_rows, TILEMAP_OPAQUE, 16, 16, 32, 32);
@@ -184,7 +184,7 @@ VIDEO_UPDATE( tank8 )
 
 VIDEO_EOF( tank8 )
 {
-	const rectangle* clip = &Machine->screen[0].visarea;
+	const rectangle* clip = &machine->screen[0].visarea;
 
 	int x;
 	int y;
@@ -194,8 +194,8 @@ VIDEO_EOF( tank8 )
 	fillbitmap(helper2, 8, clip);
 	fillbitmap(helper3, 8, clip);
 
-	draw_sprites(helper2, &Machine->screen[0].visarea);
-	draw_bullets(helper3, &Machine->screen[0].visarea);
+	draw_sprites(helper2, &machine->screen[0].visarea);
+	draw_bullets(helper3, &machine->screen[0].visarea);
 
 	for (y = clip->min_y; y <= clip->max_y; y++)
 	{

@@ -82,10 +82,10 @@ VIDEO_START( ms32 )
 	ms32_reverse_sprite_order = 1;
 
 	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
-	if (!strcmp(Machine->gamedrv->name,"kirarast"))	ms32_reverse_sprite_order = 0;
-	if (!strcmp(Machine->gamedrv->name,"tp2m32"))	ms32_reverse_sprite_order = 0;
-	if (!strcmp(Machine->gamedrv->name,"47pie2"))	ms32_reverse_sprite_order = 0;
-	if (!strcmp(Machine->gamedrv->name,"47pie2o"))	ms32_reverse_sprite_order = 0;
+	if (!strcmp(machine->gamedrv->name,"kirarast"))	ms32_reverse_sprite_order = 0;
+	if (!strcmp(machine->gamedrv->name,"tp2m32"))	ms32_reverse_sprite_order = 0;
+	if (!strcmp(machine->gamedrv->name,"47pie2"))	ms32_reverse_sprite_order = 0;
+	if (!strcmp(machine->gamedrv->name,"47pie2o"))	ms32_reverse_sprite_order = 0;
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	brt[0] = brt[1] = 0xffff;
@@ -486,7 +486,7 @@ VIDEO_UPDATE( ms32 )
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
-	fillbitmap(bitmap,Machine->pens[0],cliprect);	/* bg color */
+	fillbitmap(bitmap,machine->pens[0],cliprect);	/* bg color */
 
 #ifdef MAME_DEBUG
 if (!code_pressed(KEYCODE_Q))

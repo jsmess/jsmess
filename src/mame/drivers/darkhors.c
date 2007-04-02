@@ -146,7 +146,7 @@ VIDEO_START( darkhors )
 	tilemap_set_transparent_pen(darkhors_tmap, 0);
 	tilemap_set_transparent_pen(darkhors_tmap2, 0);
 
-	Machine->gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine->gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
 	return 0;
 }

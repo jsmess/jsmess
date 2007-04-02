@@ -81,7 +81,7 @@ static void nvram_write_timeout(int param);
 
 static VIDEO_UPDATE( amerdart )
 {
-	UINT16 *base = &vram_base[TOWORD(0x800) + (cliprect->min_y - Machine->screen[0].visarea.min_y) * TOWORD(0x800)];
+	UINT16 *base = &vram_base[TOWORD(0x800) + (cliprect->min_y - machine->screen[0].visarea.min_y) * TOWORD(0x800)];
 	int x, y;
 
 	/* if we're blank, just blank the screen */
@@ -142,25 +142,25 @@ static VIDEO_UPDATE( coolpool )
 	cpuintrf_pop_context();
 
 	/* adjust drawing area based on blanking (9 ball shootout tweaks it) */
-	if (vsblnk > veblnk && vsblnk - veblnk < Machine->screen[0].height)
+	if (vsblnk > veblnk && vsblnk - veblnk < machine->screen[0].height)
 	{
 		/* compute starting scanline offset (assume centered) */
-		scanoffs = ((Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1) - (vsblnk - veblnk)) / 2;
+		scanoffs = ((machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1) - (vsblnk - veblnk)) / 2;
 
 		/* adjust start/end scanlines */
-		if (startscan != Machine->screen[0].visarea.min_y)
+		if (startscan != machine->screen[0].visarea.min_y)
 			startscan += scanoffs;
 		endscan += scanoffs;
-		if (endscan >= Machine->screen[0].visarea.max_y)
-			endscan = Machine->screen[0].visarea.max_y;
+		if (endscan >= machine->screen[0].visarea.max_y)
+			endscan = machine->screen[0].visarea.max_y;
 	}
 
 	/* compute the offset */
 	offset = (dpyadr << 4) + dpytap;
 
 	/* adjust for when DPYADR was written */
-	if (cliprect->min_y - Machine->screen[0].visarea.min_y - scanoffs >= dpyadrscan)
-		offset += (cliprect->min_y - Machine->screen[0].visarea.min_y - scanoffs - dpyadrscan) * dudate;
+	if (cliprect->min_y - machine->screen[0].visarea.min_y - scanoffs >= dpyadrscan)
+		offset += (cliprect->min_y - machine->screen[0].visarea.min_y - scanoffs - dpyadrscan) * dudate;
 
 	/* loop over scanlines */
 	for (y = startscan; y <= endscan; y++)
@@ -168,7 +168,7 @@ static VIDEO_UPDATE( coolpool )
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
 
 		/* if we're in outer bands, just clear */
-		if (y < Machine->screen[0].visarea.min_y + scanoffs || y > Machine->screen[0].visarea.max_y - scanoffs)
+		if (y < machine->screen[0].visarea.min_y + scanoffs || y > machine->screen[0].visarea.max_y - scanoffs)
 			memset(dest, 0, (cliprect->max_x - cliprect->min_x + 1) * 2);
 
 		/* render 8bpp data */

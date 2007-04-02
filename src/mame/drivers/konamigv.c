@@ -122,6 +122,16 @@ Notes:
 #include "sound/psx.h"
 #include "sound/cdda.h"
 
+/* static variables */
+
+static UINT8 sector_buffer[ 4096 ];
+static UINT32 flash_address;
+
+static UINT16 trackball_prev[ 2 ];
+static UINT32 trackball_data[ 2 ];
+static UINT16 btc_trackball_prev[ 4 ];
+static UINT32 btc_trackball_data[ 4 ];
+
 /* EEPROM handlers */
 
 static NVRAM_HANDLER( konamigv_93C46 )
@@ -200,8 +210,6 @@ static ADDRESS_MAP_START( konamigv_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 /* SCSI */
-
-static UINT8 sector_buffer[ 4096 ];
 
 static void scsi_dma_read( UINT32 n_address, INT32 n_size )
 {
@@ -314,6 +322,13 @@ static MACHINE_RESET( konamigv )
 
 	/* also hook up CDDA audio to the CD-ROM drive */
 	cdda_set_cdrom(0, am53cf96_get_device(SCSI_ID_4));
+
+	state_save_register_global_array(sector_buffer);
+	state_save_register_global(flash_address);
+	state_save_register_global_array(trackball_prev);
+	state_save_register_global_array(trackball_data);
+	state_save_register_global_array(btc_trackball_prev);
+	state_save_register_global_array(btc_trackball_data);
 }
 
 static struct PSXSPUinterface konamigv_psxspu_interface =
@@ -430,8 +445,6 @@ static NVRAM_HANDLER( simpbowl )
 	nvram_handler_intelflash( machine, 3, file, read_or_write );
 }
 
-static int flash_address;
-
 static READ32_HANDLER( flash_r )
 {
 	int reg = offset*2;
@@ -495,9 +508,6 @@ static WRITE32_HANDLER( flash_w )
 			break;
 	}
 }
-
-static UINT16 trackball_prev[ 2 ];
-static UINT32 trackball_data[ 2 ];
 
 static READ32_HANDLER( trackball_r )
 {
@@ -581,9 +591,6 @@ static WRITE32_HANDLER( btcflash_w )
 		intelflash_write(0, (offset*2)+1, (data>>16)&0xffff);
 	}
 }
-
-static UINT16 btc_trackball_prev[ 4 ];
-static UINT32 btc_trackball_data[ 4 ];
 
 static READ32_HANDLER( btc_trackball_r )
 {
@@ -891,6 +898,6 @@ GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, kdeadeye, ROT0, "Konami", "D
 GAME( 1997, weddingr, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, tokimosh, konamigv, konamigv, konamigv, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1997, tokimosp, konamigv, konamigv, konamigv, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
+GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 

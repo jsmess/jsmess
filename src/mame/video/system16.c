@@ -815,13 +815,13 @@ VIDEO_START( system16 ){
 
 	num_sprites = 128*2; /* only 128 for most games; aburner uses 256 */
 
-	if(!strcmp(Machine->gamedrv->name, "hangon"))
+	if(!strcmp(machine->gamedrv->name, "hangon"))
 		num_sprites = 128;
 
 	{
 		/* initialize all entries to black - needed for Golden Axe*/
 		int i;
-		for( i=0; i<Machine->drv->total_colors; i++ ){
+		for( i=0; i<machine->drv->total_colors; i++ ){
 			palette_set_color( machine, i, 0,0,0 );
 		}
 
@@ -1117,13 +1117,13 @@ VIDEO_UPDATE( system18old ){
 	if(sys18_bg2_active)
 		tilemap_draw( bitmap,cliprect, background2, 0, 0 );
 	else
-		fillbitmap(bitmap,Machine->pens[0],cliprect);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY, 0 );
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY | 1, 0 );	//??
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_IGNORE_TRANSPARENCY | 2, 0 );	//??
 
-	if (!strcmp(Machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
+	if (!strcmp(machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
 	/* ASTORM also draws some sprites with the vdp, needs to be higher priority..*/
 
 //  sprite_draw(sprite_list,3);
@@ -1138,15 +1138,15 @@ VIDEO_UPDATE( system18old ){
 	if(sys18_fg2_active) tilemap_draw( bitmap,cliprect, foreground2, 1, 0x7 );
 	tilemap_draw( bitmap,cliprect, foreground, 1, 0x7 );
 
-	if (!strcmp(Machine->gamedrv->name,"ddcrew"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for ddcrew
+	if (!strcmp(machine->gamedrv->name,"ddcrew"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for ddcrew
 
 	tilemap_draw( bitmap,cliprect, text_layer, 1, 0x7 );
 //  sprite_draw(sprite_list,0);
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
 
-	if (!strcmp(Machine->gamedrv->name,"cltchitr"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
-	if (!strcmp(Machine->gamedrv->name,"cltchtrj"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
-//  if (!strcmp(Machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
+	if (!strcmp(machine->gamedrv->name,"cltchitr"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
+	if (!strcmp(machine->gamedrv->name,"cltchtrj"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
+//  if (!strcmp(machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
 
 	draw_sprites( bitmap,cliprect, 0 );
 	return 0;

@@ -29,7 +29,7 @@ PALETTE_INIT( sprtmtch )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int x =	(color_prom[i]<<8) + color_prom[0x200+i];
 		/* The bits are in reverse order! */
@@ -1197,7 +1197,7 @@ VIDEO_UPDATE( hanamai )
 
 	fillbitmap(
 		bitmap,
-		Machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
 		cliprect);
 
 	/* bit 4 = display enable? */
@@ -1233,7 +1233,7 @@ VIDEO_UPDATE( hnoridur )
 
 	fillbitmap(
 		bitmap,
-		Machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 0x0f) * 256],
+		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 0x0f) * 256],
 		cliprect);
 
 	pri = hanamai_priority >> 4;
@@ -1268,7 +1268,7 @@ VIDEO_UPDATE( sprtmtch )
 
 	fillbitmap(
 		bitmap,
-		Machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
 		cliprect);
 
 	if (layers_ctrl & 1)	hanamai_copylayer( bitmap, cliprect, 0 );
@@ -1287,7 +1287,7 @@ VIDEO_UPDATE( jantouki )
 
 	fillbitmap(
 		bitmap,
-		Machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
 		cliprect);
 
 	if (screen==0)
@@ -1318,7 +1318,7 @@ VIDEO_UPDATE( mjdialq2 )
 
 	fillbitmap(
 		bitmap,
-		Machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
 		cliprect);
 
 	if (layers_ctrl & 1)	mjdialq2_copylayer( bitmap, cliprect, 0 );

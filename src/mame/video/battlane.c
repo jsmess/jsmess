@@ -248,7 +248,7 @@ VIDEO_UPDATE( battlane )
 {
 	tilemap_mark_all_tiles_dirty(bg_tilemap); // HACK
 
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	battlane_draw_sprites(bitmap);
 	battlane_draw_fg_bitmap(bitmap);
 	return 0;

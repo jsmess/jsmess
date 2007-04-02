@@ -48,7 +48,7 @@ PALETTE_INIT( exerion )
 {
 	int i;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -361,7 +361,7 @@ VIDEO_UPDATE( exerion )
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (sprite_palette * 16);
-		const gfx_element *gfx = doubled ? Machine->gfx[2] : Machine->gfx[1];
+		const gfx_element *gfx = doubled ? machine->gfx[2] : machine->gfx[1];
 
 		if (exerion_cocktail_flip)
 		{
@@ -397,7 +397,7 @@ VIDEO_UPDATE( exerion )
 			int y = exerion_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx(bitmap, Machine->gfx[0],
+			drawgfx(bitmap, machine->gfx[0],
 				videoram[offs] + 256 * char_bank,
 				((videoram[offs] & 0xf0) >> 4) + char_palette * 16,
 				exerion_cocktail_flip, exerion_cocktail_flip, x, y,

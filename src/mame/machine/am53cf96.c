@@ -214,6 +214,7 @@ void am53cf96_init( struct AM53CF96interface *interface )
 	state_save_register_global_array(fifo);
 	state_save_register_global(fptr);
 	state_save_register_global(xfer_state);
+	state_save_register_global(last_id);
 }
 
 // retrieve data from the SCSI controller

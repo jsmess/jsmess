@@ -106,7 +106,7 @@ static int draworder[32][4];
 PALETTE_INIT( taitosj )
 {
 	int i;
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* all gfx elements use the same palette */
 	for (i = 0;i < 64;i++)
@@ -216,17 +216,17 @@ VIDEO_START( taitosj )
 	dirtybuffer3 = auto_malloc(videoram_size);
 	memset(dirtybuffer3,1,videoram_size);
 
-	sprite_plane_collbitmap1 = auto_bitmap_alloc(16,16,Machine->screen[0].format);
+	sprite_plane_collbitmap1 = auto_bitmap_alloc(16,16,machine->screen[0].format);
 
 	for (i = 0; i < 3; i++)
 	{
-		taitosj_tmpbitmap[i] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+		taitosj_tmpbitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-		sprite_plane_collbitmap2[i] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+		sprite_plane_collbitmap2[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	}
 
-	sprite_sprite_collbitmap1 = auto_bitmap_alloc(32,32,Machine->screen[0].format);
-	sprite_sprite_collbitmap2 = auto_bitmap_alloc(32,32,Machine->screen[0].format);
+	sprite_sprite_collbitmap1 = auto_bitmap_alloc(32,32,machine->screen[0].format);
+	sprite_sprite_collbitmap2 = auto_bitmap_alloc(32,32,machine->screen[0].format);
 
 	flipscreen[0] = flipscreen[1] = 0;
 
@@ -815,13 +815,13 @@ VIDEO_UPDATE( taitosj )
 	{
 		if (dirtycharacter1[offs] == 1)
 		{
-			decodechar(Machine->gfx[0],offs,taitosj_characterram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],offs,taitosj_characterram,machine->drv->gfxdecodeinfo[0].gfxlayout);
 			dirtycharacter1[offs] = 0;
 			alldirty = 1;
 		}
 		if (dirtycharacter2[offs] == 1)
 		{
-			decodechar(Machine->gfx[2],offs,taitosj_characterram + 0x1800,Machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2],offs,taitosj_characterram + 0x1800,machine->drv->gfxdecodeinfo[2].gfxlayout);
 			dirtycharacter2[offs] = 0;
 			alldirty = 1;
 		}
@@ -840,12 +840,12 @@ VIDEO_UPDATE( taitosj )
 	{
 		if (dirtysprite1[offs] == 1)
 		{
-			decodechar(Machine->gfx[1],offs,taitosj_characterram,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1],offs,taitosj_characterram,machine->drv->gfxdecodeinfo[1].gfxlayout);
 			dirtysprite1[offs] = 0;
 		}
 		if (dirtysprite2[offs] == 1)
 		{
-			decodechar(Machine->gfx[3],offs,taitosj_characterram + 0x1800,Machine->drv->gfxdecodeinfo[3].gfxlayout);
+			decodechar(machine->gfx[3],offs,taitosj_characterram + 0x1800,machine->drv->gfxdecodeinfo[3].gfxlayout);
 			dirtysprite2[offs] = 0;
 		}
 	}
@@ -867,7 +867,7 @@ VIDEO_UPDATE( taitosj )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(taitosj_tmpbitmap[0],Machine->gfx[taitosj_colorbank[0] & 0x08 ? 2 : 0],
+			drawgfx(taitosj_tmpbitmap[0],machine->gfx[taitosj_colorbank[0] & 0x08 ? 2 : 0],
 					videoram[offs],
 					(taitosj_colorbank[0] & 0x07) + 8,	/* use transparent pen 0 */
 					flipscreen[0],flipscreen[1],
@@ -887,7 +887,7 @@ VIDEO_UPDATE( taitosj )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(taitosj_tmpbitmap[1],Machine->gfx[taitosj_colorbank[0] & 0x80 ? 2 : 0],
+			drawgfx(taitosj_tmpbitmap[1],machine->gfx[taitosj_colorbank[0] & 0x80 ? 2 : 0],
 					taitosj_videoram2[offs],
 					((taitosj_colorbank[0] >> 4) & 0x07) + 8,	/* use transparent pen 0 */
 					flipscreen[0],flipscreen[1],
@@ -907,7 +907,7 @@ VIDEO_UPDATE( taitosj )
 			if (flipscreen[0]) sx = 31 - sx;
 			if (flipscreen[1]) sy = 31 - sy;
 
-			drawgfx(taitosj_tmpbitmap[2],Machine->gfx[taitosj_colorbank[1] & 0x08 ? 2 : 0],
+			drawgfx(taitosj_tmpbitmap[2],machine->gfx[taitosj_colorbank[1] & 0x08 ? 2 : 0],
 					taitosj_videoram3[offs],
 					(taitosj_colorbank[1] & 0x07) + 8,	/* use transparent pen 0 */
 					flipscreen[0],flipscreen[1],
@@ -921,8 +921,8 @@ VIDEO_UPDATE( taitosj )
 	calculate_sprites_areas();
 
 	/* first of all, fill the screen with the background color */
-	fillbitmap(bitmap,Machine->pens[8 * (taitosj_colorbank[1] & 0x07)],
-			&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[8 * (taitosj_colorbank[1] & 0x07)],
+			&machine->screen[0].visarea);
 
 	for (i = 0;i < 4;i++)
 		drawplane(draworder[*taitosj_video_priority & 0x1f][i],bitmap);

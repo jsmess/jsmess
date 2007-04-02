@@ -5,7 +5,7 @@ Sega Model 1 Hardware Overview
 
 Note! This document is a Work-In-Progress and covers all the dumped Sega Model 1 games, including....
 
-Star Wars Arcade (C) Sega, 1994 (partial dump only, sound ROMs are not dumped!)
+Star Wars Arcade (C) Sega, 1994
 Virtua Fighter   (C) Sega, 1993
 Virtua Racing    (C) Sega, 1992
 Wing War         (C) Sega, 1994
@@ -629,6 +629,7 @@ Notes:
 #include "system16.h"
 #include "video/segaic24.h"
 #include "cpu/m68000/m68k.h"
+#include "cpu/mb86233/mb86233.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
 
@@ -647,6 +648,16 @@ READ16_HANDLER( model1_tgp_copro_adr_r );
 WRITE16_HANDLER( model1_tgp_copro_adr_w );
 READ16_HANDLER( model1_tgp_copro_ram_r );
 WRITE16_HANDLER( model1_tgp_copro_ram_w );
+
+/* VR */
+extern READ16_HANDLER( model1_vr_tgp_r );
+extern WRITE16_HANDLER( model1_vr_tgp_w );
+extern READ16_HANDLER( model1_tgp_vr_adr_r );
+extern WRITE16_HANDLER( model1_tgp_vr_adr_w );
+extern READ16_HANDLER( model1_vr_tgp_ram_r );
+extern WRITE16_HANDLER( model1_vr_tgp_ram_w );
+extern void model1_vr_tgp_reset( void );
+ADDRESS_MAP_EXTERN( model1_vr_tgp_map );
 
 static int model1_sound_irq;
 
@@ -750,8 +761,8 @@ static MACHINE_RESET(model1)
 {
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000);
 	irq_init();
-	model1_tgp_reset(!strcmp(Machine->gamedrv->name, "swa") || !strcmp(Machine->gamedrv->name, "wingwar") || !strcmp(Machine->gamedrv->name, "wingwara"));
-	if (!strcmp(Machine->gamedrv->name, "swa"))
+	model1_tgp_reset(!strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwara"));
+	if (!strcmp(machine->gamedrv->name, "swa"))
 	{
 		model1_sound_irq = 0;
 	}
@@ -759,6 +770,18 @@ static MACHINE_RESET(model1)
 	{
 		model1_sound_irq = 3;
 	}
+
+	// init the sound FIFO
+	fifo_rptr = fifo_wptr = 0;
+	memset(to_68k, 0, sizeof(to_68k));
+}
+
+static MACHINE_RESET(model1_vr)
+{
+	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000);
+	irq_init();
+	model1_vr_tgp_reset();
+	model1_sound_irq = 3;
 
 	// init the sound FIFO
 	fifo_rptr = fifo_wptr = 0;
@@ -909,6 +932,54 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( model1_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_tgp_copro_ram_r)
 	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_tgp_copro_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK(1)
+	AM_RANGE(0x200000, 0x2fffff) AM_ROM
+
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(MRA16_RAM, mr2_w) AM_BASE(&mr2)
+	AM_RANGE(0x500000, 0x53ffff) AM_READWRITE(MRA16_RAM, mr_w)  AM_BASE(&mr)
+
+	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE(MRA16_RAM, md0_w) AM_BASE(&model1_display_list0)
+	AM_RANGE(0x610000, 0x61ffff) AM_READWRITE(MRA16_RAM, md1_w) AM_BASE(&model1_display_list1)
+	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
+
+	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
+	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
+	AM_RANGE(0x740000, 0x740001) AM_WRITENOP		// Horizontal synchronization register
+	AM_RANGE(0x760000, 0x760001) AM_WRITENOP		// Vertical synchronization register
+	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
+	AM_RANGE(0x780000, 0x7fffff) AM_READWRITE(sys24_char_r, sys24_char_w)
+
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(MRA16_RAM, p_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(&model1_color_xlat)
+
+	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
+
+	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
+
+	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
+	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
+
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
+	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_vr_tgp_ram_w )
+	AM_RANGE(0xd80000, 0xd80003) AM_WRITE(model1_vr_tgp_w) AM_MIRROR(0x10)
+	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
+
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
+	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
+
+	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( model1_vr_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_vr_tgp_ram_r)
+	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_vr_tgp_r)
 ADDRESS_MAP_END
 
 static READ16_HANDLER( m1_snd_68k_latch_r )
@@ -1261,6 +1332,11 @@ ROM_START( vr )
 	ROM_LOAD32_BYTE( "mpr-14899.40", 0x000001, 0x80000, CRC(2cd58bee) SHA1(73defec823de4244a387af55fea7210edc1b314f) )
 	ROM_LOAD32_BYTE( "mpr-14900.41", 0x000002, 0x80000, CRC(aa7c017d) SHA1(0fa2b59a8bb5f5907b2b2567e69d11c73b398dc1) )
 	ROM_LOAD32_BYTE( "mpr-14901.42", 0x000003, 0x80000, CRC(175b7a9a) SHA1(c86602e771cd49bab425b4ba7926d2f44858bd39) )
+
+	ROM_REGION( 0x2000, REGION_CPU3, 0 ) /* TGP program rom */
+	// this is the Daytona TGP program with some modifications needed for Virtua Racing
+	// the real TGP program is an internal ROM and still needs dumping
+	ROM_LOAD("vr-tgp.bin", 0x000000, 0x2000, BAD_DUMP CRC(3de33c7f) SHA1(acecc779c9d8fe39ded6c22492be5b7c25fd52db) )
 ROM_END
 
 ROM_START( vformula )
@@ -1307,6 +1383,11 @@ ROM_START( vformula )
 
 	ROM_REGION( 0x20000, REGION_USER3, 0 ) /* Comms Board */
 	ROM_LOAD( "epr15624.17", 0x00000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a) )
+
+	ROM_REGION( 0x2000, REGION_CPU3, 0 ) /* TGP program rom */
+	// this is the Daytona TGP program with some modifications needed for Virtua Racing
+	// the real TGP program is an internal ROM and still needs dumping
+	ROM_LOAD("vr-tgp.bin", 0x000000, 0x2000, BAD_DUMP CRC(3de33c7f) SHA1(acecc779c9d8fe39ded6c22492be5b7c25fd52db) )
 ROM_END
 
 
@@ -1492,9 +1573,57 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
+extern struct mb86233_config model1_vr_tgp_config;
+
+static MACHINE_DRIVER_START( model1_vr )
+	MDRV_CPU_ADD(V60, 16000000)
+	MDRV_CPU_PROGRAM_MAP(model1_vr_mem, 0)
+	MDRV_CPU_IO_MAP(model1_vr_io, 0)
+	MDRV_CPU_VBLANK_INT(model1_interrupt, 2)
+
+	MDRV_CPU_ADD(M68000, 10000000)	// verified on real h/w
+	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
+
+	MDRV_CPU_ADD(MB86233, 16000000)
+	MDRV_CPU_CONFIG(model1_vr_tgp_config)
+	MDRV_CPU_PROGRAM_MAP(model1_vr_tgp_map, 0)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_MACHINE_RESET(model1_vr)
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_AFTER_VBLANK )
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_SIZE(62*8, 48*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
+	MDRV_PALETTE_LENGTH(8192)
+
+	MDRV_VIDEO_START(model1)
+	MDRV_VIDEO_UPDATE(model1)
+	MDRV_VIDEO_EOF(model1)
+
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(YM3438, 8000000)
+	MDRV_SOUND_ROUTE(0, "left", 0.60)
+	MDRV_SOUND_ROUTE(1, "right", 0.60)
+
+	MDRV_SOUND_ADD(MULTIPCM, 8000000)
+	MDRV_SOUND_CONFIG(m1_multipcm_interface_1)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+	MDRV_SOUND_ADD(MULTIPCM, 8000000)
+	MDRV_SOUND_CONFIG(m1_multipcm_interface_2)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
+
 GAME( 1993, vf,      0, model1, vf,      0, ROT0, "Sega", "Virtua Fighter", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, vr,       0, model1, vr,       0, ROT0, "Sega", "Virtua Racing", GAME_NOT_WORKING )
-GAME( 1993, vformula, vr, model1, vr,       0, ROT0, "Sega", "Virtua Formula", GAME_NOT_WORKING )
+GAME( 1992, vr,       0, model1_vr, vr,       0, ROT0, "Sega", "Virtua Racing", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, vformula, vr, model1_vr, vr,       0, ROT0, "Sega", "Virtua Formula", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, swa,      0, model1, swa,      0, ROT0, "Sega", "Star Wars Arcade", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1994, wingwar,  0, model1, wingwar,  0, ROT0, "Sega", "Wing War (US)", GAME_NOT_WORKING )
 GAME( 1994, wingwara, wingwar, model1, wingwar,  0, ROT0, "Sega", "Wing War", GAME_NOT_WORKING )

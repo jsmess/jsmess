@@ -51,7 +51,7 @@ PALETTE_INIT( thepit )
 	for (i = 0;i < 8;i++)
 		palette_set_color(machine,i,pal1bit(i >> 2),pal1bit(i >> 1),pal1bit(i >> 0));
 
-	for (i = 0;i < Machine->drv->total_colors-8;i++)
+	for (i = 0;i < machine->drv->total_colors-8;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -71,7 +71,7 @@ PALETTE_INIT( thepit )
 		palette_set_color(machine,i+8,r,g,b);
 	}
 
-	for (i = 0;i < Machine->drv->color_table_len;i++)
+	for (i = 0;i < machine->drv->color_table_len;i++)
 	{
 		colortable[i] = i + 8;
 	}
@@ -95,7 +95,7 @@ PALETTE_INIT( suprmous )
 	for (i = 0;i < 8;i++)
 		palette_set_color(machine,i,pal1bit(i >> 2),pal1bit(i >> 1),pal1bit(i >> 0));
 
-	for (i = 0;i < Machine->drv->total_colors-8;i++)
+	for (i = 0;i < machine->drv->total_colors-8;i++)
 	{
 		int bit0,bit1,bit2,bit3,bit4,r,g,b;
 
@@ -121,7 +121,7 @@ PALETTE_INIT( suprmous )
 		palette_set_color(machine,i+8,r,g,b);
 	}
 
-	for (i = 0;i < Machine->drv->color_table_len;i++)
+	for (i = 0;i < machine->drv->color_table_len;i++)
 	{
 		colortable[i] = i + 8;
 	}

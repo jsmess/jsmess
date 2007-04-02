@@ -56,7 +56,7 @@ VIDEO_START( exidy440 )
 	topsecex_last_yscroll = 0;
 
 	/* allocate a bitmap */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* allocate a buffer for VRAM */
 	local_videoram = auto_malloc(256 * 256 * 2);

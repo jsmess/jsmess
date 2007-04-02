@@ -89,7 +89,7 @@ PALETTE_INIT( fuuki16 )
 
 	/* The game does not initialise the palette at startup. It should
        be totally black */
-	for (pen = 0; pen < Machine->drv->total_colors; pen++)
+	for (pen = 0; pen < machine->drv->total_colors; pen++)
 		palette_set_color(machine,pen,0,0,0);
 }
 
@@ -112,7 +112,7 @@ VIDEO_START( fuuki16 )
 	tilemap_set_transparent_pen(tilemap_2,0x0f);	// 4 bits
 	tilemap_set_transparent_pen(tilemap_3,0x0f);	// 4 bits
 
-	Machine->gfx[2]->color_granularity=16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
+	machine->gfx[2]->color_granularity=16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
 
 	return 0;
 }
@@ -349,7 +349,7 @@ VIDEO_UPDATE( fuuki16 )
 	fuuki16_draw_layer(bitmap,cliprect, tm_front,  0, 4);
 
 	// don't do the rasters on the sprites . its very slow and the hw might not anyway.
-	if (cliprect->max_y == Machine->screen[0].visarea.max_y)
-		fuuki16_draw_sprites(bitmap,&Machine->screen[0].visarea);
+	if (cliprect->max_y == machine->screen[0].visarea.max_y)
+		fuuki16_draw_sprites(bitmap,&machine->screen[0].visarea);
 	return 0;
 }

@@ -215,8 +215,8 @@ VIDEO_START( bwing )
 	for (i=0; i<4; i++) srbase[i] = fgdata + i * 0x2000;
 	for (i=0; i<8; i++) sreg[i] = 0;
 
-	fgfx = Machine->gfx[2];
-	bgfx = Machine->gfx[3];
+	fgfx = machine->gfx[2];
+	bgfx = machine->gfx[3];
 
 	if ((dwptr = fgfx->pen_usage))
 	{

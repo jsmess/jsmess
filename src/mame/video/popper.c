@@ -15,7 +15,7 @@ PALETTE_INIT( popper )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors; i++)
+	for (i = 0;i < machine->drv->total_colors; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -181,7 +181,7 @@ VIDEO_START( popper )
 	tilemap_set_transmask(popper_ol_p0_tilemap,  0,0x0f,0x0e);
 	tilemap_set_transmask(popper_ol_p0_tilemap,  1,0x0e,0x0f);
 
-	tilemap_clip = Machine->screen[0].visarea;
+	tilemap_clip = machine->screen[0].visarea;
 
 	state_save_register_global(popper_flipscreen);
 //  state_save_register_global(popper_e002);

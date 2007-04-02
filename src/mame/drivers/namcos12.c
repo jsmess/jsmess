@@ -1092,10 +1092,10 @@ MACHINE_RESET( namcos12 )
 	psx_machine_init();
 	bankoffset_w(0,0,0);
 
-	if( strcmp( Machine->gamedrv->name, "tektagt" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tektagta" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tektagtb" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tektagtc" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tektagta" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tektagtb" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 )
 	{
 		memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r );
 		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_w );
@@ -1103,21 +1103,21 @@ MACHINE_RESET( namcos12 )
 		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_w );
 	}
 
-	if( strcmp( Machine->gamedrv->name, "tektagt" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tektagta" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tektagtb" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tektagtc" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "fgtlayer" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "golgo13" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "g13knd" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "mrdrillr" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "pacapp" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "pacappsp" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "pacapp2" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tenkomoj" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "tenkomor" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "ptblank2" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "ghlpanic" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tektagta" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tektagtb" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 ||
+		strcmp( machine->gamedrv->name, "fgtlayer" ) == 0 ||
+		strcmp( machine->gamedrv->name, "golgo13" ) == 0 ||
+		strcmp( machine->gamedrv->name, "g13knd" ) == 0 ||
+		strcmp( machine->gamedrv->name, "mrdrillr" ) == 0 ||
+		strcmp( machine->gamedrv->name, "pacapp" ) == 0 ||
+		strcmp( machine->gamedrv->name, "pacappsp" ) == 0 ||
+		strcmp( machine->gamedrv->name, "pacapp2" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tenkomoj" ) == 0 ||
+		strcmp( machine->gamedrv->name, "tenkomor" ) == 0 ||
+		strcmp( machine->gamedrv->name, "ptblank2" ) == 0 ||
+		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
 		memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x1fc20280, 0x1fc2028b, 0, 0, MRA32_BANK2 );

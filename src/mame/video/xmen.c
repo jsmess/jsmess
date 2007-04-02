@@ -123,7 +123,7 @@ VIDEO_UPDATE( xmen )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	/* note the '+1' in the background color!!! */
-	fillbitmap(bitmap,Machine->pens[16 * bg_colorbase+1],cliprect);
+	fillbitmap(bitmap,machine->pens[16 * bg_colorbase+1],cliprect);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[0]],0,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
@@ -178,10 +178,10 @@ VIDEO_EOF( xmen6p )
 
 	xmen_current_frame ^=0x8000;
 
-//  cliprect.min_x = Machine->screen[0].visarea.min_x;
-//  cliprect.max_x = Machine->screen[0].visarea.max_x;
-//  cliprect.min_y = Machine->screen[0].visarea.min_y;
-//  cliprect.max_y = Machine->screen[0].visarea.max_y;
+//  cliprect.min_x = machine->screen[0].visarea.min_x;
+//  cliprect.max_x = machine->screen[0].visarea.max_x;
+//  cliprect.min_y = machine->screen[0].visarea.min_y;
+//  cliprect.max_y = machine->screen[0].visarea.max_y;
 
 	cliprect.min_x = 0;
 	cliprect.max_x = 64*8-1;
@@ -252,7 +252,7 @@ VIDEO_EOF( xmen6p )
 
 	fillbitmap(priority_bitmap,0,&cliprect);
 	/* note the '+1' in the background color!!! */
-	fillbitmap(renderbitmap,Machine->pens[16 * bg_colorbase+1],&cliprect);
+	fillbitmap(renderbitmap,machine->pens[16 * bg_colorbase+1],&cliprect);
 	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[0]],0,1);
 	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[2]],0,4);

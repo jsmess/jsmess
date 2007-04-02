@@ -40,11 +40,11 @@ static UINT32 scanline;
 PALETTE_INIT( gyruss )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -187,18 +187,18 @@ VIDEO_UPDATE( gyruss )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					videoram[offs] + 8 * (colorram[offs] & 0x20),
 					colorram[offs] & 0x0f,
 					flipx,flipy,
 					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		}
 	}
 
 
 	/* copy the character mapped graphics */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 
 	draw_sprites(bitmap);
@@ -223,12 +223,12 @@ VIDEO_UPDATE( gyruss )
 		}
 
 		if ((colorram[offs] & 0x10) != 0)
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					videoram[offs] + 8 * (colorram[offs] & 0x20),
 					colorram[offs] & 0x0f,
 					flipx,flipy,
 					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 	return 0;
 }

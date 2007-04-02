@@ -37,9 +37,9 @@ VIDEO_START( goldstar )
 	dirtybuffer3 = dirtybuffer2 + goldstar_video_size;
 
 	/* the background area is half as high as the screen */
-	tmpbitmap1 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmap3 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap3 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	/* leave everything at the default, but map all foreground 0 pens as transparent */
 //        for (i = 0;i < 16;i++) palette_used_colors[8 * i] = PALETTE_COLOR_TRANSPARENT;
@@ -129,7 +129,7 @@ VIDEO_UPDATE( goldstar )
 			sx = offs % 64;
 			sy = offs / 64;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					videoram[offs] + ((colorram[offs] & 0xf0) << 4),
 					colorram[offs] & 0x0f,
 					0,0,
@@ -138,7 +138,7 @@ VIDEO_UPDATE( goldstar )
 		}
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 
 	for (offs = goldstar_video_size - 1;offs >= 0;offs--)
@@ -151,7 +151,7 @@ VIDEO_UPDATE( goldstar )
 		{
 			dirtybuffer1[offs] = 0;
 
-			drawgfx(tmpbitmap1,Machine->gfx[1],
+			drawgfx(tmpbitmap1,machine->gfx[1],
 					goldstar_video1[offs],
 					bgcolor,
 					0,0,
@@ -163,7 +163,7 @@ VIDEO_UPDATE( goldstar )
 		{
 			dirtybuffer2[offs] = 0;
 
-			drawgfx(tmpbitmap2,Machine->gfx[1],
+			drawgfx(tmpbitmap2,machine->gfx[1],
 					goldstar_video2[offs],
 					bgcolor,
 					0,0,
@@ -175,7 +175,7 @@ VIDEO_UPDATE( goldstar )
 		{
 			dirtybuffer3[offs] = 0;
 
-			drawgfx(tmpbitmap3,Machine->gfx[1],
+			drawgfx(tmpbitmap3,machine->gfx[1],
 					goldstar_video3[offs],
 					bgcolor,
 					0,0,

@@ -91,8 +91,8 @@ VIDEO_START( gaiden )
 VIDEO_START( raiga )
 {
 	/* set up tile layers */
-	tile_bitmap_bg = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
 	background = tilemap_create(get_bg_tile_info,	   tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,32);
 	foreground = tilemap_create(get_fg_tile_info_raiga,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,32);
@@ -103,7 +103,7 @@ VIDEO_START( raiga )
 	tilemap_set_transparent_pen(text_layer,0);
 
 	/* set up sprites */
-	sprite_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
 	return 0;
 }
@@ -543,7 +543,7 @@ static void drgnbowl_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 VIDEO_UPDATE( gaiden )
 {
 	fillbitmap(priority_bitmap,                    0, cliprect);
-	fillbitmap(bitmap,          Machine->pens[0x200], cliprect);
+	fillbitmap(bitmap,          machine->pens[0x200], cliprect);
 
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);

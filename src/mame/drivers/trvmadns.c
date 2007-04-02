@@ -272,7 +272,7 @@ VIDEO_START( trvmadns )
 
 VIDEO_UPDATE( trvmadns )
 {
-	fillbitmap(bitmap,Machine->pens[0xd],cliprect);
+	fillbitmap(bitmap,machine->pens[0xd],cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 

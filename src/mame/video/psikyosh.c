@@ -1056,9 +1056,9 @@ VIDEO_START( psikyosh )
 	zoom_bitmap = auto_bitmap_alloc(16*16, 16*16, BITMAP_FORMAT_INDEXED8);
 
 	/* Need 16-bit z-buffer */
-	z_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	z_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	Machine->gfx[1]->color_granularity=16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
+	machine->gfx[1]->color_granularity=16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
 
 	{ /* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 		int i;

@@ -216,7 +216,7 @@ WRITE8_HANDLER( pacman_flipscreen_w )
 VIDEO_UPDATE( pacman )
 {
 	if (bgpriority != 0)
-		fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 
@@ -236,7 +236,7 @@ VIDEO_UPDATE( pacman )
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
 					spriteram[offs] & 1,spriteram[offs] & 2,
@@ -244,7 +244,7 @@ VIDEO_UPDATE( pacman )
 					&spriteclip,TRANSPARENCY_COLOR,0);
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
 					spriteram[offs] & 1,spriteram[offs] & 2,
@@ -260,7 +260,7 @@ VIDEO_UPDATE( pacman )
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
 					spriteram[offs] & 1,spriteram[offs] & 2,
@@ -268,7 +268,7 @@ VIDEO_UPDATE( pacman )
 					&spriteclip,TRANSPARENCY_COLOR,0);
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
 					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
 					spriteram[offs] & 2,spriteram[offs] & 1,
@@ -402,7 +402,7 @@ VIDEO_UPDATE( s2650games )
 		sy = spriteram_2[offs] - 15;
 
 		/* TODO: ?? */
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3) << 6),
 				spriteram[offs + 1] & 0x1f,
 				spriteram[offs] & 1,spriteram[offs] & 2,
@@ -420,7 +420,7 @@ VIDEO_UPDATE( s2650games )
 		sy = spriteram_2[offs] - 15;
 
 		/* TODO: ?? */
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3)<<6),
 				spriteram[offs + 1] & 0x1f,
 				spriteram[offs] & 1,spriteram[offs] & 2,

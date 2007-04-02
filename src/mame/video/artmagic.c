@@ -365,7 +365,7 @@ VIDEO_UPDATE( artmagic )
 		fillbitmap(bitmap, get_black_pen(machine), cliprect);
 		return 0;
 	}
-	offset += (cliprect->min_y - Machine->screen[0].visarea.min_y) * TOWORD(0x2000);
+	offset += (cliprect->min_y - machine->screen[0].visarea.min_y) * TOWORD(0x2000);
 	offset += dpytap;
 
 	/* render the bitmap */

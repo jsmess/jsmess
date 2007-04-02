@@ -66,7 +66,7 @@ PALETTE_INIT( bagman )
 			2,	resistances_b,	weights_b,	470,	0);
 
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -161,7 +161,7 @@ VIDEO_UPDATE( bagman )
 	if (*bagman_video_enable == 0)
 		return 0;
 
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	bagman_draw_sprites(bitmap);
 	return 0;
 }

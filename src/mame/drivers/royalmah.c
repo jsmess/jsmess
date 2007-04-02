@@ -86,7 +86,7 @@ PALETTE_INIT( royalmah )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -117,7 +117,7 @@ PALETTE_INIT( mjderngr )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int x =	(color_prom[i]<<8) + color_prom[0x200+i];
 		/* The bits are in reverse order! */
@@ -197,7 +197,7 @@ VIDEO_UPDATE( royalmah )
 			royalmah_videoram_w(offs, videoram[offs]);
 		}
 	}
-	copybitmap(bitmap,tmpbitmap,flip_screen_x,flip_screen_y,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,flip_screen_x,flip_screen_y,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

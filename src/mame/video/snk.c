@@ -38,7 +38,7 @@ PALETTE_INIT( snk_3bpp_shadow )
 	int i;
 	palette_init_RRRR_GGGG_BBBB(machine, colortable, color_prom);
 
-	if(!(Machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
@@ -53,7 +53,7 @@ PALETTE_INIT( snk_4bpp_shadow )
 	int i;
 	palette_init_RRRR_GGGG_BBBB(machine, colortable, color_prom);
 
-	if(!(Machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
@@ -69,7 +69,7 @@ VIDEO_START( snk )
 
 	dirtybuffer = auto_malloc( MAX_VRAM_SIZE );
 
-	tmpbitmap = auto_bitmap_alloc( 512, 512, Machine->screen[0].format );
+	tmpbitmap = auto_bitmap_alloc( 512, 512, machine->screen[0].format );
 
 	memset( dirtybuffer, 0xff, MAX_VRAM_SIZE );
 
@@ -259,7 +259,7 @@ VIDEO_UPDATE( tnk3 )
 VIDEO_START( sgladiat )
 {
 	dirtybuffer = auto_malloc( MAX_VRAM_SIZE );
-	tmpbitmap = auto_bitmap_alloc( 512, 256, Machine->screen[0].format );
+	tmpbitmap = auto_bitmap_alloc( 512, 256, machine->screen[0].format );
 	memset( dirtybuffer, 0xff, MAX_VRAM_SIZE );
 	return 0;
 }

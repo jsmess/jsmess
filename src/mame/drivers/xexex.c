@@ -640,7 +640,7 @@ MACHINE_START( xexex )
 
 static DRIVER_INIT( xexex )
 {
-	if (!strcmp(Machine->gamedrv->name, "xexex"))
+	if (!strcmp(machine->gamedrv->name, "xexex"))
 	{
 		// Invulnerability
 //      *(UINT16 *)(memory_region(REGION_CPU1) + 0x648d4) = 0x4a79;

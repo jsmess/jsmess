@@ -783,7 +783,7 @@ WRITE16_HANDLER( midyunit_io_register_w )
 VIDEO_EOF( midyunit )
 {
 	/* finish updating/autoerasing, even if we skipped a frame */
-	update_partial(Machine->screen[0].visarea.max_y, 0);
+	update_partial(machine->screen[0].visarea.max_y, 0);
 }
 
 
@@ -811,14 +811,14 @@ VIDEO_UPDATE( midyunit )
 	cpuintrf_push_context(0);
 	heblnk = tms34010_io_register_r(REG_HEBLNK, 0);
 	hsblnk = tms34010_io_register_r(REG_HSBLNK, 0);
-	leftscroll = (Machine->screen[0].visarea.max_x + 1 - Machine->screen[0].visarea.min_x) - (hsblnk - heblnk) * 2;
+	leftscroll = (machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x) - (hsblnk - heblnk) * 2;
 	if (leftscroll < 0)
 		leftscroll = 0;
 	cpuintrf_pop_context();
 
 	/* determine the base of the videoram */
 	offset = (~tms34010_get_DPYSTRT(0) & 0x1ff0) << 5;
-	offset += 512 * (cliprect->min_y - Machine->screen[0].visarea.min_y);
+	offset += 512 * (cliprect->min_y - machine->screen[0].visarea.min_y);
 
 	/* determine how many pixels to copy */
 	xoffs = cliprect->min_x;

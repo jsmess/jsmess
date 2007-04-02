@@ -887,12 +887,12 @@ VIDEO_UPDATE( metro )
 		}
 	}
 
-	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - Machine->screen[0].width  / 2;
-	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - Machine->screen[0].height / 2;
+	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - machine->screen[0].width  / 2;
+	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - machine->screen[0].height / 2;
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[((metro_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000],cliprect);
+	fillbitmap(bitmap,machine->pens[((metro_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000],cliprect);
 
 	/*  Screen Control Register:
 

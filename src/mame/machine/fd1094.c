@@ -152,101 +152,132 @@ more aggressively), and cleared to 0 if any plaintext words affected by the
 byte in question would be incorrectly blanked.
 
 
+When the keys were generated, the LCG seed wasn't input directly. Instead,
+another value was entered, which in most cases was derived from the current
+date/time. The LCG seed is obtained from that value via a multiplication.
+The current date/time was also used in most cases to select the three bytes of
+the global key. Interestingly, the global key must be inverted and read in
+decimal representation to see this, while the seed must be read in hexadecimal
+representation.
 
-summary of global keys:
------------------------
+For some reason, bit 3 of the first byte of the global key was always set to 1
+regardless of the value input into the key generator program, so e.g. the
+input "88 01 23" would become "80 01 23".
 
-          global01 global02 global03 LCGseed   Game
-          -------- -------- -------- ------- --------
+The very first byte of internal RAM, which indicates the IRQ state, doesn't
+seem to follow the same procedure. The IRQ state was probably decided at an
+earlier time, not during the final key generation.
+
+
+summary:
+--------
+
+   +------------------------------------------------- 317- part #
+   |       +----------------------------------------- IRQ state (hex)
+   |       |     +----------------------------------- global key (inverted, dec)
+   |       |     |        +-------------------------- main key seed (hex) (LCG seed = seed * 0x2F1E21)
+   |       |     |        |        +----------------- game
+   |       |     |        |        |      +---------- year
+   |       |     |        |        |      |        +- inferred key generation date
+   |       |     |        |        |      |        |
+--------  -- --------  ------  -------- ----  --------------------------
+0041      12 87 06 19  895963  bullet   1987  87/06/19 (atypical)
+0045?                          suprleag 1987
+0049      F1 87 10 28  8932F7  shinobi2 1987  87/10/28 (atypical)
+0050      F1 87 10 28  8932F7  shinobi1 1987  87/10/28 (atypical)
+0053      00 00 00 00  020000  sonicbom 1987  atypical
+0056      CD 80 01 23  032ABC  thndrbld 1987  88/01/23 (atypical)
+0059                           aceattac 1988
+0060      45 80 03 30  343210  aceattaa 1988  88/03/30 (atypical)
+0065                           altbeaj1 1988
+0068      20 80 06 10  880610  altbeaj3 1988  88/06/10
+0070      59 80 08 06  880806  passshtj 1988  88/08/06
+0074      47 80 08 06  880806  passshta 1988  88/08/06
+0079?                          exctleag 1989?
+0080      96 80 08 26  880826  passsht  1988  88/08/26
+0058-02C  FF 80 10 07  881007  sspirtfc 1988  88/10/07
+0084      0E 80 10 31  881031  wb31     1988  88/10/31
+0085      26 80 11 08  881108  wb32     1988  88/11/08
+0087      69 80 11 08  881108  wb34     1988  88/11/08
+0089      52 80 11 29  881129  wb33     1988  88/11/29
+0058-03B  71 80 11 25  881125  ggroundj 1988  88/11/25
+0058-03C  04 80 11 27  881127  gground  1988  88/11/27
+0090      AB 80 01 27  247333  wrestwa1 1989  atypical
+0091      68 80 11 27  881127  tetris1  1988  88/11/27
+0092      10 80 11 28  881128  tetris2  1988  88/11/28
+0093      25 80 11 29  881129  tetris   1988  88/11/29
+0093A     35 02 09 17  900209  tetris3  1988  90/02/09
+0096      21 80 11 21  881121  ddux     1988  88/11/21
+0102      AB 80 02 03  04588A  wrestwa2 1989  atypical
+0058-04B  27 03 27 14  032714  crkdownj 1989  89/03/27 14:xx
+0058-04D  DC 03 27 06  032706  crkdown  1989  89/03/27 06:xx
+0110      19 81 03 29  032916  goldnax1 1989  89/03/29 16:xx
+0115      12 04 05 11  040511  bayroutj 1989  89/04/05 11:xx
+0116      11 03 30 09  033009  bayroute 1989  89/03/30 09:xx
+0118      22 81 03 07  030719  toutrun  1989  89/03/07 19:xx
+toutrun2  22 81 03 07  031113  toutrun2 1989  89/03/11 13:xx (atypical)
+0120      0D 81 03 29  032916  goldnax3 1989  89/03/29 16:xx
+0121      35 81 03 29  032916  goldnaxj 1989  89/03/29 16:xx
+0122      03 81 04 04  890404  goldnaxu 1989  89/04/04
+0058-05B  92 81 06 09  890609  sgmastj  1989  89/06/09
+0058-05C  30 81 06 13  890613  sgmastc  1989  89/06/13
+0058-05D                       sgmast   1989
+0124A     80 06 21 11  890621  smgpj    1989  89/06/21 11:xx
+0125A     DE 06 15 16  890615  smgpu    1989  89/06/15 16:xx
+0126      54 05 28 01  890528  smgp5    1989  89/05/28 01:xx
+0126A     74 06 16 15  890616  smgp     1989  89/06/16 15:xx
+0127A     5F 81 07 06  890706  fpoint   1989  89/07/06
+0128      55 00 28 20  890828  eswatj   1989  89/08/28 20:xx
+0129      0A 00 28 20  890828  eswatu   1989  89/08/28 20:xx
+0130      EC 00 28 19  890828  eswat    1989  89/08/28 19:xx
+0134      DE 81 11 30  891130  loffirej 1989  89/11/30
+0135      98 81 11 31  891131  loffireu 1989  89/11/31
+0136      12 81 11 29  891129  loffire  1989  89/11/29
+0139      49 03 25 15  891125  bloxeed  1990  89/11/25 15:xx
+0142      91 01 24 17  900124  mvpj     1989  90/01/24 17:xx
+0143      20 02 02 18  900202  mvp      1989  90/02/02 18:xx
+0144      2E 02 23 18  022318  rachero  1989  90/02/23 18:xx
+0058-06B  88 03 15 09  900315  roughrac 1990  90/03/15 09:xx
+0146      10 04 26 17  900426  astormj  1990  90/04/26 17:xx
+0147      2D 04 14 14  900414  astormu  1990  90/04/14 14:xx
+0148      50 04 26 15  900426  astorm3  1990  90/04/26 15:xx
+0153      FC 04 10 14  900410  pontoon  1990  90/04/10 14:xx
+0157      20 07 20 10  900720  mwalkj   1990  90/07/20 10:xx
+0158      DE 07 15 15  900715  mwalku   1990  90/07/15 15:xx
+0159      39 07 20 10  900720  mwalk    1990  90/07/20 10:xx
+0162      8F 01 14 15  900914  gprider1 1990  90/09/14 15:xx
+0163      99 01 13 15  900913  gprider  1990  90/09/13 15:xx
+5023      EF 04 18 05  900917  ryukyu   1990  90/09/17 12:18? (atypical)
+0165      56 82 11 25  901125  lghostu  1990  90/11/25
+0166      A2 82 11 24  901124  lghost   1990  90/11/24
+0169B     48 06 35 32  901205  abcop    1990  90/12/05 14:35? (atypical)
+0058-08B  4E 04 17 15  910206  qsww     1991  91/02/06 12:17? (atypical)
+0175      91 83 03 22  910322  cltchtrj 1991  91/03/22
+0176      FC 83 03 14  910314  cltchitr 1991  91/03/14
+0179A     73 06 55 17  910318  cottonj  1991  91/03/18 14:55? (atypical)
+0180      73 03 53 00  910403  cottonu  1991  91/04/03 11:53? (atypical)
+0181A     73 06 55 17  910318  cotton   1991  91/03/18 14:55? (atypical)
+0058-09D  91 83 06 26  910618  dcclubfd 1991  91/06/18-91/06/26 (atypical)
+0182      07 07 12 14  921401  ddcrewj  1991  92/07/12 14:01? (atypical)
+0184      07 07 12 16  921622  ddcrew2  1991  92/07/12 16:22? (atypical)
+0186      5F 83 07 01  912030  ddcrewu  1991  92/07/01 20:30? (atypical)
+0190      07 07 17 16  921716  ddcrew   1991  92/07/17 17:16? (atypical)
+ddcrew1   91 84 07 42  910744  ddcrew1  1991  92/07/xx 07:44? (atypical)
+0196      4A 20 12 22  920623  desertbr 1992  92/06/23 20:12? (atypical)
+0197A     3F 84 06 19  920612  wwallyja 1992  92/06/12-92/06/19 (atypical)
+0197B     3F 84 06 19  920612  wwallyj  1992  92/06/12-92/06/19 (atypical)
+
+----
+
+Bad CPUs that gave some more information about the global key:
+
+          global01 global02 global03
+          -------- -------- --------
           .....    ..       ..
-0041                                         bullet
-0045                                         suprleag
-0049      10101000 11110101 11100011  0183D7 shinobi2
-0050      10101000 11110101 11100011  0183D7 shinobi1
-0053      11111111 11111111 11111111  020000 sonicbom
-0056      10101111 11111110 11101000  2E8A3C thndrbld
-0058-02C  10101111 11110101 11111000  33E2E7 sspirtfc
-0058-03B  10101111 11110100 11100110  178BC5 ggroundj
-0058-03C  10101111 11110100 11100100  35C807 gground
-0058-04B  11111100 11100100 11110001  286194 crkdownj
-0058-04D  11111100 11100100 11111001  14BBC6 crkdown
-0058-05B  10101110 11111001 11110110  05D529 sgmastj
-0058-05C  10101110 11111001 11110010  1D0273 sgmastc
-0058-05D?                                    sgmast
-0058-06B  11111100 11110000 11110110  07DBB5 roughrac
-0058-08B  11111011 11101110 11110000  07F6C6 qsww
-0058-09D  10101100 11111001 11100101  109918 dcclubfd
-0059                                         aceattac
-0060      10101111 11111100 11100001  085410 aceattaa
-0065                                         altbeaj1
-0068      10101111 11111001 11110101  2EA810 altbeaj3
-0070      10101111 11110111 11111001  13BCC6 passshtj
-0074      10101111 11110111 11111001  13BCC6 passshta
-0079?                                        exctleag
-0080      10101111 11110111 11100101  3780E6 passsht
-0084      10101111 11110101 11100000  2ED451 wb31
-0085      10101111 11110100 11110111  012208 wb32
-0087      10101111 11110100 11110111  012208 wb34
-0089      10101111 11110100 11100010  140449 wb33
-0090      10101111 11111110 11100100  0FD393 wrestwa1
-0091      10101111 11110100 11100100  35C807 tetris1
-0092      10101111 11110100 11100011  24E628 tetris2
-0093      10101111 11110100 11100010  140449 tetris
-0093A     11111101 11110110 11101110  345129 tetris3
-0096      10101111 11110100 11101010  1B1341 ddux
-0102      10101111 11111101 11111100  0595CA wrestwa2
-0110      10101110 11111100 11100010  02DFD6 goldnax1
-0115      11111011 11111010 11110100  3BA531 bayroutj
-0116      11111100 11100001 11110110  313F29 bayroute
-0118      10101110 11111100 11111000  0FD839 toutrun
-0120      10101110 11111100 11100010  02DFD6 goldnax3
-0121      10101110 11111100 11100010  02DFD6 goldnaxj
-0122      10101110 11111011 11111011  1DFC84 goldnaxu
-0124A     11111001 11101010 11110100  30A841 smgpj
-0125A     11111001 11110000 11101111  3B3EB5 smgpu, smgpu3, smgpu2, smgpu1
-0126      11111010 11100011 11111110  1C5A28 smgp5
-0126A     11111001 11101111 11110000  2A5CD6 smgp, smgp6
-0127A     10101110 11111000 11111001  169BC6 fpoint, fpoint1
-0128      11111111 11100011 11101011  36BD28 eswatj
-0129      11111111 11100011 11101011  36BD28 eswatu
-0130      11111111 11100011 11101100  36BD28 eswat
-0134      10101110 11110100 11100001  3ED730 loffirej
-0135      10101110 11110100 11100000  2DF551 loffireu
-0136      10101110 11110100 11100010  350449 loffire
-0139      11111100 11100110 11110000  388BC5 bloxeed
-0142      11111110 11100111 11101110  0E5DA4 mvpj
-0143      11111101 11111101 11101101  2A7E42 mvp
-0144      11111101 11101000 11101101  0B5618 rachero
-0146      11111011 11100101 11101110  06FCE6 astormj
-0147      11111011 11110001 11110001  36DE94 astormu
-0148      11111011 11100101 11110000  06FCE6 astorm3
-0153      11111011 11110101 11110001
-0157      11111000 11101011 11110101  06AB20 mwalkj
-0158      11111000 11110000 11110000  005FB5 mwalku
-0159      11111000 11101011 11110101  06AB20 mwalk
-0162      11111110 11110001 11110000  0D8394 gprider1
-0163      11111110 11110010 11110000  1E6573 gprider
-0165      10101101 11110100 11100110  1F8BC5 lghostu
-0166      10101101 11110100 11101110  306DA4 lghost
-0169B     11111001 11011100 11011111  19E8A5 abcop
-0175      10101100 11111100 11101001  0D6362 cltchtrj
-0176      10101100 11111100 11110001  39BD94 cltchitr
-0179A     11111001 11001000 11101110  363618 cottonj
-0180      11111100 11001010 11111111  36DE63 cottonu
-0181A     11111001 11001000 11101110  363618 cotton
-0182      11111000 11110011 11110001  1BB221 ddcrewj
-0184      11111000 11110011 11101111  2AD662 ddcrew2
-0186      10101100 11111000 11111110  0AC630 ddcrewu
-0190      11111000 11101110 11101111  138DD6 ddcrew
-0196      11101011 11110011 11101001  37E483 desertbr
-0197A     10101011 11111001 11101100  16E452 wwallyja
-0197B     10101011 11111001 11101100  16E452 wwallyj
-5023      11111011 11101101 11111010  1ADDF7 ryukyu
-          .....    ..       ..
-unknown   11111111 11110110 10111110  226D73    (Shinobi 16A, part no. unreadable, could be dead)
-unknown   10101011 11111000 11010101  07E7C4    (unknown ddcrewa key)
-dead      00001111 00001111 00001111            (Alien Storm CPU with no battery)
-bad       11100000 10101011 10111001            (flaky 317-0049)
+unknown   11111111 11110110 10111110  (Shinobi 16A, part no. unreadable, could be dead)
+unknown   10101011 11111000 11010101  (unknown ddcrewa key)
+dead      00001111 00001111 00001111  (Alien Storm CPU with no battery)
+bad       11100000 10101011 10111001  (flaky 317-0049)
 
 ----
 

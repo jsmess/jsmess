@@ -61,7 +61,7 @@ WRITE16_HANDLER( blockout_frontcolor_w )
 VIDEO_START( blockout )
 {
 	/* Allocate temporary bitmaps */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	return 0;
 }
@@ -109,13 +109,13 @@ WRITE16_HANDLER( blockout_videoram_w )
 
 VIDEO_UPDATE( blockout )
 {
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	{
 		int x,y,color;
 
 
-		color = Machine->pens[512];
+		color = machine->pens[512];
 
 		for (y = 0;y < 256;y++)
 		{

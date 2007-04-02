@@ -110,7 +110,7 @@ VIDEO_UPDATE( raiders5 )
 			col = (col >> 4) & 0x0f;
 			chr = chr | b2*0x100;
 
-			drawgfx(tmpbitmap,Machine->gfx[b1+3],
+			drawgfx(tmpbitmap,machine->gfx[b1+3],
 				chr,
 				col,
 				flipscreen,flipscreen,
@@ -130,7 +130,7 @@ VIDEO_UPDATE( raiders5 )
 		sy = raiders5_yscroll;
 	}
 
-	copyscrollbitmap(bitmap,tmpbitmap,1,&sx,1,&sy,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&sx,1,&sy,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 /* draw sprites */
 
@@ -162,20 +162,20 @@ VIDEO_UPDATE( raiders5 )
 			py = 240-y;
 		}
 
-		drawgfx(bitmap,Machine->gfx[b1],
+		drawgfx(bitmap,machine->gfx[b1],
 			chr,
 			col,
 			fx,fy,
 			px,py,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 
 		if (px>0xf0)
-			drawgfx(bitmap,Machine->gfx[b1],
+			drawgfx(bitmap,machine->gfx[b1],
 				chr,
 				col,
 				fx,fy,
 				px-0x100,py,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -200,12 +200,12 @@ VIDEO_UPDATE( raiders5 )
 				py = 248-8*y;
 			}
 
-			drawgfx(bitmap,Machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[2],
 				chr,
 				col,
 				flipscreen,flipscreen,
 				px,py,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 		}
 	}
 	return 0;

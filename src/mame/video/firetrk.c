@@ -297,8 +297,8 @@ WRITE8_HANDLER( firetrk_playfield_w )
 
 VIDEO_START( firetrk )
 {
-	helper1 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	helper2 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	tilemap1 = tilemap_create(get_tile_info1, get_memory_offset, TILEMAP_OPAQUE, 16, 16, 16, 16);
 	tilemap2 = tilemap_create(get_tile_info2, get_memory_offset, TILEMAP_OPAQUE, 16, 16, 16, 16);
@@ -394,7 +394,7 @@ VIDEO_UPDATE( firetrk )
 		}
 
 		drawgfx(bitmap,
-			Machine->gfx[car[i].layout],
+			machine->gfx[car[i].layout],
 			car[i].number,
 			car[i].color,
 			car[i].flipx,
@@ -420,8 +420,8 @@ VIDEO_EOF( firetrk )
 
 	for (i = 1; i >= 0; i--)
 	{
-		int width = Machine->gfx[car[i].layout]->width;
-		int height = Machine->gfx[car[i].layout]->height;
+		int width = machine->gfx[car[i].layout]->width;
+		int height = machine->gfx[car[i].layout]->height;
 
 		int x;
 		int y;
@@ -432,7 +432,7 @@ VIDEO_EOF( firetrk )
 		}
 
 		drawgfx(helper2,
-			Machine->gfx[car[i].layout],
+			machine->gfx[car[i].layout],
 			car[i].number,
 			0,
 			car[i].flipx,

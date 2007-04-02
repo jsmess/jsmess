@@ -169,7 +169,7 @@ VIDEO_UPDATE( livequiz )
 	}
 #endif
 
-	fillbitmap(bitmap,Machine->pens[4095],cliprect);
+	fillbitmap(bitmap,machine->pens[4095],cliprect);
 
 	if (layers_ctrl & 2)	livequiz_draw_sprites(bitmap,cliprect);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap, 0, 0);

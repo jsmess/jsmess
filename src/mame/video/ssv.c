@@ -194,7 +194,7 @@ void ssv_drawgfx(	mame_bitmap *bitmap, const gfx_element *gfx,
 
 VIDEO_START( ssv )
 {
-	Machine->gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine->gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
 	return 0;
 }
@@ -230,7 +230,7 @@ VIDEO_START( gdfs )
 	if ( video_start_ssv(machine) )
 		return 1;
 
-	Machine->gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	machine->gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
 	eaglshot_gfxram		=	(UINT16*)auto_malloc(4 * 0x100000);
 	eaglshot_dirty_tile	=	(char*)auto_malloc(4 * 0x100000 / (16*8));
@@ -939,8 +939,8 @@ VIDEO_UPDATE( eaglshot )
 			{
 				eaglshot_dirty_tile[tile] = 0;
 
-				decodechar(Machine->gfx[0], tile, (UINT8 *)eaglshot_gfxram, Machine->drv->gfxdecodeinfo[0].gfxlayout);
-				decodechar(Machine->gfx[1], tile, (UINT8 *)eaglshot_gfxram, Machine->drv->gfxdecodeinfo[1].gfxlayout);
+				decodechar(machine->gfx[0], tile, (UINT8 *)eaglshot_gfxram, machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[1], tile, (UINT8 *)eaglshot_gfxram, machine->drv->gfxdecodeinfo[1].gfxlayout);
 			}
 		}
 	}
@@ -1129,7 +1129,7 @@ VIDEO_UPDATE( gdfs )
 			{
 				eaglshot_dirty_tile[tile] = 0;
 
-				decodechar(Machine->gfx[2], tile, (UINT8 *)eaglshot_gfxram, Machine->drv->gfxdecodeinfo[2].gfxlayout);
+				decodechar(machine->gfx[2], tile, (UINT8 *)eaglshot_gfxram, machine->drv->gfxdecodeinfo[2].gfxlayout);
 			}
 		}
 	}
@@ -1167,7 +1167,7 @@ VIDEO_UPDATE( ssv )
 	}
 
 	/* The background color is the first one in the palette */
-	fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 	if (!enable_video)	return 0;
 

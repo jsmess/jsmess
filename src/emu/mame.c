@@ -238,6 +238,7 @@ const char *memory_region_names[REGION_MAX] =
 extern int mame_validitychecks(int game);
 
 static running_machine *create_machine(int game);
+static void reset_machine(running_machine *machine);
 static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
 static void soft_reset(int param);
@@ -269,6 +270,7 @@ int run_game(int game)
 
 	/* create the machine structure and driver */
 	machine = create_machine(game);
+	reset_machine(machine);
 	mame = machine->mame_data;
 
 	/* looooong term: remove this */
@@ -285,6 +287,9 @@ int run_game(int game)
 	mame->exit_pending = FALSE;
 	while (error == 0 && !mame->exit_pending)
 	{
+		/* reset the global machine state first */
+		reset_machine(machine);
+
 		init_resource_tracking();
 		add_free_resources_callback(timer_free);
 		add_free_resources_callback(state_save_free);
@@ -319,8 +324,7 @@ int run_game(int game)
 			nvram_load();
 
 			/* display the startup screens */
-			if (firstrun)
-				ui_display_startup_screens(!settingsloaded);
+			ui_display_startup_screens(firstrun, !settingsloaded);
 			firstrun = FALSE;
 
 			/* start resource tracking; note that soft_reset assumes it can */
@@ -1101,7 +1105,6 @@ UINT32 mame_rand(running_machine *machine)
 static running_machine *create_machine(int game)
 {
 	running_machine *machine;
-	int scrnum;
 
 	/* allocate memory for the machine */
 	machine = malloc(sizeof(*machine));
@@ -1129,17 +1132,7 @@ static running_machine *create_machine(int game)
 		machine->driver_data = malloc(machine->drv->driver_data_size);
 		if (machine->driver_data == NULL)
 			goto error;
-		memset(machine->driver_data, 0, machine->drv->driver_data_size);
 	}
-
-	/* configure all screens to be the default */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		machine->screen[scrnum] = machine->drv->screen[scrnum].defstate;
-
-	/* convert some options into live state */
-	machine->sample_rate = options_get_int_range(mame_options(), OPTION_SAMPLERATE, 1000, 1000000);
-	machine->debug_mode = options_get_bool(mame_options(), OPTION_DEBUG);
-
 	return machine;
 
 error:
@@ -1153,6 +1146,52 @@ error:
 		free(machine);
 	return NULL;
 }
+
+
+/*-------------------------------------------------
+    reset_machine - reset the state of the
+    machine object
+-------------------------------------------------*/
+
+static void reset_machine(running_machine *machine)
+{
+	int scrnum;
+
+	/* reset most portions of the machine */
+
+	/* video-related information */
+	memset(machine->gfx, 0, sizeof(machine->gfx));
+	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
+		machine->screen[scrnum] = machine->drv->screen[scrnum].defstate;
+
+	/* palette-related information */
+	machine->pens = NULL;
+	machine->game_colortable = NULL;
+	machine->remapped_colortable = NULL;
+	machine->shadow_table = NULL;
+
+	/* audio-related information */
+	machine->sample_rate = options_get_int_range(mame_options(), OPTION_SAMPLERATE, 1000, 1000000);
+
+	/* input-related information */
+	machine->input_ports = NULL;
+	machine->record_file = NULL;
+	machine->playback_file = NULL;
+
+	/* debugger-related information */
+	machine->debug_mode = options_get_bool(mame_options(), OPTION_DEBUG);
+
+	/* reset the global MAME data and clear the other privates */
+	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
+	machine->video_data = NULL;
+	machine->palette_data = NULL;
+	machine->streams_data = NULL;
+
+	/* reset the driver data */
+	if (machine->drv->driver_data_size != 0)
+		memset(machine->driver_data, 0, machine->drv->driver_data_size);
+}
+
 
 
 /*-------------------------------------------------

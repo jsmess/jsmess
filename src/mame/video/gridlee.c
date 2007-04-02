@@ -45,7 +45,7 @@ PALETTE_INIT( gridlee )
 {
 	int i;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		palette_set_color(machine,i,pal4bit(color_prom[0x0000]),pal4bit(color_prom[0x0800]),pal4bit(color_prom[0x1000]));
 		color_prom++;
@@ -131,7 +131,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 
 VIDEO_UPDATE( gridlee )
 {
-	pen_t *pens = &Machine->pens[palettebank_vis * 32];
+	pen_t *pens = &machine->pens[palettebank_vis * 32];
 	int x, y, i;
 
 	/* draw scanlines from the VRAM directly */

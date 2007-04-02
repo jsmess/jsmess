@@ -409,10 +409,10 @@ VIDEO_EOF( redclash )
 
 VIDEO_UPDATE( redclash )
 {
-	fillbitmap(bitmap, get_black_pen(machine), &Machine->screen[0].visarea);
+	fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
 	redclash_draw_stars(bitmap, 32, 0, 0x00, 0xff);
 	redclash_draw_sprites(bitmap);
 	redclash_draw_bullets(bitmap);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 	return 0;
 }

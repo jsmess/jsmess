@@ -4047,7 +4047,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jumppop )	/* (c) 2001 ESD */
 	DRIVER( pangpang )	/* (c) 1994 Dong Gue La Mi Ltd. */
 	DRIVER( sdfight )	/* (c) 1996 SemiCom */
-	DRIVER( wlstar )	/* (c) 199? SemiCom */
+	DRIVER( wlstar )	/* (c) 1995 Mijin */
+	DRIVER( wondl96 )	/* (c) 1996 SemiCom */
 	DRIVER( fncywld )	/* (c) 1996 Unico */
 	DRIVER( htchctch )	/* (c) 1995 SemiCom */
 	DRIVER( cookbib )	/* (c) 1995 SemiCom */
@@ -4558,7 +4559,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bm2ndmix )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bm2ndmxa )	/* GX853 (c) 1998 (Japan) */
 	DRIVER( bm3rdmix )	/* GX853 (c) 1998 (Japan) */
-	DRIVER( bm3rdmxa )	/* GX853 (c) 1998 (Japan) */
+	//DRIVER( bm3rdmxb )    /* GX853 (c) 1998 (Japan) */
 	DRIVER( bmcompmx )	/* GX858 (c) 1999 (Japan) */
 	DRIVER( hmcompmx )	/* GX858 (c) 1999 */
 	DRIVER( bm4thmix )	/* GX847 (c) 1999 (Japan) */
@@ -4570,12 +4571,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hmcompm2 )	/* GX988 (c) 2000 */
 	DRIVER( bm6thmix )	/* GXA21 (c) 2001 (Japan) */
 	DRIVER( bm7thmix )	/*       (c) 2001 (Japan) */
-	DRIVER( bmfinal )	/*       (c) 2002 (Japan) */
+	//DRIVER( bmfinal ) /*       (c) 2002 (Japan) */
 
-	DRIVER( popn1 )		/*       (c) 1998 (Japan) */
-	DRIVER( popn2 )		/*       (c) 1998 (Japan) */
-	DRIVER( popn3 )		/*       (c) 1999 (Japan) */
-	DRIVER( popnstex )	/*       (c) 1999 (Japan) */
+	//DRIVER( popn1 )       /*       (c) 1998 (Japan) */
+	//DRIVER( popn2 )       /*       (c) 1998 (Japan) */
+	//DRIVER( popn3 )       /*       (c) 1999 (Japan) */
+	//DRIVER( popnstex )    /*       (c) 1999 (Japan) */
 
 	/* Firebeat games */
 	DRIVER( ppp )		/* GQ977 (c) 2000 */
@@ -5637,7 +5638,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tharierj )	/* UPL-89053 (c) 1989 UPL (Japan) */
 	DRIVER( mustang )	/* UPL-90058 (c) 1990 UPL */
 	DRIVER( mustangs )	/* UPL-90058 (c) 1990 UPL + Seoul Trading */
-	DRIVER( mustangb )	/* bootleg */
 	DRIVER( bioship )	/* UPL-90062 (c) 1990 UPL + American Sammy license */
 	DRIVER( sbsgomo )	/* UPL-90062 (c) 1990 UPL */
 	DRIVER( vandyke )	/* UPL-90064 (c) UPL */
@@ -5652,7 +5652,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tdragon2 )	/* UPL-93091 (c) 1993 NMK */
 	DRIVER( bigbang )	/* UPL-93091 (c) 1993 NMK */
 	DRIVER( tdragon )	/* (c) 1991 NMK / Tecmo */
-	DRIVER( tdragonb )	/* bootleg */
 	DRIVER( hachamf )	/* (c) 1991 NMK */
 	DRIVER( macross )	/* (c) 1992 Banpresto */
 	DRIVER( riot )		/* (c) 1992 NMK */
@@ -5661,11 +5660,19 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sabotenb )	/* (c) 1992 NMK / Tecmo */
 	DRIVER( sabotnba )	/* (c) 1992 NMK / Tecmo */
 	DRIVER( nouryoku )	/* (c) 1995 Tecmo */
-	DRIVER( manybloc )	/* (c) 1991 Bee-Oh */
+	DRIVER( raphero )	/* (c) 1994 Media Trading Corp */
+
+	/* nmk16.c bootlegs using the Seibu Sound System */
+	DRIVER( mustangb )	/* bootleg */
+	DRIVER( tdragonb )	/* bootleg */
+
+	/* Comad games on unofficial hardware based on nmk16.c */
 	DRIVER( ssmissin )	/* (c) 1992 Comad */
 	DRIVER( airattck )	/* (c) 1996 Comad */
-	DRIVER( raphero )	/* (c) 1994 Media Trading Corp */
-	DRIVER( ddealer )	/* (c) 1991 NMK */
+	DRIVER( airattca )	/* (c) 1996 Comad */
+
+	/* Bee-Oh games on unofficial hardware based on nmk16.c */
+	DRIVER( manybloc )	/* (c) 1991 Bee-Oh */
 
 	/* Jaleco Mahjong Games, Similar Hardware to the NMK ones above? */
 	DRIVER( daireika )	/* (c) 1989 Jaleco/NMK */
@@ -5673,6 +5680,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kakumei )	/* (c) 1990 */
 	DRIVER( kakumei2 )	/* (c) 1992 */
 	DRIVER( suchipi )	/* (c) 1993 */
+
+	/* NMK Double Dealer, Similar Hardware to Jaleco Mahjong games above */
+	DRIVER( ddealer )	/* (c) 1991 NMK */
 
 	/* Based on nmk16? */
 	DRIVER( quizpani )	/* (c) 1993 NMK */

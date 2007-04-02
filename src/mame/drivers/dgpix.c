@@ -300,8 +300,8 @@ INPUT_PORTS_END
 VIDEO_START( dgpix )
 {
 	vram = auto_malloc(0x40000*2);
-	bitmaps[0] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	bitmaps[1] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	bitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	bitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	return 0;
 }
 

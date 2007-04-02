@@ -153,7 +153,7 @@ VIDEO_UPDATE( discoboy )
 
 			}
 
-			drawgfx(bitmap,Machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count+=2;
 		}
 	}

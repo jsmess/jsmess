@@ -10,7 +10,7 @@ static tilemap *mogura_tilemap;
 PALETTE_INIT( mogura )
 {
 	int i,j;
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	j = 0;
 	for (i = 0;i < 0x20;i++)
@@ -63,17 +63,17 @@ VIDEO_UPDATE( mogura )
 {
 	/* tilemap layout is a bit strange ... */
 	rectangle clip;
-	clip.min_x = Machine->screen[0].visarea.min_x;
+	clip.min_x = machine->screen[0].visarea.min_x;
 	clip.max_x = 256-1;
-	clip.min_y = Machine->screen[0].visarea.min_y;
-	clip.max_y = Machine->screen[0].visarea.max_y;
+	clip.min_y = machine->screen[0].visarea.min_y;
+	clip.max_y = machine->screen[0].visarea.max_y;
 	tilemap_set_scrollx(mogura_tilemap,0, 256);
 	tilemap_draw(bitmap,&clip,mogura_tilemap,0,0);
 
 	clip.min_x = 256;
 	clip.max_x = 512-1;
-	clip.min_y = Machine->screen[0].visarea.min_y;
-	clip.max_y = Machine->screen[0].visarea.max_y;
+	clip.min_y = machine->screen[0].visarea.min_y;
+	clip.max_y = machine->screen[0].visarea.max_y;
 	tilemap_set_scrollx(mogura_tilemap,0, -128);
 	tilemap_draw(bitmap,&clip,mogura_tilemap,0,0);
 

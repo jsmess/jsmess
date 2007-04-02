@@ -1147,6 +1147,10 @@ static int complete_create(win_window_info *window)
 	// set a pointer back to us
 	SetWindowLongPtr(window->hwnd, GWLP_USERDATA, (LONG_PTR)window);
 
+	// skip the positioning stuff for -video none */
+	if (video_config.mode == VIDEO_MODE_NONE)
+		return 0;
+
 	// adjust the window position to the initial width/height
 	tempwidth = (window->maxwidth != 0) ? window->maxwidth : 640;
 	tempheight = (window->maxheight != 0) ? window->maxheight : 480;
@@ -1168,8 +1172,7 @@ static int complete_create(win_window_info *window)
 		// finish off by trying to initialize DirectX; if we fail, ignore it
 		if ((*draw.window_init)(window))
 			return 1;
-		if (video_config.mode != VIDEO_MODE_NONE)
-			ShowWindow(window->hwnd, SW_SHOW);
+		ShowWindow(window->hwnd, SW_SHOW);
 	}
 
 	// clear the window

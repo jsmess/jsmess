@@ -321,7 +321,7 @@ VIDEO_UPDATE( jollyjgr )
 {
 	int offs;
 
-	fillbitmap(bitmap,Machine->pens[32],cliprect);
+	fillbitmap(bitmap,machine->pens[32],cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
@@ -354,7 +354,7 @@ VIDEO_UPDATE( jollyjgr )
 
 		if (offs < 3*4)  sy++;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code,color,
 				flipx,flipy,
 				sx,sy,

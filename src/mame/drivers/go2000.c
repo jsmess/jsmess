@@ -144,7 +144,7 @@ VIDEO_UPDATE(go2000)
 		{
 			int tile = go2000_video[count];
 			int attr = go2000_video2[count];
-			drawgfx(bitmap,Machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
 	}
@@ -156,7 +156,7 @@ VIDEO_UPDATE(go2000)
 		{
 			int tile = go2000_video[count];
 			int attr = go2000_video2[count];
-			drawgfx(bitmap,Machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,machine->gfx[0],tile,attr,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 		}
 	}

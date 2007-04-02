@@ -21,8 +21,8 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( tankbatt )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	#define RES_1	0xc0 /* this is a guess */
 	#define RES_2	0x3f /* this is a guess */
@@ -33,7 +33,7 @@ PALETTE_INIT( tankbatt )
 	/* ? Skip the first byte ? */
 	color_prom++;
 
-	for (i = 1;i < Machine->drv->total_colors;i++)
+	for (i = 1;i < machine->drv->total_colors;i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -111,7 +111,7 @@ static void tankbatt_draw_bullets( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( tankbatt )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	tankbatt_draw_bullets(bitmap);
 	return 0;
 }

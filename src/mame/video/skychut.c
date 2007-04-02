@@ -48,7 +48,7 @@ VIDEO_UPDATE( skychut )
 	if (get_vh_global_attribute_changed())
 		memset (dirtybuffer, 1, videoram_size);
 
-	fillbitmap(bitmap,Machine->pens[7],cliprect);
+	fillbitmap(bitmap,machine->pens[7],cliprect);
 
 	for (offs = 0;offs < 0x400;offs++)
 	{
@@ -99,7 +99,7 @@ VIDEO_UPDATE( skychut )
 		sx = 31 - offs / 32;
 		sy = offs % 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				videoram[offs],
 				colorram[offs],
 				0,0,
@@ -156,13 +156,13 @@ VIDEO_UPDATE( iremm15 )
 
 			iremm15_drawgfx(tmpbitmap,
 							videoram[offs],
-							Machine->pens[colorram[offs] & 7],
-							Machine->pens[7], // space beam not color 0
+							machine->pens[colorram[offs] & 7],
+							machine->pens[7], // space beam not color 0
 							8*sx,8*sy);
 		}
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

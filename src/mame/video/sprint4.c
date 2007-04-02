@@ -54,7 +54,7 @@ static void sprint4_tile_info(int tile_index)
 
 VIDEO_START( sprint4 )
 {
-	helper = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
 
@@ -82,7 +82,7 @@ VIDEO_UPDATE( sprint4 )
 			bank = 32;
 		}
 
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			(code >> 3) | bank,
 			(attr & 0x80) ? 4 : i,
 			0, 0,
@@ -96,7 +96,7 @@ VIDEO_UPDATE( sprint4 )
 
 VIDEO_EOF( sprint4 )
 {
-	UINT16 BG = Machine->gfx[0]->colortable[0];
+	UINT16 BG = machine->gfx[0]->colortable[0];
 
 	int i;
 
@@ -117,10 +117,10 @@ VIDEO_EOF( sprint4 )
 
 		rect.min_x = horz - 15;
 		rect.min_y = vert - 15;
-		rect.max_x = horz - 15 + Machine->gfx[1]->width - 1;
-		rect.max_y = vert - 15 + Machine->gfx[1]->height - 1;
+		rect.max_x = horz - 15 + machine->gfx[1]->width - 1;
+		rect.max_y = vert - 15 + machine->gfx[1]->height - 1;
 
-		sect_rect(&rect, &Machine->screen[0].visarea);
+		sect_rect(&rect, &machine->screen[0].visarea);
 
 		tilemap_draw(helper, &rect, playfield, 0, 0);
 
@@ -129,7 +129,7 @@ VIDEO_EOF( sprint4 )
 			bank = 32;
 		}
 
-		drawgfx(helper, Machine->gfx[1],
+		drawgfx(helper, machine->gfx[1],
 			(code >> 3) | bank,
 			4,
 			0, 0,

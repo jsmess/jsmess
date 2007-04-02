@@ -97,8 +97,9 @@ int winsound_init(running_machine *machine)
 	add_exit_callback(machine, sound_exit);
 
 	// attempt to initialize directsound
+	// don't make it fatal if we can't -- we'll just run without sound
 	if (dsound_init() != DS_OK)
-		return 1;
+		return 0;
 
 	// return the samples to play the first frame
 	return 0;

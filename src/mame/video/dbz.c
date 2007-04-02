@@ -117,7 +117,7 @@ VIDEO_START( dbz )
 	K053936_wraparound_enable(1, 1);
 	K053936_set_offset(1, -46, -16);
 
-	if (!strcmp(Machine->gamedrv->name, "dbz"))
+	if (!strcmp(machine->gamedrv->name, "dbz"))
 		K056832_set_LayerOffset(0, -34, -16);
 	else
 		K056832_set_LayerOffset(0, -35, -16);

@@ -87,7 +87,7 @@ VIDEO_START( tunhunt )
 	dirtybuffer = auto_malloc(64);
 
 	memset( dirtybuffer, 1, 64 );
-	tmpbitmap = auto_bitmap_alloc( 256, 64, Machine->screen[0].format );
+	tmpbitmap = auto_bitmap_alloc( 256, 64, machine->screen[0].format );
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);

@@ -14,7 +14,7 @@ PALETTE_INIT( mnchmobl )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -69,7 +69,7 @@ VIDEO_START( mnchmobl )
 {
 	dirtybuffer = auto_malloc(0x100);
 	memset( dirtybuffer, 1, 0x100 );
-	tmpbitmap = auto_bitmap_alloc(512,512,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(512,512,machine->screen[0].format);
 	return 0;
 }
 

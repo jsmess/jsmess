@@ -69,7 +69,7 @@ VIDEO_START( system18 )
 		return 1;
 
 	/* create a temp bitmap to draw the VDP data into */
-	tempbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	tempbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	return 0;
 }
 

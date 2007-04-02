@@ -43,7 +43,7 @@ VIDEO_UPDATE( poolshrk )
 
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	/* draw sprites */
 
@@ -52,7 +52,7 @@ VIDEO_UPDATE( poolshrk )
 		int hpos = poolshrk_hpos_ram[i];
 		int vpos = poolshrk_vpos_ram[i];
 
-		drawgfx(bitmap, Machine->gfx[0], i, (i == 0) ? 0 : 1, 0, 0,
+		drawgfx(bitmap, machine->gfx[0], i, (i == 0) ? 0 : 1, 0, 0,
 			248 - hpos, vpos - 15, cliprect, TRANSPARENCY_PEN, 0);
 	}
 

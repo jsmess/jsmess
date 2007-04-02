@@ -78,7 +78,7 @@ VIDEO_START( starshp1 )
 		val = (val << 1) | (bit & 1);
 	}
 
-	helper = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	return 0;
 }
@@ -379,7 +379,7 @@ static int circle_collision(rectangle* rect)
 
 VIDEO_UPDATE( starshp1 )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	if (starshp1_starfield_kill == 0)
 		draw_starfield(bitmap);
@@ -409,8 +409,8 @@ VIDEO_EOF( starshp1 )
 
 	rect.min_x = get_sprite_hpos(13);
 	rect.min_y = get_sprite_vpos(13);
-	rect.max_x = rect.min_x + Machine->gfx[1]->width - 1;
-	rect.max_y = rect.min_y + Machine->gfx[1]->height - 1;
+	rect.max_x = rect.min_x + machine->gfx[1]->width - 1;
+	rect.max_y = rect.min_y + machine->gfx[1]->height - 1;
 
 	if (rect.min_x < 0)
 		rect.min_x = 0;
@@ -421,12 +421,12 @@ VIDEO_EOF( starshp1 )
 	if (rect.max_y > helper->height - 1)
 		rect.max_y = helper->height - 1;
 
-	fillbitmap(helper, Machine->pens[0], &Machine->screen[0].visarea);
+	fillbitmap(helper, machine->pens[0], &machine->screen[0].visarea);
 
 	if (starshp1_attract == 0)
-		draw_spaceship(helper, &Machine->screen[0].visarea);
+		draw_spaceship(helper, &machine->screen[0].visarea);
 
-	if (circle_collision(&Machine->screen[0].visarea))
+	if (circle_collision(&machine->screen[0].visarea))
 	{
 		starshp1_collision_latch |= 1;
 	}
@@ -438,7 +438,7 @@ VIDEO_EOF( starshp1 )
 	{
 		starshp1_collision_latch |= 4;
 	}
-	if (spaceship_collision(helper, &Machine->screen[0].visarea))
+	if (spaceship_collision(helper, &machine->screen[0].visarea))
 	{
 		starshp1_collision_latch |= 8;
 	}

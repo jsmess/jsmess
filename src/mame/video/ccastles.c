@@ -52,7 +52,7 @@ VIDEO_START( ccastles )
 			3,	resistances, bweights, 1000, 0);
 
 	/* allocate a bitmap for drawing sprites */
-	spritebitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	spritebitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* register for savestates */
 	state_save_register_global_array(video_control);
@@ -289,7 +289,7 @@ VIDEO_UPDATE( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs+2] >> 7;
 
-		drawgfx(spritebitmap, Machine->gfx[0], which, color, flip, flip, x, y, cliprect, TRANSPARENCY_PEN, 7);
+		drawgfx(spritebitmap, machine->gfx[0], which, color, flip, flip, x, y, cliprect, TRANSPARENCY_PEN, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */

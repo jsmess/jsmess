@@ -86,12 +86,17 @@ int gregorian_days_in_month(int month, int year)
 void rand_memory(void *memory, size_t length)
 {
 	UINT8 *bytes = (UINT8 *) memory;
+	UINT32 currand;
 	size_t i;
+
+	currand = rand();
+	currand <<= 15;
+	currand ^= rand();
 
 	for (i = 0; i < length; i++)
 	{
-		bytes[i] = (UINT8) rand();
+		currand = currand * 214013 + 2531011;
+		bytes[i] = (UINT8) (currand >> 16);
 	}
-
 }
 

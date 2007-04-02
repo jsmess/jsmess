@@ -493,10 +493,10 @@ VIDEO_UPDATE( tms9928a )
 		tms.StatusReg = tms.oldStatusReg;
 
 	if (! (tms.Regs[1] & 0x40))
-		fillbitmap(bitmap, Machine->pens[tms.BackColour], &Machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[tms.BackColour], &machine->screen[0].visarea);
 	else
 	{
-		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 		{
 			rectangle rt;
 

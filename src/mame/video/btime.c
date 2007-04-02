@@ -52,7 +52,7 @@ PALETTE_INIT( btime )
 	/* This function is also used by Eggs. */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -97,7 +97,7 @@ PALETTE_INIT( lnc )
 	int i;
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -142,7 +142,7 @@ VIDEO_START( bnj )
     memset(dirtybuffer2,1,bnj_backgroundram_size);
 
     /* the background area is twice as wide as the screen */
-    background_bitmap = auto_bitmap_alloc(2*Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+    background_bitmap = auto_bitmap_alloc(2*machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
     bnj_scroll1 = 0;
     bnj_scroll2 = 0;
@@ -557,7 +557,7 @@ VIDEO_UPDATE( btime )
         drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
 
         /* copy the temporary bitmap to the screen */
-        copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+        copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     }
 
     drawsprites(bitmap, 0, 1, 0, videoram, 0x20);
@@ -573,7 +573,7 @@ VIDEO_UPDATE( eggs )
     drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
 
     /* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
     drawsprites(bitmap, 0, 0, 0, videoram, 0x20);
 	return 0;
@@ -588,7 +588,7 @@ VIDEO_UPDATE( lnc )
     drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
 
     /* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
     drawsprites(bitmap, 0, 1, 2, videoram, 0x20);
 	return 0;
@@ -611,7 +611,7 @@ VIDEO_UPDATE( zoar )
         drawchars(tmpbitmap, TRANSPARENCY_NONE, btime_palette + 1, -1);
 
         /* copy the temporary bitmap to the screen */
-        copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+        copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     }
 
     /* The order is important for correct priorities */
@@ -655,7 +655,7 @@ VIDEO_UPDATE( bnj )
                 sy = 240 - sy;
             }
 
-            drawgfx(background_bitmap, Machine->gfx[2],
+            drawgfx(background_bitmap, machine->gfx[2],
                     (bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
                     0,
                     flip_screen, flip_screen,
@@ -667,7 +667,7 @@ VIDEO_UPDATE( bnj )
         scroll = (bnj_scroll1 & 0x02) * 128 + 511 - bnj_scroll2;
         if (!flip_screen)
             scroll = 767-scroll;
-        copyscrollbitmap (bitmap, background_bitmap, 1, &scroll, 0, 0, &Machine->screen[0].visarea,TRANSPARENCY_NONE, 0);
+        copyscrollbitmap (bitmap, background_bitmap, 1, &scroll, 0, 0, &machine->screen[0].visarea,TRANSPARENCY_NONE, 0);
 
         /* copy the low priority characters followed by the sprites
            then the high priority characters */
@@ -680,7 +680,7 @@ VIDEO_UPDATE( bnj )
         drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
 
         /* copy the temporary bitmap to the screen */
-        copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+        copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
         drawsprites(bitmap, 0, 0, 0, videoram, 0x20);
     }
@@ -713,7 +713,7 @@ VIDEO_UPDATE( cookrace )
             sy = 31 - sy;
         }
 
-        drawgfx(bitmap, Machine->gfx[2],
+        drawgfx(bitmap, machine->gfx[2],
                 bnj_backgroundram[offs],
                 0,
                 flip_screen, flip_screen,
@@ -738,7 +738,7 @@ VIDEO_UPDATE( disco )
     drawchars(tmpbitmap, TRANSPARENCY_NONE, btime_palette, -1);
 
     /* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
     drawsprites(bitmap, btime_palette, 0, 0, spriteram, 1);
 	return 0;
@@ -754,7 +754,7 @@ VIDEO_UPDATE( progolf )
 	drawchars(tmpbitmap, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
 
 	/* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 //  drawsprites(bitmap, 0/*btime_palette*/, 0, 0, spriteram, 1);
 	return 0;

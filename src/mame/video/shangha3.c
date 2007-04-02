@@ -74,19 +74,19 @@ static mame_bitmap *rawbitmap;
 
 VIDEO_START( shangha3 )
 {
-	rawbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	rawbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	if (shangha3_do_shadows)
 	{
 		int i;
 
 		/* Prepare the shadow table */
-		/* We draw in a raw bitmap so we don't have to remap pens through Machine->pens */
+		/* We draw in a raw bitmap so we don't have to remap pens through machine->pens */
 		for (i = 0;i < 14;i++)
 			gfx_drawmode_table[i] = DRAWMODE_SOURCE;
 		gfx_drawmode_table[14] = DRAWMODE_SHADOW;
 		for (i = 0;i < 128;i++)
-			Machine->shadow_table[Machine->pens[i]] = Machine->pens[i+128];
+			machine->shadow_table[machine->pens[i]] = machine->pens[i+128];
 	}
 
 	return 0;
@@ -265,6 +265,6 @@ else
 
 VIDEO_UPDATE( shangha3 )
 {
-	copybitmap(bitmap,rawbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,rawbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }

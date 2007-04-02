@@ -491,11 +491,11 @@ VIDEO_START( nbmj8891_1layer )
 	unsigned char *CLUT = memory_region(REGION_USER1);
 	int i;
 
-	nbmj8891_tmpbitmap0 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	nbmj8891_videoram0 = auto_malloc(Machine->screen[0].width * Machine->screen[0].height * sizeof(char));
+	nbmj8891_tmpbitmap0 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	nbmj8891_videoram0 = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(char));
 	nbmj8891_palette = auto_malloc(0x200 * sizeof(char));
 	nbmj8891_clut = auto_malloc(0x800 * sizeof(char));
-	memset(nbmj8891_videoram0, 0xff, (Machine->screen[0].width * Machine->screen[0].height * sizeof(char)));
+	memset(nbmj8891_videoram0, 0xff, (machine->screen[0].width * machine->screen[0].height * sizeof(char)));
 	gfxdraw_mode = 0;
 
 	if (nb1413m3_type == NB1413M3_TAIWANMB)
@@ -506,15 +506,15 @@ VIDEO_START( nbmj8891_1layer )
 
 VIDEO_START( nbmj8891_2layer )
 {
-	nbmj8891_tmpbitmap0 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	nbmj8891_tmpbitmap1 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	nbmj8891_videoram0 = auto_malloc(Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8));
-	nbmj8891_videoram1 = auto_malloc(Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8));
+	nbmj8891_tmpbitmap0 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	nbmj8891_tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	nbmj8891_videoram0 = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT8));
+	nbmj8891_videoram1 = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT8));
 	nbmj8891_palette = auto_malloc(0x200 * sizeof(UINT8));
 	nbmj8891_clut = auto_malloc(0x800 * sizeof(UINT8));
-	memset(nbmj8891_videoram0, 0xff, (Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8)));
-	memset(nbmj8891_videoram1, 0xff, (Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8)));
-	Machine->pens[0x07f] = 0xff;	/* palette_transparent_pen */
+	memset(nbmj8891_videoram0, 0xff, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
+	memset(nbmj8891_videoram1, 0xff, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
+	machine->pens[0x07f] = 0xff;	/* palette_transparent_pen */
 	gfxdraw_mode = 1;
 	return 0;
 }
@@ -530,18 +530,18 @@ VIDEO_UPDATE( nbmj8891 )
 	if (get_vh_global_attribute_changed() || nbmj8891_screen_refresh)
 	{
 		nbmj8891_screen_refresh = 0;
-		for (y = 0; y < Machine->screen[0].height; y++)
+		for (y = 0; y < machine->screen[0].height; y++)
 		{
-			for (x = 0; x < Machine->screen[0].width; x++)
+			for (x = 0; x < machine->screen[0].width; x++)
 			{
 				update_pixel0(x, y);
 			}
 		}
 		if (gfxdraw_mode)
 		{
-			for (y = 0; y < Machine->screen[0].height; y++)
+			for (y = 0; y < machine->screen[0].height; y++)
 			{
-				for (x = 0; x < Machine->screen[0].width; x++)
+				for (x = 0; x < machine->screen[0].width; x++)
 				{
 					update_pixel1(x, y);
 				}
@@ -557,17 +557,17 @@ VIDEO_UPDATE( nbmj8891 )
 
 		if (gfxdraw_mode)
 		{
-			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap0, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap1, 0, 0, 1, &scrolly, &Machine->screen[0].visarea, TRANSPARENCY_PEN, Machine->pens[0xff]);
+			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap0, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap1, 0, 0, 1, &scrolly, &machine->screen[0].visarea, TRANSPARENCY_PEN, machine->pens[0xff]);
 		}
 		else
 		{
-			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap0, 0, 0, 1, &scrolly, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap0, 0, 0, 1, &scrolly, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 		}
 	}
 	else
 	{
-		fillbitmap(bitmap, Machine->pens[0xff], 0);
+		fillbitmap(bitmap, machine->pens[0xff], 0);
 	}
 	return 0;
 }

@@ -340,7 +340,7 @@ VIDEO_UPDATE( taitol )
 		tilemap_draw(bitmap,cliprect,ch1a_tilemap,0,0);
 	}
 	else
-		fillbitmap(bitmap,Machine->pens[0],cliprect);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	return 0;
 }
 

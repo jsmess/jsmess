@@ -43,7 +43,7 @@ PALETTE_INIT(funworld)
 	/* RRRBBBGG */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

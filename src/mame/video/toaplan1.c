@@ -1178,7 +1178,7 @@ VIDEO_UPDATE( rallybik )
 	toaplan1_log_vram();
 #endif
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 0,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 1,0);
@@ -1203,7 +1203,7 @@ VIDEO_UPDATE( toaplan1 )
 #endif
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[0x120],cliprect);
+	fillbitmap(bitmap,machine->pens[0x120],cliprect);
 
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 	for (priority = 8; priority < 16; priority++)
@@ -1230,7 +1230,7 @@ VIDEO_UPDATE( demonwld )
 #endif
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[0x120],cliprect);
+	fillbitmap(bitmap,machine->pens[0x120],cliprect);
 
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 0,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,TILEMAP_IGNORE_TRANSPARENCY | 1,0);

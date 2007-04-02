@@ -35,18 +35,18 @@ typedef void (*atarigen_scanline_callback)(int scanline);
 
 struct atarivc_state_desc
 {
-	int latch1;								/* latch #1 value (-1 means disabled) */
-	int latch2;								/* latch #2 value (-1 means disabled) */
-	int rowscroll_enable;					/* true if row-scrolling is enabled */
-	int palette_bank;						/* which palette bank is enabled */
-	int pf0_xscroll;						/* playfield 1 xscroll */
-	int pf0_xscroll_raw;					/* playfield 1 xscroll raw value */
-	int pf0_yscroll;						/* playfield 1 yscroll */
-	int pf1_xscroll;						/* playfield 2 xscroll */
-	int pf1_xscroll_raw;					/* playfield 2 xscroll raw value */
-	int pf1_yscroll;						/* playfield 2 yscroll */
-	int mo_xscroll;							/* sprite xscroll */
-	int mo_yscroll;							/* sprite xscroll */
+	UINT32 latch1;								/* latch #1 value (-1 means disabled) */
+	UINT32 latch2;								/* latch #2 value (-1 means disabled) */
+	UINT32 rowscroll_enable;					/* true if row-scrolling is enabled */
+	UINT32 palette_bank;						/* which palette bank is enabled */
+	UINT32 pf0_xscroll;						/* playfield 1 xscroll */
+	UINT32 pf0_xscroll_raw;					/* playfield 1 xscroll raw value */
+	UINT32 pf0_yscroll;						/* playfield 1 yscroll */
+	UINT32 pf1_xscroll;						/* playfield 2 xscroll */
+	UINT32 pf1_xscroll_raw;					/* playfield 2 xscroll raw value */
+	UINT32 pf1_yscroll;						/* playfield 2 yscroll */
+	UINT32 mo_xscroll;							/* sprite xscroll */
+	UINT32 mo_yscroll;							/* sprite xscroll */
 };
 
 
@@ -235,6 +235,11 @@ void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes);
 void atarigen_blend_gfx(int gfx0, int gfx1, int mask0, int mask1);
 
 
+/*---------------------------------------------------------------
+    STATE SAVE
+---------------------------------------------------------------*/
+
+void atarigen_init_save_state(void);
 
 /*##########################################################################
     GENERAL ATARI NOTES

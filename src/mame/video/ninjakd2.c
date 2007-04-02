@@ -28,7 +28,7 @@ VIDEO_START( ninjakd2 )
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
-	bitmap_sp = auto_bitmap_alloc (Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	bitmap_sp = auto_bitmap_alloc (machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	return 0;
 }
@@ -145,7 +145,7 @@ void ninjakd2_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( ninjakd2 )
 {
-	fillbitmap(bitmap, Machine->pens[0],0);
+	fillbitmap(bitmap, machine->pens[0],0);
 
 	tilemap_set_scrollx(bg_tilemap, 0, ninjakd2_scrollx);
 	tilemap_set_scrolly(bg_tilemap, 0, ninjakd2_scrolly);

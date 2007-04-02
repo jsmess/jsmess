@@ -72,8 +72,8 @@ VIDEO_START( mcr68 )
 VIDEO_START( zwackery )
 {
 	const UINT8 *colordatabase = (const UINT8 *)memory_region(REGION_GFX3);
-	gfx_element *gfx0 = Machine->gfx[0];
-	gfx_element *gfx2 = Machine->gfx[2];
+	gfx_element *gfx0 = machine->gfx[0];
+	gfx_element *gfx2 = machine->gfx[2];
 	int code, y, x;
 
 	/* initialize the background tilemap */

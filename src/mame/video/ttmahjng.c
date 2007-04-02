@@ -43,8 +43,8 @@ PALETTE_INIT( ttmahjng )
 ***************************************************************************/
 VIDEO_START( ttmahjng )
 {
-	tmpbitmap1 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	video_flip = 0;
 	video_color_select_1 = 0;
@@ -225,8 +225,8 @@ VIDEO_UPDATE( ttmahjng )
 	video_remap_2 = 0;
 
 
-	copybitmap(bitmap,tmpbitmap2,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	copybitmap(bitmap,tmpbitmap1,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+	copybitmap(bitmap,tmpbitmap2,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap1,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 	return 0;
 }
 

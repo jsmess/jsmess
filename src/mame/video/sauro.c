@@ -155,8 +155,8 @@ static void sauro_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( sauro )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 	sauro_draw_sprites(bitmap);
 	return 0;
 }
@@ -232,7 +232,7 @@ static void trckydoc_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( trckydoc )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	trckydoc_draw_sprites(bitmap);
 	return 0;
 }

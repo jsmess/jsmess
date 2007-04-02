@@ -619,11 +619,11 @@ DRIVER_INIT( atari )
 	offs_t ram_top;
 	offs_t ram_size;
 
-	if (!strcmp(Machine->gamedrv->name, "a400")
-		|| !strcmp(Machine->gamedrv->name, "a400pal")
-		|| !strcmp(Machine->gamedrv->name, "a800")
-		|| !strcmp(Machine->gamedrv->name, "a800pal")
-		|| !strcmp(Machine->gamedrv->name, "a800xl"))
+	if (!strcmp(machine->gamedrv->name, "a400")
+		|| !strcmp(machine->gamedrv->name, "a400pal")
+		|| !strcmp(machine->gamedrv->name, "a800")
+		|| !strcmp(machine->gamedrv->name, "a800pal")
+		|| !strcmp(machine->gamedrv->name, "a800xl"))
 	{
 		ram_size = 0xA000;
 	}

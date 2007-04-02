@@ -132,7 +132,7 @@ goto :eof
 :runone
 @echo Testing %1 (%2)...
 echo.>>summary.log
-mame %1 -str 30 -nothrottle -inipath .. -mt -w 1>log\%1.txt 2>log\%1.err
+mame %1 -str 30 -nothrottle -inipath .. -video none 1>log\%1.txt 2>log\%1.err
 if %errorlevel% equ 100 (
 echo @@@@@driver=%1: Exception>>summary.log
 type log\%1.err >>summary.log

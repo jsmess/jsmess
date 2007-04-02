@@ -79,8 +79,8 @@ static WRITE32_HANDLER( paletteram32_w )
 
 VIDEO_START( hangplt )
 {
-	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0) ||
-	    voodoo_start(1, 1, VOODOO_1, 2, 4, 0))
+	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 4) ||
+	    voodoo_start(1, 1, VOODOO_1, 2, 4, 4))
 	{
 		return 1;
 	}
@@ -91,7 +91,7 @@ VIDEO_START( hangplt )
 
 VIDEO_UPDATE( hangplt )
 {
-	fillbitmap(bitmap, Machine->remapped_colortable[0], cliprect);
+	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
 
 	K001604_tile_update(screen);
 //  K001604_draw_back_layer(bitmap, cliprect);
@@ -1003,7 +1003,7 @@ static DRIVER_INIT(gticlub)
 
 static DRIVER_INIT(hangplt)
 {
-	init_konami_cgboard(2, CGBOARD_TYPE_NWKTR);
+	init_konami_cgboard(2, CGBOARD_TYPE_HANGPLT);
 	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));
 	set_cgboard_texture_bank(1, 6, memory_region(REGION_USER5));
 
@@ -1011,6 +1011,7 @@ static DRIVER_INIT(hangplt)
 	sharc_dataram_1 = auto_malloc(0x100000);
 
 	K056800_init(sound_irq_callback);
+	K033906_init();
 }
 
 /*************************************************************************/

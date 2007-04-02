@@ -114,17 +114,17 @@ VIDEO_UPDATE( ikki )
 		bank = (col & 0xe0) << 3;
 		col = ((col & 0x1f)<<0) | ((col & 0x80) >> 2);
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 			videoram[offs*2+1] + bank,
 			col,
 			f,f,
 			px,py,
-			&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 
 /* draw sprites */
 
-	fillbitmap(tmpbitmap, Machine->pens[256], 0);
+	fillbitmap(tmpbitmap, machine->pens[256], 0);
 
 	/* c060 - c0ff */
 	for (offs=0x00; offs<0x800; offs +=4)
@@ -151,15 +151,15 @@ VIDEO_UPDATE( ikki )
 		if (py>240)
 			py = py-256;
 
-		drawgfx(tmpbitmap,Machine->gfx[1],
+		drawgfx(tmpbitmap,machine->gfx[1],
 			chr,
 			col,
 			f,f,
 			px,py,
-			&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+			&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_COLOR,256);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_COLOR,256);
 
 
 	/* mask sprites */
@@ -188,12 +188,12 @@ VIDEO_UPDATE( ikki )
 			bank = (col & 0xe0) << 3;
 			col = ((col & 0x1f)<<0) | ((col & 0x80) >> 2);
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				videoram[offs*2+1] + bank,
 				col,
 				f,f,
 				px,py,
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		}
 	}
 

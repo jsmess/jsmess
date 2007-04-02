@@ -40,8 +40,8 @@ static int stfight_sprite_base = 0;
 PALETTE_INIT( stfight )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	/* unique color for transparency */
@@ -295,7 +295,7 @@ VIDEO_UPDATE( stfight )
 {
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);	/* in case bg_tilemap is disabled */
+	fillbitmap(bitmap,machine->pens[0],cliprect);	/* in case bg_tilemap is disabled */
     tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 

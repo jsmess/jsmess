@@ -36,49 +36,49 @@ VIDEO_UPDATE( copsnrob )
 		sx = 31 - (offs % 32);
 		sy = offs / 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				videoram[offs] & 0x3f,0,
 				0,0,
 				8*sx,8*sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     }
 
 
     /* Draw the cars. Positioning was based on a screen shot */
     if (copsnrob_cary[0])
     {
-        drawgfx(bitmap,Machine->gfx[1],
+        drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[0],0,
                 1,0,
                 0xe4,256-copsnrob_cary[0],
-                &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+                &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
     }
 
     if (copsnrob_cary[1])
     {
-        drawgfx(bitmap,Machine->gfx[1],
+        drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[1],0,
                 1,0,
                 0xc4,256-copsnrob_cary[1],
-                &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+                &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
     }
 
     if (copsnrob_cary[2])
     {
-        drawgfx(bitmap,Machine->gfx[1],
+        drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[2],0,
                 0,0,
                 0x24,256-copsnrob_cary[2],
-                &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+                &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
     }
 
     if (copsnrob_cary[3])
     {
-        drawgfx(bitmap,Machine->gfx[1],
+        drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[3],0,
                 0,0,
                 0x04,256-copsnrob_cary[3],
-                &Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+                &machine->screen[0].visarea,TRANSPARENCY_PEN,0);
     }
 
 
@@ -105,11 +105,11 @@ VIDEO_UPDATE( copsnrob )
 			{
 				/* We've hit a truck's back end, so draw the truck.  The front
                    end may be off the top of the screen, but we don't care. */
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 						0,0,
 						0,0,
 						0x80,256-(y+31),
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 				/* Skip past this truck's front end so we don't draw this
                 truck twice. */
 				y += 31;
@@ -118,11 +118,11 @@ VIDEO_UPDATE( copsnrob )
 			{
 				/* We missed a truck's back end (it was off the bottom of the
                    screen) but have hit its front end, so draw the truck. */
-				drawgfx(bitmap,Machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[2],
 						0,0,
 						0,0,
 						0x80,256-y,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 			}
 		}
     }
@@ -150,11 +150,11 @@ VIDEO_UPDATE( copsnrob )
         {
             if (val & mask1)
             {
-                for (y = 0; y <= Machine->screen[0].visarea.max_y; y++)
+                for (y = 0; y <= machine->screen[0].visarea.max_y; y++)
                 {
                     if (copsnrob_bulletsram[y] & mask2)
                     {
-                        plot_pixel(bitmap, 256-x, y, Machine->pens[1]);
+                        plot_pixel(bitmap, 256-x, y, machine->pens[1]);
                     }
                 }
             }

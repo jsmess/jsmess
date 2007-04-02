@@ -20,7 +20,7 @@ PALETTE_INIT( nyny )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 	}
@@ -35,8 +35,8 @@ PALETTE_INIT( nyny )
 
 VIDEO_START( nyny )
 {
-	tmpbitmap1 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	nyny_videoram = auto_malloc(0x4000);
 	nyny_colourram = auto_malloc(0x4000);
@@ -146,7 +146,7 @@ WRITE8_HANDLER( nyny_videoram1_w )
 
 VIDEO_UPDATE( nyny )
 {
-	copybitmap(bitmap,tmpbitmap2,flip_screen,flip_screen,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	copybitmap(bitmap,tmpbitmap1,flip_screen,flip_screen,0,0,&Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+	copybitmap(bitmap,tmpbitmap2,flip_screen,flip_screen,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap1,flip_screen,flip_screen,0,0,&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 	return 0;
 }

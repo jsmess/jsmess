@@ -93,7 +93,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 VIDEO_UPDATE(sbowling)
 {
-	fillbitmap(bitmap,Machine->pens[0x18],cliprect);
+	fillbitmap(bitmap,machine->pens[0x18],cliprect);
 	tilemap_draw(bitmap,cliprect,sb_tilemap,0,0);
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect, TRANSPARENCY_PEN, color_prom_address);
 	return 0;
@@ -101,7 +101,7 @@ VIDEO_UPDATE(sbowling)
 
 VIDEO_START(sbowling)
 {
-	tmpbitmap = auto_bitmap_alloc(32*8,32*8,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(32*8,32*8,machine->screen[0].format);
 	sb_tilemap = tilemap_create(get_sb_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
 	return 0;
 }
@@ -303,7 +303,7 @@ static PALETTE_INIT( sbowling )
 		3,	resistances_rg, outputs_g,	0,	100,
 		2,	resistances_b,  outputs_b,	0,	100);
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

@@ -42,8 +42,8 @@ PALETTE_INIT( tceptor )
 	int totcolors, totlookup;
 	int i;
 
-	totcolors = Machine->drv->total_colors;
-	totlookup = Machine->drv->color_table_len;
+	totcolors = machine->drv->total_colors;
+	totlookup = machine->drv->color_table_len;
 
 	for (i = 0; i < totcolors; i++)
 	{
@@ -443,7 +443,7 @@ VIDEO_START( tceptor )
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (Machine->gfx[gfx_index] == 0)
+		if (machine->gfx[gfx_index] == 0)
 			break;
 	if (gfx_index + 4 > MAX_GFX_ELEMENTS)
 		return 1;
@@ -461,12 +461,12 @@ VIDEO_START( tceptor )
 		return 1;
 
 	/* allocate temp bitmaps */
-	temp_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	temp_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	if (namco_road_init(gfx_index))
 		return 1;
 
-	namco_road_set_transparent_color(Machine->remapped_colortable[0xfff]);
+	namco_road_set_transparent_color(machine->remapped_colortable[0xfff]);
 
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols, TILEMAP_TRANSPARENT_COLOR, 8, 8, 34, 28);
 

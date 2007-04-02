@@ -92,7 +92,7 @@ VIDEO_START( gradius3 )
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0;i < TOTAL_SPRITES;i++)
-		decodechar(Machine->gfx[1],i,memory_region(REGION_GFX2),&spritelayout);
+		decodechar(machine->gfx[1],i,memory_region(REGION_GFX2),&spritelayout);
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -171,7 +171,7 @@ VIDEO_UPDATE( gradius3 )
 			if (dirtychar[i])
 			{
 				dirtychar[i] = 0;
-				decodechar(Machine->gfx[0],i,(UINT8 *)gradius3_gfxram,&charlayout);
+				decodechar(machine->gfx[0],i,(UINT8 *)gradius3_gfxram,&charlayout);
 			}
 		}
 

@@ -199,7 +199,7 @@ VIDEO_UPDATE( tail2nos )
 			if (dirtychar[i])
 			{
 				dirtychar[i] = 0;
-				decodechar(Machine->gfx[2],i,(UINT8 *)zoomdata,&tilelayout);
+				decodechar(machine->gfx[2],i,(UINT8 *)zoomdata,&tilelayout);
 			}
 		}
 
@@ -214,6 +214,6 @@ VIDEO_UPDATE( tail2nos )
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
 	else
-		fillbitmap(bitmap,Machine->pens[0],cliprect);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	return 0;
 }

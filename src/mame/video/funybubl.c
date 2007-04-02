@@ -93,7 +93,7 @@ VIDEO_UPDATE(funybubl)
 			int data;
 
 			data = funybubl_banked_videoram[offs] | (funybubl_banked_videoram[offs+1] << 8);
-			drawgfx(bitmap,Machine->gfx[0],data&0x7fff,(data&0x8000)?2:1,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,machine->gfx[0],data&0x7fff,(data&0x8000)?2:1,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			offs+=2;
 		}
 	}

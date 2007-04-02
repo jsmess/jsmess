@@ -144,7 +144,7 @@ VIDEO_UPDATE( playch10 )
 	}
 	else	/* Single Monitor version */
 	{
-		rectangle top_monitor = Machine->screen[0].visarea;
+		rectangle top_monitor = machine->screen[0].visarea;
 
 		top_monitor.max_y = ( top_monitor.max_y - top_monitor.min_y ) / 2;
 

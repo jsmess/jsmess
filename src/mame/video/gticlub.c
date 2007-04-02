@@ -995,8 +995,8 @@ VIDEO_START( gticlub )
 	if (K001005_init() != 0)
 		return 1;
 
-	if (mame_stricmp(Machine->gamedrv->name, "gticlub") == 0 ||
-		mame_stricmp(Machine->gamedrv->name, "thunderh") == 0)
+	if (mame_stricmp(machine->gamedrv->name, "gticlub") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "thunderh") == 0)
 		update_30fps = 1;
 
 	return K001604_vh_start(0);

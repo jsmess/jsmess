@@ -401,10 +401,10 @@ static void extract_video_config(void)
 		load_effect_overlay(stemp);
 
 	// per-window options: extract the data
-	get_resolution("resolution0", &video_config.window[0], TRUE);
-	get_resolution("resolution1", &video_config.window[1], TRUE);
-	get_resolution("resolution2", &video_config.window[2], TRUE);
-	get_resolution("resolution3", &video_config.window[3], TRUE);
+	get_resolution(WINOPTION_RESOLUTION0, &video_config.window[0], TRUE);
+	get_resolution(WINOPTION_RESOLUTION1, &video_config.window[1], TRUE);
+	get_resolution(WINOPTION_RESOLUTION2, &video_config.window[2], TRUE);
+	get_resolution(WINOPTION_RESOLUTION3, &video_config.window[3], TRUE);
 
 	// video options: extract the data
 	stemp = options_get_string(mame_options(), WINOPTION_VIDEO);

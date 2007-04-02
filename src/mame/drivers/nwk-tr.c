@@ -382,7 +382,7 @@ void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cli
 
 void K001604_draw_front_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	tilemap_draw(bitmap, cliprect, K001604_layer_8x8[chip][1], 0,0);
+	//tilemap_draw(bitmap, cliprect, K001604_layer_8x8[chip][1], 0,0);
 	tilemap_draw(bitmap, cliprect, K001604_layer_8x8[chip][0], 0,0);
 }
 
@@ -542,7 +542,7 @@ READ32_HANDLER(K001604_reg_r)
 
 VIDEO_START( nwktr )
 {
-	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0))
+	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 4))
 		return 1;
 
 	return K001604_vh_start(0);
@@ -551,7 +551,7 @@ VIDEO_START( nwktr )
 
 VIDEO_UPDATE( nwktr )
 {
-	fillbitmap(bitmap, Machine->remapped_colortable[0], cliprect);
+	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
 
 	voodoo_update(0, bitmap, cliprect);
 
@@ -599,7 +599,8 @@ static READ32_HANDLER( sysreg_r )
 
 static WRITE32_HANDLER( sysreg_w )
 {
-	if( offset == 0 ) {
+	if( offset == 0 )
+	{
 		if (!(mem_mask & 0xff000000))
 		{
 			led_reg0 = (data >> 24) & 0xff;
@@ -611,15 +612,15 @@ static WRITE32_HANDLER( sysreg_w )
 		return;
 	}
 	if( offset == 1 )
-{
+	{
 		if (!(mem_mask & 0x000000ff))
-{
-			if (data & 0x80)	/* CG Board 1 IRQ Ack */
+		{
+			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
 				cpunum_set_input_line(0, INPUT_LINE_IRQ1, CLEAR_LINE);
-}
-			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-{
+			}
+			if (data & 0x40)	// CG Board 0 IRQ Ack
+			{
 				cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 		}
@@ -627,19 +628,52 @@ static WRITE32_HANDLER( sysreg_w )
 	}
 }
 
+static int fpga_uploaded = 0;
+static int lanc2_ram_r = 0;
+static int lanc2_ram_w = 0;
+static UINT8 lanc2_ram[0x8000];
+
 static READ32_HANDLER( lanc1_r )
 {
-	return 0xffffffff;
+	switch (offset)
+	{
+		case 0x40/4:
+		{
+			UINT32 r = 0;
+
+			r |= (fpga_uploaded) ? (1 << 6) : 0;
+			r |= 1 << 5;
+
+			return (r) << 24;
+		}
+
+		default:
+		{
+			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+			return 0xffffffff;
+		}
+	}
 }
 
 static WRITE32_HANDLER( lanc1_w )
 {
-	printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
 }
 
 static READ32_HANDLER( lanc2_r )
 {
-	return 0xffffffff;
+	UINT32 r = 0;
+
+	if (offset == 0 && !(mem_mask & 0x000000ff))
+	{
+		r |= lanc2_ram[lanc2_ram_r & 0x7fff];
+		lanc2_ram_r++;
+	}
+
+	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+	r |= 0xffffff00;
+
+	return r;
 }
 
 static WRITE32_HANDLER( lanc2_w )
@@ -657,11 +691,18 @@ static WRITE32_HANDLER( lanc2_w )
 				((value << 5) & 0x40) |
 				((value << 7) & 0x80);
 
-	//  printf("lanc2_fpga_w: %02X at %08X\n", value, activecpu_get_pc());
+		fpga_uploaded = 1;
+
+		//printf("lanc2_fpga_w: %02X at %08X\n", value, activecpu_get_pc());
+	}
+	else if (!(mem_mask & 0x000000ff))
+	{
+		lanc2_ram[lanc2_ram_w & 0x7fff] = data & 0xff;
+		lanc2_ram_w++;
 	}
 	else
 	{
-		printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+		//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
 	}
 }
 
@@ -715,9 +756,10 @@ static ADDRESS_MAP_START( sharc_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_READWRITE(voodoo_0_r, voodoo_0_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_READWRITE(nwk_voodoo_0_r, nwk_voodoo_0_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_0_r, K033906_0_w)
+	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -838,8 +880,8 @@ static MACHINE_DRIVER_START( nwktr )
  	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 48*8-1)
+	MDRV_SCREEN_SIZE(512, 384)
+	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MDRV_PALETTE_LENGTH(65536)
 
 	MDRV_VIDEO_START(nwktr)
@@ -896,10 +938,13 @@ static UINT8 backup_ram[0x2000];
 static DRIVER_INIT( nwktr )
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_NWKTR);
+	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));
+
 	sharc_dataram = auto_malloc(0x100000);
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
 	K056800_init(sound_irq_callback);
+	K033906_init();
 
 	ppc403_install_spu_tx_dma_handler(jamma_w, jamma_wdata);
 	ppc403_install_spu_rx_dma_handler(jamma_r, jamma_rdata);

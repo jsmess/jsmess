@@ -682,7 +682,7 @@ PALETTE_INIT( shanghai )
 	int i;
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -723,7 +723,7 @@ VIDEO_UPDATE( shanghai )
 		for (x = 0;x < 384;x++)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			plot_pixel(bitmap,x,y,Machine->pens[HD63484_ram[b]]);
+			plot_pixel(bitmap,x,y,machine->pens[HD63484_ram[b]]);
 			b++;
 		}
 	}
@@ -743,7 +743,7 @@ VIDEO_UPDATE( shanghai )
 			{
 				b &= (HD63484_RAM_SIZE-1);
 				if (x <= w && x + sx >= 0 && x+sx < 384)
-					plot_pixel(bitmap,x+sx,y,Machine->pens[HD63484_ram[b]]);
+					plot_pixel(bitmap,x+sx,y,machine->pens[HD63484_ram[b]]);
 				b++;
 			}
 		}

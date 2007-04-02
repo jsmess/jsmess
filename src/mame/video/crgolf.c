@@ -192,9 +192,9 @@ PALETTE_INIT( crgolf )
 VIDEO_START( crgolf )
 {
 	/* allocate temporary bitmaps */
-	screena = auto_bitmap_alloc(256, 256, Machine->screen[0].format);
-	screenb = auto_bitmap_alloc(256, 256, Machine->screen[0].format);
-	highbit = auto_bitmap_alloc(256, 256, Machine->screen[0].format);
+	screena = auto_bitmap_alloc(256, 256, machine->screen[0].format);
+	screenb = auto_bitmap_alloc(256, 256, machine->screen[0].format);
+	highbit = auto_bitmap_alloc(256, 256, machine->screen[0].format);
 
 	/* initialize the "high bit" bitmap */
 	fillbitmap(screena, 0, NULL);

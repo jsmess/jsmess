@@ -973,7 +973,7 @@ VIDEO_UPDATE( apache3 )
 {
 	update_cluts(1024, 0, 2048);
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	draw_sky(bitmap, cliprect, 256, apache3_a0000[1]);
 	draw_sprites(bitmap,cliprect,0, (tatsumi_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
@@ -990,7 +990,7 @@ VIDEO_UPDATE( roundup5 )
 	tilemap_set_scrollx(tx_layer,0,24);
 	tilemap_set_scrolly(tx_layer,0,0); //(((roundupt_crt_reg[0xe]<<8)|roundupt_crt_reg[0xf])>>5) + 96);
 
-	fillbitmap(bitmap,Machine->pens[384],cliprect); // todo
+	fillbitmap(bitmap,machine->pens[384],cliprect); // todo
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	draw_sprites(priority_bitmap,cliprect,1,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
@@ -1002,7 +1002,7 @@ VIDEO_UPDATE( roundup5 )
 
 VIDEO_UPDATE( cyclwarr )
 {
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 //  tilemap_draw(bitmap,cliprect,bg_layer,0,0);
 	update_cluts(8192, 4096, 8192);
 	draw_sprites(bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);

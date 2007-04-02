@@ -939,12 +939,12 @@ static void eeprom_handler(mame_file *file,int read_or_write)
 
 static NVRAM_HANDLER( model3 )
 {
-	if( mame_stricmp(Machine->gamedrv->name, "lostwsga") == 0 ||
-		mame_stricmp(Machine->gamedrv->name, "dirtdvls") == 0 ||
-		mame_stricmp(Machine->gamedrv->name, "dirtdvla") == 0 ||
-		mame_stricmp(Machine->gamedrv->name, "lemans24") == 0 ||
-		mame_stricmp(Machine->gamedrv->name, "von2") == 0 ||
-		mame_stricmp(Machine->gamedrv->name, "von254g") == 0)
+	if( mame_stricmp(machine->gamedrv->name, "lostwsga") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "dirtdvls") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "dirtdvla") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "lemans24") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "von2") == 0 ||
+		mame_stricmp(machine->gamedrv->name, "von254g") == 0)
 	{
 		eeprom_handler(file, read_or_write);
 	} else {

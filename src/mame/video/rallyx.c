@@ -111,8 +111,8 @@ DRIVER_INIT( commsega )
 PALETTE_INIT( rallyx )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	for (i = 0;i < 32;i++)
@@ -281,9 +281,9 @@ VIDEO_START( rallyx )
 	rallyx_radary = rallyx_radarx + 0x800;
 
 	for (i = 0;i < 16;i++)
-		Machine->shadow_table[i] = i+16;
+		machine->shadow_table[i] = i+16;
 	for (i = 16;i < 32;i++)
-		Machine->shadow_table[i] = i;
+		machine->shadow_table[i] = i;
 	for (i = 0;i < 3;i++)
 		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
 	gfx_drawmode_table[3] = DRAWMODE_NONE;
@@ -323,7 +323,7 @@ VIDEO_START( rallyx )
 					{
 						stars[total_stars].x = x;
 						stars[total_stars].y = y;
-						stars[total_stars].color = Machine->pens[color + STARS_COLOR_BASE];
+						stars[total_stars].color = machine->pens[color + STARS_COLOR_BASE];
 
 						total_stars++;
 					}

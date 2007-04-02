@@ -70,8 +70,8 @@ static rectangle rightvisiblearea =
 PALETTE_INIT( naughtyb )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* note: there is no resistor on second PROM so we define second resistance as 0 */
 	static const int resistances[2] = { 270, 0 };
@@ -84,25 +84,25 @@ PALETTE_INIT( naughtyb )
 			2,	resistances,	weights_b,	270,	270);
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,r,g,b;
 
 
 		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[Machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
 
 		/*r = 0x55 * bit0 + 0xaa * bit1;*/
 		r = combine_2_weights(weights_r, bit0, bit1);
 
 		bit0 = (color_prom[0] >> 2) & 0x01;
-		bit1 = (color_prom[Machine->drv->total_colors] >> 2) & 0x01;
+		bit1 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
 
 		/*g = 0x55 * bit0 + 0xaa * bit1;*/
 		g = combine_2_weights(weights_g, bit0, bit1);
 
 		bit0 = (color_prom[0] >> 1) & 0x01;
-		bit1 = (color_prom[Machine->drv->total_colors] >> 1) & 0x01;
+		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
 
 		/*b = 0x55 * bit0 + 0xaa * bit1;*/
 		b = combine_2_weights(weights_b, bit0, bit1);
@@ -157,7 +157,7 @@ VIDEO_START( naughtyb )
 	dirtybuffer = auto_malloc(videoram_size);
 	memset(dirtybuffer, 1, videoram_size);
 
-	tmpbitmap = auto_bitmap_alloc(68*8,28*8,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(68*8,28*8,machine->screen[0].format);
 
 	return 0;
 }
@@ -309,14 +309,14 @@ VIDEO_UPDATE( naughtyb )
 				}
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					naughtyb_videoram2[offs] + 256 * bankreg,
 					(naughtyb_videoram2[offs] >> 5) + 8 * palreg,
 					naughtyb_cocktail,naughtyb_cocktail,
 					8*sx,8*sy,
 					0,TRANSPARENCY_NONE,0);
 
-			drawgfx(tmpbitmap,Machine->gfx[1],
+			drawgfx(tmpbitmap,machine->gfx[1],
 					videoram[offs] + 256*bankreg,
 					(videoram[offs] >> 5) + 8 * palreg,
 					naughtyb_cocktail,naughtyb_cocktail,

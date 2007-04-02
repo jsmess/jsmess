@@ -14,6 +14,7 @@
   Hatch Catch           (c) 1995 SemiCom
   Cookie & Bibi[2]      (c) 1995 SemiCom
   WonderLeague Star     (c) 1995 Mijin   (Korea Only) - SemiCom used the name Mijin up to 1995
+  WonderLeague '96      (c) 1996 SemiCom (Korea Only)
   SD Fighters           (c) 1996 SemiCom (Korea Only)
   B.C. Story            (c) 1997 SemiCom
   MuHanSeungBu          (c) 1997 SemiCom (Korea Only)
@@ -3135,6 +3136,44 @@ ROM_START( wlstar )
 	ROM_LOAD16_BYTE( "10.udr4", 0x100001, 0x80000, CRC(b4693cdd) SHA1(031290586321b95436b30a3339a10dd8df12b245) )
 ROM_END
 
+/* Wonderleague '96 */
+
+ROM_START( wondl96 )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "ub17.bin", 0x00000, 0x40000, CRC(41d8e03c) SHA1(a3ff92ac2ef9b829cf89ceff606f8dd913025bef) )
+	ROM_LOAD16_BYTE( "ub18.bin", 0x00001, 0x40000, CRC(0e4963af) SHA1(6c0607541ca0e5dd8aa4f8138d71150b1ab066cd) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 Code */
+	ROM_LOAD( "ub5.bin", 0x00000, 0x10000, CRC(d99d19c4) SHA1(a7fae11275bb156cdbf2805fcc3aec44892d0817) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+
+	ROM_REGION16_BE( 0x400, REGION_USER1, ROMREGION_ERASE00 ) /* Data from Shared RAM */
+	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
+	//ROM_LOAD16_WORD( "protdata.bin", 0x00200, 0x200 , CRC(b7ffde5b) SHA1(6c370199e5df9c2e03293d0259612c5c4a9061cf) ) // from wlstar, doesn't work propely with wl96
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "uc1.bin", 0x00000, 0x40000,  CRC(0e7913e6) SHA1(9a44bd7ca4030627a26010583216ce1c8032ee1b) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "srom5.bin", 0x00001, 0x20000, CRC(db8010c3) SHA1(db43d894d545a72e8da16555c54dcdbd89d87e3d) )
+	ROM_CONTINUE ( 0x100001,0x20000)
+	ROM_CONTINUE ( 0x040001,0x20000)
+	ROM_CONTINUE ( 0x140001,0x20000)
+	ROM_LOAD16_BYTE( "srom6.bin", 0x00000, 0x20000, CRC(2f364e54) SHA1(b0d3581567bd46565e9422f6bfb11273fc760fda) )
+	ROM_CONTINUE ( 0x100000,0x20000)
+	ROM_CONTINUE ( 0x040000,0x20000)
+	ROM_CONTINUE ( 0x140000,0x20000)
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD16_BYTE( "uor1.bin",  0x000000, 0x80000, CRC(e1e9eebb) SHA1(c92ca988a988c6c5f574654f263e239c2aea9f32) )
+	ROM_LOAD16_BYTE( "uor2.bin",  0x000001, 0x80000, CRC(ddebfe83) SHA1(94e7ed19b9fb87fd7733b832d668449ab0442587) )
+	ROM_LOAD16_BYTE( "uor3.bin",  0x100000, 0x80000, CRC(7efe4d67) SHA1(b96d42cbb9c62502aac6aad9122b44c165149707) )
+	ROM_LOAD16_BYTE( "uor4.bin",  0x100001, 0x80000, CRC(7b1596d1) SHA1(2fab7d6c82318aa335a82af50835139f61e04a3d) )
+ROM_END
+
+
 /*
 
 SemiCom Baseball (MuHanSeungBu)
@@ -3664,10 +3703,12 @@ GAME( 1993, jumpkids, 0,       jumpkids,  tumblepb, jumpkids, ROT0, "Comad", "Ju
 GAME( 1994, metlsavr, 0,       metlsavr,  metlsavr, chokchok, ROT0, "First Amusement", "Metal Saver", 0 )
 GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND ) // PIC is protected, sound simulation not 100%
 GAME( 1994, suprtrio, 0,       suprtrio,  suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", 0 )
+// Should also be 'Magicball Fighting' (c)1994  see  http://kmrb.or.kr/Game_Image/1999/%EC%A0%9C1248%ED%98%B8.jpg
 GAME( 1995, htchctch, 0,       htchctch,  htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , 0 ) // not 100% sure about gfx offsets
 GAME( 1995, cookbib,  0,       cookbib,   cookbib,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , 0 ) // not 100% sure about gfx offsets
 GAME( 1995, chokchok, 0,       cookbib,   chokchok, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS ) // corruption during attract mode (tmap disable?)
-GAME( 1995, wlstar,   0,       cookbib,   wlstar,   wlstar,   ROT0, "Mijin", "Wonder League Star (Korea)", 0) // there are semicom logos on the advert boards.
+GAME( 1995, wlstar,   0,       cookbib,   wlstar,   wlstar,   ROT0, "Mijin", "Wonder League Star - Sok-Magicball Fighting (Korea)", 0) // translates to 'Wonder League Star - Return of Magicball Fighting'
+GAME( 1996, wondl96,  0,       cookbib,   wlstar,   wlstar,   ROT0, "SemiCom", "Wonder League '96 (Korea)", GAME_NOT_WORKING)
 GAME( 1996, fncywld,  0,       fncywld,   fncywld,  fncywld,  ROT0, "Unico", "Fancy World - Earth of Crisis" , 0 ) // game says 1996, testmode 1995?
 GAME( 1996, sdfight,  0,       sdfight,   sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", 0)
 GAME( 1997, bcstry,   0,       bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS) // gfx offsets?

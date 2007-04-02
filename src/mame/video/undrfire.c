@@ -294,7 +294,7 @@ VIDEO_UPDATE( undrfire )
 	pivlayer[2] = 2;
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[0],cliprect);	/* wrong color? */
+	fillbitmap(bitmap,machine->pens[0],cliprect);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a

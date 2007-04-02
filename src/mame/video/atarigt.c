@@ -148,15 +148,15 @@ VIDEO_START( atarigt )
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 64,32);
 
 	/* allocate temp bitmaps */
-	pf_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	an_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	pf_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	an_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
 	/* allocate memory */
 	expanded_mram = auto_malloc(sizeof(*expanded_mram) * MRAM_ENTRIES * 3);
 
 	/* map pens 1:1 */
-	for (i = 0; i < Machine->drv->total_colors; i++)
-		Machine->pens[i] = i;
+	for (i = 0; i < machine->drv->total_colors; i++)
+		machine->pens[i] = i;
 
 	/* compute shift values */
 	rshift = 16;

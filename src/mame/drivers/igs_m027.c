@@ -145,7 +145,7 @@ VIDEO_START(igs_majhong)
 VIDEO_UPDATE(igs_majhong)
 {
 	//??????????
-	fillbitmap(bitmap,get_black_pen(machine),&Machine->screen[0].visarea);
+	fillbitmap(bitmap,get_black_pen(machine),&machine->screen[0].visarea);
 
 	//??????
 	tilemap_draw(bitmap,cliprect,igs_bg_tilemap,0,0);

@@ -426,7 +426,7 @@ void cps_setversion(int v)
 
 static MACHINE_RESET( cps )
 {
-	const char *gamename = Machine->gamedrv->name;
+	const char *gamename = machine->gamedrv->name;
 	struct CPS1config *pCFG=&cps1_config_table[0];
 
 	while(pCFG->name)
@@ -1852,7 +1852,7 @@ VIDEO_UPDATE( cps1 )
 
 
 	/* Blank screen */
-	fillbitmap(bitmap,Machine->pens[4095],cliprect);
+	fillbitmap(bitmap,machine->pens[4095],cliprect);
 
 	cps1_render_stars(bitmap,cliprect);
 

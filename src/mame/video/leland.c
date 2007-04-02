@@ -61,7 +61,7 @@ VIDEO_START( leland )
 {
 	/* allocate memory */
     leland_video_ram = auto_malloc(VRAM_SIZE);
-    fgbitmap = auto_bitmap_alloc(VIDEO_WIDTH * 8, VIDEO_HEIGHT * 8, Machine->screen[0].format);
+    fgbitmap = auto_bitmap_alloc(VIDEO_WIDTH * 8, VIDEO_HEIGHT * 8, machine->screen[0].format);
 
 	/* reset videoram */
     memset(leland_video_ram, 0, VRAM_SIZE);
@@ -491,7 +491,7 @@ VIDEO_EOF( leland )
 VIDEO_UPDATE( leland )
 {
 	const UINT8 *background_prom = memory_region(REGION_USER1);
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	int char_bank = ((gfxbank >> 4) & 0x03) * 0x0400;
 	int prom_bank = ((gfxbank >> 3) & 0x01) * 0x2000;
 	int xcoarse = xscroll / 8;
@@ -542,7 +542,7 @@ VIDEO_UPDATE( leland )
 
 VIDEO_UPDATE( ataxx )
 {
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	int xcoarse = xscroll / 8;
 	int ycoarse = yscroll / 8;
 	int xfine = xscroll % 8;

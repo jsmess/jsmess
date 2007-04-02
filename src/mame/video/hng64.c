@@ -1305,7 +1305,7 @@ VIDEO_START( hng64 )
 	tilemap_set_transparent_pen(hng64_tilemap3,0);
 
 	// 3d Buffer Allocation
-	depthBuffer = (float*)auto_malloc((Machine->screen[0].visarea.max_x)*(Machine->screen[0].visarea.max_y)*sizeof(float)) ;
+	depthBuffer = (float*)auto_malloc((machine->screen[0].visarea.max_x)*(machine->screen[0].visarea.max_y)*sizeof(float)) ;
 
 	// The general display list of polygons in the scene...
 	// !! This really should be a dynamic array !!

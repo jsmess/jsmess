@@ -36,7 +36,7 @@ PALETTE_INIT( leprechn )
 
 VIDEO_START( leprechn )
 {
-	videoram_size = Machine->screen[0].width * Machine->screen[0].height;
+	videoram_size = machine->screen[0].width * machine->screen[0].height;
 
 	/* allocate our own dirty buffer */
 	videoram = auto_malloc(videoram_size);

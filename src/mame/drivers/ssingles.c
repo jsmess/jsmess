@@ -65,7 +65,7 @@ VIDEO_UPDATE(ssingles)
 			int 	code=ssingles_vram[addr]+256*(ssingles_vram[addr+0x800]&3);
 			addr++;
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					code,
 					0,
 					0,0,

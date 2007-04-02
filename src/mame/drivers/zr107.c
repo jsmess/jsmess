@@ -56,7 +56,7 @@ VIDEO_START( zr107 )
 
 VIDEO_UPDATE( zr107 )
 {
-	fillbitmap(bitmap, Machine->remapped_colortable[0], cliprect);
+	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
 
 	K001005_draw(bitmap, cliprect);
 	K001005_swap_buffers();

@@ -156,8 +156,8 @@ PALETTE_INIT( stactics )
 {
     int i,j;
 
-    #define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-    #define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs*sizeof(unsigned short)])
+    #define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+    #define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs*sizeof(unsigned short)])
 
     /* Now make the palette */
 
@@ -231,12 +231,12 @@ VIDEO_START( stactics )
     const unsigned char *firebeam_data;
     unsigned char firechar[256*8*9];
 
-    tmpbitmap  = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-    tmpbitmap2 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-    bitmap_B = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-    bitmap_D = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-    bitmap_E = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-    bitmap_F = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+    tmpbitmap  = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+    tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+    bitmap_B = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+    bitmap_D = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+    bitmap_E = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+    bitmap_F = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	/* Allocate dirty buffers */
 	dirty_videoram_b = auto_malloc(videoram_size);
@@ -285,10 +285,10 @@ VIDEO_START( stactics )
 
     for(i=0;i<256;i++)
     {
-        decodechar(Machine->gfx[4],
+        decodechar(machine->gfx[4],
                    i,
                    firechar,
-                   Machine->drv->gfxdecodeinfo[4].gfxlayout);
+                   machine->drv->gfxdecodeinfo[4].gfxlayout);
     }
 
     /* Decode the Fire Beam ROM for later      */
@@ -315,10 +315,10 @@ VIDEO_START( stactics )
 
     for(i=0;i<32;i++)
     {
-        decodechar(Machine->gfx[5],
+        decodechar(machine->gfx[5],
                    i,
                    stactics_special_chars,
-                   Machine->drv->gfxdecodeinfo[5].gfxlayout);
+                   machine->drv->gfxdecodeinfo[5].gfxlayout);
     }
 
     stactics_vblank_count = 0;
@@ -530,10 +530,10 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_chardata_d[char_number] == 1)
         {
-            decodechar(Machine->gfx[3],
+            decodechar(machine->gfx[3],
                        char_number,
                        stactics_chardata_d,
-                       Machine->drv->gfxdecodeinfo[3].gfxlayout);
+                       machine->drv->gfxdecodeinfo[3].gfxlayout);
             dirty_chardata_d[char_number] = 2;
             dirty_videoram_d[offs] = 1;
         }
@@ -544,12 +544,12 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_videoram_d[offs])
         {
-            drawgfx(bitmap_D,Machine->gfx[3],
+            drawgfx(bitmap_D,machine->gfx[3],
                     char_number,
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
             dirty_videoram_d[offs] = 0;
         }
 
@@ -559,10 +559,10 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_chardata_e[char_number] == 1)
         {
-            decodechar(Machine->gfx[2],
+            decodechar(machine->gfx[2],
                        char_number,
                        stactics_chardata_e,
-                       Machine->drv->gfxdecodeinfo[2].gfxlayout);
+                       machine->drv->gfxdecodeinfo[2].gfxlayout);
             dirty_chardata_e[char_number] = 2;
             dirty_videoram_e[offs] = 1;
         }
@@ -573,12 +573,12 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_videoram_e[offs])
         {
-            drawgfx(bitmap_E,Machine->gfx[2],
+            drawgfx(bitmap_E,machine->gfx[2],
                     char_number,
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
             dirty_videoram_e[offs] = 0;
         }
 
@@ -588,10 +588,10 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_chardata_f[char_number] == 1)
         {
-            decodechar(Machine->gfx[1],
+            decodechar(machine->gfx[1],
                        char_number,
                        stactics_chardata_f,
-                       Machine->drv->gfxdecodeinfo[1].gfxlayout);
+                       machine->drv->gfxdecodeinfo[1].gfxlayout);
             dirty_chardata_f[char_number] = 2;
             dirty_videoram_f[offs] = 1;
         }
@@ -602,12 +602,12 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_videoram_f[offs])
         {
-            drawgfx(bitmap_F,Machine->gfx[1],
+            drawgfx(bitmap_F,machine->gfx[1],
                     char_number,
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
             dirty_videoram_f[offs] = 0;
         }
 
@@ -617,10 +617,10 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_chardata_b[char_number] == 1)
         {
-            decodechar(Machine->gfx[0],
+            decodechar(machine->gfx[0],
                        char_number,
                        stactics_chardata_b,
-                       Machine->drv->gfxdecodeinfo[0].gfxlayout);
+                       machine->drv->gfxdecodeinfo[0].gfxlayout);
             dirty_chardata_b[char_number] = 2;
             dirty_videoram_b[offs] = 1;
         }
@@ -631,12 +631,12 @@ VIDEO_UPDATE( stactics )
 
         if (dirty_videoram_b[offs])
         {
-            drawgfx(bitmap_B,Machine->gfx[0],
+            drawgfx(bitmap_B,machine->gfx[0],
                     char_number,
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
             dirty_videoram_b[offs] = 0;
         }
 
@@ -645,16 +645,16 @@ VIDEO_UPDATE( stactics )
     /* Now, composite the four layers together */
 
     copyscrollbitmap(tmpbitmap2,bitmap_D,0,0,1,&d_offset,
-                     &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                     &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     copyscrollbitmap(tmpbitmap2,bitmap_E,0,0,1,&e_offset,
-                     &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                     &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
     copyscrollbitmap(tmpbitmap2,bitmap_F,0,0,1,&f_offset,
-                     &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                     &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
     copybitmap(tmpbitmap2,bitmap_B,0,0,0,0,
-                     &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                     &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
 
     /* Now flip X & simulate the monitor motion */
-    fillbitmap(bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+    fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
     copybitmap(bitmap,tmpbitmap2,1,0,stactics_horiz_pos,stactics_vert_pos,
                 &visible_screen_area,TRANSPARENCY_NONE,0);
 
@@ -666,30 +666,30 @@ VIDEO_UPDATE( stactics )
     pixel_y = 248;
 
     /* Draw an S */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             18,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             25,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the digits */
     for(i=1;i<7;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
+        drawgfx(bitmap,machine->gfx[5],
                 stactics_display_buffer[i]&0x0f,
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
         pixel_x+=6;
     }
 
@@ -698,30 +698,30 @@ VIDEO_UPDATE( stactics )
     pixel_x = 64+16;
 
     /* Draw a C */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             21,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             25,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the pips */
     for(i=7;i<9;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
+        drawgfx(bitmap,machine->gfx[5],
                 16 + (~stactics_display_buffer[i]&0x0f),
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
         pixel_x+=2;
     }
 
@@ -730,30 +730,30 @@ VIDEO_UPDATE( stactics )
     pixel_x = 128+16;
 
     /* Draw an R */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             22,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             25,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the pips */
     for(i=9;i<12;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
+        drawgfx(bitmap,machine->gfx[5],
                 16 + (~stactics_display_buffer[i]&0x0f),
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
         pixel_x+=2;
     }
 
@@ -761,30 +761,30 @@ VIDEO_UPDATE( stactics )
 
     pixel_x = 192+16;
     /* Draw a B */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             23,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
-    drawgfx(bitmap,Machine->gfx[5],
+    drawgfx(bitmap,machine->gfx[5],
             25,
             0,
             0,0,
             pixel_x,pixel_y,
-            &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the pips */
     for(i=12;i<16;i++)
     {
-        drawgfx(bitmap,Machine->gfx[5],
+        drawgfx(bitmap,machine->gfx[5],
                 16 + (~stactics_display_buffer[i]&0x0f),
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
         pixel_x+=2;
     }
 
@@ -826,36 +826,36 @@ VIDEO_UPDATE( stactics )
         if ((i%2)==1)
         {
             /* Draw 7 LEDS on each side */
-            drawgfx(bitmap,Machine->gfx[4],
+            drawgfx(bitmap,machine->gfx[4],
                     beamdata[firebeam_state*8+i]&0x7f,
                     16*2,  /* Make it green */
                     0,0,
                     pixel_x,pixel_y,
-                    &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-            drawgfx(bitmap,Machine->gfx[4],
+                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+            drawgfx(bitmap,machine->gfx[4],
                     beamdata[firebeam_state*8+i]&0x7f,
                     16*2,  /* Make it green */
                     1,0,
                     255-pixel_x,pixel_y,
-                    &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
             pixel_x+=14;
             pixel_y-=7;
         }
         else
         {
             /* Draw 8 LEDS on each side */
-            drawgfx(bitmap,Machine->gfx[4],
+            drawgfx(bitmap,machine->gfx[4],
                     beamdata[firebeam_state*8+i],
                     16*2,  /* Make it green */
                     0,0,
                     pixel_x,pixel_y,
-                    &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-            drawgfx(bitmap,Machine->gfx[4],
+                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+            drawgfx(bitmap,machine->gfx[4],
                     beamdata[firebeam_state*8+i],
                     16*2,  /* Make it green */
                     1,0,
                     255-pixel_x,pixel_y,
-                    &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
             pixel_x+=16;
             pixel_y-=8;
         }
@@ -869,12 +869,12 @@ VIDEO_UPDATE( stactics )
 
     if (*stactics_motor_on & 0x01)
     {
-        drawgfx(bitmap,Machine->gfx[5],
+        drawgfx(bitmap,machine->gfx[5],
                 26,
                 16, /* red */
                 0,0,
                 pixel_x,pixel_y,
-                &Machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
     }
 
     /* Update vblank counter */

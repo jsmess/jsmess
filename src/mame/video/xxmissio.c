@@ -97,12 +97,12 @@ VIDEO_UPDATE( xxmissio )
 				chr = chr + ((col & 0xc0) << 2 );
 				col = col & 0x0f;
 
-				drawgfx(tmpbitmap,Machine->gfx[2],
+				drawgfx(tmpbitmap,machine->gfx[2],
 					chr,
 					col,
 					flipscreen,flipscreen,
 					px,py,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 			}
 		}
 	}
@@ -118,7 +118,7 @@ VIDEO_UPDATE( xxmissio )
 		sy = xxmissio_yscroll;
 	}
 
-	copyscrollbitmap(bitmap,tmpbitmap,1,&sx,1,&sy,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&sx,1,&sy,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	xxmissio_bg_redraw = 0;
 
 /* draw sprites */
@@ -150,19 +150,19 @@ VIDEO_UPDATE( xxmissio )
 
 		px &= 0x1ff;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 			chr,
 			col,
 			fx,fy,
 			px,py,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 		if (px>0x1e0)
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 				chr,
 				col,
 				fx,fy,
 				px-0x200,py,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 
 	}
 
@@ -188,12 +188,12 @@ VIDEO_UPDATE( xxmissio )
 				py = 248-8*y;
 			}
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				chr,
 				col,
 				flipscreen,flipscreen,
 				px,py,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 		}
 	}
 

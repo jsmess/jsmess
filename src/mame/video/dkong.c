@@ -48,8 +48,8 @@ WRITE8_HANDLER( dkong_videoram_w )
 PALETTE_INIT( dkong )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	for (i = 0;i < 256;i++)
@@ -114,8 +114,8 @@ PALETTE_INIT( dkong )
 PALETTE_INIT( dkong3 )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	for (i = 0;i < 256;i++)
@@ -359,7 +359,7 @@ VIDEO_UPDATE( pestplce )
 	{
 		if (spriteram[offs])
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					spriteram[offs + 2],
 					(spriteram[offs + 1] & 0x0f) + 16 * palette_bank,
 					spriteram[offs + 1] & 0x80,spriteram[offs + 1] & 0x40,

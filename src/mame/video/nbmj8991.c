@@ -296,10 +296,10 @@ static void nbmj8991_gfxdraw(void)
 ******************************************************************************/
 VIDEO_START( nbmj8991 )
 {
-	nbmj8991_tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	nbmj8991_videoram = auto_malloc(Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8));
+	nbmj8991_tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	nbmj8991_videoram = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT8));
 	nbmj8991_clut = auto_malloc(0x800 * sizeof(UINT8));
-	memset(nbmj8991_videoram, 0x00, (Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8)));
+	memset(nbmj8991_videoram, 0x00, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
 	return 0;
 }
 
@@ -311,9 +311,9 @@ VIDEO_UPDATE( nbmj8991_type1 )
 	{
 		nbmj8991_screen_refresh = 0;
 
-		for (y = 0; y < Machine->screen[0].height; y++)
+		for (y = 0; y < machine->screen[0].height; y++)
 		{
-			for (x = 0; x < Machine->screen[0].width; x++)
+			for (x = 0; x < machine->screen[0].width; x++)
 			{
 				update_pixel(x, y);
 			}
@@ -335,11 +335,11 @@ VIDEO_UPDATE( nbmj8991_type1 )
 			scrolly =  (( nbmj8991_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
 	else
 	{
-		fillbitmap(bitmap, Machine->pens[0x00], 0);
+		fillbitmap(bitmap, machine->pens[0x00], 0);
 	}
 	return 0;
 }
@@ -352,9 +352,9 @@ VIDEO_UPDATE( nbmj8991_type2 )
 	{
 		nbmj8991_screen_refresh = 0;
 
-		for (y = 0; y < Machine->screen[0].height; y++)
+		for (y = 0; y < machine->screen[0].height; y++)
 		{
-			for (x = 0; x < Machine->screen[0].width; x++)
+			for (x = 0; x < machine->screen[0].width; x++)
 			{
 				update_pixel(x, y);
 			}
@@ -376,11 +376,11 @@ VIDEO_UPDATE( nbmj8991_type2 )
 			scrolly =  (( nbmj8991_scrolly) + 0x0f1) & 0x1ff;
 		}
 
-		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
 	else
 	{
-		fillbitmap(bitmap, Machine->pens[0x00], 0);
+		fillbitmap(bitmap, machine->pens[0x00], 0);
 	}
 	return 0;
 }

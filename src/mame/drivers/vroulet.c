@@ -101,7 +101,7 @@ VIDEO_START(vroulet)
 VIDEO_UPDATE(vroulet)
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	drawgfx(bitmap, Machine->gfx[0], 0x320, 1, 0, 0,
+	drawgfx(bitmap, machine->gfx[0], 0x320, 1, 0, 0,
 		vroulet_ball[1], vroulet_ball[0] - 12, cliprect, TRANSPARENCY_PEN, 0);
 	return 0;
 }

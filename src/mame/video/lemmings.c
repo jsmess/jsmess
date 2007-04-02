@@ -93,7 +93,7 @@ static void get_tile_info(int tile_index)
 
 VIDEO_START( lemmings )
 {
-	bitmap0 = auto_bitmap_alloc(2048,256,Machine->screen[0].format);
+	bitmap0 = auto_bitmap_alloc(2048,256,machine->screen[0].format);
 	vram_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,64,32);
 
 	vram_buffer = (UINT8*)auto_malloc(2048*64); /* 64 bytes per VRAM character */
@@ -173,7 +173,7 @@ VIDEO_UPDATE( lemmings )
 	/* Decode any characters that have changed in vram */
 	for (i=0; i<2048; i++) {
 		if (vram_dirty[i]) {
-			decodechar(Machine->gfx[2],i,vram_buffer,Machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2],i,vram_buffer,machine->drv->gfxdecodeinfo[2].gfxlayout);
 			tilemap_mark_tile_dirty(vram_tilemap,i);
 			vram_dirty[i]=0;
 		}
@@ -184,7 +184,7 @@ VIDEO_UPDATE( lemmings )
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((lemmings_control_data[6]&2)==0) {
-		copyscrollbitmap(bitmap,bitmap0,1,&x1,1,&y,&Machine->screen[0].visarea,TRANSPARENCY_PEN,0x100);
+		copyscrollbitmap(bitmap,bitmap0,1,&x1,1,&y,&machine->screen[0].visarea,TRANSPARENCY_PEN,0x100);
 	} else {
 		rect.max_x=159;
 		rect.min_x=0;

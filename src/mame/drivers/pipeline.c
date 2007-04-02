@@ -355,7 +355,7 @@ static PALETTE_INIT(pipeline)
 
 MACHINE_RESET( pipeline )
 {
-   ctc_intf.baseclock = Machine->drv->cpu[0].cpu_clock;
+   ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
    z80ctc_init(0, &ctc_intf);
    ppi8255_init(&ppi8255_intf);
 }

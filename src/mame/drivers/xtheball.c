@@ -70,9 +70,9 @@ static VIDEO_UPDATE( xtheball )
 			/* mode 0: foreground is the same as background */
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pix = src1[BYTE_XOR_LE(((y - Machine->screen[0].visarea.min_y) * 0x200 + x) & 0x1ffff)];
+				int pix = src1[BYTE_XOR_LE(((y - machine->screen[0].visarea.min_y) * 0x200 + x) & 0x1ffff)];
 				if (!pix)
-					pix = src0[BYTE_XOR_LE((y - Machine->screen[0].visarea.min_y) * 0x200 + x)];
+					pix = src0[BYTE_XOR_LE((y - machine->screen[0].visarea.min_y) * 0x200 + x)];
 				dst[x] = pix;
 			}
 		}
@@ -83,9 +83,9 @@ static VIDEO_UPDATE( xtheball )
 			int srcbase = display_start / 16;
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pix = src1[BYTE_XOR_LE((srcbase + (y - Machine->screen[0].visarea.min_y) * 0x100 + x/2) & 0x1ffff)];
+				int pix = src1[BYTE_XOR_LE((srcbase + (y - machine->screen[0].visarea.min_y) * 0x100 + x/2) & 0x1ffff)];
 				if (!pix)
-					pix = src0[BYTE_XOR_LE((y - Machine->screen[0].visarea.min_y) * 0x200 + x)];
+					pix = src0[BYTE_XOR_LE((y - machine->screen[0].visarea.min_y) * 0x200 + x)];
 				dst[x] = pix;
 			}
 		}

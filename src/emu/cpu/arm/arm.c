@@ -293,6 +293,8 @@ INLINE UINT32 GetRegister( int rIndex )
 INLINE void SetRegister( int rIndex, UINT32 value )
 {
 	arm.sArmRegister[sRegisterTable[MODE][rIndex]] = value;
+	if (rIndex == eR15)
+		change_pc(value & ADDRESS_MASK);
 }
 
 /***************************************************************************/
@@ -305,6 +307,7 @@ static void arm_reset(void)
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
+	change_pc(R15 & ADDRESS_MASK);
 }
 
 static void arm_exit(void)
@@ -408,6 +411,7 @@ static int arm_execute( int cycles )
 			R15 = eARM_MODE_SVC;	/* Set SVC mode so PC is saved to correct R14 bank */
 			SetRegister( 14, pc );	/* save PC */
 			R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x8|eARM_MODE_SVC|I_MASK|(pc&MODE_MASK);
+			change_pc(pc&ADDRESS_MASK);
 			arm_icount -= 2 * S_CYCLE + N_CYCLE;
 		}
 		else /* Undefined */
@@ -537,6 +541,7 @@ static void HandleBranch(  UINT32 insn )
 	{
 		R15 += off + 8;
 	}
+	change_pc(R15 & ADDRESS_MASK);
 	arm_icount -= 2 * S_CYCLE + N_CYCLE;
 }
 
@@ -612,6 +617,7 @@ static void HandleMemSingle( UINT32 insn )
 			if (rd == eR15)
 			{
 				R15 = (READ32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
+				change_pc(R15 & ADDRESS_MASK);
 
 				/*
                 The docs are explicit in that the bottom bits should be masked off
@@ -844,6 +850,7 @@ static void HandleALU( UINT32 insn )
 		{
 			/* Merge the old NZCV flags into the new PC value */
 			R15 = (rd & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & IRQ_MASK) | (R15&MODE_MASK);
+			change_pc(R15 & ADDRESS_MASK);
 			arm_icount -= S_CYCLE + N_CYCLE;
 		}
 		else

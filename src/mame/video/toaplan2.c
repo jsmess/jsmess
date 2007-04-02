@@ -531,7 +531,7 @@ VIDEO_START( truxton2_0 )
 	{
 		return 1;
 	}
-	if(!strcmp(Machine->gamedrv->name,"fixeighb"))
+	if(!strcmp(machine->gamedrv->name,"fixeighb"))
 	{
 		xoffset[0]=-26;
 		xoffset[1]=-22;
@@ -1481,7 +1481,7 @@ VIDEO_UPDATE( toaplan2_0 )
 	mark_sprite_priority(0);
 	mark_tile_priority(0);
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1508,7 +1508,7 @@ VIDEO_UPDATE( dogyuun_1 )
 	mark_tile_priority(0);
 	mark_tile_priority(1);
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1543,7 +1543,7 @@ VIDEO_UPDATE( batsugun_1 )
 	mark_tile_priority(0);
 	mark_tile_priority(1);
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1596,7 +1596,7 @@ VIDEO_UPDATE( batrider_0 )
 		objectbank_dirty = 0;
 	}
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1607,10 +1607,10 @@ VIDEO_UPDATE( batrider_0 )
 			draw_sprites(bitmap,cliprect,0,priority,1);	/* consider bank select */
 	}
 
-	clip.min_x = Machine->screen[0].visarea.min_x;
-	clip.max_x = Machine->screen[0].visarea.max_x;
-	clip.min_y = Machine->screen[0].visarea.min_y;
-	clip.max_y = Machine->screen[0].visarea.max_y;
+	clip.min_x = machine->screen[0].visarea.min_x;
+	clip.max_x = machine->screen[0].visarea.max_x;
+	clip.min_y = machine->screen[0].visarea.min_y;
+	clip.max_y = machine->screen[0].visarea.max_y;
 
 	/* used for 'for use in' and '8ing' screen on bbakraid, raizing on batrider */
 	for (line = 0; line < 256;line++)
@@ -1635,7 +1635,7 @@ VIDEO_UPDATE( mahoudai_0 )
 	mark_sprite_priority(0);
 	mark_tile_priority(0);
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	if (bg_tile_priority[0][0]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],0,0);
 	if (fg_tile_priority[0][0]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],0,0);

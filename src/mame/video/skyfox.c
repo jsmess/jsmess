@@ -286,7 +286,7 @@ void skyfox_draw_background(mame_bitmap *bitmap)
 
 VIDEO_UPDATE( skyfox )
 {
-	fillbitmap(bitmap,Machine->pens[255],&Machine->screen[0].visarea);	// the bg is black
+	fillbitmap(bitmap,machine->pens[255],&machine->screen[0].visarea);	// the bg is black
 	skyfox_draw_background(bitmap);
 	skyfox_draw_sprites(bitmap);
 	return 0;

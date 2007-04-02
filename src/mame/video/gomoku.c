@@ -33,7 +33,7 @@ PALETTE_INIT( gomoku )
 	int i;
 	int bit0, bit1, bit2, r, g, b;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -121,7 +121,7 @@ VIDEO_START( gomoku )
 	int bgdata;
 	int color;
 
-	gomoku_bg_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	gomoku_bg_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	gomoku_bg_dirty = auto_malloc(0x100);
 

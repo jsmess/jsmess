@@ -347,6 +347,9 @@ static const UINT32 seawolf_controller_table[30] =
 static INPUT_PORTS_START( seawolf )
 	PORT_START_TAG("IN0")
 	/* the grey code is inverted by buffers */
+	/* The wiring diagram shows the encoder has 32 positions. */
+	/* But there is a hand written table on the game logic sheet showing only 30 positions. */
+	/* The actual commutator pcb (encoder) has 30 positions and works like the table says. */
 	PORT_BIT( 0x1f, 0x0f, IPT_POSITIONAL ) PORT_POSITIONS(30) PORT_REMAP_TABLE(seawolf_controller_table) PORT_INVERT PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_CENTERDELTA(0) PORT_NAME("Periscope axis") PORT_CROSSHAIR(X, ((float)MW8080BW_HPIXCOUNT - 28) / MW8080BW_HPIXCOUNT, 16.0 / MW8080BW_HPIXCOUNT, 32.0 / MW8080BW_VBSTART)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Game_Time ) ) PORT_CONDITION("IN1",0xe0,PORTCOND_NOTEQUALS,0xe0) PORT_DIPLOCATION("G4:1,2")
@@ -1775,7 +1778,7 @@ static INPUT_PORTS_START( clowns )
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
 	PORT_START_TAG("MUSIC_ADJ")  /* 3 */
-	PORT_ADJUSTER( 60, "Music Volume" )
+	PORT_ADJUSTER( 40, "Music Volume" )
 INPUT_PORTS_END
 
 
@@ -1822,7 +1825,7 @@ static INPUT_PORTS_START( clowns1 )
 	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_MINMAX(0x01,0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
 	PORT_START_TAG("MUSIC_ADJ")  /* 3 */
-	PORT_ADJUSTER( 60, "Music Volume" )
+	PORT_ADJUSTER( 40, "Music Volume" )
 INPUT_PORTS_END
 
 
@@ -2159,12 +2162,14 @@ static const UINT32 spcenctr_controller_table[] =
 
 static INPUT_PORTS_START( spcenctr )
 	PORT_START_TAG("IN0")
-	PORT_BIT( 0x3f, 0x13, IPT_POSITIONAL ) PORT_POSITIONS(46) PORT_REMAP_TABLE(spcenctr_controller_table) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE /* 6 bit horiz encoder */
+	/* horizontal range is limited to 12 - 46 by stoppers on the control for 35 positions */
+	PORT_BIT( 0x3f, 17, IPT_POSITIONAL ) PORT_POSITIONS(35) PORT_REMAP_TABLE(spcenctr_controller_table+12) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE /* 6 bit horiz encoder */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x3f, 0x16, IPT_POSITIONAL_V ) PORT_POSITIONS(42) PORT_REMAP_TABLE(spcenctr_controller_table) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) /* 6 bit vert encoder */
+	/* vertical range is limited to 22 - 41 by stoppers on the control for 20 positions */
+	PORT_BIT( 0x3f, 19, IPT_POSITIONAL_V ) PORT_POSITIONS(20) PORT_REMAP_TABLE(spcenctr_controller_table+22) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE /* 6 bit vert encoder - pushing control in makes ship move faster */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  /* not connected */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )  /* marked as COIN #2, but the software never reads it */
 
@@ -2438,7 +2443,7 @@ static MACHINE_DRIVER_START( bowler )
 	MDRV_WATCHDOG_TIME_INIT(255 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL))
 
 	/* audio hardware */
-	/* MDRV_IMPORT_FROM(bowler_audio) */
+	MDRV_IMPORT_FROM(bowler_audio)
 
 MACHINE_DRIVER_END
 
@@ -3087,19 +3092,19 @@ ROM_END
 /* 612 */ GAME( 1977, boothill, 0,      boothill, boothill, 0, ROT0,   "Midway", "Boot Hill" , GAME_SUPPORTS_SAVE  )
 /* 615 */ GAME( 1977, checkmat, 0,      checkmat, checkmat, 0, ROT0,   "Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, desertgu, 0,      desertgu, desertgu, 0, ROT0,   "Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-/* 619 */ GAME( 1977, dplay,    0,      dplay,    dplay,    0, ROT0,   "Midway", "Double Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+/* 619 */ GAME( 1977, dplay,    0,      dplay,    dplay,    0, ROT0,   "Midway", "Double Play", GAME_SUPPORTS_SAVE  )
 /* 622 */ GAME( 1977, lagunar,  0,      zzzap,    lagunar,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 623 */ GAME( 1977, gmissile, 0,      gmissile, gmissile, 0, ROT0,   "Midway", "Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 626 */ GAME( 1977, m4,       0,      m4,       m4,       0, ROT0,   "Midway", "M-4", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 630 */ GAMEL(1978, clowns,   0,      clowns,   clowns,   0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
 /* 630 */ GAMEL(1978, clowns1,  clowns, clowns,   clowns1,  0, ROT0,   "Midway", "Clowns (rev. 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )
 /* 640 Space Walk (dump does not exist) */
-/* 642 */ GAME( 1978, einning,  0,      dplay,    einning,  0, ROT0,   "Midway", "Extra Inning", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+/* 642 */ GAME( 1978, einning,  0,      dplay,    einning,  0, ROT0,   "Midway", "Extra Inning", GAME_SUPPORTS_SAVE  )
 /* 643 */ GAME( 1978, shuffle,  0,      shuffle,  shuffle,  0, ROT90,  "Midway", "Shuffleboard", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 644 */ GAME( 1977, dogpatch, 0,      dogpatch, dogpatch, 0, ROT0,   "Midway", "Dog Patch", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 645 */ GAME( 1980, spcenctr, 0,      spcenctr, spcenctr, 0, ROT0,   "Midway", "Space Encounters", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 652 */ GAMEL(1979, phantom2, 0,      phantom2, phantom2, 0, ROT0,   "Midway", "Phantom II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoa0a0ff )
-/* 730 */ GAME( 1978, bowler,   0,      bowler,   bowler,   0, ROT90,  "Midway", "Bowling Alley", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
+/* 730 */ GAME( 1978, bowler,   0,      bowler,   bowler,   0, ROT90,  "Midway", "Bowling Alley", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 739 */ GAMEL(1978, invaders, 0,      invaders, invaders, 0, ROT270, "Midway", "Space Invaders", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_invaders )
 /* 742 */ GAME( 1978, blueshrk, 0,      blueshrk, blueshrk, 0, ROT0,   "Midway", "Blue Shark", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */

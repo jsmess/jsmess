@@ -123,7 +123,7 @@ VIDEO_UPDATE(fortecar)
 {
 	int x,y,count;
 	count = 0;
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	for (y=0;y<32;y++)
 	{
 		for(x=0;x<64;x++)
@@ -132,7 +132,7 @@ VIDEO_UPDATE(fortecar)
 
 			tile = fortecar_ram[0x800+(count*4)+1];
 
-			drawgfx(bitmap,Machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 
 		}

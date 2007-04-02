@@ -43,7 +43,7 @@ PALETTE_INIT( karnov )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -57,10 +57,10 @@ PALETTE_INIT( karnov )
 		bit2 = (color_prom[0] >> 6) & 0x01;
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,r,g,b);
@@ -235,7 +235,7 @@ WRITE16_HANDLER( karnov_playfield_w )
 VIDEO_START( karnov )
 {
 	/* Allocate bitmaps */
-	bitmap_f = auto_bitmap_alloc(512,512,Machine->screen[0].format);
+	bitmap_f = auto_bitmap_alloc(512,512,machine->screen[0].format);
 
 	dirty_f=auto_malloc(0x800);
 	memset(dirty_f,1,0x800);
@@ -250,7 +250,7 @@ VIDEO_START( karnov )
 VIDEO_START( wndrplnt )
 {
 	/* Allocate bitmaps */
-	bitmap_f = auto_bitmap_alloc(512,512,Machine->screen[0].format);
+	bitmap_f = auto_bitmap_alloc(512,512,machine->screen[0].format);
 
 	dirty_f=auto_malloc(0x800);
 	memset(dirty_f,1,0x800);

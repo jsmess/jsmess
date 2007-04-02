@@ -70,6 +70,6 @@ VIDEO_UPDATE( dotrikun )
 		for (offs = 0; offs < videoram_size; offs++)
 			dotrikun_videoram_w(offs,videoram[offs]);
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }

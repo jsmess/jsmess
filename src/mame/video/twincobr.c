@@ -519,7 +519,7 @@ VIDEO_UPDATE( toaplan0 )
 
 	if (wardner_sprite_hack) wardner_sprite_priority_hack();
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 	twincobr_draw_sprites(bitmap,cliprect,0x0400);

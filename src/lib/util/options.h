@@ -49,7 +49,6 @@ struct _options_entry
 	const char *		description;		/* description for -showusage */
 };
 
-typedef enum _options_message options_message;
 enum _options_message
 {
 	OPTMSG_INFO,
@@ -57,6 +56,7 @@ enum _options_message
 	OPTMSG_ERROR,
 	OPTMSG_COUNT
 };
+typedef enum _options_message options_message;
 
 
 

@@ -1077,7 +1077,7 @@ VIDEO_START( dambustr )
 	draw_bullets = dambustr_draw_bullets;
 
 	/* allocate the temporary bitmap for the background priority */
-	dambustr_tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	dambustr_tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* make a copy of the tilemap to emulate background priority */
 	dambustr_videoram2 = auto_malloc(0x0400);
@@ -2287,7 +2287,7 @@ VIDEO_UPDATE( dambustr )
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
-	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 
 	tilemap_draw(bitmap, 0, bg_tilemap, 0, 0);
 

@@ -184,7 +184,7 @@ VIDEO_START( taitojc )
 {
  	/* find first empty slot to decode gfx */
 	for (taitojc_gfx_index = 0; taitojc_gfx_index < MAX_GFX_ELEMENTS; taitojc_gfx_index++)
-		if (Machine->gfx[taitojc_gfx_index] == 0)
+		if (machine->gfx[taitojc_gfx_index] == 0)
 			break;
 
 	if (taitojc_gfx_index == MAX_GFX_ELEMENTS)
@@ -202,27 +202,27 @@ VIDEO_START( taitojc )
 	memset(taitojc_tile_ram, 0, 0x4000);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	Machine->gfx[taitojc_gfx_index] = allocgfx(&taitojc_char_layout);
-	if (!Machine->gfx[taitojc_gfx_index])
+	machine->gfx[taitojc_gfx_index] = allocgfx(&taitojc_char_layout);
+	if (!machine->gfx[taitojc_gfx_index])
 		return 1;
 
 	/* set the color information */
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-		Machine->gfx[taitojc_gfx_index]->colortable = Machine->remapped_colortable;
-		Machine->gfx[taitojc_gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+		machine->gfx[taitojc_gfx_index]->colortable = machine->remapped_colortable;
+		machine->gfx[taitojc_gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-		Machine->gfx[taitojc_gfx_index]->colortable = Machine->pens;
-		Machine->gfx[taitojc_gfx_index]->total_colors = Machine->drv->total_colors / 16;
+		machine->gfx[taitojc_gfx_index]->colortable = machine->pens;
+		machine->gfx[taitojc_gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 	taitojc_texture = auto_malloc(0x400000);
 
-	framebuffer = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	framebuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	zbuffer = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
 	return 0;
 }

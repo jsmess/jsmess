@@ -245,7 +245,7 @@ static void metlclsh_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_UPDATE( metlclsh )
 {
-	fillbitmap(bitmap,Machine->pens[0x10],cliprect);
+	fillbitmap(bitmap,machine->pens[0x10],cliprect);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,1,0);	// low priority tiles of foreground
 	if (metlclsh_scrollx[0] & 0x08)					// background (if enabled)

@@ -201,11 +201,11 @@ PALETTE_INIT( tia_PAL )
 
 VIDEO_START( tia )
 {
-	int cx = Machine->screen[0].width;
-	int cy = Machine->screen[0].height;
+	int cx = machine->screen[0].width;
+	int cy = machine->screen[0].height;
 
-	helper[0] = auto_bitmap_alloc(cx, cy, Machine->screen[0].format);
-	helper[1] = auto_bitmap_alloc(cx, cy, Machine->screen[0].format);
+	helper[0] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
+	helper[1] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
 
 	return 0;
 }

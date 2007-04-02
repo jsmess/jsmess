@@ -25,7 +25,7 @@ struct atarimo_mask
 /* internal structure containing the state of the motion objects */
 struct atarimo_data
 {
-	int					gfxchanged;			/* true if the gfx info has changed */
+	UINT32				gfxchanged;			/* true if the gfx info has changed */
 	gfx_element	gfxelement[MAX_GFX_ELEMENTS]; /* local copy of graphics elements */
 	int					gfxgranularity[MAX_GFX_ELEMENTS];
 
@@ -57,13 +57,13 @@ struct atarimo_data
 	int					sliprammask;		/* combined mask when accessing SLIP RAM with raw addresses */
 	int					slipramsize;		/* total size of SLIP RAM, in entries */
 
-	int					palettebase;		/* base palette entry */
+	UINT32				palettebase;		/* base palette entry */
 	int					maxcolors;			/* maximum number of colors */
 	int					transpen;			/* transparent pen index */
 
-	int					bank;				/* current bank number */
-	int					xscroll;			/* current x scroll offset */
-	int					yscroll;			/* current y scroll offset */
+	UINT32				bank;				/* current bank number */
+	UINT32				xscroll;			/* current x scroll offset */
+	UINT32				yscroll;			/* current y scroll offset */
 
 	int					maxperline;			/* maximum number of entries/line */
 
@@ -95,7 +95,7 @@ struct atarimo_data
 
 	struct atarimo_entry *activelist[ATARIMO_MAXPERBANK];	/* pointers to active motion objects */
 	struct atarimo_entry **activelast;		/* pointer to the last pointer in the active list */
-	int					last_link;			/* previous starting point */
+	UINT32				last_link;			/* previous starting point */
 
 	UINT8 *				dirtygrid;			/* grid of dirty rects for blending */
 	int					dirtywidth;			/* width of dirty grid */
@@ -104,8 +104,8 @@ struct atarimo_data
 	rectangle	rectlist[ATARIMO_MAXPERBANK];	/* list of bounding rectangles */
 	int					rectcount;
 
-	int					last_xpos;			/* (during processing) the previous X position */
-	int					next_xpos;			/* (during processing) the next X position */
+	UINT32				last_xpos;			/* (during processing) the previous X position */
+	UINT32				next_xpos;			/* (during processing) the next X position */
 };
 
 
@@ -143,7 +143,7 @@ UINT16 *atarimo_1_slipram;
 ##########################################################################*/
 
 static struct atarimo_data atarimo[ATARIMO_MAX];
-
+static mame_timer *force_update_timer;
 
 
 /*##########################################################################
@@ -250,7 +250,71 @@ INLINE void init_gfxelement(struct atarimo_data *mo, int idx)
 	mo->gfxelement[idx].total_colors = 65536;
 }
 
+static struct atarimo_data atarimo[ATARIMO_MAX];
+static mame_timer *force_update_timer;
 
+/*---------------------------------------------------------------
+    init_savestate: Initialize save states
+---------------------------------------------------------------*/
+
+static void init_savestate(int index, struct atarimo_data *mo)
+{
+	state_save_register_item("atarimo", index, mo->gfxchanged);
+	state_save_register_item("atarimo", index, mo->palettebase);
+	state_save_register_item("atarimo", index, mo->bank);
+	state_save_register_item("atarimo", index, mo->xscroll);
+	state_save_register_item("atarimo", index, mo->yscroll);
+	state_save_register_item("atarimo", index, mo->last_link);
+	state_save_register_item("atarimo", index, mo->last_xpos);
+	state_save_register_item("atarimo", index, mo->next_xpos);
+
+#if 0
+	// These are not modified in code
+	// Left in for completeness
+	state_save_register_item("atarimo", index, mo->reverse);
+	state_save_register_item("atarimo", index, mo->split);
+	state_save_register_item("atarimo", index, mo->linked);
+	state_save_register_item("atarimo", index, mo->swapxy);
+	state_save_register_item("atarimo", index, mo->nextneighbor);
+	state_save_register_item("atarimo", index, mo->slipshift);
+	state_save_register_item("atarimo", index, mo->slipoffset);
+	state_save_register_item("atarimo", index, mo->slipramsize);
+	state_save_register_item("atarimo", index, mo->sliprammask);
+	state_save_register_item("atarimo", index, mo->entrycount);
+	state_save_register_item("atarimo", index, mo->entrybits);
+	state_save_register_item("atarimo", index, mo->bankcount);
+	state_save_register_item("atarimo", index, mo->tilewidth);
+	state_save_register_item("atarimo", index, mo->tileheight);
+	state_save_register_item("atarimo", index, mo->tilexshift);
+	state_save_register_item("atarimo", index, mo->tileyshift);
+	state_save_register_item("atarimo", index, mo->bitmapwidth);
+	state_save_register_item("atarimo", index, mo->bitmapheight);
+	state_save_register_item("atarimo", index, mo->bitmapxmask);
+	state_save_register_item("atarimo", index, mo->bitmapymask);
+	state_save_register_item("atarimo", index, mo->spriteramsize);
+	state_save_register_item("atarimo", index, mo->spriterammask);
+	state_save_register_item("atarimo", index, mo->maxcolors);
+	state_save_register_item("atarimo", index, mo->transpen);
+	state_save_register_item("atarimo", index, mo->maxperline);
+	state_save_register_item("atarimo", index, mo->specialvalue);
+	state_save_register_item("atarimo", index, mo->codehighshift);
+	state_save_register_item("atarimo", index, mo->dirtywidth);
+	state_save_register_item("atarimo", index, mo->dirtyheight);
+#endif
+
+	state_save_register_bitmap("atarimo", index, "bitmap", mo->bitmap);
+
+	state_save_register_memory("atarimo", index, "spriteram", mo->spriteram, sizeof(struct atarimo_entry), mo->spriteramsize);
+
+	state_save_register_item_pointer("atarimo", index, mo->codelookup, round_to_powerof2(mo->codemask.mask));
+
+	state_save_register_item_pointer("atarimo", index, mo->colorlookup, round_to_powerof2(mo->colormask.mask));
+
+	state_save_register_item_pointer("atarimo", index, mo->dirtygrid, mo->dirtywidth * mo->dirtyheight);
+
+	state_save_register_item_pointer("atarimo", index, mo->gfxlookup, round_to_powerof2(mo->gfxmask.mask));
+
+}
 
 /*##########################################################################
     GLOBAL FUNCTIONS
@@ -264,7 +328,7 @@ static void force_update(int scanline)
 	scanline += 64;
 	if (scanline >= Machine->screen[0].visarea.max_y)
 		scanline = 0;
-	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, force_update);
+	mame_timer_adjust(force_update_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 /*---------------------------------------------------------------
@@ -385,7 +449,10 @@ int atarimo_init(int map, const struct atarimo_desc *desc)
 	init_gfxelement(mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, force_update);
+	force_update_timer = mame_timer_alloc(force_update);
+	mame_timer_adjust(force_update_timer,video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
+
+	init_savestate(map, mo);
 
 	logerror("atarimo_init:\n");
 	logerror("  width=%d (shift=%d),  height=%d (shift=%d)\n", mo->tilewidth, mo->tilexshift, mo->tileheight, mo->tileyshift);

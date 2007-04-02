@@ -144,12 +144,12 @@ VIDEO_START( contra )
 	private_spriteram = auto_malloc(0x800);
 	private_spriteram_2 = auto_malloc(0x800);
 
-	bg_clip = Machine->screen[0].visarea;
+	bg_clip = machine->screen[0].visarea;
 	bg_clip.min_x += 40;
 
 	fg_clip = bg_clip;
 
-	tx_clip = Machine->screen[0].visarea;
+	tx_clip = machine->screen[0].visarea;
 	tx_clip.max_x = 39;
 	tx_clip.min_x = 0;
 

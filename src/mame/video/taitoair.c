@@ -371,7 +371,7 @@ VIDEO_UPDATE( taitoair )
 {
 	TC0080VCO_tilemap_update();
 
-	fillbitmap(bitmap, Machine->pens[0x41], cliprect);
+	fillbitmap(bitmap, machine->pens[0x41], cliprect);
 
 #ifdef MAME_DEBUG
 	if ( !code_pressed(KEYCODE_A) )

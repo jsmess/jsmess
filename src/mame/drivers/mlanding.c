@@ -206,7 +206,7 @@ VIDEO_START(mlanding)
 	}
 
 	for	(i=0;i<8;i++)
-		ml_bitmap[i] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+		ml_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	return 0;
 }
 
@@ -247,7 +247,7 @@ VIDEO_UPDATE(mlanding)
 				//test
 					if(code)
 					{
-						drawgfx(ml_bitmap[num],Machine->gfx[0],
+						drawgfx(ml_bitmap[num],machine->gfx[0],
 							code++,
 							0,
 							0,0,

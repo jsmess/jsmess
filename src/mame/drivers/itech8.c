@@ -631,7 +631,7 @@ static MACHINE_START( sstrike )
 static MACHINE_RESET( itech8 )
 {
 	/* make sure bank 0 is selected */
-	if (Machine->drv->cpu[0].cpu_type == CPU_M6809)
+	if (machine->drv->cpu[0].cpu_type == CPU_M6809)
 		memory_set_bankptr(1, &memory_region(REGION_CPU1)[0x4000]);
 
 	/* reset the PIA (if used) */

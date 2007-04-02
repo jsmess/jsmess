@@ -209,18 +209,18 @@ VIDEO_UPDATE( gottlieb )
 {
 	if (!background_priority)
 	{
-		tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
+		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, TILEMAP_IGNORE_TRANSPARENCY, 0);
 	}
 	else
 	{
-		fillbitmap(bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 	}
 
 	gottlieb_draw_sprites(bitmap);
 
 	if (background_priority)
 	{
-		tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	}
 	return 0;
 }

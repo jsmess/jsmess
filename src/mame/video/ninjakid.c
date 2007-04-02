@@ -289,7 +289,7 @@ VIDEO_UPDATE( ninjakid )
 					py = 248-8*y;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 					chr,
 					col & 0x0f,
 					flipscreen,flipscreen,

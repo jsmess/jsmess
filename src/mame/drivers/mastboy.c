@@ -485,12 +485,12 @@ VIDEO_UPDATE(mastboy)
 
 			if (tileno&0x800)
 			{
-				gfx = Machine->gfx[1];
+				gfx = machine->gfx[1];
 				tileno &=0x7ff;
 			}
 			else
 			{
-				gfx = Machine->gfx[0];
+				gfx = machine->gfx[0];
 			}
 
 

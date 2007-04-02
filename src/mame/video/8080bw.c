@@ -385,7 +385,7 @@ PALETTE_INIT( invadpt2 )
 	int i;
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		/* this bit arrangment is a little unusual but are confirmed by screen shots */
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 2),pal1bit(i >> 1));
@@ -398,7 +398,7 @@ PALETTE_INIT( sflush )
 	int i;
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		/* this bit arrangment is a little unusual but are confirmed by screen shots */
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 2),pal1bit(i >> 1));
@@ -410,7 +410,7 @@ PALETTE_INIT( indianbt )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 	}
@@ -446,7 +446,7 @@ PALETTE_INIT( cosmo )
 	int i;
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 	}

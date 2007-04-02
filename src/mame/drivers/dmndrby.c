@@ -142,7 +142,7 @@ VIDEO_START(dderby)
 VIDEO_UPDATE(dderby)
 {
 	int x,y,count;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 

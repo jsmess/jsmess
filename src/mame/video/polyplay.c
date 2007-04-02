@@ -82,19 +82,19 @@ VIDEO_UPDATE( polyplay )
 				sx = offs % 64;
 				sy = offs / 64;
 
-				drawgfx(tmpbitmap,Machine->gfx[0],
+				drawgfx(tmpbitmap,machine->gfx[0],
 						charcode,
 						0,
 						0,0,
 						8*sx,8*sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+						&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 			}
 			else {
 				/* decode modified characters */
 				if (dirtycharacter[charcode] == 1)
 				{
-					decodechar(Machine->gfx[1],charcode-0x80,polyplay_characterram,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+					decodechar(machine->gfx[1],charcode-0x80,polyplay_characterram,machine->drv->gfxdecodeinfo[1].gfxlayout);
 					dirtycharacter[charcode] = 2;
 				}
 
@@ -104,17 +104,17 @@ VIDEO_UPDATE( polyplay )
 				sx = offs % 64;
 				sy = offs / 64;
 
-				drawgfx(tmpbitmap,Machine->gfx[1],
+				drawgfx(tmpbitmap,machine->gfx[1],
 						charcode,
 						0,
 						0,0,
 						8*sx,8*sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+						&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 			}
 		}
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 
 	for (offs = 0;offs < 256;offs++)

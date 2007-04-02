@@ -12,7 +12,7 @@ PALETTE_INIT( truco )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int	r = ( i & 0x8 ) ? 0xff : 0x00;
 		int g = ( i & 0x4 ) ? 0xff : 0x00;
@@ -45,7 +45,7 @@ VIDEO_UPDATE( truco )
 				pixel = ( vid[x>>1] >> 4 ) & 0x0f;
 			}
 
-			plot_pixel(bitmap,x,y,Machine->pens[pixel]);
+			plot_pixel(bitmap,x,y,machine->pens[pixel]);
 		}
 
 		vid += 0x80;

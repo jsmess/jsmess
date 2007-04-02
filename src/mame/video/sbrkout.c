@@ -57,7 +57,7 @@ static void sbrkout_draw_balls( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( sbrkout )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	sbrkout_draw_balls(bitmap);
 	return 0;
 }

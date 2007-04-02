@@ -292,7 +292,7 @@ VIDEO_UPDATE( dcon )
 	if ((dcon_enable&1)!=1)
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	else
-		fillbitmap(bitmap,Machine->pens[15],cliprect); /* Should always be black, not pen 15 */
+		fillbitmap(bitmap,machine->pens[15],cliprect); /* Should always be black, not pen 15 */
 
 	tilemap_draw(bitmap,cliprect,midground_layer,0,1);
 	tilemap_draw(bitmap,cliprect,foreground_layer,0,2);
@@ -328,7 +328,7 @@ VIDEO_UPDATE( sdgndmps )
 	if ((dcon_enable&1)!=1)
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	else
-		fillbitmap(bitmap,Machine->pens[15],cliprect); /* Should always be black, not pen 15 */
+		fillbitmap(bitmap,machine->pens[15],cliprect); /* Should always be black, not pen 15 */
 
 	tilemap_draw(bitmap,cliprect,midground_layer,0,1);
 	tilemap_draw(bitmap,cliprect,foreground_layer,0,2);

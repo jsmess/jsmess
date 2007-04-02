@@ -75,10 +75,10 @@ VIDEO_START( flkatck )
 	k007121_tilemap[0] = tilemap_create(get_tile_info_A,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 	k007121_tilemap[1] = tilemap_create(get_tile_info_B,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 
-	k007121_clip[0] = Machine->screen[0].visarea;
+	k007121_clip[0] = machine->screen[0].visarea;
 	k007121_clip[0].min_x += 40;
 
-	k007121_clip[1] = Machine->screen[0].visarea;
+	k007121_clip[1] = machine->screen[0].visarea;
 	k007121_clip[1].max_x = 39;
 	k007121_clip[1].min_x = 0;
 

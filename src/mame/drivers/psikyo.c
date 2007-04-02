@@ -1824,7 +1824,7 @@ DRIVER_INIT( sngkace )
 
 	/* Enable other regions */
 #if 0
-	if (!strcmp(Machine->gamedrv->name,"sngkace"))
+	if (!strcmp(machine->gamedrv->name,"sngkace"))
 	{
 		unsigned char *ROM	=	memory_region(REGION_CPU1);
 		ROM[0x995] = 0x4e;

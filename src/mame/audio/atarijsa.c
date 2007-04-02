@@ -74,6 +74,28 @@ static WRITE8_HANDLER( jsa3_io_w );
 
 /*************************************
  *
+ *  State save
+ *
+ *************************************/
+
+static void init_save_state(void)
+{
+	state_save_register_global(speech_data);
+	state_save_register_global(last_ctl);
+
+	state_save_register_global(oki6295_bank_base);
+
+	state_save_register_global(overall_volume);
+	state_save_register_global(pokey_volume);
+	state_save_register_global(ym2151_volume);
+	state_save_register_global(tms5220_volume);
+	state_save_register_global(oki6295_volume);
+}
+
+
+
+/*************************************
+ *
  *  External interfaces
  *
  *************************************/
@@ -120,6 +142,7 @@ void atarijsa_init(int cpunum, int inputport, int testport, int testmask)
 		memory_install_write8_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x2c00, 0x2c0f, 0, 0, pokey1_w);
 	}
 
+	init_save_state();
 	atarijsa_reset();
 }
 

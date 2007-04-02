@@ -19,11 +19,11 @@ static int spriterambank,charbank;
 PALETTE_INIT( finalizr )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -41,17 +41,17 @@ PALETTE_INIT( finalizr )
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* blue component */
-		bit0 = (color_prom[Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,r,g,b);
 		color_prom++;
 	}
 
-	color_prom += Machine->drv->total_colors;
+	color_prom += machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup tables */
 
 	for (i = 0;i < TOTAL_COLORS(1);i++)
@@ -74,7 +74,7 @@ VIDEO_START( finalizr )
 	dirtybuffer = auto_malloc(videoram_size);
 	memset(dirtybuffer,1,videoram_size);
 
-	tmpbitmap = auto_bitmap_alloc(256,256,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
 
 	return 0;
 }
@@ -122,7 +122,7 @@ VIDEO_UPDATE( finalizr )
 			sx = offs % 32;
 			sy = offs / 32;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					videoram[offs] + ((colorram[offs] & 0xc0) << 2) + (charbank<<10),
 					(colorram[offs] & 0x0f),
 					colorram[offs] & 0x10,colorram[offs] & 0x20,
@@ -139,7 +139,7 @@ VIDEO_UPDATE( finalizr )
 
 		scroll = -*finalizr_scroll + 16;
 
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scroll,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,1,&scroll,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -172,81 +172,81 @@ VIDEO_UPDATE( finalizr )
 				case 0x14:	/* ? */
 				case 0x18:	/* ? */
 				case 0x1c:	/* ? */
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 							code,
 							color,
 							flipx,flipy,
 							flipx?sx+16:sx,flipy?sy+16:sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[1],
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[1],
 							code + 1,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+16,flipy?sy+16:sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[1],
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[1],
 							code + 2,
 							color,
 							flipx,flipy,
 							flipx?sx+16:sx,flipy?sy:sy+16,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[1],
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[1],
 							code + 3,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+16,flipy?sy:sy+16,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x00:	/* 16x16 */
-					drawgfx(bitmap,Machine->gfx[1],
+					drawgfx(bitmap,machine->gfx[1],
 							code,
 							color,
 							flipx,flipy,
 							sx,sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x04:	/* 16x8 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+8,sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x08:	/* 8x16 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,Machine->gfx[2],
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy:sy+8,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 					break;
 
 				case 0x0c:	/* 8x8 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,Machine->gfx[2],
+					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
 							flipx,flipy,
 							sx,sy,
-							&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+							&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 					break;
 			}
 		}
@@ -263,12 +263,12 @@ VIDEO_UPDATE( finalizr )
 			if (sx >= 3) sx += 30;
 			sy = offs / 32;
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					finalizr_videoram2[offs] + ((finalizr_colorram2[offs] & 0xc0) << 2),
 					(finalizr_colorram2[offs] & 0x0f),
 					finalizr_colorram2[offs] & 0x10,finalizr_colorram2[offs] & 0x20,
 					8*sx,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		}
 	}
 	return 0;

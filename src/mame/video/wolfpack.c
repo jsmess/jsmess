@@ -109,7 +109,7 @@ VIDEO_START( wolfpack )
 
 	LFSR = auto_malloc(0x8000);
 
-	helper = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	for (i = 0; i < 0x8000; i++)
 	{
@@ -274,7 +274,7 @@ VIDEO_UPDATE( wolfpack )
 		{
 			int code = wolfpack_alpha_num_ram[32 * i + j];
 
-			drawgfx(bitmap, Machine->gfx[0],
+			drawgfx(bitmap, machine->gfx[0],
 				code,
 				wolfpack_video_invert,
 				0, 0,

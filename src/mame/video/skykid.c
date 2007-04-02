@@ -23,7 +23,7 @@ PALETTE_INIT( skykid )
 {
 	int i;
 	int bit0,bit1,bit2,bit3,r,g,b;
-	int totcolors = Machine->drv->total_colors;
+	int totcolors = machine->drv->total_colors;
 
 	for (i = 0; i < totcolors; i++)
 	{

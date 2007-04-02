@@ -345,8 +345,8 @@ static MACHINE_START( namcofl )
 
 static MACHINE_RESET( namcofl )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 3, 0), 0, network_interrupt_callback);
-	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 3, 0), 0, network_interrupt_callback);
+	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
 }
 
 

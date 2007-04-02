@@ -1296,15 +1296,15 @@ VIDEO_UPDATE( mpu4_vid )
 
 	int x,y,count = 0;
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	for (i=0; i < 0x1000; i++)
 		if (mpu4_vid_vidram_is_dirty[i]==1)
 		{
-			decodechar(Machine->gfx[mpu4_gfx_index+0], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_8x8_layout);
-			decodechar(Machine->gfx[mpu4_gfx_index+1], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_8x16_layout);
-			decodechar(Machine->gfx[mpu4_gfx_index+2], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_16x8_layout);
-			decodechar(Machine->gfx[mpu4_gfx_index+3], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_16x16_layout);
+			decodechar(machine->gfx[mpu4_gfx_index+0], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_8x8_layout);
+			decodechar(machine->gfx[mpu4_gfx_index+1], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_8x16_layout);
+			decodechar(machine->gfx[mpu4_gfx_index+2], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_16x8_layout);
+			decodechar(machine->gfx[mpu4_gfx_index+3], i, (UINT8 *)mpu4_vid_vidram, &mpu4_vid_char_16x16_layout);
 			mpu4_vid_vidram_is_dirty[i]=0;
 		}
 
@@ -1337,7 +1337,7 @@ VIDEO_UPDATE( mpu4_vid )
 			colattr = tiledat >>12;
 			tiledat &= 0x0fff;
 
-			drawgfx(bitmap,Machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 
 			count++;
 		}
@@ -1829,27 +1829,27 @@ VIDEO_START( mpu4_vid )
 
  	/* find first empty slot to decode gfx */
 	for (mpu4_gfx_index = 0; mpu4_gfx_index < MAX_GFX_ELEMENTS; mpu4_gfx_index++)
-		if (Machine->gfx[mpu4_gfx_index] == 0)
+		if (machine->gfx[mpu4_gfx_index] == 0)
 			break;
 
 	if (mpu4_gfx_index == MAX_GFX_ELEMENTS)
 		return 1;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	Machine->gfx[mpu4_gfx_index+0] = allocgfx(&mpu4_vid_char_8x8_layout);
-	Machine->gfx[mpu4_gfx_index+1] = allocgfx(&mpu4_vid_char_8x16_layout);
-	Machine->gfx[mpu4_gfx_index+2] = allocgfx(&mpu4_vid_char_16x8_layout);
-	Machine->gfx[mpu4_gfx_index+3] = allocgfx(&mpu4_vid_char_16x16_layout);
+	machine->gfx[mpu4_gfx_index+0] = allocgfx(&mpu4_vid_char_8x8_layout);
+	machine->gfx[mpu4_gfx_index+1] = allocgfx(&mpu4_vid_char_8x16_layout);
+	machine->gfx[mpu4_gfx_index+2] = allocgfx(&mpu4_vid_char_16x8_layout);
+	machine->gfx[mpu4_gfx_index+3] = allocgfx(&mpu4_vid_char_16x16_layout);
 
 	/* set the color information */
-	Machine->gfx[mpu4_gfx_index+0]->colortable = Machine->pens;
-	Machine->gfx[mpu4_gfx_index+0]->total_colors = Machine->drv->total_colors / 16;
-	Machine->gfx[mpu4_gfx_index+1]->colortable = Machine->pens;
-	Machine->gfx[mpu4_gfx_index+1]->total_colors = Machine->drv->total_colors / 16;
-	Machine->gfx[mpu4_gfx_index+2]->colortable = Machine->pens;
-	Machine->gfx[mpu4_gfx_index+2]->total_colors = Machine->drv->total_colors / 16;
-	Machine->gfx[mpu4_gfx_index+3]->colortable = Machine->pens;
-	Machine->gfx[mpu4_gfx_index+3]->total_colors = Machine->drv->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+0]->colortable = machine->pens;
+	machine->gfx[mpu4_gfx_index+0]->total_colors = machine->drv->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+1]->colortable = machine->pens;
+	machine->gfx[mpu4_gfx_index+1]->total_colors = machine->drv->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+2]->colortable = machine->pens;
+	machine->gfx[mpu4_gfx_index+2]->total_colors = machine->drv->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+3]->colortable = machine->pens;
+	machine->gfx[mpu4_gfx_index+3]->total_colors = machine->drv->total_colors / 16;
 
 	scn2675_IR_pointer = 0;
 
@@ -2791,11 +2791,11 @@ tilemap *dealem_tilemap;
 PALETTE_INIT(dealem)
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

@@ -117,7 +117,7 @@ static void get_bg3_tile_info(int tile_index)
 
 VIDEO_START( senjyo )
 {
-	bgbitmap = auto_bitmap_alloc(256,256,Machine->screen[0].format);
+	bgbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
 	if (senjyo)

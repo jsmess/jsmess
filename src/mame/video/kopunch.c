@@ -12,7 +12,7 @@ PALETTE_INIT( kopunch )
 	int i;
 
 	color_prom+=24;	/* first 24 colors are black */
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -111,8 +111,8 @@ VIDEO_UPDATE( kopunch )
 {
 	int offs;
 
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
-	//tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	//tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 
 	for (offs = 1023;offs >= 0;offs--)
 	{
@@ -121,12 +121,12 @@ VIDEO_UPDATE( kopunch )
 		sx = offs % 16;
 		sy = offs / 16;
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(kopunch_videoram2[offs] & 0x7f) + 128 * gfxbank,
 				0,
 				0,gfxflip,
 				8*(sx+8)+scroll[0],8*(8+(gfxflip ? 15-sy : sy))+scroll[1],
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

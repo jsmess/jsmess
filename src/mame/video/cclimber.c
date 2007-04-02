@@ -38,11 +38,11 @@ static int sidepanel_enabled;
 PALETTE_INIT( cclimber )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -129,8 +129,8 @@ PALETTE_INIT( cclimber )
 PALETTE_INIT( swimmer )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
 
 	for (i = 0;i < 256;i++)
@@ -389,7 +389,7 @@ VIDEO_UPDATE( cclimber )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
+			drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
 					videoram[offs] + 8 * (colorram[offs] & 0x20),
 					colorram[offs] & 0x0f,
 					flipx,flipy,
@@ -421,7 +421,7 @@ VIDEO_UPDATE( cclimber )
 			}
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -452,12 +452,12 @@ VIDEO_UPDATE( cclimber )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
+		drawgfx(bitmap,machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
 				(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -509,7 +509,7 @@ VIDEO_UPDATE( cannonb )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					code + 8 * attr,
 					color,
 					flipx,flipy,
@@ -541,7 +541,7 @@ VIDEO_UPDATE( cannonb )
 			}
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -573,12 +573,12 @@ VIDEO_UPDATE( cannonb )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[3],
+		drawgfx(bitmap,machine->gfx[3],
 				code + 0x40,
 				color,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 	if ((cclimber_bigspriteram[0] & 1) == 0)
@@ -632,7 +632,7 @@ VIDEO_UPDATE( swimmer )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					videoram[offs] + ((colorram[offs] & 0x10) << 4),
 					color,
 					flipx,flipy,
@@ -658,7 +658,7 @@ VIDEO_UPDATE( swimmer )
 				scroll[offs] = -cclimber_column_scroll[offs];
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -689,12 +689,12 @@ VIDEO_UPDATE( swimmer )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0x3f) | (spriteram[offs + 1] & 0x10) << 2,
 				(spriteram[offs + 1] & 0x0f) + 0x10 * palettebank,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -754,7 +754,7 @@ VIDEO_UPDATE( yamato )
 				flipy = !flipy;
 			}
 
-			drawgfx(tmpbitmap,Machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
+			drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
 					videoram[offs] + 8 * (colorram[offs] & 0x20),
 					colorram[offs] & 0x0f,
 					flipx,flipy,
@@ -786,7 +786,7 @@ VIDEO_UPDATE( yamato )
 			}
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -817,12 +817,12 @@ VIDEO_UPDATE( yamato )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
+		drawgfx(bitmap,machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
 				(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -955,7 +955,7 @@ VIDEO_UPDATE( toprollr )
 
 		palette=0x08+(spriteram[offs + 1] & 0x0f);
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 			(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20)+8*(spriteram[offs + 1] & 0x10),
 				palette,
 				flipx,flipy,
@@ -989,7 +989,7 @@ VIDEO_UPDATE( toprollr )
 			}
 
 			palette=8+(attr&0xf);
-			drawgfx(bitmap, Machine->gfx[0], code+((attr&0xf0)<<4),palette, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx(bitmap, machine->gfx[0], code+((attr&0xf0)<<4),palette, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 
 		}
 	return 0;

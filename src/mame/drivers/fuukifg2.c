@@ -556,8 +556,8 @@ static MACHINE_START( fuuki16 )
 static MACHINE_RESET( fuuki16 )
 {
 	mame_timer_set(video_screen_get_time_until_pos(0, 248, 0), 0, level_1_interrupt_callback);
-	mame_timer_set(video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
-	mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, Machine->screen[0].visarea.max_x + 1), 0, time_zero);
+	mame_timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), 0, vblank_interrupt_callback);
+	mame_timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, machine->screen[0].visarea.max_x + 1), 0, time_zero);
 }
 
 

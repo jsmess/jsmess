@@ -268,9 +268,9 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 VIDEO_START(wheelfir)
 {
 
-	wheelfir_tmp_bitmap[0] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	wheelfir_tmp_bitmap[1] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	wheelfir_tmp_bitmap[2] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	wheelfir_tmp_bitmap[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	wheelfir_tmp_bitmap[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	wheelfir_tmp_bitmap[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	return 0;
 }
 
@@ -294,7 +294,7 @@ VIDEO_UPDATE(wheelfir)
 	copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 	//copybitmap(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
 	copybitmap(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
-	fillbitmap(wheelfir_tmp_bitmap[0], 0,&Machine->screen[0].visarea);
+	fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
 
 	if ( code_pressed(KEYCODE_R) )
 	{

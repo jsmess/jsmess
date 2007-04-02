@@ -230,7 +230,7 @@ VIDEO_UPDATE( m90 )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	if (!pf2_enable)
-		fillbitmap(bitmap,Machine->pens[0],cliprect);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	if (pf2_enable)
 	{

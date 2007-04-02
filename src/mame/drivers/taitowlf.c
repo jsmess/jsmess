@@ -65,7 +65,7 @@ static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_
 static VIDEO_UPDATE(taitowlf)
 {
 	int i, j;
-	const gfx_element *gfx = Machine->gfx[0];
+	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *cga = cga_ram;
 	int index = 0;
 

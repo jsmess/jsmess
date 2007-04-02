@@ -127,12 +127,12 @@ VIDEO_UPDATE( psikyo4 )
 {
 	if (screen==0)
 	{
-		fillbitmap(bitmap, Machine->pens[0x1000], cliprect);
+		fillbitmap(bitmap, machine->pens[0x1000], cliprect);
 		psikyo4_drawsprites(bitmap, cliprect, 0x0000);
 	}
 	else if (screen==1)
 	{
-		fillbitmap(bitmap, Machine->pens[0x1001], cliprect);
+		fillbitmap(bitmap, machine->pens[0x1001], cliprect);
 		psikyo4_drawsprites(bitmap, cliprect, 0x2000);
 	}
 	return 0;
@@ -140,6 +140,6 @@ VIDEO_UPDATE( psikyo4 )
 
 VIDEO_START( psikyo4 )
 {
-	Machine->gfx[0]->color_granularity=32; /* 256 colour sprites with palette selectable on 32 colour boundaries */
+	machine->gfx[0]->color_granularity=32; /* 256 colour sprites with palette selectable on 32 colour boundaries */
 	return 0;
 }

@@ -236,7 +236,7 @@ void *pool_realloc_file_line(memory_pool *pool, void *ptr, size_t size, const ch
 	}
 
 	/* the memory allocation (if any) has succeeded, now we need to relink
-	 * under the (presumably) new hash value */
+     * under the (presumably) new hash value */
 	if (entry != NULL)
 	{
 		/* unlink this entry from the link list with the old hash value */

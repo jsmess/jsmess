@@ -163,7 +163,7 @@ if (code_pressed(KEYCODE_Z))
 	if (msk != 0) layers_ctrl &= msk;	}
 #endif
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	if (layers_ctrl & 0x1)
@@ -172,7 +172,7 @@ if (code_pressed(KEYCODE_Z))
 		int y = 0;
 		copyscrollbitmap(	bitmap, galpani2_bg15_bitmap,
 							1, &x, 1, &y,
-							cliprect,TRANSPARENCY_PEN,Machine->pens[0x4200 + 0]);
+							cliprect,TRANSPARENCY_PEN,machine->pens[0x4200 + 0]);
 	}
 
 /*  test mode:
@@ -187,7 +187,7 @@ if (code_pressed(KEYCODE_Z))
 		int y = - ( *galpani2_bg8_0_scrolly + 0x200 - 0x1be );
 		copyscrollbitmap(	bitmap, galpani2_bg8_bitmap_0,
 							1, &x, 1, &y,
-							cliprect,TRANSPARENCY_PEN,Machine->pens[0x4000 + 0]);
+							cliprect,TRANSPARENCY_PEN,machine->pens[0x4000 + 0]);
 	}
 
 	if (layers_ctrl & 0x4)
@@ -196,7 +196,7 @@ if (code_pressed(KEYCODE_Z))
 		int y = - ( *galpani2_bg8_1_scrolly + 0x200 - 0x1be );
 		copyscrollbitmap(	bitmap, galpani2_bg8_bitmap_1,
 							1, &x, 1, &y,
-							cliprect,TRANSPARENCY_PEN,Machine->pens[0x4000 + 0]);
+							cliprect,TRANSPARENCY_PEN,machine->pens[0x4000 + 0]);
 	}
 
 	if (layers_ctrl & 0x8)	kaneko16_draw_sprites(bitmap, cliprect, 0xf);

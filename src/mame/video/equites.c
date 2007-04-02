@@ -220,11 +220,11 @@ VIDEO_START( splndrbt )
 
 	assert(machine->screen[0].format == BITMAP_FORMAT_INDEXED16);
 
-	halfclip = Machine->screen[0].visarea;
+	halfclip = machine->screen[0].visarea;
 	i = halfclip.max_y - halfclip.min_y + 1;
 	halfclip.max_y = halfclip.min_y + (i >> 1) - 1;
 
-	tmpbitmap = auto_bitmap_alloc(BMW, BMW, Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(BMW, BMW, machine->screen[0].format);
 
 	charmap0 = tilemap_create(splndrbt_char0info, tilemap_scan_cols, TILEMAP_TRANSPARENT_COLOR, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap0, 0);
@@ -244,7 +244,7 @@ VIDEO_START( splndrbt )
 	memset(dirtybuf, 1, 0x800);
 
 	prestep = auto_malloc(i * sizeof(struct PRESTEP_TYPE));
-	splndrbt_prestep(prestep, &Machine->screen[0].visarea, BMW, 434, 96, 480);
+	splndrbt_prestep(prestep, &machine->screen[0].visarea, BMW, 434, 96, 480);
 
 	defcharram = videoram16 + videoram_size / 2;
 

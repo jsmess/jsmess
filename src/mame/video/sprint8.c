@@ -82,8 +82,8 @@ WRITE8_HANDLER( sprint8_video_ram_w )
 
 VIDEO_START( sprint8 )
 {
-	helper1 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	helper2 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows, TILEMAP_OPAQUE, 16, 8, 32, 32);
 	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows, TILEMAP_OPAQUE, 16, 8, 32, 32);
@@ -135,18 +135,18 @@ VIDEO_EOF( sprint8 )
 	int x;
 	int y;
 
-	tilemap_draw(helper2, &Machine->screen[0].visarea, tilemap2, 0, 0);
+	tilemap_draw(helper2, &machine->screen[0].visarea, tilemap2, 0, 0);
 
-	fillbitmap(helper1, 16, &Machine->screen[0].visarea);
+	fillbitmap(helper1, 16, &machine->screen[0].visarea);
 
-	draw_sprites(helper1, &Machine->screen[0].visarea);
+	draw_sprites(helper1, &machine->screen[0].visarea);
 
-	for (y = Machine->screen[0].visarea.min_y; y <= Machine->screen[0].visarea.max_y; y++)
+	for (y = machine->screen[0].visarea.min_y; y <= machine->screen[0].visarea.max_y; y++)
 	{
 		const UINT16* p1 = BITMAP_ADDR16(helper1, y, 0);
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 
-		for (x = Machine->screen[0].visarea.min_x; x <= Machine->screen[0].visarea.max_x; x++)
+		for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
 		{
 			if (p1[x] != 16 && p2[x] != 16)
 			{

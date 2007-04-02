@@ -103,10 +103,10 @@ static mame_bitmap * tmpbitmaps[4];
 
 VIDEO_START( mazerbla )
 {
-	tmpbitmaps[0] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmaps[1] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmaps[2] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmaps[3] = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmaps[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmaps[3] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	return 0;
 }
@@ -141,22 +141,22 @@ VIDEO_UPDATE( test_vcu )
 
 
 	if (planes_enabled[3])
-		copybitmap(bitmap,tmpbitmaps[3],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE, 0 );
+		copybitmap(bitmap,tmpbitmaps[3],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE, 0 );
 
 
 	if (planes_enabled[2])
-		copybitmap(bitmap,tmpbitmaps[2],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[color_base] );
-	fillbitmap(tmpbitmaps[2],Machine->pens[color_base],NULL);
+		copybitmap(bitmap,tmpbitmaps[2],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[color_base] );
+	fillbitmap(tmpbitmaps[2],machine->pens[color_base],NULL);
 
 
 	if (planes_enabled[1])
-		copybitmap(bitmap,tmpbitmaps[1],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[color_base] );
-	fillbitmap(tmpbitmaps[1],Machine->pens[color_base],NULL);
+		copybitmap(bitmap,tmpbitmaps[1],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[color_base] );
+	fillbitmap(tmpbitmaps[1],machine->pens[color_base],NULL);
 
 
 	if (planes_enabled[0])
-		copybitmap(bitmap,tmpbitmaps[0],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[color_base] );
-	fillbitmap(tmpbitmaps[0],Machine->pens[color_base],NULL);
+		copybitmap(bitmap,tmpbitmaps[0],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[color_base] );
+	fillbitmap(tmpbitmaps[0],machine->pens[color_base],NULL);
 
 	if (code_pressed_memory(KEYCODE_1))	/* plane 1 */
 	{
@@ -251,10 +251,10 @@ VIDEO_UPDATE( greatgun )
 
 //fillbitmap(bitmap,0,NULL);
 
-	copybitmap(bitmap,tmpbitmaps[3],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE, 0 );
-	copybitmap(bitmap,tmpbitmaps[2],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[color_base] );
-	copybitmap(bitmap,tmpbitmaps[1],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[color_base] );
-	copybitmap(bitmap,tmpbitmaps[0],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[color_base] );
+	copybitmap(bitmap,tmpbitmaps[3],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE, 0 );
+	copybitmap(bitmap,tmpbitmaps[2],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[color_base] );
+	copybitmap(bitmap,tmpbitmaps[1],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[color_base] );
+	copybitmap(bitmap,tmpbitmaps[0],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[color_base] );
 	return 0;
 }
 
@@ -271,10 +271,10 @@ VIDEO_UPDATE( mazerbla )
 
 //fillbitmap(bitmap,0,NULL);
 
-	copybitmap(bitmap,tmpbitmaps[3],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE, 0 ); //text
-	copybitmap(bitmap,tmpbitmaps[2],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0] );
-	copybitmap(bitmap,tmpbitmaps[1],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0] ); //haircross
-	copybitmap(bitmap,tmpbitmaps[0],0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0] ); //sprites
+	copybitmap(bitmap,tmpbitmaps[3],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE, 0 ); //text
+	copybitmap(bitmap,tmpbitmaps[2],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[0] );
+	copybitmap(bitmap,tmpbitmaps[1],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[0] ); //haircross
+	copybitmap(bitmap,tmpbitmaps[0],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[0] ); //sprites
 	return 0;
 }
 

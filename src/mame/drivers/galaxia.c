@@ -36,7 +36,7 @@ VIDEO_UPDATE( galaxia )
 {
 	int x,y, count;
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	count = 0;
 
 	for (y=0;y<256/8;y++)
@@ -44,7 +44,7 @@ VIDEO_UPDATE( galaxia )
 		for (x=0;x<256/8;x++)
 		{
 			int tile = galaxia_video[count];
-			drawgfx(bitmap,Machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
 

@@ -21,16 +21,16 @@ PALETTE_INIT( srmp2 )
 {
 	int i;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + Machine->drv->total_colors];
+		col = (color_prom[i] << 8) + color_prom[i + machine->drv->total_colors];
 
 		palette_set_color(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		colortable[i] = i ^ 0x0f;
 	}
@@ -41,11 +41,11 @@ PALETTE_INIT( srmp3 )
 {
 	int i;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int col;
 
-		col = (color_prom[i] << 8) + color_prom[i + Machine->drv->total_colors];
+		col = (color_prom[i] << 8) + color_prom[i + machine->drv->total_colors];
 		palette_set_color(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
@@ -440,7 +440,7 @@ static void mjyuugi_draw_sprites(mame_bitmap *bitmap)
 
 VIDEO_UPDATE( srmp2 )
 {
-	fillbitmap(bitmap, Machine->pens[0x1f0], &Machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
 	srmp2_draw_sprites(bitmap);
 	return 0;
 }
@@ -448,7 +448,7 @@ VIDEO_UPDATE( srmp2 )
 
 VIDEO_UPDATE( srmp3 )
 {
-	fillbitmap(bitmap, Machine->pens[0x1f0], &Machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
 	srmp3_draw_sprites(bitmap);
 	return 0;
 }
@@ -456,7 +456,7 @@ VIDEO_UPDATE( srmp3 )
 
 VIDEO_UPDATE( mjyuugi )
 {
-	fillbitmap(bitmap, Machine->pens[0x1f0], &Machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
 	mjyuugi_draw_sprites(bitmap);
 	return 0;
 }

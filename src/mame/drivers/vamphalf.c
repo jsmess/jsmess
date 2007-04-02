@@ -299,7 +299,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 
 static VIDEO_UPDATE( common )
 {
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 	draw_sprites(bitmap);
 	return 0;
 }
@@ -390,8 +390,8 @@ NVRAM_HANDLER( 93C46_vamphalf )
 		}
 		else
 		{
-			if (!strcmp(Machine->gamedrv->name,"suplup")) EEPROM_set_data(suplup_default_nvram,128);
-			if (!strcmp(Machine->gamedrv->name,"misncrft")) EEPROM_set_data(misncrft_default_nvram,128);
+			if (!strcmp(machine->gamedrv->name,"suplup")) EEPROM_set_data(suplup_default_nvram,128);
+			if (!strcmp(machine->gamedrv->name,"misncrft")) EEPROM_set_data(misncrft_default_nvram,128);
 		}
 	}
 }

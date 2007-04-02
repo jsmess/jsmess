@@ -22,9 +22,9 @@ VIDEO_START( mlc )
 {
 	alpha_set_level(0x80);
 
-	if (Machine->gfx[0]->color_granularity==16)
+	if (machine->gfx[0]->color_granularity==16)
 		colour_mask=0x7f;
-	else if (Machine->gfx[0]->color_granularity==32)
+	else if (machine->gfx[0]->color_granularity==32)
 		colour_mask=0x3f;
 	else
 		colour_mask=0x1f;
@@ -528,7 +528,7 @@ VIDEO_EOF( mlc )
 VIDEO_UPDATE( mlc )
 {
 //  fillbitmap(temp_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[0],cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	fillbitmap(bitmap,machine->pens[0],cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 	draw_sprites(bitmap,cliprect);
 	return 0;
 }

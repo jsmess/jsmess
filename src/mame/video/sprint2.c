@@ -25,7 +25,7 @@ static void get_tile_info(int tile_index)
 
 VIDEO_START( sprint2 )
 {
-	helper = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 16, 8, 32, 32);
 
@@ -116,7 +116,7 @@ VIDEO_UPDATE( sprint2 )
 
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx(bitmap, Machine->gfx[1],
+		drawgfx(bitmap, machine->gfx[1],
 			get_sprite_code(i),
 			i,
 			0, 0,
@@ -147,23 +147,23 @@ VIDEO_EOF( sprint2 )
 
 		rect.min_x = get_sprite_x(i);
 		rect.min_y = get_sprite_y(i);
-		rect.max_x = get_sprite_x(i) + Machine->gfx[1]->width - 1;
-		rect.max_y = get_sprite_y(i) + Machine->gfx[1]->height - 1;
+		rect.max_x = get_sprite_x(i) + machine->gfx[1]->width - 1;
+		rect.max_y = get_sprite_y(i) + machine->gfx[1]->height - 1;
 
-		if (rect.min_x < Machine->screen[0].visarea.min_x)
-			rect.min_x = Machine->screen[0].visarea.min_x;
-		if (rect.min_y < Machine->screen[0].visarea.min_y)
-			rect.min_y = Machine->screen[0].visarea.min_y;
-		if (rect.max_x > Machine->screen[0].visarea.max_x)
-			rect.max_x = Machine->screen[0].visarea.max_x;
-		if (rect.max_y > Machine->screen[0].visarea.max_y)
-			rect.max_y = Machine->screen[0].visarea.max_y;
+		if (rect.min_x < machine->screen[0].visarea.min_x)
+			rect.min_x = machine->screen[0].visarea.min_x;
+		if (rect.min_y < machine->screen[0].visarea.min_y)
+			rect.min_y = machine->screen[0].visarea.min_y;
+		if (rect.max_x > machine->screen[0].visarea.max_x)
+			rect.max_x = machine->screen[0].visarea.max_x;
+		if (rect.max_y > machine->screen[0].visarea.max_y)
+			rect.max_y = machine->screen[0].visarea.max_y;
 
 		/* check for sprite-tilemap collisions */
 
 		tilemap_draw(helper, &rect, bg_tilemap, 0, 0);
 
-		drawgfx(helper, Machine->gfx[1],
+		drawgfx(helper, machine->gfx[1],
 			get_sprite_code(i),
 			0,
 			0, 0,
@@ -179,7 +179,7 @@ VIDEO_EOF( sprint2 )
 		{
 			if (j != i)
 			{
-				drawgfx(helper, Machine->gfx[1],
+				drawgfx(helper, machine->gfx[1],
 					get_sprite_code(j),
 					1,
 					0, 0,
@@ -189,7 +189,7 @@ VIDEO_EOF( sprint2 )
 			}
 		}
 
-		drawgfx(helper, Machine->gfx[1],
+		drawgfx(helper, machine->gfx[1],
 			get_sprite_code(i),
 			0,
 			0, 0,

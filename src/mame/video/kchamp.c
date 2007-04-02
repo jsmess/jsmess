@@ -14,14 +14,14 @@ PALETTE_INIT( kchamp )
 {
 	int i, red, green, blue;
 
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		red = color_prom[i];
-		green = color_prom[Machine->drv->total_colors+i];
-		blue = color_prom[2*Machine->drv->total_colors+i];
+		green = color_prom[machine->drv->total_colors+i];
+		blue = color_prom[2*machine->drv->total_colors+i];
 
 		palette_set_color(machine,i,pal4bit(red),pal4bit(green),pal4bit(blue));
 

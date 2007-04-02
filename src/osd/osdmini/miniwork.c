@@ -69,7 +69,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 //  osd_work_item_queue
 //============================================================
 
-osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param)
+osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback callback, void *param, UINT32 flags)
 {
 
 	osd_work_item *item;

@@ -224,6 +224,8 @@ static discrete_module module_list[] =
 	{ DST_DIODE_MIX   ,"DST_DIODE_MIX"   ,sizeof(struct dst_size_context)        ,dst_diode_mix_reset   ,dst_diode_mix_step   },
 	{ DST_INTEGRATE   ,"DST_INTEGRATE"   ,sizeof(struct dst_integrate_context)   ,dst_integrate_reset   ,dst_integrate_step   },
 	{ DST_MIXER       ,"DST_MIXER"       ,sizeof(struct dst_mixer_context)       ,dst_mixer_reset       ,dst_mixer_step       },
+	{ DST_OP_AMP      ,"DST_OP_AMP"      ,sizeof(struct dst_op_amp_context)      ,dst_op_amp_reset      ,dst_op_amp_step      },
+	{ DST_OP_AMP_1SHT ,"DST_OP_AMP_1SHT" ,sizeof(struct dst_op_amp_1sht_context) ,dst_op_amp_1sht_reset ,dst_op_amp_1sht_step },
 	{ DST_TVCA_OP_AMP ,"DST_TVCA_OP_AMP" ,sizeof(struct dst_tvca_op_amp_context) ,dst_tvca_op_amp_reset ,dst_tvca_op_amp_step },
 	{ DST_VCA         ,"DST_VCA"         ,0                                      ,NULL                  ,NULL                 },
 
@@ -247,12 +249,12 @@ static discrete_module module_list[] =
 
 	/* from disc_dev.c */
 	/* generic modules */
-	{ DST_CUSTOM      ,"DST_CUSTOM"      ,0                                      ,NULL                  ,dst_transform_step   },
+	{ DST_CUSTOM      ,"DST_CUSTOM"      ,0                                      ,NULL                  ,NULL                 },
 	/* Component specific modules */
 	{ DSD_555_ASTBL   ,"DSD_555_ASTBL"   ,sizeof(struct dsd_555_astbl_context)   ,dsd_555_astbl_reset   ,dsd_555_astbl_step   },
 	{ DSD_555_MSTBL   ,"DSD_555_MSTBL"   ,sizeof(struct dsd_555_mstbl_context)   ,dsd_555_mstbl_reset   ,dsd_555_mstbl_step   },
 	{ DSD_555_CC      ,"DSD_555_CC"      ,sizeof(struct dsd_555_cc_context)      ,dsd_555_cc_reset      ,dsd_555_cc_step      },
-	{ DSD_555_VCO1    ,"DSD_555_VCO1"    ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step      },
+	{ DSD_555_VCO1    ,"DSD_555_VCO1"    ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    },
 	{ DSD_566         ,"DSD_566"         ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         },
 
 	/* must be the last one */
@@ -587,6 +589,16 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 		node->context = NULL;
 		node->name = block->name;
 		node->custom = block->custom;
+
+		/* setup module if custom */
+		if (block->type == DST_CUSTOM)
+		{
+			const discrete_custom_info *custom = node->custom;
+			node->module.reset = custom->reset;
+			node->module.step = custom->step;
+			node->module.contextsize = custom->contextsize;
+			node->custom = custom->custom;
+		}
 
 		/* allocate memory if necessary */
 		if (node->module.contextsize)

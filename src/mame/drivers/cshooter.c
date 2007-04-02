@@ -145,7 +145,7 @@ VIDEO_START(cshooter)
 
 VIDEO_UPDATE(cshooter)
 {
-	fillbitmap(bitmap, 0/*get_black_pen(machine)*/, &Machine->screen[0].visarea);
+	fillbitmap(bitmap, 0/*get_black_pen(machine)*/, &machine->screen[0].visarea);
 	tilemap_mark_all_tiles_dirty(cshooter_txtilemap);
 
 	//sprites
@@ -157,28 +157,28 @@ VIDEO_UPDATE(cshooter)
 			{
 				int tile=0x30+((spriteram[i]>>2)&0x1f);
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3],spriteram[i+2],
 							cliprect,TRANSPARENCY_PEN,3);
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2],
 							cliprect,TRANSPARENCY_PEN,3);
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,
 							spriteram[i+3]+8,spriteram[i+2]+8,
 							cliprect,TRANSPARENCY_PEN,3);
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 							tile,
 							spriteram[i+1],
 							0, 0,

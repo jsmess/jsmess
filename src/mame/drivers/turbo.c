@@ -188,7 +188,7 @@ static READ8_HANDLER( turbo_analog_r );
 
 static MACHINE_RESET( buckrog )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	state->buckrog_command = 0x00;
 }
 

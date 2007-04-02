@@ -98,10 +98,10 @@ static pen_t magspot2_map_color(UINT8 x, UINT8 y)
 PALETTE_INIT( panic )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int r = 0xff * ((i >> 0) & 1);
 		int g = 0xff * ((i >> 1) & 1);
@@ -135,10 +135,10 @@ PALETTE_INIT( cosmica )
 {
 	int i;
 
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 
 
@@ -167,7 +167,7 @@ PALETTE_INIT( cosmicg )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int r,g,b;
 
@@ -186,11 +186,11 @@ PALETTE_INIT( cosmicg )
 PALETTE_INIT( magspot2 )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int r,g,b;
 
@@ -219,11 +219,11 @@ PALETTE_INIT( magspot2 )
 PALETTE_INIT( nomnlnd )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 
 
@@ -590,7 +590,7 @@ static void nomnlnd_draw_background(mame_bitmap *bitmap)
 
 VIDEO_UPDATE( cosmicg )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	draw_bitmap(bitmap);
 	return 0;
@@ -599,7 +599,7 @@ VIDEO_UPDATE( cosmicg )
 
 VIDEO_UPDATE( panic )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	draw_bitmap(bitmap);
 
@@ -610,7 +610,7 @@ VIDEO_UPDATE( panic )
 
 VIDEO_UPDATE( cosmica )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	cosmica_draw_starfield(bitmap);
 
@@ -623,7 +623,7 @@ VIDEO_UPDATE( cosmica )
 
 VIDEO_UPDATE( magspot2 )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	draw_bitmap(bitmap);
 
@@ -634,7 +634,7 @@ VIDEO_UPDATE( magspot2 )
 
 VIDEO_UPDATE( devzone )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
     if (background_enable)
     {
@@ -653,7 +653,7 @@ VIDEO_UPDATE( nomnlnd )
 	/* according to the video summation logic on pg4, the trees and river
        have the highest priority */
 
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	draw_bitmap(bitmap);
 

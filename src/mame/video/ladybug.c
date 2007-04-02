@@ -424,7 +424,7 @@ VIDEO_UPDATE( ladybug )
 			tilemap_set_scrollx(bg_tilemap, offs, videoram[32 * sx + sy]);
 	}
 
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	ladybug_draw_sprites(bitmap);
 	return 0;
 }
@@ -454,7 +454,7 @@ VIDEO_UPDATE( sraider )
 	}
 
 	// clear the bg bitmap
-	fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 	// draw the stars
 	if (flip_screen)
@@ -463,20 +463,20 @@ VIDEO_UPDATE( sraider )
 		redclash_draw_stars(bitmap,32,1,0x00,0xd8);
 
 	// draw the horizontal gridlines
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, grid_tilemap, 0, flip_screen);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, grid_tilemap, 0, flip_screen);
 	for(i=0;i<256;i++)
 	{
 		if (gridline[i] != 0)
 		{
 			if (flip_screen)
-				plot_box(bitmap,i^0xff,0,1,255,Machine->pens[64]);
+				plot_box(bitmap,i^0xff,0,1,255,machine->pens[64]);
 			else
-				plot_box(bitmap,i,0,1,255,Machine->pens[64]);
+				plot_box(bitmap,i,0,1,255,machine->pens[64]);
 		}
 	}
 
 	// now the chars
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, flip_screen);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, flip_screen);
 
 	// now the sprites
 	ladybug_draw_sprites(bitmap);

@@ -324,14 +324,14 @@ int cli_frontend_init(int argc, char **argv)
 	if (buffer[0] != 0)
 	{
 		// okay, we got one; prepend it to the rompath
-		const char *rompath = options_get_string(mame_options(), "rompath");
+		const char *rompath = options_get_string(mame_options(), OPTION_ROMPATH);
 		if (rompath == NULL)
-			options_set_string(mame_options(), "rompath", buffer);
+			options_set_string(mame_options(), OPTION_ROMPATH, buffer);
 		else
 		{
 			char *newpath = malloc_or_die(strlen(rompath) + strlen(buffer) + 2);
 			sprintf(newpath, "%s;%s", buffer, rompath);
-			options_set_string(mame_options(), "rompath", newpath);
+			options_set_string(mame_options(), OPTION_ROMPATH, newpath);
 			free(newpath);
 		}
 	}
@@ -339,7 +339,7 @@ int cli_frontend_init(int argc, char **argv)
 	// debugging options
 {
 	extern int verbose;
-	verbose = options_get_bool(mame_options(), "verbose");
+	verbose = options_get_bool(mame_options(), WINOPTION_VERBOSE);
 }
 
 	// thread priority
@@ -374,7 +374,7 @@ static void parse_ini_file(const char *name)
 	char *fname;
 
 	// don't parse if it has been disabled
-	if (!options_get_bool(mame_options(), "readconfig"))
+	if (!options_get_bool(mame_options(), CLIOPTION_READCONFIG))
 		return;
 
 	// open the file; if we fail, that's ok
@@ -409,14 +409,14 @@ static void mame_puts_info(const char *s)
 static void execute_simple_commands(void)
 {
 	// help?
-	if (options_get_bool(mame_options(), "help"))
+	if (options_get_bool(mame_options(), CLIOPTION_HELP))
 	{
 		display_help();
 		exit(MAMERR_NONE);
 	}
 
 	// showusage?
-	if (options_get_bool(mame_options(), "showusage"))
+	if (options_get_bool(mame_options(), CLIOPTION_SHOWUSAGE))
 	{
 		mame_printf_info("Usage: %s [%s] [options]\n\nOptions:\n", APPNAME_LOWER, GAMENOUN);
 		options_output_help(mame_options(), mame_puts_info);
@@ -424,7 +424,7 @@ static void execute_simple_commands(void)
 	}
 
 	// validate?
-	if (options_get_bool(mame_options(), "validate"))
+	if (options_get_bool(mame_options(), CLIOPTION_VALIDATE))
 	{
 		extern int mame_validitychecks(int game);
 		exit(mame_validitychecks(-1));
@@ -446,25 +446,25 @@ static void execute_commands(const char *argv0)
 		int (*function)(FILE *output);
 	} frontend_options[] =
 	{
-		{ "listxml",		frontend_listxml },
-		{ "listfull",		frontend_listfull },
-		{ "listsource",		frontend_listsource },
-		{ "listclones",		frontend_listclones },
-		{ "listcrc",		frontend_listcrc },
+		{ CLIOPTION_LISTXML,		frontend_listxml },
+		{ CLIOPTION_LISTFULL,		frontend_listfull },
+		{ CLIOPTION_LISTSOURCE,		frontend_listsource },
+		{ CLIOPTION_LISTCLONES,		frontend_listclones },
+		{ CLIOPTION_LISTCRC,		frontend_listcrc },
 #ifdef MESS
-		{ "listdevices",	frontend_listdevices },
+		{ CLIOPTION_LISTDEVICES,	frontend_listdevices },
 #endif
-		{ "listroms",		frontend_listroms },
-		{ "listsamples",	frontend_listsamples },
-		{ "verifyroms",		frontend_verifyroms },
-		{ "verifysamples",	frontend_verifysamples },
-		{ "romident",		frontend_romident },
-		{ "isknown",		frontend_isknown  }
+		{ CLIOPTION_LISTROMS,		frontend_listroms },
+		{ CLIOPTION_LISTSAMPLES,	frontend_listsamples },
+		{ CLIOPTION_VERIFYROMS,		frontend_verifyroms },
+		{ CLIOPTION_VERIFYSAMPLES,	frontend_verifysamples },
+		{ CLIOPTION_ROMIDENT,		frontend_romident },
+		{ CLIOPTION_ISKNOWN,		frontend_isknown  }
 	};
 	int i;
 
 	// createconfig?
-	if (options_get_bool(mame_options(), "createconfig"))
+	if (options_get_bool(mame_options(), CLIOPTION_CREATECONFIG))
 	{
 		char basename[128];
 		mame_file *file;
@@ -489,7 +489,7 @@ static void execute_commands(const char *argv0)
 	}
 
 	// showconfig?
-	if (options_get_bool(mame_options(), "showconfig"))
+	if (options_get_bool(mame_options(), CLIOPTION_SHOWCONFIG))
 	{
 		options_output_ini_stdfile(mame_options(), stdout);
 		exit(MAMERR_NONE);

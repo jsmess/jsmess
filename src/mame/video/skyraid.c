@@ -17,7 +17,7 @@ static mame_bitmap *helper;
 
 VIDEO_START( skyraid )
 {
-	helper = auto_bitmap_alloc(128, 240, Machine->screen[0].format);
+	helper = auto_bitmap_alloc(128, 240, machine->screen[0].format);
 	return 0;
 }
 
@@ -149,7 +149,7 @@ static void draw_trapezoid(mame_bitmap* dst, mame_bitmap* src)
 
 VIDEO_UPDATE( skyraid )
 {
-	fillbitmap(bitmap, Machine->pens[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	draw_terrain(helper);
 	draw_sprites(helper, cliprect);

@@ -107,8 +107,8 @@ VIDEO_START( cska )
 	cpk_palette  = auto_malloc(0x800 * sizeof(unsigned char));
 	cpk_palette2 = auto_malloc(0x800 * sizeof(unsigned char));
 
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	/* leave everything at the default, but map all foreground 0 pens as transparent */
 	for (i = 0;i < 16;i++)
@@ -155,9 +155,9 @@ MACHINE_RESET (cpk)
 	{
 		initonce = 1;
 
-		if (strcmp(Machine->gamedrv->name,"csk227it") == 0)
+		if (strcmp(machine->gamedrv->name,"csk227it") == 0)
 			init_csk227_internals();
-		else if (strcmp(Machine->gamedrv->name,"csk234it") == 0)
+		else if (strcmp(machine->gamedrv->name,"csk234it") == 0)
 			init_csk234_internals();
 	}
 }
@@ -235,7 +235,7 @@ VIDEO_UPDATE( cska )
 				sx = offs % 64;
 				sy = offs / 64;
 
-				drawgfx(tmpbitmap2,Machine->gfx[1+(offs % 4)],
+				drawgfx(tmpbitmap2,machine->gfx[1+(offs % 4)],
 						cpk_expram[offs],
 						0,
 						0,0,
@@ -243,7 +243,7 @@ VIDEO_UPDATE( cska )
 						0,TRANSPARENCY_NONE,0);
 			}
 		}
-		copybitmap(bitmap,tmpbitmap2,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copybitmap(bitmap,tmpbitmap2,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 
 	for (offs = CPK_VIDEO_SIZE-1; offs >= 0; offs--)
@@ -261,7 +261,7 @@ VIDEO_UPDATE( cska )
 			sx = offs % 64;
 			sy = offs / 64;
 
-			drawgfx(tmpbitmap,Machine->gfx[0],
+			drawgfx(tmpbitmap,machine->gfx[0],
 					tile,
 					color,
 					0,0,
@@ -270,6 +270,6 @@ VIDEO_UPDATE( cska )
 		}
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea, (abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea, (abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
 	return 0;
 }

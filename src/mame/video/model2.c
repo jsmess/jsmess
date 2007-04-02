@@ -101,7 +101,7 @@ VIDEO_START(model2)
 VIDEO_UPDATE(model2)
 {
 	sys24_tile_update();
-	fillbitmap(bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 
 	sys24_tile_draw(bitmap, cliprect, 7, 0, 0);
 	sys24_tile_draw(bitmap, cliprect, 6, 0, 0);

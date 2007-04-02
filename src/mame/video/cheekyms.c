@@ -93,7 +93,7 @@ VIDEO_UPDATE( cheekyms )
 	int offs;
 
 
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	/* Draw the sprites first, because they're supposed to appear below
        the characters */
@@ -117,7 +117,7 @@ VIDEO_UPDATE( cheekyms )
 				code++;
 			}
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code,
 					col,
 					0,0,
@@ -126,14 +126,14 @@ VIDEO_UPDATE( cheekyms )
 		}
 		else
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code + 0x20,
 					col,
 					0,0,
 					sx,sy,
 					cliprect,TRANSPARENCY_PEN,0);
 
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					code + 0x21,
 					col,
 					0,0,
@@ -175,7 +175,7 @@ VIDEO_UPDATE( cheekyms )
 			sy = 31 - sy;
 		}
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				videoram[offs],
 				color,
 				flip_screen,flip_screen,

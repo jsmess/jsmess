@@ -33,10 +33,10 @@ static int priority;
 PALETTE_INIT( appoooh )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -78,10 +78,10 @@ PALETTE_INIT( appoooh )
 PALETTE_INIT( robowres )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -313,16 +313,16 @@ VIDEO_UPDATE( appoooh )
 	if (priority == 1)
 	{
 		/* sprite set #1 */
-		appoooh_draw_sprites( bitmap, cliprect, Machine->gfx[2],spriteram);
+		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
 		/* sprite set #2 */
-		appoooh_draw_sprites( bitmap, cliprect, Machine->gfx[3],spriteram_2);
+		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		appoooh_draw_sprites( bitmap, cliprect, Machine->gfx[3],spriteram_2);
+		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
 		/* sprite set #1 */
-		appoooh_draw_sprites( bitmap, cliprect, Machine->gfx[2],spriteram);
+		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
 	}
 
 	if (priority != 0)	/* fg in front of sprites */
@@ -341,16 +341,16 @@ VIDEO_UPDATE( robowres )
 	if (priority == 1)
 	{
 		/* sprite set #1 */
-		robowres_draw_sprites( bitmap, cliprect, Machine->gfx[2],spriteram);
+		robowres_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
 		/* sprite set #2 */
-		robowres_draw_sprites( bitmap, cliprect, Machine->gfx[3],spriteram_2);
+		robowres_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		robowres_draw_sprites( bitmap, cliprect, Machine->gfx[3],spriteram_2);
+		robowres_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
 		/* sprite set #1 */
-		robowres_draw_sprites( bitmap, cliprect, Machine->gfx[2],spriteram);
+		robowres_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
 	}
 
 	if (priority != 0)	/* fg in front of sprites */

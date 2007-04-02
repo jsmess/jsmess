@@ -38,7 +38,7 @@ PALETTE_INIT( pastelg )
 	int i;
 	int bit0, bit1, bit2, bit3, r, g, b;
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
@@ -50,10 +50,10 @@ PALETTE_INIT( pastelg )
 		bit2 = (color_prom[0] >> 6) & 0x01;
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,r,g,b);
@@ -262,10 +262,10 @@ void pastelg_gfxdraw(void)
 ******************************************************************************/
 VIDEO_START( pastelg )
 {
-	pastelg_tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height,Machine->screen[0].format);
-	pastelg_videoram = auto_malloc(Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8));
+	pastelg_tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height,machine->screen[0].format);
+	pastelg_videoram = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT8));
 	pastelg_clut = auto_malloc(0x10 * sizeof(UINT8));
-	memset(pastelg_videoram, 0x00, (Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT8)));
+	memset(pastelg_videoram, 0x00, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
 	return 0;
 }
 
@@ -282,23 +282,23 @@ VIDEO_UPDATE( pastelg )
 	{
 		pastelg_screen_refresh = 0;
 
-		for (y = 0; y < Machine->screen[0].height; y++)
+		for (y = 0; y < machine->screen[0].height; y++)
 		{
-			for (x = 0; x < Machine->screen[0].width; x++)
+			for (x = 0; x < machine->screen[0].width; x++)
 			{
-				color = pastelg_videoram[(y * Machine->screen[0].width) + x];
-				plot_pixel(pastelg_tmpbitmap, x, y, Machine->pens[color]);
+				color = pastelg_videoram[(y * machine->screen[0].width) + x];
+				plot_pixel(pastelg_tmpbitmap, x, y, machine->pens[color]);
 			}
 		}
 	}
 
 	if (pastelg_dispflag)
 	{
-		copybitmap(bitmap, pastelg_tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, pastelg_tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
 	else
 	{
-		fillbitmap(bitmap, Machine->pens[0x00], 0);
+		fillbitmap(bitmap, machine->pens[0x00], 0);
 	}
 	return 0;
 }

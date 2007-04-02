@@ -171,7 +171,7 @@ VIDEO_UPDATE( marineb )
 
 		if (!flip_screen_y)
 		{
-			sy = 256 - Machine->gfx[gfx]->width - sy;
+			sy = 256 - machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -180,12 +180,12 @@ VIDEO_UPDATE( marineb )
 			sx++;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
+		drawgfx(bitmap,machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -216,7 +216,7 @@ VIDEO_UPDATE( changes )
 
 		if (!flip_screen_y)
 		{
-			sy = 256 - Machine->gfx[1]->width - sy;
+			sy = 256 - machine->gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -225,12 +225,12 @@ VIDEO_UPDATE( changes )
 			sx++;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 
 	/* draw the big sprite */
@@ -244,7 +244,7 @@ VIDEO_UPDATE( changes )
 
 	if (!flip_screen_y)
 	{
-		sy = 256 - Machine->gfx[2]->width - sy;
+		sy = 256 - machine->gfx[2]->width - sy;
 		flipy = !flipy;
 	}
 
@@ -255,21 +255,21 @@ VIDEO_UPDATE( changes )
 
 	code >>= 4;
 
-	drawgfx(bitmap,Machine->gfx[2],
+	drawgfx(bitmap,machine->gfx[2],
 			code,
 			col,
 			flipx,flipy,
 			sx,sy,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 
 	/* draw again for wrap around */
 
-	drawgfx(bitmap,Machine->gfx[2],
+	drawgfx(bitmap,machine->gfx[2],
 			code,
 			col,
 			flipx,flipy,
 			sx-256,sy,
-			&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	return 0;
 }
 
@@ -317,7 +317,7 @@ VIDEO_UPDATE( springer )
 
 		if (!flip_screen_y)
 		{
-			sy = 256 - Machine->gfx[gfx]->width - sy;
+			sy = 256 - machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -326,12 +326,12 @@ VIDEO_UPDATE( springer )
 			sx--;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
+		drawgfx(bitmap,machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -363,22 +363,22 @@ VIDEO_UPDATE( hoccer )
 
 		if (!flip_screen_y)
 		{
-			sy = 256 - Machine->gfx[1]->width - sy;
+			sy = 256 - machine->gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
 		if (flip_screen_x)
 		{
-			sx = 256 - Machine->gfx[1]->width - sx;
+			sx = 256 - machine->gfx[1]->width - sx;
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -426,7 +426,7 @@ VIDEO_UPDATE( hopprobo )
 
 		if (!flip_screen_y)
 		{
-			sy = 256 - Machine->gfx[gfx]->width - sy;
+			sy = 256 - machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -435,12 +435,12 @@ VIDEO_UPDATE( hopprobo )
 			sx--;
 		}
 
-		drawgfx(bitmap,Machine->gfx[gfx],
+		drawgfx(bitmap,machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
 				sx,sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

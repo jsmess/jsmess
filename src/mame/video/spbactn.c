@@ -177,8 +177,8 @@ static int draw_sprites(mame_bitmap *bitmap, int priority)
 VIDEO_START( spbactn )
 {
 	/* allocate bitmaps */
-	tile_bitmap_bg = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	tile_bitmap_fg = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	tile_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
 	return 0;
 }
@@ -199,12 +199,12 @@ VIDEO_UPDATE( spbactn )
 
 		colour = ((attr & 0x00f0) >> 4) | 0x80;
 
-		drawgfx(tile_bitmap_bg, Machine->gfx[1],
+		drawgfx(tile_bitmap_bg, machine->gfx[1],
 					code,
 					colour,
 					0, 0,
 					16 * sx, 8 * sy,
-					&Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+					&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 
 		sx++;
 		if (sx > 63)
@@ -226,12 +226,12 @@ VIDEO_UPDATE( spbactn )
 
 			colour = ((attr & 0x00f0) >> 4) | 0x80;
 
-			drawgfx(tile_bitmap_bg, Machine->gfx[1],
+			drawgfx(tile_bitmap_bg, machine->gfx[1],
 					code,
 					colour,
 					0, 0,
 					16 * sx, 8 * sy,
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+					&machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 
 			sx++;
 			if (sx > 63)
@@ -260,12 +260,12 @@ VIDEO_UPDATE( spbactn )
 		else
 			colour |= 0x0080;
 
-		drawgfx(tile_bitmap_fg, Machine->gfx[0],
+		drawgfx(tile_bitmap_fg, machine->gfx[0],
 					code,
 					colour,
 					0, 0,
 					16 * sx, 8 * sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN, 0);
+					&machine->screen[0].visarea,TRANSPARENCY_PEN, 0);
 
 		sx++;
 		if (sx > 63)

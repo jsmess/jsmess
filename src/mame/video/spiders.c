@@ -25,7 +25,7 @@ VIDEO_START( spiders )
 	int loop;
 
 	// Use a temp bitmap so user change (dip switches, etc.) does not effect the bitmap
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	for(loop=0;loop<256;loop++)
 	{
@@ -103,7 +103,7 @@ VIDEO_UPDATE( spiders )
 				x=((loop%0x20)<<3)+i;
 				col=((data2&0x01)<<2)+((data1&0x01)<<1)+(data0&0x01);
 
-				plot_pixel(tmpbitmap, x, y, Machine->pens[col]);
+				plot_pixel(tmpbitmap, x, y, machine->pens[col]);
 
 				data0 >>= 1;
 				data1 >>= 1;
@@ -114,6 +114,6 @@ VIDEO_UPDATE( spiders )
 		video_addr+=increment;
 	}
 	/* Now copy the temp bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }

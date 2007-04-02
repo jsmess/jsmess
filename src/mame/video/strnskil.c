@@ -19,17 +19,17 @@ PALETTE_INIT( strnskil )
 {
 	int i;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int r = color_prom[0];
-		int g = color_prom[Machine->drv->total_colors];
-		int b = color_prom[2*Machine->drv->total_colors];
+		int g = color_prom[machine->drv->total_colors];
+		int b = color_prom[2*machine->drv->total_colors];
 
 		palette_set_color(machine,i,pal4bit(r),pal4bit(g),pal4bit(b));
 		color_prom++;
 	}
 
-	color_prom += 2*Machine->drv->total_colors;
+	color_prom += 2*machine->drv->total_colors;
 
 	/* color_prom now points to the beginning of the lookup table */
 
@@ -147,7 +147,7 @@ VIDEO_UPDATE( strnskil )
 		}
 	}
 
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	strnskil_draw_sprites(bitmap);
 	return 0;
 }

@@ -346,9 +346,9 @@ VIDEO_UPDATE( btoads )
 	/* loop over all scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *bg0_base = &btoads_vram_bg0[((y - Machine->screen[0].visarea.min_y + yscroll0) & 0xff) * TOWORD(0x4000)];
-		UINT16 *bg1_base = &btoads_vram_bg1[((y - Machine->screen[0].visarea.min_y + yscroll1) & 0xff) * TOWORD(0x4000)];
-		UINT8 *spr_base = &vram_fg_display[(y - Machine->screen[0].visarea.min_y) * TOWORD(0x4000)];
+		UINT16 *bg0_base = &btoads_vram_bg0[((y - machine->screen[0].visarea.min_y + yscroll0) & 0xff) * TOWORD(0x4000)];
+		UINT16 *bg1_base = &btoads_vram_bg1[((y - machine->screen[0].visarea.min_y + yscroll1) & 0xff) * TOWORD(0x4000)];
+		UINT8 *spr_base = &vram_fg_display[(y - machine->screen[0].visarea.min_y) * TOWORD(0x4000)];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 
 		/* for each scanline, switch off the render mode */

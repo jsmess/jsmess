@@ -206,8 +206,8 @@ static void get_tx_tile_info(int tile_index)
 
 static VIDEO_START( taitob_core )
 {
-	framebuffer[0] = auto_bitmap_alloc(512,256,Machine->screen[0].format);
-	framebuffer[1] = auto_bitmap_alloc(512,256,Machine->screen[0].format);
+	framebuffer[0] = auto_bitmap_alloc(512,256,machine->screen[0].format);
+	framebuffer[1] = auto_bitmap_alloc(512,256,machine->screen[0].format);
 	pixel_bitmap = NULL;  /* only hitice needs this */
 
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,     16,16,64,64);
@@ -283,7 +283,7 @@ VIDEO_START( hitice )
   if (video_start_taitob_color_order0(machine))
     return 1;
 
-  pixel_bitmap = auto_bitmap_alloc(1024,512,Machine->screen[0].format);
+  pixel_bitmap = auto_bitmap_alloc(1024,512,machine->screen[0].format);
 
   state_save_register_global_bitmap(pixel_bitmap);
 
@@ -607,7 +607,7 @@ VIDEO_UPDATE( taitob )
 {
   if ((video_control & 0x20) == 0)
   {
-    fillbitmap(bitmap,Machine->pens[0],cliprect);
+    fillbitmap(bitmap,machine->pens[0],cliprect);
     return 0;
   }
 
@@ -638,11 +638,11 @@ VIDEO_UPDATE( taitob )
 VIDEO_EOF( taitob )
 {
   if (~video_control & 0x01)
-    fillbitmap(framebuffer[framebuffer_page],0,&Machine->screen[0].visarea);
+    fillbitmap(framebuffer[framebuffer_page],0,&machine->screen[0].visarea);
 
   if (~video_control & 0x80)
     framebuffer_page ^= 1;
 
-  taitob_draw_sprites(framebuffer[framebuffer_page],&Machine->screen[0].visarea);
+  taitob_draw_sprites(framebuffer[framebuffer_page],&machine->screen[0].visarea);
 }
 

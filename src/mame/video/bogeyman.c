@@ -162,8 +162,8 @@ static void bogeyman_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( bogeyman )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	bogeyman_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 	return 0;
 }

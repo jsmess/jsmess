@@ -1119,6 +1119,7 @@ static DRIVER_INIT( hornet )
 	sharc_dataram[0] = auto_malloc(0x100000);
 
 	K056800_init(sound_irq_callback);
+	K033906_init();
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
@@ -1136,6 +1137,7 @@ static DRIVER_INIT( hornet_2board )
 	sharc_dataram[1] = auto_malloc(0x100000);
 
 	K056800_init(sound_irq_callback);
+	K033906_init();
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 

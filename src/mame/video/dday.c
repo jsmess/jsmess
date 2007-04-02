@@ -65,7 +65,7 @@ PALETTE_INIT( dday )
 
 	palette_set_shadow_factor(machine, 1.0/8);	/* this matches the previos version of the driver (>>3) */
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -77,16 +77,16 @@ PALETTE_INIT( dday )
 		bit3 = (color_prom[i] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* green component */
-		bit0 = (color_prom[i + Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* blue component */
-		bit0 = (color_prom[i + 2*Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + 2*machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[i + 2*machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[i + 2*machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[i + 2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,r,g,b);
@@ -242,7 +242,7 @@ VIDEO_START( dday )
 	text_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
 	sl_tilemap   = tilemap_create(get_sl_tile_info,  tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 
-	main_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	main_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	tilemap_set_transmask(bg_tilemap,0,0x00f0,0xff0f); /* pens 0-3 have priority over the foreground layer */
 
@@ -366,7 +366,7 @@ VIDEO_UPDATE( dday )
 
 				if (read_pixel(sl_bitmap, x, y) == 255)
 				{
-					src_pixel += Machine->drv->total_colors;
+					src_pixel += machine->drv->total_colors;
 				}
 
 				plot_pixel(bitmap, x, y, src_pixel);

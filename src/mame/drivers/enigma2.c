@@ -203,7 +203,7 @@ PALETTE_INIT( enigma2 )
 VIDEO_UPDATE( enigma2 )
 {
 	int i,x,y,col,offs,data;
-	fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 	blink_cnt++;
 
 	/* starfield */
@@ -211,7 +211,7 @@ VIDEO_UPDATE( enigma2 )
 		for(x=0;x<32;x++)
 		{
 		 	offs = y * 32 + x + 1024 * ((blink_cnt>>3)&1);
-			plot_pixel(bitmap,x*8,255-y*8,Machine->pens[memory_region(REGION_USER1)[offs]]);
+			plot_pixel(bitmap,x*8,255-y*8,machine->pens[memory_region(REGION_USER1)[offs]]);
 		}
 
 	/* gfx */

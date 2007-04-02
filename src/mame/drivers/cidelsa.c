@@ -5,6 +5,15 @@
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
 
+/*
+
+    TODO:
+
+    - convert to use new video timing system when it is available
+    - fix COP420 core to get sound in Draco
+
+*/
+
 #define DESTRYER_CHR1	3579000.0 // unverified
 #define DESTRYER_CHR2	5714300.0
 #define ALTAIR_CHR1		3579000.0 // unverified
@@ -46,7 +55,7 @@ READ8_HANDLER ( cidelsa_input_port_0_r )
 /* Sound Interface */
 
 static int draco_sound;
-static int draco_g;
+static int draco_ay_latch;
 
 WRITE8_HANDLER ( draco_sound_bankswitch_w )
 {
@@ -55,7 +64,31 @@ WRITE8_HANDLER ( draco_sound_bankswitch_w )
 
 WRITE8_HANDLER ( draco_sound_g_w )
 {
-    draco_g = data;
+	/*
+
+     G1 G0  description
+
+      0  0  IAB     inactive
+      0  1  DWS     write to PSG
+      1  0  DTB     read from PSG
+      1  1  INTAK   latch address
+
+    */
+
+	switch (data)
+	{
+	case 0x01:
+		AY8910_write_port_0_w(0, draco_ay_latch);
+		break;
+
+	case 0x02:
+		draco_ay_latch = AY8910_read_port_0_r(0);
+		break;
+
+	case 0x03:
+		AY8910_control_port_0_w(0, draco_ay_latch);
+		break;
+	}
 }
 
 READ8_HANDLER ( draco_sound_in_r )
@@ -63,29 +96,14 @@ READ8_HANDLER ( draco_sound_in_r )
 	return draco_sound & 0x07;
 }
 
+READ8_HANDLER ( draco_sound_ay8910_r )
+{
+	return draco_ay_latch;
+}
+
 WRITE8_HANDLER ( draco_sound_ay8910_w )
 {
-	/*
-
-     G1 G0  description
-
-      0  0  inactive
-      0  1  read from PSG
-      1  0  write to PSG
-      1  1  latch address
-
-    */
-
-	switch(draco_g)
-	{
-	case 0x02:
-		AY8910_write_port_0_w(0, data);
-		break;
-
-	case 0x03:
-		AY8910_control_port_0_w(0, data);
-		break;
-	}
+	draco_ay_latch = data;
 }
 
 WRITE8_HANDLER ( draco_ay8910_port_a_w )
@@ -271,7 +289,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( draco_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(draco_sound_bankswitch_w)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(draco_sound_g_w)
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(AY8910_read_port_0_r, draco_sound_ay8910_w)
+	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(draco_sound_ay8910_r, draco_sound_ay8910_w)
 	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN) AM_READ(draco_sound_in_r)
 ADDRESS_MAP_END
 
@@ -455,6 +473,31 @@ static INTERRUPT_GEN( draco_interrupt )
 	}
 }
 
+static MACHINE_START( destryer )
+{
+	state_save_register_global_array(cidelsa_pcb);
+	state_save_register_global(cdp1869_prd);
+	state_save_register_global(cdp1869_pcb);
+
+	return 0;
+}
+
+static MACHINE_START( draco )
+{
+	state_save_register_global_array(cidelsa_pcb);
+	state_save_register_global(cdp1869_prd);
+	state_save_register_global(cdp1869_pcb);
+	state_save_register_global(draco_sound);
+	state_save_register_global(draco_ay_latch);
+
+	return 0;
+}
+
+static MACHINE_RESET( destryer )
+{
+	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+}
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( destryer )
@@ -467,6 +510,8 @@ static MACHINE_DRIVER_START( destryer )
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_CPU_VBLANK_INT(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_MACHINE_START(destryer)
+	MDRV_MACHINE_RESET(destryer)
 
 	// video hardware
 
@@ -498,6 +543,8 @@ static MACHINE_DRIVER_START( destryea )
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_CPU_VBLANK_INT(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_MACHINE_START(destryer)
+	MDRV_MACHINE_RESET(destryer)
 
 	// video hardware
 
@@ -528,6 +575,8 @@ static MACHINE_DRIVER_START( altair )
 	MDRV_CPU_IO_MAP(altair_io_map, 0)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_CPU_VBLANK_INT(altair_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
+	MDRV_MACHINE_START(destryer)
+	MDRV_MACHINE_RESET(destryer)
 
 	// video hardware
 
@@ -559,6 +608,8 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
 	MDRV_CPU_VBLANK_INT(draco_interrupt, CDP1869_TOTAL_SCANLINES_PAL)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_MACHINE_START(draco)
+	MDRV_MACHINE_RESET(destryer)
 
 	MDRV_CPU_ADD(COP420, DRACO_SND_CHR1) // COP402N
 	MDRV_CPU_PROGRAM_MAP(draco_sound_map, 0)
@@ -679,4 +730,4 @@ ROM_END
 GAME( 1980, destryer, 0, 		destryer, destryer, cidelsa, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_SOUND )
 GAME( 1980, destryea, destryer, destryea, destryer, cidelsa, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_SOUND )
 GAME( 1981, altair,   0, 		altair,   altair,   cidelsa, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_SOUND )
-GAME( 1981, draco,    0, 		draco,    draco,    draco, 	 ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1981, draco,    0, 		draco,    draco,    draco, 	 ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_NO_SOUND )

@@ -103,7 +103,7 @@ static void blitter_scanline_callback(int param)
 VIDEO_START( dcheese )
 {
 	/* the destination bitmap is not directly accessible to the CPU */
-	dstbitmap = auto_bitmap_alloc(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, Machine->screen[0].format);
+	dstbitmap = auto_bitmap_alloc(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->screen[0].format);
 
 	/* create a timer */
 	blitter_timer = mame_timer_alloc(blitter_scanline_callback);

@@ -45,10 +45,10 @@ static void blit_horiz_pixel_line(mame_bitmap *b,int x,int y,int w, UINT32* pens
 PALETTE_INIT( magmax )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn, offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn, offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -57,22 +57,22 @@ PALETTE_INIT( magmax )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		bit3 = (color_prom[0] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*Machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*Machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*Machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*Machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
+		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
+		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
+		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine,i,r,g,b);
 		color_prom++;
 	}
 
-	color_prom += 2*Machine->drv->total_colors;
+	color_prom += 2*machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup tables */
 
 	/* characters use colors 0-15 */
@@ -98,7 +98,7 @@ VIDEO_START( magmax )
 	prom_tab = auto_malloc(256 * sizeof(UINT32));
 
 	/* Allocate temporary bitmap */
- 	tmpbitmap = auto_bitmap_alloc(256,256,Machine->screen[0].format);
+ 	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
 
 	for (i=0; i<256; i++)
 	{
@@ -124,7 +124,7 @@ VIDEO_UPDATE( magmax )
 	/* copy the background graphics */
 	if (magmax_vreg & 0x40)		/* background disable */
 	{
-		fillbitmap(bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 	}
 	else
 	{
@@ -134,7 +134,7 @@ VIDEO_UPDATE( magmax )
 		UINT32 scroll_v = (*magmax_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		fillbitmap(tmpbitmap, 0, &Machine->screen[0].visarea);
+		fillbitmap(tmpbitmap, 0, &machine->screen[0].visarea);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
@@ -143,7 +143,7 @@ VIDEO_UPDATE( magmax )
 			UINT32 rom15F_addr   = (((scroll_v + v) & 0x07)<<2) + (map_v_scr_100<<5);
 			UINT32 map_v_scr_1fe_6 =((scroll_v + v) & 0x1fe)<<6;
 
-			pen_t *pens = &Machine->pens[2*16 + (map_v_scr_100>>1)];
+			pen_t *pens = &machine->pens[2*16 + (map_v_scr_100>>1)];
 
 			if (!map_v_scr_100)
 			{
@@ -331,17 +331,17 @@ VIDEO_UPDATE( magmax )
 				code += (magmax_vreg & 0x30) * 0x8;
 			}
 
-			drawgfx(bitmap, Machine->gfx[1],
+			drawgfx(bitmap, machine->gfx[1],
 					code,
 					color,
 					flipx, flipy,
 					sx, sy,
-					&Machine->screen[0].visarea, TRANSPARENCY_COLOR, 31);
+					&machine->screen[0].visarea, TRANSPARENCY_COLOR, 31);
 		}
 	}
 	if (!(magmax_vreg & 0x40))		/* background disable */
 	{
-		copybitmap(bitmap, tmpbitmap, flipscreen,flipscreen,0,0, &Machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+		copybitmap(bitmap, tmpbitmap, flipscreen,flipscreen,0,0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 	}
 
 
@@ -363,12 +363,12 @@ VIDEO_UPDATE( magmax )
 				sy = 31 - sy;
 			}
 
-			drawgfx(bitmap, Machine->gfx[0],
+			drawgfx(bitmap, machine->gfx[0],
 					code,
 					0,
 					flipscreen, flipscreen,
 					8 * sx, 8 * sy,
-					&Machine->screen[0].visarea, TRANSPARENCY_PEN, 15);
+					&machine->screen[0].visarea, TRANSPARENCY_PEN, 15);
 		}
 	}
 	return 0;

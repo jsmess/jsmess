@@ -172,11 +172,11 @@ VIDEO_START(realbrk)
 
 	tmpbitmap0 = auto_bitmap_alloc(	32,
 									32,
-									Machine->screen[0].format);
+									machine->screen[0].format);
 
 	tmpbitmap1 = auto_bitmap_alloc(	32,
 									32,
-									Machine->screen[0].format);
+									machine->screen[0].format);
 	return 0;
 }
 
@@ -455,7 +455,7 @@ if ( code_pressed(KEYCODE_Z) )
 		return 0;
 	}
 	else
-		fillbitmap(bitmap,Machine->pens[realbrk_vregs[0xc/2] & 0x7fff],cliprect);
+		fillbitmap(bitmap,machine->pens[realbrk_vregs[0xc/2] & 0x7fff],cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);

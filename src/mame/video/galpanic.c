@@ -10,8 +10,8 @@ static mame_bitmap *sprites_bitmap;
 
 VIDEO_START( galpanic )
 {
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
-	sprites_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	galpanic_clear_sprites = 1;
 
@@ -159,7 +159,7 @@ static void draw_fgbitmap(mame_bitmap *bitmap)
 VIDEO_UPDATE( galpanic )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	draw_fgbitmap(bitmap);
 
@@ -172,7 +172,7 @@ VIDEO_UPDATE( galpanic )
 	{
 		/* keep sprites on the bitmap without clearing them */
 		galpanic_draw_sprites(sprites_bitmap);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+		copybitmap(bitmap,sprites_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -180,7 +180,7 @@ VIDEO_UPDATE( galpanic )
 VIDEO_UPDATE( comad )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	draw_fgbitmap(bitmap);
 
@@ -193,7 +193,7 @@ VIDEO_UPDATE( comad )
 	{
 		/* keep sprites on the bitmap without clearing them */
 		comad_draw_sprites(sprites_bitmap);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+		copybitmap(bitmap,sprites_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

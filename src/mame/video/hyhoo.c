@@ -315,11 +315,11 @@ void hyhoo_gfxdraw(void)
 ******************************************************************************/
 VIDEO_START( hyhoo )
 {
-	hyhoo_tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	hyhoo_videoram = auto_malloc(Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT16));
-	hyhoo_videoworkram = auto_malloc(Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT16));
+	hyhoo_tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	hyhoo_videoram = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));
+	hyhoo_videoworkram = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));
 	hyhoo_clut = auto_malloc(0x10 * sizeof(UINT8));
-	memset(hyhoo_videoram, 0x0000, (Machine->screen[0].width * Machine->screen[0].height * sizeof(UINT16)));
+	memset(hyhoo_videoram, 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT16)));
 	return 0;
 }
 
@@ -335,9 +335,9 @@ VIDEO_UPDATE( hyhoo )
 	{
 		hyhoo_screen_refresh = 0;
 
-		for (y = 0; y < Machine->screen[0].height; y++)
+		for (y = 0; y < machine->screen[0].height; y++)
 		{
-			for (x = 0; x < Machine->screen[0].width; x++)
+			for (x = 0; x < machine->screen[0].width; x++)
 			{
 				update_pixel(x, y);
 			}
@@ -346,11 +346,11 @@ VIDEO_UPDATE( hyhoo )
 
 	if (hyhoo_dispflag)
 	{
-		copyscrollbitmap(bitmap, hyhoo_tmpbitmap, 0, 0, 0, 0, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+		copyscrollbitmap(bitmap, hyhoo_tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
 	else
 	{
-		fillbitmap(bitmap, Machine->pens[0x0000], 0);
+		fillbitmap(bitmap, machine->pens[0x0000], 0);
 	}
 	return 0;
 }

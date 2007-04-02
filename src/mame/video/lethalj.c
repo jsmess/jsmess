@@ -185,14 +185,14 @@ VIDEO_UPDATE( lethalj )
 		int x, y;
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			UINT16 *source = screenram + (y - Machine->screen[0].visarea.min_y) * BLITTER_DEST_WIDTH + cliprect->min_x;
+			UINT16 *source = screenram + (y - machine->screen[0].visarea.min_y) * BLITTER_DEST_WIDTH + cliprect->min_x;
 			UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels + cliprect->min_x;
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 				*dest++ = *source++ & 0x7fff;
 		}
 	}
 
-	if (cliprect->max_y == Machine->screen[0].visarea.max_y)
+	if (cliprect->max_y == machine->screen[0].visarea.max_y)
 		blank_palette = 0;
 	return 0;
 }

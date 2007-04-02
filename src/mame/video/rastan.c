@@ -204,7 +204,7 @@ VIDEO_UPDATE( jumping )
 	for (offs = spriteram_size/2-8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram16[offs];
-		if (tile < Machine->gfx[1]->total_elements)
+		if (tile < machine->gfx[1]->total_elements)
 		{
 			int sx,sy,color,data1;
 
@@ -216,7 +216,7 @@ VIDEO_UPDATE( jumping )
 			data1 = spriteram16[offs+3];
 			color = (spriteram16[offs+4] & 0x0f) | sprite_colbank;
 
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					tile,
 					color,
 					data1 & 0x40, data1 & 0x80,

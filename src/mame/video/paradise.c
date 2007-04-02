@@ -173,7 +173,7 @@ VIDEO_START( paradise )
 								TILEMAP_TRANSPARENT, 8,8, 0x20,0x20 );
 
 	/* pixmap */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	/* paletteram and videoram (pixmap) are accessed through CPU ports, that don't
        get memory automatically allocated for them */

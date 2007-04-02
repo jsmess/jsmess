@@ -63,48 +63,48 @@ VIDEO_UPDATE( ace )
 {
 	int offs;
 
-	decodechar(Machine->gfx[1], 0, ace_characterram, Machine->drv->gfxdecodeinfo[1].gfxlayout);
-	decodechar(Machine->gfx[2], 0, ace_characterram, Machine->drv->gfxdecodeinfo[2].gfxlayout);
-	decodechar(Machine->gfx[3], 0, ace_characterram, Machine->drv->gfxdecodeinfo[3].gfxlayout);
+	decodechar(machine->gfx[1], 0, ace_characterram, machine->drv->gfxdecodeinfo[1].gfxlayout);
+	decodechar(machine->gfx[2], 0, ace_characterram, machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(machine->gfx[3], 0, ace_characterram, machine->drv->gfxdecodeinfo[3].gfxlayout);
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		decodechar(Machine->gfx[4], offs, ace_scoreram, Machine->drv->gfxdecodeinfo[4].gfxlayout);
+		decodechar(machine->gfx[4], offs, ace_scoreram, machine->drv->gfxdecodeinfo[4].gfxlayout);
 	}
 
 	/* first of all, fill the screen with the background color */
-	fillbitmap(bitmap, Machine->pens[0], &Machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 
 
-		drawgfx(bitmap,Machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1],
 				0,
 				0,
 				0,0,
 				objpos[0],objpos[1],
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
-		drawgfx(bitmap,Machine->gfx[2],
+		drawgfx(bitmap,machine->gfx[2],
 				0,
 				0,
 				0,0,
 				objpos[2],objpos[3],
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
-		drawgfx(bitmap,Machine->gfx[3],
+		drawgfx(bitmap,machine->gfx[3],
 				0,
 				0,
 				0,0,
 				objpos[4],objpos[5],
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		drawgfx(bitmap,Machine->gfx[4],
+		drawgfx(bitmap,machine->gfx[4],
 				offs,
 				0,
 				0,0,
 				10*8+offs*16,256-16, /* ?? */
-				&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
 	return 0;
 }

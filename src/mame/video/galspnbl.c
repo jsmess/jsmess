@@ -113,7 +113,7 @@ VIDEO_UPDATE( galspnbl )
 
 
 	/* copy the temporary bitmap to the screen */
-	copyscrollbitmap(bitmap,tmpbitmap,1,&screenscroll,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&screenscroll,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	draw_sprites(bitmap,0);
 
@@ -130,12 +130,12 @@ VIDEO_UPDATE( galspnbl )
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
 		{
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 					code,
 					color,
 					0,0,
 					16*sx + screenscroll,8*sy,
-					&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 		}
 	}
 

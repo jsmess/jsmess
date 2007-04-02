@@ -328,8 +328,8 @@ VIDEO_START( sega )
 {
 	if (vectorram_size == 0)
 		return 1;
-	min_x =Machine->screen[0].visarea.min_x;
-	min_y =Machine->screen[0].visarea.min_y;
+	min_x =machine->screen[0].visarea.min_x;
+	min_y =machine->screen[0].visarea.min_y;
 
 	return video_start_vector(machine);
 }

@@ -599,8 +599,8 @@ VIDEO_START(skns)
 	skns_tilemap_B = tilemap_create(get_tilemap_B_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
 
-	Machine->gfx[2]->color_granularity=256;
-	Machine->gfx[3]->color_granularity=256;
+	machine->gfx[2]->color_granularity=256;
+	machine->gfx[3]->color_granularity=256;
 
 	return 0;
 }
@@ -738,7 +738,7 @@ VIDEO_UPDATE(skns)
 			{
 				if (skns_v3t_dirty[i] == 1)
 				{
-					decodechar(Machine->gfx[1], i, (UINT8*)btiles, Machine->drv->gfxdecodeinfo[0].gfxlayout);
+					decodechar(machine->gfx[1], i, (UINT8*)btiles, machine->drv->gfxdecodeinfo[0].gfxlayout);
 
 					skns_v3t_dirty[i] = 0;
 				}
@@ -764,7 +764,7 @@ VIDEO_UPDATE(skns)
 			{
 				if (skns_v3t_4bppdirty[i] == 1)
 				{
-					decodechar(Machine->gfx[3], i, (UINT8*)btiles, Machine->drv->gfxdecodeinfo[3].gfxlayout);
+					decodechar(machine->gfx[3], i, (UINT8*)btiles, machine->drv->gfxdecodeinfo[3].gfxlayout);
 
 					skns_v3t_4bppdirty[i] = 0;
 				}
@@ -784,10 +784,10 @@ VIDEO_UPDATE(skns)
 
 
 		/* needed until we have the per tile priorities sorted out */
-		if (!strcmp(Machine->gamedrv->name,"vblokbrk") ||
-			!strcmp(Machine->gamedrv->name,"sarukani") ||
-			!strcmp(Machine->gamedrv->name,"sengekis") ||
-			!strcmp(Machine->gamedrv->name,"sengekij"))
+		if (!strcmp(machine->gamedrv->name,"vblokbrk") ||
+			!strcmp(machine->gamedrv->name,"sarukani") ||
+			!strcmp(machine->gamedrv->name,"sengekis") ||
+			!strcmp(machine->gamedrv->name,"sengekij"))
 		{
 			supernova_pri_b = 0;
 			supernova_pri_a = 1;

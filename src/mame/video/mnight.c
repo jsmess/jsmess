@@ -31,8 +31,8 @@ VIDEO_START( mnight )
 {
 	bg_dirtybuffer = auto_malloc(1024);
 
-	bitmap_bg = auto_bitmap_alloc (Machine->screen[0].width*2,Machine->screen[0].height*2,Machine->screen[0].format);
-	bitmap_sp = auto_bitmap_alloc (Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	bitmap_bg = auto_bitmap_alloc (machine->screen[0].width*2,machine->screen[0].height*2,machine->screen[0].format);
+	bitmap_sp = auto_bitmap_alloc (machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	mnight_mark_background_dirty() ;
 
@@ -205,14 +205,14 @@ VIDEO_UPDATE( mnight )
 
 	if (sp_overdraw)	/* overdraw sprite mode */
 	{
-		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		mnight_draw_sprites(bitmap_sp);
 		mnight_draw_foreground(bitmap_sp);
-		copybitmap(bitmap,bitmap_sp,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_PEN, 15);
+		copybitmap(bitmap,bitmap_sp,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN, 15);
 	}
 	else			/* normal sprite mode */
 	{
-		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,bitmap_bg,1,&scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		mnight_draw_sprites(bitmap);
 		mnight_draw_foreground(bitmap);
 	}

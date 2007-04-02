@@ -53,7 +53,7 @@ static struct playfield
 
 VIDEO_START( malzak )
 {
-	collision_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
+	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 
 	saa5050_vidram = auto_malloc(0x800);
 	s2636_1_ram = auto_malloc(0x100);
@@ -172,15 +172,15 @@ VIDEO_UPDATE( malzak )
 			{
 				if (saa5050_state.saa5050_flags & SAA5050_DBLHI)
 				{
-					drawgfx (bitmap, Machine->gfx[4], code, colour, 0, 0,
-						sx * 6, sy * 10, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-					drawgfx (bitmap, Machine->gfx[5], code, colour, 0, 0,
-						sx * 6, (sy + 1) * 10, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+					drawgfx (bitmap, machine->gfx[4], code, colour, 0, 0,
+						sx * 6, sy * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+					drawgfx (bitmap, machine->gfx[5], code, colour, 0, 0,
+						sx * 6, (sy + 1) * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 				}
 				else
 				{
-					drawgfx (bitmap, Machine->gfx[3], code, colour, 0, 0,
-						sx * 6, sy * 10, &Machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+					drawgfx (bitmap, machine->gfx[3], code, colour, 0, 0,
+						sx * 6, sy * 10, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 				}
 			}
 		}
@@ -207,8 +207,8 @@ VIDEO_UPDATE( malzak )
 			if(sx < -15)
 				sx+=256;
 
-			drawgfx(bitmap,Machine->gfx[0],field[x*16 + y].code,7,0,0,
-			sx, sy, &Machine->screen[0].visarea, TRANSPARENCY_COLOR, 0);
+			drawgfx(bitmap,machine->gfx[0],field[x*16 + y].code,7,0,0,
+			sx, sy, &machine->screen[0].visarea, TRANSPARENCY_COLOR, 0);
 		}
 
 	// S2636 - Sprites / Collision detection (x2)

@@ -44,8 +44,8 @@ static int ir_xmin, ir_ymin, ir_xmax, ir_ymax; /* clipping area */
 PALETTE_INIT( irobot )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* Convert the color prom for the text palette */
 	for (i = 0;i < 32;i++)
@@ -116,8 +116,8 @@ void irobot_poly_clear(void)
 VIDEO_START( irobot )
 {
 	/* Setup 2 bitmaps for the polygon generator */
-	polybitmap1 = auto_malloc(BITMAP_WIDTH * Machine->screen[0].height);
-	polybitmap2 = auto_malloc(BITMAP_WIDTH * Machine->screen[0].height);
+	polybitmap1 = auto_malloc(BITMAP_WIDTH * machine->screen[0].height);
+	polybitmap2 = auto_malloc(BITMAP_WIDTH * machine->screen[0].height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
 	_irobot_poly_clear(polybitmap1);
@@ -125,8 +125,8 @@ VIDEO_START( irobot )
 
 	/* Set clipping */
 	ir_xmin = ir_ymin = 0;
-	ir_xmax = Machine->screen[0].width;
-	ir_ymax = Machine->screen[0].height;
+	ir_xmax = machine->screen[0].width;
+	ir_ymax = machine->screen[0].height;
 
 	return 0;
 }
@@ -379,7 +379,7 @@ VIDEO_UPDATE( irobot )
 
 	/* copy the polygon bitmap */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], Machine->pens, -1);
+		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], machine->pens, -1);
 
 	/* redraw the non-zero characters in the alpha layer */
 	for (y = offs = 0; y < 32; y++)
@@ -390,7 +390,7 @@ VIDEO_UPDATE( irobot )
 				int color = ((videoram[offs] & 0xC0) >> 6) | (irobot_alphamap >> 3);
 				int transp=color + 64;
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						code, color,
 						0,0,
 						8*x,8*y,

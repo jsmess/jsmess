@@ -100,25 +100,25 @@ VIDEO_START(rng)
 
 	/* find first empty slot to decode gfx */
 	for (ttl_gfx_index = 0; ttl_gfx_index < MAX_GFX_ELEMENTS; ttl_gfx_index++)
-		if (Machine->gfx[ttl_gfx_index] == 0)
+		if (machine->gfx[ttl_gfx_index] == 0)
 			break;
 
 	if (ttl_gfx_index == MAX_GFX_ELEMENTS)
 		return(1);
 
 	// decode the ttl layer's gfx
-	Machine->gfx[ttl_gfx_index] = allocgfx(&charlayout);
-	decodegfx(Machine->gfx[ttl_gfx_index], memory_region(REGION_GFX3), 0, Machine->gfx[ttl_gfx_index]->total_elements);
+	machine->gfx[ttl_gfx_index] = allocgfx(&charlayout);
+	decodegfx(machine->gfx[ttl_gfx_index], memory_region(REGION_GFX3), 0, machine->gfx[ttl_gfx_index]->total_elements);
 
-	if (Machine->drv->color_table_len)
+	if (machine->drv->color_table_len)
 	{
-	        Machine->gfx[ttl_gfx_index]->colortable = Machine->remapped_colortable;
-	        Machine->gfx[ttl_gfx_index]->total_colors = Machine->drv->color_table_len / 16;
+	        machine->gfx[ttl_gfx_index]->colortable = machine->remapped_colortable;
+	        machine->gfx[ttl_gfx_index]->total_colors = machine->drv->color_table_len / 16;
 	}
 	else
 	{
-	        Machine->gfx[ttl_gfx_index]->colortable = Machine->pens;
-	        Machine->gfx[ttl_gfx_index]->total_colors = Machine->drv->total_colors / 16;
+	        machine->gfx[ttl_gfx_index]->colortable = machine->pens;
+	        machine->gfx[ttl_gfx_index]->total_colors = machine->drv->total_colors / 16;
 	}
 
 	// create the tilemap

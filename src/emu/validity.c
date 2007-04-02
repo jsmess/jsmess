@@ -1152,6 +1152,7 @@ int mame_validitychecks(int game)
 	input_port_entry *inputports = NULL;
 	int drivnum;
 	int error = FALSE;
+	UINT16 lsbtest;
 	UINT8 a, b;
 
 	/* basic system checks */
@@ -1167,6 +1168,18 @@ int mame_validitychecks(int game)
 	if (sizeof(UINT32) != 4)	{ mame_printf_error("UINT32 must be 32 bits\n"); error = TRUE; }
 	if (sizeof(INT64)  != 8)	{ mame_printf_error("INT64 must be 64 bits\n"); error = TRUE; }
 	if (sizeof(UINT64) != 8)	{ mame_printf_error("UINT64 must be 64 bits\n"); error = TRUE; }
+#ifdef PTR64
+	if (sizeof(void *) != 8)	{ mame_printf_error("PTR64 flag enabled, but was compiled for 32-bit target\n"); error = TRUE; }
+#else
+	if (sizeof(void *) != 4)	{ mame_printf_error("PTR64 flag not enabled, but was compiled for 64-bit target\n"); error = TRUE; }
+#endif
+	lsbtest = 0;
+	*(UINT8 *)&lsbtest = 0xff;
+#ifdef LSB_FIRST
+	if (lsbtest == 0xff00)		{ mame_printf_error("LSB_FIRST specified, but running on a big-endian machine\n"); error = TRUE; }
+#else
+	if (lsbtest == 0x00ff)		{ mame_printf_error("LSB_FIRST not specified, but running on a little-endian machine\n"); error = TRUE; }
+#endif
 
 	/* make sure the CPU and sound interfaces are up and running */
 	cpuintrf_init(NULL);

@@ -415,7 +415,7 @@ PALETTE_INIT( marinedt )
 {
 	int i,r,b,g;
 
-	for (i = 0;i < Machine->drv->total_colors; i++)
+	for (i = 0;i < machine->drv->total_colors; i++)
 	{
 		int bit0,bit1,bit2;
 
@@ -461,9 +461,9 @@ VIDEO_START( marinedt )
 	tilemap_set_scrolldx(tx_tilemap, 0, 4*8);
 	tilemap_set_scrolldy(tx_tilemap, 0, -4*8);
 
-	tile = auto_bitmap_alloc(32 * 8, 32 * 8, Machine->screen[0].format);
-	obj1 = auto_bitmap_alloc(32,32,Machine->screen[0].format);
-	obj2 = auto_bitmap_alloc(32,32,Machine->screen[0].format);
+	tile = auto_bitmap_alloc(32 * 8, 32 * 8, machine->screen[0].format);
+	obj1 = auto_bitmap_alloc(32,32,machine->screen[0].format);
+	obj2 = auto_bitmap_alloc(32,32,machine->screen[0].format);
 
 	return 0;
 }
@@ -486,34 +486,34 @@ VIDEO_UPDATE( marinedt )
 {
 	int sx, sy;
 
-	fillbitmap(tile, Machine->pens[0], NULL);
+	fillbitmap(tile, machine->pens[0], NULL);
 	tilemap_draw(tile, cliprect, tx_tilemap, 0, 0);
 
-	fillbitmap(obj1, Machine->pens[0], NULL);
-	drawgfx(obj1, Machine->gfx[1],
+	fillbitmap(obj1, machine->pens[0], NULL);
+	drawgfx(obj1, machine->gfx[1],
 			OBJ_CODE(marinedt_obj1_a),
 			OBJ_COLOR(marinedt_obj1_a),
 			OBJ_FLIPX(marinedt_obj1_a), OBJ_FLIPY(marinedt_obj1_a),
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(obj2, Machine->pens[0], NULL);
-	drawgfx(obj2, Machine->gfx[2],
+	fillbitmap(obj2, machine->pens[0], NULL);
+	drawgfx(obj2, machine->gfx[2],
 			OBJ_CODE(marinedt_obj2_a),
 			OBJ_COLOR(marinedt_obj2_a),
 			OBJ_FLIPX(marinedt_obj2_a), OBJ_FLIPY(marinedt_obj2_a),
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(bitmap, Machine->pens[0], NULL);
+	fillbitmap(bitmap, machine->pens[0], NULL);
 
 	if (marinedt_pd & 0x02)
-		copybitmap(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, TRANSPARENCY_COLOR, Machine->pens[0]);
+		copybitmap(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, TRANSPARENCY_COLOR, machine->pens[0]);
 
 	if (marinedt_pd & 0x01)
-		copybitmap(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, TRANSPARENCY_COLOR, Machine->pens[0]);
+		copybitmap(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, TRANSPARENCY_COLOR, machine->pens[0]);
 
-	copybitmap(bitmap, tile, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, Machine->pens[0]);
+	copybitmap(bitmap, tile, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, machine->pens[0]);
 
 	coll = cx = cyr = cyq = 0;
 	if (marinedt_pd & 0x01)
@@ -528,10 +528,10 @@ VIDEO_UPDATE( marinedt )
 				 || y < cliprect->min_y || y > cliprect->max_y)
 					continue;
 
-				if (read_pixel(obj1, sx, sy) == Machine->pens[0])
+				if (read_pixel(obj1, sx, sy) == machine->pens[0])
 					continue;
 
-				if (read_pixel(tile, x, y) != Machine->pens[0])
+				if (read_pixel(tile, x, y) != machine->pens[0])
 				{
 					coll = 0x08;
 
@@ -565,10 +565,10 @@ VIDEO_UPDATE( marinedt )
 				 || yy < 0 || yy >= 32)
 					continue;
 
-				if (read_pixel(obj1, sx, sy) == Machine->pens[0])
+				if (read_pixel(obj1, sx, sy) == machine->pens[0])
 					continue;
 
-				if (read_pixel(obj2, xx, yy) != Machine->pens[0])
+				if (read_pixel(obj2, xx, yy) != machine->pens[0])
 				{
 					collh = 0x80;
 

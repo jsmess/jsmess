@@ -215,7 +215,7 @@ VIDEO_UPDATE( actfancr )
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
@@ -300,7 +300,7 @@ VIDEO_UPDATE( triothep )
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,Machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[1],
 					sprite - multi * inc,
 					colour,
 					fx,fy,

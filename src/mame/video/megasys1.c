@@ -282,14 +282,14 @@ VIDEO_START( megasys1 )
 	megasys1_8x8_scroll_factor[1] = 1;	megasys1_16x16_scroll_factor[1] = 4;
 	megasys1_8x8_scroll_factor[2] = 1;	megasys1_16x16_scroll_factor[2] = 4;
 
-	if (strcmp(Machine->gamedrv->name, "soldamj") == 0)
+	if (strcmp(machine->gamedrv->name, "soldamj") == 0)
 	{
 		megasys1_8x8_scroll_factor[1] = 4;	megasys1_16x16_scroll_factor[1] = 4;
 	}
 
 	hardware_type_z = 0;
-	if (strcmp(Machine->gamedrv->name, "lomakai") == 0 ||
-		strcmp(Machine->gamedrv->name, "makaiden") == 0)
+	if (strcmp(machine->gamedrv->name, "lomakai") == 0 ||
+		strcmp(machine->gamedrv->name, "makaiden") == 0)
 		hardware_type_z = 1;
 
  	return 0;
@@ -770,8 +770,8 @@ PALETTE_INIT( megasys1 )
 
 	i = 0;
 	while (	priorities[i].driver &&
-			strcmp(priorities[i].driver, Machine->gamedrv->name) != 0 &&
-			strcmp(priorities[i].driver, Machine->gamedrv->parent) != 0)
+			strcmp(priorities[i].driver, machine->gamedrv->name) != 0 &&
+			strcmp(priorities[i].driver, machine->gamedrv->parent) != 0)
 		i++;
 
 	if (priorities[i].driver)
@@ -1002,7 +1002,7 @@ VIDEO_UPDATE( megasys1 )
 				if (flag != 0)
 				{
 					flag = 0;
-					fillbitmap(bitmap,Machine->pens[0],cliprect);
+					fillbitmap(bitmap,machine->pens[0],cliprect);
 				}
 
 				if (megasys1_sprite_flag & 0x100)	/* sprites are split */

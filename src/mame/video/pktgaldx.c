@@ -91,7 +91,7 @@ VIDEO_UPDATE(pktgaldx)
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,Machine->pens[0x0],cliprect); /* not Confirmed */
+	fillbitmap(bitmap,machine->pens[0x0],cliprect); /* not Confirmed */
 	fillbitmap(priority_bitmap,0,NULL);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
@@ -127,7 +127,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,Machine->gfx[0],tileno^0x1000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[0],tileno^0x1000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	for (offset = 0x1600/2;offset<0x2000/2;offset+=8)
@@ -141,7 +141,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,Machine->gfx[0],tileno^0x4000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[0],tileno^0x4000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	for (offset = 0x2000/2;offset<0x4000/2;offset+=8)
@@ -155,7 +155,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,Machine->gfx[0],tileno^0x3000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,machine->gfx[0],tileno^0x3000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	return 0;

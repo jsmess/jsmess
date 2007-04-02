@@ -603,9 +603,9 @@ VIDEO_START( f3 )
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
-	pri_alp_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
-	tile_opaque_sp = (UINT8 *)auto_malloc(Machine->gfx[2]->total_elements);
-	tile_opaque_pf = (UINT8 *)auto_malloc(Machine->gfx[1]->total_elements);
+	pri_alp_bitmap = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
+	tile_opaque_sp = (UINT8 *)auto_malloc(machine->gfx[2]->total_elements);
+	tile_opaque_pf = (UINT8 *)auto_malloc(machine->gfx[1]->total_elements);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -615,8 +615,8 @@ VIDEO_START( f3 )
 	tilemap_set_transparent_pen(pixel_layer,0);
 
 	/* Palettes have 4 bpp indexes despite up to 6 bpp data */
-	Machine->gfx[1]->color_granularity=16;
-	Machine->gfx[2]->color_granularity=16;
+	machine->gfx[1]->color_granularity=16;
+	machine->gfx[2]->color_granularity=16;
 
 	flipscreen = 0;
 	memset(spriteram32_buffered,0,spriteram_size);
@@ -637,7 +637,7 @@ VIDEO_START( f3 )
 	init_alpha_blend_func();
 
 	{
-		const gfx_element *sprite_gfx = Machine->gfx[2];
+		const gfx_element *sprite_gfx = machine->gfx[2];
 		int c;
 
 		for (c = 0;c < sprite_gfx->total_elements;c++)
@@ -661,7 +661,7 @@ VIDEO_START( f3 )
 
 
 	{
-		const gfx_element *pf_gfx = Machine->gfx[1];
+		const gfx_element *pf_gfx = machine->gfx[1];
 		int c;
 
 		for (c = 0;c < pf_gfx->total_elements;c++)
@@ -3247,7 +3247,7 @@ VIDEO_UPDATE( f3 )
 	if (vram_changed)
 		for (tile = 0;tile < 256;tile++)
 			if (vram_dirty[tile]) {
-				decodechar(Machine->gfx[0],tile,(UINT8 *)f3_vram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0],tile,(UINT8 *)f3_vram,machine->drv->gfxdecodeinfo[0].gfxlayout);
 				tilemap_mark_all_tiles_dirty(vram_layer); // TODO
 				//tilemap_mark_tile_dirty(vram_layer,tile);
 				vram_dirty[tile]=0;
@@ -3257,7 +3257,7 @@ VIDEO_UPDATE( f3 )
 	if (pivot_changed)
 		for (tile = 0;tile < 2048;tile++)
 			if (pivot_dirty[tile]) {
-				decodechar(Machine->gfx[3],tile,(UINT8 *)f3_pivot_ram,Machine->drv->gfxdecodeinfo[3].gfxlayout);
+				decodechar(machine->gfx[3],tile,(UINT8 *)f3_pivot_ram,machine->drv->gfxdecodeinfo[3].gfxlayout);
 				tilemap_mark_tile_dirty(pixel_layer,tile);
 				pivot_dirty[tile]=0;
 			}

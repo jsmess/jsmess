@@ -269,7 +269,7 @@ static z80sio_interface nflfoot_sio_intf =
 MACHINE_START( mcr )
 {
 	/* initialize the CTC */
-	ctc_intf.baseclock = Machine->drv->cpu[0].cpu_clock;
+	ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
 	z80ctc_init(0, &ctc_intf);
 
 	state_save_register_global(mcr_cocktail_flip);
@@ -280,16 +280,16 @@ MACHINE_START( mcr )
 MACHINE_START( nflfoot )
 {
 	/* initialize the CTC */
-	ctc_intf.baseclock = Machine->drv->cpu[0].cpu_clock;
+	ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
 	z80ctc_init(0, &ctc_intf);
 
-	nflfoot_ctc_intf.baseclock = Machine->drv->cpu[3].cpu_clock;
+	nflfoot_ctc_intf.baseclock = machine->drv->cpu[3].cpu_clock;
 	z80ctc_init(1, &nflfoot_ctc_intf);
 
 	z80pio_init(0, &nflfoot_pio_intf);
 	z80pio_init(1, &nflfoot_pio_intf);
 
-	nflfoot_sio_intf.baseclock = Machine->drv->cpu[3].cpu_clock;
+	nflfoot_sio_intf.baseclock = machine->drv->cpu[3].cpu_clock;
 	z80sio_init(0, &nflfoot_sio_intf);
 
 	/* allocate a timer for the IPU watchdog */

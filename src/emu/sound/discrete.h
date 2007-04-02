@@ -180,6 +180,8 @@
  * DISCRETE_MIXER6(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,IN5,INFO)
  * DISCRETE_MIXER7(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6,INFO)
  * DISCRETE_MIXER8(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,INFO)
+ * DISCRETE_OP_AMP(NODE,ENAB,IN0,IN1,INFO)
+ * DISCRETE_OP_AMP_ONESHOT(NODE,TRIG,INFO)
  * DISCRETE_OP_AMP_TRIG_VCA(NODE,TRG0,TRG1,TRG2,IN0,IN1,INFO)
  *
  * DISCRETE_LOGIC_INVERT(NODE,ENAB,INP0)
@@ -224,6 +226,12 @@
  * DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
  * DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)
+ *
+ * DISCRETE_CUSTOM1(NODE,ENAB,IN0,INFO)
+ * DISCRETE_CUSTOM2(NODE,ENAB,IN0,IN1,INFO)
+ * DISCRETE_CUSTOM3(NODE,ENAB,IN0,IN1,IN2,INFO)
+ * DISCRETE_CUSTOM4(NODE,ENAB,IN0,IN1,IN2,IN3,INFO)
+ * DISCRETE_CUSTOM5(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,INFO)
  *
  * DISCRETE_CSVLOG1(NODE1)
  * DISCRETE_CSVLOG2(NODE1,NODE2)
@@ -717,13 +725,13 @@
  *
  *  vP >-.
  *       |         c
- *       Z     .---||----+---------------------------> DISC_OP_AMP_OSCILLATOR_IS_CAP
+ *       Z     .---||----+---------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
  *       Z r1  |         |
  *       Z     |   |\    |
  *       |     |   | \   |            |\
  *       '-----+---|- \  |     r3     | \
  *                 |   >-+----ZZZZ----|- \
- *                 |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_IS_SQR
+ *                 |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
  *             .---| /             .--|+ /   |
  *             |   |/        r5    |  | /    |
  *             |      vP >--ZZZZ---+  |/     |
@@ -763,41 +771,42 @@
  *          So it is used only with DISCRETE_OP_AMP_VCO1.
  *
  *                               c
- *  .------------------------+---||----+---------------------------> DISC_OP_AMP_OSCILLATOR_IS_CAP
+ *  .------------------------+---||----+---------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
  *  |                        |         |
  *  |                        |   |\    |
  *  |              r1        |   | \   |            |\
  *  | vMod1 >--+--ZZZZ-------+---|- \  |            | \
  *  |          |                 |   >-+------------|- \
- *  |          |   r2            |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_IS_SQR
+ *  |          |   r2            |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
  *  Z          '--ZZZZ--+--------| /             .--|+ /   |
  *  Z r6                |        |/        r4    |  | /    |
  *  Z                   Z         vP/2 >--ZZZZ---+  |/     |
  *  |                   Z r5                     |         |
  * .----.               Z                        |   r3    |
- * |  En|<--------.     |                        '--ZZZZ---+
+ * | sw |<--------.     |                        '--ZZZZ---+
  * '----'         |    gnd                                 |
  *    |           |                                        |
  *   gnd          '----------------------------------------'
  *
- * Notes: The 'En' block can be a transistor or 4066 switch.  It connects
- *        r6 to ground when En is high.
+ * Notes: The 'sw' block can be a transistor or 4066 switch.  It connects
+ *        r6 to ground when 'sw' is high.
  *
  *          --------------------------------------------------
  *
  *     DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON
  *          Basic Norton Op Amp Voltage Controlled Oscillator circuit.
+ *          When disabled, c discharges and sqw out goes high.
  *
- *                                             .---------------------------> DISC_OP_AMP_OSCILLATOR_IS_CAP
+ *                                             .---------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
  *                                       c     |
  *               r6                  .---||----+
  *        vP >--ZZZZ---.             |         |         r5    |\
  *                     |             |   |\    |  vP >--ZZZZ-. | \
  *               r7    |   r1        |   | \   |             '-|- \
- *     vMod1 >--ZZZZ---+--ZZZZ-------+---|- \  |     r3        |   >--+-------> DISC_OP_AMP_OSCILLATOR_IS_SQR
+ *     vMod1 >--ZZZZ---+--ZZZZ-------+---|- \  |     r3        |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
  *                     |                 |   >-+----ZZZZ----+--|+ /   |
  *               r8    |   r2    .----.  |+ /               |  | /    |
- *     vMod2 >--ZZZZ---+--ZZZZ---| En |--| /                |  |/     |
+ *     vMod2 >--ZZZZ---+--ZZZZ---| sw |--| /                |  |/     |
  *                               '----'  |/                 |         |
  *                                 ^ ^                      |   r4    |
  *                                 | |                      '--ZZZZ---+
@@ -806,6 +815,63 @@
  *                                   '--------------------------------'
  *
  * EXAMPLES: see Polaris
+ *
+ *          --------------------------------------------------
+ *
+ *     DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON
+ *          Basic Norton Op Amp Voltage Controlled Oscillator circuit.
+ *          Note that this circuit has only 1 modulation voltage.
+ *          So it is used only with DISCRETE_OP_AMP_VCO1.
+ *          When vMod1 goes to 0V, the oscillator is disabled.
+ *          c fully charges and the sqw out goes low.
+ *
+ *                                             .---------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
+ *                                             |
+ *                                             |                 r4
+ *                                       c     |             .--ZZZZ--.
+ *                                   .---||----+             |        |
+ *                                   |         |         r5  | |\     |
+ *                                   |   |\    |  vP >--ZZZZ-+ | \    |
+ *               r1                  |   | \   |             '-|+ \   |
+ *     vMod1 >--ZZZZ-----------------+---|- \  |     r3        |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
+ *                                       |   >-+----ZZZZ-------|- /   |
+ *               r2                      |+ /                  | /    |
+ *        vP >--ZZZZ-----------------+---| /                   |/     |
+ *                                   |   |/                           |
+ *               r6      .----.      |                                |
+ *        vP >--ZZZZ-----|-sw-|------'                                |
+ *                       '----'                                       |
+ *                          ^                                         |
+ *                          |                                         |
+ *                          '-----------------------------------------'
+ *
+ * EXAMPLES: see Double Play
+ *
+ *          --------------------------------------------------
+ *
+ *     DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON
+ *          Basic Norton Op Amp Voltage Controlled Oscillator circuit.
+ *
+ *
+ *                                  c
+ *              r7              .---||----+---------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
+ *       vP >--ZZZZ---.         |         |
+ *                    |         |   |\    |
+ *              r1    |         |   | \   |            |\
+ *    vMod1 >--ZZZZ---+---------+---|- \  |     r3     | \
+ *                    |             |   >-+----ZZZZ----|- \
+ *              r6    |             |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
+ *    vMod2 >--ZZZZ---'         .---| /             .--|+ /   |
+ *                              |   |/        r5    |  | /    |
+ *                              |      vP >--ZZZZ---+  |/     |
+ *                              Z                   |         |
+ *                              Z r2                |   r4    |
+ *                              Z                   '--ZZZZ---+
+ *                              |                             |
+ *                              |                             |
+ *                              '-----------------------------'
+ *
+ * EXAMPLES: see Space Encounter
  *
  ***********************************************************************
  *
@@ -1214,7 +1280,7 @@
  *     DISC_OUT_ACTIVE_HIGH  0x00 - output active high (DEFAULT)
  *
  *  NOTE: A width of 0 seconds will output a pulse of 1 sample.
- *        This is usefull for a guaranteed minimun pulse, regardless
+ *        This is useful for a guaranteed minimun pulse, regardless
  *        of the sample rate.
  *
  * EXAMPLES: see Polaris
@@ -1577,8 +1643,9 @@
  *
  * Note: Trig0 is voltage level, not logic.
  *       No functions are used so set them to 0, or DISC_OP_AMP_TRIGGER_FUNCTION_NONE.
+ *       You can also use DISCRETE_OP_AMP with type DISC_OP_AMP_IS_NORTON to emulate this.
  *
- * EXAMPLES: see Extra Innings
+ * EXAMPLES: see Double Play
  *
  *          --------------------------------------------------
  *
@@ -1681,6 +1748,76 @@
  *
  ***********************************************************************
  *
+ * DISCRETE_OP_AMP - Various op-amp circuits
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_OP_AMP(name of node,
+ *                     enable node or static value,
+ *                     input 0 node or static value,
+ *                     input 1 node or static value,
+ *                     address of discrete_op_amp_info structure)
+ *
+ *     discrete_op_amp_info = {type, r1, r2, r3, r4, c, vN, vP}
+ *
+ * Note: Set all unused components to 0.
+ *
+ *  Types:
+ *
+ *     DISC_OP_AMP_IS_NORTON
+ *
+ *                            c
+ *                      .----||---.
+ *                      |         |
+ *             r3       |    r4   |       vP = B+
+ *     vP >---ZZZZ------+---ZZZZ--+       vN = B-
+ *                      |         |
+ *             r1       |  |\     |       Note: r2 must always be used
+ *    IN0 >---ZZZZ------+  | \    |
+ *                      '--|- \   |
+ *             r2          |   >--+-----> Netlist Node
+ *    IN1 >---ZZZZ---------|+ /
+ *                         | /
+ *                         |/
+ *
+ * EXAMPLES: see Space Encounter
+ *
+ ***********************************************************************
+ *
+ * DISCRETE_OP_AMP_ONESHOT - Various op-amp one shot circuits
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_OP_AMP_ONESHOT(name of node,
+ *                             trigger node (voltage level),
+ *                             address of discrete_op_amp_1sht_info structure)
+ *
+ *     discrete_op_amp_1sht_info = {type, r1, r2, r3, r4, r5, c1, c2, vN, vP}
+ *
+ *  Types:
+ *
+ *     DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON
+ *
+ *             c1       .---|>|---.
+ *    gnd >----||---+---+         |
+ *                  |   |    r4   |       vP = B+
+ *                  Z   '---ZZZZ--+       vN = B-
+ *                  Z r3          |
+ *                  Z      |\     |       Note: all components must be used
+ *             r1   |      | \    |             The oneshot is cancelled when TRIG goes low
+ *     vP >---ZZZZ--+------|- \   |
+ *                         |   >--+-----> Netlist Node
+ *           c2    r2   .--|+ /   |
+ *   TRIG >--||---ZZZZ--+  | /    |
+ *                      |  |/     |
+ *                      |    r5   |
+ *                      '---ZZZZ--'
+ *
+ *
+ * EXAMPLES: see Space Encounter
+ *
+ ***********************************************************************
+ *
  * DISCRETE_OP_AMP_TRIG_VCA - Triggered Norton op amp voltage controlled amplifier.
  *                            This means the cap is rapidly charged thru r5 when F2=1.
  *                            Then it discharges thru r6+r7 when F2=0.
@@ -1697,13 +1834,14 @@
  *                              input 1 node or static value,
  *                              address of discrete_op_amp_tvca_info structure)
  *
- *     discrete_op_amp_tvca_info = { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, c1, c2, c3, vP, f0, f1, f2, f3, f4, f5}
+ *     discrete_op_amp_tvca_info = { r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, c1, c2, c3, v1, v2, v3, vP, f0, f1, f2, f3, f4, f5}
  *
  * Note: Set all unused components to 0.
  *       Set all unused functions to DISC_OP_AMP_TRIGGER_FUNCTION_NONE
  *       Set all unused nodes to NODE_NC.
  *       If function F3 is not used then set r6=0 and use only r7.
  *       r2 = r2a + r2b.  r3 = r3a + r3b.
+ *       vP is the op-amp B+.
  *
  *             r2a
  *   IN0 >----ZZZZ-----.               r1
@@ -1720,19 +1858,19 @@
  *           '----'  |       |         |       | | /
  *                   |      ---      .----.    | |/
  *             r5    |      --- c1   | F3 |    |
- *    vP >----ZZZZ---'       |       '----'    |
+ *    v1 >----ZZZZ---'       |       '----'    |
  *                          gnd                |
  *                                             |
  *           .----.    diode               r9  |
  *           | F4 |--+--|>|-----------+---ZZZZ-+
  *           '----'  |           c2   |        |
  *             r8    |   gnd >---||---'        |
- *    vP >----ZZZZ---'                         |
+ *    v2 >----ZZZZ---'                         |
  *           .----.    diode               r11 |
  *           | F5 |--+--|>|-----------+---ZZZZ-'
  *           '----'  |           c3   |
  *             r10   |   gnd >---||---'
- *    vP >----ZZZZ---'
+ *    v3 >----ZZZZ---'
  *
  *  Function types:
  *
@@ -1937,6 +2075,27 @@
  *  vRef >-----------------------'  |/
  *
  * EXAMPLES: see Tank 8, Atari Baseball, Monte Carlo
+ *
+ *          --------------------------------------------------
+ *
+ *     DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON
+ *          Single Pole Multiple Feedback Band Pass Filter
+ *
+ *                         c1
+ *                      .--||----+---------.
+ *                      |        |         |
+ *                      |        Z         |
+ *                      |        Z rF      |
+ *                      |        Z         |
+ *          r1          |  c2    |  |\     |
+ *  IN0 >--ZZZZ--+------+--||----+  | \    |
+ *               |               '--|- \   |
+ *          r2   |                  |   >--+----------> Netlist Node
+ * vRef >--ZZZZ--'               .--|+ /
+ *                    r3         |  | /
+ *    vP >-----------ZZZZ--------'  |/
+ *
+ * EXAMPLES: see Space Encounter
  *
  *          --------------------------------------------------
  *
@@ -2583,6 +2742,23 @@
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
  *
  ***********************************************************************
+ *
+ * DISCRETE_CUSTOMx - Link to custom code
+ *     where x = 1 to 5
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_CUSTOMx(name of node,
+ *                      enable node or static value,
+ *                      input 0 node or static value, ...)
+ *
+ *     discrete_custom_info = {reset, step, contextsize, custom}
+ *                             reset  = address called to reset a node after creation or system reset
+ *                             step   = address called to execute one time delta of output update
+ *                             contextsize = size of context to create
+ *                             custom = address of specific initialisation data
+ *
+ ***********************************************************************
  =======================================================================
  * Debugging modules.
  =======================================================================
@@ -2776,6 +2952,9 @@ enum
 #define DISC_INTEGRATE_OP_AMP_1	0x00
 #define DISC_INTEGRATE_OP_AMP_2	0x10
 
+/* op amp 1 shot types */
+#define DISC_OP_AMP_1SHT_1	0x00
+
 /* Op Amp Filter Options */
 #define DISC_OP_AMP_FILTER_IS_LOW_PASS_1	0x00
 #define DISC_OP_AMP_FILTER_IS_HIGH_PASS_1	0x10
@@ -2789,11 +2968,12 @@ enum
 /* Op Amp Oscillator Flags */
 #define DISC_OP_AMP_OSCILLATOR_1			0x00
 #define DISC_OP_AMP_OSCILLATOR_VCO_1		0x80
+#define DISC_OP_AMP_OSCILLATOR_VCO_2		0x90
+#define DISC_OP_AMP_OSCILLATOR_VCO_3		0xa0
 #define DISC_OP_AMP_OSCILLATOR_OUT_CAP		0x00
 #define DISC_OP_AMP_OSCILLATOR_OUT_SQW		0x02
 
 #define DISC_OP_AMP_OSCILLATOR_TYPE_MASK	(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
-#define DISC_OP_AMP_OSCILLATOR_VCO_MASK		0x80	// Used only internally.
 
 /* Schmitt Oscillator Options */
 #define DISC_SCHMITT_OSC_IN_IS_LOGIC	0x00
@@ -3032,6 +3212,36 @@ struct _discrete_mixer_desc
 typedef struct _discrete_mixer_desc discrete_mixer_desc;
 
 
+struct _discrete_op_amp_info
+{
+	int		type;
+	double	r1;
+	double	r2;
+	double	r3;
+	double	r4;
+	double	c;
+	double	vN;		// Op amp B-
+	double	vP;		// Op amp B+
+};
+typedef struct _discrete_op_amp_info discrete_op_amp_info;
+
+
+struct _discrete_op_amp_1sht_info
+{
+	int		type;
+	double	r1;
+	double	r2;
+	double	r3;
+	double	r4;
+	double	r5;
+	double	c1;
+	double	c2;
+	double	vN;		// Op amp B-
+	double	vP;		// Op amp B+
+};
+typedef struct _discrete_op_amp_1sht_info discrete_op_amp_1sht_info;
+
+
 struct _discrete_op_amp_tvca_info
 {
 	double	r1;
@@ -3048,6 +3258,9 @@ struct _discrete_op_amp_tvca_info
 	double	c1;
 	double	c2;
 	double	c3;
+	double	v1;
+	double	v2;
+	double	v3;
 	double	vP;
 	int		f0;
 	int		f1;
@@ -3138,6 +3351,16 @@ struct _discrete_adsr
 	double release_value;
 };
 typedef struct _discrete_adsr discrete_adsr;
+
+
+struct _discrete_custom_info
+{
+	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
+	size_t contextsize;
+	const void *custom;						/* Custom function specific initialisation data */
+};
+typedef struct _discrete_custom_info discrete_custom_info;
 
 
 
@@ -3262,6 +3485,8 @@ enum
 	DST_DIODE_MIX,		/* Diode mixer */
 	DST_INTEGRATE,		/* Various Integration circuits */
 	DST_MIXER,			/* Final Mixing Stage */
+	DST_OP_AMP,			/* Op Amp circuits */
+	DST_OP_AMP_1SHT,	/* Op Amp One Shot */
 	DST_TVCA_OP_AMP,	/* Triggered Op Amp Voltage controlled  amplifier circuits */
 	DST_VCA,			/* IC Voltage controlled  amplifiers */
 //  DST_DELAY,          /* Phase shift/Delay line */
@@ -3293,7 +3518,7 @@ enum
 	DSD_566,			/* NE566 Emulation */
 
 	/* Custom */
-	DST_CUSTOM,			/* whatever you want someday */
+	DST_CUSTOM,			/* whatever you want */
 
 	/* Debugging */
 	DSO_CSVLOG,			/* Dump nodes as csv file */
@@ -3408,6 +3633,8 @@ enum
 #define DISCRETE_MIXER6(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,IN5,INFO)         { NODE, DST_MIXER       , 7, { ENAB,IN0,IN1,IN2,IN3,IN4,IN5 }, { ENAB,IN0,IN1,IN2,IN3,IN4,IN5 }, INFO, "Final Mixer 6 Stage" },
 #define DISCRETE_MIXER7(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6,INFO)     { NODE, DST_MIXER       , 8, { ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6 }, { ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6 }, INFO, "Final Mixer 7 Stage" },
 #define DISCRETE_MIXER8(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,INFO) { NODE, DST_MIXER       , 9, { ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7 }, { ENAB,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7 }, INFO, "Final Mixer 8 Stage" },
+#define DISCRETE_OP_AMP(NODE,ENAB,IN0,IN1,INFO)                         { NODE, DST_OP_AMP      , 3, { ENAB,IN0,IN1 }, { ENAB,IN0,IN1 }, INFO, "Op Amp Circuit" },
+#define DISCRETE_OP_AMP_ONESHOT(NODE,TRIG,INFO)                         { NODE, DST_OP_AMP_1SHT , 1, { TRIG }, { TRIG }, INFO, "Op Amp One Shot" },
 #define DISCRETE_OP_AMP_TRIG_VCA(NODE,TRG0,TRG1,TRG2,IN0,IN1,INFO)      { NODE, DST_TVCA_OP_AMP , 5, { TRG0,TRG1,TRG2,IN0,IN1 }, { TRG0,TRG1,TRG2,IN0,IN1 }, INFO, "Triggered VCA Op Amp Circuit" },
 #define DISCRETE_VCA(NODE,ENAB,IN0,CTRL,TYPE)                           { NODE, DST_VCA         , 4, { ENAB,IN0,CTRL,NODE_NC }, { ENAB,IN0,CTRL,TYPE }, NULL, "VCA IC" },
 
@@ -3433,10 +3660,11 @@ enum
 
 /* from disc_dev.c */
 /* generic modules */
-#define DISCRETE_CUSTOM1(NODE,ENAB,IN0,CALL)                            { NODE, DST_CUSTOM      , 2, { ENAB,IN0 }, { ENAB,IN0 }, CALL, "1 input custom module" },
-#define DISCRETE_CUSTOM2(NODE,ENAB,IN0,IN1,CALL)                        { NODE, DST_CUSTOM      , 3, { ENAB,IN0,IN1 }, { ENAB,IN0,IN1 }, CALL, "2 input custom module" },
-#define DISCRETE_CUSTOM3(NODE,ENAB,IN0,IN1,IN2,CALL)                    { NODE, DST_CUSTOM      , 4, { ENAB,IN0,IN1,IN2 }, { ENAB,IN0,IN1,IN2 }, CALL, "3 input custom module" },
-#define DISCRETE_CUSTOM4(NODE,ENAB,IN0,IN1,IN2,IN3,CALL)                { NODE, DST_CUSTOM      , 5, { ENAB,IN0,IN1,IN2,IN3 }, { ENAB,IN0,IN1,IN2,IN3 }, CALL, "4 input custom module" },
+#define DISCRETE_CUSTOM1(NODE,ENAB,IN0,INFO)                            { NODE, DST_CUSTOM      , 2, { ENAB,IN0 }, { ENAB,IN0 }, INFO, "1 input custom module" },
+#define DISCRETE_CUSTOM2(NODE,ENAB,IN0,IN1,INFO)                        { NODE, DST_CUSTOM      , 3, { ENAB,IN0,IN1 }, { ENAB,IN0,IN1 }, INFO, "2 input custom module" },
+#define DISCRETE_CUSTOM3(NODE,ENAB,IN0,IN1,IN2,INFO)                    { NODE, DST_CUSTOM      , 4, { ENAB,IN0,IN1,IN2 }, { ENAB,IN0,IN1,IN2 }, INFO, "3 input custom module" },
+#define DISCRETE_CUSTOM4(NODE,ENAB,IN0,IN1,IN2,IN3,INFO)                { NODE, DST_CUSTOM      , 5, { ENAB,IN0,IN1,IN2,IN3 }, { ENAB,IN0,IN1,IN2,IN3 }, INFO, "4 input custom module" },
+#define DISCRETE_CUSTOM5(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,INFO)            { NODE, DST_CUSTOM      , 6, { ENAB,IN0,IN1,IN2,IN3,IN4 }, { ENAB,IN0,IN1,IN2,IN3,IN4 }, INFO, "4 input custom module" },
 /* Component specific */
 #define DISCRETE_555_ASTABLE(NODE,RESET,R1,R2,C,OPTIONS)                { NODE, DSD_555_ASTBL   , 5, { RESET,R1,R2,C,NODE_NC }, { RESET,R1,R2,C,-1 }, OPTIONS, "555 Astable" },
 #define DISCRETE_555_ASTABLE_CV(NODE,RESET,R1,R2,C,CTRLV,OPTIONS)       { NODE, DSD_555_ASTBL   , 5, { RESET,R1,R2,C,CTRLV }, { RESET,R1,R2,C,CTRLV }, OPTIONS, "555 Astable with CV" },

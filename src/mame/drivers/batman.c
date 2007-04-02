@@ -63,6 +63,9 @@ static MACHINE_RESET( batman )
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(0, batman_scanline_update, 8);
 	atarijsa_reset();
+	atarigen_init_save_state();
+	state_save_register_global(latch_data);
+
 }
 
 
@@ -346,4 +349,4 @@ static DRIVER_INIT( batman )
  *
  *************************************/
 
-GAME( 1991, batman, 0, batman, batman, batman, ROT0, "Atari Games", "Batman", 0 )
+GAME( 1991, batman, 0, batman, batman, batman, ROT0, "Atari Games", "Batman", GAME_SUPPORTS_SAVE )

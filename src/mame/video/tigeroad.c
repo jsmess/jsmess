@@ -160,11 +160,11 @@ VIDEO_START( tigeroad )
 
 VIDEO_UPDATE( tigeroad )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, TILEMAP_BACK, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, TILEMAP_BACK, 0);
 	tigeroad_draw_sprites(bitmap, 0);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, TILEMAP_FRONT, 1);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, TILEMAP_FRONT, 1);
 	//tigeroad_draw_sprites(bitmap, 1); draw priority sprites?
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 2);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 2);
 	return 0;
 }
 

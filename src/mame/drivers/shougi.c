@@ -128,7 +128,7 @@ static PALETTE_INIT( shougi )
 			3,	resistances_rg,	weights_g,	0,	1000+1000,
 			2,	resistances_b,	weights_b,	0,	1000+1000);
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -186,7 +186,7 @@ int offs;
 		}
 	}
 	/* copy the character mapped graphics */
-	//copybitmap(bitmap,tmpbitmap,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	//copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

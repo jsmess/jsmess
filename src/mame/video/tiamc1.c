@@ -219,9 +219,9 @@ VIDEO_UPDATE( tiamc1 )
 #endif
 
 	if (tiamc1_layers_ctrl & 0x80)
-		tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap2, 0, 0);
+		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap2, 0, 0);
 	else
-		tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap1, 0, 0);
+		tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap1, 0, 0);
 
 
 	tiamc1_draw_sprites(bitmap);

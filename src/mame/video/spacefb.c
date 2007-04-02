@@ -127,7 +127,7 @@ VIDEO_UPDATE( spacefb )
 		background_colour = 35;			/* WHITE */
 	}
 
-	fillbitmap(bitmap,Machine->pens[background_colour],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[background_colour],&machine->screen[0].visarea);
 
 	/* Draw the sprite/chars */
 	spriteno = (video_control & 0x20) ? 0x80 : 0x00;
@@ -162,12 +162,12 @@ VIDEO_UPDATE( spacefb )
 					sy = 252 - sy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						code & 0x3f,
 						col,
 						flip_screen,flip_screen,
 						sx,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+						&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 
 			}
 			else if (cnt & 0x40)
@@ -180,12 +180,12 @@ VIDEO_UPDATE( spacefb )
 					sy = 248 - sy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[0],
+				drawgfx(bitmap,machine->gfx[0],
 						255 - code,
 						col,
 						flip_screen,flip_screen,
 						sx,sy,
-						&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+						&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 			}
 		}
 	}
@@ -194,24 +194,24 @@ VIDEO_UPDATE( spacefb )
 		int b;
 		for (b=0;b<8;b++)
 		{
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				 // 255 - b,
 					255 - ( (colour_control & (1<<(7-b))) ? 6 : 5),
 					1,
 					0,0,
 					32,128+(7-b)*8,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 		}
 		for (b=0;b<8;b++)
 		{
-			drawgfx(bitmap,Machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[0],
 				 // 255 - b,
 					255 - ( (spacefb_sound_latch & (1<<(7-b))) ? (7-b)+5 : 0),
 					1,
 					0,0,
 					32+8,128+(7-b)*8,
-					&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 		}
 	}

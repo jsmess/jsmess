@@ -291,14 +291,14 @@ VIDEO_UPDATE( r2dtank )
 
 			col = (data0 & 0x80) ? ((data1 & 0xe0) >> 5) : ((data1 & 0x0e)>> 1);
 
-			plot_pixel(tmpbitmap, x, y, Machine->pens[col]);
+			plot_pixel(tmpbitmap, x, y, machine->pens[col]);
 			data0 <<= 1;
 
 		}
 	}
 
 	/* Now copy the temp bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,r2dtank_video_flip,r2dtank_video_flip,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,r2dtank_video_flip,r2dtank_video_flip,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

@@ -116,7 +116,7 @@ VIDEO_UPDATE( tickee )
 
 	/* determine the base of the videoram */
 	offset = (~tms34010_get_DPYSTRT(0) & 0xfff0) << 5;
-	offset += TOBYTE(0x1000) * (cliprect->min_y - Machine->screen[0].visarea.min_y);
+	offset += TOBYTE(0x1000) * (cliprect->min_y - machine->screen[0].visarea.min_y);
 
 	/* determine how many pixels to copy */
 	xoffs = cliprect->min_x;

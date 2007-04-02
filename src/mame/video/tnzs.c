@@ -36,7 +36,7 @@ PALETTE_INIT( arknoid2 )
 {
 	int i,col;
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		col = (color_prom[i]<<8)+color_prom[i+512];
 		palette_set_color(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
@@ -202,7 +202,7 @@ VIDEO_UPDATE( tnzs )
 
 
 	/* Fill the background */
-	fillbitmap(bitmap, Machine->pens[0x1f0], &Machine->screen[0].visarea);
+	fillbitmap(bitmap, machine->pens[0x1f0], &machine->screen[0].visarea);
 
 	/* Redraw the background tiles (c400-c5ff) */
 	tnzs_vh_draw_background(bitmap, tnzs_objram + 0x400);

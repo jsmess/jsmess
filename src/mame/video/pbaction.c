@@ -141,8 +141,8 @@ static void pbaction_draw_sprites( mame_bitmap *bitmap )
 
 VIDEO_UPDATE( pbaction )
 {
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
 	pbaction_draw_sprites(bitmap);
-	tilemap_draw(bitmap, &Machine->screen[0].visarea, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, fg_tilemap, 0, 0);
 	return 0;
 }

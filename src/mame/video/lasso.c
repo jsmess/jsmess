@@ -407,7 +407,7 @@ VIDEO_UPDATE( wwjgtin )
 	if (wwjgtin_track_enable)
 		tilemap_draw(bitmap, cliprect, track_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, Machine->pens[0x40], cliprect);	// black
+		fillbitmap(bitmap, machine->pens[0x40], cliprect);	// black
 
 	draw_sprites(bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);

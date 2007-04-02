@@ -501,6 +501,7 @@ static void io_write_dword_16be(offs_t address, UINT32 data)
 	io_write_word_16be((address & ~1)+2, data & 0xffff);
 }
 
+
 /* Opcodes table */
 static void (*hyperstone_op[0x100])(void) = {
 	hyperstone_chk,	 hyperstone_chk,  hyperstone_chk,   hyperstone_chk,		/* CHK - CHKZ - NOP */
@@ -1263,258 +1264,189 @@ INLINE void decode_lim(void)
 	}
 }
 
-static void decode_registers(void)
+/* used in the jumptable */
+INLINE void RRdecode(void)
 {
-	memset(&current_regs, 0, sizeof(struct regs_decode));
+	check_delay_PC();
+	decode_RR();
+}
 
-	switch((OP & 0xff00) >> 8)
-	{
-		// RR decode
-		case 0x00: case 0x01: case 0x02: case 0x03: // CHK - CHKZ - NOP
-		case 0x04: case 0x05: case 0x06: case 0x07: // MOVD - RET
-		case 0x08: case 0x09: case 0x0a: case 0x0b: // DIVU
-		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // DIVS
-		case 0x20: case 0x21: case 0x22: case 0x23: // CMP
-		case 0x28: case 0x29: case 0x2a: case 0x2b: // ADD
-		case 0x2c: case 0x2d: case 0x2e: case 0x2f: // ADDS
-		case 0x30: case 0x31: case 0x32: case 0x33: // CMPB
-		case 0x34: case 0x35: case 0x36: case 0x37: // ANDN
-		case 0x38: case 0x39: case 0x3a: case 0x3b: // OR
-		case 0x3c: case 0x3d: case 0x3e: case 0x3f: // XOR
-		case 0x40: case 0x41: case 0x42: case 0x43: // SUBC
-		case 0x44: case 0x45: case 0x46: case 0x47: // NOT
-		case 0x48: case 0x49: case 0x4a: case 0x4b: // SUB
-		case 0x4c: case 0x4d: case 0x4e: case 0x4f: // SUBS
-		case 0x50: case 0x51: case 0x52: case 0x53: // ADDC
-		case 0x54: case 0x55: case 0x56: case 0x57: // AND
-		case 0x58: case 0x59: case 0x5a: case 0x5b: // NEG
-		case 0x5c: case 0x5d: case 0x5e: case 0x5f: // NEGS
-		case 0xb0: case 0xb1: case 0xb2: case 0xb3: // MULU
-		case 0xb4: case 0xb5: case 0xb6: case 0xb7: // MULS
-		case 0xbc: case 0xbd: case 0xbe: case 0xbf: // MUL
+INLINE void RRlimdecode(void)
+{
+	decode_lim();
+	check_delay_PC();
+	decode_RR();
+}
 
-			check_delay_PC();
-			decode_RR();
+INLINE void RRconstdecode(void)
+{
+	decode_const();
+	check_delay_PC();
+	decode_RR();
+}
 
-		break;
+INLINE void RRdisdecode(void)
+{
+	decode_dis();
+	check_delay_PC();
+	decode_RR();
+}
 
-		// RRlim decode
-		case 0x10: case 0x11: case 0x12: case 0x13: // XMx - XXx
+INLINE void RRdecodewithHflag(void)
+{
+	check_delay_PC();
+	current_regs.src = SRC_CODE;
+	current_regs.dst = DST_CODE;
+	decode_source(S_BIT, GET_H);
+	decode_dest(D_BIT, GET_H);
 
-			decode_lim();
-			check_delay_PC();
-			decode_RR();
+	if(GET_H)
+		if(S_BIT == 0 && D_BIT == 0)
+			popmessage("MOV with hflag and 2 GRegs! PC = %08X\n",PPC);
+}
 
-		break;
+INLINE void Rimmdecode(void)
+{
+	decode_immediate();
+	check_delay_PC();
+	current_regs.dst = DST_CODE;
+	decode_dest(D_BIT, 0);
+}
 
-		// RRconst decode
-		case 0x14: case 0x15: case 0x16: case 0x17: // MASK
-		case 0x18: case 0x19: case 0x1a: case 0x1b: // SUM
-		case 0x1c: case 0x1d: case 0x1e: case 0x1f: // SUMS
+INLINE void Rndecode(void)
+{
+	check_delay_PC();
+	current_regs.dst = DST_CODE;
+	decode_dest(D_BIT, 0);
+}
 
-			decode_const();
-			check_delay_PC();
-			decode_RR();
+INLINE void RimmdecodewithHflag(void)
+{
+	decode_immediate();
+	check_delay_PC();
+	current_regs.dst = DST_CODE;
+	decode_dest(D_BIT, GET_H);
+}
 
-		break;
+INLINE void Lndecode(void)
+{
+	check_delay_PC();
+	current_regs.dst = DST_CODE;
+	decode_dest(LOCAL, 0);
+}
 
-		// RRdis decode
-		case 0x90: case 0x91: case 0x92: case 0x93: // LDxx.D/A/IOD/IOA
-		case 0x94: case 0x95: case 0x96: case 0x97: // LDxx.N/S
-		case 0x98: case 0x99: case 0x9a: case 0x9b: // STxx.D/A/IOD/IOA
-		case 0x9c: case 0x9d: case 0x9e: case 0x9f: // STxx.N/S
+INLINE void LLdecode(void)
+{
+	check_delay_PC();
+	decode_LL();
+}
 
-			decode_dis();
-			check_delay_PC();
-			decode_RR();
+INLINE void LLextdecode(void)
+{
+	hyperstone.instruction_length = 2;
+	EXTRA_U = READ_OP(PC);
+	PC += 2;
+	check_delay_PC();
+	decode_LL();
+}
 
-		break;
+INLINE void LRdecode(void)
+{
+	check_delay_PC();
+	decode_LR();
+}
 
-		// RR decode with H flag
-		case 0x24: case 0x25: case 0x26: case 0x27: // MOV
+INLINE void LRconstdecode(void)
+{
+	decode_const();
+	check_delay_PC();
+	decode_LR();
+}
 
-			check_delay_PC();
+INLINE void PCreldecode(void)
+{
+	decode_pcrel();
+	check_delay_PC();
+}
 
-			current_regs.src = SRC_CODE;
-			current_regs.dst = DST_CODE;
-			decode_source(S_BIT, GET_H);
-			decode_dest(D_BIT, GET_H);
+INLINE void PCadrdecode(void)
+{
+	check_delay_PC();
+}
 
-			if(GET_H)
-				if(S_BIT == 0 && D_BIT == 0)
-					popmessage("MOV with hflag and 2 GRegs! PC = %08X\n",PPC);
+INLINE void no_decode(void)
+{
 
-		break;
-
-		// Rimm decode
-		case 0x60: case 0x61: case 0x62: case 0x63: // CMPI
-		case 0x68: case 0x69: case 0x6a: case 0x6b: // ADDI
-		case 0x6c: case 0x6d: case 0x6e: case 0x6f: // ADDSI
-		case 0x70: case 0x71: case 0x72: case 0x73: // CMPBI
-		case 0x74: case 0x75: case 0x76: case 0x77: // ANDNI
-		case 0x78: case 0x79: case 0x7a: case 0x7b: // ORI
-		case 0x7c: case 0x7d: case 0x7e: case 0x7f: // XORI
-
-			decode_immediate();
-			check_delay_PC();
-
-			current_regs.dst = DST_CODE;
-			decode_dest(D_BIT, 0);
-
-		break;
-
-		// Rn decode
-		case 0xa0: case 0xa1: case 0xa2: case 0xa3: // SHRI
-		case 0xa4: case 0xa5: case 0xa6: case 0xa7: // SARI
-		case 0xa8: case 0xa9: case 0xaa: case 0xab: // SHLI
-		case 0xb8: case 0xb9: case 0xba: case 0xbb: // SETxx - SETADR - FETCH
-
-			check_delay_PC();
-
-			current_regs.dst = DST_CODE;
-			decode_dest(D_BIT, 0);
-
-		break;
-
-		// Rimm decode with H flag
-		case 0x64: case 0x65: case 0x66: case 0x67: // MOVI
-
-			decode_immediate();
-			check_delay_PC();
-
-			current_regs.dst = DST_CODE;
-			decode_dest(D_BIT, GET_H);
-
-		break;
-
-		// Ln decode
-		case 0x80: case 0x81: // SHRDI
-		case 0x84: case 0x85: // SARDI
-		case 0x88: case 0x89: // SHLDI
-
-			check_delay_PC();
-
-			current_regs.dst = DST_CODE;
-			decode_dest(LOCAL, 0);
-
-		break;
-
-		// LL decode
-		case 0x82: // SHRD
-		case 0x83: // SHR
-		case 0x86: // SARD
-		case 0x87: // SAR
-		case 0x8a: // SHLD
-		case 0x8b: // SHL
-		case 0x8e: // TESTLZ
-		case 0x8f: // ROL
-		case 0xc0: // FADD
-		case 0xc1: // FADDD
-		case 0xc2: // FSUB
-		case 0xc3: // FSUBD
-		case 0xc4: // FMUL
-		case 0xc5: // FMULD
-		case 0xc6: // FDIV
-		case 0xc7: // FDIVD
-		case 0xc8: // FCMP
-		case 0xc9: // FCMPD
-		case 0xca: // FCMPU
-		case 0xcb: // FCMPUD
-		case 0xcc: // FCVT
-		case 0xcd: // FCVTD
-		case 0xcf: // DO
-		case 0xed: // FRAME
-
-			check_delay_PC();
-			decode_LL();
-
-		break;
-
-		// LLext decode
-		case 0xce: // EXTEND
-
-			hyperstone.instruction_length = 2;
-			EXTRA_U = READ_OP(PC);
-			PC += 2;
-			check_delay_PC();
-			decode_LL();
-
-		break;
-
-		// LR decode
-		case 0xd0: case 0xd1: // LDW.R
-		case 0xd2: case 0xd3: // LDD.R
-		case 0xd4: case 0xd5: // LDW.P
-		case 0xd6: case 0xd7: // LDD.P
-		case 0xd8: case 0xd9: // STW.R
-		case 0xda: case 0xdb: // STD.R
-		case 0xdc: case 0xdd: // STW.P
-		case 0xde: case 0xdf: // STD.P
-
-			check_delay_PC();
-			decode_LR();
-
-		break;
-
-		// LRconst decode
-		case 0xee: case 0xef: // CALL
-
-			decode_const();
-			check_delay_PC();
-			decode_LR();
-
-		break;
-
-
-        // PCrel decode
-        case 0xe0: // DBV
-        case 0xe1: // DBNV
-        case 0xe2: // DBE
-        case 0xe3: // DBNE
-        case 0xe4: // DBC
-        case 0xe5: // DBNC
-        case 0xe6: // DBSE
-        case 0xe7: // DBHT
-        case 0xe8: // DBN
-        case 0xe9: // DBNN
-        case 0xea: // DBLE
-        case 0xeb: // DBGT
-        case 0xec: // DBR
-        case 0xf0: // BV
-        case 0xf1: // BNV
-        case 0xf2: // BE
-        case 0xf3: // BNE
-        case 0xf4: // BC
-        case 0xf5: // BNC
-        case 0xf6: // BSE
-        case 0xf7: // BHT
-        case 0xf8: // BN
-        case 0xf9: // BNN
-        case 0xfa: // BLE
-        case 0xfb: // BGT
-        case 0xfc: // BR
-
-			decode_pcrel();
-			check_delay_PC();
-
-        break;
-
-        // PCadr decode
-        case 0xfd: case 0xfe: case 0xff: // TRAPxx - TRAP
-
-			check_delay_PC();
-
-		break;
-/*
-        // RESERVED
-        case 0x8c: case 0x8d:
-        case 0xac: case 0xad: case 0xae: case 0xaf:
-            break;
-*/
-	}
 }
 
 
+/* Decode helper table */
+static void (*hyperstone_decode[0x100])(void) = {
+/*00*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* CHK - CHKZ - NOP */
+/*04*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MOVD - RET */
+/*08*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* DIVU */
+/*0c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* DIVS */
+/*10*/ RRlimdecode,         RRlimdecode,         RRlimdecode,         RRlimdecode,         /* XMx - XXx */
+/*14*/ RRconstdecode,       RRconstdecode,       RRconstdecode,       RRconstdecode,       /* MASK */
+/*18*/ RRconstdecode,       RRconstdecode,       RRconstdecode,       RRconstdecode,       /* SUM */
+/*1c*/ RRconstdecode,       RRconstdecode,       RRconstdecode,       RRconstdecode,       /* SUMS */
+/*20*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* CMP */
+/*24*/ RRdecodewithHflag,   RRdecodewithHflag,   RRdecodewithHflag,   RRdecodewithHflag,   /* MOV */
+/*28*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ADD */
+/*2c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ADDS */
+/*30*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* CMPB */
+/*34*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ANDN */
+/*38*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* OR */
+/*3c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* XOR */
+/*40*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* SUBC */
+/*44*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* NOT */
+/*48*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* SUB */
+/*4c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* SUBS */
+/*50*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ADDC */
+/*54*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* AND */
+/*58*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* NEG */
+/*5c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* NEGS */
+/*60*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* CMPI */
+/*64*/ RimmdecodewithHflag, RimmdecodewithHflag, RimmdecodewithHflag, RimmdecodewithHflag, /* MOVI */
+/*68*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ADDI */
+/*6c*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ADDSI */
+/*70*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* CMPBI */
+/*74*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ANDNI */
+/*78*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ORI */
+/*7c*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* XORI */
+/*80*/ Lndecode,            Lndecode,            LLdecode,            LLdecode,            /* SHRDI, SHRD, SHR */
+/*84*/ Lndecode,            Lndecode,            LLdecode,            LLdecode,            /* SARDI, SARD, SAR */
+/*88*/ Lndecode,            Lndecode,            LLdecode,            LLdecode,            /* SHLDI, SHLD, SHL */
+/*8c*/ no_decode,           no_decode,           LLdecode,            LLdecode,            /* RESERVED, TESTLZ, ROL */
+/*90*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* LDxx.D/A/IOD/IOA */
+/*94*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* LDxx.N/S */
+/*98*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* STxx.D/A/IOD/IOA */
+/*9c*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* STxx.N/S */
+/*a0*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SHRI */
+/*a4*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SARI */
+/*a8*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SHLI */
+/*ac*/ no_decode,           no_decode,           no_decode,           no_decode,           /* RESERVED */
+/*b0*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MULU */
+/*b4*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MULS */
+/*b8*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SETxx - SETADR - FETCH */
+/*bc*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MUL */
+/*c0*/ LLdecode,            LLdecode,            LLdecode,            LLdecode,            /* FADD, FADDD, FSUB, FSUBD */
+/*c4*/ LLdecode,            LLdecode,            LLdecode,            LLdecode,            /* FMUL, FMULD, FDIV, FDIVD */
+/*c8*/ LLdecode,            LLdecode,            LLdecode,            LLdecode,            /* FCMP, FCMPD, FCMPU, FCMPUD */
+/*cc*/ LLdecode,            LLdecode,            LLextdecode,         LLdecode,            /* FCVT, FCVTD, EXTEND, DO */
+/*d0*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* LDW.R, LDD.R */
+/*d4*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* LDW.P, LDD.P */
+/*d8*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* STW.R, STD.R */
+/*dc*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* STW.P, STD.P */
+/*e0*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* DBV, DBNV, DBE, DBNE */
+/*e4*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* DBC, DBNC, DBSE, DBHT */
+/*e8*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* DBN, DBNN, DBLE, DBGT */
+/*ec*/ PCreldecode,         LLdecode,            LRconstdecode,       LRconstdecode,       /* DBR, FRAME, CALL */
+/*f0*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* BV, BNV, BE, BNE */
+/*f4*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* BC, BNC, BSE, BHT */
+/*f8*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* BN, BNN, BLE, BGT */
+/*fc*/ PCreldecode,         PCadrdecode,         PCadrdecode,         PCadrdecode          /* BR, TRAPxx - TRAP */
+};
 
 INLINE void execute_br(void)
 {
@@ -1848,8 +1780,30 @@ static int hyperstone_execute(int cycles)
 
 		hyperstone.instruction_length = 1;
 
-		decode_registers();
+		/* clear 'current regs / flags' */
+		current_regs.src = 0;
+		current_regs.dst = 0;
+		current_regs.src_value = 0;
+		current_regs.next_src_value = 0;
+		current_regs.dst_value = 0;
+		current_regs.next_dst_value = 0;
+		current_regs.sub_type = 0;
+		current_regs.extra.u = 0;
+		current_regs.extra.s = 0;
+		current_regs.set_src_register = NULL;
+		current_regs.set_dst_register = NULL;
+		current_regs.src_is_pc = 0;
+		current_regs.dst_is_pc = 0;
+		current_regs.src_is_sr = 0;
+		current_regs.dst_is_sr = 0;
+		current_regs.same_src_dst = 0;
+		current_regs.same_src_dstf = 0;
+		current_regs.same_srcf_dst = 0;
 
+		/* decode current opcode details into current regs */
+		hyperstone_decode[(OP & 0xff00) >> 8]();
+
+		/* execute opcode */
 		hyperstone_op[(OP & 0xff00) >> 8]();
 
 		SET_ILC(hyperstone.instruction_length & 3);

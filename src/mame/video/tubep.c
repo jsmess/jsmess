@@ -68,8 +68,8 @@ static UINT32	page = 0;
 PALETTE_INIT( rjammer )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	static const int resistors_rg[3] = { 1000, 470, 220 };
 	static const int resistors_b [2] = { 470, 220 };
@@ -81,7 +81,7 @@ PALETTE_INIT( rjammer )
 			2,	resistors_b,	weights_b,	470,	0,
 			0,	0,	0,	0,	0	);
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -240,8 +240,8 @@ PALETTE_INIT( tubep )
 {
 	int i,r,g,b;
 
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* background/sprites palette variables */
 
@@ -666,7 +666,7 @@ VIDEO_UPDATE( tubep )
 
 	/* draw background ram */
 	{
-		pen_t *pens = &Machine->pens[ 32 ]; //change it later
+		pen_t *pens = &machine->pens[ 32 ]; //change it later
 
 		UINT32 h,v;
 		unsigned char * romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
@@ -745,12 +745,12 @@ VIDEO_UPDATE( tubep )
 		sy = (offs/2) / 32;
 		//if (flipscreen[1]) sy = 31 - sy;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				tubep_textram[offs],
 				((tubep_textram[offs+1]) & 0x0f) | color_A4,
 				0,0, /*flipscreen[0],flipscreen[1],*/
 				8*sx,8*sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0]);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[0]);
 	}
 
 	return 0;
@@ -780,7 +780,7 @@ VIDEO_UPDATE( rjammer )
 
 	/* draw background ram */
 	{
-		pen_t *pens = &Machine->pens[ 0x00 ];
+		pen_t *pens = &machine->pens[ 0x00 ];
 
 		UINT32 h,v;
 		unsigned char * rom13D  = memory_region(REGION_USER1);
@@ -908,12 +908,12 @@ VIDEO_UPDATE( rjammer )
 		sy = (offs/2) / 32;
 		//if (flipscreen[1]) sy = 31 - sy;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				tubep_textram[offs],
 				(tubep_textram[offs+1]) & 0x0f,
 				0,0, /*flipscreen[0],flipscreen[1],*/
 				8*sx,8*sy,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN, Machine->pens[0]);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN, machine->pens[0]);
 	}
 
 	return 0;

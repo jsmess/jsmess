@@ -201,7 +201,7 @@ SRC = src
 # compile-time definitions
 #-------------------------------------------------
 
-DEFS = -DX86_ASM -DLSB_FIRST -DINLINE="static __inline__" -Dasm=__asm__ -DCRLF=3
+DEFS = -DLSB_FIRST -DINLINE="static __inline__" -DCRLF=3
 
 ifdef PTR64
 DEFS += -DPTR64

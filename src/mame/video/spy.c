@@ -76,7 +76,7 @@ VIDEO_UPDATE( spy )
 
 	if (!spy_video_enable)
 	{
-		fillbitmap(bitmap,Machine->pens[16 * layer_colorbase[0]],cliprect);
+		fillbitmap(bitmap,machine->pens[16 * layer_colorbase[0]],cliprect);
 		return 0;
 	}
 

@@ -568,8 +568,8 @@ DRIVER_INIT( coh1000c )
 
 	zn_driver_init();
 
-	if( strcmp( Machine->gamedrv->name, "glpracr" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "glprac2l" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "glpracr" ) == 0 ||
+		strcmp( machine->gamedrv->name, "glprac2l" ) == 0 )
 	{
 		/* disable:
             the QSound CPU for glpracr as it doesn't have any roms &
@@ -1237,9 +1237,9 @@ MACHINE_RESET( coh1000ta )
 	zn_machine_init();
 
 	// patch to make psyforce boot
-	if ((!strcmp(Machine->gamedrv->name, "psyforce")) ||
-	    (!strcmp(Machine->gamedrv->name, "psyforcj")) ||
-	    (!strcmp(Machine->gamedrv->name, "psyfrcex")))
+	if ((!strcmp(machine->gamedrv->name, "psyforce")) ||
+	    (!strcmp(machine->gamedrv->name, "psyforcj")) ||
+	    (!strcmp(machine->gamedrv->name, "psyfrcex")))
 	{
 		// note: these values can be anything non-zero
 		// perhaps Taito expects RAM to be initialized to 0xff on power-up?
@@ -2365,7 +2365,7 @@ DRIVER_INIT( coh1000a )
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbfff00, 0x1fbfff03, 0, 0, acpsx_00_w );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbfff10, 0x1fbfff13, 0, 0, acpsx_10_w );
 
-	if( strcmp( Machine->gamedrv->name, "nbajamex" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "nbajamex" ) == 0 )
 	{
 		nbajamex_eeprom_size = 0x8000; nbajamex_eeprom = auto_malloc( nbajamex_eeprom_size );
 
@@ -2378,8 +2378,8 @@ DRIVER_INIT( coh1000a )
 		memory_set_bankptr( 2, nbajamex_eeprom ); /* ram/eeprom/?? */
 	}
 
-	if( ( !strcmp( Machine->gamedrv->name, "jdredd" ) ) ||
-		( !strcmp( Machine->gamedrv->name, "jdreddb" ) ) )
+	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
+		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
 		memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fbfff8c, 0x1fbfff8f, 0, 0, jdredd_idestat_r );
 		memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbfff8c, 0x1fbfff8f, 0, 0, MWA32_NOP );
@@ -2396,8 +2396,8 @@ MACHINE_RESET( coh1000a )
 {
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) ); /* fixed game rom */
 	zn_machine_init();
-	if( ( !strcmp( Machine->gamedrv->name, "jdredd" ) ) ||
-		( !strcmp( Machine->gamedrv->name, "jdreddb" ) ) )
+	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
+		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
 		ide_controller_reset( 0 );
 	}

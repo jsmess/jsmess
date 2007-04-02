@@ -115,8 +115,8 @@ WRITE8_HANDLER( thief_videoram_w ){
 VIDEO_START( thief ){
 	memset( &thief_coprocessor, 0x00, sizeof(thief_coprocessor) );
 
-	thief_page0	= auto_bitmap_alloc( 256,256,Machine->screen[0].format );
-	thief_page1	= auto_bitmap_alloc( 256,256,Machine->screen[0].format );
+	thief_page0	= auto_bitmap_alloc( 256,256,machine->screen[0].format );
+	thief_page1	= auto_bitmap_alloc( 256,256,machine->screen[0].format );
 
 	videoram = auto_malloc( 0x2000*4*2 );
 	memset( videoram, 0, 0x2000*4*2 );
@@ -133,7 +133,7 @@ VIDEO_START( thief ){
 VIDEO_UPDATE( thief ){
 	unsigned int offs;
 	int flipscreen = thief_video_control&1;
-	const pen_t *pal_data = Machine->pens;
+	const pen_t *pal_data = machine->pens;
 	UINT8 *dirty = dirtybuffer;
 	const UINT8 *source = videoram;
 	mame_bitmap *page;
@@ -183,7 +183,7 @@ VIDEO_UPDATE( thief ){
 			dirty[offs] = 0;
 		}
 	}
-	copybitmap(bitmap,page,0,0,0,0,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,page,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

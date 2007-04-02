@@ -68,7 +68,7 @@ VIDEO_UPDATE( superdq )
 	if (!video_skip_this_frame() && discinfo != NULL)
 	{
 		mame_bitmap *vidbitmap;
-		rectangle fixedvis = Machine->screen[screen].visarea;
+		rectangle fixedvis = machine->screen[screen].visarea;
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 
@@ -122,7 +122,7 @@ PALETTE_INIT( superdq )
 			2,	&resistances[1], bweights, 220, 0);
 
 	/* initialize the palette with these colors */
-	for (i = 0; i < Machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2;
 		int r, g, b;

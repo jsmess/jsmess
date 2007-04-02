@@ -55,11 +55,11 @@ WRITE8_HANDLER( starcrus_p2_y_w ) { p2_y = data^0xff; }
 
 VIDEO_START( starcrus )
 {
-	ship1_vid = auto_bitmap_alloc(16,16,Machine->screen[0].format);
-	ship2_vid = auto_bitmap_alloc(16,16,Machine->screen[0].format);
+	ship1_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
+	ship2_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
 
-	proj1_vid = auto_bitmap_alloc(16,16,Machine->screen[0].format);
-	proj2_vid = auto_bitmap_alloc(16,16,Machine->screen[0].format);
+	proj1_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
+	proj2_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
 
 	return 0;
 }
@@ -491,49 +491,49 @@ int starcrus_collision_check_s2p1p2(void)
 
 VIDEO_UPDATE( starcrus )
 {
-    fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+    fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 	/* Draw ship 1 */
     drawgfx(bitmap,
-            Machine->gfx[8+((s1_sprite&0x04)>>2)],
+            machine->gfx[8+((s1_sprite&0x04)>>2)],
             (s1_sprite&0x03)^0x03,
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
             s1_x,s1_y,
-            &Machine->screen[0].visarea,
+            &machine->screen[0].visarea,
             TRANSPARENCY_PEN,
             0);
 
 	/* Draw ship 2 */
     drawgfx(bitmap,
-            Machine->gfx[10+((s2_sprite&0x04)>>2)],
+            machine->gfx[10+((s2_sprite&0x04)>>2)],
             (s2_sprite&0x03)^0x03,
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
             s2_x,s2_y,
-            &Machine->screen[0].visarea,
+            &machine->screen[0].visarea,
             TRANSPARENCY_PEN,
             0);
 
 	/* Draw score/projectile 1 */
 	drawgfx(bitmap,
-            Machine->gfx[(p1_sprite&0x0c)>>2],
+            machine->gfx[(p1_sprite&0x0c)>>2],
             (p1_sprite&0x03)^0x03,
             0,
             0,0,
             p1_x,p1_y,
-            &Machine->screen[0].visarea,
+            &machine->screen[0].visarea,
             TRANSPARENCY_PEN,
             0);
 
 	/* Draw score/projectile 2 */
 	drawgfx(bitmap,
-            Machine->gfx[4+((p2_sprite&0x0c)>>2)],
+            machine->gfx[4+((p2_sprite&0x0c)>>2)],
             (p2_sprite&0x03)^0x03,
             0,
             0,0,
             p2_x,p2_y,
-            &Machine->screen[0].visarea,
+            &machine->screen[0].visarea,
             TRANSPARENCY_PEN,
             0);
 

@@ -636,12 +636,12 @@ VIDEO_UPDATE( hyprduel )
 		}
 	}
 
-	hyprduel_sprite_xoffs	=	hyprduel_videoregs[0x06/2] - Machine->screen[0].width  / 2;
-	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - Machine->screen[0].height / 2;
+	hyprduel_sprite_xoffs	=	hyprduel_videoregs[0x06/2] - machine->screen[0].width  / 2;
+	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - machine->screen[0].height / 2;
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,Machine->pens[((hyprduel_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000],cliprect);
+	fillbitmap(bitmap,machine->pens[((hyprduel_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000],cliprect);
 
 	/*  Screen Control Register:
 

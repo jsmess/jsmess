@@ -68,7 +68,7 @@ static void hanaroku_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprec
 
 VIDEO_UPDATE(hanaroku)
 {
-	fillbitmap(bitmap, Machine->pens[0x1f0], cliprect);	// ???
+	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);	// ???
 	hanaroku_draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -14,7 +14,7 @@ PALETTE_INIT( carjmbre )
 {
 	int i,bit0,bit1,bit2,r,g,b;
 
-	for (i = 0;i < Machine->drv->total_colors; i++)
+	for (i = 0;i < machine->drv->total_colors; i++)
 	{
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -137,7 +137,7 @@ VIDEO_UPDATE( carjmbre )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,Machine->gfx[1],
+				drawgfx(bitmap,machine->gfx[1],
 						spriteram[troffs+1],
 						spriteram[troffs+2]&0x07,
 						flipx,flipy,

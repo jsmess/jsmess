@@ -54,11 +54,11 @@ static tilemap* bg_tilemap;
 PALETTE_INIT( bking2 )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
+	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < Machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -255,8 +255,8 @@ static void get_tile_info(int tile_index)
 VIDEO_START( bking2 )
 {
 	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, 0, 8, 8, 32, 32);
-	helper0 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	helper1 = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	helper0 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	return 0;
 }
@@ -268,14 +268,14 @@ VIDEO_UPDATE( bking2 )
 
 	/* draw the balls */
 
-	drawgfx(bitmap, Machine->gfx[2],
+	drawgfx(bitmap, machine->gfx[2],
 		ball1_pic,
 		palette_bank,
 		0, 0,
 		xld1, yld1,
 		cliprect, TRANSPARENCY_PEN, 0);
 
-	drawgfx(bitmap, Machine->gfx[3],
+	drawgfx(bitmap, machine->gfx[3],
 		ball2_pic,
 		palette_bank,
 		0, 0,
@@ -284,7 +284,7 @@ VIDEO_UPDATE( bking2 )
 
 	/* draw the crow */
 
-	drawgfx(bitmap, Machine->gfx[1],
+	drawgfx(bitmap, machine->gfx[1],
 		crow_pic,
 		palette_bank,
 		crow_flip, crow_flip,
@@ -308,7 +308,7 @@ VIDEO_EOF( bking2 )
 		xld = xld1;
 		yld = yld1;
 
-		drawgfx(helper1, Machine->gfx[2],
+		drawgfx(helper1, machine->gfx[2],
 			ball1_pic,
 			0,
 			0, 0,
@@ -323,7 +323,7 @@ VIDEO_EOF( bking2 )
 		xld = xld2;
 		yld = yld2;
 
-		drawgfx(helper1, Machine->gfx[3],
+		drawgfx(helper1, machine->gfx[3],
 			ball2_pic,
 			0,
 			0, 0,

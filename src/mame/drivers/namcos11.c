@@ -834,7 +834,7 @@ static DRIVER_INIT( namcos11 )
 	n_game = 0;
 	while( namcos11_config_table[ n_game ].s_name != NULL )
 	{
-		if( strcmp( Machine->gamedrv->name, namcos11_config_table[ n_game ].s_name ) == 0 )
+		if( strcmp( machine->gamedrv->name, namcos11_config_table[ n_game ].s_name ) == 0 )
 		{
 			if( namcos11_config_table[ n_game ].keycus_r != NULL )
 			{
@@ -874,7 +874,7 @@ static DRIVER_INIT( namcos11 )
 		n_game++;
 	}
 
-	if( strcmp( Machine->gamedrv->name, "ptblnk2a" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "ptblnk2a" ) == 0 )
 	{
 		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f788000, 0x1f788003, 0, 0, lightgun_w );
 		memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x1f780000, 0x1f78000f, 0, 0, lightgun_r );

@@ -313,7 +313,7 @@ void dst_op_amp_filt_step(node_description *node)
 	{
 		if (context->is_norton)
 		{
-			v = DST_OP_AMP_FILT__INP1 - context->vRef;
+			v = DST_OP_AMP_FILT__INP1 - OP_AMP_NORTON_VBE;
 			if (v < 0) v = 0;
 		}
 		else
@@ -363,9 +363,10 @@ void dst_op_amp_filt_step(node_description *node)
 				break;
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
+			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
 				node->output = -context->a1*context->y1 - context->a2*context->y2 +
 								context->b0*v + context->b1*context->x1 + context->b2*context->x2 +
-								info->vRef;
+								context->vRef;
 				context->x2 = context->x1;
 				context->x1 = v;
 				context->y2 = context->y1;
@@ -377,7 +378,7 @@ void dst_op_amp_filt_step(node_description *node)
          */
 		if (node->output > context->vP) node->output = context->vP;
 		if (node->output < context->vN) node->output = context->vN;
-		context->y1 = node->output - info->vRef;
+		context->y1 = node->output - context->vRef;
 	}
 	else
 		node->output = 0;
@@ -395,6 +396,7 @@ void dst_op_amp_filt_reset(node_description *node)
 
 	if (context->is_norton)
 	{
+		context->vRef = 0;
 		context->rTotal = info->r1;
 		if (context->type == (DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON))
 			context->rTotal += info->r2 +  info->r3;
@@ -402,8 +404,6 @@ void dst_op_amp_filt_reset(node_description *node)
 		/* Setup the current to the + input. */
 		context->iFixed = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
 
-		/* Inputs are .5V above ground. */
-		context->vRef = OP_AMP_NORTON_VBE;
 		/* Set the output max. */
 		context->vP =  info->vP - OP_AMP_NORTON_VBE;
 		context->vN =  info->vN;
@@ -445,6 +445,8 @@ void dst_op_amp_filt_reset(node_description *node)
 			context->exponentC2 = -1.0 / (context->rTotal * info->c2 * discrete_current_context->sample_rate);
 			context->exponentC2 = 1.0 - exp(context->exponentC2);
 			break;
+		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
+			context->rTotal = 1.0 / (1.0 / info->r1 + 1.0 / info->r2);
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 		{
 			double fc = 1.0 / (2 * M_PI * sqrt(context->rTotal * info->rF * info->c1 * info->c2));
@@ -457,6 +459,12 @@ void dst_op_amp_filt_reset(node_description *node)
 			context->b0 *= gain;
 			context->b1 *= gain;
 			context->b2 *= gain;
+
+			if (context->is_norton)
+				context->vRef = (info->vP - OP_AMP_NORTON_VBE) / info->r3 * info->rF;
+			else
+				context->vRef = info->vRef;
+
 			break;
 		}
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON:

@@ -83,7 +83,7 @@ VIDEO_START( chqflag )
 
 VIDEO_UPDATE( chqflag )
 {
-	fillbitmap(bitmap,Machine->pens[0],cliprect);
+	fillbitmap(bitmap,machine->pens[0],cliprect);
 
 	K051316_zoom_draw_1(bitmap,cliprect,TILEMAP_BACK,0);
 	K051960_sprites_draw(bitmap,cliprect,0,0);

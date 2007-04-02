@@ -840,7 +840,7 @@ static void seta_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 /* For games without tilemaps */
 VIDEO_UPDATE( seta_no_layers )
 {
-	fillbitmap(bitmap,Machine->pens[0x1f0],cliprect);
+	fillbitmap(bitmap,machine->pens[0x1f0],cliprect);
 	seta_draw_sprites(bitmap,cliprect);
 	return 0;
 }
@@ -855,7 +855,7 @@ VIDEO_UPDATE( seta )
 	int order	= 	0;
 	int flip	=	(spriteram16[ 0x600/2 ] & 0x40) >> 6;
 
-	int vis_dimy = Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1;
+	int vis_dimy = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1;
 
 	flip ^= tilemaps_flip;
 

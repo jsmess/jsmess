@@ -194,16 +194,11 @@ static MACHINE_RESET( mustang_sound )
 
 WRITE16_HANDLER ( ssmissin_sound_w )
 {
-	/* maybe .. */
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1,0, ASSERT_LINE);
+		cpunum_set_input_line(1,0, HOLD_LINE);
 	}
-
-	if (ACCESSING_MSB)
-		if ((data >> 8) & 0x80)
-			cpunum_set_input_line(1,0, CLEAR_LINE);
 }
 
 
@@ -3347,13 +3342,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ssmissin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)
+	MDRV_CPU_ADD(M68000, 8000000) /* 8 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_readmem,ssmissin_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112)) /* input related */
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */ /* 4 MHz ? */
+	MDRV_CPU_ADD(Z80, 8000000/2) /* 4 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_sound_readmem,ssmissin_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -3375,8 +3369,8 @@ static MACHINE_DRIVER_START( ssmissin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 8000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, 8000000/8) /* 1 Mhz, pin 7 high */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4237,23 +4231,78 @@ ROM_START( airattck )
 	ROM_LOAD16_BYTE( "uc10.bin",     0x000001, 0x20000, CRC(1837d4ba) SHA1(8dd5636a3a75c5d25d8850381e566a150ddc8ef1) )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "ul10.bin",     0x000000, 0x20000, CRC(e9362ab4) SHA1(d3e7d90e459bd4a80a189cc77821a6668103a640) )	/* 8x8 tiles */
+	ROM_LOAD( "4.ul10",     0x000000, 0x20000, CRC(e9362ab4) SHA1(d3e7d90e459bd4a80a189cc77821a6668103a640) )	/* 8x8 tiles */
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "uw9.bin",      0x000000, 0x80000, CRC(86e59966) SHA1(50944dddb4c9f28e6f9b7c610a205310f4d7a076) )
-	ROM_LOAD( "ux9.bin",      0x080000, 0x80000, CRC(122c8d04) SHA1(70a348b1a94f1bc69532ba92dafc91a2c0e41d58) )
+	ROM_LOAD( "9.uw9",      0x000000, 0x80000, CRC(86e59966) SHA1(50944dddb4c9f28e6f9b7c610a205310f4d7a076) )
+	ROM_LOAD( "10.ux9",      0x080000, 0x80000, CRC(122c8d04) SHA1(70a348b1a94f1bc69532ba92dafc91a2c0e41d58) )
 
 	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "uob1.bin",     0x000000, 0x80000, CRC(3c38d671) SHA1(f9c9aaa1622ee0c20f569f6048e2b78bd507a1e5) )	/* 16x16 tiles */
-	ROM_LOAD16_BYTE( "uob2.bin",     0x000001, 0x80000, CRC(9a83e3d8) SHA1(c765c4d278cc7f54ccdf6f00f8c6902a56abc2b8) )	/* 16x16 tiles */
+	ROM_LOAD16_BYTE( "7.uo81",     0x000000, 0x80000, CRC(3c38d671) SHA1(f9c9aaa1622ee0c20f569f6048e2b78bd507a1e5) )	/* 16x16 tiles */
+	ROM_LOAD16_BYTE( "8.uo82",     0x000001, 0x80000, CRC(9a83e3d8) SHA1(c765c4d278cc7f54ccdf6f00f8c6902a56abc2b8) )	/* 16x16 tiles */
 
 	ROM_REGION( 0x010000, REGION_CPU2, 0 )		/* Code for Sound CPU */
-	ROM_LOAD( "su6.bin",      0x000000, 0x08000, CRC(3e352370) SHA1(6e84881dc0b09a23f8b589431005459adc334c34) )
+	ROM_LOAD( "3.su6",      0x000000, 0x08000, CRC(3e352370) SHA1(6e84881dc0b09a23f8b589431005459adc334c34) )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Samples */
-	ROM_LOAD( "su12.bin",     0x000000, 0x20000, CRC(93ab615b) SHA1(f670ac60f5f88148e55200e5e3591aa18b81c325) )
-	ROM_LOAD( "su13.bin",     0x080000, 0x80000, CRC(09a836bb) SHA1(43fbd35c2ef3d201a4c82b0d3b7d7b971b385a14) )
+	ROM_LOAD( "2.su12",     0x000000, 0x20000, CRC(93ab615b) SHA1(f670ac60f5f88148e55200e5e3591aa18b81c325) )
+	ROM_LOAD( "1.su13",     0x080000, 0x80000, CRC(09a836bb) SHA1(43fbd35c2ef3d201a4c82b0d3b7d7b971b385a14) )
+
+	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_LOAD( "82s129.ug6",  0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )	/* unknown */
+	ROM_LOAD( "82s147.uh6",  0x0100, 0x0200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )	/* unknown */
 ROM_END
+
+/*
+
+Air Attack
+Comad, 1996
+
+68000 @ 8MHz
+Z80A @ 2MHz [8/4]
+M6295 @ 1MHz [8/8]. Pin 7 HIGH
+VSync 50Hz
+HSync 15.35kHz
+XTALs 8MHz (for 68000/Z80/M6295), 12MHz (for FPGAs)
+2x 62256 RAM (main program RAM)
+4x 62256 RAM (graphics)
+2x 6264 RAM (graphics)
+1x 6116 RAM (sound program)
+6x 6116 RAM (other/ shared RAM etc)
+2x PROMs
+1x Lattice pLSI1032 FPGA
+1x Actel 1020B FPGA
+
+*/
+
+ROM_START( airattca )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 Code */
+	ROM_LOAD16_BYTE( "6.uc10",     0x000000, 0x20000, CRC(3572baf0) SHA1(0a2fe3be16d95896dc757ef231b3708093fc7ffa) )
+	ROM_LOAD16_BYTE( "5.ue10",     0x000001, 0x20000, CRC(6589c005) SHA1(350a7b8685cacde6b72c10458c33962c5a45a255) )
+
+	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "4.ul10",     0x000000, 0x20000, CRC(e9362ab4) SHA1(d3e7d90e459bd4a80a189cc77821a6668103a640) )	/* 8x8 tiles */
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "9.uw9",      0x000000, 0x80000, CRC(86e59966) SHA1(50944dddb4c9f28e6f9b7c610a205310f4d7a076) )
+	ROM_LOAD( "10.ux9",      0x080000, 0x80000, CRC(122c8d04) SHA1(70a348b1a94f1bc69532ba92dafc91a2c0e41d58) )
+
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "7.uo81",     0x000000, 0x80000, CRC(3c38d671) SHA1(f9c9aaa1622ee0c20f569f6048e2b78bd507a1e5) )	/* 16x16 tiles */
+	ROM_LOAD16_BYTE( "8.uo82",     0x000001, 0x80000, CRC(9a83e3d8) SHA1(c765c4d278cc7f54ccdf6f00f8c6902a56abc2b8) )	/* 16x16 tiles */
+
+	ROM_REGION( 0x010000, REGION_CPU2, 0 )		/* Code for Sound CPU */
+	ROM_LOAD( "3.su6",      0x000000, 0x08000, CRC(3e352370) SHA1(6e84881dc0b09a23f8b589431005459adc334c34) )
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "2.su12",     0x000000, 0x20000, CRC(93ab615b) SHA1(f670ac60f5f88148e55200e5e3591aa18b81c325) )
+	ROM_LOAD( "1.su13",     0x080000, 0x80000, CRC(09a836bb) SHA1(43fbd35c2ef3d201a4c82b0d3b7d7b971b385a14) )
+
+	ROM_REGION( 0x0300, REGION_PROMS, 0 )
+	ROM_LOAD( "82s129.ug6",  0x0000, 0x0100, CRC(cfdbb86c) SHA1(588822f6308a860937349c9106c2b4b1a75823ec) )	/* unknown */
+	ROM_LOAD( "82s147.uh6",  0x0100, 0x0200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )	/* unknown */
+ROM_END
+
 
 ROM_START( strahl )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )
@@ -5007,35 +5056,45 @@ static DRIVER_INIT( bjtwin )
 //  rom[0x08f74/2] = 0x4e71);
 }
 
-GAME( 1989, tharrier, 0,       tharrier, tharrier, 0, 		  ROT270, "UPL (American Sammy license)",	"Task Force Harrier", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1989, tharierj, tharrier,tharrier, tharrier, 0, 		  ROT270, "UPL",	                        "Task Force Harrier (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1990, mustang,  0,       mustang,  mustang,  mustang,  ROT0,   "UPL",							"US AAF Mustang (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND) // Playable but there are Still Protection Problems
-GAME( 1990, mustangs, mustang, mustang,  mustang,  mustang,  ROT0,   "UPL (Seoul Trading license)",	"US AAF Mustang (Seoul Trading)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ) // Playable but there are Still Protection Problems
-GAME( 1990, mustangb, mustang, mustangb, mustang,  mustang,  ROT0,   "bootleg",						"US AAF Mustang (bootleg)", GAME_UNEMULATED_PROTECTION ) // Playable but there are Still Protection Problems
+GAME( 1989, tharrier, 0,       tharrier, tharrier, 0, 		 ROT270, "UPL (American Sammy license)",    "Task Force Harrier", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1989, tharierj, tharrier,tharrier, tharrier, 0, 		 ROT270, "UPL",                             "Task Force Harrier (Japan)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1990, mustang,  0,       mustang,  mustang,  mustang,  ROT0,   "UPL",							    "US AAF Mustang (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND) // Playable but there are Still Protection Problems
+GAME( 1990, mustangs, mustang, mustang,  mustang,  mustang,  ROT0,   "UPL (Seoul Trading license)",	    "US AAF Mustang (Seoul Trading)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ) // Playable but there are Still Protection Problems
 GAME( 1990, bioship,  0,       bioship,  bioship,  0,        ROT0,   "UPL (American Sammy license)",	"Bio-ship Paladin", GAME_IMPERFECT_SOUND )
-GAME( 1990, sbsgomo,  bioship, bioship,  bioship,  0,        ROT0,   "UPL",							"Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
-GAME( 1990, vandyke,  0,       vandyke,  vandyke,  0,        ROT270, "UPL",							"Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandyjal, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",           "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandyja2, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",           "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
-GAME( 1991, manybloc, 0,       manybloc, manybloc, 0,        ROT270, "Bee-Oh",                         "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1991, blkheart, 0,       macross,  blkheart, blkheart, ROT0,   "UPL",							"Black Heart", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND  ) // Playable but there are Still Protection Problems
-GAME( 1991, blkhearj, blkheart,macross,  blkheart, blkheart, ROT0,   "UPL",							"Black Heart (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ) // Playable but there are Still Protection Problems
-GAME( 1991, acrobatm, 0,       acrobatm, acrobatm, 0,        ROT270, "UPL (Taito license)",			"Acrobat Mission", GAME_IMPERFECT_SOUND )
-GAME( 1992, strahl,   0,       strahl,   strahl,   0,        ROT0,   "UPL",							"Koutetsu Yousai Strahl (Japan set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1992, strahla,  strahl,  strahl,   strahl,   0,        ROT0,   "UPL",							"Koutetsu Yousai Strahl (Japan set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1991, tdragon,  0,       tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",			"Thunder Dragon", GAME_IMPERFECT_SOUND )
-GAME( 1991, tdragonb, tdragon, tdragonb, tdragonb, tdragonb, ROT270, "NMK / Tecmo",					"Thunder Dragon (Bootleg)", 0 )
-GAME( 1992, ssmissin, 0,       ssmissin, ssmissin, ssmissin, ROT270, "Comad",				            "S.S. Mission", GAME_NO_COCKTAIL )
-GAME( 1996, airattck, 0,       ssmissin, airattck, ssmissin, ROT270, "Comad",				            "Air Attack", GAME_NO_COCKTAIL )
-GAME( 1991, hachamf,  0,       hachamf,  hachamf,  hachamf,  ROT0,   "NMK",							"Hacha Mecha Fighter", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1992, macross,  0,       macross,  macross,  nmk,      ROT270, "Banpresto",						"Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND )
-GAME( 1993, gunnail,  0,       gunnail,  gunnail,  nmk,      ROT270, "NMK / Tecmo",					"GunNail", GAME_IMPERFECT_SOUND )
-GAME( 1993, macross2, 0,       macross2, macross2, 0,        ROT0,   "Banpresto",						"Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
-GAME( 1993, tdragon2, 0,       tdragon2, tdragon2, 0,        ROT270, "NMK",				         	"Thunder Dragon 2", GAME_NO_COCKTAIL )
-GAME( 1993, bigbang,  tdragon2,tdragon2, tdragon2, 0,        ROT270, "NMK",				         	"Big Bang", GAME_NO_COCKTAIL )
-GAME( 1994, raphero,  0,       raphero,  raphero,  0,        ROT270, "Media Trading Corp",             "Rapid Hero (Japan?)", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1990, sbsgomo,  bioship, bioship,  bioship,  0,        ROT0,   "UPL",                             "Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
+GAME( 1990, vandyke,  0,       vandyke,  vandyke,  0,        ROT270, "UPL",                             "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandyjal, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",            "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandyja2, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",            "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
+GAME( 1991, blkheart, 0,       macross,  blkheart, blkheart, ROT0,   "UPL",                             "Black Heart", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND  ) // Playable but there are Still Protection Problems
+GAME( 1991, blkhearj, blkheart,macross,  blkheart, blkheart, ROT0,   "UPL",                             "Black Heart (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND ) // Playable but there are Still Protection Problems
+GAME( 1991, acrobatm, 0,       acrobatm, acrobatm, 0,        ROT270, "UPL (Taito license)",             "Acrobat Mission", GAME_IMPERFECT_SOUND )
+GAME( 1992, strahl,   0,       strahl,   strahl,   0,        ROT0,   "UPL",                             "Koutetsu Yousai Strahl (Japan set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1992, strahla,  strahl,  strahl,   strahl,   0,        ROT0,   "UPL",                             "Koutetsu Yousai Strahl (Japan set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1991, tdragon,  0,       tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",             "Thunder Dragon", GAME_IMPERFECT_SOUND )
 
-GAME( 1992, sabotenb, 0,       bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",					"Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
-GAME( 1992, sabotnba, sabotenb,bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",					"Saboten Bombers (set 2)", GAME_NO_COCKTAIL )
-GAME( 1993, bjtwin,   0,       bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",							"Bombjack Twin", GAME_NO_COCKTAIL )
-GAME( 1995, nouryoku, 0,       bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",							"Nouryoku Koujou Iinkai", GAME_NO_COCKTAIL )
+GAME( 1991, hachamf,  0,       hachamf,  hachamf,  hachamf,  ROT0,   "NMK",                             "Hacha Mecha Fighter", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1992, macross,  0,       macross,  macross,  nmk,      ROT270, "Banpresto",                       "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND )
+GAME( 1993, gunnail,  0,       gunnail,  gunnail,  nmk,      ROT270, "NMK / Tecmo",                     "GunNail", GAME_IMPERFECT_SOUND )
+GAME( 1993, macross2, 0,       macross2, macross2, 0,        ROT0,   "Banpresto",                       "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
+GAME( 1993, tdragon2, 0,       tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Thunder Dragon 2", GAME_NO_COCKTAIL )
+GAME( 1993, bigbang,  tdragon2,tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Big Bang", GAME_NO_COCKTAIL )
+GAME( 1994, raphero,  0,       raphero,  raphero,  0,        ROT270, "Media Trading Corp",              "Rapid Hero (Japan?)", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
+
+GAME( 1992, sabotenb, 0,       bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                     "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
+GAME( 1992, sabotnba, sabotenb,bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                     "Saboten Bombers (set 2)", GAME_NO_COCKTAIL )
+GAME( 1993, bjtwin,   0,       bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                             "Bombjack Twin", GAME_NO_COCKTAIL )
+GAME( 1995, nouryoku, 0,       bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",                           "Nouryoku Koujou Iinkai", GAME_NO_COCKTAIL )
+
+/* Non NMK boards */
+
+// these use the seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
+GAME( 1990, mustangb, mustang, mustangb, mustang,  mustang,  ROT0,   "bootleg",                         "US AAF Mustang (bootleg)", GAME_UNEMULATED_PROTECTION ) // Playable but there are Still Protection Problems
+GAME( 1991, tdragonb, tdragon, tdragonb, tdragonb, tdragonb, ROT270, "NMK / Tecmo",	                    "Thunder Dragon (Bootleg)", 0 )
+
+// these are from Comad, based on the Thunder Dragon code?
+GAME( 1992, ssmissin, 0,       ssmissin, ssmissin, ssmissin, ROT270, "Comad",                           "S.S. Mission", GAME_NO_COCKTAIL )
+GAME( 1996, airattck, 0,       ssmissin, airattck, ssmissin, ROT270, "Comad",                           "Air Attack (set 1)", GAME_NO_COCKTAIL )
+GAME( 1996, airattca, airattck,ssmissin, airattck, ssmissin, ROT270, "Comad",                           "Air Attack (set 2)", GAME_NO_COCKTAIL )
+
+// bee-oh board?
+GAME( 1991, manybloc, 0,       manybloc, manybloc, 0,        ROT270, "Bee-Oh",                          "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )

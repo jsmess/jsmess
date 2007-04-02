@@ -357,7 +357,7 @@ VIDEO_UPDATE( prosoccr )
 	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
 
 	if (background_disable)
-		fillbitmap(bitmap,Machine->pens[32],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[32],&machine->screen[0].visarea);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
 	boomrang_drawsprites(bitmap,0);
@@ -369,7 +369,7 @@ VIDEO_UPDATE( prosport )
 {
 	int mx,my,tile,color,offs;
 
-	fillbitmap(bitmap,Machine->pens[0],&Machine->screen[0].visarea);
+	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
 
 	prosport_drawsprites(bitmap);
 
@@ -384,9 +384,9 @@ VIDEO_UPDATE( prosport )
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		drawgfx(bitmap,Machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[0],
 				tile,1,0,0,248-8*mx,8*my,
-				&Machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -397,7 +397,7 @@ VIDEO_UPDATE( boomrang )
 	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
 
 	if (background_disable)
-		fillbitmap(bitmap,Machine->pens[32],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[32],&machine->screen[0].visarea);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_BACK,0);
 
@@ -415,7 +415,7 @@ VIDEO_UPDATE( liberate )
 	tilemap_set_scrollx(background_tilemap,0,-deco16_io_ram[0]);
 
 	if (background_disable)
-		fillbitmap(bitmap,Machine->pens[32],&Machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[32],&machine->screen[0].visarea);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
 
