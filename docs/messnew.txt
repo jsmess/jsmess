@@ -2,6 +2,8 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Sega Master System Store Display (not working) [Wilbert Pol]
+- Apple IIgs (ROM00) [R. Belmont]
 - Toshiba HX-10  [incog nito]
 
 
