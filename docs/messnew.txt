@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- Toshiba HX-10  [incog nito]
 
 
 
