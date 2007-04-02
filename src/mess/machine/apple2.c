@@ -728,9 +728,10 @@ static void apple2_reset(running_machine *machine)
 		|| !strncmp(Machine->gamedrv->name, "apple2g", 7);
 	apple2_setvar(need_intcxrom ? VAR_INTCXROM : 0, ~0);
 
+	// ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
 	if (!strncmp(Machine->gamedrv->name, "apple2g", 7))
 	{
-		apple2_setvar(VAR_LCRAM2, VAR_LCRAM2);
+		apple2_setvar(VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
 	}
 
 	a2_speaker_state = 0;

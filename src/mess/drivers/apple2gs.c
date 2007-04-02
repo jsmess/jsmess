@@ -273,4 +273,4 @@ SYSTEM_CONFIG_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT       INIT      CONFIG		COMPANY            FULLNAME */
 COMP( 1989, apple2gs, 0,        apple2, apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM03)", 0 )
 COMP( 1987, apple2g1, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM01)", 0 )
-COMP( 1986, apple2g0, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)",			GAME_NOT_WORKING )
+COMP( 1986, apple2g0, apple2gs, 0,      apple2gs, apple2gs,   apple2gs, apple2gs,	"Apple Computer", "Apple IIgs (ROM00)", 0 )
