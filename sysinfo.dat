@@ -3859,34 +3859,14 @@ MESS Emulation State:
 Most games tend to run fairly well. Some have slight graphic glitches; incorrect colours part
 way down the screen or other bizarre effects. See genesis.hsi for a partial list.
 
+Cartridges up to 40MBit (5MByte) are supported, including the special mapper for Super Street 
+Fighter II.
 
-Cartridges up to 32MBit (4MByte) are supported.
+The standard 3 and 6-button pads are fully supported.  Other peripherals are not yet.
 
-
-The controller may not work well with some games. This will be resolved when more information
-is obtained. Similarly, 6-button joypads aren't emulated yet.
-
-
-Split screen effects and interlacing are not yet supported.
-
+Split screen effects and interlacing are fully supported.
 
 Sprite/layer priority should be perfect.
-
-
-Sound is emulated at Z80 and PSG76489 level. 
-
-
-I still consider the Genesis driver extremely preliminary. I have a lot of further work to do 
-before I consider it anywhere near complete. My initial goal is to make it as compatible 
-as possible. Currently there is scope within the driver to handle split screen colour changes/any
- VDP effect, interlacing, without rewriting. The graphics renderer emulates VDP at scanline 
-level, and does not use tile-based methods.
-
-
-Wanted: Any Sega Megadrive information specifically, some of the finer points of DMA transfer,
- and access of the 68K memory map by the Z80! Information is extremely sparse; typically the
- same three-four documents, with parts incomplete, conflicting, and corrupted. Generally, points
- which conflict with themselves in the documentation available on the net...
 
 $end
 
@@ -7990,7 +7970,8 @@ Controller: 8-way direction pad with Select, Start, A, B, X, Y and 2 Flipper but
 
 MESS Emulation State:
 
-This driver is immature and many images will not work. Super Mario World (US version) is playable. The DSP-1 in-cart coprocessor is emulated.
+Most games that don't use special chips should do something (the DSP-1 is supported; other chips are not yet).
+Many popular games such as Super Metroid and Super Mario World are fully playable with sound and music.
 
 
 To do (see source):
@@ -8001,24 +7982,22 @@ Add horizontal mosaic, hi-res. interlaced etc to video emulation.
 
 Add support for fullgraphic mode(partially done).
 
-Fix support for Mode 7. (In Progress)
+Improve mode 7 now that byuu and anomie know the real formula.
 
 Handle interleaved ROMs (maybe even multi-part ROMs, but how?)
 
-Add support for running at 3.58Mhz at the appropriate time.
-
-I'm sure there's lots more ...
+Add correct wait-state support (will require core changes by Aaron Giles).
 
 
-Emulators:
+Emulators (in roughly decreasing order of accuracy):
 
-ZSNES - http://www.zsnes.com/
+BSNES - http://byuu.org/
 
 SNEeSe - http://www.emuunlim.com/sneese/
 
-Snes9x - http://www.snes9x.com
+ZSNES - http://www.zsnes.com/
 
-BSNES - http://byuu.org/
+Snes9x - http://www.snes9x.com
 
 $end
 
