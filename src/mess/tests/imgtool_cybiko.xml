@@ -5,6 +5,7 @@
 
 <tests>
 
+<!--
 <imgtooltest name="cybiko">
 	<createimage driver="cybiko"/>
 	<checkdirectory/>
@@ -23,5 +24,6 @@
 	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
 	<checkfile name="BIG.TXT">'Abcde' * 1500 </checkfile>
 </imgtooltest>
+-->
 
 </tests>

@@ -572,6 +572,7 @@ static void geneve_harddisk_getinfo(const device_class *devclass, UINT32 state, 
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "hd"); break;
+		case DEVINFO_STR_DEV_TAG:						strcpy(info->s = device_temp_str(), "geneve_hd"); break;
 	}
 }
 

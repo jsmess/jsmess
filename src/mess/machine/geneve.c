@@ -407,9 +407,13 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	tms5220_data_w(offset, data);
 }
 
- READ8_HANDLER ( geneve_r )
+READ8_HANDLER ( geneve_r )
 {
 	int page;
+
+	/* 03-Apr-2007 - hack because this seems to be called on startup */
+	if (!DRAM_ptr)
+		return 0;
 
 	if (mode_flags & mf_genevemode)
 	{

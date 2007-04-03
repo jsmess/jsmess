@@ -33,6 +33,8 @@ System Driver Changes:
   compatibility and accuracy plus supports the 6-button pad and
   the Super Street Fighter 2 mapper.  [R. Belmont, David Haywood]
 
+- [GENEVE] Fixed assertion failure on exit.  (bug #1136) [Nate Woods]
+
 - [MSX] Fixed MSX visible area.  [MJSTY]
 
 - [SMS] Drivers have been split up to support specific hardware versions:
@@ -43,7 +45,9 @@ System Driver Changes:
 - [THOMSON] Switch 6850 ACIA implementations to use the MAME version, and
   added natural keyboard support. [Antoine Mine]
 
-- [TI99] Fixed assertion failure.  (bug #1129) [Nate Woods]
+- [TI99_4X] Fixed assertion failure.  (bug #1129) [Nate Woods]
+
+- [TI99_8] Fixed assertion failure on exit.  (bug #1137) [Nate Woods]
 
 
 

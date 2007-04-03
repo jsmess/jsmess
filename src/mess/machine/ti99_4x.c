@@ -1365,6 +1365,10 @@ WRITE16_HANDLER ( ti99_4p_wgpl_w )
 	UINT32 mapper_reg;
 	int reply = 0;
 
+	/* 03-Apr-2007 - hack because this seems to be called on startup */
+	if (!xRAM_ptr_8)
+		return 0;
+
 	if (ti99_8_CRUS)
 	{
 		/* memory mapped ports enabled */
