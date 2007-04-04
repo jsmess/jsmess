@@ -77,6 +77,8 @@ Source Changes:
 
 - Moved per-image working directory handling into the MESS core.  [Nate Woods]
 
+- Fixed NVRAM folder creation for battery backup.  (bug #1120) [Nate Woods]
+
 - [Windows] Fixed deadlock.  (bug #1140) [Oliver Stoeneberg]
 
 
