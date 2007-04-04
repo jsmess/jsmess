@@ -17,6 +17,7 @@ struct task_data
 	HANDLE thread;
 	DWORD thread_id;
 	HANDLE semaphore;
+	HANDLE event;
 };
 
 struct call_data
@@ -90,6 +91,7 @@ static DWORD WINAPI task_proc(void *param)
 	const struct call_data *cd;
 
 	tdata = (struct task_data *) param;
+	SetEvent(tdata->event);
 	task_num = tdata - tasks + 1;
 	semaphore = tdata->semaphore;
 
@@ -165,9 +167,13 @@ int win_parallel_init(void)
 			tasks[i].semaphore = CreateSemaphore(NULL, 0, 1, NULL);
 			if (!tasks[i].semaphore)
 				goto error;
+			tasks[i].event = CreateEvent(NULL, 1, 0, NULL);
+			if (!tasks[i].event)
+				goto error;
 			tasks[i].thread = CreateThread(NULL, 0, task_proc, (void *) &tasks[i], 0, &tasks[i].thread_id);
 			if (!tasks[i].thread)
 				goto error;
+			WaitForSingleObject(tasks[i].event, INFINITE);
 			if (set_thread_ideal_processor)
 				set_thread_ideal_processor(tasks[i].thread, (i+1) % processor_count);
 		}
@@ -204,6 +210,10 @@ static void win_parallel_exit(running_machine *machine)
 			{
 				threads[thread_count++] = tasks[i].thread;
 				PostThreadMessage(tasks[i].thread_id, WM_QUIT, 0, 0);
+			}
+			if (tasks[i].event)
+			{
+				CloseHandle(tasks[i].event);
 			}
 			if (tasks[i].semaphore)
 			{

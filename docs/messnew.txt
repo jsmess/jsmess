@@ -77,6 +77,8 @@ Source Changes:
 
 - Moved per-image working directory handling into the MESS core.  [Nate Woods]
 
+- [Windows] Fixed deadlock.  (bug #1140) [Oliver Stoeneberg]
+
 
 
 0.113
