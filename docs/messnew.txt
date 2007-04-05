@@ -79,6 +79,10 @@ Source Changes:
 
 - Fixed NVRAM folder creation for battery backup.  (bug #1120) [Nate Woods]
 
+- Fixed a bug that could cause multiple file extensions to be dropped for
+  devices on certain drivers in both MESS and Imgtool.  (bug #1095)  [Nate
+  Woods]
+
 - [Windows] Fixed deadlock.  (bug #1140) [Oliver Stoeneberg]
 
 

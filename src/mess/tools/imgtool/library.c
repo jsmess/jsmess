@@ -60,6 +60,17 @@ void imgtool_library_close(imgtool_library *library)
 
 
 
+static void null_delimit_string(char *str)
+{
+	char *comma_pos;
+	int i;
+
+	for (i = 0; (comma_pos = strchr(&str[i], ',')) != NULL; i += strlen(&str[i]) + 1)
+		*comma_pos = '\0';
+}
+
+
+
 static void imgtool_library_add_class(imgtool_library *library, const imgtool_class *imgclass)
 {
 	imgtool_module *module;
@@ -78,12 +89,11 @@ static void imgtool_library_add_class(imgtool_library *library, const imgtool_cl
 
 	/* extensions have a weird format */
 	s1 = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_FILE_EXTENSIONS);
-	len = strlen(s1);;
+	len = strlen(s1);
 	s2 = imgtool_library_malloc(library, len + 2);
 	strcpy(s2, s1);
 	s2[len + 1] = '\0';
-	while((s1 = strchr(s2, ',')) != NULL)
-		*s1 = '\0';
+	null_delimit_string(s2);
 	module->extensions = s2;
 
 	module->imgclass					= *imgclass;

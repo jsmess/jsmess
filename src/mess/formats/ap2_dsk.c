@@ -488,19 +488,19 @@ static UINT32 apple2_get_track_size(floppy_image *floppy, int head, int track)
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( apple2 )
-	FLOPPY_OPTION( apple2_do, "do\0dsk\0bin\0",	"Apple ][ DOS order disk image",	apple2_dsk_identify,	apple2_do_construct,
+	FLOPPY_OPTION( apple2_do, "do,dsk,bin",	"Apple ][ DOS order disk image",	apple2_dsk_identify,	apple2_do_construct,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple2_po, "po\0dsk\0bin\0",	"Apple ][ ProDOS order disk image",	apple2_dsk_identify,	apple2_po_construct,
+	FLOPPY_OPTION( apple2_po, "po,dsk,bin",	"Apple ][ ProDOS order disk image",	apple2_dsk_identify,	apple2_po_construct,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
-	FLOPPY_OPTION( apple2_nib, "dsk\0nib\0",	"Apple ][ Nibble order disk image",	apple2_nib_identify,	apple2_nib_construct,
+	FLOPPY_OPTION( apple2_nib, "dsk,nib",	"Apple ][ Nibble order disk image",	apple2_nib_identify,	apple2_nib_construct,
 		HEADS([1])
 		TRACKS([35])
 		SECTORS([16])
