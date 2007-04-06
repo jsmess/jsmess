@@ -321,7 +321,7 @@ static casserr_t uef_cassette_load( cassette_image *cassette ) {
 }
 
 struct CassetteFormat uef_cassette_format = {
-	"uef\0",
+	"uef",
 	uef_cassette_identify,
 	uef_cassette_load,
 	NULL

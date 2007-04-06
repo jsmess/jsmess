@@ -108,7 +108,7 @@ static casserr_t pmd85_pmd_load(cassette_image *cassette)
 
 struct CassetteFormat pmd85_pmd_image_format =
 {
-	"pmd\0",
+	"pmd",
 	pmd85_pmd_identify,
 	pmd85_pmd_load,
 	NULL

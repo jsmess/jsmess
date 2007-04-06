@@ -213,7 +213,7 @@ static casserr_t zx81_p_load(cassette_image *cassette)
 
 struct CassetteFormat zx81_p_image_format =
 {
-	"p\081\0",
+	"p,81",
 	zx81_p_identify,
 	zx81_p_load,
 	NULL
@@ -276,7 +276,7 @@ static casserr_t zx80_o_load(cassette_image *cassette)
 
 struct CassetteFormat zx80_o_image_format =
 {
-	"o\080\0",
+	"o,80",
 	zx80_o_identify,
 	zx80_o_load,
 	NULL

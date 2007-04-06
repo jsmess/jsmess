@@ -226,3 +226,117 @@ int hexdigit(char c)
 
 
 
+/*-------------------------------------------------
+    is_delim - returns whether c is a comma or \0
+-------------------------------------------------*/
+
+static int is_delim(char c)
+{
+	return (c == '\0') || (c == ',');
+}
+
+
+
+/*-------------------------------------------------
+    specify_extension - merge a comma-delimited
+	list of file extensions onto an existing list
+-------------------------------------------------*/
+
+void specify_extension(char *buffer, size_t buffer_len, const char *extension)
+{
+	int extension_pos = 0;
+	int buffer_pos;
+	int i, found;
+
+	/* be aware that extension can be NULL */
+	if (extension != NULL)
+	{
+		while(extension[extension_pos] != '\0')
+		{
+			/* start to go through the buffer, and compare to each existing extension */
+			buffer_pos = 0;
+			found = FALSE;
+
+			/* try to find the file extension */
+			while(buffer[buffer_pos] != '\0')
+			{
+				/* compare a file extension */
+				i = 0;
+				while(!is_delim(buffer[buffer_pos + i])
+					&& !is_delim(extension[extension_pos + i])
+					&& (extension[extension_pos + i] == buffer[buffer_pos + i]))
+				{
+					i++;
+				}
+
+				/* check to see if it was found */
+				found = found || (is_delim(buffer[buffer_pos + i]) && is_delim(extension[extension_pos + i]));
+
+				/* move to next position in the buffer */
+				buffer_pos += i;
+				while(!is_delim(buffer[buffer_pos]))
+					buffer_pos++;
+				while(buffer[buffer_pos] == ',')
+					buffer_pos++;
+			}
+
+			/* append a delimiter if we have to */
+			if (!found && (buffer_pos > 0))
+				buffer_pos += snprintf(&buffer[buffer_pos], buffer_len - buffer_pos, ",");
+
+			/* move to the next extension, appending the extension if not found */
+			while(!is_delim(extension[extension_pos]))
+			{
+				if (!found)
+					buffer_pos += snprintf(&buffer[buffer_pos], buffer_len - buffer_pos, "%c", extension[extension_pos]);
+				extension_pos++;
+			}
+			while(extension[extension_pos] == ',')
+				extension_pos++;
+		}
+	}
+}
+
+
+
+/*-------------------------------------------------
+    utils_validitychecks - unit tests
+-------------------------------------------------*/
+
+int utils_validitychecks(void)
+{
+	char buffer[256];
+	int error = FALSE;
+
+	/* test 1 */
+	buffer[0] = '\0';
+	specify_extension(buffer, ARRAY_LENGTH(buffer), "abc");
+	if (strcmp(buffer, "abc"))
+	{
+		printf("Invalid validity check result\n");
+		error = TRUE;
+	}
+
+	/* test 2 */
+	buffer[0] = '\0';
+	specify_extension(buffer, ARRAY_LENGTH(buffer), "abc,def,ghi");
+	specify_extension(buffer, ARRAY_LENGTH(buffer), "jkl,mno,ghi");
+	if (strcmp(buffer, "abc,def,ghi,jkl,mno"))
+	{
+		printf("Invalid validity check result\n");
+		error = TRUE;
+	}
+
+	/* test 3 */
+	buffer[0] = '\0';
+	specify_extension(buffer, ARRAY_LENGTH(buffer), "abc,def,ghi");
+	specify_extension(buffer, ARRAY_LENGTH(buffer), "abc,jkl,mno");
+	if (strcmp(buffer, "abc,def,ghi,jkl,mno"))
+	{
+		printf("Invalid validity check result\n");
+		error = TRUE;
+	}
+
+	return error;
+}
+

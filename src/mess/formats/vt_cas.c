@@ -116,7 +116,7 @@ static casserr_t vtech1_cas_load(cassette_image *cassette)
 
 struct CassetteFormat vtech1_cas_format =
 {
-	"cas\0",
+	"cas",
 	vtech1_cas_identify,
 	vtech1_cas_load,
 	NULL
@@ -211,7 +211,7 @@ static casserr_t vtech2_cas_load(cassette_image *cassette)
 
 struct CassetteFormat vtech2_cas_format =
 {
-	"cas\0",
+	"cas",
 	vtech2_cas_identify,
 	vtech2_cas_load,
 	NULL

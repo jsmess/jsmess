@@ -237,7 +237,7 @@ static casserr_t primo_ptp_load(cassette_image *cassette)
 
 struct CassetteFormat primo_ptp_image_format =
 {
-	"ptp\0",
+	"ptp",
 	primo_ptp_identify,
 	primo_ptp_load,
 	NULL

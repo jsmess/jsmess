@@ -140,7 +140,7 @@ static casserr_t apf_apt_load(cassette_image *cassette)
 
 struct CassetteFormat apf_apt_format =
 {
-	"apt\0",
+	"apt",
 	apf_apt_identify,
 	apf_apt_load,
 	NULL

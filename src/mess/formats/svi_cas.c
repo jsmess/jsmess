@@ -193,7 +193,7 @@ static casserr_t svi_cas_load(cassette_image *cassette)
 
 struct CassetteFormat svi_cas_format =
 {
-	"cas\0",
+	"cas",
 	svi_cas_identify,
 	svi_cas_load,
 	NULL

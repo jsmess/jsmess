@@ -261,7 +261,7 @@ static casserr_t coco_cas_load(cassette_image *cassette)
 
 struct CassetteFormat coco_cas_format =
 {
-	"cas\0",
+	"cas",
 	coco_cas_identify,
 	coco_cas_load,
 	NULL

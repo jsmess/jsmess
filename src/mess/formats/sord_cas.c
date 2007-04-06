@@ -128,7 +128,7 @@ static casserr_t sordm5_tap_load( cassette_image *cassette)
 
 struct CassetteFormat sordm5_cas_format =
 {
-	"cas\0",
+	"cas",
 	sordm5_tap_identify,
 	sordm5_tap_load,
 	NULL

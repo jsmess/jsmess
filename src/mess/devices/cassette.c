@@ -19,7 +19,6 @@
 
 /* from devices/mflopimg.c */
 extern struct io_procs mess_ioprocs;
-extern void specify_extension(char *extbuf, size_t extbuflen, const char *extension);
 
 
 struct mess_cassetteimg
@@ -399,18 +398,14 @@ void cassette_device_getinfo(const device_class *devclass, UINT32 state, union d
 		case DEVINFO_STR_FILE_EXTENSIONS:
 			formats = device_get_info_ptr(devclass, DEVINFO_PTR_CASSETTE_FORMATS);
 
-			info->s = s = device_temp_str();
+			/* set up a temporary string */
+			s = device_temp_str();
+			info->s = s;
 			s[0] = '\0';
-			s[1] = '\0';
 
+			/* append each of the extensions */
 			for (i = 0; formats[i]; i++)
 				specify_extension(s, 256, formats[i]->extensions);
-
-			while(s[strlen(s) + 1] != '\0')
-			{
-				s += strlen(s);
-				*(s++) = ',';
-			}
 			break;
 	}
 }

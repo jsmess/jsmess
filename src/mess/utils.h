@@ -195,4 +195,7 @@ int compute_log2(int val);
 int findextension(const char *extensions, const char *ext);
 int hexdigit(char c);
 
+void specify_extension(char *buffer, size_t buffer_len, const char *extension);
+int utils_validitychecks(void);
+
 #endif /* UTILS_H */

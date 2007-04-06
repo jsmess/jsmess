@@ -325,42 +325,6 @@ static void device_unload_floppy(mess_image *image)
 
 
 
-void specify_extension(char *extbuf, size_t extbuflen, const char *extension)
-{
-	char *s;
-
-	/* loop through the extensions that we are adding */
-	while(extension && *extension)
-	{
-		/* loop through the already specified extensions; and check for dupes */
-		for (s = extbuf; *s; s += strlen(s) + 1)
-		{
-			if (!strcmp(extension, s))
-				break;
-		}
-
-		/* only write if there are no dupes */
-		if (*s == '\0')
-		{
-			/* out of room?  this should never happen */
-			if ((s - extbuf + strlen(extension) + 1) >= extbuflen)
-			{
-				assert(FALSE);
-				continue;
-			}
-	
-			/* copy the extension */
-			strcpy(s, extension);
-			s[strlen(s) + 1] = '\0';
-		}
-
-		/* next extension */
-		extension += strlen(extension) + 1;
-	}
-}
-
-
-
 /*************************************
  *
  *	Hacks for specific systems
@@ -418,18 +382,17 @@ void floppy_device_getinfo(const device_class *devclass, UINT32 state, union dev
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_FILE_EXTENSIONS:
+			/* retrieve the floppy options */
 			floppy_options = device_get_info_ptr(devclass, DEVINFO_PTR_FLOPPY_OPTIONS);
+
+			/* set up a temporary string */
 			s = device_temp_str();
 			info->s = s;
 			s[0] = '\0';
-			s[1] = '\0';
+
+			/* append each of the extensions */
 			for (i = 0; floppy_options[i].construct; i++)
 				specify_extension(s, 256, floppy_options[i].extensions);
-			while(s[strlen(s) + 1] != '\0')
-			{
-				s += strlen(s);
-				*(s++) = ',';
-			}
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

@@ -494,7 +494,7 @@ static casserr_t to7_k7_load( cassette_image *cass )
 
 
 static struct CassetteFormat to7_k7 = 
-  { "k7\0", to7_k7_identify, to7_k7_load, NULL /* no save */ };
+  { "k7", to7_k7_identify, to7_k7_load, NULL /* no save */ };
 
 
 
@@ -539,7 +539,7 @@ static casserr_t to7_wav_save ( cassette_image *cass,
 
 /* overloaded wav: dump info */
 const static struct CassetteFormat to7_wav = 
-  { "wav\0", to7_wav_identify, to7_wav_load, to7_wav_save };
+  { "wav", to7_wav_identify, to7_wav_load, to7_wav_save };
 
 
 
@@ -807,7 +807,7 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 }
 
 static struct CassetteFormat mo5_k5 = 
-  { "k5\0k7\0", mo5_k5_identify, mo5_k5_load, NULL /* no save */ };
+  { "k5,k7", mo5_k5_identify, mo5_k5_load, NULL /* no save */ };
 
 
 /********************* MO5 WAV format ************************/
@@ -844,7 +844,7 @@ casserr_t mo5_wav_save ( cassette_image *cass,
 
 /* overloaded wav: dump info */
 const static struct CassetteFormat mo5_wav = 
-  { "wav\0", mo5_wav_identify, mo5_wav_load, mo5_wav_save };
+  { "wav", mo5_wav_identify, mo5_wav_load, mo5_wav_save };
 
 
 /********************* formats ************************/
