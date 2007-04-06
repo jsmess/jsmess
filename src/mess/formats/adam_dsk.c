@@ -37,6 +37,6 @@ static FLOPPY_CONSTRUCT(adam_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( adam )
-	FLOPPY_OPTION( adam_dsk, "dsk\0",		"Adam floppy disk image",	adam_dsk_identify, adam_dsk_construct, NULL)
+	FLOPPY_OPTION( adam_dsk, "dsk",		"Adam floppy disk image",	adam_dsk_identify, adam_dsk_construct, NULL)
 FLOPPY_OPTIONS_END
 

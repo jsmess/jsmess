@@ -130,7 +130,7 @@ static FLOPPY_CONSTRUCT(pc_dsk_construct)
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( pc )
-	FLOPPY_OPTION( pc_dsk, "dsk\0ima\0img\0ufi\0",		"PC floppy disk image",	pc_dsk_identify, pc_dsk_construct,
+	FLOPPY_OPTION( pc_dsk, "dsk,ima,img,ufi",		"PC floppy disk image",	pc_dsk_identify, pc_dsk_construct,
 		HEADS([1]-2)
 		TRACKS(40/[80])
 		SECTORS(8/[9]/10/15/18/36))

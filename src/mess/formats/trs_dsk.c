@@ -56,9 +56,9 @@ static floperr_t trs80_jv1_construct(floppy_image *floppy, option_resolution *pa
 /* ----------------------------------------------------------------------- */
 
 FLOPPY_OPTIONS_START( trs80 )
-	FLOPPY_OPTION( trs80_jv1, "dsk\0",			"TRS-80 JV1 disk image",	trs80_jv1_identify,	trs80_jv1_construct,
+	FLOPPY_OPTION( trs80_jv1, "dsk",			"TRS-80 JV1 disk image",	trs80_jv1_identify,	trs80_jv1_construct,
 		TRACKS([35]-255))
-	FLOPPY_OPTION( trs80_dmk, "dsk\0dmk\0",		"TRS-80 DMK disk image",	coco_dmk_identify,	coco_dmk_construct,
+	FLOPPY_OPTION( trs80_dmk, "dsk,dmk",		"TRS-80 DMK disk image",	coco_dmk_identify,	coco_dmk_construct,
 		HEADS([1]-2)
 		TRACKS([35]-255)
 		SECTORS(1-[10]-18)
