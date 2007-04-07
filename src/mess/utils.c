@@ -237,7 +237,7 @@ int internal_find_extension(const char *extension_list, const char *target_exten
 		i = 0;
 		while(!is_delim(extension_list[pos + i])
 			&& !is_delim(target_extension[i])
-			&& (extension_list[pos + i] == target_extension[i]))
+			&& (tolower(extension_list[pos + i]) == tolower(target_extension[i])))
 		{
 			i++;
 		}
@@ -268,7 +268,8 @@ int internal_find_extension(const char *extension_list, const char *target_exten
 int find_extension(const char *extension_list, const char *target_extension)
 {
 	/* the internal function allows something that we do not */
-	assert(!strchr(target_extension, ','));
+	if (strchr(target_extension, ','))
+		return FALSE;
 
 	/* special case to allow ext to be in the form '.EXT' */
 	if (*target_extension == '.')
