@@ -293,7 +293,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 			zipent = zip_file_first_file(zip);
 			while(!rc && zipent)
 			{
-				if (!mame_stricmp(zip->filename, zip_entry_name))
+				if (!mame_stricmp(zipent->filename, zip_entry_name))
 				{
 					pBuffer = malloc(zipent->uncompressed_length);
 					if (pBuffer)
@@ -359,21 +359,26 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 	struct FileInfo *pFileInfo;
 	unsigned int nHashFunctionsUsed = 0;
 	unsigned int nCalculatedHashes = 0;
+	iodevice_t type;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	assert((nIndex >= 0) && (nIndex < pPickerInfo->nIndexLength));
 	pFileInfo = pPickerInfo->ppIndex[nIndex];
 
+	// Determine which hash functions we need to use for this file, and which hashes
+	// have already been calculated
 	if (pPickerInfo->pHashFile)
 	{
-//		if (pFileInfo->pDevice && (pFileInfo->pDevice->type < IO_COUNT))
-//	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->pHashFile, pFileInfo->pDevice->type);
-//		nCalculatedHashes = hash_data_used_functions(pFileInfo->szHash);
+		type = (iodevice_t) (int) device_get_info_int(&pFileInfo->devclass, DEVINFO_INT_TYPE);
+		if (type < IO_COUNT)
+	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->pHashFile, type);
+		nCalculatedHashes = hash_data_used_functions(pFileInfo->szHash);
 	}
 
+	// Did we fully compute all hashes?
 	if ((nHashFunctionsUsed & ~nCalculatedHashes) == 0)
 	{
-		// We have calculated all hash
+		// We have calculated all hashs for this file; mark it as realized
 		pPickerInfo->ppIndex[nIndex]->bHashRealized = TRUE;
 		pPickerInfo->nHashesRealized++;
 

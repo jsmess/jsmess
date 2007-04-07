@@ -53,7 +53,7 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- [Windows GUI] Fixed hash entry loading.  (bug #1128) [Nate Woods]
 
 
 
