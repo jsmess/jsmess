@@ -192,10 +192,13 @@ INLINE UINT64 pick_integer_le(const void *ptr, size_t offset, size_t size)
 char *stripspace(const char *src);
 char *strip_extension(const char *filename);
 int compute_log2(int val);
-int findextension(const char *extensions, const char *ext);
 int hexdigit(char c);
 
+/* extension list handling */
+int find_extension(const char *extensions, const char *ext);
 void specify_extension(char *buffer, size_t buffer_len, const char *extension);
+
+/* validity checks */
 int utils_validitychecks(void);
 
 #endif /* UTILS_H */

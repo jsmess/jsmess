@@ -140,23 +140,6 @@ int compute_log2(int val)
 
 
 
-int findextension(const char *extensions, const char *ext)
-{
-	/* special case to allow ext to be in the form '.EXT' */
-	if (*ext == '.')
-		ext++;
-
-	while(*extensions)
-	{
-		if (!mame_stricmp(extensions, ext))
-			return 1;
-		extensions += strlen(extensions) + 1;
-	}
-	return 0;
-}
-
-
-
 /*
    Compute CCITT CRC-16 using the correct bit order for floppy disks.
    CRC code courtesy of Tim Mann.
@@ -238,6 +221,66 @@ static int is_delim(char c)
 
 
 /*-------------------------------------------------
+    internal_find_extension - find an extension in
+	an extension list
+-------------------------------------------------*/
+
+int internal_find_extension(const char *extension_list, const char *target_extension)
+{
+	/* this version allows target_extension to be delimited with a comma */
+	int pos = 0;
+	int i;
+
+	while(extension_list[pos] != '\0')
+	{
+		/* compare a file extension */
+		i = 0;
+		while(!is_delim(extension_list[pos + i])
+			&& !is_delim(target_extension[i])
+			&& (extension_list[pos + i] == target_extension[i]))
+		{
+			i++;
+		}
+
+		/* check to see if it was found */
+		if (is_delim(extension_list[pos + i]) && is_delim(target_extension[i]))
+			return TRUE;
+
+		/* move to next position in the buffer */
+		pos += i;
+		while(!is_delim(extension_list[pos]))
+			pos++;
+		while(extension_list[pos] == ',')
+			pos++;
+	}
+
+	/* not found */
+	return FALSE;
+}
+
+
+
+/*-------------------------------------------------
+    find_extension - find an extension in an extension
+	list
+-------------------------------------------------*/
+
+int find_extension(const char *extension_list, const char *target_extension)
+{
+	/* the internal function allows something that we do not */
+	assert(!strchr(target_extension, ','));
+
+	/* special case to allow ext to be in the form '.EXT' */
+	if (*target_extension == '.')
+		target_extension++;
+
+	/* do the actual work */
+	return internal_find_extension(extension_list, target_extension);
+}
+
+
+
+/*-------------------------------------------------
     specify_extension - merge a comma-delimited
 	list of file extensions onto an existing list
 -------------------------------------------------*/
@@ -245,50 +288,29 @@ static int is_delim(char c)
 void specify_extension(char *buffer, size_t buffer_len, const char *extension)
 {
 	int extension_pos = 0;
-	int buffer_pos;
-	int i, found;
+	int len;
+	int found;
+
+	/* determine the length of the buffer */
+	len = strlen(buffer);
 
 	/* be aware that extension can be NULL */
 	if (extension != NULL)
 	{
 		while(extension[extension_pos] != '\0')
 		{
-			/* start to go through the buffer, and compare to each existing extension */
-			buffer_pos = 0;
-			found = FALSE;
-
 			/* try to find the file extension */
-			while(buffer[buffer_pos] != '\0')
-			{
-				/* compare a file extension */
-				i = 0;
-				while(!is_delim(buffer[buffer_pos + i])
-					&& !is_delim(extension[extension_pos + i])
-					&& (extension[extension_pos + i] == buffer[buffer_pos + i]))
-				{
-					i++;
-				}
-
-				/* check to see if it was found */
-				found = found || (is_delim(buffer[buffer_pos + i]) && is_delim(extension[extension_pos + i]));
-
-				/* move to next position in the buffer */
-				buffer_pos += i;
-				while(!is_delim(buffer[buffer_pos]))
-					buffer_pos++;
-				while(buffer[buffer_pos] == ',')
-					buffer_pos++;
-			}
+			found = internal_find_extension(buffer, &extension[extension_pos]);
 
 			/* append a delimiter if we have to */
-			if (!found && (buffer_pos > 0))
-				buffer_pos += snprintf(&buffer[buffer_pos], buffer_len - buffer_pos, ",");
+			if (!found && (len > 0))
+				len += snprintf(&buffer[len], buffer_len - len, ",");
 
 			/* move to the next extension, appending the extension if not found */
 			while(!is_delim(extension[extension_pos]))
 			{
 				if (!found)
-					buffer_pos += snprintf(&buffer[buffer_pos], buffer_len - buffer_pos, "%c", extension[extension_pos]);
+					len += snprintf(&buffer[len], buffer_len - len, "%c", extension[extension_pos]);
 				extension_pos++;
 			}
 			while(extension[extension_pos] == ',')
