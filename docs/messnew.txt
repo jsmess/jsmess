@@ -27,6 +27,9 @@ System Driver Changes:
 
 - [COCO] Implemented MUX switching delay.  (bug #655) [tim lindner]
 
+- [FAMICOM/FAMITWIN] Fixed Disk System, marked working now.
+  (bug #1101) [R. Belmont]
+
 - [GAMEGEAR] Added SMS compatibility mode.  [Wilbert Pol]
 
 - [GENESIS/MEGADRIVE] New emulation engine from HazeMD, improves

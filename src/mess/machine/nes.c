@@ -154,7 +154,7 @@ MACHINE_START( nes )
 	add_reset_callback(machine, nes_machine_reset);
 	add_exit_callback(machine, nes_machine_stop);
 
-	if (!image_exists(image_from_devtype_and_index(IO_CARTSLOT, 0)))
+	if ((!image_exists(image_from_devtype_and_index(IO_CARTSLOT, 0))) && (!image_exists(image_from_devtype_and_index(IO_FLOPPY, 0))))
 	{
 		/* NPW 05-Mar-2006 - Hack to keep the Famicom from crashing */
 		static const UINT8 infinite_loop[] = { 0x4C, 0xF9, 0xFF, 0xF9, 0xFF }; /* JMP $FFF9, DC.W $FFF9 */
@@ -162,6 +162,7 @@ MACHINE_START( nes )
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xFFF9, 0xFFFD, 0, 0, MWA8_BANK11);
 		memory_set_bankptr(11, (void *) infinite_loop);
 	}
+
 	return 0;
 }
 
@@ -569,13 +570,9 @@ DEVICE_LOAD(nes_disk)
 		image_fread (image, nes_fds.data + ((nes_fds.sides-1) * 65500), 65500);
 	}
 
-	logerror ("Number of sides: %d\n", nes_fds.sides);
+	logerror("Number of sides: %d\n", nes_fds.sides);
 
 	return INIT_PASS;
-
-//bad:
-	logerror("BAD section hit during disk load.\n");
-	return 1;
 }
 
 DEVICE_UNLOAD(nes_disk)

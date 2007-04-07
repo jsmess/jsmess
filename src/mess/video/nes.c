@@ -16,6 +16,7 @@
 
 mame_bitmap *nes_zapper_hack;
 int nes_vram_sprite[8]; /* Used only by mmc5 for now */
+static int last_frame_flip = 0;
 
 static void ppu_nmi(int num, int *ppu_regs)
 {
@@ -34,6 +35,8 @@ static void nes_vh_start(ppu_t ppu_type, double scanlines_per_frame)
 	ppu2c0x_interface ppu_interface;
 
 	nes_zapper_hack = NULL;
+
+	last_frame_flip =  0;
 
 	memset(&ppu_interface, 0, sizeof(ppu_interface));
 	ppu_interface.type				= ppu_type;
@@ -144,8 +147,10 @@ VIDEO_UPDATE( nes )
 	/* if this is a disk system game, check for the flip-disk key */
 	if (nes.mapper == 20)
 	{
-		if (readinputport(PORT_FLIPKEY) & 0x01)
+		// latch this input so it doesn't go at warp speed
+		if ((readinputport(PORT_FLIPKEY) & 0x01) && (!last_frame_flip))
 		{
+			last_frame_flip = 1;
 			nes_fds.current_side++;
 			if (nes_fds.current_side > nes_fds.sides)
 				nes_fds.current_side = 0;
@@ -158,6 +163,11 @@ VIDEO_UPDATE( nes )
 			{
 				popmessage("Disk set to side %d", nes_fds.current_side);
 			}
+		}
+
+		if (!(readinputport(PORT_FLIPKEY) & 0x01))
+		{
+			last_frame_flip = 0;
 		}
 	}
 	return 0;
