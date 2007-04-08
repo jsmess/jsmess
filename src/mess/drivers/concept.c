@@ -259,7 +259,7 @@ ROM_END
 static FLOPPY_OPTIONS_START(concept)
 #if 1
 	/* SSSD 8" */
-	FLOPPY_OPTION(concept, "img\0", "Corvus Concept 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])
@@ -267,7 +267,7 @@ static FLOPPY_OPTIONS_START(concept)
 		FIRST_SECTOR_ID([1]))
 #elif 0
 	/* SSDD 8" (according to ROMs) */
-	FLOPPY_OPTION(concept, "img\0", "Corvus Concept 8\" SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 8\" SSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])
@@ -275,7 +275,7 @@ static FLOPPY_OPTIONS_START(concept)
 		FIRST_SECTOR_ID([1]))
 #elif 0
 	/* Apple II DSDD 5"1/4 (according to ROMs) */
-	FLOPPY_OPTION(concept, "img\0", "Corvus Concept Apple II 5\"1/4 DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(concept, "img", "Corvus Concept Apple II 5\"1/4 DSDD disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([35])
 		SECTORS([16])
@@ -283,14 +283,14 @@ static FLOPPY_OPTIONS_START(concept)
 		FIRST_SECTOR_ID([1]))
 #elif 0
 	/* actual formats found */
-	FLOPPY_OPTION(concept, "img\0", "Corvus Concept 5\"1/4 DSDD disk image (256-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (256-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 #else
-	FLOPPY_OPTION(concept, "img\0", "Corvus Concept 5\"1/4 DSDD disk image (512-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(concept, "img", "Corvus Concept 5\"1/4 DSDD disk image (512-byte sectors)", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([80])
 		SECTORS([9])

@@ -289,7 +289,7 @@ static FLOPPY_CONSTRUCT(ti99_floppy_construct)
 }
 
 FLOPPY_OPTIONS_START( ti99 )
-	FLOPPY_OPTION( ti99, "dsk\0",	"TI99 disk image",	ti99_floppy_identify,	ti99_floppy_construct, NULL)
+	FLOPPY_OPTION( ti99, "dsk",	"TI99 disk image",	ti99_floppy_identify,	ti99_floppy_construct, NULL)
 FLOPPY_OPTIONS_END
 
 static void ti99_install_tracktranslate_procs(void)

@@ -69,7 +69,7 @@ enum
 FLOPPY_OPTIONS_START(fd800)
 #if 1
 	/* SSSD 8" */
-	FLOPPY_OPTION(fd800, "dsk\0", "TI990 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(fd800, "dsk", "TI990 8\" SSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([77])
 		SECTORS([26])
@@ -77,7 +77,7 @@ FLOPPY_OPTIONS_START(fd800)
 		FIRST_SECTOR_ID([1]))
 #elif 0
 	/* DSSD 8" */
-	FLOPPY_OPTION(fd800, "dsk\0", "TI990 8\" DSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(fd800, "dsk", "TI990 8\" DSSD disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
 		TRACKS([77])
 		SECTORS([26])

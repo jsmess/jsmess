@@ -700,7 +700,7 @@ ROM_START(srdm5fd5)
 ROM_END
 
 static FLOPPY_OPTIONS_START( sordm5 )
-	FLOPPY_OPTION( sordm5, "dsk\0",			"Sord M5 disk image",	basicdsk_identify_default,	basicdsk_construct_default,
+	FLOPPY_OPTION( sordm5, "dsk",			"Sord M5 disk image",	basicdsk_identify_default,	basicdsk_construct_default,
 		HEADS([1])
 		TRACKS([40])
 		SECTORS([18])
