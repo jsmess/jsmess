@@ -58,6 +58,9 @@ User Interface Changes:
 -----------------------
 - [Windows GUI] Fixed hash entry loading.  (bug #1128) [Nate Woods]
 
+- [Windows GUI] Added missing screen and controller tabs.  (bug #1134) [Oliver
+  Stoeneberg]
+
 
 
 Imgtool Changes:
