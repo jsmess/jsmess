@@ -214,9 +214,8 @@ struct drawtask_params
 	int columns;
 };
 
-static void apple2_hires_draw_task(void *param, int task_num, int task_count)
+static void apple2_hires_draw_task(struct drawtask_params *dtparams)
 {
-	struct drawtask_params *dtparams;
 	mame_bitmap *bitmap;
 	const UINT8 *vram;
 	int beginrow;
@@ -230,12 +229,10 @@ static void apple2_hires_draw_task(void *param, int task_num, int task_count)
 	UINT32 w;
 	UINT16 *artifact_map_ptr;
 
-	dtparams = (struct drawtask_params *) param;
-
 	bitmap		= dtparams->bitmap;
 	vram		= dtparams->vram;
-	beginrow	= dtparams->beginrow + (dtparams->rowcount * task_num     / task_count);
-	endrow		= dtparams->beginrow + (dtparams->rowcount * (task_num+1) / task_count) - 1;
+	beginrow	= dtparams->beginrow;
+	endrow		= dtparams->beginrow + dtparams->rowcount;
 	columns		= dtparams->columns;
 
 	vram_row[0] = 0;
@@ -313,7 +310,7 @@ static void apple2_hires_draw(mame_bitmap *bitmap, const rectangle *cliprect, in
 	dtparams.rowcount = (endrow + 1) - beginrow;
 	dtparams.columns = ((effective_a2() & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
 
-	osd_parallelize(apple2_hires_draw_task, &dtparams, dtparams.rowcount);
+	apple2_hires_draw_task(&dtparams);
 }
 
 

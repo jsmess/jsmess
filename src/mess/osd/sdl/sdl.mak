@@ -16,8 +16,7 @@ OBJDIRS += $(MESS_SDLOBJ)
 OSDCOREOBJS += \
 	$(MESS_SDLOBJ)/sdlutil.o	\
 	$(MESS_SDLOBJ)/configms.o	\
-	$(MESS_SDLOBJ)/sdlmess.o	\
-	$(MESS_SDLOBJ)/parallel.o	
+	$(MESS_SDLOBJ)/sdlmess.o	
 
 $(LIBOSD): $(OSDOBJS)
 

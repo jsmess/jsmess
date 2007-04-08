@@ -23,7 +23,6 @@ static const options_entry win_mess_opts[] =
 {
 	{ NULL,							NULL,   OPTION_HEADER,		"SDL MESS SPECIFIC OPTIONS" },
 //	{ "newui;nu",                   "1",    OPTION_BOOLEAN,		"use the new MESS UI" },
-	{ "threads;thr",				"0",	0,					"number of threads to use for parallel operations" },
 	{ "natural;nat",				"0",	OPTION_BOOLEAN,		"specifies whether to use a natural keyboard or not" },
 	{ NULL }
 };
@@ -41,7 +40,6 @@ void osd_mess_options_init(void)
 
 void sdl_mess_options_parse(void)
 {
-	win_task_count = options_get_int(mame_options(), "threads");
 	win_use_natural_keyboard = options_get_bool(mame_options(), "natural");
 }
 
