@@ -40,6 +40,9 @@ System Driver Changes:
 
 - [MSX] Fixed MSX visible area.  [MJSTY]
 
+- [ODYSSEY2] Major update: banked carts, drawing, and hardware collision
+  detection now all work much better.  [telengard]
+
 - [SMS] Drivers have been split up to support specific hardware versions:
   sms and smspal still exist; smsj21 has been renamed to smsj; sms1,
   sms1pal, and sg1000m3 have been added. Support for the prototype bios has
