@@ -69,7 +69,7 @@ static int msx_dsk_image_readfile(imgtool_image *img, const char *fname, imgtool
 IMAGEMODULE(
 	msx_img,
 	"MSX .img diskimage",				/* human readable name */
-	"img\0",							/* file extension */
+	"img",								/* file extension */
 	NULL,								/* crcfile */
 	NULL,								/* crc system name */
 	NULL,								/* eoln */
@@ -94,7 +94,7 @@ IMAGEMODULE(
 IMAGEMODULE(
 	msx_ddi,
 	"MSX DiskDupe .ddi diskimage",		/* human readable name */
-	"ddi\0",							/* file extension */
+	"ddi",								/* file extension */
 	NULL,								/* crcfile */
 	NULL,								/* crc system name */
 	NULL,								/* eoln */
@@ -118,8 +118,8 @@ IMAGEMODULE(
 
 IMAGEMODULE(
 	msx_msx,
-	"MSX .msx diskimage",		/* human readable name */
-	"ddi\0",							/* file extension */
+	"MSX .msx diskimage",				/* human readable name */
+	"ddi",								/* file extension */
 	NULL,								/* crcfile */
 	NULL,								/* crc system name */
 	NULL,								/* eoln */
@@ -144,7 +144,7 @@ IMAGEMODULE(
 IMAGEMODULE(
 	msx_mul,
 	"MSX multi disk image",				/* human readable name */
-	"dsk\0",							/* file extension */
+	"dsk",								/* file extension */
 	NULL,								/* crcfile */
 	NULL,								/* crc system name */
 	NULL,								/* eoln */
