@@ -846,7 +846,7 @@ ROM_START(exidy)
 	ROM_LOAD("exmo1-1.dat", 0x0e000, 0x0800, CRC(ac924f67) SHA1(72fcad6dd1ed5ec0527f967604401284d0e4b6a1))
 	ROM_LOAD("exmo1-2.dat", 0x0e800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be))
 
-	ROM_CART_LOAD(0, "rom\0", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
 
 //	ROM_LOAD_OPTIONAL("exsb1-1.dat", 0x0c000, 0x0800, CRC(1dd20d80) SHA1(dd34364ca1a35caa7255b18e6c953f6df664cc74))
 //	ROM_LOAD_OPTIONAL("exsb1-2.dat", 0x0c800, 0x0800, CRC(1068a3f8) SHA1(6395f2c9829d537d68b75a750acbf27145f1bbad))
@@ -869,7 +869,7 @@ ROM_START(exidyd)
 	ROM_LOAD("exmo1-2.dat", 0x0e800, 0x0800, CRC(ead1d0f6) SHA1(c68bed7344091bca135e427b4793cc7d49ca01be))
 
 	/* cart */
-	ROM_CART_LOAD(0, "rom\0", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD(0, "rom", 0xc000, 0x2000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 static void exidy_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)

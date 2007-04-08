@@ -256,20 +256,20 @@ MACHINE_DRIVER_END
 ROM_START (coleco)
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "coleco.rom", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
-	ROM_CART_LOAD(0, "rom\0col\0bin\0", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecoa)
     // differences to 0x3aa93ef3 modified characters, added a pad 2 related fix
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "colecoa.rom", 0x0000, 0x2000, CRC(39bb16fc) SHA1(99ba9be24ada3e86e5c17aeecb7a2d68c5edfe59) )
-	ROM_CART_LOAD(0, "rom\0col\0bin\0", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START (colecob)
     ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "svi603.rom", 0x0000, 0x2000, CRC(19e91b82) SHA1(8a30abe5ffef810b0f99b86db38b1b3c9d259b78) )
-	ROM_CART_LOAD(0, "rom\0col\0bin\0", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD(0, "rom,col,bin", 0x8000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 static void coleco_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)

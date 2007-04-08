@@ -542,7 +542,7 @@ MACHINE_DRIVER_END
 
 ROM_START(svision)
 	ROM_REGION(0x20000, REGION_USER1, 0)
-	ROM_CART_LOAD(0, "bin\0ws\0sv\0", 0x0000, 0x20000, ROM_MIRROR)
+	ROM_CART_LOAD(0, "bin,ws,sv", 0x0000, 0x20000, ROM_MIRROR)
 ROM_END
 
 #define rom_svisions rom_svision

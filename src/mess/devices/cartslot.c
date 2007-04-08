@@ -164,9 +164,8 @@ void cartslot_device_getinfo(const device_class *devclass, UINT32 state, union d
 {
 	const rom_entry *romrgn, *roment;
 	int position, count = 0, must_be_loaded = 0;
-	const char *file_extensions = "bin\0";
+	const char *file_extensions = "bin";
 	UINT32 flags;
-	int i;
 
 	/* try to find ROM_CART_LOADs in the ROM declaration */
 	romrgn = rom_first_region(devclass->gamedrv);
@@ -216,15 +215,7 @@ void cartslot_device_getinfo(const device_class *devclass, UINT32 state, union d
 		case DEVINFO_STR_DEV_FILE:					strcpy(info->s = device_temp_str(), __FILE__); break;
 		case DEVINFO_STR_FILE_EXTENSIONS:
 			info->s = device_temp_str();
-			info->s[0] = '\0';
-			i = 0;
-			while(file_extensions[i])
-			{
-				if (info->s[0])
-					strcat(info->s, ",");
-				strcat(info->s, &file_extensions[i]);
-				i += strlen(&file_extensions[i]) + 1;
-			}
+			strcpy(info->s, file_extensions);
 			break;
 	}
 }
