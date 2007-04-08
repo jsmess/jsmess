@@ -732,7 +732,6 @@ static imgtoolerr_t setup_openfilename_struct(OPENFILENAME *ofn, memory_pool *po
 	mess_pile pile;
 	const imgtool_module *default_module = NULL;
 	const imgtool_module *module = NULL;
-	const char *s;
 	TCHAR *filename;
 	TCHAR *filter;
 	TCHAR *initial_dir = NULL;
@@ -740,6 +739,7 @@ static imgtoolerr_t setup_openfilename_struct(OPENFILENAME *ofn, memory_pool *po
 	imgtool_module_features features;
 	DWORD filter_index = 0, current_index = 0;
 	const wimgtool_info *info;
+	int i;
 
 	info = get_wimgtool_info(window);
 	if (info->image)
@@ -771,24 +771,26 @@ static imgtoolerr_t setup_openfilename_struct(OPENFILENAME *ofn, memory_pool *po
 			pile_puts(&pile, module->description);
 			pile_puts(&pile, " (");
 
-			s = module->extensions;
-			while(*s)
+			for (i = 0; module->extensions[i]; i++)
 			{
-				if (s != module->extensions)
+				if (module->extensions[i] == ',')
 					pile_putc(&pile, ';');
-				pile_printf(&pile, "*.%s", s);
-				s += strlen(s) + 1;
+				if ((i == 0) || (module->extensions[i] == ','))
+					pile_printf(&pile, "*.");
+				if (module->extensions[i] != ',')
+					pile_putc(&pile, module->extensions[i]);
 			}
 			pile_putc(&pile, ')');
 			pile_putc(&pile, '\0');
 
-			s = module->extensions;
-			while(*s)
+			for (i = 0; module->extensions[i]; i++)
 			{
-				if (s != module->extensions)
+				if (module->extensions[i] == ',')
 					pile_putc(&pile, ';');
-				pile_printf(&pile, "*.%s", s);
-				s += strlen(s) + 1;
+				if ((i == 0) || (module->extensions[i] == ','))
+					pile_printf(&pile, "*.");
+				if (module->extensions[i] != ',')
+					pile_putc(&pile, module->extensions[i]);
 			}
 
 			pile_putc(&pile, '\0');

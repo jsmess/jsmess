@@ -803,11 +803,13 @@ static int add_filter_entry(char *dest, size_t dest_len, const char *description
 static void build_generic_filter(const struct IODevice *dev, int is_save, char *filter, size_t filter_len)
 {
 	char *s;
+	const char *file_extensions;
 
 	s = filter;
 
 	// common image types
-	s += add_filter_entry(filter, filter_len, "Common image types", dev->file_extensions);
+	file_extensions = device_get_info_string(&dev->devclass, DEVINFO_STR_FILE_EXTENSIONS);
+	s += add_filter_entry(filter, filter_len, "Common image types", file_extensions);
 
 	// all files
 	s += sprintf(s, "All files (*.*)|*.*|");
