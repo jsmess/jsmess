@@ -20,7 +20,7 @@ ADDRESS_MAP_START( odyssey2_mem , ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( odyssey2_io , ADDRESS_SPACE_IO, 8)
-	AM_RANGE( 0x00,		 0xff)		AM_READWRITE(	  odyssey2_bus_r, odyssey2_bus_w)
+	AM_RANGE( 0x00,		 0xff)		AM_READWRITE( odyssey2_bus_r, odyssey2_bus_w)
 	AM_RANGE( I8039_p1,	 I8039_p1)	AM_READWRITE( odyssey2_getp1, odyssey2_putp1 )
 	AM_RANGE( I8039_p2,	 I8039_p2)	AM_READWRITE( odyssey2_getp2, odyssey2_putp2 )
 	AM_RANGE( I8039_bus, I8039_bus)	AM_READWRITE( odyssey2_getbus, odyssey2_putbus )
@@ -138,8 +138,8 @@ static gfx_layout odyssey2_spritelayout =
 
 static gfx_decode odyssey2_gfxdecodeinfo[] =
 {
-    { REGION_GFX1, 0x0000, &odyssey2_graphicslayout,                     0, 2 },
-    { REGION_GFX1, 0x0000, &odyssey2_spritelayout,                     0, 2 },
+    { REGION_GFX1, 0x0000, &odyssey2_graphicslayout, 0, 2 },
+    { REGION_GFX1, 0x0000, &odyssey2_spritelayout,   0, 2 },
     { -1 } /* end of array */
 };
 
@@ -185,8 +185,24 @@ ROM_START (odyssey2)
 	ROM_CART_LOAD(0, "bin", 0x0000, 0x2000, ROM_MIRROR)
 ROM_END
 
+static void odyssey2_cartslot_device_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cartslot */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_VERIFY:						info->imgverify = odyssey2_cart_verify; break;
+
+		default:										cartslot_device_getinfo(devclass, state, info); break;
+	}
+}
+
 SYSTEM_CONFIG_START(odyssey2)
-	CONFIG_DEVICE(cartslot_device_getinfo)
+	CONFIG_DEVICE(odyssey2_cartslot_device_getinfo)
 SYSTEM_CONFIG_END
 
 /*     YEAR  NAME      PARENT	COMPAT	MACHINE   INPUT     INIT      CONFIG    COMPANY     FULLNAME     FLAGS */

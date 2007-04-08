@@ -10,7 +10,6 @@
 #include "video/generic.h"
 #include "includes/odyssey2.h"
 
-
 /* character sprite colors
    dark grey, red, green, orange, blue, violet, light grey, white
    dark back / grid colors
@@ -31,7 +30,6 @@ UINT8 odyssey2_colors[] =
 	0xFF,0xFF,0xFF,
 
 	/* Background,Grid Bright */
-
 	0x80,0x80,0x80,
 	0x50,0xAE,0xFF,   /* Blue */
 	0x00,0xFF,0x00,   /* Dk Green */
@@ -118,7 +116,6 @@ UINT8 o2_shape[0x40][8]={
     { 0x00,0x00,0x00,0x10,0x38,0xFF,0x7E,0x00 }
 };
 
-
 static UINT8 *odyssey2_display;
 int odyssey2_vh_hpos;
 
@@ -152,16 +149,19 @@ union {
     } s;
 } o2_vdc= { { 0 } };
 
-static UINT8 collision;
+static UINT8 collision[8];    /* only 7 used but easier to index */
 static int line;
 static double line_time;
 static UINT32 o2_snd_shift[2];
+static UINT8 x_beam_pos;
+static UINT8 y_beam_pos;
 
 /***************************************************************************
 
   Start the video hardware emulation.
 
 ***************************************************************************/
+
 VIDEO_START( odyssey2 )
 {
 	o2_snd_shift[0] = Machine->sample_rate / 983;
@@ -173,11 +173,40 @@ VIDEO_START( odyssey2 )
 	return 0;
 }
 
-/***************************************************************************
+INLINE int get_horiz_clock_beam_pos( void )
+{
+    int h;
+    h = (int)((timer_get_time() - line_time) * Machine->drv->cpu[0].cpu_clock) * 8;
 
-  Stop the video hardware emulation.
+    return h;
+}
 
-***************************************************************************/
+INLINE int get_horiz_clock( void )
+{
+    int h;
+    h = (int)((timer_get_time() - line_time) * Machine->drv->cpu[0].cpu_clock);
+
+    return h;
+}
+
+INLINE int horiz_scan_active( void )
+{
+    int h;
+    h = get_horiz_clock();
+
+    if ( h > 15 )
+        return 1;
+
+    return 0;
+}
+
+INLINE int in_vblank( void )
+{
+    if ((line > 239) && (line < 262))
+        return 1;
+
+    return 0;
+}
 
 PALETTE_INIT( odyssey2 )
 {
@@ -186,40 +215,118 @@ PALETTE_INIT( odyssey2 )
 	colortable[1] = 1;
 }
 
-extern  READ8_HANDLER ( odyssey2_video_r )
+extern READ8_HANDLER( odyssey2_video_r )
 {
-    UINT8 data=0;
-    int h;
-    switch (offset) {
-    case 0xa1: 
-	h=(int)((timer_get_time()-line_time)*Machine->drv->cpu[0].cpu_clock);
-	if (h>15) data|=1;
-	if ((line>240)&&(line<260)) data|=8;
-	break;
-    case 0xa2: data=collision;break;
-    case 0xa4: data=line;break;
-    case 0xa5:
-	data=(int)((timer_get_time()-line_time)*Machine->drv->cpu[0].cpu_clock)*8;
-	break;
-    default:
-	data=o2_vdc.reg[offset];
+    UINT8 data = 0;
+    int bit, i;
+
+    switch (offset) 
+    {
+        case 0xa1: 
+
+            if (horiz_scan_active())     /* horiz scan active */
+                data |= 1;
+
+            if (in_vblank())             /* bit goes high @ vblank */
+                data |= 8;
+
+            break;
+
+        case 0xa2: 
+
+            bit = 0x01;
+
+            for (i = 0; i < 8; i++)
+            {
+                /* o2_vdc.s.collision at this point has the requested bit(s)
+                 * to test the current collisions against.  TODO: Sometimes
+                 * $A2 has more than one bit set.  What are the correct semantics 
+                 * of that when reading back?  For now having an entire byte
+                 * for each graphics object that can collide is working.
+                 */
+
+                if (bit & o2_vdc.s.collision) 
+                {
+                    if (collision[COLLISION_SPRITE_0] & bit) 
+                        data |= (collision[COLLISION_SPRITE_0_IND] & ~bit);
+                    if (collision[COLLISION_SPRITE_1] & bit) 
+                        data |= (collision[COLLISION_SPRITE_1_IND] & ~bit);
+                    if (collision[COLLISION_SPRITE_2] & bit) 
+                        data |= (collision[COLLISION_SPRITE_2_IND] & ~bit);
+                    if (collision[COLLISION_SPRITE_3] & bit) 
+                        data |= (collision[COLLISION_SPRITE_3_IND] & ~bit);
+                    if (collision[COLLISION_VERTICAL_GRID] & bit) 
+                        data |= (collision[COLLISION_VERTICAL_GRID_IND] & ~bit);
+                    if (collision[COLLISION_HORIZ_GRID_DOTS] & bit) 
+                        data |= (collision[COLLISION_HORIZ_GRID_DOTS_IND] & ~bit);
+                    if (collision[COLLISION_CHARACTERS] & bit) 
+                        data |= (collision[COLLISION_CHARACTERS_IND] & ~bit);
+                }
+
+                bit <<= 1;
+            }
+
+            break;
+
+        case 0xa4: 
+
+            if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+                y_beam_pos = line;
+
+            data = y_beam_pos;
+
+            break;
+
+
+        case 0xa5:
+
+            if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+                x_beam_pos = get_horiz_clock_beam_pos();
+
+            data = x_beam_pos;
+
+            break;
+
+        default:
+            data = o2_vdc.reg[offset];
     }
+
     return data;
 }
 
-extern WRITE8_HANDLER ( odyssey2_video_w )
+extern WRITE8_HANDLER( odyssey2_video_w )
 {
 	/* Update the sound */
 	if( offset >= 0xa7 && offset <= 0xaa )
 		stream_update( odyssey2_sh_channel );
 
-	o2_vdc.reg[offset]=data;
+    if (offset == 0xa0)
+    {
+        if (    o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY 
+             && !(data & VDC_CONTROL_REG_STROBE_XY))
+        {
+            /* Toggling strobe bit, tuck away values */
+            x_beam_pos = get_horiz_clock_beam_pos(); 
+            y_beam_pos = line;
+
+            /* This is wrong but more games work with it, TODO: Figure
+             * out correct change.  Maybe update the screen here??
+             * It seems what happens is 0x0 is written to $A0 just before 
+             * VLBANK (video update) so no screen updates happen.
+             */
+
+            return;
+        }
+    }
+
+    o2_vdc.reg[offset] = data;
 }
 
-extern  READ8_HANDLER ( odyssey2_t1_r )
+extern READ8_HANDLER( odyssey2_t1_r )
 {
-    static int t=FALSE;
-    t=!t;
+    static int t = FALSE;
+
+    t = !t;
     return t;
 }
 
@@ -228,27 +335,28 @@ INTERRUPT_GEN( odyssey2_line )
     line_time = timer_get_time();
     line = (line + 1) % 262;
 
-    switch (line) {
-    case 252:
-		cpunum_set_input_line(0, 0, ASSERT_LINE); /* vsync?? */
-		break;
-    case 253:
-		cpunum_set_input_line(0, 0, CLEAR_LINE); /* vsync?? */
-		break;
+    switch (line) 
+    {
+        case 252:
+            cpunum_set_input_line(0, 0, ASSERT_LINE); /* vsync?? */
+            break;
+        case 253:
+            cpunum_set_input_line(0, 0, CLEAR_LINE); /* vsync?? */
+            break;
     }
 }
 
-INLINE void odyssey2_draw_box(UINT8 bg[][320], int x, int y, int width, int height, UINT8 color)
+INLINE void odyssey2_draw_box(UINT8 bg[][320], int x, int y, int width, int height, UINT8 collision_id)
 {
     int x1,y1;
     for (y1 = 0; y1 < height; y1++)
 	{
 		for (x1 = 0; x1 < width; x1++)
-			bg[y+y1][x+x1] |= color;
+			bg[y+y1][x+x1] |= collision_id;
     }
 }
 
-INLINE void odyssey2_draw(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 color)
+INLINE void odyssey2_draw(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id)
 {
     int m,x1,y1;
     for (m=0x80; m>0; m>>=1, x+=scale_x)
@@ -258,14 +366,14 @@ INLINE void odyssey2_draw(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x
 			for (y1=0; y1<scale_y; y1++)
 			{
 				for (x1 = 0; x1 < scale_x; x1++)
-					bg[y+y1][x+x1] |= color;
+					bg[y+y1][x+x1] |= collision_id;
 			}
 		}
     }
 }
 
 // different bit ordering, maybe I should change rom
-INLINE void odyssey2_draw_sprite(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 color)
+INLINE void odyssey2_draw_sprite(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id)
 {
     int m,x1,y1;
     for (m=1; m<=0x80; m<<=1, x+=scale_x)
@@ -275,30 +383,81 @@ INLINE void odyssey2_draw_sprite(UINT8 bg[][320], UINT8 code, int x, int y, int 
 			for (y1=0; y1<scale_y; y1++)
 			{
 				for (x1 = 0; x1 < scale_x; x1++)
-					bg[y+y1][x+x1] |= color;
+					bg[y+y1][x+x1] |= collision_id;
 			}
 		}
+    }
+}
+
+INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
+{
+
+#define WIDTH  (16)
+#define HEIGHT (24)
+
+    // grid 8 points right compared to characters, sprites
+
+	int i, j, x, y;
+	int color;
+    int w = 2;
+
+    color  = o2_vdc.s.color & 7;
+    color |= (o2_vdc.s.color >> 3) & 8;
+
+    for (i=0, x=0; x<9; x++, i++) 
+    {
+        for (j=1, y=0; y<9; y++, j<<=1) 
+        {
+            if ( ((j<=0x80)&&(o2_vdc.s.hgrid[0][i]&j))
+                    ||((j>0x80)&&(o2_vdc.s.hgrid[1][i]&1)) )
+            {
+                odyssey2_draw_box(bg,8+x*WIDTH,24+y*HEIGHT, WIDTH,3, COLLISION_HORIZ_GRID_DOTS);
+                plot_box(bitmap,8+x*WIDTH,24+y*HEIGHT,WIDTH,3,Machine->pens[color]);
+            }
+        }
+    }
+
+    if (o2_vdc.s.control & 0x80) 
+        w=WIDTH;
+
+    for (i=0, x=0; x<10; x++, i++) 
+    {
+        for (j=1, y=0; y<8; y++, j<<=1)
+        {
+            if (o2_vdc.s.vgrid[i] & j) 
+            {
+                odyssey2_draw_box(bg,8+x*WIDTH,24+y*HEIGHT,w,HEIGHT, COLLISION_VERTICAL_GRID);
+                plot_box(bitmap,8+x*WIDTH,24+y*HEIGHT,w,HEIGHT,Machine->pens[color]);
+            }
+        }
     }
 }
 
 INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int y, int ptr, int color)
 {
     int n, i;
-    int offset=ptr|((color&1)<<8);
-    offset=(offset+(y>>1))&0x1ff;
-    Machine->gfx[0]->colortable[1]=Machine->pens[16+((color&0xe)>>1)];
+    int offset = ptr | ((color & 1) << 8);
+
+    offset=(offset + (y >> 1)) & 0x1ff;
+    Machine->gfx[0]->colortable[1]=Machine->pens[16 + ((color & 0xe) >> 1)];
 
     // don't ask me about the technical background, but also this height thingy is needed
     // invaders aliens (!) and shoot (-)
-    n = 8-(ptr&7)-((y>>1)&7);
-    if (n<3) n+=7;
-    for (i=0; i<n; i++) {
-	if (y+i*2>=bitmap->height) break;		
-	odyssey2_draw(bg, ((char*)o2_shape)[offset], x, y+i*2, 1, 2, 0x80);
-	drawgfxzoom(bitmap, Machine->gfx[0], ((char*)o2_shape)[offset],0,
-		    0,0,x,y+i*2,
-		    0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);	
-	offset=(offset+1)&0x1ff;
+    n = 8 - (ptr & 7) - ((y >> 1) & 7);
+
+    if (n < 3) 
+        n += 7;
+
+    for (i=0; i<n; i++) 
+    {
+        if (y + i * 2 >= bitmap->height )
+            break;		
+
+        odyssey2_draw(bg, ((char*)o2_shape)[offset], x, y+i*2, 1, 2, COLLISION_CHARACTERS);
+        drawgfxzoom(bitmap, Machine->gfx[0], ((char*)o2_shape)[offset],0,
+                0,0,x,y+i*2,
+                0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);	
+        offset=(offset+1) & 0x1ff;
     }
 }
 
@@ -311,78 +470,59 @@ INLINE void odyssey2_draw_char(mame_bitmap *bitmap, UINT8 bg[][320], int x, int 
 VIDEO_UPDATE( odyssey2 )
 {
 	int i, j, x, y;
-	int color;
 	UINT8 bg[300][320]= { { 0 } };
 
-	assert(bitmap->width<=ARRAY_LENGTH(bg[0])
-		&& bitmap->height<=ARRAY_LENGTH(bg));
+	assert(bitmap->width<=ARRAY_LENGTH(bg[0]) && bitmap->height<=ARRAY_LENGTH(bg));
 
-	plot_box(bitmap, 0, 0, bitmap->width, bitmap->height, Machine->pens[(o2_vdc.s.color>>3)&0x7]);
-	if (o2_vdc.s.control & 8)
+	plot_box( bitmap, 0, 0, bitmap->width, bitmap->height, Machine->pens[(o2_vdc.s.color >> 3) & 0x7] );
+
+	if (o2_vdc.s.control & 0x08)        /* show grid */
+        odyssey2_draw_grid(bitmap, bg);
+
+    if (o2_vdc.s.control & 0x20)        /* show foreground objects */
 	{
-		// grid 8 points right compared to characters, sprites
-#define WIDTH 16
-#define HEIGHT 24
-		int w=2;
-		color=o2_vdc.s.color&7;
-		color|=(o2_vdc.s.color>>3)&8;
-		for (i=0, x=0; x<9; x++, i++) {
-			for (j=1, y=0; y<9; y++, j<<=1) {
-				if ( ((j<=0x80)&&(o2_vdc.s.hgrid[0][i]&j))
-						||((j>0x80)&&(o2_vdc.s.hgrid[1][i]&1)) )
-				{
-					odyssey2_draw_box(bg,8+x*WIDTH,24+y*HEIGHT, WIDTH,3, 0x20);
-					plot_box(bitmap,8+x*WIDTH,24+y*HEIGHT,WIDTH,3,Machine->pens[color]);
-				}
-		    }
-		}
-		if (o2_vdc.s.control&0x80) w=WIDTH;
-		for (i=0, x=0; x<10; x++, i++) {
-			for (j=1, y=0; y<8; y++, j<<=1)
-			{
-				if (o2_vdc.s.vgrid[i]&j) {
-				    odyssey2_draw_box(bg,8+x*WIDTH,24+y*HEIGHT,w,HEIGHT, 0x10);
-				    plot_box(bitmap,8+x*WIDTH,24+y*HEIGHT,w,HEIGHT,Machine->pens[color]);
-				}
-			}
-		}
-    }
-    if (o2_vdc.s.control&0x20)
-	{
-		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.foreground); i++) {
-			odyssey2_draw_char(bitmap,bg,
+		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.foreground); i++) 
+        {
+			odyssey2_draw_char(bitmap, bg,
 				o2_vdc.s.foreground[i].x, o2_vdc.s.foreground[i].y,
 				o2_vdc.s.foreground[i].ptr, o2_vdc.s.foreground[i].color);
 		}
+
 		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.quad); i++)
 		{
 			x=o2_vdc.s.quad[i].single[0].x;
 			for (j=0; j<ARRAY_LENGTH(o2_vdc.s.quad[0].single); j++, x+=2*8)
 			{
-				odyssey2_draw_char(bitmap,bg,
+				odyssey2_draw_char(bitmap, bg,
 					x, y=o2_vdc.s.quad[i].single[0].y,
 					o2_vdc.s.quad[i].single[j].ptr, o2_vdc.s.quad[i].single[j].color);
 			}
 		}
+
 		for (i=0; i<ARRAY_LENGTH(o2_vdc.s.sprites); i++)
 		{
 			Machine->gfx[0]->colortable[1]=Machine->pens[16+((o2_vdc.s.sprites[i].color>>3)&7)];
+
 			y=o2_vdc.s.sprites[i].y;
 			x=o2_vdc.s.sprites[i].x;
+
 			for (j=0; j<8; j++)
 			{
-				if (o2_vdc.s.sprites[i].color&4)
+				if (o2_vdc.s.sprites[i].color & 4)
 				{
-					if (y+4*j>=bitmap->height) break;
-					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*4, 2, 4, 1<<i);
+					if (y+4*j>=bitmap->height) 
+                        break;
+					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*4, 2, 4, 1<<i);    /* 1 << i is sprite collision index */
 					drawgfxzoom(bitmap, Machine->gfx[1], o2_vdc.s.shape[i][j],0,
 						0,0,x,y+j*4,
 						0, TRANSPARENCY_PEN,0,0x20000, 0x40000);
 				}
+
 				else
 				{
-					if (y+j*2>=bitmap->height) break;
-					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*2, 1, 2, 1<<i);
+					if (y+j*2>=bitmap->height) 
+                        break;
+					odyssey2_draw_sprite(bg, o2_vdc.s.shape[i][j], x, y+j*2, 1, 2, 1<<i);    /* 1 << i is sprite collision index */
 					drawgfxzoom(bitmap, Machine->gfx[1], o2_vdc.s.shape[i][j],0,
 						0,0,x,y+j*2,
 						0, TRANSPARENCY_PEN,0, 0x10000, 0x20000);
@@ -390,27 +530,38 @@ VIDEO_UPDATE( odyssey2 )
 			}
 		}
 	}
-	collision=0;
-//	for (y=0; y<bitmap->height; y++) {
-//		for (x=0; x<bitmap->width; x++) {
+
+	memset( collision, 0, sizeof( collision ) );
+
 	for (y=0; y<300; y++)
 	{
 		for (x=0; x<320; x++)
 		{
-			switch (bg[y][x]) {
-			case 0: case 1: case 2: case 4: case 8:
-			case 0x10: case 0x20: case 0x80:
-				break;
+			switch (bg[y][x]) 
+            {
+                case 0: case 1: case 2: case 4: case 8:
+                case 0x10: case 0x20: case 0x80:
+                    /* Only one collidable entity in this spot, no collision to mark */
+                    break;
 
-			default:
-				if (bg[y][x]&o2_vdc.s.collision)
-				{
-				    collision|=bg[y][x]&(~o2_vdc.s.collision);
-				}
-				break;
+                default:
+                    if (bg[y][x] & o2_vdc.s.collision)
+                    {
+                        int bit = 0x01;
+
+                        for (i = 0; i < 8; i++)
+                        {
+                            if ( bit & o2_vdc.s.collision )
+                                collision[i] |= bg[y][x] & ~bit;
+
+                            bit <<= 1;
+                        }
+                    }
+                    break;
 			}
 		}
 	}
+
 	return 0;
 }
 
