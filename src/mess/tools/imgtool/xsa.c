@@ -34,7 +34,7 @@ static int xsa_image_readfile(imgtool_image *img, const char *fname, imgtool_str
 IMAGEMODULE(
 	xsa,
 	"XelaSoft Archive",				/* human readable name */
-	"xsa\0",						/* file extension */
+	"xsa",							/* file extension */
 	NULL,							/* crcfile */
 	NULL,							/* crc system name */
 	NULL,							/* eoln */

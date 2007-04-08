@@ -299,7 +299,7 @@ ROM_END
 
 SYSTEM_CONFIG_START(nascom)
 #ifdef CART
-	CONFIG_DEVICE_CARTSLOT_REQ(1, "nas\0bin\0", nascom1_init_cartridge, NULL, NULL)
+	CONFIG_DEVICE_CARTSLOT_REQ(1, "nas,bin", nascom1_init_cartridge, NULL, NULL)
 #endif
 SYSTEM_CONFIG_END
 

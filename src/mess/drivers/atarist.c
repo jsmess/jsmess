@@ -2335,7 +2335,7 @@ void atarist_floppy_exit(int id)
 /***************************************************************************/
 
 SYSTEM_CONFIG_START(atarist)
-	CONFIG_DEVICE_LEGACY(IO_FLOPPY, 1, "st\0msa\0", DEVICE_LOAD_RESETS_NONE, OSD_FOPEN_RW_CREATE_OR_READ,
+	CONFIG_DEVICE_LEGACY(IO_FLOPPY, 1, "st,msa", DEVICE_LOAD_RESETS_NONE, OSD_FOPEN_RW_CREATE_OR_READ,
 		atarist_floppy_init, atarist_floppy_exit, floppy_status)
 SYSTEM_CONFIG_END
 

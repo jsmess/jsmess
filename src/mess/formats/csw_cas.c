@@ -311,7 +311,7 @@ static casserr_t csw_cassette_load( cassette_image *cassette ) {
 }
 
 struct CassetteFormat csw_cassette_format = {
-	"csw\0",
+	"csw",
 	csw_cassette_identify,
 	csw_cassette_load,
 	NULL

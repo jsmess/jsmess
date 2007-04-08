@@ -1624,7 +1624,7 @@ void thom_fd_basic_get_info(const imgtool_class *clas,
 	    "Thomson .fd disk image, BASIC format" );
     break;
   case IMGTOOLINFO_STR_FILE_EXTENSIONS:
-    strcpy( info->s = imgtool_temp_str(), "fd\0" ); break;
+    strcpy( info->s = imgtool_temp_str(), "fd" ); break;
   case IMGTOOLINFO_PTR_OPEN:
     info->open = thom_open_fd_qd; break;
   case IMGTOOLINFO_PTR_CLOSE:
@@ -1648,7 +1648,7 @@ void thom_qd_basic_get_info(const imgtool_class *clas,
 	    "Thomson .qd disk image, BASIC format" );
     break;
   case IMGTOOLINFO_STR_FILE_EXTENSIONS:
-    strcpy( info->s = imgtool_temp_str(), "qd\0" ); break;
+    strcpy( info->s = imgtool_temp_str(), "qd" ); break;
   case IMGTOOLINFO_PTR_OPEN:
     info->open = thom_open_fd_qd; break;
   case IMGTOOLINFO_PTR_CLOSE:
@@ -1672,7 +1672,7 @@ void thom_sap_basic_get_info(const imgtool_class *clas,
 	    "Thomson .sap disk image, BASIC format" );
     break;
   case IMGTOOLINFO_STR_FILE_EXTENSIONS:
-    strcpy( info->s = imgtool_temp_str(), "sap\0" ); break;
+    strcpy( info->s = imgtool_temp_str(), "sap" ); break;
   case IMGTOOLINFO_PTR_OPEN:
     info->open = thom_open_sap; break;
   case IMGTOOLINFO_PTR_CLOSE:

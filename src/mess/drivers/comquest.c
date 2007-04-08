@@ -319,7 +319,7 @@ ROM_START(comquest)
 ROM_END
 
 SYSTEM_CONFIG_START(comquest)
-	/*CONFIG_DEVICE_CARTSLOT_REQ( 1, "bin\0", a2600_load_rom, NULL, NULL)*/
+	/*CONFIG_DEVICE_CARTSLOT_REQ( 1, "bin", a2600_load_rom, NULL, NULL)*/
 SYSTEM_CONFIG_END
 
 /***************************************************************************
