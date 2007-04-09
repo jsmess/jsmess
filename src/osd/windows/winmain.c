@@ -33,10 +33,6 @@
 #include "strconv.h"
 #include "winutil.h"
 
-#ifdef MESS
-#include "parallel.h"
-#endif
-
 #define ENABLE_PROFILER		0
 #define DEBUG_SLOW_LOCKS	0
 
@@ -243,11 +239,6 @@ int osd_init(running_machine *machine)
 
 	if (result == 0)
 		winoutput_init(machine);
-
-#ifdef MESS
-	if (result == 0)
-		result = win_parallel_init();
-#endif
 
 	if (options_get_bool(mame_options(), WINOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);

@@ -19,10 +19,6 @@
 #include "render.h"
 #include "messopts.h"
 
-#ifdef WIN32
-#include "parallel.h"
-#endif
-
 #ifdef MAME_DEBUG
 #include "debug/debugcpu.h"
 #endif /* MAME_DEBUG */
