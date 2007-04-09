@@ -216,33 +216,6 @@ int osd_select_file(mess_image *img, char *filename);
 int osd_keyboard_disabled(void);
 
 
-
-/******************************************************************************
-
-  Parallel processing (for SMP)
-
-******************************************************************************/
-
-/* 
-  Called by core to distribute tasks across multiple processors.  When this is
-  called, there will be 1 to max_tasks invocations of task(); where task_count
-  specifies the number of calls, and task_num is a number from zero to
-  task_count-1 to specify which call was made.  This can be used to subdivide
-  tasks across mulitple processors.
-
-  If max_tasks<1, then it should be treated as if it was 1
-
-  A bogus implementation would look like this:
-
-	void osd_parallelize(void (*task)(void *param, int task_num, int
-		task_count), void *param, int max_tasks)
-	{
-		task(param, 0, 1);
-	}
-*/
-
-void osd_parallelize(void (*task)(void *param, int task_num, int task_count), void *param, int max_tasks);
-
 /******************************************************************************
 
   Device and file browsing

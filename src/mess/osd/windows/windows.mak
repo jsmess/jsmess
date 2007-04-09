@@ -33,7 +33,6 @@ $(LIBOSD): $(OSDOBJS)
 OSDCOREOBJS += \
 	$(OBJ)/mess/osd/windows/winmess.o	\
 	$(OBJ)/mess/osd/windows/winutils.o	\
-	$(OBJ)/mess/osd/windows/parallel.o	\
 	$(OBJ)/mess/osd/windows/glob.o
 
 $(LIBOCORE): $(OSDCOREOBJS)

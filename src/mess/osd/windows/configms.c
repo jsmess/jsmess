@@ -12,7 +12,6 @@
 // MESS headers
 #include "driver.h"
 #include "windows/config.h"
-#include "parallel.h"
 #include "menu.h"
 #include "device.h"
 #include "configms.h"
@@ -30,7 +29,6 @@ static const options_entry win_mess_opts[] =
 {
 	{ NULL,							NULL,   OPTION_HEADER,		"WINDOWS MESS SPECIFIC OPTIONS" },
 	{ "newui;nu",                   "1",    OPTION_BOOLEAN,		"use the new MESS UI" },
-	{ "threads;thr",				"0",	0,					"number of threads to use for parallel operations" },
 	{ "natural;nat",				"0",	OPTION_BOOLEAN,		"specifies whether to use a natural keyboard or not" },
 	{ NULL }
 };
