@@ -7,7 +7,6 @@
 // MESS headers
 #include "driver.h"
 #include "windows/config.h"
-#include "parallel.h"
 #include "menu.h"
 #include "device.h"
 #include "configms.h"
