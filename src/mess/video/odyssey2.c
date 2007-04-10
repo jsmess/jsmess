@@ -224,10 +224,10 @@ extern READ8_HANDLER( odyssey2_video_r )
     {
         case 0xa1: 
 
-            if (horiz_scan_active())     /* horiz scan active */
+            if (horiz_scan_active())
                 data |= 1;
 
-            if (in_vblank())             /* bit goes high @ vblank */
+            if (in_vblank())
                 data |= 8;
 
             break;
@@ -246,22 +246,7 @@ extern READ8_HANDLER( odyssey2_video_r )
                  */
 
                 if (bit & o2_vdc.s.collision) 
-                {
-                    if (collision[COLLISION_SPRITE_0] & bit) 
-                        data |= (collision[COLLISION_SPRITE_0_IND] & ~bit);
-                    if (collision[COLLISION_SPRITE_1] & bit) 
-                        data |= (collision[COLLISION_SPRITE_1_IND] & ~bit);
-                    if (collision[COLLISION_SPRITE_2] & bit) 
-                        data |= (collision[COLLISION_SPRITE_2_IND] & ~bit);
-                    if (collision[COLLISION_SPRITE_3] & bit) 
-                        data |= (collision[COLLISION_SPRITE_3_IND] & ~bit);
-                    if (collision[COLLISION_VERTICAL_GRID] & bit) 
-                        data |= (collision[COLLISION_VERTICAL_GRID_IND] & ~bit);
-                    if (collision[COLLISION_HORIZ_GRID_DOTS] & bit) 
-                        data |= (collision[COLLISION_HORIZ_GRID_DOTS_IND] & ~bit);
-                    if (collision[COLLISION_CHARACTERS] & bit) 
-                        data |= (collision[COLLISION_CHARACTERS_IND] & ~bit);
-                }
+                    data |= (collision[i] & ~bit);
 
                 bit <<= 1;
             }
@@ -376,6 +361,7 @@ INLINE void odyssey2_draw(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x
 INLINE void odyssey2_draw_sprite(UINT8 bg[][320], UINT8 code, int x, int y, int scale_x, int scale_y, UINT8 collision_id)
 {
     int m,x1,y1;
+
     for (m=1; m<=0x80; m<<=1, x+=scale_x)
 	{
 		if (code & m)
@@ -391,15 +377,13 @@ INLINE void odyssey2_draw_sprite(UINT8 bg[][320], UINT8 code, int x, int y, int 
 
 INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
 {
-
-#define WIDTH  (16)
-#define HEIGHT (24)
-
-    // grid 8 points right compared to characters, sprites
-
+    int width  = 16;
+    int height = 24;
 	int i, j, x, y;
 	int color;
     int w = 2;
+    int x_grid_offset = 8;
+    int y_grid_offset = 24;
 
     color  = o2_vdc.s.color & 7;
     color |= (o2_vdc.s.color >> 3) & 8;
@@ -411,14 +395,14 @@ INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
             if ( ((j<=0x80)&&(o2_vdc.s.hgrid[0][i]&j))
                     ||((j>0x80)&&(o2_vdc.s.hgrid[1][i]&1)) )
             {
-                odyssey2_draw_box(bg,8+x*WIDTH,24+y*HEIGHT, WIDTH,3, COLLISION_HORIZ_GRID_DOTS);
-                plot_box(bitmap,8+x*WIDTH,24+y*HEIGHT,WIDTH,3,Machine->pens[color]);
+                odyssey2_draw_box(bg, x_grid_offset + x * width, y_grid_offset + y * height, width + 2, 3, COLLISION_HORIZ_GRID_DOTS);
+                plot_box(bitmap, x_grid_offset + x * width, y_grid_offset + y * height, width + 2, 3, Machine->pens[color]);
             }
         }
     }
 
-    if (o2_vdc.s.control & 0x80) 
-        w=WIDTH;
+    if (o2_vdc.s.control & 0x80)        /* fill solid to end of next vert line */
+        w=width;
 
     for (i=0, x=0; x<10; x++, i++) 
     {
@@ -426,8 +410,8 @@ INLINE void odyssey2_draw_grid( mame_bitmap* bitmap, UINT8 bg[][320] )
         {
             if (o2_vdc.s.vgrid[i] & j) 
             {
-                odyssey2_draw_box(bg,8+x*WIDTH,24+y*HEIGHT,w,HEIGHT, COLLISION_VERTICAL_GRID);
-                plot_box(bitmap,8+x*WIDTH,24+y*HEIGHT,w,HEIGHT,Machine->pens[color]);
+                odyssey2_draw_box(bg, x_grid_offset + x * width, y_grid_offset + y * height, w, height, COLLISION_VERTICAL_GRID);
+                plot_box(bitmap, x_grid_offset + x * width, y_grid_offset + y * height, w, height, Machine->pens[color]);
             }
         }
     }
@@ -545,21 +529,19 @@ VIDEO_UPDATE( odyssey2 )
                     break;
 
                 default:
-                    if (bg[y][x] & o2_vdc.s.collision)
                     {
                         int bit = 0x01;
-
                         for (i = 0; i < 8; i++)
                         {
-                            if ( bit & o2_vdc.s.collision )
+                        if (bit & o2_vdc.s.collision && bit & bg[y][x])
                                 collision[i] |= bg[y][x] & ~bit;
 
                             bit <<= 1;
                         }
-                    }
                     break;
 			}
 		}
+	}
 	}
 
 	return 0;
