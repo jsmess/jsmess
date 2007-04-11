@@ -362,12 +362,8 @@ TESTDRIVER( c128dita )	/* Commodore 128D - PAL (italian) cost reduced set	*/
 	DRIVER( a1000n ) 	/* Commodore Amiga 1000 - NTSC						*/
 	DRIVER( cdtv )
 
-	DRIVER( c65 )		/* C65 / C64DX (Prototype, NTSC, 911001)			*/
-	DRIVER( c65e )		/* C65 / C64DX (Prototype, NTSC, 910828)			*/
-	DRIVER( c65d )		/* C65 / C64DX (Prototype, NTSC, 910626)			*/
-	DRIVER( c65c )		/* C65 / C64DX (Prototype, NTSC, 910523)			*/
-	DRIVER( c65ger )	/* C65 / C64DX (Prototype, German PAL, 910429)		*/
-	DRIVER( c65a )		/* C65 / C64DX (Prototype, NTSC, 910111)			*/
+	DRIVER( c65 )		/* 1991 C65 / C64DX (Prototype, NTSC)				*/
+	DRIVER( c64dx )		/* 1991 C65 / C64DX (Prototype, German PAL)			*/
 
 	/* IBM PC & Clones */
 	DRIVER( ibmpc )		/* 1982	IBM PC										*/
@@ -378,7 +374,7 @@ TESTDRIVER( bondwell )	/* 1985	Bondwell (CGA)								*/
 	DRIVER( europc )	/* 1988	Schneider Euro PC (CGA or Hercules)			*/
 
 	/* pc junior */
-TESTDRIVER( ibmpcjr )	/*      IBM PC Jr									*/
+TESTDRIVER( ibmpcjr )	/* 1984 IBM PC Jr									*/
 	DRIVER( t1000hx )	/* 1987 Tandy 1000HX (similiar to PCJr)				*/
 TESTDRIVER( t1000sx )	/* 1987 Tandy 1000SX (similiar to PCJr)				*/
 
@@ -404,18 +400,18 @@ TESTDRIVER( neat )		/* 1989	New Enhanced AT chipset, AMI BIOS			*/
 	DRIVER( at486 )		/* 19?? IBM AT 486									*/
 	DRIVER( at586 )		/* 19?? AT 586                          			*/
 
-	/* SINCLAIR */
-	DRIVER( zx80 )		/* Sinclair ZX-80						*/
-	DRIVER( zx81 )		/* Sinclair ZX-81						*/
+	/* SINCLAIR RESEARCH */
+	DRIVER( zx80 )		/* 1980 Sinclair ZX-80								*/
+	DRIVER( zx81 )		/* 1981 Sinclair ZX-81								*/
 	DRIVER( zx81a )		/* Sinclair ZX-81 (2nd rev)					*/
 	DRIVER( zx81b )		/* Sinclair ZX-81 (3nd rev)					*/
-	DRIVER( ts1000 )	/* Timex Sinclair 1000						*/
+	DRIVER( ts1000 )	/* 1982 Timex Sinclair 1000							*/
 	DRIVER( aszmic )	/* ASZMIC ZX-81 ROM swap					*/
 	DRIVER( pc8300 )	/* Your Computer - PC8300					*/
 	DRIVER( pow3000 )	/* Creon Enterprises - Power 3000				*/
 	DRIVER( lambda )	/* Lambda 8300							*/
 TESTDRIVER( h4th )		/* Sinclair ZX-81 Forth by David Husband			*/
-TESTDRIVER( tree4th )		/* Sinclair ZX-81 Tree-Forth by Tree Systems			*/
+TESTDRIVER( tree4th )	/* Sinclair ZX-81 Tree-Forth by Tree Systems			*/
 
 	DRIVER( spectrum )	/* 1982 ZX Spectrum 						*/
 	DRIVER( specpls4 )	/* 2000 ZX Spectrum +4						*/
@@ -442,14 +438,14 @@ TESTDRIVER( tree4th )		/* Sinclair ZX-81 Tree-Forth by Tree Systems			*/
 	DRIVER( specpl3e )	/* 2000 ZX Spectrum +3e 					*/
 	DRIVER( specp3es )	/* 2000 ZX Spectrum +3e (Spain)					*/
 
-	DRIVER( ql )		/* Sinclair QL							*/
-	DRIVER( ql_jsu )
-	DRIVER( ql_mge )
-	DRIVER( ql_mgf )
-	DRIVER( ql_mgg )
-	DRIVER( ql_mgi )
-	DRIVER( ql_mgs )
-	DRIVER( ql_efp )
+	DRIVER( ql )		/* 1984 Sinclair QL	(UK)							*/
+	DRIVER( ql_jsu )	/* 1984 Sinclair QL	(USA)							*/
+	DRIVER( ql_mge )	/* 1984 Sinclair QL	(Spain)							*/
+	DRIVER( ql_mgf )	/* 1984 Sinclair QL	(France)						*/
+	DRIVER( ql_mgg )	/* 1984 Sinclair QL	(Germany)						*/
+	DRIVER( ql_mgi )	/* 1984 Sinclair QL	(Italy)							*/
+	DRIVER( ql_mgs )	/* 1984 Sinclair QL	(Sweden)						*/
+	DRIVER( ql_efp )	/* 1984 Sinclair QL	(Mexico)						*/
 
 	/* SHARP */
 	DRIVER( pc1251 )	/* Pocket Computer 1251 							*/
