@@ -15,7 +15,6 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
 #include "devices/cartslot.h"
-#include "includes/studio2.h"
 #include "inputx.h"
 #include "sound/beep.h"
 #include "sound/discrete.h"
