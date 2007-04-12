@@ -56,6 +56,7 @@ struct _internal_screen_info
 	render_texture *		texture[2];			/* 2x textures for the screen bitmap */
 	mame_bitmap *			bitmap[2];			/* 2x bitmaps for rendering */
 	UINT8					curbitmap;			/* current bitmap index */
+	UINT8					dispbitmap;			/* displaying bitmap index */
 	bitmap_format			format;				/* format of bitmap for this screen */
 	UINT8					changed;			/* has this bitmap changed? */
 	INT32					last_partial_scan;	/* scanline of last partial update */
@@ -1023,22 +1024,21 @@ static void finish_screen_updates(running_machine *machine)
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
 			if ((machine->drv->video_attributes & (VIDEO_TYPE_VECTOR | VIDEO_SELF_RENDER)) == 0)
 			{
-				render_texture *texture = screen->texture[screen->curbitmap];
-				mame_bitmap *bitmap = screen->bitmap[screen->curbitmap];
-
 				/* if we're not skipping the frame and if the screen actually changed, then update the texture */
 				if (!global.skipping_this_frame && screen->changed)
 				{
+					mame_bitmap *bitmap = screen->bitmap[screen->curbitmap];
 					rectangle fixedvis = machine->screen[scrnum].visarea;
 					fixedvis.max_x++;
 					fixedvis.max_y++;
-					render_texture_set_bitmap(texture, bitmap, &fixedvis, machine->drv->screen[scrnum].palette_base, screen->format);
+					render_texture_set_bitmap(screen->texture[screen->curbitmap], bitmap, &fixedvis, machine->drv->screen[scrnum].palette_base, screen->format);
+					screen->dispbitmap = screen->curbitmap;
 					screen->curbitmap = 1 - screen->curbitmap;
 				}
 
 				/* create an empty container with a single quad */
 				render_container_empty(render_container_get_screen(scrnum));
-				render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+				render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), screen->texture[screen->dispbitmap], PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 			}
 
 			/* update our movie recording state */
