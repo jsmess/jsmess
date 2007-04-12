@@ -192,17 +192,19 @@ INPUT_PORTS_END
 
 // Telmac 1800
 
+#if 0
 static void tmc1800_video_dma(int cycles)
 {
 }
+#endif
 
 static void tmc1800_out_q(int level)
 {
 }
 
-static int tmc1800_in_ef(void)
+static UINT8 tmc1800_in_ef(void)
 {
-	int flags = 0;
+	UINT8 flags = 0;
 
 	/*
 		EF1		?
@@ -219,9 +221,10 @@ static int tmc1800_in_ef(void)
 
 static CDP1802_CONFIG tmc1800_config =
 {
-	tmc1800_video_dma,
-	tmc1800_out_q,
-	tmc1800_in_ef
+	NULL,/*tmc1800_video_dma*/		/* dma_r */
+	NULL,							/* dma_w */
+	tmc1800_out_q,					/* q */
+	tmc1800_in_ef					/* ef */
 };
 
 // Telmac 2000
@@ -258,9 +261,10 @@ static int tmc2000_in_ef(void)
 
 static CDP1802_CONFIG tmc2000_config =
 {
-	tmc2000_video_dma,
-	tmc2000_out_q,
-	tmc2000_in_ef
+	NULL,/*tmc1800_video_dma*/		/* dma_r */
+	NULL,							/* dma_w */
+	tmc1800_out_q,					/* q */
+	tmc1800_in_ef					/* ef */
 };
 
 /* Machine Initialization */
