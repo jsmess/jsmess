@@ -25,6 +25,9 @@
 
 */
 
+#ifndef __CDP1864_VIDEO__
+#define __CDP1864_VIDEO__
+
 #define CDP1864_CLK_FREQ		1750000.0
 #define CDP1864_DEFAULT_LATCH	0x35
 
@@ -53,3 +56,5 @@ WRITE8_HANDLER( cdp1864_tone_divisor_latch_w );
 PALETTE_INIT( tmc2000 );
 PALETTE_INIT( tmc2000e );
 VIDEO_UPDATE( cdp1864 );
+
+#endif

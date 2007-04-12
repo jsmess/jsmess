@@ -250,14 +250,14 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static void tmc600_out_q(int level)
+static void tmc600_q(int level)
 {
 	//logerror("q level: %u\n", level);
 }
 
-static int tmc600_in_ef(void)
+static UINT8 tmc600_ef(void)
 {
-	int flags = 0xff;
+	int flags = 0x0f;
 
 	/*
 		EF1		?
@@ -276,8 +276,10 @@ static int tmc600_in_ef(void)
 static CDP1802_CONFIG tmc600_cdp1802_config =
 {
 	NULL,
-	tmc600_out_q,
-	tmc600_in_ef
+	NULL,
+	tmc600_q,
+	tmc600_ef,
+	NULL
 };
 
 static INTERRUPT_GEN( vismac_blink_int )

@@ -7,8 +7,14 @@
 #define CDP1802_CYCLES_INIT			9
 #define CDP1802_CYCLES_FETCH		8
 #define CDP1802_CYCLES_EXECUTE		8
-#define CDP1802_CYCLES_DMA			1
-#define CDP1802_CYCLES_INTERRUPT	1
+#define CDP1802_CYCLES_DMA			8
+#define CDP1802_CYCLES_INTERRUPT	8
+
+enum {
+	CDP1802_INPUT_LINE_INT,
+	CDP1802_INPUT_LINE_DMAIN,
+	CDP1802_INPUT_LINE_DMAOUT
+};
 
 enum {
 	EF1 = 0x01,
@@ -25,6 +31,13 @@ enum {
 	CDP1802_STATE_2_DMA_IN,
 	CDP1802_STATE_2_DMA_OUT,
 	CDP1802_STATE_3_INT
+};
+
+enum {
+	CDP1802_STATE_CODE_S0_FETCH,
+	CDP1802_STATE_CODE_S1_EXECUTE,
+	CDP1802_STATE_CODE_S2_DMA,
+	CDP1802_STATE_CODE_S3_INTERRUPT
 };
 
 enum {
@@ -74,16 +87,16 @@ void cdp1802_get_info(UINT32 state, cpuinfo *info);
 offs_t cdp1802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 
-typedef struct {
+typedef struct
+{
 	/* called after execution of an instruction with cycles,
        return cycles taken by dma hardware */
-	void (*dma)(int cycles);
-	void (*out_q)(int level);
-	int (*in_ef)(void);
+	UINT8 (*dma_r)(void);
+	void (*dma_w)(UINT8 data);
+	void (*q)(int level);
+	UINT8 (*ef)(void);
+	void (*sc)(int state);
 } CDP1802_CONFIG;
-
-void cdp1802_dma_write(UINT8 data);
-int cdp1802_dma_read(void);
 
 void cdp1802_set_mode(int mode);
 

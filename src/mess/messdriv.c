@@ -133,12 +133,14 @@ const game_driver *test_drivers[] =
 	DRIVER( smsj )		/* Sega Master System (Japan) with FM Chip				*/
 	DRIVER( sg1000m3 )	/* Sega SG-1000 Mark III (Japan)					*/
 	DRIVER( smssdisp )	/* Sega Master System Store Display Unit				*/
-	DRIVER( genesis )	/* Sega Genesis/MegaDrive USA							*/
-	DRIVER( megadriv )	/* Sega Genesis/MegaDrive Europe						*/
-	DRIVER( megadrij )	/* Sega Genesis/MegaDrive Japan						*/
-	DRIVER( saturn )	/* Sega Saturn (USA)								*/
-	DRIVER( saturnjp )	/* Sega Saturn (Japan)								*/
-	DRIVER( saturneu )	/* Sega Saturn (PAL)								*/
+
+	DRIVER( megadrij )	/* 1988 Sega Mega Drive (Japan)						*/
+	DRIVER( genesis )	/* 1989 Sega Genesis (USA)							*/
+	DRIVER( megadriv )	/* 1990 Sega Mega Drive (Europe)					*/
+
+	DRIVER( saturnjp )	/* 1994 Sega Saturn (Japan)							*/
+	DRIVER( saturn )	/* 1995 Sega Saturn (USA)							*/
+	DRIVER( saturneu )	/* 1995 Sega Saturn (Europe)						*/
 	DRIVER( vsaturn )	/* JVC V-Saturn										*/
 	DRIVER( hisaturn )	/* Hitachi HiSaturn									*/
 
@@ -147,8 +149,8 @@ const game_driver *test_drivers[] =
 	DRIVER( astrocdw )	/* Bally Astrocade (white case)						*/
 
 	/* RCA */
-	DRIVER( vip )		/* Cosmac VIP										*/
-	DRIVER( studio2 )	/* Studio II										*/
+	DRIVER( vip )		/* 1977 Cosmac VIP									*/
+	DRIVER( studio2 )	/* 1977 Studio II									*/
 
 	/* FAIRCHILD */
 	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/

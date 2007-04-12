@@ -3,14 +3,6 @@
 #include "debugger.h"
 #include "cdp1802.h"
 
-/*
-
-    TODO:
-
-    - implement DMA properly
-
-*/
-
 typedef struct
 {
 	CDP1802_CONFIG *config;
@@ -22,6 +14,7 @@ typedef struct
 	int state;
 	int prevmode, mode;
 	int irq, dmain, dmaout;
+	int ef;
 
 } CDP1802_Regs;
 
@@ -61,8 +54,8 @@ static void cdp1802_init(int index, int clock, const void *config, int (*irqcall
 	cdp1802.mode = CDP1802_MODE_RESET;
 	cdp1802.prevmode = cdp1802.mode;
 	cdp1802.irq = CLEAR_LINE;
-	cdp1802.dmain = ASSERT_LINE; // HACK
-	cdp1802.dmaout = ASSERT_LINE; // HACK
+	cdp1802.dmain = CLEAR_LINE;
+	cdp1802.dmaout = CLEAR_LINE;
 
 	state_save_register_item("cdp1802", index, cdp1802.p);
 	state_save_register_item("cdp1802", index, cdp1802.x);
@@ -81,6 +74,7 @@ static void cdp1802_init(int index, int clock, const void *config, int (*irqcall
 	state_save_register_item("cdp1802", index, cdp1802.irq);
 	state_save_register_item("cdp1802", index, cdp1802.dmain);
 	state_save_register_item("cdp1802", index, cdp1802.dmaout);
+	state_save_register_item("cdp1802", index, cdp1802.ef);
 }
 
 INLINE void cdp1802_add(int left, int right)
@@ -164,8 +158,48 @@ INLINE void cdp1802_long_skip(int taken)
 	}
 }
 
+static void cdp1802_sample_ef(void)
+{
+	if (cdp1802.config->ef)
+	{
+		cdp1802.ef = cdp1802.config->ef() & 0x0f;
+	}
+	else
+	{
+		cdp1802.ef = 0x0f;
+	}
+}
+
+static void cdp1802_output_state_code(void)
+{
+	if (cdp1802.config->sc)
+	{
+		switch (cdp1802.state)
+		{
+		case CDP1802_STATE_0_FETCH:
+			cdp1802.config->sc(CDP1802_STATE_CODE_S0_FETCH);
+			break;
+
+		case CDP1802_STATE_1_EXECUTE:
+			cdp1802.config->sc(CDP1802_STATE_CODE_S1_EXECUTE);
+			break;
+
+		case CDP1802_STATE_2_DMA_IN:
+		case CDP1802_STATE_2_DMA_OUT:
+			cdp1802.config->sc(CDP1802_STATE_CODE_S2_DMA);
+			break;
+
+		case CDP1802_STATE_3_INT:
+			cdp1802.config->sc(CDP1802_STATE_CODE_S3_INTERRUPT);
+			break;
+		}
+	}
+}
+
 static void cdp1802_run(void)
 {
+	cdp1802_output_state_code();
+
 	switch (cdp1802.state)
 	{
 	case CDP1802_STATE_1_RESET:
@@ -224,6 +258,8 @@ static void cdp1802_run(void)
 
 	case CDP1802_STATE_1_EXECUTE:
 
+		cdp1802_sample_ef();
+
 		switch (I)
 		{
 		case 0:
@@ -261,19 +297,19 @@ static void cdp1802_run(void)
 				break;
 
 			case 4:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF1) ? 0 : 1);
+				cdp1802_short_branch((cdp1802.ef & EF1) ? 0 : 1);
 				break;
 
 			case 5:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF2) ? 0 : 1);
+				cdp1802_short_branch((cdp1802.ef & EF2) ? 0 : 1);
 				break;
 
 			case 6:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF3) ? 0 : 1);
+				cdp1802_short_branch((cdp1802.ef & EF3) ? 0 : 1);
 				break;
 
 			case 7:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF4) ? 0 : 1);
+				cdp1802_short_branch((cdp1802.ef & EF4) ? 0 : 1);
 				break;
 
 			case 8:
@@ -293,19 +329,19 @@ static void cdp1802_run(void)
 				break;
 
 			case 0xc:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF1) ? 1 : 0);
+				cdp1802_short_branch((cdp1802.ef & EF1) ? 1 : 0);
 				break;
 
 			case 0xd:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF2) ? 1 : 0);
+				cdp1802_short_branch((cdp1802.ef & EF2) ? 1 : 0);
 				break;
 
 			case 0xe:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF3) ? 1 : 0);
+				cdp1802_short_branch((cdp1802.ef & EF3) ? 1 : 0);
 				break;
 
 			case 0xf:
-				cdp1802_short_branch((cdp1802.config->in_ef() & EF4) ? 1 : 0);
+				cdp1802_short_branch((cdp1802.ef & EF4) ? 1 : 0);
 				break;
 			}
 			break;
@@ -443,18 +479,18 @@ static void cdp1802_run(void)
 			case 0xa:
 				Q = 0;
 
-				if (cdp1802.config->out_q)
+				if (cdp1802.config->q)
 				{
-					cdp1802.config->out_q(Q);
+					cdp1802.config->q(Q);
 				}
 				break;
 
 			case 0xb:
 				Q = 1;
 
-				if (cdp1802.config->out_q)
+				if (cdp1802.config->q)
 				{
-					cdp1802.config->out_q(Q);
+					cdp1802.config->q(Q);
 				}
 				break;
 
@@ -680,11 +716,15 @@ static void cdp1802_run(void)
 		CALL_MAME_DEBUG;
 
 		break;
-/*
+
     case CDP1802_STATE_2_DMA_IN:
 
-        MW(R[0], read_bus());
-        R[0] = R[0] + 1;
+		if (cdp1802.config->dma_r)
+		{
+			MW(R[0], cdp1802.config->dma_r());
+		}
+
+		R[0] = R[0] + 1;
 
         cdp1802_ICount -= CDP1802_CYCLES_DMA;
 
@@ -712,8 +752,12 @@ static void cdp1802_run(void)
 
     case CDP1802_STATE_2_DMA_OUT:
 
-        write_bus(M(R[0]));
-        R[0] = R[0] + 1;
+		if (cdp1802.config->dma_w)
+		{
+	        cdp1802.config->dma_w(M(R[0]));
+		}
+
+		R[0] = R[0] + 1;
 
         cdp1802_ICount -= CDP1802_CYCLES_DMA;
 
@@ -734,24 +778,6 @@ static void cdp1802_run(void)
             cdp1802.state = CDP1802_STATE_0_FETCH;
         }
         break;
-*/
-	case CDP1802_STATE_2_DMA_IN:
-	case CDP1802_STATE_2_DMA_OUT:
-
-		if (cdp1802.config->dma)
-		{
-			cdp1802.config->dma(cdp1802_ICount);
-		}
-
-		if (IE && cdp1802.irq)
-		{
-			cdp1802.state = CDP1802_STATE_3_INT;
-		}
-		else
-		{
-			cdp1802.state = CDP1802_STATE_0_FETCH;
-		}
-		break;
 
 	case CDP1802_STATE_3_INT:
 
@@ -838,21 +864,19 @@ static int cdp1802_execute(int cycles)
 	return cycles - cdp1802_ICount;
 }
 
-void cdp1802_dma_write(UINT8 data)
-{
-	MW(R[0]++, data);
-	cdp1802_ICount--;
-}
-
-int cdp1802_dma_read(void)
-{
-	cdp1802_ICount--;
-	return M(R[0]++);
-}
-
 static void cdp1802_set_interrupt_line(int state)
 {
 	cdp1802.irq = state;
+}
+
+static void cdp1802_set_dmain_line(int state)
+{
+	cdp1802.dmain = state;
+}
+
+static void cdp1802_set_dmaout_line(int state)
+{
+	cdp1802.dmaout = state;
 }
 
 void cdp1802_set_mode(int mode)
@@ -874,7 +898,9 @@ static void cdp1802_set_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:		cdp1802_set_interrupt_line(info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		cdp1802_set_interrupt_line(info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	cdp1802_set_dmain_line(info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	cdp1802_set_dmaout_line(info->i);		break;
 
 		case CPUINFO_INT_REGISTER + CDP1802_P:			cdp1802.p = info->i;		break;
 		case CPUINFO_INT_REGISTER + CDP1802_X:			cdp1802.x = info->i;		break;
@@ -935,7 +961,9 @@ void cdp1802_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 3;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:		info->i = cdp1802.irq;				break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		info->i = cdp1802.irq;		break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	info->i = cdp1802.dmain;	break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	info->i = cdp1802.dmaout;	break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
