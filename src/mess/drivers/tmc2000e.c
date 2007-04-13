@@ -151,9 +151,18 @@ static CDP1802_CONFIG tmc2000e_config =
 
 /* Machine Initialization */
 
+static MACHINE_START( tmc2000e )
+{
+	state_save_register_global(keylatch);
+
+	return 0;
+}
+
 static MACHINE_RESET( tmc2000e )
 {
 	machine_reset_cdp1864(machine);
+
+	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 
 	// reset program counter to 0xc000
 }
@@ -169,6 +178,7 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_CPU_IO_MAP(tmc2000e_io_map, 0)
 	MDRV_CPU_CONFIG(tmc2000e_config)
 
+	MDRV_MACHINE_START(tmc2000e)
 	MDRV_MACHINE_RESET(tmc2000e)
 
 	// video hardware
@@ -264,4 +274,4 @@ static DRIVER_INIT( telmac )
 }
 
 //    YEAR  NAME 	  PARENT   COMPAT   MACHINE   INPUT     INIT	CONFIG    COMPANY 	     FULLNAME
-COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, telmac, tmc2000e, "Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING )
+COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, telmac, tmc2000e, "Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

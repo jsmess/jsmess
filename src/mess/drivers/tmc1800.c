@@ -256,8 +256,22 @@ static CDP1802_CONFIG tmc2000_config =
 
 /* Machine Initialization */
 
+static MACHINE_START( tmc1800 )
+{
+	state_save_register_global(keylatch);
+
+	return 0;
+}
+
+static MACHINE_RESET( tmc1800 )
+{
+	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+}
+
 static MACHINE_START( tmc2000 )
 {
+	state_save_register_global(keylatch);
+
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &colorram, 0);
 
@@ -267,6 +281,8 @@ static MACHINE_START( tmc2000 )
 static MACHINE_RESET( tmc2000 )
 {
 	machine_reset_cdp1864(machine);
+
+	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 
 	// set program counter to 0x8000
 	memory_set_bank(1, 0);
@@ -282,6 +298,9 @@ static MACHINE_DRIVER_START( tmc1800 )
 	MDRV_CPU_PROGRAM_MAP(tmc1800_map, 0)
 	MDRV_CPU_IO_MAP(tmc1800_io_map, 0)
 	MDRV_CPU_CONFIG(tmc1800_config)
+
+	MDRV_MACHINE_START(tmc1800)
+	MDRV_MACHINE_RESET(tmc1800)
 
 	// video hardware
 
@@ -400,5 +419,5 @@ static DRIVER_INIT( telmac )
 /* System Drivers */
 
 //	   YEAR  NAME 	  PARENT   BIOS		COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY			FULLNAME
-COMP(  1977, tmc1800, 0,				0,		tmc1800,	tmc1800,	telmac,	tmc1800,	"Telercas Oy",	"Telmac 1800", GAME_NOT_WORKING )
-COMPB( 1980, tmc2000, 0,       tmc2000, 0,		tmc2000,	tmc1800,	telmac,	tmc2000,	"Telercas Oy",	"Telmac 2000", GAME_NOT_WORKING )
+COMP(  1977, tmc1800, 0,				0,		tmc1800,	tmc1800,	telmac,	tmc1800,	"Telercas Oy",	"Telmac 1800", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMPB( 1980, tmc2000, 0,       tmc2000, 0,		tmc2000,	tmc1800,	telmac,	tmc2000,	"Telercas Oy",	"Telmac 2000", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

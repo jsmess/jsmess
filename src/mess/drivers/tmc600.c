@@ -287,6 +287,25 @@ static INTERRUPT_GEN( vismac_blink_int )
 	vismac_blink = !vismac_blink;
 }
 
+/* Machine Initialization */
+
+static MACHINE_START( tmc600 )
+{
+	state_save_register_global(vismac_reg_latch);
+	state_save_register_global(vismac_color_latch);
+	state_save_register_global(vismac_bkg_latch);
+	state_save_register_global(vismac_blink);
+	state_save_register_global_array(vismac_colorram);
+	state_save_register_global(keylatch);
+
+	return 0;
+}
+
+static MACHINE_RESET( tmc600 )
+{
+	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+}
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( tmc600 )
@@ -298,6 +317,9 @@ static MACHINE_DRIVER_START( tmc600 )
 	MDRV_CPU_IO_MAP(tmc600_io_map, 0)
 	MDRV_CPU_CONFIG(tmc600_cdp1802_config)
 	MDRV_CPU_PERIODIC_INT(vismac_blink_int, TIME_IN_HZ(2))
+
+	MDRV_MACHINE_START(tmc600)
+	MDRV_MACHINE_RESET(tmc600)
 
 	// video hardware
 
@@ -453,4 +475,4 @@ static DRIVER_INIT( tmc600 )
 
 //    YEAR  NAME 	  PARENT    COMPAT   MACHINE   INPUT     INIT	 CONFIG    COMPANY 	      FULLNAME
 COMP( 1982, tmc600s1, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja I)",  GAME_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_SOUND )
+COMP( 1982, tmc600s2, 0,		0,	     tmc600,   tmc600,   tmc600, tmc600,   "Telercas Oy", "Telmac TMC-600 (Sarja II)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
