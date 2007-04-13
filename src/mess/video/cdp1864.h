@@ -1,5 +1,7 @@
 /*
 
+			    CDP1864C COS/MOS PAL Compatible Color TV Interface
+
 								________________
 				INLACE	 1	---|	   \/		|---  40  Vdd
 			   CLK IN_	 2	---|				|---  39  AUD
@@ -23,6 +25,8 @@
 				   Vss	20	---|________________|---  21  B DATA
 
 
+			   http://homepage.mac.com/ruske/cosmacelf/cdp1864.pdf
+
 */
 
 #ifndef __CDP1864_VIDEO__
@@ -31,30 +35,55 @@
 #define CDP1864_CLK_FREQ		1750000.0
 #define CDP1864_DEFAULT_LATCH	0x35
 
+#define CDP1864_VISIBLE_COLUMNS	64
+#define CDP1864_VISIBLE_LINES	192
+
+#define CDP1864_HBLANK_END		 1 * 8
+#define CDP1864_HBLANK_START	13 * 8
+#define CDP1864_HSYNC_START		 0 * 8
+#define CDP1864_HSYNC_END		 1 * 8
+#define CDP1864_SCREEN_START	 4 * 8
+#define CDP1864_SCREEN_END		12 * 8
 #define CDP1864_SCREEN_WIDTH	14 * 8
-#define CDP1864_SCANLINES		312
 
-#define CDP1864_FPS				(CDP1864_CLK_FREQ / CDP1864_SCREEN_WIDTH) / CDP1864_SCANLINES
+#define CDP1864_TOTAL_SCANLINES				312
 
-typedef struct
-{
-	int display;
-	int bgcolor;
-	int bgcolseq[4];
-} CDP1864_CONFIG;
+#define CDP1864_SCANLINE_VBLANK_START		CDP1864_TOTAL_SCANLINES - 4
+#define CDP1864_SCANLINE_VBLANK_END			20
+#define CDP1864_SCANLINE_VSYNC_START		0
+#define CDP1864_SCANLINE_VSYNC_END			4
+#define CDP1864_SCANLINE_SCREEN_START		80 // ???
+#define CDP1864_SCANLINE_SCREEN_END			CDP1864_SCANLINE_SCREEN_START + CDP1864_VISIBLE_LINES
+#define CDP1864_SCANLINE_INT_START			CDP1864_SCANLINE_SCREEN_START - 2
+#define CDP1864_SCANLINE_INT_END			CDP1864_SCANLINE_SCREEN_START
+#define CDP1864_SCANLINE_EFX_TOP_START		CDP1864_SCANLINE_SCREEN_START - 4
+#define CDP1864_SCANLINE_EFX_TOP_END		CDP1864_SCANLINE_SCREEN_START
+#define CDP1864_SCANLINE_EFX_BOTTOM_START	CDP1864_SCANLINE_SCREEN_END - 4
+#define CDP1864_SCANLINE_EFX_BOTTOM_END		CDP1864_SCANLINE_SCREEN_END
 
-void cdp1864_set_background_color_sequence_w(int color[]);
-void cdp1864_audio_output_w(int value);
-void cdp1864_enable_w(int value);
-void cdp1864_reset_w(void);
+#define CDP1864_CYCLES_INT_DELAY	29*8
+#define CDP1864_CYCLES_DMAOUT_LOW	8*8
+#define CDP1864_CYCLES_DMAOUT_HIGH	6*8
 
- READ8_HANDLER( cdp1864_audio_enable_r );
- READ8_HANDLER( cdp1864_audio_disable_r );
-WRITE8_HANDLER( cdp1864_step_background_color_w );
-WRITE8_HANDLER( cdp1864_tone_divisor_latch_w );
+MACHINE_RESET( cdp1864 );
+VIDEO_START( cdp1864 );
+VIDEO_UPDATE( cdp1864 );
 
-PALETTE_INIT( tmc2000 );
-PALETTE_INIT( tmc2000e );
+ READ8_HANDLER( cdp1864_dispon_r );
+WRITE8_HANDLER( cdp1864_dispoff_w );
+
+void cdp1864_dma_w(UINT8 data);
+void cdp1864_sc(int state);
+
+void cdp1864_audio_output_enable(int value);
+void cdp1864_set_background_color_sequence(int color[]);
+void cdp1864_reset(void);
+
+READ8_HANDLER( cdp1864_dispon_r );
+READ8_HANDLER( cdp1864_dispoff_r );
+WRITE8_HANDLER( cdp1864_step_bgcolor_w );
+WRITE8_HANDLER( cdp1864_tone_latch_w );
+
 VIDEO_UPDATE( cdp1864 );
 
 #endif

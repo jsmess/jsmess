@@ -8,6 +8,24 @@
 #include "video/cdp1864.h"
 #include "sound/beep.h"
 
+/* Palette */
+
+PALETTE_INIT( tmc2000e )
+{
+	int background_color_sequence[] = { 2, 0, 1, 4 };
+
+	palette_set_color(machine, 0, 0x00, 0x00, 0x00 ); // black		  0 % of max luminance
+	palette_set_color(machine, 1, 0x00, 0x97, 0x00 ); // green		 59
+	palette_set_color(machine, 2, 0x00, 0x00, 0x1c ); // blue		 11
+	palette_set_color(machine, 3, 0x00, 0xb3, 0xb3 ); // cyan		 70
+	palette_set_color(machine, 4, 0x4c, 0x00, 0x00 ); // red		 30
+	palette_set_color(machine, 5, 0xe3, 0xe3, 0x00 ); // yellow		 89
+	palette_set_color(machine, 6, 0x68, 0x00, 0x68 ); // magenta	 41
+	palette_set_color(machine, 7, 0xff, 0xff, 0xff ); // white		100
+	
+	cdp1864_set_background_color_sequence(background_color_sequence);
+}
+
 /* Read/Write Handlers */
 
 static READ8_HANDLER( vismac_r )
@@ -19,7 +37,7 @@ static WRITE8_HANDLER( vismac_w )
 {
 }
 
-static  READ8_HANDLER( floppy_r )
+static READ8_HANDLER( floppy_r )
 {
 	return 0;
 }
@@ -28,12 +46,12 @@ static WRITE8_HANDLER( floppy_w )
 {
 }
 
-static  READ8_HANDLER( ascii_keyboard_r )
+static READ8_HANDLER( ascii_keyboard_r )
 {
 	return 0;
 }
 
-static  READ8_HANDLER( io_r )
+static READ8_HANDLER( io_r )
 {
 	return 0;
 }
@@ -62,8 +80,8 @@ static ADDRESS_MAP_START( tmc2000e_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000e_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_WRITE(cdp1864_tone_divisor_latch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(cdp1864_step_background_color_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cdp1864_tone_latch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(cdp1864_step_bgcolor_w)
 	AM_RANGE(0x03, 0x03) AM_READWRITE(ascii_keyboard_r, keyboard_latch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(vismac_r, vismac_w)
@@ -91,14 +109,10 @@ INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static void tmc2000e_video_dma(int cycles)
-{
-}
-
-static void tmc2000e_out_q(int level)
+static void tmc2000e_q(int level)
 {
 	// CDP1864 sound generator on/off
-	cdp1864_audio_output_w(level);
+	cdp1864_audio_output_enable(level);
 
 	// set Q led status
 	// leds: Wait, Q, Power
@@ -109,9 +123,9 @@ static void tmc2000e_out_q(int level)
 	// floppy control (FDC-6)
 }
 
-static UINT8 tmc2000e_in_ef(void)
+static UINT8 tmc2000e_ef(void)
 {
-	UINT8 flags = 0xff;
+	UINT8 flags = 0x0f;
 
 	/*
 		EF1		CDP1864
@@ -128,23 +142,28 @@ static UINT8 tmc2000e_in_ef(void)
 
 static CDP1802_CONFIG tmc2000e_config =
 {
-	NULL, /*tmc2000e_video_dma*/	/* dma_r */
-	NULL,							/* dma_w */
-	tmc2000e_out_q,					/* q */
-	tmc2000e_in_ef					/* ef */
+	NULL,
+	cdp1864_dma_w,
+	tmc2000e_q,
+	tmc2000e_ef,
+	cdp1864_sc
 };
 
 /* Machine Initialization */
 
 static MACHINE_RESET( tmc2000e )
 {
+	machine_reset_cdp1864(machine);
+
 	// reset program counter to 0xc000
 }
 
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( tmc2000e )
+
 	// basic system hardware
+
 	MDRV_CPU_ADD(CDP1802, CDP1864_CLK_FREQ)	// 1.75 MHz
 	MDRV_CPU_PROGRAM_MAP(tmc2000e_map, 0)
 	MDRV_CPU_IO_MAP(tmc2000e_io_map, 0)
@@ -152,21 +171,18 @@ static MACHINE_DRIVER_START( tmc2000e )
 
 	MDRV_MACHINE_RESET(tmc2000e)
 
-	MDRV_SCREEN_REFRESH_RATE(CDP1864_FPS)	// 50.08 Hz
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	// video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(360, 312)
-	MDRV_SCREEN_VISIBLE_AREA(0, 360-1, 20, 308-1)
-	MDRV_PALETTE_LENGTH(8)
 
-	MDRV_PALETTE_INIT(tmc2000)
-	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
+
+	MDRV_PALETTE_INIT(tmc2000e)
+	MDRV_VIDEO_START(cdp1864)
 	MDRV_VIDEO_UPDATE(cdp1864)
 
 	// sound hardware
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

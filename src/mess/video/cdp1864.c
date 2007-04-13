@@ -4,89 +4,182 @@
 #include "video/cdp1864.h"
 #include "sound/beep.h"
 
-/*
+static mame_timer *cdp1864_int_timer;
+static mame_timer *cdp1864_efx_timer;
+static mame_timer *cdp1864_dma_timer;
 
-	RCA CDP1864 Video Chip
-
-	http://homepage.mac.com/ruske/cosmacelf/cdp1864.pdf
-
-*/
+typedef struct
+{
+	int disp;
+	int x;
+	int y;
+	int bitmap[CDP1864_VISIBLE_LINES][8];
+	int audio;
+	int bgcolor;
+	int bgcolseq[4];
+	int latch;
+	int dmaout;
+} CDP1864_CONFIG;
 
 static CDP1864_CONFIG cdp1864;
 
-PALETTE_INIT( tmc2000 )
+int cdp1864_efx;
+
+static void cdp1864_int_tick(int ref)
 {
-	int background_color_sequence[] = { 5, 7, 6, 3 };
+	int scanline = video_screen_get_vpos(0);
 
-	palette_set_color(machine,  0, 0x4c, 0x96, 0x1c ); // white
-	palette_set_color(machine,  1, 0x4c, 0x00, 0x1c ); // purple
-	palette_set_color(machine,  2, 0x00, 0x96, 0x1c ); // cyan
-	palette_set_color(machine,  3, 0x00, 0x00, 0x1c ); // blue
-	palette_set_color(machine,  4, 0x4c, 0x96, 0x00 ); // yellow
-	palette_set_color(machine,  5, 0x4c, 0x00, 0x00 ); // red
-	palette_set_color(machine,  6, 0x00, 0x96, 0x00 ); // green
-	palette_set_color(machine,  7, 0x00, 0x00, 0x00 ); // black
-
-	cdp1864_set_background_color_sequence_w(background_color_sequence);
+	if (scanline == CDP1864_SCANLINE_INT_START)
+	{
+		if (cdp1864.disp)
+		{
+			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
+		}
+		mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_END, 0), 0, time_zero);
+	}
+	else
+	{
+		if (cdp1864.disp)
+		{
+			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+		}
+		mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_START, 0), 0, time_zero);
+	}
 }
 
-PALETTE_INIT( tmc2000e )	// TODO: incorrect colors?
+static void cdp1864_efx_tick(int ref)
 {
-	int background_color_sequence[] = { 2, 0, 1, 4 };
+	int scanline = video_screen_get_vpos(0);
 
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00 ); // black		  0 % of max luminance
-	palette_set_color(machine, 1, 0x00, 0x97, 0x00 ); // green		 59
-	palette_set_color(machine, 2, 0x00, 0x00, 0x1c ); // blue		 11
-	palette_set_color(machine, 3, 0x00, 0xb3, 0xb3 ); // cyan		 70
-	palette_set_color(machine, 4, 0x4c, 0x00, 0x00 ); // red		 30
-	palette_set_color(machine, 5, 0xe3, 0xe3, 0x00 ); // yellow		 89
-	palette_set_color(machine, 6, 0x68, 0x00, 0x68 ); // magenta	 41
-	palette_set_color(machine, 7, 0xff, 0xff, 0xff ); // white		100
-	
-	cdp1864_set_background_color_sequence_w(background_color_sequence);
+	switch (scanline)
+	{
+	case CDP1864_SCANLINE_EFX_TOP_START:
+		cdp1864_efx = 0;
+		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_END, 0), 0, time_zero);
+		break;
+
+	case CDP1864_SCANLINE_EFX_TOP_END:
+		cdp1864_efx = 1;
+		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_BOTTOM_START, 0), 0, time_zero);
+		break;
+
+	case CDP1864_SCANLINE_EFX_BOTTOM_START:
+		cdp1864_efx = 0;
+		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_BOTTOM_END, 0), 0, time_zero);
+		break;
+
+	case CDP1864_SCANLINE_EFX_BOTTOM_END:
+		cdp1864_efx = 1;
+		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
+		break;
+	}
 }
 
-void cdp1864_set_background_color_sequence_w(int color[])
+static void cdp1864_dma_tick(int ref)
+{
+	if (cdp1864.dmaout)
+	{
+		cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMAOUT_HIGH, 0), 0, time_zero);
+		cdp1864.dmaout = 0;
+	}
+	else
+	{
+		cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMAOUT_LOW, 0), 0, time_zero);
+		cdp1864.dmaout = 1;
+	}
+}
+
+void cdp1864_dma_w(UINT8 data)
+{
+	cdp1864.bitmap[cdp1864.y][cdp1864.x] = data;
+
+	cdp1864.x++;
+
+	if (cdp1864.x == 8)
+	{
+		cdp1864.x = 0;
+		cdp1864.y++;
+	}
+
+	if (cdp1864.y == CDP1864_VISIBLE_LINES)
+	{
+		mame_timer_adjust(cdp1864_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
+	}
+}
+
+void cdp1864_sc(int state)
+{
+	if (state == CDP1802_STATE_CODE_S3_INTERRUPT)
+	{
+		cdp1864.dmaout = 0;
+		cdp1864.x = 0;
+		cdp1864.y = 0;
+
+		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_INT_DELAY, 0), 0, double_to_mame_time(TIME_NEVER));
+	}
+}
+
+MACHINE_RESET( cdp1864 )
+{
+	cdp1864_int_timer = mame_timer_alloc(cdp1864_int_tick);
+	cdp1864_efx_timer = mame_timer_alloc(cdp1864_efx_tick);
+	cdp1864_dma_timer = mame_timer_alloc(cdp1864_dma_tick);
+
+	mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_START, 0), 0, time_zero);
+	mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
+	mame_timer_adjust(cdp1864_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
+
+	cdp1864.disp = 0;
+}
+
+void cdp1864_set_background_color_sequence(int color[])
 {
 	int i;
 	for (i = 0; i < 4; i++)
 		cdp1864.bgcolseq[i] = color[i];
 }
 
-WRITE8_HANDLER( cdp1864_step_background_color_w )
+WRITE8_HANDLER( cdp1864_step_bgcolor_w )
 {
-	cdp1864.display = 1;
+	cdp1864.disp = 1;
 	if (++cdp1864.bgcolor > 3) cdp1864.bgcolor = 0;
 }
 
-WRITE8_HANDLER( cdp1864_tone_divisor_latch_w )
+WRITE8_HANDLER( cdp1864_tone_latch_w )
 {
+	cdp1864.latch = data;
 	beep_set_frequency(0, CDP1864_CLK_FREQ / 8 / 4 / (data + 1) / 2);
 }
 
-void cdp1864_audio_output_w(int value)
+void cdp1864_audio_output_enable(int value)
 {
+	if (value == 0)
+	{
+		cdp1864.latch = CDP1864_DEFAULT_LATCH;
+	}
+	
+	cdp1864.audio = value;
+
 	beep_set_state(0, value);
 }
 
-READ8_HANDLER( cdp1864_audio_enable_r )
+READ8_HANDLER( cdp1864_dispon_r )
 {
-	beep_set_state(0, 1);
-	return 0;
+	cdp1864.disp = 1;
+
+	return 0xff;
 }
 
-READ8_HANDLER( cdp1864_audio_disable_r )
+READ8_HANDLER( cdp1864_dispoff_r )
 {
-	beep_set_state(0, 0);
-	return 0;
+	cdp1864.disp = 0;
+
+	return 0xff;
 }
 
-void cdp1864_enable_w(int value)
-{
-	cdp1864.display = value;
-}
-
-void cdp1864_reset_w(void)
+void cdp1864_reset(void)
 {
 	int i;
 
@@ -95,13 +188,51 @@ void cdp1864_reset_w(void)
 	for (i = 0; i < 4; i++)
 		cdp1864.bgcolseq[i] = i;
 
-	cdp1864_audio_output_w(0);
-	cdp1864_tone_divisor_latch_w(0, CDP1864_DEFAULT_LATCH);
+	cdp1864_audio_output_enable(0);
+}
+
+VIDEO_START( cdp1864 )
+{
+	state_save_register_global(cdp1864.disp);
+	state_save_register_global(cdp1864.x);
+	state_save_register_global(cdp1864.y);
+	state_save_register_global(cdp1864.audio);
+	state_save_register_global(cdp1864.bgcolor);
+	state_save_register_global_array(cdp1864.bgcolseq);
+	state_save_register_global(cdp1864.latch);
+	state_save_register_global(cdp1864.dmaout);
+	state_save_register_global(cdp1864_efx);
+
+	return 0;
 }
 
 VIDEO_UPDATE( cdp1864 )
 {
-	fillbitmap(bitmap, cdp1864.bgcolseq[cdp1864.bgcolor], cliprect);
-	// TODO: draw videoram to screen using DMA
+	int x, y, bit;
+
+	if (cdp1864.disp)
+	{
+		fillbitmap(bitmap, cdp1864.bgcolseq[cdp1864.bgcolor], cliprect);
+
+		for (y = 0; y < CDP1864_VISIBLE_LINES; y++)
+		{
+			for (x = 0; x < 8; x++)
+			{
+				UINT8 data = cdp1864.bitmap[y][x];
+
+				for (bit = 0; bit < 8; bit++)
+				{
+					int color = (data & 0x80) >> 7;
+					plot_pixel(bitmap, CDP1864_SCREEN_START + (x * 8) + bit, CDP1864_SCANLINE_SCREEN_START + y, Machine->pens[color]); // TODO: get color from colorram
+					data <<= 1;
+				}
+			}
+		}
+	}
+	else
+	{
+		fillbitmap(bitmap, get_black_pen(Machine), cliprect);
+	}
+
 	return 0;
 }
