@@ -109,9 +109,9 @@ static void tmc2000e_out_q(int level)
 	// floppy control (FDC-6)
 }
 
-static int tmc2000e_in_ef(void)
+static UINT8 tmc2000e_in_ef(void)
 {
-	int flags = 0xff;
+	UINT8 flags = 0xff;
 
 	/*
 		EF1		CDP1864
@@ -128,9 +128,10 @@ static int tmc2000e_in_ef(void)
 
 static CDP1802_CONFIG tmc2000e_config =
 {
-	tmc2000e_video_dma,
-	tmc2000e_out_q,
-	tmc2000e_in_ef
+	NULL, /*tmc2000e_video_dma*/	/* dma_r */
+	NULL,							/* dma_w */
+	tmc2000e_out_q,					/* q */
+	tmc2000e_in_ef					/* ef */
 };
 
 /* Machine Initialization */
