@@ -56,7 +56,7 @@ struct _internal_screen_info
 	render_texture *		texture[2];			/* 2x textures for the screen bitmap */
 	mame_bitmap *			bitmap[2];			/* 2x bitmaps for rendering */
 	UINT8					curbitmap;			/* current bitmap index */
-	UINT8					dispbitmap;			/* displaying bitmap index */
+	UINT8					curtexture;			/* current texture index */
 	bitmap_format			format;				/* format of bitmap for this screen */
 	UINT8					changed;			/* has this bitmap changed? */
 	INT32					last_partial_scan;	/* scanline of last partial update */
@@ -65,6 +65,7 @@ struct _internal_screen_info
 	subseconds_t			scantime;			/* subseconds per scanline */
 	subseconds_t			pixeltime;			/* subseconds per pixel */
 	mame_time 				vblank_time;		/* time of last VBLANK start */
+	mame_timer *			scanline0_timer;	/* scanline 0 timer */
 
 	/* movie recording */
 	mame_file *				movie_file;			/* handle to the open movie file */
@@ -168,6 +169,7 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo);
 static void decode_graphics(const gfx_decode *gfxdecodeinfo);
 
 /* global rendering */
+static void scanline0_callback(int scrnum);
 static void finish_screen_updates(running_machine *machine);
 
 /* throttling/frameskipping/performance */
@@ -290,6 +292,9 @@ void video_init(running_machine *machine)
 		if (machine->drv->screen[scrnum].tag != NULL)
 		{
 			internal_screen_info *info = &viddata->scrinfo[scrnum];
+
+			/* allocate a timer to reset partial updates */
+			info->scanline0_timer = mame_timer_alloc(scanline0_callback);
 
 			/* make pointers back to the config and state */
 			info->config = &machine->drv->screen[scrnum];
@@ -675,6 +680,9 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 
 	/* recompute the VBLANK timing */
 	cpu_compute_vblank_timing();
+
+	/* reset the update timer */
+	mame_timer_adjust(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
 }
 
 
@@ -778,7 +786,7 @@ void video_screen_update_partial(int scrnum, int scanline)
 		profiler_mark(PROFILER_END);
 
 		/* if we modified the bitmap, we have to commit */
-		info->changed |= (~flags & UPDATE_HAS_NOT_CHANGED);
+		info->changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
 	}
 
 	/* remember where we left off */
@@ -920,22 +928,19 @@ mame_time video_screen_get_frame_period(int scrnum)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    video_reset_partial_updates - reset partial updates
-    at the start of each frame
+    scanline0_callback - reset partial updates
+    for a screen
 -------------------------------------------------*/
 
-void video_reset_partial_updates(void)
+static void scanline0_callback(int scrnum)
 {
 	video_private *viddata = Machine->video_data;
-	int scrnum;
 
 	/* reset partial updates */
-	LOG_PARTIAL_UPDATES(("Partial: reset to 0\n"));
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-	{
-		viddata->scrinfo[scrnum].last_partial_scan = 0;
-	}
+	viddata->scrinfo[scrnum].last_partial_scan = 0;
 	global.partial_updates_this_frame = 0;
+
+	mame_timer_adjust(viddata->scrinfo[scrnum].scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
 }
 
 
@@ -983,7 +988,7 @@ void video_frame_update(void)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
 		if (mame_is_paused(Machine) || mame_debug_is_active())
-			video_reset_partial_updates();
+			scanline0_callback(0);
 
 		/* otherwise, call the video EOF callback */
 		else if (Machine->drv->video_eof != NULL)
@@ -1032,13 +1037,13 @@ static void finish_screen_updates(running_machine *machine)
 					fixedvis.max_x++;
 					fixedvis.max_y++;
 					render_texture_set_bitmap(screen->texture[screen->curbitmap], bitmap, &fixedvis, machine->drv->screen[scrnum].palette_base, screen->format);
-					screen->dispbitmap = screen->curbitmap;
+					screen->curtexture = screen->curbitmap;
 					screen->curbitmap = 1 - screen->curbitmap;
 				}
 
 				/* create an empty container with a single quad */
 				render_container_empty(render_container_get_screen(scrnum));
-				render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), screen->texture[screen->dispbitmap], PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+				render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), screen->texture[screen->curtexture], PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 			}
 
 			/* update our movie recording state */

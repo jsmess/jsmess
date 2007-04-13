@@ -442,26 +442,28 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms34010_config master_config =
+static tms34010_config master_config =
 {
-	0,							/* halt on reset */
+	FALSE,						/* halt on reset */
+	0,							/* the screen operated on */
+	40000000/8,					/* pixel clock */
+	1,							/* pixels per clock */
+	exterm_scanline_update,		/* scanline updater */
 	NULL,						/* generate interrupt */
 	exterm_to_shiftreg_master,	/* write to shiftreg function */
-	exterm_from_shiftreg_master,/* read from shiftreg function */
-	NULL,						/* display address changed */
-	NULL,						/* display interrupt callback */
-	0							/* the screen operated on */
+	exterm_from_shiftreg_master	/* read from shiftreg function */
 };
 
-static struct tms34010_config slave_config =
+static tms34010_config slave_config =
 {
-	1,							/* halt on reset */
+	TRUE,						/* halt on reset */
+	0,							/* the screen operated on */
+	40000000/8,					/* pixel clock */
+	1,							/* pixels per clock */
+	NULL,						/* scanline updater */
 	NULL,						/* generate interrupt */
 	exterm_to_shiftreg_slave,	/* write to shiftreg function */
-	exterm_from_shiftreg_slave, /* read from shiftreg function */
-	NULL,						/* display address changed */
-	NULL,						/* display interrupt callback */
-	0							/* the screen operated on */
+	exterm_from_shiftreg_slave	/* read from shiftreg function */
 };
 
 
@@ -489,7 +491,6 @@ static MACHINE_DRIVER_START( exterm )
 	MDRV_CPU_ADD(M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sound_slave_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET(exterm)
@@ -497,13 +498,14 @@ static MACHINE_DRIVER_START( exterm )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_PALETTE_LENGTH(2048+32768)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 263)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 255)
-	MDRV_PALETTE_LENGTH(4096+32768)
+	MDRV_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
 
 	MDRV_PALETTE_INIT(exterm)
-	MDRV_VIDEO_UPDATE(exterm)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

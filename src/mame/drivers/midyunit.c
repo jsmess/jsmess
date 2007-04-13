@@ -27,7 +27,6 @@
         * Super Hi Impact Proto V4.0: You need to at least reset the high score
             table from the UTILITIES menu.  It's best to do a FULL FACTORY RESTORE
 
-
 **************************************************************************/
 
 #include "driver.h"
@@ -35,6 +34,13 @@
 #include "audio/williams.h"
 #include "sound/okim6295.h"
 #include "midyunit.h"
+
+
+#define SLOW_CPU_CLOCK			(40000000)	/* smashtv, trog */
+#define FAST_CPU_CLOCK			(48000000)	/* narc, strkforc, mk, totcarn */
+
+#define STDRES_PIXEL_CLOCK		(24000000/6)
+#define MEDRES_PIXEL_CLOCK		(48000000/6)
 
 
 
@@ -87,7 +93,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x01e00000, 0x01e0001f) AM_WRITE(midyunit_sound_w)
 	AM_RANGE(0x01f00000, 0x01f0001f) AM_WRITE(midyunit_control_w)
 	AM_RANGE(0x02000000, 0x05ffffff) AM_READ(midyunit_gfxrom_r) AM_BASE((UINT16 **)&midyunit_gfx_rom) AM_SIZE(&midyunit_gfx_rom_size)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, midyunit_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
 
@@ -132,9 +138,9 @@ INPUT_PORTS_START( narc )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) /* Video Freeze */
-	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Vault Switch") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Vault Switch") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -178,7 +184,7 @@ INPUT_PORTS_START( trog )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -277,7 +283,7 @@ INPUT_PORTS_START( smashtv )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -373,7 +379,7 @@ INPUT_PORTS_START( strkforc )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -469,7 +475,7 @@ INPUT_PORTS_START( mkla2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -561,7 +567,7 @@ INPUT_PORTS_START( mkla4 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -752,7 +758,7 @@ INPUT_PORTS_START( totcarn )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) /* Slam Switch */
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -846,15 +852,28 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config zunit_tms_config =
 {
-	0,								/* halt on reset */
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	MEDRES_PIXEL_CLOCK,				/* pixel clock */
+	2,								/* pixels per clock */
+	midyunit_scanline_update,		/* scanline updater */
 	NULL,							/* generate interrupt */
 	midyunit_to_shiftreg,			/* write to shiftreg function */
-	midyunit_from_shiftreg,			/* read from shiftreg function */
-	midyunit_display_addr_changed,	/* display address changed */
-	midyunit_display_interrupt,		/* display interrupt callback */
-	0								/* the screen operated on */
+	midyunit_from_shiftreg			/* read from shiftreg function */
+};
+
+static tms34010_config yunit_tms_config =
+{
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	STDRES_PIXEL_CLOCK,				/* pixel clock */
+	2,								/* pixels per clock */
+	midyunit_scanline_update,		/* scanline updater */
+	NULL,							/* generate interrupt */
+	midyunit_to_shiftreg,			/* write to shiftreg function */
+	midyunit_from_shiftreg			/* read from shiftreg function */
 };
 
 
@@ -868,24 +887,23 @@ static struct tms34010_config tms_config =
 static MACHINE_DRIVER_START( zunit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 48000000/TMS34010_CLOCK_DIVIDER)
-	MDRV_CPU_CONFIG(tms_config)
+	MDRV_CPU_ADD(TMS34010, FAST_CPU_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_CONFIG(zunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_MACHINE_RESET(midyunit)
 	MDRV_NVRAM_HANDLER(midyunit)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 432)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 27, 426)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_ALWAYS_UPDATE)
 	MDRV_PALETTE_LENGTH(8192)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK, 673, 0, 511, 433, 0, 399)
+
 	MDRV_VIDEO_START(midzunit)
-	MDRV_VIDEO_EOF(midyunit)
-	MDRV_VIDEO_UPDATE(midyunit)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(williams_narc_sound)
@@ -902,26 +920,39 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( yunit_core )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 50000000/TMS34010_CLOCK_DIVIDER)
-	MDRV_CPU_CONFIG(tms_config)
+	MDRV_CPU_ADD_TAG("main", TMS34010, FAST_CPU_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_CONFIG(yunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(MKLA5_FPS)
 	MDRV_MACHINE_RESET(midyunit)
 	MDRV_NVRAM_HANDLER(midyunit)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(410, 288)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_ALWAYS_UPDATE)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_EOF(midyunit)
-	MDRV_VIDEO_UPDATE(midyunit)
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK, 505, 0, 399, 289, 0, 253)
+
+	MDRV_VIDEO_UPDATE(tms340x0)
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( yunit_cvsd_4bit )
+static MACHINE_DRIVER_START( yunit_cvsd_4bit_slow )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(yunit_core)
+	MDRV_CPU_REPLACE("main", TMS34010, SLOW_CPU_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_IMPORT_FROM(williams_cvsd_sound)
+
+	/* video hardware */
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_VIDEO_START(midyunit_4bit)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( yunit_cvsd_4bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
@@ -933,7 +964,20 @@ static MACHINE_DRIVER_START( yunit_cvsd_4bit )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( yunit_cvsd_6bit )
+static MACHINE_DRIVER_START( yunit_cvsd_6bit_slow )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(yunit_core)
+	MDRV_CPU_REPLACE("main", TMS34010, SLOW_CPU_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_IMPORT_FROM(williams_cvsd_sound)
+
+	/* video hardware */
+	MDRV_PALETTE_LENGTH(4096)
+	MDRV_VIDEO_START(midyunit_6bit)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( yunit_cvsd_6bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
@@ -945,7 +989,7 @@ static MACHINE_DRIVER_START( yunit_cvsd_6bit )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( yunit_adpcm )
+static MACHINE_DRIVER_START( yunit_adpcm_6bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
@@ -975,66 +1019,6 @@ static MACHINE_DRIVER_START( mkyawdim )
 	MDRV_SOUND_ADD(OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
-/*
-    individual machine drivers with tweaked areas and VBLANK timing
-    based on these video params:
-
-              VERTICAL                   HORIZONTAL
-    Narc:     001B-01AB / 01B0 (400)     003D-013D / 0150 (512)
-    Trog:     0014-0114 / 0120 (256)     002D-00F3 / 00FC (396)
-    Strkforc: 0014-0113 / 0120 (255)     002D-00F5 / 00FC (400)
-    Smashtv:  0014-0114 / 0120 (256)     002D-00FA / 00FC (410)
-    Hiimpact: 0014-0114 / 0120 (256)     002D-00F3 / 00FC (396)
-    Shimpact: 0014-0114 / 0120 (256)     002D-00F3 / 00FC (396)
-    Term2:    0014-0113 / 0120 (255)     002D-00F7 / 00FC (404)
-    MK:       0014-0112 / 0120 (254)     002D-00F5 / 00FC (400)
-    Totcarn:  0014-0114 / 0120 (256)     0032-00FA / 00FC (400)
-*/
-
-
-static MACHINE_DRIVER_START( trog )
-	MDRV_IMPORT_FROM(yunit_cvsd_4bit)
-	MDRV_SCREEN_VISIBLE_AREA(0, 395, 20, 275)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( strkforc )
-	MDRV_IMPORT_FROM(yunit_cvsd_4bit)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 20, 274)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( smashtv )
-	MDRV_IMPORT_FROM(yunit_cvsd_6bit)
-	MDRV_SCREEN_VISIBLE_AREA(0, 409, 20, 275)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( hiimpact )
-	MDRV_IMPORT_FROM(yunit_cvsd_6bit)
-	MDRV_SCREEN_VISIBLE_AREA(0, 395, 20, 275)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( term2 )
-	MDRV_IMPORT_FROM(yunit_adpcm)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 20, 275)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 403, 20, 274)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( mk )
-	MDRV_IMPORT_FROM(yunit_adpcm)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 20, 273)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( totcarn )
-	MDRV_IMPORT_FROM(yunit_adpcm)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 20, 275)
 MACHINE_DRIVER_END
 
 
@@ -2058,34 +2042,34 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, narc,     0,       zunit,    narc,    narc,     ROT0, "Williams", "Narc (rev 7.00)", 0 )
-GAME( 1988, narc3,    narc,    zunit,    narc,    narc,     ROT0, "Williams", "Narc (rev 3.20)", 0 )
+GAME( 1988, narc,     0,        zunit,                 narc,     narc,     ROT0, "Williams", "Narc (rev 7.00)", 0 )
+GAME( 1988, narc3,    narc,     zunit,                 narc,     narc,     ROT0, "Williams", "Narc (rev 3.20)", 0 )
 
-GAME( 1990, trog,     0,       trog,     trog,    trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", 0 )
-GAME( 1990, trog3,    trog,    trog,     trog,    trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", 0 )
-GAME( 1990, trogpa6,  trog,    trog,     trog,    trog,     ROT0, "Midway",   "Trog (rev PA6-PAC 09/09/90)", 0 )
-GAME( 1990, trogp,    trog,    trog,     trog,    trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", 0 )
-GAME( 1991, strkforc, 0,       strkforc, strkforc,strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", 0 )
+GAME( 1990, trog,     0,        yunit_cvsd_4bit_slow,  trog,     trog,     ROT0, "Midway",   "Trog (rev LA4 03/11/91)", 0 )
+GAME( 1990, trog3,    trog,     yunit_cvsd_4bit_slow,  trog,     trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", 0 )
+GAME( 1990, trogpa6,  trog,     yunit_cvsd_4bit_slow,  trog,     trog,     ROT0, "Midway",   "Trog (rev PA6-PAC 09/09/90)", 0 )
+GAME( 1990, trogp,    trog,     yunit_cvsd_4bit_slow,  trog,     trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", 0 )
+GAME( 1991, strkforc, 0,        yunit_cvsd_4bit_fast,  strkforc, strkforc, ROT0, "Midway",   "Strike Force (rev 1 02/25/91)", 0 )
 
-GAME( 1990, smashtv,  0,       smashtv,  smashtv, smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", 0 )
-GAME( 1990, smashtv6, smashtv, smashtv,  smashtv, smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", 0 )
-GAME( 1990, smashtv5, smashtv, smashtv,  smashtv, smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", 0 )
-GAME( 1990, smashtv4, smashtv, smashtv,  smashtv, smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", 0 )
-GAME( 1990, hiimpact, 0,       hiimpact, trog,    hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", 0 )
-GAME( 1990, hiimpac3, hiimpact,hiimpact, trog,    hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", 0 )
-GAME( 1990, hiimpacp, hiimpact,hiimpact, trog,    hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", 0 )
-GAME( 1991, shimpact, 0,       hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", 0 )
-GAME( 1991, shimpacp, shimpact,hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", 0 )
-GAME( 1991, shimpap4, shimpact,hiimpact, trog,    shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", 0 ) /* See notes about factory restore above */
+GAME( 1990, smashtv,  0,        yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", 0 )
+GAME( 1990, smashtv6, smashtv,  yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", 0 )
+GAME( 1990, smashtv5, smashtv,  yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 5.00)", 0 )
+GAME( 1990, smashtv4, smashtv,  yunit_cvsd_6bit_slow,  smashtv,  smashtv,  ROT0, "Williams", "Smash T.V. (rev 4.00)", 0 )
+GAME( 1990, hiimpact, 0,        yunit_cvsd_6bit_fast,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA4 02/04/91)", 0 )
+GAME( 1990, hiimpac3, hiimpact, yunit_cvsd_6bit_fast,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", 0 )
+GAME( 1990, hiimpacp, hiimpact, yunit_cvsd_6bit_fast,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", 0 )
+GAME( 1991, shimpact, 0,        yunit_cvsd_6bit_fast,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", 0 )
+GAME( 1991, shimpacp, shimpact, yunit_cvsd_6bit_fast,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", 0 )
+GAME( 1991, shimpap4, shimpact, yunit_cvsd_6bit_fast,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", 0 ) /* See notes about factory restore above */
 
-GAME( 1991, term2,    0,       term2,    term2,   term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", 0 )
-GAME( 1991, term2la2, term2,   term2,    term2,   term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", 0 )
-GAME( 1991, term2la1, term2,   term2,    term2,   term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", 0 )
-GAME( 1992, mkprot9,  mk,      mk,       mkla2,   mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", 0 )
-GAME( 1992, mkla1,    mk,      mk,       mkla2,   mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", 0 )
-GAME( 1992, mkla2,    mk,      mk,       mkla2,   mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", 0 )
-GAME( 1992, mkla3,    mk,      mk,       mkla4,   mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", 0 )
-GAME( 1992, mkla4,    mk,      mk,       mkla4,   mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", 0 )
-GAME( 1992, mkyawdim, mk,      mkyawdim, mkla4,   mkyawdim, ROT0, "Midway",   "Mortal Kombat (Yawdim bootleg)", 0 )
-GAME( 1992, totcarn,  0,       totcarn,  totcarn, totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", 0 )
-GAME( 1992, totcarnp, totcarn, totcarn,  totcarn, totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", 0 )
+GAME( 1991, term2,    0,        yunit_adpcm_6bit_fast, term2,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", 0 )
+GAME( 1991, term2la2, term2,    yunit_adpcm_6bit_fast, term2,    term2la2, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA2 12/09/91)", 0 )
+GAME( 1991, term2la1, term2,    yunit_adpcm_6bit_fast, term2,    term2la1, ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA1 11/01/91)", 0 )
+GAME( 1992, mkprot9,  mk,       yunit_adpcm_6bit_fast, mkla2,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (prototype, rev 9.0 07/28/92)", 0 )
+GAME( 1992, mkla1,    mk,       yunit_adpcm_6bit_fast, mkla2,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 1.0 08/09/92)", 0 )
+GAME( 1992, mkla2,    mk,       yunit_adpcm_6bit_fast, mkla2,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 2.0 08/18/92)", 0 )
+GAME( 1992, mkla3,    mk,       yunit_adpcm_6bit_fast, mkla4,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 3.0 08/31/92)", 0 )
+GAME( 1992, mkla4,    mk,       yunit_adpcm_6bit_fast, mkla4,    mkyunit,  ROT0, "Midway",   "Mortal Kombat (rev 4.0 09/28/92)", 0 )
+GAME( 1992, mkyawdim, mk,       mkyawdim,              mkla4,    mkyawdim, ROT0, "Midway",   "Mortal Kombat (Yawdim bootleg)", 0 )
+GAME( 1992, totcarn,  0,        yunit_adpcm_6bit_fast, totcarn,  totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", 0 )
+GAME( 1992, totcarnp, totcarn,  yunit_adpcm_6bit_fast, totcarn,  totcarn,  ROT0, "Midway",   "Total Carnage (prototype, rev 1.0 01/25/92)", 0 )

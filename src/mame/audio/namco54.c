@@ -44,7 +44,7 @@ The command format is very simple:
 5x: play sound type C
 6x: set parameters (type C) (followed by 5 bytes)
 7x: set volume for sound type C to x
-8x-fx: nop
+8x-Fx: nop
 
 ***************************************************************************/
 
@@ -77,25 +77,23 @@ static WRITE8_HANDLER( namco_54xx_O_w )
 	if (data & 0x10)
 		discrete_sound_w(NAMCO_54XX_1_DATA, out);
 	else
-		discrete_sound_w(NAMCO_54XX_2_DATA, out);
+		discrete_sound_w(NAMCO_54XX_0_DATA, out);
 }
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
 {
 	UINT8 out = (data & 0x0f);
 
-		discrete_sound_w(NAMCO_54XX_0_DATA, out);
+	discrete_sound_w(NAMCO_54XX_2_DATA, out);
 }
 
 
 
 ADDRESS_MAP_START( namco_54xx_map_program, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(10) )	// MB8844 has 1kB of ROM
-	AM_RANGE(0x000, 0x3ff) AM_ROM AM_WRITENOP
+	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( namco_54xx_map_data, ADDRESS_SPACE_DATA, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(6) )	// MB8844 has 64 nibbles of RAM
 	AM_RANGE(0x00, 0x3f) AM_RAM
 ADDRESS_MAP_END
 

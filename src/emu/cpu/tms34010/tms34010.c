@@ -13,6 +13,7 @@
 #include "tms34010.h"
 #include "34010ops.h"
 #include "osd_cpu.h"
+#include "driver.h"
 
 
 /***************************************************************************
@@ -82,8 +83,8 @@ typedef struct tms34010_regs
 	UINT8  is_34020;
 	UINT8  ext_irq_lines;
 	int (*irq_callback)(int irqline);
-	INT32 last_update_vcount;
-	const struct tms34010_config *config;
+	const tms34010_config *config;
+	mame_timer *scantimer;
 
 	/* for the 34010, we only copy 32 of these into the new state */
 	UINT16 IOregs[64];
@@ -123,21 +124,16 @@ static int	tms34010_ICount;
 /* internal state */
 static tms34010_regs 	state;
 static UINT8			external_host_access;
-static void *			dpyint_timer[MAX_CPU];		  /* Display interrupt timer */
-static void *			vsblnk_timer[MAX_CPU];		  /* VBLANK start timer */
+static UINT8			screen_to_cpu[MAX_SCREENS];
 
 /* default configuration */
-static struct tms34010_config default_config =
+static tms34010_config default_config =
 {
-	0,					/* don't halt on reset */
-	NULL,				/* no interrupt callback */
-	NULL,				/* no shiftreg functions */
-	NULL				/* no shiftreg functions */
+	0
 };
 
 static void check_interrupt(void);
-static void vsblnk_callback(int cpunum);
-static void dpyint_callback(int cpunum);
+static void scanline_callback(int cpunum);
 static void tms34010_state_presave(void);
 static void tms34010_state_postload(void);
 
@@ -149,6 +145,7 @@ static void tms34010_state_postload(void);
 extern void (*tms34010_wfield_functions[32])(offs_t offset,UINT32 data);
 extern UINT32 (*tms34010_rfield_functions_z[32])(offs_t offset);
 extern UINT32 (*tms34010_rfield_functions_s[32])(offs_t offset);
+
 
 /***************************************************************************
     MACROS
@@ -404,7 +401,7 @@ static UINT32 read_pixel_shiftreg(offs_t offset)
 	if (state.config->to_shiftreg)
 		state.config->to_shiftreg(offset, &state.shiftreg[0]);
 	else
-		logerror("To ShiftReg function not set. PC = %08X\n", PC);
+		fatalerror("To ShiftReg function not set. PC = %08X\n", PC);
 	return state.shiftreg[0];
 }
 
@@ -522,7 +519,7 @@ static void write_pixel_shiftreg(offs_t offset,UINT32 data)
 	if (state.config->from_shiftreg)
 		state.config->from_shiftreg(offset, &state.shiftreg[0]);
 	else
-		logerror("From ShiftReg function not set. PC = %08X\n", PC);
+		fatalerror("From ShiftReg function not set. PC = %08X\n", PC);
 }
 
 
@@ -576,7 +573,7 @@ static INT32 raster_op_21(INT32 newpix, INT32 oldpix) { return (oldpix > newpix)
 
 /***************************************************************************
     Internal interrupt check
-*#################################################################################################*/
+****************************************************************************/
 
 /* Generate pending interrupts. Do NOT inline this function on DJGPP,
    it causes a slowdown */
@@ -679,19 +676,20 @@ static void check_interrupt(void)
 
 static void tms34010_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-	const struct tms34010_config *config = _config ? _config : &default_config;
-	int i;
+	const tms34010_config *config = _config ? _config : &default_config;
 
 	external_host_access = 0;
 
-	for (i = 0; i < MAX_CPU; i++)
-	{
-		dpyint_timer[i] = mame_timer_alloc(dpyint_callback);
-		vsblnk_timer[i] = mame_timer_alloc(vsblnk_callback);
-	}
-
 	state.config = config;
 	state.irq_callback = irqcallback;
+
+	/* if we have a scanline callback, make us the owner of this screen */
+	if (config->scanline_callback != NULL)
+		screen_to_cpu[config->scrnum] = index;
+
+	/* allocate a scanline timer and set it to go off at the start */
+	state.scantimer = mame_timer_alloc(scanline_callback);
+	mame_timer_adjust(state.scantimer, time_zero, index, time_zero);
 
 	/* allocate the shiftreg */
 	state.shiftreg = auto_malloc(SHIFTREG_SIZE);
@@ -721,14 +719,14 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 	state_save_register_item("tms34010", index, state.convmp);
 	state_save_register_item("tms34010", index, state.pixelshift);
 	state_save_register_item("tms34010", index, state.gfxcycles);
-	state_save_register_item("tms34010", index, state.last_update_vcount);
 	state_save_register_func_presave(tms34010_state_presave);
 	state_save_register_func_postload(tms34010_state_postload);
 }
 
 static void tms34010_reset(void)
 {
-	const struct tms34010_config *config;
+	const tms34010_config *config;
+	mame_timer *save_scantimer;
 	int (*save_irqcallback)(int);
 	UINT16 *shiftreg;
 
@@ -736,10 +734,12 @@ static void tms34010_reset(void)
 	config = state.config;
 	shiftreg = state.shiftreg;
 	save_irqcallback = state.irq_callback;
+	save_scantimer = state.scantimer;
 	memset(&state, 0, sizeof(state));
 	state.shiftreg = shiftreg;
 	state.config = config;
 	state.irq_callback = save_irqcallback;
+	state.scantimer = save_scantimer;
 
 	/* fetch the initial PC and reset the state */
 	PC = RLONG(0xffffffe0) & 0xfffffff0;
@@ -767,12 +767,6 @@ static void tms34020_reset(void)
 
 static void tms34010_exit(void)
 {
-	int i;
-
-	/* clear out the timers */
-	for (i = 0; i < MAX_CPU; i++)
-		dpyint_timer[i] = vsblnk_timer[i] = NULL;
-
 	state.shiftreg = NULL;
 }
 
@@ -894,7 +888,7 @@ static void set_irq_line(int irqline, int linestate)
 
 /***************************************************************************
     Generate internal interrupt
-*#################################################################################################*/
+***************************************************************************/
 
 static void internal_interrupt_callback(int param)
 {
@@ -916,7 +910,7 @@ static void internal_interrupt_callback(int param)
 
 /***************************************************************************
     Execute
-*#################################################################################################*/
+***************************************************************************/
 
 static int tms34010_execute(int cycles)
 {
@@ -1028,80 +1022,220 @@ static void set_raster_op(void)
     VIDEO TIMING HELPERS
 ***************************************************************************/
 
-static void update_display_address(int vcount)
+static void scanline_callback(int param)
 {
-	UINT32 dpyadr = IOREG(REG_DPYADR) & 0xfffc;
-	UINT32 dpytap = IOREG(REG_DPYTAP) & 0x3fff;
-	INT32 dudate = IOREG(REG_DPYCTL) & 0x03fc;
-	int org = IOREG(REG_DPYCTL) & 0x0400;
-	int scans = (IOREG(REG_DPYSTRT) & 3) + 1;
+	const screen_state *screen;
+	int vsblnk, veblnk, vtotal;
+	int vcount = param >> 8;
+	int cpunum = param & 0xff;
+	int enabled;
+	int master;
 
-	/* anytime during VBLANK is effectively the start of the next frame */
-	if (vcount >= SMART_IOREG(VSBLNK) || vcount <= SMART_IOREG(VEBLNK))
-		state.last_update_vcount = vcount = SMART_IOREG(VEBLNK);
+	/* set the CPU context */
+	cpuintrf_push_context(cpunum);
+	screen = &Machine->screen[state.config->scrnum];
 
-	/* otherwise, compute the updated address */
+	/* fetch the core timing parameters */
+	enabled = SMART_IOREG(DPYCTL) & 0x8000;
+	master = (state.is_34020 || (SMART_IOREG(DPYCTL) & 0x2000));
+	vsblnk = SMART_IOREG(VSBLNK);
+	veblnk = SMART_IOREG(VEBLNK);
+	vtotal = SMART_IOREG(VTOTAL);
+	if (!master)
+	{
+		vtotal = MIN(screen->height - 1, vtotal);
+		vcount = video_screen_get_vpos(state.config->scrnum);
+	}
+
+	/* update the VCOUNT */
+	SMART_IOREG(VCOUNT) = vcount;
+
+	/* if we match the display interrupt scanline, signal an interrupt */
+	if (enabled && vcount == SMART_IOREG(DPYINT))
+	{
+		/* generate the display interrupt signal */
+		internal_interrupt_callback(cpunum | (TMS34010_DI << 8));
+	}
+
+	/* at the start of VBLANK, load the starting display address */
+	if (vcount == vsblnk)
+	{
+		/* 34010 loads DPYADR with DPYSTRT, and inverts if the origin is 0 */
+		if (!state.is_34020)
+		{
+			IOREG(REG_DPYADR) = IOREG(REG_DPYSTRT);
+			logerror("Start of VBLANK, DPYADR = %04X\n", IOREG(REG_DPYADR));
+		}
+
+		/* 34020 loads DPYNXx with DPYSTx */
+		else
+		{
+			IOREG(REG020_DPYNXL) = IOREG(REG020_DPYSTL) & 0xffe0;
+			IOREG(REG020_DPYNXH) = IOREG(REG020_DPYSTH);
+		}
+	}
+
+	/* at the end of the screen, update the display parameters */
+	if (vcount == vtotal)
+	{
+		/* only do this if we have an incoming pixel clock */
+		/* also, only do it if the HEBLNK/HSBLNK values are stable */
+		if (master && state.config->scanline_callback != NULL)
+		{
+			int htotal = SMART_IOREG(HTOTAL);
+			if (htotal > 0 && vtotal > 0)
+			{
+				subseconds_t refresh = HZ_TO_SUBSECONDS(state.config->pixclock) * (htotal + 1) * (vtotal + 1);
+				int width = (htotal + 1) * state.config->pixperclock;
+				int height = vtotal + 1;
+				rectangle visarea;
+
+				/* extract the visible area */
+				visarea.min_x = SMART_IOREG(HEBLNK) * state.config->pixperclock;
+				visarea.max_x = SMART_IOREG(HSBLNK) * state.config->pixperclock - 1;
+				visarea.min_y = veblnk;
+				visarea.max_y = vsblnk - 1;
+
+				/* if everything looks good, set the info */
+				if (visarea.min_x < visarea.max_x && visarea.max_x <= width && visarea.min_y < visarea.max_y && visarea.max_y <= height)
+				{
+					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
+                       if they are the only thing that has changed */
+					if (width != screen->width || height != screen->height || visarea.min_y != screen->visarea.min_y || visarea.max_y != screen->visarea.max_y)
+						video_screen_configure(state.config->scrnum, width, height, &visarea, refresh);
+				}
+
+				logerror("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
+						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, SUBSECONDS_TO_HZ(refresh));
+
+				/* interlaced timing not supported */
+				if ((SMART_IOREG(DPYCTL) & 0x4000) == 0)
+					fatalerror("Interlaced video configured on the TMS34010 (unsupported)");
+			}
+		}
+	}
+
+	/* force a partial update within the visible area */
+	if (vcount >= screen->visarea.min_y && vcount <= screen->visarea.max_y && state.config->scanline_callback != NULL)
+		video_screen_update_partial(state.config->scrnum, vcount);
+
+	/* if we are in the visible area, increment DPYADR by DUDATE */
+	if (vcount >= veblnk && vcount < vsblnk)
+	{
+		/* 34010 increments by the DUDATE field in DPYCTL */
+		if (!state.is_34020)
+		{
+			UINT16 dpyadr = IOREG(REG_DPYADR);
+			if ((dpyadr & 3) == 0)
+				dpyadr = ((dpyadr & 0xfffc) - (IOREG(REG_DPYCTL) & 0x03fc)) | (IOREG(REG_DPYSTRT) & 0x0003);
+			else
+				dpyadr = (dpyadr & 0xfffc) | ((dpyadr - 1) & 3);
+			IOREG(REG_DPYADR) = dpyadr;
+		}
+
+		/* 34020 updates based on the DINC register, including zoom */
+		else
+		{
+			UINT32 dpynx = IOREG(REG020_DPYNXL) | (IOREG(REG020_DPYNXH) << 16);
+			UINT32 dinc = IOREG(REG020_DINCL) | (IOREG(REG020_DINCH) << 16);
+			dpynx = (dpynx & 0xffffffe0) | ((dpynx + dinc) & 0x1f);
+			if ((dpynx & 0x1f) == 0)
+				dpynx += dinc & 0xffffffe0;
+			IOREG(REG020_DPYNXL) = dpynx;
+			IOREG(REG020_DPYNXH) = dpynx >> 16;
+		}
+	}
+
+	/* adjust for the next callback */
+	vcount++;
+	if (vcount > vtotal)
+		vcount = 0;
+
+	/* note that we add !master (0 or 1) as a subseconds value; this makes no practical difference */
+	/* but helps ensure that masters are updated first before slaves */
+	mame_timer_adjust(state.scantimer, add_subseconds_to_mame_time(video_screen_get_time_until_pos(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8), time_zero);
+
+	/* restore the context */
+	cpuintrf_pop_context();
+}
+
+
+void tms34010_get_display_params(int cpunum, tms34010_display_params *params)
+{
+	cpuintrf_push_context(cpunum);
+
+	params->enabled = ((SMART_IOREG(DPYCTL) & 0x8000) != 0);
+	params->vcount = SMART_IOREG(VCOUNT);
+	params->veblnk = SMART_IOREG(VEBLNK);
+	params->vsblnk = SMART_IOREG(VSBLNK);
+	params->heblnk = SMART_IOREG(HEBLNK) * state.config->pixperclock;
+	params->hsblnk = SMART_IOREG(HSBLNK) * state.config->pixperclock;
+
+	/* 34010 gets its address from DPYADR and DPYTAP */
+	if (!state.is_34020)
+	{
+		UINT16 dpyadr = IOREG(REG_DPYADR);
+		if (!(IOREG(REG_DPYCTL) & 0x0400))
+			dpyadr ^= 0xfffc;
+		params->rowaddr = dpyadr >> 4;
+		params->coladdr = ((dpyadr & 0x007c) << 4) | (IOREG(REG_DPYTAP) & 0x3fff);
+		params->yoffset = (IOREG(REG_DPYSTRT) - IOREG(REG_DPYADR)) & 3;
+	}
+
+	/* 34020 gets its address from DPYNX */
 	else
 	{
-		int rows = vcount - state.last_update_vcount;
-		if (rows < 0) rows += SMART_IOREG(VCOUNT);
-		dpyadr -= rows * dudate / scans;
-		IOREG(REG_DPYADR) = dpyadr | (IOREG(REG_DPYADR) & 0x0003);
-		state.last_update_vcount = vcount;
+		params->rowaddr = IOREG(REG020_DPYNXH);
+		params->coladdr = IOREG(REG020_DPYNXL) & 0xffe0;
+		params->yoffset = 0;
+		if ((IOREG(REG020_DINCL) & 0x1f) != 0)
+			params->yoffset = (IOREG(REG020_DPYNXL) & 0x1f) / (IOREG(REG020_DINCL) & 0x1f);
 	}
 
-	/* now compute the actual address */
-	if (org == 0) dpyadr ^= 0xfffc;
-	dpyadr <<= 8;
-	dpyadr |= dpytap << 4;
+	cpuintrf_pop_context();
+}
 
-	/* callback */
-	if (state.config->display_addr_changed)
+
+VIDEO_UPDATE( tms340x0 )
+{
+	pen_t blackpen = get_black_pen(machine);
+	tms34010_display_params params;
+	int x;
+
+	/* get the display parameters for the screen */
+	tms34010_get_display_params(screen_to_cpu[screen], &params);
+
+	/* if the display is enabled, call the scanline callback */
+	if (params.enabled)
 	{
-		if (org != 0) dudate = -dudate;
-		(*state.config->display_addr_changed)(dpyadr & 0x00ffffff, (dudate << 8) / scans, vcount);
+		/* call through to the callback */
+		logerror("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect->min_y, params.rowaddr, params.coladdr);
+		(*state.config->scanline_callback)(machine, screen, bitmap, cliprect->min_y, &params);
 	}
+
+	/* otherwise, just blank the current scanline */
+	else
+		params.heblnk = params.hsblnk = cliprect->max_x + 1;
+
+	/* blank out the blank regions */
+	if (bitmap->bpp == 16)
+	{
+		UINT16 *dest = BITMAP_ADDR16(bitmap, cliprect->min_y, 0);
+		for (x = cliprect->min_x; x < params.heblnk; x++)
+			dest[x] = blackpen;
+		for (x = params.hsblnk; x <= cliprect->max_y; x++)
+			dest[x] = blackpen;
+	}
+	else if (bitmap->bpp == 32)
+	{
+		UINT32 *dest = BITMAP_ADDR32(bitmap, cliprect->min_y, 0);
+		for (x = cliprect->min_x; x < params.heblnk; x++)
+			dest[x] = blackpen;
+		for (x = params.hsblnk; x <= cliprect->max_y; x++)
+			dest[x] = blackpen;
+	}
+	return 0;
 }
-
-
-static void vsblnk_callback(int cpunum)
-{
-	/* set the CPU's context and update the display state */
-	cpuintrf_push_context(cpunum);
-	IOREG(REG_DPYADR) = IOREG(REG_DPYSTRT);
-	update_display_address(SMART_IOREG(VSBLNK));
-
-	cpuintrf_pop_context();
-}
-
-
-static void dpyint_callback(int cpunum)
-{
-	/* set the CPU's context and queue an interrupt */
-	cpuintrf_push_context(cpunum);
-	mame_timer_set(time_zero, cpunum | (TMS34010_DI << 8), internal_interrupt_callback);
-
-	/* allow a callback so we can update before they are likely to do nasty things */
-	if (state.config->display_int_callback)
-		(*state.config->display_int_callback)(IOREG(REG_DPYINT));
-
-	cpuintrf_pop_context();
-}
-
-
-static void update_timers(void)
-{
-	int cpunum = cpu_getactivecpu();
-	int dpyint = IOREG(REG_DPYINT);
-	int vsblnk = SMART_IOREG(VSBLNK);
-
-	/* set new timers */
-	mame_time interval = video_screen_get_frame_period(state.config->scrnum);
-
-	mame_timer_adjust(dpyint_timer[cpunum], video_screen_get_time_until_pos(state.config->scrnum, dpyint, 0), cpunum, interval);
-	mame_timer_adjust(vsblnk_timer[cpunum], video_screen_get_time_until_pos(state.config->scrnum, vsblnk, 0), cpunum, interval);
-}
-
 
 
 /***************************************************************************
@@ -1132,21 +1266,6 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 	switch (offset)
 	{
-		case REG_DPYINT:
-			if (data != oldreg || !dpyint_timer[cpunum])
-				update_timers();
-			break;
-
-		case REG_VSBLNK:
-			if (data != oldreg || !vsblnk_timer[cpunum])
-				update_timers();
-			break;
-
-		case REG_VEBLNK:
-			if (data != oldreg)
-				update_timers();
-			break;
-
 		case REG_CONTROL:
 			state.transparency = data & 0x20;
 			state.window_checking = (data >> 6) & 0x03;
@@ -1174,26 +1293,6 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 		case REG_DPYCTL:
 			set_pixel_function();
-			if ((oldreg ^ data) & 0x03fc)
-				update_display_address(video_screen_get_vpos(state.config->scrnum));
-			break;
-
-		case REG_DPYADR:
-			if (data != oldreg)
-			{
-				state.last_update_vcount = video_screen_get_vpos(state.config->scrnum);
-				update_display_address(state.last_update_vcount);
-			}
-			break;
-
-		case REG_DPYSTRT:
-			if (data != oldreg)
-				update_display_address(video_screen_get_vpos(state.config->scrnum));
-			break;
-
-		case REG_DPYTAP:
-			if ((oldreg ^ data) & 0x3fff)
-				update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG_HSTCTLH:
@@ -1311,21 +1410,6 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 	switch (offset)
 	{
-		case REG020_DPYINT:
-			if (data != oldreg || !dpyint_timer[cpunum])
-				update_timers();
-			break;
-
-		case REG020_VSBLNK:
-			if (data != oldreg || !vsblnk_timer[cpunum])
-				update_timers();
-			break;
-
-		case REG020_VEBLNK:
-			if (data != oldreg)
-				update_timers();
-			break;
-
 		case REG020_CONTROL:
 		case REG020_CONTROL2:
 			IOREG(REG020_CONTROL) = data;
@@ -1357,8 +1441,6 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 		case REG020_DPYCTL:
 			set_pixel_function();
-			if ((oldreg ^ data) & 0x03fc)
-				update_display_address(video_screen_get_vpos(state.config->scrnum));
 			break;
 
 		case REG020_HSTCTLH:
@@ -1465,15 +1547,6 @@ WRITE16_HANDLER( tms34020_io_register_w )
 		case REG020_DPYADR:
 		case REG020_DPYTAP:
 			break;
-
-		case REG020_DPYSTL:
-		case REG020_DPYSTH:
-			if (data != oldreg)
-			{
-				state.last_update_vcount = video_screen_get_vpos(state.config->scrnum);
-				update_display_address(state.last_update_vcount);
-			}
-			break;
 	}
 }
 
@@ -1493,13 +1566,10 @@ READ16_HANDLER( tms34010_io_register_r )
 
 	switch (offset)
 	{
-		case REG_VCOUNT:
-			return video_screen_get_vpos(state.config->scrnum);
-
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
 			result = video_screen_get_hpos(state.config->scrnum);
-			total = IOREG(REG_HTOTAL);
+			total = IOREG(REG_HTOTAL) + 1;
 			result = result * total / Machine->screen[state.config->scrnum].width;
 
 			/* offset by the HBLANK end */
@@ -1510,10 +1580,6 @@ READ16_HANDLER( tms34010_io_register_r )
 				result -= total;
 			return result;
 
-		case REG_DPYADR:
-			update_display_address(video_screen_get_vpos(state.config->scrnum));
-			break;
-
 		case REG_REFCNT:
 			return (activecpu_gettotalcycles() / 16) & 0xfffc;
 
@@ -1523,8 +1589,8 @@ READ16_HANDLER( tms34010_io_register_r )
 			/* Cool Pool loops in mainline code on the appearance of the DI, even though they */
 			/* have an IRQ handler. For this reason, we return it signalled a bit early in order */
 			/* to make it past these loops. */
-			if (dpyint_timer[cpunum] &&
-			    compare_mame_times(mame_timer_timeleft(dpyint_timer[cpunum]), double_to_mame_time(3 * TIME_IN_HZ(40000000/TMS34010_CLOCK_DIVIDER))) == -1)
+			if (SMART_IOREG(VCOUNT) + 1 == SMART_IOREG(DPYINT) &&
+				compare_mame_times(mame_timer_timeleft(state.scantimer), MAME_TIME_IN_HZ(40000000/TMS34010_CLOCK_DIVIDER/3)) < 0)
 				result |= TMS34010_DI;
 			return result;
 	}
@@ -1543,13 +1609,10 @@ READ16_HANDLER( tms34020_io_register_r )
 
 	switch (offset)
 	{
-		case REG020_VCOUNT:
-			return video_screen_get_vpos(state.config->scrnum);
-
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
 			result = video_screen_get_hpos(state.config->scrnum);
-			total = IOREG(REG020_HTOTAL);
+			total = IOREG(REG020_HTOTAL) + 1;
 			result = result * total / Machine->screen[state.config->scrnum].width;
 
 			/* offset by the HBLANK end */
@@ -1559,10 +1622,6 @@ READ16_HANDLER( tms34020_io_register_r )
 			if (result > total)
 				result -= total;
 			return result;
-
-		case REG020_DPYADR:
-			update_display_address(video_screen_get_vpos(state.config->scrnum));
-			break;
 
 		case REG020_REFADR:
 		{

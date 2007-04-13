@@ -19,54 +19,54 @@ static void schedule_chained_dma_op(int channel, UINT32 dma_chain_ptr, int chain
 	UINT32 ext_modifier 	= dm_read32(op_ptr - 6);
 	UINT32 ext_count 		= dm_read32(op_ptr - 7);
 
-	if (dmaop_cycles > 0)
+	if (sharc.dmaop_cycles > 0)
 	{
 		fatalerror("schedule_chained_dma_op: DMA operation already scheduled at %08X!", sharc.pc);
 	}
 
 	if (chained_direction)		// Transmit to external
 	{
-		dmaop_dst 			= ext_index;
-		dmaop_dst_modifier	= ext_modifier;
-		dmaop_dst_count		= ext_count;
-		dmaop_src			= int_index;
-		dmaop_src_modifier	= int_modifier;
-		dmaop_src_count		= int_count;
+		sharc.dmaop_dst 			= ext_index;
+		sharc.dmaop_dst_modifier	= ext_modifier;
+		sharc.dmaop_dst_count		= ext_count;
+		sharc.dmaop_src				= int_index;
+		sharc.dmaop_src_modifier	= int_modifier;
+		sharc.dmaop_src_count		= int_count;
 	}
 	else			// Receive from external
 	{
-		dmaop_src 			= ext_index;
-		dmaop_src_modifier	= ext_modifier;
-		dmaop_src_count		= ext_count;
-		dmaop_dst			= int_index;
-		dmaop_dst_modifier	= int_modifier;
-		dmaop_dst_count		= int_count;
+		sharc.dmaop_src 			= ext_index;
+		sharc.dmaop_src_modifier	= ext_modifier;
+		sharc.dmaop_src_count		= ext_count;
+		sharc.dmaop_dst				= int_index;
+		sharc.dmaop_dst_modifier	= int_modifier;
+		sharc.dmaop_dst_count		= int_count;
 	}
 
-	dmaop_pmode = 0;
-	dmaop_channel = channel;
-	dmaop_cycles = dmaop_src_count / 4;
-	dmaop_chain_ptr = chain_ptr;
-	dmaop_chained_direction = chained_direction;
+	sharc.dmaop_pmode = 0;
+	sharc.dmaop_channel = channel;
+	sharc.dmaop_cycles = sharc.dmaop_src_count / 4;
+	sharc.dmaop_chain_ptr = chain_ptr;
+	sharc.dmaop_chained_direction = chained_direction;
 }
 
 static void schedule_dma_op(int channel, UINT32 src, UINT32 dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode)
 {
-	if (dmaop_cycles > 0)
+	if (sharc.dmaop_cycles > 0)
 	{
 		fatalerror("schedule_dma_op: DMA operation already scheduled at %08X!", sharc.pc);
 	}
 
-	dmaop_channel = channel;
-	dmaop_src = src;
-	dmaop_dst = dst;
-	dmaop_src_modifier = src_modifier;
-	dmaop_dst_modifier = dst_modifier;
-	dmaop_src_count = src_count;
-	dmaop_dst_count = dst_count;
-	dmaop_pmode = pmode;
-	dmaop_chain_ptr = 0;
-	dmaop_cycles = src_count / 4;
+	sharc.dmaop_channel = channel;
+	sharc.dmaop_src = src;
+	sharc.dmaop_dst = dst;
+	sharc.dmaop_src_modifier = src_modifier;
+	sharc.dmaop_dst_modifier = dst_modifier;
+	sharc.dmaop_src_count = src_count;
+	sharc.dmaop_dst_count = dst_count;
+	sharc.dmaop_pmode = pmode;
+	sharc.dmaop_chain_ptr = 0;
+	sharc.dmaop_cycles = src_count / 4;
 }
 
 static void dma_op(UINT32 src, UINT32 dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode)
@@ -124,12 +124,15 @@ static void dma_op(UINT32 src, UINT32 dst, int src_modifier, int dst_modifier, i
 		}
 	}
 
-	sharc.irptl |= (1 << (dmaop_channel+10));
-
-	/* DMA interrupt */
-	if (sharc.imask & (1 << (dmaop_channel+10)))
+	if (sharc.dmaop_channel == 6)
 	{
-		sharc.irq_active |= 1 << (dmaop_channel+10);
+		sharc.irptl |= (1 << (sharc.dmaop_channel+10));
+
+		/* DMA interrupt */
+		if (sharc.imask & (1 << (sharc.dmaop_channel+10)))
+		{
+			sharc.irq_active |= 1 << (sharc.dmaop_channel+10);
+		}
 	}
 }
 

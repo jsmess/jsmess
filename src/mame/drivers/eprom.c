@@ -63,13 +63,19 @@ static void update_interrupts(void)
 }
 
 
-static MACHINE_RESET( eprom )
+static MACHINE_RESET( klaxp )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(0, eprom_scanline_update, 8);
 	atarijsa_reset();
 	atarigen_init_save_state();
+}
+
+
+static MACHINE_RESET( eprom )
+{
+	machine_reset_klaxp(machine);
 	state_save_register_global_pointer(sync_data, 2);
 }
 
@@ -375,7 +381,7 @@ static MACHINE_DRIVER_START( klaxp )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(10)
 
-	MDRV_MACHINE_RESET(eprom)
+	MDRV_MACHINE_RESET(klaxp)
 	MDRV_NVRAM_HANDLER(atarigen)
 
 	/* video hardware */

@@ -248,7 +248,7 @@ DISCRETE_SOUND_START(polepos_discrete_interface)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_20,
 					1,			/* ENAB */
-					NAMCO_54XX_0_DATA,
+					NAMCO_54XX_2_DATA,
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(NODE_21,
@@ -284,7 +284,7 @@ DISCRETE_SOUND_START(polepos_discrete_interface)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_40,
 					1,			/* ENAB */
-					NAMCO_54XX_2_DATA,
+					NAMCO_54XX_0_DATA,
 					4,			/* 4V - unmeasured*/
 					&polepos_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(NODE_41,

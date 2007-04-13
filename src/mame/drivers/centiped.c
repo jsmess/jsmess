@@ -433,6 +433,8 @@ static UINT8 sign[4];
 static UINT8 dsw_select, control_select;
 static UINT8 *rambase;
 
+static mame_timer *interrupt_timer;
+
 
 /*************************************
  *
@@ -451,7 +453,7 @@ static void generate_interrupt(int scanline)
 	if (scanline >= 256)
 		scanline = 0;
 
-	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, generate_interrupt);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -466,7 +468,8 @@ static MACHINE_START( centiped )
 
 static MACHINE_RESET( centiped )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, generate_interrupt);
+	interrupt_timer = mame_timer_alloc(generate_interrupt);
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	dsw_select = 0;
 	control_select = 0;

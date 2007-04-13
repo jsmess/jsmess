@@ -1295,7 +1295,8 @@ static void execute_wplist(int ref, int params, const char *param[])
 					for (wp = cpuinfo->space[spacenum].first_wp; wp; wp = wp->next)
 					{
 						int buflen;
-						buflen = sprintf(buffer, "%c%4X @ %08X-%08X %s", wp->enabled ? ' ' : 'D', wp->index, wp->address, wp->address + wp->length - 1, types[wp->type & 3]);
+						buflen = sprintf(buffer, "%c%4X @ %08X-%08X %s", wp->enabled ? ' ' : 'D',
+								wp->index, BYTE2ADDR(wp->address, cpuinfo, spacenum), BYTE2ADDR(wp->address + wp->length, cpuinfo, spacenum) - 1, types[wp->type & 3]);
 						if (wp->condition)
 							buflen += sprintf(&buffer[buflen], " if %s", expression_original_string(wp->condition));
 						if (wp->action)

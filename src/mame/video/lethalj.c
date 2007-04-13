@@ -173,26 +173,24 @@ WRITE16_HANDLER( lethalj_blitter_w )
  *
  *************************************/
 
-VIDEO_UPDATE( lethalj )
+void lethalj_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
+	UINT16 *src = &screenram[(params->rowaddr << 9) & 0x3fe00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr << 1;
+	int x;
+
 	/* blank palette: fill with white */
 	if (blank_palette)
-		fillbitmap(bitmap, 0x7fff, cliprect);
-
-	/* otherwise, blit from screenram */
-	else
 	{
-		int x, y;
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		{
-			UINT16 *source = screenram + (y - machine->screen[0].visarea.min_y) * BLITTER_DEST_WIDTH + cliprect->min_x;
-			UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels + cliprect->min_x;
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-				*dest++ = *source++ & 0x7fff;
-		}
+		for (x = params->heblnk; x < params->hsblnk; x++)
+			dest[x] = 0x7fff;
+		if (scanline == machine->screen[0].visarea.max_y)
+			blank_palette = 0;
+		return;
 	}
 
-	if (cliprect->max_y == machine->screen[0].visarea.max_y)
-		blank_palette = 0;
-	return 0;
+	/* copy the non-blanked portions of this scanline */
+	for (x = params->heblnk; x < params->hsblnk; x++)
+		dest[x] = src[coladdr++ & 0x1ff] & 0x7fff;
 }

@@ -844,6 +844,10 @@ WW.B11    Object 5 - Even
  *
  *************************************/
 
+#define MASTER_CLOCK_10MHz		(10000000)
+#define MASTER_CLOCK_8MHz		(8000000)
+#define MASTER_CLOCK_25MHz		(25174800)
+
 #define ROM_BOARD_171_5358_SMALL (0)	/* 171-5358 with smaller ROMs */
 #define ROM_BOARD_171_5358		(1)		/* 171-5358 */
 #define ROM_BOARD_171_5521		(2)		/* 171-5521 */
@@ -1371,6 +1375,23 @@ static void altbeast_i8751_sim(void)
 }
 
 
+static void ddux_i8751_sim(void)
+{
+	UINT16 temp;
+
+	/* signal a VBLANK to the main CPU */
+	cpunum_set_input_line(0, 4, HOLD_LINE);
+
+	/* process any new sound data */
+	temp = workram[0x0bd0/2];
+	if ((temp & 0xff00) != 0x0000)
+	{
+		segaic16_memory_mapper_w(0x03, temp >> 8);
+		workram[0x0bd0/2] = temp & 0x00ff;
+	}
+}
+
+
 static void goldnaxe_i8751_init(void)
 {
 	static const UINT8 memory_control_5704[0x10] =
@@ -1477,21 +1498,6 @@ static void wrestwar_i8751_sim(void)
 	workram[0x2082/2] = readinputport(0);
 }
 
-static void ddux_i8751_sim(void)
-{
-	UINT16 temp;
-
-	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(0, 4, HOLD_LINE);
-
-	/* process any new sound data */
-	temp = workram[0x0bd0/2];
-	if ((temp & 0xff00) != 0x0000)
-	{
-		segaic16_memory_mapper_w(0x03, temp>>8);
-		workram[0x0bd0/2] = temp & 0x00ff;
-	}
-}
 
 
 /*************************************
@@ -1598,6 +1604,31 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 
 /*************************************
  *
+ *  Passing Shot custom I/O
+ *
+ *************************************/
+
+static READ16_HANDLER( passshtj_custom_io_r )
+{
+	switch (offset & (0x3000/2))
+	{
+		case 0x3000/2:
+			switch (offset & 3)
+			{
+				case 0:	return readinputportbytag("P1");
+				case 1:	return readinputportbytag("P2");
+				case 2:	return readinputportbytag("P3");
+				case 3:	return readinputportbytag("P4");
+			}
+			break;
+	}
+	return standard_io_r(offset, mem_mask);
+}
+
+
+
+/*************************************
+ *
  *  SDI custom I/O
  *
  *************************************/
@@ -1662,31 +1693,6 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
 			break;
 	}
 	standard_io_w(offset, data, mem_mask);
-}
-
-
-
-/*************************************
- *
- *  Passing Shot custom I/O
- *
- *************************************/
-
-static READ16_HANDLER( passshtj_custom_io_r )
-{
-	switch (offset & (0x3000/2))
-	{
-		case 0x3000/2:
-			switch (offset & 3)
-			{
-				case 0:	return readinputportbytag("P1");
-				case 1:	return readinputportbytag("P2");
-				case 2:	return readinputportbytag("P3");
-				case 3:	return readinputportbytag("P4");
-			}
-			break;
-	}
-	return standard_io_r(offset, mem_mask);
 }
 
 
@@ -3026,21 +3032,9 @@ static struct upd7759_interface upd7759_interface =
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static const gfx_decode gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &charlayout,	0, 1024 },
+	{ REGION_GFX1, 0, &gfx_8x8x3_planar,	0, 1024 },
 	{ -1 }
 };
 
@@ -3055,11 +3049,11 @@ static const gfx_decode gfxdecodeinfo[] =
 static MACHINE_DRIVER_START( system16b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
+	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_10MHz)
 	MDRV_CPU_PROGRAM_MAP(system16b_map,0)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 5000000)
+	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_10MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -3070,11 +3064,12 @@ static MACHINE_DRIVER_START( system16b )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048*3)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 321, 262, 0, 224)
 
 	MDRV_VIDEO_START(system16b)
 	MDRV_VIDEO_UPDATE(system16b)
@@ -3082,7 +3077,7 @@ static MACHINE_DRIVER_START( system16b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("2151", YM2151, 4000000)
+	MDRV_SOUND_ADD_TAG("2151", YM2151, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MDRV_SOUND_ADD_TAG("7759", UPD7759, UPD7759_STANDARD_CLOCK)
@@ -3096,7 +3091,7 @@ static MACHINE_DRIVER_START( system16b_8751 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_VBLANK_INT(i8751_main_cpu_vblank,1)
 
-	MDRV_CPU_ADD_TAG("mcu", I8751, 8000000)
+	MDRV_CPU_ADD_TAG("mcu", I8751, MASTER_CLOCK_8MHz)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse,1)

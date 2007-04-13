@@ -332,129 +332,119 @@ void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg)
  *
  *************************************/
 
-VIDEO_UPDATE( btoads )
+void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	int x, y;
+	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 4;
+	UINT16 *bg0_base = &btoads_vram_bg0[(fulladdr + (yscroll0 << 10)) & 0x3fc00];
+	UINT16 *bg1_base = &btoads_vram_bg1[(fulladdr + (yscroll1 << 10)) & 0x3fc00];
+	UINT8 *spr_base = &vram_fg_display[fulladdr & 0x3fc00];
+	UINT16 *dst = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = fulladdr & 0x3ff;
+	int x;
 
-	/* check for disabled video */
-	if (tms34010_io_display_blanked(0))
+	/* for each scanline, switch off the render mode */
+	switch (screen_control & 3)
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
-		return 0;
-	}
+		/* mode 0: used in ship level, snake boss, title screen (free play) */
+		case 0:
 
-	/* loop over all scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		UINT16 *bg0_base = &btoads_vram_bg0[((y - machine->screen[0].visarea.min_y + yscroll0) & 0xff) * TOWORD(0x4000)];
-		UINT16 *bg1_base = &btoads_vram_bg1[((y - machine->screen[0].visarea.min_y + yscroll1) & 0xff) * TOWORD(0x4000)];
-		UINT8 *spr_base = &vram_fg_display[(y - machine->screen[0].visarea.min_y) * TOWORD(0x4000)];
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+		/* mode 2: used in EOA screen, jetpack level, first level, high score screen */
+		case 2:
+			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			{
+				UINT8 sprpix = spr_base[coladdr & 0xff];
 
-		/* for each scanline, switch off the render mode */
-		switch (screen_control & 3)
-		{
-			/* mode 0: used in ship level, snake boss, title screen (free play) */
-			case 0:
-
-			/* mode 2: used in EOA screen, jetpack level, first level, high score screen */
-			case 2:
-				for (x = 0; x < 256; x++, dst += 2)
+				if (sprpix)
 				{
-					UINT8 sprpix = spr_base[x];
-
-					if (sprpix)
-					{
-						dst[0] = sprpix;
-						dst[1] = sprpix;
-					}
-					else
-					{
-						UINT16 bg0pix = bg0_base[(x + xscroll0) & 0xff];
-						UINT16 bg1pix = bg1_base[(x + xscroll1) & 0xff];
-
-						if (bg1pix & 0xff)
-							dst[0] = bg1pix & 0xff;
-						else
-							dst[0] = bg0pix & 0xff;
-
-						if (bg1pix >> 8)
-							dst[1] = bg1pix >> 8;
-						else
-							dst[1] = bg0pix >> 8;
-					}
+					dst[x + 0] = sprpix;
+					dst[x + 1] = sprpix;
 				}
-				break;
-
-			/* mode 1: used in snow level, title screen (free play), top part of rolling ball level */
-			case 1:
-				for (x = 0; x < 256; x++, dst += 2)
+				else
 				{
-					UINT8 sprpix = spr_base[x];
+					UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
+					UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
 
-					if (sprpix && !(sprpix & 0x80))
-					{
-						dst[0] = sprpix;
-						dst[1] = sprpix;
-					}
+					if (bg1pix & 0xff)
+						dst[x + 0] = bg1pix & 0xff;
 					else
-					{
-						UINT16 bg0pix = bg0_base[(x + xscroll0) & 0xff];
-						UINT16 bg1pix = bg1_base[(x + xscroll1) & 0xff];
+						dst[x + 0] = bg0pix & 0xff;
 
-						if (bg0pix & 0xff)
-							dst[0] = bg0pix & 0xff;
-						else if (bg1pix & 0x80)
-							dst[0] = bg1pix & 0xff;
-						else if (sprpix)
-							dst[0] = sprpix;
-						else
-							dst[0] = bg1pix & 0xff;
-
-						if (bg0pix >> 8)
-							dst[1] = bg0pix >> 8;
-						else if (bg1pix & 0x8000)
-							dst[1] = bg1pix >> 8;
-						else if (sprpix)
-							dst[1] = sprpix;
-						else
-							dst[1] = bg1pix >> 8;
-					}
+					if (bg1pix >> 8)
+						dst[x + 1] = bg1pix >> 8;
+					else
+						dst[x + 1] = bg0pix >> 8;
 				}
-				break;
+			}
+			break;
 
-			/* mode 3: used in toilet level, toad intros, bottom of rolling ball level */
-			case 3:
-				for (x = 0; x < 256; x++, dst += 2)
+		/* mode 1: used in snow level, title screen (free play), top part of rolling ball level */
+		case 1:
+			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			{
+				UINT8 sprpix = spr_base[coladdr & 0xff];
+
+				if (sprpix && !(sprpix & 0x80))
 				{
-					UINT16 bg0pix = bg0_base[(x + xscroll0) & 0xff];
-					UINT16 bg1pix = bg1_base[(x + xscroll1) & 0xff];
-					UINT8 sprpix = spr_base[x];
+					dst[x + 0] = sprpix;
+					dst[x + 1] = sprpix;
+				}
+				else
+				{
+					UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
+					UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
 
-					if (bg1pix & 0x80)
-						dst[0] = bg1pix & 0xff;
-					else if (sprpix & 0x80)
-						dst[0] = sprpix;
-					else if (bg1pix & 0xff)
-						dst[0] = bg1pix & 0xff;
+					if (bg0pix & 0xff)
+						dst[x + 0] = bg0pix & 0xff;
+					else if (bg1pix & 0x80)
+						dst[x + 0] = bg1pix & 0xff;
 					else if (sprpix)
-						dst[0] = sprpix;
+						dst[x + 0] = sprpix;
 					else
-						dst[0] = bg0pix & 0xff;
+						dst[x + 0] = bg1pix & 0xff;
 
-					if (bg1pix & 0x8000)
-						dst[1] = bg1pix >> 8;
-					else if (sprpix & 0x80)
-						dst[1] = sprpix;
-					else if (bg1pix >> 8)
-						dst[1] = bg1pix >> 8;
+					if (bg0pix >> 8)
+						dst[x + 1] = bg0pix >> 8;
+					else if (bg1pix & 0x8000)
+						dst[x + 1] = bg1pix >> 8;
 					else if (sprpix)
-						dst[1] = sprpix;
+						dst[x + 1] = sprpix;
 					else
-						dst[1] = bg0pix >> 8;
+						dst[x + 1] = bg1pix >> 8;
 				}
-				break;
-		}
+			}
+			break;
+
+		/* mode 3: used in toilet level, toad intros, bottom of rolling ball level */
+		case 3:
+			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			{
+				UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
+				UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
+				UINT8 sprpix = spr_base[coladdr & 0xff];
+
+				if (bg1pix & 0x80)
+					dst[x + 0] = bg1pix & 0xff;
+				else if (sprpix & 0x80)
+					dst[x + 0] = sprpix;
+				else if (bg1pix & 0xff)
+					dst[x + 0] = bg1pix & 0xff;
+				else if (sprpix)
+					dst[x + 0] = sprpix;
+				else
+					dst[x + 0] = bg0pix & 0xff;
+
+				if (bg1pix & 0x8000)
+					dst[x + 1] = bg1pix >> 8;
+				else if (sprpix & 0x80)
+					dst[x + 1] = sprpix;
+				else if (bg1pix >> 8)
+					dst[x + 1] = bg1pix >> 8;
+				else if (sprpix)
+					dst[x + 1] = sprpix;
+				else
+					dst[x + 1] = bg0pix >> 8;
+			}
+			break;
 	}
 
 	/* debugging - dump the screen contents to a file */
@@ -475,6 +465,7 @@ VIDEO_UPDATE( btoads )
 			UINT16 *base = (i == 0) ? (UINT16 *)vram_fg_display : (i == 1) ? btoads_vram_bg0 : btoads_vram_bg1;
 			int xscr = (i == 0) ? 0 : (i == 1) ? xscroll0 : xscroll1;
 			int yscr = (i == 0) ? 0 : (i == 1) ? yscroll0 : yscroll1;
+			int y;
 
 			for (y = 0; y < 224; y++)
 			{
@@ -494,5 +485,4 @@ VIDEO_UPDATE( btoads )
 
 	logerror("---VBLANK---\n");
 #endif
-	return 0;
 }

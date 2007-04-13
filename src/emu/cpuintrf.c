@@ -125,6 +125,7 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info);
 void arm_get_info(UINT32 state, cpuinfo *info);
 void arm7_get_info(UINT32 state, cpuinfo *info);
 void sh2_get_info(UINT32 state, cpuinfo *info);
+void sh4_get_info(UINT32 state, cpuinfo *info);
 void dsp32c_get_info(UINT32 state, cpuinfo *info);
 void pic16C54_get_info(UINT32 state, cpuinfo *info);
 void pic16C55_get_info(UINT32 state, cpuinfo *info);
@@ -189,7 +190,10 @@ void tms7000_get_info(UINT32 state, cpuinfo *info);
 void tms7000_exl_get_info(UINT32 state, cpuinfo *info);
 void sm8500_get_info(UINT32 state, cpuinfo *info);
 void v30mz_get_info(UINT32 state, cpuinfo *info);
-void mb88_get_info(UINT32 state, cpuinfo *info);
+void mb8841_get_info(UINT32 state, cpuinfo *info);
+void mb8842_get_info(UINT32 state, cpuinfo *info);
+void mb8843_get_info(UINT32 state, cpuinfo *info);
+void mb8844_get_info(UINT32 state, cpuinfo *info);
 void mb86233_get_info(UINT32 state, cpuinfo *info);
 void ssp1610_get_info(UINT32 state, cpuinfo *info);
 
@@ -559,6 +563,9 @@ static const struct
 #if (HAS_SH2)
 	{ CPU_SH2, sh2_get_info },
 #endif
+#if (HAS_SH4)
+	{ CPU_SH4, sh4_get_info },
+#endif
 #if (HAS_DSP32C)
 	{ CPU_DSP32C, dsp32c_get_info },
 #endif
@@ -662,7 +669,7 @@ static const struct
 	{ CPU_PPC603, ppc603_get_info },
 #endif
 #if (HAS_MPC8240)
-	{ CPU_PPC603, mpc8240_get_info },
+	{ CPU_MPC8240, mpc8240_get_info },
 #endif
 #if (HAS_SE3208)
 	{ CPU_SE3208, SE3208_get_info },
@@ -745,11 +752,17 @@ static const struct
 #if (HAS_V30MZ)
 	{ CPU_V30MZ, v30mz_get_info },
 #endif
+#if (HAS_MB8841)
+	{ CPU_MB8841, mb8841_get_info },
+#endif
+#if (HAS_MB8842)
+	{ CPU_MB8842, mb8842_get_info },
+#endif
 #if (HAS_MB8843)
-	{ CPU_MB8843, mb88_get_info },
+	{ CPU_MB8843, mb8843_get_info },
 #endif
 #if (HAS_MB8844)
-	{ CPU_MB8844, mb88_get_info },
+	{ CPU_MB8844, mb8844_get_info },
 #endif
 #if (HAS_MB86233)
 	{ CPU_MB86233, mb86233_get_info },

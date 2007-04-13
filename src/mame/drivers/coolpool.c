@@ -41,10 +41,6 @@
 
 static UINT16 *vram_base;
 
-static UINT16 dpyadr;
-static int dpyadrscan;
-static int last_dpyint;
-
 static UINT8 cmd_pending;
 static UINT16 iop_cmd;
 static UINT16 iop_answer;
@@ -55,7 +51,7 @@ static const UINT16 nvram_unlock_seq[] =
 {
 	0x3fb, 0x3fb, 0x3f8, 0x3fc, 0x3fa, 0x3fe, 0x3f9, 0x3fd, 0x3fb, 0x3ff
 };
-#define NVRAM_UNLOCK_SEQ_LEN (sizeof(nvram_unlock_seq) / sizeof(nvram_unlock_seq[0]))
+#define NVRAM_UNLOCK_SEQ_LEN (ARRAY_LENGTH(nvram_unlock_seq))
 static UINT16 nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
 static UINT8 nvram_write_enable;
 static mame_timer *nvram_write_timer;
@@ -79,111 +75,45 @@ static void nvram_write_timeout(int param);
  *
  *************************************/
 
-static VIDEO_UPDATE( amerdart )
+static void amerdart_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 *base = &vram_base[TOWORD(0x800) + (cliprect->min_y - machine->screen[0].visarea.min_y) * TOWORD(0x800)];
-	int x, y;
-
-	/* if we're blank, just blank the screen */
-	if (tms34010_io_display_blanked(0))
-	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
-		return 0;
-	}
+	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr;
+	int x;
 
 	/* update the palette */
-	for (x = 0; x < 16; x++)
-	{
-		UINT16 pal = vram_base[x];
-		palette_set_color(machine, x, pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
-	}
-
-	/* loop over scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
-
-		/* render 4bpp data */
-		for (x = cliprect->min_x; x <= cliprect->max_x; x += 4)
+	if (scanline < 256)
+		for (x = 0; x < 16; x++)
 		{
-			UINT16 pixels = base[x / 4];
-			*dest++ = (pixels >> 0) & 15;
-			*dest++ = (pixels >> 4) & 15;
-			*dest++ = (pixels >> 8) & 15;
-			*dest++ = (pixels >> 12) & 15;
+			UINT16 pal = vram_base[x];
+			palette_set_color(machine, scanline * 16 + x, pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
-		base += TOWORD(0x800);
+
+	for (x = params->heblnk; x < params->hsblnk; x += 4)
+	{
+		UINT16 pixels = vram[coladdr++ & 0xff];
+		dest[x + 0] = scanline * 16 + ((pixels >> 0) & 15);
+		dest[x + 1] = scanline * 16 + ((pixels >> 4) & 15);
+		dest[x + 2] = scanline * 16 + ((pixels >> 8) & 15);
+		dest[x + 3] = scanline * 16 + ((pixels >> 12) & 15);
 	}
-	return 0;
 }
 
 
-static VIDEO_UPDATE( coolpool )
+static void coolpool_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 dpytap, dudate, dumask, vsblnk, veblnk;
-	int startscan = cliprect->min_y, endscan = cliprect->max_y;
-	int x, y, offset, scanoffs = 0;
+	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr;
+	int x;
 
-	/* if we're blank, just blank the screen */
-	if (tms34010_io_display_blanked(0))
+	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
-		return 0;
+		UINT16 pixels = vram[coladdr++ & 0xff];
+		dest[x + 0] = pixels & 0xff;
+		dest[x + 1] = pixels >> 8;
 	}
-
-	/* fetch current scanline advance and column offset values */
-	/* these are used aggressively in 9ballsht opening scene */
-	cpuintrf_push_context(0);
-	dudate = (tms34010_io_register_r(REG_DPYCTL, 0) & 0x03fc) << 4;
-	dumask = dudate - 1;
-	dpytap = tms34010_io_register_r(REG_DPYTAP, 0) & 0x3fff & dumask;
-	vsblnk = tms34010_io_register_r(REG_VSBLNK, 0);
-	veblnk = tms34010_io_register_r(REG_VEBLNK, 0);
-	cpuintrf_pop_context();
-
-	/* adjust drawing area based on blanking (9 ball shootout tweaks it) */
-	if (vsblnk > veblnk && vsblnk - veblnk < machine->screen[0].height)
-	{
-		/* compute starting scanline offset (assume centered) */
-		scanoffs = ((machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1) - (vsblnk - veblnk)) / 2;
-
-		/* adjust start/end scanlines */
-		if (startscan != machine->screen[0].visarea.min_y)
-			startscan += scanoffs;
-		endscan += scanoffs;
-		if (endscan >= machine->screen[0].visarea.max_y)
-			endscan = machine->screen[0].visarea.max_y;
-	}
-
-	/* compute the offset */
-	offset = (dpyadr << 4) + dpytap;
-
-	/* adjust for when DPYADR was written */
-	if (cliprect->min_y - machine->screen[0].visarea.min_y - scanoffs >= dpyadrscan)
-		offset += (cliprect->min_y - machine->screen[0].visarea.min_y - scanoffs - dpyadrscan) * dudate;
-
-	/* loop over scanlines */
-	for (y = startscan; y <= endscan; y++)
-	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, cliprect->min_x);
-
-		/* if we're in outer bands, just clear */
-		if (y < machine->screen[0].visarea.min_y + scanoffs || y > machine->screen[0].visarea.max_y - scanoffs)
-			memset(dest, 0, (cliprect->max_x - cliprect->min_x + 1) * 2);
-
-		/* render 8bpp data */
-		else
-		{
-			for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
-			{
-				UINT16 pixels = vram_base[(offset & ~dumask & TOWORD(0x1fffff)) | ((offset + x/2) & dumask)];
-				*dest++ = (pixels >> 0) & 0xff;
-				*dest++ = (pixels >> 8) & 0xff;
-			}
-			offset += dudate;
-		}
-	}
-	return 0;
 }
 
 
@@ -209,48 +139,6 @@ static void coolpool_from_shiftreg(unsigned int address, UINT16 *shiftreg)
 
 /*************************************
  *
- *  Mid-screen addressing updates
- *
- *************************************/
-
-static void coolpool_dpyint_callback(int scanline)
-{
-	/* log when we got the DPYINT so that changes are tagged to this scanline */
-	last_dpyint = scanline + 1;
-	if (scanline < Machine->screen[0].visarea.max_y)
-		video_screen_update_partial(0, scanline);
-}
-
-
-static void coolpool_reset_dpyadr(int param)
-{
-	/* at the start of each screen, re-fetch the DPYADR */
-	cpuintrf_push_context(0);
-	dpyadr = ~tms34010_io_register_r(REG_DPYADR, 0) & 0xfffc;
-	dpyadrscan = last_dpyint = 0;
-	cpuintrf_pop_context();
-
-	/* come again next screen */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, coolpool_reset_dpyadr);
-}
-
-
-static WRITE16_HANDLER( coolpool_34010_io_register_w )
-{
-	tms34010_io_register_w(offset, data, mem_mask);
-
-	/* track writes to the DPYADR register which takes effect on the following scanline */
-	if (offset == REG_DPYADR)
-	{
-		dpyadr = ~data & 0xfffc;
-		dpyadrscan = last_dpyint;
-	}
-}
-
-
-
-/*************************************
- *
  *  Game initialzation
  *
  *************************************/
@@ -264,7 +152,6 @@ static MACHINE_RESET( amerdart )
 
 static MACHINE_RESET( coolpool )
 {
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, coolpool_reset_dpyadr);
 	tlc34076_reset(6);
 	nvram_write_enable = 0;
 	nvram_write_timer = mame_timer_alloc(nvram_write_timeout);
@@ -514,7 +401,7 @@ static WRITE16_HANDLER( dsp_romaddr_w )
 
 WRITE16_HANDLER( dsp_dac_w )
 {
-	DAC_signed_data_16_w(0,(INT16)(data << 4) + 0x8000);
+	DAC_signed_data_16_w(0, (INT16)(data << 4) + 0x8000);
 }
 
 
@@ -601,7 +488,7 @@ static ADDRESS_MAP_START( amerdart_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
 	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(coolpool_iop_r, amerdart_iop_w)
 	AM_RANGE(0x06000000, 0x06007fff) AM_READWRITE(MRA16_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, coolpool_34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
 
@@ -613,7 +500,7 @@ static ADDRESS_MAP_START( coolpool_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION(REGION_GFX1, 0)
 	AM_RANGE(0x06000000, 0x06007fff) AM_READWRITE(MRA16_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, coolpool_34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
 
@@ -624,7 +511,7 @@ static ADDRESS_MAP_START( nballsht_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x04000000, 0x040000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
 	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_READWRITE(MRA16_RAM, nvram_thrash_data_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, coolpool_34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION(REGION_GFX1, 0)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
 ADDRESS_MAP_END
@@ -759,15 +646,29 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config tms_config_amerdart =
 {
-	0,								/* halt on reset */
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	40000000/12,					/* pixel clock */
+	2,								/* pixels per clock */
+	amerdart_scanline,				/* scanline callback */
 	NULL,							/* generate interrupt */
 	coolpool_to_shiftreg,			/* write to shiftreg function */
-	coolpool_from_shiftreg,			/* read from shiftreg function */
-	NULL,							/* display address changed */
-	coolpool_dpyint_callback,		/* display interrupt callback */
-	0								/* the screen operated on */
+	coolpool_from_shiftreg			/* read from shiftreg function */
+};
+
+
+static tms34010_config tms_config_coolpool =
+{
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	40000000/6,						/* pixel clock */
+	1,								/* pixels per clock */
+	coolpool_scanline,				/* scanline callback */
+	NULL,							/* generate interrupt */
+	coolpool_to_shiftreg,			/* write to shiftreg function */
+	coolpool_from_shiftreg			/* read from shiftreg function */
 };
 
 
@@ -782,25 +683,25 @@ MACHINE_DRIVER_START( amerdart )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
-	MDRV_CPU_CONFIG(tms_config)
+	MDRV_CPU_CONFIG(tms_config_amerdart)
 	MDRV_CPU_PROGRAM_MAP(amerdart_map,0)
 
 	MDRV_CPU_ADD(TMS32010, 15000000/8)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
 	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_RESET(amerdart)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 261)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 17, 256)
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(16*256)
 
-	MDRV_VIDEO_UPDATE(amerdart)
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(40000000/6, 212*2, 0, 161*2, 262, 0, 241)
+
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -814,25 +715,25 @@ static MACHINE_DRIVER_START( coolpool )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
-	MDRV_CPU_CONFIG(tms_config)
+	MDRV_CPU_CONFIG(tms_config_coolpool)
 	MDRV_CPU_PROGRAM_MAP(coolpool_map,0)
 
 	MDRV_CPU_ADD(TMS32026,40000000)
 	MDRV_CPU_PROGRAM_MAP(dsp_program_map,0)
 	MDRV_CPU_IO_MAP(dsp_io_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_RESET(coolpool)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 261)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 17, 256)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(coolpool)
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(40000000/6, 424, 0, 320, 262, 0, 240)
+
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

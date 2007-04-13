@@ -11,6 +11,7 @@
 #define _TMS34010_H
 
 #include "cpuintrf.h"
+#include "driver.h"
 
 
 /* the TMS34010 input clock is divided by 8; the 34020 by 4 */
@@ -58,19 +59,36 @@ enum
 
 
 /* Configuration structure */
-struct tms34010_config
+typedef struct _tms34010_display_params tms34010_display_params;
+struct _tms34010_display_params
+{
+	UINT16	vcount;								/* most recent VCOUNT */
+	UINT16	veblnk, vsblnk;						/* start/end of VBLANK */
+	UINT16	heblnk, hsblnk;						/* start/end of HBLANK */
+	UINT16	rowaddr, coladdr;					/* row/column addresses */
+	UINT8	yoffset;							/* y offset from addresses */
+	UINT8	enabled;							/* video enabled */
+};
+
+
+typedef struct _tms34010_config tms34010_config;
+struct _tms34010_config
 {
 	UINT8	halt_on_reset;						/* /HCS pin, which determines HALT state after reset */
+	UINT8	scrnum;								/* the screen operated on */
+	UINT32	pixclock;							/* the pixel clock (0 means don't adjust screen size) */
+	int		pixperclock;						/* pixels per clock */
+	void	(*scanline_callback)(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);
 	void	(*output_int)(int state);			/* output interrupt callback */
 	void	(*to_shiftreg)(offs_t, UINT16 *);	/* shift register write */
-	void	(*from_shiftreg)(offs_t, UINT16 *);/* shift register read */
-	void	(*display_addr_changed)(UINT32 offs, int rowbytes, int scanline);/* display address changed */
-	void	(*display_int_callback)(int scanline);/* display interrupt callback */
-	UINT8	scrnum;								/* the screen operated on */
+	void	(*from_shiftreg)(offs_t, UINT16 *);	/* shift register read */
 };
 
 
 /* PUBLIC FUNCTIONS - 34010 */
+VIDEO_UPDATE( tms340x0 );
+void tms34010_get_display_params(int cpunum, tms34010_display_params *params);
+
 void tms34010_get_info(UINT32 state, cpuinfo *info);
 
 int 		tms34010_io_display_blanked(int cpu);
@@ -82,6 +100,7 @@ void tms34020_get_info(UINT32 state, cpuinfo *info);
 
 int 		tms34020_io_display_blanked(int cpu);
 int 		tms34020_get_DPYSTRT(int cpu);
+
 
 
 /* Host control interface */

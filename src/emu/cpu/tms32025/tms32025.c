@@ -197,6 +197,7 @@ typedef struct			/* Page 3-6 (45) shows all registers */
 	UINT16	STACK[8];
 	PAIR	ALU;
 	UINT16	*intRAM;
+	UINT8	timerover;
 
 	/********************** Status data ****************************/
 	PAIR	opcode;
@@ -1906,24 +1907,39 @@ static int process_IRQs(void)
 	return R.tms32025_irq_cycles;
 }
 
-INLINE void process_timer(int counts)
+INLINE void process_timer(int clocks)
 {
-	if (counts > TIM) {				/* Overflow timer counts ? */
-		if (counts > PRD) {
-			counts %= (PRD + 1);
-		}
-		if (counts > TIM) {
-			TIM = (PRD + 1) - (counts - TIM);
-		}
-		else {
-			TIM -= counts;
-		}
+	int preclocks, ticks;
+
+	/* easy case: no actual ticks */
+again:
+	preclocks = CLK - R.timerover;
+	if (clocks < preclocks)
+	{
+		R.timerover += clocks;
+		tms32025_icount -= clocks;
+		return;
+	}
+
+	/* if we're not going to overflow the timer, just count the clocks */
+	ticks = 1 + (clocks - preclocks) / CLK;
+	if (ticks <= TIM)
+	{
+		tms32025_icount -= clocks;
+		R.timerover = clocks - (ticks - 1) * CLK - preclocks;
+		TIM -= ticks;
+	}
+
+	/* otherwise, overflow the timer and signal an interrupt */
+	else
+	{
+		tms32025_icount -= preclocks + CLK * TIM;
+		R.timerover = 0;
+		TIM = PRD;
 
 		R.IFR |= 0x08;
-		tms32025_icount -= process_IRQs();		/* Handle Timer IRQ */
-	}
-	else {
-		TIM -= counts;
+		clocks = process_IRQs();		/* Handle Timer IRQ */
+		goto again;
 	}
 }
 
@@ -1954,22 +1970,14 @@ static int tms32025_execute(int cycles)
 	else {
 		if (R.hold == 1) {
 			S_OUT(TMS32025_HOLDA,CLEAR_LINE);	/* Hold-Ack (active low) */
-			tms32025_icount -= 3;
+			process_timer(3);
 		}
 		R.hold = 0;
 	}
 
 	/**** If idling, update timer and/or exit execution */
-	if (R.idle) {
-		if ((R.hold == 0) && (IMR & 0x08) && (INTM == 0)){
-			process_timer(TIM + 1);
-			tms32025_icount -= ((TIM + 1) * CLK);
-		}
-		else {
-			process_timer(((tms32025_icount + CLK) / CLK));
-			tms32025_icount = (tms32025_icount % CLK) - CLK;	/* Exit */
-		}
-	}
+	while (R.idle && tms32025_icount > 0)
+		process_timer(tms32025_icount);
 
 	if (tms32025_icount <= 0) CALL_MAME_DEBUG;
 
@@ -2054,25 +2062,12 @@ static int tms32025_execute(int cycles)
 			R.init_load_addr = 1;
 		}
 
-		tms32025_icount -= R.tms32025_dec_cycles;
+		process_timer(R.tms32025_dec_cycles);
 
 		/**** If device is put into idle mode, exit and wait for an interrupt */
-		if (R.idle) {
-			if ((R.hold == 0) && (IMR & 0x08) && (INTM == 0)) {
-				if (R.tms32025_dec_cycles < (TIM * CLK)) {
-					int burn_cycles;
-					burn_cycles = ((TIM * CLK) <= tms32025_icount) ? (TIM * CLK) : tms32025_icount;
-					R.tms32025_dec_cycles += burn_cycles;
-					tms32025_icount -= burn_cycles;
-				}
-			}
-			else {
-				R.tms32025_dec_cycles += (tms32025_icount + CLK);
-				tms32025_icount = (tms32025_icount % CLK) - CLK;	/* Exit */
-			}
-		}
+		while (R.idle && tms32025_icount > 0)
+			process_timer(tms32025_icount);
 
-		process_timer((R.tms32025_dec_cycles / CLK));
 
 		/**** If hold pin is active, exit if accessing external memory or if HM is set */
 		if (R.hold) {

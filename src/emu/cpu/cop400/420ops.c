@@ -85,7 +85,9 @@ INLINE void skt(void)
 
 INLINE void xabr(void)
 {
-	UINT8 t = A & 0x03;
-	A = B >> 4;
-	B = t << 4;
+	UINT8 Br = A & 0x03;
+	UINT8 Bd = B & 0x0f;
+
+	A = (B & 0x30) >> 4;
+	B = (Br << 4) + Bd;
 }

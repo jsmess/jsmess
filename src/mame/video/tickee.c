@@ -103,40 +103,26 @@ VIDEO_START( tickee )
  *
  *************************************/
 
-VIDEO_UPDATE( tickee )
+void tickee_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	int v, h, width, xoffs;
-	UINT8 *base1 = (UINT8 *)tickee_vram;
-	pen_t pen_lookup[256];
-	UINT32 offset;
+	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr << 1;
+	int x;
 
-	/* fill out the pen array based on the palette bank */
-	for (h = 0; h < 256; h++)
-		pen_lookup[h] = tickee_control[2] ? 255 : h;
-
-	/* determine the base of the videoram */
-	offset = (~tms34010_get_DPYSTRT(0) & 0xfff0) << 5;
-	offset += TOBYTE(0x1000) * (cliprect->min_y - machine->screen[0].visarea.min_y);
-
-	/* determine how many pixels to copy */
-	xoffs = cliprect->min_x;
-	width = cliprect->max_x - xoffs + 1;
-	offset += xoffs;
-
-	/* loop over rows */
-	for (v = cliprect->min_y; v <= cliprect->max_y; v++)
+	/* blank palette: fill with pen 255 */
+	if (tickee_control[2])
 	{
-		UINT8 scanline[512];
-
-		/* extract the scanline to account for endianness */
-		for (h = 0; h < width; h++)
-			scanline[h] = base1[BYTE_XOR_LE(offset + h) & 0x7ffff];
-
-		/* draw it and advance */
-		draw_scanline8(bitmap, xoffs, v, width, scanline, pen_lookup, -1);
-		offset += TOBYTE(0x1000);
+		for (x = params->heblnk; x < params->hsblnk; x++)
+			dest[x] = 0xff;
+		return;
 	}
 
-	return 0;
+	/* copy the non-blanked portions of this scanline */
+	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	{
+		UINT16 pixels = src[coladdr++ & 0xff];
+		dest[x + 0] = pixels & 0xff;
+		dest[x + 1] = pixels >> 8;
+	}
 }
-

@@ -1313,9 +1313,6 @@ static void cpu_updatecallback(int param)
 
 	/* reset the refresh timer */
 	mame_timer_adjust(refresh_timer, time_never, 0, time_never);
-
-	/* reset partial updates */
-	video_reset_partial_updates();
 }
 
 

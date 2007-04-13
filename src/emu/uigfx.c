@@ -1057,10 +1057,10 @@ static void tilemap_update_bitmap(ui_gfx_state *state, int width, int height)
 	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->format != screen_format || state->bitmap->width != width || state->bitmap->height != height)
 	{
 		/* free the old stuff */
-		if (state->bitmap != NULL)
-			bitmap_free(state->bitmap);
 		if (state->texture != NULL)
 			render_texture_free(state->texture);
+		if (state->bitmap != NULL)
+			bitmap_free(state->bitmap);
 
 		/* allocate new stuff */
 		state->bitmap = bitmap_alloc(width, height, screen_format);

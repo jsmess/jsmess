@@ -4,12 +4,7 @@
 
 **************************************************************************/
 
-/* these are accurate for MK Rev 5 according to measurements done by Bryan on a real board */
-/* due to the way the TMS34010 core operates, however, we need to use 0 for our VBLANK */
-/* duration (263ms is the measured value) */
-#define MKLA5_VBLANK_DURATION		0
-#define MKLA5_FPS					53.204950
-
+#include "cpu/tms34010/tms34010.h"
 
 /*----------- defined in machine/midyunit.c -----------*/
 
@@ -66,10 +61,4 @@ WRITE16_HANDLER( midyunit_paletteram_w );
 READ16_HANDLER( midyunit_dma_r );
 WRITE16_HANDLER( midyunit_dma_w );
 
-void midyunit_display_addr_changed(UINT32 offs, int rowbytes, int scanline);
-void midyunit_display_interrupt(int scanline);
-
-WRITE16_HANDLER( midyunit_io_register_w );
-
-VIDEO_EOF( midyunit );
-VIDEO_UPDATE( midyunit );
+void midyunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);

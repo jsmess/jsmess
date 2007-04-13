@@ -25,7 +25,7 @@ PALETTE_INIT( exterm )
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color(machine, i+4096, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
+		palette_set_color(machine, i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 }
 
 
@@ -67,59 +67,48 @@ void exterm_from_shiftreg_slave(unsigned int address, UINT16 *shiftreg)
  *
  *************************************/
 
-VIDEO_UPDATE( exterm )
+void exterm_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	int x, y;
+	UINT16 *bgsrc = &exterm_master_videoram[(params->rowaddr << 8) & 0xff00];
+	UINT16 *fgsrc = NULL;
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	tms34010_display_params fgparams;
+	int coladdr = params->coladdr;
+	int fgcoladdr = 0;
+	int x;
 
-	/* if the display is blanked, fill with black */
-	if (tms34010_io_display_blanked(0))
+	/* get parameters for the slave CPU */
+	tms34010_get_display_params(1, &fgparams);
+
+	/* compute info about the slave vram */
+	if (fgparams.enabled && scanline >= fgparams.veblnk && scanline < fgparams.vsblnk && fgparams.heblnk < fgparams.hsblnk)
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
-		return 0;
+		fgsrc = &exterm_slave_videoram[((fgparams.rowaddr << 8) + (fgparams.yoffset << 7)) & 0xff80];
+		fgcoladdr = (fgparams.coladdr >> 1);
 	}
 
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	/* copy the non-blanked portions of this scanline */
+	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		UINT16 *bgsrc = &exterm_master_videoram[256 * (y - machine->screen[0].visarea.min_y)];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT16 bgdata, fgdata = 0;
 
-		/* on the top/bottom of the screen, it's all background */
-		if ((y - machine->screen[0].visarea.min_y) < 40 || (y - machine->screen[0].visarea.min_y) > 238)
-			for (x = 0; x < 256; x++)
-			{
-				UINT16 bgdata = *bgsrc++;
-				dest[x] = (bgdata & 0x8000) ? (bgdata & 0xfff) : (bgdata + 0x1000);
-			}
+		if (fgsrc != NULL)
+			fgdata = fgsrc[fgcoladdr++ & 0x7f];
 
-		/* elsewhere, we have to blend foreground and background */
+		bgdata = bgsrc[coladdr++ & 0xff];
+		if ((bgdata & 0xe000) == 0xe000)
+			dest[x + 0] = bgdata & 0x7ff;
+		else if ((fgdata & 0x00ff) != 0)
+			dest[x + 0] = fgdata & 0x00ff;
 		else
-		{
-			UINT16 *fgsrc = (tms34010_get_DPYSTRT(1) & 0x800) ? &exterm_slave_videoram[(y - machine->screen[0].visarea.min_y) * 128] : &exterm_slave_videoram[(256 + y - machine->screen[0].visarea.min_y) * 128];
+			dest[x + 0] = (bgdata & 0x8000) ? (bgdata & 0x7ff) : (bgdata + 0x800);
 
-			for (x = 0; x < 256; x += 2)
-			{
-				UINT16 fgdata = *fgsrc++;
-				UINT16 bgdata;
-
-				if (fgdata & 0x00ff)
-					dest[x] = fgdata & 0x00ff;
-				else
-				{
-					bgdata = bgsrc[0];
-					dest[x] = (bgdata & 0x8000) ? (bgdata & 0xfff) : (bgdata + 0x1000);
-				}
-
-				if (fgdata & 0xff00)
-					dest[x+1] = fgdata >> 8;
-				else
-				{
-					bgdata = bgsrc[1];
-					dest[x+1] = (bgdata & 0x8000) ? (bgdata & 0xfff) : (bgdata + 0x1000);
-				}
-
-				bgsrc += 2;
-			}
-		}
+		bgdata = bgsrc[coladdr++ & 0xff];
+		if ((bgdata & 0xe000) == 0xe000)
+			dest[x + 1] = bgdata & 0x7ff;
+		else if ((fgdata & 0xff00) != 0)
+			dest[x + 1] = fgdata >> 8;
+		else
+			dest[x + 1] = (bgdata & 0x8000) ? (bgdata & 0x7ff) : (bgdata + 0x800);
 	}
-	return 0;
 }

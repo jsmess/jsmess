@@ -189,27 +189,56 @@ void slapstic_init(int chip);
  *
  *************************************/
 
-static struct tms34010_config gsp_config =
+/* used on the medium-resolution driver boards */
+static tms34010_config gsp_config_driver =
 {
-	1,								/* halt on reset */
+	TRUE,							/* halt on reset */
+	0,								/* the screen operated on */
+	4000000,						/* pixel clock */
+	4,								/* pixels per clock */
+	harddriv_scanline_driver,		/* scanline callback */
 	hdgsp_irq_gen,					/* generate interrupt */
 	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
-	hdgsp_read_from_shiftreg,		/* read from shiftreg function */
-	hdgsp_display_update,			/* display offset update function */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	hdgsp_read_from_shiftreg		/* read from shiftreg function */
 };
 
 
-static struct tms34010_config msp_config =
+/* used on the low-resolution multisync boards for harddrvc, racedrvc, steeltal */
+static tms34010_config gsp_config_multisync =
 {
-	1,								/* halt on reset */
-	hdmsp_irq_gen,					/* generate interrupt */
-	NULL,							/* write to shiftreg function */
-	NULL,							/* read from shiftreg function */
-	NULL,							/* display offset update function */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	TRUE,							/* halt on reset */
+	0,								/* the screen operated on */
+	6000000,						/* pixel clock */
+	2,								/* pixels per clock */
+	harddriv_scanline_multisync,	/* scanline callback */
+	hdgsp_irq_gen,					/* generate interrupt */
+	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
+	hdgsp_read_from_shiftreg		/* read from shiftreg function */
+};
+
+
+/* used on the low-resolution multisync board for stunrun */
+static tms34010_config gsp_config_multisync_stunrun =
+{
+	TRUE,							/* halt on reset */
+	0,								/* the screen operated on */
+	5000000,						/* pixel clock */
+	2,								/* pixels per clock */
+	harddriv_scanline_multisync,	/* scanline callback */
+	hdgsp_irq_gen,					/* generate interrupt */
+	hdgsp_write_to_shiftreg,		/* write to shiftreg function */
+	hdgsp_read_from_shiftreg		/* read from shiftreg function */
+};
+
+
+static tms34010_config msp_config =
+{
+	TRUE,							/* halt on reset */
+	0,								/* the screen operated on */
+	5000000,						/* pixel clock */
+	2,								/* pixels per clock */
+	NULL,							/* scanline callback */
+	hdmsp_irq_gen					/* generate interrupt */
 };
 
 
@@ -928,19 +957,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-/*
-    Video timing:
-
-                VERTICAL                    HORIZONTAL
-    Harddriv:   001D-019D / 01A0 (384)      001A-0099 / 009F (508)
-    Harddrvc:   0011-0131 / 0133 (288)      003A-013A / 0142 (512)
-    Racedriv:   001D-019D / 01A0 (384)      001A-0099 / 009F (508)
-    Racedrvc:   0011-0131 / 0133 (288)      003A-013A / 0142 (512)
-    Stunrun:    0013-00F8 / 0105 (229)      0037-0137 / 013C (512)
-    Steeltal:   0011-0131 / 0133 (288)      003A-013A / 0142 (512)
-    Hdrivair:   0011-0131 / 0133 (288)      003A-013A / 0142 (512)
-*/
-
 /* Driver board without MSP (used by Race Drivin' cockpit) */
 static MACHINE_DRIVER_START( driver_nomsp )
 
@@ -948,13 +964,12 @@ static MACHINE_DRIVER_START( driver_nomsp )
 	MDRV_CPU_ADD_TAG("main", M68010, 32000000/4)
 	MDRV_CPU_PROGRAM_MAP(driver_68k_map,0)
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
-	MDRV_CPU_PERIODIC_INT(hd68k_irq_gen,TIME_IN_HZ(244))
+	MDRV_CPU_PERIODIC_INT(hd68k_irq_gen,TIME_IN_HZ(32000000/16/16/16/16/2))
 
 	MDRV_CPU_ADD_TAG("gsp", TMS34010, 48000000/TMS34010_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(driver_gsp_map,0)
-	MDRV_CPU_CONFIG(gsp_config)
+	MDRV_CPU_CONFIG(gsp_config_driver)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(500)
 
 	MDRV_MACHINE_START(harddriv)
@@ -963,13 +978,14 @@ static MACHINE_DRIVER_START( driver_nomsp )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 416)
-	MDRV_SCREEN_VISIBLE_AREA(97, 596, 29, 412)
 	MDRV_PALETTE_LENGTH(1024)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(4000000*4, 160*4, 0, 127*4, 417, 0, 384)
+
 	MDRV_VIDEO_START(harddriv)
-	MDRV_VIDEO_UPDATE(harddriv)
+	MDRV_VIDEO_UPDATE(tms340x0)
 MACHINE_DRIVER_END
 
 
@@ -981,9 +997,6 @@ static MACHINE_DRIVER_START( driver_msp )
 	MDRV_CPU_ADD_TAG("msp", TMS34010, 50000000/TMS34010_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(driver_msp_map,0)
 	MDRV_CPU_CONFIG(msp_config)
-
-	/* video hardware */
-	MDRV_SCREEN_VISIBLE_AREA(89, 596, 29, 412)
 MACHINE_DRIVER_END
 
 
@@ -996,11 +1009,12 @@ static MACHINE_DRIVER_START( multisync_nomsp )
 	MDRV_CPU_PROGRAM_MAP(multisync_68k_map,0)
 
 	MDRV_CPU_MODIFY("gsp")
+	MDRV_CPU_CONFIG(gsp_config_multisync)
 	MDRV_CPU_PROGRAM_MAP(multisync_gsp_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_SIZE(640, 307)
-	MDRV_SCREEN_VISIBLE_AREA(109, 620, 17, 304)
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(6000000*2, 323*2, 0, 256*2, 308, 0, 288)
 MACHINE_DRIVER_END
 
 
@@ -1121,11 +1135,9 @@ static MACHINE_DRIVER_START( driversnd )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("sound", M68000, 16000000/2)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(driversnd_68k_map,0)
 
 	MDRV_CPU_ADD_TAG("sounddsp", TMS32010, 20000000/TMS32010_CLOCK_DIVIDER)
-	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(driversnd_dsp_program_map,0)
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(driversnd_dsp_io_map,0)
@@ -1187,12 +1199,14 @@ static MACHINE_DRIVER_START( stunrun )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( multisync_nomsp )	/* multisync board without MSP */
+	MDRV_CPU_MODIFY("gsp")
+	MDRV_CPU_CONFIG(gsp_config_multisync_stunrun)
 	MDRV_IMPORT_FROM( adsp )			/* ADSP board */
 	MDRV_IMPORT_FROM( jsa_ii_mono )		/* JSA II sound board */
 
 	/* video hardware */
-	MDRV_SCREEN_SIZE(640, 261)
-	MDRV_SCREEN_VISIBLE_AREA(103, 614, 19, 258)
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
 MACHINE_DRIVER_END
 
 

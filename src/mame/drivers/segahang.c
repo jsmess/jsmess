@@ -23,6 +23,11 @@
 #include "sound/segapcm.h"
 
 
+#define MASTER_CLOCK_25MHz		(25174800)
+#define MASTER_CLOCK_10MHz		(10000000)
+#define MASTER_CLOCK_8MHz		(8000000)
+
+
 /*************************************
  *
  *  Statics
@@ -839,11 +844,11 @@ static const gfx_decode gfxdecodeinfo[] =
 static MACHINE_DRIVER_START( hangon_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 6000000)
+	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(hangon_map,0)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
 
-	MDRV_CPU_ADD_TAG("sub", M68000, 6000000)
+	MDRV_CPU_ADD_TAG("sub", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -853,11 +858,12 @@ static MACHINE_DRIVER_START( hangon_base )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)	/* to be verified */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048*3)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 
 	MDRV_VIDEO_START(hangon)
 	MDRV_VIDEO_UPDATE(hangon)
@@ -868,11 +874,11 @@ static MACHINE_DRIVER_START( sharrier_base )
 	MDRV_IMPORT_FROM(hangon_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", M68000, 10000000)
+	MDRV_CPU_REPLACE("main", M68000, MASTER_CLOCK_10MHz)
 	MDRV_CPU_PROGRAM_MAP(sharrier_map,0)
 	MDRV_CPU_VBLANK_INT(i8751_main_cpu_vblank,1)
 
-	MDRV_CPU_REPLACE("sub", M68000, 10000000)
+	MDRV_CPU_REPLACE("sub", M68000, MASTER_CLOCK_10MHz)
 
 	/* video hardware */
 	MDRV_VIDEO_START(sharrier)
@@ -882,14 +888,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2203 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
+	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2203,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203,0)
 
 	/* soud hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.13)
 	MDRV_SOUND_ROUTE(0, "right", 0.13)
@@ -900,7 +906,7 @@ static MACHINE_DRIVER_START( sound_board_2203 )
 	MDRV_SOUND_ROUTE(3, "left",  0.37)
 	MDRV_SOUND_ROUTE(3, "right", 0.37)
 
-	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, 8000000)
+	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, MASTER_CLOCK_8MHz)
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -910,14 +916,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2203x2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
+	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203x2,0)
 
 	/* soud hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.13)
 	MDRV_SOUND_ROUTE(0, "right", 0.13)
@@ -928,7 +934,7 @@ static MACHINE_DRIVER_START( sound_board_2203x2 )
 	MDRV_SOUND_ROUTE(3, "left",  0.37)
 	MDRV_SOUND_ROUTE(3, "right", 0.37)
 
-	MDRV_SOUND_ADD(YM2203, 4000000)
+	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_ROUTE(0, "left",  0.13)
 	MDRV_SOUND_ROUTE(0, "right", 0.13)
 	MDRV_SOUND_ROUTE(1, "left",  0.13)
@@ -938,7 +944,7 @@ static MACHINE_DRIVER_START( sound_board_2203x2 )
 	MDRV_SOUND_ROUTE(3, "left",  0.37)
 	MDRV_SOUND_ROUTE(3, "right", 0.37)
 
-	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, 4000000)
+	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -948,19 +954,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2151 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
+	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2151,0)
 
 	/* soud hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD(YM2151, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.43)
 	MDRV_SOUND_ROUTE(1, "right", 0.43)
 
-	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, 4000000)
+	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

@@ -139,7 +139,7 @@ DISCRETE_SOUND_START(bosco_discrete_interface)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_20,
 					1,			/* ENAB */
-					NAMCO_54XX_0_DATA,
+					NAMCO_54XX_2_DATA,
 					4,			/* 4V - unmeasured*/
 					&bosco_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(BOSCO_CHANL1_SND,
@@ -167,7 +167,7 @@ DISCRETE_SOUND_START(bosco_discrete_interface)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_40,
 					1,			/* ENAB */
-					NAMCO_54XX_2_DATA,
+					NAMCO_54XX_0_DATA,
 					4,			/* 4V - unmeasured*/
 					&bosco_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(BOSCO_CHANL3_SND,
@@ -323,7 +323,7 @@ DISCRETE_SOUND_START(galaga_discrete_interface)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_20,
 					1,			/* ENAB */
-					NAMCO_54XX_0_DATA,
+					NAMCO_54XX_2_DATA,
 					4,			/* 4V - unmeasured*/
 					&galaga_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(GALAGA_CHANL1_SND,
@@ -351,7 +351,7 @@ DISCRETE_SOUND_START(galaga_discrete_interface)
      ************************************************/
 	DISCRETE_DAC_R1(NODE_40,
 					1,			/* ENAB */
-					NAMCO_54XX_2_DATA,
+					NAMCO_54XX_0_DATA,
 					4,			/* 4V - unmeasured*/
 					&galaga_54xx_dac)
 	DISCRETE_OP_AMP_FILTER(GALAGA_CHANL3_SND,

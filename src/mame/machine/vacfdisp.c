@@ -4,7 +4,7 @@
 //                                                                        //
 // emulated displays: BFM BD1 vfd display, OKI MSC1937                    //
 //                                                                        //
-// 05-03-2004: Re-Animator                                                //
+// 05-03-2004: Re-Animator, last updated 09-04-2007 J. Wallace            //
 //                                                                        //
 // Theory: VFD controllers have a built in character table, which converts//
 // the displayable characters into on/off signals for the various segments//
@@ -17,9 +17,6 @@
 //       - Add 'skew' to display - characters usually slope 20 degrees    //
 //       - Implement display flashing (need precise rate figures)         //
 //       - Make display better (convert to segment shapes like LED)       //
-//                                                                        //
-// Any fixes for this driver should be forwarded to AGEMAME HQ            //
-// (http://www.mameworld.net/agemame/)                                    //
 //                                                                        //
 ////////////////////////////////////////////////////////////////////////////
 
@@ -53,7 +50,7 @@ static struct
 			flash_control;		// flash control 0/1/2/3
 
 	UINT8	string[18];			// text buffer
-	UINT16  segments[16],		// segments
+	UINT32  segments[16],		// segments
 			outputs[16];		// standardised outputs
 
 	UINT8	count,				// bit counter
@@ -188,6 +185,10 @@ static unsigned short BFMcharset[]=
 In 14 segment mode, 0 represents the whole top line,
 and 5 the bottom line, allowing both modes to share
 a charset.
+
+Note that, although we call this a 16 segment display,
+we actually have 18 segments, including the semicolon portions.
+This means our segment maths needs to be more than 16-bit to work!
 */
 
 static unsigned int OKIcharset[]=
@@ -310,21 +311,21 @@ void vfd_reset(int id)
 
 ///////////////////////////////////////////////////////////////////////////
 
-UINT16 *vfd_get_segments(int id)
+UINT32 *vfd_get_segments(int id)
 {
 	return vfds[id].segments;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-UINT16 *vfd_get_outputs(int id)
+UINT32 *vfd_get_outputs(int id)
 {
 	return vfds[id].outputs;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-UINT16 *vfd_set_outputs(int id)
+UINT32 *vfd_set_outputs(int id)
 {
 	int cursor;
 	switch ( vfds[id].type )

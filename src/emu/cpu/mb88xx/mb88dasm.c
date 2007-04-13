@@ -93,7 +93,7 @@ offs_t mb88_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram
 		case 0x48:
 		case 0x49:
 		case 0x4A:
-		case 0x4B: sprintf( buffer, "tstd%d (PortR bit%d == 1)", (op&3)+4, (op&3)+4 ); break;
+		case 0x4B: sprintf( buffer, "tstd%d (PortR bit%d == 1)", (op&3)+8, (op&3)+8 ); break;
 		case 0x4C:
 		case 0x4D:
 		case 0x4E:

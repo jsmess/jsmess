@@ -123,25 +123,20 @@
 
 /*****************************************************************************/
 
-static int systemreg_latency_cycles = 0;
-static int systemreg_latency_reg = -1;
-static UINT32 systemreg_latency_data = 0;
-static UINT32 systemreg_previous_data = 0;
-
 static void systemreg_write_latency_effect(void);
 
 static void add_systemreg_write_latency_effect(int sysreg, UINT32 data, UINT32 prev_data)
 {
-	if (systemreg_latency_cycles > 0)
+	if (sharc.systemreg_latency_cycles > 0)
 	{
 		//fatalerror("SHARC: add_systemreg_write_latency_effect: already scheduled! (reg: %02X, data: %08X, PC: %08X)\n", systemreg_latency_reg, systemreg_latency_data, sharc.pc);
 		systemreg_write_latency_effect();
 	}
 
-	systemreg_latency_cycles = 2;
-	systemreg_latency_reg = sysreg;
-	systemreg_latency_data = data;
-	systemreg_previous_data = prev_data;
+	sharc.systemreg_latency_cycles = 2;
+	sharc.systemreg_latency_reg = sysreg;
+	sharc.systemreg_latency_data = data;
+	sharc.systemreg_previous_data = prev_data;
 }
 
 INLINE void swap_register(UINT32 *a, UINT32 *b)
@@ -153,10 +148,10 @@ INLINE void swap_register(UINT32 *a, UINT32 *b)
 
 static void systemreg_write_latency_effect(void)
 {
-	UINT32 data = systemreg_latency_data;
-	UINT32 old_data = systemreg_previous_data;
+	UINT32 data = sharc.systemreg_latency_data;
+	UINT32 old_data = sharc.systemreg_previous_data;
 
-	switch(systemreg_latency_reg)
+	switch(sharc.systemreg_latency_reg)
 	{
 		case 0xb:	/* MODE1 */
 		{
@@ -276,10 +271,10 @@ static void systemreg_write_latency_effect(void)
 			}
 			break;
 		}
-		default:	fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X", systemreg_latency_reg, sharc.pc);
+		default:	fatalerror("SHARC: systemreg_latency_op: unknown register %02X at %08X", sharc.systemreg_latency_reg, sharc.pc);
 	}
 
-	systemreg_latency_reg = -1;
+	sharc.systemreg_latency_reg = -1;
 }
 
 static UINT32 GET_UREG(int ureg)
@@ -1799,7 +1794,7 @@ static void sharcop_direct_jump(void)
 				POP_STATUS_STACK();
 			}
 
-			interrupt_active = 0;
+			sharc.interrupt_active = 0;
 			sharc.irptl &= ~(1 << sharc.active_irq_num);
 		}
 
@@ -1865,7 +1860,7 @@ static void sharcop_relative_jump(void)
 				POP_STATUS_STACK();
 			}
 
-			interrupt_active = 0;
+			sharc.interrupt_active = 0;
 			sharc.irptl &= ~(1 << sharc.active_irq_num);
 		}
 
@@ -1910,7 +1905,7 @@ static void sharcop_indirect_jump(void)
 			POP_STATUS_STACK();
 		}
 
-		interrupt_active = 0;
+		sharc.interrupt_active = 0;
 		sharc.irptl &= ~(1 << sharc.active_irq_num);
 	}
 
@@ -2050,7 +2045,7 @@ static void sharcop_relative_jump_compute(void)
 			POP_STATUS_STACK();
 		}
 
-		interrupt_active = 0;
+		sharc.interrupt_active = 0;
 		sharc.irptl &= ~(1 << sharc.active_irq_num);
 	}
 
@@ -2370,7 +2365,7 @@ static void sharcop_rti(void)
 		POP_STATUS_STACK();
 	}
 
-	interrupt_active = 0;
+	sharc.interrupt_active = 0;
 	check_interrupts();
 }
 

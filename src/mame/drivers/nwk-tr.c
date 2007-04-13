@@ -40,6 +40,8 @@
 
 static UINT8 led_reg0 = 0x7f, led_reg1 = 0x7f;
 
+static UINT32 *work_ram;
+static UINT8 backup_ram[0x2000];
 
 
 static WRITE32_HANDLER( paletteram32_w )
@@ -565,6 +567,152 @@ VIDEO_UPDATE( nwktr )
 
 /*****************************************************************************/
 
+typedef struct
+{
+	int cycle;
+	int data_out;
+	int data_in;
+	int conv_mode;
+	int auto_cal;
+	int auto_zero;
+	int acq_time;
+	int data_out_sign;
+	int mode;
+	int input_shift_reg;
+	int output_shift_reg;
+	int end_conv;
+} ADC12138;
+
+static ADC12138 adc12138;
+
+#define ADC12138_CONV_MODE_12_MSB_FIRST			0
+#define ADC12138_CONV_MODE_16_MSB_FIRST			1
+#define ADC12138_CONV_MODE_12_LSB_FIRST			2
+#define ADC12138_CONV_MODE_16_LSB_FIRST			3
+
+#define ADC12138_ACQUISITION_TIME_6_CCLK		0
+#define ADC12138_ACQUISITION_TIME_10_CCLK		1
+#define ADC12138_ACQUISITION_TIME_18_CCLK		2
+#define ADC12138_ACQUISITION_TIME_34_CCLK		3
+
+static int adc12138_do_r(void)
+{
+	//printf("ADC: DO\n");
+	return adc12138.data_out;
+}
+
+static void adc12138_di_w(int state)
+{
+	adc12138.data_in = state & 1;
+}
+
+static void adc12138_cs_w(int state)
+{
+	if (state)
+	{
+		//printf("ADC: CS\n");
+
+		if (adc12138.cycle >= 7)
+		{
+			int mode = adc12138.input_shift_reg >> (adc12138.cycle - 8);
+
+			switch (mode & 0xf)
+			{
+				case 0x0:		// X X X X L L L L - 12 or 13 Bit MSB First conversion
+				{
+					break;
+				}
+				case 0x1:		// X X X X L L L H - 16 or 17 Bit MSB First conversion
+				{
+					break;
+				}
+				case 0x4:		// X X X X L H L L - 12 or 13 Bit LSB First conversion
+				{
+					break;
+				}
+				case 0x5:		// X X X X L H L H - 16 or 17 Bit LSB First conversion
+				{
+					break;
+				}
+
+				default:
+				{
+					switch (mode)
+					{
+						case 0x08:		// L L L L H L L L - Auto cal
+						{
+							adc12138.auto_cal = 1;
+							break;
+						}
+
+						case 0x0e:		// L L L L H H H L - Acquisition time 6 CCLK cycles
+						{
+							adc12138.acq_time = ADC12138_ACQUISITION_TIME_6_CCLK;
+							break;
+						}
+
+						case 0x8d:		// H L L L H H L H - Data out with sign
+						{
+							adc12138.data_out_sign = 1;
+							break;
+						}
+
+						default:
+						{
+							fatalerror("ADC12138: unknown config mode %02X\n", mode);
+						}
+					}
+					break;
+				}
+			}
+		}
+
+		adc12138.cycle = 0;
+		adc12138.input_shift_reg = 0;
+
+		adc12138.end_conv = 0;
+	}
+}
+
+static void adc12138_sclk_w(int state)
+{
+	if (state)
+	{
+		//printf("ADC: cycle %d, DI = %d\n", adc12138.cycle, adc12138.data_in);
+
+		adc12138.input_shift_reg <<= 1;
+		adc12138.input_shift_reg |= adc12138.data_in;
+
+		adc12138.data_out = adc12138.output_shift_reg & 1;
+		adc12138.output_shift_reg >>= 1;
+
+		adc12138.cycle++;
+	}
+}
+
+static void adc12138_conv_w(int state)
+{
+	adc12138.end_conv = 1;
+}
+
+static int adc12138_eoc_r(void)
+{
+	return adc12138.end_conv;
+}
+
+static void adc12138_reset(void)
+{
+	memset(&adc12138, 0, sizeof(ADC12138));
+
+	adc12138.conv_mode = ADC12138_CONV_MODE_12_MSB_FIRST;
+	adc12138.data_out_sign = 1;
+	adc12138.auto_cal = 0;
+	adc12138.auto_zero = 0;
+	adc12138.acq_time = ADC12138_ACQUISITION_TIME_10_CCLK;
+}
+
+
+
 static READ32_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
@@ -573,18 +721,18 @@ static READ32_HANDLER( sysreg_r )
 		if (!(mem_mask & 0xff000000))
 		{
 			r |= readinputport(0) << 24;
-	}
+		}
 		if (!(mem_mask & 0x00ff0000))
 		{
 			r |= readinputport(1) << 16;
-	}
+		}
 		if (!(mem_mask & 0x0000ff00))
 		{
 			r |= readinputport(2) << 8;
 		}
 		if (!(mem_mask & 0x000000ff))
 		{
-			r |= 0xf7;
+			r |= (adc12138_do_r()) | (adc12138_eoc_r() << 2);
 		}
 	}
 	else if (offset == 1)
@@ -613,15 +761,27 @@ static WRITE32_HANDLER( sysreg_w )
 	}
 	if( offset == 1 )
 	{
+		if (!(mem_mask & 0xff000000))
+		{
+			int cs = (data >> 27) & 0x1;
+			int conv = (data >> 26) & 0x1;
+			int di = (data >> 25) & 0x1;
+			int sclk = (data >> 24) & 0x1;
+
+			adc12138_cs_w(cs);
+			adc12138_conv_w(conv);
+			adc12138_di_w(di);
+			adc12138_sclk_w(sclk);
+		}
 		if (!(mem_mask & 0x000000ff))
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
-				cpunum_set_input_line(0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				//cpunum_set_input_line(0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40)	// CG Board 0 IRQ Ack
 			{
-				cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				//cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 		}
 		return;
@@ -664,52 +824,86 @@ static READ32_HANDLER( lanc2_r )
 {
 	UINT32 r = 0;
 
-	if (offset == 0 && !(mem_mask & 0x000000ff))
+	if (offset == 0)
 	{
-		r |= lanc2_ram[lanc2_ram_r & 0x7fff];
-		lanc2_ram_r++;
+		if (!(mem_mask & 0x000000ff))
+		{
+			r |= lanc2_ram[lanc2_ram_r & 0x7fff];
+			lanc2_ram_r++;
+		}
+		else
+		{
+			r |= 0xffffff00;
+		}
+	}
+
+	if (offset == 4)
+	{
+		if (!(mem_mask & 0xff000000))
+		{
+			r |= 0x00000000;
+		}
 	}
 
 	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
-	r |= 0xffffff00;
 
 	return r;
 }
 
 static WRITE32_HANDLER( lanc2_w )
 {
-	if (!(mem_mask & 0xff000000))
+	if (offset == 0)
 	{
-		UINT8 value = data >> 24;
+		if (!(mem_mask & 0xff000000))
+		{
+			UINT8 value = data >> 24;
 
-		value = ((value >> 7) & 0x01) |
-				((value >> 5) & 0x02) |
-				((value >> 3) & 0x04) |
-				((value >> 1) & 0x08) |
-				((value << 1) & 0x10) |
-				((value << 3) & 0x20) |
-				((value << 5) & 0x40) |
-				((value << 7) & 0x80);
+			value = ((value >> 7) & 0x01) |
+					((value >> 5) & 0x02) |
+					((value >> 3) & 0x04) |
+					((value >> 1) & 0x08) |
+					((value << 1) & 0x10) |
+					((value << 3) & 0x20) |
+					((value << 5) & 0x40) |
+					((value << 7) & 0x80);
 
-		fpga_uploaded = 1;
+			fpga_uploaded = 1;
 
-		//printf("lanc2_fpga_w: %02X at %08X\n", value, activecpu_get_pc());
+			//printf("lanc2_fpga_w: %02X at %08X\n", value, activecpu_get_pc());
+		}
+		else if (!(mem_mask & 0x000000ff))
+		{
+			lanc2_ram[lanc2_ram_w & 0x7fff] = data & 0xff;
+			lanc2_ram_w++;
+		}
+		else
+		{
+			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+		}
 	}
-	else if (!(mem_mask & 0x000000ff))
+	if (offset == 4)
 	{
-		lanc2_ram[lanc2_ram_w & 0x7fff] = data & 0xff;
-		lanc2_ram_w++;
+		if (mame_stricmp(Machine->gamedrv->name, "thrilld") == 0)
+		{
+			work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
+			work_ram[(0x3ffed0/4) + 1] = 0x33202020;
+			work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;
+			work_ram[(0x3ffed0/4) + 3] = 0x2a207878;
+
+			work_ram[(0x3fff40/4) + 0] = 0x47433731;
+			work_ram[(0x3fff40/4) + 1] = 0x33000000;
+			work_ram[(0x3fff40/4) + 2] = 0x19994a41;
+			work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;
+		}
 	}
-	else
-	{
-		//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
-	}
+
+	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
 }
 
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&work_ram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_reg_r, K001604_reg_w)
 	AM_RANGE(0x74010000, 0x74017fff) AM_MIRROR(0x80000000) AM_READWRITE(paletteram32_r, paletteram32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K001604_tile_r, K001604_tile_w)
@@ -720,6 +914,7 @@ static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_MIRROR(0x80000000) AM_WRITE(sysreg_w)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_MIRROR(0x80000000) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7d030000, 0x7d030007) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
+	AM_RANGE(0x7d030000, 0x7d030007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7d030008, 0x7d03000f) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7d040000, 0x7d04ffff) AM_MIRROR(0x80000000) AM_READWRITE(lanc1_r, lanc1_w)
 	AM_RANGE(0x7d050000, 0x7d05ffff) AM_MIRROR(0x80000000) AM_READWRITE(lanc2_r, lanc2_w)
@@ -767,23 +962,16 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( nwktr )
 	PORT_START
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
 	PORT_START
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -796,7 +984,7 @@ INPUT_PORTS_START( nwktr )
 	PORT_DIPNAME( 0x80, 0x00, "Test Mode" )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIP2" )
+	PORT_DIPNAME( 0x40, 0x00, "Disable Machine Init" )
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "DIP3" )
@@ -835,20 +1023,8 @@ static sharc_config sharc_cfg =
 	BOOT_MODE_EPROM
 };
 
-static int vblank = 0;
 static INTERRUPT_GEN( nwktr_vblank )
 {
-	/*if (vblank == 0)
-    {
-        cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
-    }
-    else
-    {
-        cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
-    }*/
-	vblank++;
-	vblank &= 1;
-
 	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
@@ -934,7 +1110,6 @@ static void sound_irq_callback(int irq)
 	}
 }
 
-static UINT8 backup_ram[0x2000];
 static DRIVER_INIT( nwktr )
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_NWKTR);
@@ -948,6 +1123,8 @@ static DRIVER_INIT( nwktr )
 
 	ppc403_install_spu_tx_dma_handler(jamma_w, jamma_wdata);
 	ppc403_install_spu_rx_dma_handler(jamma_r, jamma_rdata);
+
+	adc12138_reset();
 }
 
 static DRIVER_INIT(thrilld)
@@ -958,9 +1135,9 @@ static DRIVER_INIT(thrilld)
 	/* RTC data */
 	backup_ram[0x00] = 0x47;	// 'G'
 	backup_ram[0x01] = 0x43;	// 'C'
-	backup_ram[0x02] = 0x37;	// '7'
-	backup_ram[0x03] = 0x31;	// '1'
-	backup_ram[0x04] = 0x33;	// '3'
+	backup_ram[0x02] = 0x36;	// '6'
+	backup_ram[0x03] = 0x37;	// '7'
+	backup_ram[0x04] = 0x36;	// '6'
 	backup_ram[0x05] = 0x00;	//
 	backup_ram[0x06] = 0x00;	// ?
 	backup_ram[0x07] = 0x00;	// ?
@@ -1071,7 +1248,7 @@ ROM_START(racingj)
 	ROM_REGION(0x80000, REGION_CPU2, 0)		/* 68k program roms */
         ROM_LOAD16_WORD_SWAP( "676gna08.7s", 0x000000, 0x080000, CRC(8973f6f2) SHA1(f5648a7e0205f7e979ccacbb52936809ce14a184) )
 
-	ROM_REGION(0x1000000, REGION_USER3, 0) 		/* other roms (textures?) */
+	ROM_REGION(0x1000000, REGION_SOUND1, 0) 		/* other roms (textures?) */
         ROM_LOAD( "676a09.16p",   0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
         ROM_LOAD( "676a10.14p",   0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
 ROM_END
@@ -1092,7 +1269,7 @@ ROM_START(racingj2)
 	ROM_REGION(0x80000, REGION_CPU2, 0)		/* 68k program roms */
         ROM_LOAD16_WORD_SWAP( "888a08.7s",    0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
 
-	ROM_REGION(0x800000, REGION_USER3, 0) 		/* PCM sample roms */
+	ROM_REGION(0x1000000, REGION_SOUND1, 0) 		/* PCM sample roms */
         ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
         ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
 ROM_END
@@ -1112,7 +1289,7 @@ ROM_START(thrilld)
 	ROM_REGION(0x80000, REGION_CPU2, 0)		/* 68k program roms */
         ROM_LOAD16_WORD_SWAP( "713a08.7s",    0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
 
-	ROM_REGION(0x800000, REGION_USER3, 0) 		/* PCM sample roms */
+	ROM_REGION(0x1000000, REGION_SOUND1, 0) 		/* PCM sample roms */
         ROM_LOAD( "713a09.16p",   0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
         ROM_LOAD( "713a10.14p",   0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 ROM_END
@@ -1121,4 +1298,4 @@ ROM_END
 
 GAME( 1998, racingj,	0,		nwktr,	nwktr,	racingj,	ROT0,	"Konami",	"Racing Jam", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1999, racingj2,	racingj,nwktr,	nwktr,	racingj2,	ROT0,	"Konami",	"Racing Jam: Chapter 2", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, thrilld,	0,		nwktr,	nwktr,	thrilld,	ROT0,	"Konami",	"Thrill Drive", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, thrilld,	0,		nwktr,	nwktr,	thrilld,	ROT0,	"Konami",	"Thrill Drive", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )

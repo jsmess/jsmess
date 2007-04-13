@@ -46,9 +46,6 @@ static pen_t *	pen_map;
 static UINT16 *	local_videoram;
 static UINT8	videobank_select;
 
-/* update-related variables */
-static int		last_update_scanline;
-
 /* DMA-related variables */
 static UINT8	yawdim_dma;
 static UINT16 dma_register[16];
@@ -63,12 +60,6 @@ static struct
 	UINT16		palette;		/* palette base */
 	UINT16		color;			/* current foreground color with palette */
 } dma_state;
-
-
-
-/* prototypes */
-static void update_partial(int scanline, int render);
-static void scanline0_callback(int param);
 
 
 
@@ -91,15 +82,11 @@ static VIDEO_START( common )
 	/* reset all the globals */
 	midyunit_cmos_page = 0;
 	autoerase_enable = 0;
-	last_update_scanline = 0;
 	yawdim_dma = 0;
 
 	/* reset DMA state */
 	memset(dma_register, 0, sizeof(dma_register));
 	memset(&dma_state, 0, sizeof(dma_state));
-
-	/* set up scanline 0 timer */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline0_callback);
 	return 0;
 }
 
@@ -272,26 +259,7 @@ WRITE16_HANDLER( midyunit_control_w )
 		videobank_select = (data >> 5) & 1;
 
 		/* handle autoerase disable (bit 4) */
-		if (data & 0x10)
-		{
-			if (autoerase_enable)
-			{
-				logerror("autoerase off @ %d\n", video_screen_get_vpos(0));
-				update_partial(video_screen_get_vpos(0) - 1, 1);
-			}
-			autoerase_enable = 0;
-		}
-
-		/* handle autoerase enable (bit 4)  */
-		else
-		{
-			if (!autoerase_enable)
-			{
-				logerror("autoerase on @ %d\n", video_screen_get_vpos(0));
-				update_partial(video_screen_get_vpos(0) - 1, 1);
-			}
-			autoerase_enable = 1;
-		}
+		autoerase_enable = ((data & 0x10) == 0);
 	}
 }
 
@@ -683,165 +651,33 @@ WRITE16_HANDLER( midyunit_dma_w )
 
 /*************************************
  *
- *  Partial screen updater
- *
- *************************************/
-
-static void update_partial(int scanline, int render)
-{
-	/* force a partial refresh */
-	if (render)
-		video_screen_update_partial(0, scanline);
-
-	/* if no autoerase is enabled, quit now */
-	if (autoerase_enable)
-	{
-		int starty, stopy;
-		int v, width, xoffs;
-		UINT32 offset;
-
-		/* autoerase the lines here */
-		starty = (last_update_scanline > Machine->screen[0].visarea.min_y) ? last_update_scanline : Machine->screen[0].visarea.min_y;
-		stopy = (scanline < Machine->screen[0].visarea.max_y) ? scanline : Machine->screen[0].visarea.max_y;
-
-		/* determine the base of the videoram */
-		offset = (~tms34010_get_DPYSTRT(0) & 0x1ff0) << 5;
-		offset += 512 * (starty - Machine->screen[0].visarea.min_y);
-
-		/* determine how many pixels to copy */
-		xoffs = Machine->screen[0].visarea.min_x;
-		width = Machine->screen[0].visarea.max_x - xoffs + 1;
-		offset += xoffs;
-
-		/* loop over rows */
-		for (v = starty; v <= stopy; v++)
-		{
-			memcpy(&local_videoram[offset & 0x3ffff], &local_videoram[510 * 512], width * sizeof(UINT16));
-			offset += 512;
-		}
-	}
-
-	/* remember where we left off */
-	last_update_scanline = scanline + 1;
-}
-
-
-
-/*************************************
- *
- *  34010 display address callback
- *
- *************************************/
-
-void midyunit_display_addr_changed(UINT32 offs, int rowbytes, int scanline)
-{
-}
-
-
-
-/*************************************
- *
- *  34010 interrupt callback
- *
- *************************************/
-
-void midyunit_display_interrupt(int scanline)
-{
-	update_partial(scanline - 1, 1);
-}
-
-
-
-/*************************************
- *
- *  34010 I/O register kludge
- *
- *************************************/
-
-WRITE16_HANDLER( midyunit_io_register_w )
-{
-	/* if the HEBLNK or HSBLNK are changing, force an update */
-	if (offset == REG_HSBLNK || offset == REG_HEBLNK)
-	{
-		int oldval = tms34010_io_register_r(offset, mem_mask);
-		if ((data & ~mem_mask) != (oldval & ~mem_mask))
-			update_partial(video_screen_get_vpos(0), 1);
-	}
-
-	/* pass the write through */
-	tms34010_io_register_w(offset, data, mem_mask);
-}
-
-
-
-/*************************************
- *
- *  End-of-frame update
- *
- *************************************/
-
-VIDEO_EOF( midyunit )
-{
-	/* finish updating/autoerasing, even if we skipped a frame */
-	update_partial(machine->screen[0].visarea.max_y, 0);
-}
-
-
-static void scanline0_callback(int param)
-{
-	last_update_scanline = 0;
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, scanline0_callback);
-}
-
-
-
-/*************************************
- *
  *  Core refresh routine
  *
  *************************************/
 
-VIDEO_UPDATE( midyunit )
+static void autoerase_line(int scanline)
 {
-	int hsblnk, heblnk, leftscroll;
-	int v, width, xoffs;
-	UINT32 offset;
+	if (autoerase_enable && scanline >= 0 && scanline < 510)
+		memcpy(&local_videoram[512 * scanline], &local_videoram[512 * (510 + (scanline & 1))], 512 * sizeof(UINT16));
+}
 
-	/* get the current blanking values */
-	cpuintrf_push_context(0);
-	heblnk = tms34010_io_register_r(REG_HEBLNK, 0);
-	hsblnk = tms34010_io_register_r(REG_HSBLNK, 0);
-	leftscroll = (machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x) - (hsblnk - heblnk) * 2;
-	if (leftscroll < 0)
-		leftscroll = 0;
-	cpuintrf_pop_context();
 
-	/* determine the base of the videoram */
-	offset = (~tms34010_get_DPYSTRT(0) & 0x1ff0) << 5;
-	offset += 512 * (cliprect->min_y - machine->screen[0].visarea.min_y);
+void midyunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT16 *src = &local_videoram[(params->rowaddr << 9) & 0x3fe00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr << 1;
+	int x;
 
-	/* determine how many pixels to copy */
-	xoffs = cliprect->min_x;
-	width = cliprect->max_x - xoffs + 1;
-	offset += xoffs;
+	/* adjust the display address to account for ignored bits */
+	for (x = params->heblnk; x < params->hsblnk; x++)
+		dest[x] = pen_map[src[coladdr++ & 0x1ff]];
 
-	/* adjust for the left scroll hack */
-	xoffs += leftscroll;
-	width -= leftscroll;
+	/* handle autoerase on the previous line */
+	autoerase_line(params->rowaddr - 1);
 
-	/* loop over rows */
-	for (v = cliprect->min_y; v <= cliprect->max_y; v++)
-	{
-		draw_scanline16(bitmap, xoffs, v, width, &local_videoram[offset & 0x3ffff], pen_map, -1);
-		offset += 512;
-	}
-
-	/* blank the left side */
-	if (leftscroll > 0)
-	{
-		rectangle erase = *cliprect;
-		erase.max_x = leftscroll - 1;
-		fillbitmap(bitmap, get_black_pen(machine), &erase);
-	}
-	return 0;
+	/* if this is the last update of the screen, set a timer to clear out the final line */
+	/* (since we update one behind) */
+	if (scanline == machine->screen[0].visarea.max_y)
+		mame_timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), params->rowaddr, autoerase_line);
 }

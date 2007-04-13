@@ -141,6 +141,35 @@ typedef struct
 	int active_irq_num;
 
 	SHARC_BOOT_MODE boot_mode;
+
+	UINT32 dmaop_src;
+	UINT32 dmaop_dst;
+	UINT32 dmaop_chain_ptr;
+	int dmaop_src_modifier;
+	int dmaop_dst_modifier;
+	int dmaop_src_count;
+	int dmaop_dst_count;
+	int dmaop_pmode;
+	int dmaop_cycles;
+	int dmaop_channel;
+	int dmaop_chained_direction;
+
+	int interrupt_active;
+
+	int iop_latency_cycles;
+	int iop_latency_reg;
+	UINT32 iop_latency_data;
+
+	UINT32 delay_slot1, delay_slot2;
+
+	int systemreg_latency_cycles;
+	int systemreg_latency_reg;
+	UINT32 systemreg_latency_data;
+	UINT32 systemreg_previous_data;
+
+	UINT32 astat_old;
+	UINT32 astat_old_old;
+	UINT32 astat_old_old_old;
 } SHARC_REGS;
 
 
@@ -151,25 +180,9 @@ static void (* sharc_op[512])(void);
 
 
 
-static UINT32 dmaop_src;
-static UINT32 dmaop_dst;
-static UINT32 dmaop_chain_ptr;
-static int dmaop_src_modifier;
-static int dmaop_dst_modifier;
-static int dmaop_src_count;
-static int dmaop_dst_count;
-static int dmaop_pmode;
-static int dmaop_cycles = 0;
-static int dmaop_channel;
-static int dmaop_chained_direction;
-
-int interrupt_active = 0;
-
 #define ROPCODE(pc)		((UINT64)(sharc.internal_ram[((pc-0x20000) * 3) + 0]) << 32) | \
 						((UINT64)(sharc.internal_ram[((pc-0x20000) * 3) + 1]) << 16) | \
 						((UINT64)(sharc.internal_ram[((pc-0x20000) * 3) + 2]) << 0)
-
-static UINT32 delay_slot1, delay_slot2;
 
 INLINE void CHANGE_PC(UINT32 newpc)
 {
@@ -188,31 +201,24 @@ INLINE void CHANGE_PC_DELAYED(UINT32 newpc)
 {
 	sharc.nfaddr = newpc;
 
-	delay_slot1 = sharc.pc;
-	delay_slot2 = sharc.daddr;
+	sharc.delay_slot1 = sharc.pc;
+	sharc.delay_slot2 = sharc.daddr;
 }
 
-
-
-
-
-static int iop_latency_cycles = 0;
-static int iop_latency_reg = 0;
-static UINT32 iop_latency_data = 0;
 
 
 static void add_iop_write_latency_effect(int iop_reg, UINT32 data, int latency)
 {
-	iop_latency_cycles = latency+1;
-	iop_latency_reg = iop_reg;
-	iop_latency_data = data;
+	sharc.iop_latency_cycles = latency+1;
+	sharc.iop_latency_reg = iop_reg;
+	sharc.iop_latency_data = data;
 }
 
 static void iop_write_latency_effect(void)
 {
-	UINT32 data = iop_latency_data;
+	UINT32 data = sharc.iop_latency_data;
 
-	switch (iop_latency_reg)
+	switch (sharc.iop_latency_reg)
 	{
 		case 0x1c:
 		{
@@ -232,7 +238,7 @@ static void iop_write_latency_effect(void)
 			break;
 		}
 
-		default:	fatalerror("SHARC: iop_write_latency_effect: unknown IOP register %02X", iop_latency_reg);
+		default:	fatalerror("SHARC: iop_write_latency_effect: unknown IOP register %02X", sharc.iop_latency_reg);
 	}
 }
 
@@ -248,9 +254,9 @@ static UINT32 sharc_iop_r(UINT32 address)
 		case 0x37:		// DMA status
 		{
 			UINT32 r = 0;
-			if (dmaop_cycles > 0)
+			if (sharc.dmaop_cycles > 0)
 			{
-				r |= 1 << dmaop_channel;
+				r |= 1 << sharc.dmaop_channel;
 			}
 			return r;
 		}
@@ -447,9 +453,9 @@ static void sharc_reset(void)
 			sharc.dma[6].control		= 0x2a1;
 
 			sharc_dma_exec(6);
-			dma_op(dmaop_src, dmaop_dst, dmaop_src_modifier, dmaop_dst_modifier,
-				   dmaop_src_count, dmaop_dst_count, dmaop_pmode);
-			dmaop_cycles = 0;
+			dma_op(sharc.dmaop_src, sharc.dmaop_dst, sharc.dmaop_src_modifier, sharc.dmaop_dst_modifier,
+				   sharc.dmaop_src_count, sharc.dmaop_dst_count, sharc.dmaop_pmode);
+			sharc.dmaop_cycles = 0;
 
 			break;
 		}
@@ -469,7 +475,7 @@ static void sharc_reset(void)
 	sharc.idle = 0;
 	sharc.stky = 0x5400000;
 
-	interrupt_active = 0;
+	sharc.interrupt_active = 0;
 }
 
 static void sharc_exit(void)
@@ -524,8 +530,8 @@ void sharc_set_flag_input(int flag_num, int state)
 static void check_interrupts(void)
 {
 	int i;
-	if ((sharc.imask & sharc.irq_active) && (sharc.mode1 & MODE1_IRPTEN) && !interrupt_active &&
-		sharc.pc != delay_slot1 && sharc.pc != delay_slot2)
+	if ((sharc.imask & sharc.irq_active) && (sharc.mode1 & MODE1_IRPTEN) && !sharc.interrupt_active &&
+		sharc.pc != sharc.delay_slot1 && sharc.pc != sharc.delay_slot2)
 	{
 		int which = 0;
 		for (i=0; i < 32; i++)
@@ -560,13 +566,9 @@ static void check_interrupts(void)
 		sharc.active_irq_num = which;
 		sharc.irq_active &= ~(1 << which);
 
-		interrupt_active = 1;
+		sharc.interrupt_active = 1;
 	}
 }
-
-static UINT32 astat_old;
-static UINT32 astat_old_old;
-static UINT32 astat_old_old_old;
 
 static int sharc_execute(int cycles)
 {
@@ -575,16 +577,16 @@ static int sharc_execute(int cycles)
 	if (sharc.idle && sharc.irq_active == 0)
 	{
 		// handle pending DMA transfers
-		if (dmaop_cycles > 0)
+		if (sharc.dmaop_cycles > 0)
 		{
-			dmaop_cycles -= cycles;
-			if (dmaop_cycles <= 0)
+			sharc.dmaop_cycles -= cycles;
+			if (sharc.dmaop_cycles <= 0)
 			{
-				dmaop_cycles = 0;
-				dma_op(dmaop_src, dmaop_dst, dmaop_src_modifier, dmaop_dst_modifier, dmaop_src_count, dmaop_dst_count, dmaop_pmode);
-				if (dmaop_chain_ptr != 0)
+				sharc.dmaop_cycles = 0;
+				dma_op(sharc.dmaop_src, sharc.dmaop_dst, sharc.dmaop_src_modifier, sharc.dmaop_dst_modifier, sharc.dmaop_src_count, sharc.dmaop_dst_count, sharc.dmaop_pmode);
+				if (sharc.dmaop_chain_ptr != 0)
 				{
-					schedule_chained_dma_op(dmaop_channel, dmaop_chain_ptr, dmaop_chained_direction);
+					schedule_chained_dma_op(sharc.dmaop_channel, sharc.dmaop_chain_ptr, sharc.dmaop_chained_direction);
 				}
 			}
 		}
@@ -616,9 +618,9 @@ static int sharc_execute(int cycles)
 		sharc.faddr = sharc.nfaddr;
 		sharc.nfaddr++;
 
-		astat_old_old_old = astat_old_old;
-		astat_old_old = astat_old;
-		astat_old = sharc.astat;
+		sharc.astat_old_old_old = sharc.astat_old_old;
+		sharc.astat_old_old = sharc.astat_old;
+		sharc.astat_old = sharc.astat;
 
 		sharc.decode_opcode = sharc.fetch_opcode;
 
@@ -640,7 +642,7 @@ static int sharc_execute(int cycles)
 						UINT32 looptop = TOP_PC();
 						if (sharc.pc - looptop > 2)
 						{
-							sharc.astat = astat_old_old_old;
+							sharc.astat = sharc.astat_old_old_old;
 						}
 					}
 
@@ -654,7 +656,7 @@ static int sharc_execute(int cycles)
 						CHANGE_PC(TOP_PC());
 					}
 
-					sharc.astat = astat_old;
+					sharc.astat = sharc.astat_old;
 					break;
 				}
 				case 1:		// counter-based, length 1
@@ -695,35 +697,43 @@ static int sharc_execute(int cycles)
 
 
 		// System register latency effect
-		if (systemreg_latency_cycles > 0)
+		if (sharc.systemreg_latency_cycles > 0)
 		{
-			--systemreg_latency_cycles;
-			if (systemreg_latency_cycles <= 0)
+			--sharc.systemreg_latency_cycles;
+			if (sharc.systemreg_latency_cycles <= 0)
 			{
 				systemreg_write_latency_effect();
 			}
 		}
 
 		// IOP register latency effect
-		if (iop_latency_cycles > 0)
+		if (sharc.iop_latency_cycles > 0)
 		{
-			--iop_latency_cycles;
-			if (iop_latency_cycles <= 0)
+			--sharc.iop_latency_cycles;
+			if (sharc.iop_latency_cycles <= 0)
 			{
 				iop_write_latency_effect();
 			}
 		}
 
 		// DMA transfer
-		if (dmaop_cycles > 0)
+		if (sharc.dmaop_cycles > 0)
 		{
-			--dmaop_cycles;
-			if (dmaop_cycles <= 0)
+			--sharc.dmaop_cycles;
+			if (sharc.dmaop_cycles <= 0)
 			{
-				dma_op(dmaop_src, dmaop_dst, dmaop_src_modifier, dmaop_dst_modifier, dmaop_src_count, dmaop_dst_count, dmaop_pmode);
-				if (dmaop_chain_ptr != 0)
+				sharc.irptl |= (1 << (sharc.dmaop_channel+10));
+
+				/* DMA interrupt */
+				if (sharc.imask & (1 << (sharc.dmaop_channel+10)))
 				{
-					schedule_chained_dma_op(dmaop_channel, dmaop_chain_ptr, dmaop_chained_direction);
+					sharc.irq_active |= 1 << (sharc.dmaop_channel+10);
+				}
+
+				dma_op(sharc.dmaop_src, sharc.dmaop_dst, sharc.dmaop_src_modifier, sharc.dmaop_dst_modifier, sharc.dmaop_src_count, sharc.dmaop_dst_count, sharc.dmaop_pmode);
+				if (sharc.dmaop_chain_ptr != 0)
+				{
+					schedule_chained_dma_op(sharc.dmaop_channel, sharc.dmaop_chain_ptr, sharc.dmaop_chained_direction);
 				}
 			}
 		}

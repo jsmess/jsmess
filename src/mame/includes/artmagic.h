@@ -19,4 +19,4 @@ void artmagic_from_shiftreg(offs_t address, UINT16 *data);
 READ16_HANDLER( artmagic_blitter_r );
 WRITE16_HANDLER( artmagic_blitter_w );
 
-VIDEO_UPDATE( artmagic );
+void artmagic_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);

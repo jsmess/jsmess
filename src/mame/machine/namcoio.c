@@ -1,19 +1,19 @@
 /***************************************************************************
 
 The following Namco custom chips are all instances of the same 4-bit MCU,
-the Fujitsu MB8843 (42-pin DIP package) and MB8844 (28-pin DIP),
+the Fujitsu MB8843 (42-pin DIP package) and MB8842/MB8844 (28-pin DIP),
 differently programmed.
 
-chip pins function
----- ---- --------
-50XX  28  player score handling (protection)
-51XX  42  I/O (coin management built-in)
-52XX  42  sample playback
-53XX  42  I/O (steering wheel support)
-54XX  28  explosion (noise) generator
-56XX  42  I/O (coin management built-in)
-58XX  42  I/O (coin management built-in)
-62XX  28  I/O and explosion (noise) generator
+chip  MCU   pins function
+---- ------ ---- --------
+50XX MB8842  28  player score handling (protection)
+51XX MB8843  42  I/O (coin management built-in)
+52XX MB8843  42  sample playback
+53XX MB8843  42  I/O (steering wheel support)
+54XX MB8844  28  explosion (noise) generator
+56XX         42  I/O (coin management built-in)
+58XX         42  I/O (coin management built-in)
+62XX         28  I/O and explosion (noise) generator
 
 06XX interface:
 ---------------
@@ -42,7 +42,7 @@ Toy Pop                 58XX  56XX  56XX  ----
 
 Pinouts:
 
-        MB8843                      MB8844
+        MB8843                   MB8842/MB8844
        +------+                    +------+
   EXTAL|1   42|Vcc            EXTAL|1   28|Vcc
    XTAL|2   41|K3              XTAL|2   27|K3
@@ -134,6 +134,7 @@ TODO:
 
 #include "driver.h"
 #include "machine/namcoio.h"
+#include "machine/namco50.h"
 #include "sound/namco52.h"
 #include "audio/namco54.h"
 
@@ -164,379 +165,6 @@ static WRITE8_HANDLER( nop_w ) { }
 
 #define READ_PORT(n)	(io[chip].in[n](0) & 0x0f)
 #define WRITE_PORT(n,d)	io[chip].out[n](0,(d) & 0x0f)
-
-
-
-/*
-50XX
-Bosconian scoring info
-
-I/O controller command 64h update Score[Player[chip]][chip] values: (set by game code)
-
-60h = switch to player 1
-68h = switch to player 2
-
-80h =    5  (Xevious startup check)
-81h =   10  Asteroid
-82h =   15? (Battles Xevious bootleg)
-83h =   20  Cosmo-Mine
-84h =   25? (Battles Xevious bootleg)
-85h =   30? (Battles Xevious bootleg)
-86h =   40? (Battles Xevious bootleg)
-87h =   50  I-Type
-88h =   60  P-Type
-89h =   70  E-Type
-8ah =   80? (Battles Xevious bootleg)
-8bh =   90? (Battles Xevious bootleg)
-8ch =  100? (Battles Xevious bootleg)
-8Dh =  200  Spy Ship
-8eh =  300? (Battles Xevious bootleg)
-8fh =  500? (Battles Xevious bootleg)
-
-90h =   50? (guess)
-91h =  100          2nd CPU protection check
-92h =  150? (guess)
-93h =  200  Bonus & 2nd CPU protection check
-94h =  250? (guess)
-95h =  300  Bonus & 2nd CPU protection check
-96h =  400  Bonus & 2nd CPU protection check
-97h =  500          2nd CPU protection check
-98h =  600  Bonus & 2nd CPU protection check
-99h =  700          2nd CPU protection check
-9Ah =  800  Bonus & 2nd CPU protection check
-9bh =  900          2nd CPU protection check
-9ch = 1000? (guess)
-9dh = 2000? (guess)
-9eh = 3000? (guess)
-9fh = 5000? (guess)
-
-A0h =  500  I-Type Formation
-A1h = 1000  P-Type Formation
-A2h = 1500  E-Type Formation
-A3h = 2000  Bonus
-A4h = 2500? (guess)
-A5h = 3000  Bonus
-A6h = 4000  Bonus
-A7h = 5000  Bonus
-A8h = 6000  Bonus
-A9h = 7000  Bonus
-Aah = 8000? (guess)
-Abh = 9000? (guess)
-Ach =10000? (guess)
-Adh =20000? (guess)
-Aeh =30000? (guess)
-Afh =50000? (guess)
-
-b0h =   10? (guess)
-b1h =   20? (guess)
-b2h =   30? (guess)
-b3h =   40? (guess)
-b4h =   50? (guess)
-b5h =   60? (guess)
-b6h =   80? (guess)
-B7h =  100  I-Type Leader
-B8h =  120  P-Type Leader
-B9h =  140  E-Type Leader
-bah =  160? (guess)
-bbh =  180? (guess)
-bch =  200? (guess)
-bdh =  400? (guess)
-beh =  600? (guess)
-bfh = 1000? (guess)
-
-E0h =   15? (Battles Xevious bootleg)
-E1h =   30? (Battles Xevious bootleg)
-E2h =   45? (Battles Xevious bootleg)
-E3h =   60? (Battles Xevious bootleg)
-E4h =   75? (Battles Xevious bootleg)
-E5h =   90  (Xevious startup check)
-E6h =  120? (Battles Xevious bootleg)
-E7h =  150? (Battles Xevious bootleg)
-E8h =  180? (Battles Xevious bootleg)
-E9h =  210? (Battles Xevious bootleg)
-Eah =  240? (Battles Xevious bootleg)
-Ebh =  270? (Battles Xevious bootleg)
-Ech =  300? (Battles Xevious bootleg)
-Edh =  600? (Battles Xevious bootleg)
-Eeh =  900? (Battles Xevious bootleg)
-Efh = 1000? (Battles Xevious bootleg)
-
-Bonuses are given at the end of a round if the game is set to auto
-difficulty and the round is completed on one life. Bonus values are:
-
- 100x3  95h
- 100x4  96h
- 100x8  9Ah
- 200x4  96h,96h
- 200x8  9Ah,9Ah
- 300x8  A3h,96h
- 400x8  A5h,93h
- 500x8  A3h,A3h
- 600x8  A6h,9Ah
- 700x8  A7h,98h
- 800x8  A8h,96h
- 900x8  A9h,93h
-1000x8  A6h,A6h
-
-
-I/O controller command 84h set bonus values: (set by game code)
-
-Byte 0: always 10h
-Byte 1: indicator (20h=first bonus, 30h=interval bonus, others=unknown)
-Byte 2: BCD Score[Player[chip]][chip] (--ss----)
-Byte 3: BCD Score[Player[chip]][chip] (----ss--)
-Byte 4: BCD Score[Player[chip]][chip] (------ss)
-
-Indicator values 20h and 30h are sent once during startup based upon
-the dip switch settings, other values are sent during gameplay.
-The default bonus setting is 20000, 70000, and every 70000.
-
-
-I/O controller command 94h read Score[Player[chip]][chip] returned value: (read by game code)
-
-Byte 0: BCD Score[Player[chip]][chip] (fs------) and flags
-Byte 1: BCD Score[Player[chip]][chip] (--ss----)
-Byte 2: BCD Score[Player[chip]][chip] (----ss--)
-Byte 3: BCD Score[Player[chip]][chip] (------ss)
-
-Flags: 80h=high score, 40h=first bonus, 20h=interval bonus
-*/
-
-#define MAX_50XX 2
-
-static INT32 HiScore[MAX_50XX];
-static INT32 Score[2][MAX_50XX];
-static INT32 NextBonus[2][MAX_50XX];
-static INT32 FirstBonus[MAX_50XX],IntervalBonus[MAX_50XX];
-static INT32 Player[MAX_50XX];
-
-static INT32 in_count_50XX[MAX_50XX];
-
-void namcoio_50XX_write(int chipnum,int data)
-{
-	int chip = (chipnum < 4) ? 0 : 1;
-	static int fetch[MAX_50XX];
-	static int fetchmode[MAX_50XX];
-
-#if VERBOSE
-	logerror("%04x: custom 50XX #%d write %02x\n",activecpu_get_pc(),chip,data);
-#endif
-
-	if (fetch[chip])
-	{
-		switch (fetch[chip]--)
-		{
-			case 3:
-				if (fetchmode[chip] == 0x20)
-					FirstBonus[chip] = ((data / 16) * 100000) + ((data % 16) * 10000);
-				else if (fetchmode[chip] == 0x30)
-					IntervalBonus[chip] = ((data / 16) * 100000) + ((data % 16) * 10000);
-				else if (fetchmode[chip] == 0x50)
-					HiScore[chip] = ((data / 16) * 100000) + ((data % 16) * 10000);
-
-				NextBonus[0][chip] = FirstBonus[chip];
-				NextBonus[1][chip] = FirstBonus[chip];
-				break;
-			case 2:
-				if (fetchmode[chip] == 0x20)
-					FirstBonus[chip] = FirstBonus[chip] + ((data / 16) * 1000) + ((data % 16) * 100);
-				else if (fetchmode[chip] == 0x30)
-					IntervalBonus[chip] = IntervalBonus[chip] + ((data / 16) * 1000) + ((data % 16) * 100);
-				else if (fetchmode[chip] == 0x50)
-					HiScore[chip] = HiScore[chip] + ((data / 16) * 1000) + ((data % 16) * 100);
-
-				NextBonus[0][chip] = FirstBonus[chip];
-				NextBonus[1][chip] = FirstBonus[chip];
-				break;
-			case 1:
-				if (fetchmode[chip] == 0x20)
-					FirstBonus[chip] = FirstBonus[chip] + ((data / 16) * 10) + ((data % 16) * 1);
-				else if (fetchmode[chip] == 0x30)
-					IntervalBonus[chip] = IntervalBonus[chip] + ((data / 16) * 10) + ((data % 16) * 1);
-				else if (fetchmode[chip] == 0x50)
-					HiScore[chip] = HiScore[chip] + ((data / 16) * 10) + ((data % 16) * 1);
-
-				NextBonus[0][chip] = FirstBonus[chip];
-				NextBonus[1][chip] = FirstBonus[chip];
-				break;
-		}
-	}
-	else
-	{
-		switch(data)
-		{
-			case 0x10:
-				Score[0][chip] = 0;
-				Score[1][chip] = 0;
-				in_count_50XX[chip] = 0;
-				break;
-
-			case 0x20:
-			case 0x30:
-			case 0x50:
-				fetch[chip] = 3;
-				fetchmode[chip] = data;
-				break;
-
-			case 0x60:	/* 1P Score */
-				Player[chip] = 0;
-				break;
-			case 0x68:	/* 2P Score */
-				Player[chip] = 1;
-				break;
-//          case 0x70:
-//              break;
-			case 0x80:
-				Score[Player[chip]][chip] += 5;
-				break;
-			case 0x81:
-				Score[Player[chip]][chip] += 10;
-				break;
-			case 0x83:
-				Score[Player[chip]][chip] += 20;
-				break;
-			case 0x87:
-				Score[Player[chip]][chip] += 50;
-				break;
-			case 0x88:
-				Score[Player[chip]][chip] += 60;
-				break;
-			case 0x89:
-				Score[Player[chip]][chip] += 70;
-				break;
-			case 0x8D:
-				Score[Player[chip]][chip] += 200;
-				break;
-			case 0x91:
-				Score[Player[chip]][chip] += 100;
-				break;
-			case 0x93:
-				Score[Player[chip]][chip] += 200;
-				break;
-			case 0x95:
-				Score[Player[chip]][chip] += 300;
-				break;
-			case 0x96:
-				Score[Player[chip]][chip] += 400;
-				break;
-			case 0x97:
-				Score[Player[chip]][chip] += 500;
-				break;
-			case 0x98:
-				Score[Player[chip]][chip] += 600;
-				break;
-			case 0x99:
-				Score[Player[chip]][chip] += 700;
-				break;
-			case 0x9A:
-				Score[Player[chip]][chip] += 800;
-				break;
-			case 0x9b:
-				Score[Player[chip]][chip] += 900;
-				break;
-			case 0xA0:
-				Score[Player[chip]][chip] += 500;
-				break;
-			case 0xA1:
-				Score[Player[chip]][chip] += 1000;
-				break;
-			case 0xA2:
-				Score[Player[chip]][chip] += 1500;
-				break;
-			case 0xA3:
-				Score[Player[chip]][chip] += 2000;
-				break;
-			case 0xA5:
-				Score[Player[chip]][chip] += 3000;
-				break;
-			case 0xA6:
-				Score[Player[chip]][chip] += 4000;
-				break;
-			case 0xA7:
-				Score[Player[chip]][chip] += 5000;
-				break;
-			case 0xA8:
-				Score[Player[chip]][chip] += 6000;
-				break;
-			case 0xA9:
-				Score[Player[chip]][chip] += 7000;
-				break;
-			case 0xB7:
-				Score[Player[chip]][chip] += 100;
-				break;
-			case 0xB8:
-				Score[Player[chip]][chip] += 120;
-				break;
-			case 0xB9:
-				Score[Player[chip]][chip] += 140;
-				break;
-			case 0xE5:
-				Score[Player[chip]][chip] += 90;
-				break;
-			default:
-				logerror("unknown Score: %02x\n",data);
-			break;
-		}
-	}
-}
-
-UINT8 namcoio_50XX_read(int chipnum)
-{
-	int chip = (chipnum < 4) ? 0 : 1;
-#if VERBOSE
-	logerror("%04x: custom 50XX #%d read\n",activecpu_get_pc(),chip);
-#endif
-
-	switch ((in_count_50XX[chip]++) % 4)
-	{
-		default:
-		case 0:
-			{
-				int flags = 0;
-				int lo = (Score[Player[chip]][chip] / 1000000) % 10;
-				if (Score[Player[chip]][chip] >= HiScore[chip])
-				{
-					HiScore[chip] = Score[Player[chip]][chip];
-					flags |= 0x80;
-				}
-				if (Score[Player[chip]][chip] >= NextBonus[Player[chip]][chip])
-				{
-					if (NextBonus[Player[chip]][chip] == FirstBonus[chip])
-					{
-						NextBonus[Player[chip]][chip] = IntervalBonus[chip];
-						flags |= 0x40;
-					}
-					else
-					{
-						NextBonus[Player[chip]][chip] += IntervalBonus[chip];
-						flags |= 0x20;
-					}
-				}
-				return lo | flags;
-			}
-
-		case 1:
-			{
-				int hi = (Score[Player[chip]][chip] / 100000) % 10;
-				int lo = (Score[Player[chip]][chip] / 10000) % 10;
-				return (hi * 16) + lo;
-			}
-
-		case 2:
-			{
-				int hi = (Score[Player[chip]][chip] / 1000) % 10;
-				int lo = (Score[Player[chip]][chip] / 100) % 10;
-				return (hi * 16) + lo;
-			}
-
-		case 3:
-			{
-				int hi = (Score[Player[chip]][chip] / 10) % 10;
-				int lo = Score[Player[chip]][chip] % 10;
-				return (hi * 16) + lo;
-			}
-	}
-}
 
 
 
@@ -1232,15 +860,6 @@ static void namco_06xx_state_save(int chipnum)
 
 		//state_save_register_item("namcoio06xx", chipnum, nmi_cpu[chipnum]);
 		state_save_register_item("namcoio06xx", chipnum, customio_command[chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, HiScore[chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, Score[0][chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, Score[1][chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, NextBonus[0][chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, NextBonus[1][chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, FirstBonus[chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, IntervalBonus[chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, Player[chipnum]);
-
 }
 
 
@@ -1302,7 +921,8 @@ static UINT8 namco_06xx_data_read(int chipnum)
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX: return namcoio_50XX_read(chipnum);
+		case NAMCOIO_50XX:   return namco_50xx_read();
+		case NAMCOIO_50XX_2: return namco_50xx_2_read();
 		case NAMCOIO_51XX: return namcoio_51XX_read(chipnum);
 		case NAMCOIO_53XX_DIGDUG:  return namcoio_53XX_digdug_read(chipnum);
 		case NAMCOIO_53XX_POLEPOS: return namcoio_53XX_polepos_read(chipnum);
@@ -1321,12 +941,30 @@ static void namco_06xx_data_write(int chipnum,UINT8 data)
 
 	switch (io[chipnum].type)
 	{
-		case NAMCOIO_50XX: namcoio_50XX_write(chipnum,data); break;
-		case NAMCOIO_51XX: namcoio_51XX_write(chipnum,data); break;
-		case NAMCOIO_52XX: namcoio_52XX_write(data); break;
-		case NAMCOIO_54XX: namco_54xx_write(data); break;
+		case NAMCOIO_50XX:   namco_50xx_write(data); break;
+		case NAMCOIO_50XX_2: namco_50xx_2_write(data); break;
+		case NAMCOIO_51XX:   namcoio_51XX_write(chipnum,data); break;
+		case NAMCOIO_52XX:   namcoio_52XX_write(data); break;
+		case NAMCOIO_54XX:   namco_54xx_write(data); break;
 		default:
 			logerror("%04x: custom IO type %d unsupported write\n",activecpu_get_pc(),io[chipnum].type);
+			break;
+	}
+}
+
+
+static void namco_06xx_read_request(int chipnum)
+{
+#if VERBOSE
+	logerror("requesting read to chip %d\n",chipnum%3);
+#endif
+
+	switch (io[chipnum].type)
+	{
+		case NAMCOIO_50XX:   namco_50xx_read_request(); break;
+		case NAMCOIO_50XX_2: namco_50xx_2_read_request(); break;
+		default:
+			logerror("%04x: custom IO type %d read_request unsupported\n",activecpu_get_pc(),io[chipnum].type);
 			break;
 	}
 }
@@ -1415,6 +1053,19 @@ static void namco_06xx_ctrl_w(int chip,int data)
 		// On the other hand, the time cannot be too short otherwise the 54XX will
 		// not have enough time to process the incoming commands.
 		timer_adjust(nmi_timer[chip], TIME_IN_USEC(200), chip, TIME_IN_USEC(200));
+
+		if (customio_command[chip] & 0x10)
+		{
+			switch (customio_command[chip] & 0xf)
+			{
+				case 0x1: namco_06xx_read_request(4*chip + 0); break;
+				case 0x2: namco_06xx_read_request(4*chip + 1); break;
+				case 0x4: namco_06xx_read_request(4*chip + 2); break;
+				case 0x8: namco_06xx_read_request(4*chip + 3); break;
+				default:
+					logerror("%04x: 06XX #%d read in unsupported mode %02x\n",activecpu_get_pc(),chip,customio_command[chip]);
+			}
+		}
 	}
 }
 

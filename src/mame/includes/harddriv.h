@@ -4,6 +4,8 @@
 
 **************************************************************************/
 
+#include "cpu/tms34010/tms34010.h"
+
 /*----------- defined in machine/harddriv.c -----------*/
 
 extern INT8 hdcpu_main;
@@ -224,7 +226,6 @@ extern size_t hdgsp_vram_size;
 VIDEO_START( harddriv );
 void hdgsp_write_to_shiftreg(UINT32 address, UINT16 *shiftreg);
 void hdgsp_read_from_shiftreg(UINT32 address, UINT16 *shiftreg);
-void hdgsp_display_update(UINT32 offs, int rowbytes, int scanline);
 
 READ16_HANDLER( hdgsp_control_lo_r );
 WRITE16_HANDLER( hdgsp_control_lo_w );
@@ -240,4 +241,5 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w );
 READ16_HANDLER( hdgsp_paletteram_hi_r );
 WRITE16_HANDLER( hdgsp_paletteram_hi_w );
 
-VIDEO_UPDATE( harddriv );
+void harddriv_scanline_driver(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);
+void harddriv_scanline_multisync(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);

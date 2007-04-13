@@ -1727,16 +1727,33 @@ ROM_START( kungfub )
 	ROM_LOAD( "b-4d-.bin",    0x14000, 0x2000, CRC(6a70615f) SHA1(f4683dc0a566567e95e85268612bcf0e6297d955) )
 	ROM_LOAD( "b-4a-.bin",    0x16000, 0x2000, CRC(6189d626) SHA1(ce8e5e95c2684c685481e9c8d921380b20ac0460) )
 
-	ROM_REGION( 0x0720, REGION_PROMS, 0 )
-	ROM_LOAD( "g-1j-.bin",    0x0000, 0x0100, CRC(668e6bca) SHA1(cd5262b1310821ba7b12873e4db35f081d6b9df4) )	/* character palette red component */
-	ROM_LOAD( "b-1m-.bin",    0x0100, 0x0100, CRC(76c05a9c) SHA1(1f46f436a17f8c883bdd6d9804b828a81a76f880) )	/* sprite palette red component */
-	ROM_LOAD( "g-1f-.bin",    0x0200, 0x0100, CRC(964b6495) SHA1(76f30a65a0ded14babad2006221aa40621fb7ea1) )	/* character palette green component */
-	ROM_LOAD( "b-1n-.bin",    0x0300, 0x0100, CRC(23f06b99) SHA1(6b3d6349f019aeab33838ae392bc3f3f89906326) )	/* sprite palette green component */
-	ROM_LOAD( "g-1h-.bin",    0x0400, 0x0100, CRC(550563e1) SHA1(11edb45acba8b28a462c49956ebb1ba0a8b2ff26) )	/* character palette blue component */
-	ROM_LOAD( "b-1l-.bin",    0x0500, 0x0100, CRC(35e45021) SHA1(511b94507f41b377f38184ed9a85f34949b28d26) )	/* sprite palette blue component */
-	ROM_LOAD( "b-5f-.bin",    0x0600, 0x0020, CRC(7a601c3d) SHA1(5c5cdf51b2c9fdb2b05402d9c260208ae73fe245) )	/* sprite height, one entry per 32 */
-															/* sprites. Used at run time! */
-	ROM_LOAD( "b-6f-.bin",    0x0620, 0x0100, CRC(82c20d12) SHA1(268903f7d9be58a70d030b02bf31a2d6b5b6e249) )	/* video timing - same as battroad */
+	ROM_REGION( 0x14a0, REGION_PROMS, 0 )
+	ROM_LOAD( "tbp24s10-main-1c.bin", 0x0000, 0x0100, CRC(668e6bca) SHA1(cd5262b1310821ba7b12873e4db35f081d6b9df4) )	/* character palette red component */
+	ROM_LOAD( "tbp24s10-gfx-1r.bin",  0x0100, 0x0100, CRC(76c05a9c) SHA1(1f46f436a17f8c883bdd6d9804b828a81a76f880) )	/* sprite palette red component */
+	ROM_LOAD( "tbp24s10-main-1a.bin", 0x0200, 0x0100, CRC(964b6495) SHA1(76f30a65a0ded14babad2006221aa40621fb7ea1) )	/* character palette green component */
+	ROM_LOAD( "tbp24s10-gfx-1s.bin",  0x0300, 0x0100, CRC(23f06b99) SHA1(6b3d6349f019aeab33838ae392bc3f3f89906326) )	/* sprite palette green component */
+	ROM_LOAD( "tbp24s10-main-1b.bin", 0x0400, 0x0100, CRC(550563e1) SHA1(11edb45acba8b28a462c49956ebb1ba0a8b2ff26) )	/* character palette blue component */
+	ROM_LOAD( "tbp24s10-gfx-1p.bin",  0x0500, 0x0100, CRC(35e45021) SHA1(511b94507f41b377f38184ed9a85f34949b28d26) )	/* sprite palette blue component */
+	ROM_LOAD( "18s030-gfx-8t.bin",    0x0600, 0x0020, CRC(7a601c3d) SHA1(5c5cdf51b2c9fdb2b05402d9c260208ae73fe245) )	/* sprite height, one entry per 32 */
+																													/* sprites. Used at run time! */
+	ROM_LOAD( "tbp24s10-gfx-9k.bin",  0x0620, 0x0100, CRC(82c20d12) SHA1(268903f7d9be58a70d030b02bf31a2d6b5b6e249) )	/* video timing - same as battroad */
+	ROM_LOAD( "18s030-gfx-10a.bin",   0x0720, 0x0020, CRC(3858acd0) SHA1(49c96467c0e7146ed89f5107bcb7908bf4ce721a) )
+	ROM_LOAD( "18s030-gfx-5d.bin",    0x0740, 0x0020, CRC(51304fcd) SHA1(be4d659e526f6fa5318b4cd3b6612c5b73f24437) )
+	ROM_LOAD( "18s030-gfx-5e.bin",    0x0760, 0x0020, CRC(51304fcd) SHA1(be4d659e526f6fa5318b4cd3b6612c5b73f24437) )
+	ROM_LOAD( "18s030-gfx-6l.bin",    0x0780, 0x0020, CRC(3858acd0) SHA1(49c96467c0e7146ed89f5107bcb7908bf4ce721a) )
+	ROM_LOAD( "tbp24s10-gfx-3b.bin",  0x07a0, 0x0100, CRC(e6506ef4) SHA1(079841da7640b14d94aaaeb572bf018932b58293) )
+	ROM_LOAD( "tbp24s10-gfx-4a.bin",  0x08a0, 0x0100, CRC(e0aa8869) SHA1(ac8bdfeba69420ba56ec561bf3d0f1229d02cea2) )
+	ROM_LOAD( "tbp24s10-gfx-4c.bin",  0x09a0, 0x0100, CRC(b43d094f) SHA1(2bed4892d8a91d7faac5a07bf858d9294eb30606) )
+	ROM_LOAD( "tbp24s10-gfx-6d.bin",  0x0aa0, 0x0100, CRC(48bb39c9) SHA1(fbe525cc45c9287ab5f6c02c2bd729a11540d6be) )
+	ROM_LOAD( "tbp24s10-gfx-6e.bin",  0x0ba0, 0x0100, CRC(48bb39c9) SHA1(fbe525cc45c9287ab5f6c02c2bd729a11540d6be) )
+	ROM_LOAD( "tbp24s10-gfx-6m.bin",  0x0ca0, 0x0100, CRC(9f7a1a4d) SHA1(2bc38cbf4d0d65311b60c71073d81ca58ac01a5b) )
+	ROM_LOAD( "tbp24s10-gfx-6n.bin",  0x0da0, 0x0100, CRC(35e5b39e) SHA1(8889fad8a2c095129e4e50de5e2f66e986a4bedf) )
+	ROM_LOAD( "tbp24s10-gfx-8a.bin",  0x0ea0, 0x0100, CRC(35e5b39e) SHA1(8889fad8a2c095129e4e50de5e2f66e986a4bedf) )
+	ROM_LOAD( "tbp24s10-gfx-9a.bin",  0x0fa0, 0x0100, CRC(9f7a1a4d) SHA1(2bc38cbf4d0d65311b60c71073d81ca58ac01a5b) )
+	ROM_LOAD( "tbp24s10-gfx-9k.bin",  0x10a0, 0x0100, CRC(82c20d12) SHA1(268903f7d9be58a70d030b02bf31a2d6b5b6e249) )
+	ROM_LOAD( "tbp24s10-main-8b.bin", 0x11a0, 0x0100, CRC(180fbc57) SHA1(fe1cede9ec1002d48c4eb055d36f2b74c8dd4af8) )
+	ROM_LOAD( "tbp24s10-main-8c.bin", 0x12a0, 0x0100, CRC(3bb32e5a) SHA1(b666e48cb7526b9a38e151cdcc56d298c640bc3f) )
+	ROM_LOAD( "tbp24s10-main-8d.bin", 0x13a0, 0x0100, CRC(599c319f) SHA1(1e52e30f3beb2718fc382e3b85af6b6911863a08) )
 ROM_END
 
 ROM_START( kungfub2 )

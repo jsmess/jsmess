@@ -410,7 +410,20 @@ endif
 $(CPUOBJ)/sh2/sh2.o:	$(CPUSRC)/sh2/sh2.c \
 						$(CPUSRC)/sh2/sh2.h
 
+#-------------------------------------------------
+# Hitachi SH4
+#-------------------------------------------------
 
+CPUDEFS += -DHAS_SH4=$(if $(filter SH4,$(CPUS)),1,0)
+
+ifneq ($(filter SH4,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/sh4
+CPUOBJS += $(CPUOBJ)/sh4/sh4.o
+DBGOBJS += $(CPUOBJ)/sh4/sh4dasm.o
+endif
+
+$(CPUOBJ)/sh4/sh4.o:	$(CPUSRC)/sh4/sh4.c \
+						$(CPUSRC)/sh4/sh4.h
 
 #-------------------------------------------------
 # Hudsonsoft 6280
@@ -663,10 +676,12 @@ $(CPUOBJ)/lh5801/lh5801.o:	$(CPUSRC)/lh5801/lh5801.c \
 # Fujitsu MB88xx
 #-------------------------------------------------
 
+CPUDEFS += -DHAS_MB8841=$(if $(filter MB8841,$(CPUS)),1,0)
+CPUDEFS += -DHAS_MB8842=$(if $(filter MB8842,$(CPUS)),1,0)
 CPUDEFS += -DHAS_MB8843=$(if $(filter MB8843,$(CPUS)),1,0)
 CPUDEFS += -DHAS_MB8844=$(if $(filter MB8844,$(CPUS)),1,0)
 
-ifneq ($(filter MB8843 MB8844,$(CPUS)),)
+ifneq ($(filter MB8841 MB8842 MB8843 MB8844,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mb88xx
 CPUOBJS += $(CPUOBJ)/mb88xx/mb88xx.o
 DBGOBJS += $(CPUOBJ)/mb88xx/mb88dasm.o

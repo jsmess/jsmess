@@ -58,7 +58,6 @@ static UINT8 *gsp_shiftreg_source;
 
 static offs_t gfx_offset;
 static offs_t gfx_rowbytes;
-static int gfx_offsetscan;
 static INT8 gfx_finescroll;
 static UINT8 gfx_palettebank;
 
@@ -79,7 +78,6 @@ VIDEO_START( harddriv )
 
 	gfx_offset = 0;
 	gfx_rowbytes = 0;
-	gfx_offsetscan = 0;
 	gfx_finescroll = 0;
 	gfx_palettebank = 0;
 
@@ -202,31 +200,6 @@ void hdgsp_read_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 	}
 	else
 		logerror("Unknown shiftreg read %08X\n", address);
-}
-
-
-
-/*************************************
- *
- *  TMS34010 update callback
- *
- *************************************/
-
-void hdgsp_display_update(UINT32 offs, int rowbytes, int scanline)
-{
-	video_screen_update_partial(0, video_screen_get_vpos(0));
-
-	gfx_offset = offs >> hdgsp_multisync;
-	gfx_rowbytes = rowbytes >> hdgsp_multisync;
-
-	if (scanline == Machine->screen[0].visarea.min_y)
-	{
-		gfx_offsetscan = scanline;
-	}
-	else
-	{
-		gfx_offsetscan = scanline + 1;
-	}
 }
 
 
@@ -468,70 +441,9 @@ WRITE16_HANDLER( hdgsp_paletteram_hi_w )
  *
  *************************************/
 
-VIDEO_UPDATE( harddriv )
+static void display_speedups(void)
 {
-	pen_t *pens = &machine->pens[gfx_palettebank * 256];
-	pen_t black = get_black_pen(machine);
-	offs_t adjusted_offs;
-	int start, end, x, y;
-	int lzero, rzero, draw;
-
-	/* check for disabled video */
-	if (tms34010_io_display_blanked(1))
-	{
-		fillbitmap(bitmap, black, cliprect);
-		return 0;
-	}
-
-	/* gross! they use start/end of HBLANK to adjust the position of screen elements */
-	cpuintrf_push_context(hdcpu_gsp);
-	start = tms34010_io_register_r(REG_HEBLNK, 0) * (4 >> hdgsp_multisync) - gfx_finescroll;
-	end = tms34010_io_register_r(REG_HSBLNK, 0) * (4 >> hdgsp_multisync) - (15 >> hdgsp_multisync);
-	cpuintrf_pop_context();
-
-	/* compute how many pixels to blank and render */
-	lzero = start - cliprect->min_x;
-	draw = end - start;
-	rzero = cliprect->max_x + 1 - end;
-	adjusted_offs = gfx_offset;
-
-	/* clip as necessary */
-	if (lzero < 0)
-	{
-		draw += lzero;
-		adjusted_offs -= lzero;
-		lzero = 0;
-	}
-	if (rzero < 0)
-	{
-		draw += rzero;
-		rzero = 0;
-	}
-
-	/* loop over scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		UINT32 offset = adjusted_offs + gfx_rowbytes * (y - gfx_offsetscan);
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels + cliprect->min_x;
-
-		/* render */
-		for (x = 0; x < lzero; x++)
-			*dest++ = black;
-		for (x = 0; x < draw; x++)
-			*dest++ = pens[hdgsp_vram[BYTE_XOR_LE(offset++) & vram_mask]];
-		for (x = 0; x < rzero; x++)
-			*dest++ = black;
-	}
-
-	if (cliprect->max_y == machine->screen[0].visarea.max_y)
-	{
-		gfx_offsetscan = 0;
-	}
-
-	/* update the speedup counts */
 #if DISPLAY_SPEEDUPS
-if (cliprect->min_y < 30)
-{
 	char temp[200];
 	sprintf(temp, "GSP:%d/%d/%d/%d",
 			gsp_speedup_count[0], gsp_speedup_count[1],
@@ -545,7 +457,35 @@ if (cliprect->min_y < 30)
 			adsp_speedup_count[0], adsp_speedup_count[1],
 			adsp_speedup_count[2], adsp_speedup_count[3]);
 	ui_draw_text(temp, 0, 20);
-}
 #endif
-	return 0;
+}
+
+
+void harddriv_scanline_driver(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT8 *vram_base = &hdgsp_vram[(params->rowaddr << 12) & vram_mask];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 4) - 15 + (gfx_finescroll & 0x0f);
+	int x;
+
+	for (x = params->heblnk; x < params->hsblnk; x++)
+		dest[x] = gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0xfff)];
+
+	if (scanline == machine->screen[screen].visarea.max_y)
+		display_speedups();
+}
+
+
+void harddriv_scanline_multisync(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT8 *vram_base = &hdgsp_vram[(params->rowaddr << 11) & vram_mask];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = (params->yoffset << 9) + ((params->coladdr & 0xff) << 3) - 7 + (gfx_finescroll & 0x07);
+	int x;
+
+	for (x = params->heblnk; x < params->hsblnk; x++)
+		dest[x] = gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0x7ff)];
+
+	if (scanline == machine->screen[screen].visarea.max_y)
+		display_speedups();
 }

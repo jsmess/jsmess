@@ -390,7 +390,7 @@ VIDEO_UPDATE( exerion )
 	}
 
 	/* draw the visible text layer */
-	for (sy = VISIBLE_Y_MIN/8; sy < VISIBLE_Y_MAX/8; sy++)
+	for (sy = cliprect->min_y/8; sy <= cliprect->max_y/8; sy++)
 		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
 			int x = exerion_cocktail_flip ? (63*8 - 8*sx) : 8*sx;
@@ -403,5 +403,6 @@ VIDEO_UPDATE( exerion )
 				exerion_cocktail_flip, exerion_cocktail_flip, x, y,
 				cliprect, TRANSPARENCY_PEN, 0);
 		}
+
 	return 0;
 }

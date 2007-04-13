@@ -2853,6 +2853,36 @@ V-V                           TP-027
 	DRIVER( ddrmax )	/* 2001 - DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA) */
 	DRIVER( ddrmax2 )	/* 2002 - DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA) */
 
+	/* Konami Viper games */
+	DRIVER( kviper )	/* 1999 */
+	DRIVER( ppp2nd )	/* 2001 */
+	DRIVER( boxingm )	/* 2001 */
+	DRIVER( code1d )	/* 2000 */
+	DRIVER( code1db )	/* 2000 */
+	DRIVER( gticlub2 )	/* 2001 */
+	DRIVER( jpark3 )	/* 2001 */
+	DRIVER( mocapglf )	/* 2001 */
+	DRIVER( mocapb )	/* 2001 */
+	DRIVER( mocapbj )	/* 2001 */
+	DRIVER( p911 )		/* 2001 */
+	DRIVER( p911uc )	/* 2001 */
+	DRIVER( p911e )		/* 2001 */
+	DRIVER( p911j )		/* 2001 */
+	DRIVER( p9112 )		/* 2001 */
+	DRIVER( popn9 )		/* 2003 */
+	DRIVER( sscopex )	/* 2001 */
+	DRIVER( sogeki )	/* 2001 */
+	DRIVER( thrild2 )	/* 2001 */
+	DRIVER( thrild2a )	/* 2001 */
+	DRIVER( tsurugi )	/* 2001 */
+	DRIVER( tsurugij )	/* 2001 */
+	DRIVER( wcombat )	/* 2002 */
+	DRIVER( wcombak )	/* 2002 */
+	DRIVER( wcombaj )	/* 2002 */
+	DRIVER( xtrial )	/* 2002 */
+	DRIVER( mfightc )	/* 2002 */
+	DRIVER( mfightcc )	/* 2002 */
+
 	/* Mitchell games */
 	DRIVER( mgakuen )	/* (c) 1988 Yuga */
 	DRIVER( 7toitsu )	/* (c) 1988 Yuga */
@@ -3598,6 +3628,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( von )		/* 1996 */
 	DRIVER( vonusa )	/* 1996 */
 	DRIVER( dynabb )	/* 1996 */
+	DRIVER( dyndek2b )	/* 1996 */
 	DRIVER( zerogun )	/* 1997 */
 	DRIVER( zerogunj )	/* 1997 */
 	DRIVER( pltkids )	/* 1998 */
@@ -3801,6 +3832,39 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mp_col3 )	/* ?? */
 
 	DRIVER( ssf2ghw )	/* MegaDrive-based hack */
+
+	/* Sega Naomi-based (Dreamcast) systems */
+	DRIVER( naomi )
+	DRIVER( csmash )
+	DRIVER( vs2_2k )
+	DRIVER( vs2_2ka )
+	DRIVER( cspike )
+	DRIVER( capsnk )
+	DRIVER( derbyoc )
+	DRIVER( dybb99 )
+	DRIVER( gram2000 )
+	DRIVER( ggram2 )
+	DRIVER( hmgeo )
+	DRIVER( gwing2 )
+	DRIVER( suchie3 )
+	DRIVER( pjustic )
+	DRIVER( pstone )
+	DRIVER( pstone2 )
+	DRIVER( otrigger )
+	DRIVER( samba )
+	DRIVER( slasho )
+	DRIVER( spawn )
+	DRIVER( virnba )
+	DRIVER( vtennis )
+	DRIVER( zombrvn )
+	DRIVER( doa2 )
+	DRIVER( doa2m )
+	DRIVER( dybbnao )
+
+	DRIVER( naomi2 )
+
+	/* Atomiswave (Dreamcast-based) games */
+	DRIVER( awbios )
 
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 
@@ -6455,6 +6519,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* V810 + ST-0016 */
 	DRIVER( mayjinsn )	/* (c) 1994 Seta */
 	DRIVER( mayjisn2 )	/* (c) 1994 Seta */
+	DRIVER( koikois )	/* (c) 1995 Seta */
 
 	/* Seta System S12 */
 	DRIVER( srmp6 )		/* (c) 1996 Seta (Japan) */
@@ -6784,7 +6849,11 @@ Other Sun games
 	DRIVER( quizchql )	/* "73" (c) 1993 Laxan */
 	DRIVER( funkyfig )	/* "74" (c) 1993 Nakanihon + East Technology */
 	DRIVER( animaljr )	/* "75" 1993 Nakanihon/Taito */
+	DRIVER( hginga )	/*      1994 Dynax */
 	DRIVER( mjmyster )	/* "?7" 1994 Dynax */
+	DRIVER( mjmywrld )	/* "?7" 1994 Dynax */
+	DRIVER( mjmyornt )	/*      1994 Dynax */
+	DRIVER( mjmyuniv )	/*      1994 Dynax */
 	DRIVER( quiz365 )	/* "78" (c) 1994 Nakanihon */
 	DRIVER( quiz365t )	/* "78" (c) 1994 Nakanihon (Taiwan) */
 	DRIVER( rongrong )	/* "80" (c) 1994 Nakanihon */
@@ -6940,6 +7009,7 @@ Other Sun games
 	DRIVER( robowres )	/* (c) 1986 Sega */
 	DRIVER( robowrb )	/* bootleg */
 	DRIVER( bankp )		/* (c) 1984 Sega,  made by Sanritsu */
+	DRIVER( combh )		/* (c) 1987 Sega,  made by Sanritsu */
 	DRIVER( mjkjidai )	/* (c) 1986 Sanritsu */
 	DRIVER( chinsan )	/* (c) 1987 Sanritsu */
 	DRIVER( mayumi )	/* (c) 1988 Victory L.L.C.,  made by Sanritsu */

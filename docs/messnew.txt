@@ -1,3 +1,36 @@
+0.114.1
+
+New System Drivers Supported (in no particular order):
+------------------------------------------------------
+(none)
+
+
+
+System Driver Changes:
+----------------------
+(none)
+
+
+
+User Interface Changes:
+-----------------------
+(none)
+
+
+
+Imgtool Changes:
+----------------
+(none)
+
+
+
+Source Changes:
+----------------
+- The core is based on MAME 0.114u1.  This incorporates all features of the
+  update to this core.  [MAME team]
+
+
+
 0.114
 
 New System Drivers Supported (in no particular order):

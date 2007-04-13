@@ -336,6 +336,45 @@ INPUT_PORTS_START( renju )
 	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( koikois )
+	PORT_INCLUDE( st0016 )
+
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW1")	/* Dip switch A  */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x02, 0x02, "Crt Mode" ) //flip screen ?
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x40, 0x40,  DEF_STR( Controls ) )
+	PORT_DIPSETTING(    0x00, "Majyan Panel" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Joystick ) )
+
+	PORT_MODIFY("DSW2")	/* Dip switch B */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(      0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( nratechu )
 	PORT_INCLUDE( st0016 )
 
@@ -610,6 +649,47 @@ ROM_START( nratechu )
 ROM_END
 
 /*
+Koi Koi Shimasho
+Visco
+
+PCB Layout
+----------
+
+E63-00001
+|---------------------------------------|
+|VOL     RESET     TC514400   62256     |
+|        UPD6376   TC514400   62256     |
+|MJM2904                                |
+|                                       |
+|M                            42.9545MHz|
+|A                   |----------|       |
+|H                   |          |       |
+|J                   | ST-0016  |       |
+|O                   |          |  48MHz|
+|N                   |          |       |
+|G                   |          |       |
+|5                   |----------|       |
+|6                          BATTERY     |
+|                                       |
+|                                       |
+|                              KOI-5    |
+|   KOI-4   KOI-2   KOI-3  KOI-1    6264|
+|---------------------------------------|
+
+*/
+
+ROM_START( koikois )
+	ROM_REGION( 0x410000, REGION_CPU1, 0 )
+
+	ROM_LOAD16_BYTE( "koi-2.6c", 0x010001, 0x080000, CRC(2722be71) SHA1(1aa3d819eef01db042ee04a01c1b18c4d9dae65e) )
+	ROM_LOAD16_BYTE( "koi-1.4c", 0x010000, 0x080000, CRC(c79e2b43) SHA1(868174f7ab8e68e31d3302ae94dd742048deed9f) )
+	ROM_LOAD16_BYTE( "koi-4.8c", 0x110001, 0x080000, CRC(ace236df) SHA1(4bf56affe5b6d0ba3cc677eaa91f9be77f26c654) )
+	ROM_LOAD16_BYTE( "koi-3.5c", 0x110000, 0x080000, CRC(6fd88149) SHA1(87b1be32770232eb041e3ef9d1da45282af8a5d4) )
+	ROM_LOAD( "koi-5.2c", 0x210000, 0x200000, CRC(561e12c8) SHA1(a7aedf549bc3141fc01bc4a10c235af265ba4ee9) )
+	ROM_COPY( REGION_CPU1,  0x10000, 0x00000, 0x08000 )
+ROM_END
+
+/*
 Super Real Mahjong P5
 (c)199x SETA
 
@@ -856,6 +936,7 @@ static DRIVER_INIT(mayjisn2)
 GAME(  1994, renju,	0,	  st0016,   renju,    renju,    ROT0, "Visco", "Renju Kizoku", 0)
 GAME(  1996, nratechu,	0,	  st0016,   nratechu, nratechu, ROT0, "Seta",  "Neratte Chu", 0)
 GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjinsen 2", 0)
+GAME(  1995, koikois,	 0,	  st0016, koikois, renju, ROT0, "Visco",  "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
 /* Not working */
 GAME( 199?, srmp5,	0,	  srmp5,    srmp5,    srmp5,    ROT0, "Seta",  "Super Real Mahjong P5",GAME_NOT_WORKING)
 GAME( 1994, speglsht,	0,	  speglsht, speglsht, speglsht, ROT0, "Seta",  "Super Eagle Shot (set 1)",GAME_NOT_WORKING)

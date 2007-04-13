@@ -14,7 +14,6 @@ extern UINT16 *btoads_sprite_scale;
 extern UINT16 *btoads_sprite_control;
 
 VIDEO_START( btoads );
-VIDEO_UPDATE( btoads );
 
 WRITE16_HANDLER( btoads_misc_control_w );
 WRITE16_HANDLER( btoads_display_control_w );
@@ -37,3 +36,5 @@ READ16_HANDLER( btoads_vram_fg_draw_r );
 
 void btoads_to_shiftreg(UINT32 address, UINT16 *shiftreg);
 void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg);
+
+void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);

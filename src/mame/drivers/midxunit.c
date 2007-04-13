@@ -20,6 +20,9 @@
 #include "midwunit.h"
 
 
+#define PIXEL_CLOCK		(8000000)
+
+
 
 /*************************************
  *
@@ -166,15 +169,16 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config tms_config =
 {
-	0,								/* halt on reset */
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	PIXEL_CLOCK,					/* pixel clock */
+	1,								/* pixels per clock */
+	midxunit_scanline_update,		/* scanline updater */
 	NULL,							/* generate interrupt */
 	midtunit_to_shiftreg,			/* write to shiftreg function */
-	midtunit_from_shiftreg,			/* read from shiftreg function */
-	NULL,							/* display address changed */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	midtunit_from_shiftreg			/* read from shiftreg function */
 };
 
 
@@ -185,13 +189,6 @@ static struct tms34010_config tms_config =
  *
  *************************************/
 
-/*
-    visible areas and VBLANK timing based on these video params:
-
-              VERTICAL                   HORIZONTAL
-    revx:     0014-0112 / 0120 (254)     0065-001F5 / 01F9 (400)
-*/
-
 static MACHINE_DRIVER_START( midxunit )
 
 	/* basic machine hardware */
@@ -199,19 +196,19 @@ static MACHINE_DRIVER_START( midxunit )
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(MKLA5_FPS)
 	MDRV_MACHINE_RESET(midxunit)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 288)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 20, 273)
 	MDRV_PALETTE_LENGTH(32768)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 505, 0, 399, 289, 0, 253)
+
 	MDRV_VIDEO_START(midxunit)
-	MDRV_VIDEO_UPDATE(midtunit)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(dcs_audio_2k_uart)

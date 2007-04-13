@@ -66,6 +66,10 @@ struct MB88Config
 ***************************************************************************/
 
 void mb88_get_info(UINT32 state, cpuinfo *info);
+void mb8841_get_info(UINT32 state, cpuinfo *info);
+void mb8842_get_info(UINT32 state, cpuinfo *info);
+void mb8843_get_info(UINT32 state, cpuinfo *info);
+void mb8844_get_info(UINT32 state, cpuinfo *info);
 
 #ifdef MAME_DEBUG
 offs_t mb88_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);

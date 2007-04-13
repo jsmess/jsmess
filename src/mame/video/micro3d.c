@@ -69,6 +69,30 @@ VIDEO_START(micro3d)
 	return 0;
 }
 
+void micro3d_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT16 *src = &micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr;
+	int x;
+
+	/* copy the non-blanked portions of this scanline */
+	for (x = params->heblnk; x < params->hsblnk; x += 2)
+	{
+		UINT16 pix = src[coladdr++ & 0x1ff];
+
+		if (pix & 0x80)
+			dest[x + 0] = (pix & 0x7f) + 0xf00;
+		else
+			dest[x + 0] = 0;	/* 3D data */
+
+		pix >>= 8;
+		if (pix & 0x80)
+			dest[x + 1] = (pix & 0x7f) + 0xf00;
+		else
+			dest[x + 1] = 0;	/* 3D data */
+	}
+}
 
 
 VIDEO_UPDATE( micro3d )

@@ -18,7 +18,7 @@
 
 
 #define MASTER_CLOCK		50000000
-#define SOUND_CLOCK		16000000
+#define SOUND_CLOCK			32215900
 
 /* use this to fiddle with the IRQ2 timing */
 #define TWEAK_IRQ2_SCANLINE		(0)
@@ -40,6 +40,8 @@ static UINT8 timer_irq_state;
 static UINT16 *backupram;
 
 static mame_timer *interrupt_timer;
+
+
 
 /*************************************
  *
@@ -961,7 +963,7 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_CPU_ADD_TAG("suby", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(suby_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, SOUND_CLOCK/4)
+	MDRV_CPU_ADD_TAG("sound", Z80, SOUND_CLOCK/8)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
@@ -985,12 +987,12 @@ static MACHINE_DRIVER_START( yboard )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("2151", YM2151, SOUND_CLOCK/4)
+	MDRV_SOUND_ADD_TAG("2151", YM2151, SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.43)
 	MDRV_SOUND_ROUTE(1, "right", 0.43)
 
-	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, SOUND_CLOCK/4)
+	MDRV_SOUND_ADD_TAG("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

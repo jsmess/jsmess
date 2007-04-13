@@ -794,13 +794,10 @@ SYSTEM_BIOS_START( playch10 )
 	SYSTEM_BIOS_ADD( 1, "single", "Single Monitor Version" )
 SYSTEM_BIOS_END
 
-#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
-
 #define BIOS_CPU											\
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )						\
-	ROM_LOAD_BIOS( 0, "pch1-c.8t",    0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
-	ROM_LOAD_BIOS( 1, "pck1-c.8t",    0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
+	ROMX_LOAD( "pch1-c.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5), ROM_BIOS(1) ) \
+	ROMX_LOAD( "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0), ROM_BIOS(2) ) \
 
 #define BIOS_GFX											\
 	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE )	\
@@ -1657,6 +1654,7 @@ ROM_END
 ROM_START( playch10 )
     BIOS_CPU
 	BIOS_GFX
+    ROM_REGION( 0x100, REGION_USER1, ROMREGION_ERASE00 )
 ROM_END
 
 /******************************************************************************/
@@ -1665,7 +1663,7 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the other drivers, so that we do not have to include */
 /* them in every zip file */
-GAMEB( 1986, playch10, 0, playch10, playch10, playch10, 0, ROT0, "Nintendo of America", "PlayChoice-10 BIOS", NOT_A_DRIVER )
+GAMEB( 1986, playch10, 0, playch10, playch10, playch10, playch10, ROT0, "Nintendo of America", "PlayChoice-10 BIOS", NOT_A_DRIVER )
 
 /******************************************************************************/
 

@@ -302,15 +302,16 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config tms_config =
 {
-	0,								/* halt on reset */
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	40000000/4,						/* pixel clock */
+	1,								/* pixels per clock */
+	btoads_scanline_update,			/* scanline callback */
 	NULL,							/* generate interrupt */
 	btoads_to_shiftreg,				/* write to shiftreg function */
-	btoads_from_shiftreg,			/* read from shiftreg function */
-	NULL,							/* display address changed */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	btoads_from_shiftreg			/* read from shiftreg function */
 };
 
 
@@ -333,18 +334,18 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert,TIME_IN_HZ(183))
 
 	MDRV_MACHINE_RESET(btoads)
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512,256)
-	MDRV_SCREEN_VISIBLE_AREA(0,511,24,247)
 	MDRV_PALETTE_LENGTH(256)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(40000000/4, 640, 0, 512, 257, 0, 224)
+
 	MDRV_VIDEO_START(btoads)
-	MDRV_VIDEO_UPDATE(btoads)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

@@ -15,4 +15,4 @@ extern UINT16 *tickee_vram;
 
 VIDEO_START( tickee );
 
-VIDEO_UPDATE( tickee );
+void tickee_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);

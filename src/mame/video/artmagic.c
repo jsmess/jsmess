@@ -346,35 +346,15 @@ WRITE16_HANDLER( artmagic_blitter_w )
  *
  *************************************/
 
-VIDEO_UPDATE( artmagic )
+void artmagic_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT32 offset, dpytap;
-	UINT16 *vram;
-	int x, y;
+	offs_t offset = (params->rowaddr << 12) & 0x1ff000;
+	UINT16 *vram = address_to_vram(&offset);
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr << 1;
+	int x;
 
-	/* get the current parameters */
-	cpuintrf_push_context(0);
-	offset = (~tms34010_get_DPYSTRT(0) & 0xfff0) << 8;
-	dpytap = tms34010_io_register_r(REG_DPYTAP, 0);
-	cpuintrf_pop_context();
-
-	/* compute the base and offset */
-	vram = address_to_vram(&offset);
-	if (!vram || tms34010_io_display_blanked(0))
-	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
-		return 0;
-	}
-	offset += (cliprect->min_y - machine->screen[0].visarea.min_y) * TOWORD(0x2000);
-	offset += dpytap;
-
-	/* render the bitmap */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
-		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			dest[x] = vram[(offset + x) & TOWORD(0x1fffff)] & 0xff;
-		offset += TOWORD(0x2000);
-	}
-	return 0;
+	vram += offset;
+	for (x = params->heblnk; x < params->hsblnk; x++)
+		dest[x] = vram[coladdr++ & 0x1ff] & 0xff;
 }

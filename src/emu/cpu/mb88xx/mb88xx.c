@@ -552,13 +552,13 @@ static int mb88_execute(int cycles)
 
 			case 0x30: case 0x31: case 0x32: case 0x33: /* sbit ZCS:... */
 				arg = RDMEM(GETEA());
-				WRMEM(arg | (1 << (opcode&3)), GETEA());
+				WRMEM(GETEA(), arg | (1 << (opcode&3)));
 				mb88.st = 1;
 				break;
 
 			case 0x34: case 0x35: case 0x36: case 0x37: /* rbit ZCS:... */
 				arg = RDMEM(GETEA());
-				WRMEM(arg & ~(1 << (opcode&3)), GETEA());
+				WRMEM(GETEA(), arg & ~(1 << (opcode&3)));
 				mb88.st = 1;
 				break;
 
@@ -891,5 +891,65 @@ void mb88_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_STR_REGISTER + MB88_TH:			sprintf(info->s, "TH:%1X", mb88.TH);	break;
 		case CPUINFO_STR_REGISTER + MB88_TL:			sprintf(info->s, "TL:%1X", mb88.TL);	break;
 		case CPUINFO_STR_REGISTER + MB88_SB:			sprintf(info->s, "SB:%1X", mb88.SB);	break;
+	}
+}
+
+void mb8841_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 11;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 7;					break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8841");				break;
+
+		default:										mb88_get_info(state, info);			break;
+	}
+}
+
+void mb8842_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 11;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 7;					break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8842");				break;
+
+		default:										mb88_get_info(state, info);			break;
+	}
+}
+
+void mb8843_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 10;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 6;					break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8843");				break;
+
+		default:										mb88_get_info(state, info);			break;
+	}
+}
+
+void mb8844_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 10;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 6;					break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8844");				break;
+
+		default:										mb88_get_info(state, info);			break;
 	}
 }

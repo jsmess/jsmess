@@ -893,7 +893,7 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_PROGRAM_MAP(z8002_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
-	MDRV_CPU_ADD_TAG("54XX", MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)

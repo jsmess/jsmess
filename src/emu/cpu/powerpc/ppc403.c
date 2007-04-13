@@ -48,7 +48,7 @@ INLINE void ppc_set_dcr(int dcr, UINT32 value)
 		case DCR_BR7:		ppc.br[7] = value; break;
 
 		case DCR_EXISR:		ppc.exisr &= ~value; break;
-		case DCR_EXIER:		EXIER = value; break;
+		case DCR_EXIER:		EXIER = value; ppc.exisr &= EXIER; break;
 		case DCR_IOCR:		ppc.iocr = value; break;
 		case DCR_DMASR:		break;		/* TODO */
 		case DCR_DMADA0:	ppc.dma[0].da = value; break;

@@ -22,6 +22,10 @@
 #include "sound/okim6295.h"
 
 
+#define MASTER_CLOCK_40MHz		(40000000)
+#define MASTER_CLOCK_25MHz		(25000000)
+
+
 static UINT16 *control;
 
 static UINT8 tms_irq, hack_irq;
@@ -445,15 +449,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config tms_config =
 {
-	1,								/* halt on reset */
+	TRUE,							/* halt on reset */
+	0,								/* the screen operated on */
+	MASTER_CLOCK_40MHz/6,			/* pixel clock */
+	1,								/* pixels per clock */
+	artmagic_scanline,				/* scanline update */
 	m68k_gen_int,					/* generate interrupt */
 	artmagic_to_shiftreg,			/* write to shiftreg function */
-	artmagic_from_shiftreg,			/* read from shiftreg function */
-	NULL,							/* display address changed */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	artmagic_from_shiftreg			/* read from shiftreg function */
 };
 
 
@@ -712,43 +717,35 @@ INPUT_PORTS_END
  *
  *************************************/
 
-/*
-    video timing:
-        measured HSYNC frequency = 15.685kHz
-        measured VSYNC frequency = 50-51Hz
-        programmed total lines = 312
-        derived frame rate = 15685/312 = 50.27Hz
-*/
-
 MACHINE_DRIVER_START( artmagic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 25000000/2)
+	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_25MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD_TAG("tms", TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("tms", TMS34010, MASTER_CLOCK_40MHz/TMS34010_CLOCK_DIVIDER)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 
 	MDRV_MACHINE_RESET(artmagic)
-	MDRV_SCREEN_REFRESH_RATE(50.27)
 	MDRV_INTERLEAVE(100)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 312)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 44, 299)
 	MDRV_PALETTE_LENGTH(256)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)
+
 	MDRV_VIDEO_START(artmagic)
-	MDRV_VIDEO_UPDATE(artmagic)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 40000000/3/10)
+	MDRV_SOUND_ADD(OKIM6295, MASTER_CLOCK_40MHz/3/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

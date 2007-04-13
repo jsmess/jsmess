@@ -44,7 +44,6 @@ enum
 /* graphics-related variables */
        UINT8	midtunit_gfx_rom_large;
 static UINT16	midtunit_control;
-static UINT8	midtunit_using_34020;
 
 /* palette-related variables */
 static pen_t *	pen_map;
@@ -107,8 +106,6 @@ VIDEO_START( midtunit )
 
 	memset(dma_register, 0, sizeof(dma_register));
 	memset(&dma_state, 0, sizeof(dma_state));
-
-	midtunit_using_34020 = 0;
 	return 0;
 }
 
@@ -125,7 +122,6 @@ VIDEO_START( midxunit )
 {
 	int result = video_start_midtunit(machine);
 	midtunit_gfx_rom_large = 1;
-	midtunit_using_34020 = 1;
 	videobank_select = 1;
 	return result;
 }
@@ -847,42 +843,26 @@ skipdma:
  *
  *************************************/
 
-VIDEO_UPDATE( midtunit )
+void midtunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	int v, width, xoffs, dpytap;
-	UINT32 offset;
+	UINT16 *src = &local_videoram[(params->rowaddr << 9) & 0x3fe00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr << 1;
+	int x;
 
-#if LOG_DMA
-	if (code_pressed(KEYCODE_L))
-		logerror("---\n");
-#endif
+	/* copy the non-blanked portions of this scanline */
+	for (x = params->heblnk; x < params->hsblnk; x++)
+		dest[x] = pen_map[src[coladdr++ & 0x1ff]];
+}
 
-	/* get the current scroll offset */
-	cpuintrf_push_context(0);
-	dpytap = tms34010_io_register_r(REG_DPYTAP, 0) & 0x3fff;
-	cpuintrf_pop_context();
+void midxunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT32 fulladdr = ((params->rowaddr << 16) | params->coladdr) >> 3;
+	UINT16 *src = &local_videoram[fulladdr & 0x3fe00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int x;
 
-	/* determine the base of the videoram */
-	if (midtunit_using_34020)
-		offset = (tms34020_get_DPYSTRT(0) >> 3) & 0x3ffff;
-	else
-		offset = ((~tms34010_get_DPYSTRT(0) & 0x1ff0) << 5) & 0x3ffff;
-	offset += dpytap * 2;
-
-	/* determine how many pixels to copy */
-	xoffs = cliprect->min_x;
-	width = cliprect->max_x - xoffs + 1;
-
-	/* adjust the offset */
-	offset += xoffs;
-	offset += 512 * (cliprect->min_y - machine->screen[0].visarea.min_y);
-	offset &= 0x3ffff;
-
-	/* loop over rows */
-	for (v = cliprect->min_y; v <= cliprect->max_y; v++)
-	{
-		draw_scanline16(bitmap, xoffs, v, width, &local_videoram[offset], pen_map, -1);
-		offset = (offset + 512) & 0x3ffff;
-	}
-	return 0;
+	/* copy the non-blanked portions of this scanline */
+	for (x = params->heblnk; x < params->hsblnk; x++)
+		dest[x] = pen_map[src[fulladdr++ & 0x1ff]];
 }

@@ -128,6 +128,7 @@ CPUS += R5000
 CPUS += QED5271
 CPUS += RM7000
 CPUS += SH2
+CPUS += SH4
 CPUS += DSP32C
 CPUS += PIC16C54
 CPUS += PIC16C55
@@ -174,6 +175,8 @@ CPUS += CDP1802
 CPUS += COP420
 CPUS += COP410
 CPUS += TLCS90
+CPUS += MB8841
+CPUS += MB8842
 CPUS += MB8843
 CPUS += MB8844
 CPUS += MB86233
@@ -915,6 +918,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/ultrsprt.o \
 	$(DRIVERS)/ultraman.o $(VIDEO)/ultraman.o \
 	$(DRIVERS)/vendetta.o $(VIDEO)/vendetta.o \
+	$(DRIVERS)/viper.o \
 	$(DRIVERS)/wecleman.o $(VIDEO)/wecleman.o \
 	$(DRIVERS)/xexex.o $(VIDEO)/xexex.o \
 	$(DRIVERS)/xmen.o $(VIDEO)/xmen.o \
@@ -1006,6 +1010,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/warpwarp.o $(AUDIO)/warpwarp.o $(VIDEO)/warpwarp.o \
 	$(MACHINE)/namcoio.o \
 	$(AUDIO)/geebee.o \
+	$(MACHINE)/namco50.o \
 	$(AUDIO)/namco54.o \
 	$(AUDIO)/namcoc7x.o \
 	$(VIDEO)/bosco.o \
@@ -1159,6 +1164,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/model1.o $(MACHINE)/model1.o $(VIDEO)/model1.o \
 	$(DRIVERS)/model2.o $(VIDEO)/model2.o \
 	$(DRIVERS)/model3.o $(VIDEO)/model3.o $(MACHINE)/model3.o \
+	$(DRIVERS)/naomi.o \
 	$(DRIVERS)/puckpkmn.o \
 	$(DRIVERS)/segac2.o \
 	$(DRIVERS)/segag80r.o $(MACHINE)/segag80.o $(AUDIO)/segag80r.o $(VIDEO)/segag80r.o \

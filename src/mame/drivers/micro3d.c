@@ -128,36 +128,6 @@ void data_from_i8031(int data)
 }
 
 
-/* Pinched from coolpool.c */
-WRITE16_HANDLER( micro3d_34010_io_register_w )
-{
-	if (offset == REG_DPYADR || offset == REG_DPYTAP)
-		video_screen_update_partial(0, video_screen_get_vpos(0));
-	tms34010_io_register_w(offset, data, mem_mask);
-
-	if (offset == REG_DPYADR)
-	{
-		dpyadr = ~data & 0xfffc;
-		dpyadrscan = video_screen_get_vpos(0) + 1;
-	}
-}
-
-/* Also pinched from coolpool.c */
-INTERRUPT_GEN( micro3d_tms_vblank )
-{
-	/* dpyadr is latched from dpystrt at the beginning of VBLANK every frame */
-	cpuintrf_push_context(0);
-
-	/* due to timing issues, we sometimes set the DPYADR just before we get here;
-       in order to avoid trouncing that value, we look for the last scanline */
-	if (dpyadrscan < Machine->screen[0].visarea.max_y)
-		dpyadr = ~tms34010_io_register_r(REG_DPYSTRT, 0) & 0xfffc;
-	dpyadrscan = 0;
-
-	cpuintrf_pop_context();
-}
-
-
 static MACHINE_RESET( micro3d )
 {
         i8051_set_serial_tx_callback(data_from_i8031);
@@ -758,7 +728,7 @@ static ADDRESS_MAP_START( vgbmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(ti_uart_w)
 	AM_RANGE(0x03800000, 0x03dfffff) AM_ROM AM_REGION(REGION_GFX1, 0)                          /* 2D Graphics ROMs */
 	AM_RANGE(0x03e00000, 0x03ffffff) AM_ROM AM_REGION(REGION_USER1, 0)                         /* 128kB Program ROM */
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, micro3d_34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)                         /* 128kB Program ROM (Mirror - for interrupt vectors) */
 ADDRESS_MAP_END
 
@@ -835,15 +805,16 @@ static struct upd7759_interface upd7759_interface =
 	REGION_SOUND1
 };
 
-static struct tms34010_config vgb_config =
+static tms34010_config vgb_config =
 {
-	0,					/* halt on reset ????? - check this */
-	tms_interrupt,				/* Generate interrupt */
+	FALSE,							/* halt on reset ????? - check this */
+	0,								/* the screen operated on */
+	40000000/8,						/* pixel clock */
+	4,								/* pixels per clock */
+	micro3d_scanline_update,		/* scanline updater */
+	tms_interrupt,					/* Generate interrupt */
 	NULL,
-	NULL,
-	NULL,							/* display address changed */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	NULL
 };
 
 
@@ -855,26 +826,24 @@ static MACHINE_DRIVER_START( micro3d )
  	MDRV_CPU_ADD(TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
 	MDRV_CPU_CONFIG(vgb_config)
 	MDRV_CPU_PROGRAM_MAP(vgbmem,0)
-	MDRV_CPU_VBLANK_INT(micro3d_tms_vblank,1)
 
 	MDRV_CPU_ADD(I8051, 11059000)
 	MDRV_CPU_PROGRAM_MAP(soundmem_prg,0)
 	MDRV_CPU_DATA_MAP(soundmem_data,0)
 	MDRV_CPU_IO_MAP(soundmem_io,0)
 
-	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_MACHINE_RESET(micro3d)
 	MDRV_INTERLEAVE(50)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 433)
-	MDRV_SCREEN_VISIBLE_AREA(0, 575, 33, 432)
-
 	MDRV_PALETTE_LENGTH(32768)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(40000000/8*4, 192*4, 0, 144*4, 434, 0, 400)
+
 	MDRV_VIDEO_START(micro3d)
-	MDRV_VIDEO_UPDATE(micro3d)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 

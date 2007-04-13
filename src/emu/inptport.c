@@ -1233,7 +1233,9 @@ static void input_port_postload(void)
 					case IPT_PEDAL:
 					case IPT_PEDAL2:
 					case IPT_PEDAL3:
-						info->accum = info->center = ANALOG_VALUE_MIN;
+						info->center = ANALOG_VALUE_MIN;
+						/* force pedals to start at their scaled minimum */
+						info->accum = APPLY_INVERSE_SENSITIVITY(info->center, port->analog.sensitivity);
 						/* fall through to complete setup */
 
 					/* pedals, paddles and analog joysticks are absolute and autocenter */
@@ -3113,15 +3115,16 @@ static void update_analog_port(int portnum)
 		/* was pressed, apply autocentering */
 		if (info->autocenter)
 		{
+			double center = APPLY_INVERSE_SENSITIVITY(info->center, port->analog.sensitivity);
 			if (info->lastdigital && !keypressed)
 			{
 				/* autocenter from positive values */
-				if (info->accum >= info->center)
+				if (info->accum >= center)
 				{
 					info->accum -= (double)(port->analog.centerdelta) * info->keyscalepos;
-					if (info->accum < info->center)
+					if (info->accum < center)
 					{
-						info->accum = info->center;
+						info->accum = center;
 						info->lastdigital = 0;
 					}
 				}
@@ -3130,9 +3133,9 @@ static void update_analog_port(int portnum)
 				else
 				{
 					info->accum += (double)(port->analog.centerdelta) * info->keyscaleneg;
-					if (info->accum > info->center)
+					if (info->accum > center)
 					{
-						info->accum = info->center;
+						info->accum = center;
 						info->lastdigital = 0;
 					}
 				}

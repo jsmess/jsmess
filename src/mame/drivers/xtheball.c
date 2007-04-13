@@ -21,7 +21,6 @@
  *************************************/
 
 static UINT16 *vram_bg, *vram_fg;
-static int display_start;
 static UINT8 bitvals[32];
 
 
@@ -46,66 +45,44 @@ static MACHINE_RESET( xtheball )
  *
  *************************************/
 
-static VIDEO_UPDATE( xtheball )
+static void xtheball_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT8 *src0 = (UINT8 *)vram_bg;
-	UINT8 *src1 = (UINT8 *)vram_fg;
-	int x, y;
+	UINT16 *srcbg = &vram_bg[(params->rowaddr << 8) & 0xff00];
+	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	int coladdr = params->coladdr;
+	int x;
 
-	/* check for disabled video */
-	if (tms34010_io_display_blanked(0))
+	/* bit value 0x13 controls which foreground mode to use */
+	if (!bitvals[0x13])
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
-		return 0;
-	}
+		/* mode 0: foreground is the same as bcackground */
+		UINT16 *srcfg = &vram_fg[(params->rowaddr << 8) & 0xff00];
 
-	/* loop over scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+		{
+			UINT16 fgpix = srcfg[coladdr & 0xff];
+			UINT16 bgpix = srcbg[coladdr & 0xff];
 
-		/* bit value 0x13 controls which foreground mode to use */
-		if (!bitvals[0x13])
-		{
-			/* mode 0: foreground is the same as background */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			{
-				int pix = src1[BYTE_XOR_LE(((y - machine->screen[0].visarea.min_y) * 0x200 + x) & 0x1ffff)];
-				if (!pix)
-					pix = src0[BYTE_XOR_LE((y - machine->screen[0].visarea.min_y) * 0x200 + x)];
-				dst[x] = pix;
-			}
-		}
-		else
-		{
-			/* mode 1: foreground is half background resolution in */
-			/* X and supports two pages */
-			int srcbase = display_start / 16;
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			{
-				int pix = src1[BYTE_XOR_LE((srcbase + (y - machine->screen[0].visarea.min_y) * 0x100 + x/2) & 0x1ffff)];
-				if (!pix)
-					pix = src0[BYTE_XOR_LE((y - machine->screen[0].visarea.min_y) * 0x200 + x)];
-				dst[x] = pix;
-			}
+			dest[x + 0] = ((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff);
+			dest[x + 1] = ((fgpix & 0xff00) != 0) ? (fgpix >> 8) : (bgpix >> 8);
 		}
 	}
-	return 0;
-}
+	else
+	{
+		/* mode 1: foreground is half background resolution in */
+		/* X and supports two pages */
+		UINT16 *srcfg = &vram_fg[(params->rowaddr << 7) & 0xff00];
 
+		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+		{
+			UINT16 fgpix = srcfg[(coladdr >> 1) & 0xff] >> (8 * (coladdr & 1));
+			UINT16 bgpix = srcbg[coladdr & 0xff];
 
+			dest[x + 0] = ((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff);
+			dest[x + 1] = ((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix >> 8);
+		}
+	}
 
-/*************************************
- *
- *  Callback for display address change
- *
- *************************************/
-
-static void xtheball_display_addr_changed(UINT32 offs, int rowbytes, int scanline)
-{
-	logerror("display_start = %X\n", offs);
-	video_screen_update_partial(0, scanline - 1);
-	display_start = offs;
 }
 
 
@@ -360,15 +337,16 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config tms_config =
 {
-	0,								/* halt on reset */
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	5000000,						/* pixel clock */
+	2,								/* pixels per clock */
+	xtheball_scanline_update,		/* scanline callback */
 	NULL,							/* generate interrupt */
 	xtheball_to_shiftreg,			/* write to shiftreg function */
-	xtheball_from_shiftreg,			/* read from shiftreg function */
-	xtheball_display_addr_changed,	/* display address changed */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	xtheball_from_shiftreg			/* read from shiftreg function */
 };
 
 
@@ -387,17 +365,19 @@ static MACHINE_DRIVER_START( xtheball )
 	MDRV_CPU_PERIODIC_INT(irq1_line_pulse,TIME_IN_HZ(15000))
 
 	MDRV_MACHINE_RESET(xtheball)
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512,256)
 	MDRV_SCREEN_VISIBLE_AREA(0,511, 24,247)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_SCREEN_REFRESH_RATE(60)
 
-	MDRV_VIDEO_UPDATE(xtheball)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

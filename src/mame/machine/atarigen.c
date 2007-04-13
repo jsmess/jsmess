@@ -91,7 +91,6 @@ static UINT32			playfield_latch;
 static UINT32			playfield2_latch;
 
 static mame_timer *		scanline_timer[ATARIMO_MAX];
-static mame_timer *		vblank_timer[ATARIMO_MAX];
 static mame_timer *		atarivc_eof_update_timer[ATARIMO_MAX];
 
 
@@ -113,7 +112,6 @@ static void delayed_6502_sound_w(int param);
 
 static void atarigen_set_vol(int volume, int type);
 
-static void vblank_timer_callback(int param);
 static void scanline_timer_callback(int scanline);
 
 static void atarivc_common_w(int scrnum, offs_t offset, UINT16 newword);
@@ -145,12 +143,8 @@ void atarigen_interrupt_reset(atarigen_int_callback update_int)
 	scanline_interrupt_timer = NULL;
 
 	/* create timers */
-
-	for (i=0; i<ATARIMO_MAX; i++)
-	{
+	for (i = 0; i < ATARIMO_MAX; i++)
 		scanline_timer[i] = mame_timer_alloc(scanline_timer_callback);
-		vblank_timer[i] = mame_timer_alloc(vblank_timer_callback);
-	}
 
 	/* create a timer for scanlines */
 	scanline_interrupt_timer = mame_timer_alloc(scanline_interrupt_callback);
@@ -177,7 +171,7 @@ void atarigen_update_interrupts(void)
 
 void atarigen_scanline_int_set(int scrnum, int scanline)
 {
-	mame_timer_adjust(scanline_interrupt_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), 0, video_screen_get_frame_period(scrnum));
+	mame_timer_adjust(scanline_interrupt_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), scrnum, time_zero);
 }
 
 
@@ -279,6 +273,9 @@ static void scanline_interrupt_callback(int param)
 {
 	/* generate the interrupt */
 	atarigen_scanline_int_gen();
+
+	/* set a new timer to go off at the same scan line next frame */
+	mame_timer_adjust(scanline_interrupt_timer, video_screen_get_frame_period(param), param, time_zero);
 }
 
 
@@ -855,23 +852,9 @@ void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update
 	scanline_callback = update_graphics;
 	scanlines_per_callback = frequency;
 
-	/* start the VBLANK timer */
-	mame_timer_adjust(vblank_timer[scrnum], time_zero, scrnum, time_zero);
-}
-
-
-/*---------------------------------------------------------------
-    vblank_timer: Called once every VBLANK to prime the scanline
-    timers.
----------------------------------------------------------------*/
-
-static void vblank_timer_callback(int scrnum)
-{
 	/* set a timer to go off at scanline 0 */
-	mame_timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), (scrnum << 16) | 0, time_zero);
-
-	/* set a timer to go off on the next VBLANK */
-	mame_timer_adjust(vblank_timer[scrnum], video_screen_get_time_until_pos(scrnum, Machine->screen[scrnum].visarea.max_y + 1, 0), scrnum, time_zero);
+	if (scanline_callback != NULL)
+		mame_timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), (scrnum << 16) | 0, time_zero);
 }
 
 
@@ -886,15 +869,15 @@ static void scanline_timer_callback(int param)
 	int scrnum = param >> 16;
 
 	/* callback */
-	if (scanline_callback)
+	if (scanline_callback != NULL)
 	{
 		(*scanline_callback)(scanline);
 
-		/* generate another? */
+		/* generate another */
 		scanline += scanlines_per_callback;
-
-		if (scanline < Machine->screen[scrnum].height && scanlines_per_callback)
-			mame_timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline, time_zero);
+		if (scanline >= Machine->screen[scrnum].height)
+			scanline = 0;
+		mame_timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline, time_zero);
 	}
 }
 

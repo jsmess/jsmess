@@ -677,6 +677,7 @@ TODO:
 #include "driver.h"
 #include "machine/atari_vg.h"
 #include "machine/namcoio.h"
+#include "machine/namco50.h"
 #include "includes/galaga.h"
 #include "sound/namco.h"
 #include "sound/namco52.h"
@@ -799,7 +800,7 @@ static MACHINE_RESET( bosco )
 		NAMCOIO_54XX, NULL);
 
 	namco_06xx_init(1, 1,
-		NAMCOIO_50XX, NULL,
+		NAMCOIO_50XX_2, NULL,
 		NAMCOIO_52XX, NULL,
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_NONE, NULL);
@@ -1870,7 +1871,17 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,2)	/* 64V */
 
-	MDRV_CPU_ADD_TAG("54XX", MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD_TAG(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
+	MDRV_CPU_DATA_MAP(namco_50xx_map_data,0)
+	MDRV_CPU_IO_MAP(namco_50xx_map_io,0)
+
+	MDRV_CPU_ADD_TAG(CPUTAG_50XX_2, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_PROGRAM_MAP(namco_50xx_2_map_program,0)
+	MDRV_CPU_DATA_MAP(namco_50xx_2_map_data,0)
+	MDRV_CPU_IO_MAP(namco_50xx_2_map_io,0)
+
+	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1929,7 +1940,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 	MDRV_CPU_VBLANK_INT(galaga_cpu3_nmi,4)	/* 64V (see notes at the top of the driver) */
 
-	MDRV_CPU_ADD_TAG("54XX", MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1973,7 +1984,7 @@ static MACHINE_DRIVER_START( galagab )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaga)
 
-	MDRV_CPU_REMOVE("54XX")
+	MDRV_CPU_REMOVE(CPUTAG_54XX)
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem4_galaga,writemem4_galaga)
@@ -1998,7 +2009,12 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,2)	/* 64V */
 
-	MDRV_CPU_ADD_TAG("54XX", MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD_TAG(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
+	MDRV_CPU_DATA_MAP(namco_50xx_map_data,0)
+	MDRV_CPU_IO_MAP(namco_50xx_map_io,0)
+
+	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -2041,7 +2057,8 @@ static MACHINE_DRIVER_START( battles )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( xevious )
 
-	MDRV_CPU_REMOVE("54XX")
+	MDRV_CPU_REMOVE(CPUTAG_50XX)
+	MDRV_CPU_REMOVE(CPUTAG_54XX)
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem4_battles,writemem4_battles)
@@ -2135,7 +2152,13 @@ ROM_START( bosco )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2177,7 +2200,13 @@ ROM_START( boscoo )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2219,7 +2248,13 @@ ROM_START( boscoo2 )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2261,7 +2296,13 @@ ROM_START( boscomd )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2303,7 +2344,13 @@ ROM_START( boscomdo )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the third CPU  */
 	ROM_LOAD( "2900.3e",      0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 1st 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x800, REGION_CPU5, 0 )     /* 2k for the 2nd 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU6, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2580,7 +2627,10 @@ ROM_START( xevious )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2628,7 +2678,10 @@ ROM_START( xeviousa )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2676,7 +2729,10 @@ ROM_START( xeviousb )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2727,7 +2783,10 @@ ROM_START( xeviousc )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2778,7 +2837,10 @@ ROM_START( xevios )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2883,7 +2945,10 @@ ROM_START( sxevious )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
-	ROM_REGION( 0x400, REGION_CPU4, 0 )     /* 1k for the 54xx  */
+	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
+	ROM_LOAD( "50xx.bin",     0x0000, 0x0800, CRC(a0acbaf7) SHA1(f03c79451e73b3a93c1591cdb27fedc9f130508d) )
+
+	ROM_REGION( 0x400, REGION_CPU5, 0 )     /* 1k for the 54xx  */
 	ROM_LOAD( "54xx.bin",     0x0000, 0x0400, CRC(ee7357e0) SHA1(01bdf984a49e8d0cc8761b2cc162fd6434d5afbe) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )

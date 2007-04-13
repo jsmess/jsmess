@@ -35,7 +35,6 @@ UINT16 *tickee_control;
 static MACHINE_RESET( tickee )
 {
 	ticket_dispenser_init(100, 0, 1);
-
 	tlc34076_reset(6);
 }
 
@@ -282,15 +281,16 @@ static struct AY8910interface ay8910_interface_2 =
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config tms_config =
 {
-	0,								/* halt on reset */
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	14318180/2,						/* pixel clock */
+	1,								/* pixels per clock */
+	tickee_scanline_update,			/* scanline callback */
 	NULL,							/* generate interrupt */
 	NULL,							/* write to shiftreg function */
-	NULL,							/* read from shiftreg function */
-	NULL,							/* display address changed */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	NULL							/* read from shiftreg function */
 };
 
 
@@ -304,38 +304,60 @@ static struct tms34010_config tms_config =
 MACHINE_DRIVER_START( tickee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(tickee_map,0)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_MACHINE_RESET(tickee)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 232)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 24, 223)
-
 	MDRV_PALETTE_LENGTH(256)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(14318180/2, 444, 0, 320, 233, 0, 200)
+
 	MDRV_VIDEO_START(tickee)
-	MDRV_VIDEO_UPDATE(tickee)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 40000000/16)
+	MDRV_SOUND_ADD(AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(AY8910, 40000000/16)
+	MDRV_SOUND_ADD(AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+
+MACHINE_DRIVER_START( ghoshunt )
+	MDRV_IMPORT_FROM(tickee)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(ghoshunt_map,0)
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
+
+ROM_START( tickee )
+	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "3.ic4",  0x000000, 0x80000, CRC(5b1e399c) SHA1(681608f06bbaf3d258e9f4768a8a6c5047ad08ec) )
+	ROM_LOAD16_BYTE( "2.ic3",  0x000001, 0x80000, CRC(1b26d4bb) SHA1(40266ec0fe5897eba85072e5bb39973d34f97546) )
+	ROM_LOAD16_BYTE( "1.ic2",  0x100000, 0x80000, CRC(f7f0309e) SHA1(4a93e0e203f5a340a56b770a40b9ab00e131644d) )
+	ROM_LOAD16_BYTE( "4.ic5",  0x100001, 0x80000, CRC(ceb0f559) SHA1(61923fe09e1dfde1eaae297ccbc672bc74a70397) )
+ROM_END
 
 
 /*
@@ -391,58 +413,6 @@ Notes:
       ULN2803      - Motorola ULN2803 Octal High Voltage, High Current Darlington Transistor Arrays (DIP18)
       TIP122       - Motorola TIP122 General-Purpose NPN Darlington Transistor (TO-220)
 */
-
-MACHINE_DRIVER_START( ghoshunt )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
-	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(ghoshunt_map,0)
-
-	MDRV_SCREEN_REFRESH_RATE(69)
-
-	MDRV_MACHINE_RESET(tickee)
-	MDRV_NVRAM_HANDLER(generic_1fill)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 232)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 24, 223)
-
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_VIDEO_START(tickee)
-	MDRV_VIDEO_UPDATE(tickee)
-
-	/* sound hardware - 2149! */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
-
-
-
-/*************************************
- *
- *  ROM definitions
- *
- *************************************/
-
-ROM_START( tickee )
-	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )	/* 34010 code */
-	ROM_LOAD16_BYTE( "3.ic4",  0x000000, 0x80000, CRC(5b1e399c) SHA1(681608f06bbaf3d258e9f4768a8a6c5047ad08ec) )
-	ROM_LOAD16_BYTE( "2.ic3",  0x000001, 0x80000, CRC(1b26d4bb) SHA1(40266ec0fe5897eba85072e5bb39973d34f97546) )
-	ROM_LOAD16_BYTE( "1.ic2",  0x100000, 0x80000, CRC(f7f0309e) SHA1(4a93e0e203f5a340a56b770a40b9ab00e131644d) )
-	ROM_LOAD16_BYTE( "4.ic5",  0x100001, 0x80000, CRC(ceb0f559) SHA1(61923fe09e1dfde1eaae297ccbc672bc74a70397) )
-ROM_END
-
 
 ROM_START( ghoshunt )
 	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )	/* 34010 code */

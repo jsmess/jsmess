@@ -135,10 +135,19 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 		{
 			if (!(mem_mask & 0xff000000))
 			{
+				dsp_shared_ram_bank[cgboard_id] = (data >> 24) & 0x1;
+
+				if (data & 0x80000000)
+				{
+					dsp_state[cgboard_id] |= 0x10;
+				}
+
+				pci_bridge_enable[cgboard_id] = (data & 0x20000000) ? 1 : 0;
+
 				if (data & 0x10000000)
 				{
 					cpunum_set_input_line(dsp, INPUT_LINE_RESET, CLEAR_LINE);
-					cpu_spinuntil_time(TIME_IN_USEC(1000));		// Give the SHARC enough time to boot itself
+					cpu_spinuntil_time(TIME_IN_USEC(2000));		// Give the SHARC enough time to boot itself
 				}
 				else
 				{
@@ -155,15 +164,6 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 					cpunum_set_input_line(dsp, INPUT_LINE_IRQ1, ASSERT_LINE);
 					cpu_spinuntil_time(TIME_IN_USEC(1000));		// Give the SHARC enough time to respond
 				}
-
-				dsp_shared_ram_bank[cgboard_id] = (data >> 24) & 0x1;
-
-				if (data & 0x80000000)
-				{
-					dsp_state[cgboard_id] |= 0x10;
-				}
-
-				pci_bridge_enable[cgboard_id] = (data & 0x20000000) ? 1 : 0;
 			}
 
 			if (!(mem_mask & 0x000000ff))
@@ -244,7 +244,7 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 			{
 				nwk_device_sel[board] = data;
 
-				if (data & 0x01)
+				if (data & 0x01 || data & 0x10)
 				{
 					cpuintrf_push_context((board == 0) ? 2 : 3);
 					sharc_set_flag_input(1, ASSERT_LINE);
@@ -572,6 +572,10 @@ WRITE32_HANDLER(nwk_fifo_0_w)
 		int addr = ((offset >> 8) << 9) | (offset & 0xff);
 		nwk_ram[0][addr] = data;
 	}
+	else
+	{
+		voodoo_0_w(offset ^ 0x80000, data, mem_mask);
+	}
 }
 
 WRITE32_HANDLER(nwk_fifo_1_w)
@@ -584,6 +588,10 @@ WRITE32_HANDLER(nwk_fifo_1_w)
 	{
 		int addr = ((offset >> 8) << 9) | (offset & 0xff);
 		nwk_ram[1][addr] = data;
+	}
+	else
+	{
+		voodoo_1_w(offset ^ 0x80000, data, mem_mask);
 	}
 }
 

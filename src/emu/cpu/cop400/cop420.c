@@ -11,7 +11,6 @@
     - counter
     - serial I/O
     - interrupt
-    - LBI skip on extended opcodes (33xx)
 
 */
 
@@ -56,6 +55,7 @@ static int    cop420_ICount;
 
 static int InstLen[256];
 static int LBIops[256];
+static int LBIops33[256];
 
 #include "420ops.c"
 
@@ -159,26 +159,32 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	for (i=0x28; i<0x30; i++) LBIops[i] = 1;
 	for (i=0x38; i<0x40; i++) LBIops[i] = 1;
 
-	state_save_register_item("cop410", index, PC);
-	state_save_register_item("cop410", index, R.PREVPC);
-	state_save_register_item("cop410", index, A);
-	state_save_register_item("cop410", index, B);
-	state_save_register_item("cop410", index, C);
-	state_save_register_item("cop410", index, EN);
-	state_save_register_item("cop410", index, G);
-	state_save_register_item("cop410", index, Q);
-	state_save_register_item("cop410", index, SA);
-	state_save_register_item("cop410", index, SB);
-	state_save_register_item("cop410", index, SC);
-	state_save_register_item("cop410", index, SIO);
-	state_save_register_item("cop410", index, SKL);
-	state_save_register_item("cop410", index, skip);
-	state_save_register_item("cop410", index, skipLBI);
-	state_save_register_item("cop410", index, R.timerlatch);
-	state_save_register_item("cop410", index, R.counter);
-	state_save_register_item_array("cop410", index, R.RAM);
-	state_save_register_item("cop410", index, R.G_mask);
-	state_save_register_item("cop410", index, R.D_mask);
+	for (i=0; i<256; i++) LBIops33[i] = 0;
+	for (i=0x81; i<0x89; i++) LBIops33[i] = 1;
+	for (i=0x91; i<0x99; i++) LBIops33[i] = 1;
+	for (i=0xa1; i<0xa9; i++) LBIops33[i] = 1;
+	for (i=0xb1; i<0xb9; i++) LBIops33[i] = 1;
+
+	state_save_register_item("cop420", index, PC);
+	state_save_register_item("cop420", index, R.PREVPC);
+	state_save_register_item("cop420", index, A);
+	state_save_register_item("cop420", index, B);
+	state_save_register_item("cop420", index, C);
+	state_save_register_item("cop420", index, EN);
+	state_save_register_item("cop420", index, G);
+	state_save_register_item("cop420", index, Q);
+	state_save_register_item("cop420", index, SA);
+	state_save_register_item("cop420", index, SB);
+	state_save_register_item("cop420", index, SC);
+	state_save_register_item("cop420", index, SIO);
+	state_save_register_item("cop420", index, SKL);
+	state_save_register_item("cop420", index, skip);
+	state_save_register_item("cop420", index, skipLBI);
+	state_save_register_item("cop420", index, R.timerlatch);
+	state_save_register_item("cop420", index, R.counter);
+	state_save_register_item_array("cop420", index, R.RAM);
+	state_save_register_item("cop420", index, R.G_mask);
+	state_save_register_item("cop420", index, R.D_mask);
 }
 
 /****************************************************************************
@@ -214,7 +220,18 @@ static int cop420_execute(int cycles)
 
 		if (skipLBI == 1)
 		{
-			if (LBIops[opcode] == 0)
+			int is_lbi = 0;
+
+			if (opcode == 0x33)
+			{
+				is_lbi = LBIops33[ROM(PC+1)];
+			}
+			else
+			{
+				is_lbi = LBIops[opcode];
+			}
+
+			if (is_lbi == 0)
 			{
 				skipLBI = 0;
 			}
@@ -239,8 +256,7 @@ static int cop420_execute(int cycles)
 				skip = 0;
 			}
 		}
-	} while (cop420_ICount>0);
-
+	} while (cop420_ICount > 0);
 
 	return cycles - cop420_ICount;
 }

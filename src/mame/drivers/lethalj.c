@@ -48,6 +48,9 @@ Note 2: Lethal Justice uses a TMS34010FNL-50 instead of the TMS34010FNL-40
 #include "lethalj.h"
 #include "sound/okim6295.h"
 
+#define VIDEO_CLOCK			11289600
+#define VIDEO_CLOCK_LETHALJ	11059200
+
 
 
 /*************************************
@@ -466,15 +469,28 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms34010_config tms_config =
+static tms34010_config tms_config =
 {
-	0,								/* halt on reset */
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	VIDEO_CLOCK,					/* pixel clock */
+	1,								/* pixels per clock */
+	lethalj_scanline_update,		/* scanline update */
 	NULL,							/* generate interrupt */
 	NULL,							/* write to shiftreg function */
-	NULL,							/* read from shiftreg function */
-	NULL,							/* display address changed */
-	NULL,							/* display interrupt callback */
-	0								/* the screen operated on */
+	NULL							/* read from shiftreg function */
+};
+
+static tms34010_config tms_config_lethalj =
+{
+	FALSE,							/* halt on reset */
+	0,								/* the screen operated on */
+	VIDEO_CLOCK_LETHALJ,			/* pixel clock */
+	1,								/* pixels per clock */
+	lethalj_scanline_update,		/* scanline update */
+	NULL,							/* generate interrupt */
+	NULL,							/* write to shiftreg function */
+	NULL							/* read from shiftreg function */
 };
 
 
@@ -485,25 +501,23 @@ static struct tms34010_config tms_config =
  *
  *************************************/
 
-MACHINE_DRIVER_START( lethalj )
+MACHINE_DRIVER_START( gameroom )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(lethalj_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(512, 258)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 18, 253)
-
 	MDRV_PALETTE_LENGTH(32768)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236)
+
 	MDRV_VIDEO_START(lethalj)
-	MDRV_VIDEO_UPDATE(lethalj)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -519,6 +533,17 @@ MACHINE_DRIVER_START( lethalj )
 	MDRV_SOUND_ADD(OKIM6295, 2000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_3_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( lethalj )
+	MDRV_IMPORT_FROM( gameroom )
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CONFIG(tms_config_lethalj)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)
 MACHINE_DRIVER_END
 
 
@@ -730,10 +755,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, lethalj,  0,        lethalj, lethalj,  0, ROT0,  "The Game Room", "Lethal Justice", 0 )
-GAME( 1997, eggventr, 0,        lethalj, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggvent7, eggventr, lethalj, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggvntdx, eggventr, lethalj, eggvntdx, 0, ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit, 0,        lethalj, ripribit, 0, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", GAME_NOT_WORKING )
-GAME( 1999, cfarm,    0,        lethalj, laigames, 0, ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", GAME_NOT_WORKING )
-GAME( 1999, cclown,   0,        lethalj, laigames, 0, ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", GAME_NOT_WORKING )
+GAME( 1996, lethalj,  0,        lethalj,  lethalj,  0, ROT0,  "The Game Room", "Lethal Justice", 0 )
+GAME( 1997, eggventr, 0,        gameroom, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggvent7, eggventr, gameroom, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggvntdx, eggventr, gameroom, eggvntdx, 0, ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1997, ripribit, 0,        gameroom, ripribit, 0, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", GAME_NOT_WORKING )
+GAME( 1999, cfarm,    0,        gameroom, laigames, 0, ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", GAME_NOT_WORKING )
+GAME( 1999, cclown,   0,        gameroom, laigames, 0, ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", GAME_NOT_WORKING )

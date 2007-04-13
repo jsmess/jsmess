@@ -510,12 +510,12 @@ static MACHINE_DRIVER_START( limenko )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spotty )
-	MDRV_CPU_ADD(E132XT, 80000000)	//E132XN!
+	MDRV_CPU_ADD(GMS30C2232, 80000000)	/* 20 MHz with 4x internal clock multiplier? */
 	MDRV_CPU_PROGRAM_MAP(spotty_map,0)
 	MDRV_CPU_IO_MAP(spotty_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq5_line_hold, 1)
 
-	MDRV_CPU_ADD(I8051, 4000000)	/* 4 MHz? */
+	MDRV_CPU_ADD(I8051, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(spotty_sound_prg_map, 0)
 	MDRV_CPU_DATA_MAP(0, 0)
 	MDRV_CPU_IO_MAP(spotty_sound_io_map,0)

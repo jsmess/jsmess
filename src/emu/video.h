@@ -114,9 +114,6 @@ int video_screen_exists(int scrnum);
 
 /* ----- global rendering ----- */
 
-/* reset the partial updating for a frame; generally only called by cpuexec.c */
-void video_reset_partial_updates(void);
-
 /* update the screen, handling frame skipping and rendering */
 void video_frame_update(void);
 
