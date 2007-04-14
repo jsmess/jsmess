@@ -55,11 +55,10 @@ DEFS += -DUSE_OPENGL=1
 LIBGL=-lGL
 endif
 
-# Linux: add the necessary libaries
-ifeq ($(SUBARCH),linux)
-
-# some distros (notably Slackware) still put important things in /usr/X11R6/lib
-LIBS += `sdl-config --libs` -L/usr/X11R6/lib $(LIBGL) -lXinerama
+# Unix: add the necessary libraries
+ifeq ($(SUBARCH),unix)
+CFLAGS += `sdl-config --cflags`
+LIBS += -lm `sdl-config --libs` $(LIBGL) -lX11 -lXinerama
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
 ifdef DEBUG
@@ -67,23 +66,12 @@ OSDOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ
 CFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 endif # DEBUG
-endif # Linux
 
-# FreeBSD: add the necessary libraries
-ifeq ($(SUBARCH),freebsd)
-
-LIBS += `sdl-config --libs` $(LIBGL) -lXinerama
-
-# the new debugger relies on GTK+ in addition to the base SDLMAME needs
-ifdef DEBUG
-OSDOBJS += $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
-CFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0` 
-LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
-else
-CFLAGS += -I/usr/local/include -I/usr/X11R6/include
-LIBS += -L/usr/X11R6/lib
-endif # DEBUG
-endif # FreeBSD
+# make sure we can find X headers
+CFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
+# some systems still put important things in a different prefix
+LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
+endif # Unix
 
 # Win32: add the necessary libraries
 ifeq ($(SUBARCH),win32)
