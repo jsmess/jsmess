@@ -533,7 +533,7 @@ static void check_osd_inputs(void)
 	if (input_ui_pressed(IPT_OSD_1))
 		sdlwindow_toggle_full_screen();
 	
-	if (input_ui_pressed(IPT_OSD_3))
+	if (input_ui_pressed(IPT_OSD_2))
 	{
 		video_config.fullstretch = !video_config.fullstretch;
 		ui_popup_time(1, "Uneven stretch %s", video_config.fullstretch? "enabled":"disabled");

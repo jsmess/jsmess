@@ -2153,8 +2153,8 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 				seq_set_3(&idef->defaultseq, KEYCODE_ENTER, CODE_NOT, KEYCODE_LALT);
 				break;
 
-			// page down for fastforward
-			case IPT_OSD_2:
+			// page down for fastforward (must be OSD_3 as per src/emu/ui.c)
+			case IPT_OSD_3:
 				idef->token = "FAST_FORWARD";
 				idef->name = "Fast Forward";
 				seq_set_1(&idef->defaultseq, KEYCODE_PGDN);
@@ -2166,7 +2166,7 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 			// LCTRL will still press/toggle these dipswitches.
 
 			// LCTRL-F3 to toggle fullstretch
-			case IPT_OSD_3:
+			case IPT_OSD_2:
 				idef->token = "TOGGLE_FULLSTRETCH";
 				idef->name = "Toggle Fullstretch";
 				seq_set_2(&idef->defaultseq, KEYCODE_F3, KEYCODE_LCONTROL);
