@@ -418,6 +418,7 @@ static UINT8 EXLE1;
 static UINT8 EXLE2;
 static UINT8 PDR1;
 static UINT8 PDR2;
+static int intback_stage = 0, smpcSR, pmode;
 
 #define SH2_DIRECT_MODE_PORT_1 IOSEL1 = 1
 #define SH2_DIRECT_MODE_PORT_2 IOSEL2 = 1
@@ -458,15 +459,42 @@ static void system_reset()
 	/*Order is surely wrong but whatever...*/
 }
 
+static void smpc_intbackhelper(void)
+{
+	int pad;
+
+	if (intback_stage == 1)
+	{
+		intback_stage++;
+		return;
+	}
+
+	pad = readinputport(intback_stage); 	// will be 2 or 3, port 2 = player 1, port 3 = player 2
+
+	if (LOG_SMPC) logerror("SMPC: providing PAD data for intback, pad %d\n", intback_stage-2);
+	smpc_ram[33] = 0xf1;	// no tap, direct connect
+	smpc_ram[35] = 0x02;	// saturn pad
+	smpc_ram[37] = pad>>8;
+	smpc_ram[39] = pad & 0xff;
+
+	if (intback_stage == 3)
+	{
+		smpcSR = (0x80 | pmode);	// pad 2, no more data, echo back pad mode set by intback
+	}
+	else
+	{
+		smpcSR = (0xe0 | pmode);	// pad 1, more data, echo back pad mode set by intback
+	}
+}
+
 static UINT8 stv_SMPC_r8 (int offset)
 {
 	int return_data;
 
-
 	return_data = smpc_ram[offset];
 
 	if ((offset == 0x61))
-		return_data = 0x00;	// must be clear for Saturn BIOS to boot
+		return_data = smpcSR;
 
 	if (offset == 0x75)//PDR1 read
 		return_data = 0xff; //readinputport(0);
@@ -478,7 +506,7 @@ static UINT8 stv_SMPC_r8 (int offset)
 
 	if (activecpu_get_pc()==0x060020E6) return_data = 0x10;//???
 
-	//if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, return_data);
+	if (LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, offset>>1, return_data);
 
 
 	return return_data;
@@ -487,11 +515,29 @@ static UINT8 stv_SMPC_r8 (int offset)
 static void stv_SMPC_w8 (int offset, UINT8 data)
 {
 	mame_system_time systime;
+	UINT8 last;
 
 	/* get the current date/time from the core */
 	mame_get_current_datetime(Machine, &systime);
 
-//  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
+	if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
+
+	last = smpc_ram[offset];
+
+	if ((intback_stage > 0) && (offset == 1) && (((data ^ 0x80)&0x80) == (last&0x80)))
+	{
+		if (LOG_SMPC) logerror("SMPC: CONTINUE request\n");
+		intback_stage = 2;		// CONTINUE pad reading stage
+		smpc_intbackhelper();
+		cpunum_set_input_line_and_vector(0, 8, HOLD_LINE , 0x47);
+	}
+
+	if ((offset == 1) && (data & 0x40))
+	{
+		if (LOG_SMPC) logerror("SMPC: BREAK request\n");
+		intback_stage = 0;
+	}
+
 	smpc_ram[offset] = data;
 
 	if(offset == 0x75)
@@ -621,16 +667,16 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
-				if(LOG_SMPC) logerror ("SMPC: Status Acquire\n");
+				if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
 				smpc_ram[0x5f]=0x10;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 			  	smpc_ram[0x23] = DectoBCD(systime.local_time.year / 100);
-		    	smpc_ram[0x25] = DectoBCD(systime.local_time.year % 100);
-	    		smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
-		    	smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
-		    	smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
-		    	smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
-		    	smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
+			    	smpc_ram[0x25] = DectoBCD(systime.local_time.year % 100);
+		    		smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
+			    	smpc_ram[0x29] = DectoBCD(systime.local_time.mday);
+			    	smpc_ram[0x2b] = DectoBCD(systime.local_time.hour);
+			    	smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
+			    	smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
 
 				smpc_ram[0x31]=0x00;  //?
 
@@ -659,10 +705,16 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				smpc_ram[0x5b]=0xff;
 				smpc_ram[0x5d]=0xff;
 
+				smpcSR = 0x60;		// peripheral data ready, no reset, etc.
+				pmode = smpc_ram[1]>>4;
+
+				intback_stage = 1;
+
 			//  /*This is for RTC,cartridge code and similar stuff...*/
 			//  if(!(stv_scu[40] & 0x0080)) /*System Manager(SMPC) irq*/ /* we can't check this .. breaks controls .. probably issues elsewhere? */
 				{
 					if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+					smpc_intbackhelper();
 					cpunum_set_input_line_and_vector(0, 8, HOLD_LINE , 0x47);
 				}
 			break;
@@ -2010,19 +2062,10 @@ extern READ32_HANDLER ( stv_vdp1_framebuffer0_r );
 extern WRITE32_HANDLER ( stv_vdp1_framebuffer1_w );
 extern READ32_HANDLER ( stv_vdp1_framebuffer1_r );
 
-static READ32_HANDLER( stv_sh2_random_r )
-{
-	return 0xffffffff;
-}
-
-static READ32_HANDLER( saturn_unk_r )
-{
-	return 0;
-}
-
 static ADDRESS_MAP_START( saturn_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM   // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(stv_SMPC_r32, stv_SMPC_w32)
+	AM_RANGE(0x00180000, 0x0018ffff) AM_RAM AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x100000) AM_SHARE(2) AM_BASE(&stv_workram_l)
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(minit_w)
 	AM_RANGE(0x01406f40, 0x01406f43) AM_WRITE(minit_w) // prikura seems to write here ..
@@ -2051,16 +2094,6 @@ static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION(REGION_CPU3, 0) AM_BASE(&sound_ram)
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
 ADDRESS_MAP_END
-
-#define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_, _b4_) \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_##_b1_         ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_##_b2_         ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_##_b3_         ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_##_b4_         ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(_n_)
 
 INPUT_PORTS_START( saturn )
 	PORT_START
@@ -2116,73 +2149,34 @@ INPUT_PORTS_START( saturn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START
-	STV_PLAYER_INPUTS(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)	// START
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	// A
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// B
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	// C
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)	// X
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	// Y
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)	// Z
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)	// L
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1)	// R
 
 	PORT_START
-	STV_PLAYER_INPUTS(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-/*
-    PORT_START
-    STV_PLAYER_INPUTS(3, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-
-    PORT_START
-    STV_PLAYER_INPUTS(4, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-*/
-
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1P Push Switch") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2P Push Switch") PORT_CODE(KEYCODE_8)
-
-	/*This *might* be unused...*/
-	PORT_START
-	PORT_BIT ( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/*Extra button layout,used by Power Instinct 3 & Suikoenbu*/
-	PORT_START
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	/*We don't need these,AFAIK the country code doesn't work either...*/
-	#if 0
-	PORT_START							//7
-	PORT_DIPNAME( 0x0f, 0x01, "Country" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Japan ) )
-	PORT_DIPSETTING(    0x02, "Asia Ntsc" )
-	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x08, "Sud America Ntsc" )
-	PORT_DIPSETTING(    0x06, "Korea" )
-	PORT_DIPSETTING(    0x0a, "Asia Pal" )
-	PORT_DIPSETTING(    0x0c, "Europe/Other Pal" )
-	PORT_DIPSETTING(    0x0d, "Sud America Pal" )
-
-	PORT_START	/* Pad data 1a */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("B") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("C") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("A") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Start") PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Up") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Down") PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Left") PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Right") PORT_CODE(KEYCODE_L)
-
-	PORT_START	/* Pad data 1b */
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L trig") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Z") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("X") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R trig") PORT_CODE(KEYCODE_S)
-	#endif
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)	// START
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	// A
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// B
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	// C
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)	// X
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)	// Y
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)	// Z
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)	// L
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)	// R
 INPUT_PORTS_END
 
 DRIVER_INIT ( saturn )
@@ -2251,6 +2245,8 @@ MACHINE_RESET( saturn )
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
 	stv_enable_slave_sh2 = 0;
 	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
+
+	smpcSR = 0x40;	// this bit is always on according to docs
 
 	timer_0 = 0;
 	timer_1 = 0;
@@ -2392,6 +2388,8 @@ static MACHINE_DRIVER_START( saturn )
 
 	MDRV_MACHINE_START(saturn)
 	MDRV_MACHINE_RESET(saturn)
+
+	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
