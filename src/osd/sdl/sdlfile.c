@@ -10,8 +10,12 @@
 //============================================================
 
 #define _LARGEFILE64_SOURCE
+#ifdef SDLMAME_LINUX
 #define __USE_LARGEFILE64
+#endif
+#ifndef SDLMAME_FREEBSD
 #define _XOPEN_SOURCE 500
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -91,7 +95,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	UINT32 access;
 	const char *src;
 	char *dst;
-        #if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
 	struct stat st;
 	#else
 	struct stat64 st;
@@ -175,7 +179,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	#endif
 
 	// attempt to open the file
-        #if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
 	(*file)->handle = open(tmpstr, access, 0666);
 	#else
 	(*file)->handle = open64(tmpstr, access, 0666);
@@ -198,7 +202,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 				// attempt to reopen the file
 				if (error == NO_ERROR)
 				{
-				        #if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+				        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
 					(*file)->handle = open(tmpstr, access, 0666);
 					#else
 					(*file)->handle = open64(tmpstr, access, 0666);
@@ -218,7 +222,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// get the file size
-        #if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
 	fstat((*file)->handle, &st);
 	#else
 	fstat64((*file)->handle, &st);
@@ -248,15 +252,15 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 {
 	UINT32 result;
 
-#if defined(SDLMAME_MACOSX) || defined(SDLMAME_FREEBSD)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_FREEBSD)
 	result = pread(file->handle, buffer, count, offset);
-	if (!result)
-#elif defined(SDLMAME_LINUX)
-	result = pread64(file->handle, buffer, count, offset);
 	if (!result)
 #elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO)
 	lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
 	result = read(file->handle, buffer, count); 
+	if (!result)
+#elif defined(SDLMAME_UNIX)
+	result = pread64(file->handle, buffer, count, offset);
 	if (!result)
 #else
 #error Unknown SDL SUBARCH!
@@ -276,15 +280,15 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 {
 	UINT32 result;
 
-#if defined(SDLMAME_MACOSX) || defined(SDLMAME_FREEBSD)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_FREEBSD)
 	result = pwrite(file->handle, buffer, count, offset);
-	if (!result)
-#elif defined(SDLMAME_LINUX)
-	result = pwrite64(file->handle, buffer, count, offset);
 	if (!result)
 #elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO)
 	lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
 	result = write(file->handle, buffer, count); 
+	if (!result)
+#elif defined(SDLMAME_UNIX)
+	result = pwrite64(file->handle, buffer, count, offset);
 	if (!result)
 #else
 #error Unknown SDL SUBARCH!

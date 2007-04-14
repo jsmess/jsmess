@@ -12,6 +12,7 @@
 // standard SDL headers
 #include <SDL/SDL.h>
 #include <SDL/SDL_syswm.h>
+#include <SDL/SDL_thread.h>
 
 #if USE_OPENGL
 // OpenGL headers
@@ -376,7 +377,7 @@ static void *sdlwindow_resize_wt(void *param)
 	ASSERT_WINDOW_THREAD();
 	
 #if USE_OPENGL
-#ifndef SDLMAME_LINUX
+#ifndef SDLMAME_X11
 	drawsdl_destroy_all_textures(window->dxdata);
 #endif
 #endif
@@ -391,7 +392,7 @@ static void *sdlwindow_resize_wt(void *param)
 		yuv_overlay_init(window);
 	}
 #if USE_OPENGL
-#ifndef SDLMAME_LINUX
+#ifndef SDLMAME_X11
 	if (window->opengl)
 		sdlwindow_init_ogl_context();
 #endif

@@ -49,10 +49,10 @@ MAMEOS = sdl
 endif
 
 #------------------------------------------------------------------------------------
-# for SDLMAME, set this to linux, freebsd, win32, or macosx (lowercase is important!)
+# for SDLMAME, set this to unix, win32, or macosx (lowercase is important!)
 #------------------------------------------------------------------------------------
 
-SUBARCH = linux
+SUBARCH = unix
 
 
 #-------------------------------------------------
@@ -369,7 +369,7 @@ VERSIONOBJ = $(OBJ)/version.o
 # start with an empty set of libs
 LIBS = 
 # and here's flags that are applied only to linking the main executable
-MAINLDFLAGS = 
+MAINLDFLAGS =
 
 # add expat XML library
 ifdef BUILD_EXPAT
@@ -390,21 +390,25 @@ ZLIB =
 endif
 
 # add SDLMAME subarch definitions
-ifeq ($(SUBARCH),win32)
-CFLAGS += -DSDLMAME_WIN32
-endif
-
 ifeq ($(SUBARCH),linux)
-CFLAGS += -DSDLMAME_LINUX
+SUBARCH = unix
 endif
 
 ifeq ($(SUBARCH),freebsd)
-CFLAGS += -DSDLMAME_FREEBSD
+SUBARCH = unix
+endif
+
+ifeq ($(SUBARCH),unix)
+CFLAGS += -DSDLMAME_UNIX -DSDLMAME_X11
 endif
 
 ifeq ($(SUBARCH),macosx)
-CFLAGS += -DSDLMAME_MACOSX
+CFLAGS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
 MAINLDFLAGS = -Xlinker -all_load
+endif
+
+ifeq ($(SUBARCH),win32)
+CFLAGS += -DSDLMAME_WIN32
 endif
 
 
@@ -424,6 +428,11 @@ all: maketree emulator tools
 
 # include OS-specific rules first
 include $(SRC)/osd/$(MAMEOS)/$(MAMEOS).mak
+
+# include OS-specific MESS stuff if we're MESS
+ifdef MESS
+include $(SRC)/mess/osd/$(MAMEOS)/$(MAMEOS).mak
+endif
 
 # then the various core pieces
 include $(SRC)/$(TARGET)/$(SUBTARGET).mak

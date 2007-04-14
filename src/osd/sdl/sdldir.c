@@ -10,6 +10,9 @@
 //============================================================
 
 #define _LARGEFILE64_SOURCE
+#ifdef SDLMAME_LINUX
+#define __USE_LARGEFILE64
+#endif
 #ifndef SDLMAME_FREEBSD
 #define _XOPEN_SOURCE 500
 #endif
@@ -30,12 +33,16 @@
 struct _osd_directory
 {
 	osd_directory_entry ent;
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
 	struct dirent *data;
+#else
+	struct dirent64 *data;
+#endif
 	DIR *fd;
 };
 
 
-#ifndef SDLMAME_WIN32
+#if defined (SDLMAME_LINUX) || defined (SDLMAME_FREEBSD) || defined(SDLMAME_DARWIN)
 static osd_dir_entry_type get_attributes_enttype(int attributes)
 {
 	if (attributes == DT_DIR)
@@ -44,13 +51,23 @@ static osd_dir_entry_type get_attributes_enttype(int attributes)
 		return ENTTYPE_FILE;
 }
 #else
-static osd_dir_entry_type get_attributes_w32(const char *file)
+static osd_dir_entry_type get_attributes_stat(const char *file)
 {
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO)
 	struct stat st;
 	if(stat(file, &st))
 		return 0;
+#else
+	struct stat64 st;
+	if(stat64(file, &st))
+		return 0;
+#endif
 
+#ifdef SDLMAME_WIN32
 	if (S_ISBLK(st.st_mode)) return ENTTYPE_DIR;
+#else
+	if (S_ISDIR(st.st_mode)) return ENTTYPE_DIR;
+#endif
 
 	return ENTTYPE_FILE;
 }
@@ -58,7 +75,7 @@ static osd_dir_entry_type get_attributes_w32(const char *file)
 
 static UINT64 osd_get_file_size(const char *file)
 {
-#if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
 	struct stat st;
 	if(stat(file, &st))
 		return 0;
@@ -78,10 +95,10 @@ osd_directory *osd_opendir(const char *dirname)
 {
 	osd_directory *dir = NULL;
 
-	dir = malloc(sizeof(*dir));
+	dir = malloc(sizeof(osd_directory));
 	if (dir)
 	{
-		memset(dir, 0, sizeof(*dir));
+		memset(dir, 0, sizeof(osd_directory));
 		dir->fd = NULL;
 	}
 
@@ -103,16 +120,20 @@ osd_directory *osd_opendir(const char *dirname)
 
 const osd_directory_entry *osd_readdir(osd_directory *dir)
 {
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
 	dir->data = readdir(dir->fd);
+	#else
+	dir->data = readdir64(dir->fd);
+	#endif
 
 	if (dir->data == NULL)
 		return NULL;
 
 	dir->ent.name = dir->data->d_name;
-	#ifdef SDLMAME_WIN32
-	dir->ent.type = get_attributes_w32(dir->data->d_name);
-	#else
+	#if defined (SDLMAME_LINUX) || defined (SDLMAME_FREEBSD) || defined(SDLMAME_DARWIN)
 	dir->ent.type = get_attributes_enttype(dir->data->d_type);
+	#else
+	dir->ent.type = get_attributes_stat(dir->data->d_name);
 	#endif
 	dir->ent.size = osd_get_file_size(dir->data->d_name);
 	return &dir->ent;

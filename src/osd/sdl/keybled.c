@@ -3,13 +3,13 @@
 
 #include "output.h"
 
-#if defined(SDLMAME_LINUX)
+#if defined(SDLMAME_X11)
 static void led_change_notify(const char *outname, INT32 value, void *param);
 #endif
 
 void led_init(void)
 {
-	#if defined(SDLMAME_LINUX)
+	#if defined(SDLMAME_X11)
 	SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
 		
@@ -23,7 +23,7 @@ void led_init(void)
 	#endif
 }
 
-#if defined(SDLMAME_LINUX)
+#if defined(SDLMAME_X11)
 static void led_change_notify(const char *outname, INT32 value, void *param)
 {
 	XKeyboardControl values;

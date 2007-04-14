@@ -20,20 +20,21 @@
 #include "window.h"
 #include "options.h"
 #include "input.h"
+#include "ui.h"
 
 #ifdef MESS
 #include "inputx.h"
 #endif
 
 //============================================================
-//	IMPORTS
+//  IMPORTS
 //============================================================
 
 extern int verbose;
 
 
 //============================================================
-//	PARAMETERS
+//  PARAMETERS
 //============================================================
 
 #define MAX_KEYBOARDS		1
@@ -74,7 +75,7 @@ enum
 
 
 //============================================================
-//	MACROS
+//  MACROS
 //============================================================
 
 #define ELEMENTS(x)			(sizeof(x) / sizeof((x)[0]))
@@ -82,7 +83,7 @@ enum
 
 
 //============================================================
-//	GLOBAL VARIABLES
+//  GLOBAL VARIABLES
 //============================================================
 
 UINT8						win_trying_to_quit;
@@ -91,7 +92,7 @@ int						win_use_mouse;
 
 
 //============================================================
-//	LOCAL VARIABLES
+//  LOCAL VARIABLES
 //============================================================
 
 // this will be filled in dynamically
@@ -148,7 +149,7 @@ static struct {
 
 
 //============================================================
-//	PROTOTYPES
+//  PROTOTYPES
 //============================================================
 
 static void extract_input_config(void);
@@ -158,7 +159,7 @@ static void add_joylist_entry(const char *name, os_code code, input_code standar
 
 
 //============================================================
-//	KEYBOARD/JOYSTICK LIST
+//  KEYBOARD/JOYSTICK LIST
 //============================================================
 
 // macros for building/mapping keyboard codes
@@ -427,7 +428,7 @@ static const char *key_name_table[] =
 // master joystick translation table
 static int joy_trans_table[][2] =
 {
-	// internal code					MAME code
+	// internal code                        MAME code
 	{ JOYCODE(0, CODETYPE_AXIS_NEG, 0),		JOYCODE_1_LEFT },
 	{ JOYCODE(0, CODETYPE_AXIS_POS, 0),		JOYCODE_1_RIGHT },
 	{ JOYCODE(0, CODETYPE_AXIS_NEG, 1),		JOYCODE_1_UP },
@@ -1248,7 +1249,7 @@ static int win_has_menu(void)
 }
 
 //============================================================
-//	autoselect_analog_devices
+//  autoselect_analog_devices
 //============================================================
 
 static void autoselect_analog_devices(const input_port_entry *inp, int type1, int type2, int type3, int anatype, const char *ananame)
@@ -1257,7 +1258,7 @@ static void autoselect_analog_devices(const input_port_entry *inp, int type1, in
 	for ( ; inp->type != IPT_END; inp++)
 	
 		// if this port type is in use, apply the autoselect criteria
-		if ((type1 != 0 && inp->type == type1) || 
+		if ((type1 != 0 && inp->type == type1) ||
 			(type2 != 0 && inp->type == type2) ||
 			(type3 != 0 && inp->type == type3))
 		{
@@ -1279,7 +1280,7 @@ static void autoselect_analog_devices(const input_port_entry *inp, int type1, in
 				
 			// all done
 			break;
-		}	
+		}
 }
 
 //============================================================
@@ -1292,22 +1293,24 @@ void sdl_pause_input(running_machine *machine, int paused)
 }
 
 //============================================================
-//	win_exit_input
+//	wininput_exit
 //============================================================
 
 #ifdef SDLMAME_WIN32
-static void win_exit_input(running_machine *machine)
+static void wininput_exit(running_machine *machine)
 {
 	osd_lock_free(input_lock);
 	event_buf_count = 0;
 }
 #endif
 
+
+
 //============================================================
-//	win_init_input
+//  wininput_init
 //============================================================
 
-int win_init_input(running_machine *machine)
+int wininput_init(running_machine *machine)
 {
 	const input_port_entry *inp;
 	int stick, axis, button, mouse;
@@ -1323,7 +1326,7 @@ int win_init_input(running_machine *machine)
 	// make sure we start at 0
 	total_codes = 0;
 	
-	init_keycodes();
+	init_keycodes();                              
 	memset(keyboard_state, 0, sizeof(keyboard_state));
 
 	// enable devices based on autoselect
@@ -1331,12 +1334,12 @@ int win_init_input(running_machine *machine)
 	{
 		begin_resource_tracking();
 		inp = input_port_allocate(Machine->gamedrv->ipt, NULL);
-		autoselect_analog_devices(inp, IPT_PADDLE,     IPT_PADDLE_V,   0,             ANALOG_TYPE_PADDLE,   "paddle");
-		autoselect_analog_devices(inp, IPT_AD_STICK_X, IPT_AD_STICK_Y, IPT_AD_STICK_Z,ANALOG_TYPE_ADSTICK,  "analog joystick");
-		autoselect_analog_devices(inp, IPT_LIGHTGUN_X, IPT_LIGHTGUN_Y, 0,             ANALOG_TYPE_LIGHTGUN, "lightgun");
-		autoselect_analog_devices(inp, IPT_PEDAL,      IPT_PEDAL2,     IPT_PEDAL3,    ANALOG_TYPE_PEDAL,    "pedal");
-		autoselect_analog_devices(inp, IPT_DIAL,       IPT_DIAL_V,     0,             ANALOG_TYPE_DIAL,     "dial");
-		autoselect_analog_devices(inp, IPT_TRACKBALL_X,IPT_TRACKBALL_X,0,             ANALOG_TYPE_TRACKBALL,"trackball");
+		autoselect_analog_devices(inp, IPT_PADDLE,     IPT_PADDLE_V,    0,             ANALOG_TYPE_PADDLE,    "paddle");
+		autoselect_analog_devices(inp, IPT_AD_STICK_X, IPT_AD_STICK_Y,  IPT_AD_STICK_Z,ANALOG_TYPE_ADSTICK,   "analog joystick");
+		autoselect_analog_devices(inp, IPT_LIGHTGUN_X, IPT_LIGHTGUN_Y,  0,             ANALOG_TYPE_LIGHTGUN,  "lightgun");
+		autoselect_analog_devices(inp, IPT_PEDAL,      IPT_PEDAL2,      IPT_PEDAL3,    ANALOG_TYPE_PEDAL,     "pedal");
+		autoselect_analog_devices(inp, IPT_DIAL,       IPT_DIAL_V,      0,             ANALOG_TYPE_DIAL,      "dial");
+		autoselect_analog_devices(inp, IPT_TRACKBALL_X,IPT_TRACKBALL_Y, 0,             ANALOG_TYPE_TRACKBALL, "trackball");
 #ifdef MESS
 		autoselect_analog_devices(inp, IPT_MOUSE_X,    IPT_MOUSE_Y,    0,             ANALOG_TYPE_MOUSE,    "mouse");
 #endif // MESS
@@ -1388,14 +1391,14 @@ int win_init_input(running_machine *machine)
 				// add analog axes
 				if (!joystick_digital[stick][axis])
 				{
-					sprintf(tempname, "J%d %s", stick + 1, SDL_JoystickName(stick));
+					sprintf(tempname, "J%d A%d %s", stick + 1, axis, SDL_JoystickName(stick));
 					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS, axis), CODE_OTHER_ANALOG_ABSOLUTE);
 					// add negative & positive analog axis
-					sprintf(tempname, "J%d + %s", stick + 1, SDL_JoystickName(stick));
+					sprintf(tempname, "J%d A%d + %s", stick + 1, axis, SDL_JoystickName(stick));
 					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS_POS, axis), CODE_OTHER_ANALOG_ABSOLUTE);
-					sprintf(tempname, "J%d - %s", stick + 1, SDL_JoystickName(stick));
+					sprintf(tempname, "J%d A%d - %s", stick + 1, axis, SDL_JoystickName(stick));
 					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS_NEG, axis), CODE_OTHER_ANALOG_ABSOLUTE);
-				}
+				} 
 		
 				// add negative & positive digital values
 				sprintf(tempname, "J%d axis %d -", stick + 1, axis);
@@ -1415,7 +1418,7 @@ int win_init_input(running_machine *machine)
 	
 	#ifdef SDLMAME_WIN32
 	input_lock = osd_lock_alloc();
-	add_exit_callback(machine, win_exit_input);
+	add_exit_callback(machine, wininput_exit);
 	#endif
 	
 	return 0;
@@ -1449,11 +1452,17 @@ void win_process_events(void)
 {
 	SDL_Event event;
 	int i;
+	#ifdef SDLMAME_WIN32
 	int bufp;
+	#endif
 	#ifdef MESS
 	int translated;
 	#endif
-	
+#ifdef SDLMAME_WIN32
+	SDL_Event			loc_event_buf[MAX_BUF_EVENTS];
+	int					loc_event_buf_count;
+#endif
+
 	for (i=0;i<MAX_JOYSTICKS;i++)
 	{
 	        mouse_state[i].lX = 0;
@@ -1468,9 +1477,13 @@ void win_process_events(void)
 
 #ifdef SDLMAME_WIN32
 	osd_lock_acquire(input_lock);
+	memcpy(loc_event_buf, event_buf, sizeof(event_buf));
+	loc_event_buf_count = event_buf_count;
+	event_buf_count = 0;
+	osd_lock_release(input_lock);
 	bufp = 0;
-	while (bufp < event_buf_count) {
-		event = event_buf[bufp++];
+	while (bufp < loc_event_buf_count) {
+		event = loc_event_buf[bufp++];
 #else
 	while(SDL_PollEvent(&event)) {
 #endif
@@ -1533,14 +1546,10 @@ void win_process_events(void)
 			break;
 		}
 	}
-#ifdef SDLMAME_WIN32
-	event_buf_count = 0;
-	osd_lock_release(input_lock);
-#endif
 }
 
 //============================================================
-//  extract_input_options
+//  parse_analog_select
 //============================================================
 
 static void parse_analog_select(int type, const char *option)
@@ -1560,6 +1569,10 @@ static void parse_analog_select(int type, const char *option)
 	}
 }
 
+
+//============================================================
+//  parse_digital
+//============================================================
 
 static void parse_digital(const char *option)
 {
@@ -1641,6 +1654,10 @@ usage:
 	fprintf(stderr, "         j1,j2a2 -- all joystick 1 axes and axis 2 on joystick 2 are digital\n");
 }
 
+//============================================================
+//  extract_input_config
+//============================================================
+
 static void extract_input_config(void)
 {
 	// extract boolean options
@@ -1678,7 +1695,7 @@ int sdl_is_mouse_captured(void)
 
 
 //============================================================
-//	updatekeyboard
+//  updatekeyboard
 //============================================================
 
 // since the keyboard controller is slow, it is not capable of reporting multiple
@@ -1711,7 +1728,7 @@ static void updatekeyboard(void)
 
 
 //============================================================
-//	is_key_pressed
+//  is_key_pressed
 //============================================================
 
 static int is_key_pressed(os_code keycode)
@@ -1735,7 +1752,7 @@ static int is_key_pressed(os_code keycode)
 
 
 //============================================================
-//	init_keycodes
+//  init_keycodes
 //============================================================
 
 static void init_keycodes(void)
@@ -1862,7 +1879,7 @@ static void init_keycodes(void)
 
 
 //============================================================
-//	add_joylist_entry
+//  add_joylist_entry
 //============================================================
 
 static void add_joylist_entry(const char *name, os_code code, input_code standardcode)
@@ -1888,8 +1905,10 @@ static void add_joylist_entry(const char *name, os_code code, input_code standar
 	}
 }
 
+
+
 //============================================================
-//	get_joycode_value
+//  get_joycode_value
 //============================================================
 
 static INT32 get_joycode_value(os_code joycode)
@@ -1912,7 +1931,6 @@ static INT32 get_joycode_value(os_code joycode)
 			int val = joystick_state[joynum].axes[joyindex];
 			int top = 32767;
 			int middle = 0;
-
 			return (val > middle + ((top - middle) * a2d_deadzone));
 		}
 
@@ -1949,15 +1967,28 @@ static INT32 get_joycode_value(os_code joycode)
 
 		// analog joystick axis
 		case CODETYPE_JOYAXIS:
-		{
-			int val = ((int *)&joystick_state[joynum].axes)[joyindex];
-
+		case CODETYPE_JOYAXIS_NEG:
+		case CODETYPE_JOYAXIS_POS:
 			if (!use_joystick)
 				return 0;
-			if (val < ANALOG_VALUE_MIN) val = ANALOG_VALUE_MIN;
-			if (val > ANALOG_VALUE_MAX) val = ANALOG_VALUE_MAX;
-			return val;
-		}
+			else
+			{
+				int val = ((int *)&joystick_state[joynum].axes)[joyindex];
+
+				if (!use_joystick)
+					return 0;
+				if (val < ANALOG_VALUE_MIN) val = ANALOG_VALUE_MIN;
+				if (val > ANALOG_VALUE_MAX) val = ANALOG_VALUE_MAX;
+				if (codetype == CODETYPE_JOYAXIS)
+					return val;
+
+				if (codetype ==  CODETYPE_JOYAXIS_NEG)
+					val = (val < 0) ? 0 - val : 0;
+				else
+					val = (val > 0) ? val : 0;
+
+				return val * 2 + ANALOG_VALUE_MIN;
+			}
 
 		// analog mouse axis
 		case CODETYPE_MOUSEAXIS:
@@ -2013,7 +2044,7 @@ static INT32 get_joycode_value(os_code joycode)
 
 
 //============================================================
-//	osd_is_code_pressed
+//  osd_get_code_value
 //============================================================
 
 INT32 osd_get_code_value(os_code code)
@@ -2027,7 +2058,7 @@ INT32 osd_get_code_value(os_code code)
 
 
 //============================================================
-//	osd_get_code_list
+//  osd_get_code_list
 //============================================================
 
 const os_code_info *osd_get_code_list(void)
@@ -2090,7 +2121,7 @@ void osd_joystick_end_calibration(void)
 
 
 //============================================================
-//	osd_customize_inputport_list
+//  osd_customize_inputport_list
 //============================================================
 
 void osd_customize_inputport_list(input_port_default_entry *defaults)

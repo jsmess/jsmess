@@ -124,13 +124,10 @@ static const options_entry sdl_opts[] =
 	{ "frames_to_run;ftr",        "0",        0,                 "number of frames to run before automatically exiting" },
 	{ "throttle",                 "1",        OPTION_BOOLEAN,    "enable throttling to keep game running in sync with real time" },
 	{ "sleep",                    "1",        OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
-	#if defined(SDLMAME_WIN32) || (defined(SDLMAME_LINUX) && defined(X86_ASM))
+	#if defined(SDLMAME_WIN32) || (defined(SDLMAME_UNIX) && defined(X86_ASM))
 	{ "rdtsc",                    "0",    OPTION_BOOLEAN, "use the RDTSC instruction for timing on x86; faster but may result in uneven performance" },
 	#endif
-	#if defined(SDLMAME_MACOSX) && defined(X86_ASM)
-	{ "rdtsc",                    "0",    OPTION_BOOLEAN, "use the RDTSC instruction for timing on x86; faster but may result in uneven performance" },
-	#endif
-	#if defined(SDLMAME_MACOSX) && !defined(X86_ASM)
+	#if defined(SDLMAME_DARWIN) && !defined(X86_ASM)
 	{ "machtmr",                  "0",    OPTION_BOOLEAN, "use Mach timers for timing on PowerPC; alternative is SDL's built-in" },
 	#endif
 	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
@@ -188,7 +185,7 @@ static const options_entry sdl_opts[] =
 	// full screen options
 	{ NULL,                       NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
 	{ "switchres",                "0",        OPTION_BOOLEAN,    "enable resolution switching" },
-	#ifdef SDLMAME_LINUX
+	#ifdef SDLMAME_X11
 	{ "useallheads",	      "0",	  OPTION_BOOLEAN,    "split full screen image across monitors" },
 	#endif
 

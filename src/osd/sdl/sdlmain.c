@@ -6,6 +6,7 @@
 
 // standard sdl header
 #include <SDL/SDL.h>
+#include <SDL/SDL_version.h>
 
 // standard includes
 #include <time.h>
@@ -24,9 +25,14 @@
 #include <windows.h>
 #endif
 
-#if defined(SDLMAME_LINUX) || defined (SDLMAME_MACOSX)
+#ifdef SDLMAME_UNIX
 #include <signal.h>
 #include <unistd.h>
+#endif
+
+#if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #endif
 
 #ifdef MESS
@@ -106,6 +112,7 @@ int main(int argc, char *argv[])
 		return(FALSE);
 	}
 
+
 	/* Sam:
 	   We still need to pass in the application handle so that
 	   DirectInput will initialize properly when SDL_RegisterApp()
@@ -140,18 +147,38 @@ int SDL_main(int argc, char **argv)
 	// parse config and cmdline options
 	game_index = cli_frontend_init (argc, argv);
 
-	#ifdef SDLMAME_MACOSX
+
+	#ifdef SDLMAME_DARWIN
 
 	#ifdef X86_ASM	// Intel OS X only
 	sdl_use_rdtsc = options_get_bool(mame_options(), "rdtsc");
 	#else
 	sdl_use_rdtsc = options_get_bool(mame_options(), "machtmr");
 	#endif	// X86_ASM
-	#else	// MACOSX
+	#else	// DARWIN
 	#ifdef X86_ASM	// Intel only
 	sdl_use_rdtsc = options_get_bool(mame_options(), "rdtsc");
 	#endif
 	#endif
+
+#if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
+	if (SDL_Linked_Version()->patch < 10)
+	/* workaround for SDL choosing a 32-bit ARGB visual */
+	{
+		Display *display;
+		if ((display = XOpenDisplay(NULL)) && (DefaultDepth(display, DefaultScreen(display)) >= 24))
+		{
+			XVisualInfo vi;
+			char buf[130];
+			if (XMatchVisualInfo(display, DefaultScreen(display), 24, TrueColor, &vi)) {
+				snprintf(buf, sizeof(buf), "0x%lx", vi.visualid);
+				setenv("SDL_VIDEO_X11_VISUALID", buf, 0);
+			}
+		}
+		if (display)
+			XCloseDisplay(display);
+	}
+#endif 
 
 	// have we decided on a game?
 	if (game_index != -1)
@@ -226,7 +253,7 @@ int osd_init(running_machine *machine)
 	if (getenv("SDLMAME_UNSUPPORTED"))
 		led_init();
 
-	result = win_init_input(machine);
+	result = wininput_init(machine);
 
 	sdl_init_audio(machine);
 

@@ -37,7 +37,7 @@ Version 0.2, May 2000
 #include <ctype.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#if defined(SDLMAME_LINUX) || defined(SDLMAME_FREEBSD)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/mman.h>
 #endif
 #include "misc.h"
@@ -46,7 +46,7 @@ Version 0.2, May 2000
 #include <windows.h>
 #endif
 
-#if defined(SDLMAME_LINUX) || defined (SDLMAME_MACOSX)
+#if defined(SDLMAME_UNIX)
 #include <signal.h>
 #include <unistd.h>
 #endif
@@ -163,12 +163,12 @@ void *osd_alloc_executable(size_t size)
 {
 #ifdef SDLMAME_LINUX 
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_SHARED, 0, getpagesize());
-#elif defined(SDLMAME_FREEBSD)
-        return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, getpagesize());
+#elif defined(SDLMAME_DARWIN)
+	return (void *)malloc(size);
+#elif defined(SDLMAME_UNIX)
+	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, getpagesize());
 #elif defined(SDLMAME_WIN32)
 	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-#elif SDLMAME_MACOSX
-	return (void *)malloc(size);
 #else
 #error Undefined SDLMAME SUBARCH!
 #endif
@@ -176,12 +176,12 @@ void *osd_alloc_executable(size_t size)
 
 void osd_free_executable(void *ptr, size_t size)
 {
-#if defined(SDLMAME_LINUX) || defined(SDLMAME_FREEBSD)
+#ifdef SDLMAME_DARWIN
+	free(ptr);
+#elif defined(SDLMAME_UNIX)
 	munmap(ptr, size);
 #elif defined(SDLMAME_WIN32)
 	VirtualFree(ptr, 0, MEM_RELEASE);
-#elif defined(SDLMAME_MACOSX)
-	free(ptr);
 #else
 #error Undefined SDLMAME SUBARCH!
 #endif
@@ -199,7 +199,7 @@ void osd_break_into_debugger(const char *message)
 		OutputDebugString(message);
 		DebugBreak();
 	}
-#elif defined(SDLMAME_LINUX) || defined (SDLMAME_MACOSX)
+#elif defined(SDLMAME_UNIX)
 	#ifdef MAME_DEBUG
 	fprintf(stderr, "MAME exception: %s\n", message);
 	fprintf(stderr, "Attempting to fall into debugger\n");

@@ -15,7 +15,7 @@
 #include <SDL/SDL_syswm.h>
 #endif
 
-#if defined(SDLMAME_LINUX) || defined(SDLMAME_FREEBSD)
+#ifdef SDLMAME_X11
 #include <X11/extensions/Xinerama.h>
 #endif
 
@@ -234,7 +234,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	monitor->center_width = monitor->monitor_width = dbounds.size.width - dbounds.origin.x;
 	monitor->center_height = monitor->monitor_height = dbounds.size.height - dbounds.origin.y;
 	strcpy(monitor->monitor_device, "Mac OS X display");
-        #elif defined(SDLMAME_LINUX) || defined(SDLMAME_FREEBSD)        // X11 version
+        #elif defined(SDLMAME_X11)        // X11 version
 	{
 		// X11 version
 		int screen;
@@ -591,7 +591,7 @@ static void extract_video_config(void)
 	video_config.keepaspect    = options_get_bool(mame_options(), "keepaspect");
 	video_config.numscreens    = options_get_int(mame_options(), "numscreens");
 	video_config.fullstretch   = options_get_bool(mame_options(), "unevenstretch");
-	#ifdef SDLMAME_LINUX
+	#ifdef SDLMAME_X11
 	video_config.restrictonemonitor = !options_get_bool(mame_options(), "useallheads");
 	#endif
 

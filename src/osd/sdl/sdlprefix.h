@@ -9,6 +9,8 @@
 //
 //============================================================
 
+#include "osdefs.h"
+
 #ifdef MALLOC_DEBUG
 #include <stdlib.h>
 

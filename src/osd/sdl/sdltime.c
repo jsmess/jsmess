@@ -19,7 +19,7 @@
 #include <mmsystem.h>
 #endif
 
-#ifdef SDLMAME_MACOSX
+#ifdef SDLMAME_DARWIN
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #endif
@@ -34,13 +34,13 @@
 
 static osd_ticks_t init_cycle_counter(void);
 static osd_ticks_t rdtsc_cycle_counter(void);
-#if defined(SDLMAME_MACOSX) || defined(SDLMAME_LINUX) || defined(SDLMAME_FREEBSD)
+#ifdef SDLMAME_UNIX
 static osd_ticks_t time_cycle_counter(void);
 #endif
 #ifdef SDLMAME_WIN32
 static osd_ticks_t performance_cycle_counter(void);
 #endif
-#ifdef SDLMAME_MACOSX
+#ifdef SDLMAME_DARWIN
 static osd_ticks_t mach_cycle_counter(void);
 #endif
 
@@ -132,7 +132,7 @@ static osd_ticks_t init_cycle_counter(void)
 }
 #endif
 
-#ifdef SDLMAME_MACOSX
+#ifdef SDLMAME_DARWIN
 static osd_ticks_t init_cycle_counter(void)
 {
 	osd_ticks_t start, end;
@@ -192,7 +192,7 @@ static osd_ticks_t init_cycle_counter(void)
 }
 #endif
 
-#if defined(SDLMAME_LINUX) || defined(SDLMAME_FREEBSD)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 static osd_ticks_t init_cycle_counter(void)
 {
 	osd_ticks_t start, end;
@@ -256,7 +256,7 @@ static osd_ticks_t performance_cycle_counter(void)
 //============================================================
 //  mach_cycle_counter
 //============================================================
-#ifdef SDLMAME_MACOSX
+#ifdef SDLMAME_DARWIN
 static osd_ticks_t mach_cycle_counter(void)
 {
 	return mach_absolute_time();
@@ -307,7 +307,7 @@ static osd_ticks_t rdtsc_cycle_counter(void)
 //============================================================
 //  time_cycle_counter
 //============================================================
-#if defined(SDLMAME_MACOSX) || defined(SDLMAME_LINUX) || defined(SDLMAME_FREEBSD)
+#ifdef SDLMAME_UNIX
 static osd_ticks_t time_cycle_counter(void)
 {
 	return SDL_GetTicks();

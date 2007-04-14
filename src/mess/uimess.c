@@ -192,7 +192,7 @@ UINT32 ui_menu_image_info(UINT32 state)
 
 int mess_use_new_ui(void)
 {
-#ifdef WIN32
+#if defined(WIN32) && !defined(SDLMAME_WIN32)
 	if (options_get_bool(mame_options(), "newui"))
 		return TRUE;
 #endif

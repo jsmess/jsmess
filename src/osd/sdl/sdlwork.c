@@ -16,14 +16,14 @@
 
 // standard headers
 #include <time.h>
-#ifdef SDLMAME_LINUX
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_DARWIN)
 #include <sys/time.h>
 #endif
 #include <pthread.h>
 #include <unistd.h>
 #include "osdcore.h"
 
-#ifdef SDLMAME_MACOSX
+#ifdef SDLMAME_DARWIN
 #include <mach/mach.h>
 #endif
 
@@ -83,7 +83,7 @@ static int execute_work_item(osd_work_item *item);
 //  INLINE FUNCTIONS
 //============================================================
 
-INLINE void * compare_exchange_pointer(osd_work_queue *queue, void * volatile *ptr, void *compare, void *exchange)
+INLINE void * compare_exchange_pointer(osd_work_queue *queue, void * volatile *ptr, void *exchange, void *compare)
 {
 	void *ret = NULL;
 
@@ -141,7 +141,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	// determine how many threads to create
 	processors = 1;
 
-#ifdef SDLMAME_MACOSX
+#ifdef SDLMAME_DARWIN
 	{
 		struct host_basic_info host_basic_info;
 		unsigned int count;
@@ -303,8 +303,11 @@ void osd_work_queue_free(osd_work_queue *queue)
 	{
 		osd_work_item *item = (osd_work_item *)queue->free;
 		queue->free = item->next;
-		pthread_cond_destroy(&item->statecond);
-		pthread_mutex_destroy(&item->statelock);
+		if (!(item->flags & WORK_ITEM_FLAG_AUTO_RELEASE))
+		{
+			pthread_cond_destroy(&item->statecond);
+			pthread_mutex_destroy(&item->statelock);
+		}
 		free(item);
 	}
 
@@ -344,13 +347,6 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 		item = malloc(sizeof(*item));
 		if (item == NULL)
 			return NULL;
-
-		// allocate mutexes and conditions
-		if ( pthread_mutex_init(&item->statelock, NULL) != 0 || pthread_cond_init(&item->statecond, NULL) != 0 )
-		{
-			free(item);
-			return NULL;
-		}
 	}
 
 	// fill in the basics
@@ -362,6 +358,11 @@ osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work_callback call
 	item->queue = queue;
 	item->complete = FALSE;
 	item->state = WORK_STATE_INCOMPLETE;
+	// allocate mutexes and conditions
+	if ( pthread_mutex_init(&item->statelock, NULL) != 0 || pthread_cond_init(&item->statecond, NULL) != 0 )
+	{
+		return NULL;
+	}
 
 	// if no threads, just run it now
 	if (queue->threads == 0)
