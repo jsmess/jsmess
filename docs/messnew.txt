@@ -29,6 +29,10 @@ Source Changes:
 - The core is based on MAME 0.114u1.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- [Windows] Factored out handling of standard file dialogs, to centralize
+  handling of UTF-8 conversions and compatibility with old versions of
+  Windows. [Nate Woods]
+
 
 
 0.114

@@ -18,6 +18,7 @@
 #include "attrdlg.h"
 #include "secview.h"
 #include "winutil.h"
+#include "winutils.h"
 
 const TCHAR wimgtool_class[] = TEXT("wimgtool_class");
 const TCHAR wimgtool_producttext[] = TEXT("MESS Image Tool");
@@ -725,16 +726,15 @@ static imgtoolerr_t full_refresh_image(HWND window)
 
 
 
-static imgtoolerr_t setup_openfilename_struct(OPENFILENAME *ofn, memory_pool *pool,
+static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, memory_pool *pool,
 	HWND window, BOOL creating_file)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	mess_pile pile;
 	const imgtool_module *default_module = NULL;
 	const imgtool_module *module = NULL;
-	TCHAR *filename;
-	TCHAR *filter;
-	TCHAR *initial_dir = NULL;
+	char *filter;
+	char *initial_dir = NULL;
 	TCHAR *dir_char;
 	imgtool_module_features features;
 	DWORD filter_index = 0, current_index = 0;
@@ -799,14 +799,6 @@ static imgtoolerr_t setup_openfilename_struct(OPENFILENAME *ofn, memory_pool *po
 	pile_putc(&pile, '\0');
 	pile_putc(&pile, '\0');
 
-	filename = pool_malloc(pool, sizeof(TCHAR) * MAX_PATH);
-	if (!filename)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
-	filename[0] = '\0';
-
 	filter = pool_malloc(pool, pile_size(&pile));
 	if (!filter)
 	{
@@ -815,28 +807,29 @@ static imgtoolerr_t setup_openfilename_struct(OPENFILENAME *ofn, memory_pool *po
 	}
 	memcpy(filter, pile_getptr(&pile), pile_size(&pile));
 
+	// populate the actual structure
+	memset(ofn, 0, sizeof(*ofn));
+	ofn->flags = OFN_EXPLORER;
+	ofn->owner = window;
+	ofn->filter = filter;
+	ofn->filter_index = filter_index;
+
 	// can we specify an initial directory?
 	if (info->filename)
 	{
-		initial_dir = alloca((_tcslen(info->filename) + 1) * sizeof(*info->filename));
-		_tcscpy(initial_dir, info->filename);
-		dir_char = _tcsrchr(initial_dir, '\\');
+		// copy the filename into the filename structure
+		snprintf(ofn->filename, ARRAY_LENGTH(ofn->filename), "%s", info->filename);
+
+		// specify an initial directory
+		initial_dir = alloca((strlen(info->filename) + 1) * sizeof(*info->filename));
+		strcpy(initial_dir, info->filename);
+		dir_char = strrchr(initial_dir, '\\');
 		if (dir_char)
 			dir_char[1] = '\0';
 		else
 			initial_dir = NULL;
+		ofn->initial_directory = initial_dir;
 	}
-
-	// populate the actual OPENFILENAME structure
-	memset(ofn, 0, sizeof(*ofn));
-	ofn->lStructSize = sizeof(*ofn);
-	ofn->Flags = OFN_EXPLORER;
-	ofn->hwndOwner = window;
-	ofn->lpstrFile = filename;
-	ofn->nMaxFile = MAX_PATH;
-	ofn->lpstrFilter = filter;
-	ofn->nFilterIndex = filter_index;
-	ofn->lpstrInitialDir = initial_dir;
 
 done:
 	pile_delete(&pile);
@@ -1064,9 +1057,8 @@ static void menu_new(HWND window)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	memory_pool *pool;
-	OPENFILENAME ofn;
+	win_open_file_name ofn;
 	const imgtool_module *module;
-	char *filename = NULL;
 	option_resolution *resolution = NULL;
 
 	pool = pool_create(NULL);
@@ -1074,33 +1066,30 @@ static void menu_new(HWND window)
 	err = setup_openfilename_struct(&ofn, pool, window, TRUE);
 	if (err)
 		goto done;
-	ofn.Flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK;
-	ofn.hInstance = GetModuleHandle(NULL);
-	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FILETEMPLATE);
-	ofn.lpfnHook = win_new_dialog_hook;
-	ofn.lCustData = (LPARAM) &resolution;
-	if (!GetSaveFileName(&ofn))
+	ofn.flags |= OFN_ENABLETEMPLATE | OFN_ENABLEHOOK;
+	ofn.instance = GetModuleHandle(NULL);
+	ofn.template_name = MAKEINTRESOURCE(IDD_FILETEMPLATE);
+	ofn.hook = win_new_dialog_hook;
+	ofn.custom_data = (LPARAM) &resolution;
+	ofn.type = WIN_FILE_DIALOG_SAVE;
+	if (!win_get_file_name_dialog(&ofn))
 		goto done;
 
-	filename = utf8_from_tstring(ofn.lpstrFile);
-
-	module = find_filter_module(ofn.nFilterIndex, TRUE);
+	module = find_filter_module(ofn.filter_index, TRUE);
 	
-	err = imgtool_image_create(module, filename, resolution, NULL);
+	err = imgtool_image_create(module, ofn.filename, resolution, NULL);
 	if (err)
 		goto done;
 
-	err = wimgtool_open_image(window, module, filename, OSD_FOPEN_RW);
+	err = wimgtool_open_image(window, module, ofn.filename, OSD_FOPEN_RW);
 	if (err)
 		goto done;
 
 done:
 	if (err)
-		wimgtool_report_error(window, err, filename, NULL);
+		wimgtool_report_error(window, err, ofn.filename, NULL);
 	if (resolution)
 		option_resolution_close(resolution);
-	if (filename)
-		free(filename);
 	if (pool)
 		pool_free(pool);
 }
@@ -1111,9 +1100,8 @@ static void menu_open(HWND window)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	memory_pool *pool;
-	OPENFILENAME ofn;
+	win_open_file_name ofn;
 	const imgtool_module *module;
-	char *filename = NULL;
 	wimgtool_info *info;
 	int read_or_write;
 
@@ -1129,28 +1117,26 @@ static void menu_open(HWND window)
 	err = setup_openfilename_struct(&ofn, pool, window, FALSE);
 	if (err)
 		goto done;
-	ofn.Flags |= OFN_FILEMUSTEXIST;
-	if (!GetOpenFileName(&ofn))
+	ofn.flags |= OFN_FILEMUSTEXIST;
+	ofn.type = WIN_FILE_DIALOG_OPEN;
+	if (!win_get_file_name_dialog(&ofn))
 		goto done;
 
-	filename = utf8_from_tstring(ofn.lpstrFile);
-	module = find_filter_module(ofn.nFilterIndex, FALSE);
+	module = find_filter_module(ofn.filter_index, FALSE);
 
 	// is this file read only?
-	if ((ofn.Flags & OFN_READONLY) || (GetFileAttributes(ofn.lpstrFile) & FILE_ATTRIBUTE_READONLY))
+	if ((ofn.flags & OFN_READONLY) || (win_get_file_attributes_utf8(ofn.filename) & FILE_ATTRIBUTE_READONLY))
 		read_or_write = OSD_FOPEN_READ;
 	else
 		read_or_write = OSD_FOPEN_RW;
 
-	err = wimgtool_open_image(window, module, filename, read_or_write);
+	err = wimgtool_open_image(window, module, ofn.filename, read_or_write);
 	if (err)
 		goto done;
 
 done:
 	if (err)
-		wimgtool_report_error(window, err, filename, NULL);
-	if (filename)
-		free(filename);
+		wimgtool_report_error(window, err, ofn.filename, NULL);
 	if (pool)
 		pool_free(pool);
 }
@@ -1161,10 +1147,9 @@ static void menu_insert(HWND window)
 {
 	imgtoolerr_t err;
 	char *image_filename = NULL;
-	TCHAR host_filename[MAX_PATH] = { 0 };
-	const TCHAR *s1;
+	const char *s1;
 	char *s2;
-	OPENFILENAME ofn;
+	win_open_file_name ofn;
 	wimgtool_info *info;
 	option_resolution *opts = NULL;
 	BOOL cancel;
@@ -1176,26 +1161,21 @@ static void menu_insert(HWND window)
 	filter_getinfoproc filter = NULL;
 	const struct OptionGuide *writefile_optguide;
 	const char *writefile_optspec;
-	TCHAR *filename;
 
 	info = get_wimgtool_info(window);
 
 	memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = window;
-	ofn.lpstrFile = host_filename;
-	ofn.nMaxFile = sizeof(host_filename) / sizeof(host_filename[0]);
-	ofn.Flags = OFN_FILEMUSTEXIST | OFN_EXPLORER;
-	if (!GetOpenFileName(&ofn))
+	ofn.type = WIN_FILE_DIALOG_OPEN;
+	ofn.owner = window;
+	ofn.flags = OFN_FILEMUSTEXIST | OFN_EXPLORER;
+	if (!win_get_file_name_dialog(&ofn))
 	{
 		err = 0;
 		goto done;
 	}
 
 	/* we need to open the stream at this point, so that we can suggest the transfer */
-	filename = utf8_from_tstring(ofn.lpstrFile);
-	stream = stream_open(filename, OSD_FOPEN_READ);
-	free(filename);
+	stream = stream_open(ofn.filename, OSD_FOPEN_READ);
 	if (!stream)
 	{
 		err = IMGTOOLERR_FILENOTFOUND;
@@ -1227,9 +1207,9 @@ static void menu_insert(HWND window)
 	}
 
 	/* figure out the image filename */
-	s1 = _tcsrchr(ofn.lpstrFile, '\\');
-	s1 = s1 ? s1 + 1 : ofn.lpstrFile;
-	image_filename = utf8_from_tstring(s1);
+	s1 = strrchr(ofn.filename, '\\');
+	s1 = s1 ? s1 + 1 : ofn.filename;
+	image_filename = mame_strdup(s1);
 
 	if (info->current_directory)
 	{
@@ -1254,7 +1234,7 @@ done:
 	if (opts)
 		option_resolution_close(opts);
 	if (err)
-		wimgtool_report_error(window, err, image_filename, ofn.lpstrFile);
+		wimgtool_report_error(window, err, image_filename, ofn.filename);
 }
 
 
@@ -1309,13 +1289,11 @@ static UINT_PTR CALLBACK extract_dialog_hook(HWND dlgwnd, UINT message,
 static imgtoolerr_t menu_extract_proc(HWND window, const imgtool_dirent *entry, void *param)
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	TCHAR host_filename[MAX_PATH];
-	OPENFILENAME ofn;
+	win_open_file_name ofn;
 	wimgtool_info *info;
 	const char *filename;
 	const char *image_basename;
 	const char *fork;
-	TCHAR *tempstr;
 	struct transfer_suggestion_info suggestion_info;
 	int i;
 	filter_getinfoproc filter;
@@ -1326,9 +1304,6 @@ static imgtoolerr_t menu_extract_proc(HWND window, const imgtool_dirent *entry, 
 
 	// figure out a suggested host filename
 	image_basename = imgtool_partition_get_base_name(info->partition, entry->filename);
-	tempstr = tstring_from_utf8(image_basename);
-	_tcscpy(host_filename, tempstr);
-	free(tempstr);
 
 	// try suggesting some filters (only if doing a single file)
 	if (!entry->directory)
@@ -1352,30 +1327,30 @@ static imgtoolerr_t menu_extract_proc(HWND window, const imgtool_dirent *entry, 
 		suggestion_info.selected = -1;
 	}
 
-	// set up the OPENFILENAME struct
+	// set up the actual struct
 	memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = window;
-	ofn.Flags = OFN_EXPLORER;
-	ofn.lpstrFile = host_filename;
-	ofn.lpstrFilter = TEXT("All files (*.*)\0*.*\0");
-	ofn.nMaxFile = sizeof(host_filename) / sizeof(host_filename[0]);
+	ofn.owner = window;
+	ofn.flags = OFN_EXPLORER;
+	ofn.filter = "All files (*.*)|*.*";
+
+	snprintf(ofn.filename, ARRAY_LENGTH(ofn.filename), "%s", image_basename);
 
 	if (suggestion_info.suggestions[0].viability)
 	{
-		ofn.Flags |= OFN_ENABLEHOOK | OFN_ENABLESIZING | OFN_ENABLETEMPLATE;
-		ofn.lpfnHook = extract_dialog_hook;
-		ofn.hInstance = GetModuleHandle(NULL);
-		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_EXTRACTOPTIONS);
-		ofn.lCustData = (LPARAM) &suggestion_info;
+		ofn.flags |= OFN_ENABLEHOOK | OFN_ENABLESIZING | OFN_ENABLETEMPLATE;
+		ofn.hook = extract_dialog_hook;
+		ofn.instance = GetModuleHandle(NULL);
+		ofn.template_name = MAKEINTRESOURCE(IDD_EXTRACTOPTIONS);
+		ofn.custom_data = (LPARAM) &suggestion_info;
 	}
 
-	if (!GetSaveFileName(&ofn))
+	ofn.type = WIN_FILE_DIALOG_SAVE;
+	if (!win_get_file_name_dialog(&ofn))
 		goto done;
 
 	if (entry->directory)
 	{
-		err = get_recursive_directory(info->partition, filename, ofn.lpstrFile);
+		err = get_recursive_directory(info->partition, filename, ofn.filename);
 		if (err)
 			goto done;
 	}
@@ -1392,14 +1367,14 @@ static imgtoolerr_t menu_extract_proc(HWND window, const imgtool_dirent *entry, 
 			filter = NULL;
 		}
 
-		err = imgtool_partition_get_file(info->partition, filename, fork, ofn.lpstrFile, filter);
+		err = imgtool_partition_get_file(info->partition, filename, fork, ofn.filename, filter);
 		if (err)
 			goto done;
 	}
 
 done:
 	if (err)
-		wimgtool_report_error(window, err, filename, ofn.lpstrFile);
+		wimgtool_report_error(window, err, filename, ofn.filename);
 	return err;
 }
 
