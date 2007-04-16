@@ -1,12 +1,50 @@
 /*
 
+Mustang 9016 Telespiel Computer
+1978
+
+PCB Layout
+|----------------------------------------------------------------------------------------------------------|
+|7805                              |----------------------------|                          CD4069  MC14001 |
+|                                  |----------------------------|                                          |
+|                                         (ROM cart slot)                                                  |
+|                                                                                                          |
+|       ROM.IC13  ROM.IC14      CDP1822  CDP1822 CDP1822 CDP1822                            |-----------|  |
+|                                                                                           | Output    |  |
+|                                                                                           |TV Module? |  |
+| ROM.IC12                                                        CDP1802  CDP1864          |           |  |
+|                 CDP1822                                                                   |           |  |
+|                          CD4019 CDP1858 CD4081 CD4069                                     |           |  |
+|                                                                                           |           |  |
+|                                                        CD4515                             |           |  |
+|                                                                          1.750MHz         |-----------|  |
+|                                                                                              4.3236MHz   |
+|                                                                                                          |
+|                                                                                                          |
+|                                                                                                          |
+|----------------------------------------------------------------------------------------------------------|
+Notes:
+      CDP1802 - RCA CDP1802 Microprocessor
+      CDP1864 - RCA CDP1864 PAL Video Display Controller (VDC)
+      CDP1822 - RCA CDP1822 256 x4 RAM (= Mitsubishi M58721P)
+      ROM.ICx - RCA CDP1833 1k x8 MASKROM. All ROMs are marked 'PROGRAM COPYRIGHT (C) RCA CORP. 1978'
+      CD4019  - 4019 Quad AND-OR Select Gate (4000-series CMOS TTL logic IC)
+      CDP1858 - Latch/Decoder - 4-bit
+      CD4081  - 4081 Quad 2-Input AND Buffered B Series Gate (4000-series CMOS TTL logic IC)
+      CD4069  - 4069 Hex Buffer, Inverter (4000-series CMOS TTL logic IC)
+      CD4515  - 4515 4-Bit Latched/4-to-16 Line Decoders (4000-series CMOS TTL logic IC)
+      7805    - Voltage regulator, input 10V-35V, output +5V
+*/
+
+/*
+
 	TODO:
 
+	- cdp1861/cdp1864 video
 	- discrete sound
-	- cdp1861
-	- ram mirroring (mapped when A9=0)
-	- key mappings to left/right/up/down/fire
-	- load st2 carts using the header information
+	- ram mirroring (mapped when A9=0 and ROM not present)
+	- load st2 carts using header information
+	- redump studio2 bios as 2 roms
 
 */
 
@@ -14,6 +52,7 @@
 #include "image.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1861.h"
+#include "video/cdp1864.h"
 #include "devices/cartslot.h"
 #include "inputx.h"
 #include "sound/beep.h"
@@ -21,21 +60,6 @@
 
 static UINT8 keylatch;
 extern int cdp1861_efx;
-
-/* Discrete Sound */
-
-static const discrete_555_desc studio2_555 =
-{
-	DISC_555_OUT_ENERGY,
-	5,		// B+ voltage of 555
-	DEFAULT_555_VALUES
-};
-
-DISCRETE_SOUND_START(studio2_discrete_interface)
-	DISCRETE_INPUT_DATA(NODE_01) // connected to ground via a 10uF capacitor, not emulated
-	DISCRETE_555_ASTABLE_CV(NODE_02, 1, RES_K(400), RES_K(480), CAP_P(1.8), NODE_01, &studio2_555)
-	DISCRETE_OUTPUT(NODE_02, 100)
-DISCRETE_SOUND_END
 
 /* Read/Write Handlers */
 
@@ -121,11 +145,27 @@ static CDP1802_CONFIG studio2_config =
 	cdp1861_sc
 };
 
+static CDP1802_CONFIG mpt02_config = 
+{
+	NULL,
+	cdp1864_dma_w,
+	studio2_q,
+	studio2_ef,
+	cdp1864_sc
+};
+
 /* Machine Initialization */
 
 static MACHINE_RESET( studio2 )
 {
 	machine_reset_cdp1861(machine);
+
+	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+}
+
+static MACHINE_RESET( mpt02 )
+{
+	machine_reset_cdp1864(machine);
 
 	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 }
@@ -154,12 +194,35 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_VIDEO_UPDATE(cdp1861)
 
 	// sound hardware
-/*
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(DISCRETE, 0)
-	MDRV_SOUND_CONFIG(studio2_discrete_interface)
+	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-*/
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mpt02 )
+
+	// basic machine hardware
+
+	MDRV_CPU_ADD_TAG("main", CDP1802, CDP1864_CLK_FREQ)
+	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
+	MDRV_CPU_IO_MAP(studio2_io_map, 0)
+	MDRV_CPU_CONFIG(mpt02_config)
+	MDRV_MACHINE_RESET(mpt02)
+
+    // video hardware
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
+
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_VIDEO_START(cdp1861)
+	MDRV_VIDEO_UPDATE(cdp1861)
+
+	// sound hardware
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -169,7 +232,14 @@ MACHINE_DRIVER_END
 
 ROM_START( studio2 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "studio2.rom", 0x0000, 0x0800, CRC(a494b339) SHA1(f2650dacc9daab06b9fdf0e7748e977b2907010c) )
+	ROM_LOAD( "studio2.rom", 0x0000, 0x0800, BAD_DUMP CRC(a494b339) SHA1(f2650dacc9daab06b9fdf0e7748e977b2907010c) ) // should be 2 roms
+ROM_END
+
+ROM_START( m9016tc )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "86676.ic13",  0x0000, 0x0400, NO_DUMP )
+	ROM_LOAD( "86677b.ic14", 0x0400, 0x0400, NO_DUMP )
+	ROM_LOAD( "87201.ic12",  0x0800, 0x0400, NO_DUMP )
 ROM_END
 
 /* System Configuration */
@@ -249,9 +319,10 @@ static DRIVER_INIT( studio2 )
 	"Mustang", "9016 Telespiel Computer (Germany)"
 	"Soundic", "MPT-02 Victory Home TV Programmer (Austria)"
 	"Hanimex", "MPT-02 (France)"
-	"Sheen", "1200 Micro Computer (Australia)"
+	"Sheen",   "1200 Micro Computer (Australia)"
 
 */
 
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_NOT_WORKING )
+CONS( 1978,	m9016tc,	studio2,0,		mpt02,		studio2,	0,			studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_NOT_WORKING )

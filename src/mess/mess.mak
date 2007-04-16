@@ -693,7 +693,8 @@ $(MESSOBJ)/ti85.a: \
 $(MESSOBJ)/rca.a: \
 	$(MESS_DRIVERS)/vip.o  \
 	$(MESS_DRIVERS)/studio2.o  \
-	$(MESS_VIDEO)/cdp1861.o
+	$(MESS_VIDEO)/cdp1861.o \
+	$(MESS_VIDEO)/cdp1864.o
 
 $(MESSOBJ)/fairch.a: \
 	$(MESS_VIDEO)/channelf.o \

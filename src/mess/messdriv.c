@@ -151,6 +151,7 @@ const game_driver *test_drivers[] =
 	/* RCA */
 	DRIVER( vip )		/* 1977 Cosmac VIP									*/
 	DRIVER( studio2 )	/* 1977 Studio II									*/
+TESTDRIVER( m9016tc )	/* 1978 Mustang 9016 Telespiel Computer				*/
 
 	/* FAIRCHILD */
 	DRIVER( channelf )	/* Fairchild Channel F VES - 1976					*/
@@ -768,7 +769,7 @@ TESTDRIVER( svi328c ) 	/* SVI-328 + 80 column card (Swedish)						*/
 	DRIVER(mpf1)		/* 1979 Multitech Micro Professor 1					*/
 	DRIVER(mpf1b)		/* 1979 Multitech Micro Professor 1B				*/
 
-	/* Telmac */
+	/* Telercas Oy */
 TESTDRIVER(tmc1800)		/* 1977 Telmac 1800									*/
 	DRIVER(tmc2000)		/* 1980 Telmac 2000									*/
 TESTDRIVER(tmc2000e)	/* 1980 Telmac 2000E								*/
