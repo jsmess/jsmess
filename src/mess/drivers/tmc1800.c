@@ -90,10 +90,7 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/generic.h"
 #include "video/cdp1864.h"
-#include "devices/printer.h"
-#include "devices/basicdsk.h"
 #include "devices/cassette.h"
-#include "devices/snapquik.h"
 #include "sound/beep.h"
 
 extern VIDEO_START( osm200 );
@@ -363,7 +360,7 @@ SYSTEM_BIOS_END
 
 ROM_START( tmc2000 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROMX_LOAD( "200.m5",	0x8000, 0x0200, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "200.m5",    0x8000, 0x0200, BAD_DUMP CRC(53BDDF1A) SHA1(3691741A6921A2E2333B697E80D4936BE41DCDA8), ROM_BIOS(1) ) // typed in from the manual
 	ROMX_LOAD( "tool2000",	0x8000, 0x0800, NO_DUMP, ROM_BIOS(2) )
 ROM_END
 
