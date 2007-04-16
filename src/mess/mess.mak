@@ -450,6 +450,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_VIDEO)/m6847.o		\
 	$(MESS_VIDEO)/m6845.o		\
+	$(MESS_VIDEO)/cdp1864.o		\
 	$(MESS_MACHINE)/msm8251.o  \
 	$(MESS_MACHINE)/tc8521.o   \
 	$(MESS_VIDEO)/crtc6845.o \
@@ -693,8 +694,7 @@ $(MESSOBJ)/ti85.a: \
 $(MESSOBJ)/rca.a: \
 	$(MESS_DRIVERS)/vip.o  \
 	$(MESS_DRIVERS)/studio2.o  \
-	$(MESS_VIDEO)/cdp1861.o \
-	$(MESS_VIDEO)/cdp1864.o
+	$(MESS_VIDEO)/cdp1861.o
 
 $(MESSOBJ)/fairch.a: \
 	$(MESS_VIDEO)/channelf.o \
@@ -1060,7 +1060,6 @@ $(MESSOBJ)/multitch.a:					\
 $(MESSOBJ)/telmac.a:					\
 	$(MESS_DRIVERS)/tmc1800.o	\
 	$(MESS_VIDEO)/osm200.o	\
-	$(MESS_VIDEO)/cdp1864.o	\
 	$(MESS_DRIVERS)/tmc600.o	\
 	$(MESS_DRIVERS)/tmc2000e.o	\
 	$(MAME_VIDEO)/cdp1869.o	\
