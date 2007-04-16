@@ -1684,53 +1684,23 @@ static UINT_PTR CALLBACK file_dialog_hook(HWND dlgwnd, UINT message, WPARAM wpar
 //	win_file_dialog
 //============================================================
 
-BOOL win_file_dialog(HWND parent, enum file_dialog_type dlgtype, dialog_box *custom_dialog, const char *filter,
+BOOL win_file_dialog(HWND parent, win_file_dialog_type dlgtype, dialog_box *custom_dialog, const char *filter,
 	const char *initial_dir, char *filename, size_t filename_len)
 {
-	OPENFILENAME ofn;
+	win_open_file_name ofn;
 	BOOL result = FALSE;
-	TCHAR buf[MAX_PATH];
-	TCHAR *t_filter = NULL;
-	TCHAR *t_initial_dir = NULL;
-	TCHAR *t_filename = NULL;
-	TCHAR *s;
-	LPCTSTR default_extension;
-	char *u_filename = NULL;
 
 	// set up the OPENFILENAME data structure
 	memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = parent;
-	ofn.Flags = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.type = dlgtype;
+	ofn.owner = parent;
+	ofn.flags = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
+	ofn.filter = filter;
+	ofn.initial_directory = initial_dir;
 
-	if (filter)
+	if (dlgtype == WIN_FILE_DIALOG_OPEN)
 	{
-		// filter specified; first convert to a TCHAR string
-		t_filter = tstring_from_utf8(filter);
-		if (!t_filter)
-			goto done;
-		ofn.lpstrFilter = t_filter;
-
-		// convert '|' characters to '\0'
-		s = t_filter;
-		while((s = _tcschr(s, '|')) != NULL)
-			*(s++) = '\0';
-
-		// specify lpstrDefExt, if we can
-		default_extension = t_filter + _tcslen(t_filter) + 1;
-		if ((default_extension[0] == '*') && (default_extension[1] == '.'))
-			ofn.lpstrDefExt = &default_extension[2];
-	}
-	if (initial_dir)
-	{
-		t_initial_dir = tstring_from_utf8(initial_dir);
-		if (!t_initial_dir)
-			goto done;
-		ofn.lpstrInitialDir = t_initial_dir;
-	}
-	if (dlgtype == FILE_DIALOG_OPEN)
-	{
-		ofn.Flags |= OFN_FILEMUSTEXIST;
+		ofn.flags |= OFN_FILEMUSTEXIST;
 	}
 
 	if (custom_dialog)
@@ -1738,55 +1708,19 @@ BOOL win_file_dialog(HWND parent, enum file_dialog_type dlgtype, dialog_box *cus
 		custom_dialog->style = WS_CHILD | WS_CLIPSIBLINGS | DS_3DLOOK | DS_CONTROL | DS_SETFONT;
 		dialog_prime(custom_dialog);
 
-		ofn.Flags |= OFN_ENABLETEMPLATEHANDLE | OFN_ENABLEHOOK;
-		ofn.hInstance = custom_dialog->handle;
-		ofn.lCustData = (LPARAM) custom_dialog;
-		ofn.lpfnHook = file_dialog_hook;
+		ofn.flags |= OFN_ENABLETEMPLATEHANDLE | OFN_ENABLEHOOK;
+		ofn.instance = custom_dialog->handle;
+		ofn.custom_data = (LPARAM) custom_dialog;
+		ofn.hook = file_dialog_hook;
 	}
 
-	t_filename = tstring_from_utf8(filename);
-	if (!t_filename)
-		goto done;
-	_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%s"), t_filename);
-
-	ofn.lpstrFile = buf;
-	ofn.nMaxFile = sizeof(buf) / sizeof(buf[0]);
+	snprintf(ofn.filename, ARRAY_LENGTH(ofn.filename), "%s", filename);
 
 	before_display_dialog();
-
-	switch(dlgtype)
-	{
-		case FILE_DIALOG_OPEN:
-			result = GetOpenFileName(&ofn);
-			break;
-
-		case FILE_DIALOG_SAVE:
-			result = GetSaveFileName(&ofn);
-			break;
-
-		default:
-			assert(FALSE);
-			result = FALSE;
-			break;
-	}
-
+	result = win_get_file_name_dialog(&ofn);
 	after_display_dialog();
 
-	// copy the result into filename
-	u_filename = utf8_from_tstring(ofn.lpstrFile);
-	if (!u_filename)
-		goto done;
-	snprintf(filename, filename_len, "%s", u_filename);
-
-done:
-	if (t_filter)
-		free(t_filter);
-	if (t_initial_dir)
-		free(t_initial_dir);
-	if (t_filename)
-		free(t_filename);
-	if (u_filename)
-		free(u_filename);
+	snprintf(filename, filename_len, "%s", ofn.filename);
 	return result;
 }
 

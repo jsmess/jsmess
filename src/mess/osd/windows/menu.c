@@ -453,19 +453,15 @@ done:
 //	state_dialog
 //============================================================
 
-static void state_dialog(HWND wnd, BOOL (WINAPI *fileproc)(LPOPENFILENAME),
+static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 	DWORD fileproc_flags, void (*mameproc)(running_machine *machine, const char *),
 	running_machine *machine)
 {
-	TCHAR t_filename[MAX_PATH];
-	OPENFILENAME ofn;
+	win_open_file_name ofn;
 	char *dir;
 	int result = 0;
 	char *src;
 	char *dst;
-	TCHAR *t_tempstr;
-	char *tempstr;
-	TCHAR *initial_dir;
 
 	if (state_filename[0])
 	{
@@ -487,46 +483,36 @@ static void state_dialog(HWND wnd, BOOL (WINAPI *fileproc)(LPOPENFILENAME),
 		while(*(src++));
 	}
 
-	initial_dir = dir ? tstring_from_utf8(dir) : NULL;
-
 	memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = wnd;
-	ofn.Flags = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | fileproc_flags;
-	ofn.lpstrFilter = TEXT("State Files (*.sta)\0*.sta\0All Files (*.*);*.*\0");
-	ofn.lpstrInitialDir = initial_dir;
-	ofn.lpstrFile = t_filename;
-	ofn.nMaxFile = sizeof(t_filename) / sizeof(t_filename[0]);
+	ofn.type = dlgtype;
+	ofn.owner = wnd;
+	ofn.flags = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | fileproc_flags;
+	ofn.filter = "State Files (*.sta)|*.sta|All Files (*.*)|*.*";
+	ofn.initial_directory = dir;
 
-	t_tempstr = tstring_from_utf8(state_filename);
-	_sntprintf(t_filename, sizeof(t_filename) / sizeof(t_filename[0]), TEXT("%s"), t_tempstr);
-	free(t_tempstr);
+	snprintf(ofn.filename, ARRAY_LENGTH(ofn.filename), "%s", state_filename);
 
-	result = fileproc(&ofn);
+	result = win_get_file_name_dialog(&ofn);
 	if (result)
 	{
-		tempstr = utf8_from_tstring(t_filename);
-		snprintf(state_filename, sizeof(state_filename) / sizeof(state_filename[0]), "%s", tempstr);
-		free(tempstr);
+		snprintf(state_filename, ARRAY_LENGTH(state_filename), "%s", ofn.filename);
 
 		mameproc(machine, state_filename);
 	}
 	if (dir)
 		free(dir);
-	if (initial_dir)
-		free(initial_dir);
 }
 
 
 
 void state_load(HWND wnd, running_machine *machine)
 {
-	state_dialog(wnd, GetOpenFileName, OFN_FILEMUSTEXIST, mame_schedule_load, machine);
+	state_dialog(wnd, WIN_FILE_DIALOG_OPEN, OFN_FILEMUSTEXIST, mame_schedule_load, machine);
 }
 
 void state_save_as(HWND wnd, running_machine *machine)
 {
-	state_dialog(wnd, GetSaveFileName, OFN_OVERWRITEPROMPT, mame_schedule_save, machine);
+	state_dialog(wnd, WIN_FILE_DIALOG_SAVE, OFN_OVERWRITEPROMPT, mame_schedule_save, machine);
 }
 
 void state_save(running_machine *machine)
@@ -872,7 +858,7 @@ static void change_device(HWND wnd, mess_image *img, int is_save)
 	}
 
 	// display the dialog
-	result = win_file_dialog(wnd, is_save ? FILE_DIALOG_SAVE : FILE_DIALOG_OPEN,
+	result = win_file_dialog(wnd, is_save ? WIN_FILE_DIALOG_SAVE : WIN_FILE_DIALOG_OPEN,
 		dialog, filter, initial_dir, filename, sizeof(filename) / sizeof(filename[0]));
 	if (result)
 	{

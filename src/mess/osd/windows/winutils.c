@@ -90,7 +90,7 @@ BOOL win_get_file_name_dialog(win_open_file_name *ofn)
 	if (ofn->initial_directory != NULL)
 	{
 		t_initial_directory = tstring_from_utf8(ofn->initial_directory);
-		if (t_initial_directory != NULL)
+		if (t_initial_directory == NULL)
 			goto done;
 	}
 
