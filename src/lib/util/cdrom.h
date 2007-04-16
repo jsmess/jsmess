@@ -34,13 +34,15 @@
 enum
 {
 	CD_TRACK_MODE1 = 0, 		/* mode 1 2048 bytes/sector */
-	CD_TRACK_MODE1_RAW,			/* mode 1 2352 bytes/sector */
-	CD_TRACK_MODE2,				/* mode 2 2336 bytes/sector */
+	CD_TRACK_MODE1_RAW,	    	/* mode 1 2352 bytes/sector */
+	CD_TRACK_MODE2,		    	/* mode 2 2336 bytes/sector */
 	CD_TRACK_MODE2_FORM1,		/* mode 2 2048 bytes/sector */
 	CD_TRACK_MODE2_FORM2,		/* mode 2 2324 bytes/sector */
 	CD_TRACK_MODE2_FORM_MIX,	/* mode 2 2336 bytes/sector */
-	CD_TRACK_MODE2_RAW,			/* mode 2 2352 bytes / sector */
-	CD_TRACK_AUDIO				/* redbook audio track 2352 bytes/sector (588 samples) */
+	CD_TRACK_MODE2_RAW,	    	/* mode 2 2352 bytes / sector */
+	CD_TRACK_AUDIO,			/* redbook audio track 2352 bytes/sector (588 samples) */
+
+	CD_TRACK_RAW_DONTCARE		/* special flag for cdrom_read_data: just return me whatever is there */
 };
 
 enum

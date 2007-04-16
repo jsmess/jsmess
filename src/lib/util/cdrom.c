@@ -204,7 +204,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 
 	/* copy out the requested sector */
 	tracktype = file->cdtoc.tracks[tracknum].trktype;
-	if (datatype == tracktype)
+	if ((datatype == tracktype) || (datatype == CD_TRACK_RAW_DONTCARE))
 	{
 		memcpy(buffer, &file->cache[sectoroffs * CD_FRAME_SIZE], file->cdtoc.tracks[tracknum].datasize);
 	}

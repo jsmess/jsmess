@@ -8,8 +8,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
-(none)
-
+[SATURN] Preliminary CDROM, backup, & input support.  Fixed sound.  Still
+marked NOT_WORKING as only a few games do anything. [R. Belmont]
 
 
 User Interface Changes:
