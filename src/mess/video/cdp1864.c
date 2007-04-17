@@ -35,6 +35,7 @@ static void cdp1864_int_tick(int ref)
 		{
 			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
 		}
+
 		mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_END, 0), 0, time_zero);
 	}
 	else
@@ -43,6 +44,7 @@ static void cdp1864_int_tick(int ref)
 		{
 			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
 		}
+
 		mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_START, 0), 0, time_zero);
 	}
 }
@@ -54,22 +56,22 @@ static void cdp1864_efx_tick(int ref)
 	switch (scanline)
 	{
 	case CDP1864_SCANLINE_EFX_TOP_START:
-		cdp1864_efx = 0;
+		cdp1864_efx = ASSERT_LINE;
 		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_END, 0), 0, time_zero);
 		break;
 
 	case CDP1864_SCANLINE_EFX_TOP_END:
-		cdp1864_efx = 1;
+		cdp1864_efx = CLEAR_LINE;
 		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_BOTTOM_START, 0), 0, time_zero);
 		break;
 
 	case CDP1864_SCANLINE_EFX_BOTTOM_START:
-		cdp1864_efx = 0;
+		cdp1864_efx = ASSERT_LINE;
 		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_BOTTOM_END, 0), 0, time_zero);
 		break;
 
 	case CDP1864_SCANLINE_EFX_BOTTOM_END:
-		cdp1864_efx = 1;
+		cdp1864_efx = CLEAR_LINE;
 		mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
 		break;
 	}
@@ -117,7 +119,7 @@ void cdp1864_sc(int state)
 		cdp1864.x = 0;
 		cdp1864.y = 0;
 
-		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_INT_DELAY, 0), 0, double_to_mame_time(TIME_NEVER));
+		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_INT_DELAY, 0), 0, time_zero);
 	}
 }
 
@@ -132,6 +134,9 @@ MACHINE_RESET( cdp1864 )
 	mame_timer_adjust(cdp1864_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
 
 	cdp1864.disp = 0;
+	cdp1864.dmaout = 0;
+
+	cdp1864_efx = CLEAR_LINE;
 }
 
 void cdp1864_set_background_color_sequence(int color[])
