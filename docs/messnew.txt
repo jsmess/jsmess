@@ -11,6 +11,8 @@ System Driver Changes:
 [SATURN] Preliminary CDROM, backup, & input support.  Fixed sound.  Still
 marked NOT_WORKING as only a few games do anything. [R. Belmont]
 
+[STUDIO2] System is now working and playable. [Curt Coder]
+
 
 User Interface Changes:
 -----------------------
