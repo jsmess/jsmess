@@ -11,14 +11,13 @@ static mame_timer *cdp1864_dma_timer;
 typedef struct
 {
 	int disp;
-	int x;
-	int y;
-	int bitmap[CDP1864_VISIBLE_LINES][8];
 	int audio;
 	int bgcolor;
 	int bgcolseq[4];
 	int latch;
 	int dmaout;
+	int dmaptr;
+	UINT8 data[CDP1864_VISIBLE_LINES * 8];
 } CDP1864_CONFIG;
 
 static CDP1864_CONFIG cdp1864;
@@ -95,17 +94,10 @@ static void cdp1864_dma_tick(int ref)
 
 void cdp1864_dma_w(UINT8 data)
 {
-	cdp1864.bitmap[cdp1864.y][cdp1864.x] = data;
+	cdp1864.data[cdp1864.dmaptr] = data;
+	cdp1864.dmaptr++;
 
-	cdp1864.x++;
-
-	if (cdp1864.x == 8)
-	{
-		cdp1864.x = 0;
-		cdp1864.y++;
-	}
-
-	if (cdp1864.y == CDP1864_VISIBLE_LINES)
+	if (cdp1864.dmaptr == CDP1864_VISIBLE_LINES * 8)
 	{
 		mame_timer_adjust(cdp1864_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
 	}
@@ -116,8 +108,7 @@ void cdp1864_sc(int state)
 	if (state == CDP1802_STATE_CODE_S3_INTERRUPT)
 	{
 		cdp1864.dmaout = 0;
-		cdp1864.x = 0;
-		cdp1864.y = 0;
+		cdp1864.dmaptr = 0;
 
 		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_INT_DELAY, 0), 0, time_zero);
 	}
@@ -199,13 +190,13 @@ void cdp1864_reset(void)
 VIDEO_START( cdp1864 )
 {
 	state_save_register_global(cdp1864.disp);
-	state_save_register_global(cdp1864.x);
-	state_save_register_global(cdp1864.y);
 	state_save_register_global(cdp1864.audio);
 	state_save_register_global(cdp1864.bgcolor);
 	state_save_register_global_array(cdp1864.bgcolseq);
 	state_save_register_global(cdp1864.latch);
 	state_save_register_global(cdp1864.dmaout);
+	state_save_register_global(cdp1864.dmaptr);
+	state_save_register_global_array(cdp1864.data);
 	state_save_register_global(cdp1864_efx);
 
 	return 0;
@@ -213,24 +204,24 @@ VIDEO_START( cdp1864 )
 
 VIDEO_UPDATE( cdp1864 )
 {
-	int x, y, bit;
-
 	if (cdp1864.disp)
 	{
+		int i, bit;
+
 		fillbitmap(bitmap, cdp1864.bgcolseq[cdp1864.bgcolor], cliprect);
 
-		for (y = 0; y < CDP1864_VISIBLE_LINES; y++)
+		for (i = 0; i < CDP1864_VISIBLE_LINES * 8; i++)
 		{
-			for (x = 0; x < 8; x++)
-			{
-				UINT8 data = cdp1864.bitmap[y][x];
+			int x = (i % 8) * 8;
+			int y = i / 8;
 
-				for (bit = 0; bit < 8; bit++)
-				{
-					int color = (data & 0x80) >> 7;
-					plot_pixel(bitmap, CDP1864_SCREEN_START + (x * 8) + bit, CDP1864_SCANLINE_SCREEN_START + y, Machine->pens[color]); // TODO: get color from colorram
-					data <<= 1;
-				}
+			UINT8 data = cdp1864.data[i];
+
+			for (bit = 0; bit < 8; bit++)
+			{
+				int color = (data & 0x80) >> 7; // TODO: get from colorram
+				plot_pixel(bitmap, CDP1864_SCREEN_START + x + bit, CDP1864_SCANLINE_SCREEN_START + y, Machine->pens[color]);
+				data <<= 1;
 			}
 		}
 	}

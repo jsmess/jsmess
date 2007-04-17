@@ -11,9 +11,8 @@ typedef struct
 {
 	int disp;
 	int dmaout;
-	int x;
-	int y;
-	int bitmap[CDP1861_VISIBLE_LINES][8];
+	int dmaptr;
+	UINT8 data[CDP1861_VISIBLE_LINES * 8];
 } CDP1861_VIDEO_CONFIG;
 
 static CDP1861_VIDEO_CONFIG cdp1861;
@@ -90,17 +89,10 @@ static void cdp1861_dma_tick(int ref)
 
 void cdp1861_dma_w(UINT8 data)
 {
-	cdp1861.bitmap[cdp1861.y][cdp1861.x] = data;
+	cdp1861.data[cdp1861.dmaptr] = data;
+	cdp1861.dmaptr++;
 
-	cdp1861.x++;
-
-	if (cdp1861.x == 8)
-	{
-		cdp1861.x = 0;
-		cdp1861.y++;
-	}
-
-	if (cdp1861.y == CDP1861_VISIBLE_LINES)
+	if (cdp1861.dmaptr == CDP1861_VISIBLE_LINES * 8)
 	{
 		mame_timer_adjust(cdp1861_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
 	}
@@ -111,8 +103,7 @@ void cdp1861_sc(int state)
 	if (state == CDP1802_STATE_CODE_S3_INTERRUPT)
 	{
 		cdp1861.dmaout = 0;
-		cdp1861.x = 0;
-		cdp1861.y = 0;
+		cdp1861.dmaptr = 0;
 
 		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_INT_DELAY, 0), 0, time_zero);
 	}
@@ -150,34 +141,32 @@ VIDEO_START( cdp1861 )
 {
 	state_save_register_global(cdp1861.disp);
 	state_save_register_global(cdp1861.dmaout);
-	state_save_register_global(cdp1861.x);
-	state_save_register_global(cdp1861.y);
-	state_save_register_global(cdp1861_efx);
-//	state_save_register_global_array(cdp1861.bitmap);
+	state_save_register_global(cdp1861.dmaptr);
+	state_save_register_global_array(cdp1861.data);
 
 	return 0;
 }
 
 VIDEO_UPDATE( cdp1861 )
 {
-	int x, y, bit;
-
 	fillbitmap(bitmap, get_black_pen(Machine), cliprect);
 
 	if (cdp1861.disp)
 	{
-		for (y = 0; y < CDP1861_VISIBLE_LINES; y++)
-		{
-			for (x = 0; x < 8; x++)
-			{
-				UINT8 data = cdp1861.bitmap[y][x];
+		int i, bit;
 
-				for (bit = 0; bit < 8; bit++)
-				{
-					int color = (data & 0x80) >> 7;
-					plot_pixel(bitmap, CDP1861_HBLANK_END + (x * 8) + bit, CDP1861_SCANLINE_VBLANK_END + y, Machine->pens[color]);
-					data <<= 1;
-				}
+		for (i = 0; i < CDP1861_VISIBLE_LINES * 8; i++)
+		{
+			int x = (i % 8) * 8;
+			int y = i / 8;
+
+			UINT8 data = cdp1861.data[i];
+
+			for (bit = 0; bit < 8; bit++)
+			{
+				int color = (data & 0x80) >> 7;
+				plot_pixel(bitmap, CDP1861_HBLANK_END + x + bit, CDP1861_SCANLINE_VBLANK_END + y, Machine->pens[color]);
+				data <<= 1;
 			}
 		}
 	}
