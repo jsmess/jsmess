@@ -40,11 +40,9 @@ Notes:
 
 	TODO:
 
-	- cdp1861/cdp1864 video
+	- cdp1864 video colors
 	- discrete sound
-	- ram mirroring (mapped when A9=0 and ROM not present)
-	- load st2 carts using header information
-	- redump studio2 bios as 2 roms
+	- redump studio2 bios as 2 separate roms
 
 */
 
@@ -60,6 +58,7 @@ Notes:
 
 static UINT8 keylatch;
 extern int cdp1861_efx;
+extern int cdp1864_efx;
 
 /* Read/Write Handlers */
 
@@ -72,13 +71,25 @@ static WRITE8_HANDLER( keylatch_w )
 
 static ADDRESS_MAP_START( studio2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_RAM // AM_MIRROR(A9=0)
-	AM_RANGE(0x0a00, 0xffff) AM_RAM
+	AM_RANGE(0x0800, 0x09ff) AM_RAM AM_MIRROR(0x400)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( studio2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ(cdp1861_dispon_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mpt02_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0800, 0x09ff) AM_RAM
+	AM_RANGE(0x0a00, 0x0dff) AM_ROM
+	AM_RANGE(0x0e00, 0x0eff) AM_RAM AM_BASE(&colorram)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mpt02_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1864_dispon_r, cdp1864_step_bgcolor_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(cdp1864_dispoff_r, cdp1864_tone_latch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -145,12 +156,24 @@ static CDP1802_CONFIG studio2_config =
 	cdp1861_sc
 };
 
+static UINT8 mpt02_ef(void)
+{
+	int ef = 0x0f;
+
+	if (cdp1864_efx) ef -= EF1;
+
+	if (readinputport(0) & (1 << keylatch)) ef -= EF3;
+	if (readinputport(1) & (1 << keylatch)) ef -= EF4;
+
+	return ef;
+}
+
 static CDP1802_CONFIG mpt02_config = 
 {
 	NULL,
 	cdp1864_dma_w,
 	studio2_q,
-	studio2_ef,
+	mpt02_ef,
 	cdp1864_sc
 };
 
@@ -217,9 +240,8 @@ static MACHINE_DRIVER_START( mpt02 )
 	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(cdp1861)
-	MDRV_VIDEO_UPDATE(cdp1861)
+	MDRV_VIDEO_START(cdp1864)
+	MDRV_VIDEO_UPDATE(cdp1864)
 
 	// sound hardware
 
@@ -239,7 +261,7 @@ ROM_START( m9016tc )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "86676.ic13",  0x0000, 0x0400, NO_DUMP )
 	ROM_LOAD( "86677b.ic14", 0x0400, 0x0400, NO_DUMP )
-	ROM_LOAD( "87201.ic12",  0x0800, 0x0400, NO_DUMP )
+	ROM_LOAD( "87201.ic12",  0x0a00, 0x0400, NO_DUMP )
 ROM_END
 
 /* System Configuration */
@@ -310,6 +332,32 @@ static DRIVER_INIT( studio2 )
 	timer_set(0.0, 0, setup_beep);
 }
 
+static int mpt02_colorram_r(UINT16 addr)
+{
+	return colorram[addr / 4]; // 0x04 = R, 0x02 = B, 0x01 = G
+}
+
+static const CDP1864_interface mpt02_CDP1864_interface =
+{
+	RES_K(2.2),	// unverified
+	RES_K(1),	// unverified
+	RES_K(5.1),	// unverified
+	RES_K(4.7),	// unverified
+	mpt02_colorram_r
+};
+
+static void mpt02_setup_beep(int dummy)
+{
+	beep_set_state( 0, 0 );
+	beep_set_frequency( 0, 0 );
+}
+
+static DRIVER_INIT( mpt02 )
+{
+	timer_set(0.0, 0, mpt02_setup_beep);
+	cdp1864_configure(&mpt02_CDP1864_interface);
+}
+
 /* Game Drivers */
 
 /*
@@ -325,4 +373,4 @@ static DRIVER_INIT( studio2 )
 
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY   FULLNAME */
 CONS( 1977,	studio2,	0,		0,		studio2,	studio2,	studio2,	studio2,	"RCA",		"Studio II", GAME_SUPPORTS_SAVE )
-CONS( 1978,	m9016tc,	studio2,0,		mpt02,		studio2,	0,			studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_SUPPORTS_SAVE )
+CONS( 1978,	m9016tc,	studio2,0,		mpt02,		studio2,	mpt02,		studio2,	"Mustang",	"9016 Telespiel Computer (Germany)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

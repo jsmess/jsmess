@@ -65,6 +65,15 @@
 #define CDP1864_CYCLES_DMAOUT_LOW	8*8
 #define CDP1864_CYCLES_DMAOUT_HIGH	6*8
 
+typedef struct CDP1864_interface
+{
+	double res_r; // red
+	double res_g; // green
+	double res_b; // blue
+	double res_bkg; // background
+	int (*colorram_r)(UINT16 addr);
+} CDP1864_interface;
+
 MACHINE_RESET( cdp1864 );
 VIDEO_START( cdp1864 );
 VIDEO_UPDATE( cdp1864 );
@@ -76,8 +85,9 @@ void cdp1864_dma_w(UINT8 data);
 void cdp1864_sc(int state);
 
 void cdp1864_audio_output_enable(int value);
-void cdp1864_set_background_color_sequence(int color[]);
 void cdp1864_reset(void);
+
+void cdp1864_configure(const CDP1864_interface *intf);
 
 READ8_HANDLER( cdp1864_dispon_r );
 READ8_HANDLER( cdp1864_dispoff_r );

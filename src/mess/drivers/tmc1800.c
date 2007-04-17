@@ -92,27 +92,10 @@
 #include "video/cdp1864.h"
 #include "devices/cassette.h"
 #include "sound/beep.h"
+#include "rescap.h"
 
 extern VIDEO_START( osm200 );
 extern VIDEO_UPDATE( osm200 );
-
-/* Palette */
-
-PALETTE_INIT( tmc2000 )
-{
-	int background_color_sequence[] = { 5, 7, 6, 3 };
-
-	palette_set_color(machine, 0, 0x4c, 0x96, 0x1c ); // white
-	palette_set_color(machine, 1, 0x4c, 0x00, 0x1c ); // purple
-	palette_set_color(machine, 2, 0x00, 0x96, 0x1c ); // cyan
-	palette_set_color(machine, 3, 0x00, 0x00, 0x1c ); // blue
-	palette_set_color(machine, 4, 0x4c, 0x96, 0x00 ); // yellow
-	palette_set_color(machine, 5, 0x4c, 0x00, 0x00 ); // red
-	palette_set_color(machine, 6, 0x00, 0x96, 0x00 ); // green
-	palette_set_color(machine, 7, 0x00, 0x00, 0x00 ); // black
-
-	cdp1864_set_background_color_sequence(background_color_sequence);
-}
 
 /* Read/Write Handlers */
 
@@ -330,7 +313,6 @@ static MACHINE_DRIVER_START( tmc2000 )
 	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(tmc2000)
 	MDRV_VIDEO_START(cdp1864)
 	MDRV_VIDEO_UPDATE(cdp1864)
 
@@ -402,19 +384,43 @@ SYSTEM_CONFIG_START( tmc2000 )
 	CONFIG_DEVICE(tmc2000_cassette_getinfo)
 SYSTEM_CONFIG_END
 
-static void setup_beep(int dummy)
+/* Driver Initialization */
+
+static int tmc2000_colorram_r(UINT16 addr)
 {
-	beep_set_volume(0, 0);
-	beep_set_state(0, 1);
+	UINT8 data = colorram[addr]; // 0x04 = ~B, 0x02 = ~R, 0x01 = ~G
+
+	return ~(((data & 0x04) >> 1) + ((data & 0x02) << 1) + (data & 0x01)) & 0x07;
 }
 
-static DRIVER_INIT( telmac )
+static const CDP1864_interface tmc2000_CDP1864_interface =
+{
+	RES_K(2.2),	// unverified
+	RES_K(1),	// unverified
+	RES_K(5.1),	// unverified
+	RES_K(4.7),	// unverified
+	tmc2000_colorram_r
+};
+
+static void setup_beep(int dummy)
+{
+	beep_set_state(0, 0);
+	beep_set_frequency( 0, 0 );
+}
+
+static DRIVER_INIT( tmc1800 )
 {
 	timer_set(0.0, 0, setup_beep);
 }
 
+static DRIVER_INIT( tmc2000 )
+{
+	timer_set(0.0, 0, setup_beep);
+	cdp1864_configure(&tmc2000_CDP1864_interface);
+}
+
 /* System Drivers */
 
-//	   YEAR  NAME 	  PARENT   BIOS		COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY			FULLNAME
-COMP(  1977, tmc1800, 0,				0,		tmc1800,	tmc1800,	telmac,	tmc1800,	"Telercas Oy",	"Telmac 1800", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMPB( 1980, tmc2000, 0,       tmc2000, 0,		tmc2000,	tmc1800,	telmac,	tmc2000,	"Telercas Oy",	"Telmac 2000", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//	   YEAR  NAME 	  PARENT   BIOS		COMPAT	MACHINE		INPUT		INIT		CONFIG		COMPANY			FULLNAME
+COMP(  1977, tmc1800, 0,				0,		tmc1800,	tmc1800,	tmc1800,	tmc1800,	"Telercas Oy",	"Telmac 1800", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMPB( 1980, tmc2000, 0,       tmc2000, 0,		tmc2000,	tmc1800,	tmc2000,	tmc2000,	"Telercas Oy",	"Telmac 2000", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

@@ -13,14 +13,16 @@ typedef struct
 	int disp;
 	int audio;
 	int bgcolor;
-	int bgcolseq[4];
 	int latch;
 	int dmaout;
 	int dmaptr;
 	UINT8 data[CDP1864_VISIBLE_LINES * 8];
+	int (*colorram_r)(UINT16 addr);
 } CDP1864_CONFIG;
 
 static CDP1864_CONFIG cdp1864;
+
+static int cdp1864_bgcolseq[] = { 2, 0, 1, 4 };
 
 int cdp1864_efx;
 
@@ -126,15 +128,11 @@ MACHINE_RESET( cdp1864 )
 
 	cdp1864.disp = 0;
 	cdp1864.dmaout = 0;
+	cdp1864.bgcolor = 0;
 
 	cdp1864_efx = CLEAR_LINE;
-}
 
-void cdp1864_set_background_color_sequence(int color[])
-{
-	int i;
-	for (i = 0; i < 4; i++)
-		cdp1864.bgcolseq[i] = color[i];
+	cdp1864_audio_output_enable(0);
 }
 
 WRITE8_HANDLER( cdp1864_step_bgcolor_w )
@@ -175,24 +173,11 @@ READ8_HANDLER( cdp1864_dispoff_r )
 	return 0xff;
 }
 
-void cdp1864_reset(void)
-{
-	int i;
-
-	cdp1864.bgcolor = 0;
-
-	for (i = 0; i < 4; i++)
-		cdp1864.bgcolseq[i] = i;
-
-	cdp1864_audio_output_enable(0);
-}
-
 VIDEO_START( cdp1864 )
 {
 	state_save_register_global(cdp1864.disp);
 	state_save_register_global(cdp1864.audio);
 	state_save_register_global(cdp1864.bgcolor);
-	state_save_register_global_array(cdp1864.bgcolseq);
 	state_save_register_global(cdp1864.latch);
 	state_save_register_global(cdp1864.dmaout);
 	state_save_register_global(cdp1864.dmaptr);
@@ -208,7 +193,7 @@ VIDEO_UPDATE( cdp1864 )
 	{
 		int i, bit;
 
-		fillbitmap(bitmap, cdp1864.bgcolseq[cdp1864.bgcolor], cliprect);
+		fillbitmap(bitmap, cdp1864_bgcolseq[cdp1864.bgcolor], cliprect);
 
 		for (i = 0; i < CDP1864_VISIBLE_LINES * 8; i++)
 		{
@@ -219,8 +204,12 @@ VIDEO_UPDATE( cdp1864 )
 
 			for (bit = 0; bit < 8; bit++)
 			{
-				int color = (data & 0x80) >> 7; // TODO: get from colorram
-				plot_pixel(bitmap, CDP1864_SCREEN_START + x + bit, CDP1864_SCANLINE_SCREEN_START + y, Machine->pens[color]);
+				if (data & 0x80)
+				{
+					int color = cdp1864.colorram_r(i);
+					plot_pixel(bitmap, CDP1864_SCREEN_START + x + bit, CDP1864_SCANLINE_SCREEN_START + y, Machine->pens[color]);
+				}
+				
 				data <<= 1;
 			}
 		}
@@ -231,4 +220,36 @@ VIDEO_UPDATE( cdp1864 )
 	}
 
 	return 0;
+}
+
+static void cdp1864_init_palette(double res_r, double res_g, double res_b, double res_bkg)
+{
+	int i, r, g, b, luma;
+
+	double res_total = res_r + res_g + res_b;
+
+	int weight_r = (res_r / res_total) * 100;
+	int weight_g = (res_g / res_total) * 100;
+	int weight_b = (res_b / res_total) * 100;
+
+	for (i = 0; i < 8; i++)
+	{
+		luma = (i & 4) ? weight_r : 0;
+		luma += (i & 1) ? weight_g : 0;
+		luma += (i & 2) ? weight_b : 0;
+
+		r = (i & 4) ? luma : 0;
+		g = (i & 1) ? luma : 0;
+		b = (i & 2) ? luma : 0;
+
+		luma = (luma * 0xff) / 100;
+
+		palette_set_color( Machine, i, r, g, b );
+	}
+}
+
+void cdp1864_configure(const CDP1864_interface *intf)
+{
+	cdp1864.colorram_r = intf->colorram_r;
+	cdp1864_init_palette(intf->res_r, intf->res_g, intf->res_b, intf->res_bkg);
 }

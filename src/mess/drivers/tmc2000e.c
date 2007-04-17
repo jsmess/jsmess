@@ -7,24 +7,7 @@
 #include "video/generic.h"
 #include "video/cdp1864.h"
 #include "sound/beep.h"
-
-/* Palette */
-
-PALETTE_INIT( tmc2000e )
-{
-	int background_color_sequence[] = { 2, 0, 1, 4 };
-
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00 ); // black		  0 % of max luminance
-	palette_set_color(machine, 1, 0x00, 0x97, 0x00 ); // green		 59
-	palette_set_color(machine, 2, 0x00, 0x00, 0x1c ); // blue		 11
-	palette_set_color(machine, 3, 0x00, 0xb3, 0xb3 ); // cyan		 70
-	palette_set_color(machine, 4, 0x4c, 0x00, 0x00 ); // red		 30
-	palette_set_color(machine, 5, 0xe3, 0xe3, 0x00 ); // yellow		 89
-	palette_set_color(machine, 6, 0x68, 0x00, 0x68 ); // magenta	 41
-	palette_set_color(machine, 7, 0xff, 0xff, 0xff ); // white		100
-	
-	cdp1864_set_background_color_sequence(background_color_sequence);
-}
+#include "rescap.h"
 
 /* Read/Write Handlers */
 
@@ -187,7 +170,6 @@ static MACHINE_DRIVER_START( tmc2000e )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_RAW_PARAMS(CDP1864_CLK_FREQ, CDP1864_SCREEN_WIDTH, CDP1864_HBLANK_END, CDP1864_HBLANK_START, CDP1864_TOTAL_SCANLINES, CDP1864_SCANLINE_VBLANK_END, CDP1864_SCANLINE_VBLANK_START)
 
-	MDRV_PALETTE_INIT(tmc2000e)
 	MDRV_VIDEO_START(cdp1864)
 	MDRV_VIDEO_UPDATE(cdp1864)
 
@@ -262,16 +244,31 @@ SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
+static int tmc2000e_colorram_r(UINT16 addr)
+{
+	return colorram[addr]; // 0x04 = R, 0x02 = B, 0x01 = G
+}
+
+static const CDP1864_interface tmc2000e_CDP1864_interface =
+{
+	RES_K(2.2),	// unverified
+	RES_K(1),	// unverified
+	RES_K(5.1),	// unverified
+	RES_K(4.7),	// unverified
+	tmc2000e_colorram_r
+};
+
 static void setup_beep(int dummy)
 {
-	beep_set_volume(0, 0);
-	beep_set_state(0, 1);
+	beep_set_state(0, 0);
+	beep_set_frequency( 0, 0 );
 }
 
-static DRIVER_INIT( telmac )
+static DRIVER_INIT( tmc2000e )
 {
 	timer_set(0.0, 0, setup_beep);
+	cdp1864_configure(&tmc2000e_CDP1864_interface);
 }
 
-//    YEAR  NAME 	  PARENT   COMPAT   MACHINE   INPUT     INIT	CONFIG    COMPANY 	     FULLNAME
-COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, telmac, tmc2000e, "Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+//    YEAR  NAME 	  PARENT   COMPAT   MACHINE   INPUT     INIT		CONFIG    COMPANY 	     FULLNAME
+COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, tmc2000e,	tmc2000e, "Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
