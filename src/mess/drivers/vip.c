@@ -99,6 +99,8 @@ static CDP1802_CONFIG vip_config =
 
 static MACHINE_START( vip )
 {
+	state_save_register_global(keylatch);
+
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1), 0x8000);
 
 	return 0;
@@ -121,6 +123,7 @@ static MACHINE_DRIVER_START( vip )
 	MDRV_CPU_PROGRAM_MAP(vip_map, 0)
 	MDRV_CPU_IO_MAP(vip_io_map, 0)
 	MDRV_CPU_CONFIG(vip_config)
+
 	MDRV_MACHINE_START(vip)
 	MDRV_MACHINE_RESET(vip)
 
@@ -189,4 +192,4 @@ static DRIVER_INIT( vip )
 /* System Drivers */
 
 //    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY   FULLNAME
-COMP( 1977,	vip,		0,		0,		vip,		vip,		vip,		vip,	"RCA",		"COSMAC VIP", GAME_NOT_WORKING )
+COMP( 1977,	vip,		0,		0,		vip,		vip,		vip,		vip,	"RCA",		"COSMAC VIP", GAME_SUPPORTS_SAVE )

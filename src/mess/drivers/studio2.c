@@ -179,6 +179,13 @@ static CDP1802_CONFIG mpt02_config =
 
 /* Machine Initialization */
 
+static MACHINE_START( studio2 )
+{
+	state_save_register_global(keylatch);
+
+	return 0;
+}
+
 static MACHINE_RESET( studio2 )
 {
 	machine_reset_cdp1861(machine);
@@ -203,6 +210,8 @@ static MACHINE_DRIVER_START( studio2 )
 	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
 	MDRV_CPU_IO_MAP(studio2_io_map, 0)
 	MDRV_CPU_CONFIG(studio2_config)
+
+	MDRV_MACHINE_START(studio2)
 	MDRV_MACHINE_RESET(studio2)
 
     // video hardware
