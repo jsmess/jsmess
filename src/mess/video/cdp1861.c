@@ -165,7 +165,7 @@ VIDEO_UPDATE( cdp1861 )
 			for (bit = 0; bit < 8; bit++)
 			{
 				int color = (data & 0x80) >> 7;
-				plot_pixel(bitmap, CDP1861_HBLANK_END + x + bit, CDP1861_SCANLINE_VBLANK_END + y, Machine->pens[color]);
+				plot_pixel(bitmap, CDP1861_SCREEN_START + x + bit, CDP1861_SCANLINE_DISPLAY_START + y, Machine->pens[color]);
 				data <<= 1;
 			}
 		}
