@@ -28,10 +28,10 @@
 #define CDP1861_VISIBLE_LINES	128
 
 #define CDP1861_HBLANK_START	14 * 8
-#define CDP1861_HBLANK_END		 2 * 8 // approx
-#define CDP1861_HSYNC_START		 0 * 8
-#define CDP1861_HSYNC_END		 2 * 8 // approx
-#define CDP1861_SCREEN_START	 4 * 8 // approx
+#define CDP1861_HBLANK_END		12
+#define CDP1861_HSYNC_START		0
+#define CDP1861_HSYNC_END		12
+#define CDP1861_SCREEN_START	30 // DMA byte is received at x=26, cdp1861 drawing delay 4 pixels
 #define CDP1861_SCREEN_WIDTH	14 * 8
 
 #define CDP1861_TOTAL_SCANLINES				262
