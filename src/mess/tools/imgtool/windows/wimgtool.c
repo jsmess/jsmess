@@ -750,10 +750,7 @@ static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, memory_po
 	if (!creating_file)
 	{
 		current_index++;
-		pile_puts(&pile, "Autodetect (*.*)");
-		pile_putc(&pile, '\0');
-		pile_puts(&pile, "*.*");
-		pile_putc(&pile, '\0');
+		pile_puts(&pile, "Autodetect (*.*)|*.*|");
 	}
 
 	// write out library modules
@@ -780,8 +777,7 @@ static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, memory_po
 				if (module->extensions[i] != ',')
 					pile_putc(&pile, module->extensions[i]);
 			}
-			pile_putc(&pile, ')');
-			pile_putc(&pile, '\0');
+			pile_puts(&pile, ")|");
 
 			for (i = 0; module->extensions[i]; i++)
 			{
@@ -793,10 +789,9 @@ static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, memory_po
 					pile_putc(&pile, module->extensions[i]);
 			}
 
-			pile_putc(&pile, '\0');
+			pile_putc(&pile, '|');
 		}
 	}
-	pile_putc(&pile, '\0');
 	pile_putc(&pile, '\0');
 
 	filter = pool_malloc(pool, pile_size(&pile));
