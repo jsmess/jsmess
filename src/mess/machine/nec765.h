@@ -17,7 +17,8 @@ typedef enum
 {
 	NEC765A = 0,
 	NEC765B = 1,
-	SMC37C78 = 2
+	SMC37C78 = 2,
+	NEC72065 = 3
 } NEC765_VERSION;
 
 #define NEC765_DAM_DELETED_DATA 0x0f8

@@ -431,8 +431,6 @@ static void nec765_seek_setup(int is_recalibrate)
 	mess_image *img;
 	int signed_tracks;
 
-	img = current_image();
-
 	fdc.nec765_flags |= NEC765_SEEK_ACTIVE;
 
 	if (is_recalibrate)
@@ -442,6 +440,8 @@ static void nec765_seek_setup(int is_recalibrate)
 	}
 
 	nec765_setup_drive_and_side();
+
+	img = current_image();
 
 	fdc.FDC_main |= (1<<fdc.drive);
 
@@ -1932,13 +1932,20 @@ static void nec765_setup_command(void)
 			}
 			else
 			{
-				/* no int */
-				fdc.nec765_result_bytes[0] = 0x80;
-				/* return pcn */
-				fdc.nec765_result_bytes[1] = fdc.pcn[fdc.drive];
+				if(fdc.version == NEC72065 && (fdc.FDC_main & 0x0f) == 0x00)
+				{  // based on XM6
+					nec765_setup_invalid();
+				}
+				else
+				{
+					/* no int */
+					fdc.nec765_result_bytes[0] = 0x80;
+					/* return pcn */
+					fdc.nec765_result_bytes[1] = fdc.pcn[fdc.drive];
 
-				/* return result */
-				nec765_setup_result_phase(2);
+					/* return result */
+					nec765_setup_result_phase(2);
+				}
 			}
 			break;
 
@@ -2025,6 +2032,7 @@ static void nec765_setup_command(void)
 			switch (fdc.version)
 			{
 				case NEC765A:
+				case NEC72065:
 					nec765_setup_invalid();
 					break;
 

@@ -466,6 +466,8 @@ TESTDRIVER( trs80pc3 )	/* Tandy TRS80 PC-3									*/
 	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan							*/
 TESTDRIVER( mz800  )	/* 1982 Sharp MZ800 								*/
 
+	DRIVER( x68000 )    /* Sharp X68000 (1987)   */
+
 	/* SILICON GRAPHICS */
 	DRIVER( ip204415 )	/* IP20 Indigo2 */
 	DRIVER( ip225015 )

@@ -3,6 +3,7 @@
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
 - Telmac 2000 (not working) [Curt Coder]
+- X68000 [Barry Rodewald]
 
 
 

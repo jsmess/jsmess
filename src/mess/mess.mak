@@ -931,6 +931,9 @@ $(MESSOBJ)/sharp.a:    \
 	$(MESS_MACHINE)/pc1251.o	\
 	$(MESS_VIDEO)/pocketc.o	\
 	$(MESS_MACHINE)/mz700.o		\
+	$(MESS_DRIVERS)/x68k.o	\
+	$(MESS_VIDEO)/x68k.o	\
+	$(MESS_MACHINE)/hd63450.o   \
 
 $(MESSOBJ)/hp48.a:     \
 	$(MESS_MACHINE)/hp48.o     \
