@@ -88,25 +88,26 @@ INPUT_PORTS_START( tmc2000e )
 	PORT_DIPSETTING(    0x20, "VISMAC" )
 	PORT_DIPSETTING(    0x30, "UART" )
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("RUN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static void tmc2000e_q(int level)
+static UINT8 tmc2000e_mode_r(void)
 {
-	// CDP1864 sound generator on/off
-	cdp1864_audio_output_enable(level);
-
-	// set Q led status
-	// leds: Wait, Q, Power
-	set_led_status(1, level);
-
-	// tape output
-
-	// floppy control (FDC-6)
+	if (readinputportbytag("RUN") & 0x01)
+	{
+		return CDP1802_MODE_RUN;
+	}
+	else
+	{
+		return CDP1802_MODE_RESET;
+	}
 }
 
-static UINT8 tmc2000e_ef(void)
+static UINT8 tmc2000e_ef_r(void)
 {
 	UINT8 flags = 0x0f;
 
@@ -123,13 +124,28 @@ static UINT8 tmc2000e_ef(void)
 	return flags;
 }
 
+static void tmc2000e_q_w(int level)
+{
+	// CDP1864 sound generator on/off
+	cdp1864_audio_output_enable(level);
+
+	// set Q led status
+	// leds: Wait, Q, Power
+	set_led_status(1, level);
+
+	// tape output
+
+	// floppy control (FDC-6)
+}
+
 static CDP1802_CONFIG tmc2000e_config =
 {
+	tmc2000e_mode_r,
+	tmc2000e_ef_r,
 	NULL,
-	cdp1864_dma_w,
-	tmc2000e_q,
-	tmc2000e_ef,
-	cdp1864_sc
+	tmc2000e_q_w,
+	NULL,
+	cdp1864_dma_w
 };
 
 /* Machine Initialization */
@@ -266,7 +282,11 @@ static void setup_beep(int dummy)
 
 static DRIVER_INIT( tmc2000e )
 {
+	// enable power led
+	set_led_status(2, 1);
+
 	timer_set(0.0, 0, setup_beep);
+
 	cdp1864_configure(&tmc2000e_CDP1864_interface);
 }
 

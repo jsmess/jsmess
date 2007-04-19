@@ -1,8 +1,9 @@
 #include "driver.h"
-#include "video/generic.h"
 #include "cpu/cdp1802/cdp1802.h"
-#include "video/cdp1864.h"
 #include "sound/beep.h"
+#include "video/cdp1864.h"
+
+static mame_bitmap *tmpbitmap;
 
 static mame_timer *cdp1864_int_timer;
 static mame_timer *cdp1864_efx_timer;
@@ -11,16 +12,15 @@ static mame_timer *cdp1864_dma_timer;
 typedef struct
 {
 	int disp;
+	int dmaout;
+	int dmaptr;
 	int audio;
 	int bgcolor;
 	int latch;
-	int dmaout;
-	int dmaptr;
-	UINT8 data[CDP1864_VISIBLE_LINES * 8];
 	int (*colorram_r)(UINT16 addr);
-} CDP1864_CONFIG;
+} CDP1864_VIDEO_CONFIG;
 
-static CDP1864_CONFIG cdp1864;
+static CDP1864_VIDEO_CONFIG cdp1864;
 
 static int cdp1864_bgcolseq[] = { 2, 0, 1, 4 };
 
@@ -35,6 +35,7 @@ static void cdp1864_int_tick(int ref)
 		if (cdp1864.disp)
 		{
 			cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, HOLD_LINE);
+			cdp1864.dmaptr = 0;
 		}
 
 		mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_END, 0), 0, time_zero);
@@ -80,40 +81,59 @@ static void cdp1864_efx_tick(int ref)
 
 static void cdp1864_dma_tick(int ref)
 {
+	int scanline = video_screen_get_vpos(0);
+
 	if (cdp1864.dmaout)
 	{
-		cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
-		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMAOUT_HIGH, 0), 0, time_zero);
+		if (cdp1864.disp)
+		{
+			if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
+			{
+				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+			}
+		}
+
+		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMA_WAIT, 0), 0, time_zero);
+		
 		cdp1864.dmaout = 0;
 	}
 	else
 	{
-		cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
-		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMAOUT_LOW, 0), 0, time_zero);
+		if (cdp1864.disp)
+		{
+			if (scanline >= CDP1864_SCANLINE_DISPLAY_START && scanline < CDP1864_SCANLINE_DISPLAY_END)
+			{
+				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+			}
+		}
+
+		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMA_ACTIVE, 0), 0, time_zero);
+		
 		cdp1864.dmaout = 1;
 	}
 }
 
 void cdp1864_dma_w(UINT8 data)
 {
-	cdp1864.data[cdp1864.dmaptr] = data;
+	int sx = video_screen_get_hpos(0) + 4;
+	int y = video_screen_get_vpos(0);
+	int x;
+
+	for (x = 0; x < 8; x++)
+	{
+		int color = cdp1864_bgcolseq[cdp1864.bgcolor];
+
+		if (data & 0x80)
+		{
+			color = cdp1864.colorram_r(cdp1864.dmaptr);
+		}
+
+		plot_pixel(tmpbitmap, sx + x, y, Machine->pens[color]);
+		
+		data <<= 1;
+	}
+
 	cdp1864.dmaptr++;
-
-	if (cdp1864.dmaptr == CDP1864_VISIBLE_LINES * 8)
-	{
-		mame_timer_adjust(cdp1864_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
-	}
-}
-
-void cdp1864_sc(int state)
-{
-	if (state == CDP1802_STATE_CODE_S3_INTERRUPT)
-	{
-		cdp1864.dmaout = 0;
-		cdp1864.dmaptr = 0;
-
-		mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_INT_DELAY, 0), 0, time_zero);
-	}
 }
 
 MACHINE_RESET( cdp1864 )
@@ -124,10 +144,11 @@ MACHINE_RESET( cdp1864 )
 
 	mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_START, 0), 0, time_zero);
 	mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
-	mame_timer_adjust(cdp1864_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
+	mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMA_START, 0), 0, time_zero);
 
 	cdp1864.disp = 0;
 	cdp1864.dmaout = 0;
+	cdp1864.dmaptr = 0;
 	cdp1864.bgcolor = 0;
 
 	cdp1864_efx = CLEAR_LINE;
@@ -175,14 +196,18 @@ READ8_HANDLER( cdp1864_dispoff_r )
 
 VIDEO_START( cdp1864 )
 {
+	/* allocate the temporary bitmap */
+	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+
+	/* ensure the contents of the bitmap are saved */
+	state_save_register_bitmap("video", 0, "tmpbitmap", tmpbitmap);
+	
 	state_save_register_global(cdp1864.disp);
+	state_save_register_global(cdp1864.dmaout);
+	state_save_register_global(cdp1864.dmaptr);
 	state_save_register_global(cdp1864.audio);
 	state_save_register_global(cdp1864.bgcolor);
 	state_save_register_global(cdp1864.latch);
-	state_save_register_global(cdp1864.dmaout);
-	state_save_register_global(cdp1864.dmaptr);
-	state_save_register_global_array(cdp1864.data);
-	state_save_register_global(cdp1864_efx);
 
 	return 0;
 }
@@ -191,28 +216,8 @@ VIDEO_UPDATE( cdp1864 )
 {
 	if (cdp1864.disp)
 	{
-		int i, bit;
-
-		fillbitmap(bitmap, cdp1864_bgcolseq[cdp1864.bgcolor], cliprect);
-
-		for (i = 0; i < CDP1864_VISIBLE_LINES * 8; i++)
-		{
-			int x = (i % 8) * 8;
-			int y = i / 8;
-
-			UINT8 data = cdp1864.data[i];
-
-			for (bit = 0; bit < 8; bit++)
-			{
-				if (data & 0x80)
-				{
-					int color = cdp1864.colorram_r(i);
-					plot_pixel(bitmap, CDP1864_SCREEN_START + x + bit, CDP1864_SCANLINE_SCREEN_START + y, Machine->pens[color]);
-				}
-				
-				data <<= 1;
-			}
-		}
+		fillbitmap(bitmap, machine->pens[cdp1864_bgcolseq[cdp1864.bgcolor]], cliprect);
+		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, cdp1864.bgcolor);
 	}
 	else
 	{

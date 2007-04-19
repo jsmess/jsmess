@@ -6,10 +6,11 @@
 #include "sound/beep.h"
 #include "video/cdp1861.h"
 
-static UINT8 keylatch;
 extern int cdp1861_efx;
 
 /* Read/Write Handlers */
+
+static UINT8 keylatch;
 
 static WRITE8_HANDLER( keylatch_w )
 {
@@ -55,44 +56,51 @@ INPUT_PORTS_START( vip )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F TW") PORT_CODE(KEYCODE_F)
+
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
-/* vip
-   out 1 turns video off
-   out 2 set keyboard multiplexer (bit 0..3 selects key)
-   out 4 switch ram at 0000
-   inp 1 turn on video
-   q sound
-   f1 vertical blank line (low when displaying picture
-   f2 tape input (high when tone read)
-   f3 keyboard in
- */
+static UINT8 vip_mode_r(void)
+{
+	if (readinputport(1) & 0x01)
+	{
+		return CDP1802_MODE_RUN;
+	}
+	else
+	{
+		return CDP1802_MODE_RESET;
+	}
+}
 
-static UINT8 vip_ef(void)
+static UINT8 vip_ef_r(void)
 {
 	int ef = 0x0f;
 
 	if (cdp1861_efx) ef -= EF1;
-
+	// EF2 = tape (high when tone read)
 	if (readinputport(0) & (1 << keylatch)) ef -= EF3;
 
 	return ef;
 }
 
-static void vip_q(int level)
+static void vip_q_w(int level)
 {
 	beep_set_state(0, level);
+	// PWR Q TAPE
+	set_led_status(1, level);
 }
 
 static CDP1802_CONFIG vip_config = 
 {
+	vip_mode_r,
+	vip_ef_r,
 	NULL,
-	cdp1861_dma_w,
-	vip_q,
-	vip_ef,
-	cdp1861_sc
+	vip_q_w,
+	NULL,
+	cdp1861_dma_w
 };
 
 /* Machine Initialization */
@@ -119,7 +127,7 @@ static MACHINE_DRIVER_START( vip )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD(CDP1802, 3579545.0/2)
+	MDRV_CPU_ADD(CDP1802, 3579545/2)
 	MDRV_CPU_PROGRAM_MAP(vip_map, 0)
 	MDRV_CPU_IO_MAP(vip_io_map, 0)
 	MDRV_CPU_CONFIG(vip_config)
@@ -131,7 +139,7 @@ static MACHINE_DRIVER_START( vip )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(3579545.0/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
+	MDRV_SCREEN_RAW_PARAMS(3579545/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
@@ -184,6 +192,9 @@ static void setup_beep(int dummy)
 
 static DRIVER_INIT( vip )
 {
+	// enable power led
+	set_led_status(0, 1);
+
 	memory_region(REGION_CPU1)[0x8022] = 0x3e; //bn3, default monitor
 
 	timer_set(0.0, 0, setup_beep);

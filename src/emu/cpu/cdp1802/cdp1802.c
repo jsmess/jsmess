@@ -160,9 +160,9 @@ INLINE void cdp1802_long_skip(int taken)
 
 static void cdp1802_sample_ef(void)
 {
-	if (cdp1802.config->ef)
+	if (cdp1802.config->ef_r)
 	{
-		cdp1802.ef = cdp1802.config->ef() & 0x0f;
+		cdp1802.ef = cdp1802.config->ef_r() & 0x0f;
 	}
 	else
 	{
@@ -172,25 +172,25 @@ static void cdp1802_sample_ef(void)
 
 static void cdp1802_output_state_code(void)
 {
-	if (cdp1802.config->sc)
+	if (cdp1802.config->sc_w)
 	{
 		switch (cdp1802.state)
 		{
 		case CDP1802_STATE_0_FETCH:
-			cdp1802.config->sc(CDP1802_STATE_CODE_S0_FETCH);
+			cdp1802.config->sc_w(CDP1802_STATE_CODE_S0_FETCH);
 			break;
 
 		case CDP1802_STATE_1_EXECUTE:
-			cdp1802.config->sc(CDP1802_STATE_CODE_S1_EXECUTE);
+			cdp1802.config->sc_w(CDP1802_STATE_CODE_S1_EXECUTE);
 			break;
 
 		case CDP1802_STATE_2_DMA_IN:
 		case CDP1802_STATE_2_DMA_OUT:
-			cdp1802.config->sc(CDP1802_STATE_CODE_S2_DMA);
+			cdp1802.config->sc_w(CDP1802_STATE_CODE_S2_DMA);
 			break;
 
 		case CDP1802_STATE_3_INT:
-			cdp1802.config->sc(CDP1802_STATE_CODE_S3_INTERRUPT);
+			cdp1802.config->sc_w(CDP1802_STATE_CODE_S3_INTERRUPT);
 			break;
 		}
 	}
@@ -479,18 +479,18 @@ static void cdp1802_run(void)
 			case 0xa:
 				Q = 0;
 
-				if (cdp1802.config->q)
+				if (cdp1802.config->q_w)
 				{
-					cdp1802.config->q(Q);
+					cdp1802.config->q_w(Q);
 				}
 				break;
 
 			case 0xb:
 				Q = 1;
 
-				if (cdp1802.config->q)
+				if (cdp1802.config->q_w)
 				{
-					cdp1802.config->q(Q);
+					cdp1802.config->q_w(Q);
 				}
 				break;
 
@@ -537,6 +537,8 @@ static void cdp1802_run(void)
 			break;
 
 		case 0xc:
+			cdp1802_output_state_code();
+
 			switch (N)
 			{
 			case 0:
@@ -811,6 +813,9 @@ static int cdp1802_execute(int cycles)
 {
 	cdp1802_ICount = cycles;
 
+	cdp1802.prevmode = cdp1802.mode;
+	cdp1802.mode = cdp1802.config->mode_r();
+	
 	do
 	{
 		switch (cdp1802.mode)
@@ -825,7 +830,6 @@ static int cdp1802_execute(int cycles)
 		case CDP1802_MODE_RESET:
 			cdp1802.state = CDP1802_STATE_1_RESET;
 			cdp1802_run();
-			cdp1802.mode = CDP1802_MODE_RUN; // XXX real cpu doesn't work like this
 			break;
 
 		case CDP1802_MODE_PAUSE:
@@ -879,15 +883,9 @@ static void cdp1802_set_dmaout_line(int state)
 	cdp1802.dmaout = state;
 }
 
-void cdp1802_set_mode(int mode)
-{
-	cdp1802.prevmode = cdp1802.mode;
-	cdp1802.mode = mode;
-}
-
 static void cdp1802_reset(void)
 {
-	cdp1802_set_mode(CDP1802_MODE_RESET);
+	cdp1802.mode = CDP1802_MODE_RESET;
 }
 
 /**************************************************************************

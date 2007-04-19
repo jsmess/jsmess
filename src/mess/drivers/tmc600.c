@@ -246,16 +246,26 @@ INPUT_PORTS_START( tmc600 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // keyboard
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) //
+
+	PORT_START_TAG("RUN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Stop") PORT_CODE(KEYCODE_F10) PORT_TOGGLE
 INPUT_PORTS_END
 
 /* CDP1802 Interface */
 
-static void tmc600_q(int level)
+static UINT8 tmc600_mode_r(void)
 {
-	//logerror("q level: %u\n", level);
+	if (readinputportbytag("RUN") & 0x01)
+	{
+		return CDP1802_MODE_RESET;
+	}
+	else
+	{
+		return CDP1802_MODE_RUN;
+	}
 }
 
-static UINT8 tmc600_ef(void)
+static UINT8 tmc600_ef_r(void)
 {
 	int flags = 0x0f;
 
@@ -273,12 +283,17 @@ static UINT8 tmc600_ef(void)
 	return flags;
 }
 
+static void tmc600_q_w(int level)
+{
+}
+
 static CDP1802_CONFIG tmc600_cdp1802_config =
 {
+	tmc600_mode_r,
+	tmc600_ef_r,
 	NULL,
+	tmc600_q_w,
 	NULL,
-	tmc600_q,
-	tmc600_ef,
 	NULL
 };
 

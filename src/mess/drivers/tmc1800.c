@@ -161,17 +161,28 @@ INPUT_PORTS_START( tmc1800 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+
+	PORT_START_TAG("RUN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
 /* CDP1802 Interfaces */
 
 // Telmac 1800
 
-static void tmc1800_q(int level)
+static UINT8 tmc1800_mode_r(void)
 {
+	if (readinputportbytag("RUN") & 0x01)
+	{
+		return CDP1802_MODE_RUN;
+	}
+	else
+	{
+		return CDP1802_MODE_RESET;
+	}
 }
 
-static UINT8 tmc1800_ef(void)
+static UINT8 tmc1800_ef_r(void)
 {
 	UINT8 flags = 0x0f;
 
@@ -188,27 +199,23 @@ static UINT8 tmc1800_ef(void)
 	return flags;
 }
 
+static void tmc1800_q_w(int level)
+{
+}
+
 static CDP1802_CONFIG tmc1800_config =
 {
+	tmc1800_mode_r,
+	tmc1800_ef_r,
 	NULL,
+	tmc1800_q_w,
 	NULL,
-	tmc1800_q,
-	tmc1800_ef,
 	NULL
 };
 
 // Telmac 2000
 
-static void tmc2000_q(int level)
-{
-	// turn CDP1864 sound generator on/off
-	cdp1864_audio_output_enable(level);
-
-	// set Q led status
-	set_led_status(1, level);
-}
-
-static UINT8 tmc2000_ef(void)
+static UINT8 tmc2000_ef_r(void)
 {
 	int flags = 0x0f;
 
@@ -225,13 +232,23 @@ static UINT8 tmc2000_ef(void)
 	return flags;
 }
 
+static void tmc2000_q_w(int level)
+{
+	// turn CDP1864 sound generator on/off
+	cdp1864_audio_output_enable(level);
+
+	// set Q led status
+	set_led_status(1, level);
+}
+
 static CDP1802_CONFIG tmc2000_config =
 {
+	tmc1800_mode_r,
+	tmc2000_ef_r,
 	NULL,
-	cdp1864_dma_w,
-	tmc2000_q,
-	tmc2000_ef,
-	cdp1864_sc
+	tmc2000_q_w,
+	NULL,
+	cdp1864_dma_w
 };
 
 /* Machine Initialization */

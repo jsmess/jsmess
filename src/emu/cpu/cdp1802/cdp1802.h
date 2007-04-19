@@ -3,8 +3,8 @@
 
 #include "cpuintrf.h"
 
-#define CDP1802_CYCLES_RESET 		1
-#define CDP1802_CYCLES_INIT			9
+#define CDP1802_CYCLES_RESET 		8
+#define CDP1802_CYCLES_INIT			8 // really 9, but needs to be 8 to synchronize cdp1861 video timings
 #define CDP1802_CYCLES_FETCH		8
 #define CDP1802_CYCLES_EXECUTE		8
 #define CDP1802_CYCLES_DMA			8
@@ -89,15 +89,12 @@ offs_t cdp1802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *op
 
 typedef struct
 {
-	/* called after execution of an instruction with cycles,
-       return cycles taken by dma hardware */
+	UINT8 (*mode_r)(void);
+	UINT8 (*ef_r)(void);
+	void (*sc_w)(int state);
+	void (*q_w)(int level);
 	UINT8 (*dma_r)(void);
 	void (*dma_w)(UINT8 data);
-	void (*q)(int level);
-	UINT8 (*ef)(void);
-	void (*sc)(int state);
 } CDP1802_CONFIG;
-
-void cdp1802_set_mode(int mode);
 
 #endif

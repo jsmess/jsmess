@@ -3,6 +3,8 @@
 #include "video/generic.h"
 #include "video/cdp1861.h"
 
+static mame_bitmap *tmpbitmap;
+
 static mame_timer *cdp1861_int_timer;
 static mame_timer *cdp1861_efx_timer;
 static mame_timer *cdp1861_dma_timer;
@@ -11,8 +13,6 @@ typedef struct
 {
 	int disp;
 	int dmaout;
-	int dmaptr;
-	UINT8 data[CDP1861_VISIBLE_LINES * 8];
 } CDP1861_VIDEO_CONFIG;
 
 static CDP1861_VIDEO_CONFIG cdp1861;
@@ -73,39 +73,49 @@ static void cdp1861_efx_tick(int ref)
 
 static void cdp1861_dma_tick(int ref)
 {
+	int scanline = video_screen_get_vpos(0);
+
 	if (cdp1861.dmaout)
 	{
-		cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
-		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMAOUT_HIGH, 0), 0, time_zero);
+		if (cdp1861.disp)
+		{
+			if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
+			{
+				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+			}
+		}
+
+		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMA_WAIT, 0), 0, time_zero);
+		
 		cdp1861.dmaout = 0;
 	}
 	else
 	{
-		cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
-		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMAOUT_LOW, 0), 0, time_zero);
+		if (cdp1861.disp)
+		{
+			if (scanline >= CDP1861_SCANLINE_DISPLAY_START && scanline < CDP1861_SCANLINE_DISPLAY_END)
+			{
+				cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, HOLD_LINE);
+			}
+		}
+
+		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMA_ACTIVE, 0), 0, time_zero);
+		
 		cdp1861.dmaout = 1;
 	}
 }
 
 void cdp1861_dma_w(UINT8 data)
 {
-	cdp1861.data[cdp1861.dmaptr] = data;
-	cdp1861.dmaptr++;
+	int sx = video_screen_get_hpos(0) + 4;
+	int y = video_screen_get_vpos(0);
+	int x;
 
-	if (cdp1861.dmaptr == CDP1861_VISIBLE_LINES * 8)
+	for (x = 0; x < 8; x++)
 	{
-		mame_timer_adjust(cdp1861_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
-	}
-}
-
-void cdp1861_sc(int state)
-{
-	if (state == CDP1802_STATE_CODE_S3_INTERRUPT)
-	{
-		cdp1861.dmaout = 0;
-		cdp1861.dmaptr = 0;
-
-		mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_INT_DELAY, 0), 0, time_zero);
+		int color = (data & 0x80) >> 7;
+		plot_pixel(tmpbitmap, sx + x, y, Machine->pens[color]);
+		data <<= 1;
 	}
 }
 
@@ -117,7 +127,7 @@ MACHINE_RESET( cdp1861 )
 
 	mame_timer_adjust(cdp1861_int_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_INT_START, 0), 0, time_zero);
 	mame_timer_adjust(cdp1861_efx_timer, video_screen_get_time_until_pos(0, CDP1861_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
-	mame_timer_adjust(cdp1861_dma_timer, double_to_mame_time(TIME_NEVER), 0, time_zero);
+	mame_timer_adjust(cdp1861_dma_timer, MAME_TIME_IN_CYCLES(CDP1861_CYCLES_DMA_START, 0), 0, time_zero);
 
 	cdp1861.disp = 0;
 	cdp1861.dmaout = 0;
@@ -139,36 +149,27 @@ WRITE8_HANDLER( cdp1861_dispoff_w )
 
 VIDEO_START( cdp1861 )
 {
+	/* allocate the temporary bitmap */
+	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+
+	/* ensure the contents of the bitmap are saved */
+	state_save_register_bitmap("video", 0, "tmpbitmap", tmpbitmap);
+
 	state_save_register_global(cdp1861.disp);
 	state_save_register_global(cdp1861.dmaout);
-	state_save_register_global(cdp1861.dmaptr);
-	state_save_register_global_array(cdp1861.data);
 
 	return 0;
 }
 
 VIDEO_UPDATE( cdp1861 )
 {
-	fillbitmap(bitmap, get_black_pen(Machine), cliprect);
-
 	if (cdp1861.disp)
 	{
-		int i, bit;
-
-		for (i = 0; i < CDP1861_VISIBLE_LINES * 8; i++)
-		{
-			int x = (i % 8) * 8;
-			int y = i / 8;
-
-			UINT8 data = cdp1861.data[i];
-
-			for (bit = 0; bit < 8; bit++)
-			{
-				int color = (data & 0x80) >> 7;
-				plot_pixel(bitmap, CDP1861_SCREEN_START + x + bit, CDP1861_SCANLINE_DISPLAY_START + y, Machine->pens[color]);
-				data <<= 1;
-			}
-		}
+		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	}
+	else
+	{
+		fillbitmap(bitmap, get_black_pen(Machine), cliprect);
 	}
 
 	return 0;

@@ -56,11 +56,12 @@ Notes:
 #include "sound/beep.h"
 #include "sound/discrete.h"
 
-static UINT8 keylatch;
 extern int cdp1861_efx;
 extern int cdp1864_efx;
 
 /* Read/Write Handlers */
+
+static UINT8 keylatch;
 
 static WRITE8_HANDLER( keylatch_w )
 {
@@ -122,15 +123,14 @@ INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
-/* studio 2
-   output q speaker (300 hz tone on/off)
-   f1 dma_activ
-   f3 on player 2 key pressed
-   f4 on player 1 key pressed
-   inp 1 video on
-   out 2 read key value selects keys to put at f3/f4 */
+static int cdp1802_mode = CDP1802_MODE_RESET;
 
-static UINT8 studio2_ef(void)
+static UINT8 studio2_mode_r(void)
+{
+	return cdp1802_mode;
+}
+
+static UINT8 studio2_ef_r(void)
 {
 	int ef = 0x0f;
 
@@ -142,21 +142,22 @@ static UINT8 studio2_ef(void)
 	return ef;
 }
 
-static void studio2_q(int level)
+static void studio2_q_w(int level)
 {
 	beep_set_state(0, level);
 }
 
 static CDP1802_CONFIG studio2_config = 
 {
+	studio2_mode_r,
+	studio2_ef_r,
 	NULL,
-	cdp1861_dma_w,
-	studio2_q,
-	studio2_ef,
-	cdp1861_sc
+	studio2_q_w,
+	NULL,
+	cdp1861_dma_w
 };
 
-static UINT8 mpt02_ef(void)
+static UINT8 mpt02_ef_r(void)
 {
 	int ef = 0x0f;
 
@@ -170,17 +171,19 @@ static UINT8 mpt02_ef(void)
 
 static CDP1802_CONFIG mpt02_config = 
 {
+	studio2_mode_r,
+	mpt02_ef_r,
 	NULL,
-	cdp1864_dma_w,
-	studio2_q,
-	mpt02_ef,
-	cdp1864_sc
+	studio2_q_w,
+	NULL,
+	cdp1864_dma_w
 };
 
 /* Machine Initialization */
 
 static MACHINE_START( studio2 )
 {
+	state_save_register_global(cdp1802_mode);
 	state_save_register_global(keylatch);
 
 	return 0;
@@ -189,8 +192,6 @@ static MACHINE_START( studio2 )
 static MACHINE_RESET( studio2 )
 {
 	machine_reset_cdp1861(machine);
-
-	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( mpt02 )
@@ -206,7 +207,7 @@ static MACHINE_DRIVER_START( studio2 )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD_TAG("main", CDP1802, 1780000)
+	MDRV_CPU_ADD_TAG("main", CDP1802, 3579545/2)
 	MDRV_CPU_PROGRAM_MAP(studio2_map, 0)
 	MDRV_CPU_IO_MAP(studio2_io_map, 0)
 	MDRV_CPU_CONFIG(studio2_config)
@@ -218,7 +219,7 @@ static MACHINE_DRIVER_START( studio2 )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(1780000, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
+	MDRV_SCREEN_RAW_PARAMS(3579545/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
@@ -330,15 +331,21 @@ SYSTEM_CONFIG_END
 
 /* Driver Initialization */
 
+static void set_cpu_mode(int dummy)
+{
+	cdp1802_mode = CDP1802_MODE_RUN;
+}
+
 static void setup_beep(int dummy)
 {
-	beep_set_state( 0, 0 );
-	beep_set_frequency( 0, 300 );
+	beep_set_state(0, 0);
+	beep_set_frequency(0, 300);
 }
 
 static DRIVER_INIT( studio2 )
 {
 	timer_set(0.0, 0, setup_beep);
+	timer_set(0.2, 0, set_cpu_mode);
 }
 
 static int mpt02_colorram_r(UINT16 addr)
