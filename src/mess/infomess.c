@@ -164,13 +164,18 @@ void print_game_ramoptions(FILE* out, const game_driver* game)
 {
 	int i, count;
 	UINT32 ram;
-
+	UINT32 default_ram;
+	
 	count = ram_option_count(game);
+	default_ram = ram_default(game);
 
 	for (i = 0; i < count; i++)
 	{
 		ram = ram_option(game, i);
-		fprintf(out, "\t\t<ramoption>%u</ramoption>\n", ram);
+		if (ram == default_ram)
+			fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n", ram);
+		else
+			fprintf(out, "\t\t<ramoption>%u</ramoption>\n", ram);
 	}
 }
 
