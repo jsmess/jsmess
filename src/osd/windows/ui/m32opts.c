@@ -44,7 +44,7 @@
 #include "audit.h"
 #include "m32opts.h"
 #include "picker.h"
-#include "windows/config.h"
+#include "windows/winmain.h"
 #include "pool.h"
 #include "windows/winutil.h"
 #include "windows/strconv.h"
@@ -435,6 +435,7 @@ static void AddOptions(core_options *opts, const options_entry *entrylist, BOOL 
 core_options *CreateGameOptions(BOOL is_global)
 {
 	core_options *opts;
+	extern const options_entry mame_win_options[];
 
 	// create the options
 	opts = options_create(memory_error);
@@ -458,8 +459,10 @@ core_options *CreateGameOptions(BOOL is_global)
 
 BOOL OptionsInit()
 {
+	extern const options_entry mame_win_options[];
+
 	// initialize core options
-	win_options_init();
+	mame_options_init(mame_win_options);
 
 	// create a memory pool for our data
 	options_memory_pool = pool_create(memory_error);
@@ -523,7 +526,6 @@ BOOL OptionsInit()
 	LoadOptionsAndSettings();
 
 	// have our MAME core (file code) know about our rom path
-	win_options_init();
 	options_set_string(mame_options(), SEARCHPATH_ROM, GetRomDirs());
 	options_set_string(mame_options(), SEARCHPATH_SAMPLE, GetSampleDirs());
 #ifdef MESS

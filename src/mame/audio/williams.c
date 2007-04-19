@@ -275,6 +275,10 @@ void williams_cvsd_init(int pianum)
 
 	/* reset the IRQ state */
 	pia_set_input_ca1(williams_pianum, 1);
+
+	/* register for save states */
+	state_save_register_global(williams_sound_int_state);
+	state_save_register_global(audio_talkback);
 }
 
 

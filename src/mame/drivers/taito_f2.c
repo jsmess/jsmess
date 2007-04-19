@@ -186,11 +186,11 @@ Don Doko Don
 Roz layer is one pixel out vertically when screen flipped.
 
 
-Cameltry (camltrua)
+Cameltry (camltrya)
 --------
 
-Alt version with YM2203 sound missing ADPCM chip? Also sound tempo
-may be fractionally too slow.
+Alt version with YM2203 and M6295
+Sound frequencies may be incorrect
 
 
 Gun Frontier
@@ -1698,17 +1698,18 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-/* Alt US version of Cameltry, YM2203 sound, missing ADPCM ? */
+/* Alt version of Cameltry, YM2203 + M6925 sound */
 
-static ADDRESS_MAP_START( camltrua_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( camltrya_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)	// I can't see a bank control, but there ARE some bytes past 0x8000
 //  AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(OKIM6295_status_0_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( camltrua_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( camltrya_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
@@ -1716,6 +1717,8 @@ static ADDRESS_MAP_START( camltrua_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(OKIM6295_data_0_w)
 ADDRESS_MAP_END
 
 
@@ -3840,7 +3843,7 @@ static struct YM2610interface ym2610_interface =
 };
 
 
-static WRITE8_HANDLER( camltrua_porta_w )
+static WRITE8_HANDLER( camltrya_porta_w )
 {
 	// Implement //
 }
@@ -3849,7 +3852,7 @@ static struct YM2203interface ym2203_interface =
 {
 	0,	/* portA read */
 	0,
-	camltrua_porta_w,	/* portA write - not implemented */
+	camltrya_porta_w,	/* portA write - not implemented */
 	0,	/* portB write */
 	irq_handler
 };
@@ -4326,7 +4329,7 @@ static MACHINE_DRIVER_START( driftout )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( camltrua )
+static MACHINE_DRIVER_START( camltrya )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)	/* 12 MHz */
@@ -4335,7 +4338,7 @@ static MACHINE_DRIVER_START( camltrua )
 
 	MDRV_CPU_ADD(Z80,24000000/6)	/* 4 MHz */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(camltrua_sound_readmem,camltrua_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(camltrya_sound_readmem,camltrya_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -4355,12 +4358,16 @@ static MACHINE_DRIVER_START( camltrua )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD(YM2203, 24000000/8) // ?? freqnecy?
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.60)
+
+	MDRV_SOUND_ADD(OKIM6295, 24000000/16) // ?? frequency?
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
 
@@ -4762,15 +4769,41 @@ ROM_START( cameltry )
 
 	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )	/* pivot gfx */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
 
+	/* These are for a YM2610 */
 	ROM_REGION( 0x1c000, REGION_CPU2, 0 )      /* sound cpu */
 	ROM_LOAD( "c38-08.bin", 0x00000, 0x04000, CRC(7ff78873) SHA1(6574f1c707b8911fa957dd057e1cddc7a1cea99b) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "c38-03.bin", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
-
 	/* no Delta-T samples */
+ROM_END
+
+ROM_START( camltrya )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )     /* 256k for 68000 code */
+	ROM_LOAD16_BYTE( "c38-11", 0x00000, 0x20000, CRC(be172da0) SHA1(e4915bf25832175591a014aa1abac5edae09380d) )
+	ROM_LOAD16_BYTE( "c38-16", 0x00001, 0x20000, CRC(66ad6164) SHA1(2df22a6a1d6e194a467e6a6c6b6c2fc9f8441852) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* empty! */
+
+	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )	/* OBJ */
+	ROM_LOAD( "c38-01.bin", 0x00000, 0x80000, CRC(c170ff36) SHA1(6a19cc99847ed35ac8a8e9ba0e2e91bfac662203) )
+
+	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )	/* pivot gfx */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+
+	/* these are for a YM2203 and OKIM6295 */
+	ROM_REGION( 0x1c000, REGION_CPU2, 0 )      /* sound cpu (revised prog!?) */
+	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* M6295 samples */
+	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
 ROM_END
 
 ROM_START( camltrua )
@@ -4786,14 +4819,15 @@ ROM_START( camltrua )
 
 	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )	/* pivot gfx */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
 
+	/* these are for a YM2203 and OKIM6295 */
 	ROM_REGION( 0x1c000, REGION_CPU2, 0 )      /* sound cpu (revised prog!?) */
-	ROM_LOAD( "c38-us.15", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
+	ROM_LOAD( "c38-15.bin", 0x00000, 0x10000, CRC(0e60faac) SHA1(cd124efb5127e5184c412c48b94c0d4a0b2ade64) )
 
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
-	ROM_LOAD( "c38-03.bin", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
-
-	/* no Delta-T samples */
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )	/* M6295 samples */
+	ROM_LOAD( "c38-04.bin", 0x000000, 0x020000, CRC(53d330bb) SHA1(22982d889a69aefe482b24ac958ef755fd2c7601) )
 ROM_END
 
 ROM_START( cameltrj )
@@ -4809,7 +4843,10 @@ ROM_START( cameltrj )
 
 	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE )	/* pivot gfx */
 	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
+	/* this is on the PCB twice, probably one for each ROZ layer, we load it twice to make this clear */
+	ROM_LOAD( "c38-02.bin", 0x00000, 0x20000, CRC(1a11714b) SHA1(419f5ec37161fd6b4ca962768e720adf541271d5) )
 
+	/* These are for a YM2610 */
 	ROM_REGION( 0x1c000, REGION_CPU2, 0 )      /* sound cpu */
 	ROM_LOAD( "c38-08.bin", 0x00000, 0x04000, CRC(7ff78873) SHA1(6574f1c707b8911fa957dd057e1cddc7a1cea99b) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
@@ -5895,9 +5932,10 @@ GAME( 1989, megabj,   megab,    megab,    megabj,   0,        ROT0,   "Taito Cor
 GAME( 1990, thundfox, 0,        thundfox, thundfox, 0,        ROT0,   "Taito Corporation Japan", "Thunder Fox (World)", 0 )
 GAME( 1990, thndfoxu, thundfox, thundfox, thndfoxu, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", 0 )
 GAME( 1990, thndfoxj, thundfox, thundfox, thndfoxj, 0,        ROT0,   "Taito Corporation", "Thunder Fox (Japan)", 0 )
-GAME( 1989, cameltry, 0,        cameltry, cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (US)", 0 )
-GAME( 1989, camltrua, cameltry, camltrua, cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (US, alt sound)", GAME_IMPERFECT_SOUND )
-GAME( 1989, cameltrj, cameltry, cameltry, cameltrj, 0,        ROT0,   "Taito Corporation", "Cameltry (Japan)", 0 )
+GAME( 1989, cameltry, 0,        cameltry, cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", 0 )
+GAME( 1989, camltrya, cameltry, camltrya, cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", 0 )
+GAME( 1989, camltrua, cameltry, camltrya, cameltry, 0,        ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", 0 )
+GAME( 1989, cameltrj, cameltry, cameltry, cameltrj, 0,        ROT0,   "Taito Corporation", "Cameltry (Japan, YM2610)", 0 )
 GAME( 1990, qtorimon, 0,        qtorimon, qtorimon, 0,        ROT0,   "Taito Corporation", "Quiz Torimonochou (Japan)", 0 )
 GAME( 1990, liquidk,  0,        liquidk,  liquidk,  0,        ROT0,   "Taito Corporation Japan", "Liquid Kids (World)", 0 )
 GAME( 1990, liquidku, liquidk,  liquidk,  liquidku, 0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", 0 )

@@ -376,7 +376,7 @@ static UINT16 cd_readWord(UINT32 addr)
 
 			hirqreg = rv;
 
-//			CDROM_LOG("RW HIRQ: %04x (PC=%x)\n", rv, activecpu_get_pc());
+//          CDROM_LOG("RW HIRQ: %04x (PC=%x)\n", rv, activecpu_get_pc());
 
 			return rv;
 			break;
@@ -389,25 +389,25 @@ static UINT16 cd_readWord(UINT32 addr)
 
 		case 0x0018:
 		case 0x001a:
-//			CDROM_LOG("RW CR1: %04x\n", cr1);
+//          CDROM_LOG("RW CR1: %04x\n", cr1);
 			return cr1;
 			break;
 
 		case 0x001c:
 		case 0x001e:
-//			CDROM_LOG("RW CR2: %04x\n", cr2);
+//          CDROM_LOG("RW CR2: %04x\n", cr2);
 			return cr2;
 			break;
 
 		case 0x0020:
 		case 0x0022:
-//			CDROM_LOG("RW CR3: %04x\n", cr3);
+//          CDROM_LOG("RW CR3: %04x\n", cr3);
 			return cr3;
 			break;
 
 		case 0x0024:
 		case 0x0026:
-//			CDROM_LOG("RW CR4: %04x\n", cr4);
+//          CDROM_LOG("RW CR4: %04x\n", cr4);
 			return cr4;
 			break;
 
@@ -476,7 +476,7 @@ static UINT32 cd_readLong(UINT32 addr)
 						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16 |
 						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8 |
 						     transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3];
-						
+
 						xferdnum += 4;
 						xferoffs += 4;
 
@@ -540,7 +540,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 	{
 	case 0x0008:
 	case 0x000a:
-//      		CDROM_LOG("WW HIRQ: %04x & %04x => %04x (PC %x)\n", hirqreg, data, hirqreg & data, activecpu_get_pc()); 
+//              CDROM_LOG("WW HIRQ: %04x & %04x => %04x (PC %x)\n", hirqreg, data, hirqreg & data, activecpu_get_pc());
 		hirqreg &= data;
 		return;
 	case 0x000c:
@@ -550,25 +550,25 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 		return;
 	case 0x0018:
 	case 0x001a:
-//      		CDROM_LOG("WW CR1: %04x\n", data);
+//              CDROM_LOG("WW CR1: %04x\n", data);
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
 		break;
 	case 0x001c:
 	case 0x001e:
-//      		CDROM_LOG("WW CR2: %04x\n", data);
+//              CDROM_LOG("WW CR2: %04x\n", data);
 		cr2 = data;
 		break;
 	case 0x0020:
 	case 0x0022:
-//      		CDROM_LOG("WW CR3: %04x\n", data);
+//              CDROM_LOG("WW CR3: %04x\n", data);
 		cr3 = data;
 			break;
 	case 0x0024:
 	case 0x0026:
-//      		CDROM_LOG("WW CR4: %04x\n", data);
+//              CDROM_LOG("WW CR4: %04x\n", data);
 		cr4 = data;
-//		CDROM_LOG("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+//      CDROM_LOG("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 		switch (cr1 & 0xff00)
 		{
 		case 0x0000:
@@ -730,7 +730,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 		case 0x1000: // Play Disk.  FAD is in lowest 7 bits of cr1 and all of cr2.
 			CDROM_LOG( "CD: Play Disk (PC=%x)\n",   activecpu_get_pc());
-			cd_stat = CD_STAT_PLAY; //|0x80;	// set "cd-rom" bit?
+			cd_stat = CD_STAT_PLAY; //|0x80;    // set "cd-rom" bit?
 			cd_curfad = ((cr1&0xff)<<16) | cr2;
 			fadstoplay = ((cr3&0xff)<<16) | cr4;
 
@@ -797,7 +797,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 					cd_curfad = 0xffffffff;
 				}
 			}
-			
+
 
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
@@ -1049,7 +1049,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
-				
+
 				if (partitions[bufnum].numblks == 0)
 				{
 					CDROM_LOG("CD: buffer is empty\n");
@@ -1089,7 +1089,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
-				
+
 				if (partitions[bufnum].numblks == 0)
 				{
 					CDROM_LOG("CD: buffer is empty\n");
@@ -1132,7 +1132,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 					hirqreg |= (CMOK|EHST);
 					return;
 				}
-				
+
 				if (partitions[bufnum].numblks == 0)
 				{
 					CDROM_LOG("CD: buffer is empty\n");
@@ -1271,7 +1271,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			playtype = 1;
 
 			// and do the disc I/O
-//			timer_adjust(sector_timer, TIME_IN_HZ(150), 0, 0);	// 150 sectors / second = 300kBytes/second
+//          timer_adjust(sector_timer, TIME_IN_HZ(150), 0, 0);  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x7500:
@@ -1286,7 +1286,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;	// necessary to pass
 			cr2 = 0x4;
-//			hirqreg |= (CMOK|EFLS|CSCT);
+//          hirqreg |= (CMOK|EFLS|CSCT);
 			sectorstore = 1;
 			hirqreg = 0xfc5;
 			break;
@@ -1304,7 +1304,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			hirqreg |= (CMOK);
 			break;
 		}
-//		CDROM_LOG("ret: %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
+//      CDROM_LOG("ret: %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
 		break;
 	default:
 		CDROM_LOG("CD: WW %08x %04x (PC=%x)\n", addr, data, activecpu_get_pc());
@@ -1617,9 +1617,9 @@ static void cd_readTOC(void)
 	fad = cdrom_get_track_start(cdrom, 0xaa) + 150;
 
 	tocbuf[tocptr+8] = tocbuf[0];
-	tocbuf[tocptr+9]  = (fad>>16)&0xff; 
-	tocbuf[tocptr+10] = (fad>>8)&0xff;  
-	tocbuf[tocptr+11] = fad&0xff;       
+	tocbuf[tocptr+9]  = (fad>>16)&0xff;
+	tocbuf[tocptr+10] = (fad>>8)&0xff;
+	tocbuf[tocptr+11] = fad&0xff;
 }
 
 static partitionT *cd_filterdata(filterT *flt, int trktype)
@@ -1783,7 +1783,7 @@ static partitionT *cd_read_filtered_sector(INT32 fad)
 				curblock.size = 2324;
 			}
 		}
-		
+
 		return cd_filterdata(cddevice, trktype);
 	}
 

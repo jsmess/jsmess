@@ -197,7 +197,6 @@ $(LIBOCORE): $(OSDCOREOBJS)
 #-------------------------------------------------
 
 OSDOBJS = \
-	$(WINOBJ)/config.o \
 	$(WINOBJ)/d3d8intf.o \
 	$(WINOBJ)/d3d9intf.o \
 	$(WINOBJ)/drawd3d.o \

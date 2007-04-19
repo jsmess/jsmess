@@ -563,7 +563,7 @@ void drc_append_restore_sse_rounding(drc_core *drc)
 
 void drc_dasm(FILE *f, const void *begin, const void *end)
 {
-	extern int i386_dasm_one(char *buffer, UINT32 eip, UINT8 *oprom, int addr_size, int op_size);
+	extern int i386_dasm_one(char *buffer, UINT32 eip, UINT8 *oprom, int mode);
 
 	char buffer[256];
 	const UINT8 *begin_ptr = (const UINT8 *) begin;
@@ -574,7 +574,7 @@ void drc_dasm(FILE *f, const void *begin, const void *end)
 	while(begin_ptr < end_ptr)
 	{
 #if defined(MAME_DEBUG) && HAS_I386
-		length = i386_dasm_one(buffer, pc, (UINT8 *) begin_ptr, 1, 1) & DASMFLAG_LENGTHMASK;
+		length = i386_dasm_one(buffer, pc, (UINT8 *) begin_ptr, 32) & DASMFLAG_LENGTHMASK;
 #else
 		sprintf(buffer, "%02X", *begin_ptr);
 		length = 1;

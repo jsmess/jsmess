@@ -1,48 +1,39 @@
 /***************************************************************************
-MPU4 highly preliminary driver by J.Wallace, and Anonymous.
+  MPU4 highly preliminary driver by J.Wallace, and Anonymous.
 
+  09-04-2007: J Wallace: Corrected a lot of out of date info in this revision history.
+                         Revisionism, if you will.
   17-02-2007: J Wallace: Added Deal 'Em - still needs some work.
-
   10-02-2007: J Wallace: Improved input timing.
               It appears Connect 4 uses a different sound mapping to regular Barcrest games.
-
   30-01-2007: J Wallace: Characteriser rewritten to run the 'extra' data needed by some games.
-
-  24-01-2007: J Wallace: With thanks to Canonman and HIGHWAYMAN, I was able to confirm a seemingly
+  24-01-2007: J Wallace: With thanks to Canonman and HIGHWAYMAN/System 80, I was able to confirm a seemingly
               ghastly misuse of a PIA is actually on the real hardware. This fixes the meters.
-
   30-12-2006: J Wallace: Fixed init routines, state saving is theoretically supported.
-
   23-09-2006: Converted 7Segment code to cleaner version, but have yet to add new 16k EPROM, as
               the original image was purported to come from a Barcrest BBS service, and is probably
               more 'official'.
-
   07-09-2006: It appears that the video firmware is intended to be a 16k EPROM, not 64k as dumped.
               In fact, the current dump is just the code repeated 4 times, when nothing earlier than
               0xC000 is ever called. Presumably, the ROM is loaded into C000, and the remainder of the
               'ROM' space is in fact the extra 32k of RAM apparently needed to hold the video board data.
               For now, we'll continue to use the old dump, as I am unsure as to how to map this in MAME.
-              Changed Turn Over's name in AGEMAME, it's either 12 Pound or 20 Pound Turn Over, depending on settings.
-
-              Not that I know how to hook this up, but the O3 pin from IC2 seems to be able to influence
-              the audio filter in some way - see the circuit diagram on my site for the layout.
+              Changed Turn Over's name, it's either 12 Pound or 20 Pound Turn Over, depending on settings.
 
               At this stage, I cannot see how to progress any further with the emulation, so I have transferred
               a non-AWP version of this driver to MAME for further study.
 
   06-09-2006: Connect 4 added - VFD is currently reversed, although it looks to me like
               that's the correct behaviour, and that my 'correction' for Old Timer was wrong.
-              Yamaha sound does work, but is horrendous - presumably there's a filter on the
+              AY sound does work, but is horrendous - presumably there's a filter on the
               sound that I haven't spotted. Trackball is apparently connected to AUX1, via
-              Schmitt triggers - I wish I had a clue what this meant (JW).
+              Schmitt triggers - I wish I had a clue what this meant (El Condor).
 
   05-09-2006: And the award for most bone-headed bug goes to.. me! the 6840 handler wasn't
               resetting the clocks after timeout, so the wave frequencies were way off.
               Machines now hang on reset due to a lack of reel support.
               CHR decoding now included, but still requires knowledge of the data table
               location - this should be present in the ROMs somewhere.
-              6850 ACIA code now taken from the SAC-1, with a few alterations for the clocking
-              in and out - doesn't seem to be copying the right data, though.
 
   11-08-2006: It appears that the PIA IRQ's are not connected after all - but even
               disabling these won't get around the PTM issues.
@@ -78,9 +69,9 @@ One of the advantages of the hardware setup was that the developer could change 
 up to a point, adding extra lamp support, different amounts of RAM, and (in many cases) an OKI MSM6376 and related PIA and PTM
 for improved ADPCM sample support (This was eventually endorsed in the most recent official 'MOD' of the board)
 
-For the Barcrest MPU4 Video system, the cartridge contains the MPU4 video bios in the usual ROM space (occupying 16k), interface chips
-to connect an additional Video board, and a 6850 serial IO to communicate with said board. This version of the game card does not
-have the OKI chip, or the characteriser.
+For the Barcrest MPU4 Video system, the cartridge contains the MPU4 video bios in the usual ROM space (occupying 16k), an interface
+interface card to connect an additional Video board, and a 6850 serial IO to communicate with said board.
+This version of the game card does not have the OKI chip, or the characteriser.
 
 The VIDEO BOARD is driven by a 10mhz 68000 processor, and contains a 6840PTM, 6850 serial IO (the other end of the
 communications), an SAA1099 for stereo sound and SCN2674 gfx chip.
@@ -263,10 +254,10 @@ IRQ line connected to CPU
            |   |                 |        IRQB           connected to IRQ CPU
            |   |                 |
 -----------+---+-----------------+--------------------------------------------------------------------------
- 1000-FFFF | R | D D D D D D D D | ROM (can be banked switched by 0x850 in 8 banks of 64 k ) (NV)
+ 1000-FFFF | R | D D D D D D D D | ROM (can be bank switched by 0x850 in 8 banks of 64 k ) (NV)
 -----------+---+-----------------+--------------------------------------------------------------------------
 
- TODO: - confirm map, based on 6809 code.
+ TODO: - Input timing is completely wrong, need more info.
        - Get MPU4 board working properly, so that video layer will operate.
        - Confirm that MC6850 emulation is sufficient.
        - MPU4 Master clock value taken from schematic, but 68k value is not.
@@ -290,7 +281,7 @@ IRQ line connected to CPU
 
 // Video
 #include "cpu/m68000/m68000.h"
-#include "machine/mpu4.c"
+#include "machine/6850acia.h"
 //#include "machine/74148.h"
 #include "sound/saa1099.h"
 
@@ -317,12 +308,12 @@ IRQ line connected to CPU
 #define VIDEO_MASTER_CLOCK (10000000)
 
 // local vars /////////////////////////////////////////////////////////////
-static int mmtr_data;		  // mechanical meter latch
+static int mmtr_data;
 static int alpha_data_line;
 static int alpha_clock;
 static int ay8910_address;
-//static int expansion_latch; MOD 4 and above only
-//static int global_volume;
+//static int expansion_latch;// MOD 4 and above only
+//static int global_volume;// MOD 4 and above only
 static int serial_data;
 static int signal_50hz;
 static int ic4_input_b;
@@ -335,11 +326,12 @@ static int IC23GA;
 static int prot_col;
 static int lamp_col;
 static int ic24_active;
+static int serial_card_connected;
 static mame_timer *ic24_timer;
 void ic24_timeout(int state);
 // user interface stuff ///////////////////////////////////////////////////
 
-static UINT8 Lamps[128];        // 128 multiplexed lamps  (2 8X8 matrices)
+static UINT8 Lamps[128];        // 128 multiplexed lamps
 								// 32  multiplexed inputs - but a further 8 possible per AUX.
 								// Two connectors 'orange' (sampled every 8ms) and 'black' (sampled every 16ms)
 								// Each connector carries two banks of eight inputs and two enable signals
@@ -347,11 +339,15 @@ static UINT8 Lamps[128];        // 128 multiplexed lamps  (2 8X8 matrices)
 static int optic_pattern;
 static UINT16 lamp_strobe;
 static UINT8  lamp_data;
-static UINT8  yamdata;
+static UINT8  aydata;
 
 static UINT8 chr_data[144];
 static UINT16 chr16_data[144];
 static UINT8 led_segs[8];
+
+/* UART source/sinks */
+UINT8 m68k_m6809_line;
+UINT8 m6809_m68k_line;
 
 /*
 LED Segments related to pins (5 is not connected):
@@ -366,8 +362,8 @@ with settings like this in the majority of cases.
    _2_
   |   |
   4   7
-  |   |
-   _6_1
+  |_ _|
+    6  1
 
 8 display enables (pins 10 - 17)
 */
@@ -382,7 +378,7 @@ static int    input_strobe;	  // IC23 74LS138 A = CA2 IC7, B = CA2 IC4, C = CA2 
 // Video
 
 static UINT8 m6840_irq_state;
-extern UINT8 m6850_irq_state;
+static UINT8 m6850_irq_state;
 static UINT8 scn2674_irq_state;
 
 int vid_rx;
@@ -428,7 +424,6 @@ static const UINT8 MPU4_matrix2[] =
 
 void update_lamps(void)
 {
-	int x;
 	Lamps[MPU4_matrix1[(16*input_strobe)+0]] = (lamp_strobe & 0x0001) != 0;
 	Lamps[MPU4_matrix1[(16*input_strobe)+1]] = (lamp_strobe & 0x0002) != 0;
 	Lamps[MPU4_matrix1[(16*input_strobe)+2]] = (lamp_strobe & 0x0004) != 0;
@@ -447,11 +442,6 @@ void update_lamps(void)
 	Lamps[MPU4_matrix2[(16*input_strobe)+6]] = (lamp_strobe & 0x4000) != 0;
 	Lamps[MPU4_matrix2[(16*input_strobe)+7]] = (lamp_strobe & 0x8000) != 0;
 	Lamps_SetBrightness(0, 127, Lamps);
-
-	for ( x = 0; x < 128; x++ )
-	{
-		LOG_CHR(("Lamp %02X %02X", x, Lamps[x]));
-	}
 }
 
 void awp_lamp_draw(void)
@@ -546,7 +536,7 @@ static MACHINE_RESET( mpu4 )
 	IC23G2B   = 0;
 
 	prot_col  = 0;
-	ic24_timer = timer_alloc(ic24_timeout);
+	ic24_timer = mame_timer_alloc(ic24_timeout);
 // init rom bank ////////////////////////////////////////////////////////
 
 	{
@@ -588,7 +578,7 @@ static MACHINE_RESET( mpu4_vid )
 	IC23G2B   = 0;
 
 	prot_col  = 0;
-	ic24_timer = timer_alloc(ic24_timeout);
+	ic24_timer = mame_timer_alloc(ic24_timeout);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -606,7 +596,6 @@ void cpu0_firq(int state)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-
 static WRITE8_HANDLER( bankswitch_w )
 {
 	LOG(("Bank %d \n",data & 0x07));
@@ -635,6 +624,11 @@ static WRITE8_HANDLER( ic2_o2_callback )
 static WRITE8_HANDLER( ic2_o3_callback )
 {
 	ptm6840_set_c1(   0, data); // copy output value to IC2 c1
+
+	if (serial_card_connected)
+	{
+		m6809_m68k_line=data;
+	}
 }
 
 static const ptm6840_interface ptm_ic2_intf =
@@ -753,7 +747,7 @@ static void ic24_setup(void)
 		if (!ic24_active)
 		{
 			ic24_output(1);
-			timer_adjust(ic24_timer, duration, 0, 0);
+			mame_timer_adjust(ic24_timer, double_to_mame_time(duration), 0, time_zero);
 			ic24_active = 1;
 		}
 	}
@@ -761,7 +755,7 @@ static void ic24_setup(void)
 	{
 		if (ic24_active)
 		{
-			timer_adjust(ic24_timer, TIME_NOW, 0, 0);
+			mame_timer_adjust(ic24_timer, time_zero, 0, time_zero);
 		}
 	}
 }
@@ -856,10 +850,10 @@ static const pia6821_interface pia_ic5_intf =
 };
 
 /* ---------------------------------------
-   Yamaha sound function selection -
+   AY Chip sound function selection -
    ---------------------------------------
-The databus of the Yamaha sound chip is connected to IC6 Port A.
-Data is read from/written to the Yamaha chip through this port.
+The databus of the AY sound chip is connected to IC6 Port A.
+Data is read from/written to the AY chip through this port.
 
 If this sounds familiar, Amstrad did something very similar with their home computers.
 
@@ -878,7 +872,7 @@ BDIR BC1       |
 */
 /* PSG function selected */
 
-static void update_yam(void)
+static void update_ay(void)
 {
 	if (pia_get_output_cb2(2));
 	{
@@ -892,24 +886,24 @@ static void update_yam(void)
 		  	case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
 				pia_set_input_a(3, AY8910_read_port_0_r(0));
-				LOG(("Yamaha Read \n"));
+				LOG(("AY Chip Read \n"));
 				break;
 		  	}
 		  	case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
 	  			AY8910_write_port_0_w(0, pia_get_output_a(3));
-				LOG(("Yamaha Write \n"));
+				LOG(("AY Chip Write \n"));
 				break;
 	  		}
 		  	case 0x03:
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
 	  			AY8910_control_port_0_w(0, pia_get_output_a(3));
-				LOG(("Yamaha Select \n"));
+				LOG(("AY Chip Select \n"));
 				break;
 	  		}
 			default:
 			{
-				LOG(("Yamaha error \n"));
+				LOG(("AY Chip error \n"));
 			}
 		}
 	}
@@ -934,8 +928,8 @@ static WRITE8_HANDLER( pia_ic6_portb_w )
 static WRITE8_HANDLER( pia_ic6_porta_w )
 {
 	LOG(("%04x IC6 PIA Write A %2x\n", activecpu_get_previouspc(),data));
-  	yamdata = data;
-    update_yam();
+  	aydata = data;
+    update_ay();
 }
 
 static WRITE8_HANDLER( pia_ic6_ca2_w )
@@ -945,7 +939,7 @@ static WRITE8_HANDLER( pia_ic6_ca2_w )
 	if ( data ) ay8910_address |=  0x01;
 	else        ay8910_address &= ~0x01;
 
-	update_yam();
+	update_ay();
 }
 
 static WRITE8_HANDLER( pia_ic6_cb2_w )
@@ -955,7 +949,7 @@ static WRITE8_HANDLER( pia_ic6_cb2_w )
 	if ( data ) ay8910_address |=  0x02;
 	else        ay8910_address &= ~0x02;
 
-	update_yam();
+	update_ay();
 }
 
 static const pia6821_interface pia_ic6_intf =
@@ -1086,10 +1080,9 @@ static READ8_HANDLER( pia_ic8_porta_r )
 		}
 	}
 	pia_set_input_cb1(2, (readinputportbytag("AUX2") & 0x80));
-	popmessage("IC24 input %d\n",input_strobe);
+//  popmessage("IC24 input %d\n",input_strobe);
 	return readinputport(input_read);
 }
-
 
 static WRITE8_HANDLER( pia_ic8_portb_w )
 {
@@ -1173,6 +1166,31 @@ void update_mpu68_interrupts(void)
 
 }
 
+// Communications ////////////////////////////////////////////////////////
+static void cpu1_acia_irq(int state)
+{
+	m6850_irq_state = state;
+	update_mpu68_interrupts();
+}
+
+static struct acia6850_interface m6809_acia_if =
+{
+	500000,
+	500000,
+	&m68k_m6809_line,
+	&m6809_m68k_line,
+	cpu0_irq
+};
+
+static struct acia6850_interface m68k_acia_if =
+{
+	500000,
+	500000,
+	&m6809_m68k_line,
+	&m68k_m6809_line,
+	cpu1_acia_irq
+};
+
 static void cpu1_irq(int state)
 {
 	LOG(("68k IRQ set, %x\n", state));
@@ -1196,12 +1214,7 @@ static WRITE8_HANDLER( vid_o3_callback )
 
 	//Unknown function, believed to be 6850 Tx,Rx clocks
 
-	if (!m6850_mpu4_status & 0x02);
-	m6850_mpu4_data_ready_callback(m6850_mpu4_output_temp);
-
-	if (!m6850_status & 0x02);
-	m6850_data_ready_callback(m6850_output_temp);
-
+	m6809_m68k_line=data;
 }
 
 static const ptm6840_interface ptm_vid_intf =
@@ -1211,7 +1224,6 @@ static const ptm6840_interface ptm_vid_intf =
 	vid_o1_callback, vid_o2_callback, vid_o3_callback,
 	cpu1_irq
 };
-
 
 // SCN2674 AVDC emulation
 
@@ -1252,6 +1264,7 @@ static const gfx_layout mpu4_vid_char_16x8_layout =
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32},
 	8*32
 };
+
 /* double height & width */
 static const gfx_layout mpu4_vid_char_16x16_layout =
 {
@@ -1621,11 +1634,12 @@ void scn2674_write_command(UINT8 data)
 
 		if(data&0x10) //cpunum_set_input_line(1, 3, ASSERT_LINE); // maybe .. or maybe it just changes the register
 		{
-		scn2674_irq_state = 1;
-		update_mpu68_interrupts();
+			scn2674_irq_state = 1;
+			update_mpu68_interrupts();
 		}
 		else
 		scn2674_irq_state = 0;
+		update_mpu68_interrupts();
 	}
 
 	if ((data&0xe0)==0x80)
@@ -1751,13 +1765,11 @@ READ16_HANDLER( mpu4_vid_scn2674_r )
         */
 		case 0:
 			LOGSTUFF(("Read Irq Register %06x\n",activecpu_get_pc()));
-	//      return scn2674_irq_register|0x08;
-	//      return 0x04;
 			return scn2674_irq_register;
 
 		case 1:
 			LOGSTUFF(("Read Status Register %06x\n",activecpu_get_pc()));
-			return scn2674_status_register;//mame_rand(Machine);scn2674_irq_register;
+			return scn2674_status_register;
 
 		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",activecpu_get_pc()));return scn2674_screen1_l;
 		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",activecpu_get_pc()));return scn2674_screen1_h;
@@ -2435,6 +2447,7 @@ INTERRUPT_GEN(mpu4_vid_irq)
 				update_mpu68_interrupts();
 
 				scn2674_irq_register |= 0x10;
+				scn2674_irq_state = 0;
 			}
 		}
 		scn2674_status_register |= 0x10;
@@ -2459,6 +2472,12 @@ MACHINE_START( mpu4_vid )
 
 	ptm6840_config(0, &ptm_ic2b_intf );
 	ptm6840_config(1, &ptm_vid_intf );
+
+// setup comms///////////////////////////////////////////////////////////
+	serial_card_connected=1;
+
+	acia6850_config(0, &m6809_acia_if);
+	acia6850_config(1, &m68k_acia_if);
 
 // setup 128 lamps //////////////////////////////////////////////////////
 
@@ -2496,7 +2515,7 @@ static MACHINE_START( mpu4 )
 // setup ptm ////////////////////////////////////////////////////////////
 
 	ptm6840_config(0, &ptm_ic2_intf );
-
+	serial_card_connected=0;
 // setup 128 lamps //////////////////////////////////////////////////////
 
 	Lamps_init(128);
@@ -2668,9 +2687,9 @@ static ADDRESS_MAP_START( mpu4_vid_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 
-	/* comms with the MPU4? - disabling this gives MPU4 communication breakdown */
-    AM_RANGE(0xff8000, 0xff8003) AM_READ(  vidcard_uart_rx_r )  // 6850 compatible uart read  data
-    AM_RANGE(0xff8000, 0xff8003) AM_WRITE( vidcard_uart_tx_w )  // 6850 compatible uart write data
+	/* comms with the MPU4 */
+    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(acia6850_1_stat_16_r, acia6850_1_ctrl_lsb_w)
+    AM_RANGE(0xff8002, 0xff8003) AM_READWRITE(acia6850_1_data_16_r, acia6850_1_data_lsb_w)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READ(  ptm6840_1_lsb_r)
 	AM_RANGE(0xff9000, 0xff900f) AM_WRITE( ptm6840_1_lsb_w)
@@ -2684,8 +2703,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mpu4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0801) AM_READ( mpu4_uart_rx_r)	// video uart receive  reg
-	AM_RANGE(0x0800, 0x0801) AM_WRITE(mpu4_uart_tx_w)	// video uart transmit reg
+	AM_RANGE(0x0800, 0x0800) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
+	AM_RANGE(0x0801, 0x0801) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 
 	//AM_RANGE(0x0880, 0x0880) AM_READ(uart1stat_r)     // Could be a UART datalogger is here.
 	//AM_RANGE(0x0880, 0x0880) AM_WRITE(uart1ctrl_w)    // Or a PIA?
@@ -2788,63 +2807,70 @@ UINT8 *dealem_videoram,*dealem_charram;
 tilemap *dealem_tilemap;
 
 
-PALETTE_INIT(dealem)
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  The palette PROM is connected to the RGB output this way:
+
+  Red:      1K      Bit 0
+            470R
+            220R
+
+  Green:    1K      Bit 3
+            470R
+            220R
+
+  Blue:     470R
+            220R    Bit 7
+
+***************************************************************************/
+
+PALETTE_INIT( dealem )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
-
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < memory_region_length(REGION_PROMS);i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
-
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = BIT(*color_prom,0);
+		bit1 = BIT(*color_prom,1);
+		bit2 = BIT(*color_prom,2);
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = BIT(*color_prom,3);
+		bit1 = BIT(*color_prom,4);
+		bit2 = BIT(*color_prom,5);
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = BIT(*color_prom,6);
+		bit2 = BIT(*color_prom,7);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine,i,r,g,b);
-
 		color_prom++;
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
-
-	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f);
 }
 
 static void get_bg_tile_info(int tile_index)
 {
 	int tileno, colour;
 
-	tileno = dealem_videoram[tile_index*2];
-	colour = dealem_videoram[tile_index*2+1];
+	tileno = dealem_videoram[tile_index];
+	colour = dealem_videoram[tile_index];
 
 	SET_TILE_INFO(0,tileno,colour,0)
 }
 
 VIDEO_START(dealem)
 {
-	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,64,32);
+	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,32,32);
 
 	return 0;
 }
-
 
 WRITE8_HANDLER( dealem_videoram_w )
 {
@@ -2855,11 +2881,34 @@ WRITE8_HANDLER( dealem_videoram_w )
 	}
 }
 
+// this is wrong, the PAL handles the colour selection
+WRITE8_HANDLER( dealem_colorram_w )
+{
+	if (colorram[offset] != data)
+	{
+		colorram[offset] = data;
+		tilemap_mark_tile_dirty(dealem_tilemap, offset);
+	}
+}
+
 VIDEO_UPDATE(dealem)
 {
-	tilemap_draw(bitmap,cliprect,dealem_tilemap,0,0);
+	tilemap_draw(bitmap, &machine->screen[0].visarea, dealem_tilemap, 0, 0);
 	return 0;
 }
+
+static WRITE8_HANDLER( dealem_pal_w )
+{
+	switch (data)
+	{
+		default:
+		{
+			logerror("Deal 'em PAL write %d",data);
+			break;
+		}
+	}
+}
+
 
 static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
@@ -2870,11 +2919,7 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 //  AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w) // write bank (rom page select)
 
-//  AM_RANGE(0x0880, 0x0883) AM_WRITE(pia_6_w)      // PIA6821 on game board
-//  AM_RANGE(0x0880, 0x0883) AM_READ( pia_6_r)
-
-//  AM_RANGE(0x08C0, 0x08C7) AM_READ( ptm6840_1_r)  // 6840PTM on game board
-//  AM_RANGE(0x08C0, 0x08C7) AM_WRITE(ptm6840_1_w)
+	AM_RANGE(0x0880, 0x0880) AM_READ(MRA8_RAM) AM_WRITE(dealem_colorram_w) AM_BASE(&colorram) //AM_WRITE(dealem_pal_w)//
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
 //  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
@@ -2900,9 +2945,8 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0F00, 0x0F03) AM_WRITE(pia_5_w)		// PIA6821 IC8
 	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
 
-	AM_RANGE(0x1000, 0x2fff) AM_WRITE(dealem_videoram_w) AM_BASE(&dealem_videoram)
-
-	AM_RANGE(0xBE00, 0xffff) AM_ROM	// 64k  paged ROM (4 pages)
+	AM_RANGE(0x1000, 0x3000) AM_WRITE(dealem_videoram_w) AM_BASE(&dealem_videoram)
+	AM_RANGE(0xBE00, 0xffff) AM_ROM	AM_WRITENOP// 64k  paged ROM (4 pages)
 
 ADDRESS_MAP_END
 
@@ -2986,6 +3030,10 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, TIME_IN_HZ(50) )	// generate 50 hz signal
 
+	MDRV_SCREEN_REFRESH_RATE(56)//Measured accurately from the flip-flop
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8910, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -3003,7 +3051,7 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(16)
-//  MDRV_PALETTE_INIT(dealem) Needs work, confirm PROM with CanonMan
+	MDRV_PALETTE_INIT(dealem)
 
 MACHINE_DRIVER_END
 

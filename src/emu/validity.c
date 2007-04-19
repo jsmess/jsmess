@@ -1134,7 +1134,7 @@ static int validate_sound(int drivnum, const machine_config *drv)
  *
  *************************************/
 
-int mame_validitychecks(int game)
+int mame_validitychecks(const game_driver *curdriver)
 {
 	osd_ticks_t prep = 0;
 	osd_ticks_t expansion = 0;
@@ -1204,7 +1204,7 @@ int mame_validitychecks(int game)
 /* ASG -- trying this for a while to see if submission failures increase */
 #if 1
 		/* non-debug builds only care about games in the same driver */
-		if (game != -1 && strcmp(drivers[game]->source_file, driver->source_file) != 0)
+		if (curdriver != NULL && strcmp(curdriver->source_file, driver->source_file) != 0)
 			continue;
 #endif
 

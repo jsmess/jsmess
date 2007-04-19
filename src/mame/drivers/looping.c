@@ -190,13 +190,17 @@ VIDEO_START( looping )
 
 WRITE8_HANDLER( flip_screen_x_w )
 {
+	looping_state *state = Machine->driver_data;
 	flip_screen_x_set(~data & 0x01);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen ? 128 : 0);
 }
 
 
 WRITE8_HANDLER( flip_screen_y_w )
 {
+	looping_state *state = Machine->driver_data;
 	flip_screen_y_set(~data & 0x01);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen ? 128 : 0);
 }
 
 

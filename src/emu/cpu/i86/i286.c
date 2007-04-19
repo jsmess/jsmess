@@ -236,12 +236,12 @@ static int i286_execute(int num_cycles)
 	return num_cycles - i286_ICount;
 }
 
-extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int addr_size, int op_size);
+extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);
 
 #ifdef MAME_DEBUG
 static offs_t i286_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	return i386_dasm_one(buffer, pc, oprom, 0, 0);
+	return i386_dasm_one(buffer, pc, oprom, 16);
 }
 #endif /* MAME_DEBUG */
 

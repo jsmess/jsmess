@@ -170,8 +170,20 @@ static void generate_serial_data(int upper)
  *
  *************************************/
 
+static void serial_register_state(void)
+{
+	state_save_register_global_array(serial.data);
+	state_save_register_global(serial.buffer);
+	state_save_register_global(serial.index);
+	state_save_register_global(serial.status);
+	state_save_register_global(serial.bits);
+	state_save_register_global(serial.ormask);
+}
+
+
 void midway_serial_pic_init(int upper)
 {
+	serial_register_state();
 	generate_serial_data(upper);
 }
 
@@ -249,8 +261,30 @@ static void reset_timer(int param)
 }
 
 
+static void pic_register_state(void)
+{
+	state_save_register_global(pic.latch);
+	state_save_register_global(pic.latch_expire_time.seconds);
+	state_save_register_global(pic.latch_expire_time.subseconds);
+	state_save_register_global(pic.state);
+	state_save_register_global(pic.index);
+	state_save_register_global(pic.total);
+	state_save_register_global(pic.nvram_addr);
+	state_save_register_global_array(pic.buffer);
+	state_save_register_global_array(pic.nvram);
+	state_save_register_global_array(pic.default_nvram);
+	state_save_register_global_array(pic.time_buf);
+	state_save_register_global(pic.time_index);
+	state_save_register_global(pic.time_just_written);
+	state_save_register_global(pic.yearoffs);
+}
+
+
 void midway_serial_pic2_init(int upper, int yearoffs)
 {
+	serial_register_state();
+	pic_register_state();
+
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
 	pic.time_write_timer = timer_alloc(reset_timer);
@@ -536,6 +570,23 @@ static void ioasic_output_full(int state);
 static void update_ioasic_irq(void);
 static void cage_irq_handler(int state);
 
+
+static void ioasic_register_state(void)
+{
+	state_save_register_global_array(ioasic.reg);
+	state_save_register_global(ioasic.shuffle_active);
+	state_save_register_global(ioasic.irq_state);
+	state_save_register_global(ioasic.sound_irq_state);
+	state_save_register_global(ioasic.auto_ack);
+	state_save_register_global(ioasic.force_fifo_full);
+	state_save_register_global_array(ioasic.fifo);
+	state_save_register_global(ioasic.fifo_in);
+	state_save_register_global(ioasic.fifo_out);
+	state_save_register_global(ioasic.fifo_bytes);
+	state_save_register_global(ioasic.fifo_force_buffer_empty_pc);
+}
+
+
 void midway_ioasic_init(int shuffle, int upper, int yearoffs, void (*irq_callback)(int))
 {
 	static UINT8 shuffle_maps[][16] =
@@ -550,6 +601,8 @@ void midway_ioasic_init(int shuffle, int upper, int yearoffs, void (*irq_callbac
 		{ 0x7,0x4,0x5,0x6,0x2,0x0,0x1,0x3,0x8,0x9,0xa,0xb,0xd,0xc,0xe,0xf },	/* San Francisco Rush: The Rock */
 		{ 0x1,0x2,0x3,0x0,0x4,0x5,0x6,0x7,0xa,0xb,0x8,0x9,0xc,0xd,0xe,0xf },	/* Hyperdrive */
 	};
+
+	ioasic_register_state();
 
 	/* do we have a DCS2 sound chip connected? (most likely) */
 	ioasic.has_dcs = (mame_find_cpu_index(Machine, "dcs2") != -1 || mame_find_cpu_index(Machine, "dsio") != -1 || mame_find_cpu_index(Machine, "denver") != -1);

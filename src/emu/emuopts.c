@@ -24,10 +24,10 @@
 
 const options_entry mame_core_options[] =
 {
-	// unadorned options - only a single one supported at the moment
+	/* unadorned options - only a single one supported at the moment */
 	{ "<UNADORNED0>",                NULL,        0,                 NULL },
 
-	// file and directory options
+	/* seach path options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
 	{ "rompath;rp;biospath;bp",      "roms",      0,                 "path to ROMsets and hard disk images" },
 #ifdef MESS
@@ -39,6 +39,7 @@ const options_entry mame_core_options[] =
 	{ "inipath",                     ".;ini",     0,                 "path to ini files" },
 	{ "fontpath",                    ".",         0,                 "path to font files" },
 
+	/* output directory options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },
 	{ "cfg_directory",               "cfg",       0,                 "directory to save configurations" },
 	{ "nvram_directory",             "nvram",     0,                 "directory to save nvram contents" },
@@ -49,9 +50,11 @@ const options_entry mame_core_options[] =
 	{ "diff_directory",              "diff",      0,                 "directory to save hard drive image difference files" },
 	{ "comment_directory",           "comments",  0,                 "directory to save debugger comments" },
 
+	/* filename options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE FILENAME OPTIONS" },
 	{ "cheat_file",                  "cheat.dat", 0,                 "cheat filename" },
 
+	/* state/playback options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE STATE/PLAYBACK OPTIONS" },
 	{ "state",                       NULL,        0,                 "saved state to load" },
 	{ "autosave",                    "0",         OPTION_BOOLEAN,    "enable automatic restore at startup, and automatic save at exit time" },
@@ -60,6 +63,7 @@ const options_entry mame_core_options[] =
 	{ "mngwrite",                    NULL,        0,                 "optional filename to write a MNG movie of the current session" },
 	{ "wavwrite",                    NULL,        0,                 "optional filename to write a WAV file of the current session" },
 
+	/* performance options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE PERFORMANCE OPTIONS" },
 	{ "autoframeskip;afs",           "0",         OPTION_BOOLEAN,    "enable automatic frameskip selection" },
 	{ "frameskip;fs",                "0",         0,                 "set frameskip to fixed value, 0-12 (autoframeskip must be disabled)" },
@@ -67,6 +71,7 @@ const options_entry mame_core_options[] =
 	{ "throttle",                    "1",         OPTION_BOOLEAN,    "enable throttling to keep game running in sync with real time" },
 	{ "sleep",                       "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
 
+	/* rotation options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE ROTATION OPTIONS" },
 	{ "rotate",                      "1",         OPTION_BOOLEAN,    "rotate the game screen according to the game's orientation needs it" },
 	{ "ror",                         "0",         OPTION_BOOLEAN,    "rotate screen clockwise 90 degrees" },
@@ -76,32 +81,38 @@ const options_entry mame_core_options[] =
 	{ "flipx",                       "0",         OPTION_BOOLEAN,    "flip screen left-right" },
 	{ "flipy",                       "0",         OPTION_BOOLEAN,    "flip screen upside-down" },
 
+	/* artwork options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE ARTWORK OPTIONS" },
 	{ "artwork_crop;artcrop",        "0",         OPTION_BOOLEAN,    "crop artwork to game screen size" },
 	{ "use_backdrops;backdrop",      "1",         OPTION_BOOLEAN,    "enable backdrops if artwork is enabled and available" },
 	{ "use_overlays;overlay",        "1",         OPTION_BOOLEAN,    "enable overlays if artwork is enabled and available" },
 	{ "use_bezels;bezel",            "1",         OPTION_BOOLEAN,    "enable bezels if artwork is enabled and available" },
 
+	/* screen options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SCREEN OPTIONS" },
 	{ "brightness",                  "1.0",       0,                 "default game screen brightness correction" },
 	{ "contrast",                    "1.0",       0,                 "default game screen contrast correction" },
 	{ "gamma",                       "1.0",       0,                 "default game screen gamma correction" },
 	{ "pause_brightness",            "0.65",      0,                 "amount to scale the screen brightness when paused" },
 
+	/* vector options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE VECTOR OPTIONS" },
 	{ "antialias;aa",                "1",         OPTION_BOOLEAN,    "use antialiasing when drawing vectors" },
 	{ "beam",                        "1.0",       0,                 "set vector beam width" },
 	{ "flicker",                     "0",         0,                 "set vector flicker effect" },
 
+	/* sound options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SOUND OPTIONS" },
 	{ "sound",                       "1",         OPTION_BOOLEAN,    "enable sound output" },
 	{ "samplerate;sr",               "48000",     0,                 "set sound output sample rate" },
 	{ "samples",                     "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ "volume;vol",                  "0",         0,                 "sound volume in decibels (-32 min, 0 max)" },
 
+	/* input options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT OPTIONS" },
 	{ "ctrlr",                       NULL,        0,                 "preconfigure for specified controller" },
 
+	/* debugging options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },
 	{ "log",                         "0",         OPTION_BOOLEAN,    "generate an error.log file" },
 #ifdef MAME_DEBUG
@@ -112,6 +123,7 @@ const options_entry mame_core_options[] =
 	{ "debugscript",                 NULL,        OPTION_DEPRECATED, "(debugger-only command)" },
 #endif
 
+	/* misc options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE MISC OPTIONS" },
 	{ "bios",                        "default",   0,                 "select the system BIOS to use" },
 	{ "cheat;c",                     "0",         OPTION_BOOLEAN,    "enable cheat subsystem" },
@@ -177,7 +189,7 @@ void mame_options_init(const options_entry *entries)
 	options_set_output_callback(opts, OPTMSG_ERROR, mame_puts_error);
 
 	options_add_entries(opts, mame_core_options);
-	if (entries)
+	if (entries != NULL)
 		options_add_entries(opts, entries);
 
 	mame_opts = opts;

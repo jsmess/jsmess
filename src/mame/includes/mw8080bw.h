@@ -140,6 +140,7 @@ WRITE8_HANDLER( bowler_audio_4_w );
 WRITE8_HANDLER( bowler_audio_5_w );
 WRITE8_HANDLER( bowler_audio_6_w );
 
+MACHINE_DRIVER_EXTERN( invaders_samples_audio );
 MACHINE_DRIVER_EXTERN( invaders_audio );
 WRITE8_HANDLER( invaders_audio_1_w );
 WRITE8_HANDLER( invaders_audio_2_w );

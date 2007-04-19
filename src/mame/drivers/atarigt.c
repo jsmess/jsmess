@@ -811,19 +811,19 @@ static MACHINE_DRIVER_START( atarigt )
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
 	MDRV_CPU_PERIODIC_INT(atarigen_scanline_int_gen,TIME_IN_HZ(250))
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-
 	MDRV_MACHINE_RESET(atarigt)
 	MDRV_NVRAM_HANDLER(atarigen)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	/* the vert size is copied from beathead.c.  Needs to be verified */
-	MDRV_SCREEN_SIZE(42*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32768)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	/* note: these parameters are from published specs, not derived */
+	/* the board uses a pair of GALs to determine H and V parameters */
+	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
 	MDRV_VIDEO_START(atarigt)
 	MDRV_VIDEO_EOF(atarirle)

@@ -728,8 +728,9 @@ void dss_op_amp_osc_step(node_description *node)
 			iCharge[1] = (context->high_out_V - OP_AMP_NORTON_VBE) / *context->r2 - iCharge[0];
 			/* Work out the Inverting Schmitt thresholds. */
 			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r5;
+			i2 = (0.0 - OP_AMP_NORTON_VBE) / *context->r4;
+			context->thresholdLow = (i1 + i2) * *context->r3 + OP_AMP_NORTON_VBE;
 			i2 = (context->high_out_V - OP_AMP_NORTON_VBE) / *context->r4;
-			context->thresholdLow = i1 * *context->r3 + OP_AMP_NORTON_VBE;
 			context->thresholdHigh = (i1 + i2) * *context->r3 + OP_AMP_NORTON_VBE;
 			break;
 		}
@@ -753,7 +754,6 @@ void dss_op_amp_osc_step(node_description *node)
 
 			/* Work out the charge rates. */
 			v -= OP_AMP_NORTON_VBE;
-			if (v < 0) v = 0;
 			iCharge[0] = v / info->r1;
 			iCharge[1] = v / info->r2 - iCharge[0];
 
@@ -780,12 +780,10 @@ void dss_op_amp_osc_step(node_description *node)
 			/* we need to mix any bias and all modulation voltages together. */
 			iCharge[0] = context->iFixed;
 			v = DSS_OP_AMP_OSC__VMOD1 - OP_AMP_NORTON_VBE;
-			if (v < 0) v = 0;
 			iCharge[0] += v / info->r1;
 			if (info->r6 != 0)
 			{
 				v = DSS_OP_AMP_OSC__VMOD2 - OP_AMP_NORTON_VBE;
-				if (v < 0) v = 0;
 				iCharge[0] += v / info->r6;
 			}
 			iCharge[1] = context->temp1 - iCharge[0];
@@ -943,7 +941,8 @@ void dss_op_amp_osc_reset(node_description *node)
 			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
 			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
 			context->thresholdLow = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
-			context->thresholdHigh = i1 * info->r3 + OP_AMP_NORTON_VBE;
+			i2 = (0.0 - OP_AMP_NORTON_VBE) / info->r4;
+			context->thresholdHigh = (i1 - i2) * info->r3 + OP_AMP_NORTON_VBE;
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_VCO_2 | DISC_OP_AMP_IS_NORTON:
@@ -956,8 +955,9 @@ void dss_op_amp_osc_reset(node_description *node)
 			context->temp2 = (info->vP - OP_AMP_NORTON_VBE) * (1.0 / info->r2 + 1.0 / info->r6);
 			/* Work out the Inverting Schmitt thresholds. */
 			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
+			i2 = (0.0 - OP_AMP_NORTON_VBE) / info->r4;
+			context->thresholdLow = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
-			context->thresholdLow = i1 * info->r3 + OP_AMP_NORTON_VBE;
 			context->thresholdHigh = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			break;
 
@@ -973,8 +973,9 @@ void dss_op_amp_osc_reset(node_description *node)
 			context->temp1 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r2;
 			/* Work out the Inverting Schmitt thresholds. */
 			i1 = (info->vP - OP_AMP_NORTON_VBE) / info->r5;
+			i2 = (0.0 - OP_AMP_NORTON_VBE) / info->r4;
+			context->thresholdLow = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			i2 = (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r4;
-			context->thresholdLow = i1 * info->r3 + OP_AMP_NORTON_VBE;
 			context->thresholdHigh = (i1 + i2) * info->r3 + OP_AMP_NORTON_VBE;
 			break;
 	}

@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( invadpt2 )
 	MDRV_PALETTE_INIT(invadpt2)
 
     /* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -421,7 +421,7 @@ static MACHINE_DRIVER_START( spcewars )
 	MDRV_MACHINE_RESET(spcewars)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 	/* extra audio channel */
 	MDRV_SOUND_ADD(SPEAKER, 0)
@@ -517,7 +517,7 @@ static MACHINE_DRIVER_START( cosmo )
 	MDRV_PALETTE_INIT(cosmo)
 
     /* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -687,7 +687,7 @@ static MACHINE_DRIVER_START( invrvnge )
 	MDRV_MACHINE_RESET(invrvnge)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -768,7 +768,7 @@ static MACHINE_DRIVER_START( sstrangr )
 	MDRV_MACHINE_RESET(sstrangr)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -855,7 +855,7 @@ static MACHINE_DRIVER_START( sstrngr2 )
 	MDRV_PALETTE_INIT(invadpt2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -1327,7 +1327,7 @@ static MACHINE_DRIVER_START( rollingc )
 	MDRV_PALETTE_INIT(invadpt2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -1509,7 +1509,7 @@ static MACHINE_DRIVER_START( schasrcv )
 	MDRV_PALETTE_INIT(invadpt2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 	MDRV_SOUND_ADD(SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1661,7 +1661,7 @@ static MACHINE_DRIVER_START( lupin3 )
 	MDRV_PALETTE_INIT(invadpt2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -2037,7 +2037,7 @@ static MACHINE_DRIVER_START( ballbomb )
 	MDRV_PALETTE_INIT(invadpt2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -2112,7 +2112,7 @@ static MACHINE_DRIVER_START( yosakdon )
 	MDRV_MACHINE_RESET(yosakdon)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 
@@ -2216,7 +2216,7 @@ static MACHINE_DRIVER_START( indianbt )
 	MDRV_PALETTE_INIT(indianbt)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG(indianbt_discrete_interface)
@@ -2315,7 +2315,7 @@ static MACHINE_DRIVER_START( shuttlei )
 	MDRV_PALETTE_INIT(black_and_white)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_IMPORT_FROM(invaders_samples_audio)
 
 MACHINE_DRIVER_END
 

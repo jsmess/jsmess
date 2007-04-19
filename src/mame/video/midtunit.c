@@ -12,7 +12,6 @@
 
 
 /* compile-time options */
-#define FAST_DMA			0		/* DMAs complete immediately; reduces number of CPU switches */
 #define LOG_DMA				0		/* DMAs are logged if the 'L' key is pressed */
 
 
@@ -106,6 +105,14 @@ VIDEO_START( midtunit )
 
 	memset(dma_register, 0, sizeof(dma_register));
 	memset(&dma_state, 0, sizeof(dma_state));
+
+	/* register for state saving */
+	state_save_register_global(midtunit_control);
+	state_save_register_global_array(gfxbank_offset);
+	state_save_register_global_pointer(local_videoram, 0x100000/sizeof(local_videoram[0]));
+	state_save_register_global(videobank_select);
+	state_save_register_global_array(dma_register);
+
 	return 0;
 }
 
@@ -598,23 +605,10 @@ DECLARE_BLITTER_SET(dma_draw_noskip_noscale,   dma_state.bpp, EXTRACTGEN,   SKIP
  *
  *************************************/
 
-static int temp_irq_callback(int irqline)
-{
-	cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
-	return 0;
-}
-
-
 static void dma_callback(int is_in_34010_context)
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	if (is_in_34010_context)
-	{
-		cpunum_set_irq_callback(0, temp_irq_callback);
-		cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, ASSERT_LINE);
-	}
-	else
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(0, 0, ASSERT_LINE);
 }
 
 
@@ -627,6 +621,11 @@ static void dma_callback(int is_in_34010_context)
 
 READ16_HANDLER( midtunit_dma_r )
 {
+	/* rmpgwt sometimes reads register 0, expecting it to return the */
+	/* current DMA status; thus we map register 0 to register 1 */
+	/* openice does it as well */
+	if (offset == 0)
+		offset = 1;
 	return dma_register[offset];
 }
 
@@ -699,11 +698,9 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	if (!(command & 0x8000))
-	{
-		cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
 		return;
-	}
 
 	profiler_mark(PROFILER_USER1);
 
@@ -729,8 +726,8 @@ WRITE16_HANDLER( midtunit_dma_w )
 	/* clip the clippers */
 	dma_state.topclip = dma_register[DMA_TOPCLIP] & 0x1ff;
 	dma_state.botclip = dma_register[DMA_BOTCLIP] & 0x1ff;
-	dma_state.leftclip = dma_register[DMA_LEFTCLIP] & 0x1ff;
-	dma_state.rightclip = dma_register[DMA_RIGHTCLIP] & 0x1ff;
+	dma_state.leftclip = dma_register[DMA_LEFTCLIP] & 0x3ff;
+	dma_state.rightclip = dma_register[DMA_RIGHTCLIP] & 0x3ff;
 
 	/* determine the offset */
 	gfxoffset = dma_register[DMA_OFFSETLO] | (dma_register[DMA_OFFSETHI] << 16);
@@ -811,26 +808,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* signal we're done */
 skipdma:
-
-	/* special case for Open Ice: use a timer for command 0x8000, which is */
-	/* used to initiate the DMA. What they do is start the DMA, *then* set */
-	/* up the memory for it, which means that there must be some non-zero  */
-	/* delay that gives them enough time to build up the DMA command list  */
-	if (FAST_DMA)
-	{
-		if (command != 0x8000)
-			dma_callback(1);
-		else
-		{
-			cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
-			mame_timer_set(MAME_TIME_IN_NSEC(41 * pixels), 0, dma_callback);
-		}
-	}
-	else
-	{
-		cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
-		mame_timer_set(MAME_TIME_IN_NSEC(41 * pixels), 0, dma_callback);
-	}
+	mame_timer_set(MAME_TIME_IN_NSEC(41 * pixels), 0, dma_callback);
 
 	profiler_mark(PROFILER_END);
 }

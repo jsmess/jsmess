@@ -235,9 +235,9 @@ const char *memory_region_names[REGION_MAX] =
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-extern int mame_validitychecks(int game);
+extern int mame_validitychecks(const game_driver *driver);
 
-static running_machine *create_machine(int game);
+static running_machine *create_machine(const game_driver *driver);
 static void reset_machine(running_machine *machine);
 static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
@@ -260,7 +260,7 @@ static void logfile_callback(running_machine *machine, const char *buffer);
     run_game - run the given game in a session
 -------------------------------------------------*/
 
-int run_game(int game)
+int run_game(const game_driver *driver)
 {
 	running_machine *machine;
 	int error = MAMERR_NONE;
@@ -269,7 +269,7 @@ int run_game(int game)
 	callback_item *cb;
 
 	/* create the machine structure and driver */
-	machine = create_machine(game);
+	machine = create_machine(driver);
 	reset_machine(machine);
 	mame = machine->mame_data;
 
@@ -280,7 +280,7 @@ int run_game(int game)
 	mame->current_phase = MAME_PHASE_PREINIT;
 
 	/* perform validity checks before anything else */
-	if (mame_validitychecks(game) != 0)
+	if (mame_validitychecks(driver) != 0)
 		return MAMERR_FAILED_VALIDITY;
 
 	/* loop across multiple hard resets */
@@ -1102,7 +1102,7 @@ UINT32 mame_rand(running_machine *machine)
     object and initialize it based on options
 -------------------------------------------------*/
 
-static running_machine *create_machine(int game)
+static running_machine *create_machine(const game_driver *driver)
 {
 	running_machine *machine;
 
@@ -1119,7 +1119,7 @@ static running_machine *create_machine(int game)
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
 
 	/* initialize the driver-related variables in the machine */
-	machine->gamedrv = drivers[game];
+	machine->gamedrv = driver;
 	machine->drv = malloc(sizeof(*machine->drv));
 	if (machine->drv == NULL)
 		goto error;

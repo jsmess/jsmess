@@ -216,13 +216,27 @@ void dma_finished( int n_channel )
 				if( n_total > 65535 )
 				{
 					m_p_n_dmabase[ n_channel ] = n_address;
-					dma_start_timer( n_channel, 16 );
+					//FIXME:
+					// 16000 below is based on try and error.
+					// Mametesters.org: sfex20103red
+					//dma_start_timer( n_channel, 16 );
+					dma_start_timer( n_channel, 16000 );
 					return;
 				}
 				n_address &= n_adrmask;
 				n_nextaddress = g_p_n_psxram[ n_address / 4 ];
 				n_size = n_nextaddress >> 24;
 				m_p_fn_dma_write[ n_channel ]( n_address + 4, n_size );
+				//FIXME:
+				// The following conditions will cause an endless loop.
+				// If stopping the transfer is correct I cannot judge
+				// The patch is meant as a hint for somebody who knows
+				// the hardware.
+				// Mametesters.org: psyforce0105u5red, raystorm0111u1red
+				if (n_address == g_p_n_psxram[ (n_nextaddress & 0xffffff) / 4])
+					break;
+				if (n_address == (n_nextaddress & 0xffffff) )
+					break;
 				n_address = ( n_nextaddress & 0xffffff );
 
 				n_total += ( n_size + 1 );

@@ -270,7 +270,7 @@ static void messtest_output_error(void *param, const char *format, va_list argpt
 
 static messtest_result_t run_test(int flags, struct messtest_results *results)
 {
-	int driver_num;
+	const game_driver *driver;
 	messtest_result_t rc;
 	clock_t begin_time;
 	double real_run_time;
@@ -279,14 +279,10 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	const char *fake_argv[2];
 
 	/* lookup driver */
-	for (driver_num = 0; drivers[driver_num]; driver_num++)
-	{
-		if (!mame_stricmp(current_testcase.driver, drivers[driver_num]->name))
-			break;
-	}
+	driver = driver_get_name(current_testcase.driver);
 
 	/* cannot find driver? */
-	if (!drivers[driver_num])
+	if (driver == NULL)
 	{
 		report_message(MSG_FAILURE, "Cannot find driver '%s'", current_testcase.driver);
 		return MESSTEST_RESULT_STARTFAILURE;
@@ -316,14 +312,14 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 
 	/* ugh... hideous ugly fake arguments */
 	fake_argv[0] = "MESSTEST";
-	fake_argv[1] = drivers[driver_num]->name;
+	fake_argv[1] = driver->name;
 	options_parse_command_line(mame_options(), ARRAY_LENGTH(fake_argv), (char **) fake_argv);
 
 	/* preload any needed images */
 	while(current_command->command_type == MESSTEST_COMMAND_IMAGE_PRELOAD)
 	{
 		/* get the path */
-		fullpath = assemble_software_path(drivers[driver_num], current_command->u.image_args.filename);
+		fullpath = assemble_software_path(driver, current_command->u.image_args.filename);
 
 		/* get the option name */
 		device_opt = device_typename(current_command->u.image_args.device_type);
@@ -347,7 +343,7 @@ static messtest_result_t run_test(int flags, struct messtest_results *results)
 	mame_set_output_channel(OUTPUT_CHANNEL_INFO, mame_null_output_callback, NULL, NULL, NULL);
 	mame_set_output_channel(OUTPUT_CHANNEL_DEBUG, mame_null_output_callback, NULL, NULL, NULL);
 	mame_set_output_channel(OUTPUT_CHANNEL_LOG, mame_null_output_callback, NULL, NULL, NULL);
-	run_game(driver_num);
+	run_game(driver);
 	real_run_time = ((double) (clock() - begin_time)) / CLOCKS_PER_SEC;
 
 	/* what happened? */

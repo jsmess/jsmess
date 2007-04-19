@@ -21,8 +21,10 @@
 
 // MAME headers
 #include "driver.h"
+#include "clifront.h"
 
 // MAMEOS headers
+#include "winmain.h"
 #include "window.h"
 #include "video.h"
 #include "sound.h"
@@ -90,11 +92,19 @@ static const TCHAR helpfile[] = TEXT("docs\\windows.txt");
 static const TCHAR helpfile[] = TEXT("mess.chm");
 #endif
 
+//static HANDLE mm_task = NULL;
+//static DWORD task_index = 0;
+static int timeresult;
+//static MMRESULT result;
+static TIMECAPS caps;
+
 
 
 //============================================================
 //  PROTOTYPES
 //============================================================
+
+static void osd_exit(running_machine *machine);
 
 static void soft_link_functions(void);
 static int check_for_double_click_start(int argc);
@@ -105,6 +115,111 @@ static int get_code_base_size(UINT32 *base, UINT32 *size);
 static void start_profiler(void);
 static void stop_profiler(void);
 
+
+
+//============================================================
+//  OPTIONS
+//============================================================
+
+// struct definitions
+const options_entry mame_win_options[] =
+{
+	// debugging options
+	{ NULL,                       NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
+	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ "verbose;v",                "0",        OPTION_BOOLEAN,    "display additional diagnostic information" },
+
+	// performance options
+	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
+	{ "priority",                 "0",        0,                 "thread priority for the main game thread; range from -15 to 1" },
+	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
+
+	// video options
+	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
+	{ "video",                    "d3d",      0,                 "video output method: none, gdi, ddraw, or d3d" },
+	{ "numscreens",               "1",        0,                 "number of screens to create; usually, you want just one" },
+	{ "window;w",                 "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
+	{ "maximize;max",             "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
+	{ "keepaspect;ka",            "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
+	{ "prescale",                 "1",        0,                 "scale screen rendering by this amount in software" },
+	{ "effect",                   "none",     0,                 "name of a PNG file to use for visual effects, or 'none'" },
+	{ "waitvsync",                "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
+	{ "syncrefresh",              "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
+
+	// DirectDraw-specific options
+	{ NULL,                       NULL,       OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },
+	{ "hwstretch;hws",            "1",        OPTION_BOOLEAN,    "enable hardware stretching" },
+
+	// Direct3D-specific options
+	{ NULL,                       NULL,       OPTION_HEADER,     "DIRECT3D-SPECIFIC OPTIONS" },
+	{ "d3dversion",               "9",        0,                 "specify the preferred Direct3D version (8 or 9)" },
+	{ "filter;d3dfilter;flt",     "1",        OPTION_BOOLEAN,    "enable bilinear filtering on screen output" },
+
+	// per-window options
+	{ NULL,                       NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
+	{ "screen",                   "auto",     0,                 "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ "aspect;screen_aspect",     "auto",     0,                 "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ "resolution;r",             "auto",     0,                 "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view",                     "auto",     0,                 "preferred view for all screens" },
+
+	{ "screen0",                  "auto",     0,                 "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ "aspect0",                  "auto",     0,                 "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ "resolution0;r0",           "auto",     0,                 "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view0",                    "auto",     0,                 "preferred view for the first screen" },
+
+	{ "screen1",                  "auto",     0,                 "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ "aspect1",                  "auto",     0,                 "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ "resolution1;r1",           "auto",     0,                 "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view1",                    "auto",     0,                 "preferred view for the second screen" },
+
+	{ "screen2",                  "auto",     0,                 "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ "aspect2",                  "auto",     0,                 "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ "resolution2;r2",           "auto",     0,                 "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view2",                    "auto",     0,                 "preferred view for the third screen" },
+
+	{ "screen3",                  "auto",     0,                 "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ "aspect3",                  "auto",     0,                 "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ "resolution3;r3",           "auto",     0,                 "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view3",                    "auto",     0,                 "preferred view for the fourth screen" },
+
+	// full screen options
+	{ NULL,                       NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
+	{ "triplebuffer;tb",          "0",        OPTION_BOOLEAN,    "enable triple buffering" },
+	{ "switchres",                "0",        OPTION_BOOLEAN,    "enable resolution switching" },
+	{ "full_screen_brightness;fsb","1.0",     0,                 "brightness value in full screen mode" },
+	{ "full_screen_contrast;fsc", "1.0",      0,                 "contrast value in full screen mode" },
+	{ "full_screen_gamma;fsg",    "1.0",      0,                 "gamma value in full screen mode" },
+
+	// sound options
+	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS SOUND OPTIONS" },
+	{ "audio_latency",            "1",        0,                 "set audio latency (increase to reduce glitches)" },
+
+	// input options
+	{ NULL,                       NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
+	{ "mouse",                    "0",        OPTION_BOOLEAN,    "enable mouse input" },
+	{ "joystick;joy",             "0",        OPTION_BOOLEAN,    "enable joystick input" },
+	{ "lightgun;gun",             "0",        OPTION_BOOLEAN,    "enable lightgun input" },
+	{ "dual_lightgun;dual",       "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
+	{ "offscreen_reload;reload",  "0",        OPTION_BOOLEAN,    "offscreen shots reload" },
+	{ "steadykey;steady",         "0",        OPTION_BOOLEAN,    "enable steadykey support" },
+	{ "joy_deadzone;jdz",         "0.3",      0,                 "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ "joy_saturation;jsat",      "0.85",     0,                 "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
+	{ "digital",                  "none",     0,                 "mark certain joysticks or axes as digital (none|all|j<N>*|j<N>a<M>[,...])" },
+
+	{ NULL,                       NULL,       OPTION_HEADER,     "AUTOMATIC DEVICE SELECTION OPTIONS" },
+	{ "paddle_device;paddle",     "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a paddle control is present" },
+	{ "adstick_device;adstick",   "keyboard", 0,                 "enable (keyboard|mouse|joystick) if an analog joystick control is present" },
+	{ "pedal_device;pedal",       "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a pedal control is present" },
+	{ "dial_device;dial",         "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a dial control is present" },
+	{ "trackball_device;trackball","keyboard", 0,                "enable (keyboard|mouse|joystick) if a trackball control is present" },
+	{ "lightgun_device",          "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a lightgun control is present" },
+	{ "positional_device",        "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a positional control is present" },
+#ifdef MESS
+	{ "mouse_device",             "mouse",    0,                 "enable (keyboard|mouse|joystick) if a mouse control is present" },
+#endif
+
+	{ NULL }
+};
 
 
 //============================================================
@@ -131,9 +246,7 @@ static void winui_output_error(void *param, const char *format, va_list argptr)
 
 int utf8_main(int argc, char **argv)
 {
-	int game_index;
 	char *ext;
-	int res = 0;
 
 	// initialize common controls
 	InitCommonControls();
@@ -164,49 +277,7 @@ int utf8_main(int argc, char **argv)
 		strcat(mapfile_name, ".map");
 
 	// parse config and cmdline options
-	game_index = cli_frontend_init(argc, argv);
-
-	// have we decided on a game?
-	if (game_index != -1)
-	{
-//      HANDLE mm_task = NULL;
-//      DWORD task_index = 0;
-		MMRESULT result;
-		TIMECAPS caps;
-
-		// crank up the multimedia timer resolution to its max
-		// this gives the system much finer timeslices
-		result = timeGetDevCaps(&caps, sizeof(caps));
-		if (result == TIMERR_NOERROR)
-			timeBeginPeriod(caps.wPeriodMin);
-
-		// set our multimedia tasks if we can
-//      if (av_set_mm_thread_characteristics != NULL)
-//          mm_task = (*av_set_mm_thread_characteristics)(TEXT("Playback"), &task_index);
-
-		start_profiler();
-
-		// run the game
-		res = run_game(game_index);
-
-		stop_profiler();
-
-		// turn off our multimedia tasks
-//      if (av_revert_mm_thread_characteristics != NULL)
-//          (*av_revert_mm_thread_characteristics)(mm_task);
-
-		// restore the timer resolution
-		if (result == TIMERR_NOERROR)
-			timeEndPeriod(caps.wPeriodMin);
-	}
-
-	// one last pass at events
-	winwindow_process_events(0);
-
-	// close errorlog, input and playback
-	cli_frontend_exit();
-
-	return res;
+	return cli_execute(argc, argv, mame_win_options);
 }
 
 
@@ -228,6 +299,19 @@ int osd_init(running_machine *machine)
 {
 	int result = 0;
 
+	// debugging options
+{
+	extern int verbose;
+	verbose = options_get_bool(mame_options(), WINOPTION_VERBOSE);
+}
+
+	// thread priority
+	if (!options_get_bool(mame_options(), OPTION_DEBUG))
+		SetThreadPriority(GetCurrentThread(), options_get_int_range(mame_options(), WINOPTION_PRIORITY, -15, 1));
+
+	// ensure we get called on the way out
+	add_exit_callback(machine, osd_exit);
+
 	if (result == 0)
 		result = winvideo_init(machine);
 
@@ -243,8 +327,38 @@ int osd_init(running_machine *machine)
 	if (options_get_bool(mame_options(), WINOPTION_OSLOG))
 		add_logerror_callback(machine, output_oslog);
 
+	// crank up the multimedia timer resolution to its max
+	// this gives the system much finer timeslices
+	timeresult = timeGetDevCaps(&caps, sizeof(caps));
+	if (timeresult == TIMERR_NOERROR)
+		timeBeginPeriod(caps.wPeriodMin);
+
+	// set our multimedia tasks if we can
+//      if (av_set_mm_thread_characteristics != NULL)
+//          mm_task = (*av_set_mm_thread_characteristics)(TEXT("Playback"), &task_index);
+
+	start_profiler();
+
 	return result;
 }
+
+
+static void osd_exit(running_machine *machine)
+{
+	stop_profiler();
+
+	// turn off our multimedia tasks
+//      if (av_revert_mm_thread_characteristics != NULL)
+//          (*av_revert_mm_thread_characteristics)(mm_task);
+
+	// restore the timer resolution
+	if (timeresult == TIMERR_NOERROR)
+		timeEndPeriod(caps.wPeriodMin);
+
+	// one last pass at events
+	winwindow_process_events(0);
+}
+
 
 
 //============================================================
@@ -535,8 +649,6 @@ debug_flush_traces();
 		}
 	}
 #endif
-
-	cli_frontend_exit();
 
 	// exit
 	ExitProcess(100);

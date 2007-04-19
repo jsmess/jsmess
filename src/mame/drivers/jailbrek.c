@@ -413,6 +413,8 @@ static MACHINE_START( jailbrek )
 {
     state_save_register_global(irq_enable);
     state_save_register_global(nmi_enable);
+
+	return 0;
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )

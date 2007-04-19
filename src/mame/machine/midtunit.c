@@ -29,6 +29,38 @@ static UINT8	cmos_write_enable;
 static UINT8	sound_type;
 static UINT8	fake_sound_state;
 
+/* protection */
+static UINT8 	mk_prot_index;
+static UINT16 	mk2_prot_data;
+
+static const UINT32 *nbajam_prot_table;
+static UINT16	nbajam_prot_queue[5];
+static UINT8	nbajam_prot_index;
+
+static const UINT8 *jdredd_prot_table;
+static UINT8 	jdredd_prot_index;
+static UINT8 	jdredd_prot_max;
+
+
+
+/*************************************
+ *
+ *  State saving
+ *
+ *************************************/
+
+static void register_state_saving(void)
+{
+	state_save_register_global(cmos_write_enable);
+	state_save_register_global(fake_sound_state);
+	state_save_register_global(mk_prot_index);
+	state_save_register_global(mk2_prot_data);
+	state_save_register_global_array(nbajam_prot_queue);
+	state_save_register_global(nbajam_prot_index);
+	state_save_register_global(jdredd_prot_index);
+	state_save_register_global(jdredd_prot_max);
+}
+
 
 
 /*************************************
@@ -95,7 +127,6 @@ static const UINT8 mk_prot_values[] =
 	0x16, 0x2d, 0x1a, 0x34, 0x28, 0x10, 0x21, 0x03,
 	0xff
 };
-static UINT8 mk_prot_index;
 
 static READ16_HANDLER( mk_prot_r )
 {
@@ -144,8 +175,6 @@ static WRITE16_HANDLER( mk_prot_w )
  *  Mortal Kombat 2 protection
  *
  *************************************/
-
-static UINT16 mk2_prot_data;
 
 static READ16_HANDLER( mk2_prot_const_r )
 {
@@ -214,10 +243,6 @@ static const UINT32 nbajamte_prot_values[128] =
 	0x30180c26, 0x31381c0e, 0x32393c3e, 0x33192c16, 0x343a3d1e, 0x351a2d36, 0x361b0d06, 0x373b1d2e,
 	0x381c2e17, 0x393c3e3f, 0x3a3d1e0f, 0x3b1d0e27, 0x3c3e1f2f, 0x3d1e0f07, 0x3e1f2f37, 0x3f3f3f1f
 };
-
-static const UINT32 *nbajam_prot_table;
-static UINT16 nbajam_prot_queue[5];
-static UINT8 nbajam_prot_index;
 
 static READ16_HANDLER( nbajam_prot_r )
 {
@@ -289,10 +314,6 @@ static const UINT8 jdredd_prot_values_80020[] =
 	0x3A,0x1D,0x2E,0x37,0x00,0x00,0x2C,0x1C,
 	0x39,0x33,0x00,0x00,0x00,0x00,0x00,0x00
 };
-
-static const UINT8 *jdredd_prot_table;
-static UINT8 jdredd_prot_index;
-static UINT8 jdredd_prot_max;
 
 static WRITE16_HANDLER( jdredd_prot_w )
 {
@@ -376,6 +397,9 @@ static void init_tunit_generic(int sound)
 	offs_t gfx_chunk = midyunit_gfx_rom_size / 4;
 	UINT8 *base;
 	int i;
+
+	/* register for state saving */
+	register_state_saving();
 
 	/* load the graphics ROMs -- quadruples */
 	base = memory_region(REGION_GFX1);

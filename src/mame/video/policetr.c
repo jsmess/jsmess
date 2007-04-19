@@ -83,6 +83,11 @@ static void render_display_list(offs_t offset)
 		UINT32 curx, cury;
 		int x, y;
 
+		if (dstx > render_clip.max_x)
+		{
+			dstw -= (512 - dstx);
+			dstx = 0;
+		}
 		/* apply X clipping */
 		if (dstx < render_clip.min_x)
 		{
@@ -111,11 +116,12 @@ static void render_display_list(offs_t offset)
 			pixel = color | (pixel & mask);
 
 			/* loop over rows and columns */
-			for (y = 0; y < dsth; y++)
-			{
-				UINT8 *dst = &dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
-				memset(dst, pixel, dstw);
-			}
+			if (dstw > 0)
+				for (y = 0; y < dsth; y++)
+				{
+					UINT8 *dst = &dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
+					memset(dst, pixel, dstw);
+				}
 		}
 
 		/* otherwise, standard render */

@@ -142,7 +142,7 @@ typedef struct {
 } VERTEX;
 
 UINT32 K001005_status = 0;
-mame_bitmap *K001005_bitmap;
+mame_bitmap *K001005_bitmap[2];
 mame_bitmap *K001005_zbuffer;
 rectangle K001005_cliprect;
 
@@ -161,12 +161,15 @@ static int K001005_3d_fifo_ptr = 0;
 
 static int tex_mirror_table[4][128];
 
-static int update_30fps;
+static int K001005_bitmap_page = 0;
+
+void K001005_swap_buffers(void);
 
 int K001005_init(void)
 {
 	int i;
-	K001005_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	K001005_bitmap[0] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	K001005_bitmap[1] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
 	K001005_zbuffer = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
@@ -362,9 +365,12 @@ WRITE32_HANDLER( K001005_w )
 			K001005_fifo_write_ptr = 0;
 			K001005_fifo_read_ptr = 0;
 
-			render_polygons();
-			K001005_3d_fifo_ptr = 0;
-
+			if (data == 2 && K001005_3d_fifo_ptr > 0)
+			{
+				K001005_swap_buffers();
+				render_polygons();
+				K001005_3d_fifo_ptr = 0;
+			}
 			break;
 
 		case 0x11d:
@@ -422,7 +428,7 @@ static void draw_triangle(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
 			int x1, x2;
 			INT64 z;
 			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT32 *fb = BITMAP_ADDR32(K001005_bitmap, y, 0);
+			UINT32 *fb = BITMAP_ADDR32(K001005_bitmap[K001005_bitmap_page], y, 0);
 			UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, y, 0);
 
 			x1 = scan->sx;
@@ -527,7 +533,7 @@ static void draw_triangle_tex(VERTEX v1, VERTEX v2, VERTEX v3, UINT32 color)
 			int x1, x2;
 			INT64 u, v, z, w;
 			const struct poly_scanline *scan = &scans->scanline[y - scans->sy];
-			UINT32 *fb = BITMAP_ADDR32(K001005_bitmap, y, 0);
+			UINT32 *fb = BITMAP_ADDR32(K001005_bitmap[K001005_bitmap_page], y, 0);
 			UINT32 *zb = BITMAP_ADDR32(K001005_zbuffer, y, 0);
 
 			x1 = scan->sx;
@@ -967,7 +973,7 @@ void K001005_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 	for (j=cliprect->min_y; j <= cliprect->max_y; j++)
 	{
 		UINT32 *bmp = BITMAP_ADDR32(bitmap, j, 0);
-		UINT32 *src = BITMAP_ADDR32(K001005_bitmap, j, 0);
+		UINT32 *src = BITMAP_ADDR32(K001005_bitmap[K001005_bitmap_page^1], j, 0);
 
 		for (i=cliprect->min_x; i <= cliprect->max_x; i++)
 		{
@@ -981,9 +987,11 @@ void K001005_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 void K001005_swap_buffers(void)
 {
+	K001005_bitmap_page ^= 1;
+
 	//if (K001005_status == 2)
 	{
-		fillbitmap(K001005_bitmap, Machine->remapped_colortable[0], &K001005_cliprect);
+		fillbitmap(K001005_bitmap[K001005_bitmap_page], Machine->remapped_colortable[0], &K001005_cliprect);
 		fillbitmap(K001005_zbuffer, 0xffffffff, &K001005_cliprect);
 	}
 }
@@ -995,10 +1003,6 @@ VIDEO_START( gticlub )
 	if (K001005_init() != 0)
 		return 1;
 
-	if (mame_stricmp(machine->gamedrv->name, "gticlub") == 0 ||
-		mame_stricmp(machine->gamedrv->name, "thunderh") == 0)
-		update_30fps = 1;
-
 	return K001604_vh_start(0);
 }
 
@@ -1006,19 +1010,12 @@ static int tick = 0;
 static int debug_tex_page = 0;
 static int debug_tex_palette = 0;
 
-static int frame = 0;
-
 VIDEO_UPDATE( gticlub )
 {
 	K001604_tile_update(0);
 	K001604_draw_back_layer(0, bitmap, cliprect);
 
 	K001005_draw(bitmap, cliprect);
-	if (!update_30fps || K001005_status == 2)
-	{
-		K001005_swap_buffers();
-	}
-	frame++;
 
 	K001604_draw_front_layer(0, bitmap, cliprect);
 

@@ -124,16 +124,16 @@ static void add_device_options_for_device(core_options *opts, const game_driver 
 
 static void mess_driver_name_callback(core_options *opts, const char *arg)
 {
-	int drvnum;
+	const game_driver *driver;
 
 	/* only add these options if we have not yet added them */
 	if (!added_device_options)
 	{
-		drvnum = driver_get_index(arg);
-		if (drvnum >= 0)
+		driver = driver_get_name(arg);
+		if (driver != NULL)
 		{
 			/* add all of the device options for this driver */
-			enumerate_devices(opts, drivers[drvnum], add_device_options_for_device);
+			enumerate_devices(opts, driver, add_device_options_for_device);
 		}
 		added_device_options = TRUE;
 	}

@@ -34,6 +34,7 @@
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "machine/konamiic.h"
+#include "machine/adc1213x.h"
 #include "sound/rf5c400.h"
 #include "video/voodoo.h"
 #include "machine/timekpr.h"
@@ -540,12 +541,17 @@ READ32_HANDLER(K001604_reg_r)
 
 
 
-
+static void voodoo_vblank_0(int param)
+{
+	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
+}
 
 VIDEO_START( nwktr )
 {
-	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 4))
+	if (voodoo_start(0, 0, VOODOO_1, 2, 2, 2))
 		return 1;
+
+	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
 	return K001604_vh_start(0);
 }
@@ -567,151 +573,20 @@ VIDEO_UPDATE( nwktr )
 
 /*****************************************************************************/
 
-typedef struct
+static double adc12138_input_callback(int input)
 {
-	int cycle;
-	int data_out;
-	int data_in;
-	int conv_mode;
-	int auto_cal;
-	int auto_zero;
-	int acq_time;
-	int data_out_sign;
-	int mode;
-	int input_shift_reg;
-	int output_shift_reg;
-	int end_conv;
-} ADC12138;
-
-static ADC12138 adc12138;
-
-#define ADC12138_CONV_MODE_12_MSB_FIRST			0
-#define ADC12138_CONV_MODE_16_MSB_FIRST			1
-#define ADC12138_CONV_MODE_12_LSB_FIRST			2
-#define ADC12138_CONV_MODE_16_LSB_FIRST			3
-
-#define ADC12138_ACQUISITION_TIME_6_CCLK		0
-#define ADC12138_ACQUISITION_TIME_10_CCLK		1
-#define ADC12138_ACQUISITION_TIME_18_CCLK		2
-#define ADC12138_ACQUISITION_TIME_34_CCLK		3
-
-static int adc12138_do_r(void)
-{
-	//printf("ADC: DO\n");
-	return adc12138.data_out;
-}
-
-static void adc12138_di_w(int state)
-{
-	adc12138.data_in = state & 1;
-}
-
-static void adc12138_cs_w(int state)
-{
-	if (state)
+	int value = 0;
+	switch (input)
 	{
-		//printf("ADC: CS\n");
-
-		if (adc12138.cycle >= 7)
-		{
-			int mode = adc12138.input_shift_reg >> (adc12138.cycle - 8);
-
-			switch (mode & 0xf)
-			{
-				case 0x0:		// X X X X L L L L - 12 or 13 Bit MSB First conversion
-				{
-					break;
-				}
-				case 0x1:		// X X X X L L L H - 16 or 17 Bit MSB First conversion
-				{
-					break;
-				}
-				case 0x4:		// X X X X L H L L - 12 or 13 Bit LSB First conversion
-				{
-					break;
-				}
-				case 0x5:		// X X X X L H L H - 16 or 17 Bit LSB First conversion
-				{
-					break;
-				}
-
-				default:
-				{
-					switch (mode)
-					{
-						case 0x08:		// L L L L H L L L - Auto cal
-						{
-							adc12138.auto_cal = 1;
-							break;
-						}
-
-						case 0x0e:		// L L L L H H H L - Acquisition time 6 CCLK cycles
-						{
-							adc12138.acq_time = ADC12138_ACQUISITION_TIME_6_CCLK;
-							break;
-						}
-
-						case 0x8d:		// H L L L H H L H - Data out with sign
-						{
-							adc12138.data_out_sign = 1;
-							break;
-						}
-
-						default:
-						{
-							fatalerror("ADC12138: unknown config mode %02X\n", mode);
-						}
-					}
-					break;
-				}
-			}
-		}
-
-		adc12138.cycle = 0;
-		adc12138.input_shift_reg = 0;
-
-		adc12138.end_conv = 0;
+		case 0:		value = readinputport(4) - 0x800; break;
+		case 1:		value = readinputport(5); break;
+		case 2:		value = readinputport(6); break;
+		case 3:		value = readinputport(7); break;
+		case 4:		value = readinputport(8); break;
 	}
+
+	return (double)(value) / 2047.0;
 }
-
-static void adc12138_sclk_w(int state)
-{
-	if (state)
-	{
-		//printf("ADC: cycle %d, DI = %d\n", adc12138.cycle, adc12138.data_in);
-
-		adc12138.input_shift_reg <<= 1;
-		adc12138.input_shift_reg |= adc12138.data_in;
-
-		adc12138.data_out = adc12138.output_shift_reg & 1;
-		adc12138.output_shift_reg >>= 1;
-
-		adc12138.cycle++;
-	}
-}
-
-static void adc12138_conv_w(int state)
-{
-	adc12138.end_conv = 1;
-}
-
-static int adc12138_eoc_r(void)
-{
-	return adc12138.end_conv;
-}
-
-static void adc12138_reset(void)
-{
-	memset(&adc12138, 0, sizeof(ADC12138));
-
-	adc12138.conv_mode = ADC12138_CONV_MODE_12_MSB_FIRST;
-	adc12138.data_out_sign = 1;
-	adc12138.auto_cal = 0;
-	adc12138.auto_zero = 0;
-	adc12138.acq_time = ADC12138_ACQUISITION_TIME_10_CCLK;
-}
-
-
 
 static READ32_HANDLER( sysreg_r )
 {
@@ -732,7 +607,7 @@ static READ32_HANDLER( sysreg_r )
 		}
 		if (!(mem_mask & 0x000000ff))
 		{
-			r |= (adc12138_do_r()) | (adc12138_eoc_r() << 2);
+			r |= (adc1213x_do_r(0)) | (adc1213x_eoc_r(0) << 2);
 		}
 	}
 	else if (offset == 1)
@@ -768,10 +643,10 @@ static WRITE32_HANDLER( sysreg_w )
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			adc12138_cs_w(cs);
-			adc12138_conv_w(conv);
-			adc12138_di_w(di);
-			adc12138_sclk_w(sclk);
+			adc1213x_cs_w(0, cs);
+			adc1213x_conv_w(0, conv);
+			adc1213x_di_w(0, di);
+			adc1213x_sclk_w(0, sclk);
 		}
 		if (!(mem_mask & 0x000000ff))
 		{
@@ -1006,6 +881,21 @@ INPUT_PORTS_START( nwktr )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
+	PORT_START_TAG("ANALOG1")		// Steering
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START_TAG("ANALOG2")		// Acceleration pedal
+	PORT_BIT( 0x7ff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START_TAG("ANALOG3")		// Foot brake pedal
+	PORT_BIT( 0x7ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START_TAG("ANALOG4")		// Hand brake lever
+	PORT_BIT( 0x7ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
+	PORT_START_TAG("ANALOG5")		// Clutch pedal
+	PORT_BIT( 0x7ff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000, 0x7ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+
 INPUT_PORTS_END
 
 static struct RF5C400interface rf5c400_interface =
@@ -1023,11 +913,6 @@ static sharc_config sharc_cfg =
 	BOOT_MODE_EPROM
 };
 
-static INTERRUPT_GEN( nwktr_vblank )
-{
-	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
-}
-
 static MACHINE_RESET( nwktr )
 {
 	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
@@ -1039,7 +924,6 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_CONFIG(nwktr_ppc_cfg)
 	MDRV_CPU_PROGRAM_MAP(nwktr_map, 0)
-	MDRV_CPU_VBLANK_INT(nwktr_vblank, 1)
 
 	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
@@ -1049,6 +933,7 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_CPU_DATA_MAP(sharc_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET(nwktr)
 	MDRV_NVRAM_HANDLER( timekeeper_0 )
@@ -1124,7 +1009,7 @@ static DRIVER_INIT( nwktr )
 	ppc403_install_spu_tx_dma_handler(jamma_w, jamma_wdata);
 	ppc403_install_spu_rx_dma_handler(jamma_r, jamma_rdata);
 
-	adc12138_reset();
+	adc1213x_init(0, adc12138_input_callback);
 }
 
 static DRIVER_INIT(thrilld)

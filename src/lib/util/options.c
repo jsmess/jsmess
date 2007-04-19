@@ -484,7 +484,7 @@ int options_parse_command_line(core_options *opts, int argc, char **argv)
 
 int options_parse_ini_file(core_options *opts, core_file *inifile)
 {
-	char buffer[1024];
+	char buffer[4096];
 
 	/* loop over data */
 	while (core_fgets(buffer, ARRAY_LENGTH(buffer), inifile) != NULL)

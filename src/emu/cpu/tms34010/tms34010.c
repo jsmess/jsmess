@@ -81,7 +81,6 @@ typedef struct tms34010_regs
 	UINT16 *shiftreg;
 	INT32 gfxcycles;
 	UINT8  is_34020;
-	UINT8  ext_irq_lines;
 	int (*irq_callback)(int irqline);
 	const tms34010_config *config;
 	mame_timer *scantimer;
@@ -125,6 +124,7 @@ static int	tms34010_ICount;
 static tms34010_regs 	state;
 static UINT8			external_host_access;
 static UINT8			screen_to_cpu[MAX_SCREENS];
+static UINT8			executing_cpu = 0xff;
 
 /* default configuration */
 static tms34010_config default_config =
@@ -575,26 +575,23 @@ static INT32 raster_op_21(INT32 newpix, INT32 oldpix) { return (oldpix > newpix)
     Internal interrupt check
 ****************************************************************************/
 
-/* Generate pending interrupts. Do NOT inline this function on DJGPP,
-   it causes a slowdown */
+/* Generate pending interrupts. */
 static void check_interrupt(void)
 {
 	int vector = 0;
 	int irqline = -1;
 	int irq;
 
-	/* early out if no interrupts pending */
-	irq = IOREG(REG_INTPEND);
-	if (!irq)
+	/* if we're not actively executing, skip it */
+	if (executing_cpu != 0xff && executing_cpu != cpu_getactivecpu())
 		return;
 
 	/* check for NMI first */
-	if (irq & TMS34010_NMI)
+	if (IOREG(REG_HSTCTLH) & 0x0100)
 	{
 		LOG(("TMS34010#%d takes NMI\n", cpu_getactivecpu()));
 
 		/* ack the NMI */
-		IOREG(REG_INTPEND) &= ~TMS34010_NMI;
 		IOREG(REG_HSTCTLH) &= ~0x0100;
 
 		/* handle NMI mode bit */
@@ -608,11 +605,12 @@ static void check_interrupt(void)
 		RESET_ST();
 		PC = RLONG(0xfffffee0);
 		change_pc(TOBYTE(PC));
+		COUNT_CYCLES(16);
 		return;
 	}
 
 	/* early out if everything else is disabled */
-	irq &= IOREG(REG_INTENB);
+	irq = IOREG(REG_INTPEND) & IOREG(REG_INTENB);
 	if (!IE_FLAG || !irq)
 		return;
 
@@ -661,6 +659,7 @@ static void check_interrupt(void)
 		RESET_ST();
 		PC = RLONG(vector);
 		change_pc(TOBYTE(PC));
+		COUNT_CYCLES(16);
 
 		/* call the callback for externals */
 		if (irqline >= 0)
@@ -823,7 +822,6 @@ static void tms34010_set_context(void *src)
 			BREG(BINDEX(i)) = state.flat_bregs[i];
 	}
 	change_pc(TOBYTE(PC));
-	check_interrupt();
 }
 
 static void tms34020_set_context(void *src)
@@ -839,7 +837,6 @@ static void tms34020_set_context(void *src)
 			BREG(BINDEX(i)) = state.flat_bregs[i];
 	}
 	change_pc(TOBYTE(PC));
-	check_interrupt();
 }
 
 
@@ -857,31 +854,18 @@ static void set_irq_line(int irqline, int linestate)
 	{
 		case 0:
 			if (linestate != CLEAR_LINE)
-			{
-				state.ext_irq_lines |= 1;
 				IOREG(REG_INTPEND) |= TMS34010_INT1;
-			}
 			else
-			{
-				state.ext_irq_lines &= ~1;
 				IOREG(REG_INTPEND) &= ~TMS34010_INT1;
-			}
 			break;
 
 		case 1:
 			if (linestate != CLEAR_LINE)
-			{
-				state.ext_irq_lines |= 2;
 				IOREG(REG_INTPEND) |= TMS34010_INT2;
-			}
 			else
-			{
-				state.ext_irq_lines &= ~2;
 				IOREG(REG_INTPEND) &= ~TMS34010_INT2;
-			}
 			break;
 	}
-	check_interrupt();
 }
 
 
@@ -899,7 +883,6 @@ static void internal_interrupt_callback(int param)
 	cpuintrf_push_context(cpunum);
 	IOREG(REG_INTPEND) |= type;
 	LOG(("TMS34010#%d set internal interrupt $%04x\n", cpu_getactivecpu(), type));
-	check_interrupt();
 	cpuintrf_pop_context();
 
 	/* generate triggers so that spin loops can key off them */
@@ -928,6 +911,10 @@ static int tms34010_execute(int cycles)
 	/* execute starting now */
 	tms34010_ICount = cycles;
 	change_pc(TOBYTE(PC));
+
+	/* check interrupts first */
+	executing_cpu = cpu_getactivecpu();
+	check_interrupt();
 	do
 	{
 		#ifdef	MAME_DEBUG
@@ -937,6 +924,7 @@ static int tms34010_execute(int cycles)
 		(*opcode_table[state.op >> 4])();
 
 	} while (tms34010_ICount > 0);
+	executing_cpu = 0xff;
 
 	return cycles - tms34010_ICount;
 }
@@ -1064,7 +1052,7 @@ static void scanline_callback(int param)
 		if (!state.is_34020)
 		{
 			IOREG(REG_DPYADR) = IOREG(REG_DPYSTRT);
-			logerror("Start of VBLANK, DPYADR = %04X\n", IOREG(REG_DPYADR));
+			LOG(("Start of VBLANK, DPYADR = %04X\n", IOREG(REG_DPYADR)));
 		}
 
 		/* 34020 loads DPYNXx with DPYSTx */
@@ -1105,8 +1093,8 @@ static void scanline_callback(int param)
 						video_screen_configure(state.config->scrnum, width, height, &visarea, refresh);
 				}
 
-				logerror("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
-						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, SUBSECONDS_TO_HZ(refresh));
+				LOG(("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
+						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, SUBSECONDS_TO_HZ(refresh)));
 
 				/* interlaced timing not supported */
 				if ((SMART_IOREG(DPYCTL) & 0x4000) == 0)
@@ -1209,7 +1197,7 @@ VIDEO_UPDATE( tms340x0 )
 	if (params.enabled)
 	{
 		/* call through to the callback */
-		logerror("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect->min_y, params.rowaddr, params.coladdr);
+		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect->min_y, params.rowaddr, params.coladdr));
 		(*state.config->scanline_callback)(machine, screen, bitmap, cliprect->min_y, &params);
 	}
 
@@ -1303,7 +1291,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				mame_timer_set(time_zero, cpunum | (TMS34010_NMI << 8), internal_interrupt_callback);
+				mame_timer_set(time_zero, cpunum, internal_interrupt_callback);
 			break;
 
 		case REG_HSTCTLL:
@@ -1352,8 +1340,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			break;
 
 		case REG_INTENB:
-			if (IOREG(REG_INTENB) & IOREG(REG_INTPEND))
-				check_interrupt();
+			check_interrupt();
 			break;
 
 		case REG_INTPEND:
@@ -1364,7 +1351,6 @@ WRITE16_HANDLER( tms34010_io_register_w )
 				IOREG(REG_INTPEND) &= ~TMS34010_WV;
 			if (!(data & TMS34010_DI))
 				IOREG(REG_INTPEND) &= ~TMS34010_DI;
-			check_interrupt();
 			break;
 	}
 
@@ -1451,7 +1437,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				mame_timer_set(time_zero, cpunum | (TMS34010_NMI << 8), internal_interrupt_callback);
+				mame_timer_set(time_zero, cpunum, internal_interrupt_callback);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1492,8 +1478,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 			break;
 
 		case REG020_INTENB:
-			if (IOREG(REG020_INTENB) & IOREG(REG020_INTPEND))
-				check_interrupt();
+			check_interrupt();
 			break;
 
 		case REG020_INTPEND:
@@ -1504,7 +1489,6 @@ WRITE16_HANDLER( tms34020_io_register_w )
 				IOREG(REG020_INTPEND) &= ~TMS34010_WV;
 			if (!(data & TMS34010_DI))
 				IOREG(REG020_INTPEND) &= ~TMS34010_DI;
-			check_interrupt();
 			break;
 
 		case REG020_CONVSP:
@@ -1913,8 +1897,8 @@ void tms34010_get_info(UINT32 _state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (state.ext_irq_lines & 1) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (state.ext_irq_lines & 2) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (IOREG(REG_INTPEND) & TMS34010_INT1) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (IOREG(REG_INTPEND) & TMS34010_INT2) ? ASSERT_LINE : CLEAR_LINE; break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 

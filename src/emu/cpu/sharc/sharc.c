@@ -304,7 +304,7 @@ static void sharc_iop_w(UINT32 address, UINT32 data)
 		case 0x1d:
 		{
 			sharc.dma[7].control = data;
-			add_iop_write_latency_effect(0x1d, data, 20);	// does this really need to be 20 cycles!!?
+			add_iop_write_latency_effect(0x1d, data, 30);
 			break;
 		}
 

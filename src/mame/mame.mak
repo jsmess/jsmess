@@ -409,6 +409,7 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/8237dma.o \
 	$(MACHINE)/8255ppi.o \
 	$(MACHINE)/adc083x.o \
+	$(MACHINE)/adc1213x.o \
  	$(MACHINE)/am53cf96.o \
 	$(MACHINE)/ds2404.o \
  	$(MACHINE)/idectrl.o \
@@ -671,7 +672,6 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/stadhero.o $(VIDEO)/stadhero.o \
 	$(DRIVERS)/supbtime.o $(VIDEO)/supbtime.o \
 	$(DRIVERS)/tryout.o $(VIDEO)/tryout.o \
-	$(DRIVERS)/tumbleb.o $(VIDEO)/tumbleb.o \
 	$(DRIVERS)/tumbleb.o $(VIDEO)/tumbleb.o \
 	$(DRIVERS)/tumblep.o $(VIDEO)/tumblep.o \
 	$(DRIVERS)/vaportra.o $(VIDEO)/vaportra.o \
@@ -1172,7 +1172,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segahang.o $(VIDEO)/segahang.o \
 	$(DRIVERS)/segaorun.o $(VIDEO)/segaorun.o \
 	$(DRIVERS)/segas16a.o $(VIDEO)/segas16a.o \
-	$(DRIVERS)/segas16b.o \
 	$(DRIVERS)/segas16b.o $(VIDEO)/segas16b.o \
 	$(DRIVERS)/segas18.o $(VIDEO)/segas18.o \
 	$(DRIVERS)/segas32.o $(MACHINE)/segas32.o $(VIDEO)/segas32.o \
@@ -1541,6 +1540,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ertictac.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
 	$(DRIVERS)/ettrivia.o \
+	$(DRIVERS)/filetto.o \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
@@ -1590,6 +1590,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pntnpuzl.o \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
+	$(DRIVERS)/quizo.o \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/sfkick.o \

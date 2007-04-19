@@ -43,7 +43,7 @@ Seibu Kaihatsu SPI Hardware Overview
 
 This system (known as 'SPI') consists of a main board and a plug-in
 cartridge containing the game software. The games on SPI hardware can
-be swapped by changing the top cartridge and then moving jumper JP072
+be swapped by changing the top cartridge and then moving a jumper
 to the alternative position. This re-flashes some ROMs for a few minutes
 (accompanied by a techno music track). Afterwards, a message tells you to
 put the jumper back to the original position and reboot the PCB. The new
@@ -116,11 +116,11 @@ Notes:
                    - Replaced with Sharp LH28F008 on Revision 1 PCB
      XC7336(1) - Xilinx XC7336 CPLD (PLCC44, stamped 'MCTL02')
      XC7336(2) - Xilinx XC7336 CPLD (PLCC44, stamped 'MCTL03')
-     TC551001  - Toshiba TC551001 128K x8 SRAM (SOP32)
+     TC551001  - Toshiba TC551001 128k x8 SRAM (SOP32)
                    - Replaced with Toshiba TC518128 on Revision 1 PCB
-     61256     - 32K x8 SRAM (DIP28)
+     61256     - 32k x8 SRAM (DIP28)
                    - Replaced with Sony CXK5863BP-30 on Revision 1 PCB
-     TC551664  - Toshiba TC551664BJ-15 64K x16 SRAM (SOJ44)
+     TC551664  - Toshiba TC551664BJ-15 64k x16 SRAM (SOJ44)
      LH5496D-50- Sharp LH5496D-50 Asynchronous FIFO (DIP28)
      DS2404S   - Dallas DS2404S EconoRAM Time Chip (SOIC16)
      PAL1      - ICT PEEL18CV8 (DIP20, stamped 'SXX005-5')
@@ -138,7 +138,60 @@ Notes:
      JP071     - Slide Switch to flip screen
      JP121     - Jumper to set sound output to mono or stereo
      CN121     - Output connector for left/right speakers
-     *         - Unpopulated position for Toshiba TC551664BJ-15 64K x16 SRAM
+     *         - Unpopulated position for Toshiba TC551664BJ-15 64k x16 SRAM
+
+
+(C)1996 SXX2D V2.1
+|----------------------------------------------------------|
+|HA13118   CN121                                      Z80  |
+|   HA13118                     |-------|  TC518128        |
+|          4560  4560           |SEI155 |                  |
+|                               |SB09   |  TC518128   PAL3 |
+|   VOL_L  4650  YAC513-W       |-------|                  |
+|--|    VOL_R    JP121      |-------------------------|    |
+   |                        |-------------------------|    |
+|--|                 |--------|                            |
+|         16.9344MHz |YMF271-F|  61256  |---------|  61256 |
+|                    |        |         |SEI400   |        |
+|       |------|     |        |  61256  |SB07-3460|  61256 |
+|J      |SIE150|     |--------|         |         |        |
+|A      |      |                        |         |        |
+|M      |------|                        |---------|        |
+|M               LH28F008                    TC551664BJ-15 |
+|A               LH28F008     PAL2   PAL1    TC551664BJ-15 |
+|                           |-------------------------|    |
+|                           |-------------------------|    |
+|--|             28.63636MHz                               |
+   |       BATT_3V           |---------|  |-------|  PAL4  |
+|--|JP051                    |SEI600   |  |AM386DX|        |
+|                            |SB08-1513|  |       | 50MHz  |
+|                32.768kHz   |         |  |-------|        |
+|EXCN1           DS2404S     |         |                   |
+|EXCN2                       |---------|                   |
+|----------------------------------------------------------|
+Notes:
+      This is a smaller (and perhaps cheaper) version of the SXX2C hardware.
+      AM386DX   - Advanced Micro Devices AM386DX/DXL-25 (QFP132), running at 25.000MHz [50/2]
+      Z80       - Zilog Z84C0008PEC (DIP40), running at 7.15909MHz (28.63636/4)
+      YMF271-F  - Yamaha YMF271-F running at 16.9344MHz
+      LH28F008  - Sharp LH28F008SAT-85 8MBit FlashROM (TSOP40)
+      TC518128  - Toshiba TC528128 128k x8 SRAM (SOP32)
+      61256     - SBT SB61L256AS-12 32k x8 SRAM (SOJ28)
+      TC551664  - Toshiba TC551664BJ-15 64k x16 SRAM (SOJ44)
+      DS2404S   - Dallas DS2404S EconoRAM Time Chip (SOIC16)
+      PAL1      - AMD PALCE16V8 (SOIC20, stamped 'SXX2002')
+      PAL2      - AMD PALCE16V8 (SOIC20, no markings)
+      PAL3      - AMD PALCE16V8 (SOIC20, no markings)
+      PAL4      - Lattice GAL20V8B (DIP24, stamped 'SXX2D01')
+      3V_BATT   - 3 Volt coin battery CR2032 for use with DS2404S
+      4560      - Japan Radio Co. JRC4560 Op Amp IC (DIP8)
+      YAC513-W  - Yamaha YAC513-M DAC (SOIC16)
+      HA13118   - Audio Power AMP IC (ZIP15)
+      JP121     - Jumper used when swapping game board cartridges
+      JP051     - Slide Switch to flip screen
+      CN121     - Output connector for left/right speakers
+      EXCN1/2   - Connectors for player 3 & 4 controls
+
 
 ROM Board Layouts
 -----------------
@@ -203,7 +256,7 @@ Battle Balls/SenKyu      (All Mask ROMs stamped 'F-BALLS')
                          6.413      27C1024 (DIP40 EPROM)
                          7.216      27C040  (DIP32 EPROM)
 
-E-Jan High School        (All Mask ROMs stamped '       ')    //todo
+E-Jan High School        (All Mask ROMs stamped 'EJAN')
                          Filename     ROM Type
                          ------------------------------------
                          OBJ-1.U0322  23C3210 (SOP44 MaskROM)
@@ -376,15 +429,15 @@ SXX2C ROM SUB8 (C)1997
 |    *                        PAL1  |
 |OBJ-1.U0429 |------------|         |
 |    *       |            |         |
-|OBJ-4.U0430 |            | N341256 |
+|OBJ-1B.U0430|            | N341256 |
 |    *       |   RISE10   |         |
 |OBJ-2.U0431 |            | N341256 |
 |    *       |            |         |
-|OBJ-5.U0432 |            |         |
+|OBJ-2B.U0432|            |         |
 |    *       |------------|         |
 |OBJ-3.U0434                  PAL2  |
 |    *                              |
-|OBJ-6.U0433                        |
+|OBJ-3B.U0433                       |
 |                                   |
 |PAL3                               |
 |    |-------------------------|    |
@@ -399,7 +452,7 @@ SXX2C ROM SUB8 (C)1997
 -------------------------------------
 Notes:
 *      : These ROMs are surface mounted
-N341256: NKK N341256SJ-15 32K x8 SRAM (x2)
+N341256: NKK N341256SJ-15 32k x8 SRAM (x2)
 RISE10 : SEIBU custom stamped 'RISE10' (QFP240)
 PAL1   : PALCE 16V8 stamped 'RM83'
 PAL2   : PALCE 16V8 stamped 'RM81'
@@ -414,13 +467,13 @@ Raiden Fighters 2     (All Mask ROMs stamped 'RAIDEN-F2')
                        BG-2D.U0536  MX23C3210 (SOP44 MaskROM)
                        BG-1P.U0537  MX23C1610 (SOP44 MaskROM)
                        BG-2P.U0538  MX23C1610 (SOP44 MaskROM)
-                       OBJ-1.U0429  MX23C3210 (TSOP48 MaskROM)
-                       OBJ-2.U0431  MX23C3210 (TSOP48 MaskROM)
-                       OBJ-3.U0434  MX23C3210 (TSOP48 MaskROM)
-                       OBJ-4.U0430  MX23C1610 (TSOP48 MaskROM)
-                       OBJ-5.U0432  MX23C1610 (TSOP48 MaskROM)
-                       OBJ-6.U0433  MX23C1610 (TSOP48 MaskROM)
-                       PCM.U0227    MX23C1610 (SOP44 MaskROM)
+                       OBJ1.U0429   MX23C3210 (TSOP48 MaskROM)
+                       OBJ2.U0431   MX23C3210 (TSOP48 MaskROM)
+                       OBJ3.U0434   MX23C3210 (TSOP48 MaskROM)
+                       OBJ1B.U0430  MX23C1610 (TSOP48 MaskROM)
+                       OBJ2B.U0432  MX23C1610 (TSOP48 MaskROM)
+                       OBJ3B.U0433  MX23C1610 (TSOP48 MaskROM)
+                       PCM.U0217    MX23C1610 (SOP44 MaskROM)
                        1.U0211      27C040    (DIP32 EPROM)
                        2.U0212      27C040    (DIP32 EPROM)
                        3.U0221      27C040    (DIP32 EPROM)
@@ -468,7 +521,7 @@ SXX2C ROM SUB10 (C)1998
 -------------------------------------
 Notes:
 *     : These ROMs are surface mounted
-61256 : 32K x8 SRAM (x2)
+61256 : 32k x8 SRAM (x2)
 RISE11: SEIBU custom stamped 'RISE11' (QFP240)
 PAL1  : PALCE 16V8 stamped 'SPI ROM 10-2'
 PAL2  : PALCE 16V8 stamped 'SPI ROM 10-1'
@@ -496,58 +549,117 @@ Raiden Fighters Jet    (All Mask ROMs stamped 'RAIDEN-FJET')
                        SOUND1.U0222 MX27C4000 (DIP32 EPROM)
 
 
-SXX2G (C)1998
+There were some single PCBs made that run just one game. These are shown below.
+
+
+SXX2F V1.2
 |-----------------------------------------------------------------------------|
-|                       |--------|          PCM-D  rfj-4                      |
-|                       |YMF271-F|                 rfj-05   obj-3 obj-2 obj-1 |
-|                       |        |16.3840MHz                                  |
+|HA13118                |--------|           PCM   SOUND1                     |
+|                       |YMF271-F|                 ZPRG     OBJ1  OBJ2  OBJ3  |
+|                       |        |16.9344MHz                OBJ1B OBJ2B OBJ3B |
+|  VOL                  |        |                                            |
+|          YAC516-M     |--------|                                            |
+|                                    Z84C0006PCS  AE8256AJ-12                 |
+|--|            LH5496D-50                                                    |
+   |                   PAL                                                    |
+|--|       |------|    PAL   PAL   PAL   PAL                                  |
+|          |SIE150|                                            |---------|    |
+|          |      |                                            |RISE10   |  X |
+|          |------| AE8256AJ-12                                |9741 GBZ1|  0 | X051 = 28.63636MHz OSC
+|J                               |---------|     AE8256AJ-12   |         |  5 |
+|A                               |SEI400   |     AE8256AJ-12   |         |  1 |
+|M          ST93C46 AE8256AJ-12  |SB07-3460|                   |---------|    |
+|M                               |         |                                  |
+|A                               |         |                                  |
+|    JP031          AE8256AJ-12  |---------|                                  |
+|                                                  TC551664J-20     PRG0.U0259|
+|                                                  TC551664J-20               |
+|--|                AE8256AJ-12                                     PRG1.U0258|
+   |                                 |---------|     |--------|               |
+|--|                                 |SEI600   |     | Intel  |     PRG2.U0265|
+|                                    |SB08-1513|     | i386DX |               |
+|    FIX0   BG-1P.U0537  BG-1D.U0535 |         |     |--------|     PRG3.U0264|
+|    FIX1                            |         |                              |
+|    FIXP   BG-2P.U0545  BG-2D.U0536 |---------|          50MHz      PAL      |
+|                                                                             |
+|-----------------------------------------------------------------------------|
+Notes:
+      i386DX    - Intel i386DX (QFP132), running at 25.000MHz [50/2]
+      Z80       - Zilog Z84C0006PCS (DIP40) - Uknown clock
+      YMF271-F  - Yamaha YMF271-F running at 16.9344MHz
+      TC551664  - Toshiba TC551664J-20 64k x16 SRAM (SOJ44)
+      YAC516-M  - Yamaha YAC516-M DAC (SOP28)
+      JP031     - Slide Switch to flip screen (unpopulated)
+      ST93C46   - EEPROM (SOIC8)
+
+Name         Size    CRC32
+-------------------------------
+fix0.bin    65536    0x6fdf4cf6
+fix1.bin    65536    0x69b7899b
+fixp.bin    65536    0x99a5fece
+prg0.bin   524288    0xff3eeec1
+prg1.bin   524288    0xe2cf77d6
+prg2.bin   524288    0xcae87e1f
+prg3.bin   524288    0x83f4fb5f
+sound1.bin 524288    0x20384b0e
+zprg.bin   131072    0xcc543c4f
+
+
+SXX2G
+|-----------------------------------------------------------------------------|
+|HA13118                |--------|          PCM-D  RFJ-04                     |
+|                       |YMF271-F|                 RFJ-05   OBJ-3 OBJ-2 OBJ-1 |
+|                       |        |16.3840MHz                U075  U074  U073  |
 |  VOL                  |        |                                            |
 |          YAC516-M     |--------|                                            |
 |                                    Z84C0004PCS  D43256BGU-70L               |
 |--|            CY7C421-65PC                                                  |
-   |                                                                          |
-|--|       |------|             4.9152MHz                                     |
-|          |SIE150|       61256                                |---------|    |
+   |                   PAL                                                    |
+|--|       |------|    PAL   PAL   PAL   PAL                                  |
+|          |SIE150|              4.9152MHz                     |---------|    |
 |          |      |                                            |RISE11   |    |
-|          |------|       61256                                |9823 GAX1|    |
-|                                |---------|    D43256BGU-70L  |         |    |
-|                         61256  |SEI400   |    D43256BGU-70L  |         |    |
-|J          ST93C46              |SB07-3460|                   |---------|    |
-|A                        61256  |         |                                  |
-|M                               |         |                    28.63636MHz   |
-|M   JP031                       |---------|                                  |
-|A                                                 TC551664BJ-20      rfj-06  |
+|          |------|   61256                                    |9823 GAX1|    |
+|J                               |---------|    D43256BGU-70L  |         |    |
+|A                               |SEI400   |    D43256BGU-70L  |         |    |
+|M          ST93C46   61256      |SB07-3460|                   |---------|    |
+|M                               |         |                                  |
+|A                               |         |                    28.63636MHz   |
+|    JP031            61256      |---------|                                  |
+|                                                  TC551664BJ-20  RFJ-06.U0259|
 |                                                  TC551664BJ-20              |
-|--|                                                                  rfj-07  |
+|--|                  61256                                       RFJ-07.U0258|
    |                                 |---------|     |-------|                |
-|--|                                 |SEI600   |     |AM386DX|        rfj-08  |
+|--|                                 |SEI600   |     |AM386DX|    RFJ-08.U0265|
 |                                    |SB08-1513|     |  40   |                |
-|   rfj-01    bg-1p  bg-1d           |         |     |-------|        rfj-09  |
-|   rfj-02                           |         |                              |
-|   rfj-03    bg-2p  bg-2d           |---------|       28.63636MHz            |
-|                                                                    SW1      |
+|   RFJ-01  BG-1P.U0537  BG-1D.U0535 |         |     |-------|    RFJ-09.U0264|
+|   RFJ-02                           |         |                              |
+|   RFJ-03  BG-2P.U0545  BG-2D.U0536 |---------|       28.63636MHz            |
+|                                                                    SW1  PAL |
 |-----------------------------------------------------------------------------|
+Notes:
+      AM386DX   - Advanced Micro Devices AM386DX/DX-40 running at 28.63636MHz (QFP132)
+      Z80       - Zilog Z84C0004PCS running at 4.9152MHz (DIP40)
+      YMF271-F  - Yamaha YMF271-F running at 16.3840MHz
+      TC551664  - Toshiba TC551664BJ-15 64k x16 SRAM (SOJ44)
+      YAC516-M  - Yamaha YAC516-M DAC (SOP28)
+      JP031     - Slide Switch to flip screen
+      ST93C46   - EEPROM (SOIC8)
 
-     AM386DX   - Advanced Micro Devices AM386DX/DX-40 (QFP132)
-     Z80       - Zilog Z84C0004PCS (DIP40)
-     YMF271-F  - Yamaha YMF271-F running at 16.3840MHz
-     TC551664  - Toshiba TC551664BJ-15 64K x16 SRAM (SOJ44)
-     YAC516-M  - Yamaha YAC516-M DAC (SOIC16)
-     JP031     - Slide Switch to flip screen
-     ST93C46   - EEPROM
-
-RFJ-01 - FIX0   27C512
-RFJ-02 - FIX1   27C512
-RFJ-03 - FIXP   27C512
-
-RFJ-04 - SOUND1  27C040
-RFJ-05 - ZPRG    27C020
-
-
-RFJ-06 - PRG0   27C040
-RFJ-07 - PRG1   27C040
-RFJ-08 - PRG2   27C040
-RFJ-09 - PRG3   27C040
+      ROMs
+      ----
+      RFJ-01 - FIX0   27C512
+      RFJ-02 - FIX1   27C512
+      RFJ-03 - FIXP   27C512
+      RFJ-04 - SOUND1 27C040
+      RFJ-05 - ZPRG   27C020
+      RFJ-06 - PRG0   27C040
+      RFJ-07 - PRG1   27C040
+      RFJ-08 - PRG2   27C040
+      RFJ-09 - PRG3   27C040
+      Other ROMs not listed are surface mounted SOP44 except BG-2P
+      which is SOP32
+      All surface mounted ROMs are stamped 'RAIDEN-FJET' and match
+      the same named ROMs from the SPI version.
 
 */
 
@@ -1644,11 +1756,11 @@ static MACHINE_RESET( spi )
 static MACHINE_DRIVER_START( spi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I386, 50000000/2)	/* Intel 386DX, 25MHz */
+	MDRV_CPU_ADD_TAG("main",I386, 50000000/2)	/* Intel 386DX, 25MHz */
 	MDRV_CPU_PROGRAM_MAP(spi_map, 0)
 	MDRV_CPU_VBLANK_INT(spi_interrupt, 1)
 
-	MDRV_CPU_ADD(Z80, 28636360/4)
+	MDRV_CPU_ADD_TAG("sound", Z80, 28636360/4)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(spisound_map, 0)
 
@@ -1672,7 +1784,7 @@ static MACHINE_DRIVER_START( spi )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMF271, 16934400)
+	MDRV_SOUND_ADD_TAG("audio", YMF271, 16934400)
 	MDRV_SOUND_CONFIG(ymf271_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -1692,9 +1804,25 @@ static MACHINE_RESET( sxx2f )
 	cpunum_set_irq_callback(0, spi_irq_callback);
 }
 
-static MACHINE_DRIVER_START( sxx2f )
+static MACHINE_DRIVER_START( sxx2f ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz(?) */
 
 	MDRV_IMPORT_FROM(spi)
+
+	MDRV_MACHINE_RESET(sxx2f)
+	MDRV_NVRAM_HANDLER(sxx2f)
+
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured clocks */
+
+	MDRV_IMPORT_FROM(spi)
+
+	MDRV_CPU_REPLACE("main", I386, 28636360) /* AMD AM386DX/DX-40, 28.63636MHz */
+
+	MDRV_CPU_REPLACE("sound", Z80, 4915200) /* 4.9152MHz */
+
+	MDRV_SOUND_REPLACE("audio", YMF271, 16384000) /* 16.3840MHz */
+
 	MDRV_MACHINE_RESET(sxx2f)
 	MDRV_NVRAM_HANDLER(sxx2f)
 
@@ -1980,7 +2108,7 @@ ROM_START(senkyu)
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
-	ROM_LOAD24_BYTE("fb_5.48",	0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
+	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
 
 	ROM_REGION( 0x300000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
@@ -2008,7 +2136,7 @@ ROM_START(senkyua)
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
-	ROM_LOAD24_BYTE("fb_5.48",	0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
+	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
 
 	ROM_REGION( 0x300000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
@@ -2036,7 +2164,7 @@ ROM_START(batlball)
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
-	ROM_LOAD24_BYTE("fb_5.48",	0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
+	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
 
 	ROM_REGION( 0x300000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
@@ -2064,7 +2192,7 @@ ROM_START(batlbala)
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
-	ROM_LOAD24_BYTE("fb_5.48",	0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
+	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
 
 	ROM_REGION( 0x300000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
@@ -2092,7 +2220,7 @@ ROM_START(batlbalu)
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
 	ROM_LOAD24_WORD("fb_6.413", 0x000000, 0x20000, CRC(b57115c9) SHA1(eb95f416f522032ca949bfb6348f1ff824101f2d) )
-	ROM_LOAD24_BYTE("fb_5.48",	0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
+	ROM_LOAD24_BYTE("fb_5.48",  0x000002, 0x10000, CRC(440a9ae3) SHA1(3f57e6da91f0dac2d816c873759f1e1d3259caf1) )
 
 	ROM_REGION( 0x300000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("fb_bg-1d.415", 0x000000, 0x200000, CRC(eae7a1fc) SHA1(26d8a9f4e554848977ec1f6a8aad8751b558a8d4) )
@@ -2144,8 +2272,7 @@ ROM_END
 
 ROM_START(viprp1)
 	ROM_REGION32_LE(0x200000, REGION_USER1, 0)	/* i386 program */
-	ROM_LOAD32_BYTE("seibu1.211", 0x000000, 0x80000, CRC(e5caf4ff) SHA1(7c87a4e8e8dacfb7cc0be8f778352bce2801e59b
-) )
+	ROM_LOAD32_BYTE("seibu1.211", 0x000000, 0x80000, CRC(e5caf4ff) SHA1(7c87a4e8e8dacfb7cc0be8f778352bce2801e59b) )
 	ROM_LOAD32_BYTE("seibu2.212", 0x000001, 0x80000, CRC(688a998e) SHA1(0c48374b6800cd00e3ee96c0fb12119a680b091d) )
 	ROM_LOAD32_BYTE("seibu3.210", 0x000002, 0x80000, CRC(990fa76a) SHA1(7619a631d6f83b3677eb47f984aff684e9518d6d) )
 	ROM_LOAD32_BYTE("seibu4.29",  0x000003, 0x80000, CRC(13e3e343) SHA1(aac0c7450059847f53b5081e4abf26303a50f999) )
@@ -2299,7 +2426,7 @@ ROM_START(rdft)
 	ROM_REGION( 0x30000, REGION_GFX1, 0)	/* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
-	ROM_LOAD24_BYTE("gd_7.48",	0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+	ROM_LOAD24_BYTE("gd_7.48",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
 
 	ROM_REGION( 0x600000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
@@ -2308,7 +2435,7 @@ ROM_START(rdft)
 	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
 
 	ROM_REGION( 0xc00000, REGION_GFX3, 0)	/* sprites */
-	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905))
+	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
 	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
 	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
 
@@ -2316,7 +2443,7 @@ ROM_START(rdft)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
 	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",  0x200000, 0x80000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
 
 ROM_START(rdftu)
@@ -2329,7 +2456,7 @@ ROM_START(rdftu)
 	ROM_REGION( 0x30000, REGION_GFX1, 0)	/* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
-	ROM_LOAD24_BYTE("gd_7.48",	0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+	ROM_LOAD24_BYTE("gd_7.48",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
 
 	ROM_REGION( 0x600000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
@@ -2338,7 +2465,7 @@ ROM_START(rdftu)
 	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
 
 	ROM_REGION( 0xc00000, REGION_GFX3, 0)	/* sprites */
-	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905))
+	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
 	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
 	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
 
@@ -2346,7 +2473,7 @@ ROM_START(rdftu)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
 	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",  0x200000, 0x80000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
 
 
@@ -2355,12 +2482,12 @@ ROM_START(rdftj)
 	ROM_LOAD32_BYTE("rf1.bin", 0x000000, 0x80000, CRC(46861b75) SHA1(079c589c490d49f7ec97a7e68c5b6e7e37872827) )
 	ROM_LOAD32_BYTE("rf2.bin", 0x000001, 0x80000, CRC(6388ed11) SHA1(aebbccfb0f704cdceb45ea71216275dd83880e15) )
 	ROM_LOAD32_BYTE("rf3.bin", 0x000002, 0x80000, CRC(beafcd24) SHA1(2dbc47ecef6f898a371a841df2c72151da9c5a8d) )
-	ROM_LOAD32_BYTE("rf4.bin",  0x000003, 0x80000, CRC(5236f45f) SHA1(8b05d977d3d07796007a00a52d2396475dc2f7dc) )
+	ROM_LOAD32_BYTE("rf4.bin", 0x000003, 0x80000, CRC(5236f45f) SHA1(8b05d977d3d07796007a00a52d2396475dc2f7dc) )
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)	/* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
-	ROM_LOAD24_BYTE("gd_7.48",	0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+	ROM_LOAD24_BYTE("gd_7.48",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
 
 	ROM_REGION( 0x600000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
@@ -2369,7 +2496,7 @@ ROM_START(rdftj)
 	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
 
 	ROM_REGION( 0xc00000, REGION_GFX3, 0)	/* sprites */
-	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905))
+	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
 	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
 	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
 
@@ -2377,7 +2504,7 @@ ROM_START(rdftj)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
 	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",  0x200000, 0x80000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
 
 ROM_START(rdftau)
@@ -2390,7 +2517,7 @@ ROM_START(rdftau)
 	ROM_REGION( 0x30000, REGION_GFX1, 0)	/* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
-	ROM_LOAD24_BYTE("gd_7.48",	0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+	ROM_LOAD24_BYTE("gd_7.48",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
 
 	ROM_REGION( 0x600000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
@@ -2399,7 +2526,7 @@ ROM_START(rdftau)
 	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
 
 	ROM_REGION( 0xc00000, REGION_GFX3, 0)	/* sprites */
-	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905))
+	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
 	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
 	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
 
@@ -2407,7 +2534,7 @@ ROM_START(rdftau)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
 	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",  0x200000, 0x80000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
 
 ROM_START(rdftdi)
@@ -2420,7 +2547,7 @@ ROM_START(rdftdi)
 	ROM_REGION( 0x30000, REGION_GFX1, 0)	/* text layer roms */
 	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
 	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
-	ROM_LOAD24_BYTE("gd_7.48",	0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
+	ROM_LOAD24_BYTE("gd_7.48",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
 
 	ROM_REGION( 0x600000, REGION_GFX2, 0)	/* background layer roms */
 	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
@@ -2429,7 +2556,7 @@ ROM_START(rdftdi)
 	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
 
 	ROM_REGION( 0xc00000, REGION_GFX3, 0)	/* sprites */
-	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905))
+	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
 	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
 	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
 
@@ -2437,72 +2564,44 @@ ROM_START(rdftdi)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
 	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",  0x200000, 0x80000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
 
-/*
-
-file   : readme.txt
-author : Tormod
-created: 2003-01-20
-
-Raiden Fighter 2 (Single PCB, SXX2F V1.2)
-
-This dump just contains the non surface mounted chips.
-
-Name         Size    CRC32
--------------------------------
-fix0.bin    65536    0x6fdf4cf6
-fix1.bin    65536    0x69b7899b
-fixp.bin    65536    0x99a5fece
-prg0.bin   524288    0xff3eeec1
-prg1.bin   524288    0xe2cf77d6
-prg2.bin   524288    0xcae87e1f
-prg3.bin   524288    0x83f4fb5f
-sound1.bin 524288    0x20384b0e
-zprg.bin   131072    0xcc543c4f
-
-*/
-
-ROM_START(rdft2us)
+ROM_START(rdft2us)	/* Single board version SXX2F */
 	ROM_REGION32_LE(0x200000, REGION_USER1, 0)	/* i386 program */
-	ROM_LOAD32_BYTE("prg0u.bin", 0x000000, 0x80000, CRC(ff3eeec1) SHA1(88c1741e4936db9a5b13e562061b0f1cc6fa6b36) )
-	ROM_LOAD32_BYTE("prg1u.bin", 0x000001, 0x80000, CRC(e2cf77d6) SHA1(173cc0e304c9dadea4ed0812ebb64c6c83549912) )
-	ROM_LOAD32_BYTE("prg2u.bin", 0x000002, 0x80000, CRC(cae87e1f) SHA1(e460aad693eb2702ae11f758b11d37f852d00790) )
-	ROM_LOAD32_BYTE("prg3u.bin", 0x000003, 0x80000, CRC(83f4fb5f) SHA1(73f58daa1aae0c4978db409cedd736fb49b15f1c) )
+	ROM_LOAD32_BYTE("prg0.u0259", 0x000000, 0x80000, CRC(ff3eeec1) SHA1(88c1741e4936db9a5b13e562061b0f1cc6fa6b36) )
+	ROM_LOAD32_BYTE("prg1.u0258", 0x000001, 0x80000, CRC(e2cf77d6) SHA1(173cc0e304c9dadea4ed0812ebb64c6c83549912) )
+	ROM_LOAD32_BYTE("prg2.u0265", 0x000002, 0x80000, CRC(cae87e1f) SHA1(e460aad693eb2702ae11f758b11d37f852d00790) )
+	ROM_LOAD32_BYTE("prg3.u0264", 0x000003, 0x80000, CRC(83f4fb5f) SHA1(73f58daa1aae0c4978db409cedd736fb49b15f1c) )
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
-	ROM_LOAD24_BYTE("fix0.bin", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
-	ROM_LOAD24_BYTE("fix1.bin", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
-	ROM_LOAD24_BYTE("fixp.bin", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
+	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
+	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
+	ROM_LOAD24_BYTE("fixp.u0514", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
 
 	ROM_REGION( 0xc00000, REGION_GFX2, 0)	/* background layer roms */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely the same)
-	ROM_LOAD24_WORD("bg-1d.535", 0x000000, 0x400000, BAD_DUMP CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
-	ROM_LOAD24_BYTE("bg-1p.544", 0x000002, 0x200000, BAD_DUMP CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
-	ROM_LOAD24_WORD("bg-2d.536", 0x600000, 0x400000, BAD_DUMP CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
-	ROM_LOAD24_BYTE("bg-2p.545", 0x600002, 0x200000, BAD_DUMP CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
 
 	ROM_REGION( 0x1200000, REGION_GFX3, 0)	/* sprites */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely the same)
-	ROM_LOAD("obj3.075",  0x0000000, 0x400000, BAD_DUMP CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
-	ROM_LOAD("obj6.078",  0x0400000, 0x200000, BAD_DUMP CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
-	ROM_LOAD("obj2.074",  0x0600000, 0x400000, BAD_DUMP CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
-	ROM_LOAD("obj5.077",  0x0a00000, 0x200000, BAD_DUMP CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
-	ROM_LOAD("obj1.073",  0x0c00000, 0x400000, BAD_DUMP CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
-	ROM_LOAD("obj4.076",  0x1000000, 0x200000, BAD_DUMP CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+	ROM_LOAD("obj3.u075",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u078", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u074",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u077", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u073",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u076", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
 
 	ROM_REGION(0x40000, REGION_CPU2, 0)		/* 256k for the Z80 */
-	ROM_LOAD("zprg.bin", 0x000000, 0x20000, CRC(cc543c4f) SHA1(6e5c93fd3d21c594571b071d4a830211e1f162b2) )
+	ROM_LOAD("zprg.u091", 0x000000, 0x20000, CRC(cc543c4f) SHA1(6e5c93fd3d21c594571b071d4a830211e1f162b2) )
 
 	ROM_REGION(0x280000, REGION_SOUND1, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("sound1.bin", 0x100000, 0x80000, CRC(20384b0e) SHA1(9c5d725418543df740f9145974ed6ffbbabee1d0) )
-
+	ROM_LOAD("pcm.u0103",    0x000000, 0x200000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_LOAD("sound1.u0107", 0x200000, 0x080000, CRC(20384b0e) SHA1(9c5d725418543df740f9145974ed6ffbbabee1d0) ) /* Different sound1 then SPI carts */
 ROM_END
 
-/* RF2 SPI version */
-
-ROM_START(rdft2)
+ROM_START(rdft2) /* SPI Cart, Europe */
 	ROM_REGION32_LE(0x200000, REGION_USER1, 0)	/* i386 program */
 	ROM_LOAD32_BYTE("prg0.tun", 0x000000, 0x80000, CRC(3cb3fdca) SHA1(4b472dfd65c7bbbcb92a295aa73b0fa70581455b) )
 	ROM_LOAD32_BYTE("prg1.bin", 0x000001, 0x80000, CRC(cab55d88) SHA1(246e13880d34b6c7c3f4ab5e18fa8a0547c03d9d) )
@@ -2510,33 +2609,32 @@ ROM_START(rdft2)
 	ROM_LOAD32_BYTE("prg3.bin", 0x000003, 0x80000, CRC(084fb5e4) SHA1(588bfe091662b88f02f528181a2f1d9c67c7b280) )
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
-	ROM_LOAD24_BYTE("fix0.bin", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
-	ROM_LOAD24_BYTE("fix1.bin", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
-	ROM_LOAD24_BYTE("fixp.bin", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
+	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
+	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
+	ROM_LOAD24_BYTE("fixp.u0514", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
 
 	ROM_REGION( 0xc00000, REGION_GFX2, 0)	/* background layer roms */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD24_WORD("bg-1d.535", 0x000000, 0x400000, BAD_DUMP CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
-	ROM_LOAD24_BYTE("bg-1p.544", 0x000002, 0x200000, BAD_DUMP CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
-	ROM_LOAD24_WORD("bg-2d.536", 0x600000, 0x400000, BAD_DUMP CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
-	ROM_LOAD24_BYTE("bg-2p.545", 0x600002, 0x200000, BAD_DUMP CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
 
 	ROM_REGION( 0x1200000, REGION_GFX3, 0)	/* sprites */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD("obj3.075",  0x0000000, 0x400000, BAD_DUMP CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
-	ROM_LOAD("obj6.078",  0x0400000, 0x200000, BAD_DUMP CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
-	ROM_LOAD("obj2.074",  0x0600000, 0x400000, BAD_DUMP CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
-	ROM_LOAD("obj5.077",  0x0a00000, 0x200000, BAD_DUMP CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
-	ROM_LOAD("obj1.073",  0x0c00000, 0x400000, BAD_DUMP CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
-	ROM_LOAD("obj4.076",  0x1000000, 0x200000, BAD_DUMP CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+	ROM_LOAD("obj3.u0434",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u0431",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u0429",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
 
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("rf2_8_sound1.bin", 0x200000, 0x80000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // different?
+	ROM_LOAD("pcm.u0217",    0x000000, 0x200000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 ROM_END
 
-ROM_START(rdft2j)
+ROM_START(rdft2j) /* SPI Cart, Japan */
 	ROM_REGION32_LE(0x200000, REGION_USER1, 0)	/* i386 program */
 	ROM_LOAD32_BYTE("prg0.sei", 0x000000, 0x80000, CRC(a60c4e7c) SHA1(7789b029d0ac084c7e5e662a7168edaed8f11633) )
 	ROM_LOAD32_BYTE("prg1.bin", 0x000001, 0x80000, CRC(cab55d88) SHA1(246e13880d34b6c7c3f4ab5e18fa8a0547c03d9d) )
@@ -2544,33 +2642,32 @@ ROM_START(rdft2j)
 	ROM_LOAD32_BYTE("prg3.bin", 0x000003, 0x80000, CRC(084fb5e4) SHA1(588bfe091662b88f02f528181a2f1d9c67c7b280) )
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
-	ROM_LOAD24_BYTE("fix0.bin", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
-	ROM_LOAD24_BYTE("fix1.bin", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
-	ROM_LOAD24_BYTE("fixp.bin", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
+	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
+	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
+	ROM_LOAD24_BYTE("fixp.u0514", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
 
 	ROM_REGION( 0xc00000, REGION_GFX2, 0)	/* background layer roms */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD24_WORD("bg-1d.535", 0x000000, 0x400000, BAD_DUMP CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
-	ROM_LOAD24_BYTE("bg-1p.544", 0x000002, 0x200000, BAD_DUMP CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
-	ROM_LOAD24_WORD("bg-2d.536", 0x600000, 0x400000, BAD_DUMP CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
-	ROM_LOAD24_BYTE("bg-2p.545", 0x600002, 0x200000, BAD_DUMP CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
 
 	ROM_REGION( 0x1200000, REGION_GFX3, 0)	/* sprites */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD("obj3.075",  0x0000000, 0x400000, BAD_DUMP CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
-	ROM_LOAD("obj6.078",  0x0400000, 0x200000, BAD_DUMP CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
-	ROM_LOAD("obj2.074",  0x0600000, 0x400000, BAD_DUMP CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
-	ROM_LOAD("obj5.077",  0x0a00000, 0x200000, BAD_DUMP CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
-	ROM_LOAD("obj1.073",  0x0c00000, 0x400000, BAD_DUMP CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
-	ROM_LOAD("obj4.076",  0x1000000, 0x200000, BAD_DUMP CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+	ROM_LOAD("obj3.u0434",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u0431",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u0429",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
 
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("rf2_8_sound1.bin", 0x200000, 0x80000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // different?
+	ROM_LOAD("pcm.u0217",    0x000000, 0x200000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 ROM_END
 
-ROM_START(rdft2a)
+ROM_START(rdft2a) /* SPI Cart, Asia (Metrotainment license) */
 	ROM_REGION32_LE(0x200000, REGION_USER1, 0)	/* i386 program */
 	ROM_LOAD32_BYTE("prg0.met", 0x000000, 0x80000, CRC(046b3f0e) SHA1(033898f658d6007f891828835734422d4af36321) )
 	ROM_LOAD32_BYTE("prg1.bin", 0x000001, 0x80000, CRC(cab55d88) SHA1(246e13880d34b6c7c3f4ab5e18fa8a0547c03d9d) )
@@ -2578,33 +2675,32 @@ ROM_START(rdft2a)
 	ROM_LOAD32_BYTE("prg3.bin", 0x000003, 0x80000, CRC(084fb5e4) SHA1(588bfe091662b88f02f528181a2f1d9c67c7b280) )
 
 	ROM_REGION( 0x30000, REGION_GFX1, 0)
-	ROM_LOAD24_BYTE("fix0.bin", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
-	ROM_LOAD24_BYTE("fix1.bin", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
-	ROM_LOAD24_BYTE("fixp.bin", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
+	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(6fdf4cf6) SHA1(7e9d4a49e829dfdc373c0f5acfbe8c7a91ac115b) )
+	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(69b7899b) SHA1(d3cacd4ef4d2c95d803403101beb9d4be75fae61) )
+	ROM_LOAD24_BYTE("fixp.u0514", 0x000002, 0x10000, CRC(99a5fece) SHA1(44ae95d650ed6e00202d3438f5f91a5e52e319cb) )
 
 	ROM_REGION( 0xc00000, REGION_GFX2, 0)	/* background layer roms */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD24_WORD("bg-1d.535", 0x000000, 0x400000, BAD_DUMP CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
-	ROM_LOAD24_BYTE("bg-1p.544", 0x000002, 0x200000, BAD_DUMP CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
-	ROM_LOAD24_WORD("bg-2d.536", 0x600000, 0x400000, BAD_DUMP CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
-	ROM_LOAD24_BYTE("bg-2p.545", 0x600002, 0x200000, BAD_DUMP CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
 
 	ROM_REGION( 0x1200000, REGION_GFX3, 0)	/* sprites */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD("obj3.075",  0x0000000, 0x400000, BAD_DUMP CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
-	ROM_LOAD("obj6.078",  0x0400000, 0x200000, BAD_DUMP CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
-	ROM_LOAD("obj2.074",  0x0600000, 0x400000, BAD_DUMP CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
-	ROM_LOAD("obj5.077",  0x0a00000, 0x200000, BAD_DUMP CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
-	ROM_LOAD("obj1.073",  0x0c00000, 0x400000, BAD_DUMP CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
-	ROM_LOAD("obj4.076",  0x1000000, 0x200000, BAD_DUMP CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+	ROM_LOAD("obj3.u0434",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u0431",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u0429",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
 
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("rf2_8_sound1.bin", 0x200000, 0x80000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // different?
+	ROM_LOAD("pcm.u0217",    0x000000, 0x200000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 ROM_END
 
-ROM_START(rdft2a2)
+ROM_START(rdft2a2) /* SPI Cart, Asia (Dream Island license) */
 	ROM_REGION32_LE(0x200000, REGION_USER1, 0)	/* i386 program */
 	ROM_LOAD32_BYTE("rf2_1.bin", 0x000000, 0x80000, CRC(72198410) SHA1(ca4bc858f6bf247a343b0fdae1d1a3cdabc4a3c3) )
 	ROM_LOAD32_BYTE("rf2_2.bin", 0x000001, 0x80000, CRC(ec73a767) SHA1(83f3905afe49401793c0ea0193cb31d3ba1e1739) )
@@ -2617,25 +2713,24 @@ ROM_START(rdft2a2)
 	ROM_LOAD24_BYTE("rf2_7.bin", 0x000002, 0x10000, CRC(1efaac7e) SHA1(8252af56dcb7a6306dc3422070176778e3c511c2) )
 
 	ROM_REGION( 0xc00000, REGION_GFX2, 0)	/* background layer roms */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD24_WORD("bg-1d.535", 0x000000, 0x400000, BAD_DUMP CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
-	ROM_LOAD24_BYTE("bg-1p.544", 0x000002, 0x200000, BAD_DUMP CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
-	ROM_LOAD24_WORD("bg-2d.536", 0x600000, 0x400000, BAD_DUMP CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
-	ROM_LOAD24_BYTE("bg-2p.545", 0x600002, 0x200000, BAD_DUMP CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(6143f576) SHA1(c034923d0663d9ef24357a03098b8cb81dbab9f8) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(55e64ef7) SHA1(aae991268948d07342ee8ba1b3761bd180aab8ec) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x400000, CRC(c607a444) SHA1(dc1aa96a42e9394ca6036359670a4ec6f830c96d) )
+	ROM_LOAD24_BYTE("bg-2p.u0538", 0x600002, 0x200000, CRC(f0830248) SHA1(6075df96b49e70d2243fef691e096119e7a4d044) )
 
 	ROM_REGION( 0x1200000, REGION_GFX3, 0)	/* sprites */
-	// ROMs were not dumped, using the rdft22kc ones (which are likely not identical)
-	ROM_LOAD("obj3.075",  0x0000000, 0x400000, BAD_DUMP CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
-	ROM_LOAD("obj6.078",  0x0400000, 0x200000, BAD_DUMP CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
-	ROM_LOAD("obj2.074",  0x0600000, 0x400000, BAD_DUMP CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
-	ROM_LOAD("obj5.077",  0x0a00000, 0x200000, BAD_DUMP CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
-	ROM_LOAD("obj1.073",  0x0c00000, 0x400000, BAD_DUMP CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
-	ROM_LOAD("obj4.076",  0x1000000, 0x200000, BAD_DUMP CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
+	ROM_LOAD("obj3.u0434",  0x0000000, 0x400000, CRC(e08f42dc) SHA1(5188d71d4355eaf43ea8893b4cfc4fe80cc24f41) )
+	ROM_LOAD("obj3b.u0433", 0x0400000, 0x200000, CRC(1b6a523c) SHA1(99a420dbc8e22e7832ccda7cec9fa661a2a2687a) )
+	ROM_LOAD("obj2.u0431",  0x0600000, 0x400000, CRC(7aeadd8e) SHA1(47103c0579240c5b1add4d0b164eaf76f5fa97f0) )
+	ROM_LOAD("obj2b.u0432", 0x0a00000, 0x200000, CRC(5d790a5d) SHA1(1ed5d4ad4c9a7e505ce35dcc90d184c26ce891dc) )
+	ROM_LOAD("obj1.u0429",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
+	ROM_LOAD("obj1b.u0430", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
 
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("rf2_8_sound1.bin", 0x200000, 0x80000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) ) // different?
+	ROM_LOAD("pcm.u0217",    0x000000, 0x200000, CRC(2edc30b5) SHA1(c25d690d633657fc3687636b9070f36bd305ae06) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(b7bd3703) SHA1(6427a7e6de10d6743d6e64b984a1d1c647f5643a) )
 ROM_END
 
 ROM_START(rfjet) /* SPI Cart, Europe */
@@ -2664,8 +2759,8 @@ ROM_START(rfjet) /* SPI Cart, Europe */
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("pcm-d.u0227", 0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
-	ROM_LOAD("sound1.u0222", 0x200000, 0x80000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+	ROM_LOAD("pcm-d.u0227",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
 ROM_END
 
 ROM_START(rfjetj) /* SPI Cart, Japan */
@@ -2694,8 +2789,8 @@ ROM_START(rfjetj) /* SPI Cart, Japan */
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("pcm-d.u0227", 0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
-	ROM_LOAD("sound1.u0222", 0x200000, 0x80000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+	ROM_LOAD("pcm-d.u0227",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
 ROM_END
 
 
@@ -2725,8 +2820,8 @@ ROM_START(rfjetu) /* SPI Cart, US */
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("pcm-d.u0227", 0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
-	ROM_LOAD("sound1.u0222", 0x200000, 0x80000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+	ROM_LOAD("pcm-d.u0227",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
 ROM_END
 
 ROM_START(rfjeta) /* SPI Cart, Asia */
@@ -2755,8 +2850,8 @@ ROM_START(rfjeta) /* SPI Cart, Asia */
 	ROM_REGION(0x200000, REGION_SOUND1, ROMREGION_ERASE00)
 
 	ROM_REGION(0x280000, REGION_USER2, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("pcm-d.u0227", 0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
-	ROM_LOAD("sound1.u0222", 0x200000, 0x80000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+	ROM_LOAD("pcm-d.u0227",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
 ROM_END
 
 ROM_START(rfjetus)	/* Single board version SXX2G */
@@ -2772,22 +2867,22 @@ ROM_START(rfjetus)	/* Single board version SXX2G */
 	ROM_LOAD24_BYTE("fixp.u0514", 0x000002, 0x10000, CRC(015d0748) SHA1(b1e8eaeba63a7914f1dc27d7e3ca5d0b6db202ed) ) /* rfj-03 */
 
 	ROM_REGION( 0x900000, REGION_GFX2, 0)	/* background layer roms */
-	ROM_LOAD24_WORD("bg-1d.u0543", 0x000000, 0x400000, CRC(edfd96da) SHA1(4813267f104619f569e5777e75b75304321abb49) )
-	ROM_LOAD24_BYTE("bg-1p.u0544", 0x000002, 0x200000, CRC(a4cc4631) SHA1(cc1c4f4de8a078ca774f5a328a9a58291949b1fb) )
-	ROM_LOAD24_WORD("bg-2d.u0545", 0x600000, 0x200000, CRC(731fbb59) SHA1(13cd29ec4d4c73582c5fb363218e737886826e5f) )
-	ROM_LOAD24_BYTE("bg-2p.u0546", 0x600002, 0x100000, CRC(03652c25) SHA1(c0d77285111bc84e008362981ac02a246678ed0a) )
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(edfd96da) SHA1(4813267f104619f569e5777e75b75304321abb49) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(a4cc4631) SHA1(cc1c4f4de8a078ca774f5a328a9a58291949b1fb) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x200000, CRC(731fbb59) SHA1(13cd29ec4d4c73582c5fb363218e737886826e5f) )
+	ROM_LOAD24_BYTE("bg-2p.u0545", 0x600002, 0x100000, CRC(03652c25) SHA1(c0d77285111bc84e008362981ac02a246678ed0a) )
 
 	ROM_REGION( 0x1800000, REGION_GFX3, 0)	/* sprites */
-	ROM_LOAD("obj-1.u0442", 0x0000000, 0x800000, CRC(58a59896) SHA1(edeaaa69987bd5d08c47ed9bf47a3901e2dcc892) )
-	ROM_LOAD("obj-2.u0443", 0x0800000, 0x800000, CRC(a121d1e3) SHA1(1851ae81f2ae9d3404aadd9fbc0ed7f9230290b9) )
-	ROM_LOAD("obj-3.u0444", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
+	ROM_LOAD("obj-1.u073", 0x0000000, 0x800000, CRC(58a59896) SHA1(edeaaa69987bd5d08c47ed9bf47a3901e2dcc892) )
+	ROM_LOAD("obj-2.u074", 0x0800000, 0x800000, CRC(a121d1e3) SHA1(1851ae81f2ae9d3404aadd9fbc0ed7f9230290b9) )
+	ROM_LOAD("obj-3.u075", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
 
 	ROM_REGION(0x40000, REGION_CPU2, 0)		/* 256k for the Z80 */
 	ROM_LOAD("rfj-05.u091", 0x000000, 0x40000, CRC(a55e8799) SHA1(5d4ca9ae920ab54e23ee3b1b33db72711e744516) ) /* ZPRG */
 
 	ROM_REGION(0x280000, REGION_SOUND1, ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("pcm-d.u0227", 0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
-	ROM_LOAD("rfj-04.107", 0x200000, 0x80000, CRC(c050da03) SHA1(1002dac51a3a4932c4f0074c1f3d97a597d98755) ) /* SOUND1 */
+	ROM_LOAD("pcm-d.u0103",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
+	ROM_LOAD("rfj-04.u0107", 0x200000, 0x080000, CRC(c050da03) SHA1(1002dac51a3a4932c4f0074c1f3d97a597d98755) ) /* SOUND1 */
 ROM_END
 
 
@@ -2867,7 +2962,7 @@ GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu 
 GAME( 1997, rdft2us,   rdft2,   sxx2f,    spi_2button, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_NO_SOUND ) // title screen shows '2.1'
 
 /* SXX2G */
-GAME( 1999, rfjetus,   rfjet,   sxx2f,    spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND  ) // has 1998-99 copyright + planes unlocked
+GAME( 1999, rfjetus,   rfjet,   sxx2g,    spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND  ) // has 1998-99 copyright + planes unlocked
 
 /* SYS386 */
 GAME( 2000, rdft22kc,  rdft2,   seibu386, seibu386_2button, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS )

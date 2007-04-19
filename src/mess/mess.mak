@@ -1164,6 +1164,7 @@ EMUOBJS +=							\
 	$(MESS_EMUOBJ)/opresolv.o			\
 	$(MESS_EMUOBJ)/muitext.o			\
 	$(MESS_EMUOBJ)/infomess.o			\
+	$(MESS_EMUOBJ)/climess.o			\
 
 $(LIBEMU): $(EMUOBJS)
 

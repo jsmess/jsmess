@@ -27,6 +27,18 @@ UINT32 mess_ram_size;
 UINT8 *mess_ram;
 UINT8 mess_ram_default_value = 0xCD;
 
+char mess_disclaimer[] =
+		"MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"
+		"several computer and console systems. But hardware is useless without software\n"
+		"so a file dump of the ROM, cartridges, discs, and cassettes which run on that\n"
+		"hardware is required. Such files, like any other commercial software, are\n"
+		"copyrighted material and it is therefore illegal to use them if you don't own\n"
+		"the original media from which the files are derived. Needless to say, these\n"
+		"files are not distributed together with MESS. Distribution of MESS together\n"
+		"with these files is a violation of copyright law and should be promptly\n"
+		"reported to the authors so that appropriate legal action can be taken.\n\n";
+
+
 
 static void ram_init(const game_driver *gamedrv)
 {
@@ -180,46 +192,6 @@ void devices_init(running_machine *machine)
 			}
 		}
 	}
-}
-
-
-
-void showmessdisclaimer(void)
-{
-	mame_printf_info(
-		"MESS is an emulator: it reproduces, more or less faithfully, the behaviour of\n"
-		"several computer and console systems. But hardware is useless without software\n"
-		"so a file dump of the BIOS, cartridges, discs, and cassettes which run on that\n"
-		"hardware is required. Such files, like any other commercial software, are\n"
-		"copyrighted material and it is therefore illegal to use them if you don't own\n"
-		"the original media from which the files are derived. Needless to say, these\n"
-		"files are not distributed together with MESS. Distribution of MESS together\n"
-		"with these files is a violation of copyright law and should be promptly\n"
-		"reported to the authors so that appropriate legal action can be taken.\n\n");
-}
-
-
-
-void showmessinfo(void)
-{
-	mame_printf_info(
-		"M.E.S.S. v%s\n"
-		"Multiple Emulation Super System - Copyright (C) 1997-2004 by the MESS Team\n"
-		"M.E.S.S. is based on the ever excellent M.A.M.E. Source code\n"
-		"Copyright (C) 1997-2004 by Nicola Salmoria and the MAME Team\n\n",
-		build_version);
-
-	showmessdisclaimer();
-
-	mame_printf_info(
-		"Usage:  MESS <system> <device> <software> <options>\n"
-		"\n"
-		"        MESS -showusage    for a brief list of options\n"
-		"        MESS -showconfig   for a list of configuration options\n"
-		"        MESS -listdevices  for a full list of supported devices\n"
-		"        MESS -createconfig to create a mess.ini\n"
-		"\n"
-		"See mess.txt for help, readme.txt for options.\n");
 }
 
 

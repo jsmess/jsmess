@@ -10,7 +10,7 @@
 #include "i86.h"
 #include "i86intf.h"
 
-extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int addr_size, int op_size);
+extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);
 
 
 /* All pre-i286 CPUs have a 1MB address space */
@@ -243,7 +243,7 @@ static int i86_execute(int num_cycles)
 #ifdef MAME_DEBUG
 static offs_t i86_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	return i386_dasm_one(buffer, pc, oprom, 0, 0);
+	return i386_dasm_one(buffer, pc, oprom, 16);
 }
 #endif /* MAME_DEBUG */
 

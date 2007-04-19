@@ -820,7 +820,7 @@ INLINE void code_log_add_entry(UINT32 pc, UINT32 op, void *base)
 
 static void code_log(drc_core *drc, const char *label, void *start)
 {
-	extern int i386_dasm_one(char *buffer, UINT32 eip, UINT8 *oprom, int addr_size, int op_size);
+	extern int i386_dasm_one(char *buffer, UINT32 eip, UINT8 *oprom, int mode);
 	extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 	UINT8 *cur = start;
 	static FILE *f;
@@ -840,7 +840,7 @@ static void code_log(drc_core *drc, const char *label, void *start)
 		int op;
 
 		/* disassemble this instruction */
-		bytes = i386_dasm_one(buffer, (UINT32)cur, cur, 1, 1) & DASMFLAG_LENGTHMASK;
+		bytes = i386_dasm_one(buffer, (UINT32)cur, cur, 32) & DASMFLAG_LENGTHMASK;
 
 		/* look for a match in the registered opcodes */
 		for (op = 0; op < code_log_index; op++)

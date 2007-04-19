@@ -29,6 +29,7 @@
 #include "driver.h"
 
 // MAMEOS headers
+#include "winmain.h"
 #include "window.h"
 #include "video.h"
 #include "input.h"

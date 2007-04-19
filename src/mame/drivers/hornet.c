@@ -491,6 +491,16 @@ WRITE32_HANDLER(K037122_reg_w)
 
 static int voodoo_version = 0;
 
+static void voodoo_vblank_0(int param)
+{
+	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
+}
+
+static void voodoo_vblank_1(int param)
+{
+	cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
+}
+
 VIDEO_START( hornet )
 {
 	if (voodoo_version == 0)
@@ -503,6 +513,8 @@ VIDEO_START( hornet )
 		if (voodoo_start(0, 0, VOODOO_2, 2, 4, 0))
 			return 1;
 	}
+
+	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
 	return K037122_vh_start(0);
 }
@@ -521,6 +533,9 @@ VIDEO_START( hornet_2board )
 			voodoo_start(1, 1, VOODOO_2, 2, 4, 0))
 			return 1;
 	}
+
+	voodoo_set_vblank_callback(0, voodoo_vblank_0);
+	voodoo_set_vblank_callback(1, voodoo_vblank_1);
 
 	return K037122_vh_start(0) | K037122_vh_start(1);
 }
@@ -779,6 +794,54 @@ INPUT_PORTS_START( hornet )
 
 INPUT_PORTS_END
 
+INPUT_PORTS_START( sscope )
+	PORT_START
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		// Gun trigger
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START
+	PORT_DIPNAME( 0x80, 0x00, "Test Mode" )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Screen Flip (H)" )
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Screen Flip (V)" )
+	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIP4" )
+	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP5" )
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Harness" )
+	PORT_DIPSETTING( 0x04, "JVS" )
+	PORT_DIPSETTING( 0x00, "JAMMA" )
+	PORT_DIPNAME( 0x02, 0x02, "DIP7" )
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" )
+	PORT_DIPSETTING( 0x01, "24KHz" )
+	PORT_DIPSETTING( 0x00, "15KHz" )
+
+INPUT_PORTS_END
+
 static struct RF5C400interface rf5c400_interface =
 {
 	REGION_SOUND1
@@ -796,17 +859,13 @@ static sharc_config sharc_cfg =
 
 /* PowerPC interrupts
 
-    IRQ0:   Vblank
+    IRQ0:   Vblank CG Board 0
+    IRQ1:   Vblank CG Board 1
     IRQ2:   LANC
     DMA0
     NMI:    SCI
 
 */
-
-static INTERRUPT_GEN( hornet_vblank )
-{
-	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
-}
 
 static MACHINE_RESET( hornet )
 {
@@ -824,7 +883,6 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_CPU_ADD_TAG("main", PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_CONFIG(hornet_ppc_cfg)
 	MDRV_CPU_PROGRAM_MAP(hornet_map, 0)
-	MDRV_CPU_VBLANK_INT(hornet_vblank, 1)
 
 	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
@@ -834,6 +892,7 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_CPU_DATA_MAP(sharc0_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET( hornet )
 
@@ -858,21 +917,6 @@ static MACHINE_DRIVER_START( hornet )
 
 MACHINE_DRIVER_END
 
-static int vblank=0;
-static INTERRUPT_GEN( hornet_2board_vblank )
-{
-	if (vblank == 0)
-	{
-		cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
-	}
-	else
-	{
-		cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
-	}
-	vblank++;
-	vblank &= 1;
-}
-
 static MACHINE_RESET( hornet_2board )
 {
 	if (memory_region(REGION_USER3))
@@ -887,8 +931,6 @@ static MACHINE_RESET( hornet_2board )
 static MACHINE_DRIVER_START( hornet_2board )
 
 	MDRV_IMPORT_FROM(hornet)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(hornet_2board_vblank, 2)
 
 	MDRV_CPU_ADD(ADSP21062, 36000000)
 	MDRV_CPU_CONFIG(sharc_cfg)
@@ -1310,12 +1352,12 @@ ROM_START(sscope)
 	ROM_REGION(0x80000, REGION_CPU2, 0)		/* 68K Program */
 	ROM_LOAD16_WORD_SWAP("ss1-1.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1))
 
-	ROM_REGION(0x800000, REGION_USER5, 0)		/* CG Board texture roms */
-    	ROM_LOAD32_WORD_SWAP( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-    	ROM_LOAD32_WORD_SWAP( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
+	ROM_REGION(0x1000000, REGION_USER5, 0)		/* CG Board texture roms */
+    	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
+    	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
 	// these should be 32MBit each
-	ROM_REGION(0x400000, REGION_SOUND1, 0)		/* PCM sample roms */
+	ROM_REGION(0x1000000, REGION_SOUND1, 0)		/* PCM sample roms */
         ROM_LOAD( "ss1-1.16p",    0x000000, 0x200000, BAD_DUMP CRC(4503ff1e) SHA1(2c208a1e9a5633c97e8a8387b7fcc7460013bc2c) )
         ROM_LOAD( "ss1-1.14p",    0x200000, 0x200000, BAD_DUMP CRC(a5bd9a93) SHA1(c789a272b9f2b449b07fff1c04b6c9ef3ca6bfe0) )
 ROM_END
@@ -1329,12 +1371,12 @@ ROM_START(sscopea)
 	ROM_REGION(0x80000, REGION_CPU2, 0)		/* 68K Program */
 	ROM_LOAD16_WORD_SWAP("ss1-1.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1))
 
-	ROM_REGION(0x800000, REGION_USER5, 0)		/* CG Board texture roms */
-    	ROM_LOAD32_WORD_SWAP( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-    	ROM_LOAD32_WORD_SWAP( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
+	ROM_REGION(0x1000000, REGION_USER5, 0)		/* CG Board texture roms */
+    	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
+    	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
 	// these should be 32MBit each
-	ROM_REGION(0x400000, REGION_SOUND1, 0)		/* PCM sample roms */
+	ROM_REGION(0x1000000, REGION_SOUND1, 0)		/* PCM sample roms */
         ROM_LOAD( "ss1-1.16p",    0x000000, 0x200000, BAD_DUMP CRC(4503ff1e) SHA1(2c208a1e9a5633c97e8a8387b7fcc7460013bc2c) )
         ROM_LOAD( "ss1-1.14p",    0x200000, 0x200000, BAD_DUMP CRC(a5bd9a93) SHA1(c789a272b9f2b449b07fff1c04b6c9ef3ca6bfe0) )
 ROM_END
@@ -1411,6 +1453,6 @@ ROM_END
 
 GAME( 1998, gradius4,	0,		hornet,			hornet,	gradius4,	ROT0,	"Konami",	"Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND )
 GAME( 1998, nbapbp,		0,		hornet,			hornet,	nbapbp,		ROT0,	"Konami",	"NBA Play By Play", GAME_IMPERFECT_SOUND )
-GAMEL( 2000, sscope,	0,		hornet_2board,	hornet,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
-GAMEL( 2000, sscopea,	sscope, hornet_2board,	hornet,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
-GAMEL( 2000, sscope2,	0,		hornet_2board,	hornet,	sscope2,	ROT0,	"Konami",	"Silent Scope 2", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
+GAMEL( 2000, sscope,	0,		hornet_2board,	sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
+GAMEL( 2000, sscopea,	sscope, hornet_2board,	sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )
+GAMEL( 2000, sscope2,	0,		hornet_2board,	sscope,	sscope2,	ROT0,	"Konami",	"Silent Scope 2", GAME_IMPERFECT_SOUND|GAME_NOT_WORKING, layout_dualhsxs )

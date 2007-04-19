@@ -296,6 +296,10 @@ static void i386_trap(int irq, int irq_gate)
 		I.eip = offset;
 	}
 
+	/* Interrupts that vector through either interrupt gates or trap gates cause TF */
+	/* (the trap flag) to be reset after the current value of TF is saved on the stack as part of EFLAGS. */
+	I.TF = 0;
+
 	if (irq_gate)
 	{
 		I.IF = 0;
@@ -677,7 +681,7 @@ static int translate_address_cb(int space, offs_t *addr)
 #ifdef MAME_DEBUG
 static offs_t i386_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	return i386_dasm_one(buffer, pc, oprom, I.sreg[CS].d, I.sreg[CS].d);
+	return i386_dasm_one(buffer, pc, oprom, I.sreg[CS].d ? 32 : 16);
 }
 #endif /* MAME_DEBUG */
 

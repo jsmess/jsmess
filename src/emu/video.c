@@ -889,7 +889,9 @@ mame_time video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 	targetdelta = (subseconds_t)vpos * info->scantime + (subseconds_t)hpos * info->pixeltime;
 
 	/* if we're past that time (within 1/2 of a pixel), head to the next frame */
-	while (targetdelta <= curdelta + info->pixeltime / 2)
+	if (targetdelta <= curdelta + info->pixeltime / 2)
+		targetdelta += info->state->refresh;
+	while (targetdelta <= curdelta)
 		targetdelta += info->state->refresh;
 
 	/* return the difference */
@@ -1967,6 +1969,23 @@ void video_crosshair_set_screenmask_callback(running_machine *machine, UINT32 (*
 
 
 /*-------------------------------------------------
+    get_crosshair_screen_mask - returns a bitmask
+    indicating on which screens the crosshair for
+    a player's should be displayed
+-------------------------------------------------*/
+
+static UINT32 get_crosshair_screen_mask(video_private *viddata, int player)
+{
+#ifdef MESS
+	if (viddata->crosshair_visible && viddata->crosshair_get_screen_mask)
+		return viddata->crosshair_get_screen_mask(player);
+#endif /* MESS */
+
+	return (viddata->crosshair_visible & (1 << player)) ? 1 : 0;
+}
+
+
+/*-------------------------------------------------
     crosshair_render - render the crosshairs
 -------------------------------------------------*/
 
@@ -2028,14 +2047,11 @@ static void crosshair_render(video_private *viddata)
 
 	/* draw all crosshairs */
 	for (player = 0; player < MAX_PLAYERS; player++)
-		if (viddata->crosshair_visible & (1 << player))
+	{
+		UINT32 scrmask = get_crosshair_screen_mask(viddata, player);
+		if (scrmask != 0)
 		{
 			int scrnum;
-			UINT32 scrmask = 1;
-
-			/* is there a custom callback to get the screen number? */
-			if (viddata->crosshair_get_screen_mask)
-				scrmask = viddata->crosshair_get_screen_mask(player);
 
 			for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
 			{
@@ -2050,6 +2066,7 @@ static void crosshair_render(video_private *viddata)
 				}
 			}
 		}
+	}
 }
 
 

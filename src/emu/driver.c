@@ -316,11 +316,11 @@ void driver_remove_screen(machine_config *machine, const char *tag)
 
 
 /*-------------------------------------------------
-    driver_get_index - return the index of a
-    driver given its name.
+    driver_get_name - return a pointer to a
+    driver given its name
 -------------------------------------------------*/
 
-int driver_get_index(const char *name)
+const game_driver *driver_get_name(const char *name)
 {
 	int lurnum, drvnum;
 
@@ -335,7 +335,7 @@ int driver_get_index(const char *name)
 				driver_lru[0] = driver_lru[lurnum];
 				driver_lru[lurnum] = temp;
 			}
-			return driver_lru[0];
+			return drivers[driver_lru[0]];
 		}
 
 	/* scan for a match in the drivers -- slow! */
@@ -344,11 +344,10 @@ int driver_get_index(const char *name)
 		{
 			memmove((void *)&driver_lru[1], (void *)&driver_lru[0], sizeof(driver_lru[0]) * (DRIVER_LRU_SIZE - 1));
 			driver_lru[0] = drvnum;
-			return drvnum;
+			return drivers[drvnum];
 		}
 
-	/* shouldn't happen */
-	return -1;
+	return NULL;
 }
 
 
@@ -359,15 +358,12 @@ int driver_get_index(const char *name)
 
 const game_driver *driver_get_clone(const game_driver *driver)
 {
-	int index;
-
 	/* if no clone, easy out */
 	if (driver->parent == NULL || (driver->parent[0] == '0' && driver->parent[1] == 0))
 		return NULL;
 
-	/* convert the name to an index */
-	index = driver_get_index(driver->parent);
-	return (index == -1) ? NULL : drivers[index];
+	/* convert the name to a game_driver */
+	return driver_get_name(driver->parent);
 }
 
 
@@ -376,7 +372,7 @@ const game_driver *driver_get_clone(const game_driver *driver)
     matches to a driver name.
 -------------------------------------------------*/
 
-void driver_get_approx_matches(const char *name, int matches, int *indexes)
+void driver_get_approx_matches(const char *name, int matches, const game_driver **list)
 {
 	int *penalty;
 	int drvnum;
@@ -389,7 +385,7 @@ void driver_get_approx_matches(const char *name, int matches, int *indexes)
 	for (matchnum = 0; matchnum < matches; matchnum++)
 	{
 		penalty[matchnum] = 9999;
-		indexes[matchnum] = -1;
+		list[matchnum] = NULL;
 	}
 
 	/* scan the entire drivers array */
@@ -417,9 +413,9 @@ void driver_get_approx_matches(const char *name, int matches, int *indexes)
 			if (matchnum < matches - 1)
 			{
 				penalty[matchnum + 1] = penalty[matchnum];
-				indexes[matchnum + 1] = indexes[matchnum];
+				list[matchnum + 1] = list[matchnum];
 			}
-			indexes[matchnum] = drvnum;
+			list[matchnum] = drivers[drvnum];
 			penalty[matchnum] = curpenalty;
 		}
 	}

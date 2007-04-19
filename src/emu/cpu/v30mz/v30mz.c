@@ -50,7 +50,7 @@ typedef UINT32 DWORD;
 #include "v30mz.h"
 #include "necintrf.h"
 
-extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int addr_size, int op_size);
+extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom);
 
 /* NEC registers */
 typedef union
@@ -919,7 +919,7 @@ static void set_irq_line(int irqline, int state)
 #ifdef MAME_DEBUG
 static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	return necv_dasm_one(buffer, pc, oprom, 0, 0);
+	return necv_dasm_one(buffer, pc, oprom);
 }
 #endif /* MAME_DEBUG */
 

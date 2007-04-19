@@ -11,7 +11,7 @@
 #define INPUT_LINE_A20		1
 
 #ifdef MAME_DEBUG
-extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int addr_size, int op_size);
+extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 #endif
 
 typedef enum { ES, CS, SS, DS, FS, GS } SREGS;

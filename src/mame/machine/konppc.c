@@ -147,7 +147,6 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 				if (data & 0x10000000)
 				{
 					cpunum_set_input_line(dsp, INPUT_LINE_RESET, CLEAR_LINE);
-					cpu_spinuntil_time(TIME_IN_USEC(2000));		// Give the SHARC enough time to boot itself
 				}
 				else
 				{
@@ -157,19 +156,16 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 				if (data & 0x02000000)
 				{
 					cpunum_set_input_line(dsp, INPUT_LINE_IRQ0, ASSERT_LINE);
-					cpu_spinuntil_time(TIME_IN_USEC(1000));		// Give the SHARC enough time to respond
 				}
 				if (data & 0x04000000)
 				{
 					cpunum_set_input_line(dsp, INPUT_LINE_IRQ1, ASSERT_LINE);
-					cpu_spinuntil_time(TIME_IN_USEC(1000));		// Give the SHARC enough time to respond
 				}
 			}
 
 			if (!(mem_mask & 0x000000ff))
 			{
 				dsp_comm_ppc[cgboard_id][offset] = data & 0xff;
-				cpu_spinuntil_time(TIME_IN_USEC(500));			// Give the SHARC enough time to respond
 			}
 		}
 		else

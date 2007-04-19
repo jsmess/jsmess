@@ -266,22 +266,23 @@ enum
  *
  *************************************/
 
+typedef struct _sdrc_state sdrc_state;
 struct _sdrc_state
 {
 	UINT16		reg[4];
 	UINT8		seed;
 };
-typedef struct _sdrc_state sdrc_state;
 
 
+typedef struct _dsio_denver_state dsio_state;
 struct _dsio_denver_state
 {
 	UINT16		reg[4];
 	UINT8		start_on_next_write;
 };
-typedef struct _dsio_denver_state dsio_state;
 
 
+typedef struct _dcs_state dcs_state;
 struct _dcs_state
 {
 	UINT8		cpunum;
@@ -294,7 +295,7 @@ struct _dcs_state
 	mame_timer *reg_timer;
 	mame_timer *sport_timer;
 	mame_timer *internal_timer;
-	int			ireg;
+	INT32		ireg;
 	UINT16		ireg_base;
 	UINT16		control_regs[32];
 
@@ -328,23 +329,22 @@ struct _dcs_state
 	UINT32		timer_period;
 	UINT32		timers_fired;
 };
-typedef struct _dcs_state dcs_state;
 
 
+typedef struct _hle_transfer_state hle_transfer_state;
 struct _hle_transfer_state
 {
-	int			dcs_state;
-	int			state;
-	int			start;
-	int			stop;
-	int			type;
-	int			temp;
-	int			writes_left;
+	INT32		dcs_state;
+	INT32		state;
+	INT32		start;
+	INT32		stop;
+	INT32		type;
+	INT32		temp;
+	INT32		writes_left;
 	UINT16		sum;
-	int			fifo_entries;
+	INT32		fifo_entries;
 	mame_timer *watchdog;
 };
-typedef struct _hle_transfer_state hle_transfer_state;
 
 
 
@@ -828,8 +828,55 @@ static void dcs_reset(int param)
  *
  *************************************/
 
+static void dcs_register_state(void)
+{
+	state_save_register_global_array(sdrc.reg);
+	state_save_register_global(sdrc.seed);
+
+	state_save_register_global_array(dsio.reg);
+	state_save_register_global(dsio.start_on_next_write);
+
+	state_save_register_global(dcs.channels);
+	state_save_register_global(dcs.size);
+	state_save_register_global(dcs.incs);
+	state_save_register_global(dcs.ireg);
+	state_save_register_global(dcs.ireg_base);
+	state_save_register_global_array(dcs.control_regs);
+
+	state_save_register_global(dcs.sounddata_bank);
+
+	state_save_register_global(dcs.auto_ack);
+	state_save_register_global(dcs.latch_control);
+	state_save_register_global(dcs.input_data);
+	state_save_register_global(dcs.output_data);
+	state_save_register_global(dcs.output_control);
+	state_save_register_global(dcs.output_control_cycles);
+	state_save_register_global(dcs.last_output_full);
+	state_save_register_global(dcs.last_input_empty);
+
+	state_save_register_global(dcs.timer_enable);
+	state_save_register_global(dcs.timer_ignore);
+	state_save_register_global(dcs.timer_start_cycles);
+	state_save_register_global(dcs.timer_start_count);
+	state_save_register_global(dcs.timer_scale);
+	state_save_register_global(dcs.timer_period);
+	state_save_register_global(dcs.timers_fired);
+
+	state_save_register_global(transfer.dcs_state);
+	state_save_register_global(transfer.state);
+	state_save_register_global(transfer.start);
+	state_save_register_global(transfer.stop);
+	state_save_register_global(transfer.type);
+	state_save_register_global(transfer.temp);
+	state_save_register_global(transfer.writes_left);
+	state_save_register_global(transfer.sum);
+	state_save_register_global(transfer.fifo_entries);
+}
+
+
 void dcs_init(void)
 {
+	dcs_register_state();
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */
@@ -857,6 +904,7 @@ void dcs_init(void)
 
 void dcs2_init(int dram_in_mb, offs_t polling_offset)
 {
+	dcs_register_state();
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */

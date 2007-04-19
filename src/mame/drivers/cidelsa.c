@@ -28,7 +28,7 @@ static int cdp1869_prd;
 static int cdp1869_pcb;
 static UINT8 cidelsa_pcb[0x800];  // 2048x1 bit PCB ram
 
-static int cidelsa_in_ef(void)
+static UINT8 cidelsa_ef(void)
 {
 	/*
         EF1     CDP1869 _PRD
@@ -44,7 +44,9 @@ static CDP1802_CONFIG cidelsa_cdp1802_config =
 {
 	NULL,
 	NULL,
-	cidelsa_in_ef
+	NULL,
+	cidelsa_ef,
+	NULL
 };
 
 READ8_HANDLER ( cidelsa_input_port_0_r )

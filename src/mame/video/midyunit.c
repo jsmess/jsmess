@@ -12,7 +12,6 @@
 
 
 /* compile-time options */
-#define FAST_DMA			1		/* DMAs complete immediately; reduces number of CPU switches */
 #define LOG_DMA				0		/* DMAs are logged if the 'L' key is pressed */
 
 
@@ -48,7 +47,7 @@ static UINT8	videobank_select;
 
 /* DMA-related variables */
 static UINT8	yawdim_dma;
-static UINT16 dma_register[16];
+static UINT16	dma_register[16];
 static struct
 {
 	UINT32		offset;			/* source offset, in bits */
@@ -87,6 +86,14 @@ static VIDEO_START( common )
 	/* reset DMA state */
 	memset(dma_register, 0, sizeof(dma_register));
 	memset(&dma_state, 0, sizeof(dma_state));
+
+	/* register for state saving */
+	state_save_register_global(autoerase_enable);
+	state_save_register_global_pointer(local_videoram, 0x80000/sizeof(local_videoram[0]));
+	state_save_register_global_pointer(midyunit_cmos_ram, (0x2000 * 4)/sizeof(midyunit_cmos_ram[0]));
+	state_save_register_global(videobank_select);
+	state_save_register_global_array(dma_register);
+
 	return 0;
 }
 
@@ -419,11 +426,6 @@ static dma_draw_func prefix[32] =																				\
 	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf,	prefix##_c0c1_xf	/* fill */ 					\
 };
 
-/* allow for custom blitters */
-#ifdef MIDYUNIT_CUSTOM_BLITTERS
-#include "midyblit.c"
-#endif
-
 /*** blitter family declarations ***/
 DECLARE_BLITTER_SET(dma_draw)
 
@@ -435,23 +437,10 @@ DECLARE_BLITTER_SET(dma_draw)
  *
  *************************************/
 
-static int temp_irq_callback(int irqline)
-{
-	cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
-	return 0;
-}
-
-
 static void dma_callback(int is_in_34010_context)
 {
 	dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	if (is_in_34010_context)
-	{
-		cpunum_set_irq_callback(0, temp_irq_callback);
-		cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, ASSERT_LINE);
-	}
-	else
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(0, 0, ASSERT_LINE);
 }
 
 
@@ -464,35 +453,7 @@ static void dma_callback(int is_in_34010_context)
 
 READ16_HANDLER( midyunit_dma_r )
 {
-	int result = dma_register[offset];
-
-#if !FAST_DMA
-	/* see if we're done */
-	if (offset == DMA_COMMAND && (result & 0x8000))
-		switch (activecpu_get_pc())
-		{
-			case 0xfff7aa20: /* narc */
-			case 0xffe1c970: /* trog */
-			case 0xffe1c9a0: /* trog3 */
-			case 0xffe1d4a0: /* trogp */
-			case 0xffe07690: /* smashtv */
-			case 0xffe00450: /* hiimpact */
-			case 0xffe14930: /* strkforc */
-			case 0xffe02c20: /* strkforc */
-			case 0xffc79890: /* mk */
-			case 0xffc7a5a0: /* mk */
-			case 0xffc063b0: /* term2 */
-			case 0xffc00720: /* term2 */
-			case 0xffc07a60: /* totcarn/totcarnp */
-			case 0xff805200: /* mk2 */
-			case 0xff8044e0: /* mk2 */
-			case 0xff82e200: /* nbajam */
-				cpu_spinuntil_int();
-				break;
-		}
-#endif
-
-	return result;
+	return dma_register[offset];
 }
 
 
@@ -542,11 +503,9 @@ WRITE16_HANDLER( midyunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	if (!(command & 0x8000))
-	{
-		cpunum_set_info_int(0, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
 		return;
-	}
 
 #if LOG_DMA
 	if (code_pressed(KEYCODE_L))
@@ -639,10 +598,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 	}
 
 	/* signal we're done */
-	if (FAST_DMA)
-		dma_callback(1);
-	else
-		mame_timer_set(MAME_TIME_IN_NSEC(41 * dma_state.width * dma_state.height), 0, dma_callback);
+	mame_timer_set(MAME_TIME_IN_NSEC(41 * dma_state.width * dma_state.height), 0, dma_callback);
 
 	profiler_mark(PROFILER_END);
 }

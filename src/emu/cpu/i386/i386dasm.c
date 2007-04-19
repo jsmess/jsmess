@@ -66,7 +66,8 @@ enum {
 	SEG_ES,
 	SEG_FS,
 	SEG_GS,
-	SEG_SS
+	SEG_SS,
+	ALWAYS64
 };
 
 typedef struct {
@@ -175,22 +176,22 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"dec",				0,				PARAM_ESI,			0,					0				},
 	{"dec",				0,				PARAM_EDI,			0,					0				},
 	// 0x50
-	{"push",			0,				PARAM_EAX,			0,					0				},
-	{"push",			0,				PARAM_ECX,			0,					0				},
-	{"push",			0,				PARAM_EDX,			0,					0				},
-	{"push",			0,				PARAM_EBX,			0,					0				},
-	{"push",			0,				PARAM_ESP,			0,					0				},
-	{"push",			0,				PARAM_EBP,			0,					0				},
-	{"push",			0,				PARAM_ESI,			0,					0				},
-	{"push",			0,				PARAM_EDI,			0,					0				},
-	{"pop",				0,				PARAM_EAX,			0,					0				},
-	{"pop",				0,				PARAM_ECX,			0,					0				},
-	{"pop",				0,				PARAM_EDX,			0,					0				},
-	{"pop",				0,				PARAM_EBX,			0,					0				},
-	{"pop",				0,				PARAM_ESP,			0,					0				},
-	{"pop",				0,				PARAM_EBP,			0,					0				},
-	{"pop",				0,				PARAM_ESI,			0,					0				},
-	{"pop",				0,				PARAM_EDI,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_EAX,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_ECX,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_EDX,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_EBX,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_ESP,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_EBP,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_ESI,			0,					0				},
+	{"push",			ALWAYS64,		PARAM_EDI,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_EAX,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_ECX,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_EDX,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_EBX,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_ESP,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_EBP,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_ESI,			0,					0				},
+	{"pop",				ALWAYS64,		PARAM_EDI,			0,					0				},
 	// 0x60
 	{"pusha\0pushad",	VAR_NAME,		0,					0,					0				},
 	{"popa\0popad",		VAR_NAME,		0,					0,					0				},
@@ -334,16 +335,16 @@ static const I386_OPCODE i386_opcode_table1[256] =
 	{"jcxz\0jecxz",		VAR_NAME,		PARAM_REL8,			0,					0				},
 	{"in",				0,				PARAM_AL,			PARAM_UI8,			0				},
 	{"in",				0,				PARAM_EAX,			PARAM_UI8,			0				},
-	{"out",				0,				PARAM_AL,			PARAM_UI8,			0				},
-	{"out",				0,				PARAM_EAX,			PARAM_UI8,			0				},
+	{"out",				0,				PARAM_UI8,			PARAM_AL,			0				},
+	{"out",				0,				PARAM_UI8,			PARAM_EAX,			0				},
 	{"call",			0,				PARAM_REL,			0,					0,				DASMFLAG_STEP_OVER},
 	{"jmp",				0,				PARAM_REL,			0,					0				},
 	{"jmp",				0,				PARAM_ADDR,			0,					0				},
 	{"jmp",				0,				PARAM_REL8,			0,					0				},
 	{"in",				0,				PARAM_AL,			PARAM_DX,			0				},
 	{"in",				0,				PARAM_EAX,			PARAM_DX,			0				},
-	{"out",				0,				PARAM_AL,			PARAM_DX,			0				},
-	{"out",				0,				PARAM_EAX,			PARAM_DX,			0				},
+	{"out",				0,				PARAM_DX,			PARAM_AL,			0				},
+	{"out",				0,				PARAM_DX,			PARAM_EAX,			0				},
 	// 0xf0
 	{"lock",			0,				0,					0,					0				},
 	{"???",				0,				0,					0,					0				},
@@ -1169,14 +1170,16 @@ static const GROUP_OP group_op_table[] =
 
 
 
-static const char i386_reg[2][8][4] =
+static const char *i386_reg[3][16] =
 {
-	{"ax",	"cx",	"dx",	"bx",	"sp",	"bp",	"si",	"di"},
-	{"eax",	"ecx",	"edx",	"ebx",	"esp",	"ebp",	"esi",	"edi"}
+	{"ax",  "cx",  "dx",  "bx",  "sp",  "bp",  "si",  "di",  "r8w", "r9w", "r10w","r11w","r12w","r13w","r14w","r15w"},
+	{"eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi", "r8d", "r9d", "r10d","r11d","r12d","r13d","r14d","r15d"},
+	{"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"}
 };
 
-static const char i386_reg8[8][4] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
-static const char i386_sreg[8][4] = {"es", "cs", "ss", "ds", "fs", "gs", "???", "???"};
+static const char *i386_reg8[8] = {"al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"};
+//static const char *i386_reg8rex[16] = {"al", "cl", "dl", "bl", "spl", "bpl", "sil", "dil", "r8l", "r9l", "r10l", "r11l", "r12l", "r13l", "r14l", "r15l"};
+static const char *i386_sreg[8] = {"es", "cs", "ss", "ds", "fs", "gs", "???", "???"};
 
 static int address_size;
 static int operand_size;
@@ -1185,6 +1188,8 @@ static UINT8 modrm;
 static UINT32 segment;
 static offs_t dasm_flags;
 static char modrm_string[256];
+static UINT8 rex, regex, sibex, rmex;
+static UINT8 curmode;
 
 #define MODRM_REG1	((modrm >> 3) & 0x7)
 #define MODRM_REG2	(modrm & 0x7)
@@ -1265,57 +1270,21 @@ static char* handle_sib_byte( char* s, UINT8 mod )
 	UINT32 i32;
 	UINT8 scale, i, base;
 	UINT8 sib = FETCHD();
-	scale = (sib >> 6) & 0x3;
-	i = (sib >> 3) & 0x7;
-	base = sib & 0x7;
 
-	switch( base )
-	{
-		case 0: s += sprintf( s, "eax"); break;
-		case 1: s += sprintf( s, "ecx"); break;
-		case 2: s += sprintf( s, "edx"); break;
-		case 3: s += sprintf( s, "ebx"); break;
-		case 4: s += sprintf( s, "esp"); break;
-		case 5:
-			if( mod == 0 ) {
-				i32 = FETCH32();
-				s += sprintf( s, "%s", hexstring(i32, 0) );
-			} else if( mod == 1 ) {
-				s += sprintf( s, "ebp" );
-			} else if( mod == 2 ) {
-				s += sprintf( s, "ebp" );
-			}
-			break;
-		case 6: s += sprintf( s, "esi"); break;
-		case 7: s += sprintf( s, "edi"); break;
-	}
-	if (scale)
-	{
-		switch( i )
-		{
-			case 0: s += sprintf( s, "+eax*%d", (1 << scale)); break;
-			case 1: s += sprintf( s, "+ecx*%d", (1 << scale)); break;
-			case 2: s += sprintf( s, "+edx*%d", (1 << scale)); break;
-			case 3: s += sprintf( s, "+ebx*%d", (1 << scale)); break;
-			case 4: break;
-			case 5: s += sprintf( s, "+ebp*%d", (1 << scale)); break;
-			case 6: s += sprintf( s, "+esi*%d", (1 << scale)); break;
-			case 7: s += sprintf( s, "+edi*%d", (1 << scale)); break;
-		}
-	}
-	else
-	{
-		switch( i )
-		{
-			case 0: s += sprintf( s, "+eax"); break;
-			case 1: s += sprintf( s, "+ecx"); break;
-			case 2: s += sprintf( s, "+edx"); break;
-			case 3: s += sprintf( s, "+ebx"); break;
-			case 4: break;
-			case 5: s += sprintf( s, "+ebp"); break;
-			case 6: s += sprintf( s, "+esi"); break;
-			case 7: s += sprintf( s, "+edi"); break;
-		}
+	scale = (sib >> 6) & 0x3;
+	i = ((sib >> 3) & 0x7) | sibex;
+	base = (sib & 0x7) | rmex;
+
+	if (base == 5 && mod == 0) {
+		i32 = FETCH32();
+		s += sprintf( s, "%s", hexstring(i32, 0) );
+	} else if (base != 5 || mod != 3)
+		s += sprintf( s, "%s", i386_reg[address_size][base] );
+
+	if ( i != 4 ) {
+		s += sprintf( s, "+%s", i386_reg[address_size][i] );
+		if (scale)
+			s += sprintf( s, "*%d", 1 << scale );
 	}
 	return s;
 }
@@ -1329,7 +1298,7 @@ static void handle_modrm(char* s)
 
 	modrm = FETCHD();
 	mod = (modrm >> 6) & 0x3;
-	rm = modrm & 0x7;
+	rm = (modrm & 0x7) | rmex;
 
 	if( modrm >= 0xc0 )
 		return;
@@ -1345,25 +1314,32 @@ static void handle_modrm(char* s)
 	}
 
 	s += sprintf( s, "[" );
-	if( address_size ) {
-		switch( rm )
-		{
-			case 0: s += sprintf( s, "eax" ); break;
-			case 1: s += sprintf( s, "ecx" ); break;
-			case 2: s += sprintf( s, "edx" ); break;
-			case 3: s += sprintf( s, "ebx" ); break;
-			case 4: s = handle_sib_byte( s, mod ); break;
-			case 5:
-				if( mod == 0 ) {
-					disp32 = FETCHD32();
-					s += sprintf( s, "%s", hexstring(disp32, 0) );
-				} else {
-					s += sprintf( s, "ebp" );
-				}
-				break;
-			case 6: s += sprintf( s, "esi" ); break;
-			case 7: s += sprintf( s, "edi" ); break;
+	if( address_size == 2 ) {
+		if (rm == 4)
+			handle_sib_byte( s, mod );
+		else if (rm == 5 && mod == 0) {
+			disp32 = FETCHD32();
+			s += sprintf( s, "rip%s", shexstring(disp32, 0, TRUE) );
+		} else
+			s += sprintf( s, "%s", i386_reg[2][rm]);
+		if( mod == 1 ) {
+			disp8 = FETCHD();
+			s += sprintf( s, "%s", shexstring((INT32)disp8, 0, TRUE) );
+		} else if( mod == 2 ) {
+			disp32 = FETCHD32();
+			s += sprintf( s, "%s", shexstring(disp32, 0, TRUE) );
 		}
+	} else if (address_size == 1) {
+		if (rm == 4)
+			handle_sib_byte( s, mod );
+		else if (rm == 5 && mod == 0) {
+			disp32 = FETCHD32();
+			if (curmode == 64)
+				s += sprintf( s, "eip%s", shexstring(disp32, 0, TRUE) );
+			else
+				s += sprintf( s, "%s", hexstring(disp32, 0) );
+		} else
+			s += sprintf( s, "%s", i386_reg[1][rm]);
 		if( mod == 1 ) {
 			disp8 = FETCHD();
 			s += sprintf( s, "%s", shexstring((INT32)disp8, 0, TRUE) );
@@ -1415,28 +1391,28 @@ static char* handle_param(char* s, UINT32 param)
 	switch(param)
 	{
 		case PARAM_REG:
-			s += sprintf( s, "%s", i386_reg[operand_size][MODRM_REG1] );
+			s += sprintf( s, "%s", i386_reg[operand_size][MODRM_REG1 | regex] );
 			break;
 
 		case PARAM_REG8:
-			s += sprintf( s, "%s", i386_reg8[MODRM_REG1] );
+			s += sprintf( s, "%s", i386_reg8[MODRM_REG1 | regex] );
 			break;
 
 		case PARAM_REG16:
-			s += sprintf( s, "%s", i386_reg[0][MODRM_REG1] );
+			s += sprintf( s, "%s", i386_reg[0][MODRM_REG1 | regex] );
 			break;
 
 		case PARAM_MMX:
-			s += sprintf( s, "mm%d", MODRM_REG1 );
+			s += sprintf( s, "mm%d", MODRM_REG1 | regex );
 			break;
 
 		case PARAM_REG2_32:
-			s += sprintf( s, "%s", i386_reg[1][MODRM_REG2] );
+			s += sprintf( s, "%s", i386_reg[1][MODRM_REG2 | rmex] );
 			break;
 
 		case PARAM_RM:
 			if( modrm >= 0xc0 ) {
-				s += sprintf( s, "%s", i386_reg[operand_size][MODRM_REG2] );
+				s += sprintf( s, "%s", i386_reg[operand_size][MODRM_REG2 | rmex] );
 			} else {
 				if( operand_size )
 					s += sprintf( s, "dword ptr " );
@@ -1448,7 +1424,7 @@ static char* handle_param(char* s, UINT32 param)
 
 		case PARAM_RM8:
 			if( modrm >= 0xc0 ) {
-				s += sprintf( s, "%s", i386_reg8[MODRM_REG2] );
+				s += sprintf( s, "%s", i386_reg8[MODRM_REG2 | rmex] );
 			} else {
 				s += sprintf( s, "byte ptr " );
 				s += sprintf( s, "%s", modrm_string );
@@ -1457,7 +1433,7 @@ static char* handle_param(char* s, UINT32 param)
 
 		case PARAM_RM16:
 			if( modrm >= 0xc0 ) {
-				s += sprintf( s, "%s", i386_reg[0][MODRM_REG2] );
+				s += sprintf( s, "%s", i386_reg[0][MODRM_REG2 | rmex] );
 			} else {
 				s += sprintf( s, "word ptr " );
 				s += sprintf( s, "%s", modrm_string );
@@ -1475,7 +1451,7 @@ static char* handle_param(char* s, UINT32 param)
 
 		case PARAM_MMXM:
 			if( modrm >= 0xc0 ) {
-				s += sprintf( s, "mm%d", MODRM_REG2 );
+				s += sprintf( s, "mm%d", MODRM_REG2 | rmex );
 			} else {
 				s += sprintf( s, "qword ptr %s", modrm_string );
 			}
@@ -1561,11 +1537,11 @@ static char* handle_param(char* s, UINT32 param)
 			break;
 
 		case PARAM_CREG:
-			s += sprintf( s, "cr%d", MODRM_REG1 );
+			s += sprintf( s, "cr%d", MODRM_REG1 | regex );
 			break;
 
 		case PARAM_TREG:
-			s += sprintf( s, "tr%d", MODRM_REG1 );
+			s += sprintf( s, "tr%d", MODRM_REG1 | regex );
 			break;
 
 		case PARAM_1:
@@ -1585,14 +1561,14 @@ static char* handle_param(char* s, UINT32 param)
 		case PARAM_DH: s += sprintf( s, "dh" ); break;
 		case PARAM_BH: s += sprintf( s, "bh" ); break;
 
-		case PARAM_EAX: s += sprintf( s, "%s", i386_reg[operand_size][0] ); break;
-		case PARAM_ECX: s += sprintf( s, "%s", i386_reg[operand_size][1] ); break;
-		case PARAM_EDX: s += sprintf( s, "%s", i386_reg[operand_size][2] ); break;
-		case PARAM_EBX: s += sprintf( s, "%s", i386_reg[operand_size][3] ); break;
-		case PARAM_ESP: s += sprintf( s, "%s", i386_reg[operand_size][4] ); break;
-		case PARAM_EBP: s += sprintf( s, "%s", i386_reg[operand_size][5] ); break;
-		case PARAM_ESI: s += sprintf( s, "%s", i386_reg[operand_size][6] ); break;
-		case PARAM_EDI: s += sprintf( s, "%s", i386_reg[operand_size][7] ); break;
+		case PARAM_EAX: s += sprintf( s, "%s", i386_reg[operand_size][0 | rmex] ); break;
+		case PARAM_ECX: s += sprintf( s, "%s", i386_reg[operand_size][1 | rmex] ); break;
+		case PARAM_EDX: s += sprintf( s, "%s", i386_reg[operand_size][2 | rmex] ); break;
+		case PARAM_EBX: s += sprintf( s, "%s", i386_reg[operand_size][3 | rmex] ); break;
+		case PARAM_ESP: s += sprintf( s, "%s", i386_reg[operand_size][4 | rmex] ); break;
+		case PARAM_EBP: s += sprintf( s, "%s", i386_reg[operand_size][5 | rmex] ); break;
+		case PARAM_ESI: s += sprintf( s, "%s", i386_reg[operand_size][6 | rmex] ); break;
+		case PARAM_EDI: s += sprintf( s, "%s", i386_reg[operand_size][7 | rmex] ); break;
 	}
 	return s;
 }
@@ -1977,16 +1953,32 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 	int i;
 	UINT8 op2;
 
+	if (operand_size == 2 && op1 >= 0x40 && op1 < 0x50)
+	{
+		rex = op1;
+		operand_size = (op1 & 8) ? 2 : 1;
+		regex = (op1 << 1) & 8;
+		sibex = (op1 << 2) & 8;
+		rmex = (op1 << 3) & 8;
+		op2 = FETCH();
+		decode_opcode( s, &opcode_table1[op2], op1 );
+		return;
+	}
+
 	switch( op->flags )
 	{
 		case OP_SIZE:
-			operand_size ^= 1;
+			if (operand_size < 2)
+				operand_size ^= 1;
 			op2 = FETCH();
 			decode_opcode( s, &opcode_table1[op2], op1 );
 			return;
 
 		case ADDR_SIZE:
-			address_size ^= 1;
+			if (curmode != 64)
+				address_size ^= 1;
+			else
+				address_size ^= 3;
 			op2 = FETCH();
 			decode_opcode( s, &opcode_table1[op2], op1 );
 			return;
@@ -2028,7 +2020,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 
 		case GROUP:
 			handle_modrm( modrm_string );
-			for( i=0; i < (sizeof(group_op_table) / sizeof(GROUP_OP)); i++ ) {
+			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
 				if( mame_stricmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
 					decode_opcode( s, &group_op_table[i].opcode[MODRM_REG1], op1 );
 					return;
@@ -2044,9 +2036,14 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 		case MODRM:
 			handle_modrm( modrm_string );
 			break;
+
+		case ALWAYS64:
+			if (curmode == 64)
+				operand_size = 2;
+			break;
 	}
 
-	s += sprintf( s, "%-12s", op->mnemonic );
+	s += sprintf( s, "%-8s", op->mnemonic );
 	dasm_flags = op->dasm_flags;
 
 handle_params:
@@ -2069,18 +2066,20 @@ handle_unknown:
 	sprintf(s, "???");
 }
 
-int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int addr_size, int op_size)
+int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
 {
 	UINT8 op;
 
 	opcode_ptr = oprom;
 	opcode_table1 = i386_opcode_table1;
 	opcode_table2 = i386_opcode_table2;
-	address_size = addr_size;
-	operand_size = op_size;
+	address_size = (mode == 16) ? 0 : (mode == 32) ? 1 : 2;
+	operand_size = (mode == 16) ? 0 : 1;
 	pc = eip;
 	dasm_flags = 0;
 	segment = 0;
+	curmode = mode;
+	rex = regex = sibex = rmex = 0;
 
 	op = FETCH();
 
@@ -2088,18 +2087,20 @@ int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int addr_size, i
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
 }
 
-int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int addr_size, int op_size)
+int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom)
 {
 	UINT8 op;
 
 	opcode_ptr = oprom;
 	opcode_table1 = i386_opcode_table1;
 	opcode_table2 = necv_opcode_table2;
-	address_size = addr_size;
-	operand_size = op_size;
+	address_size = 0;
+	operand_size = 0;
 	pc = eip;
 	dasm_flags = 0;
 	segment = 0;
+	curmode = 16;
+	rex = regex = sibex = rmex = 0;
 
 	op = FETCH();
 

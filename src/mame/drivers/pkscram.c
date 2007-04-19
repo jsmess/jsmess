@@ -12,15 +12,20 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 */
 
 #include "driver.h"
+#include "timer.h"
 #include "sound/2203intf.h"
 
-static int out = 0;
+static int interrupt_scanline=192;
+
+static UINT16	out = 0;
+static UINT8	interrupt_line_active=0;
 
 static UINT16* pkscramble_fgtilemap_ram;
 static UINT16* pkscramble_mdtilemap_ram;
 static UINT16* pkscramble_bgtilemap_ram;
 
 static tilemap *fg_tilemap, *md_tilemap, *bg_tilemap;
+static mame_timer *scanline_timer;
 
 static WRITE16_HANDLER( pkscramble_fgtilemap_w )
 {
@@ -75,8 +80,16 @@ static WRITE16_HANDLER( pkscramble_output_w )
 	// 0x1000 -> LED5
 
 	// 0x2000 and 0x4000 are used too
+	// 0x2000 -> vblank interrupt enable
+	// 0x4000 -> set on every second frame - not used
 
 	out = data;
+
+	if (!(out & 0x2000) && interrupt_line_active)
+	{
+	    cpunum_set_input_line(0, 1, CLEAR_LINE);
+		interrupt_line_active = 0;
+	}
 
 	coin_counter_w(0, data & 0x80);
 }
@@ -193,6 +206,24 @@ static void get_fg_tile_info(int tile_index)
 	SET_TILE_INFO(0,tile,color,0)
 }
 
+static void scanline_callback(int param)
+{
+	if (param==interrupt_scanline)
+	{
+    	if (out&0x2000)
+    		cpunum_set_input_line(0, 1, ASSERT_LINE);
+		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, param+1, 0), param+1, time_zero);
+		interrupt_line_active = 1;
+	}
+	else
+	{
+		if (interrupt_line_active)
+	    	cpunum_set_input_line(0, 1, CLEAR_LINE);
+		mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, time_zero);
+		interrupt_line_active = 0;
+	}
+}
+
 VIDEO_START( pkscramble )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE,      8, 8,32,32);
@@ -243,16 +274,29 @@ static struct YM2203interface ym2203_interface =
 	irqhandler
 };
 
+MACHINE_RESET( pkscramble)
+{
+	out = 0;
+	interrupt_line_active=0;
+	scanline_timer = mame_timer_alloc(scanline_callback);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, time_zero);
+
+	state_save_register_global(out);
+	state_save_register_global(interrupt_line_active);
+}
+
 static MACHINE_DRIVER_START( pkscramble )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(pkscramble_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1) /* only valid irq */
+	//MDRV_CPU_VBLANK_INT(irq1_line_hold,1) /* only valid irq */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_MACHINE_RESET(pkscramble)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -285,4 +329,4 @@ ROM_START( pkscram )
 ROM_END
 
 
-GAME( 1993, pkscram, 0, pkscramble, pkscramble, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", 0)
+GAME( 1993, pkscram, 0, pkscramble, pkscramble, 0, ROT0, "Cosmo Electronics Corporation", "PK Scramble", GAME_SUPPORTS_SAVE)

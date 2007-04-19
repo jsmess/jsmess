@@ -31,6 +31,7 @@ OBJDIRS += \
 EMUOBJS = \
 	$(EMUOBJ)/audit.o \
 	$(EMUOBJ)/cheat.o \
+	$(EMUOBJ)/clifront.o \
 	$(EMUOBJ)/config.o \
 	$(EMUOBJ)/cpuexec.o \
 	$(EMUOBJ)/cpuint.o \

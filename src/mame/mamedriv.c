@@ -1811,6 +1811,7 @@ const game_driver * const drivers[] =
 	DRIVER( thndfoxu )	/* C28 (c) 1990 Taito America Corporation (US) */
 	DRIVER( thndfoxj )	/* C28 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( cameltry )	/* C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( camltrya )	/* C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( camltrua )	/* C38 (c) 1989 Taito America Corporation (US) */
 	DRIVER( cameltrj )	/* C38 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( qtorimon )	/* C41 (c) 1990 Taito Corporation (Japan) */
@@ -2624,7 +2625,8 @@ V-V                           TP-027
 	DRIVER( ts2 )		/* Battle Arena Toshinden 2 (USA 951124) */
 	DRIVER( ts2j )		/* Battle Arena Toshinden 2 (JAPAN 951124) */
 	DRIVER( starglad )	/* Star Gladiator (USA 960627) */
-	DRIVER( sfex )		/* Street Fighter EX (USA 961219) */
+	DRIVER( sfex )		/* Street Fighter EX (EURO 961219) */
+	DRIVER( sfexu )		/* Street Fighter EX (USA 961219) */
 	DRIVER( sfexa )		/* Street Fighter EX (ASIA 961219) */
 	DRIVER( sfexj )		/* Street Fighter EX (JAPAN 961130) */
 	DRIVER( glpracr )	/* Gallop Racer (JAPAN Ver 9.01.12) */
@@ -2740,12 +2742,14 @@ V-V                           TP-027
 	/* Namco System 12 */
 	DRIVER( tekken3 )	/* Tekken 3 (TET1/VER.E1) */
 	DRIVER( tekken3a )	/* Tekken 3 (TET2/VER.B) */
-	DRIVER( tekken3b )	/* Tekken 3 (TET2/VER.A) */
+	DRIVER( tekken3b )	/* Tekken 3 (TET3/VER.A) */
+	DRIVER( tekken3c )	/* Tekken 3 (TET2/VER.A) */
 	DRIVER( lbgrande )	/* Libero Grande (LG2/VER.A) */
 	DRIVER( soulclbr )	/* Soul Calibur (SOC14/VER.C) */
 	DRIVER( soulclba )	/* Soul Calibur (SOC11/VER.C) */
-	DRIVER( soulclbb )	/* Soul Calibur (SOC11/VER.B) */
-	DRIVER( soulclbc )	/* Soul Calibur (SOC11/VER.A2) */
+	DRIVER( soulclbb )	/* Soul Calibur (SOC13/VER.B) */
+	DRIVER( soulclbc )	/* Soul Calibur (SOC11/VER.B) */
+	DRIVER( soulclbd )	/* Soul Calibur (SOC11/VER.A2) */
 	DRIVER( ehrgeiz )	/* Ehrgeiz (EG3/VER.A) */
 	DRIVER( ehrgeiza )	/* Ehrgeiz (EG2/VER.A) */
 	DRIVER( mdhorse )	/* Derby Quiz My Dream Horse (MDH1/VER.A2) */
@@ -4487,6 +4491,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( punksht2 )	/* GX907 (c) 1990 (US) */
 	DRIVER( punkshtj )	/* GX907 (c) 1990 (Japan) */
 	DRIVER( lgtnfght )	/* GX939 (c) 1990 (World) */
+	DRIVER( lgtnfgha )	/* GX939 (c) 1990 (Asia) */
 	DRIVER( lgtnfghu )	/* GX939 (c) 1990 (US) */
 	DRIVER( trigon )	/* GX939 (c) 1990 (Japan) */
 	DRIVER( blswhstl )	/* GX060 (c) 1991 */
@@ -7589,5 +7594,7 @@ Other Sun games
 	DRIVER( 2mindril )	/* (c) 1993 Taito */
 	DRIVER( koikoi )	/* (c) 1983 Kiwako */
 	DRIVER( good )		/* (c) 1983 Kiwako */
+	DRIVER( filetto )
+	DRIVER( quizo )		/* (c) 1985 Seoul Coin Corp. */
 
 #endif	/* DRIVER_RECURSIVE */
