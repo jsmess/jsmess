@@ -25,7 +25,7 @@
 #include "ui/bitmask.h"
 #include "ui/mame32.h"
 #include "ui/resourcems.h"
-#include "ui/options.h"
+#include "ui/m32opts.h"
 #include "softwarepicker.h"
 
 

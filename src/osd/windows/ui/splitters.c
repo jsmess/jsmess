@@ -34,7 +34,7 @@
 
 #include "splitters.h"
 #include "bitmask.h"
-#include "options.h"
+#include "m32opts.h"
 #include "resource.h"
 #include "screenshot.h"
 #include "win32ui.h"

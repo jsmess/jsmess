@@ -21,7 +21,7 @@
 
 static int added_device_options;
 
-static const options_entry mess_opts[] =
+const options_entry mess_core_options[] =
 {
 	{ NULL,							NULL,   OPTION_HEADER,		"MESS SPECIFIC OPTIONS" },
     { "ramsize;ram",				NULL,	0,					"size of RAM (if supported by driver)" },
@@ -149,7 +149,7 @@ static void mess_driver_name_callback(core_options *opts, const char *arg)
 void mess_options_init(void)
 {
 	/* add MESS-specific options */
-	options_add_entries(mame_options(), mess_opts);
+	options_add_entries(mame_options(), mess_core_options);
 
 	/* add OSD-MESS specific options (hack!) */
 	osd_mess_options_init();

@@ -19,7 +19,7 @@
 #include "ui/mame32.h"
 #include "ui/directories.h"
 #include "ui/m32util.h"
-#include "ui/options.h"
+#include "ui/m32opts.h"
 #include "resourcems.h"
 #include "mess.h"
 #include "utils.h"
@@ -220,7 +220,7 @@ INT_PTR CALLBACK GameMessOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 
 struct component_param_block
 {
-	options_type *o;
+	core_options *o;
 	int nGame;
 	WORD wID;
 	WORD wNotifyCode;
@@ -343,93 +343,13 @@ static BOOL SoftwareDirectories_ComponentProc(enum component_msg msg, HWND hWnd,
 	return TRUE;
 }
 
-static BOOL RamSize_ComponentProc(enum component_msg msg, HWND hWnd, const game_driver *gamedrv, struct component_param_block *params)
-{
-	char buf[RAM_STRING_BUFLEN];
-	int i, ramopt_count, sel, default_index, nIndex;
-	UINT32 ramopt, default_ramopt;
-	HWND hRamComboBox, hRamCaption;
-	options_type *o = params->o;
-
-	/* locate the controls */
-	hRamComboBox = GetDlgItem(hWnd, IDC_RAM_COMBOBOX);
-	hRamCaption = GetDlgItem(hWnd, IDC_RAM_CAPTION);
-	if (!hRamComboBox || !hRamCaption)
-		return FALSE;
-
-	switch(msg) {
-	case CMSG_OPTIONSTOPROP:
-		/* RAM options? */
-		ramopt_count = gamedrv ? ram_option_count(gamedrv) : 0;
-		if (ramopt_count > 0)
-		{
-			/* we have RAM options */
-			ComboBox_ResetContent(hRamComboBox);
-			default_ramopt = ram_default(gamedrv);
-			default_index = sel = -1;
-
-			for (i = 0; i < ramopt_count; i++)
-			{
-				ramopt = ram_option(gamedrv, i);
-				ram_string(buf, ramopt);
-				ComboBox_AddString(hRamComboBox, buf);
-				ComboBox_SetItemData(hRamComboBox, i, ramopt);
-
-				if (sel < 0)
-				{
-					if (default_ramopt == ramopt)
-						default_index = i;
-					else if (o->mess.ram_size == ramopt)
-						sel = i;
-				}
-			}
-			
-			if (sel < 0)
-			{
-				/* there doesn't seem to be a default RAM option */
-				assert(default_index >= 0);
-				sel = default_index;
-			}
-			ComboBox_SetCurSel(hRamComboBox, sel);
-		}
-		else
-		{
-			/* we do not have RAM options */
-			ShowWindow(hRamComboBox, SW_HIDE);
-			ShowWindow(hRamCaption, SW_HIDE);
-		}
-		break;
-
-	case CMSG_PROPTOOPTIONS:
-		nIndex = ComboBox_GetCurSel(hRamComboBox);
-		if (nIndex != CB_ERR)
-			o->mess.ram_size = ComboBox_GetItemData(hRamComboBox, nIndex);
-		break;
-
-	case CMSG_COMMAND:
-		switch(params->wID) {
-		case IDC_RAM_COMBOBOX:
-			if (params->wNotifyCode == CBN_SELCHANGE)
-				*(params->changed) = TRUE;
-			break;
-		}
-		return FALSE;
-
-	default:
-		assert(0);
-		break;
-	}
-	return TRUE;
-}
-
 /* ------------------------------------------------------------------------ */
 
 typedef BOOL (*component_proc)(enum component_msg msg, HWND hWnd, const game_driver *gamedrv, struct component_param_block *params);
 
 static const component_proc s_ComponentProcs[] =
 {
-	SoftwareDirectories_ComponentProc,
-	RamSize_ComponentProc
+	SoftwareDirectories_ComponentProc
 };
 
 static BOOL InvokeComponentProcs(int nGame, enum component_msg msg, HWND hWnd, struct component_param_block *params)
@@ -449,7 +369,7 @@ static BOOL InvokeComponentProcs(int nGame, enum component_msg msg, HWND hWnd, s
 	return handled;
 }
 
-void MessOptionsToProp(int nGame, HWND hWnd, options_type *o)
+void MessOptionsToProp(int nGame, HWND hWnd, core_options *o)
 {
 	struct component_param_block params;
 	memset(&params, 0, sizeof(params));
@@ -458,7 +378,7 @@ void MessOptionsToProp(int nGame, HWND hWnd, options_type *o)
 	InvokeComponentProcs(nGame, CMSG_OPTIONSTOPROP, hWnd, &params);
 }
 
-void MessPropToOptions(int nGame, HWND hWnd, options_type *o)
+void MessPropToOptions(int nGame, HWND hWnd, core_options *o)
 {
 	struct component_param_block params;
 	memset(&params, 0, sizeof(params));
@@ -477,6 +397,6 @@ BOOL MessPropertiesCommand(int nGame, HWND hWnd, WORD wNotifyCode, WORD wID, BOO
 	return InvokeComponentProcs(nGame, CMSG_COMMAND, hWnd, &params);
 }
 
-void MessSetPropEnabledControls(HWND hWnd, options_type *o)
+void MessSetPropEnabledControls(HWND hWnd, core_options *o)
 {
 }

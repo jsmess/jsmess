@@ -131,6 +131,7 @@ int TabView_GetCurrentTab(HWND hwndTabView)
 {
 	struct TabViewInfo *pTabViewInfo;
 	LPCTSTR pszTab = NULL;
+	LPCTSTR pszThatTab;
 	int i, nTab = -1;
 
 	pTabViewInfo = GetTabViewInfo(hwndTabView);
@@ -144,7 +145,8 @@ int TabView_GetCurrentTab(HWND hwndTabView)
 		{
 			for (i = 0; i < pTabViewInfo->nTabCount; i++)
 			{
-				if (!_tcsicmp(pszTab, pTabViewInfo->pCallbacks->pfnGetTabShortName(i)))
+				pszThatTab = pTabViewInfo->pCallbacks->pfnGetTabShortName(i);
+				if (pszThatTab && !_tcsicmp(pszTab, pszThatTab))
 				{
 					nTab = i;
 					break;

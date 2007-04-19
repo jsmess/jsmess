@@ -84,6 +84,7 @@
 #define IDR_CONTEXT_SCREENSHOT          181
 #define IDI_HEADER_UP                   182
 #define IDI_HEADER_DOWN                 183
+#define IDD_PROP_DIRECT3D               184
 #define IDD_PROP_CONTROLLER             185
 #define IDD_PROP_SCREEN                 187
 #define IDI_SOUNDTAB                    666

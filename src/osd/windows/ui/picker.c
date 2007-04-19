@@ -29,8 +29,8 @@
 #include "screenshot.h"
 #include "win32ui.h"
 #include "bitmask.h"
-#include "options.h"
 #include "m32util.h"
+#include "m32opts.h"
 
 
 // fix warning: cast does not match function type

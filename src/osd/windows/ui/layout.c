@@ -32,7 +32,7 @@
 #include "M32Util.h"
 #include "resource.h"
 #include "directories.h"
-#include "options.h"
+#include "m32opts.h"
 #include "splitters.h"
 #include "help.h"
 #include "audit32.h"

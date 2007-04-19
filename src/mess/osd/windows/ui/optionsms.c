@@ -10,136 +10,124 @@
 #include <tchar.h>
 
 #include "ui/m32util.h"
+#include "ui/m32opts.h"
+#include "optionsms.h"
+#include "emuopts.h"
+#include "driver.h"
+
+#define WINGUIOPTION_SOFTWARE_COLUMN_SHOWN		"mess_column_shown"
+#define WINGUIOPTION_SOFTWARE_COLUMN_WIDTHS		"mess_column_widths"
+#define WINGUIOPTION_SOFTWARE_COLUMN_ORDER		"mess_column_order"
+#define WINGUIOPTION_SOFTWARE_SORT_REVERSED		"mess_sort_reversed"
+#define WINGUIOPTION_SOFTWARE_SORT_COLUMN		"mess_sort_column"
+#define WINGUIOPTION_SOFTWARE_TAB				"current_software_tab"
+#define WINGUIOPTION_SOFTWAREPATH				"softwarepath"
 
 #define LOG_SOFTWARE	0
 
-static void MessColumnEncodeString(void* data, char *str);
-static void MessColumnDecodeString(const char* str, void* data);
-static void MessColumnDecodeWidths(const char* str, void* data);
-
-#include "ui/options.c"
-
-static void MessColumnEncodeString(void* data, char *str)
+const options_entry mess_wingui_settings[] =
 {
-	ColumnEncodeStringWithCount(data, str, MESS_COLUMN_MAX);
-}
+	{ WINGUIOPTION_SOFTWARE_COLUMN_WIDTHS,	"186, 230, 88, 84, 84, 68, 248, 248",	0,				NULL },
+	{ WINGUIOPTION_SOFTWARE_COLUMN_ORDER,	"0,   1,    2,  3,  4,  5,   6,   7",	0,				NULL },
+	{ WINGUIOPTION_SOFTWARE_COLUMN_SHOWN,	"1,   1,    1,  1,  1,  0,   0,   0",	0,				NULL },
 
-static void MessColumnDecodeString(const char* str, void* data)
-{
-	ColumnDecodeStringWithCount(str, data, MESS_COLUMN_MAX);
-}
+	{ WINGUIOPTION_SOFTWARE_SORT_COLUMN,	"0",									0,				NULL },
+	{ WINGUIOPTION_SOFTWARE_SORT_REVERSED,	"0",									OPTION_BOOLEAN,	NULL },
 
-static void MessColumnDecodeWidths(const char* str, void* data)
-{
-	if (settings.view == VIEW_REPORT || settings.view == VIEW_GROUPED)
-		MessColumnDecodeString(str, data);
-}
-
-void SetMessColumnWidths(int width[])
-{
-    int i;
-
-    for (i=0; i < MESS_COLUMN_MAX; i++)
-        settings.mess.mess_column_width[i] = width[i];
-}
-
-void GetMessColumnWidths(int width[])
-{
-    int i;
-
-    for (i=0; i < MESS_COLUMN_MAX; i++)
-        width[i] = settings.mess.mess_column_width[i];
-}
+	{ WINGUIOPTION_SOFTWARE_TAB,			"0",									0,				NULL },
+	{ WINGUIOPTION_SOFTWAREPATH,			"software",								0,				NULL },
+	{ NULL }
+};
 
 void SetMessColumnOrder(int order[])
 {
-    int i;
-
-    for (i = 0; i < MESS_COLUMN_MAX; i++)
-        settings.mess.mess_column_order[i] = order[i];
+	char column_order_string[10000];
+	ColumnEncodeStringWithCount(order, column_order_string, MESS_COLUMN_MAX);
+	options_set_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_COLUMN_ORDER, column_order_string);
 }
 
 void GetMessColumnOrder(int order[])
 {
-    int i;
-
-    for (i = 0; i < MESS_COLUMN_MAX; i++)
-        order[i] = settings.mess.mess_column_order[i];
+	const char *column_order_string;
+	column_order_string = options_get_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_COLUMN_ORDER);
+	ColumnDecodeStringWithCount(column_order_string, order, MESS_COLUMN_MAX);
 }
 
 void SetMessColumnShown(int shown[])
 {
-    int i;
-
-    for (i = 0; i < MESS_COLUMN_MAX; i++)
-        settings.mess.mess_column_shown[i] = shown[i];
+	char column_shown_string[10000];
+	ColumnEncodeStringWithCount(shown, column_shown_string, MESS_COLUMN_MAX);
+	options_set_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_COLUMN_SHOWN, column_shown_string);
 }
 
 void GetMessColumnShown(int shown[])
 {
-    int i;
+	const char *column_shown_string;
+	column_shown_string = options_get_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_COLUMN_SHOWN);
+	ColumnDecodeStringWithCount(column_shown_string, shown, MESS_COLUMN_MAX);
+}
 
-    for (i = 0; i < MESS_COLUMN_MAX; i++)
-        shown[i] = settings.mess.mess_column_shown[i];
+void SetMessColumnWidths(int width[])
+{
+	char column_width_string[10000];
+	ColumnEncodeStringWithCount(width, column_width_string, MESS_COLUMN_MAX);
+	options_set_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_COLUMN_WIDTHS, column_width_string);
+}
+
+void GetMessColumnWidths(int width[])
+{
+	const char *column_width_string;
+	column_width_string = options_get_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_COLUMN_WIDTHS);
+	ColumnDecodeStringWithCount(column_width_string, width, MESS_COLUMN_MAX);
 }
 
 void SetMessSortColumn(int column)
 {
-	settings.mess.mess_sort_column = column;
+	options_set_int(Mame32Settings(), WINGUIOPTION_SOFTWARE_SORT_COLUMN, column);
 }
 
 int GetMessSortColumn(void)
 {
-	return settings.mess.mess_sort_column;
+	return options_get_int(Mame32Settings(), WINGUIOPTION_SOFTWARE_SORT_COLUMN);
 }
 
 void SetMessSortReverse(BOOL reverse)
 {
-	settings.mess.mess_sort_reverse = reverse;
+	options_set_bool(Mame32Settings(), WINGUIOPTION_SOFTWARE_SORT_REVERSED, reverse);
 }
 
 BOOL GetMessSortReverse(void)
 {
-	return settings.mess.mess_sort_reverse;
+	return options_get_bool(Mame32Settings(), WINGUIOPTION_SOFTWARE_SORT_REVERSED);
 }
 
 const char* GetSoftwareDirs(void)
 {
-    return settings.mess.softwaredirs;
+	return options_get_string(Mame32Settings(), WINGUIOPTION_SOFTWAREPATH);
 }
 
 void SetSoftwareDirs(const char* paths)
 {
-	FreeIfAllocated(&settings.mess.softwaredirs);
-    if (paths != NULL)
-        settings.mess.softwaredirs = mame_strdup(paths);
+	options_set_string(Mame32Settings(), WINGUIOPTION_SOFTWAREPATH, paths);
 }
 
-const char *GetCrcDir(void)
+const char *GetHashDirs(void)
 {
-	return settings.mess.hashdir;
+	return options_get_string(Mame32Global(), OPTION_HASHPATH);
 }
 
-void SetCrcDir(const char *hashdir)
+void SetHashDirs(const char *paths)
 {
-	FreeIfAllocated(&settings.mess.hashdir);
-    if (hashdir != NULL)
-        settings.mess.hashdir = mame_strdup(hashdir);
-}
-
-BOOL GetUseNewUI(int driver_index)
-{
-    assert(0 <= driver_index && driver_index < driver_index);
-    return GetGameOptions(driver_index, -1)->mess.use_new_ui;
+	options_set_string(Mame32Global(), OPTION_HASHPATH, paths);
+	options_set_string(mame_options(), OPTION_HASHPATH, paths);
 }
 
 void SetSelectedSoftware(int driver_index, int device_inst_index, const char *software)
 {
 	char *newsoftware;
-	options_type *o;
+	core_options *o;
 
 	assert(device_inst_index >= 0);
-	assert(device_inst_index < (sizeof(o->mess.software) / sizeof(o->mess.software[0])));
 
 	if (LOG_SOFTWARE)
 	{
@@ -152,20 +140,22 @@ void SetSelectedSoftware(int driver_index, int device_inst_index, const char *so
 		return;
 
 	o = GetGameOptions(driver_index, -1);
-	FreeIfAllocated(&o->mess.software[device_inst_index]);
-	o->mess.software[device_inst_index] = newsoftware;
+	//	TODO: FIXME
+	//FreeIfAllocated(&o->mess.software[device_inst_index]);
+	//o->mess.software[device_inst_index] = newsoftware;
 }
 
 const char *GetSelectedSoftware(int driver_index, int device_inst_index)
 {
 	const char *software;
-	options_type *o;
+	core_options *o;
 
 	assert(device_inst_index >= 0);
-	assert(device_inst_index < (sizeof(o->mess.software) / sizeof(o->mess.software[0])));
 
 	o = GetGameOptions(driver_index, -1);
-	software = o->mess.software[device_inst_index];
+	//	TODO: FIXME
+	//software = o->mess.software[device_inst_index];
+	software = NULL;
 	return software ? software : "";
 }
 
@@ -182,8 +172,9 @@ void SetExtraSoftwarePaths(int driver_index, const char *extra_paths)
 		if (!new_extra_paths)
 			return;
 	}
-	FreeIfAllocated(&game_variables[driver_index].mess.extra_software_paths);
-	game_variables[driver_index].mess.extra_software_paths = new_extra_paths;
+	//	TODO: FIXME
+	//FreeIfAllocated(&game_variables[driver_index].mess.extra_software_paths);
+	//game_variables[driver_index].mess.extra_software_paths = new_extra_paths;
 }
 
 const char *GetExtraSoftwarePaths(int driver_index)
@@ -193,112 +184,18 @@ const char *GetExtraSoftwarePaths(int driver_index)
 	assert(driver_index >= 0);
 	assert(driver_index < driver_get_count());
 
-	paths = game_variables[driver_index].mess.extra_software_paths;
+	//	TODO: FIXME
+	//paths = game_variables[driver_index].mess.extra_software_paths;
+	paths = NULL;
 	return paths ? paths : "";
 }
 
 void SetCurrentSoftwareTab(const char *shortname)
 {
-	FreeIfAllocated(&settings.mess.software_tab);
-	if (shortname != NULL)
-		settings.mess.software_tab = mame_strdup(shortname);
+	options_set_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_TAB, shortname);
 }
 
 const char *GetCurrentSoftwareTab(void)
 {
-	return settings.mess.software_tab;
+	return options_get_string(Mame32Settings(), WINGUIOPTION_SOFTWARE_TAB);
 }
-
-
-
-BOOL LoadDeviceOption(DWORD nSettingsFile, char *key, const char *value_str)
-{
-	const game_driver *gamedrv;
-	struct SystemConfigurationParamBlock cfg;
-	device_getinfo_handler handlers[64];
-	int count_overrides[sizeof(handlers) / sizeof(handlers[0])];
-	device_class devclass;
-	int game_index, dev, count, id, pos;
-
-	// locate the driver
-	game_index = nSettingsFile & ~SETTINGS_FILE_TYPEMASK;
-	gamedrv = drivers[game_index];
-
-	// retrieve getinfo handlers
-	memset(&cfg, 0, sizeof(cfg));
-	memset(handlers, 0, sizeof(handlers));
-	cfg.device_slotcount = sizeof(handlers) / sizeof(handlers[0]);
-	cfg.device_handlers = handlers;
-	cfg.device_countoverrides = count_overrides;
-	if (gamedrv->sysconfig_ctor)
-		gamedrv->sysconfig_ctor(&cfg);
-
-	pos = 0;
-
-	for (dev = 0; handlers[dev]; dev++)
-	{
-		devclass.gamedrv = gamedrv;
-		devclass.get_info = handlers[dev];
-
-		count = (int) device_get_info_int(&devclass, DEVINFO_INT_COUNT);
-
-		for (id = 0; id < count; id++)
-		{
-			if (!mame_stricmp(key, device_instancename(&devclass, id))
-				|| !mame_stricmp(key, device_briefinstancename(&devclass, id)))
-			{
-				FreeIfAllocated(&game_options[game_index].mess.software[pos]);
-				game_options[game_index].mess.software[pos] = mame_strdup(value_str);
-				return TRUE;
-			}
-			pos++;
-		}
-	}
-	return FALSE;
-}
-
-
-
-void SaveDeviceOption(DWORD nSettingsFile, void (*emit_callback)(void *param_, const char *key, const char *value_str, const char *comment), void *param)
-{
-	const game_driver *gamedrv;
-	struct SystemConfigurationParamBlock cfg;
-	device_getinfo_handler handlers[64];
-	int count_overrides[sizeof(handlers) / sizeof(handlers[0])];
-	device_class devclass;
-	int game_index, dev, count, id, pos;
-	const char *software;
-
-	// locate the driver
-	game_index = nSettingsFile & ~SETTINGS_FILE_TYPEMASK;
-	gamedrv = drivers[game_index];
-
-	// retrieve getinfo handlers
-	memset(&cfg, 0, sizeof(cfg));
-	memset(handlers, 0, sizeof(handlers));
-	cfg.device_slotcount = sizeof(handlers) / sizeof(handlers[0]);
-	cfg.device_handlers = handlers;
-	cfg.device_countoverrides = count_overrides;
-	if (gamedrv->sysconfig_ctor)
-		gamedrv->sysconfig_ctor(&cfg);
-
-	pos = 0;
-
-	for (dev = 0; handlers[dev]; dev++)
-	{
-		devclass.gamedrv = gamedrv;
-		devclass.get_info = handlers[dev];
-
-		count = (int) device_get_info_int(&devclass, DEVINFO_INT_COUNT);
-
-		for (id = 0; id < count; id++)
-		{
-			software = game_options[game_index].mess.software[pos++];
-			if (software)
-			{
-				emit_callback(param, device_instancename(&devclass, id), software, NULL);
-			}
-		}
-	}
-}
-

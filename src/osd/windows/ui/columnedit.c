@@ -27,7 +27,7 @@
 
 #include "resource.h"
 #include "bitmask.h"
-#include "options.h"
+#include "m32opts.h"
 #include "screenshot.h"
 #include "win32ui.h"
 

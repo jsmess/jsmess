@@ -595,7 +595,7 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
         *buffer = 0;
 
 
-        if(!history_filename)
+        if (!history_filename || !*history_filename)
                 history_filename = "history.dat";
 
         /* try to open history datafile */
@@ -627,7 +627,7 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
                 ParseClose ();
         }
 
-        if(!mameinfo_filename)
+        if (!mameinfo_filename || !*mameinfo_filename)
                 mameinfo_filename = "mameinfo.dat";
 
         /* try to open mameinfo datafile */

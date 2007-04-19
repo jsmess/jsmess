@@ -19,7 +19,7 @@
 #include "ui/bitmask.h"
 #include "ui/mame32.h"
 #include "ui/resourcems.h"
-#include "ui/options.h"
+#include "ui/m32opts.h"
 #include "ui/picker.h"
 #include "mess.h"
 #include "configms.h"
@@ -33,7 +33,7 @@
 #define LOG_SOFTWARE	0
 
 static int requested_device_type(char *tchar);
-static void MessCreateCommandLine(char *pCmdLine, options_type *pOpts, const game_driver *gamedrv);
+static void MessCreateCommandLine(char *pCmdLine, core_options *pOpts, const game_driver *gamedrv);
 static BOOL MessApproveImageList(HWND hParent, int nDriver);
 
 static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn);
@@ -643,14 +643,8 @@ static void InitMessPicker(void)
 
 
 
-static void MessCreateCommandLine(char *pCmdLine, options_type *pOpts, const game_driver *pDriver)
+static void MessCreateCommandLine(char *pCmdLine, core_options *pOpts, const game_driver *pDriver)
 {
-	if ((pOpts->mess.ram_size != 0) && ram_is_valid_option(pDriver, pOpts->mess.ram_size))
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -ramsize %d", pOpts->mess.ram_size);
-	if (pOpts->skip_warnings)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -skip_warnings");
-
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%snewui", pOpts->mess.use_new_ui ? "" : "no");
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -writeconfig");
 }
 

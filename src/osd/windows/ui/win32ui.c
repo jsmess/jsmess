@@ -70,7 +70,7 @@
 #include "DirWatch.h"
 #include "help.h"
 #include "history.h"
-#include "options.h"
+#include "m32opts.h"
 #include "dialogs.h"
 #include "state.h"
 #include "windows/input.h"
@@ -300,7 +300,7 @@ static BOOL FolderCheck(void);
 
 static void             ToggleScreenShot(void);
 static void             AdjustMetrics(void);
-static void             EnablePlayOptions(int nIndex, options_type *o);
+static void             EnablePlayOptions(int nIndex, core_options *o);
 
 /* Icon routines */
 static DWORD            GetShellLargeIconSize(void);
@@ -673,9 +673,6 @@ static ResizeItem main_resize_items[] =
 
 static Resize main_resize = { {0, 0, 0, 0}, main_resize_items };
 
-/* our dialog/configured options */
-static options_type playing_game_options;
-
 /* last directory for common file dialogs */
 static char last_directory[MAX_PATH];
 
@@ -782,12 +779,75 @@ extern game_driver driver_neogeo;
     External functions
  ***************************************************************************/
 
-static void CreateCommandLine(int nGameIndex, char* pCmdLine)
+static void AppendCommands(char *command_line, size_t command_line_length, const options_entry *entrylist, core_options *pOpts)
+{
+	static const char *command_blacklist[] =
+	{
+		"<UNADORNED0>",
+#ifndef MAME_DEBUG
+		OPTION_DEBUG,
+#endif // MAME_DEBUG
+		OPTION_DEBUGSCRIPT
+	};
+
+	char command_name[128];
+	char *s;
+	const char *arg;
+	int is_blacklisted, i;
+
+	/* loop over entries until we hit a NULL name */
+	for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER); entrylist++)
+	{
+		if ((entrylist->flags & (OPTION_COMMAND | OPTION_HEADER | OPTION_INTERNAL)) == 0)
+		{
+			// determine command name
+			snprintf(command_name, ARRAY_LENGTH(command_name), "%s", entrylist->name);
+			s = strchr(command_name, ';');
+			if (s)
+				*s = '\0';
+
+			// check to see if this argument is blacklisted
+			is_blacklisted = FALSE;
+			for (i = 0; i < ARRAY_LENGTH(command_blacklist); i++)
+			{
+				if (!strcmp(command_name, command_blacklist[i]))
+				{
+					is_blacklisted = TRUE;
+					break;
+				}
+			}
+
+			if (!is_blacklisted)
+			{
+				core_options *opts = IsGlobalOption(command_name) ? GetDefaultOptions(GLOBAL_OPTIONS, FALSE) : pOpts;
+
+				if (entrylist->flags & OPTION_BOOLEAN)
+				{
+					snprintf(&command_line[strlen(command_line)], command_line_length,
+						" -%s%s",
+						options_get_bool(opts, command_name) ? "" : "no",
+						command_name);
+				}
+				else
+				{
+					arg = options_get_string(opts, command_name);
+					snprintf(&command_line[strlen(command_line)], command_line_length,
+						" -%s \"%s\"",
+						command_name,
+						arg ? arg : "");
+				}
+			}
+		}
+	}
+}
+
+
+
+static void CreateCommandLine(int nGameIndex, char* pCmdLine, size_t command_line_length)
 {
 	char pModule[_MAX_PATH];
-	options_type* pOpts;
+	core_options *pOpts;
 	LPTREEFOLDER folder;
-	int screens_counter = 0;
 
 	// this command line can grow too long for win9x, so we try to not send
 	// some default values
@@ -810,168 +870,9 @@ static void CreateCommandLine(int nGameIndex, char* pCmdLine)
 	MessCreateCommandLine(pCmdLine, pOpts, drivers[nGameIndex]);
 #endif
 
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -rp \"%s\"",            GetRomDirs());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -sp \"%s\"",         GetSampleDirs());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -inipath \"%s\"",			GetIniDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -cfg_directory \"%s\"",      GetCfgDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -nvram_directory \"%s\"",    GetNvramDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -memcard_directory \"%s\"",  GetMemcardDir());
+	AppendCommands(pCmdLine, command_line_length, mame_core_options, pOpts);
+	AppendCommands(pCmdLine, command_line_length, mame_win_options, pOpts);
 
-	if (override_playback_directory != NULL)
-	{
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -input_directory \"%s\"",override_playback_directory);
-	}
-	else
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -input_directory \"%s\"",GetInpDir());
-
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -state_directory \"%s\"",    GetStateDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -artpath \"%s\"",	GetArtDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -snapshot_directory \"%s\"", GetImgDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -diff_directory \"%s\"",     GetDiffDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -ctrlr_directory \"%s\"",    GetCtrlrDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -comment_directory \"%s\"",  GetCommentDir());
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -cheat_file \"%s\"",         GetCheatFileName());
-
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sskip_gameinfo", pOpts->skip_gameinfo ? "" : "no");
-	/* Core Misc Options*/
-	if (DriverHasOptionalBIOS(nGameIndex))
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -bios %s",pOpts->bios);
-	if (pOpts->cheat)
-        sprintf(&pCmdLine[strlen(pCmdLine)], " -%sc",                   pOpts->cheat ? "" : "no" );
-	/* save states and input recording */
-	if (g_pSaveStateName != NULL)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -state \"%s\"",          g_pSaveStateName);
-	if (pOpts->autosave)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -autosave");
-	if (pOpts->mt_render)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -mt");
-	if (g_pPlayBkName != NULL)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -pb \"%s\"",             g_pPlayBkName);
-	if (g_pRecordName != NULL)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -rec \"%s\"",            g_pRecordName);
-	if (g_pRecordMNGName != NULL)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -mngwrite \"%s\"",       g_pRecordMNGName);
-	if (g_pRecordWaveName != NULL)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -wavwrite \"%s\"",       g_pRecordWaveName);
-	/* debugging options */
-#ifdef _DEBUG
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sd",               pOpts->mame_debug   ? "" : "no");
-#endif
-	if (pOpts->errorlog)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -%slog",                     pOpts->errorlog   ? "" : "no");
-	//Unsupported options in UI
-/*
-	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-	{ "verbose;v",                "0",    OPTION_BOOLEAN,    "display additional diagnostic information" },
-	{ "validate;valid",           NULL,   OPTION_COMMAND,    "perform driver validation on all game drivers" },
-*/
-	/* Performance Options */
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%safs",                     pOpts->autoframeskip   ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -fs %d",						pOpts->frameskip );
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -str %d",					pOpts->seconds_to_display);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sthrottle",				pOpts->throttle   ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssleep",					pOpts->sleep   ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -priority %d",				pOpts->priority);
-	/* video */
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -video %s",                  pOpts->videomode );
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -numscreens %d",             pOpts->numscreens);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sw",                      pOpts->window_mode? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%smax",                    pOpts->maximize? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ska",                     pOpts->keepaspect ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -prescale %d",               pOpts->prescale);
-	if( pOpts->effect )
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -effect \"%s\"",         pOpts->effect);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -pause_brightness %f",       pOpts->f_pause_bright); 
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%swaitvsync",              pOpts->wait_vsync ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssyncrefresh",            pOpts->syncrefresh ? "" : "no");
-	/* Video Rotation Options*/
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%srotate", pOpts->rotate ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sror",pOpts->ror ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%srol",pOpts->rol ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sautoror",pOpts->auto_ror ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sautorol",pOpts->auto_rol ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sflipx",pOpts->flipx ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sflipy",pOpts->flipy ? "" : "no");
-	/*Direct Draw Video Options*/
-	if( strcmp( pOpts->videomode, "ddraw" ) == 0 )
-	{
-		if (pOpts->ddraw_stretch)
-			sprintf(&pCmdLine[strlen(pCmdLine)], " -%shws",  pOpts->ddraw_stretch ? "" : "no");
-	}
-	/*Direct 3D Video Options*/
-	if( strcmp( pOpts->videomode, "d3d" ) == 0 )
-	{
-		if (pOpts->d3d_filter)
-			sprintf(&pCmdLine[strlen(pCmdLine)], " -%sfilter",pOpts->d3d_filter ? "" : "no");
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -d3dversion %d",         pOpts->d3d_version);
-	}
-	/* Per window options */
-	for( screens_counter = 0; screens_counter < min(pOpts->numscreens, MAX_SCREENS); screens_counter++ )
-	{
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -screen%d %s", screens_counter, pOpts->screen_params[screens_counter].screen);
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -aspect%d %s", screens_counter, pOpts->screen_params[screens_counter].aspect);
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -resolution%d %s", screens_counter, pOpts->screen_params[screens_counter].resolution);
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -view%d %s", screens_counter ,pOpts->screen_params[screens_counter].view);
-	}
-	/* Full screen Options */
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%stb",					    pOpts->use_triplebuf ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sswitchres",              pOpts->switchres ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -fsb %f",					pOpts->gfx_brightness);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -fsc %f",                    pOpts->gfx_contrast);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -fsg %f",                    pOpts->gfx_gamma);
-	/* Game screen options*/
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -brightness %f",pOpts->f_bright_correct);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -contrast %f",pOpts->f_contrast_correct);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -gamma %f",pOpts->f_gamma_correct);
-	/* Vector rendering Options*/
-	if (DriverIsVector(nGameIndex))
-	{
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -%saa",                      pOpts->antialias ? "" : "no");
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -beam %f",                   pOpts->f_beam);
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -flicker %f",                pOpts->f_flicker);
-	}
-	/* Artwork options*/
-	if (pOpts->artwork_crop)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -%sartcrop",            pOpts->artwork_crop ? "" : "no");
-	if (pOpts->backdrops)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -%sbackdrop",            pOpts->backdrops ? "" : "no");
-	if (pOpts->overlays)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -%soverlay",             pOpts->overlays ? "" : "no");
-	if (pOpts->bezels)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -%sbezel",               pOpts->bezels ? "" : "no");
-	/* Core Sound options*/
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssound",                   pOpts->enable_sound ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -sr %d",                     pOpts->samplerate);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssamples",                 pOpts->use_samples ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -vol %d",                    pOpts->attenuation);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -audio_latency %i",          pOpts->audio_latency);
-	/* input options*/
-	if (strlen(pOpts->ctrlr) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -ctrlr \"%s\"",              pOpts->ctrlr);
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%smouse",					pOpts->use_mouse ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sjoy",					pOpts->use_joystick ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sgun",					(!pOpts->window_mode && pOpts->lightgun) ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sdual",				pOpts->dual_lightgun ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%sreload",				pOpts->offscreen_reload ? "" : "no");
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -%ssteady",					pOpts->steadykey ? "" : "no");
-	if (pOpts->use_joystick){
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -jdz %f",                pOpts->f_jdz);
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -jsat %f",                pOpts->f_jsat);
-	}
-	if (strlen(pOpts->digital) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -digital \"%s\"",            pOpts->digital);
-	if (strlen(pOpts->paddle) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -paddle \"%s\"",             pOpts->paddle);
-	if (strlen(pOpts->adstick) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -adstick \"%s\"",            pOpts->adstick);
-	if (strlen(pOpts->pedal) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -pedal \"%s\"",              pOpts->pedal);
-	if (strlen(pOpts->dial) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -dial \"%s\"",               pOpts->dial);
-	if (strlen(pOpts->trackball) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -trackball \"%s\"",          pOpts->trackball);
-	if (strlen(pOpts->lightgun_device) > 0)
-		sprintf(&pCmdLine[strlen(pCmdLine)], " -lightgun_device \"%s\"",    pOpts->lightgun_device);
 	dprintf("Launching MAME32:");
 	dprintf("%s\n",pCmdLine);
 }
@@ -1006,6 +907,7 @@ static DWORD RunMAME(int nGameIndex)
 {
 	time_t start, end;
 	double elapsedtime;
+	DWORD dwExitCode = 0;
 
 #if MULTISESSION
 	int argc = 0;
@@ -1084,14 +986,11 @@ static DWORD RunMAME(int nGameIndex)
 	}
 	ShowWindow(hMain, SW_SHOW);
 
-	return 0;
-
 #else
 
-	DWORD               dwExitCode = 0;
 	STARTUPINFO         si;
 	PROCESS_INFORMATION pi;
-	char pCmdLine[2048];
+	char pCmdLine[4096];
 	HWND hGameWnd = NULL;
 	long lGameWndStyle = 0;
 	int UIPriority = GetThreadPriority(GetCurrentThread());	//Save the Priority
@@ -1100,9 +999,9 @@ static DWORD RunMAME(int nGameIndex)
 
 #ifdef MESS
 	SaveGameOptions(nGameIndex);
-#endif
+#endif // MESS
 
-	CreateCommandLine(nGameIndex, pCmdLine );
+	CreateCommandLine(nGameIndex, pCmdLine, ARRAY_LENGTH(pCmdLine) );
 
 	ZeroMemory(&si, sizeof(si));
 	ZeroMemory(&pi, sizeof(pi));
@@ -1177,15 +1076,17 @@ static DWORD RunMAME(int nGameIndex)
 			if (bPickerIdling[i])
 				Picker_ResetIdle(hwndPicker);
 		}
+	}
 
-#ifdef MESS
-		LoadGameOptions(nGameIndex);
-		MessReadMountedSoftware(nGameIndex);
 #endif
+
+	// NPW 16-Apr-2007 - God I hate this hack
+	if (GetGameUsesDefaults(nGameIndex))
+	{
+		ResetGameOptions(nGameIndex);
 	}
 
 	return dwExitCode;
-#endif
 }
 
 int Mame32Main(HINSTANCE    hInstance,
@@ -1864,22 +1765,16 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	extern const char *mameinfo_filename;
 	LONG common_control_version = GetCommonControlVersion();
 	int validity_failed = 0;
-	int argc = 0;
-	char *args[4];
-	char **argv = args;
-	char pModule[_MAX_PATH];
-	char name[_MAX_PATH];
+
+	dprintf("about to init options\n");
+	if (!OptionsInit())
+		return FALSE;
+	dprintf("options loaded\n");
 
 	srand((unsigned)time(NULL));
 
 	init_resource_tracking();
 	begin_resource_tracking();
-
-	strcpy( name, drivers[0]->name );
-	GetModuleFileName(GetModuleHandle(NULL), pModule, _MAX_PATH);
-	argv[argc++] = pModule;
-	argv[argc++] = name;
-	cli_frontend_init(argc, argv );
 
 	/* custom per-game icons */
 	icon_index = auto_malloc(sizeof(int) * driver_get_count());
@@ -1936,11 +1831,6 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 		if (IDNO == MessageBox(0, buf, MAME32NAME " Outdated comctl32.dll Warning", MB_YESNO | MB_ICONWARNING))
 			return FALSE;
     }
-
-	dprintf("about to init options");
-	if (!OptionsInit())
-		return FALSE;
-	dprintf("options loaded");
 
 	g_mame32_message = RegisterWindowMessage("MAME32");
 	g_bDoBroadcast = GetBroadcast();
@@ -3862,7 +3752,7 @@ static void PollGUIJoystick()
 			si.dwFlags = STARTF_FORCEONFEEDBACK;
 			si.cb = sizeof(si);
 			
-			CreateProcess(NULL, GetExecCommand(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
+			CreateProcess(NULL, (char *) GetExecCommand(), NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 
 			// We will not wait for the process to finish cause it might be a background task
 			// The process won't get closed when MAME32 closes either.
@@ -5825,43 +5715,14 @@ static void MamePlayRecordMNG()
 	}	
 }
 
-static void MameGetErrorText(DWORD dwExitCode, LPTSTR pszBuffer, UINT nBufferLen)
-{
-	switch(dwExitCode)
-	{
-		case 1:
-			_sntprintf(pszBuffer, nBufferLen, TEXT("Initialization error"));
-			break;
-
-		case 0xC0000005:
-			_sntprintf(pszBuffer, nBufferLen, TEXT("Access violation"));
-			break;
-
-		default:
-			if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwExitCode,
-				0, pszBuffer, nBufferLen, NULL) == 0)
-			{
-				_sntprintf(pszBuffer, nBufferLen, TEXT("Error 0x%08X"), dwExitCode);
-			}
-			break;
-	}
-}
-
 static void MamePlayGameWithOptions(int nGame)
 {
 	DWORD dwExitCode;
-	TCHAR szBuffer[256];
-	TCHAR szError[256];
 
 #ifdef MESS
 	if (!MessApproveImageList(hMain, nGame))
 		return;
 #endif
-
-	memcpy(&playing_game_options, GetGameOptions(nGame, -1), sizeof(options_type));
-
-	/* Deal with options that can be disabled. */
-	EnablePlayOptions(nGame, &playing_game_options);
 
 	if (g_pJoyGUI != NULL)
 		KillTimer(hMain, JOYGUI_TIMER);
@@ -5881,13 +5742,6 @@ static void MamePlayGameWithOptions(int nGame)
 	else
 	{
 		ShowWindow(hMain, SW_SHOW);
-
-		// attempt to display a nice error message
-		MameGetErrorText(dwExitCode, szError, sizeof(szError) / sizeof(szError[0]));
-		_sntprintf(szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]),
-			TEXT(MAME32NAME " encountered a fatal error: %s"),
-			szError);
-		MessageBox(hMain, szBuffer, MAME32NAME, MB_OK);
 	}
 
 	in_emulation = FALSE;
@@ -5992,10 +5846,8 @@ static void AdjustMetrics(void)
 
 
 /* Adjust options - tune them to the currently selected game */
-static void EnablePlayOptions(int nIndex, options_type *o)
+static void EnablePlayOptions(int nIndex, core_options *o)
 {
-	if (!DIJoystick.Available())
-		o->use_joystick = FALSE;
 }
 
 static int FindIconIndex(int nIconResource)
@@ -7247,6 +7099,9 @@ void SendIconToProcess(LPPROCESS_INFORMATION pi, int nGameIndex)
 {
 	HICON hIcon; 
 	int nParentIndex = -1;
+
+	assert(0 <= nGameIndex < driver_get_count());
+
 	hIcon = LoadIconFromFile(drivers[nGameIndex]->name); 
 	if( hIcon == NULL ) 
 	{ 

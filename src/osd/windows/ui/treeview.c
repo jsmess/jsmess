@@ -51,7 +51,7 @@
 #include "TreeView.h"
 #include "resource.h"
 #include "properties.h"
-#include "options.h"
+#include "m32opts.h"
 #include "help.h"
 #include "dialogs.h"
 

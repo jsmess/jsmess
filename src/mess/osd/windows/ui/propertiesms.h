@@ -3,10 +3,10 @@
 
 #include "ui/properties.h"
 
-void MessOptionsToProp(int nGame, HWND hWnd, options_type *o);
+void MessOptionsToProp(int nGame, HWND hWnd, core_options *o);
 BOOL MessPropertiesCommand(int nGame, HWND hWnd, WORD wNotifyCode, WORD wID, BOOL *changed);
-void MessPropToOptions(int nGame, HWND hWnd, options_type *o);
-void MessSetPropEnabledControls(HWND hWnd, options_type *o);
+void MessPropToOptions(int nGame, HWND hWnd, core_options *o);
+void MessSetPropEnabledControls(HWND hWnd, core_options *o);
 
 INT_PTR CALLBACK GameMessOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 BOOL PropSheetFilter_Config(const machine_config *drv, const game_driver *gamedrv);

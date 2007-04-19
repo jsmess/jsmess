@@ -9,7 +9,18 @@
 
 #include "options.h"
 
-// ugh hack
+
+//============================================================
+//	GLOBAL VARIABLES
+//============================================================
+
+extern const options_entry mess_win_options[];
+
+
+//============================================================
+//	UGH HACK
+//============================================================
+
 const char *get_devicedirectory(int dev);
 void set_devicedirectory(int dev, const char *dir);
 

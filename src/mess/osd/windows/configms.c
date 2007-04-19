@@ -22,10 +22,10 @@
 
 
 //============================================================
-//	LOCAL VARIABLES
+//	GLOBAL VARIABLES
 //============================================================
 
-static const options_entry win_mess_opts[] =
+const options_entry mess_win_options[] =
 {
 	{ NULL,							NULL,   OPTION_HEADER,		"WINDOWS MESS SPECIFIC OPTIONS" },
 	{ "newui;nu",                   "1",    OPTION_BOOLEAN,		"use the new MESS UI" },
@@ -37,7 +37,7 @@ static const options_entry win_mess_opts[] =
 
 void osd_mess_options_init(void)
 {
-	options_add_entries(mame_options(), win_mess_opts);
+	options_add_entries(mame_options(), mess_win_options);
 }
 
 
