@@ -17,6 +17,8 @@
 #include "driver.h"
 #include "window.h"
 #include "options.h"
+#include "clifront.h"
+#include "input.h"
 
 // we override SDL's normal startup on Win32
 #ifdef SDLMAME_WIN32
@@ -58,6 +60,124 @@ int verbose;
 //============================================================
 //	LOCAL VARIABLES
 //============================================================
+
+//============================================================
+//  OPTIONS
+//============================================================
+
+static const options_entry mame_sdl_options[] =
+{
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_MACOSX)
+	{ "inipath",                     ".;ini",     0,                 "path to ini files" },
+#else
+#if defined(INI_PATH)
+	{ "inipath",                     INI_PATH,     0,                "path to ini files" },
+#else
+#ifdef MESS
+	{ "inipath",                     "$HOME/.mess;.;ini",     0,     "path to ini files" },
+#else
+	{ "inipath",                     "$HOME/.mame;.;ini",     0,     "path to ini files" },
+#endif // MESS
+#endif // INI_PATH
+#endif // MACOSX
+	
+
+	// debugging options
+	{ NULL,                       NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
+	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ "verbose;v",                "0",        OPTION_BOOLEAN,    "display additional diagnostic information" },
+
+	// performance options
+	{ NULL,                       NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
+	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
+
+	// video options
+	{ NULL,                       NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
+	{ "video",                    "soft",     0,                 "video output method: soft or opengl" },
+	{ "numscreens",               "1",        0,                 "number of screens to create; SDLMAME only supports 1 at this time" },
+	{ "window;w",                 "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
+	{ "maximize;max",             "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
+	{ "keepaspect;ka",            "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
+	{ "unevenstretch;ues",        "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
+	{ "effect",                   "none",     0,                 "name of a PNG file to use for visual effects, or 'none'" },
+	{ "pause_brightness",         "0.65",     0,                 "amount to scale the screen brightness when paused" },
+	{ "centerh",                  "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
+	{ "centerv",                  "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
+	#if (SDL_VERSIONNUM(SDL_MAJOR_VERSION, SDL_MINOR_VERSION, SDL_PATCHLEVEL) >= 1210)
+	{ "waitvsync",                "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
+	#endif
+	{ "yuvmode;ym",               "none",     0,                 "YUV mode: none, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+
+	// OpenGL specific options
+	{ NULL,                       NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
+	{ "filter;glfilter;flt",      "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
+	{ "prescale",                 "1",        0,                 "scale screen rendering by this amount in software" },
+	{ "16bpp_texfmt",             "auto",     0,                 "how 16bpp data is send to the card: auto, argb1555, rgba5551, rgb565, argb8" },
+
+	// per-window options
+	{ NULL,                       NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
+	{ "screen",                   "auto",     0,                 "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ "aspect;screen_aspect",     "auto",     0,                 "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ "resolution;r",             "auto",     0,                 "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view",                     "auto",     0,                 "preferred view for all screens" },
+
+	{ "screen0",                  "auto",     0,                 "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ "aspect0",                  "auto",     0,                 "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ "resolution0;r0",           "auto",     0,                 "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view0",                    "auto",     0,                 "preferred view for the first screen" },
+
+	{ "screen1",                  "auto",     0,                 "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ "aspect1",                  "auto",     0,                 "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ "resolution1;r1",           "auto",     0,                 "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view1",                    "auto",     0,                 "preferred view for the second screen" },
+
+	{ "screen2",                  "auto",     0,                 "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ "aspect2",                  "auto",     0,                 "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ "resolution2;r2",           "auto",     0,                 "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view2",                    "auto",     0,                 "preferred view for the third screen" },
+
+	{ "screen3",                  "auto",     0,                 "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ "aspect3",                  "auto",     0,                 "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ "resolution3;r3",           "auto",     0,                 "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ "view3",                    "auto",     0,                 "preferred view for the fourth screen" },
+
+	// full screen options
+	{ NULL,                       NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
+	{ "switchres",                "0",        OPTION_BOOLEAN,    "enable resolution switching" },
+	#ifdef SDLMAME_X11
+	{ "useallheads",	      "0",	  OPTION_BOOLEAN,    "split full screen image across monitors" },
+	#endif
+
+	// sound options
+	{ NULL,                       NULL,       OPTION_HEADER,     "SOUND OPTIONS" },
+	{ "audio_latency",            "3",        0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+
+	// input options
+	{ NULL,                       NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
+	{ "mouse",                    "0",        OPTION_BOOLEAN,    "enable mouse input" },
+	{ "joystick;joy",             "0",        OPTION_BOOLEAN,    "enable joystick input" },
+	{ "steadykey;steady",         "0",        OPTION_BOOLEAN,    "enable steadykey support" },
+	{ "a2d_deadzone;a2d",         "0.3",      0,                 "minimal analog value for digital input" },
+	{ "digital",                  "none",     0,                 "mark certain joysticks or axes as digital (none|all|j<N>*|j<N>a<M>[,...])" },
+
+	{ NULL,                       NULL,       OPTION_HEADER,     "AUTOMATIC DEVICE SELECTION OPTIONS" },
+	{ "paddle_device;paddle",     "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a paddle control is present" },
+	{ "adstick_device;adstick",   "keyboard", 0,                 "enable (keyboard|mouse|joystick) if an analog joystick control is present" },
+	{ "pedal_device;pedal",       "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a pedal control is present" },
+	{ "dial_device;dial",         "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a dial control is present" },
+	{ "trackball_device;trackball","keyboard", 0,                "enable (keyboard|mouse|joystick) if a trackball control is present" },
+	{ "lightgun_device",          "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a lightgun control is present" },
+	{ "positional_device",        "keyboard", 0,                 "enable (keyboard|mouse|joystick) if a positional control is present" },
+#ifdef MESS
+	{ "mouse_device",             "mouse",    0,                 "enable (keyboard|mouse|joystick) if a mouse control is present" },
+#endif
+
+	// keyboard mapping
+	{ NULL, 		      NULL,       OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
+	{ "keymap",                   "0",        OPTION_BOOLEAN,    "enable keymap" },
+	{ "keymap_file",              "keymap.dat", 0,               "keymap filename" },
+	{ NULL }
+};
 
 //============================================================
 //	main
@@ -137,28 +257,10 @@ int main(int argc, char **argv)
 int SDL_main(int argc, char **argv)
 #endif
 {
-	int game_index;
 	int res = 0;
 
 	#ifdef MESS
 	getcwd(cwd, 511);
-	#endif
-
-	// parse config and cmdline options
-	game_index = cli_frontend_init (argc, argv);
-
-
-	#ifdef SDLMAME_DARWIN
-
-	#ifdef X86_ASM	// Intel OS X only
-	sdl_use_rdtsc = options_get_bool(mame_options(), "rdtsc");
-	#else
-	sdl_use_rdtsc = options_get_bool(mame_options(), "machtmr");
-	#endif	// X86_ASM
-	#else	// DARWIN
-	#ifdef X86_ASM	// Intel only
-	sdl_use_rdtsc = options_get_bool(mame_options(), "rdtsc");
-	#endif
 	#endif
 
 #if defined(SDLMAME_X11) && (SDL_MAJOR_VERSION == 1) && (SDL_MINOR_VERSION == 2)
@@ -180,13 +282,7 @@ int SDL_main(int argc, char **argv)
 	}
 #endif 
 
-	// have we decided on a game?
-	if (game_index != -1)
-		res = run_game(game_index);
-	else
-		res = -1;
-
-	cli_frontend_exit();
+	res = cli_execute(argc, argv, mame_sdl_options);
 
 #ifdef MALLOC_DEBUG
 	{
@@ -237,7 +333,6 @@ void led_init(void);
 int osd_init(running_machine *machine)
 {
 	extern int win_init_input(running_machine *machine);
-	extern int win_erroroslog;
 	int result;
 
 	#ifndef SDLMAME_WIN32
@@ -253,16 +348,16 @@ int osd_init(running_machine *machine)
 	if (getenv("SDLMAME_UNSUPPORTED"))
 		led_init();
 
-	result = wininput_init(machine);
+	result = sdlinput_init(machine);
 
 	sdl_init_audio(machine);
+
+	if (options_get_bool(mame_options(), "oslog"))
+		add_logerror_callback(machine, output_oslog);
 
 	#ifdef MESS
 	SDL_EnableUNICODE(1);
 	#endif
-
-	if(win_erroroslog)
-		add_logerror_callback(machine, output_oslog);
 
 	return result;
 }

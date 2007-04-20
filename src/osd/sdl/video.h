@@ -35,9 +35,7 @@
 #define VIDEO_YUV_MODE_MIN	VIDEO_YUV_MODE_NONE
 
 
-// lots of texture formats, we need atleast 2 different 16 bpp dest formats.
-// Because not all cards can handle all 16bpp formats efficiently, I've opted
-// to add 4 possible dest formats for 16 bpp srcs for the largest flexibility.
+// texture formats
 // This used to be an enum, but these are now defines so we can use them as
 // preprocessor conditionals
 #define SDL_TEXFORMAT_ARGB32			 0	// non-16-bit textures or specials
@@ -49,6 +47,12 @@
 #define SDL_TEXFORMAT_RGB15			 6
 #define SDL_TEXFORMAT_RGB15_PALETTED		 7
 #define SDL_TEXFORMAT_PALETTE16A		 8
+// special texture formats for 16bpp texture destination support, do not use
+// to address the tex properties / tex functions arrays!
+#define SDL_TEXFORMAT_PALETTE16_ARGB1555	 16
+#define SDL_TEXFORMAT_RGB15_ARGB1555		 17
+#define SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555	 18
+
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -123,6 +127,7 @@ struct _sdl_video_config
 	// d3d options
 	int					filter;						// enable filtering
 	int					prescale_effect;
+	int					prefer16bpp_tex;
 
 	// vector options
 	int					isvector;				// 1 if vector, 0 if raster

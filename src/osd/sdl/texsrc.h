@@ -86,6 +86,30 @@
 	#define TEXSRC_TYPE UINT16
 	#define TEXSRC_TO_DEST(src) (texsource->palette[0x000 + (src >> 8)] | (src << 8))
 	#define FUNC_NAME(name) name ## _yuv16_paletted_apple
+#elif SDL_TEXFORMAT == SDL_TEXFORMAT_PALETTE16_ARGB1555
+	#define DEST_TYPE UINT16
+	#define DEST_NAME(name) name ## _16bpp
+	#define TEXSRC_TYPE UINT16
+	#define TEXSRC_TO_DEST(src) \
+		((texsource->palette[src]&0xf80000) >> 9 | \
+		 (texsource->palette[src]&0x00f800) >> 6 | \
+		 (texsource->palette[src]&0x0000f8) >> 3 | 0x8000)
+	#define FUNC_NAME(name) name ## _palette16_argb1555
+#elif SDL_TEXFORMAT == SDL_TEXFORMAT_RGB15_ARGB1555
+	#define DEST_TYPE UINT16
+	#define DEST_NAME(name) name ## _16bpp
+	#define TEXSRC_TYPE UINT16
+	#define TEXSRC_TO_DEST(src) ((src) | 0x8000)
+	#define FUNC_NAME(name) name ## _rgb15_argb1555
+#elif SDL_TEXFORMAT == SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555
+	#define DEST_TYPE UINT16
+	#define DEST_NAME(name) name ## _16bpp
+	#define TEXSRC_TYPE UINT16
+	#define TEXSRC_TO_DEST(src) \
+		((texsource->palette[(src) >> 10] & 0xf8) << 7 | \
+		 (texsource->palette[((src) >> 5) & 0x1f] & 0xf8) << 2 | \
+		 (texsource->palette[(src) & 0x1f] & 0xf8) >> 3 | 0x8000)
+	#define FUNC_NAME(name) name ## _rgb15_paletted_argb1555
 #else
 	#error Unknown SRC_TEXFORMAT
 #endif

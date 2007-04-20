@@ -11,5 +11,8 @@ void scale2x_rgb15(texture_info *texture, const render_texinfo *texsource);
 void scale2x_rgb15_paletted(texture_info *texture, const render_texinfo *texsource);
 void scale2x_yuv16(texture_info *texture, const render_texinfo *texsource);
 void scale2x_yuv16_paletted(texture_info *texture, const render_texinfo *texsource);
+void scale2x_palette16_argb1555(texture_info *texture, const render_texinfo *texsource);
+void scale2x_rgb15_argb1555(texture_info *texture, const render_texinfo *texsource);
+void scale2x_rgb15_paletted_argb1555(texture_info *texture, const render_texinfo *texsource);
 
 #endif

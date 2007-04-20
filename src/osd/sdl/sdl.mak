@@ -35,8 +35,8 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdltime.o	\
 	$(SDLOBJ)/sdlwork.o	
 
-OSDOBJS =  $(SDLOBJ)/config.o $(SDLOBJ)/sdlmain.o \
-	$(SDLOBJ)/fronthlp.o $(SDLOBJ)/input.o \
+OSDOBJS =  $(SDLOBJ)/sdlmain.o \
+	$(SDLOBJ)/input.o \
 	$(SDLOBJ)/sound.o  $(SDLOBJ)/video.o \
 	$(SDLOBJ)/drawsdl.o $(SDLOBJ)/window.o $(SDLOBJ)/keybled.o \
 	$(SDLOBJ)/scale2x.o

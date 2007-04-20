@@ -613,11 +613,17 @@ static void extract_video_config(void)
 
 	// default to working video please
 	video_config.novideo = 0;
+	video_config.prefer16bpp_tex = 0;
 
 	// d3d options: extract the data
 	stemp = options_get_string(mame_options(), "video");
 	if (strcmp(stemp, "opengl") == 0)
 		video_config.mode = VIDEO_MODE_OPENGL;
+	else if (strcmp(stemp, "opengl16") == 0)
+	{
+ 		video_config.mode = VIDEO_MODE_OPENGL;
+ 		video_config.prefer16bpp_tex = 1;
+	}
 	else if (strcmp(stemp, "soft") == 0)
 		video_config.mode = VIDEO_MODE_SOFT;
 	else if (strcmp(stemp, "none") == 0)

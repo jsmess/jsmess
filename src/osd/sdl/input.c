@@ -1307,10 +1307,10 @@ static void wininput_exit(running_machine *machine)
 
 
 //============================================================
-//  wininput_init
+//  sdlinput_init
 //============================================================
 
-int wininput_init(running_machine *machine)
+int sdlinput_init(running_machine *machine)
 {
 	const input_port_entry *inp;
 	int stick, axis, button, mouse;
@@ -2168,7 +2168,7 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 			// LCTRL-F3 to toggle fullstretch
 			case IPT_OSD_2:
 				idef->token = "TOGGLE_FULLSTRETCH";
-				idef->name = "Toggle Fullstretch";
+				idef->name = "Toggle Uneven stretch";
 				seq_set_2(&idef->defaultseq, KEYCODE_F3, KEYCODE_LCONTROL);
 				break;
 			// add a Not lcrtl condition to the reset key

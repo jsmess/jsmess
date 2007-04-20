@@ -52,6 +52,7 @@ extern int win_use_mouse;
 void win_process_events_buf(void);
 #endif
 
+int sdlinput_init(running_machine *machine);
 void win_process_events(void);
 void start_led(void);
 void stop_led(void);

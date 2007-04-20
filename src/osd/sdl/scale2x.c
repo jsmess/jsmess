@@ -44,6 +44,18 @@
 #include "effect_func.h"
 #undef SDL_TEXFORMAT
 
+#define SDL_TEXFORMAT SDL_TEXFORMAT_PALETTE16_ARGB1555
+#include "effect_func.h"
+#undef SDL_TEXFORMAT
+
+#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_ARGB1555
+#include "effect_func.h"
+#undef SDL_TEXFORMAT
+
+#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555
+#include "effect_func.h"
+#undef SDL_TEXFORMAT
+
 #undef EFFECT_FUNC_NAME
 #undef EFFECT_DEST_NAME
 

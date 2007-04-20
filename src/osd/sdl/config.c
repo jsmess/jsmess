@@ -83,35 +83,6 @@ static char *extract_path(const char *name, char *dest, int destsize);
 // struct definitions
 static const options_entry sdl_opts[] =
 {
-	// core commands
-	{ "help;h;?",                 "0",        OPTION_COMMAND,    "show help message" },
-	{ "validate;valid",           "0",        OPTION_COMMAND,    "perform driver validation on all game drivers" },
-
-	// configuration commands
-	{ "createconfig;cc",          "0",        OPTION_COMMAND,    "create the default configuration file" },
-	{ "showconfig;sc",            "0",        OPTION_COMMAND,    "display running parameters" },
-	{ "showusage;su",             "0",        OPTION_COMMAND,    "show this help" },
-
-	// frontend commands
-	{ "listxml;lx",               "0",        OPTION_COMMAND,    "all available info on driver in XML format" },
-	{ "listfull;ll",              "0",        OPTION_COMMAND,    "short name, full name" },
-	{ "listsource;ls",            "0",        OPTION_COMMAND,    "driver sourcefile" },
-	{ "listclones;lc",            "0",        OPTION_COMMAND,    "show clones" },
-	{ "listcrc",                  "0",        OPTION_COMMAND,    "CRC-32s" },
-	{ "listroms",                 "0",        OPTION_COMMAND,    "list required roms for a driver" },
-	{ "listsamples",              "0",        OPTION_COMMAND,    "list     OPTIONal samples for a driver" },
-	{ "verifyroms",               "0",        OPTION_COMMAND,    "report romsets that have problems" },
-	{ "verifysamples",            "0",        OPTION_COMMAND,    "report samplesets that have problems" },
-	{ "romident",                 "0",        OPTION_COMMAND,    "compare files with known MAME roms" },
-	{ "isknown",                  "0",        OPTION_COMMAND,    "compare files with known MAME roms (brief)" },
-#ifdef MESS
-	{ "listdevices",              "0",        OPTION_COMMAND,    "list available devices" },
-#endif
-
-	// config options
-	{ NULL,                       NULL,       OPTION_HEADER,     "CONFIGURATION OPTIONS" },
-	{ "readconfig;rc",            "1",        OPTION_BOOLEAN,    "enable loading of configuration files" },
-
 	// debugging options
 	{ NULL,                       NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
 	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
@@ -119,11 +90,6 @@ static const options_entry sdl_opts[] =
 
 	// performance options
 	{ NULL,                       NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
-	{ "autoframeskip;afs",        "0",        OPTION_BOOLEAN,    "enable automatic frameskip selection" },
-	{ "frameskip;fs",             "0",        0,                 "set frameskip to fixed value, 0-12 (autoframeskip must be disabled)" },
-	{ "frames_to_run;ftr",        "0",        0,                 "number of frames to run before automatically exiting" },
-	{ "throttle",                 "1",        OPTION_BOOLEAN,    "enable throttling to keep game running in sync with real time" },
-	{ "sleep",                    "1",        OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
 	#if defined(SDLMAME_WIN32) || (defined(SDLMAME_UNIX) && defined(X86_ASM))
 	{ "rdtsc",                    "0",    OPTION_BOOLEAN, "use the RDTSC instruction for timing on x86; faster but may result in uneven performance" },
 	#endif
@@ -188,25 +154,6 @@ static const options_entry sdl_opts[] =
 	#ifdef SDLMAME_X11
 	{ "useallheads",	      "0",	  OPTION_BOOLEAN,    "split full screen image across monitors" },
 	#endif
-
-	// game screen options
-	{ NULL,                       NULL,       OPTION_HEADER,     "GAME SCREEN OPTIONS" },
-	{ "brightness",               "1.0",      0,                 "default game screen brightness correction" },
-	{ "contrast",                 "1.0",      0,                 "default game screen contrast correction" },
-	{ "gamma",                    "1.0",      0,                 "default game screen gamma correction" },
-
-	// vector rendering options
-	{ NULL,                       NULL,       OPTION_HEADER,     "VECTOR RENDERING OPTIONS" },
-	{ "antialias;aa",             "1",        OPTION_BOOLEAN,    "use antialiasing when drawing vectors" },
-	{ "beam",                     "1.0",      0,                 "set vector beam width" },
-	{ "flicker",                  "0",        0,                 "set vector flicker effect" },
-
-	// artwork options
-	{ NULL,                       NULL,       OPTION_HEADER,     "ARTWORK OPTIONS" },
-	{ "artwork_crop;artcrop",     "0",        OPTION_BOOLEAN,    "crop artwork to game screen size" },
-	{ "use_backdrops;backdrop",   "1",        OPTION_BOOLEAN,    "enable backdrops if artwork is enabled and available" },
-	{ "use_overlays;overlay",     "1",        OPTION_BOOLEAN,    "enable overlays if artwork is enabled and available" },
-	{ "use_bezels;bezel",         "1",        OPTION_BOOLEAN,    "enable bezels if artwork is enabled and available" },
 
 	// sound options
 	{ NULL,                       NULL,       OPTION_HEADER,     "SOUND OPTIONS" },

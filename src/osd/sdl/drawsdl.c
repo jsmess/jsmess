@@ -163,6 +163,10 @@ void texcopy_yuv16_paletted(texture_info *texture, const render_texinfo *texsour
 void texcopy_yuv16_apple(texture_info *texture, const render_texinfo *texsource);
 void texcopy_yuv16_paletted_apple(texture_info *texture, const render_texinfo *texsource);
 #endif
+// 16 bpp destination texture texcopy functions
+void texcopy_palette16_argb1555(texture_info *texture, const render_texinfo *texsource);
+void texcopy_rgb15_argb1555(texture_info *texture, const render_texinfo *texsource);
+void texcopy_rgb15_paletted_argb1555(texture_info *texture, const render_texinfo *texsource);
 
 // soft rendering
 void drawsdl_rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
@@ -868,7 +872,7 @@ enum { SDL_TEXFORMAT_INTERNAL, SDL_TEXFORMAT_TYPE, SDL_TEXFORMAT_FORMAT,
 	SDL_TEXFORMAT_SRC_EQUALS_DEST, SDL_TEXFORMAT_PIXEL_SIZE };
 
 // Note if you change this also change the matching defines in texsrc.h
-static const GLint texture_properties[9][5] = {
+static GLint texture_properties[9][5] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, TRUE, sizeof(UINT32) },
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
@@ -883,6 +887,9 @@ static const GLint texture_properties[9][5] = {
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
 	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) } };
+
+static const GLint texture_properties_argb1555[5] =
+	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, FALSE, sizeof(UINT16) };
 
 typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
 	
@@ -1034,7 +1041,30 @@ static void texture_compute_size(sdl_info *sdl, const render_texinfo *texsource,
 
 static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsource, UINT32 flags)
 {
+	static int first_time = 1;
 	texture_info *texture;
+	
+	// if this is our first call and 16bpp textures have been requested
+	// patch in the 16bpp texprops and copy funcs
+	if (first_time)
+	{
+		if (video_config.prefer16bpp_tex)
+		{
+			memcpy(texture_properties[5], texture_properties_argb1555,
+				sizeof(texture_properties_argb1555));
+			memcpy(texture_properties[6], texture_properties_argb1555,
+				sizeof(texture_properties_argb1555));
+			memcpy(texture_properties[7], texture_properties_argb1555,
+				sizeof(texture_properties_argb1555));
+			texcopy_f[0][5] = texcopy_palette16_argb1555;
+			texcopy_f[0][6] = texcopy_rgb15_argb1555;
+			texcopy_f[0][7] = texcopy_rgb15_paletted_argb1555;
+			texcopy_f[1][5] = scale2x_palette16_argb1555;
+			texcopy_f[1][6] = scale2x_rgb15_argb1555;
+			texcopy_f[1][7] = scale2x_rgb15_paletted_argb1555;
+		}
+		first_time = 0;
+	}
 
 	// allocate a new texture
 	texture = malloc(sizeof(*texture));
@@ -1384,6 +1414,15 @@ void drawsdl_destroy_all_textures(sdl_info *sdl)
 #include "texcopy.c"
 
 #define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED
+#include "texcopy.c"
+
+#define SDL_TEXFORMAT SDL_TEXFORMAT_PALETTE16_ARGB1555
+#include "texcopy.c"
+
+#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_ARGB1555
+#include "texcopy.c"
+
+#define SDL_TEXFORMAT SDL_TEXFORMAT_RGB15_PALETTED_ARGB1555
 #include "texcopy.c"
 
 #ifdef SDLMAME_MACOSX /* native MacOS X composite texture format */
