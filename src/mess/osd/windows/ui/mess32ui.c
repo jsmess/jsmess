@@ -394,7 +394,7 @@ static BOOL MessApproveImageList(HWND hParent, int nGame)
 		{
 			for (i = 0; i < pDevice->count; i++)
 			{
-				pszSoftware = GetSelectedSoftware(nGame, nPos + i);
+				pszSoftware = GetSelectedSoftware(nGame, &pDevice->devclass, i);
 				if (!pszSoftware || !*pszSoftware)
 				{
 					snprintf(szMessage, sizeof(szMessage) / sizeof(szMessage[0]),
@@ -426,15 +426,15 @@ done:
 
 
 // this is a wrapper call to wrap the idiosycracies of SetSelectedSoftware()
-static void InternalSetSelectedSoftware(int nGame, int nIndex, const char *pszSoftware)
+static void InternalSetSelectedSoftware(int nGame, const device_class *devclass, int device_inst, const char *pszSoftware)
 {
 	if (!pszSoftware)
 		pszSoftware = TEXT("");
 
 	// only call SetSelectedSoftware() if this value is different
-	if (strcmp(GetSelectedSoftware(nGame, nIndex), pszSoftware))
+	if (strcmp(GetSelectedSoftware(nGame, devclass, device_inst), pszSoftware))
 	{
-		SetSelectedSoftware(nGame, nIndex, pszSoftware);
+		SetSelectedSoftware(nGame, devclass, device_inst, pszSoftware);
 		SetGameUsesDefaults(nGame, FALSE);
 		SaveGameOptions(nGame);
 	}
@@ -469,7 +469,7 @@ static void MessSpecifyImage(int nGame, const device_class *devclass, int nID, L
 		// special case; first try to find existing image
 		for (i = 0; i < dev->count; i++)
 		{
-			s = GetSelectedSoftware(nGame, dev->position + i);
+			s = GetSelectedSoftware(nGame, &dev->devclass, i);
 			if (s && !_tcsicmp(s, pszFilename))
 			{
 				nID = i;
@@ -483,7 +483,7 @@ static void MessSpecifyImage(int nGame, const device_class *devclass, int nID, L
 		// still not found?  locate an empty slot
 		for (i = 0; i < dev->count; i++)
 		{
-			s = GetSelectedSoftware(nGame, dev->position + i);
+			s = GetSelectedSoftware(nGame, &dev->devclass, i);
 			if (!s || !*s || !_tcsicmp(s, pszFilename))
 			{
 				nID = i;
@@ -493,7 +493,7 @@ static void MessSpecifyImage(int nGame, const device_class *devclass, int nID, L
 	}
 
 	if (nID >= 0)
-		InternalSetSelectedSoftware(nGame, dev->position + nID, pszFilename);
+		InternalSetSelectedSoftware(nGame, &dev->devclass, nID, pszFilename);
 	else if (LOG_SOFTWARE)
 		dprintf("MessSpecifyImage(): Failed to place image '%s'\n", pszFilename);
 
@@ -525,7 +525,7 @@ static void MessRemoveImage(int nGame, device_class devclass, LPCTSTR pszFilenam
 		{
 			for (i = 0; i < dev->count; i++)
 			{
-				if (!_tcsicmp(pszFilename, GetSelectedSoftware(nGame, nPos + i)))
+				if (!_tcsicmp(pszFilename, GetSelectedSoftware(nGame, &dev->devclass, i)))
 				{
 					MessSpecifyImage(nGame, &devclass, i, NULL);
 					break;
@@ -553,7 +553,7 @@ static void MessReadMountedSoftware(int nGame)
 static void MessRefreshPicker(int nGame)
 {
 	HWND hwndSoftware;
-	int i, id, nPos;
+	int i, id;
 	LVFINDINFO lvfi;
 	const game_driver *pDriver;
 	const struct IODevice *pDeviceList;
@@ -574,13 +574,11 @@ static void MessRefreshPicker(int nGame)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	nPos = 0;
-
 	for (pDevice = pDeviceList; pDevice->type < IO_COUNT; pDevice++)
 	{
 		for (id = 0; id < pDevice->count; id++)
 		{
-			pszSoftware = GetSelectedSoftware(nGame, nPos);
+			pszSoftware = GetSelectedSoftware(nGame, &pDevice->devclass, id);
 			if (pszSoftware && *pszSoftware)
 			{
 				i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
@@ -598,7 +596,6 @@ static void MessRefreshPicker(int nGame)
 					ListView_SetItemState(hwndSoftware, i, LVIS_SELECTED, LVIS_SELECTED);
 				}
 			}
-			nPos++;
 		}
 	}
 
@@ -877,7 +874,7 @@ static void DevView_SetSelectedSoftware(HWND hwndDevView, int nGame,
 static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 	const struct IODevice *dev, int nID, LPTSTR pszBuffer, UINT nBufferLength)
 {
-	return GetSelectedSoftware(nDriverIndex, dev->position + nID);
+	return GetSelectedSoftware(nDriverIndex, &dev->devclass, nID);
 }
 
 

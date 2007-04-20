@@ -122,40 +122,32 @@ void SetHashDirs(const char *paths)
 	options_set_string(mame_options(), OPTION_HASHPATH, paths);
 }
 
-void SetSelectedSoftware(int driver_index, int device_inst_index, const char *software)
+void SetSelectedSoftware(int driver_index, const device_class *devclass, int device_inst, const char *software)
 {
-	char *newsoftware;
+	const char *opt_name = device_instancename(devclass, device_inst);
 	core_options *o;
-
-	assert(device_inst_index >= 0);
 
 	if (LOG_SOFTWARE)
 	{
-		dprintf("SetSelectedSoftware(): driver_index=%d (\'%s\') device_inst_index=%d software='%s'\n",
-			driver_index, drivers[driver_index]->name, device_inst_index, software);
+		dprintf("SetSelectedSoftware(): driver_index=%d (\'%s\') devclass=%p device_inst=%d software='%s'\n",
+			driver_index, drivers[driver_index]->name, devclass, device_inst, software);
 	}
 
-	newsoftware = mame_strdup(software ? software : "");
-	if (!newsoftware)
-		return;
-
 	o = GetGameOptions(driver_index, -1);
-	//	TODO: FIXME
-	//FreeIfAllocated(&o->mess.software[device_inst_index]);
-	//o->mess.software[device_inst_index] = newsoftware;
+	opt_name = device_instancename(devclass, device_inst);
+	// FIXME
+	//options_set_string(o, opt_name, software);
 }
 
-const char *GetSelectedSoftware(int driver_index, int device_inst_index)
+const char *GetSelectedSoftware(int driver_index, const device_class *devclass, int device_inst)
 {
+	const char *opt_name = device_instancename(devclass, device_inst);
 	const char *software;
 	core_options *o;
 
-	assert(device_inst_index >= 0);
-
 	o = GetGameOptions(driver_index, -1);
-	//	TODO: FIXME
-	//software = o->mess.software[device_inst_index];
-	software = NULL;
+	opt_name = device_instancename(devclass, device_inst);
+	software = NULL; // FIXME - options_get_string(o, opt_name);
 	return software ? software : "";
 }
 
