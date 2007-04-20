@@ -845,6 +845,7 @@ static void AppendCommands(char *command_line, size_t command_line_length, const
 
 static void CreateCommandLine(int nGameIndex, char* pCmdLine, size_t command_line_length)
 {
+	extern const options_entry mame_win_options[];
 	char pModule[_MAX_PATH];
 	core_options *pOpts;
 	LPTREEFOLDER folder;

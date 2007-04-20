@@ -203,7 +203,6 @@ OSDOBJS = \
 	$(WINOBJ)/drawdd.o \
 	$(WINOBJ)/drawgdi.o \
 	$(WINOBJ)/drawnone.o \
-	$(WINOBJ)/fronthlp.o \
 	$(WINOBJ)/input.o \
 	$(WINOBJ)/output.o \
 	$(WINOBJ)/sound.o \

@@ -11,7 +11,7 @@
 
 // MESS headers
 #include "driver.h"
-#include "windows/config.h"
+#include "winmain.h"
 #include "menu.h"
 #include "device.h"
 #include "configms.h"
@@ -37,6 +37,7 @@ const options_entry mess_win_options[] =
 
 void osd_mess_options_init(void)
 {
+	extern const options_entry mess_win_options[];
 	options_add_entries(mame_options(), mess_win_options);
 }
 
