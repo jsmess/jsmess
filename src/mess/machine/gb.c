@@ -232,9 +232,7 @@ static void gb_init(void) {
 	gb_sound_w( 0x16, 0x00 );       /* Initialize sound hardware */
 
 	/* Allocate the serial timer, and disable it */
-	if ( ! gb_serial_timer ) {
-		gb_serial_timer = mame_timer_alloc( gb_serial_timer_proc );
-	}
+	gb_serial_timer = mame_timer_alloc( gb_serial_timer_proc );
 	mame_timer_enable( gb_serial_timer, 0 );
 
 }
