@@ -117,6 +117,18 @@ static void add_device_options_for_device(core_options *opts, const game_driver 
 
 
 /*-------------------------------------------------
+    mess_add_device_options - add all of the device
+	options for a specified device
+-------------------------------------------------*/
+
+void mess_add_device_options(core_options *opts, const game_driver *driver)
+{
+	enumerate_devices(opts, driver, add_device_options_for_device);
+}
+
+
+
+/*-------------------------------------------------
     mess_driver_name_callback - called when we
 	parse the driver name, so we can add options
 	specific to that driver
@@ -132,8 +144,7 @@ static void mess_driver_name_callback(core_options *opts, const char *arg)
 		driver = driver_get_name(arg);
 		if (driver != NULL)
 		{
-			/* add all of the device options for this driver */
-			enumerate_devices(opts, driver, add_device_options_for_device);
+			mess_add_device_options(opts, driver);
 		}
 		added_device_options = TRUE;
 	}

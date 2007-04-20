@@ -136,7 +136,11 @@ BOOL OptionsInit(void);
 void FolderOptionsInit(void);
 void OptionsExit(void);
 
-core_options * CreateGameOptions(BOOL is_global);
+#define OPTIONS_TYPE_GLOBAL		-1
+#define OPTIONS_TYPE_FOLDER		-2
+
+void AddOptions(core_options *opts, const options_entry *entrylist, BOOL is_global);
+core_options * CreateGameOptions(int driver_index);
 
 void SyncInFolderOptions(core_options *opts, int folder_index);
 core_options * GetDefaultOptions(int iProperty, BOOL bVectorFolder);

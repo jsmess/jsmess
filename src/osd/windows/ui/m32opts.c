@@ -50,9 +50,7 @@
 #include "windows/strconv.h"
 
 #ifdef MESS
-#include "messopts.h"
 #include "osd/windows/ui/optionsms.h"
-#include "osd/windows/configms.h"
 #endif // MESS
 
 #ifdef _MSC_VER
@@ -398,7 +396,7 @@ static void memory_error(const char *message)
 
 
 
-static void AddOptions(core_options *opts, const options_entry *entrylist, BOOL is_global)
+void AddOptions(core_options *opts, const options_entry *entrylist, BOOL is_global)
 {
 	static const char *blacklist[] =
 	{
@@ -443,9 +441,10 @@ static void AddOptions(core_options *opts, const options_entry *entrylist, BOOL 
 
 
 
-core_options *CreateGameOptions(BOOL is_global)
+core_options *CreateGameOptions(int driver_index)
 {
 	core_options *opts;
+	BOOL is_global = (driver_index == OPTIONS_TYPE_GLOBAL);
 	extern const options_entry mame_win_options[];
 
 	// create the options
@@ -454,14 +453,14 @@ core_options *CreateGameOptions(BOOL is_global)
 	// add the options
 	AddOptions(opts, mame_core_options, is_global);
 	AddOptions(opts, mame_win_options, is_global);
-#ifdef MESS
-	AddOptions(opts, mess_core_options, is_global);
-	AddOptions(opts, mess_win_options, is_global);
-#endif // MESS
 
 	// customize certain options
 	if (is_global)
 		options_set_option_default_value(opts, OPTION_INIPATH, "ini");
+
+#ifdef MESS
+	MessSetupGameOptions(opts, driver_index);
+#endif // MESS
 
 	return opts;
 }
@@ -484,7 +483,7 @@ BOOL OptionsInit()
 	settings = options_create(memory_error);
 	options_add_entries(settings, regSettings);
 #ifdef MESS
-	options_add_entries(settings, mess_wingui_settings);
+	MessSetupSettings(settings);
 #endif
 
 	// set up per game options
@@ -522,7 +521,7 @@ BOOL OptionsInit()
 	}
 
 	// set up global options
-	global = CreateGameOptions(TRUE);
+	global = CreateGameOptions(OPTIONS_TYPE_GLOBAL);
 
 	// set up game options
 	game_options = (core_options **) pool_malloc(options_memory_pool, driver_get_count() * sizeof(*game_options));
@@ -796,7 +795,7 @@ core_options * GetSourceOptions(int driver_index )
 		source_opts = NULL;
 	}
 
-	source_opts = CreateGameOptions(FALSE);
+	source_opts = CreateGameOptions(OPTIONS_TYPE_FOLDER);
 
 	//initialize source_opts with global settings, we accumulate all settings there and copy them 
 	//to game_options[driver_index] in the end
@@ -825,7 +824,7 @@ core_options * GetGameOptions(int driver_index, int folder_index )
 	// do we have to load these options?
 	if (game_options[driver_index] == NULL)
 	{
-		game_options[driver_index] = CreateGameOptions(FALSE);
+		game_options[driver_index] = CreateGameOptions(driver_index);
 		options_copy(game_options[driver_index], global);
 	
 		if (DriverIsVector(driver_index))

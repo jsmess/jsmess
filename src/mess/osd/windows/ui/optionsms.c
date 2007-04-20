@@ -14,6 +14,9 @@
 #include "optionsms.h"
 #include "emuopts.h"
 #include "driver.h"
+#include "messopts.h"
+#include "osd/windows/configms.h"
+#include "winmain.h"
 
 #define WINGUIOPTION_SOFTWARE_COLUMN_SHOWN		"mess_column_shown"
 #define WINGUIOPTION_SOFTWARE_COLUMN_WIDTHS		"mess_column_widths"
@@ -25,7 +28,7 @@
 
 #define LOG_SOFTWARE	0
 
-const options_entry mess_wingui_settings[] =
+static const options_entry mess_wingui_settings[] =
 {
 	{ WINGUIOPTION_SOFTWARE_COLUMN_WIDTHS,	"186, 230, 88, 84, 84, 68, 248, 248",	0,				NULL },
 	{ WINGUIOPTION_SOFTWARE_COLUMN_ORDER,	"0,   1,    2,  3,  4,  5,   6,   7",	0,				NULL },
@@ -38,6 +41,23 @@ const options_entry mess_wingui_settings[] =
 	{ WINGUIOPTION_SOFTWAREPATH,			"software",								0,				NULL },
 	{ NULL }
 };
+
+void MessSetupSettings(core_options *settings)
+{
+	options_add_entries(settings, mess_wingui_settings);
+}
+
+void MessSetupGameOptions(core_options *opts, int driver_index)
+{
+	BOOL is_global = (driver_index == OPTIONS_TYPE_GLOBAL);
+	AddOptions(opts, mess_core_options, is_global);
+	AddOptions(opts, mess_win_options, is_global);
+
+	if (driver_index >= 0)
+	{
+		mess_add_device_options(opts, drivers[driver_index]);
+	}
+}
 
 void SetMessColumnOrder(int order[])
 {
@@ -135,8 +155,7 @@ void SetSelectedSoftware(int driver_index, const device_class *devclass, int dev
 
 	o = GetGameOptions(driver_index, -1);
 	opt_name = device_instancename(devclass, device_inst);
-	// FIXME
-	//options_set_string(o, opt_name, software);
+	options_set_string(o, opt_name, software);
 }
 
 const char *GetSelectedSoftware(int driver_index, const device_class *devclass, int device_inst)
@@ -147,38 +166,35 @@ const char *GetSelectedSoftware(int driver_index, const device_class *devclass, 
 
 	o = GetGameOptions(driver_index, -1);
 	opt_name = device_instancename(devclass, device_inst);
-	software = NULL; // FIXME - options_get_string(o, opt_name);
+	software = options_get_string(o, opt_name);
 	return software ? software : "";
 }
 
 void SetExtraSoftwarePaths(int driver_index, const char *extra_paths)
 {
-	char *new_extra_paths = NULL;
+	core_options *o;
+	char opt_name[32];
 
 	assert(driver_index >= 0);
 	assert(driver_index < driver_get_count());
 
-	if (extra_paths && *extra_paths)
-	{
-		new_extra_paths = mame_strdup(extra_paths);
-		if (!new_extra_paths)
-			return;
-	}
-	//	TODO: FIXME
-	//FreeIfAllocated(&game_variables[driver_index].mess.extra_software_paths);
-	//game_variables[driver_index].mess.extra_software_paths = new_extra_paths;
+	o = GetGameOptions(driver_index, -1);
+	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
+	options_set_string(o, opt_name, extra_paths);
 }
 
 const char *GetExtraSoftwarePaths(int driver_index)
 {
+	core_options *o;
+	char opt_name[32];
 	const char *paths;
 
 	assert(driver_index >= 0);
 	assert(driver_index < driver_get_count());
 
-	//	TODO: FIXME
-	//paths = game_variables[driver_index].mess.extra_software_paths;
-	paths = NULL;
+	o = GetGameOptions(driver_index, -1);
+	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
+	paths = options_get_string(o, opt_name);
 	return paths ? paths : "";
 }
 

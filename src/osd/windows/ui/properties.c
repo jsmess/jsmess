@@ -438,7 +438,7 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 	pGameOpts = GetDefaultOptions(-1, FALSE);
 	g_bUseDefaults = FALSE;
 	/* Stash the result for comparing later */
-	origGameOpts = CreateGameOptions(TRUE);
+	origGameOpts = CreateGameOptions(OPTIONS_TYPE_GLOBAL);
 	options_copy(origGameOpts, pGameOpts);
 	orig_uses_defaults = FALSE;
 	g_bReset = FALSE;
@@ -497,7 +497,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 		pGameOpts = GetGameOptions(game_num, folder_index);
 		g_bUseDefaults = GetGameUsesDefaults(game_num);
 		/* Stash the result for comparing later */
-		origGameOpts = CreateGameOptions(FALSE);
+		origGameOpts = CreateGameOptions(game_num);
 		options_copy(origGameOpts, pGameOpts);
 		g_nFolderGame = game_num;
 		g_nPropertyMode = SOURCE_GAME;

@@ -17,7 +17,8 @@ enum
 	MESS_COLUMN_MAX
 };
 
-extern const options_entry mess_wingui_settings[];
+void MessSetupSettings(core_options *settings);
+void MessSetupGameOptions(core_options *opts, int driver_index);
 
 void SetMessColumnWidths(int widths[]);
 void GetMessColumnWidths(int widths[]);
