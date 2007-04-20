@@ -44,7 +44,7 @@
 #include "audit.h"
 #include "m32opts.h"
 #include "picker.h"
-#include "windows/winmain.h"
+#include "winmain.h"
 #include "pool.h"
 #include "windows/winutil.h"
 #include "windows/strconv.h"
@@ -135,6 +135,34 @@ static void TabFlagsDecodeString(const char *str, int *data);
 #define M32OPTION_TEXT_COLOR					"text_color"
 #define M32OPTION_CLONE_COLOR					"clone_color"
 #define M32OPTION_HIDE_TABS						"hide_tabs"
+#define M32OPTION_HISTORY_TAB					"history_tab"
+#define M32OPTION_COLUMN_WIDTHS					"column_widths"
+#define M32OPTION_COLUMN_ORDER					"column_order"
+#define M32OPTION_COLUMN_SHOWN					"column_shown"
+#define M32OPTION_SPLITTERS						"splitters"
+#define M32OPTION_SORT_COLUMN					"sort_column"
+#define M32OPTION_SORT_REVERSED					"sort_reversed"
+#define M32OPTION_LANGUAGE						"language"
+#define M32OPTION_FLYER_DIRECTORY				"flyer_directory"
+#define M32OPTION_CABINET_DIRECTORY				"cabinet_directory"
+#define M32OPTION_MARQUEE_DIRECTORY				"marquee_directory"
+#define M32OPTION_TITLE_DIRECTORY				"title_directory"
+#define M32OPTION_CPANEL_DIRECTORY				"cpanel_directory"
+#define M32OPTION_ICONS_DIRECTORY				"icons_directory"
+#define M32OPTION_BACKGROUND_DIRECTORY			"background_directory"
+#define M32OPTION_FOLDER_DIRECTORY				"folder_directory"
+
+#ifdef MESS
+#define M32OPTION_DEFAULT_GAME					"default_system"
+#define M32OPTION_HISTORY_FILE					"sysinfo_file"
+#define M32OPTION_MAMEINFO_FILE					"messinfo_file"
+#else
+#define M32OPTION_DEFAULT_GAME					"default_game"
+#define M32OPTION_HISTORY_FILE					"history_file"
+#define M32OPTION_MAMEINFO_FILE					"mameinfo_file"
+#endif
+
+
 
 /***************************************************************************
     Internal structures
@@ -164,21 +192,15 @@ static BOOL OnlyOnGame(int driver_index)
 	return driver_index >= 0;
 }
 
-#ifdef MESS
-#define OPTION_DEFAULT_GAME		"default_system"
-#else
-#define OPTION_DEFAULT_GAME		"default_game"
-#endif
-
 // UI options in mame32ui.ini
 static const options_entry regSettings[] =
 {
 	// UI options
 	{ NULL,                       NULL,       OPTION_HEADER,     "UI OPTIONS" },
 #ifdef MESS
-	{ OPTION_DEFAULT_GAME,        "nes",      0,                 NULL },
+	{ M32OPTION_DEFAULT_GAME,     "nes",      0,                 NULL },
 #else
-	{ OPTION_DEFAULT_GAME,        "puckman",  0,                 NULL },
+	{ M32OPTION_DEFAULT_GAME,     "puckman",  0,                 NULL },
 #endif
 	{ "default_folder_id",        "0",        0,                 NULL },
 	{ "show_image_section",       "1",        OPTION_BOOLEAN,    NULL },
@@ -195,11 +217,11 @@ static const options_entry regSettings[] =
 #ifdef MESS
 	{ "show_tabs",                "0",        OPTION_BOOLEAN,    NULL },
 	{ "hide_tabs",                "flyer, cabinet, marquee, title, cpanel", 0, NULL },
-	{ "history_tab",              "1",        0,                 NULL },
+	{ M32OPTION_HISTORY_TAB,      "1",        0,                 NULL },
 #else
 	{ "show_tabs",                "1",        OPTION_BOOLEAN,    NULL },
 	{ "hide_tabs",                "marquee, title, cpanel, history", 0, NULL },
-	{ "history_tab",              "0",        0,                 NULL },
+	{ M32OPTION_HISTORY_TAB,      "0",        0,                 NULL },
 #endif
 
 	{ "check_game",               "1",        OPTION_BOOLEAN,    NULL },
@@ -208,8 +230,8 @@ static const options_entry regSettings[] =
 	{ "broadcast_game_name",      "0",        OPTION_BOOLEAN,    NULL },
 	{ "random_background",        "0",        OPTION_BOOLEAN,    NULL },
 
-	{ "sort_column",              "0",        0,                 NULL },
-	{ "sort_reversed",            "0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_SORT_COLUMN,      "0",        0,                 NULL },
+	{ M32OPTION_SORT_REVERSED,    "0",        OPTION_BOOLEAN,    NULL },
 	{ "window_x",                 "0",        0,                 NULL },
 	{ "window_y",                 "0",        0,                 NULL },
 	{ "window_width",             "640",      0,                 NULL },
@@ -222,14 +244,14 @@ static const options_entry regSettings[] =
 	/* ListMode needs to be before ColumnWidths settings */
 	{ "list_mode",                "5",        0,                 NULL },
 #ifdef MESS
-	{ "splitters",                "152,310,468", 0,              NULL },
+	{ M32OPTION_SPLITTERS,        "152,310,468", 0,              NULL },
 #else
-	{ "splitters",                "152,362",  0,                 NULL },
+	{ M32OPTION_SPLITTERS,        "152,362",  0,                 NULL },
 #endif
 	{ "list_font",                "-8,0,0,0,400,0,0,0,0,0,0,0,0,MS Sans Serif", 0, NULL },
-	{ "column_widths",            "185,68,84,84,64,88,74,108,60,144,84,60", 0, NULL },
-	{ "column_order",             "0,2,3,4,5,6,7,8,9,1,10,11", 0, NULL },
-	{ "column_shown",             "1,0,1,1,1,1,1,1,1,1,0,0", 0,  NULL },
+	{ M32OPTION_COLUMN_WIDTHS,    "185,68,84,84,64,88,74,108,60,144,84,60", 0, NULL },
+	{ M32OPTION_COLUMN_ORDER,     "0,2,3,4,5,6,7,8,9,1,10,11", 0, NULL },
+	{ M32OPTION_COLUMN_SHOWN,     "1,0,1,1,1,1,1,1,1,1,0,0", 0,  NULL },
 
 	{ "ui_key_up",                "KEYCODE_UP", 0,               NULL },
 	{ "ui_key_down",              "KEYCODE_DOWN", 0,             NULL },
@@ -291,32 +313,21 @@ static const options_entry regSettings[] =
 	{ "offset_clones",            "0",        OPTION_BOOLEAN,    NULL },
 	{ "game_caption",             "1",        OPTION_BOOLEAN,    NULL },
 
-	{ "language",                 "english",  0,                 NULL },
-	{ "flyer_directory",          "flyers",   0,                 NULL },
-	{ "cabinet_directory",        "cabinets", 0,                 NULL },
-	{ "marquee_directory",        "marquees", 0,                 NULL },
-	{ "title_directory",          "titles",   0,                 NULL },
-	{ "cpanel_directory",         "cpanel",   0,                 NULL },
-	{ "background_directory",     "bkground", 0,                 NULL },
-	{ "folder_directory",         "folders",  0,                 NULL },
-	{ "icons_directory",          "icons",    0,                 NULL },
+	{ M32OPTION_LANGUAGE,                 "english",  0,                 NULL },
+	{ M32OPTION_FLYER_DIRECTORY,          "flyers",   0,                 NULL },
+	{ M32OPTION_CABINET_DIRECTORY,        "cabinets", 0,                 NULL },
+	{ M32OPTION_MARQUEE_DIRECTORY,        "marquees", 0,                 NULL },
+	{ M32OPTION_TITLE_DIRECTORY,          "titles",   0,                 NULL },
+	{ M32OPTION_CPANEL_DIRECTORY,         "cpanel",   0,                 NULL },
+	{ M32OPTION_BACKGROUND_DIRECTORY,     "bkground", 0,                 NULL },
+	{ M32OPTION_FOLDER_DIRECTORY,         "folders",  0,                 NULL },
+	{ M32OPTION_ICONS_DIRECTORY,          "icons",    0,                 NULL },
 #ifdef MESS
-	{ "sysinfo_file",             "sysinfo.dat", 0,              NULL },
-	{ "messinfo_file",            "messinfo.dat", 0,             NULL },
+	{ M32OPTION_HISTORY_FILE,             "sysinfo.dat", 0,              NULL },
+	{ M32OPTION_MAMEINFO_FILE,            "messinfo.dat", 0,             NULL },
 #else
-	{ "history_file",             "history.dat", 0,              NULL },
-	{ "mameinfo_file",            "mameinfo.dat", 0,             NULL },
-#endif
-
-#ifdef MESS
-	{ "mess_column_widths",       "186, 230, 88, 84, 84, 68, 248, 248", 0, NULL },
-	{ "mess_column_order",        "0,   1,  2,  3,  4,  5,   6,   7",   0, NULL },
-	{ "mess_column_shown",        "1,   1,  1,  1,  1,  0,   0,   0",   0, NULL },
-
-	{ "mess_sort_column",         "0", 0,                        NULL },
-	{ "mess_sort_reversed",       "0", OPTION_BOOLEAN,           NULL },
-
-	{ "current_software_tab",     "0", 0,                        NULL },
+	{ M32OPTION_HISTORY_FILE,             "history.dat", 0,              NULL },
+	{ M32OPTION_MAMEINFO_FILE,            "mameinfo.dat", 0,             NULL },
 #endif
 	{ NULL }
 };
@@ -1256,12 +1267,12 @@ const char *GetCurrentTab(void)
 
 void SetDefaultGame(const char *name)
 {
-	options_set_string(settings, OPTION_DEFAULT_GAME, name);
+	options_set_string(settings, M32OPTION_DEFAULT_GAME, name);
 }
 
 const char *GetDefaultGame(void)
 {
-	return options_get_string(settings, OPTION_DEFAULT_GAME);
+	return options_get_string(settings, M32OPTION_DEFAULT_GAME);
 }
 
 void SetWindowArea(const AREA *area)
@@ -1398,28 +1409,28 @@ BOOL AllowedToSetShowTab(int tab,BOOL show)
 
 int GetHistoryTab(void)
 {
-	return options_get_int(settings, "history_tab");
+	return options_get_int(settings, M32OPTION_HISTORY_TAB);
 }
 
 void SetHistoryTab(int tab, BOOL show)
 {
 	if (show)
-		options_set_int(settings, "history_tab", tab);
+		options_set_int(settings, M32OPTION_HISTORY_TAB, tab);
 	else
-		options_set_int(settings, "history_tab", TAB_NONE);
+		options_set_int(settings, M32OPTION_HISTORY_TAB, TAB_NONE);
 }
 
 void SetColumnWidths(int width[])
 {
 	char column_width_string[10000];
 	ColumnEncodeStringWithCount(width, column_width_string, COLUMN_MAX);
-	options_set_string(settings, "column_widths", column_width_string);
+	options_set_string(settings, M32OPTION_COLUMN_WIDTHS, column_width_string);
 }
 
 void GetColumnWidths(int width[])
 {
 	const char *column_width_string;
-	column_width_string = options_get_string(settings, "column_widths");
+	column_width_string = options_get_string(settings, M32OPTION_COLUMN_WIDTHS);
 	ColumnDecodeStringWithCount(column_width_string, width, COLUMN_MAX);
 }
 
@@ -1431,14 +1442,14 @@ void SetSplitterPos(int splitterId, int pos)
 
 	if (splitterId < GetSplitterCount())
 	{
-		splitter_string = options_get_string(settings, "splitters");
+		splitter_string = options_get_string(settings, M32OPTION_SPLITTERS);
 		splitter = (int *) alloca(GetSplitterCount() * sizeof(*splitter));
 		SplitterDecodeString(splitter_string, splitter);
 
 		splitter[splitterId] = pos;
 
 		SplitterEncodeString(splitter, buffer);
-		options_set_string(settings, "splitters", buffer);
+		options_set_string(settings, M32OPTION_SPLITTERS, buffer);
 	}
 }
 
@@ -1447,7 +1458,7 @@ int  GetSplitterPos(int splitterId)
 	const char *splitter_string;
 	int *splitter;
 
-	splitter_string = options_get_string(settings, "splitters");
+	splitter_string = options_get_string(settings, M32OPTION_SPLITTERS);
 	splitter = (int *) alloca(GetSplitterCount() * sizeof(*splitter));
 	SplitterDecodeString(splitter_string, splitter);
 
@@ -1461,13 +1472,13 @@ void SetColumnOrder(int order[])
 {
 	char column_order_string[10000];
 	ColumnEncodeStringWithCount(order, column_order_string, COLUMN_MAX);
-	options_set_string(settings, "column_order", column_order_string);
+	options_set_string(settings, M32OPTION_COLUMN_ORDER, column_order_string);
 }
 
 void GetColumnOrder(int order[])
 {
 	const char *column_order_string;
-	column_order_string = options_get_string(settings, "column_order");
+	column_order_string = options_get_string(settings, M32OPTION_COLUMN_ORDER);
 	ColumnDecodeStringWithCount(column_order_string, order, COLUMN_MAX);
 }
 
@@ -1475,44 +1486,44 @@ void SetColumnShown(int shown[])
 {
 	char column_shown_string[10000];
 	ColumnEncodeStringWithCount(shown, column_shown_string, COLUMN_MAX);
-	options_set_string(settings, "column_shown", column_shown_string);
+	options_set_string(settings, M32OPTION_COLUMN_SHOWN, column_shown_string);
 }
 
 void GetColumnShown(int shown[])
 {
 	const char *column_shown_string;
-	column_shown_string = options_get_string(settings, "column_shown");
+	column_shown_string = options_get_string(settings, M32OPTION_COLUMN_SHOWN);
 	ColumnDecodeStringWithCount(column_shown_string, shown, COLUMN_MAX);
 }
 
 void SetSortColumn(int column)
 {
-	options_set_int(settings, "sort_column", column);
+	options_set_int(settings, M32OPTION_SORT_COLUMN, column);
 }
 
 int GetSortColumn(void)
 {
-	return options_get_int(settings, "sort_column");
+	return options_get_int(settings, M32OPTION_SORT_COLUMN);
 }
 
 void SetSortReverse(BOOL reverse)
 {
-	options_set_bool(settings, "sort_reversed", reverse);
+	options_set_bool(settings, M32OPTION_SORT_REVERSED, reverse);
 }
 
 BOOL GetSortReverse(void)
 {
-	return options_get_bool(settings, "sort_reversed");
+	return options_get_bool(settings, M32OPTION_SORT_REVERSED);
 }
 
 const char* GetLanguage(void)
 {
-	return options_get_string(settings, "language");
+	return options_get_string(settings, M32OPTION_LANGUAGE);
 }
 
 void SetLanguage(const char* lang)
 {
-	options_set_string(settings, "language", lang);
+	options_set_string(settings, M32OPTION_LANGUAGE, lang);
 }
 
 const char* GetRomDirs(void)
@@ -1648,52 +1659,52 @@ void SetMemcardDir(const char* path)
 
 const char* GetFlyerDir(void)
 {
-	return options_get_string(settings, "flyer_directory");
+	return options_get_string(settings, M32OPTION_FLYER_DIRECTORY);
 }
 
 void SetFlyerDir(const char* path)
 {
-	options_set_string(settings, "flyer_directory", path);
+	options_set_string(settings, M32OPTION_FLYER_DIRECTORY, path);
 }
 
 const char* GetCabinetDir(void)
 {
-	return options_get_string(settings, "cabinet_directory");
+	return options_get_string(settings, M32OPTION_CABINET_DIRECTORY);
 }
 
 void SetCabinetDir(const char* path)
 {
-	options_set_string(settings, "cabinet_directory", path);
+	options_set_string(settings, M32OPTION_CABINET_DIRECTORY, path);
 }
 
 const char* GetMarqueeDir(void)
 {
-	return options_get_string(settings, "marquee_directory");
+	return options_get_string(settings, M32OPTION_MARQUEE_DIRECTORY);
 }
 
 void SetMarqueeDir(const char* path)
 {
-	options_set_string(settings, "marquee_directory", path);
+	options_set_string(settings, M32OPTION_MARQUEE_DIRECTORY, path);
 }
 
 const char* GetTitlesDir(void)
 {
-	return options_get_string(settings, "title_directory");
+	return options_get_string(settings, M32OPTION_TITLE_DIRECTORY);
 }
 
 void SetTitlesDir(const char* path)
 {
-	options_set_string(settings, "title_directory", path);
+	options_set_string(settings, M32OPTION_TITLE_DIRECTORY, path);
 }
 
 const char * GetControlPanelDir(void)
 {
-	return options_get_string(settings, "cpanel_directory");
+	return options_get_string(settings, M32OPTION_CPANEL_DIRECTORY);
 }
 
 void SetControlPanelDir(const char *path)
 {
-	options_set_string(settings, "cpanel_directory", path);
+	options_set_string(settings, M32OPTION_CPANEL_DIRECTORY, path);
 }
 
 const char * GetDiffDir(void)
@@ -1708,32 +1719,32 @@ void SetDiffDir(const char* path)
 
 const char* GetIconsDir(void)
 {
-	return options_get_string(settings, "icons_directory");
+	return options_get_string(settings, M32OPTION_ICONS_DIRECTORY);
 }
 
 void SetIconsDir(const char* path)
 {
-	options_set_string(settings, "icons_directory", path);
+	options_set_string(settings, M32OPTION_ICONS_DIRECTORY, path);
 }
 
 const char* GetBgDir (void)
 {
-	return options_get_string(settings, "background_directory");
+	return options_get_string(settings, M32OPTION_BACKGROUND_DIRECTORY);
 }
 
 void SetBgDir (const char* path)
 {
-	options_set_string(settings, "background_directory", path);
+	options_set_string(settings, M32OPTION_BACKGROUND_DIRECTORY, path);
 }
 
 const char* GetFolderDir(void)
 {
-	return options_get_string(settings, "folder_directory");
+	return options_get_string(settings, M32OPTION_FOLDER_DIRECTORY);
 }
 
 void SetFolderDir(const char* path)
 {
-	options_set_string(settings, "folder_directory", path);
+	options_set_string(settings, M32OPTION_FOLDER_DIRECTORY, path);
 }
 
 const char* GetCheatFileName(void)
@@ -1748,23 +1759,23 @@ void SetCheatFileName(const char* path)
 
 const char* GetHistoryFileName(void)
 {
-	return options_get_string(settings, "history_file");
+	return options_get_string(settings, M32OPTION_HISTORY_FILE);
 }
 
 void SetHistoryFileName(const char* path)
 {
-	options_set_string(settings, "history_file", path);
+	options_set_string(settings, M32OPTION_HISTORY_FILE, path);
 }
 
 
 const char* GetMAMEInfoFileName(void)
 {
-	return options_get_string(settings, "mameinfo_file");
+	return options_get_string(settings, M32OPTION_MAMEINFO_FILE);
 }
 
 void SetMAMEInfoFileName(const char* path)
 {
-	options_set_string(settings, "mameinfo_file", path);
+	options_set_string(settings, M32OPTION_MAMEINFO_FILE, path);
 }
 
 void ResetGameOptions(int driver_index)
@@ -2815,7 +2826,7 @@ BOOL IsGlobalOption(const char *option_name)
 		OPTION_ROMPATH,
 #ifdef MESS
 		OPTION_HASHPATH,
-#endif
+#endif // MESS
 		OPTION_SAMPLEPATH,
 		OPTION_ARTPATH,
 		OPTION_CTRLRPATH,

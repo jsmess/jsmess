@@ -51,7 +51,7 @@
 #include "DataMap.h"
 #include "help.h"
 #include "resource.hm"
-#include "windows/config.h"
+#include "winmain.h"
 #include "strconv.h"
 
 typedef HANDLE HTHEME;

@@ -73,8 +73,8 @@
 #include "m32opts.h"
 #include "dialogs.h"
 #include "state.h"
+#include "winmain.h"
 #include "windows/input.h"
-#include "windows/config.h"
 #include "windows/window.h"
 
 #include "DirectDraw.h"
