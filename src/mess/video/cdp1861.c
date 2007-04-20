@@ -3,7 +3,7 @@
 #include "video/generic.h"
 #include "video/cdp1861.h"
 
-static mame_bitmap *tmpbitmap;
+static mame_bitmap *cdptmpbitmap;
 
 static mame_timer *cdp1861_int_timer;
 static mame_timer *cdp1861_efx_timer;
@@ -114,7 +114,7 @@ void cdp1861_dma_w(UINT8 data)
 	for (x = 0; x < 8; x++)
 	{
 		int color = (data & 0x80) >> 7;
-		plot_pixel(tmpbitmap, sx + x, y, Machine->pens[color]);
+		plot_pixel(cdptmpbitmap, sx + x, y, Machine->pens[color]);
 		data <<= 1;
 	}
 }
@@ -150,10 +150,10 @@ WRITE8_HANDLER( cdp1861_dispoff_w )
 VIDEO_START( cdp1861 )
 {
 	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	cdptmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
 	/* ensure the contents of the bitmap are saved */
-	state_save_register_bitmap("video", 0, "tmpbitmap", tmpbitmap);
+	state_save_register_bitmap("video", 0, "cdptmpbitmap", cdptmpbitmap);
 
 	state_save_register_global(cdp1861.disp);
 	state_save_register_global(cdp1861.dmaout);
@@ -165,7 +165,7 @@ VIDEO_UPDATE( cdp1861 )
 {
 	if (cdp1861.disp)
 	{
-		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 	}
 	else
 	{

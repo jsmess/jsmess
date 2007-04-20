@@ -3,7 +3,7 @@
 #include "sound/beep.h"
 #include "video/cdp1864.h"
 
-static mame_bitmap *tmpbitmap;
+static mame_bitmap *cdptmpbitmap;
 
 static mame_timer *cdp1864_int_timer;
 static mame_timer *cdp1864_efx_timer;
@@ -128,7 +128,7 @@ void cdp1864_dma_w(UINT8 data)
 			color = cdp1864.colorram_r(cdp1864.dmaptr);
 		}
 
-		plot_pixel(tmpbitmap, sx + x, y, Machine->pens[color]);
+		plot_pixel(cdptmpbitmap, sx + x, y, Machine->pens[color]);
 		
 		data <<= 1;
 	}
@@ -197,10 +197,10 @@ READ8_HANDLER( cdp1864_dispoff_r )
 VIDEO_START( cdp1864 )
 {
 	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	cdptmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
 	/* ensure the contents of the bitmap are saved */
-	state_save_register_bitmap("video", 0, "tmpbitmap", tmpbitmap);
+	state_save_register_bitmap("video", 0, "cdptmpbitmap", cdptmpbitmap);
 	
 	state_save_register_global(cdp1864.disp);
 	state_save_register_global(cdp1864.dmaout);
@@ -217,7 +217,7 @@ VIDEO_UPDATE( cdp1864 )
 	if (cdp1864.disp)
 	{
 		fillbitmap(bitmap, machine->pens[cdp1864_bgcolseq[cdp1864.bgcolor]], cliprect);
-		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, cdp1864.bgcolor);
+		copybitmap(bitmap, cdptmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, cdp1864.bgcolor);
 	}
 	else
 	{
