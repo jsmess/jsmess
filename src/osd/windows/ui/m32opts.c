@@ -68,25 +68,14 @@ static file_error SaveSettingsFile(core_options *opts, const char *filename);
 
 static void LoadOptionsAndSettings(void);
 
-static void  KeySeqEncodeString(void *data, char* str);
-static void  KeySeqDecodeString(const char *str, void* data);
-
-static void  ColumnDecodeWidths(const char *ptr, void* data);
-
 static void  CusColorEncodeString(const COLORREF *value, char* str);
 static void  CusColorDecodeString(const char* str, COLORREF *value);
 
 static void  SplitterEncodeString(const int *value, char* str);
 static void  SplitterDecodeString(const char *str, int *value);
 
-static void  ListEncodeString(void* data, char* str);
-static void  ListDecodeString(const char* str, void* data);
-
 static void  FontEncodeString(const LOGFONT *f, char *str);
 static void  FontDecodeString(const char* str, LOGFONT *f);
-
-static void FolderFlagsEncodeString(void *data,char *str);
-static void FolderFlagsDecodeString(const char *str,void *data);
 
 static void TabFlagsEncodeString(int data, char *str);
 static void TabFlagsDecodeString(const char *str, int *data);
@@ -184,11 +173,6 @@ static core_options *global;				// Global 'default' options
 static core_options **game_options;			// Array of Game specific options
 static core_options **folder_options;		// Array of Folder specific options
 static int *folder_options_redirect;		// Array of Folder Ids for redirecting Folder specific options
-
-static BOOL OnlyOnGame(int driver_index)
-{
-	return driver_index >= 0;
-}
 
 // UI options in mame32ui.ini
 static const options_entry regSettings[] =
@@ -377,8 +361,6 @@ const char* image_tabs_short_name[MAX_TAB_TYPES] =
 
 static BOOL save_gui_settings = TRUE;
 static BOOL save_default_options = TRUE;
-
-static const char *view_modes[VIEW_MAX] = { "Large Icons", "Small Icons", "List", "Details", "Grouped" };
 
 folder_filter_type *folder_filters;
 int size_folder_filters;
@@ -969,13 +951,6 @@ static input_seq *options_get_input_seq(core_options *opts, const char *name)
 	seq_string = options_get_string(opts, name);
 	string_to_seq(seq_string, &seq);
 	return &seq;
-}
-
-static void options_set_input_seq(core_options *opts, const char *name, const input_seq *seq)
-{
-	char buffer[1024];
-	seq_to_string(seq, buffer, ARRAY_LENGTH(buffer));
-	options_set_string(opts, name, buffer);
 }
 
 
@@ -2354,26 +2329,6 @@ void ColumnDecodeStringWithCount(const char* str, int *value, int count)
     }
 	}
 
-static void KeySeqEncodeString(void *data, char* str)
-{
-	KeySeq* ks = (KeySeq*)data;
-
-	sprintf(str, "%s", ks->seq_string);
-}
-
-static void KeySeqDecodeString(const char *str, void* data)
-{
-	KeySeq *ks = (KeySeq*)data;
-	input_seq *is = &(ks->is);
-
-	FreeIfAllocated(&ks->seq_string);
-	ks->seq_string = mame_strdup(str);
-
-	//get the new input sequence
-	string_to_seq(str,is);
-	//dprintf("seq=%s,,,%04i %04i %04i %04i \n",str,(*is)[0],(*is)[1],(*is)[2],(*is)[3]);
-}
-
 static void SplitterEncodeString(const int *value, char* str)
 {
 	int  i;
@@ -2410,33 +2365,6 @@ static void SplitterDecodeString(const char *str, int *value)
 		}
 		value[i] = atoi(s);
 	}
-}
-
-static void ListDecodeString(const char* str, void* data)
-{
-	int* value = (int*)data;
-	int i;
-
-	*value = VIEW_GROUPED;
-
-	for (i = VIEW_LARGE_ICONS; i < VIEW_MAX; i++)
-	{
-		if (strcmp(str, view_modes[i]) == 0)
-		{
-			*value = i;
-			return;
-		}
-	}
-}
-
-static void ListEncodeString(void* data, char *str)
-{
-	int value = *((int*)data);
-	const char* view_mode_string = "";
-
-	if ((value >= 0) && (value < sizeof(view_modes) / sizeof(view_modes[0])))
-		view_mode_string = view_modes[value];
-	strcpy(str, view_mode_string);
 }
 
 /* Parse the given comma-delimited string into a LOGFONT structure */
@@ -2691,25 +2619,6 @@ DWORD GetFolderFlags(int folder_index)
 		}
 	}
 	return 0;
-}
-
-static void EmitFolderFilters(DWORD nSettingsFile, void (*emit_callback)(void *param_, const char *key, const char *value_str, const char *comment), void *param)
-{
-	int i;
-	char key[32];
-	char value_str[32];
-
-	for (i = 0; i < GetNumFolders(); i++)
-	{
-		LPTREEFOLDER lpFolder = GetFolder(i);
-
-		if ((lpFolder->m_dwFlags & F_MASK) != 0)
-		{
-			sprintf(key, "%i_filters", i);
-			sprintf(value_str, "%i", (int)(lpFolder->m_dwFlags & F_MASK));
-			emit_callback(param, key, value_str, lpFolder->m_lpTitle);
-		}
-	}
 }
 
 

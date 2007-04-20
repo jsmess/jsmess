@@ -2052,29 +2052,6 @@ static void ResolutionReadControl(datamap *map, HWND dialog, HWND control, core_
 
 
 
-static void GetResolution(core_options *opts, const char *option_name, int *width, int *height, int *refresh)
-{
-	int dummy;
-	const char *option_value;
-
-	if (!width)
-		width = &dummy;
-	if (!height)
-		height = &dummy;
-	if (!refresh)
-		refresh = &dummy;
-
-	option_value = options_get_string(opts, option_name);
-	if (sscanf(option_value, "%dx%d@%d", width, height, refresh) != 3)
-	{
-		*width = 0;
-		*height = 0;
-		*refresh = 0;
-	}
-}
-
-
-
 static void ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, core_options *opts, const char *option_name)
 {
 	HWND sizes_control = GetDlgItem(dialog, IDC_SIZES);
@@ -2168,99 +2145,6 @@ static void ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 
 
 //============================================================
-
-static void AssignView(HWND hWnd)
-{
-	const char* ptr = NULL;
-	int nIndex = CB_ERR;
-	char view_option[32];
-
-	if( ComboBox_GetCount(hWnd) > 0 )
-	{
-		nIndex = ComboBox_GetCurSel(hWnd);
-		if( nIndex != CB_ERR )
-			ptr = (const char*)ComboBox_GetItemData(hWnd, nIndex);
-	
-	}
-
-	//default to auto
-	if( ptr == NULL )
-		ptr = "auto";
-
-	snprintf(view_option, ARRAY_LENGTH(view_option), "view%d", GetSelectedScreen(hWnd));
-	options_set_string(pGameOpts, view_option, ptr);
-}
-
-
-static void AssignAnalogAxes(HWND hWnd)
-{
-	int nCheckCounter = 0;
-	int nStickCount = 1;
-	int nAxisCount = 1;
-	int i = 0;
-	BOOL bJSet = FALSE;
-	BOOL bFirstTime = TRUE;
-	char joyname[256];
-	char old_joyname[256];
-	char mapping[256];
-	char j_entry[16];
-	char a_entry[16];
-	memset(&joyname,0,sizeof(joyname));
-	memset(&old_joyname,0,sizeof(old_joyname));
-	memset(&mapping,0,sizeof(mapping));
-	memset(&a_entry,0,sizeof(a_entry));
-	memset(&j_entry,0,sizeof(j_entry));
-
-	for( i=0;i<ListView_GetItemCount(hWnd);i++)
-	{
-		//determine Id of selected entry
-		ListView_GetItemText(hWnd, i, 0, joyname, 256);
-		if( strlen(old_joyname) == 0 )
-		{
-			//New Stick
-			strcpy(old_joyname, joyname);
-			sprintf(j_entry,"j%d",nStickCount );
-			bJSet = FALSE;
-		}
-		//Check if Stick has changed
-		if( strcmp(joyname, old_joyname ) != 0 )
-		{
-			strcpy(old_joyname, joyname);
-			nStickCount++;
-			nAxisCount = 0;
-			sprintf(j_entry,"j%d",nStickCount );
-			bJSet = FALSE;
-		}
-		if( ListView_GetCheckState(hWnd, i ) )
-		{
-			if( bJSet == FALSE )
-			{
-				if( bFirstTime )
-					strcat(mapping,j_entry);
-				else
-				{
-					strcat(mapping,", ");
-					strcat(mapping,j_entry);
-				}
-				bJSet = TRUE;
-			}
-			nCheckCounter++;
-			sprintf(a_entry,"a%d",nAxisCount );
-			strcat(mapping,a_entry);
-		}
-		nAxisCount++;
-	}
-	if( nCheckCounter == ListView_GetItemCount(hWnd) )
-	{
-		//all axes on all joysticks are digital
-		options_set_string(pGameOpts, WINOPTION_DIGITAL, "all");
-	}
-	if( nCheckCounter == 0 )
-	{
-		// no axes are treated as digital, which is the default...
-		options_set_string(pGameOpts, WINOPTION_DIGITAL, "");
-	}
-}
 
 /************************************************************
  * DataMap initializers

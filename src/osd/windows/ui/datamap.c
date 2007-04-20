@@ -327,36 +327,6 @@ static control_type get_control_type(HWND control)
 
 
 //============================================================
-//  get_control_value
-//============================================================
-
-static int get_control_value(HWND control)
-{
-	int value;
-	switch(get_control_type(control))
-	{
-		case CT_BUTTON:
-			value = Button_GetCheck(control);
-			break;
-
-		case CT_COMBOBOX:
-			value = ComboBox_GetCurSel(control);
-			break;
-
-		case CT_TRACKBAR:
-			value = SendMessage(control, TBM_GETPOS, 0, 0);
-			break;
-
-		default:
-			value = 0;
-			break;
-	}
-	return value;
-}
-
-
-
-//============================================================
 //  is_control_displayonly
 //============================================================
 

@@ -13,55 +13,6 @@
 #include "info.h"
 #include "hash.h"
 
-static int strwildcmp(const char *sp1, const char *sp2)
-{
-	char s1[9], s2[9];
-	int i, l1, l2;
-	char *p;
-
-	strncpy(s1, sp1, 8); s1[8] = 0; if (s1[0] == 0) strcpy(s1, "*");
-
-	strncpy(s2, sp2, 8); s2[8] = 0; if (s2[0] == 0) strcpy(s2, "*");
-
-	p = strchr(s1, '*');
-	if (p)
-	{
-		for (i = p - s1; i < 8; i++) s1[i] = '?';
-		s1[8] = 0;
-	}
-
-	p = strchr(s2, '*');
-	if (p)
-	{
-		for (i = p - s2; i < 8; i++) s2[i] = '?';
-		s2[8] = 0;
-	}
-
-	l1 = strlen(s1);
-	if (l1 < 8)
-	{
-		for (i = l1 + 1; i < 8; i++) s1[i] = ' ';
-		s1[8] = 0;
-	}
-
-	l2 = strlen(s2);
-	if (l2 < 8)
-	{
-		for (i = l2 + 1; i < 8; i++) s2[i] = ' ';
-		s2[8] = 0;
-	}
-
-	for (i = 0; i < 8; i++)
-	{
-		if (s1[i] == '?' && s2[i] != '?') s1[i] = s2[i];
-		if (s2[i] == '?' && s1[i] != '?') s2[i] = s1[i];
-	}
-
-	return mame_stricmp(s1, s2);
-}
-
-
-
 /*************************************
  *
  *  Code used by print_mame_xml()
