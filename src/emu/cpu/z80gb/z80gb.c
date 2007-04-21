@@ -195,7 +195,7 @@ static void z80gb_reset(void)
 		Regs.w.timer_callback = Regs.w.config->timer_callback;
 		Regs.w.features = Regs.w.config->features;
 	}
-	Regs.w.enable &= ~ ( IME | HALTED );
+	Regs.w.enable = 0;
 	Regs.w.IE = 0;
 	Regs.w.IF = 0;
 
