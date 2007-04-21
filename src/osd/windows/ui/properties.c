@@ -1101,19 +1101,6 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 					if( g_nGame != FOLDER_OPTIONS )
 					{
 						SetGameUsesDefaults(g_nGame,TRUE);
-						if( DriverIsClone(g_nGame) )
-						{
-							int nParentIndex = -1;
-							nParentIndex = GetParentIndex( drivers[g_nGame] );
-							if( nParentIndex >= 0)
-								options_copy(pGameOpts, GetGameOptions(nParentIndex, g_nFolder));
-							else
-								//No Parent found, use source
-								options_copy(pGameOpts, GetSourceOptions(g_nGame));
-						}
-						else
-							//No Parent found, use source
-							options_copy(pGameOpts, GetSourceOptions(g_nGame));
 						g_bUseDefaults = TRUE;
 					}
 					else
@@ -1128,9 +1115,14 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 							options_copy(pGameOpts, GetDefaultOptions(GLOBAL_OPTIONS, FALSE));
 						g_bUseDefaults = TRUE;
 					}
+
+					// NPW 20-Apr-2007 - I hate this code.  WTF were people thinking!  This
+					// code has more spaghetti than the entire nation of Italy
+					pGameOpts = GetGameOptions(g_nGame, -1);
 					datamap_populate_all_controls(properties_datamap, hDlg, pGameOpts);
 					OptionsToProp(hDlg, pGameOpts);
 					SetPropEnabledControls(hDlg);
+
 					if (orig_uses_defaults != g_bUseDefaults)
 					{
 						PropSheet_Changed(GetParent(hDlg), hDlg);
@@ -1204,7 +1196,6 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			SetPropEnabledControls(hDlg);
 
 			// make sure everything's copied over, to determine what's changed
-			PropToOptions(hDlg, pGameOpts);
 			datamap_read_all_controls(properties_datamap, hDlg, pGameOpts);
 
 			// redraw it, it might be a new color now
@@ -1252,19 +1243,22 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 			case PSN_APPLY:
 				/* Save and apply the options here */
-				PropToOptions(hDlg, pGameOpts);
-				datamap_read_all_controls(properties_datamap, hDlg, pGameOpts);
 				if (g_nGame == GLOBAL_OPTIONS)
+				{
 					pGameOpts = GetDefaultOptions(g_nGame, FALSE);
+					datamap_read_all_controls(properties_datamap, hDlg, pGameOpts);
+				}
 				else if (g_nGame == FOLDER_OPTIONS)
+				{
 					pGameOpts = pGameOpts;
+					datamap_read_all_controls(properties_datamap, hDlg, pGameOpts);
 					//origGameOpts = GetFolderOptions(g_nFolder);
+				}
 				else
 				{
-					SetGameUsesDefaults(g_nGame,g_bUseDefaults);
-					orig_uses_defaults = g_bUseDefaults;
-					//RS Problem is Data is synced in from disk, and changed games properties are not yet saved
-					//pGameOpts = GetGameOptions(g_nGame, -1);
+					//SetGameUsesDefaults(g_nGame,g_bUseDefaults);
+					//orig_uses_defaults = g_bUseDefaults;
+					pGameOpts = GetGameOptions(g_nGame, -1);
 				}
 
 				options_copy(origGameOpts, pGameOpts);
@@ -1280,7 +1274,6 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 			case PSN_KILLACTIVE:
 				/* Save Changes to the options here. */
-				PropToOptions(hDlg, pGameOpts);
 				datamap_read_all_controls(properties_datamap, hDlg, pGameOpts);
 				ResetDataMap(hDlg);
 				if (g_nGame > -1)

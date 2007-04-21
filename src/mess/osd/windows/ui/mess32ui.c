@@ -21,6 +21,9 @@
 #include "ui/resourcems.h"
 #include "ui/m32opts.h"
 #include "ui/picker.h"
+#include "ui/tabview.h"
+#include "ui/m32util.h"
+#include "ui/columnedit.h"
 #include "mess.h"
 #include "configms.h"
 #include "softwarepicker.h"
@@ -29,12 +32,11 @@
 #include "utils.h"
 #include "uitext.h"
 #include "strconv.h"
+#include "mess32ui.h"
 
 #define LOG_SOFTWARE	0
 
 static int requested_device_type(char *tchar);
-static void MessCreateCommandLine(char *pCmdLine, core_options *pOpts, const game_driver *gamedrv);
-static BOOL MessApproveImageList(HWND hParent, int nDriver);
 
 static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn);
 
@@ -58,16 +60,9 @@ static const char *mess_column_names[] =
 
 static int *mess_icon_index;
 
-static void InitMessPicker(void);
-static void MyFillSoftwareList(int nGame, BOOL bForce);
-static void MessUpdateSoftwareList(void);
 static void MessOpenOtherSoftware(int iDevice);
 static void MessCreateDevice(int iDevice);
-static void MessReadMountedSoftware(int nGame);
 static void MessRefreshPicker(int nGame);
-static BOOL CreateMessIcons(void);
-
-static BOOL MessCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify);
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem);
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem);
@@ -82,11 +77,10 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, c
 static void MessTestsBegin(void);
 #endif /* MAME_DEBUG */
 
-static int s_nGame;
-static TCHAR s_szSelectedItem[MAX_PATH];
-static BOOL s_bIgnoreSoftwarePickerNotifies;
+TCHAR g_szSelectedItem[MAX_PATH];
 
-#include "ui/win32ui.c"
+static int s_nGame;
+static BOOL s_bIgnoreSoftwarePickerNotifies;
 
 struct deviceentry
 {
@@ -226,9 +220,12 @@ static int requested_device_type(char *tchar)
 // UI
 // ------------------------------------------------------------------------
 
-static BOOL CreateMessIcons(void)
+BOOL CreateMessIcons(void)
 {
     int i;
+	HWND hwndSoftwareList;
+	HIMAGELIST hSmall;
+	HIMAGELIST hLarge;
 
 	// create the icon index, if we havn't already
     if (!mess_icon_index)
@@ -240,8 +237,11 @@ static BOOL CreateMessIcons(void)
         mess_icon_index[i] = 0;
 
 	// Associate the image lists with the list view control.
-	ListView_SetImageList(GetDlgItem(hMain, IDC_SWLIST), hSmall, LVSIL_SMALL);
-	ListView_SetImageList(GetDlgItem(hMain, IDC_SWLIST), hLarge, LVSIL_NORMAL);
+	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SWLIST);
+	hSmall = GetSmallImageList();
+	hLarge = GetLargeImageList();
+	ListView_SetImageList(hwndSoftwareList, hSmall, LVSIL_SMALL);
+	ListView_SetImageList(hwndSoftwareList, hLarge, LVSIL_NORMAL);
 	return TRUE;
 }
 
@@ -277,8 +277,8 @@ static int GetMessIcon(int nGame, int nSoftwareType)
 
 			if (hIcon)
 			{
-				nIconPos = ImageList_AddIcon(hSmall, hIcon);
-				ImageList_AddIcon(hLarge, hIcon);
+				nIconPos = ImageList_AddIcon(GetSmallImageList(), hIcon);
+				ImageList_AddIcon(GetLargeImageList(), hIcon);
 				if (nIconPos != -1)
 					mess_icon_index[the_index] = nIconPos;
 			}
@@ -334,14 +334,14 @@ static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCTSTR pszDirectories, LPCTS
 
 
 
-static void MyFillSoftwareList(int nGame, BOOL bForce)
+void MyFillSoftwareList(int nGame, BOOL bForce)
 {
 	const game_driver *drv;
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
 	
-	hwndSoftwarePicker = GetDlgItem(hMain, IDC_SWLIST);
-	hwndSoftwareDevView = GetDlgItem(hMain, IDC_SWDEVVIEW);
+	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
+	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
 	// Set up the device view
 	DevView_SetDriver(hwndSoftwareDevView, nGame);
@@ -364,14 +364,15 @@ static void MyFillSoftwareList(int nGame, BOOL bForce)
 
 
 
-static void MessUpdateSoftwareList(void)
+void MessUpdateSoftwareList(void)
 {
+	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	MyFillSoftwareList(Picker_GetSelectedItem(hwndList), TRUE);
 }
 
 
 
-static BOOL MessApproveImageList(HWND hParent, int nGame)
+BOOL MessApproveImageList(HWND hParent, int nGame)
 {
 	int i, nPos;
 	const struct IODevice *pDevice;
@@ -539,10 +540,10 @@ static void MessRemoveImage(int nGame, device_class devclass, LPCTSTR pszFilenam
 
 
 
-static void MessReadMountedSoftware(int nGame)
+void MessReadMountedSoftware(int nGame)
 {
 	// First read stuff into device view
-	DevView_Refresh(GetDlgItem(hMain, IDC_SWDEVVIEW));
+	DevView_Refresh(GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW));
 
 	// Now read stuff into picker
 	MessRefreshPicker(nGame);
@@ -562,7 +563,7 @@ static void MessRefreshPicker(int nGame)
 
 	begin_resource_tracking();
 
-	hwndSoftware = GetDlgItem(hMain, IDC_SWLIST);
+	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	pDriver = drivers[nGame];
 	pDeviceList = devices_allocate(pDriver);
 	if (!pDeviceList)
@@ -607,13 +608,13 @@ done:
 
 
 
-static void InitMessPicker(void)
+void InitMessPicker(void)
 {
 	struct PickerOptions opts;
 	HWND hwndSoftware;
 
 	s_nGame = -1;
-	hwndSoftware = GetDlgItem(hMain, IDC_SWLIST);
+	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 
 	memset(&opts, 0, sizeof(opts));
 	opts.pCallbacks = &s_softwareListCallbacks;
@@ -634,13 +635,13 @@ static void InitMessPicker(void)
 			DevView_SetSelectedSoftware,
 			DevView_GetSelectedSoftware
 		};
-		DevView_SetCallbacks(GetDlgItem(hMain, IDC_SWDEVVIEW), &s_devViewCallbacks);
+		DevView_SetCallbacks(GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW), &s_devViewCallbacks);
 	}
 }
 
 
 
-static void MessCreateCommandLine(char *pCmdLine, core_options *pOpts, const game_driver *pDriver)
+void MessCreateCommandLine(char *pCmdLine, core_options *pOpts, const game_driver *pDriver)
 {
 	sprintf(&pCmdLine[strlen(pCmdLine)], " -writeconfig");
 }
@@ -716,7 +717,7 @@ static BOOL CommonFileImageDialog(char *the_last_directory, common_file_dialog_p
     *(s++) = '\0';
 
     of.lStructSize = sizeof(of);
-    of.hwndOwner = hMain;
+    of.hwndOwner = GetMainWindow();
     of.hInstance = NULL;
     of.lpstrFilter = szFilter;
     of.lpstrCustomFilter = NULL;
@@ -800,16 +801,18 @@ static void MessSetupDevice(common_file_dialog_proc cfd, int iDevice)
 	char filename[MAX_PATH];
 	mess_image_type imagetypes[64];
 	int nGame;
+	HWND hwndList;
 
 	begin_resource_tracking();
 
+	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	nGame = Picker_GetSelectedItem(hwndList);
 	SetupImageTypes(nGame, imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, iDevice);
 
 	if (CommonFileImageDialog(last_directory, cfd, filename, imagetypes))
 	{
 		// TODO - this should go against InternalSetSelectedSoftware()
-		SoftwarePicker_AddFile(GetDlgItem(hMain, IDC_SWLIST), filename);
+		SoftwarePicker_AddFile(GetDlgItem(GetMainWindow(), IDC_SWLIST), filename);
 	}
 	end_resource_tracking();
 }
@@ -834,9 +837,11 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const struct IODevice *dev
 {
 	BOOL bResult;
 	mess_image_type imagetypes[64];
+	HWND hwndList;
 
 	begin_resource_tracking();
 
+	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	SetupImageTypes(Picker_GetSelectedItem(hwndList), imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev->type);
 	bResult = CommonFileImageDialog(last_directory, GetOpenFileName, pszFilename, imagetypes);
 
@@ -850,9 +855,11 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const struct IODevice *d
 {
 	BOOL bResult;
 	mess_image_type imagetypes[64];
+	HWND hwndList;
 
 	begin_resource_tracking();
 
+	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	SetupImageTypes(Picker_GetSelectedItem(hwndList), imagetypes, sizeof(imagetypes) / sizeof(imagetypes[0]), TRUE, dev->type);
 	bResult = CommonFileImageDialog(last_directory, GetSaveFileName, pszFilename, imagetypes);
 
@@ -883,19 +890,6 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 // Software List Class
 // ------------------------------------------------------------------------
 
-static int LookupIcon(const char *icon_name)
-{
-	int i;
-	for (i = 0; g_iconData[i].icon_name; i++)
-	{
-		if (!strcmp(g_iconData[i].icon_name, icon_name))
-			return i;
-	}
-	return -1;
-}
-
-
-
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 {
     int nType;
@@ -905,8 +899,8 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 	HWND hwndGamePicker;
 	HWND hwndSoftwarePicker;
 
-	hwndGamePicker = GetDlgItem(hMain, IDC_LIST);
-	hwndSoftwarePicker = GetDlgItem(hMain, IDC_SWLIST);
+	hwndGamePicker = GetDlgItem(GetMainWindow(), IDC_LIST);
+	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	nGame = Picker_GetSelectedItem(hwndGamePicker);
     nType = SoftwarePicker_GetImageType(hwndSoftwarePicker, nItem);
     nIcon = GetMessIcon(nGame, nType);
@@ -931,9 +925,9 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 				icon_name = lookupdevice(nType)->icon_name;
 				if (!icon_name)
 					icon_name = device_typename(nType);
-				nIcon = LookupIcon(icon_name);
+				nIcon = FindIconIndexByName(icon_name);
 				if (nIcon < 0)
-					nIcon = LookupIcon("unknown");
+					nIcon = FindIconIndexByName("unknown");
 				break;
 		}
     }
@@ -947,9 +941,11 @@ static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem)
 	int nGame;
 	device_class devclass;
 	LPCTSTR pszFullName;
+	HWND hwndList;
 
 	if (!s_bIgnoreSoftwarePickerNotifies)
 	{
+		hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 		nGame = Picker_GetSelectedItem(hwndList);
 		devclass = SoftwarePicker_LookupDevice(hwndSoftwarePicker, nItem);
 		pszFullName = SoftwarePicker_LookupFilename(hwndSoftwarePicker, nItem);
@@ -967,6 +963,9 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 	LPTSTR s;
 	int nGame;
 	device_class devclass;
+	HWND hwndList;
+
+	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 
 	if (!s_bIgnoreSoftwarePickerNotifies)
 	{
@@ -984,8 +983,8 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 		MessSpecifyImage(nGame, &devclass, -1, pszFullName);
 
 		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
-		strncpyz(s_szSelectedItem, pszName, sizeof(s_szSelectedItem) / sizeof(s_szSelectedItem[0]));
-		s = strrchr(s_szSelectedItem, '.');
+		strncpyz(g_szSelectedItem, pszName, sizeof(g_szSelectedItem) / sizeof(g_szSelectedItem[0]));
+		s = strrchr(g_szSelectedItem, '.');
 		if (s)
 			*s = '\0';
 
@@ -1054,7 +1053,7 @@ static BOOL RunColumnDialog(HWND hwndPicker)
 
 	MyColumnDialogProc_order = alloca(nColumnCount * sizeof(int));
 	MyColumnDialogProc_shown = alloca(nColumnCount * sizeof(int));
-	bResult = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_COLUMNS), hMain, MyColumnDialogProc);
+	bResult = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_COLUMNS), GetMainWindow(), MyColumnDialogProc);
 	return bResult;
 }
 
@@ -1075,12 +1074,12 @@ static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn)
 		pt.x,
 		pt.y,
 		0,
-		hMain,
+		GetMainWindow(),
 		NULL);
 
 	DestroyMenu(hMenuLoad);
 
-	hwndPicker = GetDlgItem(hMain, IDC_SWLIST);
+	hwndPicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 
 	switch(nMenuItem) {
 	case ID_SORT_ASCENDING:
@@ -1108,7 +1107,7 @@ static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn)
 // MessCommand
 // ------------------------------------------------------------------------
 
-static BOOL MessCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
+BOOL MessCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 {
 	switch (id) {
 	case ID_MESS_OPEN_SOFTWARE:
@@ -1162,10 +1161,10 @@ static void SoftwareTabView_OnSelectionChanged(void)
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
 
-	hwndSoftwarePicker = GetDlgItem(hMain, IDC_SWLIST);
-	hwndSoftwareDevView = GetDlgItem(hMain, IDC_SWDEVVIEW);
+	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
+	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
-	nTab = TabView_GetCurrentTab(GetDlgItem(hMain, IDC_SWTAB));
+	nTab = TabView_GetCurrentTab(GetDlgItem(GetMainWindow(), IDC_SWTAB));
 
 	switch(nTab)
 	{
@@ -1190,14 +1189,14 @@ static void SoftwareTabView_OnMoveSize(void)
 	HWND hwndSoftwareDevView;
 	RECT rMain, rSoftwareTabView, rClient, rTab;
 
-	hwndSoftwareTabView = GetDlgItem(hMain, IDC_SWTAB);
-	hwndSoftwarePicker = GetDlgItem(hMain, IDC_SWLIST);
-	hwndSoftwareDevView = GetDlgItem(hMain, IDC_SWDEVVIEW);
+	hwndSoftwareTabView = GetDlgItem(GetMainWindow(), IDC_SWTAB);
+	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
+	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
 	GetWindowRect(hwndSoftwareTabView, &rSoftwareTabView);
-	GetClientRect(hMain, &rMain);
-	ClientToScreen(hMain, &((POINT *) &rMain)[0]);
-	ClientToScreen(hMain, &((POINT *) &rMain)[1]);
+	GetClientRect(GetMainWindow(), &rMain);
+	ClientToScreen(GetMainWindow(), &((POINT *) &rMain)[0]);
+	ClientToScreen(GetMainWindow(), &((POINT *) &rMain)[1]);
 
 	// Calculate rClient from rSoftwareTabView in terms of rMain coordinates
 	rClient.left = rSoftwareTabView.left - rMain.left;
@@ -1232,7 +1231,7 @@ static void SetupSoftwareTabView(void)
 	opts.pCallbacks = &s_softwareTabViewCallbacks;
 	opts.nTabCount = sizeof(s_tabs) / sizeof(s_tabs[0]);
 
-	SetupTabView(GetDlgItem(hMain, IDC_SWTAB), &opts);
+	SetupTabView(GetDlgItem(GetMainWindow(), IDC_SWTAB), &opts);
 }
 
 
@@ -1262,11 +1261,11 @@ static void MessTestsColumns(void)
 			shown[j] = (i & (1<<(j-1))) ? 1 : 0;
 
 		SetMessColumnShown(shown);
-		Picker_ResetColumnDisplay(GetDlgItem(hMain, IDC_SWLIST));
+		Picker_ResetColumnDisplay(GetDlgItem(GetMainWindow(), IDC_SWLIST));
 	}
 
 	SetMessColumnShown(oldshown);
-	Picker_ResetColumnDisplay(GetDlgItem(hMain, IDC_SWLIST));
+	Picker_ResetColumnDisplay(GetDlgItem(GetMainWindow(), IDC_SWLIST));
 }
 
 
@@ -1275,11 +1274,12 @@ static void MessTestsColumns(void)
 static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 	int nNewGame;
+	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 
 	// if either of the pickers have further idle work to do, or we are
 	// already in this timerproc, do not do anything
-	if (s_bInTimerProc || Picker_IsIdling(GetDlgItem(hMain, IDC_LIST))
-		|| Picker_IsIdling(GetDlgItem(hMain, IDC_SWLIST)))
+	if (s_bInTimerProc || Picker_IsIdling(hwndList)
+		|| Picker_IsIdling(GetDlgItem(GetMainWindow(), IDC_SWLIST)))
 		return;
 	s_bInTimerProc = TRUE;
 
@@ -1293,11 +1293,11 @@ static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 		KillTimer(NULL, s_nTestingTimer);
 		s_nTestingTimer = 0;
 
-		MessageBox(hMain, "Tests successfully completed!", MAME32NAME, MB_OK);
+		MessageBox(GetMainWindow(), "Tests successfully completed!", MAME32NAME, MB_OK);
 	}
 	else
 	{
-//		MessTestsFlex(GetDlgItem(hMain, IDC_SWLIST), drivers[Picker_GetSelectedItem(hwndList)]);
+//		MessTestsFlex(GetDlgItem(GetMainWindow(), IDC_SWLIST), drivers[Picker_GetSelectedItem(hwndList)]);
 		Picker_SetSelectedPick(hwndList, nNewGame);
 	}
 	s_bInTimerProc = FALSE;
@@ -1308,6 +1308,7 @@ static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 static void MessTestsBegin(void)
 {
 	int nOriginalPick;
+	HWND hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 
 	nOriginalPick = GetSelectedPick();
 

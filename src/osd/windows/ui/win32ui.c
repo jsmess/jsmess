@@ -81,6 +81,10 @@
 #include "DirectInput.h"
 #include "DIJoystick.h"     /* For DIJoystick avalibility. */
 
+#ifdef MESS
+#include "ui/mess32ui.h"
+#endif // MESS
+
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #endif
@@ -272,7 +276,6 @@ static int              GamePicker_Compare(HWND hwndPicker, int index1, int inde
 static void             DisableSelection(void);
 static void             EnableSelection(int nGame);
 
-static int              GetSelectedPick(void);
 static HICON			GetSelectedPickItemIcon(void);
 static void             SetRandomPickItem(void);
 static void				PickColor(COLORREF *cDefault);
@@ -291,7 +294,6 @@ static void             MamePlayBackGame(void);
 static void             MamePlayRecordWave(void);
 static void             MamePlayRecordMNG(void);
 static void				MameLoadState(void);
-static void             MamePlayGame(void);
 static void             MamePlayGameWithOptions(int nGame);
 static INT_PTR CALLBACK LoadProgressDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 static int UpdateLoadProgress(const char* name, const rom_load_data *romdata);
@@ -674,7 +676,7 @@ static ResizeItem main_resize_items[] =
 static Resize main_resize = { {0, 0, 0, 0}, main_resize_items };
 
 /* last directory for common file dialogs */
-static char last_directory[MAX_PATH];
+char last_directory[MAX_PATH];
 
 /* system-wide window message sent out with an ATOM of the current game name
    each time it changes */
@@ -1126,6 +1128,16 @@ HWND GetTreeView(void)
 	return hTreeView;
 }
 
+HIMAGELIST GetLargeImageList(void)
+{
+	return hLarge;
+}
+
+HIMAGELIST GetSmallImageList(void)
+{
+	return hSmall;
+}
+
 void GetRealColumnOrder(int order[])
 {
 	int tmpOrder[COLUMN_MAX];
@@ -1411,7 +1423,7 @@ void UpdateScreenShot(void)
 	if (have_selection)
 	{
 #ifdef MESS
-		if (!s_szSelectedItem[0] || !LoadScreenShotEx(Picker_GetSelectedItem(hwndList), s_szSelectedItem,
+		if (!g_szSelectedItem[0] || !LoadScreenShotEx(Picker_GetSelectedItem(hwndList), g_szSelectedItem,
 			TabView_GetCurrentTab(hTabCtrl)))
 #endif
 		{
@@ -5240,7 +5252,7 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 	return value;
 }
 
-static int GetSelectedPick()
+int GetSelectedPick()
 {
 	/* returns index of listview selected item */
 	/* This will return -1 if not found */
@@ -5670,7 +5682,7 @@ static void MamePlayRecordGame()
 	}
 }
 
-static void MamePlayGame(void)
+void MamePlayGame(void)
 {
 	int nGame;
 
@@ -5851,12 +5863,23 @@ static void EnablePlayOptions(int nIndex, core_options *o)
 {
 }
 
-static int FindIconIndex(int nIconResource)
+int FindIconIndex(int nIconResource)
 {
 	int i;
 	for(i = 0; g_iconData[i].icon_name; i++)
 	{
 		if (g_iconData[i].resource == nIconResource)
+			return i;
+	}
+	return -1;
+}
+
+int FindIconIndexByName(const char *icon_name)
+{
+	int i;
+	for (i = 0; g_iconData[i].icon_name; i++)
+	{
+		if (!strcmp(g_iconData[i].icon_name, icon_name))
 			return i;
 	}
 	return -1;
