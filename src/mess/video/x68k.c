@@ -1031,7 +1031,8 @@ VIDEO_UPDATE( x68000 )
 //	popmessage("Layer priorities - Txt: %i  Spr: %i  Gfx: %i  Pages 0-3: %i %i %i %i",sys.video.text_pri,sys.video.sprite_pri,
 //		sys.video.gfx_pri,sys.video.gfx0_pri,sys.video.gfx1_pri,sys.video.gfx2_pri,sys.video.gfx3_pri);
 //	popmessage("Video Controller registers - %04x - %04x - %04x",sys.video.reg[0],sys.video.reg[1],sys.video.reg[2]);
-	popmessage("IOC IRQ status - %02x",sys.ioc.irqstatus);
+//	popmessage("IOC IRQ status - %02x",sys.ioc.irqstatus);
+//	popmessage("RAM: mouse data - %02x %02x %02x %02x",mess_ram[0x931],mess_ram[0x930],mess_ram[0x933],mess_ram[0x932]);
 #endif
 	return 0;
 }

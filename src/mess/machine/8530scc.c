@@ -15,6 +15,8 @@ static int scc_mode;
 static int scc_reg;
 static int scc_status;
 
+unsigned char scc_reg_val_a[16];
+unsigned char scc_reg_val_b[16];
 
 
 void scc_init(const struct scc8530_interface *intf)
@@ -37,18 +39,20 @@ void scc_set_status(int status)
 static int scc_getareg(void)
 {
 	/* Not yet implemented */
-	return 0;
+	logerror("SCC: port A reg %i read 0x%02x\n",scc_reg,scc_reg_val_a[scc_reg]);
+	return scc_reg_val_a[scc_reg];
 }
 
 
 
 static int scc_getbreg(void)
 {
+	logerror("SCC: port A reg %i read 0x%02x\n",scc_reg,scc_reg_val_b[scc_reg]);
 
 	if (scc_reg == 2)
 		return scc_status;
 
-	return 0;
+	return scc_reg_val_b[scc_reg];
 }
 
 
@@ -63,6 +67,8 @@ static void scc_putareg(int data)
 				scc_intf->acknowledge();
 		}
 	}
+	scc_reg_val_a[scc_reg] = data;
+	logerror("SCC: port A reg %i write 0x%02x\n",scc_reg,data);
 }
 
 
@@ -77,9 +83,29 @@ static void scc_putbreg(int data)
 				scc_intf->acknowledge();
 		}
 	}
+	scc_reg_val_b[scc_reg] = data;
+	logerror("SCC: port B reg %i write 0x%02x\n",scc_reg,data);
 }
 
+unsigned char scc_get_reg_a(int reg)
+{
+	return scc_reg_val_a[reg];
+}
 
+unsigned char scc_get_reg_b(int reg)
+{
+	return scc_reg_val_b[reg];
+}
+
+void scc_set_reg_a(int reg, unsigned char data)
+{
+	scc_reg_val_a[reg] = data;
+}
+
+void scc_set_reg_b(int reg, unsigned char data)
+{
+	scc_reg_val_b[reg] = data;
+}
 
 READ8_HANDLER(scc_r)
 {
@@ -137,9 +163,13 @@ WRITE8_HANDLER(scc_w)
 			/* Channel B (Printer Port) Control */
 			if (scc_mode == 0)
 			{
-				scc_mode = 1;
-				scc_reg = data & 0x0f;
-				scc_putbreg(data & 0xf0);
+				if((data & 0xf0) == 0)  // not a reset command
+				{
+					scc_mode = 1;
+					scc_reg = data & 0x0f;
+					logerror("SCC: Port B Reg select - %i\n",scc_reg);
+//					scc_putbreg(data & 0xf0);
+				}
 			}
 			else
 			{
@@ -152,9 +182,13 @@ WRITE8_HANDLER(scc_w)
 			/* Channel A (Modem Port) Control */
 			if (scc_mode == 0)
 			{
-				scc_mode = 1;
-				scc_reg = data & 0x0f;
-				scc_putareg(data & 0xf0);
+				if((data & 0xf0) == 0)  // not a reset command
+				{
+					scc_mode = 1;
+					scc_reg = data & 0x0f;
+					logerror("SCC: Port A Reg select - %i\n",scc_reg);
+//					scc_putareg(data & 0xf0);
+				}
 			}
 			else
 			{

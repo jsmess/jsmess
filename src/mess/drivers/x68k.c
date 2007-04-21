@@ -170,12 +170,14 @@ mame_timer* mfp_irq;
 mame_timer* scanline_timer;
 mame_timer* raster_irq;
 mame_timer* vblank_irq;
+mame_timer* mouse_timer;  // to set off the mouse interrupts via the SCC
 
 // MFP is clocked at 4MHz, so at /4 prescaler the timer is triggered after 1us (4 cycles)
 float prescale[8] = { 0.0, 1.0, 2.5, 4.0, 12.5, 16.0, 25.0, 50.0 };  
 
 void mfp_init(void);
 void mfp_update_irq(int);
+void x68k_scc_ack(int);
 
 void mfp_init()
 {
@@ -486,6 +488,113 @@ void mfp_recv_data(int data)
 	sys.mfp.vector = current_vector[6] = (sys.mfp.vr & 0xf0) | 0x0c;
 	mfp_trigger_irq(MFP_IRQ_RX_FULL);
 //	logerror("MFP: Receive buffer full IRQ sent\n");
+}
+
+// mouse input
+// port B of the Z8530 SCC
+// typically read from the SCC data port on receive buffer full interrupt per byte
+int x68k_read_mouse(void)
+{
+	char val = 0;
+	char ipt = 0;
+	
+	switch(sys.mouse.inputtype)
+	{
+	case 0:
+		ipt = readinputportbytag("mouse1");
+		break;
+	case 1:
+		val = readinputportbytag("mouse2");
+		ipt = val - sys.mouse.last_mouse_x;
+		sys.mouse.last_mouse_x = val;
+		break;
+	case 2:
+		val = readinputportbytag("mouse3");
+		ipt = val - sys.mouse.last_mouse_y;
+		sys.mouse.last_mouse_y = val;
+		break;
+	}
+	sys.mouse.inputtype++;
+	if(sys.mouse.inputtype > 2)
+	{
+		sys.mouse.inputtype = 0;
+		sys.mouse.bufferempty = 1;
+	}
+
+	return ipt;
+}
+
+/*
+	0xe98001 - Z8530 command port B
+	0xe98003 - Z8530 data port B  (mouse input)
+	0xe98005 - Z8530 command port A
+	0xe98007 - Z8530 data port A  (RS232)
+*/
+READ16_HANDLER( x68k_scc_r )
+{
+	offset %= 4;
+	switch(offset)
+	{
+	case 0:
+		return scc_r(0);
+	case 1:
+		return x68k_read_mouse();
+	case 2:
+		return scc_r(1);
+	case 3:
+		return scc_r(3);
+	default:
+		return 0xff;
+	}
+}
+
+WRITE16_HANDLER( x68k_scc_w )
+{
+	static unsigned char prev;
+	offset %= 4;
+
+	switch(offset)
+	{
+	case 0:
+		scc_w(0,(UINT8)data);
+		if((scc_get_reg_b(5) & 0x02) != prev)
+		{
+			if(scc_get_reg_b(5) & 0x02)
+				sys.mouse.bufferempty = 0;
+		}
+		break;
+	case 1:
+		scc_w(2,(UINT8)data);
+		break;
+	case 2:
+		scc_w(1,(UINT8)data);
+		break;
+	case 3:
+		scc_w(3,(UINT8)data);
+		break;
+	}
+	prev = scc_get_reg_b(5) & 0x02;
+}
+
+void x68k_scc_ack(int val)
+{
+	if(sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
+		return;
+
+	// hard-code the IRQ vector for now, until the SCC code is more complete
+	if((scc_get_reg_a(9) & 0x08) || (scc_get_reg_b(9) & 0x08))  // SCC reg WR9 is the same for both channels
+	{
+		if((scc_get_reg_b(1) & 0x18) != 0)  // if bits 3 and 4 of WR1 are 0, then Rx IRQs are disabled on this channel
+		{
+			if(scc_get_reg_b(5) & 0x02)  // RTS signal
+			{
+				sys.mouse.irqactive = 1;
+				current_vector[5] = 0x54;
+				current_irq_line = 5;
+				cpunum_set_input_line_and_vector(0,5,HOLD_LINE,0x54);
+			}
+		}
+	}
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
@@ -1264,6 +1373,10 @@ static int x68k_int_ack(int line)
 	{
 		sys.ioc.irqstatus &= ~0xf0;
 	}
+	if(line == 5)  // SCC
+	{
+		sys.mouse.irqactive = 0;
+	}
 	if(line == 6)  // MFP
 	{
 //		if(sys.mfp.isra & 0x10)
@@ -1311,7 +1424,7 @@ static ADDRESS_MAP_START(x68k_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xe92000, 0xe93fff) AM_READWRITE(x68k_adpcm_r, x68k_adpcm_w)
 	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe97fff) AM_READWRITE(x68k_hdc_r, x68k_hdc_w)
-//  AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
+	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
@@ -1359,6 +1472,11 @@ static struct YM2151interface ym2151_interface =
 	x68k_ct_w  // CT1, CT2 from YM2151 port 0x1b
 };
 
+static struct scc8530_interface scc_interface =
+{
+	NULL//x68k_scc_ack
+};
+
 INPUT_PORTS_START( x68000 )
 	PORT_START_TAG( "joy1" )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_CODE(JOYCODE_1_UP)	 PORT_PLAYER(1)
@@ -1376,7 +1494,6 @@ INPUT_PORTS_START( x68000 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(JOYCODE_2_BUTTON1)	 PORT_PLAYER(2)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(JOYCODE_2_BUTTON2)	 PORT_PLAYER(2)
 
-	/* TODO: keyboard */
 	PORT_START_TAG( "key1" )
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED) // unused
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)  /* ESC */
@@ -1508,7 +1625,17 @@ INPUT_PORTS_START( x68000 )
 	PORT_CONFNAME(0x02, 0x02, "Enable fake bus errors")
 	PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 	PORT_CONFSETTING( 0x02, DEF_STR( On ))
-	
+
+	PORT_START_TAG("mouse1")  // mouse buttons
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_1_BUTTON1)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_1_BUTTON2)
+
+	PORT_START_TAG("mouse2")  // X-axis
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START_TAG("mouse3")  // Y-axis
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
 INPUT_PORTS_END
 
 void dimdsk_set_geometry(mess_image* image)
@@ -1697,6 +1824,10 @@ MACHINE_START( x68000 )
 	// start keyboard timer
 	timer_adjust(kb_timer,TIME_NOW,0,TIME_IN_MSEC(5));  // every 5ms
 
+	// start mouse timer
+	timer_adjust(mouse_timer,TIME_NOW,0,TIME_IN_MSEC(2));  // a guess for now
+	sys.mouse.inputtype = 0;
+
 	return 0;
 }
 
@@ -1724,6 +1855,7 @@ DRIVER_INIT( x68000 )
 	hd63450_init(&dmac_interface);
 	nec765_reset(0);
 	mfp_init();
+	scc_init(&scc_interface);
 
 	cpunum_set_irq_callback(0, x68k_int_ack);
 
@@ -1734,6 +1866,7 @@ DRIVER_INIT( x68000 )
 //	scanline_timer = timer_alloc(x68k_scanline_check);
 	raster_irq = timer_alloc(x68k_crtc_raster_irq);
 	vblank_irq = timer_alloc(x68k_crtc_vblank_irq);
+	mouse_timer = timer_alloc(x68k_scc_ack);
 }
 
 

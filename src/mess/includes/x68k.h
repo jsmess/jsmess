@@ -164,6 +164,14 @@ struct x68k_system
 		int test;
 		int reset;
 	} rtc;  //  Ricoh RP5C15
+	struct
+	{
+		int inputtype;  // determines which input is to be received
+		int irqactive;  // non-zero if IRQ is being serviced
+		char last_mouse_x;  // previous mouse x-axis value
+		char last_mouse_y;  // previous mouse y-axis value
+		int bufferempty;  // non-zero if buffer is empty
+	} mouse;
 };
 
 void mfp_timer_a_callback(int);
