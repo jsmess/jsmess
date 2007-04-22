@@ -581,6 +581,9 @@ void x68k_scc_ack(int val)
 	if(sys.mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
 
+	if((sys.ioc.irqstatus & 0xc0) != 0)
+		return;
+
 	// hard-code the IRQ vector for now, until the SCC code is more complete
 	if((scc_get_reg_a(9) & 0x08) || (scc_get_reg_b(9) & 0x08))  // SCC reg WR9 is the same for both channels
 	{
