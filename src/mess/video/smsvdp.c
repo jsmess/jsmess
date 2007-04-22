@@ -207,6 +207,7 @@ int smsvdp_video_init( const smsvdp_configuration *config ) {
 	memset(CRAM, 0, MAX_CRAM_SIZE);
 	reg[0x01] |= 0x20;
 	reg[0x02] = 0x0E;			/* power up default */
+	reg[0x0a] = 0xff;
 
 	CRAMMask = ( IS_GAMEGEAR_VDP && ! ggSmsMode ) ? ( GG_CRAM_SIZE - 1 ) : ( SMS_CRAM_SIZE - 1 );
 
