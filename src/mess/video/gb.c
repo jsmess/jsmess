@@ -81,10 +81,12 @@ struct gb_lcd_struct {
 	int	end_x;			/* Pixel to end drawing (exclusive) */
 	struct layer_struct	layer[2];
 	mame_timer	*lcd_timer;
+	mame_timer	*vblank_delay_timer;
 } gb_lcd;
 
 void (*update_scanline)(void);
 static void gb_lcd_timer_proc( int dummy );
+static void gb_vblank_delay_proc( int dummy );
 static void gb_lcd_switch_on( void );
 
 /*
@@ -269,7 +271,7 @@ void gb_update_scanline (void) {
 				r.min_y = r.max_y = gb_lcd.current_line;
 				r.min_x = gb_lcd.start_x;
 				r.max_x = gb_lcd.end_x - 1;
-				fillbitmap( bitmap, Machine->pens[0], &r );
+				fillbitmap( bitmap, Machine->pens[ gb_bpal[0] ], &r );
 			}
 			while ( l < 2 ) {
 				UINT8	xindex, *map, *tiles;
@@ -949,6 +951,9 @@ void gb_video_init( void ) {
 
 	gb_lcd.lcd_timer = mame_timer_alloc( gb_lcd_timer_proc );
 	mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(456,0), 0, time_never );
+
+	gb_lcd.vblank_delay_timer = mame_timer_alloc( gb_vblank_delay_proc );
+	mame_timer_adjust( gb_lcd.vblank_delay_timer, time_never, 0, time_never );
 }
 
 void sgb_video_init( void ) {
@@ -1044,6 +1049,11 @@ void gb_increment_scanline( void ) {
 	}
 }
 
+static void gb_vblank_delay_proc( int dummy ) {
+	/* Trigger VBlank interrupt */
+	cpunum_set_input_line(0, VBL_INT, HOLD_LINE);
+}
+
 static void gb_lcd_timer_proc( int mode ) {
 	if ( LCDCONT & 0x80 ) {
 		switch( mode ) {
@@ -1093,8 +1103,9 @@ static void gb_lcd_timer_proc( int mode ) {
 		case 1:		/* Switch to or stay in mode 1 */
 			gb_increment_scanline();
 			if ( CURLINE == 144 ) {
-				/* Trigger VBlank interrupt */
-				cpunum_set_input_line(0, VBL_INT, HOLD_LINE);
+				/* Trigger VBlank interrupt generation */
+//				cpunum_set_input_line(0, VBL_INT, HOLD_LINE);
+				mame_timer_adjust( gb_lcd.vblank_delay_timer, MAME_TIME_IN_CYCLES(1,0), 0, time_never );
 				/* Set VBlank lcdstate */
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
 				/* Trigger LCD interrupt if requested */
