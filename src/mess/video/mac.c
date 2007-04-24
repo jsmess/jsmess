@@ -52,11 +52,11 @@ VIDEO_UPDATE( mac )
 	video_base = mess_ram_size - (screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
 	video_ram = (const UINT16 *) (mess_ram + video_base);
 
-	for (y = 0; y < Machine->screen[0].height; y++)
+	for (y = 0; y < MAC_V_VIS; y++)
 	{
 		line = BITMAP_ADDR16(bitmap, y, 0);
 
-		for (x = 0; x < Machine->screen[0].width; x += 16)
+		for (x = 0; x < MAC_H_VIS; x += 16)
 		{
 			word = *(video_ram++);
 			for (b = 0; b < 16; b++)

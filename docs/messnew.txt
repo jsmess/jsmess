@@ -2,6 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Mac 128k, Mac 512k (not working) [R. Belmont]
 - Telmac 2000 (not working) [Curt Coder]
 - X68000 [Barry Rodewald]
 
@@ -9,6 +10,9 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [MAC512/MACPLUS] Fixed video timing, booting from SCSI harddisk works 
+  once again. [R. Belmont]
+
 - [SATURN] Preliminary CDROM, backup, & input support.  Fixed sound.  Still
   marked NOT_WORKING as only a few games do anything. [R. Belmont]
 

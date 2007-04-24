@@ -12,6 +12,12 @@
 #include "mame.h"
 #include "sound/custom.h"
 
+// video parameters
+#define MAC_H_VIS	(512)
+#define MAC_V_VIS	(342)
+#define MAC_H_TOTAL	(704)		// (512+192)
+#define MAC_V_TOTAL	(370)		// (342+28)
+
 /* from machine/mac.c */
 MACHINE_RESET( mac );
 

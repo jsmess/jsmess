@@ -271,6 +271,8 @@ TESTDRIVER( las3000 )   /* ??? 1983 Laser 3000								*/
  * Macintosh SE			 March				 1987
  * Macintosh II 		 March				 1987
  */
+ 	DRIVER( mac128k )	/* 1984 Apple Macintosh */
+	DRIVER( mac512k )	/* 1985 Apple Macintosh 512k */
 	DRIVER( mac512ke )  /* 1986 Apple Macintosh 512ke						*/
 	DRIVER( macplus )	/* 1986 Apple Macintosh Plus						*/
 	DRIVER( macse )	    /* 1987 Apple Macintosh SE   						*/

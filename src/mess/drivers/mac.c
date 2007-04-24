@@ -72,9 +72,8 @@ static MACHINE_DRIVER_START( mac512ke )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 7833600)        /* 7.8336 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mac512ke_map, 0)
-	MDRV_CPU_VBLANK_INT(mac_interrupt, 370)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_REFRESH_RATE(60.15)
+	MDRV_SCREEN_VBLANK_TIME(TIME_IN_MSEC(1.26))
 	MDRV_INTERLEAVE(1)
 
 	MDRV_MACHINE_RESET( mac )
@@ -82,8 +81,8 @@ static MACHINE_DRIVER_START( mac512ke )
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 342)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 342-1)
+	MDRV_SCREEN_SIZE(MAC_H_TOTAL, MAC_V_TOTAL)
+	MDRV_SCREEN_VISIBLE_AREA(0, MAC_H_VIS-1, 0, MAC_V_VIS-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_COLORTABLE_LENGTH(2)
 	MDRV_PALETTE_INIT(mac)
@@ -252,6 +251,16 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+ROM_START( mac128k )
+	ROM_REGION16_BE(0x20000, REGION_USER1, 0)
+	ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
+ROM_END
+
+ROM_START( mac512k )
+	ROM_REGION16_BE(0x20000, REGION_USER1, 0)
+	ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
+ROM_END
+
 ROM_START( mac512ke )
 	ROM_REGION16_BE(0x20000, REGION_USER1, 0)
 	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
@@ -338,12 +347,12 @@ SYSTEM_CONFIG_END
 
 
 
-/*	   YEAR		NAME	  PARENT	COMPAT	MACHINE   INPUT		INIT			CONFIG		COMPANY				FULLNAME */
-/*COMP( 1984,	mac128k,  0, 		0,		mac128k,  macplus,	mac128k512k,	macplus,	"Apple Computer",	"Macintosh 128k",  0 )
-COMP( 1984,	mac512k,  mac128k,	0,		mac128k,  macplus,  mac128k512k,	macplus,	"Apple Computer",	"Macintosh 512k",  0 )*/
+/*    YEAR      NAME      PARENT	COMPAT	MACHINE   INPUT	    INIT		CONFIG		COMPANY				FULLNAME */
+COMP( 1984,	mac128k,  0, 		0,	mac512ke, macplus,  mac128k512k,	macplus,	"Apple Computer",	"Macintosh 128k",  GAME_NOT_WORKING )
+COMP( 1984,	mac512k,  mac128k,	0,	mac512ke, macplus,  mac128k512k,	macplus,	"Apple Computer",	"Macintosh 512k",  GAME_NOT_WORKING )
 COMP( 1986,	mac512ke, macplus,  0,		mac512ke, macplus,  mac512ke,		mac512k,	"Apple Computer",	"Macintosh 512ke", 0 )
-COMP( 1986,	macplus,  0,		0,		macplus,  macplus,  macplus,		macplus,	"Apple Computer",	"Macintosh Plus",  0 )
-COMP( 1987,	macse,    0,		0,		macplus,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  GAME_NOT_WORKING )
+COMP( 1986,	macplus,  0,		0,	macplus,  macplus,  macplus,		macplus,	"Apple Computer",	"Macintosh Plus",  0 )
+COMP( 1987,	macse,    0,		0,	macplus,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  GAME_NOT_WORKING )
 
 
 

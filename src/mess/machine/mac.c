@@ -64,6 +64,8 @@
 #define LOG_MEMORY		0
 #endif
 
+static void mac_scanline_tick(int ref);
+static mame_timer *mac_scanline_timer;
 static int scan_keyboard(void);
 static void inquiry_timeout_func(int unused);
 static void keyboard_receive(int val);
@@ -1190,7 +1192,7 @@ static READ8_HANDLER(mac_via_in_b)
 	int val = 0;
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (video_screen_get_vblank(0))
+	if (video_screen_get_vpos(0) >= MAC_V_VIS)
 		val |= 0x40;
 
 	if (has_adb())
@@ -1320,6 +1322,9 @@ MACHINE_RESET(mac)
 
 	if (mac_model == MODEL_MAC_SE)
 		timer_set(0.0, 0, set_memory_overlay);
+
+	mac_scanline_timer = timer_alloc(mac_scanline_tick);
+	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, double_to_mame_time(TIME_NEVER));
 }
 
 
@@ -1440,19 +1445,25 @@ static void mac_vblank_irq(void)
 
 
 
-INTERRUPT_GEN( mac_interrupt )
+static void mac_scanline_tick(int ref)
 {
 	int scanline;
+
+	cpuintrf_push_context(0);
 
 	mac_sh_updatebuffer();
 
 	scanline = video_screen_get_vpos(0);
-	if (scanline == 342)
+	if (scanline == MAC_V_VIS)
 		mac_vblank_irq();
 
 	/* check for mouse changes at 10 irqs per frame */
 	if (!(scanline % 10))
 		mouse_callback();
+
+	mame_timer_adjust(mac_scanline_timer, video_screen_get_time_until_pos(0, (scanline+1) % MAC_V_TOTAL, 0), 0, double_to_mame_time(TIME_NEVER));
+
+	cpuintrf_pop_context();
 }
 
 
