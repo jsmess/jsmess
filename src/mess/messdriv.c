@@ -502,7 +502,10 @@ TESTDRIVER( ti99_4p )	/* 1996 SNUG 99/4P (a.k.a. SGCPU)					*/
 	/* TEXAS INSTRUMENTS CALCULATORS */
 	DRIVER( ti81 )		/* 1990 TI-81 (Z80 2 MHz)							*/
 	DRIVER( ti85 )		/* 1992 TI-85 (Z80 6 MHz)							*/
+	DRIVER( ti82 )		/* 1993 TI-82 (Z80 6 MHz)							*/
+	DRIVER( ti83 )		/* 1996 TI-83 (Z80 6 MHz)							*/
 	DRIVER( ti86 )		/* 1997 TI-86 (Z80 6 MHz)							*/
+	DRIVER( ti83p )		/* 1999 TI-83 Plus (Z80 6 MHz)						*/
 
 	/* NEC */
 	DRIVER( pc88srl )	/* PC-8801mkIISR(Low res display, VSYNC 15KHz)		*/
