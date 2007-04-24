@@ -47,10 +47,16 @@ static int scc_getareg(void)
 
 static int scc_getbreg(void)
 {
-	logerror("SCC: port A reg %i read 0x%02x\n",scc_reg,scc_reg_val_b[scc_reg]);
+	logerror("SCC: port B reg %i read 0x%02x\n",scc_reg,scc_reg_val_b[scc_reg]);
 
 	if (scc_reg == 2)
+	{
+		// HACK! but lets the Mac Plus mouse move again.  Needs further investigation.
+		if (scc_intf && scc_intf->acknowledge)
+			scc_intf->acknowledge();
+
 		return scc_status;
+	}
 
 	return scc_reg_val_b[scc_reg];
 }
