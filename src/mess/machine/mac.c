@@ -1347,7 +1347,7 @@ static void mac_driver_init(mac_model_t model)
 	mac_install_memory(0x600000, 0x6fffff, mess_ram_size, mess_ram, FALSE, 2);
 
 	/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
-	mac_install_memory(0x400000, (model == MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
+	mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
 		memory_region_length(REGION_USER1), memory_region(REGION_USER1), TRUE, 3);
 
 	set_memory_overlay(1);
@@ -1382,8 +1382,9 @@ DRIVER_INIT(mac512ke)
 
 static SCSIConfigTable dev_table =
 {
-	1,                                      /* 1 SCSI device */
-	{ { SCSI_ID_6, 0, SCSI_DEVICE_HARDDISK } } /* SCSI ID 6, using CHD 0, and it's a harddisk */
+	2,                                      /* 2 SCSI devices */
+	{ { SCSI_ID_5, 1, SCSI_DEVICE_HARDDISK },  /* SCSI ID 5, using CHD 1, and it's a harddisk */
+	 { SCSI_ID_6, 0, SCSI_DEVICE_HARDDISK } } /* SCSI ID 6, using CHD 0, and it's a harddisk */
 };
 
 static struct NCR5380interface macplus_5380intf =
