@@ -141,8 +141,6 @@ static int  g_nFolderGame      = 0;
 static int  g_nPropertyMode    = 0;
 static BOOL g_bUseDefaults     = FALSE;
 static BOOL g_bReset           = FALSE;
-static int  g_nScreenIndex     = 0;
-static int  g_nViewIndex     = 0;
 static BOOL  g_bAutoAspect[MAX_SCREENS] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
 static BOOL g_bAnalogCheckState[65]; // 8 Joysticks  * 8 Axes each
 static HICON g_hIcon = NULL;
@@ -1963,10 +1961,16 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	char path[256];
 	int selected = 0;
 	int index = 0;
+	const char *ctrlr_option;
 
+	// determine the ctrlr option
+	ctrlr_option = options_get_string(opts, WINOPTION_CTRLR);
+	ctrlr_option = (ctrlr_option != NULL) ? ctrlr_option : "";
+
+	// reset the controllers dropdown
 	ComboBox_ResetContent(control);
 	ComboBox_InsertString(control, index, "Standard");
-	ComboBox_SetItemData(control, index, "Standard");
+	ComboBox_SetItemData(control, index, "");
 	index++;
 
 	sprintf (path, "%s\\*.*", GetCtrlrDir());
@@ -1991,7 +1995,7 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 					*ext = 0;
 
 					// set the option?
-					if (!strcmp(root, options_get_string(opts, WINOPTION_CTRLR)))
+					if (!strcmp(root, ctrlr_option))
 						selected = index;
 
 					// add it as an option
@@ -2147,26 +2151,6 @@ static void ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 static void ResetDataMap(HWND hWnd)
 {
 	char screen_option[32];
-	int i;
-
-	// if no controller type was specified or it was standard
-	if (!options_get_string(pGameOpts, WINOPTION_CTRLR) || mame_stricmp(options_get_string(pGameOpts, OPTION_CTRLR), "Standard") == 0)
-	{
-		options_set_string(pGameOpts, WINOPTION_CTRLR, "");
-	}
-	g_nViewIndex = 0;
-	//TODO HOW DO VIEWS work, where do I get the input for the combo from ???	
-	for (i = 0; i < NUMVIDEO; i++)
-	{
-		char view_option[32];
-		snprintf(view_option, ARRAY_LENGTH(view_option), "view%d", GetSelectedScreen(hWnd));
-		if (options_get_string(pGameOpts, view_option))
-		{
-			if (!mame_stricmp(options_get_string(pGameOpts, view_option), ""))
-				g_nViewIndex = i;
-		}
-	}	
-	g_nScreenIndex = 0;
 
 	snprintf(screen_option, ARRAY_LENGTH(screen_option), "screen%d", GetSelectedScreen(hWnd));
 
@@ -2175,35 +2159,6 @@ static void ResetDataMap(HWND hWnd)
 		|| (mame_stricmp(options_get_string(pGameOpts, screen_option), "auto") == 0 ) )
 	{
 		options_set_string(pGameOpts, screen_option, "auto");
-		g_nScreenIndex = 0;
-	}
-	else
-	{
-		//get the selected Index
-		int iMonitors;
-		DISPLAY_DEVICE dd;
-		int i= 0;
-		//enumerating the Monitors
-		iMonitors = GetSystemMetrics(SM_CMONITORS); // this gets the count of monitors attached
-		ZeroMemory(&dd, sizeof(dd));
-		dd.cb = sizeof(dd);
-		for(i=0; EnumDisplayDevices(NULL, i, &dd, 0); i++)
-		{
-			if( !(dd.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) )
-			{
-				if ( mame_stricmp(options_get_string(pGameOpts, screen_option), dd.DeviceName) == 0 )
-					g_nScreenIndex = i+1; // To account for "Auto" on first index
-			}
-		}
-	}
-
-	g_nViewIndex = 0;
-	for (i = 0; i < NUMVIEW; i++)
-	{
-		char view_option[32];
-		snprintf(view_option, ARRAY_LENGTH(view_option), "view%d", GetSelectedScreen(hWnd));
-		if (!mame_stricmp(options_get_string(pGameOpts, view_option), g_ComboBoxView[i].m_pData))
-			g_nViewIndex = i;
 	}
 }
 

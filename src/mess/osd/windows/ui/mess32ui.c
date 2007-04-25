@@ -230,7 +230,7 @@ BOOL CreateMessIcons(void)
 	// create the icon index, if we havn't already
     if (!mess_icon_index)
 	{
-		mess_icon_index = auto_malloc(driver_get_count() * IO_COUNT * sizeof(*mess_icon_index));
+		mess_icon_index = pool_malloc(GetMame32MemoryPool(), driver_get_count() * IO_COUNT * sizeof(*mess_icon_index));
     }
 
     for (i = 0; i < (driver_get_count() * IO_COUNT); i++)
@@ -637,13 +637,6 @@ void InitMessPicker(void)
 		};
 		DevView_SetCallbacks(GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW), &s_devViewCallbacks);
 	}
-}
-
-
-
-void MessCreateCommandLine(char *pCmdLine, core_options *pOpts, const game_driver *pDriver)
-{
-	sprintf(&pCmdLine[strlen(pCmdLine)], " -writeconfig");
 }
 
 
@@ -1232,6 +1225,18 @@ static void SetupSoftwareTabView(void)
 	opts.nTabCount = sizeof(s_tabs) / sizeof(s_tabs[0]);
 
 	SetupTabView(GetDlgItem(GetMainWindow(), IDC_SWTAB), &opts);
+}
+
+
+
+void MessCopyDeviceOption(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index)
+{
+	const char *dev_name;
+	const char *opt_value;
+
+	dev_name = device_instancename(devclass, device_index);
+	opt_value = options_get_string(opts, dev_name);
+	options_set_string(mame_options(), dev_name, opt_value);
 }
 
 

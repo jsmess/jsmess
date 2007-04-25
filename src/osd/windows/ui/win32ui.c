@@ -74,6 +74,7 @@
 #include "dialogs.h"
 #include "state.h"
 #include "winmain.h"
+#include "winutil.h"
 #include "windows/input.h"
 #include "windows/window.h"
 
@@ -83,6 +84,7 @@
 
 #ifdef MESS
 #include "ui/mess32ui.h"
+#include "messopts.h"
 #endif // MESS
 
 #ifdef _MSC_VER
@@ -487,6 +489,9 @@ static BOOL in_emulation;
 /* idle work at startup */
 static BOOL idle_work;
 
+/* memory pool in use */
+static memory_pool *mame32_pool;
+
 static int  game_index;
 static int  progBarStep;
 
@@ -781,7 +786,7 @@ extern game_driver driver_neogeo;
     External functions
  ***************************************************************************/
 
-static void AppendCommands(char *command_line, size_t command_line_length, const options_entry *entrylist, core_options *pOpts)
+static void CopyOptions(core_options *pDestOpts, const options_entry *entrylist, core_options *pOpts)
 {
 	static const char *command_blacklist[] =
 	{
@@ -794,7 +799,6 @@ static void AppendCommands(char *command_line, size_t command_line_length, const
 
 	char command_name[128];
 	char *s;
-	const char *arg;
 	int is_blacklisted, i;
 
 	/* loop over entries until we hit a NULL name */
@@ -822,63 +826,17 @@ static void AppendCommands(char *command_line, size_t command_line_length, const
 			if (!is_blacklisted)
 			{
 				core_options *opts = IsGlobalOption(command_name) ? GetDefaultOptions(GLOBAL_OPTIONS, FALSE) : pOpts;
-
-				if (entrylist->flags & OPTION_BOOLEAN)
-				{
-					snprintf(&command_line[strlen(command_line)], command_line_length,
-						" -%s%s",
-						options_get_bool(opts, command_name) ? "" : "no",
-						command_name);
-				}
-				else
-				{
-					arg = options_get_string(opts, command_name);
-					snprintf(&command_line[strlen(command_line)], command_line_length,
-						" -%s \"%s\"",
-						command_name,
-						arg ? arg : "");
-				}
+				const char *opt_value = options_get_string(opts, command_name);
+				options_set_string(
+					pDestOpts,
+					command_name,
+					opt_value ? opt_value : "");
 			}
 		}
 	}
 }
 
 
-
-static void CreateCommandLine(int nGameIndex, char* pCmdLine, size_t command_line_length)
-{
-	extern const options_entry mame_win_options[];
-	char pModule[_MAX_PATH];
-	core_options *pOpts;
-	LPTREEFOLDER folder;
-
-	// this command line can grow too long for win9x, so we try to not send
-	// some default values
-
-	GetModuleFileName(GetModuleHandle(NULL), pModule, _MAX_PATH);
-
-	folder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(nGameIndex) );
-	if( folder )
-	{
-		pOpts = GetGameOptions(nGameIndex, folder->m_nFolderId);
-	}
-	else
-	{
-		pOpts = GetGameOptions(nGameIndex, NO_FOLDER);
-	}
-
-	sprintf(pCmdLine, "%s %s", pModule, drivers[nGameIndex]->name);
-
-#ifdef MESS
-	MessCreateCommandLine(pCmdLine, pOpts, drivers[nGameIndex]);
-#endif
-
-	AppendCommands(pCmdLine, command_line_length, mame_core_options, pOpts);
-	AppendCommands(pCmdLine, command_line_length, mame_win_options, pOpts);
-
-	dprintf("Launching MAME32:");
-	dprintf("%s\n",pCmdLine);
-}
 
 static BOOL WaitWithMessageLoop(HANDLE hEvent)
 {
@@ -908,186 +866,57 @@ static BOOL WaitWithMessageLoop(HANDLE hEvent)
 
 static DWORD RunMAME(int nGameIndex)
 {
-	time_t start, end;
-	double elapsedtime;
+	extern const options_entry mame_win_options[];
 	DWORD dwExitCode = 0;
-
-#if MULTISESSION
-	int argc = 0;
-	const char *argv[100];
-	char pModule[_MAX_PATH];
-	extern int DECL_SPEC main_(int, char**);
-	int exit_code;
-	int UIPriority = GetThreadPriority(GetCurrentThread());
-
-	GetModuleFileName(GetModuleHandle(NULL), pModule, _MAX_PATH);
-	argv[argc++] = pModule;
-	argv[argc++] = drivers[nGameIndex]->name;
-
-	if (override_playback_directory != NULL)
-	{
-		argv[argc++] = "-input_directory";
-		argv[argc++] = override_playback_directory;
-	}
-	if (g_pPlayBkName != NULL)
-	{
-		argv[argc++] = "-pb";
-		argv[argc++] = g_pPlayBkName;
-	}
-	if (g_pRecordName != NULL)
-	{
-		argv[argc++] = "-rec";
-		argv[argc++] = g_pRecordName;
-	}
-	if (g_pRecordWaveName != NULL)
-	{
-		argv[argc++] = "-wavwrite";
-		argv[argc++] = g_pRecordWaveName;
-	}
-	if (g_pRecordMNGName != NULL)
-	{
-		argv[argc++] = "-mngwrite";
-		argv[argc++] = g_pRecordMNGName;
-	}
-	if (g_pSaveStateName != NULL)
-	{
-		argv[argc++] = "-state";
-		argv[argc++] = g_pSaveStateName;
-	}
-
-	ShowWindow(hMain, SW_HIDE);
-
-	time(&start);
-	SetTimer(hMain, GAMEWND_TIMER, 1000/*1s*/, NULL);
-	exit_code = main_(argc, (char **)argv);
-	time(&end);
-	/*This is to make sure this timer is killed, if the Game Window was not found
-	Should not happen, but you never know... */
-	KillTimer(hMain,GAMEWND_TIMER);
-	//Restore UI Thread Priority
-	SetThreadPriority(GetCurrentThread(),UIPriority);
-	elapsedtime = end - start;
-	if (exit_code == 0)
-	{
-		// Check the exitcode before incrementing Playtime
-		IncrementPlayTime(nGameIndex, elapsedtime);
-		ListView_RedrawItems(hwndList, GetSelectedPick(), GetSelectedPick());
-	}
-
-	if (GetHideMouseOnStartup())
-	{
-		ShowCursor(FALSE);
-	}
-	else
-	{
-		// recover windows cursor and our main window
-		while (1)
-		{
-			if (ShowCursor(TRUE) >= 0)
-				break;
-		}
-	}
-	ShowWindow(hMain, SW_SHOW);
-
-#else
-
-	STARTUPINFO         si;
-	PROCESS_INFORMATION pi;
-	char pCmdLine[4096];
-	HWND hGameWnd = NULL;
-	long lGameWndStyle = 0;
-	int UIPriority = GetThreadPriority(GetCurrentThread());	//Save the Priority
-	BOOL bPickerIdling[sizeof(s_nPickers) / sizeof(s_nPickers[0])];
+	core_options *pOpts;
+	LPTREEFOLDER folder;
 	int i;
 
 #ifdef MESS
-	SaveGameOptions(nGameIndex);
+	extern const options_entry mess_win_options[];
 #endif // MESS
 
-	CreateCommandLine(nGameIndex, pCmdLine, ARRAY_LENGTH(pCmdLine) );
+	// clear out existing MAME options
+	options_free(mame_options());
+	mame_options_init(mame_win_options);
 
-	ZeroMemory(&si, sizeof(si));
-	ZeroMemory(&pi, sizeof(pi));
-	si.cb = sizeof(si);
-
-	if (!CreateProcess(NULL,
-						pCmdLine,
-						NULL,		  /* Process handle not inheritable. */
-						NULL,		  /* Thread handle not inheritable. */
-						TRUE,		  /* Handle inheritance.  */
-						0,			  /* Creation flags. */
-						NULL,		  /* Use parent's environment block.  */
-						NULL,		  /* Use parent's starting directory.  */
-						&si,		  /* STARTUPINFO */
-						&pi))		  /* PROCESS_INFORMATION */
-	{
-		dprintf("CreateProcess failed.");
-		dwExitCode = GetLastError();
-	}
+	// retrieve the options we're going to pass
+	folder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(nGameIndex));
+	if (folder)
+		pOpts = GetGameOptions(nGameIndex, folder->m_nFolderId);
 	else
-	{
+		pOpts = GetGameOptions(nGameIndex, NO_FOLDER);
 
-		ShowWindow(hMain, SW_HIDE);
-		SendIconToProcess(&pi, nGameIndex);
-		if( ! GetGameCaption() )
-		{
-			hGameWnd = GetGameWindow(&pi);
-			if( hGameWnd )
-			{
-				lGameWndStyle = GetWindowLong(hGameWnd, GWL_STYLE);
-				lGameWndStyle = lGameWndStyle & (WS_BORDER ^ 0xffffffff);
-				SetWindowLong(hGameWnd, GWL_STYLE, lGameWndStyle);
-				SetWindowPos(hGameWnd,0,0,0,0,0,SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
-			}
-		}
-		time(&start);
+	// load MAME options
+	CopyOptions(mame_options(), mame_core_options, pOpts);
+	CopyOptions(mame_options(), mame_win_options, pOpts);
 
-		// Save idling info
-		for (i = 0; i < sizeof(s_nPickers) / sizeof(s_nPickers[0]); i++)
-		{
-			HWND hwndPicker = GetDlgItem(hMain, s_nPickers[i]);
-			bPickerIdling[i] = Picker_IsIdling(hwndPicker);
-			if (bPickerIdling[i])
-				Picker_ClearIdle(hwndPicker);
-		}
+#ifdef MESS
+	// load MESS options
+	CopyOptions(mame_options(), mess_core_options, pOpts);
+	CopyOptions(mame_options(), mess_win_options, pOpts);
 
-		// Wait until child process exits.
-		WaitWithMessageLoop(pi.hProcess);
+	mess_add_device_options(mame_options(), drivers[nGameIndex]);
+	mess_enumerate_devices(pOpts, drivers[nGameIndex], MessCopyDeviceOption);
+#endif // MESS
 
-		GetExitCodeProcess(pi.hProcess, &dwExitCode);
+	// prepare MAME32 to run the game
+	ShowWindow(hMain, SW_HIDE);
+	for (i = 0; i < ARRAY_LENGTH(s_nPickers); i++)
+		Picker_ClearIdle(GetDlgItem(hMain, s_nPickers[i]));
 
-		time(&end);
-		elapsedtime = end - start;
-		if( dwExitCode == 0 )
-		{
-			// Check the exitcode before incrementing Playtime
-			IncrementPlayTime(nGameIndex, elapsedtime);
-			ListView_RedrawItems(hwndList, GetSelectedPick(), GetSelectedPick());
-		}
+	// run the emulation
+	run_game(drivers[nGameIndex]);
 
-		ShowWindow(hMain, SW_SHOW);
-		//Restore UI Thread Priority
-		SetThreadPriority(GetCurrentThread(),UIPriority);
-		// Close process and thread handles.
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-
-		// Restore idling, if necessary
-		for (i = 0; i < sizeof(s_nPickers) / sizeof(s_nPickers[0]); i++)
-		{
-			HWND hwndPicker = GetDlgItem(hMain, s_nPickers[i]);
-			if (bPickerIdling[i])
-				Picker_ResetIdle(hwndPicker);
-		}
-	}
-
-#endif
+	// the emulation is complete; continue
+	for (i = 0; i < ARRAY_LENGTH(s_nPickers); i++)
+		Picker_ResetIdle(GetDlgItem(hMain, s_nPickers[i]));
+	ShowWindow(hMain, SW_SHOW);
+	SetForegroundWindow(hMain);
 
 	// NPW 16-Apr-2007 - God I hate this hack
 	if (GetGameUsesDefaults(nGameIndex))
-	{
 		ResetGameOptions(nGameIndex);
-	}
 
 	return dwExitCode;
 }
@@ -1136,6 +965,11 @@ HIMAGELIST GetLargeImageList(void)
 HIMAGELIST GetSmallImageList(void)
 {
 	return hSmall;
+}
+
+memory_pool *GetMame32MemoryPool(void)
+{
+	return mame32_pool;
 }
 
 void GetRealColumnOrder(int order[])
@@ -1766,6 +1600,24 @@ void SetMainTitle(void)
 	SetWindowText(hMain,buffer);
 }
 
+static void winui_output_error(void *param, const char *format, va_list argptr)
+{
+	char buffer[1024];
+
+	// if we are in fullscreen mode, go to windowed mode
+	if ((video_config.windowed == 0) && (win_window_list != NULL))
+		winwindow_toggle_full_screen();
+
+	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, argptr);
+	win_message_box_utf8(win_window_list ? win_window_list->hwnd : NULL, buffer, APPNAME, MB_OK);
+}
+
+static void memory_error(const char *message)
+{
+	win_message_box_utf8(hMain, message, APPNAME, MB_OK);
+	exit(-1);
+}
+
 static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	extern int mame_validitychecks(int game);
@@ -1786,26 +1638,27 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 
 	srand((unsigned)time(NULL));
 
-	init_resource_tracking();
-	begin_resource_tracking();
+	// output errors to message boxes
+	mame_set_output_channel(OUTPUT_CHANNEL_ERROR, winui_output_error, NULL, NULL, NULL);
 
-	/* custom per-game icons */
-	icon_index = auto_malloc(sizeof(int) * driver_get_count());
-	if (!icon_index)
-		return FALSE;
-	ZeroMemory(icon_index,sizeof(int) * driver_get_count());
+	// create the memory pool
+	mame32_pool = pool_create(memory_error);
 
-	/* sorted list of drivers by name */
-	sorted_drivers = (driver_data_type *) auto_malloc(sizeof(driver_data_type) * driver_get_count());
-	if (!sorted_drivers)
-		return FALSE;
-	for (i=0;i<driver_get_count();i++)
+	// custom per-game icons
+	icon_index = pool_malloc(mame32_pool, sizeof(int) * driver_get_count());
+	memset(icon_index, '\0', sizeof(int) * driver_get_count());
+
+	// sorted list of drivers by name
+	sorted_drivers = (driver_data_type *) pool_malloc(mame32_pool, sizeof(driver_data_type) * driver_get_count());
+	memset(sorted_drivers, '\0', sizeof(driver_data_type) * driver_get_count());
+	for (i = 0; i < driver_get_count(); i++)
 	{
 		sorted_drivers[i].name = drivers[i]->name;
 		sorted_drivers[i].index = i;
 	}
-	qsort(sorted_drivers,driver_get_count(),sizeof(driver_data_type),DriverDataCompareFunc );
+	qsort(sorted_drivers, driver_get_count(), sizeof(driver_data_type), DriverDataCompareFunc);
 
+	// set up window class
 	wndclass.style		   = CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc   = MameWindowProc;
 	wndclass.cbClsExtra    = 0;
@@ -1820,7 +1673,6 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	RegisterClass(&wndclass);
 
 #ifdef MESS
-	uistring_init(NULL);
 	DevView_RegisterClass();
 #endif //MESS
 
@@ -2188,7 +2040,8 @@ static void Win32UI_exit()
 
 	HelpExit();
 
-	end_resource_tracking();
+	pool_free(mame32_pool);
+	mame32_pool = NULL;
 }
 
 static long WINAPI MameWindowProc(HWND hWnd, UINT message, UINT wParam, LONG lParam)

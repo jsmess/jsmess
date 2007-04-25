@@ -50,7 +50,7 @@ static void ram_init(const game_driver *gamedrv)
 
 	/* parse RAM option */
 	ramsize_string = options_get_string(mame_options(), OPTION_RAMSIZE);
-	if (ramsize_string != NULL)
+	if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
 	{
 		specified_ram = ram_parse_string(ramsize_string);
 		if (specified_ram == 0)

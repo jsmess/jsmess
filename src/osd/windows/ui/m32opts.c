@@ -45,7 +45,6 @@
 #include "m32opts.h"
 #include "picker.h"
 #include "winmain.h"
-#include "pool.h"
 #include "windows/winutil.h"
 #include "windows/strconv.h"
 
@@ -138,6 +137,55 @@ static void TabFlagsDecodeString(const char *str, int *data);
 #define M32OPTION_ICONS_DIRECTORY				"icons_directory"
 #define M32OPTION_BACKGROUND_DIRECTORY			"background_directory"
 #define M32OPTION_FOLDER_DIRECTORY				"folder_directory"
+#define M32OPTION_UI_KEY_UP						"ui_key_up"
+#define M32OPTION_UI_KEY_DOWN					"ui_key_down"
+#define M32OPTION_UI_KEY_LEFT					"ui_key_left"
+#define M32OPTION_UI_KEY_RIGHT					"ui_key_right"
+#define M32OPTION_UI_KEY_START					"ui_key_start"
+#define M32OPTION_UI_KEY_PGUP					"ui_key_pgup"
+#define M32OPTION_UI_KEY_PGDWN					"ui_key_pgdwn"
+#define M32OPTION_UI_KEY_HOME					"ui_key_home"
+#define M32OPTION_UI_KEY_END					"ui_key_end"
+#define M32OPTION_UI_KEY_SS_CHANGE				"ui_key_ss_change"
+#define M32OPTION_UI_KEY_HISTORY_UP				"ui_key_history_up"
+#define M32OPTION_UI_KEY_HISTORY_DOWN			"ui_key_history_down"
+#define M32OPTION_UI_KEY_CONTEXT_FILTERS		"ui_key_context_filters"
+#define M32OPTION_UI_KEY_SELECT_RANDOM			"ui_key_select_random"
+#define M32OPTION_UI_KEY_GAME_AUDIT				"ui_key_game_audit"
+#define M32OPTION_UI_KEY_GAME_PROPERTIES		"ui_key_game_properties"
+#define M32OPTION_UI_KEY_HELP_CONTENTS			"ui_key_help_contents"
+#define M32OPTION_UI_KEY_UPDATE_GAMELIST		"ui_key_update_gamelist"
+#define M32OPTION_UI_KEY_VIEW_FOLDERS			"ui_key_view_folders"
+#define M32OPTION_UI_KEY_VIEW_FULLSCREEN		"ui_key_view_fullscreen"
+#define M32OPTION_UI_KEY_VIEW_PAGETAB			"ui_key_view_pagetab"
+#define M32OPTION_UI_KEY_VIEW_PICTURE_AREA		"ui_key_view_picture_area"
+#define M32OPTION_UI_KEY_VIEW_STATUS			"ui_key_view_status"
+#define M32OPTION_UI_KEY_VIEW_TOOLBARS			"ui_key_view_toolbars"
+#define M32OPTION_UI_KEY_VIEW_TAB_CABINET		"ui_key_view_tab_cabinet"
+#define M32OPTION_UI_KEY_VIEW_TAB_CPANEL		"ui_key_view_tab_cpanel"
+#define M32OPTION_UI_KEY_VIEW_TAB_FLYER			"ui_key_view_tab_flyer"
+#define M32OPTION_UI_KEY_VIEW_TAB_HISTORY		"ui_key_view_tab_history"
+#define M32OPTION_UI_KEY_VIEW_TAB_MARQUEE		"ui_key_view_tab_marquee"
+#define M32OPTION_UI_KEY_VIEW_TAB_SCREENSHOT	"ui_key_view_tab_screenshot"
+#define M32OPTION_UI_KEY_VIEW_TAB_TITLE			"ui_key_view_tab_title"
+#define M32OPTION_UI_KEY_QUIT					"ui_key_quit"
+#define M32OPTION_UI_JOY_UP						"ui_joy_up"
+#define M32OPTION_UI_JOY_DOWN					"ui_joy_down"
+#define M32OPTION_UI_JOY_LEFT					"ui_joy_left"
+#define M32OPTION_UI_JOY_RIGHT					"ui_joy_right"
+#define M32OPTION_UI_JOY_START					"ui_joy_start"
+#define M32OPTION_UI_JOY_PGUP					"ui_joy_pgup"
+#define M32OPTION_UI_JOY_PGDWN					"ui_joy_pgdwn"
+#define M32OPTION_UI_JOY_HOME					"ui_joy_home"
+#define M32OPTION_UI_JOY_END					"ui_joy_end"
+#define M32OPTION_UI_JOY_SS_CHANGE				"ui_joy_ss_change"
+#define M32OPTION_UI_JOY_HISTORY_UP				"ui_joy_history_up"
+#define M32OPTION_UI_JOY_HISTORY_DOWN			"ui_joy_history_down"
+#define M32OPTION_UI_JOY_EXEC					"ui_joy_exec"
+#define M32OPTION_EXEC_COMMAND					"exec_command"
+#define M32OPTION_EXEC_WAIT						"exec_wait"
+#define M32OPTION_HIDE_MOUSE					"hide_mouse"
+#define M32OPTION_FULL_SCREEN					"full_screen"
 
 #ifdef MESS
 #define M32OPTION_DEFAULT_GAME					"default_system"
@@ -178,138 +226,138 @@ static int *folder_options_redirect;		// Array of Folder Ids for redirecting Fol
 static const options_entry regSettings[] =
 {
 	// UI options
-	{ NULL,                       NULL,       OPTION_HEADER,     "UI OPTIONS" },
+	{ NULL,									NULL,       OPTION_HEADER,     "UI OPTIONS" },
 #ifdef MESS
-	{ M32OPTION_DEFAULT_GAME,     "nes",      0,                 NULL },
+	{ M32OPTION_DEFAULT_GAME,				"nes",      0,                 NULL },
 #else
-	{ M32OPTION_DEFAULT_GAME,     "puckman",  0,                 NULL },
+	{ M32OPTION_DEFAULT_GAME,				"puckman",  0,                 NULL },
 #endif
-	{ "default_folder_id",        "0",        0,                 NULL },
-	{ "show_image_section",       "1",        OPTION_BOOLEAN,    NULL },
-	{ "current_tab",              "0",        0,                 NULL },
-	{ "show_tool_bar",            "1",        OPTION_BOOLEAN,    NULL },
-	{ "show_status_bar",          "1",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_DEFAULT_FOLDER_ID,			"0",        0,                 NULL },
+	{ M32OPTION_SHOW_IMAGE_SECTION,			"1",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_CURRENT_TAB,				"0",        0,                 NULL },
+	{ M32OPTION_SHOW_TOOLBAR,				"1",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_SHOW_STATUS_BAR,			"1",        OPTION_BOOLEAN,    NULL },
 #ifdef MESS
-	{ "show_folder_section",      "0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_SHOW_FOLDER_SECTION,		"0",        OPTION_BOOLEAN,    NULL },
 #else
-	{ "show_folder_section",      "1",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_SHOW_FOLDER_SECTION,		"1",        OPTION_BOOLEAN,    NULL },
 #endif
-	{ "hide_folders",             "",         0,                 NULL },
+	{ M32OPTION_HIDE_FOLDERS,				"",         0,                 NULL },
 
 #ifdef MESS
-	{ "show_tabs",                "0",        OPTION_BOOLEAN,    NULL },
-	{ "hide_tabs",                "flyer, cabinet, marquee, title, cpanel", 0, NULL },
-	{ M32OPTION_HISTORY_TAB,      "1",        0,                 NULL },
+	{ M32OPTION_SHOW_TABS,					"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_HIDE_TABS,					"flyer, cabinet, marquee, title, cpanel", 0, NULL },
+	{ M32OPTION_HISTORY_TAB,				"1",        0,                 NULL },
 #else
-	{ "show_tabs",                "1",        OPTION_BOOLEAN,    NULL },
-	{ "hide_tabs",                "marquee, title, cpanel, history", 0, NULL },
-	{ M32OPTION_HISTORY_TAB,      "0",        0,                 NULL },
+	{ M32OPTION_SHOW_TABS,					"1",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_HIDE_TABS,					"marquee, title, cpanel, history", 0, NULL },
+	{ M32OPTION_HISTORY_TAB,				"0",        0,                 NULL },
 #endif
 
-	{ "check_game",               "1",        OPTION_BOOLEAN,    NULL },
-	{ "joystick_in_interface",    "0",        OPTION_BOOLEAN,    NULL },
-	{ "keyboard_in_interface",    "0",        OPTION_BOOLEAN,    NULL },
-	{ "broadcast_game_name",      "0",        OPTION_BOOLEAN,    NULL },
-	{ "random_background",        "0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_CHECK_GAME,					"1",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_JOYSTICK_IN_INTERFACE,		"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_KEYBOARD_IN_INTERFACE,		"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_BROADCAST_GAME_NAME,		"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_RANDOM_BACKGROUND,			"0",        OPTION_BOOLEAN,    NULL },
 
-	{ M32OPTION_SORT_COLUMN,      "0",        0,                 NULL },
-	{ M32OPTION_SORT_REVERSED,    "0",        OPTION_BOOLEAN,    NULL },
-	{ "window_x",                 "0",        0,                 NULL },
-	{ "window_y",                 "0",        0,                 NULL },
-	{ "window_width",             "640",      0,                 NULL },
-	{ "window_height",            "400",      0,                 NULL },
-	{ "window_state",             "1",        0,                 NULL },
+	{ M32OPTION_SORT_COLUMN,				"0",        0,                 NULL },
+	{ M32OPTION_SORT_REVERSED,				"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_WINDOW_X,					"0",        0,                 NULL },
+	{ M32OPTION_WINDOW_Y,					"0",        0,                 NULL },
+	{ M32OPTION_WINDOW_WIDTH,				"640",      0,                 NULL },
+	{ M32OPTION_WINDOW_HEIGHT,				"400",      0,                 NULL },
+	{ M32OPTION_WINDOW_STATE,				"1",        0,                 NULL },
 
-	{ "text_color",               "-1",       0,                 NULL },
-	{ "clone_color",              "-1",       0,                 NULL },
-	{ "custom_color",             "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0", 0, NULL },
+	{ M32OPTION_TEXT_COLOR,					"-1",       0,                 NULL },
+	{ M32OPTION_CLONE_COLOR,				"-1",       0,                 NULL },
+	{ M32OPTION_CUSTOM_COLOR,				"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0", 0, NULL },
 	/* ListMode needs to be before ColumnWidths settings */
-	{ "list_mode",                "5",        0,                 NULL },
+	{ M32OPTION_LIST_MODE,					"5",        0,                 NULL },
 #ifdef MESS
-	{ M32OPTION_SPLITTERS,        "152,310,468", 0,              NULL },
+	{ M32OPTION_SPLITTERS,					"152,310,468", 0,              NULL },
 #else
-	{ M32OPTION_SPLITTERS,        "152,362",  0,                 NULL },
+	{ M32OPTION_SPLITTERS,					"152,362",  0,                 NULL },
 #endif
-	{ "list_font",                "-8,0,0,0,400,0,0,0,0,0,0,0,0,MS Sans Serif", 0, NULL },
-	{ M32OPTION_COLUMN_WIDTHS,    "185,68,84,84,64,88,74,108,60,144,84,60", 0, NULL },
-	{ M32OPTION_COLUMN_ORDER,     "0,2,3,4,5,6,7,8,9,1,10,11", 0, NULL },
-	{ M32OPTION_COLUMN_SHOWN,     "1,0,1,1,1,1,1,1,1,1,0,0", 0,  NULL },
+	{ M32OPTION_LIST_FONT,					"-8,0,0,0,400,0,0,0,0,0,0,0,0,MS Sans Serif", 0, NULL },
+	{ M32OPTION_COLUMN_WIDTHS,				"185,68,84,84,64,88,74,108,60,144,84,60", 0, NULL },
+	{ M32OPTION_COLUMN_ORDER,				"0,2,3,4,5,6,7,8,9,1,10,11", 0, NULL },
+	{ M32OPTION_COLUMN_SHOWN,				"1,0,1,1,1,1,1,1,1,1,0,0", 0,  NULL },
 
-	{ "ui_key_up",                "KEYCODE_UP", 0,               NULL },
-	{ "ui_key_down",              "KEYCODE_DOWN", 0,             NULL },
-	{ "ui_key_left",              "KEYCODE_LEFT", 0,             NULL },
-	{ "ui_key_right",             "KEYCODE_RIGHT", 0,            NULL },
-	{ "ui_key_start",             "KEYCODE_ENTER NOT KEYCODE_LALT", 0, NULL },
-	{ "ui_key_pgup",              "KEYCODE_PGUP", 0,             NULL },
-	{ "ui_key_pgdwn",             "KEYCODE_PGDN", 0,             NULL },
-	{ "ui_key_home",              "KEYCODE_HOME", 0,             NULL },
-	{ "ui_key_end",               "KEYCODE_END", 0,              NULL },
-	{ "ui_key_ss_change",         "KEYCODE_INSERT", 0,           NULL },
-	{ "ui_key_history_up",        "KEYCODE_DEL", 0,              NULL },
-	{ "ui_key_history_down",      "KEYCODE_LALT KEYCODE_0", 0,   NULL },
+	{ M32OPTION_UI_KEY_UP,					"KEYCODE_UP", 0,               NULL },
+	{ M32OPTION_UI_KEY_DOWN,				"KEYCODE_DOWN", 0,             NULL },
+	{ M32OPTION_UI_KEY_LEFT,				"KEYCODE_LEFT", 0,             NULL },
+	{ M32OPTION_UI_KEY_RIGHT,				"KEYCODE_RIGHT", 0,            NULL },
+	{ M32OPTION_UI_KEY_START,				"KEYCODE_ENTER NOT KEYCODE_LALT", 0, NULL },
+	{ M32OPTION_UI_KEY_PGUP,				"KEYCODE_PGUP", 0,             NULL },
+	{ M32OPTION_UI_KEY_PGDWN,				"KEYCODE_PGDN", 0,             NULL },
+	{ M32OPTION_UI_KEY_HOME,				"KEYCODE_HOME", 0,             NULL },
+	{ M32OPTION_UI_KEY_END,					"KEYCODE_END", 0,              NULL },
+	{ M32OPTION_UI_KEY_SS_CHANGE,			"KEYCODE_INSERT", 0,           NULL },
+	{ M32OPTION_UI_KEY_HISTORY_UP,			"KEYCODE_DEL", 0,              NULL },
+	{ M32OPTION_UI_KEY_HISTORY_DOWN,		"KEYCODE_LALT KEYCODE_0", 0,   NULL },
 
-	{ "ui_key_context_filters",   "KEYCODE_LCONTROL KEYCODE_F", 0, NULL },
-	{ "ui_key_select_random",     "KEYCODE_LCONTROL KEYCODE_R", 0, NULL },
-	{ "ui_key_game_audit",        "KEYCODE_LALT KEYCODE_A",     0, NULL },
-	{ "ui_key_game_properties",   "KEYCODE_LALT KEYCODE_ENTER", 0, NULL },
-	{ "ui_key_help_contents",     "KEYCODE_F1",                 0, NULL },
-	{ "ui_key_update_gamelist",   "KEYCODE_F5",                 0, NULL },
-	{ "ui_key_view_folders",      "KEYCODE_LALT KEYCODE_D",     0, NULL },
-	{ "ui_key_view_fullscreen",   "KEYCODE_F11",                0, NULL },
-	{ "ui_key_view_pagetab",      "KEYCODE_LALT KEYCODE_B",     0, NULL },
-	{ "ui_key_view_picture_area", "KEYCODE_LALT KEYCODE_P",     0, NULL },
-	{ "ui_key_view_status",       "KEYCODE_LALT KEYCODE_S",     0, NULL },
-    { "ui_key_view_toolbars",     "KEYCODE_LALT KEYCODE_T",     0, NULL },
+	{ M32OPTION_UI_KEY_CONTEXT_FILTERS,		"KEYCODE_LCONTROL KEYCODE_F", 0, NULL },
+	{ M32OPTION_UI_KEY_SELECT_RANDOM,		"KEYCODE_LCONTROL KEYCODE_R", 0, NULL },
+	{ M32OPTION_UI_KEY_GAME_AUDIT,			"KEYCODE_LALT KEYCODE_A",     0, NULL },
+	{ M32OPTION_UI_KEY_GAME_PROPERTIES,		"KEYCODE_LALT KEYCODE_ENTER", 0, NULL },
+	{ M32OPTION_UI_KEY_HELP_CONTENTS,		"KEYCODE_F1",                 0, NULL },
+	{ M32OPTION_UI_KEY_UPDATE_GAMELIST,		"KEYCODE_F5",                 0, NULL },
+	{ M32OPTION_UI_KEY_VIEW_FOLDERS,		"KEYCODE_LALT KEYCODE_D",     0, NULL },
+	{ M32OPTION_UI_KEY_VIEW_FULLSCREEN,		"KEYCODE_F11",                0, NULL },
+	{ M32OPTION_UI_KEY_VIEW_PAGETAB,		"KEYCODE_LALT KEYCODE_B",     0, NULL },
+	{ M32OPTION_UI_KEY_VIEW_PICTURE_AREA,	"KEYCODE_LALT KEYCODE_P",     0, NULL },
+	{ M32OPTION_UI_KEY_VIEW_STATUS,			"KEYCODE_LALT KEYCODE_S",     0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TOOLBARS,		"KEYCODE_LALT KEYCODE_T",     0, NULL },
 
-    { "ui_key_view_tab_cabinet",  "KEYCODE_LALT KEYCODE_3",     0, NULL },
-    { "ui_key_view_tab_cpanel",   "KEYCODE_LALT KEYCODE_6",     0, NULL },
-    { "ui_key_view_tab_flyer",    "KEYCODE_LALT KEYCODE_2",     0, NULL },
-    { "ui_key_view_tab_history",  "KEYCODE_LALT KEYCODE_7",     0, NULL },
-    { "ui_key_view_tab_marquee",  "KEYCODE_LALT KEYCODE_4",     0, NULL },
-    { "ui_key_view_tab_screenshot", "KEYCODE_LALT KEYCODE_1",   0, NULL },
-    { "ui_key_view_tab_title",    "KEYCODE_LALT KEYCODE_5",     0, NULL },
-    { "ui_key_quit",              "KEYCODE_LALT KEYCODE_Q",     0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TAB_CABINET,	"KEYCODE_LALT KEYCODE_3",     0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TAB_CPANEL,		"KEYCODE_LALT KEYCODE_6",     0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TAB_FLYER,		"KEYCODE_LALT KEYCODE_2",     0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TAB_HISTORY,	"KEYCODE_LALT KEYCODE_7",     0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TAB_MARQUEE,	"KEYCODE_LALT KEYCODE_4",     0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TAB_SCREENSHOT,	"KEYCODE_LALT KEYCODE_1",   0, NULL },
+    { M32OPTION_UI_KEY_VIEW_TAB_TITLE,		"KEYCODE_LALT KEYCODE_5",     0, NULL },
+    { M32OPTION_UI_KEY_QUIT,				"KEYCODE_LALT KEYCODE_Q",     0, NULL },
 
-	{ "ui_joy_up",                "",         0,                 NULL },
-	{ "ui_joy_down",              "",         0,                 NULL },
-	{ "ui_joy_left",              "",         0,                 NULL },
-	{ "ui_joy_right",             "",         0,                 NULL },
-	{ "ui_joy_start",             "",         0,                 NULL },
-	{ "ui_joy_pgup",              "",         0,                 NULL },
-	{ "ui_joy_pgdwn",             "",         0,                 NULL },
-	{ "ui_joy_home",              "0,0,0,0",  0,                 NULL },
-	{ "ui_joy_end",               "0,0,0,0",  0,                 NULL },
-	{ "ui_joy_ss_change",         "",         0,                 NULL },
-	{ "ui_joy_history_up",        "",         0,                 NULL },
-	{ "ui_joy_history_down",      "",         0,                 NULL },
-	{ "ui_joy_exec",              "0,0,0,0",  0,                 NULL },
-	{ "exec_command",             "",         0,                 NULL },
-	{ "exec_wait",                "0",        0,                 NULL },
-	{ "hide_mouse",               "0",        OPTION_BOOLEAN,    NULL },
-	{ "full_screen",              "0",        OPTION_BOOLEAN,    NULL },
-	{ "cycle_screenshot",         "0",        0,                 NULL },
-	{ "stretch_screenshot_larger","0",        OPTION_BOOLEAN,    NULL },
- 	{ "screenshot_bordersize",    "11",       0,                 NULL },
- 	{ "screenshot_bordercolor",   "-1",       0,                 NULL },
-	{ "inherit_filter",           "0",        OPTION_BOOLEAN,    NULL },
-	{ "offset_clones",            "0",        OPTION_BOOLEAN,    NULL },
-	{ "game_caption",             "1",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_UI_JOY_UP,					"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_DOWN,				"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_LEFT,				"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_RIGHT,				"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_START,				"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_PGUP,				"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_PGDWN,				"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_HOME,				"0,0,0,0",  0,                 NULL },
+	{ M32OPTION_UI_JOY_END,					"0,0,0,0",  0,                 NULL },
+	{ M32OPTION_UI_JOY_SS_CHANGE,			"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_HISTORY_UP,			"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_HISTORY_DOWN,		"",         0,                 NULL },
+	{ M32OPTION_UI_JOY_EXEC,				"0,0,0,0",  0,                 NULL },
+	{ M32OPTION_EXEC_COMMAND,				"",         0,                 NULL },
+	{ M32OPTION_EXEC_WAIT,					"0",        0,                 NULL },
+	{ M32OPTION_HIDE_MOUSE,					"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_FULL_SCREEN,				"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_CYCLE_SCREENSHOT,			"0",        0,                 NULL },
+	{ M32OPTION_STRETCH_SCREENSHOT_LARGER,	"0",        OPTION_BOOLEAN,    NULL },
+ 	{ M32OPTION_SCREENSHOT_BORDER_SIZE,		"11",       0,                 NULL },
+ 	{ M32OPTION_SCREENSHOT_BORDER_COLOR,	"-1",       0,                 NULL },
+	{ M32OPTION_INHERIT_FILTER,				"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_OFFSET_CLONES,				"0",        OPTION_BOOLEAN,    NULL },
+	{ M32OPTION_GAME_CAPTION,				"1",        OPTION_BOOLEAN,    NULL },
 
-	{ M32OPTION_LANGUAGE,                 "english",  0,                 NULL },
-	{ M32OPTION_FLYER_DIRECTORY,          "flyers",   0,                 NULL },
-	{ M32OPTION_CABINET_DIRECTORY,        "cabinets", 0,                 NULL },
-	{ M32OPTION_MARQUEE_DIRECTORY,        "marquees", 0,                 NULL },
-	{ M32OPTION_TITLE_DIRECTORY,          "titles",   0,                 NULL },
-	{ M32OPTION_CPANEL_DIRECTORY,         "cpanel",   0,                 NULL },
-	{ M32OPTION_BACKGROUND_DIRECTORY,     "bkground", 0,                 NULL },
-	{ M32OPTION_FOLDER_DIRECTORY,         "folders",  0,                 NULL },
-	{ M32OPTION_ICONS_DIRECTORY,          "icons",    0,                 NULL },
+	{ M32OPTION_LANGUAGE,					"english",  0,                 NULL },
+	{ M32OPTION_FLYER_DIRECTORY,			"flyers",   0,                 NULL },
+	{ M32OPTION_CABINET_DIRECTORY,			"cabinets", 0,                 NULL },
+	{ M32OPTION_MARQUEE_DIRECTORY,			"marquees", 0,                 NULL },
+	{ M32OPTION_TITLE_DIRECTORY,			"titles",   0,                 NULL },
+	{ M32OPTION_CPANEL_DIRECTORY,			"cpanel",   0,                 NULL },
+	{ M32OPTION_BACKGROUND_DIRECTORY,		"bkground", 0,                 NULL },
+	{ M32OPTION_FOLDER_DIRECTORY,			"folders",  0,                 NULL },
+	{ M32OPTION_ICONS_DIRECTORY,			"icons",    0,                 NULL },
 #ifdef MESS
-	{ M32OPTION_HISTORY_FILE,             "sysinfo.dat", 0,              NULL },
-	{ M32OPTION_MAMEINFO_FILE,            "messinfo.dat", 0,             NULL },
+	{ M32OPTION_HISTORY_FILE,				"sysinfo.dat", 0,              NULL },
+	{ M32OPTION_MAMEINFO_FILE,				"messinfo.dat", 0,             NULL },
 #else
-	{ M32OPTION_HISTORY_FILE,             "history.dat", 0,              NULL },
-	{ M32OPTION_MAMEINFO_FILE,            "mameinfo.dat", 0,             NULL },
+	{ M32OPTION_HISTORY_FILE,				"history.dat", 0,              NULL },
+	{ M32OPTION_MAMEINFO_FILE,				"mameinfo.dat", 0,             NULL },
 #endif
 	{ NULL }
 };
@@ -1912,137 +1960,136 @@ void GetTextPlayTime(int driver_index,char *buf)
 		sprintf(buf, "%d:%02d:%02d", hour, minute, second );
 }
 
-
 input_seq* Get_ui_key_up(void)
 {
-	return options_get_input_seq(settings, "ui_key_up");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_UP);
 }
 input_seq* Get_ui_key_down(void)
 {
-	return options_get_input_seq(settings, "ui_key_down");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_DOWN);
 }
 input_seq* Get_ui_key_left(void)
 {
-	return options_get_input_seq(settings, "ui_key_left");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_LEFT);
 }
 input_seq* Get_ui_key_right(void)
 {
-	return options_get_input_seq(settings, "ui_key_right");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_RIGHT);
 }
 input_seq* Get_ui_key_start(void)
 {
-	return options_get_input_seq(settings, "ui_key_start");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_START);
 }
 input_seq* Get_ui_key_pgup(void)
 {
-	return options_get_input_seq(settings, "ui_key_pgup");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_PGUP);
 }
 input_seq* Get_ui_key_pgdwn(void)
 {
-	return options_get_input_seq(settings, "ui_key_pgdwn");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_PGDWN);
 }
 input_seq* Get_ui_key_home(void)
 {
-	return options_get_input_seq(settings, "ui_key_home");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_HOME);
 }
 input_seq* Get_ui_key_end(void)
 {
-	return options_get_input_seq(settings, "ui_key_end");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_END);
 }
 input_seq* Get_ui_key_ss_change(void)
 {
-	return options_get_input_seq(settings, "ui_key_ss_change");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_SS_CHANGE);
 }
 input_seq* Get_ui_key_history_up(void)
 {
-	return options_get_input_seq(settings, "ui_key_history_up");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_HISTORY_UP);
 }
 input_seq* Get_ui_key_history_down(void)
 {
-	return options_get_input_seq(settings, "ui_key_history_down");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_HISTORY_DOWN);
 }
 
 
 input_seq* Get_ui_key_context_filters(void)
 {
-	return options_get_input_seq(settings, "ui_key_context_filters");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_CONTEXT_FILTERS);
 }
 input_seq* Get_ui_key_select_random(void)
 {
-	return options_get_input_seq(settings, "ui_key_select_random");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_SELECT_RANDOM);
 }
 input_seq* Get_ui_key_game_audit(void)
 {
-	return options_get_input_seq(settings, "ui_key_game_audit");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_GAME_AUDIT);
 }
 input_seq* Get_ui_key_game_properties(void)
 {
-	return options_get_input_seq(settings, "ui_key_game_properties");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_GAME_PROPERTIES);
 }
 input_seq* Get_ui_key_help_contents(void)
 {
-	return options_get_input_seq(settings, "ui_key_help_contents");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_HELP_CONTENTS);
 }
 input_seq* Get_ui_key_update_gamelist(void)
 {
-	return options_get_input_seq(settings, "ui_key_update_gamelist");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_UPDATE_GAMELIST);
 }
 input_seq* Get_ui_key_view_folders(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_folders");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_FOLDERS);
 }
 input_seq* Get_ui_key_view_fullscreen(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_fullscreen");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_FULLSCREEN);
 }
 input_seq* Get_ui_key_view_pagetab(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_pagetab");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_PAGETAB);
 }
 input_seq* Get_ui_key_view_picture_area(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_picture_area");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_PICTURE_AREA);
 }
 input_seq* Get_ui_key_view_status(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_status");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_STATUS);
 }
 input_seq* Get_ui_key_view_toolbars(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_toolbars");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TOOLBARS);
 }
 
 input_seq* Get_ui_key_view_tab_cabinet(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_tab_cabinet");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TAB_CABINET);
 }
 input_seq* Get_ui_key_view_tab_cpanel(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_tab_cpanel");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TAB_CPANEL);
 }
 input_seq* Get_ui_key_view_tab_flyer(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_tab_flyer");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TAB_FLYER);
 }
 input_seq* Get_ui_key_view_tab_history(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_tab_history");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TAB_HISTORY);
 }
 input_seq* Get_ui_key_view_tab_marquee(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_tab_marquee");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TAB_MARQUEE);
 }
 input_seq* Get_ui_key_view_tab_screenshot(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_tab_screenshot");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TAB_SCREENSHOT);
 }
 input_seq* Get_ui_key_view_tab_title(void)
 {
-	return options_get_input_seq(settings, "ui_key_view_tab_title");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_VIEW_TAB_TITLE);
 }
 input_seq* Get_ui_key_quit(void)
 {
-	return options_get_input_seq(settings, "ui_key_quit");
+	return options_get_input_seq(settings, M32OPTION_UI_KEY_QUIT);
 }
 
 
@@ -2077,172 +2124,172 @@ static void SetUIJoy(const char *option_name, int joycodeIndex, int val)
 
 int GetUIJoyUp(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_up", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_UP, joycodeIndex);
 }
 
 void SetUIJoyUp(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_up", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_UP, joycodeIndex, val);
 }
 
 int GetUIJoyDown(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_down", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_DOWN, joycodeIndex);
 }
 
 void SetUIJoyDown(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_down", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_DOWN, joycodeIndex, val);
 }
 
 int GetUIJoyLeft(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_left", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_LEFT, joycodeIndex);
 }
 
 void SetUIJoyLeft(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_left", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_LEFT, joycodeIndex, val);
 }
 
 int GetUIJoyRight(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_right", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_RIGHT, joycodeIndex);
 }
 
 void SetUIJoyRight(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_right", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_RIGHT, joycodeIndex, val);
 }
 
 int GetUIJoyStart(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_start", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_START, joycodeIndex);
 }
 
 void SetUIJoyStart(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_start", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_START, joycodeIndex, val);
 }
 
 int GetUIJoyPageUp(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_pgup", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_PGUP, joycodeIndex);
 }
 
 void SetUIJoyPageUp(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_pgup", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_PGUP, joycodeIndex, val);
 }
 
 int GetUIJoyPageDown(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_pgdwn", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_PGDWN, joycodeIndex);
 }
 
 void SetUIJoyPageDown(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_pgdwn", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_PGDWN, joycodeIndex, val);
 }
 
 int GetUIJoyHome(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_home", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_HOME, joycodeIndex);
 }
 
 void SetUIJoyHome(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_home", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_HOME, joycodeIndex, val);
 }
 
 int GetUIJoyEnd(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_end", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_END, joycodeIndex);
 }
 
 void SetUIJoyEnd(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_end", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_END, joycodeIndex, val);
 }
 
 int GetUIJoySSChange(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_ss_change", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_SS_CHANGE, joycodeIndex);
 }
 
 void SetUIJoySSChange(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_ss_change", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_SS_CHANGE, joycodeIndex, val);
 }
 
 int GetUIJoyHistoryUp(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_history_up", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_HISTORY_UP, joycodeIndex);
 }
 
 void SetUIJoyHistoryUp(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_history_up", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_HISTORY_UP, joycodeIndex, val);
 }
 
 int GetUIJoyHistoryDown(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_history_down", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_HISTORY_DOWN, joycodeIndex);
 }
 
 void SetUIJoyHistoryDown(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_history_down", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_HISTORY_DOWN, joycodeIndex, val);
 }
 
 void SetUIJoyExec(int joycodeIndex, int val)
 {
-	SetUIJoy("ui_joy_exec", joycodeIndex, val);
+	SetUIJoy(M32OPTION_UI_JOY_EXEC, joycodeIndex, val);
 }
 
 int GetUIJoyExec(int joycodeIndex)
 {
-	return GetUIJoy("ui_joy_exec", joycodeIndex);
+	return GetUIJoy(M32OPTION_UI_JOY_EXEC, joycodeIndex);
 }
 
 const char * GetExecCommand(void)
 {
-	return options_get_string(settings, "exec_command");
+	return options_get_string(settings, M32OPTION_EXEC_COMMAND);
 }
 
 void SetExecCommand(char *cmd)
 {
-	options_set_string(settings, "exec_command", cmd);
+	options_set_string(settings, M32OPTION_EXEC_COMMAND, cmd);
 }
 
 int GetExecWait(void)
 {
-	return options_get_int(settings, "exec_wait");
+	return options_get_int(settings, M32OPTION_EXEC_WAIT);
 }
 
 void SetExecWait(int wait)
 {
-	options_set_int(settings, "exec_wait", wait);
+	options_set_int(settings, M32OPTION_EXEC_WAIT, wait);
 }
  
 BOOL GetHideMouseOnStartup(void)
 {
-	return options_get_bool(settings, "hide_mouse");
+	return options_get_bool(settings, M32OPTION_HIDE_MOUSE);
 }
 
 void SetHideMouseOnStartup(BOOL hide)
 {
-	options_set_bool(settings, "hide_mouse", hide);
+	options_set_bool(settings, M32OPTION_HIDE_MOUSE, hide);
 }
 
 BOOL GetRunFullScreen(void)
 {
-	return options_get_bool(settings, "full_screen");
+	return options_get_bool(settings, M32OPTION_FULL_SCREEN);
 }
 
 void SetRunFullScreen(BOOL fullScreen)
 {
-	options_set_bool(settings, "full_screen", fullScreen);
+	options_set_bool(settings, M32OPTION_FULL_SCREEN, fullScreen);
 }
 
 /***************************************************************************

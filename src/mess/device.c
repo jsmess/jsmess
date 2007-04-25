@@ -127,6 +127,25 @@ const char *device_briefinstancename(const device_class *devclass, int id)
  *
  *************************************/
 
+static const char *get_device_name(iodevice_t devtype)
+{
+	const char *name;
+
+	if (Machine != NULL)
+	{
+		name = ui_getstring((UI_cartridge - IO_CARTSLOT) + devtype);
+	}
+	else
+	{
+		/* man I really hate this; may god have mercy on my soul */
+		extern const char *mess_default_text[];
+		name = mess_default_text[(UI_cartridge - IO_CARTSLOT) + devtype - UI_last_mame_entry];
+	}
+	return name;
+}
+
+
+
 static const char *default_device_name(const struct IODevice *dev, int id,
 	char *buf, size_t bufsize)
 {
@@ -140,7 +159,7 @@ static const char *default_device_name(const struct IODevice *dev, int id,
 		return buf;
 	}
 
-	name = ui_getstring((UI_cartridge - IO_CARTSLOT) + dev->type);
+	name = get_device_name(dev->type);
 	if (dev->count > 1)
 	{
 		/* for the average user counting starts at #1 ;-) */

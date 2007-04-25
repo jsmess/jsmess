@@ -37,11 +37,11 @@ const options_entry mess_core_options[] =
 ***************************************************************************/
 
 /*-------------------------------------------------
-    enumerate_devices - runs a specified proc
+    mess_enumerate_devices - runs a specified proc
 	for all devices on a driver
 -------------------------------------------------*/
 
-static void enumerate_devices(core_options *opts, const game_driver *gamedrv,
+void mess_enumerate_devices(core_options *opts, const game_driver *gamedrv,
 	void (*proc)(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index))
 {
 	struct SystemConfigurationParamBlock cfg;
@@ -123,7 +123,7 @@ static void add_device_options_for_device(core_options *opts, const game_driver 
 
 void mess_add_device_options(core_options *opts, const game_driver *driver)
 {
-	enumerate_devices(opts, driver, add_device_options_for_device);
+	mess_enumerate_devices(opts, driver, add_device_options_for_device);
 }
 
 
@@ -252,7 +252,7 @@ done:
 
 void mess_options_extract(void)
 {
-	enumerate_devices(mame_options(), Machine->gamedrv, extract_device_options_for_device);
+	mess_enumerate_devices(mame_options(), Machine->gamedrv, extract_device_options_for_device);
 
 	if (options_get_bool(mame_options(), OPTION_WRITECONFIG))
 	{
