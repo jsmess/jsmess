@@ -390,16 +390,16 @@ void plot_text_pixel(int x, int y,int Dot,int Colour, int CharsPerLine, mame_bit
 		/* Plot characters twice as wide in 40 col mode */
 		if(Double)
 		{
-			plot_pixel(bitmap, (PlotX+0), (PlotY+0),Colour);
-			plot_pixel(bitmap, (PlotX+1), (PlotY+0),Colour);
+			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+0)) = Colour;		
+			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+1)) = Colour;
 	
-			plot_pixel(bitmap, (PlotX+0), (PlotY+1),Colour);
-			plot_pixel(bitmap, (PlotX+1), (PlotY+1),Colour);
+			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+0)) = Colour;		
+			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+1)) = Colour;
 		}
 		else
 		{
-			plot_pixel(bitmap, PlotX, (PlotY+0),Colour);
-			plot_pixel(bitmap, PlotX, (PlotY+1),Colour);
+			*BITMAP_ADDR16(bitmap, (PlotY+0), PlotX) = Colour;	
+			*BITMAP_ADDR16(bitmap, (PlotY+1), PlotX) = Colour;	
 		}
 	}
 }
@@ -531,20 +531,20 @@ void plot_gfx_pixel(int x, int y, int Dot, int Colour, mame_bitmap *bitmap)
 		/* twice as high and twice as wide when plotting in 320x modes */
 		if(DoubleX)
 		{
-			plot_pixel(bitmap, (PlotX+0), (PlotY+0),Colour);
-			plot_pixel(bitmap, (PlotX+1), (PlotY+0),Colour);
+			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+0)) = Colour;
+			*BITMAP_ADDR16(bitmap, (PlotY+0), (PlotX+1)) = Colour;
 		}
 		
 		/* Plot pixels twice as high if in x256 modes */
 		if (DoubleY)
 		{
-			plot_pixel(bitmap, (PlotX+0), (PlotY+1),Colour);
-			plot_pixel(bitmap, (PlotX+1), (PlotY+1),Colour);
+			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+0)) = Colour;		
+			*BITMAP_ADDR16(bitmap, (PlotY+1), (PlotX+1)) = Colour;
 		}
 		
 		if (~(DoubleX | DoubleY))
 		{
-			plot_pixel(bitmap, PlotX, PlotY,Colour);
+			*BITMAP_ADDR16(bitmap, PlotY, PlotX) = Colour;				
 		}
 	}
 }
@@ -788,14 +788,11 @@ static void RegLog(int offset, int data)
 
 static void FillScreen(int ref, int params, const char *param[])
 {
-	int	x,y;
+	int	x;
 	
 	for(x=1;x<899;x++)
 	{
-		for(y=1;y<699;y++)
-		{
-			plot_pixel(bit,x,y,x&0x7);
-		}
+		plot_box(bit, x, 1, 1, 698, x & 0x07);
 	}
 	NoScreen=1;
 }
