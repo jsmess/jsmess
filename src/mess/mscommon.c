@@ -184,13 +184,13 @@ void draw_led(mame_bitmap *bitmap, const char *led, int valueorcolor, int x, int
 		c = led[i];
 		if (c == '1')
 		{
-			plot_pixel(bitmap, x+xi, y+yi, valueorcolor);
+			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = valueorcolor;
 		}
 		else if (c >= 'a')
 		{
 			mask = 1 << (c - 'a');
 			color = Machine->pens[(valueorcolor & mask) ? 1 : 0];
-			plot_pixel(bitmap, x+xi, y+yi, color);
+			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
 		}
 		if (c != '\r')
 		{

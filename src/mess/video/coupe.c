@@ -88,13 +88,13 @@ void drawMode3_line(mame_bitmap *bitmap,int y)
 			plot_pixel(bitmap,x,y,Machine->pens[0]);
 		x++;
 #else
-		plot_pixel(bitmap,x,y,Machine->pens[CLUT[tmp>>6]]);
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[CLUT[tmp>>6]];
 		x++;
-		plot_pixel(bitmap,x,y,Machine->pens[CLUT[(tmp>>4)&0x03]]);
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[CLUT[(tmp>>4)&0x03]];
 		x++;
-		plot_pixel(bitmap,x,y,Machine->pens[CLUT[(tmp>>2)&0x03]]);
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[CLUT[(tmp>>2)&0x03]];
 		x++;
-		plot_pixel(bitmap,x,y,Machine->pens[CLUT[tmp&0x03]]);
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[CLUT[tmp&0x03]];
 		x++;
 #endif
 	}
@@ -124,16 +124,8 @@ void drawMode2_line(mame_bitmap *bitmap,int y)
 
 		for (b=0x80;b!=0;b>>=1)
 		{
-			if (tmp&b)
-			{
-				plot_pixel(bitmap,scrx++,y,Machine->pens[ink]);
-				plot_pixel(bitmap,scrx++,y,Machine->pens[ink]);
-			}
-			else
-			{
-				plot_pixel(bitmap,scrx++,y,Machine->pens[pap]);
-				plot_pixel(bitmap,scrx++,y,Machine->pens[pap]);
-			}
+			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? Machine->pens[ink] : Machine->pens[pap];
+			*BITMAP_ADDR16(bitmap, y, scrx++) = (tmp&b) ? Machine->pens[ink] : Machine->pens[pap];
 		}
 	}
 }
@@ -162,16 +154,8 @@ void drawMode1_line(mame_bitmap *bitmap,int y)
 		attr++;
 		for (b=0x80;b!=0;b>>=1)
 		{
-			if (tmp&b)
-			{
-				plot_pixel(bitmap,scrx++,scry,Machine->pens[ink]);
-				plot_pixel(bitmap,scrx++,scry,Machine->pens[ink]);
-			}
-			else
-			{
-				plot_pixel(bitmap,scrx++,scry,Machine->pens[pap]);
-				plot_pixel(bitmap,scrx++,scry,Machine->pens[pap]);
-			}
+			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? Machine->pens[ink] : Machine->pens[pap];
+			*BITMAP_ADDR16(bitmap, scry, scrx++) = (tmp&b) ? Machine->pens[ink] : Machine->pens[pap];
 		}
 	}
 }

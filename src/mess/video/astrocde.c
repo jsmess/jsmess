@@ -398,11 +398,11 @@ void astrocade_copy_line(int line)
 
 			if (astrocade_mode == 0)
 			{
-				plot_pixel(tmpbitmap,2*x,line,Machine->pens[Colour[color]]);
-				plot_pixel(tmpbitmap,2*x+1,line,Machine->pens[Colour[color]]);
+				*BITMAP_ADDR16(tmpbitmap, line, 2*x+0) = Machine->pens[Colour[color]];
+				*BITMAP_ADDR16(tmpbitmap, line, 2*x+1) = Machine->pens[Colour[color]];
 			}
 			else
-				plot_pixel(tmpbitmap,x,line,Machine->pens[Colour[color]]);
+				*BITMAP_ADDR16(tmpbitmap, line, x) = Machine->pens[Colour[color]];
 
 			data >>= 2;
 		}

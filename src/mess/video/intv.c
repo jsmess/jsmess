@@ -424,7 +424,7 @@ static void copy_sprites_to_background(mame_bitmap *bitmap)
                     continue;
                 }
 
-                currentPixel = read_pixel(bitmap, nextX, nextY);
+                currentPixel = *BITMAP_ADDR16(bitmap, nextY, nextX);
 
                 //check for foreground collision
                 if (currentPixel & FOREGROUND_BIT) {

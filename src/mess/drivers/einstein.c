@@ -1590,11 +1590,11 @@ static struct AY8910interface einstein_ay_interface =
 
 static void einstein_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
 {
+	int w;
 	if (Einstein_DE)
 	{
 
 		unsigned char *data = memory_region(REGION_CPU1)+0x012000;
-		int w;
 		unsigned char data_byte;
 		int char_code;
 
@@ -1604,14 +1604,7 @@ static void einstein_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
 
 		for (w=0; w<8;w++)
 		{
-			if (data_byte & 0x080)
-			{
-				plot_pixel(bitmap, x+w, y,1);
-			}
-			else
-			{
-				plot_pixel(bitmap, x+w, y,0);
-			}
+			*BITMAP_ADDR16(bitmap, y, x+w) = (data_byte & 0x080) ? 1 : 0;
 
 			data_byte = data_byte<<1;
 
@@ -1619,14 +1612,8 @@ static void einstein_80col_plot_char_line(int x,int y, mame_bitmap *bitmap)
 	}
 	else
 	{
-		plot_pixel(bitmap, x+0, y, 0);
-		plot_pixel(bitmap, x+1, y, 0);
-		plot_pixel(bitmap, x+2, y, 0);
-		plot_pixel(bitmap, x+3, y, 0);
-		plot_pixel(bitmap, x+4, y, 0);
-		plot_pixel(bitmap, x+5, y, 0);
-		plot_pixel(bitmap, x+6, y, 0);
-		plot_pixel(bitmap, x+7, y, 0);
+		for (w=0; w<8;w++)
+			*BITMAP_ADDR16(bitmap, y, x+w) = 0;
 	}
 
 }

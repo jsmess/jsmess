@@ -496,8 +496,8 @@ static void amstrad_plus_draw_screen_enabled_mode_2(void)
 		cpcpen = (data>>15) & 0x01;
 		messpen = 48 + (amstrad_plus_asic_ram[0x2400+cpcpen*2]);//amstrad_GateArray_render_colours[cpcpen];
 		messpen += (amstrad_plus_asic_ram[0x2401+cpcpen*2]) << 8;
-		plot_pixel(bitmap,x,y,messpen);
-    x++;        
+		*BITMAP_ADDR16(bitmap, y, x) = messpen;
+		x++;        
 		data = data<<1;
 	}
 }
@@ -674,8 +674,8 @@ static void amstrad_draw_screen_enabled_mode_2(void)
 	{
 		cpcpen = (data>>15) & 0x01;
 		messpen = amstrad_GateArray_render_colours[cpcpen];
-		plot_pixel(bitmap,x,y,messpen);
-    x++;        
+		*BITMAP_ADDR16(bitmap, y, x) = messpen;
+		x++;        
 		data = data<<1;
 	}
 }

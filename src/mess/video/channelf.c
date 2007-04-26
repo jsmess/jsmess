@@ -67,7 +67,7 @@ VIDEO_UPDATE( channelf )
 			offset = y*128+x;
 			color = palette_offset+(videoram[offset]&3);
 			pen = Machine->pens[colormap[color]];
-			plot_pixel(bitmap, x, y, pen);
+			*BITMAP_ADDR16(bitmap, y, x) = pen;
 		}
 	}
 	return 0;

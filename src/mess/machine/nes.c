@@ -183,7 +183,7 @@ static int zapper_hit_pixel(const UINT32 *input)
 	extern mame_bitmap *nes_zapper_hack;
 
 	if (nes_zapper_hack)
-		pix = read_pixel(nes_zapper_hack, input[1], input[2]);
+		pix = *BITMAP_ADDR16(nes_zapper_hack, input[2], input[1]);
 
 	col = palette_get_color(Machine, pix);
 	r = (UINT8) (col >> 16);

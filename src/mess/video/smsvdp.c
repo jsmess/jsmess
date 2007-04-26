@@ -1071,8 +1071,8 @@ VIDEO_UPDATE(sms) {
 	if (prevBitMapSaved) {
 	for (y = 0; y < Machine->screen[0].height; y++) {
 		for (x = 0; x < Machine->screen[0].width; x++) {
-			plot_pixel(bitmap, x, y, (read_pixel(tmpbitmap, x, y) + read_pixel(prevBitMap, x, y)) >> 2);
-			logerror("%x %x %x\n", read_pixel(tmpbitmap, x, y), read_pixel(prevBitMap, x, y), (read_pixel(tmpbitmap, x, y) + read_pixel(prevBitMap, x, y)) >> 2);
+			*BITMAP_ADDR32(bitmap, y, x) = (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(prevBitMap, y, x)) >> 2;
+			logerror("%x %x %x\n", *BITMAP_ADDR32(tmpbitmap, y, x), *BITMAP_ADDR32(prevBitMap, y, x), (*BITMAP_ADDR32(tmpbitmap, y, x) + *BITMAP_ADDR32(prevBitMap, y, x)) >> 2);
 		}
 	}
 	} else {

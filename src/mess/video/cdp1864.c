@@ -128,7 +128,7 @@ void cdp1864_dma_w(UINT8 data)
 			color = cdp1864.colorram_r(cdp1864.dmaptr);
 		}
 
-		plot_pixel(cdptmpbitmap, sx + x, y, Machine->pens[color]);
+		*BITMAP_ADDR16(cdptmpbitmap, y, sx + x) = Machine->pens[color];
 		
 		data <<= 1;
 	}

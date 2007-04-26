@@ -232,7 +232,7 @@ VIDEO_UPDATE( avigo )
 			px = x;
             for (b=7; b>=0; b--)
             {
-				plot_pixel(bitmap, px, y, pens[(byte>>7) & 0x01]);
+				*BITMAP_ADDR16(bitmap, y, px) = pens[(byte>>7) & 0x01];
                 px++;
 				byte = byte<<1;
             }

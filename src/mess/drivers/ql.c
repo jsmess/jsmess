@@ -66,7 +66,7 @@ WRITE8_HANDLER( ql_videoram_w )
 			
 //			logerror("x %u y %u color %u\n", x, y, color);
 
-			plot_pixel(tmpbitmap, x++, y, Machine->pens[mode4_colors[color]]);
+			*BITMAP_ADDR16(tmpbitmap, y, x++) = Machine->pens[mode4_colors[color]];
 
 			byte0 <<= 1;
 			byte1 <<= 1;

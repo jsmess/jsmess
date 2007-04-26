@@ -109,7 +109,7 @@ VIDEO_UPDATE( advision )
 			for( bit = 0; bit < 8; bit++ )
 			{
 				if( *led > 0 )
-					plot_pixel(bitmap, 85 + x, 30 + 2 *( y * 8 + bit), Machine->pens[--(*led)]);
+					*BITMAP_ADDR16(bitmap, 30 + 2 *( y * 8 + bit), 85 + x) = Machine->pens[--(*led)];
 				led += 256;
 			}
 		}

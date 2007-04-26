@@ -216,7 +216,7 @@ static void aim65_draw_7segment(mame_bitmap *bitmap,int value, int x, int y)
 
 		if (mask!=0) {
 			color=Machine->pens[(value&mask)?1:0];
-			plot_pixel(bitmap, x+xi, y+yi, color);
+			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
 		}
 		if (led[i]!='\r') xi++;
 		else { yi++, xi=0; }

@@ -501,7 +501,7 @@ static void apexc_draw_led(mame_bitmap *bitmap, int x, int y, int state)
 
 	for (yy=1; yy<7; yy++)
 		for (xx=1; xx<7; xx++)
-			plot_pixel(bitmap, x+xx, y+yy, Machine->pens[state ? 2 : 3]);
+			*BITMAP_ADDR16(bitmap, y+yy, x+xx) = Machine->pens[state ? 2 : 3];
 }
 
 /* write a single char on screen */
