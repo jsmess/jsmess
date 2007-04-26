@@ -774,7 +774,7 @@ void amstrad_plus_sprite_draw(mame_bitmap* scr_bitmap)
 	rect.min_y = display_y;//(((vid.registers[4] - 1) - (vid.registers[7] - 1))*4)+4;
 	rect.max_y = rect.min_y + (crtc6845_get_register(6) * (crtc6845_get_register(9)+1));
 
-	for(spr=0;spr<16;spr++)
+	for(spr = 15; spr >= 0; spr--)
 	{
 		sprptr = 0x2000 + (8*spr);
 		xmag = (amstrad_plus_asic_ram[sprptr+4] & 0x0c) >> 2;

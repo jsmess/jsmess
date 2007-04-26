@@ -10,6 +10,8 @@ New System Drivers Supported (in no particular order):
 
 System Driver Changes:
 ----------------------
+- [AMSTRAD] Fixed sprite order.  [Barry Rodewald]
+
 - [MAC512/MACPLUS] Fixed video timing, booting from SCSI harddisk works 
   once again. [R. Belmont]
 
