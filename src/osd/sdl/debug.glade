@@ -150,7 +150,7 @@
 		      <property name="label" translatable="yes">Step Over</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_step_over_activate" last_modification_time="Sat, 17 Sep 2005 23:37:00 GMT"/>
-		      <accelerator key="F10" modifiers="0" signal="activate"/>
+		      <accelerator key="F9" modifiers="0" signal="activate"/>
 		    </widget>
 		  </child>
 
@@ -217,7 +217,7 @@
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Raw Opcodes</property>
 		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
+		      <property name="active">True</property>
 		      <accelerator key="r" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 		    </widget>
 		  </child>
@@ -227,7 +227,7 @@
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Encryped Opcodes</property>
 		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
+		      <property name="active">True</property>
 		      <property name="group">raw_opcodes</property>
 		      <accelerator key="e" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 		    </widget>
@@ -238,7 +238,7 @@
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Comments</property>
 		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
+		      <property name="active">True</property>
 		      <property name="group">raw_opcodes</property>
 		      <accelerator key="c" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 		    </widget>

@@ -180,7 +180,7 @@ create_debugmain (void)
   gtk_widget_show (step_over);
   gtk_container_add (GTK_CONTAINER (menuitem4_menu), step_over);
   gtk_widget_add_accelerator (step_over, "activate", accel_group,
-                              GDK_F10, (GdkModifierType) 0,
+                              GDK_F9, (GdkModifierType) 0,
                               GTK_ACCEL_VISIBLE);
 
   step_out = gtk_menu_item_new_with_mnemonic ("Step Out");
@@ -235,6 +235,7 @@ create_debugmain (void)
   gtk_widget_add_accelerator (raw_opcodes, "activate", accel_group,
                               GDK_r, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (raw_opcodes), TRUE);
 
   enc_opcodes = gtk_radio_menu_item_new_with_mnemonic (raw_opcodes_group, "Encryped Opcodes");
   raw_opcodes_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (enc_opcodes));
@@ -244,6 +245,7 @@ create_debugmain (void)
   gtk_widget_add_accelerator (enc_opcodes, "activate", accel_group,
                               GDK_e, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (enc_opcodes), TRUE);
 
   comments = gtk_radio_menu_item_new_with_mnemonic (raw_opcodes_group, "Comments");
   raw_opcodes_group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (comments));
@@ -253,6 +255,7 @@ create_debugmain (void)
   gtk_widget_add_accelerator (comments, "activate", accel_group,
                               GDK_c, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
+  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (comments), TRUE);
 
   hbox1 = gtk_hbox_new (FALSE, 0);
   gtk_widget_set_name (hbox1, "hbox1");

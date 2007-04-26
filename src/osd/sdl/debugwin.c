@@ -42,7 +42,8 @@ typedef struct {
 	int cpu;
 } debugmain_i;
 
-typedef struct {
+typedef struct memorywin_i {
+	struct memorywin_i *next;
 	GtkWidget *win;
 	DView *memory_w;
 	edit ed;
@@ -50,7 +51,8 @@ typedef struct {
 	debug_view *memory;
 } memorywin_i;
 
-typedef struct {
+typedef struct disasmwin_i {
+	struct disasmwin_i *next;
 	GtkWidget *win;
 	DView *disasm_w;
 	edit ed;
@@ -58,7 +60,8 @@ typedef struct {
 	debug_view *disasm;
 } disasmwin_i;
 
-typedef struct {
+typedef struct logwin_i {
+	struct logwin_i *next;
 	GtkWidget *win;
 	DView *log_w;
 	debug_view *log;
@@ -79,10 +82,31 @@ typedef struct memorycombo_item
 
 
 static debugmain_i *dmain;
+static memorywin_i *memorywin_list;
+static disasmwin_i *disasmwin_list;
+static logwin_i    *logwin_list;
+
 static memorycombo_item *memorycombo;
 
 static void debugmain_init(void);
 
+static void debugwin_show(int show)
+{
+	memorywin_i *p1;
+	disasmwin_i *p2;
+	logwin_i *p3;
+	void (*f)(GtkWidget *widget) = show ? gtk_widget_show : gtk_widget_hide;
+	if(dmain) {
+		f(dmain->win);
+		//		dview_set_updatable(dmain->console_w, show);
+	}
+	for(p1 = memorywin_list; p1; p1 = p1->next)
+		f(p1->win);
+	for(p2 = disasmwin_list; p2; p2 = p2->next)
+		f(p2->win);
+	for(p3 = logwin_list; p3; p3 = p3->next)
+		f(p3->win);
+}
 
 //============================================================
 //  memory_determine_combo_items
@@ -299,7 +323,7 @@ static void edit_del(edit *e)
 		hentry *he = h->h;
 		free(h->e);
 		free(h);
-		he = h;
+		h = he;
 	}
 }
 
@@ -373,6 +397,7 @@ void osd_wait_for_debugger(void)
 	// update the views in the console to reflect the current CPU
 	debugmain_set_cpunum(cpu_getactivecpu());
 
+	debugwin_show(1);
 	gtk_main_iteration();
 }
 
@@ -473,6 +498,13 @@ static void memorywin_process_string(const char *str, void *memp)
 static void memorywin_destroy(GtkObject *obj, gpointer user_data)
 {
 	memorywin_i *mem = user_data;
+	memorywin_i **p = &memorywin_list;
+	while(*p != mem)
+		p = &(*p)->next;
+	if(mem->next)
+		*p = mem->next;
+	else
+		*p = 0;
 	edit_del(&mem->ed);
 	free(mem);
 }
@@ -485,6 +517,8 @@ static void memorywin_new(void)
 
 	mem = malloc(sizeof(*mem));
 	memset(mem, 0, sizeof(*mem));
+	mem->next = memorywin_list;
+	memorywin_list = mem;
 	mem->win = create_memorywin();
 
 	mem->memory_w = DVIEW(lookup_widget(mem->win, "memoryview"));
@@ -613,6 +647,13 @@ static void disasmwin_process_string(const char *str, void *disp)
 static void disasmwin_destroy(GtkObject *obj, gpointer user_data)
 {
 	disasmwin_i *dis = user_data;
+	disasmwin_i **p = &disasmwin_list;
+	while(*p != dis)
+		p = &(*p)->next;
+	if(dis->next)
+		*p = dis->next;
+	else
+		*p = 0;
 	edit_del(&dis->ed);
 	free(dis);
 }
@@ -625,6 +666,8 @@ static void disasmwin_new(void)
 
 	dis = malloc(sizeof(*dis));
 	memset(dis, 0, sizeof(*dis));
+	dis->next = disasmwin_list;
+	disasmwin_list = dis;
 	dis->win = create_disasmwin();
 
 	dis->disasm_w = DVIEW(lookup_widget(dis->win, "disasmview"));
@@ -680,6 +723,13 @@ static void disasmwin_new(void)
 static void logwin_destroy(GtkObject *obj, gpointer user_data)
 {
 	logwin_i *log = user_data;
+	logwin_i **p = &logwin_list;
+	while(*p != log)
+		p = &(*p)->next;
+	if(log->next)
+		*p = log->next;
+	else
+		*p = 0;
 	free(log);
 }
 
@@ -689,6 +739,8 @@ static void logwin_new(void)
 
 	log = malloc(sizeof(*log));
 	memset(log, 0, sizeof(*log));
+	log->next = logwin_list;
+	logwin_list = log;
 	log->win = create_logwin();
 
 	log->log_w = DVIEW(lookup_widget(log->win, "logview"));
@@ -724,6 +776,8 @@ void on_run_activate(GtkMenuItem *item, gpointer user_data)
 
 void on_run_h_activate(GtkMenuItem *item, gpointer user_data)
 {
+	debugwin_show(0);
+	debug_cpu_go(~0);
 }
 
 void on_run_cpu_activate(GtkMenuItem *item, gpointer user_data)
