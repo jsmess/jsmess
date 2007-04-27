@@ -78,13 +78,34 @@ static WRITE8_HANDLER( onetwo_soundlatch_w )
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static void setColor(int offset)
+{
+		int r,g,b;
+		r=paletteram[offset]&0x1f;
+		g=paletteram_2[offset]&0x1f;
+		b=((paletteram[offset]&0x60)>>2)|((paletteram_2[offset]&0xe0)>>5);
+		palette_set_color(Machine,offset,r<<3,g<<3,b<<3);
+}
+
+static WRITE8_HANDLER(palette1_w)
+{
+	paletteram[offset]=data;
+	setColor(offset);
+}
+
+static WRITE8_HANDLER(palette2_w)
+{
+	paletteram_2[offset]=data;
+	setColor(offset);
+}
+
 /* Main CPU */
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(REGION_CPU1, 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc800, 0xc87f) AM_READWRITE(MRA8_RAM, paletteram_xBBBBBRRRRRGGGGG_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xc900, 0xc97f) AM_READWRITE(MRA8_RAM, paletteram_xBBBBBRRRRRGGGGG_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc800, 0xc87f) AM_READWRITE(MRA8_RAM, palette1_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc900, 0xc97f) AM_READWRITE(MRA8_RAM, palette2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, onetwo_fgram_w) AM_BASE(&fgram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -276,8 +297,8 @@ static MACHINE_DRIVER_START( onetwo )
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, 1056000*2)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -313,5 +334,5 @@ ROM_START( onetwoe )
 	ROM_LOAD( "sample", 0x000000, 0x40000, CRC(b10d3132) SHA1(42613e17b6a1300063b8355596a2dc7bcd903777) )
 ROM_END
 
-GAME( 1997, onetwo,       0, onetwo, onetwo, 0, ROT0, "Barko", "One + Two", GAME_IMPERFECT_COLORS )
-GAME( 1997, onetwoe, onetwo, onetwo, onetwo, 0, ROT0, "Barko", "One + Two (earlier)", GAME_IMPERFECT_COLORS )
+GAME( 1997, onetwo,       0, onetwo, onetwo, 0, ROT0, "Barko", "One + Two", 0 )
+GAME( 1997, onetwoe, onetwo, onetwo, onetwo, 0, ROT0, "Barko", "One + Two (earlier)", 0 )

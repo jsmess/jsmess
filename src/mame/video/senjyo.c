@@ -230,14 +230,14 @@ static void draw_bgbitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 			{
 				for (y = 0;y < 256;y++)
 				{
-					plot_pixel(bgbitmap, 255 - x, y, Machine->pens[384 + pen]);
+					*BITMAP_ADDR16(bgbitmap, y, 255 - x) = Machine->pens[384 + pen];
 				}
 			}
 			else
 			{
 				for (y = 0;y < 256;y++)
 				{
-					plot_pixel(bgbitmap, x, y, Machine->pens[384 + pen]);
+					*BITMAP_ADDR16(bgbitmap, y, x) = Machine->pens[384 + pen];
 				}
 			}
 
@@ -278,9 +278,7 @@ static void draw_radar(mame_bitmap *bitmap,const rectangle *cliprect)
 
 					if (sy >= cliprect->min_y && sy <= cliprect->max_y &&
 						sx >= cliprect->min_x && sx <= cliprect->max_x)
-						plot_pixel(bitmap,
-								   sx, sy,
-								   Machine->pens[offs < 0x200 ? 512 : 513]);
+						*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[offs < 0x200 ? 512 : 513];
 				}
 			}
 		}

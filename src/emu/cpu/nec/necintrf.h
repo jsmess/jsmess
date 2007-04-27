@@ -15,8 +15,4 @@ extern void v20_get_info(UINT32 state, cpuinfo *info);
 extern void v30_get_info(UINT32 state, cpuinfo *info);
 extern void v33_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef MAME_DEBUG
-extern unsigned Dasmnec(char* buffer, unsigned pc);
-#endif
-
 #endif

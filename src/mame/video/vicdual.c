@@ -11,19 +11,16 @@
 static UINT8 palette_bank;
 
 
-#define RGB32_BLACK		(0x00000000)
-#define RGB32_WHITE		(0x00ffffff)
-
-static pen_t colors_from_color_prom[] =
+static pen_t pens_from_color_prom[] =
 {
-	0x00000000,
-	0x0000ff00,
-	0x000000ff,
-	0x0000ffff,
-	0x00ff0000,
-	0x00ffff00,
-	0x00ff00ff,
-	0x00ffffff
+	RGB_BLACK,
+	MAKE_RGB(0x00, 0xff, 0x00),
+	MAKE_RGB(0x00, 0x00, 0xff),
+	MAKE_RGB(0x00, 0xff, 0xff),
+	MAKE_RGB(0xff, 0x00, 0x00),
+	MAKE_RGB(0xff, 0xff, 0x00),
+	MAKE_RGB(0xff, 0x00, 0xff),
+	RGB_WHITE
 };
 
 
@@ -43,7 +40,7 @@ VIDEO_UPDATE( vicdual_bw )
 
 	while (1)
 	{
-		pen_t col;
+		pen_t pen;
 
 		if ((x & 0x07) == 0)
 		{
@@ -60,8 +57,8 @@ VIDEO_UPDATE( vicdual_bw )
 		}
 
 		/* plot the current pixel */
-		col = (video_data & 0x80) ? RGB32_WHITE : RGB32_BLACK;
-		plot_pixel(bitmap, x, y, col);
+		pen = (video_data & 0x80) ? RGB_WHITE : RGB_BLACK;
+		*BITMAP_ADDR32(bitmap, y, x) = pen;
 
 		/* next pixel */
 		video_data = video_data << 1;
@@ -91,12 +88,12 @@ VIDEO_UPDATE( vicdual_color )
 	UINT8 x = 0;
 	UINT8 y = cliprect->min_y;
 	UINT8 video_data = 0;
-	pen_t back_color = 0;
-	pen_t fore_color = 0;
+	pen_t back_pen = 0;
+	pen_t fore_pen = 0;
 
 	while (1)
 	{
-		pen_t col;
+		pen_t pen;
 
 		if ((x & 0x07) == 0)
 		{
@@ -113,13 +110,13 @@ VIDEO_UPDATE( vicdual_color )
 
 			/* get the foreground and background colors from the PROM */
 			offs = (char_code >> 5) | (palette_bank << 3);
-			back_color = colors_from_color_prom[(color_prom[offs] >> 1) & 0x07];
-			fore_color = colors_from_color_prom[(color_prom[offs] >> 5) & 0x07];
+			back_pen = pens_from_color_prom[(color_prom[offs] >> 1) & 0x07];
+			fore_pen = pens_from_color_prom[(color_prom[offs] >> 5) & 0x07];
 		}
 
 		/* plot the current pixel */
-		col = (video_data & 0x80) ? fore_color : back_color;
-		plot_pixel(bitmap, x, y, col);
+		pen = (video_data & 0x80) ? fore_pen : back_pen;
+		*BITMAP_ADDR32(bitmap, y, x) = pen;
 
 		/* next pixel */
 		video_data = video_data << 1;

@@ -17,6 +17,9 @@ static int num_cgboards;
 
 static UINT32 *dsp_shared_ram[MAX_CG_BOARDS];
 
+#define DSP_BANK_SIZE			0x10000
+#define DSP_BANK_SIZE_WORD		(DSP_BANK_SIZE / 4)
+
 static UINT32 dsp_state[MAX_CG_BOARDS];
 static UINT32 pci_bridge_enable[MAX_CG_BOARDS];
 static UINT32 nwk_device_sel[MAX_CG_BOARDS];
@@ -44,7 +47,7 @@ void init_konami_cgboard(int num_boards, int type)
 	for (i=0; i < num_boards; i++)
 	{
 		dsp_comm_ppc[i][0] = 0x00;
-		dsp_shared_ram[i] = auto_malloc(0x20000);
+		dsp_shared_ram[i] = auto_malloc(DSP_BANK_SIZE * 2);
 		dsp_shared_ram_bank[i] = 0;
 
 		dsp_state[i] = 0x80;
@@ -181,7 +184,7 @@ READ32_HANDLER( cgboard_dsp_shared_r_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-		return dsp_shared_ram[cgboard_id][offset + (dsp_shared_ram_bank[cgboard_id] * 0x4000)];
+		return dsp_shared_ram[cgboard_id][offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)];
 	}
 	else
 	{
@@ -194,7 +197,7 @@ WRITE32_HANDLER( cgboard_dsp_shared_w_ppc )
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
 		cpu_trigger(10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
-		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * 0x4000)));
+		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
 	}
 }
 
@@ -216,6 +219,7 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 
 	switch (cgboard_type)
 	{
+		case CGBOARD_TYPE_ZR107:
 		case CGBOARD_TYPE_GTICLUB:
 		{
 			//cpunum_set_input_line(2, SHARC_INPUT_FLAG0, ASSERT_LINE);
@@ -283,11 +287,11 @@ static UINT32 dsp_shared_ram_r_sharc(int board, int offset)
 
 	if (offset & 0x1)
 	{
-		return (dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * 0x4000)] >> 0) & 0xffff;
+		return (dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)] >> 0) & 0xffff;
 	}
 	else
 	{
-		return (dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * 0x4000)] >> 16) & 0xffff;
+		return (dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)] >> 16) & 0xffff;
 	}
 }
 
@@ -296,13 +300,13 @@ static void dsp_shared_ram_w_sharc(int board, int offset, UINT32 data)
 //  printf("dsp_shared_w: (board %d) %08X, %08X\n", cgboard_id, offset, data);
 	if (offset & 0x1)
 	{
-		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * 0x4000)] &= 0xffff0000;
-		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * 0x4000)] |= (data & 0xffff);
+		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)] &= 0xffff0000;
+		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)] |= (data & 0xffff);
 	}
 	else
 	{
-		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * 0x4000)] &= 0x0000ffff;
-		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * 0x4000)] |= ((data & 0xffff) << 16);
+		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)] &= 0x0000ffff;
+		dsp_shared_ram[board][(offset >> 1) + ((dsp_shared_ram_bank[board] ^ 1) * DSP_BANK_SIZE_WORD)] |= ((data & 0xffff) << 16);
 	}
 }
 

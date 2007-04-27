@@ -733,19 +733,19 @@ VIDEO_UPDATE( glfgreat )
 	if (layerpri[0] >= 0x30 && layerpri[1] < 0x30)
 	{
 		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1);
-		glfgreat_pixel = read_pixel(bitmap,0x105,0x80);
+		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x105,0x80);
 	}
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
 	if (layerpri[1] >= 0x30 && layerpri[2] < 0x30)
 	{
 		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1);
-		glfgreat_pixel = read_pixel(bitmap,0x105,0x80);
+		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x105,0x80);
 	}
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
 	if (layerpri[2] >= 0x30)
 	{
 		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1);
-		glfgreat_pixel = read_pixel(bitmap,0x105,0x80);
+		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x105,0x80);
 	}
 
 	K053245_sprites_draw(0, bitmap,cliprect);

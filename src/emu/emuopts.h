@@ -124,6 +124,7 @@ extern const options_entry mame_core_options[];
 ***************************************************************************/
 
 void mame_options_init(const options_entry *entries);
+void mame_options_exit(void);
 core_options *mame_options(void);
 
 #endif	/* __EMUOPTS_H__ */

@@ -27,7 +27,7 @@ WRITE16_HANDLER( galspnbl_bgvideoram_w )
 	sx = offset % 512;
 	sy = offset / 512;
 
-	plot_pixel(tmpbitmap,sx,sy,Machine->pens[1024 + (data >> 1)]);
+	*BITMAP_ADDR16(tmpbitmap, sy, sx) = Machine->pens[1024 + (data >> 1)];
 }
 
 WRITE16_HANDLER( galspnbl_scroll_w )

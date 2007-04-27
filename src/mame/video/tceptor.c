@@ -588,12 +588,10 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int spr
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-				if (read_pixel(bitmap, x, y) == SPR_MASK_COLOR)
+				if (*BITMAP_ADDR16(bitmap, y, x) == SPR_MASK_COLOR)
 				{
-					int color = read_pixel(temp_bitmap, x, y);
-
 					// restore pixel
-					plot_pixel(bitmap, x, y, color);
+					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(temp_bitmap, y, x);
 				}
 	}
 }

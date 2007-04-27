@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/nc.h"
+#include "plotpixl.h"
 
 /***************************************************************************
   Start the video hardware emulation.

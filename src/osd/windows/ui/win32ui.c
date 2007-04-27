@@ -798,7 +798,6 @@ static void CopyOptions(core_options *pDestOpts, const options_entry *entrylist,
 	};
 
 	char command_name[128];
-	char *s;
 	int is_blacklisted, i;
 
 	/* loop over entries until we hit a NULL name */
@@ -808,9 +807,9 @@ static void CopyOptions(core_options *pDestOpts, const options_entry *entrylist,
 		{
 			// determine command name
 			snprintf(command_name, ARRAY_LENGTH(command_name), "%s", entrylist->name);
-			s = strchr(command_name, ';');
-			if (s)
-				*s = '\0';
+			for (i = 0; command_name[i] && !strchr(";(", command_name[i]); i++)
+				;
+			command_name[i] = '\0';
 
 			// check to see if this argument is blacklisted
 			is_blacklisted = FALSE;
@@ -877,7 +876,7 @@ static DWORD RunMAME(int nGameIndex)
 #endif // MESS
 
 	// clear out existing MAME options
-	options_free(mame_options());
+	mame_options_exit();
 	mame_options_init(mame_win_options);
 
 	// retrieve the options we're going to pass

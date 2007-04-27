@@ -269,7 +269,7 @@ static void redclash_draw_bullets( mame_bitmap *bitmap )
 
 		if (sx >= Machine->screen[0].visarea.min_x && sx <= Machine->screen[0].visarea.max_x &&
 				sy >= Machine->screen[0].visarea.min_y && sy <= Machine->screen[0].visarea.max_y)
-			plot_pixel(bitmap, sx, sy, Machine->pens[0x0e]);
+			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[0x0e];
 	}
 }
 
@@ -392,7 +392,7 @@ void redclash_draw_stars( mame_bitmap *bitmap, UINT8 palette_offset, UINT8 sraid
 				if ((xloc>=firstx) && (xloc<=lastx))
 				{
 					star_color = (state >> 9) & 0x1f;
-					plot_pixel(bitmap,xloc,yloc,Machine->pens[palette_offset+star_color]);
+					*BITMAP_ADDR16(bitmap, yloc, xloc) = Machine->pens[palette_offset+star_color];
 				}
 			}
 		}

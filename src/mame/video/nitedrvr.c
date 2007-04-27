@@ -54,7 +54,7 @@ static void nitedrvr_draw_box( mame_bitmap *bitmap, int bx, int by, int ex, int 
 		for (x = bx; x < ex; x++)
 		{
 			if ((y < 256) && (x < 256))
-				plot_pixel(bitmap, x, y, Machine->pens[1]);
+				*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[1];
 		}
 	}
 

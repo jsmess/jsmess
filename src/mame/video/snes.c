@@ -2185,15 +2185,15 @@ static UINT8 snes_dbg_video( mame_bitmap *bitmap, UINT16 curline )
 		}
 
 			/* Draw some useful information about the back/fixed colours and current bg mode etc. */
-	plot_pixel( bitmap, SNES_DBG_HORZ_POS - 26, curline, Machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0xc0) >> 6]] );
-	plot_pixel( bitmap, SNES_DBG_HORZ_POS - 24, curline, Machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0x30) >> 4]] );
-	plot_pixel( bitmap, SNES_DBG_HORZ_POS - 22, curline, Machine->pens[dbg_mode_colours[snes_ram[BGMODE] & 0x7]] );
-	plot_pixel( bitmap, SNES_DBG_HORZ_POS - 12, curline, Machine->pens[32767] );
-	plot_pixel( bitmap, SNES_DBG_HORZ_POS - 2, curline, Machine->pens[32767] );
+			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 26) = Machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0xc0) >> 6]];
+			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 24) = Machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0x30) >> 4]];
+			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 22) = Machine->pens[dbg_mode_colours[snes_ram[BGMODE] & 0x7]];
+			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 12) = Machine->pens[32767];
+			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 2 ) = Machine->pens[32767];
 			for( ii = 0; ii < 5; ii++ )
 			{
-		plot_pixel( bitmap, SNES_DBG_HORZ_POS - 19 + ii, curline, Machine->remapped_colortable[0] );
-		plot_pixel( bitmap, SNES_DBG_HORZ_POS - 9 + ii, curline, Machine->remapped_colortable[FIXED_COLOUR] );
+			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 19 + ii) = Machine->remapped_colortable[0];
+			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 9  + ii) = Machine->remapped_colortable[FIXED_COLOUR];
 			}
 			/* Draw window positions */
 			scanlines[MAINSCREEN].buffer[snes_ram[WH0]] = Machine->pens[dbg_mode_colours[0]];

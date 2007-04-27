@@ -703,7 +703,7 @@ start_offset-=48;
 			if (col<palette_base) col=palette_base;
 			if (col>palette_base+127) col=palette_base+127;
 
-			plot_pixel(bitmap,x,y,Machine->pens[col]);
+			*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[col];
 		}
 	}
 }
@@ -835,9 +835,9 @@ offset is from last pixel of first road segment?
 			int col = linedata[0]&0xf;
 			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
 			if (shadow)
-				plot_pixel(bitmap,x,y,Machine->pens[768 + pal*16 + col]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[768 + pal*16 + col];
 			else
-				plot_pixel(bitmap,x,y,Machine->pens[256 + pal*16 + col]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[256 + pal*16 + col];
 		}
 
 		/* If startpos is negative, clip it and adjust the sampling position accordingly */
@@ -859,9 +859,9 @@ offset is from last pixel of first road segment?
 			//  col=linedata[0x7f]&0xf;
 
 			if (shadow)
-				plot_pixel(bitmap,x,y,Machine->pens[768 + pal*16 + col]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[768 + pal*16 + col];
 			else
-				plot_pixel(bitmap,x,y,Machine->pens[256 + pal*16 + col]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[256 + pal*16 + col];
 
 			samplePos+=step;
 		}
@@ -890,9 +890,9 @@ offset is from last pixel of first road segment?
 			//  col=linedata[0x7f]&0xf;
 
 			if (shadow)
-				plot_pixel(bitmap,x,y,Machine->pens[768 + pal*16 + col + 32]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[768 + pal*16 + col + 32];
 			else
-				plot_pixel(bitmap,x,y,Machine->pens[256 + pal*16 + col + 32]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[256 + pal*16 + col + 32];
 		}
 
 		if (endPos<0) {
@@ -914,9 +914,9 @@ offset is from last pixel of first road segment?
 				col=linedata[0x7f + 0x200]&0xf;
 
 			if (shadow)
-				plot_pixel(bitmap,x,y,Machine->pens[768 + pal*16 + 32 + col]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[768 + pal*16 + col + 32];
 			else
-				plot_pixel(bitmap,x,y,Machine->pens[256 + pal*16 + 32 + col]);
+				*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[256 + pal*16 + col + 32];
 
 			samplePos+=step;
 		}

@@ -723,7 +723,7 @@ VIDEO_UPDATE( shanghai )
 		for (x = 0;x < 384;x++)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			plot_pixel(bitmap,x,y,machine->pens[HD63484_ram[b]]);
+			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[HD63484_ram[b]];
 			b++;
 		}
 	}
@@ -743,7 +743,8 @@ VIDEO_UPDATE( shanghai )
 			{
 				b &= (HD63484_RAM_SIZE-1);
 				if (x <= w && x + sx >= 0 && x+sx < 384)
-					plot_pixel(bitmap,x+sx,y,machine->pens[HD63484_ram[b]]);
+					*BITMAP_ADDR16(bitmap, y, x+sx) = machine->pens[HD63484_ram[b]];
+
 				b++;
 			}
 		}

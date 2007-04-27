@@ -476,7 +476,7 @@ static void zoom_sprite( mame_bitmap *bitmap,int big,
 					int pen = colortable[src[offs/2 ^ flipx]];
 
 					if (pen != 0x1f)
-						plot_pixel(bitmap,xx,yy,pen);
+						*BITMAP_ADDR16(bitmap, yy, xx) = pen;
 				}
 				offs++;
 

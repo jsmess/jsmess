@@ -382,6 +382,7 @@ const game_driver * const drivers[] =
 	DRIVER( legion )	/* (c) 1986 */
 	DRIVER( legiono )	/* (c) 1986 */
 	DRIVER( terraf )	/* (c) 1987 */
+	DRIVER( terrafa )	/* (c) 1987 */
 	DRIVER( terrafu )	/* (c) 1987 Nichibutsu USA */
 	DRIVER( kodure )	/* (c) 1987 (Japan) */
 	DRIVER( armedf )	/* (c) 1988 */
@@ -2470,7 +2471,8 @@ V-V                           TP-027
 	DRIVER( xmcotaj1 )	/* 17/12/1994 (c) 1994 (Japan) */
 	DRIVER( xmcotaa )	/* 17/12/1994 (c) 1994 (Asia) */
 	DRIVER( xmcotajr )	/* 08/12/1994 (c) 1994 (Japan Rent) */
-	DRIVER( nwarr )		/* 06/04/1995 (c) 1995 (US) */
+	DRIVER( nwarr )		/* 16/03/1995 (c) 1995 (Euro) */
+	DRIVER( nwarru )	/* 06/04/1995 (c) 1995 (US) */
 	DRIVER( nwarrh )	/* 03/04/1995 (c) 1995 (Hispanic) */
 	DRIVER( nwarrb )	/* 03/04/1995 (c) 1995 (Brazil) */
 	DRIVER( vhuntj )	/* 02/03/1995 (c) 1995 (Japan) */
@@ -3502,6 +3504,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( sonic )		/* (c) 1992 (Japan) */
 	DRIVER( sonicp )	/* (c) 1992 (Japan) */
 	DRIVER( jpark )		/* (c) 1994 */
+	DRIVER( kokoroj2 )	/* (c) 1994 */
 	DRIVER( ga2 )		/* (c) 1992 (World) */
 	DRIVER( ga2u )		/* (c) 1992 (US) */
 	DRIVER( ga2j )		/* (c) 1992 (Japan) */

@@ -85,11 +85,11 @@ static void updatepixels(int x,int y)
 
 	if (front>>8) color = front>>8;
 	else color = (back>>8) + 256;
-	plot_pixel(tmpbitmap, x, y, Machine->pens[color]);
+	*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[color];
 
 	if (front&0xff) color = front&0xff;
 	else color = (back&0xff) + 256;
-	plot_pixel(tmpbitmap, x+1, y, Machine->pens[color]);
+	*BITMAP_ADDR16(tmpbitmap, y, x+1) = Machine->pens[color];
 }
 
 
@@ -112,30 +112,26 @@ VIDEO_UPDATE( blockout )
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	{
-		int x,y,color;
+		int x,y;
 
-
-		color = machine->pens[512];
+		pen_t color = machine->pens[512];
 
 		for (y = 0;y < 256;y++)
 		{
 			for (x = 0;x < 320;x+=8)
 			{
-				int d;
-
-
-				d = blockout_frontvideoram[y*64+(x/8)];
+				int d = blockout_frontvideoram[y*64+(x/8)];
 
 				if (d)
 				{
-					if (d&0x80) plot_pixel(bitmap, x  , y, color);
-					if (d&0x40) plot_pixel(bitmap, x+1, y, color);
-					if (d&0x20) plot_pixel(bitmap, x+2, y, color);
-					if (d&0x10) plot_pixel(bitmap, x+3, y, color);
-					if (d&0x08) plot_pixel(bitmap, x+4, y, color);
-					if (d&0x04) plot_pixel(bitmap, x+5, y, color);
-					if (d&0x02) plot_pixel(bitmap, x+6, y, color);
-					if (d&0x01) plot_pixel(bitmap, x+7, y, color);
+					if (d&0x80) *BITMAP_ADDR16(bitmap, y, x+0) = color;
+					if (d&0x40) *BITMAP_ADDR16(bitmap, y, x+1) = color;
+					if (d&0x20) *BITMAP_ADDR16(bitmap, y, x+2) = color;
+					if (d&0x10) *BITMAP_ADDR16(bitmap, y, x+3) = color;
+					if (d&0x08) *BITMAP_ADDR16(bitmap, y, x+4) = color;
+					if (d&0x04) *BITMAP_ADDR16(bitmap, y, x+5) = color;
+					if (d&0x02) *BITMAP_ADDR16(bitmap, y, x+6) = color;
+					if (d&0x01) *BITMAP_ADDR16(bitmap, y, x+7) = color;
 				}
 			}
 		}

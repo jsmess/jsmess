@@ -193,7 +193,7 @@ static void draw_center(mame_bitmap *bitmap, const rectangle *cliprect)
 			if (((sy + y) & color_center_bot & 3) == (sy & color_center_bot & 3))
 				for (x = 0; x < 256; x++)
 					if (0 != (x & 16) || 0 != (center_h_shift_space & 1))
-						plot_pixel(bitmap, (sx + x) & 255, sy + y, Machine->pens[color]);
+						*BITMAP_ADDR16(bitmap, sy + y, (sx + x) & 255) = Machine->pens[color];
 		}
 }
 

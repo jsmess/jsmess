@@ -66,7 +66,7 @@ static void plot_pixel_sbw(int x, int y, int col)
 		y = 255-y;
 		x = 247-x;
 	}
-	plot_pixel(tmpbitmap,x,y,Machine->pens[col]);
+	*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[col];
 }
 
 static WRITE8_HANDLER( sbw_videoram_w )

@@ -95,10 +95,12 @@ WRITE8_HANDLER( enigma2a_videoram_w )
 	x = 255 - col;
 	for (i = 0; i < 8; i++)
 	{
+		pen_t pen = (data&0x80) ? RGB_WHITE : RGB_BLACK;
+
 		if(!flipscreen)
-			plot_pixel(tmpbitmap, x, 255 - y, Machine->pens[(data&0x80)?1:0]);
+			*BITMAP_ADDR32(tmpbitmap, 255 - y, x) = pen;
 		else
-			plot_pixel(tmpbitmap, 255+15-x, y+31, Machine->pens[(data&0x80)?1:0]);
+			*BITMAP_ADDR32(tmpbitmap, y+31, 255+15-x) = pen;
 		x++;
 		data <<= 1;
 	}
@@ -211,7 +213,7 @@ VIDEO_UPDATE( enigma2 )
 		for(x=0;x<32;x++)
 		{
 		 	offs = y * 32 + x + 1024 * ((blink_cnt>>3)&1);
-			plot_pixel(bitmap,x*8,255-y*8,machine->pens[memory_region(REGION_USER1)[offs]]);
+			*BITMAP_ADDR16(bitmap, 255-y*8, x*8) = machine->pens[memory_region(REGION_USER1)[offs]];
 		}
 
 	/* gfx */
@@ -228,9 +230,9 @@ VIDEO_UPDATE( enigma2 )
 			if( data & 0x80 )
 			{
 				if(!flipscreen)
-					plot_pixel(bitmap, x, 255 - y, memory_region(REGION_PROMS)[((y+32) >> 3 << 5) + (col >> 3)] & 0x07);
+					*BITMAP_ADDR16(bitmap, 255 - y, x) = memory_region(REGION_PROMS)[((y+32) >> 3 << 5) + (col >> 3)] & 0x07;
 				else
-					plot_pixel(bitmap, 255+15-x, y+31, memory_region(REGION_PROMS)[((35-((y+32) >> 3)) << 5) + (31-(col >> 3))+0x400] & 0x07);
+					*BITMAP_ADDR16(bitmap, y+31, 255+15-x) = memory_region(REGION_PROMS)[((35-((y+32) >> 3)) << 5) + (31-(col >> 3))+0x400] & 0x07;
 			}
 
 			x++;
@@ -392,12 +394,9 @@ static MACHINE_DRIVER_START( enigma2a )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 4*8, 32*8-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 

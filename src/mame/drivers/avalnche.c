@@ -37,15 +37,86 @@
 
 /*************************************
  *
- *  Palette generation
+ *  Interrupt generation
  *
  *************************************/
 
-static PALETTE_INIT( avalnche )
+static INTERRUPT_GEN( avalnche_interrupt )
 {
-	/* 2 colors in the palette: black & white */
-	palette_set_color(machine,0,0x00,0x00,0x00);
-	palette_set_color(machine,1,0xff,0xff,0xff);
+	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
+
+static UINT8 avalance_video_inverted;
+
+
+static VIDEO_UPDATE( avalnche )
+{
+	offs_t offs;
+
+	for (offs = 0; offs < videoram_size; offs++)
+	{
+		int i;
+
+		UINT8 x = offs << 3;
+		int y = offs >> 5;
+		UINT8 data = videoram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen;
+
+			if (avalance_video_inverted)
+				pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+			else
+				pen = (data & 0x80) ? RGB_BLACK : RGB_WHITE;
+
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			data = data << 1;
+			x = x + 1;
+		}
+	}
+
+	return 0;
+}
+
+
+static WRITE8_HANDLER( avalance_video_invert_w )
+{
+	avalance_video_inverted = data & 0x01;
+}
+
+
+
+/*************************************
+ *
+ *  Lamp handling
+ *
+ *************************************/
+
+static WRITE8_HANDLER( avalance_credit_1_lamp_w )
+{
+	set_led_status(0, data & 0x01);
+}
+
+
+static WRITE8_HANDLER( avalance_credit_2_lamp_w )
+{
+	set_led_status(1, data & 0x01);
+}
+
+
+static WRITE8_HANDLER( avalance_start_lamp_w )
+{
+	set_led_status(2, data & 0x01);
 }
 
 
@@ -58,12 +129,20 @@ static PALETTE_INIT( avalnche )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(MRA8_RAM, avalnche_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size) /* RAM SEL */
-	AM_RANGE(0x2000, 0x2fff) AM_READ(avalnche_input_r) /* INSEL */
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(MWA8_NOP) /* WATCHDOG */
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(avalnche_output_w) /* OUTSEL */
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(avalnche_noise_amplitude_w) /* SOUNDLVL */
-	AM_RANGE(0x6000, 0x7fff) AM_ROM /* ROM1-ROM2 */
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ(input_port_0_r)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ(input_port_1_r)
+	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ(input_port_2_r)
+	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READ(MRA8_NOP)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
+	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_WRITE(avalnche_attract_enable_w)
+	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
+	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_2_lamp_w)
+	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_WRITE(avalnche_audio_w)
+	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE(avalance_start_lamp_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(avalnche_noise_amplitude_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -74,7 +153,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( avalnche )
+static INPUT_PORTS_START( avalnche )
 	PORT_START_TAG("IN0")
 	PORT_BIT (0x03, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Spare */
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coinage ) )
@@ -109,7 +188,7 @@ INPUT_PORTS_START( avalnche )
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( cascade )
+static INPUT_PORTS_START( cascade )
 	PORT_START_TAG("IN0")
 	PORT_BIT (0x03, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Spare */
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coinage ) )
@@ -144,6 +223,7 @@ INPUT_PORTS_START( cascade )
 INPUT_PORTS_END
 
 
+
 /*************************************
  *
  *  Machine driver
@@ -162,14 +242,12 @@ static MACHINE_DRIVER_START( avalnche )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_VIDEO_UPDATE(avalnche)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MDRV_PALETTE_LENGTH(2)
-
-	MDRV_PALETTE_INIT(avalnche)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(avalnche)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

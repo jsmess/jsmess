@@ -97,8 +97,8 @@ WRITE8_HANDLER( superqix_bitmapram_w )
 
 		superqix_bitmapram[offset] = data;
 
-		plot_pixel(fg_bitmap[0], x,   y, Machine->pens[data >> 4]);
-		plot_pixel(fg_bitmap[0], x+1, y, Machine->pens[data & 0x0f]);
+		*BITMAP_ADDR16(fg_bitmap[0], y, x + 0) = Machine->pens[data >> 4];
+		*BITMAP_ADDR16(fg_bitmap[0], y, x + 1) = Machine->pens[data & 0x0f];
 	}
 }
 
@@ -111,8 +111,8 @@ WRITE8_HANDLER( superqix_bitmapram2_w )
 
 		superqix_bitmapram2[offset] = data;
 
-		plot_pixel(fg_bitmap[1], x,   y, Machine->pens[data >> 4]);
-		plot_pixel(fg_bitmap[1], x+1, y, Machine->pens[data & 0x0f]);
+		*BITMAP_ADDR16(fg_bitmap[1], y, x + 0) = Machine->pens[data >> 4];
+		*BITMAP_ADDR16(fg_bitmap[1], y, x + 1) = Machine->pens[data & 0x0f];
 	}
 }
 

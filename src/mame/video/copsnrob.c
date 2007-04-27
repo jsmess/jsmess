@@ -154,7 +154,7 @@ VIDEO_UPDATE( copsnrob )
                 {
                     if (copsnrob_bulletsram[y] & mask2)
                     {
-                        plot_pixel(bitmap, 256-x, y, machine->pens[1]);
+						*BITMAP_ADDR16(bitmap, y, 256-x) = machine->pens[1];
                     }
                 }
             }

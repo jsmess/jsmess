@@ -232,10 +232,10 @@ VIDEO_UPDATE(ssfindo)
 			for(y=0;y<256;y++)
 				for(x=0;x<320;x+=4)
 				{
-					plot_pixel(bitmap,x+1,y,vram[s]&0xff);
-					plot_pixel(bitmap,x+2,y,(vram[s]>>8)&0xff);
-					plot_pixel(bitmap,x+3,y,(vram[s]>>16)&0xff);
-					plot_pixel(bitmap,x+4,y,(vram[s]>>24)&0xff);
+					*BITMAP_ADDR16(bitmap, y, x+1) = vram[s]&0xff;
+					*BITMAP_ADDR16(bitmap, y, x+2) = (vram[s]>>8)&0xff;
+					*BITMAP_ADDR16(bitmap, y, x+3) = (vram[s]>>16)&0xff;
+					*BITMAP_ADDR16(bitmap, y, x+4) = (vram[s]>>24)&0xff;
 					s++;
 				}
 		}

@@ -730,7 +730,7 @@ VIDEO_UPDATE( tubep )
 				if (sp_data!=0x0f)
 					bg_data = prom2[sp_data | color_A4];
 
-				plot_pixel(bitmap,h,v, pens[ bg_data*64 + romB_data_h ] );
+				*BITMAP_ADDR16(bitmap, v, h) = pens[ bg_data*64 + romB_data_h ];
 			}
 		}
 	}
@@ -833,7 +833,7 @@ VIDEO_UPDATE( rjammer )
 
 				if (sp_data!=0x0f)
 				{
-					plot_pixel(bitmap,h,v,pens[0x00+ sp_data ] );
+					*BITMAP_ADDR16(bitmap, v, h) = pens[0x00+ sp_data ];
 				}
 				else
 				{
@@ -892,7 +892,7 @@ VIDEO_UPDATE( rjammer )
 					color_bank =  (pal14h4_pin13 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) & (((bg_data&0x02)>>1)^1) &  (bg_data&0x01)    )
 								| (pal14h4_pin18 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) &  ((bg_data&0x02)>>1)    & ((bg_data&0x01)^1) )
 								| (pal14h4_pin19);
-					plot_pixel(bitmap,h,v,pens[0x20+ color_bank*0x10 + bg_data ] );
+					*BITMAP_ADDR16(bitmap, v, h) = pens[0x20+ color_bank*0x10 + bg_data ];
 				}
 			}
 		}

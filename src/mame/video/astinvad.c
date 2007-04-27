@@ -32,11 +32,11 @@ static void plot_byte(int x, int y, int data, int col)
 	{
 		if (flip_screen)
 		{
-			plot_pixel(tmpbitmap, 255 - (x + i), 255 - y, (data & 1) ? col : 0);
+			*BITMAP_ADDR16(tmpbitmap, 255 - y, 255 - (x + i)) = (data & 1) ? col : 0;
 		}
 		else
 		{
-			plot_pixel(tmpbitmap, x + i, y, (data & 1) ? col : 0);
+			*BITMAP_ADDR16(tmpbitmap, y, x + i) = (data & 1) ? col : 0;
 		}
 
 		data >>= 1;

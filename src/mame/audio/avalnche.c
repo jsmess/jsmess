@@ -7,6 +7,55 @@
 #include "avalnche.h"
 #include "sound/discrete.h"
 
+
+/* Discrete Sound Input Nodes */
+#define AVALNCHE_AUD0_EN			NODE_01
+#define AVALNCHE_AUD1_EN			NODE_02
+#define AVALNCHE_AUD2_EN			NODE_03
+#define AVALNCHE_SOUNDLVL_DATA		NODE_04
+#define AVALNCHE_ATTRACT_EN			NODE_05
+
+
+
+/***************************************************************************
+  avalnche_noise_amplitude_w
+***************************************************************************/
+
+WRITE8_HANDLER( avalnche_noise_amplitude_w )
+{
+	discrete_sound_w(AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
+}
+
+
+WRITE8_HANDLER( avalnche_attract_enable_w )
+{
+	discrete_sound_w(AVALNCHE_ATTRACT_EN, data & 0x01);
+}
+
+
+WRITE8_HANDLER( avalnche_audio_w )
+{
+	int bit = data & 0x01;
+
+	switch (offset & 0x07)
+	{
+	case 0x00:		/* AUD0 */
+		discrete_sound_w(AVALNCHE_AUD0_EN, bit);
+		break;
+
+	case 0x01:		/* AUD1 */
+		discrete_sound_w(AVALNCHE_AUD1_EN, bit);
+		break;
+
+	case 0x02:		/* AUD2 */
+	default:
+		discrete_sound_w(AVALNCHE_AUD2_EN, bit);
+		break;
+	}
+}
+
+
+
 /************************************************************************/
 /* avalnche Sound System Analog emulation                               */
 /************************************************************************/

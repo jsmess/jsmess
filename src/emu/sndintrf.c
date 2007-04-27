@@ -55,6 +55,7 @@ struct _sndintrf_data
 {
 	sound_interface	intf;	 		/* copy of the interface data */
 	int				sndtype; 		/* type index of this sound chip */
+	int				aliastype;		/* aliased type index of this sound chip */
 	int				index; 			/* index of this sound chip */
 	int				clock; 			/* clock for this sound chip */
 	void *			token;			/* dynamically allocated token data */
@@ -86,7 +87,12 @@ void ym3526_get_info(void *token, UINT32 state, sndinfo *info);
 void ymz280b_get_info(void *token, UINT32 state, sndinfo *info);
 void y8950_get_info(void *token, UINT32 state, sndinfo *info);
 void sn76477_get_info(void *token, UINT32 state, sndinfo *info);
+void sn76489_get_info(void *token, UINT32 state, sndinfo *info);
+void sn76489a_get_info(void *token, UINT32 state, sndinfo *info);
+void sn76494_get_info(void *token, UINT32 state, sndinfo *info);
 void sn76496_get_info(void *token, UINT32 state, sndinfo *info);
+void gamegear_get_info(void *token, UINT32 state, sndinfo *info);
+void smsiii_get_info(void *token, UINT32 state, sndinfo *info);
 void pokey_get_info(void *token, UINT32 state, sndinfo *info);
 void nesapu_get_info(void *token, UINT32 state, sndinfo *info);
 void astrocade_get_info(void *token, UINT32 state, sndinfo *info);
@@ -228,7 +234,12 @@ static const struct
 	{ SOUND_SN76477, sn76477_get_info },
 #endif
 #if (HAS_SN76496)
+	{ SOUND_SN76489, sn76489_get_info },
+	{ SOUND_SN76489A, sn76489a_get_info },
+	{ SOUND_SN76494, sn76494_get_info },
 	{ SOUND_SN76496, sn76496_get_info },
+	{ SOUND_GAMEGEAR, gamegear_get_info },
+	{ SOUND_SMSIII, smsiii_get_info },
 #endif
 #if (HAS_POKEY)
 	{ SOUND_POKEY, pokey_get_info },
@@ -525,14 +536,17 @@ int sndintrf_init_sound(int sndnum, int sndtype, int clock, const void *config)
 	/* fill in the type and interface */
 	info->intf = sndintrf[sndtype];
 	info->sndtype = sndtype;
+	info->aliastype = sndtype_get_info_int(sndtype, SNDINFO_INT_ALIAS);
+	if (info->aliastype == 0)
+		info->aliastype = sndtype;
 	info->clock = clock;
 
 	/* find an empty slot in the matrix and add it */
 	totalsnd++;
 	for (index = 0; index < MAX_SOUND; index++)
-		if (sound_matrix[sndtype][index] == 0)
+		if (sound_matrix[info->aliastype][index] == 0)
 		{
-			sound_matrix[sndtype][index] = totalsnd;
+			sound_matrix[info->aliastype][index] = totalsnd;
 			break;
 		}
 	info->index = index;
@@ -612,7 +626,7 @@ int sndnum_to_sndti(int sndnum, int *index)
 {
 	if (index != NULL)
 		*index = sound[sndnum].index;
-	return sound[sndnum].sndtype;
+	return sound[sndnum].aliastype;
 }
 
 

@@ -267,7 +267,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									plot_pixel(bitmap,sx+x,y,Machine->pens[color*16+(rom[i]&0x0f)]);
+									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]&0x0f)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
@@ -287,7 +287,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									plot_pixel(bitmap,sx+x,y,Machine->pens[color*16+(rom[i]>>4)]);
+									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]>>4)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
@@ -311,7 +311,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									plot_pixel(bitmap,sx+x,y,Machine->pens[color*16+(rom[i]>>4)]);
+									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]>>4)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
@@ -331,7 +331,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
 								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
-									plot_pixel(bitmap,sx+x,y,Machine->pens[color*16+(rom[i]&0x0f)]);
+									*BITMAP_ADDR16(bitmap, y, sx+x) = Machine->pens[color*16+(rom[i]&0x0f)];
 								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}

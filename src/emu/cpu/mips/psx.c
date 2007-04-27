@@ -151,10 +151,8 @@ static void mips_exception( int exception );
 
 static void mips_stop( void )
 {
-#ifdef MAME_DEBUG
 	DEBUGGER_BREAK;
 	CALL_MAME_DEBUG;
-#endif
 }
 
 #if LOG_BIOSCALL

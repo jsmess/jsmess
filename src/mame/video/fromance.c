@@ -17,16 +17,19 @@ static UINT8 *local_videoram[2];
 static UINT8 selected_paletteram;
 static UINT8 *local_paletteram;
 
-static int scrollx[2], scrolly[2];
+static UINT32 scrollx[2], scrolly[2];
 static UINT8 gfxreg;
 static UINT8 flipscreen;
+static UINT32 scrolly_ofs;
+static UINT32 scrollx_ofs;
 
 static UINT8 crtc_register;
 static UINT8 crtc_data[0x10];
 static void *crtc_timer;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static UINT8 flipscreen_old = -1;
 
+static tilemap *bg_tilemap, *fg_tilemap;
 
 static void crtc_interrupt_gen(int param);
 
@@ -88,6 +91,26 @@ VIDEO_START( fromance )
 
 	/* reset the timer */
 	crtc_timer = mame_timer_alloc(crtc_interrupt_gen);
+
+	scrollx_ofs = 0x159;
+	scrolly_ofs = 0x10;
+
+	/* state save */
+	state_save_register_global(selected_videoram);
+	state_save_register_global_pointer(local_videoram[0], 0x1000 * 3);
+	state_save_register_global_pointer(local_videoram[1], 0x1000 * 3);
+	state_save_register_global(selected_paletteram);
+	state_save_register_global_array(scrollx);
+	state_save_register_global_array(scrolly);
+	state_save_register_global(gfxreg);
+	state_save_register_global(flipscreen);
+	state_save_register_global(flipscreen_old);
+	state_save_register_global(scrollx_ofs);
+	state_save_register_global(scrolly_ofs);
+	state_save_register_global(crtc_register);
+	state_save_register_global_array(crtc_data);
+	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
+
 	return 0;
 }
 
@@ -101,18 +124,46 @@ VIDEO_START( nekkyoku )
 	local_videoram[0] = auto_malloc(0x1000 * 3);
 	local_videoram[1] = auto_malloc(0x1000 * 3);
 
-	/* allocate local palette RAM */
-	local_paletteram = auto_malloc(0x800 * 2);
-
 	/* configure tilemaps */
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
 	/* reset the timer */
 	crtc_timer = mame_timer_alloc(crtc_interrupt_gen);
+
+	scrollx_ofs = 0x159;
+	scrolly_ofs = 0x10;
+
+	/* state save */
+	state_save_register_global(selected_videoram);
+	state_save_register_global_pointer(local_videoram[0], 0x1000 * 3);
+	state_save_register_global_pointer(local_videoram[1], 0x1000 * 3);
+	state_save_register_global(selected_paletteram);
+	state_save_register_global(gfxreg);
+	state_save_register_global(flipscreen);
+	state_save_register_global(flipscreen_old);
+	state_save_register_global(scrolly_ofs);
+	state_save_register_global(crtc_register);
+	state_save_register_global_array(crtc_data);
+
 	return 0;
 }
 
+VIDEO_START( pipedrm )
+{
+	video_start_fromance(machine);
+	scrolly_ofs = 0x00;
 
+	return 0;
+}
+
+VIDEO_START( hatris )
+{
+	video_start_fromance(machine);
+	scrollx_ofs = 0xB9;
+	scrolly_ofs = 0x00;
+
+	return 0;
+}
 
 /*************************************
  *
@@ -122,7 +173,6 @@ VIDEO_START( nekkyoku )
 
 WRITE8_HANDLER( fromance_gfxreg_w )
 {
-	static int flipscreen_old = -1;
 
 	gfxreg = data;
 	flipscreen = (data & 0x01);
@@ -200,16 +250,16 @@ WRITE8_HANDLER( fromance_scroll_w )
 		switch (offset)
 		{
 			case 0:
-				scrollx[1] = (data + (((gfxreg & 0x08) >> 3) * 0x100) - 0x159);
+				scrollx[1] = (data + (((gfxreg & 0x08) >> 3) * 0x100) - scrollx_ofs);
 				break;
 			case 1:
-				scrolly[1] = (data + (((gfxreg & 0x04) >> 2) * 0x100) - 0x10);
+				scrolly[1] = (data + (((gfxreg & 0x04) >> 2) * 0x100) - scrolly_ofs); // - 0x10
 				break;
 			case 2:
-				scrollx[0] = (data + (((gfxreg & 0x20) >> 5) * 0x100) - 0x159);
+				scrollx[0] = (data + (((gfxreg & 0x20) >> 5) * 0x100) - scrollx_ofs);
 				break;
 			case 3:
-				scrolly[0] = (data + (((gfxreg & 0x10) >> 4) * 0x100) - 0x10);
+				scrolly[0] = (data + (((gfxreg & 0x10) >> 4) * 0x100) - scrolly_ofs);
 				break;
 		}
 	}
@@ -221,13 +271,13 @@ WRITE8_HANDLER( fromance_scroll_w )
 				scrollx[1] = (data + (((gfxreg & 0x08) >> 3) * 0x100) - 0x1f7);
 				break;
 			case 1:
-				scrolly[1] = (data + (((gfxreg & 0x04) >> 2) * 0x100) - 0xfa);
+				scrolly[1] = (data + (((gfxreg & 0x04) >> 2) * 0x100) - 0xf9);
 				break;
 			case 2:
 				scrollx[0] = (data + (((gfxreg & 0x20) >> 5) * 0x100) - 0x1f7);
 				break;
 			case 3:
-				scrolly[0] = (data + (((gfxreg & 0x10) >> 4) * 0x100) - 0xfa);
+				scrolly[0] = (data + (((gfxreg & 0x10) >> 4) * 0x100) - 0xf9);
 				break;
 		}
 	}
@@ -317,6 +367,15 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int dra
 			/* wrap around */
 			if (x > Machine->screen[0].visarea.max_x) x -= 0x200;
 			if (y > Machine->screen[0].visarea.max_y) y -= 0x200;
+
+			/* flip ? */
+			if (flipscreen)
+			{
+				y = Machine->screen[0].visarea.max_y - y - 16 * ytiles - 4;
+				x = Machine->screen[0].visarea.max_x - x - 16 * xtiles - 24;
+				xflip=!xflip;
+				yflip=!yflip;
+			}
 
 			/* normal case */
 			if (!xflip && !yflip)

@@ -861,13 +861,13 @@ static void draw_bitmap(mame_bitmap *bitmap)
 		for(x=0;x<xxx;x++)
 		{
 			pix = (nmg5_bitmap[count]&0xf000)>>12;
-			if (pix) plot_pixel(bitmap, x*4+0+xoff,y+yoff, pix + 0x300);
+			if (pix) *BITMAP_ADDR16(bitmap, y+yoff, x*4+0+xoff) = pix + 0x300;
 			pix = (nmg5_bitmap[count]&0x0f00)>>8;
-			if (pix) plot_pixel(bitmap, x*4+1+xoff,y+yoff, pix + 0x300);
+			if (pix) *BITMAP_ADDR16(bitmap, y+yoff, x*4+1+xoff) = pix + 0x300;
 			pix = (nmg5_bitmap[count]&0x00f0)>>4;
-			if (pix) plot_pixel(bitmap, x*4+2+xoff,y+yoff, pix + 0x300);
+			if (pix) *BITMAP_ADDR16(bitmap, y+yoff, x*4+2+xoff) = pix + 0x300;
 			pix = (nmg5_bitmap[count]&0x000f)>>0;
-			if (pix) plot_pixel(bitmap, x*4+3+xoff,y+yoff, pix + 0x300);
+			if (pix) *BITMAP_ADDR16(bitmap, y+yoff, x*4+3+xoff) = pix + 0x300;
 
 			count++;
 		}

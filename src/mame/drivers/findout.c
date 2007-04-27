@@ -55,14 +55,14 @@ static WRITE8_HANDLER( findout_bitmap_w )
 //if (mask != bits)
 //  popmessage("color %02x bits %02x mask %02x\n",fg,bits,mask);
 
-	if (mask & 0x80) plot_pixel(tmpbitmap,sx+0,sy,(bits & 0x80) ? fg : bg);
-	if (mask & 0x40) plot_pixel(tmpbitmap,sx+1,sy,(bits & 0x40) ? fg : bg);
-	if (mask & 0x20) plot_pixel(tmpbitmap,sx+2,sy,(bits & 0x20) ? fg : bg);
-	if (mask & 0x10) plot_pixel(tmpbitmap,sx+3,sy,(bits & 0x10) ? fg : bg);
-	if (mask & 0x08) plot_pixel(tmpbitmap,sx+4,sy,(bits & 0x08) ? fg : bg);
-	if (mask & 0x04) plot_pixel(tmpbitmap,sx+5,sy,(bits & 0x04) ? fg : bg);
-	if (mask & 0x02) plot_pixel(tmpbitmap,sx+6,sy,(bits & 0x02) ? fg : bg);
-	if (mask & 0x01) plot_pixel(tmpbitmap,sx+7,sy,(bits & 0x01) ? fg : bg);
+	if (mask & 0x80) *BITMAP_ADDR16(tmpbitmap, sy, sx+0) = (bits & 0x80) ? fg : bg;
+	if (mask & 0x40) *BITMAP_ADDR16(tmpbitmap, sy, sx+1) = (bits & 0x40) ? fg : bg;
+	if (mask & 0x20) *BITMAP_ADDR16(tmpbitmap, sy, sx+2) = (bits & 0x20) ? fg : bg;
+	if (mask & 0x10) *BITMAP_ADDR16(tmpbitmap, sy, sx+3) = (bits & 0x10) ? fg : bg;
+	if (mask & 0x08) *BITMAP_ADDR16(tmpbitmap, sy, sx+4) = (bits & 0x08) ? fg : bg;
+	if (mask & 0x04) *BITMAP_ADDR16(tmpbitmap, sy, sx+5) = (bits & 0x04) ? fg : bg;
+	if (mask & 0x02) *BITMAP_ADDR16(tmpbitmap, sy, sx+6) = (bits & 0x02) ? fg : bg;
+	if (mask & 0x01) *BITMAP_ADDR16(tmpbitmap, sy, sx+7) = (bits & 0x01) ? fg : bg;
 }
 
 

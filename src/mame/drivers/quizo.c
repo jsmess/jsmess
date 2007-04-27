@@ -85,19 +85,19 @@ VIDEO_UPDATE( quizo )
 				int pix;
 
 				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				plot_pixel(tmpbitmap, x*4+3, y,  machine->pens[pix]);
+				*BITMAP_ADDR16(tmpbitmap, y, x*4+3) = machine->pens[pix];
 				data>>=1;
 				data1>>=1;
 				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				plot_pixel(tmpbitmap, x*4+2, y,  machine->pens[pix]);
+				*BITMAP_ADDR16(tmpbitmap, y, x*4+2) = machine->pens[pix];
 				data>>=1;
 				data1>>=1;
 				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				plot_pixel(tmpbitmap, x*4+1, y,  machine->pens[pix]);
+				*BITMAP_ADDR16(tmpbitmap, y, x*4+1) = machine->pens[pix];
 				data>>=1;
 				data1>>=1;
 				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				plot_pixel(tmpbitmap, x*4+0, y,  machine->pens[pix]);
+				*BITMAP_ADDR16(tmpbitmap, y, x*4+0) = machine->pens[pix];
 			}
 		}
 	}

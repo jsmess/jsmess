@@ -41,7 +41,7 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	sy = offset / 256;
 	sx = offset % 256;
 
-	plot_pixel(tmpbitmap, sx, sy, Machine->pens[1024 + (data >> 1)]);
+	*BITMAP_ADDR16(tmpbitmap, sy, sx) = Machine->pens[1024 + (data >> 1)];
 }
 
 WRITE16_HANDLER( galpanic_paletteram_w )
@@ -152,7 +152,7 @@ static void draw_fgbitmap(mame_bitmap *bitmap)
 		sy = offs / 256;
 		color = galpanic_fgvideoram[offs];
 		if (color)
-			plot_pixel(bitmap, sx, sy, Machine->pens[color]);
+			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[color];
 	}
 }
 

@@ -8,6 +8,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/ti85.h"
+#include "plotpixl.h"
 
 #define TI81_VIDEO_MEMORY_SIZE	 768
 #define TI81_SCREEN_X_SIZE	  12

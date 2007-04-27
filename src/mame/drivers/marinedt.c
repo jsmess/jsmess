@@ -528,10 +528,10 @@ VIDEO_UPDATE( marinedt )
 				 || y < cliprect->min_y || y > cliprect->max_y)
 					continue;
 
-				if (read_pixel(obj1, sx, sy) == machine->pens[0])
+				if (*BITMAP_ADDR16(obj1, sy, sx) == machine->pens[0])
 					continue;
 
-				if (read_pixel(tile, x, y) != machine->pens[0])
+				if (*BITMAP_ADDR16(tile, y, x) != machine->pens[0])
 				{
 					coll = 0x08;
 
@@ -565,10 +565,10 @@ VIDEO_UPDATE( marinedt )
 				 || yy < 0 || yy >= 32)
 					continue;
 
-				if (read_pixel(obj1, sx, sy) == machine->pens[0])
+				if (*BITMAP_ADDR16(obj1, sy, sx) == machine->pens[0])
 					continue;
 
-				if (read_pixel(obj2, xx, yy) != machine->pens[0])
+				if (*BITMAP_ADDR16(obj2, yy, xx) != machine->pens[0])
 				{
 					collh = 0x80;
 

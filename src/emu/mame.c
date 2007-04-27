@@ -489,7 +489,7 @@ void mame_schedule_exit(running_machine *machine)
 
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
-		mame_schedule_save(machine, machine->gamedrv->name);
+		mame_schedule_save(machine, "auto");
 }
 
 
@@ -533,7 +533,7 @@ void mame_schedule_save(running_machine *machine, const char *filename)
 	/* free any existing request and allocate a copy of the requested name */
 	if (mame->saveload_pending_file != NULL)
 		free(mame->saveload_pending_file);
-	mame->saveload_pending_file = mame_strdup(filename);
+	mame->saveload_pending_file = assemble_4_strings(machine->basename, PATH_SEPARATOR, filename, ".sta");
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_save;
@@ -556,7 +556,7 @@ void mame_schedule_load(running_machine *machine, const char *filename)
 	/* free any existing request and allocate a copy of the requested name */
 	if (mame->saveload_pending_file != NULL)
 		free(mame->saveload_pending_file);
-	mame->saveload_pending_file = mame_strdup(filename);
+	mame->saveload_pending_file = assemble_4_strings(machine->basename, PATH_SEPARATOR, filename, ".sta");
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_load;
@@ -1171,7 +1171,7 @@ static void reset_machine(running_machine *machine)
 	machine->shadow_table = NULL;
 
 	/* audio-related information */
-	machine->sample_rate = options_get_int_range(mame_options(), OPTION_SAMPLERATE, 1000, 1000000);
+	machine->sample_rate = options_get_int(mame_options(), OPTION_SAMPLERATE);
 
 	/* input-related information */
 	machine->input_ports = NULL;
@@ -1392,21 +1392,11 @@ static void saveload_init(running_machine *machine)
 
 	/* if we're coming in with a savegame request, process it now */
 	if (savegame != NULL && savegame[0] != 0)
-	{
-		char name[20];
-
-		if (strlen(savegame) == 1)
-		{
-			sprintf(name, "%s-%c", machine->gamedrv->name, savegame[0]);
-			mame_schedule_load(machine, name);
-		}
-		else
-			mame_schedule_load(machine, savegame);
-	}
+		mame_schedule_load(machine, savegame);
 
 	/* if we're in autosave mode, schedule a load */
 	else if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
-		mame_schedule_load(machine, machine->gamedrv->name);
+		mame_schedule_load(machine, "auto");
 }
 
 

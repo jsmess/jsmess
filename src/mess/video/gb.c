@@ -15,6 +15,7 @@
 #include "includes/gb.h"
 #include "cpu/z80gb/z80gb.h"
 #include "profiler.h"
+#include "plotpixl.h"
 
 #define LCDCONT		gb_vid_regs[0x00]	/* LCD control register                       */
 #define LCDSTAT		gb_vid_regs[0x01]	/* LCD status register                        */

@@ -260,7 +260,7 @@ VIDEO_UPDATE(mlanding)
 						 for(yy=0;yy<8;yy++)
 						 	for(xx=0;xx<8;xx++)
 							{
-						 		plot_pixel(ml_bitmap[num],x+xx+j*8,y+yy+k*8,0); //test only .. ugly
+								*BITMAP_ADDR16(ml_bitmap[num], y+yy+k*8, x+xx+j*8) = 0; //test only .. ugly
 							}
 					}
 				}
@@ -280,7 +280,7 @@ VIDEO_UPDATE(mlanding)
 	/*  int i;
         for(i=0;i<0x8000;i++)
         {
-            plot_pixel(bitmap, ml_unk[i]&0xff,156+( ml_unk[i]>>8), 0x207);
+            *BITMAP_ADDR16(bitmap, 156+( ml_unk[i]>>8), ml_unk[i]&0xff) = 0x207;
         }
         */
 	}

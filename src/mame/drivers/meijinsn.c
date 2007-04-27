@@ -274,7 +274,7 @@ VIDEO_UPDATE(meijinsn)
 		{
 			color= ((data1>>x) & 1) | (((data1>>(4+x)) & 1)<<1);
 			data = ((data2>>x) & 1) | (((data2>>(4+x)) & 1)<<1);
-			plot_pixel(bitmap, (sx*4 + (3-x)), sy, color*4 + data);
+			*BITMAP_ADDR16(bitmap, sy, (sx*4 + (3-x))) = color*4 + data;
 		}
 	}
 	return 0;

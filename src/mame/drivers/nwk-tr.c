@@ -245,19 +245,21 @@ int K001604_vh_start(int chip)
 	if (chip == 0)
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
+		int roz_width = K001604_layer_size ? 64 : 128;
 		K001604_layer_8x8[chip][0] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TRANSPARENT, 8, 8, 64, 64);
 		K001604_layer_8x8[chip][1] = tilemap_create(K001604_0_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TRANSPARENT, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_OPAQUE, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_OPAQUE, roz_tile_size, roz_tile_size, roz_width, 64);
 		K001604_layer_roz[chip][1] = tilemap_create(K001604_0_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_OPAQUE, roz_tile_size, roz_tile_size, 64, 64);
 	}
 	else
 	{
 		int roz_tile_size = K001604_roz_size[chip] ? 16 : 8;
+		int roz_width = K001604_layer_size ? 64 : 128;
 		K001604_layer_8x8[chip][0] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_0, TILEMAP_TRANSPARENT, 8, 8, 64, 64);
 		K001604_layer_8x8[chip][1] = tilemap_create(K001604_1_tile_info_layer_8x8, K001604_scan_layer_8x8_1, TILEMAP_TRANSPARENT, 8, 8, 64, 64);
 
-		K001604_layer_roz[chip][0] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_OPAQUE, roz_tile_size, roz_tile_size, 64, 64);
+		K001604_layer_roz[chip][0] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_0, TILEMAP_OPAQUE, roz_tile_size, roz_tile_size, roz_width, 64);
 		K001604_layer_roz[chip][1] = tilemap_create(K001604_1_tile_info_layer_roz, K001604_scan_layer_roz_1, TILEMAP_OPAQUE, roz_tile_size, roz_tile_size, 64, 64);
 	}
 
@@ -355,9 +357,12 @@ void K001604_tile_update(int chip)
 void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int layer;
+	int num_layers;
 	fillbitmap(bitmap, 0, cliprect);
 
-	for (layer=0; layer < 2; layer++)
+	num_layers = K001604_layer_size ? 2 : 1;
+
+	for (layer=0; layer < num_layers; layer++)
 	{
 		int reg = 0x08;
 

@@ -1019,7 +1019,7 @@ static void custom_tilemap_draw(
 			src_x=(src_x+1)&width_mask;
 			if ((flags&TILEMAP_IGNORE_TRANSPARENCY) || (p&trans_mask))
 			{
-				plot_pixel(bitmap, x, y, Machine->pens[p]);
+				*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p];
 				if (priority_bitmap)
 				{
 					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);

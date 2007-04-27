@@ -20,6 +20,33 @@
 
 /*************************************
  *
+ *  Video hardware
+ *
+ *************************************/
+
+static WRITE8_HANDLER( clayshoo_videoram_w )
+{
+	UINT8 x,y;
+	int i;
+
+
+	x = ((offset & 0x1f) << 3);
+	y = 191 - (offset >> 5);
+
+	for (i = 0; i < 8; i++)
+	{
+		pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+		*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
+
+		x++;
+		data <<= 1;
+	}
+}
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -107,6 +134,7 @@ INPUT_PORTS_START( clayshoo )
 INPUT_PORTS_END
 
 
+
 /*************************************
  *
  *  Machine driver
@@ -128,12 +156,9 @@ static MACHINE_DRIVER_START( clayshoo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 192)
 	MDRV_SCREEN_VISIBLE_AREA(8, 247, 8, 183)
-	MDRV_PALETTE_LENGTH(2)
-
-	MDRV_PALETTE_INIT(clayshoo)
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 MACHINE_DRIVER_END

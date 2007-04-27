@@ -13,8 +13,4 @@ enum {
 /* Public functions */
 extern void v30mz_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef MAME_DEBUG
-extern unsigned Dasmnec(char* buffer, unsigned pc);
-#endif
-
 #endif

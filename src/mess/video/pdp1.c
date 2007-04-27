@@ -22,6 +22,7 @@
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
 #include "video/crt.h"
+#include "plotpixl.h"
 
 
 static mame_bitmap *panel_bitmap;

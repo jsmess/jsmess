@@ -458,8 +458,8 @@ VIDEO_EOF( firetrk )
 				if (y > playfield_window.max_y)
 					continue;
 
-				a = read_pixel(helper1, x, y);
-				b = read_pixel(helper2, x, y);
+				a = *BITMAP_ADDR16(helper1, y, x);
+				b = *BITMAP_ADDR16(helper2, y, x);
 
 				if (b != 0 && a == 1)
 				{

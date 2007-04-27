@@ -84,6 +84,7 @@ the access to the video memory is unclear to me at the moment.
 #include "video/generic.h"
 #include "video/m6845.h"
 #include "mscommon.h"
+#include "plotpixl.h"
 
 #include "includes/dgn_beta.h"
 

@@ -100,7 +100,7 @@ WRITE16_HANDLER( glass_blitter_w )
 					for (i = 0; i < 320; i++){
 						int color = *gfx;
 						gfx++;
-						plot_pixel(screen_bitmap, i, j, Machine->pens[color & 0xff]);
+						*BITMAP_ADDR16(screen_bitmap, j, i) = Machine->pens[color & 0xff];
 					}
 				}
 			} else {

@@ -131,8 +131,8 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 	if (sx>2047 || sy>255)
 		return;
 
-	plot_pixel(bitmap0,sx+0,sy,Machine->pens[((src>>8)&0xf)|0x100]);
-	plot_pixel(bitmap0,sx+1,sy,Machine->pens[((src>>0)&0xf)|0x100]);
+	*BITMAP_ADDR16(bitmap0, sy, sx+0) = Machine->pens[((src>>8)&0xf)|0x100];
+	*BITMAP_ADDR16(bitmap0, sy, sx+1) = Machine->pens[((src>>0)&0xf)|0x100];
 }
 
 WRITE16_HANDLER( lemmings_pixel_1_w )

@@ -84,7 +84,7 @@ VIDEO_UPDATE( destroyr )
 	for (i = 0; i < 256; i++)
 	{
 		if (i & 4)
-			plot_pixel(bitmap, i, destroyr_cursor ^ 0xff, machine->pens[7]);
+			*BITMAP_ADDR16(bitmap, destroyr_cursor ^ 0xff, i) = machine->pens[7];
 	}
 	return 0;
 }

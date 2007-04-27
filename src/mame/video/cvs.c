@@ -438,9 +438,9 @@ INLINE void plot_star(mame_bitmap *bitmap, int x, int y)
 		y = 255 - y;
 	}
 
-	if (read_pixel(bitmap, x, y) == Machine->pens[0])
+	if (*BITMAP_ADDR16(bitmap, y, x) == Machine->pens[0])
 	{
-		plot_pixel(bitmap, x, y, Machine->pens[7]);
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[7];
 	}
 }
 
@@ -557,9 +557,9 @@ VIDEO_UPDATE( cvs )
 
                 if((CollisionRegister & 8) == 0)
                 {
-                    if ((read_pixel(s2636_1_bitmap, bx, offs) != 0) ||
-					    (read_pixel(s2636_2_bitmap, bx, offs) != 0) ||
-					    (read_pixel(s2636_3_bitmap, bx, offs) != 0))
+                    if ((*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) ||
+					    (*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0) ||
+					    (*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0))
                         CollisionRegister |= 8;
                 }
 
@@ -567,11 +567,11 @@ VIDEO_UPDATE( cvs )
 
                 if((CollisionRegister & 0x80) == 0)
                 {
-					if (read_pixel(scrolled_background, bx, offs) != machine->pens[0])
+					if (*BITMAP_ADDR8(scrolled_background, offs, bx) != machine->pens[0])
                     	CollisionRegister |= 0x80;
                 }
 
-	            plot_pixel(bitmap,bx,offs,machine->pens[7]);
+				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[7];
             }
         }
     }

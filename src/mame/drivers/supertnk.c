@@ -153,7 +153,7 @@ WRITE8_HANDLER( supertnk_videoram_w )
 		col2 = (supertnk_videoram[0x4000 + offset] >> (7-i)) & 0x01;
 		col = ( (col0 << 2) | (col1 << 1) | (col2 << 0) );
 
-		plot_pixel(tmpbitmap, x+i, y, Machine->pens[col]);
+		*BITMAP_ADDR16(tmpbitmap, y, x+i) = Machine->pens[col];
 	}
 }
 

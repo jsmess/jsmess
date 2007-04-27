@@ -357,16 +357,16 @@ static void draw_lasso( mame_bitmap *bitmap)
 						if (flip_screen_x)
 						{
 							if (flip_screen_y)
-								plot_pixel(bitmap, 255-x, 255-y, pen);
+								*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
 							else
-								plot_pixel(bitmap, 255-x,     y, pen);
+								*BITMAP_ADDR16(bitmap, y, 255-x) = pen;
 						}
 						else
 						{
 							if (flip_screen_y)
-								plot_pixel(bitmap,     x, 255-y, pen);
+								*BITMAP_ADDR16(bitmap, 255-y, x) = pen;
 							else
-								plot_pixel(bitmap,     x,     y, pen);
+								*BITMAP_ADDR16(bitmap, y, x) = pen;
 						}
 					}
 

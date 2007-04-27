@@ -132,12 +132,12 @@ WRITE8_HANDLER( graph_processor_w )
 
 			if (bmap)
 			{
-				plot_pixel(tmpbitmap, (x-6)&0xff, y, Machine->pens[16 + color]);
+				*BITMAP_ADDR16(tmpbitmap, y, (x-6)&0xff) = Machine->pens[16 + color];
 				tmpvideoram[y*256+x] = color;
 			}
 			else
 			{
-				plot_pixel(tmpbitmap2, (x-6)&0xff, y, Machine->pens[16 + color]);
+				*BITMAP_ADDR16(tmpbitmap2, y, (x-6)&0xff) = Machine->pens[16 + color];
 				tmpvideoram2[y*256+x] = color;
 			}
 
@@ -175,8 +175,8 @@ static void refresh_bitmaps(void)
 	{
 		for (lx = 0; lx < 256; lx++)
 		{
-			plot_pixel(tmpbitmap,  (lx-6)&0xff, ly, Machine->pens[16 + tmpvideoram[ly*256+lx]]);
-			plot_pixel(tmpbitmap2, (lx-6)&0xff, ly, Machine->pens[16 + tmpvideoram2[ly*256+lx]]);
+			*BITMAP_ADDR16(tmpbitmap,  ly, (lx-6)&0xff) = Machine->pens[16 + tmpvideoram[ly*256+lx]];
+			*BITMAP_ADDR16(tmpbitmap2, ly, (lx-6)&0xff) = Machine->pens[16 + tmpvideoram2[ly*256+lx]];
 		}
 	}
 }

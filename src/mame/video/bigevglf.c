@@ -51,7 +51,7 @@ WRITE8_HANDLER( bigevglf_vidram_w )
 	vidram[ o+0x10000*plane_selected ] = data;
 	y = o >>8;
 	x = (o & 255);
-	plot_pixel(tmp_bitmap[plane_selected],x,y,data );
+	*BITMAP_ADDR16(tmp_bitmap[plane_selected], y, x) = data;
 }
 
 READ8_HANDLER( bigevglf_vidram_r )

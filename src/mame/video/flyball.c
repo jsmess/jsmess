@@ -89,7 +89,7 @@ VIDEO_UPDATE( flyball )
 			    y >= machine->screen[0].visarea.min_y &&
 			    y <= machine->screen[0].visarea.max_y)
 			{
-				plot_pixel(bitmap, x, y, machine->pens[1]);
+				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[1];
 			}
 		}
 	}

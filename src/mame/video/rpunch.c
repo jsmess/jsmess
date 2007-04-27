@@ -267,10 +267,10 @@ static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 		for(x=0;x<xxx;x++)
 		{
 			int coldat;
-			coldat = (rpunch_bitmapram[count]>>12)&0xf; if (coldat!=15) plot_pixel(bitmap, ((x*4  )-4)&0x1ff,y, coldat+colourbase);
-			coldat = (rpunch_bitmapram[count]>>8 )&0xf; if (coldat!=15) plot_pixel(bitmap, ((x*4+1)-4)&0x1ff,y, coldat+colourbase);
-			coldat = (rpunch_bitmapram[count]>>4 )&0xf; if (coldat!=15) plot_pixel(bitmap, ((x*4+2)-4)&0x1ff,y, coldat+colourbase);
-			coldat = (rpunch_bitmapram[count]>>0 )&0xf; if (coldat!=15) plot_pixel(bitmap, ((x*4+3)-4)&0x1ff,y, coldat+colourbase);
+			coldat = (rpunch_bitmapram[count]>>12)&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+0)-4)&0x1ff) = coldat+colourbase;
+			coldat = (rpunch_bitmapram[count]>>8 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
+			coldat = (rpunch_bitmapram[count]>>4 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
+			coldat = (rpunch_bitmapram[count]>>0 )&0xf; if (coldat!=15) *BITMAP_ADDR16(bitmap, y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
   	 		count++;
   		}
 	}

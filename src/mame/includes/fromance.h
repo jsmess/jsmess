@@ -11,6 +11,8 @@
 
 VIDEO_START( fromance );
 VIDEO_START( nekkyoku );
+VIDEO_START( pipedrm );
+VIDEO_START( hatris );
 VIDEO_UPDATE( fromance );
 VIDEO_UPDATE( pipedrm );
 

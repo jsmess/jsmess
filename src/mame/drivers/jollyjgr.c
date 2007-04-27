@@ -302,13 +302,13 @@ static void draw_bitmap(mame_bitmap *bitmap)
 				if(color)
 				{
 					if(jullyjgr_flip_screen_x && jullyjgr_flip_screen_y)
-						plot_pixel(bitmap, x*8 + i, y, Machine->pens[color + 32]);
+						*BITMAP_ADDR16(bitmap, y, x*8 + i) = Machine->pens[color + 32];
 					else if(jullyjgr_flip_screen_x && !jullyjgr_flip_screen_y)
-						plot_pixel(bitmap, x*8 + i, 255 - y, Machine->pens[color + 32]);
+						*BITMAP_ADDR16(bitmap, 255 - y, x*8 + i) = Machine->pens[color + 32];
 					else if(!jullyjgr_flip_screen_x && jullyjgr_flip_screen_y)
-						plot_pixel(bitmap, 255 - x*8 - i, y, Machine->pens[color + 32]);
+						*BITMAP_ADDR16(bitmap, y, 255 - x*8 - i) = Machine->pens[color + 32];
 					else
-						plot_pixel(bitmap, 255 - x*8 - i, 255 - y, Machine->pens[color + 32]);
+						*BITMAP_ADDR16(bitmap, 255 - y, 255 - x*8 - i) = Machine->pens[color + 32];
 				}
 			}
 

@@ -67,8 +67,8 @@ WRITE8_HANDLER( epos_videoram_w )
 	x = (offset % 136) * 2;
 	y = (offset / 136);
 
-	plot_pixel(tmpbitmap, x,     y, Machine->pens[current_palette | (data & 0x0f)]);
-	plot_pixel(tmpbitmap, x + 1, y, Machine->pens[current_palette | (data >> 4)]);
+	*BITMAP_ADDR16(tmpbitmap, y, x + 0) = Machine->pens[current_palette | (data & 0x0f)];
+	*BITMAP_ADDR16(tmpbitmap, y, x + 1) = Machine->pens[current_palette | (data >> 4)];
 }
 
 

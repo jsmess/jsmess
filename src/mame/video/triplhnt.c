@@ -112,8 +112,8 @@ static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect
 			{
 				for (y = rect.min_y; y <= rect.max_y; y++)
 				{
-					pen_t a = read_pixel(helper, x, y);
-					pen_t b = read_pixel(bitmap, x, y);
+					pen_t a = *BITMAP_ADDR16(helper, y, x);
+					pen_t b = *BITMAP_ADDR16(bitmap, y, x);
 
 					if (a == 2 && b == 7)
 					{
@@ -123,7 +123,7 @@ static void triplhnt_draw_sprites(mame_bitmap* bitmap, const rectangle* cliprect
 
 					if (a != 1)
 					{
-						plot_pixel(bitmap, x, y, a);
+						*BITMAP_ADDR16(bitmap, y, x) = a;
 					}
 				}
 			}

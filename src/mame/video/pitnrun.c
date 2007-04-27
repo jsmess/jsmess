@@ -122,7 +122,7 @@ void pitnrun_spotlights(void)
 	  	datapix=ROM[128*16*i+x+y*16];
 	  	for(b=0;b<8;b++)
 	  	{
-			plot_pixel(tmp_bitmap[i],x*8+(7-b), y,(datapix&1));
+			*BITMAP_ADDR16(tmp_bitmap[i], y, x*8+(7-b)) = (datapix&1);
 			datapix>>=1;
 		}
  	  }

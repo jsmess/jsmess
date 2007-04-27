@@ -121,7 +121,7 @@ static void common_videoram_w(int offset, int data, int color)
 
 	for (i = 0; i < 8; i++)
 	{
-		plot_pixel(tmpbitmap, x, y, (data & 1) ? fore : back);
+		*BITMAP_ADDR16(tmpbitmap, y, x) = (data & 1) ? fore : back;
 
 		x += dx;
 		data >>= 1;

@@ -477,8 +477,8 @@ VIDEO_UPDATE( superpac )
 	{
 		for (x = 0;x < sprite_bitmap->width;x++)
 		{
-			if (read_pixel(sprite_bitmap,x,y) == 0)
-				plot_pixel(bitmap,x,y,0);
+			if (*BITMAP_ADDR16(sprite_bitmap, y, x) == 0)
+				*BITMAP_ADDR16(bitmap, y, x) = 0;
 		}
 	}
 	return 0;

@@ -401,7 +401,7 @@ static void draw_bitmap(mame_bitmap *bitmap)
 			{
 				if(bg_full_size)
 				{
-					plot_pixel(bitmap, (x + bgscrollx) & 0x1ff, (y + bgscrolly) & 0x1ff, Machine->pens[0x100 + color]);
+					*BITMAP_ADDR16(bitmap, (y + bgscrolly) & 0x1ff, (x + bgscrollx) & 0x1ff) = Machine->pens[0x100 + color];
 
 					pri = BITMAP_ADDR8(priority_bitmap, (y + bgscrolly) & 0x1ff, 0);
 					pri[(x + bgscrollx) & 0x1ff] |= 2;
@@ -411,7 +411,7 @@ static void draw_bitmap(mame_bitmap *bitmap)
 					/* 50% size */
 					if(!(x % 2) && !(y % 2))
 					{
-						plot_pixel(bitmap, (x / 2 + bgscrollx) & 0x1ff, (y / 2 + bgscrolly) & 0x1ff, Machine->pens[0x100 + color]);
+						*BITMAP_ADDR16(bitmap, (y / 2 + bgscrolly) & 0x1ff, (x / 2 + bgscrollx) & 0x1ff) = Machine->pens[0x100 + color];
 
 						pri = BITMAP_ADDR8(priority_bitmap, (y / 2 + bgscrolly) & 0x1ff, 0);
 						pri[(x / 2 + bgscrollx) & 0x1ff] |= 2;

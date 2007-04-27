@@ -48,7 +48,7 @@ static void start_countdown_timer(void)
 {
 	timer_value = 0;
 
-	timer_pulse(TIME_IN_SEC(1), 0, countdown_timer_callback);
+	mame_timer_pulse(MAME_TIME_IN_SEC(1), 0, countdown_timer_callback);
 }
 
 
@@ -63,7 +63,7 @@ PALETTE_INIT( dday )
 	int i;
 
 
-	palette_set_shadow_factor(machine, 1.0/8);	/* this matches the previos version of the driver (>>3) */
+	palette_set_shadow_factor(machine, 1.0/8);	/* this matches the previous version of the driver (>>3) */
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
@@ -362,14 +362,14 @@ VIDEO_UPDATE( dday )
 				UINT32 src_pixel;
 
 
-				src_pixel = read_pixel(main_bitmap, x, y);
+				src_pixel = *BITMAP_ADDR16(main_bitmap, y, x);
 
-				if (read_pixel(sl_bitmap, x, y) == 255)
+				if (*BITMAP_ADDR16(sl_bitmap, y, x) == 0xff)
 				{
 					src_pixel += machine->drv->total_colors;
 				}
 
-				plot_pixel(bitmap, x, y, src_pixel);
+				*BITMAP_ADDR16(bitmap, y, x) = src_pixel;
 			}
 		}
 	}

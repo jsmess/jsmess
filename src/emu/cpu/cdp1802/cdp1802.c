@@ -815,7 +815,7 @@ static int cdp1802_execute(int cycles)
 
 	cdp1802.prevmode = cdp1802.mode;
 	cdp1802.mode = cdp1802.config->mode_r();
-	
+
 	do
 	{
 		switch (cdp1802.mode)

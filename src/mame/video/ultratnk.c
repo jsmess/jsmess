@@ -144,7 +144,7 @@ VIDEO_EOF( ultratnk )
 		{
 			for (x = rect.min_x; x <= rect.max_x; x++)
 			{
-				if (read_pixel(helper, x, y) != BG)
+				if (*BITMAP_ADDR16(helper, y, x) != BG)
 				{
 					ultratnk_collision[i] = 1;
 				}

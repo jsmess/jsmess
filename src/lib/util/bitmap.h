@@ -122,31 +122,6 @@ INLINE void union_rect(rectangle *dst, const rectangle *src)
 }
 
 
-/* plot a pixel in a bitmap of arbitrary depth */
-INLINE void plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
-{
-	switch (bitmap->bpp)
-	{
-		case 8:		*BITMAP_ADDR8(bitmap, y, x) = (UINT8)color;		break;
-		case 16:	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;	break;
-		case 32:	*BITMAP_ADDR32(bitmap, y, x) = (UINT32)color;	break;
-	}
-}
-
-
-/* read a pixel from a bitmap of arbitrary depth */
-INLINE UINT32 read_pixel(bitmap_t *bitmap, int x, int y)
-{
-	switch (bitmap->bpp)
-	{
-		case 8:		return *BITMAP_ADDR8(bitmap, y, x);
-		case 16:	return *BITMAP_ADDR16(bitmap, y, x);
-		case 32:	return *BITMAP_ADDR32(bitmap, y, x);
-	}
-	return 0;
-}
-
-
 /* draw a filled rectangle into a bitmap of arbitrary depth */
 INLINE void plot_box(bitmap_t *bitmap, int x, int y, int width, int height, UINT32 color)
 {

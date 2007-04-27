@@ -72,7 +72,7 @@ VIDEO_UPDATE( taxidrvr )
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
-						plot_pixel(bitmap,sx,sy,color);
+						*BITMAP_ADDR16(bitmap, sy, sx) = color;
 				}
 			}
 		}
@@ -90,7 +90,7 @@ VIDEO_UPDATE( taxidrvr )
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
-						plot_pixel(bitmap,sx,sy,color);
+						*BITMAP_ADDR16(bitmap, sy, sx) = color;
 				}
 			}
 		}
@@ -108,7 +108,7 @@ VIDEO_UPDATE( taxidrvr )
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
-						plot_pixel(bitmap,sx,sy,color);
+						*BITMAP_ADDR16(bitmap, sy, sx) = color;
 				}
 			}
 		}
@@ -136,7 +136,7 @@ VIDEO_UPDATE( taxidrvr )
 			color = (taxidrvr_vram4[offs/4]>>(2*(offs&3)))&0x03;
 			if (color)
 			{
-				plot_pixel(bitmap,sx,sy,2*color);
+				*BITMAP_ADDR16(bitmap, sy, sx) = 2 * color;
 			}
 		}
 	}

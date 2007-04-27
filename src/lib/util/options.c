@@ -28,6 +28,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef union _options_range_parameter options_range_parameter;
+union _options_range_parameter
+{
+	float f;
+	int i;
+};
+
 /* forward reference */
 typedef struct _options_data options_data;
 
@@ -51,6 +58,9 @@ struct _options_data
 	const char *			data;				/* data for this item */
 	const char *			defdata;			/* default data for this item */
 	const char *			description;		/* description for this item */
+	options_range_type		range_type;			/* the type of range to apply to this item */
+	options_range_parameter	range_minimum;		/* the minimum of the range */
+	options_range_parameter	range_maximum;		/* the maximum of the range */
 	void					(*callback)(core_options *opts, const char *arg);	/* callback to be invoked when parsing */
 	options_data_link		links[MAX_ENTRY_NAMES]; /* array of links */
 };
@@ -206,27 +216,38 @@ static const char *copy_string(core_options *opts, const char *start, const char
 
 
 /*-------------------------------------------------
-    separate_names - separate a list of semicolon
-    separated names into individual strings
+    parse_option_name - read data from an option_entry
+    name into an option_data structure
 -------------------------------------------------*/
 
-static int separate_names(core_options *opts, const char *srcstring, const char *results[], int maxentries)
+static int parse_option_name(core_options *opts, const char *srcstring, options_data *data)
 {
 	const char *start;
+	const char *end = NULL;
 	int curentry;
 
 	/* start with the original string and loop over entries */
 	start = srcstring;
-	for (curentry = 0; curentry < maxentries; curentry++)
+	for (curentry = 0; curentry < ARRAY_LENGTH(data->names); curentry++)
 	{
 		/* find the end of this entry and copy the string */
-		const char *end = strchr(start, ';');
-		results[curentry] = copy_string(opts, start, end);
+		for (end = start; *end != 0 && *end != ';' && *end != '('; end++)
+			;
+		data->names[curentry] = copy_string(opts, start, end);
 
 		/* if we hit the end of the source, stop */
-		if (end == NULL)
+		if (*end != ';')
 			break;
 		start = end + 1;
+	}
+
+	/* have we found a range? */
+	if (end != NULL && *end == '(')
+	{
+		if (sscanf(end, "(%d-%d)", &data->range_minimum.i, &data->range_maximum.i) == 2)
+			data->range_type = OPTION_RANGE_INT;
+		else if (sscanf(end, "(%f-%f)", &data->range_minimum.f, &data->range_maximum.f) == 2)
+			data->range_type = OPTION_RANGE_FLOAT;
 	}
 	return curentry;
 }
@@ -312,9 +333,9 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 			return FALSE;
 		memset(data, 0, sizeof(*data));
 
-		/* separate the names */
+		/* parse the option name */
 		if (entrylist->name != NULL)
-			separate_names(opts, entrylist->name, data->names, ARRAY_LENGTH(data->names));
+			parse_option_name(opts, entrylist->name, data);
 
 		/* do we match an existing entry? */
 		for (i = 0; i < ARRAY_LENGTH(data->names) && match == NULL; i++)
@@ -792,87 +813,6 @@ float options_get_float(core_options *opts, const char *name)
 
 
 /*-------------------------------------------------
-    options_get_int_range - return data formatted
-    as an integer and clamped to within the given
-    range
--------------------------------------------------*/
-
-int options_get_int_range(core_options *opts, const char *name, int minval, int maxval)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	int value = 0;
-
-	if (data == NULL)
-		message(opts, OPTMSG_ERROR, "Unexpected integer option %s queried\n", name);
-	else if (data->data == NULL || sscanf(data->data, "%d", &value) != 1)
-	{
-		if (data->defdata != NULL)
-		{
-			options_set_string(opts, name, data->defdata);
-			value = options_get_int(opts, name);
-		}
-		if (!data->error_reported)
-		{
-			message(opts, OPTMSG_ERROR, "Illegal integer value for %s; reverting to %d\n", data->names[0], value);
-			data->error_reported = TRUE;
-		}
-	}
-	else if (value < minval || value > maxval)
-	{
-		options_set_string(opts, name, data->defdata);
-		value = options_get_int(opts, name);
-		if (!data->error_reported)
-		{
-			message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %d and %d); reverting to %d\n", data->names[0], minval, maxval, value);
-			data->error_reported = TRUE;
-		}
-	}
-
-	return value;
-}
-
-
-/*-------------------------------------------------
-    options_get_float_range - return data formatted
-    as a float and clamped to within the given
-    range
--------------------------------------------------*/
-
-float options_get_float_range(core_options *opts, const char *name, float minval, float maxval)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	float value = 0;
-
-	if (data == NULL)
-		message(opts, OPTMSG_ERROR, "Unexpected float option %s queried\n", name);
-	else if (data->data == NULL || sscanf(data->data, "%f", &value) != 1)
-	{
-		if (data->defdata != NULL)
-		{
-			options_set_string(opts, name, data->defdata);
-			value = options_get_float(opts, name);
-		}
-		if (!data->error_reported)
-		{
-			message(opts, OPTMSG_ERROR, "Illegal float value for %s; reverting to %f\n", data->names[0], (double)value);
-			data->error_reported = TRUE;
-		}
-	}
-	else if (value < minval || value > maxval)
-	{
-		options_set_string(opts, name, data->defdata);
-		value = options_get_float(opts, name);
-		if (!data->error_reported)
-		{
-			message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %f and %f); reverting to %f\n", data->names[0], (double)minval, (double)maxval, (double)value);
-			data->error_reported = TRUE;
-		}
-	}
-	return value;
-}
-
-
-/*-------------------------------------------------
     options_set_string - set a string value
 -------------------------------------------------*/
 
@@ -965,6 +905,8 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 {
 	const char *dataend = newdata + strlen(newdata) - 1;
 	const char *datastart = newdata;
+	int i;
+	float f;
 
 	/* strip off leading/trailing spaces */
 	while (isspace(*datastart) && datastart <= dataend)
@@ -975,6 +917,50 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 	/* strip off quotes */
 	if (datastart != dataend && *datastart == '"' && *dataend == '"')
 		datastart++, dataend--;
+
+	/* check against range */
+	switch(data->range_type)
+	{
+		case OPTION_RANGE_NONE:
+			/* do nothing */
+			break;
+
+		case OPTION_RANGE_INT:
+			/* check against integer range */
+			i = 0;
+			if (sscanf(datastart, "%d", &i) != 1)
+			{
+				message(opts, OPTMSG_ERROR, "Illegal integer value for %s; keeping value of %s\n", data->names[0], data->data);
+				data->error_reported = TRUE;
+				return;
+			}
+			if (i < data->range_minimum.i || i > data->range_maximum.i)
+			{
+				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %i and %i); keeping value of %s\n",
+					data->names[0], data->range_minimum.i, data->range_maximum.i, data->data);
+				data->error_reported = TRUE;
+				return;
+			}
+			break;
+
+		case OPTION_RANGE_FLOAT:
+			/* check against float range */
+			f = 0;
+			if (sscanf(datastart, "%f", &f) != 1)
+			{
+				message(opts, OPTMSG_ERROR, "Illegal float value for %s; keeping value of %s\n", data->names[0], data->data);
+				data->error_reported = TRUE;
+				return;
+			}
+			if (f < data->range_minimum.f || f > data->range_maximum.f)
+			{
+				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %f and %f); keeping value of %s\n",
+					data->names[0], data->range_minimum.f, data->range_maximum.f, data->data);
+				data->error_reported = TRUE;
+				return;
+			}
+			break;
+	}
 
 	/* allocate a copy of the data */
 	if (data->data)
@@ -988,22 +974,41 @@ static void update_data(core_options *opts, options_data *data, const char *newd
 
 
 /*-------------------------------------------------
-    options_get_first_entry - begins enumerating
-    through options entries
+    options_get_range_type - determine the type
+    of range for a particular option
 -------------------------------------------------*/
 
-const options_entry *options_get_first_entry(core_options *opts)
+options_range_type options_get_range_type(core_options *opts, const char *name)
 {
-	return NULL;
+	options_data *data = find_entry_data(opts, name, FALSE);
+	return data->range_type;
 }
+
 
 
 /*-------------------------------------------------
-    options_get_next_entry - begins enumerating
-    through options entries
+    options_get_range_int - retrieve the range of
+    an integer option
 -------------------------------------------------*/
 
-const options_entry *options_get_next_entry(core_options *opts, const options_entry *entry)
+void options_get_range_int(core_options *opts, const char *name, int *minval, int *maxval)
 {
-	return NULL;
+	options_data *data = find_entry_data(opts, name, FALSE);
+	*minval = data->range_minimum.i;
+	*maxval = data->range_maximum.i;
 }
+
+
+
+/*-------------------------------------------------
+    options_get_range_float - retrieve the range of
+    a float option
+-------------------------------------------------*/
+
+void options_get_range_float(core_options *opts, const char *name, float *minval, float *maxval)
+{
+	options_data *data = find_entry_data(opts, name, FALSE);
+	*minval = data->range_minimum.f;
+	*maxval = data->range_maximum.f;
+}
+

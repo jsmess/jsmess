@@ -714,9 +714,11 @@ VIDEO_UPDATE( yamato )
 
 	for(i=0;i<256;i++)
 	{
+		pen_t pen = 16*4+8*4 + memory_region(REGION_USER1)[(flip_screen_x?0x1280:0x1200)+(i>>1)];
+
 		for(j=0;j<256;j++)
 		{
-			plot_pixel(bitmap, i-8, j, 16*4+8*4 + memory_region(REGION_USER1)[(flip_screen_x?0x1280:0x1200)+(i>>1)]);
+			*BITMAP_ADDR16(bitmap, j, i-8) = pen;
 		}
 	}
 

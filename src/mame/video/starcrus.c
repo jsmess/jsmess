@@ -234,10 +234,10 @@ int starcrus_collision_check_s1s2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (read_pixel(ship1_vid, sx, sy)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==Machine->pens[1])
            	{
         		/* Condition 1 - ship 1 = ship 2 */
-				if (read_pixel(ship2_vid, sx, sy)==Machine->pens[1])
+				if (*BITMAP_ADDR16(ship2_vid, sy, sx)==Machine->pens[1])
                 	return 1;
 			}
         }
@@ -305,10 +305,10 @@ int starcrus_collision_check_p1p2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (read_pixel(proj1_vid, sx, sy)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(proj1_vid, sy, sx)==Machine->pens[1])
            	{
         		/* Condition 1 - proj 1 = proj 2 */
-				if (read_pixel(proj2_vid, sx, sy)==Machine->pens[1])
+				if (*BITMAP_ADDR16(proj2_vid, sy, sx)==Machine->pens[1])
                 	return 1;
 			}
         }
@@ -388,13 +388,13 @@ int starcrus_collision_check_s1p1p2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (read_pixel(ship1_vid, sx, sy)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==Machine->pens[1])
            	{
         		/* Condition 1 - ship 1 = proj 1 */
-				if (read_pixel(proj1_vid, sx, sy)==Machine->pens[1])
+				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==Machine->pens[1])
                 	return 1;
         		/* Condition 2 - ship 1 = proj 2 */
-        		if (read_pixel(proj2_vid, sx, sy)==Machine->pens[1])
+        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==Machine->pens[1])
                 	return 1;
             }
         }
@@ -474,13 +474,13 @@ int starcrus_collision_check_s2p1p2(void)
     {
         for (sx=0;sx<16;sx++)
         {
-        	if (read_pixel(ship2_vid, sx, sy)==Machine->pens[1])
+        	if (*BITMAP_ADDR16(ship2_vid, sy, sx)==Machine->pens[1])
            	{
         		/* Condition 1 - ship 2 = proj 1 */
-				if (read_pixel(proj1_vid, sx, sy)==Machine->pens[1])
+				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==Machine->pens[1])
                 	return 1;
         		/* Condition 2 - ship 2 = proj 2 */
-        		if (read_pixel(proj2_vid, sx, sy)==Machine->pens[1])
+        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==Machine->pens[1])
                 	return 1;
             }
         }

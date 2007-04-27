@@ -98,10 +98,8 @@ static VIDEO_UPDATE( lastfght )
 		for (x=0;x<512;x++)
 		{
 			UINT8 *gfxdata = memory_region( REGION_GFX1 );
-			UINT8 data;
-			data = gfxdata[count];
+			*BITMAP_ADDR16(bitmap, y, x) = gfxdata[count];
 			count++;
-			plot_pixel(bitmap,x,y,data);
 		}
 	}
 

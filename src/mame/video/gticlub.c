@@ -133,8 +133,11 @@ WRITE32_HANDLER(K001006_1_w)
 /*****************************************************************************/
 /* Konami K001005 Custom 3D Pixel Renderer chip (KS10071) */
 
-static const int decode_x[8] = {  0, 16, 2, 18, 4, 20, 6, 22 };
-static const int decode_y[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 104, 65, 73, 97, 105 };
+static const int decode_x_gti[8] = {  0, 16, 2, 18, 4, 20, 6, 22 };
+static const int decode_y_gti[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 104, 65, 73, 97, 105 };
+
+static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
+static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
 
 typedef struct {
 	float x,y,z;
@@ -194,11 +197,25 @@ int K001005_init(void)
 }
 
 // rearranges the texture data to a more practical order
-void K001005_preprocess_texture_data(UINT8 *rom, int length)
+void K001005_preprocess_texture_data(UINT8 *rom, int length, int gticlub)
 {
 	int index;
 	int i, x, y;
 	UINT8 temp[0x40000];
+
+	const int *decode_x;
+	const int *decode_y;
+
+	if (gticlub)
+	{
+		decode_x = decode_x_gti;
+		decode_y = decode_y_gti;
+	}
+	else
+	{
+		decode_x = decode_x_zr107;
+		decode_y = decode_y_zr107;
+	}
 
 	for (index=0; index < length; index += 0x40000)
 	{
@@ -1060,7 +1077,7 @@ VIDEO_UPDATE( gticlub )
             for (x=0; x < 512; x++)
             {
                 UINT8 pixel = rom[index + (y*512) + x];
-                plot_pixel(bitmap, x, y, K001006_palette[tp][(pal * 256) + pixel]);
+                *BITMAP_ADDR32(bitmap, y, x) = K001006_palette[tp][(pal * 256) + pixel];
             }
         }
 

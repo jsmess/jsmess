@@ -13,19 +13,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/19 -
 
 /*******************************************************************
 
-    Palette Setting.
-
-*******************************************************************/
-
-PALETTE_INIT( minivadr )
-{
-	palette_set_color(machine,0,0x00,0x00,0x00);
-	palette_set_color(machine,1,0xff,0xff,0xff);
-}
-
-
-/*******************************************************************
-
     Draw Pixel.
 
 *******************************************************************/
@@ -33,7 +20,6 @@ WRITE8_HANDLER( minivadr_videoram_w )
 {
 	int i;
 	int x, y;
-	int color;
 
 
 	videoram[offset] = data;
@@ -48,9 +34,8 @@ WRITE8_HANDLER( minivadr_videoram_w )
 	{
 		for (i = 0; i < 8; i++)
 		{
-			color = Machine->pens[((data >> i) & 0x01)];
-
-			plot_pixel(tmpbitmap, x + (7 - i), y, color);
+			pen_t pen = ((data >> i) & 0x01) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(tmpbitmap, y, x + (7 - i)) = pen;
 		}
 	}
 }

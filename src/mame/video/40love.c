@@ -192,9 +192,9 @@ static void fortyl_plot_pix(int offset)
 	{
 		c = ((d2>>i)&1) + ((d1>>i)&1)*2;
 		if (pixram_sel)
-			plot_pixel(pixel_bitmap2, x+i, y, fortyl_pix_color[c]);
+			*BITMAP_ADDR16(pixel_bitmap2, y, x+i) = fortyl_pix_color[c];
 		else
-			plot_pixel(pixel_bitmap1, x+i, y, fortyl_pix_color[c]);
+			*BITMAP_ADDR16(pixel_bitmap1, y, x+i) = fortyl_pix_color[c];
 	}
 }
 

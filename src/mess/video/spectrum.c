@@ -18,6 +18,7 @@
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "video/border.h"
+#include "plotpixl.h"
 
 unsigned char *spectrum_characterram;
 unsigned char *spectrum_colorram;

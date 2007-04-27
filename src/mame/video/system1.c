@@ -211,7 +211,7 @@ INLINE void draw_pixel(mame_bitmap *bitmap,
 		y_flipped >= Machine->screen[0].visarea.min_y ||
 		y_flipped <= Machine->screen[0].visarea.max_y)
 	{
-		plot_pixel(bitmap, x_flipped, y_flipped, color);
+		*BITMAP_ADDR16(bitmap, y_flipped, x_flipped) = color;
 	}
 
 	xr = ((x - background_scrollx) & 0xff) / 8;

@@ -182,8 +182,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		plot_pixel(scroll_panel_bitmap, sx + i, sy,
-			Machine->pens[RADAR_PALETTE_BASE + (sy & 0xfc) + col]);
+		*BITMAP_ADDR16(scroll_panel_bitmap, sy, sx + i) = Machine->pens[RADAR_PALETTE_BASE + (sy & 0xfc) + col];
 	}
 }
 

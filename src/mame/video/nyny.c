@@ -86,7 +86,7 @@ WRITE8_HANDLER( nyny_colourram0_w )
 	for ( z=0; z<8; z++ )
 	{
 		c = v & 1 ;
-	  	plot_pixel( tmpbitmap1, x*8+z, y, Machine->pens[c*d]);
+		*BITMAP_ADDR16(tmpbitmap1, y, x*8+z) = Machine->pens[c*d];
 		v >>= 1 ;
 	}
 }
@@ -103,7 +103,7 @@ WRITE8_HANDLER( nyny_videoram0_w )
 	for ( z=0; z<8; z++ )
 	{
 		c = data & 1 ;
-  		plot_pixel( tmpbitmap1, x*8+z, y, Machine->pens[c*d]);
+		*BITMAP_ADDR16(tmpbitmap1, y, x*8+z) = Machine->pens[c*d];
 		data >>= 1 ;
 	}
 }
@@ -121,7 +121,7 @@ WRITE8_HANDLER( nyny_colourram1_w )
 	for ( z=0; z<8; z++ )
 	{
 		c = v & 1 ;
-	  	plot_pixel( tmpbitmap2, x*8+z, y, Machine->pens[c*d]);
+		*BITMAP_ADDR16(tmpbitmap2, y, x*8+z) = Machine->pens[c*d];
 		v >>= 1 ;
 	}
 
@@ -139,7 +139,7 @@ WRITE8_HANDLER( nyny_videoram1_w )
 	for ( z=0; z<8; z++ )
 	{
 		c = data & 1 ;
-	  	plot_pixel( tmpbitmap2, x*8+z, y, Machine->pens[c*d]);
+		*BITMAP_ADDR16(tmpbitmap2, y, x*8+z) = Machine->pens[c*d];
 		data >>= 1 ;
 	}
 }

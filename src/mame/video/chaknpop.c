@@ -276,9 +276,9 @@ static void chaknpop_draw_bitmap(mame_bitmap *bitmap)
 
 			if (color)
 			{
-				pen_t pen = read_pixel(bitmap, x, y);
+				pen_t pen = *BITMAP_ADDR16(bitmap, y, x);
 				pen |= color;
-				plot_pixel(bitmap, x, y, pen);
+				*BITMAP_ADDR16(bitmap, y, x) = pen;
 			}
 		}
 	}

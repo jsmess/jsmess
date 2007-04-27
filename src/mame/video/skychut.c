@@ -18,12 +18,7 @@ static int bottomline;
 
 WRITE8_HANDLER( skychut_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		dirtybuffer[offset] = 1;
-
-		colorram[offset] = data;
-	}
+	colorram[offset] = data;
 }
 
 WRITE8_HANDLER( skychut_ctrl_w )
@@ -45,8 +40,6 @@ WRITE8_HANDLER( skychut_ctrl_w )
 VIDEO_UPDATE( skychut )
 {
 	int offs;
-	if (get_vh_global_attribute_changed())
-		memset (dirtybuffer, 1, videoram_size);
 
 	fillbitmap(bitmap,machine->pens[7],cliprect);
 
@@ -68,14 +61,14 @@ VIDEO_UPDATE( skychut )
 		if (x >= cliprect->min_x && x+7 <= cliprect->max_x
 				&& y >= cliprect->min_y && y <= cliprect->max_y)
 		{
-			if (mask&0x80) plot_pixel(bitmap,x+0,y,col);
-			if (mask&0x40) plot_pixel(bitmap,x+1,y,col);
-			if (mask&0x20) plot_pixel(bitmap,x+2,y,col);
-			if (mask&0x10) plot_pixel(bitmap,x+3,y,col);
-			if (mask&0x08) plot_pixel(bitmap,x+4,y,col);
-			if (mask&0x04) plot_pixel(bitmap,x+5,y,col);
-			if (mask&0x02) plot_pixel(bitmap,x+6,y,col);
-			if (mask&0x01) plot_pixel(bitmap,x+7,y,col);
+			if (mask&0x80) *BITMAP_ADDR16(bitmap, y, x+0) = col;
+			if (mask&0x40) *BITMAP_ADDR16(bitmap, y, x+1) = col;
+			if (mask&0x20) *BITMAP_ADDR16(bitmap, y, x+2) = col;
+			if (mask&0x10) *BITMAP_ADDR16(bitmap, y, x+3) = col;
+			if (mask&0x08) *BITMAP_ADDR16(bitmap, y, x+4) = col;
+			if (mask&0x04) *BITMAP_ADDR16(bitmap, y, x+5) = col;
+			if (mask&0x02) *BITMAP_ADDR16(bitmap, y, x+6) = col;
+			if (mask&0x01) *BITMAP_ADDR16(bitmap, y, x+7) = col;
 		}
 	}
 
@@ -85,16 +78,13 @@ VIDEO_UPDATE( skychut )
 
 		for (y = cliprect->min_y;y <= cliprect->max_y;y++)
 		{
-			plot_pixel(bitmap,16,y,0);
+			*BITMAP_ADDR16(bitmap, y, 16) = 0;
 		}
 	}
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
-
-
-		dirtybuffer[offs] = 0;
 
 		sx = 31 - offs / 32;
 		sy = offs % 32;
@@ -118,14 +108,14 @@ static void iremm15_drawgfx(mame_bitmap *bitmap, int ch,
 
 	for (i=0; i<8; i++, y++) {
 		mask=iremm15_chargen[ch*8+i];
-		plot_pixel(bitmap,x+0,y,mask&0x80?color:back);
-		plot_pixel(bitmap,x+1,y,mask&0x40?color:back);
-		plot_pixel(bitmap,x+2,y,mask&0x20?color:back);
-		plot_pixel(bitmap,x+3,y,mask&0x10?color:back);
-		plot_pixel(bitmap,x+4,y,mask&0x08?color:back);
-		plot_pixel(bitmap,x+5,y,mask&0x04?color:back);
-		plot_pixel(bitmap,x+6,y,mask&0x02?color:back);
-		plot_pixel(bitmap,x+7,y,mask&0x01?color:back);
+		*BITMAP_ADDR16(bitmap, y, x+0) = mask&0x80?color:back;
+		*BITMAP_ADDR16(bitmap, y, x+1) = mask&0x40?color:back;
+		*BITMAP_ADDR16(bitmap, y, x+2) = mask&0x20?color:back;
+		*BITMAP_ADDR16(bitmap, y, x+3) = mask&0x10?color:back;
+		*BITMAP_ADDR16(bitmap, y, x+4) = mask&0x08?color:back;
+		*BITMAP_ADDR16(bitmap, y, x+5) = mask&0x04?color:back;
+		*BITMAP_ADDR16(bitmap, y, x+6) = mask&0x02?color:back;
+		*BITMAP_ADDR16(bitmap, y, x+7) = mask&0x01?color:back;
 	}
 }
 
@@ -139,27 +129,20 @@ static void iremm15_drawgfx(mame_bitmap *bitmap, int ch,
 VIDEO_UPDATE( iremm15 )
 {
 	int offs;
-	if (get_vh_global_attribute_changed())
-		memset (dirtybuffer, 1, videoram_size);
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
-		{
-			int sx,sy;
+		int sx,sy;
 
 
-			dirtybuffer[offs] = 0;
+		sx = 31 - offs / 32;
+		sy = offs % 32;
 
-			sx = 31 - offs / 32;
-			sy = offs % 32;
-
-			iremm15_drawgfx(tmpbitmap,
-							videoram[offs],
-							machine->pens[colorram[offs] & 7],
-							machine->pens[7], // space beam not color 0
-							8*sx,8*sy);
-		}
+		iremm15_drawgfx(tmpbitmap,
+						videoram[offs],
+						machine->pens[colorram[offs] & 7],
+						machine->pens[7], // space beam not color 0
+						8*sx,8*sy);
 	}
 
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);

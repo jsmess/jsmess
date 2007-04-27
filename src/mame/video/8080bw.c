@@ -185,11 +185,11 @@ static void plot_pixel_8080(int x, int y, int col)
 	{
 		if (flip_screen)
 		{
-			plot_pixel(tmpbitmap, MW8080BW_HPIXCOUNT - 1 - x, MW8080BW_VTOTAL - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), Machine->pens[col]);
+			*BITMAP_ADDR16(tmpbitmap, MW8080BW_VTOTAL - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = Machine->pens[col];
 		}
 		else
 		{
-			plot_pixel(tmpbitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, Machine->pens[col]);
+			*BITMAP_ADDR16(tmpbitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = Machine->pens[col];
 		}
 	}
 }

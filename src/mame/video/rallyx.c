@@ -399,8 +399,8 @@ static void plot_star(mame_bitmap *bitmap, const rectangle *cliprect, int x, int
 		y = 255 - y;
 	}
 
-	if (read_pixel(bitmap, x, y) == bpen)
-		plot_pixel(bitmap, x, y, Machine->pens[STARS_COLOR_BASE + color]);
+	if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[STARS_COLOR_BASE + color];
 }
 
 static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )

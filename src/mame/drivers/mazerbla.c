@@ -759,7 +759,7 @@ unsigned char * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x1
 
 				if ( ((xpos+x)<256) && ((ypos+y)<256) )
 				{
-					plot_pixel(tmpbitmaps[plane], xpos+x, ypos+y, col );
+					*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = col;
 				}
 
 				bits+=2;
@@ -794,7 +794,7 @@ unsigned char * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x1
 
 				if ( ((xpos+x)<256) && ((ypos+y)<256) )
 				{
-					plot_pixel(tmpbitmaps[plane], xpos+x, ypos+y, data? color_base | ((color&0xf0)>>4): color_base | ((color&0x0f)) );
+					*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = data? color_base | ((color&0xf0)>>4): color_base | ((color&0x0f));
 				}
 
 				bits+=1;
@@ -830,7 +830,7 @@ unsigned char * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x1
 
 				if ( ((xpos+x)<256) && ((ypos+y)<256) )
 				{
-					plot_pixel(tmpbitmaps[plane], xpos+x, ypos+y, col );
+					*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = col;
 				}
 
 				bits+=4;
@@ -931,7 +931,7 @@ unsigned char * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x1
 
 				if ( ((xpos+x)<256) && ((ypos+y)<256) )
 				{
-					plot_pixel(tmpbitmaps[plane], xpos+x, ypos+y, col );
+					*BITMAP_ADDR16(tmpbitmaps[plane], ypos+y, xpos+x) = col;
 				}
 
 				bits+=2;

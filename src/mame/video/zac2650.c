@@ -89,7 +89,7 @@ int SpriteCollision(int first,int second)
 				    continue;
 			    }
 
-        	    Checksum += read_pixel(spritebitmap, x, y);
+        	    Checksum += *BITMAP_ADDR16(spritebitmap, y, x);
             }
 	    }
 
@@ -116,7 +116,7 @@ int SpriteCollision(int first,int second)
 				    continue;
 			    }
 
-        	    Checksum -= read_pixel(spritebitmap, x, y);
+        	    Checksum -= *BITMAP_ADDR16(spritebitmap, y, x);
             }
 	    }
 
@@ -212,7 +212,7 @@ static void tinvader_draw_sprites( mame_bitmap *bitmap )
 				        continue;
 			        }
 
-        	        if (read_pixel(bitmap, x, y) != read_pixel(tmpbitmap, x, y))
+        	        if (*BITMAP_ADDR16(bitmap, y, x) != *BITMAP_ADDR16(tmpbitmap, y, x))
         	        {
                     	CollisionBackground = 0x80;
 				        break;

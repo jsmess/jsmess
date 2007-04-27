@@ -38,7 +38,8 @@ WRITE8_HANDLER( toratora_videoram_w )
 
 		for (i = 0; i < 8; i++)
 		{
-			plot_pixel(tmpbitmap, x, y, Machine->pens[(data & 0x80) ? 1 : 0]);
+			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
 
 			x++;
 			data <<= 1;
@@ -237,11 +238,9 @@ static MACHINE_DRIVER_START( toratora )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0,256-1,8,248-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)

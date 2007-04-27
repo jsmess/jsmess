@@ -66,7 +66,7 @@ const options_entry mame_core_options[] =
 	/* performance options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE PERFORMANCE OPTIONS" },
 	{ "autoframeskip;afs",           "0",         OPTION_BOOLEAN,    "enable automatic frameskip selection" },
-	{ "frameskip;fs",                "0",         0,                 "set frameskip to fixed value, 0-12 (autoframeskip must be disabled)" },
+	{ "frameskip;fs(0-10)",          "0",         0,                 "set frameskip to fixed value, 0-12 (autoframeskip must be disabled)" },
 	{ "seconds_to_run;str",          "0",         0,                 "number of emulated seconds to run before automatically exiting" },
 	{ "throttle",                    "1",         OPTION_BOOLEAN,    "enable throttling to keep game running in sync with real time" },
 	{ "sleep",                       "1",         OPTION_BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
@@ -90,10 +90,10 @@ const options_entry mame_core_options[] =
 
 	/* screen options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SCREEN OPTIONS" },
-	{ "brightness",                  "1.0",       0,                 "default game screen brightness correction" },
-	{ "contrast",                    "1.0",       0,                 "default game screen contrast correction" },
-	{ "gamma",                       "1.0",       0,                 "default game screen gamma correction" },
-	{ "pause_brightness",            "0.65",      0,                 "amount to scale the screen brightness when paused" },
+	{ "brightness(0.1-2.0)",         "1.0",       0,                 "default game screen brightness correction" },
+	{ "contrast(0.1-2.0)",           "1.0",       0,                 "default game screen contrast correction" },
+	{ "gamma(0.1-3.0)",              "1.0",       0,                 "default game screen gamma correction" },
+	{ "pause_brightness(0.0-1.0)",   "0.65",      0,                 "amount to scale the screen brightness when paused" },
 
 	/* vector options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE VECTOR OPTIONS" },
@@ -104,7 +104,7 @@ const options_entry mame_core_options[] =
 	/* sound options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SOUND OPTIONS" },
 	{ "sound",                       "1",         OPTION_BOOLEAN,    "enable sound output" },
-	{ "samplerate;sr",               "48000",     0,                 "set sound output sample rate" },
+	{ "samplerate;sr(1000-1000000)", "48000",     0,                 "set sound output sample rate" },
 	{ "samples",                     "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ "volume;vol",                  "0",         0,                 "sound volume in decibels (-32 min, 0 max)" },
 
@@ -197,6 +197,21 @@ void mame_options_init(const options_entry *entries)
 #ifdef MESS
 	mess_options_init();
 #endif /* MESS */
+}
+
+
+
+/*-------------------------------------------------
+    mame_options_exit - free core MAME options
+-------------------------------------------------*/
+
+void mame_options_exit(void)
+{
+	if (mame_opts != NULL)
+	{
+		options_free(mame_opts);
+		mame_opts = NULL;
+	}
 }
 
 

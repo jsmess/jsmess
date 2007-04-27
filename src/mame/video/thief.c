@@ -158,26 +158,22 @@ VIDEO_UPDATE( thief ){
 			int bit;
 			if( flipscreen ){
 				for( bit=0; bit<8; bit++ ){
-					plot_pixel( page, 0xff - (xpos+bit), 0xff - ypos,
+					*BITMAP_ADDR16(page, 0xff - ypos, 0xff - (xpos+bit)) =
 						pal_data[
 							(((plane0<<bit)&0x80)>>7) |
 							(((plane1<<bit)&0x80)>>6) |
 							(((plane2<<bit)&0x80)>>5) |
-							(((plane3<<bit)&0x80)>>4)
-						]
-					);
+							(((plane3<<bit)&0x80)>>4)];
 				}
 			}
 			else {
 				for( bit=0; bit<8; bit++ ){
-					plot_pixel( page, xpos+bit, ypos,
+					*BITMAP_ADDR16(page, ypos, xpos+bit) =
 						pal_data[
 							(((plane0<<bit)&0x80)>>7) |
 							(((plane1<<bit)&0x80)>>6) |
 							(((plane2<<bit)&0x80)>>5) |
-							(((plane3<<bit)&0x80)>>4)
-						]
-					);
+							(((plane3<<bit)&0x80)>>4)];
 				}
 			}
 			dirty[offs] = 0;

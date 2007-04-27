@@ -59,7 +59,6 @@ VIDEO_START( circus )
 static void draw_line(mame_bitmap *bitmap, int x1, int y1, int x2, int y2, int dotted)
 {
 	/* Draws horizontal and Vertical lines only! */
-	int col = Machine->pens[1];
 
 	int count, skip;
 
@@ -74,14 +73,14 @@ static void draw_line(mame_bitmap *bitmap, int x1, int y1, int x2, int y2, int d
 	{
 		for (count = y2; count >= y1; count -= skip)
 		{
-			plot_pixel(bitmap, x1, count, col);
+			*BITMAP_ADDR16(bitmap, count, x1) = Machine->pens[1];
 		}
 	}
 	else
 	{
 		for (count = x2; count >= x1; count -= skip)
 		{
-			plot_pixel(bitmap, count, y1, col);
+			*BITMAP_ADDR16(bitmap, y1, count) = Machine->pens[1];
 		}
 	}
 }

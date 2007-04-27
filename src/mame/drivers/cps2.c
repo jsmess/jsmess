@@ -4188,6 +4188,37 @@ ROM_END
 
 ROM_START( nwarr )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "vphe.03f", 0x000000, 0x80000, CRC(a922c44f) SHA1(aa06c7ee9b9878d999a21201f4ff3134cef1fff0) )
+	ROM_LOAD16_WORD_SWAP( "vphe.04c", 0x080000, 0x80000, CRC(7312d890) SHA1(8cf2ff6eb2c13e308e65d7ac7a5f9664c44170df) )
+	ROM_LOAD16_WORD_SWAP( "vphe.05d", 0x100000, 0x80000, CRC(cde8b506) SHA1(1c4f7fa6799be1aa444ed31464cddb79fee22928) )
+	ROM_LOAD16_WORD_SWAP( "vphe.06c", 0x180000, 0x80000, CRC(be99e7d0) SHA1(863c713ba7b6120a50835ee7a0153021fbbcef81) )
+	ROM_LOAD16_WORD_SWAP( "vphe.07b", 0x200000, 0x80000, CRC(69e0e60c) SHA1(8b9b7280dfbbb45a875d78d40703503ffce663bb) )
+	ROM_LOAD16_WORD_SWAP( "vphe.08b", 0x280000, 0x80000, CRC(d95a3849) SHA1(9ec77670fb83cf9beba95439b709c138e800bcc8) )
+	ROM_LOAD16_WORD_SWAP( "vphe.09b", 0x300000, 0x80000, CRC(9882561c) SHA1(cc6d4a50819cd4e6b8c39c60e7c8ce46ba0f05d8) )
+	ROM_LOAD16_WORD_SWAP( "vphe.10b", 0x380000, 0x80000, CRC(976fa62f) SHA1(ede8cb58365795f7068f3be52639383e226cf751) )
+
+	ROM_REGION( 0x2000000, REGION_GFX1, 0 )
+	ROMX_LOAD( "vph.13m",   0x0000000, 0x400000, CRC(c51baf99) SHA1(2fb6642908e542e404391eb17392f8270e87bf48) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.15m",   0x0000002, 0x400000, CRC(3ce83c77) SHA1(93369b23c6d7d834297434691bb047ee3dd9539c) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.17m",   0x0000004, 0x400000, CRC(4f2408e0) SHA1(cd49c6b3c7e6470c6058f98ccc5210b052bb13e2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.19m",   0x0000006, 0x400000, CRC(9ff60250) SHA1(d69ba4dc6bd37d003245f0cf3211d6e2623005b8) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.14m",   0x1000000, 0x400000, CRC(7a0e1add) SHA1(6b28a91bd59bba97886fdea30116a5b1071109ed) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.16m",   0x1000002, 0x400000, CRC(2f41ca75) SHA1(f4a67e60b62001e6fe75cb05b9c81040a8a09f54) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.18m",   0x1000004, 0x400000, CRC(64498eed) SHA1(d64e54a9ad1cbb927b7bac2eb16e1487834c5706) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.20m",   0x1000006, 0x400000, CRC(17f2433f) SHA1(0cbf8c96f92016fefb4a9c668ce5fd260342d712) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, REGION_CPU2, 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "vph.01",   0x00000, 0x08000, CRC(5045dcac) SHA1(fd1a6586fbdd48a707df1fa52309b4cf50e3cc4c) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "vph.02",   0x28000, 0x20000, CRC(86b60e59) SHA1(197d07ced8b9850729c83fa59b7afc283500bdee) )
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "vph.11m",   0x000000, 0x200000, CRC(e1837d33) SHA1(e3cb69f64767bacbec7286d0b4cd0ce7a0ba13d8) )
+	ROM_LOAD16_WORD_SWAP( "vph.12m",   0x200000, 0x200000, CRC(fbd3cd90) SHA1(4813c25802ad71b77ca04fd8f3a86344f99f0d6a) )
+ROM_END
+
+ROM_START( nwarru )
+	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "vphu.03f", 0x000000, 0x80000, CRC(85d6a359) SHA1(38f4bb5cf2e1e82ce9673b911329fdc8220ce0dc) )
 	ROM_LOAD16_WORD_SWAP( "vphu.04c", 0x080000, 0x80000, CRC(cb7fce77) SHA1(85a8c8b1c71df0eee5f23e0bf28b2d95af2ce830) )
 	ROM_LOAD16_WORD_SWAP( "vphu.05e", 0x100000, 0x80000, CRC(e08f2bba) SHA1(0f6d01a3b05085df23ead4c09c5363a1587b527e) )
@@ -7125,7 +7156,8 @@ GAME( 1995, mshjr1,   msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Su
 GAME( 1995, msha,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Asia 951024)", 0 )
 GAME( 1995, mshh,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Hispanic 951117)", 0 )
 GAME( 1995, mshb,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Brazil 951117)", 0 )
-GAME( 1995, nwarr,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)", 0 )
+GAME( 1995, nwarr,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Euro 950316)", 0 )
+GAME( 1995, nwarru,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)", 0 )
 GAME( 1995, nwarrh,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Hispanic 950403)", 0 )
 GAME( 1995, nwarrb,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Brazil 950403)", 0 )
 GAME( 1995, vhuntj,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950316)", 0 )

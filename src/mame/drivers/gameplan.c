@@ -111,7 +111,7 @@ WRITE8_HANDLER( video_CA2_w )
 					ypos++;
 			}
 
-			plot_pixel(tmpbitmap, xpos, ypos, Machine->pens[portA & 7]);
+			*BITMAP_ADDR16(tmpbitmap, ypos, xpos) = Machine->pens[portA & 7];
 			break;
 
 		case 1:	// load X register

@@ -648,7 +648,7 @@ static void copy_png_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *ha
 				/* determine alpha and expand to 32bpp */
 				UINT8 alpha = (*src < png->num_trans) ? png->trans[*src] : 0xff;
 				accumalpha &= alpha;
-				plot_pixel(bitmap, x, y, MAKE_ARGB(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
 			}
 	}
 
@@ -659,7 +659,7 @@ static void copy_png_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *ha
 		src = png->image;
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src++)
-				plot_pixel(bitmap, x, y, MAKE_ARGB(0xff, *src, *src, *src));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(0xff, *src, *src, *src);
 	}
 
 	/* handle 32bpp non-alpha case */
@@ -669,7 +669,7 @@ static void copy_png_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *ha
 		src = png->image;
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src += 3)
-				plot_pixel(bitmap, x, y, MAKE_ARGB(0xff, src[0], src[1], src[2]));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(0xff, src[0], src[1], src[2]);
 	}
 
 	/* handle 32bpp alpha case */
@@ -681,7 +681,7 @@ static void copy_png_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *ha
 			for (x = 0; x < png->width; x++, src += 4)
 			{
 				accumalpha &= src[3];
-				plot_pixel(bitmap, x, y, MAKE_ARGB(src[3], src[0], src[1], src[2]));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(src[3], src[0], src[1], src[2]);
 			}
 	}
 
@@ -710,10 +710,10 @@ static void copy_png_alpha_to_bitmap(mame_bitmap *bitmap, const png_info *png, i
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src++)
 			{
-				rgb_t pixel = read_pixel(bitmap, x, y);
+				rgb_t pixel = *BITMAP_ADDR32(bitmap, y, x);
 				UINT8 alpha = compute_brightness(MAKE_RGB(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]));
 				accumalpha &= alpha;
-				plot_pixel(bitmap, x, y, MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel)));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 
@@ -725,9 +725,9 @@ static void copy_png_alpha_to_bitmap(mame_bitmap *bitmap, const png_info *png, i
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src++)
 			{
-				rgb_t pixel = read_pixel(bitmap, x, y);
+				rgb_t pixel = *BITMAP_ADDR32(bitmap, y, x);
 				accumalpha &= *src;
-				plot_pixel(bitmap, x, y, MAKE_ARGB(*src, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel)));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(*src, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 
@@ -739,10 +739,10 @@ static void copy_png_alpha_to_bitmap(mame_bitmap *bitmap, const png_info *png, i
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src += 3)
 			{
-				rgb_t pixel = read_pixel(bitmap, x, y);
+				rgb_t pixel = *BITMAP_ADDR32(bitmap, y, x);
 				UINT8 alpha = compute_brightness(MAKE_RGB(src[0], src[1], src[2]));
 				accumalpha &= alpha;
-				plot_pixel(bitmap, x, y, MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel)));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 
@@ -754,10 +754,10 @@ static void copy_png_alpha_to_bitmap(mame_bitmap *bitmap, const png_info *png, i
 		for (y = 0; y < png->height; y++)
 			for (x = 0; x < png->width; x++, src += 4)
 			{
-				rgb_t pixel = read_pixel(bitmap, x, y);
+				rgb_t pixel = *BITMAP_ADDR32(bitmap, y, x);
 				UINT8 alpha = compute_brightness(MAKE_RGB(src[0], src[1], src[2]));
 				accumalpha &= alpha;
-				plot_pixel(bitmap, x, y, MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel)));
+				*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB(alpha, RGB_RED(pixel), RGB_GREEN(pixel), RGB_BLUE(pixel));
 			}
 	}
 

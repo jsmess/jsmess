@@ -240,14 +240,14 @@ void starfire_video_update(int scanline, int count)
 				int data = pix[y];
 				int color = col[y];
 
-				plot_pixel(tmpbitmap, x + 0, scanline + y, color | ((data >> 2) & 0x20));
-				plot_pixel(tmpbitmap, x + 1, scanline + y, color | ((data >> 1) & 0x20));
-				plot_pixel(tmpbitmap, x + 2, scanline + y, color | ((data >> 0) & 0x20));
-				plot_pixel(tmpbitmap, x + 3, scanline + y, color | ((data << 1) & 0x20));
-				plot_pixel(tmpbitmap, x + 4, scanline + y, color | ((data << 2) & 0x20));
-				plot_pixel(tmpbitmap, x + 5, scanline + y, color | ((data << 3) & 0x20));
-				plot_pixel(tmpbitmap, x + 6, scanline + y, color | ((data << 4) & 0x20));
-				plot_pixel(tmpbitmap, x + 7, scanline + y, color | ((data << 5) & 0x20));
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 0) = color | ((data >> 2) & 0x20);
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 1) = color | ((data >> 1) & 0x20);
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 2) = color | ((data >> 0) & 0x20);
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 3) = color | ((data << 1) & 0x20);
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 4) = color | ((data << 2) & 0x20);
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 5) = color | ((data << 3) & 0x20);
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 6) = color | ((data << 4) & 0x20);
+				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 7) = color | ((data << 5) & 0x20);
 			}
 
 		pix += 256;

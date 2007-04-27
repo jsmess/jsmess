@@ -191,12 +191,12 @@ VIDEO_UPDATE( gridlee )
 
 					/* left pixel */
 					if (left && currx >= 0 && currx < 256)
-						plot_pixel(bitmap, currx ^ currxor, ypos, pens[left]);
+						*BITMAP_ADDR16(bitmap, ypos, currx ^ currxor) = pens[left];
 					currx++;
 
 					/* right pixel */
 					if (right && currx >= 0 && currx < 256)
-						plot_pixel(bitmap, currx ^ currxor, ypos, pens[right]);
+						*BITMAP_ADDR16(bitmap, ypos, currx ^ currxor) = pens[right];
 					currx++;
 				}
 			}

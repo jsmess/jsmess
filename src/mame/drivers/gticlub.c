@@ -169,17 +169,18 @@ static void eeprom_handler(mame_file *file, int read_or_write)
 	}
 }
 
-static UINT8 inputport2 = 0xff;
-
 static int adc1038_cycle;
 static int adc1038_clk;
 static int adc1038_adr;
 static int adc1038_data_in;
 static int adc1038_data_out;
 static int adc1038_adc_data;
+static int adc1038_sars = 1;
+static int adc1038_gticlub_hack = 0;
 
 static int adc1038_do_r(void)
 {
+	//printf("ADC DO\n");
 	return adc1038_data_out & 1;
 }
 
@@ -190,24 +191,31 @@ static void adc1038_di_w(int bit)
 
 static void adc1038_clk_w(int bit)
 {
-	if (adc1038_clk == 0 && bit == 0)
+	// GTI Club doesn't sync on SARS
+	if (adc1038_gticlub_hack)
 	{
-		adc1038_cycle = 0;
-
-		switch (adc1038_adr)
+		if (adc1038_clk == 0 && bit == 0)
 		{
-			case 0: adc1038_adc_data = readinputport(4); break;
-			case 1: adc1038_adc_data = readinputport(5); break;
-			case 2: adc1038_adc_data = readinputport(6); break;
-			case 3: adc1038_adc_data = readinputport(7); break;
-			case 4: adc1038_adc_data = 0x000; break;
-			case 5: adc1038_adc_data = 0x000; break;
-			case 6: adc1038_adc_data = 0x000; break;
-			case 7: adc1038_adc_data = 0x000; break;
+			adc1038_cycle = 0;
+
+			switch (adc1038_adr)
+			{
+				case 0: adc1038_adc_data = readinputport(4); break;
+				case 1: adc1038_adc_data = readinputport(5); break;
+				case 2: adc1038_adc_data = readinputport(6); break;
+				case 3: adc1038_adc_data = readinputport(7); break;
+				case 4: adc1038_adc_data = 0x000; break;
+				case 5: adc1038_adc_data = 0x000; break;
+				case 6: adc1038_adc_data = 0x000; break;
+				case 7: adc1038_adc_data = 0x000; break;
+			}
 		}
 	}
-	else if (bit == 1)
+
+	if (bit == 1)
 	{
+		//printf("ADC CLK, DI = %d, cycle = %d\n", adc1038_data_in, adc1038_cycle);
+
 		if (adc1038_cycle == 0)			// A2
 		{
 			adc1038_adr = 0;
@@ -222,7 +230,8 @@ static void adc1038_clk_w(int bit)
 			adc1038_adr |= (adc1038_data_in << 0);
 		}
 
-		adc1038_data_out = (adc1038_adc_data & (1 << (9 - adc1038_cycle))) ? 1 : 0;
+		adc1038_data_out = (adc1038_adc_data & 0x200) ? 1 : 0;
+		adc1038_adc_data <<= 1;
 
 		adc1038_cycle++;
 	}
@@ -230,7 +239,29 @@ static void adc1038_clk_w(int bit)
 	adc1038_clk = bit;
 }
 
-//UINT32 eeprom_bit = 0;
+static int adc1038_sars_r(void)
+{
+	adc1038_cycle = 0;
+
+	switch (adc1038_adr)
+	{
+		case 0: adc1038_adc_data = readinputport(4); break;
+		case 1: adc1038_adc_data = readinputport(5); break;
+		case 2: adc1038_adc_data = readinputport(6); break;
+		case 3: adc1038_adc_data = readinputport(7); break;
+		case 4: adc1038_adc_data = 0x000; break;
+		case 5: adc1038_adc_data = 0x000; break;
+		case 6: adc1038_adc_data = 0x000; break;
+		case 7: adc1038_adc_data = 0x000; break;
+	}
+
+	adc1038_data_out = (adc1038_adc_data & 0x200) ? 1 : 0;
+	adc1038_adc_data <<= 1;
+
+	adc1038_sars ^= 1;
+	return adc1038_sars;
+}
+
 static READ32_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
@@ -246,9 +277,7 @@ static READ32_HANDLER( sysreg_r )
 		}
 		if (!(mem_mask & 0x0000ff00))
 		{
-			//r |= readinputport(2) << 8;
-			inputport2 ^= 0x80;
-			r |= inputport2 << 8;
+			r |= (adc1038_sars_r() << 7) << 8;
 		}
 		if (!(mem_mask & 0x000000ff))
 		{
@@ -601,10 +630,10 @@ INPUT_PORTS_START( slrasslt )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
 INPUT_PORTS_END
 
@@ -973,9 +1002,16 @@ static DRIVER_INIT(gticlub)
 	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
 	sharc_dataram_0 = auto_malloc(0x100000);
 
-	K001005_preprocess_texture_data(memory_region(REGION_GFX1), memory_region_length(REGION_GFX1));
+	K001005_preprocess_texture_data(memory_region(REGION_GFX1), memory_region_length(REGION_GFX1), 1);
 
 	K056800_init(sound_irq_callback);
+
+	// we'll need this for now
+	if (mame_stricmp(Machine->gamedrv->name, "gticlub") == 0 ||
+		mame_stricmp(Machine->gamedrv->name, "gticlubj") == 0)
+	{
+		adc1038_gticlub_hack = 1;
+	}
 }
 
 static DRIVER_INIT(hangplt)
@@ -991,10 +1027,18 @@ static DRIVER_INIT(hangplt)
 	K033906_init();
 }
 
+static DRIVER_INIT(slrasslt)
+{
+	init_gticlub(machine);
+
+	// enable self-modifying code checks
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_OPTIONS_CHECK_SELFMOD_CODE);
+}
+
 /*************************************************************************/
 
 GAME( 1996, gticlub,	0,		 gticlub, gticlub,  gticlub,  ROT0,	"Konami",	"GTI Club (ver AAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, gticlubj,	gticlub, gticlub, gticlub,  gticlub,  ROT0,	"Konami",	"GTI Club (ver JAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, thunderh,	0,		 gticlub, thunderh, gticlub,  ROT0,	"Konami",	"Operation Thunder Hurricane (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, slrasslt,	0,		 gticlub, slrasslt, gticlub,  ROT0,	"Konami",	"Solar Assault (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, slrasslt,	0,		 gticlub, slrasslt, slrasslt, ROT0,	"Konami",	"Solar Assault (ver UAA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAMEL( 1997, hangplt,	0,		 hangplt, hangplt,  hangplt,  ROT0,	"Konami",	"Hang Pilot", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND, layout_dualhovu )

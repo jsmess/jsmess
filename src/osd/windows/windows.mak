@@ -137,8 +137,8 @@ CURPATH = ./
 
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
-DEFS += -DMALLOC_DEBUG
-LDFLAGS += -Wl,--allow-multiple-definition
+#DEFS += -DMALLOC_DEBUG
+#LDFLAGS += -Wl,--allow-multiple-definition
 endif
 
 ifdef UNICODE

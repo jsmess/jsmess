@@ -377,8 +377,8 @@ static void draw_sky(mame_bitmap *bitmap)
 	{
 		for (x = 0; x <= Machine->screen[0].visarea.max_x; x++)
 		{
-		        colour = (((*bb_sky & 0x7f) + y)>>2)&0x3f;
-			plot_pixel(bitmap,x,y,Machine->pens[0x80 + colour]);
+	        colour = (((*bb_sky & 0x7f) + y)>>2)&0x3f;
+			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[0x80 + colour];
 		}
 	}
 }

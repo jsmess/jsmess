@@ -47,8 +47,4 @@ void m6809e_get_info(UINT32 state, cpuinfo *info);
 #    define TRUE (!FALSE)
 #endif
 
-#ifdef MAME_DEBUG
-extern unsigned Dasm6809 (char *buffer, unsigned pc);
-#endif
-
 #endif /* _M6809_H */

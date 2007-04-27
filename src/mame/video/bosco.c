@@ -290,8 +290,8 @@ static void draw_stars( mame_bitmap *bitmap, const rectangle *cliprect )
 
 					if (y >= Machine->screen[0].visarea.min_y && y <= Machine->screen[0].visarea.max_y)
 					{
-						if (read_pixel(bitmap, x, y) == bpen)
-   							plot_pixel(bitmap, x, y, STARS_COLOR_BASE + star_seed_tab[star_cntr].col );
+						if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
+							*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
 					}
 				 }
 			}

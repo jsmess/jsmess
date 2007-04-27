@@ -523,7 +523,7 @@ else
 			if ( (sy>=cliprect->min_y) && (sy<=cliprect->max_y) )
 			{
 				int data  = (ls195_latch>>0) & 0x0f;
-				plot_pixel(bitmap, sx, sy, Machine->pens[data] );
+				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[data];
 			}
 		}
 
@@ -592,7 +592,7 @@ else
 						if ((xp<256) && (yp<256))
 						{
 							if ( (pixdata!=0x0f) && (pixdata!=0) )
-								plot_pixel(bitmap, xp, yp, Machine->pens[16+pixdata] );
+								*BITMAP_ADDR16(bitmap, yp, xp) = Machine->pens[16+pixdata];
 						}
 
 						pixdata = data & 0x0f;
@@ -600,7 +600,7 @@ else
 						if ((xp<256) && (yp<256))
 						{
 							if ( (pixdata!=0x0f) && (pixdata!=0) )
-								plot_pixel(bitmap, xp, yp, Machine->pens[16+pixdata] );
+								*BITMAP_ADDR16(bitmap, yp, xp) = Machine->pens[16+pixdata];
 						}
 					}
 				}

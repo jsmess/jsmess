@@ -54,8 +54,8 @@ static WRITE32_HANDLER( vram_w )
 
 	if(x < 320/2 && y < 224)
 	{
-		plot_pixel(tmpbitmap,x*2+0,y,(vram[offset] >> 16) & 0x7fff);
-		plot_pixel(tmpbitmap,x*2+1,y,vram[offset] & 0x7fff);
+		*BITMAP_ADDR16(tmpbitmap, y, x*2+0) = (vram[offset] >> 16) & 0x7fff;
+		*BITMAP_ADDR16(tmpbitmap, y, x*2+1) = vram[offset] & 0x7fff;
 	}
 }
 
@@ -149,7 +149,6 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)

@@ -179,7 +179,7 @@ VIDEO_UPDATE( magmax )
 					/* not possible on the surface*/
 					//if ((map_v_scr_100) && ((graph_data & 0x0c)==0x0c))
 					//{
-					//  plot_pixel(tmpbitmap,h,v,pens[graph_color + graph_data] );
+					//  *BITMAP_ADDR16(tmpbitmap, v, h) = pens[graph_color + graph_data];
 					//}
 				}
 				for (h = 0x80; h < 0x100; h++)
@@ -213,7 +213,7 @@ VIDEO_UPDATE( magmax )
 					/* not possible on the surface*/
 					//if ((map_v_scr_100) && ((graph_data & 0x0c)==0x0c))
 					//{
-					//  plot_pixel(tmpbitmap,h,v,pens[graph_color + graph_data] );
+					//  *BITMAP_ADDR16(tmpbitmap, v, h) = pens[graph_color + graph_data];
 					//}
 				}
 			}
@@ -250,7 +250,7 @@ VIDEO_UPDATE( magmax )
 					/*priority: background over sprites*/
 					if (/*(map_v_scr_100) &&*/ ((graph_data & 0x0c)==0x0c))
 					{
-						plot_pixel(tmpbitmap,h,v,pens[graph_color + graph_data] );
+						*BITMAP_ADDR16(tmpbitmap, v, h) = pens[graph_color + graph_data];
 					}
 				}
 				for (h = 0x80; h < 0x100; h++)
@@ -283,7 +283,7 @@ VIDEO_UPDATE( magmax )
 					/*priority: background over sprites*/
 					if (/*(map_v_scr_100) &&*/ ((graph_data & 0x0c)==0x0c))
 					{
-						plot_pixel(tmpbitmap,h,v,pens[graph_color + graph_data] );
+						*BITMAP_ADDR16(tmpbitmap, v, h) = pens[graph_color + graph_data];
 					}
 				}
 			}

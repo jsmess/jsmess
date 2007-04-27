@@ -233,11 +233,11 @@ static void battlane_draw_fg_bitmap( mame_bitmap *bitmap )
 			{
 				if (flip_screen)
 				{
-					plot_pixel(bitmap, 255 - x, 255 - y, Machine->pens[data]);
+					*BITMAP_ADDR16(bitmap, 255 - y, 255 - x) = Machine->pens[data];
 				}
 				else
 				{
-					plot_pixel(bitmap, x, y, Machine->pens[data]);
+					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[data];
 				}
 			}
 		}

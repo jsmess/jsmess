@@ -268,7 +268,7 @@ void mjsikaku_vramflip(void)
 static void update_pixel(int x, int y)
 {
 	int color = mjsikaku_videoram[(y * 512) + x];
-	plot_pixel(mjsikaku_tmpbitmap, x, y, Machine->pens[color]);
+	*BITMAP_ADDR16(mjsikaku_tmpbitmap, y, x) = Machine->pens[color];
 }
 
 static void writeram_low(int x, int y, int color)
@@ -726,7 +726,7 @@ VIDEO_UPDATE( mbmj8688_LCD )
 				int data = HD61830B_ram[0][y * 60 + x];
 
 				for (b = 0;b < 8;b++)
-					plot_pixel(bitmap,(8*x+b),y,(data & (1<<b)) ? 0x0000 : 0x18ff);
+					*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
 			}
 		}
 	}
@@ -740,7 +740,7 @@ VIDEO_UPDATE( mbmj8688_LCD )
 				int data = HD61830B_ram[1][y * 60 + x];
 
 				for (b = 0;b < 8;b++)
-					plot_pixel(bitmap,(8*x+b),y,(data & (1<<b)) ? 0x0000 : 0x18ff);
+					*BITMAP_ADDR16(bitmap, y, (8*x+b)) = (data & (1<<b)) ? 0x0000 : 0x18ff;
 			}
 		}
 	}

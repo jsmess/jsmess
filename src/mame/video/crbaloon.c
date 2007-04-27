@@ -148,7 +148,7 @@ static void crbaloon_draw_sprites( mame_bitmap *bitmap )
 				continue;
 			}
 
-        	if (read_pixel(bitmap, x, y) != read_pixel(tmpbitmap, x, y))
+        	if (*BITMAP_ADDR16(bitmap, y, x) != *BITMAP_ADDR16(tmpbitmap, y, x))
         	{
 				crbaloon_collision = -1;
 				break;

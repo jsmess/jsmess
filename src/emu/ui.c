@@ -419,7 +419,7 @@ void ui_update_and_render(void)
 	/* if we're paused, dim the whole screen */
 	if (mame_get_phase(Machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(Machine)))
 	{
-		int alpha = (1.0f - options_get_float_range(mame_options(), OPTION_PAUSE_BRIGHTNESS, 0.0f, 1.0f)) * 255.0f;
+		int alpha = (1.0f - options_get_float(mame_options(), OPTION_PAUSE_BRIGHTNESS)) * 255.0f;
 		if (alpha > 255)
 			alpha = 255;
 		if (alpha >= 0)
@@ -1496,7 +1496,7 @@ static UINT32 handler_load_save(UINT32 state)
 		return state;
 
 	/* display a popup indicating that the save will proceed */
-	sprintf(filename, "%s-%c", Machine->gamedrv->name, file);
+	sprintf(filename, "%c", file);
 	if (state == LOADSAVE_SAVE)
 	{
 		popmessage("Save to position %c", file);

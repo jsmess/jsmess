@@ -167,7 +167,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 		wheelfir_six_pos++;
 
-		plot_pixel(wheelfir_tmp_bitmap[2],x,y,sixdat);
+		*BITMAP_ADDR16(wheelfir_tmp_bitmap[2], y, x) = sixdat;
 		return;
 	}
 
@@ -257,7 +257,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 
 				if(pix && destx<Machine->screen[0].width && desty <Machine->screen[0].height)
-					plot_pixel(wheelfir_tmp_bitmap[vpage],destx,desty,pix);
+					*BITMAP_ADDR16(wheelfir_tmp_bitmap[vpage], desty, destx) = pix;
 			}
 	}
 
@@ -309,7 +309,7 @@ VIDEO_UPDATE(wheelfir)
 
 				romdata = memory_region(REGION_GFX1)[romoffs];
 
-				plot_pixel(bitmap,x,y,romdata);
+				*BITMAP_ADDR16(bitmap, y, x) = romdata;
 			}
 		}
 	}

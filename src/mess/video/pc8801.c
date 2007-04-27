@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "includes/pc8801.h"
+#include "plotpixl.h"
 
 /* NPW 23-Oct-2001 - Adding this so that it compiles */
 #define palette_transparent_pen	0

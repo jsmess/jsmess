@@ -32,7 +32,6 @@ WRITE8_HANDLER( dotrikun_videoram_w )
 {
 	int i;
 	int x, y;
-	int color;
 
 
 	videoram[offset] = data;
@@ -47,13 +46,13 @@ WRITE8_HANDLER( dotrikun_videoram_w )
 	{
 		for (i = 0; i < 8; i++)
 		{
-			color = Machine->pens[((data >> i) & 0x01)];
+			pen_t pen = Machine->pens[((data >> i) & 0x01)];
 
 			/* I think the video hardware doubles pixels, screen would be too small otherwise */
-			plot_pixel(tmpbitmap, x + 2*(7 - i),   y,   color);
-			plot_pixel(tmpbitmap, x + 2*(7 - i)+1, y,   color);
-			plot_pixel(tmpbitmap, x + 2*(7 - i),   y+1, color);
-			plot_pixel(tmpbitmap, x + 2*(7 - i)+1, y+1, color);
+			*BITMAP_ADDR16(tmpbitmap, y+0, x + 2*(7 - i)+0) = pen;
+			*BITMAP_ADDR16(tmpbitmap, y+0, x + 2*(7 - i)+1) = pen;
+			*BITMAP_ADDR16(tmpbitmap, y+1, x + 2*(7 - i)+0) = pen;
+			*BITMAP_ADDR16(tmpbitmap, y+1, x + 2*(7 - i)+1) = pen;
 		}
 	}
 }

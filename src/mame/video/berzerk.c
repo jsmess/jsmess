@@ -277,17 +277,17 @@ INLINE void copy_byte(UINT8 x, UINT8 y, UINT8 data, UINT8 col)
 	fore  = Machine->pens[col >> 4];
 	back  = Machine->pens[0];
 
-	plot_pixel(tmpbitmap, x  , y, (data & 0x80) ? fore : back);
-	plot_pixel(tmpbitmap, x+1, y, (data & 0x40) ? fore : back);
-	plot_pixel(tmpbitmap, x+2, y, (data & 0x20) ? fore : back);
-	plot_pixel(tmpbitmap, x+3, y, (data & 0x10) ? fore : back);
+	*BITMAP_ADDR16(tmpbitmap, y, x+0) = (data & 0x80) ? fore : back;
+	*BITMAP_ADDR16(tmpbitmap, y, x+1) = (data & 0x40) ? fore : back;
+	*BITMAP_ADDR16(tmpbitmap, y, x+2) = (data & 0x20) ? fore : back;
+	*BITMAP_ADDR16(tmpbitmap, y, x+3) = (data & 0x10) ? fore : back;
 
 	fore  = Machine->pens[col & 0x0f];
 
-	plot_pixel(tmpbitmap, x+4, y, (data & 0x08) ? fore : back);
-	plot_pixel(tmpbitmap, x+5, y, (data & 0x04) ? fore : back);
-	plot_pixel(tmpbitmap, x+6, y, (data & 0x02) ? fore : back);
-	plot_pixel(tmpbitmap, x+7, y, (data & 0x01) ? fore : back);
+	*BITMAP_ADDR16(tmpbitmap, y, x+4) = (data & 0x08) ? fore : back;
+	*BITMAP_ADDR16(tmpbitmap, y, x+5) = (data & 0x04) ? fore : back;
+	*BITMAP_ADDR16(tmpbitmap, y, x+6) = (data & 0x02) ? fore : back;
+	*BITMAP_ADDR16(tmpbitmap, y, x+7) = (data & 0x01) ? fore : back;
 }
 
 

@@ -241,10 +241,10 @@ static void draw_phasor(mame_bitmap* bitmap)
 	{
 		if (i >= get_sprite_vpos(13))
 		{
-			plot_pixel(bitmap, 2 * i + 0, i, 7);
-			plot_pixel(bitmap, 2 * i + 1, i, 7);
-			plot_pixel(bitmap, 2 * (255 - i) + 0, i, 7);
-			plot_pixel(bitmap, 2 * (255 - i) + 1, i, 7);
+			*BITMAP_ADDR16(bitmap, i, 2 * i + 0) = 7;
+			*BITMAP_ADDR16(bitmap, i, 2 * i + 1) = 7;
+			*BITMAP_ADDR16(bitmap, i, 2 * (255 - i) + 0) = 7;
+			*BITMAP_ADDR16(bitmap, i, 2 * (255 - i) + 1) = 7;
 		}
 	}
 }

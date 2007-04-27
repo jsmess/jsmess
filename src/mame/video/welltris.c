@@ -234,8 +234,8 @@ static void welltris_drawbackground(mame_bitmap *bitmap, const rectangle *clipre
 		for (x = 0; x < 512 / 2; x++) {
 			pixdata = welltris_pixelram[(x & 0xff) + (y & 0xff) * 256];
 
-			plot_pixel(bitmap, x*2,   y, (pixdata >> 8) + (0x100 * pixelpalettebank) + 0x400);
-			plot_pixel(bitmap, x*2+1, y, (pixdata & 0xff) + (0x100 * pixelpalettebank) + 0x400);
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 0) = (pixdata >> 8) + (0x100 * pixelpalettebank) + 0x400;
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 1) = (pixdata & 0xff) + (0x100 * pixelpalettebank) + 0x400;
 		}
 	}
 }

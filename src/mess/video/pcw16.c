@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "includes/pcw16.h"
 #include "video/generic.h"
+#include "plotpixl.h"
 
 int pcw16_colour_palette[16];
 int pcw16_video_control;

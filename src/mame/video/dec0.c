@@ -282,11 +282,11 @@ static void custom_tilemap_draw(mame_bitmap *bitmap,
 				{
 					/* Top 8 pens of top 8 palettes only */
 					if ((p&0x88)==0x88)
-						plot_pixel(bitmap, x, y, Machine->pens[p]);
+						*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p];
 				}
 				else
 				{
-					plot_pixel(bitmap, x, y, Machine->pens[p]);
+					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p];
 				}
 			}
 		}

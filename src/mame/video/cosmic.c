@@ -267,9 +267,9 @@ static void draw_bitmap(mame_bitmap *bitmap)
 				if (data & 0x80)
 				{
 					if (flip_screen)
-						plot_pixel(bitmap, 255-x, 255-y, pen);
+						*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
 					else
-						plot_pixel(bitmap,     x,     y, pen);
+						*BITMAP_ADDR16(bitmap, y, x) = pen;
 				}
 
 				x++;
@@ -368,7 +368,7 @@ static void cosmica_draw_starfield(mame_bitmap *bitmap)
 				/* RGB order is reversed -- bit 7=R, 6=G, 5=B */
 				int col = (map >> 7) | ((map >> 5) & 0x02) | ((map >> 3) & 0x04);
 
-				plot_pixel(bitmap, x, y, Machine->pens[col]);
+				*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[col];
 			}
 
 
@@ -434,9 +434,9 @@ static void devzone_draw_grid(mame_bitmap *bitmap)
 					pen_t pen = Machine->pens[4];	/* blue */
 
 					if (flip_screen)
-						plot_pixel(bitmap, 255-x, 255-y, pen);
+						*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
 					else
-						plot_pixel(bitmap,     x,     y, pen);
+						*BITMAP_ADDR16(bitmap, y, x) = pen;
 				}
 
 				horz_data = (horz_data << 1) | 0x01;
@@ -564,9 +564,9 @@ static void nomnlnd_draw_background(mame_bitmap *bitmap)
 				pen_t pen = Machine->pens[color];
 
 				if (flip_screen)
-					plot_pixel(bitmap, 255-x, 255-y, pen);
+					*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
 				else
-					plot_pixel(bitmap,     x,     y, pen);
+					*BITMAP_ADDR16(bitmap, y, x) = pen;
 			}
 
 

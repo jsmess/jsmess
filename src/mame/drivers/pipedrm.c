@@ -131,6 +131,10 @@ MACHINE_RESET( pipedrm )
 	/* initialize sound bank */
 	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU2) + 0x10000, 0x8000);
 	memory_set_bank(2, 0);
+	/* state save */
+	state_save_register_global(pending_command);
+	state_save_register_global(sound_command);
+
 }
 
 
@@ -231,6 +235,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(input_port_0_r, sound_command_w)
 	AM_RANGE(0x21, 0x21) AM_READWRITE(input_port_1_r, pipedrm_bankswitch_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
@@ -577,7 +583,7 @@ static MACHINE_DRIVER_START( pipedrm )
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(fromance)
+	MDRV_VIDEO_START(pipedrm)
 	MDRV_VIDEO_UPDATE(pipedrm)
 
 	/* sound hardware */
@@ -617,7 +623,7 @@ static MACHINE_DRIVER_START( hatris )
 	MDRV_GFXDECODE(gfxdecodeinfo_hatris)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(fromance)
+	MDRV_VIDEO_START(hatris)
 	MDRV_VIDEO_UPDATE(fromance)
 
 	/* sound hardware */
@@ -762,6 +768,6 @@ static DRIVER_INIT( hatris )
  *
  *************************************/
 
-GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)", 0 )
-GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)", 0 )
-GAME( 1990, hatris,   0,       hatris,  hatris,  hatris,  ROT0, "Video System Co.", "Hatris (Japan)", 0 )
+GAME( 1990, pipedrm,  0,       pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, pipedrmj, pipedrm, pipedrm, pipedrm, pipedrm, ROT0, "Video System Co.", "Pipe Dream (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hatris,   0,       hatris,  hatris,  hatris,  ROT0, "Video System Co.", "Hatris (Japan)", GAME_SUPPORTS_SAVE )

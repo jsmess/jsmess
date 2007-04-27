@@ -17,9 +17,9 @@ static int pal[16][16];
 INLINE void wswan_plot_pixel(int x, int y, int pen) {
 	y += 5*8;
 	if ( vdp.display_vertical ) {
-		plot_pixel( tmpbitmap, y, 28*8 - 1 - x, pen );
+		*BITMAP_ADDR16(tmpbitmap, 28*8 - 1 - x, y) = pen;
 	} else {
-		plot_pixel( tmpbitmap, x, y, pen );
+		*BITMAP_ADDR16(tmpbitmap, y, x) = pen;
 	}
 }
 

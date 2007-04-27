@@ -78,6 +78,9 @@ file_error mame_fopen(const char *searchpath, const char *filename, UINT32 openf
 /* open a file in the given search path with the specified filename or a matching CRC */
 file_error mame_fopen_crc(const char *searchpath, const char *filename, UINT32 crc, UINT32 openflags, mame_file **file);
 
+/* open a file in the given search path with the specified filename, using the specified options */
+file_error mame_fopen_options(core_options *opts, const char *searchpath, const char *filename, UINT32 openflags, mame_file **file);
+
 /* open a "file" which is actually data in RAM */
 file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mame_file **file);
 

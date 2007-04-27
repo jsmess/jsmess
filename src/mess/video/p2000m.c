@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/p2000t.h"
+#include "plotpixl.h"
 
 static	INT8	frame_count;
 

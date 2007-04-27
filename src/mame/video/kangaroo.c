@@ -195,7 +195,7 @@ INLINE void kangaroo_plot_pixel(mame_bitmap *bitmap, int x, int y, int col, int 
 		y = bitmap->height - 1 - y;
 	}
 
-	plot_pixel(bitmap, x, y, Machine->pens[((col & 0x08) ? 0 : color_base) + (col & 0x07)]);
+	*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[((col & 0x08) ? 0 : color_base) + (col & 0x07)];
 }
 
 INLINE void kangaroo_redraw_4pixels(int x, int y)

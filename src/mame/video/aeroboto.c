@@ -188,7 +188,7 @@ VIDEO_UPDATE( aeroboto )
 			for (j=0; j<256; j++)
 			{
 				src_rowptr = src_colptr + (((y + j) & 0xff) << 5 );
-				if (!((unsigned)*src_rowptr & src_colmask)) plot_pixel(bitmap, i, j, pen);
+				if (!((unsigned)*src_rowptr & src_colmask)) *BITMAP_ADDR16(bitmap, j, i) = pen;
 			}
 		}
 	}

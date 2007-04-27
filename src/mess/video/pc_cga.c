@@ -50,6 +50,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "state.h"
+#include "plotpixl.h"
 
 #include "includes/crtc6845.h"
 #include "video/pc_cga.h"

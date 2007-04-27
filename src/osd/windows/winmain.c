@@ -131,13 +131,13 @@ const options_entry mame_win_options[] =
 
 	// performance options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
-	{ "priority",                 "0",        0,                 "thread priority for the main game thread; range from -15 to 1" },
+	{ "priority(-15-1)",          "0",        0,                 "thread priority for the main game thread; range from -15 to 1" },
 	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
 
 	// video options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
 	{ "video",                    "d3d",      0,                 "video output method: none, gdi, ddraw, or d3d" },
-	{ "numscreens",               "1",        0,                 "number of screens to create; usually, you want just one" },
+	{ "numscreens(1-4)",          "1",        0,                 "number of screens to create; usually, you want just one" },
 	{ "window;w",                 "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
 	{ "maximize;max",             "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
 	{ "keepaspect;ka",            "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
@@ -152,7 +152,7 @@ const options_entry mame_win_options[] =
 
 	// Direct3D-specific options
 	{ NULL,                       NULL,       OPTION_HEADER,     "DIRECT3D-SPECIFIC OPTIONS" },
-	{ "d3dversion",               "9",        0,                 "specify the preferred Direct3D version (8 or 9)" },
+	{ "d3dversion(8-9)",          "9",        0,                 "specify the preferred Direct3D version (8 or 9)" },
 	{ "filter;d3dfilter;flt",     "1",        OPTION_BOOLEAN,    "enable bilinear filtering on screen output" },
 
 	// per-window options
@@ -186,13 +186,13 @@ const options_entry mame_win_options[] =
 	{ NULL,                       NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
 	{ "triplebuffer;tb",          "0",        OPTION_BOOLEAN,    "enable triple buffering" },
 	{ "switchres",                "0",        OPTION_BOOLEAN,    "enable resolution switching" },
-	{ "full_screen_brightness;fsb","1.0",     0,                 "brightness value in full screen mode" },
-	{ "full_screen_contrast;fsc", "1.0",      0,                 "contrast value in full screen mode" },
-	{ "full_screen_gamma;fsg",    "1.0",      0,                 "gamma value in full screen mode" },
+	{ "full_screen_brightness;fsb(0.1-2.0)","1.0",     0,                 "brightness value in full screen mode" },
+	{ "full_screen_contrast;fsc(0.1-2.0)", "1.0",      0,                 "contrast value in full screen mode" },
+	{ "full_screen_gamma;fsg(0.1-3.0)",    "1.0",      0,                 "gamma value in full screen mode" },
 
 	// sound options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS SOUND OPTIONS" },
-	{ "audio_latency",            "1",        0,                 "set audio latency (increase to reduce glitches)" },
+	{ "audio_latency(1-5)",       "1",        0,                 "set audio latency (increase to reduce glitches)" },
 
 	// input options
 	{ NULL,                       NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
@@ -307,7 +307,7 @@ int osd_init(running_machine *machine)
 
 	// thread priority
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
-		SetThreadPriority(GetCurrentThread(), options_get_int_range(mame_options(), WINOPTION_PRIORITY, -15, 1));
+		SetThreadPriority(GetCurrentThread(), options_get_int(mame_options(), WINOPTION_PRIORITY));
 
 	// ensure we get called on the way out
 	add_exit_callback(machine, osd_exit);

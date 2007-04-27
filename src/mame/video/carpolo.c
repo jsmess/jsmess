@@ -417,8 +417,8 @@ static int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 		{
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
 			{
-				if ((read_pixel(sprite_sprite_collision_bitmap1, x, y) == Machine->pens[1]) &&
-				    (read_pixel(sprite_sprite_collision_bitmap2, x, y) == Machine->pens[1]))
+				if ((*BITMAP_ADDR16(sprite_sprite_collision_bitmap1, y, x) == Machine->pens[1]) &&
+				    (*BITMAP_ADDR16(sprite_sprite_collision_bitmap2, y, x) == Machine->pens[1]))
 				{
 					*col_x = (x1 + x) & 0x0f;
 					*col_y = (y1 + y) & 0x0f;
@@ -479,9 +479,9 @@ static int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy
 		{
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
 			{
-				if ((read_pixel(sprite_goal_collision_bitmap1, x, y) == Machine->pens[1]))
+				if ((*BITMAP_ADDR16(sprite_goal_collision_bitmap1, y, x) == Machine->pens[1]))
 				{
-					pen_t pix = read_pixel(sprite_goal_collision_bitmap2, x, y);
+					pen_t pix = *BITMAP_ADDR16(sprite_goal_collision_bitmap2, y, x);
 
 					if (pix == Machine->pens[LEFT_GOAL_COLOR])
 					{
@@ -545,9 +545,9 @@ static int check_sprite_right_goal_collision(int x1, int y1, int code1, int flip
 		{
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
 			{
-				if ((read_pixel(sprite_goal_collision_bitmap1, x, y) == Machine->pens[1]))
+				if ((*BITMAP_ADDR16(sprite_goal_collision_bitmap1, y, x) == Machine->pens[1]))
 				{
-					pen_t pix = read_pixel(sprite_goal_collision_bitmap2, x, y);
+					pen_t pix = *BITMAP_ADDR16(sprite_goal_collision_bitmap2, y, x);
 
 					if (pix == Machine->pens[RIGHT_GOAL_COLOR])
 					{
@@ -593,7 +593,7 @@ static int check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, int flip
 	{
 		for (y = 0; y < SPRITE_HEIGHT; y++)
 		{
-			if ((read_pixel(sprite_border_collision_bitmap, x, y) == Machine->pens[1]))
+			if ((*BITMAP_ADDR16(sprite_border_collision_bitmap, y, x) == Machine->pens[1]))
 			{
 				if (((UINT8)(x1 + x) == LEFT_BORDER) ||
 					((UINT8)(x1 + x) == RIGHT_BORDER))

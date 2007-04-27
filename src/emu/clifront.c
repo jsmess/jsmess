@@ -64,7 +64,7 @@ static int info_verifysamples(const char *gamename);
 static int info_romident(const char *gamename);
 
 /* utilities */
-static const char *extract_base_name(const char *name);
+static const char *extract_base_name(const char *name, int strip_extension);
 static void romident(const char *filename, romident_status *status);
 static void identify_file(const char *name, romident_status *status);
 static void identify_data(const char *name, const UINT8 *data, int length, romident_status *status);
@@ -165,7 +165,7 @@ INLINE int filename_ends_with(const char *filename, const char *extension)
 
 int cli_execute(int argc, char **argv, const options_entry *osd_options)
 {
-	const char *exename = extract_base_name(argv[0]);
+	const char *exename = extract_base_name(argv[0], TRUE);
 	const char *sourcename = NULL;
 	const char *gamename = NULL;
 	const game_driver *driver = NULL;
@@ -191,7 +191,7 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 	/* find out what game we might be referring to */
 	gamename = options_get_string(mame_options(), OPTION_GAMENAME);
 	if (gamename != NULL)
-		gamename = extract_base_name(gamename);
+		gamename = extract_base_name(gamename, TRUE);
 
 	/* now parse the core set of INI files */
 	parse_ini_file(CONFIGNAME);
@@ -216,7 +216,7 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 			parse_ini_file("vector");
 
 		/* then parse sourcefile.ini */
-		sourcename = extract_base_name(driver->source_file);
+		sourcename = extract_base_name(driver->source_file, TRUE);
 		parse_ini_file(sourcename);
 
 		/* then parent the grandparent, parent, and game-specific INIs */
@@ -269,7 +269,7 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 
 error:
 	/* free our options and exit */
-	options_free(mame_options());
+	mame_options_exit();
 	if (exename != NULL)
 		free((void *)exename);
 	if (sourcename != NULL)
@@ -389,7 +389,7 @@ static int execute_commands(const char *exename)
 
 		/* make the output filename */
 		filename = assemble_2_strings(exename, ".ini");
-		filerr = mame_fopen(NULL, exename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+		filerr = mame_fopen(NULL, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		free((void *)filename);
 
 		/* error if unable to create the file */
@@ -686,7 +686,7 @@ static int info_listsamples(const char *gamename)
 			expand_machine_driver(drivers[drvindex]->drv, &drv);
 
 			/* find samples interfaces */
-			for (sndnum = 0; drv.sound[sndnum].sound_type && sndnum < MAX_SOUND; sndnum++)
+			for (sndnum = 0; sndnum < MAX_SOUND && drv.sound[sndnum].sound_type; sndnum++)
 				if (drv.sound[sndnum].sound_type == SOUND_SAMPLES)
 				{
 					const char **samplenames = ((struct Samplesinterface *)drv.sound[sndnum].config)->samplenames;
@@ -914,7 +914,7 @@ static int info_romident(const char *gamename)
     assumptions about path separators
 -------------------------------------------------*/
 
-static const char *extract_base_name(const char *name)
+static const char *extract_base_name(const char *name, int strip_extension)
 {
 	char *result, *dest;
 	const char *start;
@@ -931,7 +931,7 @@ static const char *extract_base_name(const char *name)
 
 	/* copy in the base name up to the extension */
 	dest = result;
-	while (*start != 0 && *start != '.')
+	while (*start != 0 && (!strip_extension || *start != '.'))
 		*dest++ = *start++;
 	*dest = 0;
 
@@ -1069,7 +1069,7 @@ static void identify_data(const char *name, const UINT8 *data, int length, romid
 
 	/* output the name */
 	status->total++;
-	basename = extract_base_name(name);
+	basename = extract_base_name(name, FALSE);
 	mame_printf_info("%-20s", (basename != NULL) ? basename : name);
 	if (basename != NULL)
 		free((void *)basename);

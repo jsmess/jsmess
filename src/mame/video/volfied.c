@@ -1,19 +1,10 @@
 #include "driver.h"
 #include "video/taitoic.h"
 
-static mame_bitmap* pixel_layer = 0;
-
 static UINT16* video_ram = NULL;
 
 static UINT16 video_ctrl = 0;
 static UINT16 video_mask = 0;
-
-static UINT8* line_dirty = NULL;
-
-static void mark_all_dirty(void)
-{
-	memset(line_dirty, 1, 256);
-}
 
 
 /******************************************************
@@ -22,17 +13,11 @@ static void mark_all_dirty(void)
 
 VIDEO_START( volfied )
 {
-	pixel_layer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-
-	line_dirty = auto_malloc(256);
-
 	video_ram = auto_malloc(0x40000 * sizeof (UINT16));
 
 	state_save_register_global_pointer(video_ram, 0x40000);
 	state_save_register_global(video_ctrl);
 	state_save_register_global(video_mask);
-
-	state_save_register_func_postload (mark_all_dirty);
 
 	return PC090OJ_vh_start(0, 0, 0, 0);
 }
@@ -51,18 +36,11 @@ WRITE16_HANDLER( volfied_video_ram_w )
 {
 	mem_mask |= ~video_mask;
 
-	line_dirty[(offset >> 9) & 0xff] = 1;
-
 	COMBINE_DATA(&video_ram[offset]);
 }
 
 WRITE16_HANDLER( volfied_video_ctrl_w )
 {
-	if (ACCESSING_LSB && (data & 1) != (video_ctrl & 1))
-	{
-		mark_all_dirty();    /* screen switch */
-	}
-
 	COMBINE_DATA(&video_ctrl);
 }
 
@@ -92,7 +70,7 @@ WRITE16_HANDLER( volfied_sprite_ctrl_w )
                 SCREEN REFRESH
 *******************************************************/
 
-static void refresh_pixel_layer(void)
+static void refresh_pixel_layer(running_machine *machine, mame_bitmap *bitmap)
 {
 	int x, y;
 
@@ -123,32 +101,27 @@ static void refresh_pixel_layer(void)
 		p += 0x20000;
 	}
 
-	for (y = 0; y < Machine->screen[0].height; y++)
+	for (y = 0; y < machine->screen[0].height; y++)
 	{
-		if (line_dirty[y])
+		for (x = 1; x < machine->screen[0].width + 1; x++) // Hmm, 1 pixel offset is needed to align properly with sprites
 		{
-			for (x = 1; x < Machine->screen[0].width + 1; x++) // Hmm, 1 pixel offset is needed to align properly with sprites
+			int color = (p[x] << 2) & 0x700;
+
+			if (p[x] & 0x8000)
 			{
-				int color = (p[x] << 2) & 0x700;
+				color |= 0x800 | ((p[x] >> 9) & 0xf);
 
-				if (p[x] & 0x8000)
+				if (p[x] & 0x2000)
 				{
-					color |= 0x800 | ((p[x] >> 9) & 0xf);
-
-					if (p[x] & 0x2000)
-					{
-						color &= ~0xf;	  /* hack */
-					}
+					color &= ~0xf;	  /* hack */
 				}
-				else
-				{
-					color |= p[x] & 0xf;
-				}
-
-				plot_pixel(pixel_layer, x - 1, y, Machine->pens[color]);
+			}
+			else
+			{
+				color |= p[x] & 0xf;
 			}
 
-			line_dirty[y] = 0;
+			*BITMAP_ADDR16(bitmap, y, x - 1) = machine->pens[color];
 		}
 
 		p += 512;
@@ -159,9 +132,7 @@ VIDEO_UPDATE( volfied )
 {
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	refresh_pixel_layer();
-
-	copybitmap(bitmap, pixel_layer, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	refresh_pixel_layer(machine, bitmap);
 
 	PC090OJ_draw_sprites(bitmap, cliprect, 0);
 	return 0;

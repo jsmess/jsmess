@@ -40,7 +40,7 @@ static void sshangha_tilemap_draw(mame_bitmap *bitmap)
 			p=*BITMAP_ADDR16(bitmap0, y, x)&0xf;
 			p|=(*BITMAP_ADDR16(bitmap1, y, x)&0xf)<<4;
 
-			plot_pixel(bitmap, x, y, Machine->pens[p|0x300]);
+			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p|0x300];
 		}
 	}
 }

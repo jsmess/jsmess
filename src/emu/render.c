@@ -489,9 +489,9 @@ void render_init(running_machine *machine)
 		{
 			screen_container[scrnum] = render_container_alloc();
 			render_container_set_orientation(screen_container[scrnum], Machine->gamedrv->flags & ORIENTATION_MASK);
-			render_container_set_brightness(screen_container[scrnum], options_get_float_range(mame_options(), OPTION_BRIGHTNESS, 0.1f, 2.0f));
-			render_container_set_contrast(screen_container[scrnum], options_get_float_range(mame_options(), OPTION_CONTRAST, 0.1f, 2.0f));
-			render_container_set_gamma(screen_container[scrnum], options_get_float_range(mame_options(), OPTION_GAMMA, 0.1f, 3.0f));
+			render_container_set_brightness(screen_container[scrnum], options_get_float(mame_options(), OPTION_BRIGHTNESS));
+			render_container_set_contrast(screen_container[scrnum], options_get_float(mame_options(), OPTION_CONTRAST));
+			render_container_set_gamma(screen_container[scrnum], options_get_float(mame_options(), OPTION_GAMMA));
 		}
 
 	/* register callbacks */
@@ -779,17 +779,17 @@ static void render_save(int config_type, xml_data_node *parentnode)
 				xml_set_attribute_int(screennode, "index", scrnum);
 
 				/* output the color controls */
-				if (container->brightness != options_get_float_range(mame_options(), OPTION_BRIGHTNESS, 0.1f, 2.0f))
+				if (container->brightness != options_get_float(mame_options(), OPTION_BRIGHTNESS))
 				{
 					xml_set_attribute_float(screennode, "brightness", container->brightness);
 					changed = TRUE;
 				}
-				if (container->contrast != options_get_float_range(mame_options(), OPTION_CONTRAST, 0.1f, 2.0f))
+				if (container->contrast != options_get_float(mame_options(), OPTION_CONTRAST))
 				{
 					xml_set_attribute_float(screennode, "contrast", container->contrast);
 					changed = TRUE;
 				}
-				if (container->gamma != options_get_float_range(mame_options(), OPTION_GAMMA, 0.1f, 3.0f))
+				if (container->gamma != options_get_float(mame_options(), OPTION_GAMMA))
 				{
 					xml_set_attribute_float(screennode, "gamma", container->gamma);
 					changed = TRUE;

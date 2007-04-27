@@ -145,7 +145,7 @@ void skns_sprite_kludge(int x, int y)
 #define z_draw_pixel()				\
 	UINT8 val = src[xs >> 6];			\
 	if(val)					\
-		plot_pixel( bitmap, xd>>6, yd>>6, val + colour );
+		*BITMAP_ADDR16(bitmap, yd>>6, xd>>6) = val + colour;
 
 #define z_x_dst(op)			\
 	old = xd;					\
@@ -446,7 +446,8 @@ void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
-										if (pix) plot_pixel( bitmap, sx+xx, sy+yy, pix+ NewColour ); // change later
+										if (pix)
+											*BITMAP_ADDR16(bitmap, sy+yy, sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
@@ -465,7 +466,8 @@ void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
-										if (pix) plot_pixel( bitmap, sx+xx, sy+(ysize-1-yy), pix+ NewColour ); // change later
+										if (pix)
+											*BITMAP_ADDR16(bitmap, sy+(ysize-1-yy), sx+xx) = pix+ NewColour; // change later
 									}
 								}
 							}
@@ -484,7 +486,8 @@ void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
-										if (pix) plot_pixel( bitmap, sx+(xsize-1-xx), sy+yy, pix+ NewColour ); // change later
+										if (pix)
+											*BITMAP_ADDR16(bitmap, sy+yy, sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}
@@ -504,7 +507,8 @@ void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 									{
 										int pix;
 										pix = decodebuffer[xsize*yy+xx];
-										if (pix) plot_pixel( bitmap, sx+(xsize-1-xx), sy+(ysize-1-yy), pix+ NewColour ); // change later
+										if (pix)
+											*BITMAP_ADDR16(bitmap, sy+(ysize-1-yy), sx+(xsize-1-xx)) = pix+ NewColour; // change later
 									}
 								}
 							}

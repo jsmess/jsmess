@@ -41,8 +41,8 @@ void mjsister_plot0(int offset,unsigned char data)
 	c1 = (data & 0x0f)        + mjsister_colorbank * 0x20;
 	c2 = ((data & 0xf0) >> 4) + mjsister_colorbank * 0x20;
 
-	plot_pixel(mjsister_tmpbitmap0, x*2,   y, Machine->pens[c1] );
-	plot_pixel(mjsister_tmpbitmap0, x*2+1, y, Machine->pens[c2] );
+	*BITMAP_ADDR16(mjsister_tmpbitmap0, y, x*2+0) = Machine->pens[c1];
+	*BITMAP_ADDR16(mjsister_tmpbitmap0, y, x*2+1) = Machine->pens[c2];
 }
 
 void mjsister_plot1(int offset,unsigned char data)
@@ -60,8 +60,8 @@ void mjsister_plot1(int offset,unsigned char data)
 	if (c2)
 		c2 += mjsister_colorbank * 0x20 + 0x10;
 
-	plot_pixel(mjsister_tmpbitmap1, x*2,   y, Machine->pens[c1] );
-	plot_pixel(mjsister_tmpbitmap1, x*2+1, y, Machine->pens[c2] );
+	*BITMAP_ADDR16(mjsister_tmpbitmap1, y, x*2+0) = Machine->pens[c1];
+	*BITMAP_ADDR16(mjsister_tmpbitmap1, y, x*2+1) = Machine->pens[c2];
 }
 
 WRITE8_HANDLER( mjsister_videoram_w )
@@ -101,7 +101,7 @@ VIDEO_UPDATE( mjsister )
 		for (i=0; i<256; i++)
 		{
 			for (j=0; j<4; j++)
-				plot_pixel(bitmap, 256+j, i, machine->pens[mjsister_colorbank * 0x20] );
+				*BITMAP_ADDR16(bitmap, i, 256+j) = machine->pens[mjsister_colorbank * 0x20];
 		}
 
 		copybitmap(bitmap,mjsister_tmpbitmap0,f,f,0,0,cliprect,TRANSPARENCY_NONE,0);

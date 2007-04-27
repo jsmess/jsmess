@@ -308,6 +308,13 @@ static const int mpc603r_pll_config[12][9] =
 	{  -1,  -1, 0xd, 0xd, 0xd, 0xd,  -1,  -1,  -1 },
 };
 
+#define PPCDRC_OPTIONS_CHECK_SELFMOD_CODE				0x1
+
+enum
+{
+	CPUINFO_INT_PPC_DRC_OPTIONS = CPUINFO_INT_CPU_SPECIFIC,
+};
+
 typedef struct {
 	PPC_MODEL pvr;
 	int bus_frequency_multiplier;

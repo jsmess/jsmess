@@ -41,6 +41,7 @@ PAL frame timing
 #include "includes/sms.h"
 #include "video/generic.h"
 #include "cpu/z80/z80.h"
+#include "plotpixl.h"
 
 #define IS_SMS1_VDP		( features & MODEL_315_5124 )
 #define IS_SMS2_VDP		( features & MODEL_315_5246 )

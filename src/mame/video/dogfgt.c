@@ -131,9 +131,9 @@ static WRITE8_HANDLER( internal_bitmapram_w )
 		for (i = 0;i < 3;i++)
 			color |= ((bitmapram[offset + BITMAPRAM_SIZE/3 * i] >> subx) & 1) << i;
 		if (flip_screen)
-			plot_pixel(pixbitmap,(x+subx)^0xff,y^0xff,PIXMAP_COLOR_BASE + 8*pixcolor + color);
+			*BITMAP_ADDR16(pixbitmap, y^0xff, (x+subx)^0xff) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
 		else
-			plot_pixel(pixbitmap,x+subx,y,PIXMAP_COLOR_BASE + 8*pixcolor + color);
+			*BITMAP_ADDR16(pixbitmap, y, x+subx) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
 	}
 }
 

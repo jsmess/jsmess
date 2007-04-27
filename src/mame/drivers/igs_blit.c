@@ -136,10 +136,10 @@ VIDEO_UPDATE(igs)
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				plot_pixel( bitmap, x,y, get_black_pen(machine) );
+				*BITMAP_ADDR16(bitmap, y, x) = get_black_pen(machine);
 			else
 #endif
-				plot_pixel( bitmap, x,y, layer[l][scr_addr] | (l << 8) );
+				*BITMAP_ADDR16(bitmap, y, x) = layer[l][scr_addr] | (l << 8);
 		}
 	}
 	return 0;

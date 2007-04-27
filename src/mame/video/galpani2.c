@@ -64,7 +64,7 @@ WRITE16_HANDLER( galpani2_bg8_##_n_##_w ) \
 	pen	=	newword & 0xff; \
 	x	=	(offset % 512);	/* 512 x 256 */ \
 	y	=	(offset / 512); \
-	plot_pixel( galpani2_bg8_bitmap_##_n_, x, y, Machine->pens[0x4000 + pen] ); \
+	*BITMAP_ADDR16(galpani2_bg8_bitmap_##_n_, y, x) = Machine->pens[0x4000 + pen]; \
 }
 
 #define galpani2_BG8_PALETTE_W( _n_ ) \
@@ -107,7 +107,7 @@ WRITE16_HANDLER( galpani2_bg15_w )
 	int x = (offset % 256) + (offset / (256*256)) * 256 ;
 	int y = (offset / 256) % 256;
 
-	plot_pixel( galpani2_bg15_bitmap, x, y, Machine->pens[0x4200 + (newword & 0x7fff)] );
+	*BITMAP_ADDR16(galpani2_bg15_bitmap, y, x) = Machine->pens[0x4200 + (newword & 0x7fff)];
 }
 
 

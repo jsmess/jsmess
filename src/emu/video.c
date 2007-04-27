@@ -277,7 +277,7 @@ void video_init(running_machine *machine)
 	global.sleep = options_get_bool(mame_options(), OPTION_SLEEP);
 	global.throttle = options_get_bool(mame_options(), OPTION_THROTTLE);
 	global.auto_frameskip = options_get_bool(mame_options(), OPTION_AUTOFRAMESKIP);
-	global.frameskip_level = options_get_int_range(mame_options(), OPTION_FRAMESKIP, 0, MAX_FRAMESKIP);
+	global.frameskip_level = options_get_int(mame_options(), OPTION_FRAMESKIP);
 	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
 
 	/* allocate memory for our private data */
@@ -681,8 +681,12 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	/* recompute the VBLANK timing */
 	cpu_compute_vblank_timing();
 
-	/* reset the update timer */
-	mame_timer_adjust(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
+	/* if we are on scanline 0 already, reset the update timer immediately */
+	/* otherwise, defer until the next scanline 0 */
+	if (video_screen_get_vpos(scrnum) == 0)
+		mame_timer_adjust(info->scanline0_timer, time_zero, scrnum, time_zero);
+	else
+		mame_timer_adjust(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, time_zero);
 }
 
 

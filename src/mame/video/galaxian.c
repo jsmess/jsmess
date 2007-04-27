@@ -1487,7 +1487,7 @@ static void galaxian_draw_bullets(mame_bitmap *bitmap, int offs, int x, int y)
 			/* yellow missile, white shells (this is the terminology on the schematics) */
 			color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
 
-			plot_pixel(bitmap, x, y, Machine->pens[color]);
+			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[color];
 		}
 	}
 }
@@ -1507,7 +1507,7 @@ static void scramble_draw_bullets(mame_bitmap *bitmap, int offs, int x, int y)
 		x <= Machine->screen[0].visarea.max_x)
 	{
 		/* yellow bullets */
-		plot_pixel(bitmap, x, y, Machine->pens[BULLETS_COLOR_BASE]);
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[BULLETS_COLOR_BASE];
 	}
 }
 
@@ -1520,7 +1520,7 @@ static void darkplnt_draw_bullets(mame_bitmap *bitmap, int offs, int x, int y)
 	if (x >= Machine->screen[0].visarea.min_x &&
 		x <= Machine->screen[0].visarea.max_x)
 	{
-		plot_pixel(bitmap, x, y, Machine->pens[32 + darkplnt_bullet_color]);
+		*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[32 + darkplnt_bullet_color];
 	}
 }
 
@@ -1537,7 +1537,7 @@ static void theend_draw_bullets(mame_bitmap *bitmap, int offs, int x, int y)
 		if (x >= Machine->screen[0].visarea.min_x &&
 			x <= Machine->screen[0].visarea.max_x)
 		{
-			plot_pixel(bitmap, x, y, Machine->pens[BULLETS_COLOR_BASE]);
+			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[BULLETS_COLOR_BASE];
 		}
 	}
 }
@@ -1566,7 +1566,7 @@ static void dambustr_draw_bullets(mame_bitmap *bitmap, int offs, int x, int y)
 		if (x >= Machine->screen[0].visarea.min_x &&
 			x <= Machine->screen[0].visarea.max_x)
 		{
-			plot_pixel(bitmap, x, y, Machine->pens[color]);
+			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[color];
 		}
 	}
 }
@@ -1881,7 +1881,7 @@ static void plot_star(mame_bitmap *bitmap, int x, int y, int color)
 		y = 255 - y;
 	}
 
-	plot_pixel(bitmap, x, y, Machine->pens[stars_colors_start + color]);
+	*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[stars_colors_start + color];
 }
 
 static void noop_draw_stars(mame_bitmap *bitmap)

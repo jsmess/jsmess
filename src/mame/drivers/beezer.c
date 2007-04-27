@@ -14,7 +14,6 @@
 /* from video/beezer.c */
 INTERRUPT_GEN( beezer_interrupt );
 VIDEO_UPDATE( beezer );
-WRITE8_HANDLER( beezer_ram_w );
 
 /* from machine/beezer.c */
 DRIVER_INIT( beezer );
@@ -27,7 +26,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(beezer_ram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_BANK1)
 	AM_RANGE(0xd000, 0xffff) AM_WRITE(beezer_bankswitch_w)
 ADDRESS_MAP_END
@@ -108,7 +107,6 @@ static MACHINE_DRIVER_START( beezer )
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 303)
 	MDRV_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(beezer)
 
 	/* sound hardware */

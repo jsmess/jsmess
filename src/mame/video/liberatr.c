@@ -76,12 +76,9 @@ static Liberator_Planet *liberatr_planet_segs[2];
 
 INLINE void bitmap_common_w(UINT8 x, UINT8 y, int data)
 {
-	int pen;
-
 	liberatr_videoram[(y<<8) | x] = data & 0xe0;
 
-	pen = Machine->pens[(data >> 5) + 0x10];
-	plot_pixel(tmpbitmap, x, y, pen);
+	*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[(data >> 5) + 0x10];
 }
 
 WRITE8_HANDLER( liberatr_bitmap_xy_w )
@@ -357,13 +354,10 @@ static void liberatr_draw_planet(mame_bitmap *bitmap)
 		for (segment = 0; segment < segment_count; segment++)
 		{
 			UINT8 color, segment_length, i;
-			UINT16 pen;
 
 			color = *buffer++;
 			if ((color & 0x0c) == 0x0c)
 				color = base_color;
-
-			pen = Machine->pens[color];
 
 			segment_length = *buffer++;
 
@@ -371,7 +365,7 @@ static void liberatr_draw_planet(mame_bitmap *bitmap)
 			{
 				/* only plot pixels that don't cover the foreground up */
 				if (!liberatr_videoram[(y<<8) | x])
-					plot_pixel(bitmap, x, y, pen);
+					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[color];
 			}
 		}
 	}

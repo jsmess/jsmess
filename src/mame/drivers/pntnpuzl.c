@@ -242,8 +242,8 @@ VIDEO_UPDATE( pntnpuzl )
 	{
 		for(x=0;x<xxx;x+=2)
 		{
-			plot_pixel(bitmap, x,y, (pntnpuzl_3a0000ram[count]&0x1f00)>>8);
-			plot_pixel(bitmap, x+1,y, (pntnpuzl_3a0000ram[count]&0x001f)>>0);
+			*BITMAP_ADDR16(bitmap, y, x) = (pntnpuzl_3a0000ram[count]&0x1f00)>>8;
+			*BITMAP_ADDR16(bitmap, y, x+1) = (pntnpuzl_3a0000ram[count]&0x001f)>>0;
 			count++;
 		}
 	}

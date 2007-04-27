@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/electron.h"
+#include "plotpixl.h"
 
 /*
   From the ElectrEm site:

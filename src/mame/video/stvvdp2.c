@@ -2898,7 +2898,7 @@ static void stv_vdp2_draw_basic_bitmap(mame_bitmap *bitmap, const rectangle *cli
 						if(t_pen)
 						{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-								plot_pixel(bitmap,xcnt+1,ycnt,Machine->pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset]);
+								*BITMAP_ADDR16(bitmap, ycnt, xcnt+1) = Machine->pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 							else
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt+1) = alpha_blend16(*BITMAP_ADDR16(bitmap, ycnt, xcnt+1), Machine->pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset]);
 						}
@@ -2911,7 +2911,7 @@ static void stv_vdp2_draw_basic_bitmap(mame_bitmap *bitmap, const rectangle *cli
 						if(t_pen)
 						{
 							if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
-								plot_pixel(bitmap,xcnt,ycnt,Machine->pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset]);
+								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = Machine->pens[((gfxdata[0] & 0xf0) >> 4) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 							else
 								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = alpha_blend16(*BITMAP_ADDR16(bitmap, ycnt, xcnt), Machine->pens[((gfxdata[0] & 0x0f) >> 0) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset]);
 						}
@@ -2939,7 +2939,8 @@ static void stv_vdp2_draw_basic_bitmap(mame_bitmap *bitmap, const rectangle *cli
 						{
 							t_pen = ((gfxdata[xs] & 0xff) != 0) ? (1) : (0);
 							if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
-							if(t_pen) plot_pixel(bitmap,xcnt,ycnt,Machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset]);
+							if(t_pen)
+								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = Machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 						}
 						if ( (gfxdata + xs) >= gfxdatahigh )
 						{
@@ -2976,7 +2977,8 @@ static void stv_vdp2_draw_basic_bitmap(mame_bitmap *bitmap, const rectangle *cli
 						{
 							t_pen = ((gfxdata[xs] & 0xff) != 0) ? 1 : 0;
 							if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
-							if(t_pen) plot_pixel(bitmap,xcnt,ycnt,Machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset]);
+							if(t_pen)
+								*BITMAP_ADDR16(bitmap, ycnt, xcnt) = Machine->pens[(gfxdata[xs] & 0xff) | (stv2_current_tilemap.bitmap_palette_number * 0x100) | pal_color_offset];
 						}
 
 						if ( (gfxdata + xs) >= gfxdatahigh ) gfxdata = gfxdatalow;
@@ -2995,7 +2997,8 @@ static void stv_vdp2_draw_basic_bitmap(mame_bitmap *bitmap, const rectangle *cli
 					{
 						t_pen = ((((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff)) != 0) ? (1) : (0);
 						if(stv2_current_tilemap.transparency == TRANSPARENCY_NONE) t_pen = 1;
-						if(t_pen) plot_pixel(bitmap,xcnt,ycnt,Machine->pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset]);
+						if(t_pen)
+							*BITMAP_ADDR16(bitmap, ycnt, xcnt) = Machine->pens[((gfxdata[0] & 0x07) * 0x100) | (gfxdata[1] & 0xff) | pal_color_offset];
 					}
 
 					gfxdata+=2;

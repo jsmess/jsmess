@@ -9,10 +9,6 @@
 
 
 
-#define RGB32_BLACK			(0x00000000)
-#define RGB32_WHITE			(0x00ffffff)
-
-
 VIDEO_UPDATE( mw8080bw )
 {
 	UINT8 x = 0;
@@ -22,8 +18,8 @@ VIDEO_UPDATE( mw8080bw )
 	while (1)
 	{
 		/* plot the current pixel */
-		pen_t col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-		plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+		pen_t pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
+		*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		/* next pixel */
 		video_data = video_data >> 1;
@@ -37,8 +33,8 @@ VIDEO_UPDATE( mw8080bw )
 
 			for (i = 0; i < 4; i++)
 			{
-				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-				plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+				pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
+				*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
 			}
@@ -73,12 +69,12 @@ VIDEO_UPDATE( mw8080bw )
  *************************************/
 
 
-#define PHANTOM2_BOTTOM_TRENCH_DARK_RGB32_COLOR		(0x00000000)
-#define PHANTOM2_BOTTOM_TRENCH_LIGHT_RGB32_COLOR	(0x005a5a5a)
-#define PHANTOM2_TOP_TRENCH_DARK_RGB32_COLOR		(0x00000000)
-#define PHANTOM2_TOP_TRENCH_LIGHT_RGB32_COLOR		(0x00ffffff)
-#define PHANTOM2_SIDE_TRENCH_DARK_RGB32_COLOR		(0x00000000)
-#define PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_COLOR		(0x00727272)
+#define PHANTOM2_BOTTOM_TRENCH_DARK_RGB32_PEN	RGB_BLACK
+#define PHANTOM2_BOTTOM_TRENCH_LIGHT_RGB32_PEN	MAKE_RGB(0x5a, 0x5a, 0x5a)
+#define PHANTOM2_TOP_TRENCH_DARK_RGB32_PEN		RGB_BLACK
+#define PHANTOM2_TOP_TRENCH_LIGHT_RGB32_PEN		RGB_WHITE
+#define PHANTOM2_SIDE_TRENCH_DARK_RGB32_PEN		RGB_BLACK
+#define PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_PEN	MAKE_RGB(0x72, 0x72, 0x72)
 
 
 VIDEO_UPDATE( spcenctr )
@@ -102,7 +98,7 @@ VIDEO_UPDATE( spcenctr )
 	{
 		/* plot the current pixel */
 		UINT8 bit = video_data & 0x01;
-		pen_t col = bit ? RGB32_WHITE : RGB32_BLACK;
+		pen_t pen = bit ? RGB_WHITE : RGB_BLACK;
 
 		/* possibly draw trench in the background, top of trench first */
 		if (!(width & 0x80) && draw_trench)
@@ -111,7 +107,7 @@ VIDEO_UPDATE( spcenctr )
 
 			if (!bit)
 			{
-				col = draw_line ? PHANTOM2_TOP_TRENCH_LIGHT_RGB32_COLOR : PHANTOM2_TOP_TRENCH_DARK_RGB32_COLOR;
+				pen = draw_line ? PHANTOM2_TOP_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_TOP_TRENCH_DARK_RGB32_PEN;
 			}
 		}
 		/* sides of trench? */
@@ -119,7 +115,7 @@ VIDEO_UPDATE( spcenctr )
 		{
 			if (!bit)
 			{
-				col = line_buf[x] ? PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_COLOR : PHANTOM2_SIDE_TRENCH_DARK_RGB32_COLOR;
+				pen = line_buf[x] ? PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_SIDE_TRENCH_DARK_RGB32_PEN;
 			}
 		}
 		/* bottom of trench? */
@@ -129,11 +125,11 @@ VIDEO_UPDATE( spcenctr )
 
 			if (!bit)
 			{
-				col = line_buf[x] ? PHANTOM2_BOTTOM_TRENCH_LIGHT_RGB32_COLOR : PHANTOM2_BOTTOM_TRENCH_DARK_RGB32_COLOR;
+				pen = line_buf[x] ? PHANTOM2_BOTTOM_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_BOTTOM_TRENCH_DARK_RGB32_PEN;
 			}
 		}
 
-		plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+		*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		center = center + 1;
 		width = width + ((center & 0x80) ? -1 : 1);
@@ -154,8 +150,8 @@ VIDEO_UPDATE( spcenctr )
 
 			for (i = 0; i < 4; i++)
 			{
-				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-				plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+				pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
+				*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
 			}
@@ -228,7 +224,7 @@ VIDEO_UPDATE( spcenctr )
 #define PHANTOM2_CLOUD_COUNTER_END		(0x1000)
 #define PHANTOM2_CLOUD_COUNTER_PERIOD	(PHANTOM2_CLOUD_COUNTER_END - PHANTOM2_CLOUD_COUNTER_START)
 
-#define PHANTOM2_RGB32_CLOUD_COLOR		(0x00c0c0c0)
+#define PHANTOM2_RGB32_CLOUD_PEN		MAKE_RGB(0xc0, 0xc0, 0xc0)
 
 
 VIDEO_UPDATE( phantom2 )
@@ -246,7 +242,7 @@ VIDEO_UPDATE( phantom2 )
 	{
 		int load_shift_reg;
 		UINT8 cloud_data_to_load = 0;
-		pen_t col;
+		pen_t pen;
 
 		/* plot the current pixel */
 		UINT8 bit = video_data & 0x01;
@@ -254,14 +250,14 @@ VIDEO_UPDATE( phantom2 )
 		/* if background color, cloud gfx in the background */
 		if ((bit == 0) && (cloud_data & 0x01))
 		{
-			col = PHANTOM2_RGB32_CLOUD_COLOR;
+			pen = PHANTOM2_RGB32_CLOUD_PEN;
 		}
 		else
 		{
-			col = bit ? RGB32_WHITE : RGB32_BLACK;
+			pen = bit ? RGB_WHITE : RGB_BLACK;
 		}
 
-		plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+		*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
 		/* move to next pixel -- if ripple carry is currently set,
            prepare for loading the shift register */
@@ -298,8 +294,8 @@ VIDEO_UPDATE( phantom2 )
 
 			for (i = 0; i < 4; i++)
 			{
-				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
-				plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+				pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
+				*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 
 				video_data = video_data >> 1;
 			}
@@ -369,15 +365,15 @@ VIDEO_UPDATE( invaders )
 	while (1)
 	{
 		/* plot the current pixel */
-		pen_t col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
+		pen_t pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
 
 		if (flip_screen)
 		{
-			plot_pixel(bitmap, MW8080BW_HPIXCOUNT - 1 - x, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), col);
+			*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
 		}
 		else
 		{
-			plot_pixel(bitmap, x, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+			*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 		}
 
 		/* next pixel */
@@ -392,15 +388,15 @@ VIDEO_UPDATE( invaders )
 
 			for (i = 0; i < 4; i++)
 			{
-				col = (video_data & 0x01) ? RGB32_WHITE : RGB32_BLACK;
+				pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
 
 				if (flip_screen)
 				{
-					plot_pixel(bitmap, MW8080BW_HPIXCOUNT - 1 - (256 + i), MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), col);
+					*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
 				}
 				else
 				{
-					plot_pixel(bitmap, 256 + i, y - MW8080BW_VCOUNTER_START_NO_VBLANK, col);
+					*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
 				}
 
 				video_data = video_data >> 1;

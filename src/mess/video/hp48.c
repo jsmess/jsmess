@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "video/generic.h"
+#include "plotpixl.h"
 
 #include "includes/hp48.h"
 

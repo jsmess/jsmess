@@ -1650,6 +1650,8 @@ static void ppc_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_R29:			ppc.r[29] = info->i;					break;
 		case CPUINFO_INT_REGISTER + PPC_R30:			ppc.r[30] = info->i;					break;
 		case CPUINFO_INT_REGISTER + PPC_R31:			ppc.r[31] = info->i;					break;
+
+		case CPUINFO_INT_PPC_DRC_OPTIONS:				ppc.drcoptions = info->i;				break;
 	}
 }
 

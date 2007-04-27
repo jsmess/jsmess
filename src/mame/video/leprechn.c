@@ -65,7 +65,7 @@ WRITE8_HANDLER( leprechn_videoram_w )
 
 	if (pending)
 	{
-		plot_pixel(tmpbitmap, x, y, Machine->pens[color]);
+		*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[color];
         videoram[y * Machine->screen[0].width + x] = color;
 
         pending = 0;
@@ -116,7 +116,7 @@ WRITE8_HANDLER( leprechn_videoram_w )
         {
 	        for (sy = 0; sy < Machine->screen[0].height; sy++)
 	        {
-				plot_pixel(tmpbitmap, sx, sy, Machine->pens[data]);
+				*BITMAP_ADDR16(tmpbitmap, sy, sx) = Machine->pens[data];
 			}
 		}
 

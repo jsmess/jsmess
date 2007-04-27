@@ -71,9 +71,16 @@
 
 
 //============================================================
-//  PROTOTYPES
+//  GLOBAL VARIABLES
+//============================================================
+
+extern const options_entry mame_win_options[];
+
+
+
+//============================================================
+//  FUNCTION PROTOTYPES
 //============================================================
 
 // use if you want to print something with the verbose flag
 void CLIB_DECL verbose_printf(const char *text, ...) ATTR_PRINTF(1,2);
-

@@ -7,6 +7,7 @@
 
 #include "driver.h"
 #include "video/generic.h"
+#include "plotpixl.h"
 
 #include "includes/sym1.h"
 

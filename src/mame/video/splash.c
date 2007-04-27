@@ -167,7 +167,7 @@ static void splash_draw_bitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 				break;
 			}
 
-			plot_pixel(bitmap, sx-9, sy, Machine->pens[0x300+(color^colxor)]);
+			*BITMAP_ADDR16(bitmap, sy, sx-9) = Machine->pens[0x300+(color^colxor)];
 		}
 	}
 

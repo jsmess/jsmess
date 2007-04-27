@@ -173,12 +173,12 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						plot_pixel(bitmap, currx, ypos, pens[left | old[0]]);
+						*BITMAP_ADDR16(bitmap, ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						plot_pixel(bitmap, currx, ypos, pens[right | old[1]]);
+						*BITMAP_ADDR16(bitmap, ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 			}
@@ -197,12 +197,12 @@ static void draw_one_sprite(mame_bitmap *bitmap, const rectangle *cliprect, UINT
 
 					/* left pixel, combine with the background */
 					if (left && currx >= 0 && currx < 256)
-						plot_pixel(bitmap, currx, ypos, pens[left | old[0]]);
+						*BITMAP_ADDR16(bitmap, ypos, currx) = pens[left | old[0]];
 					currx++;
 
 					/* right pixel, combine with the background */
 					if (right && currx >= 0 && currx < 256)
-						plot_pixel(bitmap, currx, ypos, pens[right | old[1]]);
+						*BITMAP_ADDR16(bitmap, ypos, currx) = pens[right | old[1]];
 					currx++;
 				}
 				src += 4;

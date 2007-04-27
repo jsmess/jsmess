@@ -171,7 +171,7 @@ static int SpriteCheck(int first,int second,unsigned char *workram,int Graphics_
 				        continue;
 			        }
 
-        	        Checksum += read_pixel(collision_bitmap, x, y);
+        	        Checksum += *BITMAP_ADDR8(collision_bitmap, y, x);
                 }
 	        }
 
@@ -199,7 +199,7 @@ static int SpriteCheck(int first,int second,unsigned char *workram,int Graphics_
 				        continue;
 			        }
 
-        	        Checksum -= read_pixel(collision_bitmap, x, y);
+        	        Checksum -= *BITMAP_ADDR8(collision_bitmap, y, x);
                 }
 	        }
 

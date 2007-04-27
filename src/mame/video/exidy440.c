@@ -368,7 +368,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 					{
 						/* combine with the background */
 						pen = left | old[0];
-						plot_pixel(bitmap, currx, yoffs, Machine->pens[pen]);
+						*BITMAP_ADDR16(bitmap, yoffs, currx) = Machine->pens[pen];
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
@@ -381,7 +381,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
 					{
 						/* combine with the background */
 						pen = right | old[1];
-						plot_pixel(bitmap, currx, yoffs, Machine->pens[pen]);
+						*BITMAP_ADDR16(bitmap, yoffs, currx) = Machine->pens[pen];
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)

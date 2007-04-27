@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/gamecom.h"
+#include "plotpixl.h"
 
 #define Y_PIXELS 200
 

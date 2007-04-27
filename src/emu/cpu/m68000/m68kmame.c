@@ -300,16 +300,13 @@ void m68010_init(int index, int clock, const void *config, int (*irqcallback)(in
 	m68k_set_int_ack_callback(irqcallback);
 }
 
+#ifdef MAME_DEBUG
 static offs_t m68010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	M68K_SET_PC_CALLBACK(pc);
-#ifdef MAME_DEBUG
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68010);
-#else
-	sprintf( buffer, "$%04X", (oprom[0] << 8) | oprom[1] );
-	return 2;
-#endif
 }
+#endif /* MAME_DEBUG */
 
 #endif /* HAS_M68010 */
 
@@ -835,8 +832,9 @@ void m68010_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68010_set_info;		break;
 		case CPUINFO_PTR_INIT:							info->init = m68010_init;				break;
+#ifdef MAME_DEBUG
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m68010_dasm;		break;
-
+#endif /* MAME_DEBUG */
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "68010");				break;
 		case CPUINFO_STR_REGISTER + M68K_SFC:			sprintf(info->s, "SFC:%X",   m68k_get_reg(NULL, M68K_REG_SFC)); break;

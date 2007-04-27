@@ -1732,7 +1732,7 @@ static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
-					plot_pixel(bitmap,sx,sy,Machine->pens[0xa00+col]);
+					*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[0xa00+col];
 			}
 		}
 	}
@@ -1758,7 +1758,7 @@ static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
-					plot_pixel(bitmap,sx,sy,Machine->pens[0x800+col]);
+					*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[0x800+col];
 			}
 		}
 	}

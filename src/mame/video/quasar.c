@@ -180,7 +180,7 @@ VIDEO_UPDATE( quasar )
 
 			for(ox=0;ox<8;ox++)
 				for(oy=0;oy<8;oy++)
-					plot_pixel(effect_bitmap, sx+ox, sy+oy, forecolor);
+					*BITMAP_ADDR16(effect_bitmap, sy+oy, sx+ox) = forecolor;
 		}
 
 		if(dirtybuffer[offs])
@@ -240,10 +240,10 @@ VIDEO_UPDATE( quasar )
 
             	/* Bullet/Object Collision */
 
-				if (read_pixel(s2636_1_bitmap, bx, offs) != 0) CollisionRegister |= 4;
-                if (read_pixel(s2636_3_bitmap, bx, offs) != 0) CollisionRegister |= 8;
+				if (*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) CollisionRegister |= 4;
+                if (*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0) CollisionRegister |= 8;
 
-	            plot_pixel(bitmap,bx,offs,machine->pens[7]);
+				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[7];
             }
         }
     }

@@ -148,7 +148,7 @@ static int collision_check(grchamp_state *state, mame_bitmap *bitmap, int which 
 	{
 		for( x = 0; x<32; x++ )
 		{
-			pixel = read_pixel(state->work_bitmap,x,y);
+			pixel = *BITMAP_ADDR16(state->work_bitmap, y, x);
 			if( pixel != sprite_transp ){
 				sx = x+x0;
 				sy = y+y0;
@@ -156,13 +156,13 @@ static int collision_check(grchamp_state *state, mame_bitmap *bitmap, int which 
 					(sy >= clip->min_y) && (sy <= clip->max_y) )
 				{
 					// Collision check uses only 16 pens!
-					pixel = read_pixel(bitmap, sx, sy) % 16;
+					pixel = *BITMAP_ADDR16(bitmap, sy, sx) % 16;
 					if( pixel != bgcolor )
 					{
 						result = 1; /* flag collision */
 						/*  wipe this pixel, so collision checks with the
                         **  next layer work */
-						plot_pixel( bitmap, sx, sy, bgcolor );
+						*BITMAP_ADDR16(bitmap, sy, sx) = bgcolor;
 					}
 				}
 			}
@@ -174,7 +174,7 @@ static int collision_check(grchamp_state *state, mame_bitmap *bitmap, int which 
 
 static void draw_fog(grchamp_state *state, mame_bitmap *bitmap, const rectangle *cliprect, int fog)
 {
-	int x,y,pen,offs;
+	int x,y,offs;
 
 	// Emulation of analog fog effect
 	for (x = 0; x < 100; x++)
@@ -184,8 +184,7 @@ static void draw_fog(grchamp_state *state, mame_bitmap *bitmap, const rectangle 
 			offs = 0x40*(x-(100-FOG_SIZE-1));
 		for(y=16;y<240;y++)
 		{
-			pen = read_pixel(bitmap, x, y);
-			plot_pixel(bitmap,x, y, pen + offs);
+			*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x) + offs;
 		}
 	}
 }

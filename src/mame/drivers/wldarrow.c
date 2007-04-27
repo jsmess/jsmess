@@ -38,7 +38,7 @@ static void putpixel(int offset)
 
 		for (i = 0; i < 8; i++)
 		{
-			plot_pixel(tmpbitmap, x, y, Machine->pens[ ((d1&0x80)>>7)|((d2&0x80)>>6)|((d3&0x80)>>5) ]);
+			*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[ ((d1&0x80)>>7)|((d2&0x80)>>6)|((d3&0x80)>>5) ];
 			x++;
 			d1 <<= 1;
 			d2 <<= 1;

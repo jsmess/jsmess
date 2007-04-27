@@ -101,7 +101,7 @@ static void draw_sky(mame_bitmap *bitmap)
 	{
 		for (x = 0;x < 256;x++)
 		{
-			plot_pixel(bitmap,x,y,Machine->pens[128 + x/2]);
+			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[128 + x/2];
 		}
 	}
 }
@@ -231,7 +231,7 @@ static void draw_sprites(mame_bitmap *bitmap)
 						{
 							int dx = flip_screen_x ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
-								plot_pixel(bitmap,dx,dy,Machine->pens[sprite_color_base+col]);
+								*BITMAP_ADDR16(bitmap, dy, dx) = Machine->pens[sprite_color_base+col];
 						}
 
 						/* the following line is almost certainly wrong */

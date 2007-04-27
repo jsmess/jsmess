@@ -197,7 +197,7 @@ static void draw_torpedo(mame_bitmap* bitmap, const rectangle* cliprect)
 		{
 			if (LFSR[(current_index + 0x300 * y + x) % 0x8000])
 			{
-				plot_pixel(bitmap, x, y, 1);
+				*BITMAP_ADDR16(bitmap, y, x) = 1;
 			}
 		}
 	}
@@ -321,7 +321,7 @@ VIDEO_EOF( wolfpack )
 			if (y < 0 || y >= helper->height)
 				continue;
 
-			if (read_pixel(helper, x, y))
+			if (*BITMAP_ADDR16(helper, y, x))
 			{
 				wolfpack_collision = 1;
 			}

@@ -45,7 +45,7 @@ VIDEO_UPDATE( truco )
 				pixel = ( vid[x>>1] >> 4 ) & 0x0f;
 			}
 
-			plot_pixel(bitmap,x,y,machine->pens[pixel]);
+			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[pixel];
 		}
 
 		vid += 0x80;

@@ -267,10 +267,9 @@ void skyfox_draw_background(mame_bitmap *bitmap)
 		}
 
 		for (j = 0 ; j <= ((pen&0x80)?0:3); j++)
-			plot_pixel(	bitmap,
-						( (j&1)     + x ) % 512,
-						( ((j/2)&1) + y ) % 256,
-						Machine->pens[256+(pen&0x7f)] );
+			*BITMAP_ADDR16(bitmap,
+						   ( ((j/2)&1) + y ) % 256,
+						   ( (j&1)     + x ) % 512) = Machine->pens[256+(pen&0x7f)];
 	}
 }
 

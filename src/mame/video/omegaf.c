@@ -604,7 +604,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 						{
 							if(srcgfx[offset] != 15)
 							{
-								plot_pixel(bitmap_sp, sx + x, sy + y, 15);
+								*BITMAP_ADDR16(bitmap_sp, sy + y, sx + x) = 15;
 							}
 
 							offset++;

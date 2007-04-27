@@ -74,11 +74,11 @@ VIDEO_UPDATE(ttchamp)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			/*if(hotblock_port0&0x40)*/plot_pixel(bitmap, x,y, peno_vram[count]+0x300);
-			count++;
-		}
-	}
-	return 0;
+			/*if(hotblock_port0&0x40)*/*BITMAP_ADDR16(bitmap, y, x) = peno_vram[count]+0x300;
+            count++;
+        }
+    }
+    return 0;
 }
 
 static UINT8 paloff_l;
@@ -89,95 +89,95 @@ static UINT8 paldat_h;
 
 static WRITE8_HANDLER( paloff_l_w )
 {
-	paloff_l = data;
+    paloff_l = data;
 }
 
 static WRITE8_HANDLER( paloff_h_w )
 {
-	paloff_h = data;
+    paloff_h = data;
 }
 
 WRITE8_HANDLER( pcup_prgbank_w )
 {
-	int bank;
-	unsigned char *ROM1 = memory_region(REGION_USER1);
+    int bank;
+    unsigned char *ROM1 = memory_region(REGION_USER1);
 
-	bank = (data>>4) &0x07;
-	memory_set_bankptr(2,&ROM1[0x80000*(bank)]);
+    bank = (data>>4) &0x07;
+    memory_set_bankptr(2,&ROM1[0x80000*(bank)]);
 
 }
 
 
 static WRITE8_HANDLER( paldat_l_w )
 {
-	paldat_l = data;
+    paldat_l = data;
 }
 
 static WRITE8_HANDLER( paldat_h_w )
 {
-	int paldat;
-	int paloff;
+    int paldat;
+    int paloff;
 
-	paldat_h = data;
+    paldat_h = data;
 
-	paldat = (paldat_h <<8)|paldat_l;
-	paloff = (paloff_h <<8)|paloff_l;
-	paloff &=0x7fff;
+    paldat = (paldat_h <<8)|paldat_l;
+    paloff = (paloff_h <<8)|paloff_l;
+    paloff &=0x7fff;
 
-	palette_set_color(Machine,paloff,pal5bit(paldat>>0),pal5bit(paldat>>5),pal5bit(paldat>>10));
+    palette_set_color(Machine,paloff,pal5bit(paldat>>0),pal5bit(paldat>>5),pal5bit(paldat>>10));
 }
 
 static READ8_HANDLER( peno_rand )
 {
-	return 0xff;// rand();
+    return 0xff;// rand();
 }
 
 static READ8_HANDLER( peno_rand2 )
 {
-	return rand();
+    return rand();
 }
 
 static ADDRESS_MAP_START( ttchamp_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(&peno_vram)
-	AM_RANGE(0x20000, 0x7ffff) AM_READ(MRA8_BANK1) // ?
-	AM_RANGE(0x80000, 0xfffff) AM_READ(MRA8_BANK2) // ?
+    AM_RANGE(0x00000, 0x0ffff) AM_RAM
+    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(&peno_vram)
+    AM_RANGE(0x20000, 0x7ffff) AM_READ(MRA8_BANK1) // ?
+    AM_RANGE(0x80000, 0xfffff) AM_READ(MRA8_BANK2) // ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ttchamp_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x0000, 0x0000) AM_WRITE(MWA8_NOP)
 
-	AM_RANGE(0x0002, 0x0002) AM_READ(input_port_0_r)
-	AM_RANGE(0x0003, 0x0003) AM_READ(input_port_1_r)
-	AM_RANGE(0x0004, 0x0004) AM_READ(input_port_2_r)
-	AM_RANGE(0x0005, 0x0005) AM_READ(input_port_3_r)
+    AM_RANGE(0x0002, 0x0002) AM_READ(input_port_0_r)
+    AM_RANGE(0x0003, 0x0003) AM_READ(input_port_1_r)
+    AM_RANGE(0x0004, 0x0004) AM_READ(input_port_2_r)
+    AM_RANGE(0x0005, 0x0005) AM_READ(input_port_3_r)
 
 //  AM_RANGE(0x0018, 0x0018) AM_READ(peno_rand2)
 //  AM_RANGE(0x001e, 0x001e) AM_READ(peno_rand2)
 
-	AM_RANGE(0x0008, 0x0008) AM_WRITE(paldat_l_w)
-	AM_RANGE(0x0009, 0x0009) AM_WRITE(paldat_h_w)
+    AM_RANGE(0x0008, 0x0008) AM_WRITE(paldat_l_w)
+    AM_RANGE(0x0009, 0x0009) AM_WRITE(paldat_h_w)
 
-	AM_RANGE(0x000a, 0x000a) AM_WRITE(paloff_l_w)
-	AM_RANGE(0x000b, 0x000b) AM_WRITE(paloff_h_w)
+    AM_RANGE(0x000a, 0x000a) AM_WRITE(paloff_l_w)
+    AM_RANGE(0x000b, 0x000b) AM_WRITE(paloff_h_w)
 
 //  AM_RANGE(0x0010, 0x0010) AM_WRITE(pcup_prgbank_w)
-	AM_RANGE(0x0010, 0x0010) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0011, 0x0011) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x0010, 0x0010) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x0011, 0x0011) AM_WRITE(MWA8_NOP)
 
-	AM_RANGE(0x0020, 0x0020) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0021, 0x0021) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x0020, 0x0020) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x0021, 0x0021) AM_WRITE(MWA8_NOP)
 
 
-	AM_RANGE(0x0034, 0x0034) AM_READ(peno_rand) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x0035, 0x0035) AM_READ(peno_rand)
+    AM_RANGE(0x0034, 0x0034) AM_READ(peno_rand) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x0035, 0x0035) AM_READ(peno_rand)
 
 ADDRESS_MAP_END
 
 
 
 INPUT_PORTS_START(ttchamp)
-	PORT_START	/* 8bit */
+    PORT_START  /* 8bit */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )

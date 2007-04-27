@@ -142,17 +142,6 @@ INPUT_PORTS_START( m79amb )
 INPUT_PORTS_END
 
 
-static PALETTE_INIT( m79amb )
-{
-	palette_set_color(machine,0,0x00,0x00,0x00); /* BLACK */
-	palette_set_color(machine,1,0xff,0xff,0xff); /* WHITE */
-	palette_set_color(machine,2,0xff,0x20,0x20); /* RED */
-	palette_set_color(machine,3,0x20,0xff,0x20); /* GREEN */
-	palette_set_color(machine,4,0xff,0xff,0x20); /* YELLOW */
-	palette_set_color(machine,5,0x20,0xff,0xff); /* CYAN */
-	palette_set_color(machine,6,0xff,0x20,0xff); /* PURPLE */
-}
-
 static INTERRUPT_GEN( M79_interrupt )
 {
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcf);  /* RST 08h */
@@ -180,12 +169,9 @@ static MACHINE_DRIVER_START( m79amb )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_PALETTE_LENGTH(7)
-
-	MDRV_PALETTE_INIT(m79amb)
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 

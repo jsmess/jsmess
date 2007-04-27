@@ -192,7 +192,7 @@ INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y
 		y > cliprect->max_y)
 		return;
 
-	plot_pixel(bitmap, x, y, color);
+	*BITMAP_ADDR16(bitmap, y, x) = color;
 }
 
 

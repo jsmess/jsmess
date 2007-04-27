@@ -16,7 +16,6 @@ Japan). It has no sound.
 
 WRITE8_HANDLER( minivadr_videoram_w );
 VIDEO_UPDATE( minivadr );
-PALETTE_INIT( minivadr );
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -57,16 +56,13 @@ static MACHINE_DRIVER_START( minivadr )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MDRV_PALETTE_LENGTH(2)
-
-	MDRV_PALETTE_INIT(minivadr)
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(minivadr)
 
-	/* sound hardware */
+	/* the board has no sound hardware */
 MACHINE_DRIVER_END
 
 

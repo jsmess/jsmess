@@ -105,7 +105,7 @@ VIDEO_UPDATE(tetriunk)
 		for(z=0;z<8;z++)
 		for(x=0;x<320;x++)
 		{
-			plot_pixel(bitmap, x,   y+z, memory_region(REGION_USER1)[y*320/8+x+z*0x2000+bitmap_offset+8]);
+			*BITMAP_ADDR16(tmpbitmap, y+z, x) = memory_region(REGION_USER1)[y*320/8+x+z*0x2000+bitmap_offset+8];
 		}
 	}
 

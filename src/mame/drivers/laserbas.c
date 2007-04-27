@@ -25,7 +25,6 @@ VIDEO_START(laserbas)
 {
 	vram1=auto_malloc(0x8000);
 	vram2=auto_malloc(0x8000);
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	return 0;
 }
 
@@ -35,17 +34,16 @@ VIDEO_UPDATE(laserbas)
  	for(y=0;y<256;y++)
 		for(x=0;x<128;x++)
 		{
-			plot_pixel(tmpbitmap, x*2, y,  machine->pens[vram1[y*128+x]&0xf]+16);
-			plot_pixel(tmpbitmap, x*2+1, y, machine->pens[vram1[y*128+x]>>4]+16);
+			if (vram2[y*128+x]&0xf)
+				*BITMAP_ADDR16(bitmap, y, x*2) = machine->pens[vram2[y*128+x]&0xf]+16;
+			else
+				*BITMAP_ADDR16(bitmap, y, x*2) = machine->pens[vram1[y*128+x]&0xf]+16;
+
+			if (vram2[y*128+x]>>4)
+				*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[vram2[y*128+x]>>4]+16;
+			else
+				*BITMAP_ADDR16(bitmap, y, x*2+1) = machine->pens[vram1[y*128+x]>>4]+16;
 		}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	for(y=0;y<256;y++)
-		for(x=0;x<128;x++)
-		{
-			plot_pixel(tmpbitmap, x*2, y,  machine->pens[vram2[y*128+x]&0xf]);
-			plot_pixel(tmpbitmap, x*2+1, y, machine->pens[vram2[y*128+x]>>4]);
-		}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	return 0;
 }
 

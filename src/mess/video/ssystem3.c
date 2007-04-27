@@ -4,6 +4,7 @@
 
 #include "driver.h"
 #include "video/generic.h"
+#include "plotpixl.h"
 
 #include "includes/ssystem3.h"
 

@@ -142,7 +142,7 @@ void pastelg_vramflip(void)
 static void update_pixel(int x,int y)
 {
 	int color = pastelg_videoram[(y * Machine->screen[0].width) + x];
-	plot_pixel(pastelg_tmpbitmap, x, y, Machine->pens[color]);
+	*BITMAP_ADDR16(pastelg_tmpbitmap, y, x) = Machine->pens[color];
 }
 
 static void blitter_timer_callback(int param)
@@ -287,7 +287,7 @@ VIDEO_UPDATE( pastelg )
 			for (x = 0; x < machine->screen[0].width; x++)
 			{
 				color = pastelg_videoram[(y * machine->screen[0].width) + x];
-				plot_pixel(pastelg_tmpbitmap, x, y, machine->pens[color]);
+				*BITMAP_ADDR16(pastelg_tmpbitmap, y, x) = Machine->pens[color];
 			}
 		}
 	}

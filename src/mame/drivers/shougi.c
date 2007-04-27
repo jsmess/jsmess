@@ -181,7 +181,7 @@ int offs;
 				color= ((data1>>x) & 1) | (((data1>>(4+x)) & 1)<<1);
 				data = ((data2>>x) & 1) | (((data2>>(4+x)) & 1)<<1);
 
-				plot_pixel(bitmap, 255-(sx*4 + x), 255-sy, color*4 + data);
+				*BITMAP_ADDR16(bitmap, 255-sy, 255-(sx*4 + x)) = color*4 + data;
 			}
 		}
 	}

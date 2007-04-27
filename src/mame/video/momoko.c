@@ -91,7 +91,7 @@ void momoko_draw_bg_pri(mame_bitmap *bitmap, int chr, int col, int flipx, int fl
 					else  py=7-sy + y;
 
 				if (dot>=pri)
-					plot_pixel(bitmap, px, py, Machine->pens[col*16+dot+256]);
+					*BITMAP_ADDR16(bitmap, py, px) = Machine->pens[col*16+dot+256];
 				d0 = d0 << 1;
 				d1 = d1 << 1;
 			}

@@ -388,20 +388,20 @@ static void cdp1869_draw_line(mame_bitmap *bitmap, int x, int y, int data, int c
 	{
 		if (data & 0x80)
 		{
-			plot_pixel(bitmap, x, y, Machine->pens[color]);
+			*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[color];
 
 			if (!cdp1869.fresvert)
 			{
-				plot_pixel(bitmap, x, y + 1, Machine->pens[color]);
+				*BITMAP_ADDR16(bitmap, y + 1, x) = Machine->pens[color];
 			}
 
 			if (!cdp1869.freshorz)
 			{
-				plot_pixel(bitmap, x + 1, y, Machine->pens[color]);
+				*BITMAP_ADDR16(bitmap, y, x + 1) = Machine->pens[color];
 
 				if (!cdp1869.fresvert)
 				{
-					plot_pixel(bitmap, x + 1, y + 1, Machine->pens[color]);
+					*BITMAP_ADDR16(bitmap, y + 1, x + 1) = Machine->pens[color];
 				}
 			}
 		}

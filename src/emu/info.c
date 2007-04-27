@@ -636,7 +636,7 @@ static void print_game_micro(FILE* out, const game_driver* game)
 		}
 	}
 
-	for(j=0;j<MAX_SOUND;++j) if (sound[j].sound_type)
+	for(j=0;j<MAX_SOUND;++j)
 	{
 		if (sound[j].sound_type)
 		{

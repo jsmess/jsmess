@@ -147,11 +147,8 @@ WRITE16_HANDLER( hitice_pixelram_w )
   {
     /* bit 15 of pixel_scroll[0] is probably flip screen */
 
-    /* I always draw flipped because the driver doesn't support flip screen yet */
-    //plot_pixel(pixel_bitmap,1023-2*sx,  511-sy,Machine->pens[b_fg_color_base * 16 + (data & 0xff)]);
-    //plot_pixel(pixel_bitmap,1023-2*sx-1,511-sy,Machine->pens[b_fg_color_base * 16 + (data & 0xff)]);
-    plot_pixel(pixel_bitmap,2*sx,  sy,Machine->pens[b_fg_color_base * 16 + (data & 0xff)]);
-    plot_pixel(pixel_bitmap,2*sx+1,sy,Machine->pens[b_fg_color_base * 16 + (data & 0xff)]);
+	*BITMAP_ADDR16(pixel_bitmap, sy, 2*sx+0) = Machine->pens[b_fg_color_base * 16 + (data & 0xff)];
+	*BITMAP_ADDR16(pixel_bitmap, sy, 2*sx+1) = Machine->pens[b_fg_color_base * 16 + (data & 0xff)];
   }
 }
 
@@ -323,9 +320,8 @@ READ16_HANDLER( TC0180VCU_framebuffer_word_r )
   int sy = offset >> 8;
   int sx = 2*(offset & 0xff);
 
-  return
-    (read_pixel(framebuffer[sy >> 8],sx,  sy & 0xff) << 8) |
-     read_pixel(framebuffer[sy >> 8],sx+1,sy & 0xff);
+  return (*BITMAP_ADDR16(framebuffer[sy >> 8], sy & 0xff, sx + 0) << 8) |
+		  *BITMAP_ADDR16(framebuffer[sy >> 8], sy & 0xff, sx + 1);
 }
 
 WRITE16_HANDLER( TC0180VCU_framebuffer_word_w )
@@ -334,9 +330,9 @@ WRITE16_HANDLER( TC0180VCU_framebuffer_word_w )
   int sx = 2*(offset & 0xff);
 
   if (ACCESSING_MSB)
-    plot_pixel(framebuffer[sy >> 8],sx,  sy & 0xff,data >> 8);
+	*BITMAP_ADDR16(framebuffer[sy >> 8], sy & 0xff, sx + 0) = data >> 8;
   if (ACCESSING_LSB)
-    plot_pixel(framebuffer[sy >> 8],sx+1,sy & 0xff,data & 0xff);
+	*BITMAP_ADDR16(framebuffer[sy >> 8], sy & 0xff, sx + 1) = data & 0xff;
 }
 
 

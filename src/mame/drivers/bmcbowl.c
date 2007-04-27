@@ -142,31 +142,30 @@ VIDEO_UPDATE( bmcbowl )
 			pixdat = bmcbowl_vid2[0x8000+z];
 
 			if(pixdat&0xff)
-				plot_pixel(bitmap, x+1,   y, (pixdat&0xff));
+				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				plot_pixel(bitmap, x,   y, (pixdat>>8));
+				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
 
 			pixdat = bmcbowl_vid2[z];
 
 			if(pixdat&0xff)
-				plot_pixel(bitmap, x+1,   y, (pixdat&0xff));
+				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				plot_pixel(bitmap, x,   y, (pixdat>>8));
+				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
 
 			pixdat = bmcbowl_vid1[0x8000+z];
 
 			if(pixdat&0xff)
-				plot_pixel(bitmap, x+1,   y, (pixdat&0xff));
+				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				plot_pixel(bitmap, x,   y, (pixdat>>8));
+				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
 
 			pixdat = bmcbowl_vid1[z];
 
 			if(pixdat&0xff)
-				plot_pixel(bitmap, x+1,   y, (pixdat&0xff));
-
+				*BITMAP_ADDR16(bitmap, y, x+1) = (pixdat&0xff);
 			if(pixdat>>8)
-				plot_pixel(bitmap, x,   y, (pixdat>>8));
+				*BITMAP_ADDR16(bitmap, y, x) = (pixdat>>8);
 
 			z++;
 		}

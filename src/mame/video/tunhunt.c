@@ -226,7 +226,7 @@ static void draw_motion_object( mame_bitmap *bitmap )
 	int line,span;
 	int x,span_data;
 	int color;
-	int count,pen;
+	int count;
 	const unsigned char *source;
 	rectangle clip = Machine->screen[0].visarea;
 
@@ -241,18 +241,16 @@ static void draw_motion_object( mame_bitmap *bitmap )
 			{
 				span_data = source[span];
 				if( span_data == 0xff ) break;
-				pen = ((span_data>>6)&0x3)^0x3;
-				color = Machine->pens[pen];
+				color = ((span_data>>6)&0x3)^0x3;
 				count = (span_data&0x1f)+1;
 				while( count-- )
 				{
-					plot_pixel( tmpbitmap, x++,line,color );
+					*BITMAP_ADDR16(tmpbitmap, line, x++) = Machine->pens[color];
 				}
 			}
-			color = Machine->pens[0];
 			while( x<256 )
 			{
-				plot_pixel( tmpbitmap, x++,line,color );
+				*BITMAP_ADDR16(tmpbitmap, line, x++) = Machine->pens[0];
 			}
 		} /* dirty line */
 	} /* next line */
@@ -292,7 +290,7 @@ static void draw_box( mame_bitmap *bitmap )
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
     yet.  Once understood, this function should be converted to use fillbitmap with
-    rectangular chunks instead of plot_pixel.
+    rectangular chunks instead of BITMAP_ADDR.
 
     Tunnels:
         1080: 00 00 00      01  e7 18   ae 51   94 6b   88 77   83 7c   80 7f   x0
@@ -309,7 +307,6 @@ static void draw_box( mame_bitmap *bitmap )
 */
 	int span,x,y;
 	int color;
-	int pen;
 //  rectangle bbox;
 	int z;
 	int x0,y0,y1;
@@ -318,7 +315,7 @@ static void draw_box( mame_bitmap *bitmap )
 	{
 		for( x=0; x<256; x++ )
 		{
-			pen = 0;
+			color = 0;
 			z = 0;
 			for( span=3; span<16; span++ )
 			{
@@ -328,12 +325,11 @@ static void draw_box( mame_bitmap *bitmap )
 
 				if( y>=y0 && y<=y1 && x>=x0 && x0>=z )
 				{
-					pen = tunhunt_ram[span+0x1280]&0xf;
+					color = tunhunt_ram[span+0x1280]&0xf;
 					z = x0; /* give priority to rightmost spans */
 				}
 			}
-			color = Machine->pens[pen];
-			plot_pixel( bitmap, x, 0xff-y, color );
+			*BITMAP_ADDR16(bitmap, 0xff-y, x) = Machine->pens[color];
 		}
 	}
 	return;

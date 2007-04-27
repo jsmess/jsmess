@@ -267,7 +267,7 @@ static void starfield_render( mame_bitmap *bitmap )
 
 		if ( x >=0 && x < width && y >= 0 && y < height )
 		{
-			plot_pixel(bitmap, x, y, stars[i].col);
+			*BITMAP_ADDR16(bitmap, y, x) = stars[i].col;
 		}
 	}
 }

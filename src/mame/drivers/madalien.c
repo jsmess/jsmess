@@ -282,7 +282,7 @@ VIDEO_START( madalien )
 VIDEO_UPDATE( madalien )
 {
 	rectangle clip;
-	int i, yh, x, y, xp, yp, color;
+	int i, yh, x, y, xp, yp;
 
 	for (i=0; i<256; i++)
 		decodechar(machine->gfx[0], i, madalien_charram, machine->drv->gfxdecodeinfo[0].gfxlayout);
@@ -331,8 +331,8 @@ VIDEO_UPDATE( madalien )
 					    xp <= machine->screen[0].visarea.max_x &&
 					    yp <= machine->screen[0].visarea.max_y )
 					{
-						color = read_pixel(headlight_bitmap, x, y);
-						plot_pixel( bitmap, xp, yp, machine->pens[color+8] );
+						int color = *BITMAP_ADDR16(headlight_bitmap, y, x);
+						*BITMAP_ADDR16(bitmap, yp, xp) = machine->pens[color+8];
 					}
 				}
 	};

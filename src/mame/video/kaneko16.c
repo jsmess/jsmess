@@ -296,9 +296,7 @@ VIDEO_START( berlwall )
 			if ((r & 0x10) && (b & 0x10))
 				g = (g - 1) & 0x1f;		/* decrease with wraparound */
 
-			plot_pixel( kaneko16_bg15_bitmap,
-						sx * 256 + x, y,
-						machine->pens[2048 + ((g << 10) | (r << 5) | b)] );
+			*BITMAP_ADDR16(kaneko16_bg15_bitmap, y, sx * 256 + x) = machine->pens[2048 + ((g << 10) | (r << 5) | b)];
 	  }
 
 	return video_start_kaneko16_1xVIEW2(machine);

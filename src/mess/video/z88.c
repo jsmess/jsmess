@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/z88.h"
+#include "plotpixl.h"
 
 static int frame_number = 0;
 static int flash_invert = 0;

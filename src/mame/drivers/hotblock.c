@@ -140,7 +140,7 @@ VIDEO_UPDATE(hotblock)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			if(hotblock_port0&0x40)plot_pixel(bitmap, x,y, hotblock_ram[count]);
+			if(hotblock_port0&0x40) *BITMAP_ADDR16(bitmap, y, x) = hotblock_ram[count];
 			count++;
 		}
 	}

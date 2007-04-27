@@ -130,7 +130,7 @@ void hyhoo_vramflip(void)
 static void update_pixel(int x, int y)
 {
 	int color = hyhoo_videoram[(y * 512) + x];
-	plot_pixel(hyhoo_tmpbitmap, x, y, Machine->pens[color]);
+	*BITMAP_ADDR16(hyhoo_tmpbitmap, y, x) = Machine->pens[color];
 }
 
 

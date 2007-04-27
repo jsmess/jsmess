@@ -50,7 +50,7 @@ WRITE8_HANDLER( dorachan_videoram_w )
 		x+=offset&7;
 		for (i = 0; i < 8; i++)
 		{
-			plot_pixel(tmpbitmap, y, 255-x, (data&1)?Machine->pens[col]:Machine->pens[0]);
+			*BITMAP_ADDR16(tmpbitmap, 255-x, y) = (data&1)?Machine->pens[col]:Machine->pens[0];
 			y--;
 			data >>= 1;
 		}

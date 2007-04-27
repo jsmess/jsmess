@@ -246,17 +246,17 @@ static void common_videoram_w(int offset,int data,
 
 	if (video_flip)
 	{
-		plot_pixel(bitmap, x  , y, Machine->pens[color1 | coloroffset]);
-		plot_pixel(bitmap, x-1, y, Machine->pens[color2 | coloroffset]);
-		plot_pixel(bitmap, x-2, y, Machine->pens[color3 | coloroffset]);
-		plot_pixel(bitmap, x-3, y, Machine->pens[color4 | coloroffset]);
+		*BITMAP_ADDR16(bitmap, y, x-0) = Machine->pens[color1 | coloroffset];
+		*BITMAP_ADDR16(bitmap, y, x-1) = Machine->pens[color2 | coloroffset];
+		*BITMAP_ADDR16(bitmap, y, x-2) = Machine->pens[color3 | coloroffset];
+		*BITMAP_ADDR16(bitmap, y, x-3) = Machine->pens[color4 | coloroffset];
 	}
 	else
 	{
-		plot_pixel(bitmap, x  , y, Machine->pens[color1 | coloroffset]);
-		plot_pixel(bitmap, x+1, y, Machine->pens[color2 | coloroffset]);
-		plot_pixel(bitmap, x+2, y, Machine->pens[color3 | coloroffset]);
-		plot_pixel(bitmap, x+3, y, Machine->pens[color4 | coloroffset]);
+		*BITMAP_ADDR16(bitmap, y, x+0) = Machine->pens[color1 | coloroffset];
+		*BITMAP_ADDR16(bitmap, y, x+1) = Machine->pens[color2 | coloroffset];
+		*BITMAP_ADDR16(bitmap, y, x+2) = Machine->pens[color3 | coloroffset];
+		*BITMAP_ADDR16(bitmap, y, x+3) = Machine->pens[color4 | coloroffset];
 	}
 }
 

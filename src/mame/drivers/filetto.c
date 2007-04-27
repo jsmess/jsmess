@@ -127,7 +127,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x) = pen;
 			switch((vga_vram[offs] & 0x30) >> 4)
 			{
 				case 0: pen = 0xf0; break;
@@ -135,7 +135,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x+1,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x+1) = pen;
 			switch((vga_vram[offs] & 0x0c) >> 2)
 			{
 				case 0: pen = 0xf0; break;
@@ -143,7 +143,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x+2,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x+2) = pen;
 			switch((vga_vram[offs] & 0x03) >> 0)
 			{
 				case 0: pen = 0xf0; break;
@@ -151,7 +151,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x+3,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x+3) = pen;
 			offs++;
 		}
 
@@ -166,7 +166,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x) = pen;
 			switch((vga_vram[offs] & 0x30) >> 4)
 			{
 				case 0: pen = 0xf0; break;
@@ -174,7 +174,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x+1,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x+1) = pen;
 			switch((vga_vram[offs] & 0x0c) >> 2)
 			{
 				case 0: pen = 0xf0; break;
@@ -182,7 +182,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x+2,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x+2) = pen;
 			switch((vga_vram[offs] & 0x03) >> 0)
 			{
 				case 0: pen = 0xf0; break;
@@ -190,7 +190,7 @@ static void cga_graphic_bitmap(mame_bitmap *bitmap,const rectangle *cliprect,UIN
 				case 2: pen = 0xfd; break;
 				case 3: pen = 0xff; break;
 			}
-			plot_pixel(bitmap,x+3,y,pen);
+			*BITMAP_ADDR16(bitmap, y, x+3) = pen;
 			offs++;
 		}
 

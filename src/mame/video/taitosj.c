@@ -440,8 +440,8 @@ static int check_sprite_sprite_bitpattern(int sx1, int sy1, int num1,
 	{
 		for(x = minx;x < maxx;x++)
 		{
-			if ((read_pixel(sprite_sprite_collbitmap1, x, y) != Machine->pens[0]) &&
-			    (read_pixel(sprite_sprite_collbitmap2, x, y) != Machine->pens[0]))
+			if ((*BITMAP_ADDR16(sprite_sprite_collbitmap1, y, x) != Machine->pens[0]) &&
+			    (*BITMAP_ADDR16(sprite_sprite_collbitmap2, y, x) != Machine->pens[0]))
 			{
 				return 1;  /* collided */
 			}
@@ -589,22 +589,22 @@ static int check_sprite_plane_bitpattern(int num)
 	{
 		for (x = minx;x < maxx;x++)
 		{
-			if (read_pixel(sprite_plane_collbitmap1, x-minx, y-miny) != Machine->pens[0]) /* is there anything to check for ? */
+			if (*BITMAP_ADDR16(sprite_plane_collbitmap1, y-miny, x-minx) != Machine->pens[0]) /* is there anything to check for ? */
 			{
-				if (check_playfield1 && (read_pixel(sprite_plane_collbitmap2[0], x, y) != Machine->pens[0]))
+				if (check_playfield1 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[0], y, x) != Machine->pens[0]))
 				{
 					result |= 1;  /* collided */
 					if (result == 7)  goto done;
 					check_playfield1 = 0;
 				}
-				if (check_playfield2 && (read_pixel(sprite_plane_collbitmap2[1], x, y) != Machine->pens[0]))
+				if (check_playfield2 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[1], y, x) != Machine->pens[0]))
 				{
 					result |= 2;  /* collided */
 					if (result == 7)  goto done;
 					check_playfield2 = 0;
 
 				}
-				if (check_playfield3 && (read_pixel(sprite_plane_collbitmap2[2], x, y) != Machine->pens[0]))
+				if (check_playfield3 && (*BITMAP_ADDR16(sprite_plane_collbitmap2[2], y, x) != Machine->pens[0]))
 				{
 					result |= 4;  /* collided */
 					if (result == 7)  goto done;

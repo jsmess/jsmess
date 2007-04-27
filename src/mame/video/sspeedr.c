@@ -142,11 +142,11 @@ static void draw_track(mame_bitmap* bitmap)
 
 			if (counter_x & 2)
 			{
-				plot_pixel(bitmap, x, y, p[offset] / 16);
+				*BITMAP_ADDR16(bitmap, y, x) = p[offset] / 16;
 			}
 			else
 			{
-				plot_pixel(bitmap, x, y, p[offset] % 16);
+				*BITMAP_ADDR16(bitmap, y, x) = p[offset] % 16;
 			}
 		}
 
@@ -154,7 +154,7 @@ static void draw_track(mame_bitmap* bitmap)
 
 		for (; y < 128 + track_vert[1]; y++)
 		{
-			plot_pixel(bitmap, x, y, flag ? 15 : 0);
+			*BITMAP_ADDR16(bitmap, y, x) = flag ? 15 : 0;
 		}
 
 		/* lower landscape */
@@ -170,11 +170,11 @@ static void draw_track(mame_bitmap* bitmap)
 
 			if (counter_x & 2)
 			{
-				plot_pixel(bitmap, x, y, p[offset] / 16);
+				*BITMAP_ADDR16(bitmap, y, x) = p[offset] / 16;
 			}
 			else
 			{
-				plot_pixel(bitmap, x, y, p[offset] % 16);
+				*BITMAP_ADDR16(bitmap, y, x) = p[offset] % 16;
 			}
 		}
 	}

@@ -431,26 +431,26 @@ VIDEO_EOF( exidy )
     for (sy = 0; sy < 16; sy++)
 	    for (sx = 0; sx < 16; sx++)
 	    {
-    		if (read_pixel(motion_object_1_vid, sx, sy) != pen0)
+    		if (*BITMAP_ADDR16(motion_object_1_vid, sy, sx) != pen0)
     		{
 	  			UINT8 collision_mask = 0;
 
                 /* check for background collision (M1CHAR) */
-				if (read_pixel(tmpbitmap, org_1_x + sx, org_1_y + sy) != pen0)
+				if (*BITMAP_ADDR16(tmpbitmap, org_1_y + sy, org_1_x + sx) != pen0)
 					collision_mask |= 0x04;
 
                 /* check for motion object collision (M1M2) */
-				if (read_pixel(motion_object_2_clip, sx, sy) != pen0)
+				if (*BITMAP_ADDR16(motion_object_2_clip, sy, sx) != pen0)
 					collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
 				if ((collision_mask & exidy_collision_mask) && count++ < 128)
 					mame_timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), collision_mask, collision_irq_callback);
             }
-            if (read_pixel(motion_object_2_vid, sx, sy) != pen0)
+            if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != pen0)
     		{
                 /* check for background collision (M2CHAR) */
-				if (read_pixel(tmpbitmap, org_2_x + sx, org_2_y + sy) != pen0)
+				if (*BITMAP_ADDR16(tmpbitmap, org_2_y + sy, org_2_x + sx) != pen0)
 					if ((exidy_collision_mask & 0x08) && count++ < 128)
 						mame_timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), 0x08, collision_irq_callback);
             }

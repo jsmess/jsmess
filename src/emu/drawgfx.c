@@ -3338,12 +3338,6 @@ void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	profiler_mark(PROFILER_END);
 }
 
-INLINE void plotclip(mame_bitmap *bitmap,int x,int y,int pen,const rectangle *clip)
-{
-	if (x >= clip->min_x && x <= clip->max_x && y >= clip->min_y && y <= clip->max_y)
-		plot_pixel(bitmap,x,y,pen);
-}
-
 
 #else /* DECLARE */
 

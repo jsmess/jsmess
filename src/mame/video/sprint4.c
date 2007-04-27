@@ -141,7 +141,7 @@ VIDEO_EOF( sprint4 )
 		{
 			for (x = rect.min_x; x <= rect.max_x; x++)
 			{
-				if (read_pixel(helper, x, y) != BG)
+				if (*BITMAP_ADDR16(helper, y, x) != BG)
 				{
 					sprint4_collision[i] = 1;
 				}

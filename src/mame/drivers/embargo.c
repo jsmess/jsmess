@@ -30,7 +30,8 @@ static WRITE8_HANDLER( embargo_videoram_w )
 
 	for (i = 0; i < 8; i++)
 	{
-		plot_pixel(tmpbitmap, 8 * col + i, row, (data >> i) & 1);
+		pen_t pen = ((data >> i) & 1) ? RGB_WHITE : RGB_BLACK;
+		*BITMAP_ADDR32(tmpbitmap, row, 8 * col + i) = pen;
 	}
 
 	videoram[offset] = data;
@@ -181,12 +182,9 @@ static MACHINE_DRIVER_START( embargo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_PALETTE_LENGTH(2)
-
-	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(embargo)
 

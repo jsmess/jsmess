@@ -141,7 +141,7 @@ VIDEO_UPDATE(twins)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			plot_pixel(bitmap, x,y, twins_videoram[count]);
+			*BITMAP_ADDR16(bitmap, y, x) = twins_videoram[count];
 			count++;
 		}
 	}
@@ -238,7 +238,7 @@ VIDEO_UPDATE(twinsa)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			plot_pixel(bitmap, x,y, twins_videoram[count]);
+			*BITMAP_ADDR16(bitmap, y, x) = twins_videoram[count];
 			count++;
 		}
 	}

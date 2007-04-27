@@ -169,45 +169,45 @@ static void draw_led(mame_bitmap *bitmap, int x, int y,UINT8 value)
 
 	/* Top */
 	if( (value & 0x40) == 0 ) {
-		plot_pixel(bitmap, x+1, y+0, LED_ON);
-		plot_pixel(bitmap, x+2, y+0, LED_ON);
-		plot_pixel(bitmap, x+3, y+0, LED_ON);
+		*BITMAP_ADDR16(bitmap, y+0, x+1) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+0, x+2) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+0, x+3) = LED_ON;
 	}
 	/* Middle */
 	if( (value & 0x01) == 0 ) {
-		plot_pixel(bitmap, x+1, y+4, LED_ON);
-		plot_pixel(bitmap, x+2, y+4, LED_ON);
-		plot_pixel(bitmap, x+3, y+4, LED_ON);
+		*BITMAP_ADDR16(bitmap, y+4, x+1) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+4, x+2) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+4, x+3) = LED_ON;
 	}
 	/* Bottom */
 	if( (value & 0x08) == 0 ) {
-		plot_pixel(bitmap, x+1, y+8, LED_ON);
-		plot_pixel(bitmap, x+2, y+8, LED_ON);
-		plot_pixel(bitmap, x+3, y+8, LED_ON);
+		*BITMAP_ADDR16(bitmap, y+8, x+1) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+8, x+2) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+8, x+3) = LED_ON;
 	}
 	/* Top Left */
 	if( (value & 0x02) == 0 ) {
-		plot_pixel(bitmap, x+0, y+1, LED_ON);
-		plot_pixel(bitmap, x+0, y+2, LED_ON);
-		plot_pixel(bitmap, x+0, y+3, LED_ON);
+		*BITMAP_ADDR16(bitmap, y+1, x+0) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+2, x+0) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+3, x+0) = LED_ON;
 	}
 	/* Top Right */
 	if( (value & 0x20) == 0 ) {
-		plot_pixel(bitmap, x+4, y+1, LED_ON);
-		plot_pixel(bitmap, x+4, y+2, LED_ON);
-		plot_pixel(bitmap, x+4, y+3, LED_ON);
+		*BITMAP_ADDR16(bitmap, y+1, x+4) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+2, x+4) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+3, x+4) = LED_ON;
 	}
 	/* Bottom Left */
 	if( (value & 0x04) == 0 ) {
-		plot_pixel(bitmap, x+0, y+5, LED_ON);
-		plot_pixel(bitmap, x+0, y+6, LED_ON);
-		plot_pixel(bitmap, x+0, y+7, LED_ON);
+		*BITMAP_ADDR16(bitmap, y+5, x+0) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+6, x+0) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+7, x+0) = LED_ON;
 	}
 	/* Bottom Right */
 	if( (value & 0x10) == 0 ) {
-		plot_pixel(bitmap, x+4, y+5, LED_ON);
-		plot_pixel(bitmap, x+4, y+6, LED_ON);
-		plot_pixel(bitmap, x+4, y+7, LED_ON);
+		*BITMAP_ADDR16(bitmap, y+5, x+4) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+6, x+4) = LED_ON;
+		*BITMAP_ADDR16(bitmap, y+7, x+4) = LED_ON;
 	}
 }
 #endif

@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/mbee.h"
+#include "plotpixl.h"
 
 typedef struct {		 // CRTC 6545
 	UINT8 horizontal_total;

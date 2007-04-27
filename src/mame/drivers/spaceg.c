@@ -247,7 +247,7 @@ static WRITE8_HANDLER( zvideoram_w )
 	/* draw modified eight pixels */
 	for (i = 0; i < 8; i++)
 	{
-		plot_pixel(tmpbitmap, x-((io9400&0xe0)>>5), y, (data&1)?Machine->pens[col]:Machine->pens[0]);
+		*BITMAP_ADDR16(tmpbitmap, y, x-((io9400&0xe0)>>5)) = (data&1)?Machine->pens[col]:Machine->pens[0];
 		x++;
 		data >>= 1;
 	}
@@ -310,7 +310,7 @@ static WRITE8_HANDLER(spaceg_colorram_w)
 	/* draw modified eight pixels */
 	for (i = 0; i < 8; i++)
 	{
-		plot_pixel(tmpbitmap, x-((io9400&0xe0)>>5), y, (data&1)?Machine->pens[col]:Machine->pens[0]);
+		*BITMAP_ADDR16(tmpbitmap, y, x-((io9400&0xe0)>>5)) = (data&1)?Machine->pens[col]:Machine->pens[0];
 		x++;
 		data >>= 1;
 	}

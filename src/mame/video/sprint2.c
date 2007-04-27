@@ -75,7 +75,7 @@ static UINT8 collision_check(rectangle* rect)
 	{
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			pen_t a = read_pixel(helper, x, y);
+			pen_t a = *BITMAP_ADDR16(helper, y, x);
 
 			if (a == 0)
 			{

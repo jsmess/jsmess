@@ -7,9 +7,6 @@
 ***************************************************************************/
 
 
-/*  Stuff that work only in MS DOS (Color cycling)
- */
-
 #include "driver.h"
 
 
@@ -38,8 +35,8 @@ static void videowrite(int offset,int data)
 		y2 = 255 - y2;
 	}
 
-	plot_pixel(tmpbitmap,x1,y1,Machine->pens[data & 0x0f]);
-	plot_pixel(tmpbitmap,x2,y2,Machine->pens[data >> 4]);
+	*BITMAP_ADDR16(tmpbitmap, y1, x1) = Machine->pens[data & 0x0f];
+	*BITMAP_ADDR16(tmpbitmap, y2, x2) = Machine->pens[data >> 4];
 }
 
 

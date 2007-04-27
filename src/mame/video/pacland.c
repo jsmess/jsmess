@@ -340,9 +340,9 @@ VIDEO_UPDATE( pacland )
 	{
 		for (x = 0;x < sprite_bitmap->width;x++)
 		{
-			pen = read_pixel(sprite_bitmap,x,y);
+			pen = *BITMAP_ADDR16(sprite_bitmap, y, x);
 			if (pen >= 0xf0)
-				plot_pixel(bitmap,x,y,pen);
+				*BITMAP_ADDR16(bitmap, y, x) = pen;
 		}
 	}
 	return 0;

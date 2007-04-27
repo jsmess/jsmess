@@ -1199,6 +1199,42 @@ ROM_START( terrafu )
 	ROM_LOAD( "tf.clr",       0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) )	/* ??? */
 ROM_END
 
+/* Annoyingly this was a partial dump with only the comment 'other roms match 'terrafu',
+   so some IC positions etc. are missing */
+ROM_START( terrafa )
+	ROM_REGION( 0x60000, REGION_CPU1, 0 )	/* 64K*8 for 68000 code */
+	ROM_LOAD16_BYTE( "8.6e",         0x00000, 0x10000, CRC(fd58fa06) SHA1(f1f5fbd153be5fd5669aada66134baedfeac5d32) )
+	ROM_LOAD16_BYTE( "3.6h",         0x00001, 0x10000, CRC(54823a7d) SHA1(bdf67890428710470a622ea48383b3fae8de8cbd) )
+	ROM_LOAD16_BYTE( "tf.7",         0x20000, 0x10000, CRC(fde8de7e) SHA1(6b0d27ec49c8c0609c110ad97938bec8c077ad18) )
+	ROM_LOAD16_BYTE( "tf.2",         0x20001, 0x10000, CRC(db987414) SHA1(0a1734794c626cf9083d7854c9000c5daadfc3fd) )
+	ROM_LOAD16_BYTE( "6.3e",         0x40000, 0x10000, CRC(a5bb8c3b) SHA1(36730b1a4a686de7251b80eb084a00f64bd7b40d) )
+	ROM_LOAD16_BYTE( "1.3h",         0x40001, 0x10000, CRC(d2de6d28) SHA1(0371b5bf8e6105aaf8847c4b6d0d2d7d105079c1) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Z80 code (sound) */
+	ROM_LOAD( "11.17k", 0x00000, 0x10000,  CRC(4407d475) SHA1(96e86c7ef4dc997812436f7d0ddea332b4e6cb2b) )
+
+	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "terrafor.008", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
+
+	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "terrafor.006", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
+	ROM_LOAD( "terrafor.007", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
+
+	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "terrafor.004", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
+	ROM_LOAD( "terrafor.005", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
+
+	ROM_REGION( 0x20000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_LOAD( "12.7d", 0x00000, 0x10000, CRC(2d1f2ceb) SHA1(77544e1c4bda06feac135a96bb76af7c79278dc0) ) /* sprites */
+	ROM_LOAD( "13.9d", 0x10000, 0x10000, CRC(1d2f92d6) SHA1(e842c6bf95a5958a6ca2c85e68b9bc3cc15211a4) )
+
+	ROM_REGION( 0x4000, REGION_GFX5, 0 )	/* data for mcu/blitter */
+	ROM_LOAD( "tf.10",        0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_LOAD( "tf.clr",       0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) )	/* ??? */
+ROM_END
+
 ROM_START( kodure )
 	ROM_REGION( 0x60000, REGION_CPU1, 0 )	/* 64K*8 for 68000 code */
 	ROM_LOAD16_BYTE( "kodure8.6e", 0x00000, 0x10000, CRC(6bbfb1e6) SHA1(ffc8f835e28ff5f5b11f826b74ac2712c3018178) )
@@ -1387,6 +1423,7 @@ DRIVER_INIT( cclimbr2 )
 GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu", "Legion (ver 2.03)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu", "Legion (ver 1.05)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu", "Terra Force",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu", "Terra Force (set 2)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu", "Kodure Ookami (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME(  1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu", "Crazy Climber 2 (Japan)", 0)

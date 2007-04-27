@@ -29,6 +29,7 @@
 #include "inputx.h"
 #include "render.h"
 #include "includes/x68k.h"
+#include "plotpixl.h"
 
 extern struct x68k_system sys;
 

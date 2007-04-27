@@ -21,7 +21,7 @@
 ** - back drop correctly emulated.
 **
 ** 19 feb 2000, Sean:
-** - now uses plot_pixel (..), so -ror works properly
+** - now uses plot _pixel (..), so -ror works properly
 ** - fixed bug in tms.patternmask
 **
 ** 3 nov 2000, Raphael Nabet:
@@ -40,7 +40,7 @@
 ** - The screen image is rendered in `one go'. Modifications during
 **   screen build up are not shown.
 ** - Correctly emulate 4,8,16 kb VRAM if needed.
-** - uses plot_pixel (...) in TMS_sprites (...), which is rended in
+** - uses plot _pixel (...) in TMS_sprites (...), which is rended in
 **   in a back buffer created with malloc (). Hmm..
 ** - Colours are incorrect. [fixed by R Nabet ?]
 */
@@ -580,8 +580,7 @@ static void _TMS9928A_mode1 (mame_bitmap *bmp) {
             for (yy=0;yy<8;yy++) {
                 pattern = *patternptr++;
                 for (xx=0;xx<6;xx++) {
-		    		plot_pixel (bmp, 8+x*6+xx, y*8+yy,
-						(pattern & 0x80) ? fg : bg);
+					*BITMAP_ADDR16(bmp, y*8+yy, 8+x*6+xx) = (pattern & 0x80) ? fg : bg;
                     pattern *= 2;
                 }
             }
@@ -622,8 +621,7 @@ static void _TMS9928A_mode12 (mame_bitmap *bmp) {
             for (yy=0;yy<8;yy++) {
                 pattern = *patternptr++;
                 for (xx=0;xx<6;xx++) {
-		    		plot_pixel (bmp, 8+x*6+xx, y*8+yy,
-                        (pattern & 0x80) ? fg : bg);
+					*BITMAP_ADDR16(bmp, y*8+yy, 8+x*6+xx) = (pattern & 0x80) ? fg : bg;
                     pattern *= 2;
                 }
             }
@@ -650,8 +648,7 @@ static void _TMS9928A_mode0 (mame_bitmap *bmp) {
             for (yy=0;yy<8;yy++) {
                 pattern=*patternptr++;
                 for (xx=0;xx<8;xx++) {
-		    		plot_pixel (bmp, x*8+xx, y*8+yy,
-						(pattern & 0x80) ? fg : bg);
+					*BITMAP_ADDR16(bmp, y*8+yy, x*8+xx) = (pattern & 0x80) ? fg : bg;
                     pattern *= 2;
                 }
             }
@@ -685,8 +682,7 @@ static void _TMS9928A_mode2 (mame_bitmap *bmp) {
                 fg = Machine->pens[colour / 16];
                 bg = Machine->pens[colour & 15];
                 for (xx=0;xx<8;xx++) {
-		    		plot_pixel (bmp, x*8+xx, y*8+yy,
-						(pattern & 0x80) ? fg : bg);
+					*BITMAP_ADDR16(bmp, y*8+yy, x*8+xx) = (pattern & 0x80) ? fg : bg;
                     pattern *= 2;
                 }
             }
@@ -714,14 +710,14 @@ static void _TMS9928A_mode3 (mame_bitmap *bmp) {
                 fg = Machine->pens[(*patternptr / 16)];
                 bg = Machine->pens[((*patternptr++) & 15)];
                 for (yyy=0;yyy<4;yyy++) {
-		    plot_pixel (bmp, x*8+0, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+1, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+2, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+3, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+4, y*8+yy*4+yyy, bg);
-		    plot_pixel (bmp, x*8+5, y*8+yy*4+yyy, bg);
-		    plot_pixel (bmp, x*8+6, y*8+yy*4+yyy, bg);
-		    plot_pixel (bmp, x*8+7, y*8+yy*4+yyy, bg);
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+0) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+1) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+2) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+3) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+4) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+5) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+6) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+7) = fg;
                 }
             }
         }
@@ -749,14 +745,14 @@ static void _TMS9928A_mode23 (mame_bitmap *bmp) {
                 fg = Machine->pens[(*patternptr / 16)];
                 bg = Machine->pens[((*patternptr++) & 15)];
                 for (yyy=0;yyy<4;yyy++) {
-		    plot_pixel (bmp, x*8+0, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+1, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+2, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+3, y*8+yy*4+yyy, fg);
-		    plot_pixel (bmp, x*8+4, y*8+yy*4+yyy, bg);
-		    plot_pixel (bmp, x*8+5, y*8+yy*4+yyy, bg);
-		    plot_pixel (bmp, x*8+6, y*8+yy*4+yyy, bg);
-		    plot_pixel (bmp, x*8+7, y*8+yy*4+yyy, bg);
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+0) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+1) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+2) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+3) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+4) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+5) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+6) = fg;
+			*BITMAP_ADDR16(bmp, y*8+yy*4+yyy, x*8+7) = fg;
                 }
             }
         }
@@ -776,12 +772,12 @@ static void _TMS9928A_modebogus (mame_bitmap *bmp) {
 
     for (y=0;y<192;y++) {
         xx=0;
-        n=8; while (n--) plot_pixel (bmp, xx++, y, bg);
+        n=8; while (n--) *BITMAP_ADDR16(bmp, y, xx++) = bg;
         for (x=0;x<40;x++) {
-            n=4; while (n--) plot_pixel (bmp, xx++, y, fg);
-            n=2; while (n--) plot_pixel (bmp, xx++, y, bg);
+            n=4; while (n--) *BITMAP_ADDR16(bmp, y, xx++) = fg;
+            n=2; while (n--) *BITMAP_ADDR16(bmp, y, xx++) = bg;
         }
-        n=8; while (n--) plot_pixel (bmp, xx++, y, bg);
+        n=8; while (n--) *BITMAP_ADDR16(bmp, y, xx++) = bg;
     }
 
     _TMS9928A_set_dirty (0);
@@ -857,7 +853,7 @@ static void _TMS9928A_sprites (mame_bitmap *bmp) {
                             {
                             	tms.dBackMem[yy*256+xx] |= 0x02;
                             	if (bmp)
-									plot_pixel (bmp, LEFT_BORDER+xx, TOP_BORDER+yy, Machine->pens[c]);
+                            		*BITMAP_ADDR16(bmp, TOP_BORDER+yy, LEFT_BORDER+xx) = Machine->pens[c];
 							}
                         }
                     }
@@ -896,7 +892,7 @@ static void _TMS9928A_sprites (mame_bitmap *bmp) {
         		                    {
                 		            	tms.dBackMem[yy*256+xx] |= 0x02;
                                         if (bmp)
-                                        	plot_pixel (bmp, LEFT_BORDER+xx, TOP_BORDER+yy, Machine->pens[c]);
+		                            		*BITMAP_ADDR16(bmp, TOP_BORDER+yy, LEFT_BORDER+xx) = Machine->pens[c];
                 		            }
                                 }
                                 if (((xx+1) >=0) && ((xx+1) < 256)) {
@@ -909,7 +905,7 @@ static void _TMS9928A_sprites (mame_bitmap *bmp) {
         		                    {
                 		            	tms.dBackMem[yy*256+xx+1] |= 0x02;
                                         if (bmp)
-                                        	plot_pixel (bmp, LEFT_BORDER+xx+1, TOP_BORDER+yy, Machine->pens[c]);
+		                            		*BITMAP_ADDR16(bmp, TOP_BORDER+yy, LEFT_BORDER+xx+1) = Machine->pens[c];
 									}
                                 }
                             }

@@ -13,6 +13,7 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/oric.h"
+#include "plotpixl.h"
 
 static void oric_vh_update_flash(void);
 static void oric_vh_update_attribute(int c);

@@ -225,7 +225,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		{
 			for (x = 0; x < 8; x++)
 			{
-				plot_pixel(tmpbitmap2, sx+x, sy+y, colour);
+				*BITMAP_ADDR16(tmpbitmap2, sy+y, sx+x) = colour;
 			}
 		}
 	}
@@ -242,7 +242,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		{
 			for (x = 0; x < 8; x++)
 			{
-				plot_pixel(tmpbitmap2, sx+x, sy+y, colour);
+				*BITMAP_ADDR16(tmpbitmap2, sy+y, sx+x) = colour;
 			}
 		}
 	}

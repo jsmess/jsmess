@@ -318,10 +318,10 @@ static void draw_grid(mame_bitmap *bitmap)
 			if (table[counter] & 0x80)	/* star */
 			{
 				if (rand() & 1)	/* noise coming from sound board */
-					plot_pixel(bitmap,x,y,Machine->pens[256]);
+					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[256];
 			}
 			else if (grid_on)			/* radar */
-				plot_pixel(bitmap,x,y,Machine->pens[257]);
+				*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[257];
 		}
 
 		counter++;

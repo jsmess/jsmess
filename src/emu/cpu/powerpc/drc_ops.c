@@ -6,11 +6,6 @@
 #define USE_SSE2			0
 #define COMPILE_FPU			0
 
-#define PPCDRC_STRICT_VERIFY		0x0001			/* verify all instructions */
-
-#define PPCDRC_COMPATIBLE_OPTIONS	(PPCDRC_STRICT_VERIFY)
-#define PPCDRC_FASTEST_OPTIONS		0
-
 /* recompiler flags */
 #define RECOMPILE_UNIMPLEMENTED			0x0000
 #define RECOMPILE_SUCCESSFUL			0x0001
@@ -49,7 +44,7 @@ static void ppcdrc_init(void)
 
 	/* initialize the compiler */
 	ppc.drc = drc_init(cpu_getactivecpu(), &drconfig);
-	ppc.drcoptions = PPCDRC_FASTEST_OPTIONS;
+	ppc.drcoptions = 0;
 }
 
 static void ppcdrc_reset(drc_core *drc)
@@ -119,7 +114,7 @@ static void ppcdrc_recompile(drc_core *drc)
 	drc_begin_sequence(drc, pc);
 
 	/* loose verification case: one verification here only */
-	if (!(ppc.drcoptions & PPCDRC_STRICT_VERIFY))
+	if (!(ppc.drcoptions & PPCDRC_OPTIONS_CHECK_SELFMOD_CODE))
 	{
 		opptr = ppcdrc_getopptr(pc);
 		if (opptr)
@@ -223,8 +218,10 @@ static UINT32 compile_one(drc_core *drc, UINT32 pc)
 	}
 
 	/* emit self-modifying code checks */
-	if (ppc.drcoptions & PPCDRC_STRICT_VERIFY)
+	if (ppc.drcoptions & PPCDRC_OPTIONS_CHECK_SELFMOD_CODE)
+	{
 		drc_append_verify_code(drc, opptr, 4);
+	}
 
 	/* compile the instruction */
 	result = recompile_instruction(drc, pc, opptr);

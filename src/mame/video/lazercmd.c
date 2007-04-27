@@ -71,7 +71,7 @@ static void plot_pattern(mame_bitmap *bitmap, int x, int y)
 			if (x+xbit < 0 || x+xbit >= HORZ_RES * HORZ_CHR)
 				continue;
 
-			plot_pixel(bitmap, x+xbit, y+ybit, Machine->pens[2]);
+			*BITMAP_ADDR16(bitmap, y+ybit, x+xbit) = Machine->pens[2];
 		}
 	}
 }

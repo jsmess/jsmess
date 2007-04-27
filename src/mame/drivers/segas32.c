@@ -2903,6 +2903,47 @@ ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
+    Kokoroji 2
+    Sega System32 + CD - Sega 1993
+
+    Rom Board is 837-8393 16Mb ROM board (Same as godenaxe2 or Arabian Fight)
+
+    SCSI CD board is 839-0572-01. It use a Fujitsu MB89352AP for SCSI + a Sony CXD1095Q for I/O + 8Mhz quartz
+*/
+ROM_START( kokoroj2 )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* v60 code + data */
+	ROM_LOAD_x8( "epr16186.8",     0x000000,  0x20000, CRC(8c3afb6e) SHA1(68c3c066a943b1ea8e3bee06c7c8279b5a12e7f7) )
+	ROM_LOAD16_BYTE( "epr16183.18", 0x100000, 0x80000, CRC(4844432f) SHA1(b127169d0f108e0b99ec81814a5c3c45bb82e0b1) )
+	ROM_LOAD16_BYTE( "epr16182.9",  0x100001, 0x80000, CRC(a27f5f5f) SHA1(c2bbd1632bce0851cf8ab45d3ccbec1076e67f5e) )
+
+	ROM_REGION( 0x500000, REGION_CPU2, 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr16185.36", 0x100000, 0x020000, CRC(afb97c4d) SHA1(f6e77d932824f93d89559a9cb3b2d678d5fc6940) )
+	ROM_LOAD( "mpr16184.35",    0x200000, 0x080000, CRC(dbd44a85) SHA1(e7341d2ef27c580bff365b5c546da2adb72faee8) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD16_BYTE( "mpr16188.14", 0x000000, 0x200000, CRC(83a450ab) SHA1(1d0b45512d784ed1d82135b84c7c540f92d789f7) )
+	ROM_LOAD16_BYTE( "mpr16187.5",  0x000001, 0x200000, CRC(98b62f8b) SHA1(eaf98efd9eac7b7c385138a8a4dbc94b0ca38df5) )
+
+	ROM_REGION32_BE( 0x1000000, REGION_GFX2, 0 ) /* sprites */
+	ROMX_LOAD( "mpr16189.32", 0x000000, 0x200000, CRC(0937f713) SHA1(4b2b09ec8ed97794ad3824d1c57eae7f7e01379c) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr16191.30", 0x000002, 0x200000, CRC(cfef4aaa) SHA1(bc8a252dcbdb8facdd91eda7aed0f56fe7529d15) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr16193.28", 0x000004, 0x200000, CRC(a0706e4e) SHA1(1f36d952971c05db4190b229aa4957db3e5224f1) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr16195.26", 0x000006, 0x200000, CRC(a4ddcd61) SHA1(90ef40f1fc84d1e4d4f78c33b8f0d1f56e04bf90) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr16190.31", 0x800000, 0x200000, CRC(528d408e) SHA1(89f8a2cfc8b59377d6a65555c3172e457b131502) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr16192.29", 0x800002, 0x200000, CRC(efaa93d1) SHA1(2947eaf7fc358ced1c04e7abe7a3f3066c73f2d0) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr16194.27", 0x800004, 0x200000, CRC(39b5efe7) SHA1(2039909a2dd46951d442f1b6377f365525f9f2f1) , ROM_SKIP(6)|ROM_GROUPWORD )
+	ROMX_LOAD( "mpr16196.25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) , ROM_SKIP(6)|ROM_GROUPWORD )
+
+	/* AUDIO CD -- verify that this is an acceptable read and convert to CHD */
+//  ROM_REGION( 0x0017eb, REGION_USER1, 0 )
+//  ROM_LOAD( "segaa.cue",     0x0,  0x0017eb, CRC(7dae0d4b) SHA1(05c84e3a2b0fd0630b84b42e8d4c4ffbbb1cf531) )
+//  ROM_REGION( 0x179ce890, REGION_USER2, 0 )
+//  ROM_LOAD( "segaa.bin",     0x0,  0x179ce890, CRC(4d6937a4) SHA1(637be0a388e9bde8b12cdf6a0bfb7a0528e763b3) )
+ROM_END
+
+/**************************************************************************************************************************
+ **************************************************************************************************************************
+ **************************************************************************************************************************
     Outrunners (Multi-32)
     not protected
 */
@@ -3802,6 +3843,7 @@ GAME( 1992, ga2u,     ga2,      system32_v20, ga2u,     ga2,      ROT0, "Sega", 
 GAME( 1992, ga2j,     ga2,      system32_v20, ga2,      ga2,      ROT0, "Sega",   "Golden Axe: The Revenge of Death Adder (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, holo,     0,        system32,     holo,     holo,     ORIENTATION_FLIP_Y, "Sega",   "Holosseum (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, jpark,    0,        system32,     jpark,    jpark,    ROT0, "Sega",   "Jurassic Park", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, kokoroj2, 0,        system32,     radr,     radr,     ROT0, "Sega",   "Kokoroji 2", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING) // uses an Audio CD
 GAME( 1991, radm,     0,        system32,     radm,     radm,     ROT0, "Sega",   "Rad Mobile (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, radmu,    radm,     system32,     radm,     radm,     ROT0, "Sega",   "Rad Mobile (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, radr,     0,        system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (World)", GAME_IMPERFECT_GRAPHICS )

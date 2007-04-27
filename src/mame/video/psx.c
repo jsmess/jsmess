@@ -398,9 +398,9 @@ static void DebugMesh( int n_coordx, int n_coordy )
 				(INT16)n_x.w.h <= Machine->screen[0].width - 1 &&
 				(INT16)n_y.w.h <= Machine->screen[0].height - 1 )
 			{
-				if( read_pixel( debugmesh, n_x.w.h, n_y.w.h ) != 0xffff )
+				if( *BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) != 0xffff )
 				{
-					plot_pixel( debugmesh, n_x.w.h, n_y.w.h, n_colour );
+					*BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) = n_colour;
 				}
 			}
 			n_x.d += n_dx;

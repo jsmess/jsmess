@@ -13,6 +13,7 @@
 #include "video/generic.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
+#include "plotpixl.h"
 
 mame_bitmap *nes_zapper_hack;
 int nes_vram_sprite[8]; /* Used only by mmc5 for now */

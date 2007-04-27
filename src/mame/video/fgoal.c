@@ -98,7 +98,7 @@ VIDEO_UPDATE( fgoal )
 		{
 			if (y < 256 && x < 256)
 			{
-				plot_pixel(fgbitmap, x, y, 0x38);
+				*BITMAP_ADDR16(fgbitmap, y, x) = 0x38;
 			}
 		}
 	}

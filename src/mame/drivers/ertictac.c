@@ -46,10 +46,10 @@ static WRITE32_HANDLER(ram_w)
 		int x=(tmp%80)<<2;
 		int y=(tmp/80)&0xff;
 
-		plot_pixel(tmpbitmap, x++, y, (ram[offset]&0xff));
-		plot_pixel(tmpbitmap, x++, y, ((ram[offset]>>8)&0xff));
-		plot_pixel(tmpbitmap, x++, y, ((ram[offset]>>16)&0xff));
-		plot_pixel(tmpbitmap, x, y, ((ram[offset]>>24)&0xff));
+		*BITMAP_ADDR16(tmpbitmap, y, x++) = (ram[offset]>> 0)&0xff;
+		*BITMAP_ADDR16(tmpbitmap, y, x++) = (ram[offset]>> 8)&0xff;
+		*BITMAP_ADDR16(tmpbitmap, y, x++) = (ram[offset]>>16)&0xff;
+		*BITMAP_ADDR16(tmpbitmap, y, x  ) = (ram[offset]>>24)&0xff;
 	}
 }
 

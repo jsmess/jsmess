@@ -146,7 +146,7 @@ VIDEO_START( gomoku )
 			if (bgdata & 0x01) color = 0x21;	// board (brown)
 			if (bgdata & 0x02) color = 0x20;	// frame line (while)
 
-			plot_pixel(gomoku_bg_bitmap, (255 - x + 7), (255 - y - 1), color);
+			*BITMAP_ADDR16(gomoku_bg_bitmap, (255 - y - 1), (255 - x + 7)) = color;
 		}
 	}
 
@@ -201,7 +201,7 @@ VIDEO_UPDATE( gomoku )
 				}
 				else continue;
 
-				plot_pixel(bitmap, (255 - x + 7), (255 - y - 1), color);
+				*BITMAP_ADDR16(bitmap, (255 - y - 1), (255 - x + 7)) = color;
 			}
 		}
 
@@ -229,7 +229,7 @@ VIDEO_UPDATE( gomoku )
 				}
 				else continue;
 
-				plot_pixel(bitmap, (255 - x + 7), (255 - y - 1), color);
+				*BITMAP_ADDR16(bitmap, (255 - y - 1), (255 - x + 7)) = color;
 			}
 		}
 	}

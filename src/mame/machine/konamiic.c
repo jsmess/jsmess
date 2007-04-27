@@ -12,7 +12,12 @@ static void (*K056800_sound_irq_callback)(int);
 
 static UINT8 K056800_host_reg_r(int reg)
 {
-	return K056800_host_reg[reg];
+	UINT8 value = 0;
+
+	value = K056800_host_reg[reg];
+	if (reg == 2) value &= ~3; // suppress VOLWR busy flags
+
+	return value;
 }
 
 static void K056800_host_reg_w(int reg, UINT8 data)

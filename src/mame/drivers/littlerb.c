@@ -328,12 +328,12 @@ void littlerb_drawsprite(mame_bitmap *bitmap, int xsize,int ysize, int offset, i
 
 			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
 			{
-				if(pix1&0xf) plot_pixel(bitmap,drawxpos,  drawypos, pix1);
+				if(pix1&0xf) *BITMAP_ADDR16(bitmap, drawypos, drawxpos) = pix1;
 			}
 			drawxpos++;
 			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
 			{
-				if(pix2&0xf) plot_pixel(bitmap,drawxpos,  drawypos, pix2);
+				if(pix2&0xf) *BITMAP_ADDR16(bitmap, drawypos, drawxpos) = pix2;
 			}
 
 			offset++;

@@ -396,6 +396,8 @@ static void *namco_start(int sndindex, int clock, const void *config)
 	/* register with the save state system */
 	state_save_register_item("namco", sndindex, chip->num_voices);
 	state_save_register_item("namco", sndindex, chip->sound_enable);
+	state_save_register_item_pointer("namco", sndindex, chip->waveform[0],
+										 MAX_VOLUME * 32 * 8 * (1+chip->wave_size));
 
 	/* reset all the voices */
 	for (voice = chip->channel_list; voice < chip->last_channel; voice++)

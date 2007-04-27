@@ -253,10 +253,10 @@ static void update_smoothing(int bgtilerow, int first, int last)
 				int bl = bgcurr[(x & 0x1ff) / 2];
 				int mixt = prom[16 * tl + tr];
 				int mixb = prom[16 * bl + br];
-				plot_pixel(bgexbitmap, x & 0x1ff, curry, prom[0x400 + 16 * mixt + mixb]);
+				*BITMAP_ADDR16(bgexbitmap, curry, x & 0x1ff) = prom[0x400 + 16 * mixt + mixb];
 			}
 			else
-				plot_pixel(bgexbitmap, x & 0x1ff, curry, prom[0x400 + 16 * tr + br]);
+				*BITMAP_ADDR16(bgexbitmap, curry, x & 0x1ff) = prom[0x400 + 16 * tr + br];
 		}
 	}
 }

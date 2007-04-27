@@ -2,7 +2,6 @@
 #include "streams.h"
 #include "sound/samples.h"
 #include "includes/galaxian.h"
-#include <math.h>
 
 #define VERBOSE 0
 
@@ -43,7 +42,7 @@ static INT32 freq = MAXFREQ;
 
 #define STEP 1
 
-static void *noisetimer = 0;
+static INT32 noise_enable;
 static INT32 noisevolume;
 static INT16 *noisewave;
 static INT16 *shootwave;
@@ -70,6 +69,7 @@ static INT16 backgroundwave[32] =
 #define CHANNEL_SHOOT	1
 #define CHANNEL_LFO		2
 static sound_stream * tone_stream;
+static mame_timer *noisetimer;
 
 static void lfo_timer_cb(int param);
 static void galaxian_sh_update(int dummy);
@@ -126,7 +126,7 @@ WRITE8_HANDLER( galaxian_vol_w )
 
 static void noise_timer_cb(int param)
 {
-	if( noisevolume > 0 )
+	if( !noise_enable && noisevolume > 0 )
 	{
 		noisevolume -= (noisevolume / 10) + 1;
 		sample_set_volume(CHANNEL_NOISE,noisevolume / 100.0);
@@ -135,17 +135,12 @@ static void noise_timer_cb(int param)
 
 WRITE8_HANDLER( galaxian_noise_enable_w )
 {
-	if( data & 1 )
+	noise_enable = data & 1;
+
+	if( noise_enable )
 	{
-		timer_adjust(noisetimer, TIME_NEVER, 0, 0);
 		noisevolume = 100;
 		sample_set_volume(CHANNEL_NOISE,noisevolume / 100.0);
-	}
-	else
-	{
-		/* discharge C21, 22uF via 150k+22k R35/R36 */
-		if (noisevolume == 100)
-			timer_adjust(noisetimer, TIME_IN_USEC(0.693*(155000+22000)*22 / 100), 0, TIME_IN_USEC(0.693*(155000+22000)*22 / 100));
 	}
 }
 
@@ -369,11 +364,14 @@ static void galaxian_sh_start(void)
 	sample_start_raw(CHANNEL_LFO+2,backgroundwave,sizeof(backgroundwave)/2,1000,1);
 
 	noisetimer = timer_alloc(noise_timer_cb);
+	timer_adjust(noisetimer, TIME_IN_USEC(0.693*(155000+22000)*22 / 100), 0, TIME_IN_USEC(0.693*(155000+22000)*22 / 100));
+
 	lfotimer = timer_alloc(lfo_timer_cb);
 
 	mame_timer_pulse(make_mame_time(0, Machine->screen[0].refresh), 0, galaxian_sh_update);
 
 	state_save_register_global(freq);
+	state_save_register_global(noise_enable);
 	state_save_register_global(noisevolume);
 	state_save_register_global(last_port2);
 	state_save_register_global(pitch);
