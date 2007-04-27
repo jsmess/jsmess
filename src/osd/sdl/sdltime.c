@@ -24,6 +24,11 @@
 #include <mach/mach_time.h>
 #endif
 
+#ifdef SDLMAME_OS2
+#define INCL_DOS
+#include <os2.h>
+#endif
+
 // MAME headers
 #include "osdepend.h"
 
@@ -37,7 +42,7 @@ static osd_ticks_t rdtsc_cycle_counter(void);
 #ifdef SDLMAME_UNIX
 static osd_ticks_t time_cycle_counter(void);
 #endif
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 static osd_ticks_t performance_cycle_counter(void);
 #endif
 #ifdef SDLMAME_DARWIN
@@ -241,6 +246,76 @@ static osd_ticks_t init_cycle_counter(void)
 }
 #endif
 
+#ifdef SDLMAME_OS2
+static osd_ticks_t init_cycle_counter(void)
+{
+    osd_ticks_t start, end;
+    osd_ticks_t a, b;
+
+    ULONG  frequency;
+    PTIB   ptib;
+    ULONG  ulClass;
+    ULONG  ulDelta;
+
+    DosGetInfoBlocks( &ptib, NULL );
+    ulClass = HIBYTE( ptib->tib_ptib2->tib2_ulpri );
+    ulDelta = LOBYTE( ptib->tib_ptib2->tib2_ulpri );
+
+    suspend_adjustment = 0;
+    suspend_time = 0;
+
+    // if the RDTSC instruction is available use it because
+    // it is more precise and has less overhead than timeGetTime()
+    if (!sdl_use_rdtsc && ( DosTmrQueryFreq( &frequency ) == 0 ))
+    {
+        // use performance counter if available as it is constant
+        cycle_counter = performance_cycle_counter;
+        ticks_counter = rdtsc_cycle_counter;
+
+        ticks_per_second = frequency;
+
+        // return the current cycle count
+        return (*cycle_counter)();
+    }
+    else
+    {
+        cycle_counter = rdtsc_cycle_counter;
+        ticks_counter = rdtsc_cycle_counter;
+    }
+
+    // temporarily set our priority higher
+    DosSetPriority( PRTYS_THREAD, PRTYC_TIMECRITICAL, PRTYD_MAXIMUM, 0 );
+
+    // wait for an edge on the timeGetTime call
+    a = SDL_GetTicks();
+    do
+    {
+        b = SDL_GetTicks();
+    } while (a == b);
+
+    // get the starting cycle count
+    start = (*cycle_counter)();
+
+    // now wait for 1/4 second total
+    do
+    {
+        a = SDL_GetTicks();
+    } while (a - b < 250);
+
+    // get the ending cycle count
+    end = (*cycle_counter)();
+
+    // compute ticks_per_sec
+    ticks_per_second = (end - start) * 4;
+
+    // restore our priority
+    DosSetPriority( PRTYS_THREAD, ulClass, ulDelta, 0 );
+
+    // return the current cycle count
+    return (*cycle_counter)();
+}
+#endif
+
 //============================================================
 //  performance_cycle_counter
 //============================================================
@@ -250,6 +325,16 @@ static osd_ticks_t performance_cycle_counter(void)
 	LARGE_INTEGER performance_count;
 	QueryPerformanceCounter(&performance_count);
 	return (osd_ticks_t)performance_count.QuadPart;
+}
+#endif
+
+#ifdef SDLMAME_OS2
+static osd_ticks_t performance_cycle_counter(void)
+{
+    QWORD qwTime;
+
+    DosTmrQueryTime( &qwTime );
+    return (osd_ticks_t)qwTime.ulLo;
 }
 #endif
 

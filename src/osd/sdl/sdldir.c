@@ -1,6 +1,6 @@
 //============================================================
 //
-//  sdlwork.c - SDL core directory access functions
+//  sdldir.c - SDL core directory access functions
 //
 //  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
@@ -33,7 +33,7 @@
 struct _osd_directory
 {
 	osd_directory_entry ent;
-#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	struct dirent *data;
 #else
 	struct dirent64 *data;
@@ -53,7 +53,7 @@ static osd_dir_entry_type get_attributes_enttype(int attributes)
 #else
 static osd_dir_entry_type get_attributes_stat(const char *file)
 {
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO)
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
 	struct stat st;
 	if(stat(file, &st))
 		return 0;
@@ -75,7 +75,7 @@ static osd_dir_entry_type get_attributes_stat(const char *file)
 
 static UINT64 osd_get_file_size(const char *file)
 {
-#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	struct stat st;
 	if(stat(file, &st))
 		return 0;
@@ -120,7 +120,7 @@ osd_directory *osd_opendir(const char *dirname)
 
 const osd_directory_entry *osd_readdir(osd_directory *dir)
 {
-	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+	#if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	dir->data = readdir(dir->fd);
 	#else
 	dir->data = readdir64(dir->fd);

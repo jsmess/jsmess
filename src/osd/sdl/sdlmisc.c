@@ -51,6 +51,11 @@ Version 0.2, May 2000
 #include <unistd.h>
 #endif
 
+#ifdef SDLMAME_OS2
+#define INCL_DOS
+#include <os2.h>
+#endif
+
 #include "driver.h"
 #include "window.h"
 #include "options.h"
@@ -169,6 +174,11 @@ void *osd_alloc_executable(size_t size)
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, getpagesize());
 #elif defined(SDLMAME_WIN32)
 	return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+#elif defined(SDLMAME_OS2)
+	void *p;
+	
+	DosAllocMem( &p, size, fALLOC );
+	return p;
 #else
 #error Undefined SDLMAME SUBARCH!
 #endif
@@ -182,6 +192,8 @@ void osd_free_executable(void *ptr, size_t size)
 	munmap(ptr, size);
 #elif defined(SDLMAME_WIN32)
 	VirtualFree(ptr, 0, MEM_RELEASE);
+#elif defined(SDLMAME_OS2)
+	DosFreeMem( ptr );
 #else
 #error Undefined SDLMAME SUBARCH!
 #endif

@@ -30,6 +30,11 @@
 #include <windows.h>
 #endif
 
+#ifdef SDLMAME_OS2
+#define INCL_WIN
+#include <os2.h>
+#endif
+
 // standard C headers
 #include <math.h>
 #include <unistd.h>
@@ -315,6 +320,10 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 			monitor->center_height = ch;
 		}	
 	}
+	#elif defined(SDLMAME_OS2) 		// OS2 version
+	monitor->center_width = monitor->monitor_width = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
+	monitor->center_height = monitor->monitor_height = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
+	strcpy(monitor->monitor_device, "OS/2 display");
 	#else
 	#error Unknown SDLMAME_xx OS type!
 	#endif
@@ -583,9 +592,6 @@ static void extract_video_config(void)
 	video_config.throttle      = options_get_bool(mame_options(), "throttle");
 	video_config.sleep         = options_get_bool(mame_options(), "sleep");
 
-	// misc options: extract the data
-	video_config.framestorun   = options_get_int(mame_options(), "frames_to_run");
-
 	// global options: extract the data
 	video_config.windowed      = options_get_bool(mame_options(), "window");
 	video_config.keepaspect    = options_get_bool(mame_options(), "keepaspect");
@@ -631,8 +637,8 @@ static void extract_video_config(void)
 		video_config.mode = VIDEO_MODE_SOFT;
 		video_config.novideo = 1;
 
-		if (video_config.framestorun == 0)
-			fprintf(stderr, "Warning: -video none doesn't make much sense without -frames_to_run\n");
+		if (options_get_int(mame_options(), OPTION_SECONDS_TO_RUN) == 0)
+			fprintf(stderr, "Warning: -video none doesn't make much sense without -seconds_to_run\n");
 	}
 	else
 	{
@@ -644,9 +650,15 @@ static void extract_video_config(void)
 	video_config.filter        = options_get_bool(mame_options(), "filter");
 	video_config.centerh       = options_get_bool(mame_options(), "centerh");
 	video_config.centerv       = options_get_bool(mame_options(), "centerv");
-	video_config.prescale      = options_get_int_range(mame_options(), "prescale", 1, 3);
+	video_config.prescale      = options_get_int(mame_options(), "prescale");
+	if (video_config.prescale < 1 || video_config.prescale > 3)
+	{
+		fprintf(stderr, "Invalid prescale option, reverting to '1'\n");
+		video_config.prescale = 1;
+	}
+
 	if (getenv("SDLMAME_UNSUPPORTED"))
-		video_config.prescale_effect = options_get_int_range(mame_options(), "prescale_effect", 0, 1);
+		video_config.prescale_effect = options_get_int(mame_options(), "prescale_effect");
 	else
 		video_config.prescale_effect = 0;
 

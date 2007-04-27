@@ -95,6 +95,12 @@ LIBS += -framework Carbon
 endif	# DEBUG
 endif	# Mac OS X
 
+# OS2: add the necessary libraries
+ifeq ($(SUBARCH),os2)
+CFLAGS += `sdl-config --cflags`
+LIBS += `sdl-config --libs`
+endif # OS2
+
 TOOLS += \
 	testkeys$(EXE)
 

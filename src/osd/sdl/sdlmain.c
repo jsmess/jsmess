@@ -37,6 +37,22 @@
 #include <X11/Xutil.h>
 #endif
 
+#ifdef SDLMAME_OS2
+#define INCL_DOS
+#include <os2.h>
+
+void MorphToPM()
+{
+  PPIB pib;
+  PTIB tib;
+
+  DosGetInfoBlocks(&tib, &pib);
+
+  // Change flag from VIO to PM:
+  if (pib->pib_ultype==2) pib->pib_ultype = 3;
+}
+#endif
+
 #ifdef MESS
 static char cwd[512];
 #endif
@@ -67,7 +83,7 @@ int verbose;
 
 static const options_entry mame_sdl_options[] =
 {
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_MACOSX)
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_MACOSX) || defined(SDLMAME_OS2)
 	{ "inipath",                     ".;ini",     0,                 "path to ini files" },
 #else
 #if defined(INI_PATH)
@@ -258,6 +274,10 @@ int SDL_main(int argc, char **argv)
 #endif
 {
 	int res = 0;
+
+	#ifdef SDLMAME_OS2
+	MorphToPM();
+	#endif
 
 	#ifdef MESS
 	getcwd(cwd, 511);

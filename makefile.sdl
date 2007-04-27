@@ -49,7 +49,7 @@ MAMEOS = sdl
 endif
 
 #------------------------------------------------------------------------------------
-# for SDLMAME, set this to unix, win32, or macosx (lowercase is important!)
+# for SDLMAME, set this to unix, win32, macosx, or os2 (lowercase is important!)
 #------------------------------------------------------------------------------------
 
 SUBARCH = unix
@@ -151,6 +151,13 @@ BUILD_EXPAT = 1
 BUILD_ZLIB = 1
 endif
 
+# OS/2 can't have OpenGL (aww)
+ifeq ($(SUBARCH),os2)
+BUILD_EXPAT = 1
+BUILD_ZLIB = 1
+NO_OPENGL = 1
+endif
+
 # specify a default optimization level if none explicitly stated
 ifndef OPTIMIZE
 ifndef SYMBOLS
@@ -171,6 +178,9 @@ ifeq ($(SUBARCH),win32)
 EXE = .exe
 endif
 
+ifeq ($(SUBARCH),os2)
+EXE = .exe
+endif
 
 # compiler, linker and utilities
 AR = @ar
@@ -313,8 +323,11 @@ CFLAGS += $(ARCH) \
 	-Wstrict-prototypes \
 	-Wundef \
 	-Wformat-security \
-	-Wwrite-strings \
-	-Wdeclaration-after-statement
+	-Wwrite-strings
+
+ifneq ($(SUBARCH),os2)
+CFLAGS += -Wdeclaration-after-statement
+endif
 
 ifneq ($(OPTIMIZE),0)
 CFLAGS += -DNDEBUG $(ARCH) -fno-strict-aliasing
@@ -411,7 +424,9 @@ ifeq ($(SUBARCH),win32)
 CFLAGS += -DSDLMAME_WIN32
 endif
 
-
+ifeq ($(SUBARCH),os2)
+CFLAGS += -DSDLMAME_OS2
+endif
 
 #-------------------------------------------------
 # 'all' target needs to go here, before the 

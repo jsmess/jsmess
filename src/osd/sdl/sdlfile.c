@@ -30,7 +30,7 @@
 // MAME headers
 #include "osdepend.h"
 
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 #define PATHSEPCH '\\'
 #define INVPATHSEPCH '/'
 #else
@@ -95,7 +95,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	UINT32 access;
 	const char *src;
 	char *dst;
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	struct stat st;
 	#else
 	struct stat64 st;
@@ -174,12 +174,12 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		free(envstr);
 	}
 
-	#ifdef SDLMAME_WIN32
+	#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 	access |= O_BINARY;
 	#endif
 
 	// attempt to open the file
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	(*file)->handle = open(tmpstr, access, 0666);
 	#else
 	(*file)->handle = open64(tmpstr, access, 0666);
@@ -202,7 +202,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 				// attempt to reopen the file
 				if (error == NO_ERROR)
 				{
-				        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+		                        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 					(*file)->handle = open(tmpstr, access, 0666);
 					#else
 					(*file)->handle = open64(tmpstr, access, 0666);
@@ -222,7 +222,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// get the file size
-        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD)
+        #if defined(SDLMAME_DARWIN) || defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_FREEBSD) || defined(SDLMAME_OS2)
 	fstat((*file)->handle, &st);
 	#else
 	fstat64((*file)->handle, &st);
@@ -283,7 +283,7 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 #if defined(SDLMAME_DARWIN) || defined(SDLMAME_FREEBSD)
 	result = pwrite(file->handle, buffer, count, offset);
 	if (!result)
-#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO)
+#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
 	lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
 	result = write(file->handle, buffer, count); 
 	if (!result)
@@ -386,7 +386,7 @@ int osd_is_absolute_path(const char *path)
         
         if (osd_is_path_separator(path[0]))
                 result = TRUE;
-#ifndef SDLMAME_WIN32
+#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
         else if (path[0] == '.')
                 result = TRUE;
 #else

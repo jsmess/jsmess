@@ -216,7 +216,7 @@ int sdlwindow_init(running_machine *machine)
 			return 1;
 		osd_work_item_queue(work_queue, &sdlwindow_thread_id, NULL, WORK_ITEM_FLAG_AUTO_RELEASE);
 		//FIXME: Without sleep, Queue will not start to run
-		#ifndef SDLMAME_WIN32
+		#if !defined(SDLMAME_WIN32) && !defined(SDLMAME_OS2)
 		usleep(1);
 		#endif
 	}

@@ -20,6 +20,11 @@
 #include <windows.h>
 #endif
 
+#ifdef SDLMAME_OS2
+#define INCL_DOS
+#include <os2.h>
+#endif
+
 // standard C headers
 #include <math.h>
 #include <unistd.h>
@@ -28,6 +33,7 @@
 #include "osdcore.h"
 
 #ifndef SDLMAME_WIN32
+#ifndef SDLMAME_OS2
 #include <pthread.h>
 #include <errno.h>
 
@@ -108,6 +114,63 @@ void osd_lock_free(osd_lock *lock)
 	pthread_mutex_destroy(&mutex->id);
 	free(mutex);
 }
+#else   // SDLMAME_OS2
+
+struct _osd_lock
+{
+     HMTX   hmtx;
+};
+
+//============================================================
+//  osd_lock_alloc
+//============================================================
+
+osd_lock *osd_lock_alloc(void)
+{
+     osd_lock *lock = malloc(sizeof(*lock));
+     if (lock == NULL)
+          return NULL;
+     DosCreateMutexSem( NULL, &lock->hmtx, 0, FALSE );
+     return lock;
+}
+
+//============================================================
+//  osd_lock_acquire
+//============================================================
+
+void osd_lock_acquire(osd_lock *lock)
+{
+    DosRequestMutexSem( lock->hmtx, -1 );
+}
+
+//============================================================
+//  osd_lock_try
+//============================================================
+
+int osd_lock_try(osd_lock *lock)
+{
+    return ( DosRequestMutexSem( lock->hmtx, 0 ) == 0 );
+}
+
+//============================================================
+//  osd_lock_release
+//============================================================
+
+void osd_lock_release(osd_lock *lock)
+{
+    DosReleaseMutexSem( lock->hmtx );
+}
+
+//============================================================
+//  osd_lock_free
+//============================================================
+
+void osd_lock_free(osd_lock *lock)
+{
+    DosCloseMutexSem( lock->hmtx );
+    free( lock );
+}
+#endif
 #else	// SDLMAME_WIN32
 #include "../windows/winsync.c"
 #endif

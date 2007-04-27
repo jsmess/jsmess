@@ -5,13 +5,15 @@
 //  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
-//	SDLMAME by Olivier Galibert and R. Belmont
+//  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
 
 // MinGW does not have pthreads, defer to Aaron's implementation on that platform
 #ifdef SDLMAME_WIN32
 #include "../windows/winwork.c"
+#elif SDLMAME_OS2	// use separate OS/2 implementation
+#include "os2work.c"
 #else
 
 // standard headers
