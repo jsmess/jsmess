@@ -220,6 +220,7 @@ CPUS += M68008
 CPUS += TMS99010
 CPUS += TX0
 CPUS += COP411
+CPUS += MINX
 
 
 
@@ -408,6 +409,7 @@ DRVLIBS = \
 	$(MESSOBJ)/vc4000.a \
 	$(MESSOBJ)/veb.a \
 	$(MESSOBJ)/vtech.a \
+	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/shared.a \
 
 
@@ -551,6 +553,8 @@ $(MESSOBJ)/nintendo.a:					\
 	$(MESS_DRIVERS)/n64.o		\
 	$(MAME_MACHINE)/n64.o			\
 	$(MAME_VIDEO)/n64.o			\
+	$(MESS_MACHINE)/pokemini.o	\
+	$(MESS_DRIVERS)/pokemini.o	\
 
 $(MESSOBJ)/amiga.a: \
 	$(MAME_VIDEO)/amiga.o			\
@@ -1119,6 +1123,9 @@ $(MESSOBJ)/tiger.a:				\
 	$(MESS_DRIVERS)/gamecom.o	\
 	$(MESS_MACHINE)/gamecom.o	\
 	$(MESS_VIDEO)/gamecom.o
+
+$(MESSOBJ)/3do.a:			\
+	$(MESS_DRIVERS)/3do.o
 
 #-------------------------------------------------
 # layout dependencies

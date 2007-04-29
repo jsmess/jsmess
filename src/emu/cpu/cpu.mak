@@ -1627,3 +1627,25 @@ $(CPUOBJ)/z80gb/z80gb.o:	$(CPUSRC)/z80gb/z80gb.c \
 							$(CPUSRC)/z80gb/daa_tab.h \
 							$(CPUSRC)/z80gb/opc_cb.h \
 							$(CPUSRC)/z80gb/opc_main.h
+
+#-------------------------------------------------
+# Nintendo Minx
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_MINX=$(if $(filter MINX,$(CPUS)),1,0)
+
+ifneq ($(filter MINX,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/minx
+CPUOBJS += $(CPUOBJ)/minx/minx.o
+DBGOBJS += $(CPUOBJ)/minx/minxd.o
+endif
+
+$(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
+							$(CPUSRC)/minx/minx.h \
+							$(CPUSRC)/minx/minxd.c \
+							$(CPUSRC)/minx/minxopce.h \
+							$(CPUSRC)/minx/minxopcf.h \
+							$(CPUSRC)/minx/minxops.h \
+							$(CPUSRC)/minx/minxfunc.h
+
+

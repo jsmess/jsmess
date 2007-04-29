@@ -97,6 +97,9 @@ const game_driver *test_drivers[] =
 
 /****************CONSOLES****************************************************/
 
+	/* 3DO */
+	DRIVER( 3do )		/* 3DO consoles								*/
+
 	/* ATARI */
 	DRIVER( a2600 ) 	/* Atari 2600										*/
 	DRIVER( a5200 ) 	/* Atari 5200										*/
@@ -120,6 +123,7 @@ const game_driver *test_drivers[] =
 	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
 	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
 	DRIVER( n64 )		/* Nintendo N64										*/
+	DRIVER( pokemini )	/* Nintendo Pokemon Mini						*/
 
 	DRIVER( megaduck )	/* Megaduck											*/
 

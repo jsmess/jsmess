@@ -5,6 +5,8 @@ New System Drivers Supported (in no particular order):
 - Mac 128k, Mac 512k (not working) [R. Belmont]
 - Telmac 2000 (not working) [Curt Coder]
 - X68000 [Barry Rodewald]
+- Pokemon mini (not working) [Wilbert Pol]
+- 3DO (not working) [Wilbert Pol]
 
 
 
