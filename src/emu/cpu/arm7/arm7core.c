@@ -21,6 +21,7 @@
  *  #1) 'Atmel Corporation ARM7TDMI (Thumb) Datasheet - January 1999'
  *  #2) Arm 2/3/6 emulator By Bryan McPhail (bmcphail@tendril.co.uk) and Phil Stroffolino (MAME CORE 0.76)
  *  #3) Thumb support by Ryan Holtz
+ *  #4) Additional Thumb support and bugfixes by R. Belmont
  *
  *****************************************************************************/
 
@@ -86,30 +87,6 @@
 #define LOG(x) logerror x
 #endif
 
-#define VERBOSELOG(x) verboselog x
-
-#define VERBOSE_LEVEL ( 0 )
-
-INLINE void verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		if( cpu_getactivecpu() != -1 )
-		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
-		}
-		else
-		{
-			logerror( "(timer) : %s", buf );
-		}
-	}
-}
-
 /* Prototypes */
 
 //SJE: should these be inline? or are they too big to see any benefit?
@@ -160,64 +137,67 @@ char *(*arm7_dasm_cop_do_callback)( char *pBuf, UINT32 opcode, char *pConditionC
  ***************************************************************************/
 INLINE void arm7_cpu_write32( int addr, UINT32 data )
 {
-    //Call normal 32 bit handler
-    program_write_dword_32le(addr,data);
-
-    /* Unaligned writes are treated as normal writes */
-    #if ARM7_DEBUG_CORE
-        if(addr&3)
-            LOG(("%08x: Unaligned write %08x\n",R15,addr));
-    #endif
+	if (addr & 3)
+	{
+		program_write_byte_32le(addr, data&0xff);
+		program_write_byte_32le(addr+1, (data>>8)&0xff);
+		program_write_byte_32le(addr+2, (data>>16)&0xff);
+		program_write_byte_32le(addr+3, (data>>24)&0xff);
+	}
+	else
+	{
+		program_write_dword_32le(addr,data);
+	}
 }
 
 
 INLINE void arm7_cpu_write16( int addr, UINT16 data )
 {
-    //Call normal 16 bit handler ( for 32 bit cpu )
-    program_write_word_32le(addr,data);
+	if (addr & 1)
+	{
+		program_write_byte_32le(addr, data&0xff);
+		program_write_byte_32le(addr+1, (data>>8)&0xff);
+	}
+	else
+	{
+		program_write_word_32le(addr,data);
+	}
 }
 
 INLINE void arm7_cpu_write8( int addr, UINT8 data )
 {
-    //Call normal 8 bit handler ( for 32 bit cpu )
-    program_write_byte_32le(addr,data);
+		program_write_byte_32le(addr,data);
 }
 
 INLINE UINT32 arm7_cpu_read32( int addr )
 {
-    UINT32 result = 0;
+    UINT32 result;
 
-    //Handle through normal 32 bit handler
-    result = program_read_dword_32le(addr);
-
-    /* Unaligned reads rotate the word, they never combine words */
-    if (addr&3) {
-        #if ARM7_DEBUG_CORE
-            if(addr&1)
-                LOG(("%08x: Unaligned byte read %08x\n",R15,addr));
-        #endif
-
-        if ((addr&3)==3)
-            return ((result&0x000000ff)<<24)|((result&0xffffff00)>> 8);
-        if ((addr&3)==2)
-            return ((result&0x0000ffff)<<16)|((result&0xffff0000)>>16);
-        if ((addr&3)==1)
-            return ((result&0x00ffffff)<< 8)|((result&0xff000000)>>24);
+    if (addr&3) 
+    {
+	result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8 | program_read_byte_32le(addr+2)<<16 | program_read_byte_32le(addr+3)<<24;
+    }
+    else
+    {
+    	result = program_read_dword_32le(addr);
     }
     return result;
 }
 
 INLINE UINT16 arm7_cpu_read16( int addr )
 {
-    if(addr&3)
-    {
-        int val = addr & 3;
-        if(val != 2)
-            LOG(("%08x: MISALIGNED half word read @ %08x:\n",R15,addr));
-    }
+	UINT16 result;
+	
+	if(addr&1)
+	{
+		result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8;
+	}
+	else
+	{
+		result = program_read_word_32le(addr);
+	}
 
-    //Handle through normal 32 bit handler ( for 32 bit cpu )
-    return program_read_word_32le(addr);
+	return result;
 }
 
 INLINE UINT8 arm7_cpu_read8( offs_t addr )

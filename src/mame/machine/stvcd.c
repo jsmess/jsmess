@@ -269,6 +269,10 @@ void stvcd_reset(void)
 		CDROM_LOG("Opened CD-ROM successfully, reading root directory\n");
 		read_new_dir(0xffffff);	// read root directory
 	}
+	else
+	{
+		cd_stat = CD_STAT_OPEN;
+	}
 
 	sector_timer = timer_alloc(sector_cb);
 	timer_adjust(sector_timer, TIME_IN_HZ(150), 0, 0);	// 150 sectors / second = 300kBytes/second
@@ -569,6 +573,17 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 //              CDROM_LOG("WW CR4: %04x\n", data);
 		cr4 = data;
 //      CDROM_LOG("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
+		
+		if (!cdrom)
+		{
+			cd_stat = CD_STAT_OPEN;
+			cr1 = cd_stat | 0xff;
+			cr2 = 0xffff;
+			cr3 = 0xffff;
+			cr4 = 0xffff;
+			return;
+		}
+
 		switch (cr1 & 0xff00)
 		{
 		case 0x0000:
@@ -1638,6 +1653,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 			{
 				if (curblock.fnum != flt->fid)
 				{
+					logerror("fnum reject\n");
 					match = 0;
 				}
 			}
@@ -1668,6 +1684,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype)
 		{
 			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
 			{
+				logerror("curfad reject\n");
 				match = 0;
 			}
 		}
