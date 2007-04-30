@@ -538,6 +538,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 		}
 		/* Stash the result for comparing later */
 		g_nGame = FOLDER_OPTIONS;
+		origGameOpts = CreateGameOptions(OPTIONS_TYPE_FOLDER);
 		options_copy(origGameOpts, pGameOpts);
 	}
 	orig_uses_defaults = g_bUseDefaults;
@@ -2308,22 +2309,7 @@ static void BuildDataMap(void)
 	datamap_set_float_format(properties_datamap, IDC_JSATDISP,			"%03.2f");
 
 	// trackbar ranges
-	datamap_set_trackbar_range(properties_datamap, IDC_NUMSCREENS,		1, 4, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_FLICKER,			0, 100, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_VOLUME,			-32, 0, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_AUDIO_LATENCY,	1, 5, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,		1, 10, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_HIGH_PRIORITY,	-15, 1, 1);
-	datamap_set_trackbar_range(properties_datamap, IDC_GAMMA,			0.10,  3.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_CONTRAST,		0.10,  2.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_BRIGHTCORRECT,	0.10,  2.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_PAUSEBRIGHT,		0.50,  2.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_FSGAMMA,			0.10,  3.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_FSBRIGHTNESS,	0.10,  2.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_FSCONTRAST,		0.10,  2.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,				0.00,  1.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_JSAT,			0.00,  1.00, 0.05);
-	datamap_set_trackbar_range(properties_datamap, IDC_BEAM,			1.00, 16.00, 0.05);
+	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,    1, 10, 1);
 }
 
 BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts )

@@ -766,6 +766,8 @@ core_options * GetFolderOptions(int folder_index, BOOL bIsVector)
 	redirect_index = GetRedirectIndex(folder_index);
 	if( redirect_index < 0)
 		return NULL;
+	if (folder_options[redirect_index] == NULL)
+		folder_options[redirect_index] = CreateGameOptions(OPTIONS_TYPE_FOLDER);
 	options_copy(folder_options[redirect_index], global);
 	LoadFolderOptions(folder_index);
 	if( bIsVector)
