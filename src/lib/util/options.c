@@ -92,6 +92,13 @@ struct _core_options
 
 
 
+struct _options_enumerator
+{
+	options_data *current;
+};
+
+
+
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -1010,5 +1017,57 @@ void options_get_range_float(core_options *opts, const char *name, float *minval
 	options_data *data = find_entry_data(opts, name, FALSE);
 	*minval = data->range_minimum.f;
 	*maxval = data->range_maximum.f;
+}
+
+
+
+/*-------------------------------------------------
+    options_enumerator_begin - retrieve the range of
+    a float option
+-------------------------------------------------*/
+
+options_enumerator *options_enumerator_begin(core_options *opts)
+{
+	options_enumerator *enumerator;
+	
+	enumerator = malloc(sizeof(*enumerator));
+	if (enumerator == NULL)
+		return NULL;
+
+	enumerator->current = opts->datalist;
+	return enumerator;
+}
+
+
+
+/*-------------------------------------------------
+    options_enumerator_next - returns the current
+	option and advances the enumerator
+-------------------------------------------------*/
+
+const char *options_enumerator_next(options_enumerator *enumerator)
+{
+	const char *option_name = NULL;
+
+	/* be sure to skip over false options */
+	while((option_name == NULL) && (enumerator->current != NULL))
+	{
+		/* retrieve the current option name and advance the enumerator */
+		option_name = enumerator->current->names[0];
+		enumerator->current = enumerator->current->next;
+	}
+	return option_name;
+}
+
+
+
+/*-------------------------------------------------
+    options_enumerator_free - disposes an options
+	enumerator
+-------------------------------------------------*/
+
+void options_enumerator_free(options_enumerator *enumerator)
+{
+	free(enumerator);
 }
 

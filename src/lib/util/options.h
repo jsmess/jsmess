@@ -66,6 +66,8 @@ enum _options_range_type
 };
 typedef enum _options_range_type options_range_type;
 
+typedef struct _options_enumerator options_enumerator;
+
 
 
 /***************************************************************************
@@ -113,5 +115,10 @@ void options_set_float(core_options *opts, const char *name, float value);
 options_range_type options_get_range_type(core_options *opts, const char *name);
 void options_get_range_int(core_options *opts, const char *name, int *minval, int *maxval);
 void options_get_range_float(core_options *opts, const char *name, float *minval, float *maxval);
+
+/* enumerators */
+options_enumerator *options_enumerator_begin(core_options *opts);
+const char *options_enumerator_next(options_enumerator *enumerator);
+void options_enumerator_free(options_enumerator *enumerator);
 
 #endif /* __OPTIONS_H__ */

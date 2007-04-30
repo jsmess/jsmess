@@ -211,7 +211,7 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const game_driver *pDriver)
 		{
 			while(pDriver && !pPickerInfo->pHashFile)
 			{
-				pPickerInfo->pHashFile = hashfile_open(pDriver->name, TRUE, pPickerInfo->pfnErrorProc);
+				pPickerInfo->pHashFile = hashfile_open_options(Mame32Global(), pDriver->name, TRUE, pPickerInfo->pfnErrorProc);
 				pDriver = mess_next_compatible_driver(pDriver);
 			}
 		}

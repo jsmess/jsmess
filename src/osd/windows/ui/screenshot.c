@@ -187,31 +187,24 @@ BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 	switch (pic_type)
 	{
 	case TAB_SCREENSHOT :
-		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetImgDir());
 		zip_name = "snap";
 		break;
 	case TAB_FLYER :
-		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetFlyerDir());
 		zip_name = "flyers";
 		break;
 	case TAB_CABINET :
-		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetCabinetDir());
 		zip_name = "cabinets";
 		break;
 	case TAB_MARQUEE :
-		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetMarqueeDir());
 		zip_name = "marquees";
 		break;
 	case TAB_TITLE :
-		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetTitlesDir());
 		zip_name = "titles";
 		break;
 	case TAB_CONTROL_PANEL :
-		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetControlPanelDir());
 		zip_name = "cpanel";
 		break;
 	case BACKGROUND :
-		options_set_string(mame_options(), SEARCHPATH_ARTWORK,GetBgDir());
 		zip_name = "bkground";
 		break;
 	default :
@@ -221,20 +214,20 @@ BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 	
 	// look for the raw file
 	fname = assemble_2_strings(filename, ".png");
-	filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
+	filerr = mame_fopen_options(Mame32Global(), SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
 	free(fname);
 	if (filerr != FILERR_NONE)
 	{
 		// and look for the zip
 		fname = assemble_4_strings(zip_name, PATH_SEPARATOR, filename, ".png");
-		filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
+		filerr = mame_fopen_options(Mame32Global(), SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
 		free(fname);
 	}
 	if (filerr != FILERR_NONE)
 	{
 		// and look for the new format
 		fname = assemble_3_strings(filename, PATH_SEPARATOR, "0000.png");
-		filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
+		filerr = mame_fopen_options(Mame32Global(), SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
 		free(fname);
 	}
 	if (filerr != FILERR_NONE)

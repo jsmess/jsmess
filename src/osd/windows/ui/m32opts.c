@@ -499,11 +499,6 @@ core_options *CreateGameOptions(int driver_index)
 
 BOOL OptionsInit()
 {
-	extern const options_entry mame_win_options[];
-
-	// initialize core options
-	mame_options_init(mame_win_options);
-
 	// create a memory pool for our data
 	options_memory_pool = pool_create(memory_error);
 	if (!options_memory_pool)
@@ -564,13 +559,6 @@ BOOL OptionsInit()
 
 	// now load the options and settings
 	LoadOptionsAndSettings();
-
-	// have our MAME core (file code) know about our rom path
-	options_set_string(mame_options(), SEARCHPATH_ROM, GetRomDirs());
-	options_set_string(mame_options(), SEARCHPATH_SAMPLE, GetSampleDirs());
-#ifdef MESS
-	options_set_string(mame_options(), SEARCHPATH_HASH, GetHashDirs());
-#endif // MESS
 
 	return TRUE;
 
@@ -1556,7 +1544,6 @@ const char* GetRomDirs(void)
 void SetRomDirs(const char* paths)
 {
 	options_set_string(global, OPTION_ROMPATH, paths);
-	options_set_string(mame_options(), OPTION_ROMPATH, paths);
 }
 
 const char* GetSampleDirs(void)
@@ -1567,7 +1554,6 @@ const char* GetSampleDirs(void)
 void SetSampleDirs(const char* paths)
 {
 	options_set_string(global, OPTION_SAMPLEPATH, paths);
-	options_set_string(mame_options(), OPTION_SAMPLEPATH, paths);
 }
 
 const char * GetIniDir(void)

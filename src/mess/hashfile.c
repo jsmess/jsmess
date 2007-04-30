@@ -352,7 +352,7 @@ static void preload_use_proc(hash_file *hashfile, void *param, struct hash_info 
 
 
 
-hash_file *hashfile_open(const char *sysname, int is_preload,
+hash_file *hashfile_open_options(core_options *opts, const char *sysname, int is_preload,
 	void (*error_proc)(const char *message))
 {
 	file_error filerr;
@@ -377,7 +377,7 @@ hash_file *hashfile_open(const char *sysname, int is_preload,
 
 	/* open a file */
 	fname = assemble_2_strings(sysname, ".hsi");
-	filerr = mame_fopen(SEARCHPATH_HASH, fname, OPEN_FLAG_READ, &hashfile->file);
+	filerr = mame_fopen_options(opts, SEARCHPATH_HASH, fname, OPEN_FLAG_READ, &hashfile->file);
 	free(fname);
 
 	if (filerr != FILERR_NONE)
@@ -392,6 +392,14 @@ error:
 	if (hashfile)
 		hashfile_close(hashfile);
 	return NULL;
+}
+
+
+
+hash_file *hashfile_open(const char *sysname, int is_preload,
+	void (*error_proc)(const char *message))
+{
+	return hashfile_open_options(mame_options(), sysname, is_preload, error_proc);
 }
 
 

@@ -786,52 +786,25 @@ extern game_driver driver_neogeo;
     External functions
  ***************************************************************************/
 
-static void CopyOptions(core_options *pDestOpts, const options_entry *entrylist, core_options *pOpts)
+static void CopyOptions(core_options *pDestOpts, core_options *pSourceOpts)
 {
-	static const char *command_blacklist[] =
-	{
-		"<UNADORNED0>",
-#ifndef MAME_DEBUG
-		OPTION_DEBUG,
-#endif // MAME_DEBUG
-		OPTION_DEBUGSCRIPT
-	};
+	options_enumerator *enumerator;
+	const char *option_name;
+	const char *option_value;
 
-	char command_name[128];
-	int is_blacklisted, i;
-
-	/* loop over entries until we hit a NULL name */
-	for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER); entrylist++)
+	enumerator = options_enumerator_begin(pSourceOpts);
+	if (enumerator != NULL)
 	{
-		if ((entrylist->flags & (OPTION_COMMAND | OPTION_HEADER | OPTION_INTERNAL)) == 0)
+		while((option_name = options_enumerator_next(enumerator)) != NULL)
 		{
-			// determine command name
-			snprintf(command_name, ARRAY_LENGTH(command_name), "%s", entrylist->name);
-			for (i = 0; command_name[i] && !strchr(";(", command_name[i]); i++)
-				;
-			command_name[i] = '\0';
-
-			// check to see if this argument is blacklisted
-			is_blacklisted = FALSE;
-			for (i = 0; i < ARRAY_LENGTH(command_blacklist); i++)
+			option_value = options_get_string(pSourceOpts, option_name);
+			if (option_value != NULL)
 			{
-				if (!strcmp(command_name, command_blacklist[i]))
-				{
-					is_blacklisted = TRUE;
-					break;
-				}
-			}
-
-			if (!is_blacklisted)
-			{
-				core_options *opts = IsGlobalOption(command_name) ? GetDefaultOptions(GLOBAL_OPTIONS, FALSE) : pOpts;
-				const char *opt_value = options_get_string(opts, command_name);
-				options_set_string(
-					pDestOpts,
-					command_name,
-					opt_value ? opt_value : "");
+				dprintf("CopyOptions(): Copying %s = \"%s\"\n", option_name, option_value);
+				options_set_string(pDestOpts, option_name, option_value);
 			}
 		}
+		options_enumerator_free(enumerator);
 	}
 }
 
@@ -865,18 +838,12 @@ static BOOL WaitWithMessageLoop(HANDLE hEvent)
 
 static DWORD RunMAME(int nGameIndex)
 {
-	extern const options_entry mame_win_options[];
 	DWORD dwExitCode = 0;
 	core_options *pOpts;
 	LPTREEFOLDER folder;
 	int i;
 
-#ifdef MESS
-	extern const options_entry mess_win_options[];
-#endif // MESS
-
-	// clear out existing MAME options
-	mame_options_exit();
+	// set up MAME options
 	mame_options_init(mame_win_options);
 
 	// retrieve the options we're going to pass
@@ -886,18 +853,16 @@ static DWORD RunMAME(int nGameIndex)
 	else
 		pOpts = GetGameOptions(nGameIndex, NO_FOLDER);
 
-	// load MAME options
-	CopyOptions(mame_options(), mame_core_options, pOpts);
-	CopyOptions(mame_options(), mame_win_options, pOpts);
+	// clear out existing MAME options
+	mame_options_init(mame_win_options);
 
 #ifdef MESS
-	// load MESS options
-	CopyOptions(mame_options(), mess_core_options, pOpts);
-	CopyOptions(mame_options(), mess_win_options, pOpts);
-
+	// add MESS specific device options
 	mess_add_device_options(mame_options(), drivers[nGameIndex]);
-	mess_enumerate_devices(pOpts, drivers[nGameIndex], MessCopyDeviceOption);
 #endif // MESS
+
+	// load MAME options
+	CopyOptions(mame_options(), pOpts);
 
 	// prepare MAME32 to run the game
 	ShowWindow(hMain, SW_HIDE);
@@ -912,6 +877,9 @@ static DWORD RunMAME(int nGameIndex)
 		Picker_ResetIdle(GetDlgItem(hMain, s_nPickers[i]));
 	ShowWindow(hMain, SW_SHOW);
 	SetForegroundWindow(hMain);
+
+	// close out MAME options
+	mame_options_exit();
 
 	// NPW 16-Apr-2007 - God I hate this hack
 	if (GetGameUsesDefaults(nGameIndex))
@@ -5369,8 +5337,7 @@ static void MamePlayBackGame()
 		if (path[strlen(path)-1] == '\\')
 			path[strlen(path)-1] = 0; // take off trailing back slash
 
-		options_set_string(mame_options(), SEARCHPATH_INPUTLOG, path);
-		fileerr = mame_fopen(SEARCHPATH_INPUTLOG, fname, OPEN_FLAG_READ, &pPlayBack);
+		fileerr = mame_fopen_options(Mame32Global(), SEARCHPATH_INPUTLOG, fname, OPEN_FLAG_READ, &pPlayBack);
 		if (fileerr != FILERR_NONE)
 		{
 			MameMessageBox("Could not open '%s' as a valid input file.", filename);
@@ -5464,12 +5431,11 @@ static void MameLoadState()
 				MameMessageBox("'%s' is not a valid savestate file for game '%s'.", filename, selected_filename);
 				return;
 			}
-			options_set_string(mame_options(), OPTION_STATE_DIRECTORY, path);
 			state_fname = fname;
 		}
 #endif // MESS
 
-		mame_fopen(SEARCHPATH_STATE, state_fname, OPEN_FLAG_READ, &pSaveState);
+		mame_fopen_options(Mame32Global(), SEARCHPATH_STATE, state_fname, OPEN_FLAG_READ, &pSaveState);
 		if (pSaveState == NULL)
 		{
 			MameMessageBox("Could not open '%s' as a valid savestate file.", filename);
