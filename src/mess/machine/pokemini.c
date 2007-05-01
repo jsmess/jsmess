@@ -3,13 +3,19 @@
 #include "cpu/minx/minx.h"
 
 struct TIMERS {
-	UINT8	seconds_running;	/* Seconds timer running */
-	UINT32	seconds_counter;	/* Seconds timer counter */
+	UINT8		seconds_running;	/* Seconds timer running */
+	UINT32		seconds_counter;	/* Seconds timer counter */
 	mame_timer	*seconds_timer;
-	UINT8	hz256_running;		/* 256Hz timer running */
-	UINT8	hz256_counter;		/* 256Hz timer counter */
+	UINT8		hz256_running;		/* 256Hz timer running */
+	UINT8		hz256_counter;		/* 256Hz timer counter */
 	mame_timer	*hz256_timer;
-	UINT8	timers_enabled;		/* Timers 1 to 3 enabled */
+	UINT8		timers_enabled;		/* Timers 1 to 3 enabled */
+	UINT16		timer1_counter;
+	mame_timer	*timer1_timer;		/* Timer 1 */
+	UINT16		timer2_counter;
+	mame_timer	*timer2_timer;		/* Timer 2 */
+	UINT16		timer3_counter;
+	mame_timer	*timer3_timer;		/* Timer 3 */
 };
 
 UINT8 pokemini_hwreg[0x100];
@@ -17,21 +23,69 @@ struct VDP vdp;
 static struct TIMERS timers;
 
 static void pokemini_seconds_timer_callback( int dummy ) {
-	timers.seconds_counter += 1;
+	if ( timers.seconds_running ) {
+		timers.seconds_counter += 1;
+	}
 }
 
 static void pokemini_256hz_timer_callback( int dummy ) {
-	timers.hz256_counter += 1;
+	if ( timers.hz256_running ) {
+		timers.hz256_counter += 1;
+	}
+}
+
+static void pokemini_timer1_callback( int dummy ) {
+	timers.timer1_counter -= 1;
+	/* Check for underflow of timer */
+	if ( timers.timer1_counter == 0xFFFF ) {
+		/* TODO: Check for interrupt condition/generation */
+		timers.timer1_counter = ( pokemini_hwreg[0x33] << 8 ) | pokemini_hwreg[0x32];
+	}
+	pokemini_hwreg[0x37] = timers.timer1_counter >> 8;
+	if ( pokemini_hwreg[0x30] & 0x80 ) {
+		pokemini_hwreg[0x36] = timers.timer1_counter & 0xFF;
+	}
+}
+
+static void pokemini_timer2_callback( int dummy ) {
+	timers.timer2_counter -= 1;
+	/* Check for underflow of timer */
+	if ( timers.timer2_counter == 0xFFFF ) {
+		/* TODO: Check for interrupt condition/generation */
+		timers.timer2_counter = ( pokemini_hwreg[0x3b] << 8 ) | pokemini_hwreg[0x3a];
+	}
+	pokemini_hwreg[0x3f] = timers.timer2_counter >> 8;
+	if ( pokemini_hwreg[0x38] & 0x80 ) {
+		pokemini_hwreg[0x3e] = timers.timer2_counter & 0xFF;
+	}
+}
+
+static void pokemini_timer3_callback( int dummy ) {
+	timers.timer3_counter -= 1;
+	/* Check for underflow of timer */
+	if ( timers.timer3_counter == 0xFFFF ) {
+		/* TODO: Check for interrupt condition/generation */
+		timers.timer3_counter = ( pokemini_hwreg[0x4b] << 8 ) | pokemini_hwreg[0x4a];
+	}
+	pokemini_hwreg[0x4f] = timers.timer3_counter >> 8;
+	if ( pokemini_hwreg[0x4e] & 0x80 ) {
+		pokemini_hwreg[0x4e] = timers.timer3_counter & 0xFF;
+	}
 }
 
 MACHINE_RESET( pokemini ) {
 	memset( &vdp, 0, sizeof(vdp) );
 	memset( &timers, 0, sizeof(timers) );
+	memset( pokemini_hwreg, 0, sizeof(pokemini_hwreg) );
 	timers.seconds_timer = mame_timer_alloc( pokemini_seconds_timer_callback );
 	timers.hz256_timer = mame_timer_alloc( pokemini_256hz_timer_callback );
+	timers.timer1_timer = mame_timer_alloc( pokemini_timer1_callback );
+	timers.timer2_timer = mame_timer_alloc( pokemini_timer2_callback );
+	timers.timer3_timer = mame_timer_alloc( pokemini_timer3_callback );
 }
 
 WRITE8_HANDLER( pokemini_hwreg_w ) {
+	const int timer_to_cycles[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	logerror( "%0X: Write to hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
 	switch( offset ) {
 	case 0x00:	/* start-up contrast
@@ -77,12 +131,15 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 0-7 R   Seconds timer bit 16-23
 			*/
 		/* ignore writes to these registers */
+		logerror( "%0X: Invalid write to seconds counter\n", activecpu_get_pc() );
 		return;
 	case 0x10:	/* Low power detector
 			   Bit 0-4 R/W Unknown
 			   Bit 5   R   Battery status: 0 - battery OK, 1 - battery low
 			   Bit 6-7     Unused
 			*/
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		break;
 	case 0x18:	/* Timer 1 pre-scale + enable
 			   Bit 0-2 R/W 000 - 2000000 Hz - 2 cycles
 			               001 -  500000 Hz - 8 cycles
@@ -95,7 +152,14 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 3   R/W Enable counting
 			   Bit 4-7 R/W Unused
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x18] & 0x07 ) ) {
+			mame_timer_adjust( timers.timer1_timer, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+		}
+		if ( ( data & 0x08 ) && timers.timers_enabled ) {
+			mame_timer_enable( timers.timer1_timer, 1 );
+		} else {
+			mame_timer_enable( timers.timer1_timer, 0 );
+		}
 		break;
 	case 0x19:	/* Timers 1 to 3 enabler
 			   Bit 0   R/W SET IT TO "0"
@@ -105,6 +169,21 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 6-7     Unused
 			*/
 		timers.timers_enabled = ( data & 0x20 ) ? 1 : 0;
+		if ( timers.timers_enabled ) {
+			if ( pokemini_hwreg[0x18] & 0x08 ) {
+				mame_timer_enable( timers.timer1_timer, 1 );
+			}
+			if ( pokemini_hwreg[0x1A] & 0x08 ) {
+				mame_timer_enable( timers.timer2_timer, 1 );
+			}
+			if ( pokemini_hwreg[0x1C] & 0x08 ) {
+				mame_timer_enable( timers.timer3_timer, 1 );
+			}
+		} else {
+			mame_timer_enable( timers.timer1_timer, 0 );
+			mame_timer_enable( timers.timer2_timer, 0 );
+			mame_timer_enable( timers.timer3_timer, 0 );
+		}
 		break;
 	case 0x1A:	/* Timer 2 pre-scale + enable
 			   Bit 0-2 R/W 000 - 2000000 Hz - 2 cycles
@@ -118,6 +197,15 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 3   R/W Enable counting
 			   Bit 4-7     Unused
 			*/
+		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x1A] & 0x07 ) ) {
+			mame_timer_adjust( timers.timer2_timer, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+		}
+		if ( ( data & 0x08 ) && timers.timers_enabled ) {
+			mame_timer_enable( timers.timer2_timer, 1 );
+		} else {
+			mame_timer_enable( timers.timer2_timer, 0 );
+		}
+		break;
 	case 0x1C:	/* Timer 3 pre-scale + enable
 			   Bit 0-2 R/W 000 - 2000000 Hz - 2 cycles
 			               001 -  500000 Hz - 8 cycles
@@ -130,7 +218,14 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 3   R/W Enable counting
 			   Bit 4-7     Unused
 			*/
-		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		if ( ( data & 0x07 ) != ( pokemini_hwreg[0x1C] & 0x07 ) ) {
+			mame_timer_adjust( timers.timer3_timer, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ), 0, MAME_TIME_IN_CYCLES( timer_to_cycles[data & 0x07], 0 ) );
+		}
+		if ( ( data & 0x08 ) && timers.timers_enabled ) {
+			mame_timer_enable( timers.timer3_timer, 1 );
+		} else {
+			mame_timer_enable( timers.timer3_timer, 0 );
+		}
 		break;
 	case 0x20:	/* Event #1-#8 primary enable
 			   Bit 0-1 R/W Timer 3 overflow Interrupt #7-#8
@@ -218,13 +313,22 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 6       Shock detector trigger / Clear interrupt #14
 			   Bit 7       Unknown / Clear interrupt #13
 			*/
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		break;
 	case 0x30:	/* Timer 1 control 1
 			   Bit 0   R/W Unknown
 			   Bit 1       Unused
 			   Bit 2   W   Preset timer
 			   Bit 3-6     Unused
-			   Bit 7   R/W Enable timer 1 counting
+			   Bit 7   R/W Enable timer 1 counting (this seems to unlock/lock register 0x36)
 			*/
+		if ( data & 0x04 ) {
+			timers.timer1_counter = ( pokemini_hwreg[0x33] << 8 ) | pokemini_hwreg[0x32];
+			pokemini_hwreg[0x36] = pokemini_hwreg[0x32];
+			pokemini_hwreg[0x37] = pokemini_hwreg[0x33];
+		}
+		data &= ~0x04;
+		break;
 	case 0x31:	/* Timer 1 control 2
 			   Bit 0-2     Unused
 			   Bit 3   R/W Unknown
@@ -246,13 +350,22 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 	case 0x37:	/* Timer 1 counter (high)
 			   Bit 0-7 R/W Timer 1 counter value bit 8-15
 			*/
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		break;
 	case 0x38:	/* Timer 2 control 1
 			   Bit 0   R/W Unknown
 			   Bit 1       Unused
 			   Bit 2   W   Preset Timer
 			   Bit 3-6     Unused
-			   Bit 7   R/W Enable timer 2 counting
+			   Bit 7   R/W Enable timer 2 counting (this seems to unlock/lock register 0x3E)
 			*/
+		if ( data & 0x04 ) {
+			timers.timer2_counter = ( pokemini_hwreg[0x3b] << 8 ) | pokemini_hwreg[0x3a];
+			pokemini_hwreg[0x3e] = pokemini_hwreg[0x3a];
+			pokemini_hwreg[0x3f] = pokemini_hwreg[0x3b];
+			data &= ~0x04;
+		}
+		break;
 	case 0x39:	/* Timer 2 control 2
 			   Bit 0-2     Unused
 			   Bit 3   R/W Unknown
@@ -306,8 +419,15 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 1       Unused
 			   Bit 2   W   Preset timer
 			   Bit 3-6     Unused
-			   Bit 7   R/W Enable timer 3 counting
+			   Bit 7   R/W Enable timer 3 counting (this seems to unlock/lock register 0x4E)
 			*/
+		if ( data & 0x04 ) {
+			timers.timer3_counter = ( pokemini_hwreg[0x4f] << 8 ) | pokemini_hwreg[0x4e];
+			pokemini_hwreg[0x4a] = pokemini_hwreg[0x4e];
+			pokemini_hwreg[0x4b] = pokemini_hwreg[0x4f];
+			data &= ~0x04;
+		}
+		break;
 	case 0x49:	/* Timer 3 control 2
 			   Bit 0-2     Unused
 			   Bit 3   R/W Unknown
@@ -411,17 +531,23 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			               111 - 60Hz / 8 = 7,5Hz (0 - 7)
 			   Bit 4-7 R   Divider position, when overflow the LCD is updated
 			*/
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		break;
 	case 0x82:	/* BG tile data memory offset (low)
 			   Bit 0-2     Always "0"
 			   Bit 3-7 R/W BG tile data memory offset bit 3-7
 			*/
+		data &= 0xF8;
+		break;
 	case 0x83:	/* BG tile data memory offset (mid)
 			   Bit 0-7 R/W BG tile data memory offset bit 8-15
 			*/
+		break;
 	case 0x84:	/* BG tile data memory offset (high)
 			   Bit 0-4 R/W BG tile data memory offset bit 16-20
 			   Bit 5-7     Unused
 			*/
+		break;
 	case 0x85:	/* BG vertical move
 			   Bit 0-6 R/W Move the background up, move range:
 			               Map size 0: 0x00 to 0x40
@@ -436,17 +562,23 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			               Map size 2: 0x00 to 0x60
 			   Bit 7       Unused
 			*/
+		logerror( "%0X: Write to unknown hardware address: %02X, %02X\n", activecpu_get_pc(), offset, data );
+		break;
 	case 0x87:	/* Sprite tile data memory offset (low)
 			   Bit 0-5     Always "0"
 			   Bit 6-7 R/W Sprite tile data memory offset bit 6-7
 			*/
+		data &= 0xC0;
+		break;
 	case 0x88:	/* Sprite tile data memory offset (med)
 			   Bit 0-7 R/W Sprite tile data memory offset bit 8-15
 			*/
+		break;
 	case 0x89:	/* Sprite tile data memory offset (high)
 			   Bit 0-4 R/W Sprite tile data memory offset bit 16-20
 			   Bit 5-7     Unused
 			*/
+		break;
 	case 0x8A:	/* LCD status
 			   Bit 0   R   Unknown
 			   Bit 1   R   Unknown
@@ -470,7 +602,6 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 }
 
 READ8_HANDLER( pokemini_hwreg_r ) {
-	logerror( "%0X: Read from unknown hardware address: %02X\n", activecpu_get_pc(), offset );
 	switch( offset ) {
 	case 0x09:	return timers.seconds_counter & 0xFF;
 	case 0x0A:	return ( timers.seconds_counter >> 8 ) & 0xFF;
@@ -478,6 +609,7 @@ READ8_HANDLER( pokemini_hwreg_r ) {
 	case 0x41:	return timers.hz256_counter;
 	case 0x52:	return readinputport( 0 );
 	}
+	logerror( "%0X: Read from unknown hardware address: %02X\n", activecpu_get_pc(), offset );
 	return pokemini_hwreg[offset];
 }
 
