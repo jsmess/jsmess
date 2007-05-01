@@ -9,7 +9,6 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/mbee.h"
-#include "plotpixl.h"
 
 typedef struct {		 // CRTC 6545
 	UINT8 horizontal_total;
@@ -551,7 +550,7 @@ VIDEO_UPDATE( mbee )
 						if( y > crt.scan_lines )
 							break;
 						for( x = 0; x < 8; x++ )
-							plot_pixel(bitmap,sx+x,sy+y, Machine->pens[color]);
+							*BITMAP_ADDR16(bitmap, sy+y, sx+x) = Machine->pens[color];
 					}
 					dirtybuffer[offs] = 1;
 				}

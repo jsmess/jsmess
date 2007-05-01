@@ -515,7 +515,7 @@ INLINE void vic3_draw_block(int x, int y, UINT8 colors[8])
                 p |= colors[7] & 0x80;                      \
                 colors[7] >>= 1;                                \
             }                                                   \
-            plot_pixel(vic2.bitmap, XPOS+x+i, YPOS+y, Machine->pens[p]);  \
+            *BITMAP_ADDR16(vic2.bitmap, YPOS+y, XPOS+x+i) = Machine->pens[p];  \
         }                                                       \
     }
 
@@ -570,11 +570,11 @@ static void vic3_interlace_draw_block(int x, int y, int offset)
 			colors[7]=c64_memory[VIC3_BITPLANE_IADDR(7)+offset]<<7;
 		}
 		for (i=7;i>=0;i--) {
-			plot_pixel(vic2.bitmap, XPOS+x+i, YPOS+y,
+			*BITMAP_ADDR16(vic2.bitmap, YPOS+y, XPOS+x+i) =
 				Machine->pens[(colors[0]&1)|(colors[1]&2)
 							 |(colors[2]&4)|(colors[3]&8)
 							 |(colors[4]&0x10)|(colors[5]&0x20)
-							 |(colors[6]&0x40)|(colors[7]&0x80)]);
+							 |(colors[6]&0x40)|(colors[7]&0x80)];
 			colors[0]>>=1;
 			colors[1]>>=1;
 			colors[2]>>=1;
@@ -639,11 +639,11 @@ static void vic3_draw_block(int x, int y, int offset)
 			colors[7]=c64_memory[VIC3_BITPLANE_ADDR(7)+offset]<<7;
 		}
 		for (i=7;i>=0;i--) {
-			plot_pixel(vic2.bitmap, XPOS+x+i, YPOS+y,
+			*BITMAP_ADDR16(vic2.bitmap, YPOS+y, XPOS+x+i) =
 				Machine->pens[(colors[0]&1)|(colors[1]&2)
 							 |(colors[2]&4)|(colors[3]&8)
 							 |(colors[4]&0x10)|(colors[5]&0x20)
-							 |(colors[6]&0x40)|(colors[7]&0x80)]);
+							 |(colors[6]&0x40)|(colors[7]&0x80)];
 			colors[0]>>=1;
 			colors[1]>>=1;
 			colors[2]>>=1;

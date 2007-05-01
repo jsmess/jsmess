@@ -1,7 +1,6 @@
 #include "driver.h"
 #include "includes/pcw16.h"
 #include "video/generic.h"
-#include "plotpixl.h"
 
 int pcw16_colour_palette[16];
 int pcw16_video_control;
@@ -51,6 +50,11 @@ unsigned char pcw16_palette[PCW16_NUM_COLOURS * 3] =
 };
 
 
+INLINE void pcw16_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
+
 /* Initialise the palette */
 PALETTE_INIT( pcw16 )
 {
@@ -79,7 +83,7 @@ static void pcw16_vh_decode_mode0(mame_bitmap *bitmap, int x, int y, unsigned ch
 	px = x;
 	for (b=0; b<8; b++)
 	{
-		plot_pixel(bitmap, px, y, cols[(local_byte>>7) & 0x01]);
+		pcw16_plot_pixel(bitmap, px, y, cols[(local_byte>>7) & 0x01]);
 		px++;
 
 		local_byte = local_byte<<1;
@@ -108,9 +112,9 @@ static void pcw16_vh_decode_mode1(mame_bitmap *bitmap, int x, int y, unsigned ch
 
 		col = cols[((local_byte>>6) & 0x03)];
 
-		plot_pixel(bitmap, px, y, col);
+		pcw16_plot_pixel(bitmap, px, y, col);
 		px++;
-		plot_pixel(bitmap, px, y, col);
+		pcw16_plot_pixel(bitmap, px, y, col);
 		px++;
 
 		local_byte = local_byte<<2;
@@ -136,13 +140,13 @@ static void pcw16_vh_decode_mode2(mame_bitmap *bitmap, int x, int y, unsigned ch
 
 		col = cols[((local_byte>>4)&0x0f)];
 
-		plot_pixel(bitmap, px, y, col);
+		pcw16_plot_pixel(bitmap, px, y, col);
 		px++;
-		plot_pixel(bitmap, px, y, col);
+		pcw16_plot_pixel(bitmap, px, y, col);
 		px++;
-		plot_pixel(bitmap, px, y, col);
+		pcw16_plot_pixel(bitmap, px, y, col);
 		px++;
-		plot_pixel(bitmap, px, y, col);
+		pcw16_plot_pixel(bitmap, px, y, col);
 		px++;
 
 		local_byte = local_byte<<4;

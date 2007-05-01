@@ -9,7 +9,6 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "../includes/exidy.h"
-#include "plotpixl.h"
 
 /***************************************************************************
   Start the video hardware emulation.
@@ -86,7 +85,7 @@ VIDEO_UPDATE( exidy )
 					pen = (byte>>7) & 0x001;
 					pen = pens[pen];
 
-					plot_pixel(bitmap,px, py,pen);
+					*BITMAP_ADDR16(bitmap, py, px) = pen;
 					px++;
 					byte = byte<<1;
 				}

@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "video/generic.h"
-#include "plotpixl.h"
 
 #include "includes/hp48.h"
 
@@ -80,7 +79,7 @@ static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const char *figu
 	for (j=0; figure[j]; j++) {
 		switch (figure[j]) {
 		case '1': 
-			plot_pixel(bitmap, x+xi, y, color);
+			*BITMAP_ADDR16(bitmap, y, x+xi) = color;
 			xi++;
 			break;
 		case ' ': 

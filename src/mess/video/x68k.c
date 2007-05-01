@@ -29,7 +29,6 @@
 #include "inputx.h"
 #include "render.h"
 #include "includes/x68k.h"
-#include "plotpixl.h"
 
 extern struct x68k_system sys;
 
@@ -62,6 +61,11 @@ int sprite_shift;
 void x68k_render_video_word(int offset);
 void x68k_crtc_refresh_mode(void);
 void x68k_scanline_check(int);
+
+INLINE void x68k_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 mame_bitmap* x68k_get_gfx_pri(int pri,int type)
 {
@@ -456,7 +460,7 @@ void x68k_render_video_word(int offset)
 
 	for(l=0;l<16;l++)
 	{
-		plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
+		x68k_plot_pixel(x68k_text_bitmap,x+(15-l),y,0x100+x68k_get_text_pixel(offset,l));
 	}
 }
 
@@ -490,22 +494,22 @@ WRITE16_HANDLER( x68k_gvram_w )
 
 	if(offset < 0x40000)  // first page, all colour depths
 	{
-		plot_pixel(x68k_gfx_0_bitmap_65536,xloc,yloc,(gvram[offset] >> 1) + 512);
-		plot_pixel(x68k_gfx_0_bitmap_256,xloc,yloc,data & 0x00ff);
-		plot_pixel(x68k_gfx_0_bitmap_16,xloc,yloc,data & 0x000f);
+		x68k_plot_pixel(x68k_gfx_0_bitmap_65536,xloc,yloc,(gvram[offset] >> 1) + 512);
+		x68k_plot_pixel(x68k_gfx_0_bitmap_256,xloc,yloc,data & 0x00ff);
+		x68k_plot_pixel(x68k_gfx_0_bitmap_16,xloc,yloc,data & 0x000f);
 	}
 	if(offset >= 0x40000 && offset < 0x80000)  // second page, 16 or 256 colours
 	{
-		plot_pixel(x68k_gfx_1_bitmap_256,xloc,yloc,data & 0x00ff);
-		plot_pixel(x68k_gfx_1_bitmap_16,xloc,yloc,data & 0x000f);
+		x68k_plot_pixel(x68k_gfx_1_bitmap_256,xloc,yloc,data & 0x00ff);
+		x68k_plot_pixel(x68k_gfx_1_bitmap_16,xloc,yloc,data & 0x000f);
 	}
 	if(offset >= 0x80000 && offset < 0xc0000)  // third page, 16 colours only
 	{
-		plot_pixel(x68k_gfx_2_bitmap_16,xloc,yloc,data & 0x000f);
+		x68k_plot_pixel(x68k_gfx_2_bitmap_16,xloc,yloc,data & 0x000f);
 	}
 	if(offset >= 0xc0000 && offset < 0x100000)  // fourth page, 16 colours only
 	{
-		plot_pixel(x68k_gfx_3_bitmap_16,xloc,yloc,data & 0x000f);
+		x68k_plot_pixel(x68k_gfx_3_bitmap_16,xloc,yloc,data & 0x000f);
 	}
 }
 

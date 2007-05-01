@@ -22,7 +22,6 @@
 #include "cpu/pdp1/pdp1.h"
 #include "includes/pdp1.h"
 #include "video/crt.h"
-#include "plotpixl.h"
 
 
 static mame_bitmap *panel_bitmap;
@@ -46,6 +45,11 @@ static void pdp1_draw_panel(mame_bitmap *bitmap);
 static lightpen_t lightpen_state, previous_lightpen_state;
 static void pdp1_erase_lightpen(mame_bitmap *bitmap);
 static void pdp1_draw_lightpen(mame_bitmap *bitmap);
+
+INLINE void pdp1_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 /*
 	video init
@@ -154,7 +158,7 @@ static void pdp1_draw_led(mame_bitmap *bitmap, int x, int y, int state)
 
 	for (yy=1; yy<7; yy++)
 		for (xx=1; xx<7; xx++)
-			plot_pixel(bitmap, x+xx, y+yy, Machine->pens[state ? pen_lit_lamp : pen_unlit_lamp]);
+			pdp1_plot_pixel(bitmap, x+xx, y+yy, Machine->pens[state ? pen_lit_lamp : pen_unlit_lamp]);
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
@@ -180,34 +184,34 @@ static void pdp1_draw_switch(mame_bitmap *bitmap, int x, int y, int state)
 	/* erase area */
 	for (yy=0; yy<8; yy++)
 		for (xx=0; xx<8; xx++)
-			plot_pixel(bitmap, x+xx, y+yy, Machine->pens[pen_panel_bg]);
+			pdp1_plot_pixel(bitmap, x+xx, y+yy, Machine->pens[pen_panel_bg]);
 
 
 	/* draw nut (-> circle) */
 	for (i=0; i<4;i++)
 	{
-		plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_nut]);
-		plot_pixel(bitmap, x+2+i, y+6, Machine->pens[pen_switch_nut]);
-		plot_pixel(bitmap, x+1, y+2+i, Machine->pens[pen_switch_nut]);
-		plot_pixel(bitmap, x+6, y+2+i, Machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+6, Machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+1, y+2+i, Machine->pens[pen_switch_nut]);
+		pdp1_plot_pixel(bitmap, x+6, y+2+i, Machine->pens[pen_switch_nut]);
 	}
-	plot_pixel(bitmap, x+2, y+2, Machine->pens[pen_switch_nut]);
-	plot_pixel(bitmap, x+5, y+2, Machine->pens[pen_switch_nut]);
-	plot_pixel(bitmap, x+2, y+5, Machine->pens[pen_switch_nut]);
-	plot_pixel(bitmap, x+5, y+5, Machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+2, y+2, Machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+5, y+2, Machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+2, y+5, Machine->pens[pen_switch_nut]);
+	pdp1_plot_pixel(bitmap, x+5, y+5, Machine->pens[pen_switch_nut]);
 
 	/* draw button (->disc) */
 	if (! state)
 		y += 4;
 	for (i=0; i<2;i++)
 	{
-		plot_pixel(bitmap, x+3+i, y, Machine->pens[pen_switch_button]);
-		plot_pixel(bitmap, x+3+i, y+3, Machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+3+i, y, Machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+3+i, y+3, Machine->pens[pen_switch_button]);
 	}
 	for (i=0; i<4;i++)
 	{
-		plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_button]);
-		plot_pixel(bitmap, x+2+i, y+2, Machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_button]);
+		pdp1_plot_pixel(bitmap, x+2+i, y+2, Machine->pens[pen_switch_button]);
 	}
 }
 
@@ -518,22 +522,22 @@ static void pdp1_draw_circle(mame_bitmap *bitmap, int x, int y, int radius, int 
 		int b = sqrt(radius*radius-a*a) + .5;
 
 		if ((x-a >= 0) && (y-b >= 0))
-			plot_pixel(bitmap, x-a, y-b, color_);
+			pdp1_plot_pixel(bitmap, x-a, y-b, color_);
 		if ((x-a >= 0) && (y+b <= crt_window_height-1))
-			plot_pixel(bitmap, x-a, y+b, color_);
+			pdp1_plot_pixel(bitmap, x-a, y+b, color_);
 		if ((x+a <= crt_window_width-1) && (y-b >= 0))
-			plot_pixel(bitmap, x+a, y-b, color_);
+			pdp1_plot_pixel(bitmap, x+a, y-b, color_);
 		if ((x+a <= crt_window_width-1) && (y+b <= crt_window_height-1))
-			plot_pixel(bitmap, x+a, y+b, color_);
+			pdp1_plot_pixel(bitmap, x+a, y+b, color_);
 
 		if ((x-b >= 0) && (y-a >= 0))
-			plot_pixel(bitmap, x-b, y-a, color_);
+			pdp1_plot_pixel(bitmap, x-b, y-a, color_);
 		if ((x-b >= 0) && (y+a <= crt_window_height-1))
-			plot_pixel(bitmap, x-b, y+a, color_);
+			pdp1_plot_pixel(bitmap, x-b, y+a, color_);
 		if ((x+b <= crt_window_width-1) && (y-a >= 0))
-			plot_pixel(bitmap, x+b, y-a, color_);
+			pdp1_plot_pixel(bitmap, x+b, y-a, color_);
 		if ((x+b <= crt_window_width-1) && (y+a <= crt_window_height-1))
-			plot_pixel(bitmap, x+b, y+a, color_);
+			pdp1_plot_pixel(bitmap, x+b, y+a, color_);
 	}
 }
 #else
@@ -553,18 +557,18 @@ static void pdp1_draw_circle(mame_bitmap *bitmap, int x, int y, int radius, int 
 		float dy = sqrt(radius*radius-(x-fx)*(x-fx));
 
 		if ((x >= 0) && (x <= crt_window_width-1) && (fy-dy >= 0))
-			plot_pixel(bitmap, x, fy-dy, color);
+			pdp1_plot_pixel(bitmap, x, fy-dy, color);
 		if ((x >= 0) && (x <= crt_window_width-1) && (y+dy <= crt_window_height-1))
-			plot_pixel(bitmap, x, fy+dy, color);
+			pdp1_plot_pixel(bitmap, x, fy+dy, color);
 	}
 	for (y=/*ceil*/(fy-interval); y<=fy+interval; y++)
 	{
 		float dx = sqrt(radius*radius-(y-fy)*(y-fy));
 
 		if ((fx-dx >= 0) && (y >= 0) && (y <= crt_window_height-1))
-			plot_pixel(bitmap, fx-dx, y, color);
+			pdp1_plot_pixel(bitmap, fx-dx, y, color);
 		if ((fx+dx <= crt_window_width-1) && (y >= 0) && (y <= crt_window_height-1))
-			plot_pixel(bitmap, fx+dx, y, color);
+			pdp1_plot_pixel(bitmap, fx+dx, y, color);
 	}
 }
 #endif
@@ -574,13 +578,13 @@ static void pdp1_erase_lightpen(mame_bitmap *bitmap)
 	if (previous_lightpen_state.active)
 	{
 		/*if (previous_lightpen_state.x>0)
-			plot_pixel(bitmap, previous_lightpen_state.x/2-1, previous_lightpen_state.y/2, pen_black);
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2-1, previous_lightpen_state.y/2, pen_black);
 		if (previous_lightpen_state.x<1023)
-			plot_pixel(bitmap, previous_lightpen_state.x/2+1, previous_lightpen_state.y/2, pen_black);
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2+1, previous_lightpen_state.y/2, pen_black);
 		if (previous_lightpen_state.y>0)
-			plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2-1, pen_black);
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2-1, pen_black);
 		if (previous_lightpen_state.y<1023)
-			plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2+1, pen_black);*/
+			pdp1_plot_pixel(bitmap, previous_lightpen_state.x/2, previous_lightpen_state.y/2+1, pen_black);*/
 		pdp1_draw_circle(bitmap, previous_lightpen_state.x, previous_lightpen_state.y, previous_lightpen_state.radius, pen_black);
 	}
 }
@@ -591,13 +595,13 @@ static void pdp1_draw_lightpen(mame_bitmap *bitmap)
 	{
 		int color_ = lightpen_state.down ? pen_lightpen_pressed : pen_lightpen_nonpressed;
 		/*if (lightpen_state.x>0)
-			plot_pixel(bitmap, lightpen_state.x/2-1, lightpen_state.y/2, color);
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2-1, lightpen_state.y/2, color);
 		if (lightpen_state.x<1023)
-			plot_pixel(bitmap, lightpen_state.x/2+1, lightpen_state.y/2, color);
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2+1, lightpen_state.y/2, color);
 		if (lightpen_state.y>0)
-			plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2-1, color);
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2-1, color);
 		if (lightpen_state.y<1023)
-			plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2+1, color);*/
+			pdp1_plot_pixel(bitmap, lightpen_state.x/2, lightpen_state.y/2+1, color);*/
 		pdp1_draw_circle(bitmap, lightpen_state.x, lightpen_state.y, lightpen_state.radius, color_);
 	}
 	previous_lightpen_state = lightpen_state;

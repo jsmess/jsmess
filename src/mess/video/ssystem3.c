@@ -4,7 +4,6 @@
 
 #include "driver.h"
 #include "video/generic.h"
-#include "plotpixl.h"
 
 #include "includes/ssystem3.h"
 
@@ -96,7 +95,7 @@ static void ssystem3_draw_7segment(mame_bitmap *bitmap,int value, int x, int y)
 		
 		if (mask!=0) {
 			color=Machine->pens[(value&mask)?1:0];
-			plot_pixel(bitmap, x+xi, y+yi, color);
+			*BITMAP_ADDR16(bitmap, y+yi, x+xi) = color;
 		}
 		if (led[i]!='\r') xi++;
 		else { yi++, xi=0; }
@@ -160,7 +159,7 @@ static void ssystem3_draw_led(mame_bitmap *bitmap,INT16 color, int x, int y, int
 		switch (single_led[j]) {
 		default:
 			if (ch==single_led[j]) {
-				plot_pixel(bitmap, x+xi, y, color);
+				*BITMAP_ADDR16(bitmap, y, x+xi) = color;
 			}
 			xi++;
 			break;

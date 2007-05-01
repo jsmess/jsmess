@@ -11,7 +11,6 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/lviv.h"
-#include "plotpixl.h"
 
 unsigned char lviv_palette[8*3] =
 {
@@ -78,16 +77,16 @@ VIDEO_UPDATE( lviv )
 			data = lviv_video_ram[y*64+x/4];
 
 			pen = lviv_colortable[0][((data & 0x08) >> 3) | ((data & 0x80) >> (3+3))];
-			plot_pixel(bitmap, x, y, Machine->pens[pen]);
+			*BITMAP_ADDR16(bitmap, y, x + 0) = Machine->pens[pen];
 
 			pen = lviv_colortable[0][((data & 0x04) >> 2) | ((data & 0x40) >> (2+3))];
-			plot_pixel(bitmap, x+1, y, Machine->pens[pen]);
+			*BITMAP_ADDR16(bitmap, y, x + 1) = Machine->pens[pen];
 
 			pen = lviv_colortable[0][((data & 0x02) >> 1) | ((data & 0x20) >> (1+3))];
-			plot_pixel(bitmap, x+2, y, Machine->pens[pen]);
+			*BITMAP_ADDR16(bitmap, y, x + 2) = Machine->pens[pen];
 
 			pen = lviv_colortable[0][((data & 0x01) >> 0) | ((data & 0x10) >> (0+3))];
-			plot_pixel(bitmap, x+3, y, Machine->pens[pen]);
+			*BITMAP_ADDR16(bitmap, y, x + 3) = Machine->pens[pen];
 		}
 	return 0;
 }

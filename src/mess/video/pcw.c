@@ -9,7 +9,11 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/pcw.h"
-#include "plotpixl.h"
+
+INLINE void pcw_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 /***************************************************************************
   Start the video hardware emulation.
@@ -123,11 +127,11 @@ VIDEO_UPDATE( pcw )
 				{
 					if (byte & 0x080)
 					{
-						plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen1);
+						pcw_plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen1);
 					}
 					else
 					{
-						plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen0);
+						pcw_plot_pixel(bitmap,x+b, y+PCW_BORDER_HEIGHT, pen0);
 
 					}
 					byte = byte<<1;
@@ -149,23 +153,23 @@ VIDEO_UPDATE( pcw )
 		/* 8 pixels either side of display */
 		for (y=0; y<256; y++)
 		{
-			plot_pixel(bitmap, 0, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, 1, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, 2, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, 3, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, 4, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, 5, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, 6, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, 7, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 0, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 1, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 2, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 3, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 4, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 5, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 6, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, 7, y+PCW_BORDER_HEIGHT, pen0);
 
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+0, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+1, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+2, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+3, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+4, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+5, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+6, y+PCW_BORDER_HEIGHT, pen0);
-			plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+7, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+0, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+1, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+2, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+3, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+4, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+5, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+6, y+PCW_BORDER_HEIGHT, pen0);
+			pcw_plot_pixel(bitmap, PCW_BORDER_WIDTH+PCW_DISPLAY_WIDTH+7, y+PCW_BORDER_HEIGHT, pen0);
 		}
 	}
 	else

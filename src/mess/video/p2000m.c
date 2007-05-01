@@ -9,7 +9,6 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/p2000t.h"
-#include "plotpixl.h"
 
 static	INT8	frame_count;
 
@@ -69,7 +68,7 @@ VIDEO_UPDATE( p2000m )
 			{
 				for (loop = 0; loop < 6; loop++)
 				{
-					plot_pixel (bitmap, sx + loop, sy + 9, 1);
+					*BITMAP_ADDR16(bitmap, sy + 9, sx + loop) = 1;
 				}
 			}
 			dirtybuffer[offs] = 0;

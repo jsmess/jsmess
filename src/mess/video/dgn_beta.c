@@ -84,7 +84,6 @@ the access to the video memory is unclear to me at the moment.
 #include "video/generic.h"
 #include "video/m6845.h"
 #include "mscommon.h"
-#include "plotpixl.h"
 
 #include "includes/dgn_beta.h"
 
@@ -810,14 +809,14 @@ static void ScreenBox(int ref, int params, const char *param[])
 	
 	for(x=BoxMinX;x<BoxMaxX;x++)
 	{
-		plot_pixel(bit,x,BoxMinY,BoxColour);
-		plot_pixel(bit,x,BoxMaxY,BoxColour);
+		*BITMAP_ADDR16(bit, BoxMinY, x) = BoxColour;
+		*BITMAP_ADDR16(bit, BoxMaxY, x) = BoxColour;
 	}
 
 	for(y=BoxMinY;y<BoxMaxY;y++)
 	{
-		plot_pixel(bit,BoxMinX,y,BoxColour);
-		plot_pixel(bit,BoxMaxX,y,BoxColour);
+		*BITMAP_ADDR16(bit, y, BoxMinX) = BoxColour;
+		*BITMAP_ADDR16(bit, y, BoxMaxX) = BoxColour;
 	}
 	debug_console_printf("ScreenBox()\n");
 }

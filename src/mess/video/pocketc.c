@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "video/generic.h"
-#include "plotpixl.h"
 
 #include "includes/pocketc.h"
 
@@ -63,7 +62,7 @@ void pocketc_draw_special(mame_bitmap *bitmap,
 		for (j=0;fig[i][j]!=0;j++) {
 			switch(fig[i][j]) {
 			case '1':
-				plot_pixel(bitmap, x+j, y, color);
+				*BITMAP_ADDR16(bitmap, y, x+j) = color;
 				break;
 			case 'e': return;
 			}

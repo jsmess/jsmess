@@ -2,9 +2,13 @@
 #include "includes/intv.h"
 #include "video/generic.h"
 #include "video/stic.h"
-#include "plotpixl.h"
 
 #define FOREGROUND_BIT 0x0010
+
+INLINE void intv_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 VIDEO_START( intv )
 {
@@ -226,59 +230,59 @@ static void render_line(mame_bitmap *bitmap, UINT8 nextByte, UINT16 x, UINT16 y,
 {
     UINT32 color = (nextByte & 0x80 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x, y, color);
-    plot_pixel(bitmap, x+1, y, color);
-    plot_pixel(bitmap, x, y+1, color);
-    plot_pixel(bitmap, x+1, y+1, color);
+    intv_plot_pixel(bitmap, x, y, color);
+    intv_plot_pixel(bitmap, x+1, y, color);
+    intv_plot_pixel(bitmap, x, y+1, color);
+    intv_plot_pixel(bitmap, x+1, y+1, color);
 
     color = (nextByte & 0x40 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x+2, y, color);
-    plot_pixel(bitmap, x+3, y, color);
-    plot_pixel(bitmap, x+2, y+1, color);
-    plot_pixel(bitmap, x+3, y+1, color);
+    intv_plot_pixel(bitmap, x+2, y, color);
+    intv_plot_pixel(bitmap, x+3, y, color);
+    intv_plot_pixel(bitmap, x+2, y+1, color);
+    intv_plot_pixel(bitmap, x+3, y+1, color);
 
     color = (nextByte & 0x20 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x+4, y, color);
-    plot_pixel(bitmap, x+5, y, color);
-    plot_pixel(bitmap, x+4, y+1, color);
-    plot_pixel(bitmap, x+5, y+1, color);
+    intv_plot_pixel(bitmap, x+4, y, color);
+    intv_plot_pixel(bitmap, x+5, y, color);
+    intv_plot_pixel(bitmap, x+4, y+1, color);
+    intv_plot_pixel(bitmap, x+5, y+1, color);
 
     color = (nextByte & 0x10 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x+6, y, color);
-    plot_pixel(bitmap, x+7, y, color);
-    plot_pixel(bitmap, x+6, y+1, color);
-    plot_pixel(bitmap, x+7, y+1, color);
+    intv_plot_pixel(bitmap, x+6, y, color);
+    intv_plot_pixel(bitmap, x+7, y, color);
+    intv_plot_pixel(bitmap, x+6, y+1, color);
+    intv_plot_pixel(bitmap, x+7, y+1, color);
 
     color = (nextByte & 0x08 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x+8, y, color);
-    plot_pixel(bitmap, x+9, y, color);
-    plot_pixel(bitmap, x+8, y+1, color);
-    plot_pixel(bitmap, x+9, y+1, color);
+    intv_plot_pixel(bitmap, x+8, y, color);
+    intv_plot_pixel(bitmap, x+9, y, color);
+    intv_plot_pixel(bitmap, x+8, y+1, color);
+    intv_plot_pixel(bitmap, x+9, y+1, color);
 
     color = (nextByte & 0x04 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x+10, y, color);
-    plot_pixel(bitmap, x+11, y, color);
-    plot_pixel(bitmap, x+10, y+1, color);
-    plot_pixel(bitmap, x+11, y+1, color);
+    intv_plot_pixel(bitmap, x+10, y, color);
+    intv_plot_pixel(bitmap, x+11, y, color);
+    intv_plot_pixel(bitmap, x+10, y+1, color);
+    intv_plot_pixel(bitmap, x+11, y+1, color);
 
     color = (nextByte & 0x02 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x+12, y, color);
-    plot_pixel(bitmap, x+13, y, color);
-    plot_pixel(bitmap, x+12, y+1, color);
-    plot_pixel(bitmap, x+13, y+1, color);
+    intv_plot_pixel(bitmap, x+12, y, color);
+    intv_plot_pixel(bitmap, x+13, y, color);
+    intv_plot_pixel(bitmap, x+12, y+1, color);
+    intv_plot_pixel(bitmap, x+13, y+1, color);
 
     color = (nextByte & 0x01 ? Machine->pens[fgcolor]
             : Machine->pens[bgcolor]);
-    plot_pixel(bitmap, x+14, y, color);
-    plot_pixel(bitmap, x+15, y, color);
-    plot_pixel(bitmap, x+14, y+1, color);
-    plot_pixel(bitmap, x+15, y+1, color);
+    intv_plot_pixel(bitmap, x+14, y, color);
+    intv_plot_pixel(bitmap, x+15, y, color);
+    intv_plot_pixel(bitmap, x+14, y+1, color);
+    intv_plot_pixel(bitmap, x+15, y+1, color);
 }
 
 static void render_colored_squares(mame_bitmap *bitmap, UINT16 x, UINT16 y,
@@ -435,9 +439,9 @@ static void copy_sprites_to_background(mame_bitmap *bitmap)
                 }
 
                 if (s->visible) {
-                    plot_pixel(bitmap, nextX, nextY, Machine->pens[s->color] |
+                    intv_plot_pixel(bitmap, nextX, nextY, Machine->pens[s->color] |
                             (currentPixel & FOREGROUND_BIT));
-                    plot_pixel(bitmap, nextX+1, nextY, Machine->pens[s->color] |
+                    intv_plot_pixel(bitmap, nextX+1, nextY, Machine->pens[s->color] |
                             (currentPixel & FOREGROUND_BIT));
                 }
             }
@@ -545,8 +549,8 @@ static void draw_background(mame_bitmap *bitmap, int transparency)
 
 						for(j=0;j<8;j++)
 						{
-							//plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, Machine->pens[1]);
-							//plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, Machine->pens[1]);
+							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, Machine->pens[1]);
+							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, Machine->pens[1]);
 						}
 
 					}
@@ -560,8 +564,8 @@ static void draw_background(mame_bitmap *bitmap, int transparency)
 
 						for(j=0;j<8;j++)
 						{
-							//plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, Machine->pens[2]);
-							//plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, Machine->pens[2]);
+							//intv_plot_pixel(bitmap, col*16+j*2, row*16+7*2+1, Machine->pens[2]);
+							//intv_plot_pixel(bitmap, col*16+j*2+1, row*16+7*2+1, Machine->pens[2]);
 						}
 					}
 				}

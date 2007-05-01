@@ -1,7 +1,6 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/gamecom.h"
-#include "plotpixl.h"
 
 #define Y_PIXELS 200
 
@@ -57,10 +56,10 @@ INTERRUPT_GEN( gamecom_scanline ) {
 		}
 		for( i = 0; i < 40; i++ ) {
 			UINT8 p = line[i];
-			plot_pixel( tmpbitmap, scanline, i * 4    , Machine->pens[ pal[ ( p >> 6 ) & 3 ] ] );
-			plot_pixel( tmpbitmap, scanline, i * 4 + 1, Machine->pens[ pal[ ( p >> 4 ) & 3 ] ] );
-			plot_pixel( tmpbitmap, scanline, i * 4 + 2, Machine->pens[ pal[ ( p >> 2 ) & 3 ] ] );
-			plot_pixel( tmpbitmap, scanline, i * 4 + 3, Machine->pens[ pal[ ( p      ) & 3 ] ] );
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 0, scanline) = Machine->pens[ pal[ ( p >> 6 ) & 3 ] ];
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 1, scanline) = Machine->pens[ pal[ ( p >> 4 ) & 3 ] ];
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 2, scanline) = Machine->pens[ pal[ ( p >> 2 ) & 3 ] ];
+			*BITMAP_ADDR16(tmpbitmap, i * 4 + 3, scanline) = Machine->pens[ pal[ ( p      ) & 3 ] ];
 		}
 	}
 

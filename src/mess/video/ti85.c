@@ -8,7 +8,6 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/ti85.h"
-#include "plotpixl.h"
 
 #define TI81_VIDEO_MEMORY_SIZE	 768
 #define TI81_SCREEN_X_SIZE	  12
@@ -155,7 +154,7 @@ VIDEO_UPDATE( ti85 )
         	for (y=0; y<ti_screen_y_size; y++)
 			for (x=0; x<ti_screen_x_size; x++)
 				for (b=0; b<8; b++)
-					plot_pixel(bitmap, x*8+b, y, Machine->pens[ti85_colortable[ti85_LCD_contrast&0x1f][6]]);
+					*BITMAP_ADDR16(bitmap, y, x*8+b) = Machine->pens[ti85_colortable[ti85_LCD_contrast&0x1f][6]];
 		return 0;
 	}
 
@@ -178,7 +177,7 @@ VIDEO_UPDATE( ti85 )
 					  + ((*(ti85_frames+4*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01)
 					  + ((*(ti85_frames+5*ti_video_memory_size+y*ti_screen_x_size+x)>>(7-b)) & 0x01);
 
-				plot_pixel(bitmap, x*8+b, y, Machine->pens[ti85_colortable[ti85_LCD_contrast&0x1f][brightnes]]);
+				*BITMAP_ADDR16(bitmap, y, x*8+b) = Machine->pens[ti85_colortable[ti85_LCD_contrast&0x1f][brightnes]];
 	                }
 	return 0;
 }

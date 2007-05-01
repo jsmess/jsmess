@@ -41,7 +41,6 @@ PAL frame timing
 #include "includes/sms.h"
 #include "video/generic.h"
 #include "cpu/z80/z80.h"
-#include "plotpixl.h"
 
 #define IS_SMS1_VDP		( features & MODEL_315_5124 )
 #define IS_SMS2_VDP		( features & MODEL_315_5246 )
@@ -1017,11 +1016,10 @@ void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, in
 				rgb_t	c2 = Machine->pens[line2[x]];
 				rgb_t	c3 = Machine->pens[line3[x]];
 				rgb_t	c4 = Machine->pens[line4[x]];
-				plot_pixel( bitmap, pixelOffsetX + x, pixelPlotY,
+				*BITMAP_ADDR32( bitmap, pixelPlotY, pixelOffsetX + x) =
 					MAKE_RGB( ( RGB_RED(c1)/6 + RGB_RED(c2)/3 + RGB_RED(c3)/3 + RGB_RED(c4)/6 ),
 						( RGB_GREEN(c1)/6 + RGB_GREEN(c2)/3 + RGB_GREEN(c3)/3 + RGB_GREEN(c4)/6 ),
-						( RGB_BLUE(c1)/6 + RGB_BLUE(c2)/3 + RGB_BLUE(c3)/3 + RGB_BLUE(c4)/6 ) )
-				);
+						( RGB_BLUE(c1)/6 + RGB_BLUE(c2)/3 + RGB_BLUE(c3)/3 + RGB_BLUE(c4)/6 ) );
 			}
 			return;
 		}
@@ -1029,7 +1027,7 @@ void sms_refresh_line( mame_bitmap *bitmap, int pixelOffsetX, int pixelPlotY, in
 	}
 
 	for( x = 0; x < 256; x++ ) {
-		plot_pixel( bitmap, pixelOffsetX + x, pixelPlotY + line, Machine->pens[blitLineBuffer[x]] );
+		*BITMAP_ADDR32( bitmap, pixelPlotY + line, pixelOffsetX + x) = Machine->pens[blitLineBuffer[x]];
 	}
 }
 

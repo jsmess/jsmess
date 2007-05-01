@@ -9,11 +9,15 @@
 #include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"
-#include "plotpixl.h"
 
 
 static mame_bitmap *panel_bitmap;
 static mame_bitmap *typewriter_bitmap;
+
+INLINE void tx0_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 static const rectangle panel_bitmap_bounds =
 {
@@ -132,7 +136,7 @@ static void tx0_draw_led(mame_bitmap *bitmap, int x, int y, int state)
 
 	for (yy=1; yy<7; yy++)
 		for (xx=1; xx<7; xx++)
-			plot_pixel(bitmap, x+xx, y+yy, Machine->pens[state ? pen_lit_lamp : pen_unlit_lamp]);
+			tx0_plot_pixel(bitmap, x+xx, y+yy, Machine->pens[state ? pen_lit_lamp : pen_unlit_lamp]);
 }
 
 /* draw nb_bits leds which represent nb_bits bits in value */
@@ -158,34 +162,34 @@ static void tx0_draw_switch(mame_bitmap *bitmap, int x, int y, int state)
 	/* erase area */
 	for (yy=0; yy<8; yy++)
 		for (xx=0; xx<8; xx++)
-			plot_pixel(bitmap, x+xx, y+yy, Machine->pens[pen_panel_bg]);
+			tx0_plot_pixel(bitmap, x+xx, y+yy, Machine->pens[pen_panel_bg]);
 
 
 	/* draw nut (-> circle) */
 	for (i=0; i<4;i++)
 	{
-		plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_nut]);
-		plot_pixel(bitmap, x+2+i, y+6, Machine->pens[pen_switch_nut]);
-		plot_pixel(bitmap, x+1, y+2+i, Machine->pens[pen_switch_nut]);
-		plot_pixel(bitmap, x+6, y+2+i, Machine->pens[pen_switch_nut]);
+		tx0_plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_nut]);
+		tx0_plot_pixel(bitmap, x+2+i, y+6, Machine->pens[pen_switch_nut]);
+		tx0_plot_pixel(bitmap, x+1, y+2+i, Machine->pens[pen_switch_nut]);
+		tx0_plot_pixel(bitmap, x+6, y+2+i, Machine->pens[pen_switch_nut]);
 	}
-	plot_pixel(bitmap, x+2, y+2, Machine->pens[pen_switch_nut]);
-	plot_pixel(bitmap, x+5, y+2, Machine->pens[pen_switch_nut]);
-	plot_pixel(bitmap, x+2, y+5, Machine->pens[pen_switch_nut]);
-	plot_pixel(bitmap, x+5, y+5, Machine->pens[pen_switch_nut]);
+	tx0_plot_pixel(bitmap, x+2, y+2, Machine->pens[pen_switch_nut]);
+	tx0_plot_pixel(bitmap, x+5, y+2, Machine->pens[pen_switch_nut]);
+	tx0_plot_pixel(bitmap, x+2, y+5, Machine->pens[pen_switch_nut]);
+	tx0_plot_pixel(bitmap, x+5, y+5, Machine->pens[pen_switch_nut]);
 
 	/* draw button (->disc) */
 	if (! state)
 		y += 4;
 	for (i=0; i<2;i++)
 	{
-		plot_pixel(bitmap, x+3+i, y, Machine->pens[pen_switch_button]);
-		plot_pixel(bitmap, x+3+i, y+3, Machine->pens[pen_switch_button]);
+		tx0_plot_pixel(bitmap, x+3+i, y, Machine->pens[pen_switch_button]);
+		tx0_plot_pixel(bitmap, x+3+i, y+3, Machine->pens[pen_switch_button]);
 	}
 	for (i=0; i<4;i++)
 	{
-		plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_button]);
-		plot_pixel(bitmap, x+2+i, y+2, Machine->pens[pen_switch_button]);
+		tx0_plot_pixel(bitmap, x+2+i, y+1, Machine->pens[pen_switch_button]);
+		tx0_plot_pixel(bitmap, x+2+i, y+2, Machine->pens[pen_switch_button]);
 	}
 }
 
@@ -228,14 +232,14 @@ static void tx0_draw_string(mame_bitmap *bitmap, const char *buf, int x, int y, 
 static void tx0_draw_vline(mame_bitmap *bitmap, int x, int y, int height, int color)
 {
 	while (height--)
-		plot_pixel(bitmap, x, y++, color);
+		tx0_plot_pixel(bitmap, x, y++, color);
 }
 
 /* draw a horizontal line */
 static void tx0_draw_hline(mame_bitmap *bitmap, int x, int y, int width, int color)
 {
 	while (width--)
-		plot_pixel(bitmap, x++, y, color);
+		tx0_plot_pixel(bitmap, x++, y, color);
 }
 
 

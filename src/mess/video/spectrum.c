@@ -18,13 +18,17 @@
 #include "includes/spectrum.h"
 #include "eventlst.h"
 #include "video/border.h"
-#include "plotpixl.h"
 
 unsigned char *spectrum_characterram;
 unsigned char *spectrum_colorram;
 unsigned char *charsdirty;
 static int frame_number;    /* Used for handling FLASH 1 */
 static int flash_invert;
+
+INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 /***************************************************************************
   Start the video hardware emulation.
@@ -303,9 +307,9 @@ VIDEO_UPDATE( spectrum_128 )
                         for (b=0x80;b!=0;b>>=1)
                         {
                                 if (*scr&b)
-                                        plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,Machine->pens[ink]);
+                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,Machine->pens[ink]);
                                 else
-                                        plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,Machine->pens[pap]);
+                                        spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,Machine->pens[pap]);
 			}
                 scr++;
                 attr++;
@@ -373,13 +377,13 @@ static void ts2068_hires_scanline(mame_bitmap *bitmap, int y, int borderlines)
 		{
                         if (*scr&b)
 			{
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
 			}
 			else
 			{
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
 			}
 		}
                 scr++;
@@ -404,18 +408,18 @@ static void ts2068_64col_scanline(mame_bitmap *bitmap, int y, int borderlines, u
 		for (b=0x80;b!=0;b>>=1)
 		{
                         if (*scr1&b)
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[inkcolor]);
 			else
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[7-inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[7-inkcolor]);
 		}
                 scr1++;
 
 		for (b=0x80;b!=0;b>>=1)
 		{
                         if (*scr2&b)
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[inkcolor]);
 			else
-                                plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[7-inkcolor]);
+                                spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[7-inkcolor]);
 		}
                 scr2++;
 	}
@@ -452,13 +456,13 @@ static void ts2068_lores_scanline(mame_bitmap *bitmap, int y, int borderlines, i
 		{
 			if (*scr&b)
 			{
-				plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
-				plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[ink]);
 			}
 			else
 			{
-				plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
-				plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
+				spectrum_plot_pixel(bitmap,scrx++,scry+borderlines,Machine->pens[pap]);
 			}
 		}
 		scr++;

@@ -11,7 +11,6 @@
 
 #include "driver.h"
 #include "video/generic.h"
-#include "plotpixl.h"
 
 #include "includes/coupe.h"
 
@@ -49,11 +48,11 @@ void drawMode4_line(mame_bitmap *bitmap,int y)
 		}
 		x++;
 #else
-		plot_pixel(bitmap, x*2, y, Machine->pens[CLUT[tmp>>4]]);
-		plot_pixel(bitmap, x*2+1, y, Machine->pens[CLUT[tmp>>4]]);
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = Machine->pens[CLUT[tmp>>4]];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = Machine->pens[CLUT[tmp>>4]];
 		x++;
-		plot_pixel(bitmap, x*2, y, Machine->pens[CLUT[tmp&0x0F]]);
-		plot_pixel(bitmap, x*2+1, y, Machine->pens[CLUT[tmp&0x0F]]);				
+		*BITMAP_ADDR16(bitmap, y, x*2+0) = Machine->pens[CLUT[tmp&0x0F]];
+		*BITMAP_ADDR16(bitmap, y, x*2+1) = Machine->pens[CLUT[tmp&0x0F]];
 		x++;
 #endif
 	}

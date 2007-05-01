@@ -9,10 +9,14 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "includes/z88.h"
-#include "plotpixl.h"
 
 static int frame_number = 0;
 static int flash_invert = 0;
+
+INLINE void z88_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 /***************************************************************************
   Start the video hardware emulation.
@@ -66,7 +70,7 @@ static void z88_vh_render_8x8(mame_bitmap *bitmap, int x, int y, int pen0, int p
                   pen = pen0;
                 }
 
-                plot_pixel(bitmap, x+b, y+h, pen);
+                z88_plot_pixel(bitmap, x+b, y+h, pen);
 
                 data = data<<1;
             }
@@ -96,25 +100,25 @@ static void z88_vh_render_6x8(mame_bitmap *bitmap, int x, int y, int pen0, int p
 			  pen = pen0;
 			}
 
-			plot_pixel(bitmap, x+1+b, y+h, pen);
+			z88_plot_pixel(bitmap, x+1+b, y+h, pen);
 			data = data<<1;
 		}
 
-		plot_pixel(bitmap,x,y+h, pen0);
-		plot_pixel(bitmap,x+7,y+h, pen0);
+		z88_plot_pixel(bitmap,x,y+h, pen0);
+		z88_plot_pixel(bitmap,x+7,y+h, pen0);
 	}
 }
 
 static void z88_vh_render_line(mame_bitmap *bitmap, int x, int y,int pen)
 {
-	plot_pixel(bitmap, x, y+7, pen);
-	plot_pixel(bitmap, x+1, y+7, pen);
-	plot_pixel(bitmap, x+2, y+7, pen);
-	plot_pixel(bitmap, x+3, y+7, pen);
-	plot_pixel(bitmap, x+4, y+7, pen);
-	plot_pixel(bitmap, x+5, y+7, pen);
-	plot_pixel(bitmap, x+6, y+7, pen);
-	plot_pixel(bitmap, x+7, y+7, pen);
+	z88_plot_pixel(bitmap, x, y+7, pen);
+	z88_plot_pixel(bitmap, x+1, y+7, pen);
+	z88_plot_pixel(bitmap, x+2, y+7, pen);
+	z88_plot_pixel(bitmap, x+3, y+7, pen);
+	z88_plot_pixel(bitmap, x+4, y+7, pen);
+	z88_plot_pixel(bitmap, x+5, y+7, pen);
+	z88_plot_pixel(bitmap, x+6, y+7, pen);
+	z88_plot_pixel(bitmap, x+7, y+7, pen);
 }
 
 /* convert absolute offset into correct address to get data from */

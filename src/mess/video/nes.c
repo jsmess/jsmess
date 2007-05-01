@@ -13,7 +13,6 @@
 #include "video/generic.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
-#include "plotpixl.h"
 
 mame_bitmap *nes_zapper_hack;
 int nes_vram_sprite[8]; /* Used only by mmc5 for now */
@@ -110,11 +109,11 @@ static void draw_sight(mame_bitmap *bitmap, int playerNum, int x_center, int y_c
 
 	for(y = y_center-5; y < y_center+6; y++)
 		if((y >= 0) && (y < 256))
-			plot_pixel (bitmap, x_center, y, color);
+			*BITMAP_ADDR16(bitmap, y, x_center) = color;
 
 	for(x = x_center-5; x < x_center+6; x++)
 		if((x >= 0) && (x < 256))
-			plot_pixel (bitmap, x, y_center, color);
+			*BITMAP_ADDR16(bitmap, y_center, x) = color;
 }
 
 /***************************************************************************

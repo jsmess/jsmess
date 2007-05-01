@@ -18,7 +18,6 @@
 #include "i82720.h"
 #include "i82720cm.h"
 #include <math.h>
-#include "plotpixl.h"
 
 /*-------------------------------------------------------------------------*/
 /* Defines, constants, and global variables                                */
@@ -368,9 +367,9 @@ void gdc_plot_word(UINT32 address, UINT16 writeWord)
    for ( x = xBase; x < xBase+16; ++x ) {
       if ( (x < 640) && (y < 400) ) { /* FIXME */
          if ( writeWord & 0x8000 ) {
-            plot_pixel(gdc_mess.tmpbmp, x, y, 2);
+            *BITMAP_ADDR16(gdc_mess.tmpbmp, y, x) = 2;
          } else {
-            plot_pixel(gdc_mess.tmpbmp, x, y, 0);
+            *BITMAP_ADDR16(gdc_mess.tmpbmp, y, x) = 0;
          }
       }
       writeWord = rotright16(writeWord); /* Shift would do */

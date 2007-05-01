@@ -50,7 +50,6 @@
 #include "driver.h"
 #include "video/generic.h"
 #include "state.h"
-#include "plotpixl.h"
 
 #include "includes/crtc6845.h"
 #include "video/pc_cga.h"
@@ -843,9 +842,9 @@ INLINE void cga_plot_unit_4bpp(mame_bitmap *bitmap,
 	int i;
 
 	color = (videoram[offs] & 0xF0) >> 4;
-	for (i = 0; i < scale; i++) plot_pixel(bitmap, x++, y, Machine->pens[color]);
+	for (i = 0; i < scale; i++) *BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[color];
 	color = videoram[offs] & 0x0F;
-	for (i = 0; i < scale; i++) plot_pixel(bitmap, x++, y, Machine->pens[color]);
+	for (i = 0; i < scale; i++) *BITMAP_ADDR16(bitmap, y, x++) = Machine->pens[color];
 }
 
 
@@ -936,7 +935,7 @@ INLINE void pgfx_plot_unit_4bpp(mame_bitmap *bitmap,
 		color = ((values[0] & 0x3) << 1) | 
 			((values[1] & 2)   >> 1) |
 			((values[1] & 1)   << 3);
-		plot_pixel(bitmap, x+i, y, Machine->pens[color]);
+		*BITMAP_ADDR16(bitmap, y, x+i) = Machine->pens[color];
 		values[0]>>=2;
 		values[1]>>=2;
 	}
@@ -1130,7 +1129,7 @@ INLINE void pc1512_plot_unit(mame_bitmap *bitmap,
 	for (i=7; i>=0; i--)
 	{
 		color = (values[0]&1)|(values[1]&2)|(values[2]&4)|(values[3]&8);
-		plot_pixel(bitmap, x+i, y, Machine->pens[color]);
+		*BITMAP_ADDR16(bitmap, y, x+i) = Machine->pens[color];
 		values[0]>>=1;
 		values[1]>>=1;
 		values[2]>>=1;

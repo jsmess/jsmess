@@ -61,7 +61,6 @@
 #include "video/generic.h"
 #include "mscommon.h"
 #include "utils.h"
-#include "plotpixl.h"
 
 #define VERBOSE_DBG 1
 #include "includes/cbm.h"

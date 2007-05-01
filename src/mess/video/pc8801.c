@@ -6,7 +6,6 @@
 
 #include "driver.h"
 #include "includes/pc8801.h"
-#include "plotpixl.h"
 
 /* NPW 23-Oct-2001 - Adding this so that it compiles */
 #define palette_transparent_pen	0
@@ -85,6 +84,11 @@ static mame_bitmap *wbm1,*wbm2;
 #define TEXT_OLD(x,y) (text_old[(x)+(y)*80])
 #define ATTR_OLD(x,y) (attr_old[(x)+(y)*80])
 #define GRP_DIRTY(x,y) (graph_dirty[(x)+(y)*80])
+
+INLINE void pc8801_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 void pc8801_video_init (int hireso)
 {
@@ -517,8 +521,8 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x0000+x+y*2*80+gy*80] << gx) & 0x80) >> 7) |
 		  (((gVRAM[0x4000+x+y*2*80+gy*80] << gx) & 0x80) >> 6) |
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) >> 5);
-		plot_pixel(wbm1,x*8+gx,y*4+gy*2,Machine->pens[cg]);
-		plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,Machine->pens[17]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,Machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,Machine->pens[17]);
 	      }
 	    }
 	    break;
@@ -533,8 +537,8 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) &&
 		   disp_plane[2]) ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		plot_pixel(wbm1,x*8+gx,y*4+gy*2,Machine->pens[cg]);
-		plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,Machine->pens[17]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2,Machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy*2+1,Machine->pens[17]);
 	      }
 	    }
 	    break;
@@ -546,7 +550,7 @@ VIDEO_UPDATE( pc8801 )
 		   & 0x80) &&
 		  disp_plane[y<200 ? 0 : 1] ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		plot_pixel(wbm1,x*8+gx,y*4+gy,Machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*4+gy,Machine->pens[cg]);
 	      }
 	    }
 	    break;
@@ -564,7 +568,7 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x0000+x+y*2*80+gy*80] << gx) & 0x80) >> 7) |
 		  (((gVRAM[0x4000+x+y*2*80+gy*80] << gx) & 0x80) >> 6) |
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) >> 5);
-		plot_pixel(wbm1,x*8+gx,y*2+gy,Machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,Machine->pens[cg]);
 	      }
 	    }
 	    break;
@@ -579,7 +583,7 @@ VIDEO_UPDATE( pc8801 )
 		  (((gVRAM[0x8000+x+y*2*80+gy*80] << gx) & 0x80) &&
 		   disp_plane[2]) ?
 		  ((attr_new&TX_COL_MASK)>>TX_COL_SHIFT)+8 : 16;
-		plot_pixel(wbm1,x*8+gx,y*2+gy,Machine->pens[cg]);
+		pc8801_plot_pixel(wbm1,x*8+gx,y*2+gy,Machine->pens[cg]);
 	      }
 	    }
 	    break;

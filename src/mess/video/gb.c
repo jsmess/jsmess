@@ -15,7 +15,6 @@
 #include "includes/gb.h"
 #include "cpu/z80gb/z80gb.h"
 #include "profiler.h"
-#include "plotpixl.h"
 
 #define LCDCONT		gb_vid_regs[0x00]	/* LCD control register                       */
 #define LCDSTAT		gb_vid_regs[0x01]	/* LCD status register                        */
@@ -89,6 +88,11 @@ void (*update_scanline)(void);
 static void gb_lcd_timer_proc( int dummy );
 static void gb_vblank_delay_proc( int dummy );
 static void gb_lcd_switch_on( void );
+
+INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
+{
+	*BITMAP_ADDR16(bitmap, y, x) = (UINT16)color;
+}
 
 /*
   Select which sprites should be drawn for the current scanline and return the
@@ -176,7 +180,7 @@ INLINE void gb_update_sprites (void)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && !bg_zbuf[xindex])
-						plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data >>= 1;
 				}
 				break;
@@ -185,7 +189,7 @@ INLINE void gb_update_sprites (void)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour)
-						plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data >>= 1;
 				}
 				break;
@@ -194,7 +198,7 @@ INLINE void gb_update_sprites (void)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && !bg_zbuf[xindex])
-						plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data <<= 1;
 				}
 				break;
@@ -203,7 +207,7 @@ INLINE void gb_update_sprites (void)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour)
-						plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->pens[spal[colour]]);
 					data <<= 1;
 				}
 				break;
@@ -300,7 +304,7 @@ void gb_update_scanline (void) {
 				while ( i > 0 ) {
 					while ( ( gb_lcd.layer[l].xshift < 8 ) && i ) {
 						register int colour = ( ( data & 0x8000 ) ? 2 : 0 ) | ( ( data & 0x0080 ) ? 1 : 0 );
-						plot_pixel( bitmap, xindex, gb_lcd.current_line, Machine->pens[ gb_bpal[ colour ] ] );
+						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, Machine->pens[ gb_bpal[ colour ] ] );
 						bg_zbuf[ xindex ] = colour;
 						xindex++;
 						data <<= 1;
@@ -398,7 +402,7 @@ INLINE void sgb_update_sprites (void)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
 					data >>= 1;
 				}
 				break;
@@ -407,7 +411,7 @@ INLINE void sgb_update_sprites (void)
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour)
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
 					data >>= 1;
 				}
 				break;
@@ -416,7 +420,7 @@ INLINE void sgb_update_sprites (void)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour && !bg_zbuf[xindex - SGB_XOFFSET])
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
 					data <<= 1;
 				}
 				break;
@@ -425,7 +429,7 @@ INLINE void sgb_update_sprites (void)
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if ((xindex >= SGB_XOFFSET && xindex <= SGB_XOFFSET + 160) && colour)
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + spal[colour]]);
 					data <<= 1;
 				}
 				break;
@@ -489,7 +493,7 @@ void sgb_refresh_border(void) {
 				 */
 				if( !((yidx >= SGB_YOFFSET && yidx < SGB_YOFFSET + 144) &&
 					(xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160)) ) {
-					plot_pixel(bitmap, xindex, yidx, Machine->remapped_colortable[pal + colour]);
+					gb_plot_pixel(bitmap, xindex, yidx, Machine->remapped_colortable[pal + colour]);
 				}
 				xindex++;
 			}
@@ -621,7 +625,7 @@ void sgb_update_scanline (void) {
 				while( i > 0 ) {
 					while( ( gb_lcd.layer[l].xshift < 8 ) && i ) {
 						register int colour = ( ( data & 0x8000 ) ? 2 : 0 ) | ( ( data & 0x0080 ) ? 1 : 0 );
-						plot_pixel( bitmap, xindex + SGB_XOFFSET, gb_lcd.current_line + SGB_YOFFSET, Machine->remapped_colortable[ sgb_pal + gb_bpal[colour]] );
+						gb_plot_pixel( bitmap, xindex + SGB_XOFFSET, gb_lcd.current_line + SGB_YOFFSET, Machine->remapped_colortable[ sgb_pal + gb_bpal[colour]] );
 						bg_zbuf[xindex] = colour;
 						xindex++;
 						data <<= 1;
@@ -719,7 +723,7 @@ INLINE void cgb_update_sprites (void) {
 				{
 					register int colour = ((data & 0x0100) ? 2 : 0) | ((data & 0x0001) ? 1 : 0);
 					if (colour && !bg_zbuf[xindex])
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
 					data >>= 1;
 				}
 				break;
@@ -730,7 +734,7 @@ INLINE void cgb_update_sprites (void) {
 					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour)
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
 					data >>= 1;
 				}
 				break;
@@ -739,7 +743,7 @@ INLINE void cgb_update_sprites (void) {
 				{
 					register int colour = ((data & 0x8000) ? 2 : 0) | ((data & 0x0080) ? 1 : 0);
 					if (colour && !bg_zbuf[xindex])
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
 					data <<= 1;
 				}
 				break;
@@ -750,7 +754,7 @@ INLINE void cgb_update_sprites (void) {
 					if((bg_zbuf[xindex] & 0x80) && (bg_zbuf[xindex] & 0x7f) && (LCDCONT & 0x1))
 						colour = 0;
 					if (colour)
-						plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
+						gb_plot_pixel(bitmap, xindex, yindex, Machine->remapped_colortable[pal + colour]);
 					data <<= 1;
 				}
 				break;
@@ -873,7 +877,7 @@ void cgb_update_scanline (void) {
 							colour = ( ( data & 0x8000 ) ? 2 : 0 ) | ( ( data & 0x0080 ) ? 1 : 0 );
 							data <<= 1;
 						}
-						plot_pixel( bitmap, xindex, gb_lcd.current_line, Machine->remapped_colortable[ ( ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x07 ) * 4 ) + colour ] );
+						gb_plot_pixel( bitmap, xindex, gb_lcd.current_line, Machine->remapped_colortable[ ( ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x07 ) * 4 ) + colour ] );
 						bg_zbuf[ xindex ] = colour + ( gbcmap[ gb_lcd.layer[l].xindex ] & 0x80 );
 						xindex++;
 						gb_lcd.layer[l].xshift++;
