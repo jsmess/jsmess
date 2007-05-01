@@ -3,6 +3,8 @@
 Driver file to handle emulation of the Nintendo Pokemon Mini handheld
 by Wilbert Pol.
 
+The LCD is likely to be a SSD1828 LCD.
+
 ********************************************************************/
 
 #include "driver.h"
@@ -15,7 +17,7 @@ static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM							/* bios */
 	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM							/* VRAM/RAM */
 	AM_RANGE( 0x002000, 0x0020FF )  AM_READWRITE( pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */
-	AM_RANGE( 0x002100, 0xFFFFFF )  AM_NOP							/* cartridge area */
+	AM_RANGE( 0x002100, 0x1FFFFF )  AM_ROM							/* cartridge area */
 ADDRESS_MAP_END
 
 INPUT_PORTS_START( pokemini )
@@ -59,6 +61,10 @@ MACHINE_DRIVER_END
 static void pokemini_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
 	switch( state ) {
 	case DEVINFO_INT_COUNT:			info->i = 1; break;
+	case DEVINFO_INT_MUST_BE_LOADED:	info->i = 0; break;
+	case DEVINFO_PTR_INIT:			info->init = device_init_pokemini_cart; break;
+	case DEVINFO_PTR_LOAD:			info->load = device_load_pokemini_cart; break;
+	case DEVINFO_STR_FILE_EXTENSIONS:	strcpy( info->s = device_temp_str(), "min"); break;
 	default:				cartslot_device_getinfo( devclass, state, info ); break;
 	}
 }
@@ -68,7 +74,7 @@ SYSTEM_CONFIG_START( pokemini )
 SYSTEM_CONFIG_END
 
 ROM_START( pokemini )
-	ROM_REGION( 0x1000, REGION_CPU1, 0 )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 )
 	ROM_LOAD( "bios.min", 0x0000, 0x1000, CRC(aed3c14d) SHA1(daad4113713ed776fbd47727762bca81ba74915f) )
 ROM_END
 
