@@ -2,6 +2,17 @@
 #include "includes/pokemini.h"
 #include "cpu/minx/minx.h"
 
+struct VDP {
+	UINT8	colors_inverted;
+	UINT8	background_enabled;
+	UINT8	sprites_enabled;
+	UINT8	rendering_enabled;
+	UINT8	map_size;
+	UINT8	map_size_x;
+	UINT32	bg_tiles;
+	UINT32	spr_tiles;
+};
+
 struct TIMERS {
 	UINT8		seconds_running;	/* Seconds timer running */
 	UINT32		seconds_counter;	/* Seconds timer counter */
@@ -517,6 +528,15 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 		vdp.sprites_enabled = ( data & 0x04 ) ? 1 : 0;
 		vdp.rendering_enabled = ( data & 0x08 ) ? 1 : 0;
 		vdp.map_size = ( data >> 4 ) & 0x03;
+		switch( vdp.map_size ) {
+		case 0:
+			vdp.map_size_x = 12; break;
+		case 1:
+			vdp.map_size_x = 16; break;
+		case 2:
+		case 3:
+			vdp.map_size_x = 24; break;
+		}
 		break;
 	case 0x81:	/* LCD render refresh rate
 			   Bit 0   R/W Unknown
@@ -538,15 +558,19 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 3-7 R/W BG tile data memory offset bit 3-7
 			*/
 		data &= 0xF8;
+		vdp.bg_tiles = ( vdp.bg_tiles & 0xFFFF00 ) | data;
 		break;
 	case 0x83:	/* BG tile data memory offset (mid)
 			   Bit 0-7 R/W BG tile data memory offset bit 8-15
 			*/
+		vdp.bg_tiles = ( vdp.bg_tiles & 0xFF00FF ) | ( data << 8 );
 		break;
 	case 0x84:	/* BG tile data memory offset (high)
 			   Bit 0-4 R/W BG tile data memory offset bit 16-20
 			   Bit 5-7     Unused
 			*/
+		data &= 0x1F;
+		vdp.bg_tiles = ( vdp.bg_tiles & 0x00FFFF ) | ( data << 16 );
 		break;
 	case 0x85:	/* BG vertical move
 			   Bit 0-6 R/W Move the background up, move range:
@@ -569,15 +593,19 @@ WRITE8_HANDLER( pokemini_hwreg_w ) {
 			   Bit 6-7 R/W Sprite tile data memory offset bit 6-7
 			*/
 		data &= 0xC0;
+		vdp.spr_tiles = ( vdp.spr_tiles & 0xFFFF00 ) | data;
 		break;
 	case 0x88:	/* Sprite tile data memory offset (med)
 			   Bit 0-7 R/W Sprite tile data memory offset bit 8-15
 			*/
+		vdp.spr_tiles = ( vdp.spr_tiles & 0xFF00FF ) | ( data << 8 );
 		break;
 	case 0x89:	/* Sprite tile data memory offset (high)
 			   Bit 0-4 R/W Sprite tile data memory offset bit 16-20
 			   Bit 5-7     Unused
 			*/
+		data &= 0x1F;
+		vdp.spr_tiles = ( vdp.spr_tiles & 0x00FFFF ) | ( data << 16 );
 		break;
 	case 0x8A:	/* LCD status
 			   Bit 0   R   Unknown
@@ -643,4 +671,43 @@ DEVICE_LOAD( pokemini_cart ) {
 
 	return INIT_PASS;
 }
+
+void pokemini_render( void ) {
+	if ( vdp.background_enabled ) {
+		int x, y;
+		for ( y = 0; y < 8; y++ ) {
+			for ( x = 0; x < 12; x++ ) {
+				UINT8 tile = pokemini_ram[ 0x360 + ( y * vdp.map_size_x ) + x ];
+				int i;
+				for( i = 0; i < 8; i++ ) {
+					pokemini_ram[ ( y * 96 ) + ( x * 8 ) + i ] = program_read_byte_8( vdp.bg_tiles + ( tile * 8 ) + i );
+				}
+			}
+		}
+	}
+}
+
+INTERRUPT_GEN( pokemini_int ) {
+	/* Check if drawing is enabled */
+	if ( vdp.rendering_enabled ) {
+		int	x, y;
+
+		pokemini_render();
+
+		for( y = 0; y < 64; y += 8 ) {
+			for( x = 0; x < 96; x++ ) {
+				UINT8 data = pokemini_ram[ ( y * 12 ) + x ];
+				*BITMAP_ADDR16(tmpbitmap, y + 0, x) = ( data & 0x01 ) ? 3 : 0;
+				*BITMAP_ADDR16(tmpbitmap, y + 1, x) = ( data & 0x02 ) ? 3 : 0;
+				*BITMAP_ADDR16(tmpbitmap, y + 2, x) = ( data & 0x04 ) ? 3 : 0;
+				*BITMAP_ADDR16(tmpbitmap, y + 3, x) = ( data & 0x08 ) ? 3 : 0;
+				*BITMAP_ADDR16(tmpbitmap, y + 4, x) = ( data & 0x10 ) ? 3 : 0;
+				*BITMAP_ADDR16(tmpbitmap, y + 5, x) = ( data & 0x20 ) ? 3 : 0;
+				*BITMAP_ADDR16(tmpbitmap, y + 6, x) = ( data & 0x40 ) ? 3 : 0;
+				*BITMAP_ADDR16(tmpbitmap, y + 7, x) = ( data & 0x80 ) ? 3 : 0;
+			}
+		}
+	}
+}
+
 

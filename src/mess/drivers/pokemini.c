@@ -13,9 +13,11 @@ The LCD is likely to be a SSD1828 LCD.
 #include "cpu/minx/minx.h"
 #include "devices/cartslot.h"
 
+UINT8	*pokemini_ram;
+
 static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM							/* bios */
-	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM							/* VRAM/RAM */
+	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM AM_BASE( &pokemini_ram)				/* VRAM/RAM */
 	AM_RANGE( 0x002000, 0x0020FF )  AM_READWRITE( pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */
 	AM_RANGE( 0x002100, 0x1FFFFF )  AM_ROM							/* cartridge area */
 ADDRESS_MAP_END
@@ -32,9 +34,22 @@ INPUT_PORTS_START( pokemini )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Power")
 INPUT_PORTS_END
 
+static PALETTE_INIT( pokemini ) {
+	const unsigned char pokemini_pal[4][3] = {
+		{ 0xFF, 0xFB, 0x87 },
+		{ 0xB1, 0xAE, 0x4E },
+		{ 0x84, 0x80, 0x4E },
+		{ 0x4E, 0x4E, 0x4E }
+	};
+	int i;
+	for( i = 0; i < 4; i++ ) {
+		palette_set_color( machine, i, pokemini_pal[i][0], pokemini_pal[i][1], pokemini_pal[i][2] );
+	}
+}
+
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG( "main", MINX, 4096000 )
+	MDRV_CPU_ADD_TAG( "main", MINX, 4000000 )
 	MDRV_CPU_PROGRAM_MAP( pokemini_mem_map, 0 )
 
 	MDRV_INTERLEAVE(1)
@@ -45,12 +60,17 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
+	/* This still needs to be improved to actually match the hardware */
 	MDRV_VIDEO_ATTRIBUTES( VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 96, 64 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 95, 0, 63 )
 	MDRV_PALETTE_LENGTH( 4 )
-	MDRV_SCREEN_REFRESH_RATE( 60 )
+	MDRV_COLORTABLE_LENGTH( 4 )
+	MDRV_PALETTE_INIT( pokemini )
+	MDRV_SCREEN_REFRESH_RATE( 30 )
+	MDRV_SCREEN_VBLANK_TIME( DEFAULT_REAL_60HZ_VBLANK_DURATION )
+	MDRV_CPU_VBLANK_INT( pokemini_int, 1 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO( "left", "right" )
