@@ -63,6 +63,8 @@ UINT8 *c64_roml=0;
 UINT8 *c64_romh=0;
 UINT8 *c64_io_mirror = NULL;
 
+static UINT8 c64_port_data;
+
 static UINT8 *roml=0, *romh=0;
 static int ultimax = 0;
 int c64_tape_on = 1;
@@ -507,6 +509,18 @@ WRITE8_HANDLER( c64_write_io )
 	}
 }
 
+static UINT8 *c64_io_ram_w_ptr;
+static UINT8 *c64_io_ram_r_ptr;
+
+WRITE8_HANDLER(c64_ioarea_w)
+{
+	if ( c64_io_enabled ) {
+		c64_write_io( offset, data );
+	} else {
+		c64_io_ram_w_ptr[ offset ] = data;
+	}
+}
+
 READ8_HANDLER( c64_read_io )
 {
 	if (offset < 0x400)
@@ -521,6 +535,14 @@ READ8_HANDLER( c64_read_io )
 		return cia_1_r(offset);
 	DBG_LOG (1, "io read", ("%.3x\n", offset));
 	return 0xff;
+}
+
+READ8_HANDLER(c64_ioarea_r)
+{
+	if ( c64_io_enabled ) {
+		return c64_read_io( offset );
+	}
+	return c64_io_ram_r_ptr[ offset ];
 }
 
 /*
@@ -630,23 +652,31 @@ static void c64_bankswitch (int reset)
 		|| (charen && (loram || hiram)))
 	{
 		c64_io_enabled = 1;
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_read_io);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_write_io);
+//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_read_io);
+//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, c64_write_io);
+//		if ( cpu_getactivecpu() >= 0 )
+//			memory_set_opbase(activecpu_get_physical_pc_byte());
 	}
 	else
 	{
 		c64_io_enabled = 0;
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MRA8_BANK5);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MWA8_BANK6);
-		memory_set_bankptr (6, c64_memory + 0xd000);
-		if (!charen && (loram || hiram))
-		{
-			memory_set_bankptr (5, c64_chargen);
+		c64_io_ram_w_ptr = c64_memory + 0xd000;
+		if ( !charen && (loram || hiram)) {
+			c64_io_ram_r_ptr = c64_chargen;
+		} else {
+			c64_io_ram_r_ptr = c64_memory + 0xd000;
 		}
-		else
-		{
-			memory_set_bankptr (5, c64_memory + 0xd000);
-		}
+//		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MRA8_BANK5);
+//		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MWA8_BANK6);
+//		memory_set_bankptr (6, c64_memory + 0xd000);
+//		if (!charen && (loram || hiram))
+//		{
+//			memory_set_bankptr (5, c64_chargen);
+//		}
+//		else
+//		{
+//			memory_set_bankptr (5, c64_memory + 0xd000);
+//		}
 	}
 
 	if (!c64_game && c64_exrom)
@@ -662,6 +692,8 @@ static void c64_bankswitch (int reset)
 			memory_set_bankptr (7, c64_memory + 0xe000);
 		memory_set_bankptr (8, c64_memory + 0xe000);
 	}
+	/* make sure the opbase function gets called each time */
+	opcode_memory_max = 0xcfff;
 	game = c64_game;
 	exrom = c64_exrom;
 	old = data;
@@ -679,12 +711,35 @@ static void c64_bankswitch (int reset)
   p5 output cassette motor
   p6,7 not available on M6510
  */
-void c64_m6510_port_write(UINT8 data)
+void c64_m6510_port_write(UINT8 direction, UINT8 data)
 {
+	/* if line is marked as input then keep current value */
+	data = ( c64_port_data & ~direction ) | ( data & direction );
+
+	/* resistor makes cassette sense go high when P4 changes to input */
+	if ( ! ( direction & 0x10 ) ) {
+		data |= 0x10;
+	}
+	/* resistors make P0,P1,P2 go high when respective line is changed to input */
+	if ( ! ( direction & 0x04 ) ) {
+		data |= 0x04;
+	}
+	if ( ! ( direction & 0x02 ) ) {
+		data |= 0x02;
+	}
+	if ( ! ( direction & 0x01 ) ) {
+		data |= 0x01;
+	}
+	c64_port_data = data;
+
 	if (c64_tape_on)
 	{
-		vc20_tape_write (!(data & 8));
-		vc20_tape_motor (data & 0x20);
+		if ( direction & 0x08 ) {
+			vc20_tape_write (!(data & 8));
+		}
+		if ( direction & 0x20 ) {
+			vc20_tape_motor (data & 0x20);
+		}
 	}
 	if (is_c128())
 		c128_bankswitch_64 (0);
@@ -695,14 +750,18 @@ void c64_m6510_port_write(UINT8 data)
 	}
 	else if (!ultimax)
 		c64_bankswitch (0);
+	c64_memory[0x000] = program_read_byte_8( 0 );
+	c64_memory[0x001] = program_read_byte_8( 1 );
 }
 
-UINT8 c64_m6510_port_read(void)
+UINT8 c64_m6510_port_read(UINT8 direction)
 {
-	UINT8 data = 0xFF;
+	UINT8 data = c64_port_data;
 
 	if (c64_tape_on && !vc20_tape_switch ())
 		data &= ~0x10;
+	/* WP: motor is always marked as on??? */
+	data &= ~0x20;
 	if (is_c128() && !c128_capslock_r ())
 		data &= ~0x40;
 	if (is_c65() && C65_KEY_DIN)
@@ -908,19 +967,30 @@ void c64_common_init_machine (void)
 }
 
 OPBASE_HANDLER( c64_opbase ) {
-	if ( ( ( address & 0xf000 ) == 0xd000 ) && c64_io_enabled ) {
-		opcode_mask = 0x0fff;
-		opcode_arg_base = c64_io_mirror;
-		opcode_base = c64_io_mirror;
-		opcode_memory_min = 0xd000;
-		opcode_memory_max = 0x0fff;
-		return -1;
+	if ( ( address & 0xf000 ) == 0xd000 ) {
+		if ( c64_io_enabled ) {
+			opcode_mask = 0x0fff;
+			opcode_arg_base = c64_io_mirror;
+			opcode_base = c64_io_mirror;
+			opcode_memory_min = 0x0000;
+			opcode_memory_max = 0xcfff;
+			c64_io_mirror[address & 0x0fff] = c64_read_io( address & 0x0fff );
+		} else {
+			opcode_mask = 0x0fff;
+			opcode_arg_base = c64_io_ram_r_ptr;
+			opcode_base = c64_io_ram_r_ptr;
+			opcode_memory_min = 0x0000;
+			opcode_memory_max = 0xcfff;
+		}
+		return ~0;
 	}
 	return address;
 }
 
 MACHINE_START( c64 )
 {
+	c64_port_data = 0x17;
+
 	c64_io_mirror = auto_malloc( 0x1000 );
 	c64_common_init_machine ();
 

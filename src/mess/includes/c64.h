@@ -214,8 +214,8 @@ extern UINT8 *c64_kernal;
 extern UINT8 *c64_chargen;
 extern UINT8 *c64_memory;
 
-UINT8 c64_m6510_port_read(void);
-void c64_m6510_port_write(UINT8 data);
+UINT8 c64_m6510_port_read(UINT8 direction);
+void c64_m6510_port_write(UINT8 direction, UINT8 data);
 
 READ8_HANDLER ( c64_colorram_read );
 WRITE8_HANDLER ( c64_colorram_write );
@@ -234,6 +234,8 @@ void c64_rom_load(void);
 void c64_rom_recognition (void);
 
 /* private area */
+READ8_HANDLER(c64_ioarea_r);
+WRITE8_HANDLER(c64_ioarea_w);
 
 WRITE8_HANDLER ( c64_write_io );
 READ8_HANDLER ( c64_read_io );
