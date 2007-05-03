@@ -43,6 +43,7 @@
 {
     UINT32 pc;
     UINT32 insn;
+    static UINT32 ppc;
 
     ARM7_ICOUNT = cycles;
     do
@@ -58,6 +59,7 @@
 		INT32 offs;
 		pc = R15;
 		insn = cpu_readop16(pc & (~1));
+		ppc = pc & 0xfffffffe;
 		ARM7_ICOUNT += (3 - thumbCycles[insn >> 8]);
 		switch( ( insn & THUMB_INSN_TYPE ) >> THUMB_INSN_TYPE_SHIFT )
 		{
@@ -476,6 +478,12 @@
 										{
 											R15 += 2;
 										}
+
+									        if( rd == 7 )
+					                                        {
+                                            						R15 &= ~1;
+											change_pc(R15);
+                                        					}
 										break;
 									case 0x3:	// MOV Hd, Hs
 										rs = ( insn & THUMB_HIREG_RS ) >> THUMB_HIREG_RS_SHIFT;
@@ -485,6 +493,11 @@
 										{
 											R15 += 2;
 										}
+									        if( rd == 7 )
+					                                        {
+                                            						R15 &= ~1;
+											change_pc(R15);
+                                        					}
 										break;
 									default:
 										fatalerror("%08x: G4-2 Undefined Thumb instruction: %04x (%x)\n", pc, insn, ( insn & THUMB_HIREG_H ) >> THUMB_HIREG_H_SHIFT);
@@ -739,9 +752,7 @@
 						SET_REGISTER( 13, GET_REGISTER(13) + ( ( insn & THUMB_INSN_IMM_S ) ? -( addr << 2 ) : ( addr << 2 ) ) );
 						R15 += 2;
 						break;
-					case 0x5: /* PUSH {Rlist}{LR} */
-						SET_REGISTER( 13, GET_REGISTER(13) - 4 );
-						WRITE32( GET_REGISTER(13), GET_REGISTER(14) );
+					case 0x4: /* PUSH {Rlist} */
 						for( offs = 7; offs >= 0; offs-- )
 						{
 							if( insn & ( 1 << offs ) )
@@ -752,7 +763,9 @@
 						}
 						R15 += 2;
 						break;
-					case 0x4: /* PUSH {Rlist} */
+					case 0x5: /* PUSH {Rlist}{LR} */
+						SET_REGISTER( 13, GET_REGISTER(13) - 4 );
+						WRITE32( GET_REGISTER(13), GET_REGISTER(14) );
 						for( offs = 7; offs >= 0; offs-- )
 						{
 							if( insn & ( 1 << offs ) )
@@ -965,10 +978,13 @@
 						}
 						break;
 					case COND_AL:
-						R15 += offs;
-						break;
-					case COND_NV:
+						fatalerror("%08x: Undefined Thumb instruction: %04x (ARM9 reserved)\n", pc, insn);
 						R15 += 2;
+						break;
+
+					case COND_NV:	// SWI (this is sort of a "hole" in the opcode encoding)
+				                ARM7.pendingSwi = 1;
+				                ARM7_CHECKIRQ;
 						break;
 				}
 				break;

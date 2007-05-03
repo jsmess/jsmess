@@ -562,6 +562,7 @@ static void arm7_check_irq_state(void)
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x10;                             /* IRQ Vector address */
+	change_pc(R15);
         ARM7.pendingAbtD = 0;
         return;
     }
@@ -574,6 +575,7 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIRQ*/
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x1c;                             /* IRQ Vector address */
+	change_pc(R15);
         return;
     }
 
@@ -585,6 +587,7 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x18;                             /* IRQ Vector address */
+	change_pc(R15);
         return;
     }
 
@@ -595,6 +598,7 @@ static void arm7_check_irq_state(void)
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x0c;                             /* IRQ Vector address */
+	change_pc(R15);
         ARM7.pendingAbtP = 0;
         return;
     }
@@ -606,6 +610,7 @@ static void arm7_check_irq_state(void)
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x04;                             /* IRQ Vector address */
+	change_pc(R15);
         ARM7.pendingUnd = 0;
         return;
     }
@@ -613,11 +618,20 @@ static void arm7_check_irq_state(void)
     //Software Interrupt
     if (ARM7.pendingSwi) {
         SwitchMode(eARM7_MODE_SVC);             /* Set SVC mode so PC is saved to correct R14 bank */
-        SET_REGISTER( 14, pc );                 /* save PC to R14 */
+	// compensate for prefetch (should this also be done for normal IRQ?)
+	if (T_IS_SET(GET_CPSR))
+	{
+	        SET_REGISTER( 14, pc-2 );                 /* save PC to R14 */
+	}
+	else
+	{
+	        SET_REGISTER( 14, pc );                 /* save PC to R14 */
+	}
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
-        SET_CPSR(GET_CPSR & ~T_MASK);
-        R15 = 0x08;                             /* IRQ Vector address */
-        ARM7.pendingSwi = 0;
+        SET_CPSR(GET_CPSR & ~T_MASK);		/* Go to ARM mode */
+        R15 = 0x08;				/* Jump to the SWI vector */
+	change_pc(R15);
+        ARM7.pendingSwi = 0;								   
         return;
     }
 }
@@ -1086,36 +1100,30 @@ static void HandleHalfWordDT(UINT32 insn)
 
 static void HandleSwap(UINT32 insn)
 {
-    //According to manual - swap is an LDR followed by an STR and all endian rules apply
-    //Process: Read original data from address pointed by Rn then store data from address
-    //         pointed by Rm to Rn address, and store original data from Rn to Rd.
-    // Todo: I have no valid source to verify this function works.. so it needs to be tested
-    UINT32 rn,rnv,rm,rmv,rd;
+    UINT32 rn, rm, rd, tmp;
 
-    rn = GET_REGISTER((insn>>16)&0xf);
-    rm = GET_REGISTER(insn&0xf);
-    rd = GET_REGISTER((insn>>12)&0xf);
+    rn = GET_REGISTER((insn>>16)&0xf);	// reg. w/read address
+    rm = GET_REGISTER(insn&0xf);	// reg. w/write address
+    rd = (insn>>12)&0xf;		// dest reg
 
     #if ARM7_DEBUG_CORE
     if(rn == 15 || rm == 15 || rd == 15)
         LOG(("%08x: Illegal use of R15 in Swap Instruction\n",R15));
     #endif
 
-    //Byte Swap?
+    // can be byte or word
     if(insn & 0x400000)
     {
-        rnv = READ8(rn) & 0xff; //mask to 8 bit just in case
-        rmv = READ8(rm) & 0xff;
+    	tmp = READ8(rn);
+	WRITE8(rn, rm);
+	SET_REGISTER(rd, tmp);
     }
     else
     {
-        rnv = READ32(rn);
-        rmv = READ32(rm);
+        tmp = READ32(rn);
+	WRITE32(rn, rm);
+	SET_REGISTER(rd, tmp);
     }
-
-    //Do the swap
-    SET_REGISTER(rn,rmv);
-    SET_REGISTER(rd,rnv);
 
     R15 += 4;
     //Instruction takes 1S+2N+1I cycles - so we subtract one more..
