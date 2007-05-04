@@ -34,6 +34,7 @@
 #include "m32opts.h"
 #include "m32util.h"
 #include "win32ui.h"
+#include "unzip.h"
 
 /***************************************************************************
     function prototypes
@@ -176,66 +177,103 @@ void FreeScreenShot(void)
 	current_image_type = -1;
 }
 
+static const zip_file_header *zip_file_seek_file(zip_file *zip, const char *filename)
+{
+	const zip_file_header *header;
+
+	header = zip_file_first_file(zip);
+	while(header && strcmp(header->filename, filename))
+	{
+		header = zip_file_next_file(zip);
+	}
+	return header;
+}
+
 BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 {
 	file_error filerr;
-	mame_file *mfile = NULL;
+	zip_error ziperr;
+	core_file *file = NULL;
+	zip_file *zip;
+	const zip_file_header *zip_header;
 	char *fname;
-	BOOL success;
-	const char *zip_name = NULL;
+	BOOL success = FALSE;
+	const char *dir_name;
+	const char *zip_name;
+	void *buffer = NULL;
 
 	switch (pic_type)
 	{
-	case TAB_SCREENSHOT :
-		zip_name = "snap";
-		break;
-	case TAB_FLYER :
-		zip_name = "flyers";
-		break;
-	case TAB_CABINET :
-		zip_name = "cabinets";
-		break;
-	case TAB_MARQUEE :
-		zip_name = "marquees";
-		break;
-	case TAB_TITLE :
-		zip_name = "titles";
-		break;
-	case TAB_CONTROL_PANEL :
-		zip_name = "cpanel";
-		break;
-	case BACKGROUND :
-		zip_name = "bkground";
-		break;
-	default :
-		// in case a non-image tab gets here, which can happen
-		return FALSE;
+		case TAB_SCREENSHOT:
+			dir_name = GetImgDir();
+			zip_name = "snap";
+			break;
+		case TAB_FLYER:
+			dir_name = GetFlyerDir();
+			zip_name = "flyers";
+			break;
+		case TAB_CABINET:
+			dir_name = GetCabinetDir();
+			zip_name = "cabinets";
+			break;
+		case TAB_MARQUEE:
+			dir_name = GetMarqueeDir();
+			zip_name = "marquees";
+			break;
+		case TAB_TITLE:
+			dir_name = GetTitlesDir();
+			zip_name = "titles";
+			break;
+		case TAB_CONTROL_PANEL:
+			dir_name = GetControlPanelDir();
+			zip_name = "cpanel";
+			break;
+		case BACKGROUND:
+			dir_name = GetBgDir();
+			zip_name = "bkground";
+			break;
+		default :
+			// in case a non-image tab gets here, which can happen
+			return FALSE;
 	}
 	
 	// look for the raw file
-	fname = assemble_2_strings(filename, ".png");
-	filerr = mame_fopen_options(Mame32Global(), SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
+	fname = assemble_4_strings(dir_name, PATH_SEPARATOR, filename, ".png");
+	filerr = core_fopen(fname, OPEN_FLAG_READ, &file);
 	free(fname);
+
 	if (filerr != FILERR_NONE)
 	{
-		// and look for the zip
-		fname = assemble_4_strings(zip_name, PATH_SEPARATOR, filename, ".png");
-		filerr = mame_fopen_options(Mame32Global(), SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
+		// look into zip file
+		fname = assemble_2_strings(zip_name, ".zip");
+		ziperr = zip_file_open(fname, &zip);
 		free(fname);
+		if (ziperr == ZIPERR_NONE)
+		{
+			fname = assemble_2_strings(filename, ".png");
+			zip_header = zip_file_seek_file(zip, fname);
+			free(fname);
+
+			if (zip_header != NULL)
+			{
+				buffer = malloc(zip_header->uncompressed_length);
+				ziperr = zip_file_decompress(zip, buffer, zip_header->uncompressed_length);
+				if (ziperr == ZIPERR_NONE)
+				{
+					filerr = core_fopen_ram(buffer, zip_header->uncompressed_length, OPEN_FLAG_READ, &file);
+				}
+			}
+		}
 	}
-	if (filerr != FILERR_NONE)
+
+	if (filerr == FILERR_NONE)
 	{
-		// and look for the new format
-		fname = assemble_3_strings(filename, PATH_SEPARATOR, "0000.png");
-		filerr = mame_fopen_options(Mame32Global(), SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &mfile);
-		free(fname);
+		success = png_read_bitmap_gui(file, phDIB, pPal);
+		core_fclose(file);
 	}
-	if (filerr != FILERR_NONE)
-		return FALSE;
 
-	success = png_read_bitmap_gui(mame_core_file(mfile), phDIB, pPal);
-
-	mame_fclose(mfile);
+	if (buffer)
+		free(buffer);
 
 	return success;
 }

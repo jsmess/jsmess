@@ -41,7 +41,7 @@ const options_entry mess_core_options[] =
 	for all devices on a driver
 -------------------------------------------------*/
 
-void mess_enumerate_devices(core_options *opts, const game_driver *gamedrv,
+static void mess_enumerate_devices(core_options *opts, const game_driver *gamedrv,
 	void (*proc)(core_options *opts, const game_driver *gamedrv, const device_class *devclass, int device_index, int global_index))
 {
 	struct SystemConfigurationParamBlock cfg;

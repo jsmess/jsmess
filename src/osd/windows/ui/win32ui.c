@@ -853,9 +853,6 @@ static DWORD RunMAME(int nGameIndex)
 	else
 		pOpts = GetGameOptions(nGameIndex, NO_FOLDER);
 
-	// clear out existing MAME options
-	mame_options_init(mame_win_options);
-
 #ifdef MESS
 	// add MESS specific device options
 	mess_add_device_options(mame_options(), drivers[nGameIndex]);

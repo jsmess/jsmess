@@ -542,11 +542,13 @@ static void read_control(datamap *map, HWND control, core_options *opts, datamap
 			{
 				case DM_INT:
 					int_value = (int) float_value;
-					options_set_int(opts, option_name, int_value);
+					if (int_value != options_get_int(opts, option_name))
+						options_set_int(opts, option_name, int_value);
 					break;
 
 				case DM_FLOAT:
-					options_set_float(opts, option_name, float_value);
+					if (float_value != options_get_float(opts, option_name))
+						options_set_float(opts, option_name, float_value);
 					break;
 
 				default:

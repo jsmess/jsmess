@@ -313,15 +313,15 @@ static void DevView_ButtonClick(HWND hwndDevView, struct DevViewEntry *pEnt, HWN
 	hMenu = CreatePopupMenu();
 
 	if (pDevViewInfo->pCallbacks->pfnGetOpenFileName)
-		AppendMenu(hMenu, MF_STRING, 1, ui_getstring(UI_mount));
+		AppendMenu(hMenu, MF_STRING, 1, TEXT("Mount..."));
 
 	if (pEnt->dev->creatable)
 	{
 		if (pDevViewInfo->pCallbacks->pfnGetCreateFileName)
-			AppendMenu(hMenu, MF_STRING, 2, ui_getstring(UI_create));
+			AppendMenu(hMenu, MF_STRING, 2, TEXT("Create..."));
 	}
 
-	AppendMenu(hMenu, MF_STRING, 3, ui_getstring(UI_unmount));
+	AppendMenu(hMenu, MF_STRING, 3, TEXT("Unmount"));
 
 	GetWindowRect(hwndButton, &r);
 	rc = TrackPopupMenu(hMenu, TPM_TOPALIGN | TPM_NONOTIFY | TPM_RETURNCMD,

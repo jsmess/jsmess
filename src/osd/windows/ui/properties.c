@@ -114,8 +114,8 @@ static void InitializeControllerMappingUI(HWND hwnd);
 static void PropToOptions(HWND hWnd, core_options *o);
 static void OptionsToProp(HWND hWnd, core_options *o);
 static void SetPropEnabledControls(HWND hWnd);
-static void SelectEffect(HWND hWnd);
-static void ResetEffect(HWND hWnd);
+static BOOL SelectEffect(HWND hWnd);
+static BOOL ResetEffect(HWND hWnd);
 
 static void BuildDataMap(void);
 static void ResetDataMap(HWND hWnd);
@@ -430,6 +430,9 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 	PROPSHEETHEADER pshead;
 	PROPSHEETPAGE   *pspage;
 
+	// clear globals
+	pGameOpts = NULL;
+
 	g_nGame = GLOBAL_OPTIONS;
 
 	/* Get default options to populate property sheets */
@@ -479,6 +482,9 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 {
 	PROPSHEETHEADER pshead;
 	PROPSHEETPAGE   *pspage;
+
+	// clear globals
+	pGameOpts = NULL;
 
 	if (highlight_brush == NULL)
 		highlight_brush = CreateSolidBrush(HIGHLIGHT_COLOR);
@@ -1071,11 +1077,11 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				break;
 
 			case IDC_SELECT_EFFECT:
-				SelectEffect(hDlg);
+				changed = SelectEffect(hDlg);
 				break;
 
 			case IDC_RESET_EFFECT:
-				ResetEffect(hDlg);
+				changed = ResetEffect(hDlg);
 				break;
 
 			case IDC_PROP_RESET:
@@ -1117,6 +1123,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 
 					// NPW 20-Apr-2007 - I hate this code.  WTF were people thinking!  This
 					// code has more spaghetti than the entire nation of Italy
+					SaveGameOptions(g_nGame);
 					pGameOpts = GetGameOptions(g_nGame, -1);
 					datamap_populate_all_controls(properties_datamap, hDlg, pGameOpts);
 					OptionsToProp(hDlg, pGameOpts);
@@ -1249,9 +1256,9 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				}
 				else if (g_nGame == FOLDER_OPTIONS)
 				{
-					pGameOpts = pGameOpts;
+					pGameOpts = GetFolderOptions(g_nFolder, (g_nFolder == FOLDER_VECTOR));
 					datamap_read_all_controls(properties_datamap, hDlg, pGameOpts);
-					//origGameOpts = GetFolderOptions(g_nFolder);
+					SaveFolderOptions(g_nFolder, g_nFolderGame);
 				}
 				else
 				{
@@ -1275,16 +1282,12 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				/* Save Changes to the options here. */
 				datamap_read_all_controls(properties_datamap, hDlg, pGameOpts);
 				ResetDataMap(hDlg);
-				if (g_nGame > -1)
-					SetGameUsesDefaults(g_nGame,g_bUseDefaults);
 				SetWindowLong(hDlg, DWL_MSGRESULT, FALSE);
 				return 1;  
 
 			case PSN_RESET:
 				// Reset to the original values. Disregard changes
 				options_copy(pGameOpts, origGameOpts);
-				if (g_nGame > -1)
-					SetGameUsesDefaults(g_nGame,orig_uses_defaults);
 				SetWindowLong(hDlg, DWL_MSGRESULT, FALSE);
 				break;
 
@@ -2272,11 +2275,6 @@ static void BuildDataMap(void)
 	datamap_add(properties_datamap, IDC_BIOS,					DM_STRING,	OPTION_BIOS);
 	datamap_add(properties_datamap, IDC_ENABLE_AUTOSAVE,		DM_BOOL,	OPTION_AUTOSAVE);
 	datamap_add(properties_datamap, IDC_MULTITHREAD_RENDERING,	DM_BOOL,	WINOPTION_MULTITHREADING);
-#ifdef MESS
-	datamap_add(properties_datamap, IDC_RAM_COMBOBOX,			DM_BOOL,	OPTION_RAMSIZE);
-	datamap_add(properties_datamap, IDC_SKIP_WARNINGS,			DM_BOOL,	OPTION_SKIP_WARNINGS);
-	datamap_add(properties_datamap, IDC_USE_NEW_UI,				DM_BOOL,	"newui");
-#endif // MESS
 
 	// set up callbacks
 	datamap_set_callback(properties_datamap, IDC_ROTATE,		DCT_READ_CONTROL,		RotateReadControl);
@@ -2310,6 +2308,13 @@ static void BuildDataMap(void)
 
 	// trackbar ranges
 	datamap_set_trackbar_range(properties_datamap, IDC_PRESCALE,    1, 10, 1);
+	datamap_set_trackbar_range(properties_datamap, IDC_JDZ,         0.00,  1.00, 0.05);
+	datamap_set_trackbar_range(properties_datamap, IDC_JSAT,        0.00,  1.00, 0.05);
+
+#ifdef MESS
+	// MESS specific stuff
+	MessBuildDataMap(properties_datamap, g_nGame);
+#endif // MESS
 }
 
 BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts )
@@ -2795,7 +2800,7 @@ static void InitializeBIOSUI(HWND hwnd)
 			if (DriverHasOptionalBIOS(g_nFolderGame) == FALSE)
 			{
 				ComboBox_InsertString(hCtrl, i, "None");
-				ComboBox_SetItemData( hCtrl, i++, "none");
+				ComboBox_SetItemData( hCtrl, i++, "default");
 				return;
 			}
 			ComboBox_InsertString(hCtrl, i, "Default");
@@ -2833,9 +2838,11 @@ static void InitializeBIOSUI(HWND hwnd)
 	}
 }
 
-static void SelectEffect(HWND hWnd)
+static BOOL SelectEffect(HWND hWnd)
 {
 	char filename[MAX_PATH];
+	BOOL changed = FALSE;
+
 	*filename = 0;
 	if (CommonFileDialog(GetOpenFileName, filename, FILETYPE_EFFECT_FILES))
 	{
@@ -2854,13 +2861,29 @@ static void SelectEffect(HWND hWnd)
 			buff[l++] = filename[i];
 		}
 		buff[l] = '\0';
-		SetWindowText(GetDlgItem(hWnd, IDC_EFFECT), buff );
+
+		if (strcmp(buff, options_get_string(pGameOpts, WINOPTION_EFFECT)))
+		{
+			options_set_string(pGameOpts, WINOPTION_EFFECT, buff);
+			datamap_populate_control(properties_datamap, hWnd, pGameOpts, IDC_EFFECT);
+			changed = TRUE;
+		}
 	}
+	return changed;
 }
 
-static void ResetEffect(HWND hWnd)
+static BOOL ResetEffect(HWND hWnd)
 {
-	SetWindowText(GetDlgItem(hWnd, IDC_EFFECT), "none" );
+	BOOL changed = FALSE;
+	const char *new_value = "none";
+
+	if (strcmp(new_value, options_get_string(pGameOpts, WINOPTION_EFFECT)))
+	{
+		options_set_string(pGameOpts, WINOPTION_EFFECT, new_value);
+		datamap_populate_control(properties_datamap, hWnd, pGameOpts, IDC_EFFECT);
+		changed = TRUE;
+	}
+	return changed;
 }
 
 

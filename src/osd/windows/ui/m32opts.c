@@ -2528,7 +2528,7 @@ static file_error SaveSettingsFile(core_options *opts, const char *filename)
 
 	if (opts != NULL)
 	{
-		filerr = core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+		filerr = core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
 		{
 			options_output_ini_file(opts, file);
@@ -2634,11 +2634,7 @@ void LoadFolderOptions(int folder_index )
 		return;
 
 	options_copy(folder_options[redirect_index], global);
-	if (!LoadSettingsFile(folder_options[redirect_index], filename))
-	{
-		// uses globals
-		options_copy(folder_options[redirect_index], global);
-	}
+	LoadSettingsFile(folder_options[redirect_index], filename);
 }
 
 DWORD GetFolderFlags(int folder_index)
@@ -2736,6 +2732,7 @@ void SaveFolderOptions(int folder_index, int game_index)
 {
 	int redirect_index;
 	char filename[MAX_PATH];
+	core_options *opts;
 
 	GetFolderSettingsFileName(folder_index, filename, ARRAY_LENGTH(filename));
 	
@@ -2744,8 +2741,8 @@ void SaveFolderOptions(int folder_index, int game_index)
 	if( redirect_index < 0)
 		return;
 
-	options_copy(folder_options[redirect_index], global);
-	SaveSettingsFile(folder_options[redirect_index], filename);
+	opts = GetFolderUsesDefaults(folder_index, game_index) ? NULL : folder_options[redirect_index];
+	SaveSettingsFile(opts, filename);
 }
 
 

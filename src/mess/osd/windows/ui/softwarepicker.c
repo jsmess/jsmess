@@ -367,7 +367,7 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 
 	// Determine which hash functions we need to use for this file, and which hashes
 	// have already been calculated
-	if (pPickerInfo->pHashFile)
+	if ((pPickerInfo->pHashFile != NULL) && (pFileInfo->devclass.get_info != NULL))
 	{
 		type = (iodevice_t) (int) device_get_info_int(&pFileInfo->devclass, DEVINFO_INT_TYPE);
 		if (type < IO_COUNT)

@@ -15,6 +15,7 @@
 #include "driver.h"
 #include "device.h"
 #include "ui/screenshot.h"
+#include "ui/datamap.h"
 #include "ui/bitmask.h"
 #include "ui/mame32.h"
 #include "ui/directories.h"
@@ -26,6 +27,7 @@
 #include "propertiesms.h"
 #include "optionsms.h"
 #include "ms32util.h"
+#include "messopts.h"
 
 static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCSTR lpItem);
 static BOOL SoftwareDirectories_OnDelete(HWND hDlg);
@@ -34,6 +36,8 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR);
 
 extern BOOL BrowseForDirectory(HWND hwnd, const char* pStartDir, char* pResult);
 BOOL g_bModifiedSoftwarePaths = FALSE;
+
+static int s_nGame;
 
 static void MarkChanged(HWND hDlg)
 {
@@ -399,4 +403,51 @@ BOOL MessPropertiesCommand(int nGame, HWND hWnd, WORD wNotifyCode, WORD wID, BOO
 
 void MessSetPropEnabledControls(HWND hWnd, core_options *o)
 {
+}
+
+static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+{
+	int count, i, default_index;
+	const game_driver *gamedrv = drivers[s_nGame];
+	UINT32 ram, default_ram;
+	char buffer[64];
+	const char *this_ram_string;
+
+	ComboBox_ResetContent(control);
+
+	count = ram_option_count(gamedrv);
+	EnableWindow(control, count > 0);
+
+	if (count > 0)
+	{
+		default_ram = ram_default(gamedrv);
+		default_index = 0;
+
+		for (i = 0; i < count; i++)
+		{
+			ram = ram_option(gamedrv, i);
+			this_ram_string = mame_strdup(ram_string(buffer, ram));
+
+			ComboBox_InsertString(control, i, this_ram_string);
+			ComboBox_SetItemData(control, i, this_ram_string);
+
+			if (ram == default_ram)
+				default_index = i;
+		}
+		ComboBox_SetCurSel(control, default_index);
+	}
+}
+
+void MessBuildDataMap(datamap *properties_datamap, int nGame)
+{
+	// yuck
+	s_nGame = nGame;
+
+	// MESS specific stuff
+	datamap_add(properties_datamap, IDC_RAM_COMBOBOX,			DM_INT,		OPTION_RAMSIZE);
+	datamap_add(properties_datamap, IDC_SKIP_WARNINGS,			DM_BOOL,	OPTION_SKIP_WARNINGS);
+	datamap_add(properties_datamap, IDC_USE_NEW_UI,				DM_BOOL,	"newui");
+
+	// set up callbacks
+	datamap_set_callback(properties_datamap, IDC_RAM_COMBOBOX,	DCT_POPULATE_CONTROL,	RamPopulateControl);
 }
