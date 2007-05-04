@@ -139,7 +139,6 @@ const char *GetHashDirs(void)
 void SetHashDirs(const char *paths)
 {
 	options_set_string(Mame32Global(), OPTION_HASHPATH, paths);
-	options_set_string(mame_options(), OPTION_HASHPATH, paths);
 }
 
 void SetSelectedSoftware(int driver_index, const device_class *devclass, int device_inst, const char *software)
