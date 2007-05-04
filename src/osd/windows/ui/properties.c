@@ -1181,7 +1181,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						changed = datamap_read_control(properties_datamap, hDlg, pGameOpts, wID);
 					}
 				}
-				else if (!_tcscmp(szClass, WC_BUTTON))
+				else if (!_tcscmp(szClass, WC_BUTTON) && (GetWindowLong(hWndCtrl, GWL_STYLE) & BS_CHECKBOX))
 				{
 					// check box
 					changed = datamap_read_control(properties_datamap, hDlg, pGameOpts, wID);
