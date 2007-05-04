@@ -1580,8 +1580,6 @@ int TC0080VCO_vh_start(int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_f
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
 		Machine->gfx[gfx_index] = allocgfx(&TC0080VCO_charlayout);
-		if (!Machine->gfx[gfx_index])
-			return 1;
 
 		/* set the color information */
 		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
@@ -2355,8 +2353,6 @@ int TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_x
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
 		Machine->gfx[gfx_index] = allocgfx(&TC0100SCN_charlayout);
-		if (!Machine->gfx[gfx_index])
-			return 1;
 
 		/* set the color information */
 		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;
@@ -3240,8 +3236,6 @@ int TC0480SCP_vh_start(int gfxnum,int pixels,int x_offset,int y_offset,int text_
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
 		Machine->gfx[gfx_index] = allocgfx(&TC0480SCP_charlayout);
-		if (!Machine->gfx[gfx_index])
-			return 1;
 
 		/* set the color information */
 		Machine->gfx[gfx_index]->colortable = Machine->remapped_colortable;

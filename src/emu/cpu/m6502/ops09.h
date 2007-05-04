@@ -40,25 +40,25 @@
  *  RDOP    read an opcode
  ***************************************************************/
 #undef RDOP
-#define RDOP() cpu_readop((PCW++)|PB)
+#define RDOP() cpu_readop((PCW++)|PB); m6502_ICount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #undef RDOPARG
-#define RDOPARG() cpu_readop_arg((PCW++)|PB)
+#define RDOPARG() cpu_readop_arg((PCW++)|PB); m6502_ICount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
 #undef RDMEM
-#define RDMEM(addr) program_read_byte_8(addr)
+#define RDMEM(addr) program_read_byte_8(addr); m6502_ICount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
 #undef WRMEM
-#define WRMEM(addr,data) program_write_byte_8(addr,data)
+#define WRMEM(addr,data) program_write_byte_8(addr,data); m6502_ICount -= 1
 
 /***************************************************************
  * push a register onto the stack
@@ -87,7 +87,7 @@
  ***************************************************************/
 #undef EA_ZPX
 #define EA_ZPX													\
-	ZPL = RDOPARG() + X;										\
+	ZPL = X + RDOPARG();										\
 	ZPWH = PBWH;												\
     EAD = ZPD
 
@@ -96,7 +96,7 @@
  ***************************************************************/
 #undef EA_ZPY
 #define EA_ZPY													\
-	ZPL = RDOPARG() + Y;										\
+	ZPL = Y + RDOPARG();										\
 	ZPWH = PBWH;												\
     EAD = ZPD
 
@@ -114,7 +114,7 @@
  ***************************************************************/
 #undef EA_IDX
 #define EA_IDX													\
-	ZPL = RDOPARG() + X;										\
+	ZPL = X + RDOPARG();										\
 	ZPWH=PBWH;													\
 	EAL = RDMEM(ZPD);											\
 	ZPL++;														\
@@ -178,14 +178,14 @@
 	{															\
 		tmp = RDOPARG();										\
 		EAW = PCW + (signed char)tmp;							\
-		m6509_ICount -= (PCH == EAH) ? 3 : 4;					\
+		m6509_ICount -= (PCH == EAH) ? 1 : 2;					\
 		PCD = EAD|PB;											\
 		CHANGE_PC;												\
 	}															\
 	else														\
 	{															\
 		PCW++;													\
-		m6509_ICount -= 2;										\
+		m6509_ICount -= 1;										\
 	}
 
 /* 6502 ********************************************************

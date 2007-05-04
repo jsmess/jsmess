@@ -10,488 +10,504 @@
 #include "8080bw.h"
 #include "mw8080bw.h"
 
-static int screen_red;
-static int screen_red_enabled;		/* 1 for games that can turn the screen red */
-static int color_map_select;
-static int background_color;
-static int schaser_sx10_done;
-static UINT8 cloud_pos;
 
-static write8_handler videoram_w_p;
-
-static WRITE8_HANDLER( bw_videoram_w );
-static WRITE8_HANDLER( rollingc_videoram_w );
-static WRITE8_HANDLER( schaser_videoram_w );
-static WRITE8_HANDLER( lupin3_videoram_w );
-static WRITE8_HANDLER( polaris_videoram_w );
-static WRITE8_HANDLER( sstrngr2_videoram_w );
-static WRITE8_HANDLER( invadpt2_videoram_w );
-static WRITE8_HANDLER( cosmo_videoram_w );
-static WRITE8_HANDLER( shuttlei_videoram_w );
-
-static void plot_pixel_8080(int x, int y, int col);
-
-/* smoothed colors, overlays are not so contrasted */
-
-/*
-#define OVERLAY_RED         MAKE_ARGB(0x08,0xff,0x20,0x20)
-#define OVERLAY_GREEN       MAKE_ARGB(0x08,0x20,0xff,0x20)
-#define OVERLAY_YELLOW      MAKE_ARGB(0x08,0xff,0xff,0x20)
-
-OVERLAY_START( invdpt2m_overlay )
-    OVERLAY_RECT(  16,   0,  72, 224, OVERLAY_GREEN )
-    OVERLAY_RECT(   0,  16,  16, 134, OVERLAY_GREEN )
-    OVERLAY_RECT(  72,   0, 192, 224, OVERLAY_YELLOW )
-    OVERLAY_RECT( 192,   0, 224, 224, OVERLAY_RED )
-OVERLAY_END
-*/
+#define NUM_PENS	(8)
 
 
-DRIVER_INIT( 8080bw )
-{
-	videoram_w_p = bw_videoram_w;
-	screen_red = 0;
-	screen_red_enabled = 0;
-	color_map_select = 0;
-	flip_screen_set(0);
-}
+UINT8 *c8080bw_colorram;
 
-DRIVER_INIT( invaddlx )
-{
-	init_8080bw(machine);
-/*  artwork_set_overlay(invdpt2m_overlay);*/
-}
+static UINT8 c8080bw_flip_screen;
+static UINT8 color_map;
+static UINT8 screen_red;
+static UINT8 schaser_background_disable;
+static UINT8 schaser_background_select;
 
-DRIVER_INIT( sstrngr2 )
-{
-	init_8080bw(machine);
-	videoram_w_p = sstrngr2_videoram_w;
-	screen_red_enabled = 1;
-}
 
-DRIVER_INIT( schaser )
-{
-	int i;
-	UINT8* promm = memory_region( REGION_PROMS );
-
-	schaser_effect_555_timer = mame_timer_alloc(schaser_effect_555_cb);
-
-	init_8080bw(machine);
-	videoram_w_p = schaser_videoram_w;
-	// make background palette same as foreground one
-	for (i = 0; i < 0x80; i++) promm[i] = 0;
-
-	for (i = 0x80; i < 0x400; i++)
-	{
-		if (promm[i] == 0x0c) promm[i] = 4;
-		if (promm[i] == 0x03) promm[i] = 2;
-	}
-
-	memcpy(promm+0x400,promm,0x400);
-
-	for (i = 0x500; i < 0x800; i++)
-		if (promm[i] == 4) promm[i] = 2;
-}
-
-DRIVER_INIT( schasrcv )
-{
-	init_8080bw(machine);
-	videoram_w_p = rollingc_videoram_w;
-	background_color = 2;	/* blue */
-}
-
-DRIVER_INIT( rollingc )
-{
-	init_8080bw(machine);
-	videoram_w_p = rollingc_videoram_w;
-	background_color = 0;	/* black */
-}
-
-DRIVER_INIT( polaris )
-{
-	init_8080bw(machine);
-	videoram_w_p = polaris_videoram_w;
-}
-
-DRIVER_INIT( lupin3 )
-{
-	init_8080bw(machine);
-	videoram_w_p = lupin3_videoram_w;
-}
-
-DRIVER_INIT( invadpt2 )
-{
-	init_8080bw(machine);
-	videoram_w_p = invadpt2_videoram_w;
-	screen_red_enabled = 1;
-}
-
-DRIVER_INIT( cosmo )
-{
-	init_8080bw(machine);
-	videoram_w_p = cosmo_videoram_w;
-}
-
-DRIVER_INIT( indianbt )
-{
-	init_8080bw(machine);
-	videoram_w_p = invadpt2_videoram_w;
-}
-
-DRIVER_INIT( shuttlei )
-{
-	init_8080bw(machine);
-	videoram_w_p = shuttlei_videoram_w;
-}
 
 void c8080bw_flip_screen_w(int data)
 {
-	color_map_select = data;
-
-	if (input_port_3_r(0) & 0x01)
-	{
-		flip_screen_set(data);
-	}
+	color_map = data;
+	c8080bw_flip_screen = data && (readinputportbytag(CABINET_PORT_TAG) & 0x01);
 }
 
 
 void c8080bw_screen_red_w(int data)
 {
-	if (screen_red_enabled)
-	{
-		screen_red = data;
-	}
+	screen_red = data;
 }
 
 
-INTERRUPT_GEN( polaris_interrupt )
+void schaser_background_control_w(int data)
 {
-	static int cloud_speed;
+	schaser_background_disable = (data >> 3) & 0x01;
+	schaser_background_select = (data >> 4) & 0x01;
+}
 
-	cloud_speed++;
 
-	if (cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
+static void invadpt2_get_pens(pen_t *pens)
+{
+	offs_t i;
+
+	for (i = 0; i < NUM_PENS; i++)
 	{
-		cloud_speed = 0;
-
-		cloud_pos++;
+		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 	}
 }
 
 
-static void plot_pixel_8080(int x, int y, int col)
+static void sflush_get_pens(pen_t *pens)
+{
+	offs_t i;
+
+	pens[0] = MAKE_RGB(0x80, 0x80, 0xff);
+
+	for (i = 1; i < NUM_PENS; i++)
+	{
+		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+	}
+}
+
+
+static void cosmo_get_pens(pen_t *pens)
+{
+	offs_t i;
+
+	for (i = 0; i < NUM_PENS; i++)
+	{
+		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+	}
+}
+
+
+INLINE void set_pixel(mame_bitmap *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color)
 {
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
-		if (flip_screen)
-		{
-			*BITMAP_ADDR16(tmpbitmap, MW8080BW_VTOTAL - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = Machine->pens[col];
-		}
+		if (c8080bw_flip_screen)
+			*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
 		else
-		{
-			*BITMAP_ADDR16(tmpbitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = Machine->pens[col];
-		}
+			*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
 	}
 }
 
-INLINE void plot_byte(int x, int y, int data, int fore_color, int back_color)
+
+INLINE void set_8_pixels(mame_bitmap *bitmap, UINT8 y, UINT8 x, UINT8 data,
+						  pen_t *pens, UINT8 fore_color, UINT8 back_color)
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		plot_pixel_8080(x, y, (data & 0x01) ? fore_color : back_color);
+		set_pixel(bitmap, y, x, pens, (data & 0x01) ? fore_color : back_color);
 
-		x++;
-		data >>= 1;
+		x = x + 1;
+		data = data >> 1;
 	}
 }
 
 
-WRITE8_HANDLER( c8080bw_videoram_w )
+/* this is needed as this driver doesn't emulate the shift register like mw8080bw does */
+static void clear_extra_columns(mame_bitmap *bitmap, pen_t *pens, UINT8 color)
 {
-	videoram_w_p(offset, data);
-}
+	UINT8 x;
 
-
-static WRITE8_HANDLER( bw_videoram_w )
-{
-	int x,y;
-
-	videoram[offset] = data;
-
-	y = offset / 32;
-	x = 8 * (offset % 32);
-
-	plot_byte(x, y, data, 1, 0);
-}
-
-static WRITE8_HANDLER( rollingc_videoram_w )
-{
-	UINT8 x,y,col;
-
-	videoram[offset] = data;
-
-	y = offset / 32;
-	x = 8 * (offset % 32);
-
-	col = colorram[offset & 0x1f1f] & 0x07;
-
-	plot_byte(x, y, data, col, background_color);
-}
-
-static WRITE8_HANDLER( schaser_videoram_w )
-{
-	int x,y,z,proma,promb=0x400;	// promb = 0 for green band, promb = 400 for all blue
-	UINT8 col,chg=0;
-	UINT8* promm = memory_region( REGION_PROMS );
-	if (schaser_sx10 != schaser_sx10_done) chg++;
-	if (schaser_sx10) promb = 0;
-
-	if (chg)
+	for (x = 0; x < 4; x++)
 	{
-		for (y = 64; y < 224; y++)
+		UINT8 y;
+
+		for (y = MW8080BW_VCOUNTER_START_NO_VBLANK; y != 0; y++)
 		{
-			for (x = 40; x < 200; x+=8)
-			{
-				z = y*32+x/8;
-				col = colorram[z & 0x1f1f] & 0x07;
-				proma = promb+((z%32)*32+y/8+93);
-				plot_byte(x, y, videoram[z], col, promm[proma&0x7ff]);
-			}
-		}
-		schaser_sx10_done = schaser_sx10;
-	}
-
-	videoram[offset] = data;
-
-	y = offset / 32;
-	x = 8 * (offset % 32);
-
-	col = colorram[offset & 0x1f1f] & 0x07;
-	proma = promb+((offset%32)*32+y/8+93);
-	plot_byte(x, y, data, col, promm[proma&0x7ff]);
-}
-
-static WRITE8_HANDLER( lupin3_videoram_w )
-{
-	UINT8 x,y,col;
-
-	videoram[offset] = data;
-
-	y = offset / 32;
-	x = 8 * (offset % 32);
-
-	col = ~colorram[offset & 0x1f1f] & 0x07;
-
-	plot_byte(x, y, data, col, 0);
-}
-
-static WRITE8_HANDLER( polaris_videoram_w )
-{
-	int x,i,col,back_color,fore_color,color_map;
-	UINT8 y, cloud_y;
-
-	videoram[offset] = data;
-
-	y = offset / 32;
-	x = 8 * (offset % 32);
-
-	/* for the background color, bit 0 of the map PROM is connected to green gun.
-       red is 0 and blue is 1, giving cyan and blue for the background.  This
-       is different from what the schematics shows, but it's supported
-       by screenshots. */
-
-	color_map = memory_region(REGION_PROMS)[(y >> 3 << 5) | (x >> 3)];
-	back_color = (color_map & 1) ? 6 : 2;
-	fore_color = ~colorram[offset & 0x1f1f] & 0x07;
-
-	/* bit 3 is connected to the cloud enable. bits 1 and 2 are marked 'not use' (sic)
-       on the schematics */
-
-	cloud_y = y - cloud_pos;
-
-	if ((color_map & 0x08) || (cloud_y > 64))
-	{
-		plot_byte(x, y, data, fore_color, back_color);
-	}
-	else
-	{
-		/* cloud appears in this part of the screen */
-		for (i = 0; i < 8; i++)
-		{
-			if (data & 0x01)
-			{
-				col = fore_color;
-			}
+			if (c8080bw_flip_screen)
+				*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
 			else
-			{
-				int bit;
-				offs_t offs;
-
-				col = back_color;
-
-				bit = 1 << (~x & 0x03);
-				offs = ((x >> 2) & 0x03) | ((~cloud_y & 0x3f) << 2);
-
-				col = (memory_region(REGION_USER1)[offs] & bit) ? 7 : back_color;
-			}
-
-			plot_pixel_8080(x, y, col);
-
-			x++;
-			data >>= 1;
+				*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
 		}
 	}
 }
 
 
-static WRITE8_HANDLER( shuttlei_videoram_w )
+VIDEO_UPDATE( invadpt2 )
 {
-	int x,y,i;
-	videoram[offset] = data;
-	y = offset >>5;
-	x = 8 * (offset &31);
-	for (i = 0; i < 8; i++)
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+	UINT8 *color_map_base;
+
+	invadpt2_get_pens(pens);
+
+	color_map_base = color_map ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
-		plot_pixel_8080(x+(7-i), y, (data & 0x01) ? 1 : 0);
-		data >>= 1;
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = screen_red ? 1 : color_map_base[color_address] & 0x07;
+
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
 	}
-}
 
-/***************************************************************************
+	clear_extra_columns(bitmap, pens, 0);
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
-
-
-VIDEO_UPDATE( 8080bw )
-{
-	int offs;
-
-	for (offs = 0;offs < videoram_size;offs++)
-		videoram_w_p(offs, videoram[offs]);
-
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	return 0;
 }
 
 
-PALETTE_INIT( invadpt2 )
+VIDEO_UPDATE( ballbomb )
 {
-	int i;
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+	UINT8 *color_map_base;
 
+	invadpt2_get_pens(pens);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	color_map_base = color_map ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
-		/* this bit arrangment is a little unusual but are confirmed by screen shots */
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 2),pal1bit(i >> 1));
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = screen_red ? 1 : color_map_base[color_address] & 0x07;
+
+		/* blue background */
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 2);
 	}
+
+	clear_extra_columns(bitmap, pens, 2);
+
+	return 0;
 }
 
 
-PALETTE_INIT( sflush )
+VIDEO_UPDATE( sstrngr2 )
 {
-	int i;
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+	UINT8 *color_map_base;
 
+	invadpt2_get_pens(pens);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	color_map_base = color_map ? memory_region(REGION_PROMS) : &memory_region(REGION_PROMS)[0x0200];
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
-		/* this bit arrangment is a little unusual but are confirmed by screen shots */
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 2),pal1bit(i >> 1));
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = screen_red ? 1 : color_map_base[color_address] & 0x07;
+
+		if (color_map)
+		{
+			x = 240 - x;
+			y = 31 - y;
+		}
+
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
 	}
-	palette_set_color(machine,0,0x80,0x80,0xff);
+
+	clear_extra_columns(bitmap, pens, 0);
+
+	return 0;
 }
 
-PALETTE_INIT( indianbt )
-{
-	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+VIDEO_UPDATE( schaser )
+{
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+	UINT8 *background_map_base;
+
+	invadpt2_get_pens(pens);
+
+	background_map_base = memory_region(REGION_PROMS);
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
+		UINT8 back_color = 0;
+
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = c8080bw_colorram[offs & 0x1f1f] & 0x07;
+
+		if (!schaser_background_disable)
+		{
+			offs_t back_address = (offs >> 8 << 5) | (offs & 0x1f);
+
+			UINT8 back_data = background_map_base[back_address];
+
+			/* the equations derived from the schematics don't appear to produce
+               the right colors, but this one does, at least for this PROM */
+			back_color = (((back_data & 0x0c) == 0x0c) && schaser_background_select) ? 4 : 2;
+		}
+
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, back_color);
 	}
 
+	clear_extra_columns(bitmap, pens, schaser_background_disable ? 0 : 2);
+
+	return 0;
 }
 
 
-static WRITE8_HANDLER( invadpt2_videoram_w )
+VIDEO_UPDATE( schasrcv )
 {
-	UINT8 x,y,col;
+	pen_t pens[NUM_PENS];
+	offs_t offs;
 
-	videoram[offset] = data;
+	invadpt2_get_pens(pens);
 
-	y = offset / 32;
-	x = 8 * (offset % 32);
-
-	/* 32 x 32 colormap */
-	if (!screen_red)
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
-		UINT16 colbase;
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
 
-		colbase = color_map_select ? 0x0400 : 0;
-		col = memory_region(REGION_PROMS)[colbase | (y >> 3 << 5) | (x >> 3)] & 0x07;
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = c8080bw_colorram[offs & 0x1f1f] & 0x07;
+
+		/* blue background */
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 2);
 	}
-	else
-		col = 1;	/* red */
 
-	plot_byte(x, y, data, col, 0);
+	clear_extra_columns(bitmap, pens, 2);
+
+	return 0;
 }
 
-PALETTE_INIT( cosmo )
+
+VIDEO_UPDATE( rollingc )
 {
-	int i;
+	pen_t pens[NUM_PENS];
+	offs_t offs;
 
+	invadpt2_get_pens(pens);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = c8080bw_colorram[offs & 0x1f1f] & 0x07;
+
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
 	}
+
+	clear_extra_columns(bitmap, pens, 0);
+
+	return 0;
 }
 
-static WRITE8_HANDLER( cosmo_videoram_w )
+
+VIDEO_UPDATE( polaris )
 {
-	UINT8 x,y,col;
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+	UINT8 *color_map_base;
+	UINT8 *cloud_gfx;
 
-	videoram[offset] = data;
+	invadpt2_get_pens(pens);
 
-	y = offset / 32;
-	x = offset % 32;
+	color_map_base = memory_region(REGION_PROMS);
+	cloud_gfx = memory_region(REGION_USER1);
 
-	/* 32 x 32 colormap */
-	col = colorram[(y >> 3 << 5) | x ] & 0x07;
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	{
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
 
-	plot_byte(8*x, y, data, col, 0);
+		UINT8 data = mw8080bw_ram[offs];
+
+		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
+
+		/* for the background color, bit 0 of the map PROM is connected to green gun.
+           red is 0 and blue is 1, giving cyan and blue for the background.  This
+           is different from what the schematics shows, but it's supported
+           by screenshots.  Bit 3 is connected to cloud enable, while
+           bits 1 and 2 are marked 'not use' (sic) */
+
+		UINT8 back_color = (color_map_base[color_address] & 0x01) ? 6 : 2;
+		UINT8 fore_color = ~c8080bw_colorram[offs & 0x1f1f] & 0x07;
+
+		UINT8 cloud_y = y - polaris_get_cloud_pos();
+
+		if ((color_map_base[color_address] & 0x08) || (cloud_y >= 64))
+		{
+			set_8_pixels(bitmap, y, x, data, pens, fore_color, back_color);
+		}
+		else
+		{
+			/* cloud appears in this part of the screen */
+			int i;
+
+			for (i = 0; i < 8; i++)
+			{
+				UINT8 color;
+
+				if (data & 0x01)
+				{
+					color = fore_color;
+				}
+				else
+				{
+					int bit = 1 << (~x & 0x03);
+					offs_t cloud_gfx_offs = ((x >> 2) & 0x03) | ((~cloud_y & 0x3f) << 2);
+
+					color = (cloud_gfx[cloud_gfx_offs] & bit) ? 7 : back_color;
+				}
+
+				set_pixel(bitmap, y, x, pens, color);
+
+				x = x + 1;
+				data = data >> 1;
+			}
+		}
+	}
+
+	clear_extra_columns(bitmap, pens, 6);
+
+	return 0;
 }
 
-static WRITE8_HANDLER( sstrngr2_videoram_w )
+
+VIDEO_UPDATE( lupin3 )
 {
-	UINT8 x,y,col;
+	pen_t pens[NUM_PENS];
+	offs_t offs;
 
-	videoram[offset] = data;
+	invadpt2_get_pens(pens);
 
-	y = offset / 32;
-	x = 8 * (offset % 32);
-
-	/* 16 x 32 colormap */
-	if (!screen_red)
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
 	{
-		UINT16 colbase;
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
 
-		colbase = color_map_select ? 0 : 0x0200;
-		col = memory_region(REGION_PROMS)[colbase | (y >> 4 << 5) | (x >> 3)] & 0x0f;
-	}
-	else
-		col = 1;	/* red */
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = ~c8080bw_colorram[offs & 0x1f1f] & 0x07;
 
-	if (color_map_select)
-	{
-		x = 240 - x;
-		y = 31 - y;
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	plot_byte(x, y, data, col, 0);
+	clear_extra_columns(bitmap, pens, 0);
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( cosmo )
+{
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+
+	cosmo_get_pens(pens);
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	{
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = c8080bw_colorram[color_address] & 0x07;
+
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+	}
+
+	clear_extra_columns(bitmap, pens, 0);
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( indianbt )
+{
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+	UINT8 *color_map_base;
+
+	cosmo_get_pens(pens);
+
+	color_map_base = color_map ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	{
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = color_map_base[color_address] & 0x07;
+
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+	}
+
+	clear_extra_columns(bitmap, pens, 0);
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( shuttlei )
+{
+	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
+	offs_t offs;
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	{
+		int i;
+
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		UINT8 data = mw8080bw_ram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x = x + 1;
+			data = data << 1;
+		}
+	}
+
+	clear_extra_columns(bitmap, pens, 0);
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( sflush )
+{
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+
+	sflush_get_pens(pens);
+
+	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	{
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		UINT8 data = mw8080bw_ram[offs];
+		UINT8 fore_color = c8080bw_colorram[offs & 0x1f1f] & 0x07;
+
+		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+	}
+
+	clear_extra_columns(bitmap, pens, 0);
+
+	return 0;
 }

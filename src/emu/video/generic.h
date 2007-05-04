@@ -150,10 +150,6 @@ void flip_screen_x_set(int on);
 void flip_screen_y_set(int on);
 #define flip_screen flip_screen_x
 
-/* sets a variable and schedules a full screen refresh if it changed */
-void set_vh_global_attribute(int *addr, int data);
-int get_vh_global_attribute_changed(void);
-
 
 
 /* ----- generic palette init routines ----- */

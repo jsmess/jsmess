@@ -404,7 +404,7 @@ VIDEO_UPDATE( niyanpai )
 	int x, y;
 	int scrollx[3], scrolly[3];
 
-	if (get_vh_global_attribute_changed() || niyanpai_screen_refresh)
+	if (niyanpai_screen_refresh)
 	{
 		niyanpai_screen_refresh = 0;
 

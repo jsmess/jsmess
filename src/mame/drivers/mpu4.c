@@ -2954,7 +2954,7 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP(mpu4_map,0)
-	MDRV_CPU_PERIODIC_INT(gen_50hz, TIME_IN_HZ(50) )// generate 50 hz signal
+	MDRV_CPU_PERIODIC_INT(gen_50hz, 50 )// generate 50 hz signal
 
 	MDRV_CPU_ADD_TAG("video", M68000, VIDEO_MASTER_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(mpu4_vid_map,0)
@@ -2996,7 +2996,7 @@ static MACHINE_DRIVER_START( mpu4 )
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)// 6809 CPU
 	MDRV_CPU_PROGRAM_MAP(memmap,0)						// setup read and write memorymap
 
-	MDRV_CPU_PERIODIC_INT(gen_50hz, TIME_IN_HZ(50) )	// generate 50 hz signal
+	MDRV_CPU_PERIODIC_INT(gen_50hz, 50 )	// generate 50 hz signal
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8910, MPU4_MASTER_CLOCK/4)
@@ -3028,7 +3028,7 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)// 6809 CPU
 	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)						// setup read and write memorymap
 
-	MDRV_CPU_PERIODIC_INT(gen_50hz, TIME_IN_HZ(50) )	// generate 50 hz signal
+	MDRV_CPU_PERIODIC_INT(gen_50hz, 50)	// generate 50 hz signal
 
 	MDRV_SCREEN_REFRESH_RATE(56)//Measured accurately from the flip-flop
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
@@ -3049,8 +3049,8 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_GFXDECODE(dealemgfxdecodeinfo)
 	MDRV_VIDEO_UPDATE(dealem)
 
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(32)
+	MDRV_COLORTABLE_LENGTH(32)
 	MDRV_PALETTE_INIT(dealem)
 
 MACHINE_DRIVER_END

@@ -3948,7 +3948,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_CPU_ADD(Z80,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(bbakraid_sound_z80_port, 0)
-	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, TIME_IN_HZ(388))
+	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 388)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(262)
 

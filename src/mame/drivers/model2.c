@@ -641,7 +641,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
             cpunum_set_input_line(3, INPUT_LINE_HALT, CLEAR_LINE);
-            //cpu_spinuntil_time(TIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
+            //cpu_spinuntil_time(MAME_TIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -878,7 +878,7 @@ static int snd_68k_ready_r(void)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(TIME_IN_USEC(40));
+		cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -889,7 +889,7 @@ static void snd_latch_to_68k_w(int data)
 {
 	while (!snd_68k_ready_r())
 	{
-		cpu_spinuntil_time(TIME_IN_USEC(40));
+		cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
 	}
 
 	to_68k = data;
@@ -897,7 +897,7 @@ static void snd_latch_to_68k_w(int data)
 	cpunum_set_input_line(1, 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	cpu_spinuntil_time(TIME_IN_USEC(40));
+	cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -925,7 +925,7 @@ static WRITE32_HANDLER( model2_serial_w )
 		SCSP_MidiIn(0, data&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(TIME_IN_USEC(40));
+		cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
 	}
 }
 

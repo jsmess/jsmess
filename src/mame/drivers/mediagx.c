@@ -195,7 +195,7 @@ static void draw_framebuffer(mame_bitmap *bitmap, const rectangle *cliprect)
 		visarea.min_x = visarea.min_y = 0;
 		visarea.max_x = width - 1;
 		visarea.max_y = height - 1;
-		video_screen_configure(0, width, height, &visarea, Machine->screen[0].refresh);
+		video_screen_configure(0, width, height * 262 / 240, &visarea, Machine->screen[0].refresh);
 	}
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
@@ -494,6 +494,7 @@ static READ32_HANDLER( parallel_port_r )
 
 	if (!(mem_mask & 0x0000ff00))
 	{
+		logerror("%08X:parallel_port_r()\n", activecpu_get_pc());
 		if (controls_data == 0x18)
 		{
 			r |= readinputport(0) << 8;
@@ -523,6 +524,7 @@ static WRITE32_HANDLER( parallel_port_w )
 
 	if (!(mem_mask & 0x000000ff))
 	{
+		logerror("%08X:parallel_port_w(%02X)\n", activecpu_get_pc(), data & 0xff);
 	//  if (data == 0x10) printf("\n");
 	//  printf("parallel_port_w: %08X at %08X (%d, %d)\n", data, activecpu_get_pc(), control_num2, control_num);
 		controls_data = data;
@@ -773,6 +775,7 @@ static MACHINE_RESET(mediagx)
 	mame_timer_adjust(sound_timer, MAME_TIME_IN_MSEC(10), 0, time_zero);
 
 	dmadac_enable(0, 2, 1);
+	ide_controller_reset(0);
 }
 
 static MACHINE_DRIVER_START(mediagx)
@@ -854,35 +857,87 @@ static DRIVER_INIT( mediagx )
 }
 
 #if SPEEDUP_HACKS
-static READ32_HANDLER ( a51site4_speedup1_r )
+
+typedef struct _speedup_entry speedup_entry;
+struct _speedup_entry
 {
-	if (activecpu_get_pc() == 0x363e) cpu_spinuntil_int(); // idle
-	return main_ram[0x5504c/4];
+	UINT32			offset;
+	UINT32			pc;
+	UINT32			hits;
+};
+
+static speedup_entry *speedup_table;
+static int speedup_count;
+
+INLINE UINT32 generic_speedup(speedup_entry *entry)
+{
+	if (activecpu_get_pc() == entry->pc)
+	{
+		entry->hits++;
+		cpu_spinuntil_int();
+	}
+	return main_ram[entry->offset/4];
 }
 
-static READ32_HANDLER ( a51site4_speedup2_r )
+static READ32_HANDLER( speedup0_r ) { return generic_speedup(&speedup_table[0]); }
+static READ32_HANDLER( speedup1_r ) { return generic_speedup(&speedup_table[1]); }
+static READ32_HANDLER( speedup2_r ) { return generic_speedup(&speedup_table[2]); }
+static READ32_HANDLER( speedup3_r ) { return generic_speedup(&speedup_table[3]); }
+static READ32_HANDLER( speedup4_r ) { return generic_speedup(&speedup_table[4]); }
+static READ32_HANDLER( speedup5_r ) { return generic_speedup(&speedup_table[5]); }
+static READ32_HANDLER( speedup6_r ) { return generic_speedup(&speedup_table[6]); }
+static READ32_HANDLER( speedup7_r ) { return generic_speedup(&speedup_table[7]); }
+static READ32_HANDLER( speedup8_r ) { return generic_speedup(&speedup_table[8]); }
+static READ32_HANDLER( speedup9_r ) { return generic_speedup(&speedup_table[9]); }
+static READ32_HANDLER( speedup10_r ) { return generic_speedup(&speedup_table[10]); }
+static READ32_HANDLER( speedup11_r ) { return generic_speedup(&speedup_table[11]); }
+
+static const read32_handler speedup_handlers[] =
 {
-	if (activecpu_get_pc() == 0x363e) cpu_spinuntil_int(); // idle
-	return main_ram[0x5f11c/4];
+	speedup0_r,		speedup1_r,		speedup2_r,		speedup3_r,
+	speedup4_r,		speedup5_r,		speedup6_r,		speedup7_r,
+	speedup8_r,		speedup9_r,		speedup10_r,	speedup11_r
+};
+
+static void report_speedups(running_machine *machine)
+{
+	int i;
+
+	for (i = 0; i < speedup_count; i++)
+		printf("Speedup %2d: offs=%06X pc=%06X hits=%d\n", i, speedup_table[i].offset, speedup_table[i].pc, speedup_table[i].hits);
 }
 
-static READ32_HANDLER ( a51site4_speedup3_r )
+static void install_speedups(speedup_entry *entries, int count)
 {
-	if (activecpu_get_pc() == 0x363e) cpu_spinuntil_int(); // idle
-	return main_ram[0x5cac8/4];
+	int i;
+
+	assert(count < ARRAY_LENGTH(speedup_handlers));
+
+	speedup_table = entries;
+	speedup_count = count;
+
+	for (i = 0; i < count; i++)
+		memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
+
+#ifdef MAME_DEBUG
+	add_exit_callback(Machine, report_speedups);
+#endif
 }
 
-static READ32_HANDLER ( a51site4_speedup4_r )
+static speedup_entry a51site4_speedups[] =
 {
-	if (activecpu_get_pc() == 0x363e) cpu_spinuntil_int(); // idle
-	return main_ram[0x560fc/4];
-}
+	{ 0x5504c, 0x0363e },
+	{ 0x5f11c, 0x0363e },
+	{ 0x5cac8, 0x0363e },
+	{ 0x560fc, 0x0363e },
+	{ 0x55298, 0x0363e },
+	{ 0x63a88, 0x049d9 },
+	{ 0x5e01c, 0x049d9 },
+	{ 0x5e3ec, 0x049d9 },
+	{ 0x60504, 0x1c91d },
+	{ 0x60440, 0x1c8c4 },
+};
 
-static READ32_HANDLER ( a51site4_speedup5_r )
-{
-	if (activecpu_get_pc() == 0x363e) cpu_spinuntil_int(); // idle
-	return main_ram[0x55298/4];
-}
 #endif
 
 static DRIVER_INIT( a51site4 )
@@ -890,20 +945,7 @@ static DRIVER_INIT( a51site4 )
 	init_mediagx(machine);
 
 #if SPEEDUP_HACKS
-	// 55038+14
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x005504c, 0x005504f, 0, 0, a51site4_speedup1_r );
-
-	// 5f108+14
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x005f11c, 0x005f11f, 0, 0, a51site4_speedup2_r );
-
-	// 5cab4+14
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x005cac8, 0x005cacb, 0, 0, a51site4_speedup3_r );
-
-	// 560e8+14
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00560fc, 0x00560ff, 0, 0, a51site4_speedup4_r );
-
-	// 55284+14
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0055298, 0x005529b, 0, 0, a51site4_speedup5_r );
+	install_speedups(a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
 #endif
 }
 

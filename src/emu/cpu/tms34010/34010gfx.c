@@ -22,10 +22,10 @@ static void line(void)
 {
 	if (!P_FLAG)
 	{
-		if (state.window_checking != 0 && state.window_checking != 3)
-			logerror("LINE XY  %08X - Window Checking Mode %d not supported\n", PC, state.window_checking);
+		if (WINDOW_CHECKING != 0 && WINDOW_CHECKING != 3)
+			logerror("LINE XY  %08X - Window Checking Mode %d not supported\n", PC, WINDOW_CHECKING);
 
-		P_FLAG = 1;
+		state.st |= STBIT_P;
 		TEMP = (state.op & 0x80) ? 1 : 0;  /* boundary value depends on the algorithm */
 		LOGGFX(("%08X(%3d):LINE (%d,%d)-(%d,%d)\n", PC, video_screen_get_vpos(state.config->scrnum), DADDR_X, DADDR_Y, DADDR_X + DYDX_X, DADDR_Y + DYDX_Y));
 	}
@@ -35,7 +35,7 @@ static void line(void)
 		INT16 x1,y1;
 
 		COUNT--;
-		if (state.window_checking != 3 ||
+		if (WINDOW_CHECKING != 3 ||
 			(DADDR_X >= WSTART_X && DADDR_X <= WEND_X &&
 			 DADDR_Y >= WSTART_Y && DADDR_Y <= WEND_Y))
 			WPIXEL(DXYTOL(DADDR_XY),COLOR1);
@@ -59,7 +59,7 @@ static void line(void)
 		PC -= 0x10;  /* not done yet, check for interrupts and restart instruction */
 		return;
 	}
-	P_FLAG = 0;
+	state.st &= ~STBIT_P;
 }
 
 
@@ -75,7 +75,7 @@ cases:
 static int apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *dst, int *dx, int *dy)
 {
 	/* apply the window */
-	if (state.window_checking == 0)
+	if (WINDOW_CHECKING == 0)
 		return 0;
 	else
 	{
@@ -85,13 +85,12 @@ static int apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *d
 		int ey = sy + *dy - 1;
 		int diff, cycles = 3;
 
-		if (state.window_checking == 2)
-			logerror("%08x: %s apply_window window mode %d not supported!\n", activecpu_get_pc(), inst_name, state.window_checking);
+		if (WINDOW_CHECKING == 2)
+			logerror("%08x: %s apply_window window mode %d not supported!\n", activecpu_get_pc(), inst_name, WINDOW_CHECKING);
 
-		if (state.window_checking == 1)
-			V_FLAG = 1;
-		else
-			CLR_V;	/* clear the V flag by default */
+		CLR_V;
+		if (WINDOW_CHECKING == 1)
+			SET_V_LOG(1);
 
 		/* clip X */
 		diff = WSTART_X - sx;
@@ -100,13 +99,13 @@ static int apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *d
 			if (srcaddr)
 				*srcaddr += diff * srcbpp;
 			sx += diff;
-			V_FLAG = 1;
+			SET_V_LOG(1);
 		}
 		diff = ex - WEND_X;
 		if (diff > 0)
 		{
 			ex -= diff;
-			V_FLAG = 1;
+			SET_V_LOG(1);
 		}
 
 		/* clip Y */
@@ -116,13 +115,13 @@ static int apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *d
 			if (srcaddr)
 				*srcaddr += diff * SPTCH;
 			sy += diff;
-			V_FLAG = 1;
+			SET_V_LOG(1);
 		}
 		diff = ey - WEND_Y;
 		if (diff > 0)
 		{
 			ey -= diff;
-			V_FLAG = 1;
+			SET_V_LOG(1);
 		}
 
 		/* compute cycles */
@@ -1071,7 +1070,7 @@ static void FUNCTION_NAME(pixblt)(int src_is_linear, int dst_is_linear)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (state.window_checking == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING == 1 && !dst_is_linear)
 		{
 			CLR_V;
 			DADDR_XY = dstxy;
@@ -1091,7 +1090,7 @@ static void FUNCTION_NAME(pixblt)(int src_is_linear, int dst_is_linear)
 				daddr += (dy - 1) * DPTCH;
 			}
 
-		P_FLAG = 1;
+		state.st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1267,7 +1266,7 @@ static void FUNCTION_NAME(pixblt)(int src_is_linear, int dst_is_linear)
 	else
 	{
 		tms34010_ICount -= state.gfxcycles;
-		P_FLAG = 0;
+		state.st &= ~STBIT_P;
 		if (src_is_linear && dst_is_linear)
 			SADDR += DYDX_Y * SPTCH;
 		else if (src_is_linear)
@@ -1330,7 +1329,7 @@ static void FUNCTION_NAME(pixblt_r)(int src_is_linear, int dst_is_linear)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (state.window_checking == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING == 1 && !dst_is_linear)
 		{
 			CLR_V;
 			DADDR_XY = dstxy;
@@ -1354,7 +1353,7 @@ static void FUNCTION_NAME(pixblt_r)(int src_is_linear, int dst_is_linear)
 			}
 		}
 
-		P_FLAG = 1;
+		state.st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1530,7 +1529,7 @@ static void FUNCTION_NAME(pixblt_r)(int src_is_linear, int dst_is_linear)
 	else
 	{
 		tms34010_ICount -= state.gfxcycles;
-		P_FLAG = 0;
+		state.st &= ~STBIT_P;
 		if (src_is_linear && dst_is_linear)
 			SADDR += DYDX_Y * SPTCH;
 		else if (src_is_linear)
@@ -1592,7 +1591,7 @@ static void FUNCTION_NAME(pixblt_b)(int dst_is_linear)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (state.window_checking == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING == 1 && !dst_is_linear)
 		{
 			CLR_V;
 			DADDR_XY = dstxy;
@@ -1614,7 +1613,7 @@ static void FUNCTION_NAME(pixblt_b)(int dst_is_linear)
 
 		/* compute cycles */
 		state.gfxcycles += compute_pixblt_b_cycles(left_partials, right_partials, full_words, dy, PIXEL_OP_TIMING, BITS_PER_PIXEL);
-		P_FLAG = 1;
+		state.st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1749,7 +1748,7 @@ static void FUNCTION_NAME(pixblt_b)(int dst_is_linear)
 	else
 	{
 		tms34010_ICount -= state.gfxcycles;
-		P_FLAG = 0;
+		state.st &= ~STBIT_P;
 		SADDR += DYDX_Y * SPTCH;
 		if (dst_is_linear)
 			DADDR += DYDX_Y * DPTCH;
@@ -1803,7 +1802,7 @@ static void FUNCTION_NAME(fill)(int dst_is_linear)
 			return;
 
 		/* window mode 1: just return and interrupt if we are within the window */
-		if (state.window_checking == 1 && !dst_is_linear)
+		if (WINDOW_CHECKING == 1 && !dst_is_linear)
 		{
 			CLR_V;
 			DADDR_XY = dstxy;
@@ -1825,7 +1824,7 @@ static void FUNCTION_NAME(fill)(int dst_is_linear)
 
 		/* compute cycles */
 		state.gfxcycles += 2;
-		P_FLAG = 1;
+		state.st |= STBIT_P;
 
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
@@ -1931,7 +1930,7 @@ static void FUNCTION_NAME(fill)(int dst_is_linear)
 	else
 	{
 		tms34010_ICount -= state.gfxcycles;
-		P_FLAG = 0;
+		state.st &= ~STBIT_P;
 		if (dst_is_linear)
 			DADDR += DYDX_Y * DPTCH;
 		else

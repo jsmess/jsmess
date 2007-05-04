@@ -31,31 +31,42 @@ static void i386_load_protected_mode_segment( I386_SREG *seg )
 	UINT32 base, limit;
 	int entry;
 
-	if( seg->selector & 0x4 ) {
-			base = I.ldtr.base;
-			limit = I.ldtr.limit;
-		} else {
-			base = I.gdtr.base;
-			limit = I.gdtr.limit;
-		}
+	if ( seg->selector & 0x4 )
+	{
+		base = I.ldtr.base;
+		limit = I.ldtr.limit;
+	} else {
+		base = I.gdtr.base;
+		limit = I.gdtr.limit;
+	}
 
-		if (limit == 0)
-			return;
-	entry = (seg->selector % limit) & ~0x7;
+	if (limit == 0 || seg->selector + 7 > limit)
+		return;
+	entry = seg->selector & ~0x7;
 
-		v1 = READ32( base + entry );
-		v2 = READ32( base + entry + 4 );
+	v1 = READ32( base + entry );
+	v2 = READ32( base + entry + 4 );
 
+	seg->flags = (v2 >> 8) & 0xf0ff;
 	seg->base = (v2 & 0xff000000) | ((v2 & 0xff) << 16) | ((v1 >> 16) & 0xffff);
-	seg->limit = ((v2 << 16) & 0xf0000) | (v1 & 0xffff);
-	seg->d = ((v2 & 0x400000) && PROTECTED_MODE && !V8086_MODE) ? 1 : 0;
+	seg->limit = (v2 & 0xf0000) | (v1 & 0xffff);
+	if (seg->flags & 0x8000)
+		seg->limit = (seg->limit << 12) | 0xfff;
+	seg->d = (seg->flags & 0x4000) ? 1 : 0;
 }
 
 void i386_load_segment_descriptor( int segment )
 {
 	if (PROTECTED_MODE)
 	{
-		i386_load_protected_mode_segment( &I.sreg[segment] );
+		if (!V8086_MODE)
+			i386_load_protected_mode_segment( &I.sreg[segment] );
+		else
+		{
+			I.sreg[segment].base = I.sreg[segment].selector << 4;
+			I.sreg[segment].limit = 0xffff;
+			I.sreg[segment].flags = (segment == CS) ? 0x009a : 0x0092;
+		}
 	}
 	else
 	{
@@ -498,11 +509,29 @@ void i386_init(int index, int clock, const void *config, int (*irqcallback)(int)
 
 	state_save_register_item_array(state_type, index,	I.reg.d);
 	state_save_register_item(state_type, index, I.sreg[ES].selector);
+	state_save_register_item(state_type, index, I.sreg[ES].base);
+	state_save_register_item(state_type, index, I.sreg[ES].limit);
+	state_save_register_item(state_type, index, I.sreg[ES].flags);
 	state_save_register_item(state_type, index, I.sreg[CS].selector);
+	state_save_register_item(state_type, index, I.sreg[CS].base);
+	state_save_register_item(state_type, index, I.sreg[CS].limit);
+	state_save_register_item(state_type, index, I.sreg[CS].flags);
 	state_save_register_item(state_type, index, I.sreg[SS].selector);
+	state_save_register_item(state_type, index, I.sreg[SS].base);
+	state_save_register_item(state_type, index, I.sreg[SS].limit);
+	state_save_register_item(state_type, index, I.sreg[SS].flags);
 	state_save_register_item(state_type, index, I.sreg[DS].selector);
+	state_save_register_item(state_type, index, I.sreg[DS].base);
+	state_save_register_item(state_type, index, I.sreg[DS].limit);
+	state_save_register_item(state_type, index, I.sreg[DS].flags);
 	state_save_register_item(state_type, index, I.sreg[FS].selector);
+	state_save_register_item(state_type, index, I.sreg[FS].base);
+	state_save_register_item(state_type, index, I.sreg[FS].limit);
+	state_save_register_item(state_type, index, I.sreg[FS].flags);
 	state_save_register_item(state_type, index, I.sreg[GS].selector);
+	state_save_register_item(state_type, index, I.sreg[GS].base);
+	state_save_register_item(state_type, index, I.sreg[GS].limit);
+	state_save_register_item(state_type, index, I.sreg[GS].flags);
 	state_save_register_item(state_type, index, I.eip);
 	state_save_register_item(state_type, index, I.prev_eip);
 	state_save_register_item(state_type, index, I.CF);
@@ -521,6 +550,14 @@ void i386_init(int index, int clock, const void *config, int (*irqcallback)(int)
 	state_save_register_item(state_type, index, I.idtr.limit);
 	state_save_register_item(state_type, index, I.gdtr.base);
 	state_save_register_item(state_type, index, I.gdtr.limit);
+	state_save_register_item(state_type, index, I.task.base);
+	state_save_register_item(state_type, index, I.task.segment);
+	state_save_register_item(state_type, index, I.task.limit);
+	state_save_register_item(state_type, index, I.task.flags);
+	state_save_register_item(state_type, index, I.ldtr.base);
+	state_save_register_item(state_type, index, I.ldtr.segment);
+	state_save_register_item(state_type, index, I.ldtr.limit);
+	state_save_register_item(state_type, index, I.ldtr.flags);
 	state_save_register_item(state_type, index,  I.irq_line);
 	state_save_register_item(state_type, index, I.performed_intersegment_jump);
 	state_save_register_func_postload(i386_postload);
@@ -569,6 +606,10 @@ void i386_reset(void)
 	I.sreg[CS].base		= 0xffff0000;
 	I.sreg[CS].limit	= 0xffff;
 
+	I.sreg[DS].base = I.sreg[ES].base = I.sreg[FS].base = I.sreg[GS].base = I.sreg[SS].base = 0x00000000;
+	I.sreg[DS].limit = I.sreg[ES].limit = I.sreg[FS].limit = I.sreg[GS].limit = I.sreg[SS].limit = 0xffff;
+	I.sreg[DS].flags = I.sreg[ES].flags = I.sreg[FS].flags = I.sreg[GS].flags = I.sreg[SS].flags = 0x0092;
+
 	I.idtr.base = 0;
 	I.idtr.limit = 0x3ff;
 
@@ -606,7 +647,7 @@ static void i386_set_context(void *src)
 
 static void i386_set_irq_line(int irqline, int state)
 {
-	if (I.halted)
+	if (state != CLEAR_LINE && I.halted)
 	{
 		I.halted = 0;
 	}
@@ -731,12 +772,30 @@ static void i386_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I386_ESI:			REG32(ESI) = info->i;					break;
 		case CPUINFO_INT_REGISTER + I386_EDI:			REG32(EDI) = info->i;					break;
 		case CPUINFO_INT_REGISTER + I386_EFLAGS:		I.eflags = info->i;						break;
-		case CPUINFO_INT_REGISTER + I386_CS:			I.sreg[CS].selector = info->i & 0xffff; break;
-		case CPUINFO_INT_REGISTER + I386_SS:			I.sreg[SS].selector = info->i & 0xffff; break;
-		case CPUINFO_INT_REGISTER + I386_DS:			I.sreg[DS].selector = info->i & 0xffff; break;
-		case CPUINFO_INT_REGISTER + I386_ES:			I.sreg[ES].selector = info->i & 0xffff; break;
-		case CPUINFO_INT_REGISTER + I386_FS:			I.sreg[FS].selector = info->i & 0xffff; break;
-		case CPUINFO_INT_REGISTER + I386_GS:			I.sreg[GS].selector = info->i & 0xffff; break;
+		case CPUINFO_INT_REGISTER + I386_CS:			I.sreg[CS].selector = info->i & 0xffff; i386_load_segment_descriptor(CS); break;
+		case CPUINFO_INT_REGISTER + I386_CS_BASE:		I.sreg[CS].base = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_CS_LIMIT:		I.sreg[CS].limit = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_CS_FLAGS:		I.sreg[CS].flags = info->i & 0xf0ff;	break;
+		case CPUINFO_INT_REGISTER + I386_SS:			I.sreg[SS].selector = info->i & 0xffff; i386_load_segment_descriptor(SS); break;
+		case CPUINFO_INT_REGISTER + I386_SS_BASE:		I.sreg[SS].base = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_SS_LIMIT:		I.sreg[SS].limit = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_SS_FLAGS:		I.sreg[SS].flags = info->i & 0xf0ff;	break;
+		case CPUINFO_INT_REGISTER + I386_DS:			I.sreg[DS].selector = info->i & 0xffff; i386_load_segment_descriptor(DS); break;
+		case CPUINFO_INT_REGISTER + I386_DS_BASE:		I.sreg[DS].base = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_DS_LIMIT:		I.sreg[DS].limit = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_DS_FLAGS:		I.sreg[DS].flags = info->i & 0xf0ff;	break;
+		case CPUINFO_INT_REGISTER + I386_ES:			I.sreg[ES].selector = info->i & 0xffff; i386_load_segment_descriptor(ES); break;
+		case CPUINFO_INT_REGISTER + I386_ES_BASE:		I.sreg[ES].base = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_ES_LIMIT:		I.sreg[ES].limit = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_ES_FLAGS:		I.sreg[ES].flags = info->i & 0xf0ff;	break;
+		case CPUINFO_INT_REGISTER + I386_FS:			I.sreg[FS].selector = info->i & 0xffff; i386_load_segment_descriptor(FS); break;
+		case CPUINFO_INT_REGISTER + I386_FS_BASE:		I.sreg[FS].base = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_FS_LIMIT:		I.sreg[FS].limit = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_FS_FLAGS:		I.sreg[FS].flags = info->i & 0xf0ff;	break;
+		case CPUINFO_INT_REGISTER + I386_GS:			I.sreg[GS].selector = info->i & 0xffff; i386_load_segment_descriptor(GS); break;
+		case CPUINFO_INT_REGISTER + I386_GS_BASE:		I.sreg[GS].base = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_GS_LIMIT:		I.sreg[GS].limit = info->i;				break;
+		case CPUINFO_INT_REGISTER + I386_GS_FLAGS:		I.sreg[GS].flags = info->i & 0xf0ff;	break;
 		case CPUINFO_INT_REGISTER + I386_CR0:			I.cr[0] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_CR1:			I.cr[1] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_CR2:			I.cr[2] = info->i;						break;
@@ -751,6 +810,18 @@ static void i386_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I386_DR7:			I.dr[7] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_TR6:			I.tr[6] = info->i;						break;
 		case CPUINFO_INT_REGISTER + I386_TR7:			I.tr[7] = info->i;						break;
+		case CPUINFO_INT_REGISTER + I386_GDTR_BASE:		I.gdtr.base = info->i;					break;
+		case CPUINFO_INT_REGISTER + I386_GDTR_LIMIT:	I.gdtr.limit = info->i & 0xffff;		break;
+		case CPUINFO_INT_REGISTER + I386_IDTR_BASE:		I.idtr.base = info->i;					break;
+		case CPUINFO_INT_REGISTER + I386_IDTR_LIMIT:	I.idtr.limit = info->i & 0xffff;		break;
+		case CPUINFO_INT_REGISTER + I386_TR:			I.task.segment = info->i & 0xffff;		break;
+		case CPUINFO_INT_REGISTER + I386_TR_BASE:		I.task.base = info->i;					break;
+		case CPUINFO_INT_REGISTER + I386_TR_LIMIT:		I.task.limit = info->i;					break;
+		case CPUINFO_INT_REGISTER + I386_TR_FLAGS:		I.task.flags = info->i & 0xf0ff;		break;
+		case CPUINFO_INT_REGISTER + I386_LDTR:			I.ldtr.segment = info->i & 0xffff;		break;
+		case CPUINFO_INT_REGISTER + I386_LDTR_BASE:		I.ldtr.base = info->i;					break;
+		case CPUINFO_INT_REGISTER + I386_LDTR_LIMIT:	I.ldtr.limit = info->i;					break;
+		case CPUINFO_INT_REGISTER + I386_LDTR_FLAGS:	I.ldtr.flags = info->i & 0xf0ff;		break;
 	}
 }
 
@@ -815,11 +886,29 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I386_EDI:			info->i = REG32(EDI);					break;
 		case CPUINFO_INT_REGISTER + I386_EFLAGS:		info->i = I.eflags;						break;
 		case CPUINFO_INT_REGISTER + I386_CS:			info->i = I.sreg[CS].selector;			break;
+		case CPUINFO_INT_REGISTER + I386_CS_BASE:		info->i = I.sreg[CS].base;				break;
+		case CPUINFO_INT_REGISTER + I386_CS_LIMIT:		info->i = I.sreg[CS].limit;				break;
+		case CPUINFO_INT_REGISTER + I386_CS_FLAGS:		info->i = I.sreg[CS].flags;				break;
 		case CPUINFO_INT_REGISTER + I386_SS:			info->i = I.sreg[SS].selector;			break;
+		case CPUINFO_INT_REGISTER + I386_SS_BASE:		info->i = I.sreg[SS].base;				break;
+		case CPUINFO_INT_REGISTER + I386_SS_LIMIT:		info->i = I.sreg[SS].limit;				break;
+		case CPUINFO_INT_REGISTER + I386_SS_FLAGS:		info->i = I.sreg[SS].flags;				break;
 		case CPUINFO_INT_REGISTER + I386_DS:			info->i = I.sreg[DS].selector;			break;
+		case CPUINFO_INT_REGISTER + I386_DS_BASE:		info->i = I.sreg[DS].base;				break;
+		case CPUINFO_INT_REGISTER + I386_DS_LIMIT:		info->i = I.sreg[DS].limit;				break;
+		case CPUINFO_INT_REGISTER + I386_DS_FLAGS:		info->i = I.sreg[DS].flags;				break;
 		case CPUINFO_INT_REGISTER + I386_ES:			info->i = I.sreg[ES].selector;			break;
+		case CPUINFO_INT_REGISTER + I386_ES_BASE:		info->i = I.sreg[ES].base;				break;
+		case CPUINFO_INT_REGISTER + I386_ES_LIMIT:		info->i = I.sreg[ES].limit;				break;
+		case CPUINFO_INT_REGISTER + I386_ES_FLAGS:		info->i = I.sreg[ES].flags;				break;
 		case CPUINFO_INT_REGISTER + I386_FS:			info->i = I.sreg[FS].selector;			break;
+		case CPUINFO_INT_REGISTER + I386_FS_BASE:		info->i = I.sreg[FS].base;				break;
+		case CPUINFO_INT_REGISTER + I386_FS_LIMIT:		info->i = I.sreg[FS].limit;				break;
+		case CPUINFO_INT_REGISTER + I386_FS_FLAGS:		info->i = I.sreg[FS].flags;				break;
 		case CPUINFO_INT_REGISTER + I386_GS:			info->i = I.sreg[GS].selector;			break;
+		case CPUINFO_INT_REGISTER + I386_GS_BASE:		info->i = I.sreg[GS].base;				break;
+		case CPUINFO_INT_REGISTER + I386_GS_LIMIT:		info->i = I.sreg[GS].limit;				break;
+		case CPUINFO_INT_REGISTER + I386_GS_FLAGS:		info->i = I.sreg[GS].flags;				break;
 		case CPUINFO_INT_REGISTER + I386_CR0:			info->i = I.cr[0];						break;
 		case CPUINFO_INT_REGISTER + I386_CR1:			info->i = I.cr[1];						break;
 		case CPUINFO_INT_REGISTER + I386_CR2:			info->i = I.cr[2];						break;
@@ -834,6 +923,18 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I386_DR7:			info->i = I.dr[7];						break;
 		case CPUINFO_INT_REGISTER + I386_TR6:			info->i = I.tr[6];						break;
 		case CPUINFO_INT_REGISTER + I386_TR7:			info->i = I.tr[7];						break;
+		case CPUINFO_INT_REGISTER + I386_GDTR_BASE:		info->i = I.gdtr.base;					break;
+		case CPUINFO_INT_REGISTER + I386_GDTR_LIMIT:	info->i = I.gdtr.limit;					break;
+		case CPUINFO_INT_REGISTER + I386_IDTR_BASE:		info->i = I.idtr.base;					break;
+		case CPUINFO_INT_REGISTER + I386_IDTR_LIMIT:	info->i = I.idtr.limit;					break;
+		case CPUINFO_INT_REGISTER + I386_TR:			info->i = I.task.segment;				break;
+		case CPUINFO_INT_REGISTER + I386_TR_BASE:		info->i = I.task.base;					break;
+		case CPUINFO_INT_REGISTER + I386_TR_LIMIT:		info->i = I.task.limit;					break;
+		case CPUINFO_INT_REGISTER + I386_TR_FLAGS:		info->i = I.task.flags;					break;
+		case CPUINFO_INT_REGISTER + I386_LDTR:			info->i = I.ldtr.segment;				break;
+		case CPUINFO_INT_REGISTER + I386_LDTR_BASE:		info->i = I.ldtr.base;					break;
+		case CPUINFO_INT_REGISTER + I386_LDTR_LIMIT:	info->i = I.ldtr.limit;					break;
+		case CPUINFO_INT_REGISTER + I386_LDTR_FLAGS:	info->i = I.ldtr.flags;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:	      				info->setinfo = i386_set_info;			break;
@@ -887,12 +988,30 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + I386_ESI:			sprintf(info->s, "ESI: %08X", I.reg.d[ESI]); break;
 		case CPUINFO_STR_REGISTER + I386_EDI:			sprintf(info->s, "EDI: %08X", I.reg.d[EDI]); break;
 		case CPUINFO_STR_REGISTER + I386_EFLAGS:		sprintf(info->s, "EFLAGS: %08X", I.eflags); break;
-		case CPUINFO_STR_REGISTER + I386_CS:			sprintf(info->s, "CS: %04X:%08X", I.sreg[CS].selector, I.sreg[CS].base); break;
-		case CPUINFO_STR_REGISTER + I386_SS:			sprintf(info->s, "SS: %04X:%08X", I.sreg[SS].selector, I.sreg[SS].base); break;
-		case CPUINFO_STR_REGISTER + I386_DS:			sprintf(info->s, "DS: %04X:%08X", I.sreg[DS].selector, I.sreg[DS].base); break;
-		case CPUINFO_STR_REGISTER + I386_ES:			sprintf(info->s, "ES: %04X:%08X", I.sreg[ES].selector, I.sreg[ES].base); break;
-		case CPUINFO_STR_REGISTER + I386_FS:			sprintf(info->s, "FS: %04X:%08X", I.sreg[FS].selector, I.sreg[FS].base); break;
-		case CPUINFO_STR_REGISTER + I386_GS:			sprintf(info->s, "GS: %04X:%08X", I.sreg[GS].selector, I.sreg[GS].base); break;
+		case CPUINFO_STR_REGISTER + I386_CS:			sprintf(info->s, "CS: %04X", I.sreg[CS].selector); break;
+		case CPUINFO_STR_REGISTER + I386_CS_BASE:		sprintf(info->s, "CSBASE: %08X", I.sreg[CS].base); break;
+		case CPUINFO_STR_REGISTER + I386_CS_LIMIT:		sprintf(info->s, "CSLIMIT: %08X", I.sreg[CS].limit); break;
+		case CPUINFO_STR_REGISTER + I386_CS_FLAGS:		sprintf(info->s, "CSFLAGS: %04X", I.sreg[CS].flags); break;
+		case CPUINFO_STR_REGISTER + I386_SS:			sprintf(info->s, "SS: %04X", I.sreg[SS].selector); break;
+		case CPUINFO_STR_REGISTER + I386_SS_BASE:		sprintf(info->s, "SSBASE: %08X", I.sreg[SS].base); break;
+		case CPUINFO_STR_REGISTER + I386_SS_LIMIT:		sprintf(info->s, "SSLIMIT: %08X", I.sreg[SS].limit); break;
+		case CPUINFO_STR_REGISTER + I386_SS_FLAGS:		sprintf(info->s, "SSFLAGS: %04X", I.sreg[SS].flags); break;
+		case CPUINFO_STR_REGISTER + I386_DS:			sprintf(info->s, "DS: %04X", I.sreg[DS].selector); break;
+		case CPUINFO_STR_REGISTER + I386_DS_BASE:		sprintf(info->s, "DSBASE: %08X", I.sreg[DS].base); break;
+		case CPUINFO_STR_REGISTER + I386_DS_LIMIT:		sprintf(info->s, "DSLIMIT: %08X", I.sreg[DS].limit); break;
+		case CPUINFO_STR_REGISTER + I386_DS_FLAGS:		sprintf(info->s, "DSFLAGS: %04X", I.sreg[DS].flags); break;
+		case CPUINFO_STR_REGISTER + I386_ES:			sprintf(info->s, "ES: %04X", I.sreg[ES].selector); break;
+		case CPUINFO_STR_REGISTER + I386_ES_BASE:		sprintf(info->s, "ESBASE: %08X", I.sreg[ES].base); break;
+		case CPUINFO_STR_REGISTER + I386_ES_LIMIT:		sprintf(info->s, "ESLIMIT: %08X", I.sreg[ES].limit); break;
+		case CPUINFO_STR_REGISTER + I386_ES_FLAGS:		sprintf(info->s, "ESFLAGS: %04X", I.sreg[ES].flags); break;
+		case CPUINFO_STR_REGISTER + I386_FS:			sprintf(info->s, "FS: %04X", I.sreg[FS].selector); break;
+		case CPUINFO_STR_REGISTER + I386_FS_BASE:		sprintf(info->s, "FSBASE: %08X", I.sreg[FS].base); break;
+		case CPUINFO_STR_REGISTER + I386_FS_LIMIT:		sprintf(info->s, "FSLIMIT: %08X", I.sreg[FS].limit); break;
+		case CPUINFO_STR_REGISTER + I386_FS_FLAGS:		sprintf(info->s, "FSFLAGS: %04X", I.sreg[FS].flags); break;
+		case CPUINFO_STR_REGISTER + I386_GS:			sprintf(info->s, "GS: %04X", I.sreg[GS].selector); break;
+		case CPUINFO_STR_REGISTER + I386_GS_BASE:		sprintf(info->s, "GSBASE: %08X", I.sreg[GS].base); break;
+		case CPUINFO_STR_REGISTER + I386_GS_LIMIT:		sprintf(info->s, "GSLIMIT: %08X", I.sreg[GS].limit); break;
+		case CPUINFO_STR_REGISTER + I386_GS_FLAGS:		sprintf(info->s, "GSFLAGS: %04X", I.sreg[GS].flags); break;
 		case CPUINFO_STR_REGISTER + I386_CR0:			sprintf(info->s, "CR0: %08X", I.cr[0]); break;
 		case CPUINFO_STR_REGISTER + I386_CR1:			sprintf(info->s, "CR1: %08X", I.cr[1]); break;
 		case CPUINFO_STR_REGISTER + I386_CR2:			sprintf(info->s, "CR2: %08X", I.cr[2]); break;
@@ -907,6 +1026,18 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + I386_DR7:			sprintf(info->s, "DR7: %08X", I.dr[7]); break;
 		case CPUINFO_STR_REGISTER + I386_TR6:			sprintf(info->s, "TR6: %08X", I.tr[6]); break;
 		case CPUINFO_STR_REGISTER + I386_TR7:			sprintf(info->s, "TR7: %08X", I.tr[7]); break;
+		case CPUINFO_STR_REGISTER + I386_GDTR_BASE:		sprintf(info->s, "GDTRBASE: %08X", I.gdtr.base); break;
+		case CPUINFO_STR_REGISTER + I386_GDTR_LIMIT:	sprintf(info->s, "GDTRLIMIT: %04X", I.gdtr.limit); break;
+		case CPUINFO_STR_REGISTER + I386_IDTR_BASE:		sprintf(info->s, "IDTRBASE: %08X", I.idtr.base); break;
+		case CPUINFO_STR_REGISTER + I386_IDTR_LIMIT:	sprintf(info->s, "IDTRLIMIT: %04X", I.idtr.limit); break;
+		case CPUINFO_STR_REGISTER + I386_LDTR:			sprintf(info->s, "LDTR: %04X", I.ldtr.segment); break;
+		case CPUINFO_STR_REGISTER + I386_LDTR_BASE:		sprintf(info->s, "LDTRBASE: %08X", I.ldtr.base); break;
+		case CPUINFO_STR_REGISTER + I386_LDTR_LIMIT:	sprintf(info->s, "LDTRLIMIT: %08X", I.ldtr.limit); break;
+		case CPUINFO_STR_REGISTER + I386_LDTR_FLAGS:	sprintf(info->s, "LDTRFLAGS: %04X", I.ldtr.flags); break;
+		case CPUINFO_STR_REGISTER + I386_TR:			sprintf(info->s, "TR: %04X", I.task.segment); break;
+		case CPUINFO_STR_REGISTER + I386_TR_BASE:		sprintf(info->s, "TRBASE: %08X", I.task.base); break;
+		case CPUINFO_STR_REGISTER + I386_TR_LIMIT:		sprintf(info->s, "TRLIMIT: %08X", I.task.limit); break;
+		case CPUINFO_STR_REGISTER + I386_TR_FLAGS:		sprintf(info->s, "TRFLAGS: %04X", I.task.flags); break;
 	}
 }
 
@@ -930,6 +1061,11 @@ static void i486_reset(void)
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
 	I.sreg[CS].limit	= 0xffff;
+	I.sreg[CS].flags    = 0x009b;
+
+	I.sreg[DS].base = I.sreg[ES].base = I.sreg[FS].base = I.sreg[GS].base = I.sreg[SS].base = 0x00000000;
+	I.sreg[DS].limit = I.sreg[ES].limit = I.sreg[FS].limit = I.sreg[GS].limit = I.sreg[SS].limit = 0xffff;
+	I.sreg[DS].flags = I.sreg[ES].flags = I.sreg[FS].flags = I.sreg[GS].flags = I.sreg[SS].flags = 0x0092;
 
 	I.idtr.base = 0;
 	I.idtr.limit = 0x3ff;
@@ -1031,6 +1167,11 @@ static void pentium_reset(void)
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
 	I.sreg[CS].limit	= 0xffff;
+	I.sreg[CS].flags    = 0x009b;
+
+	I.sreg[DS].base = I.sreg[ES].base = I.sreg[FS].base = I.sreg[GS].base = I.sreg[SS].base = 0x00000000;
+	I.sreg[DS].limit = I.sreg[ES].limit = I.sreg[FS].limit = I.sreg[GS].limit = I.sreg[SS].limit = 0xffff;
+	I.sreg[DS].flags = I.sreg[ES].flags = I.sreg[FS].flags = I.sreg[GS].flags = I.sreg[SS].flags = 0x0092;
 
 	I.idtr.base = 0;
 	I.idtr.limit = 0x3ff;
@@ -1152,6 +1293,11 @@ static void mediagx_reset(void)
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
 	I.sreg[CS].limit	= 0xffff;
+	I.sreg[CS].flags    = 0x009b;
+
+	I.sreg[DS].base = I.sreg[ES].base = I.sreg[FS].base = I.sreg[GS].base = I.sreg[SS].base = 0x00000000;
+	I.sreg[DS].limit = I.sreg[ES].limit = I.sreg[FS].limit = I.sreg[GS].limit = I.sreg[SS].limit = 0xffff;
+	I.sreg[DS].flags = I.sreg[ES].flags = I.sreg[FS].flags = I.sreg[GS].flags = I.sreg[SS].flags = 0x0092;
 
 	I.idtr.base = 0;
 	I.idtr.limit = 0x3ff;

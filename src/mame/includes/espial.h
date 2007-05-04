@@ -38,15 +38,19 @@ VIDEO_UPDATE( espial );
 
 /*----------- defined in video/marineb.c -----------*/
 
-extern unsigned char *marineb_column_scroll;
-extern int marineb_active_low_flipscreen;
+extern UINT8 *marineb_videoram;
+extern UINT8 *marineb_colorram;
+extern UINT8 marineb_active_low_flipscreen;
 
-WRITE8_HANDLER( marineb_palbank0_w );
-WRITE8_HANDLER( marineb_palbank1_w );
-
+WRITE8_HANDLER( marineb_videoram_w );
+WRITE8_HANDLER( marineb_colorram_w );
+WRITE8_HANDLER( marineb_column_scroll_w );
+WRITE8_HANDLER( marineb_palette_bank_0_w );
+WRITE8_HANDLER( marineb_palette_bank_1_w );
 WRITE8_HANDLER( marineb_flipscreen_x_w );
 WRITE8_HANDLER( marineb_flipscreen_y_w );
 
+VIDEO_START( marineb );
 VIDEO_UPDATE( marineb );
 VIDEO_UPDATE( changes );
 VIDEO_UPDATE( springer );

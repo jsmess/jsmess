@@ -138,70 +138,70 @@ struct op6502_info
 };
 
 static const struct op6502_info op6502[256] = {
-	{m6502_brk,imm},{ora,idx},{ill,non},{ill,non},/* 00 */
-	{ill,non},{ora,zpg},{asl,zpg},{ill,non},
-	{php,imp},{ora,imm},{asl,acc},{ill,non},
-	{ill,non},{ora,aba},{asl,aba},{ill,non},
-	{bpl,rel},{ora,idy},{ill,non},{ill,non},/* 10 */
-	{ill,non},{ora,zpx},{asl,zpx},{ill,non},
-	{clc,imp},{ora,aby},{ill,non},{ill,non},
-	{ill,non},{ora,abx},{asl,abx},{ill,non},
-	{jsr,adr},{and,idx},{ill,non},{ill,non},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{ill,non},
-	{plp,imp},{and,imm},{rol,acc},{ill,non},
-	{bit,aba},{and,aba},{rol,aba},{ill,non},
-	{bmi,rel},{and,idy},{ill,non},{ill,non},/* 30 */
-	{ill,non},{and,zpx},{rol,zpx},{ill,non},
-	{sec,imp},{and,aby},{ill,non},{ill,non},
-	{ill,non},{and,abx},{rol,abx},{ill,non},
-	{rti,imp},{eor,idx},{ill,non},{ill,non},/* 40 */
-	{ill,non},{eor,zpg},{lsr,zpg},{ill,non},
-	{pha,imp},{eor,imm},{lsr,acc},{ill,non},
-	{jmp,adr},{eor,aba},{lsr,aba},{ill,non},
-	{bvc,rel},{eor,idy},{ill,non},{ill,non},/* 50 */
-	{ill,non},{eor,zpx},{lsr,zpx},{ill,non},
-	{cli,imp},{eor,aby},{ill,non},{ill,non},
-	{ill,non},{eor,abx},{lsr,abx},{ill,non},
-	{rts,imp},{adc,idx},{ill,non},{ill,non},/* 60 */
-	{ill,non},{adc,zpg},{ror,zpg},{ill,non},
-	{pla,imp},{adc,imm},{ror,acc},{ill,non},
-	{jmp,ind},{adc,aba},{ror,aba},{ill,non},
-	{bvs,rel},{adc,idy},{ill,non},{ill,non},/* 70 */
-	{ill,non},{adc,zpx},{ror,zpx},{ill,non},
-	{sei,imp},{adc,aby},{ill,non},{ill,non},
-	{ill,non},{adc,abx},{ror,abx},{ill,non},
-	{ill,non},{sta,idx},{ill,non},{ill,non},/* 80 */
-	{sty,zpg},{sta,zpg},{stx,zpg},{ill,non},
-	{dey,imp},{ill,non},{txa,imp},{ill,non},
-	{sty,aba},{sta,aba},{stx,aba},{ill,non},
-	{bcc,rel},{sta,idy},{ill,non},{ill,non},/* 90 */
-	{sty,zpx},{sta,zpx},{stx,zpy},{ill,non},
-	{tya,imp},{sta,aby},{txs,imp},{ill,non},
-	{ill,non},{sta,abx},{ill,non},{ill,non},
-	{ldy,imm},{lda,idx},{ldx,imm},{ill,non},/* a0 */
-	{ldy,zpg},{lda,zpg},{ldx,zpg},{ill,non},
-	{tay,imp},{lda,imm},{tax,imp},{ill,non},
-	{ldy,aba},{lda,aba},{ldx,aba},{ill,non},
-	{bcs,rel},{lda,idy},{ill,non},{ill,non},/* b0 */
-	{ldy,zpx},{lda,zpx},{ldx,zpy},{ill,non},
-	{clv,imp},{lda,aby},{tsx,imp},{ill,non},
-	{ldy,abx},{lda,abx},{ldx,aby},{ill,non},
-	{cpy,imm},{cmp,idx},{ill,non},{ill,non},/* c0 */
-	{cpy,zpg},{cmp,zpg},{dec,zpg},{ill,non},
-	{iny,imp},{cmp,imm},{dex,imp},{ill,non},
-	{cpy,aba},{cmp,aba},{dec,aba},{ill,non},
-	{bne,rel},{cmp,idy},{ill,non},{ill,non},/* d0 */
-	{ill,non},{cmp,zpx},{dec,zpx},{ill,non},
-	{cld,imp},{cmp,aby},{ill,non},{ill,non},
-	{ill,non},{cmp,abx},{dec,abx},{ill,non},
-	{cpx,imm},{sbc,idx},{ill,non},{ill,non},/* e0 */
-	{cpx,zpg},{sbc,zpg},{inc,zpg},{ill,non},
-	{inx,imp},{sbc,imm},{nop,imp},{ill,non},
-	{cpx,aba},{sbc,aba},{inc,aba},{ill,non},
-	{beq,rel},{sbc,idy},{ill,non},{ill,non},/* f0 */
-	{ill,non},{sbc,zpx},{inc,zpx},{ill,non},
-	{sed,imp},{sbc,aby},{ill,non},{ill,non},
-	{ill,non},{sbc,abx},{inc,abx},{ill,non}
+	{m6502_brk,imm},{ora,idx},{kil,non},{slo,idx},/* 00 */
+	{dop,imm},{ora,zpg},{asl,zpg},{slo,zpg},
+	{php,imp},{ora,imm},{asl,acc},{anc,imm},
+	{top,iw2},{ora,aba},{asl,aba},{slo,aba},
+	{bpl,rel},{ora,idy},{nop,imp},{slo,idy},/* 10 */
+	{dop,imm},{ora,zpx},{asl,zpx},{slo,zpx},
+	{clc,imp},{ora,aby},{kil,non},{slo,aby},
+	{top,iw2},{ora,abx},{asl,abx},{slo,abx},
+	{jsr,adr},{and,idx},{kil,non},{rla,idx},/* 20 */
+	{bit,zpg},{and,zpg},{rol,zpg},{rla,zpg},
+	{plp,imp},{and,imm},{rol,acc},{anc,imm},
+	{bit,aba},{and,aba},{rol,aba},{rla,aba},
+	{bmi,rel},{and,idy},{kil,non},{rla,idy},/* 30 */
+	{dop,imm},{and,zpx},{rol,zpx},{rla,zpx},
+	{sec,imp},{and,aby},{nop,imp},{rla,aby},
+	{top,iw2},{and,abx},{rol,abx},{rla,abx},
+	{rti,imp},{eor,idx},{kil,non},{sre,idx},/* 40 */
+	{dop,imm},{eor,zpg},{lsr,zpg},{sre,zpg},
+	{pha,imp},{eor,imm},{lsr,acc},{asr,imm},
+	{jmp,adr},{eor,aba},{lsr,aba},{sre,aba},
+	{bvc,rel},{eor,idy},{kil,non},{sre,idy},/* 50 */
+	{dop,imm},{eor,zpx},{lsr,zpx},{sre,zpx},
+	{cli,imp},{eor,aby},{nop,imp},{sre,aby},
+	{top,iw2},{eor,abx},{lsr,abx},{sre,abx},
+	{rts,imp},{adc,idx},{kil,non},{rra,idx},/* 60 */
+	{dop,imm},{adc,zpg},{ror,zpg},{rra,zpg},
+	{pla,imp},{adc,imm},{ror,acc},{arr,imm},
+	{jmp,ind},{adc,aba},{ror,aba},{rra,aba},
+	{bvs,rel},{adc,idy},{kil,non},{rra,idy},/* 70 */
+	{dop,imm},{adc,zpx},{ror,zpx},{rra,zpx},
+	{sei,imp},{adc,aby},{nop,imp},{rra,aby},
+	{top,iw2},{adc,abx},{ror,abx},{rra,abx},
+	{dop,imm},{sta,idx},{dop,imm},{sax,idx},/* 80 */
+	{sty,zpg},{sta,zpg},{stx,zpg},{sax,zpg},
+	{dey,imp},{dop,imm},{txa,imp},{axa,imm},
+	{sty,aba},{sta,aba},{stx,aba},{sax,aba},
+	{bcc,rel},{sta,idy},{kil,non},{say,idy},/* 90 */
+	{sty,zpx},{sta,zpx},{stx,zpy},{sax,zpx},
+	{tya,imp},{sta,aby},{txs,imp},{ssh,aby},
+	{syh,abx},{sta,abx},{sxh,aby},{sah,aby},
+	{ldy,imm},{lda,idx},{ldx,imm},{lax,idx},/* a0 */
+	{ldy,zpg},{lda,zpg},{ldx,zpg},{lax,zpg},
+	{tay,imp},{lda,imm},{tax,imp},{oal,imm},
+	{ldy,aba},{lda,aba},{ldx,aba},{lax,aba},
+	{bcs,rel},{lda,idy},{kil,non},{lax,idy},/* b0 */
+	{ldy,zpx},{lda,zpx},{ldx,zpy},{lax,zpx},
+	{clv,imp},{lda,aby},{tsx,imp},{ast,aby},
+	{ldy,abx},{lda,abx},{ldx,aby},{lax,abx},
+	{cpy,imm},{cmp,idx},{dop,imm},{dcp,idx},/* c0 */
+	{cpy,zpg},{cmp,zpg},{dec,zpg},{dcp,zpg},
+	{iny,imp},{cmp,imm},{dex,imp},{asx,imm},
+	{cpy,aba},{cmp,aba},{dec,aba},{dcp,aba},
+	{bne,rel},{cmp,idy},{kil,non},{dcp,idy},/* d0 */
+	{dop,imm},{cmp,zpx},{dec,zpx},{dcp,zpx},
+	{cld,imp},{cmp,aby},{nop,imp},{dcp,aby},
+	{top,iw2},{cmp,abx},{dec,abx},{dcp,abx},
+	{cpx,imm},{sbc,idx},{dop,imm},{isc,idx},/* e0 */
+	{cpx,zpg},{sbc,zpg},{inc,zpg},{isc,zpg},
+	{inx,imp},{sbc,imm},{nop,imp},{sbc,imm},
+	{cpx,aba},{sbc,aba},{inc,aba},{isc,aba},
+	{beq,rel},{sbc,idy},{kil,non},{isc,idy},/* f0 */
+	{dop,imm},{sbc,zpx},{inc,zpx},{isc,zpx},
+	{sed,imp},{sbc,aby},{nop,imp},{isc,aby},
+	{top,iw2},{sbc,abx},{inc,abx},{isc,abx}
 };
 
 static const struct op6502_info op65c02[256] = {
@@ -337,73 +337,6 @@ static const struct op6502_info op65sc02[256] = {
 	{ill,non},{sbc,zpx},{inc,zpx},{smb,zpg},
 	{sed,imp},{sbc,aby},{plx,imp},{ill,non},
 	{ill,non},{sbc,abx},{inc,abx},{bbs,zpb}
-};
-
-static const struct op6502_info op6510[256] = {
-	{m6502_brk,imm},{ora,idx},{kil,non},{slo,idx},/* 00 */
-	{dop,imm},{ora,zpg},{asl,zpg},{slo,zpg},
-	{php,imp},{ora,imm},{asl,acc},{anc,imm},
-	{top,iw2},{ora,aba},{asl,aba},{slo,aba},
-	{bpl,rel},{ora,idy},{nop,imp},{slo,idy},/* 10 */
-	{dop,imm},{ora,zpx},{asl,zpx},{slo,zpx},
-	{clc,imp},{ora,aby},{kil,non},{slo,aby},
-	{top,iw2},{ora,abx},{asl,abx},{slo,abx},
-	{jsr,adr},{and,idx},{kil,non},{rla,idx},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{rla,zpg},
-	{plp,imp},{and,imm},{rol,acc},{anc,imm},
-	{bit,aba},{and,aba},{rol,aba},{rla,aba},
-	{bmi,rel},{and,idy},{kil,non},{rla,idy},/* 30 */
-	{dop,imm},{and,zpx},{rol,zpx},{rla,zpx},
-	{sec,imp},{and,aby},{nop,imp},{rla,aby},
-	{top,iw2},{and,abx},{rol,abx},{rla,abx},
-	{rti,imp},{eor,idx},{kil,non},{sre,idx},/* 40 */
-	{dop,imm},{eor,zpg},{lsr,zpg},{sre,zpg},
-	{pha,imp},{eor,imm},{lsr,acc},{asr,imm},
-	{jmp,adr},{eor,aba},{lsr,aba},{sre,aba},
-	{bvc,rel},{eor,idy},{kil,non},{sre,idy},/* 50 */
-	{dop,imm},{eor,zpx},{lsr,zpx},{sre,zpx},
-	{cli,imp},{eor,aby},{nop,imp},{sre,aby},
-	{top,iw2},{eor,abx},{lsr,abx},{sre,abx},
-	{rts,imp},{adc,idx},{kil,non},{rra,idx},/* 60 */
-	{dop,imm},{adc,zpg},{ror,zpg},{rra,zpg},
-	{pla,imp},{adc,imm},{ror,acc},{arr,imm},
-	{jmp,ind},{adc,aba},{ror,aba},{rra,aba},
-	{bvs,rel},{adc,idy},{kil,non},{rra,idy},/* 70 */
-	{dop,imm},{adc,zpx},{ror,zpx},{rra,zpx},
-	{sei,imp},{adc,aby},{nop,imp},{rra,aby},
-	{top,iw2},{adc,abx},{ror,abx},{rra,abx},
-	{dop,imm},{sta,idx},{dop,imm},{sax,idx},/* 80 */
-	{sty,zpg},{sta,zpg},{stx,zpg},{sax,zpg},
-	{dey,imp},{dop,imm},{txa,imp},{axa,imm},
-	{sty,aba},{sta,aba},{stx,aba},{sax,aba},
-	{bcc,rel},{sta,idy},{kil,non},{say,idy},/* 90 */
-	{sty,zpx},{sta,zpx},{stx,zpy},{sax,zpx},
-	{tya,imp},{sta,aby},{txs,imp},{ssh,aby},
-	{syh,abx},{sta,abx},{sxh,aby},{sah,aby},
-	{ldy,imm},{lda,idx},{ldx,imm},{lax,idx},/* a0 */
-	{ldy,zpg},{lda,zpg},{ldx,zpg},{lax,zpg},
-	{tay,imp},{lda,imm},{tax,imp},{oal,imm},
-	{ldy,aba},{lda,aba},{ldx,aba},{lax,aba},
-	{bcs,rel},{lda,idy},{kil,non},{lax,idy},/* b0 */
-	{ldy,zpx},{lda,zpx},{ldx,zpy},{lax,zpx},
-	{clv,imp},{lda,aby},{tsx,imp},{ast,aby},
-	{ldy,abx},{lda,abx},{ldx,aby},{lax,abx},
-	{cpy,imm},{cmp,idx},{dop,imm},{dcp,idx},/* c0 */
-	{cpy,zpg},{cmp,zpg},{dec,zpg},{dcp,zpg},
-	{iny,imp},{cmp,imm},{dex,imp},{asx,imm},
-	{cpy,aba},{cmp,aba},{dec,aba},{dcp,aba},
-	{bne,rel},{cmp,idy},{kil,non},{dcp,idy},/* d0 */
-	{dop,imm},{cmp,zpx},{dec,zpx},{dcp,zpx},
-	{cld,imp},{cmp,aby},{nop,imp},{dcp,aby},
-	{top,iw2},{cmp,abx},{dec,abx},{dcp,abx},
-	{cpx,imm},{sbc,idx},{dop,imm},{isc,idx},/* e0 */
-	{cpx,zpg},{sbc,zpg},{inc,zpg},{isc,zpg},
-	{inx,imp},{sbc,imm},{nop,imp},{sbc,imm},
-	{cpx,aba},{sbc,aba},{inc,aba},{isc,aba},
-	{beq,rel},{sbc,idy},{kil,non},{isc,idy},/* f0 */
-	{dop,imm},{sbc,zpx},{inc,zpx},{isc,zpx},
-	{sed,imp},{sbc,aby},{nop,imp},{isc,aby},
-	{top,iw2},{sbc,abx},{inc,abx},{isc,abx}
 };
 
 #if (HAS_M65CE02)
@@ -797,8 +730,6 @@ static unsigned internal_m6502_dasm(const struct op6502_info *opinfo, char *buff
 		op = opram[pos++];
 		pc++;
 		addr = op;
-		pos += 2;
-		pc += 2;
 		dst += sprintf(dst,"(s,$%02X),y", addr);
 		break;
 
@@ -840,7 +771,7 @@ unsigned m65ce02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *
 #if (HAS_M6510)
 unsigned m6510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	return internal_m6502_dasm(op6510, buffer, pc, oprom, opram);
+	return internal_m6502_dasm(op6502, buffer, pc, oprom, opram);
 }
 #endif
 

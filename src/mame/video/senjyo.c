@@ -23,8 +23,6 @@ static tilemap *fg_tilemap,*bg1_tilemap,*bg2_tilemap,*bg3_tilemap;
 static int senjyo, scrollhack;
 static int senjyo_bgstripes;
 
-static mame_bitmap *bgbitmap;
-
 
 DRIVER_INIT( starforc )
 {
@@ -117,9 +115,8 @@ static void get_bg3_tile_info(int tile_index)
 
 VIDEO_START( senjyo )
 {
-	bgbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
-
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
+
 	if (senjyo)
 	{
 		bg1_tilemap = tilemap_create(senjyo_bg1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,16,32);
@@ -138,8 +135,6 @@ VIDEO_START( senjyo )
 	tilemap_set_transparent_pen(bg2_tilemap,0);
 	tilemap_set_transparent_pen(bg3_tilemap,0);
 	tilemap_set_scroll_cols(fg_tilemap,32);
-
-	set_vh_global_attribute(NULL,0);
 
 	return 0;
 }
@@ -196,7 +191,6 @@ WRITE8_HANDLER( senjyo_bg3videoram_w )
 WRITE8_HANDLER( senjyo_bgstripes_w )
 {
 	*senjyo_bgstripesram = data;
-	set_vh_global_attribute(&senjyo_bgstripes, data);
 }
 
 /***************************************************************************
@@ -213,10 +207,8 @@ static void draw_bgbitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 	if (senjyo_bgstripes == 0xff)	/* off */
 	{
 		fillbitmap(bitmap,Machine->pens[0],cliprect);
-		return;
 	}
-
-	if (get_vh_global_attribute_changed())
+	else
 	{
 		pen = 0;
 		count = 0;
@@ -230,14 +222,14 @@ static void draw_bgbitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 			{
 				for (y = 0;y < 256;y++)
 				{
-					*BITMAP_ADDR16(bgbitmap, y, 255 - x) = Machine->pens[384 + pen];
+					*BITMAP_ADDR16(bitmap, y, 255 - x) = Machine->pens[384 + pen];
 				}
 			}
 			else
 			{
 				for (y = 0;y < 256;y++)
 				{
-					*BITMAP_ADDR16(bgbitmap, y, x) = Machine->pens[384 + pen];
+					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[384 + pen];
 				}
 			}
 
@@ -249,8 +241,6 @@ static void draw_bgbitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 			}
 		}
 	}
-
-	copybitmap(bitmap,bgbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 }
 
 static void draw_radar(mame_bitmap *bitmap,const rectangle *cliprect)

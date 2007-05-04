@@ -831,7 +831,7 @@ static MACHINE_DRIVER_START( sf )
 	/* audio CPU */	/* ? xtal is 3.579545MHz */
 	MDRV_CPU_PROGRAM_MAP(sound2_readmem,sound2_writemem)
 	MDRV_CPU_IO_MAP(sound2_readport,sound2_writeport)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(8000))
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

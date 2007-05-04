@@ -750,6 +750,17 @@ int mame_timer_enable(mame_timer *which, int enable)
 
 
 /*-------------------------------------------------
+    timer_enabled - determine if a timer is
+    enabled
+-------------------------------------------------*/
+
+int mame_timer_enabled(mame_timer *which)
+{
+	return which->enabled;
+}
+
+
+/*-------------------------------------------------
     timer_get_param
     timer_get_param_ptr - returns the callback
     parameter of a timer

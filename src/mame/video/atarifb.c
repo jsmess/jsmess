@@ -36,24 +36,7 @@ WRITE8_HANDLER( atarifb_alphap2_vram_w )
 ***************************************************************************/
 WRITE8_HANDLER( atarifb_scroll_w )
 {
-	if (data - 8 != *atarifb_scroll_register)
-	{
-		*atarifb_scroll_register = data - 8;
-		memset(dirtybuffer,1,videoram_size);
-	}
-}
-
-/***************************************************************************
-***************************************************************************/
-
-VIDEO_START( atarifb )
-{
-	if (video_start_generic(machine))
-		return 1;
-
-	memset(dirtybuffer, 1, videoram_size);
-
-	return 0;
+	*atarifb_scroll_register = data - 8;
 }
 
 /***************************************************************************
@@ -69,17 +52,12 @@ VIDEO_UPDATE( atarifb )
 	int offs,obj;
 	int sprite_bank;
 
-	if (get_vh_global_attribute_changed())
-		memset(dirtybuffer,1,videoram_size);
-
 	/* Soccer uses a different graphics set for sprites */
 	if (atarifb_game == 4)
 		sprite_bank = 2;
 	else
 		sprite_bank = 1;
 
-	/* for every character in the Player 1 Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
 	for (offs = atarifb_alphap1_vram_size - 1;offs >= 0;offs--)
 	{
 		int charcode;
@@ -103,8 +81,6 @@ VIDEO_UPDATE( atarifb )
 		}
 	}
 
-	/* for every character in the Player 2 Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
 	for (offs = atarifb_alphap2_vram_size - 1;offs >= 0;offs--)
 	{
 		int charcode;
@@ -128,42 +104,37 @@ VIDEO_UPDATE( atarifb )
 		}
 	}
 
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int charcode;
+		int flipx,flipy;
+		int sx,sy;
+
+		dirtybuffer[offs]=0;
+
+		charcode = videoram[offs] & 0x3f;
+		flipx = (videoram[offs] & 0x40) >> 6;
+		flipy = (videoram[offs] & 0x80) >> 7;
+
+		sx = (8 * (offs % 32) - *atarifb_scroll_register);
+		sy = 8 * (offs / 32) + 8;
+
+		/* Soccer hack */
+		if (atarifb_game == 4)
 		{
-			int charcode;
-			int flipx,flipy;
-			int sx,sy;
-
-			dirtybuffer[offs]=0;
-
-			charcode = videoram[offs] & 0x3f;
-			flipx = (videoram[offs] & 0x40) >> 6;
-			flipy = (videoram[offs] & 0x80) >> 7;
-
-			sx = (8 * (offs % 32) - *atarifb_scroll_register);
-			sy = 8 * (offs / 32) + 8;
-
-			/* Soccer hack */
-			if (atarifb_game == 4)
-			{
-				sy += 8;
-			}
-
-			/* Baseball hack */
-			if (atarifb_game == 0x03) sx -= 8;
-
-			if (sx < 0) sx += 256;
-			if (sx > 255) sx -= 256;
-
-			drawgfx(tmpbitmap,machine->gfx[1],
-					charcode, 0,
-					flipx,flipy,sx,sy,
-					0,TRANSPARENCY_NONE,0);
+			sy += 8;
 		}
+
+		/* Baseball hack */
+		if (atarifb_game == 0x03) sx -= 8;
+
+		if (sx < 0) sx += 256;
+		if (sx > 255) sx -= 256;
+
+		drawgfx(tmpbitmap,machine->gfx[1],
+				charcode, 0,
+				flipx,flipy,sx,sy,
+				0,TRANSPARENCY_NONE,0);
 	}
 
 	/* copy the character mapped graphics */

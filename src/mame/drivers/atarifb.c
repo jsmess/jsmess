@@ -546,7 +546,7 @@ static MACHINE_DRIVER_START( atarifb )
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 	MDRV_PALETTE_INIT(atarifb)
-	MDRV_VIDEO_START(atarifb)
+	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(atarifb)
 
 	/* sound hardware */

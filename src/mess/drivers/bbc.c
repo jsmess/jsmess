@@ -725,7 +725,7 @@ static MACHINE_DRIVER_START( bbca )
 	MDRV_CPU_ADD_TAG("main", M6502, 2000000)        /* 2.00Mhz */
 	MDRV_CPU_PROGRAM_MAP( bbca_mem, 0 )
 	MDRV_CPU_VBLANK_INT(bbcb_vsync, 1)				/* screen refresh interrupts */
-	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, TIME_IN_HZ(1000))		/* scan keyboard */
+	MDRV_CPU_PERIODIC_INT(bbcb_keyscan, 1000)		/* scan keyboard */
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(128))
 	MDRV_INTERLEAVE(1)
@@ -789,7 +789,7 @@ static MACHINE_DRIVER_START( bbcm )
 	MDRV_CPU_ADD_TAG("main", M65SC02, 2000000)        /* 2.00Mhz */
 	MDRV_CPU_PROGRAM_MAP( bbcm_mem, 0 )
 	MDRV_CPU_VBLANK_INT(bbcb_vsync, 1)				/* screen refresh interrupts */
-	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, TIME_IN_HZ(1000))		/* scan keyboard */
+	MDRV_CPU_PERIODIC_INT(bbcm_keyscan, 1000)		/* scan keyboard */
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(128))
 	MDRV_INTERLEAVE(1)

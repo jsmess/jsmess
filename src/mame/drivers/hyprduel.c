@@ -140,7 +140,7 @@ static WRITE16_HANDLER( hypr_subcpu_control_w )
 			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
 			subcpu_resetline = 0;
 			if (pc == 0xbb0 || pc == 0x9d30 || pc == 0xb19c)
-				cpu_spinuntil_time(TIME_IN_USEC(15000));		/* sync semaphore */
+				cpu_spinuntil_time(MAME_TIME_IN_USEC(15000));		/* sync semaphore */
 		}
 		else if (subcpu_resetline == -1)
 		{

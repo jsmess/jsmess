@@ -324,7 +324,7 @@ WRITE8_HANDLER( decocass_mode_set_w )
 		(data & 0x40) ? " tunnel" : "",
 		(data & 0x80) ? " part_h_enable" : ""));
 
-	set_vh_global_attribute( &mode_set, data );
+	mode_set = data;
 }
 
 WRITE8_HANDLER( decocass_color_center_bot_w )
@@ -342,7 +342,8 @@ WRITE8_HANDLER( decocass_color_center_bot_w )
      * D1   CLD4
      * D0   CLD3
      */
-	set_vh_global_attribute( &color_center_bot, data);
+
+	color_center_bot = data;
 }
 
 WRITE8_HANDLER( decocass_back_h_shift_w )

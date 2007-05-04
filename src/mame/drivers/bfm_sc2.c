@@ -3168,7 +3168,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 
 	MDRV_CPU_ADD_TAG("main", M6809, 2000000 )				// 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap_vid,0)					// setup scorpion2 board memorymap
-	MDRV_CPU_PERIODIC_INT(timer_irq, TIME_IN_HZ(1000) )	// generate 1000 IRQ's per second
+	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
 	MDRV_NVRAM_HANDLER(nvram)
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc2)
 

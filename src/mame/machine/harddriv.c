@@ -1246,7 +1246,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
 	cpu_spinuntil_trigger(DS3_TRIGGER);
-	cpu_triggertime(TIME_IN_USEC(5), DS3_TRIGGER);
+	cpu_triggertime(MAME_TIME_IN_USEC(5), DS3_TRIGGER);
 
 	return ds3_gdata;
 }

@@ -278,7 +278,7 @@ VIDEO_UPDATE( pastelg )
 	int x, y;
 	unsigned char color;
 
-	if (get_vh_global_attribute_changed() || pastelg_screen_refresh)
+	if (pastelg_screen_refresh)
 	{
 		pastelg_screen_refresh = 0;
 

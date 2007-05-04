@@ -105,16 +105,16 @@ static UINT8 *sound_rambase;
 
 
 
-INLINE int swap_bits_5_6(int data)
+INLINE UINT8 swap_bits_5_6(UINT8 data)
 {
-	return (data & 0x9f) | ((data & 0x20) << 1) | ((data & 0x40) >> 1);
+	return BITSWAP8(data,7,5,6,4,3,2,1,0);
 }
 
 
 static void btime_decrypt(void)
 {
 	UINT8 *src, *src1;
-	int A,A1;
+	int addr, addr1;
 
 
 	/* the encryption is a simple bit rotation: 76543210 -> 65342710, but */
@@ -123,22 +123,21 @@ static void btime_decrypt(void)
 	/* xxxx xxx1 xxxx x1xx are encrypted. */
 
 	/* get the address of the next opcode */
-	A = activecpu_get_pc();
+	addr = activecpu_get_pc();
 
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
-	A1 = activecpu_get_previouspc();
-	src1 = (A1 < 0x9000) ? rambase : memory_region(REGION_CPU1);
-	if (decrypted[A1] == 0x20)	/* JSR $xxxx */
-		A = src1[A1+1] + 256 * src1[A1+2];
+	addr1 = activecpu_get_previouspc();
+	src1 = (addr1 < 0x9000) ? rambase : memory_region(REGION_CPU1);
+	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
+		addr = src1[addr1+1] + 256 * src1[addr1+2];
 
 	/* If the address of the next instruction is xxxx xxx1 xxxx x1xx, decode it. */
-	src = (A < 0x9000) ? rambase : memory_region(REGION_CPU1);
-	if ((A & 0x0104) == 0x0104)
+	src = (addr < 0x9000) ? rambase : memory_region(REGION_CPU1);
+	if ((addr & 0x0104) == 0x0104)
 	{
 		/* 76543210 -> 65342710 bit rotation */
-		decrypted[A] = (src[A] & 0x13) | ((src[A] & 0x80) >> 5) | ((src[A] & 0x64) << 1)
-			   | ((src[A] & 0x08) << 2);
+		decrypted[addr] = BITSWAP8(src[addr],6,5,3,4,2,7,1,0);
 	}
 }
 
@@ -181,10 +180,9 @@ static WRITE8_HANDLER( mmonkey_w )
 
 static WRITE8_HANDLER( btime_w )
 {
-	if      (offset <= 0x07ff)                     rambase[offset] = data;
+	if      (offset <= 0x07ff)                     ;
 	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(offset - 0x0c00,data);
-	else if (offset >= 0x1000 && offset <= 0x13ff) videoram_w(offset - 0x1000,data);
-	else if (offset >= 0x1400 && offset <= 0x17ff) colorram_w(offset - 0x1400,data);
+	else if (offset >= 0x1000 && offset <= 0x17ff) ;
 	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(offset - 0x1800,data);
 	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(offset - 0x1c00,data);
 	else if (offset == 0x4002)                     btime_video_control_w(0,data);
@@ -192,36 +190,39 @@ static WRITE8_HANDLER( btime_w )
 	else if (offset == 0x4004)                     bnj_scroll1_w(0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
+	rambase[offset] = data;
+
 	btime_decrypt();
 }
 
 static WRITE8_HANDLER( zoar_w )
 {
-	if      (offset <= 0x07ff) 					   rambase[offset] = data;
-	else if (offset >= 0x8000 && offset <= 0x83ff) videoram_w(offset - 0x8000,data);
-	else if (offset >= 0x8400 && offset <= 0x87ff) colorram_w(offset - 0x8400,data);
+	if      (offset <= 0x07ff) 					   ;
+	else if (offset >= 0x8000 && offset <= 0x87ff) ;
 	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(offset - 0x8800,data);
 	else if (offset >= 0x8c00 && offset <= 0x8fff) btime_mirrorcolorram_w(offset - 0x8c00,data);
 	else if (offset == 0x9000)					   zoar_video_control_w(0, data);
-	else if (offset >= 0x9800 && offset <= 0x9803) rambase[offset] = data;
+	else if (offset >= 0x9800 && offset <= 0x9803) ;
 	else if (offset == 0x9804)                     bnj_scroll2_w(0,data);
 	else if (offset == 0x9805)                     bnj_scroll1_w(0,data);
 	else if (offset == 0x9806)                     sound_command_w(0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+
+	rambase[offset] = data;
 
 	btime_decrypt();
 }
 
 static WRITE8_HANDLER( disco_w )
 {
-	if      (offset <= 0x04ff)                     rambase[offset] = data;
+	if      (offset <= 0x04ff)                     ;
 	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(offset - 0x2000,data);
-	else if (offset >= 0x8000 && offset <= 0x83ff) videoram_w(offset - 0x8000,data);
-	else if (offset >= 0x8400 && offset <= 0x87ff) colorram_w(offset - 0x8400,data);
-	else if (offset >= 0x8800 && offset <= 0x881f) rambase[offset] = data;
+	else if (offset >= 0x8000 && offset <= 0x881f) ;
 	else if (offset == 0x9a00)                     sound_command_w(0,data);
 	else if (offset == 0x9c00)                     disco_video_control_w(0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+
+	rambase[offset] = data;
 
 	btime_decrypt();
 }
@@ -245,8 +246,8 @@ static ADDRESS_MAP_START( btime_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(MWA8_NOP)
@@ -277,8 +278,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cookrace_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x0500, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0xc800, 0xcbff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_WRITE(MWA8_RAM)	/* background? */
@@ -306,8 +307,8 @@ static ADDRESS_MAP_START( zoar_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	    /* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0x8800, 0x8bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(zoar_video_control_w)
@@ -335,7 +336,7 @@ static ADDRESS_MAP_START( lnc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x7800, 0x7bff) AM_WRITE(colorram_w) AM_BASE(&colorram)  /* this is just here to initialize the pointer */
+	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)  /* this is just here to initialize the pointer */
 	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(lnc_mirrorvideoram_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(MWA8_NOP)            /* ??? */
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(lnc_video_control_w)
@@ -363,7 +364,7 @@ static ADDRESS_MAP_START( mmonkey_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 									/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x7800, 0x7bff) AM_WRITE(colorram_w) AM_BASE(&colorram)  /* this is just here to initialize the pointer */
+	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)  /* this is just here to initialize the pointer */
 	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(lnc_mirrorvideoram_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(lnc_video_control_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_RAM) AM_BASE(&lnc_charbank)
@@ -390,8 +391,8 @@ static ADDRESS_MAP_START( bnj_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(bnj_video_control_w)
 	AM_RANGE(0x1002, 0x1002) AM_WRITE(sound_command_w)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x5000, 0x51ff) AM_WRITE(bnj_background_w) AM_BASE(&bnj_backgroundram) AM_SIZE(&bnj_backgroundram_size)
@@ -417,8 +418,8 @@ static ADDRESS_MAP_START( disco_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x04ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x2000, 0x7fff) AM_WRITE(deco_charram_w) AM_BASE(&deco_charram)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0x8800, 0x881f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(sound_command_w)
 	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(disco_video_control_w)
@@ -1794,13 +1795,13 @@ static void decrypt_C10707_cpu(int cpu, int region)
 {
 	UINT8 *decrypt = auto_malloc(0x10000);
 	UINT8 *rom = memory_region(region);
-	offs_t A;
+	offs_t addr;
 
 	memory_set_decrypted_region(cpu, 0x0000, 0xffff, decrypt);
 
 	/* Swap bits 5 & 6 for opcodes */
-	for (A = 0;A < 0x10000;A++)
-		decrypt[A] = swap_bits_5_6(rom[A]);
+	for (addr = 0; addr < 0x10000; addr++)
+		decrypt[addr] = swap_bits_5_6(rom[addr]);
 
 	if (cpu == 0)
 		decrypted = decrypt;

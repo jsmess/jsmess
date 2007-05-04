@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START(ti990_4)
 	MDRV_CPU_PROGRAM_MAP(ti990_4_memmap, 0)
 	MDRV_CPU_IO_MAP(ti990_4_readcru, ti990_4_writecru)
 	/*MDRV_CPU_VBLANK_INT(NULL, 0)*/
-	MDRV_CPU_PERIODIC_INT(ti990_4_line_interrupt, TIME_IN_HZ(120)/*or TIME_IN_HZ(100) in Europe*/)
+	MDRV_CPU_PERIODIC_INT(ti990_4_line_interrupt, 120/*or TIME_IN_HZ(100) in Europe*/)
 
 	/* video hardware - we emulate a single 911 vdt display */
 	MDRV_SCREEN_REFRESH_RATE(60)

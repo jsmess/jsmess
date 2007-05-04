@@ -233,8 +233,9 @@ void dma_finished( int n_channel )
 				// The patch is meant as a hint for somebody who knows
 				// the hardware.
 				// Mametesters.org: psyforce0105u5red, raystorm0111u1red
-				if (n_address == g_p_n_psxram[ (n_nextaddress & 0xffffff) / 4])
-					break;
+				if ((n_nextaddress & 0xffffff) != 0xffffff)
+					if (n_address == g_p_n_psxram[ (n_nextaddress & 0xffffff) / 4])
+						break;
 				if (n_address == (n_nextaddress & 0xffffff) )
 					break;
 				n_address = ( n_nextaddress & 0xffffff );

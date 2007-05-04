@@ -4820,7 +4820,7 @@ INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// J
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N	)	PORT_PLAYER(2)	// N
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN		)	// Reach
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET	)	// BET
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET	)	PORT_PLAYER(2)	// BET
 
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C	)	PORT_PLAYER(2)	// C
@@ -5487,7 +5487,6 @@ static MACHINE_DRIVER_START( quizchq )
 	MDRV_CPU_PROGRAM_MAP(quizchq_readmem,quizchq_writemem)
 	MDRV_CPU_IO_MAP(quizchq_readport,quizchq_writeport)
 	MDRV_CPU_VBLANK_INT(quizchq_irq,1)
-//  MDRV_CPU_PERIODIC_INT(rtc_irq,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -5774,7 +5773,7 @@ static MACHINE_DRIVER_START( mjmyster )
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
 	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
-	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, TIME_IN_HZ(1) )
+	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 3579545)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
@@ -5842,7 +5841,7 @@ static MACHINE_DRIVER_START( mjmyuniv )
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
 	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
-	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, TIME_IN_HZ(1) )
+	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
@@ -5855,7 +5854,7 @@ static MACHINE_DRIVER_START( mjmyornt )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
 	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
-	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, TIME_IN_HZ(1) )
+	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)

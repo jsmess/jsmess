@@ -463,7 +463,7 @@ VIDEO_UPDATE( nbmj9195 )
 	int x, y;
 	int scrolly[2];
 
-	if (get_vh_global_attribute_changed() || nbmj9195_screen_refresh)
+	if (nbmj9195_screen_refresh)
 	{
 		nbmj9195_screen_refresh = 0;
 

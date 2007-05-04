@@ -10,90 +10,84 @@
 #include "driver.h"
 
 
-unsigned char *tutankhm_scrollx;
+#define NUM_PENS	(0x10)
+
+
+UINT8 *tutankhm_videoram;
+size_t tutankhm_videoram_size;
+UINT8 *tutankhm_paletteram;
+UINT8 *tutankhm_scroll;
+
+static UINT8 junofrst_blitterdata[4];
+static UINT8 tutankhm_flip_screen_x;
+static UINT8 tutankhm_flip_screen_y;
 
 
 
-static void videowrite(int offset,int data)
+WRITE8_HANDLER( tutankhm_flip_screen_x_w )
 {
-	unsigned char x1,x2,y1,y2;
-
-
-	x1 = ( offset & 0x7f ) << 1;
-	y1 = ( offset >> 7 );
-	x2 = x1 + 1;
-	y2 = y1;
-
-	if (flip_screen_x)
-	{
-		x1 = 255 - x1;
-		x2 = 255 - x2;
-	}
-	if (flip_screen_y)
-	{
-		y1 = 255 - y1;
-		y2 = 255 - y2;
-	}
-
-	*BITMAP_ADDR16(tmpbitmap, y1, x1) = Machine->pens[data & 0x0f];
-	*BITMAP_ADDR16(tmpbitmap, y2, x2) = Machine->pens[data >> 4];
+	tutankhm_flip_screen_x = data & 0x01;
 }
 
 
-
-WRITE8_HANDLER( tutankhm_videoram_w )
+WRITE8_HANDLER( tutankhm_flip_screen_y_w )
 {
-	videoram[offset] = data;
-	videowrite(offset,data);
+	tutankhm_flip_screen_y = data & 0x01;
 }
 
 
+static void get_pens(pen_t *pens)
+{
+	offs_t i;
 
-/***************************************************************************
+	for (i = 0; i < NUM_PENS; i++)
+	{
+		UINT8 data = tutankhm_paletteram[i];
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
+		pens[i] = MAKE_RGB(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+	}
+}
 
-***************************************************************************/
+
 VIDEO_UPDATE( tutankhm )
 {
-	if (get_vh_global_attribute_changed())
-	{
-		int offs;
+	pen_t pens[NUM_PENS];
+	offs_t offs;
 
-		for (offs = 0;offs < videoram_size;offs++)
-			tutankhm_videoram_w(offs,videoram[offs]);
+	get_pens(pens);
+
+	for (offs = 0; offs < tutankhm_videoram_size; offs++)
+	{
+		int i;
+
+		UINT8 data = tutankhm_videoram[offs];
+
+		UINT8 y = offs >> 7;
+		UINT8 x = offs << 1;
+
+		for (i = 0; i < 2; i++)
+		{
+			UINT8 sy = y;
+			UINT8 sx = x;
+
+			pen_t pen = pens[data & 0x0f];
+
+			/* adjust for scrolling */
+			if (x < 192)
+			{
+				sy = sy - *tutankhm_scroll;
+			}
+
+			if (tutankhm_flip_screen_y)	sy = 255 - sy;
+			if (tutankhm_flip_screen_x)	sx = 255 - sx;
+
+			*BITMAP_ADDR32(bitmap, sy, sx) = pen;
+
+			x = x + 1;
+			data = data >> 4;
+		}
 	}
 
-	/* copy the temporary bitmap to the screen */
-	{
-		int scroll[32], i;
-
-
-		if (flip_screen_x)
-		{
-			for (i = 0;i < 8;i++)
-				scroll[i] = 0;
-			for (i = 8;i < 32;i++)
-			{
-				scroll[i] = -*tutankhm_scrollx;
-				if (flip_screen_y) scroll[i] = -scroll[i];
-			}
-		}
-		else
-		{
-			for (i = 0;i < 24;i++)
-			{
-				scroll[i] = -*tutankhm_scrollx;
-				if (flip_screen_y) scroll[i] = -scroll[i];
-			}
-			for (i = 24;i < 32;i++)
-				scroll[i] = 0;
-		}
-
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	}
 	return 0;
 }
 
@@ -110,90 +104,53 @@ VIDEO_UPDATE( tutankhm )
     the destination address, or a zero will be written.
     This allows the game to quickly clear the sprites from the screen
 
-    A lookup table is used to swap the source nibbles as they are the wrong way round in the
-    source data.
-
-    Bugs -
-
-        Currently only the even pixels will be written to. This is to speed up the blit routine
-        as it does not have to worry about shifting the source data.
-        This means that all destination X values will be rounded to even values.
-        In practice no one actaully notices this.
-
-        The clear works properly.
+    TODO: Does bit 1 of the source address mean something?
+          We have to mask it off otherwise the "Juno First" logo on the title screen is wrong.
 */
 
 WRITE8_HANDLER( junofrst_blitter_w )
 {
-	static unsigned char blitterdata[4];
+	junofrst_blitterdata[offset] = data;
 
-
-	blitterdata[offset] = data;
-
-	/* Blitter is triggered by $8073 */
-	if (offset==3)
+	/* blitter is triggered by $8073 */
+	if (offset == 3)
 	{
 		int i;
-		unsigned long srcaddress;
-		unsigned long destaddress;
-		unsigned char srcflag;
-		unsigned char destflag;
-		unsigned char *JunoBLTRom = memory_region(REGION_GFX1);
+		UINT8 *gfx_rom = memory_region(REGION_GFX1);
 
-		srcaddress = (blitterdata[0x2]<<8) | (blitterdata[0x3]);
-		srcflag = srcaddress & 1;
-		srcaddress >>= 1;
-		srcaddress &= 0x7FFE;
-		destaddress = (blitterdata[0x0]<<8)  | (blitterdata[0x1]);
+		offs_t src = ((junofrst_blitterdata[2] << 8) | junofrst_blitterdata[3]) & 0xfffc;
+		offs_t dest = (junofrst_blitterdata[0] << 8) | junofrst_blitterdata[1];
 
-		destflag = destaddress & 1;
+		int copy = junofrst_blitterdata[3] & 0x01;
 
-		destaddress >>= 1;
-		destaddress &= 0x7fff;
+		/* 16x16 graphics */
+		for (i = 0; i < 16; i++)
+		{
+			int j;
 
-		if (srcflag) {
-			for (i=0;i<16;i++) {
+			for (j = 0; j < 16; j++)
+			{
+				UINT8 data = 0;	 /* assume clear */
 
-#define JUNOBLITPIXEL(x)									\
-	if (JunoBLTRom[srcaddress+x])							\
-		tutankhm_videoram_w( destaddress+x,					\
-			((JunoBLTRom[srcaddress+x] & 0xf0) >> 4)		\
-			| ((JunoBLTRom[srcaddress+x] & 0x0f) << 4));
+				if (copy)
+				{
+					if (src & 1)
+						data = gfx_rom[src >> 1] & 0x0f;
+					else
+						data = gfx_rom[src >> 1] >> 4;
 
-				JUNOBLITPIXEL(0);
-				JUNOBLITPIXEL(1);
-				JUNOBLITPIXEL(2);
-				JUNOBLITPIXEL(3);
-				JUNOBLITPIXEL(4);
-				JUNOBLITPIXEL(5);
-				JUNOBLITPIXEL(6);
-				JUNOBLITPIXEL(7);
+					src = src + 1;
+				}
 
-				destaddress += 128;
-				srcaddress += 8;
+				if (dest & 1)
+					tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0x0f) | (data << 4);
+				else
+					tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0xf0) | data;
+
+				dest = dest + 1;
 			}
-		} else {
-			for (i=0;i<16;i++) {
 
-#define JUNOCLEARPIXEL(x) 						\
-	if ((JunoBLTRom[srcaddress+x] & 0xF0)) 		\
-		tutankhm_videoram_w( destaddress+x,		\
-			videoram[destaddress+x] & 0xF0);	\
-	if ((JunoBLTRom[srcaddress+x] & 0x0F))		\
-		tutankhm_videoram_w( destaddress+x,		\
-			videoram[destaddress+x] & 0x0F);
-
-				JUNOCLEARPIXEL(0);
-				JUNOCLEARPIXEL(1);
-				JUNOCLEARPIXEL(2);
-				JUNOCLEARPIXEL(3);
-				JUNOCLEARPIXEL(4);
-				JUNOCLEARPIXEL(5);
-				JUNOCLEARPIXEL(6);
-				JUNOCLEARPIXEL(7);
-				destaddress += 128;
-				srcaddress+= 8;
-			}
+			dest = dest + 240;
 		}
 	}
 }

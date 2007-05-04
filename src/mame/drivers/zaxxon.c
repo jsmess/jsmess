@@ -989,7 +989,7 @@ static MACHINE_DRIVER_START( congo )
 
 	MDRV_CPU_ADD(Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(congo_sound_map,0)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, TIME_IN_HZ(SOUND_CLOCK/16/16/16/4))
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(512)

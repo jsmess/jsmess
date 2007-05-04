@@ -250,8 +250,6 @@ void ppu2c03b_init( const ppu2c03b_interface *interface )
 			Machine->gfx[intf->gfx_layout_number[i]] = allocgfx( &ppu_charlayout );
 			decodegfx( Machine->gfx[intf->gfx_layout_number[i]], src, 0, Machine->gfx[intf->gfx_layout_number[i]]->total_elements );
 
-			assert_always( Machine->gfx[intf->gfx_layout_number[i]] != 0, "Invalid GFX\n" );
-
 			if ( Machine->remapped_colortable )
 				Machine->gfx[intf->gfx_layout_number[i]]->colortable = &Machine->remapped_colortable[intf->color_base[i]];
 

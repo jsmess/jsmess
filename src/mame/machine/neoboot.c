@@ -297,8 +297,6 @@ void kf2k2mp_decrypt( void )
 
 	memmove(src, src + 0x300000, 0x500000);
 
-	if (dst)
-	{
 		for (i = 0; i < 0x800000; i+=0x80)
 		{
 			for (j = 0; j < 0x80 / 2; j++)
@@ -308,7 +306,6 @@ void kf2k2mp_decrypt( void )
 			}
 			memcpy(src + i, dst, 0x80);
 		}
-	}
 	free(dst);
 }
 

@@ -327,8 +327,8 @@ VIDEO_UPDATE( ojankoc )
 {
 	int offs;
 
-	if (get_vh_global_attribute_changed() || ojankoc_screen_refresh) {
-
+	if (ojankoc_screen_refresh)
+	{
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++) {
 			ojankohs_videoram_w(offs, ojankohs_videoram[offs]);

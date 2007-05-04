@@ -9,322 +9,187 @@
 #include "driver.h"
 #include "sound/sn76477.h"
 
-unsigned char *route16_sharedram;
-unsigned char *route16_videoram1;
-unsigned char *route16_videoram2;
+
+UINT8 *route16_videoram1;
+UINT8 *route16_videoram2;
 size_t route16_videoram_size;
 int route16_hardware;
 
-static mame_bitmap *tmpbitmap1;
-static mame_bitmap *tmpbitmap2;
-
-static int video_flip;
-static int video_color_select_1;
-static int video_color_select_2;
-static int video_disable_1 = 0;
-static int video_disable_2 = 0;
-static int video_remap_1;
-static int video_remap_2;
-static const unsigned char *route16_color_prom;
-
-/* Local functions */
-static void modify_pen(int pen, int colorindex);
-static void common_videoram_w(int offset,int data,
-                              int coloroffset, mame_bitmap *bitmap);
+static UINT8 flipscreen;
+static UINT8 palette_1;
+static UINT8 palette_2;
 
 
 
-PALETTE_INIT( route16 )
-{
-	route16_color_prom = color_prom;	/* we'll need this later */
-}
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
-
-/***************************************************************************
-
-  Start the video hardware emulation.
-
-***************************************************************************/
-VIDEO_START( route16 )
-{
-	tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-	video_flip = 0;
-	video_color_select_1 = 0;
-	video_color_select_2 = 0;
-	video_disable_1 = 0;
-	video_disable_2 = 0;
-	video_remap_1 = 1;
-	video_remap_2 = 1;
-
-	return 0;
-}
-
-
-/***************************************************************************
-  route16_out0_w
-***************************************************************************/
 WRITE8_HANDLER( route16_out0_w )
 {
-	static int last_write = 0;
+	palette_1 = data & 0x1f;
 
-	if (data == last_write) return;
-
-	video_disable_1 = ((data & 0x02) << 6) && route16_hardware;
-	video_color_select_1 = ((data & 0x1f) << 2);
-
-	/* Bit 5 is the coin counter. */
-	coin_counter_w(0, data & 0x20);
-
-	video_remap_1 = 1;
-	last_write = data;
+	coin_counter_w(0, (data >> 5) & 0x01);
 }
 
-/***************************************************************************
-  route16_out1_w
-***************************************************************************/
+
 WRITE8_HANDLER( route16_out1_w )
 {
-	static int last_write = 0;
+	palette_2 = data & 0x1f;
 
-	if (data == last_write) return;
-
-	video_disable_2 = ((data & 0x02) << 6 ) && route16_hardware;
-	video_color_select_2 = ((data & 0x1f) << 2);
-
-	if (video_flip != ((data & 0x20) >> 5))
-	{
-		video_flip = (data & 0x20) >> 5;
-	}
-
-	video_remap_2 = 1;
-	last_write = data;
+	flipscreen = (data >> 5) & 0x01;
 }
 
-/***************************************************************************
 
-  Handle Stratovox's extra sound effects.
 
-***************************************************************************/
-WRITE8_HANDLER( stratvox_sn76477_w )
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+static pen_t route16_make_pen(UINT8 color)
 {
-	/* get out for Route 16 */
-	if (route16_hardware) return;
+	return MAKE_RGB(pal1bit((color >> 0) & 0x01),
+					pal1bit((color >> 1) & 0x01),
+					pal1bit((color >> 2) & 0x01));
 
-    /***************************************************************
-     * AY8910 output bits are connected to...
-     * 7    - direct: 5V * 30k/(100+30k) = 1.15V - via DAC??
-     * 6    - SN76477 mixer C
-     * 5    - SN76477 mixer B
-     * 4    - SN76477 mixer A
-     * 3    - SN76477 envelope 2
-     * 2    - SN76477 envelope 1
-     * 1    - SN76477 vco
-     * 0    - SN76477 enable
-     ***************************************************************/
-    SN76477_enable_w(0, (data >> 0) & 1);
-    SN76477_vco_w(0, (data >> 1) & 1);
-	SN76477_envelope_1_w(0, (data >> 2) & 1);
-	SN76477_envelope_2_w(0, (data >> 3) & 1);
-    SN76477_mixer_a_w(0, (data >> 4) & 1);
-    SN76477_mixer_b_w(0, (data >> 5) & 1);
-    SN76477_mixer_c_w(0, (data >> 6) & 1);
 }
 
-/***************************************************************************
-  route16_sharedram_r
-***************************************************************************/
-READ8_HANDLER( route16_sharedram_r )
+
+static pen_t ttmajng_make_pen(UINT8 color)
 {
-	return route16_sharedram[offset];
-}
+	return MAKE_RGB(pal1bit((color >> 2) & 0x01),
+					pal1bit((color >> 1) & 0x01),
+					pal1bit((color >> 0) & 0x01));
 
-/***************************************************************************
-  route16_sharedram_w
-***************************************************************************/
-WRITE8_HANDLER( route16_sharedram_w )
-{
-	route16_sharedram[offset] = data;
-
-	// 4313-4319 are used in Route 16 as triggers to wake the other CPU
-	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff && route16_hardware)
-	{
-		// Let the other CPU run
-		cpu_yield();
-	}
-}
-
-/***************************************************************************
-  guessing that the unconnected IN3 and OUT2 on the stratvox schematic
-  are hooked up for speakres and spacecho to somehow read the variable
-  resistors (eg a voltage ramp), using a write to OUT2 as a trigger
-  and then bits 0-2 of IN3 going low when each pot "matches". the VRx
-  values can be seen when IN0=0x55 and p1b1 is held during power on.
-  this would then be checking that the sounds are mixed correctly.
-***************************************************************************/
-static int speakres_vrx;
-
-READ8_HANDLER ( speakres_in3_r )
-{
-	int bit2=4, bit1=2, bit0=1;
-
-	/* just using a counter, the constants are the number of reads
-       before going low, each read is 40 cycles apart. the constants
-       were chosen based on the startup tests and for vr0=vr2 */
-	speakres_vrx++;
-	if(speakres_vrx>0x300) bit0=0;		/* VR0 100k ohm - speech */
-	if(speakres_vrx>0x200) bit1=0;		/* VR1  50k ohm - main volume */
-	if(speakres_vrx>0x300) bit2=0;		/* VR2 100k ohm - explosion */
-
-	return 0xf8|bit2|bit1|bit0;
-}
-
-WRITE8_HANDLER ( speakres_out2_w )
-{
-	speakres_vrx=0;
 }
 
 
-/***************************************************************************
-  route16_videoram1_r
-***************************************************************************/
-READ8_HANDLER( route16_videoram1_r )
-{
-	return route16_videoram1[offset];
-}
+/*
+ *  Game observation shows that Route 16 can blank each
+ *  bitmap by setting bit 1 of the palette register.
+ *  Since the schematics are missing the relevant pages, I
+ *  cannot confirm how this works, but I am 99% sure the bit 1
+ *  would be connected to A7 of the color PROM.  Since the
+ *  color PROMs contain 0 in the upper half, this would produce
+ *  a black output.
+ */
 
-/***************************************************************************
-  route16_videoram2_r
-***************************************************************************/
-READ8_HANDLER( route16_videoram2_r )
-{
-	return route16_videoram1[offset];
-}
-
-/***************************************************************************
-  route16_videoram1_w
-***************************************************************************/
-WRITE8_HANDLER( route16_videoram1_w )
-{
-	route16_videoram1[offset] = data;
-
-	common_videoram_w(offset, data, 0, tmpbitmap1);
-}
-
-/***************************************************************************
-  route16_videoram2_w
-***************************************************************************/
-WRITE8_HANDLER( route16_videoram2_w )
-{
-	route16_videoram2[offset] = data;
-
-	common_videoram_w(offset, data, 4, tmpbitmap2);
-}
-
-/***************************************************************************
-  common_videoram_w
-***************************************************************************/
-static void common_videoram_w(int offset,int data,
-                              int coloroffset, mame_bitmap *bitmap)
-{
-	int x, y, color1, color2, color3, color4;
-
-	x = ((offset & 0x3f) << 2);
-	y = (offset & 0xffc0) >> 6;
-
-	if (video_flip)
-	{
-		x = 255 - x;
-		y = 255 - y;
-	}
-
-	color4 = ((data & 0x80) >> 6) | ((data & 0x08) >> 3);
-	color3 = ((data & 0x40) >> 5) | ((data & 0x04) >> 2);
-	color2 = ((data & 0x20) >> 4) | ((data & 0x02) >> 1);
-	color1 = ((data & 0x10) >> 3) | ((data & 0x01)     );
-
-	if (video_flip)
-	{
-		*BITMAP_ADDR16(bitmap, y, x-0) = Machine->pens[color1 | coloroffset];
-		*BITMAP_ADDR16(bitmap, y, x-1) = Machine->pens[color2 | coloroffset];
-		*BITMAP_ADDR16(bitmap, y, x-2) = Machine->pens[color3 | coloroffset];
-		*BITMAP_ADDR16(bitmap, y, x-3) = Machine->pens[color4 | coloroffset];
-	}
-	else
-	{
-		*BITMAP_ADDR16(bitmap, y, x+0) = Machine->pens[color1 | coloroffset];
-		*BITMAP_ADDR16(bitmap, y, x+1) = Machine->pens[color2 | coloroffset];
-		*BITMAP_ADDR16(bitmap, y, x+2) = Machine->pens[color3 | coloroffset];
-		*BITMAP_ADDR16(bitmap, y, x+3) = Machine->pens[color4 | coloroffset];
-	}
-}
-
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
-
-***************************************************************************/
 VIDEO_UPDATE( route16 )
 {
-    if (video_remap_1)
+	offs_t offs;
+
+	UINT8 *color_prom1 = &memory_region(REGION_PROMS)[0x000];
+	UINT8 *color_prom2 = &memory_region(REGION_PROMS)[0x100];
+
+	for (offs = 0; offs < route16_videoram_size; offs++)
 	{
-		modify_pen(0, video_color_select_1 + 0);
-		modify_pen(1, video_color_select_1 + 1);
-		modify_pen(2, video_color_select_1 + 2);
-		modify_pen(3, video_color_select_1 + 3);
-	}
+		int i;
 
-	if (video_remap_2)
-	{
-		modify_pen(4, video_color_select_2 + 0);
-		modify_pen(5, video_color_select_2 + 1);
-		modify_pen(6, video_color_select_2 + 2);
-		modify_pen(7, video_color_select_2 + 3);
-	}
+		UINT8 y = offs >> 6;
+		UINT8 x = offs << 2;
 
+		UINT8 data1 = route16_videoram1[offs];
+		UINT8 data2 = route16_videoram2[offs];
 
-	if (get_vh_global_attribute_changed() || video_remap_1 || video_remap_2)
-	{
-		int offs;
-
-		// redraw bitmaps
-		for (offs = 0; offs < route16_videoram_size; offs++)
+		for (i = 0; i < 4; i++)
 		{
-			route16_videoram1_w(offs, route16_videoram1[offs]);
-			route16_videoram2_w(offs, route16_videoram2[offs]);
+			UINT8 color1 = color_prom1[((palette_1 << 6) & 0x80) |
+						   			    (palette_1 << 2) |
+						   				((data1 >> 3) & 0x02) |
+						   				((data1 >> 0) & 0x01)];
+
+			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 - this is a guess */
+			UINT8 color2 = color_prom2[((palette_2 << 6) & 0x80) | (((color1 << 6) & 0x80) | ((color1 << 7) & 0x80)) |
+						   				(palette_2 << 2) |
+						   				((data2 >> 3) & 0x02) |
+						   				((data2 >> 0) & 0x01)];
+
+			/* the final color is the OR of the two colors (verified) */
+			UINT8 final_color = color1 | color2;
+
+			pen_t pen = route16_make_pen(final_color);
+
+			if (flipscreen)
+				*BITMAP_ADDR32(bitmap, 255 - y, 255 - x) = pen;
+			else
+				*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x = x + 1;
+			data1 = data1 >> 1;
+			data2 = data2 >> 1;
 		}
 	}
 
-	video_remap_1 = 0;
-	video_remap_2 = 0;
-
-
-	if (!video_disable_2)
-	{
-		copybitmap(bitmap,tmpbitmap2,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	}
-
-	if (!video_disable_1)
-	{
-		if (video_disable_2)
-			copybitmap(bitmap,tmpbitmap1,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		else
-			copybitmap(bitmap,tmpbitmap1,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-	}
 	return 0;
 }
 
-/***************************************************************************
-  mofify_pen
- ***************************************************************************/
-static void modify_pen(int pen, int colorindex)
+
+/*
+ *  The Stratovox video connections have been verified from the schematics
+ */
+
+static int video_update_stratvox_ttmahjng(mame_bitmap *bitmap,
+										  const rectangle *cliprect,
+										  pen_t (*make_pen)(UINT8))
 {
-	int color;
+	offs_t offs;
 
-	color = route16_color_prom[colorindex];
+	UINT8 *color_prom1 = &memory_region(REGION_PROMS)[0x000];
+	UINT8 *color_prom2 = &memory_region(REGION_PROMS)[0x100];
 
-	palette_set_color(Machine,pen,pal1bit(color >> 0),pal1bit(color >> 1),pal1bit(color >> 2));
+	for (offs = 0; offs < route16_videoram_size; offs++)
+	{
+		int i;
+
+		UINT8 y = offs >> 6;
+		UINT8 x = offs << 2;
+
+		UINT8 data1 = route16_videoram1[offs];
+		UINT8 data2 = route16_videoram2[offs];
+
+		for (i = 0; i < 4; i++)
+		{
+			UINT8 color1 = color_prom1[(palette_1 << 2) |
+						   			   ((data1 >> 3) & 0x02) |
+									   ((data1 >> 0) & 0x01)];
+
+			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 (verified) */
+			UINT8 color2 = color_prom2[(((data1 << 3) & 0x80) | ((data1 << 7) & 0x80)) |
+									   (palette_2 << 2) |
+									   ((data2 >> 3) & 0x02) |
+									   ((data2 >> 0) & 0x01)];
+
+			/* the final color is the OR of the two colors */
+			UINT8 final_color = color1 | color2;
+
+			pen_t pen = make_pen(final_color);
+
+			if (flipscreen)
+				*BITMAP_ADDR32(bitmap, 255 - y, 255 - x) = pen;
+			else
+				*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x = x + 1;
+			data1 = data1 >> 1;
+			data2 = data2 >> 1;
+		}
+	}
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( stratvox )
+{
+	return video_update_stratvox_ttmahjng(bitmap, cliprect, route16_make_pen);
+}
+
+
+VIDEO_UPDATE( ttmahjng )
+{
+	return video_update_stratvox_ttmahjng(bitmap, cliprect, ttmajng_make_pen);
 }

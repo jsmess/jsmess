@@ -277,7 +277,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 
 	MDRV_CPU_ADD(M68000, 8000000)		/* Not sure about the frequency */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-	MDRV_CPU_PERIODIC_INT(irq5_line_hold, TIME_IN_HZ(1))	// ???
+	MDRV_CPU_PERIODIC_INT(irq5_line_hold, 1)	// ???
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))

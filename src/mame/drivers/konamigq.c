@@ -375,7 +375,7 @@ static MACHINE_DRIVER_START( konamigq )
 	MDRV_CPU_ADD_TAG( "sound", M68000, 8000000 )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP( sndreadmem, sndwritemem )
-	MDRV_CPU_PERIODIC_INT( irq2_line_hold, TIME_IN_HZ(480) )
+	MDRV_CPU_PERIODIC_INT( irq2_line_hold, 480 )
 
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC( 0 ))

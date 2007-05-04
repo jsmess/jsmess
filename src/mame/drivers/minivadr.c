@@ -14,20 +14,43 @@ Japan). It has no sound.
 #include "cpu/z80/z80.h"
 
 
-WRITE8_HANDLER( minivadr_videoram_w );
-VIDEO_UPDATE( minivadr );
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+static VIDEO_UPDATE( minivadr )
+{
+	offs_t offs;
+
+	for (offs = 0; offs < videoram_size; offs++)
+	{
+		int i;
+
+		UINT8 x = offs << 3;
+		int y = offs >> 5;
+		UINT8 data = videoram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			data = data << 1;
+			x = x + 1;
+		}
+	}
+
+	return 0;
+}
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe008, 0xe008) AM_READ(input_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(minivadr_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(MWA8_NOP)		// ???
+static ADDRESS_MAP_START( minivadr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe008, 0xe008) AM_READWRITE(input_port_0_r, MWA8_NOP)	// W - ???
 ADDRESS_MAP_END
 
 
@@ -48,7 +71,7 @@ static MACHINE_DRIVER_START( minivadr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,24000000 / 6)		 /* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(minivadr_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -59,7 +82,6 @@ static MACHINE_DRIVER_START( minivadr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(minivadr)
 
 	/* the board has no sound hardware */

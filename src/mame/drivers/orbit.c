@@ -269,7 +269,7 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_CPU_ADD(M6800, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse, 1)
-	MDRV_CPU_PERIODIC_INT(orbit_interrupt, TIME_IN_HZ(240))
+	MDRV_CPU_PERIODIC_INT(orbit_interrupt, 240)
 
 	MDRV_SCREEN_REFRESH_RATE(60) /* interlaced */
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC((int) ((22. * 1000000) / (262. * 60) + 0.5)))

@@ -248,7 +248,7 @@ static void init_monitors(void)
 			char *utf8_device = utf8_from_tstring(monitor->info.szDevice);
 			if (utf8_device != NULL)
 			{
-				verbose_printf("Video: Monitor %p = \"%s\" %s\n", monitor->handle, utf8_device, (monitor == primary_monitor) ? "(primary)" : "");
+				mame_printf_verbose("Video: Monitor %p = \"%s\" %s\n", monitor->handle, utf8_device, (monitor == primary_monitor) ? "(primary)" : "");
 				free(utf8_device);
 			}
 		}

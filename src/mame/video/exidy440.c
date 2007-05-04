@@ -21,14 +21,12 @@ UINT8 topsecex_yscroll;
 static UINT8 exidy440_latched_x;
 static UINT8 *local_videoram;
 static UINT8 *local_paletteram;
-static UINT8 *scanline_dirty;
 
 /* local variables */
 static UINT8 firq_enable;
 static UINT8 firq_select;
 static UINT8 palettebank_io;
 static UINT8 palettebank_vis;
-static UINT8 topsecex_last_yscroll;
 
 /* function prototypes */
 void exidy440_update_firq(void);
@@ -51,12 +49,8 @@ VIDEO_START( exidy440 )
 	exidy440_firq_vblank = 0;
 	exidy440_firq_beam = 0;
 
-	/* reset Top Secret variables */
+	/* reset Top Secret scroll position */
 	topsecex_yscroll = 0;
-	topsecex_last_yscroll = 0;
-
-	/* allocate a bitmap */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* allocate a buffer for VRAM */
 	local_videoram = auto_malloc(256 * 256 * 2);
@@ -65,10 +59,6 @@ VIDEO_START( exidy440 )
 	/* allocate a buffer for palette RAM */
 	local_paletteram = auto_malloc(512 * 2);
 	memset(local_paletteram, 0, 512 * 2);
-
-	/* allocate a scanline dirty array */
-	scanline_dirty = auto_malloc(256);
-	memset(scanline_dirty, 1, 256);
 
 	return 0;
 }
@@ -97,9 +87,6 @@ WRITE8_HANDLER( exidy440_videoram_w )
 	/* expand the two pixel values into two bytes */
 	base[0] = (data >> 4) & 15;
 	base[1] = data & 15;
-
-	/* mark the scanline dirty */
-	scanline_dirty[*exidy440_scanline] = 1;
 }
 
 
@@ -416,14 +403,9 @@ static void update_screen(mame_bitmap *bitmap, const rectangle *cliprect, int sc
 		if (sy >= EXIDY440_VBSTART)
 			sy -= (EXIDY440_VBSTART - EXIDY440_VBEND);
 
-		/* only redraw if dirty */
-		if (scanline_dirty[sy])
-		{
-			draw_scanline8(tmpbitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], Machine->pens, -1);
-			scanline_dirty[sy] = 0;
-		}
+		/* draw line */
+		draw_scanline8(bitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], Machine->pens, -1);
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 
 	/* draw the sprites */
 	draw_sprites(bitmap, cliprect, scroll_offset);
@@ -439,27 +421,13 @@ static void update_screen(mame_bitmap *bitmap, const rectangle *cliprect, int sc
 
 VIDEO_UPDATE( exidy440 )
 {
-	/* if we need a full refresh, mark all scanlines dirty */
-	if (get_vh_global_attribute_changed())
-		memset(scanline_dirty, 1, 256);
-
-	/* if we're Top Secret, do our refresh here; others are done in the update function above */
-	/* unless we're doing a full refresh (eg. when the driver is paused) */
+	/* redraw the screen */
 	if (exidy440_topsecret)
 	{
-		/* if the scroll changed, mark everything dirty */
-		if (topsecex_yscroll != topsecex_last_yscroll)
-		{
-			topsecex_last_yscroll = topsecex_yscroll;
-			memset(scanline_dirty, 1, 256);
-		}
-
-		/* redraw the screen */
 		update_screen(bitmap, cliprect, topsecex_yscroll);
 	}
 	else
 	{
-		/* redraw the screen */
 		update_screen(bitmap, cliprect, 0);
 	}
 	return 0;

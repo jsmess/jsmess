@@ -83,7 +83,7 @@ emulated now. ;)
 #include "sound/samples.h"
 
 /* video hardware access */
-extern unsigned char *polyplay_characterram;
+extern UINT8 *polyplay_characterram;
 PALETTE_INIT( polyplay );
 VIDEO_UPDATE( polyplay );
 READ8_HANDLER( polyplay_characterram_r );
@@ -164,37 +164,25 @@ static INTERRUPT_GEN( coin_interrupt )
 
 
 /* memory mapping */
-static ADDRESS_MAP_START( polyplay_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0bff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x0c00, 0x0fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x8fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe800, 0xebff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xec00, 0xf7ff) AM_READ(polyplay_characterram_r)
-	AM_RANGE(0xf800, 0xffff) AM_READ(videoram_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( polyplay_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0bff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x0c00, 0x0fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1000, 0x8fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xe800, 0xebff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xec00, 0xf7ff) AM_WRITE(polyplay_characterram_w) AM_BASE(&polyplay_characterram)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+static ADDRESS_MAP_START( polyplay_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0bff) AM_ROM
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x8fff) AM_ROM
+	AM_RANGE(0xe800, 0xebff) AM_ROM
+	AM_RANGE(0xec00, 0xf7ff) AM_READWRITE(MRA8_RAM, polyplay_characterram_w) AM_BASE(&polyplay_characterram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
 /* port mapping */
-static ADDRESS_MAP_START( readport_polyplay, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x84, 0x84) AM_READ(input_port_0_r)
-	AM_RANGE(0x83, 0x83) AM_READ(polyplay_random_read)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_polyplay, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( polyplay_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
 	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)
+	AM_RANGE(0x83, 0x83) AM_READ(polyplay_random_read)
+	AM_RANGE(0x84, 0x84) AM_READ(input_port_0_r)
 ADDRESS_MAP_END
+
 
 INPUT_PORTS_START( polyplay )
 	PORT_START	/* IN0 */
@@ -308,9 +296,9 @@ static MACHINE_DRIVER_START( polyplay )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 9830400/4)
-	MDRV_CPU_PROGRAM_MAP(polyplay_readmem,polyplay_writemem)
-	MDRV_CPU_IO_MAP(readport_polyplay,writeport_polyplay)
-	MDRV_CPU_PERIODIC_INT(periodic_interrupt,TIME_IN_HZ(75))
+	MDRV_CPU_PROGRAM_MAP(polyplay_map,0)
+	MDRV_CPU_IO_MAP(polyplay_io_map,0)
+	MDRV_CPU_PERIODIC_INT(periodic_interrupt,75)
 	MDRV_CPU_VBLANK_INT(coin_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -326,7 +314,6 @@ static MACHINE_DRIVER_START( polyplay )
 	MDRV_PALETTE_LENGTH(10)
 
 	MDRV_PALETTE_INIT(polyplay)
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(polyplay)
 
 	/* sound hardware */

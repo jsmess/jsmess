@@ -308,7 +308,7 @@ static WRITE8_HANDLER( sindbadm_soundport_w )
 {
 	soundlatch_w(0,data);
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_boost_interleave(0, TIME_IN_USEC(50));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
 }
 
 

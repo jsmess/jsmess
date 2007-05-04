@@ -428,16 +428,6 @@ static UINT32 rfield_32(offs_t offset)
 	RFIELDMAC_32;
 }
 
-UINT32 (*tms34010_rfield_functions_z[32])(offs_t offset) =
-{
-	rfield_32  , rfield_z_01, rfield_z_02, rfield_z_03, rfield_z_04, rfield_z_05,
-	rfield_z_06, rfield_z_07, rfield_z_08, rfield_z_09, rfield_z_10, rfield_z_11,
-	rfield_z_12, rfield_z_13, rfield_z_14, rfield_z_15, rfield_z_16, rfield_z_17,
-	rfield_z_18, rfield_z_19, rfield_z_20, rfield_z_21, rfield_z_22, rfield_z_23,
-	rfield_z_24, rfield_z_25, rfield_z_26, rfield_z_27, rfield_z_28, rfield_z_29,
-	rfield_z_30, rfield_z_31
-};
-
 
 /***************************************************************************
     FIELD READ FUNCTIONS (SIGN-EXTEND)
@@ -675,8 +665,14 @@ static UINT32 rfield_s_31(offs_t offset)
 	return ((INT32)(ret << 1)) >> 1;
 }
 
-UINT32 (*tms34010_rfield_functions_s[32])(offs_t offset) =
+UINT32 (*tms34010_rfield_functions[64])(offs_t offset) =
 {
+	rfield_32  , rfield_z_01, rfield_z_02, rfield_z_03, rfield_z_04, rfield_z_05,
+	rfield_z_06, rfield_z_07, rfield_z_08, rfield_z_09, rfield_z_10, rfield_z_11,
+	rfield_z_12, rfield_z_13, rfield_z_14, rfield_z_15, rfield_z_16, rfield_z_17,
+	rfield_z_18, rfield_z_19, rfield_z_20, rfield_z_21, rfield_z_22, rfield_z_23,
+	rfield_z_24, rfield_z_25, rfield_z_26, rfield_z_27, rfield_z_28, rfield_z_29,
+	rfield_z_30, rfield_z_31,
 	rfield_32  , rfield_s_01, rfield_s_02, rfield_s_03, rfield_s_04, rfield_s_05,
 	rfield_s_06, rfield_s_07, rfield_s_08, rfield_s_09, rfield_s_10, rfield_s_11,
 	rfield_s_12, rfield_s_13, rfield_s_14, rfield_s_15, rfield_s_16, rfield_s_17,

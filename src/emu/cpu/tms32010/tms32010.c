@@ -966,17 +966,17 @@ void tms32010_get_info(UINT32 state, cpuinfo *info)
 				R.STR & 0x0001 ? '1':'0');
 			break;
 
-		case CPUINFO_STR_REGISTER + +TMS32010_PC:   	sprintf(info->s, "PC:%04X",   R.PC); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_SP:   	sprintf(info->s, "SP:%X", 0); /* fake stack pointer */ break;
-		case CPUINFO_STR_REGISTER + +TMS32010_STR:  	sprintf(info->s, "STR:%04X",  R.STR); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_ACC:  	sprintf(info->s, "ACC:%08X",  R.ACC.d); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_PREG: 	sprintf(info->s, "P:%08X",    R.Preg.d); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_TREG: 	sprintf(info->s, "T:%04X",    R.Treg); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_AR0:  	sprintf(info->s, "AR0:%04X",  R.AR[0]); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_AR1:  	sprintf(info->s, "AR1:%04X",  R.AR[1]); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_STK0: 	sprintf(info->s, "STK0:%04X", R.STACK[0]); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_STK1: 	sprintf(info->s, "STK1:%04X", R.STACK[1]); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_STK2: 	sprintf(info->s, "STK2:%04X", R.STACK[2]); break;
-		case CPUINFO_STR_REGISTER + +TMS32010_STK3: 	sprintf(info->s, "STK3:%04X", R.STACK[3]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_PC:   	sprintf(info->s, "PC:%04X",   R.PC); break;
+		case CPUINFO_STR_REGISTER + TMS32010_SP:   	sprintf(info->s, "SP:%X", 0); /* fake stack pointer */ break;
+		case CPUINFO_STR_REGISTER + TMS32010_STR:  	sprintf(info->s, "STR:%04X",  R.STR); break;
+		case CPUINFO_STR_REGISTER + TMS32010_ACC:  	sprintf(info->s, "ACC:%08X",  R.ACC.d); break;
+		case CPUINFO_STR_REGISTER + TMS32010_PREG: 	sprintf(info->s, "P:%08X",    R.Preg.d); break;
+		case CPUINFO_STR_REGISTER + TMS32010_TREG: 	sprintf(info->s, "T:%04X",    R.Treg); break;
+		case CPUINFO_STR_REGISTER + TMS32010_AR0:  	sprintf(info->s, "AR0:%04X",  R.AR[0]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_AR1:  	sprintf(info->s, "AR1:%04X",  R.AR[1]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK0: 	sprintf(info->s, "STK0:%04X", R.STACK[0]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK1: 	sprintf(info->s, "STK1:%04X", R.STACK[1]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK2: 	sprintf(info->s, "STK2:%04X", R.STACK[2]); break;
+		case CPUINFO_STR_REGISTER + TMS32010_STK3: 	sprintf(info->s, "STK3:%04X", R.STACK[3]); break;
 	}
 }

@@ -7,118 +7,146 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "includes/espial.h"
 
 
-unsigned char *marineb_column_scroll;
-int marineb_active_low_flipscreen;
-static int palbank;
+UINT8 *marineb_videoram;
+UINT8 *marineb_colorram;
+UINT8 marineb_active_low_flipscreen;
 
+static UINT8 column_scroll;
+static UINT8 palette_bank;
+static UINT8 flipscreen_x;
+static UINT8 flipscreen_y;
+static tilemap *bg_tilemap;
 
-WRITE8_HANDLER( marineb_palbank0_w )
-{
-	int new_palbank = (palbank & ~1) | (data & 1);
-	set_vh_global_attribute(&palbank, new_palbank);
-}
-
-WRITE8_HANDLER( marineb_palbank1_w )
-{
-	int new_palbank = (palbank & ~2) | ((data << 1) & 2);
-	set_vh_global_attribute(&palbank, new_palbank);
-}
-
-WRITE8_HANDLER( marineb_flipscreen_x_w )
-{
-	flip_screen_x_set(data ^ marineb_active_low_flipscreen);
-}
-
-WRITE8_HANDLER( marineb_flipscreen_y_w )
-{
-	flip_screen_y_set(data ^ marineb_active_low_flipscreen);
-}
 
 
 /***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
+  Callbacks for the TileMap code
 
 ***************************************************************************/
-static void draw_chars(mame_bitmap *_tmpbitmap, mame_bitmap *bitmap,
-                       int scroll_cols)
+
+static void get_tile_info(int tile_index)
 {
-	int offs;
+	UINT8 code = marineb_videoram[tile_index];
+	UINT8 col = marineb_colorram[tile_index];
+
+	SET_TILE_INFO(0,
+				  code | ((col & 0xc0) << 2),
+				  (col & 0x0f) | (palette_bank << 4),
+				  TILE_FLIPXY((col >> 4) & 0x03));
+}
 
 
-	if (get_vh_global_attribute_changed())
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+VIDEO_START( marineb )
+{
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
+
+	tilemap_set_scroll_cols(bg_tilemap, 32);
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+WRITE8_HANDLER( marineb_videoram_w )
+{
+	if (marineb_videoram[offset] != data)
 	{
-		memset(dirtybuffer,1,videoram_size);
+		marineb_videoram[offset] = data;
+		tilemap_mark_tile_dirty(bg_tilemap, offset);
 	}
+}
 
 
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+WRITE8_HANDLER( marineb_colorram_w )
+{
+	if (marineb_colorram[offset] != data)
 	{
-		if (dirtybuffer[offs])
-		{
-			int sx,sy,flipx,flipy;
-
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-
-			flipx = colorram[offs] & 0x20;
-			flipy = colorram[offs] & 0x10;
-
-			if (flip_screen_y)
-			{
-				sy = 31 - sy;
-				flipy = !flipy;
-			}
-
-			if (flip_screen_x)
-			{
-				sx = 31 - sx;
-				flipx = !flipx;
-			}
-
-			drawgfx(_tmpbitmap,Machine->gfx[0],
-					videoram[offs] | ((colorram[offs] & 0xc0) << 2),
-					(colorram[offs] & 0x0f) + 16 * palbank,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
-		}
+		marineb_colorram[offset] = data;
+		tilemap_mark_tile_dirty(bg_tilemap, offset);
 	}
+}
 
 
-	/* copy the temporary bitmap to the screen */
+WRITE8_HANDLER( marineb_column_scroll_w )
+{
+	column_scroll = data;
+}
+
+
+WRITE8_HANDLER( marineb_palette_bank_0_w )
+{
+	UINT8 old = palette_bank;
+
+	palette_bank = (palette_bank & 0x02) | ((data & 0x01) << 0);
+
+	if (old != palette_bank)
 	{
-		int scroll[32];
-
-
-		if (flip_screen_y)
-		{
-			for (offs = 0;offs < 32 - scroll_cols;offs++)
-				scroll[offs] = 0;
-
-			for (;offs < 32;offs++)
-				scroll[offs] = marineb_column_scroll[0];
-		}
-		else
-		{
-			for (offs = 0;offs < scroll_cols;offs++)
-				scroll[offs] = -marineb_column_scroll[0];
-
-			for (;offs < 32;offs++)
-				scroll[offs] = 0;
-		}
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,&Machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
+}
+
+
+WRITE8_HANDLER( marineb_palette_bank_1_w )
+{
+	UINT8 old = palette_bank;
+
+	palette_bank = (palette_bank & 0x01) | ((data & 0x01) << 1);
+
+	if (old != palette_bank)
+	{
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
+	}
+}
+
+
+WRITE8_HANDLER( marineb_flipscreen_x_w )
+{
+	flipscreen_x = data ^ marineb_active_low_flipscreen;
+
+	tilemap_set_flip(bg_tilemap, (flipscreen_x ? TILEMAP_FLIPX : 0) | (flipscreen_y ? TILEMAP_FLIPY : 0));
+}
+
+
+WRITE8_HANDLER( marineb_flipscreen_y_w )
+{
+	flipscreen_y = data ^ marineb_active_low_flipscreen;
+
+	tilemap_set_flip(bg_tilemap, (flipscreen_x ? TILEMAP_FLIPX : 0) | (flipscreen_y ? TILEMAP_FLIPY : 0));
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+static void set_tilemap_scrolly(int cols)
+{
+	int col;
+
+	for (col = 0; col < cols; col++)
+		tilemap_set_scrolly(bg_tilemap, col, column_scroll);
+
+	for (; col < 32; col++)
+		tilemap_set_scrolly(bg_tilemap, col, 0);
 }
 
 
@@ -127,7 +155,8 @@ VIDEO_UPDATE( marineb )
 	int offs;
 
 
-	draw_chars(tmpbitmap, bitmap, 24);
+	set_tilemap_scrolly(24);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 
 	/* draw the sprites */
@@ -149,10 +178,10 @@ VIDEO_UPDATE( marineb )
 		}
 
 
-		code  = videoram[offs2];
-		sx    = videoram[offs2 + 0x20];
-		sy    = colorram[offs2];
-		col   = (colorram[offs2 + 0x20] & 0x0f) + 16 * palbank;
+		code  = marineb_videoram[offs2];
+		sx    = marineb_videoram[offs2 + 0x20];
+		sy    = marineb_colorram[offs2];
+		col   = (marineb_colorram[offs2 + 0x20] & 0x0f) + 16 * palette_bank;
 		flipx =   code & 0x02;
 		flipy = !(code & 0x01);
 
@@ -169,13 +198,13 @@ VIDEO_UPDATE( marineb )
 			code >>= 2;
 		}
 
-		if (!flip_screen_y)
+		if (!flipscreen_y)
 		{
 			sy = 256 - machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
-		if (flip_screen_x)
+		if (flipscreen_x)
 		{
 			sx++;
 		}
@@ -185,7 +214,7 @@ VIDEO_UPDATE( marineb )
 				col,
 				flipx,flipy,
 				sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -196,7 +225,8 @@ VIDEO_UPDATE( changes )
 	int offs,sx,sy,code,col,flipx,flipy;
 
 
-	draw_chars(tmpbitmap, bitmap, 26);
+	set_tilemap_scrolly(26);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 
 	/* draw the small sprites */
@@ -207,20 +237,20 @@ VIDEO_UPDATE( changes )
 
 		offs2 = 0x001a + offs;
 
-		code  = videoram[offs2];
-		sx    = videoram[offs2 + 0x20];
-		sy    = colorram[offs2];
-		col   = (colorram[offs2 + 0x20] & 0x0f) + 16 * palbank;
+		code  = marineb_videoram[offs2];
+		sx    = marineb_videoram[offs2 + 0x20];
+		sy    = marineb_colorram[offs2];
+		col   = (marineb_colorram[offs2 + 0x20] & 0x0f) + 16 * palette_bank;
 		flipx =   code & 0x02;
 		flipy = !(code & 0x01);
 
-		if (!flip_screen_y)
+		if (!flipscreen_y)
 		{
 			sy = 256 - machine->gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
-		if (flip_screen_x)
+		if (flipscreen_x)
 		{
 			sx++;
 		}
@@ -230,25 +260,25 @@ VIDEO_UPDATE( changes )
 				col,
 				flipx,flipy,
 				sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	/* draw the big sprite */
 
-	code  = videoram[0x3df];
-	sx    = videoram[0x3ff];
-	sy    = colorram[0x3df];
-	col   = colorram[0x3ff];
+	code  = marineb_videoram[0x3df];
+	sx    = marineb_videoram[0x3ff];
+	sy    = marineb_colorram[0x3df];
+	col   = marineb_colorram[0x3ff];
 	flipx =   code & 0x02;
 	flipy = !(code & 0x01);
 
-	if (!flip_screen_y)
+	if (!flipscreen_y)
 	{
 		sy = 256 - machine->gfx[2]->width - sy;
 		flipy = !flipy;
 	}
 
-	if (flip_screen_x)
+	if (flipscreen_x)
 	{
 		sx++;
 	}
@@ -260,7 +290,7 @@ VIDEO_UPDATE( changes )
 			col,
 			flipx,flipy,
 			sx,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 
 	/* draw again for wrap around */
 
@@ -269,7 +299,7 @@ VIDEO_UPDATE( changes )
 			col,
 			flipx,flipy,
 			sx-256,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	return 0;
 }
 
@@ -279,7 +309,8 @@ VIDEO_UPDATE( springer )
 	int offs;
 
 
-	draw_chars(tmpbitmap, bitmap, 0);
+	set_tilemap_scrolly(0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 
 	/* draw the sprites */
@@ -294,10 +325,10 @@ VIDEO_UPDATE( springer )
 		offs2 = 0x0010 + offs;
 
 
-		code  = videoram[offs2];
-		sx    = 240 - videoram[offs2 + 0x20];
-		sy    = colorram[offs2];
-		col   = (colorram[offs2 + 0x20] & 0x0f) + 16 * palbank;
+		code  = marineb_videoram[offs2];
+		sx    = 240 - marineb_videoram[offs2 + 0x20];
+		sy    = marineb_colorram[offs2];
+		col   = (marineb_colorram[offs2 + 0x20] & 0x0f) + 16 * palette_bank;
 		flipx = !(code & 0x02);
 		flipy = !(code & 0x01);
 
@@ -315,13 +346,13 @@ VIDEO_UPDATE( springer )
 			code >>= 2;
 		}
 
-		if (!flip_screen_y)
+		if (!flipscreen_y)
 		{
 			sy = 256 - machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
-		if (!flip_screen_x)
+		if (!flipscreen_x)
 		{
 			sx--;
 		}
@@ -331,7 +362,7 @@ VIDEO_UPDATE( springer )
 				col,
 				flipx,flipy,
 				sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -342,7 +373,8 @@ VIDEO_UPDATE( hoccer )
 	int offs;
 
 
-	draw_chars(tmpbitmap, bitmap, 0);
+	set_tilemap_scrolly(0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 
 	/* draw the sprites */
@@ -356,18 +388,18 @@ VIDEO_UPDATE( hoccer )
 
 		code  = spriteram[offs2];
 		sx    = spriteram[offs2 + 0x20];
-		sy    = colorram[offs2];
-		col   = colorram[offs2 + 0x20];
+		sy    = marineb_colorram[offs2];
+		col   = marineb_colorram[offs2 + 0x20];
 		flipx =   code & 0x02;
 		flipy = !(code & 0x01);
 
-		if (!flip_screen_y)
+		if (!flipscreen_y)
 		{
 			sy = 256 - machine->gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
-		if (flip_screen_x)
+		if (flipscreen_x)
 		{
 			sx = 256 - machine->gfx[1]->width - sx;
 			flipx = !flipx;
@@ -378,7 +410,7 @@ VIDEO_UPDATE( hoccer )
 				col,
 				flipx,flipy,
 				sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }
@@ -389,7 +421,8 @@ VIDEO_UPDATE( hopprobo )
 	int offs;
 
 
-	draw_chars(tmpbitmap, bitmap, 0);
+	set_tilemap_scrolly(0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 
 	/* draw the sprites */
@@ -404,10 +437,10 @@ VIDEO_UPDATE( hopprobo )
 		offs2 = 0x0010 + offs;
 
 
-		code  = videoram[offs2];
-		sx    = videoram[offs2 + 0x20];
-		sy    = colorram[offs2];
-		col   = (colorram[offs2 + 0x20] & 0x0f) + 16 * palbank;
+		code  = marineb_videoram[offs2];
+		sx    = marineb_videoram[offs2 + 0x20];
+		sy    = marineb_colorram[offs2];
+		col   = (marineb_colorram[offs2 + 0x20] & 0x0f) + 16 * palette_bank;
 		flipx =   code & 0x02;
 		flipy = !(code & 0x01);
 
@@ -424,13 +457,13 @@ VIDEO_UPDATE( hopprobo )
 			code >>= 2;
 		}
 
-		if (!flip_screen_y)
+		if (!flipscreen_y)
 		{
 			sy = 256 - machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
-		if (!flip_screen_x)
+		if (!flipscreen_x)
 		{
 			sx--;
 		}
@@ -440,7 +473,7 @@ VIDEO_UPDATE( hopprobo )
 				col,
 				flipx,flipy,
 				sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

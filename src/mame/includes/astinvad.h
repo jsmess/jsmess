@@ -3,17 +3,15 @@
 /*----------- defined in video/astinvad.c -----------*/
 
 VIDEO_UPDATE( astinvad );
+VIDEO_UPDATE( spcking2 );
 VIDEO_UPDATE( spaceint );
 
-VIDEO_START( astinvad );
-VIDEO_START( spcking2 );
 VIDEO_START( spaceint );
 
-WRITE8_HANDLER( astinvad_videoram_w );
 WRITE8_HANDLER( spaceint_videoram_w );
 WRITE8_HANDLER( spaceint_color_w);
 
-void astinvad_set_flash(int flag);
+void astinvad_set_screen_red(int data);
 
 
 /*----------- defined in audio/astinvad.c -----------*/

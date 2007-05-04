@@ -668,7 +668,7 @@ static MACHINE_DRIVER_START( kickgoal )
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map, 0)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(kickgoal_interrupt, TIME_IN_HZ(240))
+	MDRV_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
 
 	MDRV_CPU_ADD(PIC16C57, ((12000000/4)/PIC16C5x_CLOCK_DIVIDER))	/* 3MHz ? */
 	MDRV_CPU_FLAGS(CPU_DISABLE)	/* Disables since the internal rom isn't dumped */

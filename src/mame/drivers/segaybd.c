@@ -80,7 +80,7 @@ static void update_main_irqs(void)
 		cpunum_set_input_line(0, irq, ASSERT_LINE);
 		cpunum_set_input_line(1, irq, ASSERT_LINE);
 		cpunum_set_input_line(2, irq, ASSERT_LINE);
-		cpu_boost_interleave(0, TIME_IN_USEC(50));
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
 	}
 	else
 	{

@@ -144,7 +144,7 @@
  *  DOP double no operation
  ***************************************************************/
 #define DOP 													\
-	PCW++
+	RDOPARG()
 
 /* 6510 ********************************************************
  *  ISB increment and subtract with carry
@@ -259,4 +259,20 @@
 	PCW--;														\
 	logerror("M6510 KILL opcode %04x: %02x\n",                  \
 				PCW, cpu_readop(PCW))
+
+/* N2A03 *******************************************************
+ *  ARR logical and, rotate right - no decimal mode
+ ***************************************************************/
+#define ARR_NES												\
+        {												\
+		tmp &= A;										\
+		ROR;											\
+		P &=~(F_V|F_C);										\
+		if( tmp & 0x40 )									\
+			P|=F_C;										\
+		if( (tmp & 0x60) == 0x20 || (tmp & 0x60) == 0x40 )					\
+			P|=F_V;										\
+	}
+
+
 

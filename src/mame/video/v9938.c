@@ -138,10 +138,7 @@ PALETTE_INIT( v9958 )
 	palette_init_v9938(machine, colortable, color_prom);
 
 	/* set up YJK table */
-	if (!pal_indYJK)
-	{
 		pal_indYJK = auto_malloc(0x20000 * sizeof(UINT16));
-	}
 
 	logerror ("Building YJK table for V9958 screens, may take a while ... \n");
 	i = 0;

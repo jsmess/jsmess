@@ -594,7 +594,7 @@ static MACHINE_DRIVER_START( toramich )
 	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sample_readmem,sample_writemem)
 	MDRV_CPU_IO_MAP(sample_readport,sample_writeport)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(4000))	/* ? */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4000)	/* ? */
 
 	/* sound hardware */
 	MDRV_SOUND_ADD(MSM5205, 384000)

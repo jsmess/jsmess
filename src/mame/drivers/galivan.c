@@ -569,7 +569,7 @@ static MACHINE_DRIVER_START( galivan )
 	/* audio CPU */		/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(7250))  /* timed interrupt, ?? Hz */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -614,7 +614,7 @@ static MACHINE_DRIVER_START( ninjemak )
 	/* audio CPU */		/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(7250))	/* timed interrupt, ?? Hz */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

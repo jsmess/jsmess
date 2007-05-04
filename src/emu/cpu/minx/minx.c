@@ -68,7 +68,7 @@ TODO:
 
 
 typedef struct {
-//	MINX_CONFIG  config;
+//  MINX_CONFIG  config;
 	UINT16 PC;
 	UINT16 SP;
 	UINT16 BA;

@@ -2075,7 +2075,7 @@ static MACHINE_DRIVER_START( sstingry )
 	MDRV_CPU_IO_MAP(0,kyros_sound_writeport)
 //AT
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 2)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(4000))
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2126,7 +2126,7 @@ static MACHINE_DRIVER_START( kyros )
 	MDRV_CPU_IO_MAP(0,kyros_sound_writeport)
 //AT
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 2)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(4000))
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2247,7 +2247,7 @@ static MACHINE_DRIVER_START( alpha68k_II )
 	/* audio CPU */ /* Correct?? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(7500)) //AT
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 7500) //AT
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2297,7 +2297,7 @@ static MACHINE_DRIVER_START( alpha68k_II_gm )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport, sound_writeport)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(7500))
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 7500)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2341,7 +2341,7 @@ static MACHINE_DRIVER_START( alpha68k_V )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(8500)) //AT
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2384,7 +2384,7 @@ static MACHINE_DRIVER_START( alpha68k_V_sb )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(8500)) //AT
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8500) //AT
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

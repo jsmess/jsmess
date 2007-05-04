@@ -372,7 +372,6 @@ static void
 InitDSP( int bSuperSystem22 )
 {
 	mbSuperSystem22 = bSuperSystem22;
-	mpPointRAM = auto_malloc(0x20000*sizeof(*mpPointRAM));
 	cpunum_set_input_line(1,INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
 	cpunum_set_input_line(2,INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
 	cpunum_set_input_line(3,INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
@@ -1359,10 +1358,6 @@ static WRITE32_HANDLER( spotram_w )
    *
    * 0x860006: enable
    */
-   if( !mSpotRAM.RAM )
-   {
-      mSpotRAM.RAM = auto_malloc(SPOTRAM_SIZE*2);
-   }
 	if( offset==0 )
 	{
 		if( mem_mask&0xffff0000 )
@@ -4194,44 +4189,64 @@ static void install_c74_speedup(void)
 	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x80, 0x81, 0, 0, mcu_speedup_w);
 }
 
-DRIVER_INIT( alpiner )
+static void install_130_speedup(void)
 {
-	namcos22_gametype = NAMCOS22_ALPINE_RACER;
-
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
-
 	// install speedup cheat for 1.30 MCU BIOS
 	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r);
 	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
 }
 
-DRIVER_INIT( alpiner2 )
+static void install_141_speedup(void)
 {
-	namcos22_gametype = NAMCOS22_ALPINE_RACER_2;
-
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
-
-	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r);
-	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
-}
-
-DRIVER_INIT( alpinesa )
-{
-	namcos22_gametype = NAMCOS22_ALPINE_SURFER;
-
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
-
 	// install speedup cheat for 1.41 MCU BIOS
 	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu141_speedup_r);
 	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
 }
 
+static void namcos22_init( enum namcos22_gametype game_type )
+{
+	namcos22_gametype = game_type;
+	mpPointRAM = auto_malloc(0x20000*sizeof(*mpPointRAM));
+}
+
+static void namcos22s_init( enum namcos22_gametype game_type )
+{
+	namcos22_init(game_type);
+	mSpotRAM.RAM = auto_malloc(SPOTRAM_SIZE*2);
+}
+
+DRIVER_INIT( alpiner )
+{
+	namcos22s_init(NAMCOS22_ALPINE_RACER);
+
+	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+
+	install_130_speedup();
+}
+
+DRIVER_INIT( alpiner2 )
+{
+	namcos22s_init(NAMCOS22_ALPINE_RACER_2);
+
+	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+
+	install_130_speedup();
+}
+
+DRIVER_INIT( alpinesa )
+{
+	namcos22s_init(NAMCOS22_ALPINE_SURFER);
+
+	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+
+	install_141_speedup();
+}
+
 DRIVER_INIT( airco22 )
 {
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
+	namcos22s_init(NAMCOS22_AIR_COMBAT22);
 
-	namcos22_gametype = NAMCOS22_AIR_COMBAT22;
+	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
 }
 
 DRIVER_INIT( propcycl )
@@ -4253,18 +4268,16 @@ DRIVER_INIT( propcycl )
 //   pROM[0x22296/4] &= 0xffff0000;
 //   pROM[0x22296/4] |= 0x00004e75;
 
-	namcos22_gametype = NAMCOS22_PROP_CYCLE;
+	namcos22s_init(NAMCOS22_PROP_CYCLE);
 
 	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
 
-	// install speedup cheat for 1.31 MCU BIOS
-	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu141_speedup_r);
-	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
+	install_141_speedup();
 }
 
 DRIVER_INIT( ridgeraj )
 {
-	namcos22_gametype = NAMCOS22_RIDGE_RACER;
+	namcos22_init(NAMCOS22_RIDGE_RACER);
 
 	install_c74_speedup();
 
@@ -4274,7 +4287,7 @@ DRIVER_INIT( ridgeraj )
 
 DRIVER_INIT( ridger2j )
 {
-	namcos22_gametype = NAMCOS22_RIDGE_RACER2;
+	namcos22_init(NAMCOS22_RIDGE_RACER2);
 
 	install_c74_speedup();
 
@@ -4284,7 +4297,7 @@ DRIVER_INIT( ridger2j )
 
 DRIVER_INIT( acedrvr )
 {
-	namcos22_gametype = NAMCOS22_ACE_DRIVER;
+	namcos22_init(NAMCOS22_ACE_DRIVER);
 
 	install_c74_speedup();
 
@@ -4294,7 +4307,7 @@ DRIVER_INIT( acedrvr )
 
 DRIVER_INIT( victlap )
 {
-	namcos22_gametype = NAMCOS22_VICTORY_LAP;
+	namcos22_init(NAMCOS22_VICTORY_LAP);
 
 	install_c74_speedup();
 
@@ -4304,7 +4317,7 @@ DRIVER_INIT( victlap )
 
 DRIVER_INIT( raveracw )
 {
-	namcos22_gametype = NAMCOS22_RAVE_RACER;
+	namcos22_init(NAMCOS22_RAVE_RACER);
 
 	install_c74_speedup();
 
@@ -4321,7 +4334,7 @@ DRIVER_INIT( cybrcomm )
 	pROM[0x18aec8/4] = 0x4e714e71;
 	pROM[0x18aefc/4] = 0x4e714e71;
 
-	namcos22_gametype = NAMCOS22_CYBER_COMMANDO;
+	namcos22_init(NAMCOS22_CYBER_COMMANDO);
 
 	install_c74_speedup();
 
@@ -4330,27 +4343,24 @@ DRIVER_INIT( cybrcomm )
 }
 
 DRIVER_INIT( cybrcyc )
-{ /* patch DSP RAM test */
+{
+	/* patch DSP RAM test */
 	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
 	pROM[0x355C/4] &= 0x0000ffff;
-   pROM[0x355C/4] |= 0x4e710000;
+	pROM[0x355C/4] |= 0x4e710000;
 
-	namcos22_gametype = NAMCOS22_CYBER_CYCLES;
+	namcos22s_init(NAMCOS22_CYBER_CYCLES);
 
 	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
 
-	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r);
-	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
+	install_130_speedup();
 }
 
 DRIVER_INIT( timecris )
 {
-	namcos22_gametype = NAMCOS22_TIME_CRISIS;
+	namcos22s_init(NAMCOS22_TIME_CRISIS);
 
-	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r);
-	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
+	install_130_speedup();
 }
 
 /************************************************************************************/

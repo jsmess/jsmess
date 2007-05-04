@@ -867,6 +867,33 @@ void mame_printf_info(const char *format, ...)
 
 
 /*-------------------------------------------------
+    mame_printf_verbose - output verbose text to
+    the appropriate callback
+-------------------------------------------------*/
+
+void mame_printf_verbose(const char *format, ...)
+{
+	va_list argptr;
+
+	/* if we're not verbose, skip it */
+	if (!options_get_bool(mame_options(), OPTION_VERBOSE))
+		return;
+
+	/* by default, we go to stdout */
+	if (output_cb[OUTPUT_CHANNEL_VERBOSE] == NULL)
+	{
+		output_cb[OUTPUT_CHANNEL_VERBOSE] = mame_file_output_callback;
+		output_cb_param[OUTPUT_CHANNEL_VERBOSE] = stdout;
+	}
+
+	/* do the output */
+	va_start(argptr, format);
+	(*output_cb[OUTPUT_CHANNEL_VERBOSE])(output_cb_param[OUTPUT_CHANNEL_VERBOSE], format, argptr);
+	va_end(argptr);
+}
+
+
+/*-------------------------------------------------
     mame_printf_debug - output debug text to the
     appropriate callback
 -------------------------------------------------*/

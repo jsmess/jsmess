@@ -328,7 +328,7 @@ struct _game_driver
 	if (cpu)															\
 	{																	\
 		cpu->timed_interrupt = func;									\
-		cpu->timed_interrupt_period = (rate);							\
+		cpu->timed_interrupt_period = HZ_TO_SUBSECONDS(rate);			\
 	}																	\
 
 

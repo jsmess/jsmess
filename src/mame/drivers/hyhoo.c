@@ -35,13 +35,12 @@ Memo:
 #endif
 
 
-extern PALETTE_INIT( hyhoo );
-extern VIDEO_UPDATE( hyhoo );
-extern VIDEO_START( hyhoo );
+VIDEO_UPDATE( hyhoo );
+VIDEO_START( hyhoo );
 
-extern WRITE8_HANDLER( hyhoo_clut_w );
-extern WRITE8_HANDLER( hyhoo_blitter_w );
-extern WRITE8_HANDLER( hyhoo_romsel_w );
+extern UINT8 *hyhoo_clut;
+WRITE8_HANDLER( hyhoo_blitter_w );
+WRITE8_HANDLER( hyhoo_romsel_w );
 
 
 static DRIVER_INIT( hyhoo )
@@ -91,7 +90,7 @@ static ADDRESS_MAP_START( writeport_hyhoo, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(hyhoo_clut_w)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(MWA8_RAM) AM_BASE(&hyhoo_clut)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(MWA8_NOP)
@@ -283,13 +282,9 @@ static MACHINE_DRIVER_START( hyhoo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MDRV_PALETTE_LENGTH(65536)
-	MDRV_COLORTABLE_LENGTH(65536)
-
-	MDRV_PALETTE_INIT(hyhoo)
 	MDRV_VIDEO_START(hyhoo)
 	MDRV_VIDEO_UPDATE(hyhoo)
 

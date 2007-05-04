@@ -21,59 +21,141 @@
  *****************************************************************************/
 
 /***************************************************************
- *  EA = indirect (only used by JMP)
- * correct overflow handling
- ***************************************************************/
-#undef EA_IND
-#define EA_IND													\
-	EA_ABS; 													\
-	tmp = RDMEM(EAD);											\
-	if (EAL==0xff) m6502_ICount++;								\
-	EAD++;														\
-	EAH = RDMEM(EAD);											\
-	EAL = tmp
-
-/***************************************************************
- *  EA = zero page indirect (65c02 pre indexed w/o X)
- ***************************************************************/
-#define EA_ZPI													\
-	ZPL = RDOPARG();											\
-	EAL = RDMEM(ZPD);											\
-	ZPL++;														\
-	EAH = RDMEM(ZPD)
-
-/***************************************************************
- *  EA = indirect plus x (only used by 65c02 JMP)
- ***************************************************************/
-#define EA_IAX													\
-	 EA_ABS;													\
-	 if (EAL + X > 0xff) /* assumption; probably wrong ? */ 	\
-		 m6502_ICount--;										\
-	 EAW += X;													\
-	 tmp = RDMEM(EAD);											\
-	 if (EAL==0xff) m6502_ICount++; 							\
-	 EAD++; 													\
-	 EAH = RDMEM(EAD);											\
-	 EAL = tmp
-
-#define RD_ZPI	EA_ZPI; tmp = RDMEM(EAD)
-
-/* write a value from tmp */
-#define WR_ZPI	EA_ZPI; WRMEM(EAD, tmp)
-
-/***************************************************************
  ***************************************************************
  *          Macros to emulate the 65C02 opcodes
  ***************************************************************
  ***************************************************************/
 
+/* 65C02 *******************************************************
+ *  EA = absolute address + X
+ * one additional read if page boundary is crossed
+ ***************************************************************/
+#define EA_ABX_C02_P											\
+	EA_ABS;														\
+	if ( EAL + X > 0xff ) {										\
+		RDMEM( PCW - 1 );										\
+	}															\
+	EAW += X;
+
+/* 65C02 *******************************************************
+ *  EA = absolute address + X
+ ***************************************************************/
+#define EA_ABX_C02_NP											\
+	EA_ABS;														\
+	RDMEM( PCW - 1 );											\
+	EAW += X;
+
+/***************************************************************
+ *  EA = absolute address + Y
+ * one additional read if page boundary is crossed
+ ***************************************************************/
+#define EA_ABY_C02_P											\
+	EA_ABS;														\
+	if ( EAL + Y > 0xff ) {										\
+		RDMEM( PCW - 1 );										\
+	}															\
+	EAW += Y;
+
+/* 65C02 *******************************************************
+ *  EA = absolute address + Y
+ ***************************************************************/
+#define EA_ABY_C02_NP											\
+	EA_ABS;														\
+	RDMEM( PCW - 1 );											\
+	EAW += Y
+
+/* 65C02 *******************************************************
+ *  EA = zero page indirect + Y (post indexed)
+ *  subtract 1 cycle if page boundary is crossed
+ ***************************************************************/
+#define EA_IDY_C02_P											\
+	ZPL = RDOPARG();											\
+	EAL = RDMEM(ZPD);											\
+	ZPL++;														\
+	EAH = RDMEM(ZPD);											\
+	if (EAL + Y > 0xff) {										\
+		RDMEM( PCW - 1 );										\
+	}															\
+	EAW += Y;
+
+/* 65C02 *******************************************************
+ *  EA = zero page indirect + Y
+ ***************************************************************/
+#define EA_IDY_C02_NP											\
+	ZPL = RDOPARG();											\
+	EAL = RDMEM(ZPD);											\
+	ZPL++;														\
+	EAH = RDMEM(ZPD);											\
+	RDMEM( PCW - 1 );											\
+	EAW += Y
+
+/* 65C02 *******************************************************
+ *  EA = indirect (only used by JMP)
+ * correct overflow handling
+ ***************************************************************/
+#define EA_IND_C02												\
+	EA_ABS;														\
+	tmp = RDMEM(EAD);											\
+	RDMEM(PCW-1);												\
+	EAD++;														\
+	EAH = RDMEM(EAD);											\
+	EAL = tmp
+
+/* 65C02 *******************************************************
+ *  EA = indirect plus x (only used by 65c02 JMP)
+ ***************************************************************/
+#define EA_IAX													\
+	EA_ABS;														\
+	RDMEM( PCW - 1 );											\
+	if (EAL + X > 0xff) {										\
+		RDMEM( PCW - 1 );										\
+	}															\
+	EAW += X;													\
+	tmp = RDMEM(EAD);											\
+	EAD++;														\
+	EAH = RDMEM(EAD);											\
+	EAL = tmp
+
+/* read a value into tmp */
+/* Base number of cycles taken for each mode (including reading of opcode):
+   RD_ABX_C02_P         4/5
+   RD_ABX_C02_NP/WR_ABX_C02_NP  5
+   RD_ABY_C02_P         4/5
+   RD_IDY_C02_P         5/6
+   WR_IDY_C02_NP        6
+ */
+#define RD_ABX_C02_P	EA_ABX_C02_P; tmp = RDMEM(EAD)
+#define RD_ABX_C02_NP	EA_ABX_C02_NP; tmp = RDMEM(EAD)
+#define RD_ABY_C02_P	EA_ABY_C02_P; tmp = RDMEM(EAD)
+#define RD_IDY_C02_P	EA_IDY_C02_P; tmp = RDMEM_ID(EAD); m6502_ICount -= 1
+
+#define WR_ABX_C02_NP	EA_ABX_C02_NP; WRMEM(EAD, tmp)
+#define WR_ABY_C02_NP	EA_ABY_C02_NP; WRMEM(EAD, tmp)
+#define WR_IDY_C02_NP	EA_IDY_C02_NP; WRMEM_ID(EAD, tmp); m6502_ICount -= 1
+
+
+/* 65C02********************************************************
+ *  BRA  branch relative
+ *  extra cycle if page boundary is crossed
+ ***************************************************************/
+#define BRA_C02(cond)											\
+	tmp = RDOPARG();											\
+	if (cond)													\
+	{															\
+		RDMEM(PCW);												\
+		EAW = PCW + (signed char)tmp;							\
+		if ( EAH != PCH ) {										\
+			RDMEM( PCW - 1 );									\
+		}														\
+		PCD = EAD;												\
+		CHANGE_PC;												\
+	}
 
 /* 65C02 ********************************************************
  *  ADC Add with carry
  * different setting of flags in decimal mode
  ***************************************************************/
-#undef ADC
-#define ADC 													\
+#define ADC_C02 												\
 	if (P & F_D)												\
 	{															\
 		int c = (P & F_C);										\
@@ -92,6 +174,7 @@
 		if( hi & 0xff00 )										\
 			P |= F_C;											\
 		A = (lo & 0x0f) + (hi & 0xf0);							\
+		RDMEM( PCW - 1 );										\
 	}															\
 	else														\
 	{															\
@@ -110,8 +193,7 @@
  *  SBC Subtract with carry
  * different setting of flags in decimal mode
  ***************************************************************/
-#undef SBC
-#define SBC 													\
+#define SBC_C02													\
 	if (P & F_D)												\
 	{															\
 		int c = (P & F_C) ^ F_C;								\
@@ -130,6 +212,7 @@
 		if( (sum & 0xff00) == 0 )								\
 			P |= F_C;											\
 		A = (lo & 0x0f) + (hi & 0xf0);							\
+		RDMEM( PCW - 1 );										\
 	}															\
 	else														\
 	{															\
@@ -161,9 +244,8 @@
  *  increment PC, push PC hi, PC lo, flags (with B bit set),
  *  set I flag, reset D flag and jump via IRQ vector
  ***************************************************************/
-#undef BRK
-#define BRK 													\
-	PCW++;														\
+#define BRK_C02 												\
+	RDOPARG();													\
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	PUSH(P | F_B);												\
@@ -203,14 +285,16 @@
  *  PLX Pull index X
  ***************************************************************/
 #define PLX 													\
-	PULL(X); \
+	RDMEM(SPD);													\
+	PULL(X);													\
 	SET_NZ(X)
 
 /* 65C02 *******************************************************
  *  PLY Pull index Y
  ***************************************************************/
 #define PLY 													\
-	PULL(Y); \
+	RDMEM(SPD);													\
+	PULL(Y);													\
 	SET_NZ(Y)
 
 /* 65C02 *******************************************************
@@ -258,10 +342,12 @@
  ***************************************************************/
 #define BSR 													\
 	EAL = RDOPARG();											\
+	RDMEM(SPD);													\
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	EAH = RDOPARG();											\
 	EAW = PCW + (INT16)(EAW-1); 								\
 	PCD = EAD;													\
 	CHANGE_PC
+
 

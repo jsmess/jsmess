@@ -275,7 +275,7 @@ static WRITE32_HANDLER( ms32_sound_w )
 	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	cpu_spinuntil_time(TIME_IN_USEC(40));
+	cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( ms32_sound_r )

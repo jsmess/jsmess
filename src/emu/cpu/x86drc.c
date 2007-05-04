@@ -360,7 +360,8 @@ void drc_append_call_debugger(drc_core *drc)
 		link_info link;
 		_cmp_m32abs_imm(&Machine->debug_mode, 0);						// cmp  [Machine->debug_mode],0
 		_jcc_short_link(COND_E, &link);									// je   skip
-		drc_append_save_call_restore(drc, (genf *)mame_debug_hook, 0);	// save volatiles
+		_sub_r32_imm(REG_ESP, 12);										// align stack
+		drc_append_save_call_restore(drc, (genf *)mame_debug_hook, 12);	// save volatiles
 		_resolve_link(&link);
 	}
 #endif
@@ -440,8 +441,9 @@ void drc_append_standard_epilogue(drc_core *drc, INT32 cycles, INT32 pcdelta, in
 void drc_append_dispatcher(drc_core *drc)
 {
 #if LOG_DISPATCHES
+	_sub_r32_imm(REG_ESP, 8);										// align stack
 	_push_imm(drc);													// push drc
-	drc_append_save_call_restore(drc, (void *)log_dispatch, 4);		// call log_dispatch
+	drc_append_save_call_restore(drc, (void *)log_dispatch, 12);	// call log_dispatch
 #endif
 	if (drc->pc_in_memory)
 		_mov_r32_m32abs(REG_EDI, drc->pcptr);						// mov  edi,[pc]
@@ -635,8 +637,9 @@ static void recompile_code(drc_core *drc)
 
 static void append_recompile(drc_core *drc)
 {
+	_sub_r32_imm(REG_ESP, 8);										// align stack
 	_push_imm(drc);													// push drc
-	drc_append_save_call_restore(drc, (genf *)recompile_code, 4);	// call recompile_code
+	drc_append_save_call_restore(drc, (genf *)recompile_code, 12);	// call recompile_code
 	drc_append_dispatcher(drc);										// dispatch
 }
 
@@ -647,8 +650,9 @@ static void append_recompile(drc_core *drc)
 
 static void append_flush(drc_core *drc)
 {
+	_sub_r32_imm(REG_ESP, 8);										// align stack
 	_push_imm(drc);													// push drc
-	drc_append_save_call_restore(drc, (genf *)drc_cache_reset, 4);	// call drc_cache_reset
+	drc_append_save_call_restore(drc, (genf *)drc_cache_reset, 12);	// call drc_cache_reset
 	drc_append_dispatcher(drc);										// dispatch
 }
 

@@ -1358,7 +1358,7 @@ static MACHINE_DRIVER_START( cps2 )
 
 	MDRV_CPU_ADD(Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(251))	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
 	MDRV_SCREEN_REFRESH_RATE(59.633333)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))

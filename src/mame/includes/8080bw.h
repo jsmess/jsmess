@@ -7,60 +7,81 @@
 #include "sound/discrete.h"
 
 
-/*----------- defined in audio/8080bw.c -----------*/
+#define CABINET_PORT_TAG	"CAB"
 
-MACHINE_RESET( sstrangr );
-MACHINE_RESET( spcewars );
-MACHINE_RESET( lrescue );
-MACHINE_RESET( ballbomb );
-MACHINE_RESET( schaser );
-MACHINE_RESET( polaris );
-MACHINE_RESET( indianbt );
-MACHINE_RESET( invrvnge );
-MACHINE_RESET( lupin3 );
-MACHINE_RESET( rollingc );
-MACHINE_RESET( schasrcv );
-MACHINE_RESET( shuttlei );
-MACHINE_RESET( yosakdon );
+
+/*----------- defined in drivers/8080bw.c -----------*/
+
+UINT8 polaris_get_cloud_pos(void);
+
+
+/*----------- defined in audio/8080bw.c -----------*/
 
 WRITE8_HANDLER( invadpt2_sh_port_1_w );
 WRITE8_HANDLER( invadpt2_sh_port_2_w );
 
+WRITE8_HANDLER( spcewars_sh_port_w );
+
+WRITE8_HANDLER( lrescue_sh_port_1_w );
+WRITE8_HANDLER( lrescue_sh_port_2_w );
 extern struct Samplesinterface lrescue_samples_interface;
-extern discrete_sound_block polaris_discrete_interface[];
+
+WRITE8_HANDLER( cosmo_sh_port_2_w );
+
+WRITE8_HANDLER( ballbomb_sh_port_1_w );
+WRITE8_HANDLER( ballbomb_sh_port_2_w );
+
+WRITE8_HANDLER( indianbt_sh_port_1_w );
+WRITE8_HANDLER( indianbt_sh_port_2_w );
+WRITE8_HANDLER( indianbt_sh_port_3_w );
 extern discrete_sound_block indianbt_discrete_interface[];
-extern discrete_sound_block schaser_discrete_interface[];
-void schaser_effect_555_cb(int effect);
-extern int schaser_sx10;
-extern mame_timer *schaser_effect_555_timer;
+
+WRITE8_HANDLER( polaris_sh_port_1_w );
+WRITE8_HANDLER( polaris_sh_port_2_w );
+WRITE8_HANDLER( polaris_sh_port_3_w );
+extern discrete_sound_block polaris_discrete_interface[];
+
+MACHINE_RESET( schaser );
+MACHINE_START( schaser );
+WRITE8_HANDLER( schaser_sh_port_1_w );
+WRITE8_HANDLER( schaser_sh_port_2_w );
 extern struct SN76477interface schaser_sn76477_interface;
+extern discrete_sound_block schaser_discrete_interface[];
+
+WRITE8_HANDLER( rollingc_sh_port_w );
+
+WRITE8_HANDLER( invrvnge_sh_port_w );
+
+WRITE8_HANDLER( lupin3_sh_port_1_w );
+WRITE8_HANDLER( lupin3_sh_port_2_w );
+
+WRITE8_HANDLER( schasrcv_sh_port_1_w );
+WRITE8_HANDLER( schasrcv_sh_port_2_w );
+
+WRITE8_HANDLER( yosakdon_sh_port_1_w );
+WRITE8_HANDLER( yosakdon_sh_port_2_w );
+
+WRITE8_HANDLER( shuttlei_sh_port_1_w );
+WRITE8_HANDLER( shuttlei_sh_port_2_w );
 
 
 /*----------- defined in video/8080bw.c -----------*/
 
-DRIVER_INIT( 8080bw );
-DRIVER_INIT( invadpt2 );
-DRIVER_INIT( cosmo );
-DRIVER_INIT( sstrngr2 );
-DRIVER_INIT( invaddlx );
-DRIVER_INIT( schaser );
-DRIVER_INIT( schasrcv );
-DRIVER_INIT( rollingc );
-DRIVER_INIT( polaris );
-DRIVER_INIT( lupin3 );
-DRIVER_INIT( indianbt );
-DRIVER_INIT( shuttlei );
+extern UINT8 *c8080bw_colorram;
 
 void c8080bw_flip_screen_w(int data);
 void c8080bw_screen_red_w(int data);
+void schaser_background_control_w(int data);
 
-INTERRUPT_GEN( polaris_interrupt );
-
-WRITE8_HANDLER( c8080bw_videoram_w );
-
-VIDEO_UPDATE( 8080bw );
-
-PALETTE_INIT( invadpt2 );
-PALETTE_INIT( sflush );
-PALETTE_INIT( cosmo );
-PALETTE_INIT( indianbt );
+VIDEO_UPDATE( invadpt2 );
+VIDEO_UPDATE( ballbomb );
+VIDEO_UPDATE( sstrngr2 );
+VIDEO_UPDATE( schaser );
+VIDEO_UPDATE( schasrcv );
+VIDEO_UPDATE( rollingc );
+VIDEO_UPDATE( polaris );
+VIDEO_UPDATE( lupin3 );
+VIDEO_UPDATE( cosmo );
+VIDEO_UPDATE( indianbt );
+VIDEO_UPDATE( shuttlei );
+VIDEO_UPDATE( sflush );

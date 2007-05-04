@@ -1494,7 +1494,7 @@ static MACHINE_DRIVER_START( mazerbla )
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz, NMI, IM1 INT */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
 	MDRV_CPU_IO_MAP(readport_cpu2,writeport_cpu2)
-//MDRV_CPU_PERIODIC_INT(irq0_line_hold, TIME_IN_HZ(400) ) /* frequency in Hz */
+//MDRV_CPU_PERIODIC_INT(irq0_line_hold, 400 ) /* frequency in Hz */
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz, no  NMI, IM1 INT */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)
@@ -1536,9 +1536,7 @@ static MACHINE_DRIVER_START( greatgun )
 
 	MDRV_CPU_ADD(Z80, 14318000 / 4)	/* 3.579500 MHz, NMI - caused by sound command write, periodic INT */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	/* IRQ frequency is: 14318000.0 Hz/16/16/16/16 = 218.475341796875 Hz */
-	/*   that is a period of 1000000000.0 / 218.475341796875 = 4577175.5831 ns */
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, TIME_IN_NSEC(4577176) ) /* period in nanoseconds */
+	MDRV_CPU_PERIODIC_INT(sound_interrupt, (double)14318180/16/16/16/16 )
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz, no  NMI, IM1 INT */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)

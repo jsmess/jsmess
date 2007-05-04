@@ -70,8 +70,8 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
 	AM_RANGE(0x9a00, 0x9a00) AM_READNOP
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&colorram)
 	AM_RANGE(0x8800, 0x881f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x8820, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xffff) AM_ROM

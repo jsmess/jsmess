@@ -57,8 +57,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - I've DELIBERATELY mapped DSW3 before DSW2 to try to spot the common
     things with the other Dynax mahjong games ! Please don't change this !
 
-  - When "Special Combinaisons" Dip Switch is ON, there is a marker in
-    front of a random combinaison. It's value is *2 then.
+  - When "Special Combinations" Dip Switch is ON, there is a marker in
+    front of a random combination. It's value is *2 then.
 
 3) 'mjdiplob'
 
@@ -66,8 +66,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
     (but the inputs are mapped so you can test them in the "test mode")
     P1 IN4 doesn't seem to be needed outside the "test mode" either.
 
-  - When "Special Combinaisons" Dip Switch is ON, there is a marker in
-    front of a random combinaison. It's value remains *1 though.
+  - When "Special Combinations" Dip Switch is ON, there is a marker in
+    front of a random combination. It's value remains *1 though.
     Could it be a leftover from another game ('tontonb' for exemple) ?
 
 - janptr96: in service mode press in sequence N,Ron,Ron,N to access some
@@ -80,86 +80,62 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"
 
+
 static int palette_base;
 
-PALETTE_INIT( royalmah )
+
+static void royalmah_get_pens(pen_t *pens)
 {
-	int i;
+	offs_t i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		UINT8 bit0, bit1, bit2, r, g, b;
 
+		UINT8 data = memory_region(REGION_PROMS)[i];
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (data >> 0) & 0x01;
+		bit1 = (data >> 1) & 0x01;
+		bit2 = (data >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (data >> 3) & 0x01;
+		bit1 = (data >> 4) & 0x01;
+		bit2 = (data >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (data >> 6) & 0x01;
+		bit2 = (data >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
-		color_prom++;
+		pens[i] = MAKE_RGB(r, g, b);
 	}
 }
 
-/* 0 B01234 G01234 R01234 */
-PALETTE_INIT( mjderngr )
+
+static void mjderngr_get_pens(pen_t *pens)
 {
-	int i;
+	offs_t i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < memory_region_length(REGION_PROMS) / 2; i++)
 	{
-		int x =	(color_prom[i]<<8) + color_prom[0x200+i];
-		/* The bits are in reverse order! */
-		int r = BITSWAP8((x >>  0) & 0x1f, 7,6,5, 0,1,2,3,4 );
-		int g = BITSWAP8((x >>  5) & 0x1f, 7,6,5, 0,1,2,3,4 );
-		int b = BITSWAP8((x >> 10) & 0x1f, 7,6,5, 0,1,2,3,4 );
-		r =  (r << 3) | (r >> 2);
-		g =  (g << 3) | (g >> 2);
-		b =  (b << 3) | (b >> 2);
-		palette_set_color(machine,i,r,g,b);
+		UINT16 data = (memory_region(REGION_PROMS)[i] << 8) | memory_region(REGION_PROMS)[i + 0x200];
+
+		/* the bits are in reverse order */
+		UINT8 r = BITSWAP8((data >>  0) & 0x1f,7,6,5,0,1,2,3,4 );
+		UINT8 g = BITSWAP8((data >>  5) & 0x1f,7,6,5,0,1,2,3,4 );
+		UINT8 b = BITSWAP8((data >> 10) & 0x1f,7,6,5,0,1,2,3,4 );
+
+		pens[i] = MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
 
-WRITE8_HANDLER( royalmah_videoram_w )
-{
-	int i;
-	UINT8 x, y;
-	UINT8 col1, col2;
-
-
-	videoram[offset] = data;
-
-	col1 = videoram[offset & 0x3fff];
-	col2 = videoram[offset | 0x4000];
-
-	y = (offset >> 6);
-	x = (offset & 0x3f) << 2;
-
-	for (i = 0; i < 4; i++)
-	{
-		int col = ((col1 & 0x01) >> 0) | ((col1 & 0x10) >> 3) | ((col2 & 0x01) << 2) | ((col2 & 0x10) >> 1);
-
-		*BITMAP_ADDR16(tmpbitmap, y ^ 0xff, (x+i) ^ 0xff) = 16*palette_base + col;
-
-		col1 >>= 1;
-		col2 >>= 1;
-	}
-}
-
-
-WRITE8_HANDLER( royalmah_palbank_w )
+static WRITE8_HANDLER( royalmah_palbank_w )
 {
 	/* bit 1 = coin counter */
 	coin_counter_w(0,data & 2);
@@ -167,10 +143,11 @@ WRITE8_HANDLER( royalmah_palbank_w )
 	/* bit 2 always set? */
 
 	/* bit 3 = palette bank */
-	set_vh_global_attribute(&palette_base,(data & 0x08) >> 3);
+	palette_base = (data >> 3) & 0x01;
 }
 
-WRITE8_HANDLER( mjderngr_coin_w )
+
+static WRITE8_HANDLER( mjderngr_coin_w )
 {
 	/* bit 1 = coin counter */
 	coin_counter_w(0,data & 2);
@@ -178,29 +155,59 @@ WRITE8_HANDLER( mjderngr_coin_w )
 	/* bit 2 always set? */
 }
 
-WRITE8_HANDLER( mjderngr_palbank_w )
+
+static WRITE8_HANDLER( mjderngr_palbank_w )
 {
-	set_vh_global_attribute(&palette_base,data);
+	palette_base = data;
 }
 
 
-VIDEO_UPDATE( royalmah )
+static int video_update_common(mame_bitmap *bitmap, const rectangle *cliprect, pen_t *pens)
 {
-	if (get_vh_global_attribute_changed())
+	offs_t offs;
+
+	for (offs = 0; offs < 0x4000; offs++)
 	{
-		int offs;
+		int i;
 
-		/* redraw bitmap */
+		UINT8 data1 = videoram[offs + 0x0000];
+		UINT8 data2 = videoram[offs + 0x4000];
 
-		for (offs = 0; offs < videoram_size; offs++)
+		UINT8 y = 255 - (offs >> 6);
+		UINT8 x = 255 - (offs << 2);
+
+		for (i = 0; i < 4; i++)
 		{
-			royalmah_videoram_w(offs, videoram[offs]);
+			UINT8 color = ((data2 >> 1) & 0x08) | ((data2 << 2) & 0x04) | ((data1 >> 3) & 0x02) | ((data1 >> 0) & 0x01);
+
+			*BITMAP_ADDR32(bitmap, y, x) = pens[(palette_base << 4) | color];
+
+			x = x - 1;
+			data1 = data1 >> 1;
+			data2 = data2 >> 1;
 		}
 	}
-	copybitmap(bitmap,tmpbitmap,flip_screen_x,flip_screen_y,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+
 	return 0;
 }
 
+
+static VIDEO_UPDATE( royalmah )
+{
+	pen_t pens[0x400];
+	royalmah_get_pens(pens);
+
+	return video_update_common(bitmap, cliprect, pens);
+}
+
+
+static VIDEO_UPDATE( mjderngr )
+{
+	pen_t pens[0x400];
+	mjderngr_get_pens(pens);
+
+	return video_update_common(bitmap, cliprect, pens);
+}
 
 
 
@@ -341,7 +348,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_WRITE(royalmah_rom_w)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(royalmah_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 
@@ -483,7 +490,7 @@ static ADDRESS_MAP_START( janptr96_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_BANK3)	// nvram
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(MWA8_BANK2)	// banked nvram
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(royalmah_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( janptr96_dswsel_w )
@@ -592,7 +599,7 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 {
 	if (mjifb_rom_enable)
 	{
-		royalmah_videoram_w( offset, data );
+		videoram[offset] = data;
 		return;
 	}
 
@@ -600,7 +607,7 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 
 	switch(offset)
 	{
-		case 0x8e00:	set_vh_global_attribute(&palette_base, data & 0x1f);	return;
+		case 0x8e00:	palette_base = data & 0x1f;	return;
 		case 0x9002:	AY8910_write_port_0_w(0,data);			return;
 		case 0x9003:	AY8910_control_port_0_w(0,data);		return;
 		case 0x9010:
@@ -615,12 +622,17 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 	logerror("%04X: unmapped input write at %04X = %02X\n", activecpu_get_pc(), offset,data);
 }
 
+static WRITE8_HANDLER( mjifb_videoram_w )
+{
+	videoram[offset + 0x4000] = data;
+}
+
 static ADDRESS_MAP_START( mjifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE( mjifb_rom_io_r, mjifb_rom_io_w )
-	AM_RANGE( 0xc000, 0xffff ) AM_READ( MRA8_ROM )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( royalmah_videoram_w ) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_BASE(&videoram)
+	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(MRA8_ROM, mjifb_videoram_w)
+//  AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(MRA8_ROM, MWA8_RAM)  This should, but doesn't work
 ADDRESS_MAP_END
 
 static READ8_HANDLER( mjifb_p3_r )
@@ -705,7 +717,7 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( royalmah_videoram_w ) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjtensin_iomap, ADDRESS_SPACE_IO, 8 )
@@ -716,7 +728,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( royalmah )
+static INPUT_PORTS_START( royalmah )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -841,7 +853,7 @@ INPUT_PORTS_START( royalmah )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( suzume )
+static INPUT_PORTS_START( suzume )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -1039,7 +1051,7 @@ INPUT_PORTS_START( suzume )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tontonb )
+static INPUT_PORTS_START( tontonb )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -1188,7 +1200,7 @@ INPUT_PORTS_START( tontonb )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START	/* DSW2 (inport $46 -> 0x73b2) */
-	PORT_DIPNAME( 0x01, 0x00, "Special Combinaisons" )	// see notes
+	PORT_DIPNAME( 0x01, 0x00, "Special Combinations" )	// see notes
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )		// check code at 0x07c5
@@ -1214,7 +1226,7 @@ INPUT_PORTS_START( tontonb )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjdiplob )
+static INPUT_PORTS_START( mjdiplob )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -1363,7 +1375,7 @@ INPUT_PORTS_START( mjdiplob )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START	/* DSW3 (inport $63 -> 0x76fc) */
-	PORT_DIPNAME( 0x01, 0x00, "Special Combinaisons" )	// see notes
+	PORT_DIPNAME( 0x01, 0x00, "Special Combinations" )	// see notes
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) )
@@ -1389,7 +1401,7 @@ INPUT_PORTS_START( mjdiplob )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( majs101b )
+static INPUT_PORTS_START( majs101b )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -1539,7 +1551,7 @@ INPUT_PORTS_START( majs101b )
 	PORT_DIPSETTING(    0x80, "Gray" )
 
 	PORT_START	/* DSW3 (inport $00 (after out 0,$00) -> 0x76fc) */
-	PORT_DIPNAME( 0x01, 0x00, "Special Combinaisons" )	// see notes
+	PORT_DIPNAME( 0x01, 0x00, "Special Combinations" )	// see notes
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )		// check code at 0x1cf9
@@ -1588,7 +1600,7 @@ INPUT_PORTS_START( majs101b )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( janptr96 )
+static INPUT_PORTS_START( janptr96 )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -1812,7 +1824,7 @@ INPUT_PORTS_START( janptr96 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjifb )
+static INPUT_PORTS_START( mjifb )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -2013,7 +2025,7 @@ INPUT_PORTS_START( mjifb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( mjtensin )
+static INPUT_PORTS_START( mjtensin )
 	PORT_START	/* P1 IN0 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
@@ -2252,21 +2264,18 @@ static MACHINE_DRIVER_START( royalmah )
 	MDRV_CPU_IO_MAP(royalmah_readport,royalmah_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_VIDEO_UPDATE(royalmah)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
-	MDRV_PALETTE_LENGTH(32)
-
-	MDRV_PALETTE_INIT(royalmah)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(royalmah)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2285,21 +2294,18 @@ static MACHINE_DRIVER_START( dondenmj )
 	MDRV_CPU_IO_MAP(dondenmj_readport,dondenmj_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_VIDEO_UPDATE(royalmah)
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
-	MDRV_PALETTE_LENGTH(32)
-
-	MDRV_PALETTE_INIT(royalmah)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(royalmah)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2309,7 +2315,7 @@ static MACHINE_DRIVER_START( dondenmj )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
-void suzume_irq(void)
+static void suzume_irq(void)
 {
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcd1216);
 }
@@ -2349,14 +2355,13 @@ static MACHINE_DRIVER_START( mjderngr )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(mjderngr_readport,mjderngr_writeport)
 
-	MDRV_PALETTE_LENGTH(512)
-
-	MDRV_PALETTE_INIT(mjderngr)
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(mjderngr)
 MACHINE_DRIVER_END
 
 
 /* It runs in IM 2, thus needs a vector on the data bus */
-INTERRUPT_GEN( janptr96_vblank_interrupt )
+static INTERRUPT_GEN( janptr96_vblank_interrupt )
 {
 	switch(cpu_getiloops())
 	{
@@ -2392,7 +2397,7 @@ static MACHINE_DRIVER_START( mjifb )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_DRIVER_END
 
-INTERRUPT_GEN( mjtensin_vblank_interrupt )
+static INTERRUPT_GEN( mjtensin_vblank_interrupt )
 {
 	switch(cpu_getiloops())
 	{
@@ -2429,7 +2434,7 @@ ROM_START( royalmah )
 	ROM_LOAD( "rom5",       0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) )
 	ROM_LOAD( "rom6",       0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) )
 
-	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "f-rom.bpr",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
@@ -2449,7 +2454,7 @@ ROM_START( suzume )
 	ROM_LOAD( "4.1e",       0x28000, 0x08000, CRC(9da8952e) SHA1(956d16b82ff8fe733a7b3135d082e18ea5167dfe) )	// 3
 	ROM_LOAD( "5.1h",       0x30000, 0x08000, CRC(04a6f41a) SHA1(37117faf6bc823770413faa7618387ca6f16fa34) )	// 4
 
-	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
@@ -2462,7 +2467,7 @@ ROM_START( dondenmj )
 	ROM_LOAD( "dn3.2h",     0x30000, 0x08000, CRC(b09d2897) SHA1(0cde3e16ca333be01a5ab3a232f2ea602faec7a2) )	// 4
 	ROM_LOAD( "dn4.2e",     0x50000, 0x08000, CRC(67d7dcd6) SHA1(6b708a29de1f4738eb2d4e667327d9433ff7216c) )	// 8
 
-	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
@@ -2475,7 +2480,7 @@ ROM_START( mjdiplob )
 	ROM_LOAD( "073.4j",     0x30000, 0x10000, CRC(562ed64f) SHA1(42b4a7e5a8de4dde83c12d7b9facf561bc872978) )	// 4,5
 	ROM_LOAD( "074.4h",     0x40000, 0x10000, CRC(1eba0140) SHA1(0d0b95be338d7450ad3b24cc47e24e94f86dcefe) )	// 6,7
 
-	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
 ROM_END
 
@@ -2489,7 +2494,7 @@ ROM_START( tontonb )
 	/**/													// 6,7 unused
 	ROM_LOAD( "092.5c",   	0x50000, 0x10000, CRC(7ff2738b) SHA1(89a49f89705f499439dc024fc70c87141a84780b) )	// 8,9
 
-	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
 ROM_END
 
@@ -2503,7 +2508,7 @@ ROM_START( majs101b )
 	ROM_LOAD( "173.3h",     0x50000, 0x20000, CRC(7a9e71ae) SHA1(ce1bde6e05f81b7dbb14015514397ed72f8dd92a) )	// 8,9,a,b
 	ROM_LOAD( "174.3j",     0x70000, 0x10000, CRC(972c2cc9) SHA1(ba78d29d1723783dbd0e8c754d2422caad5ab367) )	// c,d
 
-	ROM_REGION( 0x0020, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(c1e427df) SHA1(9a9980d93dff4b87a940398b18277acaf946eeab) )
 ROM_END
 
@@ -2517,7 +2522,7 @@ ROM_START( mjderngr )
 	ROM_LOAD( "2204.1e",    0x70000, 0x20000, CRC(ed5fde4b) SHA1(d55487ae1007d43b71f06ae5c407c75db7054515) )	// c,d,e,f
 	ROM_LOAD( "2205.1f",    0x90000, 0x20000, CRC(cfb8075d) SHA1(31f613a1a9b5f4295b552aeeddb760605ce2ac70) )	// 0x10,0x11,0x12,0x13
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "ic3g.bin",   0x000, 0x200, CRC(d43f4c7c) SHA1(117d2e4e8d5bea3e5dc903a4b87bd71786ae009c) )
 	ROM_LOAD( "ic4g.bin",   0x200, 0x200, CRC(30cf7831) SHA1(b4593d51c6ceb301279a01a98665e4be8a3c403d) )
 ROM_END
@@ -2558,7 +2563,7 @@ ROM_START( mjifb )
 	ROM_LOAD( "2902.1c",    0xb0000, 0x10000, CRC(0ce02a98) SHA1(69f6bca9af8548038401839047a304a4aa97cfe6) )
 	ROM_RELOAD(             0xc0000, 0x10000 )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "d29-2.4d",   0x000, 0x200, CRC(78252f6a) SHA1(1869147bc6b7573c2543bdf6b17d6c3c1debdddb) )
 	ROM_LOAD( "d29-1.4c",   0x200, 0x200, CRC(4aaec8cf) SHA1(fbe1c3729d078a422ffe68dfde495fcb9f329cdd) )
 ROM_END
@@ -2579,7 +2584,7 @@ ROM_START( janptr96 )
 	ROM_LOAD( "503x-3.1f", 0x110000, 0x80000, CRC(9ba4deb0) SHA1(e9d44a6ed849ff90c0b1f9321cdd62e18c3fd35c) )
 	ROM_LOAD( "503x-4.1e", 0x190000, 0x80000, CRC(e266ca0b) SHA1(d84608e7b474061a680510a266842e667bf2eab5) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "ns503b.3h", 0x000, 0x200, CRC(3b2a6b12) SHA1(ebd2929e6acbde989964bfef602b81f2f2fe04eb) )
 	ROM_LOAD( "ns503a.3j", 0x200, 0x200, CRC(fe49b2f0) SHA1(a36ca005380cc92dfe473254c26be2cef2ced9b4) )
 ROM_END
@@ -2674,7 +2679,7 @@ ROM_START( mjtensin )
 
 	ROM_LOAD( "1003.3e", 0x210000, 0x80000, CRC(876081bf) SHA1(fe962cfa9318a9444123bcaf3406e22fb08e8c4e) )
 
-	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "d100-2.7e",  0x000, 0x200, CRC(6edeed23) SHA1(f4420c473ebbe3df92b0f5b1f0e4d5495fcb9fda) )
 	ROM_LOAD( "d100-1.6e",  0x200, 0x200, CRC(88befd59) SHA1(cbcb437f9f6b5e542dc69f5c9e85ccbae47080af) )
 ROM_END

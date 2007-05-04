@@ -186,7 +186,7 @@ static void update_main_irqs(void)
 	if (irq != 0)
 	{
 		cpunum_set_input_line(0, irq, ASSERT_LINE);
-		cpu_boost_interleave(0, TIME_IN_USEC(100));
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 	}
 	else
 		cpunum_set_input_line(0, 7, CLEAR_LINE);

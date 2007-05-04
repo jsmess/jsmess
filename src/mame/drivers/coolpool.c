@@ -314,7 +314,7 @@ static void deferred_iop_w(int data)
 	cpunum_set_input_line(1, 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 										/* the DSP polls the status bit so it isn't strictly */
 										/* necessary to also have an IRQ */
-	cpu_boost_interleave(0, TIME_IN_USEC(50));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
 }
 
 

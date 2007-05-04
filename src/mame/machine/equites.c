@@ -27,7 +27,7 @@ drivers by Acho A. Tang
 	/* audio CPU */ \
 	MDRV_CPU_PROGRAM_MAP(equites_s_readmem, equites_s_writemem) \
 	MDRV_CPU_IO_MAP(0, equites_s_writeport) \
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(4000)) \
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) \
 	\
 	MDRV_SOUND_ADD(MSM5232, 2500000) \
 	MDRV_SOUND_CONFIG(equites_5232intf) \

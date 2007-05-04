@@ -203,8 +203,6 @@ VIDEO_START( taitojc )
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[taitojc_gfx_index] = allocgfx(&taitojc_char_layout);
-	if (!machine->gfx[taitojc_gfx_index])
-		return 1;
 
 	/* set the color information */
 	if (machine->drv->color_table_len)

@@ -575,7 +575,7 @@ static MACHINE_DRIVER_START( bzone )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(bzone_map,0)
-	MDRV_CPU_PERIODIC_INT(bzone_interrupt, TIME_IN_HZ(CLOCK_3KHZ / 12))
+	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)MASTER_CLOCK / 4096 / 12)
 
 	MDRV_SCREEN_REFRESH_RATE(40)
 	MDRV_SCREEN_VBLANK_TIME(0)
@@ -623,7 +623,7 @@ static MACHINE_DRIVER_START( redbaron )
 	MDRV_IMPORT_FROM(bzone)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(redbaron_map,0)
-	MDRV_CPU_PERIODIC_INT(bzone_interrupt, TIME_IN_HZ(CLOCK_3KHZ / 12))
+	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)MASTER_CLOCK / 4096 / 12)
 
 	MDRV_MACHINE_START(redbaron)
 

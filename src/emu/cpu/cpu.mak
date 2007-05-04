@@ -1430,6 +1430,8 @@ CPUOBJS += $(CPUOBJ)/tms34010/tms34010.o $(CPUOBJ)/tms34010/34010fld.o
 DBGOBJS += $(CPUOBJ)/tms34010/34010dsm.o
 endif
 
+$(CPUOBJ)/tms34010/34010fld.o:  $(CPUSRC)/tms34010/34010fld.c
+
 $(CPUOBJ)/tms34010/tms34010.o:	$(CPUSRC)/tms34010/tms34010.c \
 								$(CPUSRC)/tms34010/tms34010.h \
 								$(CPUSRC)/tms34010/34010ops.c \

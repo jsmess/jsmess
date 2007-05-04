@@ -8,11 +8,11 @@
 #include "sound/discrete.h"
 #include "sound/speaker.h"
 
-mame_timer *schaser_effect_555_timer;
+
+static mame_timer *schaser_effect_555_timer;
 static double schaser_effect_555_time_remain;
 static int schaser_effect_555_is_low;
-static int explosion;
-int schaser_sx10;
+static int schaser_explosion;
 static UINT8 port_1_last = 0;
 static UINT8 port_2_last = 0;
 static UINT8 port_3_last = 0;
@@ -68,26 +68,11 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
 
 /*******************************************************/
 /*                                                     */
-/* "Space Stranger"                                    */
-/*                                                     */
-/*******************************************************/
-
-MACHINE_RESET( sstrangr )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x42, 0x42, 0, 0, invadpt2_sh_port_1_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x44, 0x44, 0, 0, invadpt2_sh_port_2_w);
-
-	machine_reset_mw8080bw(machine);
-}
-
-
-/*******************************************************/
-/*                                                     */
 /* Sanritsu "Space War"                                */
 /*                                                     */
 /*******************************************************/
 
-static WRITE8_HANDLER( spcewars_sh_port3_w )
+WRITE8_HANDLER( spcewars_sh_port_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -100,14 +85,6 @@ static WRITE8_HANDLER( spcewars_sh_port3_w )
 	speaker_level_w(0, (data & 0x10) ? 1 : 0);		/* Various bitstream tunes */
 
 	port_1_last = data;
-}
-
-MACHINE_RESET( spcewars )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, spcewars_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, invadpt2_sh_port_2_w);
-
-	machine_reset_mw8080bw(machine);
 }
 
 
@@ -138,7 +115,7 @@ struct Samplesinterface lrescue_samples_interface =
 	lrescue_sample_names
 };
 
-static WRITE8_HANDLER( lrescue_sh_port3_w )
+WRITE8_HANDLER( lrescue_sh_port_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -155,7 +132,7 @@ static WRITE8_HANDLER( lrescue_sh_port3_w )
 	port_1_last = data;
 }
 
-static WRITE8_HANDLER( lrescue_sh_port5_w )
+WRITE8_HANDLER( lrescue_sh_port_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -173,12 +150,17 @@ static WRITE8_HANDLER( lrescue_sh_port5_w )
 	port_2_last = data;
 }
 
-MACHINE_RESET( lrescue )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, lrescue_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, lrescue_sh_port5_w);
 
-	machine_reset_mw8080bw(machine);
+/*******************************************************/
+/*                                                     */
+/* Cosmo                                               */
+/*                                                     */
+/*******************************************************/
+
+WRITE8_HANDLER( cosmo_sh_port_2_w )
+{
+	/* inverted flip screen bit */
+	invadpt2_sh_port_2_w(offset, data ^ 0x20);
 }
 
 
@@ -189,7 +171,7 @@ MACHINE_RESET( lrescue )
 /*                                                     */
 /*******************************************************/
 
-static WRITE8_HANDLER( ballbomb_sh_port3_w )
+WRITE8_HANDLER( ballbomb_sh_port_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -206,7 +188,7 @@ static WRITE8_HANDLER( ballbomb_sh_port3_w )
 	port_1_last = data;
 }
 
-static WRITE8_HANDLER( ballbomb_sh_port5_w )
+WRITE8_HANDLER( ballbomb_sh_port_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -219,13 +201,6 @@ static WRITE8_HANDLER( ballbomb_sh_port5_w )
 	port_2_last = data;
 }
 
-MACHINE_RESET( ballbomb )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, ballbomb_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, ballbomb_sh_port5_w);
-
-	machine_reset_mw8080bw(machine);
-}
 
 
 /*******************************************************/
@@ -270,7 +245,7 @@ DISCRETE_SOUND_START(indianbt_discrete_interface)
 
 DISCRETE_SOUND_END
 
-static WRITE8_HANDLER( indianbt_sh_port3_w )
+WRITE8_HANDLER( indianbt_sh_port_1_w )
 {
 	/* bit 4 occurs every 5.25 seconds during gameplay */
 
@@ -288,7 +263,7 @@ static WRITE8_HANDLER( indianbt_sh_port3_w )
 	port_1_last = data;
 }
 
-static WRITE8_HANDLER( indianbt_sh_port5_w )
+WRITE8_HANDLER( indianbt_sh_port_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -300,18 +275,9 @@ static WRITE8_HANDLER( indianbt_sh_port5_w )
 	port_2_last = data;
 }
 
-static WRITE8_HANDLER( indianbt_sh_port7_w )
+WRITE8_HANDLER( indianbt_sh_port_3_w )
 {
 	discrete_sound_w(INDIANBT_MUSIC_DATA, data);
-}
-
-MACHINE_RESET( indianbt )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, indianbt_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, indianbt_sh_port5_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x07, 0x07, 0, 0, indianbt_sh_port7_w);
-
-	machine_reset_mw8080bw(machine);
 }
 
 
@@ -627,12 +593,12 @@ DISCRETE_SOUND_START(polaris_discrete_interface)
 
 DISCRETE_SOUND_END
 
-static WRITE8_HANDLER( polaris_sh_port2_w )
+WRITE8_HANDLER( polaris_sh_port_1_w )
 {
 	discrete_sound_w(POLARIS_MUSIC_DATA, data);
 }
 
-static WRITE8_HANDLER( polaris_sh_port4_w )
+WRITE8_HANDLER( polaris_sh_port_2_w )
 {
 	/* 0x01 - SX0 - Shot */
 	discrete_sound_w(POLARIS_SX0_EN, data & 0x01);
@@ -652,7 +618,7 @@ static WRITE8_HANDLER( polaris_sh_port4_w )
 	discrete_sound_w(POLARIS_SX5_EN, data & 0x20);
 }
 
-static WRITE8_HANDLER( polaris_sh_port6_w )
+WRITE8_HANDLER( polaris_sh_port_3_w )
 {
 	coin_lockout_global_w(data & 0x04);  /* SX8 */
 
@@ -669,22 +635,6 @@ static WRITE8_HANDLER( polaris_sh_port6_w )
 
 	/* 0x10 - SX10 - Hit */
 	discrete_sound_w(POLARIS_SX10_EN, data & 0x10);
-}
-
-MACHINE_RESET( polaris )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, polaris_sh_port2_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, polaris_sh_port4_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, polaris_sh_port6_w);
-	// Port 5 is used to reset the watchdog timer.
-	// This port is also written to when the boss plane is going up and down.
-	// If you write this value to a note ciruit similar to the music,
-	// you will get a nice sound that accurately follows the plane.
-	// It sounds better then the actual circuit used.
-	// Probably an unfinished feature.
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, watchdog_reset_w);
-
-	machine_reset_mw8080bw(machine);
 }
 
 
@@ -821,7 +771,7 @@ static double schaser_effect_rc[8] =
 	(1.0/ (1.0/RES_K(82) + 1.0/RES_K(39) + 1.0/RES_K(15)) + RES_K(20)) * CAP_U(1)
 };
 
-static WRITE8_HANDLER( schaser_sh_port3_w )
+WRITE8_HANDLER( schaser_sh_port_1_w )
 {
 	static int last_effect = 0;
 	int effect;
@@ -870,8 +820,8 @@ static WRITE8_HANDLER( schaser_sh_port3_w )
 		last_effect = effect;
 	}
 
-	explosion = (data >> 5) & 0x01;
-	if (explosion)
+	schaser_explosion = (data >> 5) & 0x01;
+	if (schaser_explosion)
 	{
 		SN76477_amplitude_res_w(0, 1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
 	}
@@ -879,12 +829,12 @@ static WRITE8_HANDLER( schaser_sh_port3_w )
 	{
 		SN76477_amplitude_res_w(0, RES_K(200));
 	}
-	SN76477_enable_w(0, !(schaser_effect_555_is_low || explosion));
-	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
-	SN76477_mixer_b_w(0, explosion);
+	SN76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
+	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	SN76477_mixer_b_w(0, schaser_explosion);
 }
 
-static WRITE8_HANDLER( schaser_sh_port5_w )
+WRITE8_HANDLER( schaser_sh_port_2_w )
 {
 	/* bit 0 - Music (DAC) (SX6)
        bit 1 - Sound Enable (SX7)
@@ -900,12 +850,13 @@ static WRITE8_HANDLER( schaser_sh_port5_w )
 
 	coin_lockout_global_w(data & 0x04);
 
-	schaser_sx10 = data & 0x10;
+	schaser_background_control_w(data & 0x18);
 
 	c8080bw_flip_screen_w(data & 0x20);
 }
 
-void schaser_effect_555_cb(int effect)
+
+static void schaser_effect_555_cb(int effect)
 {
 	double	new_time;
 	/* Toggle 555 output */
@@ -922,20 +873,25 @@ void schaser_effect_555_cb(int effect)
 			new_time = TIME_NEVER;
 	}
 	timer_adjust(schaser_effect_555_timer, new_time, effect, 0);
-	SN76477_enable_w(0, !(schaser_effect_555_is_low || explosion));
-	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	SN76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
+	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
+
+
+MACHINE_START( schaser )
+{
+	schaser_effect_555_timer = mame_timer_alloc(schaser_effect_555_cb);
+
+	return machine_start_mw8080bw(machine);
+}
+
 
 MACHINE_RESET( schaser )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, schaser_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, schaser_sh_port5_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x06, 0x06, 0, 0, watchdog_reset_w);
-
 	schaser_effect_555_is_low = 0;
 	timer_adjust(schaser_effect_555_timer, TIME_NEVER, 0, 0);
-	schaser_sh_port3_w(0, 0);
-	schaser_sh_port5_w(0, 0);
+	schaser_sh_port_1_w(0, 0);
+	schaser_sh_port_2_w(0, 0);
 	schaser_effect_555_time_remain = 0;
 
 	machine_reset_mw8080bw(machine);
@@ -948,7 +904,7 @@ MACHINE_RESET( schaser )
 /* - Press Left or Right to choose game to play     */
 /****************************************************/
 
-static WRITE8_HANDLER( rollingc_sh_port0_w )
+WRITE8_HANDLER( rollingc_sh_port_w )
 {
 	UINT8 rising_bits = data & ~port_3_last;
 
@@ -957,13 +913,6 @@ static WRITE8_HANDLER( rollingc_sh_port0_w )
 	if (rising_bits & 0x10) sample_start(1, 8, 0);	/* Computer car is starting to move */
 
 	port_3_last = data;
-}
-
-MACHINE_RESET( rollingc )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, rollingc_sh_port0_w);
-
-	machine_reset_mw8080bw(machine);
 }
 
 
@@ -978,7 +927,7 @@ MACHINE_RESET( rollingc )
 /*************************************************************************************/
 
 
-static WRITE8_HANDLER( invrvnge_sh_port3_w )
+WRITE8_HANDLER( invrvnge_sh_port_w )
 {
 	switch (data)
 	{
@@ -1015,20 +964,13 @@ static WRITE8_HANDLER( invrvnge_sh_port3_w )
 	}
 }
 
-MACHINE_RESET( invrvnge )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, invrvnge_sh_port3_w);
-
-	machine_reset_mw8080bw(machine);
-}
-
 
 /*****************************************/
 /* Lupin III preliminary sound           */
 /* Correct samples not available         */
 /*****************************************/
 
-static WRITE8_HANDLER( lupin3_sh_port3_w )
+WRITE8_HANDLER( lupin3_sh_port_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -1043,7 +985,7 @@ static WRITE8_HANDLER( lupin3_sh_port3_w )
 	port_1_last = data;
 }
 
-static WRITE8_HANDLER( lupin3_sh_port5_w )
+WRITE8_HANDLER( lupin3_sh_port_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -1058,21 +1000,13 @@ static WRITE8_HANDLER( lupin3_sh_port5_w )
 	port_2_last = data;
 }
 
-MACHINE_RESET( lupin3 )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, lupin3_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, lupin3_sh_port5_w);
-
-	machine_reset_mw8080bw(machine);
-}
-
 
 /*****************************************/
 /* Space Chaser (CV) preliminary sound   */
 /* Much more work needs to be done       */
 /*****************************************/
 
-static WRITE8_HANDLER( schasrcv_sh_port3_w )
+WRITE8_HANDLER( schasrcv_sh_port_1_w )
 {
 
 	/* bit 2 = 2nd speedup
@@ -1087,7 +1021,7 @@ static WRITE8_HANDLER( schasrcv_sh_port3_w )
 	port_1_last = data;
 }
 
-static WRITE8_HANDLER( schasrcv_sh_port5_w )
+WRITE8_HANDLER( schasrcv_sh_port_2_w )
 {
 	speaker_level_w(0, (data & 0x01) ? 1 : 0);		/* End-of-Level */
 
@@ -1096,21 +1030,13 @@ static WRITE8_HANDLER( schasrcv_sh_port5_w )
 	c8080bw_flip_screen_w(data & 0x20);
 }
 
-MACHINE_RESET( schasrcv )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, schasrcv_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, schasrcv_sh_port5_w);
-
-	machine_reset_mw8080bw(machine);
-}
-
 
 /*******************************************************************/
 /* Yosakdon preliminary sound                                      */
 /* No information available as what the correct sounds are         */
 /*******************************************************************/
 
-static WRITE8_HANDLER( yosakdon_sh_port3_w )
+WRITE8_HANDLER( yosakdon_sh_port_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
@@ -1125,7 +1051,7 @@ static WRITE8_HANDLER( yosakdon_sh_port3_w )
 	port_1_last = data;
 }
 
-static WRITE8_HANDLER( yosakdon_sh_port5_w )
+WRITE8_HANDLER( yosakdon_sh_port_2_w )
 {
 	UINT8 rising_bits = data & ~port_2_last;
 
@@ -1141,21 +1067,13 @@ static WRITE8_HANDLER( yosakdon_sh_port5_w )
 	port_2_last = data;
 }
 
-MACHINE_RESET( yosakdon )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, yosakdon_sh_port3_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x05, 0x05, 0, 0, yosakdon_sh_port5_w);
-
-	machine_reset_mw8080bw(machine);
-}
-
 
 /*****************************************/
 /* shuttlei preliminary sound            */
 /* Proper samples are unavailable        */
 /*****************************************/
 
-static WRITE8_HANDLER( shuttlei_sh_portfd_w )
+WRITE8_HANDLER( shuttlei_sh_port_1_w )
 {
 	/* bit 3 is high while you are alive and playing */
 
@@ -1169,7 +1087,7 @@ static WRITE8_HANDLER( shuttlei_sh_portfd_w )
 	port_1_last = data;
 }
 
-static WRITE8_HANDLER( shuttlei_sh_portfe_w )
+WRITE8_HANDLER( shuttlei_sh_port_2_w )
 {
 	switch (data)
 	{
@@ -1189,12 +1107,4 @@ static WRITE8_HANDLER( shuttlei_sh_portfe_w )
 			sample_start(1, 1, 0);				/* Death */
 			break;
 	}
-}
-
-MACHINE_RESET( shuttlei )
-{
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfd, 0xfd, 0, 0, shuttlei_sh_portfd_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfe, 0xfe, 0, 0, shuttlei_sh_portfe_w);
-
-	machine_reset_mw8080bw(machine);
 }

@@ -173,7 +173,7 @@ INLINE UINT32 arm7_cpu_read32( int addr )
 {
     UINT32 result;
 
-    if (addr&3) 
+    if (addr&3)
     {
 	result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8 | program_read_byte_32le(addr+2)<<16 | program_read_byte_32le(addr+3)<<24;
     }
@@ -187,7 +187,7 @@ INLINE UINT32 arm7_cpu_read32( int addr )
 INLINE UINT16 arm7_cpu_read16( int addr )
 {
 	UINT16 result;
-	
+
 	if(addr&1)
 	{
 		result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8;

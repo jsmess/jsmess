@@ -168,7 +168,7 @@ static void sound_command_w(int data)
        quickly. Otherwise the main CPU gives up with sound. Boosting
        the interleave for a while helps. */
 
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 }
 
 WRITE16_HANDLER( vertigo_audio_w )

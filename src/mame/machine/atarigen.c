@@ -18,8 +18,8 @@
     CONSTANTS
 ##########################################################################*/
 
-#define SOUND_INTERLEAVE_RATE		MAME_TIME_IN_USEC(50)
-#define SOUND_INTERLEAVE_REPEAT		20
+#define SOUND_TIMER_RATE			MAME_TIME_IN_USEC(5)
+#define SOUND_TIMER_BOOST			MAME_TIME_IN_USEC(100)
 
 
 
@@ -105,7 +105,6 @@ static void decompress_eeprom_word(const UINT16 *data);
 static void decompress_eeprom_byte(const UINT16 *data);
 
 static void update_6502_irq(void);
-static void sound_comm_timer(int reps_left);
 static void delayed_sound_reset(int param);
 static void delayed_sound_w(int param);
 static void delayed_6502_sound_w(int param);
@@ -707,20 +706,6 @@ void update_6502_irq(void)
 
 
 /*---------------------------------------------------------------
-    sound_comm_timer: Set whenever a command is written from
-    the main CPU to the sound CPU, in order to temporarily bump
-    up the interleave rate. This helps ensure that communications
-    between the two CPUs works properly.
----------------------------------------------------------------*/
-
-static void sound_comm_timer(int reps_left)
-{
-	if (--reps_left)
-		mame_timer_set(SOUND_INTERLEAVE_RATE, reps_left, sound_comm_timer);
-}
-
-
-/*---------------------------------------------------------------
     delayed_sound_reset: Synchronizes the sound reset command
     between the two CPUs.
 ---------------------------------------------------------------*/
@@ -758,7 +743,7 @@ static void delayed_sound_w(int param)
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
-	mame_timer_set(SOUND_INTERLEAVE_RATE, SOUND_INTERLEAVE_REPEAT, sound_comm_timer);
+	cpu_boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 

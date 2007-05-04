@@ -236,11 +236,8 @@ VIDEO_START( namcona1 )
 	cgram			= auto_malloc( 0x1000*0x20*2 );
 	dirtychar		= auto_malloc( 0x1000 );
 
-	{
 		gfx0 = allocgfx( &cg_layout );
 		gfx1 = allocgfx( &shape_layout );
-		if( gfx0 && gfx1 )
-		{
 			gfx0->colortable = machine->remapped_colortable;
 			gfx0->total_colors = machine->drv->total_colors/256;
 			machine->gfx[0] = gfx0;
@@ -250,9 +247,6 @@ VIDEO_START( namcona1 )
 			machine->gfx[1] = gfx1;
 
 			return 0;
-		}
-	}
-	return -1; /* error */
 } /* namcona1_vh_start */
 
 /*************************************************************************/

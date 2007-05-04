@@ -69,13 +69,13 @@
 
 /* macro for the RC time constant on a 74LS123 with C > 1000pF */
 /* R is in ohms, C is in farads */
-#define TIME_OF_74LS123(r,c)	(0.45 * (double)(r) * (double)(c))
+#define TIME_OF_74LS123(r,c)			(0.45 * (double)(r) * (double)(c))
 
 /* macros for the RC time constant on a 555 timer IC */
 /* R is in ohms, C is in farads */
-#define TIME_OF_555_MONOSTABLE(r,c)	(1.1 * (double)(r) * ((double)(c)))
+#define TIME_OF_555_MONOSTABLE(r,c)		(1.1 * (double)(r) * (double)(c))
 #define TIME_OF_555_ASTABLE_1(r1,r2,c)	(0.693 * ((double)(r1) + (double)(r2)) * (double)(c))
-#define TIME_OF_555_ASTABLE_0(r2,c)	(0.693 * (double)(r2) * (double)(c))
+#define TIME_OF_555_ASTABLE_0(r2,c)		TIME_OF_555_ASTABLE_1(0,r2,c)
 #define PERIOD_OF_555_ASTABLE(r1,r2,c)	(0.693 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c))
 
 /* macros that map all allocations to provide file/line/functions to the callee */
@@ -161,6 +161,7 @@ void _mame_timer_set(mame_time duration, INT32 param, void (*callback)(int), con
 void _mame_timer_set_ptr(mame_time duration, void *param, void (*callback)(void *), const char *file, int line, const char *func);
 void mame_timer_reset(mame_timer *which, mame_time duration);
 int mame_timer_enable(mame_timer *which, int enable);
+int mame_timer_enabled(mame_timer *which);
 int mame_timer_get_param(mame_timer *which);
 void *mame_timer_get_param_ptr(mame_timer *which);
 mame_time mame_timer_timeelapsed(mame_timer *which);

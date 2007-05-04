@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_CPU_ADD_TAG("sound", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_PERIODIC_INT(audio_interrupt, TIME_IN_HZ(480))
+	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 
 	MDRV_INTERLEAVE(100) // higher if sound stutters
 	MDRV_SCREEN_REFRESH_RATE(60)

@@ -42,6 +42,11 @@
     above $F000. For these addresses it is vital to read zero values, or else the
     player will die for no reason.
 
+Measured Clocks:
+   Z80 - 5997077Hz (6Mhz)
+M68705 - 2998533Hz (3Mhz)
+YM2149 - 2998531Hz (3Mhz)
+
 
 Stephh's notes (based on the games Z80 code and some tests) :
 
@@ -759,11 +764,11 @@ static struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( arkanoid )
 	// basic machine hardware
-	MDRV_CPU_ADD_TAG("main", Z80, 6000000)	// 6 MHz ???
+	MDRV_CPU_ADD_TAG("main", Z80, 6000000) /* 6 Mhz */
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 500000)	// .5 MHz (don't know really how fast, but it doesn't need to even be this fast)
+	MDRV_CPU_ADD_TAG("mcu", M68705, 3000000/6) /* 3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

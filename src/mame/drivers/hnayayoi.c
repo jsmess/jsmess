@@ -625,7 +625,7 @@ static MACHINE_DRIVER_START( hnayayoi )
 	MDRV_CPU_PROGRAM_MAP(hnayayoi_readmem,hnayayoi_writemem)
 	MDRV_CPU_IO_MAP(hnayayoi_readport,hnayayoi_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,TIME_IN_HZ(8000))
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8000)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

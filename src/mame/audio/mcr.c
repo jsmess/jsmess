@@ -474,7 +474,7 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START(mcr_ssio)
 	MDRV_CPU_ADD_TAG("ssio", Z80, SSIO_CLOCK/2/4)
 	MDRV_CPU_PROGRAM_MAP(ssio_map,0)
-	MDRV_CPU_PERIODIC_INT(ssio_14024_clock,TIME_IN_HZ(SSIO_CLOCK/2/16/10))
+	MDRV_CPU_PERIODIC_INT(ssio_14024_clock, SSIO_CLOCK/2/16/10)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD_TAG("ssio.1", AY8910, SSIO_CLOCK/2/4)
@@ -526,7 +526,7 @@ static void csdeluxe_delayed_data_w(int param)
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 }
 
 static READ16_HANDLER( csdeluxe_pia_r )
@@ -646,7 +646,7 @@ static void soundsgood_delayed_data_w(int param)
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(0, TIME_IN_USEC(250));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(250));
 }
 
 
@@ -737,7 +737,7 @@ static void turbocs_delayed_data_w(int param)
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 }
 
 

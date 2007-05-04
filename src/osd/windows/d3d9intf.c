@@ -77,7 +77,7 @@ d3d *drawd3d9_init(void)
 	dllhandle = LoadLibrary(TEXT("d3d9.dll"));
 	if (dllhandle == NULL)
 	{
-		verbose_printf("Direct3D: Unable to access d3d9.dll\n");
+		mame_printf_verbose("Direct3D: Unable to access d3d9.dll\n");
 		return NULL;
 	}
 
@@ -85,7 +85,7 @@ d3d *drawd3d9_init(void)
 	direct3dcreate9 = (direct3dcreate9_ptr)GetProcAddress(dllhandle, "Direct3DCreate9");
 	if (direct3dcreate9 == NULL)
 	{
-		verbose_printf("Direct3D: Unable to find Direct3DCreate9\n");
+		mame_printf_verbose("Direct3D: Unable to find Direct3DCreate9\n");
 		FreeLibrary(dllhandle);
 		dllhandle = NULL;
 		return NULL;
@@ -95,7 +95,7 @@ d3d *drawd3d9_init(void)
 	d3d9 = (*direct3dcreate9)(D3D_SDK_VERSION);
 	if (d3d9 == NULL)
 	{
-		verbose_printf("Direct3D: Error attempting to initialize Direct3D9\n");
+		mame_printf_verbose("Direct3D: Error attempting to initialize Direct3D9\n");
 		FreeLibrary(dllhandle);
 		dllhandle = NULL;
 		return NULL;
@@ -108,7 +108,7 @@ d3d *drawd3d9_init(void)
 	d3dptr->dllhandle = dllhandle;
 	set_interfaces(d3dptr);
 
-	verbose_printf("Direct3D: Using Direct3D 9\n");
+	mame_printf_verbose("Direct3D: Using Direct3D 9\n");
 	return d3dptr;
 }
 

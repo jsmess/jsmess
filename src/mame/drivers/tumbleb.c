@@ -848,8 +848,8 @@ WRITE16_HANDLER( semicom_soundcmd_w )
 	{
 		soundlatch_w(0,data & 0xff);
 		// needed for Super Trio which reads the sound with polling
-//      cpu_spinuntil_time(TIME_IN_USEC(100));
-		cpu_boost_interleave(0, TIME_IN_USEC(20));
+//      cpu_spinuntil_time(MAME_TIME_IN_USEC(100));
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
 
 	}
 }
@@ -2267,7 +2267,7 @@ static MACHINE_DRIVER_START( jumppop )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(jumppop_sound_map, 0)
 	MDRV_CPU_IO_MAP(jumppop_sound_io_map, 0)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, TIME_IN_HZ(1953))	/* measured */
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1953)	/* measured */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(529))

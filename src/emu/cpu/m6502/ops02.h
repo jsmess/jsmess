@@ -66,65 +66,43 @@
 #define RDMEM_ID	m6502.rdmem_id
 #define WRMEM_ID	m6502.wrmem_id
 
-#if FAST_MEMORY
-extern	MHELE	*cur_mwhard;
-extern	MHELE	*cur_mrhard;
-extern	UINT8	*RAM;
-#endif
-
 #define CHANGE_PC change_pc(PCD)
 
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
-#define RDOP() cpu_readop(PCW++)
+#define RDOP() cpu_readop(PCW++); m6502_ICount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
-#define RDOPARG() cpu_readop_arg(PCW++)
+#define RDOPARG() cpu_readop_arg(PCW++); m6502_ICount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
-#if FAST_MEMORY
-#define RDMEM(addr) 											\
-	((cur_mrhard[(addr) >> (ABITS2_16 + ABITS_MIN_16)]) ?		\
-		program_read_byte_8(addr) : RAM[addr])
-#else
-#define RDMEM(addr) program_read_byte_8(addr)
-#endif
+#define RDMEM(addr) program_read_byte_8(addr); m6502_ICount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
-#if FAST_MEMORY
-#define WRMEM(addr,data)										\
-	if (cur_mwhard[(addr) >> (ABITS2_16 + ABITS_MIN_16)])		\
-		program_write_byte_8(addr,data);								\
-	else														\
-		RAM[addr] = data
-#else
-#define WRMEM(addr,data) program_write_byte_8(addr,data)
-#endif
+#define WRMEM(addr,data) program_write_byte_8(addr,data); m6502_ICount -= 1
 
 /***************************************************************
  *  BRA  branch relative
  *  extra cycle if page boundary is crossed
  ***************************************************************/
 #define BRA(cond)												\
+	tmp = RDOPARG();											\
 	if (cond)													\
 	{															\
-		tmp = RDOPARG();										\
+		RDMEM(PCW);												\
 		EAW = PCW + (signed char)tmp;							\
-		m6502_ICount -= (PCH == EAH) ? 3 : 4;					\
+		if ( EAH != PCH ) {										\
+			RDMEM( (PCH << 8 ) | EAL) ;							\
+		}														\
 		PCD = EAD;												\
 		CHANGE_PC;												\
-	}															\
-	else														\
-	{															\
-		PCW++;													\
-		m6502_ICount -= 2;										\
 	}
 
 /***************************************************************
@@ -144,14 +122,18 @@ extern	UINT8	*RAM;
  *  EA = zero page address + X
  ***************************************************************/
 #define EA_ZPX													\
-	ZPL = RDOPARG() + X;										\
+	ZPL = RDOPARG();											\
+	RDMEM(ZPD);													\
+	ZPL = X + ZPL;												\
 	EAD = ZPD
 
 /***************************************************************
  *  EA = zero page address + Y
  ***************************************************************/
 #define EA_ZPY													\
-	ZPL = RDOPARG() + Y;										\
+	ZPL = RDOPARG();											\
+	RDMEM(ZPD);													\
+	ZPL = Y + ZPL;												\
 	EAD = ZPD
 
 /***************************************************************
@@ -163,23 +145,49 @@ extern	UINT8	*RAM;
 
 /***************************************************************
  *  EA = absolute address + X
+ * one additional read if page boundary is crossed
  ***************************************************************/
-#define EA_ABX													\
+#define EA_ABX_P												\
 	EA_ABS; 													\
+	if ( EAL + X > 0xff ) {										\
+		RDMEM( ( EAH << 8 ) | ( ( EAL + X ) & 0xff ) );			\
+	}															\
+	EAW += X;
+
+/***************************************************************
+ *  EA = absolute address + X
+ ***************************************************************/
+#define EA_ABX_NP												\
+	EA_ABS;														\
+	RDMEM( ( EAH << 8 ) | ( ( EAL + X ) & 0xff ) );				\
 	EAW += X
 
 /***************************************************************
  *  EA = absolute address + Y
+ * one additional read if page boundary is crossed
  ***************************************************************/
-#define EA_ABY													\
+#define EA_ABY_P												\
 	EA_ABS; 													\
+	if ( EAL + Y > 0xff ) {										\
+		RDMEM( ( EAH << 8 ) | ( ( EAL + Y ) & 0xff ) );			\
+	}															\
+	EAW += Y;
+
+/***************************************************************
+ *  EA = absolute address + Y
+ ***************************************************************/
+#define EA_ABY_NP												\
+	EA_ABS;														\
+	RDMEM( ( EAH << 8 ) | ( ( EAL + Y ) & 0xff ) );				\
 	EAW += Y
 
 /***************************************************************
  *  EA = zero page + X indirect (pre indexed)
  ***************************************************************/
 #define EA_IDX													\
-	ZPL = RDOPARG() + X;										\
+	ZPL = RDOPARG();											\
+	RDMEM(ZPD);													\
+	ZPL = ZPL + X;												\
 	EAL = RDMEM(ZPD);											\
 	ZPL++;														\
 	EAH = RDMEM(ZPD)
@@ -188,14 +196,35 @@ extern	UINT8	*RAM;
  *  EA = zero page indirect + Y (post indexed)
  *  subtract 1 cycle if page boundary is crossed
  ***************************************************************/
-#define EA_IDY													\
+#define EA_IDY_P												\
 	ZPL = RDOPARG();											\
 	EAL = RDMEM(ZPD);											\
 	ZPL++;														\
 	EAH = RDMEM(ZPD);											\
-	if (EAL + Y > 0xff) 										\
-		m6502_ICount--; 										\
+	if (EAL + Y > 0xff) {										\
+		RDMEM( ( EAH << 8 ) | ( ( EAL + Y ) & 0xff ) );			\
+	}															\
+	EAW += Y;
+
+/***************************************************************
+ *  EA = zero page indirect + Y
+ ***************************************************************/
+#define EA_IDY_NP												\
+	ZPL = RDOPARG();											\
+	EAL = RDMEM(ZPD);											\
+	ZPL++;														\
+	EAH = RDMEM(ZPD);											\
+	RDMEM( ( EAH << 8 ) | ( ( EAL + Y ) & 0xff ) );				\
 	EAW += Y
+
+/***************************************************************
+ *  EA = zero page indirect (65c02 pre indexed w/o X)
+ ***************************************************************/
+#define EA_ZPI													\
+        ZPL = RDOPARG();										\
+        EAL = RDMEM(ZPD);										\
+        ZPL++;													\
+        EAH = RDMEM(ZPD)
 
 /***************************************************************
  *  EA = indirect (only used by JMP)
@@ -207,29 +236,54 @@ extern	UINT8	*RAM;
 	EAH = RDMEM(EAD);											\
 	EAL = tmp
 
+
 /* read a value into tmp */
-#define RD_IMM	tmp = RDOPARG()
-#define RD_ACC	tmp = A
-#define RD_ZPG	EA_ZPG; tmp = RDMEM(EAD)
-#define RD_ZPX	EA_ZPX; tmp = RDMEM(EAD)
-#define RD_ZPY	EA_ZPY; tmp = RDMEM(EAD)
-#define RD_ABS	EA_ABS; tmp = RDMEM(EAD)
-#define RD_ABX	EA_ABX; tmp = RDMEM(EAD)
-#define RD_ABY	EA_ABY; tmp = RDMEM(EAD)
-#define RD_ZPI	EA_ZPI; tmp = RDMEM(EAD)
-#define RD_IDX	EA_IDX; tmp = RDMEM_ID(EAD)
-#define RD_IDY	EA_IDY; tmp = RDMEM_ID(EAD)
+/* Base number of cycles taken for each mode (including reading of opcode):
+   RD_IMM       2
+   RD_DUM       2
+   RD_ACC       0
+   RD_ZPG/WR_ZPG    3
+   RD_ZPX/WR_ZPX    4
+   RD_ZPY/WR_ZPY    4
+   RD_ABS/WR_ABS    4
+   RD_ABX_P     4/5
+   RD_ABX_NP/WR_ABX_NP  5
+   RD_ABY_P     4/5
+   RD_ABY_NP/WR_ABY_NP  5
+   RD_IDX/WR_IDX    6
+   RD_IDY_P     5/6
+   RD_IDY_NP/WR_IDY_NP  6
+   RD_ZPI/WR_ZPI    5
+ */
+#define RD_IMM		tmp = RDOPARG()
+#define RD_DUM		RDMEM(PCW)
+#define RD_ACC		tmp = A
+#define RD_ZPG		EA_ZPG; tmp = RDMEM(EAD)
+#define RD_ZPX		EA_ZPX; tmp = RDMEM(EAD)
+#define RD_ZPY		EA_ZPY; tmp = RDMEM(EAD)
+#define RD_ABS		EA_ABS; tmp = RDMEM(EAD)
+#define RD_ABX_P	EA_ABX_P; tmp = RDMEM(EAD)
+#define RD_ABX_NP	EA_ABX_NP; tmp = RDMEM(EAD)
+#define RD_ABY_P	EA_ABY_P; tmp = RDMEM(EAD)
+#define RD_ABY_NP	EA_ABY_NP; tmp = RDMEM(EAD)
+#define RD_IDX		EA_IDX; tmp = RDMEM_ID(EAD); m6502_ICount -= 1
+#define RD_IDY_P	EA_IDY_P; tmp = RDMEM_ID(EAD); m6502_ICount -= 1
+#define RD_IDY_NP	EA_IDY_NP; tmp = RDMEM_ID(EAD); m6502_ICount -= 1
+#define RD_ZPI		EA_ZPI; tmp = RDMEM(EAD)
 
 /* write a value from tmp */
-#define WR_ZPG	EA_ZPG; WRMEM(EAD, tmp)
-#define WR_ZPX	EA_ZPX; WRMEM(EAD, tmp)
-#define WR_ZPY	EA_ZPY; WRMEM(EAD, tmp)
-#define WR_ABS	EA_ABS; WRMEM(EAD, tmp)
-#define WR_ABX	EA_ABX; WRMEM(EAD, tmp)
-#define WR_ABY	EA_ABY; WRMEM(EAD, tmp)
-#define WR_ZPI	EA_ZPI; WRMEM(EAD, tmp)
-#define WR_IDX	EA_IDX; WRMEM_ID(EAD, tmp)
-#define WR_IDY	EA_IDY; WRMEM_ID(EAD, tmp)
+#define WR_ZPG		EA_ZPG; WRMEM(EAD, tmp)
+#define WR_ZPX		EA_ZPX; WRMEM(EAD, tmp)
+#define WR_ZPY		EA_ZPY; WRMEM(EAD, tmp)
+#define WR_ABS		EA_ABS; WRMEM(EAD, tmp)
+#define WR_ABX_NP	EA_ABX_NP; WRMEM(EAD, tmp)
+#define WR_ABY_NP	EA_ABY_NP; WRMEM(EAD, tmp)
+#define WR_IDX		EA_IDX; WRMEM_ID(EAD, tmp); m6502_ICount -= 1
+#define WR_IDY_NP	EA_IDY_NP; WRMEM_ID(EAD, tmp); m6502_ICount -= 1
+#define WR_ZPI		EA_ZPI; WRMEM(EAD, tmp)
+
+/* dummy read from the last EA */
+#define RD_EA	RDMEM(EAD)
 
 /* write back a value from tmp to the last EA */
 #define WB_ACC	A = (UINT8)tmp;
@@ -255,15 +309,13 @@ extern	UINT8	*RAM;
  *  ADC Add with carry
  ***************************************************************/
 #define ADC 													\
-	if (P & F_D)												\
-	{															\
+	if (P & F_D) {												\
 	int c = (P & F_C);											\
 	int lo = (A & 0x0f) + (tmp & 0x0f) + c; 					\
 	int hi = (A & 0xf0) + (tmp & 0xf0); 						\
 		P &= ~(F_V | F_C|F_N|F_Z);								\
 		if (!((lo+hi)&0xff)) P|=F_Z;							\
-		if (lo > 0x09)											\
-		{														\
+		if (lo > 0x09) {										\
 			hi += 0x10; 										\
 			lo += 0x06; 										\
 		}														\
@@ -275,9 +327,7 @@ extern	UINT8	*RAM;
 		if (hi & 0xff00)										\
 			P |= F_C;											\
 		A = (lo & 0x0f) + (hi & 0xf0);							\
-	}															\
-	else														\
-	{															\
+	} else {													\
 		int c = (P & F_C);										\
 		int sum = A + tmp + c;									\
 		P &= ~(F_V | F_C);										\
@@ -286,7 +336,7 @@ extern	UINT8	*RAM;
 		if (sum & 0xff00)										\
 			P |= F_C;											\
 		A = (UINT8) sum;										\
-		SET_NZ(A); \
+		SET_NZ(A);												\
 	}
 
 /* 6502 ********************************************************
@@ -350,7 +400,7 @@ extern	UINT8	*RAM;
  *  set I flag, jump via IRQ vector
  ***************************************************************/
 #define BRK 													\
-	PCW++;														\
+	RDOPARG();													\
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	PUSH(P | F_B);												\
@@ -495,6 +545,7 @@ extern	UINT8	*RAM;
  ***************************************************************/
 #define JSR 													\
 	EAL = RDOPARG();											\
+	RDMEM(SPD);													\
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	EAH = RDOPARG();											\
@@ -559,6 +610,7 @@ extern	UINT8	*RAM;
  *  PLA Pull accumulator
  ***************************************************************/
 #define PLA 													\
+	RDMEM(SPD);													\
 	PULL(A);													\
 	SET_NZ(A)
 
@@ -567,10 +619,11 @@ extern	UINT8	*RAM;
  *  PLP Pull processor status (flags)
  ***************************************************************/
 #define PLP 													\
+	RDMEM(SPD);													\
 	if ( P & F_I ) {											\
 		PULL(P);												\
 		if ((m6502.irq_state != CLEAR_LINE) && !(P & F_I)) {	\
-			LOG(("M6502#%d PLP sets after_cli\n",cpu_getactivecpu())); \
+			LOG(("M6502#%d PLP sets after_cli\n",cpu_getactivecpu()));	\
 			m6502.after_cli = 1;								\
 		}														\
 	} else {													\
@@ -604,13 +657,15 @@ extern	UINT8	*RAM;
  *  PCW++;
  ***************************************************************/
 #define RTI 													\
+	RDOPARG();													\
+	RDMEM(SPD);													\
 	PULL(P);													\
 	PULL(PCL);													\
 	PULL(PCH);													\
 	P |= F_T | F_B; 											\
-	if( (m6502.irq_state != CLEAR_LINE) && !(P & F_I) ) 		\
+	if( (m6502.irq_state != CLEAR_LINE) && !(P & F_I) )			\
 	{															\
-		LOG(("M6502#%d RTI sets after_cli\n",cpu_getactivecpu())); \
+		LOG(("M6502#%d RTI sets after_cli\n",cpu_getactivecpu())); 	\
 		m6502.after_cli = 1;									\
 	}															\
 	CHANGE_PC
@@ -620,9 +675,11 @@ extern	UINT8	*RAM;
  *  pull PC lo, PC hi and increment PC
  ***************************************************************/
 #define RTS 													\
+	RDOPARG();													\
+	RDMEM(SPD);													\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	PCW++;														\
+	RDMEM(PCW); PCW++;											\
 	CHANGE_PC
 
 /* 6502 ********************************************************

@@ -75,7 +75,7 @@ INLINE UINT16 SUB16( UINT16 arg1, UINT16 arg2 ) {
 
 INLINE UINT8 SUBC8( UINT8 arg1, UINT8 arg2 ) {
 	UINT32 res = arg1 - arg2 - ( ( regs.F & FLAG_C ) ? 1 : 0 );
-	regs.F = ( regs.F & ~ ( FLAG_S | FLAG_O | FLAG_C | FLAG_Z ) ) 
+	regs.F = ( regs.F & ~ ( FLAG_S | FLAG_O | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x80 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ) & ( arg1 ^ res ) & 0x80 ) ? FLAG_O : 0 )
 		| ( ( res & 0xFF00 ) ? FLAG_C : 0 )
@@ -264,7 +264,7 @@ UINT32 addr1, addr2;
 #define AD2_IN8	addr2 = ( regs.I << 16 ) | ( regs.N << 8 ) | rdop();
 #define AD2_I16	addr2 = ( regs.I << 16 ) | rdop(); addr2 |= ( rdop() << 8 );
 #define AD2_XIX	addr2 = ( regs.XI << 16 ) | regs.X;
-#define AD2_YIY	addr2 = ( regs.YI << 16 ) | regs.Y; 
+#define AD2_YIY	addr2 = ( regs.YI << 16 ) | regs.Y;
 #define AD2_X8	addr2 = ( regs.XI << 16 ) | ( regs.X + rdop() );
 #define AD2_Y8	addr2 = ( regs.YI << 16 ) | ( regs.Y + rdop() );
 #define AD2_XL	addr2 = ( regs.XI << 16 ) | ( regs.X + ( regs.HL & 0x00FF ) );

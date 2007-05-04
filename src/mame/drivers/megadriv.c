@@ -649,7 +649,7 @@ void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(TIME_IN_USEC(length/3.5));
+	cpu_spinuntil_time(MAME_TIME_IN_NSEC(length*1000/3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{

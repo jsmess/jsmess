@@ -247,7 +247,7 @@ static MACHINE_DRIVER_START( quizpani )
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(quizpani_readmem,quizpani_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(164)) // music tempo
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,164) // music tempo
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

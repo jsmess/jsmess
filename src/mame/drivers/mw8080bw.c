@@ -191,21 +191,17 @@ static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
  *
  *************************************/
 
-static UINT8 *mw8080bw_ram;
-
-
-UINT8 mw8080bw_ram_r(offs_t offset)
-{
-	return mw8080bw_ram[offset];
-}
+UINT8 *mw8080bw_ram;
+size_t mw8080bw_ram_size;
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&mw8080bw_ram)
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
+
 
 
 /*************************************

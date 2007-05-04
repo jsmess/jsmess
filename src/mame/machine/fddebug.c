@@ -562,9 +562,6 @@ static void set_default_key_params(void)
 	{
 		{ "altbeaj1", 0xFCAFF9F9, 0x177AC6 },
 		{ "bullet",   0x12A8F9EC, 0x1B1FC3 },
-		{ "exctleag", 0x98AFF6FA, 0x31DDC6 },
-		{ "suprleag", 0x3CFEFFD8, 0x127114 },
-//      { "suprleag", 0x2CFEFFF9, 0x027114 },
 	};
 	int keynum;
 

@@ -118,7 +118,7 @@ static void sound_exit(running_machine *machine)
 
 	// print out over/underflow stats
 	if (buffer_overflows || buffer_underflows)
-		verbose_printf("Sound: buffer overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
+		mame_printf_verbose("Sound: buffer overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
 
 #if LOG_SOUND
 	if (sound_log)
@@ -370,7 +370,7 @@ static HRESULT dsound_create_buffers(void)
 		fprintf(stderr, "Error getting primary DirectSound buffer format: %08x\n", (UINT32)result);
 		goto error;
 	}
-	verbose_printf("DirectSound: Primary buffer: %d Hz, %d bits, %d channels\n",
+	mame_printf_verbose("DirectSound: Primary buffer: %d Hz, %d bits, %d channels\n",
 				(int)primary_format.nSamplesPerSec, (int)primary_format.wBitsPerSample, (int)primary_format.nChannels);
 
 	// create a buffer desc for the stream buffer

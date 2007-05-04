@@ -472,7 +472,7 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 		cpunum_set_input_line(3, M6809_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
-		cpu_boost_interleave(0, TIME_IN_USEC(50));
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
 	}
 	else
 		cpunum_set_input_line(3, M6809_IRQ_LINE, CLEAR_LINE);

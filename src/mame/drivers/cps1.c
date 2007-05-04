@@ -3980,7 +3980,7 @@ static MACHINE_DRIVER_START( qsound )
 
 	MDRV_CPU_REPLACE("sound", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(250))	/* ?? */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
 	MDRV_NVRAM_HANDLER(qsound)
 

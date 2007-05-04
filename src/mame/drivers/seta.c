@@ -1615,7 +1615,7 @@ WRITE16_HANDLER( calibr50_soundlatch_w )
 	{
 		soundlatch_word_w(0,data,mem_mask);
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(TIME_IN_USEC(50));	// Allow the other cpu to reply
+		cpu_spinuntil_time(MAME_TIME_IN_USEC(50));	// Allow the other cpu to reply
 	}
 }
 
@@ -2846,7 +2846,7 @@ ADDRESS_MAP_END
 WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
 	soundlatch2_w(0,data);
-	cpu_spinuntil_time(TIME_IN_USEC(50));	// Allow the other cpu to reply
+	cpu_spinuntil_time(MAME_TIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )

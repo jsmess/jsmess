@@ -1156,7 +1156,7 @@ unsigned char gangonta_eeprom[128] = {
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 static READ32_HANDLER( joemacr_speedup_r )
 {
-	if (activecpu_get_pc()==0x284)  cpu_spinuntil_time(TIME_IN_USEC(400));
+	if (activecpu_get_pc()==0x284)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400));
 	return simpl156_systemram[0x18/4];
 }
 
@@ -1169,7 +1169,7 @@ static DRIVER_INIT (joemacr)
 
 static READ32_HANDLER( chainrec_speedup_r )
 {
-	if (activecpu_get_pc()==0x2d4)  cpu_spinuntil_time(TIME_IN_USEC(400));
+	if (activecpu_get_pc()==0x2d4)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400));
 	return simpl156_systemram[0x18/4];
 }
 
@@ -1182,7 +1182,7 @@ static DRIVER_INIT (chainrec)
 
 static READ32_HANDLER( prtytime_speedup_r )
 {
-	if (activecpu_get_pc()==0x4f0)  cpu_spinuntil_time(TIME_IN_USEC(400));
+	if (activecpu_get_pc()==0x4f0)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400));
 	return simpl156_systemram[0xae0/4];
 }
 
@@ -1203,7 +1203,7 @@ static DRIVER_INIT (gangonta)
 
 static READ32_HANDLER( charlien_speedup_r )
 {
-	if (activecpu_get_pc()==0xc8c8)  cpu_spinuntil_time(TIME_IN_USEC(400));
+	if (activecpu_get_pc()==0xc8c8)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400));
 	return simpl156_systemram[0x10/4];
 }
 
@@ -1215,7 +1215,7 @@ static DRIVER_INIT (charlien)
 
 static READ32_HANDLER( osman_speedup_r )
 {
-	if (activecpu_get_pc()==0x5974)  cpu_spinuntil_time(TIME_IN_USEC(400));
+	if (activecpu_get_pc()==0x5974)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400));
 	return simpl156_systemram[0x10/4];
 }
 

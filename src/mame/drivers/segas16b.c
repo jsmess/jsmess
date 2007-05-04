@@ -2210,6 +2210,53 @@ static INPUT_PORTS_START( eswat )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( exctleag )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)		/* BANT0 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		/* BANT1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)		/* BANT2 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)		/* SWING0 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)		/* SWING1 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)		/* LOW */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)		/* MID */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1)		/* HI */
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1)		/* CHASE */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER(1)	/* CHANGE */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_PLAYER(1)	/* SELECT */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(2)		/* CHASE */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER(2)	/* CHANGE */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_PLAYER(2)	/* SELECT */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		/* BANT0 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		/* BANT1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)		/* BANT2 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)		/* SWING0 */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)		/* SWING1 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)		/* LOW */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)		/* MID */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)		/* HI */
+
+	PORT_START_TAG("ANALOGX1")				/* fake analog X */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+
+	PORT_START_TAG("ANALOGY1")				/* fake analog Y */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+
+	PORT_START_TAG("ANALOGX2")				/* fake analog X */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2)
+
+	PORT_START_TAG("ANALOGY2")				/* fake analog Y */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( fpoint )
 	PORT_INCLUDE( system16b_1button )
 
@@ -4305,9 +4352,7 @@ ROM_START( exctleag )
 	ROM_LOAD16_BYTE( "epr11938.a03", 0x40001, 0x10000, CRC(07c08d47) SHA1(47d3445cfa2514918206cd29a203837a9f434b42) )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
-	ROM_LOAD( "317-0079.key", 0x0000, 0x2000, NO_DUMP )
-
-	ROM_REGION16_BE( 0x060000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
+	ROM_LOAD( "317-0079.key", 0x0000, 0x2000, CRC(effefa1c) SHA1(f42e87f60c9589862ea2c05a29b1b15dc7194051) )
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr11942.b09", 0x00000, 0x10000, CRC(eb70e827) SHA1(0617b4411a90087c277354c3653fe994bc4fc580) )
@@ -5343,9 +5388,7 @@ ROM_START( suprleag )
 	ROM_LOAD16_BYTE( "epr11132.a03", 0x40001, 0x10000, CRC(ff199325) SHA1(2ece15b6b79ec3f948f7bec623e1df281cf89382) )
 
 	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* decryption key */
-	ROM_LOAD( "317-0045.key", 0x0000, 0x2000, NO_DUMP )
-
-	ROM_REGION16_BE( 0x060000, REGION_USER2, ROMREGION_ERASE00 ) /* working overlay */
+	ROM_LOAD( "317-0045.key", 0x0000, 0x2000, CRC(0594cc2e) SHA1(8aec3fffd00cbfd50d7cfb92e4748e2653fbb504) )
 
 	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "epr11136.b09", 0x00000, 0x10000, CRC(c3860ce4) SHA1(af7618f3b5a0e8d6374877c7815ba69fff218a45) )
@@ -5354,12 +5397,12 @@ ROM_START( suprleag )
 
 	ROM_REGION16_BE( 0x80000, REGION_GFX2, 0 ) /* sprites */
 	ROM_LOAD16_BYTE( "epr11144.b01", 0x00001, 0x10000, CRC(b31de51c) SHA1(011a79a37d32ab4545187e28e61f27aa0601f686) )
-	ROM_LOAD16_BYTE( "epr11145.b02", 0x00000, 0x10000, CRC(4223d2c3) SHA1(310d5c411eeaf69fe0dc9350e6bfe6dfe950b373) )
-	ROM_LOAD16_BYTE( "epr11146.b03", 0x20001, 0x10000, CRC(bf0359b6) SHA1(6cd5e6b685e53f062d5b04888f225c808aab3c4c) )
-	ROM_LOAD16_BYTE( "epr11147.b04", 0x20000, 0x10000, CRC(3e592772) SHA1(b0fe2c680871dcdbe655c0b1b98bcf8118fb3a50) )
-	ROM_LOAD16_BYTE( "epr11148.b05", 0x40001, 0x10000, CRC(126e1309) SHA1(7386ac5ac57325d8f661caf8cab0b19a42c0309d) )
-	ROM_LOAD16_BYTE( "epr11149.b06", 0x40000, 0x10000, CRC(694d3765) SHA1(4aa8590648d5b8eb5db489edefb1326ecd01ea2c) )
-	ROM_LOAD16_BYTE( "epr11150.b07", 0x60001, 0x10000, CRC(9fc0aded) SHA1(7ad9e8fe79a0a07c748b0c20ad46c0e00de8a23a) )
+	ROM_LOAD16_BYTE( "epr11148.b05", 0x00000, 0x10000, CRC(126e1309) SHA1(7386ac5ac57325d8f661caf8cab0b19a42c0309d) )
+	ROM_LOAD16_BYTE( "epr11145.b02", 0x20001, 0x10000, CRC(4223d2c3) SHA1(310d5c411eeaf69fe0dc9350e6bfe6dfe950b373) )
+	ROM_LOAD16_BYTE( "epr11149.b06", 0x20000, 0x10000, CRC(694d3765) SHA1(4aa8590648d5b8eb5db489edefb1326ecd01ea2c) )
+	ROM_LOAD16_BYTE( "epr11146.b03", 0x40001, 0x10000, CRC(bf0359b6) SHA1(6cd5e6b685e53f062d5b04888f225c808aab3c4c) )
+	ROM_LOAD16_BYTE( "epr11150.b07", 0x40000, 0x10000, CRC(9fc0aded) SHA1(7ad9e8fe79a0a07c748b0c20ad46c0e00de8a23a) )
+	ROM_LOAD16_BYTE( "epr11147.b04", 0x60001, 0x10000, CRC(3e592772) SHA1(b0fe2c680871dcdbe655c0b1b98bcf8118fb3a50) )
 	ROM_LOAD16_BYTE( "epr11151.b08", 0x60000, 0x10000, CRC(9de95169) SHA1(1a2801ecd9dece3dae7ceab3b793d5005caa4614) )
 
 	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* sound CPU */
@@ -5988,6 +6031,13 @@ static DRIVER_INIT( dunkshot_5358 )
 }
 
 
+static DRIVER_INIT( exctleag_5358 )
+{
+	init_generic_5358(machine);
+	custom_io_r = sdi_custom_io_r;
+}
+
+
 static DRIVER_INIT( goldnaxe_5704 )
 {
 	init_generic_5704(machine);
@@ -6130,7 +6180,7 @@ GAME( 1986, dunkshot, 0,        timescan,       dunkshot, dunkshot_5358, ROT0,  
 GAME( 1989, eswat,    0,        system16b,      eswat,    generic_5797,  ROT0,   "Sega",           "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
 GAME( 1989, eswatu,   eswat,    system16b,      eswat,    generic_5797,  ROT0,   "Sega",           "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
 GAME( 1989, eswatj,   eswat,    system16b,      eswat,    generic_5797,  ROT0,   "Sega",           "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
-GAME( 1989, exctleag, 0,        system16b,      generic,  generic_5358,  ROT0,   "Sega",           "Excite League (FD1094 317-0079?)", GAME_NOT_WORKING )
+GAME( 1989, exctleag, 0,        system16b,      exctleag, exctleag_5358, ROT0,   "Sega",           "Excite League (FD1094 317-0079)", 0 )
 GAME( 1989, fpoint,   0,        system16b,      fpoint,   generic_5358,  ROT0,   "Sega",           "Flash Point (set 2, Japan, FD1094 317-0127A)", 0 )
 GAME( 1989, fpoint1,  fpoint,   system16b,      fpoint,   generic_5704,  ROT0,   "Sega",           "Flash Point (set 1, Japan, FD1094 317-0127A)", 0 )
 GAME( 1989, goldnaxe, 0,        system16b_8751, goldnaxe, goldnaxe_5797, ROT0,   "Sega",           "Golden Axe (set 6, US, 8751 317-123A)", 0 )
@@ -6155,7 +6205,7 @@ GAME( 1987, shinobi3, shinobi,  system16b,      shinobi,  shinobi3_5358, ROT0,  
 GAME( 1987, shinobi2, shinobi,  system16b,      shinobi,  generic_5358,  ROT0,   "Sega",           "Shinobi (set 2, System 16B, FD1094 317-0049)", 0 )
 GAME( 1987, sonicbom, 0,        system16b,      sonicbom, generic_5358,  ROT270, "Sega",           "Sonic Boom (FD1094 317-0053)", 0 )
 GAME( 1987, sjryuko,  0,        timescan,       sjryuko,  sjryuko_5358,  ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 2, System 16B, FD1089B 317-5021)", 0 )
-GAME( 1987, suprleag, 0,        system16b,      generic,  generic_5358,  ROT0,   "Sega",           "Super League (FD1094 317-0045?)", GAME_NOT_WORKING )
+GAME( 1987, suprleag, 0,        system16b,      exctleag, exctleag_5358, ROT0,   "Sega",           "Super League (FD1094 317-0045)", 0 )
 GAME( 1988, tetris2,  tetris,   system16b,      tetris,   generic_5704,  ROT0,   "Sega",           "Tetris (set 2, Japan, System 16B, FD1094 317-0092)", 0 )
 GAME( 1988, tetris1,  tetris,   system16b,      tetris,   generic_5358,  ROT0,   "Sega",           "Tetris (set 1, Japan, System 16B, FD1094 317-0091)", 0 )
 GAME( 1987, timescan, 0,        timescan,       timescan, generic_5358,  ROT270, "Sega",           "Time Scanner (set 2, System 16B)", 0 )

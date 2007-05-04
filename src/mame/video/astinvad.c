@@ -7,73 +7,20 @@
 #include "driver.h"
 #include "includes/astinvad.h"
 
-static int spaceint_color;
-static int astinvad_adjust;
-static int astinvad_flash;
+
+static UINT8 spaceint_color;
+static UINT8 screen_red;
 
 
-void astinvad_set_flash(int data)
+void astinvad_set_screen_red(int data)
 {
-	astinvad_flash = data;
+	screen_red = data;
 }
 
 
 WRITE8_HANDLER( spaceint_color_w )
 {
-	spaceint_color = data & 15;
-}
-
-
-static void plot_byte(int x, int y, int data, int col)
-{
-	int i;
-
-	for (i = 0; i < 8; i++)
-	{
-		if (flip_screen)
-		{
-			*BITMAP_ADDR16(tmpbitmap, 255 - y, 255 - (x + i)) = (data & 1) ? col : 0;
-		}
-		else
-		{
-			*BITMAP_ADDR16(tmpbitmap, y, x + i) = (data & 1) ? col : 0;
-		}
-
-		data >>= 1;
-	}
-}
-
-
-static void spaceint_refresh(int offset)
-{
-	int n = ((offset >> 5) & 0xf0) | colorram[offset];
-
-	//
-	//  This is almost certainly wrong.
-	//
-
-	int col = memory_region(REGION_PROMS)[n];
-
-	plot_byte(8 * (offset / 256), 255 - offset % 256, videoram[offset], col & 7);
-}
-
-
-static void astinvad_refresh(int offset)
-{
-	int n = ((offset >> 3) & ~0x1f) | (offset & 0x1f);
-
-	int col;
-
-	if (!flip_screen)
-	{
-		col = memory_region(REGION_PROMS)[(~n + astinvad_adjust) & 0x3ff];
-	}
-	else
-	{
-		col = memory_region(REGION_PROMS)[n] >> 4;
-	}
-
-	plot_byte(8 * (offset % 32), offset / 32, videoram[offset], col & 7);
+	spaceint_color = data & 0x0f;
 }
 
 
@@ -81,80 +28,123 @@ WRITE8_HANDLER( spaceint_videoram_w )
 {
 	videoram[offset] = data;
 	colorram[offset] = spaceint_color;
-
-	spaceint_refresh(offset);
-}
-
-
-WRITE8_HANDLER( astinvad_videoram_w )
-{
-	videoram[offset] = data;
-
-	astinvad_refresh(offset);
-}
-
-
-VIDEO_START( astinvad )
-{
-	astinvad_adjust = 0x80;
-
-	return video_start_generic_bitmapped(machine);
-}
-
-
-VIDEO_START( spcking2 )
-{
-	astinvad_adjust = 0;
-
-	return video_start_generic_bitmapped(machine);
 }
 
 
 VIDEO_START( spaceint )
 {
-	colorram = auto_malloc(0x2000);
-	memset(colorram, 0, 0x2000);
+	colorram = auto_malloc(videoram_size);
 
-	return video_start_generic_bitmapped(machine);
+	return 0;
 }
 
 
-VIDEO_UPDATE( spaceint )
+
+static void plot_byte(mame_bitmap *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color)
 {
-	if (get_vh_global_attribute_changed())
+	int i;
+
+	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
+
+	for (i = 0; i < 8; i++)
 	{
-		int offset;
+		pen_t pen = (data & 0x01) ? fore_pen : RGB_BLACK;
 
-		for (offset = 0; offset < videoram_size; offset++)
-		{
-			spaceint_refresh(offset);
-		}
+		if (flip_screen)
+			*BITMAP_ADDR32(bitmap, 255 - y, 255 - x) = pen;
+		else
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+		x = x + 1;
+		data = data >> 1;
 	}
-
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-	return 0;
 }
 
 
 VIDEO_UPDATE( astinvad )
 {
-	if (astinvad_flash)
+	if (screen_red)
 	{
-		fillbitmap(bitmap, 1, cliprect);
+		fillbitmap(bitmap, MAKE_RGB(pal1bit(1), pal1bit(0), pal1bit(0)), cliprect);
 	}
 	else
 	{
-		if (get_vh_global_attribute_changed())
+		offs_t offs;
+
+		for (offs = 0; offs < videoram_size; offs++)
 		{
-			int offset;
+			UINT8 color;
+			UINT8 data = videoram[offs];
 
-			for (offset = 0; offset < videoram_size; offset++)
-			{
-				astinvad_refresh(offset);
-			}
+			UINT8 y = offs >> 5;
+			UINT8 x = offs << 3;
+
+			offs_t n = ((offs >> 3) & ~0x1f) | (offs & 0x1f);
+
+			if (flip_screen)
+				color = (memory_region(REGION_PROMS)[n] >> 4) & 0x07;
+			else
+				color = (memory_region(REGION_PROMS)[(~n + 0x80) & 0x3ff]) & 0x07;
+
+			plot_byte(bitmap, y, x, data, color);
 		}
-
-		copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 	}
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( spcking2 )
+{
+	if (screen_red)
+	{
+		fillbitmap(bitmap, MAKE_RGB(pal1bit(1), pal1bit(0), pal1bit(0)), cliprect);
+	}
+	else
+	{
+		offs_t offs;
+
+		for (offs = 0; offs < videoram_size; offs++)
+		{
+			UINT8 color;
+			UINT8 data = videoram[offs];
+
+			UINT8 y = offs >> 5;
+			UINT8 x = offs << 3;
+
+			offs_t n = ((offs >> 3) & ~0x1f) | (offs & 0x1f);
+
+			if (flip_screen)
+				color = (memory_region(REGION_PROMS)[n] >> 4) & 0x07;
+			else
+				color = (memory_region(REGION_PROMS)[n ^ 0x03ff]) & 0x07;
+
+			plot_byte(bitmap, y, x, data, color);
+		}
+	}
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( spaceint )
+{
+	offs_t offs;
+
+	for (offs = 0; offs < videoram_size; offs++)
+	{
+		UINT8 data = videoram[offs];
+		UINT8 color = colorram[offs];
+
+		UINT8 y = ~offs;
+		UINT8 x = offs >> 8 << 3;
+
+		/* this is almost certainly wrong */
+		offs_t n = ((offs >> 5) & 0xf0) | color;
+		color = memory_region(REGION_PROMS)[n] & 0x07;
+
+		plot_byte(bitmap, y, x, data, color);
+	}
+
 	return 0;
 }

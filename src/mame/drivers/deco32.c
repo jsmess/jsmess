@@ -2126,7 +2126,7 @@ static MACHINE_DRIVER_START( tattass )
 	MDRV_CPU_ADD(M6809, 2000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_tattass,sound_writemem_tattass)
-	MDRV_CPU_PERIODIC_INT(tattass_snd_interrupt,TIME_IN_HZ(489)) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
+	MDRV_CPU_PERIODIC_INT(tattass_snd_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_NVRAM_HANDLER(tattass)

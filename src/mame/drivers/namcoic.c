@@ -70,12 +70,6 @@ namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 		mTilemapInfo.tmap[4] = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_BITMASK,8,8,36,28);
 		mTilemapInfo.tmap[5] = tilemap_create(get_tile_info5,tilemap_scan_rows,TILEMAP_BITMASK,8,8,36,28);
 
-		/* ensure that all tilemaps have been allocated */
-		for( i=0; i<6; i++ )
-		{
-			if( !mTilemapInfo.tmap[i] ) return -1;
-		}
-
 		/* define offsets for scrolling */
 		for( i=0; i<4; i++ )
 		{
@@ -1102,11 +1096,6 @@ namco_roz_init( int gfxbank, int maskregion )
 				TILEMAP_BITMASK,
 				16,16,
 				256,256 );
-
-			if( mRozTilemap[i] == NULL )
-			{
-				return -1;
-			}
 		}
 		return 0;
 } /* namco_roz_init */
@@ -1591,8 +1580,6 @@ namco_road_init( int gfxbank )
 		mpRoadRAM = auto_malloc(0x20000);
 		{
 			gfx_element *pGfx = allocgfx( &RoadTileLayout );
-			if( pGfx )
-			{
 				decodegfx(pGfx, 0x10000+(UINT8 *)mpRoadRAM, 0, pGfx->total_elements);
 				pGfx->colortable = &Machine->remapped_colortable[0xf00];
 				pGfx->total_colors = 0x3f;
@@ -1604,18 +1591,13 @@ namco_road_init( int gfxbank )
 					ROAD_TILE_SIZE,ROAD_TILE_SIZE,
 					ROAD_COLS,ROAD_ROWS);
 
-				if( mpRoadTilemap )
-				{
 					state_save_register_global_pointer(mpRoadDirty, ROAD_TILE_COUNT_MAX);
 					state_save_register_global_pointer(mpRoadRAM,   0x20000 / 2);
 					state_save_register_func_postload(RoadMarkAllDirty);
 
 					return 0;
-				}
-			}
 		}
 	}
-	return -1;
 } /* namco_road_init */
 
 void

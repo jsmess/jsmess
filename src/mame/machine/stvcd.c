@@ -573,7 +573,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 //              CDROM_LOG("WW CR4: %04x\n", data);
 		cr4 = data;
 //      CDROM_LOG("CD: command exec %02x %02x %02x %02x %02x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
-		
+
 		if (!cdrom)
 		{
 			cd_stat = CD_STAT_OPEN;

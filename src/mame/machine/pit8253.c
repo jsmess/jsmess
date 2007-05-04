@@ -782,18 +782,13 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 			else
 			{
 				timer->outputtimer = mame_timer_alloc(outputcallback);
-				if (!timer->outputtimer)
-					goto error;
 				mame_timer_adjust(timer->outputtimer, time_never, i	| (timerno<<4),	time_zero);
-
 			}
 			if (timer->freq_callback ==	NULL)
 				timer->freqtimer = NULL;
 			else
 			{
 				timer->freqtimer = mame_timer_alloc(freqcallback);
-				if (!timer->freqtimer)
-					goto error;
 				mame_timer_adjust(timer->freqtimer,	time_never,	i |	(timerno<<4), time_zero);
 			}
 
@@ -826,14 +821,6 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 	LOG1(("pit8253_init(): initialized successfully\n"));
 
 	return 0;
-
-error:
-	pit_count =	0;
-	pits = NULL;
-
-	LOG1(("pit8253_init(): failed to initialize\n"));
-
-	return 1;
 }
 
 

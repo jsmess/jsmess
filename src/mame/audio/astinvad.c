@@ -73,7 +73,7 @@ WRITE8_HANDLER( astinvad_sound1_w )
 	if (bitsGoneHi & 0x04) sample_start(2, SND_BASEHIT, 0);
 	if (bitsGoneHi & 0x08) sample_start(3, SND_INVADERHIT, 0);
 
-	astinvad_set_flash(data & 0x04); /* LT 20-3-1998 */
+	astinvad_set_screen_red(data & 0x04);
 
 	state = data;
 }

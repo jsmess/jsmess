@@ -570,7 +570,7 @@ static MACHINE_DRIVER_START( kingofb )
 	/* audio CPU */        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,TIME_IN_HZ(6000))	/* Hz */
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -621,7 +621,7 @@ static MACHINE_DRIVER_START( ringking )
 	/* audio CPU */        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(rk_sound_readport,rk_sound_writeport)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,TIME_IN_HZ(6000))	/* Hz */
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

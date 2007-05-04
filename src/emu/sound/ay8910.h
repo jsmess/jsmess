@@ -1,6 +1,19 @@
 #ifndef AY8910_H
 #define AY8910_H
 
+/*
+AY-3-8910A: 2 I/O ports
+AY-3-8912A: 1 I/O port
+AY-3-8913A: 0 I/O port
+AY8930: upper compatible with 8910.
+In extended mode, it has higher resolution and duty ratio setting
+YM2149: higher resolution
+YM3439: same as 2149
+YMZ284: 0 I/O port, different clock divider
+YMZ294: 0 I/O port
+*/
+
+
 #define ALL_8910_CHANNELS -1
 
 struct AY8910interface

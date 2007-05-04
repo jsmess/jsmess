@@ -23,10 +23,7 @@
 /*       heard while missiles are seen to be moving.  When the red          */
 /*       missiles speed up, there should be more "klunks per second"        */
 /*       with the pitch staying constant.                                   */
-/*    2. If you select Cocktail mode, the screen inverts, but when          */
-/*       it is changed back, the screen won't flip back. You need           */
-/*       to restart MAME to fix it.                                         */
-/*    3. If "Hard" mode is selected, numerous bugs appear which             */
+/*    2. If "Hard" mode is selected, numerous bugs appear which             */
 /*       could be either an emulation fault or a bad rom. Some              */
 /*       bugs are:                                                          */
 /*       a. Graphic error halfway up the left side                          */
@@ -75,6 +72,8 @@
 /*               cosmo and dogpatch as the sound was already working.       */
 /*               [Robert]                                                   */
 /*                                                                          */
+/* 02 May 2007 - Major clean-up of driver and video system                  */
+/*                                                                          */
 /****************************************************************************/
 
 #include "driver.h"
@@ -85,59 +84,13 @@
 #include "invrvnge.lh"
 
 
-static ADDRESS_MAP_START( c8080bw_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_READWRITE(MRA8_RAM, c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4000, 0x5fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( c8080bw_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(mb14241_0_shift_result_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_0_3, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_WRITE(mb14241_0_shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(mb14241_0_shift_data_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_2_4, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x02, 0x02) AM_WRITE(mb14241_0_shift_count_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
-ADDRESS_MAP_END
-
-static MACHINE_DRIVER_START( 8080bw )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(c8080bw_cpu_map,0)
-	MDRV_CPU_IO_MAP(c8080bw_readport,writeport_2_4)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(8080bw)
-
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-
-	/* sound hardware */
-MACHINE_DRIVER_END
-
-
 /*******************************************************/
 /*                                                     */
 /* Space Invaders CV Version (Taito)                   */
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( sicv )
+static INPUT_PORTS_START( sicv )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -175,7 +128,7 @@ INPUT_PORTS_START( sicv )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -189,7 +142,7 @@ INPUT_PORTS_END
 
 /* same as the CV version with a test mode switch */
 
-INPUT_PORTS_START( sitv )
+static INPUT_PORTS_START( sitv )
 	PORT_START_TAG("IN0")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -227,7 +180,7 @@ INPUT_PORTS_START( sitv )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")
+	PORT_START_TAG(CABINET_PORT_TAG)
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -239,7 +192,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( invadrmr )
+static INPUT_PORTS_START( invadrmr )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -277,7 +230,7 @@ INPUT_PORTS_START( invadrmr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -299,7 +252,7 @@ static ADDRESS_MAP_START( invadpt2_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( invadpt2 )
+static INPUT_PORTS_START( invadpt2 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -339,7 +292,7 @@ INPUT_PORTS_START( invadpt2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -351,13 +304,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( invadpt2 )
 
     /* basic machine hardware */
-    MDRV_IMPORT_FROM(8080bw)
+    MDRV_IMPORT_FROM(mw8080bw_root)
     MDRV_CPU_MODIFY("main")
     MDRV_CPU_IO_MAP(invadpt2_io_map,0)
 
-    /* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(invadpt2)
 
     /* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -370,7 +322,17 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( spcewars )
+static ADDRESS_MAP_START( spcewars_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, spcewars_sh_port_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( spcewars )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -407,7 +369,7 @@ INPUT_PORTS_START( spcewars )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -416,9 +378,9 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( spcewars )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_MACHINE_RESET(spcewars)
+	MDRV_CPU_IO_MAP(spcewars_io_map,0)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -435,7 +397,26 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( cosmo )
+static ADDRESS_MAP_START( cosmo_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
+	AM_RANGE(0x4000, 0x57ff) AM_ROM
+	AM_RANGE(0x5c00, 0x5fff) AM_RAM AM_BASE(&c8080bw_colorram)
+ADDRESS_MAP_END
+
+/* at least one of these MWA8_NOPs must be sound related */
+static ADDRESS_MAP_START( cosmo_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, MWA8_NOP)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, MWA8_NOP)
+    AM_RANGE(0x03, 0x03) AM_WRITE(invadpt2_sh_port_1_w)
+    AM_RANGE(0x05, 0x05) AM_WRITE(cosmo_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(MWA8_NOP)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( cosmo )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -468,53 +449,22 @@ INPUT_PORTS_START( cosmo )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) /* must be HIGH normally or the joystick won't work */
 
-	PORT_START_TAG("CAB")
+	PORT_START_TAG(CABINET_PORT_TAG)
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( cosmo_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x57ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x5c00, 0x5fff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cosmo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4000, 0x57ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x5c00, 0x5fff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cosmo_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-ADDRESS_MAP_END
-
-/* at least one of these MWA8_NOPs must be sound related */
-static ADDRESS_MAP_START( cosmo_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x01, 0x01) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x02, 0x02) AM_WRITE(MWA8_NOP)
-    AM_RANGE(0x03, 0x03) AM_WRITE(invadpt2_sh_port_1_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-    AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(MWA8_NOP)
-ADDRESS_MAP_END
-
 static MACHINE_DRIVER_START( cosmo )
 
-    MDRV_IMPORT_FROM(8080bw)
+    /* basic machine hardware */
+    MDRV_IMPORT_FROM(mw8080bw_root)
     MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(cosmo_readmem, cosmo_writemem)
-	MDRV_CPU_IO_MAP(cosmo_readport, cosmo_writeport)
+	MDRV_CPU_PROGRAM_MAP(cosmo_map, 0)
+	MDRV_CPU_IO_MAP(cosmo_io_map, 0)
 
     /* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(cosmo)
+	MDRV_VIDEO_UPDATE(cosmo)
 
     /* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -527,7 +477,7 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( earthinv )
+static INPUT_PORTS_START( earthinv )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -566,7 +516,7 @@ INPUT_PORTS_START( earthinv )
 	PORT_DIPSETTING(    0x00, "2C/1C 50p/3C (+ Bonus Life)" )
 	PORT_DIPSETTING(    0x80, "1C/1C 50p/5C" )
 
-	PORT_START_TAG("CAB")
+	PORT_START_TAG(CABINET_PORT_TAG)
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -579,7 +529,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( spaceatt )
+static INPUT_PORTS_START( spaceatt )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -623,7 +573,7 @@ INPUT_PORTS_START( spaceatt )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode (not used) */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode (not used) */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -634,7 +584,16 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( invrvnge )
+static ADDRESS_MAP_START( invrvnge_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, invrvnge_sh_port_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( invrvnge )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -672,7 +631,7 @@ INPUT_PORTS_START( invrvnge )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
-	PORT_START_TAG("CAB")
+	PORT_START_TAG(CABINET_PORT_TAG)
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -682,9 +641,9 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( invrvnge )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_MACHINE_RESET(invrvnge)
+	MDRV_CPU_IO_MAP(invrvnge_io_map,0)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -698,17 +657,27 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-static ADDRESS_MAP_START( sstrangr_readport, ADDRESS_SPACE_IO, 8 )
+static MACHINE_START( sstrangr )
+{
+	/* do nothing for now - different interrupt system */
+	return 0;
+}
+
+
+static MACHINE_RESET( sstrangr )
+{
+	/* do nothing for now - different interrupt system */
+}
+
+
+static ADDRESS_MAP_START( sstrangr_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x41) AM_READ(input_port_2_r)
-	AM_RANGE(0x42, 0x42) AM_READ(input_port_1_r)
-	AM_RANGE(0x44, 0x44) AM_READ(input_port_4_r)
+	AM_RANGE(0x42, 0x42) AM_READWRITE(input_port_1_r, invadpt2_sh_port_1_w)
+	AM_RANGE(0x44, 0x44) AM_READWRITE(input_port_4_r, invadpt2_sh_port_2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sstrangr_writeport, ADDRESS_SPACE_IO, 8 )
-	/* no shifter circuit */
-ADDRESS_MAP_END
 
-INPUT_PORTS_START( sstrangr )
+static INPUT_PORTS_START( sstrangr )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -746,7 +715,7 @@ INPUT_PORTS_START( sstrangr )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -761,10 +730,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( sstrangr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(sstrangr_readport,sstrangr_writeport)
+	MDRV_CPU_IO_MAP(sstrangr_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+
+	MDRV_MACHINE_START(sstrangr)
 	MDRV_MACHINE_RESET(sstrangr)
 
 	/* sound hardware */
@@ -779,16 +750,16 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-/* colour version of Space Stranger, board has Stranger 2 written on it */
+/* color version of Space Stranger, board has Stranger 2 written on it */
 
-static ADDRESS_MAP_START( sstrngr2_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sstrngr2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(MRA8_RAM, c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
 	AM_RANGE(0x4000, 0x63ff) AM_ROM
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( sstrngr2 )
+static INPUT_PORTS_START( sstrngr2 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -828,7 +799,7 @@ INPUT_PORTS_START( sstrngr2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -843,19 +814,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( sstrngr2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(sstrangr)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(sstrngr2_cpu_map,0)
-	MDRV_CPU_IO_MAP(sstrangr_readport,sstrangr_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
-	MDRV_MACHINE_RESET(sstrangr)
+	MDRV_CPU_PROGRAM_MAP(sstrngr2_map,0)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
-
-	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_VIDEO_UPDATE(sstrngr2)
 
 MACHINE_DRIVER_END
 
@@ -866,7 +830,7 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( spclaser )
+static INPUT_PORTS_START( spclaser )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -907,7 +871,7 @@ INPUT_PORTS_START( spclaser )
     PORT_DIPSETTING(    0x00, "1 Coin/1 or 2 Players" )
     PORT_DIPSETTING(    0x80, "1 Coin/1 Player  2 Coins/2 Players" )   Irrelevant, causes bugs*/
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode (not used) */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode (not used) */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -917,7 +881,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( spcewarl )
+static INPUT_PORTS_START( spcewarl )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -958,7 +922,7 @@ INPUT_PORTS_START( spcewarl )
     PORT_DIPSETTING(    0x00, "1 Coin/1 or 2 Players" )
     PORT_DIPSETTING(    0x80, "1 Coin/1 Player  2 Coins/2 Players" )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode (not used) */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode (not used) */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -969,7 +933,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( galxwars )
+static INPUT_PORTS_START( galxwars )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1009,7 +973,7 @@ INPUT_PORTS_START( galxwars )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1022,7 +986,17 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( lrescue )
+static ADDRESS_MAP_START( lrescue_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, lrescue_sh_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(lrescue_sh_port_2_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( lrescue )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1060,7 +1034,7 @@ INPUT_PORTS_START( lrescue )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1069,13 +1043,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( lrescue )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_MACHINE_RESET(lrescue)
+	MDRV_CPU_IO_MAP(lrescue_io_map,0)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	MDRV_VIDEO_UPDATE(invadpt2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1097,7 +1070,7 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( cosmicmo )
+static INPUT_PORTS_START( cosmicmo )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1138,7 +1111,7 @@ INPUT_PORTS_START( cosmicmo )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1151,7 +1124,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( invasion )
+static INPUT_PORTS_START( invasion )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1189,7 +1162,7 @@ INPUT_PORTS_START( invasion )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1202,7 +1175,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( superinv )
+static INPUT_PORTS_START( superinv )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1238,7 +1211,7 @@ INPUT_PORTS_START( superinv )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1251,25 +1224,25 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-static ADDRESS_MAP_START( rollingc_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
-//  AM_RANGE(0x2000, 0x2002) AM_READ(MRA8_RAM)
-//  AM_RANGE(0x2003, 0x2003) AM_READ(hack)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe400, 0xffff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( rollingc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_ROM
+	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_RAM AM_BASE(&c8080bw_colorram)
+	AM_RANGE(0xe400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rollingc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
-	AM_RANGE(0xe400, 0xffff) AM_WRITE(MWA8_RAM)
+
+static ADDRESS_MAP_START( rollingc_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, rollingc_sh_port_w)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READ(mb14241_0_shift_result_r)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( rollingc )
+
+static INPUT_PORTS_START( rollingc )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -1308,7 +1281,7 @@ INPUT_PORTS_START( rollingc )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1317,14 +1290,13 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( rollingc )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(rollingc_readmem,rollingc_writemem)
-	MDRV_MACHINE_RESET(rollingc)
+	MDRV_CPU_PROGRAM_MAP(rollingc_map,0)
+	MDRV_CPU_IO_MAP(rollingc_io_map,0)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	MDRV_VIDEO_UPDATE(rollingc)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -1339,21 +1311,26 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-static ADDRESS_MAP_START( schaser_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x00e0) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( schaser_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x00e0) AM_RAM AM_BASE(&c8080bw_colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( schaser_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x00e0) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+
+static ADDRESS_MAP_START( schaser_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, schaser_sh_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(schaser_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( schaser )
+
+static INPUT_PORTS_START( schaser )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
@@ -1404,7 +1381,7 @@ INPUT_PORTS_START( schaser )
 
 	// port 3 (all 8 bits) connected to custom chip MB14241 driven by out port 2 and 4
 	// To get cocktail mode, turn this on, and choose 2 controllers.
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1422,16 +1399,16 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( schaser )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("main",8080,1996800)        /* 19.968MHz / 10 */
-	MDRV_CPU_PROGRAM_MAP(schaser_readmem,schaser_writemem)
+	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
+	MDRV_CPU_IO_MAP(schaser_io_map,0)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
+	MDRV_MACHINE_START(schaser)
 	MDRV_MACHINE_RESET(schaser)
 
 	/* video hardware */
-
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	MDRV_VIDEO_UPDATE(schaser)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1444,6 +1421,7 @@ static MACHINE_DRIVER_START( schaser )
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG(schaser_discrete_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_DRIVER_END
 
 
@@ -1453,7 +1431,17 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( schasrcv )
+static ADDRESS_MAP_START( schasrcv_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, schasrcv_sh_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(schasrcv_sh_port_2_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( schasrcv )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1490,7 +1478,7 @@ INPUT_PORTS_START( schasrcv )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1499,14 +1487,13 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( schasrcv )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(schaser_readmem,schaser_writemem)
-	MDRV_MACHINE_RESET(schasrcv)
+	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
+	MDRV_CPU_IO_MAP(schasrcv_io_map,0)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	MDRV_VIDEO_UPDATE(schasrcv)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -1531,46 +1518,36 @@ static READ8_HANDLER( sfl_input_r )
 	return sfl_int|input_port_1_r(0);
 }
 
-static ADDRESS_MAP_START( sflush_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM) //?
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
 	AM_RANGE(0x8008, 0x8008) AM_READ(input_port_2_r)
 	AM_RANGE(0x8009, 0x8009) AM_READ(mb14241_0_shift_result_r)
 	AM_RANGE(0x800a, 0x800a) AM_READ(sfl_input_r)
 	AM_RANGE(0x800b, 0x800b) AM_READ(input_port_0_r)
-	AM_RANGE(0xd800, 0xffff) AM_READ(MRA8_ROM)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sflush_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x8018, 0x8018) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x8019, 0x8019) AM_WRITE(mb14241_0_shift_count_w)
 	AM_RANGE(0x801a, 0x801a) AM_WRITE(MWA8_NOP)
 	AM_RANGE(0x801c, 0x801c) AM_WRITE(MWA8_NOP)
 	AM_RANGE(0x801d, 0x801d) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
-	AM_RANGE(0xd800, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_RAM AM_BASE(&c8080bw_colorram)
+	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( sflush )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("main",M6800,2000000)        /* ?? */
-	MDRV_CPU_PROGRAM_MAP(sflush_readmem,sflush_writemem)
-	MDRV_CPU_IO_MAP(0,0)
+	MDRV_CPU_PROGRAM_MAP(sflush_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse,2)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(sflush)
+	MDRV_VIDEO_UPDATE(sflush)
 
 MACHINE_DRIVER_END
 
-INPUT_PORTS_START( sflush )
+static INPUT_PORTS_START( sflush )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
@@ -1605,7 +1582,17 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( lupin3 )
+static ADDRESS_MAP_START( lupin3_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, lupin3_sh_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(lupin3_sh_port_2_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( lupin3 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* selects color mode (dynamic vs. static) */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* something has to do with sound */
@@ -1646,19 +1633,21 @@ INPUT_PORTS_START( lupin3 )
 	PORT_DIPNAME(0x80,  0x00, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( lupin3 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(schaser_readmem,schaser_writemem)
-	MDRV_MACHINE_RESET(lupin3)
+	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
+	MDRV_CPU_IO_MAP(lupin3_io_map,0)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	MDRV_VIDEO_UPDATE(lupin3)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -1672,7 +1661,47 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( polaris )
+static UINT8 polaris_cloud_speed;
+static UINT8 polaris_cloud_pos;
+
+
+static INTERRUPT_GEN( polaris_interrupt )
+{
+	polaris_cloud_speed++;
+
+	if (polaris_cloud_speed >= 4)	/* every 4 frames - this was verified against real machine */
+	{
+		polaris_cloud_speed = 0;
+
+		polaris_cloud_pos++;
+	}
+}
+
+
+UINT8 polaris_get_cloud_pos(void)
+{
+	return polaris_cloud_pos;
+}
+
+
+// Port 5 is used to reset the watchdog timer.
+// This port is also written to when the boss plane is going up and down.
+// If you write this value to a note ciruit similar to the music,
+// you will get a nice sound that accurately follows the plane.
+// It sounds better then the actual circuit used.
+// Probably an unfinished feature.
+static ADDRESS_MAP_START( polaris_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, polaris_sh_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, mb14241_0_shift_data_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(polaris_sh_port_2_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(polaris_sh_port_3_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( polaris )
 
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )
@@ -1728,7 +1757,7 @@ INPUT_PORTS_START( polaris )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1746,18 +1775,15 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( polaris )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("main",8080,1996800)        /* 19.968MHz / 10 */
-	MDRV_CPU_PROGRAM_MAP(schaser_readmem,schaser_writemem)
+	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
+	MDRV_CPU_IO_MAP(polaris_io_map,0)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
-
-	MDRV_CPU_IO_MAP(c8080bw_readport,writeport_0_3)
 	MDRV_CPU_VBLANK_INT(polaris_interrupt,1)
-	MDRV_MACHINE_RESET(polaris)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	MDRV_VIDEO_UPDATE(polaris)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1775,7 +1801,7 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( ozmawars )
+static INPUT_PORTS_START( ozmawars )
 	PORT_START_TAG("IN0")
 
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1816,13 +1842,13 @@ INPUT_PORTS_START( ozmawars )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( spaceph )
+static INPUT_PORTS_START( spaceph )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1862,7 +1888,7 @@ INPUT_PORTS_START( spaceph )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1876,7 +1902,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( sinvemag )
+static INPUT_PORTS_START( sinvemag )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1917,7 +1943,7 @@ INPUT_PORTS_START( sinvemag )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1931,7 +1957,7 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( jspecter )
+static INPUT_PORTS_START( jspecter )
 
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1972,7 +1998,7 @@ INPUT_PORTS_START( jspecter )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -1985,7 +2011,17 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( ballbomb )
+static ADDRESS_MAP_START( ballbomb_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, mb14241_0_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, ballbomb_sh_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ballbomb_sh_port_2_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( ballbomb )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -2019,7 +2055,7 @@ INPUT_PORTS_START( ballbomb )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -2028,13 +2064,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ballbomb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_MACHINE_RESET(ballbomb)
+	MDRV_CPU_IO_MAP(ballbomb_io_map,0)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(invadpt2)
+	MDRV_VIDEO_UPDATE(ballbomb)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -2048,31 +2083,22 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-static ADDRESS_MAP_START( yosakdon_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( yosakdon_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+static ADDRESS_MAP_START( yosakdon_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) /* what's this? */
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( yosakdon_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( yosakdon_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( yosakdon_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x03, 0x03) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x05, 0x05) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x03, 0x03) AM_WRITE(yosakdon_sh_port_1_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(yosakdon_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(MWA8_NOP) /* character numbers */
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( yosakdon )
+static INPUT_PORTS_START( yosakdon )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -2105,11 +2131,10 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( yosakdon )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(yosakdon_readmem, yosakdon_writemem)
-	MDRV_CPU_IO_MAP(yosakdon_readport, yosakdon_writeport)
-	MDRV_MACHINE_RESET(yosakdon)
+	MDRV_CPU_PROGRAM_MAP(yosakdon_map,0)
+	MDRV_CPU_IO_MAP(yosakdon_io_map,0)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -2123,7 +2148,7 @@ MACHINE_DRIVER_END
 /*                                                     */
 /*******************************************************/
 
-INPUT_PORTS_START( indianbt )
+static INPUT_PORTS_START( indianbt )
 
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -2154,7 +2179,7 @@ INPUT_PORTS_START( indianbt )
 
 	PORT_START_TAG("DUMMY") /*  cabinet fake port  must be 4th  */
 
-	PORT_START_TAG("CAB")		/* Dummy port for cocktail mode */
+	PORT_START_TAG(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -2193,27 +2218,27 @@ static READ8_HANDLER(indianbt_r)
 	return rand();
 }
 
-static ADDRESS_MAP_START( indianbt_port, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( indianbt_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(indianbt_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r) AM_WRITE(mb14241_0_shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_READ(mb14241_0_shift_result_r)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(mb14241_0_shift_result_r, indianbt_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(mb14241_0_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(indianbt_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP /* sound ? */
-//   ports 3,5,7 (write) are for sound
-
+	AM_RANGE(0x07, 0x07) AM_WRITE(indianbt_sh_port_3_w)
 ADDRESS_MAP_END
 
+
 static MACHINE_DRIVER_START( indianbt )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_MACHINE_RESET(indianbt)
-	MDRV_CPU_IO_MAP(indianbt_port,0)
+	MDRV_CPU_IO_MAP(indianbt_io_map,0)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(indianbt)
+	MDRV_VIDEO_UPDATE(indianbt)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -2246,7 +2271,7 @@ g 2x  SN75452
 
 ******************************************************/
 
-INPUT_PORTS_START( shuttlei )
+static INPUT_PORTS_START( shuttlei )
 	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -2287,32 +2312,33 @@ INPUT_PORTS_START( shuttlei )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( shuttlei_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( shuttlei_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(MRA8_RAM, c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shuttlei_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfc, 0xfc) AM_WRITENOP /* game writes 0xAA every so often (perhaps when base hit?) */
-	AM_RANGE(0xfe, 0xfe) AM_READ(input_port_0_r) AM_WRITENOP
-	AM_RANGE(0xff, 0xff) AM_READ(input_port_1_r) AM_WRITENOP
+	AM_RANGE(0xfd, 0xfd) AM_WRITE(shuttlei_sh_port_1_w)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE(input_port_0_r, shuttlei_sh_port_2_w)
+	AM_RANGE(0xff, 0xff) AM_READ(input_port_1_r)
 //         port fd (write) is for sound
 ADDRESS_MAP_END
 
+
 static MACHINE_DRIVER_START( shuttlei )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(8080bw)
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(shuttlei_memory_map,0)
+	MDRV_CPU_PROGRAM_MAP(shuttlei_map,0)
 	MDRV_CPU_IO_MAP(shuttlei_io_map,0)
-	MDRV_MACHINE_RESET(shuttlei)
 
 	/* video hardware */
 //  MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_VIDEO_UPDATE(shuttlei)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -2345,22 +2371,34 @@ Another (same checksums) dump came from board labeled SI-7811M-2
 */
 
 
-static ADDRESS_MAP_START( darthvdr_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
+
+static MACHINE_START( darthvdr )
+{
+	/* do nothing for now - different interrupt system */
+	return 0;
+}
+
+
+static MACHINE_RESET( darthvdr )
+{
+	/* do nothing for now - different interrupt system */
+}
+
+
+static ADDRESS_MAP_START( darthvdr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_ROM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darthvdr_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( darthvdr_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x00, 0x0f) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darthvdr_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_RAM, c8080bw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-ADDRESS_MAP_END
 
-INPUT_PORTS_START( darthvdr )
+static INPUT_PORTS_START( darthvdr )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -2378,11 +2416,11 @@ INPUT_PORTS_START( darthvdr )
 	PORT_DIPSETTING(    0x80, "6" )
 
 	PORT_START_TAG("IN1")
-  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-  PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
@@ -2398,16 +2436,22 @@ INPUT_PORTS_START( darthvdr )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( darthvdr )
-	MDRV_IMPORT_FROM(8080bw)
+
+    /* basic machine hardware */
+	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(darthvdr_mem,0)
-	MDRV_CPU_IO_MAP(darthvdr_readport, darthvdr_writeport)
+	MDRV_CPU_PROGRAM_MAP(darthvdr_map,0)
+	MDRV_CPU_IO_MAP(darthvdr_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+
+	MDRV_MACHINE_START(darthvdr)
+	MDRV_MACHINE_RESET(darthvdr)
+
 MACHINE_DRIVER_END
 
 
 ROM_START( searthin )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )             /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "earthinv.h",   0x0000, 0x0800, CRC(58a750c8) SHA1(90bfa4ea06f38e67fe4286d37d151632439249d2) )
 	ROM_LOAD( "earthinv.g",   0x0800, 0x0800, CRC(b91742f1) SHA1(8d9ca92405fbaf1d5a7138d400986616378d061e) )
 	ROM_LOAD( "earthinv.f",   0x1000, 0x0800, CRC(4acbbc60) SHA1(b8c1efb4251a1e690ff6936ec956d6f66136a085) )
@@ -2415,7 +2459,7 @@ ROM_START( searthin )
 ROM_END
 
 ROM_START( searthia )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "unkh.h1",   0x0000, 0x0400, CRC(272b9bf3) SHA1(dd57d6a88d42024a39640931114107b547b4c520) )
 	ROM_LOAD( "unkg.g1",   0x0400, 0x0400, CRC(61bb6101) SHA1(8fc8bbd8ac93d239e0cf0e4881f709860ec2c973) )
 	ROM_LOAD( "unkf.f1",   0x0800, 0x0400, CRC(2a8d9cd5) SHA1(7948d79b326e729bcb629607c8797156ff9fb0e8) )
@@ -2428,7 +2472,7 @@ ROM_END
 
 
 ROM_START( invadrmr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	/* yes, this rom is really on the PCB twice?! */
 	ROM_LOAD( "11.1s",       0x0000, 0x0400, CRC(389d44b6) SHA1(5d2581b8bc0da918ce57cf319e06b5b31989c681) )
 	ROM_LOAD( "11.1t",       0x0000, 0x0400, CRC(389d44b6) SHA1(5d2581b8bc0da918ce57cf319e06b5b31989c681) )
@@ -2441,7 +2485,7 @@ ROM_START( invadrmr )
 ROM_END
 
 ROM_START( spaceatt )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "h",            0x0000, 0x0400, CRC(d0c32d72) SHA1(b3bd950b1ba940fbeb5d95e55113ed8f4c311434) )
 	ROM_LOAD( "sv02.bin",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
 	ROM_LOAD( "f",            0x0800, 0x0400, CRC(483e651e) SHA1(ae795ee3bc53ac3936f6cf2c72cca7a890783513) )
@@ -2451,7 +2495,7 @@ ROM_START( spaceatt )
 ROM_END
 
 ROM_START( spaceat2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "spaceatt.h",   0x0000, 0x0800, CRC(a31d0756) SHA1(2b76929654ed0b180091348546dac29fc6e5438e) )
 	ROM_LOAD( "spaceatt.g",   0x0800, 0x0800, CRC(f41241f7) SHA1(d93cead75922510075433849c4f7099279eafc18) )
 	ROM_LOAD( "spaceatt.f",   0x1000, 0x0800, CRC(4c060223) SHA1(957e75a978aa600627399061cae0a6525e92ad11) )
@@ -2459,7 +2503,7 @@ ROM_START( spaceat2 )
 ROM_END
 
 ROM_START( sinvzen )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.bin",        0x0000, 0x0400, CRC(9b0da779) SHA1(a52ccdb252eb69c497aa5eafb35d7f25a311b44e) )
 	ROM_LOAD( "2.bin",        0x0400, 0x0400, CRC(9858ccab) SHA1(5ad8e5ef0d95779f0e513634b97bc330c9269ce4) )
 	ROM_LOAD( "3.bin",        0x0800, 0x0400, CRC(a1cc38b5) SHA1(45fc9466b548d511b8174f6f3a4783164dd59489) )
@@ -2471,7 +2515,7 @@ ROM_START( sinvzen )
 ROM_END
 
 ROM_START( sinvemag )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sv0h.bin",     0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
 	ROM_LOAD( "emag_si.b",    0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
 	ROM_LOAD( "emag_si.c",    0x0800, 0x0400, CRC(aafb24f7) SHA1(6718cdfae09f77d735be5145b9d202a73d8ed9db) )
@@ -2481,7 +2525,7 @@ ROM_START( sinvemag )
 ROM_END
 
 ROM_START( tst_invd )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "test.h",   0x0000, 0x0800, CRC(f86a2eea) SHA1(4a72ff01f3e6d16bbe9bf7f123cd98895bfbed9a) )   /*  The Test ROM */
 	ROM_LOAD( "invaders.g",   0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
 	ROM_LOAD( "invaders.f",   0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
@@ -2489,7 +2533,7 @@ ROM_START( tst_invd )
 ROM_END
 
 ROM_START( alieninv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1h.bin",       0x0000, 0x0800, CRC(c46df7f4) SHA1(eec34b3d5585bae03c7b80585daaa05ddfcc2164) )
 	ROM_LOAD( "1g.bin",       0x0800, 0x0800, CRC(4b1112d6) SHA1(b693667656e5d8f44eeb2ea730f4d4db436da579) )
 	ROM_LOAD( "1f.bin",       0x1000, 0x0800, CRC(adca18a5) SHA1(7e02651692113db31fd469868ae5ffdb0f941ecf) )
@@ -2497,7 +2541,7 @@ ROM_START( alieninv )
 ROM_END
 
 ROM_START( sitv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tv0h.s1",      0x0000, 0x0800, CRC(fef18aad) SHA1(043edeefe6a6d4934bd384eafea19326de1dbeec) )
 	ROM_LOAD( "tv02.rp1",     0x0800, 0x0800, CRC(3c759a90) SHA1(d847d592dee592b1d3a575c21d89eaf3f7f6ae1b) )
 	ROM_LOAD( "tv03.n1",      0x1000, 0x0800, CRC(0ad3657f) SHA1(a501f316535c50f7d7a20ef8e6dede1526a3f2a8) )
@@ -2505,7 +2549,7 @@ ROM_START( sitv )
 ROM_END
 
 ROM_START( sicv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cv17.bin",     0x0000, 0x0800, CRC(3dfbe9e6) SHA1(26487df7fa0bbd0b9b7f74347c4b9318b0a73b89) )
 	ROM_LOAD( "cv18.bin",     0x0800, 0x0800, CRC(bc3c82bf) SHA1(33e39fc97bd46699be1f9b9741a86f433efdc911) )
 	ROM_LOAD( "cv19.bin",     0x1000, 0x0800, CRC(d202b41c) SHA1(868fe938ef768655c894ec95b7d9a81bf21f69ca) )
@@ -2517,7 +2561,7 @@ ROM_START( sicv )
 ROM_END
 
 ROM_START( sisv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sv0h.bin",     0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
 	ROM_LOAD( "sv02.bin",     0x0400, 0x0400, CRC(0e159534) SHA1(94b2015a9d38ca738705b8d024a79fd2f9855b98) )
 	ROM_LOAD( "invaders.g",   0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
@@ -2530,7 +2574,7 @@ ROM_START( sisv )
 ROM_END
 
 ROM_START( sisv2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sv0h.bin",     0x0000, 0x0400, CRC(86bb8cb6) SHA1(a75648e7f2446c756d86624b15d387d25ce47b66) )
 	ROM_LOAD( "emag_si.b",    0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
 	ROM_LOAD( "sv12",         0x0800, 0x0400, CRC(a08e7202) SHA1(de9f7c851d1b894915e720cfc5d794cdb31752f6) )
@@ -2544,7 +2588,7 @@ ROM_START( sisv2 )
 ROM_END
 
 ROM_START( spceking )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "invaders.h",   0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
 	ROM_LOAD( "spcekng2",     0x0800, 0x0800, CRC(96dcdd42) SHA1(e18d7ffca92e863ef40e235b2be973d8c5879fdb) )
 	ROM_LOAD( "spcekng3",     0x1000, 0x0800, CRC(95fc96ad) SHA1(38175edad0e538a1561cec8f7613f15ae274dd14) )
@@ -2552,7 +2596,7 @@ ROM_START( spceking )
 ROM_END
 
 ROM_START( spcewars )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sanritsu.1",   0x0000, 0x0400, CRC(ca331679) SHA1(5c362c3d1c721d293bcddbef4033533769c8f0e0) )
 	ROM_LOAD( "sanritsu.2",   0x0400, 0x0400, CRC(48dc791c) SHA1(91a98205c83ca38961e6ba2ac43a41e6e8bc2675) )
 	ROM_LOAD( "ic35.bin",     0x0800, 0x0800, CRC(40c2d55b) SHA1(b641b63046d242ad23911143ed840011fc98eaff) )
@@ -2564,7 +2608,7 @@ ROM_START( spcewars )
 ROM_END
 
 ROM_START( spacewr3 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ic36.bin",     0x0000, 0x0800, CRC(9e30f88a) SHA1(314dfb2920d9b43b977cc19e40ac315e6933c3b9) )
 	ROM_LOAD( "ic35.bin",     0x0800, 0x0800, CRC(40c2d55b) SHA1(b641b63046d242ad23911143ed840011fc98eaff) )
 	ROM_LOAD( "ic34.bin",     0x1000, 0x0800, CRC(b435f021) SHA1(2d0d813b99d571b53770fa878a1f82ca67827caa) )
@@ -2573,7 +2617,7 @@ ROM_START( spacewr3 )
 ROM_END
 
 ROM_START( invaderl )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c01",          0x0000, 0x0400, CRC(499f253a) SHA1(e13353194277f5d35e92db9b11912b5f392f51b7) )
 	ROM_LOAD( "c02",          0x0400, 0x0400, CRC(2d0b2e1f) SHA1(2e0262d9dba607824fcd720d2995531649bdd03d) )
 	ROM_LOAD( "c03",          0x0800, 0x0400, CRC(03033dc2) SHA1(87d7838e6a6542c2c5510af593df45137cb397c6) )
@@ -2584,7 +2628,7 @@ ROM_START( invaderl )
 ROM_END
 
 ROM_START( invader4 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "spin4.a",      0x0000, 0x0800, CRC(bb386dfe) SHA1(cc00f3e4f6ca4c05bae038a24ccdb213fb951cfc) )
 	ROM_LOAD( "spin4.b",      0x0800, 0x0800, CRC(63afa11d) SHA1(d8cedfa010a49237e31f6ebaed35134cb1c3ce68) )
 	ROM_LOAD( "spin4.c",      0x1000, 0x0800, CRC(22b0317c) SHA1(8fd037bf5f89a7bcb06042697410566d5180912a) )
@@ -2592,19 +2636,19 @@ ROM_START( invader4 )
 ROM_END
 
 ROM_START( jspecter )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "3305.u6",      0x0000, 0x1000, CRC(ab211a4f) SHA1(d675ed29c3479d7318f8559bd56dd619cf631b6a) )
 	ROM_LOAD( "3306.u7",      0x1400, 0x1000, CRC(0df142a7) SHA1(2f1c32d6fe7eafb7808fef0bdeb69b4909427417) )
 ROM_END
 
 ROM_START( jspectr2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "unksi.b2",     0x0000, 0x1000, CRC(0584b6c4) SHA1(c130021b878bde2beda4a189f71bbfed61088535) )
 	ROM_LOAD( "unksi.a2",     0x1400, 0x1000, CRC(58095955) SHA1(545df3bb9ee4ff09f491d7a4b704e31aa311a8d7) )
 ROM_END
 
 ROM_START( invadpt2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pv01",        0x0000, 0x0800, CRC(7288a511) SHA1(ff617872784c28ed03591aefa9f0519e5651701f) )
 	ROM_LOAD( "pv02",        0x0800, 0x0800, CRC(097dd8d5) SHA1(8d68654d54d075c0f0d7f63c87ff4551ce8b7fbf) )
 	ROM_LOAD( "pv03",        0x1000, 0x0800, CRC(1766337e) SHA1(ea959bf06c9930d83a07559e191a28641efb07ac) )
@@ -2617,7 +2661,7 @@ ROM_START( invadpt2 )
 ROM_END
 
 ROM_START( invaddlx )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "invdelux.h",   0x0000, 0x0800, CRC(e690818f) SHA1(0860fb03a64d34a9704a1459a5e96929eafd39c7) )
 	ROM_LOAD( "invdelux.g",   0x0800, 0x0800, CRC(4268c12d) SHA1(df02419f01cf0874afd1f1aa16276751acd0604a) )
 	ROM_LOAD( "invdelux.f",   0x1000, 0x0800, CRC(f4aa1880) SHA1(995d77b67cb4f2f3781c2c8747cb058b7c1b3412) )
@@ -2626,7 +2670,7 @@ ROM_START( invaddlx )
 ROM_END
 
 ROM_START( moonbase )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	   /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ze3-1.bin",    0x0000, 0x0400, CRC(82dbf2c7) SHA1(c767d8b866db4a5059bd79f962a90ce3a962e1e6) )
 	ROM_LOAD( "ze3-2.bin",    0x0400, 0x0400, CRC(c867f5b4) SHA1(686318fda6edde297aecaf33f480bfa075fa6eca) )
 	ROM_LOAD( "ze3-3.bin",    0x0800, 0x0400, CRC(cb23ccc1) SHA1(86be2d14d52b3404e1a25c573bd25b97729d82a1) )
@@ -2644,7 +2688,7 @@ ROM_START( moonbase )
 ROM_END
 
 ROM_START( invrvnge )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "invrvnge.h",   0x0000, 0x0800, CRC(aca41bbb) SHA1(ca71f792abd6d9a44d15b19d2ccf678e82ccba4f) )
 	ROM_LOAD( "invrvnge.g",   0x0800, 0x0800, CRC(cfe89dad) SHA1(218b6a0b636c49c4cdc3667e8b1387ef0e257115) )
 	ROM_LOAD( "invrvnge.f",   0x1000, 0x0800, CRC(e350de2c) SHA1(e845565e2f96f9dec3242ec5ab75910a515428c9) )
@@ -2652,7 +2696,7 @@ ROM_START( invrvnge )
 ROM_END
 
 ROM_START( invrvnga )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "5m.bin",       0x0000, 0x0800, CRC(b145cb71) SHA1(127eb11de7ab9835f06510fb12838c0b728c0d42) )
 	ROM_LOAD( "5n.bin",       0x0800, 0x0800, CRC(660e8af3) SHA1(bd52eadf4ee3d717fd5bd7206e1e87d729250c92) )
 	ROM_LOAD( "5p.bin",       0x1000, 0x0800, CRC(6ec5a9ad) SHA1(d1e84d2d60c6128c092f2cd20a2b87216df3034b) )
@@ -2660,7 +2704,7 @@ ROM_START( invrvnga )
 ROM_END
 
 ROM_START( spclaser )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "la01",         0x0000, 0x0800, CRC(bedc0078) SHA1(a5bb0cbbb8e3f27d03beb8101b2be1111d73689d) )
 	ROM_LOAD( "spcewarl.2",   0x0800, 0x0800, CRC(43bc65c5) SHA1(5f9827c02c2d221e1607359c840374ff7fb92fbf) )
 	ROM_LOAD( "la03",         0x1000, 0x0800, CRC(1083e9cc) SHA1(7ad45c6230c9e02fcf51e3414c15e2237eebbd7a) )
@@ -2668,7 +2712,7 @@ ROM_START( spclaser )
 ROM_END
 
 ROM_START( laser )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.u36",        0x0000, 0x0800, CRC(b44e2c41) SHA1(00e0b2e088495d6f3bc175e8a53dcb3686ea8484) )
 	ROM_LOAD( "2.u35",        0x0800, 0x0800, CRC(9876f331) SHA1(14e36b26d186d9a195492834ef989ed5664d7b65) )
 	ROM_LOAD( "3.u34",        0x1000, 0x0800, CRC(ed79000b) SHA1(bfe0407e833ce61aa909f5f1f93c3fc1d46605e9) )
@@ -2676,7 +2720,7 @@ ROM_START( laser )
 ROM_END
 
 ROM_START( spcewarl )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "spcewarl.1",   0x0000, 0x0800, CRC(1fcd34d2) SHA1(674139944e0d842a85bd21b326bd735e15453038) )
 	ROM_LOAD( "spcewarl.2",   0x0800, 0x0800, CRC(43bc65c5) SHA1(5f9827c02c2d221e1607359c840374ff7fb92fbf) )
 	ROM_LOAD( "spcewarl.3",   0x1000, 0x0800, CRC(7820df3a) SHA1(53315857f4282c68624b338b068d80ee6828af4c) )
@@ -2684,7 +2728,7 @@ ROM_START( spcewarl )
 ROM_END
 
 ROM_START( galxwars )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "univgw3.0",    0x0000, 0x0400, CRC(937796f4) SHA1(88e9494cc532498e51e3a68fa1122c40f22b27dd) )
 	ROM_LOAD( "univgw4.1",    0x0400, 0x0400, CRC(4b86e7a6) SHA1(167f9f7491a2de39d08e3e6f7057cc75b36c9340) )
 	ROM_LOAD( "univgw5.2",    0x0800, 0x0400, CRC(47a187cd) SHA1(640c896ba25f34d323624005bd676257ad17b687) )
@@ -2694,13 +2738,13 @@ ROM_START( galxwars )
 ROM_END
 
 ROM_START( galxwar2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "3192.h6",      0x0000, 0x1000, CRC(bde6860b) SHA1(e04b8add32d8f7ea588fae6d6a387f1d40495f1b) )
 	ROM_LOAD( "3193.h7",      0x4000, 0x1000, CRC(a17cd507) SHA1(554ab0e8bdc0e7af4a30b0ddc8aa053c8e70255c) ) /* 2nd half unused */
 ROM_END
 
 ROM_START( galxwart )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "galxwars.0",   0x0000, 0x0400, CRC(608bfe7f) SHA1(a41a40a2f0a1bb61a70b9ff8a7da925ab1db7f74) )
 	ROM_LOAD( "galxwars.1",   0x0400, 0x0400, CRC(a810b258) SHA1(030a72fffcf240f643bc3006028cb4883cf58bbc) )
 	ROM_LOAD( "galxwars.2",   0x0800, 0x0400, CRC(74f31781) SHA1(1de70e8ebbb26eea20ffedb7bd0ca051a67f45e7) )
@@ -2710,7 +2754,7 @@ ROM_START( galxwart )
 ROM_END
 
 ROM_START( starw )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "roma",         0x0000, 0x0400, CRC(60e8993c) SHA1(0bdf163ff0f2e6a8771987d4e7ac604c45af21b8) )
 	ROM_LOAD( "romb",         0x0400, 0x0400, CRC(b8060773) SHA1(92aa358c338ef8f5773bccada8988d068764e7ea) )
 	ROM_LOAD( "romc",         0x0800, 0x0400, CRC(307ce6b8) SHA1(f4b6f54db3d2377ec27d62d33fa1c4946559a092) )
@@ -2720,7 +2764,7 @@ ROM_START( starw )
 ROM_END
 
 ROM_START( lrescue )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lrescue.1",    0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) )
 	ROM_LOAD( "lrescue.2",    0x0800, 0x0800, CRC(49e79706) SHA1(bed675bb97d59ae0132c007ccead0d096ed2ddf1) )
 	ROM_LOAD( "lrescue.3",    0x1000, 0x0800, CRC(1ac969be) SHA1(67ac47f45b9fa5c530bf6047bb7d5776b52847be) )
@@ -2734,7 +2778,7 @@ ROM_START( lrescue )
 ROM_END
 
 ROM_START( grescue )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lrescue.1",    0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) )
 	ROM_LOAD( "lrescue.2",    0x0800, 0x0800, CRC(49e79706) SHA1(bed675bb97d59ae0132c007ccead0d096ed2ddf1) )
 	ROM_LOAD( "lrescue.3",    0x1000, 0x0800, CRC(1ac969be) SHA1(67ac47f45b9fa5c530bf6047bb7d5776b52847be) )
@@ -2748,7 +2792,7 @@ ROM_START( grescue )
 ROM_END
 
 ROM_START( desterth )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "36_h.bin",     0x0000, 0x0800, CRC(f86923e5) SHA1(d19935ba3d2c1c2553b3779f1a7ad8856c003dae) )
 	ROM_LOAD( "35_g.bin",     0x0800, 0x0800, CRC(797f440d) SHA1(a96917f2296ae467acc795eacc1533a2a2d2f401) )
 	ROM_LOAD( "34_f.bin",     0x1000, 0x0800, CRC(993d0846) SHA1(6be0c45add41fa7e43cac96c776cd0ebb45ade7b) )
@@ -2763,7 +2807,7 @@ ROM_START( desterth )
 ROM_END
 
 ROM_START( lrescuem )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "48.ic36",    0x0000, 0x0400, CRC(bad5ba48) SHA1(6d8a2df172e058d16f196ad7f29430e9fd1fdaa8) )
 	ROM_LOAD( "49.ic35",    0x0400, 0x0400, CRC(a6dc23d6) SHA1(76b9105935bf239ae90b47900f64dac3032ceecd) )
 	ROM_LOAD( "50.ic34",    0x0800, 0x0400, CRC(90179fee) SHA1(35059f7399229b8d9588d34f79073fa4d3301614) )
@@ -2783,7 +2827,7 @@ ROM_START( lrescuem )
 ROM_END
 
 ROM_START( cosmo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.36",         0x0000, 0x0800, CRC(445c9a98) SHA1(89bce80a061e9c12544231f970d9dec801eb1b94) )
 	ROM_LOAD( "2.35",         0x0800, 0x0800, CRC(df3eb731) SHA1(fb90c1d0f2518195dd49062c9f0fd890536d89f4) )
 	ROM_LOAD( "3.34",         0x1000, 0x0800, CRC(772c813f) SHA1(a1c0d857c660fb0b838dd0466af7bf5d73bcd55d) )
@@ -2798,7 +2842,7 @@ ROM_START( cosmo )
 ROM_END
 
 ROM_START( cosmicmo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cosmicmo.1",   0x0000, 0x0400, CRC(d6e4e5da) SHA1(8b4275a3c71ac3fa80d17237dc04de5f586645f4) )
 	ROM_LOAD( "cosmicmo.2",   0x0400, 0x0400, CRC(8f7988e6) SHA1(b6a01d5dcab013350f8f7f3e3ebfc986bb939fe0) )
 	ROM_LOAD( "cosmicmo.3",   0x0800, 0x0400, CRC(2d2e9dc8) SHA1(dd3da4fc752e003e5e7c64bf189288133aed545b) )
@@ -2809,13 +2853,13 @@ ROM_START( cosmicmo )
 ROM_END
 
 ROM_START( cosmicm2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "3907.bin",   0x0000, 0x1000, CRC(bbffede6) SHA1(e7505ee8e3f19557ebbfd0145dc2ae0d1c529eba) )
 	ROM_LOAD( "3906.bin",   0x4000, 0x1000, CRC(b841f894) SHA1(b1f9e1800969baab14da2fd8873b58d4707b7236) )
 ROM_END
 
 ROM_START( superinv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )             /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "00",           0x0000, 0x0400, CRC(7a9b4485) SHA1(dde918ec106971972bf7c7e5085c1262522f7e35) )
 	ROM_LOAD( "01",           0x0400, 0x0400, CRC(7c86620d) SHA1(9e92ec0aa4eee96a7fa115a14a611c488d13b9dd) )
 	ROM_LOAD( "02",           0x0800, 0x0400, CRC(ccaf38f6) SHA1(8eb0456e8abdba0d1dda20a335a9ecbe7c38f9ed) )
@@ -2825,7 +2869,7 @@ ROM_START( superinv )
 ROM_END
 
 ROM_START( invasion )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )             /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "10136-0.0k",   0x0000, 0x0400, CRC(7a9b4485) SHA1(dde918ec106971972bf7c7e5085c1262522f7e35) )
 	ROM_LOAD( "10136-1.1k",   0x0400, 0x0400, CRC(7c86620d) SHA1(9e92ec0aa4eee96a7fa115a14a611c488d13b9dd) )
 	ROM_LOAD( "10136-2.2k",   0x0800, 0x0400, CRC(ccaf38f6) SHA1(8eb0456e8abdba0d1dda20a335a9ecbe7c38f9ed) )
@@ -2835,7 +2879,7 @@ ROM_START( invasion )
 ROM_END
 
 ROM_START( rollingc )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rc01.bin",     0x0000, 0x0400, CRC(66fa50bf) SHA1(7451d4ff8d3b351a324aaecdbdc5b46672f5fdd0) )
 	ROM_LOAD( "rc02.bin",     0x0400, 0x0400, CRC(61c06ae4) SHA1(7685c806e20e4a4a0508a547ac08ca8f6d75bb79) )
 	ROM_LOAD( "rc03.bin",     0x0800, 0x0400, CRC(77e39fa0) SHA1(16bf88af1b97c5a2a81e105af08b8d9d1f10dcc8) )
@@ -2852,7 +2896,7 @@ ROM_START( rollingc )
 ROM_END
 
 ROM_START( schaser )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rt13.bin",     0x0000, 0x0400, CRC(0dfbde68) SHA1(7367b138ad8448aba9222fed632a892df65cecbd) )
 	ROM_LOAD( "rt14.bin",     0x0400, 0x0400, CRC(5a508a25) SHA1(c681d0bbf49317e79b596fb094e66b8912f0e409) )
 	ROM_LOAD( "rt15.bin",     0x0800, 0x0400, CRC(2ac43a93) SHA1(d364f0940681a888c0147e06bcb01f8a0d4a24c8) )
@@ -2864,7 +2908,7 @@ ROM_START( schaser )
 	ROM_LOAD( "rt21.bin",     0x4000, 0x0400, CRC(b368ac98) SHA1(6860efe0496955db67611183be0efecda92c9c98) )
 	ROM_LOAD( "rt22.bin",     0x4400, 0x0400, CRC(6e060dfb) SHA1(614e2ecf676c3ea2f9ea869125cfffef2f713684) )
 
-	ROM_REGION( 0x0800, REGION_PROMS, 0 )		/* background color map */
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )		/* background color map */
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
 ROM_END
 
@@ -2878,7 +2922,7 @@ ROM_START( sflush )
 ROM_END
 
 ROM_START( schasrcv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1",     		  0x0000, 0x0400, CRC(bec2b16b) SHA1(c62210ecb64d7c38e5b63481d7fe04eb59bb1068) )
 	ROM_LOAD( "2",     		  0x0400, 0x0400, CRC(9d25e608) SHA1(4cc52a93a3ab96a0ec1d07593e17832fa59b30a1) )
 	ROM_LOAD( "3",     		  0x0800, 0x0400, CRC(113d0635) SHA1(ab5e98d0b5fc37d7d69bb5c541681a0f66460440) )
@@ -2896,7 +2940,7 @@ ROM_START( schasrcv )
 ROM_END
 
 ROM_START( lupin3 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lp12.bin",     0x0000, 0x0800, CRC(68a7f47a) SHA1(dce99b3810331d7603fa468f1dea984e571f709b) )
 	ROM_LOAD( "lp13.bin",     0x0800, 0x0800, CRC(cae9a17b) SHA1(a333ba7db45325996e3254ab36162bb7577e8a38) )
 	ROM_LOAD( "lp14.bin",     0x1000, 0x0800, CRC(3553b9e4) SHA1(6affb5b6caf08f365c0dce669e44046295c3df91) )
@@ -2907,7 +2951,7 @@ ROM_START( lupin3 )
 ROM_END
 
 ROM_START( polaris )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ps-01",        0x0000, 0x0800, CRC(c04ce5a9) SHA1(62cc9b3b682ebecfb7600393862c65e26ff5263f) )
 	ROM_LOAD( "ps-09",        0x0800, 0x0800, CRC(9a5c8cb2) SHA1(7a8c5d74f8b431072d9476d3ef65a3fe1d639813) )
 	ROM_LOAD( "ps-08",        0x1000, 0x0800, CRC(8680d7ea) SHA1(7fd4b8a415666c36842fed80d2798b48f8b29d0d) )
@@ -2923,7 +2967,7 @@ ROM_START( polaris )
 ROM_END
 
 ROM_START( polarisa )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ps01-1",       0x0000, 0x0800, CRC(7d41007c) SHA1(168f002fe997aac6e4141292de826d389859bb04) )
 	ROM_LOAD( "ps-09",        0x0800, 0x0800, CRC(9a5c8cb2) SHA1(7a8c5d74f8b431072d9476d3ef65a3fe1d639813) )
 	ROM_LOAD( "ps03-1",       0x1000, 0x0800, CRC(21f32415) SHA1(6ac9ae9b55e342729fe260147021ed3911a24dc2) )
@@ -2940,7 +2984,7 @@ ROM_START( polarisa )
 ROM_END
 
 ROM_START( ozmawars )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "mw01",         0x0000, 0x0800, CRC(31f4397d) SHA1(bba9765aadd608d19e2515a5edf8e0eceb70916a) )
 	ROM_LOAD( "mw02",         0x0800, 0x0800, CRC(d8e77c62) SHA1(84fc81cf9a924ecbb13a008cd7435b7d465bddf6) )
 	ROM_LOAD( "mw03",         0x1000, 0x0800, CRC(3bfa418f) SHA1(7318878202322a2263551ca463e4c70943401f68) )
@@ -2950,7 +2994,7 @@ ROM_START( ozmawars )
 ROM_END
 
 ROM_START( ozmawar2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "mw01",         0x0000, 0x0800, CRC(31f4397d) SHA1(bba9765aadd608d19e2515a5edf8e0eceb70916a) )
 	ROM_LOAD( "mw02",         0x0800, 0x0800, CRC(d8e77c62) SHA1(84fc81cf9a924ecbb13a008cd7435b7d465bddf6) )
 	ROM_LOAD( "oz5",          0x1000, 0x0400, CRC(5597bf52) SHA1(626c7348365ed974d416485d94d057745b5d9b96) )
@@ -2963,7 +3007,7 @@ ROM_START( ozmawar2 )
 ROM_END
 
 ROM_START( solfight )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "solfight.m",   0x0000, 0x0800, CRC(a4f2814e) SHA1(e2437e3543dcc97eeaea32babcd4aec6455581ac) )
 	ROM_LOAD( "solfight.n",   0x0800, 0x0800, CRC(5657ec07) SHA1(9a2fb398841160f59483bb70060caba37addb8a4) )
 	ROM_LOAD( "solfight.p",   0x1000, 0x0800, CRC(ef9ce96d) SHA1(96867b4f2d72f3a8827b1eb3a0748922eaa8d608) )
@@ -2973,7 +3017,7 @@ ROM_START( solfight )
 ROM_END
 
 ROM_START( spaceph )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sv01.bin",     0x0000, 0x0400, CRC(de84771d) SHA1(13a7e5eedb826cca4d59634d38db9fcf5e65b732) )
 	ROM_LOAD( "sv02.bin",     0x0400, 0x0400, CRC(957fc661) SHA1(ac0edc901d8033619f62967f8eaf53a02947e109) )
 	ROM_LOAD( "sv03.bin",     0x0800, 0x0400, CRC(dbda38b9) SHA1(73a277616a0c236b07c9ffa66f16a27a78c12d70) )
@@ -2989,7 +3033,7 @@ ROM_START( spaceph )
 ROM_END
 
 ROM_START( ballbomb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tn01",         0x0000, 0x0800, CRC(551585b5) SHA1(7c17b046bdfca6ab107b7e68ba9bde6ca590c3d4) )
 	ROM_LOAD( "tn02",         0x0800, 0x0800, CRC(7e1f734f) SHA1(a15656818cd730d9bc98d00ff1e7fe3f860bd624) )
 	ROM_LOAD( "tn03",         0x1000, 0x0800, CRC(d93e20bc) SHA1(2bf72f813750cef8fad572a18fb8e9fd5bf38804) )
@@ -2999,10 +3043,13 @@ ROM_START( ballbomb )
 	ROM_REGION( 0x0800, REGION_PROMS, 0 )		/* color maps player 1/player 2 */
 	ROM_LOAD( "tn06",         0x0000, 0x0400, CRC(7ec554c4) SHA1(b638605ba2043fdca4c5e18755fa5fa81ed3db07) )
 	ROM_LOAD( "tn07",         0x0400, 0x0400, CRC(deb0ac82) SHA1(839581c4e58cb7b0c2c14cf4f239220017cc26eb) )
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )		/* cloud graphics (missing) */
+	ROM_LOAD( "mb7052.2c",    0x0000, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( yosakdon )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "yd1.bin", 	  0x0000, 0x0400, CRC(607899c9) SHA1(219c0c99894715818606fba49cc75517f6f43e0c) )
 	ROM_LOAD( "yd2.bin", 	  0x0400, 0x0400, CRC(78336df4) SHA1(b0b6254568d191d2d0b9c9280a3ccf2417ef3f38) )
 	ROM_LOAD( "yd3.bin", 	  0x0800, 0x0400, CRC(c5af6d52) SHA1(c40af79fe060562c64fc316881b7d0348e11ee3f) )
@@ -3013,7 +3060,7 @@ ROM_START( yosakdon )
 ROM_END
 
 ROM_START( yosakdoa )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "yosaku1",      0x0000, 0x0400, CRC(d132f4f0) SHA1(373c7ea1bd6debcb3dad5881793b8c31dc7a01e6) )
 	ROM_LOAD( "yd2.bin", 	  0x0400, 0x0400, CRC(78336df4) SHA1(b0b6254568d191d2d0b9c9280a3ccf2417ef3f38) )
 	ROM_LOAD( "yosaku3",      0x0800, 0x0400, CRC(b1a0b3eb) SHA1(4eb80668920b45dc6216424f8ca53d753a35f4f1) )
@@ -3024,7 +3071,7 @@ ROM_START( yosakdoa )
 ROM_END
 
 ROM_START( sstrangr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "hss-01.58",     0x0000, 0x0400, CRC(feec7600) SHA1(787a6be4e24ce931e7678e777699b9f6789bc199) )
 	ROM_LOAD( "hss-02.59",     0x0400, 0x0400, CRC(7281ff0b) SHA1(56649d1362be1b9f517cb8616cbf9e4f955e9a2d) )
 	ROM_LOAD( "hss-03.60",     0x0800, 0x0400, CRC(a09ec572) SHA1(9c4ad811a6c0460403f9cdc9fe5381c460249ff5) )
@@ -3036,7 +3083,7 @@ ROM_START( sstrangr )
 ROM_END
 
 ROM_START( sstrngr2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "4764.09",      0x0000, 0x2000, CRC(d88f86cc) SHA1(9f284ee50caf3c64bd04a79a798de620348881bc) )
 	ROM_LOAD( "2708.10",      0x6000, 0x0400, CRC(eba304c1) SHA1(3fa6fbb29fa46c146283f69a712bfc51cbb2a43c) )
 
@@ -3045,7 +3092,7 @@ ROM_START( sstrngr2 )
 ROM_END
 
 ROM_START( indianbt )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.36",       0x0000, 0x0800, CRC(ddc2b25d) SHA1(120ae17492b79d7d2ad515de9f1e3be7f8b9d4eb) )
 	ROM_LOAD( "2.35",       0x0800, 0x0800, CRC(6499b062) SHA1(62a301d532b9fc4e7a17cbe8d2061eb0e842bdfa) )
 	ROM_LOAD( "3.34",       0x1000, 0x0800, CRC(5c51675d) SHA1(1313e8794ee6cd0252452b96d42cff7907eeaa21) )
@@ -3083,69 +3130,69 @@ ROM_END
 
 
 
-/* board #        rom       parent    machine   inp       init (overlay/color hardware setup) */
+/* board #        rom       parent    machine   inp */
 
 /* Taito games */
-	  GAMEL(1978, sitv,     invaders, invaders, sitv,     8080bw,   ROT270, "Taito", "Space Invaders (TV Version)", 0, layout_invaders )
-	  GAME( 1979, sicv,     invaders, invadpt2, sicv,     invadpt2, ROT270, "Taito", "Space Invaders (CV Version)", 0 )
-	  GAME( 1978, sisv,     invaders, invadpt2, sicv,     invadpt2, ROT270, "Taito", "Space Invaders (SV Version)", 0 )
-	  GAME( 1978, sisv2,    invaders, invadpt2, sicv,     invadpt2, ROT270, "Taito", "Space Invaders (SV Version 2)", 0 )
-	  GAMEL(1979, galxwars, 0,        invaders, galxwars, 8080bw,   ROT270, "Universal", "Galaxy Wars (Universal set 1)", 0, layout_invaders )
-	  GAMEL(1979, galxwar2, galxwars, invaders, galxwars, 8080bw,   ROT270, "Universal", "Galaxy Wars (Universal set 2)", 0, layout_invaders )
-	  GAMEL(1979, galxwart, galxwars, invaders, galxwars, 8080bw,   ROT270,	"Taito?", "Galaxy Wars (Taito?)" , 0, layout_invaders) /* Copyright Not Displayed */
-	  GAMEL(1979, starw,    galxwars, invaders, galxwars, 8080bw,   ROT270, "bootleg", "Star Wars", 0, layout_invaders )
-	  GAME( 1979, lrescue,  0,        lrescue,  lrescue,  invadpt2, ROT270, "Taito", "Lunar Rescue", 0 )
-	  GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  invadpt2, ROT270, "Taito (Model Racing bootleg)", "Lunar Rescue (Model Racing bootleg)", 0 )
-	  GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  invadpt2, ROT270, "Taito (Universal license?)", "Galaxy Rescue", 0 )
-	  GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, invadpt2, ROT270, "bootleg", "Destination Earth", 0 )
-	  GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, invadpt2, ROT270, "Taito", "Space Invaders Part II (Taito)", 0 )
-      GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, invaddlx, ROT270, "Midway", "Space Invaders Deluxe", 0 )
-	  GAME( 1979, cosmo,    0,        cosmo,    cosmo,    cosmo,    ROT90,  "TDS & Mints", "Cosmo", GAME_IMPERFECT_SOUND )
-	  GAME( 1979, schaser,  0,        schaser,  schaser,  schaser,  ROT270, "Taito", "Space Chaser", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-	  GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, schasrcv, ROT270, "Taito", "Space Chaser (CV version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-	  GAME( 1979, sflush,   0,        sflush,   sflush,   rollingc,	ROT270, "Taito", "Straight Flush",GAME_NO_SOUND| GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
-	  GAME( 1980, lupin3,   0,        lupin3,   lupin3,   lupin3,   ROT270, "Taito", "Lupin III", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-	  GAME( 1980, polaris,  0,        polaris,  polaris,  polaris,  ROT270, "Taito", "Polaris (set 1)", 0 )
-	  GAME( 1980, polarisa, polaris,  polaris,  polaris,  polaris,  ROT270, "Taito", "Polaris (set 2)", 0 )
-	  GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, invadpt2, ROT270, "Taito", "Balloon Bomber", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )	/* missing clouds and blue background */
-	  GAME( 1980, indianbt, 0,        indianbt, indianbt, indianbt, ROT270, "Taito", "Indian Battle", 0 )
+	  GAMEL(1978, sitv,     invaders, invaders, sitv,     0, ROT270, "Taito", "Space Invaders (TV Version)", 0, layout_invaders )
+	  GAME( 1979, sicv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (CV Version)", 0 )
+	  GAME( 1978, sisv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version)", 0 )
+	  GAME( 1978, sisv2,    invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version 2)", 0 )
+	  GAMEL(1979, galxwars, 0,        invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", 0, layout_invaders )
+	  GAMEL(1979, galxwar2, galxwars, invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", 0, layout_invaders )
+	  GAMEL(1979, galxwart, galxwars, invaders, galxwars, 0, ROT270, "Taito?", "Galaxy Wars (Taito?)" , 0, layout_invaders) /* Copyright Not Displayed */
+	  GAMEL(1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", 0, layout_invaders )
+	  GAME( 1979, lrescue,  0,        lrescue,  lrescue,  0, ROT270, "Taito", "Lunar Rescue", 0 )
+	  GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Model Racing bootleg)", "Lunar Rescue (Model Racing bootleg)", 0 )
+	  GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", 0 )
+	  GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", 0 )
+	  GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", 0 )
+      GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Midway", "Space Invaders Deluxe", 0 )
+	  GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_IMPERFECT_SOUND )
+	  GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_IMPERFECT_SOUND| GAME_IMPERFECT_COLORS )
+	  GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+	  GAME( 1979, sflush,   0,        sflush,   sflush,   0, ROT270, "Taito", "Straight Flush",GAME_NO_SOUND| GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
+	  GAME( 1980, lupin3,   0,        lupin3,   lupin3,   0, ROT270, "Taito", "Lupin III", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+	  GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 1)", 0 )
+	  GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 2)", 0 )
+	  GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, 0, ROT270, "Taito", "Balloon Bomber", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )	/* missing clouds */
+	  GAME( 1980, indianbt, 0,        indianbt, indianbt, 0, ROT270, "Taito", "Indian Battle", 0 )
 
 /* Misc. manufacturers */
 
-	  GAMEL(1980, searthin, invaders, invaders, earthinv, 8080bw,   ROT270, "bootleg", "Super Earth Invasion (set 1)", 0, layout_invaders )
-	  GAMEL(1980, searthia, invaders, invaders, earthinv, 8080bw,   ROT270, "bootleg", "Super Earth Invasion (set 2)", 0, layout_invaders )
-	  GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 8080bw,   ROT270, "Model Racing", "Space Invaders (Model Racing)", 0, layout_invaders )
-	  GAMEL(1978, spaceatt, invaders, invaders, sicv,     8080bw,   ROT270, "Video Games GMBH", "Space Attack", 0, layout_invaders )
-	  GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 8080bw,   ROT270, "Zenitone-Microsec Ltd", "Space Attack II", 0, layout_invaders )
-	  GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 8080bw,   ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", 0, layout_invaders )
-	  GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 8080bw,   ROT270, "bootleg", "Super Invaders (EMAG)", 0, layout_invaders )
-	  GAMEL(19??, tst_invd, invaders, invaders, sicv,     8080bw,   ROT0,   "Test ROM", "Space Invaders Test ROM", 0, layout_invaders )
-	  GAMEL(19??, alieninv, invaders, invaders, earthinv, 8080bw,   ROT270, "bootleg", "Alien Invasion Part II", 0, layout_invaders )
-	  GAMEL(1978, spceking, invaders, invaders, sicv,     8080bw,   ROT270, "Leijac (Konami)","Space King", 0, layout_invaders )
-	  GAMEL(1978, spcewars, invaders, spcewars, spcewars, 8080bw,   ROT270, "Sanritsu", "Space War (Sanritsu)", 0, layout_invaders )
-	  GAMEL(1978, spacewr3, invaders, spcewars, sicv,     8080bw,   ROT270, "bootleg", "Space War Part 3", 0, layout_invaders )
-	  GAMEL(1978, invaderl, invaders, invaders, sicv,     8080bw,   ROT270, "bootleg", "Space Invaders (Logitec)", 0, layout_invaders )
-	  GAMEL(1978, invader4, invaders, invaders, sicv,     8080bw,   ROT270, "bootleg", "Space Invaders Part Four", 0, layout_invaders )
-	  GAMEL(1979, jspecter, invaders, invaders, jspecter, 8080bw,   ROT270, "Jatre", "Jatre Specter (set 1)", 0, layout_invaders )
-	  GAMEL(1979, jspectr2, invaders, invaders, jspecter, 8080bw,   ROT270, "Jatre", "Jatre Specter (set 2)", 0, layout_invaders )
-	  GAMEL(1979, cosmicmo, invaders, invaders, cosmicmo, 8080bw,   ROT270, "Universal", "Cosmic Monsters", 0, layout_invaders )
-	  GAMEL(1979, cosmicm2, invaders, invaders, cosmicmo, 8080bw,   ROT270, "Universal", "Cosmic Monsters 2", 0, layout_invaders )
-	  GAMEL(19??, superinv, invaders, invaders, superinv, 8080bw,   ROT270, "bootleg", "Super Invaders", 0, layout_invaders )
-	  GAMEL(19??, invasion, invaders, invaders, invasion, 8080bw,   ROT270, "Sidam", "Invasion", 0, layout_invaders )
-	  GAME( 1978, sstrangr, 0,	      sstrangr, sstrangr, 8080bw,   ROT270,	"Yachiyo Electronics, Ltd.", "Space Stranger", 0 )
-	  GAME( 1979, sstrngr2, 0,        sstrngr2, sstrngr2, sstrngr2, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", 0 )
-	  GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, invadpt2, ROT270, "Nichibutsu", "Moon Base", 0 )
-	  GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 8080bw,   ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_IMPERFECT_SOUND, layout_invrvnge )
-	  GAMEL(19??, invrvnga, invrvnge, invrvnge, invrvnge, 8080bw,   ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_IMPERFECT_SOUND, layout_invrvnge )
-	  GAME( 1980, spclaser, 0,        invaders, spclaser, invaddlx, ROT270, "GamePlan (Taito)", "Space Laser", 0 )
-	  GAME( 1980, laser,    spclaser, invaders, spclaser, invaddlx, ROT270, "Leisure Time Electronics Inc.", "Astro Laser", 0 )
-	  GAME( 1979, spcewarl, spclaser, invaders, spcewarl, invaddlx, ROT270, "Leijac (Konami)","Space War (Leijac)", 0 )
-	  GAME( 1979, rollingc, 0,        rollingc, rollingc, rollingc, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", 0 )
-	  GAME( 1979, ozmawars, 0,        invaders, ozmawars, 8080bw,   ROT270, "SNK", "Ozma Wars (set 1)", 0 )
-	  GAME( 1979, ozmawar2, ozmawars, invaders, ozmawars, 8080bw,   ROT270, "SNK", "Ozma Wars (set 2)" , 0) /* Uses Taito's three board colour version of Space Invaders PCB */
-	  GAME( 1979, solfight, ozmawars, invaders, ozmawars, 8080bw,   ROT270, "bootleg", "Solar Fight", 0 )
-	  GAME( 1979, spaceph,  ozmawars, invaders, spaceph,  8080bw,   ROT270, "Zilec Games", "Space Phantoms", 0 )
-	  GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, 8080bw,   ROT270, "Wing", "Yosaku To Donbei (set 1)", GAME_IMPERFECT_SOUND ) /* bootleg? */
-	  GAME( 1979, yosakdoa, yosakdon, yosakdon, yosakdon, 8080bw,   ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_IMPERFECT_SOUND ) /* bootleg? */
-	  GAME( 197?, shuttlei, 0,  	  shuttlei, shuttlei, shuttlei, ROT270, "Omori", "Shuttle Invader", GAME_NO_COCKTAIL )
-	  GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 8080bw,   ROT270, "bootleg", "Darth Vader", GAME_NO_SOUND )
+	  GAMEL(1980, searthin, invaders, invaders, earthinv, 0, ROT270, "bootleg", "Super Earth Invasion (set 1)", 0, layout_invaders )
+	  GAMEL(1980, searthia, invaders, invaders, earthinv, 0, ROT270, "bootleg", "Super Earth Invasion (set 2)", 0, layout_invaders )
+	  GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 0, ROT270, "Model Racing", "Space Invaders (Model Racing)", 0, layout_invaders )
+	  GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "Video Games GMBH", "Space Attack", 0, layout_invaders )
+	  GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Space Attack II", 0, layout_invaders )
+	  GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", 0, layout_invaders )
+	  GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", 0, layout_invaders )
+	  GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Space Invaders Test ROM", 0, layout_invaders )
+	  GAMEL(19??, alieninv, invaders, invaders, earthinv, 0, ROT270, "bootleg", "Alien Invasion Part II", 0, layout_invaders )
+	  GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac (Konami)","Space King", 0, layout_invaders )
+	  GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", 0, layout_invaders )
+	  GAMEL(1978, spacewr3, invaders, spcewars, sicv,     0, ROT270, "bootleg", "Space War Part 3", 0, layout_invaders )
+	  GAMEL(1978, invaderl, invaders, invaders, sicv,     0, ROT270, "bootleg", "Space Invaders (Logitec)", 0, layout_invaders )
+	  GAMEL(1978, invader4, invaders, invaders, sicv,     0, ROT270, "bootleg", "Space Invaders Part Four", 0, layout_invaders )
+	  GAMEL(1979, jspecter, invaders, invaders, jspecter, 0, ROT270, "Jatre", "Jatre Specter (set 1)", 0, layout_invaders )
+	  GAMEL(1979, jspectr2, invaders, invaders, jspecter, 0, ROT270, "Jatre", "Jatre Specter (set 2)", 0, layout_invaders )
+	  GAMEL(1979, cosmicmo, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters", 0, layout_invaders )
+	  GAMEL(1979, cosmicm2, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters 2", 0, layout_invaders )
+	  GAMEL(19??, superinv, invaders, invaders, superinv, 0, ROT270, "bootleg", "Super Invaders", 0, layout_invaders )
+	  GAMEL(19??, invasion, invaders, invaders, invasion, 0, ROT270, "Sidam", "Invasion", 0, layout_invaders )
+	  GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth Vader", GAME_NO_SOUND )
+	  GAME( 1978, sstrangr, 0,	      sstrangr, sstrangr, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger", 0 )
+	  GAME( 1979, sstrngr2, sstrangr, sstrngr2, sstrngr2, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", 0 )
+	  GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base", 0 )
+	  GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_IMPERFECT_SOUND, layout_invrvnge )
+	  GAMEL(19??, invrvnga, invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_IMPERFECT_SOUND, layout_invrvnge )
+	  GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "GamePlan (Taito)", "Space Laser", 0 )
+	  GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "Leisure Time Electronics Inc.", "Astro Laser", 0 )
+	  GAME( 1979, spcewarl, spclaser, invaders, spcewarl, 0, ROT270, "Leijac (Konami)","Space War (Leijac)", 0 )
+	  GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", 0 )
+	  GAME( 1979, ozmawars, 0,        invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 1)", 0 )
+	  GAME( 1979, ozmawar2, ozmawars, invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 2)" , 0) /* Uses Taito's three board color version of Space Invaders PCB */
+	  GAME( 1979, solfight, ozmawars, invaders, ozmawars, 0, ROT270, "bootleg", "Solar Fight", 0 )
+	  GAME( 1979, spaceph,  ozmawars, invaders, spaceph,  0, ROT270, "Zilec Games", "Space Phantoms", 0 )
+	  GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 1)", GAME_IMPERFECT_SOUND ) /* bootleg? */
+	  GAME( 1979, yosakdoa, yosakdon, yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_IMPERFECT_SOUND ) /* bootleg? */
+	  GAME( 197?, shuttlei, 0,  	  shuttlei, shuttlei, 0, ROT270, "Omori", "Shuttle Invader", GAME_NO_COCKTAIL )

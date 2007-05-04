@@ -24,10 +24,7 @@ SOUND : (none)
 #include "cpu/z80/z80.h"
 
 
-WRITE8_HANDLER( dotrikun_videoram_w );
 VIDEO_UPDATE( dotrikun );
-VIDEO_START( dotrikun );
-
 WRITE8_HANDLER( dotrikun_color_w );
 
 
@@ -38,7 +35,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(dotrikun_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
@@ -78,13 +75,11 @@ static MACHINE_DRIVER_START( dotrikun )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_VIDEO_UPDATE(dotrikun)
+
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MDRV_PALETTE_LENGTH(2)
-
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(dotrikun)
 
 	/* sound hardware */
 MACHINE_DRIVER_END

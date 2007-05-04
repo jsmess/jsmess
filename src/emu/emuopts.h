@@ -101,6 +101,7 @@
 #define OPTION_CTRLR				"ctrlr"
 
 /* core debugging options */
+#define OPTION_VERBOSE				"verbose"
 #define OPTION_LOG					"log"
 #define OPTION_DEBUG				"debug"
 #define OPTION_DEBUGSCRIPT			"debugscript"

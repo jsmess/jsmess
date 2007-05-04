@@ -221,7 +221,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/lazercmd.h"
+#include "lazercmd.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 
@@ -307,11 +307,9 @@ static WRITE8_HANDLER( lazercmd_hardware_w )
 			}
 			break;
 		case 1: /* marker Y position */
-			lazercmd_marker_dirty(0); /* mark old position dirty */
 			marker_y = data;
 			break;
 		case 2: /* marker X position */
-			lazercmd_marker_dirty(0); /* mark old position dirty */
 			marker_x = data;
 			break;
 		case 3: /* D4 clears coin detected and D0 toggles on attract mode */
@@ -340,11 +338,9 @@ static WRITE8_HANDLER( medlanes_hardware_w )
 			}
 			break;
 		case 1: /* marker Y position */
-			lazercmd_marker_dirty(0); /* mark old position dirty */
 			marker_y = data;
 			break;
 		case 2: /* marker X position */
-			lazercmd_marker_dirty(0); /* mark old position dirty */
 			marker_x = data;
 			break;
 		case 3: /* D4 clears coin detected and D0 toggles on attract mode */
@@ -421,7 +417,7 @@ static READ8_HANDLER( lazercmd_hardware_r )
 static ADDRESS_MAP_START( lazercmd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(lazercmd_hardware_w)
 	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
 ADDRESS_MAP_END
@@ -431,7 +427,7 @@ static ADDRESS_MAP_START( medlanes_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(medlanes_hardware_w)
 	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
 ADDRESS_MAP_END
@@ -440,7 +436,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbonk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(bbonk_hardware_w)
 	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
 ADDRESS_MAP_END
@@ -644,7 +640,6 @@ static MACHINE_DRIVER_START( lazercmd )
 	MDRV_COLORTABLE_LENGTH(2*2)
 
 	MDRV_PALETTE_INIT(lazercmd)
-	MDRV_VIDEO_START(lazercmd)
 	MDRV_VIDEO_UPDATE(lazercmd)
 
 	/* sound hardware */
@@ -681,7 +676,6 @@ static MACHINE_DRIVER_START( medlanes )
 	MDRV_COLORTABLE_LENGTH(2*2)
 
 	MDRV_PALETTE_INIT(lazercmd)
-	MDRV_VIDEO_START(lazercmd)
 	MDRV_VIDEO_UPDATE(lazercmd)
 
 	/* sound hardware */
@@ -718,7 +712,6 @@ static MACHINE_DRIVER_START( bbonk )
 	MDRV_COLORTABLE_LENGTH(2*2)
 
 	MDRV_PALETTE_INIT(lazercmd)
-	MDRV_VIDEO_START(lazercmd)
 	MDRV_VIDEO_UPDATE(lazercmd)
 
 	/* sound hardware */

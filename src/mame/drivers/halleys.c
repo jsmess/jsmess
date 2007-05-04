@@ -1960,7 +1960,7 @@ static MACHINE_DRIVER_START( halleys )
 	MDRV_CPU_ADD(Z80, 6000000/2) // 3MHz(6MHz XTAL)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, TIME_IN_NSEC(27306667)) // 6000000/(4*16*16*10*16) = 36.621Hz(27306667ns period)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2234,8 +2234,7 @@ static DRIVER_INIT( benberob )
 
 	init_common();
 
-	if (!(blitter_reset_timer = timer_alloc(blitter_reset)))
-		fatalerror("timer_alloc failed");
+	blitter_reset_timer = timer_alloc(blitter_reset);
 }
 
 

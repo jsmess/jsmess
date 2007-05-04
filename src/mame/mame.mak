@@ -1275,7 +1275,6 @@ $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/shanghai.o \
 	$(DRIVERS)/shangha3.o $(VIDEO)/shangha3.o \
 	$(DRIVERS)/strnskil.o $(VIDEO)/strnskil.o \
-	$(DRIVERS)/ttmahjng.o $(VIDEO)/ttmahjng.o \
 
 $(MAMEOBJ)/suna.a: \
 	$(DRIVERS)/goindol.o $(VIDEO)/goindol.o \
@@ -1319,7 +1318,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/lsasquad.o $(MACHINE)/lsasquad.o $(VIDEO)/lsasquad.o \
 	$(DRIVERS)/marinedt.o \
 	$(DRIVERS)/mexico86.o $(MACHINE)/mexico86.o $(VIDEO)/mexico86.o \
-	$(DRIVERS)/minivadr.o $(VIDEO)/minivadr.o \
+	$(DRIVERS)/minivadr.o \
 	$(DRIVERS)/missb2.o \
 	$(DRIVERS)/mlanding.o \
 	$(DRIVERS)/msisaac.o $(VIDEO)/msisaac.o \
@@ -1545,6 +1544,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
+	$(DRIVERS)/gdrawpkr.o \
 	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
@@ -1621,7 +1621,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/turbosub.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
-	$(DRIVERS)/vp906iii.o \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \

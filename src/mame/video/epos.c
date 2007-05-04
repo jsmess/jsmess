@@ -8,12 +8,10 @@
 #include "epos.h"
 
 
-static int current_palette;
+static UINT8 palette;
 
 
 /***************************************************************************
-
-  Convert the color PROMs into a more useable format.
 
   These games has one 32 byte palette PROM, connected to the RGB output this way:
 
@@ -28,47 +26,32 @@ static int current_palette;
 
 ***************************************************************************/
 
-PALETTE_INIT( epos )
+static void get_pens(pen_t *pens)
 {
-	int i;
+	offs_t i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2, r, g, b;
 
-		/* red component */
-		bit0 = (*color_prom >> 7) & 0x01;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		UINT8 data = memory_region(REGION_PROMS)[i];
+
+		bit0 = (data >> 7) & 0x01;
+		bit1 = (data >> 6) & 0x01;
+		bit2 = (data >> 5) & 0x01;
 		r = 0x92 * bit0 + 0x4a * bit1 + 0x23 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 4) & 0x01;
-		bit1 = (*color_prom >> 3) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+
+		bit0 = (data >> 4) & 0x01;
+		bit1 = (data >> 3) & 0x01;
+		bit2 = (data >> 2) & 0x01;
 		g = 0x92 * bit0 + 0x4a * bit1 + 0x23 * bit2;
-		/* blue component */
-		bit0 = (*color_prom >> 1) & 0x01;
-		bit1 = (*color_prom >> 0) & 0x01;
+
+		bit0 = (data >> 1) & 0x01;
+		bit1 = (data >> 0) & 0x01;
 		b = 0xad * bit0 + 0x52 * bit1;
 
-		palette_set_color(machine,i,r,g,b);
-
-		color_prom++;
+		pens[i] = MAKE_RGB(r, g, b);
 	}
-}
-
-
-WRITE8_HANDLER( epos_videoram_w )
-{
-	int x,y;
-
-	videoram[offset] = data;
-
-	x = (offset % 136) * 2;
-	y = (offset / 136);
-
-	*BITMAP_ADDR16(tmpbitmap, y, x + 0) = Machine->pens[current_palette | (data & 0x0f)];
-	*BITMAP_ADDR16(tmpbitmap, y, x + 1) = Machine->pens[current_palette | (data >> 4)];
 }
 
 
@@ -81,39 +64,32 @@ WRITE8_HANDLER( epos_port_1_w )
        D4-D7 - unused
      */
 
-	set_led_status(0, data & 1);
-	set_led_status(1, data & 2);
+	set_led_status(0, (data >> 0) & 0x01);
+	set_led_status(1, (data >> 1) & 0x01);
 
-	coin_counter_w(0, data & 4);
+	coin_counter_w(0, (data >> 2) & 0x01);
 
-	if (current_palette != ((data & 8) << 1))
-	{
-		current_palette = (data & 8) << 1;
-
-		set_vh_global_attribute(NULL,0);
-	}
+	palette = (data >> 3) & 0x01;
 }
 
 
-/***************************************************************************
-
-  Draw the game screen in the given mame_bitmap.
-  To be used by bitmapped games not using sprites.
-
-***************************************************************************/
 VIDEO_UPDATE( epos )
 {
-	if (get_vh_global_attribute_changed())
+	pen_t pens[0x20];
+	offs_t offs;
+
+	get_pens(pens);
+
+	for (offs = 0; offs < videoram_size; offs++)
 	{
-		/* redraw bitmap */
+		UINT8 data = videoram[offs];
 
-		int offs;
+		int x = (offs % 136) * 2;
+		int y = (offs / 136);
 
-		for (offs = 0; offs < videoram_size; offs++)
-		{
-			epos_videoram_w(offs, videoram[offs]);
-		}
+		*BITMAP_ADDR32(bitmap, y, x + 0) = pens[(palette << 4) | (data & 0x0f)];
+		*BITMAP_ADDR32(bitmap, y, x + 1) = pens[(palette << 4) | (data >> 4)];
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+
 	return 0;
 }

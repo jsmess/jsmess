@@ -182,7 +182,7 @@ summary:
    |       |     |        |        |      |        |
 --------  -- --------  ------  -------- ----  --------------------------
 0041      12 87 06 19  895963  bullet   1987  87/06/19 (atypical)
-0045?                          suprleag 1987
+0045      34 97 02 39  384694  suprleag 1987  (atypical)
 0049      F1 87 10 28  8932F7  shinobi2 1987  87/10/28 (atypical)
 0050      F1 87 10 28  8932F7  shinobi1 1987  87/10/28 (atypical)
 0053      00 00 00 00  020000  sonicbom 1987  atypical
@@ -193,7 +193,7 @@ summary:
 0068      20 80 06 10  880610  altbeaj3 1988  88/06/10
 0070      59 80 08 06  880806  passshtj 1988  88/08/06
 0074      47 80 08 06  880806  passshta 1988  88/08/06
-0079?                          exctleag 1989?
+0079      98 80 09 05  880906  exctleag 1988  88/09/05-88/09/06 (atypical)
 0080      96 80 08 26  880826  passsht  1988  88/08/26
 0058-02C  FF 80 10 07  881007  sspirtfc 1988  88/10/07
 0084      0E 80 10 31  881031  wb31     1988  88/10/31
@@ -580,7 +580,7 @@ static int decode(int address,int val,unsigned char *main_key,int gkey1,int gkey
 		if (address <= 1) key_F = 0;
 	}
 
-	global_xor0         = 1^BIT(gkey1,5);	// could be bit 7
+	global_xor0         = 1^BIT(gkey1,5);
 	global_xor1         = 1^BIT(gkey1,2);
 	global_swap2        = 1^BIT(gkey1,0);
 
@@ -592,7 +592,7 @@ static int decode(int address,int val,unsigned char *main_key,int gkey1,int gkey
 	global_swap4        = 1^BIT(gkey3,2);
 
 	key_0a = BIT(mainkey,0) ^ BIT(gkey3,1);
-	key_0b = BIT(mainkey,0) ^ BIT(gkey1,7);	// could be bit 5
+	key_0b = BIT(mainkey,0) ^ BIT(gkey1,7);
 	key_0c = BIT(mainkey,0) ^ BIT(gkey1,1);
 
 	key_1a = BIT(mainkey,1) ^ BIT(gkey2,7);
@@ -730,13 +730,13 @@ int fd1094_set_state(unsigned char *key,int state)
 	}
 	if (state & 0x0004)
 	{
-		global_key1 ^= 0x80;	// key_0b invert - could be 0x20
+		global_key1 ^= 0x80;	// key_0b invert
 		global_key2 ^= 0x40;	// key_6b invert
 		global_key3 ^= 0x04;	// global_swap4
 	}
 	if (state & 0x0008)
 	{
-		global_key1 ^= 0x20;	// global_xor0   - could be 0x80
+		global_key1 ^= 0x20;	// global_xor0
 		global_key2 ^= 0x02;	// key_6a invert
 		global_key3 ^= 0x20;	// key_5a invert
 	}
@@ -771,82 +771,6 @@ int fd1094_set_state(unsigned char *key,int state)
 #ifdef MAME_DEBUG
 
 /*
-
-    static const UINT16 stack00000000_data[] = { 0x0000, 0x0000, 0x0000, 0x0000 };
-    static const UINT16 stack00000000_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
-    static const UINT16 stackffffff00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
-    static const UINT16 stackffffff00_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
-    static const UINT16 stackffffff7e_data[] = { 0xffff, 0xff7e, 0x0000, 0x0000 };
-    static const UINT16 stackffffff7e_mask[] = { 0xffff, 0xffff, 0xffff, 0xc001 };
-    static const UINT16 stack00x0xx00_data[] = { 0xffff, 0xff00, 0x0000, 0x0000 };
-    static const UINT16 stack00x0xx00_mask[] = { 0xff8f, 0x87ff, 0xffff, 0xc001 };
-
-// Possible: global=3CFEFFD8 seed=127114 pc=108E
-static const fd1094_constraint suprleag_constraints[] =
-{
-    // main entry point
-    { 0x001092, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
-    { 0x001094, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
-    { 0x001096, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
-    { 0x001098, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
-    { 0x00109a, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
-
-    // IRQ4 entry point -- this is very similar to fpoint
-    { 0x00042e, FD1094_STATE_IRQ   | 0x00, 0x40d7, 0xffff },    // move    sr,(a7)
-    { 0x000430, FD1094_STATE_IRQ   | 0x00, 0x1ebc, 0xffff },    // move.b  #23,(a7)
-    { 0x000432, FD1094_STATE_IRQ   | 0x00, 0x0023, 0xffff },
-    { 0x000434, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
-    { 0x000436, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
-    // this part is a guess based on the fpoint IRQ handler; it is needed
-    // to further constrain valid results down to a single one
-//  { 0x000438, FD1094_STATE_IRQ   | 0x00, 0x13f8, 0xffff },    // move.b  $xxxx.w,$c40001.l
-//  { 0x00043c, FD1094_STATE_IRQ   | 0x00, 0x00c4, 0xffff },
-//  { 0x00043e, FD1094_STATE_IRQ   | 0x00, 0x0001, 0xffff },
-
-    // IRQ4 exit points (2 of them!)
-    { 0x0004ea, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
-    { 0x0004ec, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
-    { 0x0004ee, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-    { 0x0004f4, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
-    { 0x0004f6, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
-    { 0x0004f8, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-    { 0 }
-};
-
-// Possible: global=98AFF6FA seed=31DDC6 pc=0410
-static const fd1094_constraint exctleag_constraints[] =
-{
-    // main entry point
-    { 0x000410, FD1094_STATE_RESET | 0x00, 0x4ff9, 0xffff },    // lea     $0.l,a7
-    { 0x000412, FD1094_STATE_RESET | 0x00, 0x0000, 0xffff },
-    { 0x000414, FD1094_STATE_RESET | 0x00, 0x0000, 0xffff },
-    { 0x000416, FD1094_STATE_RESET | 0x00, 0x46fc, 0xffff },    // move    #$2700,sr
-    { 0x000418, FD1094_STATE_RESET | 0x00, 0x2700, 0xffff },
-    { 0x00041a, FD1094_STATE_RESET | 0x00, 0x0c80, 0xffff },    // cmpi.l  #$00xxffff,d0
-    { 0x00041c, FD1094_STATE_RESET | 0x00, 0x0000, 0xff00 },
-    { 0x00041e, FD1094_STATE_RESET | 0x00, 0xffff, 0xffff },
-
-    // IRQ4 entry point -- this is very similar to fpoint
-    { 0x000f9e, FD1094_STATE_IRQ   | 0x00, 0x40d7, 0xffff },    // move    sr,(a7)
-    { 0x000fa0, FD1094_STATE_IRQ   | 0x00, 0x1ebc, 0xffff },    // move.b  #23,(a7)
-    { 0x000fa2, FD1094_STATE_IRQ   | 0x00, 0x0023, 0xffff },
-    { 0x000fa4, FD1094_STATE_IRQ   | 0x00, 0x48e7, 0xffff },    // movem.l d0-d7/a0-a6,-(a7)
-    { 0x000fa6, FD1094_STATE_IRQ   | 0x00, 0xfffe, 0xffff },
-    // this part is a guess based on the fpoint IRQ handler; it is needed
-    // to further constrain valid results down to a single one
-    { 0x000fa8, FD1094_STATE_IRQ   | 0x00, 0x13f8, 0xffff },    // move.b  $xxxx.w,$c40001.l
-    { 0x000fac, FD1094_STATE_IRQ   | 0x00, 0x00c4, 0xffff },
-    { 0x000fae, FD1094_STATE_IRQ   | 0x00, 0x0001, 0xffff },
-
-    // IRQ4 exit points (2 of them!)
-    { 0x001060, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
-    { 0x001062, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
-    { 0x001064, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-    { 0x001070, FD1094_STATE_IRQ   | 0x00, 0x4cdf, 0xffff },    // movem.l (a7)+,d0-d7/a0-a6
-    { 0x001072, FD1094_STATE_IRQ   | 0x00, 0x7fff, 0xffff },
-    { 0x001074, FD1094_STATE_IRQ   | 0x00, 0x4e73, 0xffff },    // rte
-    { 0 }
-};
 
 // Possible: global=12A8F8E5 seed=0AD691 pc=1882
 // Possible: global=12AAF8E5 seed=0AD691 pc=1882
@@ -911,295 +835,6 @@ static const fd1094_constraint altbeaj1_constraints[] =
 
     { 0 }
 };
-
-
-
-bullet:
-  Possible: 1882 with global 02A8F0E4, seed = 009B40 <==========
-  Possible: 1882 with global 02A8F0E4, seed = 127003 <==========
-  Possible: 1882 with global 02A8F0EC, seed = 06CE55 <==========
-  Possible: 1882 with global 02A8F0EC, seed = 0A6C55 <==========
-  Possible: 1882 with global 02A8F0EC, seed = 21024A <==========
-  Possible: 1882 with global 02A8F0EC, seed = 23185D <==========
-  Possible: 1882 with global 02A8F0EC, seed = 32750F <==========
-  Possible: 1882 with global 02A8F0ED, seed = 0A6C55 <==========
-  Possible: 1882 with global 02A8F1E4, seed = 263713 <==========
-  Possible: 1882 with global 02A8F1E4, seed = 362509 <==========
-  Possible: 1882 with global 02A8F1E5, seed = 362509 <==========
-  Possible: 1882 with global 02A8F1EC, seed = 3CEB46 <==========
-  Possible: 1882 with global 02A8F1ED, seed = 269D25 <==========
-  Possible: 1882 with global 02A8F8E4, seed = 2CAFF4 <==========
-  Possible: 1882 with global 02A8F8E5, seed = 00A73C <==========
-  Possible: 1882 with global 02A8F8E5, seed = 04453C <==========
-  Possible: 1882 with global 02A8F8E5, seed = 0941D0 <==========
-  Possible: 1882 with global 02A8F8E5, seed = 1CF144 <==========
-  Possible: 1882 with global 02A8F8E5, seed = 284DA2 <==========
-  Possible: 1882 with global 02A8F8E5, seed = 2EC607 <==========
-  Possible: 1882 with global 02A8F8EC, seed = 328B43 <==========
-  Possible: 1882 with global 02A8F8ED, seed = 15F967 <==========
-  Possible: 1882 with global 02A8F8ED, seed = 222689 <==========
-  Possible: 1882 with global 02A8F8ED, seed = 3B1B9F <==========
-  Possible: 1882 with global 02A8F9E4, seed = 39E7F5 <==========
-  Possible: 1882 with global 02A8F9E5, seed = 010848 <==========
-  Possible: 1882 with global 02A8F9EC, seed = 34AFF4 <==========
-  Possible: 1882 with global 02A8F9ED, seed = 0101CE <==========
-  Possible: 1882 with global 02A8F9ED, seed = 12D691 <==========
-  Possible: 1882 with global 02A8F9ED, seed = 283BA8 <==========
-  Possible: 1882 with global 02A8F9ED, seed = 313890 <==========
-  Possible: 1882 with global 02AAF0E4, seed = 009B40 <==========
-  Possible: 1882 with global 02AAF0E4, seed = 127003 <==========
-  Possible: 1882 with global 02AAF0EC, seed = 06CE55 <==========
-  Possible: 1882 with global 02AAF0EC, seed = 0A6C55 <==========
-  Possible: 1882 with global 02AAF0EC, seed = 21024A <==========
-  Possible: 1882 with global 02AAF0EC, seed = 23185D <==========
-  Possible: 1882 with global 02AAF0EC, seed = 32750F <==========
-  Possible: 1882 with global 02AAF0ED, seed = 0A6C55 <==========
-  Possible: 1882 with global 02AAF1E4, seed = 263713 <==========
-  Possible: 1882 with global 02AAF1E4, seed = 362509 <==========
-  Possible: 1882 with global 02AAF1E5, seed = 362509 <==========
-  Possible: 1882 with global 02AAF1EC, seed = 3CEB46 <==========
-  Possible: 1882 with global 02AAF1ED, seed = 269D25 <==========
-  Possible: 1882 with global 02AAF8E4, seed = 2CAFF4 <==========
-  Possible: 1882 with global 02AAF8E5, seed = 00A73C <==========
-  Possible: 1882 with global 02AAF8E5, seed = 04453C <==========
-  Possible: 1882 with global 02AAF8E5, seed = 0941D0 <==========
-  Possible: 1882 with global 02AAF8E5, seed = 1CF144 <==========
-  Possible: 1882 with global 02AAF8E5, seed = 284DA2 <==========
-  Possible: 1882 with global 02AAF8E5, seed = 2EC607 <==========
-  Possible: 1882 with global 02AAF8EC, seed = 328B43 <==========
-  Possible: 1882 with global 02AAF8ED, seed = 15F967 <==========
-  Possible: 1882 with global 02AAF8ED, seed = 222689 <==========
-  Possible: 1882 with global 02AAF8ED, seed = 3B1B9F <==========
-  Possible: 1882 with global 02AAF9E4, seed = 39E7F5 <==========
-  Possible: 1882 with global 02AAF9E5, seed = 010848 <==========
-  Possible: 1882 with global 02AAF9EC, seed = 34AFF4 <==========
-  Possible: 1882 with global 02AAF9ED, seed = 0101CE <==========
-  Possible: 1882 with global 02AAF9ED, seed = 12D691 <==========
-  Possible: 1882 with global 02AAF9ED, seed = 283BA8 <==========
-  Possible: 1882 with global 02AAF9ED, seed = 313890 <==========
-  Possible: 1882 with global 12A8F0E4, seed = 34B5F2 <==========
-  Possible: 1882 with global 12A8F0EC, seed = 3E2509 <==========
-  Possible: 1882 with global 12A8F0ED, seed = 3E2509 <==========
-  Possible: 1882 with global 12A8F1E5, seed = 0EC259 <==========
-  Possible: 1882 with global 12A8F1E5, seed = 231B9F <==========
-  Possible: 1882 with global 12A8F1EC, seed = 0E9727 <==========
-  Possible: 1882 with global 12A8F1EC, seed = 134BE7 <==========
-  Possible: 1882 with global 12A8F1EC, seed = 1A7003 <==========
-  Possible: 1882 with global 12A8F1EC, seed = 3CB5F2 <==========
-  Possible: 1882 with global 12A8F8E5, seed = 04B5F2 <==========
-  Possible: 1882 with global 12A8F8E5, seed = 0AD691 <==========
-  Possible: 1882 with global 12A8F8E5, seed = 169727 <==========
-  Possible: 1882 with global 12A8F8E5, seed = 1B4BE7 <==========
-  Possible: 1882 with global 12A8F8E5, seed = 203BA8 <==========
-  Possible: 1882 with global 12A8F8EC, seed = 037E9A <==========
-  Possible: 1882 with global 12A8F8EC, seed = 2BE952 <==========
-  Possible: 1882 with global 12A8F8EC, seed = 3D5C17 <==========
-  Possible: 1882 with global 12A8F8ED, seed = 129C21 <==========
-  Possible: 1882 with global 12A8F8ED, seed = 21DEB5 <==========
-  Possible: 1882 with global 12A8F8ED, seed = 2BE952 <==========
-  Possible: 1882 with global 12A8F9E4, seed = 084554 <==========
-  Possible: 1882 with global 12A8F9E4, seed = 1EC259 <==========
-  Possible: 1882 with global 12A8F9E4, seed = 331B9F <==========
-  Possible: 1882 with global 12A8F9E5, seed = 05CD43 <==========
-  Possible: 1882 with global 12A8F9E5, seed = 084554 <==========
-  Possible: 1882 with global 12A8F9E5, seed = 0A9C21 <==========
-  Possible: 1882 with global 12A8F9EC, seed = 1B1FC3 <==========
-  Possible: 1882 with global 12A8F9EC, seed = 2CF486 <==========
-  Possible: 1882 with global 12A8F9ED, seed = 0CB5F2 <==========
-  Possible: 1882 with global 12A8F9ED, seed = 0F9E58 <==========
-  Possible: 1882 with global 12A8F9ED, seed = 117724 <==========
-  Possible: 1882 with global 12A8F9ED, seed = 1E9727 <==========
-  Possible: 1882 with global 12A8F9ED, seed = 234BE7 <==========
-  Possible: 1882 with global 12A8F9ED, seed = 2AE901 <==========
-  Possible: 1882 with global 12A8F9ED, seed = 33C0DC <==========
-  Possible: 1882 with global 12AAF0E4, seed = 34B5F2 <==========
-  Possible: 1882 with global 12AAF0EC, seed = 3E2509 <==========
-  Possible: 1882 with global 12AAF0ED, seed = 3E2509 <==========
-  Possible: 1882 with global 12AAF1E5, seed = 0EC259 <==========
-  Possible: 1882 with global 12AAF1E5, seed = 231B9F <==========
-  Possible: 1882 with global 12AAF1EC, seed = 0E9727 <==========
-  Possible: 1882 with global 12AAF1EC, seed = 134BE7 <==========
-  Possible: 1882 with global 12AAF1EC, seed = 1A7003 <==========
-  Possible: 1882 with global 12AAF1EC, seed = 3CB5F2 <==========
-  Possible: 1882 with global 12AAF8E5, seed = 04B5F2 <==========
-  Possible: 1882 with global 12AAF8E5, seed = 0AD691 <==========
-  Possible: 1882 with global 12AAF8E5, seed = 169727 <==========
-  Possible: 1882 with global 12AAF8E5, seed = 1B4BE7 <==========
-  Possible: 1882 with global 12AAF8E5, seed = 203BA8 <==========
-  Possible: 1882 with global 12AAF8EC, seed = 037E9A <==========
-  Possible: 1882 with global 12AAF8EC, seed = 2BE952 <==========
-  Possible: 1882 with global 12AAF8EC, seed = 3D5C17 <==========
-  Possible: 1882 with global 12AAF8ED, seed = 129C21 <==========
-  Possible: 1882 with global 12AAF8ED, seed = 21DEB5 <==========
-  Possible: 1882 with global 12AAF8ED, seed = 2BE952 <==========
-  Possible: 1882 with global 12AAF9E4, seed = 084554 <==========
-  Possible: 1882 with global 12AAF9E4, seed = 1EC259 <==========
-  Possible: 1882 with global 12AAF9E4, seed = 331B9F <==========
-  Possible: 1882 with global 12AAF9E5, seed = 05CD43 <==========
-  Possible: 1882 with global 12AAF9E5, seed = 084554 <==========
-  Possible: 1882 with global 12AAF9E5, seed = 0A9C21 <==========
-  Possible: 1882 with global 12AAF9EC, seed = 1B1FC3 <==========
-  Possible: 1882 with global 12AAF9EC, seed = 2CF486 <==========
-  Possible: 1882 with global 12AAF9ED, seed = 0CB5F2 <==========
-  Possible: 1882 with global 12AAF9ED, seed = 0F9E58 <==========
-  Possible: 1882 with global 12AAF9ED, seed = 117724 <==========
-  Possible: 1882 with global 12AAF9ED, seed = 1E9727 <==========
-  Possible: 1882 with global 12AAF9ED, seed = 234BE7 <==========
-  Possible: 1882 with global 12AAF9ED, seed = 2AE901 <==========
-  Possible: 1882 with global 12AAF9ED, seed = 33C0DC <==========
-  Possible: 1882 with global 82A8F0E4, seed = 009B40 <==========
-  Possible: 1882 with global 82A8F0E4, seed = 127003 <==========
-  Possible: 1882 with global 82A8F0E5, seed = 1E5551 <==========
-  Possible: 1882 with global 82A8F0E5, seed = 32AE97 <==========
-  Possible: 1882 with global 82A8F0EC, seed = 06CE55 <==========
-  Possible: 1882 with global 82A8F0EC, seed = 0A6C55 <==========
-  Possible: 1882 with global 82A8F0EC, seed = 21024A <==========
-  Possible: 1882 with global 82A8F0EC, seed = 23185D <==========
-  Possible: 1882 with global 82A8F0EC, seed = 32750F <==========
-  Possible: 1882 with global 82A8F1E4, seed = 263713 <==========
-  Possible: 1882 with global 82A8F1E4, seed = 362509 <==========
-  Possible: 1882 with global 82A8F1EC, seed = 3CEB46 <==========
-  Possible: 1882 with global 82A8F1ED, seed = 265551 <==========
-  Possible: 1882 with global 82A8F1ED, seed = 2B51E5 <==========
-  Possible: 1882 with global 82A8F1ED, seed = 3AAE97 <==========
-  Possible: 1882 with global 82A8F1ED, seed = 3CEB46 <==========
-  Possible: 1882 with global 82A8F8E4, seed = 04453C <==========
-  Possible: 1882 with global 82A8F8E4, seed = 0941D0 <==========
-  Possible: 1882 with global 82A8F8E4, seed = 12A29B <==========
-  Possible: 1882 with global 82A8F8E4, seed = 26FBE1 <==========
-  Possible: 1882 with global 82A8F8E5, seed = 00A73C <==========
-  Possible: 1882 with global 82A8F8E5, seed = 04453C <==========
-  Possible: 1882 with global 82A8F8E5, seed = 0941D0 <==========
-  Possible: 1882 with global 82A8F8E5, seed = 1CF144 <==========
-  Possible: 1882 with global 82A8F8E5, seed = 284DA2 <==========
-  Possible: 1882 with global 82A8F8E5, seed = 2EC607 <==========
-  Possible: 1882 with global 82A8F8EC, seed = 15F967 <==========
-  Possible: 1882 with global 82A8F8EC, seed = 24921C <==========
-  Possible: 1882 with global 82A8F8EC, seed = 2D8EAF <==========
-  Possible: 1882 with global 82A8F8EC, seed = 3B1B9F <==========
-  Possible: 1882 with global 82A8F8ED, seed = 15F967 <==========
-  Possible: 1882 with global 82A8F8ED, seed = 222689 <==========
-  Possible: 1882 with global 82A8F8ED, seed = 3B1B9F <==========
-  Possible: 1882 with global 82A8F9E5, seed = 010848 <==========
-  Possible: 1882 with global 82A8F9EC, seed = 1AA29B <==========
-  Possible: 1882 with global 82A8F9EC, seed = 2EFBE1 <==========
-  Possible: 1882 with global 82A8F9ED, seed = 0101CE <==========
-  Possible: 1882 with global 82A8F9ED, seed = 12D691 <==========
-  Possible: 1882 with global 82A8F9ED, seed = 283BA8 <==========
-  Possible: 1882 with global 82A8F9ED, seed = 313890 <==========
-  Possible: 1882 with global 82AAF0E4, seed = 009B40 <==========
-  Possible: 1882 with global 82AAF0E4, seed = 127003 <==========
-  Possible: 1882 with global 82AAF0E5, seed = 1E5551 <==========
-  Possible: 1882 with global 82AAF0E5, seed = 32AE97 <==========
-  Possible: 1882 with global 82AAF0EC, seed = 06CE55 <==========
-  Possible: 1882 with global 82AAF0EC, seed = 0A6C55 <==========
-  Possible: 1882 with global 82AAF0EC, seed = 21024A <==========
-  Possible: 1882 with global 82AAF0EC, seed = 23185D <==========
-  Possible: 1882 with global 82AAF0EC, seed = 32750F <==========
-  Possible: 1882 with global 82AAF1E4, seed = 263713 <==========
-  Possible: 1882 with global 82AAF1E4, seed = 362509 <==========
-  Possible: 1882 with global 82AAF1EC, seed = 3CEB46 <==========
-  Possible: 1882 with global 82AAF1ED, seed = 265551 <==========
-  Possible: 1882 with global 82AAF1ED, seed = 2B51E5 <==========
-  Possible: 1882 with global 82AAF1ED, seed = 3AAE97 <==========
-  Possible: 1882 with global 82AAF1ED, seed = 3CEB46 <==========
-  Possible: 1882 with global 82AAF8E4, seed = 04453C <==========
-  Possible: 1882 with global 82AAF8E4, seed = 0941D0 <==========
-  Possible: 1882 with global 82AAF8E4, seed = 12A29B <==========
-  Possible: 1882 with global 82AAF8E4, seed = 26FBE1 <==========
-  Possible: 1882 with global 82AAF8E5, seed = 00A73C <==========
-  Possible: 1882 with global 82AAF8E5, seed = 04453C <==========
-  Possible: 1882 with global 82AAF8E5, seed = 0941D0 <==========
-  Possible: 1882 with global 82AAF8E5, seed = 1CF144 <==========
-  Possible: 1882 with global 82AAF8E5, seed = 284DA2 <==========
-  Possible: 1882 with global 82AAF8E5, seed = 2EC607 <==========
-  Possible: 1882 with global 82AAF8EC, seed = 15F967 <==========
-  Possible: 1882 with global 82AAF8EC, seed = 24921C <==========
-  Possible: 1882 with global 82AAF8EC, seed = 2D8EAF <==========
-  Possible: 1882 with global 82AAF8EC, seed = 3B1B9F <==========
-  Possible: 1882 with global 82AAF8ED, seed = 15F967 <==========
-  Possible: 1882 with global 82AAF8ED, seed = 222689 <==========
-  Possible: 1882 with global 82AAF8ED, seed = 3B1B9F <==========
-  Possible: 1882 with global 82AAF9E5, seed = 010848 <==========
-  Possible: 1882 with global 82AAF9EC, seed = 1AA29B <==========
-  Possible: 1882 with global 82AAF9EC, seed = 2EFBE1 <==========
-  Possible: 1882 with global 82AAF9ED, seed = 0101CE <==========
-  Possible: 1882 with global 82AAF9ED, seed = 12D691 <==========
-  Possible: 1882 with global 82AAF9ED, seed = 283BA8 <==========
-  Possible: 1882 with global 82AAF9ED, seed = 313890 <==========
-  Possible: 1882 with global 92A8F0E4, seed = 3590EE <==========
-  Possible: 1882 with global 92A8F0EC, seed = 08D5B0 <==========
-  Possible: 1882 with global 92A8F0EC, seed = 3700ED <==========
-  Possible: 1882 with global 92A8F0ED, seed = 3E2509 <==========
-  Possible: 1882 with global 92A8F1E4, seed = 00D5B0 <==========
-  Possible: 1882 with global 92A8F1E4, seed = 0EC259 <==========
-  Possible: 1882 with global 92A8F1E4, seed = 231B9F <==========
-  Possible: 1882 with global 92A8F1E4, seed = 2F00ED <==========
-  Possible: 1882 with global 92A8F1E5, seed = 0EC259 <==========
-  Possible: 1882 with global 92A8F1E5, seed = 231B9F <==========
-  Possible: 1882 with global 92A8F1EC, seed = 089B40 <==========
-  Possible: 1882 with global 92A8F8E5, seed = 293890 <==========
-  Possible: 1882 with global 92A8F8E5, seed = 3C89CE <==========
-  Possible: 1882 with global 92A8F8EC, seed = 037E9A <==========
-  Possible: 1882 with global 92A8F8EC, seed = 2BE952 <==========
-  Possible: 1882 with global 92A8F8EC, seed = 3D5C17 <==========
-  Possible: 1882 with global 92A8F8ED, seed = 037E9A <==========
-  Possible: 1882 with global 92A8F8ED, seed = 0700ED <==========
-  Possible: 1882 with global 92A8F8ED, seed = 10A98C <==========
-  Possible: 1882 with global 92A8F8ED, seed = 3D5C17 <==========
-  Possible: 1882 with global 92A8F8ED, seed = 3FE09A <==========
-  Possible: 1882 with global 92A8F9E4, seed = 084554 <==========
-  Possible: 1882 with global 92A8F9E4, seed = 1EC259 <==========
-  Possible: 1882 with global 92A8F9E4, seed = 331B9F <==========
-  Possible: 1882 with global 92A8F9E5, seed = 10D5B0 <==========
-  Possible: 1882 with global 92A8F9E5, seed = 142AA2 <==========
-  Possible: 1882 with global 92A8F9E5, seed = 1EC259 <==========
-  Possible: 1882 with global 92A8F9E5, seed = 2146DC <==========
-  Possible: 1882 with global 92A8F9E5, seed = 331B9F <==========
-  Possible: 1882 with global 92A8F9E5, seed = 3F00ED <==========
-  Possible: 1882 with global 92A8F9EC, seed = 1B1FC3 <==========
-  Possible: 1882 with global 92A8F9EC, seed = 2CF486 <==========
-  Possible: 1882 with global 92A8F9ED, seed = 0489CE <==========
-  Possible: 1882 with global 92A8F9ED, seed = 189B40 <==========
-  Possible: 1882 with global 92A8F9ED, seed = 1B1FC3 <==========
-  Possible: 1882 with global 92A8F9ED, seed = 2CF486 <==========
-  Possible: 1882 with global 92AAF0E4, seed = 3590EE <==========
-  Possible: 1882 with global 92AAF0EC, seed = 08D5B0 <==========
-  Possible: 1882 with global 92AAF0EC, seed = 3700ED <==========
-  Possible: 1882 with global 92AAF0ED, seed = 3E2509 <==========
-  Possible: 1882 with global 92AAF1E4, seed = 00D5B0 <==========
-  Possible: 1882 with global 92AAF1E4, seed = 0EC259 <==========
-  Possible: 1882 with global 92AAF1E4, seed = 231B9F <==========
-  Possible: 1882 with global 92AAF1E4, seed = 2F00ED <==========
-  Possible: 1882 with global 92AAF1E5, seed = 0EC259 <==========
-  Possible: 1882 with global 92AAF1E5, seed = 231B9F <==========
-  Possible: 1882 with global 92AAF1EC, seed = 089B40 <==========
-  Possible: 1882 with global 92AAF8E5, seed = 293890 <==========
-  Possible: 1882 with global 92AAF8E5, seed = 3C89CE <==========
-  Possible: 1882 with global 92AAF8EC, seed = 037E9A <==========
-  Possible: 1882 with global 92AAF8EC, seed = 2BE952 <==========
-  Possible: 1882 with global 92AAF8EC, seed = 3D5C17 <==========
-  Possible: 1882 with global 92AAF8ED, seed = 037E9A <==========
-  Possible: 1882 with global 92AAF8ED, seed = 0700ED <==========
-  Possible: 1882 with global 92AAF8ED, seed = 10A98C <==========
-  Possible: 1882 with global 92AAF8ED, seed = 3D5C17 <==========
-  Possible: 1882 with global 92AAF8ED, seed = 3FE09A <==========
-  Possible: 1882 with global 92AAF9E4, seed = 084554 <==========
-  Possible: 1882 with global 92AAF9E4, seed = 1EC259 <==========
-  Possible: 1882 with global 92AAF9E4, seed = 331B9F <==========
-  Possible: 1882 with global 92AAF9E5, seed = 10D5B0 <==========
-  Possible: 1882 with global 92AAF9E5, seed = 142AA2 <==========
-  Possible: 1882 with global 92AAF9E5, seed = 1EC259 <==========
-  Possible: 1882 with global 92AAF9E5, seed = 2146DC <==========
-  Possible: 1882 with global 92AAF9E5, seed = 331B9F <==========
-  Possible: 1882 with global 92AAF9E5, seed = 3F00ED <==========
-  Possible: 1882 with global 92AAF9EC, seed = 1B1FC3 <==========
-  Possible: 1882 with global 92AAF9EC, seed = 2CF486 <==========
-  Possible: 1882 with global 92AAF9ED, seed = 0489CE <==========
-  Possible: 1882 with global 92AAF9ED, seed = 189B40 <==========
-  Possible: 1882 with global 92AAF9ED, seed = 1B1FC3 <==========
-  Possible: 1882 with global 92AAF9ED, seed = 2CF486 <==========
-
 
 */
 

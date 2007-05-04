@@ -12,23 +12,13 @@
 #include "includes/astrof.h"
 
 
-unsigned char *astrof_color;
-unsigned char *tomahawk_protection;
+UINT8 *tomahawk_protection;
+UINT8 *astrof_color;
 
-static int do_modify_palette = 0;
-static int palette_bank = -1, red_on = -1;
-static const unsigned char *prom;
+static UINT8 palette_bank, red_on;
 
-
-/* Just save the colorprom pointer */
-PALETTE_INIT( astrof )
-{
-	prom = color_prom;
-}
 
 /***************************************************************************
-
-  Convert the color PROMs into a more useable format.
 
   The palette PROMs are connected to the RGB output this way:
 
@@ -44,31 +34,30 @@ PALETTE_INIT( astrof )
   resistor for each color gun, this is one of the concievable settings
 
 ***************************************************************************/
-static void modify_palette(void)
+
+static void get_pens(pen_t *pens)
 {
-	int i, col_index;
+	offs_t i;
 
-	col_index = (palette_bank ? 16 : 0);
-
-	for (i = 0;i < Machine->drv->total_colors; i++)
+	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
 	{
-		int bit0,bit1,r,g,b;
+		UINT8 bit0, bit1, r, g, b;
 
-		bit0 = ((prom[col_index] >> 0) & 0x01) | (red_on >> 3);
-		bit1 = ((prom[col_index] >> 1) & 0x01) | (red_on >> 3);
+		UINT8 data = memory_region(REGION_PROMS)[i];
+
+		bit0 = ((data >> 0) & 0x01) | red_on;
+		bit1 = ((data >> 1) & 0x01) | red_on;
 		r = 0xc0 * bit0 + 0x3f * bit1;
 
-		bit0 = ( prom[col_index] >> 2) & 0x01;
-		bit1 = ( prom[col_index] >> 3) & 0x01;
+		bit0 = ( data >> 2) & 0x01;
+		bit1 = ( data >> 3) & 0x01;
 		g = 0xc0 * bit0 + 0x3f * bit1;
 
-		bit0 = ( prom[col_index] >> 4) & 0x01;
-		bit1 = ( prom[col_index] >> 5) & 0x01;
+		bit0 = ( data >> 4) & 0x01;
+		bit1 = ( data >> 5) & 0x01;
 		b = 0xc0 * bit0 + 0x3f * bit1;
 
-		col_index++;
-
-		palette_set_color(Machine,i,r,g,b);
+		pens[i] = MAKE_RGB(r, g, b);
 	}
 }
 
@@ -78,66 +67,32 @@ static void modify_palette(void)
   Start the video hardware emulation.
 
 ***************************************************************************/
+
 VIDEO_START( astrof )
 {
 	colorram = auto_malloc(videoram_size);
-	memset(colorram, 0, videoram_size);
-	if (video_start_generic(machine))
-		return 1;
 
-	do_modify_palette = 0;
-	palette_bank = -1;
-	red_on = -1;
+	palette_bank = 0;
+	red_on = 0;
 
 	return 0;
 }
 
 
 
-static void common_videoram_w(int offset, int data, int color)
-{
-	/* DO NOT try to optimize this by comparing if the value actually changed.
-       The games write the same data with a different color. For example, the
-       fuel meter in Astro Fighter doesn't work with that 'optimization' */
-
-	int i,x,y,fore,back;
-	int dx = 1;
-
-	videoram[offset] = data;
-	colorram[offset] = color;
-
-	fore = Machine->pens[color | 1];
-	back = Machine->pens[color    ];
-
-	x = (offset >> 8) << 3;
-	y = 255 - (offset & 0xff);
-
-	if (flip_screen)
-	{
-		x = 255 - x;
-		y = 255 - y;
-		dx = -1;
-	}
-
-	for (i = 0; i < 8; i++)
-	{
-		*BITMAP_ADDR16(tmpbitmap, y, x) = (data & 1) ? fore : back;
-
-		x += dx;
-		data >>= 1;
-	}
-}
-
 WRITE8_HANDLER( astrof_videoram_w )
 {
 	// Astro Fighter's palette is set in astrof_video_control2_w, D0 is unused
-	common_videoram_w(offset, data, *astrof_color & 0x0e);
+	videoram[offset] = data;
+	colorram[offset] = *astrof_color & 0x0e;
 }
+
 
 WRITE8_HANDLER( tomahawk_videoram_w )
 {
 	// Tomahawk's palette is set per byte
-	common_videoram_w(offset, data, (*astrof_color & 0x0e) | ((*astrof_color & 0x01) << 4));
+	videoram[offset] = data;
+	colorram[offset] = (*astrof_color & 0x0e) | ((*astrof_color & 0x01) << 4);
 }
 
 
@@ -170,36 +125,19 @@ WRITE8_HANDLER( astrof_video_control1_w )
 
 WRITE8_HANDLER( astrof_video_control2_w )
 {
-	if (palette_bank != (data & 0x04))
-	{
-		palette_bank = (data & 0x04);
-		do_modify_palette = 1;
-	}
+	palette_bank = (data >> 2) & 0x01;
 
-	if (red_on != (data & 0x08))
-	{
-		red_on = data & 0x08;
-		do_modify_palette = 1;
-	}
-
-	/* Defer changing the colors to avoid flicker */
+	red_on = (data >> 3) & 0x01;
 }
+
 
 WRITE8_HANDLER( tomahawk_video_control2_w )
 {
-	if (palette_bank == -1)
-	{
-		palette_bank = 0;
-		do_modify_palette = 1;
-	}
+	palette_bank = 0;
 
-	if (red_on != (data & 0x08))
-	{
-		red_on = data & 0x08;
-		do_modify_palette = 1;
-	}
+	red_on = (data >> 3) & 0x01;
 
-	/* Defer changing the colors to avoid flicker */
+	video_screen_update_partial(0, video_screen_get_vpos(0));
 }
 
 
@@ -207,44 +145,43 @@ READ8_HANDLER( tomahawk_protection_r )
 {
 	/* flip the byte */
 
-	int res = ((*tomahawk_protection & 0x01) << 7) |
-			  ((*tomahawk_protection & 0x02) << 5) |
-			  ((*tomahawk_protection & 0x04) << 3) |
-			  ((*tomahawk_protection & 0x08) << 1) |
-			  ((*tomahawk_protection & 0x10) >> 1) |
-			  ((*tomahawk_protection & 0x20) >> 3) |
-			  ((*tomahawk_protection & 0x40) >> 5) |
-			  ((*tomahawk_protection & 0x80) >> 7);
-
-	return res;
+	return BITSWAP8(*tomahawk_protection,0,1,2,3,4,5,6,7);
 }
-/***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
-  Do NOT call osd_update_display() from this function, it will be called by
-  the main emulation engine.
 
-***************************************************************************/
 VIDEO_UPDATE( astrof )
 {
-	if (do_modify_palette)
+	pen_t pens[0x100];
+	offs_t offs;
+
+	get_pens(pens);
+
+	for (offs = 0; offs < videoram_size; offs++)
 	{
-		modify_palette();
+		int i;
 
-		do_modify_palette = 0;
-	}
+		UINT8 data = videoram[offs];
+		UINT8 color = colorram[offs];
 
-	if (get_vh_global_attribute_changed())
-	{
-		int offs;
+		pen_t back_pen = pens[(palette_bank << 4) | color | 0x00];
+		pen_t fore_pen = pens[(palette_bank << 4) | color | 0x01];
 
-		/* redraw bitmap */
-		for (offs = 0; offs < videoram_size; offs++)
+		UINT8 y = ~offs;
+		UINT8 x = offs >> 8 << 3;
+
+		for (i = 0; i < 8; i++)
 		{
-			common_videoram_w(offs, videoram[offs], colorram[offs]);
+			pen_t pen = (data & 0x01) ? fore_pen : back_pen;
+
+			if (flip_screen)
+				*BITMAP_ADDR32(bitmap, 255 - y, 255 - x) = pen;
+			else
+				*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x = x + 1;
+			data = data >> 1;
 		}
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }

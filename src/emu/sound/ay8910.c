@@ -792,7 +792,6 @@ static void *ay8910_start(int sndindex, int clock, const void *config)
 	return ay8910_start_ym(SOUND_AY8910, sndindex+16, clock, 3, intf->portAread, intf->portBread, intf->portAwrite, intf->portBwrite);
 }
 
-
 static void ay8910_stop(void *chip)
 {
 	ay8910_stop_ym(chip);
@@ -817,6 +816,7 @@ void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_ALIAS:							info->i = SOUND_AY8910;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = ay8910_set_info;		break;
@@ -825,7 +825,7 @@ void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_PTR_RESET:							info->reset = ay8910_reset_ym;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "AY8910";						break;
+		case SNDINFO_STR_NAME:							info->s = "AY-3-8910A";					break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "PSG";						break;
 		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
@@ -833,3 +833,72 @@ void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
+void ay8912_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_STR_NAME:							info->s = "AY-3-8912A";					break;
+		default: 										ay8910_get_info(token, state, info);	break;
+	}
+}
+
+void ay8913_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_STR_NAME:							info->s = "AY-3-8913A";					break;
+		default: 										ay8910_get_info(token, state, info);	break;
+	}
+}
+
+void ay8930_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_STR_NAME:							info->s = "AY8930";						break;
+		default: 										ay8910_get_info(token, state, info);	break;
+	}
+}
+
+void ym2149_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_STR_NAME:							info->s = "YM2149";						break;
+		default: 										ay8910_get_info(token, state, info);	break;
+	}
+}
+
+void ym3439_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_STR_NAME:							info->s = "YM3439";						break;
+		default: 										ay8910_get_info(token, state, info);	break;
+	}
+}
+
+void ymz284_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_STR_NAME:							info->s = "YMZ284";						break;
+		default: 										ay8910_get_info(token, state, info);	break;
+	}
+}
+
+void ymz294_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_STR_NAME:							info->s = "YMZ294";						break;
+		default: 										ay8910_get_info(token, state, info);	break;
+	}
+}

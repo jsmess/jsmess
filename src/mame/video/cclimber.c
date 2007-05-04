@@ -259,19 +259,13 @@ WRITE8_HANDLER( swimmer_bgcolor_w )
 
 WRITE8_HANDLER( cclimber_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		/* bit 5 of the address is not used for color memory. There is just */
-		/* 512 bytes of memory; every two consecutive rows share the same memory */
-		/* region. */
-		offset &= 0xffdf;
+	/* bit 5 of the address is not used for color memory. There is just */
+	/* 512 bytes of memory; every two consecutive rows share the same memory */
+	/* region. */
+	offset &= 0xffdf;
 
-		dirtybuffer[offset] = 1;
-		dirtybuffer[offset + 0x20] = 1;
-
-		colorram[offset] = data;
-		colorram[offset + 0x20] = data;
-	}
+	colorram[offset] = data;
+	colorram[offset + 0x20] = data;
 }
 
 
@@ -285,14 +279,14 @@ WRITE8_HANDLER( cclimber_bigsprite_videoram_w )
 
 WRITE8_HANDLER( swimmer_palettebank_w )
 {
-	set_vh_global_attribute(&palettebank, data & 1);
+	palettebank = data & 1;
 }
 
 
 
 WRITE8_HANDLER( swimmer_sidepanel_enable_w )
 {
-	set_vh_global_attribute(&sidepanel_enabled, data );
+	sidepanel_enabled = data & 1;
 }
 
 
@@ -354,48 +348,34 @@ VIDEO_UPDATE( cclimber )
 {
 	int offs;
 
-
-	if (get_vh_global_attribute_changed())
-	{
-		memset(dirtybuffer,1,videoram_size);
-	}
-
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int sx,sy,flipx,flipy;
+
+		sx = offs % 32;
+		sy = offs / 32;
+		flipx = colorram[offs] & 0x40;
+		flipy = colorram[offs] & 0x80;
+		/* vertical flipping flips two adjacent characters */
+		if (flipy) sy ^= 1;
+
+		if (flip_screen_x)
 		{
-			int sx,sy,flipx,flipy;
-
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-			flipx = colorram[offs] & 0x40;
-			flipy = colorram[offs] & 0x80;
-			/* vertical flipping flips two adjacent characters */
-			if (flipy) sy ^= 1;
-
-			if (flip_screen_x)
-			{
-				sx = 31 - sx;
-				flipx = !flipx;
-			}
-			if (flip_screen_y)
-			{
-				sy = 31 - sy;
-				flipy = !flipy;
-			}
-
-			drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
-					videoram[offs] + 8 * (colorram[offs] & 0x20),
-					colorram[offs] & 0x0f,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			sx = 31 - sx;
+			flipx = !flipx;
 		}
+		if (flip_screen_y)
+		{
+			sy = 31 - sy;
+			flipy = !flipy;
+		}
+
+		drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
+				videoram[offs] + 8 * (colorram[offs] & 0x20),
+				colorram[offs] & 0x0f,
+				flipx,flipy,
+				8*sx,8*sy,
+				0,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -472,50 +452,37 @@ VIDEO_UPDATE( cannonb )
 {
 	int offs;
 
-
-	if (get_vh_global_attribute_changed())
-	{
-		memset(dirtybuffer,1,videoram_size);
-	}
-
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int attr,code,color,sx,sy,flipx,flipy;
+
+		code = videoram[offs];
+		attr = colorram[offs] & 0x20;
+		color = colorram[offs] & 0x0f;
+		sx = offs % 32;
+		sy = offs / 32;
+		flipx = colorram[offs] & 0x40;
+		flipy = colorram[offs] & 0x80;
+		/* vertical flipping flips two adjacent characters */
+		if (flipy) sy ^= 1;
+
+		if (flip_screen_x)
 		{
-			int attr,code,color,sx,sy,flipx,flipy;
-
-			dirtybuffer[offs] = 0;
-
-			code = videoram[offs];
-			attr = colorram[offs] & 0x20;
-			color = colorram[offs] & 0x0f;
-			sx = offs % 32;
-			sy = offs / 32;
-			flipx = colorram[offs] & 0x40;
-			flipy = colorram[offs] & 0x80;
-			/* vertical flipping flips two adjacent characters */
-			if (flipy) sy ^= 1;
-
-			if (flip_screen_x)
-			{
-				sx = 31 - sx;
-				flipx = !flipx;
-			}
-			if (flip_screen_y)
-			{
-				sy = 31 - sy;
-				flipy = !flipy;
-			}
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					code + 8 * attr,
-					color,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			sx = 31 - sx;
+			flipx = !flipx;
 		}
+		if (flip_screen_y)
+		{
+			sy = 31 - sy;
+			flipy = !flipy;
+		}
+
+		drawgfx(tmpbitmap,machine->gfx[0],
+				code + 8 * attr,
+				color,
+				flipx,flipy,
+				8*sx,8*sy,
+				0,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -592,53 +559,40 @@ VIDEO_UPDATE( swimmer )
 {
 	int offs;
 
-	if (get_vh_global_attribute_changed())
-	{
-		memset(dirtybuffer,1,videoram_size);
-	}
-
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int sx,sy,flipx,flipy,color;
+
+		sx = offs % 32;
+		sy = offs / 32;
+		flipx = colorram[offs] & 0x40;
+		flipy = colorram[offs] & 0x80;
+		/* vertical flipping flips two adjacent characters */
+		if (flipy) sy ^= 1;
+
+		color = (colorram[offs] & 0x0f) + 0x10 * palettebank;
+		if (sx >= 24 && sidepanel_enabled)
 		{
-			int sx,sy,flipx,flipy,color;
-
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-			flipx = colorram[offs] & 0x40;
-			flipy = colorram[offs] & 0x80;
-			/* vertical flipping flips two adjacent characters */
-			if (flipy) sy ^= 1;
-
-			color = (colorram[offs] & 0x0f) + 0x10 * palettebank;
-			if (sx >= 24 && sidepanel_enabled)
-			{
-			    color += 32;
-			}
-
-			if (flip_screen_x)
-			{
-				sx = 31 - sx;
-				flipx = !flipx;
-			}
-			if (flip_screen_y)
-			{
-				sy = 31 - sy;
-				flipy = !flipy;
-			}
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					videoram[offs] + ((colorram[offs] & 0x10) << 4),
-					color,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			color += 32;
 		}
+
+		if (flip_screen_x)
+		{
+			sx = 31 - sx;
+			flipx = !flipx;
+		}
+		if (flip_screen_y)
+		{
+			sy = 31 - sy;
+			flipy = !flipy;
+		}
+
+		drawgfx(tmpbitmap,machine->gfx[0],
+				videoram[offs] + ((colorram[offs] & 0x10) << 4),
+				color,
+				flipx,flipy,
+				8*sx,8*sy,
+				0,TRANSPARENCY_NONE,0);
 	}
 
 
@@ -722,47 +676,35 @@ VIDEO_UPDATE( yamato )
 		}
 	}
 
-	if (get_vh_global_attribute_changed())
-	{
-		memset(dirtybuffer,1,videoram_size);
-	}
 
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int sx,sy,flipx,flipy;
+
+		sx = offs % 32;
+		sy = offs / 32;
+		flipx = colorram[offs] & 0x40;
+		flipy = colorram[offs] & 0x80;
+		/* vertical flipping flips two adjacent characters */
+		if (flipy) sy ^= 1;
+
+		if (flip_screen_x)
 		{
-			int sx,sy,flipx,flipy;
-
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-			flipx = colorram[offs] & 0x40;
-			flipy = colorram[offs] & 0x80;
-			/* vertical flipping flips two adjacent characters */
-			if (flipy) sy ^= 1;
-
-			if (flip_screen_x)
-			{
-				sx = 31 - sx;
-				flipx = !flipx;
-			}
-			if (flip_screen_y)
-			{
-				sy = 31 - sy;
-				flipy = !flipy;
-			}
-
-			drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
-					videoram[offs] + 8 * (colorram[offs] & 0x20),
-					colorram[offs] & 0x0f,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			sx = 31 - sx;
+			flipx = !flipx;
 		}
+		if (flip_screen_y)
+		{
+			sy = 31 - sy;
+			flipy = !flipy;
+		}
+
+		drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
+				videoram[offs] + 8 * (colorram[offs] & 0x20),
+				colorram[offs] & 0x0f,
+				flipx,flipy,
+				8*sx,8*sy,
+				0,TRANSPARENCY_NONE,0);
 	}
 
 

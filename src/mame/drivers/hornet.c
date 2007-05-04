@@ -341,9 +341,6 @@ int K037122_vh_start(int chip)
 
 	Machine->gfx[K037122_gfx_index[chip]] = allocgfx(&K037122_char_layout);
 	decodegfx(Machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, Machine->gfx[K037122_gfx_index[chip]]->total_elements);
-	if( !Machine->gfx[K037122_gfx_index[chip]] ) {
-		return 1;
-	}
 
 	if (Machine->drv->color_table_len)
 	{

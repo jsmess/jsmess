@@ -938,7 +938,7 @@ static WRITE8_HANDLER( n7751_command_w )
     */
 	n7751_command = data & 0x07;
 	cpunum_set_input_line(1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 }
 
 

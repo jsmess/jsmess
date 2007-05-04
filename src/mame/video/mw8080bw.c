@@ -53,7 +53,7 @@ VIDEO_UPDATE( mw8080bw )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = mw8080bw_ram_r(offs);
+			video_data = mw8080bw_ram[offs];
 		}
 	}
 
@@ -158,7 +158,7 @@ VIDEO_UPDATE( spcenctr )
 
 			/* update the cloud control for the next line */
 			offs = ((offs_t)y << 5) | 0x1f;
-			trench_control = mw8080bw_ram_r(offs);
+			trench_control = mw8080bw_ram[offs];
 
 			if (trench_control & 0x40)  draw_trench = 1;
 			if (trench_control & 0x20)  draw_trench = 0;
@@ -194,7 +194,7 @@ VIDEO_UPDATE( spcenctr )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = mw8080bw_ram_r(offs);
+			video_data = mw8080bw_ram[offs];
 		}
 	}
 
@@ -322,7 +322,7 @@ VIDEO_UPDATE( phantom2 )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = mw8080bw_ram_r(offs);
+			video_data = mw8080bw_ram[offs];
 		}
 	}
 
@@ -368,13 +368,9 @@ VIDEO_UPDATE( invaders )
 		pen_t pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
 
 		if (flip_screen)
-		{
 			*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pen;
-		}
 		else
-		{
 			*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
-		}
 
 		/* next pixel */
 		video_data = video_data >> 1;
@@ -391,13 +387,9 @@ VIDEO_UPDATE( invaders )
 				pen = (video_data & 0x01) ? RGB_WHITE : RGB_BLACK;
 
 				if (flip_screen)
-				{
 					*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + i)) = pen;
-				}
 				else
-				{
 					*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + i) = pen;
-				}
 
 				video_data = video_data >> 1;
 			}
@@ -416,7 +408,7 @@ VIDEO_UPDATE( invaders )
 		else if ((x & 0x07) == 0x04)
 		{
 			offs_t offs = ((offs_t)y << 5) | (x >> 3);
-			video_data = mw8080bw_ram_r(offs);
+			video_data = mw8080bw_ram[offs];
 		}
 	}
 

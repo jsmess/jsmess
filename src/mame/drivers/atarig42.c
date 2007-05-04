@@ -20,6 +20,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
+#include "machine/asic65.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
 #include "atarig42.h"
@@ -39,91 +40,6 @@ static int sloop_next_bank;
 static int sloop_offset;
 static int sloop_state;
 static UINT16 *sloop_base;
-
-
-
-#include "cpu/tms32010/tms32010.h"
-
-static UINT8 asic65_tfull;
-static UINT8 asic65_68full;
-static UINT8 asic65_cmd;
-static UINT8 asic65_xflg;
-static UINT16 asic65_68data;
-static UINT16 asic65_tdata;
-
-static void m68k_asic65_deferred_w(int data)
-{
-	asic65_tfull = 1;
-	asic65_cmd = data >> 16;
-	asic65_tdata = data;
-	cpunum_set_input_line(1, 0, ASSERT_LINE);
-}
-
-static WRITE16_HANDLER( m68k_asic65_w )
-{
-	mame_timer_set(time_zero, data | (offset << 16), m68k_asic65_deferred_w);
-	cpu_boost_interleave(0, TIME_IN_USEC(10));
-}
-
-static READ16_HANDLER( m68k_asic65_r )
-{
-	asic65_68full = 0;
-	return asic65_68data;
-}
-
-static READ16_HANDLER( m68k_asic65_stat_r )
-{
-	/* bit 15 = TFULL */
-	/* bit 14 = 68FULL */
-	/* bit 13 = XFLG */
-	/* bit 12 = controlled by jumper */
-	return (asic65_tfull << 15) | (asic65_68full << 14) | (asic65_xflg << 13) | 0x0000;
-}
-
-static WRITE16_HANDLER( asic65_68k_w )
-{
-	asic65_68full = 1;
-	asic65_68data = data;
-}
-
-static READ16_HANDLER( asic65_68k_r )
-{
-	asic65_tfull = 0;
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
-	return asic65_tdata;
-}
-
-static WRITE16_HANDLER( asic65_stat_w )
-{
-	asic65_xflg = data & 1;
-}
-
-static READ16_HANDLER( asic65_stat_r )
-{
-	/* bit 15 = 68FULL */
-	/* bit 14 = TFULL */
-	/* bit 13 = CMD */
-	/* bit 12 = controlled by jumper (0 = test?) */
-	return (asic65_68full << 15) | (asic65_tfull << 14) | (asic65_cmd << 13) | 0x1000;
-}
-
-static READ16_HANDLER( asci65_get_bio )
-{
-	if (!asic65_tfull)
-		cpu_spinuntil_int();
-	return asic65_tfull ? CLEAR_LINE : ASSERT_LINE;
-}
-
-static ADDRESS_MAP_START( asic65_program_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( asic65_io_map, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(asic65_68k_r, asic65_68k_w)
-	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(asic65_stat_r, asic65_stat_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(asci65_get_bio)
-ADDRESS_MAP_END
 
 
 
@@ -193,7 +109,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_MSB)
 	{
 		/* bit 14 controls the ASIC65 reset line */
-		cpunum_set_input_line(1, INPUT_LINE_RESET, (~data >> 14) & 1);
+		asic65_reset((~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(0, (data >> 11) & 7);
@@ -203,7 +119,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_LSB)
 	{
 		/* bit 4 resets the sound CPU */
-		cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10)) atarijsa_reset();
 
 		/* bit 5 is /XRESET, probably related to the ASIC */
@@ -444,9 +360,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xe03800, 0xe03801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
-	AM_RANGE(0xf40000, 0xf40001) AM_READ(m68k_asic65_stat_r)
-	AM_RANGE(0xf60000, 0xf60001) AM_READ(m68k_asic65_r)
-	AM_RANGE(0xf80000, 0xf80003) AM_WRITE(m68k_asic65_w)
+	AM_RANGE(0xf40000, 0xf40001) AM_READ(asic65_io_r)
+	AM_RANGE(0xf60000, 0xf60001) AM_READ(asic65_r)
+	AM_RANGE(0xf80000, 0xf80003) AM_WRITE(asic65_data_w)
 	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_READWRITE(MRA16_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xff0000, 0xff0fff) AM_WRITE(atarirle_0_spriteram_w) AM_BASE(&atarirle_0_spriteram)
@@ -606,9 +522,7 @@ static MACHINE_DRIVER_START( atarig42 )
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
 
 	/* ASIC65 */
-	MDRV_CPU_ADD(TMS32010, 20000000)
-	MDRV_CPU_PROGRAM_MAP(asic65_program_map,0)
-	MDRV_CPU_IO_MAP(asic65_io_map,0)
+	MDRV_IMPORT_FROM(asic65)
 
 	MDRV_MACHINE_RESET(atarig42)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -648,46 +562,46 @@ ROM_START( roadriot )
 	ROM_LOAD16_BYTE( "rriot.9c", 0x40001, 0x20000, CRC(0d34419a) SHA1(f16e9fb4cd537d727611cb7dd5537c030671fe1e) )
 
 	ROM_REGION( 0x2000, REGION_CPU2, 0 )	/* ASIC65 TMS32015 code */
-	ROM_LOAD( "asic65rr.bin", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
+	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
 
 	ROM_REGION( 0x14000, REGION_CPU3, 0 )	/* 6502 code */
-	ROM_LOAD( "rriots.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
+	ROM_LOAD( "136089-1047.12c", 0x10000, 0x4000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 	ROM_CONTINUE(           0x04000, 0xc000 )
 
 	ROM_REGION( 0xc0000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "rriot.22d",    0x000000, 0x20000, CRC(b7451f92) SHA1(9fd17913630e457e406e596f2d86afff98787750) ) /* playfield, planes 0-1 */
-	ROM_LOAD( "rriot.22c",    0x020000, 0x20000, CRC(90f3c6ee) SHA1(7607509e2d3b2080a918cfaf2879dbed6b79d029) )
-	ROM_LOAD( "rriot20.21d",  0x040000, 0x20000, CRC(d40de62b) SHA1(fa6dfd20bdad7874ae33a1027a9bb0ea200f86ca) ) /* playfield, planes 2-3 */
-	ROM_LOAD( "rriot20.21c",  0x060000, 0x20000, CRC(a7e836b1) SHA1(d41f1e4166ca757176c6976be2a953db5db05e48) )
-	ROM_LOAD( "rriot.20d",    0x080000, 0x20000, CRC(a81ae93f) SHA1(b694ba5fab35f8fa505a02039ae62f7af3c7ae1d) ) /* playfield, planes 4-5 */
-	ROM_LOAD( "rriot.20c",    0x0a0000, 0x20000, CRC(b8a6d15a) SHA1(43d2be9d40a84b2c01d80bbcac737eda04d55999) )
+	ROM_LOAD( "136089-1041.22d",    0x000000, 0x20000, CRC(b7451f92) SHA1(9fd17913630e457e406e596f2d86afff98787750) ) /* playfield, planes 0-1 */
+	ROM_LOAD( "136089-1038.22c",    0x020000, 0x20000, CRC(90f3c6ee) SHA1(7607509e2d3b2080a918cfaf2879dbed6b79d029) )
+	ROM_LOAD( "136089-1037.2021d",  0x040000, 0x20000, CRC(d40de62b) SHA1(fa6dfd20bdad7874ae33a1027a9bb0ea200f86ca) ) /* playfield, planes 2-3 */
+	ROM_LOAD( "136089-1039.2021c",  0x060000, 0x20000, CRC(a7e836b1) SHA1(d41f1e4166ca757176c6976be2a953db5db05e48) )
+	ROM_LOAD( "136089-1040.20d",    0x080000, 0x20000, CRC(a81ae93f) SHA1(b694ba5fab35f8fa505a02039ae62f7af3c7ae1d) ) /* playfield, planes 4-5 */
+	ROM_LOAD( "136089-1042.20c",    0x0a0000, 0x20000, CRC(b8a6d15a) SHA1(43d2be9d40a84b2c01d80bbcac737eda04d55999) )
 
 	ROM_REGION( 0x020000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "rriot.22j",    0x000000, 0x20000, CRC(0005bab0) SHA1(257e1b23eea117fe6701a67134b96d9d9fe10caf) ) /* alphanumerics */
+	ROM_LOAD( "136089-1046.22j",    0x000000, 0x20000, CRC(0005bab0) SHA1(257e1b23eea117fe6701a67134b96d9d9fe10caf) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x200000, REGION_GFX3, 0 )
-	ROM_LOAD16_BYTE( "rriot.2s", 0x000000, 0x20000, CRC(19590a94) SHA1(e375b7e01a8b1f366bb4e7750e33f0b6d9ae2042) )
-	ROM_LOAD16_BYTE( "rriot.2p", 0x000001, 0x20000, CRC(c2bf3f69) SHA1(f822359070b1907973ee7ee35469f4a59f720830) )
-	ROM_LOAD16_BYTE( "rriot.3s", 0x040000, 0x20000, CRC(bab110e4) SHA1(0c4e3521474249517e7832df1bc63aca6d6a6c91) )
-	ROM_LOAD16_BYTE( "rriot.3p", 0x040001, 0x20000, CRC(791ad2c5) SHA1(4ef218fbf38a9c6b58c86f203843988df1c935f6) )
-	ROM_LOAD16_BYTE( "rriot.4s", 0x080000, 0x20000, CRC(79cba484) SHA1(ce361a432f1fe627086bab3c1131118fd15056f1) )
-	ROM_LOAD16_BYTE( "rriot.4p", 0x080001, 0x20000, CRC(86a2e257) SHA1(98d95d2e67fecc332f6c66358a1f8d58b168c74b) )
-	ROM_LOAD16_BYTE( "rriot.5s", 0x0c0000, 0x20000, CRC(67d28478) SHA1(cfc9da6d20c65d11c2a59a38660a8da4d1cc219d) )
-	ROM_LOAD16_BYTE( "rriot.5p", 0x0c0001, 0x20000, CRC(74638838) SHA1(bea0fb21ccb946e023c88791ce5a8dd92b44baec) )
-	ROM_LOAD16_BYTE( "rriot.6s", 0x100000, 0x20000, CRC(24933c37) SHA1(516393aae51fc9634a5c6d5134be058d6067e114) )
-	ROM_LOAD16_BYTE( "rriot.6p", 0x100001, 0x20000, CRC(054a163b) SHA1(1b0b129c093398bc5c14b3fdd87dfe149f555fac) )
-	ROM_LOAD16_BYTE( "rriot.7s", 0x140000, 0x20000, CRC(31ff090a) SHA1(7b43ed37901c3f94cae90c84b3c8c689d7b64dd6) )
-	ROM_LOAD16_BYTE( "rriot.7p", 0x140001, 0x20000, CRC(bbe5b69b) SHA1(9eaa551fba763824d36fc41bfe0e6d735a9e68c5) )
-	ROM_LOAD16_BYTE( "rriot.8s", 0x180000, 0x20000, CRC(6c89d2c5) SHA1(0bf2990ce1cd5ec5b84f7e3171725540e6238408) )
-	ROM_LOAD16_BYTE( "rriot.8p", 0x180001, 0x20000, CRC(40d9bde5) SHA1(aca6e07ea96e4618412d32fe4d4cd293ae82d940) )
-	ROM_LOAD16_BYTE( "rriot.9s", 0x1c0000, 0x20000, CRC(eca3c595) SHA1(5d067b7c02675b1e6dd3c4046697a16f873f80af) )
-	ROM_LOAD16_BYTE( "rriot.9p", 0x1c0001, 0x20000, CRC(88acdb53) SHA1(5bf2424ee75a25248a8ce38c8605b6780da4e323) )
+	ROM_LOAD16_BYTE( "136089-1018.2s", 0x000000, 0x20000, CRC(19590a94) SHA1(e375b7e01a8b1f366bb4e7750e33f0b6d9ae2042) )
+	ROM_LOAD16_BYTE( "136089-1017.2p", 0x000001, 0x20000, CRC(c2bf3f69) SHA1(f822359070b1907973ee7ee35469f4a59f720830) )
+	ROM_LOAD16_BYTE( "136089-1020.3s", 0x040000, 0x20000, CRC(bab110e4) SHA1(0c4e3521474249517e7832df1bc63aca6d6a6c91) )
+	ROM_LOAD16_BYTE( "136089-1019.3p", 0x040001, 0x20000, CRC(791ad2c5) SHA1(4ef218fbf38a9c6b58c86f203843988df1c935f6) )
+	ROM_LOAD16_BYTE( "136089-1022.4s", 0x080000, 0x20000, CRC(79cba484) SHA1(ce361a432f1fe627086bab3c1131118fd15056f1) )
+	ROM_LOAD16_BYTE( "136089-1021.4p", 0x080001, 0x20000, CRC(86a2e257) SHA1(98d95d2e67fecc332f6c66358a1f8d58b168c74b) )
+	ROM_LOAD16_BYTE( "136089-1024.5s", 0x0c0000, 0x20000, CRC(67d28478) SHA1(cfc9da6d20c65d11c2a59a38660a8da4d1cc219d) )
+	ROM_LOAD16_BYTE( "136089-1023.5p", 0x0c0001, 0x20000, CRC(74638838) SHA1(bea0fb21ccb946e023c88791ce5a8dd92b44baec) )
+	ROM_LOAD16_BYTE( "136089-1026.6s", 0x100000, 0x20000, CRC(24933c37) SHA1(516393aae51fc9634a5c6d5134be058d6067e114) )
+	ROM_LOAD16_BYTE( "136089-1025.6p", 0x100001, 0x20000, CRC(054a163b) SHA1(1b0b129c093398bc5c14b3fdd87dfe149f555fac) )
+	ROM_LOAD16_BYTE( "136089-1028.7s", 0x140000, 0x20000, CRC(31ff090a) SHA1(7b43ed37901c3f94cae90c84b3c8c689d7b64dd6) )
+	ROM_LOAD16_BYTE( "136089-1027.7p", 0x140001, 0x20000, CRC(bbe5b69b) SHA1(9eaa551fba763824d36fc41bfe0e6d735a9e68c5) )
+	ROM_LOAD16_BYTE( "136089-1030.8s", 0x180000, 0x20000, CRC(6c89d2c5) SHA1(0bf2990ce1cd5ec5b84f7e3171725540e6238408) )
+	ROM_LOAD16_BYTE( "136089-1029.8p", 0x180001, 0x20000, CRC(40d9bde5) SHA1(aca6e07ea96e4618412d32fe4d4cd293ae82d940) )
+	ROM_LOAD16_BYTE( "136089-1032.9s", 0x1c0000, 0x20000, CRC(eca3c595) SHA1(5d067b7c02675b1e6dd3c4046697a16f873f80af) )
+	ROM_LOAD16_BYTE( "136089-1031.9p", 0x1c0001, 0x20000, CRC(88acdb53) SHA1(5bf2424ee75a25248a8ce38c8605b6780da4e323) )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* 1MB for ADPCM samples */
-	ROM_LOAD( "rriots.19e",  0x80000, 0x20000, CRC(2db638a7) SHA1(45da8088f7439beacc3056952a4d631d9633efa7) )
-	ROM_LOAD( "rriots.17e",  0xa0000, 0x20000, CRC(e1dd7f9e) SHA1(6b9a240aa84d210d3052daab6ea26f9cd0e62dc1) )
-	ROM_LOAD( "rriots.15e",  0xc0000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
-	ROM_LOAD( "rriots.12e",  0xe0000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
+	ROM_LOAD( "136089-1048.19e",  0x80000, 0x20000, CRC(2db638a7) SHA1(45da8088f7439beacc3056952a4d631d9633efa7) )
+	ROM_LOAD( "136089-1049.17e",  0xa0000, 0x20000, CRC(e1dd7f9e) SHA1(6b9a240aa84d210d3052daab6ea26f9cd0e62dc1) )
+	ROM_LOAD( "136089-1050.15e",  0xc0000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
+	ROM_LOAD( "136089-1051.12e",  0xe0000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
 
 	ROM_REGION( 0x0600, REGION_PROMS, ROMREGION_DISPOSE )	/* microcode for growth renderer */
 	ROM_LOAD( "136089-1001.bin",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
@@ -704,7 +618,7 @@ ROM_START( guardian )
 	ROM_LOAD16_BYTE( "136092-2022.9cd", 0x40001, 0x20000, CRC(ed2abc91) SHA1(81531040d5663f6ab82e924210056e3737e17a8d) )
 
 	ROM_REGION( 0x2000, REGION_CPU2, 0 )	/* ASIC65 TMS32015 code */
-	ROM_LOAD( "asic65rr.bin", 0x00000, 0x0a80, CRC(7c5498e7) SHA1(9d8b235baf7b75bef8ef9b168647c5b2b80b2cb3) )
+	ROM_LOAD( "136089-1012.3f", 0x00000, 0x0a80, NO_DUMP )
 
 	ROM_REGION( 0x14000, REGION_CPU3, 0 )	/* 6502 code */
 	ROM_LOAD( "136092-0080-snd.12c", 0x10000, 0x4000, CRC(0388f805) SHA1(49c11313bc4192dbe294cf68b652cb19047889fd) )
@@ -786,7 +700,7 @@ static DRIVER_INIT( roadriot )
 	sloop_base = memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_w);
 	memory_set_opbase_handler(0, sloop_opbase_handler);
 
-//  asic65_config(ASIC65_STANDARD);
+	asic65_config(ASIC65_ROMBASED);
 /*
     Road Riot color MUX
 
@@ -841,7 +755,7 @@ static DRIVER_INIT( guardian )
 	sloop_base = memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_w);
 	memory_set_opbase_handler(0, sloop_opbase_handler);
 
-//  asic65_config(ASIC65_GUARDIANS);
+	asic65_config(ASIC65_GUARDIANS);
 /*
     Guardians color MUX
 

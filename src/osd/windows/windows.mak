@@ -83,7 +83,7 @@ ifdef MSVC_BUILD
 
 # replace the various compilers with vconv.exe prefixes
 CC = @$(OBJ)/vconv.exe gcc -I.
-LD = @$(OBJ)/vconv.exe ld
+LD = @$(OBJ)/vconv.exe ld /profile
 AR = @$(OBJ)/vconv.exe ar
 RC = @$(OBJ)/vconv.exe windres
 
@@ -137,8 +137,8 @@ CURPATH = ./
 
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
-#DEFS += -DMALLOC_DEBUG
-#LDFLAGS += -Wl,--allow-multiple-definition
+DEFS += -DMALLOC_DEBUG
+LDFLAGS += -Wl,--allow-multiple-definition
 endif
 
 ifdef UNICODE

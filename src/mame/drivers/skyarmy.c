@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( skyarmy )
 	MDRV_CPU_PROGRAM_MAP(skyarmy_readmem,skyarmy_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(skyarmy_nmi_source,TIME_IN_HZ(650))	/* Hz */
+	MDRV_CPU_PERIODIC_INT(skyarmy_nmi_source,650)	/* Hz */
 
 	/* video hardware */
 	MDRV_SCREEN_REFRESH_RATE(60)

@@ -499,7 +499,7 @@ static MACHINE_DRIVER_START( kchamp )
 	/* audio CPU */	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_sound_readmem,kc_sound_writemem)
 	MDRV_CPU_IO_MAP(kc_sound_readport,kc_sound_writeport)
-	MDRV_CPU_PERIODIC_INT(sound_int, TIME_IN_HZ(125)) /* Hz */
+	MDRV_CPU_PERIODIC_INT(sound_int, 125) /* Hz */
 			/* irq's triggered from main cpu */
 			/* nmi's from 125 Hz clock */
 	MDRV_SCREEN_REFRESH_RATE(60)

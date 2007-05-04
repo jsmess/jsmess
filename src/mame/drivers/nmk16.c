@@ -2921,7 +2921,7 @@ static MACHINE_DRIVER_START( tharrier )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(tharrier_readmem,tharrier_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */
@@ -2969,7 +2969,7 @@ static MACHINE_DRIVER_START( manybloc )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10? MHz - check */
 	MDRV_CPU_PROGRAM_MAP(manybloc_readmem,manybloc_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(60))/* is this is too high it breaks the game on this one, too low sprites flicker */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,60)/* is this is too high it breaks the game on this one, too low sprites flicker */
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */
@@ -3016,7 +3016,7 @@ static MACHINE_DRIVER_START( mustang )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustang_readmem,mustang_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3060,7 +3060,7 @@ static MACHINE_DRIVER_START( mustangb )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustang_readmem,mustangb_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -3141,7 +3141,7 @@ static MACHINE_DRIVER_START( bioship )
 	MDRV_CPU_ADD(M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
 	MDRV_CPU_PROGRAM_MAP(bioship_readmem,bioship_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3184,7 +3184,7 @@ static MACHINE_DRIVER_START( vandyke )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(vandyke_readmem,vandyke_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3227,7 +3227,7 @@ static MACHINE_DRIVER_START( acrobatm )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? 12 MHz? */
 	MDRV_CPU_PROGRAM_MAP(acrobatm_readmem,acrobatm_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3272,7 +3272,7 @@ static MACHINE_DRIVER_START( tdragonb )
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(tdragon_readmem,tdragonb_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ?? drives music */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -3293,7 +3293,7 @@ static MACHINE_DRIVER_START( tdragonb )
 	MDRV_VIDEO_UPDATE(macross)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 8000, 1)
+	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000, 1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tdragon )
@@ -3302,7 +3302,7 @@ static MACHINE_DRIVER_START( tdragon )
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(tdragon_readmem,tdragon_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ?? drives music */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3345,7 +3345,7 @@ static MACHINE_DRIVER_START( ssmissin )
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_readmem,ssmissin_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112)) /* input related */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112) /* input related */
 
 	MDRV_CPU_ADD(Z80, 8000000/2) /* 4 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_sound_readmem,ssmissin_sound_writemem)
@@ -3381,7 +3381,7 @@ static MACHINE_DRIVER_START( strahl )
 	MDRV_CPU_ADD(M68000, 12000000) /* 12 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(strahl_readmem,strahl_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3425,7 +3425,7 @@ static MACHINE_DRIVER_START( hachamf )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(hachamf_readmem,hachamf_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3469,7 +3469,7 @@ static MACHINE_DRIVER_START( macross )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross_readmem,macross_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3513,7 +3513,7 @@ static MACHINE_DRIVER_START( gunnail )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz? */
 	MDRV_CPU_PROGRAM_MAP(gunnail_readmem,gunnail_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -3557,7 +3557,7 @@ static MACHINE_DRIVER_START( macross2 )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,macross2_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */ /* 4 MHz ? */
@@ -3602,7 +3602,7 @@ static MACHINE_DRIVER_START( tdragon2 )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,macross2_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */ /* 4 MHz ? */
@@ -3647,7 +3647,7 @@ static MACHINE_DRIVER_START( raphero )
 	MDRV_CPU_ADD(M68000, 14000000) /* 14 MHz measured */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,raphero_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ???????? */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD_TAG("sound",TMP90841, 8000000)
 	MDRV_CPU_PROGRAM_MAP(raphero_sound_mem_map,0)
@@ -3690,7 +3690,7 @@ static MACHINE_DRIVER_START( bjtwin )
 	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz? It's a P12, but xtals are 10MHz and 16MHz */
 	MDRV_CPU_PROGRAM_MAP(bjtwin_readmem,bjtwin_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(112))/* ?? drives music */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

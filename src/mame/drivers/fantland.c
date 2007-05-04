@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( fantland )
 	MDRV_CPU_ADD(I86, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_readmem, fantland_sound_writemem)
 	MDRV_CPU_IO_MAP(fantland_sound_readport,fantland_sound_writeport)
-	MDRV_CPU_PERIODIC_INT(fantland_sound_irq,TIME_IN_HZ(8000))
+	MDRV_CPU_PERIODIC_INT(fantland_sound_irq, 8000)
 	// NMI when soundlatch is written
 
 	MDRV_SCREEN_REFRESH_RATE(60)

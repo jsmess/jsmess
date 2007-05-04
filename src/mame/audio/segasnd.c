@@ -360,7 +360,7 @@ WRITE8_HANDLER( sega_usb_data_w )
 	timer_set(TIME_NOW, data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
-	cpu_boost_interleave(0, TIME_IN_USEC(250));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(250));
 }
 
 

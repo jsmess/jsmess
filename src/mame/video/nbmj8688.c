@@ -681,7 +681,7 @@ VIDEO_UPDATE( mbmj8688 )
 {
 	int x, y;
 
-	if (get_vh_global_attribute_changed() || mjsikaku_screen_refresh)
+	if (mjsikaku_screen_refresh)
 	{
 		mjsikaku_screen_refresh = 0;
 		for (y = 0; y < 256; y++)

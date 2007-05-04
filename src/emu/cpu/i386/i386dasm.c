@@ -85,6 +85,7 @@ typedef struct {
 } GROUP_OP;
 
 static const UINT8 *opcode_ptr;
+static const UINT8 *opcode_ptr_base;
 static const I386_OPCODE *opcode_table1 = 0;
 static const I386_OPCODE *opcode_table2 = 0;
 
@@ -1196,6 +1197,8 @@ static UINT8 curmode;
 
 INLINE UINT8 FETCH(void)
 {
+	if ((opcode_ptr - opcode_ptr_base) + 1 > 15)
+		return 0xff;
 	pc++;
 	return *opcode_ptr++;
 }
@@ -1203,6 +1206,8 @@ INLINE UINT8 FETCH(void)
 INLINE UINT16 FETCH16(void)
 {
 	UINT16 d;
+	if ((opcode_ptr - opcode_ptr_base) + 2 > 15)
+		return 0xffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
 	opcode_ptr += 2;
 	pc += 2;
@@ -1212,6 +1217,8 @@ INLINE UINT16 FETCH16(void)
 INLINE UINT32 FETCH32(void)
 {
 	UINT32 d;
+	if ((opcode_ptr - opcode_ptr_base) + 4 > 15)
+		return 0xffffffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
 	opcode_ptr += 4;
 	pc += 4;
@@ -1220,6 +1227,8 @@ INLINE UINT32 FETCH32(void)
 
 INLINE UINT8 FETCHD(void)
 {
+	if ((opcode_ptr - opcode_ptr_base) + 1 > 15)
+		return 0xff;
 	pc++;
 	return *opcode_ptr++;
 }
@@ -1227,6 +1236,8 @@ INLINE UINT8 FETCHD(void)
 INLINE UINT16 FETCHD16(void)
 {
 	UINT16 d;
+	if ((opcode_ptr - opcode_ptr_base) + 2 > 15)
+		return 0xffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
 	opcode_ptr += 2;
 	pc += 2;
@@ -1236,6 +1247,8 @@ INLINE UINT16 FETCHD16(void)
 INLINE UINT32 FETCHD32(void)
 {
 	UINT32 d;
+	if ((opcode_ptr - opcode_ptr_base) + 4 > 15)
+		return 0xffffffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
 	opcode_ptr += 4;
 	pc += 4;
@@ -1316,7 +1329,7 @@ static void handle_modrm(char* s)
 	s += sprintf( s, "[" );
 	if( address_size == 2 ) {
 		if (rm == 4)
-			handle_sib_byte( s, mod );
+			s = handle_sib_byte( s, mod );
 		else if (rm == 5 && mod == 0) {
 			disp32 = FETCHD32();
 			s += sprintf( s, "rip%s", shexstring(disp32, 0, TRUE) );
@@ -1331,7 +1344,7 @@ static void handle_modrm(char* s)
 		}
 	} else if (address_size == 1) {
 		if (rm == 4)
-			handle_sib_byte( s, mod );
+			s = handle_sib_byte( s, mod );
 		else if (rm == 5 && mod == 0) {
 			disp32 = FETCHD32();
 			if (curmode == 64)
@@ -2070,7 +2083,7 @@ int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
 {
 	UINT8 op;
 
-	opcode_ptr = oprom;
+	opcode_ptr = opcode_ptr_base = oprom;
 	opcode_table1 = i386_opcode_table1;
 	opcode_table2 = i386_opcode_table2;
 	address_size = (mode == 16) ? 0 : (mode == 32) ? 1 : 2;
@@ -2091,7 +2104,7 @@ int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom)
 {
 	UINT8 op;
 
-	opcode_ptr = oprom;
+	opcode_ptr = opcode_ptr_base = oprom;
 	opcode_table1 = i386_opcode_table1;
 	opcode_table2 = necv_opcode_table2;
 	address_size = 0;

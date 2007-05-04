@@ -181,7 +181,7 @@ static void sound_callback(int param)
 {
 	port_A |= 0x40; /* result from sound cpu pending */
 	main_data = param;
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 }
 
 READ8_HANDLER( starwars_sin_r )
@@ -225,7 +225,7 @@ static void main_callback(int param)
 
 	port_A |= 0x80;  /* command from main cpu pending */
 	sound_data = param;
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 
 	if (PA7_irq)
 		cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);

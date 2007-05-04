@@ -870,21 +870,21 @@ static void autoselect_analog_devices(const input_port_entry *inp, int type1, in
 			if (analog_type[anatype] == SELECT_TYPE_MOUSE && !win_use_mouse)
 			{
 				win_use_mouse = 1;
-				verbose_printf("Input: Autoenabling mice due to presence of a %s\n", ananame);
+				mame_printf_verbose("Input: Autoenabling mice due to presence of a %s\n", ananame);
 			}
 
 			// autoenable joystick devices
 			if (analog_type[anatype] == SELECT_TYPE_JOYSTICK && !use_joystick)
 			{
 				use_joystick = 1;
-				verbose_printf("Input: Autoenabling joysticks due to presence of a %s\n", ananame);
+				mame_printf_verbose("Input: Autoenabling joysticks due to presence of a %s\n", ananame);
 			}
 
 			// autoenable lightgun devices
 			if (analog_type[anatype] == SELECT_TYPE_LIGHTGUN && !use_lightgun)
 			{
 				use_lightgun = 1;
-				verbose_printf("Input: Autoenabling lightguns due to presence of a %s\n", ananame);
+				mame_printf_verbose("Input: Autoenabling lightguns due to presence of a %s\n", ananame);
 			}
 
 			// all done
@@ -1258,7 +1258,7 @@ int wininput_init(running_machine *machine)
 				goto cant_create_dinput;
 		}
 	}
-	verbose_printf("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
+	mame_printf_verbose("DirectInput: Using DirectInput %d\n", dinput_version >> 8);
 
 	// enable devices based on autoselect
 	if (Machine != NULL && Machine->gamedrv != NULL)
@@ -1331,9 +1331,9 @@ int wininput_init(running_machine *machine)
 	memset(&codelist[total_codes], 0, sizeof(codelist[total_codes]));
 
 	// print the results
-	verbose_printf("Input: Keyboards=%d  Mice=%d  Joysticks=%d  Lightguns=%d\n", keyboard_count, mouse_count, joystick_count, lightgun_count);
+	mame_printf_verbose("Input: Keyboards=%d  Mice=%d  Joysticks=%d  Lightguns=%d\n", keyboard_count, mouse_count, joystick_count, lightgun_count);
 	if (controller)
-		verbose_printf("Input: \"%s\" controller support enabled\n", controller);
+		mame_printf_verbose("Input: \"%s\" controller support enabled\n", controller);
 	return 0;
 
 cant_init_joystick:
@@ -1944,7 +1944,7 @@ static void update_joystick_axes(void)
 			{
 				static const char *axistypes[] = { "invalid", "digital", "analog" };
 				joystick_type[joynum][axis] = newtype;
-				verbose_printf("Input: Joystick %d axis %d is now %s\n", joynum, axis, axistypes[newtype]);
+				mame_printf_verbose("Input: Joystick %d axis %d is now %s\n", joynum, axis, axistypes[newtype]);
 			}
 		}
 }
@@ -1999,7 +1999,7 @@ static void init_joycodes(void)
 			sprintf(mousename, "Mouse ");
 
 		// log the info
-		verbose_printf("Input: %s: %s\n", mousename, mouse_name[mouse]);
+		mame_printf_verbose("Input: %s: %s\n", mousename, mouse_name[mouse]);
 
 		// add analog axes (fix me -- should enumerate these)
 		sprintf(tempname, "%sX", mousename);
@@ -2074,7 +2074,7 @@ static void init_joycodes(void)
 	for (stick = 0; stick < joystick_count; stick++)
 	{
 		// log the info
-		verbose_printf("Input: Joystick %d: %s (%d axes, %d buttons, %d POVs)\n", stick + 1, joystick_name[stick], (int)joystick_caps[stick].dwAxes, (int)joystick_caps[stick].dwButtons, (int)joystick_caps[stick].dwPOVs);
+		mame_printf_verbose("Input: Joystick %d: %s (%d axes, %d buttons, %d POVs)\n", stick + 1, joystick_name[stick], (int)joystick_caps[stick].dwAxes, (int)joystick_caps[stick].dwButtons, (int)joystick_caps[stick].dwPOVs);
 
 		// loop over all axes
 		for (axis = 0; axis < MAX_AXES; axis++)
@@ -2093,7 +2093,7 @@ static void init_joycodes(void)
 				char *utf8_name = utf8_from_tstring(instance.tszName);
 				if (utf8_name != NULL)
 				{
-					verbose_printf("Input:  Axis %d (%s)%s\n", axis, utf8_name, joystick_digital[stick][axis] ? " - digital" : "");
+					mame_printf_verbose("Input:  Axis %d (%s)%s\n", axis, utf8_name, joystick_digital[stick][axis] ? " - digital" : "");
 
 					// add analog axis
 					if (!joystick_digital[stick][axis])
@@ -2967,7 +2967,7 @@ static BOOL init_raw_mouse(void)
 	if (!register_raw_mouse())
 		goto cant_init_raw_input;
 
-	verbose_printf("Input: Using RAWMOUSE for Mouse input\n");
+	mame_printf_verbose("Input: Using RAWMOUSE for Mouse input\n");
 	mouse_num_of_buttons = 5;
 
 	// override lightgun settings.  Not needed with RAWinput.

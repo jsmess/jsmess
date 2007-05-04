@@ -90,7 +90,7 @@ WRITE8_HANDLER ( zx_io_w )
 		zx_ula_bkgnd(1);
 		if (ula_frame_vsync == 2)
 		{
-			cpu_spinuntil_time(mame_time_to_double(video_screen_get_time_until_pos(0, Machine->screen[0].height - 1, 0)));
+			cpu_spinuntil_time(video_screen_get_time_until_pos(0, Machine->screen[0].height - 1, 0));
 			ula_scanline_count = Machine->screen[0].height - 1;
 			logerror ("S: %d B: %d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		}

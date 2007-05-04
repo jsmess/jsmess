@@ -222,7 +222,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  sound_flag2 = 1;
 	soundlatch_word_w(offset,data,mem_mask);
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_spinuntil_time(TIME_IN_USEC(50));	// Allow the other cpu to reply
+	cpu_spinuntil_time(MAME_TIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */

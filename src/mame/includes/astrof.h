@@ -2,10 +2,9 @@
 
 /*----------- defined in video/astrof.c -----------*/
 
-extern unsigned char *astrof_color;
-extern unsigned char *tomahawk_protection;
+extern UINT8 *astrof_color;
+extern UINT8 *tomahawk_protection;
 
-PALETTE_INIT( astrof );
 VIDEO_START( astrof );
 VIDEO_UPDATE( astrof );
 WRITE8_HANDLER( astrof_videoram_w );

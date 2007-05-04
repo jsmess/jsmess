@@ -23,7 +23,6 @@ static int char_dirty[1024];
 static int btime_palette = 0;
 static unsigned char bnj_scroll1 = 0;
 static unsigned char bnj_scroll2 = 0;
-static unsigned char *dirtybuffer2 = 0;
 static mame_bitmap *background_bitmap;
 static int lnc_sound_interrupt_enabled = 0;
 
@@ -133,31 +132,23 @@ MACHINE_RESET( lnc )
 Start the video hardware emulation.
 
 ***************************************************************************/
-VIDEO_START( bnj )
-{
-    if (video_start_generic(machine) != 0)
-        return 1;
-
-    dirtybuffer2 = auto_malloc(bnj_backgroundram_size);
-    memset(dirtybuffer2,1,bnj_backgroundram_size);
-
-    /* the background area is twice as wide as the screen */
-    background_bitmap = auto_bitmap_alloc(2*machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-    bnj_scroll1 = 0;
-    bnj_scroll2 = 0;
-
-    return 0;
-}
 
 VIDEO_START( btime )
 {
     bnj_scroll1 = 0;
     bnj_scroll2 = 0;
 
-    return video_start_generic(machine);
+    return 0;
 }
 
+
+VIDEO_START( bnj )
+{
+    /* the background area is twice as wide as the screen */
+    background_bitmap = auto_bitmap_alloc(2*machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+
+    return video_start_btime(machine);
+}
 
 
 WRITE8_HANDLER( btime_paletteram_w )
@@ -168,13 +159,8 @@ WRITE8_HANDLER( btime_paletteram_w )
 
 WRITE8_HANDLER( lnc_videoram_w )
 {
-    if (videoram[offset] != data || colorram[offset] != *lnc_charbank)
-    {
-        videoram[offset] = data;
-        colorram[offset] = *lnc_charbank;
-
-        dirtybuffer[offset] = 1;
-    }
+	videoram[offset] = data;
+	colorram[offset] = *lnc_charbank;
 }
 
 READ8_HANDLER( btime_mirrorvideoram_r )
@@ -210,7 +196,7 @@ WRITE8_HANDLER( btime_mirrorvideoram_w )
     y = offset % 32;
     offset = 32 * y + x;
 
-    videoram_w(offset,data);
+    videoram[offset] = data;
 }
 
 WRITE8_HANDLER( lnc_mirrorvideoram_w )
@@ -234,7 +220,7 @@ WRITE8_HANDLER( btime_mirrorcolorram_w )
     y = offset % 32;
     offset = 32 * y + x;
 
-    colorram_w(offset,data);
+    colorram[offset] = data;
 }
 
 WRITE8_HANDLER( deco_charram_w )
@@ -254,22 +240,11 @@ WRITE8_HANDLER( deco_charram_w )
 
 WRITE8_HANDLER( bnj_background_w )
 {
-    if (bnj_backgroundram[offset] != data)
-    {
-        dirtybuffer2[offset] = 1;
-
-        bnj_backgroundram[offset] = data;
-    }
+	bnj_backgroundram[offset] = data;
 }
 
 WRITE8_HANDLER( bnj_scroll1_w )
 {
-    // Dirty screen if background is being turned off
-    if (bnj_scroll1 && !data)
-    {
-		set_vh_global_attribute(NULL,0);
-    }
-
     bnj_scroll1 = data;
 }
 
@@ -286,7 +261,6 @@ WRITE8_HANDLER( zoar_video_control_w )
     // Bit 3-4 = Palette
     // Bit 7   = Flip Screen
 
-	set_vh_global_attribute(&btime_palette, (data & 0x30) >> 3);
 	flip_screen_set(data & 0x80);
 }
 
@@ -327,8 +301,6 @@ WRITE8_HANDLER( lnc_video_control_w )
 
 WRITE8_HANDLER( disco_video_control_w )
 {
-	set_vh_global_attribute(&btime_palette, (data >> 2) & 0x03);
-
 	if (!(input_port_3_r(0) & 0x40)) /* cocktail mode */
 	{
 		flip_screen_set(data & 0x01);
@@ -354,17 +326,9 @@ static void drawchars(mame_bitmap *bitmap, int transparency, int color, int prio
 {
     int offs;
 
-    /* for every character in the Video RAM, check if it has been modified */
-    /* since last time and update it accordingly. If the background is on, */
-    /* draw characters as sprites */
-
     for (offs = videoram_size - 1;offs >= 0;offs--)
     {
         int sx,sy,code;
-
-        if (!dirtybuffer[offs] && (bitmap == tmpbitmap)) continue;
-
-        dirtybuffer[offs] = 0;
 
         code = videoram[offs] + 256 * (colorram[offs] & 3);
 
@@ -490,23 +454,12 @@ static void decode_modified(unsigned char *sprite_ram, int interleave)
 
         code = videoram[offs] + 256 * (colorram[offs] & 3);
 
-        switch (char_dirty[code])
+        if (char_dirty[code])
         {
-        case 1:
             decodechar(Machine->gfx[0],code,deco_charram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
-            char_dirty[code] = 2;
-            /* fall through */
-        case 2:
-            dirtybuffer[offs] = 1;
-            break;
-        default:
-            break;
-        }
-    }
 
-    for (i = 0; i < sizeof(char_dirty)/sizeof(char_dirty[0]); i++)
-    {
-        if (char_dirty[i] == 2)  char_dirty[i] = 0;
+            char_dirty[code] = 0;
+        }
     }
 
     /* decode dirty sprites */
@@ -515,11 +468,12 @@ static void decode_modified(unsigned char *sprite_ram, int interleave)
         int code;
 
         code  = sprite_ram[offs + interleave];
+
         if (sprite_dirty[code])
         {
-            sprite_dirty[code] = 0;
-
             decodechar(Machine->gfx[1],code,deco_charram,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+
+            sprite_dirty[code] = 0;
         }
     }
 }
@@ -527,9 +481,6 @@ static void decode_modified(unsigned char *sprite_ram, int interleave)
 
 VIDEO_UPDATE( btime )
 {
-    if (get_vh_global_attribute_changed())
-        memset(dirtybuffer,1,videoram_size);
-
     if (bnj_scroll1 & 0x10)
     {
         int i, start;
@@ -545,7 +496,7 @@ VIDEO_UPDATE( btime )
         for (i = 0; i < 4; i++)
         {
             btime_tilemap[i] = start | (bnj_scroll1 & 0x04);
-            start = (start+1) & 0x03;
+            start = (start + 1) & 0x03;
         }
 
         drawbackground(bitmap, btime_tilemap);
@@ -554,52 +505,37 @@ VIDEO_UPDATE( btime )
     }
     else
     {
-        drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
-
-        /* copy the temporary bitmap to the screen */
-        copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+        drawchars(bitmap, TRANSPARENCY_NONE, 0, -1);
     }
 
     drawsprites(bitmap, 0, 1, 0, videoram, 0x20);
+
 	return 0;
 }
 
 
 VIDEO_UPDATE( eggs )
 {
-    if (get_vh_global_attribute_changed())
-        memset(dirtybuffer,1,videoram_size);
-
-    drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
-
-    /* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    drawchars(bitmap, TRANSPARENCY_NONE, 0, -1);
 
     drawsprites(bitmap, 0, 0, 0, videoram, 0x20);
+
 	return 0;
 }
 
 
 VIDEO_UPDATE( lnc )
 {
-    if (get_vh_global_attribute_changed())
-        memset(dirtybuffer,1,videoram_size);
-
-    drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
-
-    /* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    drawchars(bitmap, TRANSPARENCY_NONE, 0, -1);
 
     drawsprites(bitmap, 0, 1, 2, videoram, 0x20);
+
 	return 0;
 }
 
 
 VIDEO_UPDATE( zoar )
 {
-    if (get_vh_global_attribute_changed())
-        memset(dirtybuffer,1,videoram_size);
-
     if (bnj_scroll1 & 0x04)
     {
         drawbackground(bitmap, zoar_scrollram);
@@ -608,31 +544,19 @@ VIDEO_UPDATE( zoar )
     }
     else
     {
-        drawchars(tmpbitmap, TRANSPARENCY_NONE, btime_palette + 1, -1);
-
-        /* copy the temporary bitmap to the screen */
-        copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+        drawchars(bitmap, TRANSPARENCY_NONE, btime_palette + 1, -1);
     }
 
     /* The order is important for correct priorities */
     drawsprites(bitmap, btime_palette + 1, 1, 2, videoram + 0x1f, 0x20);
     drawsprites(bitmap, btime_palette + 1, 1, 2, videoram,        0x20);
+
 	return 0;
 }
 
 
 VIDEO_UPDATE( bnj )
 {
-    if (get_vh_global_attribute_changed())
-    {
-        memset(dirtybuffer,1,videoram_size);
-        memset(dirtybuffer2,1,bnj_backgroundram_size);
-    }
-
-    /*
-     *  For each character in the background RAM, check if it has been
-     *  modified since last time and update it accordingly.
-     */
     if (bnj_scroll1)
     {
         int scroll, offs;
@@ -640,10 +564,6 @@ VIDEO_UPDATE( bnj )
         for (offs = bnj_backgroundram_size-1; offs >=0; offs--)
         {
             int sx,sy;
-
-            if (!dirtybuffer2[offs]) continue;
-
-            dirtybuffer2[offs] = 0;
 
             sx = 16 * ((offs < 0x100) ? ((offs % 0x80) / 8) : ((offs % 0x80) / 8) + 16);
             sy = 16 * (((offs % 0x100) < 0x80) ? offs % 8 : (offs % 8) + 8);
@@ -677,10 +597,7 @@ VIDEO_UPDATE( bnj )
     }
     else
     {
-        drawchars(tmpbitmap, TRANSPARENCY_NONE, 0, -1);
-
-        /* copy the temporary bitmap to the screen */
-        copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+        drawchars(bitmap, TRANSPARENCY_NONE, 0, -1);
 
         drawsprites(bitmap, 0, 0, 0, videoram, 0x20);
     }
@@ -692,14 +609,6 @@ VIDEO_UPDATE( cookrace )
 {
     int offs;
 
-
-    if (get_vh_global_attribute_changed())
-        memset(dirtybuffer,1,videoram_size);
-
-    /*
-     *  For each character in the background RAM, check if it has been
-     *  modified since last time and update it accordingly.
-     */
     for (offs = bnj_backgroundram_size-1; offs >=0; offs--)
     {
         int sx,sy;
@@ -724,38 +633,30 @@ VIDEO_UPDATE( cookrace )
     drawchars(bitmap, TRANSPARENCY_PEN, 0, -1);
 
     drawsprites(bitmap, 0, 1, 0, videoram, 0x20);
+
 	return 0;
 }
 
 
 VIDEO_UPDATE( disco )
 {
-    if (get_vh_global_attribute_changed())
-        memset(dirtybuffer,1,videoram_size);
-
     decode_modified(spriteram, 1);
 
-    drawchars(tmpbitmap, TRANSPARENCY_NONE, btime_palette, -1);
-
-    /* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+    drawchars(bitmap, TRANSPARENCY_NONE, btime_palette, -1);
 
     drawsprites(bitmap, btime_palette, 0, 0, spriteram, 1);
+
 	return 0;
 }
 
+
 VIDEO_UPDATE( progolf )
 {
-	if (get_vh_global_attribute_changed())
-        memset(dirtybuffer,1,videoram_size);
-
 	decode_modified(spriteram, 1);
 
-	drawchars(tmpbitmap, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
-
-	/* copy the temporary bitmap to the screen */
-    copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	drawchars(bitmap, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
 
 //  drawsprites(bitmap, 0/*btime_palette*/, 0, 0, spriteram, 1);
+
 	return 0;
 }

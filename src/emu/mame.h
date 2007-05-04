@@ -85,6 +85,7 @@ enum _output_channel
     OUTPUT_CHANNEL_WARNING,
     OUTPUT_CHANNEL_INFO,
     OUTPUT_CHANNEL_DEBUG,
+    OUTPUT_CHANNEL_VERBOSE,
     OUTPUT_CHANNEL_LOG,
     OUTPUT_CHANNEL_COUNT
 };
@@ -322,6 +323,7 @@ void mame_null_output_callback(void *param, const char *format, va_list argptr);
 void mame_printf_error(const char *format, ...) ATTR_PRINTF(1,2);
 void mame_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
 void mame_printf_info(const char *format, ...) ATTR_PRINTF(1,2);
+void mame_printf_verbose(const char *format, ...) ATTR_PRINTF(1,2);
 void mame_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
 
 /* discourage the use of printf directly */

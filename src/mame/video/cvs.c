@@ -153,12 +153,7 @@ READ8_HANDLER( cvs_character_mode_r )
     int value   = offset + 0x10;
     int newmode = (value >> 4) & 3;
 
-    if(newmode != character_mode)
-    {
-	    character_mode = newmode;
-        memset(dirtybuffer,1,videoram_size);
-    }
-
+    character_mode = newmode;
     character_page = (value << 2) & 0x300;
 
     return 0;
@@ -446,85 +441,73 @@ INLINE void plot_star(mame_bitmap *bitmap, int x, int y)
 
 VIDEO_UPDATE( cvs )
 {
-	int offs,character;
-	int sx,sy;
-
-	if (get_vh_global_attribute_changed())
-		memset(dirtybuffer, 1, videoram_size);
+	int offs;
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-        character = videoram[offs];
+		int character_bank;
+		int forecolor;
 
-		if(dirtybuffer[offs] || dirty_character[character])
+        int character = videoram[offs];
+
+		int sx = (offs % 32) * 8;
+		int sy = (offs / 32) * 8;
+
+		/* Decide if RAM or ROM based character */
+
+		if(character > ModeOffset[character_mode])
 		{
-            int character_bank;
-            int forecolor;
+			/* re-generate character if dirty */
 
-			dirtybuffer[offs] = 0;
-
-			sx = (offs % 32) * 8;
-			sy = (offs / 32) * 8;
-
-            /* Decide if RAM or ROM based character */
-
-            if(character > ModeOffset[character_mode])
-            {
-            	/* re-generate character if dirty */
-
-                if(dirty_character[character]==1)
-                {
-                	dirty_character[character]=2;
-		   			decodechar(machine->gfx[1],character,character_1_ram-1024,machine->drv->gfxdecodeinfo[1].gfxlayout);
-                }
-
-            	character_bank=1;
-            }
-            else
-            {
-            	character_bank=0;
-            }
-
-            /* Main Screen */
-
- 			drawgfx(tmpbitmap,machine->gfx[character_bank],
-				    character,
-					colorram[offs],
-				    0,0,
-				    sx,sy,
-				    0,TRANSPARENCY_NONE,0);
-
-
-            /* Foreground for Collision Detection */
-
-            forecolor = 0;
-            if(colorram[offs] & 0x80)
-            {
-				forecolor=258;
-            }
-            else
+			if (dirty_character[character])
 			{
-				if((colorram[offs] & 0x03) == 3) forecolor=256;
-                else if((colorram[offs] & 0x01) == 0) forecolor=257;
-            }
+				decodechar(machine->gfx[1],character,character_1_ram-1024,machine->drv->gfxdecodeinfo[1].gfxlayout);
 
-            if(forecolor)
- 			    drawgfx(collision_background,machine->gfx[character_bank],
-				        character,
-					    forecolor,
-				        0,0,
-				        sx,sy,
-				        0,TRANSPARENCY_NONE,0);
+				dirty_character[character] = 0;
+			}
+
+			character_bank=1;
 		}
+		else
+		{
+			character_bank=0;
+		}
+
+		/* Main Screen */
+
+		drawgfx(tmpbitmap,machine->gfx[character_bank],
+				character,
+				colorram[offs],
+				0,0,
+				sx,sy,
+				0,TRANSPARENCY_NONE,0);
+
+
+		/* Foreground for Collision Detection */
+
+		forecolor = 0;
+		if(colorram[offs] & 0x80)
+		{
+			forecolor=258;
+		}
+		else
+		{
+			if((colorram[offs] & 0x03) == 3) forecolor=256;
+			else if((colorram[offs] & 0x01) == 0) forecolor=257;
+		}
+
+		if(forecolor)
+			drawgfx(collision_background,machine->gfx[character_bank],
+					character,
+					forecolor,
+					0,0,
+					sx,sy,
+					0,TRANSPARENCY_NONE,0);
 	}
 
-    /* Tidy up dirty character map */
-
-    for(offs=128;offs<256;offs++)
-    	if(dirty_character[offs]==2) dirty_character[offs]=0;
 
     /* Update screen - 8 regions, fixed scrolling area */
 
@@ -579,6 +562,7 @@ VIDEO_UPDATE( cvs )
     /* Update 2636 images */
 
     {
+		int sx;
         UINT32 S1,S2,S3,SB,pen;
 
         for(sx=255;sx>7;sx--)

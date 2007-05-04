@@ -117,117 +117,90 @@ HT-01B
 #include "driver.h"
 #include "sound/ay8910.h"
 
-extern unsigned char *thepit_attributesram;
-extern unsigned char *intrepid_sprite_bank_select;
-WRITE8_HANDLER( thepit_attributes_w );
+
+extern UINT8 *thepit_videoram;
+extern UINT8 *thepit_colorram;
+extern UINT8 *thepit_attributesram;
+extern UINT8 *thepit_spriteram;
+extern size_t thepit_spriteram_size;
 
 PALETTE_INIT( thepit );
 PALETTE_INIT( suprmous );
+VIDEO_START( thepit );
+VIDEO_START( intrepid );
+VIDEO_START( suprmous );
 VIDEO_UPDATE( thepit );
+WRITE8_HANDLER( thepit_videoram_w );
+WRITE8_HANDLER( thepit_colorram_w );
+WRITE8_HANDLER( thepit_flip_screen_x_w );
+WRITE8_HANDLER( thepit_flip_screen_y_w );
 READ8_HANDLER( thepit_input_port_0_r );
-WRITE8_HANDLER( thepit_sound_enable_w );
-WRITE8_HANDLER( intrepid_graphics_bank_select_w );
+WRITE8_HANDLER( intrepid_graphics_bank_w );
 
-static WRITE8_HANDLER( flip_screen_x_w )
-{
-	flip_screen_x_set(data);
-}
 
-static WRITE8_HANDLER( flip_screen_y_w )
+
+static WRITE8_HANDLER( thepit_sound_enable_w )
 {
-	flip_screen_y_set(data);
+	sound_global_enable(data);
 }
 
 
-static ADDRESS_MAP_START( thepit_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8800, 0x8bff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8c00, 0x8fff) AM_READ(colorram_r)
-	AM_RANGE(0x9000, 0x93ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9400, 0x97ff) AM_READ(videoram_r)
-	AM_RANGE(0x9800, 0x98ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
+static ADDRESS_MAP_START( thepit_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, thepit_colorram_w) AM_BASE(&thepit_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, thepit_videoram_w) AM_BASE(&thepit_videoram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(&thepit_attributesram)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&thepit_spriteram) AM_SIZE(&thepit_spriteram_size)
+	AM_RANGE(0x9860, 0x98ff) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(thepit_input_port_0_r, MWA8_NOP) // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( thepit_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(colorram_w)
-	AM_RANGE(0x9000, 0x93ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x9400, 0x97ff) AM_WRITE(videoram_w)
-	AM_RANGE(0x9800, 0x983f) AM_WRITE(thepit_attributes_w) AM_BASE(&thepit_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9860, 0x98ff) AM_WRITE(MWA8_RAM) // Probably unused
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_NOP) // Not hooked up according to the schematics
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, interrupt_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(MWA8_NOP) // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(MWA8_NOP) // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
 	AM_RANGE(0xb004, 0xb005) AM_WRITE(MWA8_NOP) // Unused, but initialized
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( intrepid_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8c00, 0x8fff) AM_READ(colorram_r)
-	AM_RANGE(0x9000, 0x98ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( intrepid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, thepit_videoram_w) AM_BASE(&thepit_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(MRA8_RAM, thepit_colorram_w) AM_BASE(&thepit_colorram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(&thepit_attributesram)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&thepit_spriteram) AM_SIZE(&thepit_spriteram_size)
+	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( intrepid_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(colorram_w)
-	AM_RANGE(0x9000, 0x93ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x9400, 0x97ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x9800, 0x983f) AM_WRITE(thepit_attributes_w) AM_BASE(&thepit_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9860, 0x98ff) AM_WRITE(MWA8_RAM) // Probably unused
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, interrupt_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(MWA8_NOP) // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(MWA8_NOP) // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(MWA8_NOP) // Unused, but initialized
-	AM_RANGE(0xb005, 0xb005) AM_WRITE(intrepid_graphics_bank_select_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xb005, 0xb005) AM_WRITE(intrepid_graphics_bank_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x3800, 0x3bff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x3800, 0x3bff) AM_WRITE(MWA8_RAM)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x8f, 0x8f) AM_READ(AY8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x8c, 0x8c) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x8d, 0x8d) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x8e, 0x8e) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8f, 0x8f) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -242,6 +215,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
+
 #define IN2_FAKE\
 	PORT_START_TAG("IN2")\
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL\
@@ -253,8 +227,10 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )\
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-INPUT_PORTS_START( thepit )
-IN0_REAL
+
+static INPUT_PORTS_START( thepit )
+	IN0_REAL
+
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -292,12 +268,12 @@ IN0_REAL
 
 	/* Since the real inputs are multiplexed, we used this fake port
        to read the 2nd player controls when the screen is flipped */
-	  IN2_FAKE
+	IN2_FAKE
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( roundup )
-IN0_REAL
+static INPUT_PORTS_START( roundup )
+	IN0_REAL
 
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -333,12 +309,12 @@ IN0_REAL
 
 	/* Since the real inputs are multiplexed, we used this fake port
        to read the 2nd player controls when the screen is flipped */
-IN2_FAKE
+	IN2_FAKE
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( fitter )
-IN0_REAL
+static INPUT_PORTS_START( fitter )
+	IN0_REAL
 
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -376,13 +352,13 @@ IN0_REAL
 
 	/* Since the real inputs are multiplexed, we used this fake port
        to read the 2nd player controls when the screen is flipped */
-IN2_FAKE
+	IN2_FAKE
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( intrepid )
-IN0_REAL
-/* The bit at 0x80 in IN0 Starts a timer, which, after it runs down, doesn't seem to do anything. See $0105 */
+static INPUT_PORTS_START( intrepid )
+	IN0_REAL
+	/* The bit at 0x80 in IN0 Starts a timer, which, after it runs down, doesn't seem to do anything. See $0105 */
 
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -421,13 +397,12 @@ IN0_REAL
 
 	/* Since the real inputs are multiplexed, we used this fake port
        to read the 2nd player controls when the screen is flipped */
-IN2_FAKE
-
+	IN2_FAKE
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( dockman )
-IN0_REAL
+static INPUT_PORTS_START( dockman )
+	IN0_REAL
 
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -465,12 +440,13 @@ IN0_REAL
 
 	/* Since the real inputs are multiplexed, we used this fake port
        to read the 2nd player controls when the screen is flipped */
-IN2_FAKE
+	IN2_FAKE
 INPUT_PORTS_END
 
 
-INPUT_PORTS_START( suprmous )
-IN0_REAL
+static INPUT_PORTS_START( suprmous )
+	IN0_REAL
+
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -508,10 +484,11 @@ IN0_REAL
 
 	/* Since the real inputs are multiplexed, we used this fake port
        to read the 2nd player controls when the screen is flipped */
-IN2_FAKE
+	IN2_FAKE
 INPUT_PORTS_END
 
-INPUT_PORTS_START( rtriv )
+
+static INPUT_PORTS_START( rtriv )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
@@ -574,7 +551,8 @@ INPUT_PORTS_START( rtriv )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
+
+static const gfx_layout thepit_charlayout =
 {
 	8,8,    /* 8*8 characters */
 	256,    /* 256 characters */
@@ -586,7 +564,7 @@ static const gfx_layout charlayout =
 };
 
 
-static const gfx_layout spritelayout =
+static const gfx_layout thepit_spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	64,     /* 64 sprites */
@@ -628,24 +606,24 @@ static const gfx_layout suprmous_spritelayout =
 
 static const gfx_decode thepit_gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &charlayout,     0, 8 },
-	{ REGION_GFX1, 0, &spritelayout,   0, 8 },
+	{ REGION_GFX1, 0, &thepit_charlayout,   0, 8 + 8 },
+	{ REGION_GFX1, 0, &thepit_spritelayout, 0, 8 + 8 },
 	{ -1 } /* end of array */
 };
 
 static const gfx_decode intrepid_gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0x0000, &charlayout,     0, 8 },
-	{ REGION_GFX1, 0x0000, &spritelayout,   0, 8 },
-	{ REGION_GFX1, 0x0800, &charlayout,     0, 8 },
-	{ REGION_GFX1, 0x0800, &spritelayout,   0, 8 },
+	{ REGION_GFX1, 0x0000, &thepit_charlayout,   0, 8 + 8 },
+	{ REGION_GFX1, 0x0000, &thepit_spritelayout, 0, 8 + 8 },
+	{ REGION_GFX1, 0x0800, &thepit_charlayout,   0, 8 + 8 },
+	{ REGION_GFX1, 0x0800, &thepit_spritelayout, 0, 8 + 8 },
 	{ -1 } /* end of array */
 };
 
 static const gfx_decode suprmous_gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0x0000, &suprmous_charlayout,   0, 4 },
-	{ REGION_GFX1, 0x0800, &suprmous_spritelayout, 0, 4 },
+	{ REGION_GFX1, 0x0000, &suprmous_charlayout,   0, 4 + 8 },
+	{ REGION_GFX1, 0x0800, &suprmous_spritelayout, 0, 4 + 8 },
 	{ -1 } /* end of array */
 };
 
@@ -655,34 +633,35 @@ static struct AY8910interface ay8910_interface =
 	soundlatch_r
 };
 
+
 static MACHINE_DRIVER_START( thepit )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)     /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(thepit_readmem,thepit_writemem)
+	MDRV_CPU_PROGRAM_MAP(thepit_main_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_CPU_ADD(Z80, 10000000/4)     /* 2.5 MHz */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+	MDRV_CPU_IO_MAP(audio_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION       /* frames per second, vblank duration */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_START(thepit)
+	MDRV_VIDEO_UPDATE(thepit)
+	MDRV_PALETTE_LENGTH(32+8)
+	MDRV_PALETTE_INIT(thepit)
+	MDRV_GFXDECODE(thepit_gfxdecodeinfo)
+	MDRV_COLORTABLE_LENGTH(32+32)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(thepit_gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(32+8)
-	MDRV_COLORTABLE_LENGTH(32)
-
-	MDRV_PALETTE_INIT(thepit)
-	MDRV_VIDEO_START(generic)
-	MDRV_VIDEO_UPDATE(thepit)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION       /* frames per second, vblank duration */)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -701,9 +680,10 @@ static MACHINE_DRIVER_START( intrepid )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(thepit)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(intrepid_readmem,intrepid_writemem)
+	MDRV_CPU_PROGRAM_MAP(intrepid_main_map,0)
 
 	/* video hardware */
+	MDRV_VIDEO_START(intrepid)
 	MDRV_GFXDECODE(intrepid_gfxdecodeinfo)
 MACHINE_DRIVER_END
 
@@ -714,8 +694,10 @@ static MACHINE_DRIVER_START( suprmous )
 	MDRV_IMPORT_FROM(intrepid)
 
 	/* video hardware */
-	MDRV_GFXDECODE(suprmous_gfxdecodeinfo)
+	MDRV_VIDEO_START(suprmous)
 	MDRV_PALETTE_INIT(suprmous)
+	MDRV_GFXDECODE(suprmous_gfxdecodeinfo)
+	MDRV_COLORTABLE_LENGTH(32+64)
 MACHINE_DRIVER_END
 
 

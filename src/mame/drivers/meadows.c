@@ -623,7 +623,7 @@ static MACHINE_DRIVER_START( meadows )
 	MDRV_CPU_ADD(S2650, 5000000/8)
 	/* audio CPU */ 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt,TIME_IN_HZ(38))	/* 5000000/131072 interrupts per frame */
+	MDRV_CPU_PERIODIC_INT(sound_interrupt, (double)5000000/131072)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(10)

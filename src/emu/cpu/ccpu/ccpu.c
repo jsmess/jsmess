@@ -554,9 +554,9 @@ static int ccpu_execute(int cycles)
 	abstime = mame_timer_get_time();
 	while (compare_mame_times(abstime, scantime) >= 0)
 		scantime = add_mame_times(scantime, video_screen_get_frame_period(ccpu.scrnum));
-	cpu_spinuntil_time(mame_time_to_double(sub_mame_times(scantime, abstime)));
+	cpu_spinuntil_time(sub_mame_times(scantime, abstime));
 }
-/*              cpu_spinuntil_time(mame_time_to_double(video_screen_get_time_until_pos(ccpu.scrnum, Machine->screen[ccpu.scrnum].visarea.max_y + 1, 0))); */
+/*              cpu_spinuntil_time(video_screen_get_time_until_pos(ccpu.scrnum, Machine->screen[ccpu.scrnum].visarea.max_y + 1, 0)); */
 				NEXT_ACC_A(); CYCLES(1);
 				break;
 

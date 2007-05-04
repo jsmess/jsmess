@@ -151,14 +151,6 @@ const gfx_layout gfx_16x16x4_planar =
 
 
 /***************************************************************************
-    LOCAL VARIABLES
-***************************************************************************/
-
-static int global_attribute_changed;
-
-
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
@@ -309,9 +301,6 @@ void generic_video_init(running_machine *machine)
 	dirtybuffer32 = NULL;
 	tmpbitmap = NULL;
 	flip_screen_x = flip_screen_y = 0;
-
-	/* force the first update to be full */
-	set_vh_global_attribute(NULL, 0);
 }
 
 
@@ -629,7 +618,7 @@ void flip_screen_x_set(int on)
 	if (on) on = ~0;
 	if (flip_screen_x != on)
 	{
-		set_vh_global_attribute(&flip_screen_x,on);
+		flip_screen_x = on;
 		updateflip();
 	}
 }
@@ -644,40 +633,10 @@ void flip_screen_y_set(int on)
 	if (on) on = ~0;
 	if (flip_screen_y != on)
 	{
-		set_vh_global_attribute(&flip_screen_y,on);
+		flip_screen_y = on;
 		updateflip();
 	}
 }
-
-
-/*-------------------------------------------------
-    set_vh_global_attribute - set an arbitrary
-    global video attribute
--------------------------------------------------*/
-
-void set_vh_global_attribute( int *addr, int data )
-{
-	if (!addr || *addr != data)
-	{
-		global_attribute_changed = 1;
-		if (addr)
-			*addr = data;
-	}
-}
-
-
-/*-------------------------------------------------
-    get_vh_global_attribute - set an arbitrary
-    global video attribute
--------------------------------------------------*/
-
-int get_vh_global_attribute_changed(void)
-{
-	int result = global_attribute_changed;
-	global_attribute_changed = 0;
-	return result;
-}
-
 
 
 /***************************************************************************

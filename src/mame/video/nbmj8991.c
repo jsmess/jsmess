@@ -307,7 +307,7 @@ VIDEO_UPDATE( nbmj8991_type1 )
 {
 	int x, y;
 
-	if (get_vh_global_attribute_changed() || nbmj8991_screen_refresh)
+	if (nbmj8991_screen_refresh)
 	{
 		nbmj8991_screen_refresh = 0;
 
@@ -348,7 +348,7 @@ VIDEO_UPDATE( nbmj8991_type2 )
 {
 	int x, y;
 
-	if (get_vh_global_attribute_changed() || nbmj8991_screen_refresh)
+	if (nbmj8991_screen_refresh)
 	{
 		nbmj8991_screen_refresh = 0;
 

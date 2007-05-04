@@ -516,7 +516,7 @@ static void delayed_z80_control_w(int data)
 	}
 
 	/* boost the interleave whenever this is written to */
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 
 	/* stash the new value */
 	z80_ctrl = data;

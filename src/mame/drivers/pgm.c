@@ -342,12 +342,12 @@ static WRITE32_HANDLER( arm7_latch_arm_w )
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-//  cpu_boost_interleave(0, TIME_IN_USEC(100));
+//  cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 	if (data!=0xaa) cpu_spinuntil_trigger(1000);
 	cpu_trigger(1002);
 #else
-	cpu_boost_interleave(0, TIME_IN_USEC(100));
-	cpu_spinuntil_time(TIME_IN_CYCLES(100, 0));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+	cpu_spinuntil_time(MAME_TIME_IN_CYCLES(100, 0));
 #endif
 }
 
@@ -380,8 +380,8 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 	cpu_spinuntil_trigger(1002);
 #else
 	cpunum_set_input_line(2, ARM7_FIRQ_LINE, PULSE_LINE);
-	cpu_boost_interleave(0, TIME_IN_USEC(200));
-	cpu_spinuntil_time(TIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(200));
+	cpu_spinuntil_time(MAME_TIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
 #endif
 }
 
@@ -746,14 +746,14 @@ WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 		kovsh_lowlatch = data;
 	}
 
-//  cpu_boost_interleave(0, TIME_IN_USEC(100));
-//  cpu_spinuntil_time(TIME_IN_CYCLES(100, 0));
+//  cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
+//  cpu_spinuntil_time(MAME_TIME_IN_CYCLES(100, 0));
 }
 
 READ16_HANDLER( kovsh_68k_protlatch_r )
 {
-	//cpu_boost_interleave(0, TIME_IN_USEC(200));
-	cpu_spinuntil_time(TIME_IN_CYCLES(600, 0));
+	//cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(200));
+	cpu_spinuntil_time(MAME_TIME_IN_CYCLES(600, 0));
 
 	switch (offset)
 	{

@@ -83,6 +83,197 @@
 
 ********************************************************************************
 
+Sega System E Hardware Overview
+Sega, 1985-1988
+
+This PCB is essentially a Sega Master System home console unit, but using
+two '315-5124' VDPs and extra RAM.
+The CPU is located on a plug-in board that also holds all of the EPROMs.
+
+The games that run on this hardware include....
+Hang-On Jr.             1985
+Transformer/Astro Flash 1986
+Riddle of Pythagoras    1986
+Opa Opa                 1987
+Fantasy Zone 2          1988
+Tetris                  1988
+
+PCB Layout
+----------
+834-5803 (C)Sega 1985
+|-----------------------------------------------------|
+|         D4168      D4168      D4168       D4168     |
+|                                                     |
+|         D4168      D4168      D4168       D4168     |
+|                                                     |
+|                                                     |
+|    SW1                                              |
+|CN1                                                  |
+|    SW2                                              |
+|                                                     |
+|   LED            |---|             |---|            |
+|                  | 3 |             | 3 |            |
+|                  | 1 |             | 1 |            |
+|                  | 5 |             | 5 |            |
+|                  | | |             | | |         CN3|
+|                  | 5 |             | 5 |     8255   |
+|CN4               | 1 |             | 1 |            |
+|                  | 2 |             | 2 |            |
+|                  | 4 |             | 4 |            |
+|                  |---|             |---|            |
+|               |--------ROM-BOARD-(above)---------|  |
+|               |                                  |  |
+|               |CN2                   10.7386MHz  |  |
+|               |         D4168                    |  |
+|  VOL          |         D4168                    |  |
+| LA4460        |----------------------------------|  |
+|-----------------------------------------------------|
+Notes:
+      315-5124 VDP clock - 10.7386MHz
+      SN76496 clock      - 3.579533MHz [10.7386/3]
+      D4168              - 8k x8 SRAM
+      VSync              - 60Hz
+      HSync              - 15.58kHz
+      CN1                - Connector used for standard controls
+      CN2                - connector for CPU/ROM PCB
+      CN3                - Connector used for special controls (via a small plug-in interface PCB)
+      CN4                - Connector for power
+
+ROM Daughterboard
+-----------------
+834-6592-01
+|--------------------------------------------|
+|                                            |
+|    |---|                                   |
+|C   |   |                           IC6     |
+|N   |Z80|                                   |
+|2   |   |                                   |
+|    |   |   IC2   IC3   IC4   IC5        IC7|
+|    |---|                                   |
+|     IC1             PAD1 PAD2     PAD3 PAD4|
+|--------------------------------------------|
+Notes:
+       IC1: Z80 clock - 5.3693MHz [10.7386/2]
+            On some games this is replaced with a NEC MC-8123 Encrypted CPU Module.
+            The clock speed is the same. The MC-8123 contains a Z80 core, plus a RAM chip
+            and battery. When the battery dies, the program can no longer be decrypted
+            and the PCB does not boot up at all. The battery can not be changed because the
+            MC-8123 is sealed, so there is no way to access it.
+
+ IC2 - IC5: 27C256 EPROM (DIP28)
+
+       IC6: 74LS139
+
+       IC7: 27C256 EPROM (DIP28)
+
+    PAD1-4: These are jumper pads used to configure the ROM board for use with the
+            Z80 or with the MC8123 CPU.
+            PAD1 - Ties Z80 pin 24 (WAIT) to pin1 of the EPROMs at IC2, 3, 4 & 5
+            PAD2 - Ties CN2 pin B21 to pin1 of the EPROMs at IC2, 3, 4 & 5
+            PAD3 - Ties CN2 pin B21 to pin 2 of the 74LS139 @ IC6
+            PAD4 - Ties Z80 pin 24 (WAIT) to pin 2 of the 74LS139 @ IC6
+
+            The pads are configured like this..... (U=Upper, L=Lower)
+
+                                                 |----|      |----|
+                                                 |IC6 |      |IC7 |
+                                                 |  12|------|22  |
+                                                 |    |      |    |
+                       IC2   IC3    IC4   IC5    |   1|------|27  |
+                       PIN1  PIN1   PIN1  PIN1   |   2|--|   |    |
+                        O-----O--+---O------O    |----|  |   |----|
+                                 |                       |
+                                 |         |----|        |
+                              O--+----O    |    O    |---O
+            CN2    Z80      PAD1U   PAD2U  |  PAD3U  | PAD4U
+            B21    PIN24    PAD1L   PAD2L  |  PAD3L  | PAD4L
+             O       O--4.7k--O       O----|    O----|   O
+             |                |       |                  |
+             |                |-------|------------------|
+             |                        |
+             |------------------------|
+
+            When using a regular Z80B (and thus, unencrypted code):
+            PAD1 - Open
+            PAD2 - Open
+            PAD3 - Shorted
+            PAD4 - Open
+
+            When using an encrypted CPU module (MC-8123):
+            PAD1 - Open
+            PAD2 - Shorted
+            PAD3 - Open
+            PAD4 - Open
+            Additionally, a wire must be tied from CN2 pin B22 to the side
+            of PAD3 nearest IC6 (i.e. PAD3U).
+
+ROMs:
+-----
+
+Game                     IC2         IC3         IC4         IC5         IC7
+---------------------------------------------------------------------------------
+Hang-On Jr.              EPR-?       EPR-?       EPR-?       EPR-?       EPR-?     Hello, Sega Part Numbers....!?
+Transformer              EPR-7350    EPR-?       EPR-7348    EPR-7347    EPR-?     Ditto
+           /Astro Flash  EPR-7350    EPR-7349    EPR-7348    EPR-7347    EPR-7723
+Riddle of Pythagoras     EPR-10422   EPR-10423   EPR-10424   EPR-10425   EPR-10426
+Opa Opa                  EPR-11220   EPR-11221   EPR-11222   EPR-11223   EPR-11224
+Fantasy Zone 2           EPR-11412   EPR-11413   EPR-11414   EPR-11415   EPR-11416
+Tetris                   -           -           EPR-12211   EPR-12212   EPR-12213
+
+A System E PCB can run all of the games simply by swapping the EPROMs plus CPU.
+Well, in theory anyway. To run the not-encrypted games, just swap EPROMs and they will work.
+
+To run the encrypted games, use a double sized EPROM in IC7 (i.e. a 27C512)
+and program the decrypted opcodes to the lower half and the decrypted data to the upper half,
+then connect the highest address pin of the EPROM (A15 pin 1) to the M1 pin on the Z80.
+This method has been tested and does not actually work. An update on this may follow....
+
+
+System E PCB Pinout
+-------------------
+
+CN1
+---
+
++12V             1A  1B  Coin switch 1
+Coin switch 2    2A  2B  Test switch
+Service switch   3A  3B
+                 4A  4B  1P start
+2P start         5A  5B  1P up
+1P down          6A  6B  1P left
+1P right         7A  7B  1P button 1
+1P button 2      8A  8B
+                 9A  9B  2P up
+2P down          10A 10B 2P left
+2P RIGHT         11A 11B 2P button 1
+2P button 2      12A 12B
+                 13A 13B Video RED
+                 14A 14B Video GREEN
+                 15A 15B Video BLUE
+                 16A 16B Video SYNC
+                 17A 17B
+                 18A 18B
+Speaker [+]      19A 19B
+Speaker [-]      20A 20B
+Coin counter GND 21A 21B
+GND              22A 22B Coin counter 1
+                 23A 23B Coin counter 2
+                 24A 24B
+                 25A 25B
+CN4
+---
+
++5V  1A 1B +5V
++5V  2A 2B +5V
+     3A 3B
+GND  4A 4B GND
+GND  5A 5B GND
++12V 6A 6B +12V
++12V 7A 7B +12V
+GND  8A 8B GND
+
+********************************************************************************
+
  Change Log:
  18 Aug 2004 | DH - Added Tetris System E
  14 Jun 2001 | Stephh added the dipswitches to ROP (and coinage to the others

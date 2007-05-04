@@ -527,7 +527,7 @@ VIDEO_UPDATE( nbmj8891 )
 {
 	int x, y;
 
-	if (get_vh_global_attribute_changed() || nbmj8891_screen_refresh)
+	if (nbmj8891_screen_refresh)
 	{
 		nbmj8891_screen_refresh = 0;
 		for (y = 0; y < machine->screen[0].height; y++)

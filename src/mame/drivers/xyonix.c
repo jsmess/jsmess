@@ -249,7 +249,7 @@ static MACHINE_DRIVER_START( xyonix )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(port_readmem,port_writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-	MDRV_CPU_PERIODIC_INT(irq0_line_assert,TIME_IN_HZ(4*60))	/* ?? controls music tempo */
+	MDRV_CPU_PERIODIC_INT(irq0_line_assert,4*60)	/* ?? controls music tempo */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

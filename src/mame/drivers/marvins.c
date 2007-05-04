@@ -524,7 +524,7 @@ static MACHINE_DRIVER_START( marvins )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
-	MDRV_CPU_PERIODIC_INT(nmi_line_assert, TIME_IN_HZ(244))	// schematics show a separate 244Hz timer
+	MDRV_CPU_PERIODIC_INT(nmi_line_assert, 244)	// schematics show a separate 244Hz timer
 
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -571,7 +571,7 @@ static MACHINE_DRIVER_START( vangrd2 )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
-	MDRV_CPU_PERIODIC_INT(nmi_line_assert, TIME_IN_HZ(244))
+	MDRV_CPU_PERIODIC_INT(nmi_line_assert, 244)
 
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

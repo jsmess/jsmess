@@ -392,8 +392,8 @@ static WRITE16_HANDLER( neo_z80_w )
 	pending_command = 1;
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in pspikes2) */
-//  cpu_spinuntil_time(TIME_IN_USEC(20));
-	cpu_boost_interleave(0, TIME_IN_USEC(20));
+//  cpu_spinuntil_time(MAME_TIME_IN_USEC(20));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
 }
 
 static int mjneogo_select;

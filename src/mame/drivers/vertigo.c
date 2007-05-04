@@ -122,7 +122,7 @@ static MACHINE_DRIVER_START( vertigo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(vertigo_main,0)
-	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,TIME_IN_HZ(60))
+	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,60)
 
 	/* audio CPU */
 	MDRV_CPU_ADD(M6809, 1000000)

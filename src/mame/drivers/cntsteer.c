@@ -773,7 +773,7 @@ static MACHINE_DRIVER_START( zerotrgt )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse,16) /* ? */ // should be interrupt, 16?
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, TIME_IN_HZ(1000))
+	MDRV_CPU_PERIODIC_INT(sound_interrupt, 1000)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

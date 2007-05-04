@@ -104,8 +104,6 @@ z:      xxxx address bits a19 .. a16 for memory accesses with a15 1 ?
 #include "m6502.h"
 #include "m4510.h"
 
-#include "ops02.h"
-#include "opsc02.h"
 #include "opsce02.h"
 #include "ops4510.h"
 
@@ -394,7 +392,7 @@ static void m4510_set_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_INT_PC:							PCW = info->i; change_pc(PCD);			break;
 		case CPUINFO_INT_REGISTER + M4510_PC:			m4510.pc.w.l = info->i;					break;
-		case CPUINFO_INT_SP:							S = info->i;							break;
+		case CPUINFO_INT_SP:							SPL = info->i;							break;
 		case CPUINFO_INT_REGISTER + M4510_S:			m4510.sp.b.l = info->i;					break;
 		case CPUINFO_INT_REGISTER + M4510_P:			m4510.p = info->i;						break;
 		case CPUINFO_INT_REGISTER + M4510_A:			m4510.a = info->i;						break;
@@ -463,7 +461,7 @@ void m4510_get_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_INT_PC:							info->i = PCD;							break;
 		case CPUINFO_INT_REGISTER + M4510_PC:			info->i = m4510.pc.w.l;					break;
-		case CPUINFO_INT_SP:							info->i = S;							break;
+		case CPUINFO_INT_SP:							info->i = SPL;							break;
 		case CPUINFO_INT_REGISTER + M4510_S:			info->i = m4510.sp.b.l;					break;
 		case CPUINFO_INT_REGISTER + M4510_P:			info->i = m4510.p;						break;
 		case CPUINFO_INT_REGISTER + M4510_A:			info->i = m4510.a;						break;

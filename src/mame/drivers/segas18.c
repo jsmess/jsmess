@@ -192,7 +192,7 @@ static void system18_generic_init(int _rom_board)
 
 static void boost_interleave(int param)
 {
-	cpu_boost_interleave(0, TIME_IN_MSEC(10));
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_MSEC(10));
 }
 
 MACHINE_RESET( system18 )

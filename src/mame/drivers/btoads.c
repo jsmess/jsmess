@@ -331,7 +331,7 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
-	MDRV_CPU_PERIODIC_INT(irq0_line_assert,TIME_IN_HZ(183))
+	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 183)
 
 	MDRV_MACHINE_RESET(btoads)
 	MDRV_NVRAM_HANDLER(generic_1fill)

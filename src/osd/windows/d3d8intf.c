@@ -79,7 +79,7 @@ d3d *drawd3d8_init(void)
 	dllhandle = LoadLibrary(TEXT("d3d8.dll"));
 	if (dllhandle == NULL)
 	{
-		verbose_printf("Direct3D: Unable to access d3d8.dll\n");
+		mame_printf_verbose("Direct3D: Unable to access d3d8.dll\n");
 		return NULL;
 	}
 
@@ -87,7 +87,7 @@ d3d *drawd3d8_init(void)
 	direct3dcreate8 = (direct3dcreate8_ptr)GetProcAddress(dllhandle, "Direct3DCreate8");
 	if (direct3dcreate8 == NULL)
 	{
-		verbose_printf("Direct3D: Unable to find Direct3DCreate8\n");
+		mame_printf_verbose("Direct3D: Unable to find Direct3DCreate8\n");
 		FreeLibrary(dllhandle);
 		dllhandle = NULL;
 		return NULL;
@@ -97,7 +97,7 @@ d3d *drawd3d8_init(void)
 	d3d8 = (*direct3dcreate8)(D3D_SDK_VERSION);
 	if (d3d8 == NULL)
 	{
-		verbose_printf("Direct3D: Error attempting to initialize Direct3D8\n");
+		mame_printf_verbose("Direct3D: Error attempting to initialize Direct3D8\n");
 		FreeLibrary(dllhandle);
 		dllhandle = NULL;
 		return NULL;
@@ -110,7 +110,7 @@ d3d *drawd3d8_init(void)
 	d3dptr->dllhandle = dllhandle;
 	set_interfaces(d3dptr);
 
-	verbose_printf("Direct3D: Using Direct3D 8\n");
+	mame_printf_verbose("Direct3D: Using Direct3D 8\n");
 	return d3dptr;
 }
 

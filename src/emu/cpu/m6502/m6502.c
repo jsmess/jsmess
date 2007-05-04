@@ -76,12 +76,13 @@ typedef struct
 #if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	UINT8    ddr;
 	UINT8    port;
-	UINT8 (*port_read)(void);
-	void (*port_write)(UINT8 data);
+	UINT8	(*port_read)(UINT8 direction);
+	void	(*port_write)(UINT8 direction, UINT8 data);
 #endif
 
 }	m6502_Regs;
 
+int m6502_IntOccured = 0;
 int m6502_ICount = 0;
 
 static m6502_Regs m6502;
@@ -198,7 +199,7 @@ INLINE void m6502_take_irq(void)
 	if( !(P & F_I) )
 	{
 		EAD = M6502_IRQ_VEC;
-		m6502_ICount -= 7;
+		m6502_ICount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -226,24 +227,12 @@ static int m6502_execute(int cycles)
 
 		CALL_MAME_DEBUG;
 
-#if 1
 		/* if an irq is pending, take it now */
 		if( m6502.pending_irq )
 			m6502_take_irq();
 
 		op = RDOP();
 		(*m6502.insn[op])();
-#else
-		/* thought as irq request while executing sei */
-        /* sei sets I flag on the stack*/
-		op = RDOP();
-
-		/* if an irq is pending, take it now */
-		if( m6502.pending_irq && (op == 0x78) )
-			m6502_take_irq();
-
-		(*m6502.insn[op])();
-#endif
 
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( m6502.after_cli )
@@ -260,9 +249,18 @@ static int m6502_execute(int cycles)
 				LOG((": irq line is clear\n"));
 			}
 		}
-		else
-		if( m6502.pending_irq )
-			m6502_take_irq();
+		else {
+			if ( m6502.pending_irq == 2 ) {
+				if ( m6502_IntOccured - m6502_ICount > 1 ) {
+					m6502.pending_irq = 1;
+				}
+			}
+			if( m6502.pending_irq == 1 )
+				m6502_take_irq();
+			if ( m6502.pending_irq == 2 ) {
+				m6502.pending_irq = 1;
+			}
+		}
 
 	} while (m6502_ICount > 0);
 
@@ -279,7 +277,7 @@ static void m6502_set_irq_line(int irqline, int state)
 		{
 			LOG(( "M6502#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = M6502_NMI_VEC;
-			m6502_ICount -= 7;
+			m6502_ICount -= 2;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -307,6 +305,8 @@ static void m6502_set_irq_line(int irqline, int state)
 		{
 			LOG(( "M6502#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
 			m6502.pending_irq = 1;
+//          m6502.pending_irq = 2;
+			m6502_IntOccured = m6502_ICount;
 		}
 	}
 }
@@ -367,7 +367,7 @@ static READ8_HANDLER( m6510_read_0000 )
 			break;
 		case 0x0001:	/* Data Port */
 			if (m6502.port_read)
-				result = m6502.port_read();
+				result = m6502.port_read( m6502.ddr );
 			result = (m6502.ddr & m6502.port) | (~m6502.ddr & result);
 			break;
 	}
@@ -387,7 +387,7 @@ static WRITE8_HANDLER( m6510_write_0000 )
 	}
 
 	if (m6502.port_write)
-		m6502.port_write(m6510_get_port());
+		m6502.port_write( m6502.ddr, m6502.port & m6502.ddr );
 }
 
 static ADDRESS_MAP_START(m6510_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -418,7 +418,7 @@ INLINE void m65c02_take_irq(void)
 	if( !(P & F_I) )
 	{
 		EAD = M6502_IRQ_VEC;
-		m6502_ICount -= 7;
+		m6502_ICount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -488,7 +488,7 @@ static void m65c02_set_irq_line(int irqline, int state)
 		{
 			LOG(( "M6502#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = M6502_NMI_VEC;
-			m6502_ICount -= 7;
+			m6502_ICount -= 2;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -547,7 +547,7 @@ INLINE void deco16_take_irq(void)
 	if( !(P & F_I) )
 	{
 		EAD = DECO16_IRQ_VEC;
-		m6502_ICount -= 7;
+		m6502_ICount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -810,8 +810,8 @@ static void m6510_set_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6510_PORTREAD:	m6502.port_read = (UINT8 (*)(void)) info->f;		break;
-		case CPUINFO_PTR_M6510_PORTWRITE:	m6502.port_write = (void (*)(UINT8)) info->f;		break;
+		case CPUINFO_PTR_M6510_PORTREAD:	m6502.port_read = (UINT8 (*)(UINT8)) info->f;	break;
+		case CPUINFO_PTR_M6510_PORTWRITE:	m6502.port_write = (void (*)(UINT8,UINT8)) info->f;	break;
 
 		default:							m6502_set_info(state, info);						break;
 	}

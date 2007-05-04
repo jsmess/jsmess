@@ -458,8 +458,6 @@ VIDEO_START( st0016 )
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[gfx_index] = allocgfx(&charlayout);
-	if (!machine->gfx[gfx_index])
-		return 1;
 
 	/* set the color information */
 	machine->gfx[gfx_index]->colortable = machine->remapped_colortable;

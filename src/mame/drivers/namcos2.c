@@ -1590,7 +1590,7 @@ static MACHINE_DRIVER_START( default )
 	MDRV_CPU_ADD(M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(120))
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
@@ -1660,7 +1660,7 @@ static MACHINE_DRIVER_START( gollygho )
 	MDRV_CPU_ADD(M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(120))
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
@@ -1706,7 +1706,7 @@ static MACHINE_DRIVER_START( finallap )
 	MDRV_CPU_ADD(M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(120))
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
@@ -1752,7 +1752,7 @@ static MACHINE_DRIVER_START( sgunner )
 	MDRV_CPU_ADD(M6809,3072000) // Sound handling
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(120))
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 120)
 
 	MDRV_CPU_ADD(HD63705,2048000) // I/O handling
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
@@ -1798,7 +1798,7 @@ static MACHINE_DRIVER_START( luckywld )
 	MDRV_CPU_ADD(M6809,3072000) /* Sound handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(120))
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD(HD63705,2048000) /* I/O handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
@@ -1844,7 +1844,7 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_CPU_ADD(M6809,3072000) /* Sound handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(120))
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD(HD63705,2048000) /* I/O handling */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)

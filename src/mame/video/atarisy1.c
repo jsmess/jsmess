@@ -656,8 +656,6 @@ static int get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 
 	/* decode the graphics */
 	Machine->gfx[gfx_index] = allocgfx(&objlayout);
-	if (!Machine->gfx[gfx_index])
-		return -1;
 	decodegfx(Machine->gfx[gfx_index], &memory_region(REGION_GFX2)[0x80000 * (bank_index - 1)], 0, Machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */

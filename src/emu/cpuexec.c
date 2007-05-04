@@ -757,11 +757,8 @@ void cpunum_set_clockscale(int cpunum, double clockscale)
  *
  *************************************/
 
-void cpu_boost_interleave(double _timeslice_time, double _boost_duration)
+void cpu_boost_interleave(mame_time timeslice_time, mame_time boost_duration)
 {
-	mame_time timeslice_time = double_to_mame_time(_timeslice_time);
-	mame_time boost_duration = double_to_mame_time(_boost_duration);
-
 	/* if you pass 0 for the timeslice_time, it means pick something reasonable */
 	if (compare_mame_times(timeslice_time, perfect_interleave) < 0)
 		timeslice_time = perfect_interleave;
@@ -771,8 +768,9 @@ void cpu_boost_interleave(double _timeslice_time, double _boost_duration)
 	/* adjust the interleave timer */
 	mame_timer_adjust(interleave_boost_timer, timeslice_time, 0, timeslice_time);
 
-	/* adjust the end timer */
-	mame_timer_adjust(interleave_boost_timer_end, boost_duration, 0, time_never);
+	/* adjust the end timer, but only if we are going to extend it */
+	if (!mame_timer_enabled(interleave_boost_timer_end) || compare_mame_times(mame_timer_timeleft(interleave_boost_timer_end), boost_duration) < 0)
+		mame_timer_adjust(interleave_boost_timer_end, boost_duration, 0, time_never);
 }
 
 
@@ -997,9 +995,9 @@ void cpu_trigger(int trigger)
  *
  *************************************/
 
-void cpu_triggertime(double duration, int trigger)
+void cpu_triggertime(mame_time duration, int trigger)
 {
-	mame_timer_set(double_to_mame_time(duration), trigger, cpu_trigger);
+	mame_timer_set(duration, trigger, cpu_trigger);
 }
 
 
@@ -1111,7 +1109,7 @@ void cpu_yield(void)
  *
  *************************************/
 
-void cpu_spinuntil_time(double duration)
+void cpu_spinuntil_time(mame_time duration)
 {
 	static int timetrig = 0;
 
@@ -1121,7 +1119,7 @@ void cpu_spinuntil_time(double duration)
 }
 
 
-void cpu_yielduntil_time(double duration)
+void cpu_yielduntil_time(mame_time duration)
 {
 	static int timetrig = 0;
 
@@ -1487,9 +1485,9 @@ static void cpu_inittimers(void)
 		cpu[cpunum].vblankint_timer = mame_timer_alloc(NULL);
 
 		/* see if we need to allocate a CPU timer */
-		if (Machine->drv->cpu[cpunum].timed_interrupt_period)
+		if (Machine->drv->cpu[cpunum].timed_interrupt_period != 0)
 		{
-			cpu[cpunum].timedint_period = double_to_mame_time(Machine->drv->cpu[cpunum].timed_interrupt_period);
+			cpu[cpunum].timedint_period = make_mame_time(0, Machine->drv->cpu[cpunum].timed_interrupt_period);
 			cpu[cpunum].timedint_timer = mame_timer_alloc(cpu_timedintcallback);
 			mame_timer_adjust(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
 		}

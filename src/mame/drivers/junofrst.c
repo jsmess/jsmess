@@ -88,22 +88,26 @@ Blitter source graphics
 
 void konami1_decode(void);
 
-extern unsigned char *tutankhm_scrollx;
+extern UINT8 *tutankhm_videoram;
+extern size_t tutankhm_videoram_size;
+extern UINT8 *tutankhm_paletteram;
+extern UINT8 *tutankhm_scroll;
 
 static int i8039_status;
 
-WRITE8_HANDLER( tutankhm_videoram_w );
+WRITE8_HANDLER( tutankhm_flip_screen_x_w );
+WRITE8_HANDLER( tutankhm_flip_screen_y_w );
 WRITE8_HANDLER( junofrst_blitter_w );
 VIDEO_UPDATE( tutankhm );
-
 
 WRITE8_HANDLER( tutankhm_sh_irqtrigger_w );
 
 
-WRITE8_HANDLER( junofrst_bankselect_w )
+static WRITE8_HANDLER( junofrst_bankselect_w )
 {
 	memory_set_bank(1, data & 0x0f);
 }
+
 
 static READ8_HANDLER( junofrst_portA_r )
 {
@@ -120,6 +124,7 @@ static READ8_HANDLER( junofrst_portA_r )
 
 	return (timer << 4) | i8039_status;
 }
+
 
 static WRITE8_HANDLER( junofrst_portB_w )
 {
@@ -139,7 +144,8 @@ static WRITE8_HANDLER( junofrst_portB_w )
 	}
 }
 
-WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
+
+static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 {
 	static int last;
 
@@ -153,10 +159,12 @@ WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 	last = data;
 }
 
-WRITE8_HANDLER( junofrst_i8039_irq_w )
+
+static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
 	cpunum_set_input_line(2, 0, ASSERT_LINE);
 }
+
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
@@ -165,10 +173,13 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 	i8039_status = (data & 0x70) >> 4;
 }
 
+
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	tutankhm_flip_screen_x_w(0, data);
+	tutankhm_flip_screen_y_w(0, data);
 }
+
 
 static WRITE8_HANDLER( junofrst_coin_counter_w )
 {
@@ -177,71 +188,54 @@ static WRITE8_HANDLER( junofrst_coin_counter_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&tutankhm_videoram) AM_SIZE(&tutankhm_videoram_size)
+	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE(&tutankhm_paletteram)
 	AM_RANGE(0x8010, 0x8010) AM_READ(input_port_0_r)	/* DSW2 (inverted bits) */
 	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ(input_port_1_r)	/* IN0 I/O: Coin slots, service, 1P/2P buttons */
 	AM_RANGE(0x8024, 0x8024) AM_READ(input_port_2_r)	/* IN1: Player 1 I/O */
 	AM_RANGE(0x8028, 0x8028) AM_READ(input_port_3_r)	/* IN2: Player 2 I/O */
 	AM_RANGE(0x802c, 0x802c) AM_READ(input_port_4_r)	/* DSW1 (inverted bits) */
-	AM_RANGE(0x8100, 0x8fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x9fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(tutankhm_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8000, 0x800f) AM_WRITE(paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8031, 0x8032) AM_WRITE(junofrst_coin_counter_w)
-	AM_RANGE(0x8033, 0x8033) AM_WRITE(MWA8_RAM) AM_BASE(&tutankhm_scrollx)              /* video x pan hardware reg - Not USED in Juno*/
+	AM_RANGE(0x8033, 0x8033) AM_WRITE(MWA8_RAM) AM_BASE(&tutankhm_scroll)  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(junofrst_sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(junofrst_bankselect_w)
 	AM_RANGE(0x8070, 0x8073) AM_WRITE(junofrst_blitter_w)
-	AM_RANGE(0x8100, 0x8fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8100, 0x8fff) AM_RAM
+	AM_RANGE(0x9000, 0x9fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x4001, 0x4001) AM_READ(AY8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(junofrst_i8039_irq_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(DAC_0_data_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( junofrst )
+static INPUT_PORTS_START( junofrst )
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -307,7 +301,7 @@ INPUT_PORTS_START( junofrst )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
@@ -350,29 +344,27 @@ static MACHINE_DRIVER_START( junofrst )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 1500000)			/* 1.5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80,14318000/8)
 	/* audio CPU */	/* 1.78975 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_CPU_ADD(I8039,8000000/I8039_CLOCK_DIVIDER)
 	/* audio CPU */	/* 8MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)
+	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
+	MDRV_CPU_IO_MAP(mcu_io_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(DEFAULT_30HZ_VBLANK_DURATION))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
-	MDRV_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(tutankhm)
 
 	/* sound hardware */

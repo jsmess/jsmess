@@ -5,11 +5,9 @@
 /*************************************************************/
 
 #include "driver.h"
-#include "video/lazercmd.h"
+#include "includes/lazercmd.h"
 
 int marker_x, marker_y;
-
-static int video_inverted = 0;
 
 
 /* scale a markers vertical position */
@@ -25,28 +23,6 @@ static int vert_scale(int data)
 {
 	return ((data & 0x07)<<1) + ((data & 0xf8)>>3) * VERT_CHR;
 }
-
-/* mark the character occupied by the marker dirty */
-void lazercmd_marker_dirty(int marker)
-{
-	int x, y;
-
-	x = marker_x - 1;             /* normal video lags marker by 1 pixel */
-	y = vert_scale(marker_y) - VERT_CHR; /* first line used as scratch pad */
-
-	if (x < 0 || x >= HORZ_RES * HORZ_CHR)
-		return;
-
-	if (y < 0 || y >= (VERT_RES - 1) * VERT_CHR)
-        return;
-
-	/* mark all occupied character positions dirty */
-    dirtybuffer[(y+0)/VERT_CHR * HORZ_RES + (x+0)/HORZ_CHR] = 1;
-	dirtybuffer[(y+3)/VERT_CHR * HORZ_RES + (x+0)/HORZ_CHR] = 1;
-	dirtybuffer[(y+0)/VERT_CHR * HORZ_RES + (x+3)/HORZ_CHR] = 1;
-	dirtybuffer[(y+3)/VERT_CHR * HORZ_RES + (x+3)/HORZ_CHR] = 1;
-}
-
 
 /* plot a bitmap marker */
 /* hardware has 2 marker sizes 2x2 and 4x2 selected by jumper */
@@ -77,54 +53,33 @@ static void plot_pattern(mame_bitmap *bitmap, int x, int y)
 }
 
 
-VIDEO_START( lazercmd )
-{
-	if( video_start_generic(machine) )
-		return 1;
-
-	return 0;
-}
-
-
 VIDEO_UPDATE( lazercmd )
 {
 	int i,x,y;
 
-	if (video_inverted != (input_port_2_r(0) & 0x20))
-	{
-		video_inverted = input_port_2_r(0) & 0x20;
-		memset(dirtybuffer, 1, videoram_size);
-	}
-
-	if (get_vh_global_attribute_changed())
-        memset(dirtybuffer, 1, videoram_size);
+	int video_inverted = input_port_2_r(0) & 0x20;
 
 	/* The first row of characters are invisible */
 	for (i = 0; i < (VERT_RES - 1) * HORZ_RES; i++)
 	{
-		if (dirtybuffer[i])
-		{
-			int sx,sy;
+		int sx,sy;
 
-			dirtybuffer[i] = 0;
+		sx = i % HORZ_RES;
+		sy = i / HORZ_RES;
 
-			sx = i % HORZ_RES;
-			sy = i / HORZ_RES;
+		sx *= HORZ_CHR;
+		sy *= VERT_CHR;
 
-			sx *= HORZ_CHR;
-			sy *= VERT_CHR;
-
-			drawgfx(tmpbitmap, machine->gfx[0],
-					videoram[i], video_inverted ? 1 : 0,
-					0,0,
-					sx,sy,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		}
+		drawgfx(bitmap, machine->gfx[0],
+				videoram[i], video_inverted ? 1 : 0,
+				0,0,
+				sx,sy,
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	x = marker_x - 1;             /* normal video lags marker by 1 pixel */
 	y = vert_scale(marker_y) - VERT_CHR; /* first line used as scratch pad */
 	plot_pattern(bitmap,x,y);
+
 	return 0;
 }

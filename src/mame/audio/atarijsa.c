@@ -807,7 +807,7 @@ MACHINE_DRIVER_START( jsa_i_stereo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
 	MDRV_CPU_PROGRAM_MAP(atarijsa1_readmem,atarijsa1_writemem)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen,TIME_IN_HZ((double)ATARI_CLOCK_3MHz/4/16/16/14))
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -852,7 +852,7 @@ MACHINE_DRIVER_START( jsa_i_mono_speech )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
 	MDRV_CPU_PROGRAM_MAP(atarijsa1_readmem,atarijsa1_writemem)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen,TIME_IN_HZ((double)ATARI_CLOCK_3MHz/4/16/16/14))
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -873,7 +873,7 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
 	MDRV_CPU_PROGRAM_MAP(atarijsa2_readmem,atarijsa2_writemem)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen,TIME_IN_HZ((double)ATARI_CLOCK_3MHz/4/16/16/14))
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -916,7 +916,7 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
 	MDRV_CPU_PROGRAM_MAP(atarijsa3s_map,0)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen,TIME_IN_HZ((double)ATARI_CLOCK_3MHz/4/16/16/14))
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

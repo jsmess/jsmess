@@ -2554,10 +2554,7 @@ static int
 video_start_common( void )
 {
 	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64 );
-	if( bgtilemap )
-	{
 		tilemap_set_transparent_pen( bgtilemap, 0xf );
-	}
 
 	mbDSPisActive = 0;
 	memset( namcos22_polygonram, 0xcc, 0x20000 );

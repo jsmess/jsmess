@@ -85,7 +85,7 @@ typedef struct {
 	write8_handler wrmem_id;				/* readmem callback for indexed instructions */
 }	m6509_Regs;
 
-static int m6509_ICount = 0;
+static int m6502_ICount = 0;
 
 static m6509_Regs m6509;
 
@@ -178,7 +178,7 @@ INLINE void m6509_take_irq(void)
 	{
 		EAD = M6509_IRQ_VEC;
 		EAWH = PBWH;
-		m6509_ICount -= 7;
+		m6502_ICount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -195,7 +195,7 @@ INLINE void m6509_take_irq(void)
 
 static int m6509_execute(int cycles)
 {
-	m6509_ICount = cycles;
+	m6502_ICount = cycles;
 
 	change_pc(PCD);
 
@@ -232,9 +232,9 @@ static int m6509_execute(int cycles)
 		if( m6509.pending_irq )
 			m6509_take_irq();
 
-	} while (m6509_ICount > 0);
+	} while (m6502_ICount > 0);
 
-	return cycles - m6509_ICount;
+	return cycles - m6502_ICount;
 }
 
 static void m6509_set_irq_line(int irqline, int state)
@@ -248,7 +248,7 @@ static void m6509_set_irq_line(int irqline, int state)
 			LOG(( "M6509#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = M6509_NMI_VEC;
 			EAWH = PBWH;
-			m6509_ICount -= 7;
+			m6502_ICount -= 2;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -374,7 +374,7 @@ void m6509_get_info(UINT32 state, cpuinfo *info)
 #ifdef MAME_DEBUG
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6510_dasm;			break;
 #endif
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6509_ICount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502_ICount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map = construct_map_m6509_mem; break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m6509.rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m6509.wrmem_id;		break;

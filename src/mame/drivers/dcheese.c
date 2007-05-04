@@ -409,7 +409,7 @@ static MACHINE_DRIVER_START( dcheese )
 
 	MDRV_CPU_ADD(M6809, SOUND_OSC/16)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,TIME_IN_HZ(480))	/* accurate for fredmem */
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
 
 	MDRV_MACHINE_START(dcheese)
 	MDRV_SCREEN_REFRESH_RATE(60)

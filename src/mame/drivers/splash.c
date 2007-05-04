@@ -81,7 +81,7 @@ static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 	}
 
 	// give the z80 time to see it
-	cpu_spinuntil_time(TIME_IN_USEC(40));
+	cpu_spinuntil_time(MAME_TIME_IN_USEC(40));
 }
 
 static ADDRESS_MAP_START( splash_readmem, ADDRESS_SPACE_PROGRAM, 16 )

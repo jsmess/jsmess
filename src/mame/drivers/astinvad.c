@@ -18,15 +18,6 @@ Space Intruder emulation by Lee Taylor (lee@defender.demon.co.uk),
 #include "includes/astinvad.h"
 
 
-static PALETTE_INIT( astinvad )
-{
-	int i;
-
-	for (i = 0; i < 8; i++)
-		palette_set_color(machine, i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
-}
-
-
 static ADDRESS_MAP_START( astinvad_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1bff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x1c00, 0x3fff) AM_READ(MRA8_RAM)
@@ -35,7 +26,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( astinvad_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1bff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(astinvad_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(MWA8_NOP) /* sloppy game code writes here */
 ADDRESS_MAP_END
 
@@ -237,19 +228,16 @@ static MACHINE_DRIVER_START( astinvad )
 	MDRV_CPU_IO_MAP(astinvad_readport,astinvad_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)    /* two interrupts per frame */
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_VIDEO_UPDATE(astinvad)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MDRV_PALETTE_LENGTH(8)
-
-	MDRV_PALETTE_INIT(astinvad)
-	MDRV_VIDEO_START(astinvad)
-	MDRV_VIDEO_UPDATE(astinvad)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -266,9 +254,9 @@ static MACHINE_DRIVER_START( spcking2 )
 	MDRV_IMPORT_FROM(astinvad)
 
 	/* video hardware */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_VIDEO_UPDATE( spcking2 )
 
-	MDRV_VIDEO_START( spcking2 )
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 MACHINE_DRIVER_END
 
 
@@ -280,18 +268,16 @@ static MACHINE_DRIVER_START( spaceint )
 	MDRV_CPU_IO_MAP(spaceint_readport,spaceint_writeport)
 	MDRV_CPU_VBLANK_INT(spaceint_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MDRV_PALETTE_LENGTH(8)
-
-	MDRV_PALETTE_INIT(astinvad)
 	MDRV_VIDEO_START(spaceint)
 	MDRV_VIDEO_UPDATE(spaceint)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MDRV_SCREEN_REFRESH_RATE(60)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -406,7 +406,7 @@ static MACHINE_DRIVER_START( powerinb )
 	MDRV_CPU_MODIFY("sound") /* 6 MHz */
 	/* audio CPU */
 	MDRV_CPU_IO_MAP(powerinb_io_snd,0)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, TIME_IN_HZ(120))	// YM2203 rate is at 150??
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 
 	MDRV_SOUND_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
 MACHINE_DRIVER_END

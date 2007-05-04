@@ -70,7 +70,6 @@ VIDEO_START( quasar );
 extern unsigned char *bullet_ram;
 
 extern unsigned char *effectram;
-extern unsigned char *effectdirty;
 extern int			 effectcontrol;
 
 static int page = 0;
@@ -151,12 +150,10 @@ static WRITE8_HANDLER( quasar_video_w )
 	if (page == 2)
 	{
 		effectram[offset]   = data;
-		effectdirty[offset] = 1;
 	}
 	if (page == 3)
 	{
 		effectcontrol = data;
-		memset(effectdirty,1,sizeof(effectdirty));
 	}
 }
 

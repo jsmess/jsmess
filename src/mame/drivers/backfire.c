@@ -679,8 +679,8 @@ static READ32_HANDLER( backfire_speedup_r )
 {
 //  mame_printf_debug( "%08x\n",activecpu_get_pc());
 
-	if (activecpu_get_pc()==0xce44)  cpu_spinuntil_time(TIME_IN_USEC(400)); // backfire
-	if (activecpu_get_pc()==0xcee4)  cpu_spinuntil_time(TIME_IN_USEC(400)); // backfira
+	if (activecpu_get_pc()==0xce44)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400)); // backfire
+	if (activecpu_get_pc()==0xcee4)  cpu_spinuntil_time(MAME_TIME_IN_USEC(400)); // backfira
 
 	return backfire_mainram[0x18/4];
 }

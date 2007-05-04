@@ -240,7 +240,10 @@ void sample_start_n(int num,int channel,int samplenum,int loop)
     struct sample_channel *chan;
     struct loaded_sample *sample;
 
-    assert( info->samples != NULL );
+	/* if samples are disabled, just return quietly */
+	if (info->samples == NULL)
+		return;
+
     assert( samplenum < info->samples->total );
     assert( channel < info->numchannels );
 

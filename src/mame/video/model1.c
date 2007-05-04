@@ -415,11 +415,16 @@ static int comp_quads(const void *q1, const void *q2)
 {
 	float z1 = (*(const struct quad **)q1)->z;
 	float z2 = (*(const struct quad **)q2)->z;
+
 	if(z1<z2)
 		return +1;
 	if(z1>z2)
 		return -1;
-	return 0;
+
+	if (*(const struct quad **)q1 - quaddb < *(const struct quad **)q2 - quaddb)
+		return -1;
+
+	return +1;
 }
 
 static void sort_quads(void)
@@ -1488,17 +1493,18 @@ VIDEO_UPDATE(model1)
 	fillbitmap(priority_bitmap, 0, 0);
 	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
 
-	sys24_tile_draw(bitmap, cliprect, 7, 0, 0);
 	sys24_tile_draw(bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 5, 0, 0);
 	sys24_tile_draw(bitmap, cliprect, 4, 0, 0);
+	sys24_tile_draw(bitmap, cliprect, 2, 0, 0);
+	sys24_tile_draw(bitmap, cliprect, 0, 0, 0);
 
 	tgp_render(bitmap, cliprect);
 
+	sys24_tile_draw(bitmap, cliprect, 7, 0, 0);
+	sys24_tile_draw(bitmap, cliprect, 5, 0, 0);
 	sys24_tile_draw(bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 2, 0, 0);
 	sys24_tile_draw(bitmap, cliprect, 1, 0, 0);
-	sys24_tile_draw(bitmap, cliprect, 0, 0, 0);
+
 	return 0;
 }
 

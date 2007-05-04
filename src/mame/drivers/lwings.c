@@ -914,7 +914,7 @@ static MACHINE_DRIVER_START( trojan )
 	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(adpcm_readmem,adpcm_writemem)
 	MDRV_CPU_IO_MAP(adpcm_readport,adpcm_writeport)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(4000))
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -968,7 +968,7 @@ static MACHINE_DRIVER_START( avengers )
 	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(adpcm_readmem,adpcm_writemem)
 	MDRV_CPU_IO_MAP(avengers_adpcm_readport,adpcm_writeport)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,TIME_IN_HZ(4000))
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

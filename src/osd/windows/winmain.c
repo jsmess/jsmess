@@ -127,7 +127,6 @@ const options_entry mame_win_options[] =
 	// debugging options
 	{ NULL,                       NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
 	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-	{ "verbose;v",                "0",        OPTION_BOOLEAN,    "display additional diagnostic information" },
 
 	// performance options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
@@ -299,12 +298,6 @@ int osd_init(running_machine *machine)
 {
 	int result = 0;
 
-	// debugging options
-{
-	extern int verbose;
-	verbose = options_get_bool(mame_options(), WINOPTION_VERBOSE);
-}
-
 	// thread priority
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 		SetThreadPriority(GetCurrentThread(), options_get_int(mame_options(), WINOPTION_PRIORITY));
@@ -359,24 +352,6 @@ static void osd_exit(running_machine *machine)
 	winwindow_process_events(0);
 }
 
-
-
-//============================================================
-//  verbose_printf
-//============================================================
-
-void CLIB_DECL verbose_printf(const char *text, ...)
-{
-	if (verbose)
-	{
-		va_list arg;
-
-		/* dump to the buffer */
-		va_start(arg, text);
-		vprintf(text, arg);
-		va_end(arg);
-	}
-}
 
 
 //============================================================

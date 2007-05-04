@@ -35,7 +35,7 @@ struct _cpu_config
 	void 		(*vblank_interrupt)(void);	/* for interrupts tied to VBLANK */
 	int 		vblank_interrupts_per_frame;/* usually 1 */
 	void 		(*timed_interrupt)(void);	/* for interrupts not tied to VBLANK */
-	double 		timed_interrupt_period;		/* period for periodic interrupts */
+	subseconds_t timed_interrupt_period;	/* period for periodic interrupts */
 	void *		reset_param;				/* parameter for cpu_reset */
 	const char *tag;
 };
@@ -135,7 +135,7 @@ double cpunum_get_clockscale(int cpunum);
 void cpunum_set_clockscale(int cpunum, double clockscale);
 
 /* Temporarily boosts the interleave factor */
-void cpu_boost_interleave(double timeslice_time, double boost_duration);
+void cpu_boost_interleave(mame_time timeslice_time, mame_time boost_duration);
 
 
 
@@ -193,7 +193,7 @@ int cpu_getcurrentframe(void);
 void cpu_trigger(int trigger);
 
 /* generate a trigger after a specific period of time */
-void cpu_triggertime(double duration, int trigger);
+void cpu_triggertime(mame_time duration, int trigger);
 
 /* generate a trigger corresponding to an interrupt on the given CPU */
 void cpu_triggerint(int cpunum);
@@ -202,7 +202,7 @@ void cpu_triggerint(int cpunum);
 void cpu_spinuntil_trigger(int trigger);
 
 /* burn specified CPU cycles until a timer trigger */
-void cpunum_spinuntil_trigger( int cpunum, int trigger );
+void cpunum_spinuntil_trigger(int cpunum, int trigger);
 
 /* yield our timeslice until a timer trigger */
 void cpu_yielduntil_trigger(int trigger);
@@ -220,10 +220,10 @@ void cpu_spin(void);
 void cpu_yield(void);
 
 /* burn CPU cycles for a specific period of time */
-void cpu_spinuntil_time(double duration);
+void cpu_spinuntil_time(mame_time duration);
 
 /* yield our timeslice for a specific period of time */
-void cpu_yielduntil_time(double duration);
+void cpu_yielduntil_time(mame_time duration);
 
 
 

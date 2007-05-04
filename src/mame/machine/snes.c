@@ -958,7 +958,7 @@ WRITE8_HANDLER( snes_w_io )
 	{
 //          printf("816: %02x to APU @ %d\n", data, offset&3);
 	     	spc_port_in[offset & 0x3] = data;
-		cpu_boost_interleave(0, TIME_IN_USEC(20));
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
 		return;
 	}
 

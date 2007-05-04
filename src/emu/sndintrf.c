@@ -74,6 +74,13 @@ void dac_get_info(void *token, UINT32 state, sndinfo *info);
 void dmadac_get_info(void *token, UINT32 state, sndinfo *info);
 void discrete_get_info(void *token, UINT32 state, sndinfo *info);
 void ay8910_get_info(void *token, UINT32 state, sndinfo *info);
+void ay8912_get_info(void *token, UINT32 state, sndinfo *info);
+void ay8913_get_info(void *token, UINT32 state, sndinfo *info);
+void ay8930_get_info(void *token, UINT32 state, sndinfo *info);
+void ym2149_get_info(void *token, UINT32 state, sndinfo *info);
+void ym3439_get_info(void *token, UINT32 state, sndinfo *info);
+void ymz284_get_info(void *token, UINT32 state, sndinfo *info);
+void ymz294_get_info(void *token, UINT32 state, sndinfo *info);
 void ym2203_get_info(void *token, UINT32 state, sndinfo *info);
 void ym2151_get_info(void *token, UINT32 state, sndinfo *info);
 void ym2608_get_info(void *token, UINT32 state, sndinfo *info);
@@ -193,6 +200,13 @@ static const struct
 #endif
 #if (HAS_AY8910)
 	{ SOUND_AY8910, ay8910_get_info },
+	{ SOUND_AY8912, ay8912_get_info },
+	{ SOUND_AY8913, ay8913_get_info },
+	{ SOUND_AY8930, ay8930_get_info },
+	{ SOUND_YM2149, ym2149_get_info },
+	{ SOUND_YM3439, ym3439_get_info },
+	{ SOUND_YMZ284, ymz284_get_info },
+	{ SOUND_YMZ294, ymz294_get_info },
 #endif
 #if (HAS_YM2203)
 	{ SOUND_YM2203, ym2203_get_info },

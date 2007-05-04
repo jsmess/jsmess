@@ -294,8 +294,6 @@ static int decode_bg(int region)
 
 	/* decode the graphics */
 	Machine->gfx[gfx_index] = allocgfx(&bg_layout);
-	if (!Machine->gfx[gfx_index])
-		return 1;
 	decodegfx(Machine->gfx[gfx_index], memory_region(region), 0, Machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
@@ -309,8 +307,6 @@ static int decode_sprite(int gfx_index, const gfx_layout *layout, const void *da
 {
 	/* decode the graphics */
 	Machine->gfx[gfx_index] = allocgfx(layout);
-	if (!Machine->gfx[gfx_index])
-		return 1;
 	decodegfx(Machine->gfx[gfx_index], data, 0, Machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */

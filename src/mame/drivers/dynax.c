@@ -3348,7 +3348,7 @@ static MACHINE_DRIVER_START( yarunara )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
 	MDRV_CPU_IO_MAP(yarunara_io_map,0)
-	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt,TIME_IN_HZ(60))	// RTC
+	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

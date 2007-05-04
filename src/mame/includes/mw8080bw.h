@@ -28,7 +28,9 @@
 
 /*----------- defined in drivers/mw8080bw.c -----------*/
 
-UINT8 mw8080bw_ram_r(offs_t offset);
+extern UINT8 *mw8080bw_ram;
+extern size_t mw8080bw_ram_size;
+
 MACHINE_DRIVER_EXTERN( mw8080bw_root );
 MACHINE_DRIVER_EXTERN( invaders );
 extern const char layout_invaders[];

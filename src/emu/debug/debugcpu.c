@@ -1334,14 +1334,14 @@ static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address
 				{
 					if (type & WATCHPOINT_WRITE)
 					{
-						sprintf(buffer, "Stopped at watchpoint %X writing %s to %08X", wp->index, sizes[size], BYTE2ADDR(address, &debug_cpuinfo[cpunum], spacenum));
+						sprintf(buffer, "Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index, sizes[size], BYTE2ADDR(address, &debug_cpuinfo[cpunum], spacenum), activecpu_get_pc());
 						if (value_to_write >> 32)
 							sprintf(&buffer[strlen(buffer)], " (data=%X%08X)", (UINT32)(value_to_write >> 32), (UINT32)value_to_write);
 						else
 							sprintf(&buffer[strlen(buffer)], " (data=%X)", (UINT32)value_to_write);
 					}
 					else
-						sprintf(buffer, "Stopped at watchpoint %X reading %s from %08X", wp->index, sizes[size], BYTE2ADDR(address, &debug_cpuinfo[cpunum], spacenum));
+						sprintf(buffer, "Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index, sizes[size], BYTE2ADDR(address, &debug_cpuinfo[cpunum], spacenum), activecpu_get_pc());
 					debug_console_printf("%s\n", buffer);
 				}
 				break;

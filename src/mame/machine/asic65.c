@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "includes/atarig42.h"
+#include "cpu/tms32010/tms32010.h"
 #include "asic65.h"
 #include <math.h>
 
@@ -19,14 +20,23 @@
  *
  *************************************/
 
-static UINT8  asic65_type;
-static int    asic65_command;
-static UINT16 asic65_param[32];
-static UINT16 asic65_yorigin = 0x1800;
-static UINT8  asic65_param_index;
-static UINT8  asic65_result_index;
-static UINT8  asic65_reset_state;
-static UINT8  asic65_last_bank;
+static UINT8  	asic65_type;
+static int    	asic65_command;
+static UINT16 	asic65_param[32];
+static UINT16 	asic65_yorigin = 0x1800;
+static UINT8  	asic65_param_index;
+static UINT8  	asic65_result_index;
+static UINT8  	asic65_reset_state;
+static UINT8  	asic65_last_bank;
+
+/* ROM-based interface states */
+static UINT8	asic65_cpunum;
+static UINT8	asic65_tfull;
+static UINT8 	asic65_68full;
+static UINT8 	asic65_cmd;
+static UINT8 	asic65_xflg;
+static UINT16 	asic65_68data;
+static UINT16 	asic65_tdata;
 
 static FILE * asic65_log;
 
@@ -117,6 +127,8 @@ static const UINT8 command_map[3][MAX_COMMANDS] =
 void asic65_config(int asictype)
 {
 	asic65_type = asictype;
+	if (asic65_type == ASIC65_ROMBASED)
+		asic65_cpunum = mame_find_cpu_index(Machine, "asic65");
 }
 
 
@@ -129,19 +141,29 @@ void asic65_config(int asictype)
 
 void asic65_reset(int state)
 {
-	/* if reset is being signalled, clear everything */
-	if (state && !asic65_reset_state)
-		asic65_command = -1;
+	/* rom-based means reset and clear states */
+	if (asic65_type == ASIC65_ROMBASED)
+		cpunum_set_input_line(asic65_cpunum, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
-	/* if reset is going high, latch the command */
-	else if (!state && asic65_reset_state)
+	/* otherwise, do it manually */
+	else
 	{
-		if (asic65_command != -1)
-			asic65_data_w(1, asic65_command, 0);
-	}
+		cpunum_suspend(mame_find_cpu_index(Machine, "asic65"), SUSPEND_REASON_DISABLE, 1);
 
-	/* update the state */
-	asic65_reset_state = state;
+		/* if reset is being signalled, clear everything */
+		if (state && !asic65_reset_state)
+			asic65_command = -1;
+
+		/* if reset is going high, latch the command */
+		else if (!state && asic65_reset_state)
+		{
+			if (asic65_command != -1)
+				asic65_data_w(1, asic65_command, 0);
+		}
+
+		/* update the state */
+		asic65_reset_state = state;
+	}
 }
 
 
@@ -152,12 +174,29 @@ void asic65_reset(int state)
  *
  *************************************/
 
+static void m68k_asic65_deferred_w(int data)
+{
+	asic65_tfull = 1;
+	asic65_cmd = data >> 16;
+	asic65_tdata = data;
+	cpunum_set_input_line(asic65_cpunum, 0, ASSERT_LINE);
+}
+
+
 WRITE16_HANDLER( asic65_data_w )
 {
 	/* logging */
 #if LOG_ASIC
 	if (!asic65_log) asic65_log = fopen("asic65.log", "w");
 #endif
+
+	/* rom-based use a deferred write mechanism */
+	if (asic65_type == ASIC65_ROMBASED)
+	{
+		mame_timer_set(time_zero, data | (offset << 16), m68k_asic65_deferred_w);
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(20));
+		return;
+	}
 
 	/* parameters go to offset 0 */
 	if (!(offset & 1))
@@ -188,6 +227,14 @@ READ16_HANDLER( asic65_r )
 	int command = (asic65_command < MAX_COMMANDS) ? command_map[asic65_type][asic65_command] : OP_UNKNOWN;
 	INT64 element, result64 = 0;
 	UINT16 result = 0;
+
+	/* rom-based just returns latched data */
+	if (asic65_type == ASIC65_ROMBASED)
+	{
+		asic65_68full = 0;
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(5));
+		return asic65_68data;
+	}
 
 	/* update results */
 	switch (command)
@@ -399,9 +446,103 @@ READ16_HANDLER( asic65_r )
 
 READ16_HANDLER( asic65_io_r )
 {
-	/* indicate that we always are ready to accept data and always ready to send */
-	return 0x4000;
+	if (asic65_type == ASIC65_ROMBASED)
+	{
+		/* bit 15 = TFULL */
+		/* bit 14 = 68FULL */
+		/* bit 13 = XFLG */
+		/* bit 12 = controlled by jumper */
+		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(5));
+		return (asic65_tfull << 15) | (asic65_68full << 14) | (asic65_xflg << 13) | 0x0000;
+	}
+	else
+	{
+		/* indicate that we always are ready to accept data and always ready to send */
+		return 0x4000;
+	}
 }
+
+
+
+/*************************************
+ *
+ *  Read/write handlers for TMS32015
+ *
+ *************************************/
+
+static WRITE16_HANDLER( asic65_68k_w )
+{
+	asic65_68full = 1;
+	asic65_68data = data;
+}
+
+
+static READ16_HANDLER( asic65_68k_r )
+{
+	asic65_tfull = 0;
+	cpunum_set_input_line(asic65_cpunum, 0, CLEAR_LINE);
+	return asic65_tdata;
+}
+
+
+static WRITE16_HANDLER( asic65_stat_w )
+{
+	asic65_xflg = data & 1;
+}
+
+
+static READ16_HANDLER( asic65_stat_r )
+{
+	/* bit 15 = 68FULL */
+	/* bit 14 = TFULL */
+	/* bit 13 = CMD */
+	/* bit 12 = controlled by jumper (0 = test?) */
+	return (asic65_68full << 15) | (asic65_tfull << 14) | (asic65_cmd << 13) | 0x1000;
+}
+
+
+static READ16_HANDLER( asci65_get_bio )
+{
+	if (!asic65_tfull)
+		cpu_spinuntil_int();
+	return asic65_tfull ? CLEAR_LINE : ASSERT_LINE;
+}
+
+
+
+/*************************************
+ *
+ *  Address maps for TMS32015
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( asic65_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	AM_RANGE(0x000, 0xfff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( asic65_io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(asic65_68k_r, asic65_68k_w)
+	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(asic65_stat_r, asic65_stat_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(asci65_get_bio)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Machine driver for ROM-based
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( asic65 )
+
+	/* ASIC65 */
+	MDRV_CPU_ADD_TAG("asic65", TMS32010, 20000000/TMS32010_CLOCK_DIVIDER)
+	MDRV_CPU_PROGRAM_MAP(asic65_program_map,0)
+	MDRV_CPU_IO_MAP(asic65_io_map,0)
+MACHINE_DRIVER_END
+
 
 
 /***********************************************************************

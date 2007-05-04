@@ -539,15 +539,17 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 		}
 		else
 		{
-			_push_m32bd(REG_ESP, mips3.bigendian ? 12 : 8);							// push [esp+8/12]
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
+			_push_m32bd(REG_ESP, mips3.bigendian ? 16 : 12);						// push [esp+12/16]
 			_push_r32(REG_EBX);														// push ebx
 			_call(mips3.memory.writelong);											// call writelong
 			_add_r32_imm(REG_EBX, 4);												// add  ebx,4
-			_push_m32bd(REG_ESP, mips3.bigendian ? (8+8) : (12+8));					// push [esp+8+8/12]
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
+			_push_m32bd(REG_ESP, mips3.bigendian ? (12+16) : (16+16));				// push [esp+16+12/16]
 			_push_r32(REG_EBX);														// push ebx
 			_call(mips3.memory.writelong);											// call writelong
 			_sub_r32_imm(REG_EBX, 4);												// sub  ebx,4
-			_add_r32_imm(REG_ESP, 16);												// add  esp,16
+			_add_r32_imm(REG_ESP, 28);												// add  esp,28
 			_ret();																	// ret
 		}
 	}
@@ -555,24 +557,26 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 	{
 		if (size == 1)
 		{
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_push_r32(REG_EBX);														// push ebx
 			_call(mips3.memory.readbyte);											// call  readbyte
 			if (is_signed)
 				_movsx_r32_r8(REG_EAX, REG_AL);										// movsx eax,al
 			else
 				_movzx_r32_r8(REG_EAX, REG_AL);										// movzx eax,al
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_ret();																	// ret
 		}
 		else if (size == 2)
 		{
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_push_r32(REG_EBX);														// push ebx
 			_call(mips3.memory.readword);											// call  readword
 			if (is_signed)
 				_movsx_r32_r16(REG_EAX, REG_AX);									// movsx eax,ax
 			else
 				_movzx_r32_r16(REG_EAX, REG_AX);									// movzx eax,ax
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_ret();																	// ret
 		}
 		else if (size == 4)
@@ -582,11 +586,12 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 		}
 		else
 		{
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_push_r32(REG_EBX);														// push ebx
 			_call(mips3.memory.readlong);											// call readlong
 			_add_r32_imm(REG_EBX, 4);												// add  ebx,4
-			_mov_m32bd_r32(REG_ESP, 0, REG_EAX);									// mov  [esp],eax
-			_push_r32(REG_EBX);														// push ebx
+			_mov_m32bd_r32(REG_ESP, 4, REG_EAX);									// mov  [esp+4],eax
+			_mov_m32bd_r32(REG_ESP, 0, REG_EBX);									// mov  [esp],ebx
 			_call(mips3.memory.readlong);											// call readlong
 			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			if (mips3.bigendian)
@@ -597,6 +602,7 @@ static void append_readwrite_and_translate(drc_core *drc, int is_write, int size
 				_pop_r32(REG_EAX);													// pop  eax
 			}
 			_sub_r32_imm(REG_EBX, 4);												// sub  ebx,4
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			_ret();																	// ret
 		}
 	}
@@ -632,7 +638,9 @@ static void append_tlb_verify(drc_core *drc, UINT32 pc, void *target)
 static void append_update_cycle_counting(drc_core *drc)
 {
 	_mov_m32abs_r32(&mips3_icount, REG_EBP);										// mov  [mips3_icount],ebp
+	_sub_r32_imm(REG_ESP, 12);														// sub  esp,12
 	_call((genf *)update_cycle_counting);											// call update_cycle_counting
+	_add_r32_imm(REG_ESP, 12);														// add  esp,12
 	_mov_r32_m32abs(REG_EBP, &mips3_icount);										// mov  ebp,[mips3_icount]
 }
 
@@ -1335,6 +1343,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x1a:	/* LDL */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1344,6 +1353,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_double);							// call read_and_translate_double
 			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			_pop_r32(REG_ECX);														// pop  ecx
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
@@ -1372,6 +1382,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x1b:	/* LDR */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1381,6 +1392,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_double);							// call read_and_translate_double
 			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			_pop_r32(REG_ECX);														// pop  ecx
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
@@ -1463,6 +1475,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x20:	/* LB */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1474,7 +1487,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_byte_signed);							// call read_and_translate_byte_signed
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_cdq();																// cdq
@@ -1486,6 +1499,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x21:	/* LH */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1497,7 +1511,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_word_signed);							// call read_and_translate_word_signed
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_cdq();																// cdq
@@ -1509,6 +1523,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x22:	/* LWL */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1518,6 +1533,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_long);							// call read_and_translate_long
 			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			_pop_r32(REG_ECX);														// pop  ecx
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
@@ -1538,6 +1554,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x23:	/* LW */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1549,7 +1566,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_long);									// call read_and_translate_long
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_cdq();																// cdq
@@ -1561,6 +1578,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x24:	/* LBU */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1572,7 +1590,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_byte_unsigned);							// call read_and_translate_byte_unsigned
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_mov_m32bd_imm(REG_ESI, REGDISP(RTREG)+4, 0);						// mov  [rtreg].hi,0
@@ -1584,6 +1602,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x25:	/* LHU */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1595,7 +1614,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_word_unsigned);							// call read_and_translate_word_unsigned
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_mov_m32bd_imm(REG_ESI, REGDISP(RTREG)+4, 0);						// mov  [rtreg].hi,0
@@ -1607,6 +1626,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x26:	/* LWR */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1616,6 +1636,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_long);							// call read_and_translate_long
 			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			_pop_r32(REG_ECX);														// pop  ecx
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			if (RTREG != 0)
 			{
@@ -1636,6 +1657,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x27:	/* LWU */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1647,7 +1669,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_long);									// call read_and_translate_long
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			if (RTREG != 0)
 			{
 				_mov_m32bd_imm(REG_ESI, REGDISP(RTREG)+4, 0);						// mov  [rtreg].hi,0
@@ -1659,6 +1681,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x28:	/* SB */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			if (RTREG != 0)
 				_push_m32bd(REG_ESI, REGDISP(RTREG));								// push dword [rtreg]
 			else
@@ -1674,13 +1697,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.write_and_translate_byte);									// call writebyte
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x29:	/* SH */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			if (RTREG != 0)
 				_push_m32bd(REG_ESI, REGDISP(RTREG));								// push dword [rtreg]
 			else
@@ -1696,13 +1720,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.write_and_translate_word);									// call writeword
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x2a:	/* SWL */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1711,6 +1736,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_push_r32(REG_EAX);														// push eax
 			_call((genf *)mips3.read_and_translate_long);							// call read_and_translate_long
 			_mov_r32_m32bd(REG_ECX, REG_ESP, 4);									// mov  ecx,[esp+4]
+			_add_r32_imm(REG_ESP, 8);												// add  esp,8
 
 			_and_r32_imm(REG_ECX, 3);												// and  ecx,3
 			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
@@ -1729,7 +1755,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_push_r32(REG_EAX);														// push eax
 			_push_r32(REG_EBX);														// push ebx
 			_call((genf *)mips3.write_back_long);									// call writelong
-			_add_r32_imm(REG_ESP, 16);												// add  esp,16
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1737,6 +1763,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x2b:	/* SW */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			if (RTREG != 0)
 				_push_m32bd(REG_ESI, REGDISP(RTREG));								// push dword [rtreg]
 			else
@@ -1752,13 +1779,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.write_and_translate_long);									// call write_and_translate_long
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x2c:	/* SDL */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1768,6 +1796,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_double);							// call read_and_translate_double
 			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			_pop_r32(REG_ECX);														// pop  ecx
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			_and_r32_imm(REG_ECX, 7);												// and  ecx,7
 			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
@@ -1807,6 +1836,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x2d:	/* SDR */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1816,6 +1846,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_double);							// call read_and_translate_double
 			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 			_pop_r32(REG_ECX);														// pop  ecx
+			_add_r32_imm(REG_ESP, 4);												// add  esp,4
 
 			_and_r32_imm(REG_ECX, 7);												// and  ecx,7
 			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
@@ -1855,6 +1886,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x2e:	/* SWR */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// add  esp,4
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			if (SIMMVAL)
 				_add_r32_imm(REG_EAX, SIMMVAL);										// add  eax,SIMMVAL
@@ -1863,6 +1895,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_push_r32(REG_EAX);														// push eax
 			_call((genf *)mips3.read_and_translate_long);							// call read_and_translate_long
 			_mov_r32_m32bd(REG_ECX, REG_ESP, 4);									// mov  ecx,[esp+4]
+			_add_r32_imm(REG_ESP, 8);												// add  esp,8
 
 			_and_r32_imm(REG_ECX, 3);												// and  ecx,3
 			_shl_r32_imm(REG_ECX, 3);												// shl  ecx,3
@@ -1881,7 +1914,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_push_r32(REG_EAX);														// push eax
 			_push_r32(REG_EBX);														// push ebx
 			_call((genf *)mips3.write_back_long);									// call write_back_long
-			_add_r32_imm(REG_ESP, 16);												// add  esp,16
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1894,6 +1927,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x31:	/* LWC1 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1905,7 +1939,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_long);									// call read_and_translate_long
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_m32abs_r32(FPR32(RTREG), REG_EAX);									// mov  [rtreg],eax
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1913,6 +1947,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x32:	/* LWC2 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1924,7 +1959,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.read_and_translate_long);									// call read_and_translate_long
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_m32abs_r32(&mips3.cpr[2][RTREG], REG_EAX);							// mov  [rtreg],eax
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -1943,6 +1978,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x35:	/* LDC1 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1956,13 +1992,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_double);							// call read_and_translate_double
 			_mov_m32abs_r32(LO(FPR64(RTREG)), REG_EAX);								// mov  [rtreg].lo,eax
 			_mov_m32abs_r32(HI(FPR64(RTREG)), REG_EDX);								// mov  [rtreg].hi,edx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x36:	/* LDC2 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -1976,13 +2013,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			_call((genf *)mips3.read_and_translate_double);							// call read_and_translate_long
 			_mov_m32abs_r32(LO(&mips3.cpr[2][RTREG]), REG_EAX);						// mov  [rtreg].lo,eax
 			_mov_m32abs_r32(HI(&mips3.cpr[2][RTREG]), REG_EDX);						// mov  [rtreg].hi,edx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x37:	/* LD */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
 				_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));					// mov  eax,[rsreg]
@@ -2000,7 +2038,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 				_mov_m32bd_r32(REG_ESI, REGDISP(RTREG)+4, REG_EDX);					// mov  [rtreg].hi,edx
 			}
 
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -2009,6 +2047,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 		case 0x39:	/* SWC1 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_push_m32abs(FPR32(RTREG));												// push dword [rtreg]
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
@@ -2021,13 +2060,14 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.write_and_translate_long);									// call write_and_translate_long
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x3a:	/* SWC2 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_push_m32abs(&mips3.cpr[2][RTREG]);										// push dword [rtreg]
 			if (RSREG != 0 && SIMMVAL != 0)
 			{
@@ -2040,7 +2080,7 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			else
 				_push_imm(SIMMVAL);													// push SIMMVAL
 			_call(mips3.write_and_translate_long);									// call write_and_translate_long
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
@@ -2547,17 +2587,19 @@ static UINT32 recompile_special1(drc_core *drc, UINT32 pc, UINT32 op)
 			return RECOMPILE_SUCCESSFUL_CP(8,4);
 
 		case 0x1e:	/* DDIV */
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_push_imm(&mips3.r[RTREG]);												// push [rtreg]
 			_push_imm(&mips3.r[RSREG]);												// push [rsreg]
 			_call((genf *)ddiv);													// call ddiv
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			return RECOMPILE_SUCCESSFUL_CP(68,4);
 
 		case 0x1f:	/* DDIVU */
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_push_imm(&mips3.r[RTREG]);												// push [rtreg]
 			_push_imm(&mips3.r[RSREG]);												// push [rsreg]
 			_call((genf *)ddivu);													// call ddivu
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			return RECOMPILE_SUCCESSFUL_CP(68,4);
 	}
 
@@ -3491,11 +3533,12 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 #ifdef MAME_DEBUG
             _test_r32_imm(REG_EAX, 0xe0);                                           // test eax,0xe0
             _jcc_short_link(COND_Z, &link1);                                        // jz   skip
+            _sub_r32_imm(REG_ESP, 4);                                               // sub  esp,4
             _push_r32(REG_EAX);                                                     // push eax
             _push_imm("System set 64-bit addressing mode, SR=%08X");                // push <string>
-            _call(mame_printf_debug);                                                     // call mame_printf_debug
-            _add_r32_imm(REG_ESP, 8);                                               // add esp,8
+            _call(mame_printf_debug);                                               // call mame_printf_debug
             _call(mame_debug_break);                                                // call mame_debug_break
+            _add_r32_imm(REG_ESP, 12);                                              // add esp,12
             _resolve_link(&link1);                                                  // skip:
 #endif
 */
@@ -3508,9 +3551,11 @@ static UINT32 recompile_set_cop0_reg(drc_core *drc, UINT8 reg)
 		case COP0_Count:
 			_mov_m32abs_r32(&mips3.cpr[0][COP0_Count], REG_EAX);					// mov  [mips3.cpr[0][COP0_Count]],eax
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_push_r32(REG_EAX);														// push eax
 			_call((genf *)activecpu_gettotalcycles64);								// call activecpu_gettotalcycles64
 			_pop_r32(REG_EBX);														// pop  ebx
+			_add_r32_imm(REG_ESP, 8);												// add  esp,8
 			_sub_r32_r32(REG_EAX, REG_EBX);											// sub  eax,ebx
 			_sbb_r32_imm(REG_EDX, 0);												// sbb  edx,0
 			_sub_r32_r32(REG_EAX, REG_EBX);											// sub  eax,ebx
@@ -3560,7 +3605,9 @@ static UINT32 recompile_get_cop0_reg(drc_core *drc, UINT8 reg)
 			_xor_r32_r32(REG_EBP, REG_EBP);											// xor  ebp,ebp
 			_resolve_link(&link1);													// notneg:
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
+			_sub_r32_imm(REG_ESP, 12);												// sub  esp,12
 			_call((genf *)activecpu_gettotalcycles64);								// call activecpu_gettotalcycles64
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_sub_r32_m32abs(REG_EAX, LO(&mips3.count_zero_time));					// sub  eax,[mips3.count_zero_time+0]
 			_sbb_r32_m32abs(REG_EDX, HI(&mips3.count_zero_time));					// sbb  edx,[mips3.count_zero_time+4]
 			_shrd_r32_r32_imm(REG_EAX, REG_EDX, 1);									// shrd eax,edx,1
@@ -3685,19 +3732,23 @@ static UINT32 recompile_cop0(drc_core *drc, UINT32 pc, UINT32 op)
 			switch (op & 0x01ffffff)
 			{
 				case 0x01:	/* TLBR */
-					drc_append_save_call_restore(drc, (genf *)tlbr, 0);
+					_sub_r32_imm(REG_ESP, 12);
+					drc_append_save_call_restore(drc, (genf *)tlbr, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x02:	/* TLBWI */
-					drc_append_save_call_restore(drc, (genf *)tlbwi, 0);
+					_sub_r32_imm(REG_ESP, 12);
+					drc_append_save_call_restore(drc, (genf *)tlbwi, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x06:	/* TLBWR */
-					drc_append_save_call_restore(drc, (genf *)tlbwr, 0);
+					_sub_r32_imm(REG_ESP, 12);
+					drc_append_save_call_restore(drc, (genf *)tlbwr, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x08:	/* TLBP */
-					drc_append_save_call_restore(drc, (genf *)tlbp, 0);
+					_sub_r32_imm(REG_ESP, 12);
+					drc_append_save_call_restore(drc, (genf *)tlbp, 12);
 					return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 				case 0x10:	/* RFE */
@@ -4552,11 +4603,12 @@ static UINT32 recompile_cop1x(drc_core *drc, UINT32 pc, UINT32 op)
 		case 0x00:		/* LWXC1 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// add  eax,[rtreg]
 			_push_r32(REG_EAX);														// push eax
 			_call(mips3.read_and_translate_long);									// call read_and_translate_long
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_m32abs_r32(FPR32(FDREG), REG_EAX);									// mov  [fdreg],eax
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -4564,29 +4616,36 @@ static UINT32 recompile_cop1x(drc_core *drc, UINT32 pc, UINT32 op)
 		case 0x01:		/* LDXC1 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 8);												// sub  esp,8
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// add  eax,[rtreg]
 			_push_r32(REG_EAX);														// push eax
 			_call(mips3.read_and_translate_double);									// call read_and_translate_double
 			_mov_m32abs_r32(LO(FPR64(FDREG)), REG_EAX);								// mov  [fdreg].lo,eax
 			_mov_m32abs_r32(HI(FPR64(FDREG)), REG_EDX);								// mov  [fdreg].hi,edx
-			_add_r32_imm(REG_ESP, 4);												// add  esp,4
+			_add_r32_imm(REG_ESP, 12);												// add  esp,12
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x08:		/* SWXC1 */
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
+			_sub_r32_imm(REG_ESP, 4);												// sub  esp,4
 			_push_m32abs(FPR32(FSREG));												// push [fsreg]
 			_mov_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RSREG));						// mov  eax,[rsreg]
 			_add_r32_m32bd(REG_EAX, REG_ESI, REGDISP(RTREG));						// add  eax,[rtreg]
 			_push_r32(REG_EAX);														// push eax
 			_call(mips3.write_and_translate_long);									// call write_and_translate_long
-			_add_r32_imm(REG_ESP, 8);												// add  esp,8
+			_add_r32_imm(REG_ESP, 12);												// add  esp,8
 			_mov_r32_m32abs(REG_EBP, &mips3_icount);								// mov  ebp,[mips3_icount]
 			return RECOMPILE_SUCCESSFUL_CP(1,4);
 
 		case 0x09:		/* SDXC1 */
+			// REVISIT: does this actually work?
+			// Two 32-bit words are pushed, before the call, but three are popped afterwards!
+			// This, as far as I can see, will kill off the return address.
+			// All other calls to mips3.write_and_translate_double take three 32-bit words as arguments.
+			// So is one argument too few being pushed, or is one too many being popped?
 			_mov_m32abs_r32(&mips3_icount, REG_EBP);								// mov  [mips3_icount],ebp
 			_save_pc_before_call();													// save pc
 			_push_m32abs(HI(FPR64(FSREG)));											// push [fsreg].hi

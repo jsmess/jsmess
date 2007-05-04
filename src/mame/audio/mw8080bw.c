@@ -18,11 +18,8 @@
  *
  *************************************/
 
-
 static UINT8 port_1_last;
 static UINT8 port_2_last;
-static UINT8 port_3_last;
-static UINT8 port_4_last;
 
 
 
@@ -38,8 +35,6 @@ MACHINE_START( mw8080bw_audio )
 	/* setup for save states */
 	state_save_register_global(port_1_last);
 	state_save_register_global(port_2_last);
-	state_save_register_global(port_3_last);
-	state_save_register_global(port_4_last);
 
 	return 0;
 }

@@ -11,7 +11,8 @@
 
 #include "driver.h"
 
-unsigned char *polyplay_characterram;
+
+UINT8 *polyplay_characterram;
 static unsigned char dirtycharacter[256];
 
 
@@ -36,90 +37,35 @@ WRITE8_HANDLER( polyplay_characterram_w )
 {
 	if (polyplay_characterram[offset] != data)
 	{
-		dirtycharacter[((offset / 8) & 0x7f) + 0x80] = 1;
+		dirtycharacter[((offset >> 3) & 0x7f) | 0x80] = 1;
 
 		polyplay_characterram[offset] = data;
 	}
 }
 
-READ8_HANDLER( polyplay_characterram_r )
-{
-	return polyplay_characterram[offset];
-}
-
 
 VIDEO_UPDATE( polyplay )
 {
-	int offs;
+	offs_t offs;
 
 
-	if (get_vh_global_attribute_changed())
+	for (offs = 0; offs < videoram_size; offs++)
 	{
-		memset(dirtybuffer,1,videoram_size);
-	}
+		int sx = (offs & 0x3f) << 3;
+		int sy = offs >> 6 << 3;
+		UINT8 code = videoram[offs];
 
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
-	{
-		int charcode;
-
-
-		charcode = videoram[offs];
-
-		if (dirtybuffer[offs] || dirtycharacter[charcode])
+		if (dirtycharacter[code])
 		{
-			int sx,sy;
+			decodechar(machine->gfx[1], code & 0x7f, polyplay_characterram, machine->drv->gfxdecodeinfo[1].gfxlayout);
 
-
-			/* index=0 -> 1 bit chr; index=1 -> 3 bit chr */
-			if (charcode < 0x80) {
-
-				/* ROM chr, no need for decoding */
-
-				dirtybuffer[offs] = 0;
-
-				sx = offs % 64;
-				sy = offs / 64;
-
-				drawgfx(tmpbitmap,machine->gfx[0],
-						charcode,
-						0,
-						0,0,
-						8*sx,8*sy,
-						&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-
-			}
-			else {
-				/* decode modified characters */
-				if (dirtycharacter[charcode] == 1)
-				{
-					decodechar(machine->gfx[1],charcode-0x80,polyplay_characterram,machine->drv->gfxdecodeinfo[1].gfxlayout);
-					dirtycharacter[charcode] = 2;
-				}
-
-
-				dirtybuffer[offs] = 0;
-
-				sx = offs % 64;
-				sy = offs / 64;
-
-				drawgfx(tmpbitmap,machine->gfx[1],
-						charcode,
-						0,
-						0,0,
-						8*sx,8*sy,
-						&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-
-			}
+			dirtycharacter[code] = 0;
 		}
-	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
-
-	for (offs = 0;offs < 256;offs++)
-	{
-		if (dirtycharacter[offs] == 2) dirtycharacter[offs] = 0;
+		drawgfx(bitmap,machine->gfx[(code >> 7) & 0x01],
+				code, 0, 0, 0, sx, sy,
+				&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	}
+
 	return 0;
 }

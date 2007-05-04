@@ -973,33 +973,6 @@ INPUT_PORTS_START( everysec )
 INPUT_PORTS_END
 #endif
 
-/*
-    Allocate work RAM and video RAM shared
-    by Z80 and Slipstream.
-*/
-static int init_ram(void)
-{
-	/* 768kB work RAM */
-	work_ram = auto_malloc(0xC0000);
-
-	if (!work_ram)
-		goto startfailed;
-
-	/* 128kB video RAM */
-	video_ram = auto_malloc(0x20000);
-
-	if (!video_ram)
-		goto startfailed;
-
-	memset(work_ram, 0, 0xc0000);
-	memset(video_ram, 0, 0x20000);
-
-	return 0;
-
-startfailed:
-	return 1;
-}
-
 static void z80_acia_irq(int state)
 {
 	cpunum_set_input_line(0, 0, state ? HOLD_LINE : CLEAR_LINE);
@@ -1051,7 +1024,7 @@ DRIVER_INIT( bfcobra )
 	UINT8 *rom;
 	UINT8 *tmp;
 
-	tmp = malloc(0x8000);
+	tmp = malloc_or_die(0x8000);
 	rom = memory_region(REGION_CPU2) + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
@@ -1077,7 +1050,13 @@ DRIVER_INIT( bfcobra )
 
 	free(tmp);
 
-	init_ram();
+	/* 768kB work RAM */
+	work_ram = auto_malloc(0xC0000);
+	memset(work_ram, 0, 0xc0000);
+
+	/* 128kB video RAM */
+	video_ram = auto_malloc(0x20000);
+	memset(video_ram, 0, 0x20000);
 
 	bank[0] = 1;
 	bank[1] = 0;
@@ -1125,7 +1104,7 @@ static MACHINE_DRIVER_START( bfcobra )
 
 	MDRV_CPU_ADD(M6809, M6809_XTAL)
 	MDRV_CPU_PROGRAM_MAP(m6809_prog_map, 0)
-	MDRV_CPU_PERIODIC_INT(timer_irq, TIME_IN_HZ(1000))
+	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(bfcobra)

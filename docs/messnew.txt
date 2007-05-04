@@ -37,7 +37,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.114u3.  This incorporates all features of the
+- The core is based on MAME 0.114u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Added support for noting default RAM options in -listxml.  (bug #1147) [Nate

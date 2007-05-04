@@ -104,18 +104,38 @@ enum
 
 	/* segment registers */
 	I386_CS,
+	I386_CS_BASE,
+	I386_CS_LIMIT,
+	I386_CS_FLAGS,
 	I386_SS,
+	I386_SS_BASE,
+	I386_SS_LIMIT,
+	I386_SS_FLAGS,
 	I386_DS,
+	I386_DS_BASE,
+	I386_DS_LIMIT,
+	I386_DS_FLAGS,
 	I386_ES,
+	I386_ES_BASE,
+	I386_ES_LIMIT,
+	I386_ES_FLAGS,
 	I386_FS,
+	I386_FS_BASE,
+	I386_FS_LIMIT,
+	I386_FS_FLAGS,
 	I386_GS,
+	I386_GS_BASE,
+	I386_GS_LIMIT,
+	I386_GS_FLAGS,
 
 	/* other */
 	I386_EFLAGS,
+
 	I386_CR0,
 	I386_CR1,
 	I386_CR2,
 	I386_CR3,
+
 	I386_DR0,
 	I386_DR1,
 	I386_DR2,
@@ -124,8 +144,23 @@ enum
 	I386_DR5,
 	I386_DR6,
 	I386_DR7,
+
 	I386_TR6,
 	I386_TR7,
+
+	I386_GDTR_BASE,
+	I386_GDTR_LIMIT,
+	I386_IDTR_BASE,
+	I386_IDTR_LIMIT,
+	I386_TR,
+	I386_TR_BASE,
+	I386_TR_LIMIT,
+	I386_TR_FLAGS,
+	I386_LDTR,
+	I386_LDTR_BASE,
+	I386_LDTR_LIMIT,
+	I386_LDTR_FLAGS,
+
 	X87_CTRL,
 	X87_STATUS,
 	X87_ST0,
@@ -140,6 +175,7 @@ enum
 
 typedef struct {
 	UINT16 selector;
+	UINT16 flags;
 	UINT32 base;
 	UINT32 limit;
 	int d;		// Operand size
@@ -152,6 +188,7 @@ typedef struct {
 
 typedef struct {
 	UINT16 segment;
+	UINT16 flags;
 	UINT32 base;
 	UINT32 limit;
 } I386_SEG_DESC;

@@ -166,10 +166,6 @@ int sys24_tile_vh_start(UINT16 tile_mask)
 
 	Machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
 
-	if(!Machine->gfx[sys24_char_gfx_index]) {
-		return 1;
-	}
-
 	if (Machine->drv->color_table_len)
 	{
 		Machine->gfx[sys24_char_gfx_index]->colortable = Machine->remapped_colortable;

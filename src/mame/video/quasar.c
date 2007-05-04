@@ -52,10 +52,9 @@ extern int CollisionRegister;
 //static int    scroll_reg = 0;
 
 unsigned char *effectram;
-unsigned char *effectdirty;
 int           effectcontrol;
 
-mame_bitmap *effect_bitmap;
+static mame_bitmap *effect_bitmap;
 
 PALETTE_INIT( quasar )
 {
@@ -138,9 +137,6 @@ PALETTE_INIT( quasar )
 VIDEO_START( quasar )
 {
 	effectram   = auto_malloc(0x400);
-	effectdirty = auto_malloc(0x400);
-
-	memset(effectdirty,0,sizeof(effectdirty));
 
 	effect_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
@@ -152,9 +148,6 @@ VIDEO_UPDATE( quasar )
 	int offs,character;
 	int sx,sy, ox, oy;
     int forecolor;
-
-	if (get_vh_global_attribute_changed())
-		memset(dirtybuffer, 1, videoram_size);
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -169,45 +162,35 @@ VIDEO_UPDATE( quasar )
 		// While we have the current character code, draw the effects layer
 		// intensity / on and off controlled by latch
 
-		//if (effectdirty[offs]) doesn't work!
+		if (effectcontrol == 0x30)
+			forecolor = 0;
+		else
+			forecolor = effectram[offs] + (256 * (((effectcontrol >> 4) ^ 3) & 3));
+
+		for(ox=0;ox<8;ox++)
+			for(oy=0;oy<8;oy++)
+				*BITMAP_ADDR16(effect_bitmap, sy+oy, sx+ox) = forecolor;
+
+		/* Main Screen */
+
+		drawgfx(tmpbitmap,machine->gfx[0],
+				character,
+				colorram[offs],
+				0,0,
+				sx,sy,
+				0,TRANSPARENCY_NONE,0);
+
+
+		/* background for Collision Detection (it can only hit certain items) */
+
+		if((colorram[offs] & 7) == 0)
 		{
-			effectdirty[offs] = 0;
-
-			if (effectcontrol == 0x30)
-				forecolor = 0;
-			else
-				forecolor = effectram[offs] + (256 * (((effectcontrol >> 4) ^ 3) & 3));
-
-			for(ox=0;ox<8;ox++)
-				for(oy=0;oy<8;oy++)
-					*BITMAP_ADDR16(effect_bitmap, sy+oy, sx+ox) = forecolor;
-		}
-
-		if(dirtybuffer[offs])
-		{
-			dirtybuffer[offs] = 0;
-
-            /* Main Screen */
-
- 			drawgfx(tmpbitmap,machine->gfx[0],
-				    character,
-					colorram[offs],
-				    0,0,
-				    sx,sy,
-				    0,TRANSPARENCY_NONE,0);
-
-
-            /* background for Collision Detection (it can only hit certain items) */
-
-            if((colorram[offs] & 7) == 0)
-            {
- 			    drawgfx(collision_background,machine->gfx[0],
-				        character,
-					    64,
-				        0,0,
-				        sx,sy,
-				        0,TRANSPARENCY_NONE,0);
-            }
+			drawgfx(collision_background,machine->gfx[0],
+					character,
+					64,
+					0,0,
+					sx,sy,
+					0,TRANSPARENCY_NONE,0);
 		}
 	}
 
