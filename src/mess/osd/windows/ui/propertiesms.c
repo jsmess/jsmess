@@ -40,6 +40,8 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR);
 extern BOOL BrowseForDirectory(HWND hwnd, const char* pStartDir, char* pResult);
 BOOL g_bModifiedSoftwarePaths = FALSE;
 
+
+
 static void MarkChanged(HWND hDlg)
 {
 	HWND hCtrl;
@@ -49,7 +51,9 @@ static void MarkChanged(HWND hDlg)
 	PostMessage(hDlg, WM_COMMAND, (CBN_SELCHANGE << 16) | IDC_SIZES, (LPARAM) hCtrl);
 }
 
-static void AppendList(HWND hList, LPCSTR lpItem, int nItem)
+
+
+static void AppendList(HWND hList, LPCTSTR lpItem, int nItem)
 {
     LV_ITEM Item;
 	memset(&Item, 0, sizeof(LV_ITEM));
@@ -58,6 +62,8 @@ static void AppendList(HWND hList, LPCSTR lpItem, int nItem)
 	Item.iItem = nItem;
 	ListView_InsertItem(hList, &Item);
 }
+
+
 
 static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCSTR lpItem)
 {
@@ -102,6 +108,8 @@ static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCSTR l
 	return TRUE;
 }
 
+
+
 static BOOL SoftwareDirectories_OnDelete(HWND hDlg)
 {
     int     nCount;
@@ -137,6 +145,8 @@ static BOOL SoftwareDirectories_OnDelete(HWND hDlg)
 	return TRUE;
 }
 
+
+
 static BOOL SoftwareDirectories_OnBeginLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 {
 	BOOL          bResult = FALSE;
@@ -153,6 +163,8 @@ static BOOL SoftwareDirectories_OnBeginLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
 	return bResult;
 }
+
+
 
 static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 {
@@ -191,10 +203,14 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
     return bResult;
 }
 
+
+
 BOOL PropSheetFilter_Config(const machine_config *drv, const game_driver *gamedrv)
 {
 	return (ram_option_count(gamedrv) > 0) || DriverHasDevice(gamedrv, IO_PRINTER);
 }
+
+
 
 INT_PTR CALLBACK GameMessOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -221,158 +237,7 @@ INT_PTR CALLBACK GameMessOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 	return rc;
 }
 
-/* ------------------------------------------------------------------------ */
 
-struct component_param_block
-{
-	core_options *o;
-	int nGame;
-	WORD wID;
-	WORD wNotifyCode;
-	BOOL *changed;
-};
-
-enum component_msg
-{
-	CMSG_OPTIONSTOPROP,
-	CMSG_PROPTOOPTIONS,
-	CMSG_COMMAND
-};
-
-static BOOL SoftwareDirectories_ComponentProc(enum component_msg msg, HWND hWnd, const game_driver *gamedrv, struct component_param_block *params)
-{
-	HWND hList;
-	RECT        rectClient;
-	LVCOLUMN    LVCol;
-	int nItem;
-	int nLen;
-	char buf[2048];
-	LPCSTR s;
-	LPCSTR lpList;
-	LPSTR lpBuf;
-    LV_ITEM Item;
-	int iCount, i;
-	int iBufLen;
-
-	hList = GetDlgItem(hWnd, IDC_DIR_LIST);
-	if (!hList)
-		return FALSE;
-
-	switch(msg) {
-	case CMSG_OPTIONSTOPROP:
-		ListView_DeleteAllItems(hList);
-
-		GetClientRect(hList, &rectClient);
-		memset(&LVCol, 0, sizeof(LVCOLUMN));
-		LVCol.mask    = LVCF_WIDTH;
-		LVCol.cx      = rectClient.right - rectClient.left - GetSystemMetrics(SM_CXHSCROLL);
-		ListView_InsertColumn(hList, 0, &LVCol);
-
-		lpList = (params->nGame >= 0) ? GetExtraSoftwarePaths(params->nGame) : NULL;
-
-		nItem = 0;
-		while(lpList && *lpList)
-		{
-			s = strchr(lpList, ';');
-			nLen = (s) ? (s - lpList) : (strlen(lpList));
-			if (nLen >= sizeof(buf) / sizeof(buf[0]))
-				nLen = (sizeof(buf) / sizeof(buf[0])) - 1;
-			strncpy(buf, lpList, nLen);
-			buf[nLen] = '\0';
-			lpList += nLen;
-			if (*lpList == ';')
-				lpList++;
-
-			AppendList(hList, buf, nItem++);
-		}
-		AppendList(hList, DIRLIST_NEWENTRYTEXT, nItem);
-
-		ListView_SetItemState(hList, 0, LVIS_SELECTED, LVIS_SELECTED);
-		break;
-
-	case CMSG_PROPTOOPTIONS:
-		lpBuf = buf;
-		iBufLen = sizeof(buf) / sizeof(buf[0]);
-		memset(lpBuf, '\0', iBufLen);
-
-		iCount = ListView_GetItemCount(hList);
-		if (iCount)
-			iCount--;
-
-		memset(&Item, '\0', sizeof(Item));
-		Item.mask = LVIF_TEXT;
-
-		*lpBuf = '\0';
-
-		for (i = 0; i < iCount; i++)
-		{
-			if (i > 0)
-				strncatz(lpBuf, ";", iBufLen);
-
-			Item.iItem = i;
-			Item.pszText = lpBuf + strlen(lpBuf);
-			Item.cchTextMax = iBufLen - strlen(lpBuf);
-			ListView_GetItem(hList, &Item);
-		}
-
-		if (params->nGame >= 0)
-			SetExtraSoftwarePaths(params->nGame, buf);
-		break;
-
-	case CMSG_COMMAND:
-		switch(params->wID) {
-		case IDC_DIR_BROWSE:
-			if (params->wNotifyCode == BN_CLICKED)
-				*(params->changed) = SoftwareDirectories_OnInsertBrowse(hWnd, TRUE, NULL);
-			break;
-
-		case IDC_DIR_INSERT:
-			if (params->wNotifyCode == BN_CLICKED)
-				*(params->changed) = SoftwareDirectories_OnInsertBrowse(hWnd, FALSE, NULL);
-			break;
-
-		case IDC_DIR_DELETE:
-			if (params->wNotifyCode == BN_CLICKED)
-				*(params->changed) = SoftwareDirectories_OnDelete(hWnd);
-			break;
-
-		default:
-			return FALSE;
-		}
-		break;
-
-	default:
-		assert(0);
-		break;
-	}
-	return TRUE;
-}
-
-/* ------------------------------------------------------------------------ */
-
-typedef BOOL (*component_proc)(enum component_msg msg, HWND hWnd, const game_driver *gamedrv, struct component_param_block *params);
-
-static const component_proc s_ComponentProcs[] =
-{
-	SoftwareDirectories_ComponentProc
-};
-
-static BOOL InvokeComponentProcs(int nGame, enum component_msg msg, HWND hWnd, struct component_param_block *params)
-{
-	int i;
-	const game_driver *gamedrv;
-	BOOL handled = FALSE;
-
-	/* figure out which GameDriver we're using.  NULL indicated default options */
-	gamedrv = (nGame >= 0) ? drivers[nGame] : NULL;
-
-	for (i = 0; i < sizeof(s_ComponentProcs) / sizeof(s_ComponentProcs[0]); i++)
-	{
-		if (s_ComponentProcs[i](msg, hWnd, gamedrv, params))
-			handled = TRUE;
-	}
-	return handled;
-}
 
 BOOL MessPropertiesCommand(int nGame, HWND hWnd, WORD wNotifyCode, WORD wID, BOOL *changed)
 {
@@ -401,6 +266,8 @@ BOOL MessPropertiesCommand(int nGame, HWND hWnd, WORD wNotifyCode, WORD wID, BOO
 	}
 	return handled;
 }
+
+
 
 //============================================================
 //  DATAMAP HANDLERS
@@ -453,8 +320,7 @@ static void DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 
 static void DirListPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
-	int driver_index;
-	int directory_count, pos;
+	int driver_index, pos, new_pos, current_item;
 	const char *dir_list;
 	TCHAR *t_dir_list;
 	TCHAR *s;
@@ -468,25 +334,6 @@ static void DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 	if (!t_dir_list)
 		return;
 
-	// count the number of directories
-	directory_count = 0;
-	pos = 0;
-	while(t_dir_list[pos] != '\0')
-	{
-		directory_count++;
-
-		s = _tcschr(&t_dir_list[pos], ';');
-		if (s != NULL)
-		{
-			*s = '\0';
-			pos = s - &t_dir_list[pos] + 1;
-		}
-		else
-		{
-			pos += _tcslen(&t_dir_list[pos]);
-		}
-	}
-
 	// delete all items in the list control
 	ListView_DeleteAllItems(control);
 
@@ -496,7 +343,35 @@ static void DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 	lvc.mask = LVCF_WIDTH;
 	lvc.cx = r.right - r.left - GetSystemMetrics(SM_CXHSCROLL);
 
+	// add each of the directories
+	pos = 0;
+	current_item = 0;
+	while(t_dir_list[pos] != '\0')
+	{
+		// parse off this item
+		s = _tcschr(&t_dir_list[pos], ';');
+		if (s != NULL)
+		{
+			*s = '\0';
+			new_pos = s - &t_dir_list[pos] + 1;
+		}
+		else
+		{
+			new_pos = pos + _tcslen(&t_dir_list[pos]);
+		}
 
+		// append this item
+		AppendList(control, &t_dir_list[pos], current_item);
+
+		// advance to next item
+		pos = new_pos;
+		current_item++;
+	}
+
+	// finish up
+	AppendList(control, DIRLIST_NEWENTRYTEXT, current_item);
+	ListView_SetItemState(control, 0, LVIS_SELECTED, LVIS_SELECTED);
+	free(t_dir_list);
 }
 
 
