@@ -255,7 +255,7 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 #if defined(SDLMAME_DARWIN) || defined(SDLMAME_FREEBSD)
 	result = pread(file->handle, buffer, count, offset);
 	if (!result)
-#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO)
+#elif defined(SDLMAME_WIN32) || defined(SDLMAME_NO64BITIO) || defined(SDLMAME_OS2)
 	lseek(file->handle, (UINT32)offset&0xffffffff, SEEK_SET);
 	result = read(file->handle, buffer, count); 
 	if (!result)
@@ -390,10 +390,10 @@ int osd_is_absolute_path(const char *path)
         else if (path[0] == '.')
                 result = TRUE;
 #else
-#ifndef UNDER_CE
-        else if (isalpha(path[0]))
-                result = (path[1] == ':');
-#endif
+	#ifndef UNDER_CE
+	else if (*path && path[1] == ':')
+		result = TRUE;
+	#endif
 #endif
         else
                 result = FALSE;
