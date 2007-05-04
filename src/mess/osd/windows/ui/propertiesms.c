@@ -11,6 +11,8 @@
 #include <commdlg.h>
 #include <windowsx.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <tchar.h>
 
 #include "driver.h"
 #include "device.h"
@@ -28,6 +30,7 @@
 #include "optionsms.h"
 #include "ms32util.h"
 #include "messopts.h"
+#include "strconv.h"
 
 static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCSTR lpItem);
 static BOOL SoftwareDirectories_OnDelete(HWND hDlg);
@@ -36,8 +39,6 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR);
 
 extern BOOL BrowseForDirectory(HWND hwnd, const char* pStartDir, char* pResult);
 BOOL g_bModifiedSoftwarePaths = FALSE;
-
-static int s_nGame;
 
 static void MarkChanged(HWND hDlg)
 {
@@ -373,45 +374,143 @@ static BOOL InvokeComponentProcs(int nGame, enum component_msg msg, HWND hWnd, s
 	return handled;
 }
 
-void MessOptionsToProp(int nGame, HWND hWnd, core_options *o)
-{
-	struct component_param_block params;
-	memset(&params, 0, sizeof(params));
-	params.o = o;
-	params.nGame = nGame;
-	InvokeComponentProcs(nGame, CMSG_OPTIONSTOPROP, hWnd, &params);
-}
-
-void MessPropToOptions(int nGame, HWND hWnd, core_options *o)
-{
-	struct component_param_block params;
-	memset(&params, 0, sizeof(params));
-	params.o = o;
-	params.nGame = nGame;
-	InvokeComponentProcs(nGame, CMSG_PROPTOOPTIONS, hWnd, &params);
-}
-
 BOOL MessPropertiesCommand(int nGame, HWND hWnd, WORD wNotifyCode, WORD wID, BOOL *changed)
 {
-	struct component_param_block params;
-	memset(&params, 0, sizeof(params));
-	params.wID = wID;
-	params.wNotifyCode = wNotifyCode;
-	params.changed = changed;
-	return InvokeComponentProcs(nGame, CMSG_COMMAND, hWnd, &params);
+	BOOL handled = TRUE;
+
+	switch(wID)
+	{
+		case IDC_DIR_BROWSE:
+			if (wNotifyCode == BN_CLICKED)
+				*changed = SoftwareDirectories_OnInsertBrowse(hWnd, TRUE, NULL);
+			break;
+
+		case IDC_DIR_INSERT:
+			if (wNotifyCode == BN_CLICKED)
+				*changed = SoftwareDirectories_OnInsertBrowse(hWnd, FALSE, NULL);
+			break;
+
+		case IDC_DIR_DELETE:
+			if (wNotifyCode == BN_CLICKED)
+				*changed = SoftwareDirectories_OnDelete(hWnd);
+			break;
+
+		default:
+			handled = FALSE;
+			break;
+	}
+	return handled;
 }
 
-void MessSetPropEnabledControls(HWND hWnd, core_options *o)
+//============================================================
+//  DATAMAP HANDLERS
+//============================================================
+
+static void DirListReadControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
+	int directory_count;
+    LV_ITEM lvi;
+	TCHAR buffer[2048];
+	char *dir_list;
+	int i, pos, driver_index;
+
+	// determine the directory count; note that one item is the "<    >" entry
+	directory_count = ListView_GetItemCount(control);
+	if (directory_count > 0)
+		directory_count--;
+
+	buffer[0] = '\0';
+	pos = 0;
+
+	for (i = 0; i < directory_count; i++)
+	{
+		// append a semicolon, if we're past the first entry
+		if (i > 0)
+			pos += _sntprintf(&buffer[pos], ARRAY_LENGTH(buffer) - pos, ";");
+
+		// retrieve the next entry
+		memset(&lvi, '\0', sizeof(lvi));
+		lvi.mask = LVIF_TEXT;
+		lvi.iItem = i;
+		lvi.pszText = &buffer[pos];
+		lvi.cchTextMax = ARRAY_LENGTH(buffer) - pos;
+		ListView_GetItem(control, &lvi);
+
+		// advance the position
+		pos += _tcslen(&buffer[pos]);
+	}
+
+	dir_list = utf8_from_tstring(buffer);
+	if (dir_list != NULL)
+	{
+		driver_index = PropertiesCurrentGame(dialog);
+		SetExtraSoftwarePaths(driver_index, dir_list);
+		free(dir_list);
+	}
 }
+
+
+
+static void DirListPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
+{
+	int driver_index;
+	int directory_count, pos;
+	const char *dir_list;
+	TCHAR *t_dir_list;
+	TCHAR *s;
+	LV_COLUMN lvc;
+	RECT r;
+
+	// access the directory list, and convert to TCHARs
+	driver_index = PropertiesCurrentGame(dialog);
+	dir_list = GetExtraSoftwarePaths(driver_index);
+	t_dir_list = tstring_from_utf8(dir_list);
+	if (!t_dir_list)
+		return;
+
+	// count the number of directories
+	directory_count = 0;
+	pos = 0;
+	while(t_dir_list[pos] != '\0')
+	{
+		directory_count++;
+
+		s = _tcschr(&t_dir_list[pos], ';');
+		if (s != NULL)
+		{
+			*s = '\0';
+			pos = s - &t_dir_list[pos] + 1;
+		}
+		else
+		{
+			pos += _tcslen(&t_dir_list[pos]);
+		}
+	}
+
+	// delete all items in the list control
+	ListView_DeleteAllItems(control);
+
+	// add the column
+	GetClientRect(control, &r);
+	memset(&lvc, 0, sizeof(LVCOLUMN));
+	lvc.mask = LVCF_WIDTH;
+	lvc.cx = r.right - r.left - GetSystemMetrics(SM_CXHSCROLL);
+
+
+}
+
+
 
 static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
-	int count, i, default_index;
-	const game_driver *gamedrv = drivers[s_nGame];
+	int count, i, default_index, driver_index;
+	const game_driver *gamedrv;
 	UINT32 ram, default_ram;
 	char buffer[64];
 	const char *this_ram_string;
+
+	driver_index = PropertiesCurrentGame(dialog);
+	gamedrv = drivers[driver_index];
 
 	ComboBox_ResetContent(control);
 
@@ -438,16 +537,22 @@ static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	}
 }
 
-void MessBuildDataMap(datamap *properties_datamap, int nGame)
-{
-	// yuck
-	s_nGame = nGame;
 
+
+//============================================================
+//  DATAMAP SETUP
+//============================================================
+
+void MessBuildDataMap(datamap *properties_datamap)
+{
 	// MESS specific stuff
+	datamap_add(properties_datamap, IDC_DIR_LIST,				DM_STRING,	NULL);
 	datamap_add(properties_datamap, IDC_RAM_COMBOBOX,			DM_INT,		OPTION_RAMSIZE);
 	datamap_add(properties_datamap, IDC_SKIP_WARNINGS,			DM_BOOL,	OPTION_SKIP_WARNINGS);
 	datamap_add(properties_datamap, IDC_USE_NEW_UI,				DM_BOOL,	"newui");
 
 	// set up callbacks
+	datamap_set_callback(properties_datamap, IDC_DIR_LIST,		DCT_READ_CONTROL,		DirListReadControl);
+	datamap_set_callback(properties_datamap, IDC_DIR_LIST,		DCT_POPULATE_CONTROL,	DirListPopulateControl);
 	datamap_set_callback(properties_datamap, IDC_RAM_COMBOBOX,	DCT_POPULATE_CONTROL,	RamPopulateControl);
 }

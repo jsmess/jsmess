@@ -336,6 +336,11 @@ void PropertiesInit(void)
 	bThemeActive = FALSE;
 }
 
+int PropertiesCurrentGame(HWND hDlg)
+{
+	return g_nGame;
+}
+
 DWORD GetHelpIDs(void)
 {
 	return (DWORD) (LPSTR) dwHelpIDs;
@@ -1495,9 +1500,6 @@ static void PropToOptions(HWND hWnd, core_options *o)
 			options_set_string(o, WINOPTION_DIGITAL, digital);
 		}
 	}
-#ifdef MESS
-	MessPropToOptions(g_nGame, hWnd, o);
-#endif
 }
 
 /* Populate controls that are not handled in the DataMap */
@@ -1672,10 +1674,6 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 			}
 		}
 	}
-
-#ifdef MESS
-	MessOptionsToProp(g_nGame, hWnd, o);
-#endif
 }
 
 /* Adjust controls - tune them to the currently selected game */
@@ -1691,10 +1689,6 @@ static void SetPropEnabledControls(HWND hWnd)
 	BOOL multimon = (DirectDraw_GetNumDisplays() >= 2);
 	int joystick_attached = 0;
 	int in_window = 0;
-
-#ifdef MESS
-	MessSetPropEnabledControls(hWnd, pGameOpts);
-#endif
 
 	nIndex = g_nGame;
 	
@@ -2313,7 +2307,7 @@ static void BuildDataMap(void)
 
 #ifdef MESS
 	// MESS specific stuff
-	MessBuildDataMap(properties_datamap, g_nGame);
+	MessBuildDataMap(properties_datamap);
 #endif // MESS
 }
 

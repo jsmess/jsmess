@@ -65,5 +65,6 @@ INT_PTR CALLBACK GamePropertiesDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LP
 INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 void PropertiesInit(void);
+int PropertiesCurrentGame(HWND hDlg);
 
 #endif
