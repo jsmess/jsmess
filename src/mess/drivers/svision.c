@@ -300,14 +300,11 @@ INPUT_PORTS_END
 /* most games contain their graphics in roms, and have hardware to
    draw complete rectangular objects */
 
-#define PALETTE_START 2
+#define PALETTE_START 0
 
 /* palette in red, green, blue triples */
 static const unsigned char svision_palette[] =
 {
-	/* these are necessary to appease the MAME core */
-	0x00, 0x00, 0x00,
-	0xff, 0xff, 0xff,
 #if 0
     /* greens grabbed from a scan of a handheld
      * in its best adjustment for contrast
@@ -328,9 +325,6 @@ static const unsigned char svision_palette[] =
 /* palette in red, green, blue tribles */
 static const unsigned char svisionp_palette[] =
 {
-	/* these are necessary to appease the MAME core */
-	0x00, 0x00, 0x00,
-	0xff, 0xff, 0xff,
 	// pal
 	1, 1, 3,
 	5, 18, 9,
@@ -341,9 +335,6 @@ static const unsigned char svisionp_palette[] =
 /* palette in red, green, blue tribles */
 static const unsigned char svisionn_palette[] =
 {
-	/* these are necessary to appease the MAME core */
-	0x00, 0x00, 0x00,
-	0xff, 0xff, 0xff,
 	0, 0, 0,
 	188, 242, 244, // darker
 	129, 204, 255,
@@ -473,10 +464,10 @@ static MACHINE_RESET( tvlink )
 	memset(svision_reg + 0x800, 0xff, 0x40); // normally done from tvlink microcontroller
 	svision_reg[0x82a] = 0xdf;
 
-	tvlink.palette[0] = MAKE24_RGB15(svisionp_palette[PALETTE_START+0*3+0], svisionp_palette[PALETTE_START+0*3+1], svisionp_palette[PALETTE_START+0*3+2]);
-	tvlink.palette[1] = MAKE24_RGB15(svisionp_palette[PALETTE_START+1*3+0], svisionp_palette[PALETTE_START+1*3+1], svisionp_palette[PALETTE_START+1*3+2]);
-	tvlink.palette[2] = MAKE24_RGB15(svisionp_palette[PALETTE_START+2*3+0], svisionp_palette[PALETTE_START+2*3+1], svisionp_palette[PALETTE_START+2*3+2]);
-	tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[PALETTE_START+3*3+0], svisionp_palette[PALETTE_START+3*3+1], svisionp_palette[PALETTE_START+3*3+2]);
+	tvlink.palette[0] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+0)*3+0], svisionp_palette[(PALETTE_START+0)*3+1], svisionp_palette[(PALETTE_START+0)*3+2]);
+	tvlink.palette[1] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+1)*3+0], svisionp_palette[(PALETTE_START+1)*3+1], svisionp_palette[(PALETTE_START+1)*3+2]);
+	tvlink.palette[2] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+2)*3+0], svisionp_palette[(PALETTE_START+2)*3+1], svisionp_palette[(PALETTE_START+2)*3+2]);
+	tvlink.palette[3] = MAKE24_RGB15(svisionp_palette[(PALETTE_START+3)*3+0], svisionp_palette[(PALETTE_START+3)*3+1], svisionp_palette[(PALETTE_START+3)*3+2]);
 }
 
 struct CustomSound_interface svision_sound_interface =
