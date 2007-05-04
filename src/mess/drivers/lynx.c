@@ -1,5 +1,5 @@
 /******************************************************************************
- PeT mess@utanet.at 2000,2001
+ PeT peter.trauner@utanet.at 2000,2001
 
  info found in bastian schick's bll
  and in cc65 for lynx
@@ -46,11 +46,11 @@ INPUT_PORTS_START( lynx )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_3)
 	// power on and power off buttons
 	PORT_START
-	PORT_DIPNAME ( 0x03, 3, "90 Degree Rotation")
-	PORT_DIPSETTING(	2, "Counterclockwise" )
-	PORT_DIPSETTING(	1, "Clockwise" )
-	PORT_DIPSETTING(	0, DEF_STR( None ) )
-	PORT_DIPSETTING(	3, "Crcfile" )
+	PORT_CONFNAME ( 0x03, 3, "90 Degree Rotation")
+	PORT_CONFSETTING(	2, "Counterclockwise" )
+	PORT_CONFSETTING(	1, "Clockwise" )
+	PORT_CONFSETTING(	0, DEF_STR( None ) )
+	PORT_CONFSETTING(	3, "Crcfile" )
 INPUT_PORTS_END
 
 static INTERRUPT_GEN( lynx_frame_int )
@@ -239,7 +239,7 @@ static MACHINE_DRIVER_START( lynx )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(CUSTOM, 0)
+        MDRV_SOUND_ADD_TAG("lynx", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(lynx_sound_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -249,8 +249,10 @@ static MACHINE_DRIVER_START( lynx2 )
 	MDRV_IMPORT_FROM( lynx )
 
 	/* sound hardware */
+        MDRV_SPEAKER_REMOVE("mono")
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD(CUSTOM, 0)
+        MDRV_SOUND_REMOVE("lynx")
+        MDRV_SOUND_ADD_TAG("lynx2", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(lynx2_sound_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
@@ -262,9 +264,20 @@ MACHINE_DRIVER_END
    (memory configuration)
    these 2 dumps differ only in this byte!
 */
+
+SYSTEM_BIOS_START( lynx )
+	SYSTEM_BIOS_ADD( 0, BIOS_DEFAULT,   "rom save" )
+	SYSTEM_BIOS_ADD( 1, "a", "alternate rom save" )
+SYSTEM_BIOS_END
+
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+
 ROM_START(lynx)
 	ROM_REGION(0x200,REGION_CPU1, 0)
-	ROM_LOAD("lynx.bin", 0, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
+	ROM_LOAD_BIOS( 0, "lynx.bin",    0x00000, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
+	ROM_LOAD_BIOS( 1, "lynxa.bin",    0x00000, 0x200, CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb))
+//	ROM_LOAD("lynx.bin", 0, 0x200, CRC(e1ffecb6) SHA1(de60f2263851bbe10e5801ef8f6c357a4bc077e6))
 	ROM_REGION(0x100,REGION_GFX1, 0)
 	ROM_REGION(0x100000, REGION_USER1, 0)
 ROM_END
