@@ -239,7 +239,7 @@ INT_PTR CALLBACK GameMessOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 
 
 
-BOOL MessPropertiesCommand(int nGame, HWND hWnd, WORD wNotifyCode, WORD wID, BOOL *changed)
+BOOL MessPropertiesCommand(HWND hWnd, WORD wNotifyCode, WORD wID, BOOL *changed)
 {
 	BOOL handled = TRUE;
 
@@ -342,6 +342,7 @@ static void DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 	memset(&lvc, 0, sizeof(LVCOLUMN));
 	lvc.mask = LVCF_WIDTH;
 	lvc.cx = r.right - r.left - GetSystemMetrics(SM_CXHSCROLL);
+	ListView_InsertColumn(control, 0, &lvc);
 
 	// add each of the directories
 	pos = 0;

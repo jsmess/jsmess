@@ -171,29 +171,23 @@ const char *GetSelectedSoftware(int driver_index, const device_class *devclass, 
 
 void SetExtraSoftwarePaths(int driver_index, const char *extra_paths)
 {
-	core_options *o;
 	char opt_name[32];
 
-	assert(driver_index >= 0);
-	assert(driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
-	o = GetGameOptions(driver_index, -1);
 	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
-	options_set_string(o, opt_name, extra_paths);
+	options_set_string(Mame32Settings(), opt_name, extra_paths);
 }
 
 const char *GetExtraSoftwarePaths(int driver_index)
 {
-	core_options *o;
 	char opt_name[32];
 	const char *paths;
 
-	assert(driver_index >= 0);
-	assert(driver_index < driver_get_count());
+	assert(0 <= driver_index && driver_index < driver_get_count());
 
-	o = GetGameOptions(driver_index, -1);
 	snprintf(opt_name, ARRAY_LENGTH(opt_name), "%s_extra_software", drivers[driver_index]->name);
-	paths = options_get_string(o, opt_name);
+	paths = options_get_string(Mame32Settings(), opt_name);
 	return paths ? paths : "";
 }
 

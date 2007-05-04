@@ -1175,6 +1175,11 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 				break;
 
 			default:
+#ifdef MESS
+				if (MessPropertiesCommand(hDlg, wNotifyCode, wID, &changed))
+					break;
+#endif // MESS
+
 				// use default behavior; try to get the result out of the datamap if
 				// appropriate
 				GetClassName(hWndCtrl, szClass, ARRAY_LENGTH(szClass));

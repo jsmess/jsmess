@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
+#include <tchar.h>
 
 // standard C headers
 #include <stdarg.h>
@@ -37,6 +38,7 @@ enum _control_type
 	CT_EDIT,
 	CT_COMBOBOX,
 	CT_TRACKBAR,
+	CT_LISTVIEW
 };
 
 
@@ -307,16 +309,18 @@ static control_type get_control_type(HWND control)
 	TCHAR class_name[256];
 
 	GetClassName(control, class_name, ARRAY_LENGTH(class_name));
-	if (!strcmp(class_name, WC_BUTTON))
+	if (!_tcscmp(class_name, WC_BUTTON))
 		type = CT_BUTTON;
-	else if (!strcmp(class_name, WC_STATIC))
+	else if (!_tcscmp(class_name, WC_STATIC))
 		type = CT_STATIC;
-	else if (!strcmp(class_name, WC_EDIT))
+	else if (!_tcscmp(class_name, WC_EDIT))
 		type = CT_EDIT;
-	else if (!strcmp(class_name, WC_COMBOBOX))
+	else if (!_tcscmp(class_name, WC_COMBOBOX))
 		type = CT_COMBOBOX;
-	else if (!strcmp(class_name, TRACKBAR_CLASS))
+	else if (!_tcscmp(class_name, TRACKBAR_CLASS))
 		type = CT_TRACKBAR;
+	else if (!_tcscmp(class_name, WC_LISTVIEW))
+		type = CT_LISTVIEW;
 	else
 		type = CT_UNKNOWN;
 
@@ -562,6 +566,7 @@ static void read_control(datamap *map, HWND control, core_options *opts, datamap
 			break;
 
 		case CT_STATIC:
+		case CT_LISTVIEW:
 		case CT_UNKNOWN:
 			// non applicable
 			break;
@@ -727,6 +732,7 @@ static void populate_control(datamap *map, HWND control, core_options *opts, dat
 			SendMessage(control, TBM_SETPOS, (WPARAM) TRUE, (LPARAM) trackbar_pos);
 			break;
 
+		case CT_LISTVIEW:
 		case CT_UNKNOWN:
 			// non applicable
 			break;
