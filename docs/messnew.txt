@@ -25,6 +25,8 @@ System Driver Changes:
 - [VTECH1] Fixed snapshot loading on big-endian systems and added correct
   interrupt emulation. [Dirk Best]
 
+
+
 User Interface Changes:
 -----------------------
 (none)
@@ -48,6 +50,9 @@ Source Changes:
 - [Windows] Factored out handling of standard file dialogs, to centralize
   handling of UTF-8 conversions and compatibility with old versions of
   Windows. [Nate Woods]
+
+- Fixed border colors for systems that use the MC6847 video chip and a
+  custom palette. [Dirk Best]
 
 
 
@@ -5145,9 +5150,9 @@ Other Changes:
   *"Engine" is separate from the "shell"; which gives the potential for front ends for 
    those who don't like command lines. [Nate Woods]
 
-- Disk write support for AMSTRAD CPC [Oscar Mart�n Gonz�lez]
+- Disk write support for AMSTRAD CPC [Oscar Martín González]
 
-- Wave timer fix [Oscar Mart�n Gonz�lez]
+- Wave timer fix [Oscar Martín González]
 
 - m6510t/m7501/m8502 CPU cores added [Peter Trauner]
 

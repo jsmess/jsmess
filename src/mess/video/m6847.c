@@ -1563,7 +1563,7 @@ INLINE void prepare_scanline(int xpos)
 					border_color = BLACK;
 
 				/* need to use palette table directly; border colors are constant */
-				m6847->border[scanline] = palette[border_color];
+				m6847->border[scanline] = m6847->palette[border_color];
 			}
 
 			/* is this a display scanline? */
