@@ -278,6 +278,10 @@ ROM_START( macse )
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
 ROM_END
 
+ROM_START( macclasc )
+	ROM_REGION16_BE(0x40000, REGION_USER1, 0)
+	ROM_LOAD16_WORD( "classic.rom",  0x00000, 0x40000, CRC(b14ddcde) SHA1(f710e73e8e0f99d9d0e9e79e71f67a6c3648bf06) )
+ROM_END
 
 static void mac128512_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -353,6 +357,7 @@ COMP( 1984,	mac512k,  mac128k,	0,	mac512ke, macplus,  mac128k512k,	mac512k,	"App
 COMP( 1986,	mac512ke, macplus,  0,		mac512ke, macplus,  mac512ke,		mac512k,	"Apple Computer",	"Macintosh 512ke", 0 )
 COMP( 1986,	macplus,  0,		0,	macplus,  macplus,  macplus,		macplus,	"Apple Computer",	"Macintosh Plus",  0 )
 COMP( 1987,	macse,    0,		0,	macplus,  macplus,  macse,		    macse,		"Apple Computer",	"Macintosh SE",  GAME_NOT_WORKING )
+COMP( 1990,	macclasc, 0,		0,	macplus,  macplus,  macclassic,		    macse,		"Apple Computer",	"Macintosh Classic",  GAME_NOT_WORKING )
 
 
 

@@ -94,7 +94,8 @@ typedef enum
 	MODEL_MAC_128K512K,
 	MODEL_MAC_512KE,
 	MODEL_MAC_PLUS,
-	MODEL_MAC_SE
+	MODEL_MAC_SE,
+	MODEL_MAC_CLASSIC
 } mac_model_t;
 
 static UINT32 mac_overlay = 0;
@@ -1407,6 +1408,12 @@ DRIVER_INIT(macse)
 	ncr5380_init(&macplus_5380intf);
 }
 
+DRIVER_INIT(macclassic)
+{
+	mac_driver_init(MODEL_MAC_CLASSIC);
+
+	ncr5380_init(&macplus_5380intf);
+}
 
 static void mac_vblank_irq(void)
 {
