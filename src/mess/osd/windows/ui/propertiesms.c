@@ -379,37 +379,53 @@ static void DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 
 static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
-	int count, i, default_index, driver_index;
+	int count, i, current_index, driver_index;
 	const game_driver *gamedrv;
-	UINT32 ram, default_ram;
+	UINT32 ram, current_ram;
 	char buffer[64];
 	const char *this_ram_string;
 
+	// identify the driver
 	driver_index = PropertiesCurrentGame(dialog);
 	gamedrv = drivers[driver_index];
 
+	// clear out the combo box
 	ComboBox_ResetContent(control);
 
+	// identify how many options that we have
 	count = ram_option_count(gamedrv);
 	EnableWindow(control, count > 0);
 
+	// we can only do something meaningful if there is more than one option
 	if (count > 0)
 	{
-		default_ram = ram_default(gamedrv);
-		default_index = 0;
+		// identify the current amount of RAM
+		this_ram_string = options_get_string(opts, OPTION_RAMSIZE);
+		current_ram = (this_ram_string != NULL) ? ram_parse_string(this_ram_string) : 0;
+		if (current_ram == 0)
+			current_ram = ram_default(gamedrv);
 
+		// by default, assume index 0
+		current_index = 0;
+
+		// loop through all options
 		for (i = 0; i < count; i++)
 		{
+			// identify this option
 			ram = ram_option(gamedrv, i);
-			this_ram_string = mame_strdup(ram_string(buffer, ram));
+			this_ram_string = ram_string(buffer, ram);
 
+			// add this option to the combo box
 			ComboBox_InsertString(control, i, this_ram_string);
-			ComboBox_SetItemData(control, i, this_ram_string);
+			ComboBox_SetItemData(control, i, ram);
 
-			if (ram == default_ram)
-				default_index = i;
+			// is this the current option?  record the index if so
+			if (ram == current_ram)
+				current_index = i;
 		}
-		ComboBox_SetCurSel(control, default_index);
+
+		// set the combo box
+		ComboBox_SetCurSel(control, current_index);
 	}
 }
 
