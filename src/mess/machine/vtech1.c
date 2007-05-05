@@ -202,7 +202,8 @@ SNAPSHOT_LOAD(vtech1)
 	switch (header[21])
 	{
 	case VZ_BASIC:
-		program_write_word_16le(0x78a4, start);  /* start of basic program */
+		program_write_byte_8(0x78a4, start % 256); /* start of basic program */
+		program_write_byte_8(0x78a5, start / 256);	
 		program_write_byte_8(0x78f9, end % 256); /* end of basic program */
 		program_write_byte_8(0x78fa, end / 256);
 		program_write_byte_8(0x78fb, end % 256); /* start variable table */
@@ -212,7 +213,8 @@ SNAPSHOT_LOAD(vtech1)
 		break;	
 	
 	case VZ_MCODE:
-		program_write_word_16le(0x788e, start); /* usr subroutine address */
+		program_write_byte_8(0x788e, start % 256); /* usr subroutine address */
+		program_write_byte_8(0x788e, start / 256);
 		break;
 	
 	default:
@@ -483,7 +485,7 @@ READ8_HANDLER(vtech1_keyboard_r)
 			data &= readinputportbytag(portname);
 	}
 	
-    if (video_screen_get_vpos(0) >= 16*12)
+	if (video_screen_get_vblank(0))
         data &= ~0x80;
 
 	/* cassette input is bit 5 (0x40) */
@@ -580,14 +582,4 @@ READ8_HANDLER(vtech1_serial_r)
 WRITE8_HANDLER(vtech1_serial_w)
 {
 	logerror("vtech1_serial_w $%02x, offset %02x\n", data, offset);
-}
-
-
-/******************************************************************************
- Interrupt Handling
-******************************************************************************/
-
-INTERRUPT_GEN(vtech1_interrupt)
-{
-	cpunum_set_input_line(0, 0, HOLD_LINE);
 }

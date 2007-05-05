@@ -79,6 +79,15 @@ static const UINT8 *vtech1_get_video_ram(int scanline)
 }
 
 
+static void vtech1_field_sync_callback(int data)
+{
+	if (data)
+		cpunum_set_input_line(0, 0, CLEAR_LINE);		
+	else
+		cpunum_set_input_line(0, 0, HOLD_LINE);
+}
+
+
 VIDEO_START( vtech1m )
 {
 	m6847_config cfg;
@@ -99,6 +108,7 @@ VIDEO_START( vtech1m )
 	cfg.get_attributes = vtech1_get_attributes;
 	cfg.get_video_ram = vtech1_get_video_ram;
 	cfg.custom_palette = vtech1_palette_mono;
+	cfg.field_sync_callback = vtech1_field_sync_callback;
 	m6847_init(&cfg);
 	return 0;
 }
@@ -112,6 +122,7 @@ VIDEO_START( vtech1 )
 	cfg.type = M6847_VERSION_ORIGINAL_PAL;
 	cfg.get_attributes = vtech1_get_attributes;
 	cfg.get_video_ram = vtech1_get_video_ram;
+	cfg.field_sync_callback = vtech1_field_sync_callback;
 	m6847_init(&cfg);
 	return 0;
 }
