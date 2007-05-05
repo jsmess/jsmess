@@ -218,6 +218,7 @@ static memory_pool *options_memory_pool;
 static core_options *settings;
 
 static core_options *global;				// Global 'default' options
+static core_options *vector_options;		// Vector options
 static core_options **game_options;			// Array of Game specific options
 static core_options **folder_options;		// Array of Folder specific options
 static int *folder_options_redirect;		// Array of Folder Ids for redirecting Folder specific options
@@ -605,6 +606,13 @@ void OptionsExit(void)
 	options_free(settings);
 	settings = NULL;
 
+	// free vector options
+	if (vector_options != NULL)
+	{
+		options_free(vector_options);
+		vector_options = NULL;
+	}
+
 	// free the memory pool
 	pool_free(options_memory_pool);
 	options_memory_pool = NULL;
@@ -790,16 +798,16 @@ void SetFolderOptionsRedirectArr(int *redirect_arr)
 
 core_options * GetVectorOptions(void)
 {
-	static core_options *vector_ops;
-
-	//initialize vector_ops with global settings, we accumulate all settings there and copy them 
-	//to game_options[driver_index] in the end
-	options_copy(vector_ops, global);
+	if (vector_options == NULL)
+	{
+		vector_options = CreateGameOptions(OPTIONS_TYPE_FOLDER);
+		options_copy(vector_options, global);
+	}
 	
 	//If it is a Vector game sync in the Vector.ini settings
-	SyncInFolderOptions(vector_ops, FOLDER_VECTOR);
+	SyncInFolderOptions(vector_options, FOLDER_VECTOR);
 
-	return vector_ops;
+	return vector_options;
 }
 
 core_options * GetSourceOptions(int driver_index )

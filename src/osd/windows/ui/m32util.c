@@ -492,12 +492,12 @@ BOOL SafeIsAppThemed(void)
 {
 	BOOL bResult = FALSE;
 	HMODULE hThemes;
-	BOOL (STDCALL *pfnIsAppThemed)(void);
+	BOOL (WINAPI *pfnIsAppThemed)(void);
 	
 	hThemes = LoadLibrary(TEXT("uxtheme.dll"));
 	if (hThemes != NULL)
 	{
-		pfnIsAppThemed = (BOOL (STDCALL *)(void)) GetProcAddress(hThemes, "IsAppThemed");
+		pfnIsAppThemed = (BOOL (WINAPI *)(void)) GetProcAddress(hThemes, "IsAppThemed");
 		if (pfnIsAppThemed != NULL)
 			bResult = pfnIsAppThemed();
 		FreeLibrary(hThemes);
