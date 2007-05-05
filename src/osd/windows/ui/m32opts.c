@@ -2721,11 +2721,13 @@ BOOL GetGameUsesDefaults(int driver_index)
 
 void SaveGameOptions(int driver_index)
 {
+	core_options *opts;
 	char filename[MAX_PATH];
 
 	// save out the actual settings file
 	snprintf(filename, ARRAY_LENGTH(filename), "%s\\%s.ini", GetIniDir(), drivers[driver_index]->name);
-	SaveSettingsFile(game_options[driver_index], filename);
+	opts = GetGameUsesDefaults(driver_index) ? NULL : game_options[driver_index];
+	SaveSettingsFile(opts, filename);
 }
 
 void SaveFolderOptions(int folder_index, int game_index)

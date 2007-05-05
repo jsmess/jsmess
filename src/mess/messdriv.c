@@ -120,7 +120,6 @@ const game_driver *test_drivers[] =
 	DRIVER( supergb )	/* Nintendo Super GameBoy SNES Cartridge			*/
 	DRIVER( gbpocket )	/* Nintendo GameBoy Pocket Handheld					*/
 	DRIVER( gbcolor )	/* Nintendo GameBoy Color Handheld					*/
-	DRIVER( gba )		/* GameBoy Advance */
 	DRIVER( snes )		/* Nintendo Super Nintendo NTSC						*/
 	DRIVER( snespal )	/* Nintendo Super Nintendo PAL						*/
 	DRIVER( n64 )		/* Nintendo N64										*/

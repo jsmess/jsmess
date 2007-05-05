@@ -23,7 +23,6 @@
   Nov/Dec 1998 - Mike Haaland
 
 ***************************************************************************/
-#define MULTISESSION 0
 
 #ifdef _MSC_VER
 #ifndef NONAMELESSUNION
@@ -355,18 +354,6 @@ void CalculateBestScreenShotRect(HWND hWnd, RECT *pRect, BOOL restrict_height);
 
 BOOL MouseHasBeenMoved(void);
 void SwitchFullScreenMode(void);
-
-// Game Window Communication Functions
-#if MULTISESSION
-BOOL SendMessageToEmulationWindow(UINT Msg, WPARAM wParam, LPARAM lParam);
-BOOL SendIconToEmulationWindow(int nGameIndex);
-HWND GetGameWindow(void);
-#else
-void SendMessageToProcess(LPPROCESS_INFORMATION lpProcessInformation,
-						  UINT Msg, WPARAM wParam, LPARAM lParam);
-void SendIconToProcess(LPPROCESS_INFORMATION lpProcessInformation, int nGameIndex);
-HWND GetGameWindow(LPPROCESS_INFORMATION lpProcessInformation);
-#endif
 
 static BOOL CALLBACK EnumWindowCallBack(HWND hwnd, LPARAM lParam);
 /***************************************************************************
@@ -2011,13 +1998,6 @@ static void Win32UI_exit()
 static long WINAPI MameWindowProc(HWND hWnd, UINT message, UINT wParam, LONG lParam)
 {
 	MINMAXINFO	*mminfo;
-#if MULTISESSION
-	int nGame;
-	HWND hGameWnd;
-	long lGameWndStyle;
-#endif // MULTISESSION
-
-
 	int 		i;
 	TCHAR szClass[128];
 
@@ -2094,24 +2074,6 @@ static long WINAPI MameWindowProc(HWND hWnd, UINT message, UINT wParam, LONG lPa
 			TabView_CalculateNextTab(hTabCtrl);
 			UpdateScreenShot();
 			TabView_UpdateSelection(hTabCtrl);
-			break;
-		case GAMEWND_TIMER:
-#if MULTISESSION
-			nGame = Picker_GetSelectedItem(hwndList);
-			if( ! GetGameCaption() )
-			{
-				hGameWnd = GetGameWindow();
-				if( hGameWnd )
-				{
-					lGameWndStyle = GetWindowLong(hGameWnd, GWL_STYLE);
-					lGameWndStyle = lGameWndStyle & (WS_BORDER ^ 0xffffffff);
-					SetWindowLong(hGameWnd, GWL_STYLE, lGameWndStyle);
-					SetWindowPos(hGameWnd,0,0,0,0,0,SWP_DRAWFRAME | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
-				}
-			}
-			if( SendIconToEmulationWindow(nGame)== TRUE);
-				KillTimer(hMain, GAMEWND_TIMER);
-#endif // MULTISESSION
 			break;
 		default:
 			break;
@@ -6838,184 +6800,5 @@ BOOL MouseHasBeenMoved(void)
 	
 	return (p.x != mouse_x || p.y != mouse_y);       
 }
-
-/*
-	The following two functions enable us to send Messages to the Game Window
-*/
-#if MULTISESSION
-
-BOOL SendIconToEmulationWindow(int nGameIndex)
-{
-	HICON hIcon; 
-	int nParentIndex = -1;
-	hIcon = LoadIconFromFile(drivers[nGameIndex]->name); 
-	if( hIcon == NULL ) 
-	{ 
-		//Check if clone, if so try parent icon first 
-		if( DriverIsClone(nGameIndex) ) 
-		{ 
-			nParentIndex = GetParentIndex(drivers[nGameIndex]);
-			if( nParentIndex >= 0)
-				hIcon = LoadIconFromFile(drivers[nParentIndex]->name); 
-			if( hIcon == NULL) 
-			{ 
-				hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_MAME32_ICON)); 
-			} 
-		} 
-		else 
-		{ 
-			hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_MAME32_ICON)); 
-		} 
-	} 
-	if( SendMessageToEmulationWindow( WM_SETICON, ICON_SMALL, (LPARAM)hIcon ) == FALSE)
-		return FALSE;
-	if( SendMessageToEmulationWindow( WM_SETICON, ICON_BIG, (LPARAM)hIcon ) == FALSE)
-		return FALSE;
-	return TRUE;
-}
-
-BOOL SendMessageToEmulationWindow(UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	FINDWINDOWHANDLE fwhs;
-	fwhs.ProcessInfo = NULL;
-	fwhs.hwndFound  = NULL;
-
-	EnumWindows(EnumWindowCallBack, (LPARAM)&fwhs);
-	if( fwhs.hwndFound )
-	{
-		SendMessage(fwhs.hwndFound, Msg, wParam, lParam);
-		//Fix for loosing Focus, we reset the Focus on our own Main window
-		SendMessage(fwhs.hwndFound, WM_KILLFOCUS,(WPARAM) hMain, (LPARAM) NULL);
-		return TRUE;
-	}
-	return FALSE;
-}
-
-
-static BOOL CALLBACK EnumWindowCallBack(HWND hwnd, LPARAM lParam) 
-{ 
-	FINDWINDOWHANDLE * pfwhs = (FINDWINDOWHANDLE * )lParam; 
-	DWORD ProcessId, ProcessIdGUI; 
-	char buffer[MAX_PATH]; 
-
-	GetWindowThreadProcessId(hwnd, &ProcessId);
-	GetWindowThreadProcessId(hMain, &ProcessIdGUI);
-
-	// cmk--I'm not sure I believe this note is necessary
-	// note: In order to make sure we have the MainFrame, verify that the title 
-	// has Zero-Length. Under Windows 98, sometimes the Client Window ( which doesn't 
-	// have a title ) is enumerated before the MainFrame 
-
-	GetWindowText(hwnd, buffer, sizeof(buffer));
-	if (ProcessId  == ProcessIdGUI &&
-		 strncmp(buffer,MAMENAME,strlen(MAMENAME)) == 0 &&
-		 hwnd != hMain) 
-	{ 
-		pfwhs->hwndFound = hwnd; 
-		return FALSE; 
-	} 
-	else 
-	{ 
-		// Keep enumerating 
-		return TRUE; 
-	} 
-}
-
-HWND GetGameWindow(void)
-{
-	FINDWINDOWHANDLE fwhs;
-	fwhs.ProcessInfo = NULL;
-	fwhs.hwndFound  = NULL;
-
-	EnumWindows(EnumWindowCallBack, (LPARAM)&fwhs);
-	return fwhs.hwndFound;
-}
-
-
-#else
-
-void SendIconToProcess(LPPROCESS_INFORMATION pi, int nGameIndex)
-{
-	HICON hIcon; 
-	int nParentIndex = -1;
-
-	assert(0 <= nGameIndex < driver_get_count());
-
-	hIcon = LoadIconFromFile(drivers[nGameIndex]->name); 
-	if( hIcon == NULL ) 
-	{ 
-		//Check if clone, if so try parent icon first 
-		if( DriverIsClone(nGameIndex) ) 
-		{ 
-			nParentIndex = GetParentIndex(drivers[nGameIndex]);
-			if( nParentIndex >= 0)
-				hIcon = LoadIconFromFile(drivers[nParentIndex]->name); 
-			if( hIcon == NULL) 
-			{ 
-				hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_MAME32_ICON)); 
-			} 
-		} 
-		else 
-		{ 
-			hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_MAME32_ICON)); 
-		} 
-	} 
-	WaitForInputIdle( pi->hProcess, INFINITE ); 
-	SendMessageToProcess( pi, WM_SETICON, ICON_SMALL, (LPARAM)hIcon ); 
-	SendMessageToProcess( pi, WM_SETICON, ICON_BIG, (LPARAM)hIcon ); 
-}
-
-void SendMessageToProcess(LPPROCESS_INFORMATION lpProcessInformation, 
-                                      UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	FINDWINDOWHANDLE fwhs;
-	fwhs.ProcessInfo = lpProcessInformation;
-	fwhs.hwndFound  = NULL;
-
-	EnumWindows(EnumWindowCallBack, (LPARAM)&fwhs);
-
-	SendMessage(fwhs.hwndFound, Msg, wParam, lParam);
-	//Fix for loosing Focus, we reset the Focus on our own Main window
-	SendMessage(fwhs.hwndFound, WM_KILLFOCUS,(WPARAM) hMain, (LPARAM) NULL);
-}
-
-static BOOL CALLBACK EnumWindowCallBack(HWND hwnd, LPARAM lParam) 
-{ 
-	FINDWINDOWHANDLE * pfwhs = (FINDWINDOWHANDLE * )lParam; 
-	DWORD ProcessId; 
-	char buffer[MAX_PATH]; 
-
-	GetWindowThreadProcessId(hwnd, &ProcessId);
-
-	// cmk--I'm not sure I believe this note is necessary
-	// note: In order to make sure we have the MainFrame, verify that the title 
-	// has Zero-Length. Under Windows 98, sometimes the Client Window ( which doesn't 
-	// have a title ) is enumerated before the MainFrame 
-
-	GetWindowText(hwnd, buffer, sizeof(buffer));
-	if (ProcessId  == pfwhs->ProcessInfo->dwProcessId &&
-		 strncmp(buffer,MAMENAME,strlen(MAMENAME)) == 0) 
-	{ 
-		pfwhs->hwndFound = hwnd; 
-		return FALSE; 
-	} 
-	else 
-	{ 
-		// Keep enumerating 
-		return TRUE; 
-	} 
-}
-
-HWND GetGameWindow(LPPROCESS_INFORMATION lpProcessInformation)
-{
-	FINDWINDOWHANDLE fwhs;
-	fwhs.ProcessInfo = lpProcessInformation;
-	fwhs.hwndFound  = NULL;
-
-	EnumWindows(EnumWindowCallBack, (LPARAM)&fwhs);
-	return fwhs.hwndFound;
-}
-
-#endif
 
 /* End of source file */
