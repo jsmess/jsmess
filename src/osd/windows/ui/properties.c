@@ -124,7 +124,6 @@ static BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts );
 
 static void UpdateBackgroundBrush(HWND hwndTab);
 HBRUSH hBkBrush;
-BOOL bThemeActive;
 
 /**************************************************************
  * Local private variables
@@ -319,21 +318,8 @@ static struct ComboBoxDevices
  * Public functions
  ***************************************************************/
 
-typedef HTHEME (WINAPI *OpenThemeProc)(HWND hwnd, LPCWSTR pszClassList);
-
-HMODULE hThemes;
-OpenThemeProc fnOpenTheme;
-FARPROC fnIsThemed;
-
 void PropertiesInit(void)
 {
-	hThemes = LoadLibrary("uxtheme.dll");
-
-	if (hThemes)
-	{
-		fnIsThemed = GetProcAddress(hThemes,"IsAppThemed");
-	}
-	bThemeActive = FALSE;
 }
 
 int PropertiesCurrentGame(HWND hDlg)
@@ -408,7 +394,7 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 	}
 	for (; g_propSheets[i].pfnDlgProc; i++)
 	{
-		if (!bOnlyDefault || g_propSheets[i].bOnDefaultPage)
+		if ((gamedrv != NULL) || g_propSheets[i].bOnDefaultPage)
 		{
 			if (!gamedrv || !g_propSheets[i].pfnFilterProc || g_propSheets[i].pfnFilterProc(&drv, gamedrv))
 			{
@@ -1362,35 +1348,28 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 		}
 		if( Msg == WM_CTLCOLORSTATIC )
 		{
-
-		//	SetBkColor((HDC)wParam,GetSysColor(COLOR_3DFACE) );
-			if( hThemes )
+			if (SafeIsAppThemed())
 			{
-				if( fnIsThemed && fnIsThemed() )
-				{
-					HWND hWnd = PropSheet_GetTabControl(GetParent(hDlg));
-					// Set the background mode to transparent
-					SetBkMode((HDC)wParam, TRANSPARENT);
+				HWND hWnd = PropSheet_GetTabControl(GetParent(hDlg));
+				// Set the background mode to transparent
+				SetBkMode((HDC)wParam, TRANSPARENT);
 
-					// Get the controls window dimensions
-					GetWindowRect((HWND)lParam, &rc);
+				// Get the controls window dimensions
+				GetWindowRect((HWND)lParam, &rc);
 
-					// Map the coordinates to coordinates with the upper left corner of dialog control as base
-					MapWindowPoints(NULL, hWnd, (LPPOINT)(&rc), 2);
+				// Map the coordinates to coordinates with the upper left corner of dialog control as base
+				MapWindowPoints(NULL, hWnd, (LPPOINT)(&rc), 2);
 
-					// Adjust the position of the brush for this control (else we see the top left of the brush as background)
-					SetBrushOrgEx((HDC)wParam, -rc.left, -rc.top, NULL);
+				// Adjust the position of the brush for this control (else we see the top left of the brush as background)
+				SetBrushOrgEx((HDC)wParam, -rc.left, -rc.top, NULL);
 
-					// Return the brush
-					return (INT_PTR)(hBkBrush);
-				}
-				else
-				{
-					SetBkColor((HDC) wParam,GetSysColor(COLOR_3DFACE) );
-				}
+				// Return the brush
+				return (INT_PTR)(hBkBrush);
 			}
 			else
+			{
 				SetBkColor((HDC) wParam,GetSysColor(COLOR_3DFACE) );
+			}
 		}
 		else
 			SetBkColor((HDC)wParam,RGB(255,255,255) );
@@ -2888,12 +2867,6 @@ static BOOL ResetEffect(HWND hWnd)
 
 void UpdateBackgroundBrush(HWND hwndTab)
 {
-    // Check if the application is themed
-    if (hThemes)
-    {
-        if(fnIsThemed)
-            bThemeActive = fnIsThemed();
-    }
     // Destroy old brush
     if (hBkBrush)
         DeleteObject(hBkBrush);
@@ -2901,7 +2874,7 @@ void UpdateBackgroundBrush(HWND hwndTab)
     hBkBrush = NULL;
 
     // Only do this if the theme is active
-    if (bThemeActive)
+    if (SafeIsAppThemed())
     {
         RECT rc;
         HDC hDC, hDCMem;

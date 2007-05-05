@@ -485,6 +485,23 @@ BOOL StringIsSuffixedBy(const char *s, const char *suffix)
 }
 
 /***************************************************************************
-	Internal functions
+	Win32 wrappers
  ***************************************************************************/
 
+BOOL SafeIsAppThemed(void)
+{
+	BOOL bResult = FALSE;
+	HMODULE hThemes;
+	BOOL (STDCALL *pfnIsAppThemed)(void);
+	
+	hThemes = LoadLibrary(TEXT("uxtheme.dll"));
+	if (hThemes != NULL)
+	{
+		pfnIsAppThemed = (BOOL (STDCALL *)(void)) GetProcAddress(hThemes, "IsAppThemed");
+		if (pfnIsAppThemed != NULL)
+			bResult = pfnIsAppThemed();
+		FreeLibrary(hThemes);
+	}
+	return bResult;
+
+}

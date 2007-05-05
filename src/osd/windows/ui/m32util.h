@@ -51,4 +51,6 @@ void FreeIfAllocated(char **s);
 
 BOOL StringIsSuffixedBy(const char *s, const char *suffix);
 
+BOOL SafeIsAppThemed(void);
+
 #endif /* MAME32UTIL_H */
