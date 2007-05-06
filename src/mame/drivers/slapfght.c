@@ -186,6 +186,7 @@ $8609 - $860f    High score characters to display to screen for highest score
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 
 /* video */
@@ -948,7 +949,7 @@ static MACHINE_DRIVER_START( tigerh )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,6)    /* ??? */
 
-	MDRV_CPU_ADD(M68705,4000000/2)
+	MDRV_CPU_ADD(M68705,4000000/M68705_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

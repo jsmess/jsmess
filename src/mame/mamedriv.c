@@ -6034,6 +6034,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( viprp1s )	/* (c) 1995 Seibu Kaihatsu */
 	DRIVER( viprp1o )	/* (c) 1995 Seibu Kaihatsu */
 	DRIVER( viprp1ot )	/* (c) 1995 Seibu Kaihatsu (Tuning License) */
+	DRIVER( viprp1hk )	/* (c) 1995 Seibu Kaihatsu (Metrotainment License) */
 
 	DRIVER( ejanhs )	/* (c) 1996 Seibu Kaihatsu */
 
@@ -7580,11 +7581,11 @@ Other Sun games
 	DRIVER( sb2003a )	/* (c) 2003 Limenko */
 	DRIVER( spotty )	/* (c) 2001 Prince Co. */
 	DRIVER( carrera )	/* (c) 19?? BS Electronics */
-	DRIVER( pmpoker )	/* (c) 198? PlayMan? */
-	DRIVER( goldnpkr )	/* (c) 198? Bonanza? */
+	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
+	DRIVER( goldnpkr )	/* (c) 1981 Bonanza */
  	DRIVER( goldnpkb )	/* (c) 1981 Bonanza */
-	DRIVER( jokerpkr )	/* (c) 198? Coinmaster-Gaming */
-	DRIVER( pottnpkr )	/* (c) 198? ???? */
+	DRIVER( jokerpkr )	/* Bootleg in Coinmaster hardware */
+	DRIVER( pottnpkr )	/* (c) 198? Unknown */
 	DRIVER( gdrawpkr )	/* (c) 1981 Cal Omega / Casino Electronics Inc. */
 	DRIVER( altair )	/* (c) 1981 Cidelsa */
 	DRIVER( destryer )	/* (c) 1981 Cidelsa */

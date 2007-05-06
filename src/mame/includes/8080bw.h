@@ -75,7 +75,6 @@ void schaser_background_control_w(int data);
 
 VIDEO_UPDATE( invadpt2 );
 VIDEO_UPDATE( ballbomb );
-VIDEO_UPDATE( sstrngr2 );
 VIDEO_UPDATE( schaser );
 VIDEO_UPDATE( schasrcv );
 VIDEO_UPDATE( rollingc );

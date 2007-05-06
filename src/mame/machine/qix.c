@@ -10,12 +10,12 @@
 #include "qix.h"
 #include "6821pia.h"
 #include "cpu/m6800/m6800.h"
+#include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 
 
 /* Globals */
-UINT8 *qix_sharedram;
 UINT8 *qix_68705_port_out;
 UINT8 *qix_68705_ddr;
 
@@ -223,11 +223,11 @@ MACHINE_START( qix )
 
 MACHINE_RESET( qix )
 {
-	/* set a timer for the first scanline */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, qix_scanline_callback);
-
 	/* reset the PIAs */
 	pia_reset();
+
+	/* reset the coin counter register */
+	qix_coinctrl = 0x00;
 }
 
 
@@ -240,21 +240,12 @@ MACHINE_START( qixmcu )
 	pia_config(3, PIA_STANDARD_ORDERING, &qix_pia_3_intf);
 	pia_config(4, PIA_STANDARD_ORDERING, &qix_pia_4_intf);
 	pia_config(5, PIA_STANDARD_ORDERING, &qix_pia_5_intf);
+
+	/* set up save states */
+	state_save_register_global_array(qix_68705_port_in);
+	state_save_register_global(qix_coinctrl);
 	return 0;
 }
-
-MACHINE_RESET( qixmcu )
-{
-	/* set a timer for the first scanline */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, qix_scanline_callback);
-
-	/* reset the PIAs */
-	pia_reset();
-
-	/* reset the coin counter register */
-	qix_coinctrl = 0x00;
-}
-
 
 MACHINE_START( slither )
 {
@@ -264,16 +255,6 @@ MACHINE_START( slither )
 	pia_config(2, PIA_STANDARD_ORDERING, &slither_pia_2_intf);
 	pia_config(3, PIA_STANDARD_ORDERING, &slither_pia_3_intf);
 	return 0;
-}
-
-
-MACHINE_RESET( slither )
-{
-	/* set a timer for the first scanline */
-	mame_timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, qix_scanline_callback);
-
-	/* reset the PIAs */
-	pia_reset();
 }
 
 
@@ -300,38 +281,13 @@ INTERRUPT_GEN( qix_vblank_start )
 
 /*************************************
  *
- *  Shared RAM
- *
- *************************************/
-
-READ8_HANDLER( qix_sharedram_r )
-{
-	return qix_sharedram[offset];
-}
-
-
-WRITE8_HANDLER( qix_sharedram_w )
-{
-	qix_sharedram[offset] = data;
-}
-
-
-
-/*************************************
- *
  *  Zoo Keeper bankswitching
  *
  *************************************/
 
 WRITE8_HANDLER( zoo_bankswitch_w )
 {
-	UINT8 *rom = memory_region(REGION_CPU2);
-
-	if (data & 0x04)
-		memory_set_bankptr(1, &rom[0x10000]);
-	else
-		memory_set_bankptr(1, &rom[0xa000]);
-
+	memory_set_bank(1, (data >> 2) & 1);
 	/* not necessary, but technically correct */
 	qix_palettebank_w(offset,data);
 }
@@ -469,13 +425,13 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 {
 	if (data & 0x04)
 	{
-		cpunum_set_input_line(3, M6809_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(3, M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
 		cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(50));
 	}
 	else
-		cpunum_set_input_line(3, M6809_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(3, M68705_IRQ_LINE, CLEAR_LINE);
 
 	/* this is a callback called by pia_0_w(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_0_w() */

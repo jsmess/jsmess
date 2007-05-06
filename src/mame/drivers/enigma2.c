@@ -12,11 +12,8 @@ Enigma2 (1981)
 Enigma2a (1984?)
  Conversion applied to a Taito Space Invaders Part II board set. Bootleg ?
 
-Writes to ROM/unmapped area = only durning gfx scrolling
-                      (enigma and zilec logo, big spaceships)
-                        Probably a bit buggy game code
 TODO:
- - enigma2  - More accurate starfield emulation (screen flipping , blinking freq measured at 0.001 kHz)
+ - enigma2  - Star blinking frequency
  - enigma2a - bad sound ROM
 
 *********************************************************************/
@@ -24,243 +21,452 @@ TODO:
 #include "driver.h"
 #include "sound/ay8910.h"
 
-static int sndlatch;
-static int prevdata=0;
-static int protdata=0;
-static int flipscreen;
-static int blink_cnt=0;
 
-static READ8_HANDLER( dipsw_r )
+#define LOG_PROT	(0)
+
+/* these values provide a fairly low refresh rate of around 53Hz, but
+   they were derived from the schemtics.  The horizontal synch chain
+   counts from 0x0c0-0x1ff and the vertical one from 0x0d8-0x1ff.  */
+
+#define MASTER_CLOCK		(10000000)
+#define CPU_CLOCK			(MASTER_CLOCK / 4)
+#define PIXEL_CLOCK			(MASTER_CLOCK / 2)
+#define AY8910_CLOCK		(MASTER_CLOCK / 8)
+#define HCOUNTER_START		(0x0c0)
+#define HCOUNTER_END		(0x1ff)
+#define HTOTAL				(HCOUNTER_END + 1 - HCOUNTER_START)
+#define HBEND				(0x000)
+#define HBSTART				(0x100)
+#define VCOUNTER_START		(0x0d8)
+#define VCOUNTER_END		(0x1ff)
+#define VTOTAL				(VCOUNTER_END + 1 - VCOUNTER_START)
+#define VBEND				(0x048)
+#define VBSTART				(VTOTAL)
+
+/* the IRQ line is cleared (active LO) at these vertical sync counter
+   values and raised one scan line later */
+#define INT_TRIGGER_COUNT_1	(0x10f)
+#define INT_TRIGGER_COUNT_2	(0x18f)
+
+
+#define NUM_PENS	(8)
+
+
+static UINT8 *enigma2_ram;
+
+static UINT8 sound_latch;
+static UINT8 last_sound_data;
+static UINT8 protection_data;
+static UINT8 engima2_flip_screen;
+
+
+
+/*************************************
+ *
+ *  Interrupt generation
+ *
+ *************************************/
+
+static mame_timer *interrupt_clear_timer;
+static mame_timer *interrupt_assert_timer;
+
+
+INLINE UINT16 vpos_to_vysnc_chain_counter(int vpos)
 {
-	if(protdata!=0xff)
-		return protdata^0x88;
+	return vpos + VCOUNTER_START;
+}
+
+
+INLINE int vysnc_chain_counter_to_vpos(UINT16 counter)
+{
+	return counter - VCOUNTER_START;
+}
+
+
+static void interrupt_clear_callback(int param)
+{
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
+}
+
+
+static void interrupt_assert_callback(int param)
+{
+	UINT16 next_counter;
+	int next_vpos;
+
+	/* compute vector and set the interrupt line */
+	int vpos = video_screen_get_vpos(0);
+	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
+	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
+	cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, vector);
+
+	/* set up for next interrupt */
+	if (counter == INT_TRIGGER_COUNT_1)
+		next_counter = INT_TRIGGER_COUNT_2;
 	else
-		return readinputport(2);
+		next_counter = INT_TRIGGER_COUNT_1;
+
+	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
+	mame_timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, time_zero);
+	mame_timer_adjust(interrupt_clear_timer, video_screen_get_time_until_pos(0, vpos + 1, 0), 0, time_zero);
 }
 
-static WRITE8_HANDLER(sound_w)
+
+static void create_interrupt_timers(void)
 {
-	if((!(data&4)) && (prevdata&4)) // 0->1
-		sndlatch=((sndlatch<<1)|((data&1)^1))&0xff;
-
-	if(data&2)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
-
-	prevdata=data;
+	interrupt_clear_timer = mame_timer_alloc(interrupt_clear_callback);
+	interrupt_assert_timer = mame_timer_alloc(interrupt_assert_callback);
 }
 
-static READ8_HANDLER(sound_r)
+
+static void start_interrupt_timers(void)
 {
-	return BITSWAP8(sndlatch,0,1,2,3,4,5,6,7);
+	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
+	mame_timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
 }
 
-static WRITE8_HANDLER(protection_w)
+
+
+static MACHINE_START( enigma2 )
 {
-	protdata=data;
-}
+	create_interrupt_timers();
 
-static WRITE8_HANDLER(videoctrl_w)
-{
-	if((data & 0x20) == 0x20 && (readinputport(2) & 0x20) == 0x20)
-		flipscreen = 1;
-	else
-		flipscreen = 0;
-}
-
-static WRITE8_HANDLER(videoctrl2a_w)
-{
-	int i, old_flip;
-
-	old_flip = flipscreen;
-
-	if((data & 0x20) == 0x20 && (readinputport(2) & 0x20) == 0x20)
-		flipscreen = 1;
-	else
-		flipscreen = 0;
-
-	if(old_flip != flipscreen)
-	{
-		/* redraw screen */
-		for(i=0;i<0x1c00;i++)
-			videoram_w(i,videoram[i]);
-	}
-}
-
-WRITE8_HANDLER( enigma2a_videoram_w )
-{
-	int i,x,y,col;
-	videoram[offset]=data;
-	y = offset / 32;
-	col = 8 * (offset % 32);
-	x = 255 - col;
-	for (i = 0; i < 8; i++)
-	{
-		pen_t pen = (data&0x80) ? RGB_WHITE : RGB_BLACK;
-
-		if(!flipscreen)
-			*BITMAP_ADDR32(tmpbitmap, 255 - y, x) = pen;
-		else
-			*BITMAP_ADDR32(tmpbitmap, y+31, 255+15-x) = pen;
-		x++;
-		data <<= 1;
-	}
-}
-
-/* unknown reads - protection ? mirrors ? */
-
-static READ8_HANDLER( unknown_r1 )
-{
-	if( activecpu_get_pc() == 0x7e5 )
-		return 0xaa;
-	else
-		return 0xf4;
-}
-
-static READ8_HANDLER( unknown_r2 )
-{
-	return 0x38;
-}
-
-static READ8_HANDLER( unknown_r3 )
-{
-	return 0xaa;
-}
-
-static READ8_HANDLER( unknown_r4 )
-{
-	return 0x38;
-}
-
-static READ8_HANDLER( enigma2_player2_r )
-{
-	if(flipscreen)
-		return input_port_1_r(0);
-	else
-		return input_port_0_r(0);
-}
-
-/* Enigma 2 */
-
-static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x3fff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x5001, 0x5001) AM_READ(dipsw_r)
-	AM_RANGE(0x5002, 0x5002) AM_READ(unknown_r1)
-	AM_RANGE(0x5803, 0x5803) AM_WRITE(sound_w)
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(videoctrl_w)
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x5035, 0x5035) AM_READ(unknown_r2)
-	AM_RANGE(0x5051, 0x5051) AM_READ(unknown_r3)
-	AM_RANGE(0x5079, 0x5079) AM_READ(unknown_r4)
-	AM_RANGE(0x5801, 0x5801) AM_READ(input_port_0_r)
-	AM_RANGE(0x5802, 0x5802) AM_READ(enigma2_player2_r)
-ADDRESS_MAP_END
-
-/* Enigma 2a */
-
-static ADDRESS_MAP_START( main2a_cpu, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x3fff) AM_READ(videoram_r) AM_WRITE(enigma2a_videoram_w) AM_BASE(&videoram) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x5001, 0x5001) AM_READ(dipsw_r)
-	AM_RANGE(0x5002, 0x5002) AM_READ(unknown_r1)
-	AM_RANGE(0x5035, 0x5035) AM_READ(unknown_r2)
-	AM_RANGE(0x5051, 0x5051) AM_READ(unknown_r3)
-	AM_RANGE(0x5079, 0x5079) AM_READ(unknown_r4)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(enigma2_player2_r)
-	AM_RANGE(0x03, 0x03) AM_WRITE(sound_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(videoctrl2a_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(MWA8_NOP)
-ADDRESS_MAP_END
-
-
-/* sound cpu */
-static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xa002, 0xa002) AM_READ(AY8910_read_port_0_r)
-ADDRESS_MAP_END
-
-PALETTE_INIT( enigma2 )
-{
-	palette_set_color(machine,0,0,0,0);
-	palette_set_color(machine,1,0,0xff,0);
-	palette_set_color(machine,2,0,0,0xff);
-	palette_set_color(machine,3,0,0xff,0xff);
-	palette_set_color(machine,4,0xff,0,0);
-	palette_set_color(machine,5,0xff,0xff,0);
-	palette_set_color(machine,6,0xff,0,0xff);
-	palette_set_color(machine,7,0xff,0xff,0xff);
-}
-
-VIDEO_UPDATE( enigma2 )
-{
-	int i,x,y,col,offs,data;
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
-	blink_cnt++;
-
-	/* starfield */
-	for(y=0;y<32;y++)
-		for(x=0;x<32;x++)
-		{
-		 	offs = y * 32 + x + 1024 * ((blink_cnt>>3)&1);
-			*BITMAP_ADDR16(bitmap, 255-y*8, x*8) = machine->pens[memory_region(REGION_USER1)[offs]];
-		}
-
-	/* gfx */
-	for(offs=0;offs<0x1c00;offs++)
-	{
-		y = offs / 32;
-		col = 8 * (offs % 32);
-		x = 255 - col;
-
-		data=videoram[offs];
-
-		for (i = 0; i < 8; i++)
-		{
-			if( data & 0x80 )
-			{
-				if(!flipscreen)
-					*BITMAP_ADDR16(bitmap, 255 - y, x) = memory_region(REGION_PROMS)[((y+32) >> 3 << 5) + (col >> 3)] & 0x07;
-				else
-					*BITMAP_ADDR16(bitmap, y+31, 255+15-x) = memory_region(REGION_PROMS)[((35-((y+32) >> 3)) << 5) + (31-(col >> 3))+0x400] & 0x07;
-			}
-
-			x++;
-			data <<= 1;
-		}
-	}
 	return 0;
 }
 
-INPUT_PORTS_START( enigma2 )
+
+static MACHINE_RESET( enigma2 )
+{
+	last_sound_data = 0;
+	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+
+	engima2_flip_screen = 0;
+
+	start_interrupt_timers();
+}
+
+
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
+
+static void get_pens(pen_t *pens)
+{
+	offs_t i;
+
+	for (i = 0; i < NUM_PENS; i++)
+	{
+		/* this color gun arrengement is supported by the flyer screenshot */
+		pens[i] = MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+	}
+}
+
+
+static VIDEO_UPDATE( enigma2 )
+{
+	static int blink_count;
+
+	pen_t pens[NUM_PENS];
+
+	UINT8 *color_map_base = engima2_flip_screen ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
+	UINT8 *star_map_base = (blink_count & 0x08) ? &memory_region(REGION_PROMS)[0x0c00] : &memory_region(REGION_PROMS)[0x0800];
+
+	UINT8 x = 0;
+	UINT16 bitmap_y = machine->screen[screen].visarea.min_y;
+	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
+	UINT8 video_data = 0;
+	UINT8 fore_color = 0;
+	UINT8 star_color = 0;
+
+	get_pens(pens);
+
+	while (1)
+	{
+		UINT8 bit;
+		UINT8 color;
+
+		/* read the video RAM */
+		if ((x & 0x07) == 0x00)
+		{
+			offs_t color_map_address = (y >> 3 << 5) | (x >> 3);
+			/* the schematics shows it like this, but it doesn't work as this would
+               produce no stars, due to the contents of the PROM -- maybe there is
+               a star disabled bit somewhere that's connected here instead of flip_screen */
+			/* star_map_address = (y >> 4 << 6) | (engima2_flip_screen << 5) | (x >> 3); */
+			offs_t star_map_address = (y >> 4 << 6) | 0x20 | (x >> 3);
+
+			offs_t videoram_address = (y << 5) | (x >> 3);
+
+			/* when the screen is flipped, all the video address bits are inverted,
+               and the adder at 16A is activated */
+			if (engima2_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+
+			video_data = enigma2_ram[videoram_address];
+
+			fore_color = color_map_base[color_map_address] & 0x07;
+			star_color = star_map_base[star_map_address] & 0x07;
+		}
+
+		/* plot the current pixel */
+		if (engima2_flip_screen)
+		{
+			bit = video_data & 0x80;
+			video_data = video_data << 1;
+		}
+		else
+		{
+			bit = video_data & 0x01;
+			video_data = video_data >> 1;
+		}
+
+		if (bit)
+			color = fore_color;
+		else
+			/* stars only appear at certain positions */
+			color = ((x & y & 0x0f) == 0x0f) ? star_color : 0;
+
+		*BITMAP_ADDR32(bitmap, bitmap_y, x) = pens[color];
+
+		/* next pixel */
+		x = x + 1;
+
+		/* end of line? */
+		if (x == 0)
+		{
+			/* end of screen? */
+			if (bitmap_y == machine->screen[screen].visarea.max_y)
+			{
+				break;
+			}
+
+			/* next row */
+			y = y + 1;
+			bitmap_y = bitmap_y + 1;
+		}
+	}
+
+	blink_count++;
+
+	return 0;
+}
+
+
+static VIDEO_UPDATE( enigma2a )
+{
+	UINT8 x = 0;
+	UINT16 bitmap_y = machine->screen[screen].visarea.min_y;
+	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
+	UINT8 video_data = 0;
+
+	while (1)
+	{
+		UINT8 bit;
+		pen_t pen;
+
+		/* read the video RAM */
+		if ((x & 0x07) == 0x00)
+		{
+			offs_t videoram_address = (y << 5) | (x >> 3);
+
+			/* when the screen is flipped, all the video address bits are inverted,
+               and the adder at 16A is activated */
+			if (engima2_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+
+			video_data = enigma2_ram[videoram_address];
+		}
+
+		/* plot the current pixel */
+		if (engima2_flip_screen)
+		{
+			bit = video_data & 0x80;
+			video_data = video_data << 1;
+		}
+		else
+		{
+			bit = video_data & 0x01;
+			video_data = video_data >> 1;
+		}
+
+		pen = bit ? RGB_WHITE : RGB_BLACK;
+		*BITMAP_ADDR32(bitmap, bitmap_y, x) = pen;
+
+		/* next pixel */
+		x = x + 1;
+
+		/* end of line? */
+		if (x == 0)
+		{
+			/* end of screen? */
+			if (bitmap_y == machine->screen[screen].visarea.max_y)
+			{
+				break;
+			}
+
+			/* next row */
+			y = y + 1;
+			bitmap_y = bitmap_y + 1;
+		}
+	}
+
+	return 0;
+}
+
+
+
+static READ8_HANDLER( dip_switch_r )
+{
+	UINT8 ret = 0x00;
+
+if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, activecpu_get_pc(), protection_data);
+	switch (offset)
+	{
+	case 0x01:
+		if (protection_data != 0xff)
+			ret = protection_data ^ 0x88;
+		else
+			ret = readinputport(2);
+		break;
+
+	case 0x02:
+		if (activecpu_get_pc() == 0x07e5)
+			ret = 0xaa;
+		else
+			ret = 0xf4;
+		break;
+
+	case 0x35:	ret = 0x38; break;
+	case 0x51:	ret = 0xaa; break;
+	case 0x79:	ret = 0x38; break;
+	}
+
+	return ret;
+}
+
+
+static WRITE8_HANDLER( sound_data_w )
+{
+	/* clock sound latch shift register on rising edge of D2 */
+	if (!(data & 0x04) && (last_sound_data & 0x04))
+	{
+		sound_latch = (sound_latch << 1) | (~data & 0x01);
+	}
+
+	cpunum_set_input_line(1, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+
+	last_sound_data = data;
+}
+
+
+static READ8_HANDLER( sound_latch_r )
+{
+	return BITSWAP8(sound_latch,0,1,2,3,4,5,6,7);
+}
+
+
+static WRITE8_HANDLER( protection_data_w )
+{
+if (LOG_PROT) logerror("Protection Data Write: %x at %x\n", data, safe_activecpu_get_pc());
+	protection_data = data;
+}
+
+
+static WRITE8_HANDLER( enigma2_flip_screen_w )
+{
+	engima2_flip_screen = ((data >> 5) & 0x01) && ((readinputport(2) & 0x20) == 0x20);
+}
+
+
+static UINT32 p1_controls_r(void *param)
+{
+	return readinputportbytag("P1CONTROLS");
+}
+
+
+static UINT32 p2_controls_r(void *param)
+{
+	if (engima2_flip_screen)
+		return readinputportbytag("P2CONTROLS");
+	else
+		return readinputportbytag("P1CONTROLS");
+}
+
+
+
+static struct AY8910interface ay8910_interface =
+{
+	sound_latch_r,
+	0,
+	0,
+	protection_data_w
+};
+
+
+
+static ADDRESS_MAP_START( engima2_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&enigma2_ram)
+	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, MWA8_NOP)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_NOP
+	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READWRITE(input_port_0_r, MWA8_NOP)
+	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_READWRITE(MRA8_NOP, sound_data_w)
+	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_NOP
+	AM_RANGE(0x5805, 0x5805) AM_MIRROR(0x07f8) AM_READWRITE(MRA8_NOP, enigma2_flip_screen_w)
+	AM_RANGE(0x5806, 0x5807) AM_MIRROR(0x07f8) AM_NOP
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( engima2a_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&enigma2_ram)
+	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, MWA8_NOP)
+	AM_RANGE(0x5800, 0x5fff) AM_NOP
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( engima2a_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(3) )
+	AM_RANGE(0x00, 0x00) AM_NOP
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_0_r, MWA8_NOP)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(MRA8_NOP, sound_data_w)
+	AM_RANGE(0x04, 0x04) AM_NOP
+	AM_RANGE(0x05, 0x05) AM_READWRITE(MRA8_NOP, enigma2_flip_screen_w)
+	AM_RANGE(0x06, 0x07) AM_NOP
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( engima2_audio_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_WRITENOP
+	AM_RANGE(0x2000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ffc) AM_NOP
+	AM_RANGE(0xc000, 0xffff) AM_NOP
+ADDRESS_MAP_END
+
+
+
+static INPUT_PORTS_START( enigma2 )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p1_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p2_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START
@@ -285,17 +491,30 @@ INPUT_PORTS_START( enigma2 )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_START_TAG("P1CONTROLS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("P2CONTROLS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( enigma2a )
+
+static INPUT_PORTS_START( enigma2a )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p1_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START
@@ -303,9 +522,7 @@ INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(p2_controls_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START
@@ -330,82 +547,82 @@ INPUT_PORTS_START( enigma2a )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_START_TAG("P1CONTROLS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("P2CONTROLS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN( enigma2_interrupt )
-{
-	int vector = video_screen_get_vblank(0) ? 0xcf : 0xd7;
-    cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, vector);
-}
-
-
-static struct AY8910interface ay8910_interface =
-{
-	sound_r,
-	0,
-	0,
-	protection_w
-};
-
 static MACHINE_DRIVER_START( enigma2 )
-	MDRV_CPU_ADD_TAG("main", Z80, 2500000)
-	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
-	MDRV_CPU_VBLANK_INT(enigma2_interrupt,2)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", Z80, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(engima2_main_cpu_map,0)
 
 	MDRV_CPU_ADD(Z80, 2500000)
-	/* audio CPU */
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,8)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map,0)
 
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_MACHINE_START(enigma2)
+	MDRV_MACHINE_RESET(enigma2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 4*8, 32*8-1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(enigma2)
-
 	MDRV_VIDEO_UPDATE(enigma2)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2500000/2)
+	MDRV_SOUND_ADD(AY8910, AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( enigma2a )
-	MDRV_CPU_ADD_TAG("main", 8080, 2000000)
-	MDRV_CPU_PROGRAM_MAP(main2a_cpu,0)
-	MDRV_CPU_IO_MAP(portmap,0)
-	MDRV_CPU_VBLANK_INT(enigma2_interrupt,2)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", 8080, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(engima2a_main_cpu_map,0)
+	MDRV_CPU_IO_MAP(engima2a_main_cpu_io_map,0)
 
 	MDRV_CPU_ADD(Z80, 2500000)
-	/* audio CPU */
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,8)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
+	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_MACHINE_START(enigma2)
+	MDRV_MACHINE_RESET(enigma2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 4*8, 32*8-1)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(enigma2a)
 
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2500000/2)
+	MDRV_SOUND_ADD(AY8910, AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+
 
 ROM_START( enigma2 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -419,13 +636,9 @@ ROM_START( enigma2 )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "enigma2.s",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
 
-	 /* Color Map */
-	ROM_REGION( 0x800, REGION_PROMS, 0 )
+	ROM_REGION( 0x1000, REGION_PROMS, 0 )	/* color map/star map */
 	ROM_LOAD( "7.11f",        0x0000, 0x0800, CRC(409b5aad) SHA1(1b774a70f725637458ed68df9ed42476291b0e43) )
-
-	/* Star Map */
-	ROM_REGION( 0x800, REGION_USER1, 0 )
-	ROM_LOAD( "8.13f",        0x0000, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
+	ROM_LOAD( "8.13f",        0x0800, 0x0800, CRC(e9cb116d) SHA1(41da4f46c5614ec3345c233467ebad022c6b0bf5) )
 ROM_END
 
 
@@ -438,18 +651,23 @@ ROM_START( enigma2a )
 	ROM_LOAD( "5.11d",        0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "6.13d",   	  0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
-
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
 ROM_END
 
 
+
 static DRIVER_INIT(enigma2)
 {
-	int i;
-	for(i=0;i<0x2000;i++)
-		memory_region(REGION_CPU2)[i]=BITSWAP8(memory_region(REGION_CPU2)[i],4,5,6,0,7,1,3,2);
+	offs_t i;
+
+	for(i = 0; i < 0x2000; i++)
+	{
+		memory_region(REGION_CPU2)[i] = BITSWAP8(memory_region(REGION_CPU2)[i],4,5,6,0,7,1,3,2);
+	}
 }
 
-GAME( 1981, enigma2,  0,	   enigma2,  enigma2,  enigma2, ROT90, "GamePlan (Zilec Electronics license)", "Enigma 2", 0 )
-GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2, ROT90, "Zilec Electronics", "Enigma 2 (Space Invaders Hardware)", 0 )
+
+
+GAME( 1981, enigma2,  0,	   enigma2,  enigma2,  enigma2, ROT270, "GamePlan (Zilec Electronics license)", "Enigma II", 0 )
+GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2, ROT270, "Zilec Electronics", "Enigma II (Space Invaders hardware)", 0 )

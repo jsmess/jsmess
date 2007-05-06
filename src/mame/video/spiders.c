@@ -57,9 +57,9 @@ VIDEO_UPDATE( spiders )
 	size_t crtc6845_mem_size;
 	int video_addr,increment;
 
-	crtc6845_mem_size=crtc6845_horiz_disp*crtc6845_vert_disp*8;
+	crtc6845_mem_size=crtc6845.horiz_disp*crtc6845.vert_disp*8;
 
-	video_addr=crtc6845_start_addr & 0x7f;
+	video_addr=crtc6845.start_addr & 0x7f;
 
 	if(spiders_video_flip)
 	{
@@ -72,7 +72,7 @@ VIDEO_UPDATE( spiders )
 	}
 
 	// Access bank1
-	if(crtc6845_page_flip)
+	if(crtc6845.page_flip)
 		video_addr+=0x2000;
 
 	for(loop=0;loop<crtc6845_mem_size;loop++)

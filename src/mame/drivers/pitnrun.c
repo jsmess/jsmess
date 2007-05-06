@@ -64,6 +64,7 @@ K1000233A
 */
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 
 WRITE8_HANDLER (pitnrun_68705_portA_w);
@@ -299,7 +300,7 @@ static MACHINE_DRIVER_START( pitnrun )
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(M68705,2000000)
+	MDRV_CPU_ADD(M68705,2000000/M68705_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_MACHINE_RESET(pitnrun)

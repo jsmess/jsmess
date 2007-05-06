@@ -34,22 +34,22 @@ added external port callback, and functions to set the volume of the channels
 
 typedef struct kdacApcm
 {
-  unsigned char vol[KDAC_A_PCM_MAX][2];	/* volume for the left and right channel */
-  unsigned int  addr[KDAC_A_PCM_MAX];
-  unsigned int  start[KDAC_A_PCM_MAX];
-  unsigned int  step[KDAC_A_PCM_MAX];
-  unsigned int  bank[KDAC_A_PCM_MAX];
-  int play[KDAC_A_PCM_MAX];
+	UINT8			vol[KDAC_A_PCM_MAX][2];	/* volume for the left and right channel */
+	UINT32			addr[KDAC_A_PCM_MAX];
+	UINT32			start[KDAC_A_PCM_MAX];
+	UINT32			step[KDAC_A_PCM_MAX];
+	UINT32			bank[KDAC_A_PCM_MAX];
+	int				play[KDAC_A_PCM_MAX];
 
-  unsigned char wreg[0x10];	/* write data */
-  unsigned char *pcmbuf[2];	/* Channel A & B pointers */
+	UINT8 			wreg[0x10];	/* write data */
+	UINT8 *			pcmbuf[2];	/* Channel A & B pointers */
 
-  unsigned int  clock;          /* chip clock */
-  unsigned int  pcmlimit;
+	UINT32  		clock;          /* chip clock */
+	UINT32  		pcmlimit;
 
-  sound_stream * stream;
+	sound_stream * 	stream;
 	const struct K007232_interface *intf;
-  float fncode[0x200];
+	UINT32 			fncode[0x200];
 } KDAC_A_PCM;
 
 
@@ -202,7 +202,9 @@ static void KDAC_A_make_fncode( struct kdacApcm *info ){
 #else
   for( i = 0; i < 0x200; i++ ){
     //fncode[i] = (0x200 * 55) / (0x200 - i);
-    info->fncode[i] = ((0x200 * 55.2) / (0x200 - i)) / (440.00 / 2);
+    info->fncode[i] = (32 << BASE_SHIFT) / (0x200 - i);
+//  info->fncode[i] = ((0x200 * 55.2 / 880) / (0x200 - i));
+    // = 512 * 55.2 / 220 / (512 - i) = 128 / (512 - i)
     //    logerror("2 : fncode[%04x] = %.2f\n", i, fncode[i] );
   }
 
@@ -323,7 +325,7 @@ static void *k007232_start(int sndindex, int clock, const void *config)
 
       for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-      info->stream = stream_create(0,2,(INT64)7850 * (INT64)clock / 4000000,info,KDAC_A_update);
+      info->stream = stream_create(0,2,clock/128,info,KDAC_A_update);
 
   KDAC_A_make_fncode(info);
 
@@ -370,7 +372,7 @@ static void K007232_WriteReg( int r, int v, int chip )
 	logerror("%04x\n" ,data );
 #endif
 
-      info->step[reg_port] = info->fncode[data] * (1<<BASE_SHIFT);
+      info->step[reg_port] = info->fncode[data];
       break;
 
     case 0x02:

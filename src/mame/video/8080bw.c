@@ -185,41 +185,6 @@ VIDEO_UPDATE( ballbomb )
 }
 
 
-VIDEO_UPDATE( sstrngr2 )
-{
-	pen_t pens[NUM_PENS];
-	offs_t offs;
-	UINT8 *color_map_base;
-
-	invadpt2_get_pens(pens);
-
-	color_map_base = color_map ? memory_region(REGION_PROMS) : &memory_region(REGION_PROMS)[0x0200];
-
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
-	{
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
-
-		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
-
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = screen_red ? 1 : color_map_base[color_address] & 0x07;
-
-		if (color_map)
-		{
-			x = 240 - x;
-			y = 31 - y;
-		}
-
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
-	}
-
-	clear_extra_columns(bitmap, pens, 0);
-
-	return 0;
-}
-
-
 VIDEO_UPDATE( schaser )
 {
 	pen_t pens[NUM_PENS];

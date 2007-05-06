@@ -107,6 +107,7 @@ DSW2 stored @ $f237
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 
@@ -965,7 +966,7 @@ static MACHINE_DRIVER_START( hotsmash )
 	MDRV_CPU_IO_MAP(hotsmash_port_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(M68705, 4000000/2) /* ???? */
+	MDRV_CPU_ADD(M68705, 4000000/M68705_CLOCK_DIVIDER) /* ???? */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

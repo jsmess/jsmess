@@ -147,6 +147,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
 
@@ -597,7 +598,7 @@ static MACHINE_DRIVER_START( lsasquad )
 	/* audio CPU */	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* IRQs are triggered by the YM2203 */
-	MDRV_CPU_ADD(M68705,4000000/2)	/* ? */
+	MDRV_CPU_ADD(M68705,4000000/M68705_CLOCK_DIVIDER)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

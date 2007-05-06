@@ -8,10 +8,11 @@
 
 #include "sound/discrete.h"
 
+#define QIX_CHARACTER_CLOCK		(20000000/2/16)
+
 
 /*----------- defined in machine/qix.c -----------*/
 
-extern UINT8 *qix_sharedram;
 extern UINT8 *qix_68705_port_out;
 extern UINT8 *qix_68705_ddr;
 
@@ -19,11 +20,6 @@ MACHINE_START( qix );
 MACHINE_START( qixmcu );
 MACHINE_START( slither );
 MACHINE_RESET( qix );
-MACHINE_RESET( qixmcu );
-MACHINE_RESET( slither );
-
-READ8_HANDLER( qix_sharedram_r );
-WRITE8_HANDLER( qix_sharedram_w );
 
 WRITE8_HANDLER( zoo_bankswitch_w );
 
@@ -58,9 +54,9 @@ extern UINT8 qix_cocktail_flip;
 VIDEO_START( qix );
 VIDEO_UPDATE( qix );
 
-void qix_scanline_callback(int scanline);
-
 READ8_HANDLER( qix_scanline_r );
+READ8_HANDLER( qix_videocontrol_r );
+WRITE8_HANDLER( qix_videocontrol_w );
 READ8_HANDLER( qix_videoram_r );
 WRITE8_HANDLER( qix_videoram_w );
 READ8_HANDLER( qix_addresslatch_r );

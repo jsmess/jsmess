@@ -75,9 +75,16 @@ namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 		{
 			static const int adj[4] = { 4,2,1,0 };
 			int dx = 44+adj[i];
-			tilemap_set_scrolldx( mTilemapInfo.tmap[i], -dx, -(-288-dx) );
-			tilemap_set_scrolldy( mTilemapInfo.tmap[i], -24, -(-224-24) );
+			tilemap_set_scrolldx( mTilemapInfo.tmap[i], -dx, -(-384-dx) );
+			tilemap_set_scrolldy( mTilemapInfo.tmap[i], -24, 288 );
 		}
+
+		tilemap_set_scrolldx( mTilemapInfo.tmap[4], 0, 96 );
+		tilemap_set_scrolldy( mTilemapInfo.tmap[4], 0, 40 );
+
+		tilemap_set_scrolldx( mTilemapInfo.tmap[5], 0, 96 );
+		tilemap_set_scrolldy( mTilemapInfo.tmap[5], 0, 40 );
+
 		return 0;
 } /* namco_tilemap_init */
 
@@ -597,7 +604,6 @@ static UINT16 mSpritePos[4];
 WRITE16_HANDLER( namco_spritepos16_w )
 {
 	COMBINE_DATA( &mSpritePos[offset] );
-	logerror( "namco_spritepos16_w(%d):=%d\n", offset, (INT16)mSpritePos[offset] );
 }
 READ16_HANDLER( namco_spritepos16_r )
 {

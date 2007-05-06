@@ -36,13 +36,13 @@
 #define CLR_Z					state.st &= ~STBIT_Z
 #define CLR_V					state.st &= ~STBIT_V
 #define CLR_C					state.st &= ~STBIT_C
+#define CLR_N					state.st &= ~STBIT_N
 #define CLR_NZ					state.st &= ~(STBIT_N | STBIT_Z)
-#define CLR_ZC					state.st &= ~(STBIT_Z | STBIT_C)
+#define CLR_CZ					state.st &= ~(STBIT_Z | STBIT_C)
 #define CLR_ZV					state.st &= ~(STBIT_Z | STBIT_V)
-#define CLR_VC					state.st &= ~(STBIT_V | STBIT_C)
 #define CLR_NZV					state.st &= ~(STBIT_N | STBIT_Z | STBIT_V)
 #define CLR_NCZ					state.st &= ~(STBIT_N | STBIT_C | STBIT_Z)
-#define CLR_NZCV				state.st &= ~(STBIT_N | STBIT_Z | STBIT_C | STBIT_V)
+#define CLR_NCZV				state.st &= ~(STBIT_N | STBIT_Z | STBIT_C | STBIT_V)
 
 #define SET_V_BIT_LO(val,bit)	state.st |= ((val) << (28 - (bit))) & STBIT_V
 #define SET_V_BIT_HI(val,bit)	state.st |= ((val) >> ((bit) - 28)) & STBIT_V
@@ -112,7 +112,7 @@ static void unimpl(void)
 {												\
 	XY  a =  R##REG_XY(SRCREG);					\
 	XY *b = &R##REG_XY(DSTREG);					\
-	CLR_NZCV;									\
+	CLR_NCZV;									\
 	b->x += a.x;								\
 	b->y += a.y;								\
 	SET_N_LOG(b->x == 0);						\
@@ -128,7 +128,7 @@ static void add_xy_b(void) { ADD_XY(B); }
 {												\
 	XY  a =  R##REG_XY(SRCREG);					\
 	XY *b = &R##REG_XY(DSTREG);					\
-	CLR_NZCV;									\
+	CLR_NCZV;									\
 	SET_N_LOG(a.x == b->x);						\
 	SET_C_LOG(a.y > b->y);						\
 	SET_Z_LOG(a.y == b->y);						\
@@ -145,7 +145,7 @@ static void sub_xy_b(void) { SUB_XY(B); }
 	INT16 res;									\
 	XY a = R##REG_XY(DSTREG);					\
 	XY b = R##REG_XY(SRCREG);					\
-	CLR_NZCV;									\
+	CLR_NCZV;									\
 	res = a.x-b.x;								\
 	SET_N_LOG(res == 0);						\
 	SET_V_BIT_LO(res, 15);						\
@@ -330,7 +330,7 @@ static void abs_b(void) { ABS(B); }
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 b = *rd;											\
 	INT32 r = a + b;										\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	*rd = r;												\
 	SET_NZCV_ADD(a,b,r);									\
 	COUNT_CYCLES(1);										\
@@ -346,7 +346,7 @@ static void add_b(void) { ADD(B); }
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 b = *rd;											\
 	INT32 r = a + b + (C_FLAG ? 1 : 0);						\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	*rd = r;												\
 	SET_NZCV_ADD(a,b,r);									\
 	COUNT_CYCLES(1);										\
@@ -360,7 +360,7 @@ static void addc_b(void) { ADDC(B); }
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 b = *rd;											\
 	INT32 r = a + b;										\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	*rd = r;												\
 	SET_NZCV_ADD(a,b,r);									\
 	COUNT_CYCLES(2);										\
@@ -374,7 +374,7 @@ static void addi_w_b(void) { ADDI_W(B); }
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 b = *rd;											\
 	INT32 r = a + b;										\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	*rd = r;												\
 	SET_NZCV_ADD(a,b,r);									\
 	COUNT_CYCLES(3);										\
@@ -388,7 +388,7 @@ static void addi_l_b(void) { ADDI_L(B); }
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 b = *rd;											\
 	INT32 r = a + b;										\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	*rd = r;												\
 	SET_NZCV_ADD(a,b,r);									\
 	COUNT_CYCLES(1);										\
@@ -466,7 +466,7 @@ static void clrc(void)
 	INT32 *rs = &R##REG(SRCREG);							\
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 r = *rd - *rs;									\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	SET_NZCV_SUB(*rd,*rs,r);								\
 	COUNT_CYCLES(1);										\
 }
@@ -478,7 +478,7 @@ static void cmp_b(void) { CMP(B); }
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 t = (INT16)~PARAM_WORD();							\
 	INT32 r = *rd - t;										\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	SET_NZCV_SUB(*rd,t,r);									\
 	COUNT_CYCLES(2);										\
 }
@@ -490,7 +490,7 @@ static void cmpi_w_b(void) { CMPI_W(B); }
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 t = ~PARAM_LONG();								\
 	INT32 r = *rd - t;										\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	SET_NZCV_SUB(*rd,t,r);									\
 	COUNT_CYCLES(3);										\
 }
@@ -564,7 +564,7 @@ static void divs_b(void) { DIVS(B); }
 		}													\
 		else												\
 		{													\
-			INT32 *rd2 = &R##REG(DSTREG+1);				\
+			INT32 *rd2 = &R##REG(DSTREG+1);					\
 			UINT64 dividend  = COMBINE_U64_U32_U32(*rd1, *rd2);	\
 			UINT64 quotient  = DIV_U64_U64_U32(dividend, *rs);	\
 			UINT32 remainder = MOD_U32_U64_U32(dividend, *rs); 	\
@@ -669,6 +669,11 @@ static void mmfm_b(void) { MMFM(B); }
 	COUNT_CYCLES(2);											\
 	{															\
 		INT32 rd = DSTREG;										\
+		if (state.is_34020)										\
+		{														\
+			CLR_N;												\
+			SET_N_VAL(R##REG(rd) ^ 0x80000000);					\
+		}														\
 		for (i = 0; i  < 16; i++)								\
 		{														\
 			if (l & 0x8000)										\
@@ -705,7 +710,7 @@ static void mods_b(void) { MODS(B); }
 {				  												\
 	INT32 *rs = &R##REG(SRCREG);								\
 	INT32 *rd = &R##REG(DSTREG);								\
-	CLR_NZV;													\
+	CLR_ZV;														\
 	if (*rs != 0)												\
 	{															\
 		*rd = (UINT32)*rd % (UINT32)*rs;						\
@@ -761,7 +766,7 @@ static void mpyu_b(void) { MPYU(B); }
 {			  													\
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 r = 0 - *rd;											\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	SET_NZCV_SUB(0,*rd,r);										\
 	*rd = r;													\
 	COUNT_CYCLES(1);											\
@@ -774,7 +779,7 @@ static void neg_b(void) { NEG(B); }
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 t = *rd + (C_FLAG ? 1 : 0);							\
 	INT32 r = 0 - t;											\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	SET_NZCV_SUB(0,t,r);										\
 	*rd = r;													\
 	COUNT_CYCLES(1);											\
@@ -854,7 +859,7 @@ static void sext1_b(void) { SEXT(1,B); }
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 res = *rd;											\
 	INT32 k = (K);												\
-	CLR_ZC;														\
+	CLR_CZ;														\
 	if (k)														\
 	{															\
 		res<<=(k-1);											\
@@ -876,7 +881,7 @@ static void rl_r_b(void) { RL(B,BREG(SRCREG)&0x1f); }
 	 INT32 *rd = &R##REG(DSTREG);								\
 	UINT32 res = *rd;											\
 	 INT32 k = K;												\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	if (k)														\
 	{															\
 		UINT32 mask = (0xffffffff<<(31-k))&0x7fffffff;			\
@@ -901,7 +906,7 @@ static void sla_r_b(void) { SLA(B,BREG(SRCREG)&0x1f); }
 	 INT32 *rd = &R##REG(DSTREG);								\
 	UINT32 res = *rd;											\
 	 INT32 k = K;												\
-	CLR_VC;														\
+	CLR_CZ;														\
 	if (k)														\
 	{															\
 		res<<=(k-1);											\
@@ -943,7 +948,7 @@ static void sra_r_b(void) { SRA(B,BREG(SRCREG)); }
 	 INT32 *rd = &R##REG(DSTREG);								\
 	UINT32 res = *rd;											\
 	 INT32 k = (-(K)) & 0x1f;									\
-	CLR_ZC;														\
+	CLR_CZ;														\
 	if (k)														\
 	{															\
 		res>>=(k-1);											\
@@ -964,7 +969,7 @@ static void srl_r_b(void) { SRL(B,BREG(SRCREG)); }
 	INT32 *rs = &R##REG(SRCREG);								\
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 r = *rd - *rs;										\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	SET_NZCV_SUB(*rd,*rs,r);									\
 	*rd = r;													\
 	COUNT_CYCLES(1);											\
@@ -977,7 +982,7 @@ static void sub_b(void) { SUB(B); }
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 t = R##REG(SRCREG);									\
 	INT32 r = *rd - t - (C_FLAG ? 1 : 0);						\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	SET_NZCV_SUB(*rd,t,r);										\
 	*rd = r;													\
 	COUNT_CYCLES(1);											\
@@ -990,7 +995,7 @@ static void subb_b(void) { SUBB(B); }
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 r;													\
 	INT32 t = ~PARAM_WORD();									\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	r = *rd - t;												\
 	SET_NZCV_SUB(*rd,t,r);										\
 	*rd = r;													\
@@ -1004,7 +1009,7 @@ static void subi_w_b(void) { SUBI_W(B); }
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 t = ~PARAM_LONG();									\
 	INT32 r = *rd - t;											\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	SET_NZCV_SUB(*rd,t,r);										\
 	*rd = r;													\
 	COUNT_CYCLES(3);											\
@@ -1017,7 +1022,7 @@ static void subi_l_b(void) { SUBI_L(B); }
 	INT32 *rd = &R##REG(DSTREG);								\
 	INT32 t = fw_inc[PARAM_K];									\
 	INT32 r = *rd - t;											\
-	CLR_NZCV;													\
+	CLR_NCZV;													\
 	SET_NZCV_SUB(*rd,t,r);										\
 	*rd = r;													\
 	COUNT_CYCLES(1);											\
@@ -2024,7 +2029,7 @@ New 34020 ops:
 {												\
 	UINT32 a = PARAM_LONG();					\
 	XY *b = &R##REG_XY(DSTREG);					\
-	CLR_NZCV;									\
+	CLR_NCZV;									\
 	b->x += (INT16)(a & 0xffff);				\
 	b->y += ((INT32)a >> 16);					\
 	SET_N_LOG(b->x == 0);						\
@@ -2196,7 +2201,7 @@ static void cmovmc_b(void)
 	INT32 r;												\
 	INT32 *rd = &R##REG(DSTREG);							\
 	INT32 t = PARAM_K; if (!t) t = 32;						\
-	CLR_NZCV;												\
+	CLR_NCZV;												\
 	r = *rd - t;											\
 	SET_NZCV_SUB(*rd,t,r);									\
 	COUNT_CYCLES(1);										\

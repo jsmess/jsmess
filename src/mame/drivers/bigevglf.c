@@ -58,6 +58,7 @@ J1100072A
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
+#include "cpu/m6805/m6805.h"
 
 VIDEO_START( bigevglf );
 VIDEO_UPDATE( bigevglf );
@@ -483,7 +484,7 @@ static MACHINE_DRIVER_START( bigevglf )
         2 irqs/frame give good music tempo but also SOUND ERROR in test mode,
         4 irqs/frame give SOUND OK in test mode but music seems to be running too fast */
 
-	MDRV_CPU_ADD(M68705,2000000)	/* ??? */
+	MDRV_CPU_ADD(M68705,2000000/M68705_CLOCK_DIVIDER)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

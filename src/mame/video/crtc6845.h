@@ -1,52 +1,37 @@
 /**********************************************************************
 
-        Motorola 6845 CRT Controller interface and emulation
+    Motorola 6845 CRT Controller interface and emulation
 
-        This function emulates the functionality of a single
-        crtc6845.
+    This function emulates the functionality of a single
+    crtc6845.
 
 **********************************************************************/
 
+typedef struct _crtc6845_state crtc6845_state;
+struct _crtc6845_state
+{
+	UINT8		address_latch;
+	UINT8		horiz_total;
+	UINT8		horiz_disp;
+	UINT8		horiz_sync_pos;
+	UINT8		sync_width;
+	UINT8		vert_total;
+	UINT8		vert_total_adj;
+	UINT8		vert_disp;
+	UINT8		vert_sync_pos;
+	UINT8		intl_skew;
+	UINT8		max_ras_addr;
+	UINT8		cursor_start_ras;
+	UINT8		cursor_end_ras;
+	UINT16		start_addr;
+	UINT16		cursor;
+	UINT16		light_pen;
+	UINT8		page_flip;
+};
 
-#ifdef CRTC6845_C
-	int crtc6845_address_latch=0;
-	int crtc6845_horiz_total=0;
-	int crtc6845_horiz_disp=0;
-	int crtc6845_horiz_sync_pos=0;
-	int crtc6845_sync_width=0;
-	int crtc6845_vert_total=0;
-	int crtc6845_vert_total_adj=0;
-	int crtc6845_vert_disp=0;
-	int crtc6845_vert_sync_pos=0;
-	int crtc6845_intl_skew=0;
-	int crtc6845_max_ras_addr=0;
-	int crtc6845_cursor_start_ras=0;
-	int crtc6845_cursor_end_ras=0;
-	int crtc6845_start_addr=0;
-	int crtc6845_cursor=0;
-	int crtc6845_light_pen=0;
-	int crtc6845_page_flip=0;		/* This seems to be present in the HD46505 */
+extern crtc6845_state crtc6845;
 
-#else
-	extern int crtc6845_address_latch;
-	extern int crtc6845_horiz_total;
-	extern int crtc6845_horiz_disp;
-	extern int crtc6845_horiz_sync_pos;
-	extern int crtc6845_sync_width;
-	extern int crtc6845_vert_total;
-	extern int crtc6845_vert_total_adj;
-	extern int crtc6845_vert_disp;
-	extern int crtc6845_vert_sync_pos;
-	extern int crtc6845_intl_skew;
-	extern int crtc6845_max_ras_addr;
-	extern int crtc6845_cursor_start_ras;
-	extern int crtc6845_cursor_end_ras;
-	extern int crtc6845_start_addr;
-	extern int crtc6845_cursor;
-	extern int crtc6845_light_pen;
-	extern int crtc6845_page_flip;
-#endif
-
+void crtc6845_init(void);
 READ8_HANDLER( crtc6845_register_r );
 WRITE8_HANDLER( crtc6845_address_w );
 WRITE8_HANDLER( crtc6845_register_w );

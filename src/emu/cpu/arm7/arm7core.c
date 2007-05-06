@@ -173,7 +173,7 @@ INLINE UINT32 arm7_cpu_read32( int addr )
 {
     UINT32 result;
 
-    if (addr&3) 
+    if (addr&3)
     {
 	result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8 | program_read_byte_32le(addr+2)<<16 | program_read_byte_32le(addr+3)<<24;
     }
@@ -187,7 +187,7 @@ INLINE UINT32 arm7_cpu_read32( int addr )
 INLINE UINT16 arm7_cpu_read16( int addr )
 {
 	UINT16 result;
-	
+
 	if(addr&1)
 	{
 		result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8;
@@ -631,7 +631,7 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR & ~T_MASK);		/* Go to ARM mode */
         R15 = 0x08;				/* Jump to the SWI vector */
 	change_pc(R15);
-        ARM7.pendingSwi = 0;								   
+        ARM7.pendingSwi = 0;
         return;
     }
 }

@@ -219,6 +219,7 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 #include <math.h>
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/msm5232.h"
@@ -1187,7 +1188,7 @@ static MACHINE_DRIVER_START( 40love )
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
-	MDRV_CPU_ADD(M68705,18432000/6) /* OK */
+	MDRV_CPU_ADD(M68705,18432000/6/M68705_CLOCK_DIVIDER) /* OK */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1234,7 +1235,7 @@ static MACHINE_DRIVER_START( undoukai )
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
-//  MDRV_CPU_ADD(M68705,18432000/6)
+//  MDRV_CPU_ADD(M68705,18432000/6/M68705_CLOCK_DIVIDER)
 //  MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

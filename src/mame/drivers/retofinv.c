@@ -29,6 +29,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/sn76496.h"
 
 /* in machine */
@@ -377,7 +378,7 @@ static MACHINE_DRIVER_START( retofinv )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,2)
 
-	MDRV_CPU_ADD_TAG("68705", M68705,18432000/6)	/* 3.072 MHz? */
+	MDRV_CPU_ADD_TAG("68705", M68705,18432000/6/M68705_CLOCK_DIVIDER)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -437,7 +438,7 @@ ROM_START( retofinv )
 
 	ROM_REGION( 0x0800, REGION_CPU4, 0 )	/* 8k for the microcontroller */
 	/* the only available dump is from a bootleg board, and is not the real thing (see notes at top of driver) */
-	ROM_LOAD( "a37-09.37", 0x00000, 0x0800, NO_DUMP CRC(79bd6ded) SHA1(4967e95b4461c1bfb4e933d1804677799014f77b) )
+	ROM_LOAD( "a37-09.37", 0x00000, 0x0800, BAD_DUMP CRC(79bd6ded) SHA1(4967e95b4461c1bfb4e933d1804677799014f77b) )
 
 	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "a37-16.61", 0x0000, 0x2000, CRC(4e3f501c) SHA1(2d832f4038ae65bfdeedfab870f6f1176ec6b676) )

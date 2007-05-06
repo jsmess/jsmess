@@ -66,6 +66,7 @@ conversion kit which could be applied to a bootleg double dragon :-p?
 
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
+#include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
@@ -1027,7 +1028,7 @@ static MACHINE_DRIVER_START( darktowr )
  	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_CPU_ADD(M68705,8000000/2)  /* ? MHz */
+	MDRV_CPU_ADD(M68705,8000000/2/M68705_CLOCK_DIVIDER)  /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)

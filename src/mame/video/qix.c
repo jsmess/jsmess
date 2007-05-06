@@ -8,10 +8,11 @@
 
 #include "driver.h"
 #include "qix.h"
+#include "crtc6845.h"
 
 
 /* Constants */
-#define SCANLINE_INCREMENT	4
+#define SCANLINE_INCREMENT	1
 
 
 /* Globals */
@@ -22,7 +23,13 @@ UINT8 qix_cocktail_flip;
 /* Local variables */
 static UINT8 vram_mask;
 static UINT8 qix_palettebank;
-static int leds;
+static UINT8 leds;
+static mame_timer *scanline_timer;
+
+
+/* Prototypes */
+static void scanline_callback(int scanline);
+
 
 
 /*************************************
@@ -38,6 +45,19 @@ VIDEO_START( qix )
 
 	/* initialize the mask for games that don't use it */
 	vram_mask = 0xff;
+
+	/* allocate a timer */
+	scanline_timer = mame_timer_alloc(scanline_callback);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, time_zero);
+
+	/* set up save states */
+	crtc6845_init();
+	state_save_register_global_pointer(videoram, 256 * 256);
+	state_save_register_global(qix_cocktail_flip);
+	state_save_register_global(vram_mask);
+	state_save_register_global(qix_palettebank);
+	state_save_register_global(leds);
+
 	return 0;
 }
 
@@ -49,16 +69,16 @@ VIDEO_START( qix )
  *
  *************************************/
 
-void qix_scanline_callback(int scanline)
+static void scanline_callback(int scanline)
 {
 	/* force a partial update */
 	video_screen_update_partial(0, scanline - 1);
 
 	/* set a timer for the next increment */
 	scanline += SCANLINE_INCREMENT;
-	if (scanline > 256)
+	if (scanline > Machine->screen[0].visarea.max_y)
 		scanline = SCANLINE_INCREMENT;
-	mame_timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, qix_scanline_callback);
+	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
 
 
@@ -71,8 +91,65 @@ void qix_scanline_callback(int scanline)
 
 READ8_HANDLER( qix_scanline_r )
 {
+	/*
+        This doesn't actually latch the scanline; rather, it latches the upper bits
+        of the address output by the 6845CRTC; this is based on the starting address
+        loaded into the CRTC registers plus the scanline. Furthermore, the transparent
+        latch holding the address is latched when the display is disabled; this means
+        that during blanking periods it continues to hold the last address output
+    */
+	int startaddr = (crtc6845.start_addr & 0x3ff) >> 2;
 	int scanline = video_screen_get_vpos(0);
-	return (scanline <= 0xff) ? scanline : 0;
+	scanline = MIN(scanline, Machine->screen[0].visarea.max_y);
+	return (scanline + startaddr) & 0xff;
+}
+
+
+
+/*************************************
+ *
+ *  Video controller read/write
+ *
+ *************************************/
+
+READ8_HANDLER( qix_videocontrol_r )
+{
+	return crtc6845_register_r(offset);
+}
+
+
+WRITE8_HANDLER( qix_videocontrol_w )
+{
+	/* even offsets write to the address register */
+	if (offset == 0)
+		crtc6845_address_w(offset, data);
+
+	/* odd offsets write to the register itself */
+	else
+	{
+		int vtotal, vvisible, vfrac, scans_per_char;
+		int htotal, hvisible;
+		rectangle visarea;
+
+		crtc6845_register_w(offset, data);
+
+		/* grab the screen parameters */
+		htotal = crtc6845.horiz_total + 1;
+		hvisible = crtc6845.horiz_disp;
+		scans_per_char = crtc6845.max_ras_addr + 1;
+		vtotal = crtc6845.vert_total + 1;
+		vfrac = crtc6845.vert_total_adj;
+		vvisible = crtc6845.vert_disp;
+
+		/* determine the visible area */
+		visarea.min_x = visarea.min_y = 0;
+		visarea.max_x = hvisible * 8 - 1;
+		visarea.max_y = vvisible * 8 - 1;
+
+		/* update the screen if we have valid data */
+		if (htotal > 1 && visarea.max_x < htotal * 8 && vtotal > 1 && visarea.max_y < vtotal * scans_per_char + vfrac)
+			video_screen_configure(0, htotal * 8, vtotal * scans_per_char + vfrac, &visarea, HZ_TO_SUBSECONDS(QIX_CHARACTER_CLOCK) * htotal * (vtotal * scans_per_char + vfrac));
+	}
 }
 
 
@@ -234,9 +311,10 @@ WRITE8_HANDLER( qix_palettebank_w )
 
 VIDEO_UPDATE( qix )
 {
+	int startaddr = (crtc6845.start_addr & 0x3ff) << 6;
 	pen_t *pens = &machine->pens[qix_palettebank * 256];
-	UINT8 *vram;
 	UINT8 scanline[256];
+	int offset;
 	int x,y;
 
 	/* draw the bitmap */
@@ -244,9 +322,9 @@ VIDEO_UPDATE( qix )
 	{
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			vram = &videoram[(y ^ 0xff) * 256];
+			offset = startaddr + (y ^ 0xff) * 256;
 			for (x = 0;x < 256;x++)
-				scanline[x] = vram[x ^ 0xff];
+				scanline[x] = videoram[(offset + (x ^ 0xff)) & 0xffff];
 			draw_scanline8(bitmap, 0, y, 256, scanline, pens, -1);
 		}
 	}
@@ -254,9 +332,9 @@ VIDEO_UPDATE( qix )
 	{
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			vram = &videoram[y * 256];
+			offset = startaddr + y * 256;
 			for (x = 0;x < 256;x++)
-				scanline[x] = vram[x];
+				scanline[x] = videoram[(offset + x) & 0xffff];
 			draw_scanline8(bitmap, 0, y, 256, scanline, pens, -1);
 		}
 	}

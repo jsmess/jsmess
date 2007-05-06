@@ -550,7 +550,7 @@ INLINE void BURNODD(int cycles, int opcodes, int cyclesum)
 #define ENTER_HALT {											\
 	PC--;														\
 	HALT = 1;													\
-	if( !Z80.after_ei )											\
+	if( Z80.irq_state == CLEAR_LINE )							\
 		z80_burn( z80_ICount );									\
 }
 
@@ -663,7 +663,7 @@ INLINE UINT32 ARG16(void)
 	/* speed up busy loop */									\
 	if( PCD == oldpc )											\
 	{															\
-		if( !Z80.after_ei )										\
+		if( Z80.irq_state == CLEAR_LINE )						\
 			BURNODD( z80_ICount, 1, cc[Z80_TABLE_op][0xc3] );	\
 	}															\
 	else														\
@@ -674,7 +674,7 @@ INLINE UINT32 ARG16(void)
 			/* NOP - JP $-1 or EI - JP $-1 */					\
 			if ( op == 0x00 || op == 0xfb )						\
 			{													\
-				if( !Z80.after_ei )								\
+				if( Z80.irq_state == CLEAR_LINE )				\
 					BURNODD( z80_ICount-cc[Z80_TABLE_op][0x00], \
 						2, cc[Z80_TABLE_op][0x00]+cc[Z80_TABLE_op][0xc3]); \
 			}													\
@@ -683,7 +683,7 @@ INLINE UINT32 ARG16(void)
 		/* LD SP,#xxxx - JP $-3 (Galaga) */						\
 		if( PCD == oldpc-3 && op == 0x31 )						\
 		{														\
-			if( !Z80.after_ei )									\
+			if( Z80.irq_state == CLEAR_LINE )					\
 				BURNODD( z80_ICount-cc[Z80_TABLE_op][0x31],		\
 					2, cc[Z80_TABLE_op][0x31]+cc[Z80_TABLE_op][0xc3]); \
 		}														\
@@ -723,7 +723,7 @@ INLINE UINT32 ARG16(void)
 	/* speed up busy loop */									\
 	if( PCD == oldpc )											\
 	{															\
-		if( !Z80.after_ei )										\
+		if( Z80.irq_state == CLEAR_LINE )						\
 			BURNODD( z80_ICount, 1, cc[Z80_TABLE_op][0x18] );	\
 	}															\
 	else														\
@@ -734,7 +734,7 @@ INLINE UINT32 ARG16(void)
 			/* NOP - JR $-1 or EI - JR $-1 */					\
 			if ( op == 0x00 || op == 0xfb )						\
 			{													\
-				if( !Z80.after_ei )								\
+				if( Z80.irq_state == CLEAR_LINE )				\
 				   BURNODD( z80_ICount-cc[Z80_TABLE_op][0x00],	\
 					   2, cc[Z80_TABLE_op][0x00]+cc[Z80_TABLE_op][0x18]); \
 			}													\
@@ -743,7 +743,7 @@ INLINE UINT32 ARG16(void)
 		/* LD SP,#xxxx - JR $-3 */								\
 		if( PCD == oldpc-3 && op == 0x31 )						\
 		{														\
-			if( !Z80.after_ei )									\
+			if( Z80.irq_state == CLEAR_LINE )					\
 			   BURNODD( z80_ICount-cc[Z80_TABLE_op][0x31],		\
 				   2, cc[Z80_TABLE_op][0x31]+cc[Z80_TABLE_op][0x18]); \
 		}														\
@@ -1537,12 +1537,8 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
  * EI
  ***************************************************************/
 #define EI {													\
-	/* If interrupts were disabled, execute one more            \
-     * instruction and check the IRQ line.                      \
-     * If not, simply set interrupt flip-flop 2                 \
-     */															\
 	IFF1 = IFF2 = 1;											\
-	Z80.after_ei = TRUE;	/* avoid cycle skip hacks */		\
+	Z80.after_ei = TRUE;										\
 }
 
 /**********************************************************

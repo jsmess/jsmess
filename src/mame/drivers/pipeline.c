@@ -52,6 +52,7 @@ Notes:
 #include "sound/2203intf.h"
 #include "machine/8255ppi.h"
 #include "cpu/z80/z80daisy.h"
+#include "cpu/m6805/m6805.h"
 
 static tilemap *tilemap1;
 static tilemap *tilemap2;
@@ -173,14 +174,8 @@ static WRITE8_HANDLER(vidctrl_w)
 	vidctrl=data;
 }
 
-static READ8_HANDLER(vram2_r)
-{
-	return vram2[offset];
-}
-
 static WRITE8_HANDLER(vram2_w)
 {
-
 	if(!(vidctrl&1))
 	{
 		tilemap_mark_tile_dirty(tilemap1,offset&0x7ff);
@@ -197,15 +192,10 @@ static WRITE8_HANDLER(vram2_w)
 	}
 }
 
-static READ8_HANDLER(vram1_r)
-{
-	return vram1[offset];
-}
-
 static WRITE8_HANDLER(vram1_w)
 {
-		tilemap_mark_tile_dirty(tilemap2,offset&0x7ff);
-		vram1[offset]=data;
+	tilemap_mark_tile_dirty(tilemap2,offset&0x7ff);
+	vram1[offset]=data;
 }
 
 static READ8_HANDLER(protection_r)
@@ -213,17 +203,22 @@ static READ8_HANDLER(protection_r)
 	return fromMCU;
 }
 
-static WRITE8_HANDLER(protection_w)
+static void protection_deferred_w(int data)
 {
 	toMCU=data;
-	timer_set(TIME_NOW, 0, NULL);
+}
+
+static WRITE8_HANDLER(protection_w)
+{
+	mame_timer_set(time_zero, data, protection_deferred_w);
+	cpu_boost_interleave(time_zero, MAME_TIME_IN_USEC(100));
 }
 
 static ADDRESS_MAP_START( cpu0_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x97ff) AM_READWRITE(vram1_r, vram1_w) AM_BASE(&vram1)
-	AM_RANGE(0x9800, 0xa7ff) AM_READWRITE(vram2_r, vram2_w) AM_BASE(&vram2)
+	AM_RANGE(0x8800, 0x97ff) AM_READWRITE(MRA8_RAM, vram1_w) AM_BASE(&vram1)
+	AM_RANGE(0x9800, 0xa7ff) AM_READWRITE(MRA8_RAM, vram2_w) AM_BASE(&vram2)
 	AM_RANGE(0xb800, 0xb803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0xb810, 0xb813) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
 	AM_RANGE(0xb830, 0xb830) AM_NOP
@@ -245,7 +240,6 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER(mcu_portA_w)
 {
 	fromMCU=data;
-	timer_set(TIME_NOW, 0, NULL);
 }
 
 static READ8_HANDLER(mcu_portA_r)
@@ -318,12 +312,12 @@ static struct z80_irq_daisy_chain daisy_chain_sound[] =
 static ppi8255_interface ppi8255_intf =
 {
 	3,
-	{ input_port_0_r,     input_port_1_r,	NULL },	/* Port A read */
-	{ NULL,             	input_port_2_r,	NULL },	/* Port B read */
-	{ NULL,        				protection_r,		NULL },	/* Port C read */
-	{ NULL, 							NULL,						NULL },	/* Port A write */
-	{ NULL, 							NULL,						NULL },	/* Port B write */
-	{ vidctrl_w,          protection_w,		NULL },	/* Port C write */
+	{ input_port_0_r, input_port_1_r, NULL },	/* Port A read */
+	{ NULL,           input_port_2_r, NULL },	/* Port B read */
+	{ NULL,           protection_r,	  NULL },	/* Port C read */
+	{ NULL,           NULL,	          NULL },	/* Port A write */
+	{ NULL,           NULL,           NULL },	/* Port B write */
+	{ vidctrl_w,      protection_w,   NULL },	/* Port C write */
 };
 
 static struct YM2203interface ym2203_interface =
@@ -355,9 +349,9 @@ static PALETTE_INIT(pipeline)
 
 MACHINE_RESET( pipeline )
 {
-   ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
-   z80ctc_init(0, &ctc_intf);
-   ppi8255_init(&ppi8255_intf);
+	ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
+	z80ctc_init(0, &ctc_intf);
+	ppi8255_init(&ppi8255_intf);
 }
 
 static MACHINE_DRIVER_START( pipeline )
@@ -371,9 +365,8 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(cpu1_mem, 0)
 	MDRV_CPU_IO_MAP(sound_port, 0)
-	/* audio CPU */
 
-	MDRV_CPU_ADD(M68705, 7372800/2)
+	MDRV_CPU_ADD(M68705, 7372800/2/M68705_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

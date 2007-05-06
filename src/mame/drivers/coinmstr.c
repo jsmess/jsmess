@@ -37,24 +37,24 @@ static WRITE8_HANDLER( quizmstr_bg_w )
 {
 	videoram[offset] = data;
 
-	if(offset >= crtc6845_start_addr)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845_start_addr);
+	if(offset >= crtc6845.start_addr)
+		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845.start_addr);
 }
 
 static WRITE8_HANDLER( quizmstr_attr1_w )
 {
 	attr_ram1[offset] = data;
 
-	if(offset >= crtc6845_start_addr)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845_start_addr);
+	if(offset >= crtc6845.start_addr)
+		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845.start_addr);
 }
 
 static WRITE8_HANDLER( quizmstr_attr2_w )
 {
 	attr_ram2[offset] = data;
 
-	if(offset >= crtc6845_start_addr)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845_start_addr);
+	if(offset >= crtc6845.start_addr)
+		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845.start_addr);
 }
 
 static READ8_HANDLER( question_r )
@@ -524,11 +524,11 @@ static const gfx_decode gfxdecodeinfo[] =
 
 static void get_bg_tile_info(int tile_index)
 {
-	int tile = videoram[tile_index + crtc6845_start_addr];
+	int tile = videoram[tile_index + crtc6845.start_addr];
 	int color = 0;
 
-	tile |= (attr_ram1[tile_index + crtc6845_start_addr] & 0x80) << 1;
-	tile |= (attr_ram2[tile_index + crtc6845_start_addr] & 0x80) << 2;
+	tile |= (attr_ram1[tile_index + crtc6845.start_addr] & 0x80) << 1;
+	tile |= (attr_ram2[tile_index + crtc6845.start_addr] & 0x80) << 2;
 
 	SET_TILE_INFO(0,tile,color,0)
 }

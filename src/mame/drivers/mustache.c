@@ -183,12 +183,32 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 } /* end of array */
 };
 
+static void clear_irq_cb(int param)
+{
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
+}
+
+static void assert_irq(void)
+{
+	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	mame_timer_set(MAME_TIME_IN_CYCLES(14288, 0), 0, clear_irq_cb);
+       /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
+          fires no less than TWICE per frame, else game doesn't work right.
+      6000000 / 56.747 = 105732.4616 cycles per frame, we'll call it A
+      screen size is 256x256, though less is visible.
+          lets assume we have 256 lines L and 40 'lines' (really line-times)
+          of vblank V:
+      So (A/(L+V))*V = the number of cycles spent in vblank.
+      (105732.4616 / (256+40)) * 40 = 14288.17049 z80 clocks in vblank
+       */
+}
+
 static MACHINE_DRIVER_START( mustache )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT(assert_irq,1)
 
 	MDRV_CPU_ADD_TAG(CPUTAG_T5182,Z80, T5182_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)
@@ -201,7 +221,7 @@ static MACHINE_DRIVER_START( mustache )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 31*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(8*16+16*8)
 

@@ -8,11 +8,11 @@
 
     Games running on this hardware:
 
-    * PlayMan Poker (Germany).            1981, PlayMan?
+    * PlayMan Poker (Germany).            1981, PlayMan.
     * Golden Poker Double Up (Big Boy).   1981, Bonanza Enterprises, Ltd.
     * Golden Poker Double Up (Mini Boy).  1981, Bonanza Enterprises, Ltd.
-    * Joker Poker.                        1981, Coinmaster-Gaming, Ltd.
-    * Jack Potten's Poker.                1981, Unknown.
+    * Joker-Poker.                        198?, Bootleg in Coinmaster hardware.
+    * Jack Potten's Poker.                198?, Unknown.
 
 
 *******************************************************************************
@@ -33,51 +33,9 @@
     - All this driver was made using reverse engineering in the program roms.
 
 
-    Game Notes (goldnpkr):
+    Game Notes (goldnpkr & goldnpkb):
 
-    - Key 9 for Meters/Stats. To reset meters push CANCEL + SMALL buttons. HOLD5 to exit.
-    This is a timed function and after 30-40 seconds switch back to the game.
-    In goldnpkr you can switch between Permanent/Interim Meters.
-    In pmpoker you can see only Permanent Meters.
-
-    - Service (F2) for settings.
-    This is a timed function and after 30-40 seconds switch back to the game.
-    Press DOUBLE UP to change Double Up 7 settings between 'Even' and 'Lose'.
-    Press BET to adjust the maximum bet (20-200).
-    Press HOLD4 for Meter Over (5000-50000).
-    Press BIG to change Double Up settings (Normal-Hard).
-    Press TAKE SCORE to set Half Gamble (Yes/No).
-    Press SMALL to set win sound (Yes/No).
-    Press HOLD1 to set coinage 1.
-    Press HOLD2 to set coinage 2.
-    Press HOLD3 to set coinage 3.
-    Press HOLD5 to exit.
-
-
-    Buttons/Inputs:     goldnpkr    goldnpkr    pmpoker     jokerpkr    pottnpkr
-
-    - HOLD (5 buttons)  mapped      mapped      mapped      mapped      mapped
-    - CANCEL            mapped      mapped      mapped      mapped      mapped
-    - BIG               mapped      mapped      mapped      ---         ---
-    - SMALL             mapped      mapped      mapped      ---         ---
-    - DOUBLE UP         mapped      mapped      mapped      ---         ---
-    - TAKE SCORE        mapped      mapped      mapped      mapped      mapped
-    - DEAL/DRAW         mapped      mapped      mapped      mapped      mapped
-    - BET               mapped      mapped      mapped      mapped      mapped
-
-    - Coin 1 (coins)    not_mapped  not_mapped  mapped      mapped      mapped
-    - Coin 2 (notes)    coin1       coin1       coin1       coin1       coin1
-    - Coin 3 (coupons)  coin2       coin2       n/a         n/a         n/a
-    - Payout            mapped      mapped      mapped      mapped      mapped
-
-    - SETTINGS          mapped      mapped      mapped      mapped      mapped
-    - METERS            mapped      mapped      mapped      mapped      mapped
-
-    Inputs are different for some games. In goldnpkr, each button has only one function.
-    In pmpoker, some buttons have different functions.
-
-
-    "How to play"... (from "Golden Poker Double Up" instruction card):
+    **** "How to play"... (from "Golden Poker Double Up" instruction card) ****
 
     1st GAME
     - Insert coin / bank note.
@@ -95,16 +53,59 @@
     - Over 5,000 winnings will be storaged automatically.
 
 
+    ----- Learn Mode (settings) -----
+    Press LEARN (F2) to enter the learn mode for settings.
+    This is a timed function and after 30-40 seconds switch back to the game.
+
+    Press DOUBLE UP to change Double Up 7 settings between 'Even' and 'Lose'.
+    Press BET to adjust the maximum bet (20-200).
+    Press HOLD4 for Meter Over (5000-50000).
+    Press BIG to change Double Up settings (Normal-Hard).
+    Press TAKE SCORE to set Half Gamble (Yes/No).
+    Press SMALL to set win sound (Yes/No).
+    Press HOLD1 to set coinage 1.
+    Press HOLD2 to set coinage 2.
+    Press HOLD3 to set coinage 3.
+    Press HOLD5 to exit.
+
+    ----- Meters Mode -----
+    Press METER SW (9) to enter the Meters mode. You also can switch between interim
+    and permanent meters using METER SW (only for goldnpkr).
+    This is a timed function and after 30-40 seconds switch back to the game.
+
+    To reset meters push CANCEL + SMALL buttons. HOLD5 to exit.
+    In goldnpkr you can switch between Permanent/Interim Meters.
+    In goldnpkb & pmpoker you can see only Permanent Meters.
+
+    ----- Percentage Mode -----
+    Press Meter SW (9), then DEAL/DRAW, to enter the percentage mode.
+    Press HOLD4 to change the value following the table below (from manual). HOLD1 to exit.
+
+    Number    Overall scoring percentage in the LONG RUN
+    - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      0         about 85%
+      1         about 30%
+      2         about 40%
+      3         about 50%
+
+    ----- Test Mode -----
+    Press Meter SW (9), then DEAL/DRAW, then HOLD5 to enter the test mode.
+    After a RAM test, you can see an input test matrix. Press HOLD1+HOLD2+HOLD3 to exit
+    entering into a video grid test. Press HOLD5 to exit.
+
+
+*******************************************************************************
+
 
     Hardware Notes (pmpoker):
 
-    - CPU:      1x M6502.
-    - Video:    1x MC6845.
-    - RAM:      4x uPD2114LC
-    - I/O       2x 6821 PIAs.
-    - prg ROMs: 3x 2732 (32Kb) or similar.
-    - gfx ROMs: 4x 2716 (16Kb) or similar.
-    - sound:    DAC??
+    - CPU:            1x M6502.
+    - Video:          1x MC6845.
+    - RAM:            4x uPD2114LC
+    - I/O             2x 6821 PIAs.
+    - prg ROMs:       3x 2732 (32Kb) or similar.
+    - gfx ROMs:       4x 2716 (16Kb) or similar.
+    - sound:          (discrete).
     - battery backup: 2x S8423
 
 
@@ -144,7 +145,7 @@
     |      |_________|   |_________|             |_________|                    ____|
     |  ________________   _________   _________   _________                     ____|
     | |                | | 2114-LC | | 74LS08H | | TI (XX) | <-- socketed.      ____|
-    | |      2716      | |_________| |_________| |_________|       PROM?        ____|
+    | |      2716      | |_________| |_________| |_________|       PROM         ____|
     | |________________|              _________   _________                     ____|
     |  ________________              | 74LS04P | | 74LS174 |                    ____|
     | |                |             |_________| |_________|                    ____|
@@ -202,45 +203,77 @@
     Now all have sense.
 
 
+*******************************************************************************
+
+
     --------------------
     ***  Memory Map  ***
     --------------------
 
-    $0000 - $00FF   RAM     ; zero page (pointers and registers)
+    $0000 - $00FF   RAM     ; Zero Page (pointers and registers)
 
-                            ; $45 - $47 Coin settings.
-                            ; $50 - Input Port.
-                            ; $5C - Input Port.
-                            ; $5D - Input Port.
-                            ; $5E - Input Port.
-                            ; $5F - Input Port.
+                            ; $45 to $47 - Coin settings.
+                            ; $50 - Input port register.
+                            ; $5C - Input port register.
+                            ; $5D - Input port register.
+                            ; $5E - Input port register.
+                            ; $5F - Input port register.
 
     $0100 - $01FF   RAM     ; 6502 Stack Pointer.
 
     $0200 - $02FF   RAM     ; R/W. (settings)
-    $0300 - $03FF   RAM     ; R/W (mainly to $0383). still not totally understood. $0340 - $035f (settings).
+    $0300 - $03FF   RAM     ; R/W (mainly to $0383). $0340 - $035f (settings).
 
-    $0800 - $0801   MC6845  ; mc6845 use $0800 for register addressing and $0801 for register values.
+    $0800 - $0801   MC6845  ; MC6845 use $0800 for register addressing and $0801 for register values.
 
                             *** pmpoker mc6845 init at $65B9 ***
                             register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
-                            value:     0x27  0x20  0x22  0x02  0x1F  0x04  0x1D  0x1E  0x00  0x07  0x00  0x00  0x00  0x00  #$00  #$00  #$00  #$00.
+                            value:     0x27  0x20  0x22  0x02  0x1F  0x04  0x1D  0x1E  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
 
                             *** goldnpkr mc6845 init at $5E75 ***
                             register:   00    01    02    03    04    05    06    07    08    09    10    11    12    13    14    15    16    17
-                            value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1F  0x00  0x07  0x00  0x00  0x00  0x00  #$00  #$00  #$00  #$00.
+                            value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1D  0x1F  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
 
-    $0844 - $0847   PIA1    ; writes: 0xFF 0x04 0xFF 0x04.  initialized at $5000.
-    $0848 - $084b   PIA2    ; writes: 0xFF 0x04 0xFF 0x04.  initialized at $5000.
+    $0844 - $0847   PIA0    ; Muxed inputs and lamps. Initialized at $5000.
+    $0848 - $084b   PIA1    ; Sound writes and muxed inputs selector. Initialized at $5000.
 
-    $1000 - $13FF   Video RAM   ; initialized in subroutine starting at $5042.
-    $1800 - $1BFF   Color RAM   ; initialized in subroutine starting at $5042.
+    $1000 - $13FF   Video RAM   ; Initialized in subroutine starting at $5042.
+    $1800 - $1BFF   Color RAM   ; Initialized in subroutine starting at $5042.
 
     $5000 - $7FFF   ROM
-    $F000 - $FFFF   ROM     ; mirrored from $7000 - $7FFF for vectors/pointers purposes.
+    $F000 - $FFFF   ROM     ; Mirrored from $7000 - $7FFF for vectors/pointers purposes.
 
 
-    -------------------------------------------------------------------------
+*******************************************************************************
+
+
+    Buttons/Inputs   goldnpkr    goldnpkb    pmpoker     jokerpkr    pottnpkr
+    ----------------------------------------------------------------------------
+
+    HOLD (5 buttons)  mapped      mapped      mapped      mapped      mapped
+    CANCEL            mapped      mapped      mapped      mapped      mapped
+    BIG               mapped      mapped      mapped       ---         ---
+    SMALL             mapped      mapped      mapped       ---         ---
+    DOUBLE UP         mapped      mapped      mapped       ---         ---
+    TAKE SCORE        mapped      mapped      mapped      mapped      mapped
+    DEAL/DRAW         mapped      mapped      mapped      mapped      mapped
+    BET               mapped      mapped      mapped      mapped      mapped
+
+    Coin 1 (coins)    mapped      mapped      mapped      mapped      mapped
+    Coin 2 (notes)    mapped      mapped      mapped      mapped      mapped
+    Coin 3 (coupons)  mapped      mapped      mapped       ---         ---
+    Payout            mapped      mapped      mapped      mapped      mapped
+    Manual Collect    mapped      mapped      mapped      mapped      mapped
+
+    LEARN/SETTINGS    mapped      mapped      mapped      mapped      mapped
+    METERS            mapped      mapped      mapped      mapped      mapped
+
+
+    Inputs are different for some games. Normally each button has only one function.
+    In pmpoker some buttons have different functions.
+
+
+*******************************************************************************
 
 
     DRIVER UPDATES:
@@ -296,12 +329,27 @@
     - Updated technical notes.
 
 
+    [2007-05-05]
+
+    - Removed all inputs hacks.
+    - Connected both PIAs properly.
+    - Demuxed all inputs for each game.
+    - Documented all outputs.
+    - Added lamps support.
+    - Created different layout files to cover each game.
+    - Add NVRAM support to all games.
+    - Corrected the color PROM status for each set.
+    - Figured out most of the DIP switches.
+    - Added diplocations to goldnpkb.
+    - Replaced the remaining IPT_SERVICE with IPT_BUTTON for regular buttons.
+    - Updated technical notes.
+    - Cleaned up the driver. Now is better organized and documented.
+
+
     TODO:
 
-    - Check and complete connections for both PIAs.
-    - Battery backed RAM.
-    - Figure out the sound.
-    - Cleanup and split the driver.
+    - Figure out the discrete sound.
+    - Final cleanup and split the driver.
 
 
 *******************************************************************************/
@@ -312,6 +360,11 @@
 #include "driver.h"
 #include "video/crtc6845.h"
 #include "machine/6821pia.h"
+#include "sound/discrete.h"
+
+#include "pmpoker.lh"
+#include "goldnpkr.lh"
+#include "pottnpkr.lh"
 
 
 /*************************
@@ -386,7 +439,7 @@ PALETTE_INIT( pottnpkr )
 	/* 00000BGR */
 	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < Machine->drv->total_colors;i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -409,26 +462,15 @@ PALETTE_INIT( pottnpkr )
 
 
 /*************************
-* Memory map information *
+* Memory Map Information *
 *************************/
 
 static ADDRESS_MAP_START( pmpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x004f) AM_RAM    /* AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) */
-
-	AM_RANGE(0x0050, 0x0050) AM_READ(input_port_1_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005c, 0x005c) AM_READ(input_port_2_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005d, 0x005d) AM_READ(input_port_3_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005e, 0x005e) AM_READ(input_port_4_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005f, 0x005f) AM_READ(input_port_5_r)    /* while understand how to connect to PIAs */
-
-	AM_RANGE(0x0060, 0x07ff) AM_RAM    /* should be battery backed ram too */
-
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(crtc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
-
 	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
-
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_WRITE(pmpoker_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
@@ -436,22 +478,11 @@ static ADDRESS_MAP_START( pmpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jokerpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x004f) AM_RAM    /* AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) */
-
-	AM_RANGE(0x0050, 0x0050) AM_READ(input_port_1_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005c, 0x005c) AM_READ(input_port_2_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005d, 0x005d) AM_READ(input_port_3_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005e, 0x005e) AM_READ(input_port_4_r)    /* while understand how to connect to PIAs */
-	AM_RANGE(0x005f, 0x005f) AM_READ(input_port_5_r)    /* while understand how to connect to PIAs */
-
-	AM_RANGE(0x0060, 0x07ff) AM_RAM    /* should be battery backed ram too */
-
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(crtc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
-
 	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
-
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_WRITE(pmpoker_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
@@ -460,14 +491,24 @@ ADDRESS_MAP_END
 
 
 /*************************
-*      Input ports       *
+*      Input Ports       *
 *************************/
 
 INPUT_PORTS_START( pmpoker )
-
-	PORT_START_TAG("IN0")    /* PIA1 - timing issues */
+	/* Multiplexed - 4x5bits */
+	PORT_START_TAG("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Meters") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -475,57 +516,27 @@ INPUT_PORTS_START( pmpoker )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")    /* 0x50 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* should be coin1 (coin) */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* should be coin1 (coin) too */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1 / Take Score (Kasse)") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2 / Small (Tief)") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3 / Bet (Setze)") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4 / Big (Hoch)") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5 / Double Up (Dopp.)") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")    /* 0x5c */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Meters/Stats")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Note 1 In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Note 2 In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")    /* 0x5d */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN4")    /* 0x5e */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(3) PORT_NAME("Hold1 / Take Score (Kasse)") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_IMPULSE(3) PORT_NAME("Hold2 / Small (Tief)") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_IMPULSE(3) PORT_NAME("Hold3 / Bet (Setze)") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_IMPULSE(3) PORT_NAME("Hold4 / Big (Hoch)") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_BUTTON5 ) PORT_IMPULSE(3) PORT_NAME("Hold5 / Double Up (Dopp.)") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN5")    /* 0x5f */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )    /* service/settings mode */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* "notes in" */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)    /* notes */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("DSW0")    /* still not connected */
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -538,116 +549,97 @@ INPUT_PORTS_START( pmpoker )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Hohes Paar (Jacks or Better)" )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 INPUT_PORTS_START( goldnpkr )
-
-	PORT_START_TAG("IN0")    /* PIA1 - timing issues */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	/* Multiplexed - 4x5bits */
+	PORT_START_TAG("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Meters") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Double Up") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")    /* 0x50 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* PORT_NAME("Coins In"); need to check more closely */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Off (Payout)") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Take") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")    /* 0x5c */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1) PORT_NAME("Meters/Stats")    /* GP: Permanent/Interim Meters (timed) */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_IMPULSE(1) PORT_NAME("Double Up") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_IMPULSE(1) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_BUTTON6 ) PORT_IMPULSE(1) PORT_NAME("Cancel") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")    /* 0x5d */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_IMPULSE(1) PORT_NAME("Payout") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_IMPULSE(1) PORT_NAME("Take Score") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_IMPULSE(1) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_BUTTON10 ) PORT_IMPULSE(1) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("D-31") PORT_CODE(KEYCODE_E)	/* O.A.R? (D-31 in schematics) */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Weight (Coupon In)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")    /* 0x5e */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(1) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_IMPULSE(1) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_IMPULSE(1) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_IMPULSE(1) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_BUTTON5 ) PORT_IMPULSE(1) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN5")    /* 0x5f */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )    /* service/settings mode */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)    /* PORT_NAME("Notes In") */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_IMPULSE(1) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)    /* PORT_NAME("Coupons In") */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("DSW0")    /* still not connected */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_START_TAG("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:3")	/* listed in the manual as "Play Mode" */
+	PORT_DIPSETTING(    0x40, "Manual" )			/*  listed in the manual as "Out Play" */
+	PORT_DIPSETTING(    0x00, "Auto" )				/*  listed in the manual as "Credit Play" */
+	PORT_DIPNAME( 0x80, 0x00, "Royal Flush" )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( jokerpkr )
+	/* Multiplexed - 4x5bits */
+	PORT_START_TAG("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Meters") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN0")    /* PIA1 - timing issues */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Off (Payout)") PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -655,57 +647,27 @@ INPUT_PORTS_START( jokerpkr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")    /* 0x50 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* PORT_NAME("Coins In"); need to check more closely */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")    /* 0x5c */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1) PORT_NAME("Meters/Stats")    /* GP: Permanent/Interim Meters (timed) */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* Double Up button (unused) */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_IMPULSE(1) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_BUTTON6 ) PORT_IMPULSE(1) PORT_NAME("Cancel") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note in")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")    /* 0x5d */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_IMPULSE(1) PORT_NAME("Payout") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_IMPULSE(1) PORT_NAME("Take Score") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* Big button (unused) */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_UNKNOWN )    /* Small button (unused) */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN4")    /* 0x5e */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(1) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_IMPULSE(1) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_IMPULSE(1) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_IMPULSE(1) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,	IPT_BUTTON5 ) PORT_IMPULSE(1) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN5")    /* 0x5f */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )    /* service/settings mode */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )	PORT_IMPULSE(1)    /* PORT_NAME("Notes In") */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_IMPULSE(1) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)    /* PORT_NAME("Coupons In") */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("DSW0")    /* still not connected */
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -718,20 +680,89 @@ INPUT_PORTS_START( jokerpkr )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Royal Flush Value" )
+	PORT_DIPSETTING(    0x20, "250 by bet" )
+	PORT_DIPSETTING(    0x00, "500 by bet" )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
+
+INPUT_PORTS_START( pottnpkr )
+	/* Multiplexed - 4x5bits */
+	PORT_START_TAG("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Meters") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Off (Payout)") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note in")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Ace or Better" )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -773,16 +804,92 @@ static const gfx_decode gfxdecodeinfo[] =
 
 
 /***********************
+*     R/W Handlers     *
+**********************/
+
+static int mux_data = 0;
+
+/* Inputs (buttons) are multiplexed.
+   There are 4 sets of 5 bits each and are connected to PIA0, portA.
+   The selector bits are located in PIA1, portB (bits 4-7).
+*/
+static READ8_HANDLER( mux_port_r )
+{
+	switch( mux_data&0xf0 )	/* bits 4-7 */
+	{
+		case 0x10: return input_port_0_r(0);
+		case 0x20: return input_port_1_r(0);
+		case 0x40: return input_port_2_r(0);
+		case 0x80: return input_port_3_r(0);
+	}
+	return 0xff;
+}
+
+static WRITE8_HANDLER( mux_w )
+{
+	mux_data = data ^ 0xff;	/* inverted */
+}
+
+/***** Lamps wiring *****
+
+    -------------------
+    pmpoker
+    -------------------
+    L0 = Deal
+    L1 = Hold3
+    L2 = Hold1
+    L3 = Hold5
+    L4 = Hold2 & Hold4
+
+    -------------------
+    goldnpkr & goldnpkb
+    -------------------
+    L0 = Bet
+    L1 = Deal
+    L2 = Holds (all)
+    L3 = Double Up & Take
+    L4 = Big & Small
+
+    -------------------
+    pottnpkr & jokerpkr
+    -------------------
+    L0 = Bet
+    L1 = Deal
+    L2 = Holds (all)
+*/
+
+static WRITE8_HANDLER( lamps_a_w )
+{
+	output_set_lamp_value(0, 1-((data) & 1));		/* Lamp 0 */
+	output_set_lamp_value(1, 1-((data >> 1) & 1));	/* Lamp 1 */
+	output_set_lamp_value(2, 1-((data >> 2) & 1));	/* Lamp 2 */
+	output_set_lamp_value(3, 1-((data >> 3) & 1));	/* Lamp 3 */
+	output_set_lamp_value(4, 1-((data >> 4) & 1));	/* Lamp 4 */
+
+/*  bit 5 = Coin out
+    bit 6 = Coin counter
+    bit 7 = Note counter (only goldnpkr use it) */
+}
+
+static WRITE8_HANDLER( sound_w )
+{
+
+/* discrete sound is connected to PIA1, portA: bits 0-3 */
+
+}
+
+
+/***********************
 *    PIA Interfaces    *
 **********************/
 
- static const pia6821_interface pia0_intf =
+static const pia6821_interface pia0_intf =
 {
 	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	input_port_0_r, 0, 0, 0, 0, 0,
+	mux_port_r, 0, 0, 0, 0, 0,
 
 	/* PIA outputs: A, B, CA2, CB2 */
-	0, 0, 0, 0,
+	0, lamps_a_w, 0, 0,
 
 	/* PIA IRQs: A, B */
 	0, 0
@@ -791,10 +898,11 @@ static const gfx_decode gfxdecodeinfo[] =
 static const pia6821_interface pia1_intf =
 {
 	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	0, 0, 0, 0, 0, 0,
+	input_port_4_r, 0, 0, 0, 0, 0,
 
 	/* PIA outputs: A, B, CA2, CB2 */
-	0, 0, 0, 0,
+
+	sound_w, mux_w, 0, 0,
 
 	/* PIA IRQs: A, B */
 	0, 0
@@ -802,20 +910,20 @@ static const pia6821_interface pia1_intf =
 
 
 /*************************
-*     Machine Driver     *
+*    Machine Drivers     *
 *************************/
 
 static MACHINE_DRIVER_START( pmpoker )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/16)	// guessing...
+	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(pmpoker_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-//  MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -824,22 +932,19 @@ static MACHINE_DRIVER_START( pmpoker )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 
 	MDRV_GFXDECODE(gfxdecodeinfo)
+
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(pottnpkr)
 	MDRV_COLORTABLE_LENGTH(1024)
 
 	MDRV_VIDEO_START(pmpoker)
 	MDRV_VIDEO_UPDATE(pmpoker)
-
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jokerpkr )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(pmpoker)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(jokerpkr_map, 0)
-
 MACHINE_DRIVER_END
 
 
@@ -863,7 +968,7 @@ ROM_START( pmpoker )
 	ROM_LOAD( "1-3.bin",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )	// cards deck gfx, bitplane3.
 
 	ROM_REGION( 0x0100, REGION_PROMS, 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
 /*  the original goldnpkr u40_4a.bin rom is bit corrupted.
@@ -885,7 +990,7 @@ ROM_START( goldnpkr )
 	ROM_COPY( REGION_GFX1,	0x0800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
 
 	ROM_REGION( 0x0100, REGION_PROMS, 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 
 /*  pmpoker                 goldnpkr
     1-4.bin                 u38_5a (1st quarter)    96.582031%  \ 1st and 2nd halves are identical.
@@ -908,7 +1013,7 @@ ROM_START( goldnpkb )
 	ROM_COPY( REGION_GFX1,	0x0800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
 
 	ROM_REGION( 0x0100, REGION_PROMS, 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 
 /*  pmpoker                 goldnpkb
     1-4.bin                 u38.5a (1st quarter)    96.582031%  \ 1st and 2nd halves are identical.
@@ -917,7 +1022,7 @@ ROM_START( goldnpkb )
 */
 ROM_END
 
-ROM_START( jokerpkr )    /* is this a Coinmaster game? */
+ROM_START( jokerpkr )    /* a Coinmaster game?... seems to be a hack */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "vp-5.bin",	0x2000, 0x1000, CRC(1443d0ff) SHA1(36625d24d9a871cc8c03bdeda983982ba301b385) )
 	ROM_LOAD( "vp-6.bin",	0x3000, 0x1000, CRC(94f82fc1) SHA1(ce95fc429f5389eea45fec877bac992fa7ba2b3c) )
@@ -932,7 +1037,7 @@ ROM_START( jokerpkr )    /* is this a Coinmaster game? */
 	ROM_LOAD( "vp-3.bin",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
 	ROM_REGION( 0x0100, REGION_PROMS, 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
 /* the alternative Jack Potten set is identical, but with different sized roms.
@@ -973,13 +1078,6 @@ ROM_END
 
 static DRIVER_INIT( pmpoker )
 {
-/* temporary patch to avoid hardware input errors */
-/*  UINT8 *ROM = memory_region(REGION_CPU1);
-
-    ROM[0x2dae] = 0x4c;
-    ROM[0x2daf] = 0xae;
-    ROM[0x2db0] = 0x2d;
-*/
 	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
 	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
 }
@@ -989,10 +1087,10 @@ static DRIVER_INIT( pmpoker )
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME        PARENT      MACHINE     INPUT       INIT        ROT     COMPANY                     FULLNAME                            FLAGS        */
-GAME( 1981,	pmpoker,	0,			pmpoker,	pmpoker,	pmpoker,	ROT0,	"PlayMan?",					"PlayMan Poker (Germany)",			GAME_NO_SOUND )
-GAME( 1981,	goldnpkr,	pmpoker,	pmpoker,	goldnpkr,	pmpoker,	ROT0,	"Bonanza Enterprises, Ltd",	"Golden Poker Double Up (Big Boy)",	GAME_NO_SOUND )
-GAME( 1981,	goldnpkb,	pmpoker,	pmpoker,	goldnpkr,	pmpoker,	ROT0,	"Bonanza Enterprises, Ltd",	"Golden Poker Double Up (Mini Boy)",GAME_NO_SOUND )
-GAME( 1981,	jokerpkr,	pmpoker,	jokerpkr,	jokerpkr,	pmpoker,	ROT0,	"Coinmaster-Gaming, Ltd",	"Joker Poker",						GAME_NO_SOUND )
-GAME( 1981,	pottnpkr,	pmpoker,	jokerpkr,	goldnpkr,	pmpoker,	ROT0,	"Unknown",					"Jack Potten's Poker",				GAME_NO_SOUND )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                           FULLNAME                            FLAGS          LAYOUT         */
+GAMEL( 1981, pmpoker,  0,        pmpoker,  pmpoker,  pmpoker,  ROT0,   "PlayMan",                        "PlayMan Poker (Germany)",           GAME_NO_SOUND ,layout_pmpoker )
+GAMEL( 1981, goldnpkr, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza Enterprises, Ltd",       "Golden Poker Double Up (Big Boy)",  GAME_NO_SOUND ,layout_goldnpkr )
+GAMEL( 1981, goldnpkb, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza Enterprises, Ltd",       "Golden Poker Double Up (Mini Boy)", GAME_NO_SOUND ,layout_goldnpkr )
+GAMEL( 198?, jokerpkr, pmpoker,  jokerpkr, jokerpkr, pmpoker,  ROT0,   "Bootleg in Coinmaster hardware", "Joker-Poker",                       GAME_NO_SOUND ,layout_pottnpkr )
+GAMEL( 198?, pottnpkr, pmpoker,  jokerpkr, pottnpkr, pmpoker,  ROT0,   "Unknown",                        "Jack Potten's Poker",               GAME_NO_SOUND ,layout_pottnpkr )
 

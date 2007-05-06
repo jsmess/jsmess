@@ -34,6 +34,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
 
 /* in machine/mexico86.c */
@@ -376,7 +377,7 @@ static MACHINE_DRIVER_START( mexico86 )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000/2) /* xtal is 4MHz (????) I think it's divided by 2 internally */
+	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000/M68705_CLOCK_DIVIDER) /* xtal is 4MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 	MDRV_CPU_VBLANK_INT(mexico86_m68705_interrupt,2)
 

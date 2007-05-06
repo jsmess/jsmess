@@ -10,203 +10,242 @@ Video hardware driver by Uki
 
 #include "driver.h"
 
-UINT8 *raiders5_fgram;
-size_t raiders5_fgram_size;
 
-static UINT8 raiders5_xscroll,raiders5_yscroll;
-static UINT8 flipscreen;
+UINT8 *raiders5_foreground_videoram;
+UINT8 *raiders5_foreground_colorram;
+UINT8 *raiders5_background_videoram;
+UINT8 *raiders5_background_colorram;
+UINT8 *raiders5_spriteram;
+size_t raiders5_spriteram_size;
 
+
+static UINT8 raiders5_scroll_x;
+static UINT8 raiders5_scroll_y;
+static UINT8 raiders5_flip_screen;
+
+static tilemap *background_tilemap;
+static tilemap *foreground_tilemap;
+
+
+
+/*************************************
+ *
+ *  Callbacks for the TileMap code
+ *
+ *************************************/
+
+static void get_background_tile_info(int tile_index)
+{
+	UINT8 bank = ((raiders5_background_colorram[tile_index] >> 1) & 0x01) + 3;  /* ? */
+
+	UINT16 code = raiders5_background_videoram[tile_index] |
+				((raiders5_background_colorram[tile_index] & 0x01) << 8);
+
+	UINT8 color = raiders5_background_colorram[tile_index] >> 4;
+
+	SET_TILE_INFO(bank, code, color, 0)
+}
+
+
+static void get_foreground_tile_info(int tile_index)
+{
+	UINT16 code = raiders5_foreground_videoram[tile_index];
+
+	UINT8 color = raiders5_foreground_colorram[tile_index] >> 4;
+
+	SET_TILE_INFO(2, code, color, 0)
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+VIDEO_START( raiders5 )
+{
+	background_tilemap = tilemap_create(get_background_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
+	foreground_tilemap = tilemap_create(get_foreground_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
+
+	tilemap_set_scrolldx(background_tilemap, 7, 0);
+
+	tilemap_set_transparent_pen(foreground_tilemap, 0);
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 WRITE8_HANDLER( raiders5_scroll_x_w )
 {
-	raiders5_xscroll = data;
+	raiders5_scroll_x = data;
 }
+
+
 WRITE8_HANDLER( raiders5_scroll_y_w )
 {
-	raiders5_yscroll = data;
+	raiders5_scroll_y = data;
 }
 
-WRITE8_HANDLER( raiders5_flipscreen_w )
+
+WRITE8_HANDLER( raiders5_flip_screen_w )
 {
-	flipscreen = data & 0x01;
+	raiders5_flip_screen = data & 0x01;
+
+	tilemap_set_flip(ALL_TILEMAPS, (raiders5_flip_screen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0));
 }
 
-READ8_HANDLER( raiders5_fgram_r )
+
+WRITE8_HANDLER( raiders5_foreground_videoram_w )
 {
-	return raiders5_fgram[offset];
-}
-WRITE8_HANDLER( raiders5_fgram_w )
-{
-	raiders5_fgram[offset] = data;
+	if (raiders5_foreground_videoram[offset] != data)
+	{
+		raiders5_foreground_videoram[offset] = data;
+
+		tilemap_mark_tile_dirty(foreground_tilemap, offset);
+	}
 }
 
-WRITE8_HANDLER( raiders5_videoram_w )
-{
-	int y = (offset + ((raiders5_yscroll & 0xf8) << 2) ) & 0x3e0;
-	int x = (offset + (raiders5_xscroll >> 3) ) & 0x1f;
-	int offs = x+y+(offset & 0x400);
 
-	videoram[offs] = data;
-}
-READ8_HANDLER( raiders5_videoram_r )
+WRITE8_HANDLER( raiders5_foreground_colorram_w )
 {
-	int y = (offset + ((raiders5_yscroll & 0xf8) << 2) ) & 0x3e0;
-	int x = (offset + (raiders5_xscroll >> 3) ) & 0x1f;
-	int offs = x+y+(offset & 0x400);
+	if (raiders5_foreground_colorram[offset] != data)
+	{
+		raiders5_foreground_colorram[offset] = data;
 
-	return videoram[offs];
+		tilemap_mark_tile_dirty(foreground_tilemap, offset);
+	}
 }
+
+
+WRITE8_HANDLER( raiders5_background_videoram_w )
+{
+	offs_t y = (offset + ((raiders5_scroll_y & 0xf8) << 2)) & 0x3e0;
+	offs_t x = (offset + (raiders5_scroll_x >> 3)) & 0x1f;
+
+	if (raiders5_background_videoram[y | x] != data)
+	{
+		raiders5_background_videoram[y | x] = data;
+
+		tilemap_mark_tile_dirty(background_tilemap, y | x);
+	}
+}
+
+
+READ8_HANDLER( raiders5_background_videoram_r )
+{
+	offs_t y = (offset + ((raiders5_scroll_y & 0xf8) << 2)) & 0x3e0;
+	offs_t x = (offset + (raiders5_scroll_x >> 3)) & 0x1f;
+
+	return raiders5_background_videoram[y | x];
+}
+
+
+WRITE8_HANDLER( raiders5_background_colorram_w )
+{
+	offs_t y = (offset + ((raiders5_scroll_y & 0xf8) << 2)) & 0x3e0;
+	offs_t x = (offset + (raiders5_scroll_x >> 3)) & 0x1f;
+
+	if (raiders5_background_colorram[y | x] != data)
+	{
+		raiders5_background_colorram[y | x] = data;
+
+		tilemap_mark_tile_dirty(background_tilemap, y | x);
+	}
+}
+
+
+READ8_HANDLER( raiders5_background_colorram_r )
+{
+	offs_t y = (offset + ((raiders5_scroll_y & 0xf8) << 2)) & 0x3e0;
+	offs_t x = (offset + (raiders5_scroll_x >> 3)) & 0x1f;
+
+	return raiders5_background_colorram[y | x];
+}
+
 
 WRITE8_HANDLER( raiders5_paletteram_w )
 {
-	int i;
+	paletteram_BBGGRRII_w(offset, data);
 
-	paletteram_BBGGRRII_w(offset,data);
-
-	if (offset > 15)
-		return;
-
-	if (offset != 1)
+	if (offset < 0x10)
 	{
-		for (i=0; i<16; i++)
+		if (offset != 1)
 		{
-			paletteram_BBGGRRII_w(0x200+offset+i*16,data);
+			int i;
+
+			for (i = 0; i < 0x10; i++)
+			{
+				paletteram_BBGGRRII_w(offset + (i * 0x10) + 0x0200, data);
+			}
 		}
+
+		paletteram_BBGGRRII_w((offset * 0x10) + 0x0201, data);
 	}
-	paletteram_BBGGRRII_w(0x200+offset*16+1,data);
 }
 
-/****************************************************************************/
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	offs_t offs;
+
+	for (offs = 0; offs < raiders5_spriteram_size; offs += 32)
+	{
+		UINT8 bank = (raiders5_spriteram[offs + 3] >> 1) & 0x01;
+
+		UINT8 code = ((raiders5_spriteram[offs + 3] << 6) & 0x40) | (raiders5_spriteram[offs + 0] >> 2);
+
+		UINT8 color = raiders5_spriteram[offs + 3] >> 4;
+
+		int flip_y = ((raiders5_spriteram[offs + 0] >> 1) & 0x01) ^ raiders5_flip_screen;
+		int flip_x = ((raiders5_spriteram[offs + 0] >> 0) & 0x01) ^ raiders5_flip_screen;
+
+		UINT8 y = raiders5_spriteram[offs + 2];
+		UINT8 x = raiders5_spriteram[offs + 1];
+
+		if (raiders5_flip_screen)
+		{
+			y = 240 - y;
+			x = 240 - x;
+		}
+
+		drawgfx(bitmap,machine->gfx[bank],
+				code, color, flip_x, flip_y,
+				x, y, cliprect, TRANSPARENCY_PEN, 0);
+
+		/* draw it wrapped around */
+		drawgfx(bitmap,machine->gfx[bank],
+				code, color, flip_x, flip_y,
+				x - 0x100, y, cliprect, TRANSPARENCY_PEN, 0);
+	}
+}
+
 
 VIDEO_UPDATE( raiders5 )
 {
-	int offs;
-	int chr,col;
-	int x,y,px,py,fx,fy,sx,sy;
-	int b1,b2;
+	tilemap_set_scrolly(background_tilemap, 0, raiders5_scroll_y);
+	tilemap_set_scrollx(background_tilemap, 0, raiders5_scroll_x);
 
-	int size = videoram_size/2;
+	tilemap_draw(bitmap, cliprect, background_tilemap, 0, 0);
 
-/* draw BG layer */
+	draw_sprites(machine, bitmap, cliprect);
 
-	for (y=0; y<32; y++)
-	{
-		for (x=0; x<32; x++)
-		{
-			offs = y*0x20 + x;
+	tilemap_draw(bitmap, cliprect, foreground_tilemap, 0, 0);
 
-			if (flipscreen!=0)
-				offs = (size-1)-offs;
-
-			px = x*8;
-			py = y*8;
-
-			chr = videoram[ offs ] ;
-			col = videoram[ offs + size];
-
-			b1 = (col >> 1) & 1; /* ? */
-			b2 = col & 1;
-
-			col = (col >> 4) & 0x0f;
-			chr = chr | b2*0x100;
-
-			drawgfx(tmpbitmap,machine->gfx[b1+3],
-				chr,
-				col,
-				flipscreen,flipscreen,
-				px,py,
-				0,TRANSPARENCY_NONE,0);
-		}
-	}
-
-	if (flipscreen == 0)
-	{
-		sx = -raiders5_xscroll+7;
-		sy = -raiders5_yscroll;
-	}
-	else
-	{
-		sx = raiders5_xscroll;
-		sy = raiders5_yscroll;
-	}
-
-	copyscrollbitmap(bitmap,tmpbitmap,1,&sx,1,&sy,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-
-/* draw sprites */
-
-	for (offs=0; offs<spriteram_size; offs +=32)
-	{
-		chr = spriteram[offs];
-		col = spriteram[offs+3];
-
-		b1 = (col >> 1) & 1;
-		b2 = col & 0x01;
-
-		fx = ((chr >> 0) & 1) ^ flipscreen;
-		fy = ((chr >> 1) & 1) ^ flipscreen;
-
-		x = spriteram[offs+1];
-		y = spriteram[offs+2];
-
-		col = (col >> 4) & 0x0f ;
-		chr = (chr >> 2) | b2*0x40;
-
-		if (flipscreen==0)
-		{
-			px = x;
-			py = y;
-		}
-		else
-		{
-			px = 240-x;
-			py = 240-y;
-		}
-
-		drawgfx(bitmap,machine->gfx[b1],
-			chr,
-			col,
-			fx,fy,
-			px,py,
-			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-
-		if (px>0xf0)
-			drawgfx(bitmap,machine->gfx[b1],
-				chr,
-				col,
-				fx,fy,
-				px-0x100,py,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-	}
-
-
-/* draw FG layer */
-
-	for (y=4; y<28; y++)
-	{
-		for (x=0; x<32; x++)
-		{
-			offs = y*32+x;
-			chr = raiders5_fgram[offs];
-			col = raiders5_fgram[offs + 0x400] >> 4;
-
-			if (flipscreen==0)
-			{
-				px = 8*x;
-				py = 8*y;
-			}
-			else
-			{
-				px = 248-8*x;
-				py = 248-8*y;
-			}
-
-			drawgfx(bitmap,machine->gfx[2],
-				chr,
-				col,
-				flipscreen,flipscreen,
-				px,py,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
-		}
-	}
 	return 0;
 }

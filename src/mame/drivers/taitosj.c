@@ -165,6 +165,7 @@ TODO:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -1963,7 +1964,7 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
-	MDRV_CPU_ADD(M68705,3000000/4)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD(M68705,3000000/M68705_CLOCK_DIVIDER)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 MACHINE_DRIVER_END
 
@@ -1974,7 +1975,7 @@ static MACHINE_DRIVER_START( kikstart )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(kikstart_readmem,kikstart_writemem)
 
-	MDRV_CPU_ADD(M68705,3000000/4)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD(M68705,3000000/M68705_CLOCK_DIVIDER)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 MACHINE_DRIVER_END
 

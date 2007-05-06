@@ -10,6 +10,7 @@ Tomasz Slanina
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 
 static unsigned char portA_in,portA_out,ddrA;
@@ -1136,7 +1137,7 @@ static MACHINE_DRIVER_START( changela )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(chl_interrupt,4)
 
-	MDRV_CPU_ADD(M68705,2000000)
+	MDRV_CPU_ADD(M68705,2000000/M68705_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

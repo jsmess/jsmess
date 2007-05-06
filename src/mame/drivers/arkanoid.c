@@ -465,6 +465,7 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
 #include "driver.h"
 #include "arkanoid.h"
 #include "sound/ay8910.h"
+#include "cpu/m6805/m6805.h"
 
 int arkanoid_bootleg_id;
 
@@ -768,7 +769,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 3000000/6) /* 3 Mhz */
+	MDRV_CPU_ADD_TAG("mcu", M68705, 3000000/M68705_CLOCK_DIVIDER) /* 3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

@@ -14,8 +14,8 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "includes/atari.h"
 #include "cpu/m6805/m6805.h"
+#include "includes/atari.h"
 #include "sound/speaker.h"
 #include "sound/pokey.h"
 #include "machine/6821pia.h"
@@ -454,7 +454,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_CPU_VBLANK_INT(a800xl_interrupt, TOTAL_LINES_60HZ)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
 
-	MDRV_CPU_ADD(M68705, 3579545)
+	MDRV_CPU_ADD(M68705, 3579545/M68705_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem,0)
 	MDRV_CPU_PERIODIC_INT( supervisor_board_check_coin_input, 10 )
 

@@ -26,111 +26,76 @@ Notes:
 #include "driver.h"
 #include "sound/ay8910.h"
 
+
+extern UINT8 *raiders5_foreground_videoram;
+extern UINT8 *raiders5_foreground_colorram;
+extern UINT8 *raiders5_background_videoram;
+extern UINT8 *raiders5_background_colorram;
+extern UINT8 *raiders5_spriteram;
+extern size_t raiders5_spriteram_size;
+extern UINT8 *raiders5_paletteram;
+
+VIDEO_START( raiders5 );
 VIDEO_UPDATE( raiders5 );
-
-extern UINT8 *raiders5_fgram;
-extern size_t raiders5_fgram_size;
-
-static UINT8 *raiders5_shared_workram;
-
 
 WRITE8_HANDLER( raiders5_scroll_x_w );
 WRITE8_HANDLER( raiders5_scroll_y_w );
-WRITE8_HANDLER( raiders5_flipscreen_w );
+WRITE8_HANDLER( raiders5_flip_screen_w );
 
-READ8_HANDLER( raiders5_videoram_r );
-WRITE8_HANDLER( raiders5_videoram_w );
-READ8_HANDLER( raiders5_fgram_r );
-WRITE8_HANDLER( raiders5_fgram_w );
+WRITE8_HANDLER( raiders5_background_videoram_w );
+READ8_HANDLER( raiders5_background_videoram_r );
+WRITE8_HANDLER( raiders5_background_colorram_w );
+READ8_HANDLER( raiders5_background_colorram_r );
+WRITE8_HANDLER( raiders5_foreground_videoram_w );
+WRITE8_HANDLER( raiders5_foreground_colorram_w );
 
 WRITE8_HANDLER( raiders5_paletteram_w );
 
-WRITE8_HANDLER( raiders5_shared_workram_w )
-{
-	raiders5_shared_workram[offset] = data;
-}
 
-READ8_HANDLER( raiders5_shared_workram_r )
-{
-	return raiders5_shared_workram[offset];
-}
 
-/****************************************************************************/
-
-static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-
-	AM_RANGE(0x8000, 0x87ff) AM_READ(spriteram_r)
-	AM_RANGE(0x8800, 0x8fff) AM_READ(raiders5_fgram_r)
-	AM_RANGE(0x9000, 0x97ff) AM_READ(raiders5_videoram_r)
-
-	AM_RANGE(0xc001, 0xc001) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xc003, 0xc003) AM_READ(AY8910_read_port_1_r)
-
-	AM_RANGE(0xd000, 0xd1ff) AM_READ(paletteram_r)
-
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(raiders5_fgram_w) AM_BASE(&raiders5_fgram) AM_SIZE(&raiders5_fgram_size)
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(raiders5_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-
+static ADDRESS_MAP_START( raiders5_map_1, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&raiders5_spriteram) AM_SIZE(&raiders5_spriteram_size)
+	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(MRA8_RAM, raiders5_foreground_videoram_w) AM_BASE(&raiders5_foreground_videoram)
+	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(MRA8_RAM, raiders5_foreground_colorram_w) AM_BASE(&raiders5_foreground_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(raiders5_background_videoram_r, raiders5_background_videoram_w) AM_BASE(&raiders5_background_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(raiders5_background_colorram_r, raiders5_background_colorram_w) AM_BASE(&raiders5_background_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(raiders5_scroll_x_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(raiders5_scroll_y_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(raiders5_flipscreen_w)
-
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(raiders5_flip_screen_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(AY8910_write_port_1_w)
-
-	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(raiders5_paletteram_w) AM_BASE(&paletteram)
-
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&raiders5_shared_workram)
+	AM_RANGE(0xc003, 0xc003) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
+	AM_RANGE(0xd000, 0xd1ff) AM_READWRITE(MRA8_RAM, raiders5_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport1, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(MRA8_NOP) /* watchdog? */
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-
-	AM_RANGE(0x8001, 0x8001) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x8003, 0x8003) AM_READ(AY8910_read_port_1_r)
-
+static ADDRESS_MAP_START( raiders5_map_2, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0x8002, 0x8002) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x8003, 0x8003) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ(MRA8_NOP) /* unknown */
-
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(raiders5_shared_workram_r)
-
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xc000, 0xc000) AM_READ(MRA8_NOP) /* unknown */
 	AM_RANGE(0xc800, 0xc800) AM_READ(MRA8_NOP) /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READ(MRA8_NOP) /* unknown */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(AY8910_write_port_1_w)
-
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(raiders5_shared_workram_w)
-
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(raiders5_scroll_x_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(raiders5_scroll_y_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(raiders5_flipscreen_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(raiders5_flip_screen_w)
 ADDRESS_MAP_END
 
-/****************************************************************************/
 
-INPUT_PORTS_START( raiders5 )
+static ADDRESS_MAP_START( raiders5_io_map_1, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(MRA8_NOP) /* watchdog? */
+ADDRESS_MAP_END
+
+
+
+static INPUT_PORTS_START( raiders5 )
 	PORT_START
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -204,13 +169,13 @@ INPUT_PORTS_START( raiders5 )
 
 INPUT_PORTS_END
 
-/****************************************************************************/
+
 
 static const gfx_layout charlayout =
 {
-	8,8,   /* 8*8 characters */
-	512,   /* 512 characters */
-	4,     /* 4 bits per pixel */
+	8,8,
+	512,
+	4,
 	{0,1,2,3},
 	{0,4,8192*8+0,8192*8+4,8,12,8192*8+8,8192*8+12},
 	{16*0, 16*1, 16*2, 16*3, 16*4, 16*5, 16*6, 16*7},
@@ -219,9 +184,9 @@ static const gfx_layout charlayout =
 
 static const gfx_layout spritelayout =
 {
-	16,16,    /* 16*16 characters */
-	128,	  /* 128 sprites */
-	4,        /* 4 bits per pixel */
+	16, 16,
+	128,
+	4,
 	{0,1,2,3},
 	{0,4,8192*8+0,8192*8+4,8,12,8192*8+8,8192*8+12,
 	16*8+0,16*8+4,16*8+8192*8+0,16*8+8192*8+4,16*8+8,16*8+12,16*8+8192*8+8,16*8+8192*8+12},
@@ -241,7 +206,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 } /* end of array */
 };
 
-/****************************************************************************/
+
 
 static struct AY8910interface ay8910_interface_1 =
 {
@@ -255,32 +220,35 @@ static struct AY8910interface ay8910_interface_2 =
 	input_port_3_r
 };
 
+
+
 static MACHINE_DRIVER_START( raiders5 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,12000000/4)	/* 3.0MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem1,writemem1)
-	MDRV_CPU_IO_MAP(readport1,0)
+	MDRV_CPU_PROGRAM_MAP(raiders5_map_1,0)
+	MDRV_CPU_IO_MAP(raiders5_io_map_1,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80,12000000/4)	/* 3.0MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
+	MDRV_CPU_PROGRAM_MAP(raiders5_map_2,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(400)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_PALETTE_LENGTH(768)
+	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_VIDEO_START(raiders5)
+	MDRV_VIDEO_UPDATE(raiders5)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(768)
-
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(raiders5)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -294,7 +262,6 @@ static MACHINE_DRIVER_START( raiders5 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
-/****************************************************************************/
 
 
 ROM_START( raiders5 )
@@ -324,6 +291,7 @@ ROM_START( raidrs5t )
 	ROM_LOAD( "raiders4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
 	ROM_LOAD( "raiders5.11n", 0x8000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
+
 
 
 GAME( 1985, raiders5, 0,        raiders5, raiders5, 0, ROT0, "UPL", "Raiders5", 0 )
