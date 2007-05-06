@@ -7,6 +7,7 @@
   Original code                               Carsten Sorensen   1998
   Mess modifications, bug fixes and speedups  Hans de Goede      1998
   Bug fixes, SGB and GBC code                 Anthony Kruize     2002
+  Improvements to match real hardware         Wilbert Pol        2006,2007
 
 ***************************************************************************/
 
@@ -74,11 +75,12 @@ struct gb_lcd_struct {
 
 	/* Things used to render current line */
 	int	current_line;		/* Current line */
-	int	sprCount;		/* Number of sprites on current line */
-	int	sprite[10];		/* References to sprites to draw on current line */
+	int	sprCount;			/* Number of sprites on current line */
+	int	sprite[10];			/* References to sprites to draw on current line */
 	int	previous_line;		/* Previous line we've drawn in */
-	int	start_x;		/* Pixel to start drawing from (inclusive) */
-	int	end_x;			/* Pixel to end drawing (exclusive) */
+	int	start_x;			/* Pixel to start drawing from (inclusive) */
+	int	end_x;				/* Pixel to end drawing (exclusive) */
+	int lcd_int_state;		/* Keep track of LCD_INT state */
 	struct layer_struct	layer[2];
 	mame_timer	*lcd_timer;
 	mame_timer	*vblank_delay_timer;
@@ -1059,6 +1061,32 @@ static void gb_vblank_delay_proc( int dummy ) {
 	cpunum_set_input_line(0, VBL_INT, HOLD_LINE);
 }
 
+/* Check whether an LCD_INT interrupt should be triggered */
+static void gb_lcd_int_check( void ) {
+	int	lcd_int_state = 0;
+
+	/* Check if stat 0 should trigger an interrupt */
+	if ( LCDSTAT & 0x08 && ( LCDSTAT & 0x03 ) == 0x00 ) {
+		lcd_int_state = 1;
+	}
+
+	/* Check if stat 2 should trigger an interrupt */
+	if ( LCDSTAT & 0x20 && ( LCDSTAT & 0x03 ) == 0x02 ) {
+		lcd_int_state = 1;
+	}
+
+	/* Check if stat 1 should trigger an interrupt */
+	if ( LCDSTAT & 0x10 && ( LCDSTAT & 0x03 ) == 0x01 ) {
+		lcd_int_state = 1;
+	}
+
+	if ( gb_lcd.lcd_int_state == 0 && lcd_int_state == 1 ) {
+		cpunum_set_input_line( 0, LCD_INT, HOLD_LINE );
+	}
+
+	gb_lcd.lcd_int_state = lcd_int_state;
+}
+
 static void gb_lcd_timer_proc( int mode ) {
 	if ( LCDCONT & 0x80 ) {
 		switch( mode ) {
@@ -1073,16 +1101,14 @@ static void gb_lcd_timer_proc( int mode ) {
 			/* Set Mode 0 lcdstate */
 			LCDSTAT &= 0xFC;
 			/* Generate lcd interrupt if requested */
-			if( LCDSTAT & 0x08 ) {
-				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
-			}
+			gb_lcd_int_check();
 			/* Check for HBLANK DMA */
 			if( gbc_hdma_enabled )
 				gbc_hdma(0x10);
 			if ( CURLINE == 143 ) {
-				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(204,0), 1, time_never );
+				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(204 - 10 * gb_lcd.sprCount,0), 1, time_never );
 			} else {
-				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(204,0), 2, time_never );
+				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(204 - 10 * gb_lcd.sprCount,0), 2, time_never );
 			}
 			break;
 		case 2:		/* Switch to mode 2 */
@@ -1091,9 +1117,7 @@ static void gb_lcd_timer_proc( int mode ) {
 			/* Set Mode 2 lcdstate */
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x02;
 			/* Generate lcd interrupt if requested */
-			if (LCDSTAT & 0x20) {
-				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
-			}
+			gb_lcd_int_check();
 			/* Mode 2 last for approximately 80 clock cycles */
 			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(80,0), 3, time_never );
 			break;
@@ -1101,22 +1125,20 @@ static void gb_lcd_timer_proc( int mode ) {
 			gb_select_sprites();
 			/* Set Mode 3 lcdstate */
 			LCDSTAT = (LCDSTAT & 0xFC) | 0x03;
+			gb_lcd_int_check();
 			/* Mode 3 lasts for approximately 172+#sprites*10 clock cycles */
-			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(172,0), 0, time_never );
+			mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(172 + 10 * gb_lcd.sprCount,0), 0, time_never );
 			gb_lcd.start_x = 0;
 			break;
 		case 1:		/* Switch to or stay in mode 1 */
 			gb_increment_scanline();
 			if ( CURLINE == 144 ) {
 				/* Trigger VBlank interrupt generation */
-//				cpunum_set_input_line(0, VBL_INT, HOLD_LINE);
 				mame_timer_adjust( gb_lcd.vblank_delay_timer, MAME_TIME_IN_CYCLES(1,0), 0, time_never );
 				/* Set VBlank lcdstate */
 				LCDSTAT = (LCDSTAT & 0xFC) | 0x01;
 				/* Trigger LCD interrupt if requested */
-				if( LCDSTAT & 0x10 ) {
-					cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
-				}
+				gb_lcd_int_check();
 			}
 			if ( gb_lcd.current_line == 153 ) {
 				mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(24,0), 4, time_never );
@@ -1142,6 +1164,7 @@ static void gb_lcd_switch_on( void ) {
 	gb_lcd.current_line = 0;
 	gb_lcd.previous_line = 153;
 	gb_lcd.window_lines_drawn = 0;
+	gb_lcd.lcd_int_state = 0;
 	/* Check for LY=LYC coincidence */
 	if ( CURLINE == CMPLINE ) {
 		LCDSTAT |= 0x04;
