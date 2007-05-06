@@ -18,7 +18,7 @@ Machine driver:
 
     Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
       - everything
-      
+
     Dirk Best <duke@redump.de>, May 2004
       - clean up
       - fixed mode 1 display (graphic mode)
@@ -29,7 +29,7 @@ Machine driver:
       - 64K bank switched memory implemented
       - better printer emulation
       - cartridge support
-      
+
 Thanks go to:
 
     - Guy Thomason
@@ -40,8 +40,8 @@ Thanks go to:
 
 Todo:
 
-	- Lightpen
-	- RS232 serial
+    - Lightpen
+    - RS232 serial
 
 ****************************************************************************/
 
@@ -88,7 +88,7 @@ static void common_init_machine(int base)
 	/* internal ram */
 	memory_configure_bank(1, 0, 1, mess_ram, 0);
 	memory_set_bank(1, 0);
-	
+
 	/* expansion memory configuration */
 	switch (mess_ram_size) {
 		case 18 * 1024:
@@ -99,11 +99,11 @@ static void common_init_machine(int base)
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, base, base + 0x3fff, 0, 0, MWA8_BANK2);
 			memory_configure_bank(2, 0, 1, mess_ram + base - 0x7800, 0);
 			memory_set_bank(2, 0);
-			
+
 			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, base + 0x4000, 0xffff, 0, 0, MRA8_NOP);
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, base + 0x4000, 0xffff, 0, 0, MWA8_NOP);
 			break;
-			
+
 		case 66 * 1024:
 		case 4098 * 1024:
 			/* 64KB/4MB memory expansion */
@@ -113,14 +113,14 @@ static void common_init_machine(int base)
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MWA8_BANK2);
 			memory_configure_bank(2, 0, 1, mess_ram + 0x800, 0);
 			memory_set_bank(2, 0);
-			
+
 			/* install the others, dynamically banked in */
 			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MRA8_BANK3);
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MWA8_BANK3);
 			memory_configure_bank(3, 0, (mess_ram_size - 0x4800) / 0x4000, mess_ram + 0x4800, 0x4000);
 			memory_set_bank(3, 0);
 			break;
-			
+
 		default:
 			/* no memory expansion */
 			memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, base, 0xffff, 0, 0, MRA8_NOP);
@@ -150,7 +150,7 @@ MACHINE_START(laser310)
 
 /******************************************************************************
  Memory Bank Handling
- 
+
  TODO: What happens when an invalid bank is selected?
        Currently, we just ignore it and keep the current bank.
 ******************************************************************************/
@@ -158,7 +158,7 @@ MACHINE_START(laser310)
 WRITE8_HANDLER (vtech1_memory_bank_w)
 {
 	logerror("vtech1_memory_bank_w $%02X\n", data);
-	
+
 	if (data >= 1)
 		if ((data <= 3 && (mess_ram_size == (66 * 1024))) || (mess_ram_size == (4098 * 1024)))
 			memory_set_bank(3, data - 1);
@@ -183,10 +183,10 @@ SNAPSHOT_LOAD(vtech1)
 {
 	UINT8 header[24];
 	UINT16 start, end;
-	
+
 	/* get the header */
 	image_fread(image, &header, sizeof(header));
-	
+
 	/* get start and end addresses */
 	start = pick_integer_le(header, 22, 2);
 	end = start + snapshot_size - sizeof(header);
@@ -197,32 +197,32 @@ SNAPSHOT_LOAD(vtech1)
 
 	/* write it to ram */
 	image_fread(image, &mess_ram[start - 0x7800], end - start);
-	
+
 	/* patch variables depending on snapshot type */
 	switch (header[21])
 	{
 	case VZ_BASIC:
 		program_write_byte_8(0x78a4, start % 256); /* start of basic program */
-		program_write_byte_8(0x78a5, start / 256);	
+		program_write_byte_8(0x78a5, start / 256);
 		program_write_byte_8(0x78f9, end % 256); /* end of basic program */
 		program_write_byte_8(0x78fa, end / 256);
 		program_write_byte_8(0x78fb, end % 256); /* start variable table */
 		program_write_byte_8(0x78fc, end / 256);
 		program_write_byte_8(0x78fd, end % 256); /* start free mem, end variable table */
-		program_write_byte_8(0x78fe, end / 256);	
-		break;	
-	
+		program_write_byte_8(0x78fe, end / 256);
+		break;
+
 	case VZ_MCODE:
 		program_write_byte_8(0x788e, start % 256); /* usr subroutine address */
-		program_write_byte_8(0x788e, start / 256);
+		program_write_byte_8(0x788f, start / 256);
 		break;
-	
+
 	default:
 		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
 		return INIT_FAIL;
-		break;	
+		break;
 	}
-	
+
 	return INIT_PASS;
 }
 
@@ -245,7 +245,7 @@ int vtech1_floppy_id(int id)
     mame_file *file;
     UINT8 buff[32];
 
-	file = image_fopen(IO_FLOPPY, id, FILETYPE_IMAGE, OSD_FOPEN_READ);
+    file = image_fopen(IO_FLOPPY, id, FILETYPE_IMAGE, OSD_FOPEN_READ);
     if (file)
     {
         mame_fread(file, buff, sizeof(buff));
@@ -374,7 +374,7 @@ WRITE8_HANDLER(vtech1_fdc_w)
             {
 				if (vtech1_track_x2[vtech1_drive] > 0)
 					vtech1_track_x2[vtech1_drive]--;
-				if (LOG_VTECH1_FDC)	
+				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, vtech1_drive, vtech1_track_x2[vtech1_drive]/2,5*(vtech1_track_x2[vtech1_drive]&1));
 				if ((vtech1_track_x2[vtech1_drive] & 1) == 0)
 					vtech1_get_track();
@@ -452,7 +452,7 @@ WRITE8_HANDLER(vtech1_fdc_w)
 READ8_HANDLER(vtech1_lightpen_r)
 {
 	logerror("vtech1_lightpen_r(%d)\n", offset);
-	return 0xff;	
+	return 0xff;
 }
 
 READ8_HANDLER(vtech1_joystick_r)
@@ -484,7 +484,7 @@ READ8_HANDLER(vtech1_keyboard_r)
 		if (!(offset & (1 << row)))
 			data &= readinputportbytag(portname);
 	}
-	
+
 	if (video_screen_get_vblank(0))
         data &= ~0x80;
 
@@ -502,8 +502,8 @@ READ8_HANDLER(vtech1_keyboard_r)
 
 /*************************************************
  * bit  function
- * 7	not assigned
- * 6	not assigned
+ * 7    not assigned
+ * 6    not assigned
  * 5    speaker B
  * 4    VDC background 0 green, 1 orange
  * 3    VDC display mode 0 text, 1 graphics
@@ -515,7 +515,7 @@ WRITE8_HANDLER(vtech1_latch_w)
 {
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
-	
+
 	/* cassette data bits toggle? */
 	if ((vtech1_latch ^ data ) & 0x06)
 	{
@@ -536,7 +536,7 @@ WRITE8_HANDLER(vtech1_latch_w)
 ******************************************************************************/
 
 /*
-The VZ200/300 printer interface uses I/O port address OE Hex for the ASCII 
+The VZ200/300 printer interface uses I/O port address OE Hex for the ASCII
 character code data and strobe output, and address OOH for the busy/ready-bar
 status input (bit 0).
 */
@@ -544,17 +544,17 @@ status input (bit 0).
 READ8_HANDLER(vtech1_printer_r)
 {
 	int data = 0xff;
-	
+
 	if (printer_status(image_from_devtype_and_index(IO_PRINTER, 0), 0))
 		data &= ~0x01;
-		
+
 	return data;
 }
 
 WRITE8_HANDLER(vtech1_printer_w)
 {
 	static int prn_data;
-	
+
 	switch (offset) {
 		case 0x0d:	/* strobe data to printer */
 			printer_output(image_from_devtype_and_index(IO_PRINTER, 0), prn_data);
