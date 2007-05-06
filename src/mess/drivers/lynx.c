@@ -282,13 +282,6 @@ ROM_START(lynx)
 	ROM_REGION(0x100000, REGION_USER1, 0)
 ROM_END
 
-ROM_START(lynxa)
-	ROM_REGION(0x200,REGION_CPU1, 0)
-	ROM_LOAD("lynxa.bin", 0, 0x200, CRC(0d973c9d) SHA1(e4ed47fae31693e016b081c6bda48da5b70d7ccb))
-	ROM_REGION(0x100,REGION_GFX1, 0)
-	ROM_REGION(0x100000, REGION_USER1, 0)
-ROM_END
-
 ROM_START(lynx2)
 	ROM_REGION(0x200,REGION_CPU1, 0)
 	ROM_LOAD("lynx2.bin", 0, 0x200, NO_DUMP)
@@ -448,7 +441,6 @@ SYSTEM_CONFIG_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT	MACHINE	INPUT	INIT	CONFIG	MONITOR	COMPANY   FULLNAME */
-CONS( 1989, lynx,	  0, 		0,		lynx,	lynx,	0,		lynx,	"Atari",  "Lynx", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
-CONS( 1989, lynxa,	  lynx, 	0,		lynx,	lynx,	0,		lynx,	"Atari",  "Lynx (alternate rom save!)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
-CONS( 1991, lynx2,	  lynx, 	0,		lynx2,	lynx,	0,		lynx,	"Atari",  "Lynx II", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+/*     YEAR  NAME     PARENT	BIOS	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY   FULLNAME */
+CONSB( 1989, lynx,	  0, 		lynx,	0,		lynx,	lynx,	0,		lynx,	"Atari",  "Lynx", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
+CONS ( 1991, lynx2,	  lynx, 			0,		lynx2,	lynx,	0,		lynx,	"Atari",  "Lynx II", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND)
