@@ -87,9 +87,12 @@ struct gb_lcd_struct {
 } gb_lcd;
 
 void (*update_scanline)(void);
+
+/* Prototypes */
 static void gb_lcd_timer_proc( int dummy );
 static void gb_vblank_delay_proc( int dummy );
 static void gb_lcd_switch_on( void );
+static void gb_lcd_int_check( void );
 
 INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 {
@@ -1044,12 +1047,11 @@ void gb_increment_scanline( void ) {
 		CURLINE = gb_lcd.current_line;
 		if ( CURLINE == CMPLINE ) {
 			LCDSTAT |= 0x04;
-			/* Generate lcd interrupt if requested */
-			if ( LCDSTAT & 0x40 )
-				cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
 		} else {
 			LCDSTAT &= 0xFB;
 		}
+		/* Generate lcd interrupt if requested */
+		gb_lcd_int_check();
 	}
 	if ( gb_lcd.current_line == 0 ) {
 		gb_lcd.window_lines_drawn = 0;
@@ -1077,6 +1079,11 @@ static void gb_lcd_int_check( void ) {
 
 	/* Check if stat 1 should trigger an interrupt */
 	if ( LCDSTAT & 0x10 && ( LCDSTAT & 0x03 ) == 0x01 ) {
+		lcd_int_state = 1;
+	}
+
+	/* Check if LY==LYC should trigger an interrupt */
+	if ( LCDSTAT & 0x40 && LCDSTAT & 0x04 ) {
 		lcd_int_state = 1;
 	}
 
@@ -1169,9 +1176,7 @@ static void gb_lcd_switch_on( void ) {
 	if ( CURLINE == CMPLINE ) {
 		LCDSTAT |= 0x04;
 		/* Generate lcd interrupt if requested */
-		if ( LCDSTAT & 0x40 ) {
-			cpunum_set_input_line(0, LCD_INT, HOLD_LINE);
-		}
+		gb_lcd_int_check();
 	}
 	mame_timer_adjust( gb_lcd.lcd_timer, MAME_TIME_IN_CYCLES(80,0), 3, time_never );
 }
@@ -1231,6 +1236,15 @@ WRITE8_HANDLER ( gb_video_w ) {
 		break;
 	case 0x04:						/* LY - LCD Y-coordinate */
 		return;
+	case 0x05:						/* LYC */
+		if ( CURLINE == data ) {
+			LCDSTAT |= 0x04;
+		} else {
+			LCDSTAT &= 0xFB;
+		}
+		/* Generate lcd interrupt if requested */
+		gb_lcd_int_check();
+		break;
 	case 0x06:						/* DMA - DMA Transfer and Start Address */
 		{
 			UINT8 *P = gb_oam;
@@ -1263,7 +1277,6 @@ WRITE8_HANDLER ( gb_video_w ) {
 	case 0x02:						/* SCY - Scroll Y */
 	case 0x03:						/* SCX - Scroll X */
 		update_scanline();
-	case 0x05:						/* LYC - LCD Y-compare */
 	case 0x0A:						/* WY - Window Y position */
 	case 0x0B:						/* WX - Window X position */
 		break;
