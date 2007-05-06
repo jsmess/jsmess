@@ -2531,8 +2531,7 @@ static file_error LoadSettingsFile(core_options *opts, const char *filename)
 static file_error SaveSettingsFile(core_options *opts, const char *filename)
 {
 	core_file *file;
-	file_error filerr = FILERR_NONE;
-	TCHAR *t_filename;
+	file_error filerr;
 
 	if (opts != NULL)
 	{
@@ -2545,9 +2544,7 @@ static file_error SaveSettingsFile(core_options *opts, const char *filename)
 	}
 	else
 	{
-		t_filename = tstring_from_utf8(filename);
-		DeleteFile(t_filename);
-		free(t_filename);
+		filerr = osd_rmfile(filename);
 	}
 
 	return filerr;
@@ -2686,7 +2683,7 @@ BOOL GetFolderUsesDefaults(int folder_index, int driver_index)
 	core_options *opts;
 	int redirect_index;
 
-	if( DriverIsVector(driver_index) )
+	if (DriverIsVector(driver_index) && (folder_index != FOLDER_VECTOR))
 		opts = GetVectorOptions();
 	else
 		opts = global;
