@@ -50,7 +50,6 @@ extern void win_timer_enable(int enabled);
 //	PARAMETERS
 //============================================================
 
-#define FRAMESKIP_LEVELS			12
 #define ID_FRAMESKIP_0				10000
 #define ID_DEVICE_0					11000
 #define ID_JOYSTICK_0				12000
@@ -1174,7 +1173,30 @@ static void setup_joystick_menu(HMENU menu_bar)
 //	is_windowed
 //============================================================
 
-static int is_windowed(void)	{ return video_config.windowed; }
+static int is_windowed(void)
+{
+	return video_config.windowed;
+}
+
+
+
+//============================================================
+//	frameskip_level_count
+//============================================================
+
+static int frameskip_level_count(void)
+{
+	static int count = -1;
+
+	if (count < 0)
+	{
+		int frameskip_min = 0;
+		int frameskip_max = 10;
+		options_get_range_int(mame_options(), OPTION_FRAMESKIP, &frameskip_min, &frameskip_max);
+		count = frameskip_max + 1;
+	}
+	return count;
+}
 
 
 
@@ -1269,7 +1291,7 @@ static void prepare_menus(HWND wnd)
 	set_command_state(menu_bar, ID_VIDEO_ROTATE_270,		(orientation == ROT270)						? MFS_CHECKED : MFS_ENABLED);
 
 	set_command_state(menu_bar, ID_FRAMESKIP_AUTO,			(frameskip < 0)								? MFS_CHECKED : MFS_ENABLED);
-	for (i = 0; i < FRAMESKIP_LEVELS; i++)
+	for (i = 0; i < frameskip_level_count(); i++)
 		set_command_state(menu_bar, ID_FRAMESKIP_0 + i,		(frameskip == i)							? MFS_CHECKED : MFS_ENABLED);
 
 	// if we are using categorized input, we need to properly checkmark the categories
@@ -1752,7 +1774,7 @@ static int invoke_command(HWND wnd, UINT command)
 			while(Machine->input_ports[port_count].type != IPT_END)
 				port_count++;
 
-			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + FRAMESKIP_LEVELS))
+			if ((command >= ID_FRAMESKIP_0) && (command < ID_FRAMESKIP_0 + frameskip_level_count()))
 			{
 				// change frameskip
 				video_set_frameskip(command - ID_FRAMESKIP_0);
@@ -1898,7 +1920,7 @@ int win_setup_menus(HMODULE module, HMENU menu_bar)
 	frameskip_menu = find_sub_menu(menu_bar, "&Options\0&Frameskip\0", FALSE);
 	if (!frameskip_menu)
 		return 1;
-	for(i = 0; i < FRAMESKIP_LEVELS; i++)
+	for(i = 0; i < frameskip_level_count(); i++)
 	{
 		snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%i", i);
 		append_menu_utf8(frameskip_menu, MF_STRING, ID_FRAMESKIP_0 + i, buf);

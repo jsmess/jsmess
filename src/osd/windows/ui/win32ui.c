@@ -846,6 +846,7 @@ static DWORD RunMAME(int nGameIndex)
 #endif // MESS
 
 	// load MAME options
+	CopyOptions(mame_options(), Mame32Global());
 	CopyOptions(mame_options(), pOpts);
 
 	// prepare MAME32 to run the game
