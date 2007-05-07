@@ -1,13 +1,61 @@
 /*
 
-Mustang 9016 Telespiel Computer
-1978
+RCA Studio II
 
 PCB Layout
+----------
+
+1809746-S1-E
+
+|----------------------------------------------------------------------------------------------------------|
+|                                  |----------------------------|                                          |
+|                                  |----------------------------|                          CA555   7805    |
+|      SPKR                                     CN1                                                        |
+|                                                                                                          |
+|						                                                                    |-----------|  |
+|                                                                                           | Output    |  |
+|   ROM.4  ROM.3  ROM.2  ROM.1  CDP1822  CDP1822  CDP1822  CDP1822                          |TV Module  |  |
+|                                                                                           |           |  |
+|                                                                 CDP1802  TA10171V1        |           |  |
+|                                                                                           |           |  |
+|                                                                                           |           |  |
+|                                                                                           |           |  |
+|                                                                                           |-----------|  |
+|                                                                                                          |
+|                       CD4042  CD4001  CD4515                                                             |
+|                                                                                                          |
+|      CN2                                                                                       CN3       |
+|----------------------------------------------------------------------------------------------------------|
+
+Notes:
+      All IC's shown.
+
+      CDP1802 - RCA CDP1802CE Microprocessor
+      TA10171V1 - RCA TA10171V1 NTSC Video Display Controller (VDC) (= RCA CDP1861)
+      CDP1822 - RCA CDP1822NCE 256 x4 RAM (= Mitsubishi M58721P)
+      ROM.x   - RCA CDP1831CE 512 x8 MASKROM. All ROMs are marked 'PROGRAM COPYRIGHT (C) RCA CORP. 1977'
+	  CD4001  - 4001 Quad 2-Input NOR Buffered B Series Gate (4000-series CMOS TTL logic IC)
+	  CD4042  - 4042 Quad Clocked D Latch (4000-series CMOS TTL logic IC)
+      CD4515  - 4515 4-Bit Latched/4-to-16 Line Decoders (4000-series CMOS TTL logic IC)
+	  CA555   - CA555CG General Purpose Single Bipolar Timer (= NE555)
+      7805    - Voltage regulator, input 10V-35V, output +5V
+	  SPKR    - Loudspeaker, 8 ohms, 0.3 W
+	  CN1     - ROM cartridge connector, 2x22 pins, 0.154" spacing
+	  CN2     - Player A keypad connector, 1x12 pins
+	  CN3     - Player B keypad connector, 1x12 pins
+*/
+
+/*
+
+Mustang 9016 Telespiel Computer
+
+PCB Layout
+----------
+
 |----------------------------------------------------------------------------------------------------------|
 |7805                              |----------------------------|                          CD4069  MC14001 |
 |                                  |----------------------------|                                          |
-|                                         (ROM cart slot)                                                  |
+|                                               CN1                                                        |
 |                                                                                                          |
 |       ROM.IC13  ROM.IC14      CDP1822  CDP1822 CDP1822 CDP1822                            |-----------|  |
 |                                                                                           | Output    |  |
@@ -23,17 +71,21 @@ PCB Layout
 |                                                                                                          |
 |                                                                                                          |
 |----------------------------------------------------------------------------------------------------------|
+
 Notes:
-      CDP1802 - RCA CDP1802 Microprocessor
-      CDP1864 - RCA CDP1864 PAL Video Display Controller (VDC)
-      CDP1822 - RCA CDP1822 256 x4 RAM (= Mitsubishi M58721P)
+      All IC's shown.
+
+      CDP1802 - RCA CDP1802CE Microprocessor
+      CDP1864 - RCA CDP1864CE PAL Video Display Controller (VDC)
+      CDP1822 - RCA CDP1822NCE 256 x4 RAM (= Mitsubishi M58721P)
       ROM.ICx - RCA CDP1833 1k x8 MASKROM. All ROMs are marked 'PROGRAM COPYRIGHT (C) RCA CORP. 1978'
       CD4019  - 4019 Quad AND-OR Select Gate (4000-series CMOS TTL logic IC)
-      CDP1858 - Latch/Decoder - 4-bit
+      CDP1858 - RCA CDP1858E Latch/Decoder - 4-bit
       CD4081  - 4081 Quad 2-Input AND Buffered B Series Gate (4000-series CMOS TTL logic IC)
       CD4069  - 4069 Hex Buffer, Inverter (4000-series CMOS TTL logic IC)
       CD4515  - 4515 4-Bit Latched/4-to-16 Line Decoders (4000-series CMOS TTL logic IC)
       7805    - Voltage regulator, input 10V-35V, output +5V
+	  CN1     - ROM cartridge connector, 2x22 pins, 0.154" spacing
 */
 
 /*
@@ -42,7 +94,7 @@ Notes:
 
 	- cdp1864 video colors
 	- discrete sound
-	- redump studio2 bios as 2 separate roms
+	- redump studio2 bios as 4 separate roms
 
 */
 
@@ -264,7 +316,11 @@ MACHINE_DRIVER_END
 
 ROM_START( studio2 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "studio2.rom", 0x0000, 0x0800, BAD_DUMP CRC(a494b339) SHA1(f2650dacc9daab06b9fdf0e7748e977b2907010c) ) // should be 2 roms
+	ROM_LOAD( "84932", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "84933", 0x0200, 0x0200, NO_DUMP )
+	ROM_LOAD( "85456", 0x0400, 0x0200, NO_DUMP )
+	ROM_LOAD( "85457", 0x0600, 0x0200, NO_DUMP )
+	ROM_LOAD( "studio2.rom", 0x0000, 0x0800, BAD_DUMP CRC(a494b339) SHA1(f2650dacc9daab06b9fdf0e7748e977b2907010c) )
 ROM_END
 
 ROM_START( m9016tc )
