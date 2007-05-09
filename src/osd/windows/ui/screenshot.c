@@ -180,26 +180,80 @@ void FreeScreenShot(void)
 static const zip_file_header *zip_file_seek_file(zip_file *zip, const char *filename)
 {
 	const zip_file_header *header;
+	char *new_filename;
+	int i;
 
+	// we need to change filename; allocate a copy
+	new_filename = malloc(strlen(filename) + 1);
+	if (!new_filename)
+		return NULL;
+	
+	// change all backslashes to forward slashes
+	for (i = 0; filename[i]; i++)
+		new_filename[i] = (filename[i] != '\\') ? filename[i] : '/';
+	new_filename[i] = '\0';
+
+	// find the entry
 	header = zip_file_first_file(zip);
-	while(header && strcmp(header->filename, filename))
+	while(header && mame_stricmp(header->filename, new_filename))
 	{
 		header = zip_file_next_file(zip);
 	}
+
+	free(new_filename);
 	return header;
 }
 
-BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
+static file_error OpenDIBFile(const char *dir_name, const char *zip_name, const char *filename,
+	core_file **file, void **buffer)
 {
 	file_error filerr;
 	zip_error ziperr;
-	core_file *file = NULL;
 	zip_file *zip;
 	const zip_file_header *zip_header;
 	char *fname;
+
+	// clear out result
+	*file = NULL;
+
+	// look for the raw file
+	fname = assemble_3_strings(dir_name, PATH_SEPARATOR, filename);
+	filerr = core_fopen(fname, OPEN_FLAG_READ, file);
+	free(fname);
+
+	// did the raw file not exist?
+	if (filerr != FILERR_NONE)
+	{
+		// look into zip file
+		fname = assemble_4_strings(dir_name, PATH_SEPARATOR, zip_name, ".zip");
+		ziperr = zip_file_open(fname, &zip);
+		free(fname);
+		if (ziperr == ZIPERR_NONE)
+		{
+			zip_header = zip_file_seek_file(zip, filename);
+			if (zip_header != NULL)
+			{
+				*buffer = malloc(zip_header->uncompressed_length);
+				ziperr = zip_file_decompress(zip, *buffer, zip_header->uncompressed_length);
+				if (ziperr == ZIPERR_NONE)
+				{
+					filerr = core_fopen_ram(*buffer, zip_header->uncompressed_length, OPEN_FLAG_READ, file);
+				}
+			}
+			zip_file_close(zip);
+		}
+	}
+	return filerr;
+}
+
+BOOL LoadDIB(const char *filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
+{
+	file_error filerr;
+	core_file *file = NULL;
 	BOOL success = FALSE;
 	const char *dir_name;
 	const char *zip_name;
+	char *fname;
 	void *buffer = NULL;
 
 	switch (pic_type)
@@ -236,34 +290,16 @@ BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 			// in case a non-image tab gets here, which can happen
 			return FALSE;
 	}
-	
-	// look for the raw file
-	fname = assemble_4_strings(dir_name, PATH_SEPARATOR, filename, ".png");
-	filerr = core_fopen(fname, OPEN_FLAG_READ, &file);
+
+	fname = assemble_2_strings(filename, ".png");
+	filerr = OpenDIBFile(dir_name, zip_name, fname, &file, &buffer);
 	free(fname);
 
 	if (filerr != FILERR_NONE)
 	{
-		// look into zip file
-		fname = assemble_2_strings(zip_name, ".zip");
-		ziperr = zip_file_open(fname, &zip);
+		fname = assemble_3_strings(filename, PATH_SEPARATOR, "0000.png");
+		filerr = OpenDIBFile(dir_name, zip_name, fname, &file, &buffer);
 		free(fname);
-		if (ziperr == ZIPERR_NONE)
-		{
-			fname = assemble_2_strings(filename, ".png");
-			zip_header = zip_file_seek_file(zip, fname);
-			free(fname);
-
-			if (zip_header != NULL)
-			{
-				buffer = malloc(zip_header->uncompressed_length);
-				ziperr = zip_file_decompress(zip, buffer, zip_header->uncompressed_length);
-				if (ziperr == ZIPERR_NONE)
-				{
-					filerr = core_fopen_ram(buffer, zip_header->uncompressed_length, OPEN_FLAG_READ, &file);
-				}
-			}
-		}
 	}
 
 	if (filerr == FILERR_NONE)
@@ -272,7 +308,8 @@ BOOL LoadDIB(LPCTSTR filename, HGLOBAL *phDIB, HPALETTE *pPal, int pic_type)
 		core_fclose(file);
 	}
 
-	if (buffer)
+	// free the buffer if we have to
+	if (buffer != NULL)
 		free(buffer);
 
 	return success;

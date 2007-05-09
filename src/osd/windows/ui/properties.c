@@ -1094,10 +1094,14 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			case IDC_USE_DEFAULT:
 				if (g_nGame != GLOBAL_OPTIONS)
 				{
+					// NPW 20-Apr-2007 - I hate this code.  WTF were people thinking!  This
+					// code has more spaghetti than the entire nation of Italy
 					if( g_nGame != FOLDER_OPTIONS )
 					{
 						SetGameUsesDefaults(g_nGame,TRUE);
-						g_bUseDefaults = TRUE;
+
+						SaveGameOptions(g_nGame);
+						pGameOpts = GetGameOptions(g_nGame, -1);
 					}
 					else
 					{
@@ -1109,16 +1113,14 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						// every other folder
 						else
 							options_copy(pGameOpts, GetDefaultOptions(GLOBAL_OPTIONS, FALSE));
-						g_bUseDefaults = TRUE;
-					}
 
-					// NPW 20-Apr-2007 - I hate this code.  WTF were people thinking!  This
-					// code has more spaghetti than the entire nation of Italy
-					SaveGameOptions(g_nGame);
-					pGameOpts = GetGameOptions(g_nGame, -1);
+						SaveFolderOptions(g_nFolder, g_nFolderGame);
+						pGameOpts = GetFolderOptions(g_nFolder, (g_nFolder == FOLDER_VECTOR));
+					}
 					datamap_populate_all_controls(properties_datamap, hDlg, pGameOpts);
 					OptionsToProp(hDlg, pGameOpts);
 					SetPropEnabledControls(hDlg);
+					g_bUseDefaults = TRUE;
 
 					if (orig_uses_defaults != g_bUseDefaults)
 					{
