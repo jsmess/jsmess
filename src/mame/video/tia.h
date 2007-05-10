@@ -8,3 +8,4 @@ READ8_HANDLER( tia_r );
 WRITE8_HANDLER( tia_w );
 
 void tia_init(void);
+void tia_init_pal(void);

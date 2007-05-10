@@ -17,11 +17,15 @@ static int horzP1;
 static int horzM0;
 static int horzM1;
 static int horzBL;
+static int startP0;
+static int startP1;
 
 static int current_bitmap;
 
 static int prev_x;
 static int prev_y;
+static UINT8 prev_lineP0[160];
+static UINT8 prev_lineP1[160];
 
 static UINT8 VSYNC;
 static UINT8 VBLANK;
@@ -66,6 +70,10 @@ static UINT8 INPT5;
 static UINT8 prevGRP0;
 static UINT8 prevGRP1;
 static UINT8 prevENABL;
+
+static int HMOVE_started;
+static UINT8 HMM0_latch;
+static UINT8 HMM1_latch;
 
 static mame_bitmap *helper[2];
 
@@ -219,7 +227,7 @@ VIDEO_UPDATE( tia )
 }
 
 
-static void draw_sprite_helper(UINT8* p, int horz,
+static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, int start,
 	UINT8 GRP, UINT8 NUSIZ, UINT8 COLUP, UINT8 REFP)
 {
 	int num = nusiz[NUSIZ & 7][0];
@@ -242,25 +250,49 @@ static void draw_sprite_helper(UINT8* p, int horz,
 
 	for (i = 0; i < num; i++)
 	{
-		for (j = 0; j < 8; j++)
+		if (i > 0 || start)
 		{
-			for (k = 0; k < siz; k++)
+			for (j = 0; j < 8; j++)
 			{
-				if (GRP & (0x80 >> j))
+				for (k = 0; k < siz; k++)
 				{
-					p[horz % 160] = COLUP >> 1;
-				}
+					if (GRP & (0x80 >> j))
+					{
+						p[horz % 160] = COLUP >> 1;
+						col[horz % 160] = COLUP >> 1;
+					}
 
-				horz++;
+					horz++;
+				}
+			}
+		} else {
+			/* copy data over from previous draw action */
+			for (j = 0; j < 8; j++)
+			{
+				for (k = 0; k < siz; k++)
+				{
+					if ( prevcol[horz % 160] != 0xFF )
+					{
+						p[horz % 160] = prevcol[horz % 160];
+						col[horz % 160] = prevcol[horz % 160];
+					}
+					horz++;
+				}
 			}
 		}
 
 		horz += 8 * skp;
 	}
+	if ( ! start ) {
+		for (i = 0; i < 160; i++)
+		{
+			prevcol[i] = col[i];
+		}
+	}
 }
 
 
-static void draw_missile_helper(UINT8* p, int horz,
+static void draw_missile_helper(UINT8* p, UINT8* col, int horz, int latch,
 	UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM)
 {
 	int num = nusiz[NUSIZ & 7][0];
@@ -277,7 +309,26 @@ static void draw_missile_helper(UINT8* p, int horz,
 		{
 			if ((ENAM & 2) && !(RESMP & 2))
 			{
-				p[horz % 160] = COLUM >> 1;
+				if ( latch ) {
+					switch ( horz % 4 ) {
+					case 1:
+						if ( horz < 156 ) {
+							p[(horz + 4) % 160] = COLUM >> 1;
+							col[(horz + 4) % 160] = COLUM >> 1;
+						}
+						p[horz % 160] = COLUM >> 1;
+						col[horz % 160] = COLUM >> 1;
+						break;
+					case 2:
+					case 3:
+						p[horz % 160] = COLUM >> 1;
+						col[horz % 160] = COLUM >> 1;
+						break;
+					}
+				} else {
+					p[horz % 160] = COLUM >> 1;
+					col[horz % 160] = COLUM >> 1;
+				}
 			}
 
 			horz++;
@@ -288,7 +339,7 @@ static void draw_missile_helper(UINT8* p, int horz,
 }
 
 
-static void draw_playfield_helper(UINT8* p, int horz,
+static void draw_playfield_helper(UINT8* p, UINT8* col, int horz,
 	UINT8 COLU, UINT8 REFPF)
 {
 	UINT32 PF =
@@ -325,6 +376,7 @@ static void draw_playfield_helper(UINT8* p, int horz,
 			if (PF & (0x80000 >> i))
 			{
 				p[horz] = COLU >> 1;
+				col[horz] = COLU >> 1;
 			}
 
 			horz++;
@@ -333,7 +385,7 @@ static void draw_playfield_helper(UINT8* p, int horz,
 }
 
 
-static void draw_ball_helper(UINT8* p, int horz, UINT8 ENAB)
+static void draw_ball_helper(UINT8* p, UINT8* col, int horz, UINT8 ENAB)
 {
 	int width = 1 << ((CTRLPF >> 4) & 3);
 
@@ -344,6 +396,7 @@ static void draw_ball_helper(UINT8* p, int horz, UINT8 ENAB)
 		if (ENAB & 2)
 		{
 			p[horz % 160] = COLUPF >> 1;
+			col[horz % 160] = COLUPF >> 1;
 		}
 
 		horz++;
@@ -351,44 +404,44 @@ static void draw_ball_helper(UINT8* p, int horz, UINT8 ENAB)
 }
 
 
-static void drawS0(UINT8* p)
+static void drawS0(UINT8* p, UINT8* col)
 {
-	draw_sprite_helper(p, horzP0,
+	draw_sprite_helper(p, col, prev_lineP0, horzP0, startP0,
 		(VDELP0 & 1) ? prevGRP0 : GRP0, NUSIZ0, COLUP0, REFP0);
 }
 
 
-static void drawS1(UINT8* p)
+static void drawS1(UINT8* p, UINT8* col)
 {
-	draw_sprite_helper(p, horzP1,
+	draw_sprite_helper(p, col, prev_lineP1, horzP1, startP1,
 		(VDELP1 & 1) ? prevGRP1 : GRP1, NUSIZ1, COLUP1, REFP1);
 }
 
 
-static void drawM0(UINT8* p)
+static void drawM0(UINT8* p, UINT8* col)
 {
-	draw_missile_helper(p, horzM0, RESMP0, ENAM0, NUSIZ0, COLUP0);
+	draw_missile_helper(p, col, horzM0, HMM0_latch, RESMP0, ENAM0, NUSIZ0, COLUP0);
 }
 
 
-static void drawM1(UINT8* p)
+static void drawM1(UINT8* p, UINT8* col)
 {
-	draw_missile_helper(p, horzM1, RESMP1, ENAM1, NUSIZ1, COLUP1);
+	draw_missile_helper(p, col, horzM1, HMM1_latch, RESMP1, ENAM1, NUSIZ1, COLUP1);
 }
 
 
-static void drawBL(UINT8* p)
+static void drawBL(UINT8* p, UINT8* col)
 {
-	draw_ball_helper(p, horzBL, (VDELBL & 1) ? prevENABL : ENABL);
+	draw_ball_helper(p, col, horzBL, (VDELBL & 1) ? prevENABL : ENABL);
 }
 
 
-static void drawPF(UINT8* p)
+static void drawPF(UINT8* p, UINT8 *col)
 {
-	draw_playfield_helper(p, 0,
+	draw_playfield_helper(p, col, 0,
 		(CTRLPF & 2) ? COLUP0 : COLUPF, 0);
 
-	draw_playfield_helper(p, 80,
+	draw_playfield_helper(p, col, 80,
 		(CTRLPF & 2) ? COLUP1 : COLUPF, CTRLPF & 1);
 }
 
@@ -453,32 +506,25 @@ static void update_bitmap(int next_x, int next_y)
 	}
 	else
 	{
-		drawPF(linePF);
-		drawS0(lineP0);
-		drawS1(lineP1);
-		drawM0(lineM0);
-		drawM1(lineM1);
-		drawBL(lineBL);
-
 		memset(temp, COLUBK >> 1, 160);
 
 		if (CTRLPF & 4)
 		{
-			drawS1(temp);
-			drawM1(temp);
-			drawS0(temp);
-			drawM0(temp);
-			drawPF(temp);
-			drawBL(temp);
+			drawS1(temp, lineP1);
+			drawM1(temp, lineM1);
+			drawS0(temp, lineP0);
+			drawM0(temp, lineM0);
+			drawPF(temp, linePF);
+			drawBL(temp, lineBL);
 		}
 		else
 		{
-			drawPF(temp);
-			drawBL(temp);
-			drawS1(temp);
-			drawM1(temp);
-			drawS0(temp);
-			drawM0(temp);
+			drawPF(temp, linePF);
+			drawBL(temp, lineBL);
+			drawS1(temp, lineP1);
+			drawM1(temp, lineM1);
+			drawS0(temp, lineP0);
+			drawM0(temp, lineM0);
 		}
 	}
 
@@ -489,6 +535,58 @@ static void update_bitmap(int next_x, int next_y)
 		int x1 = prev_x;
 		int x2 = next_x;
 
+		if ( y !=  prev_y ) {
+			int redraw_line = 0;
+
+			/* Redraw line if a RESPx occured during the lastline */
+			if ( ! startP0 || ! startP1 ) {
+				startP0 = 1;
+				startP1 = 1;
+
+				redraw_line = 1;
+			}
+
+			/* Redraw line if HMM0 latch is still set */
+			if ( HMM0_latch ) {
+				horzM0 -= 17;
+				if ( horzM0 < 0 )
+					horzM0 += 160;
+				redraw_line = 1;
+			}
+
+			/* Redraw line if HMM1 latch is still set */
+			if ( HMM1_latch ) {
+				horzM1 -= 17;
+				if ( horzM1 < 0 )
+					horzM1 += 160;
+				redraw_line = 1;
+			}
+			if ( redraw_line ) {
+				memset(lineP0, 0xFF, sizeof lineP0);
+				memset(lineP1, 0xFF, sizeof lineP1);
+
+				memset(temp, COLUBK >> 1, 160);
+
+				if (CTRLPF & 4)
+				{
+					drawS1(temp, lineP1);
+					drawM1(temp, lineM1);
+					drawS0(temp, lineP0);
+					drawM0(temp, lineM0);
+					drawPF(temp, linePF);
+					drawBL(temp, lineBL);
+				}
+				else
+				{
+					drawPF(temp, linePF);
+					drawBL(temp, lineBL);
+					drawS1(temp, lineP1);
+					drawM1(temp, lineM1);
+					drawS0(temp, lineP0);
+					drawM0(temp, lineM0);
+				}
+			}
+		}
 		if (y != prev_y || x1 < 0)
 		{
 			x1 = 0;
@@ -610,16 +708,57 @@ static WRITE8_HANDLER( VBLANK_w )
 }
 
 
+static WRITE8_HANDLER( HMM0_w )
+{
+	int curr_x = current_x();
+	int window = curr_x - ( HMOVE_started + ( ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 2 ) );
+
+	data &= 0xF0;
+	if ( window >= 0 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
+		//logerror("%04X: HMOVE/HMM0 madness detected\n", activecpu_get_pc());
+		horzM0 += ((signed char) HMM0) >> 4;
+		horzM0 -= 15;
+		if (horzM0 < 0 )
+			horzM0 += 160;
+		horzM0 %= 160;
+		HMM0_latch = 1;
+	}
+	HMM0 = data;
+}
+
+static WRITE8_HANDLER( HMM1_w )
+{
+	int curr_x = current_x();
+	int window = curr_x - ( HMOVE_started + ( ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 2 ) );
+
+	data &= 0xF0;
+	if ( window >= 0 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
+		//logerror("%04X: HMOVE/HMM1 madness detected\n", activecpu_get_pc());
+		horzM1 += ((signed char) HMM1) >> 4;
+		horzM1 -= 15;
+		if ( horzM1 < 0 )
+			horzM1 += 160;
+		horzM1 %= 160;
+		HMM1_latch = 1;
+	}
+	HMM1 = data;
+}
+
 static WRITE8_HANDLER( HMOVE_w )
 {
 	int curr_x = current_x();
 	int curr_y = current_y();
+
+	HMOVE_started = curr_x;
 
 	horzP0 -= ((signed char) HMP0) >> 4;
 	horzP1 -= ((signed char) HMP1) >> 4;
 	horzM0 -= ((signed char) HMM0) >> 4;
 	horzM1 -= ((signed char) HMM1) >> 4;
 	horzBL -= ((signed char) HMBL) >> 4;
+
+	HMM0_latch = 0;
+	HMM1_latch = 0;
 
 	if (horzP0 < 0)
 		horzP0 += 160;
@@ -683,13 +822,14 @@ static WRITE8_HANDLER( RESP0_w )
 {
 	horzP0 = current_x();
 
-	if (horzP0 < 0)
+	if (horzP0 < -3)
 	{
-		horzP0 = 3;
+		horzP0 = 1;
 	}
 	else
 	{
 		horzP0 = (horzP0 + 5) % 160;
+		startP0 = 0;
 	}
 }
 
@@ -698,13 +838,14 @@ static WRITE8_HANDLER( RESP1_w )
 {
 	horzP1 = current_x();
 
-	if (horzP1 < 0)
+	if (horzP1 < -3)
 	{
-		horzP1 = 3;
+		horzP1 = 1;
 	}
 	else
 	{
 		horzP1 = (horzP1 + 5) % 160;
+		startP1 = 0;
 	}
 }
 
@@ -870,9 +1011,9 @@ WRITE8_HANDLER( tia_w )
 		 0,	// CTRLPF
 		 0,	// REFP0
 		 0,	// REFP1
-		 4,	// PF0
-		 4,	// PF1
-		 4,	// PF2
+		 8,	// PF0
+		 8,	// PF1
+		 8,	// PF2
 		 0,	// RESP0
 		 0,	// RESP1
 		 0,	// RESM0
@@ -1016,10 +1157,10 @@ WRITE8_HANDLER( tia_w )
 		HMP1 = data;
 		break;
 	case 0x22:
-		HMM0 = data;
+		HMM0_w(offset, data);
 		break;
 	case 0x23:
-		HMM1 = data;
+		HMM1_w(offset, data);
 		break;
 	case 0x24:
 		HMBL = data;
@@ -1059,11 +1200,11 @@ static void tia_reset(running_machine *machine)
 
 
 
-void tia_init(void)
+void tia_init_internal(int freq)
 {
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
 
-	timer_pulse(TIME_IN_HZ(60), 0, button_callback);
+	timer_pulse(TIME_IN_HZ(freq), 0, button_callback);
 
 	INPT4 = 0x80;
 	INPT5 = 0x80;
@@ -1074,9 +1215,27 @@ void tia_init(void)
 	HMM1 = 0;
 	HMBL = 0;
 
+	startP0 = 1;
+	startP1 = 1;
+
+	HMM0_latch = 0;
+	HMM1_latch = 0;
+
 	prev_x = 0;
 	prev_y = 0;
 
+	HMOVE_started = -200;
+
 	frame_cycles = 0;
 	add_reset_callback(Machine, tia_reset);
+}
+
+void tia_init(void)
+{
+	tia_init_internal(60);
+}
+
+void tia_init_pal(void)
+{
+	tia_init_internal(50);
 }

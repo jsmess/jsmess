@@ -9,17 +9,9 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "devices/cartslot.h"
+#include "video/tia.h"
 #include "inputx.h"
 #include "zlib.h"
-
-extern PALETTE_INIT( tia_NTSC );
-extern PALETTE_INIT( tia_PAL );
-extern VIDEO_START( tia );
-extern VIDEO_UPDATE( tia );
-extern  READ8_HANDLER( tia_r );
-extern WRITE8_HANDLER( tia_w );
-
-extern void tia_init(void);
 
 #define CART memory_region(REGION_USER1)
 
@@ -334,7 +326,11 @@ static MACHINE_START( a2600 )
 
 	r6532_init(0, &r6532_interface);
 
-	tia_init();
+	if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
+		tia_init_pal();
+	} else {
+		tia_init();
+	}
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x7f, 0, 0, tia_w);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x7f, 0, 0, tia_r);
@@ -650,7 +646,7 @@ static MACHINE_DRIVER_START( a2600 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(160, 262)
+	MDRV_SCREEN_SIZE(228, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 159, 36, 261)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(tia_NTSC)
@@ -664,12 +660,41 @@ static MACHINE_DRIVER_START( a2600 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( a2600p )
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M6502, 3584160 / 3)    /* actually M6507 */
+	MDRV_CPU_PROGRAM_MAP(a2600_mem, 0)
+
+	MDRV_SCREEN_REFRESH_RATE(50)
+
+	MDRV_MACHINE_START(a2600)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(228, 312)
+	MDRV_SCREEN_VISIBLE_AREA(0, 159, 44, 311)
+	MDRV_PALETTE_LENGTH(128)
+	MDRV_PALETTE_INIT(tia_PAL)
+
+	MDRV_VIDEO_START(tia)
+	MDRV_VIDEO_UPDATE(tia)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(TIA, 31400)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
+
 
 ROM_START( a2600 )
 	ROM_REGION( 0x2000, REGION_CPU1, 0 )
+	ROM_FILL( 0x0000, 0x2000, 0xFF )
 	ROM_REGION( 0x10000, REGION_USER1, 0 )
+	ROM_FILL( 0x00000, 0x10000, 0xFF )
 ROM_END
 
+#define rom_a2600p rom_a2600
 
 static void a2600_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
@@ -697,3 +722,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR	NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	CONFIG	COMPANY		FULLNAME */
 CONS( 1977,	a2600,	0,		0,		a2600,	a2600,	0,		a2600,	"Atari",	"Atari 2600 (NTSC)" , 0)
+CONS( 1977,	a2600p,	a2600,	0,		a2600p,	a2600,	0,		a2600,  "Atari",    "Atari 2600 (PAL)", 0)
