@@ -1212,16 +1212,16 @@ WRITE8_HANDLER ( dgnalpha_psg_porta_write )
 	switch (data & 0xF)
 	{
 		case(0x01) :
-			wd179x_set_drive(0);
+			wd17xx_set_drive(0);
 			break;
 		case(0x02) :
-			wd179x_set_drive(1);
+			wd17xx_set_drive(1);
 			break;
 		case(0x04) :
-			wd179x_set_drive(2);
+			wd17xx_set_drive(2);
 			break;
 		case(0x08) :
-			wd179x_set_drive(3);
+			wd17xx_set_drive(3);
 			break;
 	}
 }
@@ -1659,17 +1659,17 @@ static void dragon_page_rom(int	romswitch)
 /* Dragon Alpha onboard FDC */
 /********************************************************************************************/
 
-static void	dgnalpha_fdc_callback(int event)
+static void	dgnalpha_fdc_callback(wd17xx_state_t event, void *param)
 {
 	/* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 	/* The DRQ line goes through pia2 cb1, in exactly the same way as DRQ from DragonDos does */
 	/* for pia1 cb1 */
 	switch(event) 
 	{
-		case WD179X_IRQ_CLR:
+		case WD17XX_IRQ_CLR:
 			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
-		case WD179X_IRQ_SET:
+		case WD17XX_IRQ_SET:
 			if(dgnalpha_just_reset)
 			{
 				dgnalpha_just_reset = 0;
@@ -1680,10 +1680,10 @@ static void	dgnalpha_fdc_callback(int event)
 					cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
 			}
 			break;
-		case WD179X_DRQ_CLR:
+		case WD17XX_DRQ_CLR:
 			pia_2_cb1_w(0,CARTLINE_CLEAR);
 			break;
-		case WD179X_DRQ_SET:
+		case WD17XX_DRQ_SET:
 			pia_2_cb1_w(0,CARTLINE_ASSERTED);
 			break;
 	}
@@ -1697,16 +1697,16 @@ READ8_HANDLER(wd2797_r)
 	switch(offset & 0x03) 
 	{
 		case 0:
-			result = wd179x_data_r(0);
+			result = wd17xx_data_r(0);
 			break;
 		case 1:
-			result = wd179x_sector_r(0);
+			result = wd17xx_sector_r(0);
 			break;
 		case 2:
-			result = wd179x_track_r(0);
+			result = wd17xx_track_r(0);
 			break;
 		case 3:
-			result = wd179x_status_r(0);
+			result = wd17xx_status_r(0);
 			break;
 		default:
 			break;
@@ -1720,19 +1720,19 @@ WRITE8_HANDLER(wd2797_w)
     switch(offset & 0x3) 
 	{
 		case 0:
-			wd179x_data_w(0, data);
+			wd17xx_data_w(0, data);
 			break;
 		case 1:
-			wd179x_sector_w(0, data);
+			wd17xx_sector_w(0, data);
 			break;
 		case 2:
-			wd179x_track_w(0, data);
+			wd17xx_track_w(0, data);
 			break;
 		case 3:
-			wd179x_command_w(0, data);
+			wd17xx_command_w(0, data);
 
 			/* disk head is encoded in the command byte */
-			wd179x_set_side((data & 0x02) ? 1 : 0);
+			wd17xx_set_side((data & 0x02) ? 1 : 0);
 			break;
 	};
 }
@@ -3141,7 +3141,7 @@ MACHINE_START( dgnalpha )
 	/* by the WD2797, it is reset to 0 after the first inurrupt */
 	dgnalpha_just_reset=1;
 	
-	wd179x_init(WD_TYPE_179X, dgnalpha_fdc_callback);
+	wd17xx_init(WD_TYPE_179X, dgnalpha_fdc_callback, NULL);
 	
 	return 0;
 }

@@ -315,7 +315,7 @@ MACHINE_RESET( msx2 )
 	msx_ch_reset_core ();
 }
 
-static void msx_wd179x_int (int state);
+static void msx_wd179x_int (wd17xx_state_t state, void *param);
 
 static WRITE8_HANDLER ( msx_ppi_port_a_w );
 static WRITE8_HANDLER ( msx_ppi_port_c_w );
@@ -351,8 +351,8 @@ static void msx_init(void)
 		msx1.cart_state[i] = cart_state[i];
 	}
 
-	wd179x_init (WD_TYPE_179X, msx_wd179x_int);
-	wd179x_set_density (DEN_FM_HI);
+	wd17xx_init (WD_TYPE_179X, msx_wd179x_int, NULL);
+	wd17xx_set_density (DEN_FM_HI);
 	msx1.dsk_stat = 0x7f;
 
 	cpunum_set_input_line_vector (0, 0, 0xff);
@@ -646,13 +646,14 @@ set on 7FFDH bit 2 always to 0 (some use it as disk change reset)
 
 */
 
-static void msx_wd179x_int (int state)
+static void msx_wd179x_int (wd17xx_state_t state, void *param)
+{
+	switch (state)
 	{
-	switch (state) {
-		case WD179X_IRQ_CLR: msx1.dsk_stat |= 0x40; break;
-		case WD179X_IRQ_SET: msx1.dsk_stat &= ~0x40; break;
-		case WD179X_DRQ_CLR: msx1.dsk_stat |= 0x80; break;
-		case WD179X_DRQ_SET: msx1.dsk_stat &= ~0x80; break;
+		case WD17XX_IRQ_CLR: msx1.dsk_stat |= 0x40; break;
+		case WD17XX_IRQ_SET: msx1.dsk_stat &= ~0x40; break;
+		case WD17XX_DRQ_CLR: msx1.dsk_stat |= 0x80; break;
+		case WD17XX_DRQ_SET: msx1.dsk_stat &= ~0x80; break;
 	}
 }
 

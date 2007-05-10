@@ -263,7 +263,7 @@ static UINT8 to7_5p14_select;
 
 static READ8_HANDLER ( to7_5p14_r )
 {
-  if ( offset < 4 ) return wd179x_r( offset );
+  if ( offset < 4 ) return wd17xx_r( offset );
   else if ( offset == 8 ) return to7_5p14_select;
   else
     logerror ( "%f $%04x to7_5p14_r: invalid read offset %i\n", 
@@ -273,7 +273,7 @@ static READ8_HANDLER ( to7_5p14_r )
 
 static WRITE8_HANDLER( to7_5p14_w )
 {
-  if ( offset < 4 ) wd179x_w( offset, data );
+  if ( offset < 4 ) wd17xx_w( offset, data );
   else if ( offset == 8 ) {
     /* drive select */
     int drive = -1, side = 0;
@@ -292,14 +292,14 @@ static WRITE8_HANDLER( to7_5p14_w )
     
     dens = (data & 0x80) ? DEN_FM_LO : DEN_MFM_LO;
     thom_floppy_set_density( dens );
-    wd179x_set_density( dens );
+    wd17xx_set_density( dens );
     
     to7_5p14_select = data;
 
     if ( drive != -1 ) {
       thom_floppy_active( 0 );
-      wd179x_set_drive( drive );
-      wd179x_set_side( side );
+      wd17xx_set_drive( drive );
+      wd17xx_set_side( side );
       LOG(( "%f $%04x to7_5p14_w: $%02X set drive=%i side=%i density=%s\n", 
 	    timer_get_time(), activecpu_get_previouspc(),
 	    data, drive, side, (dens == DEN_FM_LO) ? "FM" : "MFM" ));
@@ -315,7 +315,7 @@ static void to7_5p14_reset( void )
   int i;
   LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
   thom_floppy_set_density( DEN_MFM_LO );
-  wd179x_reset();
+  wd17xx_reset();
   for ( i = 0; i < device_count( IO_FLOPPY ); i++ ) {
     mess_image * img = image_from_devtype_and_index( IO_FLOPPY, i );
     floppy_drive_set_ready_state( img, FLOPPY_DRIVE_READY, 0 );
@@ -327,7 +327,7 @@ static void to7_5p14_reset( void )
 static void to7_5p14_init( void )
 {
   LOG(( "to7_5p14_init: CD 90-640 controller\n" ));
-  wd179x_init( WD_TYPE_2793, NULL );
+  wd17xx_init( WD_TYPE_2793, NULL, NULL );
   state_save_register_global( to7_5p14_select );
 }
 

@@ -90,9 +90,9 @@ static const struct cartridge_callback *cartcallbacks;
 #endif
 
 static int	dskreg;
-static void	coco_fdc_callback(int event);
-static void	dragon_fdc_callback(int event);
-static void 	dragon_delta_fdc_callback(int event);
+static void	coco_fdc_callback(wd17xx_state_t event, void *param);
+static void	dragon_fdc_callback(wd17xx_state_t event, void *param);
+static void dragon_delta_fdc_callback(wd17xx_state_t event, void *param);
 static int	drq_state;
 static int	intrq_state;
 
@@ -111,7 +111,7 @@ enum {
 
 static void coco_fdc_init(const struct cartridge_callback *callbacks)
 {
-    wd179x_init(WD_TYPE_1773, coco_fdc_callback);
+    wd17xx_init(WD_TYPE_1773, coco_fdc_callback, NULL);
 	dskreg = 0;
 	cartcallbacks = callbacks;
 	drq_state = ASSERT_LINE;
@@ -120,7 +120,7 @@ static void coco_fdc_init(const struct cartridge_callback *callbacks)
 
 static void dragon_fdc_init(const struct cartridge_callback *callbacks)
 {
-    wd179x_init(WD_TYPE_179X,dragon_fdc_callback);
+    wd17xx_init(WD_TYPE_179X,dragon_fdc_callback, NULL);
 	dskreg = 0;
 	cartcallbacks = callbacks;
 
@@ -128,7 +128,7 @@ static void dragon_fdc_init(const struct cartridge_callback *callbacks)
 
 static void dragon_delta_fdc_init(const struct cartridge_callback *callbacks)
 {
-    wd179x_init(WD_TYPE_179X,dragon_delta_fdc_callback);
+    wd17xx_init(WD_TYPE_179X,dragon_delta_fdc_callback, NULL);
 	dskreg = 0;
 	cartcallbacks = callbacks;
 }
@@ -147,75 +147,77 @@ static void raise_halt(int dummy)
 	coco_set_halt_line(ASSERT_LINE);
 }
 
-static void coco_fdc_callback(int event)
+static void coco_fdc_callback(wd17xx_state_t event, void *param)
 {
-	switch(event) {
-	case WD179X_IRQ_CLR:
-		intrq_state = CLEAR_LINE;
-		cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
-		break;
-
-	case WD179X_IRQ_SET:
-		intrq_state = ASSERT_LINE;
-		CLEAR_COCO_HALTENABLE;
-		coco_set_halt_line(CLEAR_LINE);
-		if( COCO_NMIENABLE )
-			timer_set( TIME_IN_USEC(0), 0, raise_nmi);
-		else
+	switch(event)
+	{
+		case WD17XX_IRQ_CLR:
+			intrq_state = CLEAR_LINE;
 			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
-		break;
+			break;
 
-	case WD179X_DRQ_CLR:
-		drq_state = CLEAR_LINE;
-		if( COCO_HALTENABLE )
-			timer_set( TIME_IN_CYCLES(7,0), 0, raise_halt);
-		else
+		case WD17XX_IRQ_SET:
+			intrq_state = ASSERT_LINE;
+			CLEAR_COCO_HALTENABLE;
 			coco_set_halt_line(CLEAR_LINE);
-		break;
-	case WD179X_DRQ_SET:
-		drq_state = ASSERT_LINE;
-		coco_set_halt_line(CLEAR_LINE);
-		break;
+			if( COCO_NMIENABLE )
+				timer_set( TIME_IN_USEC(0), 0, raise_nmi);
+			else
+				cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+			break;
+
+		case WD17XX_DRQ_CLR:
+			drq_state = CLEAR_LINE;
+			if( COCO_HALTENABLE )
+				timer_set( TIME_IN_CYCLES(7,0), 0, raise_halt);
+			else
+				coco_set_halt_line(CLEAR_LINE);
+			break;
+		case WD17XX_DRQ_SET:
+			drq_state = ASSERT_LINE;
+			coco_set_halt_line(CLEAR_LINE);
+			break;
 	}
 }
 
-static void dragon_fdc_callback(int event)
+static void dragon_fdc_callback(wd17xx_state_t event, void *param)
 {
-	switch(event) {
-	case WD179X_IRQ_CLR:
-		LOG(("dragon_fdc_callback(): WD179X_IRQ_CLR\n" ));
-		cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
-		break;
-	case WD179X_IRQ_SET:
-		LOG(("dragon_fdc_callback(): WD179X_IRQ_SET\n" ));
-		if (DRAGON_NMIENABLE)
-			timer_set( TIME_IN_USEC(0), 0, raise_nmi);
-		break;
-	case WD179X_DRQ_CLR:
-		LOG(("dragon_fdc_callback(): WD179X_DRQ_CLR\n" ));
-		cartcallbacks->setcartline(CARTLINE_CLEAR);
-		break;
-	case WD179X_DRQ_SET:
-		LOG(("dragon_fdc_callback(): WD179X_DRQ_SET\n" ));
-		cartcallbacks->setcartline(CARTLINE_ASSERTED);
-		break;
+	switch(event)
+	{
+		case WD17XX_IRQ_CLR:
+			LOG(("dragon_fdc_callback(): WD17XX_IRQ_CLR\n" ));
+			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+			break;
+		case WD17XX_IRQ_SET:
+			LOG(("dragon_fdc_callback(): WD17XX_IRQ_SET\n" ));
+			if (DRAGON_NMIENABLE)
+				timer_set( TIME_IN_USEC(0), 0, raise_nmi);
+			break;
+		case WD17XX_DRQ_CLR:
+			LOG(("dragon_fdc_callback(): WD17XX_DRQ_CLR\n" ));
+			cartcallbacks->setcartline(CARTLINE_CLEAR);
+			break;
+		case WD17XX_DRQ_SET:
+			LOG(("dragon_fdc_callback(): WD17XX_DRQ_SET\n" ));
+			cartcallbacks->setcartline(CARTLINE_ASSERTED);
+			break;
 	}
 }
 
-static void dragon_delta_fdc_callback(int event)
+static void dragon_delta_fdc_callback(wd17xx_state_t event, void *param)
 {
 	switch(event) {
-	case WD179X_IRQ_CLR:
-		LOG(("dragon_delta_fdc_callback(): WD179X_IRQ_CLR\n" ));
+	case WD17XX_IRQ_CLR:
+		LOG(("dragon_delta_fdc_callback(): WD17XX_IRQ_CLR\n" ));
 		break;
-	case WD179X_IRQ_SET:
-		LOG(("dragon_delta_fdc_callback(): WD179X_IRQ_SET\n" ));
+	case WD17XX_IRQ_SET:
+		LOG(("dragon_delta_fdc_callback(): WD17XX_IRQ_SET\n" ));
 		break;
-	case WD179X_DRQ_CLR:
-		LOG(("dragon_delta_fdc_callback(): WD179X_DRQ_CLR\n" ));
+	case WD17XX_DRQ_CLR:
+		LOG(("dragon_delta_fdc_callback(): WD17XX_DRQ_CLR\n" ));
 		break;
-	case WD179X_DRQ_SET:
-		LOG(("dragon_delta_fdc_callback(): WD179X_DRQ_SET\n" ));
+	case WD17XX_DRQ_SET:
+		LOG(("dragon_delta_fdc_callback(): WD17XX_DRQ_SET\n" ));
 		break;
 	}
 }
@@ -275,9 +277,9 @@ static void set_coco_dskreg(int data)
 	else
 		cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
 
-	wd179x_set_drive(drive);
-	wd179x_set_side(head);
-	wd179x_set_density( (dskreg & 0x20) ? DEN_MFM_LO : DEN_FM_LO );
+	wd17xx_set_drive(drive);
+	wd17xx_set_side(head);
+	wd17xx_set_density( (dskreg & 0x20) ? DEN_MFM_LO : DEN_FM_LO );
 }
 
 static void set_dragon_dskreg(int data)
@@ -294,9 +296,9 @@ static void set_dragon_dskreg(int data)
 								data ));
 
 	if (data & 0x04)
-		wd179x_set_drive( data & 0x03 );
+		wd17xx_set_drive( data & 0x03 );
 
-	wd179x_set_density( (data & 0x08) ? DEN_FM_LO: DEN_MFM_LO );
+	wd17xx_set_density( (data & 0x08) ? DEN_FM_LO: DEN_MFM_LO );
 	dskreg = data;
 }
 
@@ -313,11 +315,11 @@ static void set_dragon_delta_dskreg(int data)
 								data & 0x01 ? '1' : '0',
 								data ));
 
-	wd179x_set_drive( data & 0x03 );
+	wd17xx_set_drive( data & 0x03 );
 	
-	wd179x_set_side((data & 0x04) ? 1 : 0);
+	wd17xx_set_side((data & 0x04) ? 1 : 0);
 
-	wd179x_set_density( (data & 0x10) ? DEN_MFM_HI: DEN_FM_LO );
+	wd17xx_set_density( (data & 0x10) ? DEN_MFM_HI: DEN_FM_LO );
 
 	dskreg = data;
 }
@@ -346,16 +348,16 @@ READ8_HANDLER(coco_floppy_r)
 	switch(offset & 0xef)
 	{
 		case 8:
-			result = wd179x_status_r(0);
+			result = wd17xx_status_r(0);
 			break;
 		case 9:
-			result = wd179x_track_r(0);
+			result = wd17xx_track_r(0);
 			break;
 		case 10:
-			result = wd179x_sector_r(0);
+			result = wd17xx_sector_r(0);
 			break;
 		case 11:
-			result = wd179x_data_r(0);
+			result = wd17xx_data_r(0);
 			break;
 		default:
 			if (device_count(IO_VHD) > 0)
@@ -404,16 +406,16 @@ WRITE8_HANDLER(coco_floppy_w)
 			set_coco_dskreg(data);
 			break;
 		case 8:
-			wd179x_command_w(0, data);
+			wd17xx_command_w(0, data);
 			break;
 		case 9:
-			wd179x_track_w(0, data);
+			wd17xx_track_w(0, data);
 			break;
 		case 10:
-			wd179x_sector_w(0, data);
+			wd17xx_sector_w(0, data);
 			break;
 		case 11:
-			wd179x_data_w(0, data);
+			wd17xx_data_w(0, data);
 			break;
 	};
 
@@ -444,16 +446,16 @@ WRITE8_HANDLER(coco_floppy_w)
 
 	switch(offset & 0xef) {
 	case 0:
-		result = wd179x_status_r(0);
+		result = wd17xx_status_r(0);
 		break;
 	case 1:
-		result = wd179x_track_r(0);
+		result = wd17xx_track_r(0);
 		break;
 	case 2:
-		result = wd179x_sector_r(0);
+		result = wd17xx_sector_r(0);
 		break;
 	case 3:
-		result = wd179x_data_r(0);
+		result = wd17xx_data_r(0);
 		break;
 	default:
 		break;
@@ -465,21 +467,21 @@ WRITE8_HANDLER(dragon_floppy_w)
 {
 	switch(offset & 0xef) {
 	case 0:
-		wd179x_command_w(0, data);
+		wd17xx_command_w(0, data);
 
 		/* disk head is encoded in the command byte */
 		/* Only for type 3 & 4 commands */
 		if (data & 0x80)
-			wd179x_set_side((data & 0x02) ? 1 : 0);
+			wd17xx_set_side((data & 0x02) ? 1 : 0);
 		break;
 	case 1:
-		wd179x_track_w(0, data);
+		wd17xx_track_w(0, data);
 		break;
 	case 2:
-		wd179x_sector_w(0, data);
+		wd17xx_sector_w(0, data);
 		break;
 	case 3:
-		wd179x_data_w(0, data);
+		wd17xx_data_w(0, data);
 		break;
 	case 8:
 	case 9:
@@ -501,16 +503,16 @@ READ8_HANDLER(dragon_delta_floppy_r)
 	switch(offset & 0xef) 
 	{
 	case 0:
-		result = wd179x_status_r(0);
+		result = wd17xx_status_r(0);
 		break;
 	case 1:
-		result = wd179x_track_r(0);
+		result = wd17xx_track_r(0);
 		break;
 	case 2:
-		result = wd179x_sector_r(0);
+		result = wd17xx_sector_r(0);
 		break;
 	case 3:
-		result = wd179x_data_r(0);
+		result = wd17xx_data_r(0);
 		break;
 	default:
 		break;
@@ -529,16 +531,16 @@ WRITE8_HANDLER(dragon_delta_floppy_w)
 	switch(offset & 0xef) 
 	{
 	case 0:
-		wd179x_command_w(0, ~data);
+		wd17xx_command_w(0, ~data);
 		break;
 	case 1:
-		wd179x_track_w(0, ~data);
+		wd17xx_track_w(0, ~data);
 		break;
 	case 2:
-		wd179x_sector_w(0, ~data);
+		wd17xx_sector_w(0, ~data);
 		break;
 	case 3:
-		wd179x_data_w(0, ~data);
+		wd17xx_data_w(0, ~data);
 		break;
 	case 4:
 		set_dragon_delta_dskreg(data);

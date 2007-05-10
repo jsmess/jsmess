@@ -18,12 +18,6 @@
 
 void Enterprise_SetupPalette(void);
 
-MACHINE_RESET( enterprise )
-{
-	/* initialise the hardware */
-	Enterprise_Initialise();
-}
-
 DEVICE_LOAD( enterprise_floppy )
 {
 	if (device_load_basicdsk_floppy(image)==INIT_PASS)

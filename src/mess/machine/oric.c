@@ -684,7 +684,7 @@ static void oric_jasmin_wd179x_callback(int State)
 	switch (State)
 	{
 		/* DRQ is connected to interrupt */
-		case WD179X_DRQ_CLR:
+		case WD17XX_DRQ_CLR:
 		{
 			oric_irqs &=~(1<<1);
 
@@ -692,7 +692,7 @@ static void oric_jasmin_wd179x_callback(int State)
 		}
 		break;
 
-		case WD179X_DRQ_SET:
+		case WD17XX_DRQ_SET:
 		{
 			oric_irqs |= (1<<1);
 
@@ -713,16 +713,16 @@ static  READ8_HANDLER (oric_jasmin_r)
 	{
 		/* jasmin floppy disc interface */
 		case 0x04:
-			data = wd179x_status_r(0);
+			data = wd17xx_status_r(0);
 			break;
 		case 0x05:
-			data =wd179x_track_r(0);
+			data =wd17xx_track_r(0);
 			break;
 		case 0x06:
-			data = wd179x_sector_r(0);
+			data = wd17xx_sector_r(0);
 			break;
 		case 0x07:
-			data = wd179x_data_r(0);
+			data = wd17xx_data_r(0);
 			break;
 		default:
 			data = via_0_r(offset & 0x0f);
@@ -741,24 +741,24 @@ static WRITE8_HANDLER(oric_jasmin_w)
 		/* microdisc floppy disc interface */
 		case 0x04:
 			logerror("cycles: %d\n",cycles_currently_ran());
-			wd179x_command_w(0,data);
+			wd17xx_command_w(0,data);
 			break;
 		case 0x05:
-			wd179x_track_w(0,data);
+			wd17xx_track_w(0,data);
 			break;
 		case 0x06:
-			wd179x_sector_w(0,data);
+			wd17xx_sector_w(0,data);
 			break;
 		case 0x07:
-			wd179x_data_w(0,data);
+			wd17xx_data_w(0,data);
 			break;
 		/* bit 0 = side */
 		case 0x08:
-			wd179x_set_side(data & 0x01);
+			wd17xx_set_side(data & 0x01);
 			break;
 		/* any write will cause wd179x to reset */
 		case 0x09:
-			wd179x_reset();
+			wd17xx_reset();
 			break;
 		case 0x0a:
 			logerror("jasmin overlay ram w: %02x PC: %04x\n",data,activecpu_get_pc());
@@ -775,7 +775,7 @@ static WRITE8_HANDLER(oric_jasmin_w)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			wd179x_set_drive(offset & 0x03);
+			wd17xx_set_drive(offset & 0x03);
 			break;
 
 		default:
@@ -833,7 +833,7 @@ static void oric_microdisc_wd179x_callback(int State)
 {
 	switch (State)
 	{
-		case WD179X_IRQ_CLR:
+		case WD17XX_IRQ_CLR:
 		{
 			port_314_r |=(1<<7);
 
@@ -843,7 +843,7 @@ static void oric_microdisc_wd179x_callback(int State)
 		}
 		break;
 
-		case WD179X_IRQ_SET:
+		case WD17XX_IRQ_SET:
 		{
 			port_314_r &= ~(1<<7);
 
@@ -853,13 +853,13 @@ static void oric_microdisc_wd179x_callback(int State)
 		}
 		break;
 
-		case WD179X_DRQ_CLR:
+		case WD17XX_DRQ_CLR:
 		{
 			port_318_r |= (1<<7);
 		}
 		break;
 
-		case WD179X_DRQ_SET:
+		case WD17XX_DRQ_SET:
 		{
 			port_318_r &=~(1<<7);
 		}
@@ -946,16 +946,16 @@ READ8_HANDLER (oric_microdisc_r)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			data = wd179x_status_r(0);
+			data = wd17xx_status_r(0);
 			break;
 		case 0x01:
-			data =wd179x_track_r(0);
+			data =wd17xx_track_r(0);
 			break;
 		case 0x02:
-			data = wd179x_sector_r(0);
+			data = wd17xx_sector_r(0);
 			break;
 		case 0x03:
-			data = wd179x_data_r(0);
+			data = wd17xx_data_r(0);
 			break;
 		case 0x04:
 			data = port_314_r | 0x07f;
@@ -981,16 +981,16 @@ WRITE8_HANDLER(oric_microdisc_w)
 	{
 		/* microdisc floppy disc interface */
 		case 0x00:
-			wd179x_command_w(0,data);
+			wd17xx_command_w(0,data);
 			break;
 		case 0x01:
-			wd179x_track_w(0,data);
+			wd17xx_track_w(0,data);
 			break;
 		case 0x02:
-			wd179x_sector_w(0,data);
+			wd17xx_sector_w(0,data);
 			break;
 		case 0x03:
-			wd179x_data_w(0,data);
+			wd17xx_data_w(0,data);
 			break;
 		case 0x04:
 		{
@@ -1004,8 +1004,8 @@ WRITE8_HANDLER(oric_microdisc_w)
 			/* bit 4: side */
 			/* bit 3: double density enable */
 			/* bit 0: enable FDC IRQ to trigger IRQ on CPU */
-			wd179x_set_drive((data>>5) & 0x03);
-			wd179x_set_side((data>>4) & 0x01);
+			wd17xx_set_drive((data>>5) & 0x03);
+			wd17xx_set_side((data>>4) & 0x01);
 			if (data & (1<<3))
 			{
 				density = DEN_MFM_LO;
@@ -1015,7 +1015,7 @@ WRITE8_HANDLER(oric_microdisc_w)
 				density = DEN_FM_HI;
 			}
 
-			wd179x_set_density(density);
+			wd17xx_set_density(density);
 
 			oric_microdisc_set_mem_0x0c000();
 			oric_microdisc_refresh_wd179x_ints();
@@ -1050,7 +1050,7 @@ static void oric_install_microdisc_interface(void)
 /*********************************************************/
 
 
-static void oric_wd179x_callback(int State)
+static void oric_wd179x_callback(wd17xx_state_t State, void *param)
 {
 	switch (readinputport(9) &  0x07)
 	{
@@ -1179,7 +1179,7 @@ MACHINE_START( oric )
 	}
 
 
-	wd179x_init(WD_TYPE_179X,oric_wd179x_callback);
+	wd17xx_init(WD_TYPE_179X,oric_wd179x_callback, NULL);
 	return 0;
 }
 
@@ -1512,6 +1512,6 @@ MACHINE_START( telestrat )
 	via_config(1, &telestrat_via2_interface);
 	via_set_clock(1,1000000);
 
-	wd179x_init(WD_TYPE_179X,oric_wd179x_callback);
+	wd17xx_init(WD_TYPE_179X,oric_wd179x_callback, NULL);
 	return 0;
 }

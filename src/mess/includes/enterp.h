@@ -1,4 +1,3 @@
-MACHINE_RESET( enterprise );
 DEVICE_LOAD( enterprise_floppy );
 
 int enterprise_rom_load(int);

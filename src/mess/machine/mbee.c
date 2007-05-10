@@ -31,7 +31,7 @@ static UINT8 fdc_head = 0;
 static UINT8 fdc_den = 0;
 static UINT8 fdc_status = 0;
 static void pio_interrupt(int state);
-static void mbee_fdc_callback(int);
+static void mbee_fdc_callback(wd17xx_state_t event, void *param);
 static UINT8 mbee_busnop = 0;
 
 UINT8 *mbee_workram;
@@ -86,21 +86,25 @@ offs_t mbee56_opbase_handler(offs_t address)
 
 MACHINE_RESET( mbee )
 {
-	z80pio_init(0, &pio_intf);
-	wd179x_init(WD_TYPE_179X,mbee_fdc_callback);
-
 	mbee_busnop = 1;
+}
+
+static void mbee_machine_start(opbase_handler handler)
+{
+	z80pio_init(0, &pio_intf);
+	wd17xx_init(WD_TYPE_179X,mbee_fdc_callback, NULL);
+	memory_set_opbase_handler(0, handler);
 }
 
 MACHINE_START( mbee )
 {
-	memory_set_opbase_handler(0, mbee_opbase_handler);
+	mbee_machine_start(mbee_opbase_handler);
 	return 0;
 }
 
 MACHINE_START( mbee56 )
 {
-	memory_set_opbase_handler(0, mbee56_opbase_handler);
+	mbee_machine_start(mbee56_opbase_handler);
 	return 0;
 }
 
@@ -146,22 +150,22 @@ WRITE8_HANDLER ( mbee_pio_w )
 	}
 }
 
-static void mbee_fdc_callback(int param)
+static void mbee_fdc_callback(wd17xx_state_t state, void *param)
 {
-	switch( param )
+	switch( state )
 	{
-	case WD179X_IRQ_CLR:
+	case WD17XX_IRQ_CLR:
 //		cpunum_set_input_line(0,0,CLEAR_LINE);
 		fdc_status &= ~0x40;
         break;
-	case WD179X_IRQ_SET:
+	case WD17XX_IRQ_SET:
 //		cpunum_set_input_line(0,0,HOLD_LINE);
 		fdc_status |= 0x40;
         break;
-	case WD179X_DRQ_CLR:
+	case WD17XX_DRQ_CLR:
 		fdc_status &= ~0x80;
 		break;
-	case WD179X_DRQ_SET:
+	case WD17XX_DRQ_SET:
 		fdc_status |= 0x80;
         break;
     }
@@ -185,15 +189,15 @@ WRITE8_HANDLER ( mbee_fdc_motor_w )
 	fdc_drv = data & 3;
 	fdc_head = (data >> 2) & 1;
 	fdc_den = (data >> 3) & 1;
-	wd179x_set_drive(fdc_drv);
-	wd179x_set_side(fdc_head);
+	wd17xx_set_drive(fdc_drv);
+	wd17xx_set_side(fdc_head);
 	if (data & (1<<3))
 	{
-	   wd179x_set_density(DEN_FM_HI);
+	   wd17xx_set_density(DEN_FM_HI);
 	}
 	else
 	{
-	   wd179x_set_density(DEN_MFM_LO);
+	   wd17xx_set_density(DEN_MFM_LO);
 	}
 
 }

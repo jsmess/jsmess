@@ -1418,29 +1418,29 @@ static OPBASE_HANDLER(betadisk_opbase_handler)
 	return pc & 0x0ffff;
 }
 
-static void betadisk_wd179x_callback(int state)
+static void betadisk_wd179x_callback(wd17xx_state_t state, void *param)
 {
 	switch (state)
 	{
-		case WD179X_DRQ_SET:
+		case WD17XX_DRQ_SET:
 		{
 			betadisk_status |= (1<<6);
 		}
 		break;
 
-		case WD179X_DRQ_CLR:
+		case WD17XX_DRQ_CLR:
 		{
 			betadisk_status &=~(1<<6);
 		}
 		break;
 
-		case WD179X_IRQ_SET:
+		case WD17XX_IRQ_SET:
 		{
 			betadisk_status |= (1<<7);
 		}
 		break;
 
-		case WD179X_IRQ_CLR:
+		case WD17XX_IRQ_CLR:
 		{
 			betadisk_status &=~(1<<7);
 		}
@@ -1482,7 +1482,7 @@ static void	 betadisk_init(void)
 {
 	betadisk_active = 0;
 	betadisk_status = 0x03f;
-	wd179x_init(WD_TYPE_179X,&betadisk_wd179x_callback);
+	wd17xx_init(WD_TYPE_179X, betadisk_wd179x_callback, NULL);
 }
 
 /****************************************************************************************************/
@@ -1644,13 +1644,13 @@ static  READ8_HANDLER(scorpion_port_r)
 	 switch (offset & 0x0ff)
 	 {
 		case 0x01f:
-			return wd179x_status_r(offset);
+			return wd17xx_status_r(offset);
 		case 0x03f:
-			return wd179x_track_r(offset);
+			return wd17xx_track_r(offset);
 		case 0x05f:
-			return wd179x_sector_r(offset);
+			return wd17xx_sector_r(offset);
 		case 0x07f:
-			return wd179x_data_r(offset);
+			return wd17xx_data_r(offset);
 		case 0x0ff:
 			return betadisk_status;
 	 }

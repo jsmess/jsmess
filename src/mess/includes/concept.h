@@ -11,7 +11,7 @@ enum
 	display_orientation_concept = 7
 };
 
-MACHINE_RESET(concept);
+MACHINE_START(concept);
 VIDEO_START(concept);
 VIDEO_UPDATE(concept);
 INTERRUPT_GEN( concept_interrupt );

@@ -117,7 +117,7 @@ void coupe_update_memory(void)
 		sam_screen = &mess_ram[((VMPR&0x1F) & PAGE_MASK) * 0x4000];
 }
 
-MACHINE_RESET( coupe )
+static void coupe_reset(running_machine *machine)
 {
     LMPR = 0x0F;            /* ROM0 paged in, ROM1 paged out RAM Banks */
     HMPR = 0x01;
@@ -132,6 +132,11 @@ MACHINE_RESET( coupe )
     CURLINE = 0x00;
 
     coupe_update_memory();
+}
 
-    wd179x_init(WD_TYPE_177X,NULL);
+MACHINE_START( coupe )
+{
+    wd17xx_init(WD_TYPE_177X,NULL, NULL);
+	add_reset_callback(machine, coupe_reset);
+	return 0;
 }

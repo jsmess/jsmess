@@ -218,7 +218,7 @@ static OPBASE_HANDLER (opbaseoverride)
 	return address;
 }
 
-static void cgenie_fdc_callback(int);
+static void cgenie_fdc_callback(wd17xx_state_t event, void *param);
 
 static void cgenie_machine_reset(running_machine *machine)
 {
@@ -242,8 +242,6 @@ static void cgenie_machine_reset(running_machine *machine)
 
 	/* wipe out font RAM */
 	memset(&ROM[0x0f400], 0xff, 0x0400);
-
-	wd179x_init(WD_TYPE_179X,cgenie_fdc_callback);
 
 	if( readinputport(0) & 0x80 )
 	{
@@ -336,6 +334,9 @@ MACHINE_START( cgenie )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000 + mess_ram_size - 1, 0, 0, cgenie_videoram_w);
 	videoram = mess_ram;
 	memory_set_bankptr(1, mess_ram);
+
+	/* set up FDC */
+	wd17xx_init(WD_TYPE_179X, cgenie_fdc_callback, NULL);
 
 	add_reset_callback(machine, cgenie_machine_reset);
 	add_exit_callback(machine, tape_put_close);
@@ -912,7 +913,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0 */
 	if( (readinputport(0) & 0x80) == 0 )
 		return 0;
-	return wd179x_status_r(offset);
+	return wd17xx_status_r(offset);
 }
 
  READ8_HANDLER( cgenie_track_r )
@@ -920,7 +921,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0xff */
 	if( (readinputport(0) & 0x80) == 0 )
 		return 0xff;
-	return wd179x_track_r(offset);
+	return wd17xx_track_r(offset);
 }
 
  READ8_HANDLER( cgenie_sector_r )
@@ -928,7 +929,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0xff */
 	if( (readinputport(0) & 0x80) == 0 )
 		return 0xff;
-	return wd179x_sector_r(offset);
+	return wd17xx_sector_r(offset);
 }
 
  READ8_HANDLER(cgenie_data_r )
@@ -936,7 +937,7 @@ WRITE8_HANDLER( cgenie_psg_port_b_w )
 	/* If the floppy isn't emulated, return 0xff */
 	if( (readinputport(0) & 0x80) == 0 )
 		return 0xff;
-	return wd179x_data_r(offset);
+	return wd17xx_data_r(offset);
 }
 
 WRITE8_HANDLER( cgenie_command_w )
@@ -944,7 +945,7 @@ WRITE8_HANDLER( cgenie_command_w )
 	/* If the floppy isn't emulated, return immediately */
 	if( (readinputport(0) & 0x80) == 0 )
 		return;
-	wd179x_command_w(offset, data);
+	wd17xx_command_w(offset, data);
 }
 
 WRITE8_HANDLER( cgenie_track_w )
@@ -952,7 +953,7 @@ WRITE8_HANDLER( cgenie_track_w )
 	/* If the floppy isn't emulated, ignore the write */
 	if( (readinputport(0) & 0x80) == 0 )
 		return;
-	wd179x_track_w(offset, data);
+	wd17xx_track_w(offset, data);
 }
 
 WRITE8_HANDLER( cgenie_sector_w )
@@ -960,7 +961,7 @@ WRITE8_HANDLER( cgenie_sector_w )
 	/* If the floppy isn't emulated, ignore the write */
 	if( (readinputport(0) & 0x80) == 0 )
 		return;
-	wd179x_sector_w(offset, data);
+	wd17xx_sector_w(offset, data);
 }
 
 WRITE8_HANDLER( cgenie_data_w )
@@ -968,7 +969,7 @@ WRITE8_HANDLER( cgenie_data_w )
 	/* If the floppy isn't emulated, ignore the write */
 	if( (readinputport(0) & 0x80) == 0 )
 		return;
-	wd179x_data_w(offset, data);
+	wd17xx_data_w(offset, data);
 }
 
  READ8_HANDLER( cgenie_irq_status_r )
@@ -997,7 +998,7 @@ static INTERRUPT_GEN( cgenie_fdc_interrupt )
 	}
 }
 
-void cgenie_fdc_callback(int event)
+void cgenie_fdc_callback(wd17xx_state_t event, void *param)
 {
 	/* if disc hardware is not enabled, do not cause an int */
 	if (!( readinputport(0) & 0x80 ))
@@ -1005,12 +1006,16 @@ void cgenie_fdc_callback(int event)
 
 	switch( event )
 	{
-	case WD179X_IRQ_CLR:
-		irq_status &= ~IRQ_FDC;
-		break;
-	case WD179X_IRQ_SET:
-		cgenie_fdc_interrupt();
-		break;
+		case WD17XX_IRQ_CLR:
+			irq_status &= ~IRQ_FDC;
+			break;
+		case WD17XX_IRQ_SET:
+			cgenie_fdc_interrupt();
+			break;
+		case WD17XX_DRQ_CLR:
+		case WD17XX_DRQ_SET:
+			/* do nothing */
+			break;
 	}
 }
 
@@ -1038,8 +1043,8 @@ WRITE8_HANDLER( cgenie_motor_w )
 	/* currently selected drive */
 	motor_drive = drive;
 
-	wd179x_set_drive(drive);
-	wd179x_set_side(head);
+	wd17xx_set_drive(drive);
+	wd17xx_set_side(head);
 }
 
 /*************************************

@@ -835,12 +835,12 @@ void atarist_dma_transfer(void)
 	if (fdc.dma_direction)
 	{
 		/* write the data */
-		wd179x_data_w(0,addr[0]);
+		wd17xx_data_w(0,addr[0]);
 	}
 	else
 	{
 		/* read the data */
-		addr[0] = wd179x_data_r(0);
+		addr[0] = wd17xx_data_r(0);
 
 	}
 
@@ -859,17 +859,17 @@ void atarist_dma_transfer(void)
 }
 
 
-void atarist_fdc_callback(int event)
+void atarist_fdc_callback(int event, void *param)
 {
 	switch (event)
 	{
-		case WD179X_IRQ_CLR:
-		case WD179X_DRQ_CLR:
+		case WD17XX_IRQ_CLR:
+		case WD17XX_DRQ_CLR:
 			break;
-		case WD179X_IRQ_SET:
+		case WD17XX_IRQ_SET:
 			logerror("WD1792:  Warning: IRQ set!\n");
 			break;
-		case WD179X_DRQ_SET:
+		case WD17XX_DRQ_SET:
 			if (fdc.dma_select==0) { /* If DMA is enabled */
 				atarist_dma_transfer();
 			}
@@ -888,10 +888,10 @@ static READ16_HANDLER( atarist_fdc_r )
 			wd1772_active=0;//todo?
 			switch (fdc.reg_select&0xf) {
 				/* A0/A1 pins on wd179x controller */
-				case 0: fdc.dma_status=1; return wd179x_status_r(0);
-				case 1: fdc.dma_status=1; return wd179x_track_r(0);
-				case 2: fdc.dma_status=1; return wd179x_sector_r(0);
-				case 3: fdc.dma_status=1; return wd179x_data_r(0);
+				case 0: fdc.dma_status=1; return wd17xx_status_r(0);
+				case 1: fdc.dma_status=1; return wd17xx_track_r(0);
+				case 2: fdc.dma_status=1; return wd17xx_sector_r(0);
+				case 3: fdc.dma_status=1; return wd17xx_data_r(0);
 
 				/* HDC register select - Unimplemented */
 				case 4: case 5: case 6: case 7:
@@ -922,10 +922,10 @@ static WRITE16_HANDLER( atarist_fdc_w )
 		case 4: /* Data register */
 			switch (fdc.reg_select&0xf) {
 				/* A0/A1 pins on wd179x controller */
-				case 0: wd179x_command_w(0, data&0xff); break;
-				case 1: wd179x_track_w(0, data&0xff); break;
-				case 2: wd179x_sector_w(0, data&0xff); break;
-				case 3: wd179x_data_w(0, data&0xff); break;
+				case 0: wd17xx_command_w(0, data&0xff); break;
+				case 1: wd17xx_track_w(0, data&0xff); break;
+				case 2: wd17xx_sector_w(0, data&0xff); break;
+				case 3: wd17xx_data_w(0, data&0xff); break;
 
 				/* HDC register select - Unimplemented */
 				case 4: case 5: case 6: case 7:
@@ -1967,7 +1967,7 @@ static MACHINE_RESET( atarist )
 	WRITE_WORD(&RAM2[6],READ_WORD(&RAM[6]));
 
 	mfp_init();
-	wd179x_init(WD_TYPE_177X,atarist_fdc_callback);
+	wd17xx_init(WD_TYPE_177X, atarist_fdc_callback, NULL);
 	ikbd_reset();
 	atarist_current_drive=-1;
 }
@@ -2032,11 +2032,11 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 	ym2149_port_a=data&0xff;
 
 	/* info from "Atari ST Internals" by my friend James Boulton ;) */
-	wd179x_set_side(data & 0x01);
+	wd17xx_set_side(data & 0x01);
 
 	/* not sure if these bits form drive index or, select drives independantly */
 	/* for now select drive 0 */
-	wd179x_set_drive(0);
+	wd17xx_set_drive(0);
 
 //	logerror("PSG port a %02x\n",data);
 	/* BIT 8 RTS */

@@ -311,7 +311,7 @@ static void ti99_install_tracktranslate_procs(void)
 */
 
 /* prototypes */
-static void fdc_callback(int);
+static void fdc_callback(wd17xx_state_t event, void *param);
 static void motor_on_timer_callback(int dummy);
 static int fdc_cru_r(int offset);
 static void fdc_cru_w(int offset, int data);
@@ -374,8 +374,8 @@ void ti99_fdc_init(void)
 
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
 
-	wd179x_init(WD_TYPE_179X, fdc_callback);		/* initialize the floppy disk controller */
-	wd179x_set_density(DEN_FM_LO);
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	wd17xx_set_density(DEN_FM_LO);
 
 	use_80_track_drives = FALSE;
 
@@ -400,22 +400,22 @@ static void fdc_handle_hold(void)
 /*
 	callback called whenever DRQ/IRQ state change
 */
-static void fdc_callback(int event)
+static void fdc_callback(wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
-	case WD179X_IRQ_CLR:
+	case WD17XX_IRQ_CLR:
 		DRQ_IRQ_status &= ~fdc_IRQ;
 		ti99_peb_set_ilb_bit(intb_fdc_bit, 0);
 		break;
-	case WD179X_IRQ_SET:
+	case WD17XX_IRQ_SET:
 		DRQ_IRQ_status |= fdc_IRQ;
 		ti99_peb_set_ilb_bit(intb_fdc_bit, 1);
 		break;
-	case WD179X_DRQ_CLR:
+	case WD17XX_DRQ_CLR:
 		DRQ_IRQ_status &= ~fdc_DRQ;
 		break;
-	case WD179X_DRQ_SET:
+	case WD17XX_DRQ_SET:
 		DRQ_IRQ_status |= fdc_DRQ;
 		break;
 	}
@@ -519,8 +519,8 @@ static void fdc_cru_w(int offset, int data)
 				{
 					DSKnum = drive;
 
-					wd179x_set_drive(DSKnum);
-					/*wd179x_set_side(DSKside);*/
+					wd17xx_set_drive(DSKnum);
+					/*wd17xx_set_side(DSKside);*/
 				}
 			}
 			else
@@ -538,7 +538,7 @@ static void fdc_cru_w(int offset, int data)
 	case 7:
 		/* Select side of disk (bit 7) */
 		DSKside = data;
-		wd179x_set_side(DSKside);
+		wd17xx_set_side(DSKside);
 		break;
 	}
 }
@@ -552,16 +552,16 @@ static  READ8_HANDLER(fdc_mem_r)
 	switch (offset)
 	{
 	case 0x1FF0:					/* Status register */
-		return (wd179x_status_r(offset) ^ 0xFF);
+		return (wd17xx_status_r(offset) ^ 0xFF);
 		break;
 	case 0x1FF2:					/* Track register */
-		return wd179x_track_r(offset) ^ 0xFF;
+		return wd17xx_track_r(offset) ^ 0xFF;
 		break;
 	case 0x1FF4:					/* Sector register */
-		return wd179x_sector_r(offset) ^ 0xFF;
+		return wd17xx_sector_r(offset) ^ 0xFF;
 		break;
 	case 0x1FF6:					/* Data register */
-		return wd179x_data_r(offset) ^ 0xFF;
+		return wd17xx_data_r(offset) ^ 0xFF;
 		break;
 	default:						/* DSR ROM */
 		return ti99_disk_DSR[offset];
@@ -579,16 +579,16 @@ static WRITE8_HANDLER(fdc_mem_w)
 	switch (offset)
 	{
 	case 0x1FF8:					/* Command register */
-		wd179x_command_w(offset, data);
+		wd17xx_command_w(offset, data);
 		break;
 	case 0x1FFA:					/* Track register */
-		wd179x_track_w(offset, data);
+		wd17xx_track_w(offset, data);
 		break;
 	case 0x1FFC:					/* Sector register */
-		wd179x_sector_w(offset, data);
+		wd17xx_sector_w(offset, data);
 		break;
 	case 0x1FFE:					/* Data register */
-		wd179x_data_w(offset, data);
+		wd17xx_data_w(offset, data);
 		break;
 	}
 }
@@ -639,8 +639,8 @@ void ti99_ccfdc_init(void)
 
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
 
-	wd179x_init(WD_TYPE_179X, fdc_callback);		/* initialize the floppy disk controller */
-	wd179x_set_density(DEN_MFM_LO);
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	wd17xx_set_density(DEN_MFM_LO);
 
 
 	use_80_track_drives = FALSE;
@@ -728,8 +728,8 @@ static void ccfdc_cru_w(int offset, int data)
 				{
 					DSKnum = drive;
 
-					wd179x_set_drive(DSKnum);
-					/*wd179x_set_side(DSKside);*/
+					wd17xx_set_drive(DSKnum);
+					/*wd17xx_set_side(DSKside);*/
 				}
 			}
 			else
@@ -747,12 +747,12 @@ static void ccfdc_cru_w(int offset, int data)
 	case 7:
 		/* Select side of disk (bit 7) */
 		DSKside = data;
-		wd179x_set_side(DSKside);
+		wd17xx_set_side(DSKside);
 		break;
 
 	case 10:
 		/* double density enable (active low) */
-		wd179x_set_density(data ? DEN_FM_LO : DEN_MFM_LO);
+		wd17xx_set_density(data ? DEN_FM_LO : DEN_MFM_LO);
 		break;
 
 	case 11:
@@ -858,8 +858,8 @@ void ti99_bwg_init(void)
 
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 
-	wd179x_init(WD_TYPE_179X, fdc_callback);		/* initialize the floppy disk controller */
-	wd179x_set_density(DEN_MFM_LO);
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);		/* initialize the floppy disk controller */
+	wd17xx_set_density(DEN_MFM_LO);
 
 
 	mm58274c_init(1, 1);	/* initialize the RTC */
@@ -949,8 +949,8 @@ static void bwg_cru_w(int offset, int data)
 				{
 					DSKnum = drive;
 
-					wd179x_set_drive(DSKnum);
-					/*wd179x_set_side(DSKside);*/
+					wd17xx_set_drive(DSKnum);
+					/*wd17xx_set_side(DSKside);*/
 				}
 			}
 			else
@@ -968,12 +968,12 @@ static void bwg_cru_w(int offset, int data)
 	case 7:
 		/* Select side of disk (bit 7) */
 		DSKside = data;
-		wd179x_set_side(DSKside);
+		wd17xx_set_side(DSKside);
 		break;
 
 	case 10:
 		/* double density enable (active low) */
-		wd179x_set_density(data ? DEN_FM_LO : DEN_MFM_LO);
+		wd17xx_set_density(data ? DEN_FM_LO : DEN_MFM_LO);
 		break;
 
 	case 11:
@@ -1038,16 +1038,16 @@ static  READ8_HANDLER(bwg_mem_r)
 			switch (offset)
 			{
 			case 0x1FF0:					/* Status register */
-				reply = wd179x_status_r(offset);
+				reply = wd17xx_status_r(offset);
 				break;
 			case 0x1FF2:					/* Track register */
-				reply = wd179x_track_r(offset);
+				reply = wd17xx_track_r(offset);
 				break;
 			case 0x1FF4:					/* Sector register */
-				reply = wd179x_sector_r(offset);
+				reply = wd17xx_sector_r(offset);
 				break;
 			case 0x1FF6:					/* Data register */
-				reply = wd179x_data_r(offset);
+				reply = wd17xx_data_r(offset);
 				break;
 			default:
 				reply = 0;
@@ -1083,16 +1083,16 @@ static WRITE8_HANDLER(bwg_mem_w)
 			switch (offset)
 			{
 			case 0x1FF8:					/* Command register */
-				wd179x_command_w(offset, data);
+				wd17xx_command_w(offset, data);
 				break;
 			case 0x1FFA:					/* Track register */
-				wd179x_track_w(offset, data);
+				wd17xx_track_w(offset, data);
 				break;
 			case 0x1FFC:					/* Sector register */
-				wd179x_sector_w(offset, data);
+				wd17xx_sector_w(offset, data);
 				break;
 			case 0x1FFE:					/* Data register */
-				wd179x_data_w(offset, data);
+				wd17xx_data_w(offset, data);
 				break;
 			}
 		}

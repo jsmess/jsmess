@@ -159,20 +159,20 @@ static READ8_HANDLER( coupe_port_r )
 	{
 	case DSK1_PORT+0:	/* This covers the total range of ports for 1 floppy controller */
     case DSK1_PORT+4:
-		wd179x_set_side((offset >> 2) & 1);
-		return wd179x_status_r(0);
+		wd17xx_set_side((offset >> 2) & 1);
+		return wd17xx_status_r(0);
 	case DSK1_PORT+1:
     case DSK1_PORT+5:
-		wd179x_set_side((offset >> 2) & 1);
-        return wd179x_track_r(0);
+		wd17xx_set_side((offset >> 2) & 1);
+        return wd17xx_track_r(0);
 	case DSK1_PORT+2:
     case DSK1_PORT+6:
-		wd179x_set_side((offset >> 2) & 1);
-        return wd179x_sector_r(0);
+		wd17xx_set_side((offset >> 2) & 1);
+        return wd17xx_sector_r(0);
 	case DSK1_PORT+3:
 	case DSK1_PORT+7:
-		wd179x_set_side((offset >> 2) & 1);
-        return wd179x_data_r(0);
+		wd17xx_set_side((offset >> 2) & 1);
+        return wd17xx_data_r(0);
 	case LPEN_PORT:
 		return LPEN;
 	case STAT_PORT:
@@ -209,26 +209,26 @@ static WRITE8_HANDLER( coupe_port_w )
 	{
 	case DSK1_PORT+0:							// This covers the total range of ports for 1 floppy controller
     case DSK1_PORT+4:
-		wd179x_set_side((offset >> 2) & 1);
-        wd179x_command_w(0, data);
+		wd17xx_set_side((offset >> 2) & 1);
+        wd17xx_command_w(0, data);
 		break;
     case DSK1_PORT+1:
     case DSK1_PORT+5:
 		/* Track byte requested on address line */
-		wd179x_set_side((offset >> 2) & 1);
-        wd179x_track_w(0, data);
+		wd17xx_set_side((offset >> 2) & 1);
+        wd17xx_track_w(0, data);
 		break;
     case DSK1_PORT+2:
     case DSK1_PORT+6:
 		/* Sector byte requested on address line */
-		wd179x_set_side((offset >> 2) & 1);
-        wd179x_sector_w(0, data);
+		wd17xx_set_side((offset >> 2) & 1);
+        wd17xx_sector_w(0, data);
         break;
     case DSK1_PORT+3:
 	case DSK1_PORT+7:
 		/* Data byte requested on address line */
-		wd179x_set_side((offset >> 2) & 1);
-        wd179x_data_w(0, data);
+		wd17xx_set_side((offset >> 2) & 1);
+        wd17xx_data_w(0, data);
 		break;
 	case CLUT_PORT:
 		CLUT[(offset >> 8)&0x0F]=data&0x7F;		// set CLUT data
@@ -415,7 +415,7 @@ static MACHINE_DRIVER_START( coupe )
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(0))
 	MDRV_INTERLEAVE(1)
 
-	MDRV_MACHINE_RESET( coupe )
+	MDRV_MACHINE_START( coupe )
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

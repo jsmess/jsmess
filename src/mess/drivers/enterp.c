@@ -174,9 +174,9 @@ DAVE_INTERFACE	enterprise_dave_interface=
 };
 
 
-static void enterp_wd177x_callback(int);
+static void enterp_wd177x_callback(wd17xx_state_t event, void *param);
 
-void Enterprise_Initialise()
+static void enterprise_reset(running_machine *machine)
 {
 	int i;
 
@@ -231,9 +231,14 @@ void Enterprise_Initialise()
 
 	cpunum_set_input_line_vector(0,0,0x0ff);
 
-	wd179x_init(WD_TYPE_177X, enterp_wd177x_callback);
-
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
+}
+
+static MACHINE_START(enterprise)
+{
+	wd17xx_init(WD_TYPE_177X, enterp_wd177x_callback, NULL);
+	add_reset_callback(machine, enterprise_reset);
+	return 0;
 }
 
 static  READ8_HANDLER ( enterprise_wd177x_read )
@@ -241,13 +246,13 @@ static  READ8_HANDLER ( enterprise_wd177x_read )
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd179x_status_r(offset);
+		return wd17xx_status_r(offset);
 	case 1:
-		return wd179x_track_r(offset);
+		return wd17xx_track_r(offset);
 	case 2:
-		return wd179x_sector_r(offset);
+		return wd17xx_sector_r(offset);
 	case 3:
-		return wd179x_data_r(offset);
+		return wd17xx_data_r(offset);
 	default:
 		break;
 	}
@@ -260,16 +265,16 @@ static WRITE8_HANDLER (	enterprise_wd177x_write )
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd179x_command_w(offset, data);
+		wd17xx_command_w(offset, data);
 		return;
 	case 1:
-		wd179x_track_w(offset, data);
+		wd17xx_track_w(offset, data);
 		return;
 	case 2:
-		wd179x_sector_w(offset, data);
+		wd17xx_sector_w(offset, data);
 		return;
 	case 3:
-		wd179x_data_w(offset, data);
+		wd17xx_data_w(offset, data);
 		return;
 	default:
 		break;
@@ -314,24 +319,24 @@ static int EXDOS_GetDriveSelection(int data)
 
 static char EXDOS_CARD_R = 0;
 
-static void enterp_wd177x_callback(int State)
+static void enterp_wd177x_callback(wd17xx_state_t State, void *param)
 {
-   if (State==WD179X_IRQ_CLR)
+   if (State==WD17XX_IRQ_CLR)
    {
 		EXDOS_CARD_R &= ~0x02;
    }
 
-   if (State==WD179X_IRQ_SET)
+   if (State==WD17XX_IRQ_SET)
    {
 		EXDOS_CARD_R |= 0x02;
    }
 
-   if (State==WD179X_DRQ_CLR)
+   if (State==WD17XX_DRQ_CLR)
    {
 		EXDOS_CARD_R &= ~0x080;
    }
 
-   if (State==WD179X_DRQ_SET)
+   if (State==WD17XX_DRQ_SET)
    {
 		EXDOS_CARD_R |= 0x080;
    }
@@ -346,8 +351,8 @@ static WRITE8_HANDLER ( exdos_card_w )
 
 	int drive = EXDOS_GetDriveSelection(data);
 
-	wd179x_set_drive(drive);
-	wd179x_set_side(head);
+	wd17xx_set_drive(drive);
+	wd17xx_set_side(head);
 }
 
 /* bit 0 - ??
@@ -537,7 +542,7 @@ static MACHINE_DRIVER_START( ep128 )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(1)
 
-	MDRV_MACHINE_RESET( enterprise )
+	MDRV_MACHINE_START( enterprise )
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

@@ -33,7 +33,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- WD17xx cleanups.  [Nate Woods]
 
 
 

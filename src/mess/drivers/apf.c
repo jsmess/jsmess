@@ -315,7 +315,7 @@ static MACHINE_START( apf_imagination )
 {
 	pia_config(1, PIA_STANDARD_ORDERING,&apf_imagination_pia_interface);
 	apf_common_init();
-	wd179x_init(WD_TYPE_179X,NULL);
+	wd17xx_init(WD_TYPE_179X, NULL, NULL);
 	return 0;
 }
 
@@ -332,7 +332,7 @@ static WRITE8_HANDLER(apf_dischw_w)
 	/* bit 3 is index of drive to select */
 	drive = (data>>3) & 0x01;
 
-	wd179x_set_drive(drive);
+	wd17xx_set_drive(drive);
 
 	logerror("disc w %04x %04x\n",offset,data);
 }
@@ -350,42 +350,42 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {
-	wd179x_command_w(offset,~data);
+	wd17xx_command_w(offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd179x_track_w(offset,~data);
+	wd17xx_track_w(offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd179x_sector_w(offset,~data);
+	wd17xx_sector_w(offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd179x_data_w(offset,~data);
+	wd17xx_data_w(offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd179x_status_r(offset);
+	return ~wd17xx_status_r(offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd179x_track_r(offset);
+	return ~wd17xx_track_r(offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd179x_sector_r(offset);
+	return ~wd17xx_sector_r(offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd179x_data_r(offset);
+	return wd17xx_data_r(offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)

@@ -20,10 +20,13 @@
 
 ***************************************************************************/
 
-#define WD179X_IRQ_CLR	0
-#define WD179X_IRQ_SET	1
-#define WD179X_DRQ_CLR	2
-#define WD179X_DRQ_SET	3
+typedef enum
+{
+	WD17XX_IRQ_CLR,
+	WD17XX_IRQ_SET,
+	WD17XX_DRQ_CLR,
+	WD17XX_DRQ_SET
+} wd17xx_state_t;
 
 /* enumeration to specify the type of FDC; there are subtle differences */
 typedef enum
@@ -38,7 +41,7 @@ typedef enum
 	/* duplicate constants */
 	WD_TYPE_177X = WD_TYPE_1770,
 	WD_TYPE_MB8877 = WD_TYPE_179X
-} wd179x_type_t;
+} wd17xx_type_t;
 
 
 
@@ -48,27 +51,27 @@ typedef enum
 
 ***************************************************************************/
 
-void wd179x_init(wd179x_type_t type, void (*callback)(int));
-void wd179x_reset(void);
+void wd17xx_init(wd17xx_type_t type, void (*callback)(wd17xx_state_t, void *), void *param);
+void wd17xx_reset(void);
 
 /* the following are not strictly part of the wd179x hardware/emulation
 but will be put here for now until the flopdrv code has been finalised more */
-void wd179x_set_drive(UINT8);		/* set drive wd179x is accessing */
-void wd179x_set_side(UINT8);		/* set side wd179x is accessing */
-void wd179x_set_density(DENSITY);	/* set density */
+void wd17xx_set_drive(UINT8);		/* set drive wd179x is accessing */
+void wd17xx_set_side(UINT8);		/* set side wd179x is accessing */
+void wd17xx_set_density(DENSITY);	/* set density */
 
-READ8_HANDLER( wd179x_status_r );
-READ8_HANDLER( wd179x_track_r );
-READ8_HANDLER( wd179x_sector_r );
-READ8_HANDLER( wd179x_data_r );
+READ8_HANDLER( wd17xx_status_r );
+READ8_HANDLER( wd17xx_track_r );
+READ8_HANDLER( wd17xx_sector_r );
+READ8_HANDLER( wd17xx_data_r );
 
-WRITE8_HANDLER( wd179x_command_w );
-WRITE8_HANDLER( wd179x_track_w );
-WRITE8_HANDLER( wd179x_sector_w );
-WRITE8_HANDLER( wd179x_data_w );
+WRITE8_HANDLER( wd17xx_command_w );
+WRITE8_HANDLER( wd17xx_track_w );
+WRITE8_HANDLER( wd17xx_sector_w );
+WRITE8_HANDLER( wd17xx_data_w );
 
-READ8_HANDLER( wd179x_r );
-WRITE8_HANDLER( wd179x_w );
+READ8_HANDLER( wd17xx_r );
+WRITE8_HANDLER( wd17xx_w );
 
 #endif /* WD179X_H */
 

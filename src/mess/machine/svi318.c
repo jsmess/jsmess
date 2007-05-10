@@ -261,20 +261,20 @@ typedef struct
 
 static SVI318_FDC_STRUCT svi318_fdc;
 
-static void svi_fdc_callback(int param)
+static void svi_fdc_callback(wd17xx_state_t state, void *param)
 {
-	switch( param )
+	switch( state )
 	{
-	case WD179X_IRQ_CLR:
+	case WD17XX_IRQ_CLR:
 		svi318_fdc.irq_drq &= ~0x80;
 		break;
-	case WD179X_IRQ_SET:
+	case WD17XX_IRQ_SET:
 		svi318_fdc.irq_drq |= 0x80;
 		break;
-	case WD179X_DRQ_CLR:
+	case WD17XX_DRQ_CLR:
 		svi318_fdc.irq_drq &= ~0x40;
 		break;
-	case WD179X_DRQ_SET:
+	case WD17XX_DRQ_SET:
 		svi318_fdc.irq_drq |= 0x40;
 		break;
 	}
@@ -285,11 +285,11 @@ WRITE8_HANDLER( svi318_fdc_drive_motor_w )
 	switch (data & 3)
 	{
 	case 1:
-		wd179x_set_drive(0);
+		wd17xx_set_drive(0);
 		svi318_fdc.driveselect = 0;
 		break;
 	case 2:
-		wd179x_set_drive(1);
+		wd17xx_set_drive(1);
 		svi318_fdc.driveselect = 1;
 		break;
 	}
@@ -299,9 +299,9 @@ WRITE8_HANDLER( svi318_fdc_density_side_w )
 {
 	mess_image *image;
 
-	wd179x_set_density(data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
+	wd17xx_set_density(data & 0x01 ? DEN_FM_LO:DEN_MFM_LO);
 
-	wd179x_set_side(data & 0x02 ? 1:0);
+	wd17xx_set_side(data & 0x02 ? 1:0);
             
 	image = image_from_devtype_and_index(IO_FLOPPY, svi318_fdc.driveselect);
 	if (image_exists(image))
@@ -606,7 +606,7 @@ DRIVER_INIT( svi318 )
 	}
 
 	/* floppy */
-	wd179x_init(WD_TYPE_179X, svi_fdc_callback);
+	wd17xx_init(WD_TYPE_179X, svi_fdc_callback, NULL);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -634,7 +634,7 @@ MACHINE_RESET( svi318 )
 	svi.bank_switch = 0xff;
 	svi318_set_banks();
 
-	wd179x_reset();
+	wd17xx_reset();
 }
 
 INTERRUPT_GEN( svi318_interrupt )

@@ -82,7 +82,7 @@ struct
 static void concept_fdc_init(int slot);
 static void concept_hdc_init(int slot);
 
-MACHINE_RESET(concept)
+MACHINE_START(concept)
 {
 	/* initialize int state */
 	pending_interrupts = 0;
@@ -105,6 +105,7 @@ MACHINE_RESET(concept)
 
 	concept_hdc_init(1);	/* Flat cable Hard Disk Controller in Slot 2 */
 	concept_fdc_init(2);	/* Floppy Disk Controller in Slot 3 */
+	return 0;
 }
 
 static void install_expansion_slot(int slot,
@@ -594,7 +595,7 @@ enum
 	LC_FMMFM_mask	= (1 << LC_FMMFM_bit)
 };
 
-static void fdc_callback(int event);
+static void fdc_callback(wd17xx_state_t event, void *param);
 
 static  READ8_HANDLER(concept_fdc_reg_r);
 static WRITE8_HANDLER(concept_fdc_reg_w);
@@ -605,27 +606,27 @@ static void concept_fdc_init(int slot)
 	fdc_local_status = 0;
 	fdc_local_command = 0;
 
-	wd179x_init(WD_TYPE_179X, fdc_callback);
+	wd17xx_init(WD_TYPE_179X, fdc_callback, NULL);
 
 	install_expansion_slot(slot, concept_fdc_reg_r, concept_fdc_reg_w, concept_fdc_rom_r, NULL);
 }
 
-static void fdc_callback(int event)
+static void fdc_callback(wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
-	case WD179X_IRQ_CLR:
-		fdc_local_status &= ~LS_INT_mask;
-		break;
-	case WD179X_IRQ_SET:
-		fdc_local_status |= LS_INT_mask;
-		break;
-	case WD179X_DRQ_CLR:
-		fdc_local_status &= ~LS_DRQ_mask;
-		break;
-	case WD179X_DRQ_SET:
-		fdc_local_status |= LS_DRQ_mask;
-		break;
+		case WD17XX_IRQ_CLR:
+			fdc_local_status &= ~LS_INT_mask;
+			break;
+		case WD17XX_IRQ_SET:
+			fdc_local_status |= LS_INT_mask;
+			break;
+		case WD17XX_DRQ_CLR:
+			fdc_local_status &= ~LS_DRQ_mask;
+			break;
+		case WD17XX_DRQ_SET:
+			fdc_local_status |= LS_DRQ_mask;
+			break;
 	}
 }
 
@@ -640,22 +641,22 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 
 	case 8:
 		/* FDC STATUS REG */
-		return wd179x_status_r(offset);
+		return wd17xx_status_r(offset);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		return wd179x_track_r(offset);
+		return wd17xx_track_r(offset);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		return wd179x_sector_r(offset);
+		return wd17xx_sector_r(offset);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		return wd179x_data_r(offset);
+		return wd17xx_data_r(offset);
 		break;
 	}
 
@@ -672,34 +673,34 @@ static WRITE8_HANDLER(concept_fdc_reg_w)
 		/* local command reg */
 		fdc_local_command = data;
 
-		wd179x_set_side((data & LC_FLPSD1_mask) != 0);
+		wd17xx_set_side((data & LC_FLPSD1_mask) != 0);
 		current_drive = ((data >> LC_DE0_bit) & 1) | ((data >> (LC_DE1_bit-1)) & 2);
-		wd179x_set_drive(current_drive);
+		wd17xx_set_drive(current_drive);
 		/*motor_on = (data & LC_MOTOROF_mask) == 0;*/
 		// floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, current_drive), (data & LC_MOTOROF_mask) == 0 ? 1 : 0);
 		/*flp_8in = (data & LC_FLP8IN_mask) != 0;*/
-		wd179x_set_density((data & LC_FMMFM_mask) ? DEN_FM_LO : DEN_MFM_LO);
+		wd17xx_set_density((data & LC_FMMFM_mask) ? DEN_FM_LO : DEN_MFM_LO);
 		floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, current_drive), 1, 0);
 		break;
 
 	case 8:
 		/* FDC COMMAMD REG */
-		wd179x_command_w(offset, data);
+		wd17xx_command_w(offset, data);
 		break;
 
 	case 9:
 		/* FDC TRACK REG */
-		wd179x_track_w(offset, data);
+		wd17xx_track_w(offset, data);
 		break;
 
 	case 10:
 		/* FDC SECTOR REG */
-		wd179x_sector_w(offset, data);
+		wd17xx_sector_w(offset, data);
 		break;
 
 	case 11:
 		/* FDC DATA REG */
-		wd179x_data_w(offset, data);
+		wd17xx_data_w(offset, data);
 		break;
 	}
 }

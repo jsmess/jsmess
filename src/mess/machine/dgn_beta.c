@@ -711,12 +711,12 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 	}
 	
 	/* Drive selects are binary encoded on PA0 & PA1 */
-	wd179x_set_drive(~data & DSMask);
+	wd17xx_set_drive(~data & DSMask);
 	
 	/* Set density of WD2797 */
 	if (data & DDenCtrl) 
 	{
-		wd179x_set_density(DEN_FM_LO);
+		wd17xx_set_density(DEN_FM_LO);
 #ifdef MAME_DEBUG
 		if (LOG_DISK)
 			logerror("Set density low %d\n",(data & DDenCtrl));
@@ -724,7 +724,7 @@ static WRITE8_HANDLER(d_pia1_pa_w)
 	}
 	else
 	{
-		wd179x_set_density(DEN_MFM_LO);
+		wd17xx_set_density(DEN_MFM_LO);
 #ifdef MAME_DEBUG
 		if (LOG_DISK)
 			logerror("Set density high %d\n",(data & DDenCtrl));
@@ -939,24 +939,24 @@ static void cpu1_recalc_firq(int state)
 /* Dragon Beta onboard FDC */
 /********************************************************************************************/
 
-static void dgnbeta_fdc_callback(int event)
+static void dgnbeta_fdc_callback(wd17xx_state_t event, void *param)
 {
 	/* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
 	/* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
 	
 	switch(event) 
 	{
-		case WD179X_IRQ_CLR:
+		case WD17XX_IRQ_CLR:
 			pia_2_ca1_w(0,CLEAR_LINE);
 			break;
-		case WD179X_IRQ_SET:
+		case WD17XX_IRQ_SET:
 			pia_2_ca1_w(0,ASSERT_LINE);
 			break;
-		case WD179X_DRQ_CLR:
+		case WD17XX_DRQ_CLR:
 			/*wd2797_drq=CLEAR_LINE;*/
 			cpu1_recalc_firq(CLEAR_LINE);
 			break;
-		case WD179X_DRQ_SET:
+		case WD17XX_DRQ_SET:
 			/*wd2797_drq=ASSERT_LINE;*/
 			cpu1_recalc_firq(ASSERT_LINE);
 			break;		
@@ -975,20 +975,20 @@ static void dgnbeta_fdc_callback(int event)
 	switch(offset & 0x03) 
 	{
 		case 0:
-			result = wd179x_status_r(0);
+			result = wd17xx_status_r(0);
 #ifdef MAME_DEBUG
 			if (LOG_DISK)
 				logerror("Disk status=%2.2X\n",result);
 #endif
 			break;
 		case 1:
-			result = wd179x_track_r(0);
+			result = wd17xx_track_r(0);
 			break;
 		case 2:
-			result = wd179x_sector_r(0);
+			result = wd17xx_sector_r(0);
 			break;
 		case 3:
-			result = wd179x_data_r(0);
+			result = wd17xx_data_r(0);
 			break;
 		default:
 			break;
@@ -1005,17 +1005,17 @@ WRITE8_HANDLER(dgnbeta_wd2797_w)
 			/* disk head is encoded in the command byte */
 			/* But only for Type 3/4 commands */
 			if(data & 0x80)
-				wd179x_set_side((data & 0x02) ? 1 : 0);
-			wd179x_command_w(0, data);
+				wd17xx_set_side((data & 0x02) ? 1 : 0);
+			wd17xx_command_w(0, data);
 			break;
 		case 1:
-			wd179x_track_w(0, data);
+			wd17xx_track_w(0, data);
 			break;
 		case 2:
-			wd179x_sector_w(0, data);
+			wd17xx_sector_w(0, data);
 			break;
 		case 3:
-			wd179x_data_w(0, data);
+			wd17xx_data_w(0, data);
 			break;
 	};
 }
@@ -1126,9 +1126,9 @@ static void dgnbeta_reset(running_machine *machine)
 	DMA_NMI_LAST=0x80;			/* start with DMA NMI inactive, as pulled up */
 //	DMA_NMI=CLEAR_LINE;			/* start with DMA NMI inactive */
 	
-	wd179x_reset();
-	wd179x_set_density(DEN_MFM_LO);
-	wd179x_set_drive(0);
+	wd17xx_reset();
+	wd17xx_set_density(DEN_MFM_LO);
+	wd17xx_set_drive(0);
 
 	videoram=mess_ram;			/* Point video ram at the start of physical ram */
 }
@@ -1142,7 +1142,7 @@ MACHINE_START( dgnbeta )
 
 	init_video();
 	
-	wd179x_init(WD_TYPE_179X,dgnbeta_fdc_callback);
+	wd17xx_init(WD_TYPE_179X,dgnbeta_fdc_callback, NULL);
 #ifdef MAME_DEBUG
 	cpuintrf_set_dasm_override(0,dgnbeta_dasm_override);
 #endif /* MAME_DEBUG */

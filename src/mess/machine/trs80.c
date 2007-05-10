@@ -275,7 +275,7 @@ DEVICE_LOAD( trs80_floppy )
     return INIT_PASS;
 }
 
-static void trs80_fdc_callback(int);
+static void trs80_fdc_callback(wd17xx_state_t event, void *param);
 
 static void trs80_machine_reset(running_machine *machine)
 {
@@ -319,7 +319,7 @@ DRIVER_INIT( trs80 )
 
 MACHINE_START( trs80 )
 {
-	wd179x_init(WD_TYPE_179X,trs80_fdc_callback);
+	wd17xx_init(WD_TYPE_179X,trs80_fdc_callback, NULL);
 	add_reset_callback(machine, trs80_machine_reset);
 	add_exit_callback(machine, tape_put_close);
 	return 0;
@@ -623,15 +623,19 @@ INTERRUPT_GEN( trs80_fdc_interrupt )
 	}
 }
 
-void trs80_fdc_callback(int event)
+void trs80_fdc_callback(wd17xx_state_t event, void *param)
 {
 	switch (event)
 	{
-		case WD179X_IRQ_CLR:
+		case WD17XX_IRQ_CLR:
 			irq_status &= ~IRQ_FDC;
 			break;
-		case WD179X_IRQ_SET:
+		case WD17XX_IRQ_SET:
 			trs80_fdc_interrupt();
+			break;
+		case WD17XX_DRQ_CLR:
+		case WD17XX_DRQ_SET:
+			/* do nothing */
 			break;
 	}
 }
@@ -710,8 +714,8 @@ WRITE8_HANDLER( trs80_motor_w )
 	if (drive > 3)
 		return;
 
-    wd179x_set_drive(drive);
-	wd179x_set_side(head);
+    wd17xx_set_drive(drive);
+	wd17xx_set_side(head);
 
 }
 

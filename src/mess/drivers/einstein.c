@@ -525,25 +525,25 @@ static WRITE8_HANDLER(einstein_fdc_w)
 	{
 		case 0:
 		{
-			wd179x_command_w(reg, data);
+			wd17xx_command_w(reg, data);
 		}
 		break;
 	
 		case 1:
 		{
-			wd179x_track_w(reg, data);
+			wd17xx_track_w(reg, data);
 		}
 		break;
 	
 		case 2:
 		{
-			wd179x_sector_w(reg, data);
+			wd17xx_sector_w(reg, data);
 		}
 		break;
 
 		case 3:
 		{
-			wd179x_data_w(reg, data);
+			wd17xx_data_w(reg, data);
 		}
 		break;
 	}
@@ -560,25 +560,25 @@ static  READ8_HANDLER(einstein_fdc_r)
 	{
 		case 0:
 		{
-			return wd179x_status_r(reg);
+			return wd17xx_status_r(reg);
 		}
 		break;
 	
 		case 1:
 		{
-			return wd179x_track_r(reg);
+			return wd17xx_track_r(reg);
 		}
 		break;
 	
 		case 2:
 		{
-			return wd179x_sector_r(reg);
+			return wd17xx_sector_r(reg);
 		}
 		break;
 
 		case 3:
 		{
-			return wd179x_data_r(reg);
+			return wd17xx_data_r(reg);
 		}
 		break;
 	}
@@ -774,26 +774,26 @@ static WRITE8_HANDLER(einstein_drive_w)
 
 	logerror("drive w: PC: %04x %04x %02x\n",activecpu_get_pc(),offset,data); 
 
-	wd179x_set_side((data>>4) & 0x01);
+	wd17xx_set_side((data>>4) & 0x01);
 	
 	if (data & 0x01)
 	{
-		wd179x_set_drive(0);
+		wd17xx_set_drive(0);
 	}
 	else
 	if (data & 0x02)
 	{
-		wd179x_set_drive(1);
+		wd17xx_set_drive(1);
 	}
 	else
 	if (data & 0x04)
 	{
-		wd179x_set_drive(2);
+		wd17xx_set_drive(2);
 	}
 	else
 	if (data & 0x08)
 	{
-		wd179x_set_drive(3);
+		wd17xx_set_drive(3);
 	}
 }
 
@@ -1398,7 +1398,7 @@ static MACHINE_RESET( einstein )
 	einstein_rom_enabled = 1;
 	einstein_page_rom();
 
-	wd179x_init(WD_TYPE_177X,NULL);
+	wd17xx_init(WD_TYPE_177X, NULL, NULL);
 
 	einstein_ctc_trigger = 0;
 

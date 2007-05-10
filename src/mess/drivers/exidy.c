@@ -274,7 +274,7 @@ static MACHINE_RESET( exidy )
 
 	timer_set(TIME_NOW, 0, exidy_reset_timer_callback);
 	
-	wd179x_init(WD_TYPE_179X,NULL);
+	wd17xx_init(WD_TYPE_179X,NULL, NULL);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 
@@ -308,7 +308,7 @@ static MACHINE_RESET( exidyd )
 
 	timer_set(TIME_NOW, 0, exidy_reset_timer_callback);
 	
-	wd179x_init(WD_TYPE_179X,NULL);
+	wd17xx_init(WD_TYPE_179X,NULL, NULL);
 
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
@@ -318,13 +318,13 @@ static  READ8_HANDLER ( exidy_wd179x_r )
 	switch (offset & 0x03)
 	{
 	case 0:
-		return wd179x_status_r(offset);
+		return wd17xx_status_r(offset);
 	case 1:
-		return wd179x_track_r(offset);
+		return wd17xx_track_r(offset);
 	case 2:
-		return wd179x_sector_r(offset);
+		return wd17xx_sector_r(offset);
 	case 3:
-		return wd179x_data_r(offset);
+		return wd17xx_data_r(offset);
 	default:
 		break;
 	}
@@ -337,16 +337,16 @@ static WRITE8_HANDLER ( exidy_wd179x_w )
 	switch (offset & 0x03)
 	{
 	case 0:
-		wd179x_command_w(offset, data);
+		wd17xx_command_w(offset, data);
 		return;
 	case 1:
-		wd179x_track_w(offset, data);
+		wd17xx_track_w(offset, data);
 		return;
 	case 2:
-		wd179x_sector_w(offset, data);
+		wd17xx_sector_w(offset, data);
 		return;
 	case 3:
-		wd179x_data_w(offset, data);
+		wd17xx_data_w(offset, data);
 		return;
 	default:
 		break;

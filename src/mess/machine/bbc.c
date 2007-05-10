@@ -1614,7 +1614,7 @@ density disc image
 
 static int bbc_1770_IntEnabled;
 
-static void bbc_wd177x_callback(int event)
+static void bbc_wd177x_callback(wd17xx_state_t event, void *param)
 {
 	int state;
 	/* wd177x_IRQ_SET and latch bit 4 (nmi_enable) are NAND'ED together
@@ -1635,25 +1635,25 @@ static void bbc_wd177x_callback(int event)
 	/* update bbc_wd177x_drq_irq_state depending on event */
 	switch (event)
 	{
-        case WD179X_DRQ_SET:
+        case WD17XX_DRQ_SET:
 		{
 			bbc_wd177x_drq_irq_state |= 1;
 		}
 		break;
 
-		case WD179X_DRQ_CLR:
+		case WD17XX_DRQ_CLR:
 		{
 			bbc_wd177x_drq_irq_state &= ~1;
 		}
 		break;
 
-		case  WD179X_IRQ_SET:
+		case  WD17XX_IRQ_SET:
 		{
 			bbc_wd177x_drq_irq_state |= (1<<1);
 		}
 		break;
 
-		case WD179X_IRQ_CLR:
+		case WD17XX_IRQ_CLR:
 		{
 			bbc_wd177x_drq_irq_state &= ~(1<<1);
 		}
@@ -1693,22 +1693,22 @@ WRITE8_HANDLER(bbc_wd177x_status_w)
 	drive_control = data;
 
 	/* set drive */
-	if ((data>>0) & 0x01) wd179x_set_drive(0);
-	if ((data>>1) & 0x01) wd179x_set_drive(1);
+	if ((data>>0) & 0x01) wd17xx_set_drive(0);
+	if ((data>>1) & 0x01) wd17xx_set_drive(1);
 
 	/* set side */
-	wd179x_set_side((data>>2) & 0x01);
+	wd17xx_set_side((data>>2) & 0x01);
 
 	/* set density */
 	if ((data>>3) & 0x01)
 	{
 		/* single density */
-		wd179x_set_density(DEN_FM_HI);
+		wd17xx_set_density(DEN_FM_HI);
 	}
 	else
 	{
 		/* double density */
-		wd179x_set_density(DEN_MFM_LO);
+		wd17xx_set_density(DEN_MFM_LO);
 	}
 
 	bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
@@ -1723,16 +1723,16 @@ READ8_HANDLER ( bbc_wd1770_read )
 	switch (offset)
 	{
 	case 4:
-		retval=wd179x_status_r(0);
+		retval=wd17xx_status_r(0);
 		break;
 	case 5:
-		retval=wd179x_track_r(0);
+		retval=wd17xx_track_r(0);
 		break;
 	case 6:
-		retval=wd179x_sector_r(0);
+		retval=wd17xx_sector_r(0);
 		break;
 	case 7:
-		retval=wd179x_data_r(0);
+		retval=wd17xx_data_r(0);
 		break;
 	default:
 		break;
@@ -1751,16 +1751,16 @@ WRITE8_HANDLER ( bbc_wd1770_write )
 		bbc_wd177x_status_w(0, data);
 		break;
 	case 4:
-		wd179x_command_w(0, data);
+		wd17xx_command_w(0, data);
 		break;
 	case 5:
-		wd179x_track_w(0, data);
+		wd17xx_track_w(0, data);
 		break;
 	case 6:
-		wd179x_sector_w(0, data);
+		wd17xx_sector_w(0, data);
 		break;
 	case 7:
-		wd179x_data_w(0, data);
+		wd17xx_data_w(0, data);
 		break;
 	default:
 		break;
@@ -1810,22 +1810,22 @@ WRITE8_HANDLER( bbc_opus_status_w )
 	drive_control = data;
 
 	/* set drive */
-	if ((data>>1) & 0x01) wd179x_set_drive(0);
-	if ((data>>2) & 0x01) wd179x_set_drive(1);
+	if ((data>>1) & 0x01) wd17xx_set_drive(0);
+	if ((data>>2) & 0x01) wd17xx_set_drive(1);
 
 	/* set side */
-	wd179x_set_side((data>>0) & 0x01);
+	wd17xx_set_side((data>>0) & 0x01);
 
 	/* set density */
 	if ((data>>5) & 0x01)
 	{
 		/* single density */
-		wd179x_set_density(DEN_FM_HI);
+		wd17xx_set_density(DEN_FM_HI);
 	}
 	else
 	{
 		/* double density */
-		wd179x_set_density(DEN_MFM_LO);
+		wd17xx_set_density(DEN_MFM_LO);
 	}
 
 	bbc_1770_IntEnabled=(data>>4) & 0x01;
@@ -1843,16 +1843,16 @@ READ8_HANDLER( bbc_opus_read )
 			switch (offset)
 			{
 				case 0xf8:
-					return wd179x_status_r(0);
+					return wd17xx_status_r(0);
 					break;
 				case 0xf9:
-					return wd179x_track_r(0);
+					return wd17xx_track_r(0);
 					break;
 				case 0xfa:
-					return wd179x_sector_r(0);
+					return wd17xx_sector_r(0);
 					break;
 				case 0xfb:
-					return wd179x_data_r(0);
+					return wd17xx_data_r(0);
 					break;
 			}
 
@@ -1874,16 +1874,16 @@ WRITE8_HANDLER (bbc_opus_write)
 			switch (offset)
 			{
 				case 0xf8:
-					wd179x_command_w(0, data);
+					wd17xx_command_w(0, data);
 					break;
 				case 0xf9:
-					wd179x_track_w(0, data);
+					wd17xx_track_w(0, data);
 					break;
 				case 0xfa:
-					wd179x_sector_w(0, data);
+					wd17xx_sector_w(0, data);
 					break;
 				case 0xfb:
-					wd179x_data_w(0, data);
+					wd17xx_data_w(0, data);
 					break;
 				case 0xfc:
 					bbc_opus_status_w(0,data);
@@ -1913,16 +1913,16 @@ READ8_HANDLER ( bbcm_wd1770_read )
 	switch (offset)
 	{
 	case 0:
-		retval=wd179x_status_r(0);
+		retval=wd17xx_status_r(0);
 		break;
 	case 1:
-		retval=wd179x_track_r(0);
+		retval=wd17xx_track_r(0);
 		break;
 	case 2:
-		retval=wd179x_sector_r(0);
+		retval=wd17xx_sector_r(0);
 		break;
 	case 3:
-		retval=wd179x_data_r(0);
+		retval=wd17xx_data_r(0);
 		break;
 	default:
 		break;
@@ -1937,16 +1937,16 @@ WRITE8_HANDLER ( bbcm_wd1770_write )
 	switch (offset)
 	{
 	case 0:
-		wd179x_command_w(0, data);
+		wd17xx_command_w(0, data);
 		break;
 	case 1:
-		wd179x_track_w(0, data);
+		wd17xx_track_w(0, data);
 		break;
 	case 2:
-		wd179x_sector_w(0, data);
+		wd17xx_sector_w(0, data);
 		break;
 	case 3:
-		wd179x_data_w(0, data);
+		wd17xx_data_w(0, data);
 		break;
 	default:
 		break;
@@ -1964,22 +1964,22 @@ WRITE8_HANDLER ( bbcm_wd1770l_write )
 	drive_control = data;
 
 	/* set drive */
-	if ((data>>0) & 0x01) wd179x_set_drive(0);
-	if ((data>>1) & 0x01) wd179x_set_drive(1);
+	if ((data>>0) & 0x01) wd17xx_set_drive(0);
+	if ((data>>1) & 0x01) wd17xx_set_drive(1);
 
 	/* set side */
-	wd179x_set_side((data>>4) & 0x01);
+	wd17xx_set_side((data>>4) & 0x01);
 
 	/* set density */
 	if ((data>>5) & 0x01)
 	{
 		/* single density */
-		wd179x_set_density(DEN_FM_HI);
+		wd17xx_set_density(DEN_FM_HI);
 	}
 	else
 	{
 		/* double density */
-		wd179x_set_density(DEN_MFM_LO);
+		wd17xx_set_density(DEN_MFM_LO);
 	}
 
 //	bbc_1770_IntEnabled=(((data>>4) & 0x01)==0);
@@ -2144,7 +2144,7 @@ MACHINE_START( bbcb )
 	//	break;
 	//case 4: case 5: case 6:
 		previous_wd177x_int_state=1;
-	    wd179x_init(WD_TYPE_177X,bbc_wd177x_callback);
+	    wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
 	//	break;
 	//}
 	return 0;
@@ -2185,7 +2185,7 @@ MACHINE_RESET( bbcb )
 		i8271_reset();
 	//	break;
 	//case 4: case 5: case 6:
-	    wd179x_reset();
+	    wd17xx_reset();
 	//	break;
 	//}
 }
@@ -2204,7 +2204,7 @@ MACHINE_START( bbcbp )
 	via_config(1, &bbcb_user_via);
 	via_set_clock(1,1000000);
 
-	wd179x_init(WD_TYPE_177X,bbc_wd177x_callback);
+	wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
 	return 0;
 }
 
@@ -2224,7 +2224,7 @@ MACHINE_RESET( bbcbp )
 	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;
-    wd179x_reset();
+    wd17xx_reset();
 }
 
 
@@ -2242,7 +2242,7 @@ MACHINE_START( bbcm )
 	via_config(1, &bbcb_user_via);
 	via_set_clock(1,1000000);
 
-	wd179x_init(WD_TYPE_177X,bbc_wd177x_callback);
+	wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
 	return 0;
 }
 
@@ -2262,5 +2262,5 @@ MACHINE_RESET( bbcm )
 	MC6850_config(&BBC_MC6850_calls);
 
 	previous_wd177x_int_state=1;
-    wd179x_reset();
+    wd17xx_reset();
 }
