@@ -238,6 +238,16 @@ extern const ICONDATA g_iconData[];
 extern const char g_szPlayGameString[];
 extern const char g_szGameCountString[];
 
+typedef struct _play_options play_options;
+struct _play_options
+{
+	const char *record;			// OPTION_RECORD
+	const char *playback;		// OPTION_PLAYBACK
+	const char *state;			// OPTION_STATE
+	const char *wavwrite;		// OPTION_WAVWRITE
+	const char *mngwrite;		// OPTION_MNGWRITE
+};
+
 /***************************************************************************
     function prototypes
  ***************************************************************************/
@@ -295,7 +305,7 @@ static void             MamePlayBackGame(void);
 static void             MamePlayRecordWave(void);
 static void             MamePlayRecordMNG(void);
 static void				MameLoadState(void);
-static void             MamePlayGameWithOptions(int nGame);
+static void             MamePlayGameWithOptions(int nGame, const play_options *playopts);
 static INT_PTR CALLBACK LoadProgressDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 static int UpdateLoadProgress(const char* name, const rom_load_data *romdata);
 static BOOL GameCheck(void);
@@ -691,14 +701,6 @@ typedef struct
 } driver_data_type;
 static driver_data_type *sorted_drivers;
 
-static char * g_pRecordName = NULL;
-static char * g_pPlayBkName = NULL;
-static char * g_pSaveStateName = NULL;
-static char * g_pRecordWaveName = NULL;
-static char * g_pRecordMNGName = NULL;
-static char * override_playback_directory = NULL;
-static char * override_savestate_directory = NULL;
-
 /***************************************************************************
     Global variables
  ***************************************************************************/
@@ -823,7 +825,7 @@ static BOOL WaitWithMessageLoop(HANDLE hEvent)
 	return FALSE;
 }
 
-static DWORD RunMAME(int nGameIndex)
+static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 {
 	DWORD dwExitCode = 0;
 	core_options *pOpts;
@@ -848,6 +850,21 @@ static DWORD RunMAME(int nGameIndex)
 	// load MAME options
 	CopyOptions(mame_options(), Mame32Global());
 	CopyOptions(mame_options(), pOpts);
+
+	// load specified play options
+	if (playopts != NULL)
+	{
+		if (playopts->record != NULL)
+			options_set_string(mame_options(), OPTION_RECORD, playopts->record);
+		if (playopts->playback != NULL)
+			options_set_string(mame_options(), OPTION_PLAYBACK, playopts->playback);
+		if (playopts->state != NULL)
+			options_set_string(mame_options(), OPTION_STATE, playopts->state);
+		if (playopts->wavwrite != NULL)
+			options_set_string(mame_options(), OPTION_WAVWRITE, playopts->wavwrite);
+		if (playopts->mngwrite != NULL)
+			options_set_string(mame_options(), OPTION_MNGWRITE, playopts->mngwrite);
+	}
 
 	// prepare MAME32 to run the game
 	ShowWindow(hMain, SW_HIDE);
@@ -5289,6 +5306,7 @@ static void MamePlayBackGame()
 
 		char path[MAX_PATH];
 		char fname[MAX_PATH];
+		play_options playopts;
 
 		_splitpath(filename, drive, dir, bare_fname, ext);
 
@@ -5329,11 +5347,9 @@ static void MamePlayBackGame()
 		}
 		mame_fclose(pPlayBack);
 
-		g_pPlayBkName = fname;
-		override_playback_directory = path;
-		MamePlayGameWithOptions(nGame);
-		g_pPlayBkName = NULL;
-		override_playback_directory = NULL;
+		memset(&playopts, 0, sizeof(playopts));
+		playopts.playback = fname;
+		MamePlayGameWithOptions(nGame, &playopts);
 	}
 }
 
@@ -5342,6 +5358,7 @@ static void MameLoadState()
 	int nGame;
 	char filename[MAX_PATH];
 	char selected_filename[MAX_PATH];
+	play_options playopts;
 
 	*filename = 0;
 
@@ -5408,8 +5425,9 @@ static void MameLoadState()
 		if (rc)
 			return;
 
+		memset(&playopts, 0, sizeof(playopts));
 #ifdef MESS
-		g_pSaveStateName = state_fname;
+		playopts.state = state_fname;
 #else
 		{
 			char *cPos;
@@ -5417,15 +5435,12 @@ static void MameLoadState()
 			cPos = cPos+1;
 			if( strlen(cPos) >0)
 			{
-				g_pSaveStateName = cPos;
-				override_savestate_directory = path;
+				playopts.state = cPos;
 			}
 		}
 #endif
 
-		MamePlayGameWithOptions(nGame);
-		g_pSaveStateName = NULL;
-		override_savestate_directory = NULL;
+		MamePlayGameWithOptions(nGame, &playopts);
 	}
 }
 
@@ -5445,6 +5460,7 @@ static void MamePlayRecordGame()
 		char fname[_MAX_FNAME];
 		char ext[_MAX_EXT];
 		char path[MAX_PATH];
+		play_options playopts;
 
 		_splitpath(filename, drive, dir, fname, ext);
 
@@ -5452,61 +5468,58 @@ static void MamePlayRecordGame()
 		if (path[strlen(path)-1] == '\\')
 			path[strlen(path)-1] = 0; // take off trailing back slash
 
-		g_pRecordName = fname;
-		override_playback_directory = path;
-		MamePlayGameWithOptions(nGame);
-		g_pRecordName = NULL;
-		override_playback_directory = NULL;
+		memset(&playopts, 0, sizeof(playopts));
+		playopts.record = fname;
+		MamePlayGameWithOptions(nGame, &playopts);
 	}
 }
 
 void MamePlayGame(void)
 {
 	int nGame;
+	play_options playopts;
 
 	nGame = Picker_GetSelectedItem(hwndList);
 
-	g_pPlayBkName = NULL;
-	g_pRecordName = NULL;
-
-	MamePlayGameWithOptions(nGame);
+	memset(&playopts, 0, sizeof(playopts));
+	MamePlayGameWithOptions(nGame, &playopts);
 }
 
 static void MamePlayRecordWave()
 {
 	int  nGame;
 	char filename[MAX_PATH];
-	*filename = 0;
+	play_options playopts;
 
 	nGame = Picker_GetSelectedItem(hwndList);
 	strcpy(filename, drivers[nGame]->name);
 
 	if (CommonFileDialog(GetSaveFileName, filename, FILETYPE_WAVE_FILES))
 	{
-		g_pRecordWaveName = filename;
-		MamePlayGameWithOptions(nGame);
-		g_pRecordWaveName = NULL;
+		memset(&playopts, 0, sizeof(playopts));
+		playopts.wavwrite = filename;
+		MamePlayGameWithOptions(nGame, &playopts);
 	}	
 }
 
 static void MamePlayRecordMNG()
 {
 	int  nGame;
-	char filename[MAX_PATH];
-	*filename = 0;
+	char filename[MAX_PATH] = { 0, };
+	play_options playopts;
 
 	nGame = Picker_GetSelectedItem(hwndList);
 	strcpy(filename, drivers[nGame]->name);
 
 	if (CommonFileDialog(GetSaveFileName, filename, FILETYPE_MNG_FILES))
 	{
-		g_pRecordMNGName = filename;
-		MamePlayGameWithOptions(nGame);
-		g_pRecordMNGName = NULL;
+		memset(&playopts, 0, sizeof(playopts));
+		playopts.mngwrite = filename;
+		MamePlayGameWithOptions(nGame, &playopts);
 	}	
 }
 
-static void MamePlayGameWithOptions(int nGame)
+static void MamePlayGameWithOptions(int nGame, const play_options *playopts)
 {
 	DWORD dwExitCode;
 
@@ -5524,7 +5537,7 @@ static void MamePlayGameWithOptions(int nGame)
 
 	in_emulation = TRUE;
 
-	dwExitCode = RunMAME(nGame);
+	dwExitCode = RunMAME(nGame, playopts);
 	if (dwExitCode == 0)
 	{
 		IncrementPlayCount(nGame);
