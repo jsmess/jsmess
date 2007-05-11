@@ -632,7 +632,7 @@ static void update_bitmap(int next_x, int next_y)
 			continue;
 		}
 
-		p = BITMAP_ADDR16(helper[current_bitmap], y, 0);
+		p = BITMAP_ADDR16(helper[current_bitmap], y, 34);
 
 		for (x = x1; x < x2; x++)
 		{
@@ -781,7 +781,7 @@ static WRITE8_HANDLER( HMOVE_w )
 	{
 		if (curr_y < helper[current_bitmap]->height)
 		{
-			memset(BITMAP_ADDR16(helper[current_bitmap], curr_y, 0), 0, 16);
+			memset(BITMAP_ADDR16(helper[current_bitmap], curr_y, 34), 0, 16);
 		}
 
 		prev_x = 8;

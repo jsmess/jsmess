@@ -2,7 +2,7 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
-(none)
+- Atari 2600 PAL [Wilbert Pol]
 
 
 
@@ -20,6 +20,9 @@ System Driver Changes:
 
 - [A2600] Changed start up bank for 16KB cartridges (partially
   fixed bug #1170).  [Wilbert Pol]
+
+- [A2600] Recoded tia to support MDRV_SCREEN_RAW_PARAMS and
+  adjusted screen sizes (partially fixes bug #1170).  [Wilbert Pol]
 
 
 User Interface Changes:
