@@ -186,9 +186,9 @@ PALETTE_INIT( tia_PAL )
 			double G = Y - 0.344 * U - 0.714 * V;
 			double B = Y + 1.770 * U;
 
-			R = pow(R, 1.2) / pow(255, 1.2);
-			G = pow(G, 1.2) / pow(255, 1.2);
-			B = pow(B, 1.2) / pow(255, 1.2);
+			R = pow(R, 1.2) / pow(1, 1.2);
+			G = pow(G, 1.2) / pow(1, 1.2);
+			B = pow(B, 1.2) / pow(1, 1.2);
 
 			if (R < 0) R = 0;
 			if (G < 0) G = 0;
