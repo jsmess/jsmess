@@ -11,12 +11,15 @@ System Driver Changes:
 - [A2600] Updated delay when writing to the playfield registers
   (bug #389, partially fixes bug #1152).  [Wilbert Pol]
 
-- [A2600] Updated how RESPx/NUSIZx combinations are handled (fixes
-  rest of bug #1152).  [Wilbert Pol]
+- [A2600] Updated how RESPx/NUSIZx combinations are handled
+  (partially fixes bug #1152).  [Wilbert Pol]
 
 - [A2600] Added support for handling hardware oddity with writes
   to HMMx when the HMOVE timer is about to expire (bug #391).
   [Wilbert Pol]
+
+- [A2600] Changed start up bank for 16KB cartridges (partially
+  fixed bug #1170).  [Wilbert Pol]
 
 
 User Interface Changes:

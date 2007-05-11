@@ -421,7 +421,7 @@ static MACHINE_START( a2600 )
 		break;
 
 	case mode16:
-		install_banks(1, 0x3000);
+		install_banks(1, 0x0000);
 		break;
 
 	case mode32:
