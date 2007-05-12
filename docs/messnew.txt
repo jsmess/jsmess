@@ -24,6 +24,9 @@ System Driver Changes:
 - [A2600] Recoded tia to support MDRV_SCREEN_RAW_PARAMS and
   adjusted screen sizes (partially fixes bug #1170).  [Wilbert Pol]
 
+- [A2600] Updated playfield reflect bit to only have effect when
+  set before pixel 80.  (bug #1174) [Wilbert Pol]
+
 
 User Interface Changes:
 -----------------------

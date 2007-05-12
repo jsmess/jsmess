@@ -74,6 +74,7 @@ static UINT8 prevENABL;
 static int HMOVE_started;
 static UINT8 HMM0_latch;
 static UINT8 HMM1_latch;
+static UINT8 REFLECT;		/* Should playfield be reflected or not */
 
 static mame_bitmap *helper[2];
 
@@ -451,7 +452,7 @@ static void drawPF(UINT8* p, UINT8 *col)
 		(CTRLPF & 2) ? COLUP0 : COLUPF, 0);
 
 	draw_playfield_helper(p, col, 80,
-		(CTRLPF & 2) ? COLUP1 : COLUPF, CTRLPF & 1);
+		(CTRLPF & 2) ? COLUP1 : COLUPF, REFLECT);
 }
 
 
@@ -546,6 +547,11 @@ static void update_bitmap(int next_x, int next_y)
 
 		if ( y !=  prev_y ) {
 			int redraw_line = 0;
+
+			if ( REFLECT != ( CTRLPF & 0x01 ) ) {
+				REFLECT = CTRLPF & 0x01;
+				redraw_line = 1;
+			}
 
 			/* Redraw line if a RESPx occured during the lastline */
 			if ( ! startP0 || ! startP1 ) {
@@ -716,6 +722,16 @@ static WRITE8_HANDLER( VBLANK_w )
 	VBLANK = data;
 }
 
+
+static WRITE8_HANDLER( CTRLPF_w )
+{
+	int curr_x = current_x();
+
+	CTRLPF = data;
+	if ( curr_x < 80 ) {
+		REFLECT = CTRLPF & 1;
+	}
+}
 
 static WRITE8_HANDLER( HMM0_w )
 {
@@ -1102,7 +1118,8 @@ WRITE8_HANDLER( tia_w )
 		COLUBK = data;
 		break;
 	case 0x0A:
-		CTRLPF = data;
+		//logerror("CTRLPF write %02X, x = %d\n", data, curr_x );
+		CTRLPF_w(offset, data);
 		break;
 	case 0x0B:
 		REFP0 = data;
@@ -1111,12 +1128,15 @@ WRITE8_HANDLER( tia_w )
 		REFP1 = data;
 		break;
 	case 0x0D:
+		//logerror("PF0 write %02X, x = %d\n", data, curr_x);
 		PF0 = data;
 		break;
 	case 0x0E:
+		//logerror("PF1 write %02X, x = %d\n", data, curr_x);
 		PF1 = data;
 		break;
 	case 0x0F:
+		//logerror("PF2 write %02X, x = %d\n", data, curr_x);
 		PF2 = data;
 		break;
 	case 0x10:
@@ -1229,6 +1249,8 @@ void tia_init_internal(int freq)
 
 	HMM0_latch = 0;
 	HMM1_latch = 0;
+
+	REFLECT = 0;
 
 	prev_x = 0;
 	prev_y = 0;
