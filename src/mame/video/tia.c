@@ -248,6 +248,15 @@ static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, i
 		horz++; /* hardware oddity, see bridges in River Raid */
 	}
 
+	if ( ! start ) {
+		/* Keep the few pixels which may still need to be drawn */
+		for (i = horz-1; i < horz; i++ ) {
+			if ( prevcol[i % 160] != 0xFF ) {
+				p[i % 160] = prevcol[i % 160];
+				col[i % 160] = prevcol[i % 160];
+			}
+		}
+	}
 	for (i = 0; i < num; i++)
 	{
 		if (i > 0 || start)
