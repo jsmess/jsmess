@@ -1941,16 +1941,26 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 {
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
-	char *ext;
-	char root[256];
-	char path[256];
+	TCHAR *ext;
+	TCHAR root[256];
+	TCHAR path[256];
 	int selected = 0;
 	int index = 0;
+	LPCTSTR t_ctrlr_option = 0;
+	LPTSTR buf = 0;
 	const char *ctrlr_option;
 
 	// determine the ctrlr option
 	ctrlr_option = options_get_string(opts, WINOPTION_CTRLR);
-	ctrlr_option = (ctrlr_option != NULL) ? ctrlr_option : "";
+	if( ctrlr_option != NULL ) {
+		buf = tstring_from_utf8(ctrlr_option);
+		if( !buf )
+			return;
+		t_ctrlr_option = buf;
+	}
+	else {
+		t_ctrlr_option = TEXT("");
+	}
 
 	// reset the controllers dropdown
 	ComboBox_ResetContent(control);
@@ -1958,7 +1968,7 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	ComboBox_SetItemData(control, index, "");
 	index++;
 
-	sprintf (path, "%s\\*.*", GetCtrlrDir());
+	_stprintf (path, TEXT("%s\\*.*"), GetCtrlrDir());
 
 	hFind = FindFirstFile(path, &FindFileData);
 
@@ -1967,20 +1977,20 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 		do 
 		{
 			// copy the filename
-			strcpy (root,FindFileData.cFileName);
+			_tcscpy (root,FindFileData.cFileName);
 
 			// find the extension
-			ext = strrchr (root,'.');
+			ext = _tcsrchr (root,'.');
 			if (ext)
 			{
 				// check if it's a cfg file
-				if (strcmp (ext, ".cfg") == 0)
+				if (_tcscmp (ext, TEXT(".cfg")) == 0)
 				{
 					// and strip off the extension
 					*ext = 0;
 
 					// set the option?
-					if (!strcmp(root, ctrlr_option))
+					if (!_tcscmp(root, t_ctrlr_option))
 						selected = index;
 
 					// add it as an option
@@ -1996,6 +2006,9 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	}
 
 	ComboBox_SetCurSel(control, selected);
+	
+	if( buf )
+		free(buf);
 }
 
 
@@ -2642,7 +2655,7 @@ static void InitializeAnalogAxesUI(HWND hwnd)
 {
 	int i=0, j=0, res = 0;
 	int iEntryCounter = 0;
-	char buf[256];
+	TCHAR buf[256];
 	LVITEM item;
 	LVCOLUMN column;
 	HWND hCtrl = GetDlgItem(hwnd, IDC_ANALOG_AXES);
@@ -2685,9 +2698,9 @@ static void InitializeAnalogAxesUI(HWND hwnd)
 			{
 				ListView_InsertItem(hCtrl,&item );
 				ListView_SetItemText(hCtrl,iEntryCounter,1, DIJoystick_GetPhysicalJoystickAxisName(i,j));
-				sprintf(buf, "%d", i);
+				_stprintf(buf, TEXT("%d"), i);
 				ListView_SetItemText(hCtrl,iEntryCounter,2, buf);
-				sprintf(buf, "%d", j);
+				_stprintf(buf, TEXT("%d"), j);
 				ListView_SetItemText(hCtrl,iEntryCounter++,3, buf);
 				item.iItem = iEntryCounter;
 			}

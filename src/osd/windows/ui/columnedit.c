@@ -113,7 +113,7 @@ void DoMoveItem( HWND hWnd, BOOL bDown)
 
 INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam,
 	int nColumnMax, int *shown, int *order,
-	const char **names, void (*pfnGetRealColumnOrder)(int *),
+	LPCTSTR *names, void (*pfnGetRealColumnOrder)(int *),
 	void (*pfnGetColumnInfo)(int *pnOrder, int *pnShown),
 	void (*pfnSetColumnInfo)(int *pnOrder, int *pnShown))
 {
@@ -170,7 +170,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 #endif
 		for (i = 0 ; i < nColumnMax; i++)
 		{		 
-			lvi.pszText = (char *) names[order[i]];
+			lvi.pszText = (TCHAR *) names[order[i]];
 			lvi.lParam	= order[i];
 
 			if (shown[order[i]])
@@ -466,7 +466,7 @@ INT_PTR CALLBACK ColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 {
 	static int shown[COLUMN_MAX];
 	static int order[COLUMN_MAX];
-	extern const char *column_names[COLUMN_MAX]; // from win32ui.c, should improve
+	extern LPCTSTR column_names[COLUMN_MAX]; // from win32ui.c, should improve
 
 
 	return InternalColumnDialogProc(hDlg, Msg, wParam, lParam, COLUMN_MAX,

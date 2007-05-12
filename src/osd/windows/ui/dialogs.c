@@ -47,6 +47,8 @@
 #include "mame32.h"
 #include "properties.h"
 #include "dialogs.h"
+#include "strconv.h"
+#include "winutil.h"
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -54,7 +56,7 @@
 
 #define FILTERTEXT_LEN 256
 
-static char g_FilterText[FILTERTEXT_LEN];
+static TCHAR g_FilterText[FILTERTEXT_LEN];
 
 #define NUM_EXCLUSIONS  9
 
@@ -75,7 +77,7 @@ static void OnHScroll(HWND hWnd, HWND hwndCtl, UINT code, int pos);
 
 /***************************************************************************/
 
-const char * GetFilterText(void)
+LPCTSTR GetFilterText(void)
 {
 	return g_FilterText;
 }
@@ -525,6 +527,9 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 
 INT_PTR CALLBACK AboutDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+	char* version;
+	TCHAR* t_version;
+	
 	switch (Msg)
 	{
 	case WM_INITDIALOG:
@@ -535,7 +540,12 @@ INT_PTR CALLBACK AboutDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 									  IMAGE_BITMAP, 0, 0, LR_SHARED);
 			SendDlgItemMessage(hDlg, IDC_ABOUT, STM_SETIMAGE,
 						(WPARAM)IMAGE_BITMAP, (LPARAM)hBmp);
-			Static_SetText(GetDlgItem(hDlg, IDC_VERSION), GetVersionString());
+			version = GetVersionString();
+			t_version = tstring_from_utf8(version);
+			if( !t_version) 
+				return 0;
+			Static_SetText(GetDlgItem(hDlg, IDC_VERSION), t_version);
+			free(t_version);
 		}
 		return 1;
 
@@ -633,7 +643,7 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 			}
 		}
 		
-      	SetWindowText(GetDlgItem(hDlg,IDC_CUSTOMFILE_GAME),
+		win_set_window_text_utf8(GetDlgItem(hDlg,IDC_CUSTOMFILE_GAME),
 					  ModifyThe(drivers[driver_index]->description));
 
 		return TRUE;

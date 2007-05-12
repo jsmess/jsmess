@@ -30,6 +30,8 @@
 #include "sound/samples.h"
 #include "MAME32.h"
 #include "M32Util.h"
+#include "winutil.h"
+#include "strconv.h"
 
 
 /***************************************************************************
@@ -91,7 +93,7 @@ void __cdecl ErrorMsg(const char* fmt, ...)
 
 	vsprintf(buf, fmt, va);
 
-	MessageBox(GetActiveWindow(), buf, TEXT(MAME32NAME), MB_OK | MB_ICONERROR);
+	win_message_box_utf8(GetActiveWindow(), buf, MAME32NAME, MB_OK | MB_ICONERROR);
 
 	strcpy(buf2, MAME32NAME ": ");
 	strcat(buf2,buf);
@@ -120,7 +122,7 @@ void __cdecl dprintf(const char* fmt, ...)
 
 	_vsnprintf(buf,sizeof(buf),fmt,va);
 
-	OutputDebugString(buf);
+	win_output_debug_string_utf8(buf);
 
 	va_end(va);
 }
@@ -198,10 +200,18 @@ void DisplayTextFile(HWND hWnd, const char *cName)
 {
 	HINSTANCE hErr;
 	LPCTSTR	  msg = 0;
-
-	hErr = ShellExecute(hWnd, NULL, cName, NULL, NULL, SW_SHOWNORMAL);
-	if ((int)hErr > 32)
+	LPTSTR    tName;
+	
+	tName = tstring_from_utf8(cName);
+	if( !tName )
 		return;
+
+	hErr = ShellExecute(hWnd, NULL, tName, NULL, NULL, SW_SHOWNORMAL);
+	if ((int)hErr > 32) 
+	{
+		free(tName);
+		return;
+	}
 
 	switch((int)hErr)
 	{
@@ -233,7 +243,9 @@ void DisplayTextFile(HWND hWnd, const char *cName)
 		msg = TEXT("Unknown error.");
 	}
  
-	MessageBox(NULL, msg, cName, MB_OK); 
+	MessageBox(NULL, msg, tName, MB_OK);
+	
+	free(tName);
 }
 
 char* MyStrStrI(const char* pFirst, const char* pSrch)
@@ -285,17 +297,17 @@ char * ConvertToWindowsNewlines(const char *source)
  */
 const char * GetDriverFilename(int nIndex)
 {
-    static char tmp[40];
-    char *ptmp;
+	static char tmp[40];
+	char *ptmp;
 
 	const char *s = drivers[nIndex]->source_file;
 
-    tmp[0] = '\0';
+	tmp[0] = '\0';
 
 	ptmp = strrchr(s, '\\');
 	if (ptmp == NULL)
 		ptmp = strrchr(s, '/');
-    if (ptmp == NULL)
+	if (ptmp == NULL)
 		return s;
 
 	ptmp++;

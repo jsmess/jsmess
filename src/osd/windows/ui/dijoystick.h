@@ -63,10 +63,10 @@ struct OSDJoystick
 
 extern struct OSDJoystick DIJoystick;
 
-extern int   DIJoystick_GetNumPhysicalJoysticks(void);
-extern char* DIJoystick_GetPhysicalJoystickName(int num_joystick);
+extern int    DIJoystick_GetNumPhysicalJoysticks(void);
+extern TCHAR* DIJoystick_GetPhysicalJoystickName(int num_joystick);
 
-extern int   DIJoystick_GetNumPhysicalJoystickAxes(int num_joystick);
-extern char* DIJoystick_GetPhysicalJoystickAxisName(int num_joystick, int num_axis);
+extern int    DIJoystick_GetNumPhysicalJoystickAxes(int num_joystick);
+extern TCHAR* DIJoystick_GetPhysicalJoystickAxisName(int num_joystick, int num_axis);
 
 #endif

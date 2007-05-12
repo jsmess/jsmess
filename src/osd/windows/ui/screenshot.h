@@ -21,7 +21,7 @@ typedef struct _mybitmapinfo
 } MYBITMAPINFO, *LPMYBITMAPINFO;
 
 #ifdef MESS
-extern BOOL LoadScreenShotEx(int nGame, LPCSTR lpSoftwareName, int nType);
+extern BOOL LoadScreenShotEx(int nGame, LPCTSTR lpSoftwareName, int nType);
 #endif /* MESS */
 
 extern BOOL LoadScreenShot(int nGame, int nType);
