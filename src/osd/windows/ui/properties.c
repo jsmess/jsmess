@@ -447,7 +447,7 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 	pshead.dwSize                     = sizeof(PROPSHEETHEADER);
 	pshead.dwFlags                    = PSH_PROPSHEETPAGE | PSH_USEICONID | PSH_PROPTITLE;
 	pshead.hInstance                  = hInst;
-	pshead.pszCaption                 = "Default Game";
+	pshead.pszCaption                 = TEXT("Default Game");
 	pshead.DUMMYUNIONNAME2.nStartPage = 0;
 	pshead.DUMMYUNIONNAME.pszIcon     = MAKEINTRESOURCE(IDI_MAME32_ICON);
 	pshead.DUMMYUNIONNAME3.ppsp       = pspage;
@@ -455,10 +455,10 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 	/* Create the Property sheet and display it */
 	if (PropertySheet(&pshead) == -1)
 	{
-		char temp[100];
+		TCHAR temp[100];
 		DWORD dwError = GetLastError();
-		sprintf(temp, "Propery Sheet Error %d %X", (int)dwError, (int)dwError);
-		MessageBox(0, temp, "Error", IDOK);
+		_stprintf(temp, TEXT("Propery Sheet Error %d %X"), (int)dwError, (int)dwError);
+		MessageBox(0, temp, TEXT("Error"), IDOK);
 	}
 
 	free(pspage);
@@ -575,10 +575,10 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 	/* Create the Property sheet and display it */
 	if (PropertySheet(&pshead) == -1)
 	{
-		char temp[100];
+		TCHAR temp[100];
 		DWORD dwError = GetLastError();
-		sprintf(temp, "Propery Sheet Error %d %X", (int)dwError, (int)dwError);
-		MessageBox(0, temp, "Error", IDOK);
+		_stprintf(temp, TEXT("Propery Sheet Error %d %X"), (int)dwError, (int)dwError);
+		MessageBox(0, temp, TEXT("Error"), IDOK);
 	}
 
 	free(pspage);
@@ -1420,13 +1420,14 @@ static void PropToOptions(HWND hWnd, core_options *o)
 		{
 			int n = 0;
 			int d = 0;
-			char buffer[200];
+			TCHAR buffer[200];
+			char buffer2[200];
 
 			Edit_GetText(hCtrl,buffer,sizeof(buffer));
-			sscanf(buffer,"%d",&n);
+			_stscanf(buffer,TEXT("%d"),&n);
 
 			Edit_GetText(hCtrl2,buffer,sizeof(buffer));
-			sscanf(buffer,"%d",&d);
+			_stscanf(buffer,TEXT("%d"),&d);
 
 			if (n == 0 || d == 0)
 			{
@@ -1434,8 +1435,8 @@ static void PropToOptions(HWND hWnd, core_options *o)
 				d = 3;
 			}
 
-			snprintf(buffer,sizeof(buffer),"%d:%d",n,d);
-			options_set_string(o, aspect_option, buffer);
+			snprintf(buffer2,sizeof(buffer2),"%d:%d",n,d);
+			options_set_string(o, aspect_option, buffer2);
 		}
 	}
 	/*analog axes*/
@@ -1493,7 +1494,7 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 {
 	HWND hCtrl;
 	HWND hCtrl2;
-	char buf[100];
+	TCHAR buf[100];
 	int  n = 0;
 	int  d = 0;
 
@@ -1561,21 +1562,21 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 		{
 			if (sscanf(options_get_string(o, aspect_option), "%d:%d", &n, &d) == 2 && n != 0 && d != 0)
 			{
-				sprintf(buf, "%d", n);
+				_stprintf(buf, TEXT("%d"), n);
 				Edit_SetText(hCtrl, buf);
-				sprintf(buf, "%d", d);
+				_stprintf(buf, TEXT("%d"), d);
 				Edit_SetText(hCtrl2, buf);
 			}
 			else
 			{
-				Edit_SetText(hCtrl,  "4");
-				Edit_SetText(hCtrl2, "3");
+				Edit_SetText(hCtrl,  TEXT("4"));
+				Edit_SetText(hCtrl2, TEXT("3"));
 			}
 		}
 		else
 		{
-			Edit_SetText(hCtrl,  "4");
-			Edit_SetText(hCtrl2, "3");
+			Edit_SetText(hCtrl,  TEXT("4"));
+			Edit_SetText(hCtrl2, TEXT("3"));
 		}
 	}
 
@@ -2017,7 +2018,7 @@ static void ResolutionReadControl(datamap *map, HWND dialog, HWND control, core_
 	if (refresh_control && sizes_control)
 	{
 		ComboBox_GetText(sizes_control, buffer, ARRAY_LENGTH(buffer) - 1);
-		if (_stscanf(buffer, "%d x %d", &width, &height) == 2)
+		if (_stscanf(buffer, TEXT("%d x %d"), &width, &height) == 2)
 		{
 			refresh_index = ComboBox_GetCurSel(refresh_control);
 			refresh_value = ComboBox_GetItemData(refresh_control, refresh_index);
@@ -2652,22 +2653,22 @@ static void InitializeAnalogAxesUI(HWND hwnd)
 		//add two Columns...
 		column.mask = LVCF_TEXT | LVCF_WIDTH |LVCF_SUBITEM;
 		column.pszText = (TCHAR *)"Joystick";
-		column.cchTextMax = strlen(column.pszText);
+		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 0;
 		column.cx = 100;
 		res = ListView_InsertColumn(hCtrl,0, &column );
 		column.pszText = (TCHAR *)"Axis";
-		column.cchTextMax = strlen(column.pszText);
+		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 1;
 		column.cx = 100;
 		res = ListView_InsertColumn(hCtrl,1, &column );
 		column.pszText = (TCHAR *)"JoystickId";
-		column.cchTextMax = strlen(column.pszText);
+		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 2;
 		column.cx = 70;
 		res = ListView_InsertColumn(hCtrl,2, &column );
 		column.pszText = (TCHAR *)"AxisId";
-		column.cchTextMax = strlen(column.pszText);
+		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 3;
 		column.cx = 50;
 		res = ListView_InsertColumn(hCtrl,3, &column );
@@ -2678,7 +2679,7 @@ static void InitializeAnalogAxesUI(HWND hwnd)
 		{
 			item.iItem = iEntryCounter;
 			item.pszText = DIJoystick_GetPhysicalJoystickName(i);
-			item.cchTextMax = strlen(item.pszText);
+			item.cchTextMax = _tcslen(item.pszText);
 
 			for( j=0;j<DIJoystick_GetNumPhysicalJoystickAxes(i);j++)
 			{

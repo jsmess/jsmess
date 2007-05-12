@@ -1029,7 +1029,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
 #ifdef MESS
     GROUPBOX        "System Selection",IDC_STATIC,6,4,189,194
-    CONTROL         "&Search for new systems on start",IDC_START_GAME_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,16,111,10,0,HIDC_START_GAME_CHECK
+    CONTROL         "&Search for new systems on start",IDC_START_GAME_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,16,112,10,0,HIDC_START_GAME_CHECK
     CONTROL         "Allow system selection by a &joystick (requires restart)",IDC_JOY_GUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,30,178,10,0,HIDC_JOY_GUI
     CONTROL         "Allow system selection by custom &key sequences",IDC_KEY_GUI,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,44,166,10
 #else
@@ -1063,7 +1063,7 @@ BEGIN
                     WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Emulation",IDC_STATIC,202,4,170,28
 #ifdef MESS
-    CONTROL         "Show System Ca&ption",IDC_GAME_CAPTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,16,80,10
+    CONTROL         "Show System Ca&ption",IDC_GAME_CAPTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,210,16,81,10
 #else
     CONTROL         "Show Game Ca&ption",IDC_GAME_CAPTION,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,210,16,80,10,0,

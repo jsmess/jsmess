@@ -81,7 +81,7 @@ BOOL DirectInputInitialize()
 
 	/* Turn off error dialog for this call */
 	error_mode = SetErrorMode(0);
-	hDLL = LoadLibrary("dinput.dll");
+	hDLL = LoadLibrary(TEXT("dinput.dll"));
 	SetErrorMode(error_mode);
 
 	if (hDLL == NULL)

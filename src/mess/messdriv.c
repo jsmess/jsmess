@@ -61,20 +61,16 @@ const game_driver *test_drivers[] =
 /* step 1: declare all external references */
 #define DRIVER(NAME) extern const game_driver driver_##NAME;
 #define TESTDRIVER(NAME) extern const game_driver driver_##NAME;
-#define NOBODY(NAME) extern const game_driver driver_##NAME;
 #include "messdriv.c"
 
 /* step 2: define the drivers[] array */
 #undef DRIVER
 #undef TESTDRIVER
-#undef NOBODY
 #define DRIVER(NAME) &driver_##NAME,
 #ifdef MESS_DEBUG
 #define TESTDRIVER(NAME) &driver_##NAME,
-#define NOBODY(NAME)
 #else
 #define TESTDRIVER(NAME)
-#define NOBODY(NAME)
 #endif
 const game_driver * const drivers[] =
 {

@@ -24,6 +24,7 @@
 #include <commctrl.h>
 #include <stdio.h>
 #include <richedit.h>
+#include <tchar.h>
 
 #include "screenshot.h"
 #include "win32ui.h"
@@ -85,7 +86,7 @@ void AuditDialog(HWND hParent)
 	samples_incorrect = 0;
 
 	//RS use Riched32.dll
-	hModule = LoadLibrary("Riched32.dll");
+	hModule = LoadLibrary(TEXT("Riched32.dll"));
 	if( hModule )
 	{
 		DialogBox(GetModuleHandle(NULL),MAKEINTRESOURCE(IDD_AUDIT),hParent,AuditWindowProc);
@@ -94,7 +95,7 @@ void AuditDialog(HWND hParent)
 	}
 	else
 	{
-	    MessageBox(GetMainWindow(),"Unable to Load Riched32.dll","Error",
+	    MessageBox(GetMainWindow(),TEXT("Unable to Load Riched32.dll"),TEXT("Error"),
 				   MB_OK | MB_ICONERROR);
 	}
 	
@@ -214,7 +215,7 @@ int Mame32VerifySampleSet(int game)
 
 static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 {
-	char buffer[200];
+	TCHAR buffer[200];
 
 	while (!bCancel)
 	{
@@ -222,7 +223,7 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 		{
 			if (rom_index != -1)
 			{
-				sprintf(buffer, "Checking Game %s - %s",
+				_stprintf(buffer, TEXT("Checking Game %s - %s"),
 					drivers[rom_index]->name, drivers[rom_index]->description);
 				SetWindowText(hDlg, buffer);
 				ProcessNextRom();
@@ -231,14 +232,14 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 			{
 				if (sample_index != -1)
 				{
-					sprintf(buffer, "Checking Game %s - %s",
+					_stprintf(buffer, TEXT("Checking Game %s - %s"),
 						drivers[sample_index]->name, drivers[sample_index]->description);
 					SetWindowText(hDlg, buffer);
 					ProcessNextSample();
 				}
 				else
 				{
-					sprintf(buffer, "%s", "File Audit");
+					_stprintf(buffer, TEXT("%s"), "File Audit");
 					SetWindowText(hDlg, buffer);
 					EnableWindow(GetDlgItem(hDlg, IDPAUSE), FALSE);
 					ExitThread(1);

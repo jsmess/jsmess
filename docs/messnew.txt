@@ -27,7 +27,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
-(none)
+- [Windows GUI] Fixed a couple of static text fields.  (bug #1073) [Oliver
+  Stoeneberg]
 
 
 

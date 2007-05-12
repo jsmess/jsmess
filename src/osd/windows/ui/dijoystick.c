@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
+#include <tchar.h>
 
 // undef WINNT for dinput.h to prevent duplicate definition
 #undef WINNT
@@ -432,7 +433,7 @@ static BOOL CALLBACK DIJoystick_EnumAxisObjectsProc(LPCDIDEVICEOBJECTINSTANCE lp
 
 	joystick->axes[joystick->num_axes].guid = lpddoi->guidType;
 
-	joystick->axes[joystick->num_axes].name = (char *)malloc(strlen(lpddoi->tszName) + 1);
+	joystick->axes[joystick->num_axes].name = (char *)malloc(_tcslen(lpddoi->tszName) + 1);
 	strcpy(joystick->axes[joystick->num_axes].name, lpddoi->tszName);
 
 	joystick->axes[joystick->num_axes].offset = lpddoi->dwOfs;

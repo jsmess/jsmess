@@ -219,8 +219,8 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 			for (id = 0; id < dev->count; id++)
 			{
 				s = dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0]));
-				ppszDevices[i] = alloca(strlen(s) + 1);
-				strcpy(ppszDevices[i], s);
+				ppszDevices[i] = alloca(_tcslen(s) + 1);
+				_tcscpy(ppszDevices[i], s);
 				i++;
 			}
 		}

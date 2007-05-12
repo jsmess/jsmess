@@ -32,6 +32,7 @@
 #include <commctrl.h>
 #include <commdlg.h>
 #include <string.h>
+#include <tchar.h>
 
 #include "bitmask.h"
 #include "TreeView.h"
@@ -111,14 +112,17 @@ INT_PTR CALLBACK ResetDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			resetUI 	  = Button_GetCheck(GetDlgItem(hDlg, IDC_RESET_UI));
 			if (resetFilters || resetGames || resetUI || resetDefaults)
 			{
-				char temp[200];
-				strcpy(temp, MAME32NAME " will now reset the selected\n");
-				strcat(temp, "items to the original, installation\n");
-				strcat(temp, "settings then exit.\n\n");
-				strcat(temp, "The new settings will take effect\n");
-				strcat(temp, "the next time " MAME32NAME " is run.\n\n");
-				strcat(temp, "Do you wish to continue?");
-				if (MessageBox(hDlg, temp, "Restore Settings", IDOK) == IDOK)
+				TCHAR temp[200];
+				_tcscpy(temp, TEXT(MAME32NAME));
+				_tcscat(temp, TEXT(" will now reset the selected\n"));
+				_tcscat(temp, TEXT("items to the original, installation\n"));
+				_tcscat(temp, TEXT("settings then exit.\n\n"));
+				_tcscat(temp, TEXT("The new settings will take effect\n"));
+				_tcscat(temp, TEXT("the next time "));
+				_tcscat(temp, TEXT(MAME32NAME));
+				_tcscat(temp, TEXT(" is run.\n\n"));
+				_tcscat(temp, TEXT("Do you wish to continue?"));
+				if (MessageBox(hDlg, temp, TEXT("Restore Settings"), IDOK) == IDOK)
 				{
 					if (resetFilters)
 						ResetFilters();
@@ -336,7 +340,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 	static DWORD			dwFilters;
 	static DWORD			dwpFilters;
 	static LPFOLDERDATA		lpFilterRecord;
-	char strText[250];
+	TCHAR 					strText[250];
 	int 					i;
 
 	switch (Msg)
@@ -351,14 +355,14 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 
 		if (folder != NULL)
 		{
-			char tmp[80];
+			TCHAR tmp[80];
 			
 			Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_EDIT), g_FilterText);
 			Edit_SetSel(GetDlgItem(hDlg, IDC_FILTER_EDIT), 0, -1);
 			// Mask out non filter flags
 			dwFilters = folder->m_dwFlags & F_MASK;
 			// Display current folder name in dialog titlebar
-			snprintf(tmp,sizeof(tmp),"Filters for %s Folder",folder->m_lpTitle);
+			_sntprintf(tmp,ARRAY_LENGTH(tmp),TEXT("Filters for %s Folder"),folder->m_lpTitle);
 			SetWindowText(hDlg, tmp);
 			if ( GetFilterInherit() )
 			{
@@ -376,7 +380,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_CLONES), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_CLONES), strText);
 							bShowExplanation = TRUE;
 						}
@@ -384,7 +388,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_NONWORKING), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_NONWORKING), strText);
 							bShowExplanation = TRUE;
 						}
@@ -392,7 +396,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_UNAVAILABLE), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_UNAVAILABLE), strText);
 							bShowExplanation = TRUE;
 						}
@@ -400,7 +404,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_VECTOR), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_VECTOR), strText);
 							bShowExplanation = TRUE;
 						}
@@ -408,7 +412,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_RASTER), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_RASTER), strText);
 							bShowExplanation = TRUE;
 						}
@@ -416,7 +420,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_ORIGINALS), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_ORIGINALS), strText);
 							bShowExplanation = TRUE;
 						}
@@ -424,7 +428,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_WORKING), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_WORKING), strText);
 							bShowExplanation = TRUE;
 						}
@@ -432,7 +436,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
 							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_AVAILABLE), strText, 250);
-							strcat(strText, " (*)");
+							_tcscat(strText, TEXT(" (*)"));
 							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_AVAILABLE), strText);
 							bShowExplanation = TRUE;
 						}
@@ -686,7 +690,7 @@ INT_PTR CALLBACK DirectXDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lP
 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDB_WEB_PAGE)
-			ShellExecute(GetMainWindow(), NULL, "http://www.microsoft.com/directx",
+			ShellExecute(GetMainWindow(), NULL, TEXT("http://www.microsoft.com/directx"),
 						 NULL, NULL, SW_SHOWNORMAL);
 
 		if (LOWORD(wParam) == IDCANCEL || LOWORD(wParam) == IDB_WEB_PAGE)

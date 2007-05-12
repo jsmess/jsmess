@@ -96,7 +96,7 @@ HWND HelpFunction(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD_PTR dwDa
 
 static void Help_Load(void)
 {
-	g_hHelpLib = LoadLibrary("hhctrl.ocx");
+	g_hHelpLib = LoadLibrary(TEXT("hhctrl.ocx"));
 	if (g_hHelpLib)
 	{
 		FARPROC pProc = NULL;

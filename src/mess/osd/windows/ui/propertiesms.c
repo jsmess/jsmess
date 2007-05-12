@@ -58,7 +58,7 @@ static void AppendList(HWND hList, LPCTSTR lpItem, int nItem)
     LV_ITEM Item;
 	memset(&Item, 0, sizeof(LV_ITEM));
 	Item.mask = LVIF_TEXT;
-	Item.pszText = (LPSTR) lpItem;
+	Item.pszText = (LPTSTR) lpItem;
 	Item.iItem = nItem;
 	ListView_InsertItem(hList, &Item);
 }
@@ -158,7 +158,7 @@ static BOOL SoftwareDirectories_OnBeginLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 	if (pItem->iItem == ListView_GetItemCount(hList) - 1)
 	{
 		HWND hEdit = (HWND) (int) SendMessage(hList, LVM_GETEDITCONTROL, 0, 0);
-		Edit_SetText(hEdit, "");
+		Edit_SetText(hEdit, TEXT(""));
 	}
 
 	return bResult;
@@ -174,23 +174,23 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
     if (pItem->pszText != NULL)
     {
-        struct stat file_stat;
+        struct _stat file_stat;
 
         /* Don't allow empty entries. */
-        if (!strcmp(pItem->pszText, ""))
+        if (!_tcscmp(pItem->pszText, TEXT("")))
         {
             return FALSE;
         }
 
         /* Check validity of edited directory. */
-        if (stat(pItem->pszText, &file_stat) == 0
+        if (_tstat(pItem->pszText, &file_stat) == 0
         &&  (file_stat.st_mode & S_IFDIR))
         {
             bResult = TRUE;
         }
         else
         {
-            if (MessageBox(NULL, "Directory does not exist, continue anyway?", MAME32NAME, MB_OKCANCEL) == IDOK)
+            if (MessageBox(NULL, TEXT("Directory does not exist, continue anyway?"), TEXT(MAME32NAME), MB_OKCANCEL) == IDOK)
                 bResult = TRUE;
         }
     }
@@ -293,7 +293,7 @@ static void DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 	{
 		// append a semicolon, if we're past the first entry
 		if (i > 0)
-			pos += _sntprintf(&buffer[pos], ARRAY_LENGTH(buffer) - pos, ";");
+			pos += _sntprintf(&buffer[pos], ARRAY_LENGTH(buffer) - pos, TEXT(";"));
 
 		// retrieve the next entry
 		memset(&lvi, '\0', sizeof(lvi));

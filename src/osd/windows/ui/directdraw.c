@@ -154,7 +154,7 @@ BOOL DirectDraw_Initialize(void)
 
 	/* Turn off error dialog for this call */
 	error_mode = SetErrorMode(0);
-	g_hDLL = LoadLibrary("ddraw.dll");
+	g_hDLL = LoadLibrary(TEXT("ddraw.dll"));
 	SetErrorMode(error_mode);
 
 	if (g_hDLL == NULL)

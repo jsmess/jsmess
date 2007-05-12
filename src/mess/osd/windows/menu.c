@@ -1533,14 +1533,14 @@ static void help_display(HWND wnd, const char *chapter)
 	typedef HWND (WINAPI *htmlhelpproc)(HWND hwndCaller, LPCTSTR pszFile, UINT uCommand, DWORD_PTR dwData);
 	static htmlhelpproc htmlhelp;
 	static DWORD htmlhelp_cookie;
-	LPCTSTR htmlhelp_funcname;
+	LPCSTR htmlhelp_funcname;
 
 	if (htmlhelp == NULL)
 	{
 #ifdef UNICODE
-		htmlhelp_funcname = TEXT("HtmlHelpW");
+		htmlhelp_funcname = "HtmlHelpW";
 #else
-		htmlhelp_funcname = TEXT("HtmlHelpA");
+		htmlhelp_funcname = "HtmlHelpA";
 #endif
 		htmlhelp = (htmlhelpproc) GetProcAddress(LoadLibrary(TEXT("hhctrl.ocx")), htmlhelp_funcname);
 		if (!htmlhelp)
@@ -1947,7 +1947,7 @@ HMODULE win_resource_module(void)
 #else // !_MSC_VER
 	static HMODULE module;
 	if (!module)
-		module = LoadLibrary(EMULATORDLL);
+		module = LoadLibrary(TEXT(EMULATORDLL));
 	return module;
 #endif // _MSC_VER
 }

@@ -23,6 +23,7 @@
 #include <shlobj.h>
 #include <sys/stat.h>
 #include <assert.h>
+#include <tchar.h>
 
 #include "screenshot.h"
 #include "MAME32.h"
@@ -548,7 +549,7 @@ static BOOL Directories_OnBeginLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 				return TRUE; /* don't edit */
 
 			hEdit = (HWND)(LRESULT)(int)SendDlgItemMessage(hDlg, IDC_DIR_LIST, LVM_GETEDITCONTROL, 0, 0);
-			Edit_SetText(hEdit, "");
+			Edit_SetText(hEdit, TEXT(""));
 		}
 	}
 
@@ -563,23 +564,23 @@ static BOOL Directories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
 	if (pItem->pszText != NULL)
 	{
-		struct stat file_stat;
+		struct _stat file_stat;
 
 		/* Don't allow empty entries. */
-		if (!strcmp(pItem->pszText, ""))
+		if (!_tcscmp(pItem->pszText, TEXT("")))
 		{
 			return FALSE;
 		}
 
 		/* Check validity of edited directory. */
-		if (stat(pItem->pszText, &file_stat) == 0
+		if (_tstat(pItem->pszText, &file_stat) == 0
 		&&	(file_stat.st_mode & S_IFDIR))
 		{
 			bResult = TRUE;
 		}
 		else
 		{
-			if (MessageBox(NULL, "Directory does not exist, continue anyway?", MAME32NAME, MB_OKCANCEL) == IDOK)
+			if (MessageBox(NULL, TEXT("Directory does not exist, continue anyway?"), TEXT(MAME32NAME), MB_OKCANCEL) == IDOK)
 				bResult = TRUE;
 		}
 	}
@@ -716,7 +717,7 @@ BOOL BrowseForDirectory(HWND hwnd, const char* pStartDir, char* pResult)
 	Info.hwndOwner		= hwnd;
 	Info.pidlRoot		= NULL;
 	Info.pszDisplayName = buf;
-	Info.lpszTitle		= (LPCSTR)"Directory name:";
+	Info.lpszTitle		= TEXT("Directory name:");
 	Info.ulFlags		= BIF_RETURNONLYFSDIRS;
 	Info.lpfn			= BrowseCallbackProc;
 	Info.lParam 		= (LPARAM)pStartDir;

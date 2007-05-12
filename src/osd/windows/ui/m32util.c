@@ -22,6 +22,7 @@
 #include <shlwapi.h>
 #include <assert.h>
 #include <stdio.h>
+#include <tchar.h>
 
 #include "unzip.h"
 #include "bitmask.h"
@@ -90,7 +91,7 @@ void __cdecl ErrorMsg(const char* fmt, ...)
 
 	vsprintf(buf, fmt, va);
 
-	MessageBox(GetActiveWindow(), buf, MAME32NAME, MB_OK | MB_ICONERROR);
+	MessageBox(GetActiveWindow(), buf, TEXT(MAME32NAME), MB_OK | MB_ICONERROR);
 
 	strcpy(buf2, MAME32NAME ": ");
 	strcat(buf2,buf);
@@ -112,7 +113,7 @@ void __cdecl ErrorMsg(const char* fmt, ...)
 
 void __cdecl dprintf(const char* fmt, ...)
 {
-	char	buf[5000];
+	char 	buf[5000];
 	va_list va;
 
 	va_start(va, fmt);
@@ -144,7 +145,7 @@ UINT GetDepth(HWND hWnd)
  */
 LONG GetCommonControlVersion()
 {
-	HMODULE hModule = GetModuleHandle("comctl32");
+	HMODULE hModule = GetModuleHandle(TEXT("comctl32"));
 
 	if (hModule)
 	{
@@ -196,7 +197,7 @@ LONG GetCommonControlVersion()
 void DisplayTextFile(HWND hWnd, const char *cName)
 {
 	HINSTANCE hErr;
-	const char	  *msg = 0;
+	LPCTSTR	  msg = 0;
 
 	hErr = ShellExecute(hWnd, NULL, cName, NULL, NULL, SW_SHOWNORMAL);
 	if ((int)hErr > 32)
@@ -205,31 +206,31 @@ void DisplayTextFile(HWND hWnd, const char *cName)
 	switch((int)hErr)
 	{
 	case 0:
-		msg = "The operating system is out of memory or resources.";
+		msg = TEXT("The operating system is out of memory or resources.");
 		break;
 
 	case ERROR_FILE_NOT_FOUND:
-		msg = "The specified file was not found."; 
+		msg = TEXT("The specified file was not found."); 
 		break;
 
 	case SE_ERR_NOASSOC :
-		msg = "There is no application associated with the given filename extension.";
+		msg = TEXT("There is no application associated with the given filename extension.");
 		break;
 
 	case SE_ERR_OOM :
-		msg = "There was not enough memory to complete the operation.";
+		msg = TEXT("There was not enough memory to complete the operation.");
 		break;
 
 	case SE_ERR_PNF :
-		msg = "The specified path was not found.";
+		msg = TEXT("The specified path was not found.");
 		break;
 
 	case SE_ERR_SHARE :
-		msg = "A sharing violation occurred.";
+		msg = TEXT("A sharing violation occurred.");
 		break;
 
 	default:
-		msg = "Unknown error.";
+		msg = TEXT("Unknown error.");
 	}
  
 	MessageBox(NULL, msg, cName, MB_OK); 

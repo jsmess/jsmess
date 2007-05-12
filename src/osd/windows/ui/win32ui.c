@@ -1562,10 +1562,10 @@ static void RandomSelectBackground(void)
 void SetMainTitle(void)
 {
 	char version[50];
-	char buffer[100];
+	TCHAR buffer[100];
 
 	sscanf(build_version,"%s",version);
-	sprintf(buffer,"%s %s",MAME32NAME,version);
+	_stprintf(buffer,TEXT("%s %s"),MAME32NAME,version);
 	SetWindowText(hMain,buffer);
 }
 
@@ -1637,7 +1637,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	wndclass.hCursor	   = NULL;
 	wndclass.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
 	wndclass.lpszMenuName  = MAKEINTRESOURCE(IDR_UI_MENU);
-	wndclass.lpszClassName = "MainClass";
+	wndclass.lpszClassName = TEXT("MainClass");
 
 	RegisterClass(&wndclass);
 
@@ -1666,7 +1666,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 			return FALSE;
     }
 
-	g_mame32_message = RegisterWindowMessage("MAME32");
+	g_mame32_message = RegisterWindowMessage(TEXT("MAME32"));
 	g_bDoBroadcast = GetBroadcast();
 
 	HelpInit();
@@ -1943,7 +1943,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	if (validity_failed)
 	{
 		MessageBox(hMain, MAMENAME " has failed its validity checks.  The GUI will "
-			"still work, but emulations will fail to execute", MAMENAME, MB_OK);
+			"still work, but emulations will fail to execute", TEXT(MAMENAME), MB_OK);
 	}
 
 	return TRUE;
@@ -1954,7 +1954,7 @@ static void Win32UI_exit()
 {
     if (g_bDoBroadcast == TRUE)
     {
-        ATOM a = GlobalAddAtom("");
+        ATOM a = GlobalAddAtom(TEXT(""));
         SendMessage(HWND_BROADCAST, g_mame32_message, a, a);
         GlobalDeleteAtom(a);
     }
@@ -2210,9 +2210,9 @@ static long WINAPI MameWindowProc(HWND hWnd, UINT message, UINT wParam, LONG lPa
 				return TreeViewNotify(lpNmHdr);
 
 			GetClassName(lpNmHdr->hwndFrom, szClass, sizeof(szClass) / sizeof(szClass[0]));
-			if (!strcmp(szClass, "SysListView32"))
+			if (!_tcscmp(szClass, TEXT("SysListView32")))
 				return Picker_HandleNotify(lpNmHdr);	
-			if (!strcmp(szClass, "SysTabControl32"))
+			if (!_tcscmp(szClass, TEXT("SysTabControl32")))
 				return TabView_HandleNotify(lpNmHdr);
 		}
 		break;
@@ -2222,7 +2222,7 @@ static long WINAPI MameWindowProc(HWND hWnd, UINT message, UINT wParam, LONG lPa
 			LPDRAWITEMSTRUCT lpDis = (LPDRAWITEMSTRUCT)lParam;
 
 			GetClassName(lpDis->hwndItem, szClass, sizeof(szClass) / sizeof(szClass[0]));
-			if (!strcmp(szClass, "SysListView32"))
+			if (!_tcscmp(szClass, TEXT("SysListView32")))
 				Picker_HandleDrawItem(GetDlgItem(hMain, lpDis->CtlID), lpDis);
 		}
 		break;
@@ -2712,16 +2712,16 @@ static void ProgressBarHide()
 		return;
 	}
 
-    hDC = GetDC(hProgWnd);
+	hDC = GetDC(hProgWnd);
 
 	ShowWindow(hProgWnd, SW_HIDE);
 
-	GetTextExtentPoint32(hDC, "MMX", 3 , &size);
+	GetTextExtentPoint32(hDC, TEXT("MMX"), 3, &size);
 	widths[3] = size.cx;
-	GetTextExtentPoint32(hDC, "MMMM games", 10, &size);
+	GetTextExtentPoint32(hDC, TEXT("MMMM games"), 10, &size);
 	widths[2] = size.cx;
 	//Just specify 24 instead of 30, gives us sufficient space to display the message, and saves some space
-	GetTextExtentPoint32(hDC, "Screen flip support is missing", 24, &size);
+	GetTextExtentPoint32(hDC, TEXT("Screen flip support is missing"), 24, &size);
 	widths[1] = size.cx;
 
 	ReleaseDC(hProgWnd, hDC);
@@ -2784,7 +2784,7 @@ static HWND InitProgressBar(HWND hParent)
 
 	return CreateWindowEx(WS_EX_STATICEDGE,
 			PROGRESS_CLASS,
-			"Progress Bar",
+			TEXT("Progress Bar"),
 			WS_CHILD | PBS_SMOOTH,
 			rect.left,
 			rect.top,
@@ -2874,7 +2874,7 @@ static HWND InitStatusBar(HWND hParent)
 
 	return CreateStatusWindow(WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
 							  CCS_BOTTOM | SBARS_SIZEGRIP | SBT_TOOLTIPS,
-							  "Ready",
+							  TEXT("Ready"),
 							  hParent,
 							  2);
 }
@@ -3004,8 +3004,8 @@ static void DisableSelection()
 	mmi.cbSize	   = sizeof(mmi);
 	mmi.fMask	   = MIIM_TYPE;
 	mmi.fType	   = MFT_STRING;
-	mmi.dwTypeData = (char *)"&Play";
-	mmi.cch 	   = strlen(mmi.dwTypeData);
+	mmi.dwTypeData = (TCHAR *) TEXT("&Play");
+	mmi.cch 	   = _tcslen(mmi.dwTypeData);
 	SetMenuItemInfo(hMenu, ID_FILE_PLAY, FALSE, &mmi);
 
 	EnableMenuItem(hMenu, ID_FILE_PLAY, 		   MF_GRAYED);
@@ -3038,7 +3038,7 @@ static void EnableSelection(int nGame)
 	mmi.fMask	   = MIIM_TYPE;
 	mmi.fType	   = MFT_STRING;
 	mmi.dwTypeData = buf;
-	mmi.cch 	   = strlen(mmi.dwTypeData);
+	mmi.cch 	   = _tcslen(mmi.dwTypeData);
 	SetMenuItemInfo(hMenu, ID_FILE_PLAY, FALSE, &mmi);
 
 	pText = ModifyThe(drivers[nGame]->description);
@@ -3196,7 +3196,7 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 
 		g_in_treeview_edit = FALSE;
 
-		if (ptvdi->item.pszText == NULL || strlen(ptvdi->item.pszText) == 0)
+		if (ptvdi->item.pszText == NULL || _tcslen(ptvdi->item.pszText) == 0)
 			return FALSE;
 
 		return TryRenameCustomFolder(folder,ptvdi->item.pszText);
@@ -3798,11 +3798,11 @@ static void PickFont(void)
 		{
 			if (GetClassName(hWnd, szClass, sizeof(szClass) / sizeof(szClass[0])))
 			{
-				if (!strcmp(szClass, "SysListView32"))
+				if (!_tcscmp(szClass, TEXT("SysListView32")))
 				{
 					ListView_SetTextColor(hWnd, textColor);
 				}
-				else if (!strcmp(szClass, "SysTreeView32"))
+				else if (!_tcscmp(szClass, TEXT("SysTreeView32")))
 				{
 					TreeView_SetTextColor(hTreeView, textColor);
 				}
@@ -4570,7 +4570,7 @@ const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nColumn,
 
 		case COLUMN_PLAYED:
 			/* times played */
-			sprintf(pszBuffer, "%i", GetPlayCount(nItem));
+			_stprintf(pszBuffer, TEXT("%i"), GetPlayCount(nItem));
 			s = pszBuffer;
 			break;
 
@@ -4622,7 +4622,7 @@ static int GamePicker_FindItemParent(HWND hwndPicker, int nItem)
 static void InitListView()
 {
 	LVBKIMAGE bki;
-	char path[MAX_PATH];
+	TCHAR path[MAX_PATH];
 
 	static const struct PickerCallbacks s_gameListCallbacks =
 	{
@@ -4664,7 +4664,7 @@ static void InitListView()
 
 	ListView_SetTextBkColor(hwndList, CLR_NONE);
 	ListView_SetBkColor(hwndList, CLR_NONE);
-	sprintf(path, "%s\\bkground.png", GetBgDir() );
+	_stprintf(path, TEXT("%s\\bkground.png"), GetBgDir() );
 	bki.ulFlags = LVBKIF_SOURCE_URL | LVBKIF_STYLE_TILE;
 	bki.pszImage = path;
 	if( hBackground )	
@@ -4773,10 +4773,10 @@ static DWORD GetShellLargeIconSize(void)
 	HKEY   hKey;
 
 	/* Get the Key */
-	RegOpenKey(HKEY_CURRENT_USER, "Control Panel\\desktop\\WindowMetrics", &hKey);
+	RegOpenKey(HKEY_CURRENT_USER, TEXT("Control Panel\\desktop\\WindowMetrics"), &hKey);
 	/* Save the last size */
-	RegQueryValueEx(hKey, "Shell Icon Size", NULL, &dwType, (LPBYTE)szBuffer, &dwLength);
-	dwSize = atol(szBuffer);
+	RegQueryValueEx(hKey, TEXT("Shell Icon Size"), NULL, &dwType, (LPBYTE)szBuffer, &dwLength);
+	dwSize = _ttol(szBuffer);
 	if (dwSize < 32)
 		dwSize = 32;
 
@@ -5097,13 +5097,13 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		of.lpstrFilter   = MAMENAME " savestate files (*.sta)\0*.sta;\0All files (*.*)\0*.*\0";
 		break;
 	case FILETYPE_WAVE_FILES :
-		of.lpstrFilter   = "sounds (*.wav)\0*.wav;\0All files (*.*)\0*.*\0";
+		of.lpstrFilter   = TEXT("sounds (*.wav)\0*.wav;\0All files (*.*)\0*.*\0");
 		break;
 	case FILETYPE_MNG_FILES :
-		of.lpstrFilter   = "videos (*.mng)\0*.mng;\0All files (*.*)\0*.*\0";
+		of.lpstrFilter   = TEXT("videos (*.mng)\0*.mng;\0All files (*.*)\0*.*\0");
 		break;
 	case FILETYPE_EFFECT_FILES :
-		of.lpstrFilter   = "effects (*.png)\0*.png;\0All files (*.*)\0*.*\0";
+		of.lpstrFilter   = TEXT("effects (*.png)\0*.png;\0All files (*.*)\0*.*\0");
 		break;
 	}
 	of.lpstrCustomFilter = NULL;
@@ -5129,19 +5129,19 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	switch (filetype)
 	{
 	case FILETYPE_INPUT_FILES :
-		of.lpstrDefExt       = "inp";
+		of.lpstrDefExt       = TEXT("inp");
 		break;
 	case FILETYPE_SAVESTATE_FILES :
-		of.lpstrDefExt       = "sta";
+		of.lpstrDefExt       = TEXT("sta");
 		break;
 	case FILETYPE_WAVE_FILES :
-		of.lpstrDefExt       = "wav";
+		of.lpstrDefExt       = TEXT("wav");
 		break;
 	case FILETYPE_MNG_FILES :
-		of.lpstrDefExt       = "mng";
+		of.lpstrDefExt       = TEXT("mng");
 		break;
 	case FILETYPE_EFFECT_FILES :
-		of.lpstrDefExt       = "png";
+		of.lpstrDefExt       = TEXT("png");
 		break;
 	}
 	of.lCustData         = 0;
@@ -5178,7 +5178,7 @@ static BOOL SelectLanguageFile(HWND hWnd, TCHAR* filename)
 	of.Flags             = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST;
 	of.nFileOffset       = 0;
 	of.nFileExtension    = 0;
-	of.lpstrDefExt       = "lng";
+	of.lpstrDefExt       = TEXT("lng");
 	of.lCustData         = 0;
 	of.lpfnHook          = NULL;
 	of.lpTemplateName    = NULL;
@@ -5200,7 +5200,7 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 			const char* pLang = GetLanguage();
 			if (pLang == NULL || *pLang == '\0')
 			{
-				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), "");
+				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), TEXT(""));
 				Button_SetCheck(GetDlgItem(hDlg, IDC_LANGUAGECHECK), FALSE);
 				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEEDIT),   FALSE);
 				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEBROWSE), FALSE);
@@ -5241,7 +5241,7 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 			EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEEDIT),   bCheck);
 			EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEBROWSE), bCheck);
 			if (bCheck == FALSE)
-				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), "");
+				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), TEXT(""));
 			return TRUE;
 		}
 
@@ -5280,7 +5280,7 @@ static void CLIB_DECL MameMessageBox(const char *fmt, ...)
 
 	va_start(va, fmt);
 	vsprintf(buf, fmt, va);
-	MessageBox(GetMainWindow(), buf, MAME32NAME, MB_OK | MB_ICONERROR);
+	MessageBox(GetMainWindow(), buf, TEXT(MAME32NAME), MB_OK | MB_ICONERROR);
 	va_end(va);
 }
 
@@ -5614,12 +5614,12 @@ static void AdjustMetrics(void)
 	{
 		if (GetClassName(hWnd, szClass, sizeof(szClass) / sizeof(szClass[0])))
 		{
-			if (!strcmp(szClass, "SysListView32"))
+			if (!_tcscmp(szClass, TEXT("SysListView32")))
 			{
 				ListView_SetBkColor(hWnd, GetSysColor(COLOR_WINDOW));
 				ListView_SetTextColor(hWnd, textColor);
 			}
-			else if (!strcmp(szClass, "SysTreeView32"))
+			else if (!_tcscmp(szClass, TEXT("SysTreeView32")))
 			{
 				TreeView_SetBkColor(hTreeView, GetSysColor(COLOR_WINDOW));
 				TreeView_SetTextColor(hTreeView, textColor);
@@ -5820,7 +5820,7 @@ static void UpdateMenu(HMENU hMenu)
 		mItem.fMask 	 = MIIM_TYPE;
 		mItem.fType 	 = MFT_STRING;
 		mItem.dwTypeData = buf;
-		mItem.cch		 = strlen(mItem.dwTypeData);
+		mItem.cch		 = _tcslen(mItem.dwTypeData);
 
 		SetMenuItemInfo(hMenu, ID_FILE_PLAY, FALSE, &mItem);
 
@@ -5928,7 +5928,7 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 		mii.fMask = MIIM_TYPE | MIIM_ID;
 		mii.fType = MFT_STRING;
 		mii.dwTypeData = (char *)g_folderData[i].m_lpTitle;
-		mii.cch = strlen(mii.dwTypeData);
+		mii.cch = _tcslen(mii.dwTypeData);
 		mii.wID = ID_CONTEXT_SHOW_FOLDER_START + g_folderData[i].m_nFolderId;
 
 
@@ -5945,7 +5945,7 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 void InitBodyContextMenu(HMENU hBodyContextMenu)
 {
 	LPTREEFOLDER lpFolder;
-	char tmp[30];
+	TCHAR tmp[30];
 	MENUITEMINFO mii;
 	ZeroMemory(&mii,sizeof(mii));
 	mii.cbSize = sizeof(mii);
@@ -5956,11 +5956,11 @@ void InitBodyContextMenu(HMENU hBodyContextMenu)
 		return;
 	}
 	lpFolder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(Picker_GetSelectedItem(hwndList)) );
-	snprintf(tmp,sizeof(tmp),"Properties for %s",lpFolder->m_lpTitle );
+	_sntprintf(tmp,ARRAY_LENGTH(tmp),TEXT("Properties for %s"),lpFolder->m_lpTitle );
 	mii.fMask = MIIM_TYPE | MIIM_ID;
 	mii.fType = MFT_STRING;
 	mii.dwTypeData = tmp;
-	mii.cch = strlen(mii.dwTypeData);
+	mii.cch = _tcslen(mii.dwTypeData);
 	mii.wID = ID_FOLDER_SOURCEPROPERTIES;
 
 
@@ -6227,9 +6227,9 @@ static INT_PTR CALLBACK LoadProgressDialogProc(HWND hDlg, UINT Msg, WPARAM wPara
 	{
 	case WM_INITDIALOG :
 	{
-		char buf[256];
+		TCHAR buf[256];
 		
-		sprintf(buf, "Loading %s", Machine->gamedrv->description);
+		_stprintf(buf, TEXT("Loading %s"), Machine->gamedrv->description);
 		SetWindowText(hDlg, buf);
 		
 		g_bCloseLoading = FALSE;
@@ -6293,7 +6293,7 @@ int UpdateLoadProgress(const char* name, const rom_load_data *romdata)
 	if (name == NULL)
 	{
 		// final call to us
-		SetWindowText(GetDlgItem(hWndLoad, IDC_LOAD_ROMNAME), "");
+		SetWindowText(GetDlgItem(hWndLoad, IDC_LOAD_ROMNAME), TEXT(""));
 		if (romdata->errors > 0 )
 		{
 			
@@ -6310,7 +6310,7 @@ int UpdateLoadProgress(const char* name, const rom_load_data *romdata)
 			SetFocus(GetDlgItem(hWndLoad,IDOK));
 			if (romdata->errors)
 				SetWindowText(GetDlgItem(hWndLoad,IDC_ERROR_TEXT),
-							  "ERROR: required files are missing, the game cannot be run.");
+							  TEXT("ERROR: required files are missing, the game cannot be run."));
 		}
 	}
 	else
@@ -6399,7 +6399,7 @@ void RemoveGameCustomFolder(int driver_index)
 			return;
 		}
 	}
-	MessageBox(GetMainWindow(), "Error searching for custom folder", MAME32NAME, MB_OK | MB_ICONERROR);
+	MessageBox(GetMainWindow(), TEXT("Error searching for custom folder"), TEXT(MAME32NAME), MB_OK | MB_ICONERROR);
 
 }
 

@@ -35,7 +35,7 @@
 int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 {
 	LV_ITEM lvi;
-	char	buf[80];
+	TCHAR	buf[80];
 	int 	nFrom, nTo;
 
 	nFrom = ListView_GetItemCount(hFrom);
@@ -45,7 +45,7 @@ int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 	if (lvi.iItem < nMinItem)
 	{
 		if (lvi.iItem != -1) // Can't remove the first column
-			MessageBox(0, "Cannot Move Selected Item", "Move Item", IDOK);
+			MessageBox(0, TEXT("Cannot Move Selected Item"), TEXT("Move Item"), IDOK);
 		SetFocus(hFrom);
 		return FALSE;
 	}
@@ -71,7 +71,7 @@ int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 void DoMoveItem( HWND hWnd, BOOL bDown)
 {
 	LV_ITEM lvi;
-	char	buf[80];
+	TCHAR	buf[80];
 	int 	nMaxpos;
 	
 	lvi.iItem = ListView_GetNextItem(hWnd, -1, LVIS_SELECTED | LVIS_FOCUSED);
@@ -250,7 +250,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 							LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
 						if (showMsg)
 						{
-							MessageBox(0, "Changing this item is not permitted", "Select Item", IDOK);
+							MessageBox(0, TEXT("Changing this item is not permitted"), TEXT("Select Item"), IDOK);
 							showMsg = FALSE;
 						}
 						EnableWindow(GetDlgItem(hDlg, IDC_BUTTONREMOVE),   FALSE);

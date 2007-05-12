@@ -46,16 +46,16 @@ static void SoftwareTabView_OnSelectionChanged(void);
 static void SoftwareTabView_OnMoveSize(void);
 static void SetupSoftwareTabView(void);
 
-static const char *mess_column_names[] =
+static LPCTSTR mess_column_names[] =
 {
-    "Software",
-	"Goodname",
-    "Manufacturer",
-    "Year",
-    "Playable",
-	"CRC",
-	"SHA-1",
-	"MD5"
+    TEXT("Software"),
+	TEXT("Goodname"),
+    TEXT("Manufacturer"),
+    TEXT("Year"),
+    TEXT("Playable"),
+	TEXT("CRC"),
+	TEXT("SHA-1"),
+	TEXT("MD5")
 };
 
 static int *mess_icon_index;
@@ -416,7 +416,7 @@ done:
 	if (!bResult)
 	{
 		pszMessage = tstring_from_utf8(szMessage);
-		MessageBox(hParent, pszMessage, MAME32NAME, MB_OK);
+		MessageBox(hParent, pszMessage, TEXT(MAME32NAME), MB_OK);
 		free((void *) pszMessage);
 	}
 
@@ -430,7 +430,7 @@ done:
 static void InternalSetSelectedSoftware(int nGame, const device_class *devclass, int device_inst, const char *pszSoftware)
 {
 	if (!pszSoftware)
-		pszSoftware = TEXT("");
+		pszSoftware = "";
 
 	// only call SetSelectedSoftware() if this value is different
 	if (strcmp(GetSelectedSoftware(nGame, devclass, device_inst), pszSoftware))
@@ -725,7 +725,7 @@ static BOOL CommonFileImageDialog(char *the_last_directory, common_file_dialog_p
     of.Flags = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;
     of.nFileOffset = 0;
     of.nFileExtension = 0;
-    of.lpstrDefExt = "rom";
+    of.lpstrDefExt = TEXT("rom");
     of.lCustData = 0;
     of.lpfnHook = NULL;
     of.lpTemplateName = NULL;
@@ -966,7 +966,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 
 		// Get the fullname and partialname for this file
 		pszFullName = SoftwarePicker_LookupFilename(hwndSoftwarePicker, nItem);
-		s = strrchr(pszFullName, '\\');
+		s = _tcschr(pszFullName, '\\');
 		pszName = s ? s + 1 : pszFullName;
 
 		// Do the dirty work
@@ -977,7 +977,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 
 		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
 		strncpyz(g_szSelectedItem, pszName, sizeof(g_szSelectedItem) / sizeof(g_szSelectedItem[0]));
-		s = strrchr(g_szSelectedItem, '.');
+		s = _tcsrchr(g_szSelectedItem, '.');
 		if (s)
 			*s = '\0';
 
