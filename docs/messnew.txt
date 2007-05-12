@@ -42,6 +42,8 @@ Source Changes:
 ----------------
 - WD17xx cleanups.  [Nate Woods]
 
+- Fixed a memory leak.  (bug #1019) [Oliver Stoeneberg]
+
 
 
 0.115

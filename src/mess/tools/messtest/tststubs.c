@@ -110,11 +110,6 @@ void osd_customize_inputport_list(input_port_default_entry *defaults)
 {
 }
 
-int osd_display_loading_rom_message(const char *name, rom_load_data *romdata)
-{
-	return 0;
-}
-
 void osd_logerror(const char *text)
 {
 }
