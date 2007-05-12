@@ -833,7 +833,7 @@ static WRITE8_HANDLER( RESP0_w )
 
 	if (horzP0 < -3)
 	{
-		horzP0 = 1;
+		horzP0 = 3;
 	}
 	else
 	{
@@ -849,7 +849,7 @@ static WRITE8_HANDLER( RESP1_w )
 
 	if (horzP1 < -3)
 	{
-		horzP1 = 1;
+		horzP1 = 3;
 	}
 	else
 	{
