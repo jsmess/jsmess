@@ -53,4 +53,12 @@ BOOL StringIsSuffixedBy(const char *s, const char *suffix);
 
 BOOL SafeIsAppThemed(void);
 
+HWND win_create_window_utf8(const char* classname, const char* windowname, DWORD style, 
+							int x, int y, int width, int height, HWND parent, HMENU menu, 
+							HINSTANCE instance, void* param);
+HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconindex);
+BOOL win_set_file_attributes_utf8(const char* filename, DWORD fileattributes);
+BOOL win_copy_file_utf8(const char* existingfilename, const char* newfilename, BOOL failifexists);
+BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename);
+
 #endif /* MAME32UTIL_H */

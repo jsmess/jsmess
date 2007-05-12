@@ -268,6 +268,7 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	LPCSTR		s;
 	TCHAR       *token;
 	TCHAR       buf[MAX_PATH * MAX_DIRS];
+	TCHAR*      t_s;
 
 	/* count how many dirinfos there are */
 	nDirInfoCount = 0;
@@ -298,10 +299,11 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	for (i = 0; i < nDirInfoCount; i++)
 	{
 		s = g_directoryInfo[i].pfnGetTheseDirs();
+		t_s = tstring_from_utf8(s);
 		if (g_directoryInfo[i].bMulti)
 		{
 			/* Copy the string to our own buffer so that we can mutilate it */
-			_tcscpy(buf, s);
+			_tcscpy(buf, t_s);
 
 			g_pDirInfo[i].m_Path = malloc(sizeof(tPath));
 			if (!g_pDirInfo[i].m_Path)
@@ -319,8 +321,9 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 		}
 		else
 		{
-			DirInfo_SetDir(g_pDirInfo, i, -1, s);
+			DirInfo_SetDir(g_pDirInfo, i, -1, t_s);
 		}
+		free(t_s);
 	}
 
 	UpdateDirectoryList(hDlg);
@@ -364,6 +367,7 @@ static int RetrieveDirList(int nDir, int nFlagResult, void (*SetTheseDirs)(const
 	int nResult = 0;
 	int nPaths;
 	TCHAR buf[MAX_PATH * MAX_DIRS];
+	char* utf8_buf;
 
 	if (DirInfo_Modified(g_pDirInfo, nDir))
 	{
@@ -371,13 +375,14 @@ static int RetrieveDirList(int nDir, int nFlagResult, void (*SetTheseDirs)(const
 		nPaths = DirInfo_NumDir(g_pDirInfo, nDir);
 		for (i = 0; i < nPaths; i++)
 		{
-
 			_tcscat(buf, FixSlash(DirInfo_Path(g_pDirInfo, nDir, i)));
 
 			if (i < nPaths - 1)
 				_tcscat(buf, TEXT(";"));
 		}
-		SetTheseDirs(buf);
+		utf8_buf = utf8_from_tstring(buf);
+		SetTheseDirs(utf8_buf);
+		free(utf8_buf);
 
 		nResult |= nFlagResult;
     }
@@ -389,6 +394,7 @@ static void Directories_OnOk(HWND hDlg)
 	int i;
 	int nResult = 0;
 	LPTSTR s;
+	char* utf8_s;
 
 	for (i = 0; g_directoryInfo[i].lpName; i++)
 	{
@@ -399,7 +405,9 @@ static void Directories_OnOk(HWND hDlg)
 		else
 		{
 			s = FixSlash(DirInfo_Dir(g_pDirInfo, i));
-			g_directoryInfo[i].pfnSetTheseDirs(s);
+			utf8_s = utf8_from_tstring(s);
+			g_directoryInfo[i].pfnSetTheseDirs(utf8_s);
+			free(utf8_s);
 		}
 	}
 	EndDialog(hDlg, nResult);

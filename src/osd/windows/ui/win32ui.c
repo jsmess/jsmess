@@ -277,12 +277,12 @@ static void             UpdateStatusBar(void);
 static BOOL             PickerHitTest(HWND hWnd);
 static BOOL             TreeViewNotify(NMHDR *nm);
 
-static void             ResetBackground(TCHAR *szFile);
+static void             ResetBackground(char *szFile);
 static void				RandomSelectBackground(void);
 static void             LoadBackgroundBitmap(void);
 static void             PaintBackgroundImage(HWND hWnd, HRGN hRgn, int x, int y);
 
-static int CLIB_DECL DriverDataCompareFunc(const void *arg1,const void *arg2);
+static int CLIB_DECL    DriverDataCompareFunc(const void *arg1,const void *arg2);
 static int              GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_subitem);
 
 static void             DisableSelection(void);
@@ -364,7 +364,6 @@ void CalculateBestScreenShotRect(HWND hWnd, RECT *pRect, BOOL restrict_height);
 BOOL MouseHasBeenMoved(void);
 void SwitchFullScreenMode(void);
 
-static BOOL CALLBACK EnumWindowCallBack(HWND hwnd, LPARAM lParam);
 /***************************************************************************
     External variables
  ***************************************************************************/
@@ -1066,32 +1065,27 @@ HICON FormatICOInMemoryToHICON(PBYTE ptrBuffer, UINT nBufferSize)
 HICON LoadIconFromFile(const char *iconname)
 {
 	HICON hIcon = 0;
-	struct _stat file_stat;
-	TCHAR tmpStr[MAX_PATH];
+	struct stat file_stat;
+	char tmpStr[MAX_PATH];
 	char tmpIcoName[MAX_PATH];
 	const char* sDirName = GetImgDir();
 	PBYTE bufferPtr;
 	zip_error ziperr;
 	zip_file *zip;
 	const zip_file_header *entry;
-	char* c_tmpStr;
 
-	_stprintf(tmpStr, TEXT("%s/%s.ico"), GetIconsDir(), iconname);
-	if (_tstat(tmpStr, &file_stat) != 0
-	|| (hIcon = ExtractIcon(hInst, tmpStr, 0)) == 0)
+	sprintf(tmpStr, "%s/%s.ico", GetIconsDir(), iconname);
+	if (stat(tmpStr, &file_stat) != 0
+	|| (hIcon = win_extract_icon_utf8(hInst, tmpStr, 0)) == 0)
 	{
-		_stprintf(tmpStr, TEXT("%s/%s.ico"), sDirName, iconname);
-		if (_tstat(tmpStr, &file_stat) != 0
-		|| (hIcon = ExtractIcon(hInst, tmpStr, 0)) == 0)
+		sprintf(tmpStr, "%s/%s.ico", sDirName, iconname);
+		if (stat(tmpStr, &file_stat) != 0
+		|| (hIcon = win_extract_icon_utf8(hInst, tmpStr, 0)) == 0)
 		{
-			_stprintf(tmpStr, TEXT("%s/icons.zip"), GetIconsDir());
+			sprintf(tmpStr, "%s/icons.zip", GetIconsDir());
 			sprintf(tmpIcoName, "%s.ico", iconname);
 
-			c_tmpStr = utf8_from_tstring(tmpStr);
-			if( !c_tmpStr )
-				return hIcon;
-
-			ziperr = zip_file_open(c_tmpStr, &zip);
+			ziperr = zip_file_open(tmpStr, &zip);
 			if (ziperr == ZIPERR_NONE)
 			{
 				entry = zip_file_first_file(zip);
@@ -1114,8 +1108,6 @@ HICON LoadIconFromFile(const char *iconname)
 				}
 				zip_file_close(zip);
 			}
-			
-			free(c_tmpStr);
 		}
 	}
 	return hIcon;
@@ -1503,21 +1495,21 @@ int CLIB_DECL DriverDataCompareFunc(const void *arg1,const void *arg2)
     return strcmp( ((driver_data_type *)arg1)->name, ((driver_data_type *)arg2)->name );
 }
 
-static void ResetBackground(TCHAR *szFile)
+static void ResetBackground(char *szFile)
 {
-	TCHAR szDestFile[MAX_PATH];
+	char szDestFile[MAX_PATH];
 
 	/* The MAME core load the .png file first, so we only need replace this file */
-	_stprintf(szDestFile, TEXT("%s\\bkground.png"), GetBgDir());
-	SetFileAttributes(szDestFile, FILE_ATTRIBUTE_NORMAL);
-	CopyFile(szFile, szDestFile, FALSE);
+	sprintf(szDestFile, "%s\\bkground.png", GetBgDir());
+	win_set_file_attributes_utf8(szDestFile, FILE_ATTRIBUTE_NORMAL);
+	win_copy_file_utf8(szFile, szDestFile, FALSE);
 }
 
 static void RandomSelectBackground(void)
 {
-	struct _tfinddata_t c_file;
+	struct _finddata_t c_file;
 	long hFile;
-	TCHAR szFile[MAX_PATH];
+	char szFile[MAX_PATH];
 	int count=0;
 	const char *szDir=GetBgDir();
 	char *buf=malloc(_MAX_FNAME * MAX_BGFILES);
@@ -1525,8 +1517,8 @@ static void RandomSelectBackground(void)
 	if (buf == NULL)
 		return;
 
-	_stprintf(szFile, TEXT("%s\\*.bmp"), szDir);
-	hFile = _tfindfirst(szFile, &c_file);
+	sprintf(szFile, "%s\\*.bmp", szDir);
+	hFile = _findfirst(szFile, &c_file);
 	if (hFile != -1L)
 	{
 		int Done = 0;
@@ -1534,12 +1526,12 @@ static void RandomSelectBackground(void)
 		{
 			memcpy(buf + count * _MAX_FNAME, c_file.name, _MAX_FNAME);
 			count++;
-			Done = _tfindnext(hFile, &c_file);
+			Done = _findnext(hFile, &c_file);
 		}
 		_findclose(hFile);
 	}
-	_stprintf(szFile, TEXT("%s\\*.png"), szDir);
-	hFile = _tfindfirst(szFile, &c_file);
+	sprintf(szFile, "%s\\*.png", szDir);
+	hFile = _findfirst(szFile, &c_file);
 	if (hFile != -1L)
 	{
 		int Done = 0;
@@ -1547,7 +1539,7 @@ static void RandomSelectBackground(void)
 		{
 			memcpy(buf + count * _MAX_FNAME, c_file.name, _MAX_FNAME);
 			count++;
-			Done = _tfindnext(hFile, &c_file);
+			Done = _findnext(hFile, &c_file);
 		}
 		_findclose(hFile);
 	}
@@ -1555,7 +1547,7 @@ static void RandomSelectBackground(void)
 	if (count)
 	{
 		srand( (unsigned)time( NULL ) );
-		_stprintf(szFile, TEXT("%s\\%s"), szDir, buf + (rand() % count) * _MAX_FNAME);
+		sprintf(szFile, "%s\\%s", szDir, buf + (rand() % count) * _MAX_FNAME);
 		ResetBackground(szFile);
 	}
 
@@ -2966,7 +2958,7 @@ static void UpdateHistory(void)
 		char *histText = GetGameHistory(Picker_GetSelectedItem(hwndList));
 
 		have_history = (histText && histText[0]) ? TRUE : FALSE;
-		Edit_SetText(GetDlgItem(hMain, IDC_HISTORY), histText);
+		win_set_window_text_utf8(GetDlgItem(hMain, IDC_HISTORY), histText);
 	}
 
 	if (have_history && GetShowScreenShot()
@@ -5211,14 +5203,14 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 			const char* pLang = GetLanguage();
 			if (pLang == NULL || *pLang == '\0')
 			{
-				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), TEXT(""));
+				win_set_window_text_utf8(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), "");
 				Button_SetCheck(GetDlgItem(hDlg, IDC_LANGUAGECHECK), FALSE);
 				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEEDIT),   FALSE);
 				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEBROWSE), FALSE);
 			}
 			else
 			{
-				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), pLang);
+				win_set_window_text_utf8(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), pLang);
 				Button_SetCheck(GetDlgItem(hDlg, IDC_LANGUAGECHECK), TRUE);
 				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEEDIT),   TRUE);
 				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEBROWSE), TRUE);

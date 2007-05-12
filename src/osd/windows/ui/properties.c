@@ -53,6 +53,7 @@
 #include "resource.hm"
 #include "winmain.h"
 #include "strconv.h"
+#include "winutil.h"
 
 typedef HANDLE HTHEME;
 
@@ -455,10 +456,10 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 	/* Create the Property sheet and display it */
 	if (PropertySheet(&pshead) == -1)
 	{
-		TCHAR temp[100];
+		char temp[100];
 		DWORD dwError = GetLastError();
-		_stprintf(temp, TEXT("Propery Sheet Error %d %X"), (int)dwError, (int)dwError);
-		MessageBox(0, temp, TEXT("Error"), IDOK);
+		sprintf(temp, "Propery Sheet Error %d %X", (int)dwError, (int)dwError);
+		win_message_box_utf8(0, temp, "Error", IDOK);
 	}
 
 	free(pspage);
@@ -575,10 +576,10 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 	/* Create the Property sheet and display it */
 	if (PropertySheet(&pshead) == -1)
 	{
-		TCHAR temp[100];
+		char temp[100];
 		DWORD dwError = GetLastError();
-		_stprintf(temp, TEXT("Propery Sheet Error %d %X"), (int)dwError, (int)dwError);
-		MessageBox(0, temp, TEXT("Error"), IDOK);
+		sprintf(temp, "Propery Sheet Error %d %X", (int)dwError, (int)dwError);
+		win_message_box_utf8(0, temp, "Error", IDOK);
 	}
 
 	free(pspage);
@@ -952,15 +953,15 @@ HWND hWnd;
 		}
 #endif
 
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_TITLE),         GameInfoTitle(g_nGame));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_MANUFACTURED),  GameInfoManufactured(g_nGame));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_STATUS),        GameInfoStatus(g_nGame, FALSE));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_CPU),           GameInfoCPU(g_nGame));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_SOUND),         GameInfoSound(g_nGame));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_SCREEN),        GameInfoScreen(g_nGame));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_COLORS),        GameInfoColors(g_nGame));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_CLONEOF),       GameInfoCloneOf(g_nGame));
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_SOURCE),        GameInfoSource(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_TITLE),         GameInfoTitle(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_MANUFACTURED),  GameInfoManufactured(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_STATUS),        GameInfoStatus(g_nGame, FALSE));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_CPU),           GameInfoCPU(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_SOUND),         GameInfoSound(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_SCREEN),        GameInfoScreen(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_COLORS),        GameInfoColors(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_CLONEOF),       GameInfoCloneOf(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_SOURCE),        GameInfoSource(g_nGame));
 		
 		if (DriverIsClone(g_nGame))
 		{
@@ -988,7 +989,7 @@ INT_PTR CALLBACK GameOptionsProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 	{
 	case WM_INITDIALOG:
 		/* Fill in the Game info at the top of the sheet */
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_TITLE), GameInfoTitle(g_nGame));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_TITLE), GameInfoTitle(g_nGame));
 		InitializeOptions(hDlg);
 		InitializeMisc(hDlg);
 
@@ -2665,22 +2666,22 @@ static void InitializeAnalogAxesUI(HWND hwnd)
 		ListView_SetExtendedListViewStyle(hCtrl,LVS_EX_CHECKBOXES );
 		//add two Columns...
 		column.mask = LVCF_TEXT | LVCF_WIDTH |LVCF_SUBITEM;
-		column.pszText = (TCHAR *)"Joystick";
+		column.pszText = (TCHAR *)TEXT("Joystick");
 		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 0;
 		column.cx = 100;
 		res = ListView_InsertColumn(hCtrl,0, &column );
-		column.pszText = (TCHAR *)"Axis";
+		column.pszText = (TCHAR *)TEXT("Axis");
 		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 1;
 		column.cx = 100;
 		res = ListView_InsertColumn(hCtrl,1, &column );
-		column.pszText = (TCHAR *)"JoystickId";
+		column.pszText = (TCHAR *)TEXT("JoystickId");
 		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 2;
 		column.cx = 70;
 		res = ListView_InsertColumn(hCtrl,2, &column );
-		column.pszText = (TCHAR *)"AxisId";
+		column.pszText = (TCHAR *)TEXT("AxisId");
 		column.cchTextMax = _tcslen(column.pszText);
 		column.iSubItem = 3;
 		column.cx = 50;

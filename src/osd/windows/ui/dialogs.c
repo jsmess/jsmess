@@ -56,7 +56,7 @@
 
 #define FILTERTEXT_LEN 256
 
-static TCHAR g_FilterText[FILTERTEXT_LEN];
+static char g_FilterText[FILTERTEXT_LEN];
 
 #define NUM_EXCLUSIONS  9
 
@@ -77,7 +77,7 @@ static void OnHScroll(HWND hWnd, HWND hwndCtl, UINT code, int pos);
 
 /***************************************************************************/
 
-LPCTSTR GetFilterText(void)
+const char * GetFilterText(void)
 {
 	return g_FilterText;
 }
@@ -342,7 +342,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 	static DWORD			dwFilters;
 	static DWORD			dwpFilters;
 	static LPFOLDERDATA		lpFilterRecord;
-	TCHAR 					strText[250];
+	char 					strText[250];
 	int 					i;
 
 	switch (Msg)
@@ -357,15 +357,15 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 
 		if (folder != NULL)
 		{
-			TCHAR tmp[80];
+			char tmp[80];
 			
-			Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_EDIT), g_FilterText);
+			win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_EDIT), g_FilterText);
 			Edit_SetSel(GetDlgItem(hDlg, IDC_FILTER_EDIT), 0, -1);
 			// Mask out non filter flags
 			dwFilters = folder->m_dwFlags & F_MASK;
 			// Display current folder name in dialog titlebar
-			_sntprintf(tmp,ARRAY_LENGTH(tmp),TEXT("Filters for %s Folder"),folder->m_lpTitle);
-			SetWindowText(hDlg, tmp);
+			snprintf(tmp,ARRAY_LENGTH(tmp),"Filters for %s Folder",folder->m_lpTitle);
+			win_set_window_text_utf8(hDlg, tmp);
 			if ( GetFilterInherit() )
 			{
 				if( folder )
@@ -381,65 +381,65 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 						if( (dwpFilters & F_CLONES) && !(dwFilters & F_CLONES) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_CLONES), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_CLONES), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_CLONES), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_CLONES), strText);
 							bShowExplanation = TRUE;
 						}
 						if( (dwpFilters & F_NONWORKING) && !(dwFilters & F_NONWORKING) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_NONWORKING), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_NONWORKING), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_NONWORKING), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_NONWORKING), strText);
 							bShowExplanation = TRUE;
 						}
 						if( (dwpFilters & F_UNAVAILABLE) && !(dwFilters & F_UNAVAILABLE) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_UNAVAILABLE), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_UNAVAILABLE), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_UNAVAILABLE), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_UNAVAILABLE), strText);
 							bShowExplanation = TRUE;
 						}
 						if( (dwpFilters & F_VECTOR) && !(dwFilters & F_VECTOR) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_VECTOR), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_VECTOR), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_VECTOR), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_VECTOR), strText);
 							bShowExplanation = TRUE;
 						}
 						if( (dwpFilters & F_RASTER) && !(dwFilters & F_RASTER) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_RASTER), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_RASTER), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_RASTER), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_RASTER), strText);
 							bShowExplanation = TRUE;
 						}
 						if( (dwpFilters & F_ORIGINALS) && !(dwFilters & F_ORIGINALS) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_ORIGINALS), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_ORIGINALS), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_ORIGINALS), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_ORIGINALS), strText);
 							bShowExplanation = TRUE;
 						}
 						if( (dwpFilters & F_WORKING) && !(dwFilters & F_WORKING) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_WORKING), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_WORKING), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_WORKING), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_WORKING), strText);
 							bShowExplanation = TRUE;
 						}
 						if( (dwpFilters & F_AVAILABLE) && !(dwFilters & F_AVAILABLE) )
 						{
 							/*Add a Specifier to the Checkbox to show it was inherited from the parent*/
-							Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_AVAILABLE), strText, 250);
-							_tcscat(strText, TEXT(" (*)"));
-							Edit_SetText(GetDlgItem(hDlg, IDC_FILTER_AVAILABLE), strText);
+							win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_AVAILABLE), strText, 250);
+							strcat(strText, " (*)");
+							win_set_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_AVAILABLE), strText);
 							bShowExplanation = TRUE;
 						}
 						/*Do not or in the Values of the parent, so that the values of the folder still can be set*/
@@ -489,7 +489,7 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 		case IDOK:
 			dwFilters = 0;
 			
-			Edit_GetText(GetDlgItem(hDlg, IDC_FILTER_EDIT), g_FilterText, FILTERTEXT_LEN);
+			win_get_window_text_utf8(GetDlgItem(hDlg, IDC_FILTER_EDIT), g_FilterText, FILTERTEXT_LEN);
 			
 			// see which buttons are checked
 			for (i = 0; g_lpFilterList[i].m_dwFilterType; i++)
@@ -527,9 +527,6 @@ INT_PTR CALLBACK FilterDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 
 INT_PTR CALLBACK AboutDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	char* version;
-	TCHAR* t_version;
-	
 	switch (Msg)
 	{
 	case WM_INITDIALOG:
@@ -540,12 +537,7 @@ INT_PTR CALLBACK AboutDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 									  IMAGE_BITMAP, 0, 0, LR_SHARED);
 			SendDlgItemMessage(hDlg, IDC_ABOUT, STM_SETIMAGE,
 						(WPARAM)IMAGE_BITMAP, (LPARAM)hBmp);
-			version = GetVersionString();
-			t_version = tstring_from_utf8(version);
-			if( !t_version) 
-				return 0;
-			Static_SetText(GetDlgItem(hDlg, IDC_VERSION), t_version);
-			free(t_version);
+			win_set_window_text_utf8(GetDlgItem(hDlg, IDC_VERSION), GetVersionString());
 		}
 		return 1;
 

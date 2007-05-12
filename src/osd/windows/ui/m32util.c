@@ -518,3 +518,137 @@ BOOL SafeIsAppThemed(void)
 	return bResult;
 
 }
+
+
+
+//============================================================
+//  win_create_window_utf8
+//============================================================
+
+HWND win_create_window_utf8(const char* classname, const char* windowname, DWORD style, 
+							int x, int y, int width, int height, HWND parent, HMENU menu, 
+							HINSTANCE instance, void* param)
+{
+	TCHAR* t_classname;
+	TCHAR* t_windowname;
+	HWND result = 0;
+	
+	t_classname = tstring_from_utf8(classname);
+	if( !t_classname )
+		return result;
+
+	t_windowname = tstring_from_utf8(windowname);
+	if( !t_windowname ) {
+		free(t_classname);
+		return result;
+	}
+	
+	result = CreateWindow(t_classname, t_windowname, style, x, y, width, height, parent,
+						  menu, instance, param);
+	
+	free(t_windowname);
+	free(t_classname);
+	
+	return result;
+}
+
+
+
+//============================================================
+//  win_extract_icon_utf8
+//============================================================
+
+HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconindex)
+{
+	HICON icon = 0;
+	TCHAR* t_exefilename = tstring_from_utf8(exefilename);
+	if( !t_exefilename )
+		return icon;
+	
+	icon = ExtractIcon(inst, t_exefilename, iconindex);
+	
+	free(t_exefilename);
+	
+	return icon;
+}
+
+
+
+//============================================================
+//  win_set_file_attributes_utf8
+//============================================================
+
+BOOL win_set_file_attributes_utf8(const char* filename, DWORD fileattributes)
+{
+	BOOL result = FALSE;
+	TCHAR* t_filename = tstring_from_utf8(filename);
+	if( !t_filename )
+		return result;
+		
+	result = SetFileAttributes(t_filename, fileattributes);
+		
+	free(t_filename);
+	
+	return result;
+}
+
+
+
+//============================================================
+//  win_copy_file_utf8
+//============================================================
+
+BOOL win_copy_file_utf8(const char* existingfilename, const char* newfilename, BOOL failifexists)
+{
+	TCHAR* t_existingfilename;
+	TCHAR* t_newfilename;
+	BOOL result = FALSE;
+	
+	t_existingfilename = tstring_from_utf8(existingfilename);
+	if( !t_existingfilename )
+		return result;
+
+	t_newfilename = tstring_from_utf8(newfilename);
+	if( !t_newfilename ) {
+		free(t_existingfilename);
+		return result;
+	}
+	
+	result = CopyFile(t_existingfilename, t_newfilename, failifexists);
+	
+	free(t_newfilename);
+	free(t_existingfilename);
+	
+	return result;	
+}
+
+
+
+//============================================================
+//  win_move_file_utf8
+//============================================================
+
+BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename)
+{
+	TCHAR* t_existingfilename;
+	TCHAR* t_newfilename;
+	BOOL result = FALSE;
+	
+	t_existingfilename = tstring_from_utf8(existingfilename);
+	if( !t_existingfilename )
+		return result;
+
+	t_newfilename = tstring_from_utf8(newfilename);
+	if( !t_newfilename ) {
+		free(t_existingfilename);
+		return result;
+	}
+	
+	result = MoveFile(t_existingfilename, t_newfilename);
+	
+	free(t_newfilename);
+	free(t_existingfilename);
+	
+	return result;	
+}
+

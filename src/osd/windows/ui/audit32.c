@@ -24,10 +24,10 @@
 #include <commctrl.h>
 #include <stdio.h>
 #include <richedit.h>
-#include <tchar.h>
 
 #include "screenshot.h"
 #include "win32ui.h"
+#include "winutil.h"
 
 #include <audit.h>
 #include <unzip.h>
@@ -215,7 +215,7 @@ int Mame32VerifySampleSet(int game)
 
 static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 {
-	TCHAR buffer[200];
+	char buffer[200];
 
 	while (!bCancel)
 	{
@@ -223,24 +223,23 @@ static DWORD WINAPI AuditThreadProc(LPVOID hDlg)
 		{
 			if (rom_index != -1)
 			{
-				_stprintf(buffer, TEXT("Checking Game %s - %s"),
+				sprintf(buffer, "Checking Game %s - %s",
 					drivers[rom_index]->name, drivers[rom_index]->description);
-				SetWindowText(hDlg, buffer);
+				win_set_window_text_utf8(hDlg, buffer);
 				ProcessNextRom();
 			}
 			else
 			{
 				if (sample_index != -1)
 				{
-					_stprintf(buffer, TEXT("Checking Game %s - %s"),
+					sprintf(buffer, "Checking Game %s - %s",
 						drivers[sample_index]->name, drivers[sample_index]->description);
-					SetWindowText(hDlg, buffer);
+					win_set_window_text_utf8(hDlg, buffer);
 					ProcessNextSample();
 				}
 				else
 				{
-					_stprintf(buffer, TEXT("%s"), "File Audit");
-					SetWindowText(hDlg, buffer);
+					win_set_window_text_utf8(hDlg, "File Audit");
 					EnableWindow(GetDlgItem(hDlg, IDPAUSE), FALSE);
 					ExitThread(1);
 				}
@@ -321,7 +320,7 @@ INT_PTR CALLBACK GameAuditDialogProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lPa
 	case WM_INITDIALOG:
 		FlushFileCaches();
 		hAudit = hDlg;
-		Static_SetText(GetDlgItem(hDlg, IDC_PROP_TITLE), GameInfoTitle(rom_index));
+		win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_TITLE), GameInfoTitle(rom_index));
 		SetTimer(hDlg, 0, 1, NULL);
 		return 1;
 
@@ -333,11 +332,11 @@ INT_PTR CALLBACK GameAuditDialogProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lPa
 
 			iStatus = Mame32VerifyRomSet(rom_index);
 			lpStatus = DriverUsesRoms(rom_index) ? StatusString(iStatus) : "None required";
-			SetWindowText(GetDlgItem(hDlg, IDC_PROP_ROMS), lpStatus);
+			win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_ROMS), lpStatus);
 
 			iStatus = Mame32VerifySampleSet(rom_index);
 			lpStatus = DriverUsesSamples(rom_index) ? StatusString(iStatus) : "None required";
-			SetWindowText(GetDlgItem(hDlg, IDC_PROP_SAMPLES), lpStatus);
+			win_set_window_text_utf8(GetDlgItem(hDlg, IDC_PROP_SAMPLES), lpStatus);
 		}
 		ShowWindow(hDlg, SW_SHOW);
 		break;

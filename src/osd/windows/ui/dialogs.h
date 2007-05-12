@@ -13,7 +13,7 @@
 #ifndef DIALOGS_H
 #define DIALOGS_H
 
-LPCTSTR GetFilterText(void);
+const char * GetFilterText(void);
 
 INT_PTR CALLBACK ResetDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);

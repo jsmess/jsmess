@@ -17,6 +17,9 @@
 #include "devview.h"
 #include "optionsms.h"
 #include "uitext.h"
+#include "strconv.h"
+#include "winutil.h"
+#include "ui/m32util.h"
 
 #define DEVVIEW_PADDING	10
 
@@ -187,10 +190,11 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 	int nStaticPos, nStaticWidth, nEditPos, nEditWidth, nButtonPos, nButtonWidth;
 	HDC hDc;
 	LPTSTR *ppszDevices;
-	LPCTSTR s;
+	LPTSTR s;
 	SIZE sz;
 	char buf[128];
 	LONG_PTR l;
+	const char* utf8_s;
 
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 
@@ -218,9 +222,11 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 		{
 			for (id = 0; id < dev->count; id++)
 			{
-				s = dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0]));
+				utf8_s = dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0]));
+				s = tstring_from_utf8(utf8_s);
 				ppszDevices[i] = alloca(_tcslen(s) + 1);
 				_tcscpy(ppszDevices[i], s);
+				free(s);
 				i++;
 			}
 		}
@@ -257,15 +263,15 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 				pEnt->dev = dev;
 				pEnt->id = id;
 
-				pEnt->hwndStatic = CreateWindow(TEXT("STATIC"), dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0])),
+				pEnt->hwndStatic = win_create_window_utf8("STATIC", dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0])),
 					WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
 					hwndDevView, NULL, NULL, NULL);
 
-				pEnt->hwndEdit = CreateWindow(TEXT("EDIT"), TEXT(""),
+				pEnt->hwndEdit = win_create_window_utf8("EDIT", "",
 					WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL, nEditPos, y, nEditWidth, nHeight,
 					hwndDevView, NULL, NULL, NULL);
 
-				pEnt->hwndBrowseButton = CreateWindow(TEXT("BUTTON"), TEXT("..."),
+				pEnt->hwndBrowseButton = win_create_window_utf8("BUTTON", "...",
 					WS_VISIBLE | WS_CHILD, nButtonPos, y, nButtonWidth, nHeight,
 					hwndDevView, NULL, NULL, NULL);
 

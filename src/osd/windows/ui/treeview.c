@@ -55,6 +55,7 @@
 #include "m32opts.h"
 #include "help.h"
 #include "dialogs.h"
+#include "winutil.h"
 
 #ifdef _MSC_VER
 #if _MSC_VER > 1200
@@ -2183,8 +2184,8 @@ void GetFolders(TREEFOLDER ***folders,int *num_folders)
 
 BOOL TryRenameCustomFolderIni(LPTREEFOLDER lpFolder,const char *old_name,const char *new_name)
 {
-	TCHAR filename[MAX_PATH];
-	TCHAR new_filename[MAX_PATH];
+	char filename[MAX_PATH];
+	char new_filename[MAX_PATH];
 	LPTREEFOLDER lpParent = NULL;
 	if (lpFolder->m_nParent >= 0)
 	{
@@ -2192,30 +2193,30 @@ BOOL TryRenameCustomFolderIni(LPTREEFOLDER lpFolder,const char *old_name,const c
 		lpParent = GetFolder( lpFolder->m_nParent );
 		if( lpParent )
 		{
-			_sntprintf(filename,ARRAY_LENGTH(filename),TEXT("%s\\%s\\%s.ini"),GetIniDir(),lpParent->m_lpTitle, old_name );
-			_sntprintf(new_filename,ARRAY_LENGTH(new_filename),TEXT("%s\\%s\\%s.ini"),GetIniDir(),lpParent->m_lpTitle, new_name );
-			MoveFile(filename,new_filename);
+			snprintf(filename,ARRAY_LENGTH(filename),"%s\\%s\\%s.ini",GetIniDir(),lpParent->m_lpTitle, old_name );
+			snprintf(new_filename,ARRAY_LENGTH(new_filename),"%s\\%s\\%s.ini",GetIniDir(),lpParent->m_lpTitle, new_name );
+			win_move_file_utf8(filename,new_filename);
 		}
 	}
 	else
 	{
 		//Rename the File, if it exists
-		_sntprintf(filename,ARRAY_LENGTH(filename),TEXT("%s\\%s.ini"),GetIniDir(),old_name );
-		_sntprintf(new_filename,ARRAY_LENGTH(new_filename),TEXT("%s\\%s.ini"),GetIniDir(), new_name );
-		MoveFile(filename,new_filename);
+		snprintf(filename,ARRAY_LENGTH(filename),"%s\\%s.ini",GetIniDir(),old_name );
+		snprintf(new_filename,ARRAY_LENGTH(new_filename),"%s\\%s.ini",GetIniDir(), new_name );
+		win_move_file_utf8(filename,new_filename);
 		//Rename the Directory, if it exists
-		_sntprintf(filename,ARRAY_LENGTH(filename),TEXT("%s\\%s"),GetIniDir(),old_name );
-		_sntprintf(new_filename,ARRAY_LENGTH(new_filename),TEXT("%s\\%s"),GetIniDir(), new_name );
-		MoveFile(filename,new_filename);
+		snprintf(filename,ARRAY_LENGTH(filename),"%s\\%s",GetIniDir(),old_name );
+		snprintf(new_filename,ARRAY_LENGTH(new_filename),"%s\\%s",GetIniDir(), new_name );
+		win_move_file_utf8(filename,new_filename);
 	}
 	return TRUE;
 }
 
-BOOL TryRenameCustomFolder(LPTREEFOLDER lpFolder,const char *new_name)
+BOOL TryRenameCustomFolder(LPTREEFOLDER lpFolder, const char *new_name)
 {
 	BOOL retval;
-	TCHAR filename[MAX_PATH];
-	TCHAR new_filename[MAX_PATH];
+	char filename[MAX_PATH];
+	char new_filename[MAX_PATH];
 	
 	if (lpFolder->m_nParent >= 0)
 	{
@@ -2244,10 +2245,10 @@ BOOL TryRenameCustomFolder(LPTREEFOLDER lpFolder,const char *new_name)
 	
 	// a parent extra folder was renamed, so rename the file
 
-    _sntprintf(new_filename,ARRAY_LENGTH(new_filename),TEXT("%s\\%s.ini"),GetFolderDir(),new_name);
-    _sntprintf(filename,ARRAY_LENGTH(filename),TEXT("%s\\%s.ini"),GetFolderDir(),lpFolder->m_lpTitle);
+	snprintf(new_filename,ARRAY_LENGTH(new_filename),"%s\\%s.ini",GetFolderDir(),new_name);
+	snprintf(filename,ARRAY_LENGTH(filename),"%s\\%s.ini",GetFolderDir(),lpFolder->m_lpTitle);
 
-	retval = MoveFile(filename,new_filename);
+	retval = win_move_file_utf8(filename,new_filename);
 
 	if (retval)
 	{
@@ -2258,10 +2259,10 @@ BOOL TryRenameCustomFolder(LPTREEFOLDER lpFolder,const char *new_name)
 	}
 	else
 	{
-		TCHAR buf[500];
-		_sntprintf(buf,sizeof(buf),TEXT("Error while renaming custom file %s to %s"),
+		char buf[500];
+		snprintf(buf,ARRAY_LENGTH(buf),"Error while renaming custom file %s to %s",
 				 filename,new_filename);
-		MessageBox(GetMainWindow(), buf, TEXT(MAME32NAME), MB_OK | MB_ICONERROR);
+		win_message_box_utf8(GetMainWindow(), buf, MAME32NAME, MB_OK | MB_ICONERROR);
 	}
 	return retval;
 }
@@ -2270,8 +2271,8 @@ void AddToCustomFolder(LPTREEFOLDER lpFolder,int driver_index)
 {
     if ((lpFolder->m_dwFlags & F_CUSTOM) == 0)
 	{
-	    MessageBox(GetMainWindow(),TEXT("Unable to add game to non-custom folder") ,
-				   TEXT(MAME32NAME),MB_OK | MB_ICONERROR);
+	    win_message_box_utf8(GetMainWindow(),"Unable to add game to non-custom folder",
+				   MAME32NAME,MB_OK | MB_ICONERROR);
 		return;
 	}
 
@@ -2287,8 +2288,8 @@ void RemoveFromCustomFolder(LPTREEFOLDER lpFolder,int driver_index)
 {
     if ((lpFolder->m_dwFlags & F_CUSTOM) == 0)
 	{
-	    MessageBox(GetMainWindow(),TEXT("Unable to remove game from non-custom folder"),
-				   TEXT(MAME32NAME),MB_OK | MB_ICONERROR);
+	    win_message_box_utf8(GetMainWindow(),"Unable to remove game from non-custom folder",
+				   MAME32NAME,MB_OK | MB_ICONERROR);
 		return;
 	}
 
@@ -2396,13 +2397,13 @@ BOOL TrySaveExtraFolder(LPTREEFOLDER lpFolder)
 	   }
 	   if (fclose(fp) != 0)
 		   error = TRUE;
-    }
+	}
 
 	if (error)
 	{
-		TCHAR buf[500];
-		_sntprintf(buf,ARRAY_LENGTH(buf),TEXT("Error while saving custom file %s"),fname);
-		MessageBox(GetMainWindow(), buf, TEXT(MAME32NAME), MB_OK | MB_ICONERROR);
+		char buf[500];
+		snprintf(buf,ARRAY_LENGTH(buf),"Error while saving custom file %s",fname);
+		win_message_box_utf8(GetMainWindow(), buf, MAME32NAME, MB_OK | MB_ICONERROR);
 	}
 	return !error;
 }
