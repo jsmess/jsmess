@@ -545,9 +545,11 @@ static void update_bitmap(int next_x, int next_y)
 		int x1 = prev_x;
 		int x2 = next_x;
 
+		/* Check if we have crossed a line boundary */
 		if ( y !=  prev_y ) {
 			int redraw_line = 0;
 
+			/* Redraw line if the playfield reflect bit was changed after the center of the screen */
 			if ( REFLECT != ( CTRLPF & 0x01 ) ) {
 				REFLECT = CTRLPF & 0x01;
 				redraw_line = 1;
@@ -1036,9 +1038,9 @@ WRITE8_HANDLER( tia_w )
 		 0,	// CTRLPF
 		 0,	// REFP0
 		 0,	// REFP1
-		 8,	// PF0
-		 8,	// PF1
-		 8,	// PF2
+		 4,	// PF0
+		 4,	// PF1
+		 4,	// PF2
 		 0,	// RESP0
 		 0,	// RESP1
 		 0,	// RESM0
@@ -1078,6 +1080,12 @@ WRITE8_HANDLER( tia_w )
 	if (offset >= 0x0D && offset <= 0x0F)
 	{
 		curr_x &= ~3;
+		/* There seems to be a 4 cycle delay after the CNT signal. This
+		   fixes all playfield issues. Not 100% sure whether this is correct.
+		*/
+		if ( curr_x >= 80 ) {
+			curr_x += 4;
+		}
 	}
 
 	if (delay[offset] >= 0)
@@ -1118,7 +1126,7 @@ WRITE8_HANDLER( tia_w )
 		COLUBK = data;
 		break;
 	case 0x0A:
-		//logerror("CTRLPF write %02X, x = %d\n", data, curr_x );
+		//logerror("CTRLPF write %02X, x = %d, y = %d\n", data, curr_x, curr_y );
 		CTRLPF_w(offset, data);
 		break;
 	case 0x0B:
@@ -1128,15 +1136,15 @@ WRITE8_HANDLER( tia_w )
 		REFP1 = data;
 		break;
 	case 0x0D:
-		//logerror("PF0 write %02X, x = %d\n", data, curr_x);
+		//logerror("PF0 write %02X, x = %d, y = %d\n", data, curr_x, curr_y);
 		PF0 = data;
 		break;
 	case 0x0E:
-		//logerror("PF1 write %02X, x = %d\n", data, curr_x);
+		//logerror("PF1 write %02X, x = %d, y = %d\n", data, curr_x, curr_y);
 		PF1 = data;
 		break;
 	case 0x0F:
-		//logerror("PF2 write %02X, x = %d\n", data, curr_x);
+		//logerror("PF2 write %02X, x = %d, y = %d\n", data, curr_x, curr_y);
 		PF2 = data;
 		break;
 	case 0x10:
