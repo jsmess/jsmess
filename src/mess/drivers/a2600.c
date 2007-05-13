@@ -35,7 +35,7 @@ enum
 };
 
 
-static char* extra_RAM;
+static UINT8* extra_RAM;
 
 static unsigned cart_size;
 static unsigned current_bank;
@@ -171,6 +171,10 @@ void modeMN_switch(UINT16 offset, UINT8 data)
 {
 	memory_set_bankptr(1, CART + 0x800 * offset);
 }
+void modeMN_RAM_switch(UINT16 offset, UINT8 data)
+{
+	memory_set_bankptr(9, extra_RAM + (4 + offset) * 256 );
+}
 void modeDC_switch(UINT16 offset, UINT8 data)
 {
 	memory_set_bankptr(1, CART + 0x1000 * next_bank());
@@ -183,6 +187,7 @@ static  READ8_HANDLER(mode16_switch_r) { mode16_switch(offset, 0); return 0; }
 static  READ8_HANDLER(mode32_switch_r) { mode32_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modePB_switch_r) { modePB_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeMN_switch_r) { modeMN_switch(offset, 0); return 0; }
+static  READ8_HANDLER(modeMN_RAM_switch_r) { modeMN_RAM_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeTV_switch_r) { modeTV_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return 0; }
@@ -194,6 +199,7 @@ static WRITE8_HANDLER(mode16_switch_w) { mode16_switch(offset, data); }
 static WRITE8_HANDLER(mode32_switch_w) { mode32_switch(offset, data); }
 static WRITE8_HANDLER(modePB_switch_w) {	modePB_switch(offset, data); }
 static WRITE8_HANDLER(modeMN_switch_w) {	modeMN_switch(offset, data); }
+static WRITE8_HANDLER(modeMN_RAM_switch_w) { modeMN_RAM_switch(offset, data); }
 static WRITE8_HANDLER(modeTV_switch_w) { modeTV_switch(offset, data); }
 static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(offset, data); }
 static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(offset, data); }
@@ -323,7 +329,7 @@ static MACHINE_START( a2600 )
 	int mode = 0xFF; /* readinputport(10); */
 	int chip = 0xFF; /* readinputport(11); */
 
-	extra_RAM = auto_malloc(0x400);
+	extra_RAM = auto_malloc(0x800);
 
 	r6532_init(0, &r6532_interface);
 
@@ -507,6 +513,13 @@ static MACHINE_START( a2600 )
 	case modeMN:
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeMN_switch_w);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeMN_switch_r);
+		if ( 0xc183fbbc == crc32(0, CART, cart_size) ) {
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_w);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_r);
+			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, MWA8_BANK9);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, MRA8_BANK9);
+			memory_set_bankptr( 9, extra_RAM + 4 * 256 );
+		}
 		break;
 
 	case modeDC:
