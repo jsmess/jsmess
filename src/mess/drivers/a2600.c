@@ -83,7 +83,7 @@ static const UINT32 games[][2] =
 	{ 0xb53b33f1, modeUA }, // Funky Fish Prototype
 	{ 0x35589cec, modeUA }, // Pleiads Prototype
 	{ 0xdf2bc303, modeMN }, // Bump 'n' Jump
-	{ 0xc18E0bbc, modeMN }, // Burgertime
+	{ 0xc183fbbc, modeMN }, // Burgertime
 	{ 0x0603e177, modeMN }, // Masters of the Universe
 	{ 0x14f126c0, modeCV }, // Magicard
 	{ 0x34b0b5c2, modeCV }  // Video Life
