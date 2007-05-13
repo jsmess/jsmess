@@ -27,6 +27,9 @@ System Driver Changes:
 - [A2600] Updated playfield reflect bit to only have effect when
   set before pixel 80.  (bug #1174) [Wilbert Pol]
 
+- [A2600] Paddles no longer auto-center.  Set default keys for
+  player 4. (bug #1176 and bug #1167) [Christopher Stone]
+
 
 User Interface Changes:
 -----------------------
