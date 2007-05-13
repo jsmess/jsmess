@@ -629,7 +629,11 @@ static void stop_rev_timer( int drive ) {
 }
 
 static void fdc_setup_leds( int drive ) {
-
+	
+	char portname[12];
+	sprintf(portname, "drive_%d_led", drive);
+	output_set_value(portname, fdc_status[drive].motor_on == 0 ? 0 : 1);
+	
 	if ( drive == 0 )
 		set_led_status( 1, fdc_status[drive].motor_on ); /* update internal drive led */
 

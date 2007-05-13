@@ -47,6 +47,9 @@ Source Changes:
 
 - Fixed a memory leak.  (bug #1019) [Oliver Stoeneberg]
 
+- Updated the Amiga driver to output the power and drive LED status to the
+  artwork system. [Dirk Best]
+
 
 
 0.115
