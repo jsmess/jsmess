@@ -979,12 +979,12 @@ static READ8_HANDLER( INPT_r )
 READ8_HANDLER( tia_r )
 {
 	 /* lower bits 0 - 5 seem to depend on the last byte on the
-         data bus. Since this is usually the address of the
-         register that's being read, we will cheat and use the
-         lower bits of the offset. - Wilbert Pol
+         data bus. This is normally the last byte read during
+         program execution, so we will refetch that byte and
+         use those contents for the low bits. - Wilbert Pol
     */
 
-	UINT8 data = offset & 0x3f;
+	UINT8 data = program_read_byte_8( activecpu_get_pc() - 1 ) & 0x3f;
 
 	if (!(offset & 0x8))
 	{
