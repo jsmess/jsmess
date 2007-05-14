@@ -512,7 +512,8 @@ $(MESSOBJ)/sega.a:						\
 	$(MESS_VIDEO)/smsvdp.o	\
 	$(MESS_MACHINE)/sms.o		\
 	$(MESS_DRIVERS)/sms.o		\
-	$(MAME_DRIVERS)/megadriv.o
+	$(MAME_DRIVERS)/megadriv.o  \
+	$(MESS_DRIVERS)/sg1000.o
 
 $(MESSOBJ)/atari.a:						\
 	$(MAME_VIDEO)/tia.o			\

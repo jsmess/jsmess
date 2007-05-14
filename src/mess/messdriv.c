@@ -124,6 +124,10 @@ const game_driver *test_drivers[] =
 	DRIVER( megaduck )	/* Megaduck											*/
 
 	/* SEGA */
+	DRIVER( sg1000 )	/* Sega SG-1000 (Japan)								*/
+	DRIVER( sc3000 )	/* Sega SC-3000 (Japan)								*/
+	DRIVER( sf7000 )	/* Sega SC-3000 w/ SF-7000 (Japan)					*/
+
 	DRIVER( gamegear )	/* Sega GameGear									*/
 	DRIVER( gamegeaj )	/* Sega GameGear (Japan)						*/
 	DRIVER( sms )		/* Sega Master System II (NTSC)						*/

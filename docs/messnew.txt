@@ -2,6 +2,12 @@
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
+- Sega Game 1000 [Curt Coder]
+- Sega Computer 3000 [Curt Coder]
+- Sega Super Control Station (not working) [Curt Coder]
+- Texas Instruments TI-82 (not working) [Curt Coder]
+- Texas Instruments TI-83 (not working) [Curt Coder]
+- Texas Instruments TI-83 Plus (not working) [Curt Coder]
 - Atari 2600 PAL [Wilbert Pol]
 
 
