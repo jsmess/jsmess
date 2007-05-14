@@ -1,12 +1,9 @@
 /*
 	Nintendo 64
-	
+
 	Driver by Ville Linde
 	Reformatted to share hardware by R. Belmont
-
-	Note (RB): Some games boot and do useful things with the MIPS3_DRC enabled 
-	that don't otherwise.  Example: the entire "Madden" series starting with 
-	"Madden Football 64".
+	Additional work by Ryan Holtz
 */
 
 #include "driver.h"
@@ -56,12 +53,12 @@ INPUT_PORTS_START( n64 )
 		PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON7 )        PORT_PLAYER(1) PORT_NAME("Button C \xE2\x86\x93") /* Down */
 		PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON8 )        PORT_PLAYER(1) PORT_NAME("Button C \xE2\x86\x90") /* Left */
 		PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON9 )        PORT_PLAYER(1) PORT_NAME("Button C \xE2\x86\x92") /* Right */
-	
+
 	PORT_START_TAG("P1_ANALOG_X")
 		PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START_TAG("P1_ANALOG_Y")
-		PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0xff,0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)	
+		PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0xff,0x00) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 /* ?? */
@@ -88,11 +85,12 @@ MACHINE_DRIVER_START( n64 )
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(n64_map, 0)
 	MDRV_CPU_VBLANK_INT( n64_vblank, 1 )
-	
+
 	MDRV_CPU_ADD(RSP, 62500000)
 	MDRV_CPU_PROGRAM_MAP(rsp_map, 0)
-	
+
 	MDRV_MACHINE_RESET( n64 )
+	MDRV_INTERLEAVE(10)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -105,7 +103,7 @@ MACHINE_DRIVER_START( n64 )
 
 	MDRV_VIDEO_START(n64)
 	MDRV_VIDEO_UPDATE(n64)
-	
+
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(DMADAC, 0)
@@ -116,22 +114,22 @@ MACHINE_DRIVER_END
 
 DRIVER_INIT( n64 )
 {
-
 }
 
 ROM_START( n64)
-	ROM_REGION( 0x800000, REGION_CPU1, 0 )		/* dummy region for R4300 */
-	ROM_REGION( 0x800, REGION_USER1, 0 )
-	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0)
+    ROM_REGION( 0x800000, REGION_CPU1, 0 )      /* dummy region for R4300 */
+    ROM_REGION32_BE( 0x800, REGION_USER1, 0 )
+    ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+    ROM_REGION32_BE( 0x4000000, REGION_USER2, 0)
 ROM_END
 
 static DEVICE_LOAD(n64_cart)
 {
 	int i, length;
 	UINT8 *cart = memory_region(REGION_USER2);
-	
+
 	length = image_fread(image, cart, 0x4000000);
-	
+
 	if (cart[0] == 0x37 && cart[1] == 0x80)
 	{
 		for (i=0; i < length; i+=4)
@@ -158,9 +156,9 @@ static DEVICE_LOAD(n64_cart)
 			cart[i+1] = b3;
 			cart[i+2] = b2;
 			cart[i+3] = b1;
-		}		
+		}
 	}
-	
+
 	logerror("cart length = %d\n", length);
 	return INIT_PASS;
 }

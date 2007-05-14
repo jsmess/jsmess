@@ -218,7 +218,7 @@ static UINT16 primitive_delta_z;
 
 static int fb_format;
 static int fb_size;
-static int fb_width;
+int fb_width;
 static UINT32 fb_address;
 
 static UINT32 zb_address;

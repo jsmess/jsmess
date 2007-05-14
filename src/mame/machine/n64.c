@@ -2,6 +2,7 @@
 
 #include "driver.h"
 #include "cpu/mips/mips3.h"
+#include "cpu/rsp/rsp.h"
 #include "sound/custom.h"
 #include "streams.h"
 #include "includes/n64.h"
@@ -19,12 +20,14 @@ UINT32 *rdram;
 UINT32 *rsp_imem;
 UINT32 *rsp_dmem;
 
-static int first_rsp = 1;
+//static int first_rsp = 1;
 
 // MIPS Interface
 static UINT32 mi_version;
 static UINT32 mi_interrupt = 0;
 static UINT32 mi_intr_mask = 0;
+
+extern int fb_width;
 
 void signal_rcp_interrupt(int interrupt)
 {
@@ -108,7 +111,9 @@ WRITE32_HANDLER( n64_mi_reg_w )
 
 // RSP Interface
 
-static UINT32 rsp_sp_status = 0;
+// #define RSP_STATUS_HALT          0x00000001
+
+//static UINT32 rsp_sp_status = 0;
 //static UINT32 cpu_sp_status = SP_STATUS_HALT;
 static UINT32 sp_mem_addr;
 static UINT32 sp_dram_addr;
@@ -122,7 +127,7 @@ static void sp_dma(int direction)
 {
 	UINT8 *src, *dst;
 	int i;
-	int cpu = cpu_getactivecpu();
+	//int cpu = cpu_getactivecpu();
 
 	if (sp_dma_length == 0)
 	{
@@ -134,22 +139,29 @@ static void sp_dma(int direction)
 	if ((sp_dma_length & 3) != 0)
 	{
 		//fatalerror("sp_dma (%s): sp_dma_length unaligned %08X\n", cpu ? "RSP" : "R4300i", sp_dma_length);
-		sp_dma_length = (sp_dma_length + 3) & ~3;
+		sp_dma_length = sp_dma_length & ~3;
+        //sp_dma_length = (sp_dma_length + 3) & ~3;
 
 		//sp_dma_length &= ~3;
 	}
 
 	if (sp_mem_addr & 0x3)
 	{
-		fatalerror("sp_dma (%s): sp_mem_addr unaligned: %08X\n", cpu ? "RSP" : "R4300i", sp_mem_addr);
+        //sp_mem_addr = (sp_mem_addr + 3) & ~3;
+        sp_mem_addr = sp_mem_addr & ~3;
+        // sp_mem_addr &= ~0x3;
+        // fatalerror("sp_dma (%s): sp_mem_addr unaligned: %08X\n", cpu ? "RSP" : "R4300i", sp_mem_addr);
 	}
 	if (sp_dram_addr & 0x3)
 	{
-		fatalerror("sp_dma (%s): sp_dram_addr unaligned: %08X\n", cpu ? "RSP" : "R4300i", sp_dram_addr);
+        //sp_dram_addr = (sp_dram_addr + 3) & ~3;
+        sp_dram_addr = sp_dram_addr & ~3;
+        // sp_dram_addr &= ~0x3;
+        // fatalerror("sp_dma (%s): sp_dram_addr unaligned: %08X\n", cpu ? "RSP" : "R4300i", sp_dram_addr);
 
-		// Diddy Kong Racing does unaligned DMA?
-		//sp_dram_addr &= ~0x3;
-		//sp_dram_addr = (sp_dram_addr + 3) & ~0x3;
+        // Diddy Kong Racing does unaligned DMA?
+        //sp_dram_addr &= ~0x3;
+        //sp_dram_addr = (sp_dram_addr + 3) & ~0x3;
 	}
 
 	if (sp_dma_count > 0)
@@ -217,16 +229,18 @@ void sp_set_status(UINT32 status)
 {
 	if (status & 0x1)
 	{
-		cpu_trigger(6789);
+		//cpu_trigger(6789);
 
 		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
-		rsp_sp_status |= SP_STATUS_HALT;
+        cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT);
+		//rsp_sp_status |= SP_STATUS_HALT;
 	}
 	if (status & 0x2)
 	{
-		rsp_sp_status |= SP_STATUS_BROKE;
+		//rsp_sp_status |= SP_STATUS_BROKE;
+        cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_BROKE);
 
-		if (rsp_sp_status & SP_STATUS_INTR_BREAK)
+        if (cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & RSP_STATUS_INTR_BREAK)
 		{
 			signal_rcp_interrupt(SP_INTERRUPT);
 		}
@@ -247,7 +261,7 @@ READ32_HANDLER( n64_sp_reg_r )
 			return (sp_dma_skip << 20) | (sp_dma_count << 12) | sp_dma_length;
 
 		case 0x10/4:		// SP_STATUS_REG
-			return rsp_sp_status;
+            return cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR);
 
 		case 0x14/4:		// SP_DMA_FULL_REG
 			return 0;
@@ -258,9 +272,22 @@ READ32_HANDLER( n64_sp_reg_r )
 		case 0x1c/4:		// SP_SEMAPHORE_REG
 			return sp_semaphore;
 
-		default:
-			logerror("sp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
-			break;
+        case 0x20/4:        // DP_CMD_START
+        case 0x24/4:        // DP_CMD_END
+        case 0x28/4:        // DP_CMD_CURRENT
+        case 0x2c/4:        // DP_CMD_STATUS
+        case 0x30/4:        // DP_CMD_CLOCK
+        case 0x34/4:        // DP_CMD_BUSY
+        case 0x38/4:        // DP_CMD_PIPE_BUSY
+        case 0x3c/4:        // DP_CMD_TMEM_BUSY
+            return 0;
+
+        case 0x40000/4:     // PC
+            return cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_PC);
+
+        default:
+            logerror("sp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+            break;
 	}
 
 	return 0;
@@ -294,58 +321,150 @@ WRITE32_HANDLER( n64_sp_reg_w )
 				sp_dma(1);
 				break;
 
-			case 0x10/4:		// SP_STATUS_REG
-			{
-				if (data & 0x00000001)		// clear halt
-				{
-					if (first_rsp)
-					{
-						cpu_spinuntil_trigger(6789);
+            case 0x10/4:        // RSP_STATUS_REG
+            {
+                // printf( "RSP_STATUS_REG Write; %08x\n", data );
+                if (data & 0x00000001)      // clear halt
+                {
+                    //if (first_rsp)
+                    //{
+                    //  cpu_spinuntil_trigger(6789);
 
-						cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-						rsp_sp_status &= ~SP_STATUS_HALT;
-					}
-					else
-					{
-						first_rsp = 1;
-					}
-				}
-				if (data & 0x00000002)		// set halt
-				{
-					cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
-					rsp_sp_status |= SP_STATUS_HALT;
-				}
-				if (data & 0x00000004) rsp_sp_status &= ~SP_STATUS_BROKE;		// clear broke
-				if (data & 0x00000008)		// clear interrupt
-				{
-					clear_rcp_interrupt(SP_INTERRUPT);
-				}
-				if (data & 0x00000010)		// set interrupt
-				{
-					signal_rcp_interrupt(SP_INTERRUPT);
-				}
-				if (data & 0x00000020) rsp_sp_status &= ~SP_STATUS_SSTEP;		// clear single step
-				if (data & 0x00000040) rsp_sp_status |= SP_STATUS_SSTEP;		// set single step
-				if (data & 0x00000080) rsp_sp_status &= ~SP_STATUS_INTR_BREAK;	// clear interrupt on break
-				if (data & 0x00000100) rsp_sp_status |= SP_STATUS_INTR_BREAK;	// set interrupt on break
-				if (data & 0x00000200) rsp_sp_status &= ~SP_STATUS_SIGNAL0;		// clear signal 0
-				if (data & 0x00000400) rsp_sp_status |= SP_STATUS_SIGNAL0;		// set signal 0
-				if (data & 0x00000800) rsp_sp_status &= ~SP_STATUS_SIGNAL1;		// clear signal 1
-				if (data & 0x00001000) rsp_sp_status |= SP_STATUS_SIGNAL1;		// set signal 1
-				if (data & 0x00002000) rsp_sp_status &= ~SP_STATUS_SIGNAL2;		// clear signal 2
-				if (data & 0x00004000) rsp_sp_status |= SP_STATUS_SIGNAL2;		// set signal 2
-				if (data & 0x00008000) rsp_sp_status &= ~SP_STATUS_SIGNAL3;		// clear signal 3
-				if (data & 0x00010000) rsp_sp_status |= SP_STATUS_SIGNAL3;		// set signal 3
-				if (data & 0x00020000) rsp_sp_status &= ~SP_STATUS_SIGNAL4;		// clear signal 4
-				if (data & 0x00040000) rsp_sp_status |= SP_STATUS_SIGNAL4;		// set signal 4
-				if (data & 0x00080000) rsp_sp_status &= ~SP_STATUS_SIGNAL5;		// clear signal 5
-				if (data & 0x00100000) rsp_sp_status |= SP_STATUS_SIGNAL5;		// set signal 5
-				if (data & 0x00200000) rsp_sp_status &= ~SP_STATUS_SIGNAL6;		// clear signal 6
-				if (data & 0x00400000) rsp_sp_status |= SP_STATUS_SIGNAL6;		// set signal 6
-				if (data & 0x00800000) rsp_sp_status &= ~SP_STATUS_SIGNAL7;		// clear signal 7
-				if (data & 0x01000000) rsp_sp_status |= SP_STATUS_SIGNAL7;		// set signal 7
-				break;
-			}
+                        // printf( "Clearing RSP_STATUS_HALT\n" );
+                        cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+                        cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_HALT );
+                        // RSP_STATUS &= ~RSP_STATUS_HALT;
+                    //}
+                    //else
+                    //{
+                    //  first_rsp = 1;
+                    //}
+                }
+                if (data & 0x00000002)      // set halt
+                {
+                    // printf( "Setting RSP_STATUS_HALT\n" );
+                    cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT );
+                    // RSP_STATUS |= RSP_STATUS_HALT;
+                }
+                if (data & 0x00000004)
+                {
+                    //printf( "Clearing RSP_STATUS_BROKE\n" );
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_BROKE );
+                    // RSP_STATUS &= ~RSP_STATUS_BROKE;     // clear broke
+                }
+                if (data & 0x00000008)      // clear interrupt
+                {
+                    clear_rcp_interrupt(SP_INTERRUPT);
+                }
+                if (data & 0x00000010)      // set interrupt
+                {
+                    signal_rcp_interrupt(SP_INTERRUPT);
+                }
+                if (data & 0x00000020)
+                {
+                    // printf( "Clearing RSP_STATUS_SSTEP\n" );
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SSTEP );
+                    // RSP_STATUS &= ~RSP_STATUS_SSTEP;     // clear single step
+                }
+                if (data & 0x00000040)
+                {
+                    //printf( "Setting RSP_STATUS_SSTEP\n" );
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SSTEP );
+                    // RSP_STATUS |= RSP_STATUS_SSTEP;      // set single step
+                }
+                if (data & 0x00000080)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_INTR_BREAK );
+                    // RSP_STATUS &= ~RSP_STATUS_INTR_BREAK;    // clear interrupt on break
+                }
+                if (data & 0x00000100)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_INTR_BREAK );
+                    // RSP_STATUS |= RSP_STATUS_INTR_BREAK; // set interrupt on break
+                }
+                if (data & 0x00000200)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL0 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL0;       // clear signal 0
+                }
+                if (data & 0x00000400)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL0 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL0;        // set signal 0
+                }
+                if (data & 0x00000800)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL1 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL1;       // clear signal 1
+                }
+                if (data & 0x00001000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL1 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL1;        // set signal 1
+                }
+                if (data & 0x00002000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL2 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL2;       // clear signal 2
+                }
+                if (data & 0x00004000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL2 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL2;        // set signal 2
+                }
+                if (data & 0x00008000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL3 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL3;       // clear signal 3
+                }
+                if (data & 0x00010000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL3 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL3;        // set signal 3
+                }
+                if (data & 0x00020000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL4 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL4;       // clear signal 4
+                }
+                if (data & 0x00040000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL4 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL4;        // set signal 4
+                }
+                if (data & 0x00080000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL5 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL5;       // clear signal 5
+                }
+                if (data & 0x00100000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL5 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL5;        // set signal 5
+                }
+                if (data & 0x00200000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL6 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL6;       // clear signal 6
+                }
+                if (data & 0x00400000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL6 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL6;        // set signal 6
+                }
+                if (data & 0x00800000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_SIGNAL7 );
+                    // RSP_STATUS &= ~RSP_STATUS_SIGNAL7;       // clear signal 7
+                }
+                if (data & 0x01000000)
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SIGNAL7 );
+                    // RSP_STATUS |= RSP_STATUS_SIGNAL7;        // set signal 7
+                }
+                break;
+            }
 
 			case 0x1c/4:		// SP_SEMAPHORE_REG
 				sp_semaphore = data;
@@ -359,15 +478,23 @@ WRITE32_HANDLER( n64_sp_reg_w )
 	}
 	else
 	{
-		switch (offset & 0xffff)
-		{
-			case 0x00/4:		// SP_PC_REG
-				cpunum_set_info_int(1, CPUINFO_INT_PC, 0x04001000 | (data & 0xfff));
-				break;
+        switch (offset & 0xffff)
+        {
+            case 0x00/4:        // SP_PC_REG
+                //printf( "Setting PC to: %08x\n", 0x04001000 | (data & 0xfff ) );
+                if( cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_NEXTPC) != 0xffffffff )
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_NEXTPC, 0x04001000 | (data & 0xfff));
+                }
+                else
+                {
+                    cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_PC, 0x04001000 | (data & 0xfff));
+                }
+                break;
 
-			default:
-				logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
-				break;
+            default:
+                logerror("sp_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+                break;
 		}
 	}
 }
@@ -541,6 +668,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
 				video_screen_configure(0, visarea.max_x + 1, state->height, &visarea, Machine->screen[0].refresh);
 			}
 			vi_width = data;
+		        fb_width = data;
 			break;
 
 		case 0x0c/4:		// VI_INTR_REG
@@ -586,6 +714,13 @@ WRITE32_HANDLER( n64_vi_reg_w )
 		case 0x34/4:		// VI_Y_SCALE_REG
 			vi_yscale = data;
 			break;
+
+        /*
+        Uncomment this for convenient homebrew debugging
+        case 0x44/4:        // TEMP DEBUG
+            printf( "E Ping: %08x\n", data );
+            break;
+        */
 
 		default:
 			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
@@ -1383,25 +1518,53 @@ WRITE32_HANDLER( n64_si_reg_w )
 	}
 }
 
+UINT32 cic_status = 0x00000000;
+
 READ32_HANDLER( n64_pif_ram_r )
 {
-	return pif_ram[offset];
+    mame_printf_debug( "pif_ram_r: %08X, %08X = %08X\n", offset << 2, mem_mask, ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & ~mem_mask );
+    if( offset == ( 0x24 / 4 ) )
+    {
+        cic_status = 0x00000080;
+    }
+    if( offset == ( 0x3C / 4 ) )
+    {
+        return cic_status;
+    }
+    return ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & ~mem_mask;
 }
 
 WRITE32_HANDLER( n64_pif_ram_w )
 {
-//  mame_printf_debug("pif_ram_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-	pif_ram[offset] = data;
+    mame_printf_debug("pif_ram_w: %08X, %08X, %08X\n", data, offset << 4, mem_mask);
+    /*
+    if( (~mem_mask) & 0xff000000 )
+    {
+        pif_ram[offset*4+0] = ( data >> 24 ) & 0x000000ff;
+    }
+    if( (~mem_mask) & 0x00ff0000 )
+    {
+        pif_ram[offset*4+1] = ( data >> 16 ) & 0x000000ff;
+    }
+    if( (~mem_mask) & 0x0000ff00 )
+    {
+        pif_ram[offset*4+2] = ( data >>  8 ) & 0x000000ff;
+    }
+    if( (~mem_mask) & 0x000000ff )
+    {
+        pif_ram[offset*4+3] = ( data >>  0 ) & 0x000000ff;
+    }
+    */
 
-	signal_rcp_interrupt(SI_INTERRUPT);
+    signal_rcp_interrupt(SI_INTERRUPT);
 }
 
-static UINT16 crc_seed = 0x3f;
+//static UINT16 crc_seed = 0x3f;
 
 void n64_machine_reset(void)
 {
 	int i;
-	UINT32 *pif_rom	= (UINT32*)memory_region(REGION_USER1);
+	//UINT32 *pif_rom	= (UINT32*)memory_region(REGION_USER1);
 	UINT32 *cart = (UINT32*)memory_region(REGION_USER2);
 	UINT64 boot_checksum;
 
@@ -1419,6 +1582,61 @@ void n64_machine_reset(void)
 
 	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
 
+    // bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
+    boot_checksum = 0;
+    for (i=0x40; i < 0x1000; i+=4)
+    {
+        boot_checksum += cart[i/4]+i;
+    }
+
+    if (boot_checksum == U64(0x000000d057e84864))
+    {
+        // CIC-NUS-6101
+        mame_printf_debug("CIC-NUS-6101 detected\n");
+        // crc_seed = 0x3f;
+        pif_ram[0x24] = 0x00;
+        pif_ram[0x25] = 0x04;
+        pif_ram[0x26] = 0x3f;
+        pif_ram[0x27] = 0x3f;
+    }
+    else if (boot_checksum == U64(0x000000d6499e376b))
+    {
+        // CIC-NUS-6103
+        mame_printf_debug("CIC-NUS-6103 detected\n");
+        // crc_seed = 0x78;
+        pif_ram[0x24] = 0x00;
+        pif_ram[0x25] = 0x04;
+        pif_ram[0x26] = 0x78;
+        pif_ram[0x27] = 0x78;
+    }
+    else if (boot_checksum == U64(0x0000011a4a1604b6))
+    {
+        // CIC-NUS-6105
+        mame_printf_debug("CIC-NUS-6105 detected\n");
+        // crc_seed = 0x91;
+
+        // first_rsp = 0;
+        pif_ram[0x24] = 0x00;
+        pif_ram[0x25] = 0x04;
+        pif_ram[0x26] = 0x91;
+        pif_ram[0x27] = 0x91;
+    }
+    else if (boot_checksum == U64(0x000000d6d5de4ba0))
+    {
+        // CIC-NUS-6106
+        mame_printf_debug("CIC-NUS-6106 detected\n");
+        // crc_seed = 0x85;
+        pif_ram[0x24] = 0x00;
+        pif_ram[0x25] = 0x04;
+        pif_ram[0x26] = 0x85;
+        pif_ram[0x27] = 0x85;
+    }
+    else
+    {
+        mame_printf_debug("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
+    }
+
+    /*
 	// bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
 	boot_checksum = 0;
 	for (i=0x40; i < 0x1000; i+=4)
@@ -1531,4 +1749,5 @@ void n64_machine_reset(void)
 	*pif_rom++ = 0x3c000000 | 1 << 16 | 0xa400;						// LUI r1, 0xa400
 	*pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0040;			// ORI r1, r1, 0x0040
 	*pif_rom++ = 0x00000000 | 1 << 21 | 0x8;						// JR r1
+    */
 }
