@@ -12,21 +12,34 @@
 
 /*
 
+	TODO:
+
+	- Terebi Oekaki touchpad emulation
+
+		cpu #0 (PC=00000123): unmapped program memory byte write to 0000A000 = E6
+		cpu #0 (PC=00000126): unmapped program memory byte read from 00008000
+		cpu #0 (PC=0000012D): unmapped program memory byte read from 0000A000
+		cpu #0 (PC=0000010B): unmapped program memory byte write to 00006000 = 00
+		cpu #0 (PC=00000902): unmapped program memory byte read from 00008000
+
+	- SC-3000 cartridge RAM mapping, now it is just hacked to have maximum RAM
+
+*/
+
+/*
+
 	SG-1000 non-working roms:
 
 	Black Onyx, The (J)
 	Bomb Jack (JA)
 	Borderline (JAE)
-	Castle, the (J)
+	Castle, The (J)
 	Chack'n Pop (J)
 	Champion Golf (J)
 	Champion Soccer (J)
 	Guzzler (J)
 	Hang-On II (JA)
 	Monaco GP (J)
-	Q-Bert (J)
-	Terebi Oekaki (J)
-	Zippy Race (JA) ?
 
 */
 
@@ -36,7 +49,7 @@
 
 static ADDRESS_MAP_START( sg1000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sg1000_io_map, ADDRESS_SPACE_IO, 8 )
@@ -52,7 +65,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc3000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+//	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_RAM // HACK to support all cartridges
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
@@ -253,10 +267,6 @@ static MACHINE_START( sg1000 )
 	return 0;
 }
 
-static MACHINE_RESET( sg1000 )
-{
-}
-
 // SC-3000
 
 static int keylatch;
@@ -334,10 +344,6 @@ static MACHINE_START( sc3000 )
 	return 0;
 }
 
-static MACHINE_RESET( sc3000 )
-{
-}
-
 // SF-7000
 
 static int fdc_int;
@@ -402,7 +408,7 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 		nec765_reset(0);
 	}
 
-	memory_set_bank(1, (data & 0x40) ? 0 : 1);
+	memory_set_bank(1, (data & 0x40) ? 1 : 0);
 }
 
 static ppi8255_interface sf7000_ppi8255_intf =
@@ -462,7 +468,6 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_START( sg1000 )
-	MDRV_MACHINE_RESET( sg1000 )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
@@ -483,7 +488,6 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_START( sc3000 )
-	MDRV_MACHINE_RESET( sc3000 )
 
     // video hardware
 	MDRV_IMPORT_FROM(tms9928a)
@@ -534,12 +538,36 @@ ROM_END
 
 static DEVICE_LOAD( sg1000_cart )
 {
-	int filesize = image_length( image );
-	UINT8 *ptr = ((UINT8 *)memory_region( REGION_CPU1 ) );
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(REGION_CPU1);
 
-	if (image_fread(image, ptr, filesize ) != filesize)
+	switch (size)
+	{
+	case 0x2000:
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0x6000, MRA8_ROM);
+		break;
+	case 0x4000:
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0x4000, MRA8_ROM);
+		break;
+	case 0x8000:
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, MRA8_ROM);
+		break;
+	}
+
+	if (image_fread(image, ptr, size ) != size)
 	{
 		return INIT_FAIL;
+	}
+
+	if (!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&ptr[0x6a20], 29))
+	{
+		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_RAM); // BASIC Level III A
+		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MRA8_RAM); // BASIC Level III B
+	}
+
+	if (!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
+	{
+		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_RAM);
 	}
 
 	return INIT_PASS;
@@ -643,8 +671,6 @@ SYSTEM_CONFIG_START( sg1000 )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( sc3000 )
-	CONFIG_RAM_DEFAULT	( 1 * 1024)
-	CONFIG_RAM			( 2 * 1024)
 	CONFIG_DEVICE(sg1000_cartslot_getinfo)
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
 	CONFIG_DEVICE(sc3000_printer_getinfo)
@@ -657,7 +683,7 @@ SYSTEM_CONFIG_START( sf7000 )
 SYSTEM_CONFIG_END
 
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY   FULLNAME */
-CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"Game 1000", 0 )
-COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"Computer 3000", 0 )
-COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sc3000,		0,		sf7000,		"Sega",	"Super Control Station", GAME_NOT_WORKING )
+CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", 0 )
+COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", 0 )
+COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sc3000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", GAME_NOT_WORKING )
 // Othello Multivision
