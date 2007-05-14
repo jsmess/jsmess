@@ -579,28 +579,35 @@ static void update_bitmap(int next_x, int next_y)
 				redraw_line = 1;
 			}
 			if ( redraw_line ) {
-				memset(lineP0, 0xFF, sizeof lineP0);
-				memset(lineP1, 0xFF, sizeof lineP1);
-
-				memset(temp, COLUBK >> 1, 160);
-
-				if (CTRLPF & 4)
+				if (VBLANK & 2)
 				{
-					drawS1(temp, lineP1);
-					drawM1(temp, lineM1);
-					drawS0(temp, lineP0);
-					drawM0(temp, lineM0);
-					drawPF(temp, linePF);
-					drawBL(temp, lineBL);
+					memset(temp, 0, 160);
 				}
 				else
 				{
-					drawPF(temp, linePF);
-					drawBL(temp, lineBL);
-					drawS1(temp, lineP1);
-					drawM1(temp, lineM1);
-					drawS0(temp, lineP0);
-					drawM0(temp, lineM0);
+					memset(lineP0, 0xFF, sizeof lineP0);
+					memset(lineP1, 0xFF, sizeof lineP1);
+
+					memset(temp, COLUBK >> 1, 160);
+
+					if (CTRLPF & 4)
+					{
+						drawS1(temp, lineP1);
+						drawM1(temp, lineM1);
+						drawS0(temp, lineP0);
+						drawM0(temp, lineM0);
+						drawPF(temp, linePF);
+						drawBL(temp, lineBL);
+					}
+					else
+					{
+						drawPF(temp, linePF);
+						drawBL(temp, lineBL);
+						drawS1(temp, lineP1);
+						drawM1(temp, lineM1);
+						drawS0(temp, lineP0);
+						drawM0(temp, lineM0);
+					}
 				}
 			}
 		}
@@ -720,7 +727,6 @@ static WRITE8_HANDLER( VBLANK_w )
 	{
 		paddle_cycles = activecpu_gettotalcycles();
 	}
-
 	VBLANK = data;
 }
 
