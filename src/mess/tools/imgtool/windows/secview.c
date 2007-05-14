@@ -220,13 +220,13 @@ static void set_sector_text(HWND dialog)
 	SetWindowText(GetDlgItem(dialog, IDC_TRACKEDIT), buf);
 
 	if (info->head != ~0)
-		_snprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%u"), (unsigned int) info->head);
+		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%u"), (unsigned int) info->head);
 	else
 		buf[0] = '\0';
 	SetWindowText(GetDlgItem(dialog, IDC_HEADEDIT), buf);
 
 	if (info->sector != ~0)
-		_snprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%u"), (unsigned int) info->sector);
+		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%u"), (unsigned int) info->sector);
 	else
 		buf[0] = '\0';
 	SetWindowText(GetDlgItem(dialog, IDC_SECTOREDIT), buf);

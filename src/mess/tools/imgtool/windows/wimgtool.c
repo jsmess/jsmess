@@ -21,7 +21,7 @@
 #include "winutils.h"
 
 const TCHAR wimgtool_class[] = TEXT("wimgtool_class");
-const TCHAR wimgtool_producttext[] = TEXT("MESS Image Tool");
+const char wimgtool_producttext[] = "MESS Image Tool";
 
 extern void win_association_dialog(HWND parent);
 
@@ -735,7 +735,7 @@ static imgtoolerr_t setup_openfilename_struct(win_open_file_name *ofn, memory_po
 	const imgtool_module *module = NULL;
 	char *filter;
 	char *initial_dir = NULL;
-	TCHAR *dir_char;
+	char *dir_char;
 	imgtool_module_features features;
 	DWORD filter_index = 0, current_index = 0;
 	const wimgtool_info *info;
@@ -858,7 +858,7 @@ const imgtool_module *find_filter_module(int filter_index,
 
 
 
-static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const char *path, LPCTSTR local_path)
+static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const char *path, LPCSTR local_path)
 {
 	imgtoolerr_t err;
 	imgtool_directory *imageenum = NULL;
@@ -885,7 +885,7 @@ static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const 
 		if (!entry.eof)
 		{
 			snprintf(local_subpath, sizeof(local_subpath) / sizeof(local_subpath[0]),
-				TEXT("%s\\%s"), local_path, entry.filename);
+				"%s\\%s", local_path, entry.filename);
 			subpath = imgtool_partition_path_concatenate(partition, path, entry.filename);
 			
 			if (entry.directory)

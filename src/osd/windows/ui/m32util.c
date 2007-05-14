@@ -688,3 +688,58 @@ HANDLE win_create_file_utf8(const char* filename, DWORD desiredmode, DWORD share
 						
 	return result;
 }
+
+//============================================================
+//  win_get_current_directory_utf8
+//============================================================
+
+DWORD win_get_current_directory_utf8(DWORD bufferlength, char* buffer)
+{
+	DWORD result = 0;
+	TCHAR* t_buffer = NULL;
+	char* utf8_buffer = NULL;
+	
+	if( bufferlength > 0 ) {
+		t_buffer = malloc((bufferlength * sizeof(TCHAR)) + 1);
+		if( !t_buffer )
+			return result;
+	}
+	
+	result = GetCurrentDirectory(bufferlength, t_buffer);
+	
+	if( bufferlength > 0 ) {
+		utf8_buffer = utf8_from_tstring(t_buffer);
+		if( !utf8_buffer ) {
+			free(t_buffer);
+			return result;
+		}
+	}
+		
+	strncpy(buffer, utf8_buffer, bufferlength);
+	
+	if( utf8_buffer )
+		free(utf8_buffer);
+	
+	if( t_buffer )
+		free(t_buffer);
+	
+	return result;
+}
+
+//============================================================
+//  win_find_first_file_utf8
+//============================================================
+
+HANDLE win_find_first_file_utf8(const char* filename, LPWIN32_FIND_DATA findfiledata)
+{
+	HANDLE result = 0;
+	TCHAR* t_filename = tstring_from_utf8(filename);
+	if( !t_filename )
+		return result;
+	
+	result = FindFirstFile(t_filename, findfiledata);
+	
+	free(t_filename);
+	
+	return result;
+}

@@ -44,7 +44,7 @@ typedef struct
 	const char *icon_name;
 } ICONDATA;
 
-extern char last_directory[MAX_PATH];
+extern TCHAR last_directory[MAX_PATH];
 
 typedef BOOL (WINAPI *common_file_dialog_proc)(LPOPENFILENAME lpofn);
 BOOL CommonFileDialog(common_file_dialog_proc cfd,char *filename, int filetype);

@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "winutils.h"
 
-const TCHAR hexview_class[] = "hexview_class";
+const TCHAR hexview_class[] = TEXT("hexview_class");
 
 
 

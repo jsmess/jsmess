@@ -76,21 +76,19 @@ BOOL ScreenShotLoaded(void)
 }
 
 #ifdef MESS
-static BOOL LoadSoftwareScreenShot(const game_driver *drv, LPCTSTR lpSoftwareName, int nType)
+static BOOL LoadSoftwareScreenShot(const game_driver *drv, LPCSTR lpSoftwareName, int nType)
 {
 	BOOL result;
-	char *software_name = utf8_from_tstring(lpSoftwareName);
-	char *s = alloca(strlen(drv->name) + 1 + strlen(software_name) + 5);
-	sprintf(s, "%s/%s.png", drv->name, software_name);
+	char *s = alloca(strlen(drv->name) + 1 + strlen(lpSoftwareName) + 5);
+	sprintf(s, "%s/%s.png", drv->name, lpSoftwareName);
 	result = LoadDIB(s, &m_hDIB, &m_hPal, nType);
-	free(software_name);
 	return result;
 }
 #endif /* MESS */
 
 /* Allow us to pre-load the DIB once for future draws */
 #ifdef MESS
-BOOL LoadScreenShotEx(int nGame, LPCTSTR lpSoftwareName, int nType)
+BOOL LoadScreenShotEx(int nGame, LPCSTR lpSoftwareName, int nType)
 #else /* !MESS */
 BOOL LoadScreenShot(int nGame, int nType)
 #endif /* MESS */

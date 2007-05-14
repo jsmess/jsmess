@@ -7,7 +7,7 @@
 #include "uitext.h"
 #include "options.h"
 
-extern TCHAR g_szSelectedItem[MAX_PATH];
+extern char g_szSelectedItem[MAX_PATH];
 
 void InitMessPicker(void);
 void MessUpdateSoftwareList(void);

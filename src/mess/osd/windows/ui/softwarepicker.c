@@ -27,6 +27,7 @@
 #include "ui/resourcems.h"
 #include "ui/m32opts.h"
 #include "softwarepicker.h"
+#include "ui/m32util.h"
 
 
 
@@ -39,9 +40,9 @@ struct FileInfo
 	BOOL bHashRealized;
 	const struct hash_info *pHashInfo;
 
-	LPCTSTR pszZipEntryName;
-	LPCTSTR pszSubName;
-	TCHAR szFilename[1];
+	LPCSTR pszZipEntryName;
+	LPCSTR pszSubName;
+	char szFilename[1];
 };
 
 struct DirectorySearchInfo
@@ -49,7 +50,7 @@ struct DirectorySearchInfo
 	struct DirectorySearchInfo *pNext;
 	HANDLE hFind;
 	WIN32_FIND_DATA fd;
-	TCHAR szDirectory[1];
+	char szDirectory[1];
 };
 
 struct SoftwarePickerInfo
@@ -72,29 +73,29 @@ static const TCHAR s_szSoftwarePickerProp[] = TEXT("SWPICKER");
 
 
 
-static LPCTSTR NormalizePath(LPCTSTR pszPath, LPTSTR pszBuffer, size_t nBufferSize)
+static LPCSTR NormalizePath(LPCSTR pszPath, LPSTR pszBuffer, size_t nBufferSize)
 {
 	BOOL bChanged = FALSE;
-	LPTSTR s;
+	LPSTR s;
 	int i, j;
 
 	if (pszPath[0] == '\\')
 	{
-		GetCurrentDirectory(nBufferSize, pszBuffer);
+		win_get_current_directory_utf8(nBufferSize, pszBuffer);
 		pszBuffer[2] = '\0';
 		bChanged = TRUE;
 	}
 	else if (!_istalpha(pszPath[0]) || (pszPath[1] != ':'))
 	{
-		GetCurrentDirectory(nBufferSize, pszBuffer);
+		win_get_current_directory_utf8(nBufferSize, pszBuffer);
 		bChanged = TRUE;
 	}
 
 	if (bChanged)
 	{
-		s = (LPTSTR) alloca((_tcslen(pszBuffer) + 1) * sizeof(TCHAR));
-		_tcscpy(s, pszBuffer);
-		_sntprintf(pszBuffer, nBufferSize, TEXT("%s\\%s"), s, pszPath);
+		s = (LPSTR) alloca(strlen(pszBuffer) + 1);
+		strcpy(s, pszBuffer);
+		snprintf(pszBuffer, nBufferSize, "%s\\%s", s, pszPath);
 		pszPath = pszBuffer;
 
 		// Remove double path separators
@@ -123,7 +124,7 @@ static struct SoftwarePickerInfo *GetSoftwarePickerInfo(HWND hwndPicker)
 
 
 
-LPCTSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex)
+LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -149,7 +150,7 @@ device_class SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
 
 
 
-int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCTSTR pszFilename)
+int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	int i;
@@ -157,7 +158,7 @@ int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCTSTR pszFilename)
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	for (i = 0; i < pPickerInfo->nIndexLength; i++)
 	{
-		if (!_tcsicmp(pPickerInfo->ppIndex[i]->szFilename, pszFilename))
+		if (!mame_stricmp(pPickerInfo->ppIndex[i]->szFilename, pszFilename))
 			return i;
 	}
 	return -1;
@@ -257,7 +258,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	struct FileInfo *pFileInfo;
-	LPTSTR pszZipName;
+	LPSTR pszZipName;
 	BOOL rc = FALSE;
 	unsigned char *pBuffer;
 	unsigned int nLength;
@@ -274,26 +275,21 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 		zip_file *zip;
 		zip_error ziperr;
 		const zip_file_header *zipent;
-		char *zip_file_name;
-		char *zip_entry_name;
 
 		// open the ZIP file
 		nLength = pFileInfo->pszZipEntryName - pFileInfo->szFilename;
-		pszZipName = (LPTSTR) alloca(nLength * sizeof(TCHAR));
-		memcpy(pszZipName, pFileInfo->szFilename, nLength * sizeof(TCHAR));
+		pszZipName = (LPSTR) alloca(nLength);
+		memcpy(pszZipName, pFileInfo->szFilename, nLength);
 		pszZipName[nLength - 1] = '\0';
 
 		// get the entry name
-		zip_file_name = utf8_from_tstring(pszZipName);
-		zip_entry_name = utf8_from_tstring(pFileInfo->pszZipEntryName);
-
-		ziperr = zip_file_open(zip_file_name, &zip);
+		ziperr = zip_file_open(pszZipName, &zip);
 		if (ziperr == ZIPERR_NONE)
 		{
 			zipent = zip_file_first_file(zip);
 			while(!rc && zipent)
 			{
-				if (!mame_stricmp(zipent->filename, zip_entry_name))
+				if (!mame_stricmp(zipent->filename, pFileInfo->pszZipEntryName))
 				{
 					pBuffer = malloc(zipent->uncompressed_length);
 					if (pBuffer)
@@ -311,13 +307,11 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 			}
 			zip_file_close(zip);
 		}
-		free(zip_file_name);
-		free(zip_entry_name);
 	}
 	else
 	{
 		// plain open file; map it into memory and calculate the hash
-		hFile = CreateFile(pFileInfo->szFilename, GENERIC_READ, FILE_SHARE_READ, NULL,
+		hFile = win_create_file_utf8(pFileInfo->szFilename, GENERIC_READ, FILE_SHARE_READ, NULL,
 			OPEN_EXISTING, 0, NULL);
 		if (hFile != INVALID_HANDLE_VALUE)
 		{
@@ -392,7 +386,7 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 
 
 
-static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCTSTR pszFilename,
+static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	UINT nZipEntryNameLength, UINT32 nCrc, BOOL bForce)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
@@ -410,8 +404,8 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCTSTR pszFilename,
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
 	// look up the device
-	if (_tcsrchr(pszFilename, '.'))
-		pszExtension = utf8_from_tstring(_tcsrchr(pszFilename, '.'));
+	if (strrchr(pszFilename, '.'))
+		pszExtension = strrchr(pszFilename, '.');
 	if (pszExtension && pPickerInfo->pDriver)
 	{
 		pszExtension++;
@@ -440,14 +434,14 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCTSTR pszFilename,
 		return TRUE;
 
 	// create the FileInfo structure
-	nSize = sizeof(struct FileInfo) + (_tcslen(pszFilename) * sizeof(TCHAR));
+	nSize = sizeof(struct FileInfo) + strlen(pszFilename);
 	pInfo = (struct FileInfo *) malloc(nSize);
 	if (!pInfo)
 		goto error;
 	memset(pInfo, 0, nSize);
 
 	// copy the filename
-	_tcscpy(pInfo->szFilename, pszFilename);
+	strcpy(pInfo->szFilename, pszFilename);
 	
 	// set up device and CRC, if specified
 	pInfo->devclass = devclass;
@@ -458,10 +452,10 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCTSTR pszFilename,
 
 	// set up zip entry name length, if specified
 	if (nZipEntryNameLength > 0)
-		pInfo->pszZipEntryName = pInfo->szFilename + _tcslen(pInfo->szFilename) - nZipEntryNameLength;
+		pInfo->pszZipEntryName = pInfo->szFilename + strlen(pInfo->szFilename) - nZipEntryNameLength;
 
 	// calculate the subname
-	pInfo->pszSubName = _tcsrchr(pInfo->szFilename, '\\');
+	pInfo->pszSubName = strrchr(pInfo->szFilename, '\\');
 	if (pInfo->pszSubName)
 		pInfo->pszSubName++;
 	else
@@ -490,77 +484,43 @@ error:
 
 
 
-static BOOL SoftwarePicker_AddZipEntFile(HWND hwndPicker, LPCTSTR pszZipPath,
+static BOOL SoftwarePicker_AddZipEntFile(HWND hwndPicker, LPCSTR pszZipPath,
 	BOOL bForce, zip_file *pZip, const zip_file_header *pZipEnt)
 {
-	LPTSTR pszZipSubPath;
-	LPTSTR s;
+	LPSTR s;
+	LPCSTR temp = pZipEnt->filename;
 	int nLength;
 	int nZipEntryNameLength;
 
-	pszZipSubPath = tstring_from_utf8(pZipEnt->filename);
-
 	// special case; skip first two characters if they are './'
-	if ((pszZipSubPath[0] == '.') && (pszZipSubPath[1] == '/'))
+	if ((pZipEnt->filename[0] == '.') && (pZipEnt->filename[1] == '/'))
 	{
-		while(*(++pszZipSubPath) == '/')
+		while(*(++temp) == '/')
 			;
 	}
 
+	nZipEntryNameLength = strlen(pZipEnt->filename);
+	nLength = strlen(pszZipPath) + 1 + nZipEntryNameLength + 1;
+	s = (LPSTR) alloca(nLength);
+	snprintf(s, nLength, "%s\\%s", pszZipPath, pZipEnt->filename);
 
-	nZipEntryNameLength = _tcslen(pszZipSubPath);
-	nLength = _tcslen(pszZipPath) + 1 + nZipEntryNameLength + 1;
-	s = (LPTSTR) alloca(nLength * sizeof(TCHAR));
-	_sntprintf(s, nLength, TEXT("%s\\%s"), pszZipPath, pszZipSubPath);
-
-	free(pszZipSubPath);
 	return SoftwarePicker_AddFileEntry(hwndPicker, s, 
 		nZipEntryNameLength, pZipEnt->crc, bForce);
 }
 
-
-
-static zip_error zip_file_open_tstring(LPCTSTR filename, zip_file **zip)
-{
-	zip_error ziperr;
-	char *filename_utf8;
-	
-	*zip = NULL;
-
-	// convert filename to UTF-8
-	filename_utf8 = utf8_from_tstring(filename);
-	if (!filename_utf8)
-	{
-		ziperr = ZIPERR_OUT_OF_MEMORY;
-		goto done;
-	}
-
-	// open the ZIP file
-	ziperr = zip_file_open(filename_utf8, zip);
-	if (ziperr != ZIPERR_NONE)
-		goto done;
-
-done:
-	if (filename_utf8)
-		free(filename_utf8);
-	return ziperr;
-}
-
-
-
-static BOOL SoftwarePicker_InternalAddFile(HWND hwndPicker, LPCTSTR pszFilename,
+static BOOL SoftwarePicker_InternalAddFile(HWND hwndPicker, LPCSTR pszFilename,
 	BOOL bForce)
 {
-	LPCTSTR s;
+	LPCSTR s;
 	BOOL rc = TRUE;
 	zip_error ziperr;
 	zip_file *pZip;
 	const zip_file_header *pZipEnt;
 
-	s = _tcsrchr(pszFilename, '.');
-	if (s && (!_tcsicmp(s, TEXT(".zip"))))
+	s = strrchr(pszFilename, '.');
+	if (s && !mame_stricmp(s, ".zip"))
 	{
-		ziperr = zip_file_open_tstring(pszFilename, &pZip);
+		ziperr = zip_file_open(pszFilename, &pZip);
 		if (ziperr  == ZIPERR_NONE)
 		{
 			pZipEnt = zip_file_first_file(pZip);
@@ -582,9 +542,9 @@ static BOOL SoftwarePicker_InternalAddFile(HWND hwndPicker, LPCTSTR pszFilename,
 
 
 
-BOOL SoftwarePicker_AddFile(HWND hwndPicker, LPCTSTR pszFilename)
+BOOL SoftwarePicker_AddFile(HWND hwndPicker, LPCSTR pszFilename)
 {
-	TCHAR szBuffer[MAX_PATH];
+	char szBuffer[MAX_PATH];
 
 	Picker_ResetIdle(hwndPicker);
 	pszFilename = NormalizePath(pszFilename, szBuffer, sizeof(szBuffer)
@@ -595,13 +555,13 @@ BOOL SoftwarePicker_AddFile(HWND hwndPicker, LPCTSTR pszFilename)
 
 
 
-BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCTSTR pszDirectory)
+BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	struct DirectorySearchInfo *pSearchInfo;
 	struct DirectorySearchInfo **ppLast;
 	size_t nSearchInfoSize;
-	TCHAR szBuffer[MAX_PATH];
+	char szBuffer[MAX_PATH];
 
 	pszDirectory = NormalizePath(pszDirectory, szBuffer, sizeof(szBuffer)
 		/ sizeof(szBuffer[0]));
@@ -609,14 +569,14 @@ BOOL SoftwarePicker_AddDirectory(HWND hwndPicker, LPCTSTR pszDirectory)
 	Picker_ResetIdle(hwndPicker);
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
-	nSearchInfoSize = sizeof(struct DirectorySearchInfo) + (_tcslen(pszDirectory) * sizeof(TCHAR));
+	nSearchInfoSize = sizeof(struct DirectorySearchInfo) + strlen(pszDirectory);
 	pSearchInfo = malloc(nSearchInfoSize);
 	if (!pSearchInfo)
 		return FALSE;
 	memset(pSearchInfo, 0, nSearchInfoSize);
 	pSearchInfo->hFind = INVALID_HANDLE_VALUE;
 
-	_tcscpy(pSearchInfo->szDirectory, pszDirectory);
+	strcpy(pSearchInfo->szDirectory, pszDirectory);
 
 	// insert into linked list
 	if (pPickerInfo->pLastSearchInfo)
@@ -676,23 +636,32 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 	struct DirectorySearchInfo *pSearchInfo)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
-	LPTSTR pszFilename;
+	LPSTR pszFilename;
 	BOOL rc;
+	char* utf8_FileName;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
+	
+	utf8_FileName = utf8_from_tstring(pSearchInfo->fd.cFileName);
+	if( !utf8_FileName )
+		return FALSE;
 
-	if (!_tcscmp(pSearchInfo->fd.cFileName, TEXT(".")) || !_tcscmp(pSearchInfo->fd.cFileName, TEXT("..")))
+	if (!strcmp(utf8_FileName, ".") || !strcmp(utf8_FileName, "..")) {
+		free(utf8_FileName);
 		return TRUE;
+	}
 
-	pszFilename = alloca((_tcslen(pSearchInfo->szDirectory) + 1 + _tcslen(pSearchInfo->fd.cFileName) + 1) * sizeof(TCHAR));
-	_tcscpy(pszFilename, pSearchInfo->szDirectory);
-	_tcscat(pszFilename, TEXT("\\"));
-	_tcscat(pszFilename, pSearchInfo->fd.cFileName);
+	pszFilename = alloca(strlen(pSearchInfo->szDirectory) + 1 + strlen(utf8_FileName) + 1);
+	strcpy(pszFilename, pSearchInfo->szDirectory);
+	strcat(pszFilename, "\\");
+	strcat(pszFilename, utf8_FileName);
 
 	if (pSearchInfo->fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		rc = SoftwarePicker_AddDirectory(hwndPicker, pszFilename);
 	else
 		rc = SoftwarePicker_InternalAddFile(hwndPicker, pszFilename, FALSE);
+		
+		free(utf8_FileName);
 	return rc;
 }
 
@@ -702,9 +671,9 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	struct FileInfo *pFileInfo;
-	static const TCHAR szWildcards[] = TEXT("\\*.*");
+	static const char szWildcards[] = "\\*.*";
 	struct DirectorySearchInfo *pSearchInfo;
-	LPTSTR pszFilter;
+	LPSTR pszFilter;
 	BOOL bSuccess;
 	int nCount;
 	BOOL bDone = FALSE;
@@ -722,10 +691,10 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		}
 		else
 		{
-			pszFilter = alloca((_tcslen(pSearchInfo->szDirectory) + _tcslen(szWildcards) + 1) * sizeof(TCHAR));
-			_tcscpy(pszFilter, pSearchInfo->szDirectory);
-			_tcscat(pszFilter, szWildcards);
-			pSearchInfo->hFind = FindFirstFile(pszFilter, &pSearchInfo->fd);
+			pszFilter = alloca(strlen(pSearchInfo->szDirectory) + strlen(szWildcards) + 1);
+			strcpy(pszFilter, pSearchInfo->szDirectory);
+			strcat(pszFilter, szWildcards);
+			pSearchInfo->hFind = win_find_first_file_utf8(pszFilter, &pSearchInfo->fd);
 			bSuccess = pSearchInfo->hFind != INVALID_HANDLE_VALUE;
 		}
 
@@ -787,12 +756,12 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 
 
 
-const TCHAR *SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
-	TCHAR *pszBuffer, UINT nBufferLength)
+LPCSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
+	char *pszBuffer, UINT nBufferLength)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	const struct FileInfo *pFileInfo;
-	LPCTSTR s = NULL;
+	LPCSTR s = NULL;
 	const char *pszUtf8 = NULL;
 	unsigned int nHashFunction = 0;
 	char szBuffer[256];
@@ -832,10 +801,8 @@ const TCHAR *SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn
 				}
 				if (pszUtf8)
 				{
-					TCHAR *tempstr = tstring_from_utf8(pszUtf8);
-					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), tempstr);
-					free(tempstr);
-					s = pszBuffer;
+					strncpy(pszBuffer, pszUtf8, nBufferLength);
+					s = pszUtf8;
 				}
 			}
 			break;
@@ -851,10 +818,8 @@ const TCHAR *SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn
 			}
 			if (hash_data_extract_printable_checksum(pFileInfo->szHash, nHashFunction, szBuffer))
 			{
-				TCHAR *tempstr = tstring_from_utf8(szBuffer);
-				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), tempstr);
-				free(tempstr);
-				s = pszBuffer;
+				strncpy(pszBuffer, szBuffer, nBufferLength);
+				s = szBuffer;
 			}
 			break;
 	}

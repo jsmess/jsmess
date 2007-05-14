@@ -673,7 +673,7 @@ static ResizeItem main_resize_items[] =
 static Resize main_resize = { {0, 0, 0, 0}, main_resize_items };
 
 /* last directory for common file dialogs */
-char last_directory[MAX_PATH];
+TCHAR last_directory[MAX_PATH];
 
 /* system-wide window message sent out with an ATOM of the current game name
    each time it changes */
@@ -1594,6 +1594,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	extern const char *mameinfo_filename;
 	LONG common_control_version = GetCommonControlVersion();
 	int validity_failed = 0;
+	TCHAR* t_inpdir;
 
 	dprintf("about to init options\n");
 	if (!OptionsInit())
@@ -1665,8 +1666,13 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPSTR lpCmdLine, int nCmdShow)
 	g_bDoBroadcast = GetBroadcast();
 
 	HelpInit();
+	
+	t_inpdir = tstring_from_utf8(GetInpDir());
+	if( ! t_inpdir )
+		return FALSE;
 
-	strcpy(last_directory,GetInpDir());
+	_tcscpy(last_directory,t_inpdir);
+	free(t_inpdir);
 	hMain = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), 0, NULL);
 	if (hMain == NULL)
 	{
