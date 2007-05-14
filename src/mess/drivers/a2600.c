@@ -2,6 +2,10 @@
 
   Atari VCS 2600 driver
 
+  On a real TV it appears there's some space between the pixels on the
+  display. The current TIA implementation does not display these spaces
+  between the pixels.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -16,6 +20,8 @@
 #define CART memory_region(REGION_USER1)
 
 #define MASTER_CLOCK	3584160
+#define MASTER_CLOCK_NTSC	3579575
+#define MASTER_CLOCK_PAL	3546894
 
 enum
 {
@@ -84,6 +90,7 @@ static const UINT32 games[][2] =
 	{ 0x35589cec, modeUA }, // Pleiads Prototype
 	{ 0xdf2bc303, modeMN }, // Bump 'n' Jump
 	{ 0xc183fbbc, modeMN }, // Burgertime
+	{ 0x66f1849e, modeMN }, // Burgertime (E7)
 	{ 0x0603e177, modeMN }, // Masters of the Universe
 	{ 0x14f126c0, modeCV }, // Magicard
 	{ 0x34b0b5c2, modeCV }  // Video Life
@@ -232,8 +239,7 @@ OPBASE_HANDLER(modeAV_opbase_handler)
 	}
 	else
 	{
-		/* Wait for one memory access to have passed (reading of new PCH either from
-code or from stack) */
+		/* Wait for one memory access to have passed (reading of new PCH either from code or from stack) */
 		AVTimer--;
 	}
 	return address;
@@ -513,13 +519,11 @@ static MACHINE_START( a2600 )
 	case modeMN:
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeMN_switch_w);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe0, 0x1fe7, 0, 0, modeMN_switch_r);
-		if ( 0xc183fbbc == crc32(0, CART, cart_size) ) {
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_w);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_r);
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, MWA8_BANK9);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, MRA8_BANK9);
-			memory_set_bankptr( 9, extra_RAM + 4 * 256 );
-		}
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_w);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fe8, 0x1feb, 0, 0, modeMN_RAM_switch_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x18ff, 0, 0, MWA8_BANK9);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1900, 0x19ff, 0, 0, MRA8_BANK9);
+		memory_set_bankptr( 9, extra_RAM + 4 * 256 );
 		break;
 
 	case modeDC:
@@ -668,7 +672,7 @@ static MACHINE_DRIVER_START( a2600 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(TIA, 31400)
+	MDRV_SOUND_ADD(TIA, MASTER_CLOCK/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -692,7 +696,7 @@ static MACHINE_DRIVER_START( a2600p )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(TIA, 31400)
+	MDRV_SOUND_ADD(TIA, MASTER_CLOCK/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
