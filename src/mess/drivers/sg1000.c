@@ -14,34 +14,64 @@
 
 	TODO:
 
+	- SG-1000 pause button (NMI vector 0x66)
+	- SG-1000 external cartridge RAM
+	- SC-3000 reset key
+	- SC-3000 external cartridge RAM
+	- SC-3000 serial printer
+	- SC-3000 cassette
+	- SF-7000 disk
+	- SF-7000 serial comms
 	- Terebi Oekaki touchpad emulation
 
-		cpu #0 (PC=00000123): unmapped program memory byte write to 0000A000 = E6
-		cpu #0 (PC=00000126): unmapped program memory byte read from 00008000
-		cpu #0 (PC=0000012D): unmapped program memory byte read from 0000A000
-		cpu #0 (PC=0000010B): unmapped program memory byte write to 00006000 = 00
-		cpu #0 (PC=00000902): unmapped program memory byte read from 00008000
-
-	- SC-3000 cartridge RAM mapping, now it is just hacked to have maximum RAM
-
 */
+
+/* Terebi Oekaki */
 
 /*
 
-	SG-1000 non-working roms:
+	Address	Access	Bits
+			 		7		6	5	4	3	2	1	0
+	$6000	W		-		-	-	-	-	-	-	AXIS
+	$8000	R		BUSY	-	-	-	-	-	-	PRESS
+	$A000	R/W		DATA
 
-	Black Onyx, The (J)
-	Bomb Jack (JA)
-	Borderline (JAE)
-	Castle, The (J)
-	Chack'n Pop (J)
-	Champion Golf (J)
-	Champion Soccer (J)
-	Guzzler (J)
-	Hang-On II (JA)
-	Monaco GP (J)
+	AXIS: write 0 to select X axis, 1 to select Y axis.
+	BUSY: reads 1 when graphic board is busy sampling position, else 0.
+	PRESS: reads 0 when pen is touching graphic board, else 1.
+	DATA: when pen is touching graphic board, return 8-bit sample position for currently selected axis (X is in the 0-255 range, Y in the 0-191 range). Else, return 0.
 
 */
+
+static int terebi_axis;
+
+static WRITE8_HANDLER( terebi_axis_w )
+{
+	terebi_axis = data & 0x01;
+}
+
+static READ8_HANDLER( terebi_status_r )
+{
+	return 1;
+}
+
+static READ8_HANDLER( terebi_data_r )
+{
+	if (terebi_axis)
+	{
+		// Y axis
+	}
+	else
+	{
+		// X axis
+	}
+
+	return 0;
+}
+
+static WRITE8_HANDLER( terebi_data_w )
+{
+}
 
 /* Memory Maps */
 
@@ -49,6 +79,7 @@
 
 static ADDRESS_MAP_START( sg1000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM // HACK to support all cartridges
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -91,8 +122,8 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_READWRITE(nec765_data_r, nec765_data_w)
 	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0xff00) AM_READ(nec765_status_r)
 	AM_RANGE(0xe4, 0xe7) AM_MIRROR(0xff00) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
-//	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_READWRITE(usart8251_data_r, usart8251_data_w)
-//	AM_RANGE(0xe9, 0xe9) AM_MIRROR(0xff00) AM_READWRITE(usart8251_status_r, usary8251_command_w)
+//	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_READWRITE(usart8251_0_data_r, usart8251_0_data_w)
+//	AM_RANGE(0xe9, 0xe9) AM_MIRROR(0xff00) AM_READWRITE(usart8251_0_status_r, usart8251_0_command_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -114,61 +145,64 @@ INPUT_PORTS_START( sg1000 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PAUSE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_ESC)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sc3000 )
 	PORT_START_TAG("PA0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ENG DIER'S")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ENG DIER'S") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 
 	PORT_START_TAG("PA1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPC") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 
 	PORT_START_TAG("PA2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HOME CLR") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CHAR(';')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 
 	PORT_START_TAG("PA3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INS DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PI")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CHAR(':')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('@')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PI") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@') PORT_CHAR('`')
 
 	PORT_START_TAG("PA4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']') PORT_CHAR('}')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
 
 	PORT_START_TAG("PA5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
@@ -178,7 +212,7 @@ INPUT_PORTS_START( sc3000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PA6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
@@ -198,11 +232,11 @@ INPUT_PORTS_START( sc3000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 
 	PORT_START_TAG("PB0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PB1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PB2")
@@ -210,21 +244,21 @@ INPUT_PORTS_START( sc3000 )
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PB3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PB4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CHAR('^')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('^')
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PB5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("YEN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("YEN") PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FUNC") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FUNC") PORT_CODE(KEYCODE_TAB)
 
 	PORT_START_TAG("PB6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(RALT))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
@@ -235,7 +269,7 @@ INPUT_PORTS_START( sc3000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START_TAG("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10)
 INPUT_PORTS_END
 
 /* Machine Interfaces */
@@ -541,23 +575,12 @@ static DEVICE_LOAD( sg1000_cart )
 	int size = image_length(image);
 	UINT8 *ptr = memory_region(REGION_CPU1);
 
-	switch (size)
-	{
-	case 0x2000:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0x6000, MRA8_ROM);
-		break;
-	case 0x4000:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0x4000, MRA8_ROM);
-		break;
-	case 0x8000:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, MRA8_ROM);
-		break;
-	}
-
 	if (image_fread(image, ptr, size ) != size)
 	{
 		return INIT_FAIL;
 	}
+
+	// SC-3000 BASIC Level III
 
 	if (!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&ptr[0x6a20], 29))
 	{
@@ -565,9 +588,35 @@ static DEVICE_LOAD( sg1000_cart )
 		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MRA8_RAM); // BASIC Level III B
 	}
 
+	// Sega SC-3000 Music Editor
+
 	if (!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
 	{
 		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_RAM);
+	}
+
+	// Terebi Oekaki
+
+	if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
+	{
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, &terebi_axis_w);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, &terebi_status_r);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_w);
+	}
+
+	// The Castle
+
+	if (!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
+	{
+		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_RAM);
+	}
+
+	// Monaco GP
+
+	if (!strncmp("MONACO GP", (const char *)&ptr[0x0009], 9))
+	{
+		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_RAM);
 	}
 
 	return INIT_PASS;
@@ -577,27 +626,19 @@ static void sg1000_cartslot_getinfo( const device_class *devclass, UINT32 state,
 {
 	switch( state )
 	{
-	case DEVINFO_INT_COUNT:							info->i = 1; break;
-	case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_sg1000_cart; break;
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,sc"); break;
 
-	case DEVINFO_PTR_LOAD:
-		info->load = device_load_sg1000_cart;
-		break;
-	case DEVINFO_STR_FILE_EXTENSIONS:
-		strcpy(info->s = device_temp_str(), "sg,sc");
-		break;
-	default:
-		cartslot_device_getinfo( devclass, state, info );
-		break;
+		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
 }
 
 static void sc3000_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* cassette */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										cassette_device_getinfo(devclass, state, info); break;
@@ -606,10 +647,8 @@ static void sc3000_cassette_getinfo(const device_class *devclass, UINT32 state, 
 
 static void sc3000_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* printer */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_COUNT:							info->i = 1; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
@@ -618,10 +657,8 @@ static void sc3000_printer_getinfo(const device_class *devclass, UINT32 state, u
 
 static void sf7000_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* printer */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_COUNT:							info->i = 2; break;
 
 		default:										printer_device_getinfo(devclass, state, info); break;
@@ -650,17 +687,11 @@ DEVICE_LOAD( sf7000_floppy )
 
 static void sf7000_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
-	/* floppy */
 	switch(state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_COUNT:							info->i = 1; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_floppy; break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sf7"); break;
 
 		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
 	}
@@ -682,8 +713,10 @@ SYSTEM_CONFIG_START( sf7000 )
 	CONFIG_DEVICE(sf7000_floppy_getinfo)
 SYSTEM_CONFIG_END
 
+/* System Drivers */
+
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY   FULLNAME */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", 0 )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", 0 )
 COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sc3000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", GAME_NOT_WORKING )
-// Othello Multivision
+//COMP( 1983,	omv,		sc3000, 0,		omv,		omv,		0,		omv,		"Tsukuda Original",	"Othello Multivision", GAME_NOT_WORKING )
