@@ -91,6 +91,9 @@ BUILD_ZLIB = 1
 # uncomment next line to generate a link map for exception handling in windows
 # MAP = 1
 
+# uncomment next line to generate a unicode build
+# UNICODE = 1
+
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
 # OPTIMIZE = 3
@@ -185,7 +188,12 @@ ifdef MSVC_BUILD
 SUFFIX:=$(SUFFIX)vc
 endif
 
-# debug builds just get the 'd' suffix and nothing more
+# unicode builds just get the additional 'u' suffix
+ifdef UNICODE
+SUFFIX:=$(SUFFIX)u
+endif
+
+# debug builds just get the additional 'd' suffix
 ifdef DEBUG
 SUFFIX:=$(SUFFIX)d
 endif

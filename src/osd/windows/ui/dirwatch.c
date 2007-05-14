@@ -14,6 +14,7 @@
 #include <string.h>
 #include <tchar.h>
 #include "dirwatch.h"
+#include "ui/m32util.h"
 
 typedef BOOL (WINAPI *READDIRECTORYCHANGESFUNC)(HANDLE hDirectory, LPVOID lpBuffer,
 		DWORD nBufferLength, BOOL bWatchSubtree, DWORD dwNotifyFilter,
@@ -36,7 +37,7 @@ struct DirWatcherEntry
 		BYTE buffer[1024];
 	} u;
 
-	TCHAR szDirPath[1];
+	char szDirPath[1];
 };
 
 
@@ -59,7 +60,7 @@ struct DirWatcher
 	BOOL bQuit;
 	BOOL bWatchSubtree;
 	WORD nIndex;
-	LPCTSTR pszPathList;
+	LPCSTR pszPathList;
 };
 
 
@@ -92,19 +93,19 @@ static void DirWatcher_FreeEntry(struct DirWatcherEntry *pEntry)
 
 
 static BOOL DirWatcher_WatchDirectory(PDIRWATCHER pWatcher, int nIndex, int nSubIndex,
-	LPCTSTR pszPath, BOOL bWatchSubtree)
+	LPCSTR pszPath, BOOL bWatchSubtree)
 {
 	struct DirWatcherEntry *pEntry;
 	HANDLE hDir;
 
-	pEntry = malloc(sizeof(*pEntry) + (_tcslen(pszPath) * sizeof(pszPath)));
+	pEntry = malloc(sizeof(*pEntry) + strlen(pszPath));
 	if (!pEntry)
 		goto error;
 	memset(pEntry, 0, sizeof(*pEntry));
-	_tcscpy(pEntry->szDirPath, pszPath);
+	strcpy(pEntry->szDirPath, pszPath);
 	pEntry->overlapped.hEvent = pWatcher->hRequestEvent;
 
-	hDir = CreateFile(pszPath, FILE_LIST_DIRECTORY,
+	hDir = win_create_file_utf8(pszPath, FILE_LIST_DIRECTORY,
 		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 		NULL, OPEN_EXISTING,
 		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
@@ -134,35 +135,31 @@ error:
 
 static void DirWatcher_Signal(PDIRWATCHER pWatcher, struct DirWatcherEntry *pEntry)
 {
-	LPTSTR pszFileName;
-	LPTSTR pszFullFileName;
+	LPSTR pszFileName;
+	LPSTR pszFullFileName;
 	BOOL bPause;
 	HANDLE hFile;
 	int nTries;
 
-#ifdef UNICODE
-	pszFileName = pEntry->u.notify.FileName;
-#else
 	{
 		int nLength;
 		nLength = WideCharToMultiByte(CP_ACP, 0, pEntry->u.notify.FileName, -1, NULL, 0, NULL, NULL);
 		pszFileName = (LPSTR) alloca(nLength * sizeof(*pszFileName));
 		WideCharToMultiByte(CP_ACP, 0, pEntry->u.notify.FileName, -1, pszFileName, nLength, NULL, NULL);
 	}
-#endif
 
 	// get the full path to this new file
-	pszFullFileName = (LPTSTR) alloca((_tcslen(pEntry->szDirPath) + _tcslen(pszFileName) + 2) * sizeof(*pszFullFileName));
-	_tcscpy(pszFullFileName, pEntry->szDirPath);
-	_tcscat(pszFullFileName, TEXT("\\"));
-	_tcscat(pszFullFileName, pszFileName);
+	pszFullFileName = (LPSTR) alloca(strlen(pEntry->szDirPath) + strlen(pszFileName) + 2);
+	strcpy(pszFullFileName, pEntry->szDirPath);
+	strcat(pszFullFileName, "\\");
+	strcat(pszFullFileName, pszFileName);
 
 	// attempt to busy wait until any result other than ERROR_SHARING_VIOLATION
 	// is generated
 	nTries = 100;
 	do
 	{
-		hFile = CreateFile(pszFullFileName, GENERIC_READ,
+		hFile = win_create_file_utf8(pszFullFileName, GENERIC_READ,
 			FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 		if (hFile != INVALID_HANDLE_VALUE)
 			CloseHandle(hFile);
@@ -190,8 +187,8 @@ static void DirWatcher_Signal(PDIRWATCHER pWatcher, struct DirWatcherEntry *pEnt
 
 static DWORD WINAPI DirWatcher_ThreadProc(LPVOID lpParameter)
 {
-	LPTSTR pszPathList;
-	LPTSTR s;
+	LPSTR pszPathList;
+	LPSTR s;
 	int nSubIndex;
 	PDIRWATCHER pWatcher = (PDIRWATCHER) lpParameter;
 	struct DirWatcherEntry *pEntry;
@@ -220,13 +217,13 @@ static DWORD WINAPI DirWatcher_ThreadProc(LPVOID lpParameter)
 			}
 
 			// allocate our own copy of the path list
-			pszPathList = (LPTSTR) alloca((_tcslen(pWatcher->pszPathList) + 1) * sizeof(*pWatcher->pszPathList));
-			_tcscpy(pszPathList, pWatcher->pszPathList);
+			pszPathList = (LPSTR) alloca(strlen(pWatcher->pszPathList) + 1);
+			strcpy(pszPathList, pWatcher->pszPathList);
 			
 			nSubIndex = 0;
 			do
 			{
-				s = _tcschr(pszPathList, ';');
+				s = strchr(pszPathList, ';');
 				if (s)
 					*s = '\0';
 
@@ -310,7 +307,7 @@ error:
 
 
 
-BOOL DirWatcher_Watch(PDIRWATCHER pWatcher, WORD nIndex, LPCTSTR pszPathList, BOOL bWatchSubtrees)
+BOOL DirWatcher_Watch(PDIRWATCHER pWatcher, WORD nIndex, LPCSTR pszPathList, BOOL bWatchSubtrees)
 {
 	EnterCriticalSection(&pWatcher->crit);
 

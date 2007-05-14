@@ -667,3 +667,24 @@ TCHAR* win_tstring_strdup(LPCTSTR str)
 	}
 	return cpy;
 }
+
+//============================================================
+//  win_create_file_utf8
+//============================================================
+
+HANDLE win_create_file_utf8(const char* filename, DWORD desiredmode, DWORD sharemode, 
+					   		LPSECURITY_ATTRIBUTES securityattributes, DWORD creationdisposition,
+					   		DWORD flagsandattributes, HANDLE templatehandle)
+{
+	HANDLE result = 0;
+	TCHAR* t_filename = tstring_from_utf8(filename);
+	if( !t_filename )
+		return result;
+	
+	result = CreateFile(t_filename, desiredmode, sharemode, securityattributes, creationdisposition,
+						flagsandattributes, templatehandle);
+
+	free(t_filename);
+						
+	return result;
+}

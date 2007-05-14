@@ -130,8 +130,8 @@ static int TabView_GetTabFromTabIndex(HWND hwndTabView, int tab_index)
 int TabView_GetCurrentTab(HWND hwndTabView)
 {
 	struct TabViewInfo *pTabViewInfo;
-	LPCTSTR pszTab = NULL;
-	LPCTSTR pszThatTab;
+	LPCSTR pszTab = NULL;
+	LPCSTR pszThatTab;
 	int i, nTab = -1;
 
 	pTabViewInfo = GetTabViewInfo(hwndTabView);
@@ -146,7 +146,7 @@ int TabView_GetCurrentTab(HWND hwndTabView)
 			for (i = 0; i < pTabViewInfo->nTabCount; i++)
 			{
 				pszThatTab = pTabViewInfo->pCallbacks->pfnGetTabShortName(i);
-				if (pszThatTab && !_tcsicmp(pszTab, pszThatTab))
+				if (pszThatTab && !stricmp(pszTab, pszThatTab))
 				{
 					nTab = i;
 					break;
@@ -156,7 +156,7 @@ int TabView_GetCurrentTab(HWND hwndTabView)
 		if (nTab < 0)
 		{
 			nTab = 0;
-			_stscanf(pszTab, TEXT("%d"), &nTab);
+			sscanf(pszTab, "%d", &nTab);
 		}
 	}
 	else
@@ -171,8 +171,8 @@ int TabView_GetCurrentTab(HWND hwndTabView)
 void TabView_SetCurrentTab(HWND hwndTabView, int nTab)
 {
 	struct TabViewInfo *pTabViewInfo;
-	LPCTSTR pszName;
-	TCHAR szBuffer[16];
+	LPCSTR pszName;
+	char szBuffer[16];
 
 	pTabViewInfo = GetTabViewInfo(hwndTabView);
 
@@ -182,8 +182,8 @@ void TabView_SetCurrentTab(HWND hwndTabView, int nTab)
 	}
 	else
 	{
-		_sntprintf(szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]),
-			TEXT("%d"), nTab);
+		snprintf(szBuffer, sizeof(szBuffer) / sizeof(szBuffer[0]),
+			"%d", nTab);
 		pszName = szBuffer;
 	}
 

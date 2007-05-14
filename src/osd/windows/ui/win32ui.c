@@ -2797,7 +2797,7 @@ static void CopyToolTipText(LPTOOLTIPTEXT lpttt)
 	int   iButton = lpttt->hdr.idFrom;
 	static char String[1024];
 	BOOL bConverted = FALSE;
-	//LPSTR pDest = lpttt->lpszText;
+
 	/* Map command ID to string index */
 	for (i = 0; CommandToString[i] != -1; i++)
 	{
@@ -2832,7 +2832,7 @@ static void CopyToolTipText(LPTOOLTIPTEXT lpttt)
 	}
 	else
 		strcpy(String,"Invalid Button Index");
-	//strcpy(pDest, (LPCTSTR)&String);
+
 	lpttt->lpszText = String;
 }
 
@@ -5106,10 +5106,10 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	switch (filetype)
 	{
 	case FILETYPE_INPUT_FILES :
-		of.lpstrFilter   = MAMENAME " input files (*.inp,*.zip)\0*.inp;*.zip\0All files (*.*)\0*.*\0";
+		of.lpstrFilter   = TEXT(MAMENAME " input files (*.inp,*.zip)\0*.inp;*.zip\0All files (*.*)\0*.*\0");
 		break;
 	case FILETYPE_SAVESTATE_FILES :
-		of.lpstrFilter   = MAMENAME " savestate files (*.sta)\0*.sta;\0All files (*.*)\0*.*\0";
+		of.lpstrFilter   = TEXT(MAMENAME " savestate files (*.sta)\0*.sta;\0All files (*.*)\0*.*\0");
 		break;
 	case FILETYPE_WAVE_FILES :
 		of.lpstrFilter   = TEXT("sounds (*.wav)\0*.wav;\0All files (*.*)\0*.*\0");
@@ -5135,7 +5135,7 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		if (filetype == FILETYPE_EFFECT_FILES)
 			of.lpstrInitialDir = GetArtDir();
 		else
-			of.lpstrInitialDir   = last_directory;
+			of.lpstrInitialDir = last_directory;
 	}
 	of.lpstrTitle        = NULL;
 	of.Flags             = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;

@@ -17,14 +17,14 @@ struct TabViewCallbacks
 {
 	// Options retrieval
 	BOOL (*pfnGetShowTabCtrl)(void);
-	void (*pfnSetCurrentTab)(LPCTSTR pszShortName);
-	LPCTSTR (*pfnGetCurrentTab)(void);
+	void (*pfnSetCurrentTab)(LPCSTR pszShortName);
+	LPCSTR (*pfnGetCurrentTab)(void);
 	void (*pfnSetShowTab)(int nTab, BOOL show);
 	int (*pfnGetShowTab)(int nTab);
 
 	// Accessors
-	LPCTSTR (*pfnGetTabShortName)(int nTab);
-	LPCTSTR (*pfnGetTabLongName)(int nTab);
+	LPCSTR (*pfnGetTabShortName)(int nTab);
+	LPCSTR (*pfnGetTabLongName)(int nTab);
 
 	// Callbacks
 	void (*pfnOnSelectionChanged)(void);

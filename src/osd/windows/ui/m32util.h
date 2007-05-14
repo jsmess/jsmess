@@ -61,5 +61,8 @@ BOOL win_set_file_attributes_utf8(const char* filename, DWORD fileattributes);
 BOOL win_copy_file_utf8(const char* existingfilename, const char* newfilename, BOOL failifexists);
 BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename);
 TCHAR* win_tstring_strdup(LPCTSTR str);
+HANDLE win_create_file_utf8(const char* filename, DWORD desiredmode, DWORD sharemode, 
+					   		LPSECURITY_ATTRIBUTES securityattributes, DWORD creationdisposition,
+					   		DWORD flagsandattributes, HANDLE templatehandle);
 
 #endif /* MAME32UTIL_H */
