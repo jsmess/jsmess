@@ -60,5 +60,6 @@ HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconin
 BOOL win_set_file_attributes_utf8(const char* filename, DWORD fileattributes);
 BOOL win_copy_file_utf8(const char* existingfilename, const char* newfilename, BOOL failifexists);
 BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename);
+TCHAR* win_tstring_strdup(LPCTSTR str);
 
 #endif /* MAME32UTIL_H */

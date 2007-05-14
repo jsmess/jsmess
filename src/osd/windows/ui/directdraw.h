@@ -40,6 +40,6 @@ extern struct tDisplayModes* DirectDraw_GetDisplayModes(void);
 extern int            DirectDraw_GetNumDisplays(void);
 extern BOOL           DirectDraw_HasHWStretch(void);
 extern BOOL           DirectDraw_HasRefresh(void);
-extern const char*    DirectDraw_GetDisplayName(int num_display);
+extern LPCTSTR        DirectDraw_GetDisplayName(int num_display);
 
 #endif

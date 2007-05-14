@@ -652,3 +652,18 @@ BOOL win_move_file_utf8(const char* existingfilename, const char* newfilename)
 	return result;	
 }
 
+//============================================================
+//  win_tstring_strdup
+//============================================================
+
+TCHAR* win_tstring_strdup(LPCTSTR str)
+{
+	TCHAR *cpy = NULL;
+	if (str != NULL)
+	{
+		cpy = malloc(_tcslen(str) + 1);
+		if (cpy != NULL)
+			_tcscpy(cpy, str);
+	}
+	return cpy;
+}

@@ -54,6 +54,7 @@
 #include "winmain.h"
 #include "strconv.h"
 #include "winutil.h"
+#include "ui/m32util.h"
 
 typedef HANDLE HTHEME;
 
@@ -1445,48 +1446,54 @@ static void PropToOptions(HWND hWnd, core_options *o)
 	if (hCtrl)
 	{
 		int nCount;
-		char buffer[200];
-		char digital[200];
+		TCHAR buffer[200];
+		TCHAR digital[200];
 		int oldJoyId = -1;
 		int joyId = 0;
 		int axisId = 0;
 		BOOL bFirst = TRUE;
-		memset(digital,0,sizeof(digital));
+		char* utf8_digital;
+		memset(digital,0,ARRAY_LENGTH(digital));
 		// Get the number of items in the control
 		for(nCount=0;nCount < ListView_GetItemCount(hCtrl);nCount++)
 		{
 			if( ListView_GetCheckState(hCtrl,nCount) )
 			{
 				//Get The JoyId
-				ListView_GetItemText(hCtrl, nCount,2, buffer, sizeof(buffer));
-				joyId = atoi(buffer);
+				ListView_GetItemText(hCtrl, nCount,2, buffer, ARRAY_LENGTH(buffer));
+				joyId = _ttoi(buffer);
 				if( oldJoyId != joyId) 
 				{
 					oldJoyId = joyId;
 					//add new JoyId
 					if( bFirst )
 					{
-						strcat(digital, "j");
+						_tcscat(digital, TEXT("j"));
 						bFirst = FALSE;
 					}
 					else
 					{
-						strcat(digital, ",j");
+						_tcscat(digital, TEXT(",j"));
 					}
-					strcat(digital, buffer);
+					_tcscat(digital, buffer);
 				}
 				//Get The AxisId
-				ListView_GetItemText(hCtrl, nCount,3, buffer, sizeof(buffer));
-				axisId = atoi(buffer);
-				strcat(digital,"a");
-				strcat(digital, buffer);
+				ListView_GetItemText(hCtrl, nCount,3, buffer, ARRAY_LENGTH(buffer));
+				axisId = _ttoi(buffer);
+				_tcscat(digital, TEXT("a"));
+				_tcscat(digital, buffer);
 			}
 		}
-		if (mame_stricmp (digital, options_get_string(o, WINOPTION_DIGITAL)) != 0)
+		utf8_digital = utf8_from_tstring(digital);
+		if( !utf8_digital )
+			return;
+		
+		if (mame_stricmp (utf8_digital, options_get_string(o, WINOPTION_DIGITAL)) != 0)
 		{
 			// save the new setting
-			options_set_string(o, WINOPTION_DIGITAL, digital);
+			options_set_string(o, WINOPTION_DIGITAL, utf8_digital);
 		}
+		free(utf8_digital);
 	}
 }
 
@@ -1598,7 +1605,7 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 		int result3 = 0;
 		int joyId = 0;
 		int axisId = 0;
-		memset(digital,0,200);
+		memset(digital,0,sizeof(digital));
 		// Get the number of items in the control
 		for(nCount=0;nCount < ListView_GetItemCount(hCtrl);nCount++)
 		{
@@ -1874,8 +1881,9 @@ static void ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 {
 	int iMonitors;
 	DISPLAY_DEVICE dd;
-	int i= 0;
-	int nSelection  = 0;
+	int i = 0;
+	int nSelection = 0;
+	TCHAR* t_option = 0;
 
 	/* Remove all items in the list. */
 	ComboBox_ResetContent(control);
@@ -1893,12 +1901,16 @@ static void ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 			char screen_option[32];
 
 			//we have to add 1 to account for the "auto" entry
-			ComboBox_InsertString(control, i+1, mame_strdup(dd.DeviceName));
-			ComboBox_SetItemData(control, i+1, (const char*)mame_strdup(dd.DeviceName));
+			ComboBox_InsertString(control, i+1, win_tstring_strdup(dd.DeviceName));
+			ComboBox_SetItemData(control, i+1, (void*)win_tstring_strdup(dd.DeviceName));
 
 			snprintf(screen_option, ARRAY_LENGTH(screen_option), "screen%d", GetSelectedScreen(dialog));
-			if (strcmp(options_get_string(opts, screen_option), dd.DeviceName) == 0)
+			t_option = tstring_from_utf8(options_get_string(opts, screen_option));
+			if( !t_option )
+				return;
+			if (_tcscmp(t_option, dd.DeviceName) == 0)
 				nSelection = i+1;
+			free(t_option);
 		}
 	}
 	ComboBox_SetCurSel(control, nSelection);
@@ -1996,7 +2008,7 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 
 					// add it as an option
 					ComboBox_InsertString(control, index, root);
-					ComboBox_SetItemData(control, index, (void *) mame_strdup(root));	// FIXME - leaks memory!
+					ComboBox_SetItemData(control, index, (void*)win_tstring_strdup(root));	// FIXME - leaks memory!
 					index++;
 				}
 			}

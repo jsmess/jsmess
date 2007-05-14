@@ -32,12 +32,12 @@
 #include "messopts.h"
 #include "strconv.h"
 
-static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCSTR lpItem);
+static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR lpItem);
 static BOOL SoftwareDirectories_OnDelete(HWND hDlg);
 static BOOL SoftwareDirectories_OnBeginLabelEdit(HWND hDlg, NMHDR* pNMHDR);
 static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR);
 
-extern BOOL BrowseForDirectory(HWND hwnd, const char* pStartDir, char* pResult);
+extern BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult);
 BOOL g_bModifiedSoftwarePaths = FALSE;
 
 
@@ -65,13 +65,13 @@ static void AppendList(HWND hList, LPCTSTR lpItem, int nItem)
 
 
 
-static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCSTR lpItem)
+static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR lpItem)
 {
     int nItem;
-    char inbuf[MAX_PATH];
-    char outbuf[MAX_PATH];
+    TCHAR inbuf[MAX_PATH];
+    TCHAR outbuf[MAX_PATH];
     HWND hList;
-	LPSTR lpIn;
+	LPTSTR lpIn;
 
 	g_bModifiedSoftwarePaths = TRUE;
 
@@ -89,7 +89,7 @@ static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCSTR l
 
 	if (!lpItem) {
 		if (bBrowse) {
-			ListView_GetItemText(hList, nItem, 0, inbuf, sizeof(inbuf) / sizeof(inbuf[0]));
+			ListView_GetItemText(hList, nItem, 0, inbuf, ARRAY_LENGTH(inbuf) / sizeof(inbuf[0]));
 			lpIn = inbuf;
 		}
 		else {
@@ -370,7 +370,7 @@ static void DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 	}
 
 	// finish up
-	AppendList(control, DIRLIST_NEWENTRYTEXT, current_item);
+	AppendList(control, TEXT(DIRLIST_NEWENTRYTEXT), current_item);
 	ListView_SetItemState(control, 0, LVIS_SELECTED, LVIS_SELECTED);
 	free(t_dir_list);
 }

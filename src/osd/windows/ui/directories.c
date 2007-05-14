@@ -30,6 +30,7 @@
 #include "Directories.h"
 #include "resource.h"
 #include "strconv.h"
+#include "ui/m32util.h"
 
 #define MAX_DIRS 20
 
@@ -153,7 +154,7 @@ static void DirInfo_SetDir(tDirInfo *pInfo, int nType, int nItem, LPCTSTR pText)
 	}
 	else
 	{
-		s = mame_strdup(pText);
+		s = win_tstring_strdup(pText);
 		if (!s)
 			return;
 		pOldText = pInfo[nType].m_Directory;
@@ -371,7 +372,7 @@ static int RetrieveDirList(int nDir, int nFlagResult, void (*SetTheseDirs)(const
 
 	if (DirInfo_Modified(g_pDirInfo, nDir))
 	{
-		memset(buf, 0, sizeof(buf));
+		memset(buf, 0, ARRAY_LENGTH(buf));
 		nPaths = DirInfo_NumDir(g_pDirInfo, nDir);
 		for (i = 0; i < nPaths; i++)
 		{
@@ -737,7 +738,7 @@ BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult)
 	{
 		if (SHGetPathFromIDList(pItemIDList, buf) == TRUE)
 		{
-			_snprintf(pResult, MAX_PATH, TEXT("%s"), buf);
+			_tcsncpy(pResult, buf, MAX_PATH);
 			bResult = TRUE;
 		}
 		IMalloc_Free(piMalloc, pItemIDList);

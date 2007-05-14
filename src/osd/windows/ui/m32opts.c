@@ -31,6 +31,7 @@
 #include <direct.h>
 #include <driver.h>
 #include <stddef.h>
+#include <tchar.h>
 
 #include "screenshot.h"
 #include "bitmask.h"
@@ -2414,6 +2415,7 @@ static void SplitterDecodeString(const char *str, int *value)
 static void FontDecodeString(const char* str, LOGFONT *f)
 {
 	char*	 ptr;
+	TCHAR* 	 t_ptr;
 	
 	sscanf(str, "%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i",
 		   &f->lfHeight,
@@ -2430,13 +2432,22 @@ static void FontDecodeString(const char* str, LOGFONT *f)
 		   (int*)&f->lfQuality,
 		   (int*)&f->lfPitchAndFamily);
 	ptr = strrchr(str, ',');
-	if (ptr != NULL)
-		strcpy(f->lfFaceName, ptr + 1);
+	if (ptr != NULL) {
+		t_ptr = tstring_from_utf8(ptr + 1);
+		if( !t_ptr )
+			return;
+		_tcscpy(f->lfFaceName, t_ptr);
+		free(t_ptr);
+	}
 }
 
 /* Encode the given LOGFONT structure into a comma-delimited string */
 static void FontEncodeString(const LOGFONT *f, char *str)
 {
+	char* utf8_FaceName = utf8_from_tstring(f->lfFaceName);
+	if( !utf8_FaceName )
+		return;
+	
 	sprintf(str, "%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i,%s",
 			f->lfHeight,
 			f->lfWidth,
@@ -2451,7 +2462,9 @@ static void FontEncodeString(const LOGFONT *f, char *str)
 			f->lfClipPrecision,
 			f->lfQuality,
 			f->lfPitchAndFamily,
-			f->lfFaceName);
+			utf8_FaceName);
+			
+	free(utf8_FaceName);
 }
 
 static void TabFlagsEncodeString(int data, char *str)

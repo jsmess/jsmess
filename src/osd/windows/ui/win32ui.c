@@ -3851,6 +3851,8 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 {
 	int i;
 	LPTREEFOLDER folder;
+	char* t_szFile;
+	
 	switch (id)
 	{
 	case ID_FILE_PLAY:
@@ -4302,9 +4304,13 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 
 			if (GetOpenFileName(&OpenFileName))
 			{
-				ResetBackground(szFile);
+				t_szFile = utf8_from_tstring(szFile);
+				if( !t_szFile )
+					return FALSE;
+				ResetBackground(t_szFile);
 				LoadBackgroundBitmap();
 				InvalidateRect(hMain, NULL, TRUE);
+				free(t_szFile);
 				return TRUE;
 			}
 		}
@@ -4602,12 +4608,18 @@ static void GamePicker_LeavingItem(HWND hwndPicker, int nItem)
 
 static void GamePicker_EnteringItem(HWND hwndPicker, int nItem)
 {
+	TCHAR* t_description;
+	ATOM a;
 	// printf("entering %s\n",drivers[nItem]->name);
 	if (g_bDoBroadcast == TRUE)
 	{
-		ATOM a = GlobalAddAtom(drivers[nItem]->description);
+		t_description = tstring_from_utf8(drivers[nItem]->description);
+		if( !t_description )
+			return;
+		a = GlobalAddAtom(t_description);
 		SendMessage(HWND_BROADCAST, g_mame32_message, a, a);
 		GlobalDeleteAtom(a);
+		free(t_description);
 	}
 
 	EnableSelection(nItem);
@@ -5168,7 +5180,7 @@ static BOOL SelectLanguageFile(HWND hWnd, TCHAR* filename)
 	of.lStructSize       = sizeof(of);
 	of.hwndOwner         = hWnd;
 	of.hInstance         = NULL;
-	of.lpstrFilter       = MAMENAME " Language files (*.lng)\0*.lng\0";
+	of.lpstrFilter       = TEXT(MAMENAME " Language files (*.lng)\0*.lng\0");
 	of.lpstrCustomFilter = NULL;
 	of.nMaxCustFilter    = 0;
 	of.nFilterIndex      = 1;
@@ -5195,6 +5207,7 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 	DWORD dwHelpIDs[] = { IDC_LANGUAGECHECK, HIDC_LANGUAGECHECK,
 						  IDC_LANGUAGEEDIT,  HIDC_LANGUAGEEDIT,
 						  0, 0};
+	char* utf8_LangFile;
 
 	switch (Msg)
 	{
@@ -5232,7 +5245,11 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 		{
 		case IDOK:
 			Edit_GetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), pLangFile, MAX_PATH);
-			SetLanguage(pLangFile);
+			utf8_LangFile = utf8_from_tstring(pLangFile);
+			if( !utf8_LangFile )
+				return FALSE;
+			SetLanguage(utf8_LangFile);
+			free(utf8_LangFile);
 
 		case IDCANCEL:
 			EndDialog(hDlg, 0);
