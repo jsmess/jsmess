@@ -107,6 +107,11 @@ static int detect_super_chip(void)
 			return 0;
 		}
 	}
+	/* Check the reset vector does not point into the super chip RAM area */
+	i = ( CART[0x0FFF] << 8 ) | CART[0x0FFE];
+	if ( ( i & 0x0FFF ) < 0x0100 ) {
+		return 0;
+	}
 
 	return 1;
 }
