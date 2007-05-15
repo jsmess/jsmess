@@ -5,6 +5,8 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
+#include "includes/serial.h"
+#include "includes/msm8251.h"
 #include "machine/8255ppi.h"
 #include "machine/nec765.h"
 #include "sound/sn76496.h"
@@ -119,11 +121,11 @@ static ADDRESS_MAP_START( sf7000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbe, 0xbe) AM_MIRROR(0xff00) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xbf, 0xbf) AM_MIRROR(0xff00) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0xdc, 0xdf) AM_MIRROR(0xff00) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_READWRITE(nec765_data_r, nec765_data_w)
-	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0xff00) AM_READ(nec765_status_r)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_READ(nec765_status_r)
+	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0xff00) AM_READWRITE(nec765_data_r, nec765_data_w)
 	AM_RANGE(0xe4, 0xe7) AM_MIRROR(0xff00) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
-//	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_READWRITE(usart8251_0_data_r, usart8251_0_data_w)
-//	AM_RANGE(0xe9, 0xe9) AM_MIRROR(0xff00) AM_READWRITE(usart8251_0_status_r, usart8251_0_command_w)
+	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_READWRITE(msm8251_data_r, msm8251_data_w)
+	AM_RANGE(0xe9, 0xe9) AM_MIRROR(0xff00) AM_READWRITE(msm8251_status_r, msm8251_control_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -380,7 +382,8 @@ static MACHINE_START( sc3000 )
 
 // SF-7000
 
-static int fdc_int;
+static int sf7000_fdc_int;
+static int sf7000_fdc_index;
 
 static READ8_HANDLER( sf7000_ppi8255_a_r )
 {
@@ -397,7 +400,7 @@ static READ8_HANDLER( sf7000_ppi8255_a_r )
 		PA7		
 	*/
 
-	return fdc_int;
+	return (sf7000_fdc_index << 2) | sf7000_fdc_int;
 }
 
 static WRITE8_HANDLER( sf7000_ppi8255_b_w )
@@ -459,18 +462,25 @@ static ppi8255_interface sf7000_ppi8255_intf =
 /* callback for /INT output from FDC */
 static void sf7000_fdc_interrupt(int state)
 {
-	fdc_int = state;
+	sf7000_fdc_int = state;
 }
 
-/* callback for /DRQ output from FDC */
-static void sf7000_fdc_dma_drq(int state, int read_)
+static void sf7000_fdc_index_callback(mess_image *img, int state)
 {
+	sf7000_fdc_index = state;
 }
 
 static struct nec765_interface sf7000_nec765_interface =
 {
 	sf7000_fdc_interrupt,
-	sf7000_fdc_dma_drq
+	NULL
+};
+
+static struct msm8251_interface sf7000_uart_interface=
+{
+	NULL,
+	NULL,
+	NULL
 };
 
 static MACHINE_START( sf7000 )
@@ -478,6 +488,8 @@ static MACHINE_START( sf7000 )
 	TMS9928A_configure(&tms9928a_interface);
 	ppi8255_init(&sf7000_ppi8255_intf);
 	nec765_init(&sf7000_nec765_interface, NEC765A);
+	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
+	msm8251_init(&sf7000_uart_interface);
 
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x10000, 0);
 	memory_configure_bank(1, 1, 1, memory_region(REGION_CPU1), 0);
@@ -678,9 +690,8 @@ DEVICE_LOAD( sf7000_floppy )
 	{
 		if (device_load_basicdsk_floppy(image) == INIT_PASS)
 		{
-			/* sector id's 0-9 */
-			/* drive, tracks, heads, sectors per track, sector length, dir_sector, dir_length, first sector id */
-			basicdsk_set_geometry(image, 40, 1, 16, 256, 0, 0, FALSE);
+			/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track 0, track skipping */
+			basicdsk_set_geometry(image, 40, 1, 16, 256, 1, 0, FALSE);
 			
 			return INIT_PASS;
 		}
@@ -701,6 +712,47 @@ static void sf7000_floppy_getinfo(const device_class *devclass, UINT32 state, un
 	}
 }
 
+DEVICE_LOAD( sf7000_serial )
+{
+	/* filename specified */
+	if (serial_device_load(image)==INIT_PASS)
+	{
+		/* setup transmit parameters */
+		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
+
+		/* connect serial chip to serial device */
+		msm8251_connect_to_serial_device(image);
+
+		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
+
+		/* and start transmit */
+		serial_device_set_transmit_state(image, 1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+static void sf7000_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* serial */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INIT:							info->init = serial_device_init; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_sf7000_serial; break;
+		case DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
+	}
+}
+
 SYSTEM_CONFIG_START( sg1000 )
 	CONFIG_DEVICE(sg1000_cartslot_getinfo)
 SYSTEM_CONFIG_END
@@ -715,6 +767,7 @@ SYSTEM_CONFIG_START( sf7000 )
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
 	CONFIG_DEVICE(sf7000_printer_getinfo)
 	CONFIG_DEVICE(sf7000_floppy_getinfo)
+	CONFIG_DEVICE(sf7000_serial_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */
