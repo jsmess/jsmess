@@ -609,12 +609,18 @@ static void sg1000_map_cartridge_memory(UINT8 *ptr)
 		// Monaco GP
 
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_ROM);
+		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+		memory_set_bank(1, 0);
 	}
-	else if (!strncmp("wwffUUC2!", (const char *)&ptr[0x0cd7], 9))
+	else if (!strncmp("wwffUUC2!", (const char *)&ptr[0x0cda], 9))
 	{
 		// Home Mahjong v1.0/v1.1
-		// what to do? it writes to B200-BFFF but adding memory there doesn't help
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MWA8_ROM);
+		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+		memory_set_bank(1, 0);
 	}
 }
 
@@ -643,7 +649,7 @@ static void sg1000_cartslot_getinfo( const device_class *devclass, UINT32 state,
 		case DEVINFO_INT_COUNT:							info->i = 1; break;
 		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 		case DEVINFO_PTR_LOAD:							info->load = device_load_sg1000_cart; break;
-		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sc"); break;
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
 	}
