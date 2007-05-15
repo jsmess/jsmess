@@ -17,12 +17,9 @@
 	TODO:
 
 	- SG-1000 pause button (NMI vector 0x66)
-	- SG-1000 external cartridge RAM
 	- SC-3000 reset key
-	- SC-3000 external cartridge RAM
 	- SC-3000 serial printer
 	- SC-3000 cassette
-	- SF-7000 disk
 	- SF-7000 serial comms
 	- Terebi Oekaki touchpad emulation
 
@@ -81,8 +78,8 @@ static WRITE8_HANDLER( terebi_data_w )
 
 static ADDRESS_MAP_START( sg1000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM // HACK to support all cartridges
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sg1000_io_map, ADDRESS_SPACE_IO, 8 )
@@ -98,8 +95,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc3000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-//	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM // HACK to support all cartridges
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc3000_io_map, ADDRESS_SPACE_IO, 8 )
@@ -112,7 +109,7 @@ ADDRESS_MAP_END
 // SF-7000
 
 static ADDRESS_MAP_START( sf7000_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(MRA8_BANK1, MWA8_BANK2)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -149,7 +146,7 @@ INPUT_PORTS_START( sg1000 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("PAUSE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_ESC)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( sc3000 )
@@ -390,9 +387,9 @@ static READ8_HANDLER( sf7000_ppi8255_a_r )
 	/*
 		Signal	Description
 
-		PA0		FDC INT from FDC
+		PA0		INT from FDC
 		PA1		BUSY from Centronics printer
-		PA2		INDEX from FDC
+		PA2		INDEX from FDD
 		PA3		
 		PA4		
 		PA5		
@@ -428,8 +425,8 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 
 		PC0		/INUSE signal to FDD
 		PC1		/MOTOR ON signal to FDD
-		PC2		TC signal to FDD
-		PC3		RESET signal to FDD
+		PC2		TC signal to FDC
+		PC3		RESET signal to FDC
 		PC4		not connected
 		PC5		not connected
 		PC6		/ROM SEL (switch between IPL ROM and RAM)
@@ -437,6 +434,7 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 	*/
 
 	floppy_drive_set_motor_state(image_from_devtype_and_index(IO_FLOPPY, 0), (data & 0x02) ? 0 : 1);
+	floppy_drive_set_ready_state(image_from_devtype_and_index(IO_FLOPPY, 0), 1, 0);
 	
 	nec765_set_tc_state(data & 0x04);
 
@@ -445,7 +443,7 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 		nec765_reset(0);
 	}
 
-	memory_set_bank(1, (data & 0x40) ? 1 : 0);
+	memory_set_bank(1, (data & 0x40) >> 6);
 }
 
 static ppi8255_interface sf7000_ppi8255_intf =
@@ -491,8 +489,9 @@ static MACHINE_START( sf7000 )
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 	msm8251_init(&sf7000_uart_interface);
 
-	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x10000, 0);
-	memory_configure_bank(1, 1, 1, memory_region(REGION_CPU1), 0);
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
+	memory_configure_bank(1, 1, 1, mess_ram, 0);
+	memory_configure_bank(2, 0, 1, mess_ram, 0);
 
 	return 0;
 }
@@ -500,6 +499,7 @@ static MACHINE_START( sf7000 )
 static MACHINE_RESET( sf7000 )
 {
 	memory_set_bank(1, 0);
+	memory_set_bank(2, 0);
 }
 
 /* Machine Drivers */
@@ -580,11 +580,43 @@ ROM_START( sc3000 )
 ROM_END
 
 ROM_START( sf7000 )
-    ROM_REGION( 0x18000, REGION_CPU1, 0 )
-    ROM_LOAD( "ipl.rom", 0x10000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
+    ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
 ROM_END
 
 /* System Configuration */
+
+static void sg1000_map_cartridge_memory(UINT8 *ptr)
+{
+	if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
+	{
+		// Terebi Oekaki
+
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, &terebi_axis_w);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, &terebi_status_r);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_w);
+	}
+	else if (!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
+	{
+		// The Castle
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK1);
+	}
+	else if (!strncmp("MONACO GP", (const char *)&ptr[0x0009], 9))
+	{
+		// Monaco GP
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK1);
+	}
+	else if (!strncmp("wwffUUC2!", (const char *)&ptr[0x0cd7], 9))
+	{
+		// Home Mahjong v1.0/v1.1
+		// what to do? it writes to B200-BFFF but adding memory there doesn't help
+	}
+}
 
 static DEVICE_LOAD( sg1000_cart )
 {
@@ -596,44 +628,10 @@ static DEVICE_LOAD( sg1000_cart )
 		return INIT_FAIL;
 	}
 
-	// SC-3000 BASIC Level III
+	sg1000_map_cartridge_memory(ptr);
 
-	if (!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&ptr[0x6a20], 29))
-	{
-		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_RAM); // BASIC Level III A
-		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MRA8_RAM); // BASIC Level III B
-	}
-
-	// Sega SC-3000 Music Editor
-
-	if (!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
-	{
-		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_RAM);
-	}
-
-	// Terebi Oekaki
-
-	if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
-	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, &terebi_axis_w);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, &terebi_status_r);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_w);
-	}
-
-	// The Castle
-
-	if (!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
-	{
-		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_RAM);
-	}
-
-	// Monaco GP
-
-	if (!strncmp("MONACO GP", (const char *)&ptr[0x0009], 9))
-	{
-		//memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_RAM);
-	}
+	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, MRA8_BANK2);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, MWA8_BANK2);
 
 	return INIT_PASS;
 }
@@ -645,6 +643,66 @@ static void sg1000_cartslot_getinfo( const device_class *devclass, UINT32 state,
 		case DEVINFO_INT_COUNT:							info->i = 1; break;
 		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
 		case DEVINFO_PTR_LOAD:							info->load = device_load_sg1000_cart; break;
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sc"); break;
+
+		default:										cartslot_device_getinfo( devclass, state, info ); break;
+	}
+}
+
+static void sc3000_map_cartridge_memory(UINT8 *ptr)
+{
+	if (!strncmp("SC-3000 BASIC Level 3 ver 1.0", (const char *)&ptr[0x6a20], 29))
+	{
+		// SC-3000 BASIC Level III
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MWA8_BANK1);
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MRA8_BANK2);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MWA8_BANK2);
+	}
+	else if (!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
+	{
+		// Sega SC-3000 Music Editor
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK1);
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, MRA8_BANK2);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, MWA8_BANK2);
+	}
+	else
+	{
+		// regular cartridges
+
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, MRA8_BANK2);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0x3800, MWA8_BANK2);
+	}
+}
+
+static DEVICE_LOAD( sc3000_cart )
+{
+	int size = image_length(image);
+	UINT8 *ptr = memory_region(REGION_CPU1);
+
+	if (image_fread(image, ptr, size ) != size)
+	{
+		return INIT_FAIL;
+	}
+
+	sg1000_map_cartridge_memory(ptr);
+	sc3000_map_cartridge_memory(ptr);
+
+	return INIT_PASS;
+}
+
+static void sc3000_cartslot_getinfo( const device_class *devclass, UINT32 state, union devinfo *info )
+{
+	switch( state )
+	{
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+		case DEVINFO_INT_MUST_BE_LOADED:				info->i = 1; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_sc3000_cart; break;
 		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "sg,sc"); break;
 
 		default:										cartslot_device_getinfo( devclass, state, info ); break;
@@ -690,7 +748,7 @@ DEVICE_LOAD( sf7000_floppy )
 	{
 		if (device_load_basicdsk_floppy(image) == INIT_PASS)
 		{
-			/* drive, tracks, heads, sectors per track, sector length, first sector id, offset track 0, track skipping */
+			/* image, tracks, sides, sectors per track, sector length, first sector id, offset of track 0, track skipping */
 			basicdsk_set_geometry(image, 40, 1, 16, 256, 1, 0, FALSE);
 			
 			return INIT_PASS;
@@ -758,12 +816,13 @@ SYSTEM_CONFIG_START( sg1000 )
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( sc3000 )
-	CONFIG_DEVICE(sg1000_cartslot_getinfo)
+	CONFIG_DEVICE(sc3000_cartslot_getinfo)
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
 	CONFIG_DEVICE(sc3000_printer_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( sf7000 )
+	CONFIG_RAM_DEFAULT	(64 * 1024)
 	CONFIG_DEVICE(sc3000_cassette_getinfo)
 	CONFIG_DEVICE(sf7000_printer_getinfo)
 	CONFIG_DEVICE(sf7000_floppy_getinfo)
@@ -775,6 +834,6 @@ SYSTEM_CONFIG_END
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY   FULLNAME */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", 0 )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", 0 )
-COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sc3000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", GAME_NOT_WORKING )
+COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sc3000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", 0 )
 CONS( 1983,	sg1000m2,	0,		0,		sc3000,		sc3000,		0,		sg1000,		"Sega",	"SG-1000 Mark II", 0 )
 //COMP( 1983,	omv,		sc3000, 0,		omv,		omv,		0,		omv,		"Tsukuda Original",	"Othello Multivision", GAME_NOT_WORKING )
