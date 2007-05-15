@@ -15,8 +15,8 @@
 #include "strconv.h"
 #include "winutil.h"
 
-int WINAPI _tWinMain(HINSTANCE instance, HINSTANCE prev_instance,
-	LPTSTR command_line, int cmd_show)
+int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
+	LPSTR command_line, int cmd_show)
 {
 	MSG msg;
 	HWND window;
@@ -24,7 +24,6 @@ int WINAPI _tWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	int pos, rc = -1;
 	imgtoolerr_t err;
 	HACCEL accel = NULL;
-	char *command_line_utf8;
 	
 	// initialize Windows classes
 	InitCommonControls();
@@ -55,23 +54,19 @@ int WINAPI _tWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	// load image specified at the command line
 	if (command_line && command_line[0])
 	{
-		// convert command line to UTF-8
-		command_line_utf8 = utf8_from_tstring(command_line);
-		rtrim(command_line_utf8);
+		rtrim(command_line);
 		pos = 0;
 
 		// check to see if everything is quoted
-		if ((command_line_utf8[pos] == '\"') && (command_line_utf8[strlen(command_line_utf8)-1] == '\"'))
+		if ((command_line[pos] == '\"') && (command_line[strlen(command_line)-1] == '\"'))
 		{
-			command_line_utf8[strlen(command_line_utf8)-1] = '\0';
+			command_line[strlen(command_line)-1] = '\0';
 			pos++;
 		}
 		
-		err = wimgtool_open_image(window, NULL, command_line_utf8 + pos, OSD_FOPEN_RW);
+		err = wimgtool_open_image(window, NULL, command_line + pos, OSD_FOPEN_RW);
 		if (err)
-			wimgtool_report_error(window, err, command_line_utf8 + pos, NULL);
-
-		free(command_line_utf8);
+			wimgtool_report_error(window, err, command_line + pos, NULL);
 	}
 
 	accel = LoadAccelerators(NULL, MAKEINTRESOURCE(IDA_WIMGTOOL_MENU));

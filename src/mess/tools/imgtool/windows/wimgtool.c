@@ -49,7 +49,32 @@ struct _wimgtool_info
 	POINT dragpt;
 };
 
+static void tstring_rtrim(TCHAR *buf)
+{
+	size_t buflen;
+	TCHAR *s;
 
+	buflen = _tcslen(buf);
+	if (buflen)
+	{
+		for (s = &buf[buflen-1]; s >= buf && isspace(*s); s--)
+			*s = '\0';
+	}
+}
+
+static BOOL win_create_directory_utf8(const char* pathname, LPSECURITY_ATTRIBUTES securityattributes)
+{
+	BOOL result = FALSE;
+	TCHAR* t_pathname = tstring_from_utf8(pathname);
+	if( !t_pathname )
+		return result;
+		
+	result = CreateDirectory(t_pathname, securityattributes);
+	
+	free(t_pathname);
+	
+	return result;
+}
 
 static wimgtool_info *get_wimgtool_info(HWND window)
 {
@@ -454,7 +479,7 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 		{
 			local_time = localtime(&entry->creation_time);
 			_sntprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), _tasctime(local_time));
-			rtrim(buffer);
+			tstring_rtrim(buffer);
 			ListView_SetItemText(info->listview, new_index, column_index, buffer);
 		}
 		column_index++;
@@ -467,7 +492,7 @@ static imgtoolerr_t append_dirent(HWND window, int index, const imgtool_dirent *
 		{
 			local_time = localtime(&entry->lastmodified_time);
 			_sntprintf(buffer, sizeof(buffer) / sizeof(buffer[0]), _tasctime(local_time));
-			rtrim(buffer);
+			tstring_rtrim(buffer);
 			ListView_SetItemText(info->listview, new_index, column_index, buffer);
 		}
 		column_index++;
@@ -866,7 +891,7 @@ static imgtoolerr_t get_recursive_directory(imgtool_partition *partition, const 
 	const char *subpath;
 	char local_subpath[MAX_PATH];
 
-	if (!CreateDirectory(local_path, NULL))
+	if (!win_create_directory_utf8(local_path, NULL))
 	{
 		err = IMGTOOLERR_UNEXPECTED;
 		goto done;
