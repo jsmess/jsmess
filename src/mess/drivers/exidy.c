@@ -254,6 +254,16 @@ static void cassette_serial_in(int id, unsigned long state)
 	cassette_serial_connection.input_state = state;
 }
 
+static MACHINE_START( exidy )
+{
+	serial_timer = timer_alloc(exidy_serial_timer_callback);
+	cassette_timer = timer_alloc(exidy_cassette_timer_callback);
+
+	wd17xx_init(WD_TYPE_179X, NULL, NULL);
+
+	return 0;
+}
+
 static MACHINE_RESET( exidy )
 {
 	hd6402_init();
@@ -264,9 +274,6 @@ static MACHINE_RESET( exidy )
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
-	serial_timer = timer_alloc(exidy_serial_timer_callback);
-	cassette_timer = timer_alloc(exidy_cassette_timer_callback);
-
 	serial_connection_init(&cassette_serial_connection);
 	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
 	
@@ -274,8 +281,6 @@ static MACHINE_RESET( exidy )
 
 	timer_set(TIME_NOW, 0, exidy_reset_timer_callback);
 	
-	wd17xx_init(WD_TYPE_179X,NULL, NULL);
-
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 
 	/* this is temporary. Normally when a Z80 is reset, it will
@@ -298,9 +303,6 @@ static MACHINE_RESET( exidyd )
 	/* assumption: select is tied low */
 	centronics_write_handshake(0, CENTRONICS_SELECT | CENTRONICS_NO_RESET, CENTRONICS_SELECT| CENTRONICS_NO_RESET);
 
-	serial_timer = timer_alloc(exidy_serial_timer_callback);
-	cassette_timer = timer_alloc(exidy_cassette_timer_callback);
-
 	serial_connection_init(&cassette_serial_connection);
 	serial_connection_set_in_callback(&cassette_serial_connection, cassette_serial_in);
 	
@@ -308,8 +310,6 @@ static MACHINE_RESET( exidyd )
 
 	timer_set(TIME_NOW, 0, exidy_reset_timer_callback);
 	
-	wd17xx_init(WD_TYPE_179X,NULL, NULL);
-
 	floppy_drive_set_geometry(image_from_devtype_and_index(IO_FLOPPY, 0), FLOPPY_DRIVE_DS_80);
 }
 
@@ -796,6 +796,7 @@ static MACHINE_DRIVER_START( exidy )
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(200))
 	MDRV_INTERLEAVE(1)
 
+	MDRV_MACHINE_START( exidy )
 	MDRV_MACHINE_RESET( exidy )
 
     /* video hardware */
