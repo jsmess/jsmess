@@ -738,7 +738,7 @@ BOOL BrowseForDirectory(HWND hwnd, LPCTSTR pStartDir, TCHAR* pResult)
 	{
 		if (SHGetPathFromIDList(pItemIDList, buf) == TRUE)
 		{
-			_snprintf(pResult, MAX_PATH, TEXT("%s"), buf);
+			_sntprintf(pResult, MAX_PATH, TEXT("%s"), buf);
 			bResult = TRUE;
 		}
 		IMalloc_Free(piMalloc, pItemIDList);

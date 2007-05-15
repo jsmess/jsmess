@@ -587,7 +587,7 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 				    tvis.hParent = TVI_ROOT;
 					tvis.hInsertAfter = TVI_SORT;
 					tvi.mask = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-					tvi.pszText = folders[i]->m_lpTitle;
+					tvi.pszText = folders[i]->m_lptTitle;
 					tvi.lParam = (LPARAM)folders[i];
 					tvi.iImage = GetTreeViewIconIndex(folders[i]->m_nIconId);
 					tvi.iSelectedImage = 0;
@@ -608,7 +608,7 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 						    tvis.hParent = hti;
 							tvis.hInsertAfter = TVI_SORT;
 							tvi.mask = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-							tvi.pszText = folders[jj]->m_lpTitle;
+							tvi.pszText = folders[jj]->m_lptTitle;
 							tvi.lParam = (LPARAM)folders[jj];
 							tvi.iImage = GetTreeViewIconIndex(folders[jj]->m_nIconId);
 							tvi.iSelectedImage = 0;

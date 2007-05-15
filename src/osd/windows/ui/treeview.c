@@ -56,6 +56,7 @@
 #include "help.h"
 #include "dialogs.h"
 #include "winutil.h"
+#include "strconv.h"
 
 #ifdef _MSC_VER
 #if _MSC_VER > 1200
@@ -1379,7 +1380,7 @@ void ResetTreeViewFolders(void)
 
 			tvi.mask	= TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
 			tvs.hParent = TVI_ROOT;
-			tvi.pszText = lpFolder->m_lpTitle;
+			tvi.pszText = lpFolder->m_lptTitle;
 			tvi.lParam	= (LPARAM)lpFolder;
 			tvi.iImage	= GetTreeViewIconIndex(lpFolder->m_nIconId);
 			tvi.iSelectedImage = 0;
@@ -1430,7 +1431,7 @@ void ResetTreeViewFolders(void)
 		tvs.hParent = hti_parent;
 		tvi.iImage	= GetTreeViewIconIndex(treeFolders[i]->m_nIconId);
 		tvi.iSelectedImage = 0;
-		tvi.pszText = treeFolders[i]->m_lpTitle;
+		tvi.pszText = treeFolders[i]->m_lptTitle;
 		tvi.lParam	= (LPARAM)treeFolders[i];
 		
 #if defined(__GNUC__) /* bug in commctrl.h */
@@ -1518,6 +1519,7 @@ static LPTREEFOLDER NewFolder(const char *lpTitle,
 	memset(lpFolder, '\0', sizeof (TREEFOLDER));
 	lpFolder->m_lpTitle = (LPSTR)malloc(strlen(lpTitle) + 1);
 	strcpy((char *)lpFolder->m_lpTitle,lpTitle);
+	lpFolder->m_lptTitle = tstring_from_utf8(lpFolder->m_lpTitle);
 	lpFolder->m_lpGameBits = NewBits(driver_get_count());
 	lpFolder->m_nFolderId = nFolderId;
 	lpFolder->m_nParent = nParent;
@@ -1537,6 +1539,8 @@ static void DeleteFolder(LPTREEFOLDER lpFolder)
 			DeleteBits(lpFolder->m_lpGameBits);
 			lpFolder->m_lpGameBits = 0;
 		}
+		free(lpFolder->m_lptTitle);
+		lpFolder->m_lptTitle = 0;
 		free(lpFolder->m_lpTitle);
 		lpFolder->m_lpTitle = 0;
 		free(lpFolder);
