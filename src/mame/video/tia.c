@@ -560,6 +560,10 @@ static void update_bitmap(int next_x, int next_y)
 				startP0 = 1;
 				startP1 = 1;
 
+				/* Clear out contents of backup player graphic line buffer */
+				memset( prev_lineP0, 0xFF, sizeof prev_lineP0 );
+				memset( prev_lineP1, 0xFF, sizeof prev_lineP1 );
+
 				redraw_line = 1;
 			}
 
