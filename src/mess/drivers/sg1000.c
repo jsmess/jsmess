@@ -586,9 +586,23 @@ ROM_END
 
 /* System Configuration */
 
-static void sg1000_map_cartridge_memory(UINT8 *ptr)
+static void sg1000_map_cartridge_memory(UINT8 *ptr, int size)
 {
-	if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
+	if (size == 40 * 1024)
+	{
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_ROM);
+		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+		memory_set_bank(1, 0);
+	}
+	else if (size == 48 * 1024)
+	{
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK1);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MWA8_ROM);
+		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+		memory_set_bank(1, 0);
+	}
+	else if (!strncmp("annakmn", (const char *)&ptr[0x13b3], 7))
 	{
 		// Terebi Oekaki
 
@@ -604,24 +618,6 @@ static void sg1000_map_cartridge_memory(UINT8 *ptr)
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_BANK1);
 	}
-	else if (!strncmp("MONACO GP", (const char *)&ptr[0x0009], 9))
-	{
-		// Monaco GP
-
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MRA8_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, MWA8_ROM);
-		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
-		memory_set_bank(1, 0);
-	}
-	else if (!strncmp("wwffUUC2!", (const char *)&ptr[0x0cda], 9))
-	{
-		// Home Mahjong v1.0/v1.1
-
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK1);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MWA8_ROM);
-		memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
-		memory_set_bank(1, 0);
-	}
 }
 
 static DEVICE_LOAD( sg1000_cart )
@@ -634,7 +630,7 @@ static DEVICE_LOAD( sg1000_cart )
 		return INIT_FAIL;
 	}
 
-	sg1000_map_cartridge_memory(ptr);
+	sg1000_map_cartridge_memory(ptr, size);
 
 	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, MRA8_BANK2);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc3ff, 0, 0x3c00, MWA8_BANK2);
@@ -696,7 +692,7 @@ static DEVICE_LOAD( sc3000_cart )
 		return INIT_FAIL;
 	}
 
-	sg1000_map_cartridge_memory(ptr);
+	sg1000_map_cartridge_memory(ptr, size);
 	sc3000_map_cartridge_memory(ptr);
 
 	return INIT_PASS;
