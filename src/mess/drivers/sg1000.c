@@ -5,6 +5,7 @@
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
+#include "includes/centroni.h"
 #include "includes/serial.h"
 #include "includes/msm8251.h"
 #include "machine/8255ppi.h"
@@ -18,9 +19,9 @@
 
 	- SG-1000 pause button (NMI vector 0x66)
 	- SC-3000 reset key
-	- SC-3000 serial printer
 	- SC-3000 cassette
 	- SF-7000 serial comms
+	- SP-400 serial printer
 	- Terebi Oekaki touchpad emulation
 
 */
@@ -269,6 +270,15 @@ INPUT_PORTS_START( sc3000 )
 
 	PORT_START_TAG("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10)
+
+	PORT_START_TAG("BAUD")
+	PORT_CONFNAME( 0x05, 0x05, "Baud rate")
+	PORT_CONFSETTING( 0x00, "9600 baud" )
+	PORT_CONFSETTING( 0x01, "4800 baud" )
+	PORT_CONFSETTING( 0x02, "2400 baud" )
+	PORT_CONFSETTING( 0x03, "1200 baud" )
+	PORT_CONFSETTING( 0x04, "600 baud" )
+	PORT_CONFSETTING( 0x05, "300 baud" )
 INPUT_PORTS_END
 
 /* Machine Interfaces */
@@ -332,8 +342,8 @@ static READ8_HANDLER( sc3000_ppi8255_b_r )
 		PB2		Keyboard input
 		PB3		Keyboard input
 		PB4		/CONT input from cartridge terminal B-11
-		PB5		/FAULT input from printer
-		PB6		/BUSY input from printer
+		PB5		FAULT input from printer
+		PB6		BUSY input from printer
 		PB7		Cassette tape input
 	*/
 
@@ -397,7 +407,15 @@ static READ8_HANDLER( sf7000_ppi8255_a_r )
 		PA7		
 	*/
 
-	return (sf7000_fdc_index << 2) | sf7000_fdc_int;
+	int centronics_handshake = centronics_read_handshake(1);
+	int busy = 0;
+	
+	if ((centronics_handshake & CENTRONICS_NOT_BUSY) == 0)
+	{
+		busy = 0x02;
+	}
+
+	return (sf7000_fdc_index << 2) | busy | sf7000_fdc_int;
 }
 
 static WRITE8_HANDLER( sf7000_ppi8255_b_w )
@@ -415,7 +433,7 @@ static WRITE8_HANDLER( sf7000_ppi8255_b_w )
 		PB7		Data output to Centronics printer
 	*/
 
-	printer_output(image_from_devtype_and_index(IO_PRINTER, 1), data);
+	centronics_write_data(1, data);
 }
 
 static WRITE8_HANDLER( sf7000_ppi8255_c_w )
@@ -444,6 +462,8 @@ static WRITE8_HANDLER( sf7000_ppi8255_c_w )
 	}
 
 	memory_set_bank(1, (data & 0x40) >> 6);
+
+	centronics_write_handshake(1, (data & 0x80) ? 0 : CENTRONICS_STROBE, CENTRONICS_STROBE);
 }
 
 static ppi8255_interface sf7000_ppi8255_intf =
@@ -474,11 +494,18 @@ static struct nec765_interface sf7000_nec765_interface =
 	NULL
 };
 
-static struct msm8251_interface sf7000_uart_interface=
+static struct msm8251_interface sf7000_uart_interface =
 {
 	NULL,
 	NULL,
 	NULL
+};
+
+static CENTRONICS_CONFIG sf7000_centronics_config[1] = {
+	{
+		PRINTER_IBM,
+		NULL
+	}
 };
 
 static MACHINE_START( sf7000 )
@@ -488,6 +515,7 @@ static MACHINE_START( sf7000 )
 	nec765_init(&sf7000_nec765_interface, NEC765A);
 	floppy_drive_set_index_pulse_callback(image_from_devtype_and_index(IO_FLOPPY, 0), sf7000_fdc_index_callback);
 	msm8251_init(&sf7000_uart_interface);
+	centronics_config(1, sf7000_centronics_config);
 
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
@@ -778,7 +806,7 @@ DEVICE_LOAD( sf7000_serial )
 	if (serial_device_load(image)==INIT_PASS)
 	{
 		/* setup transmit parameters */
-		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
+		serial_device_setup(image, 9600 >> readinputportbytag("BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
 		/* connect serial chip to serial device */
 		msm8251_connect_to_serial_device(image);
