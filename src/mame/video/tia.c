@@ -751,8 +751,8 @@ static WRITE8_HANDLER( HMM0_w )
 	int window = curr_x - ( HMOVE_started + ( ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 2 ) );
 
 	data &= 0xF0;
-	if ( window >= 0 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
-		//logerror("%04X: HMOVE/HMM0 madness detected\n", activecpu_get_pc());
+	if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
+		//logerror("%04X: HMOVE/HMM0 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
 		horzM0 += ((signed char) HMM0) >> 4;
 		horzM0 -= 15;
 		if (horzM0 < 0 )
@@ -769,8 +769,8 @@ static WRITE8_HANDLER( HMM1_w )
 	int window = curr_x - ( HMOVE_started + ( ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 2 ) );
 
 	data &= 0xF0;
-	if ( window >= 0 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
-		//logerror("%04X: HMOVE/HMM1 madness detected\n", activecpu_get_pc());
+	if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
+		//logerror("%04X: HMOVE/HMM1 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
 		horzM1 += ((signed char) HMM1) >> 4;
 		horzM1 -= 15;
 		if ( horzM1 < 0 )
@@ -786,6 +786,7 @@ static WRITE8_HANDLER( HMOVE_w )
 	int curr_x = current_x();
 	int curr_y = current_y();
 
+	//logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
 	HMOVE_started = curr_x;
 
 	horzP0 -= ((signed char) HMP0) >> 4;
