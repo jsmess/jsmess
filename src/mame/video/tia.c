@@ -9,6 +9,8 @@
 #include "sound/tiaintf.h"
 #include <math.h>
 
+#define HMOVE_INVALID	-200
+
 static UINT32 frame_cycles;
 static UINT32 paddle_cycles;
 
@@ -548,6 +550,10 @@ static void update_bitmap(int next_x, int next_y)
 		/* Check if we have crossed a line boundary */
 		if ( y !=  prev_y ) {
 			int redraw_line = 0;
+
+			if ( ! HMM0_latch && ! HMM1_latch ) {
+				HMOVE_started = HMOVE_INVALID;
+			}
 
 			/* Redraw line if the playfield reflect bit was changed after the center of the screen */
 			if ( REFLECT != ( CTRLPF & 0x01 ) ) {
@@ -1265,7 +1271,7 @@ void tia_init_internal(int freq)
 	prev_x = 0;
 	prev_y = 0;
 
-	HMOVE_started = -200;
+	HMOVE_started = HMOVE_INVALID;
 
 	frame_cycles = 0;
 	add_reset_callback(Machine, tia_reset);
