@@ -614,17 +614,17 @@ static TBBUTTON tbb[] =
 
 #define NUM_TOOLTIPS 8
 
-static char szTbStrings[NUM_TOOLTIPS + 1][30] =
+static TCHAR szTbStrings[NUM_TOOLTIPS + 1][30] =
 {
-	"Toggle Folder List",
-	"Toggle Screen Shot",
-	"Large Icons",
-	"Small Icons",
-	"List",
-	"Details",
-	"Grouped",
-	"About",
-	"Help"
+	TEXT("Toggle Folder List"),
+	TEXT("Toggle Screen Shot"),
+	TEXT("Large Icons"),
+	TEXT("Small Icons"),
+	TEXT("List"),
+	TEXT("Details"),
+	TEXT("Grouped"),
+	TEXT("About"),
+	TEXT("Help")
 };
 
 static int CommandToString[] =
@@ -1558,10 +1558,15 @@ void SetMainTitle(void)
 {
 	char version[50];
 	TCHAR buffer[100];
+	TCHAR* t_version;
 
 	sscanf(build_version,"%s",version);
-	_stprintf(buffer,TEXT("%s %s"),MAME32NAME,version);
+	t_version = tstring_from_utf8(version);
+	if( !t_version )
+		return;
+	_stprintf(buffer,TEXT("%s %s"),TEXT(MAME32NAME),t_version);
 	SetWindowText(hMain,buffer);
+	free(t_version);
 }
 
 static void winui_output_error(void *param, const char *format, va_list argptr)
@@ -2801,8 +2806,9 @@ static void CopyToolTipText(LPTOOLTIPTEXT lpttt)
 {
 	int   i;
 	int   iButton = lpttt->hdr.idFrom;
-	static char String[1024];
+	static TCHAR String[1024];
 	BOOL bConverted = FALSE;
+	TCHAR* t_gameinfostatus;
 
 	/* Map command ID to string index */
 	for (i = 0; CommandToString[i] != -1; i++)
@@ -2819,11 +2825,11 @@ static void CopyToolTipText(LPTOOLTIPTEXT lpttt)
 		/* Check for valid parameter */
 		if(iButton > NUM_TOOLTIPS)
 		{
-			strcpy(String,"Invalid Button Index");
+			_tcscpy(String,TEXT("Invalid Button Index"));
 		}
 		else
 		{
-			strcpy(String,szTbStrings[iButton]);
+			_tcscpy(String,szTbStrings[iButton]);
 		}
 	}
 	else if ( iButton <= 2 )
@@ -2831,13 +2837,18 @@ static void CopyToolTipText(LPTOOLTIPTEXT lpttt)
 		//Statusbar
 		SendMessage(lpttt->hdr.hwndFrom, TTM_SETMAXTIPWIDTH, 0, 200);
 		if( iButton != 1)
-			SendMessage(hStatusBar, SB_GETTEXT, (WPARAM)iButton, (LPARAM)(LPSTR) &String );
-		else
+			SendMessage(hStatusBar, SB_GETTEXT, (WPARAM)iButton, (LPARAM)&String );
+		else {
 			//for first pane we get the Status directly, to get the line breaks
-			strcpy(String, GameInfoStatus(Picker_GetSelectedItem(hwndList), FALSE) );
+			t_gameinfostatus = tstring_from_utf8( GameInfoStatus(Picker_GetSelectedItem(hwndList), FALSE));
+			if( !t_gameinfostatus )
+				return;
+			_tcscpy(String, t_gameinfostatus);
+			free(t_gameinfostatus);
+		}
 	}
 	else
-		strcpy(String,"Invalid Button Index");
+		_tcscpy(String,TEXT("Invalid Button Index"));
 
 	lpttt->lpszText = String;
 }
@@ -3029,12 +3040,17 @@ static void EnableSelection(int nGame)
 	const char *	pText;
 	MENUITEMINFO	mmi;
 	HMENU			hMenu = GetMenu(hMain);
+	TCHAR*          t_description;
 
 #ifdef MESS
 	MyFillSoftwareList(nGame, FALSE);
 #endif
 
-	_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), g_szPlayGameString, ConvertAmpersandString(ModifyThe(drivers[nGame]->description)));
+	t_description = tstring_from_utf8(ConvertAmpersandString(ModifyThe(drivers[nGame]->description)));
+	if( !t_description )
+		return;
+
+	_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), g_szPlayGameString, t_description);
 	mmi.cbSize	   = sizeof(mmi);
 	mmi.fMask	   = MIIM_TYPE;
 	mmi.fType	   = MFT_STRING;
@@ -3064,6 +3080,8 @@ static void EnableSelection(int nGame)
 	have_selection = TRUE;
 
 	UpdateScreenShot();
+
+	free(t_description);
 }
 
 static void PaintBackgroundImage(HWND hWnd, HRGN hRgn, int x, int y)
@@ -3194,13 +3212,23 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 	{
 		TV_DISPINFO *ptvdi = (TV_DISPINFO *)nm;
 		LPTREEFOLDER folder = (LPTREEFOLDER)ptvdi->item.lParam;
+		char* szText;
+		BOOL result;
 
 		g_in_treeview_edit = FALSE;
 
 		if (ptvdi->item.pszText == NULL || _tcslen(ptvdi->item.pszText) == 0)
 			return FALSE;
+			
+		szText = utf8_from_tstring(ptvdi->item.pszText);
+		if( !szText )
+			return FALSE;
 
-		return TryRenameCustomFolder(folder,ptvdi->item.pszText);
+		result = TryRenameCustomFolder(folder,szText);
+		
+		free(szText);
+		
+		return result;
 	}
 	}
 	return FALSE;
@@ -4286,6 +4314,9 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		{
 			OPENFILENAME OpenFileName;
 			static TCHAR szFile[MAX_PATH] = TEXT("\0");
+			TCHAR*       t_bgdir = tstring_from_utf8(GetBgDir());
+			if( !t_bgdir )
+				return FALSE;
 
 			OpenFileName.lStructSize       = sizeof(OPENFILENAME);
 			OpenFileName.hwndOwner         = hMain;
@@ -4298,7 +4329,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 			OpenFileName.nMaxFile          = sizeof(szFile);
 			OpenFileName.lpstrFileTitle    = NULL;
 			OpenFileName.nMaxFileTitle     = 0;
-			OpenFileName.lpstrInitialDir   = GetBgDir();
+			OpenFileName.lpstrInitialDir   = t_bgdir;
 			OpenFileName.lpstrTitle        = TEXT("Select a Background Image");
 			OpenFileName.nFileOffset       = 0;
 			OpenFileName.nFileExtension    = 0;
@@ -4316,9 +4347,11 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				ResetBackground(t_szFile);
 				LoadBackgroundBitmap();
 				InvalidateRect(hMain, NULL, TRUE);
+				free(t_bgdir);
 				free(t_szFile);
 				return TRUE;
 			}
+			free(t_bgdir);
 		}
 		break;
 
@@ -4644,6 +4677,7 @@ static void InitListView()
 {
 	LVBKIMAGE bki;
 	TCHAR path[MAX_PATH];
+	TCHAR* t_bgdir;
 
 	static const struct PickerCallbacks s_gameListCallbacks =
 	{
@@ -4685,7 +4719,10 @@ static void InitListView()
 
 	ListView_SetTextBkColor(hwndList, CLR_NONE);
 	ListView_SetBkColor(hwndList, CLR_NONE);
-	_stprintf(path, TEXT("%s\\bkground.png"), GetBgDir() );
+	t_bgdir = tstring_from_utf8(GetBgDir());
+	if( !t_bgdir )
+		return;
+	_stprintf(path, TEXT("%s\\bkground.png"), t_bgdir);
 	bki.ulFlags = LVBKIF_SOURCE_URL | LVBKIF_STYLE_TILE;
 	bki.pszImage = path;
 	if( hBackground )	
@@ -4697,6 +4734,7 @@ static void InitListView()
 
 	// Allow selection to change the default saved game
 	bListReady = TRUE;
+	free(t_bgdir); 
 }
 
 static void AddDriverIcon(int nItem,int default_icon_index)
@@ -5105,6 +5143,13 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 {
 	BOOL success;
 	OPENFILENAME of;
+	TCHAR* t_filename;
+	TCHAR* t_statedir = 0;
+	TCHAR* t_artdir = 0;
+	
+	t_filename = tstring_from_utf8(filename);
+	if( !t_filename )
+		return FALSE;
 
 	of.lStructSize       = sizeof(of);
 	of.hwndOwner         = hMain;
@@ -5130,16 +5175,32 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	of.lpstrCustomFilter = NULL;
 	of.nMaxCustFilter    = 0;
 	of.nFilterIndex      = 1;
-	of.lpstrFile         = filename;
+	of.lpstrFile         = t_filename;
 	of.nMaxFile          = MAX_PATH;
 	of.lpstrFileTitle    = NULL;
 	of.nMaxFileTitle     = 0;
 	if (filetype == FILETYPE_SAVESTATE_FILES)
-		of.lpstrInitialDir = GetStateDir();
+	{
+		t_statedir = tstring_from_utf8(GetStateDir());
+		if( !t_statedir )
+		{
+			free(t_filename);
+			return FALSE;
+		}
+		of.lpstrInitialDir = t_statedir;
+	}
 	else
 	{
 		if (filetype == FILETYPE_EFFECT_FILES)
-			of.lpstrInitialDir = GetArtDir();
+		{
+			t_artdir = tstring_from_utf8(GetArtDir());
+			if( !t_artdir )
+			{
+				free(t_filename);
+				return FALSE;
+			}
+			of.lpstrInitialDir = t_artdir;
+		}
 		else
 			of.lpstrInitialDir = last_directory;
 	}
@@ -5175,6 +5236,12 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		//dprintf("got filename %s nFileExtension %u\n",filename,of.nFileExtension);
 		/*GetDirectory(filename,last_directory,sizeof(last_directory));*/
 	}
+	
+	if( t_artdir )
+		free(t_artdir);
+	if( t_statedir )
+		free(t_statedir);
+	free(t_filename);
 
 	return success;
 }
@@ -5834,11 +5901,15 @@ static void UpdateMenu(HMENU hMenu)
 	LPTREEFOLDER lpFolder = GetCurrentFolder();
 	int i;
 	const char *pParent;
+	TCHAR* t_description;
 
 	if (have_selection)
 	{
-		_sntprintf(buf, sizeof(buf), g_szPlayGameString,
-				 ConvertAmpersandString(ModifyThe(drivers[nGame]->description)));
+		t_description = tstring_from_utf8(ConvertAmpersandString(ModifyThe(drivers[nGame]->description)));
+		if( !t_description )
+			return;
+		
+		_sntprintf(buf, ARRAY_LENGTH(buf), g_szPlayGameString, t_description);
 
 		mItem.cbSize	 = sizeof(mItem);
 		mItem.fMask 	 = MIIM_TYPE;
@@ -5849,6 +5920,8 @@ static void UpdateMenu(HMENU hMenu)
 		SetMenuItemInfo(hMenu, ID_FILE_PLAY, FALSE, &mItem);
 
 		EnableMenuItem(hMenu, ID_CONTEXT_SELECT_RANDOM, MF_ENABLED);
+		
+		free(t_description);
 	}
 	else
 	{
@@ -5949,9 +6022,13 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 	
 	for (i=0;g_folderData[i].m_lpTitle != NULL;i++)
 	{
+		TCHAR* t_title = tstring_from_utf8(g_folderData[i].m_lpTitle);
+		if( !t_title )
+			return;
+		
 		mii.fMask = MIIM_TYPE | MIIM_ID;
 		mii.fType = MFT_STRING;
-		mii.dwTypeData = (char *)g_folderData[i].m_lpTitle;
+		mii.dwTypeData = t_title;
 		mii.cch = _tcslen(mii.dwTypeData);
 		mii.wID = ID_CONTEXT_SHOW_FOLDER_START + g_folderData[i].m_nFolderId;
 
@@ -5962,6 +6039,8 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 			SetMenuItemInfo(hMenu,ID_CONTEXT_SHOW_FOLDER_START,FALSE,&mii);
 		else
 			InsertMenuItem(hMenu,i,FALSE,&mii);
+			
+		free(t_title);
 	}
 
 }
@@ -5980,7 +6059,7 @@ void InitBodyContextMenu(HMENU hBodyContextMenu)
 		return;
 	}
 	lpFolder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(Picker_GetSelectedItem(hwndList)) );
-	_sntprintf(tmp,ARRAY_LENGTH(tmp),TEXT("Properties for %s"),lpFolder->m_lpTitle );
+	_sntprintf(tmp,ARRAY_LENGTH(tmp),TEXT("Properties for %s"),lpFolder->m_lptTitle );
 	mii.fMask = MIIM_TYPE | MIIM_ID;
 	mii.fType = MFT_STRING;
 	mii.dwTypeData = tmp;

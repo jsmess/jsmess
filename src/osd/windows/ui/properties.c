@@ -475,6 +475,8 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 {
 	PROPSHEETHEADER pshead;
 	PROPSHEETPAGE   *pspage;
+	TCHAR*          t_description = 0;
+	TCHAR*          t_foldername = 0;
 
 	// clear globals
 	pGameOpts = NULL;
@@ -564,11 +566,17 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 	pshead.hInstance                  = hInst;
 	if( source == SRC_GAME )
 	{
-		pshead.pszCaption = ModifyThe(drivers[g_nGame]->description);
+		t_description = tstring_from_utf8(ModifyThe(drivers[g_nGame]->description));
+		if( !t_description )
+			return;
+		pshead.pszCaption = t_description;
 	}
 	else
 	{
-		pshead.pszCaption = GetFolderNameByID(g_nFolder);
+		t_foldername = tstring_from_utf8(GetFolderNameByID(g_nFolder));
+		if( !t_foldername )
+			return;
+		pshead.pszCaption = t_foldername;
 	}
 	pshead.DUMMYUNIONNAME2.nStartPage = start_page;
 	pshead.DUMMYUNIONNAME.pszIcon     = MAKEINTRESOURCE(IDI_MAME32_ICON);
@@ -582,7 +590,11 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, int game_num, HICON hIco
 		sprintf(temp, "Propery Sheet Error %d %X", (int)dwError, (int)dwError);
 		win_message_box_utf8(0, temp, "Error", IDOK);
 	}
-
+	
+	if( t_foldername )
+		free(t_foldername);
+	if( t_description )
+		free(t_description);
 	free(pspage);
 }
 
@@ -1962,6 +1974,7 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	LPCTSTR t_ctrlr_option = 0;
 	LPTSTR buf = 0;
 	const char *ctrlr_option;
+	TCHAR* t_ctrldir;
 
 	// determine the ctrlr option
 	ctrlr_option = options_get_string(opts, WINOPTION_CTRLR);
@@ -1980,8 +1993,14 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	ComboBox_InsertString(control, index, "Standard");
 	ComboBox_SetItemData(control, index, "");
 	index++;
+	
+	t_ctrldir = tstring_from_utf8(GetCtrlrDir());
+	if( !t_ctrldir )
+		return;
 
-	_stprintf (path, TEXT("%s\\*.*"), GetCtrlrDir());
+	_stprintf (path, TEXT("%s\\*.*"), t_ctrldir);
+	
+	free(t_ctrldir);
 
 	hFind = FindFirstFile(path, &FindFileData);
 
