@@ -935,6 +935,13 @@ static WRITE8_HANDLER( RESBL_w )
 		{
 			horzBL = 3;
 		}
+		/* Adjust for possibly incoming horizontal move cycles */
+		if ( HMOVE_started != HMOVE_INVALID ) {
+			int window = current_x() - ( HMOVE_started + ( ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 2 ) );
+			if ( window < -1 ) {
+				horzBL += ( ( window - 2 ) / -4 );
+			}
+		}
 	}
 	else
 	{
