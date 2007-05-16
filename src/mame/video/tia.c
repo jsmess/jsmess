@@ -929,6 +929,10 @@ static WRITE8_HANDLER( RESBL_w )
 	{
 		horzBL = 3;
 	}
+	else
+	{
+		horzBL = (horzBL + 4) % 160;
+	}
 }
 
 
