@@ -927,7 +927,14 @@ static WRITE8_HANDLER( RESBL_w )
 
 	if (horzBL < 0)
 	{
-		horzBL = 3;
+		if (horzBL == -68)
+		{
+			horzBL = 2;
+		}
+		else
+		{
+			horzBL = 3;
+		}
 	}
 	else
 	{
