@@ -655,16 +655,15 @@ static void update_bitmap(int next_x, int next_y)
 		if (collision_check(lineM0, lineM1, x1, x2))
 			CXPPMM |= 0x40;
 
-		if (y >= helper[current_bitmap]->height)
-		{
-			continue;
-		}
-
-		p = BITMAP_ADDR16(helper[current_bitmap], y, 34);
+		p = BITMAP_ADDR16(helper[current_bitmap], y % (helper[current_bitmap]->height), 34);
 
 		for (x = x1; x < x2; x++)
 		{
 			p[x] = temp[x];
+		}
+
+		if ( x2 == 160 && y % (helper[current_bitmap]->height) == (helper[current_bitmap]->height - 1) ) {
+			current_bitmap ^= 1;
 		}
 	}
 
@@ -711,8 +710,6 @@ static WRITE8_HANDLER( VSYNC_w )
 			update_bitmap(
 				Machine->screen[0].width,
 				Machine->screen[0].height);
-
-			current_bitmap ^= 1;
 
 			prev_y = 0;
 			prev_x = 0;
