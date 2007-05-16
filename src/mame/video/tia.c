@@ -1090,13 +1090,7 @@ WRITE8_HANDLER( tia_w )
 
 	if (offset >= 0x0D && offset <= 0x0F)
 	{
-		curr_x &= ~3;
-		/* There seems to be a 4 cycle delay after the CNT signal. This
-		   fixes all playfield issues. Not 100% sure whether this is correct.
-		*/
-		if ( curr_x >= 80 ) {
-			curr_x += 4;
-		}
+		curr_x = ( curr_x + 1 ) & ~3;
 	}
 
 	if (delay[offset] >= 0)
@@ -1137,7 +1131,7 @@ WRITE8_HANDLER( tia_w )
 		COLUBK = data;
 		break;
 	case 0x0A:
-		//logerror("CTRLPF write %02X, x = %d, y = %d\n", data, curr_x, curr_y );
+		//logerror("%04X: CTRLPF write %02X, x = %d, y = %d\n", activecpu_get_pc(), data, curr_x, curr_y );
 		CTRLPF_w(offset, data);
 		break;
 	case 0x0B:
@@ -1147,15 +1141,15 @@ WRITE8_HANDLER( tia_w )
 		REFP1 = data;
 		break;
 	case 0x0D:
-		//logerror("PF0 write %02X, x = %d, y = %d\n", data, curr_x, curr_y);
+		//logerror("%04X: PF0 write %02X, x = %d, y = %d, real x = %d\n", activecpu_get_pc(), data, curr_x, curr_y, current_x());
 		PF0 = data;
 		break;
 	case 0x0E:
-		//logerror("PF1 write %02X, x = %d, y = %d\n", data, curr_x, curr_y);
+		//logerror("%04X: PF1 write %02X, x = %d, y = %d, real x = %d\n", activecpu_get_pc(), data, curr_x, curr_y, current_x());
 		PF1 = data;
 		break;
 	case 0x0F:
-		//logerror("PF2 write %02X, x = %d, y = %d\n", data, curr_x, curr_y);
+		//logerror("%04X: PF2 write %02X, x = %d, y = %d, real x = %d\n", activecpu_get_pc(), data, curr_x, curr_y, current_x());
 		PF2 = data;
 		break;
 	case 0x10:
