@@ -71,8 +71,8 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem);
 
 static BOOL DevView_GetOpenFileName(HWND hwndDevView, const struct IODevice *dev, LPTSTR pszFilename, UINT nFilenameLength);
 static BOOL DevView_GetCreateFileName(HWND hwndDevView, const struct IODevice *dev, LPTSTR pszFilename, UINT nFilenameLength);
-static void DevView_SetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const struct IODevice *dev, int nID, LPCSTR pszFilename);
-static LPCSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const struct IODevice *dev, int nID, LPSTR pszBuffer, UINT nBufferLength);
+static void DevView_SetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const struct IODevice *dev, int nID, LPCTSTR pszFilename);
+static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const struct IODevice *dev, int nID, LPTSTR pszBuffer, UINT nBufferLength);
 
 #ifdef MAME_DEBUG
 static void MessTestsBegin(void);
@@ -872,16 +872,20 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const struct IODevice *d
 
 
 static void DevView_SetSelectedSoftware(HWND hwndDevView, int nGame,
-	const struct IODevice *dev, int nID, LPCSTR pszFilename)
+	const struct IODevice *dev, int nID, LPCTSTR pszFilename)
 {
-	MessSpecifyImage(nGame, &dev->devclass, nID, pszFilename);
+	char* utf8_filename = utf8_from_tstring(pszFilename);
+	if( !utf8_filename )
+		return;
+	MessSpecifyImage(nGame, &dev->devclass, nID, utf8_filename);
 	MessRefreshPicker(nGame);
+	free(utf8_filename);
 }
 
 
 
-static LPCSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
-	const struct IODevice *dev, int nID, LPSTR pszBuffer, UINT nBufferLength)
+static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
+	const struct IODevice *dev, int nID, LPTSTR pszBuffer, UINT nBufferLength)
 {
 	return GetSelectedSoftware(nDriverIndex, &dev->devclass, nID);
 }
@@ -1036,11 +1040,23 @@ static void MySetColumnInfo(int *order, int *shown)
 
 static INT_PTR CALLBACK MyColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+	INT_PTR result = 0;
+	char* utf8_columnnames;
+	const char* utf8_ptr;
 	int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
 	LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
-	return InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
-		MyColumnDialogProc_shown, MyColumnDialogProc_order, ppszColumnNames,
+	utf8_columnnames = utf8_from_tstring(*ppszColumnNames);
+	if( !utf8_columnnames )
+		return result;
+	
+	utf8_ptr = utf8_columnnames;
+	
+	result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
+		MyColumnDialogProc_shown, MyColumnDialogProc_order, &utf8_ptr,
 		MyGetRealColumnOrder, MyGetColumnInfo, MySetColumnInfo);
+		
+	free(utf8_columnnames);
+	return result;
 }
 
 

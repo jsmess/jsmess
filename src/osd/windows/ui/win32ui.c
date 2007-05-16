@@ -4561,39 +4561,41 @@ const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nColumn,
 	TCHAR *pszBuffer, UINT nBufferLength)
 {
 	const TCHAR *s = NULL;
+	const char* utf8_s = NULL;
+	char playtime_buf[256];
 
 	switch(nColumn)
 	{
 		case COLUMN_GAMES:
 			/* Driver description */
-			s = ModifyThe(drivers[nItem]->description);
+			utf8_s = ModifyThe(drivers[nItem]->description);
 			break;
 
 		case COLUMN_ROMS:
 			/* Has Roms */
-			s = GetAuditString(GetRomAuditResults(nItem));
+			utf8_s = GetAuditString(GetRomAuditResults(nItem));
 			break;
 
 		case COLUMN_SAMPLES:
 			/* Samples */
 			if (DriverUsesSamples(nItem))
-				s = GetAuditString(GetSampleAuditResults(nItem));
+				utf8_s = GetAuditString(GetSampleAuditResults(nItem));
 			break;
 
 		case COLUMN_DIRECTORY:
 			/* Driver name (directory) */
-			s = drivers[nItem]->name;
+			utf8_s = drivers[nItem]->name;
 			break;
 
 		case COLUMN_SRCDRIVERS:
 			/* Source drivers */
-			s = GetDriverFilename(nItem);
+			utf8_s = GetDriverFilename(nItem);
 			break;
 
         case COLUMN_PLAYTIME:
 			/* Source drivers */
-			GetTextPlayTime(nItem, pszBuffer);
-			s = pszBuffer;
+			GetTextPlayTime(nItem, playtime_buf);
+			utf8_s = playtime_buf;
 			break;
 
 		case COLUMN_TYPE:
@@ -4618,24 +4620,36 @@ const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nColumn,
 
 		case COLUMN_PLAYED:
 			/* times played */
-			_stprintf(pszBuffer, TEXT("%i"), GetPlayCount(nItem));
+			_sntprintf(pszBuffer, nBufferLength, TEXT("%i"), GetPlayCount(nItem));
 			s = pszBuffer;
 			break;
 
 		case COLUMN_MANUFACTURER:
 			/* Manufacturer */
-			s = drivers[nItem]->manufacturer;
+			utf8_s = drivers[nItem]->manufacturer;
 			break;
 
 		case COLUMN_YEAR:
 			/* Year */
-			s = drivers[nItem]->year;
+			utf8_s = drivers[nItem]->year;
 			break;
 
 		case COLUMN_CLONE:
-			s = GetCloneParentName(nItem);
+			utf8_s = GetCloneParentName(nItem);
 			break;
 	}
+	
+	if( utf8_s ) {
+		TCHAR* t_s = tstring_from_utf8(utf8_s);
+		if( !t_s )
+			return s;
+		
+		_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_s);		
+		free(t_s);
+		
+		s = pszBuffer;
+	}
+	
 	return s;
 }
 

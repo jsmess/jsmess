@@ -756,15 +756,16 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 
 
 
-LPCSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
-	char *pszBuffer, UINT nBufferLength)
+LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
+	TCHAR *pszBuffer, UINT nBufferLength)
 {
 	struct SoftwarePickerInfo *pPickerInfo;
 	const struct FileInfo *pFileInfo;
-	LPCSTR s = NULL;
+	LPCTSTR s = NULL;
 	const char *pszUtf8 = NULL;
 	unsigned int nHashFunction = 0;
 	char szBuffer[256];
+	TCHAR* t_buf;
 	
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 	if ((nRow < 0) || (nRow >= pPickerInfo->nIndexLength))
@@ -775,7 +776,12 @@ LPCSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	switch(nColumn)
 	{
 		case MESS_COLUMN_IMAGES:
-			s = pFileInfo->pszSubName;
+			t_buf = tstring_from_utf8(pFileInfo->pszSubName);
+			if( !t_buf )
+				return s;
+			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);	
+			s = pszBuffer;
+			free(t_buf);
 			break;
 
 		case MESS_COLUMN_GOODNAME:
@@ -801,8 +807,12 @@ LPCSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 				}
 				if (pszUtf8)
 				{
-					strncpy(pszBuffer, pszUtf8, nBufferLength);
-					s = pszUtf8;
+					t_buf = tstring_from_utf8(pszUtf8);
+					if( !t_buf )
+						return s;
+					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);	
+					s = pszBuffer;
+					free(t_buf);
 				}
 			}
 			break;
@@ -818,8 +828,12 @@ LPCSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 			}
 			if (hash_data_extract_printable_checksum(pFileInfo->szHash, nHashFunction, szBuffer))
 			{
-				strncpy(pszBuffer, szBuffer, nBufferLength);
-				s = szBuffer;
+				t_buf = tstring_from_utf8(szBuffer);
+				if( !t_buf )
+					return s;	
+				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
+				s = pszBuffer;
+				free(t_buf);
 			}
 			break;
 	}

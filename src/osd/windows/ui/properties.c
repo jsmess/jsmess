@@ -1607,41 +1607,45 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 		int nCount;
 
 		/* Get the number of items in the control */
-		char buffer[200];
-		char digital[200];
-		char *pDest = NULL;
-		char *pDest2 = NULL;
-		char *pDest3 = NULL;
+		TCHAR buffer[200];
+		TCHAR digital[200];
+		TCHAR *pDest = NULL;
+		TCHAR *pDest2 = NULL;
+		TCHAR *pDest3 = NULL;
 		int result = 0;
 		int result2 = 0;
 		int result3 = 0;
 		int joyId = 0;
 		int axisId = 0;
+		TCHAR* t_digital_option = tstring_from_utf8(options_get_string(o, WINOPTION_DIGITAL));
+		if( !t_digital_option )
+			return;
+
 		memset(digital,0,sizeof(digital));
 		// Get the number of items in the control
 		for(nCount=0;nCount < ListView_GetItemCount(hCtrl);nCount++)
 		{
 			//Get The JoyId
-			ListView_GetItemText(hCtrl, nCount,2, buffer, sizeof(buffer));
-			joyId = atoi(buffer);
-			sprintf(digital,"j%s",buffer);
+			ListView_GetItemText(hCtrl, nCount,2, buffer, ARRAY_LENGTH(buffer));
+			joyId = _ttoi(buffer);
+			_stprintf(digital,TEXT("j%s"),buffer);
 			//First find the JoyId in the saved String
-			pDest = strstr (options_get_string(o, WINOPTION_DIGITAL), digital);
-			result = pDest - options_get_string(o, WINOPTION_DIGITAL) + 1;
+			pDest = _tcsstr (t_digital_option, digital);
+			result = pDest - t_digital_option + 1;
 			if ( pDest != NULL)
 			{
 				//TrimRight pDest to the first Comma, as there starts a new Joystick
-				pDest2 = strchr(pDest,',');
+				pDest2 = _tcschr(pDest,',');
 				if( pDest2 != NULL )
 				{
 					result2 = pDest2 - pDest + 1;
 				}
 				//Get The AxisId
-				ListView_GetItemText(hCtrl, nCount,3, buffer, sizeof(buffer));
-				axisId = atoi(buffer);
-				sprintf(digital,"a%s",buffer);
+				ListView_GetItemText(hCtrl, nCount,3, buffer, ARRAY_LENGTH(buffer));
+				axisId = _ttoi(buffer);
+				_stprintf(digital,TEXT("a%s"),buffer);
 				//Now find the AxisId in the saved String
-				pDest3 = strstr (pDest,digital);
+				pDest3 = _tcsstr (pDest,digital);
 				result3 = pDest3 - pDest + 1;
 				if ( pDest3 != NULL)
 				{
@@ -1679,7 +1683,8 @@ static void OptionsToProp(HWND hWnd, core_options* o)
 				g_bAnalogCheckState[nCount] = FALSE;
 				ListView_SetCheckState(hCtrl, nCount, FALSE );
 			}
-		}
+		}		
+		free(t_digital_option);
 	}
 }
 

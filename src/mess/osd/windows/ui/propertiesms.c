@@ -89,7 +89,7 @@ static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR 
 
 	if (!lpItem) {
 		if (bBrowse) {
-			ListView_GetItemText(hList, nItem, 0, inbuf, ARRAY_LENGTH(inbuf) / sizeof(inbuf[0]));
+			ListView_GetItemText(hList, nItem, 0, inbuf, ARRAY_LENGTH(inbuf));
 			lpIn = inbuf;
 		}
 		else {
