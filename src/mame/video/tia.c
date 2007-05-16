@@ -927,11 +927,7 @@ static WRITE8_HANDLER( RESBL_w )
 
 	if (horzBL < 0)
 	{
-		horzBL = 2;
-	}
-	else
-	{
-		horzBL = (horzBL + 4) % 160;
+		horzBL = 3;
 	}
 }
 
