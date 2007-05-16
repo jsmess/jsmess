@@ -415,6 +415,7 @@ static MACHINE_START( a2600 )
 
 		if (crc == 0xee7b80d1) chip = 1; // Dig Dug
 		if (crc == 0xa09779ea) chip = 1; // Off the Wall
+		if (crc == 0x861c4aca) chip = 1; // Fatal Run
 	}
 
 	/* set up ROM banks */
