@@ -81,7 +81,7 @@ static const UINT32 games[][2] =
 	{ 0xbd08d915, modeTV }, // Miner 2049er
 	{ 0xbfa477cd, modeTV }, // Miner 2049er Volume II
 	{ 0xdb376663, modeTV }, // Polaris
-	{ 0x25b7f8f9, modeTV }, // Polaris
+	{ 0x25b78f89, modeTV }, // Polaris
 	{ 0x71ecefaf, modeTV }, // Polaris
 	{ 0xc820bd75, modeTV }, // River Patrol
 	{ 0xdd183a4f, modeTV }, // Springer
