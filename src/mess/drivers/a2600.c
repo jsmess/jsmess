@@ -199,7 +199,6 @@ static  READ8_HANDLER(mode32_switch_r) { mode32_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modePB_switch_r) { modePB_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeMN_switch_r) { modeMN_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeMN_RAM_switch_r) { modeMN_RAM_switch(offset, 0); return 0; }
-static  READ8_HANDLER(modeTV_switch_r) { modeTV_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return 0; }
 
@@ -513,7 +512,6 @@ static MACHINE_START( a2600 )
 
 	case modeTV:
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x3f, 0, 0, modeTV_switch_w);
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x3f, 0, 0, modeTV_switch_r);
 		break;
 
 	case modeUA:
