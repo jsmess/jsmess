@@ -18,7 +18,7 @@
 #include "optionsms.h"
 #include "uitext.h"
 #include "strconv.h"
-#include "winutil.h"
+#include "winutf8.h"
 #include "ui/m32util.h"
 
 #define DEVVIEW_PADDING	10

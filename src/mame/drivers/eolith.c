@@ -838,13 +838,13 @@ ROM_END
 
 static DRIVER_INIT( eolith )
 {
-	init_eolith_speedup(Machine);
+	init_eolith_speedup(machine);
 }
 
 static DRIVER_INIT( landbrk )
 {
 	coin_counter_bit = 0x1000;
-	init_eolith(Machine);
+	init_eolith_speedup(machine);
 }
 
 static DRIVER_INIT( landbrka )
@@ -856,7 +856,7 @@ static DRIVER_INIT( landbrka )
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	coin_counter_bit = 0x2000;
-	init_eolith(Machine);
+	init_eolith_speedup(machine);
 }
 
 static DRIVER_INIT( hidctch2 )
@@ -864,7 +864,7 @@ static DRIVER_INIT( hidctch2 )
 	//it fails compares in memory like in landbrka
 	UINT32 *rombase = (UINT32*)memory_region(REGION_CPU1);
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
-	init_eolith(Machine);
+	init_eolith_speedup(machine);
 }
 
 GAME( 1998, hidnctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98

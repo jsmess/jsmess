@@ -541,9 +541,9 @@ ROM_START( omegrace )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for audio cpu */
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-    /* DVG PROM */
-    ROM_REGION( 0x100, REGION_PROMS, 0 )
-    ROM_LOAD( "01-34602.bin",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+	/* DVG PROM */
+	ROM_REGION( 0x100, REGION_USER1, 0 )
+	ROM_LOAD( "01-34602.bin",	0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
 ROM_START( deltrace )
@@ -558,9 +558,9 @@ ROM_START( deltrace )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for audio cpu */
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-    /* DVG PROM */
-    ROM_REGION( 0x100, REGION_PROMS, 0 )
-    ROM_LOAD( "01-34602.bin",   0x0000, 0x0100, CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
+	/* DVG PROM */
+	ROM_REGION( 0x100, REGION_USER1, 0 )
+	ROM_LOAD( "01-34602.bin",	0x0000, 0x0100, BAD_DUMP CRC(97953db8) SHA1(8cbded64d1dd35b18c4d5cece00f77e7b2cab2ad) )
 ROM_END
 
 

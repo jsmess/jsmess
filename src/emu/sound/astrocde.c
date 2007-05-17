@@ -1,20 +1,43 @@
 /***********************************************************
 
-     Astrocade custom 'IO' chip sound chip driver
-     Frank Palazzolo
+    Astrocade custom 'IO' chip sound chip driver
+    Aaron Giles
+    based on original work by Frank Palazzolo
 
-     Portions copied from the Pokey emulator by Ron Fries
+************************************************************
 
-     First Release:
-        09/20/98
-     Updated 11/2004
-        Fixed noise generator bug
-        Changed to stream system
-        Fixed out of bounds memory access bug
+    Register Map
+    ============
+
+    Register 0:
+        D7..D0: Master oscillator frequency
+
+    Register 1:
+        D7..D0: Tone generator A frequency
+
+    Register 2:
+        D7..D0: Tone generator B frequency
+
+    Register 3:
+        D7..D0: Tone generator C frequency
+
+    Register 4:
+        D7..D6: Vibrato speed
+        D5..D0: Vibrato depth
+
+    Register 5:
+            D5: Noise AM enable
+            D4: Mux source (0=vibrato, 1=noise)
+        D3..D0: Tone generator C volume
+
+    Register 6:
+        D7..D4: Tone generator B volume
+        D3..D0: Tone generator A volume
+
+    Register 7:
+        D7..D0: Noise volume
 
 ***********************************************************/
-
-#include <math.h>
 
 #include "sndintrf.h"
 #include "streams.h"
@@ -23,326 +46,283 @@
 
 struct astrocade_info
 {
-	const struct astrocade_interface *intf;
+	sound_stream *stream;		/* sound stream */
 
-	INT32 current_count_A;
-	INT32 current_count_B;
-	INT32 current_count_C;
-	INT32 current_count_V;
-	INT32 current_count_N;
+	UINT8		reg[8];			/* 8 control registers */
 
-	INT32 current_state_A;
-	INT32 current_state_B;
-	INT32 current_state_C;
-	INT32 current_state_V;
+	UINT8		master_count;	/* current master oscillator count */
+	UINT16		vibrato_clock;	/* current vibrato clock */
 
-	INT32 current_size_A;
-	INT32 current_size_B;
-	INT32 current_size_C;
-	INT32 current_size_V;
-	INT32 current_size_N;
+	UINT8		noise_clock;	/* current noise generator clock */
+	UINT16		noise_state;	/* current noise LFSR state */
 
-	sound_stream *stream;
+	UINT8		a_count;		/* current tone generator A count */
+	UINT8		a_state;		/* current tone generator A state */
 
-	/* Registers */
+	UINT8		b_count;		/* current tone generator B count */
+	UINT8		b_state;		/* current tone generator B state */
 
-	UINT8 master_osc;
-	UINT8 freq_A;
-	UINT8 freq_B;
-	UINT8 freq_C;
-	UINT8 vol_A;
-	UINT8 vol_B;
-	UINT8 vol_C;
-	UINT8 vibrato;
-	UINT8 vibrato_speed;
-	UINT8 mux;
-	UINT8 noise_am;
-	UINT8 vol_noise4;
-	UINT8 vol_noise8;
+	UINT8		c_count;		/* current tone generator C count */
+	UINT8		c_state;		/* current tone generator C state */
 
-	int randbyte;
-	int randbit;
+	UINT8		bitswap[256];	/* bitswap table */
 };
 
-static void astrocade_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int num_samples)
+
+
+/*************************************
+ *
+ *  Core sound update
+ *
+ *************************************/
+
+static void astrocade_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int samples)
 {
 	struct astrocade_info *chip = param;
-	stream_sample_t *bufptr;
-	int count;
-	int data, data16, noise_plus_osc, vib_plus_osc;
+	stream_sample_t *dest = buffer[0];
+	UINT16 noise_state;
+	UINT8 master_count;
+	UINT8 noise_clock;
 
-	bufptr = buffer[0];
-	count = num_samples;
+	/* load some locals */
+	master_count = chip->master_count;
+	noise_clock = chip->noise_clock;
+	noise_state = chip->noise_state;
 
-	/* For each sample */
-	while(count>0)
+	/* loop over samples */
+	while (samples > 0)
 	{
-		/* Update current output value */
+		stream_sample_t cursample = 0;
+		int samples_this_time;
+		int samp;
 
-		if (chip->current_count_N == 0)
+		/* compute the number of cycles until the next master oscillator reset */
+		/* or until the next noise boundary */
+		samples_this_time = MIN(samples, 256 - master_count);
+		samples_this_time = MIN(samples_this_time, 64 - noise_clock);
+		samples -= samples_this_time;
+
+		/* sum the output of the tone generators */
+		if (chip->a_state)
+			cursample += chip->reg[6] & 0x0f;
+		if (chip->b_state)
+			cursample += chip->reg[6] >> 4;
+		if (chip->c_state)
+			cursample += chip->reg[5] & 0x0f;
+
+		/* add in the noise if it is enabled, based on the top bit of the LFSR */
+		if ((chip->reg[5] & 0x20) && (noise_state & 0x4000))
+			cursample += chip->reg[7] >> 4;
+
+		/* scale to max and output */
+		cursample = cursample * 32767 / 60;
+		for (samp = 0; samp < samples_this_time; samp++)
+			*dest++ = cursample;
+
+		/* clock the noise; a 2-bit counter clocks a 4-bit counter which clocks the LFSR */
+		noise_clock += samples_this_time;
+		if (noise_clock >= 64)
 		{
-			chip->randbyte = rand() & 0xff;
+			/* update the noise state; this is a 15-bit LFSR with feedback from */
+			/* the XOR of the top two bits */
+			noise_state = (noise_state << 1) | (~((noise_state >> 14) ^ (noise_state >> 13)) & 1);
+			noise_clock -= 64;
+
+			/* the same clock also controls the vibrato clock, which is a 13-bit counter */
+			chip->vibrato_clock++;
 		}
 
-		chip->current_size_V = 32768*chip->vibrato_speed;
-
-		if (!chip->mux)
+		/* clock the master oscillator; this is an 8-bit up counter */
+		master_count += samples_this_time;
+		if (master_count == 0)
 		{
-			if (chip->current_state_V == -1)
-				vib_plus_osc = (chip->master_osc-chip->vibrato)&0xff;
+			/* reload based on mux value -- the value from the register is negative logic */
+			master_count = ~chip->reg[0];
+
+			/* mux value 0 means reload based on the vibrato control */
+			if ((chip->reg[5] & 0x10) == 0)
+			{
+				/* vibrato speed (register 4 bits 6-7) selects one of the top 4 bits */
+				/* of the 13-bit vibrato clock to use (0=highest freq, 3=lowest) */
+				if (!((chip->vibrato_clock >> (chip->reg[4] >> 6)) & 0x0200))
+				{
+					/* if the bit is clear, we add the vibrato volume to the counter */
+					master_count += chip->reg[4] & 0x3f;
+				}
+			}
+
+			/* mux value 1 means reload based on the noise control */
 			else
-				vib_plus_osc = chip->master_osc;
-			chip->current_size_A = vib_plus_osc*chip->freq_A;
-			chip->current_size_B = vib_plus_osc*chip->freq_B;
-			chip->current_size_C = vib_plus_osc*chip->freq_C;
+			{
+				/* the top 8 bits of the noise LFSR are ANDed with the noise volume */
+				/* register and added to the count */
+				master_count += chip->bitswap[(noise_state >> 7) & 0xff] & chip->reg[7];
+			}
+
+			/* clock tone A */
+			if (++chip->a_count == 0)
+			{
+				chip->a_state ^= 1;
+				chip->a_count = ~chip->reg[1];
+			}
+
+			/* clock tone B */
+			if (++chip->b_count == 0)
+			{
+				chip->b_state ^= 1;
+				chip->b_count = ~chip->reg[2];
+			}
+
+			/* clock tone C */
+			if (++chip->c_count == 0)
+			{
+				chip->c_state ^= 1;
+				chip->c_count = ~chip->reg[3];
+			}
 		}
-		else
-		{
-			noise_plus_osc = ((chip->master_osc-(chip->vol_noise8&chip->randbyte)))&0xff;
-			chip->current_size_A = noise_plus_osc*chip->freq_A;
-			chip->current_size_B = noise_plus_osc*chip->freq_B;
-			chip->current_size_C = noise_plus_osc*chip->freq_C;
-			chip->current_size_N = 2*noise_plus_osc;
-		}
-
-		data = (chip->current_state_A*chip->vol_A +
-				chip->current_state_B*chip->vol_B +
-				chip->current_state_C*chip->vol_C);
-
-		if (chip->noise_am)
-		{
-			chip->randbit = rand() & 1;
-			data = data + chip->randbit*chip->vol_noise4;
-		}
-
-		/* Put it in the buffer */
-
-		data16 = data<<8;
-		*bufptr = data16;
-		bufptr++;
-
-		/* Update the state of the chip */
-
-		if (chip->current_count_A >= chip->current_size_A)
-		{
-			chip->current_state_A = -chip->current_state_A;
-			chip->current_count_A = 0;
-		}
-		else
-			chip->current_count_A++;
-
-		if (chip->current_count_B >= chip->current_size_B)
-		{
-			chip->current_state_B = -chip->current_state_B;
-			chip->current_count_B = 0;
-		}
-		else
-			chip->current_count_B++;
-
-		if (chip->current_count_C >= chip->current_size_C)
-		{
-			chip->current_state_C = -chip->current_state_C;
-			chip->current_count_C = 0;
-		}
-		else
-			chip->current_count_C++;
-
-		if (chip->current_count_V >= chip->current_size_V)
-		{
-			chip->current_state_V = -chip->current_state_V;
-			chip->current_count_V = 0;
-		}
-		else
-			chip->current_count_V++;
-
-		if (chip->current_count_N >= chip->current_size_N)
-		{
-			chip->current_count_N = 0;
-		}
-		else
-			chip->current_count_N++;
-
-		count--;
 	}
+
+	/* put back the locals */
+	chip->master_count = master_count;
+	chip->noise_clock = noise_clock;
+	chip->noise_state = noise_state;
 }
 
+
+
+/*************************************
+ *
+ *  Chip reset
+ *
+ *************************************/
 
 static void astrocade_reset(void *_chip)
 {
 	struct astrocade_info *chip = _chip;
-	chip->current_count_A = 0;
-	chip->current_count_B = 0;
-	chip->current_count_C = 0;
-	chip->current_count_V = 0;
-	chip->current_count_N = 0;
-	chip->current_state_A = 1;
-	chip->current_state_B = 1;
-	chip->current_state_C = 1;
-	chip->current_state_V = 1;
-	chip->randbyte = 0;
-	chip->randbit = 1;
+
+	memset(chip->reg, 0, sizeof(chip->reg));
+
+	chip->master_count = 0;
+	chip->vibrato_clock = 0;
+
+	chip->noise_clock = 0;
+	chip->noise_state = 0;
+
+	chip->a_count = 0;
+	chip->a_state = 0;
+
+	chip->b_count = 0;
+	chip->b_state = 0;
+
+	chip->c_count = 0;
+	chip->c_state = 0;
 }
+
+
+
+/*************************************
+ *
+ *  Save state registration
+ *
+ *************************************/
 
 static void astrocade_state_save_register(struct astrocade_info *chip, int sndindex)
 {
-	state_save_register_item("astrocade", sndindex, chip->current_count_A);
-	state_save_register_item("astrocade", sndindex, chip->current_count_B);
-	state_save_register_item("astrocade", sndindex, chip->current_count_C);
-	state_save_register_item("astrocade", sndindex, chip->current_count_V);
-	state_save_register_item("astrocade", sndindex, chip->current_count_N);
+	state_save_register_item_array("globals", sndindex, chip->reg);
 
-	state_save_register_item("astrocade", sndindex, chip->current_state_A);
-	state_save_register_item("astrocade", sndindex, chip->current_state_B);
-	state_save_register_item("astrocade", sndindex, chip->current_state_C);
-	state_save_register_item("astrocade", sndindex, chip->current_state_V);
+	state_save_register_item_array("astrocade", sndindex, chip->reg);
 
-	state_save_register_item("astrocade", sndindex, chip->current_size_A);
-	state_save_register_item("astrocade", sndindex, chip->current_size_B);
-	state_save_register_item("astrocade", sndindex, chip->current_size_C);
-	state_save_register_item("astrocade", sndindex, chip->current_size_V);
-	state_save_register_item("astrocade", sndindex, chip->current_size_N);
+	state_save_register_item("astrocade", sndindex, chip->master_count);
+	state_save_register_item("astrocade", sndindex, chip->vibrato_clock);
 
-	state_save_register_item("astrocade", sndindex, chip->master_osc);
-	state_save_register_item("astrocade", sndindex, chip->freq_A);
-	state_save_register_item("astrocade", sndindex, chip->freq_B);
-	state_save_register_item("astrocade", sndindex, chip->freq_C);
-	state_save_register_item("astrocade", sndindex, chip->vol_A);
-	state_save_register_item("astrocade", sndindex, chip->vol_B);
-	state_save_register_item("astrocade", sndindex, chip->vol_C);
-	state_save_register_item("astrocade", sndindex, chip->vibrato);
-	state_save_register_item("astrocade", sndindex, chip->vibrato_speed);
-	state_save_register_item("astrocade", sndindex, chip->mux);
-	state_save_register_item("astrocade", sndindex, chip->noise_am);
-	state_save_register_item("astrocade", sndindex, chip->vol_noise4);
-	state_save_register_item("astrocade", sndindex, chip->vol_noise8);
+	state_save_register_item("astrocade", sndindex, chip->noise_clock);
+	state_save_register_item("astrocade", sndindex, chip->noise_state);
+
+	state_save_register_item("astrocade", sndindex, chip->a_count);
+	state_save_register_item("astrocade", sndindex, chip->a_state);
+
+	state_save_register_item("astrocade", sndindex, chip->b_count);
+	state_save_register_item("astrocade", sndindex, chip->b_state);
+
+	state_save_register_item("astrocade", sndindex, chip->c_count);
+	state_save_register_item("astrocade", sndindex, chip->c_state);
 }
+
+
+
+/*************************************
+ *
+ *  Chip initialization
+ *
+ *************************************/
 
 static void *astrocade_start(int sndindex, int clock, const void *config)
 {
 	struct astrocade_info *chip;
+	int i;
 
+	/* allocate the chip memory */
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->intf = config;
+	/* generate a bitswap table for the noise */
+	for (i = 0; i < 256; i++)
+		chip->bitswap[i] = BITSWAP8(i, 0,1,2,3,4,5,6,7);
 
-	chip->stream = stream_create(0,1,clock,chip,astrocade_update);
+	/* allocate a stream for output */
+	chip->stream = stream_create(0, 1, clock, chip, astrocade_update);
 
 	/* reset state */
 	astrocade_reset(chip);
-
 	astrocade_state_save_register(chip, sndindex);
 
 	return chip;
 }
 
+
+
+/*************************************
+ *
+ *  Sound write accessors
+ *
+ *************************************/
+
 void astrocade_sound_w(UINT8 num, offs_t offset, UINT8 data)
 {
 	struct astrocade_info *chip = sndti_token(SOUND_ASTROCADE, num);
-	int temp_vib;
 
 	/* update */
 	stream_update(chip->stream);
 
-	switch(offset)
-	{
-		case 0:  /* Master Oscillator */
-#ifdef VERBOSE
-			logerror("Master Osc Write: %02x\n",data);
-#endif
-			chip->master_osc = data+1;
-		break;
-
-		case 1:  /* Tone A Frequency */
-#ifdef VERBOSE
-			logerror("Tone A Write:        %02x\n",data);
-#endif
-			chip->freq_A = data+1;
-		break;
-
-		case 2:  /* Tone B Frequency */
-#ifdef VERBOSE
-			logerror("Tone B Write:           %02x\n",data);
-#endif
-			chip->freq_B = data+1;
-		break;
-
-		case 3:  /* Tone C Frequency */
-#ifdef VERBOSE
-			logerror("Tone C Write:              %02x\n",data);
-#endif
-			chip->freq_C = data+1;
-		break;
-
-		case 4:  /* Vibrato Register */
-#ifdef VERBOSE
-			logerror("Vibrato Depth:                %02x\n",data&0x3f);
-			logerror("Vibrato Speed:                %02x\n",data>>6);
-#endif
-			chip->vibrato = data & 0x3f;
-
-			temp_vib = (data>>6) & 0x03;
-			chip->vibrato_speed = (1 << temp_vib);
-
-		break;
-
-		case 5:  /* Tone C Volume, Noise Modulation Control */
-			chip->vol_C = data & 0x0f;
-			chip->mux = (data>>4) & 0x01;
-			chip->noise_am = (data>>5) & 0x01;
-#ifdef VERBOSE
-			logerror("Tone C Vol:                      %02x\n",chip->vol_C);
-			logerror("Mux Source:                      %02x\n",chip->mux);
-			logerror("Noise Am:                        %02x\n",chip->noise_am);
-#endif
-		break;
-
-		case 6:  /* Tone A & B Volume */
-			chip->vol_B = (data>>4) & 0x0f;
-			chip->vol_A = data & 0x0f;
-#ifdef VERBOSE
-			logerror("Tone A Vol:                         %02x\n",chip->vol_A);
-			logerror("Tone B Vol:                         %02x\n",chip->vol_B);
-#endif
-		break;
-
-		case 7:  /* Noise Volume Register */
-			chip->vol_noise8 = data;
-			chip->vol_noise4 = (data>>4) & 0x0f;
-#ifdef VERBOSE
-			logerror("Noise Vol:                             %02x\n",chip->vol_noise8);
-			logerror("Noise Vol (4):                         %02x\n",chip->vol_noise4);
-#endif
-		break;
-	}
+	/* stash the new register value */
+	chip->reg[offset & 7] = data;
 }
 
-WRITE8_HANDLER( astrocade_soundblock1_w )
-{
-	astrocade_sound_w(0, (offset>>8)&7, data);
-}
-
-WRITE8_HANDLER( astrocade_soundblock2_w )
-{
-	astrocade_sound_w(1, (offset>>8)&7, data);
-}
 
 WRITE8_HANDLER( astrocade_sound1_w )
 {
-	astrocade_sound_w(0, offset, data);
+	if ((offset & 8) != 0)
+		astrocade_sound_w(0, (offset >> 8) & 7, data);
+	else
+		astrocade_sound_w(0, offset & 7, data);
 }
+
 
 WRITE8_HANDLER( astrocade_sound2_w )
 {
-	astrocade_sound_w(1, offset, data);
+	if ((offset & 8) != 0)
+		astrocade_sound_w(1, (offset >> 8) & 7, data);
+	else
+		astrocade_sound_w(1, offset & 7, data);
 }
 
 
 
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
+/*************************************
+ *
+ *  Get/set info callbacks
+ *
+ *************************************/
 
 static void astrocade_set_info(void *token, UINT32 state, sndinfo *info)
 {
@@ -368,9 +348,8 @@ void astrocade_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "Astrocade";					break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Bally";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "2.0";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004, The MAME Team"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004-2007, The MAME Team"; break;
 	}
 }
-

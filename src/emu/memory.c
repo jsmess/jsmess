@@ -1167,10 +1167,10 @@ static void init_cpudata(void)
 INLINE void adjust_addresses(addrspace_data *space, int ismatchmask, offs_t *start, offs_t *end, offs_t *mask, offs_t *mirror)
 {
 	/* adjust start/end/mask values */
-	if (!*mask) *mask = space->rawmask;
-/* ASG - I think this is wrong - it prevents using a mask to mirror match/mask cases
-    if (ismatchmask) *mask |= *end & space->rawmask; */
-	*mask &= ~*mirror;
+	if (*mask == 0)
+		*mask = space->rawmask & ~*mirror;
+	else
+		*mask &= space->rawmask;
 	*start &= ~*mirror & space->rawmask;
 	*end &= ~*mirror & space->rawmask;
 

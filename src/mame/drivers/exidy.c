@@ -1453,7 +1453,7 @@ DRIVER_INIT( fax )
  *
  *************************************/
 
-GAME( 1979, sidetrac, 0,       targ,    sidetrac, sidetrac, ROT0, "Exidy", "Side Track", 0 )
+GAME( 1979, sidetrac, 0,       targ,    sidetrac, sidetrac, ROT0, "Exidy", "Side Trak", 0 )
 GAME( 1980, targ,     0,       targ,    targ,     targ,     ROT0, "Exidy", "Targ", 0 )
 GAME( 1980, targc,    targ,    targ,    targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", 0 )
 GAME( 1980, spectar,  0,       targ,    spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", 0 )

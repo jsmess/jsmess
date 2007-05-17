@@ -1343,7 +1343,7 @@ static DRIVER_INIT( namcos12 )
 
 static DRIVER_INIT( ptblank2 )
 {
-	init_namcos12(machine);
+	driver_init_namcos12(machine);
 
 	/* patch out wait for dma 5 to complete */
 	*( (UINT32 *)( memory_region( REGION_USER1 ) + 0x331c4 ) ) = 0;
@@ -1353,14 +1353,14 @@ static DRIVER_INIT( ptblank2 )
 
 static DRIVER_INIT( ghlpanic )
 {
-	init_namcos12(machine);
+	driver_init_namcos12(machine);
 
 	system11gun_install();
 }
 
 static DRIVER_INIT( golgo13 )
 {
-	init_namcos12(machine);
+	driver_init_namcos12(machine);
 }
 
 static MACHINE_DRIVER_START( coh700 )

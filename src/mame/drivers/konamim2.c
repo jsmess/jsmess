@@ -1118,19 +1118,8 @@ static DRIVER_INIT( m2 )
 	cde_init();
 }
 
-
-static DRIVER_INIT( polystar )
-{
-	init_m2(machine);
-}
-
-static DRIVER_INIT( btltryst )
-{
-	init_m2(machine);
-}
-
-GAME( 1997, polystar,	0,	m2, m2, polystar,		ROT0,	"Konami",	"Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1997, totlvice,	0,	m2, m2, m2,				ROT0,	"Konami",	"Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, btltryst,	0,	m2,	m2,	btltryst,		ROT0,	"Konami",	"Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, heatof11,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1998, evilngt,	0,	m2,	m2,	m2,				ROT0,	"Konami",	"Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, polystar, 0, m2, m2, m2, ROT0, "Konami", "Tobe! Polystars (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1997, totlvice, 0, m2, m2, m2, ROT0, "Konami", "Total Vice (ver JAD)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, btltryst, 0, m2, m2, m2, ROT0, "Konami", "Battle Tryst (ver JAC)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, heatof11, 0, m2, m2, m2, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1998, evilngt,  0, m2, m2, m2, ROT0, "Konami", "Evil Night (ver EAA)", GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -259,16 +259,16 @@ static UINT32 timer_next;
 #define CLR_C		CC&=0xfe
 
 /* macros for CC -- CC bits affected should be reset before calling */
-#define SET_Z(a)		if(!a)SEZ
-#define SET_Z8(a)		SET_Z((UINT8)a)
-#define SET_Z16(a)		SET_Z((UINT16)a)
-#define SET_N8(a)		CC|=((a&0x80)>>4)
-#define SET_N16(a)		CC|=((a&0x8000)>>12)
-#define SET_H(a,b,r)	CC|=(((a^b^r)&0x10)<<1)
-#define SET_C8(a)		CC|=((a&0x100)>>8)
-#define SET_C16(a)		CC|=((a&0x10000)>>16)
-#define SET_V8(a,b,r)	CC|=(((a^b^r^(r>>1))&0x80)>>6)
-#define SET_V16(a,b,r)	CC|=(((a^b^r^(r>>1))&0x8000)>>14)
+#define SET_Z(a)		if(!(a))SEZ
+#define SET_Z8(a)		SET_Z((UINT8)(a))
+#define SET_Z16(a)		SET_Z((UINT16)(a))
+#define SET_N8(a)		CC|=(((a)&0x80)>>4)
+#define SET_N16(a)		CC|=(((a)&0x8000)>>12)
+#define SET_H(a,b,r)	CC|=((((a)^(b)^(r))&0x10)<<1)
+#define SET_C8(a)		CC|=(((a)&0x100)>>8)
+#define SET_C16(a)		CC|=(((a)&0x10000)>>16)
+#define SET_V8(a,b,r)	CC|=((((a)^(b)^(r)^((r)>>1))&0x80)>>6)
+#define SET_V16(a,b,r)	CC|=((((a)^(b)^(r)^((r)>>1))&0x8000)>>14)
 
 static const UINT8 flags8i[256]=	 /* increment */
 {
@@ -312,8 +312,8 @@ static const UINT8 flags8d[256]= /* decrement */
 #define SET_FLAGS8D(a)		{CC|=flags8d[(a)&0xff];}
 
 /* combos */
-#define SET_NZ8(a)			{SET_N8(a);SET_Z(a);}
-#define SET_NZ16(a)			{SET_N16(a);SET_Z(a);}
+#define SET_NZ8(a)			{SET_N8(a);SET_Z8(a);}
+#define SET_NZ16(a)			{SET_N16(a);SET_Z16(a);}
 #define SET_FLAGS8(a,b,r)	{SET_N8(r);SET_Z8(r);SET_V8(a,b,r);SET_C8(r);}
 #define SET_FLAGS16(a,b,r)	{SET_N16(r);SET_Z16(r);SET_V16(a,b,r);SET_C16(r);}
 

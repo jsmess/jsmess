@@ -24,10 +24,11 @@
 #include <commctrl.h>
 #include <stdio.h>
 #include <richedit.h>
+#include <tchar.h>
 
 #include "screenshot.h"
 #include "win32ui.h"
-#include "winutil.h"
+#include "winutf8.h"
 
 #include <audit.h>
 #include <unzip.h>
@@ -41,6 +42,7 @@
 #include "Properties.h"
 #include "emuopts.h"
 #include "winmain.h"
+#include "strconv.h"
 
 /***************************************************************************
     function prototypes
@@ -297,12 +299,12 @@ static INT_PTR CALLBACK AuditWindowProc(HWND hDlg, UINT Msg, WPARAM wParam, LPAR
 		case IDPAUSE:
 			if (bPaused)
 			{
-				SendDlgItemMessage(hAudit, IDPAUSE, WM_SETTEXT, 0, (LPARAM)"Pause");
+				SendDlgItemMessage(hAudit, IDPAUSE, WM_SETTEXT, 0, (LPARAM)TEXT("Pause"));
 				bPaused = FALSE;
 			}
 			else
 			{
-				SendDlgItemMessage(hAudit, IDPAUSE, WM_SETTEXT, 0, (LPARAM)"Continue");
+				SendDlgItemMessage(hAudit, IDPAUSE, WM_SETTEXT, 0, (LPARAM)TEXT("Continue"));
 				bPaused = TRUE;
 			}
 			break;
@@ -347,7 +349,7 @@ INT_PTR CALLBACK GameAuditDialogProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lPa
 static void ProcessNextRom()
 {
 	int retval;
-	char buffer[200];
+	TCHAR buffer[200];
 
 	retval = Mame32VerifyRomSet(rom_index);
 	switch (retval)
@@ -355,9 +357,9 @@ static void ProcessNextRom()
 	case BEST_AVAILABLE: /* correct, incorrect or separate count? */
 	case CORRECT:
 		roms_correct++;
-		sprintf(buffer, "%i", roms_correct);
+		_stprintf(buffer, TEXT("%i"), roms_correct);
 		SendDlgItemMessage(hAudit, IDC_ROMS_CORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
-		sprintf(buffer, "%i", roms_correct + roms_incorrect);
+		_stprintf(buffer, TEXT("%i"), roms_correct + roms_incorrect);
 		SendDlgItemMessage(hAudit, IDC_ROMS_TOTAL, WM_SETTEXT, 0, (LPARAM)buffer);
 		break;
 
@@ -366,9 +368,9 @@ static void ProcessNextRom()
 
 	case INCORRECT:
 		roms_incorrect++;
-		sprintf(buffer, "%i", roms_incorrect);
+		_stprintf(buffer, TEXT("%i"), roms_incorrect);
 		SendDlgItemMessage(hAudit, IDC_ROMS_INCORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
-		sprintf(buffer, "%i", roms_correct + roms_incorrect);
+		_stprintf(buffer, TEXT("%i"), roms_correct + roms_incorrect);
 		SendDlgItemMessage(hAudit, IDC_ROMS_TOTAL, WM_SETTEXT, 0, (LPARAM)buffer);
 		break;
 	}
@@ -386,7 +388,7 @@ static void ProcessNextRom()
 static void ProcessNextSample()
 {
 	int  retval;
-	char buffer[200];
+	TCHAR buffer[200];
 	
 	retval = Mame32VerifySampleSet(sample_index);
 	
@@ -396,9 +398,9 @@ static void ProcessNextSample()
 		if (DriverUsesSamples(sample_index))
 		{
 			samples_correct++;
-			sprintf(buffer, "%i", samples_correct);
+			_stprintf(buffer, TEXT("%i"), samples_correct);
 			SendDlgItemMessage(hAudit, IDC_SAMPLES_CORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
-			sprintf(buffer, "%i", samples_correct + samples_incorrect);
+			_stprintf(buffer, TEXT("%i"), samples_correct + samples_incorrect);
 			SendDlgItemMessage(hAudit, IDC_SAMPLES_TOTAL, WM_SETTEXT, 0, (LPARAM)buffer);
 			break;
 		}
@@ -408,9 +410,9 @@ static void ProcessNextSample()
 			
 	case INCORRECT:
 		samples_incorrect++;
-		sprintf(buffer, "%i", samples_incorrect);
+		_stprintf(buffer, TEXT("%i"), samples_incorrect);
 		SendDlgItemMessage(hAudit, IDC_SAMPLES_INCORRECT, WM_SETTEXT, 0, (LPARAM)buffer);
-		sprintf(buffer, "%i", samples_correct + samples_incorrect);
+		_stprintf(buffer, TEXT("%i"), samples_correct + samples_incorrect);
 		SendDlgItemMessage(hAudit, IDC_SAMPLES_TOTAL, WM_SETTEXT, 0, (LPARAM)buffer);
 		
 		break;
@@ -422,7 +424,7 @@ static void ProcessNextSample()
 	if (sample_index == driver_get_count())
 	{
 		DetailsPrintf("Audit complete.\n");
-		SendDlgItemMessage(hAudit, IDCANCEL, WM_SETTEXT, 0, (LPARAM)"Close");
+		SendDlgItemMessage(hAudit, IDCANCEL, WM_SETTEXT, 0, (LPARAM)TEXT("Close"));
 		sample_index = -1;
 	}
 }
@@ -432,8 +434,7 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 	HWND	hEdit;
 	va_list marker;
 	char	buffer[2000];
-	char * s;
-	long l;
+	TCHAR*  t_s;
 
 	//RS 20030613 Different Ids for Property Page and Dialog
 	// so see which one's currently instantiated
@@ -453,11 +454,13 @@ static void CLIB_DECL DetailsPrintf(const char *fmt, ...)
 	
 	va_end(marker);
 
-	s = ConvertToWindowsNewlines(buffer);
+	t_s = tstring_from_utf8(ConvertToWindowsNewlines(buffer));
+	if( !t_s )
+		return;
 
-	l = Edit_GetTextLength(hEdit);
 	Edit_SetSel(hEdit, Edit_GetTextLength(hEdit), Edit_GetTextLength(hEdit));
-	SendMessage( hEdit, EM_REPLACESEL, FALSE, (WPARAM)s );
+	SendMessage( hEdit, EM_REPLACESEL, FALSE, (WPARAM)(LPCTSTR)win_tstring_strdup(t_s) );
+	free(t_s);
 }
 
 static const char * StatusString(int iStatus)

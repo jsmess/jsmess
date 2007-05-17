@@ -33,4 +33,8 @@ UINT8 * EEPROM_get_data_pointer(int * length);
 extern struct EEPROM_interface eeprom_interface_93C46;
 NVRAM_HANDLER( 93C46 );
 
+/* 93C66B */
+extern struct EEPROM_interface eeprom_interface_93C66B;
+NVRAM_HANDLER( 93C66B );
+
 #endif

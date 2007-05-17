@@ -174,19 +174,8 @@ READ8_HANDLER( wow_speech_r )
 	return data;				                   /* Return nicely */
 }
 
-int wow_status_r(void)
+
+UINT32 wow_speech_status_r(void *param)
 {
-//  logerror("asked for samples status %d\n",0);
 	return !sample_playing(0);
-}
-
-/* Read from port 2 (0x12) returns speech status as 0x80 */
-
-READ8_HANDLER( wow_port_2_r )
-{
-	int Ans;
-
-	Ans = (input_port_2_r(0) & 0x7F);
-	if (wow_status_r() != 0) Ans += 128;
-	return Ans;
 }

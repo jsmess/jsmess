@@ -17,6 +17,7 @@
 #include "strconv.h"
 #include "attrdlg.h"
 #include "secview.h"
+#include "winutf8.h"
 #include "winutil.h"
 #include "winutils.h"
 

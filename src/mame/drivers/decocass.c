@@ -1180,7 +1180,7 @@ static DRIVER_INIT( decocrom )
 	int i;
 
 	/* standard init */
-	init_decocass(machine);
+	driver_init_decocass(machine);
 
 	/* decrypt the ROMs */
 	for (i = 0; i < romlength; i++)

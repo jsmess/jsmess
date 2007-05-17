@@ -154,6 +154,19 @@ static tms7000_Regs tms7000;
 #define CHANGE_PC change_pc(pPC)
 
 
+static READ8_HANDLER( tms7000_internal_r );
+static WRITE8_HANDLER( tms7000_internal_w );
+static READ8_HANDLER( tms70x0_pf_r );
+static WRITE8_HANDLER( tms70x0_pf_w );
+
+static ADDRESS_MAP_START(tms7000_mem, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x0000, 0x007f)	AM_READWRITE(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */
+	AM_RANGE(0x0080, 0x00ff)	AM_READWRITE(MRA8_NOP, MWA8_NOP)						/* reserved */
+	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
+ADDRESS_MAP_END
+
+
+
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
@@ -210,12 +223,6 @@ static void tms7000_reset(void)
 {
 //  tms7000.architecture = (int)param;
 
-	/*memory_install_read8_handler(cpu, ADDRESS_SPACE_PROGRAM, 0x0000, 0x007f, 0x0000, 0x0000, tms7000_internal_r);
-    memory_install_write8_handler(cpu, ADDRESS_SPACE_PROGRAM, 0x0000, 0x007f, 0x0000, 0x0000, tms7000_internal_w);
-
-    memory_install_read8_handler(cpu, ADDRESS_SPACE_PROGRAM, 0x0100, 0x01ff, 0x0000, 0x0000, tms70x0_pf_r);
-    memory_install_write8_handler(cpu, ADDRESS_SPACE_PROGRAM, 0x0100, 0x01ff, 0x0000, 0x0000, tms70x0_pf_w);*/
-
 	tms7000.idle_state = 0;
 	tms7000.irq_state[ TMS7000_IRQ1_LINE ] = CLEAR_LINE;
 	tms7000.irq_state[ TMS7000_IRQ2_LINE ] = CLEAR_LINE;
@@ -248,6 +255,7 @@ static void tms7000_reset(void)
 
 	tms7000_div_by_16_trigger = -16;
 }
+
 
 
 /**************************************************************************
@@ -333,6 +341,7 @@ void tms7000_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = tms7000_dasm;	break;
 #endif
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &tms7000_icount;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map = construct_map_tms7000_mem; break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
         case CPUINFO_STR_NAME:	strcpy(info->s = cpuintrf_temp_str(), "TMS7000"); break;
@@ -569,7 +578,7 @@ static void tms7000_service_timer1( void )
 //  tick2 = activecpu_gettotalcycles();
 }
 
-WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
+static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 {
 	UINT8	temp1, temp2, temp3;
 
@@ -637,7 +646,7 @@ WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 	}
 }
 
- READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
+static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 {
 	UINT8 result;
 	UINT8	temp1, temp2, temp3;
@@ -730,10 +739,10 @@ static UINT16 bcd_sub( UINT16 a, UINT16 b)
 	return bcd_add(a, bcd_tencomp(b) & 0xff);
 }
 
-WRITE8_HANDLER( tms7000_internal_w ) {
+static WRITE8_HANDLER( tms7000_internal_w ) {
 	tms7000.rf[ offset ] = data;
 }
 
- READ8_HANDLER( tms7000_internal_r ) {
+static READ8_HANDLER( tms7000_internal_r ) {
 	return tms7000.rf[ offset ];
 }

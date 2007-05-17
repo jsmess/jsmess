@@ -17,15 +17,15 @@
 
 /* Declare inividual irq handlers, may be able to combine later */
 /* Main CPU */
-void spiders_irq0a(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
-void spiders_irq0b(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
-void spiders_irq1a(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
-void spiders_irq1b(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
-void spiders_irq2a(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
-void spiders_irq2b(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
+static void spiders_irq0a(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
+static void spiders_irq0b(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
+static void spiders_irq1a(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
+static void spiders_irq1b(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
+static void spiders_irq2a(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
+static void spiders_irq2b(int state) { cpunum_set_input_line(0,M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
 
 /* Sound CPU */
-void spiders_irq3a(int state) { cpunum_set_input_line(1,M6802_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
+static void spiders_irq3a(int state) { cpunum_set_input_line(1,M6802_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static WRITE8_HANDLER( spiders_soundcmd_w )
 {
@@ -33,32 +33,12 @@ static WRITE8_HANDLER( spiders_soundcmd_w )
 	pia_set_input_ca1(3,data  & 0x80 ? 1 : 0);
 }
 
-static WRITE8_HANDLER( spiders_sounda_w )
-{
-	discrete_sound_w(SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
-}
-
-static WRITE8_HANDLER( spiders_soundb_w )
-{
-	discrete_sound_w(SPIDERS_WEB_SOUND_DATA, data);
-}
-
-
-static WRITE8_HANDLER( spiders_soundctrl_w )
-{
-	discrete_sound_w(SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
-	discrete_sound_w(SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
-	discrete_sound_w(SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
-	discrete_sound_w(SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
-	discrete_sound_w(SPIDERS_X_EN, data & 0x01 ? 1 : 0);
-
-}
 
 /* Function prototypes */
 
-WRITE8_HANDLER( spiders_flip_w );
-WRITE8_HANDLER( spiders_vrif_w );
-READ8_HANDLER( spiders_vrom_r );
+static WRITE8_HANDLER( spiders_flip_w );
+static WRITE8_HANDLER( spiders_vrif_w );
+static READ8_HANDLER( spiders_vrom_r );
 
 
 /* Declare PIA structure */
@@ -164,21 +144,21 @@ static int vrom_ctrl_mode;
 static int vrom_ctrl_latch;
 static int vrom_ctrl_data;
 
-int spiders_video_flip=0;
+UINT8 spiders_video_flip=0;
 
-WRITE8_HANDLER( spiders_flip_w )
+static WRITE8_HANDLER( spiders_flip_w )
 {
 	spiders_video_flip=data;
 }
 
-WRITE8_HANDLER( spiders_vrif_w )
+static WRITE8_HANDLER( spiders_vrif_w )
 {
 	vrom_ctrl_mode=(data&0x80)>>7;
 	vrom_ctrl_latch=(data&0x30)>>4;
 	vrom_ctrl_data=15-(data&0x0f);
 }
 
-READ8_HANDLER( spiders_vrom_r )
+static READ8_HANDLER( spiders_vrom_r )
 {
 	int retval;
 	unsigned char *RAM = memory_region(REGION_GFX1);

@@ -2055,9 +2055,11 @@ INPUT_PORTS_START( saturn )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P2 R") PORT_PLAYER(2)	// R
 INPUT_PORTS_END
 
-DRIVER_INIT ( saturn )
+static void saturn_init_driver(int rgn)
 {
 	mame_system_time systime;
+
+	saturn_region = rgn;
 
 	/* get the current date/time from the core */
 	mame_get_current_datetime(Machine, &systime);
@@ -2084,22 +2086,24 @@ DRIVER_INIT ( saturn )
  	smpc_ram[0x5f] = 0x10;
 }
 
+DRIVER_INIT( saturn )
+{
+	saturn_init_driver(0);
+}
+
 DRIVER_INIT( saturnus )
 {
-	init_saturn(machine);
-	saturn_region = 4;
+	saturn_init_driver(4);
 }
 
 DRIVER_INIT( saturneu )
 {
-	init_saturn(machine);
-	saturn_region = 12;
+	saturn_init_driver(12);
 }
 
 DRIVER_INIT( saturnjp )
 {
-	init_saturn(machine);
-	saturn_region = 1;
+	saturn_init_driver(1);
 }
 
 

@@ -2115,14 +2115,14 @@ static DRIVER_INIT( grobda )
       */
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 
-	init_58_56(machine);
+	driver_init_58_56(machine);
 }
 
 static DRIVER_INIT( digdug2 )
 {
 	/* appears to not use the watchdog */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, MWA8_NOP);
-	init_58_56(machine);
+	driver_init_58_56(machine);
 }
 
 

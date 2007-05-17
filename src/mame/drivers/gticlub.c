@@ -1029,7 +1029,7 @@ static DRIVER_INIT(hangplt)
 
 static DRIVER_INIT(slrasslt)
 {
-	init_gticlub(machine);
+	driver_init_gticlub(machine);
 
 	// enable self-modifying code checks
 	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_OPTIONS_CHECK_SELFMOD_CODE);

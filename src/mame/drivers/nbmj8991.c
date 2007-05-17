@@ -134,15 +134,11 @@ static DRIVER_INIT( qmhayaku )
 static DRIVER_INIT( galkoku )
 {
 	nb1413m3_type = NB1413M3_GALKOKU;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( hyouban )
 {
 	nb1413m3_type = NB1413M3_HYOUBAN;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( galkaika )
@@ -154,8 +150,6 @@ static DRIVER_INIT( galkaika )
 	ROM[0x0002] = 0x56;
 #endif
 	nb1413m3_type = NB1413M3_GALKAIKA;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( tokyogal )
@@ -167,8 +161,6 @@ static DRIVER_INIT( tokyogal )
 	ROM[0x0002] = 0x56;
 #endif
 	nb1413m3_type = NB1413M3_TOKYOGAL;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( tokimbsj )
@@ -180,29 +172,21 @@ static DRIVER_INIT( tokimbsj )
 	ROM[0x0002] = 0x56;
 #endif
 	nb1413m3_type = NB1413M3_TOKIMBSJ;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( mcontest )
 {
 	nb1413m3_type = NB1413M3_MCONTEST;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( uchuuai )
 {
 	nb1413m3_type = NB1413M3_UCHUUAI;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( mjgottub )
 {
 	nb1413m3_type = NB1413M3_MJGOTTUB;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( av2mj1bb )

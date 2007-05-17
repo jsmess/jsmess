@@ -3737,7 +3737,7 @@ static DRIVER_INIT( aamat )
 	/*
         Tournament Version
     */
-	init_aama(machine);
+	driver_init_aama(machine);
 	timekeeper_init( 0, TIMEKEEPER_M48T02, NULL );
 	memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r);
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_w);
@@ -3775,7 +3775,7 @@ static DRIVER_INIT( gtclassp )
 {
 	/* a little extra protection */
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x680000, 0x680003, 0, 0, gtclass_prot_result_r);
-	init_aama(machine);
+	driver_init_aama(machine);
 
 	/* The protection code is:
 

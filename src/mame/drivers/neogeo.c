@@ -7386,13 +7386,13 @@ ROM_END
 
 DRIVER_INIT( fatfury2 )
 {
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	fatfury2_install_protection();
 }
 
 DRIVER_INIT( mslugx )
 {
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	mslugx_install_protection();
 }
 
@@ -7401,7 +7401,7 @@ DRIVER_INIT( kof99 )
 	kof99_decrypt_68k();
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0x00);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	kof99_install_protection();
 }
 
@@ -7410,7 +7410,7 @@ DRIVER_INIT( garou )
 	garou_decrypt_68k();
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0x06);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	garou_install_protection();
 }
 
@@ -7419,7 +7419,7 @@ DRIVER_INIT( garouo )
 	garouo_decrypt_68k();
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0x06);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	garouo_install_protection();
 }
 
@@ -7427,7 +7427,7 @@ DRIVER_INIT( garoubl )
 {
 	neogeo_bootleg_sx_decrypt(2);
 	neogeo_bootleg_cx_decrypt();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( mslug3 )
@@ -7435,7 +7435,7 @@ DRIVER_INIT( mslug3 )
 	mslug3_decrypt_68k();
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0xad);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	mslug3_install_protection();
 }
 
@@ -7444,7 +7444,7 @@ DRIVER_INIT( kof2000 )
 	kof2000_decrypt_68k();
 	neogeo_fix_bank_type = 2;
 	kof2000_neogeo_gfx_decrypt(0x00);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	kof2000_install_protection();
 }
 
@@ -7452,14 +7452,14 @@ DRIVER_INIT( kof2001 )
 {
 	neogeo_fix_bank_type = 0;
 	kof2000_neogeo_gfx_decrypt(0x1e);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( mslug4 )
 {
 	neogeo_fix_bank_type = 1; /* USA violent content screen is wrong -- not a bug, confirmed on real hardware! */
 	kof2000_neogeo_gfx_decrypt(0x31);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	neo_pcm2_snk_1999(8);
 }
 
@@ -7467,76 +7467,76 @@ DRIVER_INIT( kof99n )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0x00);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( ganryu )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0x07);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( s1945p )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0x05);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( preisle2 )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0x9f);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( mslug3n )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0xad);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( kof2000n )
 {
 	neogeo_fix_bank_type = 2;
 	kof2000_neogeo_gfx_decrypt(0x00);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( bangbead )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0xf8);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( nitd )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0xff);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( zupapa )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0xbd);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( sengoku3 )
 {
 	neogeo_fix_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(0xfe);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT ( kof98 )
 {
 	kof98_decrypt_68k();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_kof98_protection();
 }
 
@@ -7546,7 +7546,7 @@ DRIVER_INIT( mjneogeo )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x300001, 0, 0, mjneogeo_r);
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x380000, 0x380001, 0, 0, mjneogeo_w);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 /* Pop and Bounce and use a custom Spinner for Controls */
@@ -7554,7 +7554,7 @@ DRIVER_INIT( popbounc )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x300001, 0, 0, popbounc1_16_r);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x340000, 0x340001, 0, 0, popbounc2_16_r);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( rotd )
@@ -7562,7 +7562,7 @@ DRIVER_INIT( rotd )
 	neo_pcm2_snk_1999(16);
 	neogeo_fix_bank_type = 1;
 	kof2000_neogeo_gfx_decrypt(0x3f);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 
@@ -7572,7 +7572,7 @@ DRIVER_INIT( kof2002 )
 	neo_pcm2_swap(0);
 	neogeo_fix_bank_type = 0;
 	kof2000_neogeo_gfx_decrypt(0xec);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( kf2k2pls )
@@ -7581,7 +7581,7 @@ DRIVER_INIT( kf2k2pls )
 	neo_pcm2_swap(0);
 	neogeo_fix_bank_type = 0;
 	cmc50_neogeo_gfx_decrypt(0xec);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( kf2k2mp )
@@ -7591,7 +7591,7 @@ DRIVER_INIT( kf2k2mp )
 	neogeo_bootleg_sx_decrypt(2);
 	neogeo_fix_bank_type = 0;
 	cmc50_neogeo_gfx_decrypt(0xec);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( kof2km2 )
@@ -7601,7 +7601,7 @@ DRIVER_INIT( kof2km2 )
 	neogeo_bootleg_sx_decrypt(1);
 	neogeo_fix_bank_type = 0;
 	cmc50_neogeo_gfx_decrypt(0xec);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( matrim )
@@ -7610,7 +7610,7 @@ DRIVER_INIT( matrim )
 	neo_pcm2_swap(1);
 	neogeo_fix_bank_type = 2;
 	kof2000_neogeo_gfx_decrypt(0x6a);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( pnyaa )
@@ -7618,7 +7618,7 @@ DRIVER_INIT( pnyaa )
 	neo_pcm2_snk_1999(4);
 	neogeo_fix_bank_type = 1;
 	kof2000_neogeo_gfx_decrypt(0x2e);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( mslug5 ) /* By HalRIN */
@@ -7627,7 +7627,7 @@ DRIVER_INIT( mslug5 ) /* By HalRIN */
 	neo_pcm2_swap(2);
 	neogeo_fix_bank_type = 1;
 	kof2000_neogeo_gfx_decrypt(0x19);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 }
 
@@ -7639,7 +7639,7 @@ DRIVER_INIT( ms5pcb )
 	neogeo_fix_bank_type = 2;
 	svcpcb_s1data_decrypt();
 	neo_pcm2_swap(2);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 }
 
@@ -7650,7 +7650,7 @@ DRIVER_INIT( ms5plus )
 //  decrypt_ms5plus_s1();
     neogeo_bootleg_sx_decrypt(1);
 	neogeo_fix_bank_type = 1;
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_ms5plus_protection();
 }
 
@@ -7662,7 +7662,7 @@ DRIVER_INIT( svcpcb )
 	svcpcb_s1data_decrypt();
 	neo_pcm2_swap(3);
 	neogeo_fix_bank_type = 2;
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 }
 
@@ -7672,7 +7672,7 @@ DRIVER_INIT( svchaosa ) /* By HalRIN */
 	neo_pcm2_swap(3);
 	neogeo_fix_bank_type = 2;
 	kof2000_neogeo_gfx_decrypt(0x57);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 }
 
@@ -7680,7 +7680,7 @@ DRIVER_INIT( svcboot )
 {
 	svcboot_px_decrypt();
 	svcboot_cx_decrypt();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 }
 
@@ -7691,7 +7691,7 @@ DRIVER_INIT( svcplus )
 //  svcplus_sx_decrypt();
 	neogeo_bootleg_sx_decrypt(1);
 	svcplus_px_hack();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( svcplusa )
@@ -7699,7 +7699,7 @@ DRIVER_INIT( svcplusa )
 	svcplusa_px_decrypt();
 	svcboot_cx_decrypt();
 	svcplus_px_hack();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( svcsplus )
@@ -7709,7 +7709,7 @@ DRIVER_INIT( svcsplus )
 	neogeo_bootleg_sx_decrypt(2);
 	svcboot_cx_decrypt();
 	svcsplus_px_hack();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 }
 
@@ -7719,7 +7719,7 @@ DRIVER_INIT( samsho5 )
 	neo_pcm2_swap(4);
 	neogeo_fix_bank_type = 1;
 	kof2000_neogeo_gfx_decrypt(0x0f);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( samsho5b )
@@ -7728,7 +7728,7 @@ DRIVER_INIT( samsho5b )
 	neogeo_fix_bank_type = 1;
 	kof2000_neogeo_gfx_decrypt(0x0f);
 	samsh5bl_px_decrypt();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( kf2k3pcb ) /* Jamama, Single Board */
@@ -7741,7 +7741,7 @@ DRIVER_INIT( kf2k3pcb ) /* Jamama, Single Board */
 	/* rom[i] = BITSWAP8(rom[i], 5, 6, 1, 4, 3, 0, 7, 2) -- extra encrypted m1 swap? not confirmed */
 	neo_pcm2_swap(5);
 	neogeo_fix_bank_type = 2;
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 	memory_install_read16_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc7ffff, 0, 0, MRA16_BANK3 );  // 512k bios
 }
@@ -7753,7 +7753,7 @@ DRIVER_INIT( kof2003 )
 	neo_pcm2_swap(5);
 	neogeo_fix_bank_type = 2;
 	kof2000_neogeo_gfx_decrypt(0x9d);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_pvc_protection();
 }
 
@@ -7761,7 +7761,7 @@ DRIVER_INIT( kof2003b )
 {
 //  kof2003b_sx_decrypt();
 	neogeo_bootleg_sx_decrypt(1);
-    init_neogeo(machine);
+	driver_init_neogeo(machine);
 	kof2003b_install_protection();
 }
 
@@ -7770,7 +7770,7 @@ DRIVER_INIT( kof2k3pl )
 	kof2k3pl_px_decrypt();
 	//decrypt_ms5plus_s1();
     neogeo_bootleg_sx_decrypt(1);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	kf2k3pl_install_protection();
 }
 
@@ -7780,7 +7780,7 @@ DRIVER_INIT( kof2k3up )
     kof2k3up_px_decrypt();
 //  kof2k3up_sx_decrypt();
 	neogeo_bootleg_sx_decrypt(2);
-    init_neogeo(machine);
+	driver_init_neogeo(machine);
 	kof2k3up_install_protection();
 }
 
@@ -7792,7 +7792,7 @@ DRIVER_INIT( samsh5sp )
 	neo_pcm2_swap(6);
 	neogeo_fix_bank_type = 1;
 	kof2000_neogeo_gfx_decrypt(0x0d);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 
@@ -7847,7 +7847,7 @@ DRIVER_INIT( jockeygp )
 //  memory_install_read16_handler( 0, ADDRESS_SPACE_PROGRAM, 0x280000, 0x280001, 0, 0, vliner_coins_r );
 //  memory_install_read16_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2c0000, 0x2c0001, 0, 0, vliner_2c0000_r );
 
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( vliner )
@@ -7860,7 +7860,7 @@ DRIVER_INIT( vliner )
 	memory_install_read16_handler( 0, ADDRESS_SPACE_PROGRAM, 0x280000, 0x280001, 0, 0, vliner_coins_r );
 	memory_install_read16_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2c0000, 0x2c0001, 0, 0, vliner_2c0000_r );
 
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 /* bootleg related INITs */
@@ -7870,48 +7870,48 @@ DRIVER_INIT( kog )
 	kog_px_decrypt();
 	neogeo_bootleg_sx_decrypt(1);
 	neogeo_bootleg_cx_decrypt();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 
 DRIVER_INIT( kof10th )
 {
 	decrypt_kof10th();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	install_kof10th_protection();
 }
 
 DRIVER_INIT( kf10thep )
 {
 	decrypt_kf10thep();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 
 DRIVER_INIT( kf2k5uni )
 {
 	decrypt_kf2k5uni();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( cthd2003 )
 {
 	decrypt_cthd2003();
- 	init_neogeo(machine);
+ 	driver_init_neogeo(machine);
 	patch_cthd2003();
 }
 
 DRIVER_INIT ( ct2k3sp )
 {
 	decrypt_ct2k3sp();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 	patch_cthd2003();
 }
 
 DRIVER_INIT( kof2k4se )
 {
 	decrypt_kof2k4se_68k();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( lans2004 )
@@ -7920,14 +7920,14 @@ DRIVER_INIT( lans2004 )
 	lans2004_vx_decrypt();
 	neogeo_bootleg_sx_decrypt(1);
 	neogeo_bootleg_cx_decrypt();
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 DRIVER_INIT( mslug3b6 )
 {
 	neogeo_bootleg_sx_decrypt(2);
 	cmc42_neogeo_gfx_decrypt(0xad);
-	init_neogeo(machine);
+	driver_init_neogeo(machine);
 }
 
 

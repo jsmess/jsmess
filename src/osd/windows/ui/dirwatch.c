@@ -15,6 +15,7 @@
 #include <tchar.h>
 #include "dirwatch.h"
 #include "ui/m32util.h"
+#include "strconv.h"
 
 typedef BOOL (WINAPI *READDIRECTORYCHANGESFUNC)(HANDLE hDirectory, LPVOID lpBuffer,
 		DWORD nBufferLength, BOOL bWatchSubtree, DWORD dwNotifyFilter,
@@ -140,6 +141,7 @@ static void DirWatcher_Signal(PDIRWATCHER pWatcher, struct DirWatcherEntry *pEnt
 	BOOL bPause;
 	HANDLE hFile;
 	int nTries;
+	TCHAR* t_filename;
 
 	{
 		int nLength;
@@ -174,10 +176,14 @@ static void DirWatcher_Signal(PDIRWATCHER pWatcher, struct DirWatcherEntry *pEnt
 	// send the message (assuming that we have a target)
 	if (pWatcher->hwndTarget)
 	{
+		t_filename = tstring_from_utf8(pszFileName);
+		if( !t_filename )
+			return;
 		SendMessage(pWatcher->hwndTarget,
 			pWatcher->nMessage,
 			(pEntry->nIndex << 16) | (pEntry->nSubIndex << 0),
-			(LPARAM) pszFileName);
+			(LPARAM)(LPCTSTR) win_tstring_strdup(t_filename));
+		free(t_filename);
 	}
 
 	DirWatcher_SetupWatch(pWatcher, pEntry);

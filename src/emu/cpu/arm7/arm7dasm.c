@@ -785,6 +785,11 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 								rd = ( opcode & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 								pBuf += sprintf( pBuf, "CMP R%d, R%d", rd, rs );
 								break;
+							case 0xb: /* CMN Rd, Rs - check flags, add dasm */
+								rs = ( opcode & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
+								rd = ( opcode & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
+								pBuf += sprintf( pBuf, "CMN R%d, R%d", rd, rs );
+								break;
 							case 0xc: /* ORR Rd, Rs */
 								rs = ( opcode & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
 								rd = ( opcode & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
@@ -818,8 +823,14 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 								rd = opcode & THUMB_HIREG_RD;
 								switch( ( opcode & THUMB_HIREG_H ) >> THUMB_HIREG_H_SHIFT )
 								{
+									case 0x1: /* ADD Rd, HRs */
+										pBuf += sprintf( pBuf, "ADD R%d, R%d", rd, rs + 8 );
+										break;
 									case 0x2: /* ADD HRd, Rs */
 										pBuf += sprintf( pBuf, "ADD R%d, R%d", rd + 8, rs );
+										break;
+									case 0x3: /* ADD HRd, HRs */
+										pBuf += sprintf( pBuf, "ADD R%d, R%d", rd + 8, rs + 8 );
 										break;
 									default:
 										sprintf( pBuf, "INVALID %04x", opcode);
@@ -1020,13 +1031,13 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 				if( opcode & THUMB_STACKOP_L )
 				{
 					rd = ( opcode & THUMB_STACKOP_RD ) >> THUMB_STACKOP_RD_SHIFT;
-					offs = (INT8)( opcode & THUMB_INSN_IMM );
+					offs = (UINT8)( opcode & THUMB_INSN_IMM );
 					pBuf += sprintf( pBuf, "LDR R%d, [SP, #%03x]", rd, offs << 2 );
 				}
 				else
 				{
 					rd = ( opcode & THUMB_STACKOP_RD ) >> THUMB_STACKOP_RD_SHIFT;
-					offs = (INT8)( opcode & THUMB_INSN_IMM );
+					offs = (UINT8)( opcode & THUMB_INSN_IMM );
 					pBuf += sprintf( pBuf, "STR R%d, [SP, #%03x]", rd, offs << 2 );
 				}
 				break;

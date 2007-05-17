@@ -1947,7 +1947,7 @@ READ32_HANDLER ( rfjet_speedup_r )
 	return spimainram[(0x002894c-0x800)/4];
 }
 
-static DRIVER_INIT( spi )
+static void init_spi(running_machine *machine)
 {
 	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
@@ -2009,7 +2009,7 @@ static DRIVER_INIT( viprp1o )
 
 
 
-static DRIVER_INIT( rf2 )
+static void init_rf2(running_machine *machine)
 {
 	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );

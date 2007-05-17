@@ -2326,7 +2326,7 @@ static DRIVER_INIT (kirarast)
 //  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
 
-	init_ss92047_01(machine);
+	driver_init_ss92047_01(machine);
 }
 
 static DRIVER_INIT (47pie2)
@@ -2334,14 +2334,14 @@ static DRIVER_INIT (47pie2)
 //  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
 
-	init_ss92048_01(machine);
+	driver_init_ss92048_01(machine);
 }
 
 static DRIVER_INIT (f1superb)
 {
 	UINT32 *pROM = (UINT32 *)memory_region(REGION_CPU1);
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
-	init_ss92046_01(machine);
+	driver_init_ss92046_01(machine);
 }
 
 /********** GAME DRIVERS **********/

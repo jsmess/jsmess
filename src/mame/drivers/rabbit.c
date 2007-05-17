@@ -1208,14 +1208,8 @@ static MACHINE_DRIVER_START( tmmjprd )
 MACHINE_DRIVER_END
 
 
-DRIVER_INIT( rabbit_common )
-{
-
-}
-
 DRIVER_INIT(rabbit)
 {
-	init_rabbit_common(machine);
 	rabbit_banking = 1;
 	rabbit_vblirqlevel = 6;
 	rabbit_bltirqlevel = 4;
@@ -1224,7 +1218,6 @@ DRIVER_INIT(rabbit)
 
 DRIVER_INIT(tmmjprd)
 {
-	init_rabbit_common(machine);
 	rabbit_banking = 0;
 	rabbit_vblirqlevel = 5;
 	rabbit_bltirqlevel = 3; // actually palette related?

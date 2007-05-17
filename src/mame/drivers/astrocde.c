@@ -1,79 +1,178 @@
 /****************************************************************************
 
-Bally Astrocade style games
+    Bally Astrocade style games
+    driver by Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles
 
-driver by Nicola Salmoria, Mike Coates, Frank Palazzolo
+    Games supported:
+        * Sea Wolf II
+        * Extra Bases
+        * Space Zap
+        * Wizard of Wor
+        * Gorf
+        * Robby Roto
+        * Professor Pac-Man
+        * Demons and Dragons
+        * Ten Pix Deluxe
 
-TODO:
-    add rotate support
-    profpac_vm - self test
-    look into NVRAM problems in demndrgn
-    try 10-pin deluxe roms?
-    finish looking at noise gen bug
-    optimize sound code
-    dig into gorf timing hacks
+    Known bugs:
+        * no audio board for Demons and Dragons
+        * Demons and Dragons doesn't work with RAM protection enabled
+        * Professor Pac-Man fails screen RAM test
 
-Notes:
-- In seawolf2, service mode dip switch turns on memory test. Reset with 2 pressed
-  to get to an input check screen, reset with 1+2 pressed to get to a convergence
-  test screen.
+****************************************************************************
 
+    Game boards:
+        90002 = Sea Wolf II Motherboard (seawolf2)
+        90700 = Sea Wolf II Logic Board (seawolf2, ebases)
+        91312 = Characterization Card (seawolf2)
+        91354 = CPU Board (ebases, spacezap, wow, gorf, robby)
+        91355 = Pattern Board (spacezap, wow, gorf, robby)
+        91356 = RAM Board (ebases, spacezap, wow, gorf, robby)
+        91364 = ROM/RAM Board (gorf)
+        91397 = Memory Board (wow)
+        91423 = Memory Board (robby)
+        91465 = 16 Color CPU Card (profpac/tenpindx)
+        91466 = Screen RAM Board (profpac/tenpindx)
+        91467 = Super Game Memory (profpac/tenpindx)
+        91469 = Game Board (profpac)
+        91488 = Pattern Mover (appears to be identical to 91355) (profpac/tenpindx)
+        91699 = Sound I/O Board (tenpindx)
+        91846 = 640K EPROM board (profpac)
 
-memory map (preliminary)
+    Sea Wolf II:
+        90002 = Sea Wolf II Motherboard
+        90700 = Sea Wolf II Logic Board
+        91312 = Characterization Card
 
-0000-3fff ROM but also "magic" RAM (which processes data and copies it to the video RAM)
-4000-7fff SCREEN RAM (bitmap)
-8000-cfff ROM
-d000-d3ff STATIC RAM
+    Extra Bases:
+        90700 = Game I/O board
+        91354 = CPU Board
+        91356 = RAM Board
 
-I/O ports:
-IN:
-08        intercept register (collision detector)
-          bit 0: intercept in pixel 3 in an OR or XOR write since last reset
-          bit 1: intercept in pixel 2 in an OR or XOR write since last reset
-          bit 2: intercept in pixel 1 in an OR or XOR write since last reset
-          bit 3: intercept in pixel 0 in an OR or XOR write since last reset
-          bit 4: intercept in pixel 3 in last OR or XOR write
-          bit 5: intercept in pixel 2 in last OR or XOR write
-          bit 6: intercept in pixel 1 in last OR or XOR write
-          bit 7: intercept in pixel 0 in last OR or XOR write
-10        IN0
-11        IN1
-12        IN2
-13        DSW
-14        Video Retrace
-15        ?
-17        Speech Synthesizer (Output)
+    Space Zap:
+        90706 = Space Zap Game Board
+        91354 = CPU Board
+        91355 = Pattern Board
+        91356 = RAM Board
 
-OUT:
-00-07     palette (00-03 = right part of screen; 04-07 left part)
-08        select video mode (0 = low res 160x102, 1 = high res 320x204)
-09        --xxxxxx position where to switch from the "left" to the "right" palette (/2).
-          xx------ background color (portion of screen after vblank)
-0a        screen height
-0b        color block transfer
-0c        magic RAM control
-          bit 7: ?
-          bit 6: flip
-          bit 5: draw in XOR mode
-          bit 4: draw in OR mode
-          bit 3: "expand" mode (convert 1bpp data to 2bpp)
-          bit 2: "rotate" mode (rotate 90 degrees - NOT EMULATED)
-          bit 1:\ shift amount to be applied before copying
-          bit 0:/
-0d        set interrupt vector
-10-18     sound
-19        magic RAM expand mode color
-78-7e     pattern board (see video.c for details)
+    Wizard of Wor:
+        90708 = Game Board
+        91354 = CPU Board
+        91355 = Pattern Transfer Board
+        91356 = RAM Board
+        91397 = Memory Board
+
+    Gorf:
+        90708 = Game Board
+        91354 = CPU Board
+        91355 = Pattern Board
+        91356 = RAM Board
+        91364 = ROM/RAM Board
+
+    Robby Roto:
+        90708 = Game Board
+        91354 = CPU Board
+        91355 = Pattern Board
+        91356 = RAM Board
+        91423 = Memory Board
+
+    Professor Pac-Man:
+        91465 = 16 Color CPU Card
+        91466 = Screen RAM Board
+        91467 = Super Game Memory
+        91469 = Game Board
+        91488 = Pattern Mover (appears to be identical to 91355)
+        91846 = 640K EPROM board
+
+    Ten Pin Deluxe:
+        91456 = 16 Color CPU Card
+        91466 = Screen RAM Board
+        91467 = Super Game Memory
+        91488 = Pattern Mover
+        91699 = Sound I/O Board
+
+****************************************************************************
+
+    Notes:
+    - In seawolf2, service mode dip switch turns on memory test. Reset with
+      2 pressed to get to an input check screen, reset with 1+2 pressed to
+      get to a convergence test screen.
 
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80daisy.h"
 #include "includes/astrocde.h"
+#include "machine/z80ctc.h"
 #include "sound/samples.h"
 #include "sound/astrocde.h"
+#include "sound/ay8910.h"
+#include "tenpindx.lh"
 
-static UINT8 game_on = 0;
+
+static UINT8 *protected_ram;
+
+static UINT8 port_1_last;
+static UINT8 port_2_last;
+static UINT8 ram_write_enable;
+static UINT8 input_select;
+static UINT8 profpac_bank;
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( astrocde )
+{
+	state_save_register_global(port_1_last);
+	state_save_register_global(port_2_last);
+	state_save_register_global(ram_write_enable);
+	state_save_register_global(input_select);
+	state_save_register_global(profpac_bank);
+
+	port_1_last = port_2_last = 0xff;
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Protected RAM
+ *
+ *************************************/
+
+static WRITE8_HANDLER( protected_ram_enable_w )
+{
+	ram_write_enable = TRUE;
+}
+
+
+static READ8_HANDLER( protected_ram_r )
+{
+	ram_write_enable = FALSE;
+	return protected_ram[offset];
+}
+
+
+static WRITE8_HANDLER( protected_ram_w )
+{
+	if (ram_write_enable)
+		protected_ram[offset] = data;
+	ram_write_enable = FALSE;
+}
+
+
+
+/*************************************
+ *
+ *  Sea Wolf II specific input/output
+ *
+ *************************************/
 
 static WRITE8_HANDLER( seawolf2_lamps_w )
 {
@@ -85,51 +184,381 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 	/* ------x- torpedo 3 available */
 	/* -------x torpedo 4 available */
 
-	/* I'm only supporting the "RELOAD" lamp since we don't have enough leds ;-) */
-	set_led_status(offset^1,data & 0x10);
+	output_set_lamp_value((offset ^ 1) * 7 + 0, ( data >> 5) & 1);	/* 0/7  = hit lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 1, (~data >> 4) & 1);	/* 1/8  = reload lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 2, ( data >> 4) & 1);	/* 2/9  = ready lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 3, ( data >> 3) & 1);	/* 3/10 = torpedo 1 lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 4, ( data >> 2) & 1);	/* 4/11 = torpedo 2 lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 5, ( data >> 1) & 1);	/* 5/12 = torpedo 3 lamp */
+	output_set_lamp_value((offset ^ 1) * 7 + 6, ( data >> 0) & 1);	/* 6/13 = torpedo 4 lamp */
 }
+
 
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
-	if (game_on)
-	{
-		if (data & 0x01)
-			sample_start (1, 1, 0);  /* Left Torpedo */
-		if (data & 0x02)
-			sample_start (0, 0, 0);  /* Left Ship Hit */
-		if (data & 0x04)
-			sample_start (4, 4, 0);  /* Left Mine Hit */
-		if (data & 0x08)
-			sample_start (6, 1, 0);  /* Right Torpedo */
-		if (data & 0x10)
-			sample_start (5, 0, 0);  /* Right Ship Hit */
-		if (data & 0x20)
-			sample_start (9, 4, 0);  /* Right Mine Hit */
-	}
+	UINT8 rising_bits = data & ~port_1_last;
+	port_1_last = data;
+
+	if (rising_bits & 0x01) sample_start(1, 1, 0);  /* Left Torpedo */
+	if (rising_bits & 0x02) sample_start(0, 0, 0);  /* Left Ship Hit */
+	if (rising_bits & 0x04) sample_start(4, 4, 0);  /* Left Mine Hit */
+	if (rising_bits & 0x08) sample_start(6, 1, 0);  /* Right Torpedo */
+	if (rising_bits & 0x10) sample_start(5, 0, 0);  /* Right Ship Hit */
+	if (rising_bits & 0x20) sample_start(9, 4, 0);  /* Right Mine Hit */
 }
+
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
-	game_on = data & 0x80;
+	UINT8 rising_bits = data & ~port_2_last;
+	port_2_last = data;
 
-	if (game_on)
+	sample_set_volume(0, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(1, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(3, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(4, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(5, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(6, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(8, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(9, (data & 0x80) ? 1.0 : 0.0);
+
+	/* dive panning controlled by low 3 bits */
+	sample_set_volume(2, (float)(~data & 0x07) / 7.0);
+	sample_set_volume(7, (float)(data & 0x07) / 7.0);
+
+	if (rising_bits & 0x08)
 	{
-		// data & 0x07 control dive L/R panning - not implemented
-		if (data & 0x08)
-			sample_start (2, 2, 0);  /* Dive */
-		if (data & 0x10)
-			sample_start (8, 3, 0);  /* Right Sonar */
-		if (data & 0x20)
-			sample_start (3, 3, 0);  /* Left Sonar */
+		sample_start(2, 2, 0);
+		sample_start(7, 2, 0);
 	}
+	if (rising_bits & 0x10) sample_start(8, 3, 0);  /* Right Sonar */
+	if (rising_bits & 0x20) sample_start(3, 3, 0);  /* Left Sonar */
 
 	coin_counter_w(0, data & 0x40);    /* Coin Counter */
 }
 
-void astrocade_state_save_register_main(void)
+
+
+/*************************************
+ *
+ *  Extra Bases specific input/output
+ *
+ *************************************/
+
+static UINT32 ebases_trackball_r(void *param)
 {
-	state_save_register_global(game_on);
+	static const char *names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
+	return readinputportbytag(names[input_select]);
 }
+
+
+static WRITE8_HANDLER( ebases_trackball_select_w )
+{
+	input_select = data & 3;
+}
+
+
+static WRITE8_HANDLER( ebases_coin_w )
+{
+	coin_counter_w(0, data & 1);
+}
+
+
+
+/*************************************
+ *
+ *  Space Zap specific input/output
+ *
+ *************************************/
+
+static READ8_HANDLER( spacezap_io_r )
+{
+	coin_counter_w(0, (offset >> 8) & 1);
+	coin_counter_w(1, (offset >> 9) & 1);
+	return readinputportbytag_safe("P3HANDLE", 0xff);
+}
+
+
+
+/*************************************
+ *
+ *  Wizard of Wor specific input/output
+ *
+ *************************************/
+
+static READ8_HANDLER( wow_io_r )
+{
+	UINT8 data = (offset >> 8) & 1;
+
+	switch ((offset >> 9) & 7)
+	{
+		case 0: coin_counter_w(0, data);		break;
+		case 1: coin_counter_w(1, data);		break;
+		case 2: astrocade_sparkle[0] = data;	break;
+		case 3: astrocade_sparkle[1] = data;	break;
+		case 4: astrocade_sparkle[2] = data;	break;
+		case 5: astrocade_sparkle[3] = data;	break;
+		case 7: coin_counter_w(2, data); 		break;
+	}
+	return 0xff;
+}
+
+
+
+/*************************************
+ *
+ *  Gorf specific input/output
+ *
+ *************************************/
+
+static READ8_HANDLER( gorf_io_1_r )
+{
+	UINT8 data = (offset >> 8) & 1;
+
+	switch ((offset >> 9) & 7)
+	{
+		case 0: coin_counter_w(0, data);		break;
+		case 1: coin_counter_w(1, data);		break;
+		case 2: astrocade_sparkle[0] = data;	break;
+		case 3: astrocade_sparkle[1] = data;	break;
+		case 4: astrocade_sparkle[2] = data;	break;
+		case 5: astrocade_sparkle[3] = data;	break;
+	}
+	return 0xff;
+}
+
+
+static READ8_HANDLER( gorf_io_2_r )
+{
+	UINT8 data = (offset >> 8) & 1;
+
+	switch ((offset >> 9) & 7)
+	{
+		case 0: output_set_lamp_value(0, data);	break;
+		case 1: output_set_lamp_value(1, data);	break;
+		case 2: output_set_lamp_value(2, data);	break;
+		case 3: output_set_lamp_value(3, data);	break;
+		case 4: output_set_lamp_value(4, data);	break;
+		case 5: output_set_lamp_value(5, data);	break;
+	}
+	return 0xff;
+}
+
+
+
+/*************************************
+ *
+ *  Robby Roto specific input/output
+ *
+ *************************************/
+
+static READ8_HANDLER( robby_io_r )
+{
+	UINT8 data = (offset >> 8) & 1;
+
+	switch ((offset >> 9) & 7)
+	{
+		case 0: coin_counter_w(0, data);	break;
+		case 1: coin_counter_w(1, data);	break;
+		case 2: coin_counter_w(2, data);	break;
+		case 6: set_led_status(0, data);	break;
+		case 7: set_led_status(1, data);	break;
+	}
+	return 0xff;
+}
+
+
+
+/*************************************
+ *
+ *  Professor Pac-Man specific input/output
+ *
+ *************************************/
+
+static READ8_HANDLER( profpac_io_1_r )
+{
+	coin_counter_w(0, (offset >> 8) & 1);
+	coin_counter_w(1, (offset >> 9) & 1);
+	set_led_status(0, (offset >> 10) & 1);
+	set_led_status(1, (offset >> 11) & 1);
+	return 0xff;
+}
+
+
+static READ8_HANDLER( profpac_io_2_r )
+{
+	output_set_lamp_value(0, (offset >> 8) & 1);	/* left lamp A */
+	output_set_lamp_value(1, (offset >> 9) & 1);	/* left lamp B */
+	output_set_lamp_value(2, (offset >> 10) & 1);	/* left lamp C */
+	output_set_lamp_value(3, (offset >> 12) & 1);	/* right lamp A */
+	output_set_lamp_value(4, (offset >> 13) & 1);	/* right lamp B */
+	output_set_lamp_value(5, (offset >> 14) & 1);	/* right lamp C */
+	return 0xff;
+}
+
+
+static WRITE8_HANDLER( profpac_banksw_w )
+{
+	int bank = (data >> 5) & 3;
+
+	/* remember the banking bits for save state support */
+	profpac_bank = data;
+
+	/* set the main banking */
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, MRA8_BANK1);
+	memory_set_bankptr(1, memory_region(REGION_USER1) + 0x8000 * bank);
+
+	/* bank 0 reads video RAM in the 4000-7FFF range */
+	if (bank == 0)
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
+
+	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
+	if ((data & 0x80) && memory_region(REGION_USER2) != NULL)
+	{
+		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
+		bank = data - 0x80;
+
+		/* if the bank is in range, map the appropriate bank */
+		if (bank < 0x28)
+		{
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_BANK2);
+			memory_set_bankptr(2, memory_region(REGION_USER2) + 0x4000 * bank);
+		}
+		else
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_UNMAP);
+	}
+}
+
+
+static void profbank_banksw_restore(void)
+{
+	profpac_banksw_w(0, profpac_bank);
+}
+
+
+
+/*************************************
+ *
+ *  Demons and Dragons specific input/output
+ *
+ *************************************/
+
+static READ8_HANDLER( demndrgn_io_r )
+{
+	coin_counter_w(0, (offset >> 8) & 1);
+	coin_counter_w(1, (offset >> 9) & 1);
+	set_led_status(0, (offset >> 10) & 1);
+	set_led_status(1, (offset >> 11) & 1);
+	input_select = (offset >> 12) & 1;
+	return 0xff;
+}
+
+
+static UINT32 demndragn_joystick_r(void *param)
+{
+	static const char *names[] = { "MOVEX", "MOVEY" };
+	return readinputportbytag(names[input_select]);
+}
+
+
+static WRITE8_HANDLER( demndrgn_sound_w )
+{
+	logerror("Trigger sound sample 0x%02x\n",data);
+}
+
+
+
+/*************************************
+ *
+ *  Ten Pin Deluxe specific input/output
+ *
+ *************************************/
+
+static void ctc_interrupt(int state)
+{
+	cpunum_set_input_line(1, 0, state);
+}
+
+
+static z80ctc_interface ctc_intf =
+{
+	0,              	/* clock (filled in from the CPU 0 clock) */
+	0,              	/* timer disables */
+	ctc_interrupt,  	/* interrupt handler */
+	0,					/* ZC/TO0 callback */
+	0,              	/* ZC/TO1 callback */
+	0               	/* ZC/TO2 callback */
+};
+
+
+static const struct AY8910interface ay8912_interface =
+{
+	input_port_5_r
+};
+
+
+static MACHINE_START( tenpindx )
+{
+	/* initialize the CTC */
+	ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
+	z80ctc_init(0, &ctc_intf);
+	return machine_start_astrocde(machine);
+}
+
+
+static WRITE8_HANDLER( tenpindx_sound_w )
+{
+	soundlatch_w(offset, data);
+	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+static WRITE8_HANDLER( tenpindx_lamp_w )
+{
+	/* lamps */
+	if (offset == 0)
+	{
+		output_set_lamp_value(0, (data >> 2) & 1);
+		output_set_lamp_value(1, (data >> 3) & 1);
+		output_set_lamp_value(2, (data >> 4) & 1);
+		output_set_lamp_value(3, (data >> 5) & 1);
+		output_set_lamp_value(4, (data >> 6) & 1);
+		output_set_lamp_value(5, (data >> 7) & 1);
+	}
+	else
+	{
+		output_set_lamp_value(6, (data >> 0) & 1);
+		output_set_lamp_value(7, (data >> 1) & 1);
+		output_set_lamp_value(8, (data >> 2) & 1);
+		output_set_lamp_value(9, (data >> 3) & 1);
+	}
+}
+
+
+static WRITE8_HANDLER( tenpindx_counter_w )
+{
+	coin_counter_w(0, (data >> 0) & 1);
+	if (data & 0xfc) mame_printf_debug("tenpindx_counter_w = %02X\n", data);
+}
+
+
+static WRITE8_HANDLER( tenpindx_lights_w )
+{
+	/* "flashlights" */
+	int which = data >> 4;
+
+	output_set_lamp_value(10, (which == 1));
+	output_set_lamp_value(11, (which == 2));
+	output_set_lamp_value(12, (which == 3));
+	output_set_lamp_value(13, (which == 4));
+	output_set_lamp_value(14, (which == 5));
+	output_set_lamp_value(15, (which == 6));
+	output_set_lamp_value(16, (which == 7));
+	output_set_lamp_value(17, (which == 8));
+	output_set_lamp_value(18, (which == 9));
+}
+
+
 
 /*************************************
  *
@@ -139,60 +568,76 @@ void astrocade_state_save_register_main(void)
 
 static ADDRESS_MAP_START( seawolf2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(wow_magicram_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&wow_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astrocde_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ebases_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(wow_magicram_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&wow_videoram)
-	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( spacezap_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
+	AM_RANGE(0xd040, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( wow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(wow_magicram_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&wow_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM //AM_READWRITE(wow_protected_ram_r, wow_protected_ram_w) AM_BASE(&wow_protected_ram)
-	AM_RANGE(0xd400, 0xdfff) AM_RAM
+	AM_RANGE(0xd000, 0xd03f) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
+	AM_RANGE(0xd040, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( robby_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(wow_magicram_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&wow_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(robby_nvram_r, robby_nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xe800, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( demndrgn_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(wow_magicram_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK1, profpac_videoram_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-  	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(demndrgn_nvram_r, demndrgn_nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+  	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( profpac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(wow_magicram_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK1, profpac_videoram_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-  	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(profpac_nvram_r, profpac_nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+  	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
+  	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xe800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( demndrgn_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_ROM
+  	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( tenpin_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -203,59 +648,56 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_READ(wow_intercept_r)
-	AM_RANGE(0x0e, 0x0e) AM_MIRROR(0xff00) AM_READ(wow_video_retrace_r)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xff00) AM_READ(input_port_0_r)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0xff00) AM_READ(input_port_1_r)
-  	AM_RANGE(0x12, 0x12) AM_MIRROR(0xff00) AM_READ(input_port_2_r)
-	AM_RANGE(0x13, 0x13) AM_MIRROR(0xff00) AM_READ(input_port_3_r)
+static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( demndrgn_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_READ(wow_intercept_r)
-	AM_RANGE(0x0e, 0x0e) AM_MIRROR(0xff00) AM_READ(wow_video_retrace_r)
+
+static ADDRESS_MAP_START( port_map_mono_pattern, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
+	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( seawolf2_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_WRITE(astrocde_colour_register_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(astrocde_mode_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_WRITE(astrocde_colour_split_w)
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_WRITE(astrocde_vertical_blank_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_WRITE(astrocde_colour_block_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(astrocde_magic_control_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0xff00) AM_WRITE(astrocde_interrupt_vector_w)
-	AM_RANGE(0x0e, 0x0e) AM_MIRROR(0xff00) AM_WRITE(astrocde_interrupt_enable_w)
-	AM_RANGE(0x0f, 0x0f) AM_MIRROR(0xff00) AM_WRITE(astrocde_interrupt_w)
 
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_WRITE(astrocde_magic_expand_color_w)
-
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE(seawolf2_sound_1_w) /* analog sound */
-	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff00) AM_WRITE(seawolf2_sound_2_w) /* analog sound */
-	AM_RANGE(0x42, 0x43) AM_MIRROR(0xff00) AM_WRITE(seawolf2_lamps_w)	/* cabinet lamps */
+static ADDRESS_MAP_START( port_map_stereo_pattern, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(astrocade_sound2_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
+	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_WRITE(astrocde_colour_register_w)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(astrocde_mode_w)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0xff00) AM_WRITE(astrocde_colour_split_w)
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_WRITE(astrocde_vertical_blank_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_WRITE(astrocde_colour_block_w)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(astrocde_magic_control_w)
-	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0xff00) AM_WRITE(astrocde_interrupt_vector_w)
-	AM_RANGE(0x0e, 0x0e) AM_MIRROR(0xff00) AM_WRITE(astrocde_interrupt_enable_w)
-	AM_RANGE(0x0f, 0x0f) AM_MIRROR(0xff00) AM_WRITE(astrocde_interrupt_w)
 
-	AM_RANGE(0x10, 0x17) AM_MIRROR(0xff00) AM_WRITE(astrocade_sound1_w)
-	AM_SPACE(0x18, 0xff) AM_WRITE(astrocade_soundblock1_w)
+static ADDRESS_MAP_START( port_map_16col_pattern, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(astrocade_sound2_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
+	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
+	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ(profpac_intercept_r)
+	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE(profpac_screenram_ctrl_w)
+	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(profpac_banksw_w)
+	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
+ADDRESS_MAP_END
 
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_WRITE(astrocde_magic_expand_color_w)
 
-	/* These two are not part of seawolf2 or ebases */
-	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(wow_ramwrite_enable_w) /* ram write enable */
-	AM_RANGE(0x78, 0x7e) AM_MIRROR(0xff00) AM_WRITE(astrocde_pattern_board_w)
+static ADDRESS_MAP_START( port_map_16col_pattern_nosound, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
+	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
+	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ(profpac_intercept_r)
+	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE(profpac_screenram_ctrl_w)
+	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(profpac_banksw_w)
+	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
+ADDRESS_MAP_END
 
-/*  AM_RANGE(0xf8, 0xff) AM_MIRROR(0xff00) AM_WRITE(MWA8_NOP) */ /* Gorf uses these */
+
+static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x90, 0x93) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
+	AM_RANGE(0x98, 0x98) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x98, 0x98) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x9a, 0x9a) AM_WRITE(AY8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -266,57 +708,118 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static const UINT32 controller_table[64] =
+{
+	0x20, 0x21, 0x23, 0x22, 0x26, 0x27, 0x25, 0x24,
+	0x2c, 0x2d, 0x2f, 0x2e, 0x2a, 0x2b, 0x29, 0x28,
+	0x38, 0x39, 0x3b, 0x3a, 0x3e, 0x3f, 0x3d, 0x3c,
+	0x34, 0x35, 0x37, 0x36, 0x32, 0x33, 0x31, 0x30,
+	0x10, 0x11, 0x13, 0x12, 0x16, 0x17, 0x15, 0x14,
+	0x1c, 0x1d, 0x1f, 0x1e, 0x1a, 0x1b, 0x19, 0x18,
+	0x08, 0x09, 0x0b, 0x0a, 0x0e, 0x0f, 0x0d, 0x0c,
+	0x04, 0x05, 0x07, 0x06, 0x02, 0x03, 0x01, 0x00
+};
+
 INPUT_PORTS_START( seawolf2 )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(20) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
+	PORT_START_TAG("P1HANDLE")
+	PORT_BIT( 0x3f, 0x1f, IPT_POSITIONAL ) PORT_PLAYER(2) PORT_POSITIONS(64) PORT_REMAP_TABLE(controller_table) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_CROSSHAIR(X, 2.0, -0.40, 12.0 / 204.0)
 	PORT_DIPNAME( 0x40, 0x00, "Language 1" )
 	PORT_DIPSETTING(    0x00, "Language 2" )
 	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x3f, 0x20, IPT_PADDLE ) PORT_MINMAX(0,0x3f) PORT_SENSITIVITY(20) PORT_KEYDELTA(5) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P2HANDLE")
+	PORT_BIT( 0x3f, 0x1f, IPT_POSITIONAL ) PORT_PLAYER(1) PORT_POSITIONS(64) PORT_REMAP_TABLE(controller_table) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_CROSSHAIR(X, 2.0, -0.45, 12.0 / 204.0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+
+	PORT_START_TAG("P3HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_DIPNAME( 0x08, 0x00, "Language 2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( German ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("DSW") /* Dip Switch */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) ) PORT_DIPLOCATION("S1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x00, "Play Time" )
+	PORT_DIPNAME( 0x06, 0x00, "Play Time" ) PORT_DIPLOCATION("S1:3,4")
 	PORT_DIPSETTING(    0x06, "40" )
 	PORT_DIPSETTING(    0x04, "50" )
 	PORT_DIPSETTING(    0x02, "60" )
 	PORT_DIPSETTING(    0x00, "70" )
-	PORT_DIPNAME( 0x08, 0x08, "2 Players Game" )
+	PORT_DIPNAME( 0x08, 0x08, "2 Players Game" ) PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x00, "1 Credit" )
 	PORT_DIPSETTING(    0x08, "2 Credits" )
-	PORT_DIPNAME( 0x30, 0x00, "Extended Play" )
+	PORT_DIPNAME( 0x30, 0x00, "Extended Play" ) PORT_DIPLOCATION("S1:5,6")
 	PORT_DIPSETTING(    0x10, "5000" )
 	PORT_DIPSETTING(    0x20, "6000" )
 	PORT_DIPSETTING(    0x30, "7000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, "Monitor" )
+	PORT_DIPNAME( 0x40, 0x40, "Monitor" ) PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x40, "Color" )
 	PORT_DIPSETTING(    0x00, "B/W" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "S1:8")
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( ebases )
+	PORT_START_TAG("P1HANDLE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("P2HANDLE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, "Monitor" )
+	PORT_DIPSETTING(    0x00, "Color" )
+	PORT_DIPSETTING(    0x10, "B/W" )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("P3HANDLE")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ebases_trackball_r, 0)
+
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPNAME( 0x01, 0x00, "2 Players Game" ) PORT_DIPLOCATION( "S1:1" )
+	PORT_DIPSETTING(    0x00, "1 Credit" )
+	PORT_DIPSETTING(    0x01, "2 Credits" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "S1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "S1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "S1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "S1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
+
+	PORT_START_TAG("TRACKX1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET
+
+	PORT_START_TAG("TRACKY1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET
+
+	PORT_START_TAG("TRACKX2")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
+
+	PORT_START_TAG("TRACKY2")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START( spacezap )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
@@ -325,15 +828,16 @@ INPUT_PORTS_START( spacezap )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )	// starts a 1 player game if 1 credit
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "S1:7" )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P3HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -344,104 +848,24 @@ INPUT_PORTS_START( spacezap )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("DSW") /* Dip Switch */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) ) PORT_DIPLOCATION( "S1:1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) ) PORT_DIPLOCATION( "S1:2,3" )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( ebases )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Monitor" )
-	PORT_DIPSETTING(    0x00, "Color" )
-	PORT_DIPSETTING(    0x10, "B/W" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "2 Players Game" )
-	PORT_DIPSETTING(    0x00, "1 Credit" )
-	PORT_DIPSETTING(    0x01, "2 Credits" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START_TAG("IN3")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)	\
-
-	PORT_START_TAG("IN4")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET PORT_PLAYER(2)	\
-
-	PORT_START_TAG("IN5")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET	\
-
-	PORT_START_TAG("IN6")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_RESET	\
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "S1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "S1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START( wow )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -453,17 +877,16 @@ INPUT_PORTS_START( wow )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P3HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -471,37 +894,37 @@ INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* speech status */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wow_speech_status_r, 0)
 
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("S1:2,3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) ) PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, "Foreign (NEED ROM)" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("S1:5")
  	PORT_DIPSETTING(    0x10, "2 for 1 Credit / 5 for 2 Credits" )
  	PORT_DIPSETTING(    0x00, "3 for 1 Credit / 7 for 2 Credits" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("S1:6")
 	PORT_DIPSETTING(    0x20, "3rd Level" )
 	PORT_DIPSETTING(    0x00, "4th Level" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING(    0x00, "On only when controls are touched" )
 	PORT_DIPSETTING(    0x80, "Always On"  )
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START( gorf )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
@@ -511,198 +934,246 @@ INPUT_PORTS_START( gorf )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x80, 0x80, "Speech" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P3HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* speech status */
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gorf_speech_status_r, 0)
 
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("S1:2,3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Language ) ) PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x00, "Foreign (NEED ROM)" )
-	PORT_DIPNAME( 0x10, 0x00, "Lives per Credit" )
+	PORT_DIPNAME( 0x10, 0x00, "Lives per Credit" ) PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("S1:6")
 	PORT_DIPSETTING(    0x00, "Mission 5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("S1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START( robby )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPUNUSED( 0x80, 0x00 )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")
+	PORT_START_TAG("P3HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Use NVRAM" )
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPNAME( 0x01, 0x01, "Use NVRAM" ) PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Use Service Mode Settings" )
+	PORT_DIPNAME( 0x02, 0x02, "Use Service Mode Settings" ) PORT_DIPLOCATION("S1:2")
 	PORT_DIPSETTING(    0x00, "Reset" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("S1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "S1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S1:7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("S1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( demndrgn )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
-	PORT_START_TAG("IN3")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 INPUT_PORTS_START( profpac )
-	PORT_START_TAG("IN0")
+	PORT_START_TAG("P1HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("P2HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* Left A */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* Left B */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* Left C */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* Right A */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* Right B */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* Right C */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START_TAG("P3HANDLE")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("S1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, "Reset on powerup" )
+	PORT_DIPNAME( 0x02, 0x02, "Reset on powerup" ) PORT_DIPLOCATION("S1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Halt on error" )
+	PORT_DIPNAME( 0x04, 0x00, "Halt on error" ) PORT_DIPLOCATION("S1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Beep" )
+	PORT_DIPNAME( 0x08, 0x00, "Beep" ) PORT_DIPLOCATION("S1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, "ROM" )
+	PORT_DIPNAME( 0x10, 0x10, "ROM" ) PORT_DIPLOCATION("S1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
 INPUT_PORTS_END
+
+
+INPUT_PORTS_START( demndrgn )
+	PORT_START_TAG("P1HANDLE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("P2HANDLE")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(demndragn_joystick_r, 0)
+
+	PORT_START_TAG("P3HANDLE")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("P4HANDLE")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "S1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "S1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "S1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "S1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "S1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
+
+	PORT_START_TAG("MOVEX")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_RESET
+
+	PORT_START_TAG("MOVEY")
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(2) PORT_RESET
+
+	PORT_START_TAG("FIREX")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_REVERSE
+
+	PORT_START_TAG("FIREY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_REVERSE
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( tenpindx )
+	PORT_START_TAG("P60")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* select game */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* number of players */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )		/* start game */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("P61")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("S1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x02, "Lockup" ) PORT_DIPLOCATION("S1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, "Reset" ) PORT_DIPLOCATION("S1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x00, "Beep" ) PORT_DIPLOCATION("S1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Regulation" ) PORT_DIPLOCATION("S1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Ticket Dispenser" ) PORT_DIPLOCATION("S1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Bill Acceptor" ) PORT_DIPLOCATION("S1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
+
+	PORT_START_TAG("P62")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )	/* F1-F8 */
+
+	PORT_START_TAG("P63")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )	/* F9-F0,P1-P6 */
+
+	PORT_START_TAG("P64")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL )	/* P7-P0 */
+
+	PORT_START_TAG("DIPSW")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "S2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "S2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "S2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "S2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "S2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S2:8" )
+INPUT_PORTS_END
+
 
 
 
@@ -720,7 +1191,7 @@ static const char *seawolf_sample_names[] =
 	"dive.wav",
 	"sonar.wav",
 	"minehit.wav",
-	0       /* end of array */
+	0
 };
 
 struct Samplesinterface seawolf2_samples_interface =
@@ -731,13 +1202,13 @@ struct Samplesinterface seawolf2_samples_interface =
 
 static struct Samplesinterface wow_samples_interface =
 {
-	8,	/* 8 channels */
+	1,
 	wow_sample_names
 };
 
 static struct Samplesinterface gorf_samples_interface =
 {
-	8,	/* 8 channels */
+	1,
 	gorf_sample_names
 };
 
@@ -745,178 +1216,172 @@ static struct Samplesinterface gorf_samples_interface =
 
 /*************************************
  *
- *  Machine drivers
+ *  CPU configurations
  *
  *************************************/
 
-static MACHINE_DRIVER_START( seawolf2 )
+struct z80_irq_daisy_chain tenpin_daisy_chain[] =
+{
+	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
+	{ 0, 0, 0, 0, -1 }		/* end mark */
+};
+
+
+
+/*************************************
+ *
+ *  Generic machine drivers
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( astrocade_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
-	MDRV_CPU_PROGRAM_MAP(seawolf2_map,0)
-	MDRV_CPU_IO_MAP(readport,seawolf2_writeport)
-	MDRV_CPU_VBLANK_INT(wow_interrupt,256)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_CPU_ADD_TAG("main", Z80, ASTROCADE_CLOCK/4)
+	/* each game has its own map */
 
 	MDRV_MACHINE_START(astrocde)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_PALETTE_INIT(astrocde)
-	MDRV_VIDEO_START(astrocde)
-	MDRV_VIDEO_UPDATE(seawolf2)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(seawolf2_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( spacezap )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
-	MDRV_CPU_PROGRAM_MAP(wow_map,0)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(wow_interrupt,256)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_START(astrocde)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 320, 262, 0, 204)
 
 	MDRV_PALETTE_INIT(astrocde)
 	MDRV_VIDEO_START(astrocde)
 	MDRV_VIDEO_UPDATE(astrocde)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( astrocade_16color_base )
+	MDRV_IMPORT_FROM(astrocade_base)
+
+	/* basic machine hardware */
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	/* video hardware */
+	MDRV_PALETTE_LENGTH(4096)
+
+	MDRV_PALETTE_INIT(profpac)
+	MDRV_VIDEO_START(profpac)
+	MDRV_VIDEO_UPDATE(profpac)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( astrocade_mono_sound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
+	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( ebases )
 
-	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
-	MDRV_CPU_PROGRAM_MAP(astrocde_map,0)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(wow_interrupt,256)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_START(astrocde)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_PALETTE_INIT(astrocde)
-	MDRV_VIDEO_START(astrocde)
-	MDRV_VIDEO_UPDATE(astrocde)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( wow )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
-	MDRV_CPU_PROGRAM_MAP(wow_map,0)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(wow_interrupt,256)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_START(astrocde)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_PALETTE_INIT(astrocde)
-
-	MDRV_VIDEO_START(astrocde_stars)
-	MDRV_VIDEO_UPDATE(astrocde)
+static MACHINE_DRIVER_START( astrocade_stereo_sound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
+	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
+	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+MACHINE_DRIVER_END
 
+
+
+/*************************************
+ *
+ *  Game specific machine drivers
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( seawolf2 )
+	MDRV_IMPORT_FROM(astrocade_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(seawolf2_map,0)
+	MDRV_CPU_IO_MAP(port_map,0)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(seawolf2_samples_interface)
+	MDRV_SOUND_ROUTE(0, "left", 0.25)
+	MDRV_SOUND_ROUTE(1, "left", 0.25)
+	MDRV_SOUND_ROUTE(2, "left", 0.25)
+	MDRV_SOUND_ROUTE(3, "left", 0.25)
+	MDRV_SOUND_ROUTE(4, "left", 0.25)
+	MDRV_SOUND_ROUTE(5, "right", 0.25)
+	MDRV_SOUND_ROUTE(6, "right", 0.25)
+	MDRV_SOUND_ROUTE(7, "right", 0.25)
+	MDRV_SOUND_ROUTE(8, "right", 0.25)
+	MDRV_SOUND_ROUTE(9, "right", 0.25)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ebases )
+	MDRV_IMPORT_FROM(astrocade_base)
+	MDRV_IMPORT_FROM(astrocade_mono_sound)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(ebases_map,0)
+	MDRV_CPU_IO_MAP(port_map,0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( spacezap )
+	MDRV_IMPORT_FROM(astrocade_base)
+	MDRV_IMPORT_FROM(astrocade_mono_sound)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(spacezap_map,0)
+	MDRV_CPU_IO_MAP(port_map_mono_pattern,0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( wow )
+	MDRV_IMPORT_FROM(astrocade_base)
+	MDRV_IMPORT_FROM(astrocade_stereo_sound)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(wow_map,0)
+	MDRV_CPU_IO_MAP(port_map_stereo_pattern,0)
+
+	/* sound hardware */
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(wow_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.25)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( gorf )
+	MDRV_IMPORT_FROM(astrocade_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(wow_map,0)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(gorf_interrupt,256)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_START(astrocde)
-
-	/* video hardware */
-	/* it may look like the right hand side of the screen needs clipping, but */
-	/* this isn't the case: cocktail mode would be clipped on the wrong side */
-
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_PALETTE_INIT(astrocde)
-	MDRV_VIDEO_START(astrocde_stars)
-	MDRV_VIDEO_UPDATE(astrocde)
+	MDRV_CPU_IO_MAP(port_map_stereo_pattern,0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_ADD("upper", 0.0, 0.0, 1.0)
 	MDRV_SPEAKER_ADD("lower", 0.0, -0.5, 1.0)
 
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
+	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
+	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -925,103 +1390,61 @@ static MACHINE_DRIVER_START( gorf )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lower", 0.25)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( robby )
+	MDRV_IMPORT_FROM(astrocade_base)
+	MDRV_IMPORT_FROM(astrocade_stereo_sound)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(robby_map,0)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(wow_interrupt,256)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_START(astrocde)
+	MDRV_CPU_IO_MAP(port_map_stereo_pattern,0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_PALETTE_INIT(astrocde)
-
-	MDRV_VIDEO_START(astrocde)
-	MDRV_VIDEO_UPDATE(astrocde)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( demndrgn )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
-	MDRV_CPU_PROGRAM_MAP(demndrgn_map,0)
-	MDRV_CPU_IO_MAP(demndrgn_readport,writeport)
-	MDRV_CPU_VBLANK_INT(wow_interrupt,256)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_START(profpac)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_PALETTE_INIT(astrocde)
-	MDRV_VIDEO_START(profpac)
-	MDRV_VIDEO_UPDATE(profpac)
-MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( profpac )
+	MDRV_IMPORT_FROM(astrocade_16color_base)
+	MDRV_IMPORT_FROM(astrocade_stereo_sound)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 1789773)	/* 1.789 MHz */
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(profpac_map,0)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(wow_interrupt,256)
+	MDRV_CPU_IO_MAP(port_map_16col_pattern,0)
+MACHINE_DRIVER_END
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_MACHINE_START(profpac)
+static MACHINE_DRIVER_START( demndrgn )
+	MDRV_IMPORT_FROM(astrocade_16color_base)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(demndrgn_map,0)
+	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound,0)
+MACHINE_DRIVER_END
 
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 204)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 204-1)
-	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(astrocde)
-	MDRV_VIDEO_START(profpac)
-	MDRV_VIDEO_UPDATE(profpac)
+static MACHINE_DRIVER_START( tenpindx )
+	MDRV_IMPORT_FROM(astrocade_16color_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(profpac_map,0)
+	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound,0)
+
+	MDRV_CPU_ADD(Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MDRV_CPU_CONFIG(tenpin_daisy_chain)
+	MDRV_CPU_PROGRAM_MAP(tenpin_sub_map,0)
+	MDRV_CPU_IO_MAP(tenpin_sub_io_map,0)
+
+	MDRV_MACHINE_START(tenpindx)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-
-	MDRV_SOUND_ADD(ASTROCADE, 1789773)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MDRV_SOUND_CONFIG(ay8912_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
 
@@ -1033,7 +1456,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( seawolf2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x2000, REGION_CPU1, 0 )
 	ROM_LOAD( "sw2x1.bin",    0x0000, 0x0800, CRC(ad0103f6) SHA1(c6e411444a824ce54b0eee10f7dc15e4229ec070) )
 	ROM_LOAD( "sw2x2.bin",    0x0800, 0x0800, CRC(e0430f0a) SHA1(63d8c6b77e0aa536b4f5bb774bc9285f736d4265) )
 	ROM_LOAD( "sw2x3.bin",    0x1000, 0x0800, CRC(05ad1619) SHA1(c9dbeaa4540dc95f98970f501a420b18b9898c91) )
@@ -1042,7 +1465,7 @@ ROM_END
 
 
 ROM_START( spacezap )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x4000, REGION_CPU1, 0 )
 	ROM_LOAD( "0662.01",      0x0000, 0x1000, CRC(a92de312) SHA1(784ac67c75c7c101f97ebfd39b2b3f7bf7fa470a) )
 	ROM_LOAD( "0663.xx",      0x1000, 0x1000, CRC(4836ebf1) SHA1(ad0e8c34a209c827c1336f0250cc61fee667fb03) )
 	ROM_LOAD( "0664.xx",      0x2000, 0x1000, CRC(d8193a80) SHA1(72151e773562da62acd2c1d9638711711cbc13a3) )
@@ -1051,7 +1474,7 @@ ROM_END
 
 
 ROM_START( ebases )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_REGION( 0x4000, REGION_CPU1, 0 )
 	ROM_LOAD( "m761a",        0x0000, 0x1000, CRC(34422147) SHA1(6483ca1359b675b0dd739605db2a1dbd4b7fb8cb) )
 	ROM_LOAD( "m761b",        0x1000, 0x1000, CRC(4f28dfd6) SHA1(52e571e671fa61b0f9ab397a5947094c24f6c388) )
 	ROM_LOAD( "m761c",        0x2000, 0x1000, CRC(bff6c97e) SHA1(e41fb9db919039c8a48b4caebf80821a066d7ccf) )
@@ -1068,7 +1491,7 @@ ROM_START( wow )
 	ROM_LOAD( "wow.x5",       0x8000, 0x1000, CRC(16912c2b) SHA1(faf9c96d99bc111c5f1618f6863f22fd9269027b) )
 	ROM_LOAD( "wow.x6",       0x9000, 0x1000, CRC(35797f82) SHA1(376bba29e88c16d95438fa996913b76581df0937) )
 	ROM_LOAD( "wow.x7",       0xa000, 0x1000, CRC(ce404305) SHA1(a52c6c7b77842f25c79515460be6b7ed959b5edb) )
-/*  ROM_LOAD( "wow.x8",       0xc000, CRC(00001000) , ? )   here would go the foreign language ROM */
+/*  ROM_LOAD( "wow.x11",      0xc000, CRC(00001000) , ? )   here would go the foreign language ROM */
 ROM_END
 
 
@@ -1083,7 +1506,6 @@ ROM_START( gorf )
 	ROM_LOAD( "gorf-g.bin",   0xa000, 0x1000, CRC(4e2bd9b9) SHA1(9edccceea5af015275582553ed238c40c73d8f4f) )
 	ROM_LOAD( "gorf-h.bin",   0xb000, 0x1000, CRC(fe7b863d) SHA1(5aa8d824814ee1c30eaf0044da78d3aa8220dcaa) )
 ROM_END
-
 
 ROM_START( gorfpgm1 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -1113,39 +1535,21 @@ ROM_START( robby )
 ROM_END
 
 
-ROM_START( demndrgn )
-	ROM_REGION( 0x2a000, REGION_CPU1, 0 )
-	ROM_LOAD( "dd-x1.bin",     0x0000, 0x2000, CRC(9aeaf79e) SHA1(c70aa1a31bc085cca904d497c34e55d49fef49b7) )
-	ROM_LOAD( "dd-x2.bin",     0x2000, 0x2000, CRC(0c63b624) SHA1(3eaeb4e0820e9dda7233a13bb146acc44402addd) )
-	ROM_LOAD( "dd-x9.bin",     0xc000, 0x2000, CRC(3792d632) SHA1(da053df344f39a8f25a2c57fb1a908131c10f248) )
-	ROM_LOAD( "dd-x5.bin",     0x14000, 0x2000, CRC(e377e831) SHA1(f53e74b3138611f9385845d6bdeab891b5d15931) )
-	ROM_LOAD( "dd-x6.bin",     0x16000, 0x2000, CRC(0fcb46ad) SHA1(5611135f9e341bd394d6da7912167b05fff17a93) )
-	ROM_LOAD( "dd-x7.bin",     0x18000, 0x2000, CRC(0675e4fa) SHA1(59668e32271ff9bac0b4411cc0c541d2825ee145) )
-	ROM_LOAD( "dd-x10.bin",    0x1c000, 0x2000, CRC(4a22c4f9) SHA1(d86ca38727fcf1896ea64c3b6255e3230054b5d6) )
-	ROM_LOAD( "dd-x11.bin",    0x1e000, 0x2000, CRC(d3158845) SHA1(510bb8d459625263370ee68f6f63d6d7abc6d26d) )
-	ROM_LOAD( "dd-x12.bin",    0x20000, 0x2000, CRC(592c1d9a) SHA1(c884aabf4cff9f9b974e497fc3a1f8cdd0753680) )
-	ROM_LOAD( "dd-x13.bin",    0x22000, 0x2000, CRC(492d7b7e) SHA1(a9a89a61179b154a8afa429e11e984609f787d74) )
-	ROM_LOAD( "dd-x14.bin",    0x24000, 0x2000, CRC(7843c818) SHA1(4756bf7dd07071b86645908d61891edcdffdde83) )
-	ROM_LOAD( "dd-x15.bin",    0x26000, 0x2000, CRC(6e6bc1b6) SHA1(b8c5ed8df6a709a6502dac47be88271ad22b9203) )
-	ROM_LOAD( "dd-x16.bin",    0x28000, 0x2000, CRC(7a4a343b) SHA1(4eb82ae38ce1b14778fb29d8549c61a46bc3ee66) )
-ROM_END
-
-
 ROM_START( profpac )
-	ROM_REGION( 0x2c000, REGION_CPU1, 0 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pps1",         0x0000, 0x2000, CRC(a244a62d) SHA1(f7a9606ce6d66c3e6d210cc25572904aeab2b6c8) )
 	ROM_LOAD( "pps2",         0x2000, 0x2000, CRC(8a9a6653) SHA1(b730b24088dcfddbe954670ff9212b7383c923f6) )
-	ROM_LOAD( "pps3",         0x8000, 0x2000, CRC(15717fd8) SHA1(ffbb156f417d20478117b39de28a15680993b528) )
-	ROM_LOAD( "pps4",         0xa000, 0x2000, CRC(36540598) SHA1(33c797c690801afded45091d822347e1ecc72b54) )
 	ROM_LOAD( "pps9",         0xc000, 0x2000, CRC(17a0b418) SHA1(8b7ed84090dbc5181deef6f55ec755c05d4c0d5e) )
-	ROM_LOAD( "pps5",         0x14000, 0x2000, CRC(8dc89a59) SHA1(fb4d3ba40697425d69ee19bfdcf00aea1df5fa80) )
-	ROM_LOAD( "pps6",         0x16000, 0x2000, CRC(5a2186c3) SHA1(f706cef6518b7d839377aa8a7c75fdeed4985c57) )
-	ROM_LOAD( "pps7",         0x18000, 0x2000, CRC(f9c26aba) SHA1(201b930cca9669114ffc97978cade69587e34a0f) )
-	ROM_LOAD( "pps8",         0x1a000, 0x2000, CRC(4d201e41) SHA1(786b30cd7a7db55bdde05909d7a1a7f122b6e546) )
-	/* the rest of the sockets are empty */
 
-	/* Each of these can get mapped from 0x4000-0x7fff */
-	ROM_REGION( 0x38000, REGION_USER1, 0 )
+	ROM_REGION( 0x20000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_LOAD( "pps3",         0x04000, 0x2000, CRC(15717fd8) SHA1(ffbb156f417d20478117b39de28a15680993b528) )
+	ROM_LOAD( "pps4",         0x06000, 0x2000, CRC(36540598) SHA1(33c797c690801afded45091d822347e1ecc72b54) )
+	ROM_LOAD( "pps5",         0x08000, 0x2000, CRC(8dc89a59) SHA1(fb4d3ba40697425d69ee19bfdcf00aea1df5fa80) )
+	ROM_LOAD( "pps6",         0x0a000, 0x2000, CRC(5a2186c3) SHA1(f706cef6518b7d839377aa8a7c75fdeed4985c57) )
+	ROM_LOAD( "pps7",         0x0c000, 0x2000, CRC(f9c26aba) SHA1(201b930cca9669114ffc97978cade69587e34a0f) )
+	ROM_LOAD( "pps8",         0x0e000, 0x2000, CRC(4d201e41) SHA1(786b30cd7a7db55bdde05909d7a1a7f122b6e546) )
+
+	ROM_REGION( 0xa0000, REGION_USER2, ROMREGION_ERASEFF )
 	ROM_LOAD( "ppq1",         0x00000, 0x4000, CRC(dddc2ccc) SHA1(d81caaa639f63d971a0d3199b9da6359211edf3d) )
 	ROM_LOAD( "ppq2",         0x04000, 0x4000, CRC(33bbcabe) SHA1(f9455868c70f479ede0e0621f21f69da165d9b7a) )
 	ROM_LOAD( "ppq3",         0x08000, 0x4000, CRC(3534d895) SHA1(24fb14c6b31b7f27e0737605cfbf963d29dd3fc5) )
@@ -1160,6 +1564,75 @@ ROM_START( profpac )
 	ROM_LOAD( "ppq12",        0x2c000, 0x4000, CRC(e01a8dbe) SHA1(c7052bf9ce9d2006dda5ddc07ad164d0119b86ea) )
 	ROM_LOAD( "ppq13",        0x30000, 0x4000, CRC(87165d4f) SHA1(d47655300c8747698a46f30deb65fe762073e869) )
 	ROM_LOAD( "ppq14",        0x34000, 0x4000, CRC(ecb861de) SHA1(73d28a79b76795d3016dd608f9ab3d255f40e477) )
+
+	ROM_REGION( 0xa00, REGION_PLDS, ROMREGION_DISPOSE )
+    ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
+	ROM_LOAD( "pls153a_cpu.u16",  0x00100, 0x00eb, CRC(9a5ea540) SHA1(8619c7626e58eac09a4d91f5ad49742240f5f71e) )
+	ROM_LOAD( "pls153a_epr.u6",   0x00200, 0x00eb, CRC(d8454bf7) SHA1(5e074a2cbac99ebbf02bc4cd331679ede30eea3f) )
+	ROM_LOAD( "pls153a_epr.u7",   0x00300, 0x00eb, CRC(fa831d9f) SHA1(ca8c3d8db24e99537c682aaf9726cbcef86728dd) )
+	ROM_LOAD( "pls153a_gam.u10",  0x00400, 0x00eb, CRC(fe2157b0) SHA1(577e6839190054f9b3aec6425e9d2a1810e11a08) )
+	ROM_LOAD( "pls153a_gam.u11",  0x00500, 0x00eb, CRC(5772f6d8) SHA1(01a02aa67a42ff61e38e12683b02bf81c16519b8) )
+	ROM_LOAD( "pls153a_gam.u5",   0x00600, 0x00eb, CRC(b3f2c6b8) SHA1(e49fb4ca7d9c8a769c145fd497b1244d6696831f) )
+	ROM_LOAD( "pls153a_scr.u19",  0x00700, 0x00eb, CRC(b5fff2db) SHA1(beae4fc5664d15a4b83a885d97d21efd14977380) )
+	ROM_LOAD( "pls153a_scr.u39",  0x00800, 0x00eb, CRC(ba7ef5dd) SHA1(7aea6e17edbf87dc1d47ca8c640b50ebdb65dd29) )
+	ROM_LOAD( "pls153a_scr.u55",  0x00900, 0x00eb, CRC(c3f47134) SHA1(78ae2cc1d8b761b077e36343d4a91517298ce9e8) )
+ROM_END
+
+
+ROM_START( demndrgn )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "dd-x1.bin",     0x0000, 0x2000, CRC(9aeaf79e) SHA1(c70aa1a31bc085cca904d497c34e55d49fef49b7) )
+	ROM_LOAD( "dd-x2.bin",     0x2000, 0x2000, CRC(0c63b624) SHA1(3eaeb4e0820e9dda7233a13bb146acc44402addd) )
+	ROM_LOAD( "dd-x9.bin",     0xc000, 0x2000, CRC(3792d632) SHA1(da053df344f39a8f25a2c57fb1a908131c10f248) )
+
+	ROM_REGION( 0x20000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_LOAD( "dd-x5.bin",     0x08000, 0x2000, CRC(e377e831) SHA1(f53e74b3138611f9385845d6bdeab891b5d15931) )
+	ROM_LOAD( "dd-x6.bin",     0x0a000, 0x2000, CRC(0fcb46ad) SHA1(5611135f9e341bd394d6da7912167b05fff17a93) )
+	ROM_LOAD( "dd-x7.bin",     0x0c000, 0x2000, CRC(0675e4fa) SHA1(59668e32271ff9bac0b4411cc0c541d2825ee145) )
+	ROM_LOAD( "dd-x10.bin",    0x10000, 0x2000, CRC(4a22c4f9) SHA1(d86ca38727fcf1896ea64c3b6255e3230054b5d6) )
+	ROM_LOAD( "dd-x11.bin",    0x12000, 0x2000, CRC(d3158845) SHA1(510bb8d459625263370ee68f6f63d6d7abc6d26d) )
+	ROM_LOAD( "dd-x12.bin",    0x14000, 0x2000, CRC(592c1d9a) SHA1(c884aabf4cff9f9b974e497fc3a1f8cdd0753680) )
+	ROM_LOAD( "dd-x13.bin",    0x16000, 0x2000, CRC(492d7b7e) SHA1(a9a89a61179b154a8afa429e11e984609f787d74) )
+	ROM_LOAD( "dd-x14.bin",    0x18000, 0x2000, CRC(7843c818) SHA1(4756bf7dd07071b86645908d61891edcdffdde83) )
+	ROM_LOAD( "dd-x15.bin",    0x1a000, 0x2000, CRC(6e6bc1b6) SHA1(b8c5ed8df6a709a6502dac47be88271ad22b9203) )
+	ROM_LOAD( "dd-x16.bin",    0x1c000, 0x2000, CRC(7a4a343b) SHA1(4eb82ae38ce1b14778fb29d8549c61a46bc3ee66) )
+ROM_END
+
+
+ROM_START( tenpindx )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "tpd_x1.bin",     0x0000, 0x2000, CRC(ef424484) SHA1(d70f8491059e24775ee05140c8c3b0afa6c1107c) )
+	ROM_LOAD( "tpd_x2.bin",     0x2000, 0x2000, CRC(a0f53af2) SHA1(966a98f73bdd358601f105ca97c823575b33bab3) )
+	ROM_LOAD( "tpd_x9.bin",     0xc000, 0x2000, CRC(ce9a9bd4) SHA1(fcc48a66b6079c56992afef2ca8ab95c66f8f431) )
+
+	ROM_REGION( 0x4000, REGION_CPU2, 0 )
+	ROM_LOAD( "tpd_axfd.bin",   0x0000, 0x4000, CRC(0aed11f3) SHA1(09575cceda38178a77c6753074be82825d368334) )
+
+	ROM_REGION( 0x20000, REGION_USER1, ROMREGION_ERASEFF )
+	ROM_LOAD( "tpd_x3.bin",     0x04000, 0x2000, CRC(d4645f6d) SHA1(185bcd58f1ba69e26274475c57219de0353267e1) )
+	ROM_LOAD( "tpd_x4.bin",     0x06000, 0x2000, CRC(acf474ba) SHA1(b324dccac0991660f8ba2a70cbbdb06c9d25c361) )
+	ROM_LOAD( "tpd_x5.bin",     0x08000, 0x2000, CRC(e206913f) SHA1(bb9476516bca7bf7066df058db36e4fdd52a6ed2) )
+	ROM_LOAD( "tpd_x6.bin",     0x0a000, 0x2000, CRC(d90142fb) SHA1(01ac2ba60105a8dc84359a8feafd2fea2a635369) )
+	ROM_LOAD( "tpd_x8.bin",     0x0e000, 0x2000, CRC(ae22cf50) SHA1(bc6aa59e41cffc840e5cffcd352d8c12c053982d) )
+	ROM_LOAD( "tpd_x10.bin",    0x10000, 0x2000, CRC(85d5b970) SHA1(24206cb2829674910e7648ccd30b9fddda9bec95) )
+	ROM_LOAD( "tpd_x11.bin",    0x12000, 0x2000, CRC(7bd3c90f) SHA1(d6c2f547c83972668e123203906b3e7fb52c1696) )
+	ROM_LOAD( "tpd_x12.bin",    0x14000, 0x2000, CRC(46078cc7) SHA1(50ac83f73dcca74c736961001c0808b379a949f4) )
+	ROM_LOAD( "tpd_x13.bin",    0x16000, 0x2000, CRC(b49767b4) SHA1(71aba2967afe95f0d78f539aae9e7bf9a1315aa0) )
+	ROM_LOAD( "tpd_x14.bin",    0x18000, 0x2000, CRC(29a28d40) SHA1(c4d6b4b1881e674337e47f801291e94d73a0fcbd) )
+	ROM_LOAD( "tpd_x15.bin",    0x1a000, 0x2000, CRC(2ae98fb2) SHA1(a8b4058189bf23fec281da3ff73393346bfead6f) )
+	ROM_LOAD( "tpd_x16.bin",    0x1c000, 0x2000, CRC(8839d0e1) SHA1(5f1e581066d1851ee996f152ebec83db40aa7073) )
+
+	ROM_REGION( 0xa00, REGION_PLDS, ROMREGION_DISPOSE )
+    ROM_LOAD( "pls153a_cpu.u12",  0x00000, 0x00eb, CRC(499a6fc5) SHA1(633d647bcae2f762847a2abe8069741ac33b15b8) )
+	ROM_LOAD( "pls153a_cpu.u16",  0x00100, 0x00eb, CRC(9a5ea540) SHA1(8619c7626e58eac09a4d91f5ad49742240f5f71e) )
+	ROM_LOAD( "pls153a_epr.u6",   0x00200, 0x00eb, CRC(d8454bf7) SHA1(5e074a2cbac99ebbf02bc4cd331679ede30eea3f) )
+	ROM_LOAD( "pls153a_epr.u7",   0x00300, 0x00eb, CRC(fa831d9f) SHA1(ca8c3d8db24e99537c682aaf9726cbcef86728dd) )
+	ROM_LOAD( "pls153a_gam.u10",  0x00400, 0x00eb, CRC(fe2157b0) SHA1(577e6839190054f9b3aec6425e9d2a1810e11a08) )
+	ROM_LOAD( "pls153a_gam.u11",  0x00500, 0x00eb, CRC(5772f6d8) SHA1(01a02aa67a42ff61e38e12683b02bf81c16519b8) )
+	ROM_LOAD( "pls153a_gam.u5",   0x00600, 0x00eb, CRC(b3f2c6b8) SHA1(e49fb4ca7d9c8a769c145fd497b1244d6696831f) )
+	ROM_LOAD( "pls153a_scr.u19",  0x00700, 0x00eb, CRC(b5fff2db) SHA1(beae4fc5664d15a4b83a885d97d21efd14977380) )
+	ROM_LOAD( "pls153a_scr.u39",  0x00800, 0x00eb, CRC(ba7ef5dd) SHA1(7aea6e17edbf87dc1d47ca8c640b50ebdb65dd29) )
+	ROM_LOAD( "pls153a_scr.u55",  0x00900, 0x00eb, CRC(c3f47134) SHA1(78ae2cc1d8b761b077e36343d4a91517298ce9e8) )
 ROM_END
 
 
@@ -1172,85 +1645,94 @@ ROM_END
 
 static DRIVER_INIT( seawolf2 )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x10, 0x10, 0, 0xff00, seawolf2_controller2_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x11, 0x11, 0, 0xff00, seawolf2_controller1_r);
+	astrocade_video_config = 0x00;
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x40, 0x40, 0, 0xff18, seawolf2_sound_1_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x41, 0x41, 0, 0xff18, seawolf2_sound_2_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x42, 0x43, 0, 0xff18, seawolf2_lamps_w);
 }
+
 
 static DRIVER_INIT( ebases )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x13, 0x13, 0, 0xff00, ebases_trackball_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0xff00, ebases_io_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x28, 0x28, 0, 0xff00, ebases_trackball_select_w);
+	astrocade_video_config = AC_SOUND_PRESENT;
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0xff07, ebases_coin_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x28, 0x28, 0, 0xff07, ebases_trackball_select_w);
 }
 
-static DRIVER_INIT( wow )
-{
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x12, 0x12, 0, 0xff00, wow_port_2_r);
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x15, 0xff, 0, 0, wow_io_r);
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x17, 0xff, 0, 0, wow_speech_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x50, 0x57, 0, 0xff00, astrocade_sound2_w);
-	memory_install_write8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x58, 0xff, 0, 0, astrocade_soundblock2_w);
-}
 
 static DRIVER_INIT( spacezap )
 {
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x13, 0xff, 0, 0, spacezap_io_r);
+	astrocade_video_config = AC_SOUND_PRESENT;
+	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
 }
+
+
+static DRIVER_INIT( wow )
+{
+	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, wow_io_r);
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, wow_speech_r);
+}
+
 
 static DRIVER_INIT( gorf )
 {
-	/* This is part of the timing/interrupt hack stuff */
-//  extern UINT8 *gorf_timer_ram;
-//  gorf_timer_ram = memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd0a5, 0xd0a5, 0, 0, gorf_timer_r);
-
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x12, 0x12, 0, 0xff00, gorf_port_2_r);
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x15, 0xff, 0, 0, gorf_io_1_r);
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x16, 0xff, 0, 0, gorf_io_2_r);
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x17, 0xff, 0, 0, gorf_speech_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x50, 0x57, 0, 0xff00, astrocade_sound2_w);
-	memory_install_write8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x58, 0xff, 0, 0, astrocade_soundblock2_w);
+	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, gorf_io_1_r);
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x16, 0x16, 0x0fff, 0xff00, gorf_io_2_r);
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, gorf_speech_r);
 }
+
 
 static DRIVER_INIT( robby )
 {
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x15, 0xff, 0, 0, robby_io_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x50, 0x57, 0, 0xff00, astrocade_sound2_w);
-	memory_install_write8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x58, 0xff, 0, 0, astrocade_soundblock2_w);
+	astrocade_video_config = AC_SOUND_PRESENT;
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, robby_io_r);
 }
 
-static DRIVER_INIT( demndrgn )
-{
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x10, 0x10, 0, 0xff00, input_port_0_r );
-
-	/* 0x00 is the middle value, range is up to 0x7f, and down to 0x80 */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x11, 0x11, 0, 0xff00, demndrgn_move_r );
-
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x14, 0xff, 0, 0, demndrgn_io_r );
-
-	/* analog joystick, converted to digital in software */
-	/* 0x80 is the middle, values of > 0xd8 and < 0x28 are the thresholds */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x1c, 0x1c, 0, 0xff00, demndrgn_fire_x_r );
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x1d, 0x1d, 0, 0xff00, demndrgn_fire_y_r );
-
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x97, 0x97, 0, 0xff00, demndrgn_sound_w );
-
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xbf, 0xbf, 0, 0xff00, profpac_page_select_w);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0xc3, 0xc3, 0, 0xff00, profpac_intercept_r );
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc5, 0, 0xff00, profpac_screenram_ctrl_w );
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xf3, 0xf3, 0, 0xff00, profpac_banksw_w);
-}
 
 static DRIVER_INIT( profpac )
 {
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x14, 0xff, 0, 0, profpac_io_1_r);
-	memory_install_read8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x15, 0xff, 0, 0, profpac_io_2_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x50, 0x57, 0, 0xff00, astrocade_sound2_w);
-	memory_install_write8_matchmask_handler(0, ADDRESS_SPACE_IO, 0x58, 0xff, 0, 0, astrocade_soundblock2_w);
+	astrocade_video_config = AC_SOUND_PRESENT;
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x0fff, 0xff00, profpac_io_1_r);
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x77ff, 0xff00, profpac_io_2_r);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xbf, 0xbf, 0, 0xff00, profpac_page_select_w);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0xc3, 0xc3, 0, 0xff00, profpac_intercept_r );
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc5, 0, 0xff00, profpac_screenram_ctrl_w );
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xf3, 0xf3, 0, 0xff00, profpac_banksw_w);
+	/* reset banking */
+	profpac_banksw_w(0, 0);
+	state_save_register_func_postload(profbank_banksw_restore);
+}
+
+
+static DRIVER_INIT( demndrgn )
+{
+	astrocade_video_config = 0x00;
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x1c, 0x1c, 0x0000, 0xff00, port_tag_to_handler8("FIREX"));
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x1d, 0x1d, 0x0000, 0xff00, port_tag_to_handler8("FIREY"));
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
+
+	/* reset banking */
+	profpac_banksw_w(0, 0);
+	state_save_register_func_postload(profbank_banksw_restore);
+}
+
+
+static DRIVER_INIT( tenpindx )
+{
+	astrocade_video_config = 0x00;
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x60, 0x60, 0x0000, 0xff00, port_tag_to_handler8("P60"));
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x61, 0x61, 0x0000, 0xff00, port_tag_to_handler8("P61"));
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x62, 0x62, 0x0000, 0xff00, port_tag_to_handler8("P62"));
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x63, 0x63, 0x0000, 0xff00, port_tag_to_handler8("P63"));
+	memory_install_read8_handler (0, ADDRESS_SPACE_IO, 0x64, 0x64, 0x0000, 0xff00, port_tag_to_handler8("P64"));
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, tenpindx_sound_w);
+
+	/* reset banking */
+	profpac_banksw_w(0, 0);
+	state_save_register_func_postload(profbank_banksw_restore);
 }
 
 
@@ -1261,12 +1743,28 @@ static DRIVER_INIT( profpac )
  *
  *************************************/
 
-GAME( 1978, seawolf2, 0,    seawolf2, seawolf2, seawolf2, ROT0,   "Midway", "Sea Wolf II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spacezap, 0,    spacezap, spacezap, spacezap, ROT0,   "Midway", "Space Zap", GAME_SUPPORTS_SAVE )
+/* 90002 CPU board + 90700 game board + 91312 "characterization card" */
+GAME( 1978, seawolf2, 0,    seawolf2, seawolf2, seawolf2, ROT0,   "Midway", "Sea Wolf II", GAME_SUPPORTS_SAVE )
+
+/* 91354 CPU board + 90700 game board + 91356 RAM board */
 GAME( 1980, ebases,   0,    ebases,   ebases,   ebases,   ROT0,   "Midway", "Extra Bases", GAME_SUPPORTS_SAVE )
+
+/* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board */
+GAME( 1980, spacezap, 0,    spacezap, spacezap, spacezap, ROT0,   "Midway", "Space Zap", GAME_SUPPORTS_SAVE )
+
+/* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board */
 GAME( 1980, wow,      0,    wow,      wow,      wow,      ROT0,   "Midway", "Wizard of Wor", GAME_SUPPORTS_SAVE )
+
+/* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board */
 GAME( 1981, gorf,     0,    gorf,     gorf,     gorf,     ROT270, "Midway", "Gorf", GAME_SUPPORTS_SAVE )
 GAME( 1981, gorfpgm1, gorf, gorf,     gorf,     gorf,     ROT270, "Midway", "Gorf (Program 1)", GAME_SUPPORTS_SAVE )
+
+/* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board */
 GAME( 1981, robby,    0,    robby,    robby,    robby,    ROT0,   "Bally Midway", "Robby Roto", GAME_SUPPORTS_SAVE )
-GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, demndrgn, ROT0,   "Bally Midway", "Demons and Dragons (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+
+/* 91465 CPU board + 91469 game board + 91466 RAM board + 91488 pattern board + 91467 memory board + 91846 EPROM board */
 GAME( 1983, profpac,  0,    profpac,  profpac,  profpac,  ROT0,   "Bally Midway", "Professor PacMan", GAME_SUPPORTS_SAVE )
+
+/* 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board */
+GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, demndrgn, ROT0,   "Bally Midway", "Demons and Dragons (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx, tenpindx, ROT0,   "Bally Midway", "Ten Pin Deluxe", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_tenpindx )

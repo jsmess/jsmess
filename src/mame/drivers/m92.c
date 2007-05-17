@@ -55,10 +55,6 @@ Glitch list!
         Almost certainly a core bug.
 
     Irem Skins:
-        - Priority bug: you can't see the arrow on the top right map.
-        - Gfx problems at the players information during attract mode in
-          Skins Game *only*, Major Title is fine (that part of attract mode
-          is different).
         - Eeprom load/save not yet implemented - when done, MT2EEP should
           be removed from the ROM definition.
 
@@ -2145,7 +2141,6 @@ ROM_START( geostorm )
 ROM_END
 
 
-
 static void m92_startup(int hasbanks)
 {
 	unsigned char *RAM = memory_region(REGION_CPU1);
@@ -2261,10 +2256,10 @@ static DRIVER_INIT( nbbatman )
 
 static DRIVER_INIT( ssoldier )
 {
- init_m92(psoldier_decryption_table, 1);
- m92_irq_vectorbase=0x20;
- /* main CPU expects an answer even before writing the first command */
- sound_status = 0x80;
+	init_m92(psoldier_decryption_table, 1);
+	m92_irq_vectorbase=0x20;
+	/* main CPU expects an answer even before writing the first command */
+	sound_status = 0x80;
 }
 
 static DRIVER_INIT( psoldier )
@@ -2300,10 +2295,10 @@ GAME( 1992, uccops,   0,        raster,    uccops,   uccops,   ROT0,   "Irem",  
 GAME( 1992, uccopsj,  uccops,   raster,    uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Japan)", 0 )
 GAME( 1992, mysticri, 0,        nonraster, mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (World)", 0 )
 GAME( 1992, gunhohki, mysticri, nonraster, mysticri, mysticri, ROT0,   "Irem",         "Gun Hohki (Japan)", 0 )
-GAME( 1992, majtitl2, 0,        raster,    majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, majtit2j, majtitl2, raster,    majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, skingame, majtitl2, raster,    majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, skingam2, majtitl2, raster,    majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 2)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, majtitl2, 0,        raster,    majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (World)", 0 )
+GAME( 1992, majtit2j, majtitl2, raster,    majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", 0 )
+GAME( 1992, skingame, majtitl2, raster,    majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", 0 )
+GAME( 1992, skingam2, majtitl2, raster,    majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 2)", 0 )
 GAME( 1992, hook,     0,        nonraster, hook,     hook,     ROT0,   "Irem",         "Hook (World)", 0 )
 GAME( 1992, hooku,    hook,     nonraster, hook,     hook,     ROT0,   "Irem America", "Hook (US)", 0 )
 GAME( 1992, hookj,    hook,     nonraster, hook,     hook,     ROT0,   "Irem",         "Hook (Japan)", 0 )

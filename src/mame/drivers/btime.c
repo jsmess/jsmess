@@ -50,6 +50,10 @@ can take. Should the game reset????
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
+
+extern UINT8 *btime_videoram;
+extern size_t btime_videoram_size;
+extern UINT8 *btime_colorram;
 extern UINT8 *lnc_charbank;
 extern UINT8 *bnj_backgroundram;
 extern size_t bnj_backgroundram_size;
@@ -246,8 +250,8 @@ static ADDRESS_MAP_START( btime_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(MWA8_NOP)
@@ -278,8 +282,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cookrace_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x0500, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0xc800, 0xcbff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_WRITE(MWA8_RAM)	/* background? */
@@ -307,8 +311,8 @@ static ADDRESS_MAP_START( zoar_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	    /* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0x8800, 0x8bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(zoar_video_control_w)
@@ -335,8 +339,8 @@ static ADDRESS_MAP_START( lnc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)      	/* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)  /* this is just here to initialize the pointer */
+	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)  /* this is just here to initialize the pointer */
 	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(lnc_mirrorvideoram_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(MWA8_NOP)            /* ??? */
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(lnc_video_control_w)
@@ -363,8 +367,8 @@ static ADDRESS_MAP_START( mmonkey_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)  /* override the following entries to */
 									/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)  /* this is just here to initialize the pointer */
+	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)  /* this is just here to initialize the pointer */
 	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(lnc_mirrorvideoram_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(lnc_video_control_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_RAM) AM_BASE(&lnc_charbank)
@@ -391,8 +395,8 @@ static ADDRESS_MAP_START( bnj_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(bnj_video_control_w)
 	AM_RANGE(0x1002, 0x1002) AM_WRITE(sound_command_w)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x5000, 0x51ff) AM_WRITE(bnj_background_w) AM_BASE(&bnj_backgroundram) AM_SIZE(&bnj_backgroundram_size)
@@ -418,8 +422,8 @@ static ADDRESS_MAP_START( disco_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x04ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
 	AM_RANGE(0x2000, 0x7fff) AM_WRITE(deco_charram_w) AM_BASE(&deco_charram)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0x8800, 0x881f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(sound_command_w)
 	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(disco_video_control_w)
@@ -1703,7 +1707,7 @@ ROM_END
 
 ROM_START( zoar )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
-	ROM_LOAD( "zoar15",       0xd000, 0x1000, CRC(1f0cfdb7) SHA1(ce7e871f17c52b6eaf99cfb721e702e4f0e6bb25) )
+	ROM_LOAD( "zoar15",       0xd000, 0x1000, BAD_DUMP CRC(1f0cfdb7) SHA1(ce7e871f17c52b6eaf99cfb721e702e4f0e6bb25) )
 	ROM_LOAD( "zoar16",       0xe000, 0x1000, CRC(7685999c) SHA1(fabe38d71e797ae0b04b5d3aba228b4c85d96185) )
 	ROM_LOAD( "zoar17",       0xf000, 0x1000, CRC(619ea867) SHA1(0a3735384f03a1052d54ab799b5e37038d8ece2a) )
 
@@ -1820,7 +1824,7 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 	return RAM[0xc15f];
 }
 
-static DRIVER_INIT( btime )
+static void init_rom1(void)
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 
@@ -1833,6 +1837,11 @@ static DRIVER_INIT( btime )
 	memcpy(decrypted,rom,0x10000);
 }
 
+static DRIVER_INIT( btime )
+{
+	init_rom1();
+}
+
 static DRIVER_INIT( zoar )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
@@ -1843,7 +1852,7 @@ static DRIVER_INIT( zoar )
        I'm NOPing it out for now. */
 	memset(&rom[0xd50a],0xea,8);
 
-    init_btime(machine);
+	init_rom1();
 }
 
 static DRIVER_INIT( lnc )
@@ -1854,14 +1863,14 @@ static DRIVER_INIT( lnc )
 static DRIVER_INIT( cookrace )
 {
 	memcpy(&sound_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
-	init_lnc(machine);
+	decrypt_C10707_cpu(0, REGION_CPU1);
 }
 
 static DRIVER_INIT( wtennis )
 {
 	memcpy(&sound_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
-	init_lnc(machine);
+	decrypt_C10707_cpu(0, REGION_CPU1);
 }
 
 static DRIVER_INIT( sdtennis )

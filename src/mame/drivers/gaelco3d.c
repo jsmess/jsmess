@@ -258,35 +258,9 @@ static WRITE32_HANDLER( irq_ack_020_w ) { if ((mem_mask & 0xffff0000) != 0xffff0
 
 /*************************************
  *
- *  EEPROM (93C66)
+ *  EEPROM (93C66B)
  *
  *************************************/
-
-static struct EEPROM_interface gaelco2_eeprom_interface =
-{
-	8,				/* address bits */
-	16,				/* data bits */
-	"*110",			/* read command */
-	"*101",			/* write command */
-	"*111",			/* erase command */
-	"*10000xxxxxx",	/* lock command */
-	"*10011xxxxxx", /* unlock command */
-//  "*10001xxxxxx", /* write all */
-//  "*10010xxxxxx", /* erase all */
-};
-
-
-static NVRAM_HANDLER( gaelco3d )
-{
-	if (read_or_write)
-		EEPROM_save(file);
-	else
-	{
-		EEPROM_init(&gaelco2_eeprom_interface);
-		if (file) EEPROM_load(file);
-	}
-}
-
 
 static READ16_HANDLER( eeprom_data_r )
 {
@@ -981,7 +955,7 @@ MACHINE_DRIVER_START( gaelco3d )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_RESET(gaelco3d)
-	MDRV_NVRAM_HANDLER(gaelco3d)
+	MDRV_NVRAM_HANDLER(93C66B)
 
 	MDRV_INTERLEAVE(100)
 

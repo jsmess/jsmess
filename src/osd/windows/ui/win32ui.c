@@ -73,7 +73,7 @@
 #include "dialogs.h"
 #include "state.h"
 #include "winmain.h"
-#include "winutil.h"
+#include "winutf8.h"
 #include "strconv.h"
 #include "windows/input.h"
 #include "windows/window.h"
@@ -614,7 +614,7 @@ static TBBUTTON tbb[] =
 
 #define NUM_TOOLTIPS 8
 
-static TCHAR szTbStrings[NUM_TOOLTIPS + 1][30] =
+static const TCHAR szTbStrings[NUM_TOOLTIPS + 1][30] =
 {
 	TEXT("Toggle Folder List"),
 	TEXT("Toggle Screen Shot"),
@@ -1557,16 +1557,10 @@ static void RandomSelectBackground(void)
 void SetMainTitle(void)
 {
 	char version[50];
-	TCHAR buffer[100];
-	TCHAR* t_version;
-
+	char buffer[100];
 	sscanf(build_version,"%s",version);
-	t_version = tstring_from_utf8(version);
-	if( !t_version )
-		return;
-	_stprintf(buffer,TEXT("%s %s"),TEXT(MAME32NAME),t_version);
-	SetWindowText(hMain,buffer);
-	free(t_version);
+	snprintf(buffer, ARRAY_LENGTH(buffer), "%s %s", MAME32NAME, version);
+	win_set_window_text_utf8(hMain,buffer);
 }
 
 static void winui_output_error(void *param, const char *format, va_list argptr)
@@ -3756,7 +3750,7 @@ UINT_PTR CALLBACK CFHookProc(
 	switch (uiMsg)
 	{
 		case WM_INITDIALOG:
-			SendDlgItemMessage(hdlg, cmb4, CB_ADDSTRING, 0, (LPARAM)"Custom");
+			SendDlgItemMessage(hdlg, cmb4, CB_ADDSTRING, 0, (LPARAM)TEXT("Custom"));
 			iIndex = SendDlgItemMessage(hdlg, cmb4, CB_GETCOUNT, 0, 0);
 			cList = GetListFontColor();
 			SendDlgItemMessage(hdlg, cmb4, CB_SETITEMDATA,(WPARAM)iIndex-1,(LPARAM)cList );
@@ -3784,7 +3778,7 @@ UINT_PTR CALLBACK CFHookProc(
  							cList = GetListFontColor();
  							PickColor(&cList);
 							SendDlgItemMessage(hdlg, cmb4, CB_DELETESTRING, iIndex, 0);
-							SendDlgItemMessage(hdlg, cmb4, CB_ADDSTRING, 0, (LPARAM)"Custom");
+							SendDlgItemMessage(hdlg, cmb4, CB_ADDSTRING, 0, (LPARAM)TEXT("Custom"));
 							SendDlgItemMessage(hdlg, cmb4, CB_SETITEMDATA,(WPARAM)iIndex,(LPARAM)cList);
 							SendDlgItemMessage(hdlg, cmb4, CB_SETCURSEL,(WPARAM)iIndex,0 );
 							return TRUE;
@@ -4592,7 +4586,7 @@ const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nColumn,
 			utf8_s = GetDriverFilename(nItem);
 			break;
 
-        case COLUMN_PLAYTIME:
+		case COLUMN_PLAYTIME:
 			/* Source drivers */
 			GetTextPlayTime(nItem, playtime_buf);
 			utf8_s = playtime_buf;
@@ -4639,7 +4633,8 @@ const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nColumn,
 			break;
 	}
 	
-	if( utf8_s ) {
+	if( utf8_s )
+	{
 		TCHAR* t_s = tstring_from_utf8(utf8_s);
 		if( !t_s )
 			return s;
@@ -5365,7 +5360,15 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 
 void SetStatusBarText(int part_index, const char *message)
 {
-	SendMessage(hStatusBar, SB_SETTEXT, (WPARAM) part_index, (LPARAM) message);
+	/*
+	TCHAR* t_message = tstring_from_utf8(message);
+	if( !t_message )
+		return;
+	*/
+	SendMessage(hStatusBar, SB_SETTEXT, (WPARAM) part_index, (LPARAM)/*(LPCTSTR) win_tstring_strdup(t_*/message/*)*/);
+	/*
+	free(t_message);
+	*/
 }
 
 void SetStatusBarTextF(int part_index, const char *fmt, ...)

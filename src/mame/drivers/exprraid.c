@@ -557,13 +557,10 @@ static void exprraid_gfx_expand(void)
 }
 
 
-static DRIVER_INIT( wexpress )
+static void patch_rom1(void)
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	int i;
-
-
-	exprraid_gfx_expand();
 
 	/* HACK!: Implement custom opcode as regular with a mapped io read */
 	for ( i = 0; i < 0x10000; i++ )
@@ -577,6 +574,12 @@ static DRIVER_INIT( wexpress )
 			rom[i] = 0xff;
 		}
 	}
+}
+
+static DRIVER_INIT( wexpress )
+{
+	patch_rom1();
+	exprraid_gfx_expand();
 }
 
 static DRIVER_INIT( exprraid )
@@ -594,8 +597,8 @@ static DRIVER_INIT( exprraid )
 	rom[0xfffe] = rom[0xfff3];
 	rom[0xffff] = rom[0xfff2];
 
-	/* HACK!: Implement custom opcode as regular with a mapped io read */
-	init_wexpress(machine);
+	patch_rom1();
+	exprraid_gfx_expand();
 }
 
 static DRIVER_INIT( wexpresb )

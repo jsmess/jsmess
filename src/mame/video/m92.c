@@ -450,64 +450,72 @@ VIDEO_START( m92 )
 
 static void m92_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	int offs=0;
+	int offs,k;
 
-	while (offs<m92_sprite_list) {
-		int x,y,sprite,colour,fx,fy,x_multi,y_multi,i,j,s_ptr,pri;
+	for (k=0; k<8; k++) {
+		offs = 0;
+		while (offs<m92_sprite_list) {
 
-		y=(buffered_spriteram[offs+0] | (buffered_spriteram[offs+1]<<8))&0x1ff;
-		x=(buffered_spriteram[offs+6] | (buffered_spriteram[offs+7]<<8))&0x1ff;
+			int x,y,sprite,colour,fx,fy,x_multi,y_multi,i,j,s_ptr,pri_back,pri_sprite;
 
-		if ((buffered_spriteram[offs+4]&0x80)==0x80) pri=0; else pri=2;
+			y=(buffered_spriteram[offs+0] | (buffered_spriteram[offs+1]<<8))&0x1ff;
+			x=(buffered_spriteram[offs+6] | (buffered_spriteram[offs+7]<<8))&0x1ff;
 
-		x = x - 16;
-		y = 512 - 16 - y;
+			if ((buffered_spriteram[offs+4] & 0x80)==0x80) pri_back=0; else pri_back=2;
 
-	    sprite=(buffered_spriteram[offs+2] | (buffered_spriteram[offs+3]<<8));
-		colour=buffered_spriteram[offs+4]&0x7f;
+			x = x - 16;
+			y = 512 - 16 - y;
 
-		fx=buffered_spriteram[offs+5]&1;
-		fy=(buffered_spriteram[offs+5]&2)>>1;
-		y_multi=(buffered_spriteram[offs+1]>>1)&0x3;
-		x_multi=(buffered_spriteram[offs+1]>>3)&0x3;
+		 	sprite=(buffered_spriteram[offs+2] | (buffered_spriteram[offs+3]<<8));
+			colour=buffered_spriteram[offs+4]&0x7f;
+			pri_sprite=(buffered_spriteram[offs+1] & 0xe0)>>5;
 
-		y_multi=1 << y_multi; /* 1, 2, 4 or 8 */
-		x_multi=1 << x_multi; /* 1, 2, 4 or 8 */
+			fx=buffered_spriteram[offs+5]&1;
+			fy=(buffered_spriteram[offs+5]&2)>>1;
+			y_multi=(buffered_spriteram[offs+1]>>1)&0x3;
+			x_multi=(buffered_spriteram[offs+1]>>3)&0x3;
 
-		if (fx) x+=16 * (x_multi - 1);
+			y_multi=1 << y_multi;
+			x_multi=1 << x_multi;
 
-		for (j=0; j<x_multi; j++)
-		{
-			s_ptr=8 * j;
-			if (!fy) s_ptr+=y_multi-1;
+			if (fx) x+=16 * (x_multi - 1);
 
-			for (i=0; i<y_multi; i++)
+			for (j=0; j<x_multi; j++)
 			{
-				if (flip_screen) {
-					int ffx=fx,ffy=fy;
-					if (ffx) ffx=0; else ffx=1;
-					if (ffy) ffy=0; else ffy=1;
-					pdrawgfx(bitmap,Machine->gfx[1],
-							sprite + s_ptr,
-							colour,
-							ffx,ffy,
-							496-x,496-(y-i*16),
-							cliprect,TRANSPARENCY_PEN,0,pri);
-				} else {
-					pdrawgfx(bitmap,Machine->gfx[1],
-							sprite + s_ptr,
-							colour,
-							fx,fy,
-							x,y-i*16,
-							cliprect,TRANSPARENCY_PEN,0,pri);
+				s_ptr=8 * j;
+				if (!fy) s_ptr+=y_multi-1;
+
+				for (i=0; i<y_multi; i++)
+				{
+					if (flip_screen) {
+						int ffx=fx,ffy=fy;
+						if (ffx) ffx=0; else ffx=1;
+						if (ffy) ffy=0; else ffy=1;
+							if (pri_sprite==k)
+								pdrawgfx(bitmap,Machine->gfx[1],
+									sprite + s_ptr,
+									colour,
+									ffx,ffy,
+									496-x,496-(y-i*16),
+									cliprect,TRANSPARENCY_PEN,0,pri_back);
+					} else {
+							if (pri_sprite==k)
+								pdrawgfx(bitmap,Machine->gfx[1],
+									sprite + s_ptr,
+									colour,
+									fx,fy,
+									x,y-i*16,
+									cliprect,TRANSPARENCY_PEN,0,pri_back);
+					}
+					if (fy) s_ptr++; else s_ptr--;
 				}
-				if (fy) s_ptr++; else s_ptr--;
+				if (fx) x-=16; else x+=16;
+				offs+=8;
 			}
-			if (fx) x-=16; else x+=16;
-			offs+=8;
 		}
 	}
 }
+
 
 /*****************************************************************************/
 

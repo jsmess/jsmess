@@ -68,7 +68,7 @@ DRIVER_INIT( empcity )
 
 DRIVER_INIT( stfight )
 {
-	init_empcity(machine);
+	driver_init_empcity(machine);
 
 	/* patch out a tight loop during startup - is the code waiting */
 	/* for NMI to wake it up? */

@@ -1273,59 +1273,6 @@ static DRIVER_INIT( taitojc )
 	polygon_fifo = auto_malloc(POLYGON_FIFO_SIZE * sizeof(UINT16));
 }
 
-static DRIVER_INIT( dendeg )
-{
-	//UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
-
-	//rom[(0x12bec2 / 2) ^ 1] = 0xffff;     // enable debug mode
-
-	init_taitojc(machine);
-}
-
-static DRIVER_INIT( dendegx )
-{
-	//UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
-
-	init_taitojc(machine);
-}
-
-static DRIVER_INIT( dendeg2 )
-{
-	//UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
-
-	init_taitojc(machine);
-}
-
-static DRIVER_INIT( dendeg2x )
-{
-	//UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
-
-	init_taitojc(machine);
-}
-
-static DRIVER_INIT( sidebs )
-{
-	//UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
-
-	//rom[((0x100000 + 0x33c30) / 2) ^ 1] = 0xffff;     // enable debug mode
-
-	init_taitojc(machine);
-}
-
-static DRIVER_INIT( sidebs2 )
-{
-	//UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
-
-	init_taitojc(machine);
-}
-
-static DRIVER_INIT( landgear )
-{
-	//UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
-
-	init_taitojc(machine);
-}
-
 ROM_START( sidebs )
 	ROM_REGION(0x200000, REGION_CPU1, 0)		/* 68040 code */
  	ROM_LOAD32_BYTE("e23-19.036", 0x000000, 0x80000, CRC(7b75481b) SHA1(47332e045f92b31e4f35c38e6880a7287b9a5c2c) )
@@ -1686,12 +1633,10 @@ ROM_START( landgear )
 ROM_END
 
 
-
-
-GAME( 1996, dendeg,   0,       taitojc, dendeg,   dendeg,   ROT0, "Taito", "Densya De Go", GAME_NOT_WORKING )
-GAME( 1996, dendegx,  dendeg,  taitojc, dendeg,   dendegx,  ROT0, "Taito", "Densya De Go Ex", GAME_NOT_WORKING )
-GAME( 1998, dendeg2,  0,       taitojc, dendeg,   dendeg2,  ROT0, "Taito", "Densya De Go 2", GAME_NOT_WORKING )
-GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   dendeg2x, ROT0, "Taito", "Densya De Go 2 Ex", GAME_NOT_WORKING )
-GAME( 1996, sidebs,   0,       taitojc, sidebs,   sidebs,   ROT0, "Taito", "Side By Side", GAME_NOT_WORKING )
-GAME( 1997, sidebs2,  0,       taitojc, sidebs,   sidebs2,  ROT0, "Taito", "Side By Side 2", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, landgear, 0,       taitojc, landgear, landgear, ROT0, "Taito", "Landing Gear", GAME_NOT_WORKING )
+GAME( 1996, dendeg,   0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go", GAME_NOT_WORKING )
+GAME( 1996, dendegx,  dendeg,  taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go Ex", GAME_NOT_WORKING )
+GAME( 1998, dendeg2,  0,       taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2", GAME_NOT_WORKING )
+GAME( 1998, dendeg2x, dendeg2, taitojc, dendeg,   taitojc,  ROT0, "Taito", "Densya De Go 2 Ex", GAME_NOT_WORKING )
+GAME( 1996, sidebs,   0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side", GAME_NOT_WORKING )
+GAME( 1997, sidebs2,  0,       taitojc, sidebs,   taitojc,  ROT0, "Taito", "Side By Side 2", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, landgear, 0,       taitojc, landgear, taitojc,  ROT0, "Taito", "Landing Gear", GAME_NOT_WORKING )

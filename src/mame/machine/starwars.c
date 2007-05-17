@@ -175,7 +175,7 @@ WRITE8_HANDLER( starwars_adc_select_w )
 
 void swmathbox_init(void)
 {
-	UINT8 *src = memory_region(REGION_PROMS);
+	UINT8 *src = memory_region(REGION_USER2);
 	int cnt, val;
 
 	PROM_STR = auto_malloc(1024 * sizeof(PROM_STR[0]));

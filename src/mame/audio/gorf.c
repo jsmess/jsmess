@@ -179,18 +179,8 @@ READ8_HANDLER( gorf_speech_r )
 	 return data;				                   /* Return nicely */
 }
 
-int gorf_status_r(void)
+
+UINT32 gorf_speech_status_r(void *param)
 {
-    return !sample_playing(0);
-}
-
-/* Read from port 2 (0x12) returns speech status as 0x80 */
-
-READ8_HANDLER( gorf_port_2_r )
-{
-    int Ans;
-
-    Ans = (input_port_2_r(0) & 0x7F);
-    if (gorf_status_r() != 0) Ans += 128;
-    return Ans;
+	return !sample_playing(0);
 }

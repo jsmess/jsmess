@@ -54,6 +54,10 @@ it as ASCII text.
 
 
 /* from video/btime.c */
+extern UINT8 *btime_videoram;
+extern size_t btime_videoram_size;
+extern UINT8 *btime_colorram;
+
 PALETTE_INIT( btime );
 VIDEO_START( btime );
 VIDEO_UPDATE( eggs );
@@ -78,8 +82,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dommy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(MWA8_NOP)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(btime_video_control_w)
@@ -105,8 +109,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eggs_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(btime_video_control_w)
@@ -120,7 +124,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( scregg )
+static INPUT_PORTS_START( scregg )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -382,7 +386,7 @@ ROM_START( rockduck )
 ROM_END
 
 
-DRIVER_INIT( rockduck )
+static DRIVER_INIT( rockduck )
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;

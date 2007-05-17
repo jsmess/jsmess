@@ -317,7 +317,7 @@ DRIVER_INIT(hshavoc)
 
 
 
-	init_genesis(machine);
+	driver_init_genesis(machine);
 
 }
 

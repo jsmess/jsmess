@@ -283,7 +283,11 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 
 	for (i = nDirInfoCount - 1; i >= 0; i--)
 	{
-		ComboBox_InsertString(GetDlgItem(hDlg, IDC_DIR_COMBO), 0, g_directoryInfo[i].lpName);
+		t_s = tstring_from_utf8(g_directoryInfo[i].lpName);
+		if( !t_s )
+			return FALSE;
+		ComboBox_InsertString(GetDlgItem(hDlg, IDC_DIR_COMBO), 0, win_tstring_strdup(t_s));
+		free(t_s);
 	}
 
 	ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_DIR_COMBO), 0);
@@ -301,6 +305,8 @@ static BOOL Directories_OnInitDialog(HWND hDlg, HWND hwndFocus, LPARAM lParam)
 	{
 		s = g_directoryInfo[i].pfnGetTheseDirs();
 		t_s = tstring_from_utf8(s);
+		if( !t_s )
+			return FALSE;
 		if (g_directoryInfo[i].bMulti)
 		{
 			/* Copy the string to our own buffer so that we can mutilate it */

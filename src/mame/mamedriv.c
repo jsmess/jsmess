@@ -1207,6 +1207,7 @@ const game_driver * const drivers[] =
 	DRIVER( robby )		/* (c) 1981 Bally Midway */
 	DRIVER( demndrgn )	/* (c) 1982 Bally Midway */
 	DRIVER( profpac )	/* (c) 1983 Bally Midway */
+	DRIVER( tenpindx )	/* (c) 1983 Bally Midway */
 
 	/* Bally Midway MCR games */
 	/* MCR1 */
@@ -4011,6 +4012,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( shackled )	/* (c) 1986 Data East USA (US) */
 	DRIVER( breywood )	/* (c) 1986 Data East Corporation (Japan) */
 	DRIVER( csilver )	/* (c) 1987 Data East Corporation (Japan) */
+	DRIVER( csilverj )	/* (c) 1987 Data East Corporation (Japan) */
 	DRIVER( ghostb )	/* (c) 1987 Data East USA (US) */
 	DRIVER( ghostb3 )	/* (c) 1987 Data East USA (US) */
 	DRIVER( meikyuh )	/* (c) 1987 Data East Corporation (Japan) */
@@ -6540,6 +6542,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( srmp6 )		/* (c) 1996 Seta (Japan) */
 
 	/* Seta Aleck64 and similar (N64 based) */
+	DRIVER( aleck64 )	/* (c) 1998 Nintendo/Seta */
 	DRIVER( 11beat )	/* (c) 1998 Hudson */
 	DRIVER( mtetrisc )	/* (c) 1998 Capcom */
 	DRIVER( starsldr )	/* (c) 1998 Hudson/Seta */
@@ -7205,6 +7208,13 @@ Other Sun games
 	DRIVER( skattv )	/* (c) 1994 */
 	DRIVER( skattva )	/* (c) 1995 */
 	DRIVER( fashiong )	/* (c) 1997 */
+
+	/* JMP Impact Games */
+	DRIVER( cluedo )	/* (c) 1995 */
+	DRIVER( cluedo2c )	/* (c) 1995 */
+	DRIVER( trivialp )	/* (c) 1996 */
+	DRIVER( scrabble )	/* (c) 1997 */
+	DRIVER( hngmnjpm )	/* (c) 1998 */
 
 	/* Other Games */
 	DRIVER( astinvad )	/* (c) 1980 Stern */

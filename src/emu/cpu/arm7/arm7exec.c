@@ -43,7 +43,6 @@
 {
     UINT32 pc;
     UINT32 insn;
-    static UINT32 ppc;
 
     ARM7_ICOUNT = cycles;
     do
@@ -59,7 +58,6 @@
 		INT32 offs;
 		pc = R15;
 		insn = cpu_readop16(pc & (~1));
-		ppc = pc & 0xfffffffe;
 		ARM7_ICOUNT += (3 - thumbCycles[insn >> 8]);
 		switch( ( insn & THUMB_INSN_TYPE ) >> THUMB_INSN_TYPE_SHIFT )
 		{
@@ -71,13 +69,9 @@
 					rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 					rrs = GET_REGISTER(rs);
 					offs = ( insn & THUMB_SHIFT_AMT ) >> THUMB_SHIFT_AMT_SHIFT;
-					R15 += 2;
-					if( offs == 0 )
+					if( offs != 0 )
 					{
-						offs = 32;
-					}
-					SET_REGISTER( rd, GET_REGISTER(rs) >> offs );
-					SET_CPSR(GET_CPSR | Z_MASK);
+						SET_REGISTER( rd, rrs >> offs );
 					if( rrs & ( 1 << (offs-1) ) )
 					{
 						SET_CPSR(GET_CPSR | C_MASK);
@@ -86,8 +80,22 @@
 					{
 						SET_CPSR(GET_CPSR &~ C_MASK);
 					}
+					}
+					else
+					{
+						SET_REGISTER( rd, 0 );
+						if( rrs & 0x80000000 )
+						{
+						        SET_CPSR( GET_CPSR | C_MASK );
+						}
+						else
+						{
+						        SET_CPSR( GET_CPSR &~ C_MASK );
+						}
+					}
 					SET_CPSR(GET_CPSR &~ ( Z_MASK | N_MASK ) );
 					SET_CPSR( GET_CPSR | HandleALUNZFlags( GET_REGISTER(rd) ) );
+				        R15 += 2;
 				}
 				else /* Shift left */
 				{
@@ -95,12 +103,10 @@
 					rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 					rrs = GET_REGISTER(rs);
 					offs = ( insn & THUMB_SHIFT_AMT ) >> THUMB_SHIFT_AMT_SHIFT;
-					R15 += 2;
-					if( offs == 0 )
+					if( offs != 0 )
 					{
-						SET_REGISTER( rd, 0 );
-						SET_CPSR(GET_CPSR | Z_MASK);
-						if( rrs & 1 )
+						SET_REGISTER( rd, rrs << offs );
+						if( rrs & ( 1 << ( 31 - ( offs - 1 ) ) ) )
 						{
 							SET_CPSR(GET_CPSR | C_MASK);
 						}
@@ -111,18 +117,11 @@
 					}
 					else
 					{
-						SET_REGISTER( rd, GET_REGISTER(rs) << offs );
-						if( !GET_REGISTER(rd) )
-						{
-							SET_CPSR(GET_CPSR | Z_MASK);
-						}
-						if( GET_REGISTER(rd) & ( 1 << 31 ) )
-						{
-							SET_CPSR(GET_CPSR | N_MASK);
-						}
+						SET_REGISTER( rd, rrs );
 					}
 					SET_CPSR( GET_CPSR &~ ( Z_MASK | N_MASK ) );
 					SET_CPSR( GET_CPSR | HandleALUNZFlags( GET_REGISTER(rd) ) );
+					R15 += 2;
 				}
 				break;
 			case 0x1: /* Arithmetic */
@@ -173,13 +172,14 @@
 						rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
 						rrs = GET_REGISTER(rs);
 						offs = ( insn & THUMB_SHIFT_AMT ) >> THUMB_SHIFT_AMT_SHIFT;
-						R15 += 2;
 						if( offs == 0 )
 						{
 							offs = 32;
 						}
-						SET_REGISTER( rd, (INT32)(GET_REGISTER(rs)) >> offs );
-						if( rrs & ( 1 << (offs-1) ) )
+
+						if( offs >= 32 )
+						{
+						        if( rrs >> 31 )
 						{
 							SET_CPSR(GET_CPSR | C_MASK);
 						}
@@ -187,8 +187,23 @@
 						{
 							SET_CPSR(GET_CPSR &~ C_MASK);
 						}
+						        SET_REGISTER( rd, ( rrs & 0x80000000 ) ? 0xFFFFFFFF : 0x00000000 );
+						}
+						else
+						{
+						        if( ( rrs >> ( offs - 1 ) ) & 1 )
+						        {
+						        SET_CPSR( GET_CPSR | C_MASK );
+						        }
+						        else
+						        {
+						        SET_CPSR( GET_CPSR &~ C_MASK );
+						        }
+						        SET_REGISTER( rd, ( rrs & 0x80000000 ) ? ( ( 0xFFFFFFFF << ( 32 - offs ) ) | ( rrs >> offs ) ) : ( rrs >> offs ) );
+						}
 						SET_CPSR(GET_CPSR &~ (N_MASK | Z_MASK));
 						SET_CPSR( GET_CPSR | HandleALUNZFlags( GET_REGISTER(rd) ) );
+						R15 += 2;
 					}
 
 				}
@@ -257,15 +272,82 @@
 							case 0x2: /* LSL Rd, Rs */
 								rs = ( insn & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
 								rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
-								SET_REGISTER( rd, GET_REGISTER(rd) << GET_REGISTER(rs) );
+								rrd = GET_REGISTER(rd);
+								offs = GET_REGISTER(rs) & 0x000000ff;
+								if (offs > 0)
+								{
+									if ( offs < 32 )
+									{
+									        SET_REGISTER( rd, rrd << offs );
+									        if( rrd & ( 1 << ( 31 - ( offs - 1 ) ) ) )
+									        {
+										        SET_CPSR( GET_CPSR | C_MASK );
+									        }
+									        else
+									        {
+										        SET_CPSR( GET_CPSR &~ C_MASK );
+									        }
+									}
+									else if( offs == 32 )
+									{
+									        SET_REGISTER( rd, 0 );
+									        if( rrd & 1 )
+									        {
+										        SET_CPSR( GET_CPSR | C_MASK );
+									        }
+									        else
+									        {
+										        SET_CPSR( GET_CPSR &~ C_MASK );
+									        }
+									}
+									else
+									{
+									        SET_REGISTER( rd, 0 );
+									        SET_CPSR( GET_CPSR &~ C_MASK );
+									}
+								}
+								SET_CPSR( GET_CPSR &~ ( Z_MASK | N_MASK ) );
 								SET_CPSR( GET_CPSR | HandleALUNZFlags( GET_REGISTER(rd) ) );
 								R15 += 2;
 								break;
 							case 0x3: /* LSR Rd, Rs */
 								rs = ( insn & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
 								rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
-								// printf( "LSR R%d (%08x), R%d (%08x) (= %08x)\n", rd, GET_REGISTER(rd), rs, GET_REGISTER(rs), GET_REGISTER(rd) << GET_REGISTER(rs) );
-								SET_REGISTER( rd, GET_REGISTER(rd) >> GET_REGISTER(rs) );
+								rrd = GET_REGISTER(rd);
+								offs = GET_REGISTER(rs) & 0x000000ff;
+								if (offs >  0)
+								{
+									if( offs < 32 )
+									{
+									        SET_REGISTER( rd, rrd >> offs );
+									        if( rrd & ( 1 << ( offs - 1 ) ) )
+									        {
+										        SET_CPSR( GET_CPSR | C_MASK );
+									        }
+									        else
+									        {
+										        SET_CPSR( GET_CPSR &~ C_MASK );
+									        }
+									}
+									else if( offs == 32 )
+									{
+									        SET_REGISTER( rd, 0 );
+									        if( rrd & 0x80000000 )
+									        {
+										        SET_CPSR( GET_CPSR | C_MASK );
+									        }
+									        else
+									        {
+										        SET_CPSR( GET_CPSR &~ C_MASK );
+									        }
+									}
+									else
+									{
+									        SET_REGISTER( rd, 0 );
+									        SET_CPSR( GET_CPSR &~ C_MASK );
+									}
+								}
+								SET_CPSR( GET_CPSR &~ ( Z_MASK | N_MASK ) );
 								SET_CPSR( GET_CPSR | HandleALUNZFlags( GET_REGISTER(rd) ) );
 								R15 += 2;
 								break;
@@ -326,12 +408,16 @@
 							case 0x7: /* ROR Rd, Rs */
 								rs = ( insn & THUMB_ADDSUB_RS ) >> THUMB_ADDSUB_RS_SHIFT;
 								rd = ( insn & THUMB_ADDSUB_RD ) >> THUMB_ADDSUB_RD_SHIFT;
+                     					        rrd = GET_REGISTER(rd);
 								imm = GET_REGISTER(rs) & 0x0000001f;
-								SET_REGISTER( rd, ( GET_REGISTER(rd) >> imm ) | ( GET_REGISTER(rd) << ( 32 - imm ) ) );
-								SET_CPSR( GET_CPSR &~ C_MASK );
-								if( GET_REGISTER(rd) & 0x80000000 )
+								SET_REGISTER( rd, ( rrd >> imm ) | ( rrd << ( 32 - imm ) ) );
+								if( rrd & ( 1 << ( imm - 1 ) ) )
 								{
-									SET_CPSR( GET_CPSR | C_BIT );
+								        SET_CPSR( GET_CPSR | C_MASK );
+								}
+								else
+								{
+								        SET_CPSR( GET_CPSR &~ C_MASK );
 								}
 								SET_CPSR( GET_CPSR &~ ( Z_MASK | N_MASK ) );
 								SET_CPSR( GET_CPSR | HandleALUNZFlags( GET_REGISTER(rd) ) );
@@ -411,15 +497,30 @@
 								rd = insn & THUMB_HIREG_RD;
 								switch( ( insn & THUMB_HIREG_H ) >> THUMB_HIREG_H_SHIFT )
 								{
+									case 0x1: /* ADD Rd, HRs */
+						      				SET_REGISTER( rd, GET_REGISTER(rd) + GET_REGISTER(rs+8) );
+										break;
 									case 0x2: /* ADD HRd, Rs */
 										SET_REGISTER( rd+8, GET_REGISTER(rd+8) + GET_REGISTER(rs) );
-										if (rd == 7) // urgh.. kov2 and martmast need this.. maybe anything else relying on R15 is wrong too
+										if (rd == 7)
+										{
 											R15 += 2;
+											change_pc(R15);
+										}
+										break;
+									case 0x3: /* Add HRd, HRs */
+										SET_REGISTER( rd+8, GET_REGISTER(rd+8) + GET_REGISTER(rs+8) );
+										if (rd == 7)
+										{
+											R15 += 2;
+											change_pc(R15);
+										}
+										break;
+									default:
+										fatalerror("%08x: G4-1-0 Undefined Thumb instruction: %04x %x\n", pc, insn, ( insn & THUMB_HIREG_H ) >> THUMB_HIREG_H_SHIFT );
 										break;
 								}
-								//printf("fix me!\n");
 								R15 += 2;
-
 								break;
 							case 0x1: /* CMP */
 								switch( ( insn & THUMB_HIREG_H ) >> THUMB_HIREG_H_SHIFT )
@@ -714,16 +815,16 @@
 				if( insn & THUMB_STACKOP_L )
 				{
 					rd = ( insn & THUMB_STACKOP_RD ) >> THUMB_STACKOP_RD_SHIFT;
-					offs = (INT8)( insn & THUMB_INSN_IMM );
-					readword = READ32( GET_REGISTER(13) + ( (INT32)offs << 2 ) );
+					offs = (UINT8)( insn & THUMB_INSN_IMM );
+					readword = READ32( GET_REGISTER(13) + ( (UINT32)offs << 2 ) );
 					SET_REGISTER( rd, readword );
 					R15 += 2;
 				}
 				else
 				{
 					rd = ( insn & THUMB_STACKOP_RD ) >> THUMB_STACKOP_RD_SHIFT;
-					offs = (INT8)( insn & THUMB_INSN_IMM );
-					WRITE32( GET_REGISTER(13) + ( (INT32)offs << 2 ), GET_REGISTER(rd) );
+					offs = (UINT8)( insn & THUMB_INSN_IMM );
+					WRITE32( GET_REGISTER(13) + ( (UINT32)offs << 2 ), GET_REGISTER(rd) );
 					R15 += 2;
 				}
 				break;

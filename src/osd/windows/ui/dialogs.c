@@ -48,7 +48,7 @@
 #include "properties.h"
 #include "dialogs.h"
 #include "strconv.h"
-#include "winutil.h"
+#include "winutf8.h"
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -158,7 +158,7 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 {
 	CHOOSECOLOR cc;
 	COLORREF choice_colors[16];
-	char tmp[4];
+	TCHAR tmp[4];
 	int i;
 	BOOL bRedrawList = FALSE;
 	int nCurSelection = 0;
@@ -184,7 +184,7 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 					(LPARAM)MAKELONG(0, 60)); /* [0, 60] */
 		value = GetCycleScreenshot();
 		SendDlgItemMessage(hDlg,IDC_CYCLETIMESEC, TBM_SETPOS, TRUE, value);
-		itoa(value,tmp,10);
+		_itot(value,tmp,10);
 		SendDlgItemMessage(hDlg,IDC_CYCLETIMESECTXT,WM_SETTEXT,0, (WPARAM)tmp);
 
 		Button_SetCheck(GetDlgItem(hDlg,IDC_STRETCH_SCREENSHOT_LARGER),
@@ -193,21 +193,21 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 						GetFilterInherit());
 		Button_SetCheck(GetDlgItem(hDlg,IDC_NOOFFSET_CLONES),
 						GetOffsetClones());
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "Snapshot");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Snapshot"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_SCREENSHOT);
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "Flyer");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Flyer"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_FLYER);
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "Cabinet");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Cabinet"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_CABINET);
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "Marquee");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Marquee"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_MARQUEE);
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "Title");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Title"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_TITLE);
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "Control Panel");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("Control Panel"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_CONTROL_PANEL);
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "All");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("All"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_ALL);
-		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), "None");
+		ComboBox_AddString(GetDlgItem(hDlg, IDC_HISTORY_TAB), TEXT("None"));
 		ComboBox_SetItemData(GetDlgItem(hDlg, IDC_HISTORY_TAB), nCount++, TAB_NONE);
 		if( GetHistoryTab() < MAX_TAB_TYPES )
 			ComboBox_SetCurSel(GetDlgItem(hDlg, IDC_HISTORY_TAB), GetHistoryTab());
@@ -219,7 +219,7 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
 					(LPARAM)MAKELONG(0, 100)); /* [0, 100] */
 		value = GetScreenshotBorderSize();
 		SendDlgItemMessage(hDlg,IDC_SCREENSHOT_BORDERSIZE, TBM_SETPOS, TRUE, value);
-		itoa(value,tmp,10);
+		_itot(value,tmp,10);
 		SendDlgItemMessage(hDlg,IDC_SCREENSHOT_BORDERSIZETXT,WM_SETTEXT,0, (WPARAM)tmp);
 
 		//return TRUE;
@@ -785,18 +785,18 @@ static DWORD ValidateFilters(LPFOLDERDATA lpFilterRecord, DWORD dwFlags)
 static void OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, int pos)
 {
 	int value;
-	char tmp[4];
+	TCHAR tmp[4];
 	if (hwndCtl == GetDlgItem(hwnd, IDC_CYCLETIMESEC))
 	{
 		value = SendDlgItemMessage(hwnd,IDC_CYCLETIMESEC, TBM_GETPOS, 0, 0);
-		itoa(value,tmp,10);
+		_itot(value,tmp,10);
 		SendDlgItemMessage(hwnd,IDC_CYCLETIMESECTXT,WM_SETTEXT,0, (WPARAM)tmp);
 	}
 	else
 	if (hwndCtl == GetDlgItem(hwnd, IDC_SCREENSHOT_BORDERSIZE))
 	{
 		value = SendDlgItemMessage(hwnd,IDC_SCREENSHOT_BORDERSIZE, TBM_GETPOS, 0, 0);
-		itoa(value,tmp,10);
+		_itot(value,tmp,10);
 		SendDlgItemMessage(hwnd,IDC_SCREENSHOT_BORDERSIZETXT,WM_SETTEXT,0, (WPARAM)tmp);
 	}
 }

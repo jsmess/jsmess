@@ -2212,20 +2212,20 @@ static DRIVER_INIT( generic_5987 )
 
 static DRIVER_INIT( ddcrew )
 {
-	init_generic_5987(machine);
+	driver_init_generic_5987(machine);
 	custom_io_r = ddcrew_custom_io_r;
 }
 
 static DRIVER_INIT( lghost )
 {
-	init_generic_5987(machine);
+	driver_init_generic_5987(machine);
 	custom_io_r = lghost_custom_io_r;
 	custom_io_w = lghost_custom_io_w;
 }
 
 static DRIVER_INIT( wwally )
 {
-	init_generic_5987(machine);
+	driver_init_generic_5987(machine);
 	custom_io_r = wwally_custom_io_r;
 	custom_io_w = wwally_custom_io_w;
 }

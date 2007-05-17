@@ -291,7 +291,7 @@ static INTERRUPT_GEN( ssio_14024_clock )
         /SINT is generated as follows:
 
         Starts with a 16MHz oscillator
-            /2 via 7474 flip-flip @ F11
+            /2 via 7474 flip-flop @ F11
             /16 via 74161 binary counter @ E11
             /10 via 74190 decade counter @ D11
 

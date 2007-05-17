@@ -1634,7 +1634,7 @@ static WRITE32_HANDLER( ge765pwbba_w )
 
 static DRIVER_INIT( ge765pwbba )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	uPD4701_init( 0 );
 
@@ -1934,7 +1934,7 @@ static void gn845pwbb_output_callback( int offset, int data )
 
 static DRIVER_INIT( ddr )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	gx700pwfbf_init( gn845pwbb_output_callback );
 
@@ -1992,7 +1992,7 @@ static WRITE32_HANDLER( gtrfrks_io_w )
 
 static DRIVER_INIT( gtrfrks )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_w );
@@ -2302,7 +2302,7 @@ static void gx894pwbba_init( void (*output_callback)( int offset, int data ) )
 
 static DRIVER_INIT( ddrdigital )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	gx894pwbba_init( gn845pwbb_output_callback );
 }
@@ -2311,7 +2311,7 @@ static DRIVER_INIT( ddrdigital )
 
 static DRIVER_INIT( gtrfrkdigital )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	gx894pwbba_init( NULL );
 
@@ -2376,7 +2376,7 @@ static void ddrsolo_output_callback( int offset, int data )
 
 static DRIVER_INIT( ddrsolo )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	gx894pwbba_init( ddrsolo_output_callback );
 }
@@ -2449,14 +2449,14 @@ static void drmn_output_callback( int offset, int data )
 
 static DRIVER_INIT( drmn )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	gx700pwfbf_init( drmn_output_callback );
 }
 
 static DRIVER_INIT( drmndigital )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	gx894pwbba_init( drmn_output_callback );
 }
@@ -2605,7 +2605,7 @@ static WRITE32_HANDLER( dmx_io_w )
 
 static DRIVER_INIT( dmx )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	gx894pwbba_init( dmx_output_callback );
 
@@ -2673,7 +2673,7 @@ static void salarymc_lamp_clk_write( int data )
 
 static DRIVER_INIT( salarymc )
 {
-	init_konami573( machine );
+	driver_init_konami573( machine );
 
 	security_bit7_write = salarymc_lamp_data_write;
 	security_bit6_write = salarymc_lamp_rst_write;

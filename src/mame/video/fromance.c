@@ -124,6 +124,9 @@ VIDEO_START( nekkyoku )
 	local_videoram[0] = auto_malloc(0x1000 * 3);
 	local_videoram[1] = auto_malloc(0x1000 * 3);
 
+	/* allocate local palette RAM */
+	local_paletteram = auto_malloc(0x800 * 2);
+
 	/* configure tilemaps */
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
@@ -138,12 +141,16 @@ VIDEO_START( nekkyoku )
 	state_save_register_global_pointer(local_videoram[0], 0x1000 * 3);
 	state_save_register_global_pointer(local_videoram[1], 0x1000 * 3);
 	state_save_register_global(selected_paletteram);
+	state_save_register_global_array(scrollx);
+	state_save_register_global_array(scrolly);
 	state_save_register_global(gfxreg);
 	state_save_register_global(flipscreen);
 	state_save_register_global(flipscreen_old);
+	state_save_register_global(scrollx_ofs);
 	state_save_register_global(scrolly_ofs);
 	state_save_register_global(crtc_register);
 	state_save_register_global_array(crtc_data);
+	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
 
 	return 0;
 }

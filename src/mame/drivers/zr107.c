@@ -491,12 +491,6 @@ static DRIVER_INIT(zr107)
 	adc083x_init(0, ADC0838, adc0838_callback);
 }
 
-static DRIVER_INIT(midnrun)
-{
-	init_zr107(machine);
-}
-
-
 /*****************************************************************************/
 
 ROM_START(midnrun)
@@ -553,5 +547,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,	0, zr107, midnrun,	 midnrun,  ROT0, "Konami",	"Midnight Run", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, windheat,	0, zr107, windheat,  zr107,    ROT0, "Konami",	"Winding Heat", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1995, midnrun,  0, zr107, midnrun,   zr107,    ROT0, "Konami", "Midnight Run", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, windheat, 0, zr107, windheat,  zr107,    ROT0, "Konami", "Winding Heat", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

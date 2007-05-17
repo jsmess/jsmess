@@ -1375,17 +1375,16 @@ static MACHINE_DRIVER_START( defender )
 	MDRV_CPU_ADD_TAG("sound", M6808, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(defender_sound_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-
 	MDRV_MACHINE_RESET(defender)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(10, 303, 7, 245)
 	MDRV_PALETTE_LENGTH(16)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
 
 	MDRV_VIDEO_START(williams)
 	MDRV_VIDEO_UPDATE(williams)
@@ -1482,18 +1481,17 @@ static MACHINE_DRIVER_START( williams2 )
 	MDRV_CPU_ADD_TAG("sound", M6808, MASTER_CLOCK/3/4)	/* yes, this is different from the older games */
 	MDRV_CPU_PROGRAM_MAP(williams2_sound_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-
 	MDRV_MACHINE_RESET(williams2)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 256)
-	MDRV_SCREEN_VISIBLE_AREA(8, 288-5, 8, 248-1)
 	MDRV_GFXDECODE(williams2_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
 
 	MDRV_VIDEO_START(williams2)
 	MDRV_VIDEO_UPDATE(williams2)
@@ -2703,6 +2701,10 @@ static DRIVER_INIT( inferno )
 	/* install RAM instead of ROM in the Dxxx slot */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MRA8_RAM);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MWA8_RAM);
+
+	/* hack! the sound CPU programs the DDRA register to $80 instead of $00, meaning */
+	/* that the top bit gets chopped off; not sure how to fix this for real */
+	memory_region(REGION_CPU2)[0xe015] = 0;
 }
 
 

@@ -3672,7 +3672,7 @@ DRIVER_INIT( suprtrio )
 
 DRIVER_INIT( chokchok )
 {
-	init_htchctch(machine);
+	driver_init_htchctch(machine);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x140fff, 0, 0, paletteram16_xxxxBBBBGGGGRRRR_word_w);
@@ -3683,7 +3683,7 @@ DRIVER_INIT( chokchok )
 
 DRIVER_INIT( wlstar )
 {
-	init_htchctch(machine);
+	driver_init_htchctch(machine);
 
 	/* slightly different banking */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);

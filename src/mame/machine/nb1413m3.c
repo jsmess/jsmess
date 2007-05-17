@@ -121,11 +121,6 @@ void nb1413m3_timer_callback(int param)
 #endif
 }
 
-DRIVER_INIT( nb1413m3 )
-{
-	;
-}
-
 MACHINE_RESET( nb1413m3 )
 {
 	nb1413m3_nmi_clock = 0;

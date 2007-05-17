@@ -17,7 +17,7 @@
 #include "exerion.h"
 #include "sound/ay8910.h"
 
-
+static UINT8 *exerion_ram;
 
 /*************************************
  *
@@ -71,12 +71,10 @@ static WRITE8_HANDLER( exerion_portb_w )
 
 static READ8_HANDLER( exerion_protection_r )
 {
-	UINT8 *RAM = memory_region(REGION_CPU1);
-
 	if (activecpu_get_pc() == 0x4143)
-		return RAM[0x33c0 + (RAM[0x600d] << 2) + offset];
+		return memory_region(REGION_CPU1)[0x33c0 + (exerion_ram[0x600d] << 2) + offset];
 	else
-		return RAM[0x6008 + offset];
+		return exerion_ram[0x6008 + offset];
 }
 
 
@@ -90,7 +88,7 @@ static READ8_HANDLER( exerion_protection_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&exerion_ram)
 	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
@@ -322,12 +320,12 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( exerion )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )     /* 64k for code */
 	ROM_LOAD( "exerion.07",   0x0000, 0x2000, CRC(4c78d57d) SHA1(ac702e9ad2bc05493fb1355858667c31c36acfe4) )
 	ROM_LOAD( "exerion.08",   0x2000, 0x2000, CRC(dcadc1df) SHA1(91388f617cfaa4289ca1c84c697fcfdd8834ae15) )
 	ROM_LOAD( "exerion.09",   0x4000, 0x2000, CRC(34cc4d14) SHA1(511c9de038f7bcaf6f7c96f2cbbe50a80673fa72) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, REGION_CPU2, 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
 	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -353,11 +351,11 @@ ROM_END
 
 
 ROM_START( exeriont )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )     /* 64k for code */
 	ROM_LOAD( "prom5.4p",     0x0000, 0x4000, CRC(58b4dc1b) SHA1(3e34d1eda0b0537dac1062e96259d4cc7c64049c) )
 	ROM_LOAD( "prom6.4s",     0x4000, 0x2000, CRC(fca18c2d) SHA1(31077dada3ed4aa2e26af933f589e01e0c71e5cd) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, REGION_CPU2, 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
 	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -383,11 +381,11 @@ ROM_END
 
 
 ROM_START( exerionb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )     /* 64k for code */
 	ROM_LOAD( "eb5.bin",      0x0000, 0x4000, CRC(da175855) SHA1(11ea46fd1d504e16e5ffc604d74c1ce210d6be1c) )
 	ROM_LOAD( "eb6.bin",      0x4000, 0x2000, CRC(0dbe2eff) SHA1(5b0e5e8453619beec46c4350d1b2ed571fe3dc24) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, REGION_CPU2, 0 )     /* 64k for the second CPU */
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
 	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -477,7 +475,7 @@ static DRIVER_INIT( exerionb )
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
 	/* also convert the gfx as in Exerion */
-	init_exerion(machine);
+	driver_init_exerion(machine);
 }
 
 

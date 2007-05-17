@@ -545,7 +545,7 @@ static DRIVER_INIT( simpbowl )
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f6800c8, 0x1f6800cb, 0, 0, unknown_r ); /* ?? */
 
-	init_konamigv(machine);
+	driver_init_konamigv(machine);
 }
 
 static MACHINE_DRIVER_START( simpbowl )
@@ -634,7 +634,7 @@ static DRIVER_INIT( btchamp )
 	memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r );
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_w );
 
-	init_konamigv(machine);
+	driver_init_konamigv(machine);
 }
 
 static MACHINE_DRIVER_START( btchamp )
@@ -689,7 +689,7 @@ static DRIVER_INIT( tokimosh )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f680083, 0, 0, tokimeki_serial_r );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f680090, 0x1f680093, 0, 0, tokimeki_serial_w );
 
-	init_konamigv(machine);
+	driver_init_konamigv(machine);
 }
 
 /*
@@ -726,7 +726,7 @@ static DRIVER_INIT( kdeadeye )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_w );
 
-	init_konamigv(machine);
+	driver_init_konamigv(machine);
 }
 
 static MACHINE_DRIVER_START( kdeadeye )

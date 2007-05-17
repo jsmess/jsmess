@@ -1801,7 +1801,7 @@ ROM_START( pspikes )
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 
 	ROM_REGION( 0x0200, REGION_PLDS, ROMREGION_DISPOSE )
-	ROM_LOAD( "peel18cv8.biin", 0x0000, 0x0155, CRC(af5a83c9) SHA1(e8fd64ff71d1c2dff5a0d307ca3543352e903bbe) )
+	ROM_LOAD( "peel18cv8.bin", 0x0000, 0x0155, CRC(af5a83c9) SHA1(e8fd64ff71d1c2dff5a0d307ca3543352e903bbe) )
 ROM_END
 
 ROM_START( pspikesk )

@@ -1190,7 +1190,7 @@ static DRIVER_INIT( kram3 )
 		i += 4;
 	}
 
-	init_kram(machine);
+	driver_init_kram(machine);
 }
 
 static DRIVER_INIT( zookeep )

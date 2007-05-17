@@ -19,7 +19,7 @@
     MACROS (must be *before* the includes below)
 ***************************************************************************/
 
-#define DRIVER_INIT(name)		void init_##name(running_machine *machine)
+#define DRIVER_INIT(name)		void driver_init_##name(running_machine *machine)
 
 #define NVRAM_HANDLER(name)		void nvram_handler_##name(running_machine *machine, mame_file *file, int read_or_write)
 
@@ -39,7 +39,7 @@
 #define VIDEO_UPDATE(name)		UINT32 video_update_##name(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect)
 
 /* NULL versions */
-#define init_NULL				NULL
+#define driver_init_NULL				NULL
 #define nvram_handler_NULL 		NULL
 #define memcard_handler_NULL	NULL
 #define machine_start_NULL 		NULL
@@ -513,7 +513,7 @@ game_driver driver_##NAME =					\
 	COMPANY,								\
 	construct_##MACHINE,					\
 	ipt_##INPUT,					\
-	init_##INIT,							\
+	driver_init_##INIT,							\
 	rom_##NAME,								\
 	(MONITOR)|(FLAGS),						\
 	NULL									\
@@ -531,7 +531,7 @@ game_driver driver_##NAME =					\
 	COMPANY,								\
 	construct_##MACHINE,					\
 	ipt_##INPUT,					\
-	init_##INIT,							\
+	driver_init_##INIT,							\
 	rom_##NAME,								\
 	(MONITOR)|(FLAGS),						\
 	NULL									\
@@ -549,14 +549,14 @@ game_driver driver_##NAME =					\
 	COMPANY,								\
 	construct_##MACHINE,					\
 	ipt_##INPUT,					\
-	init_##INIT,							\
+	driver_init_##INIT,							\
 	rom_##NAME,								\
 	(MONITOR)|(FLAGS),						\
 	&LAYOUT[0]								\
 };
 
 /* this allows to leave the INIT field empty in the GAME() macro call */
-#define init_0 0
+#define driver_init_0 0
 
 /* this allows to leave the BIOS field empty in the GAMEB() macro call */
 #define system_bios_0 0

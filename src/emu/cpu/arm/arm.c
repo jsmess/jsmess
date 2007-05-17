@@ -693,6 +693,9 @@ static void HandleMemSingle( UINT32 insn )
 	}
 } /* HandleMemSingle */
 
+#define IsNeg(i) ((i) >> 31)
+#define IsPos(i) ((~(i)) >> 31)
+
 /* Set NZCV flags for ADDS / SUBS */
 
 #define HandleALUAddFlags(rd, rn, op2) \
@@ -712,7 +715,7 @@ static void HandleMemSingle( UINT32 insn )
       ((R15 &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
       | ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) \
           << V_BIT) \
-      | (((op2) <= (rn)) << C_BIT) \
+      | (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
       | HandleALUNZFlags(rd)) \
       + 4; \
   else R15 += 4;

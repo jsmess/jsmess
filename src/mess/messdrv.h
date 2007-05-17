@@ -91,7 +91,7 @@ const game_driver driver_##NAME = 	\
 	COMPANY,								\
 	construct_##MACHINE,					\
 	ipt_##INPUT,							\
-	init_##INIT,							\
+	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
 	&driver_##COMPAT,						\
@@ -114,7 +114,7 @@ const game_driver driver_##NAME = 	\
 	COMPANY,								\
 	construct_##MACHINE,					\
 	ipt_##INPUT,							\
-	init_##INIT,							\
+	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
 	&driver_##COMPAT,						\
@@ -137,7 +137,7 @@ const game_driver driver_##NAME = 	\
 	COMPANY,								\
 	construct_##MACHINE,					\
 	ipt_##INPUT,							\
-	init_##INIT,							\
+	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
 	&driver_##COMPAT,						\
@@ -160,7 +160,7 @@ const game_driver driver_##NAME = 	\
 	COMPANY,								\
 	construct_##MACHINE,					\
 	ipt_##INPUT,							\
-	init_##INIT,							\
+	driver_init_##INIT,						\
 	rom_##NAME,								\
 	construct_sysconfig_##CONFIG,			\
 	&driver_##COMPAT,						\

@@ -388,6 +388,8 @@ ROM_START( starfir2 )
 	ROM_LOAD( "sfire2.12",     0x5800, 0x0800, CRC(a35ba06d) SHA1(122f1dbc235977367fdd06b7517c356a3147dfd1) )
 ROM_END
 
+
+
 /*************************************
  *
  *  Driver init

@@ -372,7 +372,7 @@ static void tms32031_init(int index, int clock, const void *_config, int (*irqca
 	for (i=0;i<36;i++)
 	{
 		sprintf(namebuf,"tms32031.r[%d]",i);
-		state_save_register_generic("tms32031", index, namebuf, tms32031.r[i].i8, sizeof(UINT8), 8);
+		state_save_register_generic("tms32031", index, namebuf, tms32031.r[i].i8, UINT8, 8);
 	}
 	state_save_register_item("tms32031", index, tms32031.bkmask);
 	state_save_register_item("tms32031", index, tms32031.ppc);

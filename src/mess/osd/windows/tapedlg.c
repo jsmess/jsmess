@@ -14,7 +14,7 @@
 #include "mess.h"
 #include "messres.h"
 #include "window.h"
-#include "winutil.h"
+#include "winutf8.h"
 
 //============================================================
 //	PARAMETERS

@@ -952,7 +952,7 @@ $(MAMEOBJ)/midw8080.a: \
 	$(DRIVERS)/sspeedr.o $(VIDEO)/sspeedr.o \
 
 $(MAMEOBJ)/midway.a: \
-	$(DRIVERS)/astrocde.o $(MACHINE)/astrocde.o $(VIDEO)/astrocde.o \
+	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o \
 	$(DRIVERS)/balsente.o $(MACHINE)/balsente.o $(VIDEO)/balsente.o \
 	$(DRIVERS)/gridlee.o $(AUDIO)/gridlee.o $(VIDEO)/gridlee.o \
 	$(DRIVERS)/mcr.o $(MACHINE)/mcr.o $(AUDIO)/mcr.o $(VIDEO)/mcr.o \
@@ -1061,7 +1061,7 @@ $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/playch10.o $(MACHINE)/playch10.o $(VIDEO)/playch10.o \
 	$(DRIVERS)/popeye.o $(VIDEO)/popeye.o \
 	$(DRIVERS)/punchout.o $(VIDEO)/punchout.o \
-	$(DRIVERS)/spacefb.o $(VIDEO)/spacefb.o \
+	$(DRIVERS)/spacefb.o $(AUDIO)/spacefb.o  $(VIDEO)/spacefb.o\
 	$(DRIVERS)/vsnes.o $(MACHINE)/vsnes.o $(VIDEO)/vsnes.o \
 	$(MACHINE)/drakton.o \
 	$(MACHINE)/rp5h01.o \
@@ -1241,7 +1241,7 @@ $(MAMEOBJ)/seta.a: \
 $(MAMEOBJ)/sigma.a: \
 	$(DRIVERS)/nyny.o $(VIDEO)/nyny.o \
 	$(DRIVERS)/r2dtank.o \
-	$(DRIVERS)/spiders.o $(MACHINE)/spiders.o $(AUDIO)/spiders.o $(VIDEO)/spiders.o \
+	$(DRIVERS)/spiders.o $(MACHINE)/spiders.o $(AUDIO)/spiders.o \
 
 $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/bbusters.o $(VIDEO)/bbusters.o \
@@ -1428,7 +1428,6 @@ $(MAMEOBJ)/toaplan.a: \
 	$(DRIVERS)/wardner.o \
 
 $(MAMEOBJ)/tong.a: \
-	$(DRIVERS)/leprechn.o $(MACHINE)/leprechn.o $(VIDEO)/leprechn.o \
 	$(DRIVERS)/beezer.o $(MACHINE)/beezer.o $(VIDEO)/beezer.o \
 
 $(MAMEOBJ)/unico.a: \
@@ -1530,7 +1529,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \
 	$(DRIVERS)/dgpix.o \
 	$(DRIVERS)/discoboy.o \
-	$(DRIVERS)/dorachan.o $(VIDEO)/dorachan.o \
+	$(DRIVERS)/dorachan.o \
 	$(DRIVERS)/dreamwld.o \
 	$(DRIVERS)/dribling.o $(VIDEO)/dribling.o \
 	$(DRIVERS)/dwarfd.o \
@@ -1555,6 +1554,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hotblock.o \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/jackpool.o \
+	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 	$(DRIVERS)/koikoi.o \
 	$(DRIVERS)/kyugo.o $(VIDEO)/kyugo.o \
 	$(DRIVERS)/ladyfrog.o $(VIDEO)/ladyfrog.o \
@@ -1635,6 +1635,8 @@ $(MAMEOBJ)/misc.a: \
 $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
+
+$(DRIVERS)/astrocde.o:	$(LAYOUT)/tenpindx.lh
 
 $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 						$(LAYOUT)/atarifb4.lh \

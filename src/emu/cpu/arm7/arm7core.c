@@ -175,7 +175,8 @@ INLINE UINT32 arm7_cpu_read32( int addr )
 
     if (addr&3)
     {
-	result = program_read_byte_32le(addr) | program_read_byte_32le(addr+1)<<8 | program_read_byte_32le(addr+2)<<16 | program_read_byte_32le(addr+3)<<24;
+        result = program_read_dword_32le(addr);
+        result = ( result >> ( 8 * ( addr & 3 ) ) ) | ( result << ( 32 - ( 8 * ( addr & 3 ) ) ) );
     }
     else
     {
@@ -230,13 +231,16 @@ INLINE UINT8 arm7_cpu_read8( offs_t addr )
       | HandleALUNZFlags(rd))); \
   	R15 += 2;
 
+#define IsNeg(i) ((i) >> 31)
+#define IsPos(i) ((~(i)) >> 31)
+
 #define HandleALUSubFlags(rd, rn, op2) \
   if (insn & INSN_S) \
     SET_CPSR( \
       ((GET_CPSR &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
       | ((SIGN_BITS_DIFFER(rn, op2) && SIGN_BITS_DIFFER(rn, rd)) \
           << V_BIT) \
-      | (((op2) <= (rn)) << C_BIT) \
+      | (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
       | HandleALUNZFlags(rd))); \
   R15 += 4;
 
@@ -245,7 +249,7 @@ INLINE UINT8 arm7_cpu_read8( offs_t addr )
       ((GET_CPSR &~ (N_MASK | Z_MASK | V_MASK | C_MASK)) \
       | ((THUMB_SIGN_BITS_DIFFER(rn, op2) && THUMB_SIGN_BITS_DIFFER(rn, rd)) \
           << V_BIT) \
-      | (((op2) <= (rn)) << C_BIT) \
+      | (((IsNeg(rn) & IsPos(op2)) | (IsNeg(rn) & IsPos(rd)) | (IsPos(op2) & IsPos(rd))) ? C_MASK : 0) \
       | HandleALUNZFlags(rd))); \
 	R15 += 2;
 
@@ -1408,7 +1412,7 @@ static void HandleSMulLong( UINT32 insn)
     /* Add on Rn if this is a MLA */
     if (insn & INSN_MUL_A)
     {
-        INT64 acum = (INT64)((((INT64)(rhi))<<32) | rlo);
+        INT64 acum = (INT64)((((INT64)(GET_REGISTER(rhi)))<<32) | GET_REGISTER(rlo));
         res += acum;
     }
 
@@ -1446,7 +1450,7 @@ static void HandleUMulLong( UINT32 insn)
     /* Add on Rn if this is a MLA */
     if (insn & INSN_MUL_A)
     {
-        UINT64 acum = (UINT64)((((UINT64)(rhi))<<32) | rlo);
+        UINT64 acum = (UINT64)((((UINT64)(GET_REGISTER(rhi)))<<32) | GET_REGISTER(rlo));
         res += acum;
     }
 

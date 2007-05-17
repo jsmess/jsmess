@@ -18,7 +18,7 @@
 #include "mscommon.h"
 #include "pool.h"
 #include "config.h"
-#include "winutil.h"
+#include "winutf8.h"
 
 
 //============================================================

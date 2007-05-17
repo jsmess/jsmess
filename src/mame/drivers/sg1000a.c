@@ -332,7 +332,7 @@ DRIVER_INIT( sg1000a )
 
 DRIVER_INIT(chwrestl)
 {
-	init_sg1000a(machine);
+	driver_init_sg1000a(machine);
 	regulus_decode();
 }
 

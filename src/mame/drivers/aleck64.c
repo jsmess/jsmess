@@ -468,9 +468,20 @@ DRIVER_INIT( aleck64 )
 	rom[0x67f] = 0;
 }
 
+#define PIF_BOOTROM ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+
+ROM_START( aleck64 )
+	ROM_REGION32_BE( 0x800, REGION_USER1, 0 )
+	ROM_LOAD( "pifdata.bin", 0x0000, 0x0800, CRC(5ec82be9) SHA1(9174eadc0f0ea2654c95fd941406ab46b9dc9bdd) )
+
+	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0 )
+	ROM_REGION32_BE( 0x100000, REGION_USER3, 0 )
+	ROM_REGION32_BE( 0x80, REGION_USER4, 0 )
+ROM_END
+
 ROM_START( 11beat )
 	ROM_REGION32_BE( 0x800, REGION_USER1, ROMREGION_ERASE00 )
-		// PIF Boot ROM - not dumped
+	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zhaj.u3", 0x000000, 0x0800000,  CRC(95258ba2) SHA1(0299b8fb9a8b1b24428d0f340f6bf1cfaf99c672) )
@@ -478,7 +489,7 @@ ROM_END
 
 ROM_START( mtetrisc )
 	ROM_REGION32_BE( 0x800, REGION_USER1, ROMREGION_ERASE00 )
-		// PIF Boot ROM - not dumped
+	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zcaj.u4", 0x000000, 0x1000000,  CRC(ec4563fc) SHA1(4d5a30873a5850cf4cd1c0bdbe24e1934f163cd0) )
@@ -492,7 +503,7 @@ ROM_END
 
 ROM_START( starsldr )
 	ROM_REGION32_BE( 0x800, REGION_USER1, ROMREGION_ERASE00 )
-		// PIF Boot ROM - not dumped
+	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zhbj-0.u3", 0x000000, 0xc00000,  CRC(a4edac93) SHA1(3794606c008fb69f5d16dcccece94d03da23bf8a) )
@@ -501,7 +512,7 @@ ROM_END
 
 ROM_START( srmvs )
 	ROM_REGION32_BE( 0x800, REGION_USER1, ROMREGION_ERASE00 )
-		// PIF Boot ROM - not dumped
+	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsej-0.u2", 0x000000, 0x2000000,  CRC(44f40102) SHA1(a78de955f2fcd99dda14e782984368b320eb5415) )
@@ -510,7 +521,7 @@ ROM_END
 
 ROM_START( vivdolls )
 	ROM_REGION32_BE( 0x800, REGION_USER1, ROMREGION_ERASE00 )
-		// PIF Boot ROM - not dumped
+	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsaj-0.u3", 0x000000, 0x800000,  CRC(f3220e29) SHA1(06d8b808cc19378b046803f4dc75c7d791b7767f) )
@@ -519,7 +530,7 @@ ROM_END
 
 ROM_START( twrshaft )
 	ROM_REGION32_BE( 0x800, REGION_USER1, ROMREGION_ERASE00 )
-		// PIF Boot ROM - not dumped
+	PIF_BOOTROM
 
 	ROM_REGION32_BE( 0x4000000, REGION_USER2, 0 )
 	ROM_LOAD16_WORD_SWAP( "ua3012--all02.u3", 0x000000, 0x1000000,  CRC(904a91a7) SHA1(7dfa3447d2c489c0448c4004dc12d3037c05a0f3) )
@@ -529,9 +540,13 @@ ROM_START( twrshaft )
 
 ROM_END
 
-GAME( 1998, 11beat,   0,  aleck64, aleck64,  aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, mtetrisc, 0,  aleck64, mtetrisc, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, starsldr, 0,  aleck64, starsldr, aleck64, ROT0, "Hudson/Seta", "Star Soldier: Vanishing Earth", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, vivdolls, 0,  aleck64, aleck64,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, srmvs,    0,  aleck64, aleck64,  aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, twrshaft, 0,  aleck64, aleck64,  aleck64, ROT0, "Aruze", "Tower & Shaft", GAME_NOT_WORKING|GAME_NO_SOUND )
+// BIOS
+GAME( 1998, aleck64,        0,  aleck64, aleck64,  aleck64, ROT0, "Nintendo/Seta", "Aleck64 PIF BIOS", NOT_A_DRIVER)
+
+// games
+GAME( 1998, 11beat,   aleck64,  aleck64, aleck64,  aleck64, ROT0, "Hudson", "Eleven Beat", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, mtetrisc, aleck64,  aleck64, mtetrisc, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64, ROT0, "Hudson/Seta", "Star Soldier: Vanishing Earth", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, vivdolls, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Visco", "Vivid Dolls", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, srmvs,    aleck64,  aleck64, aleck64,  aleck64, ROT0, "Seta", "Super Real Mahjong VS", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, twrshaft, aleck64,  aleck64, aleck64,  aleck64, ROT0, "Aruze", "Tower & Shaft", GAME_NOT_WORKING|GAME_NO_SOUND )

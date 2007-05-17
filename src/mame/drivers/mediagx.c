@@ -843,7 +843,7 @@ static struct pci_device_info cx5510 =
 	cx5510_pci_w
 };
 
-static DRIVER_INIT( mediagx )
+static void init_mediagx(running_machine *machine)
 {
 	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT | PCCOMMON_TIMER_8254);
 	mc146818_init(MC146818_STANDARD);

@@ -13,7 +13,7 @@
 #include "hexview.h"
 #include "../modules.h"
 #include "strconv.h"
-#include "winutil.h"
+#include "winutf8.h"
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	LPSTR command_line, int cmd_show)

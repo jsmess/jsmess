@@ -384,6 +384,7 @@ static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	UINT32 ram, current_ram;
 	char buffer[64];
 	const char *this_ram_string;
+	TCHAR* t_ramstring;
 
 	// identify the driver
 	driver_index = PropertiesCurrentGame(dialog);
@@ -415,9 +416,15 @@ static void RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 			ram = ram_option(gamedrv, i);
 			this_ram_string = ram_string(buffer, ram);
 
+			t_ramstring = tstring_from_utf8(this_ram_string);
+			if( !t_ramstring )
+				return;
+
 			// add this option to the combo box
-			ComboBox_InsertString(control, i, this_ram_string);
+			ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
 			ComboBox_SetItemData(control, i, ram);
+			
+			free(t_ramstring);
 
 			// is this the current option?  record the index if so
 			if (ram == current_ram)

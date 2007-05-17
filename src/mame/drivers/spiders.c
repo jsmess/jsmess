@@ -167,52 +167,110 @@ $F987 - Addresses table at $f98d containing four structs:
 #include "machine/6821pia.h"
 #include "spiders.h"
 
-UINT8 *spiders_ram;
 
-PALETTE_INIT( nyny );
+static UINT8 *spiders_ram;
 
-/* Driver structure definition */
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_RAM) AM_BASE(&spiders_ram)
-	AM_RANGE(0xc001, 0xc001) AM_READ(crtc6845_register_r)
-	AM_RANGE(0xc020, 0xc027) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc044, 0xc047) AM_READ(pia_0_r)
-	AM_RANGE(0xc048, 0xc04b) AM_READ(pia_1_r)
-	AM_RANGE(0xc050, 0xc053) AM_READ(pia_2_r)
+
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
+
+#define NUM_PENS	(8)
+
+
+static void get_pens(pen_t *pens)
+{
+	offs_t i;
+
+	for (i = 0; i < NUM_PENS; i++)
+	{
+		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+	}
+}
+
+
+static VIDEO_UPDATE( spiders )
+{
+	offs_t offs;
+	pen_t pens[NUM_PENS];
+
+	offs_t page_offs = crtc6845.page_flip ? 0x2000 : 0;
+
+	get_pens(pens);
+
+	for (offs = 0; offs < 0x2000; offs++)
+	{
+		int i;
+
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		UINT8 data1 = spiders_ram[0x0000 | page_offs | offs];
+		UINT8 data2 = spiders_ram[0x4000 | page_offs | offs];
+		UINT8 data3 = spiders_ram[0x8000 | page_offs | offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			UINT8 color = ((data3 & 0x01) << 2) |
+						  ((data2 & 0x01) << 1) |
+						  ((data1 & 0x01) << 0);
+
+			if (spiders_video_flip)
+				*BITMAP_ADDR32(bitmap, (UINT8)(223 - y), 255 - x) = pens[color];
+			else
+				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+
+			data1 = data1 >> 1;
+			data2 = data2 >> 1;
+			data3 = data3 >> 1;
+			x = x + 1;
+		}
+	}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(crtc6845_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc044, 0xc047) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0xc048, 0xc04b) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0xc050, 0xc053) AM_READWRITE(pia_2_r, pia_2_w)
 	AM_RANGE(0xc060, 0xc060) AM_READ(input_port_2_r)
 	AM_RANGE(0xc080, 0xc080) AM_READ(input_port_3_r)
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ(input_port_4_r)
-	AM_RANGE(0xc100, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(crtc6845_register_w)
-	AM_RANGE(0xc020, 0xc027) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc044, 0xc047) AM_WRITE(pia_0_w)
-	AM_RANGE(0xc048, 0xc04b) AM_WRITE(pia_1_w)
-	AM_RANGE(0xc050, 0xc053) AM_WRITE(pia_2_w)
-	AM_RANGE(0xc100, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xc100, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0080, 0x0083) AM_READ(pia_3_r)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0080, 0x0083) AM_WRITE(pia_3_w)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_ROM)
+static ADDRESS_MAP_START( spiders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0083) AM_READWRITE(pia_3_r, pia_3_w)
+	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 
-INPUT_PORTS_START( spiders )
+/*************************************
+ *
+ *  Port definition
+ *
+ *************************************/
+
+static INPUT_PORTS_START( spiders )
     /* PIA0 PA0 - PA7 */
     PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -243,27 +301,27 @@ INPUT_PORTS_START( spiders )
     PORT_BIT(0xf8, IP_ACTIVE_LOW,IPT_UNUSED)
 
     PORT_START  /* IN3, DSW2 */
-    PORT_DIPNAME( 0x03, 0x03, "Play mode" )	PORT_DIPLOCATION("SW2:1,2")
+    PORT_DIPNAME( 0x03, 0x03, "Play Mode" )	PORT_DIPLOCATION("SW2:1,2")
     PORT_DIPSETTING(    0x00, "A A'" )
     PORT_DIPSETTING(    0x01, "A B'" )
     PORT_DIPSETTING(    0x02, "B A'" )
     PORT_DIPSETTING(    0x03, "B B'" )
-    PORT_DIPNAME( 0x0c, 0x0c, "Spiders to complete belt" )	PORT_DIPLOCATION("SW2:3,4")
+    PORT_DIPNAME( 0x0c, 0x0c, "Spiders to Complete Belt" )	PORT_DIPLOCATION("SW2:3,4")
     PORT_DIPSETTING(    0x00, "14" )
+    PORT_DIPSETTING(    0x0c, "16" )
     PORT_DIPSETTING(    0x04, "20" )
     PORT_DIPSETTING(    0x08, "26" )
-    PORT_DIPSETTING(    0x0c, "16" )
-    PORT_DIPNAME( 0x10, 0x10, "Spare Guns" )	PORT_DIPLOCATION("SW2:5")
-    PORT_DIPSETTING(    0x00, "4" )
+    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW2:5")
     PORT_DIPSETTING(    0x10, "3" )
-    PORT_DIPNAME( 0x60, 0x60, "Score for bonus gun" )	PORT_DIPLOCATION("SW2:6,7")
+    PORT_DIPSETTING(    0x00, "4" )
+    PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:6,7")
     PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+    PORT_DIPSETTING(    0x60, "15K" )
     PORT_DIPSETTING(    0x20, "20K" )
     PORT_DIPSETTING(    0x40, "25K" )
-    PORT_DIPSETTING(    0x60, "15K" )
     PORT_DIPNAME( 0x80, 0x00, "Giant Spiders" )	PORT_DIPLOCATION("SW2:8")
-    PORT_DIPSETTING(    0x00, "First screen" )
-    PORT_DIPSETTING(    0x80, "Every screen" )
+    PORT_DIPSETTING(    0x00, "First Screen" )
+    PORT_DIPSETTING(    0x80, "Every Screen" )
 
     PORT_START  /* IN4, DSW3 */
     PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
@@ -301,19 +359,22 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( spiders )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2800000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_PERIODIC_INT(spiders_timed_irq , 25)   /* Timed Int  */
+	MDRV_CPU_PROGRAM_MAP(spiders_main_map,0)
+	MDRV_CPU_PERIODIC_INT(spiders_timed_irq, 25)
 
-	MDRV_CPU_ADD(M6802, 3000000)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_CPU_ADD(M6802, 3000000)
+	MDRV_CPU_PROGRAM_MAP(spiders_audio_map,0)
 
 	MDRV_MACHINE_START(spiders)
 	MDRV_MACHINE_RESET(spiders)
@@ -321,22 +382,27 @@ static MACHINE_DRIVER_START( spiders )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MDRV_PALETTE_LENGTH(8)
-
-	MDRV_PALETTE_INIT(nyny)
-	MDRV_VIDEO_START(spiders)
 	MDRV_VIDEO_UPDATE(spiders)
 
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG(spiders_discrete_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+
+	/* audio hardware */
+	MDRV_IMPORT_FROM(spiders_audio)
+
 MACHINE_DRIVER_END
 
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( spiders )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -345,10 +411,10 @@ ROM_START( spiders )
 	ROM_LOAD( "sp-ic72",      0xe000, 0x1000, CRC(464125da) SHA1(94e9edd52e8bd72bbb5dc91b0aa11955e940799c) )
 	ROM_LOAD( "sp-ic71",      0xf000, 0x1000, CRC(a9539b18) SHA1(2d02343a78a4a65e5a1798552cd015f16ad5423a) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sp-ic3",       0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 )     /* 64k graphics block used at runtime */
+	ROM_REGION( 0x10000, REGION_GFX1, 0 )
 	ROM_LOAD( "sp-ic33",      0x0000, 0x1000, CRC(b6731baa) SHA1(b551030df417b40f4a8488fc82a8b5809d3d32f6) )
 	ROM_LOAD( "sp-ic25",      0x1000, 0x1000, CRC(baec64e7) SHA1(beb45e2e6270607c14cdf964c08fe320ce8236a0) )
 	ROM_LOAD( "sp-ic24",      0x2000, 0x1000, CRC(a40a5517) SHA1(3f524c7dbbfe8aad7860d15c38d2702732895681) )
@@ -365,10 +431,10 @@ ROM_START( spiders2 )
 	ROM_LOAD( "sp-ic72",      0xe000, 0x1000, CRC(464125da) SHA1(94e9edd52e8bd72bbb5dc91b0aa11955e940799c) )
 	ROM_LOAD( "sp4.bin",      0xf000, 0x1000, CRC(f3d126bb) SHA1(ecc9156a7da661fa7543d7656aa7da77274e0842) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sp-ic3",       0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 )     /* 64k graphics block used at runtime */
+	ROM_REGION( 0x10000, REGION_GFX1, 0 )
 	ROM_LOAD( "sp-ic33",      0x0000, 0x1000, CRC(b6731baa) SHA1(b551030df417b40f4a8488fc82a8b5809d3d32f6) )
 	ROM_LOAD( "sp-ic25",      0x1000, 0x1000, CRC(baec64e7) SHA1(beb45e2e6270607c14cdf964c08fe320ce8236a0) )
 	ROM_LOAD( "sp-ic24",      0x2000, 0x1000, CRC(a40a5517) SHA1(3f524c7dbbfe8aad7860d15c38d2702732895681) )
@@ -385,10 +451,10 @@ ROM_START( spinner )
 	ROM_LOAD( "sp03-98.t1",   0xe000, 0x1000, CRC(fdabc5df) SHA1(a3276eb1f09f6a3c406721f89993a39c92fb7728) )
 	ROM_LOAD( "sp04-97.v1",   0xf000, 0x1000, CRC(62798f96) SHA1(1407a2ccb2b8f998f2ee494f52a471b627895dbe) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sp41-28.d9",   0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
-	ROM_REGION( 0x10000, REGION_GFX1, 0 )     /* 64k graphics block used at runtime */
+	ROM_REGION( 0x10000, REGION_GFX1, 0 )
 	ROM_LOAD( "sp05-25.k8",   0x0000, 0x1000, CRC(ccc696ee) SHA1(1d41e9eb0cae73b221327d7b6e02450275d056c6) )
 	ROM_LOAD( "sp06-17.k9",   0x1000, 0x1000, CRC(d3d06722) SHA1(da510ed162e5c310945123c9ce6d5648c7b0ae48) )
 	ROM_LOAD( "sp07-16.l9",   0x2000, 0x1000, CRC(a40a5517) SHA1(3f524c7dbbfe8aad7860d15c38d2702732895681) )
@@ -397,6 +463,14 @@ ROM_START( spinner )
 	ROM_LOAD( "sp10-13.q9",   0x5000, 0x1000, CRC(41b344b4) SHA1(c0eac1e332da1eada062059ae742b666051da76c) )
 	ROM_LOAD( "sp11-12.r9",   0x6000, 0x1000, CRC(4d37da5a) SHA1(37567d19596506385e9dcc7a7c0cf65120189ae0) )
 ROM_END
+
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
 
 /* this is a newer version with just one bug fix */
 GAME( 1981, spiders,  0,       spiders, spiders, 0, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", 0)

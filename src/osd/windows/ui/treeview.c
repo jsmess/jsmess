@@ -55,7 +55,7 @@
 #include "m32opts.h"
 #include "help.h"
 #include "dialogs.h"
-#include "winutil.h"
+#include "winutf8.h"
 #include "strconv.h"
 
 #ifdef _MSC_VER

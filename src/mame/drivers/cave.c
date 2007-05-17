@@ -4214,7 +4214,7 @@ void sailormn_unpack_tiles( const int region )
 	}
 }
 
-DRIVER_INIT( cave )
+static void init_cave(running_machine *machine)
 {
 	cave_default_eeprom = 0;
 	cave_default_eeprom_length = 0;
@@ -4427,7 +4427,7 @@ DRIVER_INIT( pwrinst2 )
 {
 	/* this patch fixes on of the moves, why is it needed? is the rom bad or is there another
        problem? does the Japan set need it or not? */
-	init_pwrins2j(machine);
+	driver_init_pwrins2j(machine);
 
 #if 1		//ROM PATCH
 	{

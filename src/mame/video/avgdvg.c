@@ -105,8 +105,6 @@ typedef struct _vgdata
 	INT32 clipy_min;
 	INT32 clipx_max;
 	INT32 clipy_max;
-
-	UINT8 *state_prom;
 } vgdata;
 
 typedef struct _vgconf
@@ -1178,12 +1176,13 @@ static void vg_set_halt(int dummy)
 static void run_state_machine(int dummy)
 {
 	int cycles = 0;
+	UINT8 *state_prom = memory_region(REGION_USER1);
 
   	while (cycles < VGSLICE)
 	{
 		/* Get next state */
 		vg->state_latch = (vg->state_latch & 0x10)
-			| (vg->state_prom[vgc->state_addr(vg)] & 0xf);
+			| (state_prom[vgc->state_addr(vg)] & 0xf);
 
 		if (ST3)
 		{
@@ -1472,7 +1471,6 @@ VIDEO_START( dvg )
 {
 	vgc = &dvg_default;
 	vg = &vgd;
-	vg->state_prom = memory_region(REGION_PROMS);
 	return video_start_avgdvg(machine);
 }
 
@@ -1480,7 +1478,6 @@ VIDEO_START( avg )
 {
 	vgc = &avg_default;
 	vg = &vgd;
-	vg->state_prom = memory_region(REGION_PROMS);
 	return video_start_avgdvg(machine);
 }
 
@@ -1488,7 +1485,6 @@ VIDEO_START( avg_starwars )
 {
 	vgc = &avg_starwars;
 	vg = &vgd;
-	vg->state_prom = memory_region(REGION_PROMS) + 0x1000;
 	return video_start_avgdvg(machine);
 }
 
@@ -1496,7 +1492,6 @@ VIDEO_START( avg_tempest )
 {
 	vgc = &avg_tempest;
 	vg = &vgd;
-	vg->state_prom = memory_region(REGION_PROMS);
 	return video_start_avgdvg(machine);
 }
 
@@ -1504,7 +1499,6 @@ VIDEO_START( avg_mhavoc )
 {
 	vgc = &avg_mhavoc;
 	vg = &vgd;
-	vg->state_prom = memory_region(REGION_PROMS);
 	return video_start_avgdvg(machine);
 }
 
@@ -1512,7 +1506,6 @@ VIDEO_START( avg_bzone )
 {
 	vgc = &avg_bzone;
 	vg = &vgd;
-	vg->state_prom = memory_region(REGION_PROMS);
 	return video_start_avgdvg(machine);
 }
 
@@ -1520,7 +1513,6 @@ VIDEO_START( avg_quantum )
 {
 	vgc = &avg_quantum;
 	vg = &vgd;
-	vg->state_prom = memory_region(REGION_PROMS);
 	return video_start_avgdvg(machine);
 }
 

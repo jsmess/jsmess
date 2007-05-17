@@ -17,7 +17,7 @@
 #include "osdcore.h"
 
 // MAMEOS headers
-#include "winutil.h"
+#include "winutf8.h"
 #include "strconv.h"
 
 

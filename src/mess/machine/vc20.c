@@ -521,7 +521,7 @@ DRIVER_INIT( vic20 )
 
 DRIVER_INIT( vic1001 )
 {
-	init_vic20(machine);
+	driver_init_vic20(machine);
 }
 
 DRIVER_INIT( vic20i )

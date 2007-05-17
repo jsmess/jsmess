@@ -46,7 +46,7 @@
 #include "m32opts.h"
 #include "picker.h"
 #include "winmain.h"
-#include "windows/winutil.h"
+#include "windows/winutf8.h"
 #include "windows/strconv.h"
 
 #ifdef MESS

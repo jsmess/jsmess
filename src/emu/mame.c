@@ -268,6 +268,10 @@ int run_game(const game_driver *driver)
 	mame_private *mame;
 	callback_item *cb;
 
+	/* perform validity checks before anything else */
+	if (mame_validitychecks(driver) != 0)
+		return MAMERR_FAILED_VALIDITY;
+
 	/* create the machine structure and driver */
 	machine = create_machine(driver);
 	reset_machine(machine);
@@ -278,10 +282,6 @@ int run_game(const game_driver *driver)
 
 	/* start in the "pre-init phase" */
 	mame->current_phase = MAME_PHASE_PREINIT;
-
-	/* perform validity checks before anything else */
-	if (mame_validitychecks(driver) != 0)
-		return MAMERR_FAILED_VALIDITY;
 
 	/* loop across multiple hard resets */
 	mame->exit_pending = FALSE;

@@ -85,7 +85,7 @@ DRIVER_INIT( at386 )
 
 DRIVER_INIT( at586 )
 {
-	init_at386(machine);
+	driver_init_at386(machine);
 	intel82439tx_init();
 }
 

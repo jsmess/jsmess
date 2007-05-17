@@ -1291,13 +1291,13 @@ DRIVER_INIT( hng64 )
 DRIVER_INIT(hng64_fght)
 {
 	no_machine_error_code=0x01010101;
-	init_hng64(machine);
+	driver_init_hng64(machine);
 }
 
 DRIVER_INIT(hng64_race)
 {
 	no_machine_error_code=0x02020202;
-	init_hng64(machine);
+	driver_init_hng64(machine);
 }
 
 

@@ -315,20 +315,20 @@ static DRIVER_INIT( gencommon )
 
 static DRIVER_INIT( genusa )
 {
-	init_gencommon(machine);
-	init_megadriv(machine);
+	driver_init_gencommon(machine);
+	driver_init_megadriv(machine);
 }
 
 static DRIVER_INIT( geneur )
 {
-	init_gencommon(machine);
-	init_megadrie(machine);
+	driver_init_gencommon(machine);
+	driver_init_megadrie(machine);
 }
 
 static DRIVER_INIT( genjpn )
 {
-	init_gencommon(machine);
-	init_megadrij(machine);
+	driver_init_gencommon(machine);
+	driver_init_megadrij(machine);
 }
 
 /***************************************************************************

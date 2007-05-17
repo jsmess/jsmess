@@ -33,7 +33,7 @@
 #include "uitext.h"
 #include "strconv.h"
 #include "mess32ui.h"
-#include "winutil.h"
+#include "winutf8.h"
 
 #define LOG_SOFTWARE	0
 
@@ -313,7 +313,7 @@ static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCSTR pszDirectories, LPCSTR
 		nLength = s - pszDirectories;
 		if (nLength > 0)
 		{
-			pszNewString = (LPSTR) alloca((nLength + 1 + pszSubDir ? strlen(pszSubDir) + 1 : 0));
+			pszNewString = (LPSTR) alloca((nLength + 1 + (pszSubDir ? strlen(pszSubDir) + 1 : 0)));
 			memcpy(pszNewString, pszDirectories, nLength);
 			pszNewString[nLength] = '\0';
 

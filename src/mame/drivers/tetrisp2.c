@@ -1026,7 +1026,7 @@ void rockn_timer_sub_level1_callback(int param)
 	cpunum_set_input_line(1, 1, HOLD_LINE);
 }
 
-DRIVER_INIT( rockn_timer )
+static void init_rockn_timer(running_machine *machine)
 {
 	timer_pulse(TIME_IN_MSEC(32), 0, rockn_timer_level1_callback);
 	rockn_timer_l4 = timer_alloc(rockn_timer_level4_callback);

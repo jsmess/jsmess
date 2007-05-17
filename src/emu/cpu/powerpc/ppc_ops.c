@@ -734,7 +734,32 @@ static void ppc_lswi(UINT32 op)
 
 static void ppc_lswx(UINT32 op)
 {
-	fatalerror("ppc: lswx unimplemented at %08X", ppc.pc);
+	int n, r, i;
+	UINT32 ea = 0;
+	if( RA != 0 )
+		ea = REG(RA);
+
+	ea += REG(RB);
+
+	n = ppc.xer & 0x7f;
+
+	r = RT - 1;
+	i = 0;
+
+	while(n > 0)
+	{
+		if (i == 0) {
+			r = (r + 1) % 32;
+			REG(r) = 0;
+		}
+		REG(r) |= ((READ8(ea) & 0xff) << (24 - i));
+		i += 8;
+		if (i == 32) {
+			i = 0;
+		}
+		ea++;
+		n--;
+	}
 }
 
 static void ppc_lwarx(UINT32 op)
@@ -1264,7 +1289,31 @@ static void ppc_stswi(UINT32 op)
 
 static void ppc_stswx(UINT32 op)
 {
-	fatalerror("ppc: stswx unimplemented");
+	int n, r, i;
+	UINT32 ea = 0;
+	if( RA != 0 )
+		ea = REG(RA);
+
+	ea += REG(RB);
+
+	n = ppc.xer & 0x7f;
+
+	r = RT - 1;
+	i = 0;
+
+	while(n > 0)
+	{
+		if (i == 0) {
+			r = (r + 1) % 32;
+		}
+		WRITE8(ea, (REG(r) >> (24-i)) & 0xff);
+		i += 8;
+		if (i == 32) {
+			i = 0;
+		}
+		ea++;
+		n--;
+	}
 }
 
 static void ppc_stw(UINT32 op)

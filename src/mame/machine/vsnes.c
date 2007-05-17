@@ -256,7 +256,7 @@ MACHINE_RESET( vsdual )
  *  Common init for all games
  *
  *************************************/
-DRIVER_INIT( vsnes )
+static void init_vsnes(running_machine *machine)
 {
 	/* set the controller to default */
 	vsnes_gun_controller = 0;
@@ -314,7 +314,7 @@ DRIVER_INIT( suprmrio )
 	init_vsnes(machine);
 
 	/* normal banking */
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_RAM );
@@ -466,7 +466,7 @@ DRIVER_INIT( vspinbal )
 	init_vsnes(machine);
 
 	/* normal banking */
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 
 	/* now override the vidaccess callback */
 	remapped_colortable = rp2c04001_colortable;
@@ -682,7 +682,7 @@ DRIVER_INIT( excitebk )
 	init_vsnes(machine);
 
 	/* normal banking */
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 
 	/* now override the vidaccess callback */
 	/* we need to remap color tables */
@@ -696,7 +696,7 @@ DRIVER_INIT( excitbkj )
 	init_vsnes(machine);
 
 	/* normal banking */
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 
 	/* now override the vidaccess callback */
 	/* we need to remap color tables */
@@ -715,7 +715,7 @@ DRIVER_INIT( machridr )
 	init_vsnes(machine);
 
 	/* normal banking */
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 
 	/* now override the vidaccess callback */
 	/* we need to remap color tables */
@@ -1009,7 +1009,7 @@ static READ8_HANDLER( rbi_hack_r)
 
 DRIVER_INIT( rbibb )
 {
-	init_MMC3(machine);
+	driver_init_MMC3(machine);
 
 	/* RBI Base ball hack */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5e00, 0x5e01, 0, 0, rbi_hack_r) ;
@@ -1059,7 +1059,7 @@ static READ8_HANDLER( supxevs_read_prot_4_r )
 
 DRIVER_INIT( supxevs )
 {
-	init_MMC3(machine);
+	driver_init_MMC3(machine);
 
 	/* Vs. Super Xevious Protection */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x54ff, 0x54ff, 0, 0, supxevs_read_prot_1_r );
@@ -1094,7 +1094,7 @@ static READ8_HANDLER( tko_security_r )
 
 DRIVER_INIT( tkoboxng )
 {
-	init_MMC3(machine);
+	driver_init_MMC3(machine);
 
 	/* security device at $5e00-$5e01 */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5e00, 0x5e01, 0, 0, tko_security_r );
@@ -1109,7 +1109,7 @@ DRIVER_INIT( tkoboxng )
 
 DRIVER_INIT( vsfdf )
 {
-	init_MMC3(machine);
+	driver_init_MMC3(machine);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, gun_in0_r );
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, gun_in0_w );
@@ -1201,7 +1201,7 @@ DRIVER_INIT( bnglngby )
 	init_vsnes(machine);
 
 	/* normal banking */
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 
 	remapped_colortable = rp2c04002_colortable;
 }
@@ -1229,7 +1229,7 @@ DRIVER_INIT( jajamaru )
 	init_vsnes(machine);
 
 	/* normal banking */
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 }
 
 /***********************************************************************/
@@ -1294,7 +1294,7 @@ DRIVER_INIT( wrecking )
 {
 	/* only differance between this and vstennis is the colors */
 
-	init_vstennis(machine);
+	driver_init_vstennis(machine);
 	remapped_colortable = rp2c04002_colortable;
 }
 
@@ -1305,7 +1305,7 @@ DRIVER_INIT( balonfgt )
 {
 	/* only differance between this and vstennis is the colors */
 
-	init_vstennis(machine);
+	driver_init_vstennis(machine);
 
 	remapped_colortable = rp2c04003_colortable;
 }
@@ -1318,7 +1318,7 @@ DRIVER_INIT( vsbball )
 {
 	/* only differance between this and vstennis is the colors */
 
-	init_vstennis(machine);
+	driver_init_vstennis(machine);
 
 	remapped_colortable = rp2c04001_colortable;
 
@@ -1332,7 +1332,7 @@ DRIVER_INIT( iceclmrj )
 {
 	/* only differance between this and vstennis is the colors */
 
-	init_vstennis(machine);
+	driver_init_vstennis(machine);
 
 	remapped_colortable = rp2c05004_colortable;
 
@@ -1343,7 +1343,7 @@ DRIVER_INIT( iceclmrj )
 DRIVER_INIT( btlecity )
 {
 	init_vsnes(machine);
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 	remapped_colortable = rp2c04003_colortable;
 }
 
@@ -1356,6 +1356,6 @@ DRIVER_INIT( vstetris )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_RAM );
 
 	init_vsnes(machine);
-	init_vsnormal(machine);
+	driver_init_vsnormal(machine);
 	remapped_colortable = rp2c04003_colortable;
 }

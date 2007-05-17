@@ -53,7 +53,7 @@
 #include "resource.hm"
 #include "winmain.h"
 #include "strconv.h"
-#include "winutil.h"
+#include "winutf8.h"
 #include "ui/m32util.h"
 
 typedef HANDLE HTHEME;
@@ -251,51 +251,51 @@ static DWORD dwHelpIDs[] =
 
 static struct ComboBoxVideo
 {
-	const char*	m_pText;
-	const char*	m_pData;
+	const TCHAR*	m_pText;
+	const char*		m_pData;
 } g_ComboBoxVideo[] = 
 {
-	{ "GDI",                  "gdi"    },
-	{ "DirectDraw",           "ddraw"   },
-	{ "Direct3D",             "d3d"     },
+	{ TEXT("GDI"),                  "gdi"    },
+	{ TEXT("DirectDraw"),           "ddraw"   },
+	{ TEXT("Direct3D"),             "d3d"     },
 };
 #define NUMVIDEO (sizeof(g_ComboBoxVideo) / sizeof(g_ComboBoxVideo[0]))
 
 static struct ComboBoxD3DVersion
 {
-	const char*	m_pText;
-	const int	m_pData;
+	const TCHAR*	m_pText;
+	const int		m_pData;
 } g_ComboBoxD3DVersion[] = 
 {
-	{ "Version 9",           9    },
-	{ "Version 8",           8   },
+	{ TEXT("Version 9"),           9   },
+	{ TEXT("Version 8"),           8   },
 };
 
 #define NUMD3DVERSIONS (sizeof(g_ComboBoxD3DVersion) / sizeof(g_ComboBoxD3DVersion[0]))
 
 static struct ComboBoxSelectScreen
 {
-	const char*	m_pText;
-	const int	m_pData;
+	const TCHAR*	m_pText;
+	const int		m_pData;
 } g_ComboBoxSelectScreen[] = 
 {
-	{ "Screen 0",             0    },
-	{ "Screen 1",             1    },
-	{ "Screen 2",             2    },
-	{ "Screen 3",             3    },
+	{ TEXT("Screen 0"),             0    },
+	{ TEXT("Screen 1"),             1    },
+	{ TEXT("Screen 2"),             2    },
+	{ TEXT("Screen 3"),             3    },
 };
 #define NUMSELECTSCREEN (sizeof(g_ComboBoxSelectScreen) / sizeof(g_ComboBoxSelectScreen[0]))
 
 static struct ComboBoxView
 {
-	const char*	m_pText;
-	const char*	m_pData;
+	const TCHAR*	m_pText;
+	const char*		m_pData;
 } g_ComboBoxView[] = 
 {
-	{ "Auto",		      "auto"    },
-	{ "Standard",         "standard"    }, 
-	{ "Pixel Aspect",     "pixel"   }, 
-	{ "Cocktail",         "cocktail"     },
+	{ TEXT("Auto"),		        "auto"        },
+	{ TEXT("Standard"),         "standard"    }, 
+	{ TEXT("Pixel Aspect"),     "pixel"       }, 
+	{ TEXT("Cocktail"),         "cocktail"    },
 };
 #define NUMVIEW (sizeof(g_ComboBoxView) / sizeof(g_ComboBoxView[0]))
 
@@ -303,15 +303,15 @@ static struct ComboBoxView
 
 static struct ComboBoxDevices
 {
-	const char*	m_pText;
-	const char* m_pData;
+	const TCHAR*	m_pText;
+	const char* 	m_pData;
 } g_ComboBoxDevice[] = 
 {
-	{ "None",                  "none"      },
-	{ "Keyboard",              "keyboard"  },
-	{ "Mouse",				   "mouse"     },
-	{ "Joystick",              "joystick"  },
-	{ "Lightgun",              "lightgun"  },
+	{ TEXT("None"),                  "none"      },
+	{ TEXT("Keyboard"),              "keyboard"  },
+	{ TEXT("Mouse"),				   "mouse"     },
+	{ TEXT("Joystick"),              "joystick"  },
+	{ TEXT("Lightgun"),              "lightgun"  },
 };
 
 #define NUMDEVICES (sizeof(g_ComboBoxDevice) / sizeof(g_ComboBoxDevice[0]))
@@ -1904,7 +1904,7 @@ static void ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 
 	/* Remove all items in the list. */
 	ComboBox_ResetContent(control);
-	ComboBox_InsertString(control, 0, "Auto");
+	ComboBox_InsertString(control, 0, TEXT("Auto"));
 	ComboBox_SetItemData(control, 0, (const char*)mame_strdup("auto"));
 
 	//Dynamically populate it, by enumerating the Monitors
@@ -1995,7 +1995,7 @@ static void DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 
 	// reset the controllers dropdown
 	ComboBox_ResetContent(control);
-	ComboBox_InsertString(control, index, "Standard");
+	ComboBox_InsertString(control, index, TEXT("Standard"));
 	ComboBox_SetItemData(control, index, "");
 	index++;
 	
@@ -2563,13 +2563,13 @@ static void InitializeSoundUI(HWND hwnd)
 	hCtrl = GetDlgItem(hwnd, IDC_SAMPLERATE);
 	if (hCtrl)
 	{
-		ComboBox_AddString(hCtrl, "11025");
+		ComboBox_AddString(hCtrl, TEXT("11025"));
 		ComboBox_SetItemData(hCtrl, i++, 11025);
-		ComboBox_AddString(hCtrl, "22050");
+		ComboBox_AddString(hCtrl, TEXT("22050"));
 		ComboBox_SetItemData(hCtrl, i++, 22050);
-		ComboBox_AddString(hCtrl, "44100");
+		ComboBox_AddString(hCtrl, TEXT("44100"));
 		ComboBox_SetItemData(hCtrl, i++, 44100);
-		ComboBox_AddString(hCtrl, "48000");
+		ComboBox_AddString(hCtrl, TEXT("48000"));
 		ComboBox_SetItemData(hCtrl, i++, 48000);
 		ComboBox_SetCurSel(hCtrl, 1);
 	}
@@ -2583,29 +2583,29 @@ static void InitializeSkippingUI(HWND hwnd)
 
 	if (hCtrl)
 	{
-		ComboBox_AddString(hCtrl, "Draw every frame");
+		ComboBox_AddString(hCtrl, TEXT("Draw every frame"));
 		ComboBox_SetItemData(hCtrl, i++, 0);
-		ComboBox_AddString(hCtrl, "Skip 1 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 1 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 1);
-		ComboBox_AddString(hCtrl, "Skip 2 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 2 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 2);
-		ComboBox_AddString(hCtrl, "Skip 3 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 3 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 3);
-		ComboBox_AddString(hCtrl, "Skip 4 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 4 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 4);
-		ComboBox_AddString(hCtrl, "Skip 5 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 5 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 5);
-		ComboBox_AddString(hCtrl, "Skip 6 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 6 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 6);
-		ComboBox_AddString(hCtrl, "Skip 7 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 7 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 7);
-		ComboBox_AddString(hCtrl, "Skip 8 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 8 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 8);
-		ComboBox_AddString(hCtrl, "Skip 9 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 9 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 9);
-		ComboBox_AddString(hCtrl, "Skip 10 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 10 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 10);
-		ComboBox_AddString(hCtrl, "Skip 11 of 12 frames");
+		ComboBox_AddString(hCtrl, TEXT("Skip 11 of 12 frames"));
 		ComboBox_SetItemData(hCtrl, i++, 11);
 	}
 }
@@ -2617,12 +2617,12 @@ static void InitializeRotateUI(HWND hwnd)
 
 	if (hCtrl)
 	{
-		ComboBox_AddString(hCtrl, "Default");             // 0
-		ComboBox_AddString(hCtrl, "Clockwise");           // 1
-		ComboBox_AddString(hCtrl, "Anti-clockwise");      // 2
-		ComboBox_AddString(hCtrl, "None");                // 3
-		ComboBox_AddString(hCtrl, "Auto clockwise");      // 4
-		ComboBox_AddString(hCtrl, "Auto anti-clockwise"); // 5
+		ComboBox_AddString(hCtrl, TEXT("Default"));             // 0
+		ComboBox_AddString(hCtrl, TEXT("Clockwise"));           // 1
+		ComboBox_AddString(hCtrl, TEXT("Anti-clockwise"));      // 2
+		ComboBox_AddString(hCtrl, TEXT("None"));                // 3
+		ComboBox_AddString(hCtrl, TEXT("Auto clockwise"));      // 4
+		ComboBox_AddString(hCtrl, TEXT("Auto anti-clockwise")); // 5
 	}
 }
 
@@ -2814,6 +2814,7 @@ static void InitializeBIOSUI(HWND hwnd)
 {
 	HWND hCtrl = GetDlgItem(hwnd,IDC_BIOS);
 	int i = 0;
+	TCHAR* t_s;
 	if (hCtrl)
 	{
 		const game_driver *gamedrv = drivers[g_nGame];
@@ -2821,7 +2822,7 @@ static void InitializeBIOSUI(HWND hwnd)
 
 		if (g_nGame == GLOBAL_OPTIONS)
 		{
-			ComboBox_InsertString(hCtrl, i, "None");
+			ComboBox_InsertString(hCtrl, i, TEXT("None"));
 			ComboBox_SetItemData( hCtrl, i++, "none");
 			return;
 		}
@@ -2830,34 +2831,41 @@ static void InitializeBIOSUI(HWND hwnd)
 			gamedrv = drivers[g_nFolderGame];
 			if (DriverHasOptionalBIOS(g_nFolderGame) == FALSE)
 			{
-				ComboBox_InsertString(hCtrl, i, "None");
+				ComboBox_InsertString(hCtrl, i, TEXT("None"));
 				ComboBox_SetItemData( hCtrl, i++, "default");
 				return;
 			}
-			ComboBox_InsertString(hCtrl, i, "Default");
+			ComboBox_InsertString(hCtrl, i, TEXT("Default"));
 			ComboBox_SetItemData( hCtrl, i++, "default");
 			thisbios = gamedrv->bios;
 			while (!BIOSENTRY_ISEND(thisbios))
 			{
-				ComboBox_InsertString(hCtrl, i, thisbios->_description);
+				t_s = tstring_from_utf8(thisbios->_description);
+				if( !t_s )
+					return;
+				ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
 				ComboBox_SetItemData( hCtrl, i++, thisbios->_name);
 				thisbios++;
+				free(t_s);
 			}
 			return;
 		}
 
 		if (DriverHasOptionalBIOS(g_nGame) == FALSE)
 		{
-			ComboBox_InsertString(hCtrl, i, "None");
+			ComboBox_InsertString(hCtrl, i, TEXT("None"));
 			ComboBox_SetItemData( hCtrl, i++, "none");
 			return;
 		}
-		ComboBox_InsertString(hCtrl, i, "Default");
+		ComboBox_InsertString(hCtrl, i, TEXT("Default"));
 		ComboBox_SetItemData( hCtrl, i++, "default");
 		thisbios = gamedrv->bios;
 		while (!BIOSENTRY_ISEND(thisbios))
 		{
-			ComboBox_InsertString(hCtrl, i, thisbios->_description);
+			t_s = tstring_from_utf8(thisbios->_description);
+			if( !t_s )
+				return;
+			ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
 			ComboBox_SetItemData( hCtrl, i, thisbios->_name);
 			if( strcmp( thisbios->_name, options_get_string(pGameOpts, OPTION_BIOS) ) == 0 )
 			{
@@ -2865,6 +2873,7 @@ static void InitializeBIOSUI(HWND hwnd)
 			}
 			i++;
 			thisbios++;
+			free(t_s);
 		}
 	}
 }

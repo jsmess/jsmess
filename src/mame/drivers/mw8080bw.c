@@ -31,8 +31,9 @@
         * Space Invaders Deluxe (cocktail version)
 
     Other games on this basic hardware:
+        * Gun Fight (cocktail version)
         * Space Walk
-        * Bowling Alley (cocktail version)
+        * 4 Player Bowling Alley (cocktail version)
 
     Notes:
         * Most of these games do not actually use the MB14241 shifter IC,
@@ -3082,6 +3083,7 @@ ROM_END
 
 /* 596 */ GAME( 1976, seawolf,  0,      seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 597 */ GAMEL(1975, gunfight, 0,      gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
+/* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME( 1976, tornbase, 0,      tornbase, tornbase, 0, ROT0,   "Midway", "Tornado Baseball", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 610 */ GAME( 1976, 280zzzap, 0,      zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 611 */ GAMEL(1976, maze,     0,      maze,     maze,     0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE , layout_ho4f893d )

@@ -90,6 +90,19 @@ struct EEPROM_interface eeprom_interface_93C46 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
+struct EEPROM_interface eeprom_interface_93C66B =
+{
+	8,				/* address bits */
+	16,				/* data bits */
+	"*110",			/* read command */
+	"*101",			/* write command */
+	"*111",			/* erase command */
+	"*10000xxxxxx",	/* lock command */
+	"*10011xxxxxx", /* unlock command */
+	1,
+//  "*10001xxxxxx", /* write all */
+//  "*10010xxxxxx", /* erase all */
+};
 
 NVRAM_HANDLER( 93C46 )
 {
@@ -102,6 +115,16 @@ NVRAM_HANDLER( 93C46 )
 	}
 }
 
+NVRAM_HANDLER( 93C66B )
+{
+	if (read_or_write)
+		EEPROM_save(file);
+	else
+	{
+		EEPROM_init(&eeprom_interface_93C66B);
+		if (file)	EEPROM_load(file);
+	}
+}
 
 void EEPROM_init(struct EEPROM_interface *interface)
 {

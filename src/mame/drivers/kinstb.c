@@ -268,7 +268,7 @@ static DRIVER_INIT(kinstb)
 	{
 		memory_region(REGION_USER3)[i]=BITSWAP8(memory_region(REGION_USER3)[i],5,0,6,1,7,4,3,2 );
 	}
-	init_snes_hirom(machine);
+	driver_init_snes_hirom(machine);
 }
 
 ROM_START( kinstb )

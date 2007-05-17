@@ -7070,13 +7070,13 @@ ROM_END
 static DRIVER_INIT( cps2 )
 {
 	/* Decrypt the game - see machine/cps2crpt.c */
-	init_cps2crpt(machine);
+	driver_init_cps2crpt(machine);
 	cps2networkpresent = 0;
 }
 
 static DRIVER_INIT( ssf2tb )
 {
-	init_cps2(machine);
+	driver_init_cps2(machine);
 	cps2networkpresent = 0;
 
 	/* we don't emulate the network board, so don't say it's present for now, otherwise the game will
@@ -7087,7 +7087,7 @@ static DRIVER_INIT( ssf2tb )
 
 static DRIVER_INIT ( puzloop2 )
 {
-	init_cps2(machine);
+	driver_init_cps2(machine);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, pl2_port_0_word_r);
 }
 

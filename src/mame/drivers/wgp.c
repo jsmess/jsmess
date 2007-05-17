@@ -1493,7 +1493,7 @@ DRIVER_INIT( wgp2 )
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
 
-	init_wgp(machine);
+	cpua_ctrl = 0xff;
 }
 
 /* Working Games with some graphics problems - e.g. missing rotation */

@@ -626,7 +626,7 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 	state_save_register_item("tms34010", index, state.pc);
 	state_save_register_item("tms34010", index, state.st);
 	state_save_register_item("tms34010", index, state.reset_deferred);
-	state_save_register_item_pointer("tms34010", index, state.shiftreg, SHIFTREG_SIZE);
+	state_save_register_item_pointer("tms34010", index, state.shiftreg, SHIFTREG_SIZE / 2);
 	state_save_register_item_array("tms34010", index, state.IOregs);
 	state_save_register_item("tms34010", index, state.convsp);
 	state_save_register_item("tms34010", index, state.convdp);

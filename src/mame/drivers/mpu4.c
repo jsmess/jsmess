@@ -191,7 +191,7 @@ IRQ line connected to CPU
            |   |                 |
            |   |                 |             CB1  INPUT,  connected to PB7 (Aux2 connector pin 4)
            |   |                 |
-           |   |                 |             CB2  OUTPUT, AY8910 chip select line
+           |   |                 |             CB2  OUTPUT, AY8913 chip select line
            |   |                 |             IRQB connected to IRQ of CPU
            |   |                 |
 -----------+---+-----------------+--------------------------------------------------------------------------
@@ -199,10 +199,10 @@ IRQ line connected to CPU
            |   |                 |
            |   |                 |  port A
            |   |                 |
-           |   |                 |        PA0 - PA7 (INPUT/OUTPUT) data port AY8910 sound chip
+           |   |                 |        PA0 - PA7 (INPUT/OUTPUT) data port AY8913 sound chip
            |   |                 |
            |   |                 |        CA1 INPUT,  not connected
-           |   |                 |        CA2 OUTPUT, BC1 pin AY8910 sound chip
+           |   |                 |        CA2 OUTPUT, BC1 pin AY8913 sound chip
            |   |                 |        IRQA , connected to IRQ CPU
            |   |                 |
            |   |                 |  port B
@@ -211,7 +211,7 @@ IRQ line connected to CPU
            |   |                 |        PB4-PB7 OUTPUT, reel B
            |   |                 |
            |   |                 |        CB1 INPUT,  not connected
-           |   |                 |        CB2 OUTPUT, B01R pin AY8910 sound chip
+           |   |                 |        CB2 OUTPUT, B01R pin AY8913 sound chip
            |   |                 |        IRQB , connected to IRQ CPU
            |   |                 |
 -----------+---+-----------------+--------------------------------------------------------------------------
@@ -311,7 +311,7 @@ IRQ line connected to CPU
 static int mmtr_data;
 static int alpha_data_line;
 static int alpha_clock;
-static int ay8910_address;
+static int ay8913_address;
 //static int expansion_latch;// MOD 4 and above only
 //static int global_volume;// MOD 4 and above only
 static int serial_data;
@@ -746,16 +746,9 @@ static void ic24_setup(void)
 		double duration = TIME_OF_74LS123((220*1000),(0.1*0.000001));
 		if (!ic24_active)
 		{
-			ic24_output(1);
+			ic24_output(0);
 			mame_timer_adjust(ic24_timer, double_to_mame_time(duration), 0, time_zero);
 			ic24_active = 1;
-		}
-	}
-	else
-	{
-		if (ic24_active)
-		{
-			mame_timer_adjust(ic24_timer, time_zero, 0, time_zero);
 		}
 	}
 }
@@ -763,7 +756,7 @@ static void ic24_setup(void)
 void ic24_timeout(int dummy)
 {
 	ic24_active = 0;
-	ic24_output(0);
+	ic24_output(1);
 }
 
 static WRITE8_HANDLER( pia_ic4_porta_w )
@@ -876,7 +869,7 @@ static void update_ay(void)
 {
 	if (pia_get_output_cb2(2));
 	{
-		switch (ay8910_address)
+		switch (ay8913_address)
 		{
   			case 0x00:
 			{
@@ -936,8 +929,8 @@ static WRITE8_HANDLER( pia_ic6_ca2_w )
 {
 	LOG(("%04x IC6 PIA write CA2 %2x (AY8912 BC1)\n", activecpu_get_previouspc(),data));
 
-	if ( data ) ay8910_address |=  0x01;
-	else        ay8910_address &= ~0x01;
+	if ( data ) ay8913_address |=  0x01;
+	else        ay8913_address &= ~0x01;
 
 	update_ay();
 }
@@ -946,8 +939,8 @@ static WRITE8_HANDLER( pia_ic6_cb2_w )
 {
 	LOG(("%04x IC6 PIA write CB2 %2x (AY8912 BCDIR)\n", activecpu_get_previouspc(),data));
 
-	if ( data ) ay8910_address |=  0x02;
-	else        ay8910_address &= ~0x02;
+	if ( data ) ay8913_address |=  0x02;
+	else        ay8913_address &= ~0x02;
 
 	update_ay();
 }
@@ -2977,7 +2970,7 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ADD(AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")// Present on all video cards
@@ -2999,7 +2992,7 @@ static MACHINE_DRIVER_START( mpu4 )
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 50 )	// generate 50 hz signal
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ADD(AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
@@ -3035,7 +3028,7 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ADD(AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM

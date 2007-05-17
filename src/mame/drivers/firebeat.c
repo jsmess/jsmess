@@ -2164,7 +2164,7 @@ static void init_lights(write32_handler out1, write32_handler out2, write32_hand
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x7d000324, 0x7d000327, 0, 0, out3);
 }
 
-static DRIVER_INIT(firebeat)
+static void init_firebeat(running_machine *machine)
 {
 	UINT8 *rom = memory_region(REGION_USER2);
 

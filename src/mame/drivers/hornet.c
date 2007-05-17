@@ -1150,7 +1150,7 @@ static void sound_irq_callback(int irq)
 }
 
 static UINT8 backup_ram[0x2000];
-static DRIVER_INIT( hornet )
+static void init_hornet(running_machine *machine)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));
@@ -1166,7 +1166,7 @@ static DRIVER_INIT( hornet )
 	ppc403_install_spu_rx_dma_handler(jamma_r, jamma_rdata);
 }
 
-static DRIVER_INIT( hornet_2board )
+static void init_hornet_2board(running_machine *machine)
 {
 	init_konami_cgboard(2, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(REGION_USER5));

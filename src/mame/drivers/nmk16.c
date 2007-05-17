@@ -5033,7 +5033,7 @@ static DRIVER_INIT( mustang )
 
 static DRIVER_INIT( bjtwin )
 {
-	init_nmk(machine);
+	driver_init_nmk(machine);
 
 	/* Patch rom to enable test mode */
 

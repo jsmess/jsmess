@@ -99,6 +99,7 @@
 #include "ui.h"
 #include <math.h>
 #include <ctype.h>
+#include <time.h>
 
 #ifdef MESS
 #include "inputx.h"
@@ -223,6 +224,15 @@ struct _input_port_init_params
 	int					current_port;/* current port index */
 };
 
+/* Support for eXtended INP format */
+struct ext_header
+{
+	char header[7];  // must be "XINP" followed by NULLs
+	char shortname[9];  // game shortname
+	char version[32];  // MAME version string
+	long starttime;  // approximate INP start time
+	char dummy[32];  // for possible future expansion
+};
 
 
 /***************************************************************************
@@ -258,6 +268,15 @@ static const char *seqtypestrings[] = { "standard", "decrement", "increment" };
 /* original input_ports without modifications */
 input_port_entry *input_ports_default;
 
+/* recorded speed read from an INP file */
+double rec_speed;
+
+/* set to 1 if INP file being played is a standard MAME INP file */
+int no_extended_inp;
+
+/* for average speed calculations */
+int framecount;
+double totalspeed;
 
 
 /***************************************************************************
@@ -1114,6 +1133,9 @@ static void setup_playback(running_machine *machine)
 	inp_header inp_header;
 	file_error filerr;
 
+	struct ext_header xheader;
+	unsigned char check[7];
+
 	/* if no file, nothing to do */
 	if (filename == NULL || filename[0] == 0)
 		return;
@@ -1122,20 +1144,50 @@ static void setup_playback(running_machine *machine)
 	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_READ, &machine->playback_file);
 	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
 
-	/* read playback header */
-	mame_fread(machine->playback_file, &inp_header, sizeof(inp_header));
+	// read first four bytes to check INP type
+	mame_fread(Machine->playback_file, check, 7);
+	mame_fseek(Machine->playback_file, 0, SEEK_SET);
 
-	/* if the first byte is not alphanumeric, it's an old INP file with no header */
-	if (!isalnum(inp_header.name[0]))
-		mame_fseek(machine->playback_file, 0, SEEK_SET);
+	/* Check if input file is an eXtended INP file */
+	if (strncmp(check,"XINP\0\0\0",7) != 0)
+	{
+		no_extended_inp = 1;
+		mame_printf_info("This INP file is not an extended INP file, extra info not available\n");
 
-	/* else verify the header against the current game */
-	else if (strcmp(machine->gamedrv->name, inp_header.name) != 0)
-		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", inp_header.name, machine->gamedrv->name);
+		/* read playback header */
+		mame_fread(machine->playback_file, &inp_header, sizeof(inp_header));
 
-	/* otherwise, print a message indicating what's happening */
-	else
-		mame_printf_info("Playing back previously recorded " GAMENOUN " %s\n", machine->gamedrv->name);
+		/* if the first byte is not alphanumeric, it's an old INP file with no header */
+		if (!isalnum(inp_header.name[0]))
+			mame_fseek(machine->playback_file, 0, SEEK_SET);
+
+		/* else verify the header against the current game */
+		else if (strcmp(machine->gamedrv->name, inp_header.name) != 0)
+			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", inp_header.name, machine->gamedrv->name);
+
+		/* otherwise, print a message indicating what's happening */
+		else
+			mame_printf_info("Playing back previously recorded " GAMENOUN " %s\n", machine->gamedrv->name);
+	}
+ 	else
+	{
+		no_extended_inp = 0;
+		mame_printf_info("Extended INP file info:\n");
+
+		// read header
+		mame_fread(Machine->playback_file, &xheader, sizeof(struct ext_header));
+
+		// output info to console
+		mame_printf_info("Version string: %s\n",xheader.version);
+		mame_printf_info("Start time: %s\n",ctime(&xheader.starttime));
+
+		// verify header against current game
+		if (strcmp(machine->gamedrv->name, xheader.shortname) != 0)
+			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", xheader.shortname, machine->gamedrv->name);
+		else
+			mame_printf_info("Playing back previously recorded " GAMENOUN " %s\n", machine->gamedrv->name);
+	}
+
 }
 
 
@@ -1269,7 +1321,7 @@ static void input_port_postload(void)
 
 				/* adjust default, min, and max so they fall in the bitmask range */
 				port->default_value = (port->default_value & port->mask) >> info->shift;
-				if (!(port->type == IPT_POSITIONAL) && !(port->type == IPT_POSITIONAL_V))
+				if (port->type != IPT_POSITIONAL && port->type != IPT_POSITIONAL_V)
 				{
 					port->analog.min = (port->analog.min & port->mask) >> info->shift;
 					port->analog.max = (port->analog.max & port->mask) >> info->shift;
@@ -2673,6 +2725,13 @@ static void update_playback_record(int portnum, UINT32 portvalue)
 		{
 			mame_fclose(Machine->playback_file);
 			Machine->playback_file = NULL;
+			if(no_extended_inp)
+				popmessage("End of playback");
+			else
+			{
+				popmessage("End of playback - %i frames - Average speed %f%%",framecount,(double)totalspeed/framecount);
+				printf("End of playback - %i frames - Average speed %f%%\n",framecount,(double)totalspeed/framecount);
+			}
 		}
 	}
 
@@ -2881,6 +2940,17 @@ profiler_mark(PROFILER_INPUT);
 		/* non-analog ports must be manually updated */
 		else
 			update_playback_record(portnum, readinputport(portnum));
+	}
+
+	/* store speed read from INP file, if extended INP */
+	if (Machine->playback_file != NULL && !no_extended_inp)
+	{
+		long dummy;
+		mame_fread(Machine->playback_file,&rec_speed,sizeof(double));
+		mame_fread(Machine->playback_file,&dummy,sizeof(long));
+		framecount++;
+		rec_speed *= 100;
+		totalspeed += rec_speed;
 	}
 
 profiler_mark(PROFILER_END);

@@ -292,7 +292,7 @@ DRIVER_INIT( playch10 )
 DRIVER_INIT( pc_gun )
 {
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 
 	/* set the control type */
 	pc10_gun_controller = 1;
@@ -304,7 +304,7 @@ DRIVER_INIT( pc_gun )
 DRIVER_INIT( pc_hrz )
 {
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 
 	/* setup mirroring */
 	mirroring = PPU_MIRROR_HORZ;
@@ -438,7 +438,7 @@ DRIVER_INIT( pcaboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, aboard_vrom_switch_w );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 
 	/* set the mirroring here */
 	mirroring = PPU_MIRROR_VERT;
@@ -465,7 +465,7 @@ DRIVER_INIT( pcbboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, bboard_rom_switch_w );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 
 	/* set the mirroring here */
 	mirroring = PPU_MIRROR_VERT;
@@ -486,7 +486,7 @@ DRIVER_INIT( pccboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, cboard_vrom_switch_w );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }
 
 /**********************************************************************************/
@@ -505,7 +505,7 @@ DRIVER_INIT( pcdboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }
 
 /* D Board games with extra ram (Metroid) */
@@ -517,7 +517,7 @@ DRIVER_INIT( pcdboard_2 )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MWA8_RAM );
 
 	/* common init */
-	init_pcdboard(machine);
+	driver_init_pcdboard(machine);
 }
 
 /**********************************************************************************/
@@ -609,7 +609,7 @@ DRIVER_INIT( pceboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MWA8_RAM );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }
 
 /**********************************************************************************/
@@ -628,7 +628,7 @@ DRIVER_INIT( pcfboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }
 
 /* F Board games with extra ram (Baseball Stars) */
@@ -640,7 +640,7 @@ DRIVER_INIT( pcfboard_2 )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MWA8_RAM );
 
 	/* common init */
-	init_pcfboard(machine);
+	driver_init_pcfboard(machine);
 }
 
 /**********************************************************************************/
@@ -815,13 +815,13 @@ DRIVER_INIT( pcgboard )
 	gboard_4screen = 0;
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }
 
 DRIVER_INIT( pcgboard_type2 )
 {
 	/* common init */
-	init_pcgboard(machine);
+	driver_init_pcgboard(machine);
 
 	/* enable 4 screen mirror */
 	gboard_4screen = 1;
@@ -853,7 +853,7 @@ DRIVER_INIT( pciboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, iboard_rom_switch_w );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }
 
 /**********************************************************************************/
@@ -878,7 +878,7 @@ DRIVER_INIT( pchboard )
 	gboard_scanline_latch = 0;
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }
 
 /**********************************************************************************/
@@ -901,5 +901,5 @@ DRIVER_INIT( pckboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
-	init_playch10(machine);
+	driver_init_playch10(machine);
 }

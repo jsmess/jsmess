@@ -438,7 +438,7 @@ INLINE int get_madsel(void)
             to do in MAME, we just ignore the first two positive hits on MADSEL
             and only return TRUE on the third or later */
 		madsel_lastpc = pc;
-		return (++madsel_delay >= 3);
+		return (++madsel_delay >= 4);
 	}
 	madsel_delay = 0;
 	return 0;

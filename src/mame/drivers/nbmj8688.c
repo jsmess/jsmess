@@ -76,22 +76,16 @@ extern WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w );
 static DRIVER_INIT( mjsikaku )
 {
 	nb1413m3_type = NB1413M3_MJSIKAKU;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( mmsikaku )
 {
 	nb1413m3_type = NB1413M3_MMSIKAKU;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( otonano )
 {
 	nb1413m3_type = NB1413M3_OTONANO;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( mjcamera )
@@ -111,8 +105,6 @@ static DRIVER_INIT( mjcamera )
 	}
 
 	nb1413m3_type = NB1413M3_MJCAMERA;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( kanatuen )
@@ -126,8 +118,6 @@ static DRIVER_INIT( kanatuen )
 	rom[0x0301] = 0xdc;
 
 	nb1413m3_type = NB1413M3_KANATUEN;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( kyuhito )
@@ -142,8 +132,6 @@ static DRIVER_INIT( kyuhito )
 #endif
 
 	nb1413m3_type = NB1413M3_KYUHITO;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( idhimitu )
@@ -163,15 +151,12 @@ static DRIVER_INIT( idhimitu )
 	}
 
 	nb1413m3_type = NB1413M3_IDHIMITU;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( kaguya )
 {
 	nb1413m3_type = NB1413M3_KAGUYA;
 
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( kaguya2 )
@@ -191,176 +176,126 @@ static DRIVER_INIT( kaguya2 )
 	}
 
 	nb1413m3_type = NB1413M3_KAGUYA2;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( secolove )
 {
 	nb1413m3_type = NB1413M3_SECOLOVE;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( citylove )
 {
 	nb1413m3_type = NB1413M3_CITYLOVE;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( mcitylov )
 {
 	nb1413m3_type = NB1413M3_MCITYLOV;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( seiha )
 {
 	nb1413m3_type = NB1413M3_SEIHA;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( seiham )
 {
 	nb1413m3_type = NB1413M3_SEIHAM;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( korinai )
 {
 	nb1413m3_type = NB1413M3_KORINAI;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( korinaim )
 {
 	nb1413m3_type = NB1413M3_KORINAIM;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( iemoto )
 {
 	nb1413m3_type = NB1413M3_IEMOTO;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( iemotom )
 {
 	nb1413m3_type = NB1413M3_IEMOTOM;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( ryuuha )
 {
 	nb1413m3_type = NB1413M3_RYUUHA;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( ojousan )
 {
 	nb1413m3_type = NB1413M3_OJOUSAN;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( ojousanm )
 {
 	nb1413m3_type = NB1413M3_OJOUSANM;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( bijokkoy )
 {
 	nb1413m3_type = NB1413M3_BIJOKKOY;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( bijokkog )
 {
 	nb1413m3_type = NB1413M3_BIJOKKOG;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( housemnq )
 {
 	nb1413m3_type = NB1413M3_HOUSEMNQ;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( housemn2 )
 {
 	nb1413m3_type = NB1413M3_HOUSEMN2;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( orangec )
 {
 	nb1413m3_type = NB1413M3_ORANGEC;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( orangeci )
 {
 	nb1413m3_type = NB1413M3_ORANGECI;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( vipclub )
 {
 	nb1413m3_type = NB1413M3_VIPCLUB;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( livegal )
 {
 	nb1413m3_type = NB1413M3_LIVEGAL;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( crystalg )
 {
 	nb1413m3_type = NB1413M3_CRYSTALG;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( crystal2 )
 {
 	nb1413m3_type = NB1413M3_CRYSTAL2;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( apparel )
 {
 	nb1413m3_type = NB1413M3_APPAREL;
-
-	init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( nightlov )
 {
 	nb1413m3_type = NB1413M3_NIGHTLOV;
-
-	init_nb1413m3(machine);
 }
 
 

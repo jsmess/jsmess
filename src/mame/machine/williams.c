@@ -253,7 +253,7 @@ static void williams_va11_callback(int scanline)
 	video_screen_update_partial(0, scanline - 1);
 
 	/* set a timer for the next update */
-	scanline += 8;
+	scanline++;
 	if (scanline >= 256) scanline = 0;
 	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }
@@ -354,7 +354,7 @@ static void williams2_va11_callback(int scanline)
 	video_screen_update_partial(0, scanline);
 
 	/* set a timer for the next update */
-	scanline += 8;
+	scanline++;
 	if (scanline >= 256) scanline = 0;
 	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, time_zero);
 }

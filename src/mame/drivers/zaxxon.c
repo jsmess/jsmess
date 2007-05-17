@@ -1428,28 +1428,28 @@ static DRIVER_INIT( zaxxon )
 static DRIVER_INIT( zaxxonb )
 {
 	zaxxonb_decode();
-	init_zaxxon(machine);
+	driver_init_zaxxon(machine);
 }
 
 
 static DRIVER_INIT( szaxxon )
 {
 	szaxxon_decode();
-	init_zaxxon(machine);
+	driver_init_zaxxon(machine);
 }
 
 
 static DRIVER_INIT( futspy )
 {
 	futspy_decode();
-	init_zaxxon(machine);
+	driver_init_zaxxon(machine);
 }
 
 
 static DRIVER_INIT( razmataz )
 {
 	nprinces_decode();
-	init_zaxxon(machine);
+	driver_init_zaxxon(machine);
 
 	/* additional input ports are wired */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
@@ -1472,7 +1472,7 @@ static DRIVER_INIT( razmataz )
 static DRIVER_INIT( ixion )
 {
 	szaxxon_decode();
-	init_zaxxon(machine);
+	driver_init_zaxxon(machine);
 
 	/* connect the universal sound board */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);

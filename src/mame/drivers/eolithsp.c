@@ -55,7 +55,7 @@ static struct
 };
 
 
-DRIVER_INIT( eolith_speedup )
+void init_eolith_speedup(running_machine *machine)
 {
 	int n_game = 0;
 	eolith_speedup_address = 0;

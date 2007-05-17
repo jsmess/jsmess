@@ -743,7 +743,7 @@ draw_spriteC355( mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *p
 	xscroll &= 0x1ff; if( xscroll & 0x100 ) xscroll |= ~0x1ff;
 	yscroll &= 0x1ff; if( yscroll & 0x100 ) yscroll |= ~0x1ff;
 
-	if( bitmap->width > 288 )
+	if( bitmap->width > 384 )
 	{ /* Medium Resolution: System21 adjust */
 			yscroll += 0x10;
 	}
@@ -895,21 +895,13 @@ DrawObjectList(
 		const UINT16 *pSpriteList16,
 		const UINT16 *pSpriteTable )
 {
-	UINT16 which;
 	int i;
-	int count = 0;
-	/* count the sprites */
+	/* draw the sprites */
 	for( i=0; i<256; i++ )
 	{
-		which = pSpriteList16[i];
-		count++;
-		if( which&0x100 ) break;
-	}
-	/* draw the sprites */
-	for( i=0; i<count; i++ )
-	{
-		which = pSpriteList16[i];
+		UINT16 which = pSpriteList16[i];
 		draw_spriteC355( bitmap, cliprect, &pSpriteTable[(which&0xff)*8], pri, i );
+		if( which&0x100 ) break;
 	}
 } /* DrawObjectList */
 
