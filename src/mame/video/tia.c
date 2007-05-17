@@ -451,10 +451,10 @@ static void drawBL(UINT8* p, UINT8* col)
 static void drawPF(UINT8* p, UINT8 *col)
 {
 	draw_playfield_helper(p, col, 0,
-		(CTRLPF & 2) ? COLUP0 : COLUPF, 0);
+		((CTRLPF & 6) == 2) ? COLUP0 : COLUPF, 0);
 
 	draw_playfield_helper(p, col, 80,
-		(CTRLPF & 2) ? COLUP1 : COLUPF, REFLECT);
+		((CTRLPF & 6) == 2) ? COLUP1 : COLUPF, REFLECT);
 }
 
 
