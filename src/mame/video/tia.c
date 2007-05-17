@@ -792,11 +792,19 @@ static WRITE8_HANDLER( HMOVE_w )
 	//logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
 	HMOVE_started = curr_x;
 
-	horzP0 -= ((signed char) HMP0) >> 4;
-	horzP1 -= ((signed char) HMP1) >> 4;
-	horzM0 -= ((signed char) HMM0) >> 4;
-	horzM1 -= ((signed char) HMM1) >> 4;
-	horzBL -= ((signed char) HMBL) >> 4;
+	if ( curr_x < 0 ) {
+		horzP0 += 8;
+		horzP1 += 8;
+		horzM0 += 8;
+		horzM1 += 8;
+		horzBL += 8;
+	}
+
+	horzP0 -= ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4;
+	horzP1 -= ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4;
+	horzM0 -= ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 4;
+	horzM1 -= ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 4;
+	horzBL -= ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 4;
 
 	HMM0_latch = 0;
 	HMM1_latch = 0;

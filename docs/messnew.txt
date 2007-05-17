@@ -37,6 +37,12 @@ System Driver Changes:
 - [A2600] Paddles no longer auto-center.  Set default keys for
   player 4. (bug #1176 and bug #1167) [Christopher Stone]
 
+- [A2600] Fixed delay behavior when resetting BL/M0/M1 position during
+  HMOVE period.  [Wilbert Pol]
+
+- [A2600] Corrected HMOVE behavior when initiated outside hblank.
+  [Wilbert Pol]
+
 
 User Interface Changes:
 -----------------------
