@@ -41,6 +41,7 @@ enum
 
 
 static UINT8* extra_RAM;
+static UINT8* bank_base[5];
 
 static unsigned cart_size;
 static unsigned current_bank;
@@ -152,35 +153,44 @@ static int next_bank(void)
 
 void mode8K_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + 0x1000 * offset);
+	bank_base[1] = CART + 0x1000 * offset;
+	memory_set_bankptr(1, bank_base[1]);
 }
 void mode12_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + 0x1000 * offset);
+	bank_base[1] = CART + 0x1000 * offset;
+	memory_set_bankptr(1, bank_base[1]);
 }
 void mode16_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + 0x1000 * offset);
+	bank_base[1] = CART + 0x1000 * offset;
+	memory_set_bankptr(1, bank_base[1]);
 }
 void mode32_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + 0x1000 * offset);
+	bank_base[1] = CART + 0x1000 * offset;
+	memory_set_bankptr(1, bank_base[1]);
 }
 void modeTV_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + 0x800 * (data & 3));
+	bank_base[1] = CART + 0x800 * (data & 3);
+	memory_set_bankptr(1, bank_base[1]);
 }
 void modeUA_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + (offset >> 6) * 0x1000);
+	bank_base[1] = CART + (offset >> 6) * 0x1000;
+	memory_set_bankptr(1, bank_base[1]);
 }
 void modePB_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1 + (offset >> 3), CART + 0x400 * (offset & 7));
+	int bank = 1 + (offset >> 3);
+	bank_base[bank] = CART + 0x400 * (offset & 7);
+	memory_set_bankptr(bank, bank_base[bank]);
 }
 void modeMN_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + 0x800 * offset);
+	bank_base[1] = CART + 0x800 * offset;
+	memory_set_bankptr(1, bank_base[1]);
 }
 void modeMN_RAM_switch(UINT16 offset, UINT8 data)
 {
@@ -188,19 +198,20 @@ void modeMN_RAM_switch(UINT16 offset, UINT8 data)
 }
 void modeDC_switch(UINT16 offset, UINT8 data)
 {
-	memory_set_bankptr(1, CART + 0x1000 * next_bank());
+	bank_base[1] = CART + 0x1000 * next_bank();
+	memory_set_bankptr(1, bank_base[1]);
 }
 
-
-static  READ8_HANDLER(mode8K_switch_r) { mode8K_switch(offset, 0); return 0; }
-static  READ8_HANDLER(mode12_switch_r) { mode12_switch(offset, 0); return 0; }
-static  READ8_HANDLER(mode16_switch_r) { mode16_switch(offset, 0); return 0; }
-static  READ8_HANDLER(mode32_switch_r) { mode32_switch(offset, 0); return 0; }
-static  READ8_HANDLER(modePB_switch_r) { modePB_switch(offset, 0); return 0; }
-static  READ8_HANDLER(modeMN_switch_r) { modeMN_switch(offset, 0); return 0; }
+/* These read handlers will return the byte from the new bank */
+static  READ8_HANDLER(mode8K_switch_r) { mode8K_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(mode12_switch_r) { mode12_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
+static  READ8_HANDLER(mode16_switch_r) { mode16_switch(offset, 0); return bank_base[1][0xff6 + offset]; }
+static  READ8_HANDLER(mode32_switch_r) { mode32_switch(offset, 0); return bank_base[1][0xff4 + offset]; }
+static  READ8_HANDLER(modePB_switch_r) { modePB_switch(offset, 0); return bank_base[4][0x3e0 + offset]; }
+static  READ8_HANDLER(modeMN_switch_r) { modeMN_switch(offset, 0); return bank_base[1][0xfe0 + offset]; }
 static  READ8_HANDLER(modeMN_RAM_switch_r) { modeMN_RAM_switch(offset, 0); return 0; }
 static  READ8_HANDLER(modeUA_switch_r) { modeUA_switch(offset, 0); return 0; }
-static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return 0; }
+static  READ8_HANDLER(modeDC_switch_r) { modeDC_switch(offset, 0); return bank_base[1][0xff0 + offset]; }
 
 
 static WRITE8_HANDLER(mode8K_switch_w) { mode8K_switch(offset, data); }
@@ -236,7 +247,8 @@ OPBASE_HANDLER(modeAV_opbase_handler)
 		/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
 		   cpu should be the last byte that was on the data bus and so should determine the bank
 		   we should switch in. */
-		memory_set_bankptr( 1, CART + 0x1000 * ( ( address & 0x2000) ? 0 : 1 ) );
+		bank_base[1] = CART + 0x1000 * ( ( address & 0x2000 ) ? 0 : 1 );
+		memory_set_bankptr( 1, bank_base[1] );
 		/* and restore old opbase handler */
 		memory_set_opbase_handler(0, AV_old_opbase_handler);
 	}
@@ -274,7 +286,6 @@ static  READ8_HANDLER(current_bank_r)
 {
 	return current_bank;
 }
-
 
 static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) )
@@ -327,10 +338,73 @@ static void install_banks(int count, unsigned init)
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, 0, 0, handler[i]);
 
-		memory_set_bankptr(i + 1, memory_region(REGION_USER1) + init);
+		bank_base[i + 1] = memory_region(REGION_USER1) + init;
+		memory_set_bankptr(i + 1, bank_base[i + 1]);
 	}
 }
 
+static int a2600_read_input_port(int port) {
+	switch( port ) {
+	case 0:
+		switch ( readinputport(9) / 16 ) {
+		case 0x00:	/* Joystick */
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		case 0x01:	/* Paddle */
+			return readinputport(0);
+		default:
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		}
+		break;
+	case 1:
+		switch ( readinputport(9) / 16 ) {
+		case 0x00:	/* Joystick */
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		case 0x01:	/* Paddle */
+			return readinputport(1);
+		default:
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		}
+		break;
+	case 2:
+		switch ( readinputport(9) & 0x0f ) {
+		case 0x00:	/* Joystick */
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		case 0x01:	/* Paddle */
+			return readinputport(2);
+		default:
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		}
+		break;
+	case 3:
+		switch ( readinputport(9) & 0x0f ) {
+		case 0x00:	/* Joystick */
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		case 0x01:	/* Paddle */
+			return readinputport(3);
+		default:
+			return TIA_INPUT_PORT_ALWAYS_OFF;
+		}
+		break;
+	case 4:
+		switch ( readinputport(9) / 16 ) {
+		case 0x00:	/* Joystick */
+			return readinputport(4);
+		case 0x01:	/* Paddle */
+		default:
+			return 0xff;
+		}
+		break;
+	case 5:
+		switch ( readinputport(9) & 0x0f ) {
+		case 0x00:	/* Joystick */
+			return readinputport(5);
+		case 0x01:	/* Paddle */
+		default:
+			return 0xff;
+		}
+	}
+	return TIA_INPUT_PORT_ALWAYS_OFF;
+}
 
 static MACHINE_START( a2600 )
 {
@@ -343,9 +417,9 @@ static MACHINE_START( a2600 )
 	r6532_init(0, &r6532_interface);
 
 	if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
-		tia_init_pal();
+		tia_init_pal(a2600_read_input_port);
 	} else {
-		tia_init();
+		tia_init(a2600_read_input_port);
 	}
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x7f, 0, 0, tia_w);

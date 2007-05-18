@@ -93,6 +93,7 @@ static const int nusiz[8][3] =
 	{ 1, 4, 0 }
 };
 
+static int (*tia_read_input_port)(int);
 
 PALETTE_INIT( tia_NTSC )
 {
@@ -680,8 +681,20 @@ static void update_bitmap(int next_x, int next_y)
 
 static void button_callback(int dummy)
 {
-	int button0 = readinputport(4) & 0x80;
-	int button1 = readinputport(5) & 0x80;
+	int button0;
+	int button1;
+
+	if ( tia_read_input_port )
+	{
+		button0 = tia_read_input_port(4) & 0x80;
+		button1 = tia_read_input_port(5) & 0x80;
+	}
+	else
+	{
+		button0 = readinputport(4) & 0x80;
+		button1 = readinputport(5) & 0x80;
+	}
+	
 
 	if (VBLANK & 0x40)
 	{
@@ -1020,8 +1033,21 @@ static WRITE8_HANDLER( GRP1_w )
 static READ8_HANDLER( INPT_r )
 {
 	UINT32 elapsed = activecpu_gettotalcycles() - paddle_cycles;
+	int input;
 
-	return elapsed > 76 * readinputport(offset & 3) ? 0x80 : 0x00;
+	if ( tia_read_input_port )
+	{
+		input = tia_read_input_port(offset & 3);
+		if ( input == TIA_INPUT_PORT_ALWAYS_ON )
+			return 0x80;
+		if ( input == TIA_INPUT_PORT_ALWAYS_OFF )
+			return 0x00;
+	}
+	else
+	{
+		input = readinputport(offset & 3);
+	}
+	return elapsed > 76 * input ? 0x80 : 0x00;
 }
 
 
@@ -1286,7 +1312,7 @@ static void tia_reset(running_machine *machine)
 
 
 
-void tia_init_internal(int freq)
+void tia_init_internal(int freq, int (*read_input_port)(int))
 {
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
 
@@ -1314,16 +1340,18 @@ void tia_init_internal(int freq)
 
 	HMOVE_started = HMOVE_INVALID;
 
+	tia_read_input_port = read_input_port;
+
 	frame_cycles = 0;
 	add_reset_callback(Machine, tia_reset);
 }
 
-void tia_init(void)
+void tia_init(int (*read_input_port)(int))
 {
-	tia_init_internal(60);
+	tia_init_internal(60, read_input_port);
 }
 
-void tia_init_pal(void)
+void tia_init_pal(int (*read_input_port)(int))
 {
-	tia_init_internal(50);
+	tia_init_internal(50, read_input_port);
 }
