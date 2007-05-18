@@ -93,7 +93,8 @@ static const int nusiz[8][3] =
 	{ 1, 4, 0 }
 };
 
-static int (*tia_read_input_port)(int);
+static read16_handler	tia_read_input_port;
+static read8_handler	tia_get_databus;
 
 PALETTE_INIT( tia_NTSC )
 {
@@ -686,8 +687,8 @@ static void button_callback(int dummy)
 
 	if ( tia_read_input_port )
 	{
-		button0 = tia_read_input_port(4) & 0x80;
-		button1 = tia_read_input_port(5) & 0x80;
+		button0 = tia_read_input_port(4,0xFFFF) & 0x80;
+		button1 = tia_read_input_port(5,0xFFFF) & 0x80;
 	}
 	else
 	{
@@ -1037,7 +1038,7 @@ static READ8_HANDLER( INPT_r )
 
 	if ( tia_read_input_port )
 	{
-		input = tia_read_input_port(offset & 3);
+		input = tia_read_input_port(offset & 3, 0xFFFF);
 		if ( input == TIA_INPUT_PORT_ALWAYS_ON )
 			return 0x80;
 		if ( input == TIA_INPUT_PORT_ALWAYS_OFF )
@@ -1054,12 +1055,16 @@ static READ8_HANDLER( INPT_r )
 READ8_HANDLER( tia_r )
 {
 	 /* lower bits 0 - 5 seem to depend on the last byte on the
-         data bus. This is normally the last byte read during
-         program execution, so we will refetch that byte and
-         use those contents for the low bits. - Wilbert Pol
+         data bus. If the driver supplied a routine to retrieve
+	     that we will call that, otherwise we will use the lower
+	     bit of the offset.
     */
+	UINT8 data = offset & 0x3f;
 
-	UINT8 data = program_read_byte_8( activecpu_get_pc() - 1 ) & 0x3f;
+	if ( tia_get_databus )
+	{
+		data = tia_get_databus(offset) & 0x3f;
+	}
 
 	if (!(offset & 0x8))
 	{
@@ -1312,7 +1317,7 @@ static void tia_reset(running_machine *machine)
 
 
 
-void tia_init_internal(int freq, int (*read_input_port)(int))
+void tia_init_internal(int freq, const struct TIAinterface* ti)
 {
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
 
@@ -1340,18 +1345,24 @@ void tia_init_internal(int freq, int (*read_input_port)(int))
 
 	HMOVE_started = HMOVE_INVALID;
 
-	tia_read_input_port = read_input_port;
+	if ( ti ) {
+		tia_read_input_port = ti->read_input_port;
+		tia_get_databus = ti->databus_contents;
+	} else {
+		tia_read_input_port = NULL;
+		tia_get_databus = NULL;
+	}
 
 	frame_cycles = 0;
 	add_reset_callback(Machine, tia_reset);
 }
 
-void tia_init(int (*read_input_port)(int))
+void tia_init(const struct TIAinterface* ti)
 {
-	tia_init_internal(60, read_input_port);
+	tia_init_internal(60, ti);
 }
 
-void tia_init_pal(int (*read_input_port)(int))
+void tia_init_pal(const struct TIAinterface* ti)
 {
-	tia_init_internal(50, read_input_port);
+	tia_init_internal(50, ti);
 }

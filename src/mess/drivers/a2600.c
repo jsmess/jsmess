@@ -43,6 +43,9 @@ enum
 static UINT8* extra_RAM;
 static UINT8* bank_base[5];
 
+static UINT8 keypad_left_column;
+static UINT8 keypad_right_column;
+
 static unsigned cart_size;
 static unsigned current_bank;
 
@@ -62,6 +65,7 @@ static const UINT32 games[][2] =
 	{ 0x34d3ffc8, modePB }, // James Bond 007
 	{ 0x59b96db3, modePB }, // Lord of the Rings Prototype
 	{ 0xe680a1c9, modePB }, // Montezuma's Revenge
+	{ 0xb687a91f, modePB }, // Montezuma's Revenge (trained)
 	{ 0x044735b9, modePB }, // Mr Do's Castle
 	{ 0x7d287f20, modePB }, // Popeye
 	{ 0x742ac749, modePB }, // Popeye PAL
@@ -297,15 +301,48 @@ static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
+static WRITE8_HANDLER( switch_A_w )
+{
+	/* Left controller port */
+	if ( readinputport(9) / 16 == 0x04 ) {
+		keypad_left_column = data / 16;
+	}
+
+	/* Right controller port */
+	if ( readinputport(9) % 16 == 0x04 ) {
+		keypad_right_column = data & 0x0F;
+	}
+}
+
 static  READ8_HANDLER( switch_A_r )
 {
 	UINT8 val = 0;
 
-	int control0 = readinputport(9) % 16;
-	int control1 = readinputport(9) / 16;
+	/* Left controller port */
+	switch( readinputport(9) / 16 ) {
+	case 0x00:  /* Joystick */
+		val |= readinputport(6) & 0xF0;
+		break;
+	case 0x01:  /* Paddle */
+		val |= readinputport(7) & 0xF0;
+		break;
+	default:
+		val |= 0xF0;
+		break;
+	}
 
-	val |= readinputport(6 + control0) & 0x0F;
-	val |= readinputport(6 + control1) & 0xF0;
+	/* Right controller port */
+	switch( readinputport(9) % 16 ) {
+	case 0x00:	/* Joystick */
+		val |= readinputport(6) & 0x0F;
+		break;
+	case 0x01:	/* Paddle */
+		val |= readinputport(7) & 0x0F;
+		break;
+	default:
+		val |= 0x0F;
+		break;
+	}
 
 	return val;
 }
@@ -315,10 +352,9 @@ static struct R6532interface r6532_interface =
 {
 	switch_A_r,
 	input_port_8_r,
-	NULL,
+	switch_A_w,
 	NULL
 };
-
 
 
 static void install_banks(int count, unsigned init)
@@ -344,14 +380,26 @@ static void install_banks(int count, unsigned init)
 	}
 }
 
-static int a2600_read_input_port(int port) {
-	switch( port ) {
+static READ16_HANDLER(a2600_read_input_port) {
+	int i;
+
+	switch( offset ) {
 	case 0:
 		switch ( readinputport(9) / 16 ) {
 		case 0x00:	/* Joystick */
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return readinputport(0);
+		case 0x04:	/* Keypad */
+			for ( i = 0; i < 4; i++ ) {
+				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
+					if ( ( readinputport(12) >> 3*i ) & 0x01 ) {
+						return TIA_INPUT_PORT_ALWAYS_OFF;
+					} else {
+						return TIA_INPUT_PORT_ALWAYS_ON;
+					}
+				}
+			}
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
@@ -362,6 +410,16 @@ static int a2600_read_input_port(int port) {
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return readinputport(1);
+		case 0x04:	/* Keypad */
+			for ( i = 0; i < 4; i++ ) {
+				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
+					if ( ( readinputport(12) >> 3*i ) & 0x02 ) {
+						return TIA_INPUT_PORT_ALWAYS_OFF;
+					} else {
+						return TIA_INPUT_PORT_ALWAYS_ON;
+					}
+				}
+			}
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
@@ -372,6 +430,11 @@ static int a2600_read_input_port(int port) {
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return readinputport(2);
+		case 0x04:	/* Keypad */
+			for ( i = 0; i < 4; i++ ) {
+				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
+				}
+			}
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
@@ -382,6 +445,11 @@ static int a2600_read_input_port(int port) {
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		case 0x01:	/* Paddle */
 			return readinputport(3);
+		case 0x04:	/* Keypad */
+			for ( i = 0; i < 4; i++ ) {
+				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
+				}
+			}
 		default:
 			return TIA_INPUT_PORT_ALWAYS_OFF;
 		}
@@ -390,7 +458,18 @@ static int a2600_read_input_port(int port) {
 		switch ( readinputport(9) / 16 ) {
 		case 0x00:	/* Joystick */
 			return readinputport(4);
+		case 0x04:	/* Keypad */
+			return 0xff;
 		case 0x01:	/* Paddle */
+			for ( i = 0; i < 4; i++ ) {
+				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
+					if ( ( readinputport(12) >> 3*i ) & 0x04 ) {
+						return TIA_INPUT_PORT_ALWAYS_OFF;
+					} else {
+						return TIA_INPUT_PORT_ALWAYS_ON;
+					}
+				}
+			}
 		default:
 			return 0xff;
 		}
@@ -399,12 +478,41 @@ static int a2600_read_input_port(int port) {
 		switch ( readinputport(9) & 0x0f ) {
 		case 0x00:	/* Joystick */
 			return readinputport(5);
+		case 0x04:	/* Keypad */
+			return 0xff;
 		case 0x01:	/* Paddle */
+			for ( i = 0; i < 4; i++ ) {
+				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
+				}
+			}
 		default:
 			return 0xff;
 		}
 	}
 	return TIA_INPUT_PORT_ALWAYS_OFF;
+}
+
+static READ8_HANDLER(a2600_get_databus_contents) {
+	UINT16 last_address = activecpu_get_pc() - 1;
+	if ( ! ( last_address & 0x1000 ) && ( last_address < 0x80 || 
+	     ( last_address >= 0x100 && last_address < 0x180 ) ) ) {
+		return offset;
+	}
+	return program_read_byte_8( last_address );
+}
+
+static struct TIAinterface tia_interface =
+{
+	a2600_read_input_port,
+	a2600_get_databus_contents
+};
+
+static void setup_riot(int dummy) {
+	/* It appears the 6532 is running in 64 cycle mode with some random timer value
+	   on startup. This is not verified against real hardware yet! */
+	cpuintrf_push_context(0);
+	r6532_0_w( 0x16, ( mame_rand(Machine) & 0x7F ) | 0x40 );
+	cpuintrf_pop_context();
 }
 
 static MACHINE_START( a2600 )
@@ -417,10 +525,12 @@ static MACHINE_START( a2600 )
 
 	r6532_init(0, &r6532_interface);
 
+	timer_set( 0.0, 0, setup_riot );
+
 	if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
-		tia_init_pal(a2600_read_input_port);
+		tia_init_pal( &tia_interface );
 	} else {
-		tia_init(a2600_read_input_port);
+		tia_init( &tia_interface );
 	}
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x7f, 0, 0, tia_w);
@@ -733,6 +843,34 @@ INPUT_PORTS_START( a2600 )
 	PORT_CONFSETTING(    0xff, "Auto" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
 	PORT_CONFSETTING(    0x01, DEF_STR( On ))
+
+	PORT_START	/* [12] left keypad */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 1") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 2") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 3") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 7") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 8") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 9") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left *") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 0") PORT_CODE(KEYCODE_DEL_PAD)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left #") PORT_CODE(KEYCODE_ENTER_PAD)
+
+	PORT_START  /* [13] right keypad */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 3")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 4")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 5")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 6")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 7")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 8")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 9")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right *")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 0")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right #")
 INPUT_PORTS_END
 
 
