@@ -81,6 +81,7 @@ static const UINT32 games[][2] =
 	{ 0x34b80a97, modeTV }, // Espial
 	{ 0xbd08d915, modeTV }, // Miner 2049er
 	{ 0xbfa477cd, modeTV }, // Miner 2049er Volume II
+	{ 0x71e814e9, modeTV }, // Miner 2049er Volume II
 	{ 0xdb376663, modeTV }, // Polaris
 	{ 0x25b78f89, modeTV }, // Polaris
 	{ 0x71ecefaf, modeTV }, // Polaris
