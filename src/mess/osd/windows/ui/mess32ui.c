@@ -887,7 +887,19 @@ static void DevView_SetSelectedSoftware(HWND hwndDevView, int nGame,
 static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 	const struct IODevice *dev, int nID, LPTSTR pszBuffer, UINT nBufferLength)
 {
-	return GetSelectedSoftware(nDriverIndex, &dev->devclass, nID);
+	LPCTSTR t_buffer = NULL;
+	TCHAR* t_s;
+	LPCSTR s = GetSelectedSoftware(nDriverIndex, &dev->devclass, nID);
+	
+	t_s = tstring_from_utf8(s);
+	if( !t_s )
+		return t_buffer;
+	
+	_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_s);
+	free(t_s);	
+	t_buffer = pszBuffer;
+	
+	return t_buffer;
 }
 
 

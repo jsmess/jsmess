@@ -668,7 +668,7 @@ BEGIN
                     WS_TABSTOP,10,52,55,10,0,HIDC_SAMPLES
     GROUPBOX        "Sample rate",IDC_RATETEXT,60,65,100,28
     COMBOBOX        IDC_SAMPLERATE,66,75,88,60,CBS_DROPDOWNLIST | 
-                    CBS_UPPERCASE | WS_VSCROLL | WS_TABSTOP,0,
+                    WS_VSCROLL | WS_TABSTOP,0,
                     HIDC_SAMPLERATE
     GROUPBOX        "Volume attenuation",IDC_STATIC,60,96,100,28
     CONTROL         "Slider1",IDC_VOLUME,"msctls_trackbar32",TBS_BOTH | 

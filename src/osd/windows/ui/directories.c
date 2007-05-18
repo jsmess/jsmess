@@ -45,11 +45,10 @@ typedef struct
 	BOOL    m_bModified;
 } tPath;
 
-typedef union
+typedef struct
 {
 	tPath	*m_Path;
 	TCHAR	*m_Directory;
-	void    *m_Ptr;
 } tDirInfo;
 
 /***************************************************************************
@@ -355,8 +354,10 @@ static void Directories_OnDestroy(HWND hDlg)
 
 		for (i = 0; i < nDirInfoCount; i++)
 		{
-			if (g_pDirInfo[i].m_Ptr)
-				free(g_pDirInfo[i].m_Ptr);
+			if (g_pDirInfo[i].m_Path)
+				free(g_pDirInfo[i].m_Path);
+			if (g_pDirInfo[i].m_Directory)
+				free(g_pDirInfo[i].m_Directory);			
 		}
 		free(g_pDirInfo);
 		g_pDirInfo = NULL;

@@ -30,7 +30,7 @@
 
 #include "tabview.h"
 #include "m32util.h"
-
+#include "strconv.h"
 
 
 struct TabViewInfo
@@ -146,7 +146,7 @@ int TabView_GetCurrentTab(HWND hwndTabView)
 			for (i = 0; i < pTabViewInfo->nTabCount; i++)
 			{
 				pszThatTab = pTabViewInfo->pCallbacks->pfnGetTabShortName(i);
-				if (pszThatTab && !stricmp(pszTab, pszThatTab))
+				if (pszThatTab && !mame_stricmp(pszTab, pszThatTab))
 				{
 					nTab = i;
 					break;
@@ -279,6 +279,7 @@ void TabView_Reset(HWND hwndTabView)
 	struct TabViewInfo *pTabViewInfo;
 	TC_ITEM tci;
 	int i;
+	TCHAR* t_text;
 
 	pTabViewInfo = GetTabViewInfo(hwndTabView);
 
@@ -292,8 +293,12 @@ void TabView_Reset(HWND hwndTabView)
 	{
 		if (!pTabViewInfo->pCallbacks->pfnGetShowTab || pTabViewInfo->pCallbacks->pfnGetShowTab(i))
 		{
-			tci.pszText = (TCHAR *) pTabViewInfo->pCallbacks->pfnGetTabLongName(i);
+			t_text = tstring_from_utf8(pTabViewInfo->pCallbacks->pfnGetTabLongName(i));
+			if( !t_text )
+				return;
+			tci.pszText = t_text;
 			TabCtrl_InsertItem(hwndTabView, i, &tci);
+			free(t_text);
 		}
 	}
 	TabView_UpdateSelection(hwndTabView);

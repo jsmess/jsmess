@@ -159,7 +159,7 @@ const ICONDATA g_iconData[] =
 	{ 0 }
 };
 
-const char g_szPlayGameString[] = "&Run %s";
+const TCHAR g_szPlayGameString[] = TEXT("&Run %s");
 const char g_szGameCountString[] = "%d systems";
 const char g_szHistoryFileName[] = "sysinfo.dat";
 const char g_szMameInfoFileName[] = "messinfo.dat";

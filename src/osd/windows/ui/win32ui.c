@@ -1558,6 +1558,7 @@ void SetMainTitle(void)
 {
 	char version[50];
 	char buffer[100];
+
 	sscanf(build_version,"%s",version);
 	snprintf(buffer, ARRAY_LENGTH(buffer), "%s %s", MAME32NAME, version);
 	win_set_window_text_utf8(hMain,buffer);
@@ -5360,15 +5361,11 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 
 void SetStatusBarText(int part_index, const char *message)
 {
-	/*
 	TCHAR* t_message = tstring_from_utf8(message);
 	if( !t_message )
 		return;
-	*/
-	SendMessage(hStatusBar, SB_SETTEXT, (WPARAM) part_index, (LPARAM)/*(LPCTSTR) win_tstring_strdup(t_*/message/*)*/);
-	/*
+	SendMessage(hStatusBar, SB_SETTEXT, (WPARAM) part_index, (LPARAM)(LPCTSTR) win_tstring_strdup(t_message));
 	free(t_message);
-	*/
 }
 
 void SetStatusBarTextF(int part_index, const char *fmt, ...)

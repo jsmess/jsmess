@@ -224,7 +224,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, int nGame)
 			{
 				utf8_s = dev->name(dev, id, buf, sizeof(buf) / sizeof(buf[0]));
 				s = tstring_from_utf8(utf8_s);
-				ppszDevices[i] = alloca(_tcslen(s) + 1);
+				ppszDevices[i] = alloca((_tcslen(s) + 1) * sizeof(TCHAR));
 				_tcscpy(ppszDevices[i], s);
 				free(s);
 				i++;

@@ -416,7 +416,7 @@ BOOL CALLBACK DIJoystick_EnumDeviceProc(LPDIDEVICEINSTANCE pdidi, LPVOID pv)
 	This.joysticks[This.num_joysticks].guidDevice = pdidi->guidInstance;
 
 	_stprintf(buffer, TEXT("%s (%s)"), pdidi->tszProductName, pdidi->tszInstanceName);
-	This.joysticks[This.num_joysticks].name = (TCHAR *)malloc(_tcslen(buffer) + 1);
+	This.joysticks[This.num_joysticks].name = (TCHAR *)malloc((_tcslen(buffer) + 1) * sizeof(TCHAR));
 	_tcscpy(This.joysticks[This.num_joysticks].name, buffer);
 
 	This.num_joysticks++;
@@ -433,7 +433,7 @@ static BOOL CALLBACK DIJoystick_EnumAxisObjectsProc(LPCDIDEVICEOBJECTINSTANCE lp
 
 	joystick->axes[joystick->num_axes].guid = lpddoi->guidType;
 
-	joystick->axes[joystick->num_axes].name = (TCHAR *)malloc(_tcslen(lpddoi->tszName) + 1);
+	joystick->axes[joystick->num_axes].name = (TCHAR *)malloc((_tcslen(lpddoi->tszName) + 1) * sizeof(TCHAR));
 	_tcscpy(joystick->axes[joystick->num_axes].name, lpddoi->tszName);
 
 	joystick->axes[joystick->num_axes].offset = lpddoi->dwOfs;
