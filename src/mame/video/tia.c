@@ -881,6 +881,18 @@ static WRITE8_HANDLER( CXCLR_w )
 }
 
 
+#define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION)											\
+	if ( current_x() < ( HMOVE_started + 16 * 4 ) && HMOVE_started != HMOVE_INVALID ) {	\
+		int decrements = ( ( MOTION & 0xF0 ) ^ 0x80 ) >> 4;								\
+		int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();			\
+		HORZ += 8;																		\
+		if ( window > 0 ) {																\
+			HORZ -= ( ( window + 1 ) / 4 + 1 );											\
+			if ( HORZ < 0 )																\
+				HORZ += 160;															\
+		}																				\
+	}
+
 static WRITE8_HANDLER( RESP0_w )
 {
 	horzP0 = current_x();
@@ -896,16 +908,7 @@ static WRITE8_HANDLER( RESP0_w )
 	}
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	if ( current_x() < ( HMOVE_started + 16 * 4 ) && HMOVE_started != HMOVE_INVALID ) {
-		int decrements = ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4;
-		int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();
-		horzP0 += 8;
-		if ( window > 0 ) {
-			horzP0 -= ( ( window + 1 ) / 4 + 1 );
-			if ( horzP0 < 0 )
-				horzP0 += 160;
-		}
-	}
+	RESXX_APPLY_ACTIVE_HMOVE( horzP0, HMP0 );
 }
 
 
@@ -924,16 +927,7 @@ static WRITE8_HANDLER( RESP1_w )
 	}
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	if ( current_x() < ( HMOVE_started + 16 * 4 ) && HMOVE_started != HMOVE_INVALID ) {
-		int decrements = ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4;
-		int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();
-		horzP1 += 8;
-		if ( window > 0 ) {
-			horzP1 -= ( ( window + 1 ) / 4 + 1 );
-			if ( horzP1 < 0 )
-				horzP1 += 160;
-		}   
-	}
+	RESXX_APPLY_ACTIVE_HMOVE( horzP1, HMP1 );
 }
 
 
@@ -944,22 +938,14 @@ static WRITE8_HANDLER( RESM0_w )
 	if (horzM0 < 0)
 	{
 		horzM0 = 2;
-		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-		if ( HMOVE_started != HMOVE_INVALID ) {
-			int decrements = ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 4;
-			int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();
-			horzM0 += 8;
-			if ( window > 0 ) {
-				horzM0 -= ( ( window + 1 ) / 4 + 1 );
-				if ( horzM0 < 0 )
-					horzM0 += 160;
-			}
-		}
 	}
 	else
 	{
 		horzM0 = (horzM0 + 4) % 160;
 	}
+
+	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+	RESXX_APPLY_ACTIVE_HMOVE( horzM0, HMM0 );
 }
 
 
@@ -970,22 +956,14 @@ static WRITE8_HANDLER( RESM1_w )
 	if (horzM1 < 0)
 	{
 		horzM1 = 2;
-		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-		if ( HMOVE_started != HMOVE_INVALID ) {
-			int decrements = ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 4;
-			int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();
-			horzM1 += 8;
-			if ( window > 0 ) {
-				horzM1 -= ( ( window + 1 ) / 4 + 1 );
-				if ( horzM1 < 0 )
-					horzM1 += 160;
-			}
-		}
 	}
 	else
 	{
 		horzM1 = (horzM1 + 4) % 160;
 	}
+
+	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+	RESXX_APPLY_ACTIVE_HMOVE( horzM1, HMM1 );
 }
 
 
@@ -996,22 +974,14 @@ static WRITE8_HANDLER( RESBL_w )
 	if (horzBL < 0)
 	{
 		horzBL = 2;
-		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-		if ( HMOVE_started != HMOVE_INVALID ) {
-			int decrements = ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 4;
-			int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();
-			horzBL += 8;
-			if ( window > 0 ) {
-				horzBL -= ( ( window + 1 ) / 4 + 1 );
-				if ( horzBL < 0 )
-					horzBL += 160;
-			}
-		}
 	}
 	else
 	{
 		horzBL = (horzBL + 4) % 160;
 	}
+
+	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+	RESXX_APPLY_ACTIVE_HMOVE( horzBL, HMBL );
 }
 
 
