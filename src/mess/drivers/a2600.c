@@ -535,7 +535,7 @@ static void setup_riot(int dummy) {
 	/* It appears the 6532 is running in 64 cycle mode with some random timer value
 	   on startup. This is not verified against real hardware yet! */
 	cpuintrf_push_context(0);
-	r6532_0_w( 0x16, ( mame_rand(Machine) & 0x7F ) | 0x40 );
+	r6532_0_w( 0x16, ( mame_rand(Machine) & 0x7F ) | 0x60 );
 	cpuintrf_pop_context();
 }
 
