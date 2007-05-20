@@ -896,7 +896,7 @@ static WRITE8_HANDLER( RESP0_w )
 	}
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	if ( current_x() < 8 && HMOVE_started != HMOVE_INVALID ) {
+	if ( current_x() < ( HMOVE_started + 16 * 4 ) && HMOVE_started != HMOVE_INVALID ) {
 		int decrements = ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4;
 		int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();
 		horzP0 += 8;
@@ -924,7 +924,7 @@ static WRITE8_HANDLER( RESP1_w )
 	}
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	if ( current_x() < 8 && HMOVE_started != HMOVE_INVALID ) {
+	if ( current_x() < ( HMOVE_started + 16 * 4 ) && HMOVE_started != HMOVE_INVALID ) {
 		int decrements = ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4;
 		int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();
 		horzP1 += 8;
