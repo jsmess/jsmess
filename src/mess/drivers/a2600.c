@@ -502,7 +502,7 @@ static READ8_HANDLER(a2600_get_databus_contents) {
 	return program_read_byte_8( last_address );
 }
 
-static struct TIAinterface tia_interface =
+static struct tia_interface tia_interface =
 {
 	a2600_read_input_port,
 	a2600_get_databus_contents

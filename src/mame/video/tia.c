@@ -1341,7 +1341,7 @@ static void tia_reset(running_machine *machine)
 
 
 
-void tia_init_internal(int freq, const struct TIAinterface* ti)
+void tia_init_internal(int freq, const struct tia_interface* ti)
 {
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
 
@@ -1381,12 +1381,12 @@ void tia_init_internal(int freq, const struct TIAinterface* ti)
 	add_reset_callback(Machine, tia_reset);
 }
 
-void tia_init(const struct TIAinterface* ti)
+void tia_init(const struct tia_interface* ti)
 {
 	tia_init_internal(60, ti);
 }
 
-void tia_init_pal(const struct TIAinterface* ti)
+void tia_init_pal(const struct tia_interface* ti)
 {
 	tia_init_internal(50, ti);
 }
