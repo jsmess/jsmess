@@ -493,13 +493,36 @@ static READ16_HANDLER(a2600_read_input_port) {
 	return TIA_INPUT_PORT_ALWAYS_OFF;
 }
 
+/* There are a few games that do an LDA ($80-$FF),Y instruction.
+   The contents off the databus then depend on whatever was read
+   from the RAM. To do this really properly the 6502 core would
+   need to keep track of the last databus contents so we can query
+   that. For now this is a quick hack to determine that value anyway.
+   Examples:
+   Q-Bert's Qubes (NTSC,F6) at 0x1594
+   Berzerk at 0xF093.
+*/
 static READ8_HANDLER(a2600_get_databus_contents) {
-	UINT16 last_address = activecpu_get_pc() - 1;
-	if ( ! ( last_address & 0x1000 ) && ( last_address < 0x80 || 
-	     ( last_address >= 0x100 && last_address < 0x180 ) ) ) {
+	UINT16	last_address, prev_address;
+	UINT8	last_byte, prev_byte;
+
+	last_address = activecpu_get_pc() - 1;
+	if ( ! ( last_address & 0x1E80 ) ) {
 		return offset;
 	}
-	return program_read_byte_8( last_address );
+	last_byte = program_read_byte_8( last_address );
+	if ( last_byte < 0x80 || last_byte == 0xFF ) {
+		return last_byte;
+	}
+	prev_address = last_address - 1;
+	if ( ! ( prev_address & 0x1E80 ) ) {
+		return last_byte;
+	}
+	prev_byte = program_read_byte_8( prev_address );
+	if ( prev_byte == 0xB1 ) {	/* LDA (XX),Y */
+		return program_read_byte_8( last_byte + 1 );
+	}
+	return last_byte;
 }
 
 static struct tia_interface tia_interface =
