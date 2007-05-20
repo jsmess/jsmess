@@ -1146,8 +1146,8 @@ WRITE8_HANDLER( tia_w )
 		 0,	// COLUPF
 		 0,	// COLUBK
 		 0,	// CTRLPF
-		 0,	// REFP0
-		 0,	// REFP1
+		 1,	// REFP0
+		 1,	// REFP1
 		 4,	// PF0
 		 4,	// PF1
 		 4,	// PF2
