@@ -313,7 +313,7 @@ SOUNDS += BEEP
 SOUNDS += WAVE
 SOUNDS += SID6581
 SOUNDS += SID8580
-#SOUNDS += SP0256
+SOUNDS += SP0256
 
 
 
@@ -601,7 +601,6 @@ $(MESSOBJ)/cbm.a: \
 
 $(MESSOBJ)/coco.a:   \
 	$(MESS_MACHINE)/6883sam.o	\
-	$(MESS_MACHINE)/cococart.o	\
 	$(MESS_MACHINE)/ds1315.o	\
 	$(MESS_MACHINE)/m6242b.o	\
 	$(MESS_MACHINE)/coco.o		\
@@ -610,6 +609,10 @@ $(MESSOBJ)/coco.a:   \
 	$(MESS_VIDEO)/coco3.o		\
 	$(MESS_FORMATS)/cocopak.o	\
 	$(MESS_DEVICES)/coco_vhd.o	\
+	$(MESS_DEVICES)/cococart.o	\
+	$(MESS_DEVICES)/coco_fdc.o	\
+	$(MESS_DEVICES)/coco_pak.o	\
+	$(MESS_DEVICES)/orch90.o	\
 
 $(MESSOBJ)/mc10.a:	\
 	$(MESS_MACHINE)/mc10.o		\

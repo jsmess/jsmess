@@ -43,6 +43,8 @@ System Driver Changes:
 - [A2600] Corrected HMOVE behavior when initiated outside hblank.
   [Wilbert Pol]
 
+- [COCO/DRAGON] Cartridge slot rearchitecture.  [Nate Woods]
+
 
 
 User Interface Changes:
