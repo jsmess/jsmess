@@ -1,4 +1,4 @@
-0.115.1
+﻿0.115.1
 
 New System Drivers Supported (in no particular order):
 ------------------------------------------------------
@@ -45,6 +45,7 @@ System Driver Changes:
 
 - [COCO/DRAGON] Cartridge slot rearchitecture.  [Nate Woods]
 
+- [sysinfo.dat] Massive update to entire file. [Fabio Priuli]
 
 
 User Interface Changes:
