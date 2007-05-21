@@ -803,22 +803,33 @@ static WRITE8_HANDLER( HMOVE_w )
 	int curr_x = current_x();
 	int curr_y = current_y();
 
-	//logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
+	logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
 	HMOVE_started = curr_x;
 
-	if ( curr_x < 0 ) {
-		horzP0 += 8;
-		horzP1 += 8;
-		horzM0 += 8;
-		horzM1 += 8;
-		horzBL += 8;
+	if ( curr_x < 0 || curr_x >= 157 ) {
+		horzP0 += 8 - ( ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4 );
+		horzP1 += 8 - ( ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4 );
+		horzM0 += 8 - ( ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 4 );
+		horzM1 += 8 - ( ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 4 );
+		horzBL += 8 - ( ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 4 );
+	} else {
+		int skip_decrements = ( 160 - HMOVE_started - 4 ) / 4;
+		int decrP0 = ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4;
+		int decrP1 = ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4;
+		int decrM0 = ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 4;
+		int decrM1 = ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 4;
+		int decrBL = ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 4;
+		if ( decrP0 > skip_decrements )
+			horzP0 -= decrP0 - skip_decrements;
+		if ( decrP1 > skip_decrements )
+			horzP1 -= decrP1 - skip_decrements;
+		if ( decrM0 > skip_decrements )
+			horzM0 -= decrM0 - skip_decrements;
+		if ( decrM1 > skip_decrements )
+			horzM1 -= decrM1 - skip_decrements;
+		if ( decrBL > skip_decrements )
+			horzBL -= decrBL - skip_decrements;
 	}
-
-	horzP0 -= ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4;
-	horzP1 -= ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4;
-	horzM0 -= ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 4;
-	horzM1 -= ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 4;
-	horzBL -= ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 4;
 
 	HMM0_latch = 0;
 	HMM1_latch = 0;
