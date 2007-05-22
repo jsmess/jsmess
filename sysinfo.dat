@@ -3493,8 +3493,7 @@ The Apple //c was the compact (the "c" stands for compact) version of the Apple 
 It had the same basic characteristics as the Apple IIe but included a lot of features 
 which were optional on the IIe: floppy disk drive, 80-column display, color display, 
 128 KB RAM. But unlike the Apple IIe, it had no expansion slots, so it was hard to add 
-features to this computer. It ran either with DOS 3.3 or with ProDos and had the first 
-version of QuickDraw in ROM.
+features to this computer. It ran either with DOS 3.3 or with ProDOS.
 
 
 The Apple //c was originally designed to be a portable version of the Apple ][, but it 
@@ -3863,11 +3862,11 @@ that double-hi-resolution modes are available.
 
 The Enhanced Apple IIe, a.k.a. the Apple //e (MESS system name, "apple2ee") was released in
 1985.  It included ROM bugfixes, replace the 6502 processor with the 65C02, and added a
-character genrator ROM with new graphic characters called "Mouse Text".  This model was
-actually more compatable with the Apple ][ and ][+.
+character genrator ROM with new graphic characters called "MouseText".  The 65C02 and MouseText
+hurt compatibility with the older models slightly but gave it slightly better performance.
 
 
-The Platinum Apple //e adopted the ||GS keyboard and minor motherboard modifications.
+The Platinum Apple //e adopted the ||GS keyboard layout and minor motherboard modifications.
 
 
 * Apple "][", Apple "II", Apple "//" -- which is correct?
@@ -3992,10 +3991,10 @@ Features:
 * CPU: Western Design Center 65C816 (16 bit) 2.8 MHz, switchable to 1 MHz
 
 
-* RAM: 128 KB expandable to 8 MB
+* RAM: 128 KB (ROM 0, ROM 1) or 1 MB (ROM 3), expandable to 8 MB
 
 
-* ROM: 128 KB expandable to 1 MB
+* ROM: 128 KB (ROM 0, ROM 1) or 256 KB (ROM 3), expandable to 1 MB
 
 
 * Text Modes: 40 or 80 chars x 25 lines
@@ -4007,21 +4006,34 @@ Features:
 * Colors: 4096
 
 
-* Sound: Ensoniq 32 with 16 stereo voices (+ 64 KB on chip RAM to store sound data), 
-one voice is reserved for the system beep
+* Sound: Ensoniq ES5503 32-voice wavetable synthesizer.  The ES5503 was designed by
+  Bob Yannes after leaving Commodore and it's the true sequel to the C64's SID chip.
+  The 5503 has 64k of dedicated wavetable RAM in the IIgs.  The IIgs also retains
+  the speaker toggle of previous Apple IIs.
 
 
-* I/O Ports: 7 slots, ram card, RS422c (2), analogue RGB, Apple Desktop Bus 
+* I/O Ports: 7 slots, memory expansion, RS422c (2), analogue RGB, Apple Desktop Bus 
 (mouse & keyboard), Composite video, joystick, audio, disk port, AppleTalk
 
 
-* Keyboard: Detached 80-key full stroke with 10-key numeric pad and mouse connector
+* Keyboard: Detached 80-key full stroke with 10-key numeric pad and ADB pass-through
+  port for the mouse.
 
 
-* Built In Media: Built-in 3.5'' 800 KB floppy drive
+* Built In Media: None.
 
 
-* OS: GS / OS, ProDOS 8 & 16, DOS 3.3, Pascal UCSD, CP/M (with Z80 card)
+* OS: All 8-bit Apple II OSes plus ProDOS 16 (a 16-bit translation layer over ProDOS,
+  similar to how Windows 9x rode on top of DOS) and later GS/OS, a full 16-bit native
+  OS with much better performance and advanced features like hot-swappable device
+  drivers and plug-in filesystem modules to read CD-ROMs, MS-DOS FAT disks, and
+  Macintosh HFS disks.
+
+  The IIgs also included a full port of the Macintosh's "Toolbox" - GUI applications
+  written in a high-level language such as C or Pascal were relatively easy to port
+  aside from the endian and screen resolution differences.  In fact, the IIgs was
+  the first Apple released with a color version of the Mac UI (although the Mac II
+  followed it very closely).
 
 
 
@@ -4030,61 +4042,83 @@ History and Trivia:
 -------------------
 
 
-The Apple IIGS was designed in response to the Amiga 1000 and Atari 520ST computers & could be 
-considered a cross between the Macintosh & Apple II (naturally, it can't use Macintosh programs). 
-It was (and still is) a quantum leap for the Apple II line.
+The Apple IIGS was originally the "IIX" project, which was intended to use the 65816 along with
+a special slot that could be used to add either an 8088 (for PC compatibility) or a 68000 (to
+run Mac software).  But the 65816 was running late (William D. Mensch famously laid it out by hand 
+on his kitchen table, using no computer assistance) and Apple management killed the project.
+
+It was later resurrected under the codename "Phoenix" (and later "Gumby" and "Rambo") when the 
+65816 was ready, and it did make it to market despite a lukewarm response from Apple management.  
+The IIGS was made possible by the development of the "Mega II" ASIC, which contained the entire 
+circuitry of an enhanced Apple IIe except for the CPU, ROMs, and RAM on a small single chip, but 
+it was Steve Wozniak himself who gave a crucial boost to the engineers, coming up with a scheme 
+that would maintain very high Apple II compatibility while still letting the IIgs be it's own machine.
+In tribute, the first production run of the IIgs had Woz's signature stamped onto the case.
 
 
 Sales were strong initially and the IIGS even outsold the black and white Macintosh units that 
-were its contemporary. Sadly, Apple wanted Macintosh to be its future. The total number of 
-advertisements and commercials for the IIGS could probably be counted on one hand. If the computer 
-had been introduced a year or two earlier, things might have been different. The Apple IIGS 
+were its contemporary.  The IIGS was the first Apple released that could show the Mac GUI in
+color and the first released machine with the new ADB peripheral connection (the Mac II and SE 
+were introduced several months later).  Apple management was terrified of hurting Mac sales so
+they had forced the engineers to run the 65816 much slower than the 7 MHz 68000 of the Mac Plus.
+(Wozniak and the engineering team had wanted to run the 65816 at 8 MHz).  Even so, the IIgs's 
+all-assembly language Toolbox was eventually tuned to the point where even at 2.8 MHz the GUI 
+felt as snappy as it's more powerful cousin.  The slow CPU did hurt it for games though -
+games on the IIgs typically looked good and sounded great but animated poorly.  The Apple IIGS 
 disappeared from the market in 1992.
 
 
 In one final gasp, the Apple II supporters at Apple designed the Apple IIGS Plus, code named 
-"Mark Twain". It had an 8Mhz 65C816, a built in SuperDrive, 2MB on the motherboard, and a hard 
-drive. Prototypes leaked out and a user group that has one and wrote a series of articles about 
-it. Apple management vetoed this unit.
+"Mark Twain".  It was rumored to have an 8 Mhz 65C816, a built in SuperDrive, 2MB on the 
+motherboard, and a hard drive.  Apple management originally green lighted the new machine and
+reserved time during a satellite broadcast in September of 1991 to introduce it to the world,
+but it was killed at the last minute due to the usual objections that it could hurt the Macintosh.
+A prototype leaked out of Apple years later and was much less ambitious than was originally thought:
+it contained the same ROM 3, but with 2 MB of RAM, an on-board SCSI controller, and an internal SCSI
+HDD.  So even if it had been introduced it would have been too little too late.
 
 
-The Ensoniq chip in the Apple IIGS was a brilliant move by Apple, but it drew a lawsuit from 
-Apple Records, the Beatles' record label. Apple never again put a synthesizer chip in any computer. 
-Even today, the Macintosh does not have hardware synthesizers. The Macintosh works around this by 
-using software-based synthesis.
+The Ensoniq chip in the Apple IIGS was a brilliant move by Apple, but like a lot of things related
+to the IIgs it was something of an accident. Although the 5503 powered several successful Ensoniq 
+synthesizers (the ESQ-1, SQ-80, and the Mirage sampler), Bob Yannes remembered the impact of his 
+SID on the Commodore 64 and wanted to get the chip into a computer.  He first called Commodore, but
+they weren't interested in chips they didn't make (they also passed on the 65816 CPU - imagine a C64
+sequel with the 65816 and 5503!)  He called Apple and got bounced around to various people until 
+it hit an engineer on the IIgs team who was heavily into electronic music.  As usual getting management
+to accept the chip was an uphill fight - originally the sockets for the 5503 and it's RAM were to be
+placed on the board and the chips sold separately, but finally they realized the cost difference
+was minor at that point and included the chips in every machine sold.  It was so close that
+the system software shipped with an error code defined for "Ensoniq not present".
+
+The chip also caused legal trouble with Apple Records, which resulted in Apple never again putting
+a hardware synthesizer chip into a computer.  The Macs relied on a 4-voice DMA setup similar to the
+Commodore Amiga for years and now just use software synthesis.
 
 
-It had a lot of graphic modes: All modes used a 12-bit palette for 4096 colors.
+The IIGS had a lot of graphic modes: All modes used a 12-bit palette for 4096 colors.
 
 
-- 320x200 with 16 colors
+- 320x200 with 16 colors per scanline.  There were a total of 16 hardware palettes that could each
+  be assigned to one or more scanlines, making 256 colors on screen possible at once.  Later software
+  discovered that there was (barely) enough CPU time to rewrite the palette as the beam marched down the
+  screen, giving 16 unique colors on each scanline and up to 3200 colors on screen at once (similar
+  to the Amiga's HAM mode, but more limited).
 
-- 320x200 with 256 colors: in this mode, the VGC is taking advantage of the fact that it has memory 
-for 16 separate palettes. Each scan line can be assigned any one of these 16 palettes for a total of 
-256 possible colors. This mode requires no CPU assistance and is often used in games.
+- 640x200 with 4 colors.  The pixels were small enough in this mode that adjacent pairs of pixels blended
+  to create the illusion of 16 colors, although this of course effectively reduced the effective resolution
+  for things which weren't in black and white.  Most apps using the GUI Toolbox ran in this mode,
+  although the aspect ratio was pretty terrible.
 
-- 320x200 with 3200 colors: in this mode, the CPU is used to swap palettes into and out of video 
-memory such that a separate 16 color palette can be used on each of the 200 scan lines for 3200 
-possible colors. This mode is often used for viewing graphics.
+- Fill mode can be enabled on scanlines which are in the 320x200 mode.  This makes color 0 repeat the
+  last non-0 color present on the scanline, making it possible to draw filled polygons at a much
+  higher speed than would otherwise be possible.  It was used mostly in a few Eurodemos and a port
+  of the Amiga game "Out Of This World".
 
-- 640x200 with 4 pure colors: this mode is bland and is not often used.
+- Each scanline could independantly be in 320 or 640 mode, although such mixes weren't commonly seen.
+  A per-scanline interrupt was also available for raster effects (such as the "3200 color" mode).
 
-- 640x200 with 16 dithered colors: in this mode, the pixels in the graphic screen are grouped into 
-even and odd columns. The even columns can have a palette of 4 pure colors out of a of a possible 4096. 
-The odd columns can have a second palette of 4 pure colors. The GS dithers the adjacent colors for 
-4x4=16 dithered colors. This mode is widely used in productivity programs and also in Apple's Finder 
-for the GS.
-
-- Fill mode: for faster rendering of graphics, fill mode is a hardware mode in which an outline of 
-a graphic can be drawn and the outline filled by a solid color without needing to draw in all the 
-pixels.
-
-- Combinations and variations: the Apple IIGS supported scan line interrupts. Part of the screen could 
-be in 640x200 mode while another part could be in 20x200 resolution. Such split modes were sometimes 
-used in paint programs, where the menu bar was in 640x200 while the graphic was in 320x200.
-
-- SVGA modes with 24-bit color could be added with an additional video card (see the Second Sight SVGA 
-card at Sequential Systems at http://www.sequential.com/).
+- SVGA modes with 24-bit color could be added with a 3rd party VGA card, but it came late in the life
+  of the IIGS and had little software support.
 
 
 The Apple IIGS also had all the graphics modes found on the Apple IIc.
@@ -4102,11 +4136,11 @@ High Resolution mode graphic. The text in mixed mode could be either 40 column o
 Double Low Res and Double High Res modes couldn't be mixed with text.
 
 
-The "SmartPort" external drive port supports both Apple IIe/IIc UniDisks (3.5" and 5.25" models) and 
-Apple IIGS daisy-chain 3.5" drives and Apple 5.25" disks. It was sold with a 3.5" floppy drive which not 
-only worked on this computer, but on the Macintosh as well. It was also designed to support the Chinook 
-CT-series 20MB to 100MB SmartPort hard drives, but Apple IIGS users usually added an SCSI card to the 
-system for faster hard drive access.
+The "SmartPort" external drive port supports both Apple IIe/IIc UniDisks (3.5" and 5.25" models) and the
+newer Apple 3.5 Drive which was shared with the Macintosh.  You could have a total of 2 UniDisks and 4
+Apple 3.5 Drives daisy-chained, although such a configuration would have put quite a strain on the stock
+power supply.  Some companies also made SmartPort compatible harddisks, but these were relatively slow
+and most IIGS users used an add-on SCSI card and drive instead.
 
 
 The difference between a UniDisk and a IIGS 3.5" drive is that the IIGS drive is controlled directly by 
@@ -4114,26 +4148,26 @@ the computer while the UniDisk has a separate processor. The UniDisk is thus muc
 than a IIGS 3.5" drive.
 
 
-The SmartPort can support two 800K 3.5" drives, two 140K 5.25" drives, and one 100MB CT100 hard drive 
-simultaneously daisy-chained to each other.
+Apple and third parties both sold SCSI cards for the IIGS, and Applied Engineering sold a "high density"
+floppy drive that got double the density by spinning the disk at half speed.  There was never any official
+Apple support for the more conventional 1.44 MB SuperDrives that were used with the Mac - those required
+the newer "SWIM" controller chip, while the IIgs still had only the original "IWM" (shared with Macs up
+through the Mac Plus).
 
 
-The Apple IIGS often shipped with the Apple High Speed (DMA) SCSI controller in an expansion slot for 
-controlling SCSI devices. Even 100MB Zip Drives and 1 GB Jazz Drives work on this SCSI port. A SuperDrive 
-controller could be added for using 1.44MB high density floppy drives.
+The IIgs was available initially as an upgrade motherboard for the Apple IIe - you got a board which would
+fit in the IIe case and had connectors for the IIe's power supply and internal keyboard and replacement
+stickers which changed the old "Apple" and "IIe" in Apple's original font into "Apple IIgs" in the newer 
+Apple font.  All the other connectors were still present, and you could buy an ADB keyboard and mouse to
+use with it as well.  A IIe upgrade version of the ROM 3 motherboard was never made however.
 
 
-(infos from old-computers.com)
+The initial ROM 0 IIgs shipped with defects in the "Video Graphics Controller" custom ASIC that caused
+fringing in the old Apple II video modes under some circumstances.  A new VGC and a new ROM chip were
+a free upgrade to bring those systems up to ROM 1 specs.
 
 
-* There are three main variations of the IIgs: the ROM 00, commonly found in the 'Woz' limited edition 
-case which was a signature on the front, the ROM 01, and the 1989 ROM 03  variant. The ROM 03 has a 
-larger ROM (256K instead of 128K), 1Mb of RAM on board (the ROM 00/ROM 01 models have 256K RAM on board) 
-and improved slot handling capability - the end result being a machine that is faster and more stable.
-The ROM 04 - Mark Twain - prototype only ran at 2.8MHz and lacked a SuperDrive, though it was rumoured 
-to have these things. Of more interest was the Apple II Ethernet card, which was destined to be released 
-in '91 along with GS/OS 6.1 - it featured a 4MHz 65C816, and was produced - one sold on eBay for $300 
-earlier this year. (Revisions informations thanks to Richard Kilpatrick)
+(infos from old-computers.com and other sources)
 
 
 * Apple "][", Apple "II", Apple "//" -- which is correct?
@@ -4163,16 +4197,17 @@ Apple //c
 
 Apple IIc+
 
-Apple IIgs or  GS  or best (if you have the fonts)  ||GS
+Apple IIgs or  GS.  Ideally on a modern system you'd set "Apple II" in one font size then "GS" in a smaller font.
+The "Apple IIGS" on the case was in Apple's corporate font of the time, a varient of Garamond.  (This same font
+was also used on the cases of many Macs and the platinum Apple IIe).
 
 
 * Easter Egg: The IIGS with ROM version 3 has an audio recording built-in. Upon booting, when 
 you see the "Open Apple" move back and forth on the screen, press <Control> <Open Apple> 
-<Option> <N>. You will hear the IIGS design team shouting "Apple 2". 
+<Option> <N>. You will hear the IIGS design team shouting "Apple II!", and see the
+designers' credits.
 
-
-On older sytems with ROM version 1, you will see developers credits. 
-
+ROM 1 has the same Easter Egg without the audio clip due to it's smaller ROM.
 
 
 Links:
@@ -4192,10 +4227,11 @@ Links:
 * CSA2 Usenet Apple II FAQs and Links -- http://home.swbell.net/rubywand/A2FAQs1START.html
 
 
-* GS WorldView (on-line journal of Apple II computing) -- http://www.grin.net/~cturley/gsezine/
-
-
 * Ninjaforce (Makers of demos for the Apple IIGS, including the Ninjaforce Mega Demo) -- http://www.ninjaforce.com/
+
+
+* Free Tools Association (The premiere IIgs demo group, based in France.  They offer downloads of their productions plus a version
+  of KEGS that runs as an Active X control inside Internet Explorer).  http://www.freetoolsassociation.com/
 
 
 * What is the Apple IIgs? -- http://www.whatisthe2gs.apple2.org.za/
@@ -4210,7 +4246,7 @@ MESS Emulation State:
 ---------------------
 
 
-Preliminary.
+Good.
 
 
 
@@ -4219,10 +4255,10 @@ Other Emulators:
 ----------------
 
 
-* XGS (Windows, DOS, Mac, NeXT) -- http://www.inwards.com/xgs/
+* XGS (Windows, DOS, Mac, NeXT - now discontinued) -- http://www.inwards.com/xgs/
 
 
-* KEGS (For Mac OS X, Win32, Linux, and Unix/X11) -- http://kegs.sourceforge.net/
+* KEGS (For Mac OS X, Win32, Linux, and Unix/X11 - extremely accurate) -- http://kegs.sourceforge.net/
 
 
 * KEGS32 (Win emulator based on the Kent Dickey's KEGS for UNIX) -- http://www.geocities.com/akilgard/kegs32/
@@ -4266,7 +4302,7 @@ Features:
 * Built In Media: None
 
 
-* OS: DOS 3.2.1
+* OS: DOS 3.2.1 and DOS 3.3
 
 
 * Built In Language: AppleSoft Basic (Microsoft F.P. version)
