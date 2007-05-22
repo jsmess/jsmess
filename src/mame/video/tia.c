@@ -908,7 +908,7 @@ static WRITE8_HANDLER( RESP0_w )
 {
 	horzP0 = current_x();
 
-	if (horzP0 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP0 < 5 ) )
+	if (horzP0 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP0 < 7 ) )
 	{
 		horzP0 = 3;
 	}
@@ -927,7 +927,7 @@ static WRITE8_HANDLER( RESP1_w )
 {
 	horzP1 = current_x();
 
-	if (horzP1 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP1 < 5 ) )
+	if (horzP1 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP1 < 7 ) )
 	{
 		horzP1 = 3;
 	}
@@ -946,7 +946,7 @@ static WRITE8_HANDLER( RESM0_w )
 {
 	horzM0 = current_x();
 
-	if (horzM0 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM0 < 8 ) )
+	if (horzM0 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM0 < 7 ) )
 	{
 		horzM0 = 2;
 	}
@@ -964,7 +964,7 @@ static WRITE8_HANDLER( RESM1_w )
 {
 	horzM1 = current_x();
 
-	if (horzM1 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM1 < 8 ) )
+	if (horzM1 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM1 < 7 ) )
 	{
 		horzM1 = 2;
 	}
@@ -982,7 +982,7 @@ static WRITE8_HANDLER( RESBL_w )
 {
 	horzBL = current_x();
 
-	if (horzBL < 0 || ( HMOVE_started != HMOVE_INVALID && horzBL < 8 ) )
+	if (horzBL < 0 || ( HMOVE_started != HMOVE_INVALID && horzBL < 7 ) )
 	{
 		horzBL = 2;
 	}
