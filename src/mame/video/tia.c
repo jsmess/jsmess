@@ -915,8 +915,8 @@ static WRITE8_HANDLER( RESP0_w )
 	else
 	{
 		horzP0 = (horzP0 + 5) % 160;
-		startP0 = 0;
 	}
+	startP0 = 0;
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 	RESXX_APPLY_ACTIVE_HMOVE( horzP0, HMP0 );
@@ -934,8 +934,8 @@ static WRITE8_HANDLER( RESP1_w )
 	else
 	{
 		horzP1 = (horzP1 + 5) % 160;
-		startP1 = 0;
 	}
+	startP1 = 0;
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 	RESXX_APPLY_ACTIVE_HMOVE( horzP1, HMP1 );
