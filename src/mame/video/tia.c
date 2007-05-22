@@ -908,7 +908,7 @@ static WRITE8_HANDLER( RESP0_w )
 {
 	horzP0 = current_x();
 
-	if (horzP0 < 0 || ( HMOVE_started != HMOVE_INVALID && horzP0 < 8 ) )
+	if (horzP0 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP0 < 5 ) )
 	{
 		horzP0 = 3;
 	}
@@ -927,7 +927,7 @@ static WRITE8_HANDLER( RESP1_w )
 {
 	horzP1 = current_x();
 
-	if (horzP1 < 0 || ( HMOVE_started != HMOVE_INVALID && horzP1 < 8 ) )
+	if (horzP1 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP1 < 5 ) )
 	{
 		horzP1 = 3;
 	}
