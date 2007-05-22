@@ -908,8 +908,7 @@ static WRITE8_HANDLER( RESP0_w )
 {
 	horzP0 = current_x();
 
-	/* I'm not sure if the hmove limit should be 5 or 8 */
-	if (horzP0 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP0 < 5 ) )
+	if (horzP0 < 0 || ( HMOVE_started != HMOVE_INVALID && horzP0 < 8 ) )
 	{
 		horzP0 = 3;
 	}
@@ -928,8 +927,7 @@ static WRITE8_HANDLER( RESP1_w )
 {
 	horzP1 = current_x();
 
-	/* I'm not sure if the hmove limit should be 5 or 8 */
-	if (horzP1 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP1 < 5 ) )
+	if (horzP1 < 0 || ( HMOVE_started != HMOVE_INVALID && horzP1 < 8 ) )
 	{
 		horzP1 = 3;
 	}
@@ -948,8 +946,7 @@ static WRITE8_HANDLER( RESM0_w )
 {
 	horzM0 = current_x();
 
-	/* I'm not sure if the hmove limit should be 5 or 8 */
-	if (horzM0 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM0 < 5 ) )
+	if (horzM0 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM0 < 8 ) )
 	{
 		horzM0 = 2;
 	}
@@ -967,8 +964,7 @@ static WRITE8_HANDLER( RESM1_w )
 {
 	horzM1 = current_x();
 
-	/* I'm not sure if the hmove limit should be 5 or 8 */
-	if (horzM1 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM1 < 5 ) )
+	if (horzM1 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM1 < 8 ) )
 	{
 		horzM1 = 2;
 	}
@@ -986,8 +982,7 @@ static WRITE8_HANDLER( RESBL_w )
 {
 	horzBL = current_x();
 
-	/* I'm not sure if the hmove limit should be 5 or 8 */
-	if (horzBL < 0 || ( HMOVE_started != HMOVE_INVALID && horzBL < 5 ) )
+	if (horzBL < 0 || ( HMOVE_started != HMOVE_INVALID && horzBL < 8 ) )
 	{
 		horzBL = 2;
 	}
