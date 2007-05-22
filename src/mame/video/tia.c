@@ -803,7 +803,7 @@ static WRITE8_HANDLER( HMOVE_w )
 	int curr_x = current_x();
 	int curr_y = current_y();
 
-	logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
+	//logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
 	HMOVE_started = curr_x;
 
 	if ( curr_x < 0 || curr_x >= 157 ) {
