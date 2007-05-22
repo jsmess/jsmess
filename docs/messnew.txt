@@ -43,6 +43,10 @@ System Driver Changes:
 - [A2600] Corrected HMOVE behavior when initiated outside hblank.
   [Wilbert Pol]
 
+- [A2600] Improved positioning of all graphics when position counters
+  are reset in the extended HBlank period during a HMOVE. (bug #1184)
+  [Wilbert Pol]
+
 - [COCO/DRAGON] Cartridge slot rearchitecture.  [Nate Woods]
 
 - [sysinfo.dat] Massive update to entire file. [Fabio Priuli]
