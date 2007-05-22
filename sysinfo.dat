@@ -1336,10 +1336,10 @@ Machine".
 The 5200 shared much of the architecture of the Atari 400/800 computers, but featured a 
 different cartridge connector and completely different controllers. Non-centering analogue 
 joysticks which offered a full 360 degrees of mobility, were both innovative and unreliable. 
-Other controller features included a keypad, and a ahead-of-it's-time pause button.
+Other controller features included a keypad, and an ahead-of-its-time pause button.
 
 
-The Atari 5200 suffered from it's initial incompatibility with the VCS/2600 (an adapter was later released) 
+The Atari 5200 suffered from its initial incompatibility with the VCS/2600 (an adapter was later released) 
 and fierce competition from Coleco. When Warner Communications sold Atari Corp. to the Tramiels in 1984, 
 they quickly removed it from the market.
 
@@ -1409,7 +1409,7 @@ Other Emulators:
 * kat5200 -- http://home.cfl.rr.com/jberlin/kat5200/index.html
 
 
-Because of it's hardware similarity to 400/800/XL/XE computers line, 5200 emulation is also included in:
+Because of the hardware's similarity to the 400/800/XL/XE line of computers, 5200 emulation is also included in:
 
 
 * Atari800 -- http://atari800.sourceforge.net/
@@ -1421,7 +1421,7 @@ Because of it's hardware similarity to 400/800/XL/XE computers line, 5200 emulat
 * Atari800Win Plus -- http://www.a800win.atari-area.prv.pl/
 
 
-* Raibow -- http://www.chrislam.co.uk/ 
+* Rainbow -- http://www.chrislam.co.uk/ 
 
 $end
 
@@ -4052,7 +4052,7 @@ It was later resurrected under the codename "Phoenix" (and later "Gumby" and "Ra
 The IIGS was made possible by the development of the "Mega II" ASIC, which contained the entire 
 circuitry of an enhanced Apple IIe except for the CPU, ROMs, and RAM on a small single chip, but 
 it was Steve Wozniak himself who gave a crucial boost to the engineers, coming up with a scheme 
-that would maintain very high Apple II compatibility while still letting the IIgs be it's own machine.
+that would maintain very high Apple II compatibility while still letting the IIgs be its own machine.
 In tribute, the first production run of the IIgs had Woz's signature stamped onto the case.
 
 
@@ -4063,7 +4063,7 @@ were introduced several months later).  Apple management was terrified of hurtin
 they had forced the engineers to run the 65816 much slower than the 7 MHz 68000 of the Mac Plus.
 (Wozniak and the engineering team had wanted to run the 65816 at 8 MHz).  Even so, the IIgs's 
 all-assembly language Toolbox was eventually tuned to the point where even at 2.8 MHz the GUI 
-felt as snappy as it's more powerful cousin.  The slow CPU did hurt it for games though -
+felt as snappy as its more powerful cousin.  The slow CPU did hurt it for games though -
 games on the IIgs typically looked good and sounded great but animated poorly.  The Apple IIGS 
 disappeared from the market in 1992.
 
@@ -4085,7 +4085,7 @@ SID on the Commodore 64 and wanted to get the chip into a computer.  He first ca
 they weren't interested in chips they didn't make (they also passed on the 65816 CPU - imagine a C64
 sequel with the 65816 and 5503!)  He called Apple and got bounced around to various people until 
 it hit an engineer on the IIgs team who was heavily into electronic music.  As usual getting management
-to accept the chip was an uphill fight - originally the sockets for the 5503 and it's RAM were to be
+to accept the chip was an uphill fight - originally the sockets for the 5503 and its RAM were to be
 placed on the board and the chips sold separately, but finally they realized the cost difference
 was minor at that point and included the chips in every machine sold.  It was so close that
 the system software shipped with an error code defined for "Ensoniq not present".
@@ -4207,7 +4207,7 @@ you see the "Open Apple" move back and forth on the screen, press <Control> <Ope
 <Option> <N>. You will hear the IIGS design team shouting "Apple II!", and see the
 designers' credits.
 
-ROM 1 has the same Easter Egg without the audio clip due to it's smaller ROM.
+ROM 1 has the same Easter Egg without the audio clip due to its smaller ROM.
 
 
 Links:
@@ -5986,7 +5986,7 @@ future Mac OS X. Two years later, BeOs ran on Intel machines.
 
 Because of the small size of the company and the competition from much larger competitors, the Be 
 adventure finally ended on Novembre 2001 when the company sold all of its intellectual property and 
-technology assets to Palm. Just before this happened, J.L. Gassé offered for free the lastest version 
+technology assets to Palm. Just before this happened, J.L. Gassé offered for free the latest version 
 of his OS (R5) to Intel PC users.
 Nowadays, Although marginal, BeOs is still alive, and new releases and updates are regularly announced 
 by the BeOs community. 
@@ -7166,7 +7166,7 @@ and 64 kilobytes of RAM.
 
 
 The Commodore 64 is, along with the Apple II and the Atari 8-Bit computers, one of the 
-most famous home computers of it's era. During its production from 1982 to 1993 (!) 17 
+most famous home computers of its era. During its production from 1982 to 1993 (!) 17 
 to 22 million (!) of these computer would sell, to put in perspective, that's more than 
 all the Macintoshes in the world. It was one of the first to offer a high quality sound 
 chip and graphic resolution with many colors and sprites. A great range of peripherals 
@@ -8516,7 +8516,7 @@ After several minutes you'll see the prompt again
 
 *?
 
-Now type / (slash) and ENTER and the program will be started at it's defined run address. If 
+Now type / (slash) and ENTER and the program will be started at its defined run address. If 
 a program does not have a run address, you could also specify /[decimal value] to run from a 
 specific value...
 
@@ -8706,7 +8706,7 @@ only these two colors on the whole line.
 * I/O Ports: TV out
 
 
-* Controllers: Two `grip-stick' controllers attached to main unit with dedicated wires. 8 way digital 
+* Controllers: Two 'grip-stick' controllers attached to main unit with dedicated wires. 8 way digital 
 movement, forward/backwards, left/right, pull knob down/pull up and twist counter-/clockwise
 
 
@@ -8777,16 +8777,16 @@ system, it was nonetheless important at the time for having a number of original
 were copied by later more successful systems.
 
 
-Unique to the console is a `hold' button that allowed the player freeze the game and also change 
+Unique to the console is a 'hold' button that allowed the player freeze the game and also change 
 either the time, the speed or both during the course of the game, without altering the score. Another 
-feature which was used for the Hockey game was `overtime' which allowed one minute of extra play should 
+feature which was used for the Hockey game was 'overtime' which allowed one minute of extra play should 
 there be a tie-break in the score.
 
 
-Detached controllers were just starting to appear on `pong' units as opposed to having them directly on 
+Detached controllers were just starting to appear on 'pong' units as opposed to having them directly on 
 the unit itself. The Channel F controllers which were attached to the unit with dedicated wires, were 
 gripped by the whole hand and enabled movement in all directions, including the twisting left and right 
-for `paddle' movement. There was no firebutton, the joystick had 8 way digital movement, forward/backwards, 
+for 'paddle' movement. There was no fire button, the joystick had 8 way digital movement, forward/backwards, 
 left/right, pull knob down/pull up and twist counter-/clockwise.
 
 
@@ -8800,7 +8800,7 @@ to complete their collection.
 
 The Channel F console's popularity lowered when the Atari released their VCS in 1977 as the VCS had much 
 better graphics, games and sound. Fairchild responded to the Atari VCS by changing the name of their console to 
-the `Fairchild Channel F' from it's original name of the `Fairchild Video Entertainment System', but this 
+the 'Fairchild Channel F' from its original name of the 'Fairchild Video Entertainment System', but this 
 did not raise flagging sales.
 
 
@@ -9627,7 +9627,7 @@ monochrome display while the first model had green on black.
 
 
 Svenska Datorer AB (Swedish Computers AB) went bankrupt shortly after beginning the production of the 
-compis. Further production was taken over by the state-owned Televerket´s company TeleNova that 
+compis. Further production was taken over by the state-owned Televerket’s company TeleNova that 
 invested large amounts of money in the project.
 
 
@@ -14173,7 +14173,7 @@ The Mega PC was similar in concept to the Teradrive, but was an unrelated projec
 Developed by Firebox, the Mini Mega Drive is around the same size as an average joystick, includes 6 built-in games and can plug 
 directly into a television set without the need for an external power supply (the unit can run off an AA battery source). A single 
 Mega Drive pad has a direct connection to the Mini Mega Drive, allowing the player to select 1 of the 6 in-built games to play, 
-which include: Sonic the Hedgehog 1, Golden Axe, Kid Chameleon, Flicky, Dr. Robotnik's Mean Bean Machine and Altered Beast. One of it's 
+which include: Sonic the Hedgehog 1, Golden Axe, Kid Chameleon, Flicky, Dr. Robotnik's Mean Bean Machine and Altered Beast. One of its 
 major drawbacks is the lack of a secondary controller, and the lack of ability to connect one, hence any 2-player games are only 
 playable single player.
 
@@ -18379,7 +18379,7 @@ History and Trivia:
 The Mega Duck was released by Creatronic, Videojet and Timlex in 1993 mainly in Germany and France. 
 The Cougar Boy was released by Cougar, an electronic manufacturer of device and accessories, had mainly 
 distributed it in Brasil in 1993. Cougar brought the rights from Creatronics to manufacture it under 
-it's own name.
+its own name.
 
 
 Looks much like a Game Boy with its monochrome green screen, "start", "Select", "A" & "B" buttons and 
@@ -19444,7 +19444,7 @@ control technology. In the 80's it was sold as an Z80 CPU learning and initiatio
 
 
 The capacities of the system were quite poor. The standard model could be programmed only in 
-machine code through the small hexadecimal keyboard. When sold in it's original package it had 
+machine code through the small hexadecimal keyboard. When sold in its original package it had 
 the particularity to look like a book when closed.
 
 
@@ -19596,7 +19596,7 @@ the cartridges end up.
 The PSG, PPI (key click), SCC are emulated. The SCC isn't perfect yet, you
 can hear slight imperfections in King's Valley 2 (when you through the knife),
 F1 Spirit (when you start a race), Solid Snake (when you get to building 3).
-The SCC is called `k051649' in the volume menu.
+The SCC is called 'k051649' in the volume menu.
 
 
 The FM-PAC is also emulated for which you need the ROM dump of an original
@@ -19681,8 +19681,8 @@ be converted to .dsk using imgtool (it can convert .msx, .img, .ddi, .xsa,
 multidisks -- see imgtool.txt for more information).
 
 
-Error aren't properly handled yet. ``not ready'' is reported as ``record
-not found'', which results in ``Disk I/O error'' in MSX-BASIC.
+Errors aren't properly handled yet. "not ready" is reported as "record
+not found", which results in "Disk I/O error" in MSX-BASIC.
 
 
 Also not that memory emulation isn't complete so MSX2 memory mappers
@@ -20323,7 +20323,7 @@ the cartridges end up.
 The PSG, PPI (key click), SCC are emulated. The SCC isn't perfect yet, you
 can hear slight imperfections in King's Valley 2 (when you through the knife),
 F1 Spirit (when you start a race), Solid Snake (when you get to building 3).
-The SCC is called `k051649' in the volume menu.
+The SCC is called 'k051649' in the volume menu.
 
 
 The FM-PAC is also emulated for which you need the ROM dump of an original
@@ -20416,8 +20416,8 @@ be converted to .dsk using imgtool (it can convert .msx, .img, .ddi, .xsa,
 multidisks -- see imgtool.txt for more information).
 
 
-Error aren't properly handled yet. ``not ready'' is reported as ``record
-not found'', which results in ``Disk I/O error'' in MSX-BASIC.
+Errors aren't properly handled yet. "not ready" is reported as "record
+not found", which results in "Disk I/O error" in MSX-BASIC.
 
 
 Also not that memory emulation isn't complete so MSX2 memory mappers
@@ -20709,7 +20709,7 @@ the cartridges end up.
 The PSG, PPI (key click), SCC are emulated. The SCC isn't perfect yet, you
 can hear slight imperfections in King's Valley 2 (when you through the knife),
 F1 Spirit (when you start a race), Solid Snake (when you get to building 3).
-The SCC is called `k051649' in the volume menu.
+The SCC is called 'k051649' in the volume menu.
 
 
 The FM-PAC is also emulated for which you need the ROM dump of an original
@@ -20802,8 +20802,8 @@ be converted to .dsk using imgtool (it can convert .msx, .img, .ddi, .xsa,
 multidisks -- see imgtool.txt for more information).
 
 
-Error aren't properly handled yet. ``not ready'' is reported as ``record
-not found'', which results in ``Disk I/O error'' in MSX-BASIC.
+Errors aren't properly handled yet. "not ready" is reported as "record
+not found", which results in "Disk I/O error" in MSX-BASIC.
 
 
 Also not that memory emulation isn't complete so MSX2 memory mappers
@@ -27652,7 +27652,7 @@ this case NOT referring to Capcom Play System) in 1994, as an attempt to sell th
 games in console format.  The console basically served as an encased SuperGun (Television 
 JAMMA adapter) but was wired up so coin inputs could not be added by hackers, and only the
 special CPS Changer cartridge boards would work. The CPS Changer had outputs for Composite
-video, S-Video and 8 channel mono audio. It's joystick (named the "CPS Fighter") had the
+video, S-Video and 8 channel mono audio. Its joystick (named the "CPS Fighter") had the
 same connection as the Super Famicom, and was even marketed separately for that console.
 
 
@@ -29533,7 +29533,7 @@ The floppy disc interface:
 
 - NEC765 compatible disc controller
 
-- internally the disc interface uses interrupts to transfer data into it's own RAM.
+- internally the disc interface uses interrupts to transfer data into its own RAM.
 
 The floppy disc drives are 3" and are believed to use 40 track, double density, double sided discs,
 giving 360K per disc.
@@ -35254,7 +35254,7 @@ History and Trivia:
 
 The Vectrex was released in the US late in 1982 by General Consumer Electric (GCE) at a 
 suggested retail price of $199. The Vectrex differed from other consoles in that it had 
-it's own built in nine inch by eleven inch vector monitor, and thus didn't require (or 
+its own built in nine inch by eleven inch vector monitor, and thus didn't require (or 
 even allow) the use of a television set. The system even contained a built in game, the 
 Asteroids-like "Minestorm". 
 
@@ -35265,7 +35265,7 @@ reduce the severity of the inherent flickering caused by the vector monitor.
 
 In 1983, GCE was merged into Milton Bradley, who expanded the Vectrex's market to include 
 Europe. As the video game market declined and then crashed, the Vectrex exited the market 
-in early 1984. The rights to the system reverted to it's developers, Smith Engineering. 
+in early 1984. The rights to the system reverted to its developers, Smith Engineering. 
 
 
 Smith Engineering briefly considered designing a handheld version of the device in 1988, 
