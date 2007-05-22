@@ -85,7 +85,7 @@ This system does not work.
 
 MESS supports the following 3do models: "Panasonic FZ-10 R.E.A.L. 3DO", "Goldstar 3DO v1.01m", 
 "Panasonic FZ-1 R.E.A.L. 3DO", "Goldstar 3DO Alive II", "Sanyo TRY 3DO". You can switch between them, 
-changing the bios. At command line, 
+changing the -bios parameter. At command line, 
 
 
 "-bios 0" or "-bios panafz10" = Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer
@@ -620,13 +620,11 @@ Known Issues:
 -------------
 
 
-* Restricted to 2KB and 4KB carts
+* Good compatibility (few games are even more accurate than in Stella, e.g. Solaris and its space warp)
 
-* Limited compatibility
+* Preliminary support for keypad controls
 
-* No support for keypad controls
-
-* Dip switch used to select joystick or paddles
+* You can select between joysticks or paddles in the "Input Devices" menu, accessible by pressing TAB
 
 
 
@@ -1165,6 +1163,18 @@ Sound is not currently supported.
 
 The driver is now working fairly well, though some games may need more memory than currently
 emulated.
+
+MESS supports various Kickstart ROM versions: v1.2, v1.3, v2.04, v3.1. You can switch between them, 
+changing the -bios parameter. At command line, 
+
+
+"-bios 0" or "-bios kick13" = Kickstart 1.3 (34.5)
+
+"-bios 1" or "-bios kick12" = Kickstart 1.2 (33.180)
+
+"-bios 2" or "-bios kick204" = Kickstart 2.04 (37.175)
+
+"-bios 3" or "-bios kick31" = Kickstart 3.1 (40.63)
 
 
 
@@ -7550,6 +7560,21 @@ no other expansion modules
 * no userport: no rs232/v.24 interface
 
 
+MESS supports various revisions of c65: v0.9.910111, v0.9.910523, v0.9.910626, v0.9.910828, 
+v0.9.911001. You can switch between them, changing the -bios parameter. At command line, 
+
+
+"-bios 0" or "-bios 910111" = v0.9.910111
+
+"-bios 1" or "-bios 910523" = v0.9.910523
+
+"-bios 2" or "-bios 910626" = v0.9.910626
+
+"-bios 3" or "-bios 910828" = v0.9.910828
+
+"-bios 4" or "-bios 911001" = v0.9.911001
+
+
 
 History and Trivia:
 
@@ -8690,6 +8715,21 @@ MOVE COUNTERCLOCKWISE (movements you could do with the joystick, on the original
 
 
 
+Known Issues:
+
+-------------
+
+
+MESS emulates "Luxor Video Entertainment System" (Swedish version of Channel F) and "Fairchild Channel F". 
+You can switch between the two, changing the -bios parameter. At command line, 
+
+
+"-bios 0" or "-bios sl90025" = Luxor Video Entertainment System
+
+"-bios 1" or "-bios sl31253" = Fairchild Channel F
+
+
+
 History and Trivia:
 
 -------------------
@@ -8743,21 +8783,6 @@ in the UK it's called Grandstand.
 
 
 (infos from old-computers.com)
-
-
-
-Known Issue:
-
-------------
-
-
-MESS emulates "Luxor Video Entertainment System" (Swedish version of Channel F) and "Fairchild Channel F". 
-You can switch between the two, changing the bios. At command line, 
-
-
-"-bios 0" or "-bios sl90025" = Luxor Video Entertainment System
-
-"-bios 1" or "-bios sl31253" = Fairchild Channel F
 
 
 
@@ -13247,6 +13272,16 @@ To do (see source):
 * PSG control for Game Gear (needs custom SN76489 with stereo output for each channel)
 
 
+MESS emulates two different Game Gear versions: the BIOS-less model by Sega and the Majesco model. 
+You can switch between the two, changing the -bios parameter. At command line, both for gamegear 
+and for gamegeaj 
+
+
+"-bios 0" or "-bios none" = No BIOS
+
+"-bios 1" or "-bios majesco" = Majesco BIOS
+
+
 
 History and Trivia:
 
@@ -13618,12 +13653,10 @@ Usage:
 
 
 Under the "Dipswitches" menu, accessible by hitting TAB, you can change the Region on the fly.
-You can choose between US, Japan or Europe. Many cartridges compare their country codes with 
-that of the Genesis itself and may behave differently, or lock up if the two types do not match.
-
-
-You can also let the emu to auto-set the Genesis / Megadrive country code. This may not be 100% 
-accurate, however.
+You can choose between US, Japan or Europe (or you can come back to the default region of the 
+driver you have chosen: genesis = US, megadriv = Europe, megadrij = Japan). Many cartridges 
+compare their country codes with that of the Genesis itself and may behave differently, or lock 
+up if the two types do not match.
 
 
 
@@ -16675,6 +16708,21 @@ Features:
 
 
 
+Known Issues:
+
+-------------
+
+
+MESS emulates two different BASIC ROM versions for Laser 310 / VZ-300: BASIC v2.0 and BASIC v2.1 (hack). You can 
+switch between the two, changing the -bios parameter. At command line, both for laser310 and for vz300
+
+
+"-bios 0" or "-bios basic20" = BASIC V2.0
+
+"-bios 1" or "-bios basic21" = BASIC V2.1 (hack)
+
+
+
 History and Trivia:
 
 -------------------
@@ -17085,6 +17133,17 @@ Printer is not emulated. Timings are not implemented, due to it emulated machine
 fast as orginal. .RSS files are not supported.
 
 
+MESS supports three different L'viv versions. You can switch between them, changing the 
+-bios parameter. At command line, 
+
+
+"-bios 0" or "-bios lviv" = Lviv/L'vov
+
+"-bios 1" or "-bios lviva" = Lviv/L'vov (alternate)
+
+"-bios 2" or "-bios lvivp" = Lviv/L'vov (prototype)
+
+
 
 MESS Emulation State:
 
@@ -17166,6 +17225,16 @@ Known Issue:
 * No serial port emulation
 
 * Lynx II bios is needed!
+
+
+MESS supports two different Lynx dumps, both saved from a running machine (therefore the rom byte 
+at 0xff09 is not readable: the 2 dumps differ only in this byte). You can switch between them, 
+changing the -bios parameter. At command line, 
+
+
+"-bios 0" = Lynx
+
+"-bios 1" or "-bios a" = Lynx (alternate rom save)
 
 
 
@@ -26346,6 +26415,47 @@ Known Issues:
 CD Emulation is still missing. The driver can anyway run demos and games in executable form.
 
 
+MESS supports several Playstation BIOS revisions (and few are known to be still undumped). You 
+can switch between them, changing the -bios parameter. At command line, for psxj
+
+
+"-bios 0" or "-bios scph1000" = SCPH-1000 (09/22/94)
+
+"-bios 1" or "-bios scph3000" = SCPH-3000 (v1.1 01/22/95)
+
+"-bios 2" or "-bios scph3500" = SCPH-3500 (v2.1 07/17/95)
+
+"-bios 3" or "-bios scph5000" = SCPH-5000 (v2.2 12/04/95)
+
+"-bios 4" or "-bios scph5500" = SCPH-5500 (v3.0 09/09/96)
+
+"-bios 5" or "-bios scph7000" = SCPH-7000 (v4.0 08/18/97)
+
+
+for psxe
+
+
+"-bios 0" or "-bios scph1002" = SCPH-1002 (v2.0 05/10/95)
+
+"-bios 1" or "-bios dtlh3002" = DTLH-3002 (v2.2 12/04/95)
+
+"-bios 3" or "-bios scph5502" = SCPH-5502/SCPH-5552 (v3.0 01/06/97)
+
+"-bios 5" or "-bios scph7502" = SCPH-7502 (v4.1 12/16/97)
+
+
+and for psxu
+
+
+"-bios 0" or "-bios scph1001" = SCPH-1001/DTLH-3001 (v2.2 12/04/95)
+
+"-bios 2" or "-bios scph5501" = SCPH-5501 (v3.0 11/18/96)
+
+"-bios 3" or "-bios scph7001" = SCPH-7001 (v4.1 12/16/97)
+
+"-bios 6" or "-bios scph101" = SCPH-101 (v4.5 05/25/00) (PS one)
+
+
 
 History and Trivia:
 
@@ -26660,6 +26770,34 @@ ROM connector, Expansion bus, External microdrives bus, RGB video output, RF vid
 
 
 
+Known Issues:
+
+-------------
+
+
+MESS supports several different QL (UK) revisions: v1.00 (FB), v1.01 (PM), v1.02 (AH), v1.03 (JM),
+v1.0? (TB), v1.10 (JS). You can switch between them, changing the -bios parameter. At command line, 
+
+
+"-bios 0" or "-bios fb" = v1.00 (FB)
+
+"-bios 1" or "-bios pm" = v1.01 (PM)
+
+"-bios 2" or "-bios ah" = v1.02 (AH)
+
+"-bios 3" or "-bios jm" = v1.03 (JM)
+
+"-bios 4" or "-bios tb" = v1.0? (TB)
+
+"-bios 5" or "-bios js" = v1.10 (JS)
+
+
+MESS also supports few non-UK versions, one revision each: ql_jsu (US version), ql_mge (Spanish 
+version), ql_mgf (French version), ql_mgg (German version), ql_mgi (Italian version), ql_mgs 
+(Swedish version) and ql_efp (Mexican version).
+
+
+
 History and Trivia:
 
 -------------------
@@ -26816,9 +26954,27 @@ Known Issues:
 -------------
 
 
-See source code for more information.
+See source code for more informations.
 
 Partially added CD-ROM Emulation. It still needs work on inputs.
+
+
+MESS supports different Saturn BIOS revisions: Japan v1.00, Japan v1.01, Overseas v1.00a, 
+Overseas v1.01a. You can switch between them, changing the -bios parameter. At command line, for 
+saturnjp
+
+
+"-bios 0" or "-bios 101" = Japan v1.01 (941228)
+
+"-bios 1" or "-bios 100" = Japan v1.00 (940921)
+
+
+and for saturn / saturneu
+
+
+"-bios 0" or "-bios 101a" = Overseas v1.01a (941115)
+
+"-bios 1" or "-bios 100a" = Overseas v1.00a (941115)
 
 
 
@@ -27687,6 +27843,51 @@ This driver runs just about everything!
 
 
 To do (see source): SMS lightgun support, SMS 3D glass support
+
+
+MESS supports several Sega Master System revisions. You can switch between them, 
+changing the -bios parameter. At command line,
+
+
+* sms / smssdisp:
+
+"-bios 0" or "-bios alexkidd" = US/European BIOS with Alex Kidd in Miracle World (1990)
+
+
+* smspal:
+
+"-bios 0" or "-bios alexkidd" = US/European BIOS with Alex Kidd in Miracle World (1990)
+
+"-bios 1" or "-bios sonic" = European/Brazilian BIOS with Sonic the Hedgehog (1991)
+
+
+* sms1:
+
+"-bios 0" or "-bios bios13" = US/European BIOS v1.3 (1986)
+
+"-bios 1" or "-bios hangonsh" = US/European BIOS v2.4 with Hang On and Safari Hunt (1988)
+
+"-bios 2" or "-bios hangon" = US/European BIOS v3.4 with Hang On (1988)
+
+"-bios 3" or "-bios missiled" = US/European BIOS v4.4 with Missile Defense 3D (1988)
+
+"-bios 4" or "-bios proto" = US Master System Prototype BIOS
+
+
+* sms1pal:
+
+"-bios 0" or "-bios bios13" = US/European BIOS v1.3 (1986)
+
+"-bios 1" or "-bios hangonsh" = US/European BIOS v2.4 with Hang On and Safari Hunt (1988)
+
+"-bios 2" or "-bios hangon" = US/European BIOS v3.4 with Hang On (1988)
+
+"-bios 3" or "-bios missiled" = US/European BIOS v4.4 with Missile Defense 3D (1988)
+
+
+* smsj:
+
+"-bios 0" or "-bios jbios21" = Japanese BIOS v2.1 (1987)
 
 
 
@@ -30090,15 +30291,28 @@ Known Issues:
 -------------
 
 
-* Very preliminary support
+There is still a lot open to do:
 
-* Preliminary sound support
+* Support for the 4 in 1 power selected cartridges (power off/on cycle selects nexts 64k 
+image in cartridge, done via hardware)
 
-* No serial port
+* Tvlink emulation (microcontroller not dumped yet, basically 2 supervision, 1st for 
+inputs transmitted tvlink cartridge, 2nd for game, microcontroller for copying game video 
+data to crtc ram)
 
-* No TV adapter support
+* Probably tvlink (4 colors out of a palette of 4096) simulation, but only my Tron supports 
+tvlink color selection
 
-* Work stopped until more cartridges are available
+* Multiple Supervisions linked together via serial port, but only my Tron supports 2 player 
+via serial link (svisions is transmitting buttons of 2nd supervision to serial port in the 
+needed protocol)
+
+* Selection of type of handheld/hardware via menu (but handheld, tvlink pal and tvlink ntsc 
+are based on different clocks)
+
+* Selection of a palette in configuration menu instead of selection via driver
+
+* Switching audio to mono (like handheld internal speaker, tvlink)
 
 
 
@@ -31027,6 +31241,19 @@ Known Issues:
 No dumps of any version but 16.0, 17.0, 18.0, 19.0
 
 
+MESS supports several TI-82 versions. You can switch between them, changing the -bios parameter. 
+At command line, 
+
+
+"-bios 0" or "-bios v16" = V 16.0
+
+"-bios 1" or "-bios v17" = V 17.0
+
+"-bios 2" or "-bios v18" = V 18.0
+
+"-bios 3" or "-bios v19" = V 19.0
+
+
 
 History and Trivia:
 
@@ -31104,6 +31331,31 @@ Features:
 
 
 * Known ROM versions: 1.02, 1.03, 1.04, 1.06, 1.07, 1.08, 1.10
+
+
+
+Known Issues:
+
+-------------
+
+
+MESS supports several TI-83 versions. You can switch between them, changing the -bios parameter. 
+At command line, 
+
+
+"-bios 0" or "-bios v102" = V 1.02
+
+"-bios 1" or "-bios v103" = V 1.03
+
+"-bios 2" or "-bios v104" = V 1.04
+
+"-bios 3" or "-bios v106" = V 1.06
+
+"-bios 4" or "-bios v107" = V 1.07
+
+"-bios 5" or "-bios v108" = V 1.08
+
+"-bios 6" or "-bios v110" = V 1.10
 
 
 
@@ -31194,6 +31446,17 @@ Known Issues:
 
 
 No dumps of any version but 1.03, 1.10, 1.12
+
+
+MESS supports several TI-83 Plus versions. You can switch between them, changing the -bios parameter. 
+At command line, 
+
+
+"-bios 0" or "-bios v103" = V 1.03
+
+"-bios 1" or "-bios v110" = V 1.10
+
+"-bios 2" or "-bios v112" = V 1.12
 
 
 
@@ -31297,8 +31560,6 @@ Known Issues:
 -------------
 
 
-* Drivers for ROM versions:  3.0A, 4.0, 5.0, 6.0, 8.0, 9.0, 10.0
-
 * Sound emulated (speaker connected to link port)
 
 * Link port emulated
@@ -31320,6 +31581,25 @@ Known Issues:
 - High quality artwork.
 
 - Dumps of ROM versions: 1.0, 2.0, 7.0
+
+
+MESS supports several TI-85 versions. You can switch between them, changing the -bios parameter. 
+At command line, 
+
+
+"-bios 0" or "-bios v30a" = V 3.0A
+
+"-bios 1" or "-bios v40" = V 4.0
+
+"-bios 2" or "-bios v50" = V 5.0
+
+"-bios 3" or "-bios v60" = V 6.0
+
+"-bios 4" or "-bios v80" = V 8.0
+
+"-bios 5" or "-bios v90" = V 9.0
+
+"-bios 6" or "-bios v100" = V 10.0
 
 
 
@@ -31434,8 +31714,6 @@ Known Issues:
 -------------
 
 
-* Drivers for ROM versions: 1.3, 1.4, 1.5, 1.6
-
 * Driver for ti86grom (homebrew ROM by Daniel Foesch)
 
 * Sound emulated (speaker connected to link port)
@@ -31458,7 +31736,22 @@ Known Issues:
 
 - High quality artwork.
 
-- Dumps of ROM version 1.2
+- Redump of ROM version 1.5 (the one used by MESS is a bad dump)
+
+
+MESS supports several TI-86 versions. You can switch between them, changing the -bios parameter. At 
+command line, 
+
+
+"-bios 0" or "-bios v12" = V 1.2
+
+"-bios 1" or "-bios v13" = V 1.3
+
+"-bios 2" or "-bios v14" = V 1.4
+
+"-bios 3" or "-bios v15" = V 1.5
+
+"-bios 4" or "-bios v16" = V 1.6
 
 
 
