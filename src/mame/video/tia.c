@@ -851,8 +851,15 @@ static WRITE8_HANDLER( HMOVE_w )
 	horzM1 %= 160;
 	horzBL %= 160;
 
-	if (curr_x <= -8)
+	/* When HMOVE is triggered on CPU cycle 75, the HBlank period on the
+	   next line is also extended. */
+	if (curr_x <= -8 || curr_x >= 157)
 	{
+		if (curr_x >= 157)
+		{
+			curr_y += 1;
+			update_bitmap( -8, curr_y );
+		}
 		if (curr_y < helper[current_bitmap]->height)
 		{
 			memset(BITMAP_ADDR16(helper[current_bitmap], curr_y, 34), 0, 16);

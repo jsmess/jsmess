@@ -47,6 +47,9 @@ System Driver Changes:
   are reset in the extended HBlank period during a HMOVE. (bug #1184)
   [Wilbert Pol]
 
+- [A2600] HMOVE triggered on the last possible CPU cycle also triggers
+  a delay of the end of HBlank. (bug #1222) [Wilbert Pol]
+
 - [COCO/DRAGON] Cartridge slot rearchitecture.  [Nate Woods]
 
 - [sysinfo.dat] Massive update to entire file. [Fabio Priuli]
