@@ -90,7 +90,7 @@ int winsound_init(running_machine *machine)
 #endif
 
 	// if no sound, don't create anything
-	if (!options_get_bool(mame_options(), "sound"))
+	if (!options_get_bool(mame_options(), OPTION_SOUND))
 		return 0;
 
 	// ensure we get called on the way out

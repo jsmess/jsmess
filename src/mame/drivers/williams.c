@@ -2501,9 +2501,9 @@ ROM_END
 	williams2_tilemap_config = x
 
 #define CONFIGURE_PIAS(a,b,c) \
-	pia_config(0, PIA_STANDARD_ORDERING, &a);\
-	pia_config(1, PIA_STANDARD_ORDERING, &b);\
-	pia_config(2, PIA_STANDARD_ORDERING, &c)
+	pia_config(0, &a);\
+	pia_config(1, &b);\
+	pia_config(2, &c)
 
 
 
@@ -2630,7 +2630,7 @@ static DRIVER_INIT( spdball )
 	CONFIGURE_PIAS(williams_pia_0_intf, williams_pia_1_intf, williams_snd_pia_intf);
 
 	/* add a third PIA */
-	pia_config(3, PIA_STANDARD_ORDERING, &spdball_pia_3_intf);
+	pia_config(3, &spdball_pia_3_intf);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc808, 0xc80b, 0, 0, pia_3_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc808, 0xc80b, 0, 0, pia_3_w);
 
@@ -2768,5 +2768,5 @@ GAME( 1987, lottofun, 0,        williams, lottofun, lottofun, ROT0,   "H.A.R. Ma
 /* 2nd Generation Williams hardware with tilemaps */
 GAME( 1983, mysticm,  0,        williams2,mysticm,  mysticm,  ROT0,   "Williams", "Mystic Marathon", GAME_SUPPORTS_SAVE )
 GAME( 1984, tshoot,   0,        williams2,tshoot,   tshoot,   ROT0,   "Williams", "Turkey Shoot", GAME_SUPPORTS_SAVE )
-GAME( 1984, inferno,  0,        williams2,inferno,  inferno,  ROT0,   "Williams", "Inferno", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, inferno,  0,        williams2,inferno,  inferno,  ROT0,   "Williams", "Inferno", GAME_SUPPORTS_SAVE )
 GAME( 1986, joust2,   0,        joust2,   joust2,   joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (set 1)", GAME_SUPPORTS_SAVE )

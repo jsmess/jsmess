@@ -37,24 +37,24 @@ static WRITE8_HANDLER( quizmstr_bg_w )
 {
 	videoram[offset] = data;
 
-	if(offset >= crtc6845.start_addr)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845.start_addr);
+	if(offset >= 0x0240)
+		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
 }
 
 static WRITE8_HANDLER( quizmstr_attr1_w )
 {
 	attr_ram1[offset] = data;
 
-	if(offset >= crtc6845.start_addr)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845.start_addr);
+	if(offset >= 0x0240)
+		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
 }
 
 static WRITE8_HANDLER( quizmstr_attr2_w )
 {
 	attr_ram2[offset] = data;
 
-	if(offset >= crtc6845.start_addr)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - crtc6845.start_addr);
+	if(offset >= 0x0240)
+		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
 }
 
 static READ8_HANDLER( question_r )
@@ -524,11 +524,11 @@ static const gfx_decode gfxdecodeinfo[] =
 
 static void get_bg_tile_info(int tile_index)
 {
-	int tile = videoram[tile_index + crtc6845.start_addr];
+	int tile = videoram[tile_index + 0x0240];
 	int color = 0;
 
-	tile |= (attr_ram1[tile_index + crtc6845.start_addr] & 0x80) << 1;
-	tile |= (attr_ram2[tile_index + crtc6845.start_addr] & 0x80) << 2;
+	tile |= (attr_ram1[tile_index + 0x0240] & 0x80) << 1;
+	tile |= (attr_ram2[tile_index + 0x0240] & 0x80) << 2;
 
 	SET_TILE_INFO(0,tile,color,0)
 }
@@ -599,9 +599,9 @@ static const pia6821_interface trailblz_pia_2_intf =
 
 static MACHINE_START( quizmstr )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &quizmstr_pia_0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &quizmstr_pia_1_intf);
-	pia_config(2, PIA_STANDARD_ORDERING, &quizmstr_pia_2_intf);
+	pia_config(0, &quizmstr_pia_0_intf);
+	pia_config(1, &quizmstr_pia_1_intf);
+	pia_config(2, &quizmstr_pia_2_intf);
 	return 0;
 }
 
@@ -612,9 +612,9 @@ static MACHINE_RESET( quizmstr )
 
 static MACHINE_START( trailblz )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &trailblz_pia_0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &trailblz_pia_1_intf);
-	pia_config(2, PIA_STANDARD_ORDERING, &trailblz_pia_2_intf);
+	pia_config(0, &trailblz_pia_0_intf);
+	pia_config(1, &trailblz_pia_1_intf);
+	pia_config(2, &trailblz_pia_2_intf);
 	return 0;
 }
 

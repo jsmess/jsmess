@@ -2,8 +2,10 @@
 
     Motorola 6821 PIA interface and emulation
 
-    This function emulates all the functionality of up to 4 M6821
-    peripheral interface adapters.
+    Notes:
+        * the 'alt' interface functions are used when the A0 and A1
+          address bits are swapped
+        * all 'int' data or return values are Boolean
 
 **********************************************************************/
 
@@ -14,22 +16,7 @@
 #define MAX_PIA 8
 
 
-/* this is the standard ordering of the registers */
-/* alternate ordering swaps registers 1 and 2 */
-#define	PIA_DDRA	0
-#define	PIA_CTLA	1
-#define	PIA_DDRB	2
-#define	PIA_CTLB	3
-
-/* PIA addressing modes */
-#define PIA_STANDARD_ORDERING		0
-#define PIA_ALTERNATE_ORDERING		1
-
-#ifdef MESS
-#define PIA_8BIT                    0
-#define PIA_AUTOSENSE				8
-#endif
-
+/*------------- PIA interface structure -----------------*/
 
 typedef struct _pia6821_interface pia6821_interface;
 struct _pia6821_interface
@@ -48,27 +35,88 @@ struct _pia6821_interface
 	void (*irq_b_func)(int state);
 };
 
-void pia_config(int which, int addressing, const pia6821_interface *intf);
+
+
+/*------------------ Configuration -----------------------*/
+
+void pia_config(int which, const pia6821_interface *intf);
+
+
+
+/*----------------------- Reset --------------------------*/
+
 void pia_reset(void);
-int pia_read(int which, int offset);
-void pia_write(int which, int offset, int data);
-void pia_set_input_a(int which, int data);
-int pia_get_output_a(int which);
+
+
+
+/*-------------- CPU interface for PIA read --------------*/
+
+UINT8 pia_read(int which, offs_t offset);
+UINT8 pia_alt_read(int which, offs_t offset);
+
+
+
+/*------------- CPU interface for PIA write --------------*/
+
+void pia_write(int which, offs_t offset, UINT8 data);
+void pia_alt_write(int which, offs_t offset, UINT8 data);
+
+
+
+/*------------- Device interface for port A --------------*/
+
+void pia_set_input_a(int which, UINT8 data);
+UINT8 pia_get_output_a(int which);
+
+
+
+/*----------- Device interface for the CA1 pin -----------*/
+
 void pia_set_input_ca1(int which, int data);
+
+
+
+/*----------- Device interface for the CA2 pin -----------*/
+
 void pia_set_input_ca2(int which, int data);
 int pia_get_output_ca2(int which);
-void pia_set_input_b(int which, int data);
-int pia_get_output_b(int which);
+
+
+
+/*------------- Device interface for port A --------------*/
+
+void pia_set_input_b(int which, UINT8 data);
+UINT8 pia_get_output_b(int which);
+
+
+
+/*----------- Device interface for the CB1 pin -----------*/
+
 void pia_set_input_cb1(int which, int data);
+
+
+
+/*----------- Device interface for the CB2 pin -----------*/
+
 void pia_set_input_cb2(int which, int data);
 int pia_get_output_cb2(int which);
+
+
+
+/*----- Convinience interface retrieving for the DDR -----*/
+
 UINT8 pia_get_ddr_a(int which);
 UINT8 pia_get_ddr_b(int which);
+
+
+/*-- Convinience interface for retrieving the IRQ state --*/
+
 int pia_get_irq_a(int which);
 int pia_get_irq_b(int which);
 
-#define PIA_UNUSED_VAL(x) ((read8_handler)(x+1))
-/******************* Standard 8-bit CPU interfaces, D0-D7 *******************/
+
+
+/*---------- Standard 8-bit CPU interfaces, D0-D7 --------*/
 
 READ8_HANDLER( pia_0_r );
 READ8_HANDLER( pia_1_r );
@@ -88,7 +136,27 @@ WRITE8_HANDLER( pia_5_w );
 WRITE8_HANDLER( pia_6_w );
 WRITE8_HANDLER( pia_7_w );
 
-/******************* Standard 16-bit CPU interfaces, D0-D7 *******************/
+READ8_HANDLER( pia_0_alt_r );
+READ8_HANDLER( pia_1_alt_r );
+READ8_HANDLER( pia_2_alt_r );
+READ8_HANDLER( pia_3_alt_r );
+READ8_HANDLER( pia_4_alt_r );
+READ8_HANDLER( pia_5_alt_r );
+READ8_HANDLER( pia_6_alt_r );
+READ8_HANDLER( pia_7_alt_r );
+
+WRITE8_HANDLER( pia_0_alt_w );
+WRITE8_HANDLER( pia_1_alt_w );
+WRITE8_HANDLER( pia_2_alt_w );
+WRITE8_HANDLER( pia_3_alt_w );
+WRITE8_HANDLER( pia_4_alt_w );
+WRITE8_HANDLER( pia_5_alt_w );
+WRITE8_HANDLER( pia_6_alt_w );
+WRITE8_HANDLER( pia_7_alt_w );
+
+
+
+/*---------- Standard 16-bit CPU interfaces, D0-D7 -------*/
 
 READ16_HANDLER( pia_0_lsb_r );
 READ16_HANDLER( pia_1_lsb_r );
@@ -108,7 +176,27 @@ WRITE16_HANDLER( pia_5_lsb_w );
 WRITE16_HANDLER( pia_6_lsb_w );
 WRITE16_HANDLER( pia_7_lsb_w );
 
-/******************* Standard 16-bit CPU interfaces, D8-D15 *******************/
+READ16_HANDLER( pia_0_lsb_alt_r );
+READ16_HANDLER( pia_1_lsb_alt_r );
+READ16_HANDLER( pia_2_lsb_alt_r );
+READ16_HANDLER( pia_3_lsb_alt_r );
+READ16_HANDLER( pia_4_lsb_alt_r );
+READ16_HANDLER( pia_5_lsb_alt_r );
+READ16_HANDLER( pia_6_lsb_alt_r );
+READ16_HANDLER( pia_7_lsb_alt_r );
+
+WRITE16_HANDLER( pia_0_lsb_alt_w );
+WRITE16_HANDLER( pia_1_lsb_alt_w );
+WRITE16_HANDLER( pia_2_lsb_alt_w );
+WRITE16_HANDLER( pia_3_lsb_alt_w );
+WRITE16_HANDLER( pia_4_lsb_alt_w );
+WRITE16_HANDLER( pia_5_lsb_alt_w );
+WRITE16_HANDLER( pia_6_lsb_alt_w );
+WRITE16_HANDLER( pia_7_lsb_alt_w );
+
+
+
+/*--------- Standard 16-bit CPU interfaces, D8-D15 -------*/
 
 READ16_HANDLER( pia_0_msb_r );
 READ16_HANDLER( pia_1_msb_r );
@@ -128,7 +216,27 @@ WRITE16_HANDLER( pia_5_msb_w );
 WRITE16_HANDLER( pia_6_msb_w );
 WRITE16_HANDLER( pia_7_msb_w );
 
-/******************* 8-bit A/B port interfaces *******************/
+READ16_HANDLER( pia_0_msb_alt_r );
+READ16_HANDLER( pia_1_msb_alt_r );
+READ16_HANDLER( pia_2_msb_alt_r );
+READ16_HANDLER( pia_3_msb_alt_r );
+READ16_HANDLER( pia_4_msb_alt_r );
+READ16_HANDLER( pia_5_msb_alt_r );
+READ16_HANDLER( pia_6_msb_alt_r );
+READ16_HANDLER( pia_7_msb_alt_r );
+
+WRITE16_HANDLER( pia_0_msb_alt_w );
+WRITE16_HANDLER( pia_1_msb_alt_w );
+WRITE16_HANDLER( pia_2_msb_alt_w );
+WRITE16_HANDLER( pia_3_msb_alt_w );
+WRITE16_HANDLER( pia_4_msb_alt_w );
+WRITE16_HANDLER( pia_5_msb_alt_w );
+WRITE16_HANDLER( pia_6_msb_alt_w );
+WRITE16_HANDLER( pia_7_msb_alt_w );
+
+
+
+/*--------------- 8-bit A/B port interfaces -------------*/
 
 WRITE8_HANDLER( pia_0_porta_w );
 WRITE8_HANDLER( pia_1_porta_w );
@@ -166,7 +274,9 @@ READ8_HANDLER( pia_5_portb_r );
 READ8_HANDLER( pia_6_portb_r );
 READ8_HANDLER( pia_7_portb_r );
 
-/******************* 1-bit CA1/CA2/CB1/CB2 port interfaces *******************/
+
+
+/*--------- 1-bit CA1/CA2/CB1/CB2 port interfaces -------*/
 
 WRITE8_HANDLER( pia_0_ca1_w );
 WRITE8_HANDLER( pia_1_ca1_w );
@@ -176,6 +286,7 @@ WRITE8_HANDLER( pia_4_ca1_w );
 WRITE8_HANDLER( pia_5_ca1_w );
 WRITE8_HANDLER( pia_6_ca1_w );
 WRITE8_HANDLER( pia_7_ca1_w );
+
 WRITE8_HANDLER( pia_0_ca2_w );
 WRITE8_HANDLER( pia_1_ca2_w );
 WRITE8_HANDLER( pia_2_ca2_w );
@@ -193,6 +304,7 @@ WRITE8_HANDLER( pia_4_cb1_w );
 WRITE8_HANDLER( pia_5_cb1_w );
 WRITE8_HANDLER( pia_6_cb1_w );
 WRITE8_HANDLER( pia_7_cb1_w );
+
 WRITE8_HANDLER( pia_0_cb2_w );
 WRITE8_HANDLER( pia_1_cb2_w );
 WRITE8_HANDLER( pia_2_cb2_w );
@@ -210,6 +322,7 @@ READ8_HANDLER( pia_4_ca1_r );
 READ8_HANDLER( pia_5_ca1_r );
 READ8_HANDLER( pia_6_ca1_r );
 READ8_HANDLER( pia_7_ca1_r );
+
 READ8_HANDLER( pia_0_ca2_r );
 READ8_HANDLER( pia_1_ca2_r );
 READ8_HANDLER( pia_2_ca2_r );
@@ -227,6 +340,7 @@ READ8_HANDLER( pia_4_cb1_r );
 READ8_HANDLER( pia_5_cb1_r );
 READ8_HANDLER( pia_6_cb1_r );
 READ8_HANDLER( pia_7_cb1_r );
+
 READ8_HANDLER( pia_0_cb2_r );
 READ8_HANDLER( pia_1_cb2_r );
 READ8_HANDLER( pia_2_cb2_r );

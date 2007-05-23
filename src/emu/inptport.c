@@ -1179,7 +1179,7 @@ static void setup_playback(running_machine *machine)
 
 		// output info to console
 		mame_printf_info("Version string: %s\n",xheader.version);
-		mame_printf_info("Start time: %s\n",ctime(&xheader.starttime));
+		mame_printf_info("Start time: %s\n", ctime((const time_t *)&xheader.starttime));
 
 		// verify header against current game
 		if (strcmp(machine->gamedrv->name, xheader.shortname) != 0)

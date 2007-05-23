@@ -711,6 +711,28 @@ INPUT_PORTS_START( pignewt )
 INPUT_PORTS_END
 
 
+INPUT_PORTS_START( pignewta )
+	PORT_INCLUDE(pignewt)
+
+	PORT_MODIFY("D7D6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("D5D4")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("FC")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+INPUT_PORTS_END
+
+
 INPUT_PORTS_START( sindbadm )
 	PORT_INCLUDE(g80r_generic)
 
@@ -1580,5 +1602,5 @@ GAME( 1982, monsterb, 0,       monsterb, monsterb, monsterb, ROT270, "Sega", "Mo
 /* 2-board G-80 system */
 GAME( 1982, monster2, monsterb,monsterb, monsterb, monster2, ROT270, "Sega", "Monster Bash (2 board version)", 0 )
 GAME( 1983, pignewt,  0,       pignewt,  pignewt,  pignewt,  ROT270, "Sega", "Pig Newton (version C)", GAME_IMPERFECT_SOUND )
-GAME( 1983, pignewta, pignewt, pignewt,  pignewt,  pignewt,  ROT270, "Sega", "Pig Newton (version A)", GAME_IMPERFECT_SOUND )
+GAME( 1983, pignewta, pignewt, pignewt,  pignewta, pignewt,  ROT270, "Sega", "Pig Newton (version A)", GAME_IMPERFECT_SOUND )
 GAME( 1983, sindbadm, 0,       sindbadm, sindbadm, sindbadm, ROT270, "Sega", "Sindbad Mystery", 0 )

@@ -307,13 +307,13 @@ extern unsigned char *apf_video_ram;
 static void apf_common_init(void)
 {
 	apf_ints = 0;
-	pia_config(0, PIA_STANDARD_ORDERING,&apf_m1000_pia_interface);
+	pia_config(0,&apf_m1000_pia_interface);
 	pia_reset();
 }
 
 static MACHINE_START( apf_imagination )
 {
-	pia_config(1, PIA_STANDARD_ORDERING,&apf_imagination_pia_interface);
+	pia_config(1,&apf_imagination_pia_interface);
 	apf_common_init();
 	wd17xx_init(WD_TYPE_179X, NULL, NULL);
 	return 0;

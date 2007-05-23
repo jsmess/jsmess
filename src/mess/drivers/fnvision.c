@@ -269,7 +269,7 @@ static const pia6821_interface pia0_intf =
 static MACHINE_START( fnvision )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
+	pia_config(0, &pia0_intf);
 	return 0;
 }
 

@@ -56,8 +56,8 @@ static int testbit = 0;	/* Pulses a bit in order to simulate */
 					/* test output */
 static int outputbit=0;
 static int bitno=0;
-static char reading=0;
-static char writting=0;
+static INT8 reading=0;
+static INT8 writting=0;
 
 static int clock_line=0;
 static int command_line=0;	//??

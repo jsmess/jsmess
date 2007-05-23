@@ -322,8 +322,8 @@ static const pia6821_interface pia_1_intf =
 
 MACHINE_START( r2dtank )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia_1_intf);
+	pia_config(0, &pia_0_intf);
+	pia_config(1, &pia_1_intf);
 	return 0;
 }
 

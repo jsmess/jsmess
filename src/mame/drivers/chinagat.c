@@ -261,21 +261,10 @@ static void saiyugb1_m5205_irq_w(int num)
 	adpcm_sound_irq = 1;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0x3f00, 0x3f00) AM_READ(input_port_0_r)
-	AM_RANGE(0x3f01, 0x3f01) AM_READ(input_port_1_r)
-	AM_RANGE(0x3f02, 0x3f02) AM_READ(input_port_2_r)
-	AM_RANGE(0x3f03, 0x3f03) AM_READ(input_port_3_r)
-	AM_RANGE(0x3f04, 0x3f04) AM_READ(input_port_4_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_BANK2)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(ddragon_fgvideoram_w) AM_BASE(&ddragon_fgvideoram)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(ddragon_bgvideoram_w) AM_BASE(&ddragon_bgvideoram)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(MRA8_RAM, ddragon_fgvideoram_w) AM_BASE(&ddragon_fgvideoram)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(MRA8_RAM, ddragon_bgvideoram_w) AM_BASE(&ddragon_bgvideoram)
 	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0x3800, 0x397f) AM_WRITE(MWA8_BANK3) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -288,103 +277,73 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3e07, 0x3e07) AM_WRITE(MWA8_RAM) AM_BASE(&ddragon_scrollx_lo)
 	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(chinagat_video_ctrl_w)
 	AM_RANGE(0x3f01, 0x3f01) AM_WRITE(chinagat_bankswitch_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x3f00, 0x3f00) AM_READ(input_port_0_r)
+	AM_RANGE(0x3f01, 0x3f01) AM_READ(input_port_1_r)
+	AM_RANGE(0x3f02, 0x3f02) AM_READ(input_port_2_r)
+	AM_RANGE(0x3f03, 0x3f03) AM_READ(input_port_3_r)
+	AM_RANGE(0x3f04, 0x3f04) AM_READ(input_port_4_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_BANK2)
-//  AM_RANGE(0x2a2b, 0x2a2b) AM_READ(MRA8_NOP) /* What lives here? */
-//  AM_RANGE(0x2a30, 0x2a30) AM_READ(MRA8_NOP) /* What lives here? */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK4)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_BANK2)
+static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(chinagat_sub_bankswitch_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(MWA8_RAM) /* Called on CPU start and after return from jump table */
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+//  AM_RANGE(0x2a2b, 0x2a2b) AM_READ(MRA8_NOP) /* What lives here? */
+//  AM_RANGE(0x2a30, 0x2a30) AM_READ(MRA8_NOP) /* What lives here? */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(4)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8801, 0x8801) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ym2203c_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8800, 0x8800) AM_READ(YM2203_status_port_0_r)
-//  AM_RANGE(0x8802, 0x8802) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0x8804, 0x8804) AM_READ(YM2203_status_port_1_r)
-//  AM_RANGE(0x8801, 0x8801) AM_READ(YM2151_status_port_0_r)
-//  AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ym2203c_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 // 8804 and/or 8805 make a gong sound when the coin goes in
 // but only on the title screen....
 
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2203_control_port_0_w)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2203_write_port_0_w)
-//  AM_RANGE(0x8802, 0x8802) AM_WRITE(OKIM6295_data_0_w)
+//  AM_RANGE(0x8802, 0x8802) AM_READWRITE(OKIM6295_data_0_w, OKIM6295_status_0_r)
 //  AM_RANGE(0x8803, 0x8803) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x8804, 0x8804) AM_WRITE(YM2203_control_port_1_w)
+	AM_RANGE(0x8804, 0x8804) AM_READWRITE(YM2203_status_port_1_r,  YM2203_control_port_1_w)
 	AM_RANGE(0x8805, 0x8805) AM_WRITE(YM2203_write_port_1_w)
 //  AM_RANGE(0x8804, 0x8804) AM_WRITE(MWA8_RAM)
 //  AM_RANGE(0x8805, 0x8805) AM_WRITE(MWA8_RAM)
 
 //  AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
 //  AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
-//  AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( saiyugb1_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8801, 0x8801) AM_READ(YM2151_status_port_0_r)
+//  AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saiyugb1_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( saiyugb1_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(saiyugb1_mcu_command_w)
+	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8748_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x0400, 0x07ff) AM_READ(MRA8_ROM)	/* i8749 version */
+static ADDRESS_MAP_START( i8748_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x07ff) AM_ROM		/* i8749 version */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8748_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8748_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( i8748_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_bus, I8039_bus) AM_READ(saiyugb1_mcu_command_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(saiyugb1_m5205_irq_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8748_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_t0, I8039_t0) AM_WRITE(saiyugb1_m5205_clk_w) 		/* Drives the clock on the m5205 at 1/8 of this frequency */
+	AM_RANGE(I8039_t1, I8039_t1) AM_READ(saiyugb1_m5205_irq_r)
 	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(saiyugb1_adpcm_rom_addr_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(saiyugb1_adpcm_control_w)
 ADDRESS_MAP_END
@@ -536,14 +495,14 @@ static MACHINE_DRIVER_START( chinagat )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309,12000000/8)		/* 1.5 MHz (12MHz oscillator ???) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(chinagat_interrupt,1)
 
 	MDRV_CPU_ADD(HD6309,12000000/8)		/* 1.5 MHz (12MHz oscillator ???) */
-	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_CPU_ADD(Z80, 3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -579,18 +538,18 @@ static MACHINE_DRIVER_START( saiyugb1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,12000000/8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(chinagat_interrupt,1)
 
 	MDRV_CPU_ADD(M6809,12000000/8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_CPU_ADD(Z80, 3579545)		/* 3.579545 MHz oscillator */
-	MDRV_CPU_PROGRAM_MAP(saiyugb1_sound_readmem,saiyugb1_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(saiyugb1_sound_map,0)
 
 	MDRV_CPU_ADD(I8048,9263750/3)		/* 3.087916 MHz (9.263750 MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(i8748_readmem,i8748_writemem)
-	MDRV_CPU_IO_MAP(i8748_readport,i8748_writeport)
+	MDRV_CPU_PROGRAM_MAP(i8748_map,0)
+	MDRV_CPU_IO_MAP(i8748_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -626,14 +585,14 @@ static MACHINE_DRIVER_START( saiyugb2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,12000000/8)		/* 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(chinagat_interrupt,1)
 
 	MDRV_CPU_ADD(M6809,12000000/8)		/* 1.5 MHz (12MHz oscillator) */
-	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_CPU_ADD(Z80, 3579545)		/* 3.579545 MHz oscillator */
-	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_readmem,ym2203c_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)

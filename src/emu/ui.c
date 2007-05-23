@@ -1558,16 +1558,21 @@ static void slider_init(void)
 	for (item = 0; item < MAX_SCREENS; item++)
 		if (Machine->drv->screen[item].tag != NULL)
 		{
+			int defxscale = floor(Machine->drv->screen[item].xscale * 1000.0f + 0.5f);
+			int defyscale = floor(Machine->drv->screen[item].yscale * 1000.0f + 0.5f);
+			int defxoffset = floor(Machine->drv->screen[item].xoffset * 1000.0f + 0.5f);
+			int defyoffset = floor(Machine->drv->screen[item].yoffset * 1000.0f + 0.5f);
+
 			/* add standard brightness/contrast/gamma controls per-screen */
 			slider_config(&slider_list[slider_count++], 100, 1000, 2000, 10, slider_brightness, item);
 			slider_config(&slider_list[slider_count++], 100, 1000, 2000, 50, slider_contrast, item);
 			slider_config(&slider_list[slider_count++], 100, 1000, 3000, 50, slider_gamma, item);
 
 			/* add scale and offset controls per-screen */
-			slider_config(&slider_list[slider_count++], 800, 1000, 1200, 2, slider_xscale, item);
-			slider_config(&slider_list[slider_count++], 800, 1000, 1200, 2, slider_yscale, item);
-			slider_config(&slider_list[slider_count++], -200, 0, 200, 2, slider_xoffset, item);
-			slider_config(&slider_list[slider_count++], -200, 0, 200, 2, slider_yoffset, item);
+			slider_config(&slider_list[slider_count++], 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_xscale, item);
+			slider_config(&slider_list[slider_count++], -500, defxoffset, 500, 2, slider_xoffset, item);
+			slider_config(&slider_list[slider_count++], 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_yscale, item);
+			slider_config(&slider_list[slider_count++], -500, defyoffset, 500, 2, slider_yoffset, item);
 		}
 
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)

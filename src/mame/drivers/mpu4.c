@@ -2452,12 +2452,12 @@ INTERRUPT_GEN(mpu4_vid_irq)
 
 MACHINE_START( mpu4_vid )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_ic3_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia_ic4_intf);
-	pia_config(2, PIA_STANDARD_ORDERING, &pia_ic5_intf);
-	pia_config(3, PIA_STANDARD_ORDERING, &pia_ic6_intf);
-	pia_config(4, PIA_STANDARD_ORDERING, &pia_ic7_intf);
-	pia_config(5, PIA_STANDARD_ORDERING, &pia_ic8_intf);
+	pia_config(0, &pia_ic3_intf);
+	pia_config(1, &pia_ic4_intf);
+	pia_config(2, &pia_ic5_intf);
+	pia_config(3, &pia_ic6_intf);
+	pia_config(4, &pia_ic7_intf);
+	pia_config(5, &pia_ic8_intf);
 
 	pia_reset();
 
@@ -2496,12 +2496,12 @@ MACHINE_START( mpu4_vid )
 
 static MACHINE_START( mpu4 )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_ic3_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia_ic4_intf);
-	pia_config(2, PIA_STANDARD_ORDERING, &pia_ic5_intf);
-	pia_config(3, PIA_STANDARD_ORDERING, &pia_ic6_intf);
-	pia_config(4, PIA_STANDARD_ORDERING, &pia_ic7_intf);
-	pia_config(5, PIA_STANDARD_ORDERING, &pia_ic8_intf);
+	pia_config(0, &pia_ic3_intf);
+	pia_config(1, &pia_ic4_intf);
+	pia_config(2, &pia_ic5_intf);
+	pia_config(3, &pia_ic6_intf);
+	pia_config(4, &pia_ic7_intf);
+	pia_config(5, &pia_ic8_intf);
 
 	pia_reset();
 

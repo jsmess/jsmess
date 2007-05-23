@@ -131,7 +131,7 @@ void mcr_sound_init(UINT8 config)
 	/* Turbo Chip Squeak */
 	if (mcr_sound_config & MCR_TURBO_CHIP_SQUEAK)
 	{
-		pia_config(0, PIA_ALTERNATE_ORDERING, &turbocs_pia_intf);
+		pia_config(0, &turbocs_pia_intf);
 		turbocs_dac_index = dac_index++;
 		turbocs_sound_cpu = sound_cpu++;
 		state_save_register_global(turbocs_status);
@@ -140,7 +140,7 @@ void mcr_sound_init(UINT8 config)
 	/* Chip Squeak Deluxe */
 	if (mcr_sound_config & MCR_CHIP_SQUEAK_DELUXE)
 	{
-		pia_config(0, PIA_ALTERNATE_ORDERING, &csdeluxe_pia_intf);
+		pia_config(0, &csdeluxe_pia_intf);
 		csdeluxe_dac_index = dac_index++;
 		csdeluxe_sound_cpu = sound_cpu++;
 		state_save_register_global(csdeluxe_status);
@@ -150,7 +150,7 @@ void mcr_sound_init(UINT8 config)
 	if (mcr_sound_config & MCR_SOUNDS_GOOD)
 	{
 		/* special case: Spy Hunter 2 has both Turbo CS and Sounds Good, so we use PIA slot 1 */
-		pia_config(1, PIA_ALTERNATE_ORDERING, &soundsgood_pia_intf);
+		pia_config(1, &soundsgood_pia_intf);
 		soundsgood_dac_index = dac_index++;
 		soundsgood_sound_cpu = sound_cpu++;
 		state_save_register_global(soundsgood_status);
@@ -159,8 +159,8 @@ void mcr_sound_init(UINT8 config)
 	/* Squawk n Talk */
 	if (mcr_sound_config & MCR_SQUAWK_N_TALK)
 	{
-		pia_config(0, PIA_STANDARD_ORDERING, &squawkntalk_pia0_intf);
-		pia_config(1, PIA_STANDARD_ORDERING, &squawkntalk_pia1_intf);
+		pia_config(0, &squawkntalk_pia0_intf);
+		pia_config(1, &squawkntalk_pia1_intf);
 		squawkntalk_sound_cpu = sound_cpu++;
 		state_save_register_global(squawkntalk_tms_command);
 		state_save_register_global(squawkntalk_tms_strobes);
@@ -536,17 +536,17 @@ static READ16_HANDLER( csdeluxe_pia_r )
 	/* using the MOVEP instruction outputs the same value on the high and */
 	/* low bytes. */
 	if (ACCESSING_MSB)
-		return pia_0_r(offset) << 8;
+		return pia_0_alt_r(offset) << 8;
 	else
-		return pia_0_r(offset);
+		return pia_0_alt_r(offset);
 }
 
 static WRITE16_HANDLER( csdeluxe_pia_w )
 {
 	if (ACCESSING_MSB)
-		pia_0_w(offset, data >> 8);
+		pia_0_alt_w(offset, data >> 8);
 	else
-		pia_0_w(offset, data);
+		pia_0_alt_w(offset, data);
 }
 
 
@@ -674,7 +674,7 @@ void soundsgood_reset_w(int state)
 ADDRESS_MAP_START( soundsgood_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) | AMEF_ABITS(19) )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pia_1_msb_r, pia_1_msb_w)
+	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pia_1_msb_alt_r, pia_1_msb_alt_w)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -764,7 +764,7 @@ void turbocs_reset_w(int state)
 ADDRESS_MAP_START( turbocs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

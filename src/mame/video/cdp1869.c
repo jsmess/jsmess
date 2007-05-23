@@ -194,7 +194,7 @@ PALETTE_INIT( cdp1869 )
 
 	for (i = 0; i < 8; i++)
 	{
-		cdp1869_set_color(i, i, i);
+		cdp1869_set_color(i, i, 15);
 	}
 
 	// tone-on-tone display (CFC=1)
@@ -484,18 +484,27 @@ VIDEO_UPDATE( cdp1869 )
 	{
 		int sx, sy, rows, cols, width, height;
 		UINT16 addr, pmemsize;
-		rectangle screen;
+		rectangle screen, outer;
 
 		switch (cdp1869.ntsc_pal)
 		{
 		case CDP1869_NTSC:
+			outer.min_x = CDP1869_HBLANK_END;
+			outer.max_x = CDP1869_HBLANK_START - 1;
+			outer.min_y = CDP1869_SCANLINE_VBLANK_END_NTSC;
+			outer.max_y = CDP1869_SCANLINE_VBLANK_START_NTSC - 1;
 			screen.min_x = CDP1869_SCREEN_START_NTSC;
 			screen.max_x = CDP1869_SCREEN_END - 1;
 			screen.min_y = CDP1869_SCANLINE_DISPLAY_START_NTSC;
 			screen.max_y = CDP1869_SCANLINE_DISPLAY_END_NTSC - 1;
 			break;
 
+		default:
 		case CDP1869_PAL:
+			outer.min_x = CDP1869_HBLANK_END;
+			outer.max_x = CDP1869_HBLANK_START - 1;
+			outer.min_y = CDP1869_SCANLINE_VBLANK_END_PAL;
+			outer.max_y = CDP1869_SCANLINE_VBLANK_START_PAL - 1;
 			screen.min_x = CDP1869_SCREEN_START_PAL;
 			screen.max_x = CDP1869_SCREEN_END - 1;
 			screen.min_y = CDP1869_SCANLINE_DISPLAY_START_PAL;
@@ -503,7 +512,8 @@ VIDEO_UPDATE( cdp1869 )
 			break;
 		}
 
-		fillbitmap(bitmap, machine->pens[cdp1869.bkg], &screen);
+		sect_rect(&outer, cliprect);
+		fillbitmap(bitmap, machine->pens[cdp1869.bkg], &outer);
 
 		width = CDP1869_CHAR_WIDTH;
 		height = cdp1869_get_lines();

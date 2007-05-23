@@ -1,10 +1,12 @@
-/*************************************************************************
+/***************************************************************************
 
-    audio\spiders.c
+    Sigma Spiders hardware
 
-*************************************************************************/
+***************************************************************************/
+
 #include "driver.h"
 #include "sound/discrete.h"
+#include "machine/6821pia.h"
 
 
 /* Discrete Sound Input Nodes */
@@ -166,18 +168,26 @@ static DISCRETE_SOUND_START(spiders_discrete_interface)
 DISCRETE_SOUND_END
 
 
-WRITE8_HANDLER( spiders_sounda_w )
+
+WRITE8_HANDLER( spiders_audio_command_w )
+{
+	pia_set_input_a(4, data & 0xf8);
+	pia_set_input_ca1(4, data  & 0x80 ? 1 : 0);
+}
+
+
+WRITE8_HANDLER( spiders_audio_a_w )
 {
 	discrete_sound_w(SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
 }
 
-WRITE8_HANDLER( spiders_soundb_w )
+WRITE8_HANDLER( spiders_audio_b_w )
 {
 	discrete_sound_w(SPIDERS_WEB_SOUND_DATA, data);
 }
 
 
-WRITE8_HANDLER( spiders_soundctrl_w )
+WRITE8_HANDLER( spiders_audio_ctrl_w )
 {
 	discrete_sound_w(SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
 	discrete_sound_w(SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);

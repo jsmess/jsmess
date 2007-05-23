@@ -21,6 +21,8 @@
  *************************************/
 
 #define RNG_PERIOD		((1 << 17) - 1)
+#define VERT_OFFSET		(22)				/* pixels from top of screen to top of game area */
+#define HORZ_OFFSET		(16)				/* pixels from left of screen to left of game area */
 
 
 
@@ -93,6 +95,22 @@ static UINT8 profpac_vw;
 static void init_savestate(void);
 static void scanline_callback(int scanline);
 static void init_sparklestar(void);
+
+
+
+/*************************************
+ *
+ *  Scanline conversion
+ *
+ *************************************/
+
+INLINE int mame_vpos_to_astrocade_vpos(int scanline)
+{
+	scanline -= VERT_OFFSET;
+	if (scanline < 0)
+		scanline += 262;
+	return scanline;
+}
 
 
 
@@ -291,40 +309,49 @@ static void init_savestate(void)
 
 VIDEO_UPDATE( astrocde )
 {
-	UINT32 sparkleoffs = 0, staroffs = 0;
 	int xystep = 2 - video_mode;
+	UINT32 sparklebase = 0;
 	int y;
 
-	/* compute the star and sparkle offset at the start of this line */
+	/* compute the starting point of sparkle for the current frame */
 	if (astrocade_video_config & AC_STARS)
-	{
-		staroffs = cliprect->min_y * Machine->screen[0].width;
-		sparkleoffs = ((UINT64)cpu_getcurrentframe() * (UINT64)(Machine->screen[0].width * Machine->screen[0].height) + staroffs) % RNG_PERIOD;
-	}
+		sparklebase = ((UINT64)cpu_getcurrentframe() * (UINT64)(Machine->screen[0].width * Machine->screen[0].height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-		UINT16 offset = (y / xystep) * (80 / xystep);
+		int effy = mame_vpos_to_astrocade_vpos(y);
+		UINT16 offset = (effy / xystep) * (80 / xystep);
+		UINT32 sparkleoffs = 0, staroffs = 0;
 		int x;
 
-		/* iterate over groups of 4 pixels */
-		for (x = 0; x < 80; x += xystep)
+		/* compute the star and sparkle offset at the start of this line */
+		if (astrocade_video_config & AC_STARS)
 		{
-			const UINT8 *colorbase = &colors[(x < colorsplit) ? 4 : 0];
+			staroffs = ((effy < 0) ? (effy + 262) : effy) * Machine->screen[0].width;
+			sparkleoffs = sparklebase + y * Machine->screen[0].width;
+			if (sparkleoffs >= RNG_PERIOD)
+				sparkleoffs -= RNG_PERIOD;
+		}
+
+		/* iterate over groups of 4 pixels */
+		for (x = 0; x < 456/4; x += xystep)
+		{
+			int effx = x - HORZ_OFFSET/4;
+			const UINT8 *colorbase = &colors[(effx < colorsplit) ? 4 : 0];
 			UINT8 data;
 			int xx;
 
 			/* select either video data or background data */
-			data = (y < vblank) ? videoram[offset++] : bgdata;
+			data = (effx >= 0 && effx < 80 && effy >= 0 && effy < vblank) ? videoram[offset++] : bgdata;
 
 			/* iterate over the 4 pixels */
 			for (xx = 0; xx < 4; xx++)
 			{
 				UINT8 pixdata = (data >> 6) & 3;
 				int coldata = colorbase[pixdata] << 1;
-				int y = coldata & 0x0f;
+				int luma = coldata & 0x0f;
 				rgb_t color;
 
 				/* handle stars/sparkle */
@@ -335,9 +362,9 @@ VIDEO_UPDATE( astrocde )
 					if (astrocade_sparkle[pixdata] == 0)
 					{
 						if (pixdata != 0 || (sparklestar[staroffs] & 0x10))
-							y = sparklestar[sparkleoffs] & 0x0f;
+							luma = sparklestar[sparkleoffs] & 0x0f;
 						else if (pixdata == 0)
-							coldata = y = 0;
+							coldata = luma = 0;
 					}
 
 					/* update sparkle/star offsets */
@@ -345,7 +372,7 @@ VIDEO_UPDATE( astrocde )
 					if (++sparkleoffs >= RNG_PERIOD)
 						sparkleoffs = 0;
 				}
-				color = (coldata & 0x1f0) | y;
+				color = (coldata & 0x1f0) | luma;
 
 				/* store the final color to the destination and shift */
 				*dest++ = color;
@@ -435,11 +462,13 @@ void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback)
 
 static void scanline_callback(int scanline)
 {
+	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);
+
 	/* force an update against the current scanline */
 	video_screen_update_partial(0, scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
-	if (scanline == interrupt_scanline && (interrupt_enable & 0x08) != 0)
+	if (astrocade_scanline == interrupt_scanline && (interrupt_enable & 0x08) != 0)
 	{
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x04) == 0)
@@ -455,7 +484,7 @@ static void scanline_callback(int scanline)
 
 	/* on some games, the horizontal drive line is conected to the lightpen interrupt */
 	else if (astrocade_video_config & AC_LIGHTPEN_INTS)
-		astrocade_trigger_lightpen(scanline, 8);
+		astrocade_trigger_lightpen(astrocade_scanline, 8);
 
 	/* advance to the next scanline */
 	scanline++;
@@ -674,22 +703,22 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	{
 		UINT8 olddata = program_read_byte_8(0x4000 + offset);
 
+		/* compute any intercepts */
+		funcgen_intercept &= 0x0f;
+		if ((olddata & 0xc0) && (data & 0xc0))
+			funcgen_intercept |= 0x11;
+		if ((olddata & 0x30) && (data & 0x30))
+			funcgen_intercept |= 0x22;
+		if ((olddata & 0x0c) && (data & 0x0c))
+			funcgen_intercept |= 0x44;
+		if ((olddata & 0x03) && (data & 0x03))
+			funcgen_intercept |= 0x88;
+
 		/* apply the operation */
 		if (funcgen_control & 0x10)
 			data |= olddata;
 		else if (funcgen_control & 0x20)
 			data ^= olddata;
-
-		/* compute any intercepts */
-		funcgen_intercept &= 0x0f;
-		if ((olddata & 0xc0) && (olddata & 0xc0))
-			funcgen_intercept |= 0x11;
-		if ((olddata & 0x30) && (olddata & 0x30))
-			funcgen_intercept |= 0x22;
-		if ((olddata & 0x0c) && (olddata & 0x0c))
-			funcgen_intercept |= 0x44;
-		if ((olddata & 0x03) && (olddata & 0x03))
-			funcgen_intercept |= 0x88;
 	}
 
 	/* write the result */

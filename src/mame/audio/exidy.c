@@ -448,8 +448,8 @@ static void *common_start(void)
 void *exidy_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	/* Init PIA */
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia_1_intf);
+	pia_config(0, &pia_0_intf);
+	pia_config(1, &pia_1_intf);
 	has_sh8253 = TRUE;
 	return common_start();
 }
@@ -458,7 +458,7 @@ void *exidy_sh_start(int clock, const struct CustomSound_interface *config)
 void *victory_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	/* Init PIA */
-	pia_config(0, PIA_STANDARD_ORDERING, &victory_pia_0_intf);
+	pia_config(0, &victory_pia_0_intf);
 	pia_0_cb1_w(0, 1);
 	has_sh8253 = TRUE;
 	return common_start();

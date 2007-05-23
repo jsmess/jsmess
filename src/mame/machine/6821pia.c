@@ -2,13 +2,11 @@
 
     Motorola 6821 PIA interface and emulation
 
-    This function emulates all the functionality of up to 8 M6821
-    peripheral interface adapters.
-
 **********************************************************************/
 
 #include "driver.h"
 #include "6821pia.h"
+
 
 #define VERBOSE 0
 
@@ -19,13 +17,17 @@
 #endif
 
 
-/******************* internal PIA data structure *******************/
+
+/*************************************
+ *
+ *  Internal PIA data structure
+ *
+ *************************************/
 
 typedef struct _pia6821 pia6821;
 struct _pia6821
 {
 	const pia6821_interface *intf;
-	UINT8 addr;
 
 	UINT8 in_a;
 	UINT8 in_ca1;
@@ -48,87 +50,117 @@ struct _pia6821
 	UINT8 irq_b1;
 	UINT8 irq_b2;
 	UINT8 irq_b_state;
-	UINT8 in_set; // which input ports are set
+
+	/* variables that indicate if access a line externally -
+       used to for logging purposes ONLY */
+	UINT8 in_a_pushed;
+	UINT8 out_a_needs_pulled;
+	UINT8 in_ca1_pushed;
+	UINT8 in_ca2_pushed;
+	UINT8 out_ca2_needs_pulled;
+	UINT8 in_b_pushed;
+	UINT8 out_b_needs_pulled;
+	UINT8 in_cb1_pushed;
+	UINT8 in_cb2_pushed;
+	UINT8 out_cb2_needs_pulled;
 };
 
 
-/******************* convenince macros and defines *******************/
 
-#define PIA_IRQ1				0x80
-#define PIA_IRQ2				0x40
+/*************************************
+ *
+ *  Convenince macros and defines
+ *
+ *************************************/
 
-#define IRQ1_ENABLED(c)			(c & 0x01)
-#define IRQ1_DISABLED(c)		(!(c & 0x01))
-#define C1_LOW_TO_HIGH(c)		(c & 0x02)
-#define C1_HIGH_TO_LOW(c)		(!(c & 0x02))
-#define OUTPUT_SELECTED(c)		(c & 0x04)
-#define DDR_SELECTED(c)			(!(c & 0x04))
-#define IRQ2_ENABLED(c)			(c & 0x08)
-#define IRQ2_DISABLED(c)		(!(c & 0x08))
-#define STROBE_E_RESET(c)		(c & 0x08)
-#define STROBE_C1_RESET(c)		(!(c & 0x08))
-#define SET_C2(c)				(c & 0x08)
-#define RESET_C2(c)				(!(c & 0x08))
-#define C2_LOW_TO_HIGH(c)		(c & 0x10)
-#define C2_HIGH_TO_LOW(c)		(!(c & 0x10))
-#define C2_SET_MODE(c)			(c & 0x10)
-#define C2_STROBE_MODE(c)		(!(c & 0x10))
-#define C2_OUTPUT(c)			(c & 0x20)
-#define C2_INPUT(c)				(!(c & 0x20))
+#define PIA_IRQ1				(0x80)
+#define PIA_IRQ2				(0x40)
 
-#define PIA_IN_SET_A   0x01
-#define PIA_IN_SET_CA1 0x02
-#define PIA_IN_SET_CA2 0x04
-#define PIA_IN_SET_B   0x08
-#define PIA_IN_SET_CB1 0x10
-#define PIA_IN_SET_CB2 0x20
-
-/******************* static variables *******************/
-
-static pia6821 pia[MAX_PIA];
-
-static const UINT8 swizzle_address[4] = { 0, 2, 1, 3 };
+#define IRQ1_ENABLED(c)			( (((c) >> 0) & 0x01))
+#define C1_LOW_TO_HIGH(c)		( (((c) >> 1) & 0x01))
+#define C1_HIGH_TO_LOW(c)		(!(((c) >> 1) & 0x01))
+#define OUTPUT_SELECTED(c)		( (((c) >> 2) & 0x01))
+#define IRQ2_ENABLED(c)			( (((c) >> 3) & 0x01))
+#define STROBE_E_RESET(c)		( (((c) >> 3) & 0x01))
+#define STROBE_C1_RESET(c)		(!(((c) >> 3) & 0x01))
+#define C2_SET(c)				( (((c) >> 3) & 0x01))
+#define C2_LOW_TO_HIGH(c)		( (((c) >> 4) & 0x01))
+#define C2_HIGH_TO_LOW(c)		(!(((c) >> 4) & 0x01))
+#define C2_SET_MODE(c)			( (((c) >> 4) & 0x01))
+#define C2_STROBE_MODE(c)		(!(((c) >> 4) & 0x01))
+#define C2_OUTPUT(c)			( (((c) >> 5) & 0x01))
+#define C2_INPUT(c)				(!(((c) >> 5) & 0x01))
 
 
 
-/******************* configuration *******************/
+/*************************************
+ *
+ *  Static variables
+ *
+ *************************************/
 
-void pia_config(int which, int addressing, const pia6821_interface *intf)
+static pia6821 pias[MAX_PIA];
+
+
+
+/*************************************
+ *
+ *  Configuration
+ *
+ *************************************/
+
+void pia_config(int which, const pia6821_interface *intf)
 {
+	pia6821 *p;
+
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call pia_config at init time!");
 	assert_always((which >= 0) && (which < MAX_PIA), "pia_config called on an invalid PIA!");
 	assert_always(intf, "pia_config called with an invalid interface!");
 
-	memset(&pia[which], 0, sizeof(pia[0]));
+	p = &pias[which];
+	memset(p, 0, sizeof(pias[0]));
 
-	pia[which].intf = intf;
-	pia[which].addr = addressing;
+	p->intf = intf;
 
-	state_save_register_item("6821pia", which, pia[which].in_a);
-	state_save_register_item("6821pia", which, pia[which].in_ca1);
-	state_save_register_item("6821pia", which, pia[which].in_ca2);
-	state_save_register_item("6821pia", which, pia[which].out_a);
-	state_save_register_item("6821pia", which, pia[which].out_ca2);
-	state_save_register_item("6821pia", which, pia[which].ddr_a);
-	state_save_register_item("6821pia", which, pia[which].ctl_a);
-	state_save_register_item("6821pia", which, pia[which].irq_a1);
-	state_save_register_item("6821pia", which, pia[which].irq_a2);
-	state_save_register_item("6821pia", which, pia[which].irq_a_state);
-	state_save_register_item("6821pia", which, pia[which].in_b);
-	state_save_register_item("6821pia", which, pia[which].in_cb1);
-	state_save_register_item("6821pia", which, pia[which].in_cb2);
-	state_save_register_item("6821pia", which, pia[which].out_b);
-	state_save_register_item("6821pia", which, pia[which].out_cb2);
-	state_save_register_item("6821pia", which, pia[which].ddr_b);
-	state_save_register_item("6821pia", which, pia[which].ctl_b);
-	state_save_register_item("6821pia", which, pia[which].irq_b1);
-	state_save_register_item("6821pia", which, pia[which].irq_b2);
-	state_save_register_item("6821pia", which, pia[which].irq_b_state);
-	state_save_register_item("6821pia", which, pia[which].in_set);
+	state_save_register_item("6821pia", which, p->in_a);
+	state_save_register_item("6821pia", which, p->in_ca1);
+	state_save_register_item("6821pia", which, p->in_ca2);
+	state_save_register_item("6821pia", which, p->out_a);
+	state_save_register_item("6821pia", which, p->out_ca2);
+	state_save_register_item("6821pia", which, p->ddr_a);
+	state_save_register_item("6821pia", which, p->ctl_a);
+	state_save_register_item("6821pia", which, p->irq_a1);
+	state_save_register_item("6821pia", which, p->irq_a2);
+	state_save_register_item("6821pia", which, p->irq_a_state);
+	state_save_register_item("6821pia", which, p->in_b);
+	state_save_register_item("6821pia", which, p->in_cb1);
+	state_save_register_item("6821pia", which, p->in_cb2);
+	state_save_register_item("6821pia", which, p->out_b);
+	state_save_register_item("6821pia", which, p->out_cb2);
+	state_save_register_item("6821pia", which, p->ddr_b);
+	state_save_register_item("6821pia", which, p->ctl_b);
+	state_save_register_item("6821pia", which, p->irq_b1);
+	state_save_register_item("6821pia", which, p->irq_b2);
+	state_save_register_item("6821pia", which, p->irq_b_state);
+	state_save_register_item("6821pia", which, p->in_a_pushed);
+	state_save_register_item("6821pia", which, p->out_a_needs_pulled);
+	state_save_register_item("6821pia", which, p->in_ca1_pushed);
+	state_save_register_item("6821pia", which, p->in_ca2_pushed);
+	state_save_register_item("6821pia", which, p->out_ca2_needs_pulled);
+	state_save_register_item("6821pia", which, p->in_b_pushed);
+	state_save_register_item("6821pia", which, p->out_b_needs_pulled);
+	state_save_register_item("6821pia", which, p->in_cb1_pushed);
+	state_save_register_item("6821pia", which, p->in_cb2_pushed);
+	state_save_register_item("6821pia", which, p->out_cb2_needs_pulled);
 }
 
 
-/******************* reset *******************/
+
+/*************************************
+ *
+ *  Reset
+ *
+ *************************************/
 
 void pia_reset(void)
 {
@@ -137,56 +169,31 @@ void pia_reset(void)
 	/* zap each structure, preserving the interface and swizzle */
 	for (i = 0; i < MAX_PIA; i++)
 	{
-		const pia6821_interface *intf = pia[i].intf;
-		int addressing = pia[i].addr;
+		const pia6821_interface *intf = pias[i].intf;
 
-		memset(&pia[i], 0, sizeof(pia[i]));
+		memset(&pias[i], 0, sizeof(pias[i]));
 
-		pia[i].intf = intf;
-		pia[i].addr = addressing;
+		pias[i].intf = intf;
 
-		// set default read values.
-		// Ports A,CA1,CA2 default to 1
-		// Ports B,CB1,CB2 are three-state and undefined (set to 0)
-		pia[i].in_a = pia[i].in_ca1 = pia[i].in_ca2 = 0xff;
-		if (intf)
-		{
-			if ((intf->in_a_func) && ((FPTR)(intf->in_a_func) <= 0x100))
-			{
-				pia[i].in_a = ((FPTR)(intf->in_a_func) - 1);
-				pia[i].in_set |= PIA_IN_SET_A;
-			}
-			if ((intf->in_b_func) && ((FPTR)(intf->in_b_func) <= 0x100))
-			{
-				pia[i].in_b = ((FPTR)(intf->in_b_func) - 1);
-				pia[i].in_set |= PIA_IN_SET_B;
-			}
-			if ((intf->in_ca1_func) && ((FPTR)(intf->in_ca1_func) <= 0x100))
-			{
-				pia[i].in_ca1 = ((FPTR)(intf->in_ca1_func) - 1);
-				pia[i].in_set |= PIA_IN_SET_CA1;
-			}
-			if ((intf->in_ca2_func) && ((FPTR)(intf->in_ca2_func) <= 0x100))
-			{
-				pia[i].in_ca2 = ((FPTR)(intf->in_ca2_func) - 1);
-				pia[i].in_set |= PIA_IN_SET_CA2;
-			}
-			if ((intf->in_cb1_func) && ((FPTR)(intf->in_cb1_func) <= 0x100))
-			{
-				pia[i].in_cb1 = ((FPTR)(intf->in_cb1_func) - 1);
-				pia[i].in_set |= PIA_IN_SET_CB1;
-			}
-			if ((intf->in_cb2_func) && ((FPTR)(intf->in_cb2_func) <= 0x100))
-			{
-				pia[i].in_cb2 = ((FPTR)(intf->in_cb2_func) - 1);
-				pia[i].in_set |= PIA_IN_SET_CB2;
-			}
-		}
+		/*
+         * set default read values.
+         *
+         * ports A,CA1,CA2 default to 1
+         * ports B,CB1,CB2 are three-state and undefined (set to 0)
+         */
+		pias[i].in_a = 0xff;
+		pias[i].in_ca1 = TRUE;
+		pias[i].in_ca2 = TRUE;
 	}
 }
 
 
-/******************* wire-OR for all interrupt handlers *******************/
+
+/*************************************
+ *
+ *  Wire-OR for all interrupt handlers
+ *
+ *************************************/
 
 static void update_shared_irq_handler(void (*irq_func)(int state))
 {
@@ -194,660 +201,781 @@ static void update_shared_irq_handler(void (*irq_func)(int state))
 
 	/* search all PIAs for this same IRQ function */
 	for (i = 0; i < MAX_PIA; i++)
-		if (pia[i].intf)
+	{
+		if (pias[i].intf)
 		{
 			/* check IRQ A */
-			if (pia[i].intf->irq_a_func == irq_func && pia[i].irq_a_state)
+			if ((pias[i].intf->irq_a_func == irq_func) && pias[i].irq_a_state)
 			{
-				(*irq_func)(1);
+				(*irq_func)(TRUE);
 				return;
 			}
 
 			/* check IRQ B */
-			if (pia[i].intf->irq_b_func == irq_func && pia[i].irq_b_state)
+			if ((pias[i].intf->irq_b_func == irq_func) && pias[i].irq_b_state)
 			{
-				(*irq_func)(1);
+				(*irq_func)(TRUE);
 				return;
 			}
 		}
+	}
 
 	/* if we found nothing, the state is off */
-	(*irq_func)(0);
+	(*irq_func)(FALSE);
 }
 
 
-/******************* external interrupt check *******************/
+
+/*************************************
+ *
+ *  External interrupt check
+ *
+ *************************************/
 
 static void update_6821_interrupts(pia6821 *p)
 {
 	int new_state;
 
 	/* start with IRQ A */
-	new_state = 0;
-	if ((p->irq_a1 && IRQ1_ENABLED(p->ctl_a)) || (p->irq_a2 && IRQ2_ENABLED(p->ctl_a))) new_state = 1;
+	new_state = (p->irq_a1 && IRQ1_ENABLED(p->ctl_a)) || (p->irq_a2 && IRQ2_ENABLED(p->ctl_a));
+
 	if (new_state != p->irq_a_state)
 	{
 		p->irq_a_state = new_state;
+
 		if (p->intf->irq_a_func) update_shared_irq_handler(p->intf->irq_a_func);
 	}
 
 	/* then do IRQ B */
-	new_state = 0;
-	if ((p->irq_b1 && IRQ1_ENABLED(p->ctl_b)) || (p->irq_b2 && IRQ2_ENABLED(p->ctl_b))) new_state = 1;
+	new_state = (p->irq_b1 && IRQ1_ENABLED(p->ctl_b)) || (p->irq_b2 && IRQ2_ENABLED(p->ctl_b));
+
 	if (new_state != p->irq_b_state)
 	{
 		p->irq_b_state = new_state;
+
 		if (p->intf->irq_b_func) update_shared_irq_handler(p->intf->irq_b_func);
 	}
 }
 
 
-/******************* CPU interface for PIA read *******************/
 
-int pia_read(int which, int offset)
+/*************************************
+ *
+ *  Sets state value and call callbacks
+ *  if changed
+ *
+ *************************************/
+
+static void set_out_ca2(int which, int data)
 {
-	pia6821 *p = pia + which;
-	int val = 0;
+	pia6821 *p = &pias[which];
 
-	/* adjust offset for 16-bit and ordering */
-	offset &= 3;
-	if (p->addr & PIA_ALTERNATE_ORDERING) offset = swizzle_address[offset];
-
-	switch (offset)
+	if (data != p->out_ca2)
 	{
-		/******************* port A output/DDR read *******************/
-		case PIA_DDRA:
-
-			/* read output register */
-			if (OUTPUT_SELECTED(p->ctl_a))
-			{
-				/* update the input */
-				if ((FPTR)(p->intf->in_a_func) > 0x100)
-					p->in_a = p->intf->in_a_func(0);
-#ifdef MAME_DEBUG
-				else if ((p->ddr_a ^ 0xff) && !(p->in_set & PIA_IN_SET_A)) {
-					logerror("PIA%d: Warning! no port A read handler. Assuming pins %02x not connected\n",
-					         which, p->ddr_a ^ 0xff);
-					p->in_set |= PIA_IN_SET_A; // disable logging
-				}
-#endif // MAME_DEBUG
-
-				/* combine input and output values */
-				val = (p->out_a & p->ddr_a) + (p->in_a & ~p->ddr_a);
-
-				/* IRQ flags implicitly cleared by a read */
-				p->irq_a1 = p->irq_a2 = 0;
-				update_6821_interrupts(p);
-
-				/* CA2 is configured as output and in read strobe mode */
-				if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a))
-				{
-					/* this will cause a transition low; call the output function if we're currently high */
-					if (p->out_ca2)
-						if (p->intf->out_ca2_func) p->intf->out_ca2_func(0, 0);
-					p->out_ca2 = 0;
-
-					/* if the CA2 strobe is cleared by the E, reset it right away */
-					if (STROBE_E_RESET(p->ctl_a))
-					{
-						if (p->intf->out_ca2_func) p->intf->out_ca2_func(0, 1);
-						p->out_ca2 = 1;
-					}
-				}
-
-				LOG(("%04x: PIA%d read port A = %02X\n", activecpu_get_previouspc(),  which, val));
-			}
-
-			/* read DDR register */
-			else
-			{
-				val = p->ddr_a;
-				LOG(("%04x: PIA%d read DDR A = %02X\n", activecpu_get_previouspc(), which, val));
-			}
-			break;
-
-		/******************* port B output/DDR read *******************/
-		case PIA_DDRB:
-
-			/* read output register */
-			if (OUTPUT_SELECTED(p->ctl_b))
-			{
-				/* update the input */
-				if ((FPTR)(p->intf->in_b_func) > 0x100)
-					p->in_b = p->intf->in_b_func(0);
-#ifdef MAME_DEBUG
-				else if ((p->ddr_b ^ 0xff) && !(p->in_set & PIA_IN_SET_B)) {
-					logerror("PIA%d: Error! no port B read handler. Three-state pins %02x are undefined\n",
-					         which, p->ddr_b ^ 0xff);
-					p->in_set |= PIA_IN_SET_B; // disable logging
-				}
-#endif // MAME_DEBUG
-
-				/* combine input and output values */
-				val = (p->out_b & p->ddr_b) + (p->in_b & ~p->ddr_b);
-
-				/* This read will implicitly clear the IRQ B1 flag.  If CB2 is in write-strobe
-                   output mode with CB1 restore, and a CB1 active transition set the flag,
-                   clearing it will cause CB2 to go high again.  Note that this is different
-                   from what happens with port A. */
-				if (p->irq_b1 && C2_OUTPUT(p->ctl_b) && C2_STROBE_MODE(p->ctl_b) && STROBE_C1_RESET(p->ctl_b))
-				{
-					/* call the CB2 output function */
-					if (!p->out_cb2)
-						if (p->intf->out_cb2_func) p->intf->out_cb2_func(0, 1);
-
-					/* clear CB2 */
-					p->out_cb2 = 1;
-				}
-
-				/* IRQ flags implicitly cleared by a read */
-				p->irq_b1 = p->irq_b2 = 0;
-				update_6821_interrupts(p);
-
-				LOG(("%04x: PIA%d read port B = %02X\n", activecpu_get_previouspc(), which, val));
-			}
-
-			/* read DDR register */
-			else
-			{
-				val = p->ddr_b;
-				LOG(("%04x: PIA%d read DDR B = %02X\n", activecpu_get_previouspc(), which, val));
-			}
-			break;
-
-		/******************* port A control read *******************/
-		case PIA_CTLA:
-
-			/* Update CA1 & CA2 if callback exists, these in turn may update IRQ's */
-			if ((FPTR)(p->intf->in_ca1_func) > 0x100)
-				pia_set_input_ca1(which, p->intf->in_ca1_func(0));
-#ifdef MAME_DEBUG
-			else if (!(p->in_set & PIA_IN_SET_CA1)) {
-				logerror("PIA%d: Warning! no CA1 read handler. Assuming pin not connected\n",which);
-				p->in_set |= PIA_IN_SET_CA1; // disable logging
-			}
-#endif // MAME_DEBUG
-			if ((FPTR)(p->intf->in_ca2_func) > 0x100)
-				pia_set_input_ca2(which, p->intf->in_ca2_func(0));
-#ifdef MAME_DEBUG
-			else if (C2_INPUT(p->ctl_a) && !(p->in_set & PIA_IN_SET_CA2)) {
-				logerror("PIA%d: Warning! no CA2 read handler. Assuming pin not connected\n",which);
-				p->in_set |= PIA_IN_SET_CA2; // disable logging
-			}
-#endif // MAME_DEBUG
-
-			/* read control register */
-			val = p->ctl_a;
-
-			/* set the IRQ flags if we have pending IRQs */
-			if (p->irq_a1) val |= PIA_IRQ1;
-			if (p->irq_a2 && C2_INPUT(p->ctl_a)) val |= PIA_IRQ2;
-
-			LOG(("%04x: PIA%d read control A = %02X\n", activecpu_get_previouspc(), which, val));
-			break;
-
-		/******************* port B control read *******************/
-		case PIA_CTLB:
-
-			/* Update CB1 & CB2 if callback exists, these in turn may update IRQ's */
-			if ((FPTR)(p->intf->in_cb1_func) > 0x100)
-				pia_set_input_cb1(which, p->intf->in_cb1_func(0));
-#ifdef MAME_DEBUG
-			else if (!(p->in_set & PIA_IN_SET_CB1)) {
-				logerror("PIA%d: Error! no CB1 read handler. Three-state pin is undefined\n",which);
-				p->in_set |= PIA_IN_SET_CB1; // disable logging
-			}
-#endif // MAME_DEBUG
-			if ((FPTR)(p->intf->in_cb2_func) > 0x100)
-				pia_set_input_cb2(which, p->intf->in_cb2_func(0));
-#ifdef MAME_DEBUG
-			else if (C2_INPUT(p->ctl_b) && !(p->in_set & PIA_IN_SET_CB2)) {
-				logerror("PIA%d: Error! no CB2 read handler. Three-state pin is undefined\n",which);
-				p->in_set |= PIA_IN_SET_CB2; // disable logging
-			}
-#endif // MAME_DEBUG
-
-			/* read control register */
-			val = p->ctl_b;
-
-			/* set the IRQ flags if we have pending IRQs */
-			if (p->irq_b1) val |= PIA_IRQ1;
-			if (p->irq_b2 && C2_INPUT(p->ctl_b)) val |= PIA_IRQ2;
-
-			LOG(("%04x: PIA%d read control B = %02X\n", activecpu_get_previouspc(), which, val));
-			break;
-	}
-
-	return val;
-}
-
-
-/******************* CPU interface for PIA write *******************/
-
-void pia_write(int which, int offset, int data)
-{
-	pia6821 *p = pia + which;
-
-	/* adjust offset for 16-bit and ordering */
-	offset &= 3;
-	if (p->addr & PIA_ALTERNATE_ORDERING) offset = swizzle_address[offset];
-
-	switch (offset)
-	{
-		/******************* port A output/DDR write *******************/
-		case PIA_DDRA:
-
-			/* write output register */
-			if (OUTPUT_SELECTED(p->ctl_a))
-			{
-				LOG(("%04x: PIA%d port A write = %02X\n", activecpu_get_previouspc(), which, data));
-
-				/* update the output value */
-				p->out_a = data;/* & p->ddr_a; */	/* NS990130 - don't mask now, DDR could change later */
-
-				/* send it to the output function */
-				if (p->intf->out_a_func && p->ddr_a) p->intf->out_a_func(0, p->out_a & p->ddr_a);	/* NS990130 */
-			}
-
-			/* write DDR register */
-			else
-			{
-				LOG(("%04x: PIA%d DDR A write = %02X\n", activecpu_get_previouspc(), which, data));
-
-				if (p->ddr_a != data)
-				{
-					/* NS990130 - if DDR changed, call the callback again */
-					p->ddr_a = data;
-
-					/* send it to the output function */
-					if (p->intf->out_a_func && p->ddr_a) p->intf->out_a_func(0, p->out_a & p->ddr_a);
-				}
-			}
-			break;
-
-		/******************* port B output/DDR write *******************/
-		case PIA_DDRB:
-
-			/* write output register */
-			if (OUTPUT_SELECTED(p->ctl_b))
-			{
-				LOG(("%04x: PIA%d port B write = %02X\n", activecpu_get_previouspc(), which, data));
-
-				/* update the output value */
-				p->out_b = data;/* & p->ddr_b */	/* NS990130 - don't mask now, DDR could change later */
-
-				/* send it to the output function */
-				if (p->intf->out_b_func && p->ddr_b) p->intf->out_b_func(0, p->out_b & p->ddr_b);	/* NS990130 */
-
-				/* CB2 is configured as output and in write strobe mode */
-				if (C2_OUTPUT(p->ctl_b) && C2_STROBE_MODE(p->ctl_b))
-				{
-					/* this will cause a transition low; call the output function if we're currently high */
-					if (p->out_cb2)
-						if (p->intf->out_cb2_func) p->intf->out_cb2_func(0, 0);
-					p->out_cb2 = 0;
-
-					/* if the CB2 strobe is cleared by the E, reset it right away */
-					if (STROBE_E_RESET(p->ctl_b))
-					{
-						if (p->intf->out_cb2_func) p->intf->out_cb2_func(0, 1);
-						p->out_cb2 = 1;
-					}
-				}
-			}
-
-			/* write DDR register */
-			else
-			{
-				LOG(("%04x: PIA%d DDR B write = %02X\n", activecpu_get_previouspc(), which, data));
-
-				if (p->ddr_b != data)
-				{
-					/* NS990130 - if DDR changed, call the callback again */
-					p->ddr_b = data;
-
-					/* send it to the output function */
-					if (p->intf->out_b_func && p->ddr_b) p->intf->out_b_func(0, p->out_b & p->ddr_b);
-				}
-			}
-			break;
-
-		/******************* port A control write *******************/
-		case PIA_CTLA:
-
-			/* Bit 7 and 6 read only - PD 16/01/00 */
-
-			data &= 0x3f;
-
-
-			LOG(("%04x: PIA%d control A write = %02X\n", activecpu_get_previouspc(), which, data));
-
-			/* CA2 is configured as output */
-			if (C2_OUTPUT(data))
-			{
-				int temp;
-
-				if (C2_SET_MODE(data))
-				{
-					/* set/reset mode--bit value determines the new output */
-					temp = SET_C2(data) ? 1 : 0;
-				}
-				else {
-					/* strobe mode--output is always high unless strobed. */
-					temp = 1;
-				}
-
-				/* if we're going from input to output mode, or we're already in output mode
-                   and this change creates a transition, call the CA2 output function */
-				if (C2_INPUT(p->ctl_a) || (C2_OUTPUT(p->ctl_a) && (p->out_ca2 ^ temp)))
-					if (p->intf->out_ca2_func) p->intf->out_ca2_func(0, temp);
-
-				/* set the new value */
-				p->out_ca2 = temp;
-			}
-
-			/* update the control register */
-			p->ctl_a = data;
-
-			/* update externals */
-			update_6821_interrupts(p);
-			break;
-
-		/******************* port B control write *******************/
-		case PIA_CTLB:
-
-			/* Bit 7 and 6 read only - PD 16/01/00 */
-
-			data &= 0x3f;
-
-			LOG(("%04x: PIA%d control B write = %02X\n", activecpu_get_previouspc(), which, data));
-
-			/* CB2 is configured as output */
-			if (C2_OUTPUT(data))
-			{
-				int temp;
-
-				if (C2_SET_MODE(data))
-				{
-					/* set/reset mode--bit value determines the new output */
-					temp = SET_C2(data) ? 1 : 0;
-				}
-				else {
-					/* strobe mode--output is always high unless strobed. */
-					temp = 1;
-				}
-
-				/* if we're going from input to output mode, or we're already in output mode
-                   and this change creates a transition, call the CB2 output function */
-				if (C2_INPUT(p->ctl_b) || (C2_OUTPUT(p->ctl_b) && (p->out_cb2 ^ temp)))
-					if (p->intf->out_cb2_func) p->intf->out_cb2_func(0, temp);
-
-				/* set the new value */
-				p->out_cb2 = temp;
-			}
-
-			/* update the control register */
-			p->ctl_b = data;
-
-			/* update externals */
-			update_6821_interrupts(p);
-			break;
+		p->out_ca2 = data;
+
+		/* send to output function */
+		if (p->intf->out_ca2_func)
+			p->intf->out_ca2_func(0, p->out_ca2);
+		else
+		{
+			if (p->out_ca2_needs_pulled)
+				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port CA2 write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+			p->out_ca2_needs_pulled = TRUE;
+		}
 	}
 }
 
 
-/******************* interface setting PIA port A input *******************/
-
-void pia_set_input_a(int which, int data)
+static void set_out_cb2(int which, int data)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
+
+	if (data != p->out_cb2)
+	{
+		p->out_cb2 = data;
+
+		/* send to output function */
+		if (p->intf->out_cb2_func)
+			p->intf->out_cb2_func(0, p->out_cb2);
+		else
+		{
+			if (p->out_cb2_needs_pulled)
+				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port CB2 write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+			p->out_cb2_needs_pulled = TRUE;
+		}
+	}
+}
+
+
+
+/*************************************
+ *
+ *  CPU interface for PIA read
+ *
+ *************************************/
+
+static UINT8 pia_ddra_read(int which)
+{
+	pia6821 *p = &pias[which];
+	UINT8 ret;
+
+	/* read output register */
+	if (OUTPUT_SELECTED(p->ctl_a))
+	{
+		/* update the input */
+		if (p->ddr_a != 0xff)
+		{
+			if (p->intf->in_a_func)
+				p->in_a = p->intf->in_a_func(0);
+			else if (!p->in_a_pushed)
+				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A read handler. Assuming pins %02x not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_a ^ 0xff);
+		}
+
+		/* combine input and output values */
+		ret = (p->out_a & p->ddr_a) | (p->in_a & ~p->ddr_a);
+
+		/* IRQ flags implicitly cleared by a read */
+		p->irq_a1 = FALSE;
+		p->irq_a2 = FALSE;
+		update_6821_interrupts(p);
+
+		/* CA2 is configured as output and in read strobe mode */
+		if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a))
+		{
+			/* this will cause a transition low */
+			set_out_ca2(which, FALSE);
+
+			/* if the CA2 strobe is cleared by the E, reset it right away */
+			if (STROBE_E_RESET(p->ctl_a))
+				set_out_ca2(which, TRUE);
+		}
+
+		LOG(("cpu #%d (PC=%08X): PIA #%d: read port A = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+	}
+
+	/* read DDR register */
+	else
+	{
+		ret = p->ddr_a;
+		LOG(("cpu #%d (PC=%08X): PIA #%d: read DDR A = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+	}
+
+	return ret;
+}
+
+
+static UINT8 pia_ddrb_read(int which)
+{
+	pia6821 *p = &pias[which];
+	UINT8 ret;
+
+	/* read output register */
+	if (OUTPUT_SELECTED(p->ctl_b))
+	{
+		/* update the input */
+		if (p->ddr_b != 0xff)
+		{
+			if (p->intf->in_b_func)
+				p->in_b = p->intf->in_b_func(0);
+			else if (!p->in_b_pushed)
+				logerror("cpu #%d (PC=%08X): PIA #%d: Error! No port B read handler. Three-state pins %02x are undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_b ^ 0xff);
+		}
+
+		/* combine input and output values */
+		ret = (p->out_b & p->ddr_b) | (p->in_b & ~p->ddr_b);
+
+		/* This read will implicitly clear the IRQ B1 flag.  If CB2 is in write-strobe
+           output mode with CB1 restore, and a CB1 active transition set the flag,
+           clearing it will cause CB2 to go high again.  Note that this is different
+           from what happens with port A. */
+		if (p->irq_b1 && C2_OUTPUT(p->ctl_b) && C2_STROBE_MODE(p->ctl_b) && STROBE_C1_RESET(p->ctl_b))
+			set_out_cb2(which, TRUE);
+
+		/* IRQ flags implicitly cleared by a read */
+		p->irq_b1 = p->irq_b2 = FALSE;
+		update_6821_interrupts(p);
+
+		LOG(("cpu #%d (PC=%08X): PIA #%d: read port B = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+	}
+
+	/* read DDR register */
+	else
+	{
+		ret = p->ddr_b;
+		LOG(("cpu #%d (PC=%08X): PIA #%d: read DDR B = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+	}
+
+	return ret;
+}
+
+
+static UINT8 pia_ctla_read(int which)
+{
+	pia6821 *p = &pias[which];
+	UINT8 ret;
+
+	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
+	if (p->intf->in_ca1_func)
+		pia_set_input_ca1(which, p->intf->in_ca1_func(0));
+	else if (!p->in_ca1_pushed)
+		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA1 read handler. Assuming pin not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+	if (p->intf->in_ca2_func)
+		pia_set_input_ca2(which, p->intf->in_ca2_func(0));
+	else if (C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
+		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA2 read handler. Assuming pin not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+	/* read control register */
+	ret = p->ctl_a;
+
+	/* set the IRQ flags if we have pending IRQs */
+	if (p->irq_a1)
+		ret |= PIA_IRQ1;
+
+	if (p->irq_a2 && C2_INPUT(p->ctl_a))
+		ret |= PIA_IRQ2;
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: read control A = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+
+	return ret;
+}
+
+
+static UINT8 pia_ctlb_read(int which)
+{
+	pia6821 *p = &pias[which];
+	UINT8 ret;
+
+	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
+	if (p->intf->in_cb1_func)
+		pia_set_input_cb1(which, p->intf->in_cb1_func(0));
+	else if (!p->in_cb1_pushed)
+		logerror("cpu #%d (PC=%08X): PIA #%d: Error! no CB1 read handler. Three-state pin is undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+	if (p->intf->in_cb2_func)
+		pia_set_input_cb2(which, p->intf->in_cb2_func(0));
+	else if (C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
+		logerror("cpu #%d (PC=%08X): PIA #%d: Error! No CB2 read handler. Three-state pin is undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+	/* read control register */
+	ret = p->ctl_b;
+
+	/* set the IRQ flags if we have pending IRQs */
+	if (p->irq_b1)
+		ret |= PIA_IRQ1;
+
+	if (p->irq_b2 && C2_INPUT(p->ctl_b))
+		ret |= PIA_IRQ2;
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: read control B = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+
+	return ret;
+}
+
+
+UINT8 pia_read(int which, offs_t offset)
+{
+	UINT8 ret;
+
+	switch (offset & 0x03)
+	{
+		default: /* impossible */
+		case 0x00:  ret = pia_ddra_read(which); break;
+		case 0x01:  ret = pia_ctla_read(which); break;
+		case 0x02:  ret = pia_ddrb_read(which); break;
+		case 0x03:  ret = pia_ctlb_read(which); break;
+	}
+
+	return ret;
+}
+
+
+UINT8 pia_alt_read(int which, offs_t offset)
+{
+	return pia_read(which, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
+}
+
+
+
+/*************************************
+ *
+ *  CPU interface for PIA write
+ *
+ *************************************/
+
+static void send_to_out_a_func(int which)
+{
+	pia6821 *p = &pias[which];
+
+	if (p->ddr_a)
+	{
+		if (p->intf->out_a_func)
+			p->intf->out_a_func(0, p->out_a & p->ddr_a);
+		else
+		{
+			if (p->out_a_needs_pulled)
+				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+			p->out_a_needs_pulled = TRUE;
+		}
+	}
+}
+
+
+static void send_to_out_b_func(int which)
+{
+	pia6821 *p = &pias[which];
+
+	if (p->ddr_b)
+	{
+		if (p->intf->out_b_func)
+			p->intf->out_b_func(0, p->out_b & p->ddr_b);
+		else
+		{
+			if (p->out_b_needs_pulled)
+				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port B write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+
+			p->out_b_needs_pulled = TRUE;
+		}
+	}
+}
+
+
+static void pia_ddra_write(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	/* write output register */
+	if (OUTPUT_SELECTED(p->ctl_a))
+	{
+		LOG(("cpu #%d (PC=%08X): PIA #%d: port A write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+		/* update the output value - don't mask now, DDR could change later */
+		p->out_a = data;
+
+		send_to_out_a_func(which);
+	}
+
+	/* write DDR register */
+	else
+	{
+		if (data == 0x00)
+			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (read mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+		else if (data == 0xff)
+			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (write mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+		else
+			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (mixed mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+		if (p->ddr_a != data)
+		{
+			/* DDR changed, call the callback again */
+			p->ddr_a = data;
+
+			send_to_out_a_func(which);
+		}
+	}
+}
+
+
+static void pia_ddrb_write(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	/* write output register */
+	if (OUTPUT_SELECTED(p->ctl_b))
+	{
+		LOG(("cpu #%d (PC=%08X): PIA #%d: port B write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+		/* update the output value - don't mask now, DDR could change later */
+		p->out_b = data;
+
+		send_to_out_b_func(which);
+
+		/* CB2 is configured as output and in write strobe mode */
+		if (C2_OUTPUT(p->ctl_b) && C2_STROBE_MODE(p->ctl_b))
+		{
+			/* this will cause a transition low */
+			set_out_cb2(which, FALSE);
+
+			/* if the CB2 strobe is cleared by the E, reset it right away */
+			if (STROBE_E_RESET(p->ctl_b))
+				set_out_cb2(which, TRUE);
+		}
+	}
+
+	/* write DDR register */
+	else
+	{
+		if (data == 0x00)
+			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (read mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+		else if (data == 0xff)
+			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (write mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+		else
+			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (mixed mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+		if (p->ddr_b != data)
+		{
+			/* DDR changed, call the callback again */
+			p->ddr_b = data;
+
+			send_to_out_b_func(which);
+		}
+	}
+}
+
+
+static void pia_ctla_write(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	/* bit 7 and 6 are read only */
+	data &= 0x3f;
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: control A write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+	/* CA2 is configured as output */
+	if (C2_OUTPUT(data))
+	{
+		int temp;
+
+		if (C2_SET_MODE(data))
+			/* set/reset mode--bit value determines the new output */
+			temp = C2_SET(data);
+		else
+			/* strobe mode--output is always high unless strobed */
+			temp = TRUE;
+
+		set_out_ca2(which, temp);
+	}
+
+	/* update the control register */
+	p->ctl_a = data;
+
+	/* update externals */
+	update_6821_interrupts(p);
+}
+
+
+static void pia_ctlb_write(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	/* bit 7 and 6 are read only */
+	data &= 0x3f;
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: control B write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+	/* CB2 is configured as output */
+	if (C2_OUTPUT(data))
+	{
+		int temp;
+
+		if (C2_SET_MODE(data))
+			/* set/reset mode--bit value determines the new output */
+			temp = C2_SET(data);
+		else
+			/* strobe mode--output is always high unless strobed */
+			temp = TRUE;
+
+		set_out_cb2(which, temp);
+	}
+
+	/* update the control register */
+	p->ctl_b = data;
+
+	/* update externals */
+	update_6821_interrupts(p);
+}
+
+
+void pia_write(int which, offs_t offset, UINT8 data)
+{
+	switch (offset & 0x03)
+	{
+		default: /* impossible */
+		case 0x00:  pia_ddra_write(which, data); break;
+		case 0x01:  pia_ctla_write(which, data); break;
+		case 0x02:  pia_ddrb_write(which, data); break;
+		case 0x03:  pia_ctlb_write(which, data); break;
+	}
+}
+
+
+void pia_alt_write(int which, offs_t offset, UINT8 data)
+{
+	pia_write(which, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
+}
+
+
+
+/*************************************
+ *
+ *  Device interface for port A
+ *
+ *************************************/
+
+void pia_set_input_a(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
 
 	assert_always(p->intf->in_a_func == NULL, "pia_set_input_a() called when in_a_func implemented");
 
-	/* set the input, what could be easier? */
 	p->in_a = data;
-	p->in_set |= PIA_IN_SET_A;
+	p->in_a_pushed = TRUE;
 }
 
 
-
-/******************* interface setting PIA port A input *******************/
-
-int pia_get_output_a(int which)
+UINT8 pia_get_output_a(int which)
 {
-	pia6821 *p = pia + which;
-	return (p->out_a & p->ddr_a) + (p->in_a & ~p->ddr_a);
+	pia6821 *p = &pias[which];
+
+	p->out_a_needs_pulled = FALSE;
+
+	return (p->out_a & p->ddr_a) | (p->in_a & ~p->ddr_a);
 }
 
 
 
-/******************* interface setting PIA port CA1 input *******************/
+/*************************************
+ *
+ *  Device interface for the CA1 pin
+ *
+ *************************************/
 
 void pia_set_input_ca1(int which, int data)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
 
 	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
+	data = data ? TRUE : FALSE;
 
 	/* the new state has caused a transition */
-	if (p->in_ca1 ^ data)
+	if ((p->in_ca1 != data) &&
+		((data && C1_LOW_TO_HIGH(p->ctl_a)) || (!data && C1_HIGH_TO_LOW(p->ctl_a))))
 	{
-		/* handle the active transition */
-		if ((data && C1_LOW_TO_HIGH(p->ctl_a)) || (!data && C1_HIGH_TO_LOW(p->ctl_a)))
-		{
-			/* mark the IRQ */
-			p->irq_a1 = 1;
+		/* mark the IRQ */
+		p->irq_a1 = TRUE;
 
-			/* update externals */
-			update_6821_interrupts(p);
+		/* update externals */
+		update_6821_interrupts(p);
 
-			/* CA2 is configured as output and in read strobe mode and cleared by a CA1 transition */
-			if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a) && STROBE_C1_RESET(p->ctl_a))
-			{
-				/* call the CA2 output function */
-				if (!p->out_ca2)
-					if (p->intf->out_ca2_func) p->intf->out_ca2_func(0, 1);
-
-				/* clear CA2 */
-				p->out_ca2 = 1;
-			}
-		}
+		/* CA2 is configured as output and in read strobe mode and cleared by a CA1 transition */
+		if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a) && STROBE_C1_RESET(p->ctl_a))
+			set_out_ca2(which, TRUE);
 	}
 
 	/* set the new value for CA1 */
 	p->in_ca1 = data;
-	p->in_set |= PIA_IN_SET_CA1;
+	p->in_ca1_pushed = TRUE;
 }
 
 
 
-/******************* interface setting PIA port CA2 input *******************/
+/*************************************
+ *
+ *  Device interface for the CA2 pin
+ *
+ *************************************/
 
 void pia_set_input_ca2(int which, int data)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	/* CA2 is in input mode */
-	if (C2_INPUT(p->ctl_a))
+	/* if input mode and the new state has caused a transition */
+	if (C2_INPUT(p->ctl_a) &&
+		(p->in_ca2 != data) &&
+		((data && C2_LOW_TO_HIGH(p->ctl_a)) || (!data && C2_HIGH_TO_LOW(p->ctl_a))))
 	{
-		/* the new state has caused a transition */
-		if (p->in_ca2 ^ data)
-		{
-			/* handle the active transition */
-			if ((data && C2_LOW_TO_HIGH(p->ctl_a)) || (!data && C2_HIGH_TO_LOW(p->ctl_a)))
-			{
-				/* mark the IRQ */
-				p->irq_a2 = 1;
+		/* mark the IRQ */
+		p->irq_a2 = TRUE;
 
-				/* update externals */
-				update_6821_interrupts(p);
-			}
-		}
+		/* update externals */
+		update_6821_interrupts(p);
 	}
 
 	/* set the new value for CA2 */
 	p->in_ca2 = data;
-	p->in_set |= PIA_IN_SET_CA2;
+	p->in_ca2_pushed = TRUE;
 }
 
-
-
-/******************* interface setting PIA port B input *******************/
-
-void pia_set_input_b(int which, int data)
-{
-	pia6821 *p = pia + which;
-
-	assert_always(p->intf->in_b_func == NULL, "pia_set_input_b() called when in_b_func implemented");
-
-	/* set the input, what could be easier? */
-	p->in_b = data;
-    p->in_set |= PIA_IN_SET_B;
-}
-
-
-
-/******************* interface setting PIA port A input *******************/
-
-int pia_get_output_b(int which)
-{
-	pia6821 *p = pia + which;
-	return (p->out_b & p->ddr_b) + (p->in_b & ~p->ddr_b);
-}
-
-
-
-/******************* interface setting PIA port CB1 input *******************/
-
-void pia_set_input_cb1(int which, int data)
-{
-	pia6821 *p = pia + which;
-
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
-
-	/* the new state has caused a transition */
-	if (p->in_cb1 ^ data)
-	{
-		/* handle the active transition */
-		if ((data && C1_LOW_TO_HIGH(p->ctl_b)) || (!data && C1_HIGH_TO_LOW(p->ctl_b)))
-		{
-			/* mark the IRQ */
-			p->irq_b1 = 1;
-
-			/* update externals */
-			update_6821_interrupts(p);
-
-			/* If CB2 is configured as a write-strobe output which is reset by a CB1
-               transition, this reset will only happen when a read from port B implicitly
-               clears the IRQ B1 flag.  So we handle the CB2 reset there.  Note that this
-               is different from what happens with port A. */
-		}
-	}
-
-	/* set the new value for CB1 */
-	p->in_cb1 = data;
-	p->in_set |= PIA_IN_SET_CB1;
-}
-
-
-
-/******************* interface setting PIA port CB2 input *******************/
-
-void pia_set_input_cb2(int which, int data)
-{
-	pia6821 *p = pia + which;
-
-	/* limit the data to 0 or 1 */
-	data = data ? 1 : 0;
-
-	/* CB2 is in input mode */
-	if (C2_INPUT(p->ctl_b))
-	{
-		/* the new state has caused a transition */
-		if (p->in_cb2 ^ data)
-		{
-			/* handle the active transition */
-			if ((data && C2_LOW_TO_HIGH(p->ctl_b)) || (!data && C2_HIGH_TO_LOW(p->ctl_b)))
-			{
-				/* mark the IRQ */
-				p->irq_b2 = 1;
-
-				/* update externals */
-				update_6821_interrupts(p);
-			}
-		}
-	}
-
-	/* set the new value for CA2 */
-	p->in_cb2 = data;
-	p->in_set |= PIA_IN_SET_CB2;
-}
-
-
-
-/******************* interface retrieving PIA port CA2 output *******************/
 
 int pia_get_output_ca2(int which)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
+
+	p->out_ca2_needs_pulled = FALSE;
+
 	return p->out_ca2;
 }
 
 
 
-/******************* interface retrieving PIA port CB2 output *******************/
+/*************************************
+ *
+ *  Device interface for port B
+ *
+ *************************************/
+
+void pia_set_input_b(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	assert_always(p->intf->in_b_func == NULL, "pia_set_input_b() called when in_b_func implemented");
+
+	p->in_b = data;
+	p->in_b_pushed = TRUE;
+}
+
+
+
+UINT8 pia_get_output_b(int which)
+{
+	pia6821 *p = &pias[which];
+
+	p->out_b_needs_pulled = FALSE;
+
+	return (p->out_b & p->ddr_b) | (p->in_b & ~p->ddr_b);
+}
+
+
+
+/*************************************
+ *
+ *  Device interface for the CB1 pin
+ *
+ *************************************/
+
+void pia_set_input_cb1(int which, int data)
+{
+	pia6821 *p = &pias[which];
+
+	/* limit the data to 0 or 1 */
+	data = data ? 1 : 0;
+
+	/* the new state has caused a transition */
+	if ((p->in_cb1 != data) &&
+		((data && C1_LOW_TO_HIGH(p->ctl_b)) || (!data && C1_HIGH_TO_LOW(p->ctl_b))))
+	{
+		/* mark the IRQ */
+		p->irq_b1 = 1;
+
+		/* update externals */
+		update_6821_interrupts(p);
+
+		/* If CB2 is configured as a write-strobe output which is reset by a CB1
+           transition, this reset will only happen when a read from port B implicitly
+           clears the IRQ B1 flag.  So we handle the CB2 reset there.  Note that this
+           is different from what happens with port A. */
+	}
+
+	/* set the new value for CB1 */
+	p->in_cb1 = data;
+	p->in_cb1_pushed = TRUE;
+}
+
+
+
+/*************************************
+ *
+ *  Device interface for the CB2 pin
+ *
+ *************************************/
+
+void pia_set_input_cb2(int which, int data)
+{
+	pia6821 *p = &pias[which];
+
+	/* limit the data to 0 or 1 */
+	data = data ? 1 : 0;
+
+	/* if input mode and the new state has caused a transition */
+	if (C2_INPUT(p->ctl_b) &&
+		(p->in_cb2 != data) &&
+		((data && C2_LOW_TO_HIGH(p->ctl_b)) || (!data && C2_HIGH_TO_LOW(p->ctl_b))))
+	{
+		/* mark the IRQ */
+		p->irq_b2 = 1;
+
+		/* update externals */
+		update_6821_interrupts(p);
+	}
+
+	/* set the new value for CA2 */
+	p->in_cb2 = data;
+	p->in_cb2_pushed = TRUE;
+}
+
 
 int pia_get_output_cb2(int which)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
+
+	p->out_cb2_needs_pulled = FALSE;
+
 	return p->out_cb2;
 }
 
 
 
-/******************* interface retrieving DDR *******************/
+/*************************************
+ *
+ *  Convinience interface for
+ *  retrieving the DDR
+ *
+ *************************************/
 
 UINT8 pia_get_ddr_a(int which)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
+
 	return p->ddr_a;
 }
 
 
-
 UINT8 pia_get_ddr_b(int which)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
+
 	return p->ddr_b;
 }
 
 
 
-/******************* interface retrieving IRQ *******************/
+/*************************************
+ *
+ *  Convinience interface for
+ *  retrieving the IRQ state
+ *
+ *************************************/
 
 int pia_get_irq_a(int which)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
+
 	return p->irq_a_state;
 }
 
 
-
 int pia_get_irq_b(int which)
 {
-	pia6821 *p = pia + which;
+	pia6821 *p = &pias[which];
+
 	return p->irq_b_state;
 }
 
 
 
-
-/******************* Standard 8-bit CPU interfaces, D0-D7 *******************/
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 READ8_HANDLER( pia_0_r ) { return pia_read(0, offset); }
 READ8_HANDLER( pia_1_r ) { return pia_read(1, offset); }
@@ -867,6 +995,24 @@ WRITE8_HANDLER( pia_5_w ) { pia_write(5, offset, data); }
 WRITE8_HANDLER( pia_6_w ) { pia_write(6, offset, data); }
 WRITE8_HANDLER( pia_7_w ) { pia_write(7, offset, data); }
 
+READ8_HANDLER( pia_0_alt_r ) { return pia_alt_read(0, offset); }
+READ8_HANDLER( pia_1_alt_r ) { return pia_alt_read(1, offset); }
+READ8_HANDLER( pia_2_alt_r ) { return pia_alt_read(2, offset); }
+READ8_HANDLER( pia_3_alt_r ) { return pia_alt_read(3, offset); }
+READ8_HANDLER( pia_4_alt_r ) { return pia_alt_read(4, offset); }
+READ8_HANDLER( pia_5_alt_r ) { return pia_alt_read(5, offset); }
+READ8_HANDLER( pia_6_alt_r ) { return pia_alt_read(6, offset); }
+READ8_HANDLER( pia_7_alt_r ) { return pia_alt_read(7, offset); }
+
+WRITE8_HANDLER( pia_0_alt_w ) { pia_alt_write(0, offset, data); }
+WRITE8_HANDLER( pia_1_alt_w ) { pia_alt_write(1, offset, data); }
+WRITE8_HANDLER( pia_2_alt_w ) { pia_alt_write(2, offset, data); }
+WRITE8_HANDLER( pia_3_alt_w ) { pia_alt_write(3, offset, data); }
+WRITE8_HANDLER( pia_4_alt_w ) { pia_alt_write(4, offset, data); }
+WRITE8_HANDLER( pia_5_alt_w ) { pia_alt_write(5, offset, data); }
+WRITE8_HANDLER( pia_6_alt_w ) { pia_alt_write(6, offset, data); }
+WRITE8_HANDLER( pia_7_alt_w ) { pia_alt_write(7, offset, data); }
+
 /******************* Standard 16-bit CPU interfaces, D0-D7 *******************/
 
 READ16_HANDLER( pia_0_lsb_r ) { return pia_read(0, offset); }
@@ -878,14 +1024,32 @@ READ16_HANDLER( pia_5_lsb_r ) { return pia_read(5, offset); }
 READ16_HANDLER( pia_6_lsb_r ) { return pia_read(6, offset); }
 READ16_HANDLER( pia_7_lsb_r ) { return pia_read(7, offset); }
 
-WRITE16_HANDLER( pia_0_lsb_w ) { if (ACCESSING_LSB) pia_write(0, offset, data & 0xff); }
-WRITE16_HANDLER( pia_1_lsb_w ) { if (ACCESSING_LSB) pia_write(1, offset, data & 0xff); }
-WRITE16_HANDLER( pia_2_lsb_w ) { if (ACCESSING_LSB) pia_write(2, offset, data & 0xff); }
-WRITE16_HANDLER( pia_3_lsb_w ) { if (ACCESSING_LSB) pia_write(3, offset, data & 0xff); }
-WRITE16_HANDLER( pia_4_lsb_w ) { if (ACCESSING_LSB) pia_write(4, offset, data & 0xff); }
-WRITE16_HANDLER( pia_5_lsb_w ) { if (ACCESSING_LSB) pia_write(5, offset, data & 0xff); }
-WRITE16_HANDLER( pia_6_lsb_w ) { if (ACCESSING_LSB) pia_write(6, offset, data & 0xff); }
-WRITE16_HANDLER( pia_7_lsb_w ) { if (ACCESSING_LSB) pia_write(7, offset, data & 0xff); }
+WRITE16_HANDLER( pia_0_lsb_w ) { if (ACCESSING_LSB) pia_write(0, offset, data); }
+WRITE16_HANDLER( pia_1_lsb_w ) { if (ACCESSING_LSB) pia_write(1, offset, data); }
+WRITE16_HANDLER( pia_2_lsb_w ) { if (ACCESSING_LSB) pia_write(2, offset, data); }
+WRITE16_HANDLER( pia_3_lsb_w ) { if (ACCESSING_LSB) pia_write(3, offset, data); }
+WRITE16_HANDLER( pia_4_lsb_w ) { if (ACCESSING_LSB) pia_write(4, offset, data); }
+WRITE16_HANDLER( pia_5_lsb_w ) { if (ACCESSING_LSB) pia_write(5, offset, data); }
+WRITE16_HANDLER( pia_6_lsb_w ) { if (ACCESSING_LSB) pia_write(6, offset, data); }
+WRITE16_HANDLER( pia_7_lsb_w ) { if (ACCESSING_LSB) pia_write(7, offset, data); }
+
+READ16_HANDLER( pia_0_lsb_alt_r ) { return pia_alt_read(0, offset); }
+READ16_HANDLER( pia_1_lsb_alt_r ) { return pia_alt_read(1, offset); }
+READ16_HANDLER( pia_2_lsb_alt_r ) { return pia_alt_read(2, offset); }
+READ16_HANDLER( pia_3_lsb_alt_r ) { return pia_alt_read(3, offset); }
+READ16_HANDLER( pia_4_lsb_alt_r ) { return pia_alt_read(4, offset); }
+READ16_HANDLER( pia_5_lsb_alt_r ) { return pia_alt_read(5, offset); }
+READ16_HANDLER( pia_6_lsb_alt_r ) { return pia_alt_read(6, offset); }
+READ16_HANDLER( pia_7_lsb_alt_r ) { return pia_alt_read(7, offset); }
+
+WRITE16_HANDLER( pia_0_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(0, offset, data); }
+WRITE16_HANDLER( pia_1_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(1, offset, data); }
+WRITE16_HANDLER( pia_2_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(2, offset, data); }
+WRITE16_HANDLER( pia_3_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(3, offset, data); }
+WRITE16_HANDLER( pia_4_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(4, offset, data); }
+WRITE16_HANDLER( pia_5_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(5, offset, data); }
+WRITE16_HANDLER( pia_6_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(6, offset, data); }
+WRITE16_HANDLER( pia_7_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(7, offset, data); }
 
 /******************* Standard 16-bit CPU interfaces, D8-D15 *******************/
 
@@ -907,6 +1071,24 @@ WRITE16_HANDLER( pia_5_msb_w ) { if (ACCESSING_MSB) pia_write(5, offset, data >>
 WRITE16_HANDLER( pia_6_msb_w ) { if (ACCESSING_MSB) pia_write(6, offset, data >> 8); }
 WRITE16_HANDLER( pia_7_msb_w ) { if (ACCESSING_MSB) pia_write(7, offset, data >> 8); }
 
+READ16_HANDLER( pia_0_msb_alt_r ) { return pia_alt_read(0, offset) << 8; }
+READ16_HANDLER( pia_1_msb_alt_r ) { return pia_alt_read(1, offset) << 8; }
+READ16_HANDLER( pia_2_msb_alt_r ) { return pia_alt_read(2, offset) << 8; }
+READ16_HANDLER( pia_3_msb_alt_r ) { return pia_alt_read(3, offset) << 8; }
+READ16_HANDLER( pia_4_msb_alt_r ) { return pia_alt_read(4, offset) << 8; }
+READ16_HANDLER( pia_5_msb_alt_r ) { return pia_alt_read(5, offset) << 8; }
+READ16_HANDLER( pia_6_msb_alt_r ) { return pia_alt_read(6, offset) << 8; }
+READ16_HANDLER( pia_7_msb_alt_r ) { return pia_alt_read(7, offset) << 8; }
+
+WRITE16_HANDLER( pia_0_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(0, offset, data >> 8); }
+WRITE16_HANDLER( pia_1_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(1, offset, data >> 8); }
+WRITE16_HANDLER( pia_2_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(2, offset, data >> 8); }
+WRITE16_HANDLER( pia_3_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(3, offset, data >> 8); }
+WRITE16_HANDLER( pia_4_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(4, offset, data >> 8); }
+WRITE16_HANDLER( pia_5_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(5, offset, data >> 8); }
+WRITE16_HANDLER( pia_6_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(6, offset, data >> 8); }
+WRITE16_HANDLER( pia_7_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(7, offset, data >> 8); }
+
 /******************* 8-bit A/B port interfaces *******************/
 
 WRITE8_HANDLER( pia_0_porta_w ) { pia_set_input_a(0, data); }
@@ -927,23 +1109,23 @@ WRITE8_HANDLER( pia_5_portb_w ) { pia_set_input_b(5, data); }
 WRITE8_HANDLER( pia_6_portb_w ) { pia_set_input_b(6, data); }
 WRITE8_HANDLER( pia_7_portb_w ) { pia_set_input_b(7, data); }
 
-READ8_HANDLER( pia_0_porta_r ) { return pia[0].in_a; }
-READ8_HANDLER( pia_1_porta_r ) { return pia[1].in_a; }
-READ8_HANDLER( pia_2_porta_r ) { return pia[2].in_a; }
-READ8_HANDLER( pia_3_porta_r ) { return pia[3].in_a; }
-READ8_HANDLER( pia_4_porta_r ) { return pia[4].in_a; }
-READ8_HANDLER( pia_5_porta_r ) { return pia[5].in_a; }
-READ8_HANDLER( pia_6_porta_r ) { return pia[6].in_a; }
-READ8_HANDLER( pia_7_porta_r ) { return pia[7].in_a; }
+READ8_HANDLER( pia_0_porta_r ) { return pias[0].in_a; }
+READ8_HANDLER( pia_1_porta_r ) { return pias[1].in_a; }
+READ8_HANDLER( pia_2_porta_r ) { return pias[2].in_a; }
+READ8_HANDLER( pia_3_porta_r ) { return pias[3].in_a; }
+READ8_HANDLER( pia_4_porta_r ) { return pias[4].in_a; }
+READ8_HANDLER( pia_5_porta_r ) { return pias[5].in_a; }
+READ8_HANDLER( pia_6_porta_r ) { return pias[6].in_a; }
+READ8_HANDLER( pia_7_porta_r ) { return pias[7].in_a; }
 
-READ8_HANDLER( pia_0_portb_r ) { return pia[0].in_b; }
-READ8_HANDLER( pia_1_portb_r ) { return pia[1].in_b; }
-READ8_HANDLER( pia_2_portb_r ) { return pia[2].in_b; }
-READ8_HANDLER( pia_3_portb_r ) { return pia[3].in_b; }
-READ8_HANDLER( pia_4_portb_r ) { return pia[4].in_b; }
-READ8_HANDLER( pia_5_portb_r ) { return pia[5].in_b; }
-READ8_HANDLER( pia_6_portb_r ) { return pia[6].in_b; }
-READ8_HANDLER( pia_7_portb_r ) { return pia[7].in_b; }
+READ8_HANDLER( pia_0_portb_r ) { return pias[0].in_b; }
+READ8_HANDLER( pia_1_portb_r ) { return pias[1].in_b; }
+READ8_HANDLER( pia_2_portb_r ) { return pias[2].in_b; }
+READ8_HANDLER( pia_3_portb_r ) { return pias[3].in_b; }
+READ8_HANDLER( pia_4_portb_r ) { return pias[4].in_b; }
+READ8_HANDLER( pia_5_portb_r ) { return pias[5].in_b; }
+READ8_HANDLER( pia_6_portb_r ) { return pias[6].in_b; }
+READ8_HANDLER( pia_7_portb_r ) { return pias[7].in_b; }
 
 /******************* 1-bit CA1/CA2/CB1/CB2 port interfaces *******************/
 
@@ -955,6 +1137,7 @@ WRITE8_HANDLER( pia_4_ca1_w ) { pia_set_input_ca1(4, data); }
 WRITE8_HANDLER( pia_5_ca1_w ) { pia_set_input_ca1(5, data); }
 WRITE8_HANDLER( pia_6_ca1_w ) { pia_set_input_ca1(6, data); }
 WRITE8_HANDLER( pia_7_ca1_w ) { pia_set_input_ca1(7, data); }
+
 WRITE8_HANDLER( pia_0_ca2_w ) { pia_set_input_ca2(0, data); }
 WRITE8_HANDLER( pia_1_ca2_w ) { pia_set_input_ca2(1, data); }
 WRITE8_HANDLER( pia_2_ca2_w ) { pia_set_input_ca2(2, data); }
@@ -972,6 +1155,7 @@ WRITE8_HANDLER( pia_4_cb1_w ) { pia_set_input_cb1(4, data); }
 WRITE8_HANDLER( pia_5_cb1_w ) { pia_set_input_cb1(5, data); }
 WRITE8_HANDLER( pia_6_cb1_w ) { pia_set_input_cb1(6, data); }
 WRITE8_HANDLER( pia_7_cb1_w ) { pia_set_input_cb1(7, data); }
+
 WRITE8_HANDLER( pia_0_cb2_w ) { pia_set_input_cb2(0, data); }
 WRITE8_HANDLER( pia_1_cb2_w ) { pia_set_input_cb2(1, data); }
 WRITE8_HANDLER( pia_2_cb2_w ) { pia_set_input_cb2(2, data); }
@@ -981,36 +1165,38 @@ WRITE8_HANDLER( pia_5_cb2_w ) { pia_set_input_cb2(5, data); }
 WRITE8_HANDLER( pia_6_cb2_w ) { pia_set_input_cb2(6, data); }
 WRITE8_HANDLER( pia_7_cb2_w ) { pia_set_input_cb2(7, data); }
 
-READ8_HANDLER( pia_0_ca1_r ) { return pia[0].in_ca1; }
-READ8_HANDLER( pia_1_ca1_r ) { return pia[1].in_ca1; }
-READ8_HANDLER( pia_2_ca1_r ) { return pia[2].in_ca1; }
-READ8_HANDLER( pia_3_ca1_r ) { return pia[3].in_ca1; }
-READ8_HANDLER( pia_4_ca1_r ) { return pia[4].in_ca1; }
-READ8_HANDLER( pia_5_ca1_r ) { return pia[5].in_ca1; }
-READ8_HANDLER( pia_6_ca1_r ) { return pia[6].in_ca1; }
-READ8_HANDLER( pia_7_ca1_r ) { return pia[7].in_ca1; }
-READ8_HANDLER( pia_0_ca2_r ) { return pia[0].in_ca2; }
-READ8_HANDLER( pia_1_ca2_r ) { return pia[1].in_ca2; }
-READ8_HANDLER( pia_2_ca2_r ) { return pia[2].in_ca2; }
-READ8_HANDLER( pia_3_ca2_r ) { return pia[3].in_ca2; }
-READ8_HANDLER( pia_4_ca2_r ) { return pia[4].in_ca2; }
-READ8_HANDLER( pia_5_ca2_r ) { return pia[5].in_ca2; }
-READ8_HANDLER( pia_6_ca2_r ) { return pia[6].in_ca2; }
-READ8_HANDLER( pia_7_ca2_r ) { return pia[7].in_ca2; }
+READ8_HANDLER( pia_0_ca1_r ) { return pias[0].in_ca1; }
+READ8_HANDLER( pia_1_ca1_r ) { return pias[1].in_ca1; }
+READ8_HANDLER( pia_2_ca1_r ) { return pias[2].in_ca1; }
+READ8_HANDLER( pia_3_ca1_r ) { return pias[3].in_ca1; }
+READ8_HANDLER( pia_4_ca1_r ) { return pias[4].in_ca1; }
+READ8_HANDLER( pia_5_ca1_r ) { return pias[5].in_ca1; }
+READ8_HANDLER( pia_6_ca1_r ) { return pias[6].in_ca1; }
+READ8_HANDLER( pia_7_ca1_r ) { return pias[7].in_ca1; }
 
-READ8_HANDLER( pia_0_cb1_r ) { return pia[0].in_cb1; }
-READ8_HANDLER( pia_1_cb1_r ) { return pia[1].in_cb1; }
-READ8_HANDLER( pia_2_cb1_r ) { return pia[2].in_cb1; }
-READ8_HANDLER( pia_3_cb1_r ) { return pia[3].in_cb1; }
-READ8_HANDLER( pia_4_cb1_r ) { return pia[4].in_cb1; }
-READ8_HANDLER( pia_5_cb1_r ) { return pia[5].in_cb1; }
-READ8_HANDLER( pia_6_cb1_r ) { return pia[6].in_cb1; }
-READ8_HANDLER( pia_7_cb1_r ) { return pia[7].in_cb1; }
-READ8_HANDLER( pia_0_cb2_r ) { return pia[0].in_cb2; }
-READ8_HANDLER( pia_1_cb2_r ) { return pia[1].in_cb2; }
-READ8_HANDLER( pia_2_cb2_r ) { return pia[2].in_cb2; }
-READ8_HANDLER( pia_3_cb2_r ) { return pia[3].in_cb2; }
-READ8_HANDLER( pia_4_cb2_r ) { return pia[4].in_cb2; }
-READ8_HANDLER( pia_5_cb2_r ) { return pia[5].in_cb2; }
-READ8_HANDLER( pia_6_cb2_r ) { return pia[6].in_cb2; }
-READ8_HANDLER( pia_7_cb2_r ) { return pia[7].in_cb2; }
+READ8_HANDLER( pia_0_ca2_r ) { return pias[0].in_ca2; }
+READ8_HANDLER( pia_1_ca2_r ) { return pias[1].in_ca2; }
+READ8_HANDLER( pia_2_ca2_r ) { return pias[2].in_ca2; }
+READ8_HANDLER( pia_3_ca2_r ) { return pias[3].in_ca2; }
+READ8_HANDLER( pia_4_ca2_r ) { return pias[4].in_ca2; }
+READ8_HANDLER( pia_5_ca2_r ) { return pias[5].in_ca2; }
+READ8_HANDLER( pia_6_ca2_r ) { return pias[6].in_ca2; }
+READ8_HANDLER( pia_7_ca2_r ) { return pias[7].in_ca2; }
+
+READ8_HANDLER( pia_0_cb1_r ) { return pias[0].in_cb1; }
+READ8_HANDLER( pia_1_cb1_r ) { return pias[1].in_cb1; }
+READ8_HANDLER( pia_2_cb1_r ) { return pias[2].in_cb1; }
+READ8_HANDLER( pia_3_cb1_r ) { return pias[3].in_cb1; }
+READ8_HANDLER( pia_4_cb1_r ) { return pias[4].in_cb1; }
+READ8_HANDLER( pia_5_cb1_r ) { return pias[5].in_cb1; }
+READ8_HANDLER( pia_6_cb1_r ) { return pias[6].in_cb1; }
+READ8_HANDLER( pia_7_cb1_r ) { return pias[7].in_cb1; }
+
+READ8_HANDLER( pia_0_cb2_r ) { return pias[0].in_cb2; }
+READ8_HANDLER( pia_1_cb2_r ) { return pias[1].in_cb2; }
+READ8_HANDLER( pia_2_cb2_r ) { return pias[2].in_cb2; }
+READ8_HANDLER( pia_3_cb2_r ) { return pias[3].in_cb2; }
+READ8_HANDLER( pia_4_cb2_r ) { return pias[4].in_cb2; }
+READ8_HANDLER( pia_5_cb2_r ) { return pias[5].in_cb2; }
+READ8_HANDLER( pia_6_cb2_r ) { return pias[6].in_cb2; }
+READ8_HANDLER( pia_7_cb2_r ) { return pias[7].in_cb2; }

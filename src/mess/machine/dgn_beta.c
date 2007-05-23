@@ -1136,9 +1136,9 @@ static void dgnbeta_reset(running_machine *machine)
 
 MACHINE_START( dgnbeta )
 {
-	pia_config(0, PIA_STANDARD_ORDERING | PIA_8BIT, &dgnbeta_pia_intf[0]);
-	pia_config(1, PIA_STANDARD_ORDERING | PIA_8BIT, &dgnbeta_pia_intf[1]);
-	pia_config(2, PIA_STANDARD_ORDERING | PIA_8BIT, &dgnbeta_pia_intf[2]); 
+	pia_config(0, &dgnbeta_pia_intf[0]);
+	pia_config(1, &dgnbeta_pia_intf[1]);
+	pia_config(2, &dgnbeta_pia_intf[2]); 
 
 	init_video();
 	

@@ -257,7 +257,7 @@ void williams_cvsd_init(int pianum)
 
 	/* configure the PIA */
 	williams_pianum = pianum;
-	pia_config(pianum, PIA_STANDARD_ORDERING, &cvsd_pia_intf);
+	pia_config(pianum, &cvsd_pia_intf);
 
 	/* configure master CPU banks */
 	ROM = memory_region(REGION_CPU1 + sound_cpunum);

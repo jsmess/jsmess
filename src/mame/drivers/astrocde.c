@@ -323,6 +323,11 @@ static READ8_HANDLER( gorf_io_1_r )
 		case 3: astrocade_sparkle[1] = data;	break;
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
+		case 6:
+			sndti_set_output_gain(SOUND_ASTROCADE, 0, 0, data ? 0.0 : 1.0);
+			sndti_set_output_gain(SOUND_SAMPLES,   0, 0, data ? 1.0 : 0.0);
+			break;
+		case 7:	mame_printf_debug("io_1:%d\n", data); break;
 	}
 	return 0xff;
 }
@@ -340,6 +345,8 @@ static READ8_HANDLER( gorf_io_2_r )
 		case 3: output_set_lamp_value(3, data);	break;
 		case 4: output_set_lamp_value(4, data);	break;
 		case 5: output_set_lamp_value(5, data);	break;
+		case 6:	/* n/c */						break;
+		case 7:	mame_printf_debug("io_2:%d\n", data); break;
 	}
 	return 0xff;
 }
@@ -1248,7 +1255,8 @@ static MACHINE_DRIVER_START( astrocade_base )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 320, 262, 0, 204)
+	MDRV_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
+	MDRV_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)	/* clip out borders */
 
 	MDRV_PALETTE_INIT(astrocde)
 	MDRV_VIDEO_START(astrocde)
@@ -1358,11 +1366,17 @@ static MACHINE_DRIVER_START( wow )
 	MDRV_CPU_PROGRAM_MAP(wow_map,0)
 	MDRV_CPU_IO_MAP(port_map_stereo_pattern,0)
 
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match screenshots */
+//  MDRV_SCREEN_DEFAULT_POSITION(1.066, -0.004, 1.048, -0.026)  /* adjusted to match flyer */
+
 	/* sound hardware */
+	MDRV_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
+
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(wow_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.25)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_DRIVER_END
 
 
@@ -1374,20 +1388,23 @@ static MACHINE_DRIVER_START( gorf )
 	MDRV_CPU_PROGRAM_MAP(wow_map,0)
 	MDRV_CPU_IO_MAP(port_map_stereo_pattern,0)
 
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match flyer */
+
 	/* sound hardware */
 	MDRV_SPEAKER_ADD("upper", 0.0, 0.0, 1.0)
 	MDRV_SPEAKER_ADD("lower", 0.0, -0.5, 1.0)
 
 	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
 
 	MDRV_SOUND_ADD(ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gorf_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.25)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lower", 0.25)
 MACHINE_DRIVER_END
 
 

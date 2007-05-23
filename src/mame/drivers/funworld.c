@@ -1829,8 +1829,8 @@ ROM_END
 static DRIVER_INIT( funworld )
 {
 	/* Initializing PIAs... */
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
 }
 
 static DRIVER_INIT( jolycdit )
@@ -1901,8 +1901,8 @@ static DRIVER_INIT( jolycdit )
 	}
 
 	/* Initializing PIAs... */
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
 }
 
 static DRIVER_INIT( jolycdae )
@@ -1924,8 +1924,8 @@ static DRIVER_INIT( jolycdae )
 	}
 
 	/* Initializing PIAs... */
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
 }
 
 static DRIVER_INIT( soccernw )
@@ -1944,8 +1944,8 @@ static DRIVER_INIT( soccernw )
 //  ROM[0xa33c] = 0xea;
 
 	/* Initializing PIAs... */
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
 }
 
 

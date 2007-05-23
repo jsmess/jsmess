@@ -249,50 +249,16 @@ error:
 
 
 /*-------------------------------------------------
-    main - main entry point
+    bitmap_to_chars - convert a bitmap to
+    characters in the given font
 -------------------------------------------------*/
 
-int main(int argc, char *argv[])
+static int bitmap_to_chars(bitmap_t *bitmap, render_font *font)
 {
-	file_error filerr;
-	const char *bdcname;
-	const char *pngname;
-	render_font *font;
-	bitmap_t *bitmap;
-	png_error pngerr;
-	core_file *file;
-	int x, y, rowstart;
-
-    /* first argument is the directory */
-    if (argc < 3)
-    {
-    	fprintf(stderr, "Usage:\npng2bdf <input.png> <output.bdc>\n");
-    	return 1;
-    }
-    pngname = argv[1];
-    bdcname = argv[2];
-
-    /* load the png file */
-	filerr = core_fopen(pngname, OPEN_FLAG_READ, &file);
-	if (filerr != FILERR_NONE)
-    {
-    	fprintf(stderr, "Error %d attempting to open PNG file\n", filerr);
-    	return 1;
-    }
-	pngerr = png_read_bitmap(file, &bitmap);
-	core_fclose(file);
-	if (pngerr != PNGERR_NONE)
-	{
-		fprintf(stderr, "Error %d reading PNG file\n", pngerr);
-		return 1;
-	}
-
-	/* allocate a font */
-	font = malloc(sizeof(*font));
-	memset(font, 0, sizeof(*font));
+	int rowstart = 0;
+	int x, y;
 
 	/* loop over rows */
-	rowstart = 0;
 	while (rowstart < bitmap->height)
 	{
 		int rowend, baseline, colstart;
@@ -406,9 +372,73 @@ int main(int argc, char *argv[])
 		rowstart = rowend + 1;
 	}
 
-	render_font_save_cached(font, bdcname, 0);
+	/* return non-zero (TRUE) if we errored */
+	return (rowstart < bitmap->height);
+}
 
+
+/*-------------------------------------------------
+    main - main entry point
+-------------------------------------------------*/
+
+int main(int argc, char *argv[])
+{
+	const char *bdcname;
+	render_font *font;
+	int error = FALSE;
+	int curarg;
+
+	/* validate arguments */
+    if (argc < 3)
+    {
+    	fprintf(stderr, "Usage:\npng2bdf <input.png> [<input2.png> [...]] <output.bdc>\n");
+    	return 1;
+    }
+    bdcname = argv[argc - 1];
+
+	/* allocate a font */
+	font = malloc(sizeof(*font));
+	memset(font, 0, sizeof(*font));
+
+	/* iterate over input files */
+	for (curarg = 1; curarg < argc - 1; curarg++)
+	{
+		const char *pngname = argv[curarg];
+		file_error filerr;
+		png_error pngerr;
+		bitmap_t *bitmap;
+		core_file *file;
+		int error;
+
+	    /* load the png file */
+		filerr = core_fopen(pngname, OPEN_FLAG_READ, &file);
+		if (filerr != FILERR_NONE)
+	    {
+	    	fprintf(stderr, "Error %d attempting to open PNG file\n", filerr);
+	    	error = TRUE;
+	    	break;
+	    }
+		pngerr = png_read_bitmap(file, &bitmap);
+		core_fclose(file);
+		if (pngerr != PNGERR_NONE)
+		{
+			fprintf(stderr, "Error %d reading PNG file\n", pngerr);
+			error = TRUE;
+			break;
+		}
+
+		/* parse the PNG into characters */
+		error = bitmap_to_chars(bitmap, font);
+		bitmap_free(bitmap);
+		if (error)
+			break;
+	}
+
+	/* write out the resulting font */
+	if (!error)
+		render_font_save_cached(font, bdcname, 0);
+
+	/* cleanup after ourselves */
 	free(font);
-	bitmap_free(bitmap);
-    return 0;
+    return error;
 }

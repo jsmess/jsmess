@@ -512,8 +512,8 @@ static struct TTL7474_interface TTL7474_2U_2_intf =
 MACHINE_START( carpolo )
 {
 	/* set up the PIA's */
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia_1_intf);
+	pia_config(0, &pia_0_intf);
+	pia_config(1, &pia_1_intf);
 	return 0;
 }
 

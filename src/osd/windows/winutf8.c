@@ -203,21 +203,22 @@ done:
 //  win_get_window_text_utf8
 //============================================================
 
-BOOL win_get_window_text_utf8(HWND window, char *buffer, size_t buffer_size)
+int win_get_window_text_utf8(HWND window, char *buffer, size_t buffer_size)
 {
-	BOOL result = FALSE;
+	int result = 0;
 	char *utf8_buffer = NULL;
 	TCHAR t_buffer[256];
 
-	if (!GetWindowText(window, t_buffer, ARRAY_LENGTH(t_buffer)))
-		goto done;
+	t_buffer[0] = '\0';
+
+	// invoke the core Win32 API
+	GetWindowText(window, t_buffer, ARRAY_LENGTH(t_buffer));
 
 	utf8_buffer = utf8_from_tstring(t_buffer);
 	if (!utf8_buffer)
 		goto done;
 
-	snprintf(buffer, buffer_size, "%s", utf8_buffer);
-	result = TRUE;
+	result = snprintf(buffer, buffer_size, "%s", utf8_buffer);
 
 done:
 	if (utf8_buffer)

@@ -627,8 +627,8 @@ static DRIVER_INIT( gdrawpkr )
 	}
 
 	/* Initializing PIAs... */
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
 }
 
 

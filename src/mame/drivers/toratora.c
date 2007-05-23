@@ -129,9 +129,9 @@ static const pia6821_interface pia2_intf =
 
 MACHINE_START( toratora )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
-	pia_config(2, PIA_STANDARD_ORDERING, &pia2_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
+	pia_config(2, &pia2_intf);
 	return 0;
 }
 

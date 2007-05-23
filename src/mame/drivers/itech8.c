@@ -614,7 +614,7 @@ static void behind_the_beam_update(int scanline_plus_interval);
 
 static MACHINE_START( itech8 )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_interface);
+	pia_config(0, &pia_interface);
 	return 0;
 }
 

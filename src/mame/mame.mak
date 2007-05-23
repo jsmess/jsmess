@@ -1054,8 +1054,10 @@ $(MAMEOBJ)/nichibut.a: \
 
 $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/dkong.o $(AUDIO)/dkong.o $(VIDEO)/dkong.o \
+	$(DRIVERS)/cham24.o \
 	$(DRIVERS)/kinstb.o \
 	$(DRIVERS)/mario.o $(AUDIO)/mario.o $(VIDEO)/mario.o \
+	$(DRIVERS)/multigam.o \
 	$(DRIVERS)/n8080.o $(AUDIO)/n8080.o $(VIDEO)/n8080.o \
 	$(DRIVERS)/nss.o $(MACHINE)/snes.o $(AUDIO)/snes.o $(VIDEO)/snes.o \
 	$(DRIVERS)/playch10.o $(MACHINE)/playch10.o $(VIDEO)/playch10.o \
@@ -1239,9 +1241,9 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/st0016.o $(VIDEO)/st0016.o \
 
 $(MAMEOBJ)/sigma.a: \
-	$(DRIVERS)/nyny.o $(VIDEO)/nyny.o \
+	$(DRIVERS)/nyny.o \
 	$(DRIVERS)/r2dtank.o \
-	$(DRIVERS)/spiders.o $(MACHINE)/spiders.o $(AUDIO)/spiders.o \
+	$(DRIVERS)/spiders.o $(AUDIO)/spiders.o \
 
 $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/bbusters.o $(VIDEO)/bbusters.o \
@@ -1690,8 +1692,8 @@ $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
 
 $(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
-			$(LAYOUT)/goldnpkr.lh \
-			$(LAYOUT)/pottnpkr.lh
+						$(LAYOUT)/goldnpkr.lh \
+						$(LAYOUT)/pottnpkr.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 

@@ -2761,9 +2761,9 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
 		
-	pia_config(0, PIA_STANDARD_ORDERING | PIA_8BIT, &init->piaintf[0]);
-	pia_config(1, PIA_STANDARD_ORDERING | PIA_8BIT, &init->piaintf[1]);
-	pia_config(2, PIA_STANDARD_ORDERING | PIA_8BIT, &init->piaintf[2]); /* Dragon Alpha 3rd pia */
+	pia_config(0, &init->piaintf[0]);
+	pia_config(1, &init->piaintf[1]);
+	pia_config(2, &init->piaintf[2]); /* Dragon Alpha 3rd pia */
 	pia_reset();
 
 	/* cartridge line timers */

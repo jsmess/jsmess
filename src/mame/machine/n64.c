@@ -1564,7 +1564,7 @@ WRITE32_HANDLER( n64_pif_ram_w )
 void n64_machine_reset(void)
 {
 	int i;
-	//UINT32 *pif_rom	= (UINT32*)memory_region(REGION_USER1);
+	//UINT32 *pif_rom   = (UINT32*)memory_region(REGION_USER1);
 	UINT32 *cart = (UINT32*)memory_region(REGION_USER2);
 	UINT64 boot_checksum;
 
@@ -1637,117 +1637,117 @@ void n64_machine_reset(void)
     }
 
     /*
-	// bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
-	boot_checksum = 0;
-	for (i=0x40; i < 0x1000; i+=4)
-	{
-		boot_checksum += cart[i/4]+i;
-	}
+    // bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
+    boot_checksum = 0;
+    for (i=0x40; i < 0x1000; i+=4)
+    {
+        boot_checksum += cart[i/4]+i;
+    }
 
-	if (boot_checksum == U64(0x000000d057e84864))
-	{
-		// CIC-NUS-6101
-		mame_printf_debug("CIC-NUS-6101 detected\n");
-		crc_seed = 0x3f;
-	}
-	else if (boot_checksum == U64(0x000000d6499e376b))
-	{
-		// CIC-NUS-6103
-		mame_printf_debug("CIC-NUS-6103 detected\n");
-		crc_seed = 0x78;
-	}
-	else if (boot_checksum == U64(0x0000011a4a1604b6))
-	{
-		// CIC-NUS-6105
-		mame_printf_debug("CIC-NUS-6105 detected\n");
-		crc_seed = 0x91;
+    if (boot_checksum == U64(0x000000d057e84864))
+    {
+        // CIC-NUS-6101
+        mame_printf_debug("CIC-NUS-6101 detected\n");
+        crc_seed = 0x3f;
+    }
+    else if (boot_checksum == U64(0x000000d6499e376b))
+    {
+        // CIC-NUS-6103
+        mame_printf_debug("CIC-NUS-6103 detected\n");
+        crc_seed = 0x78;
+    }
+    else if (boot_checksum == U64(0x0000011a4a1604b6))
+    {
+        // CIC-NUS-6105
+        mame_printf_debug("CIC-NUS-6105 detected\n");
+        crc_seed = 0x91;
 
-		first_rsp = 0;
-	}
-	else if (boot_checksum == U64(0x000000d6d5de4ba0))
-	{
-		// CIC-NUS-6106
-		mame_printf_debug("CIC-NUS-6106 detected\n");
-		crc_seed = 0x85;
-	}
-	else
-	{
-		mame_printf_debug("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
-	}
+        first_rsp = 0;
+    }
+    else if (boot_checksum == U64(0x000000d6d5de4ba0))
+    {
+        // CIC-NUS-6106
+        mame_printf_debug("CIC-NUS-6106 detected\n");
+        crc_seed = 0x85;
+    }
+    else
+    {
+        mame_printf_debug("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
+    }
 
-	// The PIF Boot ROM is not dumped, the following code simulates it
+    // The PIF Boot ROM is not dumped, the following code simulates it
 
-	// clear all registers
-	for (i=1; i < 32; i++)
-	{
-		*pif_rom++ = 0x00000000 | 0 << 21 | 0 << 16 | i << 11 | 0x20;		// ADD ri, r0, r0
-	}
+    // clear all registers
+    for (i=1; i < 32; i++)
+    {
+        *pif_rom++ = 0x00000000 | 0 << 21 | 0 << 16 | i << 11 | 0x20;       // ADD ri, r0, r0
+    }
 
-	// R20 <- 0x00000001
-	*pif_rom++ = 0x34000000 | 20 << 16 | 0x0001;					// ORI r20, r0, 0x0001
+    // R20 <- 0x00000001
+    *pif_rom++ = 0x34000000 | 20 << 16 | 0x0001;                    // ORI r20, r0, 0x0001
 
-	// R22 <- 0x0000003F
-	*pif_rom++ = 0x34000000 | 22 << 16 | crc_seed;					// ORI r22, r0, 0x003f
+    // R22 <- 0x0000003F
+    *pif_rom++ = 0x34000000 | 22 << 16 | crc_seed;                  // ORI r22, r0, 0x003f
 
-	// R29 <- 0xA4001FF0
-	*pif_rom++ = 0x3c000000 | 29 << 16 | 0xa400;					// LUI r29, 0xa400
-	*pif_rom++ = 0x34000000 | 29 << 21 | 29 << 16 | 0x1ff0;			// ORI r29, r29, 0x1ff0
+    // R29 <- 0xA4001FF0
+    *pif_rom++ = 0x3c000000 | 29 << 16 | 0xa400;                    // LUI r29, 0xa400
+    *pif_rom++ = 0x34000000 | 29 << 21 | 29 << 16 | 0x1ff0;         // ORI r29, r29, 0x1ff0
 
-	// clear CP0 registers
-	for (i=0; i < 32; i++)
-	{
-		*pif_rom++ = 0x40000000 | 4 << 21 | 0 << 16 | i << 11;		// MTC2 cp0ri, r0
-	}
+    // clear CP0 registers
+    for (i=0; i < 32; i++)
+    {
+        *pif_rom++ = 0x40000000 | 4 << 21 | 0 << 16 | i << 11;      // MTC2 cp0ri, r0
+    }
 
-	// Random <- 0x0000001F
-	*pif_rom++ = 0x34000000 | 1 << 16 | 0x001f;
-	*pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 1 << 11;			// MTC2 Random, r1
+    // Random <- 0x0000001F
+    *pif_rom++ = 0x34000000 | 1 << 16 | 0x001f;
+    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 1 << 11;          // MTC2 Random, r1
 
-	// Status <- 0x70400004
-	*pif_rom++ = 0x3c000000 | 1 << 16 | 0x7040;						// LUI r1, 0x7040
-	*pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0004;			// ORI r1, r1, 0x0004
-	*pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 12 << 11;			// MTC2 Status, r1
+    // Status <- 0x70400004
+    *pif_rom++ = 0x3c000000 | 1 << 16 | 0x7040;                     // LUI r1, 0x7040
+    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0004;           // ORI r1, r1, 0x0004
+    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 12 << 11;         // MTC2 Status, r1
 
-	// PRId <- 0x00000B00
-	*pif_rom++ = 0x34000000 | 1 << 16 | 0x0b00;						// ORI r1, r0, 0x0b00
-	*pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 15 << 11;			// MTC2 PRId, r1
+    // PRId <- 0x00000B00
+    *pif_rom++ = 0x34000000 | 1 << 16 | 0x0b00;                     // ORI r1, r0, 0x0b00
+    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 15 << 11;         // MTC2 PRId, r1
 
-	// Config <- 0x0006E463
-	*pif_rom++ = 0x3c000000 | 1 << 16 | 0x0006;						// LUI r1, 0x0006
-	*pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0xe463;			// ORI r1, r1, 0xe463
-	*pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 16 << 11;			// MTC2 Config, r1
+    // Config <- 0x0006E463
+    *pif_rom++ = 0x3c000000 | 1 << 16 | 0x0006;                     // LUI r1, 0x0006
+    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0xe463;           // ORI r1, r1, 0xe463
+    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 16 << 11;         // MTC2 Config, r1
 
-	// (0xa4300004) <- 0x01010101
-	*pif_rom++ = 0x3c000000 | 1 << 16 | 0x0101;						// LUI r1, 0x0101
-	*pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0101;			// ORI r1, r1, 0x0101
-	*pif_rom++ = 0x3c000000 | 3 << 16 | 0xa430;						// LUI r3, 0xa430
-	*pif_rom++ = 0xac000000 | 3 << 21 | 1 << 16 | 0x0004;			// SW r1, 0x0004(r3)
+    // (0xa4300004) <- 0x01010101
+    *pif_rom++ = 0x3c000000 | 1 << 16 | 0x0101;                     // LUI r1, 0x0101
+    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0101;           // ORI r1, r1, 0x0101
+    *pif_rom++ = 0x3c000000 | 3 << 16 | 0xa430;                     // LUI r3, 0xa430
+    *pif_rom++ = 0xac000000 | 3 << 21 | 1 << 16 | 0x0004;           // SW r1, 0x0004(r3)
 
-	// Copy 0xb0000000...1fff -> 0xa4000000...1fff
-	*pif_rom++ = 0x34000000 | 3 << 16 | 0x0400;						// ORI r3, r0, 0x0400
-	*pif_rom++ = 0x3c000000 | 4 << 16 | 0xb000;						// LUI r4, 0xb000
-	*pif_rom++ = 0x3c000000 | 5 << 16 | 0xa400;						// LUI r5, 0xa400
-	*pif_rom++ = 0x8c000000 | 4 << 21 | 1 << 16;					// LW r1, 0x0000(r4)
-	*pif_rom++ = 0xac000000 | 5 << 21 | 1 << 16;					// SW r1, 0x0000(r5)
-	*pif_rom++ = 0x20000000 | 4 << 21 | 4 << 16 | 0x0004;			// ADDI r4, r4, 0x0004
-	*pif_rom++ = 0x20000000 | 5 << 21 | 5 << 16 | 0x0004;			// ADDI r5, r5, 0x0004
-	*pif_rom++ = 0x20000000 | 3 << 21 | 3 << 16 | 0xffff;			// ADDI r3, r3, -1
-	*pif_rom++ = 0x14000000 | 3 << 21 | 0 << 16 | 0xfffa;			// BNE r3, r0, -6
-	*pif_rom++ = 0x00000000;
+    // Copy 0xb0000000...1fff -> 0xa4000000...1fff
+    *pif_rom++ = 0x34000000 | 3 << 16 | 0x0400;                     // ORI r3, r0, 0x0400
+    *pif_rom++ = 0x3c000000 | 4 << 16 | 0xb000;                     // LUI r4, 0xb000
+    *pif_rom++ = 0x3c000000 | 5 << 16 | 0xa400;                     // LUI r5, 0xa400
+    *pif_rom++ = 0x8c000000 | 4 << 21 | 1 << 16;                    // LW r1, 0x0000(r4)
+    *pif_rom++ = 0xac000000 | 5 << 21 | 1 << 16;                    // SW r1, 0x0000(r5)
+    *pif_rom++ = 0x20000000 | 4 << 21 | 4 << 16 | 0x0004;           // ADDI r4, r4, 0x0004
+    *pif_rom++ = 0x20000000 | 5 << 21 | 5 << 16 | 0x0004;           // ADDI r5, r5, 0x0004
+    *pif_rom++ = 0x20000000 | 3 << 21 | 3 << 16 | 0xffff;           // ADDI r3, r3, -1
+    *pif_rom++ = 0x14000000 | 3 << 21 | 0 << 16 | 0xfffa;           // BNE r3, r0, -6
+    *pif_rom++ = 0x00000000;
 
-	*pif_rom++ = 0x34000000 | 3 << 16 | 0x0000;						// ORI r3, r0, 0x0000
-	*pif_rom++ = 0x34000000 | 4 << 16 | 0x0000;						// ORI r4, r0, 0x0000
-	*pif_rom++ = 0x34000000 | 5 << 16 | 0x0000;						// ORI r5, r0, 0x0000
+    *pif_rom++ = 0x34000000 | 3 << 16 | 0x0000;                     // ORI r3, r0, 0x0000
+    *pif_rom++ = 0x34000000 | 4 << 16 | 0x0000;                     // ORI r4, r0, 0x0000
+    *pif_rom++ = 0x34000000 | 5 << 16 | 0x0000;                     // ORI r5, r0, 0x0000
 
-	// Zelda and DK64 need these
-	*pif_rom++ = 0x3c000000 | 9 << 16 | 0xa400;
-	*pif_rom++ = 0x34000000 | 9 << 21 | 9 << 16 | 0x1ff0;
-	*pif_rom++ = 0x3c000000 | 11 << 16 | 0xa400;
-	*pif_rom++ = 0x3c000000 | 31 << 16 | 0xffff;
-	*pif_rom++ = 0x34000000 | 31 << 21 | 31 << 16 | 0xffff;
+    // Zelda and DK64 need these
+    *pif_rom++ = 0x3c000000 | 9 << 16 | 0xa400;
+    *pif_rom++ = 0x34000000 | 9 << 21 | 9 << 16 | 0x1ff0;
+    *pif_rom++ = 0x3c000000 | 11 << 16 | 0xa400;
+    *pif_rom++ = 0x3c000000 | 31 << 16 | 0xffff;
+    *pif_rom++ = 0x34000000 | 31 << 21 | 31 << 16 | 0xffff;
 
-	*pif_rom++ = 0x3c000000 | 1 << 16 | 0xa400;						// LUI r1, 0xa400
-	*pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0040;			// ORI r1, r1, 0x0040
-	*pif_rom++ = 0x00000000 | 1 << 21 | 0x8;						// JR r1
+    *pif_rom++ = 0x3c000000 | 1 << 16 | 0xa400;                     // LUI r1, 0xa400
+    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0040;           // ORI r1, r1, 0x0040
+    *pif_rom++ = 0x00000000 | 1 << 21 | 0x8;                        // JR r1
     */
 }

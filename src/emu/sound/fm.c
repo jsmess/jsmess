@@ -2430,7 +2430,7 @@ INLINE void ADPCMA_calc_chan( YM2610 *F2610, ADPCM_CH *ch )
 			ch->adpcm_acc += jedi_table[ch->adpcm_step + data];
 
 			/* extend 12-bit signed int */
-			if (ch->adpcm_acc & 0x800)
+			if (ch->adpcm_acc & ~0x7ff)
 				ch->adpcm_acc |= ~0xfff;
 			else
 				ch->adpcm_acc &= 0xfff;

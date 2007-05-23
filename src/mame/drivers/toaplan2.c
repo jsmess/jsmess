@@ -2361,6 +2361,7 @@ INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
 
 	PORT_MODIFY("SYS")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_HIGH)	/* Service input is a push-button marked 'Test SW' */
 
 #if 0

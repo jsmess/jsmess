@@ -663,7 +663,7 @@ static struct AY8910interface ay8910_interface =
 
 static MACHINE_START( catnmous )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_0_intf);
+	pia_config(0, &pia_0_intf);
 	return 0;
 }
 

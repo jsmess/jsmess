@@ -432,9 +432,9 @@ static void pet_common_driver_init (void)
 	/* pet clock */
 	timer_pulse(0.01, 0, pet_interrupt);
 
-	via_config(0,&pet_via);
-	pia_config(0,PIA_STANDARD_ORDERING,&pet_pia0);
-	pia_config(1,PIA_STANDARD_ORDERING,&pet_pia1);
+	via_config(0, &pet_via);
+	pia_config(0, &pet_pia0);
+	pia_config(1, &pet_pia1);
 
 	cbm_ieee_open();
 }

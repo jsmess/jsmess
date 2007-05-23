@@ -225,6 +225,7 @@ Interrupts:
 #include "qix.h"
 #include "cpu/m6805/m6805.h"
 #include "machine/6821pia.h"
+#include "video/crtc6845.h"
 #include "sound/sn76496.h"
 #include "sound/discrete.h"
 
@@ -289,7 +290,8 @@ static ADDRESS_MAP_START( video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE(&qix_videoaddress)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(qix_scanline_r)
-	AM_RANGE(0x9c00, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_videocontrol_r, qix_videocontrol_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(crtc6845_0_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -306,7 +308,8 @@ static ADDRESS_MAP_START( zoo_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE(&qix_videoaddress)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(qix_scanline_r)
-	AM_RANGE(0x9c00, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_videocontrol_r, qix_videocontrol_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(crtc6845_0_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(crtc6845_0_register_r, crtc6845_0_register_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -625,13 +628,12 @@ static MACHINE_DRIVER_START( qix )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_PALETTE_LENGTH(1024)
+	MDRV_VIDEO_START(qix)
+	MDRV_VIDEO_UPDATE(crtc6845)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x29*8, 0, 0x20*8, 0x20*8+0x11, 0, 0x20*8)
-
-	MDRV_VIDEO_START(qix)
-	MDRV_VIDEO_UPDATE(qix)
+	MDRV_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -685,9 +687,6 @@ static MACHINE_DRIVER_START( slither )
 	MDRV_CPU_REMOVE("sound")
 
 	MDRV_MACHINE_START(slither)
-
-	/* video hardware */
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
 
 	/* sound hardware */
 	MDRV_SPEAKER_REMOVE("left")

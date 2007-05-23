@@ -291,6 +291,7 @@ void video_init(running_machine *machine)
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
 		if (machine->drv->screen[scrnum].tag != NULL)
 		{
+			render_container *container = render_container_get_screen(scrnum);
 			internal_screen_info *info = &viddata->scrinfo[scrnum];
 
 			/* allocate a timer to reset partial updates */
@@ -302,6 +303,16 @@ void video_init(running_machine *machine)
 
 			/* configure the screen with the default parameters */
 			video_screen_configure(scrnum, info->state->width, info->state->height, &info->state->visarea, info->state->refresh);
+
+			/* configure the default cliparea */
+			if (info->config->xoffset != 0)
+				render_container_set_xoffset(container, info->config->xoffset);
+			if (info->config->yoffset != 0)
+				render_container_set_yoffset(container, info->config->yoffset);
+			if (info->config->xscale != 0)
+				render_container_set_xscale(container, info->config->xscale);
+			if (info->config->yscale != 0)
+				render_container_set_yscale(container, info->config->yscale);
 
 			/* reset VBLANK timing */
 			info->vblank_time = sub_subseconds_from_mame_time(time_zero, machine->screen[0].vblank);

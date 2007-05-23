@@ -3299,14 +3299,15 @@ static MACHINE_DRIVER_START( chasehq )
 	MDRV_VIDEO_UPDATE(chasehq)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_ADD("front",  0.0, 0.0, 0.7);
+	MDRV_SPEAKER_ADD("rear",   0.0, 0.0, 1.3);
 
 	MDRV_SOUND_ADD(YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "rear",  0.25)
+	MDRV_SOUND_ROUTE(0, "front", 0.25)
+	MDRV_SOUND_ROUTE(1, "rear",  1.0)
+	MDRV_SOUND_ROUTE(2, "front", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -3473,14 +3474,15 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_VIDEO_UPDATE(chasehq)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_ADD("front",  0.0, 0.0, 0.7);
+	MDRV_SPEAKER_ADD("rear",   0.0, 0.0, 1.3);
 
 	MDRV_SOUND_ADD(YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "front", 0.25)
+	MDRV_SOUND_ROUTE(0, "rear",  0.25)
+	MDRV_SOUND_ROUTE(1, "front", 1.0)
+	MDRV_SOUND_ROUTE(2, "rear",  1.0)
 MACHINE_DRIVER_END
 
 

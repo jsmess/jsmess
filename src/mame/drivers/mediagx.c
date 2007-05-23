@@ -87,6 +87,35 @@ static UINT8 pal[768];
 static UINT32 *main_ram;
 
 static UINT32 disp_ctrl_reg[256/4];
+static int frame_width = 1, frame_height = 1;
+
+static UINT32 memory_ctrl_reg[256/4];
+static int pal_index = 0;
+
+static UINT32 biu_ctrl_reg[256/4];
+
+static UINT8 mediagx_config_reg_sel;
+static UINT8 mediagx_config_regs[256];
+
+//static UINT8 controls_data = 0;
+static UINT8 parallel_pointer;
+static UINT8 parallel_latched;
+static UINT32 parport;
+//static int control_num = 0;
+//static int control_num2 = 0;
+//static int control_read = 0;
+
+static UINT32 cx5510_regs[256/4];
+
+static UINT16 *dacl;
+static UINT16 *dacr;
+static int dacl_ptr = 0;
+static int dacr_ptr = 0;
+
+static mame_timer *sound_timer;
+static UINT8 ad1847_regs[16];
+static UINT32 ad1847_sample_counter = 0;
+static UINT32 ad1847_sample_rate;
 
 
 // Display controller registers
@@ -122,7 +151,7 @@ static UINT32 disp_ctrl_reg[256/4];
 
 
 
-static int cga_palette[16][3] =
+static const UINT8 cga_palette[16][3] =
 {
 	{ 0x00, 0x00, 0x00 }, { 0x00, 0x00, 0xaa }, { 0x00, 0xaa, 0x00 }, { 0x00, 0xaa, 0xaa },
 	{ 0xaa, 0x00, 0x00 }, { 0xaa, 0x00, 0xaa }, { 0xaa, 0x55, 0x00 }, { 0xaa, 0xaa, 0xaa },
@@ -168,7 +197,6 @@ static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_
 	}
 }
 
-static int frame_width = 1, frame_height = 1;
 static void draw_framebuffer(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i, j;
@@ -370,13 +398,11 @@ static WRITE32_HANDLER( fdc_w )
 
 
 
-static UINT32 memory_ctrl_reg[256/4];
 static READ32_HANDLER( memory_ctrl_r )
 {
 	return memory_ctrl_reg[offset];
 }
 
-static int pal_index = 0;
 static WRITE32_HANDLER( memory_ctrl_w )
 {
 //  mame_printf_debug("memory_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
@@ -387,7 +413,7 @@ static WRITE32_HANDLER( memory_ctrl_w )
 	}
 	else if (offset == 8)
 	{
-		pal[pal_index-2] = data & 0xff;
+		pal[pal_index] = data & 0xff;
 		pal_index++;
 		if (pal_index >= 768)
 		{
@@ -402,7 +428,6 @@ static WRITE32_HANDLER( memory_ctrl_w )
 
 
 
-static UINT32 biu_ctrl_reg[256/4];
 static READ32_HANDLER( biu_ctrl_r )
 {
 	if (offset == 0)
@@ -427,9 +452,6 @@ static WRITE32_HANDLER(bios_ram_w)
 {
 
 }
-
-static UINT8 mediagx_config_reg_sel;
-static UINT8 mediagx_config_regs[256];
 
 static UINT8 mediagx_config_reg_r(void)
 {
@@ -483,32 +505,29 @@ static WRITE32_HANDLER( io20_w )
 	}
 }
 
-static UINT8 controls_data = 0;
-static UINT32 parport;
-//static int control_num = 0;
-//static int control_num2 = 0;
-//static int control_read = 0;
 static READ32_HANDLER( parallel_port_r )
 {
 	UINT32 r = 0;
 
 	if (!(mem_mask & 0x0000ff00))
 	{
+		UINT8 nibble = parallel_latched;//(readinputport(parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
+		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
 		logerror("%08X:parallel_port_r()\n", activecpu_get_pc());
-		if (controls_data == 0x18)
-		{
-			r |= readinputport(0) << 8;
-		}
-		else if (controls_data == 0x60)
-		{
-			r |= readinputport(1) << 8;
-		}
-		else if (controls_data == 0xff ||  controls_data == 0x50)
-		{
-			r |= readinputport(2) << 8;
-		}
+/*      if (controls_data == 0x18)
+        {
+            r |= readinputport(0) << 8;
+        }
+        else if (controls_data == 0x60)
+        {
+            r |= readinputport(1) << 8;
+        }
+        else if (controls_data == 0xff ||  controls_data == 0x50)
+        {
+            r |= readinputport(2) << 8;
+        }
 
-		//r |= control_read << 8;
+        //r |= control_read << 8;*/
 	}
 	if (!(mem_mask & 0x00ff0000))
 	{
@@ -524,45 +543,81 @@ static WRITE32_HANDLER( parallel_port_w )
 
 	if (!(mem_mask & 0x000000ff))
 	{
-		logerror("%08X:parallel_port_w(%02X)\n", activecpu_get_pc(), data & 0xff);
-	//  if (data == 0x10) printf("\n");
-	//  printf("parallel_port_w: %08X at %08X (%d, %d)\n", data, activecpu_get_pc(), control_num2, control_num);
-		controls_data = data;
 		/*
-        if ((data == 0xff || data == 0x60) && control_num == 1)
-        {
-            control_read = readinputport(0);
-        }
-        if (data == 0x18 && control_num == 2)
-        {
-            control_read = readinputport(1);
-        }
-        if ((data & 0xc0) == 0x40)
-        {
-            control_read = readinputport(2);
-        }
-        if ((data & 0xc0) == 0x50)
-        {
-            control_read = readinputport(3);
-        }
+            Controls:
 
-        control_num++;
-
-        if (data == 0x18)
-        {
-            control_num = 0;
-            control_num2++;
-        }
-        if (data == 0x10)
-        {
-            control_num2 = 0;
-        }
+                18 = reset internal pointer to 0
+                19 = reset internal pointer to 1
+                1a = reset internal pointer to 2
+                1b = reset internal pointer to 3
+                2x = set low 4 bits of general purpose output to 'x'
+                3x = set high 4 bits of general purpose output to 'x'
+                4x = control up to 4 coin counters; each bit of 'x' controls one
+                5x = control up to 2 watchdogged outputs (kickers); bits D0-D1 control each one
+                6x = watchdog reset
+                7x..ff = advance pointer
         */
-		//mame_printf_debug("parallel_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
+
+		logerror("%08X:", activecpu_get_pc());
+
+		parallel_latched = (readinputport(parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
+//      parallel_pointer++;
+//      logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
+		switch (data & 0xfc)
+		{
+			case 0x18:
+				parallel_pointer = data & 3;
+				logerror("[%02X] Reset pointer to %d\n", data, parallel_pointer);
+				break;
+
+			case 0x20:
+			case 0x24:
+			case 0x28:
+			case 0x2c:
+				logerror("[%02X] General purpose output = x%X\n", data, data & 0x0f);
+				break;
+
+			case 0x30:
+			case 0x34:
+			case 0x38:
+			case 0x3c:
+				logerror("[%02X] General purpose output = %Xx\n", data, data & 0x0f);
+				break;
+
+			case 0x40:
+			case 0x44:
+			case 0x48:
+			case 0x4c:
+				logerror("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
+				break;
+
+			case 0x50:
+			case 0x54:
+			case 0x58:
+			case 0x5c:
+				logerror("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
+				break;
+
+			case 0x60:
+			case 0x64:
+			case 0x68:
+			case 0x6c:
+				logerror("[%02X] Watchdog reset\n", data);
+				break;
+
+			default:
+				if (data >= 0x70)
+				{
+					parallel_pointer++;
+					logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
+				}
+				else
+					logerror("[%02X] Unknown write\n", data);
+				break;
+		}
 	}
 }
 
-static UINT32 cx5510_regs[256/4];
 static UINT32 cx5510_pci_r(int function, int reg, UINT32 mem_mask)
 {
 //  mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
@@ -583,15 +638,6 @@ static void cx5510_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 
 /* Analog Devices AD1847 Stereo DAC */
 
-static UINT16 *dacl;
-static UINT16 *dacr;
-static int dacl_ptr = 0;
-static int dacr_ptr = 0;
-
-static void* sound_timer;
-static UINT8 ad1847_regs[16];
-static UINT32 ad1847_sample_counter = 0;
-static UINT32 ad1847_sample_rate;
 static void sound_timer_callback(int num)
 {
 	ad1847_sample_counter = 0;
@@ -604,10 +650,10 @@ static void sound_timer_callback(int num)
 	dacr_ptr = 0;
 }
 
-static const int divide_factor[] = { 3072, 1536, 896, 768, 448, 384, 512, 2560 };
-
 static void ad1847_reg_write(int reg, UINT8 data)
 {
+	static const int divide_factor[] = { 3072, 1536, 896, 768, 448, 384, 512, 2560 };
+
 	switch (reg)
 	{
 		case 8:		// Data format register
@@ -738,14 +784,58 @@ static const gfx_decode CGA_gfxdecodeinfo[] =
 
 INPUT_PORTS_START(mediagx)
 	PORT_START
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
+	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_START3 )
+	PORT_BIT( 0x800, IP_ACTIVE_HIGH, IPT_START4 )
 
 	PORT_START
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 
 	PORT_START
-	PORT_BIT( 0xa8, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+
+	PORT_START
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON7 )
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON8 )
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON9 )
+
+	PORT_START
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+
+	PORT_START
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
+
+	PORT_START
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+
+	PORT_START
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+
+	PORT_START
+	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
 INPUT_PORTS_END
 
 static int irq_callback(int irqline)

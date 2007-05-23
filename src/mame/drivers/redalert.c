@@ -407,7 +407,7 @@ static const pia6821_interface pia_0_intf =
 
 MACHINE_START( demoneye )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia_0_intf);
+	pia_config(0, &pia_0_intf);
 	return 0;
 }
 

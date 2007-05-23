@@ -1,162 +1,190 @@
 /*****************************************************************************
 
-  74123 monoflop emulator - there are 2 monoflops per chips
+    74123 monoflop emulator - see 74123.h for pin out and truth table
 
-  74123 pins and assigned interface variables/functions
-
-    TTL74123_trigger_comp_w [ 1] /1TR          VCC [16]
-    TTL74123_trigger_w      [ 2]  1TR       1RCext [15]
-    TTL74123_reset_comp_w   [ 3] /1RST       1Cext [14]
-    TTL74123_output_comp_r  [ 4] /1Q            1Q [13] TTL74123_output_r
-    TTL74123_output_r       [ 5]  2Q           /2Q [12] TTL74123_output_comp_r
-                            [ 6]  2Cext      /2RST [11] TTL74123_reset_comp_w
-                            [ 7]  2RCext       2TR [10] TTL74123_trigger_w
-                            [ 8]  GND         /2TR [9]  TTL74123_trigger_comp_w
-
-    All resistor values in Ohms.
-    All capacitor values in Farads.
-
-    Truth table:
-    R   A   B | Q  /Q
-    ----------|-------
-    L   X   X | L   H
-    X   H   X | L   H
-    X   X   L | L   H
-    H   L  _- |_-_ -_-
-    H  -_   H |_-_ -_-
-    _-  L   H |_-_ -_-
-    ------------------
-    A   = trigger_comp
-    B   = trigger
-    R   = reset_comp
-    L   = lo (0)
-    H   = hi (1)
-    X   = any state
-    _-  = raising edge
-    -_  = falling edge
-    _-_ = positive pulse
-    -_- = negative pulse
+    Formulas came from the TI datasheet revised on March 1998
 
  *****************************************************************************/
 
 #include "driver.h"
 #include "machine/74123.h"
+#include "rescap.h"
 
-struct TTL74123 {
-	const struct TTL74123_interface *intf;
-	int trigger;			/* pin 2/10 */
-	int trigger_comp;		/* pin 1/9 */
-	int reset_comp;			/* pin 3/11 */
-	int output;				/* pin 13/5 */
-	void *timer;
-	int timer_active;
+
+#define	LOG		(0)
+
+
+typedef struct _TTL74123_state TTL74123_state;
+
+struct _TTL74123_state
+{
+	const TTL74123_interface *intf;
+	int which;
+
+	UINT8 A;			/* pin 1/9 */
+	UINT8 B;			/* pin 2/10 */
+	UINT8 clear;		/* pin 3/11 */
+	mame_timer *timer;
 };
 
-static struct TTL74123 chip[MAX_TTL74123];
+static TTL74123_state chips[MAX_TTL74123];
 
 
-static void set_output(int which, int data)
+static mame_time compute_duration(TTL74123_state *chip)
 {
-	chip[which].output = data;
-	chip[which].intf->output_changed_cb();
-}
+	double duration;
 
+	switch (chip->intf->connection_type)
+	{
+	case TTL74123_NOT_GROUNDED_NO_DIODE:
+		duration = 0.28 * chip->intf->res * chip->intf->cap * (1.0 + (0.7 / chip->intf->res));
+		break;
 
-static void clear_callback(int which)
-{
-	struct TTL74123 *c = chip + which;
+	case TTL74123_NOT_GROUNDED_DIODE:
+		duration = 0.25 * chip->intf->res * chip->intf->cap * (1.0 + (0.7 / chip->intf->res));
+		break;
 
-    c->timer_active = 0;
-	set_output(which, 0);
-}
-
-
-void TTL74123_config(int which, const struct TTL74123_interface *intf)
-{
-	if (which >= MAX_TTL74123) return;
-
-	chip[which].intf = intf;
-
-	/* all inputs are open first */
-    chip[which].trigger = 1;
-	chip[which].trigger_comp = 1;
-	chip[which].reset_comp = 1;
-	chip[which].timer = timer_alloc(clear_callback);
-	set_output(which, 1);
-}
-
-
-void TTL74123_unconfig(void)
-{
-	memset(&chip, 0, sizeof(chip));
-}
-
-
-#define CHECK_TRIGGER(COND) 													\
-	{																			\
-		if (COND)																\
-		{																		\
-			double duration = TIME_IN_SEC(0.68 * c->intf->res * c->intf->cap);	\
-			if (!c->timer_active) set_output(which, 1);							\
-			timer_adjust(c->timer, duration, which, 0);							\
-			c->timer_active = 1;												\
-		}																		\
+	case TTL74123_GROUNDED:
+	default:
+		if (chip->intf->cap < CAP_U(0.1))
+			/* this is really a curve - a very flat one in the 0.1uF-.01uF range */
+			duration = 0.32 * chip->intf->res * chip->intf->cap;
+		else
+			duration = 0.33 * chip->intf->res * chip->intf->cap;
+		break;
 	}
 
-#define RESET																	\
-	if (c->timer_active)														\
-		timer_adjust(c->timer, TIME_NOW, which, 0);								\
+	return double_to_mame_time(TIME_IN_SEC(duration));
+}
 
 
-void TTL74123_trigger_w(int which, int data)
+static int timer_running(TTL74123_state *chip)
 {
-	struct TTL74123 *c = chip + which;
+	return (compare_mame_times(mame_timer_timeleft(chip->timer), time_zero) > 0) &&
+		   (compare_mame_times(mame_timer_timeleft(chip->timer), time_never) != 0);
+}
 
-	/* trigger_comp=lo and rising edge on trigger (while reset_comp is hi) */
-	if (data)
-		CHECK_TRIGGER(!c->trigger_comp && !c->trigger && c->reset_comp)
+
+static void set_output(TTL74123_state *chip)
+{
+	int output = timer_running(chip);
+
+	chip->intf->output_changed_cb(output);
+
+	if (LOG) logerror("74123 #%d:  Output: %d\n", chip->which, output);
+}
+
+
+static void clear_callback(void *param)
+{
+	TTL74123_state *chip = (TTL74123_state *)param;
+
+	set_output(chip);
+}
+
+
+void TTL74123_config(int which, const TTL74123_interface *intf)
+{
+	TTL74123_state *chip;
+
+	assert_always(which < MAX_TTL74123, "Exceeded maximum number of 74123 chips");
+	assert_always(intf, "No interface specified");
+	assert_always((intf->connection_type == TTL74123_GROUNDED) && (intf->cap >= CAP_U(0.01)), "Only capacitors >= 0.01uF supported for GROUNDED type");
+	assert_always(intf->cap >= CAP_P(1000), "Only capacitors >= 1000pF supported ");
+
+	chip = &chips[which];
+
+	chip->intf = intf;
+	chip->which = which;
+	chip->timer = mame_timer_alloc_ptr(clear_callback, chip);
+
+	/* start with the defaults */
+	chip->A = intf->A;
+    chip->B = intf->B;
+	chip->clear = intf->clear;
+
+	/* register for state saving */
+	state_save_register_item("TTL74123", which, chip->A);
+	state_save_register_item("TTL74123", which, chip->B);
+	state_save_register_item("TTL74123", which, chip->clear);
+}
+
+
+void TTL74123_reset(int which)
+{
+	TTL74123_state *chip = &chips[which];
+
+	set_output(chip);
+}
+
+
+static void start_pulse(TTL74123_state *chip)
+{
+	mame_time duration = compute_duration(chip);
+
+	if (timer_running(chip))
+	{
+		/* retriggering, but not if we are called to quickly */
+		mame_time delay_time = double_to_mame_time(TIME_IN_NSEC(0.22 * (chip->intf->cap / 1e-12)));
+
+		if (compare_mame_times(mame_timer_timeelapsed(chip->timer), delay_time) >= 0)
+		{
+			mame_timer_adjust_ptr(chip->timer, duration, time_never);
+
+			if (LOG) logerror("74123 #%d:  Retriggering pulse.  Duration: %f\n", chip->which, mame_time_to_double(duration));
+		}
+		else
+		{
+			if (LOG) logerror("74123 #%d:  Retriggering failed.\n", chip->which);
+		}
+	}
 	else
-		RESET
+	{
+		/* starting */
+		mame_timer_adjust_ptr(chip->timer, duration, time_never);
 
-	c->trigger = data;
+		set_output(chip);
+
+		if (LOG) logerror("74123 #%d:  Starting pulse.  Duration: %f\n", chip->which, mame_time_to_double(duration));
+	}
 }
 
 
-void TTL74123_trigger_comp_w(int which, int data)
+void TTL74123_A_w(int which, int data)
 {
-	struct TTL74123 *c = chip + which;
+	TTL74123_state *chip = &chips[which];
 
-	/* trigger=hi and falling edge on trigger_comp (while reset_comp is hi) */
-	if (!data)
-		CHECK_TRIGGER(c->trigger && c->trigger_comp && c->reset_comp)
-	else
-		RESET
+	/* start/regtrigger pulse if B=HI and falling edge on A (while clear is HI) */
+	if (!data && chip->A && chip->B && chip->clear)
+		start_pulse(chip);
 
-	c->trigger_comp = data;
+	chip->A = data;
 }
 
 
-void TTL74123_reset_comp_w(int which, int data)
+void TTL74123_B_w(int which, int data)
 {
-	struct TTL74123 *c = chip + which;
+	TTL74123_state *chip = &chips[which];
 
-	/* trigger=hi, trigger_comp=lo and rising edge on reset_comp */
-	if (data)
-    	CHECK_TRIGGER(c->trigger && !c->trigger_comp && !c->reset_comp)
-	else
-		RESET
+	/* start/regtrigger pulse if A=LO and rising edge on B (while clear is HI) */
+	if (data && !chip->B && !chip->A && chip->clear)
+		start_pulse(chip);
 
-	c->reset_comp = data;
+	chip->B = data;
 }
 
 
-int TTL74123_output_r(int which)
+void TTL74123_clear_w(int which, int data)
 {
-	return chip[which].output;
-}
+	TTL74123_state *chip = &chips[which];
 
+	/* clear the output if A=LO, B=HI and falling edge on clear */
+	if (!data && chip->clear && chip->B && !chip->A && !chip->clear)
+	{
+		mame_timer_adjust_ptr(chip->timer, time_zero, time_never);
 
-int TTL74123_output_comp_r(int which)
-{
-	return !chip[which].output;
+		if (LOG) logerror("74123 #%d:  Cleared\n", which);
+	}
+
+	chip->clear = data;
 }

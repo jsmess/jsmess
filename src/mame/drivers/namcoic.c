@@ -1173,7 +1173,9 @@ DrawRozHelper(
 	const struct RozParam *rozInfo )
 {
 
-	if( bitmap->bpp == 16 )
+	if( (bitmap->bpp == 16) &&
+	    (namcos2_gametype != NAMCOFL_SPEED_RACER) &&
+	    (namcos2_gametype != NAMCOFL_FINAL_LAP_R))
 	{
 		UINT32 size_mask = rozInfo->size-1;
 		mame_bitmap *srcbitmap = tilemap_get_pixmap( tmap );

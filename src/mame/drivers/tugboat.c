@@ -172,8 +172,8 @@ static void interrupt_gen(int scanline)
 
 MACHINE_START( tugboat )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
 	return 0;
 }
 

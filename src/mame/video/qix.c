@@ -27,8 +27,27 @@ static UINT8 leds;
 static mame_timer *scanline_timer;
 
 
-/* Prototypes */
+
+/*************************************
+ *
+ *  Static function prototypes
+ *
+ *************************************/
+
 static void scanline_callback(int scanline);
+
+static void *qix_begin_update(running_machine *machine,
+							  int screen,
+							  mame_bitmap *bitmap,
+							  const rectangle *cliprect);
+
+static void qix_update_row(mame_bitmap *bitmap,
+						   const rectangle *cliprect,
+						   UINT16 ma,
+						   UINT8 ra,
+						   UINT16 y,
+						   UINT8 x_count,
+						   void *param);
 
 
 
@@ -38,8 +57,23 @@ static void scanline_callback(int scanline);
  *
  *************************************/
 
+static const crtc6845_interface crtc6845_intf =
+{
+	0,						/* screen we are acting on */
+	QIX_CHARACTER_CLOCK, 	/* the clock (pin 21) of the chip */
+	8,						/* number of pixels per video memory address */
+	qix_begin_update,		/* before pixel update callback */
+	qix_update_row,			/* row update callback */
+	0,						/* after pixel update callback */
+	0						/* call back for display state changes */
+};
+
+
 VIDEO_START( qix )
 {
+	/* configure the CRT controller */
+	crtc6845_config(0, &crtc6845_intf);
+
 	/* allocate memory for the full video RAM */
 	videoram = auto_malloc(256 * 256);
 
@@ -51,7 +85,6 @@ VIDEO_START( qix )
 	mame_timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, time_zero);
 
 	/* set up save states */
-	crtc6845_init();
 	state_save_register_global_pointer(videoram, 256 * 256);
 	state_save_register_global(qix_cocktail_flip);
 	state_save_register_global(vram_mask);
@@ -91,65 +124,11 @@ static void scanline_callback(int scanline)
 
 READ8_HANDLER( qix_scanline_r )
 {
-	/*
-        This doesn't actually latch the scanline; rather, it latches the upper bits
-        of the address output by the 6845CRTC; this is based on the starting address
-        loaded into the CRTC registers plus the scanline. Furthermore, the transparent
-        latch holding the address is latched when the display is disabled; this means
-        that during blanking periods it continues to hold the last address output
-    */
-	int startaddr = (crtc6845.start_addr & 0x3ff) >> 2;
-	int scanline = video_screen_get_vpos(0);
-	scanline = MIN(scanline, Machine->screen[0].visarea.max_y);
-	return (scanline + startaddr) & 0xff;
-}
+	UINT16 ma = crtc6845_get_ma(0);
+	UINT8 ra = crtc6845_get_ra(0);
 
-
-
-/*************************************
- *
- *  Video controller read/write
- *
- *************************************/
-
-READ8_HANDLER( qix_videocontrol_r )
-{
-	return crtc6845_register_r(offset);
-}
-
-
-WRITE8_HANDLER( qix_videocontrol_w )
-{
-	/* even offsets write to the address register */
-	if (offset == 0)
-		crtc6845_address_w(offset, data);
-
-	/* odd offsets write to the register itself */
-	else
-	{
-		int vtotal, vvisible, vfrac, scans_per_char;
-		int htotal, hvisible;
-		rectangle visarea;
-
-		crtc6845_register_w(offset, data);
-
-		/* grab the screen parameters */
-		htotal = crtc6845.horiz_total + 1;
-		hvisible = crtc6845.horiz_disp;
-		scans_per_char = crtc6845.max_ras_addr + 1;
-		vtotal = crtc6845.vert_total + 1;
-		vfrac = crtc6845.vert_total_adj;
-		vvisible = crtc6845.vert_disp;
-
-		/* determine the visible area */
-		visarea.min_x = visarea.min_y = 0;
-		visarea.max_x = hvisible * 8 - 1;
-		visarea.max_y = vvisible * 8 - 1;
-
-		/* update the screen if we have valid data */
-		if (htotal > 1 && visarea.max_x < htotal * 8 && vtotal > 1 && visarea.max_y < vtotal * scans_per_char + vfrac)
-			video_screen_configure(0, htotal * 8, vtotal * scans_per_char + vfrac, &visarea, HZ_TO_SUBSECONDS(QIX_CHARACTER_CLOCK) * htotal * (vtotal * scans_per_char + vfrac));
-	}
+	/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
+	return ((ma >> 2) & 0xf8) | (ra & 0x07);
 }
 
 
@@ -305,42 +284,38 @@ WRITE8_HANDLER( qix_palettebank_w )
 
 /*************************************
  *
- *  Core video refresh
+ *  CRTC callbacks for updating
+ *  the screen
  *
  *************************************/
 
-VIDEO_UPDATE( qix )
+static void *qix_begin_update(running_machine *machine, int screen,
+							  mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	int startaddr = (crtc6845.start_addr & 0x3ff) << 6;
-	pen_t *pens = &machine->pens[qix_palettebank * 256];
-	UINT8 scanline[256];
-	int offset;
-	int x,y;
-
-	/* draw the bitmap */
-	if (qix_cocktail_flip)
-	{
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		{
-			offset = startaddr + (y ^ 0xff) * 256;
-			for (x = 0;x < 256;x++)
-				scanline[x] = videoram[(offset + (x ^ 0xff)) & 0xffff];
-			draw_scanline8(bitmap, 0, y, 256, scanline, pens, -1);
-		}
-	}
-	else
-	{
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		{
-			offset = startaddr + y * 256;
-			for (x = 0;x < 256;x++)
-				scanline[x] = videoram[(offset + x) & 0xffff];
-			draw_scanline8(bitmap, 0, y, 256, scanline, pens, -1);
-		}
-	}
 #if 0
 	// note the confusing bit order!
 	popmessage("self test leds: %d%d %d%d%d%d",BIT(leds,7),BIT(leds,5),BIT(leds,6),BIT(leds,4),BIT(leds,2),BIT(leds,3));
 #endif
-	return 0;
+
+	/* return the pens we are going to use to update the display */
+	return &machine->pens[qix_palettebank * 256];
+}
+
+
+static void qix_update_row(mame_bitmap *bitmap, const rectangle *cliprect,
+						   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
+{
+	UINT16 x;
+	UINT8 scanline[256];
+
+	pen_t *pens = (pen_t *)param;
+
+	/* the memory is hooked up to the MA, RA lines this way */
+	offs_t offs = ((ma << 6) & 0xf800) | ((ra << 8) & 0x0700);
+	offs_t offs_xor = qix_cocktail_flip ? 0xffff : 0;
+
+	for (x = 0; x < x_count * 8; x++)
+		scanline[x] = videoram[(offs + x) ^ offs_xor];
+
+	draw_scanline8(bitmap, 0, y, x_count * 8, scanline, pens, -1);
 }

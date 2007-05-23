@@ -62,6 +62,8 @@ struct _screen_config
 	const char *	tag;						/* nametag for the screen */
 	UINT32			palette_base;				/* base palette entry for this screen */
 	screen_state	defstate;					/* default state */
+	float			xoffset, yoffset;			/* default X/Y offsets */
+	float			xscale, yscale;				/* default X/Y scale factor */
 };
 
 

@@ -1078,8 +1078,8 @@ ROM_END
 
 static DRIVER_INIT( pmpoker )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia0_intf);
-	pia_config(1, PIA_STANDARD_ORDERING, &pia1_intf);
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
 }
 
 

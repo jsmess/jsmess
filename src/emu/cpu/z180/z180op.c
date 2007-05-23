@@ -507,7 +507,7 @@ static void take_interrupt(int irq)
 		}
 		else
 		{
-			irq_vector = (Z180.io[Z180_IL] & Z180_IL_IL) + (irq - Z180_INT1) * 2;
+			irq_vector = (IO(Z180_IL) & Z180_IL_IL) + (irq - Z180_INT1) * 2;
 			irq_vector = (_I << 8) + (irq_vector & 0xff);
 			PUSH( PC );
 			RM16( irq_vector, &Z180.PC );

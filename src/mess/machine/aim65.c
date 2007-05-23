@@ -227,7 +227,7 @@ static struct via6522_interface via0={
 
 DRIVER_INIT( aim65 )
 {
-	pia_config(0, PIA_STANDARD_ORDERING, &pia);
+	pia_config(0, &pia);
 	riot_init(0, &riot);
 	via_config(0,&via0);
 	via_reset();

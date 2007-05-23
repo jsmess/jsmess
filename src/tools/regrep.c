@@ -45,6 +45,7 @@ enum
 	BUCKET_CONSISTENT_ERROR,
 	BUCKET_GOOD,
 	BUCKET_GOOD_BUT_CHANGED,
+	BUCKET_GOOD_BUT_CHANGED_SCREENSHOTS,
 	BUCKET_COUNT
 };
 
@@ -58,10 +59,10 @@ typedef struct _summary_file summary_file;
 struct _summary_file
 {
     summary_file *  next;
-    int				basebitmap;
     char            name[10];
     char            source[100];
     UINT8           status[MAX_COMPARES];
+    UINT8			matchbitmap[MAX_COMPARES];
     char *          text[MAX_COMPARES];
     UINT32          textsize[MAX_COMPARES];
     UINT32          textalloc[MAX_COMPARES];
@@ -96,7 +97,8 @@ static const char *bucket_name[] =
 	"Games With Multiple Errors",
 	"Games With Consistent Errors",
 	"Games That Are Consistently Good",
-	"Games That Regressed But Improved"
+	"Games That Regressed But Improved",
+	"Games With Changed Screenshots",
 };
 
 static const int bucket_output_order[] =
@@ -104,6 +106,7 @@ static const int bucket_output_order[] =
 	BUCKET_REGRESSED,
 	BUCKET_IMPROVED,
 	BUCKET_CHANGED,
+	BUCKET_GOOD_BUT_CHANGED_SCREENSHOTS,
 	BUCKET_GOOD_BUT_CHANGED,
 	BUCKET_MULTI_ERROR,
 	BUCKET_CONSISTENT_ERROR
@@ -155,8 +158,8 @@ static int copy_file(const char *srcdir, const char *srcname, const char *dstdir
 /* report generators */
 static void output_report(const char *dirname, summary_file *filelist);
 static int compare_screenshots(summary_file *curfile);
-static int generate_png_diff(const char *srcdir1, const char *srcdir2, const char *srcname, const char *destdir, const char *destname);
-static void create_linked_file(const char *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile);
+static int generate_png_diff(const summary_file *curfile, const char *destdir, const char *destname);
+static void create_linked_file(const char *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile, const char *pngfile);
 static void append_driver_list_table(const char *header, const char *dirname, FILE *indexfile, const summary_file *listhead);
 
 
@@ -203,6 +206,27 @@ INLINE char *trim_string(char *string)
 		string[--length] = 0;
 
 	return string;
+}
+
+
+/*-------------------------------------------------
+    get_unique_index - get the unique bitmap
+    index for a given entry
+-------------------------------------------------*/
+
+INLINE int get_unique_index(const summary_file *curfile, int index)
+{
+	int listnum, curindex = 0;
+
+	/* if we're invalid, just return that */
+	if (curfile->matchbitmap[index] == 0xff)
+		return -1;
+
+	/* count unique elements up to us */
+	for (listnum = 0; listnum < curfile->matchbitmap[index]; listnum++)
+		if (curfile->matchbitmap[listnum] == listnum)
+			curindex++;
+	return curindex;
 }
 
 
@@ -686,6 +710,7 @@ static void output_report(const char *dirname, summary_file *filelist)
 	const char *indexname;
 	int listnum, bucknum;
 	FILE *indexfile;
+	int count = 0, total;
 
 	/* initialize the lists */
 	for (bucknum = 0; bucknum < BUCKET_COUNT; bucknum++)
@@ -694,6 +719,11 @@ static void output_report(const char *dirname, summary_file *filelist)
 		buckettailptr[bucknum] = &buckethead[bucknum];
 	}
 
+	/* compute the total number of files */
+	total = 0;
+	for (curfile = filelist; curfile != NULL; curfile = curfile->next)
+		total++;
+
 	/* first bucketize the games */
 	for (curfile = filelist; curfile != NULL; curfile = curfile->next)
 	{
@@ -701,6 +731,10 @@ static void output_report(const char *dirname, summary_file *filelist)
 		int bucket = BUCKET_UNKNOWN;
 		int unique_codes = 0;
 		int first_valid;
+
+		/* print status */
+		if (++count % 100 == 0)
+			fprintf(stderr, "Processing file %d/%d\n", count, total);
 
 		/* find the first valid entry */
 		for (first_valid = 0; curfile->status[first_valid] == STATUS_NOT_PRESENT; first_valid++) ;
@@ -715,15 +749,7 @@ static void output_report(const char *dirname, summary_file *filelist)
 		{
 			/* were we consistently ok? */
 			if (curfile->status[first_valid] == STATUS_SUCCESS)
-			{
-				int result = compare_screenshots(curfile);
-				if (result == 2)
-					bucket = BUCKET_CHANGED;
-				else if (result == 1)
-					bucket = BUCKET_GOOD_BUT_CHANGED;
-				else
-					bucket = BUCKET_GOOD;
-			}
+				bucket = compare_screenshots(curfile);
 
 			/* must have been consistently erroring */
 			else
@@ -775,7 +801,10 @@ static void output_report(const char *dirname, summary_file *filelist)
 		int curbucket = bucket_output_order[bucknum];
 
 		if (buckethead[curbucket] != NULL)
+		{
+			fprintf(stderr, "Outputting bucket: %s\n", bucket_name[curbucket]);
 			append_driver_list_table(bucket_name[curbucket], dirname, indexfile, buckethead[curbucket]);
+		}
 	}
 
 	/* output footer */
@@ -790,13 +819,15 @@ static void output_report(const char *dirname, summary_file *filelist)
 
 static int compare_screenshots(summary_file *curfile)
 {
-	bitmap_t *base_bitmap = NULL;
-	int last_diff = FALSE;
-	int any_diff = FALSE;
+	bitmap_t *bitmaps[MAX_COMPARES];
+	int unique[MAX_COMPARES];
+	int numunique = 0;
 	int listnum;
 
-	/* iterate over all files */
+	/* iterate over all files and load their bitmaps */
 	for (listnum = 0; listnum < list_count; listnum++)
+	{
+		bitmaps[listnum] = NULL;
 		if (curfile->status[listnum] == STATUS_SUCCESS)
 		{
 			file_error filerr;
@@ -827,143 +858,187 @@ static int compare_screenshots(summary_file *curfile)
 			/* if that worked, load the file */
 			if (filerr == FILERR_NONE)
 			{
-				png_error pngerr;
-				bitmap_t *bitmap;
-
-				/* extract the PNG to a bitmap */
-				pngerr = png_read_bitmap(file, &bitmap);
-				if (pngerr == FILERR_NONE)
-				{
-					/* reset the different status since we only care about the last one */
-					last_diff = FALSE;
-
-					/* if this is the first one, just stash it */
-					if (base_bitmap == NULL)
-					{
-						base_bitmap = bitmap;
-						curfile->basebitmap = listnum;
-					}
-
-					/* if the sizes are different, they are different; we can stop */
-					else if (bitmap->width != base_bitmap->width || bitmap->height != base_bitmap->height)
-						last_diff = any_diff = TRUE;
-
-					/* otherwise, compare them */
-					else
-					{
-						int x, y;
-
-						for (y = 0; y < bitmap->height && !last_diff; y++)
-						{
-							UINT32 *base = BITMAP_ADDR32(base_bitmap, y, 0);
-							UINT32 *curr = BITMAP_ADDR32(bitmap, y, 0);
-
-							/* scan the scanline */
-							for (x = 0; x < bitmap->width; x++)
-								if (*base++ != *curr++)
-									break;
-							last_diff = any_diff = (x != bitmap->width);
-						}
-					}
-
-					/* if different, adjust the status */
-					if (last_diff)
-						curfile->status[listnum] = STATUS_SUCCESS_DIFFERENT;
-
-					/* free the bitmap unless it is the base */
-					if (bitmap != base_bitmap)
-						bitmap_free(bitmap);
-				}
+				png_read_bitmap(file, &bitmaps[listnum]);
 				core_fclose(file);
 			}
 		}
+	}
 
-	/* free the base */
-	if (base_bitmap != NULL)
-		bitmap_free(base_bitmap);
+	/* now find all the different bitmap types */
+	for (listnum = 0; listnum < list_count; listnum++)
+	{
+		curfile->matchbitmap[listnum] = 0xff;
+		if (bitmaps[listnum] != NULL)
+		{
+			bitmap_t *this_bitmap = bitmaps[listnum];
+			int compnum;
 
-	/* return whether or not we are different */
-	return last_diff ? 2 : any_diff ? 1 : 0;
+			/* compare against all unique bitmaps */
+			for (compnum = 0; compnum < numunique; compnum++)
+			{
+				bitmap_t *base_bitmap = bitmaps[unique[compnum]];
+				int bitmaps_differ;
+				int x, y;
+
+				/* if the sizes are different, we differ; otherwise start off assuming we are the same */
+				bitmaps_differ = (this_bitmap->width != base_bitmap->width || this_bitmap->height != base_bitmap->height);
+
+				/* compare scanline by scanline */
+				for (y = 0; y < this_bitmap->height && !bitmaps_differ; y++)
+				{
+					UINT32 *base = BITMAP_ADDR32(base_bitmap, y, 0);
+					UINT32 *curr = BITMAP_ADDR32(this_bitmap, y, 0);
+
+					/* scan the scanline */
+					for (x = 0; x < this_bitmap->width; x++)
+						if (*base++ != *curr++)
+							break;
+					bitmaps_differ = (x != this_bitmap->width);
+				}
+
+				/* if we matched, remember which listnum index we matched, and stop */
+				if (!bitmaps_differ)
+				{
+					curfile->matchbitmap[listnum] = unique[compnum];
+					break;
+				}
+
+				/* if different from the first unique entry, adjust the status */
+				if (bitmaps_differ && compnum == 0)
+					curfile->status[listnum] = STATUS_SUCCESS_DIFFERENT;
+			}
+
+			/* if we're unique, add ourselves to the list */
+			if (compnum >= numunique)
+			{
+				unique[numunique++] = listnum;
+				curfile->matchbitmap[listnum] = listnum;
+				continue;
+			}
+		}
+	}
+
+	/* free the bitmaps */
+	for (listnum = 0; listnum < list_count; listnum++)
+		if (bitmaps[listnum] != NULL)
+			bitmap_free(bitmaps[listnum]);
+
+	/* if all screenshots matched, we're good */
+	if (numunique == 1)
+		return BUCKET_GOOD;
+
+	/* if the last screenshot matched the first unique one, we're good but changed */
+	if (curfile->matchbitmap[listnum - 1] == unique[0])
+		return BUCKET_GOOD_BUT_CHANGED_SCREENSHOTS;
+
+	/* otherwise we're just changed */
+	return BUCKET_CHANGED;
 }
 
 
 /*-------------------------------------------------
     generate_png_diff - create a new PNG file
-    that shows two differing PNGs side by side
-    with a third set of differences
+    that shows multiple differing PNGs side by
+    side with a third set of differences
 -------------------------------------------------*/
 
-static int generate_png_diff(const char *srcdir1, const char *srcdir2, const char *srcname, const char *destdir, const char *destname)
+static int generate_png_diff(const summary_file *curfile, const char *destdir, const char *destname)
 {
-	const char *src1filename = alloc_filename(srcdir1, srcname);
-	const char *src2filename = alloc_filename(srcdir2, srcname);
 	const char *dstfilename = alloc_filename(destdir, destname);
-	bitmap_t *bitmap1 = NULL, *bitmap2 = NULL, *finalbitmap = NULL;
+	bitmap_t *bitmaps[MAX_COMPARES] = { NULL };
+	bitmap_t *finalbitmap = NULL;
 	int width, height, maxwidth;
-	file_error filerr;
+	int bitmapcount = 0;
+	int listnum, bmnum;
 	core_file *file = NULL;
+	char srcimgname[50];
+	file_error filerr;
 	png_error pngerr;
 	int error = -1;
-	int x, y, diffs;
+	int starty;
 
-	/* open and load source 1 */
-	filerr = core_fopen(src1filename, OPEN_FLAG_READ, &file);
-	if (filerr != FILERR_NONE)
-		goto error;
-	pngerr = png_read_bitmap(file, &bitmap1);
-	core_fclose(file);
-	if (pngerr != FILERR_NONE)
-		goto error;
+	/* generate the common source filename */
+	sprintf(srcimgname, "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
 
-	/* open and load source 2 */
-	filerr = core_fopen(src2filename, OPEN_FLAG_READ, &file);
-	if (filerr != FILERR_NONE)
-		goto error;
-	pngerr = png_read_bitmap(file, &bitmap2);
-	core_fclose(file);
-	if (pngerr != FILERR_NONE)
+	/* open and load all unique bitmaps */
+	for (listnum = 0; listnum < list_count; listnum++)
+		if (curfile->matchbitmap[listnum] == listnum)
+		{
+			const char *filename = alloc_filename(lists[listnum].dir, srcimgname);
+
+			/* open the source image */
+			filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
+			free((void *)filename);
+			if (filerr != FILERR_NONE)
+				goto error;
+
+			/* load the source image */
+			pngerr = png_read_bitmap(file, &bitmaps[bitmapcount++]);
+			core_fclose(file);
+			if (pngerr != FILERR_NONE)
+				goto error;
+		}
+
+	/* if there's only one unique bitmap, skip it */
+	if (bitmapcount <= 1)
 		goto error;
 
 	/* determine the size of the final bitmap */
-	maxwidth = MAX(bitmap1->width, bitmap2->width);
-	width = bitmap1->width + BITMAP_SPACE + bitmap2->width + BITMAP_SPACE + maxwidth;
-	height = MAX(bitmap1->height, bitmap2->height);
+	height = width = 0;
+	maxwidth = bitmaps[0]->width;
+	for (bmnum = 1; bmnum < bitmapcount; bmnum++)
+	{
+		int curwidth;
+
+		/* determine the maximal width */
+		maxwidth = MAX(maxwidth, bitmaps[bmnum]->width);
+		curwidth = bitmaps[0]->width + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
+		width = MAX(width, curwidth);
+
+		/* add to the height */
+		height += MAX(bitmaps[0]->height, bitmaps[bmnum]->height);
+		if (bmnum != 1)
+			height += BITMAP_SPACE;
+	}
+
+	/* allocate the final bitmap */
 	finalbitmap = bitmap_alloc(width, height, BITMAP_FORMAT_ARGB32);
 	if (finalbitmap == NULL)
 		goto error;
 
-	/* now copy and compare the two bitmaps */
-	diffs = 0;
-	for (y = 0; y < height; y++)
+	/* now copy and compare each set of bitmaps */
+	starty = 0;
+	for (bmnum = 1; bmnum < bitmapcount; bmnum++)
 	{
-		UINT32 *src1 = (y < bitmap1->height) ? BITMAP_ADDR32(bitmap1, y, 0) : NULL;
-		UINT32 *src2 = (y < bitmap2->height) ? BITMAP_ADDR32(bitmap2, y, 0) : NULL;
-		UINT32 *dst1 = BITMAP_ADDR32(finalbitmap, y, 0);
-		UINT32 *dst2 = BITMAP_ADDR32(finalbitmap, y, bitmap1->width + BITMAP_SPACE);
-		UINT32 *dstdiff = BITMAP_ADDR32(finalbitmap, y, bitmap1->width + BITMAP_SPACE + bitmap2->width + BITMAP_SPACE);
+		bitmap_t *bitmap1 = bitmaps[0];
+		bitmap_t *bitmap2 = bitmaps[bmnum];
+		int curheight = MAX(bitmap1->height, bitmap2->height);
+		int x, y;
 
-		/* now iterate over columns */
-		for (x = 0; x < maxwidth; x++)
+		/* iterate over rows in these bitmaps */
+		for (y = 0; y < curheight; y++)
 		{
-			int pix1 = -1, pix2 = -2;
+			UINT32 *src1 = (y < bitmap1->height) ? BITMAP_ADDR32(bitmap1, y, 0) : NULL;
+			UINT32 *src2 = (y < bitmap2->height) ? BITMAP_ADDR32(bitmap2, y, 0) : NULL;
+			UINT32 *dst1 = BITMAP_ADDR32(finalbitmap, starty + y, 0);
+			UINT32 *dst2 = BITMAP_ADDR32(finalbitmap, starty + y, bitmap1->width + BITMAP_SPACE);
+			UINT32 *dstdiff = BITMAP_ADDR32(finalbitmap, starty + y, bitmap1->width + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
 
-			if (src1 != NULL && x < bitmap1->width)
-				pix1 = dst1[x] = src1[x];
-			if (src2 != NULL && x < bitmap2->width)
-				pix2 = dst2[x] = src2[x];
-			if (pix1 != pix2)
+			/* now iterate over columns */
+			for (x = 0; x < maxwidth; x++)
 			{
-				dstdiff[x] = 0xffffffff;
-				diffs++;
+				int pix1 = -1, pix2 = -2;
+
+				if (src1 != NULL && x < bitmap1->width)
+					pix1 = dst1[x] = src1[x];
+				if (src2 != NULL && x < bitmap2->width)
+					pix2 = dst2[x] = src2[x];
+				dstdiff[x] = (pix1 != pix2) ? 0xffffffff : 0xff000000;
 			}
-			else
-				dstdiff[x] = 0xff000000;
 		}
-	}
-	if (diffs == 0)
-	{
-		error = 1;
-		goto error;
+
+		/* update the starting Y position */
+		starty += BITMAP_SPACE + MAX(bitmap1->height, bitmap2->height);
 	}
 
 	/* write the final PNG */
@@ -979,12 +1054,13 @@ static int generate_png_diff(const char *srcdir1, const char *srcdir2, const cha
 	error = 0;
 
 error:
+	if (dstfilename != NULL)
+		free((void *)dstfilename);
 	if (finalbitmap != NULL)
 		bitmap_free(finalbitmap);
-	if (bitmap2 != NULL)
-		bitmap_free(bitmap2);
-	if (bitmap1 != NULL)
-		bitmap_free(bitmap1);
+	for (bmnum = 0; bmnum < bitmapcount; bmnum++)
+		if (bitmaps[bmnum] != NULL)
+			bitmap_free(bitmaps[bmnum]);
 	if (error)
 		osd_rmfile(dstfilename);
 	return error;
@@ -996,13 +1072,13 @@ error:
     file between differing versions
 -------------------------------------------------*/
 
-static void create_linked_file(const char *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile)
+static void create_linked_file(const char *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile, const char *pngfile)
 {
 	const char *linkname;
 	char filename[100];
 	char title[100];
 	FILE *linkfile;
-	int i;
+	int listnum;
 
 	/* create the filename */
 	sprintf(filename, "%s.html", curfile->name);
@@ -1034,47 +1110,35 @@ static void create_linked_file(const char *dirname, const summary_file *curfile,
 	fprintf(linkfile, "\t</p>\n");
 
 	/* output data for each one */
-	for (i = 0; i < list_count; i++)
+	for (listnum = 0; listnum < list_count; listnum++)
 	{
-		char srcimgname[40], dstimgname[40];
-		int has_image = FALSE;
-
-		/* create a name for the image */
-		sprintf(srcimgname, "snap%s%s%sfinal.png", PATH_SEPARATOR, curfile->name, PATH_SEPARATOR);
-		sprintf(dstimgname, "ss_%s_%s.png", curfile->name, lists[i].version);
-
-		/* copy the file */
-		if (i > curfile->basebitmap)
-		{
-			int result = generate_png_diff(lists[curfile->basebitmap].dir, lists[i].dir, srcimgname, dirname, dstimgname);
-			has_image = (result == 0);
-			if (!has_image)
-			{
-				sprintf(srcimgname, "snap%s_%s.png", PATH_SEPARATOR, curfile->name);
-				result = generate_png_diff(lists[curfile->basebitmap].dir, lists[i].dir, srcimgname, dirname, dstimgname);
-				has_image = (result == 0);
-			}
-		}
+		int imageindex = -1;
 
 		/* generate the HTML */
-		fprintf(linkfile, "\n\t<h2>%s</h2>\n", lists[i].version);
+		fprintf(linkfile, "\n\t<h2>%s</h2>\n", lists[listnum].version);
 		fprintf(linkfile, "\t<p>\n");
-		fprintf(linkfile, "\t<b>Status:</b> %s\n", status_text[curfile->status[i]]);
+		fprintf(linkfile, "\t<b>Status:</b> %s\n", status_text[curfile->status[listnum]]);
+		if (pngfile != NULL)
+			imageindex = get_unique_index(curfile, listnum);
+		if (imageindex != -1)
+			fprintf(linkfile, " [%d]", imageindex);
 		fprintf(linkfile, "\t</p>\n");
-		if (curfile->text[i] != NULL)
+		if (curfile->text[listnum] != NULL)
 		{
 			fprintf(linkfile, "\t<p>\n");
 			fprintf(linkfile, "\t<b>Errors:</b>\n");
-			fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[i]);
+			fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum]);
 			fprintf(linkfile, "\t</p>\n");
 		}
-		if (has_image)
-		{
-			fprintf(linkfile, "\t<p>\n");
-			fprintf(linkfile, "\t<b>Screenshot:</b><br/>\n");
-			fprintf(linkfile, "\t<img src=\"%s\" />\n", dstimgname);
-			fprintf(linkfile, "\t</p>\n");
-		}
+	}
+
+	/* output link to the image */
+	if (pngfile != NULL)
+	{
+		fprintf(linkfile, "\n\t<h2>Screenshot Comparisons</h2>\n");
+		fprintf(linkfile, "\t<p>\n");
+		fprintf(linkfile, "\t<img src=\"%s\" />\n", pngfile);
+		fprintf(linkfile, "\t</p>\n");
 	}
 
 	/* output footer */
@@ -1115,7 +1179,8 @@ static void append_driver_list_table(const char *header, const char *dirname, FI
 	/* iterate over files */
 	for (prevfile = NULL, curfile = listhead; curfile != NULL; prevfile = curfile, curfile = curfile->next)
 	{
-		int rowspan = 0;
+		int rowspan = 0, uniqueshots = 0;
+		char pngdiffname[40];
 
 		/* if this is the first entry in this source file, count how many rows we need to span */
 		if (prevfile == NULL || strcmp(prevfile->source, curfile->source) != 0)
@@ -1128,17 +1193,38 @@ static void append_driver_list_table(const char *header, const char *dirname, FI
 					break;
 		}
 
+		/* create screenshots if necessary */
+		pngdiffname[0] = 0;
+		for (listnum = 0; listnum < list_count; listnum++)
+			if (curfile->matchbitmap[listnum] == listnum)
+				uniqueshots++;
+		if (uniqueshots > 1)
+		{
+			sprintf(pngdiffname, "compare_%s.png", curfile->name);
+			if (generate_png_diff(curfile, dirname, pngdiffname) != 0)
+				pngdiffname[0] = 0;
+		}
+
+		/* create a linked file */
+		create_linked_file(dirname, curfile, prevfile, curfile->next, (pngdiffname[0] == 0) ? NULL : pngdiffname);
+
 		/* create a row */
 		fprintf(indexfile, "\t\t<tr>\n\t\t\t");
 		if (rowspan > 0)
 			fprintf(indexfile, "<td rowspan=\"%d\">%s</td>", rowspan, curfile->source);
 		fprintf(indexfile, "<td><a href=\"%s.html\">%s</a></td>", curfile->name, curfile->name);
 		for (listnum = 0; listnum < list_count; listnum++)
-			fprintf(indexfile, "<td %s>%s</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]]);
-		fprintf(indexfile, "\n\t\t</tr>\n");
+		{
+			int unique_index = -1;
 
-		/* create a linked file */
-		create_linked_file(dirname, curfile, prevfile, curfile->next);
+			if (pngdiffname[0] != 0)
+				unique_index = get_unique_index(curfile, listnum);
+			if (unique_index != -1)
+				fprintf(indexfile, "<td %s>%s [<a href=\"%s\" target=\"blank\">%d</a>]</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]], pngdiffname, unique_index);
+			else
+				fprintf(indexfile, "<td %s>%s</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]]);
+		}
+		fprintf(indexfile, "\n\t\t</tr>\n");
 
 		/* also print the name and source file */
 		printf("%s %s\n", curfile->name, curfile->source);
