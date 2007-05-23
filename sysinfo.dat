@@ -211,7 +211,7 @@ of the Goldstar systems cause some games not to work.
 enables a PC to play 3DO games.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -293,7 +293,7 @@ TI additionally sold University Basic for the TM990/189.  It is a relatively sim
 Basic interpreter.  This program is emulated.
 
 
-(infos from Raphael Nabet, author of the MESS driver)
+(info from Raphael Nabet, author of the MESS driver)
 
 
 
@@ -374,7 +374,7 @@ This board was not designed by TI, but an external society (Eyring Research
 Institute).
 
 
-(infos from Raphael Nabet, author of the MESS driver)
+(info from Raphael Nabet, author of the MESS driver)
 
 
 
@@ -400,13 +400,13 @@ Features:
 ---------
 
 
-* CPU: Motorola MC68000 7.16 mHz
+* CPU: Motorola MC68000 7.16 MHz
 
 
 * Co-Processors: Denise (video), Agnus (memory manager, blitter & copper), Paula (sound and disk access)
 
 
-* RAM: 256kb, upgradable to 512k internally. Extensible to 8.5 MB with extension card (512 KB CHIP RAM + 8 MB FAST RAM) and to 10 MB
+* RAM: 256kb, upgradeable  to 512k internally. Extensible to 8.5 MB with extension card (512 KB CHIP RAM + 8 MB FAST RAM) and to 10 MB
 
 
 * ROM: 8 KB (The Kickstart isn't in ROM but loaded at the boot in RAM, where it takes 256 KB)
@@ -480,7 +480,7 @@ with its successor, the Amiga 2000) had a PAL display, enhanced video modes
 (HAM & EHB) and was built in Germany.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -763,7 +763,7 @@ TV switch and Donkey Kong and Mouse Trap carts.
 Also, some 3D games were planned for it as well. 
 
 
-(infos about 2600 versions, clones and unreleased hardware from Zube's "Atari 2600/7800 FAQ")
+(info about 2600 versions, clones and unreleased hardware from Zube's "Atari 2600/7800 FAQ")
 
 
 
@@ -834,7 +834,7 @@ $end
 # ---------
 
 
-# * CPU: ARM-2 32 bit RISC (ARM-3 in the A500 series) 4 / 8 mHz
+# * CPU: ARM-2 32 bit RISC (ARM-3 in the A500 series) 4 / 8 MHz
 
 
 # * Co-Processor: MEMC (memory), VIDC (Video and Sound), IOC (I/O)
@@ -929,7 +929,7 @@ $end
 # - A540 - 16 MB RAM, 120 MB Hard Disk
 
 
-# (infos from old-computers.com)
+# (info from old-computers.com)
 
 
 
@@ -1056,7 +1056,7 @@ Originally, the 400 was sold with 8 kb RAM, but later most 400's with 16 kb.
 The Atari 400 was known inside Atari as code name "Candy". 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -1214,7 +1214,7 @@ This computer was, and is still used a lot in the "demoscene" to create cool vid
 breaking graphics and sounds! 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -1364,7 +1364,7 @@ number of 2600 adaptor compatible consoles produced. These much harder to find 4
 by an asterisk in the serial number.
 
 
-(infos on the different hardware versions from Wikipedia)
+(info on the different hardware versions from Wikipedia)
 
 
 
@@ -1530,7 +1530,7 @@ to be.
 shell.
 
 
-(infos on 7800 models from Zube's "Atari 2600/7800 FAQ")
+(info on 7800 models from Zube's "Atari 2600/7800 FAQ")
 
 
 
@@ -1673,7 +1673,7 @@ Prior to production, the 800 was known inside Atari as code name "Colleen". It i
 Colleen and Candy (the 400 code name) were actually secretaries at Atari.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 Many peripherals were product for the 800. Among these we recall: Atari 810 floppy drive, 
@@ -1710,7 +1710,7 @@ same speed. Basically a cheaper version of the 800, it is supposed to be compati
 port (PBI), general purpose I/O port. 
 
 
-(infos from oldcomputers.net)
+(info from oldcomputers.net)
 
 
 
@@ -1794,7 +1794,7 @@ Features:
 * Graphics Modes: 78 x 75
 
 
-* Colors: Monochrom
+* Colors: Monochrome
 
 
 * Sound: 1 channel - Built-in speaker
@@ -1828,7 +1828,7 @@ Many schools in Sweden had ABC 80 or ABC 800 for the students. It was possible t
 several ABC 80 thanks to a network called ABC NET. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -1933,7 +1933,7 @@ The ABC 800 series was also sold by Facit under the DTC (DeskTop Computer) name,
 enclosure. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -1995,7 +1995,7 @@ Features:
 * Co-Processor: 6801 Master-microcomputer
 
 
-* RAM: 64 kb (25 kb available with Smart Basic), upgradable to 144 kb
+* RAM: 64 kb (25 kb available with Smart Basic), upgradeable  to 144 kb
 
 
 * VRAM: 16 kb
@@ -2045,7 +2045,7 @@ History and Trivia:
 The ADAM was available in two models, the complete system and Expansion Module #3. 
 When the memory console of Expansion Module #3 is connected to the ColecoVision, the 
 two models are essentially identical in function. The expansion module #3 uses part 
-of the Colecovision hardware, thus the memory unit doesn't have any cartridge slot, 
+of the ColecoVision hardware, thus the memory unit doesn't have any cartridge slot, 
 and isn't delivered with any controllers nor TV switch box.
 
 
@@ -2065,7 +2065,7 @@ expanders up to 2 MB in size (which is usually used as a RAM disk), and also a p
 (like a bubble jet)! 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -2125,7 +2125,7 @@ Features:
 ---------
 
 
-* CPU: Intel 8048 733Khz
+* CPU: Intel 8048 733kHz
 
 
 * RAM: 1K + 64 bytes internal to processor
@@ -2134,7 +2134,7 @@ Features:
 * ROM: 1K Cartridge ROM, 1K BIOS
 
 
-* Sound: COP411L 52.6Khz micro controller with custom sound generation software. 16 Pure Tone, 13 Sound Effects
+* Sound: COP411L 52.6 kHz micro controller with custom sound generation software. 16 Pure Tone, 13 Sound Effects
 
 
 * Graphics: 40x1 LED array and spinning mirror, 15fps
@@ -2232,7 +2232,7 @@ Features:
 ---------
 
 
-* CPU: Rockwell 6502 1Mhz
+* CPU: Rockwell 6502 1MHz
 
 
 * RAM: 4 KB (up to 32 KB of static RAM)
@@ -2296,7 +2296,7 @@ programming language.
 In 1981 Rockwell introduced an improved model with a 40 character display as the AIM-65/40.
 
 
-(infos from old-computers.com) 
+(info from old-computers.com) 
 
 
 
@@ -2639,7 +2639,7 @@ Features:
 ---------
 
 
-* CPU: Motorola 6800 3.579 Mhz
+* CPU: Motorola 6800 3.579 MHz
 
 
 * Co-Processor: Motorola MC-6847P video display generator
@@ -2796,14 +2796,14 @@ to play with graphics. For example, to clear the screen, the command was CALL 17
 
 The video game system nestled on top of the keyboard module. This computer add-on 
 concept would later be used by several game system manufacturers like Coleco with 
-their Colecovision game system connected to the Adam Computer, or Intellivision and their 
+their ColecoVision game system connected to the Adam Computer, or Intellivision and their 
 ECS module (and keyboard component).
 
 
 An additional disc interface was available.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -2861,7 +2861,7 @@ Features:
 ---------
 
 
-* CPU: Motorola 6800 (8 bit) 3.579 Mhz
+* CPU: Motorola 6800 (8 bit) 3.579 MHz
 
 
 * Co-Processor: Motorola MC-6847P video display generator
@@ -3167,7 +3167,7 @@ at the time, a major purchaser of MOS 6502 processors and Commodore owned MOS Te
 Wozniak wanted $15,000 more than Tramiel offered. Needless to say, the deal fell through. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -3505,7 +3505,7 @@ plugged into the unit. The Apple //c was mainly used as a desktop computer.
 The Apple //c was replaced with the Apple IIc+ in 1988. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 * Apple //c went under several revisions: you can discover which machine you are using issuing
@@ -3674,10 +3674,10 @@ The Apple IIc Plus unit was a direct response to the Laser 128EX/2.
 
 
 Apple retrofitted the IIc design to try to compete with Video Technology's high-speed Apple II 
-clone. The retrofitting is evident in the design of the motherboard. The motherboard runs at 1Mhz, 
-unlike the Laser 128EX/2. In order to run its programs faster, Apple used a 4Mhz 65C02 with 8k 
+clone. The retrofitting is evident in the design of the motherboard. The motherboard runs at 1MHz, 
+unlike the Laser 128EX/2. In order to run its programs faster, Apple used a 4MHz 65C02 with 8k 
 of high speed SRAM cache and licensed the accelerator design from Zip Technologies (makers of 
-the ZipChip accelerator for the IIe and IIc). They built an accelerator into a 1Mhz motherboard 
+the ZipChip accelerator for the IIe and IIc). They built an accelerator into a 1MHz motherboard 
 rather than designing a faster motherboard from scratch.
 
 
@@ -3691,7 +3691,7 @@ the apparent backward step in technology compared to the 16-bit Apple IIGS, and 
 sales of the Laser 128EX/2, the IIc Plus also was to be the most short-lived of the Apple II models. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 * Apple //c (the series of computer which Apple IIc+ belongs to) went under several revisions: you 
@@ -4069,7 +4069,7 @@ disappeared from the market in 1992.
 
 
 In one final gasp, the Apple II supporters at Apple designed the Apple IIGS Plus, code named 
-"Mark Twain".  It was rumored to have an 8 Mhz 65C816, a built in SuperDrive, 2MB on the 
+"Mark Twain".  It was rumored to have an 8 MHz 65C816, a built in SuperDrive, 2MB on the 
 motherboard, and a hard drive.  Apple management originally green lighted the new machine and
 reserved time during a satellite broadcast in September of 1991 to introduce it to the world,
 but it was killed at the last minute due to the usual objections that it could hurt the Macintosh.
@@ -4167,7 +4167,7 @@ fringing in the old Apple II video modes under some circumstances.  A new VGC an
 a free upgrade to bring those systems up to ROM 1 specs.
 
 
-(infos from old-computers.com and other sources)
+(info from old-computers.com and other sources)
 
 
 * Apple "][", Apple "II", Apple "//" -- which is correct?
@@ -4366,7 +4366,7 @@ The Apple II+ was sold in Europe as the Apple IIeuroplus which could display vid
 PAL format, and had ESC sequences for European letters. It was followed by the Apple 2e.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 * Apple "][", Apple "II", Apple "//" -- which is correct?
@@ -4554,7 +4554,7 @@ The Apple /// was followed in december 1983 by the Apple /// plus which had an A
 keyboard and a new video interface. Four months later, it was discontinued.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -4595,7 +4595,7 @@ Features:
 ---------
 
 
-* CPU: Zilog Z80A	3.5 mHz
+* CPU: Zilog Z80A	3.5 MHz
 
 
 * RAM: 4 KB (up to 32 KB), 1,7 KB free for user
@@ -4767,7 +4767,7 @@ There were also a Modem planned and Mattel even announced network services for g
 programs downloads...
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -4824,7 +4824,7 @@ Features:
 ---------
 
 
-* CPU: Signetics 2650A 3.58 Mhz
+* CPU: Signetics 2650A 3.58 MHz
 
 
 * Co-Processor: Signetics 2637UVI (audio & video processing unit)
@@ -4993,7 +4993,7 @@ Other Emulators:
 * 2001 (for DOS) -- http://users.aol.com/mk14emu/arcadia.htm
 
 
-* Emulator2001 (for Windows) -- http://www.gstsoftware.co.nz/ (min. CPU: Pentium 1.4Ghz - a joke!)
+* Emulator2001 (for Windows) -- http://www.gstsoftware.co.nz/ (min. CPU: Pentium 1.4GHz - a joke!)
 
 
 * WinArcadia -- http://amigan.byethost33.com/
@@ -5178,7 +5178,7 @@ $end
 # ---------
 
 
-# * CPU: Motorola MC68000 8 mHz
+# * CPU: Motorola MC68000 8 MHz
 
 
 # * Co-Processor: 'Shifter' and 'Glue' custom chips
@@ -5203,7 +5203,7 @@ $end
 # * Sound: 3 voices, 8 octaves
 
 
-# * I/O Ports: RGB, TV modulator (520STm), Cardridge, Midi (in/out), Centronics, RS232c, 
+# * I/O Ports: RGB, TV modulator (520STm), Cartridge, Midi (in/out), Centronics, RS232c, 
 # Hard Disk, Floppy Disk, Joystick, Mouse
 
 
@@ -5250,7 +5250,7 @@ $end
 # processor, which referred to the Motorola 68000's 16-bit external bus and 32-bit internals.
 
 
-# (infos from old-computers.com)
+# (info from old-computers.com)
 
 
 
@@ -5318,7 +5318,7 @@ Features:
 ---------
 
 
-* CPU: 6502 1 mHz
+* CPU: 6502 1 MHz
 
 
 * Co-Processor: 6847 Video Display Generator, PIA 8255 (keyboard & tape)
@@ -5413,7 +5413,7 @@ Atom!,
 - etc... 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -5498,7 +5498,7 @@ Features:
 ---------
 
 
-* CPU: Custom Z-80 8Mhz
+* CPU: Custom Z-80 8MHz
 
 
 * Memory: 1MB Flash memory (approx. 680KB user available)
@@ -5579,7 +5579,7 @@ time are:
 - A slot for a memory expansion card (which expands the flash memory capacity to two megabytes)
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -5655,7 +5655,7 @@ Features:
 
 
 * I/O Ports: UHF TV out, BNC video out, RGB vide out, RS423, Cassette, Analogue In (DB15), 
-Econet port, TUBE interface, 1Mhz BUS, User port, Printer port, Disk-drive connector
+Econet port, TUBE interface, 1MHz BUS, User port, Printer port, Disk-drive connector
 
 
 * Keyboard: Full-stroke QWERTY keyboard, 64 keys, 10 function keys, arrow keys
@@ -5716,7 +5716,7 @@ upgrade in the models A and B). The later models included disk support as standa
 It was then followed by the BBC Master.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -5790,7 +5790,7 @@ Features:
 * Colors: 8 among 16
 
 
-* Sound: 4 chanels, 8 octaves - SN76489 sound generator
+* Sound: 4 channels, 8 octaves - SN76489 sound generator
 
 
 * I/O Ports: Tube expansion, BBC High Speed Bus, FDD interface, User interface, RS423 serial, 
@@ -5849,7 +5849,7 @@ marketing the BBC Master, Acorn realized the PC world was moving on from 8-bit t
 and started developing their own 32-bit chip, the Acorn RISC Machine, or ARM.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -6012,7 +6012,7 @@ GeekPort in back, which allowed for experimentation.
 - Eleven power and ground pins: Two at +5 V, one at +12 V, one at -12 V, seven ground pins.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -6057,7 +6057,7 @@ Features:
 ---------
 
 
-* CPU on pc-type adapter: 8088 with 3.75/8 mhz (turboswitch)
+* CPU on pc-type adapter: 8088 with 3.75/8 MHz (turboswitch)
 
 
 * socket for 8087
@@ -6136,7 +6136,7 @@ Features:
 ---------
 
 
-* CPU: 8502 1/2 mHz, 1.022 MHz (for C64 mode)+ Zilog Z80 ~2.5 MHz
+* CPU: 8502 1/2 MHz, 1.022 MHz (for C64 mode)+ Zilog Z80 ~2.5 MHz
 
 
 * Co-Processor: SID (sound), VDC & VIC-II (video)
@@ -6163,7 +6163,7 @@ Features:
 * Sound: 3 voices / 6 octaves
 
 
-* I/O Ports: RGB, Video Composite, Joystick (2), Cardridge, Tape, User Port (RS232 compatible), TV, serial
+* I/O Ports: RGB, Video Composite, Joystick (2), cartridge, Tape, User Port (RS232 compatible), TV, serial
 
 
 * Keyboard: Complete full-stroke keyboard with separated numeric keypad
@@ -6343,7 +6343,7 @@ for i=0 to 8191:poke 32*256+i, peek(224*256+i): next
 poke43,0:poke44,32:poke45,0:poke46,64:save"0:kernel64",8
 
 
-* c64 charset (swedish version or original c64 version)
+* c64 charset (Swedish version or original c64 version)
 
 
 To dump it, in C128 Mode:
@@ -6525,7 +6525,7 @@ It was the successor of the Commodore 64 and could use all the software and a lo
 of the C64 (the 8502 could be slowed down 1 MHz for compatibility).
 
 
-One of the main specialities of this machine was the additional Z80 CPU and Video chip, which means 
+One of the main specialties of this machine was the additional Z80 CPU and Video chip, which means 
 that you could attach two monitors. Thanks to the Z80, the Commodore 128 could run under CP/M + : 
 lots of software were adapted for this computer and Osborne or Kaypro programs could run directly.
 
@@ -6564,7 +6564,7 @@ hardware.
 - the 128D-CR did not have a carrying handle.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 * Easter egg: Entering the command "SYS 32800,123,45,6" in native mode would reveal a 40-column 
@@ -6834,7 +6834,7 @@ The official presentation of the C264 series took place on the Hannover fair in 
 Luckily, the developers didn't eliminate the right shift key in the final keyboard layout. 
 The formerly unlabeled keys bear a label now: the key that used to be the left arrow 
 key on the C64 and the VC20 says 'Esc', the key between '@' and '*' bears the English pound 
-sign, and the key that was labelled 'SHIFT LOCK' on all 8-bit computers Commodore ever 
+sign, and the key that was labeled 'SHIFT LOCK' on all 8-bit computers Commodore ever 
 produced now says - guess what - 'SHIFT LOCK' :-) (must have been a hard decision between 
 SHIFT and CAPS lock).
 
@@ -6887,7 +6887,7 @@ It has a powerful basic language (contrary to the VIC-20 or the C64) which makes
 and sounds easy to program.  The C16, like the Commodore Plus/4 was a commercial failure.
 
 
-It seems that the first C16s had the two control ports labelled JOY 0 and JOY 1 instead of 
+It seems that the first C16s had the two control ports labeled  JOY 0 and JOY 1 instead of 
 JOY 1 and JOY 2, just as a hint for collectors :-)
 
 
@@ -6912,7 +6912,7 @@ Note that both the C116 and the C16 lack a user port.
 Final assembly was done in Mexico by a company named Sigma.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -7003,7 +7003,7 @@ Features:
 * Sound: 3 voices / 9 octaves, 4 waveforms (sound output through TV)
 
 
-* I/O Ports: RGB (composite, chroma/luma and sound in/out), 2 x Joystick plugs, Cardridge slot, Tape interfarce (300 bps), Serial, 
+* I/O Ports: RGB (composite, chroma/luma and sound in/out), 2 x Joystick plugs, Cartridge slot, Tape interfarce (300 bps), Serial, 
 
 
 * User Port, TV RF output
@@ -7223,7 +7223,7 @@ It came with one game cartridge containing International Soccer, Klax, Flimbo's 
 and Fiendish Freddy's Big Top O'Fun. The carts had a memory of 4 megabits (512k).
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -7428,7 +7428,7 @@ and Sega Master System were already dominating the market and did so until aroun
 - TV hookup was already found on regular C64 machines.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -7463,7 +7463,7 @@ Features:
 ---------
 
 
-* CPU: CSG4510 1.02 or 3.5 Mhz depending models
+* CPU: CSG4510 1.02 or 3.5 MHz depending models
 
 
 * Co-Processor: Commodore CSG 4567 enhanced VIC chip (Video), Commodore CSG8580 SID chips (Sound)
@@ -7491,7 +7491,7 @@ Features:
 
 
 * I/O Ports: RF video output jack, Analog video RGB port (DB-9), Composite video/audio port, 
-Joystick (2), Cardridge slot, Tape, Serial bus port, User Port (RS232 compatible), RAM Expansion 
+Joystick (2), Cartridge slot, Tape, Serial bus port, User Port (RS232 compatible), RAM Expansion 
 port, External floppy drive port, 2 x controller ports, Stereo audio output
 
 
@@ -7639,7 +7639,7 @@ controller and because of the cost of this computer), and because of the success
 Commodore produced about 50 C65's, the first ones display C64DX at boot, the latest display C65.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -7686,7 +7686,7 @@ Features:
 ---------
 
 
-* CPU: 6502 1 mHz
+* CPU: 6502 1 MHz
 
 
 * RAM: 8, 16 or 32 k
@@ -7701,7 +7701,7 @@ Features:
 * Graphic Modes: None
 
 
-* Colors: monochrom
+* Colors: Monochrome
 
 
 * I/O Ports: IEEE 488, Tape (2)
@@ -7728,7 +7728,7 @@ keyboard layout, which used a full typewriter keyboard instead of the "mickey mo
 of the PET, and dropped the on-board cassette unit.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -7787,7 +7787,7 @@ Features:
 * ROM: 20 KB
 
 
-* Text Modes: 40 columns x 25 lines, upgradable to 80 columns
+* Text Modes: 40 columns x 25 lines, upgradeable  to 80 columns
 
 
 * Graphic Modes: None
@@ -7828,7 +7828,7 @@ The 4032 and the 4016 were sold with an 80-column dot matrix printer (5x8 charac
 This printer (4022) was an Epson printer with a Commodore name on it. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -7934,7 +7934,7 @@ The 500 / 600 series was mainly sold in Europe, but a few models are known to ha
 in the United States.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -8039,7 +8039,7 @@ The 500 / 600 series was mainly sold in Europe, but a few models are known to ha
 in the United States.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -8156,7 +8156,7 @@ Both versions could be purchased with a built-in dual floppy disk drive which wa
 with the external 8250 dual drive unit. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -8221,7 +8221,7 @@ Features:
 * Graphic Modes: none
 
 
-* Colors: monochrome
+* Colors: Monochrome
 
 
 * I/O Ports: IEEE 488, Cassette
@@ -8256,7 +8256,7 @@ of RAM and 12 KB of ROM (which contains the DOS). It was sold with Ozz, a Databa
 version of the spreadsheet "Visicalc".
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -8331,7 +8331,7 @@ Features:
 
 
 * I/O Ports: One credit card type slot (to save games scores) , 1 video slot, 1 DMA extension, 
-Mouse & infrared joystick, Parallel, Serial, 15Khz RGB video, External floppy, Stereo RCA Audio 
+Mouse & infrared joystick, Parallel, Serial, 15kHz RGB video, External floppy, Stereo RCA Audio 
 jacks (16 bit), Colour composite Video output, MIDI In/Out, Headphone Jack
 
 
@@ -8377,7 +8377,7 @@ strange twist of fate, the man in charge of Atari at the time, was Jack Tramiel,
 founded Commodore.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -8643,7 +8643,7 @@ a little level display located above the keyboard, which allowed to set the reco
 recorder to improve reliability when writing onto a tape.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -8730,7 +8730,7 @@ resemble a dynamite detonator, with a control knob at top that had 8 basic movem
 left / right / twist left / twist right / pull up / pull down. 
 
 
-On the console, five bottons are present: a RESET button, plus four button (numbered from 1 to 4). 
+On the console, five buttons are present: a RESET button, plus four button (numbered from 1 to 4). 
 These were used to select games (e.g. without cart, at the G? prompt: 1=Hockey, 2=Tennis) and different 
 time durations of a game (1=2 mins, 2=5 mins, 3=10 mins, 4=20 mins). Moreover:
 
@@ -8818,7 +8818,7 @@ similar to Channel F and Channel F System II. In Germany, the system was called 
 in the UK it's called Grandstand. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -8878,7 +8878,7 @@ Features:
 ---------
 
 
-* CPU: Motorola 6809 E 0.895 MHz (or 1.79 MHz) [CoCo, CoCo2], Motorola MC6809EP 0,9 Mhz +
+* CPU: Motorola 6809 E 0.895 MHz (or 1.79 MHz) [CoCo, CoCo2], Motorola MC6809EP 0,9 MHz +
 Motorola MC-6847 Video Display Generator [Dragon 32, Dragon 64, CP-400]
 
 
@@ -8903,7 +8903,7 @@ Motorola MC-6847 Video Display Generator [Dragon 32, Dragon 64, CP-400]
 with machine code [Dragon 32, Dragon 64], 4 virtual channels [CP-400]
 
 
-* I/O Ports: Tape, RGB, Joystick (2), Monitor, Cardridge, Serial RS232
+* I/O Ports: Tape, RGB, Joystick (2), Monitor, Cartridge, Serial RS232
 
 
 * Keyboard: QWERTY calculator type keyboard [CoCo], QWERTY Mechanical keyboard [Dragon 32, Dragon 64],
@@ -9080,7 +9080,7 @@ in software and documentation. Even though the Color Computer was successfull in
 to find material for it in Brazil.
 
 
-* About the various Tandy Color BASIC versions (infos from Lee Veal): In reality, the 'dialects' of BASIC 
+* About the various Tandy Color BASIC versions (info from Lee Veal): In reality, the 'dialects' of BASIC 
 on all versions of the TRS-80 Color Computer 1s & 2s were written by Microsoft for Tandy. That includes 
 Color BASIC (CB), Extended Color BASIC (ECB) and Disk Extended Color BASIC (DECB). In fact, with very few 
 modifcations, BASIC programs from an IBM-PC or compatible using Microsoft BASIC could run on a CoCo and 
@@ -9110,7 +9110,7 @@ choice of a BASIC developer), called BASIC09, was NOT compatible with Microsoft 
 a powerful language that compiled to intermediate code but it is more akin to Pascal then BASIC. 
 
 
-* About the double speed of CoCo & CoCo II (infos from Gary Clouse): 
+* About the double speed of CoCo & CoCo II (info from Gary Clouse): 
 The double speed mode was not really accomplished by changing the clock speed. The Synchronous address 
 multiplexor (SAM) chip by default generated memory refresh cycles for the entire address space. The "double 
 speed poke" disabled the refresh cycle for the upper 32k memory address, where the ROM was mapped. Since the 
@@ -9120,7 +9120,7 @@ be unusable, such as saving data to a tape. Also if you were using the upper 32k
 would wipe the memory. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -9193,7 +9193,7 @@ Features:
 ---------
 
 
-* CPU: Motorola 68b09e (uses an external clock generator) 2 MHz (0.89mhz under RS-DOS for 
+* CPU: Motorola 68b09e (uses an external clock generator) 2 MHz (0.89MHz under RS-DOS for 
 compatability with FD expansion unit)
 
 
@@ -9286,7 +9286,7 @@ in Machine Language.
 Tandy made several prototypes of a Color Computer model IV but it was never released.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -9407,7 +9407,7 @@ Usage:
 ------
 
 
-Colecovision standard controller features a Joystick, two fire button at sides, and a 12-keys keypad with
+ColecoVision standard controller features a Joystick, two fire button at sides, and a 12-keys keypad with
 the following layout:
 
 
@@ -9467,8 +9467,8 @@ videogame market, inspired by the success of cartridge based systems like the At
 Mattel Intellivision.
 
 
-As the Colecovision was released later than these competitors, it was possible for the Coleco 
-engineers to put more hardware in the box while keeping the cost acceptable. The Colecovision is 
+As the ColecoVision was released later than these competitors, it was possible for the Coleco 
+engineers to put more hardware in the box while keeping the cost acceptable. The ColecoVision is 
 thus powered by a Z80A cpu running at 3.58 MHz. It has 8 KB RAM, 16 KB VRAM, three-channel sound 
 and a powerful video display unit (Texas Instruments TMS9928A) offering 16 colors, 32 sprites and 
 a 256x192 resolution. The result is that when the system was finaly released in summer 1982, it 
@@ -9485,12 +9485,12 @@ resulted in a Zaxxon cartridge that sported excellent 3D effects.
 
 But the best was to come: one february 1, 1982 Coleco and Nintendo signed an agreement which gave 
 six-months exclusive license for Donkey-Kong! Their excellent version was thus exlusively sold as 
-a pack-in with Colecovision as an incentive to purchase the system, and it worked! The Colecovision 
+a pack-in with ColecoVision as an incentive to purchase the system, and it worked! The ColecoVision 
 was an instant success.
 
 
 Coleco marketed different add-ons for their console. The Expansion Module #1 is an Atari VCS adapter 
-wich enables the Colecovision to play Atari cartridges! Coleco sold 150,000 Atari adapters in just 
+wich enables the ColecoVision to play Atari cartridges! Coleco sold 150,000 Atari adapters in just 
 two months... Atari sued Coleco for $850 million, but lost the case.
 
 
@@ -9504,7 +9504,7 @@ and complete controller, was used to play sports games like Super Action Basebal
 Action Boxing.
 
 
-Colecovision was a great success, selling over six millions units in just three years. Unfortunately, 
+ColecoVision was a great success, selling over six millions units in just three years. Unfortunately, 
 the ColecoVision suffered the same fate as the rest in the great video game shake-out of 1984. Coleco's 
 unsuccessful bug-ridden ADAM computer only complicated the problem, and Coleco stopped production of 
 the ColecoVision in 1984.
@@ -9514,7 +9514,7 @@ Telegames purchased the rights to the system, and many of the manufactured games
 a clone, The Personal Arcade, in 1988. It was later re-released by them, as the DINA.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -9526,13 +9526,13 @@ Links
 * coleco.free.fr -- http://coleco.free.fr/
 
 
-* Colecovision FAQ -- http://www.classicgaming.com/colecofaq/
+* ColecoVision FAQ -- http://www.classicgaming.com/colecofaq/
 
 
-* Norman G. Sippel's Colecovision Page -- http://my.ohio.voyager.net/~ngsippel/cv.html
+* Norman G. Sippel's ColecoVision Page -- http://my.ohio.voyager.net/~ngsippel/cv.html
 
 
-* Colecovision at old-computers.com -- http://www.old-computers.com/museum/computer.asp?c=755
+* ColecoVision at old-computers.com -- http://www.old-computers.com/museum/computer.asp?c=755
 
 
 
@@ -9567,7 +9567,7 @@ Features:
 ---------
 
 
-* CPU: Intel 80186 8 Mhz
+* CPU: Intel 80186 8 MHz
 
 
 * Co-Processor: 82720 (Graphic), 8087(arithmetic coprocessor),
@@ -9585,7 +9585,7 @@ Features:
 * Graphic Modes: 640 x 400 (color), 1280 x 800 (monochrome)
 
 
-* Colors: Monochrom
+* Colors: Monochrome
 
 
 * Sound: No sound...
@@ -9611,7 +9611,7 @@ History and Trivia:
 -------------------
 
 
-The Telenova Compis computer was designed to be used in swedish schools. It featured a 80186 cpu and 
+The Telenova Compis computer was designed to be used in Swedish schools. It featured a 80186 cpu and 
 used CP/M 86.
 
 
@@ -9634,7 +9634,7 @@ invested large amounts of money in the project.
 The following languages were available on disk : Comal, Pascal, Fortran, Cobol. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -9735,7 +9735,7 @@ Features:
 ---------
 
 
-* CPU: Motorola 68000 8 Mhz.
+* CPU: Motorola 68000 8 MHz.
 
 
 * RAM: 256 KB expandable to 512 KB
@@ -9837,7 +9837,7 @@ The price was about 4000$ for a bare 256-kbyte system in 1984 (1000$ for extra
 size).
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -9933,7 +9933,7 @@ powerful 8-bit machine with specs that in cases out performed those of the 16-bi
 the nicely priced Sam rather than a more expensive 16-bit machine.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -10164,7 +10164,7 @@ It was basically the same machine as the Amstrad CPC-64 with a less colorful cas
 some slight hardware differences, like better quality back connectors. 
 
 
-* About OSes and Add-Ons (infos from Ekkehard Morgenstern): AMSDOS could be run only with Amstrad's 
+* About OSes and Add-Ons (info from Ekkehard Morgenstern): AMSDOS could be run only with Amstrad's 
 3" floppy disk drive. CP/M could be run either with 3" floppy disk drives or other drives available 
 on the market. (I had a 5 1/4" Vortex disk drive with 704K capacity)
 
@@ -10192,7 +10192,7 @@ programs at 19200 baud or higher. However, this could lead to read errors of cou
 used as a copy protection by many programs sold on tape. 
 
 
-* About the differences between Amstrad and Schneider CPC (infos from Lyall Moffitt):
+* About the differences between Amstrad and Schneider CPC (info from Lyall Moffitt):
 This document lists the differences between the English CPC's and the German CPC's. The original 
 distributor in Germany was Schneider GmbH. The machines distributed by Schneider had the Schneider 
 logo on them. (The monitors and some peripherals were also re-branded as "Schneider" e.g. 
@@ -10229,7 +10229,7 @@ top of the CPC6128 and CPC664 disc drive is also in German. The computer informa
 of the computer is also in German. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -10309,7 +10309,7 @@ Features:
 ---------
 
 
-* CPU: Zilog Z80A 4 mHz
+* CPU: Zilog Z80A 4 MHz
 
 
 * RAM: 64 kb
@@ -10375,7 +10375,7 @@ from the Amstrad CPC Plus hardware called the GX 4000. This console used the sam
 computer but were supplied on cartridges. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -10608,7 +10608,7 @@ Lots of Amstrad or third-party peripherals could be added, among them: 2nd 3"/3.
 Modem, 3 key Mouse, Light Pen, Centronics Dot Matrix Printer, "PC-Hormon" MSDOS emulator
 
 
-* About the differences between Amstrad and Schneider CPC (infos from Lyall Moffitt):
+* About the differences between Amstrad and Schneider CPC (info from Lyall Moffitt):
 This document lists the differences between the English CPC's and the German CPC's. The original 
 distributor in Germany was Schneider GmbH. The machines distributed by Schneider had the Schneider 
 logo on them. (The monitors and some peripherals were also re-branded as "Schneider" e.g. 
@@ -10644,7 +10644,7 @@ top of the CPC6128 and CPC664 disc drive is also in German. The computer informa
 of the computer is also in German. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -10724,7 +10724,7 @@ Features:
 ---------
 
 
-* CPU: Zilog Z80A 4 mHz
+* CPU: Zilog Z80A 4 MHz
 
 
 * RAM: 128 kb
@@ -10790,7 +10790,7 @@ from the Amstrad CPC Plus hardware called the GX 4000. This console used the sam
 computer but were supplied on cartridges. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -11018,7 +11018,7 @@ The 664 was delivered with the AMSDOS and CP/M 2.2 operating systems. The LOGO l
 with the CP/M disc. 
 
 
-* About the differences between Amstrad and Schneider CPC (infos from Lyall Moffitt):
+* About the differences between Amstrad and Schneider CPC (info from Lyall Moffitt):
 This document lists the differences between the English CPC's and the German CPC's. The original 
 distributor in Germany was Schneider GmbH. The machines distributed by Schneider had the Schneider 
 logo on them. (The monitors and some peripherals were also re-branded as "Schneider" e.g. 
@@ -11054,7 +11054,7 @@ top of the CPC6128 and CPC664 disc drive is also in German. The computer informa
 of the computer is also in German. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -11134,7 +11134,7 @@ Features:
 ---------
 
 
-* CPU: Intel 8080A 2 mhz
+* CPU: Intel 8080A 2 MHz
 
 
 * Co-Processor: AMD 9511 (optional numeric processor)
@@ -11203,7 +11203,7 @@ A lot of peripherals were developped for this computer : a hard disk (8 MB), sev
 drives and even a robot !! The DAI can run under CP/M.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -11384,7 +11384,7 @@ The TC-01 is the first version of the hardware, with the 256 being the second ve
 more towards games.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -11509,7 +11509,7 @@ Despite being more powerful than the ZX Spectrum, the Electron didn't sell well 
 a lack of certain software.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -11640,7 +11640,7 @@ $end
 # the "Cosmac Elf 2000," based on the original ELF, with some newer and easier to find components.
 
 
-# (infos from Wikipedia)
+# (info from Wikipedia)
 
 
 
@@ -11711,7 +11711,7 @@ Features:
 * I/O Ports: RGB Video / Audio output, Expansion port, Tape Interface, Joystick (2), 
 
 
-* Cardridge slot, RS432 (Serial/Net), TV output, Power input, Printer
+* Cartridge slot, RS432 (Serial/Net), TV output, Power input, Printer
 
 
 * Keyboard: Complete keyboard with function keys and built-in joystick
@@ -11810,7 +11810,7 @@ Unsold stocks of these systems (nearly all :-)), were sold to East-Europeans cou
 Hungary where it met great success. Thus, most nowadays Enterprise activity comes from here. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -11928,7 +11928,7 @@ $end
 # ---------
 
 
-# * CPU: TMS 7040 (Texas-Instrument) 4,9 Mhz
+# * CPU: TMS 7040 (Texas-Instrument) 4,9 MHz
 
 
 # * Co-Processor: TMS 7042 (I/O)
@@ -11987,7 +11987,7 @@ $end
 # educative software through a dedicated network.
 
 
-# (infos from old-computers.com)
+# (info from old-computers.com)
 
 
 
@@ -12028,7 +12028,7 @@ Features:
 ---------
 
 
-* CPU: Zilog Z80 A 2.106 Mhz.
+* CPU: Zilog Z80 A 2.106 MHz.
 
 
 * RAM: 8 KB, later 16KB (up to 48 KB)
@@ -12113,7 +12113,7 @@ capabilities but excellent graphics, the Sorcerer instead had excellent text and
 graphics.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -12338,7 +12338,7 @@ as jokes, news (mainly about Nintendo), game tips, weather reports for Japan and
 number of programs to be downloaded.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -12506,7 +12506,7 @@ Salora also distributed the Laser 2001 as the Manager. It was meant to be the hi
 computer range. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -12587,7 +12587,7 @@ and similar clones were designed for use with PAL standard television sets.
 
 The FunVision console sported an 8-bit Rockwell 6502A CPU at a speed of 2 MHz, 1kb of RAM and 
 16kb of Video RAM, and had a graphics resolution of 256 x 192 with 16 colors and 32 sprites. The console 
-had 2 integrated joystick/membrane keypad controllers (much like the Colecovision) which, when set in a 
+had 2 integrated joystick/membrane keypad controllers (much like the ColecoVision) which, when set in a 
 special compartment on top of the console, could be used as a makeshift computer keyboard. The FunVision 
 had interfaces for a cassette player, an extra rubber keyboard, floppy disk drive, parallel I/O interface, 
 modem (likely unreleased), Centronics printer and one memory expansion module for use with the Basic 
@@ -12597,7 +12597,7 @@ language cartridge.
 It was discontinued in 1984.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -12861,7 +12861,7 @@ the programs to the tape and then load them later, while other unsuspecting list
 noise). 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -13055,7 +13055,7 @@ Internet and online auction sites, the console has become more widely available.
 produced with an independently lit (backlit or frontlit) screen until the release of the GameBoy Advance SP in 2003.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -13227,7 +13227,7 @@ owners had a subscription to the game.com internet service, which would barely s
 of the handheld itself.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -13431,7 +13431,7 @@ Though its sales success has been surpassed by the Sony PSP, the Game Gear is st
 supported handheld console not made by Nintendo to date.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -13588,7 +13588,7 @@ In addition, most GameBoy games published by Nintendo have a special palette tha
 are pressed. Any game that does not have a special palette will default to the Dark Green (Right + A) palette instead.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -13652,10 +13652,10 @@ Features:
 ---------
 
 
-* Main Processor: Motorola M68000 (16-bit) at 7.67 Mhz
+* Main Processor: Motorola M68000 (16-bit) at 7.67 MHz
 
  
-* Co-processor: Z80a at 3.58Mhz
+* Co-processor: Z80a at 3.58MHz
 
 
 * RAM: 64k (Plus 64k Ram for sound)
@@ -14223,7 +14223,7 @@ programs.
 - The AX990 had 50 programs. They are likely to be an unofficial multicart or other MSX programs.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -14453,7 +14453,7 @@ to emulate the Saturn CPU of the earlier models. It also has a significantly dif
 keyboard design.
 
 
-(infos from hpcc.org)
+(info from hpcc.org)
 
 
 
@@ -14507,7 +14507,7 @@ $end
 # ---------
 
 
-# * CPU: 8086 with 8 mhz
+# * CPU: 8086 with 8 MHz
 
 
 # * Co-Processor: Socket for 8087
@@ -14576,7 +14576,7 @@ Features:
 ---------
 
 
-* CPU: 80286 with 10 mhz
+* CPU: 80286 with 10 MHz
 
 
 * Co-Processor: socket for 80287
@@ -14666,7 +14666,7 @@ in the same case, as the 55. You can look at this thing on Tavi's page. It's not
 it costs less than some batteries to replace, and, as with all PS/2 models, no soldering is needed.
 
 
-(infos from members.chello.at/theodor.lauppert/computer/ps2/8530-286.htm)
+(info from members.chello.at/theodor.lauppert/computer/ps2/8530-286.htm)
 
 
 
@@ -14784,7 +14784,7 @@ clone industry. The next year, the first PC based on a 80386 was made by Compaq 
 failed to impose the PS/2 standard in 1986
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -14949,13 +14949,13 @@ Another notable great feature of the PC line was the expansion base: it added ad
 (I think it was eight) 8-bit slots in an external enclosure.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 The following PC's and compatibles are supported by, or currently under development in MESS:
 
 
-- IBM PC: Intel 8088 process with 4.77 Mhz clock.
+- IBM PC: Intel 8088 process with 4.77 MHz clock.
 
 - IBM PC Junior: based on IBM PC, Special keyboard, CGA with 160x200x16, 320x200x16 and 
 640x200x4? colors, 3 channel sound chip
@@ -15123,7 +15123,7 @@ Many people were able to then run the PCjr as a competent business type of syste
 well.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -15241,7 +15241,7 @@ then with the PC XT 286.
 Clones of the XT, such as the Tandy 1000 became commonplace by the end of the decade.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -15276,7 +15276,7 @@ Features:
 ---------
 
 
-* CPU: General Instruments 16 bit Microprocessor 1 Mhz
+* CPU: General Instruments 16 bit Microprocessor 1 MHz
 
 
 * Memory: 4K internal ROM operating system, 2K RAM
@@ -15599,7 +15599,7 @@ released previously unfinished materials from the Jaguar's past, but also severa
 to satisfy the system's cult following.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -15717,7 +15717,7 @@ Steve Vickers wrote the ZX Spectrum manual - he has been an academic researcher 
 recently (2003) at Imperial College London, and the Open University. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -15863,7 +15863,7 @@ Hyams in the movie version of 2010. Their work was done using a Kaypro computer 
 was in Sri Lanka and Peter Hyams in Los Angeles. Their communications turned into the book 
 The Odyssey File - The Making of 2010. 
 
-(infos based on old-computers.com)
+(info based on old-computers.com)
 
 
 
@@ -15909,7 +15909,7 @@ Features:
 ---------
 
 
-* CPU: U880 D (Z80 clone) 1,75 Mhz
+* CPU: U880 D (Z80 clone) 1,75 MHz
 
 
 * RAM: 32 KB (30 kb left for user), expandable up to 4 MB
@@ -15968,7 +15968,7 @@ Both CAOS and Basic interpreter also had some new commands, especially for graph
 but the Basic remains fully compatible with the 85/2 version. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -16006,7 +16006,7 @@ Features:
 ---------
 
 
-* CPU: U880 D (Z80 clone) 1,77 Mhz
+* CPU: U880 D (Z80 clone) 1,77 MHz
 
 
 * Co-Processor: none. CPU even managed video processing.
@@ -16074,7 +16074,7 @@ to 20 KB. The CAOS system offered printer support for most of the available GDR 
 There are two expansion slots, which could be extended to four through an expansion set-top. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -16319,7 +16319,7 @@ with XYZZY-type secret word, monsters, treasures, 26 rooms, and more). It was an
 Mine still works! (Bob Leedom)
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -16363,13 +16363,13 @@ Features:
 ---------
 
 
-* CPU: Z80A 3,58 Mhz
+* CPU: Z80A 3,58 MHz
 
 
 * Co-Processor: Motorola 6847 video processor
 
 
-* RAM: 4 KB or 8 KB ? Upgradable to 64 KB
+* RAM: 4 KB or 8 KB ? upgradeable  to 64 KB
 
 
 * ROM: 16 KB
@@ -16429,7 +16429,7 @@ An obscure VZ-100 version was also released but this wasn't the same machine as 
 and New-Zealand by Dick Smith Electronics. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -16775,7 +16775,7 @@ This model was also sold worldwide, the most popular version being the VZ-300 fr
 Electronics.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -16834,7 +16834,7 @@ Features:
 ---------
 
 
-* CPU: NEC D780c (Z80A compatible) 3,58 Mhz
+* CPU: NEC D780c (Z80A compatible) 3,58 MHz
 
 
 * RAM: 16 kb, up to 128 kb [Laser 350]; 64 kb (30 kb free), up to 128 kb [Laser 500 / 700]
@@ -16893,7 +16893,7 @@ memory size is also better compared to the old serie and goes from 16k RAM for t
 128k RAM for the Laser 750. The Laser 500 and 700 have 64k.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -17085,7 +17085,7 @@ since Apple was a major computer maker. Also, Lisa (along with Macintosh, Atari 
 Amiga) introduced GUI to hobbyists and home computer users, which enabled GUI to live.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -17212,7 +17212,7 @@ Features:
 ---------
 
 
-* CPU: Two 16-Bit custom CMOS chips running at 16Mhz (named Mikey and Suzy)
+* CPU: Two 16-Bit custom CMOS chips running at 16MHz (named Mikey and Suzy)
 
 
 * Sound: 8 bit DAC for each channel; 4 channels integrated stereo speaker (wired for mono in original)
@@ -17358,7 +17358,7 @@ still needed to be copied from ROM to RAM before it could be used, so less memor
 loaded slower than necessary.
 
 
-(infos from Wikipedia, Lynx FAQs and Atari Age)
+(info from Wikipedia, Lynx FAQs and Atari Age)
 
 
 
@@ -17480,7 +17480,7 @@ There were also two variants of Macintosh 512K. The 512K was shipped with a 400K
 128 KB of ROM, an 800K floppy drive, and supported HFS right out of the box.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -17656,7 +17656,7 @@ Features:
 * Display: 9" b&w screen, 512 x 342 pixels
 
 
-* Audio: 8-bit mono 22Khz
+* Audio: 8-bit mono 22kHz
 
 
 * Hard drive: 40 MB
@@ -17719,7 +17719,7 @@ their stores would benefit local school districts. The Classic was the most popu
 to distribute through this and other programs, mostly because of its low cost.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -17772,7 +17772,7 @@ Features:
 * Colors: Monochrome
 
 
-* Sound: Tone Generator & Digital-Analog converter (22KHz sampling rate)
+* Sound: Tone Generator & Digital-Analog converter (22kHz sampling rate)
 
 
 * I/O Ports: RS 232/422 x 2 for printer and modem, SCSI, external F.D. unit, ext. loudspeaker
@@ -17820,7 +17820,7 @@ of Macintosh Classic on 15th october 1990. This makes Macintosh Plus the longest
 ever produced.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -17941,7 +17941,7 @@ to replace the ROM chips as well so it would recognize them. Finally, all SEs I'
 can theoretically put dual floppies in a newer model.  (from Luca Rescigno)
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -17997,7 +17997,7 @@ Features:
 ---------
 
 
-* CPU: MOS 6510 (6502 compatible) 1 Mhz
+* CPU: MOS 6510 (6502 compatible) 1 MHz
 
 
 * Co-Processor: SID (Sound chip), 6566 VIC-II (Video chip)
@@ -18060,7 +18060,7 @@ in Japan. It was advertised in North America under the name ULTIMAX, as well as 
 Germany under the name VC-10. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -18155,16 +18155,16 @@ as the preferred system.
 
 
 Over the years there has been several versions of the Microbee 32. The early ones (PLUS series) had 
-monochrome display and clock rate at 2 Mhz. Later ones (Colour/IC series), from june 1983, included 
-colour and 3.375 Mhz clock rate.
+monochrome display and clock rate at 2 MHz. Later ones (Colour/IC series), from june 1983, included 
+colour and 3.375 MHz clock rate.
 
 
 * Different models:
 
-- 32k Home built - 2mHz clock, Z80
+- 32k Home built - 2MHz clock, Z80
 
-- 32k IC (with EDASM) - 3.375 mHz clock. All later Z80 Microbees would run at this speed though many 
-were over clocked up to 6 mHz.
+- 32k IC (with EDASM) - 3.375 MHz clock. All later Z80 Microbees would run at this speed though many 
+were over clocked up to 6 MHz.
 
 - 32k Personal Communicator (with Basic, Telcom terminal program and Wordbee - a word processor in ROM)
 
@@ -18178,7 +18178,7 @@ keen prototype systems, the Gamma and the Delta, which were intended to compete 
 problems within the company led to their cancellation not long before the company's collapse. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -18293,7 +18293,7 @@ and the sound-chip had synthesizer posibilities. If all these extra functions we
 manual, I bet that these machine would have sold much more. (Richard Vermeulen)
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -18396,7 +18396,7 @@ With an external joystick (not included) two players could play against each oth
 There were around 30 games made for the system.
 
 
-(infos from the MegaDuck's FAQs)
+(info from the MegaDuck's FAQs)
 
 
 
@@ -18437,7 +18437,7 @@ Features:
 * RAM: 1 kb (up to 48k)
 
 
-* ROM: 1 kb (TANBUG v1), upgradable to 14kb
+* ROM: 1 kb (TANBUG v1), upgradeable  to 14kb
 
 
 * Text Modes: 32 x 16
@@ -18477,7 +18477,7 @@ the unextended Microtan65, there was no way to save your work (not tape facility
 to re-type your program each time you switched-on the computer!
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -19397,7 +19397,7 @@ Features:
 ---------
 
 
-* CPU: Zilog Z80 1,79 Mhz
+* CPU: Zilog Z80 1,79 MHz
 
 
 * Co-Processor: 8255 Programmable Peripheral Interface (used for keyboard scanning and control 
@@ -19457,7 +19457,7 @@ code programmed only whereas the MPF-1B offers a really crude version of BASIC (
 as per the early TRS-80) in addition to the machine code capabilities.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -19524,7 +19524,7 @@ TMS 9928/A (Japan : 60 Hz) or TMS 9929/A (Europe : 50 Hz)
 * Sound: General Instruments AY-3-8910 Programmable Sound Generator, 3 channels, 8 octaves
 
 
-* I/O Ports: Joystick socket (1 or 2), Cardridge slot (1 or 2), Tape-recorder plug 
+* I/O Ports: Joystick socket (1 or 2), Cartridge slot (1 or 2), Tape-recorder plug 
 (1200/2400 bauds), RGB video output, Centronics interface
 
 
@@ -19753,7 +19753,7 @@ have great success in USA, however was pretty known in Europe (Netherlands and F
 South America (Brazil) and USSR. This standard was replaced in 1985 by MSX 2. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 A list of known MSX compliant machines:
@@ -20481,7 +20481,7 @@ after launching the MSX 2 standard, Microsoft abandoned the project, but several
 took it over.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 A list of known MSX2 compliant machines:
@@ -20634,7 +20634,7 @@ screen modes): 40x24, 32x24, 256x192, 64x48
 * Sound: FM-PAC (OPLL YM-2413) - 9 channel FM synthesizer
 
 
-* I/O Ports: Joystick(1 or 2), Cardridge(2), Tape(1200/2400 bauds), RGB video output, CVBS/RF video 
+* I/O Ports: Joystick(1 or 2), Cartridge(2), Tape(1200/2400 bauds), RGB video output, CVBS/RF video 
 output, Centronics, Sound output
 
 
@@ -20871,7 +20871,7 @@ MSX2+ computers were only produced by Panasonic, Sony and Sanyo (the one picture
 Panasonic FS A1 WSX). There were only available in Japan...
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 A list of known MSX2+ compliant machines:
@@ -21059,7 +21059,7 @@ There exists also a second model, the MTX 500 which has the same characteristics
 RS-128. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -21217,7 +21217,7 @@ but there were 512 graphic characters in ROM, which can be used to offset it (so
 It will be replaced with the MZ 800. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -21344,7 +21344,7 @@ The MZ 800 was sold in Japan under the name SHARP MZ 1500. The MZ 1500 had the s
 except its black case, a built-in Quick-Disc drive and a slighty different graphic video management.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -21545,7 +21545,7 @@ anything but small textures into the rendering engine, especially textures with 
 and was the primary cause of blurry graphics. 
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -21684,7 +21684,7 @@ and its relatives, the Gemini computers, were published. Many languages were ava
 including BASIC, PASCAL, C, FORTH, etc.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -21844,7 +21844,7 @@ Lucas Logic (later Lucas Nascom) in 1982 and the Nascom 2 will come back in a ca
 called Nascom 3. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -22129,7 +22129,7 @@ All the NC computers were made in Japan by Nakajima. The company also sold its o
 of the NC-100, called ES-210.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -22303,7 +22303,7 @@ It also had a spreadsheet, which the NC100 did not, as well as twice as much bui
 memory at 128 kilobytes. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -22607,7 +22607,7 @@ allow them to fit inside the NES hardware. Nintendo did this to reduce costs and
 cartridge boards in America and Japan.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -22805,7 +22805,7 @@ boxes with katakana stickers on them and cheaply printed black-and-white Japanes
 apparently not very successful; Japanese Odyssey2 items are now very difficult to find.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -22913,7 +22913,7 @@ Notice that the sound chip was the same one used in the Amstrad CPC, MSX compute
 Its ROM was very buggy, & was later replaced with the Oric Atmos.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -22984,7 +22984,7 @@ Features:
 ---------
 
 
-* CPU: 6502A 1 mHz
+* CPU: 6502A 1 MHz
 
 
 * RAM: 16 KB or 48 KB
@@ -23080,11 +23080,11 @@ bit longer thanks to some improvements (peritel power supply and better tape rel
 and cheap prices policy.
 
 
-The Atmos was somehow legally licenced in Yugoslavia as the Nova 64. The Pravetz 8D was a 
+The Atmos was somehow legally licensed  in Yugoslavia as the Nova 64. The Pravetz 8D was a 
 bulgarian clone of the Atmos. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -23229,7 +23229,7 @@ provided lots of original software and hardware extensions like CP/M or disk dri
 cards. The P2000 was also widely used in Dutch and German schools.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -23334,7 +23334,7 @@ tape interface for external tape recorders.
 The PC-1250 was the same machine as the PC-1251 but with only 2 KB of RAM.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -23571,7 +23571,7 @@ was introduced. It was alcaline battery powered and could print 24 characters pe
 special thermal paper. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 Other related models (only few currently supported by MESS) include:
@@ -23726,7 +23726,7 @@ the PC-1403H (D43256AG 32k x 8 static RAM). The new functions also required a la
 LZ92K32 plus SC6976T). 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -23890,11 +23890,11 @@ $end
 
 
 # Two years later, the slightly expanded model PC-1500A was released (in Japan and maybe some 
-# other countries labelled as PC-1501). It was equipped with four HM6116 RAM chips, which made 
+# other countries labeled  as PC-1501). It was equipped with four HM6116 RAM chips, which made 
 # 5946 Bytes available for BASIC, and an additional 1KB area for machine code only. 
 
 
-# (infos from old-computers.com)
+# (info from old-computers.com)
 
 
 
@@ -24029,7 +24029,7 @@ The mouse port, although using 9 pins like a COM port, is proprietary to Amstrad
 The port is female and is only for use with an Amstrad mouse. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -24071,7 +24071,7 @@ Features:
 ---------
 
 
-* CPU: Intel 8086 8 mHz
+* CPU: Intel 8086 8 MHz
 
 
 * RAM: 640 KB
@@ -24132,7 +24132,7 @@ marketed under the name PC-6400 in the USA. It was also sold in Germany and mayb
 European countries under the name Schneider.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -24172,7 +24172,7 @@ Features:
 ---------
 
 
-* CPU: 8086 with 8 mhz
+* CPU: 8086 with 8 MHz
 
 
 * Co-Processor: socket for 8087 math coprocessor
@@ -24265,7 +24265,7 @@ Sinclair PC 200 except for the color of the case (black for the Sinclair, white 
 Amstrad) and the TV output (not implemented on the PC-20). 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -24399,7 +24399,7 @@ on the system without disk, just like the PC 8001. It also had a software / hard
 to turn it into PC 8001 mode.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -24796,7 +24796,7 @@ Turbografx: (Unofficial) European version
 Vistar 16: Korean version
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -24976,11 +24976,11 @@ Amstrad provided Several internal expansions for the PCW-16, 1 MB RAM, 2 MB Flas
 Application ROMs, second FDD drive; but it seems that none of them saw the light.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 This is a successor to the PCW 8xxx and PCW9xxx series. It is a re-designed machine, with a 
-16Mhz Z80 CPU, improved graphics and improved hardware, and a nice GUI system.
+16MHz Z80 CPU, improved graphics and improved hardware, and a nice GUI system.
 
 
 This system takes advantage of a Super I/O chip, as used in many PCs, which provides PC 
@@ -25043,7 +25043,7 @@ Features:
 
 
 * CPU: Zilog Z80A (The CPU is running at 4 MHz, but is slowed down by the internal clock 
-to 3,4 Mhz) for PCW8xxx; Zilog Z80A 4 MHz for PCW9xxx
+to 3,4 MHz) for PCW8xxx; Zilog Z80A 4 MHz for PCW9xxx
 
 
 * Co-Processors: Amstrad ASIC custom chip (Video), NEC 765 (DD controller) for PCW8xxx only
@@ -25061,7 +25061,7 @@ to 3,4 Mhz) for PCW8xxx; Zilog Z80A 4 MHz for PCW9xxx
 * Graphic Modes: 720 x 256 (PAL), 720 x 200 (NTSC) for PCW8xxx; 720 x 256 dots for PCW9xxx
 
 
-* Colors: monochrome (black & green) for PCW8xxx; monochrome (black & white) for PCW9xxx
+* Colors: Monochrome (black & green) for PCW8xxx; monochrome (black & white) for PCW9xxx
 
 
 * Sound: Beeper, 1 channel
@@ -25177,7 +25177,7 @@ In 1991, two new models were produced :
 Finally in 1993, these models were replaced with the PcW-10. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 These machines were designed primarily for word processing (hence the name "Personal Computer 
@@ -25193,7 +25193,7 @@ Later models changed the case design, but also allowed the use of any printer th
 available. (The original 8256 had a proprietary printer and interface).
 
 
-The hardware is simple, a Z80 running at 4Mhz, slowed to 3.3 with wait states, an Amstrad 
+The hardware is simple, a Z80 running at 4MHz, slowed to 3.3 with wait states, an Amstrad 
 ASIC custom chip for driving the display (2 colours, 720x256 in PAL, 720x200 in NTSC), a 
 beep for sound, and a NEC765 floppy disc controller.
 
@@ -25223,7 +25223,7 @@ A few games were written for it, two of these are "Head Over Heels" and "Hitchhi
 to the Galaxy".
 
 
-(infos from Kevin Thacker, author of MESS driver)
+(info from Kevin Thacker, author of MESS driver)
 
 
 
@@ -25415,7 +25415,7 @@ Features:
 ---------
 
 
-* CPU: 6502 1 mHz
+* CPU: 6502 1 MHz
 
 
 * RAM: 4 KB (early version) then 8 KB
@@ -25538,7 +25538,7 @@ RAM, PET 2001-16N with 16 KB RAM and the PET 2001-32N. They were conceived by Ch
 later founded Tandon, a drive manufacturer.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -25699,7 +25699,7 @@ in between the head and the clean paper for the printer to work correctly - to p
 That's what I call innovative approach :-) 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -25758,7 +25758,7 @@ Pokemon Mini games were included in the Gamecube game, Pokemon Channel in a soft
 the Pokemon Mini itself.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -25962,7 +25962,7 @@ The differences between the PPC-512 and PPC-640 were a different colour case, a 
 with 10 C size batteries (1 hour battery life), or with an external AC adaptor.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -25997,7 +25997,7 @@ Features:
 ---------
 
 
-* CPU: CM630 - Bulgarian copy of the 6502 1 mHz
+* CPU: CM630 - Bulgarian copy of the 6502 1 MHz
 
 
 * RAM: 48 KB
@@ -26193,7 +26193,7 @@ The main differences from the Oric Atmos were obviously the keyboard and the flo
 
 
 The Pravetz 8D can display both Cyrillic and Latin alphabets - the one currently in use 
-is selected by the key labelled "C/L" which takes place of the "FUNCT" key present on the 
+is selected by the key labeled  "C/L" which takes place of the "FUNCT" key present on the 
 Atmos. Other features of the keyboard are the "ESC" and "CTRL" keys, labeled respectively 
 "OSV" and "MK".
 
@@ -26295,7 +26295,7 @@ a perfect way for quick typing).
 There was a colour prototype as well, called pro PRIMO. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -26702,7 +26702,7 @@ also be used for an external mod-chip, which may have been why it was removed,
 although size-constraints may also be to blame.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -26853,7 +26853,7 @@ was sold in the U.K. under the names One Per Desk and Merlin Tonto. The same mod
 sold in Australia, with the name Telecom Computerphone. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -26959,7 +26959,7 @@ Features:
 * Sound CPU: Motorola 68EC000 at 11.3 MHz
 
 
-* Sound: 32 Channels, with 16 bit sampling at a sampling rate of 44.1 KHz max.
+* Sound: 32 Channels, with 16 bit sampling at a sampling rate of 44.1 kHz max.
 
 
 * Resolution: 704 x 512 (horz) 60.00 Hz 
@@ -27346,7 +27346,7 @@ MK-80200-50: Version 1.01a BIOS.
 MK-80200A-50: Lacks a drive access LED. Buttons are grey.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -27454,7 +27454,7 @@ A 40 pin IC socket allowed an expansion board and OSI bus to be connected, givin
 to memory expansion (up to 64 KB) and floppy drive controller.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -27561,7 +27561,7 @@ This computer was also marketed by Yeno under the same name (Yeno SC 3000 & SC 3
 exactly the same computer except for the Yeno brand... 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -27612,7 +27612,7 @@ The SF-7000 added 64KB of RAM and 8KB ROM, a 3-inch floppy disk drive, a Centron
 port, and an RS232 serial port.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -27732,8 +27732,8 @@ Italy, Spain, and South Africa. The console in its original form never reached N
 
 
 Game manufacturer Tsukada Original made Othello Multivision, an SG-1000 clone. Bit Corp's Dina 
-2-in-1 Colecovision clone was brought to North America by a company called Telegames. Telegames 
-called its clone the Telegames Personal Arcade, which could play Colecovision and SG-1000 games.
+2-in-1 ColecoVision clone was brought to North America by a company called Telegames. Telegames 
+called its clone the Telegames Personal Arcade, which could play ColecoVision and SG-1000 games.
 
 
 A caveat is the SG-1000's surprisingly wide availability on Taiwan's secondary market. This 
@@ -27750,7 +27750,7 @@ modified Sega Master System II - and the 'Mark' naming convention was further ex
 Mega Drive/Genesis (which became 'Mark V').
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -27801,7 +27801,7 @@ The Card Catcher would become built into the SG-1000 Mark III, as well as the fi
 of the Sega Master System.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -28089,7 +28089,7 @@ newer methods that wouldn't work on a home TV. Only six Master System games were
 3-D compatible.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -28153,7 +28153,7 @@ Features:
 ---------
 
 
-* CPU: Custom 16-bit - 65C816 at 3.58 MHz (Variable memory access speeds of 3.58, 2.68, and 1.79 Mhz)
+* CPU: Custom 16-bit - 65C816 at 3.58 MHz (Variable memory access speeds of 3.58, 2.68, and 1.79 MHz)
 
 
 * Co-processor: None (DSP and SuperFX were inside the cartridge of selected games )
@@ -28481,7 +28481,7 @@ from an initial menu and function as if it were running from its normal
 cartridge.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -28672,7 +28672,7 @@ One year later the M5 Pro and M5 Jr were released with a built-in power supply u
 more RAM?). 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -28898,7 +28898,7 @@ last official Sinclair Spectrum model ever made. The +2A and +2B models vere lau
 a little later, but were just a revision of the +2 model already marketed.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -29353,7 +29353,7 @@ the second half. It was possible with a few logic chips for the experimenter to 
 to the faulty 32K bank.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -29674,7 +29674,7 @@ One year later the M5 Pro and M5 Jr were released with a built-in power supply u
 more RAM?). 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -29891,7 +29891,7 @@ and what was to become one of the largest game libraries of any console to date.
 
 
 Some years later, color clone systems appeared in Europe. They were clearly marketed as 
-cheap systems for people who couldn't afford more "modern" systems like the Colecovision 
+cheap systems for people who couldn't afford more "modern" systems like the ColecoVision 
 or Vectrex. They include the Soundic MPT-02 Victory, Hanimex MPT-02, Mustang 9016 Telespiel 
 Computer, Conic M-1200 and the Sheen 1200 Micro Computer. Some have modifications from the 
 original RCA Studio II such as detachable controllers or even color graphics. There were 
@@ -29904,7 +29904,7 @@ MPT-03 are Emerson Arcadia 2001 software-compatible and MPT-04/05 systems are In
 VC-4000 software-compatible systems... 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -30095,7 +30095,7 @@ A more professional version of the SV318 was launched a while later: the SV-328 
 has 80 KB RAM and a numeric keyboard and the SV-728 case).
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -30211,7 +30211,7 @@ Centronics port and six expansion slots. Some other peripherals were released: G
 Tablet, 80-column card, 1200/75 modem card, RS232 interface. 
 
 
-More informations (infos from Taneli Lukka - Finland): There were two different versions 
+More informations (info from Taneli Lukka - Finland): There were two different versions 
 of this computer. They could be identified by a very small red MK II-logo beside the 
 SVI-328 logo on top of the machine. The older MK I version had no built in RF-modulator, 
 it was a separate box that you had to connect to a DIN-socket on the back of the machine.
@@ -30232,7 +30232,7 @@ MSX compliant models. When MSX took of the User Group supported bith the older S
 and all MSX machines form different manufacturers.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -30372,7 +30372,7 @@ The Supervision was marketed by several different companies around the world and
 different names, including Quickshot Supervision, Travell Mate, and Hartung SV-100.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 * Variations:
@@ -30422,7 +30422,7 @@ Features:
 ---------
 
 
-* CPU: 6510 1 Mhz
+* CPU: 6510 1 MHz
 
 
 * Co-Processor: VIC II (Video), SID (Sound)
@@ -30497,7 +30497,7 @@ The SX64 was not the only machine that Commodore made in this chassis, there was
 SX500, which was an Amiga in the SX case.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -30593,7 +30593,7 @@ It was reported to us that the Sym card also came in a 6809 version that support
 compatibility. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -30696,8 +30696,8 @@ This can also be achieved by issuing a MODE command from DOS.
 and A: becomes the secondary drive, this lets you start the
 computer from the B Drive.
 
-* F4 = Starts the computer in slow (4 mhz) mode. 
-This is useful if a program runs too fast or not at all in normal (8 mhz) mode.
+* F4 = Starts the computer in slow (4 MHz) mode. 
+This is useful if a program runs too fast or not at all in normal (8 MHz) mode.
 
 
 
@@ -30744,8 +30744,8 @@ however, was a non standard edge card printer connector built onto the motherboa
 through the rear; an adaptor would be needed to work a standard IBM style printer.
 
 
-The original line was equipped with the Intel-8088 CPU at 4.77Mhz, which was later extended to 
-faster clock speeds up to 7.16Mhz, as well as the upgrade to 8086 and 80286 processors at 10Mhz 
+The original line was equipped with the Intel-8088 CPU at 4.77MHz, which was later extended to 
+faster clock speeds up to 7.16MHz, as well as the upgrade to 8086 and 80286 processors at 10MHz 
 (in the TL & TX configurations). Common models of the machine included the Tandy 1000, EX, HX, SX, 
 TX, SL, SL/2, RL, and TL, TL/2, TL/3.
 
@@ -30788,7 +30788,7 @@ direct to the floppy drive instead. Most versions of MS-DOS worked with the 1000
 working. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -30883,7 +30883,7 @@ different speeds: 4.77 MHz and 7.16 MHz thus offering more speed than the origin
 the same software. The SX also comes with more memory (384 KB) than the Tandy 1000 (128 KB).
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -30974,7 +30974,7 @@ Features:
 ---------
 
 
-* CPU: MOS 6502 1 Mhz
+* CPU: MOS 6502 1 MHz
 
 
 * RAM: 64 kb
@@ -31047,7 +31047,7 @@ Several ROM cartridges were developed for this machine: Midi software (unrelease
 Basic (compiled basic), Telematic Basic (designed for telecommunications), etc...
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -31203,7 +31203,7 @@ of third-party games and other programs, since the code must be typed into the c
 hand. 
 
 
-(infos from ticalc.org)
+(info from ticalc.org)
 
 
 
@@ -31304,7 +31304,7 @@ the place of the TI-82 as the standard in math and science classrooms and the TI
 to be discontinued shortly.
 
 
-(infos from ticalc.org)
+(info from ticalc.org)
 
 
 
@@ -31410,7 +31410,7 @@ TI-83 was a popular programming platform, but has now been largely replaced by t
 an updated model.
 
 
-(infos from ticalc.org)
+(info from ticalc.org)
 
 
 
@@ -31502,11 +31502,11 @@ History and Trivia:
 
 
 The TI-83 Plus is nearly identical to the TI-83, maintaining backwards compatibility but 
-greatly increasing available memory and allowing for flash-upgradable ROM and commercial 
+greatly increasing available memory and allowing for flash-upgradeable  ROM and commercial 
 calculator-based applications.
 
 
-(infos from ticalc.org)
+(info from ticalc.org)
 
 
 
@@ -31650,7 +31650,7 @@ capability (through an unintentional loophole). It has since been eclipsed by
 the TI-86, which features TI-85 compatibility along with more advanced features.
 
 
-(infos from ticalc.org)
+(info from ticalc.org)
 
 
 
@@ -31802,7 +31802,7 @@ the TI-83, and greater memory capacity, while still maintaining compatibility wi
 TI-85 programs. 
 
 
-(infos from ticalc.org)
+(info from ticalc.org)
 
 
 
@@ -31864,7 +31864,7 @@ Features:
 ---------
 
 
-* CPU: Texas Instruments TMS 9995 10.7 Mhz
+* CPU: Texas Instruments TMS 9995 10.7 MHz
 
 
 * Co-Processor: Unknown
@@ -32147,7 +32147,7 @@ accesed via machine code) Sprites (only with TI-Extended Basic)
 * Colors: 16
 
 
-* Sound: 3 channels, 5 octaves (110hz to 55khz) and 1 noise channel (periodic and white)
+* Sound: 3 channels, 5 octaves (110Hz to 55kHz) and 1 noise channel (periodic and white)
 
 
 * I/O Ports: Tape interface, RGB video, Joystick (2), cartridge slot (Solid State Cartridge)
@@ -34298,7 +34298,7 @@ the second drive (189k) was due to the first drive must also contain some TRS-DO
 operating system).
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -34416,7 +34416,7 @@ $end
 # A portable version of the Model IV called Model 4P (ref. 26-1080) was also marketed few time after.
 
 
-# (infos from old-computers.com)
+# (info from old-computers.com)
 
 
 
@@ -34584,7 +34584,7 @@ software point of view, the Tutor Basic is directly derived from TI Extended
 Basic (there is even a GPL interpreter in ROM, though the Tutor variant of GPL
 is quite different from TI GPL).  However, other Tutor software do not seem to
 be derived from TI-99 software.  It is therefore likely that Matsushita
-designed the Tutor independently from TI and licenced the TI Basic from TI as
+designed the Tutor independently from TI and licensed  the TI Basic from TI as
 an afterthought; OTOH, the whole design might have originated from TI, as the
 computer really looks like a "TI-99/3" (the hardware is similar to the TI-99/4
 series, whereas the concept is very close to the TI-99/2).
@@ -34801,7 +34801,7 @@ available. It was thus possible to upgrade this machine beyond all recognision !
 were also made and sold by a number of manufacturers. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -34920,7 +34920,7 @@ systems: Emerson Arcadia 2001 & "clones"...
 
 According to the excellent research work from Dale Hansen, the 1292 Advanced 
 Programmable Video System from Radofin would be the first member of the line as 
-it was released in 1976! Radofin then licenced its system wordlwide to different 
+it was released in 1976! Radofin then licensed  its system wordlwide to different 
 companies.
 
 
@@ -34940,7 +34940,7 @@ About 40 cartridges were released (37 so far). The games are not bad for 1978, b
 not impressive too... 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 * Variations: grundig super play computer 4000, acetronic mpu1000/mpu2000, prinztronic vc6000?,
@@ -34992,7 +34992,7 @@ Features:
 ---------
 
 
-* CPU: Signetics 2650A 3.58 Mhz
+* CPU: Signetics 2650A 3.58 MHz
 
 
 * Co-Processor: Signetics 2637 (Audio & video processing unit)
@@ -35069,13 +35069,13 @@ Emerson Arcadia 2001.
 Though, the Emerson Arcadia 2001 is the most popular system of this console group, it was not 
 necessarily at the origin of it. Things must be seen differently. Philips / Signetics developped 
 a hardware platform to demonstrate the possibilities of their Signetics 2650 & 2636 chipsets. 
-Somehow, this hardware was licenced (by Philips?) to many third-companies around the world 
+Somehow, this hardware was licensed  (by Philips?) to many third-companies around the world 
 resulting in systems like the Interton VC-4000, Voltmace DataBase, Acetronic MPU-1000, ITMC 
 MPT-05, etc.
 
 
 Some times later, the hardware was improved, with the use of a Signetics 2637 instead of the 
-2636 (handling the audio & video), somehow resulting in a new wave of licenced systems, all 
+2636 (handling the audio & video), somehow resulting in a new wave of licensed  systems, all 
 based on the same hardware and playing the same games. This console group includes : the 
 Emerson Arcadia 2001, Advision Home-Arcade, Prestige MPT-03, Tele-Fever, etc. and the Palladium 
 Video-Computer-Game.
@@ -35103,7 +35103,7 @@ the Tele-Cassetten-Game. The Mr Altus and Polybrain systems are however the same
 marketed under different brands. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -35145,7 +35145,7 @@ Other Emulators:
 * 2001 (for DOS) -- http://users.aol.com/mk14emu/arcadia.htm
 
 
-* Emulator2001 (for Windows) -- http://www.gstsoftware.co.nz/ (min. CPU: Pentium 1.4Ghz - a joke!)
+* Emulator2001 (for Windows) -- http://www.gstsoftware.co.nz/ (min. CPU: Pentium 1.4GHz - a joke!)
 
 
 * WinArcadia -- http://amigan.byethost33.com/
@@ -35321,7 +35321,7 @@ Features:
 ---------
 
 
-* CPU: Commodore Semiconductor Group 6502A 1.0227 Mhz
+* CPU: Commodore Semiconductor Group 6502A 1.0227 MHz
 
 
 * Co-Processor: VIC-I (6560) for sound and graphics.
@@ -35562,7 +35562,7 @@ A wide range of peripherals and software were developed for the VIC-20. When it 
 obsolete, Commodore replaced it by the Commodore 16 which had no success.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -35625,7 +35625,7 @@ Features:
 * Co-Processor: RCA CDP-1861 video chip
 
 
-* RAM: 2 Kb, upgradable to 32 kb
+* RAM: 2 Kb, upgradeable  to 32 kb
 
 
 * ROM: 4 kb CMOS ROM + 512 byte Monitor ROM
@@ -35712,7 +35712,7 @@ on the motherboard but have to be implemented as options. With the I/O interface
 connect interface relays, sensors, printers or ASCII keyboards.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -35786,7 +35786,7 @@ will appear under the Bandai logo when the system is turned on. Option settings 
 volume and contrast may also be set here.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -35885,7 +35885,7 @@ features a fairly large library of games. As it was a console designed essential
 Japanese market, most of the games are in Japanese, with only a few featuring English text.
 
 
-(infos from Wikipedia)
+(info from Wikipedia)
 
 
 
@@ -36001,7 +36001,7 @@ environment).
 It was followed by the X68000 Ace and Ace HD. 
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -36133,7 +36133,7 @@ an editor nor debugger! This means that mistakes in a line can only be corrected
 whole line again! (reported by Jan M.L. Bosmans)
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -36193,7 +36193,7 @@ Features:
 * CPU: NEC 780C-1 (Z80 compatible) 3.25 MHz
 
 
-* RAM: 1 KB, 901 bytes available (upgradable to 64 KB)
+* RAM: 1 KB, 901 bytes available (upgradeable  to 64 KB)
 
 
 * ROM: 4 KB. Can be expended to 8 KB, thereby making it almost a ZX81
@@ -36258,7 +36258,7 @@ micro-computers world : Sinclair Computers Ltd. It was replaced in 1981 with the
 was more integrated and cheaper.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
@@ -36408,7 +36408,7 @@ It was followed by the ZX-Spectrum and was also sold as the Timex Sinclair 1000 
 difference was that the TS 1000 has 2 KB RAM instead of the 1 KB RAM of the original ZX-81.
 
 
-(infos from old-computers.com)
+(info from old-computers.com)
 
 
 
