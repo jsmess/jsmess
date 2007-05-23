@@ -22,11 +22,10 @@
 	- SC-3000 cassette
 	- SF-7000 serial comms
 	- SP-400 serial printer
-	- Terebi Oekaki touchpad emulation
 
 */
 
-/* Terebi Oekaki */
+/* Terebi Oekaki (TV Draw) */
 
 /*
 
@@ -43,34 +42,31 @@
 
 */
 
-static int terebi_axis;
+static int tvdraw_data;
 
-static WRITE8_HANDLER( terebi_axis_w )
+static WRITE8_HANDLER( tvdraw_axis_w )
 {
-	terebi_axis = data & 0x01;
-}
-
-static READ8_HANDLER( terebi_status_r )
-{
-	return 1;
-}
-
-static READ8_HANDLER( terebi_data_r )
-{
-	if (terebi_axis)
+	if (data & 0x01)
 	{
-		// Y axis
+		tvdraw_data = readinputportbytag("TVDRAW_X");
+
+		if (tvdraw_data < 4) tvdraw_data = 4;
+		if (tvdraw_data > 251) tvdraw_data = 251;
 	}
 	else
 	{
-		// X axis
+		tvdraw_data = readinputportbytag("TVDRAW_Y") + 32;
 	}
-
-	return 0;
 }
 
-static WRITE8_HANDLER( terebi_data_w )
+static READ8_HANDLER( tvdraw_status_r )
 {
+	return readinputportbytag("TVDRAW_PEN");
+}
+
+static READ8_HANDLER( tvdraw_data_r )
+{
+	return tvdraw_data;
 }
 
 /* Memory Maps */
@@ -128,6 +124,17 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
+INPUT_PORTS_START( tvdraw )
+	PORT_START_TAG("TVDRAW_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START_TAG("TVDRAW_Y")
+	PORT_BIT( 0xff, 0x60, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 191) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START_TAG("TVDRAW_PEN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pen")
+INPUT_PORTS_END
+
 INPUT_PORTS_START( sg1000 )
 	PORT_START_TAG("PA7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -148,9 +155,11 @@ INPUT_PORTS_START( sg1000 )
 
 	PORT_START_TAG("PAUSE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE")
+
+	PORT_INCLUDE( tvdraw )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( sc3000 )
+INPUT_PORTS_START( sk1100 )
 	PORT_START_TAG("PA0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
@@ -270,6 +279,15 @@ INPUT_PORTS_START( sc3000 )
 
 	PORT_START_TAG("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc3000 )
+	PORT_INCLUDE( sk1100 )
+	PORT_INCLUDE( tvdraw )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sf7000 )
+	PORT_INCLUDE( sk1100 )
 
 	PORT_START_TAG("BAUD")
 	PORT_CONFNAME( 0x05, 0x05, "Baud rate")
@@ -634,10 +652,10 @@ static void sg1000_map_cartridge_memory(UINT8 *ptr, int size)
 	{
 		// Terebi Oekaki
 
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, &terebi_axis_w);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, &terebi_status_r);
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_r);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &terebi_data_w);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, &tvdraw_axis_w);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, &tvdraw_status_r);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, &tvdraw_data_r);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, MWA8_NOP);
 	}
 	else if (!strncmp("ASCII 1986", (const char *)&ptr[0x1cc3], 10))
 	{
@@ -864,6 +882,6 @@ SYSTEM_CONFIG_END
 /*    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY   FULLNAME */
 CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		sg1000,		"Sega",	"SG-1000", 0 )
 COMP( 1983,	sc3000,		0,		0,		sc3000,		sc3000,		0,		sc3000,		"Sega",	"SC-3000", 0 )
-COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sc3000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", 0 )
-CONS( 1983,	sg1000m2,	0,		0,		sc3000,		sc3000,		0,		sg1000,		"Sega",	"SG-1000 Mark II", 0 )
-//COMP( 1983,	omv,		sc3000, 0,		omv,		omv,		0,		omv,		"Tsukuda Original",	"Othello Multivision", GAME_NOT_WORKING )
+COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		sf7000,		"Sega",	"SC-3000/Super Control Station SF-7000", 0 )
+CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		sg1000,		"Sega",	"SG-1000 Mark II", 0 )
+//COMP( 1983,	omv,		sg1000, 0,		omv,		omv,		0,		omv,		"Tsukuda Original",	"Othello Multivision", GAME_NOT_WORKING )
