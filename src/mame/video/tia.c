@@ -682,20 +682,14 @@ static void update_bitmap(int next_x, int next_y)
 
 static void button_callback(int dummy)
 {
-	int button0;
-	int button1;
+	int button0 = 0x80;
+	int button1 = 0x80;
 
 	if ( tia_read_input_port )
 	{
 		button0 = tia_read_input_port(4,0xFFFF) & 0x80;
 		button1 = tia_read_input_port(5,0xFFFF) & 0x80;
 	}
-	else
-	{
-		button0 = readinputport(4) & 0x80;
-		button1 = readinputport(5) & 0x80;
-	}
-	
 
 	if (VBLANK & 0x40)
 	{
@@ -1046,20 +1040,18 @@ static WRITE8_HANDLER( GRP1_w )
 static READ8_HANDLER( INPT_r )
 {
 	UINT32 elapsed = activecpu_gettotalcycles() - paddle_cycles;
-	int input;
+	int input = TIA_INPUT_PORT_ALWAYS_ON;
 
 	if ( tia_read_input_port )
 	{
 		input = tia_read_input_port(offset & 3, 0xFFFF);
-		if ( input == TIA_INPUT_PORT_ALWAYS_ON )
-			return 0x80;
-		if ( input == TIA_INPUT_PORT_ALWAYS_OFF )
-			return 0x00;
 	}
-	else
-	{
-		input = readinputport(offset & 3);
-	}
+
+	if ( input == TIA_INPUT_PORT_ALWAYS_ON )
+		return 0x80;
+	if ( input == TIA_INPUT_PORT_ALWAYS_OFF )
+		return 0x00;
+
 	return elapsed > 76 * input ? 0x80 : 0x00;
 }
 
