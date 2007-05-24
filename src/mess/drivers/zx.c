@@ -506,12 +506,12 @@ ROM_END
 
 ROM_START(h4th)
 	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "h4th.rom", 0x0000, 0x2000, CRC(257d5a32) )
+	ROM_LOAD( "h4th.rom", 0x0000, 0x2000, CRC(257d5a32) SHA1(03809a6b464609ff924f7e55a85eef875cd47ae8) )
 ROM_END                                                                                                                                       
 
 ROM_START(tree4th)
 	ROM_REGION( 0x10000, REGION_CPU1,0 )
-	ROM_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) )
+	ROM_LOAD( "tree4th.rom", 0x0000, 0x2000, CRC(71616238) SHA1(3ee15779e03482b10fc59eb4df2446376c56b00d) )
 ROM_END                                                                                                                                       
 
 ROM_START(ts1000)

@@ -1453,7 +1453,7 @@ MACHINE_DRIVER_END
 	rom. The boot rom is also on the OS rescue disc. Handy! */
 ROM_START(pcw16)
 	ROM_REGION((0x010000+524288), REGION_CPU1,0)
-	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498))
+	ROM_LOAD("pcw045.sys",0x10000, 524288, CRC(c642f498) SHA1(8a5c05de92e7b2c5acdfb038217503ad363285b5))
 ROM_END
 
 static void pcw16_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)

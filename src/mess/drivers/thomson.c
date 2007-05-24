@@ -474,44 +474,53 @@ ADDRESS_MAP_END
      /* CD 90-640 (5"1/4) */						\
      ROM_LOAD ( "cd90-640.rom", base+0x800, 0x7c0,			\
 		CRC(5114c0a5)						\
-		MD5(e5b609dd90b26c9974a46cd54eab4216) )			\
+		MD5(e5b609dd90b26c9974a46cd54eab4216) 			\
+		SHA1(5c72566c22d8160ef0c75959e1863a1309bbbe49) )	\
      /* CD 90-351 (3"1/2) */						\
      ROM_LOAD ( "cd-351-0.rom", base+0x1000, 0x7c0,			\
 		CRC(2c0159fd)						\
-		MD5(74b61b2905e355419c497b5520706aa0) )			\
+		MD5(74b61b2905e355419c497b5520706aa0) 			\
+		SHA1(bab5395ed8bc7c06f9897897f836054e6546e8e8) )	\
      ROM_LOAD ( "cd-351-1.rom", base+0x1800, 0x7c0,			\
 		CRC(8e58d159)						\
-		MD5(e2a2cd1be213bc340bb8e9ebbed95d0d) )			\
+		MD5(e2a2cd1be213bc340bb8e9ebbed95d0d) 			\
+		SHA1(dcf992c96e7556b2faee6bacd3f744e56998e6ea) )	\
      ROM_LOAD ( "cd-351-2.rom", base+0x2000, 0x7c0,			\
 		CRC(c9228b60)						\
-		MD5(087e52f007dd24a385adea39f80682a3) )			\
+		MD5(087e52f007dd24a385adea39f80682a3) 			\
+		SHA1(179e10107d5be91e684069dee80f94847b83201f) )	\
      ROM_LOAD ( "cd-351-3.rom", base+0x2800, 0x7c0,			\
 		CRC(3ca8e5dc)						\
-		MD5(e01dceb2295fa548a4f74cf0487c3f6d) )			\
+		MD5(e01dceb2295fa548a4f74cf0487c3f6d) 			\
+		SHA1(7118636fb5c597c78c2fce17b02aed5e4ba38635) )	\
      /* CQ 90-028 (2"8, aka QDD) */					\
      ROM_LOAD ( "cq90-028.rom", base+0x3000, 0x7c0,			\
 		CRC(ca4dba3d)						\
-		MD5(0f58e167bf6ebcd2cbba946be2084fbe) )			
+		MD5(0f58e167bf6ebcd2cbba946be2084fbe)			\
+		SHA1(949c1f777c892da62c242215d79757d61e71e62b) )			
      
 /* external floppy / network controller: 8 banks */     
 #define ROM_FLOPPY5( base )				\
   ROM_FLOPPY( base )					\
   ROM_LOAD ( "nano5.rom", base+0x3800, 0x7c0,	\
 	     CRC(2f756868)				\
-	     MD5(06ff309276d4fc656e99a8ad1ca67899) )
+	     MD5(06ff309276d4fc656e99a8ad1ca67899) 	\
+	     SHA1(b5b7cb6d12493d849330b6b5628efd1a83a4bbf5) )
 
 #define ROM_FLOPPY7( base )				\
   ROM_FLOPPY( base )					\
   ROM_LOAD ( "nano7.rom", base+0x3800, 0x7c0,	\
 	     CRC(42a1d1a6)				\
-	     MD5(77da8cfc9e0a14ef2ed7034f5941b542) )
+	     MD5(77da8cfc9e0a14ef2ed7034f5941b542) 	\
+	     SHA1(973209f4baa5e81bf7885c0602949e064bac7862) )
      
 
 ROM_START ( to7 )
      ROM_REGION ( 0x28000, REGION_CPU1, 0 )
      ROM_LOAD ( "to7.rom", 0xe800, 0x1800,
 		CRC(0e7826da)
-		MD5(5bf18521bf35293de942645f690b2845) )
+		MD5(5bf18521bf35293de942645f690b2845) 
+		SHA1(23a2f84b03c01d385cc1923c8ece95c43756297a) )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
      ROM_FLOPPY7 ( 0x24000 )
 ROM_END
@@ -520,7 +529,8 @@ ROM_START ( t9000 )
      ROM_REGION ( 0x28000, REGION_CPU1, 0 )
      ROM_LOAD ( "t9000.rom", 0xe800, 0x1800,
 		CRC(daa8cfbf)
-		MD5(b3007f26e7b621c1a4f0fd2c287f80b9) )
+		MD5(b3007f26e7b621c1a4f0fd2c287f80b9) 
+		SHA1(a5735db1ad4e529804fc46603f838d3f4ccaf5cf) )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
      ROM_FLOPPY7 ( 0x24000 )
 ROM_END
@@ -852,7 +862,8 @@ ROM_START ( to770 )
      ROM_REGION ( 0x40000, REGION_CPU1, 0 )
      ROM_LOAD ( "to770.rom", 0xe800, 0x1800, /* BIOS */
 		CRC(89518862)
-		MD5(61402c35b75faeb4b74b815f323fff3d) )
+		MD5(61402c35b75faeb4b74b815f323fff3d) 
+		SHA1(cd34474c0bcc758f6d71c90fbd40cef379d61374) )
      ROM_FLOPPY7 ( 0x3c000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -861,7 +872,8 @@ ROM_START ( to770a )
      ROM_REGION ( 0x40000, REGION_CPU1, 0 )
      ROM_LOAD ( "to770a.rom", 0xe800, 0x1800,
 		CRC(378ea808)
-		MD5(6b63aa135107beee243967a2da0e5453) )
+		MD5(6b63aa135107beee243967a2da0e5453) 
+		SHA1(f4575b537dfdb46ff2a0e7cbe8dfe4ba63161b8e) )
      ROM_FLOPPY7 ( 0x3c000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -1042,10 +1054,12 @@ ROM_START ( mo5 )
      ROM_REGION ( 0x38000, REGION_CPU1, 0 )
      ROM_LOAD ( "mo5.rom", 0xf000, 0x1000,
 		CRC(f0ea9140)
-		MD5(ab3533a7132f90933acce80e256ae459) )
+		MD5(ab3533a7132f90933acce80e256ae459) 
+		SHA1(36ce2d3df1866ec2fe368c1c28757e2f5401cf44) )
      ROM_LOAD ( "basic5.rom", 0x11000, 0x3000,
 		CRC(c2c11b9d)
-		MD5(f992a912093d3e8f165f225f74345b57) )
+		MD5(f992a912093d3e8f165f225f74345b57) 
+		SHA1(512dd40fb45bc2b51a24c84b3723a32bc8e80c06) )
      ROM_FLOPPY5 ( 0x34000 )
 ROM_END
 
@@ -1053,10 +1067,12 @@ ROM_START ( mo5e )
      ROM_REGION ( 0x38000, REGION_CPU1, 0 )
      ROM_LOAD ( "mo5e.rom", 0xf000, 0x1000,
 		CRC(6520213a)
-		MD5(434c42b96c31a341e13085048cdc8eae) )
+		MD5(434c42b96c31a341e13085048cdc8eae) 
+		SHA1(f17a7a59baf2819ec80991b34b204795536a5e01) )
      ROM_LOAD ( "basic5e.rom", 0x11000, 0x3000,
 		CRC(934a72b2)
-		MD5(6404a7f49ec28937decd905d2a3cbb28) )
+		MD5(6404a7f49ec28937decd905d2a3cbb28) 
+		SHA1(b37e2b1afbfba368c19be87b3bf61dfe6ad8b0bb) )
      ROM_FLOPPY5 ( 0x34000 )
 ROM_END
 
@@ -1254,33 +1270,42 @@ ROM_START ( to9 )
      ROM_REGION ( 0x6c000, REGION_CPU1, 0 )
      ROM_LOAD ( "to9.rom", 0xe000, 0x2000, /* BIOS & floppy controller */
 		CRC(f9278bf7)
-		MD5(507f0c482462b70b816fd23cf6791179) )
+		MD5(507f0c482462b70b816fd23cf6791179) 
+		SHA1(9e99e6ae0285950f007b19161de642a4031fe46e) )
 
      /* BASIC & software */
      ROM_LOAD ( "basic9-0.rom", 0x20000, 0x4000,
 		CRC(c7bac620)
-		MD5(095d0f94ab506ab5da1e73ae550ee2bc) )
+		MD5(095d0f94ab506ab5da1e73ae550ee2bc) 
+		SHA1(4b2a8b30cf437858ce978ba7b0dfa2bbd57eb38a) )
      ROM_LOAD ( "basic9-1.rom", 0x24000, 0x4000,
 		CRC(ea5f3e43)
-		MD5(ce29a894c31db083acf6bdf015a02b5e) )
+		MD5(ce29a894c31db083acf6bdf015a02b5e) 
+		SHA1(5e58a29c2d117fcdb1f5e7ca31dbfffa0f9218f2) )
      ROM_LOAD ( "basic9-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
-		MD5(02279e22b8bfe29e750fb62671e3951d) )
+		MD5(02279e22b8bfe29e750fb62671e3951d) 
+		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
      ROM_LOAD ( "basic9-3.rom", 0x2c000, 0x4000,
 		CRC(6b5b19e3)
-		MD5(dac4b33a8cbebf64916b35515e0693c8) )
+		MD5(dac4b33a8cbebf64916b35515e0693c8) 
+		SHA1(0e832670c185694d9abbcebcc3ad90e94eed585d) )
      ROM_LOAD ( "soft9-0a.rom", 0x30000, 0x4000,
 		CRC(8cee157e)
-		MD5(3dab712e800351b4f639790595b12101) )
+		MD5(3dab712e800351b4f639790595b12101) 
+		SHA1(f32fc39b95890c00571e9f3fbcc2d8e0596fc4a1) )
      ROM_LOAD ( "soft9-1a.rom", 0x34000, 0x4000,
 		CRC(cf39ac93)
-		MD5(bcd744cdbd022cd9e2651e87792cd742) )
+		MD5(bcd744cdbd022cd9e2651e87792cd742) 
+		SHA1(b97e6b7389398e5706624973c11ee7ddba323ce1) )
      ROM_LOAD ( "soft9-0b.rom", 0x38000, 0x4000,
 		CRC(033aee3f)
-		MD5(1a4d3549c78328479361e867d240f285) )
+		MD5(1a4d3549c78328479361e867d240f285) 
+		SHA1(f3604e500329ec0489b05dbab05530322e9463c5) )
      ROM_LOAD ( "soft9-1b.rom", 0x3c000, 0x4000,
 		CRC(214fe527)
-		MD5(3dc2820fbe7b81a3936f731b44f23cbe) )
+		MD5(3dc2820fbe7b81a3936f731b44f23cbe) 
+		SHA1(0d8e3f1ca347026e906c3d00a0371e8238c44a60) )
 
      ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -1527,24 +1552,30 @@ ROM_START ( to8 )
      /* BIOS & floppy */
      ROM_LOAD ( "to8-0.rom", 0xb0000, 0x2000,
 		CRC(3c4a640a)
-		MD5(97c9b803305031daf6bffa671f7667c2) )
+		MD5(97c9b803305031daf6bffa671f7667c2) 
+		SHA1(0a4952f0ca002d82ac83755e1f694d56399413b2) )
      ROM_LOAD ( "to8-1.rom", 0xb2000, 0x2000,
 		CRC(cb9bae2d)
-		MD5(6ca0ebe022f9c433373eaed403aaf0ce) )
+		MD5(6ca0ebe022f9c433373eaed403aaf0ce) 
+		SHA1(a4a55a6e2c74bca15951158c5164970e922fc1c1) )
 
      /* BASIC */
      ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
-		MD5(6c33e3cd79bd6c675634b172594bbfec) )
+		MD5(6c33e3cd79bd6c675634b172594bbfec) 
+		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
      ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
-		MD5(360cbf42078bf8c80a283828bf6ee4e6) )
+		MD5(360cbf42078bf8c80a283828bf6ee4e6) 
+		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
      ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
-		MD5(02279e22b8bfe29e750fb62671e3951d) )
+		MD5(02279e22b8bfe29e750fb62671e3951d) 
+		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
      ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
 		CRC(f552e7e3)
-		MD5(56c1e929ef4be6771cac7157d169132f) )
+		MD5(56c1e929ef4be6771cac7157d169132f) 
+		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
      ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -1555,24 +1586,30 @@ ROM_START ( to8d )
      /* BIOS & floppy */
      ROM_LOAD ( "to8d-0.rom", 0xb0000, 0x2000,
 		CRC(30ea4950)
-		MD5(7704c1148b8761e9ce650ef1aa7ded69) )
+		MD5(7704c1148b8761e9ce650ef1aa7ded69) 
+		SHA1(6705100cd337fffb26ce999302b55fb71557b128) )
      ROM_LOAD ( "to8d-1.rom", 0xb2000, 0x2000,
 		CRC(926cf0ca)
-		MD5(3e202c3914e16c5ede32ab2bd2a61a5e) )
+		MD5(3e202c3914e16c5ede32ab2bd2a61a5e)
+		SHA1(8521613ac00e04dd94b69e771aeaefbf4fe97bf7) )
 
      /* BASIC */
      ROM_LOAD ( "basic8-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
-		MD5(6c33e3cd79bd6c675634b172594bbfec) )
+		MD5(6c33e3cd79bd6c675634b172594bbfec)
+		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
      ROM_LOAD ( "basic8-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
-		MD5(360cbf42078bf8c80a283828bf6ee4e6) )
+		MD5(360cbf42078bf8c80a283828bf6ee4e6)
+		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
      ROM_LOAD ( "basic8-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
-		MD5(02279e22b8bfe29e750fb62671e3951d) )
+		MD5(02279e22b8bfe29e750fb62671e3951d)
+		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
      ROM_LOAD ( "basic8-3.rom", 0x2c000, 0x4000,
 		CRC(f552e7e3)
-		MD5(56c1e929ef4be6771cac7157d169132f) )
+		MD5(56c1e929ef4be6771cac7157d169132f)
+		SHA1(3208e0d7d90241a327ed24e4921303f16e167bd5) )
 
      ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -1727,24 +1764,30 @@ ROM_START ( to9p )
      /* BIOS & floppy */
      ROM_LOAD ( "to9p-0.rom", 0xb0000, 0x2000,
 		CRC(a2731296)
-		MD5(dfb6bfe5ae6142395fe4d1b854b7f6ff) )
+		MD5(dfb6bfe5ae6142395fe4d1b854b7f6ff)
+		SHA1(b30e06127d6e99d4ac5a5bb67881df27bbd9a7e5) )
      ROM_LOAD ( "to9p-1.rom", 0xb2000, 0x2000,
 		CRC(c52ce315)
-		MD5(66bba93895d27c788b25a8b48c8d3799) )
+		MD5(66bba93895d27c788b25a8b48c8d3799)
+		SHA1(7eacbd796e76bc72b872f9700c9b90414899ea0f) )
 
      /* BASIC */
      ROM_LOAD ( "basicp-0.rom", 0x20000, 0x4000,
 		CRC(e5a00fb3)
-		MD5(6c33e3cd79bd6c675634b172594bbfec) )
+		MD5(6c33e3cd79bd6c675634b172594bbfec) 
+		SHA1(281e535ed9b0f76e620253e9103292b8ff623d02) )
      ROM_LOAD ( "basicp-1.rom", 0x24000, 0x4000,
 		CRC(4b241e63)
-		MD5(360cbf42078bf8c80a283828bf6ee4e6) )
+		MD5(360cbf42078bf8c80a283828bf6ee4e6)
+		SHA1(ca8941a10db6cc069bf84c773f5e7d7d2c18449e) )
      ROM_LOAD ( "basicp-2.rom", 0x28000, 0x4000,
 		CRC(0f5581b3)
-		MD5(02279e22b8bfe29e750fb62671e3951d) )
+		MD5(02279e22b8bfe29e750fb62671e3951d)
+		SHA1(93815ca78d3532192aaa56cbf65b68b0f10f1b8a) )
      ROM_LOAD ( "basicp-3.rom", 0x2c000, 0x4000,
 		CRC(ebe9c8d9)
-		MD5(67e7f2de15bcd2ee9dac7974da478901) )
+		MD5(67e7f2de15bcd2ee9dac7974da478901)
+		SHA1(b667ad09a1181f65059a2cbb4c95421bc544a334) )
 
       ROM_FILL( 0x10000, 0x10000, 0x39 )
 ROM_END
@@ -1881,24 +1924,30 @@ ROM_START ( mo6 )
      /* BIOS */
      ROM_LOAD ( "mo6-0.rom", 0x23000, 0x1000,
 		CRC(0446eef6)
-		MD5(192c44506f347b02030eb3ec862b850f) )
+		MD5(192c44506f347b02030eb3ec862b850f)
+		SHA1(b57fcda69c95f0c97c5cb0605d17c49a0c630300) )
      ROM_LOAD ( "mo6-1.rom", 0x27000, 0x1000,
 		CRC(eb6df8d4)
-		MD5(7ff810d9b7e6900d8904336b6114ebd7) )
+		MD5(7ff810d9b7e6900d8904336b6114ebd7)
+		SHA1(24e2232f582ce04f260acd8e9ec710468a81505c) )
 
      /* BASIC */
      ROM_LOAD ( "basic6-0.rom", 0x20000, 0x3000,
 		CRC(18789833)
-		MD5(08edc429b44e581b3c826ac81b06cd2b) )
+		MD5(08edc429b44e581b3c826ac81b06cd2b)
+		SHA1(fccbf69cbc6deba45a767a26cd6454cf0eedfc2b) )
      ROM_LOAD ( "basic6-1.rom", 0x24000, 0x3000,
 		CRC(c9b4d6f4)
-		MD5(03f82e6d26547dd23fca7c420b6952c4) )
+		MD5(03f82e6d26547dd23fca7c420b6952c4)
+		SHA1(47487d2bc4c9a9c09c733bd89c49693c52e262de) )
      ROM_LOAD ( "basic6-2.rom", 0x28000, 0x4000,
 		CRC(08eac9bb)
-		MD5(4f5d0bb8dea45d85d8551c09888423d1) )
+		MD5(4f5d0bb8dea45d85d8551c09888423d1)
+		SHA1(c0231fdb3bcccbbb10c1f93cc529fc3b96dd3f4d) )
      ROM_LOAD ( "basic6-3.rom", 0x2c000, 0x4000,
 		CRC(19d66dc4)
-		MD5(c2c4dab28d42adf4ea264270ea889c4f) )
+		MD5(c2c4dab28d42adf4ea264270ea889c4f)
+		SHA1(301b6366269181b74cb5d7ccdf5455b7290ae99b) )
 
      ROM_FLOPPY5 ( 0x50000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
@@ -1910,24 +1959,30 @@ ROM_START ( pro128 )
      /* BIOS */
      ROM_LOAD ( "pro128-0.rom", 0x23000, 0x1000,
 		CRC(a8aef291)
-		MD5(b7d937421754b79587050208b8c3beb2) )
+		MD5(b7d937421754b79587050208b8c3beb2)
+		SHA1(2685cca841f405a37ef48b0115f90c865ce79d0f) )
      ROM_LOAD ( "pro128-1.rom", 0x27000, 0x1000,
 		CRC(5b3340ec)
-		MD5(9b7f4505195d12a5efceaac26bcb4079) )
+		MD5(9b7f4505195d12a5efceaac26bcb4079)
+		SHA1(269f2eb3e3452014b8d1f0f9e1c63fe56375a863) )
 
      /* BASIC */
      ROM_LOAD ( "basico-0.rom", 0x20000, 0x3000,
 		CRC(98b10d5e)
-		MD5(96ce523fe27cd3935195f4218deb6277) )
+		MD5(96ce523fe27cd3935195f4218deb6277)
+		SHA1(d6b77e694fa85e1114293448e5a64f6e2cf46c22) )
      ROM_LOAD ( "basico-1.rom", 0x24000, 0x3000,
 		CRC(721d2124)
-		MD5(73cfdcd1638932ef8ebc639cbc6e2dd0) )
+		MD5(73cfdcd1638932ef8ebc639cbc6e2dd0)
+		SHA1(51db1cd03b3891e212a24aa6563b09968930d897) )
      ROM_LOAD ( "basico-2.rom", 0x28000, 0x4000,
 		CRC(135438ab)
-		MD5(d155a93aa1a2b1b5102bb5e0acdb3391) )
+		MD5(d155a93aa1a2b1b5102bb5e0acdb3391)
+		SHA1(617d4e4979842bea2c21ef7f8c50f3b08b15239a) )
      ROM_LOAD ( "basico-3.rom", 0x2c000, 0x4000,
 		CRC(2c2befa6)
-		MD5(5e31d779961ed1ae7fc800489277f96a) )
+		MD5(5e31d779961ed1ae7fc800489277f96a)
+		SHA1(3e94e182bacbb55bb07be2af4c76c0b0df47b3bf) )
 
      ROM_FLOPPY5 ( 0x50000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 )
@@ -2196,24 +2251,30 @@ ROM_START ( mo5nr )
      /* BIOS */
      ROM_LOAD ( "mo5nr-0.rom", 0x23000, 0x1000,
 		CRC(06e31115)
-		MD5(5826a0190d7d0eb9a03c327072198a5d) )
+		MD5(5826a0190d7d0eb9a03c327072198a5d)
+		SHA1(7429cc0c15475398b5ab514cb3d3efdc71cf082f) )
      ROM_LOAD ( "mo5nr-1.rom", 0x27000, 0x1000,
 		CRC(7cda17c9)
-		MD5(ede3dd012cd15ad5066581522ce724b5) )
+		MD5(ede3dd012cd15ad5066581522ce724b5)
+		SHA1(2ff6480ce9e30acc4c89b6113d7c8ea6095d90a5) )
 
      /* BASIC */
      ROM_LOAD ( "basicn-0.rom", 0x20000, 0x3000,
 		CRC(fae9e691)
-		MD5(03c7d856a17b34c7b295b22038c89c8f) )
+		MD5(03c7d856a17b34c7b295b22038c89c8f)
+		SHA1(62fbfd6d4ca837f6cb8ed37f828eca97f80e6200) )
      ROM_LOAD ( "basicn-1.rom", 0x24000, 0x3000,
 		CRC(cf134dd7)
-		MD5(e8069cd0857735e856ac0125b473b696) )
+		MD5(e8069cd0857735e856ac0125b473b696)
+		SHA1(1bd961314e16e460d37a65f5e7f4acf5604fbb17) )
      ROM_LOAD ( "basicn-2.rom", 0x28000, 0x4000,
 		CRC(b69d2e0d)
-		MD5(cd11f0244c0cd30fd315c14e83b21381) )
+		MD5(cd11f0244c0cd30fd315c14e83b21381)
+		SHA1(ea3220bbae991e08259d38a7ea24533b2bb86418) )
      ROM_LOAD ( "basicn-3.rom", 0x2c000, 0x4000,
 		CRC(7785610f)
-		MD5(c67c65ac66c5f82bea3fcb83c2308a51) )
+		MD5(c67c65ac66c5f82bea3fcb83c2308a51)
+		SHA1(c38b0be404d8af6f409a1b52cb79a4e10fc33177) )
 
      ROM_FLOPPY5 ( 0x50000 )
      ROM_FILL ( 0x10000, 0x10000, 0x39 ) /* TODO: network ROM */

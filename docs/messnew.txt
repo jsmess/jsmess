@@ -50,9 +50,11 @@ System Driver Changes:
 - [A2600] HMOVE triggered on the last possible CPU cycle also triggers
   a delay of the end of HBlank. (bug #1222) [Wilbert Pol]
 
+- [AMIGA] Updated the Amiga driver to output the power and drive LED status
+  to the artwork system. [Dirk Best]
+
 - [COCO/DRAGON] Cartridge slot rearchitecture.  [Nate Woods]
 
-- [sysinfo.dat] Massive update to entire file. [Fabio Priuli]
 
 
 User Interface Changes:
@@ -80,8 +82,9 @@ Source Changes:
 
 - Fixed a memory leak.  (bug #1019) [Oliver Stoeneberg]
 
-- Updated the Amiga driver to output the power and drive LED status to the
-  artwork system. [Dirk Best]
+- Massive update to entire sysinfo.dat file. [Fabio Priuli]
+
+- Added many SHA1 hashes. [Fabio Priuli]
 
 
 
