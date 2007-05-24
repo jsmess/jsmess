@@ -100,7 +100,6 @@
 	TODO:
 
 	- inputs
-	- only astro pinball & chopper rescue carts work
 
 */
 
@@ -120,8 +119,8 @@ static ADDRESS_MAP_START( fnvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_READ(TMS9928A_register_r)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(TMS9928A_register_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM AM_MIRROR(0x3800)
 ADDRESS_MAP_END
 
@@ -216,14 +215,7 @@ static INTERRUPT_GEN( fnvision_int )
 
 static void fnvision_vdp_interrupt(int state)
 {
-	static int last_state;
-
-    // only if it goes up
-	if (state && !last_state)
-	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-	}
-	last_state = state;
+	cpunum_set_input_line(0, INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -280,10 +272,10 @@ static MACHINE_RESET( fnvision )
 
 static MACHINE_DRIVER_START( fnvision )
 	// basic machine hardware
-	MDRV_CPU_ADD(M6502, 2000000)	// ???
+	MDRV_CPU_ADD(M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(fnvision_map, 0)
 	MDRV_CPU_VBLANK_INT(fnvision_int, 1)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(10738635.0/2/342/262) //
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 
 	MDRV_MACHINE_START( fnvision )
@@ -294,7 +286,7 @@ static MACHINE_DRIVER_START( fnvision )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76496, 2000000)	/* 2 MHz */
+	MDRV_SOUND_ADD(SN76496, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -303,55 +295,68 @@ ROM_START( fnvision )
     ROM_LOAD( "funboot.rom", 0xc000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 
-int device_load_fnvision_cart(mess_image *image)
+
+static DEVICE_LOAD( fnvision_cart )
 {
-	/*
-
-		Cartridge Image format
-		======================
-
-		- The first 16K is read into 8000 - BFFF. If the cart file is less than 16k
-		then the cartridge is read into 8000, then replicated to fill up the 16k
-		(eg. a 4k cartridge file is written to 8000 - 8FFF, then replicated at
-		9000-9FFF, A000-AFFF and B000-BFFF).
-		- The next 16k is read into 4000 - 7FFF. If this extra bit is less than 16k,
-		then the data is replicated throughout 4000 - 7FFF.
-
-		For example, an 18k cartridge dump has its first 16k read and written into
-		memory at 8000-BFFF. The remaining 2K is written into 4000-47FF, then 
-		replicated 8 times to appear at 4800, 5000, 5800, 6000, 6800, 7000 and 7800.
-
-	*/
-
-	int size = image_fread(image, memory_region(REGION_CPU1) + 0x8000, 0x4000);
+	int size = image_length(image);
 
 	switch (size)
 	{
-	case 0x1000:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0x3000, MRA8_ROM);
+	case 0x1000: // 4K
+		image_fread(image, memory_region(REGION_CPU1) + 0x9000, 0x1000);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0x2000, MRA8_BANK1);
 		break;
-	case 0x2000:
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0x2000, MRA8_ROM);
-		break;
-	case 0x4000:
-		size = image_fread(image, memory_region(REGION_CPU1) + 0x4000, 0x4000);
 
-		switch (size)
-		{
-		case 0x0800:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x47ff, 0, 0x3800, MRA8_ROM);
-			break;
-		case 0x1000:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0x3000, MRA8_ROM);
-			break;
-		case 0x2000:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0x2000, MRA8_ROM);
-			break;
-		}
+	case 0x1800: // 6K
+		image_fread(image, memory_region(REGION_CPU1) + 0x9000, 0x1000);
+		image_fread(image, memory_region(REGION_CPU1) + 0x8800, 0x0800);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0x2000, MRA8_BANK1);
 		break;
+
+	case 0x2000: // 8K
+		image_fread(image, memory_region(REGION_CPU1) + 0x8000, 0x2000);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0x2000, MRA8_BANK1);
+		break;
+
+	case 0x2800: // 10K
+		image_fread(image, memory_region(REGION_CPU1) + 0x8000, 0x2000);
+		image_fread(image, memory_region(REGION_CPU1) + 0x5800, 0x0800);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0x2000, MRA8_BANK1);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0x2000, MRA8_BANK2);
+		break;
+
+	case 0x3000: // 12K
+		image_fread(image, memory_region(REGION_CPU1) + 0x8000, 0x2000);
+		image_fread(image, memory_region(REGION_CPU1) + 0x5000, 0x1000);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0x2000, MRA8_BANK1);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0x2000, MRA8_BANK2);
+		break;
+
+	case 0x4000: // 16K
+		image_fread(image, memory_region(REGION_CPU1) + 0xa000, 0x2000);
+		image_fread(image, memory_region(REGION_CPU1) + 0x8000, 0x2000);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK1);
+		break;
+
+	case 0x4800: // 18K
+		image_fread(image, memory_region(REGION_CPU1) + 0xa000, 0x2000);
+		image_fread(image, memory_region(REGION_CPU1) + 0x8000, 0x2000);
+		image_fread(image, memory_region(REGION_CPU1) + 0x4800, 0x0800);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, MRA8_BANK1);
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4fff, 0, 0x3000, MRA8_BANK2);
+		break;
+
+	default:
+		return INIT_FAIL;
 	}
 
-	return 0;
+	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
+	memory_set_bank(1, 0);
+
+	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1) + 0x4000, 0);
+	memory_set_bank(2, 0);
+
+	return INIT_PASS;
 }
 
 static void fnvision_cartslot_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
