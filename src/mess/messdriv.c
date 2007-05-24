@@ -166,7 +166,6 @@ TESTDRIVER( m9016tc )	/* 1978 Mustang 9016 Telespiel Computer				*/
 	DRIVER( colecoa )	/* ColecoVision (Thick Characters)					*/
 	DRIVER( colecob )	/* Spectravideo SVI-603 Coleco Game Adapter				*/
 	DRIVER( adam )		/* Coleco Adam								*/
-	DRIVER( fnvision )  /* Coleco FunVision                                 */
 
 	/* NEC */
 	DRIVER( pce )		/* PC/Engine NEC 1987-1993		*/
@@ -579,6 +578,8 @@ TESTDRIVER( trs80m3 )	/* TRS-80 Model III - Radio Shack/Tandy 			*/
 	/* system 80 trs80 compatible */
 
 	/* VIDEO TECHNOLOGY */
+	DRIVER( crvision )  /* 1981 creatiVision                                */
+	DRIVER( fnvision )  /* 1983 FunVision									*/
 	DRIVER( laser110 )	/* 1983 Laser 110									*/
 	DRIVER( las110de )  /* 1983 Sanyo Laser 110 (Germany)                   */
 	DRIVER( laser200 )	/* 1983 Laser 200 (color version of 110)			*/
