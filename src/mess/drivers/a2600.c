@@ -82,6 +82,7 @@ static const UINT32 games[][2] =
 	{ 0xfd8c81e5, modePB }, // Tooth Protectors
 	{ 0xec959bf2, modePB }, // Tutankham
 	{ 0x8fbe2b84, modePB }, // Tutankham PAL
+	{ 0xc5baae6f, modePB }, // Tutankham Zelda Hack
 	{ 0x1f95351a, modeTV }, // Espial
 	{ 0x34b80a97, modeTV }, // Espial PAL
 	{ 0xbd08d915, modeTV }, // Miner 2049er
