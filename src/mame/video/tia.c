@@ -1144,9 +1144,9 @@ WRITE8_HANDLER( tia_w )
 		-1,	// AUDV1
 		 1,	// GRP0
 		 1,	// GRP1
-		 0,	// ENAM0
-		 0,	// ENAM1
-		 0,	// ENABL
+		 1,	// ENAM0
+		 1,	// ENAM1
+		 1,	// ENABL
 		-1,	// HMP0
 		-1,	// HMP1
 		-1,	// HMM0
