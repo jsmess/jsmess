@@ -13,6 +13,9 @@
 #include "video/tia.h"
 
 
+#define MASTER_CLOCK	3579575
+
+
 static UINT8* r6532_0_ram;
 static UINT8* r6532_1_ram;
 
@@ -46,6 +49,17 @@ static READ8_HANDLER( r6532_0_ram_r )
 static READ8_HANDLER( r6532_1_ram_r )
 {
 	return r6532_1_ram[offset];
+}
+
+
+static READ16_HANDLER( tourtabl_read_input_port )
+{
+	return readinputport(offset);
+}
+
+static READ8_HANDLER( tourtabl_get_databus_contents )
+{
+	return offset;
 }
 
 
@@ -93,12 +107,19 @@ static const struct R6532interface r6532_interface_1 =
 };
 
 
+static const struct tia_interface tourtabl_tia_interface =
+{
+	tourtabl_read_input_port,
+	tourtabl_get_databus_contents
+};
+
+
 static MACHINE_START( tourtabl )
 {
 	r6532_init(0, &r6532_interface_0);
 	r6532_init(1, &r6532_interface_1);
 
-	tia_init();
+	tia_init( &tourtabl_tia_interface );
 	return 0;
 }
 
@@ -106,16 +127,16 @@ static MACHINE_START( tourtabl )
 INPUT_PORTS_START( tourtabl )
 
 	PORT_START
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_START
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(4)
 
 	PORT_START
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(4)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START /* TIA INPT4 */
 	PORT_DIPNAME( 0x80, 0x80, "Breakout Replay" )
@@ -180,18 +201,16 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( tourtabl )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 3579575 / 3)	/* actually M6507 */
+	MDRV_CPU_ADD(M6502, MASTER_CLOCK / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_MACHINE_START(tourtabl)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(160, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 159, 46, 245)
+	MDRV_SCREEN_ADD("main",0)
+	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(tia_NTSC)
 
@@ -201,7 +220,7 @@ static MACHINE_DRIVER_START( tourtabl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(TIA, 31400)
+	MDRV_SOUND_ADD(TIA, MASTER_CLOCK/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
