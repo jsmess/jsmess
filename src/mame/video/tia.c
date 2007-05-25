@@ -548,6 +548,7 @@ static void update_bitmap(int next_x, int next_y)
 
 		int x1 = prev_x;
 		int x2 = next_x;
+		int colx1;
 
 		/* Check if we have crossed a line boundary */
 		if ( y !=  prev_y ) {
@@ -632,35 +633,38 @@ static void update_bitmap(int next_x, int next_y)
 			x2 = 160;
 		}
 
-		if (collision_check(lineM0, lineP1, x1, x2))
+		/* Collision detection also takes place under the extended hblank area */
+		colx1 = ( x1 == 8 && HMOVE_started != HMOVE_INVALID ) ? 0 : x1;
+
+		if (collision_check(lineM0, lineP1, colx1, x2))
 			CXM0P |= 0x80;
-		if (collision_check(lineM0, lineP0, x1, x2))
+		if (collision_check(lineM0, lineP0, colx1, x2))
 			CXM0P |= 0x40;
-		if (collision_check(lineM1, lineP0, x1, x2))
+		if (collision_check(lineM1, lineP0, colx1, x2))
 			CXM1P |= 0x80;
-		if (collision_check(lineM1, lineP1, x1, x2))
+		if (collision_check(lineM1, lineP1, colx1, x2))
 			CXM1P |= 0x40;
-		if (collision_check(lineP0, linePF, x1, x2))
+		if (collision_check(lineP0, linePF, colx1, x2))
 			CXP0FB |= 0x80;
-		if (collision_check(lineP0, lineBL, x1, x2))
+		if (collision_check(lineP0, lineBL, colx1, x2))
 			CXP0FB |= 0x40;
-		if (collision_check(lineP1, linePF, x1, x2))
+		if (collision_check(lineP1, linePF, colx1, x2))
 			CXP1FB |= 0x80;
-		if (collision_check(lineP1, lineBL, x1, x2))
+		if (collision_check(lineP1, lineBL, colx1, x2))
 			CXP1FB |= 0x40;
-		if (collision_check(lineM0, linePF, x1, x2))
+		if (collision_check(lineM0, linePF, colx1, x2))
 			CXM0FB |= 0x80;
-		if (collision_check(lineM0, lineBL, x1, x2))
+		if (collision_check(lineM0, lineBL, colx1, x2))
 			CXM0FB |= 0x40;
-		if (collision_check(lineM1, linePF, x1, x2))
+		if (collision_check(lineM1, linePF, colx1, x2))
 			CXM1FB |= 0x80;
-		if (collision_check(lineM1, lineBL, x1, x2))
+		if (collision_check(lineM1, lineBL, colx1, x2))
 			CXM1FB |= 0x40;
-		if (collision_check(lineBL, linePF, x1, x2))
+		if (collision_check(lineBL, linePF, colx1, x2))
 			CXBLPF |= 0x80;
-		if (collision_check(lineP0, lineP1, x1, x2))
+		if (collision_check(lineP0, lineP1, colx1, x2))
 			CXPPMM |= 0x80;
-		if (collision_check(lineM0, lineM1, x1, x2))
+		if (collision_check(lineM0, lineM1, colx1, x2))
 			CXPPMM |= 0x40;
 
 		p = BITMAP_ADDR16(helper[current_bitmap], y % (helper[current_bitmap]->height), 34);
