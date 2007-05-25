@@ -19,8 +19,8 @@ static int horzP1;
 static int horzM0;
 static int horzM1;
 static int horzBL;
-static int startP0;
-static int startP1;
+static int startP0after;
+static int startP1after;
 
 static int current_bitmap;
 
@@ -232,7 +232,7 @@ VIDEO_UPDATE( tia )
 }
 
 
-static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, int start,
+static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, int start_after,
 	UINT8 GRP, UINT8 NUSIZ, UINT8 COLUP, UINT8 REFP)
 {
 	int num = nusiz[NUSIZ & 7][0];
@@ -253,7 +253,7 @@ static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, i
 		horz++; /* hardware oddity, see bridges in River Raid */
 	}
 
-	if ( ! start ) {
+	if ( start_after > -1 ) {
 		/* Keep the few pixels which may still need to be drawn */
 		for (i = horz-1; i < horz; i++ ) {
 			if ( prevcol[i % 160] != 0xFF ) {
@@ -264,7 +264,7 @@ static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, i
 	}
 	for (i = 0; i < num; i++)
 	{
-		if (i > 0 || start)
+		if (horz > start_after)
 		{
 			for (j = 0; j < 8; j++)
 			{
@@ -297,7 +297,7 @@ static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, i
 
 		horz += 8 * skp;
 	}
-	if ( ! start ) {
+	if ( start_after > -1 ) {
 		for (i = 0; i < 160; i++)
 		{
 			prevcol[i] = col[i];
@@ -420,14 +420,14 @@ static void draw_ball_helper(UINT8* p, UINT8* col, int horz, UINT8 ENAB)
 
 static void drawS0(UINT8* p, UINT8* col)
 {
-	draw_sprite_helper(p, col, prev_lineP0, horzP0, startP0,
+	draw_sprite_helper(p, col, prev_lineP0, horzP0, startP0after,
 		(VDELP0 & 1) ? prevGRP0 : GRP0, NUSIZ0, COLUP0, REFP0);
 }
 
 
 static void drawS1(UINT8* p, UINT8* col)
 {
-	draw_sprite_helper(p, col, prev_lineP1, horzP1, startP1,
+	draw_sprite_helper(p, col, prev_lineP1, horzP1, startP1after,
 		(VDELP1 & 1) ? prevGRP1 : GRP1, NUSIZ1, COLUP1, REFP1);
 }
 
@@ -563,10 +563,10 @@ static void update_bitmap(int next_x, int next_y)
 				redraw_line = 1;
 			}
 
-			/* Redraw line if a RESPx occured during the lastline */
-			if ( ! startP0 || ! startP1 ) {
-				startP0 = 1;
-				startP1 = 1;
+			/* Redraw line if a RESPx or NUSIZx occured during the lastline */
+			if ( startP0after > -1 || startP1after > -1 ) {
+				startP0after = -1;
+				startP1after = -1;
 
 				/* Clear out contents of backup player graphic line buffer */
 				memset( prev_lineP0, 0xFF, sizeof prev_lineP0 );
@@ -917,10 +917,11 @@ static WRITE8_HANDLER( RESP0_w )
 	{
 		horzP0 = (horzP0 + 5) % 160;
 	}
-	startP0 = 0;
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 	RESXX_APPLY_ACTIVE_HMOVE( horzP0, HMP0 );
+
+	startP0after = horzP0;
 }
 
 
@@ -936,10 +937,11 @@ static WRITE8_HANDLER( RESP1_w )
 	{
 		horzP1 = (horzP1 + 5) % 160;
 	}
-	startP1 = 0;
 
 	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 	RESXX_APPLY_ACTIVE_HMOVE( horzP1, HMP1 );
+
+	startP1after = horzP1;
 }
 
 
@@ -1192,9 +1194,15 @@ WRITE8_HANDLER( tia_w )
 		RSYNC_w(offset, data);
 		break;
 	case 0x04:
+		if ( nusiz[data & 7][0] > nusiz[NUSIZ0 & 7][0] ) {
+			startP0after = curr_x;
+		}
 		NUSIZ0 = data;
 		break;
 	case 0x05:
+		if ( nusiz[data & 7][0] > nusiz[NUSIZ1 & 7][0] ) {
+			startP1after = curr_x;
+		}
 		NUSIZ1 = data;
 		break;
 	case 0x06:
@@ -1336,8 +1344,8 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 	HMM1 = 0;
 	HMBL = 0;
 
-	startP0 = 1;
-	startP1 = 1;
+	startP0after = -1;
+	startP1after = -1;
 
 	HMM0_latch = 0;
 	HMM1_latch = 0;
