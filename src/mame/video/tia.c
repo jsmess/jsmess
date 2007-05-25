@@ -1198,13 +1198,13 @@ WRITE8_HANDLER( tia_w )
 		RSYNC_w(offset, data);
 		break;
 	case 0x04:
-		if ( nusiz[data & 7][0] > nusiz[NUSIZ0 & 7][0] ) {
+		if ( nusiz[data & 7][0] > nusiz[NUSIZ0 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ0 & 7][1] ) {
 			startP0after = curr_x;
 		}
 		NUSIZ0 = data;
 		break;
 	case 0x05:
-		if ( nusiz[data & 7][0] > nusiz[NUSIZ1 & 7][0] ) {
+		if ( nusiz[data & 7][0] > nusiz[NUSIZ1 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ1 & 7][1]) {
 			startP1after = curr_x;
 		}
 		NUSIZ1 = data;
