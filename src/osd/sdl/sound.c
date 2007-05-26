@@ -29,7 +29,7 @@
 //	IMPORTS
 //============================================================
 
-extern int verbose;
+void verbose_printf(const char *text, ...);
 
 
 //============================================================
@@ -136,8 +136,8 @@ static void sdl_cleanup_audio(running_machine *machine)
 	sdl_destroy_buffers();
 	
 	// print out over/underflow stats
-	if (verbose && (buffer_overflows || buffer_underflows))
-		fprintf(stderr, "Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
+	if (buffer_overflows || buffer_underflows)
+		verbose_printf("Sound buffer: overflows=%d underflows=%d\n", buffer_overflows, buffer_underflows);
 
 #if LOG_SOUND
 	if (sound_log)
@@ -385,8 +385,13 @@ void sdl_callback(void *userdata, Uint8 *stream, int len)
 	if (snd_enabled)
 	{
 		memcpy(stream, stream_buffer + stream_playpos, len1);
+		memset(stream_buffer + stream_playpos, 0, len1); // no longer needed
 		if (len2)
+		{
 			memcpy(stream+len1, stream_buffer, len2);
+			memset(stream_buffer, 0, len2); // no longer needed
+		}
+
 	}
 	else
 	{

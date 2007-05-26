@@ -30,8 +30,7 @@
 //  IMPORTS
 //============================================================
 
-extern int verbose;
-
+void verbose_printf(const char *text, ...);
 
 //============================================================
 //  PARAMETERS
@@ -48,6 +47,8 @@ extern int verbose;
 #define MAX_AXES			8
 #define MAX_BUTTONS			32
 #define MAX_POV				4
+
+#define MAX_JOYMAP 		(MAX_JOYSTICKS*2)
 
 enum
 {
@@ -155,6 +156,7 @@ static struct {
 static void extract_input_config(void);
 static void updatekeyboard(void);
 static void init_keycodes(void);
+static void init_joymap(void);
 static void add_joylist_entry(const char *name, os_code code, input_code standardcode);
 
 
@@ -1225,6 +1227,14 @@ static const INT32 mess_keytrans[][2] =
 };
 #endif
 
+static struct {
+	int		logical;
+	int		ismapped;
+	char	*name;
+} joy_map[MAX_JOYMAP];
+
+static int joy_logical[MAX_JOYSTICKS];
+
 static int lookup_key_code(const key_lookup_table *kt, char *kn)
 {
 	int i=0;
@@ -1266,16 +1276,14 @@ static void autoselect_analog_devices(const input_port_entry *inp, int type1, in
 			if (analog_type[anatype] == SELECT_TYPE_MOUSE && !win_use_mouse)
 			{
 				win_use_mouse = 1;
-				if (verbose)
-					printf("Autoenabling mice due to presence of a %s\n", ananame);
+				verbose_printf("Autoenabling mice due to presence of a %s\n", ananame);
 			}
 				
 			// autoenable joystick devices
 			if (analog_type[anatype] == SELECT_TYPE_JOYSTICK && !use_joystick)
 			{
 				use_joystick = 1;
-				if (verbose)
-					printf("Autoenabling joysticks due to presence of a %s\n", ananame);
+				verbose_printf("Autoenabling joysticks due to presence of a %s\n", ananame);
 			}
 				
 			// all done
@@ -1296,24 +1304,66 @@ void sdl_pause_input(running_machine *machine, int paused)
 //	wininput_exit
 //============================================================
 
-#ifdef SDLMAME_WIN32
-static void wininput_exit(running_machine *machine)
+static void sdlinput_exit(running_machine *machine)
 {
+	int stick;
+	
+	for (stick=0; stick < joystick_count; stick++)
+		SDL_JoystickClose(joystick_device[stick]);
+
+#ifdef SDLMAME_WIN32
 	osd_lock_free(input_lock);
 	event_buf_count = 0;
+	#endif
 }
-#endif
 
+static int joy_map_leastfree(void)
+{
+	int i,j,found;
+	for (i=0;i<MAX_JOYSTICKS;i++)
+	{
+		found = 0;
+		for (j=0;j<MAX_JOYMAP;j++)
+			if (joy_map[j].logical == i)
+				found = 1;
+		if (!found)
+			return i;
+	}
+	return -1;
+}
 
+static char *remove_spaces(const char *s)
+{
+	char *r, *p;
+
+	while (*s && *s == ' ')
+		s++;
+	r = auto_malloc(strlen(s));
+	p = r;
+	while (*s)
+	{
+		if (*s != ' ')
+			*p++ = *s++;
+		else
+		{
+			while (*s && *s == ' ')
+				s++;
+			if (*s)
+				*p++ = ' ';
+		}
+	}
+	*p = 0;
+	return r;
+}
 
 //============================================================
-//  sdlinput_init
+//  wininput_init
 //============================================================
 
 int sdlinput_init(running_machine *machine)
 {
 	const input_port_entry *inp;
-	int stick, axis, button, mouse;
+	int physical_stick, axis, button, mouse;
 	char tempname[512];
 	SDL_Joystick *joy;
 
@@ -1326,7 +1376,8 @@ int sdlinput_init(running_machine *machine)
 	// make sure we start at 0
 	total_codes = 0;
 	
-	init_keycodes();                              
+	init_keycodes();
+	init_joymap();
 	memset(keyboard_state, 0, sizeof(keyboard_state));
 
 	// enable devices based on autoselect
@@ -1375,28 +1426,55 @@ int sdlinput_init(running_machine *machine)
 	joystick_count = 0;
 	if (use_joystick)
 	{
-		for (stick = 0; stick < SDL_NumJoysticks(); stick++)
+		int stick, i, first_free;
+		verbose_printf("Joystick: Start initialization\n");
+		for (physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
+			char *joy_name = remove_spaces(SDL_JoystickName(physical_stick));
+			
 			joystick_count++;
 
+			stick = -1;
+			first_free = 0;
+			for (i=0;i<MAX_JOYSTICKS;i++)
+			{
+				if (!first_free && !joy_map[i].name[0])
+					first_free = i;
+				if (!joy_map[i].ismapped && !strcmp(joy_name,joy_map[i].name))
+				{
+					stick = joy_map[i].logical;
+					joy_map[i].ismapped = 1;
+				}
+			}
+			if (stick == -1)
+			{
+				stick = joy_map_leastfree();
+				joy_map[first_free].logical = stick;
+				joy_map[first_free].name	= joy_name;
+				joy_map[first_free].ismapped = 1;
+			}
+			
+			joy_logical[physical_stick] = stick;
+			
 			// loop over all axes
-			joy = SDL_JoystickOpen(stick);
-			joystick_device[stick] = joy;
+			joy = SDL_JoystickOpen(physical_stick);
+			joystick_device[physical_stick] = joy;
 
-//			printf("stick %d (%s) has %d axes, %d buttons, and %d hats\n", stick+1, SDL_JoystickName(stick),
-//				SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy));
+			verbose_printf("Joystick: %s\n", joy_name);
+			verbose_printf("Joystick:   ...  %d axes, %d buttons %d hats\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy));
+			verbose_printf("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick);
 
 			for (axis = 0; axis < SDL_JoystickNumAxes(joy); axis++)
 			{
 				// add analog axes
 				if (!joystick_digital[stick][axis])
 				{
-					sprintf(tempname, "J%d A%d %s", stick + 1, axis, SDL_JoystickName(stick));
+					sprintf(tempname, "J%d A%d %s", stick + 1, axis, joy_name);
 					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS, axis), CODE_OTHER_ANALOG_ABSOLUTE);
 					// add negative & positive analog axis
-					sprintf(tempname, "J%d A%d + %s", stick + 1, axis, SDL_JoystickName(stick));
+					sprintf(tempname, "J%d A%d + %s", stick + 1, axis, joy_name);
 					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS_POS, axis), CODE_OTHER_ANALOG_ABSOLUTE);
-					sprintf(tempname, "J%d A%d - %s", stick + 1, axis, SDL_JoystickName(stick));
+					sprintf(tempname, "J%d A%d - %s", stick + 1, axis, joy_name);
 					add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_JOYAXIS_NEG, axis), CODE_OTHER_ANALOG_ABSOLUTE);
 				} 
 		
@@ -1414,12 +1492,13 @@ int sdlinput_init(running_machine *machine)
 				add_joylist_entry(tempname, JOYCODE(stick, CODETYPE_BUTTON, button), CODE_OTHER_DIGITAL);
 			}
 		}
+		verbose_printf("Joystick: End initialization\n");
 	}
 	
 	#ifdef SDLMAME_WIN32
 	input_lock = osd_lock_alloc();
-	add_exit_callback(machine, wininput_exit);
 	#endif
+	add_exit_callback(machine, sdlinput_exit);
 	
 	return 0;
 }
@@ -1452,15 +1531,13 @@ void win_process_events(void)
 {
 	SDL_Event event;
 	int i;
-	#ifdef SDLMAME_WIN32
-	int bufp;
-	#endif
 	#ifdef MESS
 	int translated;
 	#endif
 #ifdef SDLMAME_WIN32
 	SDL_Event			loc_event_buf[MAX_BUF_EVENTS];
 	int					loc_event_buf_count;
+	int bufp;
 #endif
 
 	for (i=0;i<MAX_JOYSTICKS;i++)
@@ -1525,11 +1602,11 @@ void win_process_events(void)
 			updatekeyboard();
 			break;
 		case SDL_JOYAXISMOTION:
- 			joystick_state[event.jaxis.which].axes[event.jaxis.axis] = (event.jaxis.value * 2);
+ 			joystick_state[joy_logical[event.jaxis.which]].axes[event.jaxis.axis] = (event.jaxis.value * 2);
 			break;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			joystick_state[event.jbutton.which].buttons[event.jbutton.button] = event.jbutton.state == SDL_PRESSED;
+			joystick_state[joy_logical[event.jbutton.which]].buttons[event.jbutton.button] = event.jbutton.state == SDL_PRESSED;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			mouse_state[0].buttons[event.button.button-1] = 1;
@@ -1750,6 +1827,72 @@ static int is_key_pressed(os_code keycode)
 }
 
 
+//============================================================
+//  init_joymap
+//============================================================
+
+static void init_joymap(void)
+{
+	int stick;
+
+	for (stick=0; stick < MAX_JOYMAP; stick++)
+	{
+		joy_map[stick].name = "";
+		joy_map[stick].logical = -1;
+		joy_map[stick].ismapped = 0;
+	}
+		
+	if (options_get_bool(mame_options(), "joymap"))
+	{
+		FILE *joymap_file;
+		int line = 1;
+		char *joymap_filename;
+	
+		joymap_filename = (char *)options_get_string(mame_options(), "joymap_file");
+		verbose_printf("Joymap: Start reading joymap_file %s\n", joymap_filename);
+
+		joymap_file = fopen(joymap_filename, "r");
+
+		if (joymap_file == NULL)
+		{
+			fprintf(stderr, "Joymap: Unable to open joymap %s - using default mapping\n", joymap_filename);
+		}
+		else
+		{
+			int i, cnt, logical;
+			char buf[256];
+			char name[65];
+			
+			cnt=0;
+			while (!feof(joymap_file) && fgets(buf, 255, joymap_file))
+			{
+				if (*buf && buf[0] && buf[0] != '#')
+				{
+					buf[255]=0;
+					i=strlen(buf);
+					if (i && buf[i-1] == '\n')
+						buf[i-1] = 0;
+					memset(name, 0, 65);
+					logical = -1;
+					sscanf(buf, "%x %64c\n", &logical, name);
+					if ((logical >=0 ) && (logical < MAX_JOYSTICKS))
+					{
+						joy_map[cnt].logical = logical;
+						joy_map[cnt].name = remove_spaces(name);
+						verbose_printf("Joymap: Logical id %d: %s\n", logical, joy_map[cnt].name);
+						cnt++;
+					}
+					else
+						fprintf(stderr,"Joymap: Error reading keymap: Line %d: %s\n", line, buf);
+				}
+				line++;
+			}
+			fclose(joymap_file);
+			verbose_printf("Joymap: Processed %d lines\n", line);
+		}
+	}
+}
+
 
 //============================================================
 //  init_keycodes
@@ -1768,11 +1911,13 @@ static void init_keycodes(void)
 		int line = 1;
 
 		keymap_filename = (char *)options_get_string(mame_options(), "keymap_file");
+		verbose_printf("Keymap: Start reading keymap_file %s\n", keymap_filename);
+
 		keymap_file = fopen(keymap_filename, "r");
 
 		if (keymap_file == NULL)
 		{
-			printf("Unable to open keymap %s, using default\n", keymap_filename);
+			fprintf(stderr, "Keymap: Unable to open keymap %s, using default\n", keymap_filename);
 			key_trans_table = (int (*)[4])def_key_trans_table;
 		}
 		else
@@ -1818,7 +1963,6 @@ static void init_keycodes(void)
 							}	
 							i++;
 						}
-						printf("Index %d\n", index);
 						if (index>=0)
 						{
 							key_trans_table[index][SDL_KEY] = sk;
@@ -1826,15 +1970,16 @@ static void init_keycodes(void)
 							key_trans_table[index][ASCII_KEY] = ak;
 							ui_name[index] = auto_malloc(strlen(kns)+1);
 							strcpy(ui_name[index], kns);
+							verbose_printf("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 						}
 					}
 					else
-						fprintf(stderr,"Warning: Line %d: %s\n", line, buf);
+						fprintf(stderr,"Keymap: Error on line %d: %s\n", line, buf);
 				}
 				line++;
 			}
 			fclose(keymap_file);
-			fprintf(stderr,"Processed %d lines\n", line);
+			verbose_printf("Keymap: Processed %d lines\n", line);
 		}
 	}
 	else
@@ -1859,7 +2004,6 @@ static void init_keycodes(void)
 		// fill in the key description
 		if (ui_name && ui_name[key] && *ui_name[key])
 		{
-			printf("%d <%s>\n", key, ui_name[key]);
 			namecopy = ui_name[key];
 		}
 		else 

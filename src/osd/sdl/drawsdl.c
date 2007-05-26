@@ -330,9 +330,9 @@ static const render_primitive_list *drawsdl_window_get_primitives(sdl_window_inf
 		compute_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
 	}
 	if (video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
-		render_target_set_bounds(window->target, sdl->blitwidth, sdl->blitheight, 0);
+		render_target_set_bounds(window->target, sdl->blitwidth, sdl->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
 	else
-		render_target_set_bounds(window->target, window->minwidth, window->minheight, 0);
+		render_target_set_bounds(window->target, window->yuv_ovl_width, window->yuv_ovl_height, sdlvideo_monitor_get_aspect(window->monitor));
 	return render_target_get_primitives(window->target);
 }
 
@@ -492,6 +492,9 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	int ch, cw;
 	static INT32 old_blitwidth = 0, old_blitheight = 0;
 	static INT32 blittimer = 0;
+	static INT32 surf_w = 0, surf_h = 0;
+    int  textureDisabled = FALSE;
+    int  pendingPrimitive = -1;
 
 	if (video_config.novideo)
 	{
@@ -515,52 +518,58 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		blittimer = 2;
 	}
 
-	// reset the current matrix to the identity
-	glLoadIdentity();				   
+    if ( window->sdlsurf->w!= surf_w || window->sdlsurf->w!= surf_w )
+    {
+        surf_w=window->sdlsurf->w;
+        surf_h=window->sdlsurf->h;
 
-	// we're doing nothing 3d, so the Z-buffer is currently not interesting
-	glDisable(GL_DEPTH_TEST);
+        // reset the current matrix to the identity
+        glLoadIdentity();				   
 
-	if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
-	{
-		// enable antialiasing for lines
-		glEnable(GL_LINE_SMOOTH);
-		// enable antialiasing for points
-		glEnable(GL_POINT_SMOOTH);
+        // we're doing nothing 3d, so the Z-buffer is currently not interesting
+        glDisable(GL_DEPTH_TEST);
 
-		// prefer quality to speed
-		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	}
-	else
-	{
-		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POINT_SMOOTH);
-	}
+        if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
+        {
+            // enable antialiasing for lines
+            glEnable(GL_LINE_SMOOTH);
+            // enable antialiasing for points
+            glEnable(GL_POINT_SMOOTH);
 
-	// enable blending
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	sdl->last_blendmode = BLENDMODE_ALPHA;
+            // prefer quality to speed
+            glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+            glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        }
+        else
+        {
+            glDisable(GL_LINE_SMOOTH);
+            glDisable(GL_POINT_SMOOTH);
+        }
 
-	// set lines and points just barely above normal size to get proper results
-	glLineWidth(video_config.beamwidth);
-	glPointSize(video_config.beamwidth);
+        // enable blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        sdl->last_blendmode = BLENDMODE_ALPHA;
 
-	// set up a nice simple 2D coordinate system, so GL behaves exactly how we'd like.
-	//
-	// (0,0)     (w,0)
-	//   |~~~~~~~~~|
-	//   |	       |
-	//   |	       |
-	//   |	       |
-	//   |_________|
-	// (0,h)     (w,h)
+        // set lines and points just barely above normal size to get proper results
+        glLineWidth(video_config.beamwidth);
+        glPointSize(video_config.beamwidth);
 
-	glViewport(0.0, 0.0, (GLsizei)window->sdlsurf->w, (GLsizei)window->sdlsurf->h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0.0, (GLdouble)window->sdlsurf->w, (GLdouble)window->sdlsurf->h, 0.0, 0.0, -1.0);
+        // set up a nice simple 2D coordinate system, so GL behaves exactly how we'd like.
+        //
+        // (0,0)     (w,0)
+        //   |~~~~~~~~~|
+        //   |	       |
+        //   |	       |
+        //   |	       |
+        //   |_________|
+        // (0,h)     (w,h)
+
+        glViewport(0.0, 0.0, (GLsizei)window->sdlsurf->w, (GLsizei)window->sdlsurf->h);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0.0, (GLdouble)window->sdlsurf->w, (GLdouble)window->sdlsurf->h, 0.0, 0.0, -1.0);
+    }
 
 	// compute centering parameters
 	vofs = hofs = 0.0f;
@@ -603,35 +612,55 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 			case RENDER_PRIMITIVE_LINE:
 				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), 0);
 
-				// disable texturing
-				if (sdl->usetexturerect)
-				{
-					glDisable(GL_TEXTURE_RECTANGLE_ARB);
-				}
-				else
-				{
-					glDisable(GL_TEXTURE_2D);
-				}
+                if ( !textureDisabled )
+                {
+                    // disable texturing
+                    if (sdl->usetexturerect)
+                    {
+                        glDisable(GL_TEXTURE_RECTANGLE_ARB);
+                    }
+                    else
+                    {
+                        glDisable(GL_TEXTURE_2D);
+                    }
+                    textureDisabled = TRUE;
+                }
 				// check if it's really a point
 				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
 				{
-					glBegin(GL_POINTS);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-					glEnd();
+                    if(pendingPrimitive!=GL_POINTS)
+                    {
+                        if(pendingPrimitive>=0)
+                            glEnd();
+                        glBegin(GL_POINTS);
+                        pendingPrimitive=GL_POINTS;
+                    }
+                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
 				}
 				else
 				{
-					glBegin(GL_LINES);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-						glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
-					glEnd();
+                    if(pendingPrimitive!=GL_LINES)
+                    {
+                        if(pendingPrimitive>=0)
+                            glEnd();
+                        glBegin(GL_LINES);
+                        pendingPrimitive=GL_LINES;
+                    }
+                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+                    glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
 				}
 				break;
 
 			case RENDER_PRIMITIVE_QUAD:
-			        texture = texture_find(sdl, prim);
+                if(pendingPrimitive>=0)
+                {
+                    glEnd();
+                    pendingPrimitive=-1;
+                }
+
+                texture = texture_find(sdl, prim);
 
 				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), texture);
 
@@ -656,6 +685,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 						glEnable(GL_TEXTURE_2D);
 						glBindTexture(GL_TEXTURE_2D, texture->texturename);
 					}
+                    textureDisabled=FALSE;
 
 					glBegin(GL_QUADS);
 						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
@@ -674,14 +704,19 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				}
 				else	// untextured quad
 				{
-					if (sdl->usetexturerect)
-					{
-						glDisable(GL_TEXTURE_RECTANGLE_ARB);
-					}
-					else
-					{
-						glDisable(GL_TEXTURE_2D);
-					}
+                    if ( !textureDisabled )
+                    {
+                        // disable texturing
+                        if (sdl->usetexturerect)
+                        {
+                            glDisable(GL_TEXTURE_RECTANGLE_ARB);
+                        }
+                        else
+                        {
+                            glDisable(GL_TEXTURE_2D);
+                        }
+                        textureDisabled = TRUE;
+                    }
 					glBegin(GL_QUADS);
 						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
 						glVertex2f(prim->bounds.x0 + hofs, prim->bounds.y0 + vofs);
@@ -696,6 +731,11 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				break;
 		}
 	}
+    if(pendingPrimitive>=0)
+    {
+        glEnd();
+        pendingPrimitive=-1;
+    }
 
 	osd_lock_release(window->primlist->lock);
 
@@ -785,6 +825,10 @@ void compute_blit_surface_size(sdl_window_info *window, int window_width, int wi
 		newwidth *= xscale;
 		newheight *= yscale;
 	}
+
+	if ((render_target_get_layer_config(window->target) & LAYER_CONFIG_ZOOM_TO_SCREEN)
+		&& video_config.yuv_mode == VIDEO_YUV_MODE_NONE)
+		newwidth = window_width;
 
 	if (((sdl->blitwidth != newwidth) || (sdl->blitheight != newheight)) && !(window->opengl) && (window->sdlsurf))
 	{
@@ -1185,7 +1229,7 @@ static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsour
 static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_texinfo *texsource, UINT32 flags)
 {
 	#ifdef OGL_PIXELBUFS
-	if (texture->type == TEXTURE_TYPE_DYNAMIC)
+	if (texture->type == TEXTURE_TYPE_DYNAMIC && !texture->nocopy)
 	{
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
 		glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, texture->rawwidth * texture->rawheight * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE], NULL, GL_STREAM_DRAW);
@@ -1220,7 +1264,7 @@ static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_
 	}
 
 	#ifdef OGL_PIXELBUFS
-	if (texture->type == TEXTURE_TYPE_DYNAMIC)
+	if (texture->type == TEXTURE_TYPE_DYNAMIC && !texture->nocopy)
 	{
 		// unmap the buffer from the CPU space so it can DMA
 		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);

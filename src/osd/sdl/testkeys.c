@@ -267,7 +267,7 @@ static key_lookup_table sdl_lookup[] =
 	KE(-1)
 };
 
-static char * lookup_key_name(const key_lookup_table *kt, int kc)
+static const char * lookup_key_name(const key_lookup_table *kt, int kc)
 {
 	int i=0;
 	while (kt[i].code>=0)
@@ -337,11 +337,10 @@ int utf8_main(int argc, char *argv[])
 int main(int argc, char *argv[])
 #endif
 {
-	SDLKey key;
 	SDL_Event event;
 	int quit = 0;
 	char buf[20];
-	mbstate_t ps;
+	wchar_t uc;
 
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		fprintf(stderr, "Couldn't initialize SDL: %s\n",
@@ -361,8 +360,9 @@ int main(int argc, char *argv[])
 			else
 			{
 				memset(buf, 0, 19);
-				UNICODE_to_UTF8(buf, 2, &event.key.keysym.unicode, 1);
-				printf("KEYCODE_XY %s 0x%x 0x%x %s \n",
+				uc = event.key.keysym.unicode;
+				UNICODE_to_UTF8(buf, 2, &uc, 1);
+				printf("KEYCODE_XY %s 0x%x 0x%x %s\n",
 					lookup_key_name(sdl_lookup, event.key.keysym.sym),
 					(int) event.key.keysym.scancode, 
 					(int) event.key.keysym.unicode, 

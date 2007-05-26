@@ -148,7 +148,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		strcpy(envstr, tmpstr);
 
 		i = 0;
-		while (envstr[i] != PATHSEPCH)
+		while (envstr[i] != PATHSEPCH && envstr[i] != 0 && envstr[i] != '.')
 		{
 			i++;
 		}

@@ -192,8 +192,30 @@ static const options_entry mame_sdl_options[] =
 	{ NULL, 		      NULL,       OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
 	{ "keymap",                   "0",        OPTION_BOOLEAN,    "enable keymap" },
 	{ "keymap_file",              "keymap.dat", 0,               "keymap filename" },
+
+	// joystick mapping
+	{ NULL, 		      NULL,       OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
+	{ "joymap",                   "0",        OPTION_BOOLEAN,    "enable physical to logical joystick mapping" },
+	{ "joymap_file",              "joymap.dat", 0,               "joymap filename" },
 	{ NULL }
 };
+
+//============================================================
+//  verbose_printf
+//============================================================
+
+void verbose_printf(const char *text, ...)
+{
+	if (verbose)
+	{
+		va_list arg;
+
+		/* dump to the buffer */
+		va_start(arg, text);
+		vprintf(text, arg);
+		va_end(arg);
+	}
+}
 
 //============================================================
 //	main
