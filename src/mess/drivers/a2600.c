@@ -47,6 +47,7 @@ static UINT8 keypad_left_column;
 static UINT8 keypad_right_column;
 
 static unsigned cart_size;
+static unsigned number_banks;
 static unsigned current_bank;
 
 
@@ -125,7 +126,7 @@ static int detect_super_chip(void)
 }
 
 
-static int device_load_a2600_cart(mess_image *image)
+static DEVICE_LOAD( a2600_cart )
 {
 	cart_size = image_length(image);
 
@@ -138,9 +139,11 @@ static int device_load_a2600_cart(mess_image *image)
 	case 0x04000:
 	case 0x08000:
 	case 0x10000:
+	case 0x80000:
 		break;
 
 	default:
+		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
 		return 1; /* unsupported image format */
 	}
 
@@ -180,7 +183,7 @@ void mode32_switch(UINT16 offset, UINT8 data)
 }
 void modeTV_switch(UINT16 offset, UINT8 data)
 {
-	bank_base[1] = CART + 0x800 * (data & 3);
+	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
 	memory_set_bankptr(1, bank_base[1]);
 }
 void modeUA_switch(UINT16 offset, UINT8 data)
@@ -598,6 +601,9 @@ static MACHINE_START( a2600 )
 		case 0x10000:
 			mode = modeDC;
 			break;
+		case 0x80000:
+			mode = modeTV;
+			break;
 		}
 
 		for (i = 0; 8 * i < sizeof games; i++)
@@ -664,7 +670,8 @@ static MACHINE_START( a2600 )
 		break;
 
 	case modeTV:
-		install_banks(2, 0x1800);
+		install_banks(2, cart_size - 0x800);
+		number_banks = cart_size / 0x800;
 		break;
 
 	case modeUA:
@@ -951,8 +958,8 @@ MACHINE_DRIVER_END
 ROM_START( a2600 )
 	ROM_REGION( 0x2000, REGION_CPU1, 0 )
 	ROM_FILL( 0x0000, 0x2000, 0xFF )
-	ROM_REGION( 0x10000, REGION_USER1, 0 )
-	ROM_FILL( 0x00000, 0x10000, 0xFF )
+	ROM_REGION( 0x80000, REGION_USER1, 0 )
+	ROM_FILL( 0x00000, 0x80000, 0xFF )
 ROM_END
 
 #define rom_a2600p rom_a2600
