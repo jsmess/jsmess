@@ -1015,9 +1015,9 @@ static WRITE8_HANDLER( CXCLR_w )
 
 
 #define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION)											\
-	if ( current_x() < ( HMOVE_started + 16 * 4 ) && HMOVE_started != HMOVE_INVALID ) {	\
+	if ( curr_x < MIN( ( HMOVE_started + 16 * 4 ), 7 ) ) {								\
 		int decrements = ( ( MOTION & 0xF0 ) ^ 0x80 ) >> 4;								\
-		int window = ( HMOVE_started + decrements * 4 ) - current_x();					\
+		int window = MIN( ( HMOVE_started + decrements * 4 ), 7 ) - curr_x;				\
 		HORZ += 8;																		\
 		if ( window > 0 ) {																\
 			HORZ -= ( ( window + 1 ) / 4 + 1 );											\
@@ -1028,19 +1028,15 @@ static WRITE8_HANDLER( CXCLR_w )
 
 static WRITE8_HANDLER( RESP0_w )
 {
-	horzP0 = current_x();
+	int curr_x = current_x();
 
-	if (horzP0 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP0 < 7 ) )
-	{
-		horzP0 = 3;
+	if ( HMOVE_started != HMOVE_INVALID ) {
+		horzP0 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+		RESXX_APPLY_ACTIVE_HMOVE( horzP0, HMP0 );
+	} else {
+		horzP0 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 	}
-	else
-	{
-		horzP0 = (horzP0 + 5) % 160;
-	}
-
-	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	RESXX_APPLY_ACTIVE_HMOVE( horzP0, HMP0 );
 
 	startP0after = horzP0;
 }
@@ -1048,19 +1044,15 @@ static WRITE8_HANDLER( RESP0_w )
 
 static WRITE8_HANDLER( RESP1_w )
 {
-	horzP1 = current_x();
+	int curr_x = current_x();
 
-	if (horzP1 < -3 || ( HMOVE_started != HMOVE_INVALID && horzP1 < 7 ) )
-	{
-		horzP1 = 3;
+	if ( HMOVE_started != HMOVE_INVALID ) {
+		horzP1 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+		RESXX_APPLY_ACTIVE_HMOVE( horzP1, HMP1 );
+	} else {
+		horzP1 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 	}
-	else
-	{
-		horzP1 = (horzP1 + 5) % 160;
-	}
-
-	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	RESXX_APPLY_ACTIVE_HMOVE( horzP1, HMP1 );
 
 	startP1after = horzP1;
 }
@@ -1068,55 +1060,43 @@ static WRITE8_HANDLER( RESP1_w )
 
 static WRITE8_HANDLER( RESM0_w )
 {
-	horzM0 = current_x();
+	int curr_x = current_x();
 
-	if (horzM0 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM0 < 7 ) )
-	{
-		horzM0 = 2;
+	if ( HMOVE_started != HMOVE_INVALID ) {
+		horzM0 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+		RESXX_APPLY_ACTIVE_HMOVE( horzM0, HMM0 );
+	} else {
+		horzM0 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 	}
-	else
-	{
-		horzM0 = (horzM0 + 4) % 160;
-	}
-
-	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	RESXX_APPLY_ACTIVE_HMOVE( horzM0, HMM0 );
 }
 
 
 static WRITE8_HANDLER( RESM1_w )
 {
-	horzM1 = current_x();
+	int curr_x = current_x();
 
-	if (horzM1 < 0 || ( HMOVE_started != HMOVE_INVALID && horzM1 < 7 ) )
-	{
-		horzM1 = 2;
+	if ( HMOVE_started != HMOVE_INVALID ) {
+		horzM1 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+		RESXX_APPLY_ACTIVE_HMOVE( horzM1, HMM1 );
+	} else {
+		horzM1 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 	}
-	else
-	{
-		horzM1 = (horzM1 + 4) % 160;
-	}
-
-	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	RESXX_APPLY_ACTIVE_HMOVE( horzM1, HMM1 );
 }
 
 
 static WRITE8_HANDLER( RESBL_w )
 {
-	horzBL = current_x();
+	int curr_x = current_x();
 
-	if (horzBL < 0 || ( HMOVE_started != HMOVE_INVALID && horzBL < 7 ) )
-	{
-		horzBL = 2;
+	if ( HMOVE_started != HMOVE_INVALID ) {
+		horzBL = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
+		RESXX_APPLY_ACTIVE_HMOVE( horzBL, HMBL );
+	} else {
+		horzBL = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 	}
-	else
-	{
-		horzBL = (horzBL + 4) % 160;
-	}
-
-	/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-	RESXX_APPLY_ACTIVE_HMOVE( horzBL, HMBL );
 }
 
 
