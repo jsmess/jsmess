@@ -1837,7 +1837,7 @@ static void init_joymap(void)
 
 	for (stick=0; stick < MAX_JOYMAP; stick++)
 	{
-		joy_map[stick].name = "";
+		joy_map[stick].name = (char *)"";
 		joy_map[stick].logical = -1;
 		joy_map[stick].ismapped = 0;
 	}

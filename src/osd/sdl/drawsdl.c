@@ -26,13 +26,26 @@
 #include <GL/glext.h>
 #endif
 
+#ifdef SDLMAME_WIN32
+typedef ptrdiff_t GLsizeiptr;
+#endif
+
+#if defined(SDLMAME_MACOSX) || defined(SDLMAME_WIN32)
+typedef void (* PFNGLGENBUFFERSPROC) (GLsizei n, GLuint *buffers);
+typedef void (* PFNGLBINDBUFFERPROC) (GLenum, GLuint);
+typedef void (* PFNGLBUFFERDATAPROC) (GLenum, GLsizeiptr, const GLvoid *, GLenum);
+typedef GLvoid* (* PFNGLMAPBUFFERPROC) (GLenum, GLenum);
+typedef GLboolean (* PFNGLUNMAPBUFFERPROC) (GLenum);
+typedef void (* PFNGLDELETEBUFFERSPROC) (GLsizei, const GLuint *);
+#endif
+
 // make sure the extensions compile OK everywhere
 #ifndef GL_TEXTURE_STORAGE_HINT_APPLE
-#define GL_TEXTURE_STORAGE_HINT_APPLE 0x85bc
+#define GL_TEXTURE_STORAGE_HINT_APPLE     0x85bc
 #endif
 
 #ifndef GL_STORAGE_CACHED_APPLE
-#define GL_STORAGE_CACHED_APPLE 0x85be
+#define GL_STORAGE_CACHED_APPLE           0x85be
 #endif
 
 #ifndef GL_UNPACK_CLIENT_STORAGE_APPLE
@@ -42,6 +55,30 @@
 #ifndef GL_TEXTURE_RECTANGLE_ARB
 #define GL_TEXTURE_RECTANGLE_ARB          0x84F5
 #endif
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER_ARB
+#define GL_PIXEL_UNPACK_BUFFER_ARB        0x88EC
+#endif
+
+#ifndef GL_STREAM_DRAW
+#define GL_STREAM_DRAW                    0x88E0
+#endif
+
+#ifndef GL_WRITE_ONLY
+#define GL_WRITE_ONLY                     0x88B9
+#endif
+
+#ifndef GL_ARRAY_BUFFER_ARB
+#define GL_ARRAY_BUFFER_ARB               0x8892
+#endif
+
+#ifndef GL_STATIC_DRAW_ARB
+#define GL_STATIC_DRAW_ARB                0x88E4
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER_ARB
+#define GL_PIXEL_UNPACK_BUFFER_ARB        0x88EC
 #endif
 
 // standard C headers
@@ -62,6 +99,7 @@
 
 #define DEBUG_MODE_SCORES	0
 
+// #define DEBUG_VERBOSE   1
 
 
 //============================================================
@@ -144,6 +182,13 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update);
 #if USE_OPENGL
 static int drawogl_window_init(sdl_window_info *window);
 static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update);
+
+static PFNGLGENBUFFERSPROC pfn_glGenBuffers       = NULL;
+static PFNGLBINDBUFFERPROC pfn_glBindBuffer       = NULL;
+static PFNGLBUFFERDATAPROC pfn_glBufferData       = NULL;
+static PFNGLMAPBUFFERPROC     pfn_glMapBuffer        = NULL;
+static PFNGLUNMAPBUFFERPROC   pfn_glUnmapBuffer      = NULL;
+static PFNGLDELETEBUFFERSPROC pfn_glDeleteBuffers = NULL;
 #endif
 
 // drawing helpers
@@ -179,8 +224,9 @@ void drawsdl_rgb555_draw_primitives(const render_primitive *primlist, void *dstd
 static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsource, UINT32 flags);
 static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_texinfo *texsource, UINT32 flags);
 static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim);
-static void texture_update(sdl_info *sdl, const render_primitive *prim);
-void drawsdl_destroy_all_textures(sdl_info *sdl);
+static texture_info * texture_update(sdl_info *sdl, const render_primitive *prim);
+void texture_all_disable(sdl_info *sdl);
+void drawsdl_destroy_all_textures(sdl_window_info *window);
 #endif
 
 // YUV overlays
@@ -295,7 +341,7 @@ static void drawsdl_window_destroy(sdl_window_info *window)
 
 	// free the memory in the window
 #if USE_OPENGL
-	drawsdl_destroy_all_textures(sdl);
+        drawsdl_destroy_all_textures(window);
 #endif
 	free(sdl);
 	window->dxdata = NULL;
@@ -483,18 +529,66 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 }
 
 #if USE_OPENGL
+
+static void loadGLExtensions(sdl_info *sdl)
+{
+    //sdl->usevbo=FALSE; // You may want to switch VBO and PBO off, by uncommenting this statement
+    //sdl->usepbo=FALSE; // You may want to switch PBO off, by uncommenting this statement
+
+    if ( ! sdl->usevbo )
+    {
+        sdl->usepbo=FALSE;
+        printf("OpenGL: Neither VBO, nor PBO supported\n");
+        return;
+    }
+
+    // Get Pointers To The GL Functions
+    pfn_glGenBuffers = (PFNGLGENBUFFERSPROC) SDL_GL_GetProcAddress("glGenBuffers");
+    pfn_glBindBuffer = (PFNGLBINDBUFFERPROC) SDL_GL_GetProcAddress("glBindBuffer");
+    pfn_glBufferData = (PFNGLBUFFERDATAPROC) SDL_GL_GetProcAddress("glBufferData");
+    pfn_glMapBuffer  = (PFNGLMAPBUFFERPROC) SDL_GL_GetProcAddress("glMapBuffer");
+    pfn_glUnmapBuffer= (PFNGLUNMAPBUFFERPROC) SDL_GL_GetProcAddress("glUnmapBuffer");
+    pfn_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) SDL_GL_GetProcAddress("glDeleteBuffers");
+    if (pfn_glGenBuffers && pfn_glBindBuffer && pfn_glBufferData && 
+        pfn_glMapBuffer && pfn_glUnmapBuffer && pfn_glDeleteBuffers )
+    {
+        if(sdl->usepbo)
+            printf("OpenGL: VBO PBO supported\n");
+        else
+            printf("OpenGL: VBO supported\n");
+    } else {
+        sdl->usevbo = 0;
+        sdl->usepbo = 0;
+        printf("OpenGL: VBO and PBO not supported, missing: ");
+        if (!pfn_glGenBuffers)
+            printf("glGenBuffers, ");
+        if (!pfn_glBindBuffer)
+            printf("glBindBuffer, ");
+        if (!pfn_glBufferData)
+            printf("glBufferData, ");
+        if (!pfn_glMapBuffer)
+            printf("glMapBuffer, ");
+        if (!pfn_glUnmapBuffer)
+            printf("glUnmapBuffer, ");
+        if (!pfn_glDeleteBuffers)
+            printf("glDeleteBuffers");
+    }
+    printf("\n");
+}
+
 static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 {
 	sdl_info *sdl = window->dxdata;
 	render_primitive *prim;
 	texture_info *texture;
-	float du, dv, vofs, hofs;
+	float vofs, hofs;
 	int ch, cw;
 	static INT32 old_blitwidth = 0, old_blitheight = 0;
 	static INT32 blittimer = 0;
 	static INT32 surf_w = 0, surf_h = 0;
-    int  textureDisabled = FALSE;
-    int  pendingPrimitive = -1;
+        static GLfloat texVerticex[8];
+        int  textureEnabled = FALSE; // we start and leave this function with no textures enabled
+        int  pendingPrimitive = 0;
 
 	if (video_config.novideo)
 	{
@@ -518,58 +612,63 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		blittimer = 2;
 	}
 
-    if ( window->sdlsurf->w!= surf_w || window->sdlsurf->w!= surf_w )
-    {
-        surf_w=window->sdlsurf->w;
-        surf_h=window->sdlsurf->h;
-
-        // reset the current matrix to the identity
-        glLoadIdentity();				   
-
-        // we're doing nothing 3d, so the Z-buffer is currently not interesting
-        glDisable(GL_DEPTH_TEST);
-
-        if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
+        if ( window->sdlsurf->w!= surf_w || window->sdlsurf->w!= surf_w )
         {
-            // enable antialiasing for lines
-            glEnable(GL_LINE_SMOOTH);
-            // enable antialiasing for points
-            glEnable(GL_POINT_SMOOTH);
+                loadGLExtensions(sdl);
 
-            // prefer quality to speed
-            glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-            glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+                surf_w=window->sdlsurf->w;
+                surf_h=window->sdlsurf->h;
+
+                // reset the current matrix to the identity
+                glLoadIdentity();				   
+
+                // we're doing nothing 3d, so the Z-buffer is currently not interesting
+                glDisable(GL_DEPTH_TEST);
+
+                if (options_get_bool(mame_options(), OPTION_ANTIALIAS))
+                {
+                    // enable antialiasing for lines
+                    glEnable(GL_LINE_SMOOTH);
+                    // enable antialiasing for points
+                    glEnable(GL_POINT_SMOOTH);
+
+                    // prefer quality to speed
+                    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+                    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+                }
+                else
+                {
+                    glDisable(GL_LINE_SMOOTH);
+                    glDisable(GL_POINT_SMOOTH);
+                }
+
+                // enable blending
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                sdl->last_blendmode = BLENDMODE_ALPHA;
+
+                // set lines and points just barely above normal size to get proper results
+                glLineWidth(video_config.beamwidth);
+                glPointSize(video_config.beamwidth);
+
+                // set up a nice simple 2D coordinate system, so GL behaves exactly how we'd like.
+                //
+                // (0,0)     (w,0)
+                //   |~~~~~~~~~|
+                //   |	       |
+                //   |	       |
+                //   |	       |
+                //   |_________|
+                // (0,h)     (w,h)
+
+                glViewport(0.0, 0.0, (GLsizei)window->sdlsurf->w, (GLsizei)window->sdlsurf->h);
+                glMatrixMode(GL_PROJECTION);
+                glLoadIdentity();
+                glOrtho(0.0, (GLdouble)window->sdlsurf->w, (GLdouble)window->sdlsurf->h, 0.0, 0.0, -1.0);
+
+                glEnableClientState(GL_VERTEX_ARRAY);
+                glVertexPointer(2, GL_FLOAT, 0, texVerticex); // no VBO, since it's too volatile
         }
-        else
-        {
-            glDisable(GL_LINE_SMOOTH);
-            glDisable(GL_POINT_SMOOTH);
-        }
-
-        // enable blending
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        sdl->last_blendmode = BLENDMODE_ALPHA;
-
-        // set lines and points just barely above normal size to get proper results
-        glLineWidth(video_config.beamwidth);
-        glPointSize(video_config.beamwidth);
-
-        // set up a nice simple 2D coordinate system, so GL behaves exactly how we'd like.
-        //
-        // (0,0)     (w,0)
-        //   |~~~~~~~~~|
-        //   |	       |
-        //   |	       |
-        //   |	       |
-        //   |_________|
-        // (0,h)     (w,h)
-
-        glViewport(0.0, 0.0, (GLsizei)window->sdlsurf->w, (GLsizei)window->sdlsurf->h);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0.0, (GLdouble)window->sdlsurf->w, (GLdouble)window->sdlsurf->h, 0.0, 0.0, -1.0);
-    }
 
 	// compute centering parameters
 	vofs = hofs = 0.0f;
@@ -595,151 +694,103 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 	osd_lock_acquire(window->primlist->lock);
 
-	// first update/upload the textures
-	for (prim = window->primlist->head; prim != NULL; prim = prim->next)
-	{
-		if (prim->texture.base != NULL)
-		{
-			texture_update(sdl, prim);
-		}
-	}
-
 	// now draw
 	for (prim = window->primlist->head; prim != NULL; prim = prim->next)
 	{
 		switch (prim->type)
 		{
 			case RENDER_PRIMITIVE_LINE:
-				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), 0);
+                                if ( !pendingPrimitive )
+                                    set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), 0);
 
-                if ( !textureDisabled )
-                {
-                    // disable texturing
-                    if (sdl->usetexturerect)
-                    {
-                        glDisable(GL_TEXTURE_RECTANGLE_ARB);
-                    }
-                    else
-                    {
-                        glDisable(GL_TEXTURE_2D);
-                    }
-                    textureDisabled = TRUE;
-                }
+                                if ( textureEnabled )
+                                {
+                                    // disable texturing
+                                    texture_all_disable(sdl);
+                                    textureEnabled = FALSE;
+                                }
 				// check if it's really a point
 				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
 				{
-                    if(pendingPrimitive!=GL_POINTS)
-                    {
-                        if(pendingPrimitive>=0)
-                            glEnd();
-                        glBegin(GL_POINTS);
-                        pendingPrimitive=GL_POINTS;
-                    }
-                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+                                    if(pendingPrimitive!=GL_POINTS)
+                                    {
+                                        if(pendingPrimitive)
+                                            glEnd();
+                                        glBegin(GL_POINTS);
+                                        pendingPrimitive=GL_POINTS;
+                                    }
+                                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+                                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
 				}
 				else
 				{
-                    if(pendingPrimitive!=GL_LINES)
-                    {
-                        if(pendingPrimitive>=0)
-                            glEnd();
-                        glBegin(GL_LINES);
-                        pendingPrimitive=GL_LINES;
-                    }
-                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
-                    glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
+                                    if(pendingPrimitive!=GL_LINES)
+                                    {
+                                        if(pendingPrimitive)
+                                            glEnd();
+                                        glBegin(GL_LINES);
+                                        pendingPrimitive=GL_LINES;
+                                    }
+                                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+                                    glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
+                                    glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
 				}
 				break;
 
 			case RENDER_PRIMITIVE_QUAD:
-                if(pendingPrimitive>=0)
-                {
-                    glEnd();
-                    pendingPrimitive=-1;
-                }
+                                if(pendingPrimitive)
+                                {
+                                    glEnd();
+                                    pendingPrimitive=0;
+                                }
 
-                texture = texture_find(sdl, prim);
+                                // first update/upload the textures
+                                texture = texture_update(sdl, prim);
 
-				set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), texture);
+                                set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), texture);
 
 				// select the texture
 				if (texture != NULL)
 				{
-					du = texture->ustop - texture->ustart;
-					dv = texture->vstop - texture->vstart;
-
-					if (sdl->usetexturerect)
-					{
-						glEnable(GL_TEXTURE_RECTANGLE_ARB);
-						glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture->texturename);
-
-						// texture coordinates for TEXTURE_RECTANGLE are 0,0 -> w,h
-						// rather than 0,0 -> 1,1 as with normal OpenGL texturing
-						du *= (float)texture->rawwidth;
-						dv *= (float)texture->rawheight;
-					}
-					else
-					{
-						glEnable(GL_TEXTURE_2D);
-						glBindTexture(GL_TEXTURE_2D, texture->texturename);
-					}
-                    textureDisabled=FALSE;
-
-					glBegin(GL_QUADS);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glTexCoord2f(texture->ustart + du * prim->texcoords.tl.u, texture->vstart + dv * prim->texcoords.tl.v);
-						glVertex2f(prim->bounds.x0 + hofs, prim->bounds.y0 + vofs);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glTexCoord2f(texture->ustart + du * prim->texcoords.tr.u, texture->vstart + dv * prim->texcoords.tr.v);
-						glVertex2f(prim->bounds.x1 + hofs, prim->bounds.y0 + vofs);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glTexCoord2f(texture->ustart + du * prim->texcoords.br.u, texture->vstart + dv * prim->texcoords.br.v);
-						glVertex2f(prim->bounds.x1 + hofs, prim->bounds.y1 + vofs);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glTexCoord2f(texture->ustart + du * prim->texcoords.bl.u, texture->vstart + dv * prim->texcoords.bl.v);
-						glVertex2f(prim->bounds.x0 + hofs, prim->bounds.y1 + vofs);
-					glEnd();
-				}
+                                    textureEnabled=TRUE;  // texture_update has enabled and 'done' all textures
+                                }
 				else	// untextured quad
 				{
-                    if ( !textureDisabled )
-                    {
-                        // disable texturing
-                        if (sdl->usetexturerect)
-                        {
-                            glDisable(GL_TEXTURE_RECTANGLE_ARB);
-                        }
-                        else
-                        {
-                            glDisable(GL_TEXTURE_2D);
-                        }
-                        textureDisabled = TRUE;
-                    }
-					glBegin(GL_QUADS);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glVertex2f(prim->bounds.x0 + hofs, prim->bounds.y0 + vofs);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glVertex2f(prim->bounds.x1 + hofs, prim->bounds.y0 + vofs);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glVertex2f(prim->bounds.x1 + hofs, prim->bounds.y1 + vofs);
-						glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
-						glVertex2f(prim->bounds.x0 + hofs, prim->bounds.y1 + vofs);
-					glEnd();
-				}
-				break;
+                                    textureEnabled=FALSE;   // texture_update has disabled the textures already
+                                }
+
+                                glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+
+                                texVerticex[0]=prim->bounds.x0 + hofs;
+                                texVerticex[1]=prim->bounds.y0 + vofs;
+                                texVerticex[2]=prim->bounds.x1 + hofs;
+                                texVerticex[3]=prim->bounds.y0 + vofs;
+                                texVerticex[4]=prim->bounds.x1 + hofs;
+                                texVerticex[5]=prim->bounds.y1 + vofs;
+                                texVerticex[6]=prim->bounds.x0 + hofs;
+                                texVerticex[7]=prim->bounds.y1 + vofs;
+
+                                glDrawArrays(GL_QUADS, 0, 4);
+
+                                break;
 		}
 	}
-    if(pendingPrimitive>=0)
-    {
-        glEnd();
-        pendingPrimitive=-1;
-    }
+
+        if(pendingPrimitive)
+        {
+                glEnd();
+                pendingPrimitive=0;
+        }
+
+
+        if ( textureEnabled )
+        {
+                texture_all_disable(sdl); // clean fin of frame
+                glFinish(); // should not be necessary, buggy NV driver would flicker otherwise though ..
+        }
 
 	osd_lock_release(window->primlist->lock);
 
-	//FIXME: If there is a crash, it is here
 	SDL_GL_SwapBuffers();
 	return 0;
 }
@@ -911,29 +962,55 @@ void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 }
 
 #if USE_OPENGL
-// 5 properties (per format)
-enum { SDL_TEXFORMAT_INTERNAL, SDL_TEXFORMAT_TYPE, SDL_TEXFORMAT_FORMAT,
-	SDL_TEXFORMAT_SRC_EQUALS_DEST, SDL_TEXFORMAT_PIXEL_SIZE };
 
-// Note if you change this also change the matching defines in texsrc.h
-static GLint texture_properties[9][5] = {
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, TRUE, sizeof(UINT32) },
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
-#ifdef SDLMAME_MACOSX
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, FALSE, sizeof(UINT16) },
-	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, FALSE, sizeof(UINT16) },
-#else
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
+#ifdef DEBUG_VERBOSE   // FYI .. 
+static const char * texfmt_to_string[9] = {
+        "ARGB32",
+        "RGB32",
+        "RGB32_PALETTED",
+        "YUV16",
+        "YUV16_PALETTED",
+        "PALETTE16",
+        "RGB15",
+        "RGB15_PALETTE",
+        "PALETTE16A"
+        };
 #endif
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) },
-	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, FALSE, sizeof(UINT32) } };
 
-static const GLint texture_properties_argb1555[5] =
-	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, FALSE, sizeof(UINT16) };
+// 6 properties (per format)
+// right order according to glTexImage2D: internal, format, type, ..
+enum { SDL_TEXFORMAT_INTERNAL, SDL_TEXFORMAT_FORMAT, SDL_TEXFORMAT_TYPE, 
+       SDL_TEXFORMAT_SRC_EQUALS_DEST, SDL_TEXFORMAT_SRC_HAS_PALETTE, SDL_TEXFORMAT_PIXEL_SIZE };
+
+//
+// tested with: 
+//      - fglrx, nvidia
+//      - RGB15: neogeo, ..
+//      - RGB32: segas32, psychic5, ..
+//
+// Note if you change this also change the matching defines in texsrc.h
+static GLint texture_properties[9][6] = {
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   TRUE,  FALSE, sizeof(UINT32) },    // SDL_TEXFORMAT_ARGB32
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   TRUE,  FALSE, sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   TRUE,  TRUE,  sizeof(UINT32) },    // SDL_TEXFORMAT_RGB32_PALETTED
+#ifdef SDLMAME_MACOSX
+	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, FALSE, FALSE, sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16
+	{ GL_RGB8, GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_REV_APPLE, FALSE, TRUE,  sizeof(UINT16) }, // SDL_TEXFORMAT_YUY16_PALETTED
+#else
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   FALSE, FALSE, sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   FALSE, TRUE,  sizeof(UINT32) },   // SDL_TEXFORMAT_YUY16_PALETTED
+#endif
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   FALSE, TRUE,  sizeof(UINT32) },   // SDL_TEXFORMAT_PALETTE16
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, TRUE,  FALSE, sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   TRUE,  TRUE,  sizeof(UINT32) },   // SDL_TEXFORMAT_RGB15_PALETTED
+	{ GL_RGBA8, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,   FALSE, TRUE,  sizeof(UINT32) }    // SDL_TEXFORMAT_PALETTE16A
+};
+
+static const GLint texture_properties_argb1555[3][6] = {
+	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, FALSE, TRUE,  sizeof(UINT16) }, // SDL_TEXFORMAT_PALETTE16
+	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, TRUE,  FALSE, sizeof(UINT16) }, // SDL_TEXFORMAT_RGB15
+	{ GL_RGB5_A1, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, TRUE,  TRUE,  sizeof(UINT16) }  // SDL_TEXFORMAT_RGB15_PALETTED
+};
 
 typedef void (*texture_copy_func)(texture_info *texture, const render_texinfo *texsource);
 	
@@ -969,13 +1046,98 @@ texture_copy_func texcopy_f[2][9] = { {
 		
 
 //============================================================
-//  texture_compute_size
+//  texture_compute_size and type
 //============================================================
 
-static void texture_compute_size(sdl_info *sdl, const render_texinfo *texsource, texture_info *texture, UINT32 flags)
+//
+// glBufferData to push a nocopy texture to the GPU is slower than TexSubImage2D, 
+// so don't use PBO here
+//
+#define PBO_SLOW_BUFFERDATA_COPY 1
+
+static void texture_compute_type_subroutine(sdl_info *sdl, texture_info *texture, UINT32 flags)
 {
-	int finalheight = texsource->height;
-	int finalwidth = texsource->width;
+	if (!PRIMFLAG_GET_SCREENTEX(flags))
+	{
+		texture->type = TEXTURE_TYPE_PLAIN;
+	} else {
+                #ifdef PBO_SLOW_BUFFERDATA_COPY
+                if(sdl->usepbo && !texture->nocopy)
+                #else
+                if(sdl->usepbo)
+                #endif
+		{
+			texture->type = TEXTURE_TYPE_DYNAMIC;
+		} else {
+                        texture->type = TEXTURE_TYPE_SURFACE;
+		}
+        }
+}
+
+static void texture_compute_size_subroutine(sdl_info *sdl, texture_info *texture, UINT32 flags,
+                                            int width, int height,
+                                            int* p_width, int* p_height, int* p_width_pow2, int* p_height_pow2) 
+{
+        int width_pow2 = width;
+        int height_pow2 = height;
+
+        if ( sdl->forcepoweroftwo )
+        {
+                // round width/height up to nearest power of 2
+
+                // first the width
+                if (width_pow2 & (width_pow2 - 1))
+                {
+                        width_pow2 |= width_pow2 >> 1;
+                        width_pow2 |= width_pow2 >> 2;
+                        width_pow2 |= width_pow2 >> 4;
+                        width_pow2 |= width_pow2 >> 8;
+                        width_pow2++;
+                }
+
+                // then the height
+                if (height_pow2 & (height_pow2 - 1))
+                {
+                        height_pow2 |= height_pow2 >> 1;
+                        height_pow2 |= height_pow2 >> 2;
+                        height_pow2 |= height_pow2 >> 4;
+                        height_pow2 |= height_pow2 >> 8;
+                        height_pow2++;
+                }
+        }
+	
+	// don't prescale above max texture size
+	while (texture->xprescale > 1 && width_pow2 * texture->xprescale > sdl->texture_max_width)
+		texture->xprescale--;
+	while (texture->yprescale > 1 && height_pow2 * texture->yprescale > sdl->texture_max_height)
+		texture->yprescale--;
+	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != video_config.prescale || texture->yprescale != video_config.prescale))
+		printf("SDL: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, texture->xprescale, texture->yprescale);
+
+	width  *= texture->xprescale;
+	height *= texture->yprescale;
+	width_pow2  *= texture->xprescale;
+	height_pow2 *= texture->yprescale;
+
+	// adjust the size for the border (must do this *after* the power of 2 clamp to satisfy
+	// OpenGL semantics)
+	if (texture->borderpix)
+	{
+		width += 2;
+		height += 2;
+		width_pow2 += 2;
+		height_pow2 += 2;
+	}
+        *p_width=width;
+        *p_height=height;
+        *p_width_pow2=width_pow2;
+        *p_height_pow2=height_pow2;
+}
+
+static void texture_compute_size_type(sdl_info *sdl, const render_texinfo *texsource, texture_info *texture, UINT32 flags)
+{
+	int finalheight, finalwidth;
+	int finalheight_create, finalwidth_create;
 
 	// if we're not wrapping, add a 1 pixel border on all sides
 	texture->borderpix = 0; //!(texture->flags & PRIMFLAG_TEXWRAP_MASK);
@@ -984,48 +1146,20 @@ static void texture_compute_size(sdl_info *sdl, const render_texinfo *texsource,
 		texture->borderpix = 0;	// don't border the screen right now, there's a bug
 	}
 
-	// round width/height up to nearest power of 2
-	if (sdl->forcepoweroftwo)
+	// determine if we can skip the copy step
+	if (texture_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
+	    !texture_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE] && 
+	    texture->xprescale == 1 && texture->yprescale == 1 &&
+	    !texture->borderpix &&
+	    texsource->rowpixels <= sdl->texture_max_width)
 	{
-		// first the width
-		if (finalwidth & (finalwidth - 1))
-		{
-			finalwidth |= finalwidth >> 1;
-			finalwidth |= finalwidth >> 2;
-			finalwidth |= finalwidth >> 4;
-			finalwidth |= finalwidth >> 8;
-			finalwidth++;
-		}
+		texture->nocopy = TRUE;
+        }
 
-		// then the height
-		if (finalheight & (finalheight - 1))
-		{
-			finalheight |= finalheight >> 1;
-			finalheight |= finalheight >> 2;
-			finalheight |= finalheight >> 4;
-			finalheight |= finalheight >> 8;
-			finalheight++;
-		}
-	}
-	
-	// don't prescale above max texture size
-	while (texture->xprescale > 1 && texture->rawwidth * texture->xprescale > sdl->texture_max_width)
-		texture->xprescale--;
-	while (texture->yprescale > 1 && texture->rawheight * texture->yprescale > sdl->texture_max_height)
-		texture->yprescale--;
-	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != video_config.prescale || texture->yprescale != video_config.prescale))
-		printf("SDL: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, texture->xprescale, texture->yprescale);
-
-	finalwidth  *= texture->xprescale;
-	finalheight *= texture->yprescale;
-
-	// adjust the size for the border (must do this *after* the power of 2 clamp to satisfy
-	// OpenGL semantics)
-	if (texture->borderpix)
-	{
-		finalwidth += 2;
-		finalheight += 2;
-	}
+        texture_compute_type_subroutine(sdl, texture, flags);
+         
+        texture_compute_size_subroutine(sdl, texture, flags, texsource->width, texsource->height, 
+                                        &finalwidth, &finalheight, &finalwidth_create, &finalheight_create);
 
 	// if we added pixels for the border, and that just barely pushed us over, take it back
 	if (texture->borderpix &&
@@ -1033,34 +1167,55 @@ static void texture_compute_size(sdl_info *sdl, const render_texinfo *texsource,
 		 (finalheight > sdl->texture_max_height && finalheight - 2 <= sdl->texture_max_height)))
 	{
 		texture->borderpix = FALSE;
-		finalwidth -= 2;
-		finalheight -= 2;
+
+                if (texture_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
+                    texture->xprescale == 1 && texture->yprescale == 1 &&
+                    texsource->rowpixels <= sdl->texture_max_width)
+                {
+                        texture->nocopy = TRUE;
+                }
+
+                texture_compute_type_subroutine(sdl, texture, flags);
+                 
+                texture_compute_size_subroutine(sdl, texture, flags, texsource->width, texsource->height, 
+                                                &finalwidth, &finalheight, &finalwidth_create, &finalheight_create);
 	}
 
 	// if we're above the max width/height, do what?
-	if (finalwidth > sdl->texture_max_width || finalheight > sdl->texture_max_height)
-	{
-		static int printed = FALSE;
-		if (!printed) fprintf(stderr, "Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth, finalheight, sdl->texture_max_width, sdl->texture_max_height);
-		printed = TRUE;
-	}
+        if (finalwidth_create > sdl->texture_max_width || finalheight_create > sdl->texture_max_height)
+        {
+            static int printed = FALSE;
+            if (!printed) fprintf(stderr, "Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, sdl->texture_max_width, sdl->texture_max_height);
+            printed = TRUE;
+        }
 
-	// determine if we can skip the copy step
-	if (texture_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST] &&
-		texture->xprescale == 1 && texture->yprescale == 1 &&
-		!texture->borderpix &&
-		texsource->rowpixels <= sdl->texture_max_width &&  
-		(!sdl->forcepoweroftwo || (finalwidth == texsource->rowpixels)))
-	{
-		texture->nocopy = TRUE;
-		finalwidth = texsource->rowpixels;
-	}
+#ifdef DEBUG_VERBOSE   // FYI .. 
+        if(!texture->nocopy || texture->type==TEXTURE_TYPE_DYNAMIC || 
+            // any of the mame core's device generated bitmap types:
+            texture->format==SDL_TEXFORMAT_RGB32  ||
+            texture->format==SDL_TEXFORMAT_RGB32_PALETTED  ||
+            texture->format==SDL_TEXFORMAT_RGB15  ||
+            texture->format==SDL_TEXFORMAT_RGB15_PALETTED  ||
+            texture->format==SDL_TEXFORMAT_PALETTE16  ||
+            texture->format==SDL_TEXFORMAT_PALETTE16A
+            )
+        {
+        printf("GL texture: copy %d - dynamic %d -  %dx%d %dx%d [format: %d/%s, Equal: %d, Palette: %d, scale %dx%d, border %d, pitch %d,%d/%d]\n", 
+                !texture->nocopy, texture->type==TEXTURE_TYPE_DYNAMIC,
+                finalwidth, finalheight, finalwidth_create, finalheight_create, 
+                texture->format, texfmt_to_string[texture->format], 
+                texture_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST],
+                texture_properties[texture->format][SDL_TEXFORMAT_SRC_HAS_PALETTE],
+                texture->xprescale, texture->yprescale, texture->borderpix, 
+                texsource->rowpixels, finalwidth, sdl->texture_max_width);
+        }
+#endif
 
 	// compute the U/V scale factors
 	if (texture->borderpix)
 	{
-		int unscaledwidth = (finalwidth-2) / texture->xprescale + 2;
-		int unscaledheight = (finalheight-2) / texture->yprescale + 2;
+		int unscaledwidth = (finalwidth_create-2) / texture->xprescale + 2;
+		int unscaledheight = (finalheight_create-2) / texture->yprescale + 2;
 		texture->ustart = 1.0f / (float)(unscaledwidth);
 		texture->ustop = (float)(texsource->width + 1) / (float)(unscaledwidth);
 		texture->vstart = 1.0f / (float)(unscaledheight);
@@ -1069,14 +1224,16 @@ static void texture_compute_size(sdl_info *sdl, const render_texinfo *texsource,
 	else
 	{
 		texture->ustart = 0.0f;
-		texture->ustop = (float)(texsource->width*texture->xprescale) / (float)finalwidth;
+		texture->ustop = (float)(texsource->width*texture->xprescale) / (float)finalwidth_create;
 		texture->vstart = 0.0f;
-		texture->vstop = (float)(texsource->height*texture->yprescale) / (float)finalheight;
+		texture->vstop = (float)(texsource->height*texture->yprescale) / (float)finalheight_create;
 	}
 
 	// set the final values
 	texture->rawwidth = finalwidth;
 	texture->rawheight = finalheight;
+	texture->rawwidth_create = finalwidth_create;
+	texture->rawheight_create = finalheight_create;
 }
 
 //============================================================
@@ -1094,11 +1251,8 @@ static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsour
 	{
 		if (video_config.prefer16bpp_tex)
 		{
+                        // overwrite the 15bpp specs ..
 			memcpy(texture_properties[5], texture_properties_argb1555,
-				sizeof(texture_properties_argb1555));
-			memcpy(texture_properties[6], texture_properties_argb1555,
-				sizeof(texture_properties_argb1555));
-			memcpy(texture_properties[7], texture_properties_argb1555,
 				sizeof(texture_properties_argb1555));
 			texcopy_f[0][5] = texcopy_palette16_argb1555;
 			texcopy_f[0][6] = texcopy_rgb15_argb1555;
@@ -1132,25 +1286,39 @@ static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsour
 	}
 
 	// set the texture_format
+        // 
+        // src/emu/validity.c:validate_display() states, 
+        // an emulated driver can only produce
+        //      BITMAP_FORMAT_INDEXED16, BITMAP_FORMAT_RGB15 and BITMAP_FORMAT_RGB32
+        // where only the first original paletted.
+        //
+        // other paletted formats, i.e.:
+        //   SDL_TEXFORMAT_RGB32_PALETTED, SDL_TEXFORMAT_RGB15_PALETTED and SDL_TEXFORMAT_YUY16_PALETTED
+        // add features like brightness etc by the mame core 
+        //
+        // all palette lookup may be implemented using shaders later on ..
+        // that's why we keep the EQUAL flag TRUE, for all original true color bitmaps.
+        //
 	switch (PRIMFLAG_GET_TEXFORMAT(flags))
 	{
 		case TEXFORMAT_ARGB32:
 			texture->format = SDL_TEXFORMAT_ARGB32;
 			break;
 		case TEXFORMAT_RGB32:
-			if (texsource->palette != NULL)
-				texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
-			else
-				texture->format = SDL_TEXFORMAT_RGB32;
+                        if (texsource->palette != NULL)
+                                texture->format = SDL_TEXFORMAT_RGB32_PALETTED;
+                        else
+                                texture->format = SDL_TEXFORMAT_RGB32;
 			break;
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
 			break;
 		case TEXFORMAT_RGB15:
-			if (texsource->palette != NULL)
-				texture->format = SDL_TEXFORMAT_RGB15_PALETTED;
-			else
-				texture->format = SDL_TEXFORMAT_RGB15;
+                        if (texsource->palette != NULL)
+                                texture->format = SDL_TEXFORMAT_RGB15_PALETTED;
+                        else
+                                texture->format = SDL_TEXFORMAT_RGB15;
+
 			break;
 		case TEXFORMAT_PALETTEA16:
 			texture->format = SDL_TEXFORMAT_PALETTE16A;
@@ -1167,48 +1335,51 @@ static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsour
 	}
 
 	// compute the size
-	texture_compute_size(sdl, texsource, texture, flags);
+	texture_compute_size_type(sdl, texsource, texture, flags);
 
-	// non-screen textures are easy
-	if (!PRIMFLAG_GET_SCREENTEX(flags))
+        texture->pbo=0;
+
+        // get a name for this texture
+        glGenTextures(1, &texture->texturename);
+
+	if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
-		// get a name for this texture
-		glGenTextures(1, &texture->texturename);
+                assert(sdl->usepbo);
 
-		texture->type = TEXTURE_TYPE_PLAIN;
-	}
-	// screen textures are allocated differently (but not really)
-	else
-	{
-		// get a name for this texture
-		glGenTextures(1, &texture->texturename);
+                glEnable(GL_TEXTURE_2D);
 
-		#ifdef OGL_PIXELBUFS
-		if (sdl->usepbo)
-		{
-			// bind the empty buffer
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+                // bind the empty buffer
+                pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 
-			// make sure we're operating on *this* texture
-			glBindTexture(GL_TEXTURE_2D, texture->texturename);
+                // make sure we're operating on *this* texture
+                glBindTexture(GL_TEXTURE_2D, texture->texturename);
 
-			// this doesn't actually upload, it just sets up the PBO's parameters
-			glTexImage2D(GL_TEXTURE_2D, 0, texture_properties[texture->format][SDL_TEXFORMAT_INTERNAL], texture->rawwidth, texture->rawheight, texture->borderpix ? 1 : 0, texture_properties[texture->format][SDL_TEXFORMAT_TYPE], texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], NULL);
+                // this doesn't actually upload, it just sets up the PBO's parameters
+                glTexImage2D(GL_TEXTURE_2D, 0, texture_properties[texture->format][SDL_TEXFORMAT_INTERNAL], texture->rawwidth_create, texture->rawheight_create, texture->borderpix ? 1 : 0, texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture_properties[texture->format][SDL_TEXFORMAT_TYPE], NULL);
 
-			// create the PBO
-			glGenBuffers(1, &texture->pbo);
+                // create the PBO
+                pfn_glGenBuffers(1, &texture->pbo);
 
-			texture->type = TEXTURE_TYPE_DYNAMIC;
-		}
-		else
-		#endif
-		{
-			texture->type = TEXTURE_TYPE_SURFACE;
-		}
-	}
-	
-	if ((texture->type != TEXTURE_TYPE_DYNAMIC) && !texture->nocopy)
-		texture->data = malloc(texture->rawwidth * texture->rawheight * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE]);
+                texture->type = TEXTURE_TYPE_DYNAMIC;
+	} else {
+                GLenum texTarget = (sdl->usetexturerect)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
+
+                if ( sdl->usepbo )
+                    pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+
+                glEnable(texTarget);
+
+                // dummy upload .. texture size power of 2 if so ..
+                glBindTexture(texTarget, texture->texturename);
+
+                glTexImage2D(texTarget, 0, texture_properties[texture->format][SDL_TEXFORMAT_INTERNAL], texture->rawwidth_create, texture->rawheight_create, texture->borderpix ? 1 : 0, texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture_properties[texture->format][SDL_TEXFORMAT_TYPE], NULL);
+        }
+
+        if ( !texture->pbo && !texture->nocopy)
+        {
+            texture->data = malloc(texture->rawwidth* texture->rawheight * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE]);
+            texture->data_own=TRUE;
+        }
 
 	if (texture->prescale_effect && !texture_properties[texture->format][SDL_TEXFORMAT_SRC_EQUALS_DEST])
 		texture->effectbuf = malloc_or_die(texsource->width * 3 * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE]);
@@ -1219,6 +1390,7 @@ static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsour
 	// add us to the texture list
 	texture->next = sdl->texlist;
 	sdl->texlist = texture;
+
 	return texture;
 }
 
@@ -1228,25 +1400,28 @@ static texture_info *texture_create(sdl_info *sdl, const render_texinfo *texsour
 
 static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_texinfo *texsource, UINT32 flags)
 {
-	#ifdef OGL_PIXELBUFS
-	if (texture->type == TEXTURE_TYPE_DYNAMIC && !texture->nocopy)
+        GLenum texTarget = (sdl->usetexturerect)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
+
+        if ( texture->pbo )
 	{
-		glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
-		glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, texture->rawwidth * texture->rawheight * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE], NULL, GL_STREAM_DRAW);
-		texture->data = glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
-		// HMM is this wise, maybe we should not never use PBO's in the nocopy case
-		if (texture->nocopy)
-			memcpy(texture->data, texsource->base, texsource->rowpixels * texsource->height * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE]);
-	}
-	else
-	#endif
-	{
-		// note that nocopy and borderpix are mutually exclusive, IOW
-		// they cannot be both true, thus this cannot lead to the
-		// borderpix code below writing to texsource->base .
-		if (texture->nocopy)
-			texture->data = texsource->base;
-	}
+#if 0 // FYI ..
+                printf("0x%X: tx pbo: name %d, pbo %d, seq %d\n",
+                        pthread_self(), texture->texturename, texture->pbo, texture->texinfo.seqid);
+#endif
+                texTarget = GL_TEXTURE_2D;
+                pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
+                // set up the PBO dimension, ..
+		pfn_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, texture->rawwidth_create * texture->rawheight_create * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE], NULL, GL_STREAM_DRAW);
+		if (!texture->nocopy)
+                        texture->data = pfn_glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+                // else we use glBufferData ..
+        }
+
+        // note that nocopy and borderpix are mutually exclusive, IOW
+        // they cannot be both true, thus this cannot lead to the
+        // borderpix code below writing to texsource->base .
+        if (texture->nocopy)
+                texture->data = texsource->base;
 
 	// always fill non-wrapping textures with an extra pixel on the top
 	if (texture->borderpix)
@@ -1263,108 +1438,63 @@ static void texture_set_data(sdl_info *sdl, texture_info *texture, const render_
 			(texsource->width * texture->xprescale + 2) * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE]);
 	}
 
-	#ifdef OGL_PIXELBUFS
-	if (texture->type == TEXTURE_TYPE_DYNAMIC && !texture->nocopy)
+        // give the card a hint
+        if (texture->nocopy)
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->texinfo.rowpixels);
+        else
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth);
+
+        if ( texture->pbo )
 	{
-		// unmap the buffer from the CPU space so it can DMA
-		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);
-		// bind us to the right texture object
-		glBindTexture(GL_TEXTURE_2D, texture->texturename);
+		if (!texture->nocopy)
+                {
+                        // unmap the buffer from the CPU space so it can DMA
+                        pfn_glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);
+                } else 
+                {
+                        pfn_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, texture->rawwidth * texture->rawheight * texture_properties[texture->format][SDL_TEXFORMAT_PIXEL_SIZE], texture->data, GL_STREAM_DRAW);
+                        #ifdef PBO_SLOW_BUFFERDATA_COPY 
+                        printf("*Warning* Slow PBO glBufferData vopy path\n");
+                        #endif
+                }
 		// kick off the DMA
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texture->rawwidth, texture->rawheight, texture_properties[texture->format][SDL_TEXFORMAT_TYPE], texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], NULL);
-		// unbind the PBO
-		glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
-	}
-	else
-	#endif
-	{
-		if (sdl->usetexturerect)
-		{
-			// bind the texture to the TEXTURE_RECTANGLE target
-			glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture->texturename);
-
-			// give the card a hint
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth);
-
-			// and upload the image - use the fast path if we can
-			if (!texture->uploadedonce)
-			{
-				glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, texture_properties[texture->format][SDL_TEXFORMAT_INTERNAL], texture->rawwidth, texture->rawheight, texture->borderpix ? 1 : 0, texture_properties[texture->format][SDL_TEXFORMAT_TYPE], texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture->data);
-			 	texture->uploadedonce = 1;
-			}
-			else
-			{
-				glTexSubImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, 0, 0, texture->rawwidth, texture->rawheight, texture_properties[texture->format][SDL_TEXFORMAT_TYPE], texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture->data);
-			}
-		}
-		else
-		{
-			// bind the texture to the TEXTURE_2D target
-			glBindTexture(GL_TEXTURE_2D, texture->texturename);
-
-			// give the card a hint
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth);
-
-			// and upload the image - use the fast path if we can
-			if (!texture->uploadedonce)
-			{
-				glTexImage2D(GL_TEXTURE_2D, 0, texture_properties[texture->format][SDL_TEXFORMAT_INTERNAL], texture->rawwidth, texture->rawheight, texture->borderpix ? 1 : 0, texture_properties[texture->format][SDL_TEXFORMAT_TYPE], texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture->data);
-			 	texture->uploadedonce = 1;
-			}
-			else
-			{
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texture->rawwidth, texture->rawheight, texture_properties[texture->format][SDL_TEXFORMAT_TYPE], texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture->data);
-			}
-		}
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texture->rawwidth, texture->rawheight, texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture_properties[texture->format][SDL_TEXFORMAT_TYPE], NULL);
+	} else {
+                // and upload the image 
+                glTexSubImage2D(texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight, texture_properties[texture->format][SDL_TEXFORMAT_FORMAT], texture_properties[texture->format][SDL_TEXFORMAT_TYPE], texture->data);
 	}
 
-	// set filter mode appropriately
-	if (sdl->usetexturerect)
-	{
-		if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
-		{
-			// screen textures get the user's choice of filtering
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		}
-		else
-		{
-			// non-screen textures will never be filtered
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		}
+        if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
+        {
+                // screen textures get the user's choice of filtering
+                glTexParameteri(texTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(texTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        else
+        {
+                // non-screen textures will never be filtered
+                glTexParameteri(texTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(texTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
 
-		// texture rectangles can't wrap
-		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	}
-	else
-	{
-		if ((PRIMFLAG_GET_SCREENTEX(flags)) && video_config.filter)
-		{
-			// screen textures get the user's choice of filtering
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		}
-		else
-		{
-			// non-screen textures will never be filtered
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		}
-
-		// set wrapping mode appropriately
-		if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		}
-		else
-		{
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-		}
-	}
+        if( texTarget==GL_TEXTURE_RECTANGLE_ARB )
+        {
+                // texture rectangles can't wrap
+                glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP);
+                glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        } else {
+                // set wrapping mode appropriately
+                if (texture->flags & PRIMFLAG_TEXWRAP_MASK)
+                {
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                }
+                else
+                {
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+                        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+                }
+        }
 }
 
 //============================================================
@@ -1396,42 +1526,154 @@ static texture_info *texture_find(sdl_info *sdl, const render_primitive *prim)
 //  texture_update
 //============================================================
 
-static void texture_update(sdl_info *sdl, const render_primitive *prim)
+static texture_info * texture_update(sdl_info *sdl, const render_primitive *prim)
 {
+        float du, dv;
+
 	texture_info *texture = texture_find(sdl, prim);
 
 	// if we didn't find one, create a new texture
-	if (texture == NULL)
-		texture = texture_create(sdl, &prim->texture, prim->flags);
+	if (texture == NULL && prim->texture.base != NULL)
+        {
+                texture = texture_create(sdl, &prim->texture, prim->flags);
+                du = texture->ustop - texture->ustart;
+                dv = texture->vstop - texture->vstart;
 
-	// if we found it, but with a different seqid, copy the data
-	if (texture->texinfo.seqid != prim->texture.seqid)
-	{
-		texture_set_data(sdl, texture, &prim->texture, prim->flags);
-		texture->texinfo.seqid = prim->texture.seqid;
-	}
+                if (sdl->usetexturerect)
+                {
+                    // texture coordinates for TEXTURE_RECTANGLE are 0,0 -> w,h
+                    // rather than 0,0 -> 1,1 as with normal OpenGL texturing
+                    du *= (float)texture->rawwidth;
+                    dv *= (float)texture->rawheight;
+                }
+
+                texture->texCoord[0]=texture->ustart + du * prim->texcoords.tl.u;
+                texture->texCoord[1]=texture->vstart + dv * prim->texcoords.tl.v;
+                texture->texCoord[2]=texture->ustart + du * prim->texcoords.tr.u;
+                texture->texCoord[3]=texture->vstart + dv * prim->texcoords.tr.v;
+                texture->texCoord[4]=texture->ustart + du * prim->texcoords.br.u;
+                texture->texCoord[5]=texture->vstart + dv * prim->texcoords.br.v;
+                texture->texCoord[6]=texture->ustart + du * prim->texcoords.bl.u;
+                texture->texCoord[7]=texture->vstart + dv * prim->texcoords.bl.v;
+                #if 0
+                printf("texCoord (%f/%f)/(%f/%f) (%f/%f)/(%f/%f)\n", 
+                        texture->texCoord[0], texture->texCoord[1], texture->texCoord[2], texture->texCoord[3],
+                        texture->texCoord[4], texture->texCoord[5], texture->texCoord[6], texture->texCoord[7]);
+                #endif
+
+                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+                if(sdl->usevbo)
+                {
+                    // Generate And Bind The Texture Coordinate Buffer
+                    pfn_glGenBuffers( 1, &(texture->texCoordBufferName) );
+                    pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
+                    // Load The Data
+                    pfn_glBufferData( GL_ARRAY_BUFFER_ARB, 4*2*sizeof(GLfloat), texture->texCoord, GL_STATIC_DRAW_ARB );
+                    glTexCoordPointer( 2, GL_FLOAT, 0, (char *) NULL ); // we are using ARB VBO buffers 
+                } else {
+                    glTexCoordPointer(2, GL_FLOAT, 0, texture->texCoord);
+                }
+        } else  if (texture != NULL)
+        {
+                GLenum texTarget = (sdl->usetexturerect && texture->type!=TEXTURE_TYPE_DYNAMIC)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
+
+                if ( sdl->usepbo )
+                    pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo); // 0 to free or the true pbo
+
+                glEnable(texTarget);
+
+                glBindTexture(texTarget, texture->texturename);
+
+                if (prim->texture.base != NULL && texture->texinfo.seqid != prim->texture.seqid)
+                {
+                        texture->texinfo.seqid = prim->texture.seqid;
+                        // if we found it, but with a different seqid, copy the data
+                        texture_set_data(sdl, texture, &prim->texture, prim->flags);
+                }
+
+                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+                if(sdl->usevbo)
+                {
+                    pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
+                    glTexCoordPointer( 2, GL_FLOAT, 0, (char *) NULL ); // we are using ARB VBO buffers 
+                } else {
+                    glTexCoordPointer(2, GL_FLOAT, 0, texture->texCoord);
+                }
+        } else {
+            assert(texture==NULL);
+            texture_all_disable(sdl);
+        }
+
+        return texture;
 }
 
-void drawsdl_destroy_all_textures(sdl_info *sdl)
+void texture_all_disable(sdl_info *sdl)
 {
-	texture_info *next_texture, *texture = sdl->texlist;
+        if(sdl->usetexturerect)
+                glDisable(GL_TEXTURE_RECTANGLE_ARB);
+        glDisable(GL_TEXTURE_2D);
 
-	while (texture)
-	{
-		next_texture = texture->next;
-		glDeleteTextures(1, &texture->texturename);
-		if ((texture->type != TEXTURE_TYPE_DYNAMIC) && !texture->nocopy)
-		{
-			free(texture->data);
-		}
-		if (texture->effectbuf)
-		{
-			free(texture->effectbuf);
-		}
-		free(texture);
-		texture = next_texture;
-	}
-	sdl->texlist = NULL;
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        if(sdl->usevbo)
+            pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, 0); // unbind ..
+}
+
+void drawsdl_destroy_all_textures(sdl_window_info *window)
+{
+        int lock=FALSE;
+
+        if(window->primlist && window->primlist->lock) { lock=TRUE; osd_lock_acquire(window->primlist->lock); }
+        {
+                texture_info *next_texture=NULL, *texture = NULL;
+                sdl_info *sdl = window->dxdata;
+
+                if (sdl == NULL)
+                        goto exit;
+
+                texture = sdl->texlist;
+
+                glDisableClientState(GL_VERTEX_ARRAY);
+
+                texture_all_disable(sdl);
+
+                if(sdl->usepbo)
+                {
+                        pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+                }
+
+                while (texture)
+                {
+                        next_texture = texture->next;
+
+                        if(sdl->usevbo)
+                        {
+                            pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
+                            texture->texCoordBufferName=0;
+                        }
+
+                        if(sdl->usepbo && texture->pbo)
+                        {
+                            pfn_glDeleteBuffers( 1, &(texture->pbo) );
+                            texture->pbo=0;
+                        }
+
+                        glDeleteTextures(1, &texture->texturename);
+                        if ( texture->data_own )
+                        {
+                                free(texture->data);
+                                texture->data=NULL;
+                        }
+                        if (texture->effectbuf)
+                        {
+                                free(texture->effectbuf);
+                        }
+                        free(texture);
+                        texture = next_texture;
+                }
+                sdl->texlist = NULL;
+        }
+exit:
+        if(lock) { osd_lock_release(window->primlist->lock); }
 }
 #endif
 

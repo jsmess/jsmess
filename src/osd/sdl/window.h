@@ -16,6 +16,16 @@
 #include "video.h"
 #include "render.h"
 
+#if USE_OPENGL
+// OpenGL headers
+#ifdef SDLMAME_MACOSX
+#include <OpenGL/gl.h>
+#include <OpenGL/glext.h>
+#else
+#include <GL/gl.h>
+#include <GL/glext.h>
+#endif
+#endif
 
 //============================================================
 //  PARAMETERS
@@ -49,24 +59,28 @@ struct _texture_info
 	render_texinfo			texinfo;			// copy of the texture info
 	float				ustart, ustop;			// beginning/ending U coordinates
 	float				vstart, vstop;			// beginning/ending V coordinates
-	int				rawwidth, rawheight;		// raw width/height of the texture
+        int				rawwidth, rawheight;		// raw width/height of the texture
+	int				rawwidth_create;                // raw width/height, pow2 compatible, if needed
+        int                             rawheight_create;               // (create and initial set the texture, not for copy!)
 	int				type;				// what type of texture are we?
 	int				format;				// texture format
 	int				borderpix;			// do we have a 1 pixel border?
 	int				xprescale;			// what is our X prescale factor?
 	int				yprescale;			// what is our Y prescale factor?
 	int				prescale_effect;		// which prescale effect (if any) to use
-	int				uploadedonce;			// were we uploaded once already?
 	int				nocopy;				// must the texture date be copied?
 
 	UINT32				texturename;			// OpenGL texture "name"/ID
 
-	#ifdef OGL_PIXELBUFS
-	UINT32				pbo;				// pixel buffer object for this texture (if DYNAMIC only!)
-	#endif
+	UINT32				pbo;				// pixel buffer object for this texture (DYNAMIC only!)
 
 	UINT32				*data;				// pixels for the texture
+        int                              data_own;                      // do we own / allocated it ?
 	UINT32				*effectbuf;			// buffer for intermediate effect results or NULL
+#if USE_OPENGL
+    GLfloat          texCoord[8];
+    GLuint           texCoordBufferName;
+#endif
 };
 
 typedef struct _sdl_window_info sdl_window_info;
@@ -130,6 +144,7 @@ struct _sdl_info
 	INT32	   			texture_max_height;    	// texture maximum height
 	int				forcepoweroftwo;	// must textures be power-of-2 sized?
 	int				usepbo;			// runtime check if PBO is available
+	int				usevbo;			// runtime check if VBO is available
 	int				usetexturerect;		// use ARB_texture_rectangle for non-power-of-2
 };
 

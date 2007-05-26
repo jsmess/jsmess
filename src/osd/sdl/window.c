@@ -110,13 +110,12 @@ static UINT32 last_update_time;
 
 static sdl_draw_callbacks draw;
 
-typedef struct _worker_param worker_param;
-struct _worker_param {
+typedef struct _worker_param {
 	sdl_window_info *window;
 	const render_primitive_list *list;
 	int resize_new_width;
 	int resize_new_height;
-};
+} worker_param;
 
 
 //============================================================
@@ -142,6 +141,17 @@ extern int sdl_is_mouse_captured(void);
 /* in drawsdl.c */
 void yuv_lookup_init(sdl_window_info *window);
 
+//============================================================
+//  clear the worker_param structure, inline - faster than memset
+//============================================================
+
+INLINE void clear_worker_param(worker_param *wp)
+{
+	wp->window=NULL;
+	wp->list=NULL;
+	wp->resize_new_width=0;
+	wp->resize_new_height=0;
+}
 
 //============================================================
 //  execute_async
@@ -407,6 +417,8 @@ void sdlwindow_resize(INT32 width, INT32 height)
 	sdl_window_info *window = sdl_window_list;
 	worker_param wp;
 
+        clear_worker_param(&wp);
+
 	ASSERT_MAIN_THREAD();
 
 	if (width == window->sdlsurf->w && height == window->sdlsurf->h)
@@ -460,6 +472,8 @@ void sdlwindow_toggle_full_screen(void)
 	worker_param wp;
 	sdl_window_info *window = sdl_window_list;
 
+        clear_worker_param(&wp);
+
 	ASSERT_MAIN_THREAD();
 
 	wp.window = window;
@@ -481,6 +495,7 @@ void sdlwindow_modify_yuv(int dir)
 	if (new_yuv_mode != video_config.yuv_mode)
 	{
 		worker_param wp;
+                clear_worker_param(&wp);
 		wp.window = window;
 
 		execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
@@ -510,6 +525,7 @@ void sdlwindow_modify_prescale(int dir)
 	worker_param wp;
 	int new_prescale = video_config.prescale;
 
+        clear_worker_param(&wp);
 	wp.window = window;
 
 	if (dir > 0 && video_config.prescale < 3)
@@ -562,6 +578,7 @@ void sdlwindow_modify_effect(int dir)
 	if (new_prescale_effect != video_config.prescale_effect)
 	{
 #if USE_OPENGL
+                clear_worker_param(&wp);
 		wp.window = window;
 		execute_async_wait(destroy_all_textures_wt, &wp);
 #endif
@@ -574,6 +591,8 @@ void sdlwindow_toggle_draw(void)
 {
 	sdl_window_info *window = sdl_window_list;
 	worker_param wp;
+
+        clear_worker_param(&wp);
 
 	// If we are not fullscreen (windowed) remember our windowed size
 	if (!window->fullscreen)
@@ -646,6 +665,8 @@ int sdlwindow_video_window_create(int index, sdl_monitor_info *monitor, const sd
 	worker_param *wp = malloc(sizeof(worker_param));
 	char option[20];
 	int *result;
+
+        clear_worker_param(wp);
 
 	ASSERT_MAIN_THREAD();
 
@@ -733,6 +754,8 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 	sdl_window_info **prevptr;
 	worker_param wp;
 
+        clear_worker_param(&wp);
+
 	ASSERT_MAIN_THREAD();
 	if (multithreading_enabled)
 	{
@@ -749,13 +772,13 @@ static void sdlwindow_video_window_destroy(sdl_window_info *window)
 			break;
 		}
 
-	// free the render target
-	if (window->target != NULL)
-		render_target_free(window->target);
-
 	// free the textures etc
 	wp.window = window;
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
+
+	// free the render target, after the textures !
+	if (window->target != NULL)
+		render_target_free(window->target);
 
 	// free the lock
 	osd_lock_free(window->render_lock);
@@ -822,6 +845,8 @@ void sdlwindow_video_window_update(sdl_window_info *window)
 		{
 			worker_param wp;
 			const render_primitive_list *primlist;
+
+                        clear_worker_param(&wp);
 
 			// don't hold the lock; we just used it to see if rendering was still happening
 			osd_lock_release(window->render_lock);
@@ -1035,6 +1060,7 @@ static void *complete_create_wt(void *param)
 
 		sdl->usetexturerect = 0;
 		sdl->forcepoweroftwo = 0;
+		sdl->usevbo = 0;
 		sdl->usepbo = 0;
 
 		// does this card support non-power-of-two sized textures?  (they're faster, so use them if possible)
@@ -1047,7 +1073,15 @@ static void *complete_create_wt(void *param)
 		}
 		else
 		{
+                        // we don't use GL_EXT_texture_rectangle,
+                        // because it is somehow buggy, slower and has less features.
+                        // Since the new texture copy code copies only the net data,
+                        // and not the pow2 data .. it's ok.
+                        // Artwork (cropped and nor cropped) is visible too now ;-)
+
+                        #if 0
 			// second chance: GL_ARB_texture_rectangle or GL_EXT_texture_rectangle (old version)
+
 			if (strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle"))
 			{
 				if (!shown_video_info)
@@ -1057,16 +1091,25 @@ static void *complete_create_wt(void *param)
 				sdl->usetexturerect = 1;
 			}
 			else
+                        #endif
 			{
 				if (!shown_video_info)
 				{
-					printf("OpenGL: forcing power-of-2 textures\n");
+					printf("OpenGL: forcing power-of-2 textures (creation, not copy)\n");
 				}
 				sdl->forcepoweroftwo = 1;
 			}
 		}
 
-		#ifdef OGL_PIXELBUFS
+		if (strstr(extstr, "GL_ARB_vertex_buffer_object"))
+		{
+			if (!shown_video_info)
+			{
+				printf("OpenGL: vertex buffer object\n");
+			}
+                        sdl->usevbo = 1;
+		}
+
 		if (strstr(extstr, "GL_ARB_pixel_buffer_object"))
 		{
 			if (!shown_video_info)
@@ -1082,7 +1125,6 @@ static void *complete_create_wt(void *param)
 				printf("OpenGL: pixel buffers not supported\n");
 			}
 		}
-		#endif
 		
 		if (getenv("SDLMAME_VMWARE"))
 		{

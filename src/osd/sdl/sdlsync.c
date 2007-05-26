@@ -10,7 +10,9 @@
 //============================================================
 
 #ifndef SDLMAME_WIN32
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE 	// for PTHREAD_MUTEX_RECURSIVE; needs to be here before other glibc headers are included
+#endif
 #endif
 
 #include <SDL/SDL.h>
@@ -72,7 +74,7 @@ void osd_lock_acquire(osd_lock *lock)
 	r =	pthread_mutex_lock(&mutex->id);
 	if (r==0)
 		return;
-	fprintf(stderr, "Error on lock: %d\n", r);
+	fprintf(stderr, "Error on lock: %d: %s\n", r, strerror(r));
 }
 
 //============================================================
@@ -88,7 +90,7 @@ int osd_lock_try(osd_lock *lock)
 	if (r==0)
 		return 1;
 	if (r!=EBUSY)
-		fprintf(stderr, "Error on trylock: %d\n", r);
+                fprintf(stderr, "Error on trylock: %d: %s\n", r, strerror(r));
 	return 0;
 }
 

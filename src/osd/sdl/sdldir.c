@@ -24,7 +24,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef __USE_BSD
 #define __USE_BSD	// to get DT_xxx on Linux
+#endif
 #undef _POSIX_C_SOURCE  // to get DT_xxx on OS X
 #include <dirent.h>
 

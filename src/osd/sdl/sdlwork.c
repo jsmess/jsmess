@@ -10,9 +10,9 @@
 //============================================================
 
 // MinGW does not have pthreads, defer to Aaron's implementation on that platform
-#ifdef SDLMAME_WIN32
+#if defined(SDLMAME_WIN32)
 #include "../windows/winwork.c"
-#elif SDLMAME_OS2	// use separate OS/2 implementation
+#elif defined(SDLMAME_OS2)	// use separate OS/2 implementation
 #include "os2work.c"
 #else
 
