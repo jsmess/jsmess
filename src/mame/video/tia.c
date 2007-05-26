@@ -760,20 +760,92 @@ static WRITE8_HANDLER( CTRLPF_w )
 	}
 }
 
+static WRITE8_HANDLER( HMP0_w )
+{
+	int curr_x = current_x();
+
+	data &= 0xF0;
+
+	if ( data == HMP0 )
+		return;
+
+	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+		int decrements = ( HMP0 ^ 0x80 ) >> 4;
+		int window = curr_x - ( HMOVE_started + decrements * 4 );
+
+		/* HMOVE cycles are still being applied */
+		if ( window < 0 ) {
+			int new_decrements = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+
+			if ( new_window < 0 ) {
+				horzP0 -= ( new_decrements - decrements );
+			}
+		}
+	}
+	HMP0 = data;
+}
+
+static WRITE8_HANDLER( HMP1_w )
+{
+	int curr_x = current_x();
+
+	data &= 0xF0;
+
+	if ( data == HMP1 )
+		return;
+
+	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+		int decrements = ( HMP1 ^ 0x80 ) >> 4;
+		int window = curr_x - ( HMOVE_started + decrements * 4 );
+
+		/* HMOVE cycles are still being applied */
+		if ( window < 0 ) {
+			int new_decrements = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+
+			if ( new_window < 0 ) {
+				horzP1 -= ( new_decrements - decrements );
+			}
+		}
+	}
+	HMP1 = data;
+}
+
 static WRITE8_HANDLER( HMM0_w )
 {
 	int curr_x = current_x();
-	int window = curr_x - ( HMOVE_started + ( ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 2 ) );
 
 	data &= 0xF0;
-	if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
-		//logerror("%04X: HMOVE/HMM0 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
-		horzM0 += ((signed char) HMM0) >> 4;
-		horzM0 -= 15;
-		if (horzM0 < 0 )
-			horzM0 += 160;
-		horzM0 %= 160;
-		HMM0_latch = 1;
+
+	if ( data == HMM0 )
+		return;
+
+	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+		int decrements = ( HMM0 ^ 0x80 ) >> 4;
+		int window = curr_x - ( HMOVE_started + decrements * 4 );
+
+		/* HMOVE cycles are still being applied */
+		if ( window < 0 ) {
+			int new_decrements = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+
+			if ( new_window < 0 ) {
+				horzM0 -= ( new_decrements - decrements );
+			}
+		}
+
+		/* All HMOVE cycles have been applied but the compare hasn't occured yet */
+		if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
+
+			//logerror("%04X: HMOVE/HMM0 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
+			horzM0 += ((signed char) HMM0) >> 4;
+			horzM0 -= 15;
+			if (horzM0 < 0 )
+				horzM0 += 160;
+			horzM0 %= 160;
+			HMM0_latch = 1;
+		}
 	}
 	HMM0 = data;
 }
@@ -781,19 +853,64 @@ static WRITE8_HANDLER( HMM0_w )
 static WRITE8_HANDLER( HMM1_w )
 {
 	int curr_x = current_x();
-	int window = curr_x - ( HMOVE_started + ( ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 2 ) );
 
 	data &= 0xF0;
-	if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
-		//logerror("%04X: HMOVE/HMM1 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
-		horzM1 += ((signed char) HMM1) >> 4;
-		horzM1 -= 15;
-		if ( horzM1 < 0 )
-			horzM1 += 160;
-		horzM1 %= 160;
-		HMM1_latch = 1;
+
+	if ( data == HMM1 )
+		return;
+
+	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+		int decrements = ( HMM1 ^ 0x80 ) >> 4;
+		int window = curr_x - ( HMOVE_started + decrements * 4 );
+
+		/* HMOVE cycles are still being applied */
+		if ( window < 0 ) {
+			int new_decrements = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+
+			if ( new_window < 0 ) {
+				horzM1 -= ( new_decrements - decrements );
+			}
+		}
+
+		/* All HMOVE cycles have been applied but the compare hasn't occured yet */
+		if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
+			//logerror("%04X: HMOVE/HMM1 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
+			horzM1 += ((signed char) HMM1) >> 4;
+			horzM1 -= 15;
+			if ( horzM1 < 0 )
+				horzM1 += 160;
+			horzM1 %= 160;
+			HMM1_latch = 1;
+		}
 	}
 	HMM1 = data;
+}
+
+static WRITE8_HANDLER( HMBL_w )
+{
+	int curr_x = current_x();
+
+	data &= 0xF0;
+
+	if ( data == HMBL )
+		return;
+
+	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+		int decrements = ( HMBL ^ 0x80 ) >> 4;
+		int window = curr_x - ( HMOVE_started + decrements * 4 );
+
+		/* HMOVE cycles are still being applied */
+		if ( window < 0 ) {
+			int new_decrements = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+
+			if ( new_window < 0 ) {
+				horzBL -= ( new_decrements - decrements );
+			}
+		}
+	}
+	HMBL = data;
 }
 
 static WRITE8_HANDLER( HMOVE_w )
@@ -876,11 +993,11 @@ static WRITE8_HANDLER( RSYNC_w )
 
 static WRITE8_HANDLER( HMCLR_w )
 {
-	HMP0 = 0;
-	HMP1 = 0;
-	HMM0 = 0;
-	HMM1 = 0;
-	HMBL = 0;
+	HMP0_w( offset, 0 );
+	HMP1_w( offset, 0 );
+	HMM0_w( offset, 0 );
+	HMM1_w( offset, 0 );
+	HMBL_w( offset, 0 );
 }
 
 
@@ -900,7 +1017,7 @@ static WRITE8_HANDLER( CXCLR_w )
 #define RESXX_APPLY_ACTIVE_HMOVE(HORZ,MOTION)											\
 	if ( current_x() < ( HMOVE_started + 16 * 4 ) && HMOVE_started != HMOVE_INVALID ) {	\
 		int decrements = ( ( MOTION & 0xF0 ) ^ 0x80 ) >> 4;								\
-		int window = ( HMOVE_started + ( 16 - decrements ) * 4 ) - current_x();			\
+		int window = ( HMOVE_started + decrements * 4 ) - current_x();					\
 		HORZ += 8;																		\
 		if ( window > 0 ) {																\
 			HORZ -= ( ( window + 1 ) / 4 + 1 );											\
@@ -1153,18 +1270,18 @@ WRITE8_HANDLER( tia_w )
 		 1,	// ENAM0
 		 1,	// ENAM1
 		 1,	// ENABL
-		-1,	// HMP0
-		-1,	// HMP1
-		-1,	// HMM0
-		-1,	// HMM1
-		-1,	// HMBL
+		 0,	// HMP0
+		 0,	// HMP1
+		 0,	// HMM0
+		 0,	// HMM1
+		 0,	// HMBL
 		 0,	// VDELP0
 		 0,	// VDELP1
 		 0,	// VDELBL
 		 0,	// RESMP0
 		 0,	// RESMP1
 		 3,	// HMOVE
-		-1,	// HMCLR
+		 0,	// HMCLR
 		 0,	// CXCLR
 	};
 
@@ -1284,10 +1401,10 @@ WRITE8_HANDLER( tia_w )
 		ENABL = data;
 		break;
 	case 0x20:
-		HMP0 = data;
+		HMP0_w(offset, data);
 		break;
 	case 0x21:
-		HMP1 = data;
+		HMP1_w(offset, data);
 		break;
 	case 0x22:
 		HMM0_w(offset, data);
@@ -1296,7 +1413,7 @@ WRITE8_HANDLER( tia_w )
 		HMM1_w(offset, data);
 		break;
 	case 0x24:
-		HMBL = data;
+		HMBL_w(offset, data);
 		break;
 	case 0x25:
 		VDELP0 = data;
