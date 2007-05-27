@@ -105,6 +105,24 @@ static const UINT32 games[][2] =
 };
 
 
+static int detect_32K_modeTV(void)
+{
+	int i,numfound = 0;
+	unsigned char TVsignature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
+	if (cart_size >= 0x8000)
+	{
+		for (i = 0; i < cart_size; i++)
+		{
+			if (!memcmp(&CART[i], TVsignature,4))
+			{
+				numfound++;
+			}
+		}
+	}
+	if (numfound > 1) return 1;
+	return 0;
+}
+
 static int detect_super_chip(void)
 {
 	int i;
@@ -606,6 +624,11 @@ static MACHINE_START( a2600 )
 			break;
 		}
 
+		if (detect_32K_modeTV())
+		{
+			mode = modeTV;
+			printf("32K ModeTV found\n");
+		}
 		for (i = 0; 8 * i < sizeof games; i++)
 		{
 			if (games[i][0] == crc)
@@ -630,7 +653,10 @@ static MACHINE_START( a2600 )
 
 		if (crc == 0xee7b80d1) chip = 1; // Dig Dug
 		if (crc == 0xa09779ea) chip = 1; // Off the Wall
-		if (crc == 0x861c4aca) chip = 1; // Fatal Run
+		if (crc == 0x861c4aca) chip = 1; // Fatal Run (PAL) (alt)
+		if (crc == 0x991d2348) chip = 1; // Fatal Run (PAL)
+		if (crc == 0x7169337a) chip = 1; // Fatal Run (PAL) (NTSC fixed)
+
 	}
 
 	/* set up ROM banks */
