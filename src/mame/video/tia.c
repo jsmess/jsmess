@@ -1115,62 +1115,78 @@ static WRITE8_HANDLER( CXCLR_w )
 static WRITE8_HANDLER( RESP0_w )
 {
 	int curr_x = current_x();
+	int new_horzP0;
 
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
-		horzP0 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP0 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-		RESXX_APPLY_ACTIVE_HMOVE( horzP0, HMP0 );
+		RESXX_APPLY_ACTIVE_HMOVE( new_horzP0, HMP0 );
 	} else {
-		horzP0 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP0 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 	}
 
-	startP0after = horzP0;
+	if ( new_horzP0 != horzP0 ) {
+		horzP0 = new_horzP0;
+		startP0after = horzP0;
+	}
 }
 
 
 static WRITE8_HANDLER( RESP1_w )
 {
 	int curr_x = current_x();
+	int new_horzP1;
 
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
-		horzP1 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP1 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-		RESXX_APPLY_ACTIVE_HMOVE( horzP1, HMP1 );
+		RESXX_APPLY_ACTIVE_HMOVE( new_horzP1, HMP1 );
 	} else {
-		horzP1 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
+		new_horzP1 = ( curr_x < -3 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 	}
 
-	startP1after = horzP1;
+	if ( new_horzP1 != horzP1 ) {
+		horzP1 = new_horzP1;
+		startP1after = horzP1;
+	}
 }
 
 
 static WRITE8_HANDLER( RESM0_w )
 {
 	int curr_x = current_x();
+	int new_horzM0;
 
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
-		horzM0 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		new_horzM0 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-		RESXX_APPLY_ACTIVE_HMOVE( horzM0, HMM0 );
+		RESXX_APPLY_ACTIVE_HMOVE( new_horzM0, HMM0 );
 	} else {
-		horzM0 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		new_horzM0 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 	}
-	startM0 = 0;
+	if ( new_horzM0 != horzM0 ) {
+		horzM0 = new_horzM0;
+		startM0 = 0;
+	}
 }
 
 
 static WRITE8_HANDLER( RESM1_w )
 {
 	int curr_x = current_x();
+	int new_horzM1;
 
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
-		horzM1 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		new_horzM1 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
-		RESXX_APPLY_ACTIVE_HMOVE( horzM1, HMM1 );
+		RESXX_APPLY_ACTIVE_HMOVE( new_horzM1, HMM1 );
 	} else {
-		horzM1 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
+		new_horzM1 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 	}
-	startM1 = 0;
+	if ( new_horzM1 != horzM1 ){
+		horzM1 = new_horzM1;
+		startM1 = 0;
+	}
 }
 
 
