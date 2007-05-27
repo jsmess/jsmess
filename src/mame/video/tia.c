@@ -19,6 +19,11 @@ static int horzP1;
 static int horzM0;
 static int horzM1;
 static int horzBL;
+static int motclkP0;
+static int motclkP1;
+static int motclkM0;
+static int motclkM1;
+static int motclkBL;
 static int startP0after;
 static int startP1after;
 
@@ -555,6 +560,24 @@ static void update_bitmap(int next_x, int next_y)
 			int redraw_line = 0;
 
 			if ( ! HMM0_latch && ! HMM1_latch ) {
+				/* Apply pending motion clocks from a HMOVE initiated during the scanline */
+				if ( HMOVE_started >= 97 && HMOVE_started < 157 ) {
+					horzP0 -= motclkP0;
+					horzP1 -= motclkP1;
+					horzM0 -= motclkM0;
+					horzM1 -= motclkM1;
+					horzBL -= motclkBL;
+					if (horzP0 < 0)
+						horzP0 += 160;
+					if (horzP1 < 0)
+						horzP1 += 160;
+					if (horzM0 < 0)
+						horzM0 += 160;
+					if (horzM1 < 0)
+						horzM1 += 160;
+					if (horzBL < 0)
+						horzBL += 160;
+				}
 				HMOVE_started = HMOVE_INACTIVE;
 			}
 
@@ -591,6 +614,7 @@ static void update_bitmap(int next_x, int next_y)
 					horzM1 += 160;
 				redraw_line = 1;
 			}
+
 			if ( redraw_line ) {
 				if (VBLANK & 2)
 				{
@@ -921,55 +945,87 @@ static WRITE8_HANDLER( HMOVE_w )
 	//logerror("%04X: HMOVE write, curr_x = %d, curr_y = %d\n", activecpu_get_pc(), curr_x, curr_y );
 	HMOVE_started = curr_x;
 
-	if ( curr_x < 0 || curr_x >= 157 ) {
-		horzP0 += 8 - ( ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4 );
-		horzP1 += 8 - ( ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4 );
-		horzM0 += 8 - ( ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 4 );
-		horzM1 += 8 - ( ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 4 );
-		horzBL += 8 - ( ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 4 );
-	} else {
-		int skip_decrements = ( 160 - HMOVE_started - 4 ) / 4;
-		int decrP0 = ( ( HMP0 & 0xF0 ) ^ 0x80 ) >> 4;
-		int decrP1 = ( ( HMP1 & 0xF0 ) ^ 0x80 ) >> 4;
-		int decrM0 = ( ( HMM0 & 0xF0 ) ^ 0x80 ) >> 4;
-		int decrM1 = ( ( HMM1 & 0xF0 ) ^ 0x80 ) >> 4;
-		int decrBL = ( ( HMBL & 0xF0 ) ^ 0x80 ) >> 4;
-		if ( decrP0 > skip_decrements )
-			horzP0 -= decrP0 - skip_decrements;
-		if ( decrP1 > skip_decrements )
-			horzP1 -= decrP1 - skip_decrements;
-		if ( decrM0 > skip_decrements )
-			horzM0 -= decrM0 - skip_decrements;
-		if ( decrM1 > skip_decrements )
-			horzM1 -= decrM1 - skip_decrements;
-		if ( decrBL > skip_decrements )
-			horzBL -= decrBL - skip_decrements;
-	}
-
 	HMM0_latch = 0;
 	HMM1_latch = 0;
 
-	if (horzP0 < 0)
-		horzP0 += 160;
-	if (horzP1 < 0)
-		horzP1 += 160;
-	if (horzM0 < 0)
-		horzM0 += 160;
-	if (horzM1 < 0)
-		horzM1 += 160;
-	if (horzBL < 0)
-		horzBL += 160;
+	/* Check if HMOVE activities can be ignored */
+	if ( curr_x >= -5 && curr_x < 97 ) {
+		motclkP0 = 0;
+		motclkP1 = 0;
+		motclkM0 = 0;
+		motclkM1 = 0;
+		motclkBL = 0;
+		HMOVE_started = HMOVE_INACTIVE;
+		return;
+	}
 
-	horzP0 %= 160;
-	horzP1 %= 160;
-	horzM0 %= 160;
-	horzM1 %= 160;
-	horzBL %= 160;
+	motclkP0 = ( HMP0 ^ 0x80 ) >> 4;
+	motclkP1 = ( HMP1 ^ 0x80 ) >> 4;
+	motclkM0 = ( HMM0 ^ 0x80 ) >> 4;
+	motclkM1 = ( HMM1 ^ 0x80 ) >> 4;
+	motclkBL = ( HMBL ^ 0x80 ) >> 4;
 
-	/* When HMOVE is triggered on CPU cycle 75, the HBlank period on the
-	   next line is also extended. */
-	if (curr_x <= -8 || curr_x >= 157)
-	{
+	/* Adjust number of graphics motion clocks for active display */
+	if ( curr_x >= 97 && curr_x < 151 ) {
+		int skip_motclks = ( 160 - HMOVE_started - 6 ) / 4;
+		motclkP0 -= skip_motclks;
+		motclkP1 -= skip_motclks;
+		motclkM0 -= skip_motclks;
+		motclkM1 -= skip_motclks;
+		motclkBL -= skip_motclks;
+		if ( motclkP0 < 0 )
+			motclkP0 = 0;
+		if ( motclkP1 < 0 )
+			motclkP1 = 0;
+		if ( motclkM0 < 0 )
+			motclkM0 = 0;
+		if ( motclkM1 < 0 )
+			motclkM1 = 0;
+		if ( motclkBL < 0 )
+			motclkBL = 0;
+	}
+
+	if ( curr_x >= -56 && curr_x < -5 ) {
+		int max_motclks = ( 3 - ( HMOVE_started + 1 ) ) / 4;
+		if ( motclkP0 > max_motclks )
+			motclkP0 = max_motclks;
+		if ( motclkP1 > max_motclks )
+			motclkP1 = max_motclks;
+		if ( motclkM0 > max_motclks )
+			motclkM0 = max_motclks;
+		if ( motclkM1 > max_motclks )
+			motclkM1 = max_motclks;
+		if ( motclkBL > max_motclks )
+			motclkBL = max_motclks;
+	}
+
+	/* Apply horizontal motion */
+	if ( curr_x < -5 || curr_x >= 157 ) {
+		horzP0 += 8 - motclkP0;
+		horzP1 += 8 - motclkP1;
+		horzM0 += 8 - motclkM0;
+		horzM1 += 8 - motclkM1;
+		horzBL += 8 - motclkBL;
+
+		if (horzP0 < 0)
+			horzP0 += 160;
+		if (horzP1 < 0)
+			horzP1 += 160;
+		if (horzM0 < 0)
+			horzM0 += 160;
+		if (horzM1 < 0)
+			horzM1 += 160;
+		if (horzBL < 0)
+			horzBL += 160;
+
+		horzP0 %= 160;
+		horzP1 %= 160;
+		horzM0 %= 160;
+		horzM1 %= 160;
+		horzBL %= 160;
+
+		/* When HMOVE is triggered on CPU cycle 75, the HBlank period on the
+		   next line is also extended. */
 		if (curr_x >= 157)
 		{
 			curr_y += 1;
@@ -988,6 +1044,28 @@ static WRITE8_HANDLER( HMOVE_w )
 static WRITE8_HANDLER( RSYNC_w )
 {
 	/* this address is used in chip testing */
+}
+
+
+static WRITE8_HANDLER( NUSIZ0_w )
+{
+	int curr_x = current_x();
+
+	if ( nusiz[data & 7][0] > nusiz[NUSIZ0 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ0 & 7][1] ) {
+		startP0after = curr_x;
+	}
+	NUSIZ0 = data;
+}
+
+
+static WRITE8_HANDLER( NUSIZ1_w )
+{
+	int curr_x = current_x();
+
+	if ( nusiz[data & 7][0] > nusiz[NUSIZ1 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ1 & 7][1] ) {
+		startP1after = curr_x;
+	}
+	NUSIZ1 = data;
 }
 
 
@@ -1295,16 +1373,10 @@ WRITE8_HANDLER( tia_w )
 		RSYNC_w(offset, data);
 		break;
 	case 0x04:
-		if ( nusiz[data & 7][0] > nusiz[NUSIZ0 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ0 & 7][1] ) {
-			startP0after = curr_x;
-		}
-		NUSIZ0 = data;
+		NUSIZ0_w(offset, data);
 		break;
 	case 0x05:
-		if ( nusiz[data & 7][0] > nusiz[NUSIZ1 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ1 & 7][1]) {
-			startP1after = curr_x;
-		}
-		NUSIZ1 = data;
+		NUSIZ1_w(offset, data);
 		break;
 	case 0x06:
 		COLUP0 = data;
@@ -1457,6 +1529,12 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 	prev_y = 0;
 
 	HMOVE_started = HMOVE_INACTIVE;
+
+	motclkP0 = 0;
+	motclkP1 = 0;
+	motclkM0 = 0;
+	motclkM1 = 0;
+	motclkBL = 0;
 
 	if ( ti ) {
 		tia_read_input_port = ti->read_input_port;
