@@ -26,6 +26,8 @@ static int motclkM1;
 static int motclkBL;
 static int startP0after;
 static int startP1after;
+static int startM0;
+static int startM1;
 
 static int current_bitmap;
 
@@ -311,7 +313,7 @@ static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, i
 }
 
 
-static void draw_missile_helper(UINT8* p, UINT8* col, int horz, int latch,
+static void draw_missile_helper(UINT8* p, UINT8* col, int horz, int latch, int start,
 	UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM)
 {
 	int num = nusiz[NUSIZ & 7][0];
@@ -324,33 +326,37 @@ static void draw_missile_helper(UINT8* p, UINT8* col, int horz, int latch,
 
 	for (i = 0; i < num; i++)
 	{
-		for (j = 0; j < width; j++)
-		{
-			if ((ENAM & 2) && !(RESMP & 2))
+		if ( i > 0 || start ) {
+			for (j = 0; j < width; j++)
 			{
-				if ( latch ) {
-					switch ( horz % 4 ) {
-					case 1:
-						if ( horz < 156 ) {
-							p[(horz + 4) % 160] = COLUM >> 1;
-							col[(horz + 4) % 160] = COLUM >> 1;
+				if ((ENAM & 2) && !(RESMP & 2))
+				{
+					if ( latch ) {
+						switch ( horz % 4 ) {
+						case 1:
+							if ( horz < 156 ) {
+								p[(horz + 4) % 160] = COLUM >> 1;
+								col[(horz + 4) % 160] = COLUM >> 1;
+							}
+							p[horz % 160] = COLUM >> 1;
+							col[horz % 160] = COLUM >> 1;
+							break;
+						case 2:
+						case 3:
+							p[horz % 160] = COLUM >> 1;
+							col[horz % 160] = COLUM >> 1;
+							break;
 						}
+					} else {
 						p[horz % 160] = COLUM >> 1;
 						col[horz % 160] = COLUM >> 1;
-						break;
-					case 2:
-					case 3:
-						p[horz % 160] = COLUM >> 1;
-						col[horz % 160] = COLUM >> 1;
-						break;
 					}
-				} else {
-					p[horz % 160] = COLUM >> 1;
-					col[horz % 160] = COLUM >> 1;
 				}
-			}
 
-			horz++;
+				horz++;
+			}
+		} else {
+			horz+= width;
 		}
 
 		horz += 8 * (skp + 1) - width;
@@ -439,13 +445,13 @@ static void drawS1(UINT8* p, UINT8* col)
 
 static void drawM0(UINT8* p, UINT8* col)
 {
-	draw_missile_helper(p, col, horzM0, HMM0_latch, RESMP0, ENAM0, NUSIZ0, COLUP0);
+	draw_missile_helper(p, col, horzM0, HMM0_latch, startM0, RESMP0, ENAM0, NUSIZ0, COLUP0);
 }
 
 
 static void drawM1(UINT8* p, UINT8* col)
 {
-	draw_missile_helper(p, col, horzM1, HMM1_latch, RESMP1, ENAM1, NUSIZ1, COLUP1);
+	draw_missile_helper(p, col, horzM1, HMM1_latch, startM1, RESMP1, ENAM1, NUSIZ1, COLUP1);
 }
 
 
@@ -588,9 +594,11 @@ static void update_bitmap(int next_x, int next_y)
 			}
 
 			/* Redraw line if a RESPx or NUSIZx occured during the lastline */
-			if ( startP0after > -1 || startP1after > -1 ) {
+			if ( startP0after > -1 || startP1after > -1 || ! startM0 || ! startM1) {
 				startP0after = -1;
 				startP1after = -1;
+				startM0 = 1;
+				startM1 = 1;
 
 				/* Clear out contents of backup player graphic line buffer */
 				memset( prev_lineP0, 0xFF, sizeof prev_lineP0 );
@@ -1147,6 +1155,7 @@ static WRITE8_HANDLER( RESM0_w )
 	} else {
 		horzM0 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 	}
+	startM0 = 0;
 }
 
 
@@ -1161,6 +1170,7 @@ static WRITE8_HANDLER( RESM1_w )
 	} else {
 		horzM1 = ( curr_x < 0 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 	}
+	startM1 = 0;
 }
 
 
@@ -1522,6 +1532,9 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 
 	HMM0_latch = 0;
 	HMM1_latch = 0;
+
+	startM0 = 1;
+	startM1 = 1;
 
 	REFLECT = 0;
 
