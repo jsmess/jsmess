@@ -341,7 +341,10 @@ static void drawsdl_window_destroy(sdl_window_info *window)
 
 	// free the memory in the window
 #if USE_OPENGL
-        drawsdl_destroy_all_textures(window);
+	if (video_config.mode == VIDEO_MODE_OPENGL)
+	{
+	        drawsdl_destroy_all_textures(window);
+	}
 #endif
 	free(sdl);
 	window->dxdata = NULL;
@@ -576,6 +579,8 @@ static void loadGLExtensions(sdl_info *sdl)
     printf("\n");
 }
 
+#define GL_NO_PRIMITIVE -1
+
 static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 {
 	sdl_info *sdl = window->dxdata;
@@ -588,7 +593,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	static INT32 surf_w = 0, surf_h = 0;
         static GLfloat texVerticex[8];
         int  textureEnabled = FALSE; // we start and leave this function with no textures enabled
-        int  pendingPrimitive = 0;
+        int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 
 	if (video_config.novideo)
 	{
@@ -699,50 +704,63 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		switch (prim->type)
 		{
+			/**
+			 * Try to stay in one Begin/End block as long as possible,
+			 * since entering and leaving one is most expensive..
+			 */
 			case RENDER_PRIMITIVE_LINE:
-                                if ( !pendingPrimitive )
-                                    set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), 0);
-
                                 if ( textureEnabled )
                                 {
                                     // disable texturing
                                     texture_all_disable(sdl);
                                     textureEnabled = FALSE;
                                 }
+
 				// check if it's really a point
 				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
 				{
-                                    if(pendingPrimitive!=GL_POINTS)
-                                    {
-                                        if(pendingPrimitive)
-                                            glEnd();
-                                        glBegin(GL_POINTS);
-                                        pendingPrimitive=GL_POINTS;
-                                    }
-                                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+				    curPrimitive=GL_POINTS;
+				} else {
+				    curPrimitive=GL_LINES;
+				}
+
+                                if(pendingPrimitive!=GL_NO_PRIMITIVE && pendingPrimitive!=curPrimitive)
+				{
+				    glEnd();
+				    pendingPrimitive=GL_NO_PRIMITIVE;
+				}
+
+                                if ( pendingPrimitive==GL_NO_PRIMITIVE )
+                                    set_blendmode(sdl, PRIMFLAG_GET_BLENDMODE(prim->flags), 0);
+
+				glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
+
+                                if(pendingPrimitive!=curPrimitive)
+                                {
+                                    glBegin(curPrimitive);
+                                    pendingPrimitive=curPrimitive;
+                                }
+
+				// check if it's really a point
+				if (curPrimitive==GL_POINTS)
+				{
                                     glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
 				}
 				else
 				{
-                                    if(pendingPrimitive!=GL_LINES)
-                                    {
-                                        if(pendingPrimitive)
-                                            glEnd();
-                                        glBegin(GL_LINES);
-                                        pendingPrimitive=GL_LINES;
-                                    }
-                                    glColor4f(prim->color.r, prim->color.g, prim->color.b, prim->color.a);
                                     glVertex2f(prim->bounds.x0+hofs, prim->bounds.y0+vofs);
                                     glVertex2f(prim->bounds.x1+hofs, prim->bounds.y1+vofs);
 				}
 				break;
 
 			case RENDER_PRIMITIVE_QUAD:
-                                if(pendingPrimitive)
-                                {
-                                    glEnd();
-                                    pendingPrimitive=0;
-                                }
+			        curPrimitive=GL_QUADS;
+
+                                if(pendingPrimitive!=GL_NO_PRIMITIVE && pendingPrimitive!=curPrimitive)
+				{
+				    glEnd();
+				    pendingPrimitive=GL_QUADS;
+				}
 
                                 // first update/upload the textures
                                 texture = texture_update(sdl, prim);
@@ -776,10 +794,10 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		}
 	}
 
-        if(pendingPrimitive)
+        if(pendingPrimitive!=GL_NO_PRIMITIVE)
         {
                 glEnd();
-                pendingPrimitive=0;
+                pendingPrimitive=GL_NO_PRIMITIVE;
         }
 
 
