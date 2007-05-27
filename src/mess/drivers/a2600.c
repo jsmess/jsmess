@@ -87,6 +87,7 @@ static const UINT32 games[][2] =
 	{ 0xec959bf2, modePB }, // Tutankham
 	{ 0x8fbe2b84, modePB }, // Tutankham PAL
 	{ 0xc5baae6f, modePB }, // Tutankham Zelda Hack
+/*
 	{ 0x1f95351a, modeTV }, // Espial
 	{ 0x34b80a97, modeTV }, // Espial PAL
 	{ 0xbd08d915, modeTV }, // Miner 2049er
@@ -97,17 +98,107 @@ static const UINT32 games[][2] =
 	{ 0x71ecefaf, modeTV }, // Polaris
 	{ 0xc820bd75, modeTV }, // River Patrol
 	{ 0xdd183a4f, modeTV }, // Springer
+*/
 	{ 0xAAFF3AB1, mode3E }, // not BoulderDash
+	{ 0x8cdfb7ec, mode3E }, // not BoulderDash PAL
+/*
 	{ 0xb53b33f1, modeUA }, // Funky Fish Prototype
 	{ 0x35589cec, modeUA }, // Pleiads Prototype
+*/
+/*
 	{ 0xdf2bc303, modeMN }, // Bump 'n' Jump
 	{ 0xc183fbbc, modeMN }, // Burgertime
 	{ 0x66f1849e, modeMN }, // Burgertime (E7)
 	{ 0x0603e177, modeMN }, // Masters of the Universe
-	{ 0x14f126c0, modeCV }, // Magicard
+*/
+
+/*	{ 0x14f126c0, modeCV }, // Magicard
 	{ 0x34b0b5c2, modeCV }  // Video Life
+*/
 };
 
+static int detect_modeCV(void)
+{
+	int i,numfound = 0;
+	unsigned char TVsignature1[3] = { 0x9d, 0xff, 0xf3 };
+	unsigned char TVsignature2[3] = { 0x99, 0x00, 0xf4 };
+	if (cart_size == 0x0800 || cart_size == 0x1000)
+	{
+		for (i = 0; i < cart_size - sizeof TVsignature1; i++)
+		{
+			if (!memcmp(&CART[i], TVsignature1,sizeof TVsignature1))
+			{
+				numfound = 1;
+			}
+			if (!memcmp(&CART[i], TVsignature2,sizeof TVsignature2))
+			{
+				numfound = 1;
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_modeMN(void)
+{
+	int i,numfound = 0;
+	unsigned char TVsignature[3] = { 0xad, 0xe5, 0xff };
+	if (cart_size == 0x4000)
+	{
+		for (i = 0; i < cart_size - sizeof TVsignature; i++)
+		{
+			if (!memcmp(&CART[i], TVsignature,sizeof TVsignature))
+			{
+				numfound = 1;
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_modeUA(void)
+{
+	int i,numfound = 0;
+	unsigned char TVsignature[3] = { 0x8d, 0x40, 0x02 };
+	if (cart_size == 0x2000)
+	{
+		for (i = 0; i < cart_size - sizeof TVsignature; i++)
+		{
+			if (!memcmp(&CART[i], TVsignature,sizeof TVsignature))
+			{
+				numfound = 1;
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_8K_modeTV(void)
+{
+	int i,numfound = 0;
+	unsigned char TVsignature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
+	unsigned char TVsignature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
+	// have to look for two signatures because 'not boulderdash' gives false positive otherwise
+	if (cart_size == 0x2000)
+	{
+		for (i = 0; i < cart_size - sizeof TVsignature1; i++)
+		{
+			if (!memcmp(&CART[i], TVsignature1,sizeof TVsignature1))
+			{
+				numfound |= 0x01;
+			}
+			if (!memcmp(&CART[i], TVsignature2,sizeof TVsignature2))
+			{
+				numfound |= 0x02;
+			}
+		}
+	}
+	if (numfound == 0x03) return 1;
+	return 0;
+}
 
 static int detect_32K_modeTV(void)
 {
@@ -115,9 +206,9 @@ static int detect_32K_modeTV(void)
 	unsigned char TVsignature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
 	if (cart_size >= 0x8000)
 	{
-		for (i = 0; i < cart_size; i++)
+		for (i = 0; i < cart_size - sizeof TVsignature; i++)
 		{
-			if (!memcmp(&CART[i], TVsignature,4))
+			if (!memcmp(&CART[i], TVsignature,sizeof TVsignature))
 			{
 				numfound++;
 			}
@@ -263,8 +354,8 @@ static WRITE8_HANDLER(mode8K_switch_w) { mode8K_switch(offset, data); }
 static WRITE8_HANDLER(mode12_switch_w) { mode12_switch(offset, data); }
 static WRITE8_HANDLER(mode16_switch_w) { mode16_switch(offset, data); }
 static WRITE8_HANDLER(mode32_switch_w) { mode32_switch(offset, data); }
-static WRITE8_HANDLER(modePB_switch_w) {	modePB_switch(offset, data); }
-static WRITE8_HANDLER(modeMN_switch_w) {	modeMN_switch(offset, data); }
+static WRITE8_HANDLER(modePB_switch_w) { modePB_switch(offset, data); }
+static WRITE8_HANDLER(modeMN_switch_w) { modeMN_switch(offset, data); }
 static WRITE8_HANDLER(modeMN_RAM_switch_w) { modeMN_RAM_switch(offset, data); }
 static WRITE8_HANDLER(modeTV_switch_w) { modeTV_switch(offset, data); }
 static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(offset, data); }
@@ -648,6 +739,22 @@ static MACHINE_START( a2600 )
 			break;
 		}
 
+		if (detect_modeCV())
+		{
+			mode = modeCV;
+		}
+		if (detect_modeMN())
+		{
+			mode = modeMN;
+		}
+		if (detect_modeUA())
+		{
+			mode = modeUA;
+		}
+		if (detect_8K_modeTV())
+		{
+			mode = modeTV;
+		}
 		if (detect_32K_modeTV())
 		{
 			mode = modeTV;
