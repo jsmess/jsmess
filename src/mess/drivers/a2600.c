@@ -36,12 +36,14 @@ enum
 	modeUA,
 	modeMN,
 	modeDC,
-	modeCV
+	modeCV,
+	mode3E
 };
 
 
 static UINT8* extra_RAM;
 static UINT8* bank_base[5];
+static UINT8* ram_base;
 
 static UINT8 keypad_left_column;
 static UINT8 keypad_right_column;
@@ -49,6 +51,7 @@ static UINT8 keypad_right_column;
 static unsigned cart_size;
 static unsigned number_banks;
 static unsigned current_bank;
+static unsigned mode3E_ram_enabled;
 
 
 static const UINT32 games[][2] =
@@ -94,6 +97,7 @@ static const UINT32 games[][2] =
 	{ 0x71ecefaf, modeTV }, // Polaris
 	{ 0xc820bd75, modeTV }, // River Patrol
 	{ 0xdd183a4f, modeTV }, // Springer
+	{ 0xAAFF3AB1, mode3E }, // not BoulderDash
 	{ 0xb53b33f1, modeUA }, // Funky Fish Prototype
 	{ 0x35589cec, modeUA }, // Pleiads Prototype
 	{ 0xdf2bc303, modeMN }, // Bump 'n' Jump
@@ -229,6 +233,19 @@ void modeDC_switch(UINT16 offset, UINT8 data)
 	bank_base[1] = CART + 0x1000 * next_bank();
 	memory_set_bankptr(1, bank_base[1]);
 }
+void mode3E_switch(UINT16 offset, UINT8 data)
+{
+	bank_base[1] = CART + 0x800 * (data & (number_banks - 1));
+	memory_set_bankptr(1, bank_base[1]);
+	mode3E_ram_enabled = 0;
+}
+void mode3E_RAM_switch(UINT16 offset, UINT8 data)
+{
+	ram_base = extra_RAM + 0x200 * ( data & 0x3F );
+	memory_set_bankptr(1, ram_base );
+	mode3E_ram_enabled = 1;
+}
+
 
 /* These read handlers will return the byte from the new bank */
 static  READ8_HANDLER(mode8K_switch_r) { mode8K_switch(offset, 0); return bank_base[1][0xff8 + offset]; }
@@ -252,6 +269,13 @@ static WRITE8_HANDLER(modeMN_RAM_switch_w) { modeMN_RAM_switch(offset, data); }
 static WRITE8_HANDLER(modeTV_switch_w) { modeTV_switch(offset, data); }
 static WRITE8_HANDLER(modeUA_switch_w) { modeUA_switch(offset, data); }
 static WRITE8_HANDLER(modeDC_switch_w) { modeDC_switch(offset, data); }
+static WRITE8_HANDLER(mode3E_switch_w) { mode3E_switch(offset, data); }
+static WRITE8_HANDLER(mode3E_RAM_switch_w) { mode3E_RAM_switch(offset, data); }
+static WRITE8_HANDLER(mode3E_RAM_w) {
+	if ( mode3E_ram_enabled ) {
+		ram_base[offset] = data;
+	}
+}
 
 /*
 
@@ -567,7 +591,7 @@ static MACHINE_START( a2600 )
 	int mode = 0xFF; /* readinputport(10); */
 	int chip = 0xFF; /* readinputport(11); */
 
-	extra_RAM = auto_malloc(0x800);
+	extra_RAM = auto_malloc(0x8600);
 
 	r6532_init(0, &r6532_interface);
 
@@ -714,6 +738,12 @@ static MACHINE_START( a2600 )
 	case modeCV:
 		install_banks(2, 0x0000);
 		break;
+
+	case mode3E:
+		install_banks(2, cart_size - 0x800);
+		number_banks = cart_size / 0x800;
+		mode3E_ram_enabled = 0;
+		break;
 	}
 
 	/* set up bank counter */
@@ -779,6 +809,12 @@ static MACHINE_START( a2600 )
 	case modeAV:
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeAV_switch_w);
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01fe, 0x01fe, 0, 0, modeAV_switch_r);
+		break;
+
+	case mode3E:
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
 		break;
 	}
 
