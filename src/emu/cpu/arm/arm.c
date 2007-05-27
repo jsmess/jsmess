@@ -761,9 +761,9 @@ static void HandleALU( UINT32 insn )
 	}
 	else
 	{
-		op2 = decodeShift(insn, (insn & INSN_S && (opcode & 4) == 4)? &sc : NULL);
+		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
 
-		if (!(insn & INSN_S && (opcode & 4) == 4))
+        	if (!(insn & INSN_S))
 			sc=0;
 	}
 

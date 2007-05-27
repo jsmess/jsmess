@@ -319,8 +319,6 @@ static UINT32 decodeShift( UINT32 insn, UINT32 *pCarry)
     UINT32 t  = (insn & INSN_OP2_SHIFT_TYPE) >> INSN_OP2_SHIFT_TYPE_SHIFT;
 
     if ((insn & INSN_OP2_RM)==0xf) {
-        /* If hardwired shift, then PC is 8 bytes ahead, else if register shift
-        is used, then 12 bytes - TODO?? */
         rm+=8;
     }
 
@@ -1219,9 +1217,9 @@ static void HandleALU( UINT32 insn )
     /* Op2 = Register Value */
     else
     {
-        op2 = decodeShift(insn, (insn & INSN_S && (opcode & 4) == 4)? &sc : NULL);
+        op2 = decodeShift(insn, (insn & INSN_S) ? &sc : NULL);
 
-        if (!(insn & INSN_S && (opcode & 4) == 4))
+        if (!(insn & INSN_S))
             sc=0;
     }
 

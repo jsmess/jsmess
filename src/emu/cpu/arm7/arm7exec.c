@@ -57,6 +57,7 @@
 		UINT32 rm, rn, rs, rd, op2, imm, rrs, rrd;
 		INT32 offs;
 		pc = R15;
+
 		insn = cpu_readop16(pc & (~1));
 		ARM7_ICOUNT += (3 - thumbCycles[insn >> 8]);
 		switch( ( insn & THUMB_INSN_TYPE ) >> THUMB_INSN_TYPE_SHIFT )
@@ -499,6 +500,11 @@
 								{
 									case 0x1: /* ADD Rd, HRs */
 						      				SET_REGISTER( rd, GET_REGISTER(rd) + GET_REGISTER(rs+8) );
+										// emulate the effects of pre-fetch
+										if (rs == 7)
+										{
+											SET_REGISTER(rd, GET_REGISTER(rd) + 4);
+										}
 										break;
 									case 0x2: /* ADD HRd, Rs */
 										SET_REGISTER( rd+8, GET_REGISTER(rd+8) + GET_REGISTER(rs) );
@@ -510,6 +516,11 @@
 										break;
 									case 0x3: /* Add HRd, HRs */
 										SET_REGISTER( rd+8, GET_REGISTER(rd+8) + GET_REGISTER(rs+8) );
+										// emulate the effects of pre-fetch
+										if (rs == 7)
+										{
+											SET_REGISTER(rd+8, GET_REGISTER(rd+8) + 4);
+										}
 										if (rd == 7)
 										{
 											R15 += 2;
@@ -914,7 +925,7 @@
 					{
 						if( insn & ( 1 << offs ) )
 						{
-							SET_REGISTER( offs, READ32( GET_REGISTER(rd) ) );
+							SET_REGISTER( offs, READ32( (GET_REGISTER(rd)&0xfffffffc) ) );
 							SET_REGISTER( rd, GET_REGISTER(rd) + 4 );
 						}
 					}
@@ -927,7 +938,7 @@
 					{
 						if( insn & ( 1 << offs ) )
 						{
-							WRITE32( GET_REGISTER(rd), GET_REGISTER(offs) );
+							WRITE32( (GET_REGISTER(rd)&0xfffffffc), GET_REGISTER(offs) );
 							SET_REGISTER( rd, GET_REGISTER(rd) + 4 );
 						}
 					}
