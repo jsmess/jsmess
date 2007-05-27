@@ -1127,7 +1127,7 @@ static WRITE8_HANDLER( RESP0_w )
 
 	if ( new_horzP0 != horzP0 ) {
 		horzP0 = new_horzP0;
-		startP0after = horzP0;
+		startP0after = horzP0 + 1;
 	}
 }
 
@@ -1147,7 +1147,7 @@ static WRITE8_HANDLER( RESP1_w )
 
 	if ( new_horzP1 != horzP1 ) {
 		horzP1 = new_horzP1;
-		startP1after = horzP1;
+		startP1after = horzP1 + 1;
 	}
 }
 
