@@ -9,7 +9,7 @@
 #include "sound/tiaintf.h"
 #include <math.h>
 
-#define HMOVE_INVALID	-200
+#define HMOVE_INACTIVE	-200
 
 static UINT32 frame_cycles;
 static UINT32 paddle_cycles;
@@ -555,7 +555,7 @@ static void update_bitmap(int next_x, int next_y)
 			int redraw_line = 0;
 
 			if ( ! HMM0_latch && ! HMM1_latch ) {
-				HMOVE_started = HMOVE_INVALID;
+				HMOVE_started = HMOVE_INACTIVE;
 			}
 
 			/* Redraw line if the playfield reflect bit was changed after the center of the screen */
@@ -634,7 +634,7 @@ static void update_bitmap(int next_x, int next_y)
 		}
 
 		/* Collision detection also takes place under the extended hblank area */
-		colx1 = ( x1 == 8 && HMOVE_started != HMOVE_INVALID ) ? 0 : x1;
+		colx1 = ( x1 == 8 && HMOVE_started != HMOVE_INACTIVE ) ? 0 : x1;
 
 		if (collision_check(lineM0, lineP1, colx1, x2))
 			CXM0P |= 0x80;
@@ -769,7 +769,7 @@ static WRITE8_HANDLER( HMP0_w )
 	if ( data == HMP0 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
 		int decrements = ( HMP0 ^ 0x80 ) >> 4;
 		int window = curr_x - ( HMOVE_started + decrements * 4 );
 
@@ -795,7 +795,7 @@ static WRITE8_HANDLER( HMP1_w )
 	if ( data == HMP1 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
 		int decrements = ( HMP1 ^ 0x80 ) >> 4;
 		int window = curr_x - ( HMOVE_started + decrements * 4 );
 
@@ -821,7 +821,7 @@ static WRITE8_HANDLER( HMM0_w )
 	if ( data == HMM0 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
 		int decrements = ( HMM0 ^ 0x80 ) >> 4;
 		int window = curr_x - ( HMOVE_started + decrements * 4 );
 
@@ -859,7 +859,7 @@ static WRITE8_HANDLER( HMM1_w )
 	if ( data == HMM1 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
 		int decrements = ( HMM1 ^ 0x80 ) >> 4;
 		int window = curr_x - ( HMOVE_started + decrements * 4 );
 
@@ -896,7 +896,7 @@ static WRITE8_HANDLER( HMBL_w )
 	if ( data == HMBL )
 		return;
 
-	if ( HMOVE_started != HMOVE_INVALID && curr_x < HMOVE_started + 16 * 4 ) {
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
 		int decrements = ( HMBL ^ 0x80 ) >> 4;
 		int window = curr_x - ( HMOVE_started + decrements * 4 );
 
@@ -1030,7 +1030,7 @@ static WRITE8_HANDLER( RESP0_w )
 {
 	int curr_x = current_x();
 
-	if ( HMOVE_started != HMOVE_INVALID ) {
+	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		horzP0 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( horzP0, HMP0 );
@@ -1046,7 +1046,7 @@ static WRITE8_HANDLER( RESP1_w )
 {
 	int curr_x = current_x();
 
-	if ( HMOVE_started != HMOVE_INVALID ) {
+	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		horzP1 = ( curr_x < 7 ) ? 3 : ( ( curr_x + 5 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( horzP1, HMP1 );
@@ -1062,7 +1062,7 @@ static WRITE8_HANDLER( RESM0_w )
 {
 	int curr_x = current_x();
 
-	if ( HMOVE_started != HMOVE_INVALID ) {
+	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		horzM0 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( horzM0, HMM0 );
@@ -1076,7 +1076,7 @@ static WRITE8_HANDLER( RESM1_w )
 {
 	int curr_x = current_x();
 
-	if ( HMOVE_started != HMOVE_INVALID ) {
+	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		horzM1 = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( horzM1, HMM1 );
@@ -1090,7 +1090,7 @@ static WRITE8_HANDLER( RESBL_w )
 {
 	int curr_x = current_x();
 
-	if ( HMOVE_started != HMOVE_INVALID ) {
+	if ( HMOVE_started != HMOVE_INACTIVE ) {
 		horzBL = ( curr_x < 7 ) ? 2 : ( ( curr_x + 4 ) % 160 );
 		/* If HMOVE is active, adjust for remaining horizontal move clocks if any */
 		RESXX_APPLY_ACTIVE_HMOVE( horzBL, HMBL );
@@ -1456,7 +1456,7 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 	prev_x = 0;
 	prev_y = 0;
 
-	HMOVE_started = HMOVE_INVALID;
+	HMOVE_started = HMOVE_INACTIVE;
 
 	if ( ti ) {
 		tia_read_input_port = ti->read_input_port;
