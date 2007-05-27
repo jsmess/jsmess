@@ -627,7 +627,6 @@ static MACHINE_START( a2600 )
 		if (detect_32K_modeTV())
 		{
 			mode = modeTV;
-			printf("32K ModeTV found\n");
 		}
 		for (i = 0; 8 * i < sizeof games; i++)
 		{
