@@ -2897,7 +2897,7 @@ MACHINE_START( tanodr64 )
 	init.printer_out_		= printer_out_dragon;
 	init.cart_timer_proc	= coco_cart_timer_proc;
 	init.map_memory			= coco_mapmemory;
-	init.fdc_cart_hardware	= "dragon_fdc";
+	init.fdc_cart_hardware	= "coco_fdc";
 	
 	generic_coco12_dragon_init(machine, &init);
 	
