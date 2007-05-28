@@ -802,7 +802,7 @@ static MACHINE_START( a2600 )
 		break;
 
 	case mode8K:
-		install_banks(1, 0x1000);
+		install_banks(1, 0x0000);
 		break;
 
 	case mode12:
