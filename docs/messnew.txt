@@ -51,6 +51,8 @@ System Driver Changes:
 - [A2600] HMOVE triggered on the last possible CPU cycle also triggers
   a delay of the end of HBlank. (bug #1222) [Wilbert Pol]
 
+- [A2600] Rewrote player graphics drawing and handling. [Wilbert Pol]
+
 - [AMIGA] Updated the Amiga driver to output the power and drive LED status
   to the artwork system. [Dirk Best]
 

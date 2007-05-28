@@ -10,6 +10,20 @@
 #include <math.h>
 
 #define HMOVE_INACTIVE	-200
+#define PLAYER_GFX_SLOTS	4
+
+// Per player graphic
+// - pixel number to start drawing from (0-7, from GRPx) / number of pixels drawn from GRPx
+// - display position to start drawing
+// - size to use
+struct player_gfx {
+	int	start_pixel[PLAYER_GFX_SLOTS];
+	int start_drawing[PLAYER_GFX_SLOTS];
+	int size[PLAYER_GFX_SLOTS];
+};
+
+struct player_gfx p0gfx;
+struct player_gfx p1gfx;
 
 static UINT32 frame_cycles;
 static UINT32 paddle_cycles;
@@ -24,8 +38,8 @@ static int motclkP1;
 static int motclkM0;
 static int motclkM1;
 static int motclkBL;
-static int startP0after;
-static int startP1after;
+static int startP0;
+static int startP1;
 static int startM0;
 static int startM1;
 
@@ -33,8 +47,6 @@ static int current_bitmap;
 
 static int prev_x;
 static int prev_y;
-static UINT8 prev_lineP0[160];
-static UINT8 prev_lineP1[160];
 
 static UINT8 VSYNC;
 static UINT8 VBLANK;
@@ -84,6 +96,7 @@ static int HMOVE_started;
 static UINT8 HMM0_latch;
 static UINT8 HMM1_latch;
 static UINT8 REFLECT;		/* Should playfield be reflected or not */
+static UINT8 NUSIZx_changed;
 
 static mame_bitmap *helper[2];
 
@@ -239,13 +252,9 @@ VIDEO_UPDATE( tia )
 }
 
 
-static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, int start_after,
-	UINT8 GRP, UINT8 NUSIZ, UINT8 COLUP, UINT8 REFP)
+static void draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gfx *gfx,
+	UINT8 GRP, UINT8 COLUP, UINT8 REFP)
 {
-	int num = nusiz[NUSIZ & 7][0];
-	int siz = nusiz[NUSIZ & 7][1];
-	int skp = nusiz[NUSIZ & 7][2];
-
 	int i;
 	int j;
 	int k;
@@ -255,59 +264,20 @@ static void draw_sprite_helper(UINT8* p, UINT8 *col, UINT8* prevcol, int horz, i
 		GRP = BITSWAP8(GRP, 0, 1, 2, 3, 4, 5, 6, 7);
 	}
 
-	if (siz >= 2)
+	for (i = 0; i < PLAYER_GFX_SLOTS; i++)
 	{
-		horz++; /* hardware oddity, see bridges in River Raid */
-	}
-
-	if ( start_after > -1 ) {
-		/* Keep the few pixels which may still need to be drawn */
-		for (i = horz-1; i < horz; i++ ) {
-			if ( prevcol[i % 160] != 0xFF ) {
-				p[i % 160] = prevcol[i % 160];
-				col[i % 160] = prevcol[i % 160];
-			}
-		}
-	}
-	for (i = 0; i < num; i++)
-	{
-		if (horz > start_after)
+		int start_pos = gfx->start_drawing[i];
+		for (j = gfx->start_pixel[i]; j < 8; j++)
 		{
-			for (j = 0; j < 8; j++)
+			for (k = 0; k < gfx->size[i]; k++)
 			{
-				for (k = 0; k < siz; k++)
+				if (GRP & (0x80 >> j))
 				{
-					if (GRP & (0x80 >> j))
-					{
-						p[horz % 160] = COLUP >> 1;
-						col[horz % 160] = COLUP >> 1;
-					}
-
-					horz++;
+					p[start_pos % 160] = COLUP >> 1;
+					col[start_pos % 160] = COLUP >> 1;
 				}
+				start_pos++;
 			}
-		} else {
-			/* copy data over from previous draw action */
-			for (j = 0; j < 8; j++)
-			{
-				for (k = 0; k < siz; k++)
-				{
-					if ( prevcol[horz % 160] != 0xFF )
-					{
-						p[horz % 160] = prevcol[horz % 160];
-						col[horz % 160] = prevcol[horz % 160];
-					}
-					horz++;
-				}
-			}
-		}
-
-		horz += 8 * skp;
-	}
-	if ( start_after > -1 ) {
-		for (i = 0; i < 160; i++)
-		{
-			prevcol[i] = col[i];
 		}
 	}
 }
@@ -335,8 +305,8 @@ static void draw_missile_helper(UINT8* p, UINT8* col, int horz, int latch, int s
 						switch ( horz % 4 ) {
 						case 1:
 							if ( horz < 156 ) {
-								p[(horz + 4) % 160] = COLUM >> 1;
-								col[(horz + 4) % 160] = COLUM >> 1;
+								p[(horz + 1) % 160] = COLUM >> 1;
+								col[(horz + 1) % 160] = COLUM >> 1;
 							}
 							p[horz % 160] = COLUM >> 1;
 							col[horz % 160] = COLUM >> 1;
@@ -431,15 +401,13 @@ static void draw_ball_helper(UINT8* p, UINT8* col, int horz, UINT8 ENAB)
 
 static void drawS0(UINT8* p, UINT8* col)
 {
-	draw_sprite_helper(p, col, prev_lineP0, horzP0, startP0after,
-		(VDELP0 & 1) ? prevGRP0 : GRP0, NUSIZ0, COLUP0, REFP0);
+	draw_sprite_helper(p, col, &p0gfx, (VDELP0 & 1) ? prevGRP0 : GRP0, COLUP0, REFP0);
 }
 
 
 static void drawS1(UINT8* p, UINT8* col)
 {
-	draw_sprite_helper(p, col, prev_lineP1, horzP1, startP1after,
-		(VDELP1 & 1) ? prevGRP1 : GRP1, NUSIZ1, COLUP1, REFP1);
+	draw_sprite_helper(p, col, &p1gfx, (VDELP1 & 1) ? prevGRP1 : GRP1, COLUP1, REFP1);
 }
 
 
@@ -498,6 +466,36 @@ static int current_y(void)
 	return (activecpu_gettotalcycles() - frame_cycles) / 76;
 }
 
+
+static void setup_pXgfx(void)
+{
+	int i;
+	for ( i = 0; i < PLAYER_GFX_SLOTS; i++ )
+	{
+		if ( i < nusiz[NUSIZ0 & 7][0] && i >= ( startP0 ? 0 : 1 ) )
+		{
+			p0gfx.size[i] = nusiz[NUSIZ0 & 7][1];
+			p0gfx.start_drawing[i] = ( horzP0 + (p0gfx.size[i] > 1 ? 1 : 0)
+									 + i * 8 * ( nusiz[NUSIZ0 & 7][2] + p0gfx.size[i] ) ) % 160;
+			p0gfx.start_pixel[i] = 0;
+		}
+		else
+		{
+			p0gfx.start_pixel[i] = 8;
+		}
+		if ( i < nusiz[NUSIZ1 & 7][0] && i >= ( startP1 ? 0 : 1 ) )
+		{
+			p1gfx.size[i] = nusiz[NUSIZ1 & 7][1];
+			p1gfx.start_drawing[i] = ( horzP1 + (p1gfx.size[i] > 1 ? 1 : 0)
+									 + i * 8 * ( nusiz[NUSIZ1 & 7][2] + p1gfx.size[i] ) ) % 160;
+			p1gfx.start_pixel[i] = 0;
+		}
+		else
+		{
+			p1gfx.start_pixel[i] = 8;
+		}
+	}
+}
 
 static void update_bitmap(int next_x, int next_y)
 {
@@ -594,15 +592,11 @@ static void update_bitmap(int next_x, int next_y)
 			}
 
 			/* Redraw line if a RESPx or NUSIZx occured during the lastline */
-			if ( startP0after > -1 || startP1after > -1 || ! startM0 || ! startM1) {
-				startP0after = -1;
-				startP1after = -1;
+			if ( ! startP0 || ! startP1 || ! startM0 || ! startM1) {
+				startP0 = 1;
+				startP1 = 1;
 				startM0 = 1;
 				startM1 = 1;
-
-				/* Clear out contents of backup player graphic line buffer */
-				memset( prev_lineP0, 0xFF, sizeof prev_lineP0 );
-				memset( prev_lineP1, 0xFF, sizeof prev_lineP1 );
 
 				redraw_line = 1;
 			}
@@ -623,6 +617,12 @@ static void update_bitmap(int next_x, int next_y)
 				redraw_line = 1;
 			}
 
+			/* Redraw line if NUSIZx data was changed */
+			if ( NUSIZx_changed ) {
+				NUSIZx_changed = 0;
+				redraw_line = 1;
+			}
+
 			if ( redraw_line ) {
 				if (VBLANK & 2)
 				{
@@ -634,6 +634,8 @@ static void update_bitmap(int next_x, int next_y)
 					memset(lineP1, 0xFF, sizeof lineP1);
 
 					memset(temp, COLUBK >> 1, 160);
+
+					setup_pXgfx();
 
 					if (CTRLPF & 4)
 					{
@@ -812,6 +814,7 @@ static WRITE8_HANDLER( HMP0_w )
 			if ( new_window < 0 ) {
 				horzP0 -= ( new_motclkP0 - motclkP0 );
 				motclkP0 = new_motclkP0;
+				setup_pXgfx();
 			}
 		}
 	}
@@ -838,6 +841,7 @@ static WRITE8_HANDLER( HMP1_w )
 			if ( new_window < 0 ) {
 				horzP1 -= ( new_motclkP1 - motclkP1 );
 				motclkP1 = new_motclkP1;
+				setup_pXgfx();
 			}
 		}
 	}
@@ -1038,6 +1042,10 @@ static WRITE8_HANDLER( HMOVE_w )
 			curr_y += 1;
 			update_bitmap( -8, curr_y );
 		}
+		else
+		{
+			setup_pXgfx();
+		}
 		if (curr_y < helper[current_bitmap]->height)
 		{
 			memset(BITMAP_ADDR16(helper[current_bitmap], curr_y, 34), 0, 16);
@@ -1058,8 +1066,47 @@ static WRITE8_HANDLER( NUSIZ0_w )
 {
 	int curr_x = current_x();
 
-	if ( nusiz[data & 7][0] > nusiz[NUSIZ0 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ0 & 7][1] ) {
-		startP0after = curr_x;
+	/* Check if relevant bits have changed */
+	if ( ( data & 7 ) != ( NUSIZ0 & 7 ) ) {
+		int i;
+		/* Check if we are (about to start) drawing a copy of the player 0 graphics */
+		for ( i = 0; i < PLAYER_GFX_SLOTS; i++ ) {
+			if ( p0gfx.start_pixel[i] < 8 ) {
+				int min_x = p0gfx.start_drawing[i];
+				int size = ( 8 - p0gfx.start_pixel[i] ) * p0gfx.size[i];
+				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
+					if ( curr_x >= min_x % 160 || p0gfx.start_pixel[i] != 0 ) {
+						/* This copy has started drawing */
+						p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
+						p0gfx.start_drawing[i] = curr_x;
+						p0gfx.size[i] = nusiz[data & 7][1];
+					} else {
+						/* This copy was just about to start drawing (meltdown) */
+						p0gfx.size[i] = nusiz[data & 7][1];
+					}
+				} else {
+					/* We are passed the copy or the copy still needs to be done. Mark
+					   it as done/invalid, the data will be reset in the next loop. */
+					p0gfx.start_pixel[i] = 8;
+				}
+			}
+		}
+		/* Apply NUSIZ updates to not yet drawn copies */
+		for ( i = ( startP0 ? 0 : 1 ); i < nusiz[data & 7][0]; i++ ) {
+			int j;
+			/* Find an unused p0gfx entry */
+			for ( j = 0; j < PLAYER_GFX_SLOTS; j++ ) {
+				if ( p0gfx.start_pixel[j] == 8 )
+					break;
+			}
+			p0gfx.size[j] = nusiz[data & 7][1];
+			p0gfx.start_drawing[j] = ( horzP0 + (p0gfx.size[j] > 1 ? 1 : 0)
+									+ i * 8 * ( nusiz[data & 7][2] + p0gfx.size[j] ) ) % 160;
+			if ( curr_x < p0gfx.start_drawing[j] % 160 ) {
+				p0gfx.start_pixel[j] = 0;
+			}
+		}
+		NUSIZx_changed = 1;
 	}
 	NUSIZ0 = data;
 }
@@ -1069,8 +1116,49 @@ static WRITE8_HANDLER( NUSIZ1_w )
 {
 	int curr_x = current_x();
 
-	if ( nusiz[data & 7][0] > nusiz[NUSIZ1 & 7][0] || nusiz[data & 7][1] > nusiz[NUSIZ1 & 7][1] ) {
-		startP1after = curr_x;
+	/* Check if relevant bits have changed */
+	if ( ( data & 7 ) != ( NUSIZ1 & 7 ) ) {
+		int i;
+		/* Check if we are (about to start) drawing a copy of the player 1 graphics */
+		for ( i = 0; i < PLAYER_GFX_SLOTS; i++ ) {
+			if ( p1gfx.start_pixel[i] < 8 ) {
+				int min_x = p1gfx.start_drawing[i];
+				int size = ( 8 - p1gfx.start_pixel[i] ) * p1gfx.size[i];
+				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
+					if ( curr_x >= ( min_x - 5 ) % 160 ) {
+						if ( curr_x >= min_x % 160 || p1gfx.start_pixel[i] != 0 ) {
+							/* This copy has started drawing */
+							p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
+							p1gfx.start_drawing[i] = curr_x;
+							p1gfx.size[i] = nusiz[data & 7][1];
+						} else {
+							/* This copy was just about to start drawing (meltdown) */
+							p1gfx.size[i] = nusiz[data & 7][1];
+						}
+					}
+				} else {
+					/* We are passed the copy or the copy still needs to be done. Mark
+					   it as done/invalid, the data will be reset in the next loop. */
+					p1gfx.start_pixel[i] = 8;
+				}
+			}
+		}
+		/* Apply NUSIZ updates to not yet drawn copies */
+		for ( i = ( startP1 ? 0 : 1 ); i < nusiz[data & 7][0]; i++ ) {
+			int j;
+			/* Find an unused p1gfx entry */
+			for ( j = 0; j < PLAYER_GFX_SLOTS; j++ ) {
+				if ( p1gfx.start_pixel[j] == 8 )
+					break;
+			}
+			p1gfx.size[j] = nusiz[data & 7][1];
+			p1gfx.start_drawing[j] = ( horzP1 + (p1gfx.size[j] > 1 ? 1 : 0)
+									+ i * 8 * ( nusiz[data & 7][2] + p1gfx.size[j] ) ) % 160;
+			if ( curr_x < p1gfx.start_drawing[j] % 160 ) {
+				p1gfx.start_pixel[j] = 0;
+			}
+		}
+		NUSIZx_changed = 1;
 	}
 	NUSIZ1 = data;
 }
@@ -1124,8 +1212,40 @@ static WRITE8_HANDLER( RESP0_w )
 	}
 
 	if ( new_horzP0 != horzP0 ) {
+		int i;
 		horzP0 = new_horzP0;
-		startP0after = horzP0 + 1;
+		startP0 = 0;
+		/* Check if we are (about to start) drawing a copy of the player 0 graphics */
+		for ( i = 0; i < PLAYER_GFX_SLOTS; i++ ) {
+			if ( p0gfx.start_pixel[i] < 8 ) {
+				int min_x = p0gfx.start_drawing[i];
+				int size = ( 8 - p0gfx.start_pixel[i] ) * p0gfx.size[i];
+				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
+					/* This copy has started drawing */
+					p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
+					p0gfx.start_drawing[i] = curr_x;
+				} else {
+					/* We are passed the copy or the copy still needs to be done. Mark
+					   it as done/invalid, the data will be reset in the next loop. */
+					p0gfx.start_pixel[i] = 8;
+				}
+			}
+		}
+		/* Apply NUSIZ and position updates to not yet drawn copies */
+		for ( i = 1; i < nusiz[NUSIZ0 & 7][0]; i++ ) {
+			int j;
+			/* Find an unused p0gfx entry */
+			for ( j = 0; j < PLAYER_GFX_SLOTS; j++ ) {
+				if ( p0gfx.start_pixel[j] == 8 )
+					break;
+			}
+			p0gfx.size[j] = nusiz[NUSIZ0 & 7][1];
+			p0gfx.start_drawing[j] = ( horzP0 + (p0gfx.size[j] > 1 ? 1 : 0)
+									+ i * 8 * ( nusiz[NUSIZ0 & 7][2] + p0gfx.size[j] ) ) % 160;
+			if ( curr_x < p0gfx.start_drawing[j] % 160 ) {
+				p0gfx.start_pixel[j] = 0;
+			}
+		}
 	}
 }
 
@@ -1144,8 +1264,40 @@ static WRITE8_HANDLER( RESP1_w )
 	}
 
 	if ( new_horzP1 != horzP1 ) {
+		int i;
 		horzP1 = new_horzP1;
-		startP1after = horzP1 + 1;
+		startP1 = 0;
+		/* Check if we are (about to start) drawing a copy of the player 1 graphics */
+		for ( i = 0; i < PLAYER_GFX_SLOTS; i++ ) {
+			if ( p1gfx.start_pixel[i] < 8 ) {
+				int min_x = p1gfx.start_drawing[i];
+				int size = ( 8 - p1gfx.start_pixel[i] ) * p1gfx.size[i];
+				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
+					/* This copy has started drawing */
+					p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
+					p1gfx.start_drawing[i] = curr_x;
+				} else {
+					/* We are passed the copy or the copy still needs to be done. Mark
+					   it as done/invalid, the data will be reset in the next loop. */
+					p1gfx.start_pixel[i] = 8;
+				}
+			}
+		}
+		/* Apply NUSIZ and position updates to not yet drawn copies */
+		for ( i = 1; i < nusiz[NUSIZ1 & 7][0]; i++ ) {
+			int j;
+			/* Find an unused p1gfx entry */
+			for ( j = 0; j < PLAYER_GFX_SLOTS; j++ ) {
+				if ( p1gfx.start_pixel[j] == 8 )
+					break;
+			}
+			p1gfx.size[j] = nusiz[NUSIZ1 & 7][1];
+			p1gfx.start_drawing[j] = ( horzP1 + (p1gfx.size[j] > 1 ? 1 : 0)
+									+ i * 8 * ( nusiz[NUSIZ1 & 7][2] + p1gfx.size[j] ) ) % 160;
+			if ( curr_x < p1gfx.start_drawing[j] % 160 ) {
+				p1gfx.start_pixel[j] = 0;
+			}
+		}
 	}
 }
 
@@ -1541,8 +1693,8 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 	HMM1 = 0;
 	HMBL = 0;
 
-	startP0after = -1;
-	startP1after = -1;
+	startP0 = 1;
+	startP1 = 1;
 
 	HMM0_latch = 0;
 	HMM1_latch = 0;
@@ -1562,6 +1714,11 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 	motclkM0 = 0;
 	motclkM1 = 0;
 	motclkBL = 0;
+
+	p0gfx.start_pixel[0] = p0gfx.start_pixel[1] = p0gfx.start_pixel[2] = 8;
+	p1gfx.start_pixel[0] = p1gfx.start_pixel[1] = p1gfx.start_pixel[2] = 8;
+
+	NUSIZx_changed = 0;
 
 	if ( ti ) {
 		tia_read_input_port = ti->read_input_port;
