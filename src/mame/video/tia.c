@@ -801,17 +801,17 @@ static WRITE8_HANDLER( HMP0_w )
 	if ( data == HMP0 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
-		int decrements = ( HMP0 ^ 0x80 ) >> 4;
-		int window = curr_x - ( HMOVE_started + decrements * 4 );
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkP0 * 4 + 2 ) {
+		int window = curr_x - ( HMOVE_started + 4 + motclkP0 * 4 );
 
 		/* HMOVE cycles are still being applied */
 		if ( window < 0 ) {
-			int new_decrements = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+			int new_motclkP0 = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkP0 * 4 );
 
 			if ( new_window < 0 ) {
-				horzP0 -= ( new_decrements - decrements );
+				horzP0 -= ( new_motclkP0 - motclkP0 );
+				motclkP0 = new_motclkP0;
 			}
 		}
 	}
@@ -827,17 +827,17 @@ static WRITE8_HANDLER( HMP1_w )
 	if ( data == HMP1 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
-		int decrements = ( HMP1 ^ 0x80 ) >> 4;
-		int window = curr_x - ( HMOVE_started + decrements * 4 );
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkP1 * 4 + 2 ) {
+		int window = curr_x - ( HMOVE_started + 4 + motclkP1 * 4 );
 
 		/* HMOVE cycles are still being applied */
 		if ( window < 0 ) {
-			int new_decrements = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+			int new_motclkP1 = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkP1 * 4 );
 
 			if ( new_window < 0 ) {
-				horzP1 -= ( new_decrements - decrements );
+				horzP1 -= ( new_motclkP1 - motclkP1 );
+				motclkP1 = new_motclkP1;
 			}
 		}
 	}
@@ -853,26 +853,25 @@ static WRITE8_HANDLER( HMM0_w )
 	if ( data == HMM0 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
-		int decrements = ( HMM0 ^ 0x80 ) >> 4;
-		int window = curr_x - ( HMOVE_started + decrements * 4 );
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkM0 * 4 + 2 ) {
+		int window = curr_x - ( HMOVE_started + 4 + motclkM0 * 4 );
 
 		/* HMOVE cycles are still being applied */
 		if ( window < 0 ) {
-			int new_decrements = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+			int new_motclkM0 = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkM0 * 4 );
 
 			if ( new_window < 0 ) {
-				horzM0 -= ( new_decrements - decrements );
+				horzM0 -= ( new_motclkM0 - motclkM0 );
+				motclkM0 = new_motclkM0;
 			}
 		}
 
 		/* All HMOVE cycles have been applied but the compare hasn't occured yet */
-		if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
-
-			//logerror("%04X: HMOVE/HMM0 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
+		if ( window >= -1 && window < 2 && ( data != 0x70 && data != 0x80 ) ) {
 			horzM0 += ((signed char) HMM0) >> 4;
-			horzM0 -= 15;
+			motclkM0 = 15;
+			horzM0 -= motclkM0;
 			if (horzM0 < 0 )
 				horzM0 += 160;
 			horzM0 %= 160;
@@ -891,25 +890,25 @@ static WRITE8_HANDLER( HMM1_w )
 	if ( data == HMM1 )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
-		int decrements = ( HMM1 ^ 0x80 ) >> 4;
-		int window = curr_x - ( HMOVE_started + decrements * 4 );
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkM1 * 4 + 2 ) {
+		int window = curr_x - ( HMOVE_started + 4 + motclkM1 * 4 );
 
 		/* HMOVE cycles are still being applied */
 		if ( window < 0 ) {
-			int new_decrements = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+			int new_motclkM1 = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkM1 * 4 );
 
 			if ( new_window < 0 ) {
-				horzM1 -= ( new_decrements - decrements );
+				horzM1 -= ( new_motclkM1 - motclkM1 );
+				motclkM1 = new_motclkM1;
 			}
 		}
 
 		/* All HMOVE cycles have been applied but the compare hasn't occured yet */
-		if ( window >= 2 && window < 4 && ( data != 0x70 && data != 0x80 ) ) {
-			//logerror("%04X: HMOVE/HMM1 madness detected, current_x = %d, HMOVE_started = %d, window = %d\n", activecpu_get_pc(), curr_x, HMOVE_started, window);
+		if ( window >= -1 && window < 2 && ( data != 0x70 && data != 0x80 ) ) {
 			horzM1 += ((signed char) HMM1) >> 4;
-			horzM1 -= 15;
+			motclkM1 = 15;
+			horzM1 -= motclkM1;
 			if ( horzM1 < 0 )
 				horzM1 += 160;
 			horzM1 %= 160;
@@ -928,17 +927,17 @@ static WRITE8_HANDLER( HMBL_w )
 	if ( data == HMBL )
 		return;
 
-	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 16 * 4 ) {
-		int decrements = ( HMBL ^ 0x80 ) >> 4;
-		int window = curr_x - ( HMOVE_started + decrements * 4 );
+	if ( HMOVE_started != HMOVE_INACTIVE && curr_x < HMOVE_started + 4 + motclkBL * 4 + 2 ) {
+		int window = curr_x - ( HMOVE_started + 4 + motclkBL * 4 );
 
 		/* HMOVE cycles are still being applied */
 		if ( window < 0 ) {
-			int new_decrements = ( data ^ 0x80 ) >> 4;
-			int new_window = curr_x - ( HMOVE_started + new_decrements * 4 );
+			int new_motclkBL = ( data ^ 0x80 ) >> 4;
+			int new_window = curr_x - ( HMOVE_started + 4 + new_motclkBL * 4 );
 
 			if ( new_window < 0 ) {
-				horzBL -= ( new_decrements - decrements );
+				horzBL -= ( new_motclkBL - motclkBL );
+				motclkBL = new_motclkBL;
 			}
 		}
 	}
