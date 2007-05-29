@@ -564,6 +564,10 @@ static void update_bitmap(int next_x, int next_y)
 			int redraw_line = 0;
 
 			if ( ! HMM0_latch && ! HMM1_latch ) {
+				redraw_line = 1;
+			}
+
+			if ( HMOVE_started != HMOVE_INACTIVE ) {
 				/* Apply pending motion clocks from a HMOVE initiated during the scanline */
 				if ( HMOVE_started >= 97 && HMOVE_started < 157 ) {
 					horzP0 -= motclkP0;
