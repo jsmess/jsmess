@@ -583,6 +583,7 @@ static void update_bitmap(int next_x, int next_y)
 						horzBL += 160;
 				}
 				HMOVE_started = HMOVE_INACTIVE;
+				redraw_line = 1;
 			}
 
 			/* Redraw line if the playfield reflect bit was changed after the center of the screen */
