@@ -432,7 +432,7 @@ static  READ8_HANDLER(current_bank_r)
 
 static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) )
-	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0100) AM_READWRITE(tia_r, tia_w)
+	AM_RANGE(0x0000, 0x007F) AM_MIRROR(0x0F00) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00FF) AM_MIRROR(0x0100) AM_RAM
 	AM_RANGE(0x0280, 0x029F)                   AM_READWRITE(r6532_0_r, r6532_0_w)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK(1)
@@ -693,15 +693,6 @@ static MACHINE_START( a2600 )
 	} else {
 		tia_init( &tia_interface );
 	}
-
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x7f, 0, 0, tia_w);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x00, 0x7f, 0, 0, tia_r);
-
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, MWA8_NOP);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x200, 0x27f, 0, 0, MRA8_NOP);
-
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MWA8_NOP);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, MRA8_NOP);
 
 	/* auto-detect bank mode */
 
