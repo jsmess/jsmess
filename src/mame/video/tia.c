@@ -1082,11 +1082,34 @@ static WRITE8_HANDLER( NUSIZ0_w )
 				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
 					if ( curr_x >= min_x % 160 || p0gfx.start_pixel[i] != 0 ) {
 						/* This copy has started drawing */
-						p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
-						p0gfx.start_drawing[i] = curr_x;
+						if ( p0gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
+							int delay = 1 + ( ( p0gfx.start_pixel[i] + ( curr_x - p0gfx.start_drawing[i] ) ) & 1 );
+							update_bitmap( curr_x + delay, current_y() );
+							p0gfx.start_pixel[i] += ( curr_x + delay - p0gfx.start_drawing[i] );
+							if ( p0gfx.start_pixel[i] > 8 )
+								p0gfx.start_pixel[i] = 8;
+							p0gfx.start_drawing[i] = curr_x + delay;
+						} else if ( p0gfx.size[1] > 1 && nusiz[data & 7][1] == 1 ) {
+							int delay = ( curr_x - p0gfx.start_drawing[i] ) & ( p0gfx.size[i] - 1 );
+							if ( delay ) {
+								delay = p0gfx.size[i] - delay;
+							}
+							update_bitmap( curr_x + delay, current_y() );
+							p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
+							p0gfx.start_drawing[i] = curr_x + delay;
+						} else {
+							p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
+							p0gfx.start_drawing[i] = curr_x;
+						}
 						p0gfx.size[i] = nusiz[data & 7][1];
 					} else {
 						/* This copy was just about to start drawing (meltdown) */
+						/* Adjust for 1 clock delay between zoomed and non-zoomed sprites */
+						if ( p0gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
+							p0gfx.start_drawing[i]++;
+						} else if ( p0gfx.size[i] > 1 && nusiz[data & 7][1] == 1 ) {
+							p0gfx.start_drawing[i]--;
+						}
 						p0gfx.size[i] = nusiz[data & 7][1];
 					}
 				} else {
@@ -1130,16 +1153,37 @@ static WRITE8_HANDLER( NUSIZ1_w )
 				int min_x = p1gfx.start_drawing[i];
 				int size = ( 8 - p1gfx.start_pixel[i] ) * p1gfx.size[i];
 				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
-					if ( curr_x >= ( min_x - 5 ) % 160 ) {
-						if ( curr_x >= min_x % 160 || p1gfx.start_pixel[i] != 0 ) {
-							/* This copy has started drawing */
+					if ( curr_x >= min_x % 160 || p1gfx.start_pixel[i] != 0 ) {
+						/* This copy has started drawing */
+						if ( p1gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
+							int delay = 1 + ( ( p0gfx.start_pixel[i] + ( curr_x - p0gfx.start_drawing[i] ) ) & 1 );
+							update_bitmap( curr_x + delay, current_y() );
+							p1gfx.start_pixel[i] += ( curr_x + delay - p1gfx.start_drawing[i] );
+							if ( p1gfx.start_pixel[i] > 8 )
+								p1gfx.start_pixel[i] = 8;
+							p1gfx.start_drawing[i] = curr_x + delay;
+						} else if ( p1gfx.size[1] > 1 && nusiz[data & 7][1] == 1 ) {
+							int delay = ( curr_x - p1gfx.start_drawing[i] ) & ( p1gfx.size[i] - 1 );
+							if ( delay ) {
+								delay = p1gfx.size[i] - delay;
+							}
+							update_bitmap( curr_x + delay, current_y() );
+							p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
+							p1gfx.start_drawing[i] = curr_x + delay;
+						} else {
 							p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
 							p1gfx.start_drawing[i] = curr_x;
-							p1gfx.size[i] = nusiz[data & 7][1];
-						} else {
-							/* This copy was just about to start drawing (meltdown) */
-							p1gfx.size[i] = nusiz[data & 7][1];
 						}
+						p1gfx.size[i] = nusiz[data & 7][1];
+					} else {
+						/* This copy was just about to start drawing (meltdown) */
+						/* Adjust for 1 clock delay between zoomed and non-zoomed sprites */
+						if ( p1gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
+							p1gfx.start_drawing[i]++;
+						} else if ( p1gfx.size[i] > 1 && nusiz[data & 7][1] == 1 ) {
+							p1gfx.start_drawing[i]--;
+						}
+						p1gfx.size[i] = nusiz[data & 7][1];
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
