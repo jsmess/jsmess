@@ -738,6 +738,8 @@ READ8_HANDLER( input_port_26_r ) { return readinputport(26); }
 READ8_HANDLER( input_port_27_r ) { return readinputport(27); }
 READ8_HANDLER( input_port_28_r ) { return readinputport(28); }
 READ8_HANDLER( input_port_29_r ) { return readinputport(29); }
+READ8_HANDLER( input_port_30_r ) { return readinputport(30); }
+READ8_HANDLER( input_port_31_r ) { return readinputport(31); }
 
 
 /*-------------------------------------------------
@@ -774,6 +776,8 @@ READ16_HANDLER( input_port_26_word_r ) { return readinputport(26); }
 READ16_HANDLER( input_port_27_word_r ) { return readinputport(27); }
 READ16_HANDLER( input_port_28_word_r ) { return readinputport(28); }
 READ16_HANDLER( input_port_29_word_r ) { return readinputport(29); }
+READ16_HANDLER( input_port_30_word_r ) { return readinputport(30); }
+READ16_HANDLER( input_port_31_word_r ) { return readinputport(31); }
 
 
 /*-------------------------------------------------
@@ -810,4 +814,6 @@ READ32_HANDLER( input_port_26_dword_r ) { return readinputport(26); }
 READ32_HANDLER( input_port_27_dword_r ) { return readinputport(27); }
 READ32_HANDLER( input_port_28_dword_r ) { return readinputport(28); }
 READ32_HANDLER( input_port_29_dword_r ) { return readinputport(29); }
+READ32_HANDLER( input_port_30_dword_r ) { return readinputport(30); }
+READ32_HANDLER( input_port_31_dword_r ) { return readinputport(31); }
 

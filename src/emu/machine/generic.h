@@ -217,6 +217,8 @@ READ8_HANDLER( input_port_26_r );
 READ8_HANDLER( input_port_27_r );
 READ8_HANDLER( input_port_28_r );
 READ8_HANDLER( input_port_29_r );
+READ8_HANDLER( input_port_30_r );
+READ8_HANDLER( input_port_31_r );
 
 /* 16-bit handlers */
 READ16_HANDLER( input_port_0_word_r );
@@ -249,6 +251,8 @@ READ16_HANDLER( input_port_26_word_r );
 READ16_HANDLER( input_port_27_word_r );
 READ16_HANDLER( input_port_28_word_r );
 READ16_HANDLER( input_port_29_word_r );
+READ16_HANDLER( input_port_30_word_r );
+READ16_HANDLER( input_port_31_word_r );
 
 /* 32-bit handlers */
 READ32_HANDLER( input_port_0_dword_r );
@@ -281,6 +285,8 @@ READ32_HANDLER( input_port_26_dword_r );
 READ32_HANDLER( input_port_27_dword_r );
 READ32_HANDLER( input_port_28_dword_r );
 READ32_HANDLER( input_port_29_dword_r );
+READ32_HANDLER( input_port_30_dword_r );
+READ32_HANDLER( input_port_31_dword_r );
 
 
 #endif	/* __MACHINE_GENERIC_H__ */

@@ -292,7 +292,7 @@ static const read8_handler port_handler8[] =
 	input_port_16_r,		input_port_17_r,		input_port_18_r,		input_port_19_r,
 	input_port_20_r,		input_port_21_r,		input_port_22_r,		input_port_23_r,
 	input_port_24_r,		input_port_25_r,		input_port_26_r,		input_port_27_r,
-	input_port_28_r,		input_port_29_r
+	input_port_28_r,		input_port_29_r,		input_port_30_r,		input_port_31_r
 };
 
 
@@ -305,7 +305,7 @@ static const read16_handler port_handler16[] =
 	input_port_16_word_r,	input_port_17_word_r,	input_port_18_word_r,	input_port_19_word_r,
 	input_port_20_word_r,	input_port_21_word_r,	input_port_22_word_r,	input_port_23_word_r,
 	input_port_24_word_r,	input_port_25_word_r,	input_port_26_word_r,	input_port_27_word_r,
-	input_port_28_word_r,	input_port_29_word_r
+	input_port_28_word_r,	input_port_29_word_r,	input_port_30_word_r,	input_port_31_word_r
 };
 
 
@@ -318,7 +318,7 @@ static const read32_handler port_handler32[] =
 	input_port_16_dword_r,	input_port_17_dword_r,	input_port_18_dword_r,	input_port_19_dword_r,
 	input_port_20_dword_r,	input_port_21_dword_r,	input_port_22_dword_r,	input_port_23_dword_r,
 	input_port_24_dword_r,	input_port_25_dword_r,	input_port_26_dword_r,	input_port_27_dword_r,
-	input_port_28_dword_r,	input_port_29_dword_r
+	input_port_28_dword_r,	input_port_29_dword_r,	input_port_30_dword_r,	input_port_31_dword_r
 };
 
 
