@@ -1,108 +1,3 @@
-/*
-
-	FUNVISION TECHNICAL INFO
-	========================
-
-	CHIPS
-	=====
-
-	2MHZ 6502A cpu
-	2 x 2114 (1K RAM)
-	9929 Video chip with 16kb vram
-	76489 sound chip
-	6821 PIA
-
-	MEMORY MAP
-	==========
-
-	0000 - 0FFF     1K RAM repeated 4 times
-	1000 - 1FFF     PIA (only 4 addresses)
-	2000 - 2FFF     Read VDP chip (only occupies 2 addresses)
-	3000 - 3FFF     Write VDP chip (only occupies 2 addresses)
-	4000 - 7FFF     2nd cartridge ROM area
-	8000 - BFFF     1st cartridge ROM area 
-	C000 - FFFF     2K boot ROM repeated 8 times.
-
-	Video
-	=====
-
-	Most code writes to $3000 and $3001 and reads from $2000 and $2001. Go read 
-	a manual for the 9929/9918 for how it all works.
-
-	Sound
-	=====
-
-	The 76489 is wired into port B of the PIA. You just write single bytes to it.
-	Its a relatively slow access device so this is undoubtedly why they wired it to
-	the PIA rather than straight to the data bus. I think they configure the PIA to
-	automatically send a strobe signal when you write to $1002.
-
-	Keyboard
-	========
-
-	The keyboard is the weirdest thing imaginable. Visually it consists of the two
-	hand controllers slotted into the top of the console. The left joystick and
-	24 keys on one side and the right joystick and another 24 keys on the other.
-	The basic layout of the keys is:
-
-	Left controller
-	---------------
-
-	 1     2     3     4     5     6
-	ctrl   Q     W     E     R     T
-	 <-    A     S     D     F     G
-	shft   Z     X     C     V     B
-
-	Right controller
-	----------------
-
-	 7     8     9     0     :     -
-	 Y     U     I     O     P    Enter
-	 H     J     K     L     ;     ->
-	 N     M     ,     .     /    space
-
-	The left controller is wired to the PIA pins pa0, pa1 and pb0-7
-	The right controller is wired to the PIA pins pa2, pa3 and pb0-7
-
-	The basic key scanning routine sets pa0-3 high then sends pa0 low, then pa1
-	low and so forth and each time it reads back a value into pb0-7. You might ask
-	the question 'How do they read 48 keys and two 8(16?) position joysticks using
-	a 4 x 8 key matrix?'. Somehow when you press a key and the appropriate 
-	strobe is low, two of the 8 input lines are sent low instead of 1. I have
-	no idea how they do this. This allows them to read virtually all 24 keys on
-	one controller by just sending one strobe low. The strobes go something like:
-
-		PA? low          keys
-		-------          ----
-		PA3             right hand keys
-		PA2             right joystick
-		PA1             left hand keys
-		PA0             left joystick
-
-	An example of a key press is the 'Y' key. Its on the right controller so is
-	scanned when PA3 is low. It will return 11111010 ($FA).
-
-	There are some keys that don't follow the setup above. These are the '1', Left
-	arrow, space and right arrow. They are all scanned as part of the corresponding
-	joystick strobe. eg. '1' is detected by sending PA0 low and reading back a 
-	11110011 ($F3). Also some keys are effectively the same as the fire buttons
-	on the controllers. Left shift and control act like the fire buttons on the 
-	left controller and right arrow and '-' act the same as the fire buttons on the
-	right controller.
-
-	---
-
-	MESS Driver by Curt Coder
-	Based on the FunnyMu emulator by ???
-
-	---
-
-	TODO:
-
-	- find out how the !#¤ keyboard is connected
-
-*/
-
 #include "driver.h"
 #include "inputx.h"
 #include "devices/cartslot.h"
@@ -127,70 +22,165 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 INPUT_PORTS_START( crvision )
-	PORT_START_TAG("PIAA0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	// Player 1 Joystick
+
+	PORT_START_TAG("PA0-0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA0-1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0xfd, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA0-2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA0-3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA0-4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA0-5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA0-6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA0-7")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2 / CNT'L") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START_TAG("PIAA1")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x05, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x09, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("<-") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x0a, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT( 0x11, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x12, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT( 0x14, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x18, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x21, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x22, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x24, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x28, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x41, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x42, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT( 0x44, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT( 0x48, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x50, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	// Player 1 Keyboard
+
+	PORT_START_TAG("PA1-0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("<-") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x81, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA1-1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT( 0x83, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA1-2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA1-3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA1-4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA1-5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA1-6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA1-7")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1 / SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	
-	PORT_START_TAG("PIAA2")
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
+
+	// Player 2 Joystick
+
+	PORT_START_TAG("PA2-0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0xfd, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0xf3, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA2-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA2-4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA2-6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA2-7")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 / ->") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9) PORT_PLAYER(2)
 
-	PORT_START_TAG("PIAA3")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT( 0x05, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT( 0x09, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RET'N") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
-	PORT_BIT( 0x0a, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT( 0x11, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT( 0x12, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('@')
-	PORT_BIT( 0x14, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT( 0x18, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x21, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT( 0x22, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x24, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT( 0x28, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x41, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT( 0x42, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x44, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT( 0x48, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT( 0x50, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	// Player 2 Keyboard
+
+	PORT_START_TAG("PA3-0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RET'N") PORT_CODE(KEYCODE_ENTER) PORT_CHAR('\r')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT( 0x81, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA3-1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('@')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x83, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA3-2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x87, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA3-3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA3-4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA3-5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0xbf, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA3-6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("PA3-7")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Button 1 / - =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=') PORT_PLAYER(2)
 INPUT_PORTS_END
 
@@ -242,6 +232,29 @@ static WRITE8_HANDLER( pia_porta_w )
 	keylatch = ~data & 0x0f;
 }
 
+static UINT8 read_keyboard(int pa)
+{
+	int i;
+	UINT8 value;
+	char portname[10];
+	
+	for (i = 0; i < 8; i++)
+	{
+		sprintf(portname, "PA%u-%u", pa, i);
+		value = readinputportbytag(portname);
+		
+		if (value != 0xff)
+		{
+			if (value == 0xff - (1 << i))
+				return value;
+			else
+				return value - (1 << i);
+		}
+	}
+
+	return 0xff;
+}
+
 static READ8_HANDLER( pia_portb_r )
 {
 	/*
@@ -257,29 +270,24 @@ static READ8_HANDLER( pia_portb_r )
 		PB7		Keyboard input
 	*/
 
-	UINT8 data = 0xff;
-
 	if (keylatch & 0x01)
 	{
-		data = readinputportbytag("PIAA0");
+		return read_keyboard(0);
 	}
-
-	if (keylatch & 0x02)
+	else if (keylatch & 0x02)
 	{
-		data = readinputportbytag("PIAA1");
+		return read_keyboard(1);
 	}
-
-	if (keylatch & 0x04)
+	else if (keylatch & 0x04)
 	{
-		data = readinputportbytag("PIAA2");
+		return read_keyboard(2);
 	}
-
-	if (keylatch & 0x08)
+	else if (keylatch & 0x08)
 	{
-		data = readinputportbytag("PIAA3");
+		return read_keyboard(3);
 	}
 
-	return data;
+	return 0xff;
 }
 
 static READ8_HANDLER( pia_ca1_r )
@@ -350,6 +358,9 @@ static const pia6821_interface crvision_pia_intf =
 
 static MACHINE_START( crvision )
 {
+	state_save_register_global(keylatch);
+	state_save_register_global(sn76489_ready);
+
 	TMS9928A_configure(&tms9918_intf);
 	pia_config(0, &crvision_pia_intf);
 
@@ -358,6 +369,9 @@ static MACHINE_START( crvision )
 
 static MACHINE_START( fnvision )
 {
+	state_save_register_global(keylatch);
+	state_save_register_global(sn76489_ready);
+
 	TMS9928A_configure(&tms9929_intf);
 	pia_config(0, &crvision_pia_intf);
 
@@ -500,5 +514,5 @@ SYSTEM_CONFIG_END
 /* System Drivers */
 
 /*    YEAR	NAME	  PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY				FULLNAME */
-CONS( 1981, crvision, 0,		0,		crvision,	crvision,	0,		crvision,	"Video Technology", "creatiVision (NTSC)", GAME_NOT_WORKING )
-CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		crvision,	"Video Technology", "FunVision (PAL)", GAME_NOT_WORKING )
+COMP( 1981, crvision, 0,		0,		crvision,	crvision,	0,		crvision,	"Video Technology", "CreatiVision (NTSC)", GAME_SUPPORTS_SAVE )
+CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		crvision,	"Video Technology", "FunVision Computer Video Games System (PAL)", GAME_SUPPORTS_SAVE )

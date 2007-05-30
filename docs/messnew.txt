@@ -10,7 +10,7 @@ New System Drivers Supported (in no particular order):
 - Texas Instruments TI-82 (not working) [Curt Coder]
 - Texas Instruments TI-83 (not working) [Curt Coder]
 - Texas Instruments TI-83 Plus (not working) [Curt Coder]
-- VTech creatiVision (not working) [Curt Coder]
+- VTech CreatiVision [Curt Coder]
 
 
 
@@ -57,6 +57,8 @@ System Driver Changes:
   to the artwork system. [Dirk Best]
 
 - [COCO/DRAGON] Cartridge slot rearchitecture.  [Nate Woods]
+
+- [FUNVISION] Driver is now working and fully playable. [Curt Coder]
 
 
 
