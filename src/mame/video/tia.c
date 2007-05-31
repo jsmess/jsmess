@@ -1729,6 +1729,8 @@ static void tia_reset(running_machine *machine)
 
 void tia_init_internal(int freq, const struct tia_interface* ti)
 {
+	int	i;
+
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
 
 	timer_pulse(TIME_IN_HZ(freq), 0, button_callback);
@@ -1764,8 +1766,13 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 	motclkM1 = 0;
 	motclkBL = 0;
 
-	p0gfx.start_pixel[0] = p0gfx.start_pixel[1] = p0gfx.start_pixel[2] = 8;
-	p1gfx.start_pixel[0] = p1gfx.start_pixel[1] = p1gfx.start_pixel[2] = 8;
+	for( i = 0; i < PLAYER_GFX_SLOTS; i++ )
+	{
+		p0gfx.start_pixel[i] = 8;
+		p0gfx.size[i] = 1;
+		p1gfx.start_pixel[i] = 8;
+		p1gfx.size[i] = 1;
+	}
 
 	NUSIZx_changed = 0;
 
