@@ -37,7 +37,8 @@ enum
 	modeMN,
 	modeDC,
 	modeCV,
-	mode3E
+	mode3E,
+	modeSS
 };
 
 
@@ -52,6 +53,11 @@ static unsigned cart_size;
 static unsigned number_banks;
 static unsigned current_bank;
 static unsigned mode3E_ram_enabled;
+static UINT8 modeSS_byte;
+static UINT32 modeSS_byte_started;
+static unsigned modeSS_write_delay;
+static unsigned modeSS_write_enabled;
+static unsigned modeSS_diff_adjust;
 
 
 static const UINT32 games[][2] =
@@ -115,6 +121,7 @@ static const UINT32 games[][2] =
 /*	{ 0x14f126c0, modeCV }, // Magicard
 	{ 0x34b0b5c2, modeCV }  // Video Life
 */
+	{ 0xc3a3f073, modeSS }, // Starpath Supercharger BIOS
 };
 
 static int detect_modeCV(void)
@@ -366,6 +373,104 @@ static WRITE8_HANDLER(mode3E_RAM_w) {
 	if ( mode3E_ram_enabled ) {
 		ram_base[offset] = data;
 	}
+}
+
+OPBASE_HANDLER( modeSS_opbase )
+{
+	if ( address & 0x1000 ) {
+		opcode_mask = 0x07ff;
+		opcode_memory_min = 0x0000;
+		opcode_memory_max = 0x0fff;
+		if ( address & 0x800 ) {
+			opcode_arg_base = bank_base[2];
+			opcode_base = bank_base[2];
+		} else {
+			opcode_arg_base = bank_base[1];
+			opcode_base = bank_base[1];
+		}
+		return ~0;
+	}
+	return address;
+}
+
+static READ8_HANDLER(modeSS_r)
+{
+	UINT8 data = ( offset & 0x800 ) ? bank_base[2][offset & 0x7FF] : bank_base[1][offset];
+
+	//logerror("%04X: read from modeSS area offset = %04X\n", activecpu_get_pc(), offset);
+	if ( offset < 0x100 )
+	{
+		modeSS_byte = offset;
+		modeSS_byte_started = activecpu_gettotalcycles();
+	} else {
+		/* Control register "write" */
+		if ( offset == 0xFF8 ) {
+			//logerror("%04X: write to modeSS control register data = %02X\n", activecpu_get_pc(), modeSS_byte);
+			modeSS_write_enabled = modeSS_byte & 0x02;
+			modeSS_write_delay = modeSS_byte >> 5;
+			switch ( modeSS_byte & 0x1C ) {
+			case 0x00:
+				bank_base[1] = extra_RAM + 2 * 0x800;
+				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				break;
+			case 0x04:
+				bank_base[1] = extra_RAM;
+				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				break;
+			case 0x08:
+				bank_base[1] = extra_RAM + 2 * 0x800;
+				bank_base[2] = extra_RAM;
+				break;
+			case 0x0C:
+				bank_base[1] = extra_RAM;
+				bank_base[2] = extra_RAM + 2 * 0x800;
+				break;
+			case 0x10:
+				bank_base[1] = extra_RAM + 2 * 0x800;
+				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				break;
+			case 0x14:
+				bank_base[1] = extra_RAM + 0x800;
+				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				break;
+			case 0x18:
+				bank_base[1] = extra_RAM + 2 * 0x800;
+				bank_base[2] = extra_RAM + 0x800;
+				break;
+			case 0x1C:
+				bank_base[1] = extra_RAM + 0x800;
+				bank_base[2] = extra_RAM + 2 * 0x800;
+				break;
+			}
+			memory_set_bankptr( 1, bank_base[1] );
+			memory_set_bankptr( 2, bank_base[2] );
+		} else if ( offset == 0xFF9 ) {
+			/* Cassette port read */
+			//logerror("%04X: Cassette port read\n", activecpu_get_pc());
+		} else {
+			/* Possible RAM write */
+			if ( modeSS_write_enabled ) {
+				int diff = activecpu_gettotalcycles() - modeSS_byte_started;
+				//logerror("%04X: offset = %04X, %d\n", activecpu_get_pc(), offset, diff);
+				if ( diff - modeSS_diff_adjust == 5 ) {
+					//logerror("%04X: RAM write offset = %04X, data = %02X\n", activecpu_get_pc(), offset, modeSS_byte );
+					if ( offset & 0x800 ) {
+						// TODO: Add support for writing to RAM in high area
+					} else {
+						bank_base[1][offset] = modeSS_byte;
+						data = modeSS_byte;
+					}
+				}
+				/* Check for dummy read from same address */
+				if ( diff == 2 ) {
+					modeSS_diff_adjust = 1;
+				} else {
+					modeSS_diff_adjust = 0;
+				}
+			}
+		}
+	}
+	return data;
 }
 
 /*
@@ -842,6 +947,10 @@ static MACHINE_START( a2600 )
 		number_banks = cart_size / 0x800;
 		mode3E_ram_enabled = 0;
 		break;
+
+	case modeSS:
+		install_banks(2, 0x0000);
+		break;
 	}
 
 	/* set up bank counter */
@@ -913,6 +1022,16 @@ static MACHINE_START( a2600 )
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3e, 0x3e, 0, 0, mode3E_RAM_switch_w);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3f, 0x3f, 0, 0, mode3E_switch_w);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x15ff, 0, 0, mode3E_RAM_w);
+		break;
+
+	case modeSS:
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1fff, 0, 0, modeSS_r);
+		bank_base[1] = extra_RAM + 2 * 0x800;
+		bank_base[2] = CART;
+		memory_set_bankptr( 1, bank_base[1] );
+		memory_set_bankptr( 2, bank_base[2] );
+		modeSS_write_enabled = 0;
+		memory_set_opbase_handler( 0, modeSS_opbase );
 		break;
 	}
 
