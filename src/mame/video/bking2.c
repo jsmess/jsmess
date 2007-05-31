@@ -238,7 +238,7 @@ static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 
 }
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code0 = bking2_playfield_ram[2 * tile_index + 0];
 	UINT8 code1 = bking2_playfield_ram[2 * tile_index + 1];

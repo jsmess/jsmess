@@ -23,7 +23,7 @@
 
 static tilemap *tmap;
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index];
 	int color=colorram[tile_index];

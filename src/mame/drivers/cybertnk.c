@@ -180,7 +180,7 @@ static UINT16 *io_ram;
 #define LOG_UNKNOWN_WRITE logerror("unknown io write CPU%d:%08x  0x%08x 0x%04x & 0x%04x\n", cpu_getactivecpu(), activecpu_get_pc(), offset*2, data, mem_mask);
 #define IGNORE_MISSING_ROM 1
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int code = tx_vram[tile_index];
 	SET_TILE_INFO(

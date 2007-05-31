@@ -878,7 +878,7 @@ static void update_ay(void)
 		    }
 		  	case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
-				pia_set_input_a(3, AY8910_read_port_0_r(0));
+				pia_set_input_a(3, AY8910_read_port_0_r(0), 0);
 				LOG(("AY Chip Read \n"));
 				break;
 		  	}
@@ -2848,7 +2848,7 @@ PALETTE_INIT( dealem )
 
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tileno, colour;
 
@@ -3267,7 +3267,7 @@ ROM_END
 
 /*    YEAR   NAME    PARENT   MACHINE   INPUT     INIT   MONITOR COMPANY            FULLNAME                                                            FLAGS (0 if none)  */
 
-GAME( 198?, connect4,0,       mpu4,     connect4, 0,		0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 198?, connect4,0,       mpu4,     connect4, 0,		0,   "Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 199?, bctvidbs,0,       mpu4,		mpu4,	  0,     ROT0,   "Barcrest", 		"MPU4 Video Firmware",												NOT_A_DRIVER )
 
 //Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass

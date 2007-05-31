@@ -69,26 +69,26 @@ static write8_handler ssio_custom_output[2];
 static UINT8 csdeluxe_sound_cpu;
 static UINT8 csdeluxe_dac_index;
 static UINT8 csdeluxe_status;
-extern const pia6821_interface csdeluxe_pia_intf;
+static const pia6821_interface csdeluxe_pia_intf;
 
 /* Turbo Chip Squeak-specific globals */
 static UINT8 turbocs_sound_cpu;
 static UINT8 turbocs_dac_index;
 static UINT8 turbocs_status;
-extern const pia6821_interface turbocs_pia_intf;
+static const pia6821_interface turbocs_pia_intf;
 
 /* Sounds Good-specific globals */
 static UINT8 soundsgood_sound_cpu;
 static UINT8 soundsgood_dac_index;
 static UINT8 soundsgood_status;
-extern const pia6821_interface soundsgood_pia_intf;
+static const pia6821_interface soundsgood_pia_intf;
 
 /* Squawk n' Talk-specific globals */
 static UINT8 squawkntalk_sound_cpu;
 static UINT8 squawkntalk_tms_command;
 static UINT8 squawkntalk_tms_strobes;
-extern const pia6821_interface squawkntalk_pia0_intf;
-extern const pia6821_interface squawkntalk_pia1_intf;
+static const pia6821_interface squawkntalk_pia0_intf;
+static const pia6821_interface squawkntalk_pia1_intf;
 
 
 
@@ -505,13 +505,13 @@ static WRITE8_HANDLER( csdeluxe_porta_w )
 
 static WRITE8_HANDLER( csdeluxe_portb_w )
 {
+	UINT8 z_mask = pia_get_port_b_z_mask(0);
+
 	dacval = (dacval & ~0x003) | (data >> 6);
 	DAC_signed_data_16_w(csdeluxe_dac_index, dacval << 6);
 
-	/* some games tend to set the DDR only temporarily to allow these bits */
-	/* to go through, assuming that they will be effectively latched */
-	if (pia_get_ddr_b(0) & 0x30)
-		csdeluxe_status = (data >> 4) & 3;
+	if (~z_mask & 0x10)  csdeluxe_status = (csdeluxe_status & ~1) | ((data >> 4) & 1);
+	if (~z_mask & 0x20)  csdeluxe_status = (csdeluxe_status & ~2) | ((data >> 4) & 2);
 }
 
 static void csdeluxe_irq(int state)
@@ -579,7 +579,7 @@ ADDRESS_MAP_END
 
 
 /********* PIA interfaces ***********/
-const pia6821_interface csdeluxe_pia_intf =
+static const pia6821_interface csdeluxe_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ csdeluxe_porta_w, csdeluxe_portb_w, 0, 0,
@@ -625,13 +625,13 @@ static WRITE8_HANDLER( soundsgood_porta_w )
 
 static WRITE8_HANDLER( soundsgood_portb_w )
 {
+	UINT8 z_mask = pia_get_port_b_z_mask(1);
+
 	dacval = (dacval & ~0x003) | (data >> 6);
 	DAC_signed_data_16_w(soundsgood_dac_index, dacval << 6);
 
-	/* some games tend to set the DDR only temporarily to allow these bits */
-	/* to go through, assuming that they will be effectively latched */
-	if (pia_get_ddr_b(1) & 0x30)
-		soundsgood_status = (data >> 4) & 3;
+	if (~z_mask & 0x10)  soundsgood_status = (soundsgood_status & ~1) | ((data >> 4) & 1);
+	if (~z_mask & 0x20)  soundsgood_status = (soundsgood_status & ~2) | ((data >> 4) & 2);
 }
 
 static void soundsgood_irq(int state)
@@ -683,7 +683,7 @@ ADDRESS_MAP_END
 /* Note: we map this board to PIA #1. It is only used in Spy Hunter and Spy Hunter 2 */
 /* For Spy Hunter 2, we also have a Turbo Chip Squeak in PIA slot 0, so we don't want */
 /* to interfere */
-const pia6821_interface soundsgood_pia_intf =
+static const pia6821_interface soundsgood_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ soundsgood_porta_w, soundsgood_portb_w, 0, 0,
@@ -770,7 +770,7 @@ ADDRESS_MAP_END
 
 
 /********* PIA interfaces ***********/
-const pia6821_interface turbocs_pia_intf =
+static const pia6821_interface turbocs_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ turbocs_porta_w, turbocs_portb_w, 0, 0,
@@ -907,14 +907,14 @@ ADDRESS_MAP_END
 
 
 /********* PIA interfaces ***********/
-const pia6821_interface squawkntalk_pia0_intf =
+static const pia6821_interface squawkntalk_pia0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ squawkntalk_porta1_w, 0, 0, 0,
 	/*irqs   : A/B             */ squawkntalk_irq, squawkntalk_irq
 };
 
-const pia6821_interface squawkntalk_pia1_intf =
+static const pia6821_interface squawkntalk_pia1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ squawkntalk_porta2_w, squawkntalk_portb2_w, 0, 0,

@@ -337,7 +337,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 }
 };
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = bgram[tile_index]+((bgram[tile_index+0x400]&(1<<3))<<(8-3));
 

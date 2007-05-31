@@ -125,7 +125,7 @@ static UINT32 K001604_scan_layer_roz_1( UINT32 col, UINT32 row, UINT32 num_cols,
 	return (row * width) + col + (K001604_layer_size ? 192 : 64);
 }
 
-static void K001604_0_tile_info_layer_8x8(int tile_index)
+static TILE_GET_INFO( K001604_0_tile_info_layer_8x8 )
 {
 	UINT32 val = K001604_tile_ram[0][tile_index];
 	int color = (val >> 17) & 0x1f;
@@ -140,7 +140,7 @@ static void K001604_0_tile_info_layer_8x8(int tile_index)
 	SET_TILE_INFO(K001604_gfx_index[0][0], tile, color, flags);
 }
 
-static void K001604_0_tile_info_layer_roz(int tile_index)
+static TILE_GET_INFO( K001604_0_tile_info_layer_roz )
 {
 	UINT32 val = K001604_tile_ram[0][tile_index];
 	int flags = 0;
@@ -157,7 +157,7 @@ static void K001604_0_tile_info_layer_roz(int tile_index)
 	SET_TILE_INFO(K001604_gfx_index[0][K001604_roz_size[0]], tile, color, flags);
 }
 
-static void K001604_1_tile_info_layer_8x8(int tile_index)
+static TILE_GET_INFO( K001604_1_tile_info_layer_8x8 )
 {
 	UINT32 val = K001604_tile_ram[1][tile_index];
 	int color = (val >> 17) & 0x1f;
@@ -172,7 +172,7 @@ static void K001604_1_tile_info_layer_8x8(int tile_index)
 	SET_TILE_INFO(K001604_gfx_index[1][0], tile, color, flags);
 }
 
-static void K001604_1_tile_info_layer_roz(int tile_index)
+static TILE_GET_INFO( K001604_1_tile_info_layer_roz )
 {
 	UINT32 val = K001604_tile_ram[1][tile_index];
 	int flags = 0;

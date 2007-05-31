@@ -51,7 +51,7 @@ static UINT32 color_prom_address = 0;
 static UINT8 pix_sh = 0;
 static UINT8 pix[2] = {0, 0};
 
-static void get_sb_tile_info(int tile_index)
+static TILE_GET_INFO( get_sb_tile_info )
 {
 	unsigned char *rom = memory_region(REGION_USER1);
 	int tileno = rom[tile_index + bgmap * 1024];

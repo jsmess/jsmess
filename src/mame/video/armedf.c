@@ -45,7 +45,7 @@ static UINT32 armedf_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	}
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int tile_number = terraf_text_videoram[tile_index]&0xff;
 	int attributes;
@@ -65,7 +65,7 @@ static void get_tx_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info( int tile_index )
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int data = armedf_fg_videoram[tile_index];
 	SET_TILE_INFO(
@@ -76,7 +76,7 @@ static void get_fg_tile_info( int tile_index )
 }
 
 
-static void get_bg_tile_info( int tile_index )
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int data = armedf_bg_videoram[tile_index];
 	SET_TILE_INFO(

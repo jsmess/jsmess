@@ -165,7 +165,7 @@ static void hitice_clear_pixel_bitmap(void)
 		hitice_pixelram_w(i,0,0);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile  = TC0180VCU_ram[tile_index + bg_rambank[0]];
 	int color = TC0180VCU_ram[tile_index + bg_rambank[1]];
@@ -177,7 +177,7 @@ static void get_bg_tile_info(int tile_index)
 		TILE_FLIPYX((color & 0x00c0)>>6))
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile  = TC0180VCU_ram[tile_index + fg_rambank[0]];
 	int color = TC0180VCU_ram[tile_index + fg_rambank[1]];
@@ -189,7 +189,7 @@ static void get_fg_tile_info(int tile_index)
 		TILE_FLIPYX((color & 0x00c0)>>6))
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int tile = TC0180VCU_ram[tile_index + tx_rambank];
 

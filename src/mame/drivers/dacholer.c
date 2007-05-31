@@ -179,12 +179,12 @@ INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	SET_TILE_INFO(1,bgvideoram[tile_index] + bg_bank * 0x100,0,0);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	SET_TILE_INFO(0,fgvideoram[tile_index],0,0);
 }

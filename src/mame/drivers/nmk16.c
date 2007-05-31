@@ -3599,13 +3599,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tdragon2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz  */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,macross2_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */ /* 4 MHz ? */
+	/* audio CPU */ /* 4 MHz  */
 	MDRV_CPU_PROGRAM_MAP(macross2_sound_readmem,macross2_sound_writemem)
 	MDRV_CPU_IO_MAP(macross2_sound_readport,macross2_sound_writeport)
 
@@ -3630,15 +3630,15 @@ static MACHINE_DRIVER_START( tdragon2 )
 
 	MDRV_SOUND_ADD(YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( raphero )
@@ -4485,6 +4485,35 @@ ROM_END
 
 ROM_START( tdragon2 )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )		/* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "6.rom",      0x00000, 0x80000, CRC(ca348caf) SHA1(7c5b0b92560baf413591230e061d2d57b25deafe) )
+
+	ROM_REGION( 0x30000, REGION_CPU2, 0 )		/* Z80 code */
+	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) )
+	ROM_RELOAD(              0x10000, 0x20000 )				/* banked */
+
+	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "1.bin",    0x000000, 0x020000, CRC(d488aafa) SHA1(4d05e7ca075b638dd90ae4c9f224817a8a3ae9f3) )	/* 8x8 tiles */
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "ww930914.2", 0x000000, 0x200000, CRC(f968c65d) SHA1(fd6d21bba53f945b1597d7d0735bc62dd44d5498) )	/* 16x16 tiles */
+
+	ROM_REGION( 0x400000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )	/* Sprites */
+	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
+
+	ROM_REGION( 0x240000, REGION_SOUND1, 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )	/* all banked */
+
+	ROM_REGION( 0x240000, REGION_SOUND2, 0 )	/* OKIM6295 samples */
+	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )	/* all banked */
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )	/* unknown */
+	ROM_LOAD( "10.bpr", 0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) )	/* unknown */
+ROM_END
+
+ROM_START( tdragn2a )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "6.bin",      0x00000, 0x80000, CRC(310d6bca) SHA1(f46ad1d13cf5014aef1f0e8862b369ab31c22866) )
 
 	ROM_REGION( 0x30000, REGION_CPU2, 0 )		/* Z80 code */
@@ -5076,8 +5105,9 @@ GAME( 1991, hachamf,  0,       hachamf,  hachamf,  hachamf,  ROT0,   "NMK",     
 GAME( 1992, macross,  0,       macross,  macross,  nmk,      ROT270, "Banpresto",                       "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND )
 GAME( 1993, gunnail,  0,       gunnail,  gunnail,  nmk,      ROT270, "NMK / Tecmo",                     "GunNail", GAME_IMPERFECT_SOUND )
 GAME( 1993, macross2, 0,       macross2, macross2, 0,        ROT0,   "Banpresto",                       "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
-GAME( 1993, tdragon2, 0,       tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Thunder Dragon 2", GAME_NO_COCKTAIL )
-GAME( 1993, bigbang,  tdragon2,tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Big Bang", GAME_NO_COCKTAIL )
+GAME( 1993, tdragon2, 0,       tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Thunder Dragon 2 (9th Nov. 1993)", GAME_NO_COCKTAIL )
+GAME( 1993, tdragn2a, tdragon2,tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL )
+GAME( 1993, bigbang,  tdragon2,tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL )
 GAME( 1994, raphero,  0,       raphero,  raphero,  0,        ROT270, "Media Trading Corp",              "Rapid Hero (Japan?)", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
 GAME( 1992, sabotenb, 0,       bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                     "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )

@@ -11,7 +11,7 @@ static int layer_colorbase[2];
 
 ***************************************************************************/
 
-static void tile_callback(int layer, int bank, int *code, int *color)
+static void tile_callback(int layer, int bank, int *code, int *color, int *flags)
 {
 	*code |= ((*color & 0x0f) << 9) | ((*color & 0x40) << 2);
 	*color = layer_colorbase[layer];

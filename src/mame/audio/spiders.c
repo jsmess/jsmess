@@ -171,7 +171,7 @@ DISCRETE_SOUND_END
 
 WRITE8_HANDLER( spiders_audio_command_w )
 {
-	pia_set_input_a(4, data & 0xf8);
+	pia_set_input_a(4, data & 0xf8, 0);
 	pia_set_input_ca1(4, data  & 0x80 ? 1 : 0);
 }
 

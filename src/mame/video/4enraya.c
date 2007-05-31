@@ -17,7 +17,7 @@ WRITE8_HANDLER( fenraya_videoram_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset&0x3ff);
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index*2]+(videoram[tile_index*2+1]<<8);
 	SET_TILE_INFO(

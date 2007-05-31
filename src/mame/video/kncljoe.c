@@ -92,7 +92,7 @@ PALETTE_INIT( kncljoe )
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = videoram[2*tile_index+1];
 	int code = videoram[2*tile_index] + ((attr & 0xc0) << 2) + (tile_bank << 10);

@@ -11,7 +11,7 @@
 static tilemap *background_layer,*text_layer;
 
 
-static void get_back_tile_info(int tile_index)
+static TILE_GET_INFO( get_back_tile_info )
 {
 	int tile = videoram16[tile_index];
 	int color = (tile>>12)&0xf;
@@ -25,7 +25,7 @@ static void get_back_tile_info(int tile_index)
 			0)
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile = colorram16[tile_index];
 	int color = (tile>>10);

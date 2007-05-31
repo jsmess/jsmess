@@ -12,14 +12,14 @@ static int layerpri[3];
 
 ***************************************************************************/
 
-static void vendetta_tile_callback(int layer,int bank,int *code,int *color)
+static void vendetta_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x30) << 6) |
 			((*color & 0x0c) << 10) | (bank << 14);
 	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
-static void esckids_tile_callback(int layer,int bank,int *code,int *color)
+static void esckids_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) |
 			((*color & 0x0c) <<  9) | (bank << 13);

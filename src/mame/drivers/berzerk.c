@@ -1,65 +1,532 @@
 /***************************************************************************
 
- Berzerk Driver by Zsolt Vasvari
- Original Sound Driver by Alex Judd
- New Sound Driver by Aaron Giles, R. Belmont, and Lord Nightmare
+    Berzerk hardware
+
+    Driver by Zsolt Vasvari
+    Original sound driver by Alex Judd
+    New sound driver by Aaron Giles, R. Belmont and Lord Nightmare
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "includes/berzerk.h"
-#include "includes/exidy.h"
-#include "sound/s14001a.h"
+#include "berzerk.h"
+#include "machine/74181.h"
+#include "video/res_net.h"
 
-#define MASTER_CLOCK                    10000000
-#define S14001A_CLOCK                   (MASTER_CLOCK/2)
 
+#define MONITOR_TYPE_PORT_TAG ("MONITOR_TYPE")
+
+#define MAIN_CPU_CLOCK  			(BERZERK_MASTER_CLOCK / 4)
+#define PIXEL_CLOCK  				(BERZERK_MASTER_CLOCK / 2)
+#define HTOTAL						(0x140)
+#define HBEND						(0x000)
+#define HBSTART						(0x100)
+#define VTOTAL						(0x106)
+#define VBEND						(0x020)
+#define VBSTART						(0x100)
+#define VCOUNTER_START_NO_VBLANK	(0x020)
+#define VCOUNTER_START_VBLANK		(0x0da)
+#define IRQS_PER_FRAME				(2)
+#define NMIS_PER_FRAME				(8)
+
+static const UINT8 irq_trigger_counts[IRQS_PER_FRAME] = { 0x80, 0xda };
+static const UINT8 irq_trigger_v256s [IRQS_PER_FRAME] = { 0x00, 0x01 };
+
+static const UINT8 nmi_trigger_counts[NMIS_PER_FRAME] = { 0x30, 0x50, 0x70, 0x90, 0xb0, 0xd0, 0xf0, 0xf0 };
+static const UINT8 nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+
+
+static UINT8 *berzerk_videoram;
+static size_t berzerk_videoram_size;
+static UINT8 *berzerk_colorram;
+
+static UINT8 magicram_control;		/* 8-bit latch @ 6C */
+static UINT8 last_shift_data;		/* 7-bit latch @ 7C */
+static UINT8 intercept;				/* J-K flip-flop @ 6B */
+
+static mame_timer *irq_timer;
+static mame_timer *nmi_timer;
+static UINT8 irq_enabled;			/* J-K flip-flop @ 3D */
+static UINT8 nmi_enabled;			/* flip-flop made out of 2 NAND gates @ 1D */
+
+
+
+/*************************************
+ *
+ *  Start LED handling
+ *
+ *************************************/
+
+static READ8_HANDLER( led_on_r )
+{
+	set_led_status(0, 1);
+
+	return 0;
+}
+
+
+static WRITE8_HANDLER( led_on_w )
+{
+	set_led_status(0, 1);
+}
+
+
+static READ8_HANDLER( led_off_r )
+{
+	set_led_status(0, 0);
+
+	return 0;
+}
+
+
+static WRITE8_HANDLER( led_off_w )
+{
+	set_led_status(0, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Convert to/from our line counting
+ *  to the hardware's vsync chain
+ *
+ *************************************/
+
+static void vpos_to_vysnc_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
+{
+	/* convert from a vertical position to the actual values on the vertical sync counters */
+	*v256 = ((vpos < VBEND) || (vpos >= VBSTART));
+
+	if (*v256)
+	{
+		int temp = vpos - VBSTART + VCOUNTER_START_VBLANK;
+
+		if (temp < 0)
+			*counter = temp + VTOTAL;
+		else
+			*counter = temp;
+	}
+	else
+		*counter = vpos;
+}
+
+
+static int vysnc_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
+{
+	/* convert from the vertical sync counters to an actual vertical position */
+	int vpos;
+
+	if (v256)
+	{
+		vpos = counter - VCOUNTER_START_VBLANK + VBSTART;
+
+		if (vpos >= VTOTAL)
+			vpos = vpos - VTOTAL;
+	}
+	else
+		vpos = counter;
+
+	return vpos;
+}
+
+
+
+/*************************************
+ *
+ *  IRQ generation
+ *
+ *  There are two IRQ's per frame
+ *
+ *************************************/
+
+static WRITE8_HANDLER( irq_enable_w )
+{
+	irq_enabled = data & 0x01;
+}
+
+
+static void irq_callback(int irq_number)
+{
+	UINT8 next_counter;
+	UINT8 next_v256;
+	int next_vpos;
+	int next_irq_number;
+
+	/* set the IRQ line if enabled */
+	if (irq_enabled)
+		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xfc);
+
+	/* set up for next interrupt */
+	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
+	next_counter = irq_trigger_counts[next_irq_number];
+	next_v256 = irq_trigger_v256s[next_irq_number];
+
+	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
+	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_irq_number, time_zero);
+}
+
+
+static void create_irq_timer(void)
+{
+	irq_timer = mame_timer_alloc(irq_callback);
+}
+
+
+static void start_irq_timer(void)
+{
+	int vpos = vysnc_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
+	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
+}
+
+
+
+/*************************************
+ *
+ *  NMI generation
+ *
+ *  An NMI is asserted roughly every
+ *  32 scanlines when V16 clocks HI.
+ *  The NMI is cleared 2 pixels later.
+ *  Since this happens so quickly, I am
+ *  not emulating it, just pulse
+ *  the line instead.
+ *
+ *************************************/
+
+static WRITE8_HANDLER( nmi_enable_w )
+{
+	nmi_enabled = 1;
+}
+
+
+static WRITE8_HANDLER( nmi_disable_w )
+{
+	nmi_enabled = 0;
+}
+
+
+static READ8_HANDLER( nmi_enable_r )
+{
+	nmi_enabled = 1;
+
+	return 0;
+}
+
+
+static READ8_HANDLER( nmi_disable_r )
+{
+	nmi_enabled = 0;
+
+	return 0;
+}
+
+
+static void nmi_callback(int nmi_number)
+{
+	UINT8 next_counter;
+	UINT8 next_v256;
+	int next_vpos;
+	int next_nmi_number;
+
+	/* pulse the NMI line if enabled */
+	if (nmi_enabled)
+		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+
+	/* set up for next interrupt */
+	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;
+	next_counter = nmi_trigger_counts[next_nmi_number];
+	next_v256 = nmi_trigger_v256s[next_nmi_number];
+
+	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
+	mame_timer_adjust(nmi_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_nmi_number, time_zero);
+}
+
+
+static void create_nmi_timer(void)
+{
+	nmi_timer = mame_timer_alloc(nmi_callback);
+}
+
+
+static void start_nmi_timer(void)
+{
+	int vpos = vysnc_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
+	mame_timer_adjust(nmi_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
+}
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( berzerk )
+{
+	create_irq_timer();
+	create_nmi_timer();
+
+	/* register for state saving */
+	state_save_register_global(magicram_control);
+	state_save_register_global(last_shift_data);
+	state_save_register_global(intercept);
+	state_save_register_global(irq_enabled);
+	state_save_register_global(nmi_enabled);
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Machine reset
+ *
+ *************************************/
+
+MACHINE_RESET( berzerk )
+{
+	irq_enabled = 0;
+	nmi_enabled = 0;
+	set_led_status(0, 0);
+	magicram_control = 0;
+
+	start_irq_timer();
+	start_nmi_timer();
+}
+
+
+
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
+
+#define NUM_PENS	(0x10)
+
+#define LS181_12C 	(0)
+#define LS181_10C 	(1)
+
+
+static VIDEO_START( berzerk )
+{
+	TTL74181_config(LS181_12C, 0);
+	TTL74181_write(LS181_12C, TTL74181_INPUT_M, 1, 1);
+
+	TTL74181_config(LS181_10C, 0);
+	TTL74181_write(LS181_10C, TTL74181_INPUT_M, 1, 1);
+
+	return 0;
+}
+
+
+static WRITE8_HANDLER( magicram_w )
+{
+	UINT8 alu_output;
+
+	UINT8 current_video_data = berzerk_videoram[offset];
+
+	/* shift data towards LSB.  MSB bits are filled by data from last_shift_data.
+       The shifter consists of 5 74153 devices @ 7A, 8A, 9A, 10A and 11A,
+       followed by 4 more 153's at 11B, 10B, 9B and 8B, which optionally
+       reverse the order of the resulting bits */
+	UINT8 shift_flop_output = (((UINT16)last_shift_data << 8) | data) >> (magicram_control & 0x07);
+
+	if (magicram_control & 0x08)
+		shift_flop_output = BITSWAP8(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
+
+	/* collision detection - AND gate output goes to the K pin of the flip-flop,
+       while J is LO, therefore, it only resets, never sets */
+	if (shift_flop_output & current_video_data)
+		intercept = 0;
+
+	/* perform ALU step */
+	TTL74181_write(LS181_12C, TTL74181_INPUT_A0, 4, shift_flop_output & 0x0f);
+	TTL74181_write(LS181_10C, TTL74181_INPUT_A0, 4, shift_flop_output >> 4);
+	TTL74181_write(LS181_12C, TTL74181_INPUT_B0, 4, current_video_data & 0x0f);
+	TTL74181_write(LS181_10C, TTL74181_INPUT_B0, 4, current_video_data >> 4);
+	TTL74181_write(LS181_12C, TTL74181_INPUT_S0, 4, magicram_control >> 4);
+	TTL74181_write(LS181_10C, TTL74181_INPUT_S0, 4, magicram_control >> 4);
+
+	alu_output = (TTL74181_read(LS181_10C, TTL74181_OUTPUT_F0, 4) << 4) |
+				 (TTL74181_read(LS181_12C, TTL74181_OUTPUT_F0, 4) << 0);
+
+	berzerk_videoram[offset] = alu_output ^ 0xff;
+
+	/* save data for next time */
+	last_shift_data = data & 0x7f;
+}
+
+
+static WRITE8_HANDLER( magicram_control_w )
+{
+	/* save the control byte, clear the shift data latch,
+       and set the intercept flip-flop */
+	magicram_control = data;
+	last_shift_data = 0;
+	intercept = 1;
+}
+
+
+static READ8_HANDLER( intercept_v256_r )
+{
+	UINT8 counter;
+	UINT8 v256;
+
+	vpos_to_vysnc_chain_counter(video_screen_get_vpos(0), &counter, &v256);
+
+	return (!intercept << 7) | v256;
+}
+
+
+static void get_pens(pen_t *pens)
+{
+	static const int resistances_wg[] = { 750, 0 };
+	static const int resistances_el[] = { 1.0 / ((1.0 / 750.0) + (1.0 / 360.0)), 0 };
+
+	int color;
+	double color_weights[2];
+
+	if (readinputportbytag(MONITOR_TYPE_PORT_TAG) == 0)
+		compute_resistor_weights(0, 0xff, -1.0,
+								 2, resistances_wg, color_weights, 0, 270,
+								 2, resistances_wg, color_weights, 0, 270,
+								 2, resistances_wg, color_weights, 0, 270);
+	else
+		compute_resistor_weights(0, 0xff, -1.0,
+								 2, resistances_el, color_weights, 0, 270,
+								 2, resistances_el, color_weights, 0, 270,
+								 2, resistances_el, color_weights, 0, 270);
+
+	for (color = 0; color < NUM_PENS; color++)
+	{
+		UINT8 r_bit = (color >> 0) & 0x01;
+		UINT8 g_bit = (color >> 1) & 0x01;
+		UINT8 b_bit = (color >> 2) & 0x01;
+		UINT8 i_bit = (color >> 3) & 0x01;
+
+		UINT8 r = combine_2_weights(color_weights, r_bit & i_bit, r_bit);
+		UINT8 g = combine_2_weights(color_weights, g_bit & i_bit, g_bit);
+		UINT8 b = combine_2_weights(color_weights, b_bit & i_bit, b_bit);
+
+		pens[color] = MAKE_RGB(r, g, b);
+	}
+}
+
+
+static VIDEO_UPDATE( berzerk )
+{
+	pen_t pens[NUM_PENS];
+	offs_t offs;
+
+	get_pens(pens);
+
+	for (offs = 0; offs < berzerk_videoram_size; offs++)
+	{
+		int i;
+
+		UINT8 data = berzerk_videoram[offs];
+		UINT8 color = berzerk_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
+
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		for (i = 0; i < 4; i++)
+		{
+			pen_t pen = (data & 0x80) ? pens[color >> 4] : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x = x + 1;
+			data = data << 1;
+		}
+
+		for (; i < 8; i++)
+		{
+			pen_t pen = (data & 0x80) ? pens[color & 0x0f] : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x = x + 1;
+			data = data << 1;
+		}
+	}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( berzerk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_RAM,berzerk_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(MRA8_RAM,berzerk_magicram_w) AM_SHARE(1)
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM,berzerk_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&berzerk_videoram) AM_SIZE(&berzerk_videoram_size) AM_SHARE(1)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(MRA8_RAM, magicram_w) AM_SHARE(1)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(&berzerk_colorram)
+	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( frenzy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_RAM,berzerk_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
-	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(MRA8_RAM,berzerk_magicram_w) AM_SHARE(1)
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM,berzerk_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&berzerk_videoram) AM_SIZE(&berzerk_videoram_size) AM_SHARE(1)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(MRA8_RAM, magicram_w) AM_SHARE(1)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(&berzerk_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xf800, 0xfbff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
+
+/*************************************
+ *
+ *  Port handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( berzerk_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x40, 0x47) AM_READWRITE(berzerk_sound_r,berzerk_sound_w) /* First sound board */
-	AM_RANGE(0x48, 0x48) AM_READ(input_port_0_r)
-	AM_RANGE(0x49, 0x49) AM_READ(input_port_1_r)
-	AM_RANGE(0x4a, 0x4a) AM_READ(input_port_2_r)
-	AM_RANGE(0x4b, 0x4b) AM_WRITE(berzerk_magicram_control_w)
-	AM_RANGE(0x4c, 0x4c) AM_READWRITE(berzerk_nmi_enable_r,berzerk_nmi_enable_w)
-	AM_RANGE(0x4d, 0x4d) AM_READWRITE(berzerk_nmi_disable_r,berzerk_nmi_disable_w)
-	AM_RANGE(0x4e, 0x4e) AM_READ(berzerk_port_4e_r)
-	AM_RANGE(0x4f, 0x4f) AM_WRITE(berzerk_irq_enable_w)
-	AM_RANGE(0x50, 0x57) AM_WRITE(MWA8_NOP) /* Second sound board but not used */
-	AM_RANGE(0x60, 0x60) AM_READ(input_port_4_r)
-	AM_RANGE(0x61, 0x61) AM_READ(input_port_5_r)
-	AM_RANGE(0x62, 0x62) AM_READ(input_port_6_r)
-	AM_RANGE(0x63, 0x63) AM_READ(input_port_7_r)
-	AM_RANGE(0x64, 0x64) AM_READ(input_port_8_r)
-	AM_RANGE(0x65, 0x65) AM_READ(input_port_9_r)
-	AM_RANGE(0x66, 0x66) AM_READ(berzerk_led_off_r)
-	AM_RANGE(0x67, 0x67) AM_READ(berzerk_led_on_r)
+	AM_RANGE(0x00, 0x3f) AM_NOP
+	AM_RANGE(0x40, 0x47) AM_READWRITE(berzerk_audio_r, berzerk_audio_w)
+	AM_RANGE(0x48, 0x48) AM_READWRITE(input_port_0_r, MWA8_NOP)
+	AM_RANGE(0x49, 0x49) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x4a, 0x4a) AM_READWRITE(input_port_2_r, MWA8_NOP)
+	AM_RANGE(0x4b, 0x4b) AM_READWRITE(MRA8_NOP, magicram_control_w)
+	AM_RANGE(0x4c, 0x4c) AM_READWRITE(nmi_enable_r, nmi_enable_w)
+	AM_RANGE(0x4d, 0x4d) AM_READWRITE(nmi_disable_r, nmi_disable_w)
+	AM_RANGE(0x4e, 0x4e) AM_READWRITE(intercept_v256_r, MWA8_NOP)
+	AM_RANGE(0x4f, 0x4f) AM_READWRITE(MRA8_NOP, irq_enable_w)
+	AM_RANGE(0x50, 0x57) AM_NOP /* second sound board, but not used */
+	AM_RANGE(0x58, 0x5f) AM_NOP
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x18) AM_READWRITE(input_port_3_r, MWA8_NOP)
+	AM_RANGE(0x61, 0x61) AM_MIRROR(0x18) AM_READWRITE(input_port_4_r, MWA8_NOP)
+	AM_RANGE(0x62, 0x62) AM_MIRROR(0x18) AM_READWRITE(input_port_5_r, MWA8_NOP)
+	AM_RANGE(0x63, 0x63) AM_MIRROR(0x18) AM_READWRITE(input_port_6_r, MWA8_NOP)
+	AM_RANGE(0x64, 0x64) AM_MIRROR(0x18) AM_READWRITE(input_port_7_r, MWA8_NOP)
+	AM_RANGE(0x65, 0x65) AM_MIRROR(0x18) AM_READWRITE(input_port_8_r, MWA8_NOP)
+	AM_RANGE(0x66, 0x66) AM_MIRROR(0x18) AM_READWRITE(led_off_r, led_off_w)
+	AM_RANGE(0x67, 0x67) AM_MIRROR(0x18) AM_READWRITE(led_on_r, led_on_w)
+	AM_RANGE(0x80, 0xff) AM_NOP
 ADDRESS_MAP_END
 
 
-#define COINAGE(CHUTE) \
-	PORT_DIPNAME( 0x0f, 0x00, "Coin "#CHUTE ) \
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
+#define BERZERK_COINAGE(CHUTE, DIPBANK) \
+	PORT_DIPNAME( 0x0f, 0x00, "Coin "#CHUTE )  PORT_DIPLOCATION(#DIPBANK":1,2,3,4") \
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x0d, DEF_STR( 4C_3C ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) \
@@ -79,7 +546,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 
-INPUT_PORTS_START( berzerk )
+static INPUT_PORTS_START( berzerk )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -108,53 +575,56 @@ INPUT_PORTS_START( berzerk )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START      /* IN3 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* Collision */
-
-	PORT_START      /* IN4 */
-	PORT_BIT(    0x01, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Input Test Mode") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT(    0x01, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Input Test Mode") PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_DIPLOCATION("F3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT(    0x02, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Crosshair Pattern") PORT_CODE(KEYCODE_F4) PORT_TOGGLE
+	PORT_BIT(    0x02, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Crosshair Pattern") PORT_CODE(KEYCODE_F4) PORT_TOGGLE PORT_DIPLOCATION("F3:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("F3:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
 
-	PORT_START      /* IN5 */
-	PORT_BIT(    0x03, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Color Test") PORT_CODE(KEYCODE_F5) PORT_TOGGLE
+	PORT_START      /* IN4 */
+	PORT_BIT(    0x03, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Color Test") PORT_CODE(KEYCODE_F5) PORT_TOGGLE PORT_DIPLOCATION("F2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( On ) )
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("F2:7,8")
 	PORT_DIPSETTING(    0xc0, "5000 and 10000" )
 	PORT_DIPSETTING(    0x40, "5000" )
 	PORT_DIPSETTING(    0x80, "10000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
+	PORT_START      /* IN5 */
+	BERZERK_COINAGE(3, F6)
+
 	PORT_START      /* IN6 */
-	COINAGE(3)
+	BERZERK_COINAGE(2, F5)
 
 	PORT_START      /* IN7 */
-	COINAGE(2)
+	BERZERK_COINAGE(1, F4)
 
 	PORT_START      /* IN8 */
-	COINAGE(1)
-
-	PORT_START      /* IN9 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
+
+	/* fake port for monitor type */
+	PORT_START_TAG(MONITOR_TYPE_PORT_TAG)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "Wells-Gardner" )
+	PORT_CONFSETTING(    0x01, "Electrohome" )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( frenzy )
+
+static INPUT_PORTS_START( frenzy )
 	PORT_START      /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -182,11 +652,6 @@ INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START      /* IN3 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* Collision */
-
-	PORT_START      /* IN4 */
 	PORT_DIPNAME( 0x0f, 0x03, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x01, "1000" )
 	PORT_DIPSETTING(    0x02, "2000" )
@@ -211,7 +676,7 @@ INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
 
-	PORT_START      /* IN5 */
+	PORT_START      /* IN4 */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )  /* Bit 0 does some more hardware tests */
 	PORT_BIT(    0x04, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Input Test Mode") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -222,7 +687,7 @@ INPUT_PORTS_START( frenzy )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* The following 3 ports use all 8 bits, but I didn't feel like adding all 256 values :-) */
-	PORT_START      /* IN6 */
+	PORT_START      /* IN5 */
 	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit B" )
 	/*PORT_DIPSETTING(    0x00, "0" )    Can't insert coins  */
 	PORT_DIPSETTING(    0x01, "1" )
@@ -242,7 +707,7 @@ INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0f, "15" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
 
-	PORT_START      /* IN7 */
+	PORT_START      /* IN6 */
 	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit A" )
 	/*PORT_DIPSETTING(    0x00, "0" )    Can't insert coins  */
 	PORT_DIPSETTING(    0x01, "1" )
@@ -262,7 +727,7 @@ INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0f, "15" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
 
-	PORT_START      /* IN8 */
+	PORT_START      /* IN7 */
 	PORT_DIPNAME( 0x0f, 0x01, "Coin Multiplier" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x01, "1" )
@@ -282,60 +747,53 @@ INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0f, "15" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
 
-	PORT_START      /* IN9 */
+	PORT_START      /* IN8 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
+
+	/* fake port for monitor type */
+	PORT_START_TAG(MONITOR_TYPE_PORT_TAG)
+	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "Wells-Gardner" )
+	PORT_CONFSETTING(    0x01, "Electrohome" )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static struct S14001A_interface berzerk_s14001a_interface =
-{
-	REGION_SOUND1				/* where to find the voice data */
-};
 
-static struct CustomSound_interface custom_interface =
-{
-	berzerk_sh_start
-};
 
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( berzerk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)        /* 2.5 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(berzerk_map,0)
-	MDRV_CPU_IO_MAP(port_map,0)
-	MDRV_CPU_VBLANK_INT(berzerk_interrupt,8)
+	MDRV_CPU_IO_MAP(berzerk_io_map,0)
 
+	MDRV_MACHINE_START(berzerk)
 	MDRV_MACHINE_RESET(berzerk)
+
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(2500)  /* Needs to be long enough so 2 of the 8 */)
-								/* interrupts fall inside the VBLANK */
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 32, 256-1)
-
-	MDRV_PALETTE_LENGTH(16)
-
-	MDRV_PALETTE_INIT(berzerk)
 	MDRV_VIDEO_START(berzerk)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(berzerk)
 
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MDRV_SOUND_ADD(S14001A, S14001A_CLOCK)	/* CPU clock divided by 16 divided by a programmable TTL setup */
-	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	/* audio hardware */
+	MDRV_IMPORT_FROM(berzerk_audio)
 
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( frenzy )
 
@@ -343,15 +801,16 @@ static MACHINE_DRIVER_START( frenzy )
 	MDRV_IMPORT_FROM(berzerk)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(frenzy_map,0)
+
 MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( berzerk )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -383,6 +842,7 @@ ROM_START( berzerk1 )
 	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )
 ROM_END
 
+
 ROM_START( frenzy )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1c-0",         0x0000, 0x1000, CRC(abdd25b8) SHA1(e6a3ab826b51b2c6ddd63d55681848fccad800dd) )
@@ -399,6 +859,7 @@ ROM_START( frenzy )
 	ROM_LOAD( "prom.6e",        0x0000, 0x0020, BAD_DUMP CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */ /* currently a copy of the moon war one, I suspect the real frenzy one is either the same or more likely has the first byte the same as the second byte */
 
 ROM_END
+
 
 /*
    The original / prototype version of moon war appears to run on Frenzy hardware, however the only board found
@@ -425,6 +886,13 @@ ROM_START( moonwarp )
 
 ROM_END
 
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
 
 GAME( 1980, berzerk,  0,       berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 1)", 0 )
 GAME( 1980, berzerk1, berzerk, berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 2)", 0 )

@@ -81,7 +81,7 @@ PALETTE_INIT( brkthru )
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	/* BG RAM format
         0         1
@@ -106,7 +106,7 @@ WRITE8_HANDLER( brkthru_bgram_w )
 }
 
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT8 code = brkthru_videoram[tile_index];
 	SET_TILE_INFO(0, code, 0, 0)

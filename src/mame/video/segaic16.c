@@ -804,27 +804,27 @@ void segaic16_draw_virtual_tilemap(struct tilemap_info *info, mame_bitmap *bitma
  *
  *******************************************************************************************/
 
-static void segaic16_tilemap_16a_tile_info(int tile_index)
+static TILE_GET_INFO( segaic16_tilemap_16a_tile_info )
 {
-	const struct tilemap_callback_info *info = tile_info.user_data;
+	const struct tilemap_callback_info *info = tileinfo->user_data;
 	UINT16 data = info->rambase[tile_index];
 	int code = ((data >> 1) & 0x1000) | (data & 0xfff);
 	int color = (data >> 5) & 0x7f;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tile_info.priority = (data >> 12) & 1;
+	tileinfo->priority = (data >> 12) & 1;
 }
 
 
-static void segaic16_tilemap_16a_text_info(int tile_index)
+static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
 {
-	const struct tilemap_callback_info *info = tile_info.user_data;
+	const struct tilemap_callback_info *info = tileinfo->user_data;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tile_info.priority = (data >> 11) & 1;
+	tileinfo->priority = (data >> 11) & 1;
 }
 
 
@@ -1016,9 +1016,9 @@ static void segaic16_tilemap_16a_draw_layer(struct tilemap_info *info, mame_bitm
  *
  *******************************************************************************************/
 
-static void segaic16_tilemap_16b_tile_info(int tile_index)
+static TILE_GET_INFO( segaic16_tilemap_16b_tile_info )
 {
-	const struct tilemap_callback_info *info = tile_info.user_data;
+	const struct tilemap_callback_info *info = tileinfo->user_data;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 6) & 0x7f;
 	int code = data & 0x1fff;
@@ -1026,26 +1026,26 @@ static void segaic16_tilemap_16b_tile_info(int tile_index)
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tile_info.priority = (data >> 15) & 1;
+	tileinfo->priority = (data >> 15) & 1;
 }
 
 
-static void segaic16_tilemap_16b_text_info(int tile_index)
+static TILE_GET_INFO( segaic16_tilemap_16b_text_info )
 {
-	const struct tilemap_callback_info *info = tile_info.user_data;
+	const struct tilemap_callback_info *info = tileinfo->user_data;
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 9) & 0x07;
 	int code = data & 0x1ff;
 
 	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
-	tile_info.priority = (data >> 15) & 1;
+	tileinfo->priority = (data >> 15) & 1;
 }
 
 
-static void segaic16_tilemap_16b_alt_tile_info(int tile_index)
+static TILE_GET_INFO( segaic16_tilemap_16b_alt_tile_info )
 {
-	const struct tilemap_callback_info *info = tile_info.user_data;
+	const struct tilemap_callback_info *info = tileinfo->user_data;
 	UINT16 data = info->rambase[tile_index];
 	int color = (data >> 5) & 0x7f;
 	int code = data & 0x1fff;
@@ -1053,20 +1053,20 @@ static void segaic16_tilemap_16b_alt_tile_info(int tile_index)
 	code = info->bank[code / info->banksize] * info->banksize + code % info->banksize;
 
 	SET_TILE_INFO(0, code, color, 0);
-	tile_info.priority = (data >> 15) & 1;
+	tileinfo->priority = (data >> 15) & 1;
 }
 
 
-static void segaic16_tilemap_16b_alt_text_info(int tile_index)
+static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 {
-	const struct tilemap_callback_info *info = tile_info.user_data;
+	const struct tilemap_callback_info *info = tileinfo->user_data;
 	UINT16 data = info->rambase[tile_index];
 	int bank = info->bank[0];
 	int color = (data >> 8) & 0x07;
 	int code = data & 0xff;
 
 	SET_TILE_INFO(0, bank * info->banksize + code, color, 0);
-	tile_info.priority = (data >> 15) & 1;
+	tileinfo->priority = (data >> 15) & 1;
 }
 
 
@@ -1200,8 +1200,8 @@ void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 int segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
-	void (*get_text_info)(int);
-	void (*get_tile_info)(int);
+	tile_get_info_fn get_text_info;
+	tile_get_info_fn get_tile_info;
 	int pagenum;
 	int i;
 

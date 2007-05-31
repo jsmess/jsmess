@@ -20,7 +20,7 @@ static int layer_colorbase[3],sprite_colorbase,zoom_colorbase;
 
 ***************************************************************************/
 
-static void tile_callback(int layer,int bank,int *code,int *color)
+static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
 	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
@@ -55,7 +55,7 @@ static void sprite_callback(int *code,int *color,int *priority,int *shadow)
 
 ***************************************************************************/
 
-static void zoom_callback(int *code,int *color)
+static void zoom_callback(int *code,int *color,int *flags)
 {
 	*code |= ((*color & 0x07) << 8);
 	*color = zoom_colorbase + ((*color & 0x08) >> 3);

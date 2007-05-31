@@ -42,7 +42,7 @@ WRITE16_HANDLER( alpha68k_paletteram_w )
 
 /******************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int tile  = videoram16[2*tile_index]   &0xff;
 	int color = videoram16[2*tile_index+1] &0x0f;

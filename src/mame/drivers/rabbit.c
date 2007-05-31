@@ -105,7 +105,7 @@ UINT32 *rabbit_spriteram;
 static tilemap *rabbit_tilemap[4];
 
 /* call with tilesize = 0 for 8x8 or 1 for 16x16 */
-INLINE void get_rabbit_tilemap_info(int whichtilemap, int tilesize, int tile_index)
+INLINE void get_rabbit_tilemap_info(running_machine *machine, tile_data *tileinfo, int tile_index, int whichtilemap, int tilesize)
 {
 	int tileno,colour,flipxy, depth;
 	int bank;
@@ -147,26 +147,26 @@ INLINE void get_rabbit_tilemap_info(int whichtilemap, int tilesize, int tile_ind
 	}
 }
 
-static void get_rabbit_tilemap0_tile_info(int tile_index)
+static TILE_GET_INFO( get_rabbit_tilemap0_tile_info )
 {
-	get_rabbit_tilemap_info(0,1,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,0,1);
 }
 
-static void get_rabbit_tilemap1_tile_info(int tile_index)
+static TILE_GET_INFO( get_rabbit_tilemap1_tile_info )
 {
-	get_rabbit_tilemap_info(1,1,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,1,1);
 }
 
-static void get_rabbit_tilemap2_tile_info(int tile_index)
+static TILE_GET_INFO( get_rabbit_tilemap2_tile_info )
 {
-	get_rabbit_tilemap_info(2,1,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,2,1);
 }
 
 /* some bad colours on life bars for this layer .. fix them ..
     (needs mask of 0x3f but this breaks other gfx..) */
-static void get_rabbit_tilemap3_tile_info(int tile_index)
+static TILE_GET_INFO( get_rabbit_tilemap3_tile_info )
 {
-	get_rabbit_tilemap_info(3,0,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
 }
 
 WRITE32_HANDLER( rabbit_tilemap0_w )
@@ -1103,24 +1103,24 @@ MACHINE_DRIVER_END
 
 
 
-static void get_tmmjprd_tilemap0_tile_info(int tile_index)
+static TILE_GET_INFO( get_tmmjprd_tilemap0_tile_info )
 {
-	get_rabbit_tilemap_info(0,0,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,0,0);
 }
 
-static void get_tmmjprd_tilemap1_tile_info(int tile_index)
+static TILE_GET_INFO( get_tmmjprd_tilemap1_tile_info )
 {
-	get_rabbit_tilemap_info(1,0,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,1,0);
 }
 
-static void get_tmmjprd_tilemap2_tile_info(int tile_index)
+static TILE_GET_INFO( get_tmmjprd_tilemap2_tile_info )
 {
-	get_rabbit_tilemap_info(2,0,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,2,0);
 }
 
-static void get_tmmjprd_tilemap3_tile_info(int tile_index)
+static TILE_GET_INFO( get_tmmjprd_tilemap3_tile_info )
 {
-	get_rabbit_tilemap_info(3,0,tile_index);
+	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
 }
 
 VIDEO_START(tmmjprd)

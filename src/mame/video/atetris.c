@@ -17,7 +17,7 @@ static tilemap *bg_tilemap;
  *
  *************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index * 2] | ((videoram[tile_index * 2 + 1] & 7) << 8);
 	int color = (videoram[tile_index * 2 + 1] & 0xf0) >> 4;

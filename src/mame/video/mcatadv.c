@@ -23,7 +23,7 @@ static UINT16 *spriteram_old, *vidregs_old;
 static int palette_bank1, palette_bank2;
 
 
-static void get_mcatadv_tile_info1(int tile_index)
+static TILE_GET_INFO( get_mcatadv_tile_info1 )
 {
 	int tileno, colour, pri;
 
@@ -32,7 +32,7 @@ static void get_mcatadv_tile_info1(int tile_index)
 	pri = (mcatadv_videoram1[tile_index*2] & 0xc000)>>14;
 
 	SET_TILE_INFO(0,tileno,colour + palette_bank1*0x40,0)
-	tile_info.priority = pri;
+	tileinfo->priority = pri;
 }
 
 WRITE16_HANDLER( mcatadv_videoram1_w )
@@ -44,7 +44,7 @@ WRITE16_HANDLER( mcatadv_videoram1_w )
 	}
 }
 
-static void get_mcatadv_tile_info2(int tile_index)
+static TILE_GET_INFO( get_mcatadv_tile_info2 )
 {
 	int tileno, colour, pri;
 
@@ -53,7 +53,7 @@ static void get_mcatadv_tile_info2(int tile_index)
 	pri = (mcatadv_videoram2[tile_index*2] & 0xc000)>>14;
 
 	SET_TILE_INFO(1,tileno,colour + palette_bank2*0x40,0)
-	tile_info.priority = pri;
+	tileinfo->priority = pri;
 }
 
 WRITE16_HANDLER( mcatadv_videoram2_w )

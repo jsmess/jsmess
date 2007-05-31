@@ -16,7 +16,7 @@
  *
  *************************************/
 
-static void get_playfield_tile_info(int tile_index)
+static TILE_GET_INFO( get_playfield_tile_info )
 {
 	UINT16 data1 = atarigen_playfield[tile_index];
 	UINT16 data2 = atarigen_playfield_upper[tile_index] >> 8;

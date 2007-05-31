@@ -40,7 +40,7 @@ static UINT32 fix_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (row & 0x1f) + ((31-(col &0x1f))<<5);
 }
 
-static void get_back_tile_info( int tile_index )
+static TILE_GET_INFO( get_back_tile_info )
 {
 	const UINT8 *RAM = memory_region(REGION_USER1);
 	int tile,bank;
@@ -63,7 +63,7 @@ static void get_back_tile_info( int tile_index )
 	SET_TILE_INFO(bank,tile&0x7f,background_color,0)
 }
 
-static void get_fix_tile_info( int tile_index )
+static TILE_GET_INFO( get_fix_tile_info )
 {
 	int tile,color;
 

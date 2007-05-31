@@ -155,7 +155,7 @@ PALETTE_INIT( suprmous )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 fore_color;
 
@@ -178,7 +178,7 @@ static void get_tile_info(int tile_index)
 	}
 
 	SET_TILE_INFO(2 * graphics_bank, code, fore_color, 0);
-	tile_info.priority = priority;
+	tileinfo->priority = priority;
 }
 
 

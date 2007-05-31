@@ -126,7 +126,7 @@ READ8_HANDLER( mermaid_collision_r )
 	return 0;	// not implemented
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = mermaid_videoram2[tile_index];
 	int sx = tile_index % 32;
@@ -135,7 +135,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(2, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0x30) << 4);

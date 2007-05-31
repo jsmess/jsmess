@@ -237,7 +237,7 @@ PALETTE_INIT( korokoro )
 
 ***************************************************************************/
 
-INLINE void get_tile_info(int GFX, UINT16 *VRAM, int TDIM, int tile_index)
+INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, int GFX, UINT16 *VRAM, int TDIM)
 {
 	UINT32 code, color, pri, tile;
 
@@ -269,7 +269,7 @@ INLINE void get_tile_info(int GFX, UINT16 *VRAM, int TDIM, int tile_index)
 							code,
 							color,
 							0	);
-	tile_info.priority	=	pri;
+	tileinfo->priority	=	pri;
 }
 
 /* Sailormn: the lower 2 Megabytes of tiles banked */
@@ -285,7 +285,7 @@ void sailormn_tilebank_w( int bank )
 	}
 }
 
-void sailormn_get_tile_info_2(int tile_index)
+TILE_GET_INFO( sailormn_get_tile_info_2 )
 {
 	UINT32 code, color, pri;
 
@@ -320,7 +320,7 @@ void sailormn_get_tile_info_2(int tile_index)
 							code,
 							color,
 							0	);
-	tile_info.priority	=	pri;
+	tileinfo->priority	=	pri;
 }
 
 
@@ -355,10 +355,10 @@ INLINE void vram_8x8_w(UINT16 *VRAM, tilemap *TILEMAP,ATTR_UNUSED offs_t offset,
 	tilemap_mark_tile_dirty(TILEMAP,offset/2);
 }
 
-static void get_tile_info_0(int tile_index)	{ get_tile_info(0, cave_vram_0, tiledim_0, tile_index); }
-static void get_tile_info_1(int tile_index)	{ get_tile_info(1, cave_vram_1, tiledim_1, tile_index); }
-static void get_tile_info_2(int tile_index)	{ get_tile_info(2, cave_vram_2, tiledim_2, tile_index); }
-static void get_tile_info_3(int tile_index)	{ get_tile_info(3, cave_vram_3, tiledim_3, tile_index); }
+static TILE_GET_INFO( get_tile_info_0 )	{ get_tile_info(machine, tileinfo, tile_index, 0, cave_vram_0, tiledim_0 ); }
+static TILE_GET_INFO( get_tile_info_1 )	{ get_tile_info(machine, tileinfo, tile_index, 1, cave_vram_1, tiledim_1 ); }
+static TILE_GET_INFO( get_tile_info_2 )	{ get_tile_info(machine, tileinfo, tile_index, 2, cave_vram_2, tiledim_2 ); }
+static TILE_GET_INFO( get_tile_info_3 )	{ get_tile_info(machine, tileinfo, tile_index, 3, cave_vram_3, tiledim_3 ); }
 
 WRITE16_HANDLER( cave_vram_0_w )		{ vram_w    (cave_vram_0, tilemap_0, offset, data, mem_mask); }
 WRITE16_HANDLER( cave_vram_0_8x8_w )	{ vram_8x8_w(cave_vram_0, tilemap_0, offset, data, mem_mask); }

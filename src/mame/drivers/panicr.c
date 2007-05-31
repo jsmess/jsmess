@@ -102,7 +102,7 @@ PALETTE_INIT( panicr )
 	}
 }
 
-static void get_bgtile_info(int tile_index)
+static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr;
 
@@ -116,7 +116,7 @@ static void get_bgtile_info(int tile_index)
         0)
 }
 
-static void get_txttile_info(int tile_index)
+static TILE_GET_INFO( get_txttile_info )
 {
 	int code,attr;
 

@@ -11,7 +11,7 @@ static tilemap *tx_tilemap, *fg_tilemap, *bg_tilemap;
 
 /* tilemaps */
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int code = pirates_tx_tileram[tile_index*2];
 	int colr = pirates_tx_tileram[tile_index*2+1];
@@ -19,7 +19,7 @@ static void get_tx_tile_info(int tile_index)
 	SET_TILE_INFO(0,code,colr,0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = pirates_fg_tileram[tile_index*2];
 	int colr = pirates_fg_tileram[tile_index*2+1]+0x80;
@@ -27,7 +27,7 @@ static void get_fg_tile_info(int tile_index)
 	SET_TILE_INFO(0,code,colr,0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = pirates_bg_tileram[tile_index*2];
 	int colr = pirates_bg_tileram[tile_index*2+1]+ 0x100;

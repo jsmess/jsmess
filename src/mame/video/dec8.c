@@ -456,13 +456,13 @@ VIDEO_UPDATE( cobracom )
 
 /******************************************************************************/
 
-static void get_bac0_tile_info( int tile_index )
+static TILE_GET_INFO( get_bac0_tile_info )
 {
 	int tile,color,offs=tile_index<<1;
 
 	tile=(dec8_pf0_data[offs]<<8) | dec8_pf0_data[offs+1];
 	color=tile >> 12;
-	if (color>7 && game_uses_priority) tile_info.priority=1; else tile_info.priority=0;
+	if (color>7 && game_uses_priority) tileinfo->priority=1; else tileinfo->priority=0;
 
 	SET_TILE_INFO(
 			2,
@@ -471,13 +471,13 @@ static void get_bac0_tile_info( int tile_index )
 			0)
 }
 
-static void get_bac1_tile_info( int tile_index )
+static TILE_GET_INFO( get_bac1_tile_info )
 {
 	int tile,color,offs=tile_index<<1;
 
 	tile=(dec8_pf1_data[offs]<<8) | dec8_pf1_data[offs+1];
 	color=tile >> 12;
-	if (color>7 && game_uses_priority) tile_info.priority=1; else tile_info.priority=0;
+	if (color>7 && game_uses_priority) tileinfo->priority=1; else tileinfo->priority=0;
 
 	SET_TILE_INFO(
 			3,
@@ -492,7 +492,7 @@ static UINT32 bac0_scan_rows(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_ro
 	return ((col & 0x0f) + ((row & 0x0f) << 4)) + ((col & 0x10) << 5) + ((row & 0x10) << 4);
 }
 
-static void get_cobracom_fix_tile_info( int tile_index )
+static TILE_GET_INFO( get_cobracom_fix_tile_info )
 {
 	int offs=tile_index<<1;
 	int tile=videoram[offs+1]+(videoram[offs]<<8);
@@ -542,7 +542,7 @@ VIDEO_UPDATE( ghostb )
 	return 0;
 }
 
-static void get_ghostb_fix_tile_info( int tile_index )
+static TILE_GET_INFO( get_ghostb_fix_tile_info )
 {
 	int offs=tile_index<<1;
 	int tile=videoram[offs+1]+(videoram[offs]<<8);
@@ -584,7 +584,7 @@ VIDEO_UPDATE( oscar )
 	return 0;
 }
 
-static void get_oscar_fix_tile_info( int tile_index )
+static TILE_GET_INFO( get_oscar_fix_tile_info )
 {
 	int offs=tile_index<<1;
 	int tile=videoram[offs+1]+(videoram[offs]<<8);
@@ -644,13 +644,13 @@ static UINT32 lastmiss_scan_rows(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 nu
 	return ((col & 0x0f) + ((row & 0x0f) << 4)) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static void get_lastmiss_tile_info( int tile_index )
+static TILE_GET_INFO( get_lastmiss_tile_info )
 {
 	int offs=tile_index*2;
 	int tile=dec8_pf0_data[offs+1]+(dec8_pf0_data[offs]<<8);
 	int color=tile >> 12;
 
-	if (color>7 && game_uses_priority) tile_info.priority=1; else tile_info.priority=0;
+	if (color>7 && game_uses_priority) tileinfo->priority=1; else tileinfo->priority=0;
 
 	SET_TILE_INFO(
 			2,
@@ -659,7 +659,7 @@ static void get_lastmiss_tile_info( int tile_index )
 			0)
 }
 
-static void get_lastmiss_fix_tile_info( int tile_index )
+static TILE_GET_INFO( get_lastmiss_fix_tile_info )
 {
 	int offs=tile_index<<1;
 	int tile=videoram[offs+1]+(videoram[offs]<<8);
@@ -709,12 +709,12 @@ VIDEO_UPDATE( srdarwin )
 	return 0;
 }
 
-static void get_srdarwin_fix_tile_info( int tile_index )
+static TILE_GET_INFO( get_srdarwin_fix_tile_info )
 {
 	int tile=videoram[tile_index];
 	int color=0; /* ? */
 
-	if (color>1) tile_info.priority=1; else tile_info.priority=0;
+	if (color>1) tileinfo->priority=1; else tileinfo->priority=0;
 
 	SET_TILE_INFO(
 			0,
@@ -724,7 +724,7 @@ static void get_srdarwin_fix_tile_info( int tile_index )
 }
 
 //AT: improved priority and fixed stage 4+ crashes caused by bank overflow
-static void get_srdarwin_tile_info(int tile_index)
+static TILE_GET_INFO( get_srdarwin_tile_info )
 {
 	int tile=dec8_pf0_data[2*tile_index+1]+(dec8_pf0_data[2*tile_index]<<8);
 	int color=tile >> 12 & 3;
@@ -782,7 +782,7 @@ VIDEO_UPDATE( garyoret )
 	return 0;
 }
 
-static void get_gondo_fix_tile_info( int tile_index )
+static TILE_GET_INFO( get_gondo_fix_tile_info )
 {
 	int offs=tile_index*2;
 	int tile=videoram[offs+1]+(videoram[offs]<<8);
@@ -795,13 +795,13 @@ static void get_gondo_fix_tile_info( int tile_index )
 			0)
 }
 
-static void get_gondo_tile_info( int tile_index )
+static TILE_GET_INFO( get_gondo_tile_info )
 {
 	int offs=tile_index*2;
 	int tile=dec8_pf0_data[offs+1]+(dec8_pf0_data[offs]<<8);
 	int color=tile>> 12;
 
-	if (color>7 && game_uses_priority) tile_info.priority=1; else tile_info.priority=0;
+	if (color>7 && game_uses_priority) tileinfo->priority=1; else tileinfo->priority=0;
 
 	SET_TILE_INFO(
 			2,

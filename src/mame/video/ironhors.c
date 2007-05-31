@@ -147,7 +147,7 @@ WRITE8_HANDLER( ironhors_flipscreen_w )
 	/* other bits are used too, but unknown */
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x40) << 2) +
 		((colorram[tile_index] & 0x20) << 4) + (charbank << 10);

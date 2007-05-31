@@ -8,7 +8,7 @@
         * Beam Invader (2 sets)
 
     Known issues:
-        * Port 0 might be a analog port select
+        * Port 0 might be an analog port select
 
 
 Stephh's notes (based on the games Z80 code and some tests) :
@@ -54,6 +54,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "driver.h"
 
 
+static UINT8 *beaminv_videoram;
+static size_t beaminv_videoram_size;
 static UINT8 controller_select;
 
 
@@ -66,36 +68,38 @@ static UINT8 controller_select;
 
 /* the interrupt scanlines are a guess */
 
+#define INTERRUPTS_PER_FRAME	(2)
+
+static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
+
 static mame_timer *interrupt_timer;
 
 
-static void beaminv_interrupt_callback(int param)
+static void interrupt_callback(int interrupt_number)
 {
-	int vpos = video_screen_get_vpos(0);
+	int next_interrupt_number;
+	int next_vpos;
 
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 
 	/* set up for next interrupt */
-	vpos = (vpos == 0x00) ? 0x80 : 0x00;
+	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
+	next_vpos = interrupt_lines[next_interrupt_number];
+
+	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_interrupt_number, time_zero);
+}
+
+
+static void create_interrupt_timer(void)
+{
+	interrupt_timer = mame_timer_alloc(interrupt_callback);
+}
+
+
+static void start_interrupt_timer(void)
+{
+	int vpos = interrupt_lines[0];
 	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, time_zero);
-}
-
-
-static void beaminv_create_interrupt_timer(void)
-{
-	interrupt_timer = mame_timer_alloc(beaminv_interrupt_callback);
-}
-
-
-static void beaminv_start_interrupt_timer(void)
-{
-	mame_timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
-}
-
-
-static READ8_HANDLER( beaminv_v128_r )
-{
-	return (video_screen_get_vpos(0) >> 7) & 0x01;
 }
 
 
@@ -108,7 +112,7 @@ static READ8_HANDLER( beaminv_v128_r )
 
 static MACHINE_START( beaminv )
 {
-	beaminv_create_interrupt_timer();
+	create_interrupt_timer();
 
 	/* setup for save states */
 	state_save_register_global(controller_select);
@@ -126,7 +130,7 @@ static MACHINE_START( beaminv )
 
 static MACHINE_RESET( beaminv )
 {
-	beaminv_start_interrupt_timer();
+	start_interrupt_timer();
 }
 
 
@@ -137,25 +141,35 @@ static MACHINE_RESET( beaminv )
  *
  *************************************/
 
-static WRITE8_HANDLER( beaminv_videoram_w )
+static VIDEO_UPDATE( beaminv )
 {
-	UINT8 x,y;
-	int i;
+	offs_t offs;
 
-
-	videoram[offset] = data;
-
-	y = ~(offset >> 8 << 3);
-	x = offset;
-
-	for (i = 0; i < 8; i++)
+	for (offs = 0; offs < beaminv_videoram_size; offs++)
 	{
-		pen_t pen = (data & 0x01) ? RGB_WHITE : RGB_BLACK;
-		*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
+		int i;
 
-		y--;
-		data >>= 1;
+		UINT8 y = offs;
+		UINT8 x = offs >> 8 << 3;
+		UINT8 data = beaminv_videoram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x01) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			data = data >> 1;
+			x = x + 1;
+		}
 	}
+
+	return 0;
+}
+
+
+static READ8_HANDLER( v128_r )
+{
+	return (video_screen_get_vpos(0) >> 7) & 0x01;
 }
 
 
@@ -170,14 +184,14 @@ static WRITE8_HANDLER( beaminv_videoram_w )
 #define P2_CONTROL_PORT_TAG	("CONTP2")
 
 
-static WRITE8_HANDLER( beaminv_controller_select_w )
+static WRITE8_HANDLER( controller_select_w )
 {
 	/* 0x01 (player 1) or 0x02 (player 2) */
 	controller_select = data;
 }
 
 
-static READ8_HANDLER( beaminv_controller_r )
+static READ8_HANDLER( controller_r )
 {
 	return readinputportbytag((controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
 }
@@ -190,20 +204,14 @@ static READ8_HANDLER( beaminv_controller_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2400, 0x2400) AM_READ(input_port_0_r)
-	AM_RANGE(0x2800, 0x28ff) AM_READ(input_port_1_r)
-	AM_RANGE(0x3400, 0x3400) AM_READ(beaminv_controller_r)
-	AM_RANGE(0x3800, 0x3800) AM_READ(beaminv_v128_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(beaminv_videoram_w) AM_BASE(&videoram)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_ROM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM
+	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_READ(input_port_0_r)
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ(input_port_1_r)
+	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(controller_r)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ(v128_r)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&beaminv_videoram) AM_SIZE(&beaminv_videoram_size)
 ADDRESS_MAP_END
 
 
@@ -214,9 +222,9 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(beaminv_controller_select_w) /* to be confirmed */
+	AM_RANGE(0x00, 0x00) AM_WRITE(controller_select_w) /* to be confirmed */
 ADDRESS_MAP_END
 
 
@@ -227,7 +235,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( beaminv )
+static INPUT_PORTS_START( beaminv )
 	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -254,10 +262,6 @@ INPUT_PORTS_START( beaminv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START_TAG("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(beaminv_v128_r, 0)
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG(P1_CONTROL_PORT_TAG)
 	PORT_BIT( 0xff, 0x65, IPT_PADDLE ) PORT_MINMAX(0x35,0x95) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(1)
@@ -314,21 +318,22 @@ static MACHINE_DRIVER_START( beaminv )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 2000000)	/* 2 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(0,writeport)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(main_io_map,0)
 
 	MDRV_MACHINE_START(beaminv)
 	MDRV_MACHINE_RESET(beaminv)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_UPDATE(beaminv)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(16, 223, 16, 247)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_SCREEN_VISIBLE_AREA(0, 247, 16, 231)
+	MDRV_SCREEN_REFRESH_RATE(60)
+
 MACHINE_DRIVER_END
 
 
@@ -349,6 +354,7 @@ ROM_START( beaminv )
 	ROM_LOAD( "5a", 0x1400, 0x0400, CRC(ec08bc1f) SHA1(e1df6704298e470a77158740c275fdca105e8f69) )
 ROM_END
 
+
 ROM_START( beaminva )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rom_0", 0x0000, 0x0400, CRC(67e100dd) SHA1(5f58e2ed3da14c48f7c382ee6091a59caf8e0609) )
@@ -367,5 +373,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 19??, beaminv,  0,       beaminv, beaminv,  0, ROT0, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT0, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE) // what's the real title ?
+GAME( 19??, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT270, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE) // what's the real title ?

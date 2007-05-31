@@ -19,7 +19,7 @@ int wgp_piv_xoffs,wgp_piv_yoffs;
 
 /*******************************************************************/
 
-static void common_get_piv_tile_info(int num,int tile_index)
+INLINE void common_get_piv_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int num)
 {
 	UINT16 tilenum  = wgp_pivram[tile_index + num*0x1000];	/* 3 blocks of $2000 */
 	UINT16 attr = wgp_pivram[tile_index + num*0x1000 + 0x8000];	/* 3 blocks of $2000 */
@@ -31,19 +31,19 @@ static void common_get_piv_tile_info(int num,int tile_index)
 			TILE_FLIPYX( (attr & 0xc0) >> 6))
 }
 
-static void get_piv0_tile_info(int tile_index)
+static TILE_GET_INFO( get_piv0_tile_info )
 {
-	common_get_piv_tile_info(0,tile_index);
+	common_get_piv_tile_info(machine,tileinfo,tile_index,0);
 }
 
-static void get_piv1_tile_info(int tile_index)
+static TILE_GET_INFO( get_piv1_tile_info )
 {
-	common_get_piv_tile_info(1,tile_index);
+	common_get_piv_tile_info(machine,tileinfo,tile_index,1);
 }
 
-static void get_piv2_tile_info(int tile_index)
+static TILE_GET_INFO( get_piv2_tile_info )
 {
-	common_get_piv_tile_info(2,tile_index);
+	common_get_piv_tile_info(machine,tileinfo,tile_index,2);
 }
 
 static void dirty_piv_tilemaps(void)

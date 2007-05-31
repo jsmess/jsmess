@@ -62,7 +62,7 @@ static void mystwarr_rest_orig_tiles(void)
 
 
 // Mystic Warriors requires tile based blending.
-static void mystwarr_tile_callback(int layer, int *code, int *color)
+static void mystwarr_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	if (layer==1) {if ((*code&0xff00)+(*color)==0x4101) cbparam++; else cbparam--;} //* water hack (TEMPORARY)
 
@@ -70,13 +70,13 @@ static void mystwarr_tile_callback(int layer, int *code, int *color)
 }
 
 // for games with 5bpp tile data
-static void game5bpp_tile_callback(int layer, int *code, int *color)
+static void game5bpp_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = layer_colorbase[layer] | (*color>>1 & 0x1f);
 }
 
 // for games with 4bpp tile data
-static void game4bpp_tile_callback(int layer, int *code, int *color)
+static void game4bpp_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = layer_colorbase[layer] | (*color>>2 & 0x0f);
 }
@@ -135,7 +135,7 @@ static void martchmp_sprite_callback(int *code, int *color, int *priority)
 
 
 
-static void get_gai_936_tile_info(int tile_index)
+static TILE_GET_INFO( get_gai_936_tile_info )
 {
 	int tileno, colour;
 	unsigned char *ROM = memory_region(REGION_GFX4);
@@ -192,7 +192,7 @@ VIDEO_START(gaiapols)
 	return 0;
 }
 
-static void get_ult_936_tile_info(int tile_index)
+static TILE_GET_INFO( get_ult_936_tile_info )
 {
 	int tileno, colour;
 	unsigned char *ROM = memory_region(REGION_GFX4);

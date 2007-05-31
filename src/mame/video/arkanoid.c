@@ -66,7 +66,7 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	/* bit 7 is unknown */
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int code = videoram[offs + 1] + ((videoram[offs] & 0x07) << 8) + 2048 * gfxbank;

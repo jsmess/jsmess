@@ -176,7 +176,7 @@ PALETTE_INIT( dday )
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code;
 
@@ -184,7 +184,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, code >> 5, 0);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code, flipx;
 
@@ -193,7 +193,7 @@ static void get_fg_tile_info(int tile_index)
 	SET_TILE_INFO(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int code;
 
@@ -201,7 +201,7 @@ static void get_text_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, code >> 5, 0)
 }
 
-static void get_sl_tile_info(int tile_index)
+static TILE_GET_INFO( get_sl_tile_info )
 {
 	int code, sl_flipx, flipx;
 	UINT8* sl_map;

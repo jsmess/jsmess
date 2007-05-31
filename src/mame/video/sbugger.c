@@ -6,7 +6,7 @@ extern UINT8* sbugger_videoram, *sbugger_videoram_attr;
 
 static tilemap *sbugger_tilemap;
 
-static void get_sbugger_tile_info(int tile_index)
+static TILE_GET_INFO( get_sbugger_tile_info )
 {
 	int tileno, color;
 

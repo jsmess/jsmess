@@ -111,7 +111,7 @@ static int bank_mask = 1;
   Callbacks for the tilemap code
 ***************************************************************************/
 
-static void get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg0_tile_info )
 {
 	int color, tile, hi, lo;
 
@@ -127,10 +127,10 @@ static void get_bg0_tile_info(int tile_index)
 			tile,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	int color, tile, hi, lo;
 
@@ -146,10 +146,10 @@ static void get_bg1_tile_info(int tile_index)
 			tile,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int color, tile, hi, lo;
 
@@ -165,10 +165,10 @@ static void get_bg2_tile_info(int tile_index)
 			tile,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
-static void robokid_get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( robokid_get_bg0_tile_info )
 {
 	int color, tile, hi, lo;
 
@@ -184,10 +184,10 @@ static void robokid_get_bg0_tile_info(int tile_index)
 			tile,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
-static void robokid_get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( robokid_get_bg1_tile_info )
 {
 	int color, tile, hi, lo;
 
@@ -203,10 +203,10 @@ static void robokid_get_bg1_tile_info(int tile_index)
 			tile,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
-static void robokid_get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( robokid_get_bg2_tile_info )
 {
 	int color, tile, hi, lo;
 
@@ -222,10 +222,10 @@ static void robokid_get_bg2_tile_info(int tile_index)
 			tile,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int color, tile, hi, lo;
 
@@ -239,7 +239,7 @@ static void get_fg_tile_info(int tile_index)
 			tile,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
 

@@ -416,7 +416,7 @@ static void sprite_draw(mame_bitmap *bitmap, const rectangle *cliprect)
                 [ Frontmost (text) layer + video registers ]
 ------------------------------------------------------------------------*/
 
-void wecleman_get_txt_tile_info( int tile_index )
+TILE_GET_INFO( wecleman_get_txt_tile_info )
 {
 	int code = wecleman_txtram[tile_index];
 	SET_TILE_INFO(PAGE_GFX, code&0xfff, (code>>5&0x78)+(code>>12), 0)
@@ -462,7 +462,7 @@ WRITE16_HANDLER( wecleman_txtram_w )
                             [ Background ]
 ------------------------------------------------------------------------*/
 
-void wecleman_get_bg_tile_info( int tile_index )
+TILE_GET_INFO( wecleman_get_bg_tile_info )
 {
 	int page = wecleman_bgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = wecleman_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
@@ -474,7 +474,7 @@ void wecleman_get_bg_tile_info( int tile_index )
                             [ Foreground ]
 ------------------------------------------------------------------------*/
 
-void wecleman_get_fg_tile_info( int tile_index )
+TILE_GET_INFO( wecleman_get_fg_tile_info )
 {
 	int page = wecleman_fgpage[((tile_index&0x7f)>>6) + ((tile_index>>12)<<1)];
 	int code = wecleman_pageram[(tile_index&0x3f) + ((tile_index>>7&0x1f)<<6) + (page<<11)];
@@ -963,13 +963,13 @@ VIDEO_START( wecleman )
 #define ZOOMROM0_MEM_REGION REGION_GFX2
 #define ZOOMROM1_MEM_REGION REGION_GFX3
 
-static void zoom_callback_0(int *code,int *color)
+static void zoom_callback_0(int *code,int *color,int *flags)
 {
 	*code |= (*color & 0x03) << 8;
 	*color = (*color & 0xfc) >> 2;
 }
 
-static void zoom_callback_1(int *code,int *color)
+static void zoom_callback_1(int *code,int *color,int *flags)
 {
 	*code |= (*color & 0x01) << 8;
 	*color = ((*color & 0x3f) << 1) | ((*code & 0x80) >> 7);

@@ -31,7 +31,7 @@ static UINT32 bg4x8_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x30) << 4) + ((row & 0x70) << 6);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	/* the tile priority table is a guess compiled by looking at the game. It
        was not derived from a PROM so it could be wrong. */
@@ -51,7 +51,7 @@ static void get_bg_tile_info(int tile_index)
 			TILE_SPLIT(split_table[color]) | ((attr & 0x80) ? TILE_FLIPX : 0))
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	unsigned char attr = blktiger_txvideoram[tile_index + 0x400];
 	SET_TILE_INFO(

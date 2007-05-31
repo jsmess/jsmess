@@ -45,7 +45,7 @@ static void video_cleanup(running_machine *machine)
 		render_texture_free(overlay_texture);
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int tile = videoram[tile_index];
 

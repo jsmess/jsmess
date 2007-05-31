@@ -114,7 +114,7 @@ static void ar_coin_hack(void)
 	}
 }
 
-static void get_cstx_tile_info(int tile_index)
+static TILE_GET_INFO( get_cstx_tile_info )
 {
 	int code = (cshooter_txram[tile_index*2]);
 	int attr = (cshooter_txram[tile_index*2+1]);

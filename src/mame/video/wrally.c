@@ -39,7 +39,7 @@ extern UINT16 *wrally_encr_table[2];
 */
 
 
-static void get_tile_info_wrally_screen0(int tile_index)
+static TILE_GET_INFO( get_tile_info_wrally_screen0 )
 {
 	int data = wrally_videoram[tile_index << 1];
 	int data2 = wrally_videoram[(tile_index << 1) + 1];
@@ -48,7 +48,7 @@ static void get_tile_info_wrally_screen0(int tile_index)
 	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x00))
 }
 
-static void get_tile_info_wrally_screen1(int tile_index)
+static TILE_GET_INFO( get_tile_info_wrally_screen1 )
 {
 	int data = wrally_videoram[(0x2000/2) + (tile_index << 1)];
 	int data2 = wrally_videoram[(0x2000/2) + (tile_index << 1) + 1];

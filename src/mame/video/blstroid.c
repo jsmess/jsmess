@@ -26,7 +26,7 @@ UINT16 *blstroid_priorityram;
  *
  *************************************/
 
-static void get_playfield_tile_info(int tile_index)
+static TILE_GET_INFO( get_playfield_tile_info )
 {
 	UINT16 data = atarigen_playfield[tile_index];
 	int code = data & 0x1fff;

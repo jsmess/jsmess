@@ -95,7 +95,7 @@ PALETTE_INIT( 1942 )
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code, color;
 
@@ -108,7 +108,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code, color;
 

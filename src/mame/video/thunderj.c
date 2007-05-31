@@ -26,7 +26,7 @@ UINT8 thunderj_alpha_tile_bank;
  *
  *************************************/
 
-static void get_alpha_tile_info(int tile_index)
+static TILE_GET_INFO( get_alpha_tile_info )
 {
 	UINT16 data = atarigen_alpha[tile_index];
 	int code = ((data & 0x200) ? (thunderj_alpha_tile_bank * 0x200) : 0) + (data & 0x1ff);
@@ -36,25 +36,25 @@ static void get_alpha_tile_info(int tile_index)
 }
 
 
-static void get_playfield_tile_info(int tile_index)
+static TILE_GET_INFO( get_playfield_tile_info )
 {
 	UINT16 data1 = atarigen_playfield[tile_index];
 	UINT16 data2 = atarigen_playfield_upper[tile_index] & 0xff;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
-	tile_info.priority = (data2 >> 4) & 3;
+	tileinfo->priority = (data2 >> 4) & 3;
 }
 
 
-static void get_playfield2_tile_info(int tile_index)
+static TILE_GET_INFO( get_playfield2_tile_info )
 {
 	UINT16 data1 = atarigen_playfield2[tile_index];
 	UINT16 data2 = atarigen_playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
-	tile_info.priority = (data2 >> 4) & 3;
+	tileinfo->priority = (data2 >> 4) & 3;
 }
 
 

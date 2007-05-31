@@ -63,7 +63,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-static void get_mugsmash_tile_info1(int tile_index)
+static TILE_GET_INFO( get_mugsmash_tile_info1 )
 {
 
 	/* fF-- cccc  nnnn nnnn */
@@ -92,7 +92,7 @@ WRITE16_HANDLER( mugsmash_videoram1_w )
 	}
 }
 
-static void get_mugsmash_tile_info2(int tile_index)
+static TILE_GET_INFO( get_mugsmash_tile_info2 )
 {
 
 	/* fF-- cccc  nnnn nnnn */

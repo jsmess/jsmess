@@ -36,7 +36,7 @@ PALETTE_INIT( ultratnk )
 }
 
 
-static void ultratnk_tile_info(int tile_index)
+static TILE_GET_INFO( ultratnk_tile_info )
 {
 	UINT8 code = videoram[tile_index];
 

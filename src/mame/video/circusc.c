@@ -86,10 +86,10 @@ PALETTE_INIT( circusc )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	unsigned char attr = circusc_colorram[tile_index];
-	tile_info.priority = (attr & 0x10) >> 4;
+	tileinfo->priority = (attr & 0x10) >> 4;
 	SET_TILE_INFO(
 			0,
 			circusc_videoram[tile_index] + ((attr & 0x20) << 3),

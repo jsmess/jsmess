@@ -31,19 +31,19 @@ UINT16 *bbuster_pf1_data,*bbuster_pf2_data,*bbuster_pf1_scroll_data,*bbuster_pf2
 
 /******************************************************************************/
 
-static void get_bbuster_tile_info( int tile_index )
+static TILE_GET_INFO( get_bbuster_tile_info )
 {
 	UINT16 tile=videoram16[tile_index];
 	SET_TILE_INFO(0,tile&0xfff,tile>>12,0)
 }
 
-static void get_pf1_tile_info( int tile_index )
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	UINT16 tile=bbuster_pf1_data[tile_index];
 	SET_TILE_INFO(3,tile&0xfff,tile>>12,0)
 }
 
-static void get_pf2_tile_info( int tile_index )
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	UINT16 tile=bbuster_pf2_data[tile_index];
 	SET_TILE_INFO(4,tile&0xfff,tile>>12,0)

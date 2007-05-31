@@ -601,7 +601,7 @@ INPUT_PORTS_END
 
 
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	int attr = phrcraze_attr[tile_index];
 	int region = (attr & 0x40) >> 6;

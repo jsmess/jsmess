@@ -36,7 +36,7 @@ static tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap;
 static int flipscreen;
 
 
-static void get_ms32_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_ms32_tx_tile_info )
 {
 	int tileno, colour;
 
@@ -46,7 +46,7 @@ static void get_ms32_tx_tile_info(int tile_index)
 	SET_TILE_INFO(3,tileno,colour,0)
 }
 
-static void get_ms32_roz_tile_info(int tile_index)
+static TILE_GET_INFO( get_ms32_roz_tile_info )
 {
 	int tileno,colour;
 
@@ -56,7 +56,7 @@ static void get_ms32_roz_tile_info(int tile_index)
 	SET_TILE_INFO(1,tileno,colour,0)
 }
 
-static void get_ms32_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_ms32_bg_tile_info )
 {
 	int tileno,colour;
 

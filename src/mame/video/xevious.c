@@ -183,7 +183,7 @@ PALETTE_INIT( battles )
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	unsigned char attr = xevious_fg_colorram[tile_index];
 
@@ -199,7 +199,7 @@ static void get_fg_tile_info(int tile_index)
 			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen ? TILE_FLIPX : 0))
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char code = xevious_bg_videoram[tile_index];
 	unsigned char attr = xevious_bg_colorram[tile_index];

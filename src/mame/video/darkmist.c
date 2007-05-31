@@ -16,7 +16,7 @@ static int spritebank;
 
 static tilemap *bgtilemap, *fgtilemap, *txtilemap;
 
-static void get_bgtile_info(int tile_index)
+static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr,pal;
 
@@ -32,7 +32,7 @@ static void get_bgtile_info(int tile_index)
         0)
 }
 
-static void get_fgtile_info(int tile_index)
+static TILE_GET_INFO( get_fgtile_info )
 {
 	int code,attr,pal;
 
@@ -53,7 +53,7 @@ static void get_fgtile_info(int tile_index)
         0)
 }
 
-static void get_txttile_info(int tile_index)
+static TILE_GET_INFO( get_txttile_info )
 {
 	int code,attr,pal;
 

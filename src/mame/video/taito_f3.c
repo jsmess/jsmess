@@ -438,7 +438,7 @@ static void print_debug_info(mame_bitmap *bitmap)
 
 /******************************************************************************/
 
-INLINE void get_tile_info(int tile_index, UINT32 *gfx_base)
+INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT32 *gfx_base)
 {
 	UINT32 tile=gfx_base[tile_index];
 	UINT8 abtype=(tile>>(16+9))&0x1f;
@@ -448,52 +448,53 @@ INLINE void get_tile_info(int tile_index, UINT32 *gfx_base)
 			tile&0xffff,
 			(tile>>16)&0x1ff,
 			TILE_FLIPYX( tile >> 30 ))
-	tile_info.priority =  abtype&1;		/* alpha blending type */
+	tileinfo->priority =  abtype&1;		/* alpha blending type */
 }
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
-	get_tile_info(tile_index,f3_pf_data_1);
+	get_tile_info(machine,tileinfo,tile_index,f3_pf_data_1);
 }
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
-	get_tile_info(tile_index,f3_pf_data_2);
+	get_tile_info(machine,tileinfo,tile_index,f3_pf_data_2);
 }
 
-static void get_tile_info3(int tile_index)
+static TILE_GET_INFO( get_tile_info3 )
 {
-	get_tile_info(tile_index,f3_pf_data_3);
+	get_tile_info(machine,tileinfo,tile_index,f3_pf_data_3);
 }
 
-static void get_tile_info4(int tile_index)
+static TILE_GET_INFO( get_tile_info4 )
 {
-	get_tile_info(tile_index,f3_pf_data_4);
+	get_tile_info(machine,tileinfo,tile_index,f3_pf_data_4);
 }
 
-static void get_tile_info_vram(int tile_index)
+static TILE_GET_INFO( get_tile_info_vram )
 {
 	int vram_tile;
+	int flags=0;
 
 	if (tile_index&1)
 	   	vram_tile = (videoram32[tile_index>>1]&0xffff);
 	else
 		vram_tile = (videoram32[tile_index>>1]>>16);
 
+	if (vram_tile&0x0100) flags|=TILE_FLIPX;
+	if (vram_tile&0x8000) flags|=TILE_FLIPY;
+
 	SET_TILE_INFO(
 			0,
 			vram_tile&0xff,
 			(vram_tile>>9)&0x3f,
-			0)
-
-	tile_info.flags=0;
-	if (vram_tile&0x0100) tile_info.flags|=TILE_FLIPX;
-	if (vram_tile&0x8000) tile_info.flags|=TILE_FLIPY;
+			flags)
 }
 
-static void get_tile_info_pixel(int tile_index)
+static TILE_GET_INFO( get_tile_info_pixel )
 {
 	int vram_tile,col_off;
+	int flags=0;
 	int y_offs=(f3_control_1[2]&0x1ff);
 	if (flipscreen) y_offs+=0x100;
 
@@ -508,15 +509,14 @@ static void get_tile_info_pixel(int tile_index)
 	else
 		vram_tile = (videoram32[col_off>>1]>>16);
 
+	if (vram_tile&0x0100) flags|=TILE_FLIPX;
+	if (vram_tile&0x8000) flags|=TILE_FLIPY;
+
 	SET_TILE_INFO(
 			3,
 			tile_index,
 			(vram_tile>>9)&0x3f,
-			0)
-
-	tile_info.flags=0;
-	if (vram_tile&0x0100) tile_info.flags|=TILE_FLIPX;
-	if (vram_tile&0x8000) tile_info.flags|=TILE_FLIPY;
+			flags)
 }
 
 /******************************************************************************/

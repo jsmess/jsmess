@@ -265,7 +265,7 @@ static PALETTE_INIT( jollyjgr )
 }
 
 /* Tilemap is the same as in Galaxian */
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int color = colorram[((tile_index & 0x1f) << 1) | 1] & 7;
 	SET_TILE_INFO(0, videoram[tile_index], color, 0)

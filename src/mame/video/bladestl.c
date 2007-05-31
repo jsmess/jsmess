@@ -21,7 +21,7 @@ PALETTE_INIT( bladestl )
 
 ***************************************************************************/
 
-static void tile_callback(int layer, int bank, int *code, int *color)
+static void tile_callback(int layer, int bank, int *code, int *color, int *flags)
 {
 	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
 	*color = layer_colorbase[layer];

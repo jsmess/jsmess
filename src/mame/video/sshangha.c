@@ -157,19 +157,19 @@ static UINT32 sshangha_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_row
 }
 #endif
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	UINT16 tile=sshangha_pf2_data[tile_index];
 	SET_TILE_INFO(1,(tile&0xfff)|sshangha_pf2_bank,(tile>>12)|32,0)
 }
 
-static void get_pf1_16x16_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_16x16_tile_info )
 {
 	UINT16 tile=sshangha_pf1_data[tile_index];
 	SET_TILE_INFO(1,(tile&0xfff)|sshangha_pf1_bank,tile>>12,0)
 }
 
-static void get_pf1_8x8_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_8x8_tile_info )
 {
 	UINT16 tile=sshangha_pf1_data[tile_index];
 	SET_TILE_INFO(0,(tile&0xfff)|sshangha_pf1_bank,tile>>12,0)

@@ -96,7 +96,7 @@ WRITE8_HANDLER( rcasino_colorram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int bank = (attr & 0x40) >> 6;

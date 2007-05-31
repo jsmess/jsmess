@@ -12,7 +12,7 @@ static int layer_colorbase[3],sprite_colorbase;
 
 ***************************************************************************/
 
-static void tile_callback(int layer,int bank,int *code,int *color)
+static void tile_callback(int layer,int bank,int *code,int *color,int *flags, int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x0d) << 8) | ((*color & 0x10) << 5) | (bank << 12);

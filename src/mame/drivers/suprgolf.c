@@ -21,7 +21,7 @@ static tilemap *suprgolf_tilemap;
 
 static int suprgolf_rom_bank;
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index*2]+256*(videoram[tile_index*2+1]);
 	SET_TILE_INFO(

@@ -21,7 +21,7 @@ static tilemap *background, *foreground;
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char attributes = tsamurai_videoram[2*tile_index+1];
 	int tile_number = tsamurai_videoram[2*tile_index];
@@ -34,7 +34,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile_number = videoram[tile_index];
 	if (textbank1 & 0x01) tile_number += 256; /* legacy */
@@ -249,7 +249,7 @@ WRITE8_HANDLER( vsgongf_color_w )
 }
 
 
-static void get_vsgongf_tile_info(int tile_index)
+static TILE_GET_INFO( get_vsgongf_tile_info )
 {
 	int tile_number = videoram[tile_index];
 	int color = vsgongf_color&0x1f;

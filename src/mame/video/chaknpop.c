@@ -153,7 +153,7 @@ WRITE8_HANDLER( chaknpop_attrram_w )
  *  I'm not sure how to handle attributes about color
  */
 
-static void chaknpop_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( chaknpop_get_tx_tile_info )
 {
 	int tile = chaknpop_txram[tile_index];
 	int tile_h_bank = (gfxmode & GFX_TX_BANK2) << 2;	/* 0x00-0xff -> 0x200-0x2ff */

@@ -937,7 +937,7 @@ static void hng64_draw3d( mame_bitmap *bitmap, const rectangle *cliprect )
 
 
 /* 8x8 tiles, 4bpp layer */
-static void get_hng64_tile0_info(int tile_index)
+static TILE_GET_INFO( get_hng64_tile0_info )
 {
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index];
@@ -946,7 +946,7 @@ static void get_hng64_tile0_info(int tile_index)
 }
 
 /* 16x16 tiles, 8bpp layer */
-static void get_hng64_tile1_info(int tile_index)
+static TILE_GET_INFO( get_hng64_tile1_info )
 {
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x10000/4)];
@@ -956,7 +956,7 @@ static void get_hng64_tile1_info(int tile_index)
 }
 
 /* 16x16 tiles, 8bpp layer */
-static void get_hng64_tile2_info(int tile_index)
+static TILE_GET_INFO( get_hng64_tile2_info )
 {
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x20000/4)];
@@ -965,7 +965,7 @@ static void get_hng64_tile2_info(int tile_index)
 }
 
 /* 16x16 tiles, 8bpp layer */
-static void get_hng64_tile3_info(int tile_index)
+static TILE_GET_INFO( get_hng64_tile3_info )
 {
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x30000/4)];

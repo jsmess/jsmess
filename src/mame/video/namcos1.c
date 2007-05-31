@@ -60,32 +60,32 @@ static UINT8 *tilemap_maskdata;
 
 ***************************************************************************/
 
-INLINE void bg_get_info(int tile_index,UINT8 *info_vram)
+INLINE void bg_get_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT8 *info_vram)
 {
 	int code;
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
 	SET_TILE_INFO(0,code,0,0);
-	tile_info.mask_data = &tilemap_maskdata[code << 3];
+	tileinfo->mask_data = &tilemap_maskdata[code << 3];
 }
 
-INLINE void fg_get_info(int tile_index,UINT8 *info_vram)
+INLINE void fg_get_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT8 *info_vram)
 {
 	int code;
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
 	SET_TILE_INFO(0,code,0,0);
-	tile_info.mask_data = &tilemap_maskdata[code << 3];
+	tileinfo->mask_data = &tilemap_maskdata[code << 3];
 }
 
-static void bg_get_info0(int tile_index) { bg_get_info(tile_index,&namcos1_videoram[0x0000]); }
-static void bg_get_info1(int tile_index) { bg_get_info(tile_index,&namcos1_videoram[0x2000]); }
-static void bg_get_info2(int tile_index) { bg_get_info(tile_index,&namcos1_videoram[0x4000]); }
-static void bg_get_info3(int tile_index) { bg_get_info(tile_index,&namcos1_videoram[0x6000]); }
-static void fg_get_info4(int tile_index) { fg_get_info(tile_index,&namcos1_videoram[0x7010]); }
-static void fg_get_info5(int tile_index) { fg_get_info(tile_index,&namcos1_videoram[0x7810]); }
+static TILE_GET_INFO( bg_get_info0 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x0000]); }
+static TILE_GET_INFO( bg_get_info1 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x2000]); }
+static TILE_GET_INFO( bg_get_info2 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x4000]); }
+static TILE_GET_INFO( bg_get_info3 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x6000]); }
+static TILE_GET_INFO( fg_get_info4 ) { fg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x7010]); }
+static TILE_GET_INFO( fg_get_info5 ) { fg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x7810]); }
 
 
 

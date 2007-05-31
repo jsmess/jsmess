@@ -91,7 +91,7 @@ static UINT32 get_bg_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UIN
 			((row & 0x10) << 5) | ((col & 0x10) << 6);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code, color;
 
@@ -104,7 +104,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-INLINE void get_bg_tile_info(int tile_index, unsigned char *bgvideoram, int gfx_region)
+INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, unsigned char *bgvideoram, int gfx_region)
 {
 	int code, color;
 
@@ -117,14 +117,14 @@ INLINE void get_bg_tile_info(int tile_index, unsigned char *bgvideoram, int gfx_
 			TILE_FLIPXY((color & 0x0c) >> 2))
 }
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
-	get_bg_tile_info(tile_index, firetrap_bg1videoram, 1);
+	get_bg_tile_info(machine, tileinfo, tile_index, firetrap_bg1videoram, 1);
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
-	get_bg_tile_info(tile_index, firetrap_bg2videoram, 2);
+	get_bg_tile_info(machine, tileinfo, tile_index, firetrap_bg2videoram, 2);
 }
 
 

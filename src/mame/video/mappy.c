@@ -204,10 +204,10 @@ static UINT32 mappy_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 nu
 	return offs;
 }
 
-static void superpac_get_tile_info(int tile_index)
+static TILE_GET_INFO( superpac_get_tile_info )
 {
 	unsigned char attr = mappy_videoram[tile_index + 0x400];
-	tile_info.priority = (attr & 0x40) >> 6;
+	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index],
@@ -215,10 +215,10 @@ static void superpac_get_tile_info(int tile_index)
 			0)
 }
 
-static void phozon_get_tile_info(int tile_index)
+static TILE_GET_INFO( phozon_get_tile_info )
 {
 	unsigned char attr = mappy_videoram[tile_index + 0x400];
-	tile_info.priority = (attr & 0x40) >> 6;
+	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index] + ((attr & 0x80) << 1),
@@ -226,10 +226,10 @@ static void phozon_get_tile_info(int tile_index)
 			0)
 }
 
-static void mappy_get_tile_info(int tile_index)
+static TILE_GET_INFO( mappy_get_tile_info )
 {
 	unsigned char attr = mappy_videoram[tile_index + 0x800];
-	tile_info.priority = (attr & 0x40) >> 6;
+	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
 			mappy_videoram[tile_index],

@@ -8,7 +8,7 @@
 #include "6821pia.h"
 
 
-#define VERBOSE 0
+#define VERBOSE 1
 
 #if VERBOSE
 #define LOG(x)	logerror x
@@ -34,6 +34,7 @@ struct _pia6821
 	UINT8 in_ca2;
 	UINT8 out_a;
 	UINT8 out_ca2;
+	UINT8 port_a_z_mask;
 	UINT8 ddr_a;
 	UINT8 ctl_a;
 	UINT8 irq_a1;
@@ -45,6 +46,7 @@ struct _pia6821
 	UINT8 in_cb2;
 	UINT8 out_b;
 	UINT8 out_cb2;
+	UINT8 last_out_cb2_z;
 	UINT8 ddr_b;
 	UINT8 ctl_b;
 	UINT8 irq_b1;
@@ -63,6 +65,8 @@ struct _pia6821
 	UINT8 in_cb1_pushed;
 	UINT8 in_cb2_pushed;
 	UINT8 out_cb2_needs_pulled;
+	UINT8 logged_port_a_not_connected;
+	UINT8 logged_port_b_not_connected;
 };
 
 
@@ -127,6 +131,7 @@ void pia_config(int which, const pia6821_interface *intf)
 	state_save_register_item("6821pia", which, p->in_ca2);
 	state_save_register_item("6821pia", which, p->out_a);
 	state_save_register_item("6821pia", which, p->out_ca2);
+	state_save_register_item("6821pia", which, p->port_a_z_mask);
 	state_save_register_item("6821pia", which, p->ddr_a);
 	state_save_register_item("6821pia", which, p->ctl_a);
 	state_save_register_item("6821pia", which, p->irq_a1);
@@ -137,6 +142,7 @@ void pia_config(int which, const pia6821_interface *intf)
 	state_save_register_item("6821pia", which, p->in_cb2);
 	state_save_register_item("6821pia", which, p->out_b);
 	state_save_register_item("6821pia", which, p->out_cb2);
+	state_save_register_item("6821pia", which, p->last_out_cb2_z);
 	state_save_register_item("6821pia", which, p->ddr_b);
 	state_save_register_item("6821pia", which, p->ctl_b);
 	state_save_register_item("6821pia", which, p->irq_b1);
@@ -232,7 +238,7 @@ static void update_shared_irq_handler(void (*irq_func)(int state))
  *
  *************************************/
 
-static void update_6821_interrupts(pia6821 *p)
+static void update_interrupts(pia6821 *p)
 {
 	int new_state;
 
@@ -261,8 +267,126 @@ static void update_6821_interrupts(pia6821 *p)
 
 /*************************************
  *
- *  Sets state value and call callbacks
- *  if changed
+ *  Port A/B input pins
+ *
+ *************************************/
+
+static UINT8 get_in_a_value(int which)
+{
+	pia6821 *p = &pias[which];
+	UINT8 port_a_data = 0;
+	UINT8 ret;
+
+	/* update the input */
+	if (p->intf->in_a_func)
+		port_a_data = p->intf->in_a_func(0);
+	else
+	{
+		if (p->in_a_pushed)
+			port_a_data = p->in_a;
+		else
+		{
+			/* mark all pins disconnected */
+			p->port_a_z_mask = 0xff;
+
+			if (!p->logged_port_a_not_connected && (p->ddr_a != 0xff))
+			{
+				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_a ^ 0xff);
+
+				p->logged_port_a_not_connected = TRUE;
+			}
+		}
+	}
+
+	/* - connected pins are always read
+       - disconnected pins read the output buffer in output mode
+       - disconnected pins are HI in input mode */
+	ret = (~p->port_a_z_mask             & port_a_data) |
+	      ( p->port_a_z_mask &  p->ddr_a & p->out_a) |
+	      ( p->port_a_z_mask & ~p->ddr_a);
+
+	return ret;
+}
+
+
+static UINT8 get_in_b_value(int which)
+{
+	pia6821 *p = &pias[which];
+	UINT8 ret;
+
+	if (p->ddr_b == 0xff)
+		/* all output, just return buffer */
+		ret = p->out_b;
+	else
+	{
+		UINT8 port_b_data;
+
+		/* update the input */
+		if (p->intf->in_b_func)
+			port_b_data = p->intf->in_b_func(0);
+		else
+		{
+			if (p->in_b_pushed)
+				port_b_data = p->in_b;
+			else
+			{
+				if (!p->logged_port_b_not_connected && (p->ddr_b != 0xff))
+				{
+					logerror("cpu #%d (PC=%08X): PIA #%d: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_b ^ 0xff);
+
+					p->logged_port_b_not_connected = TRUE;
+				}
+
+				/* undefined -- need to return something */
+				port_b_data = 0x00;
+			}
+		}
+
+		/* the DDR determines if the pin or the output buffer is read */
+		ret = (p->out_b & p->ddr_b) | (port_b_data & ~p->ddr_b);
+	}
+
+	return ret;
+}
+
+
+
+/*************************************
+ *
+ *  Port A/B output pins
+ *
+ *************************************/
+
+static UINT8 get_out_a_value(int which)
+{
+	UINT8 ret;
+	pia6821 *p = &pias[which];
+
+	if (p->ddr_a == 0xff)
+		/* all output */
+		ret = p->out_a;
+	else
+		/* input pins don't change */
+		ret = (p->out_a & p->ddr_a) | (get_in_a_value(which) & ~p->ddr_a);
+
+	return ret;
+}
+
+
+static UINT8 get_out_b_value(int which)
+{
+	pia6821 *p = &pias[which];
+
+	/* input pins are high-impedance - we just send them as zeros for backwards compatibility */
+	return p->out_b & p->ddr_b;
+}
+
+
+
+/*************************************
+ *
+ *  Sets C2 state value and call
+ *  callbacks if changed
  *
  *************************************/
 
@@ -292,9 +416,12 @@ static void set_out_cb2(int which, int data)
 {
 	pia6821 *p = &pias[which];
 
-	if (data != p->out_cb2)
+	int z = pia_get_output_cb2_z(which);
+
+	if ((data != p->out_cb2) || (z != p->last_out_cb2_z))
 	{
 		p->out_cb2 = data;
+		p->last_out_cb2_z = z;
 
 		/* send to output function */
 		if (p->intf->out_cb2_func)
@@ -313,106 +440,87 @@ static void set_out_cb2(int which, int data)
 
 /*************************************
  *
- *  CPU interface for PIA read
+ *  CPU interface for reading from the PIA
  *
  *************************************/
 
-static UINT8 pia_ddra_read(int which)
+static UINT8 port_a_r(int which)
 {
 	pia6821 *p = &pias[which];
-	UINT8 ret;
 
-	/* read output register */
-	if (OUTPUT_SELECTED(p->ctl_a))
+	UINT8 ret = get_in_a_value(which);
+
+	/* IRQ flags implicitly cleared by a read */
+	p->irq_a1 = FALSE;
+	p->irq_a2 = FALSE;
+	update_interrupts(p);
+
+	/* CA2 is configured as output and in read strobe mode */
+	if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a))
 	{
-		/* update the input */
-		if (p->ddr_a != 0xff)
-		{
-			if (p->intf->in_a_func)
-				p->in_a = p->intf->in_a_func(0);
-			else if (!p->in_a_pushed)
-				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A read handler. Assuming pins %02x not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_a ^ 0xff);
-		}
+		/* this will cause a transition low */
+		set_out_ca2(which, FALSE);
 
-		/* combine input and output values */
-		ret = (p->out_a & p->ddr_a) | (p->in_a & ~p->ddr_a);
-
-		/* IRQ flags implicitly cleared by a read */
-		p->irq_a1 = FALSE;
-		p->irq_a2 = FALSE;
-		update_6821_interrupts(p);
-
-		/* CA2 is configured as output and in read strobe mode */
-		if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a))
-		{
-			/* this will cause a transition low */
-			set_out_ca2(which, FALSE);
-
-			/* if the CA2 strobe is cleared by the E, reset it right away */
-			if (STROBE_E_RESET(p->ctl_a))
-				set_out_ca2(which, TRUE);
-		}
-
-		LOG(("cpu #%d (PC=%08X): PIA #%d: read port A = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+		/* if the CA2 strobe is cleared by the E, reset it right away */
+		if (STROBE_E_RESET(p->ctl_a))
+			set_out_ca2(which, TRUE);
 	}
 
-	/* read DDR register */
-	else
-	{
-		ret = p->ddr_a;
-		LOG(("cpu #%d (PC=%08X): PIA #%d: read DDR A = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
-	}
+	LOG(("cpu #%d (PC=%08X): PIA #%d: port A read = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
 
 	return ret;
 }
 
 
-static UINT8 pia_ddrb_read(int which)
+static UINT8 ddr_a_r(int which)
 {
 	pia6821 *p = &pias[which];
-	UINT8 ret;
 
-	/* read output register */
-	if (OUTPUT_SELECTED(p->ctl_b))
-	{
-		/* update the input */
-		if (p->ddr_b != 0xff)
-		{
-			if (p->intf->in_b_func)
-				p->in_b = p->intf->in_b_func(0);
-			else if (!p->in_b_pushed)
-				logerror("cpu #%d (PC=%08X): PIA #%d: Error! No port B read handler. Three-state pins %02x are undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, p->ddr_b ^ 0xff);
-		}
+	UINT8 ret = p->ddr_a;
 
-		/* combine input and output values */
-		ret = (p->out_b & p->ddr_b) | (p->in_b & ~p->ddr_b);
-
-		/* This read will implicitly clear the IRQ B1 flag.  If CB2 is in write-strobe
-           output mode with CB1 restore, and a CB1 active transition set the flag,
-           clearing it will cause CB2 to go high again.  Note that this is different
-           from what happens with port A. */
-		if (p->irq_b1 && C2_OUTPUT(p->ctl_b) && C2_STROBE_MODE(p->ctl_b) && STROBE_C1_RESET(p->ctl_b))
-			set_out_cb2(which, TRUE);
-
-		/* IRQ flags implicitly cleared by a read */
-		p->irq_b1 = p->irq_b2 = FALSE;
-		update_6821_interrupts(p);
-
-		LOG(("cpu #%d (PC=%08X): PIA #%d: read port B = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
-	}
-
-	/* read DDR register */
-	else
-	{
-		ret = p->ddr_b;
-		LOG(("cpu #%d (PC=%08X): PIA #%d: read DDR B = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
-	}
+	LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A read = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
 
 	return ret;
 }
 
 
-static UINT8 pia_ctla_read(int which)
+static UINT8 port_b_r(int which)
+{
+	pia6821 *p = &pias[which];
+
+	UINT8 ret = get_in_b_value(which);
+
+	/* This read will implicitly clear the IRQ B1 flag.  If CB2 is in write-strobe
+       mode with CB1 restore, and a CB1 active transition set the flag,
+       clearing it will cause CB2 to go high again.  Note that this is different
+       from what happens with port A. */
+	if (p->irq_b1 && C2_STROBE_MODE(p->ctl_b) && STROBE_C1_RESET(p->ctl_b))
+		set_out_cb2(which, TRUE);
+
+	/* IRQ flags implicitly cleared by a read */
+	p->irq_b1 = FALSE;
+	p->irq_b2 = FALSE;
+	update_interrupts(p);
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: port B read = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+
+	return ret;
+}
+
+
+static UINT8 ddr_b_r(int which)
+{
+	pia6821 *p = &pias[which];
+
+	UINT8 ret = p->ddr_b;
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B read = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+
+	return ret;
+}
+
+
+static UINT8 control_a_r(int which)
 {
 	pia6821 *p = &pias[which];
 	UINT8 ret;
@@ -438,13 +546,13 @@ static UINT8 pia_ctla_read(int which)
 	if (p->irq_a2 && C2_INPUT(p->ctl_a))
 		ret |= PIA_IRQ2;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: read control A = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+	LOG(("cpu #%d (PC=%08X): PIA #%d: control A read = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
 
 	return ret;
 }
 
 
-static UINT8 pia_ctlb_read(int which)
+static UINT8 control_b_r(int which)
 {
 	pia6821 *p = &pias[which];
 	UINT8 ret;
@@ -470,7 +578,7 @@ static UINT8 pia_ctlb_read(int which)
 	if (p->irq_b2 && C2_INPUT(p->ctl_b))
 		ret |= PIA_IRQ2;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: read control B = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
+	LOG(("cpu #%d (PC=%08X): PIA #%d: control B read = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, ret));
 
 	return ret;
 }
@@ -478,15 +586,33 @@ static UINT8 pia_ctlb_read(int which)
 
 UINT8 pia_read(int which, offs_t offset)
 {
+	pia6821 *p = &pias[which];
 	UINT8 ret;
 
 	switch (offset & 0x03)
 	{
 		default: /* impossible */
-		case 0x00:  ret = pia_ddra_read(which); break;
-		case 0x01:  ret = pia_ctla_read(which); break;
-		case 0x02:  ret = pia_ddrb_read(which); break;
-		case 0x03:  ret = pia_ctlb_read(which); break;
+		case 0x00:
+			if (OUTPUT_SELECTED(p->ctl_a))
+				ret = port_a_r(which);
+			else
+				ret = ddr_a_r(which);
+			break;
+
+		case 0x01:
+			ret = control_a_r(which);
+			break;
+
+		case 0x02:
+			if (OUTPUT_SELECTED(p->ctl_b))
+				ret = port_b_r(which);
+			else
+				ret = ddr_b_r(which);
+			break;
+
+		case 0x03:
+			ret = control_b_r(which);
+			break;
 	}
 
 	return ret;
@@ -499,135 +625,141 @@ UINT8 pia_alt_read(int which, offs_t offset)
 }
 
 
+UINT8 pia_get_port_b_z_mask(int which)
+{
+	pia6821 *p = &pias[which];
+
+	return ~p->ddr_b;
+}
+
+
 
 /*************************************
  *
- *  CPU interface for PIA write
+ *  CPU interface for writing to the PIA
  *
  *************************************/
 
-static void send_to_out_a_func(int which)
+static void send_to_out_a_func(int which, const char* message)
 {
 	pia6821 *p = &pias[which];
 
-	if (p->ddr_a)
-	{
-		if (p->intf->out_a_func)
-			p->intf->out_a_func(0, p->out_a & p->ddr_a);
-		else
-		{
-			if (p->out_a_needs_pulled)
-				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
+	/* input pins are pulled high */
+	UINT8 data = get_out_a_value(which);
 
-			p->out_a_needs_pulled = TRUE;
-		}
-	}
-}
+	LOG(("cpu #%d (PC=%08X): PIA #%d: %s = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, message, data));
 
-
-static void send_to_out_b_func(int which)
-{
-	pia6821 *p = &pias[which];
-
-	if (p->ddr_b)
-	{
-		if (p->intf->out_b_func)
-			p->intf->out_b_func(0, p->out_b & p->ddr_b);
-		else
-		{
-			if (p->out_b_needs_pulled)
-				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port B write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
-
-			p->out_b_needs_pulled = TRUE;
-		}
-	}
-}
-
-
-static void pia_ddra_write(int which, UINT8 data)
-{
-	pia6821 *p = &pias[which];
-
-	/* write output register */
-	if (OUTPUT_SELECTED(p->ctl_a))
-	{
-		LOG(("cpu #%d (PC=%08X): PIA #%d: port A write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
-
-		/* update the output value - don't mask now, DDR could change later */
-		p->out_a = data;
-
-		send_to_out_a_func(which);
-	}
-
-	/* write DDR register */
+	if (p->intf->out_a_func)
+		p->intf->out_a_func(0, data);
 	else
 	{
-		if (data == 0x00)
-			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (read mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
-		else if (data == 0xff)
-			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (write mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
-		else
-			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (mixed mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+		if (p->out_a_needs_pulled)
+			logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
 
-		if (p->ddr_a != data)
-		{
-			/* DDR changed, call the callback again */
-			p->ddr_a = data;
-
-			send_to_out_a_func(which);
-		}
+		p->out_a_needs_pulled = TRUE;
 	}
 }
 
 
-static void pia_ddrb_write(int which, UINT8 data)
+static void send_to_out_b_func(int which, const char* message)
 {
 	pia6821 *p = &pias[which];
 
-	/* write output register */
-	if (OUTPUT_SELECTED(p->ctl_b))
-	{
-		LOG(("cpu #%d (PC=%08X): PIA #%d: port B write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+	/* input pins are high-impedance - we just send them as zeros for backwards compatibility */
+	UINT8 data = get_out_b_value(which);
 
-		/* update the output value - don't mask now, DDR could change later */
-		p->out_b = data;
+	LOG(("cpu #%d (PC=%08X): PIA #%d: %s = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, message, data));
 
-		send_to_out_b_func(which);
-
-		/* CB2 is configured as output and in write strobe mode */
-		if (C2_OUTPUT(p->ctl_b) && C2_STROBE_MODE(p->ctl_b))
-		{
-			/* this will cause a transition low */
-			set_out_cb2(which, FALSE);
-
-			/* if the CB2 strobe is cleared by the E, reset it right away */
-			if (STROBE_E_RESET(p->ctl_b))
-				set_out_cb2(which, TRUE);
-		}
-	}
-
-	/* write DDR register */
+	if (p->intf->out_b_func)
+		p->intf->out_b_func(0, data);
 	else
 	{
-		if (data == 0x00)
-			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (read mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
-		else if (data == 0xff)
-			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (write mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
-		else
-			LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (mixed mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+		if (p->out_b_needs_pulled)
+			logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port B write handler. Previous value has been lost!\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
 
-		if (p->ddr_b != data)
-		{
-			/* DDR changed, call the callback again */
-			p->ddr_b = data;
-
-			send_to_out_b_func(which);
-		}
+		p->out_b_needs_pulled = TRUE;
 	}
 }
 
 
-static void pia_ctla_write(int which, UINT8 data)
+static void port_a_w(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	/* buffer the output value */
+	p->out_a = data;
+
+	send_to_out_a_func(which, "port A write");
+}
+
+
+static void ddr_a_w(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	if (data == 0x00)
+		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (input mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+	else if (data == 0xff)
+		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (output mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+	else
+		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (mixed mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+	if (p->ddr_a != data)
+	{
+		/* DDR changed, call the callback again */
+		p->ddr_a = data;
+		p->logged_port_a_not_connected = FALSE;
+
+		send_to_out_a_func(which, "port A write due to DDR change");
+	}
+}
+
+
+static void port_b_w(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	/* buffer the output value */
+	p->out_b = data;
+
+	send_to_out_b_func(which, "port B write");
+
+	/* CB2 in write strobe mode */
+	if (C2_STROBE_MODE(p->ctl_b))
+	{
+		/* this will cause a transition low */
+		set_out_cb2(which, FALSE);
+
+		/* if the CB2 strobe is cleared by the E, reset it right away */
+		if (STROBE_E_RESET(p->ctl_b))
+			set_out_cb2(which, TRUE);
+	}
+}
+
+
+static void ddr_b_w(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	if (data == 0x00)
+		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (input mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+	else if (data == 0xff)
+		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (output mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+	else
+		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (mixed mode)\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
+	if (p->ddr_b != data)
+	{
+		/* DDR changed, call the callback again */
+		p->ddr_b = data;
+		p->logged_port_b_not_connected = FALSE;
+
+		send_to_out_b_func(which, "port B write due to DDR change");
+	}
+}
+
+
+static void control_a_w(int which, UINT8 data)
 {
 	pia6821 *p = &pias[which];
 
@@ -636,70 +768,84 @@ static void pia_ctla_write(int which, UINT8 data)
 
 	LOG(("cpu #%d (PC=%08X): PIA #%d: control A write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
 
+	/* update the control register */
+	p->ctl_a = data;
+
 	/* CA2 is configured as output */
-	if (C2_OUTPUT(data))
+	if (C2_OUTPUT(p->ctl_a))
 	{
 		int temp;
 
-		if (C2_SET_MODE(data))
-			/* set/reset mode--bit value determines the new output */
-			temp = C2_SET(data);
+		if (C2_SET_MODE(p->ctl_a))
+			/* set/reset mode - bit value determines the new output */
+			temp = C2_SET(p->ctl_a);
 		else
-			/* strobe mode--output is always high unless strobed */
+			/* strobe mode - output is always high unless strobed */
 			temp = TRUE;
 
 		set_out_ca2(which, temp);
 	}
 
-	/* update the control register */
-	p->ctl_a = data;
-
 	/* update externals */
-	update_6821_interrupts(p);
+	update_interrupts(p);
 }
 
 
-static void pia_ctlb_write(int which, UINT8 data)
+static void control_b_w(int which, UINT8 data)
 {
 	pia6821 *p = &pias[which];
+	int temp;
 
 	/* bit 7 and 6 are read only */
 	data &= 0x3f;
 
 	LOG(("cpu #%d (PC=%08X): PIA #%d: control B write = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
 
-	/* CB2 is configured as output */
-	if (C2_OUTPUT(data))
-	{
-		int temp;
-
-		if (C2_SET_MODE(data))
-			/* set/reset mode--bit value determines the new output */
-			temp = C2_SET(data);
-		else
-			/* strobe mode--output is always high unless strobed */
-			temp = TRUE;
-
-		set_out_cb2(which, temp);
-	}
-
 	/* update the control register */
 	p->ctl_b = data;
 
+	if (C2_SET_MODE(p->ctl_b))
+		/* set/reset mode - bit value determines the new output */
+		temp = C2_SET(p->ctl_b);
+	else
+		/* strobe mode - output is always high unless strobed */
+		temp = TRUE;
+
+	set_out_cb2(which, temp);
+
 	/* update externals */
-	update_6821_interrupts(p);
+	update_interrupts(p);
 }
 
 
 void pia_write(int which, offs_t offset, UINT8 data)
 {
+	pia6821 *p = &pias[which];
+
 	switch (offset & 0x03)
 	{
 		default: /* impossible */
-		case 0x00:  pia_ddra_write(which, data); break;
-		case 0x01:  pia_ctla_write(which, data); break;
-		case 0x02:  pia_ddrb_write(which, data); break;
-		case 0x03:  pia_ctlb_write(which, data); break;
+		case 0x00:
+			if (OUTPUT_SELECTED(p->ctl_a))
+				port_a_w(which, data);
+			else
+				ddr_a_w(which, data);
+			break;
+
+		case 0x01:
+			control_a_w(which, data);
+			break;
+
+		case 0x02:
+			if (OUTPUT_SELECTED(p->ctl_b))
+				port_b_w(which, data);
+			else
+				ddr_b_w(which, data);
+			break;
+
+		case 0x03:
+			control_b_w(which, data);
+			break;
 	}
 }
 
@@ -710,20 +856,29 @@ void pia_alt_write(int which, offs_t offset, UINT8 data)
 }
 
 
+void pia_set_port_a_z_mask(int which, UINT8 data)
+{
+	pia6821 *p = &pias[which];
+
+	p->port_a_z_mask = data;
+}
+
+
 
 /*************************************
  *
- *  Device interface for port A
+ *  Device interface to port A
  *
  *************************************/
 
-void pia_set_input_a(int which, UINT8 data)
+void pia_set_input_a(int which, UINT8 data, UINT8 z_mask)
 {
 	pia6821 *p = &pias[which];
 
 	assert_always(p->intf->in_a_func == NULL, "pia_set_input_a() called when in_a_func implemented");
 
 	p->in_a = data;
+	p->port_a_z_mask = z_mask;
 	p->in_a_pushed = TRUE;
 }
 
@@ -734,14 +889,14 @@ UINT8 pia_get_output_a(int which)
 
 	p->out_a_needs_pulled = FALSE;
 
-	return (p->out_a & p->ddr_a) | (p->in_a & ~p->ddr_a);
+	return get_out_a_value(which);
 }
 
 
 
 /*************************************
  *
- *  Device interface for the CA1 pin
+ *  Device interface to the CA1 pin
  *
  *************************************/
 
@@ -760,7 +915,7 @@ void pia_set_input_ca1(int which, int data)
 		p->irq_a1 = TRUE;
 
 		/* update externals */
-		update_6821_interrupts(p);
+		update_interrupts(p);
 
 		/* CA2 is configured as output and in read strobe mode and cleared by a CA1 transition */
 		if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a) && STROBE_C1_RESET(p->ctl_a))
@@ -776,7 +931,7 @@ void pia_set_input_ca1(int which, int data)
 
 /*************************************
  *
- *  Device interface for the CA2 pin
+ *  Device interface to the CA2 pin
  *
  *************************************/
 
@@ -796,7 +951,7 @@ void pia_set_input_ca2(int which, int data)
 		p->irq_a2 = TRUE;
 
 		/* update externals */
-		update_6821_interrupts(p);
+		update_interrupts(p);
 	}
 
 	/* set the new value for CA2 */
@@ -818,7 +973,7 @@ int pia_get_output_ca2(int which)
 
 /*************************************
  *
- *  Device interface for port B
+ *  Device interface to port B
  *
  *************************************/
 
@@ -840,14 +995,14 @@ UINT8 pia_get_output_b(int which)
 
 	p->out_b_needs_pulled = FALSE;
 
-	return (p->out_b & p->ddr_b) | (p->in_b & ~p->ddr_b);
+	return get_out_b_value(which);
 }
 
 
 
 /*************************************
  *
- *  Device interface for the CB1 pin
+ *  Device interface to the CB1 pin
  *
  *************************************/
 
@@ -866,7 +1021,7 @@ void pia_set_input_cb1(int which, int data)
 		p->irq_b1 = 1;
 
 		/* update externals */
-		update_6821_interrupts(p);
+		update_interrupts(p);
 
 		/* If CB2 is configured as a write-strobe output which is reset by a CB1
            transition, this reset will only happen when a read from port B implicitly
@@ -883,7 +1038,7 @@ void pia_set_input_cb1(int which, int data)
 
 /*************************************
  *
- *  Device interface for the CB2 pin
+ *  Device interface to the CB2 pin
  *
  *************************************/
 
@@ -903,7 +1058,7 @@ void pia_set_input_cb2(int which, int data)
 		p->irq_b2 = 1;
 
 		/* update externals */
-		update_6821_interrupts(p);
+		update_interrupts(p);
 	}
 
 	/* set the new value for CA2 */
@@ -922,27 +1077,11 @@ int pia_get_output_cb2(int which)
 }
 
 
-
-/*************************************
- *
- *  Convinience interface for
- *  retrieving the DDR
- *
- *************************************/
-
-UINT8 pia_get_ddr_a(int which)
+int pia_get_output_cb2_z(int which)
 {
 	pia6821 *p = &pias[which];
 
-	return p->ddr_a;
-}
-
-
-UINT8 pia_get_ddr_b(int which)
-{
-	pia6821 *p = &pias[which];
-
-	return p->ddr_b;
+	return !C2_OUTPUT(p->ctl_b);
 }
 
 
@@ -1091,14 +1230,14 @@ WRITE16_HANDLER( pia_7_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(7, offset,
 
 /******************* 8-bit A/B port interfaces *******************/
 
-WRITE8_HANDLER( pia_0_porta_w ) { pia_set_input_a(0, data); }
-WRITE8_HANDLER( pia_1_porta_w ) { pia_set_input_a(1, data); }
-WRITE8_HANDLER( pia_2_porta_w ) { pia_set_input_a(2, data); }
-WRITE8_HANDLER( pia_3_porta_w ) { pia_set_input_a(3, data); }
-WRITE8_HANDLER( pia_4_porta_w ) { pia_set_input_a(4, data); }
-WRITE8_HANDLER( pia_5_porta_w ) { pia_set_input_a(5, data); }
-WRITE8_HANDLER( pia_6_porta_w ) { pia_set_input_a(6, data); }
-WRITE8_HANDLER( pia_7_porta_w ) { pia_set_input_a(7, data); }
+WRITE8_HANDLER( pia_0_porta_w ) { pia_set_input_a(0, data, 0); }
+WRITE8_HANDLER( pia_1_porta_w ) { pia_set_input_a(1, data, 0); }
+WRITE8_HANDLER( pia_2_porta_w ) { pia_set_input_a(2, data, 0); }
+WRITE8_HANDLER( pia_3_porta_w ) { pia_set_input_a(3, data, 0); }
+WRITE8_HANDLER( pia_4_porta_w ) { pia_set_input_a(4, data, 0); }
+WRITE8_HANDLER( pia_5_porta_w ) { pia_set_input_a(5, data, 0); }
+WRITE8_HANDLER( pia_6_porta_w ) { pia_set_input_a(6, data, 0); }
+WRITE8_HANDLER( pia_7_porta_w ) { pia_set_input_a(7, data, 0); }
 
 WRITE8_HANDLER( pia_0_portb_w ) { pia_set_input_b(0, data); }
 WRITE8_HANDLER( pia_1_portb_w ) { pia_set_input_b(1, data); }

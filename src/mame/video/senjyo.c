@@ -50,19 +50,22 @@ DRIVER_INIT( senjyo )
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	unsigned char attr = senjyo_fgcolorram[tile_index];
+	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
+
+	if (senjyo && (tile_index & 0x1f) >= 32-8)
+		flags |= TILE_IGNORE_TRANSPARENCY;
+
 	SET_TILE_INFO(
 			0,
 			senjyo_fgvideoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x07,
-			(attr & 0x80) ? TILE_FLIPY : 0)
-	if (senjyo && (tile_index & 0x1f) >= 32-8)
-		tile_info.flags |= TILE_IGNORE_TRANSPARENCY;
+			flags)
 }
 
-static void senjyo_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( senjyo_bg1_tile_info )
 {
 	unsigned char code = senjyo_bg1videoram[tile_index];
 	SET_TILE_INFO(
@@ -72,7 +75,7 @@ static void senjyo_bg1_tile_info(int tile_index)
 			0)
 }
 
-static void starforc_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( starforc_bg1_tile_info )
 {
 	/* Star Force has more tiles in bg1, so to get a uniform color code spread */
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
@@ -85,7 +88,7 @@ static void starforc_bg1_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	unsigned char code = senjyo_bg2videoram[tile_index];
 	SET_TILE_INFO(
@@ -95,7 +98,7 @@ static void get_bg2_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg3_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg3_tile_info )
 {
 	unsigned char code = senjyo_bg3videoram[tile_index];
 	SET_TILE_INFO(

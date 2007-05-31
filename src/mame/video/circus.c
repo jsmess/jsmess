@@ -41,7 +41,7 @@ WRITE8_HANDLER( circus_clown_y_w )
 	clown_y = 240-data;
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 

@@ -97,14 +97,14 @@ WRITE32_HANDLER( unico_palette32_w )
 #define LAYER( _N_ ) \
 static tilemap *tilemap_##_N_; \
 \
-static void get_tile_info_##_N_(int tile_index) \
+static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
 	UINT16 code = unico_vram_##_N_[ 2 * tile_index + 0 ]; \
 	UINT16 attr = unico_vram_##_N_[ 2 * tile_index + 1 ]; \
 	SET_TILE_INFO(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 )) \
 } \
 \
-static void get_tile_info32_##_N_(int tile_index) \
+static TILE_GET_INFO( get_tile_info32_##_N_ ) \
 { \
 	UINT32 code = unico_vram32_##_N_[tile_index]; \
 	SET_TILE_INFO(1, code >> 16, code & 0x1f, TILE_FLIPYX( code >> 5 )) \

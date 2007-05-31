@@ -89,7 +89,7 @@ PALETTE_INIT( combascb )
 
 ***************************************************************************/
 
-static void get_tile_info0(int tile_index)
+static TILE_GET_INFO( get_tile_info0 )
 {
 	UINT8 attributes = combasc_page[0][tile_index];
 	int bank = 4*((combasc_vreg & 0x0f) - 1);
@@ -111,10 +111,10 @@ static void get_tile_info0(int tile_index)
 			number,
 			color,
 			0)
-	tile_info.priority = (attributes & 0x40) >> 6;
+	tileinfo->priority = (attributes & 0x40) >> 6;
 }
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
 	UINT8 attributes = combasc_page[1][tile_index];
 	int bank = 4*((combasc_vreg >> 4) - 1);
@@ -136,10 +136,10 @@ static void get_tile_info1(int tile_index)
 			number,
 			color,
 			0)
-	tile_info.priority = (attributes & 0x40) >> 6;
+	tileinfo->priority = (attributes & 0x40) >> 6;
 }
 
-static void get_text_info(int tile_index)
+static TILE_GET_INFO( get_text_info )
 {
 	UINT8 attributes = combasc_page[0][tile_index + 0x800];
 	int number = combasc_page[0][tile_index + 0xc00];
@@ -153,7 +153,7 @@ static void get_text_info(int tile_index)
 }
 
 
-static void get_tile_info0_bootleg(int tile_index)
+static TILE_GET_INFO( get_tile_info0_bootleg )
 {
 	UINT8 attributes = combasc_page[0][tile_index];
 	int bank = 4*((combasc_vreg & 0x0f) - 1);
@@ -177,7 +177,7 @@ static void get_tile_info0_bootleg(int tile_index)
 			0)
 }
 
-static void get_tile_info1_bootleg(int tile_index)
+static TILE_GET_INFO( get_tile_info1_bootleg )
 {
 	UINT8 attributes = combasc_page[1][tile_index];
 	int bank = 4*((combasc_vreg >> 4) - 1);
@@ -201,7 +201,7 @@ static void get_tile_info1_bootleg(int tile_index)
 			0)
 }
 
-static void get_text_info_bootleg(int tile_index)
+static TILE_GET_INFO( get_text_info_bootleg )
 {
 //  UINT8 attributes = combasc_page[0][tile_index + 0x800];
 	int number = combasc_page[0][tile_index + 0xc00];

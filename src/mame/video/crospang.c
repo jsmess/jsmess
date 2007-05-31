@@ -85,7 +85,7 @@ WRITE16_HANDLER ( crospang_bg_videoram_w )
 	tilemap_mark_tile_dirty(bg_layer,offset);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int data  = crospang_bg_videoram[tile_index];
 	int tile  = data & 0xfff;
@@ -94,7 +94,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x20,0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int data  = crospang_fg_videoram[tile_index];
 	int tile  = data & 0xfff;

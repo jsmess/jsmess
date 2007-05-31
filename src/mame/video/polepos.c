@@ -150,7 +150,7 @@ PALETTE_INIT( polepos )
 
 ***************************************************************************/
 
-static void bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( bg_get_tile_info )
 {
 	UINT16 word = polepos_view16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
@@ -162,7 +162,7 @@ static void bg_get_tile_info(int tile_index)
 			0)
 }
 
-static void tx_get_tile_info(int tile_index)
+static TILE_GET_INFO( tx_get_tile_info )
 {
 	UINT16 word = polepos_alpha16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);

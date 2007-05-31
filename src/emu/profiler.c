@@ -189,19 +189,21 @@ const char *profiler_get_text(void)
 			showdelay[i]--;
 
 			if (i < PROFILER_PROFILER)
-				bufptr += sprintf(bufptr,"%s%3d%%%3d%%\n",names[i],
+				bufptr += sprintf(bufptr,"%02d%% %02d%% %s\n",
 						(int)((computed * 100 + total/2) / total),
-						(int)((computed * 100 + normalize/2) / normalize));
+						(int)((computed * 100 + normalize/2) / normalize),
+						names[i]);
 			else
-				bufptr += sprintf(bufptr,"%s%3d%%\n",names[i],
-						(int)((computed * 100 + total/2) / total));
+				bufptr += sprintf(bufptr,"%02d%% %s\n",
+						(int)((computed * 100 + total/2) / total),
+						names[i]);
 		}
 	}
 
 	i = 0;
 	for (j = 0;j < MEMORY;j++)
 		i += profile.cpu_context_switches[j];
-	bufptr += sprintf(bufptr,"CPU switches%4d\n",i / MEMORY);
+	bufptr += sprintf(bufptr,"%4d CPU switches\n",i / MEMORY);
 
 	/* reset the counters */
 	memory = (memory + 1) % MEMORY;

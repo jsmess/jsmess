@@ -98,7 +98,7 @@ WRITE8_HANDLER( bagman_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int gfxbank = (Machine->gfx[2] && (colorram[tile_index] & 0x10)) ? 2 : 0;
 	int code = videoram[tile_index] + 8 * (colorram[tile_index] & 0x20);

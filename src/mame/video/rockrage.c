@@ -23,7 +23,7 @@ PALETTE_INIT( rockrage )
 
 ***************************************************************************/
 
-static void tile_callback(int layer, int bank, int *code, int *color)
+static void tile_callback(int layer, int bank, int *code, int *color, int *flags)
 {
 	if (layer == 1)
 		*code |= ((*color & 0x40) << 2) | ((bank & 0x01) << 9);

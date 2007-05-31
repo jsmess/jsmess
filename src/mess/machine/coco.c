@@ -1322,7 +1322,7 @@ static UINT8 coco_update_keyboard(void)
 	/* sample joystick buttons */
 	porta &= ~readinputportbytag_safe("joystick_buttons", 0);
 	
-	pia_set_input_a(0, porta);
+	pia_set_input_a(0, porta, 0);
 	return porta;
 }
 
@@ -1495,7 +1495,7 @@ static WRITE8_HANDLER( dragon64_pia1_pb_w )
 	/* to control the paging of the 32k and 64k basic roms */
 	/* Otherwise it set as an input, with an EXTERNAL pull-up so it should */
 	/* always be high (enabling 32k basic rom) */
-	if (pia_get_ddr_b(1) & 0x04)
+	/* PIA FIXME - if (pia_get_ddr_b(1) & 0x04) */
 	{
 		dragon_page_rom(data & 0x04);
 	}	
@@ -1520,7 +1520,7 @@ static WRITE8_HANDLER( dgnalpha_pia2_pa_w )
 	/* to control the paging of the boot and basic roms */
 	/* Otherwise it set as an input, with an internal pull-up so it should */
 	/* always be high (enabling boot rom) */
-	if (pia_get_ddr_a(2) & 0x04)
+	/* PIA FIXME if (pia_get_ddr_a(2) & 0x04) */
 	{
 		dragon_page_rom(data & 0x04);	/* bit 2 controls boot or basic rom */
 	}

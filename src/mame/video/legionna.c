@@ -85,7 +85,7 @@ WRITE16_HANDLER( legionna_text_w )
 		tilemap_mark_tile_dirty(text_layer,offset);
 }
 
-static void get_back_tile_info(int tile_index)
+static TILE_GET_INFO( get_back_tile_info )
 {
 	int tile=legionna_back_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -96,7 +96,7 @@ static void get_back_tile_info(int tile_index)
 	SET_TILE_INFO(1,tile,color,0)
 }
 
-static void get_mid_tile_info(int tile_index)
+static TILE_GET_INFO( get_mid_tile_info )
 {
 	int tile=legionna_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -106,7 +106,7 @@ static void get_mid_tile_info(int tile_index)
 	SET_TILE_INFO(5,tile,color,0)
 }
 
-static void get_mid_tile_info_denji(int tile_index)
+static TILE_GET_INFO( get_mid_tile_info_denji )
 {
 	int tile=legionna_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -117,7 +117,7 @@ static void get_mid_tile_info_denji(int tile_index)
 	SET_TILE_INFO(5,tile,color,0)
 }
 
-static void get_mid_tile_info_cupsoc(int tile_index)
+static TILE_GET_INFO( get_mid_tile_info_cupsoc )
 {
 	int tile=legionna_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -129,7 +129,7 @@ static void get_mid_tile_info_cupsoc(int tile_index)
 	SET_TILE_INFO(1,tile,color,0)
 }
 
-static void get_fore_tile_info(int tile_index)	/* this is giving bad tiles... */
+static TILE_GET_INFO( get_fore_tile_info )	/* this is giving bad tiles... */
 {
 	int tile=legionna_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -140,7 +140,7 @@ static void get_fore_tile_info(int tile_index)	/* this is giving bad tiles... */
 	SET_TILE_INFO(4,tile,color,0)
 }
 
-static void get_fore_tile_info_denji(int tile_index)
+static TILE_GET_INFO( get_fore_tile_info_denji )
 {
 	int tile=legionna_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -151,7 +151,7 @@ static void get_fore_tile_info_denji(int tile_index)
 	SET_TILE_INFO(4,tile,color,0)
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile = legionna_textram[tile_index];
 	int color=(tile>>12)&0xf;

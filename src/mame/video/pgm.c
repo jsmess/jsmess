@@ -254,7 +254,7 @@ WRITE16_HANDLER( pgm_tx_videoram_w )
 	}
 }
 
-static void get_pgm_tx_tilemap_tile_info(int tile_index)
+static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
 {
 
 /* 0x904000 - 0x90ffff is the Text Overlay Ram (pgm_tx_videoram)
@@ -293,7 +293,7 @@ WRITE16_HANDLER( pgm_bg_videoram_w )
 	}
 }
 
-static void get_pgm_bg_tilemap_tile_info(int tile_index)
+static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 {
 	/* pretty much the same as tx layer */
 

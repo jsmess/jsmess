@@ -556,7 +556,7 @@ static void print_game_sampleof(FILE* out, const game_driver* game)
 
 	expand_machine_driver(game->drv, &drv);
 
-	for( i = 0; drv.sound[i].sound_type && i < MAX_SOUND; i++ )
+	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type; i++ )
 	{
 		const char **samplenames = NULL;
 		if( drv.sound[i].sound_type == SOUND_SAMPLES )
@@ -583,7 +583,7 @@ static void print_game_sample(FILE* out, const game_driver* game)
 
 	expand_machine_driver(game->drv, &drv);
 
-	for( i = 0; drv.sound[i].sound_type && i < MAX_SOUND; i++ )
+	for( i = 0; i < MAX_SOUND && drv.sound[i].sound_type; i++ )
 	{
 		const char **samplenames = NULL;
 		if( drv.sound[i].sound_type == SOUND_SAMPLES )

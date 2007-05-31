@@ -62,7 +62,7 @@ WRITE8_HANDLER( trucocl_colorram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int gfxsel = colorram[tile_index] & 1;
 	int bank = ( ( colorram[tile_index] >> 2 ) & 0x07 );

@@ -89,7 +89,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 		return (row << 5) + col;
 }
 
-static void bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( bg_get_tile_info )
 {
 	SET_TILE_INFO(
 			1,
@@ -98,7 +98,7 @@ static void bg_get_tile_info(int tile_index)
 			0)
 }
 
-static void fg_get_tile_info(int tile_index)
+static TILE_GET_INFO( fg_get_tile_info )
 {
 	/* not sure about the transparency thing, but it makes sense */
 	SET_TILE_INFO(

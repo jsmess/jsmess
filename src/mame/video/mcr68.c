@@ -25,18 +25,18 @@ static tilemap *fg_tilemap;
  *
  *************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int data = LOW_BYTE(videoram16[tile_index * 2]) | (LOW_BYTE(videoram16[tile_index * 2 + 1]) << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 	if (Machine->gfx[0]->total_elements < 0x1000)
-		tile_info.priority = (data >> 15) & 1;
+		tileinfo->priority = (data >> 15) & 1;
 }
 
 
-static void zwackery_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( zwackery_get_bg_tile_info )
 {
 	int data = videoram16[tile_index];
 	int color = (data >> 13) & 7;
@@ -44,12 +44,12 @@ static void zwackery_get_bg_tile_info(int tile_index)
 }
 
 
-static void zwackery_get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( zwackery_get_fg_tile_info )
 {
 	int data = videoram16[tile_index];
 	int color = (data >> 13) & 7;
 	SET_TILE_INFO(2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
-	tile_info.priority = (color != 0);
+	tileinfo->priority = (color != 0);
 }
 
 

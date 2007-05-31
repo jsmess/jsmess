@@ -75,7 +75,7 @@ WRITE8_HANDLER( gridiron_led1_w )
 	led1 = data;
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int attr = tehkanwc_videoram2[offs + 1];
@@ -86,14 +86,14 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(2, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0x10) << 4);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
-	tile_info.priority = (attr & 0x20) ? 0 : 1;
+	tileinfo->priority = (attr & 0x20) ? 0 : 1;
 
 	SET_TILE_INFO(0, code, color, flags)
 }

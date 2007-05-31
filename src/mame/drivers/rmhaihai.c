@@ -53,7 +53,7 @@ WRITE8_HANDLER( rmhaihai_colorram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + (gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);

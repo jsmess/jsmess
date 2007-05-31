@@ -21,7 +21,7 @@ static tilemap *bg_tilemap;
  *
  *************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	SET_TILE_INFO(0, videoram[tile_index] & 0x7f, 0, 0);
 }

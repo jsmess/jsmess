@@ -70,7 +70,7 @@ WRITE8_HANDLER( battlex_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile = videoram[tile_index*2] | (((videoram[tile_index*2+1] & 0x01)) << 8);
 	int color = (videoram[tile_index*2+1] & 0x0e) >> 1;

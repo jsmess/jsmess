@@ -148,7 +148,7 @@ WRITE8_HANDLER( c1943_d806_w )
 	objon = data & 0x40;
 }
 
-static void c1943_get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( c1943_get_bg2_tile_info )
 {
 	UINT8 *tilerom = memory_region(REGION_GFX5) + 0x8000;
 
@@ -161,7 +161,7 @@ static void c1943_get_bg2_tile_info(int tile_index)
 	SET_TILE_INFO(2, code, color, flags)
 }
 
-static void c1943_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( c1943_get_bg_tile_info )
 {
 	UINT8 *tilerom = memory_region(REGION_GFX5);
 
@@ -174,7 +174,7 @@ static void c1943_get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void c1943_get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( c1943_get_fg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0xe0) << 3);

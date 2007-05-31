@@ -17,7 +17,7 @@ static tilemap *oneshot_mid_tilemap;
 static tilemap *oneshot_fg_tilemap;
 
 /* bg tilemap */
-static void get_oneshot_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_oneshot_bg_tile_info )
 {
 	int tileno;
 
@@ -36,7 +36,7 @@ WRITE16_HANDLER( oneshot_bg_videoram_w )
 }
 
 /* mid tilemap */
-static void get_oneshot_mid_tile_info(int tile_index)
+static TILE_GET_INFO( get_oneshot_mid_tile_info )
 {
 	int tileno;
 
@@ -56,7 +56,7 @@ WRITE16_HANDLER( oneshot_mid_videoram_w )
 
 
 /* fg tilemap */
-static void get_oneshot_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_oneshot_fg_tile_info )
 {
 	int tileno;
 

@@ -417,7 +417,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int pri
 	}
 }
 
-static void get_text_tile_info( int tile_index )
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int offs = tile_index / 2;
 	int tile = (tilemap_ram[offs + text_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -428,7 +428,7 @@ static void get_text_tile_info( int tile_index )
 	SET_TILE_INFO(0, tile, color, 0)
 }
 
-static void get_back_tile_info( int tile_index )
+static TILE_GET_INFO( get_back_tile_info )
 {
 	int offs = tile_index / 2;
 	int tile = (tilemap_ram[offs] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -442,7 +442,7 @@ static void get_back_tile_info( int tile_index )
 	SET_TILE_INFO(1, tile, color, 0)
 }
 
-static void get_mid_tile_info( int tile_index )
+static TILE_GET_INFO( get_mid_tile_info )
 {
 	int offs = tile_index / 2;
 	int tile = (tilemap_ram[offs + mid_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -457,7 +457,7 @@ static void get_mid_tile_info( int tile_index )
 	SET_TILE_INFO(1, tile, color + 16, 0)
 }
 
-static void get_fore_tile_info( int tile_index )
+static TILE_GET_INFO( get_fore_tile_info )
 {
 	int offs = tile_index / 2;
 	int tile = (tilemap_ram[offs + fore_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;

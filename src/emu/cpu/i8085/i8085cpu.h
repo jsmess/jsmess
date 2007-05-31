@@ -36,8 +36,8 @@
 #define ADDR_RST75      0x003c
 #define ADDR_INTR       0x0038
 
-#define M_INR(R) ++R; I.AF.b.l=(I.AF.b.l&CF)|ZSP[R]|((R==0x80)?VF:0)|((R&0x0F)?0:HF)
-#define M_DCR(R) I.AF.b.l=(I.AF.b.l&CF)|NF|((R==0x80)?VF:0)|((R&0x0F)?0:HF); I.AF.b.l|=ZSP[--R]
+#define M_INR(R) ++R; I.AF.b.l=(I.AF.b.l&CF)|ZS[R]|((R==0x80)?VF:0)|((R&0x0F)?0:HF)
+#define M_DCR(R) I.AF.b.l=(I.AF.b.l&CF)|NF|((R==0x80)?VF:0)|((R&0x0F)?0:HF); I.AF.b.l|=ZS[--R]
 #define M_MVI(R) R=ARG()
 
 #define M_ANA(R) I.AF.b.h&=R; I.AF.b.l=ZSP[I.AF.b.h]|HF

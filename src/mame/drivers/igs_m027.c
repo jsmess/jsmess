@@ -88,7 +88,7 @@ WRITE32_HANDLER( igs_tx_videoram_w )
 	//logerror( "TX VIDEO RAM OFFSET %x ,data %x!\n",offset ,igs_tx_videoram[offset]);
 }
 
-static void get_tx_tilemap_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tilemap_tile_info )
 {
 	//ppppppppNNNNNNNN
 	int tileno,colour;
@@ -107,7 +107,7 @@ WRITE32_HANDLER( igs_bg_videoram_w )
 	logerror("BG VIDEO RAM OFFSET %x ,data %x!\n",offset ,igs_bg_videoram[offset]);
 }
 
-static void get_bg_tilemap_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tilemap_tile_info )
 {
 	//ppppppppNNNNNNNN
 	int tileno,colour;

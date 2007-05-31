@@ -14,13 +14,13 @@ static tilemap *aquarius_tilemap;
 
 /**************************************************************************/
 
-static void aquarius_gettileinfo(int memory_offset)
+static TILE_GET_INFO(aquarius_gettileinfo)
 {
 	SET_TILE_INFO(
-		0,									/* gfx */
-		videoram[memory_offset +    40],	/* character */
-		videoram[memory_offset + 0x400],	/* color */
-		0)									/* flags */
+		0,								/* gfx */
+		videoram[tile_index +    40],	/* character */
+		videoram[tile_index + 0x400],	/* color */
+		0)								/* flags */
 }
 
 VIDEO_START( aquarius )

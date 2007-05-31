@@ -43,17 +43,17 @@ READ8_HANDLER(nycaptor_spriteram_r)
 	return nycaptor_spriteram[offset];
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int flags,pal;
-	tile_info.priority = (videoram[tile_index*2 + 1] & 0x30)>>4;
+	tileinfo->priority = (videoram[tile_index*2 + 1] & 0x30)>>4;
 	pal=videoram[tile_index*2+1]&0x0f;
   flags=TILE_SPLIT(0);
   if((!nycaptor_spot())&&(pal==6))flags=TILE_SPLIT(1);
 	if(((nycaptor_spot()==3)&&(pal==8))||((nycaptor_spot()==1)&&(pal==0xc)))flags=TILE_SPLIT(2);
-	if((nycaptor_spot()==1)&&(tile_info.priority==2))flags=TILE_SPLIT(3);
+	if((nycaptor_spot()==1)&&(tileinfo->priority==2))flags=TILE_SPLIT(3);
 #ifdef MAME_DEBUG
-  if(nycaptor_mask&(1<<tile_info.priority))
+  if(nycaptor_mask&(1<<tileinfo->priority))
   {
     if(nycaptor_spot())pal=0xe;else pal=4;
   }

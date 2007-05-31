@@ -77,7 +77,7 @@ static void sslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 
 /* Text Layer */
 
-static void get_sslam_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_sslam_tx_tile_info )
 {
 	int code = sslam_tx_tileram[tile_index] & 0x0fff;
 	int colr = sslam_tx_tileram[tile_index] & 0xf000;
@@ -93,7 +93,7 @@ WRITE16_HANDLER( sslam_tx_tileram_w )
 
 /* Middle Layer */
 
-static void get_sslam_md_tile_info(int tile_index)
+static TILE_GET_INFO( get_sslam_md_tile_info )
 {
 	int code = sslam_md_tileram[tile_index] & 0x0fff;
 	int colr = sslam_md_tileram[tile_index] & 0xf000;
@@ -109,7 +109,7 @@ WRITE16_HANDLER( sslam_md_tileram_w )
 
 /* Background Layer */
 
-static void get_sslam_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_sslam_bg_tile_info )
 {
 	int code = sslam_bg_tileram[tile_index] & 0x1fff;
 	int colr = sslam_bg_tileram[tile_index] & 0xe000;
@@ -123,7 +123,7 @@ WRITE16_HANDLER( sslam_bg_tileram_w )
 	tilemap_mark_tile_dirty(sslam_bg_tilemap,offset);
 }
 
-static void get_powerbls_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_powerbls_bg_tile_info )
 {
 	int code = sslam_bg_tileram[tile_index*2+1] & 0x0fff;
 	int colr = (sslam_bg_tileram[tile_index*2+1] & 0xf000) >> 12;

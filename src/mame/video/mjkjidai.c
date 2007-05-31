@@ -14,7 +14,7 @@ static tilemap *bg_tilemap;
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int attr = mjkjidai_videoram[tile_index + 0x800];
 	int code = mjkjidai_videoram[tile_index] + ((attr & 0x1f) << 8);

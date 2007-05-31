@@ -12,7 +12,7 @@ UINT8 ninjakun_io_8000_ctrl[4];
  Tilemap Callbacks
 *******************************************************************************/
 
-static void get_fg_tile_info(int tile_index){
+static TILE_GET_INFO( get_fg_tile_info ){
 	unsigned int tile_number = videoram[tile_index] & 0xFF;
 	unsigned char attr  = videoram[tile_index+0x400];
 	tile_number += (attr & 0x20) << 3; /* bank */
@@ -23,7 +23,7 @@ static void get_fg_tile_info(int tile_index){
 			0)
 }
 
-static void get_bg_tile_info(int tile_index){
+static TILE_GET_INFO( get_bg_tile_info ){
 	unsigned int tile_number = videoram[tile_index+0x800] & 0xFF;
 	unsigned char attr  = videoram[tile_index+0xc00];
 	tile_number += (attr & 0xC0) << 2; /* bank */

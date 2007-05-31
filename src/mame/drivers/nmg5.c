@@ -792,13 +792,13 @@ INPUT_PORTS_START( wondstck )
 INPUT_PORTS_END
 
 
-INLINE void get_tile_info(int tile_index,UINT16 *vram,int color)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *vram,int color)
 {
 	SET_TILE_INFO(0,vram[tile_index] | (gfx_bank << 16),color,0)
 }
 
-static void fg_get_tile_info(int tile_index) { get_tile_info(tile_index,fg_videoram, 0); }
-static void bg_get_tile_info(int tile_index) { get_tile_info(tile_index,bg_videoram, 1); }
+static TILE_GET_INFO( fg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,fg_videoram, 0); }
+static TILE_GET_INFO( bg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,bg_videoram, 1); }
 
 VIDEO_START( nmg5 )
 {

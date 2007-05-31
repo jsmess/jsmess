@@ -40,14 +40,14 @@ nth_byte32( const UINT32 *pSource, int which )
 	}
 } /* nth_byte32 */
 
-INLINE void
+static void
 NB1TilemapCB(UINT16 code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;
 } /* NB1TilemapCB */
 
-INLINE void
+static void
 NB2TilemapCB(UINT16 code, int *tile, int *mask )
 {
 	int mangle;

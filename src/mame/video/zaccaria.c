@@ -131,7 +131,7 @@ PALETTE_INIT( zaccaria )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	unsigned char attr = zaccaria_videoram[tile_index + 0x400];
 	SET_TILE_INFO(

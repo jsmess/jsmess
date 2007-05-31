@@ -21,14 +21,14 @@ static UINT8 penmask[64];
  *
  *************************************/
 
-static void centiped_get_tile_info(int tile_index)
+static TILE_GET_INFO( centiped_get_tile_info )
 {
 	int data = videoram[tile_index];
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
 }
 
 
-static void warlords_get_tile_info(int tile_index)
+static TILE_GET_INFO( warlords_get_tile_info )
 {
 	int data = videoram[tile_index];
 	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (centiped_flipscreen >> 5);
@@ -36,7 +36,7 @@ static void warlords_get_tile_info(int tile_index)
 }
 
 
-static void milliped_get_tile_info(int tile_index)
+static TILE_GET_INFO( milliped_get_tile_info )
 {
 	int data = videoram[tile_index];
 	int bank = (data >> 6) & 1;
@@ -47,7 +47,7 @@ static void milliped_get_tile_info(int tile_index)
 }
 
 
-static void bullsdrt_get_tile_info(int tile_index)
+static TILE_GET_INFO( bullsdrt_get_tile_info )
 {
 	int data = videoram[tile_index];
 	int bank = bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;

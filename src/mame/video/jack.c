@@ -45,7 +45,7 @@ WRITE8_HANDLER( jack_flipscreen_w )
 	flip_screen_set(offset);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x18) << 5);
 	int color = colorram[tile_index] & 0x07;
@@ -134,7 +134,7 @@ PALETTE_INIT( joinem )
 	}
 }
 
-static void joinem_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( joinem_get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x01) << 8);
 	int color = (colorram[tile_index] & 0x38) >> 3;

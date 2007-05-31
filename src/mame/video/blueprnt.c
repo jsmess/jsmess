@@ -74,13 +74,13 @@ WRITE8_HANDLER( blueprnt_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + 256 * gfx_bank;
 	int color = attr & 0x7f;
 
-	tile_info.priority = (attr & 0x80) ? 1 : 0;
+	tileinfo->priority = (attr & 0x80) ? 1 : 0;
 
 	SET_TILE_INFO(0, code, color, 0)
 }

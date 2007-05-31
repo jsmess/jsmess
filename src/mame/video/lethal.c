@@ -40,7 +40,7 @@ static void lethalen_sprite_callback(int *code, int *color, int *priority_mask)
 	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
 }
 
-static void lethalen_tile_callback(int layer, int *code, int *color)
+static void lethalen_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = layer_colorbase[layer] + ((*color & 0x3c)<<2);
 }

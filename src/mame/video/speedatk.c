@@ -86,7 +86,7 @@ WRITE8_HANDLER( speedatk_flip_screen_w )
 	flip_screen_set(data);
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code, color, region;
 

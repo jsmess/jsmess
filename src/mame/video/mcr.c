@@ -26,12 +26,12 @@ static tilemap *bg_tilemap;
     Byte 0:
         pppppppp = picture index
  */
-static void mcr_90009_get_tile_info(int tile_index)
+static TILE_GET_INFO( mcr_90009_get_tile_info )
 {
 	SET_TILE_INFO(0, videoram[tile_index], 0, 0);
 
 	/* sprite color base is constant 0x10 */
-	tile_info.priority = 1;
+	tileinfo->priority = 1;
 }
 
 
@@ -48,7 +48,7 @@ static void mcr_90009_get_tile_info(int tile_index)
         ------x- = X flip
         -------p = picture index (high 1 bit)
  */
-static void mcr_90010_get_tile_info(int tile_index)
+static TILE_GET_INFO( mcr_90010_get_tile_info )
 {
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x1ff;
@@ -56,7 +56,7 @@ static void mcr_90010_get_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 9) & 3));
 
 	/* sprite color base comes from the top 2 bits */
-	tile_info.priority = (data >> 14) & 3;
+	tileinfo->priority = (data >> 14) & 3;
 }
 
 
@@ -73,7 +73,7 @@ static void mcr_90010_get_tile_info(int tile_index)
         -----x-- = X flip
         ------pp = picture index (high 2 bits)
  */
-static void mcr_91490_get_tile_info(int tile_index)
+static TILE_GET_INFO( mcr_91490_get_tile_info )
 {
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = data & 0x3ff;
@@ -81,7 +81,7 @@ static void mcr_91490_get_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
 
 	/* sprite color base might come from the top 2 bits */
-	tile_info.priority = (data >> 14) & 3;
+	tileinfo->priority = (data >> 14) & 3;
 }
 
 

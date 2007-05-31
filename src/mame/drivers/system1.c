@@ -2915,6 +2915,58 @@ ROM_START( flicky )
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
+ROM_START( flicks2 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_LOAD( "epr-6621.bin",	0x0000, 0x4000, CRC(b21ff546) SHA1(e1d5438eaf0efeaeb4687dcfc12bf325e804182f) )
+	ROM_LOAD( "epr-6622.bin",	0x4000, 0x4000, CRC(133a8bf1) SHA1(e5e620797daace0843a680cb4572586b5e639ca0) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for sound cpu */
+	ROM_LOAD( "epr-5869.120",	0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
+
+	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "epr-5868.62",	0x0000, 0x2000, CRC(7402256b) SHA1(5bd660ac24a2d0d8ad983e948674a82a2d2e8b49) )
+	ROM_LOAD( "epr-5867.61",	0x2000, 0x2000, CRC(2f5ce930) SHA1(4bc3bc6eb8f03926d3710c9f96fcc1b116e918d3) )
+	ROM_LOAD( "epr-5866.64",	0x4000, 0x2000, CRC(967f1d9a) SHA1(652be7848526c6e61db4a502f75d1689d2ff2f59) )
+	ROM_LOAD( "epr-5865.63",	0x6000, 0x2000, CRC(03d9a34c) SHA1(e158db3e0b86f2b8ad34cefc2714cb0a942efde7) )
+	ROM_LOAD( "epr-5864.66",	0x8000, 0x2000, CRC(e659f358) SHA1(cf59f1fb0f9fb77d5ac36be52b6ee946ee85d6de) )
+	ROM_LOAD( "epr-5863.65",	0xa000, 0x2000, CRC(a496ca15) SHA1(8c629a853486bbe049b1deecdc00f9e16b87698f) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 ) /* 32k for sprites data */
+	ROM_LOAD( "epr-5855.117",	0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) )
+	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+ROM_END
+
+
+
+ROM_START( flicks1 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_LOAD( "ic129",	0x0000, 0x2000, CRC(7011275c) SHA1(69d9d1a66734bf859dbd0200b5a772110bd522c1) ) /* encrypted */
+	ROM_LOAD( "ic130",	0x2000, 0x2000, CRC(e7ed012d) SHA1(7f378ad3e0b6721d7108b4ee10333422df92c039) ) /* encrypted */
+	ROM_LOAD( "ic131",	0x4000, 0x2000, CRC(c5e98cd1) SHA1(ea8d97bebfce4e41242169d34bccbf430b094fd7) ) /* encrypted */
+	ROM_LOAD( "ic132",	0x6000, 0x2000, CRC(0e5122c2) SHA1(cec34001d4eb8a983b3299462ec513049a3dab46) ) /* encrypted */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for sound cpu */
+	ROM_LOAD( "epr-5869.120",	0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
+
+	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "epr-5868.62",	0x0000, 0x2000, CRC(7402256b) SHA1(5bd660ac24a2d0d8ad983e948674a82a2d2e8b49) )
+	ROM_LOAD( "epr-5867.61",	0x2000, 0x2000, CRC(2f5ce930) SHA1(4bc3bc6eb8f03926d3710c9f96fcc1b116e918d3) )
+	ROM_LOAD( "epr-5866.64",	0x4000, 0x2000, CRC(967f1d9a) SHA1(652be7848526c6e61db4a502f75d1689d2ff2f59) )
+	ROM_LOAD( "epr-5865.63",	0x6000, 0x2000, CRC(03d9a34c) SHA1(e158db3e0b86f2b8ad34cefc2714cb0a942efde7) )
+	ROM_LOAD( "epr-5864.66",	0x8000, 0x2000, CRC(e659f358) SHA1(cf59f1fb0f9fb77d5ac36be52b6ee946ee85d6de) )
+	ROM_LOAD( "epr-5863.65",	0xa000, 0x2000, CRC(a496ca15) SHA1(8c629a853486bbe049b1deecdc00f9e16b87698f) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 ) /* 32k for sprites data */
+	ROM_LOAD( "epr-5855.117",	0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) )
+	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+ROM_END
+
 ROM_START( flickyo )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */
 	ROM_LOAD( "epr-5857.bin",	0x0000, 0x2000, CRC(a65ac88e) SHA1(1d1c276f7ffb33bc9f216b6b69517f1783d435a4) ) /* encrypted */
@@ -4660,8 +4712,10 @@ GAME( 1983, upndownu, upndown,  system1,  upndown,  0,        ROT270, "Sega", 		
 GAME( 1984, mrviking, 0,        small,    mrviking, mrviking, ROT270, "Sega", 			 	   "Mister Viking (315-5041)", GAME_SUPPORTS_SAVE )
 GAME( 1984, mrvikngj, mrviking, small,    mrvikngj, mrviking, ROT270, "Sega", 			 	   "Mister Viking (315-5041, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, swat,     0,        system1,  swat,     swat,     ROT270, "Coreland / Sega", 	   "SWAT (315-5048)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flicky,   0,        system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (315-5051, 128k Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flickyo,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (315-5051, 64k Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flicky,   0,        system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (128k Version, System 2, 315-5051)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flicks2,  flicky,   system1,  flicky,   0,        ROT0,   "Sega", 			 	   "Flicky (128k Version, System 2, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flickyo,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (64k Version, System 1, 315-5051, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flicks1,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (64k Version, System 1, 315-5051, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, wmatch,   0,        small, 	  wmatch,   wmatch,   ROT270, "Sega", 			 	   "Water Match (315-5064)", GAME_SUPPORTS_SAVE )
 GAME( 1984, bullfgt,  0,        system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "Bullfight (315-5065)", GAME_SUPPORTS_SAVE )
 GAME( 1984, thetogyu, bullfgt,  system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "The Togyu (315-5065, Japan)", GAME_SUPPORTS_SAVE )

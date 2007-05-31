@@ -46,7 +46,7 @@ static tilemap *bg_tilemap[2];
       0  | xxxx---- -------- | color
 */
 
-static void get_tile_info_splash_tilemap0(int tile_index)
+static TILE_GET_INFO( get_tile_info_splash_tilemap0 )
 {
 	int data = splash_videoram[tile_index];
 	int attr = data >> 8;
@@ -59,7 +59,7 @@ static void get_tile_info_splash_tilemap0(int tile_index)
 			0)
 }
 
-static void get_tile_info_splash_tilemap1(int tile_index)
+static TILE_GET_INFO( get_tile_info_splash_tilemap1 )
 {
 	int data = splash_videoram[(0x1000/2) + tile_index];
 	int attr = data >> 8;

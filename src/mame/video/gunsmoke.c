@@ -131,7 +131,7 @@ WRITE8_HANDLER( gunsmoke_d806_w )
 	objon = data & 0x20;
 }
 
-static void get_bg_tile_info( int tile_index )
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 *tilerom = memory_region(REGION_GFX4);
 
@@ -144,7 +144,7 @@ static void get_bg_tile_info( int tile_index )
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_fg_tile_info( int tile_index )
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0xe0) << 2);

@@ -36,8 +36,9 @@ static WRITE32_HANDLER( paletteram32_w )
 
 #define NUM_LAYERS	2
 
-static void game_tile_callback(int layer, int *code, int *color)
+static void game_tile_callback(int layer, int *code, int *color, int *flags)
 {
+	*color += layer * 0x40;
 }
 
 VIDEO_START( zr107 )

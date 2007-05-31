@@ -99,7 +99,7 @@ WRITE8_HANDLER( hanaawas_portB_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
 	int offset = (tile_index + (flip_screen ? 1 : -1)) & 0x3ff;

@@ -70,7 +70,7 @@ static WRITE16_HANDLER( k3_bgram_w )
 	}
 }
 
-static void get_k3_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_k3_bg_tile_info )
 {
 	int tileno;
 	tileno = k3_bgram[tile_index];

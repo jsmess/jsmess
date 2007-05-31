@@ -21,7 +21,7 @@ static void gijoe_sprite_callback(int *code, int *color, int *priority_mask)
 	*color = sprite_colorbase | (c & 0x001f);
 }
 
-static void gijoe_tile_callback(int layer, int *code, int *color)
+static void gijoe_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	int tile = *code;
 

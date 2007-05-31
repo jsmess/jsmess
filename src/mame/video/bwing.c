@@ -164,29 +164,29 @@ WRITE8_HANDLER( bwing_paletteram_w )
 // Initializations
 
 #define BW_SET_TILE_INFO(GFX, CODE, COLOR) { \
-	tile_info.tile_number = (CODE); \
-	tile_info.pen_data = GFX->gfxdata + (CODE) * GFX->char_modulo; \
-	tile_info.pal_data = &GFX->colortable[(COLOR) << 3]; \
-	tile_info.pen_usage = GFX->pen_usage[(CODE)]; }
+	tileinfo->tile_number = (CODE); \
+	tileinfo->pen_data = GFX->gfxdata + (CODE) * GFX->char_modulo; \
+	tileinfo->pal_data = &GFX->colortable[(COLOR) << 3]; \
+	tileinfo->pen_usage = GFX->pen_usage[(CODE)]; }
 
-INLINE void get_fgtileinfo(int i)
+static TILE_GET_INFO( get_fgtileinfo )
 {
-	unsigned code = fgdata[i];
+	unsigned code = fgdata[tile_index];
 	BW_SET_TILE_INFO(fgfx, code & (BW_NTILES-1), code >> 7)
 }
 
-INLINE void get_bgtileinfo(int i)
+static TILE_GET_INFO( get_bgtileinfo )
 {
-	unsigned code = bgdata[i];
+	unsigned code = bgdata[tile_index];
 	BW_SET_TILE_INFO(bgfx, code & (BW_NTILES-1), code >> 7)
 }
 
-INLINE void get_charinfo(int i)
+static TILE_GET_INFO( get_charinfo )
 {
-	SET_TILE_INFO(0, videoram[i], 0, 0)
+	SET_TILE_INFO(0, videoram[tile_index], 0, 0)
 }
 
-INLINE UINT32 bwing_scan_cols(UINT32 col, UINT32 row, UINT32 nc, UINT32 nr)
+static UINT32 bwing_scan_cols(UINT32 col, UINT32 row, UINT32 nc, UINT32 nr)
 {
 	return((col<<6) + row);
 }

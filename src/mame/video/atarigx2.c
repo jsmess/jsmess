@@ -57,7 +57,7 @@ static UINT16 playfield_yscroll;
  *
  *************************************/
 
-static void get_alpha_tile_info(int tile_index)
+static TILE_GET_INFO( get_alpha_tile_info )
 {
 	UINT16 data = atarigen_alpha32[tile_index / 2] >> (16 * (~tile_index & 1));
 	int code = data & 0xfff;
@@ -67,13 +67,13 @@ static void get_alpha_tile_info(int tile_index)
 }
 
 
-static void get_playfield_tile_info(int tile_index)
+static TILE_GET_INFO( get_playfield_tile_info )
 {
 	UINT16 data = atarigen_playfield32[tile_index / 2] >> (16 * (~tile_index & 1));
 	int code = (playfield_tile_bank << 12) | (data & 0xfff);
 	int color = (atarigx2_playfield_base >> 5) + ((playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
-	tile_info.priority = (playfield_color_bank >> 2) & 7;
+	tileinfo->priority = (playfield_color_bank >> 2) & 7;
 }
 
 

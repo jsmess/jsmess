@@ -29,7 +29,7 @@ static UINT16 playfield_yscroll;
  *
  *************************************/
 
-static void get_alpha_tile_info(int tile_index)
+static TILE_GET_INFO( get_alpha_tile_info )
 {
 	UINT16 data = atarigen_alpha[tile_index];
 	int code = data & 0x3ff;
@@ -39,7 +39,7 @@ static void get_alpha_tile_info(int tile_index)
 }
 
 
-static void get_playfield_tile_info(int tile_index)
+static TILE_GET_INFO( get_playfield_tile_info )
 {
 	UINT16 data = atarigen_playfield[tile_index];
 	int code = (playfield_tile_bank * 0x1000) + (data & 0xfff);

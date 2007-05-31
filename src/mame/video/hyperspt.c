@@ -100,7 +100,7 @@ WRITE8_HANDLER( hyperspt_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x80) << 1) + ((colorram[tile_index] & 0x40) << 3);
 	int color = colorram[tile_index] & 0x0f;
@@ -179,7 +179,7 @@ VIDEO_UPDATE( hyperspt )
 
 /* Road Fighter */
 
-static void roadf_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( roadf_get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x80) << 1) + ((colorram[tile_index] & 0x60) << 4);
 	int color = colorram[tile_index] & 0x0f;

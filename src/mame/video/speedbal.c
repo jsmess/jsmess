@@ -13,7 +13,7 @@ UINT8 *speedbal_foreground_videoram;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = speedbal_background_videoram[tile_index*2] + ((speedbal_background_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = speedbal_background_videoram[tile_index*2+1] & 0x0f;
@@ -21,7 +21,7 @@ static void get_tile_info_bg(int tile_index)
 	SET_TILE_INFO(1, code, color, TILE_SPLIT(color == 8 ? 1 : 0))
 }
 
-static void get_tile_info_fg(int tile_index)
+static TILE_GET_INFO( get_tile_info_fg )
 {
 	int code = speedbal_foreground_videoram[tile_index*2] + ((speedbal_foreground_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = speedbal_foreground_videoram[tile_index*2+1] & 0x0f;

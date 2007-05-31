@@ -33,28 +33,28 @@ WRITE8_HANDLER( sengokmj_txvram_w )
 	tilemap_mark_tile_dirty(tx_tilemap,offset/2);
 }
 
-static void sengoku_bg_tile_info(int tile_index)
+static TILE_GET_INFO( sengoku_bg_tile_info )
 {
 	int tile = sengokmj_bgvram[tile_index*2] + (sengokmj_bgvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;
 	SET_TILE_INFO(1, tile & 0xfff, color, 0)
 }
 
-static void sengoku_md_tile_info(int tile_index)
+static TILE_GET_INFO( sengoku_md_tile_info )
 {
 	int tile = sengokmj_mdvram[tile_index*2] + (sengokmj_mdvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;
 	SET_TILE_INFO(1, (tile & 0xfff) + 0x1000, color + 0x10, 0)
 }
 
-static void sengoku_fg_tile_info(int tile_index)
+static TILE_GET_INFO( sengoku_fg_tile_info )
 {
 	int tile = sengokmj_fgvram[tile_index*2] + (sengokmj_fgvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;
 	SET_TILE_INFO(1, (tile & 0xfff) + 0x2000, color + 0x20, 0)
 }
 
-static void sengoku_tx_tile_info(int tile_index)
+static TILE_GET_INFO( sengoku_tx_tile_info )
 {
 	int tile = sengokmj_txvram[tile_index*2] + (sengokmj_txvram[2*tile_index+1] << 8);
 	int color = (tile >> 12) & 0x0f;

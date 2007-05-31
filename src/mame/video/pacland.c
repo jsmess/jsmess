@@ -134,7 +134,7 @@ PALETTE_INIT( pacland )
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int attr = pacland_videoram2[offs + 1];
@@ -145,7 +145,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int offs = tile_index * 2;
 	int attr = pacland_videoram[offs + 1];
@@ -153,7 +153,7 @@ static void get_fg_tile_info(int tile_index)
 	int color = ((attr & 0x1e) >> 1) + ((code & 0x1e0) >> 1);
 	int flags = TILE_FLIPYX(attr >> 6);
 
-	tile_info.priority = (attr & 0x20) ? 1 : 0;
+	tileinfo->priority = (attr & 0x20) ? 1 : 0;
 
 	SET_TILE_INFO(0, code, color, flags)
 }

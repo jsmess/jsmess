@@ -13,7 +13,7 @@ int stlforce_sprxoffs;
 
 /* background, appears to be the bottom layer */
 
-static void get_stlforce_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_stlforce_bg_tile_info )
 {
 	int tileno,colour;
 
@@ -34,7 +34,7 @@ WRITE16_HANDLER( stlforce_bg_videoram_w )
 
 /* middle layer, low */
 
-static void get_stlforce_mlow_tile_info(int tile_index)
+static TILE_GET_INFO( get_stlforce_mlow_tile_info )
 {
 	int tileno,colour;
 
@@ -58,7 +58,7 @@ WRITE16_HANDLER( stlforce_mlow_videoram_w )
 
 /* middle layer, high */
 
-static void get_stlforce_mhigh_tile_info(int tile_index)
+static TILE_GET_INFO( get_stlforce_mhigh_tile_info )
 {
 	int tileno,colour;
 
@@ -82,7 +82,7 @@ WRITE16_HANDLER( stlforce_mhigh_videoram_w )
 
 /* text layer, appears to be the top layer */
 
-static void get_stlforce_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_stlforce_tx_tile_info )
 {
 	int tileno,colour;
 

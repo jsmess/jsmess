@@ -496,7 +496,7 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 	}
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	const UINT16 *source = twin16_videoram2;
 	int attr = source[tile_index];

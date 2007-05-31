@@ -186,15 +186,18 @@ PALETTE_INIT( shtrider )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	unsigned char attr = travrusa_videoram[2*tile_index+1];
+	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
+
+	if ((attr & 0x0f) == 0x0f) flags |= TILE_SPLIT(1);	/* tunnels */
+
 	SET_TILE_INFO(
 			0,
 			travrusa_videoram[2*tile_index] + ((attr & 0xc0) << 2),
 			attr & 0x0f,
-			TILE_FLIPXY((attr & 0x30) >> 4))
-	if ((attr & 0x0f) == 0x0f) tile_info.flags |= TILE_SPLIT(1);	/* tunnels */
+			flags)
 }
 
 

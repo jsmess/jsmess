@@ -28,7 +28,7 @@ UINT8 *skyarmy_colorram;
 UINT8 *skyarmy_scrollram;
 static tilemap* skyarmy_tilemap;
 
-static void get_skyarmy_tile_info(int tile_index)
+static TILE_GET_INFO( get_skyarmy_tile_info )
 {
         int code = skyarmy_videoram[tile_index];
         int attr = skyarmy_colorram[tile_index];

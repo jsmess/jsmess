@@ -39,7 +39,7 @@ static UINT32 bg_scan_td2(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 }
 
 
-static void macross_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( macross_get_bg_tile_info )
 {
 	int code = nmk_bgvideoram[tile_index];
 	SET_TILE_INFO(
@@ -49,7 +49,7 @@ static void macross_get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void strahl_get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( strahl_get_fg_tile_info )
 {
 	int code = nmk_fgvideoram[tile_index];
 	SET_TILE_INFO(
@@ -59,7 +59,7 @@ static void strahl_get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void macross_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( macross_get_tx_tile_info )
 {
 	int code = nmk_txvideoram[tile_index];
 	SET_TILE_INFO(
@@ -69,7 +69,7 @@ static void macross_get_tx_tile_info(int tile_index)
 			0)
 }
 
-static void bjtwin_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( bjtwin_get_bg_tile_info )
 {
 	int code = nmk_bgvideoram[tile_index];
 	int bank = (code & 0x800) ? 1 : 0;

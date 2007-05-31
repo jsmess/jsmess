@@ -314,7 +314,7 @@ static UINT32 tumblep_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-INLINE void get_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
+INLINE void get_bg_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int gfx_bank,UINT16 *gfx_base)
 {
 	int data = gfx_base[tile_index];
 
@@ -325,10 +325,10 @@ INLINE void get_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
 			0)
 }
 
-static void get_bg1_tile_info(int tile_index) { get_bg_tile_info(tile_index,2,tumblepb_pf1_data); }
-static void get_bg2_tile_info(int tile_index) { get_bg_tile_info(tile_index,1,tumblepb_pf2_data); }
+static TILE_GET_INFO( get_bg1_tile_info ) { get_bg_tile_info(machine,tileinfo,tile_index,2,tumblepb_pf1_data); }
+static TILE_GET_INFO( get_bg2_tile_info ) { get_bg_tile_info(machine,tileinfo,tile_index,1,tumblepb_pf2_data); }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int data = tumblepb_pf1_data[tile_index];
 
@@ -339,7 +339,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-INLINE void get_fncywld_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
+INLINE void get_fncywld_bg_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int gfx_bank,UINT16 *gfx_base)
 {
 	int data = gfx_base[tile_index*2];
 	int attr = gfx_base[tile_index*2+1];
@@ -351,10 +351,10 @@ INLINE void get_fncywld_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_bas
 			0)
 }
 
-static void get_fncywld_bg1_tile_info(int tile_index) { get_fncywld_bg_tile_info(tile_index,2,tumblepb_pf1_data); }
-static void get_fncywld_bg2_tile_info(int tile_index) { get_fncywld_bg_tile_info(tile_index,1,tumblepb_pf2_data); }
+static TILE_GET_INFO( get_fncywld_bg1_tile_info ) { get_fncywld_bg_tile_info(machine,tileinfo,tile_index,2,tumblepb_pf1_data); }
+static TILE_GET_INFO( get_fncywld_bg2_tile_info ) { get_fncywld_bg_tile_info(machine,tileinfo,tile_index,1,tumblepb_pf2_data); }
 
-static void get_fncywld_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fncywld_fg_tile_info )
 {
 	int data = tumblepb_pf1_data[tile_index*2];
 	int attr = tumblepb_pf1_data[tile_index*2+1];
@@ -368,7 +368,7 @@ static void get_fncywld_fg_tile_info(int tile_index)
 
 
 /* jump pop */
-static void get_jumppop_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_jumppop_bg1_tile_info )
 {
 	int data = tumblepb_pf1_data[tile_index];
 
@@ -379,7 +379,7 @@ static void get_jumppop_bg1_tile_info(int tile_index)
 			0)
 }
 
-static void get_jumppop_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_jumppop_bg2_tile_info )
 {
 	int data = tumblepb_pf2_data[tile_index];
 
@@ -390,7 +390,7 @@ static void get_jumppop_bg2_tile_info(int tile_index)
 			0)
 }
 
-static void get_jumppop_bg2_alt_tile_info(int tile_index)
+static TILE_GET_INFO( get_jumppop_bg2_alt_tile_info )
 {
 	int data = tumblepb_pf2_data[tile_index];
 
@@ -402,7 +402,7 @@ static void get_jumppop_bg2_alt_tile_info(int tile_index)
 }
 
 
-static void get_jumppop_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_jumppop_fg_tile_info )
 {
 	int data = tumblepb_pf1_data[tile_index];
 
@@ -432,7 +432,7 @@ WRITE16_HANDLER( pangpang_pf2_data_w )
 
 
 
-INLINE void pangpang_get_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
+INLINE void pangpang_get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index,int gfx_bank,UINT16 *gfx_base)
 {
 	int data = gfx_base[tile_index*2+1];
 	int attr = gfx_base[tile_index*2];
@@ -444,7 +444,7 @@ INLINE void pangpang_get_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_ba
 			0)
 }
 
-INLINE void pangpang_get_bg2x_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
+INLINE void pangpang_get_bg2x_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index,int gfx_bank,UINT16 *gfx_base)
 {
 	int data = gfx_base[tile_index*2+1];
 	int attr = gfx_base[tile_index*2];
@@ -457,10 +457,10 @@ INLINE void pangpang_get_bg2x_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_
 }
 
 
-static void pangpang_get_bg1_tile_info(int tile_index) { pangpang_get_bg_tile_info(tile_index,2,tumblepb_pf1_data); }
-static void pangpang_get_bg2_tile_info(int tile_index) { pangpang_get_bg2x_tile_info(tile_index,1,tumblepb_pf2_data); }
+static TILE_GET_INFO( pangpang_get_bg1_tile_info ) { pangpang_get_bg_tile_info(machine,tileinfo,tile_index,2,tumblepb_pf1_data); }
+static TILE_GET_INFO( pangpang_get_bg2_tile_info ) { pangpang_get_bg2x_tile_info(machine,tileinfo,tile_index,1,tumblepb_pf2_data); }
 
-static void pangpang_get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( pangpang_get_fg_tile_info )
 {
 	int data = tumblepb_pf1_data[tile_index*2+1];
 	int attr = tumblepb_pf1_data[tile_index*2];

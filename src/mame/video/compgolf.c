@@ -48,10 +48,10 @@ WRITE8_HANDLER( compgolf_back_w )
 	tilemap_mark_tile_dirty(background_tilemap, offset/2);
 }
 
-static void get_text_info(int cgindex)
+static TILE_GET_INFO( get_text_info )
 {
-	cgindex<<=1;
-	SET_TILE_INFO(2, videoram[cgindex+1]|(videoram[cgindex]<<8), videoram[cgindex]>>2, 0)
+	tile_index<<=1;
+	SET_TILE_INFO(2, videoram[tile_index+1]|(videoram[tile_index]<<8), videoram[tile_index]>>2, 0)
 }
 
 static UINT32 back_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
@@ -60,10 +60,10 @@ static UINT32 back_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static void get_back_info(int cgindex)
+static TILE_GET_INFO( get_back_info )
 {
-	int attr = compgolf_bg_ram[cgindex*2];
-	int code = compgolf_bg_ram[cgindex*2+1] + ((attr & 1) << 8);
+	int attr = compgolf_bg_ram[tile_index*2];
+	int code = compgolf_bg_ram[tile_index*2+1] + ((attr & 1) << 8);
 	int color = (attr & 0x3e) >> 1;
 
 	SET_TILE_INFO(1,code,color,0)

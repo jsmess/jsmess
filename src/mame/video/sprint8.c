@@ -19,7 +19,7 @@ static mame_bitmap* helper1;
 static mame_bitmap* helper2;
 
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
 	UINT8 code = sprint8_video_ram[tile_index];
 
@@ -49,7 +49,7 @@ static void get_tile_info1(int tile_index)
 }
 
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	UINT8 code = sprint8_video_ram[tile_index];
 

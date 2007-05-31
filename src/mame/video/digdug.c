@@ -93,7 +93,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 }
 
 
-static void bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( bg_get_tile_info )
 {
 	UINT8 *rom = memory_region(REGION_GFX4);
 	int code = rom[tile_index | (bg_select << 10)];
@@ -110,7 +110,7 @@ static void bg_get_tile_info(int tile_index)
 			0)
 }
 
-static void tx_get_tile_info(int tile_index)
+static TILE_GET_INFO( tx_get_tile_info )
 {
 	unsigned char code = digdug_videoram[tile_index];
 	int color;

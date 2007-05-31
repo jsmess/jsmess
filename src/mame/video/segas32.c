@@ -272,7 +272,7 @@ static UINT32 *spriteram_32bit;
  *
  *************************************/
 
-static void get_tile_info(int tile_index);
+static TILE_GET_INFO( get_tile_info );
 static void sprite_erase_buffer(void);
 static void sprite_swap_buffers(void);
 static void sprite_render_list(void);
@@ -796,9 +796,9 @@ static tilemap *find_cache_entry(int page, int bank)
  *
  *************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
-	struct cache_entry *entry = tile_info.user_data;
+	struct cache_entry *entry = tileinfo->user_data;
 	UINT16 data = system32_videoram[(entry->page & 0x7f) * 0x200 + tile_index];
 	SET_TILE_INFO(0, (entry->bank << 13) + (data & 0x1fff), (data >> 4) & 0x1ff, (data >> 14) & 3);
 }

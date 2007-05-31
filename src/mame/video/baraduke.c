@@ -76,7 +76,7 @@ static UINT32 tx_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 	return offs;
 }
 
-static void tx_get_tile_info(int tile_index)
+static TILE_GET_INFO( tx_get_tile_info )
 {
 	SET_TILE_INFO(
 			0,
@@ -85,7 +85,7 @@ static void tx_get_tile_info(int tile_index)
 			0)
 }
 
-static void get_tile_info0(int tile_index)
+static TILE_GET_INFO( get_tile_info0 )
 {
 	int code = baraduke_videoram[2*tile_index];
 	int attr = baraduke_videoram[2*tile_index + 1];
@@ -97,7 +97,7 @@ static void get_tile_info0(int tile_index)
 			0)
 }
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
 	int code = baraduke_videoram[0x1000 + 2*tile_index];
 	int attr = baraduke_videoram[0x1000 + 2*tile_index + 1];

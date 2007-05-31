@@ -51,7 +51,7 @@ WRITE16_HANDLER( goal92_foreground_w )
 		tilemap_mark_tile_dirty(foreground_layer,offset);
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile = goal92_textram[tile_index];
 	int color=(tile>>12)&0xf;
@@ -63,7 +63,7 @@ static void get_text_tile_info(int tile_index)
 	SET_TILE_INFO(1,tile,color,0)
 }
 
-static void get_back_tile_info(int tile_index)
+static TILE_GET_INFO( get_back_tile_info )
 {
 	int tile=goal92_back_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -73,7 +73,7 @@ static void get_back_tile_info(int tile_index)
 	SET_TILE_INFO(2,tile,color,0)
 }
 
-static void get_fore_tile_info(int tile_index)
+static TILE_GET_INFO( get_fore_tile_info )
 {
 	int tile=goal92_fore_data[tile_index];
 	int color=(tile>>12)&0xf;

@@ -74,7 +74,7 @@ PALETTE_INIT( cop01 )
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile = cop01_bgvideoram[tile_index];
 	int attr = cop01_bgvideoram[tile_index+0x800];
@@ -95,7 +95,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1,tile + ((attr & 0x03) << 8),(attr & 0x1c) >> 2,TILE_SPLIT(pri));
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile = cop01_fgvideoram[tile_index];
 	SET_TILE_INFO(0,tile,0,0);

@@ -28,7 +28,7 @@ WRITE16_HANDLER(zerozone_tilebank_w)
 	tilemap_mark_all_tiles_dirty(zerozone_tilemap);
 }
 
-static void get_zerozone_tile_info(int tile_index)
+static TILE_GET_INFO( get_zerozone_tile_info )
 {
 	int tileno,colour;
 	tileno = zerozone_videoram[tile_index] & 0x07ff;

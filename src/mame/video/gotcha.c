@@ -18,7 +18,7 @@ UINT32 gotcha_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 	return (col & 0x1f) | (row << 5) | ((col & 0x20) << 5);
 }
 
-INLINE void get_tile_info(int tile_index,UINT16 *vram,int color_offs)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *vram,int color_offs)
 {
 	UINT16 data = vram[tile_index];
 	int code = (data & 0x3ff) | (gfxbank[(data & 0x0c00) >> 10] << 10);
@@ -26,8 +26,8 @@ INLINE void get_tile_info(int tile_index,UINT16 *vram,int color_offs)
 	SET_TILE_INFO(0,code,(data >> 12) + color_offs,0)
 }
 
-static void fg_get_tile_info(int tile_index) { get_tile_info(tile_index,gotcha_fgvideoram, 0); }
-static void bg_get_tile_info(int tile_index) { get_tile_info(tile_index,gotcha_bgvideoram,16); }
+static TILE_GET_INFO( fg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,gotcha_fgvideoram, 0); }
+static TILE_GET_INFO( bg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_index,gotcha_bgvideoram,16); }
 
 
 

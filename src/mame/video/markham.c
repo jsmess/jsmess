@@ -65,7 +65,7 @@ WRITE8_HANDLER( markham_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = videoram[tile_index * 2];
 	int code = videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);

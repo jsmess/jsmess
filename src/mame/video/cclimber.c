@@ -790,7 +790,7 @@ UINT8 *toprollr_videoram3;
 UINT8 *toprollr_videoram4;
 
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = toprollr_videoram3[tile_index];
 	int attr = toprollr_videoram4[tile_index];

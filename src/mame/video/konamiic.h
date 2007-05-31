@@ -16,7 +16,7 @@ void K007121_sprites_draw(int chip,mame_bitmap *bitmap,const rectangle *cliprect
 		UINT32 pri_mask);
 
 
-int K007342_vh_start(int gfx_index, void (*callback)(int layer,int bank,int *code,int *color));
+int K007342_vh_start(int gfx_index, void (*callback)(int layer,int bank,int *code,int *color,int *flags));
 READ8_HANDLER( K007342_r );
 WRITE8_HANDLER( K007342_w );
 READ8_HANDLER( K007342_scroll_r );
@@ -65,7 +65,7 @@ The callback must put:
 extern tilemap *K052109_tilemap[3];
 
 int K052109_vh_start(int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
-		void (*callback)(int layer,int bank,int *code,int *color));
+		void (*callback)(int layer,int bank,int *code,int *color,int *flags,int *priority));
 /* plain 8-bit access */
 READ8_HANDLER( K052109_r );
 WRITE8_HANDLER( K052109_w );
@@ -193,13 +193,13 @@ The callback must put:
 */
 int K051316_vh_start_0(int gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
-		void (*callback)(int *code,int *color));
+		void (*callback)(int *code,int *color,int *flags));
 int K051316_vh_start_1(int gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
-		void (*callback)(int *code,int *color));
+		void (*callback)(int *code,int *color,int *flags));
 int K051316_vh_start_2(int gfx_memory_region,int bpp,
 		int tilemap_type,int transparent_pen,
-		void (*callback)(int *code,int *color));
+		void (*callback)(int *code,int *color,int *flags));
 READ8_HANDLER( K051316_0_r );
 READ8_HANDLER( K051316_1_r );
 READ8_HANDLER( K051316_2_r );
@@ -254,7 +254,7 @@ void K056832_SetExtLinescroll(void);	/* Lethal Enforcers */
 
 int K056832_vh_start(int gfx_memory_region, int bpp, int big,
 			int (*scrolld)[4][2],
-			void (*callback)(int, int *, int *),
+			void (*callback)(int layer, int *code, int *color, int *flags),
 			int djmain_hack);
 READ16_HANDLER( K056832_ram_word_r );
 WRITE16_HANDLER( K056832_ram_word_w );

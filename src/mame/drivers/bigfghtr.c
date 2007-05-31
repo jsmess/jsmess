@@ -124,7 +124,7 @@ static UINT16 fg_scrollx,fg_scrolly;
 
 static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 
-static void get_fg_tile_info( int tile_index )
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int data = fg_videoram[tile_index];
 	SET_TILE_INFO(
@@ -135,7 +135,7 @@ static void get_fg_tile_info( int tile_index )
 }
 
 
-static void get_bg_tile_info( int tile_index )
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int data = bg_videoram[tile_index];
 	SET_TILE_INFO(
@@ -145,7 +145,7 @@ static void get_bg_tile_info( int tile_index )
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int tile_number = text_videoram[tile_index]&0xff;
 	int attributes;

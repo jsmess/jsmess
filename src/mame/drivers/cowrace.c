@@ -24,7 +24,7 @@ static WRITE8_HANDLER( cowrace_colorram_w )
 	tilemap_mark_tile_dirty(tmap, offset);
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 code = videoram[ tile_index ] + (colorram[ tile_index ] << 8) ;
 	SET_TILE_INFO(1, code & 0x1ff, 0, TILE_FLIPYX( 0 ));

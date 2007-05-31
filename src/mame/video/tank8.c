@@ -35,7 +35,7 @@ WRITE8_HANDLER( tank8_video_ram_w )
 
 
 
-static void tank8_get_tile_info1(int tile_index)
+static TILE_GET_INFO( tank8_get_tile_info1 )
 {
 	UINT8 code = tank8_video_ram[tile_index];
 
@@ -65,7 +65,7 @@ static void tank8_get_tile_info1(int tile_index)
 }
 
 
-static void tank8_get_tile_info2(int tile_index)
+static TILE_GET_INFO( tank8_get_tile_info2 )
 {
 	UINT8 code = tank8_video_ram[tile_index];
 

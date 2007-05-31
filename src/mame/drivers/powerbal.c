@@ -325,7 +325,7 @@ INPUT_PORTS_START( magicstk )
 	PORT_DIPSETTING(    0xe0, "Easy 9" )
 INPUT_PORTS_END
 
-static void powerbal_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( powerbal_get_bg_tile_info )
 {
 	int code = (magicstk_videoram[tile_index] & 0x07ff) + magicstk_tilebank * 0x800;
 	int colr = magicstk_videoram[tile_index] & 0xf000;

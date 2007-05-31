@@ -101,7 +101,7 @@ PALETTE_INIT( namcos86 )
 
 ***************************************************************************/
 
-INLINE void get_tile_info(int tile_index,int layer,UINT8 *vram)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT8 *vram)
 {
 	int attr = vram[2*tile_index + 1];
 	int tile_offs;
@@ -117,10 +117,10 @@ INLINE void get_tile_info(int tile_index,int layer,UINT8 *vram)
 			0)
 }
 
-static void get_tile_info0(int tile_index) { get_tile_info(tile_index,0,&rthunder_videoram1[0x0000]); }
-static void get_tile_info1(int tile_index) { get_tile_info(tile_index,1,&rthunder_videoram1[0x1000]); }
-static void get_tile_info2(int tile_index) { get_tile_info(tile_index,2,&rthunder_videoram2[0x0000]); }
-static void get_tile_info3(int tile_index) { get_tile_info(tile_index,3,&rthunder_videoram2[0x1000]); }
+static TILE_GET_INFO( get_tile_info0 ) { get_tile_info(machine,tileinfo,tile_index,0,&rthunder_videoram1[0x0000]); }
+static TILE_GET_INFO( get_tile_info1 ) { get_tile_info(machine,tileinfo,tile_index,1,&rthunder_videoram1[0x1000]); }
+static TILE_GET_INFO( get_tile_info2 ) { get_tile_info(machine,tileinfo,tile_index,2,&rthunder_videoram2[0x0000]); }
+static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_index,3,&rthunder_videoram2[0x1000]); }
 
 
 /***************************************************************************

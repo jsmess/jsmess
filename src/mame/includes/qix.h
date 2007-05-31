@@ -41,8 +41,6 @@ WRITE8_HANDLER( qix_68705_portB_w );
 WRITE8_HANDLER( qix_68705_portC_w );
 
 WRITE8_HANDLER( qix_pia_0_w );
-WRITE8_HANDLER( zookeep_pia_0_w );
-WRITE8_HANDLER( zookeep_pia_2_w );
 
 INTERRUPT_GEN( qix_vblank_start );
 

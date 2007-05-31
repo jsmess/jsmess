@@ -13,7 +13,7 @@ static tilemap *bg_tilemap[2];
 
 ***************************************************************************/
 
-INLINE void get_tile_info(int tile_index,UINT8 *ram)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT8 *ram)
 {
 	tile_index *= 4;
 	SET_TILE_INFO(
@@ -23,14 +23,14 @@ INLINE void get_tile_info(int tile_index,UINT8 *ram)
 			0)
 }
 
-static void get_tile_info0(int tile_index)
+static TILE_GET_INFO( get_tile_info0 )
 {
-	get_tile_info(tile_index,vram[0]);
+	get_tile_info(machine,tileinfo,tile_index,vram[0]);
 }
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
-	get_tile_info(tile_index,vram[1]);
+	get_tile_info(machine,tileinfo,tile_index,vram[1]);
 }
 
 

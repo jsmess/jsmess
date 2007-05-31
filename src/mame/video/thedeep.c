@@ -52,7 +52,7 @@ static UINT32 tilemap_scan_rows_back( UINT32 col, UINT32 row, UINT32 num_cols, U
 	return (col & 0x0f) + ((col & 0x10) << 5) + (row << 4);
 }
 
-static void get_tile_info_0( int tile_index )
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT8 code	=	thedeep_vram_0[ tile_index * 2 + 0 ];
 	UINT8 color	=	thedeep_vram_0[ tile_index * 2 + 1 ];
@@ -63,7 +63,7 @@ static void get_tile_info_0( int tile_index )
 			TILE_FLIPX	)	// why?
 }
 
-static void get_tile_info_1( int tile_index )
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT8 code	=	thedeep_vram_1[ tile_index * 2 + 0 ];
 	UINT8 color	=	thedeep_vram_1[ tile_index * 2 + 1 ];

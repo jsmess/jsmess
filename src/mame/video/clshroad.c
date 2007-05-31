@@ -127,7 +127,7 @@ Offset:
 
 ***************************************************************************/
 
-static void get_tile_info_0a( int tile_index )
+static TILE_GET_INFO( get_tile_info_0a )
 {
 	UINT8 code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
@@ -140,7 +140,7 @@ static void get_tile_info_0a( int tile_index )
 			0)
 }
 
-static void get_tile_info_0b( int tile_index )
+static TILE_GET_INFO( get_tile_info_0b )
 {
 	UINT8 code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
@@ -200,7 +200,7 @@ static UINT32 tilemap_scan_rows_extra( UINT32 col, UINT32 row, UINT32 num_cols, 
 	return (col-2) + row * 0x20;
 }
 
-static void get_tile_info_fb1( int tile_index )
+static TILE_GET_INFO( get_tile_info_fb1 )
 {
 	UINT8 code	=	clshroad_vram_1[ tile_index + 0x000 ];
 	UINT8 color	=	clshroad_vram_1[ tile_index + 0x400 ];
@@ -211,7 +211,7 @@ static void get_tile_info_fb1( int tile_index )
 			0)
 }
 
-static void get_tile_info_1( int tile_index )
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT8 code	=	clshroad_vram_1[ tile_index + 0x000 ];
 	UINT8 color	=	clshroad_vram_1[ tile_index + 0x400 ];

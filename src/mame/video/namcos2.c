@@ -55,7 +55,7 @@ WRITE16_HANDLER( namcos2_gfx_ctrl_w )
 	COMBINE_DATA(&namcos2_gfx_ctrl);
 } /* namcos2_gfx_ctrl_w */
 
-static void get_tile_info_roz(int tile_index)
+static TILE_GET_INFO( get_tile_info_roz )
 {
 	int tile = namcos2_68k_roz_ram[tile_index];
 	SET_TILE_INFO(3,tile,0/*color*/,0)

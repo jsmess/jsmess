@@ -341,7 +341,7 @@ WRITE8_HANDLER( magicfly_colorram_w )
 	}
 }
 
-static void get_magicfly_tile_info(int tile_index)
+static TILE_GET_INFO( get_magicfly_tile_info )
 {
 /*  - bits -
     7654 3210
@@ -375,7 +375,7 @@ VIDEO_START(magicfly)
 	return 0;
 }
 
-static void get_7mezzo_tile_info(int tile_index)
+static TILE_GET_INFO( get_7mezzo_tile_info )
 {
 /*  - bits -
     7654 3210

@@ -24,7 +24,7 @@ static tilemap *bg_tilemap;
 
 ***************************************************************************/
 
-static void pb_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( pb_get_bg_tile_info )
 {
 	int attr = superqix_videoram[tile_index + 0x400];
 	int code = superqix_videoram[tile_index] + 256 * (attr & 0x7);
@@ -32,7 +32,7 @@ static void pb_get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void sqix_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( sqix_get_bg_tile_info )
 {
 	int attr = superqix_videoram[tile_index + 0x400];
 	int bank = (attr & 0x04) ? 0 : 1;

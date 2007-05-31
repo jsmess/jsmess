@@ -75,7 +75,7 @@ static UINT16 *metro_tiletable_old;
 static UINT8 *dirtyindex;
 
 
-static void metro_K053936_get_tile_info(int tile_index)
+static TILE_GET_INFO( metro_K053936_get_tile_info )
 {
 	int code = metro_K053936_ram[tile_index];
 
@@ -86,7 +86,7 @@ static void metro_K053936_get_tile_info(int tile_index)
 			0)
 }
 
-static void metro_K053936_gstrik2_get_tile_info(int tile_index)
+static TILE_GET_INFO( metro_K053936_gstrik2_get_tile_info )
 {
 	int code = metro_K053936_ram[tile_index];
 
@@ -182,7 +182,7 @@ static UINT8 *empty_tiles;
 
 
 /* 8x8x4 tiles only */
-INLINE void get_tile_info(int tile_index,int layer,UINT16 *vram)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
 	int      table_index;
@@ -203,11 +203,11 @@ INLINE void get_tile_info(int tile_index,int layer,UINT16 *vram)
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tile_info.tile_number = _code;
-		tile_info.pen_data = empty_tiles + _code*16*16;
-		tile_info.pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
-		tile_info.pen_usage = 0;
-		tile_info.flags = 0;
+		tileinfo->tile_number = _code;
+		tileinfo->pen_data = empty_tiles + _code*16*16;
+		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pen_usage = 0;
+		tileinfo->flags = 0;
 	}
 	else
 		SET_TILE_INFO(
@@ -220,7 +220,7 @@ INLINE void get_tile_info(int tile_index,int layer,UINT16 *vram)
 
 /* 8x8x4 or 8x8x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_8bit(int tile_index,int layer,UINT16 *vram)
+INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
 	int      table_index;
@@ -241,11 +241,11 @@ INLINE void get_tile_info_8bit(int tile_index,int layer,UINT16 *vram)
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tile_info.tile_number = _code;
-		tile_info.pen_data = empty_tiles + _code*16*16;
-		tile_info.pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
-		tile_info.pen_usage = 0;
-		tile_info.flags = 0;
+		tileinfo->tile_number = _code;
+		tileinfo->pen_data = empty_tiles + _code*16*16;
+		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pen_usage = 0;
+		tileinfo->flags = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
 		SET_TILE_INFO(
@@ -263,7 +263,7 @@ INLINE void get_tile_info_8bit(int tile_index,int layer,UINT16 *vram)
 
 /* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_16x16_8bit(int tile_index,int layer,UINT16 *vram)
+INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
 	int      table_index;
@@ -284,11 +284,11 @@ INLINE void get_tile_info_16x16_8bit(int tile_index,int layer,UINT16 *vram)
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tile_info.tile_number = _code;
-		tile_info.pen_data = empty_tiles + _code*16*16;
-		tile_info.pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
-		tile_info.pen_usage = 0;
-		tile_info.flags = 0;
+		tileinfo->tile_number = _code;
+		tileinfo->pen_data = empty_tiles + _code*16*16;
+		tileinfo->pal_data = &Machine->remapped_colortable[(((code & 0x0ff0) ^ 0x0f0) + 0x1000)];
+		tileinfo->pen_usage = 0;
+		tileinfo->flags = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
 		SET_TILE_INFO(
@@ -328,17 +328,17 @@ INLINE void metro_vram_w(offs_t offset,UINT16 data,UINT16 mem_mask,int layer,UIN
 
 
 
-static void get_tile_info_0(int tile_index) { get_tile_info(tile_index,0,metro_vram_0); }
-static void get_tile_info_1(int tile_index) { get_tile_info(tile_index,1,metro_vram_1); }
-static void get_tile_info_2(int tile_index) { get_tile_info(tile_index,2,metro_vram_2); }
+static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info(machine,tileinfo,tile_index,0,metro_vram_0); }
+static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info(machine,tileinfo,tile_index,1,metro_vram_1); }
+static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info(machine,tileinfo,tile_index,2,metro_vram_2); }
 
-static void get_tile_info_0_8bit(int tile_index) { get_tile_info_8bit(tile_index,0,metro_vram_0); }
-static void get_tile_info_1_8bit(int tile_index) { get_tile_info_8bit(tile_index,1,metro_vram_1); }
-static void get_tile_info_2_8bit(int tile_index) { get_tile_info_8bit(tile_index,2,metro_vram_2); }
+static TILE_GET_INFO( get_tile_info_0_8bit ) { get_tile_info_8bit(machine,tileinfo,tile_index,0,metro_vram_0); }
+static TILE_GET_INFO( get_tile_info_1_8bit ) { get_tile_info_8bit(machine,tileinfo,tile_index,1,metro_vram_1); }
+static TILE_GET_INFO( get_tile_info_2_8bit ) { get_tile_info_8bit(machine,tileinfo,tile_index,2,metro_vram_2); }
 
-static void get_tile_info_0_16x16_8bit(int tile_index) { get_tile_info_16x16_8bit(tile_index,0,metro_vram_0); }
-static void get_tile_info_1_16x16_8bit(int tile_index) { get_tile_info_16x16_8bit(tile_index,1,metro_vram_1); }
-static void get_tile_info_2_16x16_8bit(int tile_index) { get_tile_info_16x16_8bit(tile_index,2,metro_vram_2); }
+static TILE_GET_INFO( get_tile_info_0_16x16_8bit ) { get_tile_info_16x16_8bit(machine,tileinfo,tile_index,0,metro_vram_0); }
+static TILE_GET_INFO( get_tile_info_1_16x16_8bit ) { get_tile_info_16x16_8bit(machine,tileinfo,tile_index,1,metro_vram_1); }
+static TILE_GET_INFO( get_tile_info_2_16x16_8bit ) { get_tile_info_16x16_8bit(machine,tileinfo,tile_index,2,metro_vram_2); }
 
 WRITE16_HANDLER( metro_vram_0_w ) { metro_vram_w(offset,data,mem_mask,0,metro_vram_0); }
 WRITE16_HANDLER( metro_vram_1_w ) { metro_vram_w(offset,data,mem_mask,1,metro_vram_1); }

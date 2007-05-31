@@ -21,7 +21,7 @@ static unsigned char buff_spriteram[SPRITERAM_SIZE];
 
 ***************************************************************************/
 
-static void get_bg18_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg18_tile_info )
 {
 	int attr = taitol_rambanks[2*tile_index+0x4000+1];
 	int code = taitol_rambanks[2*tile_index+0x4000]
@@ -36,7 +36,7 @@ static void get_bg18_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg19_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg19_tile_info )
 {
 	int attr = taitol_rambanks[2*tile_index+0x5000+1];
 	int code = taitol_rambanks[2*tile_index+0x5000]
@@ -51,7 +51,7 @@ static void get_bg19_tile_info(int tile_index)
 			0)
 }
 
-static void get_ch1a_tile_info(int tile_index)
+static TILE_GET_INFO( get_ch1a_tile_info )
 {
 	int attr = taitol_rambanks[2*tile_index+0x6000+1];
 	int code = taitol_rambanks[2*tile_index+0x6000]|((attr&0x01)<<8)|((attr&0x04)<<7);

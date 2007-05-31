@@ -22,7 +22,7 @@ static int k007121_flip_screen = 0;
 
 ***************************************************************************/
 
-static void get_tile_info_A(int tile_index)
+static TILE_GET_INFO( get_tile_info_A )
 {
 	int attr = k007121_ram[tile_index];
 	int code = k007121_ram[tile_index+0x400];
@@ -51,7 +51,7 @@ static void get_tile_info_A(int tile_index)
 			(attr & 0x20) ? TILE_FLIPY : 0)
 }
 
-static void get_tile_info_B(int tile_index)
+static TILE_GET_INFO( get_tile_info_B )
 {
 	int attr = k007121_ram[tile_index+0x800];
 	int code = k007121_ram[tile_index+0xc00];

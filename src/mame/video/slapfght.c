@@ -25,7 +25,7 @@ static tilemap *pf1_tilemap,*fix_tilemap;
 
 ***************************************************************************/
 
-static void get_pf_tile_info(int tile_index)	/* For Performan only */
+static TILE_GET_INFO( get_pf_tile_info )	/* For Performan only */
 {
 	int tile,color;
 
@@ -38,7 +38,7 @@ static void get_pf_tile_info(int tile_index)	/* For Performan only */
 			0)
 }
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int tile,color;
 
@@ -52,7 +52,7 @@ static void get_pf1_tile_info(int tile_index)
 			0)
 }
 
-static void get_fix_tile_info(int tile_index)
+static TILE_GET_INFO( get_fix_tile_info )
 {
 	int tile,color;
 

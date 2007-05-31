@@ -247,7 +247,7 @@ static const gfx_layout K037122_char_layout =
 	8*128
 };
 
-static void K037122_0_tile_info_layer0(int tile_index)
+static TILE_GET_INFO( K037122_0_tile_info_layer0 )
 {
 	UINT32 val = K037122_tile_ram[0][tile_index + (0x8000/4)];
 	int color = (val >> 17) & 0x1f;
@@ -262,7 +262,7 @@ static void K037122_0_tile_info_layer0(int tile_index)
 	SET_TILE_INFO(K037122_gfx_index[0], tile, color, flags);
 }
 
-static void K037122_0_tile_info_layer1(int tile_index)
+static TILE_GET_INFO( K037122_0_tile_info_layer1 )
 {
 	UINT32 val = K037122_tile_ram[0][tile_index];
 	int color = (val >> 17) & 0x1f;
@@ -277,7 +277,7 @@ static void K037122_0_tile_info_layer1(int tile_index)
 	SET_TILE_INFO(K037122_gfx_index[0], tile, color, flags);
 }
 
-static void K037122_1_tile_info_layer0(int tile_index)
+static TILE_GET_INFO( K037122_1_tile_info_layer0 )
 {
 	UINT32 val = K037122_tile_ram[1][tile_index + (0x8000/4)];
 	int color = (val >> 17) & 0x1f;
@@ -292,7 +292,7 @@ static void K037122_1_tile_info_layer0(int tile_index)
 	SET_TILE_INFO(K037122_gfx_index[1], tile, color, flags);
 }
 
-static void K037122_1_tile_info_layer1(int tile_index)
+static TILE_GET_INFO( K037122_1_tile_info_layer1 )
 {
 	UINT32 val = K037122_tile_ram[1][tile_index];
 	int color = (val >> 17) & 0x1f;

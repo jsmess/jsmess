@@ -127,7 +127,7 @@ Offset:
 #define DIM_NY_0			(0x20)
 
 
-static void get_tile_info_0( int tile_index )
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 code = powerins_vram_0[tile_index];
 	SET_TILE_INFO(
@@ -169,7 +169,7 @@ Offset:
 #define DIM_NX_1	(0x40)
 #define DIM_NY_1	(0x20)
 
-static void get_tile_info_1( int tile_index )
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 code = powerins_vram_1[tile_index];
 	SET_TILE_INFO(

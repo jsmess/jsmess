@@ -160,6 +160,27 @@ gfx_layout mcr_sprite_layout =
 
 READ8_HANDLER( zwackery_port_2_r );
 
+
+static READ8_HANDLER( zwackery_port_1_r )
+{
+	UINT8 ret = readinputport(1);
+
+	pia_set_port_a_z_mask(3, ret);
+
+	return ret;
+}
+
+
+static READ8_HANDLER( zwackery_port_3_r )
+{
+	UINT8 ret = readinputport(3);
+
+	pia_set_port_a_z_mask(4, ret);
+
+	return ret;
+}
+
+
 static const pia6821_interface zwackery_pia_2_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, input_port_0_r, 0, 0, 0, 0,
@@ -169,14 +190,14 @@ static const pia6821_interface zwackery_pia_2_intf =
 
 static const pia6821_interface zwackery_pia_3_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_1_r, zwackery_port_2_r, 0, 0, 0, 0,
+	/*inputs : A/B,CA/B1,CA/B2 */ zwackery_port_1_r, zwackery_port_2_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ zwackery_pia_3_w, 0, zwackery_ca2_w, 0,
 	/*irqs   : A/B             */ 0, 0
 };
 
 static const pia6821_interface zwackery_pia_4_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_3_r, input_port_4_r, 0, 0, 0, 0,
+	/*inputs : A/B,CA/B1,CA/B2 */ zwackery_port_3_r, input_port_4_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
 	/*irqs   : A/B             */ 0, 0
 };

@@ -99,14 +99,14 @@ WRITE8_HANDLER( gberet_sprite_bank_w )
 	gberet_spritebank = data;
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0x40) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
-	tile_info.priority = (attr & 0x80) >> 7;
+	tileinfo->priority = (attr & 0x80) >> 7;
 
 	SET_TILE_INFO(0, code, color, flags);
 }

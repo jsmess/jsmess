@@ -55,7 +55,7 @@ static UINT32 scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x3f) + ((row & 0x1f) << 6) + ((col & 0x40) << 5) + ((row & 0x20) << 7);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int page = tile_index >> 11;
 	UINT16 attr = deniam_videoram[bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
@@ -66,7 +66,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int page = tile_index >> 11;
 	UINT16 attr = deniam_videoram[fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
@@ -77,7 +77,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	UINT16 attr = deniam_textram[tile_index];
 	SET_TILE_INFO(

@@ -24,14 +24,14 @@ static UINT8 flipx, flipy;
  *
  *************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = suprridr_bgram[tile_index];
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	UINT8 code = suprridr_fgram[tile_index];
 	SET_TILE_INFO(1, code, 0, 0);

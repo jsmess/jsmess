@@ -144,7 +144,7 @@ WRITE8_HANDLER( bankp_out_w )
 	/* bits 6-7 unknown */
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = bankp_videoram2[tile_index] + 256 * (bankp_colorram2[tile_index] & 0x07);
 	int color = bankp_colorram2[tile_index] >> 4;
@@ -153,7 +153,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = videoram[tile_index] + 256 * ((colorram[tile_index] & 3) >> 0);
 	int color = colorram[tile_index] >> 3;

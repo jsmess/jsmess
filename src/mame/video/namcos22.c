@@ -1822,7 +1822,7 @@ UpdatePalette( void ) /* for System22 - ignore gamma/fader effects for now */
 
 static tilemap *bgtilemap;
 
-static void TextTilemapGetInfo( int tile_index )
+static TILE_GET_INFO( TextTilemapGetInfo )
 {
 	UINT16 data = nthword( namcos22_textram,tile_index );
 	/**
@@ -1834,7 +1834,7 @@ static void TextTilemapGetInfo( int tile_index )
 	SET_TILE_INFO( GFX_CHAR,data&0x03ff,data>>12,TILE_FLIPYX((data&0x0c00)>>10) );
 	if( data&0x8000 )
 	{
-		tile_info.priority = 1;
+		tileinfo->priority = 1;
 	}
 } /* TextTilemapGetInfo */
 

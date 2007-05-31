@@ -46,7 +46,7 @@ WRITE8_HANDLER( sichuan2_paletteram_w )
 	palette_set_color(Machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int code = videoram[offs] + ((videoram[offs + 1] & 0x0f) << 8) + (gfxbank << 12);

@@ -61,7 +61,7 @@ WRITE8_HANDLER( carjmbre_bgcolor_w )
 	}
 }
 
-static void get_carjmbre_tile_info(int tile_index){
+static TILE_GET_INFO( get_carjmbre_tile_info ){
 	unsigned int tile_number = videoram[tile_index] & 0xFF;
 	unsigned char attr  = videoram[tile_index+0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */

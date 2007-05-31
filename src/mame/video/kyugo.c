@@ -31,7 +31,7 @@ static const UINT8 *color_codes;
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = kyugo_fgvideoram[tile_index];
 	SET_TILE_INFO(0,
@@ -41,7 +41,7 @@ static void get_fg_tile_info(int tile_index)
 }
 
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = kyugo_bgvideoram[tile_index];
 	int attr = kyugo_bgattribram[tile_index];

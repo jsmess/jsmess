@@ -198,10 +198,10 @@ static UINT32 fg_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 }
 
 
-static void rallyx_get_tile_info(int ram_offs,int tile_index)
+INLINE void rallyx_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int ram_offs)
 {
 	UINT8 attr = rallyx_videoram[ram_offs + tile_index + 0x800];
-	tile_info.priority = (attr & 0x20) >> 5;
+	tileinfo->priority = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			rallyx_videoram[ram_offs + tile_index],
@@ -209,23 +209,23 @@ static void rallyx_get_tile_info(int ram_offs,int tile_index)
 			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX)
 }
 
-static void rallyx_bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( rallyx_bg_get_tile_info )
 {
-	rallyx_get_tile_info(0x400,tile_index);
+	rallyx_get_tile_info(machine,tileinfo,tile_index,0x400);
 }
 
-static void rallyx_fg_get_tile_info(int tile_index)
+static TILE_GET_INFO( rallyx_fg_get_tile_info )
 {
-	rallyx_get_tile_info(0x000,tile_index);
+	rallyx_get_tile_info(machine,tileinfo,tile_index,0x000);
 }
 
 
-static void locomotn_get_tile_info(int ram_offs,int tile_index)
+INLINE void locomotn_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int ram_offs)
 {
 	UINT8 attr = rallyx_videoram[ram_offs + tile_index + 0x800];
 	int code = rallyx_videoram[ram_offs + tile_index];
 	code = (code & 0x7f) + 2*(attr & 0x40) + 2*(code & 0x80);
-	tile_info.priority = (attr & 0x20) >> 5;
+	tileinfo->priority = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			code,
@@ -233,14 +233,14 @@ static void locomotn_get_tile_info(int ram_offs,int tile_index)
 			(attr & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0)
 }
 
-static void locomotn_bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( locomotn_bg_get_tile_info )
 {
-	locomotn_get_tile_info(0x400,tile_index);
+	locomotn_get_tile_info(machine,tileinfo,tile_index,0x400);
 }
 
-static void locomotn_fg_get_tile_info(int tile_index)
+static TILE_GET_INFO( locomotn_fg_get_tile_info )
 {
-	locomotn_get_tile_info(0x000,tile_index);
+	locomotn_get_tile_info(machine,tileinfo,tile_index,0x000);
 }
 
 

@@ -103,10 +103,10 @@ static UINT32 fg_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 }
 
 
-static void get_tile_info(int ram_offs,int tile_index)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int ram_offs)
 {
 	UINT8 attr = bosco_videoram[ram_offs + tile_index + 0x800];
-	tile_info.priority = (attr & 0x20) >> 5;
+	tileinfo->priority = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			bosco_videoram[ram_offs + tile_index],
@@ -114,14 +114,14 @@ static void get_tile_info(int ram_offs,int tile_index)
 			TILE_FLIPYX(attr >> 6) ^ TILE_FLIPX)
 }
 
-static void bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( bg_get_tile_info )
 {
-	get_tile_info(0x400,tile_index);
+	get_tile_info(machine,tileinfo,tile_index,0x400);
 }
 
-static void fg_get_tile_info(int tile_index)
+static TILE_GET_INFO( fg_get_tile_info )
 {
-	get_tile_info(0x000,tile_index);
+	get_tile_info(machine,tileinfo,tile_index,0x000);
 }
 
 

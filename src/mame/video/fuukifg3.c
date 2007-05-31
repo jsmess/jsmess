@@ -59,7 +59,7 @@ static UINT32 spr_buffered_tilebank[2];
 \
 static tilemap *tilemap_##_N_; \
 \
-static void get_tile_info_##_N_(int tile_index) \
+static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
 	UINT16 code = (fuuki32_vram_##_N_[tile_index]&0xffff0000)>>16; \
 	UINT16 attr = (fuuki32_vram_##_N_[tile_index]&0x0000ffff); \
@@ -79,7 +79,7 @@ WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
 \
 static tilemap *tilemap_##_N_; \
 \
-static void get_tile_info_##_N_(int tile_index) \
+static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
 	UINT16 code = (fuuki32_vram_##_N_[tile_index]&0xffff0000)>>16; \
 	UINT16 attr = (fuuki32_vram_##_N_[tile_index]&0x0000ffff); \

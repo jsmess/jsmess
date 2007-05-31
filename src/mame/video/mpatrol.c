@@ -171,7 +171,7 @@ PALETTE_INIT( mpatrol )
 
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 video = videoram[tile_index];
 	UINT8 color = colorram[tile_index];

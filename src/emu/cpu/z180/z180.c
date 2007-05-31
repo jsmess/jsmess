@@ -749,7 +749,6 @@ static UINT8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 
 static UINT8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 
 #if BIG_FLAGS_ARRAY
-#include <signal.h>
 static UINT8 *SZHVC_add = 0;
 static UINT8 *SZHVC_sub = 0;
 #endif
@@ -1842,13 +1841,8 @@ static void z180_reset(void)
 		int oldval, newval, val;
 		UINT8 *padd, *padc, *psub, *psbc;
 		/* allocate big flag arrays once */
-		SZHVC_add = (UINT8 *)malloc(2*256*256);
-		SZHVC_sub = (UINT8 *)malloc(2*256*256);
-		if( !SZHVC_add || !SZHVC_sub )
-		{
-			LOG(("Z180: failed to allocate 2 * 128K flags arrays!!!\n"));
-			raise(SIGABRT);
-		}
+		SZHVC_add = (UINT8 *)auto_malloc(2*256*256);
+		SZHVC_sub = (UINT8 *)auto_malloc(2*256*256);
 		padd = &SZHVC_add[	0*256];
 		padc = &SZHVC_add[256*256];
 		psub = &SZHVC_sub[	0*256];
@@ -2014,16 +2008,6 @@ static void z180_reset(void)
 		z80daisy_reset(Z180.daisy);
 	z180_mmu();
 	z180_change_pc(_PCD);
-}
-
-static void z180_exit(void)
-{
-#if BIG_FLAGS_ARRAY
-	if (SZHVC_add) free(SZHVC_add);
-	SZHVC_add = NULL;
-	if (SZHVC_sub) free(SZHVC_sub);
-	SZHVC_sub = NULL;
-#endif
 }
 
 /****************************************************************************
@@ -2416,7 +2400,6 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = z180_set_context;	break;
 		case CPUINFO_PTR_INIT:							info->init = z180_init;					break;
 		case CPUINFO_PTR_RESET:							info->reset = z180_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = z180_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = z180_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = z180_burn;					break;
 #ifdef MAME_DEBUG

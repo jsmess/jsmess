@@ -49,7 +49,7 @@ static int pf1_rowscroll,pf2_rowscroll,pf3_rowscroll,pf4_rowscroll;
 
 /*****************************************************************************/
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int tile,color;
 	tile_index = 4*tile_index + pf1_vram_ptr;
@@ -65,10 +65,10 @@ static void get_pf1_tile_info(int tile_index)
 			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2))
 
 	/* Priority 1 = tile appears above sprites */
-	tile_info.priority = ((m107_vram_data[tile_index+3]&2)>>1);
+	tileinfo->priority = ((m107_vram_data[tile_index+3]&2)>>1);
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int tile,color;
 	tile_index = 4*tile_index + pf2_vram_ptr;
@@ -83,10 +83,10 @@ static void get_pf2_tile_info(int tile_index)
 			color&0x7f,
 			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2))
 
-	tile_info.priority = ((m107_vram_data[tile_index+3]&2)>>1);
+	tileinfo->priority = ((m107_vram_data[tile_index+3]&2)>>1);
 }
 
-static void get_pf3_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3_tile_info )
 {
 	int tile,color;
 	tile_index = 4*tile_index + pf3_vram_ptr;
@@ -102,7 +102,7 @@ static void get_pf3_tile_info(int tile_index)
 			TILE_FLIPYX((m107_vram_data[tile_index+3] & 0xc)>>2))
 }
 
-static void get_pf4_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf4_tile_info )
 {
 	int tile,color;
 	tile_index = 4*tile_index + pf4_vram_ptr;

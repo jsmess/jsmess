@@ -614,7 +614,7 @@ error:
 		if (newfile->file != NULL)
 		{
 			osd_close(newfile->file);
-			remove(filename);
+			osd_rmfile(filename);
 		}
 		free(newfile);
 	}

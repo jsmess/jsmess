@@ -42,7 +42,7 @@ COR_x are LN60G resitor packs
 static tilemap *fg_tilemap;
 static UINT8 *fgram;
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = (fgram[tile_index*2+1]<<8) | fgram[tile_index*2];
 	int color = (fgram[tile_index*2+1] & 0x80) >> 7;

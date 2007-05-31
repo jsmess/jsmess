@@ -6,7 +6,7 @@ tilemap *freek_tilemap;
 UINT8 *freek_videoram;
 
 
-static void get_freek_tile_info(int tile_index)
+static TILE_GET_INFO( get_freek_tile_info )
 {
 	int tileno,palno;
 

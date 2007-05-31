@@ -13,6 +13,9 @@ UINT8 *spacefb_videoram;
 size_t spacefb_videoram_size;
 
 
+/* bitmap that marks whether a given pixel has a sprite/bullet there */
+static bitmap_t *object_present_map;
+
 static UINT8 flipscreen;
 static UINT8 gfx_bank;
 static UINT8 palette_bank;
@@ -153,7 +156,11 @@ VIDEO_START( spacefb )
 							 3, resistances_rg, color_weights_g, 470, 0,
 							 2, resistances_b,  color_weights_b, 470, 0);
 
-	/* the start value is based on a good screen shot */
+	object_present_map = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8);
+
+	/* this start value positions the stars to match the flyer screen shot,
+       but most likely, the actual star position is random as the hardware
+       uses whatever value is on the shift register on power-up */
 	star_shift_reg = 0x18f89;
 
 	return 0;
@@ -229,14 +236,17 @@ static void draw_starfield(running_machine *machine,
 
 		for (x = SPACEFB_HBEND; x < SPACEFB_HBSTART; x++)
 		{
-			/* draw the star - the 4 possible values come from the effect of the two XOR gates */
-			if (((star_shift_reg & 0x1c0ff) == 0x0c0b7) ||
-				((star_shift_reg & 0x1c0ff) == 0x0c0d7) ||
-				((star_shift_reg & 0x1c0ff) == 0x0c0bb) ||
-				((star_shift_reg & 0x1c0ff) == 0x0c0db))
-				*BITMAP_ADDR32(bitmap, y, x) = pens[(star_shift_reg >> 8) & 0x3f];
-			else
-				*BITMAP_ADDR32(bitmap, y, x) = pens[0];
+			if (!*BITMAP_ADDR8(object_present_map, y, x))
+			{
+				/* draw the star - the 4 possible values come from the effect of the two XOR gates */
+				if (((star_shift_reg & 0x1c0ff) == 0x0c0b7) ||
+					((star_shift_reg & 0x1c0ff) == 0x0c0d7) ||
+					((star_shift_reg & 0x1c0ff) == 0x0c0bb) ||
+					((star_shift_reg & 0x1c0ff) == 0x0c0db))
+					*BITMAP_ADDR32(bitmap, y, x) = pens[(star_shift_reg >> 8) & 0x3f];
+				else
+					*BITMAP_ADDR32(bitmap, y, x) = pens[0];
+			}
 
 			shift_star_generator();
 		}
@@ -259,71 +269,13 @@ static void draw_starfield(running_machine *machine,
  *
  *  Sprite/Bullet hardware
  *
+ *  Sprites are opaque wrt. each other,
+ *  but transparent wrt. to the
+ *  star field.
+ *
  *************************************/
 
 #define NUM_SPRITE_PENS	(0x40)
-
-
-static void draw_bullets(running_machine *machine,
-						 int scrnum,
-						 mame_bitmap *bitmap,
-						 const rectangle *cliprect)
-{
-	/* since the way the schematics show the bullet color
-       connected is impossible, just use pure red for now */
-	pen_t pen = MAKE_RGB(0xff, 0x00, 0x00);
-
-	UINT8 *gfx = memory_region(REGION_GFX2);
-
-	offs_t offs = (gfx_bank) ? 0x80 : 0x00;
-
-	while (1)
-	{
-		if (spacefb_videoram[offs + 0x0300] & 0x20)
-		{
-			UINT8 sy;
-
-			UINT8 code = spacefb_videoram[offs + 0x0200] & 0x3f;
-			UINT8 y = ~spacefb_videoram[offs + 0x0100] - 2;
-
-			for (sy = 0; sy < 4; sy++)
-			{
-				UINT8 sx;
-
-				UINT8 data = gfx[(code << 2) | sy];
-				UINT8 x = spacefb_videoram[offs + 0x0000];
-
-				for (sx = 0; sx < 4; sx++)
-				{
-					if (data & 0x01)
-					{
-						if (flipscreen)
-						{
-							*BITMAP_ADDR32(bitmap, 255 - y, ((255 - x) * 2) + 0) = pen;
-							*BITMAP_ADDR32(bitmap, 255 - y, ((255 - x) * 2) + 1) = pen;
-						}
-						else
-						{
-							*BITMAP_ADDR32(bitmap, y, (x * 2) + 0) = pen;
-							*BITMAP_ADDR32(bitmap, y, (x * 2) + 1) = pen;
-						}
-					}
-
-					data = data >> 1;
-					x = x + 1;
-				}
-
-				y = y + 1;
-			}
-		}
-
-		/* next bullet */
-		offs = offs + 1;
-
-		/* end of bank? */
-		if ((offs & 0x7f) == 0)  break;
-	}
-}
 
 
 static void get_sprite_pens(pen_t *pens)
@@ -356,9 +308,9 @@ static void get_sprite_pens(pen_t *pens)
 			double fade_weight = fade_weights[i >> 4];
 
 			/* faded pens */
-			r = (double)r / fade_weight;
-			g = (double)g / fade_weight;
-			b = (double)b / fade_weight;
+			r = (r / fade_weight) + 0.5;
+			g = (g / fade_weight) + 0.5;
+			b = (b / fade_weight) + 0.5;
 		}
 
 		pens[i] = MAKE_RGB(r, g, b);
@@ -366,66 +318,134 @@ static void get_sprite_pens(pen_t *pens)
 }
 
 
-static void draw_sprites(running_machine *machine,
-						 int scrnum,
-						 mame_bitmap *bitmap,
-						 const rectangle *cliprect)
+static void draw_bullet(offs_t offs, pen_t pen, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	pen_t pens[NUM_SPRITE_PENS];
+	UINT8 sy;
 
-	UINT8 *gfx = memory_region(REGION_GFX1);
+	UINT8 *gfx = memory_region(REGION_GFX2);
 
-	offs_t offs = (gfx_bank) ? 0x80 : 0x00;
+	UINT8 code = spacefb_videoram[offs + 0x0200] & 0x3f;
+	UINT8 y = ~spacefb_videoram[offs + 0x0100] - 2;
 
-	get_sprite_pens(pens);
-
-	while (1)
+	for (sy = 0; sy < 4; sy++)
 	{
-		if (spacefb_videoram[offs + 0x0300] & 0x40)
+		UINT8 sx, dy;
+
+		UINT8 data = gfx[(code << 2) | sy];
+		UINT8 x = spacefb_videoram[offs + 0x0000];
+
+		if (flipscreen)
+			dy = ~y;
+		else
+			dy = y;
+
+		if ((dy > cliprect->min_y) && (dy < cliprect->max_y))
 		{
-			UINT8 sy;
-
-			UINT8 code = ~spacefb_videoram[offs + 0x0200];
-			UINT8 color = ~spacefb_videoram[offs + 0x0300] & 0x0f;
-			UINT8 y = ~spacefb_videoram[offs + 0x0100] - 2;
-
-			for (sy = 0; sy < 8; sy++)
+			for (sx = 0; sx < 4; sx++)
 			{
-				UINT8 sx;
-
-				UINT8 data1 = gfx[0x0000 | (code << 3) | (sy ^ 0x07)];
-				UINT8 data2 = gfx[0x0800 | (code << 3) | (sy ^ 0x07)];
-
-				UINT8 x = spacefb_videoram[offs + 0x0000] - 3;
-
-				for (sx = 0; sx < 8; sx++)
+				if (data & 0x01)
 				{
-					UINT8 data = ((data1 << 1) & 0x02) | (data2 & 0x01);
+					UINT16 dx;
 
-					if (data)
-					{
-						if (flipscreen)
-						{
-							*BITMAP_ADDR32(bitmap, 255 - y, ((255 - x) * 2) + 0) = pens[(color << 2) | data];
-							*BITMAP_ADDR32(bitmap, 255 - y, ((255 - x) * 2) + 1) = pens[(color << 2) | data];
-						}
-						else
-						{
-							*BITMAP_ADDR32(bitmap, y, (x * 2) + 0) = pens[(color << 2) | data];
-							*BITMAP_ADDR32(bitmap, y, (x * 2) + 1) = pens[(color << 2) | data];
-						}
-					}
+					if (flipscreen)
+						dx = (255 - x) * 2;
+					else
+						dx = x * 2;
 
-					data1 = data1 >> 1;
-					data2 = data2 >> 1;
-					x = x + 1;
+					*BITMAP_ADDR32(bitmap, dy, dx + 0) = pen;
+					*BITMAP_ADDR32(bitmap, dy, dx + 1) = pen;
+
+					*BITMAP_ADDR8(object_present_map, dy, dx + 0) = 1;
+					*BITMAP_ADDR8(object_present_map, dy, dx + 1) = 1;
 				}
 
-				y = y + 1;
+				x = x + 1;
+				data = data >> 1;
 			}
 		}
 
-		/* next sprite */
+		y = y + 1;
+	}
+}
+
+
+static void draw_sprite(offs_t offs, pen_t* pens, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	UINT8 sy;
+
+	UINT8 *gfx = memory_region(REGION_GFX1);
+
+	UINT8 code = ~spacefb_videoram[offs + 0x0200];
+	UINT8 color_base = (~spacefb_videoram[offs + 0x0300] & 0x0f) << 2;
+	UINT8 y = ~spacefb_videoram[offs + 0x0100] - 2;
+
+	for (sy = 0; sy < 8; sy++)
+	{
+		UINT8 sx, dy;
+
+		UINT8 data1 = gfx[0x0000 | (code << 3) | (sy ^ 0x07)];
+		UINT8 data2 = gfx[0x0800 | (code << 3) | (sy ^ 0x07)];
+
+		UINT8 x = spacefb_videoram[offs + 0x0000] - 3;
+
+		if (flipscreen)
+			dy = ~y;
+		else
+			dy = y;
+
+		if ((dy > cliprect->min_y) && (dy < cliprect->max_y))
+		{
+			for (sx = 0; sx < 8; sx++)
+			{
+				UINT16 dx;
+				UINT8 data;
+				pen_t pen;
+
+				if (flipscreen)
+					dx = (255 - x) * 2;
+				else
+					dx = x * 2;
+
+				data = ((data1 << 1) & 0x02) | (data2 & 0x01);
+				pen = pens[color_base | data];
+
+				*BITMAP_ADDR32(bitmap, dy, dx + 0) = pen;
+				*BITMAP_ADDR32(bitmap, dy, dx + 1) = pen;
+
+				*BITMAP_ADDR8(object_present_map, dy, dx + 0) = (data != 0);
+				*BITMAP_ADDR8(object_present_map, dy, dx + 1) = (data != 0);
+
+				x = x + 1;
+				data1 = data1 >> 1;
+				data2 = data2 >> 1;
+			}
+		}
+
+		y = y + 1;
+	}
+}
+
+
+static void draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	pen_t sprite_pens[NUM_SPRITE_PENS];
+
+	offs_t offs = gfx_bank ? 0x80 : 0x00;
+
+	/* since the way the schematics show the bullet color
+       connected is impossible, just use pure red for now */
+	pen_t bullet_pen = MAKE_RGB(0xff, 0x00, 0x00);
+
+	get_sprite_pens(sprite_pens);
+
+	while (1)
+	{
+		if (spacefb_videoram[offs + 0x0300] & 0x20)
+			draw_bullet(offs, bullet_pen, bitmap, cliprect);
+		else if (spacefb_videoram[offs + 0x0300] & 0x40)
+			draw_sprite(offs, sprite_pens, bitmap, cliprect);
+
+		/* next object */
 		offs = offs + 1;
 
 		/* end of bank? */
@@ -443,14 +463,11 @@ static void draw_sprites(running_machine *machine,
 
 VIDEO_UPDATE( spacefb )
 {
-	/* the order of the following calls is important
-       for correct priorities */
+	fillbitmap(object_present_map, 0, cliprect);
+
+	draw_objects(bitmap, cliprect);
 
 	draw_starfield(machine, screen, bitmap, cliprect);
-
-	draw_bullets(machine, screen, bitmap, cliprect);
-
-	draw_sprites(machine, screen, bitmap, cliprect);
 
 	return 0;
 }

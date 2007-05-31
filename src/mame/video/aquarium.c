@@ -94,7 +94,7 @@ static void aquarium_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 
 /* TXT Layer */
 
-static void get_aquarium_txt_tile_info(int tile_index)
+static TILE_GET_INFO( get_aquarium_txt_tile_info )
 {
 	int tileno,colour;
 
@@ -114,7 +114,7 @@ WRITE16_HANDLER( aquarium_txt_videoram_w )
 
 /* MID Layer */
 
-static void get_aquarium_mid_tile_info(int tile_index)
+static TILE_GET_INFO( get_aquarium_mid_tile_info )
 {
 	int tileno,colour,flag;
 
@@ -124,7 +124,7 @@ static void get_aquarium_mid_tile_info(int tile_index)
 
 	SET_TILE_INFO(1,tileno,colour,flag)
 
-	tile_info.priority = (aquarium_mid_videoram[tile_index*2+1] & 0x20) >> 5;
+	tileinfo->priority = (aquarium_mid_videoram[tile_index*2+1] & 0x20) >> 5;
 }
 
 WRITE16_HANDLER( aquarium_mid_videoram_w )
@@ -137,7 +137,7 @@ WRITE16_HANDLER( aquarium_mid_videoram_w )
 }
 
 /* BAK Layer */
-static void get_aquarium_bak_tile_info(int tile_index)
+static TILE_GET_INFO( get_aquarium_bak_tile_info )
 
 {
 	int tileno,colour,flag;
@@ -148,7 +148,7 @@ static void get_aquarium_bak_tile_info(int tile_index)
 
 	SET_TILE_INFO(3,tileno,colour,flag)
 
-	tile_info.priority = (aquarium_bak_videoram[tile_index*2+1] & 0x20) >> 5;
+	tileinfo->priority = (aquarium_bak_videoram[tile_index*2+1] & 0x20) >> 5;
 }
 
 WRITE16_HANDLER( aquarium_bak_videoram_w )

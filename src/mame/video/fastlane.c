@@ -25,7 +25,7 @@ PALETTE_INIT( fastlane )
 
 ***************************************************************************/
 
-static void get_tile_info0(int tile_index)
+static TILE_GET_INFO( get_tile_info0 )
 {
 	int attr = fastlane_videoram1[tile_index];
 	int code = fastlane_videoram1[tile_index + 0x400];
@@ -50,7 +50,7 @@ static void get_tile_info0(int tile_index)
 			0)
 }
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
 	int attr = fastlane_videoram2[tile_index];
 	int code = fastlane_videoram2[tile_index + 0x400];

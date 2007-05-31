@@ -818,35 +818,35 @@ static gfx_decode x68k_gfxdecodeinfo[] =
 };
 */
 
-static void x68k_get_bg0_tile(int index)
+static TILE_GET_INFO(x68k_get_bg0_tile)
 {
-	int code = x68k_spriteram[0x3000+index] & 0x00ff;
-	int colour = (x68k_spriteram[0x3000+index] & 0x0f00) >> 8;
-	int flags = (x68k_spriteram[0x3000+index] & 0xc000) >> 14;
+	int code = x68k_spriteram[0x3000+tile_index] & 0x00ff;
+	int colour = (x68k_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
+	int flags = (x68k_spriteram[0x3000+tile_index] & 0xc000) >> 14;
 	SET_TILE_INFO(0,code,colour,flags)
 }
 
-static void x68k_get_bg1_tile(int index)
+static TILE_GET_INFO(x68k_get_bg1_tile)
 {
-	int code = x68k_spriteram[0x2000+index] & 0x00ff;
-	int colour = (x68k_spriteram[0x2000+index] & 0x0f00) >> 8;
-	int flags = (x68k_spriteram[0x2000+index] & 0xc000) >> 14;
+	int code = x68k_spriteram[0x2000+tile_index] & 0x00ff;
+	int colour = (x68k_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
+	int flags = (x68k_spriteram[0x2000+tile_index] & 0xc000) >> 14;
 	SET_TILE_INFO(0,code,colour,flags)
 }
 
-static void x68k_get_bg0_tile_16(int index)
+static TILE_GET_INFO(x68k_get_bg0_tile_16)
 {
-	int code = x68k_spriteram[0x3000+index] & 0x00ff;
-	int colour = (x68k_spriteram[0x3000+index] & 0x0f00) >> 8;
-	int flags = (x68k_spriteram[0x3000+index] & 0xc000) >> 14;
+	int code = x68k_spriteram[0x3000+tile_index] & 0x00ff;
+	int colour = (x68k_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
+	int flags = (x68k_spriteram[0x3000+tile_index] & 0xc000) >> 14;
 	SET_TILE_INFO(1,code,colour,flags)
 }
 
-static void x68k_get_bg1_tile_16(int index)
+static TILE_GET_INFO(x68k_get_bg1_tile_16)
 {
-	int code = x68k_spriteram[0x2000+index] & 0x00ff;
-	int colour = (x68k_spriteram[0x2000+index] & 0x0f00) >> 8;
-	int flags = (x68k_spriteram[0x2000+index] & 0xc000) >> 14;
+	int code = x68k_spriteram[0x2000+tile_index] & 0x00ff;
+	int colour = (x68k_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
+	int flags = (x68k_spriteram[0x2000+tile_index] & 0xc000) >> 14;
 	SET_TILE_INFO(1,code,colour,flags)
 }
 

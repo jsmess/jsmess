@@ -20,7 +20,7 @@ static UINT16 tbowl_bg2yscroll;
 
 /* Foreground Layer (tx) Tilemap */
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int tileno;
 	int col;
@@ -42,7 +42,7 @@ WRITE8_HANDLER( tbowl_txvideoram_w )
 
 /* Bottom BG Layer (bg) Tilemap */
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tileno;
 	int col;
@@ -84,7 +84,7 @@ WRITE8_HANDLER (tbowl_bgyscroll_hi)
 
 /* Middle BG Layer (bg2) Tilemaps */
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int tileno;
 	int col;

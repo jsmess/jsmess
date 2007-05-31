@@ -123,7 +123,7 @@ PALETTE_INIT( mrdo )
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char attr = mrdo_bgvideoram[tile_index];
 	SET_TILE_INFO(
@@ -133,7 +133,7 @@ static void get_bg_tile_info(int tile_index)
 			(attr & 0x40) ? TILE_IGNORE_TRANSPARENCY : 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	unsigned char attr = mrdo_fgvideoram[tile_index];
 	SET_TILE_INFO(

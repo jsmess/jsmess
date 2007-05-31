@@ -2701,10 +2701,6 @@ static DRIVER_INIT( inferno )
 	/* install RAM instead of ROM in the Dxxx slot */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MRA8_RAM);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, MWA8_RAM);
-
-	/* hack! the sound CPU programs the DDRA register to $80 instead of $00, meaning */
-	/* that the top bit gets chopped off; not sure how to fix this for real */
-	memory_region(REGION_CPU2)[0xe015] = 0;
 }
 
 

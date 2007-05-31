@@ -12,7 +12,7 @@ static tilemap *joetilemap, *joetilemap2, *joetilemap3, *joetilemap4, *joetilema
 
 UINT16 *ashnojoe_tilemap_reg;
 
-static void get_joe_tile_info(int tile_index)
+static TILE_GET_INFO( get_joe_tile_info )
 {
 	int code = ashnojoetileram16 [tile_index];
 
@@ -23,7 +23,7 @@ static void get_joe_tile_info(int tile_index)
 			0)
 }
 
-static void get_joe_tile_info_2(int tile_index)
+static TILE_GET_INFO( get_joe_tile_info_2 )
 {
 	int code = ashnojoetileram16_2 [tile_index*2];
 	int attr = ashnojoetileram16_2 [tile_index*2+1];
@@ -35,7 +35,7 @@ static void get_joe_tile_info_2(int tile_index)
 			0)
 }
 
-static void get_joe_tile_info_3(int tile_index)
+static TILE_GET_INFO( get_joe_tile_info_3 )
 {
 	int code = ashnojoetileram16_3 [tile_index];
 
@@ -46,7 +46,7 @@ static void get_joe_tile_info_3(int tile_index)
 			0)
 }
 
-static void get_joe_tile_info_4(int tile_index)
+static TILE_GET_INFO( get_joe_tile_info_4 )
 {
 	int code = ashnojoetileram16_4 [tile_index];
 
@@ -57,7 +57,7 @@ static void get_joe_tile_info_4(int tile_index)
 			0)
 }
 
-static void get_joe_tile_info_5(int tile_index)
+static TILE_GET_INFO( get_joe_tile_info_5 )
 {
 	int code = ashnojoetileram16_5 [tile_index*2];
 	int attr = ashnojoetileram16_5 [tile_index*2+1];
@@ -69,7 +69,7 @@ static void get_joe_tile_info_5(int tile_index)
 			0)
 }
 
-static void get_joe_tile_info_6(int tile_index)
+static TILE_GET_INFO( get_joe_tile_info_6 )
 {
 	int code = ashnojoetileram16_6 [tile_index*2];
 	int attr = ashnojoetileram16_6 [tile_index*2+1];
@@ -82,7 +82,7 @@ static void get_joe_tile_info_6(int tile_index)
 }
 
 
-static void get_joe_tile_info_7(int tile_index)
+static TILE_GET_INFO( get_joe_tile_info_7 )
 {
 	int code = ashnojoetileram16_7 [tile_index*2];
 	int attr = ashnojoetileram16_7 [tile_index*2+1];

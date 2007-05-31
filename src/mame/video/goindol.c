@@ -26,7 +26,7 @@ static tilemap *bg_tilemap,*fg_tilemap;
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = goindol_fg_videoram[2*tile_index+1];
 	int attr = goindol_fg_videoram[2*tile_index];
@@ -37,7 +37,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = goindol_bg_videoram[2*tile_index+1];
 	int attr = goindol_bg_videoram[2*tile_index];

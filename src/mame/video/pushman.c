@@ -16,7 +16,7 @@ static UINT32 background_scan_rows(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 
 	return ((col & 0x7)) + ((7-(row & 0x7)) << 3) + ((col & 0x78) <<3) + ((0x38-(row&0x38))<<7);
 }
 
-static void get_back_tile_info( int tile_index )
+static TILE_GET_INFO( get_back_tile_info )
 {
 	unsigned char *bgMap = memory_region(REGION_GFX4);
 	int tile;
@@ -29,7 +29,7 @@ static void get_back_tile_info( int tile_index )
 			(tile&0x2000)?TILE_FLIPX:0)
 }
 
-static void get_text_tile_info( int tile_index )
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile = videoram16[tile_index];
 	SET_TILE_INFO(

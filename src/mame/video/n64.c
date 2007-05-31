@@ -47,7 +47,7 @@ static SPAN span[1024];
 
 /*****************************************************************************/
 
-#if LSB_FIRST
+#ifdef LSB_FIRST
 	#define BYTE_ADDR_XOR		3
 	#define WORD_ADDR_XOR		1
 #else

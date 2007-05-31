@@ -20,7 +20,6 @@
  *
  *****************************************************************************/
 
-#include <signal.h>
 #include "debugger.h"
 #include "sh4.h"
 
@@ -2252,14 +2251,6 @@ static void sh4_reset(void)
 	sh4.internal_irq_level = -1;
 }
 
-/* Shut down CPU core */
-static void sh4_exit(void)
-{
-	if (sh4.m)
-		free(sh4.m);
-	sh4.m = NULL;
-}
-
 /* Execute cycles - returns number of cycles actually run */
 static int sh4_execute(int cycles)
 {
@@ -2877,12 +2868,7 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 	sh4.dma_timer[1] = timer_alloc(sh4_dmac_callback);
 	timer_adjust(sh4.dma_timer[1], TIME_NEVER, 0, 0);
 
-	sh4.m = malloc(0x200);
-	if (!sh4.m)
-	{
-		logerror("SH4 failed to malloc FREGS\n");
-		raise( SIGABRT );
-	}
+	sh4.m = auto_malloc(0x200);
 
 	if(conf)
 		sh4.is_slave = conf->is_slave;
@@ -3155,7 +3141,6 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh4_set_context;		break;
 		case CPUINFO_PTR_INIT:							info->init = sh4_init;					break;
 		case CPUINFO_PTR_RESET:							info->reset = sh4_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = sh4_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh4_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 #ifdef MAME_DEBUG

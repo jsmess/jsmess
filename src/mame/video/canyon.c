@@ -23,7 +23,7 @@ WRITE8_HANDLER( canyon_videoram_w )
 }
 
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 code = canyon_videoram[tile_index];
 

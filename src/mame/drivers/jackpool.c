@@ -20,7 +20,7 @@ static tilemap *jackpool_layer2_tilemap;
 static UINT16 *jackpool_layer2_videoram;
 
 
-static void get_jackpool_layer0_tile_info(int tile_index)
+static TILE_GET_INFO( get_jackpool_layer0_tile_info )
 {
 	int tileno,attr;
 
@@ -37,7 +37,7 @@ WRITE16_HANDLER( jackpool_layer0_videoram_w )
 	tilemap_mark_tile_dirty(jackpool_layer0_tilemap,offset&0x07ff);
 }
 
-static void get_jackpool_layer1_tile_info(int tile_index)
+static TILE_GET_INFO( get_jackpool_layer1_tile_info )
 {
 	int tileno,attr;
 
@@ -54,7 +54,7 @@ WRITE16_HANDLER( jackpool_layer1_videoram_w )
 	tilemap_mark_tile_dirty(jackpool_layer1_tilemap,offset&0x07ff);
 }
 
-static void get_jackpool_layer2_tile_info(int tile_index)
+static TILE_GET_INFO( get_jackpool_layer2_tile_info )
 {
 	int tileno,attr;
 

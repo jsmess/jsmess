@@ -16,7 +16,7 @@ READ8_HANDLER(ssrj_vram1_r)
 	return ssrj_vram1[offset];
 }
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
 	int code;
 	code=ssrj_vram1[tile_index<<1]+(ssrj_vram1[(tile_index<<1)+1]<<8);
@@ -40,7 +40,7 @@ READ8_HANDLER(ssrj_vram2_r)
 	return ssrj_vram2[offset];
 }
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	int code;
 	code=ssrj_vram2[tile_index<<1]+(ssrj_vram2[(tile_index<<1)+1]<<8);
@@ -64,7 +64,7 @@ READ8_HANDLER(ssrj_vram4_r)
 	return ssrj_vram4[offset];
 }
 
-static void get_tile_info4(int tile_index)
+static TILE_GET_INFO( get_tile_info4 )
 {
 	int code;
 	code=ssrj_vram4[tile_index<<1]+(ssrj_vram4[(tile_index<<1)+1]<<8);

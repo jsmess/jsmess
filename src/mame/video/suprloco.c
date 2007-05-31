@@ -76,7 +76,7 @@ PALETTE_INIT( suprloco )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	unsigned char attr = suprloco_videoram[2*tile_index+1];
 	SET_TILE_INFO(
@@ -84,7 +84,7 @@ static void get_tile_info(int tile_index)
 			suprloco_videoram[2*tile_index] | ((attr & 0x03) << 8),
 			(attr & 0x1c) >> 2,
 			0)
-	tile_info.priority = (attr & 0x20) >> 5;
+	tileinfo->priority = (attr & 0x20) >> 5;
 }
 
 

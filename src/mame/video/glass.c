@@ -41,7 +41,7 @@ int glass_current_bit = 0;
       1  | xxxxxxxx -------- | not used
 */
 
-static void get_tile_info_glass_screen0(int tile_index)
+static TILE_GET_INFO( get_tile_info_glass_screen0 )
 {
 	int data = glass_videoram[tile_index << 1];
 	int data2 = glass_videoram[(tile_index << 1) + 1];
@@ -51,7 +51,7 @@ static void get_tile_info_glass_screen0(int tile_index)
 }
 
 
-static void get_tile_info_glass_screen1(int tile_index)
+static TILE_GET_INFO( get_tile_info_glass_screen1 )
 {
 	int data = glass_videoram[(0x1000/2) + (tile_index << 1)];
 	int data2 = glass_videoram[(0x1000/2) + (tile_index << 1) + 1];

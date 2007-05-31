@@ -105,7 +105,7 @@ WRITE8_HANDLER( popper_gfx_bank_w )
 	}
 }
 
-static void get_popper_p123_tile_info(int tile_index)
+static TILE_GET_INFO( get_popper_p123_tile_info )
 {
 	unsigned int tile_number = popper_videoram[tile_index];
 	unsigned char attr  = popper_attribram[tile_index];
@@ -118,7 +118,7 @@ static void get_popper_p123_tile_info(int tile_index)
 			TILE_SPLIT((attr & 0x80)>>7))
 }
 
-static void get_popper_p0_tile_info(int tile_index)
+static TILE_GET_INFO( get_popper_p0_tile_info )
 {
 	unsigned int tile_number = popper_videoram[tile_index];
 	unsigned char attr = popper_attribram[tile_index];
@@ -135,7 +135,7 @@ static void get_popper_p0_tile_info(int tile_index)
 			flags)
 }
 
-static void get_popper_ol_p123_tile_info(int tile_index)
+static TILE_GET_INFO( get_popper_ol_p123_tile_info )
 {
 	unsigned int tile_number = popper_ol_videoram[tile_index];
 	unsigned char attr  = popper_ol_attribram[tile_index];
@@ -148,7 +148,7 @@ static void get_popper_ol_p123_tile_info(int tile_index)
 			TILE_SPLIT((attr & 0x80)>>7))
 }
 
-static void get_popper_ol_p0_tile_info(int tile_index)
+static TILE_GET_INFO( get_popper_ol_p0_tile_info )
 {
 	unsigned int tile_number = popper_ol_videoram[tile_index];
 	unsigned char attr = popper_ol_attribram[tile_index];

@@ -3,6 +3,15 @@
     Motorola 6821 PIA interface and emulation
 
     Notes:
+        * pia_get_port_b_z_mask() gives the caller the bitmask
+          that show which bits are high-impendance when
+          reading port B, thus neither 0 or 1.
+          pia_get_output_cb2_z() returns the same
+          information for the CB2 pin
+        * pia_set_port_a_z_mask allows the input callback to
+          indicate which port A bits are disconnected.
+          For these bit, the read operation will return the
+          output buffer's contents
         * the 'alt' interface functions are used when the A0 and A1
           address bits are swapped
         * all 'int' data or return values are Boolean
@@ -53,6 +62,7 @@ void pia_reset(void);
 
 UINT8 pia_read(int which, offs_t offset);
 UINT8 pia_alt_read(int which, offs_t offset);
+UINT8 pia_get_port_b_z_mask(int which);  /* see first note */
 
 
 
@@ -60,12 +70,13 @@ UINT8 pia_alt_read(int which, offs_t offset);
 
 void pia_write(int which, offs_t offset, UINT8 data);
 void pia_alt_write(int which, offs_t offset, UINT8 data);
+void pia_set_port_a_z_mask(int which, UINT8 data);  /* see second note */
 
 
 
 /*------------- Device interface for port A --------------*/
 
-void pia_set_input_a(int which, UINT8 data);
+void pia_set_input_a(int which, UINT8 data, UINT8 z_mask);
 UINT8 pia_get_output_a(int which);
 
 
@@ -100,13 +111,8 @@ void pia_set_input_cb1(int which, int data);
 
 void pia_set_input_cb2(int which, int data);
 int pia_get_output_cb2(int which);
+int pia_get_output_cb2_z(int which);  /* see first note */
 
-
-
-/*----- Convinience interface retrieving for the DDR -----*/
-
-UINT8 pia_get_ddr_a(int which);
-UINT8 pia_get_ddr_b(int which);
 
 
 /*-- Convinience interface for retrieving the IRQ state --*/

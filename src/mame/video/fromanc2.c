@@ -20,7 +20,7 @@ static tilemap *fromanc2_tilemap[2][4];
 
 ******************************************************************************/
 
-INLINE void fromanc2_get_tile_info(int tile_index, int vram, int layer)
+INLINE void fromanc2_get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, int vram, int layer)
 {
 	int tile, color;
 
@@ -30,17 +30,17 @@ INLINE void fromanc2_get_tile_info(int tile_index, int vram, int layer)
 	SET_TILE_INFO(layer, tile, color, 0)
 }
 
-static void fromanc2_get_v0_l0_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 0, 0); }
-static void fromanc2_get_v0_l1_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 0, 1); }
-static void fromanc2_get_v0_l2_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 0, 2); }
-static void fromanc2_get_v0_l3_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 0, 3); }
-static void fromanc2_get_v1_l0_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 1, 0); }
-static void fromanc2_get_v1_l1_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 1, 1); }
-static void fromanc2_get_v1_l2_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 1, 2); }
-static void fromanc2_get_v1_l3_tile_info(int tile_index) { fromanc2_get_tile_info(tile_index, 1, 3); }
+static TILE_GET_INFO( fromanc2_get_v0_l0_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 0, 0); }
+static TILE_GET_INFO( fromanc2_get_v0_l1_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 0, 1); }
+static TILE_GET_INFO( fromanc2_get_v0_l2_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 0, 2); }
+static TILE_GET_INFO( fromanc2_get_v0_l3_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 0, 3); }
+static TILE_GET_INFO( fromanc2_get_v1_l0_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 1, 0); }
+static TILE_GET_INFO( fromanc2_get_v1_l1_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 1, 1); }
+static TILE_GET_INFO( fromanc2_get_v1_l2_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 1, 2); }
+static TILE_GET_INFO( fromanc2_get_v1_l3_tile_info ) { fromanc2_get_tile_info(machine, tileinfo, tile_index, 1, 3); }
 
 
-INLINE void fromancr_get_tile_info(int tile_index, int vram, int layer)
+INLINE void fromancr_get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, int vram, int layer)
 {
 	int tile, color;
 
@@ -50,12 +50,12 @@ INLINE void fromancr_get_tile_info(int tile_index, int vram, int layer)
 	SET_TILE_INFO(layer, tile, color, 0)
 }
 
-static void fromancr_get_v0_l0_tile_info(int tile_index) { fromancr_get_tile_info(tile_index, 0, 0); }
-static void fromancr_get_v0_l1_tile_info(int tile_index) { fromancr_get_tile_info(tile_index, 0, 1); }
-static void fromancr_get_v0_l2_tile_info(int tile_index) { fromancr_get_tile_info(tile_index, 0, 2); }
-static void fromancr_get_v1_l0_tile_info(int tile_index) { fromancr_get_tile_info(tile_index, 1, 0); }
-static void fromancr_get_v1_l1_tile_info(int tile_index) { fromancr_get_tile_info(tile_index, 1, 1); }
-static void fromancr_get_v1_l2_tile_info(int tile_index) { fromancr_get_tile_info(tile_index, 1, 2); }
+static TILE_GET_INFO( fromancr_get_v0_l0_tile_info ) { fromancr_get_tile_info(machine, tileinfo, tile_index, 0, 0); }
+static TILE_GET_INFO( fromancr_get_v0_l1_tile_info ) { fromancr_get_tile_info(machine, tileinfo, tile_index, 0, 1); }
+static TILE_GET_INFO( fromancr_get_v0_l2_tile_info ) { fromancr_get_tile_info(machine, tileinfo, tile_index, 0, 2); }
+static TILE_GET_INFO( fromancr_get_v1_l0_tile_info ) { fromancr_get_tile_info(machine, tileinfo, tile_index, 1, 0); }
+static TILE_GET_INFO( fromancr_get_v1_l1_tile_info ) { fromancr_get_tile_info(machine, tileinfo, tile_index, 1, 1); }
+static TILE_GET_INFO( fromancr_get_v1_l2_tile_info ) { fromancr_get_tile_info(machine, tileinfo, tile_index, 1, 2); }
 
 
 /******************************************************************************

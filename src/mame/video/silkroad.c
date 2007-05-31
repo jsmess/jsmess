@@ -67,7 +67,7 @@ static void silkroad_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 }
 
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 
 	int code = ((silkroad_vidram[tile_index] & 0xffff0000) >> 16 );
@@ -92,7 +92,7 @@ WRITE32_HANDLER( silkroad_fgram_w )
 	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
-static void get_fg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg2_tile_info )
 {
 	int code = ((silkroad_vidram2[tile_index] & 0xffff0000) >> 16 );
 	int color = ((silkroad_vidram2[tile_index] & 0x000001f));
@@ -113,7 +113,7 @@ WRITE32_HANDLER( silkroad_fgram2_w )
 	tilemap_mark_tile_dirty(fg2_tilemap,offset);
 }
 
-static void get_fg3_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg3_tile_info )
 {
 	int code = ((silkroad_vidram3[tile_index] & 0xffff0000) >> 16 );
 	int color = ((silkroad_vidram3[tile_index] & 0x000001f));

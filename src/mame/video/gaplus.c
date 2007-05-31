@@ -101,10 +101,10 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 	return offs;
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	unsigned char attr = gaplus_videoram[tile_index + 0x400];
-	tile_info.priority = (attr & 0x40) >> 6;
+	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
 			gaplus_videoram[tile_index] + ((attr & 0x80) << 1),

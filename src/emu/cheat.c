@@ -47,10 +47,6 @@
 
 #define CHEAT_FILENAME_MAX_LEN					255
 
-#ifndef LSB_FIRST
-#define LSB_FIRST 0
-#endif
-
 /********** BIT FIELD **********/
 
 enum

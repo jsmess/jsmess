@@ -151,7 +151,7 @@ PALETTE_INIT( dkong3 )
 	color_codes = color_prom;	/* we'll need it later */
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + 256 * gfx_bank;
 	int color = (color_codes[tile_index % 32 + 32 * (tile_index / 32 / 4)] & 0x0f) + 0x10 * palette_bank;

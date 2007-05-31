@@ -63,7 +63,7 @@ PALETTE_INIT( dogfgt )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	SET_TILE_INFO(
 			0,

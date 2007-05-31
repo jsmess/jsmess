@@ -208,7 +208,7 @@ VIDEO_UPDATE( karnov )
 
 /******************************************************************************/
 
-static void get_fix_tile_info(int tile_index)
+static TILE_GET_INFO( get_fix_tile_info )
 {
 	int tile=videoram16[tile_index];
 	SET_TILE_INFO(

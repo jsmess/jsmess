@@ -160,7 +160,7 @@ static UINT8 williams2_fg_color;
 
 static void blitter_init(int blitter_config, const UINT8 *remap_prom);
 static void create_palette_lookup(void);
-static void get_tile_info(int tile_index);
+static TILE_GET_INFO( get_tile_info );
 static int blitter_core(int sstart, int dstart, int w, int h, int data);
 
 
@@ -438,7 +438,7 @@ READ8_HANDLER( williams2_video_counter_r )
  *
  *************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int mask = Machine->gfx[0]->total_elements - 1;
 	int data = williams2_tileram[tile_index];

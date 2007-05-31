@@ -87,7 +87,7 @@ static UINT8 *calorie_sprites;
 
 static tilemap *bg_tilemap,*fg_tilemap;
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 *src = memory_region(REGION_USER1);
 	int bg_base = (calorie_bg & 0x0f) * 0x200;
@@ -98,7 +98,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flag)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code  = ((calorie_fg[tile_index + 0x400] & 0x30) << 4) | calorie_fg[tile_index];
 	int color = calorie_fg[tile_index + 0x400] & 0x0f;

@@ -42,7 +42,7 @@ WRITE8_HANDLER( raidena_text_w )
 	tilemap_mark_tile_dirty( tx_layer,offset/2);
 }
 
-static void get_back_tile_info(int tile_index)
+static TILE_GET_INFO( get_back_tile_info )
 {
 	int tile=raiden_back_data[2*tile_index]+(raiden_back_data[2*tile_index+1]<<8);
 	int color=tile >> 12;
@@ -56,7 +56,7 @@ static void get_back_tile_info(int tile_index)
 			0)
 }
 
-static void get_fore_tile_info(int tile_index)
+static TILE_GET_INFO( get_fore_tile_info )
 {
 	int tile=raiden_fore_data[2*tile_index]+(raiden_fore_data[2*tile_index+1]<<8);
 	int color=tile >> 12;
@@ -70,7 +70,7 @@ static void get_fore_tile_info(int tile_index)
 			0)
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile=videoram[2*tile_index]+((videoram[2*tile_index+1]&0xc0)<<2);
 	int color=videoram[2*tile_index+1]&0xf;

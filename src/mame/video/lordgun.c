@@ -62,28 +62,28 @@ struct
 
 static tilemap *tilemap_0, *tilemap_1, *tilemap_2, *tilemap_3;
 
-static void get_tile_info_0( int tile_index )
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 attr = lordgun_vram_0[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_0[ tile_index * 2 + 1 ];
 	SET_TILE_INFO( 1, code, (attr & 0x0030) >> 4, TILE_FLIPXY(attr >> 14))
 }
 
-static void get_tile_info_1( int tile_index )
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 attr = lordgun_vram_1[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_1[ tile_index * 2 + 1 ];
 	SET_TILE_INFO( 2, code, (attr & 0x0070) >> 4, TILE_FLIPXY(attr >> 14))
 }
 
-static void get_tile_info_2( int tile_index )
+static TILE_GET_INFO( get_tile_info_2 )
 {
 	UINT16 attr = lordgun_vram_2[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_2[ tile_index * 2 + 1 ];
 	SET_TILE_INFO( 3, code, (attr & 0x0300) >> 8, TILE_FLIPXY(attr >> 14))
 }
 
-static void get_tile_info_3( int tile_index )
+static TILE_GET_INFO( get_tile_info_3 )
 {
 	UINT16 attr = lordgun_vram_3[ tile_index * 2 + 0 ];
 	UINT16 code = lordgun_vram_3[ tile_index * 2 + 1 ];

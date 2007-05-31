@@ -564,7 +564,8 @@ UINT8 cia_read(int which, offs_t offset)
 		case CIA_PRB:
 			port = &cia->port[offset & 1];
 			data = port->read ? (*port->read)() : 0;
-			data = (data & ~port->ddr) | (port->latch & port->ddr);
+			data = data & (port->latch | ~port->ddr);
+			//data = (data & ~port->ddr) | (port->latch & port->ddr);
 			port->in = data;
 
 			if (offset == CIA_PRB)

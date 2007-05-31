@@ -11,7 +11,7 @@ static UINT8* cball_video_ram;
 static tilemap* bg_tilemap;
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = cball_video_ram[tile_index];
 

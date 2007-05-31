@@ -11,12 +11,12 @@ int qdrmfgp_get_palette(void);
 
 
 
-static void tile_callback(int layer, int *code, int *color)
+static void tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = ((*color>>2) & 0x0f) | qdrmfgp_get_palette();
 }
 
-static void gp2_tile_callback(int layer, int *code, int *color)
+static void gp2_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = (*color>>1) & 0x7f;
 }

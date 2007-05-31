@@ -168,7 +168,7 @@ WRITE8_HANDLER( rockola_scrolly_w )
   the main emulation engine.
 
 ***************************************************************************/
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + 256 * charbank;
 	int color = (colorram[tile_index] & 0x38) >> 3;
@@ -176,7 +176,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = rockola_videoram2[tile_index];
 	int color = colorram[tile_index] & 0x07;
@@ -299,7 +299,7 @@ WRITE8_HANDLER( satansat_backcolor_w )
 	}
 }
 
-static void satansat_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( satansat_get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 	int color = (colorram[tile_index] & 0x0c) >> 2;
@@ -307,7 +307,7 @@ static void satansat_get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, 0)
 }
 
-static void satansat_get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( satansat_get_fg_tile_info )
 {
 	int code = rockola_videoram2[tile_index];
 	int color = colorram[tile_index] & 0x03;

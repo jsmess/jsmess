@@ -142,7 +142,7 @@ WRITE8_HANDLER( nova2001_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 	int color = colorram[tile_index] & 0x0f;
@@ -150,7 +150,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = nova2001_videoram2[tile_index];
 	int color = nova2001_colorram2[tile_index] & 0x0f;

@@ -520,7 +520,7 @@ static const gfx_decode laserbat_gfxdecodeinfo[] =
 	{ -1 } /* end of array */
 };
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	// wrong color index!
 	SET_TILE_INFO(0, videoram[tile_index], colorram[tile_index], 0)

@@ -111,7 +111,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 static int gametype;
 
 static tilemap *txt_tilemap;
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 
 	SET_TILE_INFO(

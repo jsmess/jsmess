@@ -120,7 +120,7 @@ PALETTE_INIT( zodiack )
 	COLOR(2, 1) = 48;
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = zodiack_videoram2[tile_index];
 	int color = (zodiack_attributesram[2 * (tile_index % 32) + 1] >> 4) & 0x07;
@@ -128,7 +128,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = videoram[tile_index];
 	int color = zodiack_attributesram[2 * (tile_index % 32) + 1] & 0x07;

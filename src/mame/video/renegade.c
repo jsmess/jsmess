@@ -46,7 +46,7 @@ WRITE8_HANDLER( renegade_scroll1_w )
 	renegade_scrollx = (renegade_scrollx & 0xff) | (data << 8);
 }
 
-static void get_bg_tilemap_info(int tile_index)
+static TILE_GET_INFO( get_bg_tilemap_info )
 {
 	const UINT8 *source = &videoram[tile_index];
 	UINT8 attributes = source[0x400]; /* CCC??BBB */
@@ -57,7 +57,7 @@ static void get_bg_tilemap_info(int tile_index)
 		0)
 }
 
-static void get_fg_tilemap_info(int tile_index)
+static TILE_GET_INFO( get_fg_tilemap_info )
 {
 	const UINT8 *source = &renegade_videoram2[tile_index];
 	UINT8 attributes = source[0x400];

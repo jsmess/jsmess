@@ -7,7 +7,7 @@ extern UINT16 *shadfrce_fgvideoram, *shadfrce_bg0videoram,  *shadfrce_bg1videora
 static UINT16 *shadfrce_spvideoram_old; /* I *think* the sprites need to be delayed anyway */
 
 
-static void get_shadfrce_fgtile_info(int tile_index)
+static TILE_GET_INFO( get_shadfrce_fgtile_info )
 {
 
 	/* ---- ----  tttt tttt  ---- ----  pppp TTTT */
@@ -28,7 +28,7 @@ WRITE16_HANDLER( shadfrce_fgvideoram_w )
 	}
 }
 
-static void get_shadfrce_bg0tile_info(int tile_index)
+static TILE_GET_INFO( get_shadfrce_bg0tile_info )
 {
 
 	/* ---- ----  ---- cccc  --TT TTTT TTTT TTTT */
@@ -51,7 +51,7 @@ WRITE16_HANDLER( shadfrce_bg0videoram_w )
 	}
 }
 
-static void get_shadfrce_bg1tile_info(int tile_index)
+static TILE_GET_INFO( get_shadfrce_bg1tile_info )
 {
 	int tileno, colour;
 

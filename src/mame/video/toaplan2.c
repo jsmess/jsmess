@@ -244,7 +244,7 @@ static void defaultOffsets(void)
 
 ***************************************************************************/
 
-static void get_top0_tile_info(int tile_index)
+static TILE_GET_INFO( get_top0_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -256,10 +256,10 @@ static void get_top0_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void get_fg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg0_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -271,10 +271,10 @@ static void get_fg0_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg0_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -286,11 +286,11 @@ static void get_bg0_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
-/// if ((attrib & 0x0f00) == 0) tile_info.flags |= TILE_IGNORE_TRANSPARENCY;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
+/// if ((attrib & 0x0f00) == 0) tileinfo->flags |= TILE_IGNORE_TRANSPARENCY;
 }
 
-static void get_top1_tile_info(int tile_index)
+static TILE_GET_INFO( get_top1_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -302,10 +302,10 @@ static void get_top1_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void get_fg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg1_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -317,10 +317,10 @@ static void get_fg1_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -332,10 +332,10 @@ static void get_bg1_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void batrider_get_top0_tile_info(int tile_index)
+static TILE_GET_INFO( batrider_get_top0_tile_info )
 {
 	int color, tile_number, attrib, tile;
 
@@ -348,10 +348,10 @@ static void batrider_get_top0_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void batrider_get_fg0_tile_info(int tile_index)
+static TILE_GET_INFO( batrider_get_fg0_tile_info )
 {
 	int color, tile_number, attrib, tile;
 
@@ -364,10 +364,10 @@ static void batrider_get_fg0_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void batrider_get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( batrider_get_bg0_tile_info )
 {
 	int color, tile_number, attrib, tile;
 
@@ -380,10 +380,10 @@ static void batrider_get_bg0_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = (attrib & 0x0f00) >> 8;
+	tileinfo->priority = (attrib & 0x0f00) >> 8;
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -395,7 +395,7 @@ static void get_text_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
 /***************************************************************************

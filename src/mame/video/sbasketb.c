@@ -119,7 +119,7 @@ WRITE8_HANDLER( sbasketb_scroll_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x20) << 3);
 	int color = colorram[tile_index] & 0x0f;

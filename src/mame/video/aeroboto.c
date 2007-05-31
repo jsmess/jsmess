@@ -22,7 +22,7 @@ static tilemap *bg_tilemap;
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	unsigned char code = aeroboto_videoram[tile_index];
 	SET_TILE_INFO(

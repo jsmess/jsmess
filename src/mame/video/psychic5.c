@@ -249,7 +249,7 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int attr = psychic5_bg_videoram[offs + 1];
@@ -260,7 +260,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int offs = tile_index * 2;
 	int attr = psychic5_fg_videoram[offs + 1];

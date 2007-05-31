@@ -19,7 +19,7 @@ static struct tempsprite *spritelist;
 
 /***************************************************************************/
 
-static void actual_get_fg_tile_info(UINT16 *ram,int gfxnum,int tile_index)
+INLINE void actual_get_fg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT16 *ram,int gfxnum)
 {
 	UINT16 code = (ram[tile_index + 0x2000] & 0x7ff);
 	UINT16 attr = ram[tile_index];
@@ -31,15 +31,10 @@ static void actual_get_fg_tile_info(UINT16 *ram,int gfxnum,int tile_index)
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
-	actual_get_fg_tile_info(darius_fg_ram,2,tile_index);
+	actual_get_fg_tile_info(machine, tileinfo, tile_index, darius_fg_ram, 2);
 }
-
-static void (*darius_fg_get_tile_info[1])(int tile_index) =
-{
-	get_fg_tile_info
-};
 
 static void dirty_fg_tilemap(void)
 {
@@ -50,7 +45,7 @@ static void dirty_fg_tilemap(void)
 
 VIDEO_START( darius )
 {
-	fg_tilemap = tilemap_create(darius_fg_get_tile_info[0],tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,128,64);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,128,64);
 
 	spritelist = auto_malloc(0x800 * sizeof(*spritelist));
 

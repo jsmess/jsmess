@@ -1053,6 +1053,7 @@ const game_driver * const drivers[] =
 
 	/* NES-based hacks */
 	DRIVER( multigam )	/* 1992 */
+	DRIVER( multigmb )	/* 1992 */
 	DRIVER( cham24 )	/* 2002 */
 
 	/* Nintendo Super System Games */
@@ -2512,6 +2513,7 @@ V-V                           TP-027
 	DRIVER( 19xxjr1 )	/* 07/12/1995 (c) 1996 (Japan) */
 	DRIVER( 19xxa )		/* 07/12/1995 (c) 1996 (Asia) */
 	DRIVER( 19xxh )		/* 18/12/1995 (c) 1996 (Hispanic) */
+	DRIVER( 19xxb )		/* 18/12/1995 (c) 1996 (Brazil) */
 	DRIVER( ddsom )		/* 19/06/1996 (c) 1996 (Euro) */
 	DRIVER( ddsomr1 )	/* 23/02/1996 (c) 1996 (Euro) */
 	DRIVER( ddsomr2 )	/* 09/02/1996 (c) 1996 (Euro) */
@@ -3154,7 +3156,9 @@ V-V                           TP-027
 	DRIVER( mrvikngj )	/* 834-5383 (c) 1984 (S1) */
 	DRIVER( swat )		/* 834-5388 (c) 1984 Coreland / Sega (S1) */
 	DRIVER( flicky )	/* (c) 1984 (S1) */
+	DRIVER( flicks2 )	/* (c) 1984 (S1) */
 	DRIVER( flickyo )	/* (c) 1984 (S1) */
+	DRIVER( flicks1 )	/* (c) 1984 (S1) */
 	DRIVER( wmatch )	/* (c) 1984 (S1) */
 	DRIVER( bullfgt )	/* 834-5478 (c) 1984 Sega / Coreland (S1) */
 	DRIVER( thetogyu )	/* 834-5478 (c) 1984 Sega / Coreland (S1) */
@@ -5734,6 +5738,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( strahla )	/* UPL-91074 (c) 1992 UPL (Japan) */
 	DRIVER( bjtwin )	/* UPL-93087 (c) 1993 NMK */
 	DRIVER( tdragon2 )	/* UPL-93091 (c) 1993 NMK */
+	DRIVER( tdragn2a )	/* UPL-93091 (c) 1993 NMK */
 	DRIVER( bigbang )	/* UPL-93091 (c) 1993 NMK */
 	DRIVER( tdragon )	/* (c) 1991 NMK / Tecmo */
 	DRIVER( hachamf )	/* (c) 1991 NMK */
@@ -7507,8 +7512,8 @@ Other Sun games
 	DRIVER( dambustr )	/* (c) 19?? GAT */
 	DRIVER( gunpey )	/* (c) 2000 Banpresto */
 	DRIVER( spaceg )	/* (c) 19?? */
-	DRIVER( wldarrow )	/* (c) 19?? */
-	DRIVER( unkmeyco )	/* (c) 19?? */
+	DRIVER( wldarrow )	/* (c) 1982 */
+	DRIVER( mdrawpkr )	/* (c) 19?? */
 	DRIVER( laserbas )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( laserbsa )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( futflash )	/* (c) 19?? HOEI */
@@ -7620,5 +7625,6 @@ Other Sun games
 	DRIVER( good )		/* (c) 1983 Kiwako */
 	DRIVER( filetto )
 	DRIVER( quizo )		/* (c) 1985 Seoul Coin Corp. */
+	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
 
 #endif	/* DRIVER_RECURSIVE */

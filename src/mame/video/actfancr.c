@@ -24,7 +24,7 @@ static UINT32 actfancr_scan2(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_ro
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x70) << 5);
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int tile,color;
 
@@ -45,7 +45,7 @@ static UINT32 triothep_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_row
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x10) << 5);
 }
 
-static void get_trio_tile_info(int tile_index)
+static TILE_GET_INFO( get_trio_tile_info )
 {
 	int tile,color;
 
@@ -60,7 +60,7 @@ static void get_trio_tile_info(int tile_index)
 			0)
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int tile,color;
 

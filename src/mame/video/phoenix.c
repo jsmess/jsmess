@@ -127,7 +127,7 @@ PALETTE_INIT( pleiads )
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code;
 
@@ -139,7 +139,7 @@ static void get_fg_tile_info(int tile_index)
 			(tile_index & 0x1f) ? 0 : TILE_IGNORE_TRANSPARENCY)	/* first row (column) is opaque */
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code;
 

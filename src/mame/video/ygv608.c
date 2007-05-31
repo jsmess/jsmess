@@ -108,11 +108,11 @@ static UINT32 get_tile_offset( UINT32 col, UINT32 row,
 #define layout_total(x) \
 (Machine->drv->gfxdecodeinfo[x].gfxlayout->total)
 
-static void get_tile_info_A_8( int offset )
+static TILE_GET_INFO( get_tile_info_A_8 )
 {
-	// extract row,col packed into offset
-	int             col = offset >> 6;
-	int             row = offset & 0x3f;
+	// extract row,col packed into tile_index
+	int             col = tile_index >> 6;
+	int             row = tile_index & 0x3f;
 
 	unsigned char   attr = 0;
 	int             pattern_name_base = 0;
@@ -201,11 +201,11 @@ static void get_tile_info_A_8( int offset )
 	}
 }
 
-static void get_tile_info_B_8( int offset )
+static TILE_GET_INFO( get_tile_info_B_8 )
 {
-	// extract row,col packed into offset
-	int             col = offset >> 6;
-	int             row = offset & 0x3f;
+	// extract row,col packed into tile_index
+	int             col = tile_index >> 6;
+	int             row = tile_index & 0x3f;
 
 	unsigned char   attr = 0;
 	int             pattern_name_base = ( ( ygv608.page_y << ygv608.pny_shift )
@@ -298,11 +298,11 @@ static void get_tile_info_B_8( int offset )
 	}
 }
 
-static void get_tile_info_A_16( int offset )
+static TILE_GET_INFO( get_tile_info_A_16 )
 {
-  // extract row,col packed into offset
-  int             col = offset >> 6;
-  int             row = offset & 0x3f;
+  // extract row,col packed into tile_index
+  int             col = tile_index >> 6;
+  int             row = tile_index & 0x3f;
 
   unsigned char   attr = 0;
   int             pattern_name_base = 0;
@@ -387,11 +387,11 @@ static void get_tile_info_A_16( int offset )
 	}
 }
 
-static void get_tile_info_B_16( int offset )
+static TILE_GET_INFO( get_tile_info_B_16 )
 {
-  // extract row,col packed into offset
-  int             col = offset >> 6;
-  int             row = offset & 0x3f;
+  // extract row,col packed into tile_index
+  int             col = tile_index >> 6;
+  int             row = tile_index & 0x3f;
 
   unsigned char   attr = 0;
   int             pattern_name_base = ( ( ygv608.page_y << ygv608.pny_shift )

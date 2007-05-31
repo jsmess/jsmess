@@ -165,7 +165,7 @@ static mame_bitmap *mosaicbitmap;
   Callbacks for the tilemap code
 ***************************************************************************/
 
-static void argus_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( argus_get_tx_tile_info )
 {
 	int hi, lo;
 
@@ -179,7 +179,7 @@ static void argus_get_tx_tile_info(int tile_index)
 			TILE_FLIPYX((hi & 0x30) >> 4))
 }
 
-static void argus_get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( argus_get_bg0_tile_info )
 {
 	int hi, lo;
 
@@ -193,7 +193,7 @@ static void argus_get_bg0_tile_info(int tile_index)
 			TILE_FLIPYX((hi & 0x30) >> 4))
 }
 
-static void argus_get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( argus_get_bg1_tile_info )
 {
 	int hi, lo;
 
@@ -207,7 +207,7 @@ static void argus_get_bg1_tile_info(int tile_index)
 			TILE_FLIPYX((hi & 0x30) >> 4))
 }
 
-static void valtric_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( valtric_get_tx_tile_info )
 {
 	int hi, lo;
 
@@ -221,7 +221,7 @@ static void valtric_get_tx_tile_info(int tile_index)
 			TILE_FLIPYX((hi & 0x30) >> 4))
 }
 
-static void valtric_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( valtric_get_bg_tile_info )
 {
 	int hi, lo, color, tile;
 
@@ -238,7 +238,7 @@ static void valtric_get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void butasan_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( butasan_get_tx_tile_info )
 {
 	int hi, lo;
 
@@ -254,7 +254,7 @@ static void butasan_get_tx_tile_info(int tile_index)
 			TILE_FLIPYX((hi & 0x30) >> 4))
 }
 
-static void butasan_get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( butasan_get_bg0_tile_info )
 {
 	int hi, lo;
 	int attrib;
@@ -278,7 +278,7 @@ static void butasan_get_bg0_tile_info(int tile_index)
 
 
 
-static void butasan_get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( butasan_get_bg1_tile_info )
 {
 	int bank, tile, attrib, color;
 
@@ -367,7 +367,7 @@ VIDEO_START( butasan )
 }
 
 #if 0
-static void bombsa_get_tx_alt_tile_info(int tile_index)
+static TILE_GET_INFO( bombsa_get_tx_alt_tile_info )
 {
 	int hi, lo;
 
@@ -382,7 +382,7 @@ static void bombsa_get_tx_alt_tile_info(int tile_index)
 }
 #endif
 
-static void bombsa_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( bombsa_get_bg_tile_info )
 {
 	int tileno;
 	int col;

@@ -31,7 +31,7 @@ unsigned char *m90_video_data;
 static tilemap *pf1_layer,*pf2_layer,*pf1_wide_layer,*pf2_wide_layer;
 static INT32 m90_video_control_data[16];
 
-static void get_tile_info(int tile_index,int layer,int page_mask)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,int page_mask)
 {
 	int tile,color;
 	tile_index = 4*tile_index + ((m90_video_control_data[0xa+2*layer] & page_mask)*0x4000);
@@ -43,14 +43,14 @@ static void get_tile_info(int tile_index,int layer,int page_mask)
 			tile,
 			color&0xf,
 			TILE_FLIPYX((color & 0xc0) >> 6))
-	tile_info.priority = (color & 0x30) ? 1 : 0;
+	tileinfo->priority = (color & 0x30) ? 1 : 0;
 }
 
 
-static void get_pf1_tile_info (int tile_index) { get_tile_info(tile_index,0,3); }
-static void get_pf1w_tile_info(int tile_index) { get_tile_info(tile_index,0,2); }
-static void get_pf2_tile_info (int tile_index) { get_tile_info(tile_index,1,3); }
-static void get_pf2w_tile_info(int tile_index) { get_tile_info(tile_index,1,2); }
+static TILE_GET_INFO( get_pf1_tile_info ) { get_tile_info(machine,tileinfo,tile_index,0,3); }
+static TILE_GET_INFO( get_pf1w_tile_info ) { get_tile_info(machine,tileinfo,tile_index,0,2); }
+static TILE_GET_INFO( get_pf2_tile_info ) { get_tile_info(machine,tileinfo,tile_index,1,3); }
+static TILE_GET_INFO( get_pf2w_tile_info ) { get_tile_info(machine,tileinfo,tile_index,1,2); }
 
 
 VIDEO_START( m90 )

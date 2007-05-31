@@ -444,7 +444,7 @@ bit0=0;
 }
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = tx_tileram[tile_index];
 	int color = 0;

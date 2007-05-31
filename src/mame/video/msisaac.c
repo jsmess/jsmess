@@ -21,7 +21,7 @@ static tilemap *background, *background2, *foreground;
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile_number = videoram[tile_index];
 	SET_TILE_INFO(	0,
@@ -30,7 +30,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int tile_number = msisaac_videoram2[tile_index];
 
@@ -43,7 +43,7 @@ static void get_bg2_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile_number = msisaac_videoram[tile_index];
 	SET_TILE_INFO(	1,

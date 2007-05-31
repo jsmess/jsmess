@@ -142,7 +142,7 @@ PALETTE_INIT( galivan )
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 *BGROM = memory_region(REGION_GFX4);
 	int attr = BGROM[tile_index + 0x4000];
@@ -154,7 +154,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] | ((attr & 0x01) << 8);
@@ -163,10 +163,10 @@ static void get_tx_tile_info(int tile_index)
 			code,
 			(attr & 0xe0) >> 5,		/* not sure */
 			0)
-	tile_info.priority = attr & 8 ? 0 : 1;	/* seems correct */
+	tileinfo->priority = attr & 8 ? 0 : 1;	/* seems correct */
 }
 
-static void ninjemak_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 {
 	UINT8 *BGROM = memory_region(REGION_GFX4);
 	int attr = BGROM[tile_index + 0x4000];
@@ -178,7 +178,7 @@ static void ninjemak_get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void ninjemak_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] | ((attr & 0x03) << 8);

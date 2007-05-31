@@ -104,7 +104,7 @@ WRITE8_HANDLER( battlane_video_ctrl_w )
 	battlane_video_ctrl = data;
 }
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = battlane_tileram[tile_index];
 	int attr = battlane_tileram[tile_index + 0x400];

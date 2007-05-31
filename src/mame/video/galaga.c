@@ -410,7 +410,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 }
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	/* the hardware has two character sets, one normal and one x-flipped. When
        screen is flipped, character y flip is done by the hardware inverting the

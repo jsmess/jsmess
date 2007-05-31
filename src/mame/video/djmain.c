@@ -130,7 +130,7 @@ static void djmain_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-static void game_tile_callback(int layer, int *code, int *color)
+static void game_tile_callback(int layer, int *code, int *color, int *flags)
 {
 }
 

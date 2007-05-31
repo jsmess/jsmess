@@ -173,7 +173,7 @@ static void inufuku_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 ******************************************************************************/
 
-static void get_inufuku_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_inufuku_bg_tile_info )
 {
 	SET_TILE_INFO(
 			0,
@@ -182,7 +182,7 @@ static void get_inufuku_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_inufuku_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_inufuku_text_tile_info )
 {
 	SET_TILE_INFO(
 			1,

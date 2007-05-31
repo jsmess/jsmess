@@ -121,7 +121,7 @@ WRITE8_HANDLER( marvins_text_ram_w )
 **
 ***************************************************************************/
 
-static void get_bg_tilemap_info(int tile_index)
+static TILE_GET_INFO( get_bg_tilemap_info )
 {
 	SET_TILE_INFO(
 			2,
@@ -130,7 +130,7 @@ static void get_bg_tilemap_info(int tile_index)
 			0)
 }
 
-static void get_fg_tilemap_info(int tile_index)
+static TILE_GET_INFO( get_fg_tilemap_info )
 {
 	SET_TILE_INFO(
 			1,
@@ -139,7 +139,7 @@ static void get_fg_tilemap_info(int tile_index)
 			0)
 }
 
-static void get_tx_tilemap_info(int tile_index)
+static TILE_GET_INFO( get_tx_tilemap_info )
 {
 	int tile_number = videoram[tile_index];
 	SET_TILE_INFO(

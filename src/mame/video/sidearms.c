@@ -106,12 +106,12 @@ WRITE8_HANDLER( sidearms_star_scrolly_w )
 }
 
 
-INLINE void get_sidearms_bg_tile_info(int offs)
+static TILE_GET_INFO( get_sidearms_bg_tile_info )
 {
 	int code, attr, color, flags;
 
-	code = tilerom[offs];
-	attr = tilerom[offs + 1];
+	code = tilerom[tile_index];
+	attr = tilerom[tile_index + 1];
 	code |= attr<<8 & 0x100;
 	color = attr>>3 & 0x1f;
 	flags = attr>>1 & 0x03;
@@ -119,12 +119,12 @@ INLINE void get_sidearms_bg_tile_info(int offs)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-INLINE void get_philko_bg_tile_info(int offs)
+static TILE_GET_INFO( get_philko_bg_tile_info )
 {
 	int code, attr, color, flags;
 
-	code = tilerom[offs];
-	attr = tilerom[offs + 1];
+	code = tilerom[tile_index];
+	attr = tilerom[tile_index + 1];
 	code |= (((attr>>6 & 0x02) | (attr & 0x01)) * 0x100);
 	color = attr>>3 & 0x0f;
 	flags = attr>>1 & 0x03;
@@ -132,7 +132,7 @@ INLINE void get_philko_bg_tile_info(int offs)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-INLINE void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + (attr<<2 & 0x300);
@@ -141,7 +141,7 @@ INLINE void get_fg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-INLINE UINT32 sidearms_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
+static UINT32 sidearms_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
 {
 	/* logical (col,row) -> memory offset */
 	int offset = ((row << 7) + col) << 1;

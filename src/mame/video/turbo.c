@@ -166,7 +166,7 @@ PALETTE_INIT( buckrog )
  *
  *************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	turbo_state *state = Machine->driver_data;
 	int code = state->videoram[tile_index];

@@ -76,13 +76,13 @@ static UINT8 *dunhuang_paldata;
 
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 code		=	dunhuang_videoram[ tile_index ];
 	UINT8  color	=	dunhuang_colorram[ tile_index ] & 0x0f;
 	SET_TILE_INFO(0, code, color, 0);
 }
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	UINT16 code		=	dunhuang_videoram2[ tile_index ];
 	UINT8  color	=	dunhuang_colorram2[ tile_index ] & 0x0f;

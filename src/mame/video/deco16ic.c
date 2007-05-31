@@ -242,7 +242,7 @@ static UINT32 deco16_scan_rows(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-static void get_pf4_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf4_tile_info )
 {
 	UINT16 tile=deco16_pf4_data[tile_index];
 	UINT8 colour=(tile>>12)&0xf;
@@ -266,7 +266,7 @@ static void get_pf4_tile_info(int tile_index)
 			flags)
 }
 
-static void get_pf3_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3_tile_info )
 {
 	UINT16 tile=deco16_pf3_data[tile_index];
 	UINT8 colour=(tile>>12)&0xf;
@@ -290,7 +290,7 @@ static void get_pf3_tile_info(int tile_index)
 			flags)
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	UINT16 tile=deco16_pf2_data[tile_index];
 	UINT8 colour=(tile>>12)&0xf;
@@ -314,7 +314,7 @@ static void get_pf2_tile_info(int tile_index)
 			flags)
 }
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	UINT16 tile=deco16_pf1_data[tile_index];
 	UINT8 colour=(tile>>12)&0xf;
@@ -338,7 +338,7 @@ static void get_pf1_tile_info(int tile_index)
 			flags)
 }
 
-static void get_pf2_tile_info_b(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info_b )
 {
 	UINT16 tile=deco16_pf2_data[tile_index];
 	UINT8 colour=(tile>>12)&0xf;
@@ -362,7 +362,7 @@ static void get_pf2_tile_info_b(int tile_index)
 			flags)
 }
 
-static void get_pf1_tile_info_b(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info_b )
 {
 	UINT16 tile=deco16_pf1_data[tile_index];
 	UINT8 colour=(tile>>12)&0xf;

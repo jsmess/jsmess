@@ -99,7 +99,7 @@ WRITE8_HANDLER( paradise_palbank_w )
 	}
 }
 
-static void get_tile_info_0( int tile_index )
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	int code = paradise_vram_0[tile_index] + (paradise_vram_0[tile_index + 0x400] << 8);
 	SET_TILE_INFO(1, code, paradise_palbank, 0);
@@ -116,7 +116,7 @@ WRITE8_HANDLER( paradise_vram_1_w )
 	}
 }
 
-static void get_tile_info_1( int tile_index )
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	int code = paradise_vram_1[tile_index] + (paradise_vram_1[tile_index + 0x400] << 8);
 	SET_TILE_INFO(2, code, 0, 0);
@@ -133,7 +133,7 @@ WRITE8_HANDLER( paradise_vram_2_w )
 	}
 }
 
-static void get_tile_info_2( int tile_index )
+static TILE_GET_INFO( get_tile_info_2 )
 {
 	int code = paradise_vram_2[tile_index] + (paradise_vram_2[tile_index + 0x400] << 8);
 	SET_TILE_INFO(3, code, 0, 0);

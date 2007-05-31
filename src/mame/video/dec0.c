@@ -682,20 +682,20 @@ static UINT32 tile_shape2_8x8_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 
 	return (col & 0x1f) + ((row & 0x7f) << 5);
 }
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int tile=dec0_pf1_data[tile_index];
 	SET_TILE_INFO(0,tile&0xfff,tile>>12,0)
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int tile=dec0_pf2_data[tile_index];
 	int pri=((tile>>12)>7);
 	SET_TILE_INFO(1,tile&0xfff,tile>>12,TILE_SPLIT(pri))
 }
 
-static void get_pf3_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3_tile_info )
 {
 	int tile=dec0_pf3_data[tile_index];
 	int pri=((tile>>12)>7);

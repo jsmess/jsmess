@@ -172,7 +172,7 @@ static WRITE8_HANDLER(raiden2_text_w)
 
 /* TILEMAP RELATED (move to video file) */
 
-static void get_back_tile_info( int tile_index )
+static TILE_GET_INFO( get_back_tile_info )
 {
 	int offs = tile_index*2;
 	int tile = back_data[offs]+(back_data[offs+1]<<8);
@@ -183,7 +183,7 @@ static void get_back_tile_info( int tile_index )
 	SET_TILE_INFO(1,tile+0x0000,color,0)
 }
 
-static void get_mid_tile_info( int tile_index )
+static TILE_GET_INFO( get_mid_tile_info )
 {
 	int offs = tile_index*2;
 	int tile = mid_data[offs]+(mid_data[offs+1]<<8);
@@ -194,7 +194,7 @@ static void get_mid_tile_info( int tile_index )
 	SET_TILE_INFO(1,tile,color,0)
 }
 
-static void get_fore_tile_info( int tile_index )
+static TILE_GET_INFO( get_fore_tile_info )
 {
 	int offs = tile_index*2;
 	int tile = fore_data[offs]+(fore_data[offs+1]<<8);
@@ -207,7 +207,7 @@ static void get_fore_tile_info( int tile_index )
 	SET_TILE_INFO(1,tile,color,0)
 }
 
-static void get_text_tile_info( int tile_index )
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int offs = tile_index*2;
 	int tile = videoram[offs]+(videoram[offs+1]<<8);

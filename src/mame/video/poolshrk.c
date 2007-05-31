@@ -20,7 +20,7 @@ static UINT32 get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 
 }
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	SET_TILE_INFO(1, poolshrk_playfield_ram[tile_index] & 0x3f, 0, 0)
 }

@@ -122,7 +122,7 @@ static tilemap *tilemap1;  // timemap screen1
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void get_tile0_info(int tile_index)
+static TILE_GET_INFO( get_tile0_info )
 {
 	short data;
 	int  code,  color, flags,x,y;
@@ -145,7 +145,7 @@ static void get_tile0_info(int tile_index)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void get_tile1_info(int tile_index)
+static TILE_GET_INFO( get_tile1_info )
 {
 	short data;
 	int  code,  color, flags,x,y;

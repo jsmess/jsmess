@@ -212,7 +212,7 @@ VIDEO_START( eaglshot )
 
 static tilemap *gdfs_tmap;
 
-static void get_tile_info_0(int tile_index)
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 tile = gdfs_tmapram[tile_index];
 	SET_TILE_INFO(3, tile, 0, TILE_FLIPXY( tile >> 14 ));

@@ -94,7 +94,7 @@ WRITE8_HANDLER( yiear_control_w )
 	coin_counter_w(1, data & 0x10);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int attr = videoram[offs];

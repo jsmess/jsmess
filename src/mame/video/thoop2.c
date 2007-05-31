@@ -43,25 +43,25 @@ static tilemap *pant[2];
       1  | x------- -------- | flip y
 */
 
-static void get_tile_info_thoop2_screen0(int tile_index)
+static TILE_GET_INFO( get_tile_info_thoop2_screen0 )
 {
 	int data = thoop2_videoram[tile_index << 1];
 	int data2 = thoop2_videoram[(tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2) | ((data & 0x0003) << 14);
 
-	tile_info.priority = (data2 >> 6) & 0x03;
+	tileinfo->priority = (data2 >> 6) & 0x03;
 
 	SET_TILE_INFO(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03))
 }
 
 
-static void get_tile_info_thoop2_screen1(int tile_index)
+static TILE_GET_INFO( get_tile_info_thoop2_screen1 )
 {
 	int data = thoop2_videoram[(0x1000/2) + (tile_index << 1)];
 	int data2 = thoop2_videoram[(0x1000/2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2) | ((data & 0x0003) << 14);
 
-	tile_info.priority = (data2 >> 6) & 0x03;
+	tileinfo->priority = (data2 >> 6) & 0x03;
 
 	SET_TILE_INFO(1, code, data2 & 0x3f, TILE_FLIPYX((data2 >> 14) & 0x03))
 }

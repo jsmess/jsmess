@@ -34,7 +34,7 @@ PALETTE_INIT(usg)
 
 
 
-static void get_usg_tile_info(int tile_index)
+static TILE_GET_INFO( get_usg_tile_info )
 {
 	int tileno, colour;
 

@@ -17,7 +17,7 @@ WRITE16_HANDLER( gumbo_bg_videoram_w )
 	}
 }
 
-static void get_gumbo_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_gumbo_bg_tile_info )
 {
 	int tileno;
 	tileno = gumbo_bg_videoram[tile_index];
@@ -34,7 +34,7 @@ WRITE16_HANDLER( gumbo_fg_videoram_w )
 	}
 }
 
-static void get_gumbo_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_gumbo_fg_tile_info )
 {
 	int tileno;
 	tileno = gumbo_fg_videoram[tile_index];

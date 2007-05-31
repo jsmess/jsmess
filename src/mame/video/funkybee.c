@@ -79,7 +79,7 @@ WRITE8_HANDLER( funkybee_flipscreen_w )
 	flip_screen_set(data & 0x01);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x80) << 1);
 	int color = colorram[tile_index] & 0x03;

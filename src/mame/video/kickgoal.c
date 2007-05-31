@@ -6,7 +6,7 @@ extern UINT16 *kickgoal_fgram, *kickgoal_bgram, *kickgoal_bg2ram, *kickgoal_scrr
 tilemap *kickgoal_fgtm, *kickgoal_bgtm, *kickgoal_bg2tm;
 
 /* FG */
-static void get_kickgoal_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_kickgoal_fg_tile_info )
 {
 	int tileno = kickgoal_fgram[tile_index*2] & 0x0fff;
 	int color = kickgoal_fgram[tile_index*2+1] & 0x000f;
@@ -15,7 +15,7 @@ static void get_kickgoal_fg_tile_info(int tile_index)
 }
 
 /* BG */
-static void get_kickgoal_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_kickgoal_bg_tile_info )
 {
 	int tileno = kickgoal_bgram[tile_index*2] & 0x0fff;
 	int color = kickgoal_bgram[tile_index*2+1] & 0x000f;
@@ -24,7 +24,7 @@ static void get_kickgoal_bg_tile_info(int tile_index)
 }
 
 /* BG 2 */
-static void get_kickgoal_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_kickgoal_bg2_tile_info )
 {
 	int tileno = kickgoal_bg2ram[tile_index*2] & 0x07ff;
 	int color = kickgoal_bg2ram[tile_index*2+1] & 0x000f;
@@ -158,7 +158,7 @@ VIDEO_UPDATE( kickgoal )
 /* Holywood Action */
 
 /* FG */
-static void get_actionhw_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_actionhw_fg_tile_info )
 {
 	int tileno = kickgoal_fgram[tile_index*2] & 0x0fff;
 	int color = kickgoal_fgram[tile_index*2+1] & 0x000f;
@@ -167,7 +167,7 @@ static void get_actionhw_fg_tile_info(int tile_index)
 }
 
 /* BG */
-static void get_actionhw_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_actionhw_bg_tile_info )
 {
 	int tileno = kickgoal_bgram[tile_index*2] & 0x1fff;
 	int color = kickgoal_bgram[tile_index*2+1] & 0x000f;
@@ -178,7 +178,7 @@ static void get_actionhw_bg_tile_info(int tile_index)
 }
 
 /* BG 2 */
-static void get_actionhw_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_actionhw_bg2_tile_info )
 {
 	int tileno = kickgoal_bg2ram[tile_index*2] & 0x1fff;
 	int color = kickgoal_bg2ram[tile_index*2+1] & 0x000f;

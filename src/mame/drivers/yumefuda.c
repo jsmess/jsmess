@@ -58,7 +58,7 @@ Code disassembling
 
 static tilemap *bg_tilemap;
 
-static void y_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( y_get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 	int color = colorram[tile_index];

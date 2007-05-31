@@ -108,7 +108,7 @@ PALETTE_INIT( fastfred )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 x = tile_index & 0x1f;
 
@@ -344,7 +344,7 @@ VIDEO_UPDATE( fastfred )
 }
 
 
-static void imago_get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( imago_get_tile_info_bg )
 {
 	UINT8 x = tile_index & 0x1f;
 
@@ -354,13 +354,13 @@ static void imago_get_tile_info_bg(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void imago_get_tile_info_fg(int tile_index)
+static TILE_GET_INFO( imago_get_tile_info_fg )
 {
 	int code = imago_fg_videoram[tile_index];
 	SET_TILE_INFO(2, code, 2, 0)
 }
 
-static void imago_get_tile_info_web(int tile_index)
+static TILE_GET_INFO( imago_get_tile_info_web )
 {
 	SET_TILE_INFO(3, tile_index & 0x1ff, 0, 0)
 }

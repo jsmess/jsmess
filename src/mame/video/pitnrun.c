@@ -29,7 +29,7 @@ static tilemap *bg, *fg;
 UINT8* pitnrun_videoram2;
 
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
 	int code;
 	code = videoram[tile_index];
@@ -40,7 +40,7 @@ static void get_tile_info1(int tile_index)
 		0)
 }
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	int code;
 	code = pitnrun_videoram2[tile_index];

@@ -253,7 +253,7 @@ INPUT_PORTS_START( wink )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 	code |= 0x200 * tile_bank;

@@ -103,7 +103,7 @@ WRITE16_HANDLER( suprslam_screen_videoram_w )
 }
 
 
-static void get_suprslam_tile_info(int tile_index)
+static TILE_GET_INFO( get_suprslam_tile_info )
 {
 	int tileno, colour;
 
@@ -127,7 +127,7 @@ WRITE16_HANDLER( suprslam_bg_videoram_w )
 }
 
 
-static void get_suprslam_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_suprslam_bg_tile_info )
 {
 	int tileno, colour;
 

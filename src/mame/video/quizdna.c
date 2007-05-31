@@ -23,7 +23,7 @@ static int quizdna_flipscreen = -1;
 static int quizdna_video_enable;
 
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = quizdna_bg_ram[tile_index*2] + quizdna_bg_ram[tile_index*2+1]*0x100 ;
 	int col = quizdna_bg_ram[tile_index*2+0x1000] & 0x7f;
@@ -34,7 +34,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, col, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code,col,x,y;
 	UINT8 *FG = memory_region(REGION_USER1);

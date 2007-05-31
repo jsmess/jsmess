@@ -82,7 +82,7 @@ UINT16 *ginganin_fgram16, *ginganin_txtram16, *ginganin_vregs16;
 #define BG_NX  (16*32)
 #define BG_NY  (16*2)
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = memory_region(REGION_GFX5)[2*tile_index + 0] * 256 + memory_region(REGION_GFX5)[2*tile_index + 1];
 	SET_TILE_INFO(
@@ -99,7 +99,7 @@ static void get_bg_tile_info(int tile_index)
 #define FG_NX  (16*16)
 #define FG_NY  (16*2)
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT16 code = ginganin_fgram16[tile_index];
 	SET_TILE_INFO(
@@ -124,7 +124,7 @@ WRITE16_HANDLER( ginganin_fgram16_w )
 #define TXT_NX	(32)
 #define TXT_NY	(32)
 
-static void get_txt_tile_info(int tile_index)
+static TILE_GET_INFO( get_txt_tile_info )
 {
 	UINT16 code = ginganin_txtram16[tile_index];
 	SET_TILE_INFO(

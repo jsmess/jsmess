@@ -15,7 +15,7 @@ static mame_bitmap* helper;
 static int collision[2];
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = sprint2_video_ram[tile_index];
 

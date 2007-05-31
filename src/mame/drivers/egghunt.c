@@ -92,7 +92,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = ((egghunt_bgram[tile_index*2+1] << 8) | egghunt_bgram[tile_index*2]) & 0x3fff;
 	int colour = egghunt_atram[tile_index];

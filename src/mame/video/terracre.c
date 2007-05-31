@@ -15,8 +15,8 @@ static const UINT8 *spritepalettebank;
 
 UINT16 *amazon_videoram;
 
-static void
-get_bg_tile_info(int tile_index)
+static
+TILE_GET_INFO( get_bg_tile_info )
 {
 	/* xxxx.----.----.----
      * ----.xx--.----.----
@@ -26,8 +26,8 @@ get_bg_tile_info(int tile_index)
 	SET_TILE_INFO( 1,data&0x3ff,color,0 );
 }
 
-static void
-get_fg_tile_info(int tile_index)
+static
+TILE_GET_INFO( get_fg_tile_info )
 {
 	int data = videoram16[tile_index];
 	SET_TILE_INFO( 0,data&0xff,0,0 );

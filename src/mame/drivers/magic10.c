@@ -276,17 +276,17 @@ INPUT_PORTS_START( magic102 )
 */
 INPUT_PORTS_END
 
-static void get_layer0_tile_info(int tile_index)
+static TILE_GET_INFO( get_layer0_tile_info )
 {
 	SET_TILE_INFO(1,layer0_videoram[tile_index*2],layer0_videoram[tile_index*2+1] & 0xf,TILE_FLIPYX((layer0_videoram[tile_index*2+1] & 0xc0) >> 6))
 }
 
-static void get_layer1_tile_info(int tile_index)
+static TILE_GET_INFO( get_layer1_tile_info )
 {
 	SET_TILE_INFO(1,layer1_videoram[tile_index*2],layer1_videoram[tile_index*2+1] & 0xf,TILE_FLIPYX((layer1_videoram[tile_index*2+1] & 0xc0) >> 6))
 }
 
-static void get_layer2_tile_info(int tile_index)
+static TILE_GET_INFO( get_layer2_tile_info )
 {
 	SET_TILE_INFO(0,layer2_videoram[tile_index*2],layer2_videoram[tile_index*2+1] & 0xf,0)
 }

@@ -42,7 +42,7 @@ static tilemap *alpha_tilemap;
  *
  *************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
@@ -51,7 +51,7 @@ static void get_bg_tile_info(int tile_index)
 }
 
 
-static void mcrmono_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( mcrmono_get_bg_tile_info )
 {
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
@@ -67,7 +67,7 @@ static UINT32 spyhunt_bg_scan(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 nu
 }
 
 
-static void spyhunt_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( spyhunt_get_bg_tile_info )
 {
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
@@ -75,7 +75,7 @@ static void spyhunt_get_bg_tile_info(int tile_index)
 }
 
 
-static void spyhunt_get_alpha_tile_info(int tile_index)
+static TILE_GET_INFO( spyhunt_get_alpha_tile_info )
 {
 	SET_TILE_INFO(2, spyhunt_alpharam[tile_index], 0, 0);
 }

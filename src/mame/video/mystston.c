@@ -111,7 +111,7 @@ WRITE8_HANDLER( mystston_control_w )
 	flip_screen_set((data & 0x80) ^ ((readinputport(3) & 0x20) ? 0x80:0));
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = mystston_videoram2[tile_index] + ((mystston_videoram2[tile_index + 0x200] & 0x01) << 8);
 	int flags = (tile_index & 0x10) ? TILE_FLIPY : 0;
@@ -119,7 +119,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, 0, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = videoram[tile_index] + ((videoram[tile_index + 0x400] & 0x07) << 8);
 	int color = mystston_fgcolor;

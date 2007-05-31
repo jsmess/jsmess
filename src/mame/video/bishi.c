@@ -13,7 +13,7 @@
 
 static int layer_colorbase[4], layerpri[4];
 
-static void bishi_tile_callback(int layer, int *code, int *color)
+static void bishi_tile_callback(int layer, int *code, int *color, int *flags)
 {
 //  *code -= '0';
 //  *color = layer_colorbase[layer] | (*color>>2 & 0x0f);

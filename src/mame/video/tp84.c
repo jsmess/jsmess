@@ -190,7 +190,7 @@ READ8_HANDLER( tp84_scanline_r )
 	return scanline;
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int coloffs = ((col0 & 0x18) << 1) + ((col0 & 0x07) << 6);
 	int attr = colorram[tile_index];
@@ -201,7 +201,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int coloffs = ((col0 & 0x18) << 1) + ((col0 & 0x07) << 6);
 	int attr = tp84_colorram2[tile_index];

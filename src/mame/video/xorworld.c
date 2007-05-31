@@ -66,7 +66,7 @@ WRITE16_HANDLER( xorworld_videoram16_w )
       0  | xxxx---- -------- | color
 */
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int data = videoram16[tile_index];
 	int code = data & 0x0fff;

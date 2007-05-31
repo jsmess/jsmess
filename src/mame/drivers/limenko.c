@@ -172,21 +172,21 @@ ADDRESS_MAP_END
   VIDEO HARDWARE EMULATION
 *****************************************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile  = bg_videoram[tile_index] & 0x7ffff;
 	int color = (bg_videoram[tile_index]>>28) & 0xf;
 	SET_TILE_INFO(0,tile,color,0)
 }
 
-static void get_md_tile_info(int tile_index)
+static TILE_GET_INFO( get_md_tile_info )
 {
 	int tile  = md_videoram[tile_index] & 0x7ffff;
 	int color = (md_videoram[tile_index]>>28) & 0xf;
 	SET_TILE_INFO(0,tile,color,0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile  = fg_videoram[tile_index] & 0x7ffff;
 	int color = (fg_videoram[tile_index]>>28) & 0xf;

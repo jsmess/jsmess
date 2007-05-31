@@ -23,7 +23,7 @@ static tilemap *fix_tilemap;
 
 ***************************************************************************/
 
-static void get_pow_tile_info(int tile_index)
+static TILE_GET_INFO( get_pow_tile_info )
 {
 	int tile=videoram16[2*tile_index]&0xff;
 	int color=videoram16[2*tile_index+1];
@@ -38,7 +38,7 @@ static void get_pow_tile_info(int tile_index)
 			0)
 }
 
-static void get_sar_tile_info(int tile_index)
+static TILE_GET_INFO( get_sar_tile_info )
 {
 	int tile=videoram16[2*tile_index];
 	int color=tile >> 12;
@@ -52,7 +52,7 @@ static void get_sar_tile_info(int tile_index)
 			0)
 }
 
-static void get_ikari3_tile_info(int tile_index)
+static TILE_GET_INFO( get_ikari3_tile_info )
 {
 	int tile=videoram16[2*tile_index];
 	int color=tile >> 12;

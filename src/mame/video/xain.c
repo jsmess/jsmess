@@ -49,7 +49,7 @@ static UINT32 back_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static void get_bgram0_tile_info(int tile_index)
+static TILE_GET_INFO( get_bgram0_tile_info )
 {
 	int attr = xain_bgram0[tile_index | 0x400];
 	SET_TILE_INFO(
@@ -59,7 +59,7 @@ static void get_bgram0_tile_info(int tile_index)
 			(attr & 0x80) ? TILE_FLIPX : 0)
 }
 
-static void get_bgram1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bgram1_tile_info )
 {
 	int attr = xain_bgram1[tile_index | 0x400];
 	SET_TILE_INFO(
@@ -69,7 +69,7 @@ static void get_bgram1_tile_info(int tile_index)
 			(attr & 0x80) ? TILE_FLIPX : 0)
 }
 
-static void get_char_tile_info(int tile_index)
+static TILE_GET_INFO( get_char_tile_info )
 {
 	int attr = xain_charram[tile_index | 0x400];
 	SET_TILE_INFO(

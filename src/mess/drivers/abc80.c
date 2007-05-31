@@ -136,7 +136,7 @@ static PALETTE_INIT( abc800c )	// probably wrong
 	memcpy(colortable, colortable_abc800c, sizeof(colortable_abc800c));
 }
 
-static void abc80_get_tile_info(int tile_index)
+static TILE_GET_INFO(abc80_get_tile_info)
 {
 	int attr = videoram[tile_index];
 	int bank = 0;	// TODO: bank 1 is graphics mode, add a [40][25] array to support it, also to videoram_w
@@ -168,7 +168,7 @@ VIDEO_START( abc800m )
 	return 0;
 }
 
-static void abc800c_get_tile_info(int tile_index)
+static TILE_GET_INFO(abc800c_get_tile_info)
 {
 	int code = videoram[tile_index];
 	int color = 1;						// WRONG!

@@ -48,7 +48,7 @@ struct _tilemap
 	int logical_flip_to_cached_flip[4];
 
 	/* callback to interpret video RAM for the tilemap */
-	void (*tile_get_info)( int memory_offset );
+	tile_get_info_fn tile_get_info;
 	void *user_data;
 
 	UINT32 max_memory_offset;
@@ -110,7 +110,8 @@ UINT32					priority_bitmap_pitch_row;
 
 static tilemap *	first_tilemap; /* resource tracking */
 static UINT32			screen_width, screen_height;
-tile_data				tile_info;
+#undef tile_info
+static tile_data				tile_info;
 
 typedef void (*blitmask_t)( void *dest, const void *source, const UINT8 *pMask, int mask, int value, int count, UINT8 *pri, UINT32 pcode );
 typedef void (*blitopaque_t)( void *dest, const void *source, int count, UINT8 *pri, UINT32 pcode );
@@ -775,7 +776,7 @@ static void tilemap_postload(void *param)
 
 
 tilemap *tilemap_create(
-	void (*tile_get_info)( int memory_offset ),
+	tile_get_info_fn tile_get_info,
 	UINT32 (*get_memory_offset)( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows ),
 	int type,
 	int tile_width, int tile_height,
@@ -1010,7 +1011,7 @@ static void update_tile_info( tilemap *tmap, UINT32 cached_indx, UINT32 col, UIN
 profiler_mark(PROFILER_TILEMAP_UPDATE);
 
 	memory_offset = tmap->cached_indx_to_memory_offset[cached_indx];
-	tmap->tile_get_info( memory_offset );
+	tmap->tile_get_info( Machine, &tile_info, memory_offset );
 	flags = tile_info.flags;
 	flags = (flags&0xfc)|tmap->logical_flip_to_cached_flip[flags&0x3];
 	x0 = tmap->cached_tile_width*col;

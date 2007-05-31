@@ -107,7 +107,7 @@ int dual_monitor;
 
 ***************************************************************************/
 
-static void get_tile_info_gaelco2_screen0(int tile_index)
+static TILE_GET_INFO( get_tile_info_gaelco2_screen0 )
 {
 	int data = gaelco2_videoram[(((gaelco2_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = gaelco2_videoram[(((gaelco2_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
@@ -116,7 +116,7 @@ static void get_tile_info_gaelco2_screen0(int tile_index)
 	SET_TILE_INFO(0, code, ((data >> 9) & 0x7f), TILE_FLIPXY((data >> 6) & 0x03))
 }
 
-static void get_tile_info_gaelco2_screen1(int tile_index)
+static TILE_GET_INFO( get_tile_info_gaelco2_screen1 )
 {
 	int data = gaelco2_videoram[(((gaelco2_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = gaelco2_videoram[(((gaelco2_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
@@ -148,7 +148,7 @@ static void get_tile_info_gaelco2_screen1(int tile_index)
 
 ***************************************************************************/
 
-static void get_tile_info_gaelco2_screen0_dual(int tile_index)
+static TILE_GET_INFO( get_tile_info_gaelco2_screen0_dual )
 {
 	int data = gaelco2_videoram[(((gaelco2_vregs[0] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = gaelco2_videoram[(((gaelco2_vregs[0] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];
@@ -157,7 +157,7 @@ static void get_tile_info_gaelco2_screen0_dual(int tile_index)
 	SET_TILE_INFO(0, code, ((data >> 9) & 0x3f), TILE_FLIPXY((data >> 6) & 0x03))
 }
 
-static void get_tile_info_gaelco2_screen1_dual(int tile_index)
+static TILE_GET_INFO( get_tile_info_gaelco2_screen1_dual )
 {
 	int data = gaelco2_videoram[(((gaelco2_vregs[1] >> 9) & 0x07)*0x2000/2) + (tile_index << 1)];
 	int data2 = gaelco2_videoram[(((gaelco2_vregs[1] >> 9) & 0x07)*0x2000/2) + ((tile_index << 1) + 1)];

@@ -16,7 +16,7 @@ WRITE8_HANDLER(me_c600_w)
 	mame_printf_debug("canvas %04x\n",data&=0xf0);
 }
 
-static void get_me_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_me_fg_tile_info )
 {
 	int code = (me_fgram[tile_index]);
 
@@ -80,7 +80,7 @@ WRITE8_HANDLER( me_fgram_w )
 }
 
 
-static void get_me_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_me_bg_tile_info )
 {
 	int code = (me_bgram[tile_index]);
 

@@ -123,7 +123,7 @@ INLINE int get_tile_addr(int tile_index)
 	return TX_TILE_OFFSET_CENTER + (x - 1) + y * 32;
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int offset = get_tile_addr(tile_index);
 	int code = tceptor_tile_ram[offset];
@@ -190,7 +190,7 @@ WRITE8_HANDLER( tceptor_tile_attr_w )
 
 /*******************************************************************/
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	UINT16 data = tceptor_bg_ram[tile_index * 2] | (tceptor_bg_ram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | 0x000;
@@ -199,7 +199,7 @@ static void get_bg1_tile_info(int tile_index)
 	SET_TILE_INFO(bg, code, color, 0);
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	UINT16 data = tceptor_bg_ram[tile_index * 2 + 0x1000] | (tceptor_bg_ram[tile_index * 2 + 1 + 0x1000] << 8);
 	int code = (data & 0x3ff) | 0x400;

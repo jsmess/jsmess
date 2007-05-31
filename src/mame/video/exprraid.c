@@ -50,7 +50,7 @@ WRITE8_HANDLER( exprraid_scrolly_w )
 	tilemap_set_scrolly(bg_tilemap, 0, data);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 *tilerom = memory_region(REGION_GFX4);
 
@@ -72,12 +72,12 @@ static void get_bg_tile_info(int tile_index)
 	color = (attr & 0x18) >> 3;
 	flags = (attr & 0x04) ? TILE_FLIPX : 0;
 
-	tile_info.priority = ((attr & 0x80) ? 1 : 0);
+	tileinfo->priority = ((attr & 0x80) ? 1 : 0);
 
 	SET_TILE_INFO(bank, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0x07) << 8);

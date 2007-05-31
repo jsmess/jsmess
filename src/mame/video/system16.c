@@ -581,9 +581,9 @@ static void update_page( void ){
 	}
 }
 
-static void get_bg_tile_info( int offset ){
-	const UINT16 *source = 64*32*sys16_bg_page[offset/(64*32)] + sys16_tileram;
-	int data = source[offset%(64*32)];
+static TILE_GET_INFO( get_bg_tile_info ){
+	const UINT16 *source = 64*32*sys16_bg_page[tile_index/(64*32)] + sys16_tileram;
+	int data = source[tile_index%(64*32)];
 	int tile_number = (data&0xfff) + 0x1000*((data&sys16_tilebank_switch)?sys16_tile_bank1:sys16_tile_bank0);
 
 	if (!shinobl_kludge)
@@ -605,25 +605,25 @@ static void get_bg_tile_info( int offset ){
 
 	switch(sys16_bg_priority_mode) {
 	case 1: // Alien Syndrome
-		tile_info.priority = (data&0x8000)?1:0;
+		tileinfo->priority = (data&0x8000)?1:0;
 		break;
 	case 2: // Body Slam / wrestwar
-		tile_info.priority = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
+		tileinfo->priority = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
 		break;
 	case 3: // sys18 games
 		if( data&0x8000 ){
-			tile_info.priority = 2;
+			tileinfo->priority = 2;
 		}
 		else {
-			tile_info.priority = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
+			tileinfo->priority = ((data&0xff00) >= sys16_bg_priority_value)?1:0;
 		}
 		break;
 	}
 }
 
-static void get_fg_tile_info( int offset ){
-	const UINT16 *source = 64*32*sys16_fg_page[offset/(64*32)] + sys16_tileram;
-	int data = source[offset%(64*32)];
+static TILE_GET_INFO( get_fg_tile_info ){
+	const UINT16 *source = 64*32*sys16_fg_page[tile_index/(64*32)] + sys16_tileram;
+	int data = source[tile_index%(64*32)];
 	int tile_number = (data&0xfff) + 0x1000*((data&sys16_tilebank_switch)?sys16_tile_bank1:sys16_tile_bank0);
 
 	if (!shinobl_kludge)
@@ -645,24 +645,24 @@ static void get_fg_tile_info( int offset ){
 
 	switch(sys16_fg_priority_mode){
 	case 1: // alien syndrome
-		tile_info.priority = (data&0x8000)?1:0;
+		tileinfo->priority = (data&0x8000)?1:0;
 		break;
 
 	case 3:
-		tile_info.priority = ((data&0xff00) >= sys16_fg_priority_value)?1:0;
+		tileinfo->priority = ((data&0xff00) >= sys16_fg_priority_value)?1:0;
 		break;
 
 	default:
 		if( sys16_fg_priority_mode>=0 ){
-			tile_info.priority = (data&0x8000)?1:0;
+			tileinfo->priority = (data&0x8000)?1:0;
 		}
 		break;
 	}
 }
 
-static void get_bg2_tile_info( int offset ){
-	const UINT16 *source = 64*32*sys16_bg2_page[offset/(64*32)] + sys16_tileram;
-	int data = source[offset%(64*32)];
+static TILE_GET_INFO( get_bg2_tile_info ){
+	const UINT16 *source = 64*32*sys16_bg2_page[tile_index/(64*32)] + sys16_tileram;
+	int data = source[tile_index%(64*32)];
 	int tile_number = (data&0xfff) + 0x1000*((data&0x1000)?sys16_tile_bank1:sys16_tile_bank0);
 
 	SET_TILE_INFO(
@@ -671,12 +671,12 @@ static void get_bg2_tile_info( int offset ){
 			(data>>6)&0x7f,
 			0)
 
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 }
 
-static void get_fg2_tile_info( int offset ){
-	const UINT16 *source = 64*32*sys16_fg2_page[offset/(64*32)] + sys16_tileram;
-	int data = source[offset%(64*32)];
+static TILE_GET_INFO( get_fg2_tile_info ){
+	const UINT16 *source = 64*32*sys16_fg2_page[tile_index/(64*32)] + sys16_tileram;
+	int data = source[tile_index%(64*32)];
 	int tile_number = (data&0xfff) + 0x1000*((data&0x1000)?sys16_tile_bank1:sys16_tile_bank0);
 
 	SET_TILE_INFO(
@@ -685,8 +685,8 @@ static void get_fg2_tile_info( int offset ){
 			(data>>6)&0x7f,
 			0)
 
-	if((data&0xff00) >= sys16_fg_priority_value) tile_info.priority = 1;
-	else tile_info.priority = 0;
+	if((data&0xff00) >= sys16_fg_priority_value) tileinfo->priority = 1;
+	else tileinfo->priority = 0;
 }
 
 WRITE16_HANDLER( sys16_tileram_w ){
@@ -722,9 +722,9 @@ WRITE16_HANDLER( sys16_tileram_w ){
 
 /***************************************************************************/
 
-static void get_text_tile_info( int offset ){
+static TILE_GET_INFO( get_text_tile_info ){
 	const UINT16 *source = sys16_textram;
-	int tile_number = source[offset];
+	int tile_number = source[tile_index];
 	int pri = tile_number >> 8;
 
 	if (!shinobl_kludge)
@@ -745,9 +745,9 @@ static void get_text_tile_info( int offset ){
 	}
 
 	if(pri>=sys16_textlayer_lo_min && pri<=sys16_textlayer_lo_max)
-		tile_info.priority = 1;
+		tileinfo->priority = 1;
 	if(pri>=sys16_textlayer_hi_min && pri<=sys16_textlayer_hi_max)
-		tile_info.priority = 0;
+		tileinfo->priority = 0;
 }
 
 WRITE16_HANDLER( sys16_textram_w ){

@@ -24,21 +24,21 @@ static int f1gp2_roz_bank;
 
 ***************************************************************************/
 
-static void f1gp_get_roz_tile_info(int tile_index)
+static TILE_GET_INFO( f1gp_get_roz_tile_info )
 {
 	int code = f1gp_rozvideoram[tile_index];
 
 	SET_TILE_INFO(3,code & 0x7ff,code >> 12,0)
 }
 
-static void f1gp2_get_roz_tile_info(int tile_index)
+static TILE_GET_INFO( f1gp2_get_roz_tile_info )
 {
 	int code = f1gp_rozvideoram[tile_index];
 
 	SET_TILE_INFO(2,(code & 0x7ff) + (f1gp2_roz_bank << 11),code >> 12,0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = f1gp_fgvideoram[tile_index];
 

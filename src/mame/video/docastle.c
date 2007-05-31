@@ -186,7 +186,7 @@ WRITE8_HANDLER( docastle_flipscreen_on_w )
 	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + 8 * (colorram[tile_index] & 0x20);
 	int color = colorram[tile_index] & 0x1f;
@@ -194,7 +194,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = videoram[tile_index] + 8 * (colorram[tile_index] & 0x20);
 	int color = (colorram[tile_index] & 0x1f) + 32;

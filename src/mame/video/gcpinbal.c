@@ -20,7 +20,7 @@ static UINT16 bg1_gfxset = 0;
 /*******************************************************************/
 
 
-static void get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg0_tile_info )
 {
 	UINT16 tilenum = gcpinbal_tilemapram[0 + tile_index*2];
 	UINT16 attr    = gcpinbal_tilemapram[1 + tile_index*2];
@@ -32,7 +32,7 @@ static void get_bg0_tile_info(int tile_index)
 			TILE_FLIPYX( (attr & 0x300) >> 8))
 }
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	UINT16 tilenum = gcpinbal_tilemapram[0x800 + tile_index*2];
 	UINT16 attr    = gcpinbal_tilemapram[0x801 + tile_index*2];
@@ -44,7 +44,7 @@ static void get_bg1_tile_info(int tile_index)
 			TILE_FLIPYX( (attr & 0x300) >> 8))
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT16 tilenum = gcpinbal_tilemapram[0x1000 + tile_index];
 

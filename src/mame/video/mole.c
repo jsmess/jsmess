@@ -21,7 +21,7 @@ PALETTE_INIT( mole )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT16 code = tileram[tile_index];
 	SET_TILE_INFO((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0)

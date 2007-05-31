@@ -44,7 +44,7 @@ PALETTE_INIT( ksayakyu )
 		}
 }
 
-static void get_ksayakyu_tile_info(int tile_index)
+static TILE_GET_INFO( get_ksayakyu_tile_info )
 {
 	int code = memory_region(REGION_USER1)[tile_index];
 	int attr = memory_region(REGION_USER1)[tile_index+0x2000];
@@ -52,7 +52,7 @@ static void get_ksayakyu_tile_info(int tile_index)
 	SET_TILE_INFO(1,code,((attr>>2)&0x07)*2,(attr&0x80) ? TILE_FLIPX : 0)
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int code = videoram[tile_index*2+1];
 	int attr = videoram[tile_index*2];

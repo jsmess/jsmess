@@ -79,7 +79,7 @@ WRITE8_HANDLER( bogeyman_paletteram_w )
 	paletteram_BBGGGRRR_w(offset, ~data);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int gfxbank = ((((attr & 0x01) << 8) + videoram[tile_index]) / 0x80) + 3;
@@ -89,7 +89,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(gfxbank, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = bogeyman_colorram2[tile_index];
 	int tile = bogeyman_videoram2[tile_index] | ((attr & 0x03) << 8);

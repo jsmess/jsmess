@@ -17,7 +17,7 @@
 #include "2608intf.h"
 #include "fm.h"
 
-#ifdef BUILD_YM2608
+#if (BUILD_YM2608)
 
 struct ym2608_info
 {

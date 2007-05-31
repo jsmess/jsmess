@@ -140,7 +140,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 	return offs;
 }
 
-static void geebee_get_tile_info(int tile_index)
+static TILE_GET_INFO( geebee_get_tile_info )
 {
 	int code = geebee_videoram[tile_index];
 	int color = (geebee_bgw & 1) | ((code & 0x80) >> 6);
@@ -151,7 +151,7 @@ static void geebee_get_tile_info(int tile_index)
 			0)
 }
 
-static void navarone_get_tile_info(int tile_index)
+static TILE_GET_INFO( navarone_get_tile_info )
 {
 	int code = geebee_videoram[tile_index];
 	int color = geebee_bgw & 1;
@@ -162,7 +162,7 @@ static void navarone_get_tile_info(int tile_index)
 			0)
 }
 
-static void warpwarp_get_tile_info(int tile_index)
+static TILE_GET_INFO( warpwarp_get_tile_info )
 {
 	SET_TILE_INFO(
 			0,

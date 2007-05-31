@@ -690,7 +690,7 @@ static tilemap *PC080SN_tilemap[PC080SN_MAX_CHIPS][2];
 static int PC080SN_bg_gfx[PC080SN_MAX_CHIPS];
 static int PC080SN_yinvert,PC080SN_dblwidth;
 
-INLINE void common_get_PC080SN_bg_tile_info(UINT16 *ram,int gfxnum,int tile_index)
+INLINE void common_get_PC080SN_bg_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *ram,int gfxnum)
 {
 	UINT16 code,attr;
 
@@ -712,7 +712,7 @@ INLINE void common_get_PC080SN_bg_tile_info(UINT16 *ram,int gfxnum,int tile_inde
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-INLINE void common_get_PC080SN_fg_tile_info(UINT16 *ram,int gfxnum,int tile_index)
+INLINE void common_get_PC080SN_fg_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *ram,int gfxnum)
 {
 	UINT16 code,attr;
 
@@ -734,27 +734,27 @@ INLINE void common_get_PC080SN_fg_tile_info(UINT16 *ram,int gfxnum,int tile_inde
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-static void PC080SN_get_bg_tile_info_0(int tile_index)
+static TILE_GET_INFO( PC080SN_get_bg_tile_info_0 )
 {
-	common_get_PC080SN_bg_tile_info(PC080SN_bg_ram[0][0],PC080SN_bg_gfx[0],tile_index);
+	common_get_PC080SN_bg_tile_info(machine,tileinfo,tile_index,PC080SN_bg_ram[0][0],PC080SN_bg_gfx[0]);
 }
 
-static void PC080SN_get_fg_tile_info_0(int tile_index)
+static TILE_GET_INFO( PC080SN_get_fg_tile_info_0 )
 {
-	common_get_PC080SN_fg_tile_info(PC080SN_bg_ram[0][1],PC080SN_bg_gfx[0],tile_index);
+	common_get_PC080SN_fg_tile_info(machine,tileinfo,tile_index,PC080SN_bg_ram[0][1],PC080SN_bg_gfx[0]);
 }
 
-static void PC080SN_get_bg_tile_info_1(int tile_index)
+static TILE_GET_INFO( PC080SN_get_bg_tile_info_1 )
 {
-	common_get_PC080SN_bg_tile_info(PC080SN_bg_ram[1][0],PC080SN_bg_gfx[1],tile_index);
+	common_get_PC080SN_bg_tile_info(machine,tileinfo,tile_index,PC080SN_bg_ram[1][0],PC080SN_bg_gfx[1]);
 }
 
-static void PC080SN_get_fg_tile_info_1(int tile_index)
+static TILE_GET_INFO( PC080SN_get_fg_tile_info_1 )
 {
-	common_get_PC080SN_fg_tile_info(PC080SN_bg_ram[1][1],PC080SN_bg_gfx[1],tile_index);
+	common_get_PC080SN_fg_tile_info(machine,tileinfo,tile_index,PC080SN_bg_ram[1][1],PC080SN_bg_gfx[1]);
 }
 
-void (*PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2])(int tile_index) =
+tile_get_info_fn PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2] =
 {
 	{ PC080SN_get_bg_tile_info_0, PC080SN_get_fg_tile_info_0 },
 	{ PC080SN_get_bg_tile_info_1, PC080SN_get_fg_tile_info_1 }
@@ -1397,14 +1397,14 @@ static int TC0080VCO_zoomy_conv_table[] =
 #endif
 
 
-static void TC0080VCO_get_bg0_tile_info_0(int tile_index)
+static TILE_GET_INFO( TC0080VCO_get_bg0_tile_info_0 )
 {
 	int color, tile;
 
 	color = TC0080VCO_bg0_ram_1[ tile_index ] & 0x001f;
 	tile  = TC0080VCO_bg0_ram_0[ tile_index ] & 0x7fff;
 
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 
 	SET_TILE_INFO(
 			TC0080VCO_bg_gfx,
@@ -1413,14 +1413,14 @@ static void TC0080VCO_get_bg0_tile_info_0(int tile_index)
 			TILE_FLIPYX((TC0080VCO_bg0_ram_1[tile_index] & 0x00c0) >> 6))
 }
 
-static void TC0080VCO_get_bg1_tile_info_0(int tile_index)
+static TILE_GET_INFO( TC0080VCO_get_bg1_tile_info_0 )
 {
 	int color, tile;
 
 	color = TC0080VCO_bg1_ram_1[ tile_index ] & 0x001f;
 	tile  = TC0080VCO_bg1_ram_0[ tile_index ] & 0x7fff;
 
-	tile_info.priority = 0;
+	tileinfo->priority = 0;
 
 	SET_TILE_INFO(
 			TC0080VCO_bg_gfx,
@@ -1429,7 +1429,7 @@ static void TC0080VCO_get_bg1_tile_info_0(int tile_index)
 			TILE_FLIPYX((TC0080VCO_bg1_ram_1[tile_index] & 0x00c0) >> 6))
 }
 
-static void TC0080VCO_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( TC0080VCO_get_tx_tile_info )
 {
 	int tile;
 
@@ -1439,7 +1439,7 @@ static void TC0080VCO_get_tx_tile_info(int tile_index)
 			tile = (TC0080VCO_tx_ram_0[tile_index >> 1] & 0x00ff);
 		else
 			tile = (TC0080VCO_tx_ram_0[tile_index >> 1] & 0xff00) >> 8;
-		tile_info.priority = 0;
+		tileinfo->priority = 0;
 	}
 	else
 	{
@@ -1447,7 +1447,7 @@ static void TC0080VCO_get_tx_tile_info(int tile_index)
 			tile = (TC0080VCO_tx_ram_0[tile_index >> 1] & 0xff00) >> 8;
 		else
 			tile = (TC0080VCO_tx_ram_0[tile_index >> 1] & 0x00ff);
-		tile_info.priority = 0;
+		tileinfo->priority = 0;
 	}
 
 	SET_TILE_INFO(
@@ -2069,7 +2069,7 @@ static INT32 TC0100SCN_gfxbank,TC0100SCN_chip_colbank[3],TC0100SCN_colbank[3];
 static int TC0100SCN_dblwidth[TC0100SCN_MAX_CHIPS];
 
 
-INLINE void common_get_bg0_tile_info(UINT16 *ram,int gfxnum,int tile_index,int colbank,int dblwidth)
+INLINE void common_get_bg0_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *ram,int gfxnum,int colbank,int dblwidth)
 {
 	int code,attr;
 
@@ -2091,7 +2091,7 @@ INLINE void common_get_bg0_tile_info(UINT16 *ram,int gfxnum,int tile_index,int c
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-INLINE void common_get_bg1_tile_info(UINT16 *ram,int gfxnum,int tile_index,int colbank,int dblwidth)
+INLINE void common_get_bg1_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *ram,int gfxnum,int colbank,int dblwidth)
 {
 	int code,attr;
 
@@ -2113,7 +2113,7 @@ INLINE void common_get_bg1_tile_info(UINT16 *ram,int gfxnum,int tile_index,int c
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-INLINE void common_get_tx_tile_info(UINT16 *ram,int gfxnum,int tile_index,int colbank,int dblwidth)
+INLINE void common_get_tx_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *ram,int gfxnum,int colbank,int dblwidth)
 {
 	int attr = ram[tile_index];
 
@@ -2124,63 +2124,63 @@ INLINE void common_get_tx_tile_info(UINT16 *ram,int gfxnum,int tile_index,int co
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-static void TC0100SCN_get_bg_tile_info_0(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_bg_tile_info_0 )
 {
-	common_get_bg0_tile_info(TC0100SCN_bg_ram[0],TC0100SCN_bg_gfx[0],tile_index,
+	common_get_bg0_tile_info(machine,tileinfo,tile_index,TC0100SCN_bg_ram[0],TC0100SCN_bg_gfx[0],
 			TC0100SCN_chip_colbank[0],TC0100SCN_dblwidth[0]);
 }
 
-static void TC0100SCN_get_fg_tile_info_0(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_fg_tile_info_0 )
 {
-	common_get_bg1_tile_info(TC0100SCN_fg_ram[0],TC0100SCN_bg_gfx[0],tile_index,
+	common_get_bg1_tile_info(machine,tileinfo,tile_index,TC0100SCN_fg_ram[0],TC0100SCN_bg_gfx[0],
 			TC0100SCN_chip_colbank[0],TC0100SCN_dblwidth[0]);
 }
 
-static void TC0100SCN_get_tx_tile_info_0(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_tx_tile_info_0 )
 {
-	common_get_tx_tile_info(TC0100SCN_tx_ram[0],TC0100SCN_tx_gfx[0],tile_index,
+	common_get_tx_tile_info(machine,tileinfo,tile_index,TC0100SCN_tx_ram[0],TC0100SCN_tx_gfx[0],
 			TC0100SCN_chip_colbank[0],TC0100SCN_dblwidth[0]);
 }
 
-static void TC0100SCN_get_bg_tile_info_1(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_bg_tile_info_1 )
 {
-	common_get_bg0_tile_info(TC0100SCN_bg_ram[1],TC0100SCN_bg_gfx[1],tile_index,
+	common_get_bg0_tile_info(machine,tileinfo,tile_index,TC0100SCN_bg_ram[1],TC0100SCN_bg_gfx[1],
 			TC0100SCN_chip_colbank[1],TC0100SCN_dblwidth[1]);
 }
 
-static void TC0100SCN_get_fg_tile_info_1(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_fg_tile_info_1 )
 {
-	common_get_bg1_tile_info(TC0100SCN_fg_ram[1],TC0100SCN_bg_gfx[1],tile_index,
+	common_get_bg1_tile_info(machine,tileinfo,tile_index,TC0100SCN_fg_ram[1],TC0100SCN_bg_gfx[1],
 			TC0100SCN_chip_colbank[1],TC0100SCN_dblwidth[1]);
 }
 
-static void TC0100SCN_get_tx_tile_info_1(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_tx_tile_info_1 )
 {
-	common_get_tx_tile_info(TC0100SCN_tx_ram[1],TC0100SCN_tx_gfx[1],tile_index,
+	common_get_tx_tile_info(machine,tileinfo,tile_index,TC0100SCN_tx_ram[1],TC0100SCN_tx_gfx[1],
 			TC0100SCN_chip_colbank[1],TC0100SCN_dblwidth[1]);
 }
 
-static void TC0100SCN_get_bg_tile_info_2(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_bg_tile_info_2 )
 {
-	common_get_bg0_tile_info(TC0100SCN_bg_ram[2],TC0100SCN_bg_gfx[2],tile_index,
+	common_get_bg0_tile_info(machine,tileinfo,tile_index,TC0100SCN_bg_ram[2],TC0100SCN_bg_gfx[2],
 			TC0100SCN_chip_colbank[2],TC0100SCN_dblwidth[2]);
 }
 
-static void TC0100SCN_get_fg_tile_info_2(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_fg_tile_info_2 )
 {
-	common_get_bg1_tile_info(TC0100SCN_fg_ram[2],TC0100SCN_bg_gfx[2],tile_index,
+	common_get_bg1_tile_info(machine,tileinfo,tile_index,TC0100SCN_fg_ram[2],TC0100SCN_bg_gfx[2],
 			TC0100SCN_chip_colbank[2],TC0100SCN_dblwidth[2]);
 }
 
-static void TC0100SCN_get_tx_tile_info_2(int tile_index)
+static TILE_GET_INFO( TC0100SCN_get_tx_tile_info_2 )
 {
-	common_get_tx_tile_info(TC0100SCN_tx_ram[2],TC0100SCN_tx_gfx[2],tile_index,
+	common_get_tx_tile_info(machine,tileinfo,tile_index,TC0100SCN_tx_ram[2],TC0100SCN_tx_gfx[2],
 			TC0100SCN_chip_colbank[2],TC0100SCN_dblwidth[2]);
 }
 
 /* This array changes with TC0100SCN_MAX_CHIPS */
 
-void (*TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3])(int tile_index) =
+tile_get_info_fn TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3] =
 {
 	{ TC0100SCN_get_bg_tile_info_0, TC0100SCN_get_fg_tile_info_0, TC0100SCN_get_tx_tile_info_0 },
 	{ TC0100SCN_get_bg_tile_info_1, TC0100SCN_get_fg_tile_info_1, TC0100SCN_get_tx_tile_info_1 },
@@ -2799,7 +2799,7 @@ static tilemap *TC0280GRD_tilemap;
 static int TC0280GRD_gfxnum,TC0280GRD_base_color;
 
 
-static void TC0280GRD_get_tile_info(int tile_index)
+static TILE_GET_INFO( TC0280GRD_get_tile_info )
 {
 	int attr = TC0280GRD_ram[tile_index];
 	SET_TILE_INFO(
@@ -3000,7 +3000,7 @@ static int TC0480SCP_text_xoffs,TC0480SCP_text_yoffs;
 static int TC0480SCP_flip_xoffs,TC0480SCP_flip_yoffs;
 
 
-INLINE void common_get_tc0480bg_tile_info(UINT16 *ram,int gfxnum,int tile_index)
+INLINE void common_get_tc0480bg_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *ram,int gfxnum)
 {
 	int code = ram[2*tile_index + 1] & 0x7fff;
 	int attr = ram[2*tile_index];
@@ -3011,7 +3011,7 @@ INLINE void common_get_tc0480bg_tile_info(UINT16 *ram,int gfxnum,int tile_index)
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-INLINE void common_get_tc0480tx_tile_info(UINT16 *ram,int gfxnum,int tile_index)
+INLINE void common_get_tc0480tx_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *ram,int gfxnum)
 {
 	int attr = ram[tile_index];
 	SET_TILE_INFO(
@@ -3021,32 +3021,32 @@ INLINE void common_get_tc0480tx_tile_info(UINT16 *ram,int gfxnum,int tile_index)
 			TILE_FLIPYX((attr & 0xc000) >> 14))
 }
 
-static void TC0480SCP_get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( TC0480SCP_get_bg0_tile_info )
 {
-	common_get_tc0480bg_tile_info(TC0480SCP_bg_ram[0],TC0480SCP_bg_gfx,tile_index);
+	common_get_tc0480bg_tile_info(machine,tileinfo,tile_index,TC0480SCP_bg_ram[0],TC0480SCP_bg_gfx);
 }
 
-static void TC0480SCP_get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( TC0480SCP_get_bg1_tile_info )
 {
-	common_get_tc0480bg_tile_info(TC0480SCP_bg_ram[1],TC0480SCP_bg_gfx,tile_index);
+	common_get_tc0480bg_tile_info(machine,tileinfo,tile_index,TC0480SCP_bg_ram[1],TC0480SCP_bg_gfx);
 }
 
-static void TC0480SCP_get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( TC0480SCP_get_bg2_tile_info )
 {
-	common_get_tc0480bg_tile_info(TC0480SCP_bg_ram[2],TC0480SCP_bg_gfx,tile_index);
+	common_get_tc0480bg_tile_info(machine,tileinfo,tile_index,TC0480SCP_bg_ram[2],TC0480SCP_bg_gfx);
 }
 
-static void TC0480SCP_get_bg3_tile_info(int tile_index)
+static TILE_GET_INFO( TC0480SCP_get_bg3_tile_info )
 {
-	common_get_tc0480bg_tile_info(TC0480SCP_bg_ram[3],TC0480SCP_bg_gfx,tile_index);
+	common_get_tc0480bg_tile_info(machine,tileinfo,tile_index,TC0480SCP_bg_ram[3],TC0480SCP_bg_gfx);
 }
 
-static void TC0480SCP_get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( TC0480SCP_get_tx_tile_info )
 {
-	common_get_tc0480tx_tile_info(TC0480SCP_tx_ram,TC0480SCP_tx_gfx,tile_index);
+	common_get_tc0480tx_tile_info(machine,tileinfo,tile_index,TC0480SCP_tx_ram,TC0480SCP_tx_gfx);
 }
 
-void (*tc480_get_tile_info[5])(int tile_index) =
+tile_get_info_fn tc480_get_tile_info[5] =
 {
 	TC0480SCP_get_bg0_tile_info, TC0480SCP_get_bg1_tile_info,
 	TC0480SCP_get_bg2_tile_info, TC0480SCP_get_bg3_tile_info,

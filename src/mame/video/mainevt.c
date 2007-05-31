@@ -20,19 +20,17 @@ static int layer_colorbase[3],sprite_colorbase;
 
 ***************************************************************************/
 
-static void mainevt_tile_callback(int layer,int bank,int *code,int *color)
+static void mainevt_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
-	tile_info.flags = (*color & 0x02) ? TILE_FLIPX : 0;
+	*flags = (*color & 0x02) ? TILE_FLIPX : 0;
 
 	/* priority relative to HALF priority sprites */
-	if (layer == 2) tile_info.priority = (*color & 0x20) >> 5;
-	else tile_info.priority = 0;
-
+	*priority = (layer == 2) ? (*color & 0x20) >> 5 : 0;
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
 	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
-static void dv_tile_callback(int layer,int bank,int *code,int *color)
+static void dv_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x3c) << 7);

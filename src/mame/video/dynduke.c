@@ -43,7 +43,7 @@ WRITE8_HANDLER( dynduke_text_w )
 	tilemap_mark_tile_dirty(tx_layer,offset/2);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile=dynduke_back_data[2*tile_index]+(dynduke_back_data[2*tile_index+1]<<8);
 	int color=tile >> 12;
@@ -57,7 +57,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile=dynduke_fore_data[2*tile_index]+(dynduke_fore_data[2*tile_index+1]<<8);
 	int color=tile >> 12;
@@ -71,7 +71,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int tile=videoram[2*tile_index]+((videoram[2*tile_index+1]&0xc0)<<2);
 	int color=videoram[2*tile_index+1]&0xf;

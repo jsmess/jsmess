@@ -91,13 +91,13 @@ PALETTE_INIT( equites )
 		colortable[i+0x100] = clut_ptr[i];
 }
 
-static void equites_charinfo(int offset)
+static TILE_GET_INFO( equites_charinfo )
 {
 	int tile, color;
 
-	offset <<= 1;
-	tile = videoram16[offset];
-	color = videoram16[offset+1];
+	tile_index <<= 1;
+	tile = videoram16[tile_index];
+	color = videoram16[tile_index+1];
 	tile &= 0xff;
 	color &= 0x1f;
 
@@ -137,26 +137,26 @@ PALETTE_INIT( splndrbt )
 	for (i=0; i<0x400; i++) colortable[i] = prom_ptr[i];
 }
 
-static void splndrbt_char0info(int offset)
+static TILE_GET_INFO( splndrbt_char0info )
 {
 	int tile, color;
 
-	offset <<= 1;
-	tile = charram0[offset];
-	color = charram0[offset+1];
+	tile_index <<= 1;
+	tile = charram0[tile_index];
+	color = charram0[tile_index+1];
 	tile &= 0xff;
 	color &= 0x3f;
 
 	SET_TILE_INFO(0, tile, color, 0);
 }
 
-static void splndrbt_char1info(int offset)
+static TILE_GET_INFO( splndrbt_char1info )
 {
 	int tile, color;
 
-	offset <<= 1;
-	tile = charram1[offset];
-	color = charram1[offset+1];
+	tile_index <<= 1;
+	tile = charram1[tile_index];
+	color = charram1[tile_index+1];
 	tile &= 0xff;
 	color &= 0x3f;
 	tile += 0x100;

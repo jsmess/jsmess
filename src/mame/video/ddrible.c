@@ -80,7 +80,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);	/* skip 0x400 */
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	unsigned char attr = ddrible_fg_videoram[tile_index];
 	int num = ddrible_fg_videoram[tile_index + 0x400] +
@@ -92,7 +92,7 @@ static void get_fg_tile_info(int tile_index)
 			TILE_FLIPYX((attr & 0x30) >> 4))
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char attr = ddrible_bg_videoram[tile_index];
 	int num = ddrible_bg_videoram[tile_index + 0x400] +

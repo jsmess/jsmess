@@ -61,7 +61,7 @@ WRITE8_HANDLER( runaway_tile_bank_w )
 }
 
 
-static void runaway_get_tile_info(int tile_index)
+static TILE_GET_INFO( runaway_get_tile_info )
 {
 	UINT8 code = runaway_video_ram[tile_index];
 
@@ -69,7 +69,7 @@ static void runaway_get_tile_info(int tile_index)
 }
 
 
-static void qwak_get_tile_info(int tile_index)
+static TILE_GET_INFO( qwak_get_tile_info )
 {
 	UINT8 code = runaway_video_ram[tile_index];
 

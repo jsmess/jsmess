@@ -31,9 +31,9 @@ if (code_pressed(KEYCODE_R) && (*color & 0x10)) *color = rand();
 
 ***************************************************************************/
 
-static void zoom_callback(int *code,int *color)
+static void zoom_callback(int *code,int *color,int *flags)
 {
-	tile_info.flags = TILE_FLIPYX((*color & 0xc0) >> 6);
+	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
 	*color = zoom_colorbase + ((*color & 0x30) >> 4);
 }

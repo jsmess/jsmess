@@ -62,7 +62,7 @@ static UINT32 bsb_bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return offset;
 }
 
-static void get_bsb_tile_info(int tile_index)
+static TILE_GET_INFO( get_bsb_tile_info )
 {
 	int tileno,col;
 
@@ -81,7 +81,7 @@ WRITE16_HANDLER( bsb_videoram_w )
 	}
 }
 
-static void get_bsb_tile2_info(int tile_index)
+static TILE_GET_INFO( get_bsb_tile2_info )
 {
 	int tileno,col;
 
@@ -101,7 +101,7 @@ WRITE16_HANDLER( bsb_videoram2_w )
 }
 
 
-static void get_bsb_tile3_info(int tile_index)
+static TILE_GET_INFO( get_bsb_tile3_info )
 {
 	int tileno,col;
 

@@ -47,7 +47,7 @@ void jackal_mark_tile_dirty(int offset)
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 

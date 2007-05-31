@@ -151,6 +151,7 @@ typedef struct _mame_private mame_private;
 typedef struct _video_private video_private;
 typedef struct _palette_private palette_private;
 typedef struct _streams_private streams_private;
+typedef struct _devices_private devices_private;
 
 
 /* description of the currently-running machine */
@@ -193,6 +194,7 @@ struct _running_machine
 	video_private *			video_data;			/* internal data from video.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
 	streams_private *		streams_data;		/* internal data from streams.c */
+	devices_private *		devices_data;		/* internal data from devices.c */
 
 	/* driver-specific information */
 	void *					driver_data;		/* drivers can hang data off of here instead of using globals */

@@ -182,7 +182,7 @@ INPUT_PORTS_START( pkscramble )
 INPUT_PORTS_END
 
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile  = pkscramble_bgtilemap_ram[tile_index*2];
 	int color = pkscramble_bgtilemap_ram[tile_index*2 + 1] & 0x7f;
@@ -190,7 +190,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0,tile,color,0)
 }
 
-static void get_md_tile_info(int tile_index)
+static TILE_GET_INFO( get_md_tile_info )
 {
 	int tile  = pkscramble_mdtilemap_ram[tile_index*2];
 	int color = pkscramble_mdtilemap_ram[tile_index*2 + 1] & 0x7f;
@@ -198,7 +198,7 @@ static void get_md_tile_info(int tile_index)
 	SET_TILE_INFO(0,tile,color,0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile  = pkscramble_fgtilemap_ram[tile_index*2];
 	int color = pkscramble_fgtilemap_ram[tile_index*2 + 1] & 0x7f;

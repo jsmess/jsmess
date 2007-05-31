@@ -75,7 +75,7 @@ static tilemap *tilemap_0, *tilemap_1;
 #define DIM_NX		(0x40)
 #define DIM_NY		(0x20)
 
-static void get_tile_info_0( int tile_index )
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 code = blmbycar_vram_0[ tile_index * 2 + 0 ];
 	UINT16 attr = blmbycar_vram_0[ tile_index * 2 + 1 ];
@@ -85,10 +85,10 @@ static void get_tile_info_0( int tile_index )
 			attr & 0x1f,
 			TILE_FLIPYX((attr >> 6) & 3))
 
-	tile_info.priority = (attr >> 5) & 1;
+	tileinfo->priority = (attr >> 5) & 1;
 }
 
-static void get_tile_info_1( int tile_index )
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 code = blmbycar_vram_1[ tile_index * 2 + 0 ];
 	UINT16 attr = blmbycar_vram_1[ tile_index * 2 + 1 ];
@@ -98,7 +98,7 @@ static void get_tile_info_1( int tile_index )
 			attr & 0x1f,
 			TILE_FLIPYX((attr >> 6) & 3))
 
-	tile_info.priority = (attr >> 5) & 1;
+	tileinfo->priority = (attr >> 5) & 1;
 }
 
 

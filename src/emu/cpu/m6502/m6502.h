@@ -100,7 +100,7 @@ extern unsigned m6510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UI
 
 #endif
 
-#ifdef HAS_M6510T
+#if (HAS_M6510T)
 #define M6510T_A						M6502_A
 #define M6510T_X						M6502_X
 #define M6510T_Y						M6502_Y
@@ -122,7 +122,7 @@ extern unsigned m6510t_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const U
 
 #endif
 
-#ifdef HAS_M7501
+#if (HAS_M7501)
 #define M7501_A 						M6502_A
 #define M7501_X 						M6502_X
 #define M7501_Y 						M6502_Y
@@ -139,7 +139,7 @@ extern unsigned m6510t_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const U
 extern void m7501_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#ifdef HAS_M8502
+#if (HAS_M8502)
 #define M8502_A 						M6502_A
 #define M8502_X 						M6502_X
 #define M8502_Y 						M6502_Y

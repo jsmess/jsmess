@@ -17,16 +17,9 @@
 //  INLINE FUNCTIONS
 //============================================================
 
-#ifdef PTR64
+#if defined(_MSC_VER) && defined(_M_IX86) && !defined(PTR64)
 
-#define vec_mult _vec_mult
-INLINE int _vec_mult(int x, int y)
-{
-	return (int)(((INT64)x * (INT64)y) >> 32);
-}
-
-#elif defined(_MSC_VER)
-
+// Microsoft Visual C, x86, 32-bit
 #define vec_mult _vec_mult
 INLINE int _vec_mult(int x, int y)
 {
@@ -41,8 +34,9 @@ INLINE int _vec_mult(int x, int y)
     return result;
 }
 
-#else
+#elif defined(__GNUC__) && !defined(PTR64)
 
+// GCC, x86, 32-bit
 #define vec_mult _vec_mult
 INLINE int _vec_mult(int x, int y)
 {
@@ -59,6 +53,15 @@ INLINE int _vec_mult(int x, int y)
 	return result;
 }
 
-#endif /* PTR64 */
+#else
+
+// other
+#define vec_mult _vec_mult
+INLINE int _vec_mult(int x, int y)
+{
+	return (int)(((INT64)x * (INT64)y) >> 32);
+}
+
+#endif // defined(_MSC_VER) && defined(_M_IX86) && !defined(PTR64)
 
 #endif /* __OSINLINE__ */

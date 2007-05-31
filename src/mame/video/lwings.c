@@ -26,7 +26,7 @@ static UINT32 get_bg2_memory_offset( UINT32 col, UINT32 row, UINT32 num_cols, UI
 	return (row * 0x800) | (col * 2);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code, color;
 
@@ -39,7 +39,7 @@ static void get_fg_tile_info(int tile_index)
 			TILE_FLIPYX((color & 0x30) >> 4))
 }
 
-static void lwings_get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( lwings_get_bg1_tile_info )
 {
 	int code, color;
 
@@ -52,7 +52,7 @@ static void lwings_get_bg1_tile_info(int tile_index)
 			TILE_FLIPYX((color & 0x18) >> 3))
 }
 
-static void trojan_get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( trojan_get_bg1_tile_info )
 {
 	int code, color;
 
@@ -66,7 +66,7 @@ static void trojan_get_bg1_tile_info(int tile_index)
 			TILE_SPLIT((color & 0x08) >> 3) | ((color & 0x10) ? TILE_FLIPX : 0))
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int code, color;
 	UINT8 *rom = memory_region(REGION_GFX5);

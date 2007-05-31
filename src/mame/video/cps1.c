@@ -1006,7 +1006,7 @@ static UINT32 tilemap2_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_row
 
 static UINT8 empty_tile[32*32/2];
 
-static void get_tile0_info(int tile_index)
+static TILE_GET_INFO( get_tile0_info )
 {
 	int base = cps1_game_config->bank_scroll1 * 0x08000;
 	int code = cps1_scroll1[2*tile_index];
@@ -1024,7 +1024,7 @@ static void get_tile0_info(int tile_index)
 		if (code == 0xf020) { gfxset = 4; code = 0; } // use a blank tile (see startup text..)
 
 	/* 0x0020 appears to never be drawn for CPS1 games (it is drawn for CPS2 games though, see gigawing '0' in score for example) */
-	if (cps_version == 1 && code == 0x0020) { gfxset = 4; code = 0; tile_info.pen_usage = 0x8000; }
+	if (cps_version == 1 && code == 0x0020) { gfxset = 4; code = 0; tileinfo->pen_usage = 0x8000; }
 
 	SET_TILE_INFO(
 			gfxset,
@@ -1033,7 +1033,7 @@ static void get_tile0_info(int tile_index)
 			TILE_FLIPYX((attr & 0x60) >> 5) | TILE_SPLIT((attr & 0x0180) >> 7))
 }
 
-static void get_tile1_info(int tile_index)
+static TILE_GET_INFO( get_tile1_info )
 {
 	int base = cps1_game_config->bank_scroll2 * 0x04000;
 	const int startcode = cps1_game_config->start_scroll2;
@@ -1054,12 +1054,12 @@ static void get_tile1_info(int tile_index)
 		|| (cps1_game_config->kludge == 4 && (code >= 0x1e00 && code < 0x5400))
 	)
 	{
-		tile_info.pen_data = empty_tile;
-		tile_info.pen_usage = 0x8000;
+		tileinfo->pen_data = empty_tile;
+		tileinfo->pen_usage = 0x8000;
 	}
 }
 
-static void get_tile2_info(int tile_index)
+static TILE_GET_INFO( get_tile2_info )
 {
 	int base = cps1_game_config->bank_scroll3 * 0x1000;
 	const int startcode = cps1_game_config->start_scroll3;
@@ -1088,8 +1088,8 @@ static void get_tile2_info(int tile_index)
 
 	if (code < startcode || code > endcode)
 	{
-		tile_info.pen_data = empty_tile;
-		tile_info.pen_usage = 0x8000;
+		tileinfo->pen_data = empty_tile;
+		tileinfo->pen_usage = 0x8000;
 	}
 }
 

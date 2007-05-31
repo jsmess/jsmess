@@ -93,7 +93,7 @@ WRITE8_HANDLER( funworld_colorram_w )
     xxxx -xxx   tiles color (background).
 */
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 //  - bits -
 //  7654 3210

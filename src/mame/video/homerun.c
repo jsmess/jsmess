@@ -51,7 +51,7 @@ WRITE8_HANDLER(homerun_color_w)
 	palette_set_color(Machine,offset,r,g,b);
 }
 
-static void get_homerun_tile_info(int tile_index)
+static TILE_GET_INFO( get_homerun_tile_info )
 {
 	int tileno,palno;
 	tileno = (homerun_videoram[tile_index])+((homerun_videoram[tile_index+0x1000]&0x38)<<5)+ ((homerun_gfx_ctrl&1)<<11);

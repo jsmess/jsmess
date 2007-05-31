@@ -15,10 +15,10 @@ static int gx_tilemode, gx_rozenable, psac_colorbase, last_psac_colorbase;
 static tilemap *gx_psac_tilemap, *gx_psac_tilemap2;
 extern UINT32 *gx_psacram, *gx_subpaletteram32;
 
-static void (*game_tile_callback)(int, int *, int *);
+static void (*game_tile_callback)(int layer, int *code, int *color, int *flags);
 
 /* Run and Gun 2 / Rushing Heroes */
-static void get_gx_psac_tile_info(int tile_index)
+static TILE_GET_INFO( get_gx_psac_tile_info )
 {
 	int tileno, colour, flipx;
 	UINT16 *map16 = (UINT16 *)gx_psacram;
@@ -31,7 +31,7 @@ static void get_gx_psac_tile_info(int tile_index)
 }
 
 /* Soccer Superstars (tile and flip bits now TRUSTED) */
-static void get_gx_psac3_tile_info(int tile_index)
+static TILE_GET_INFO( get_gx_psac3_tile_info )
 {
 	int tileno, colour, flip;
 	unsigned char *tmap = memory_region(REGION_GFX4);
@@ -49,7 +49,7 @@ static void get_gx_psac3_tile_info(int tile_index)
 /* PSAC4 */
 /* these tilemaps are weird in both format and content, one of them
    doesn't really look like it should be displayed? */
-static void get_gx_psac1a_tile_info(int tile_index)
+static TILE_GET_INFO( get_gx_psac1a_tile_info )
 {
 	int tileno, colour, flipx,flipy;
 	int flip;
@@ -66,7 +66,7 @@ static void get_gx_psac1a_tile_info(int tile_index)
 	SET_TILE_INFO(1, tileno, colour, flip)
 }
 
-static void get_gx_psac1b_tile_info(int tile_index)
+static TILE_GET_INFO( get_gx_psac1b_tile_info )
 {
 	int tileno, colour, flipx,flipy;
 	int flip;
@@ -83,7 +83,7 @@ static void get_gx_psac1b_tile_info(int tile_index)
 	SET_TILE_INFO(0, tileno, colour, flip)
 }
 
-static void konamigx_type2_tile_callback(int layer, int *code, int *color)
+static void konamigx_type2_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	int d = *code;
 
@@ -91,7 +91,7 @@ static void konamigx_type2_tile_callback(int layer, int *code, int *color)
 	K055555GX_decode_vmixcolor(layer, color);
 }
 
-static void konamigx_alpha_tile_callback(int layer, int *code, int *color)
+static void konamigx_alpha_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	int mixcode;
 	int d = *code;

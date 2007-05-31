@@ -18,16 +18,14 @@ static UINT16 ttl_vram[0x800];
 
 /* TTL text plane */
 
-static void ttl_get_tile_info(int tile_index)
+static TILE_GET_INFO( ttl_get_tile_info )
 {
 	int attr, code;
 
 	code = ttl_vram[tile_index]&0xff;
 	attr = 0;
 
-	tile_info.flags = 0;
-
-	SET_TILE_INFO(ttl_gfx_index, code, attr, tile_info.flags);
+	SET_TILE_INFO(ttl_gfx_index, code, attr, 0);
 }
 
 static UINT32 ttl_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)

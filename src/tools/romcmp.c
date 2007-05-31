@@ -14,21 +14,6 @@
 #include "osdcore.h"
 
 #include <stdarg.h>
-#ifdef macintosh
-#	include "macromcmp.h"
-#else
-#ifndef _WIN32
-#	include <dirent.h>
-#	include <errno.h>
-#else
-#	include <windows.h>
-#endif
-#include <sys/stat.h>
-#ifdef _MSC_VER
-#define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
-#define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
-#endif
-#endif
 
 
 #define MAX_FILES 100

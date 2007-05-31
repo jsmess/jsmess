@@ -277,7 +277,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 } /* end of array */
 };
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tileno,colour;
 
@@ -287,7 +287,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(4,tileno,colour,0)
 }
 
-static void get_mlow_tile_info(int tile_index)
+static TILE_GET_INFO( get_mlow_tile_info )
 {
 	int tileno,colour;
 
@@ -297,7 +297,7 @@ static void get_mlow_tile_info(int tile_index)
 	SET_TILE_INFO(3,tileno,colour,0)
 }
 
-static void get_mhigh_tile_info(int tile_index)
+static TILE_GET_INFO( get_mhigh_tile_info )
 {
 	int tileno,colour;
 
@@ -307,7 +307,7 @@ static void get_mhigh_tile_info(int tile_index)
 	SET_TILE_INFO(2,tileno,colour,0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int tileno,colour;
 

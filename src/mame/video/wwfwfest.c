@@ -57,7 +57,7 @@ WRITE16_HANDLER( wwfwfest_bg1_videoram_w )
 /*******************************************************************************
  Tilemap Related Functions
 *******************************************************************************/
-static void get_fg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg0_tile_info )
 {
 	/*- FG0 RAM Format -**
 
@@ -88,7 +88,7 @@ static void get_fg0_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg0_tile_info )
 {
 	/*- BG0 RAM Format -**
 
@@ -118,7 +118,7 @@ static void get_bg0_tile_info(int tile_index)
 			TILE_FLIPYX((tilebase[0] & 0x00c0) >> 6))
 }
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	/*- BG1 RAM Format -**
 

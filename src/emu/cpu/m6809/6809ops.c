@@ -154,9 +154,7 @@ INLINE void jmp_di( void )
 INLINE void clr_di( void )
 {
 	DIRECT;
-#ifdef MESS
 	RM(EAD);
-#endif
 	WM(EAD,0);
 	CLR_NZVC;
 	SEZ;
@@ -213,7 +211,6 @@ INLINE void lbsr( void )
 
 /* $18 ILLEGAL */
 
-#if 1
 /* $19 DAA inherent (A) -**0* */
 INLINE void daa( void )
 {
@@ -228,20 +225,6 @@ INLINE void daa( void )
 	SET_NZ8((UINT8)t); SET_C8(t);
 	A = t;
 }
-#else
-/* $19 DAA inherent (A) -**0* */
-INLINE void daa( void )
-{
-	UINT16 t;
-	t = A;
-	if (CC & CC_H) t+=0x06;
-	if ((t&0x0f)>9) t+=0x06;		/* ASG -- this code is broken! $66+$99=$FF -> DAA should = $65, we get $05! */
-	if (CC & CC_C) t+=0x60;
-	if ((t&0xf0)>0x90) t+=0x60;
-	if (t&0x100) SEC;
-	A = t;
-}
-#endif
 
 /* $1A ORCC immediate ##### */
 INLINE void orcc( void )
@@ -263,7 +246,7 @@ INLINE void andcc( void )
 	CHECK_IRQ_LINES;	/* HJB 990116 */
 }
 
-/* $1D SEX inherent -**0- */
+/* $1D SEX inherent -**-- */
 INLINE void sex( void )
 {
 	UINT16 t;
@@ -1155,9 +1138,7 @@ INLINE void jmp_ix( void )
 INLINE void clr_ix( void )
 {
 	fetch_effective_address();
-#ifdef MESS
 	RM(EAD);
-#endif
 	WM(EAD,0);
 	CLR_NZVC; SEZ;
 }
@@ -1272,9 +1253,7 @@ INLINE void jmp_ex( void )
 INLINE void clr_ex( void )
 {
 	EXTENDED;
-#ifdef MESS
 	RM(EAD);
-#endif
 	WM(EAD,0);
 	CLR_NZVC; SEZ;
 }

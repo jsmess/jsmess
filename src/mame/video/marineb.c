@@ -27,7 +27,7 @@ static tilemap *bg_tilemap;
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = marineb_videoram[tile_index];
 	UINT8 col = marineb_colorram[tile_index];

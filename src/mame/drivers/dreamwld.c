@@ -114,7 +114,7 @@ WRITE32_HANDLER( dreamwld_bg_videoram_w )
 
 }
 
-static void get_dreamwld_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 {
 	int tileno,colour;
 	tileno = (tile_index&1)?(dreamwld_bg_videoram[tile_index>>1]&0xffff):((dreamwld_bg_videoram[tile_index>>1]>>16)&0xffff);
@@ -131,7 +131,7 @@ WRITE32_HANDLER( dreamwld_bg2_videoram_w )
 	tilemap_mark_tile_dirty(dreamwld_bg2_tilemap,offset*2+1);
 }
 
-static void get_dreamwld_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 {
 	UINT16 tileno,colour;
 	tileno = (tile_index&1)?(dreamwld_bg2_videoram[tile_index>>1]&0xffff):((dreamwld_bg2_videoram[tile_index>>1]>>16)&0xffff);

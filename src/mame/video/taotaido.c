@@ -173,7 +173,7 @@ WRITE16_HANDLER( taotaido_bgvideoram_w )
 	}
 }
 
-static void taotaido_bg_tile_info(int tile_index)
+static TILE_GET_INFO( taotaido_bg_tile_info )
 {
 	int code = taotaido_bgram[tile_index]&0x01ff;
 	int bank = (taotaido_bgram[tile_index]&0x0e00)>>9;

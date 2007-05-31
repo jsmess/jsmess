@@ -183,7 +183,7 @@ static tilemap *pf1_tilemap, *pf2_tilemap, *pf3_tilemap, *pf4_tilemap;
 
 ***************************************************************************/
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -195,11 +195,11 @@ static void get_pf1_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	if (pf1_tilevram16[2*tile_index+1] & 0x8000) tile_info.priority = 0;
-	else tile_info.priority = (attrib & 0xf000) >> 12;
+	if (pf1_tilevram16[2*tile_index+1] & 0x8000) tileinfo->priority = 0;
+	else tileinfo->priority = (attrib & 0xf000) >> 12;
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -211,11 +211,11 @@ static void get_pf2_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	if (pf2_tilevram16[2*tile_index+1] & 0x8000) tile_info.priority = 0;
-	else tile_info.priority = (attrib & 0xf000) >> 12;
+	if (pf2_tilevram16[2*tile_index+1] & 0x8000) tileinfo->priority = 0;
+	else tileinfo->priority = (attrib & 0xf000) >> 12;
 }
 
-static void get_pf3_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -227,11 +227,11 @@ static void get_pf3_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	if (pf3_tilevram16[2*tile_index+1] & 0x8000) tile_info.priority = 0;
-	else tile_info.priority = (attrib & 0xf000) >> 12;
+	if (pf3_tilevram16[2*tile_index+1] & 0x8000) tileinfo->priority = 0;
+	else tileinfo->priority = (attrib & 0xf000) >> 12;
 }
 
-static void get_pf4_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf4_tile_info )
 {
 	int color, tile_number, attrib;
 
@@ -243,8 +243,8 @@ static void get_pf4_tile_info(int tile_index)
 			tile_number,
 			color,
 			0)
-	if (pf4_tilevram16[2*tile_index+1] & 0x8000) tile_info.priority = 0;
-	else tile_info.priority = (attrib & 0xf000) >> 12;
+	if (pf4_tilevram16[2*tile_index+1] & 0x8000) tileinfo->priority = 0;
+	else tileinfo->priority = (attrib & 0xf000) >> 12;
 }
 
 /***************************************************************************

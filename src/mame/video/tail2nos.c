@@ -21,7 +21,7 @@ static unsigned char *dirtychar;
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 code = tail2nos_bgvideoram[tile_index];
 	SET_TILE_INFO(
@@ -38,7 +38,7 @@ static void get_tile_info(int tile_index)
 
 ***************************************************************************/
 
-static void zoom_callback(int *code,int *color)
+static void zoom_callback(int *code,int *color,int *flags)
 {
 	*code |= ((*color & 0x03) << 8);
 	*color = 32 + ((*color & 0x38) >> 3);

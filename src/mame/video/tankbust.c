@@ -32,7 +32,7 @@ note:
 
 */
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 	int attr = colorram[tile_index];
@@ -54,7 +54,7 @@ static void get_bg_tile_info(int tile_index)
 #endif
 
 	/* priority bg/sprites (1 = this bg tile on top of sprites) */
-	tile_info.priority = (attr & 0x08) >> 3;
+	tileinfo->priority = (attr & 0x08) >> 3;
 
 	SET_TILE_INFO(	1,
 			code,
@@ -62,7 +62,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_txt_tile_info(int tile_index)
+static TILE_GET_INFO( get_txt_tile_info )
 {
 	int code = txt_ram[tile_index];
 	int color = ((code>>6) & 0x03);

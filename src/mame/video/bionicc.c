@@ -38,7 +38,7 @@ static tilemap *tx_tilemap, *bg_tilemap, *fg_tilemap;
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = bionicc_bgvideoram[2*tile_index+1];
 	SET_TILE_INFO(
@@ -48,19 +48,19 @@ static void get_bg_tile_info(int tile_index)
 			TILE_FLIPXY((attr & 0xc0) >> 6))
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = bionicc_fgvideoram[2*tile_index+1];
 	int flags;
 
 	if ((attr & 0xc0) == 0xc0)
 	{
-		tile_info.priority = 1;
+		tileinfo->priority = 1;
 		flags = TILE_SPLIT(0);
 	}
 	else
 	{
-		tile_info.priority = 0;
+		tileinfo->priority = 0;
 		flags = TILE_SPLIT((attr & 0x20) >> 5) | TILE_FLIPXY((attr & 0xc0) >> 6);
 	}
 
@@ -71,7 +71,7 @@ static void get_fg_tile_info(int tile_index)
 			flags)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int attr = bionicc_txvideoram[tile_index + 0x400];
 	SET_TILE_INFO(

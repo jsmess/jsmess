@@ -525,23 +525,23 @@ void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )
 static tilemap *skns_tilemap_A;
 static tilemap *skns_tilemap_B;
 
-static void get_tilemap_A_tile_info(int tile_index)
+static TILE_GET_INFO( get_tilemap_A_tile_info )
 {
 	int code = ((skns_tilemapA_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((skns_tilemapA_ram[tile_index] & 0x3f000000) >> 24 );
 //  int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
 	int depth = (skns_v3_regs[0x0c/4] & 0x0001) << 1;
-	tile_info.flags = 0;
+	int flags = 0;
 
-	if(skns_tilemapA_ram[tile_index] & 0x80000000) tile_info.flags |= TILE_FLIPX;
-	if(skns_tilemapA_ram[tile_index] & 0x40000000) tile_info.flags |= TILE_FLIPY;
+	if(skns_tilemapA_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
+	if(skns_tilemapA_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
 	SET_TILE_INFO(
 			0+depth,
 			code,
 			0x40+colr,
-			tile_info.flags)
-//  tile_info.priority = pri;
+			flags)
+//  tileinfo->priority = pri;
 }
 
 WRITE32_HANDLER ( skns_tilemapA_w )
@@ -550,23 +550,23 @@ WRITE32_HANDLER ( skns_tilemapA_w )
 	tilemap_mark_tile_dirty(skns_tilemap_A,offset);
 }
 
-static void get_tilemap_B_tile_info(int tile_index)
+static TILE_GET_INFO( get_tilemap_B_tile_info )
 {
 	int code = ((skns_tilemapB_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((skns_tilemapB_ram[tile_index] & 0x3f000000) >> 24 );
 //  int pri  = ((skns_tilemapA_ram[tile_index] & 0x00e00000) >> 21 );
 	int depth = (skns_v3_regs[0x0c/4] & 0x0100) >> 7;
-	tile_info.flags = 0;
+	int flags = 0;
 
-	if(skns_tilemapB_ram[tile_index] & 0x80000000) tile_info.flags |= TILE_FLIPX;
-	if(skns_tilemapB_ram[tile_index] & 0x40000000) tile_info.flags |= TILE_FLIPY;
+	if(skns_tilemapB_ram[tile_index] & 0x80000000) flags |= TILE_FLIPX;
+	if(skns_tilemapB_ram[tile_index] & 0x40000000) flags |= TILE_FLIPY;
 
 	SET_TILE_INFO(
 			1+depth,
 			code,
 			0x40+colr,
-			tile_info.flags)
-//  tile_info.priority = pri;
+			flags)
+//  tileinfo->priority = pri;
 }
 
 WRITE32_HANDLER ( skns_tilemapB_w )

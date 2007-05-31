@@ -391,7 +391,7 @@ WRITE8_HANDLER( pmpoker_colorram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 /*  - bits -
     7654 3210

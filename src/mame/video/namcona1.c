@@ -21,7 +21,7 @@ static int tilemap_palette_bank[NAMCONA1_NUM_TILEMAPS];
 static int palette_is_dirty;
 
 static void tilemap_get_info(
-	int tile_index,const UINT16 *tilemap_videoram,int tilemap_color )
+	running_machine *machine,tile_data *tileinfo,int tile_index,const UINT16 *tilemap_videoram,int tilemap_color )
 {
 #ifdef LSB_FIRST
 	UINT16 *source;
@@ -48,17 +48,17 @@ static void tilemap_get_info(
 		mask_data[5] = source[2]&0xff;
 		mask_data[6] = source[3]>>8;
 		mask_data[7] = source[3]&0xff;
-		tile_info.mask_data = mask_data;
+		tileinfo->mask_data = mask_data;
 #else
-		tile_info.mask_data = (UINT8 *)(shaperam+4*tile);
+		tileinfo->mask_data = (UINT8 *)(shaperam+4*tile);
 #endif
 	}
 } /* tilemap_get_info */
 
-static void tilemap_get_info0(int tile_index){ tilemap_get_info(tile_index,0*0x1000+videoram16,tilemap_palette_bank[0]); }
-static void tilemap_get_info1(int tile_index){ tilemap_get_info(tile_index,1*0x1000+videoram16,tilemap_palette_bank[1]); }
-static void tilemap_get_info2(int tile_index){ tilemap_get_info(tile_index,2*0x1000+videoram16,tilemap_palette_bank[2]); }
-static void tilemap_get_info3(int tile_index){ tilemap_get_info(tile_index,3*0x1000+videoram16,tilemap_palette_bank[3]); }
+static TILE_GET_INFO( tilemap_get_info0 ){ tilemap_get_info(machine,tileinfo,tile_index,0*0x1000+videoram16,tilemap_palette_bank[0]); }
+static TILE_GET_INFO( tilemap_get_info1 ){ tilemap_get_info(machine,tileinfo,tile_index,1*0x1000+videoram16,tilemap_palette_bank[1]); }
+static TILE_GET_INFO( tilemap_get_info2 ){ tilemap_get_info(machine,tileinfo,tile_index,2*0x1000+videoram16,tilemap_palette_bank[2]); }
+static TILE_GET_INFO( tilemap_get_info3 ){ tilemap_get_info(machine,tileinfo,tile_index,3*0x1000+videoram16,tilemap_palette_bank[3]); }
 
 /*************************************************************************/
 
@@ -219,7 +219,7 @@ VIDEO_START( namcona1 )
 {
 	int i;
 	gfx_element *gfx0,*gfx1;
-	static void (*get_info[4])(int tile_index) =
+	static tile_get_info_fn get_info[4] =
 	{ tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )

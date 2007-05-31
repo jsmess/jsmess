@@ -39,7 +39,7 @@ MACHINE_RESET( skydiver )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = skydiver_videoram[tile_index];
 	SET_TILE_INFO(0, code & 0x3f, code >> 6, 0)

@@ -35,9 +35,9 @@ static void asterix_sprite_callback(int *code, int *color, int *priority_mask)
 }
 
 
-static void asterix_tile_callback(int layer, int *code, int *color)
+static void asterix_tile_callback(int layer, int *code, int *color, int *flags)
 {
-	tile_info.flags = *code & 0x1000 ? TILE_FLIPX : 0;
+	*flags = *code & 0x1000 ? TILE_FLIPX : 0;
 	*color = (layer_colorbase[layer] + ((*code & 0xe000) >> 13)) & 0x7f;
 	*code = (*code & 0x03ff) | tilebanks[(*code >> 10) & 3];
 }

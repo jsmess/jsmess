@@ -36,7 +36,7 @@ WRITE8_HANDLER( tx1_vram_w )
 	tx1_vram[offset] = data;
 }
 
-static void get_tx1_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx1_tile_info )
 {
 	int bit15, upper, lower, tileno;
 
@@ -184,7 +184,7 @@ WRITE8_HANDLER( buggyboy_vram_w )
 }
 
 
-static void get_buggyb1_tile_info(int tile_index)
+static TILE_GET_INFO( get_buggyb1_tile_info )
 {
 	int color, bit15, upper, lower, tileno;
 
@@ -198,7 +198,7 @@ static void get_buggyb1_tile_info(int tile_index)
 	SET_TILE_INFO(0,tileno,color,0);
 }
 
-static void get_buggyboy_tile_info(int tile_index)
+static TILE_GET_INFO( get_buggyboy_tile_info )
 {
   	int color, bit15, upper, lower, tileno;
 

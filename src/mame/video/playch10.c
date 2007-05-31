@@ -86,7 +86,7 @@ static const ppu2c0x_interface ppu_interface =
 	{ ppu_irq }				/* irq */
 };
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int code = videoram[offs] + ((videoram[offs + 1] & 0x07) << 8);

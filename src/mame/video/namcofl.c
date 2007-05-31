@@ -130,7 +130,7 @@ handle_mcu( void )
 	}
 } /* handle_mcu */
 
-INLINE void
+static void
 TilemapCB(UINT16 code, int *tile, int *mask )
 {
 	*tile = code;

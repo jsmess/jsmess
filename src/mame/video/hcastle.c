@@ -54,7 +54,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);	/* skip 0x400 */
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;
 	int bit1 = (K007121_ctrlram[0][0x05] >> 2) & 0x03;
@@ -76,7 +76,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int bit0 = (K007121_ctrlram[1][0x05] >> 0) & 0x03;
 	int bit1 = (K007121_ctrlram[1][0x05] >> 2) & 0x03;

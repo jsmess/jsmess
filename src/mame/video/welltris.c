@@ -196,7 +196,7 @@ WRITE16_HANDLER( welltris_scrollreg_w )
 	}
 }
 
-static void get_welltris_tile_info(int tile_index)
+static TILE_GET_INFO( get_welltris_tile_info )
 {
 	UINT16 code = welltris_charvideoram[tile_index];
 	int bank = (code & 0x1000) >> 12;

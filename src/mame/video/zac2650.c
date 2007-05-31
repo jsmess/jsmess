@@ -133,7 +133,7 @@ int SpriteCollision(int first,int second)
 	return Checksum;
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
 

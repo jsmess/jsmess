@@ -70,7 +70,7 @@ static tilemap	*tilemap_0,*tilemap_1,	// Backgrounds
 
 ***************************************************************************/
 
-static void get_tile_info_0(int tile_index)
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 attr = realbrk_vram_0[tile_index * 2 + 0];
 	UINT16 code = realbrk_vram_0[tile_index * 2 + 1];
@@ -81,7 +81,7 @@ static void get_tile_info_0(int tile_index)
 			TILE_FLIPYX( attr >> 14 ))
 }
 
-static void get_tile_info_1(int tile_index)
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 attr = realbrk_vram_1[tile_index * 2 + 0];
 	UINT16 code = realbrk_vram_1[tile_index * 2 + 1];
@@ -120,7 +120,7 @@ WRITE16_HANDLER( realbrk_vram_1_w )
 
 ***************************************************************************/
 
-static void get_tile_info_2(int tile_index)
+static TILE_GET_INFO( get_tile_info_2 )
 {
 	UINT16 code = realbrk_vram_2[tile_index];
 	SET_TILE_INFO(

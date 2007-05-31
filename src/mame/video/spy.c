@@ -13,9 +13,9 @@ static int layer_colorbase[3],sprite_colorbase;
 
 ***************************************************************************/
 
-static void tile_callback(int layer,int bank,int *code,int *color)
+static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
-	tile_info.flags = (*color & 0x20) ? TILE_FLIPX : 0;
+	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9)
 			| (bank << 13);
 	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);

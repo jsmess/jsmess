@@ -339,7 +339,7 @@ static UINT16 nthword( const UINT32 *pSource, int offs )
 	return (pSource[0]<<((offs&1)*16))>>16;
 }
 
-static void TextTilemapGetInfo( int tile_index )
+static TILE_GET_INFO( TextTilemapGetInfo )
 {
 	UINT16 data = nthword( namcos23_textram,tile_index );
   /**
@@ -351,7 +351,7 @@ static void TextTilemapGetInfo( int tile_index )
 	SET_TILE_INFO( 0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10) );
 	if( data&0x8000 )
 	{
-		tile_info.priority = 1;
+		tileinfo->priority = 1;
 	}
 } /* TextTilemapGetInfo */
 

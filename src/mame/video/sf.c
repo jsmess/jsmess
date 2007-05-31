@@ -14,7 +14,7 @@ static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char *base = memory_region(REGION_GFX5) + 2*tile_index;
 	int attr = base[0x10000];
@@ -27,7 +27,7 @@ static void get_bg_tile_info(int tile_index)
 			TILE_FLIPYX(attr & 3))
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	unsigned char *base = memory_region(REGION_GFX5) + 0x20000 + 2*tile_index;
 	int attr = base[0x10000];
@@ -40,7 +40,7 @@ static void get_fg_tile_info(int tile_index)
 			TILE_FLIPYX(attr & 3))
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int code = sf_videoram[tile_index];
 	SET_TILE_INFO(

@@ -30,7 +30,7 @@ static UINT32 citycon_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	SET_TILE_INFO(
 			0,
@@ -39,7 +39,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 *rom = memory_region(REGION_GFX4);
 	int code = rom[0x1000 * bg_image + tile_index];

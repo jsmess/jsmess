@@ -71,7 +71,7 @@ PALETTE_INIT( pandoras )
 
 ***************************************************************************/
 
-static void get_tile_info0(int tile_index)
+static TILE_GET_INFO( get_tile_info0 )
 {
 	unsigned char attr = colorram[tile_index];
 	SET_TILE_INFO(
@@ -79,7 +79,7 @@ static void get_tile_info0(int tile_index)
 			videoram[tile_index] + ((attr & 0x10) << 4),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0xc0) >> 6))
-	tile_info.priority = (attr & 0x20) >> 5;
+	tileinfo->priority = (attr & 0x20) >> 5;
 }
 
 /***************************************************************************

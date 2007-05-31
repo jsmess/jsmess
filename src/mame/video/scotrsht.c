@@ -112,7 +112,7 @@ WRITE8_HANDLER( scotrsht_palettebank_w )
 }
 
 
-static void scotrsht_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( scotrsht_get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + (scotrsht_charbank << 9) + ((attr & 0x40) << 2);

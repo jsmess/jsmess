@@ -17,7 +17,7 @@ static tilemap *bg_tilemap,*fg_tilemap;
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = iqblock_bgvideoram[tile_index] + (iqblock_bgvideoram[tile_index + 0x800] << 8);
 	SET_TILE_INFO(
@@ -27,7 +27,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = iqblock_fgvideoram[tile_index];
 	SET_TILE_INFO(

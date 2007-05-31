@@ -113,7 +113,7 @@ static UINT32 bgvideoram_scan_cols( UINT32 col, UINT32 row, UINT32 num_cols, UIN
 	return tile_offset[col * num_rows + row];
 }
 
-static void get_bg_l_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_l_tile_info )
 {
 	int color = (color_center_bot >> 7) & 1;
 	SET_TILE_INFO(
@@ -123,7 +123,7 @@ static void get_bg_l_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_r_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_r_tile_info )
 {
 	int color = (color_center_bot >> 7) & 1;
 	SET_TILE_INFO(
@@ -133,7 +133,7 @@ static void get_bg_r_tile_info(int tile_index)
 			TILE_FLIPY)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT8 code = decocass_fgvideoram[tile_index];
 	UINT8 attr = decocass_colorram[tile_index];

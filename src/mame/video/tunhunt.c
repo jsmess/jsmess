@@ -67,7 +67,7 @@ WRITE8_HANDLER( tunhunt_mott_w )
 	}
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = videoram[tile_index];
 	int code = attr & 0x3f;

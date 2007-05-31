@@ -130,7 +130,7 @@ UINT32 firehawk_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 
 
 static tilemap *tilemap_0, *tilemap_1;
 
-static void get_tile_info_0(int tile_index)
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 code = afega_vram_0[tile_index];
 	SET_TILE_INFO(
@@ -139,7 +139,7 @@ static void get_tile_info_0(int tile_index)
 			(code & 0xf000) >> 12,
 			0)
 }
-static void get_tile_info_1(int tile_index)
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 code = afega_vram_1[tile_index];
 	SET_TILE_INFO(

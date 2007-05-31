@@ -14,7 +14,7 @@ static tilemap *bg_tilemap;
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 code = ohmygod_videoram[2*tile_index+1];
 	UINT16 attr = ohmygod_videoram[2*tile_index];

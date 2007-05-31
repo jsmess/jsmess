@@ -11,7 +11,7 @@ extern UINT16 *sderby_fg_videoram;
 
 /* BG Layer */
 
-static void get_sderby_tile_info(int tile_index)
+static TILE_GET_INFO( get_sderby_tile_info )
 {
 	int tileno,colour;
 
@@ -31,7 +31,7 @@ WRITE16_HANDLER( sderby_videoram_w )
 
 /* MD Layer */
 
-static void get_sderby_md_tile_info(int tile_index)
+static TILE_GET_INFO( get_sderby_md_tile_info )
 {
 	int tileno,colour;
 
@@ -51,7 +51,7 @@ WRITE16_HANDLER( sderby_md_videoram_w )
 
 /* FG Layer */
 
-static void get_sderby_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_sderby_fg_tile_info )
 {
 	int tileno,colour;
 

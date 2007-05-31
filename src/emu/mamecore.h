@@ -32,6 +32,11 @@
 #undef PPC
 #endif
 
+/* Suppress warnings about redefining the macro 'ARM' on ARM. */
+#ifdef ARM
+#undef ARM
+#endif
+
 
 
 /***************************************************************************

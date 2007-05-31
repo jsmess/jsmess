@@ -151,7 +151,7 @@ static tilemap *tilemap_sub_bg, *tilemap_sub_fg, *tilemap_sub_rot;
 #define NX_0  (0x40)
 #define NY_0  (0x40)
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	UINT16 code_hi = tetrisp2_vram_bg[ 2 * tile_index + 0];
 	UINT16 code_lo = tetrisp2_vram_bg[ 2 * tile_index + 1];
@@ -174,7 +174,7 @@ WRITE16_HANDLER( tetrisp2_vram_bg_w )
 #define NX_1  (0x40)
 #define NY_1  (0x40)
 
-static void get_tile_info_fg(int tile_index)
+static TILE_GET_INFO( get_tile_info_fg )
 {
 	UINT16 code_hi = tetrisp2_vram_fg[ 2 * tile_index + 0];
 	UINT16 code_lo = tetrisp2_vram_fg[ 2 * tile_index + 1];
@@ -193,7 +193,7 @@ WRITE16_HANDLER( tetrisp2_vram_fg_w )
 }
 
 
-static void get_tile_info_rot(int tile_index)
+static TILE_GET_INFO( get_tile_info_rot )
 {
 	UINT16 code_hi = tetrisp2_vram_rot[ 2 * tile_index + 0];
 	UINT16 code_lo = tetrisp2_vram_rot[ 2 * tile_index + 1];
@@ -211,7 +211,7 @@ WRITE16_HANDLER( tetrisp2_vram_rot_w )
 	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_rot,offset/2);
 }
 
-static void get_tile_info_rocknms_sub_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
 {
 	UINT16 code_hi = rocknms_sub_vram_bg[ 2 * tile_index + 0];
 	UINT16 code_lo = rocknms_sub_vram_bg[ 2 * tile_index + 1];
@@ -230,7 +230,7 @@ WRITE16_HANDLER( rocknms_sub_vram_bg_w )
 }
 
 
-static void get_tile_info_rocknms_sub_fg(int tile_index)
+static TILE_GET_INFO( get_tile_info_rocknms_sub_fg )
 {
 	UINT16 code_hi = rocknms_sub_vram_fg[ 2 * tile_index + 0];
 	UINT16 code_lo = rocknms_sub_vram_fg[ 2 * tile_index + 1];
@@ -249,7 +249,7 @@ WRITE16_HANDLER( rocknms_sub_vram_fg_w )
 }
 
 
-static void get_tile_info_rocknms_sub_rot(int tile_index)
+static TILE_GET_INFO( get_tile_info_rocknms_sub_rot )
 {
 	UINT16 code_hi = rocknms_sub_vram_rot[ 2 * tile_index + 0];
 	UINT16 code_lo = rocknms_sub_vram_rot[ 2 * tile_index + 1];

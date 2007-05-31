@@ -147,7 +147,7 @@ WRITE8_HANDLER( redclash_star_reset_w )
 	redclash_set_stars_enable(1);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = videoram[tile_index];
 	int color = (videoram[tile_index] & 0x70) >> 4; // ??

@@ -44,7 +44,7 @@ PALETTE_INIT( sidepckt )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	unsigned char attr = colorram[tile_index];
 	SET_TILE_INFO(

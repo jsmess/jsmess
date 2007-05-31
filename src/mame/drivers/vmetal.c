@@ -369,7 +369,7 @@ static const gfx_decode gfxdecodeinfo[] =
 };
 
 
-static void get_vmetal_texttilemap_tile_info(int tile_index)
+static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
 {
 	UINT32 tile;
 	UINT16 color, data = vmetal_texttileram[tile_index];
@@ -382,14 +382,14 @@ static void get_vmetal_texttilemap_tile_info(int tile_index)
 }
 
 
-static void get_vmetal_mid1tilemap_tile_info(int tile_index)
+static TILE_GET_INFO( get_vmetal_mid1tilemap_tile_info )
 {
 	UINT16 tile, color, data = vmetal_mid1tileram[tile_index];
 	get_vmetal_tlookup(data, &tile, &color);
 	if (data & 0x8000) tile = 0;
 	SET_TILE_INFO(0, tile, color^0xf, TILE_FLIPYX(0x0));
 }
-static void get_vmetal_mid2tilemap_tile_info(int tile_index)
+static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 {
 	UINT16 tile, color, data = vmetal_mid2tileram[tile_index];
 	get_vmetal_tlookup(data, &tile, &color);

@@ -584,7 +584,7 @@ const UINT8 dsoccr94_decryption_table[256] = {
 const UINT8 matchit2_decryption_table[256] = {
 	xxxx,0x86,0x0a,xxxx,0x32,0x01,0x81,0xbe, 0xea,xxxx,0xbb,xxxx,xxxx,xxxx,0xa5,0xf6, /* 00 */
 //  new  new       new  new  new  new                  new                 new  new
-	0x5d,0x8c,0xf3,0xc4,0x42,0x5a,0x22,0x26, xxxx,0x58,xxxx,xxxx,0x59,0x53,0x80,0x09, /* 10 */
+	0x5d,0x8c,0xf3,0xc4,0x42,0x5a,0x22,0x26, xxxx,0x58,xxxx,0x97,0x59,0x53,0x80,0x09, /* 10 */
 //  new  new  new  new  !!!! new  !!!!            new       ???? new  new  new  !!!!
 	xxxx,0x1e,0x48,0xe2,0x50,xxxx,0xc3,0x23, xxxx,xxxx,0xe9,xxxx,0x40,0x83,0xa3,0x46, /* 20 */
 //       new  new  new  new       new  new             new       new  new  new
@@ -608,7 +608,7 @@ const UINT8 matchit2_decryption_table[256] = {
 //  new       new                      new   new  new  new  new  new       new  !!!!
 	0x73,xxxx,xxxx,0x45,0x92,0x99,xxxx,0xf7, 0x3d,0xd0,0xb6,0x36,0xf9,0xfa,0x0f,xxxx, /* C0 */
 //  new            new  new  new       new   new  new  !!!! new  new
-	0x75,xxxx,xxxx,0x9c,xxxx,0x11,xxxx,xxxx, 0x27,0x4b,xxxx,0x2c,0x51,0x2e,0xfd,xxxx, /* D0 */
+	0x75,xxxx,0x6e,0x9c,xxxx,0x11,xxxx,xxxx, 0x27,0x4b,xxxx,0x2c,0x51,0x2e,0xfd,xxxx, /* D0 */
 //  new       ???? new       new             new  new       new  new  new  !!!!
 	0x55,0x3c,xxxx,0xb7,xxxx,0xd1,0x8e,xxxx, 0xb2,xxxx,0x78,xxxx,0x12,xxxx,0x29,0x0c, /* E0 */
 //  new  new       new  ???? new  new        new       new       new       new  new
@@ -622,13 +622,12 @@ from shisen 2:
 E4 -> pc: b08; f458, 1920 (99% 1 byte at boot and sometimes when a piece is selected)
           b65c (after one match is finished with the girl on the background or when you finish some levels in the other modes)
          (16 37 3e 3f 41 4a 4d 4e 4f 90 91 95 96)
-4E -> pc: 7ac3, 7ae8 (after a 2 players match)
-1B -> pc: 630e (when you've to insert the high score)
-D2 -> pc: 631c (when you've to insert the high score)
+4E -> pc: 7ac3, 7ae8 (after a 2 players match and in a 2 players match in "stalemate")
 
 Found (marked "!!!!")
 14 -> pc: 8b2a -> 42
 16 -> pc: 1714, 1804, 1a70, 1cc3 (00 10 13 1C 20 21 22 34 D4 D5 after a match) -> 22
+1B -> pc: 630e (when you've to insert the high score) -> 97
 1F -> pc: f30, f35, af74, 153a, 6dd8, 674f -> 09
 30 -> pc: 19af, 1986 -> 49
 31 -> pc: c804, c813, c822, 1358, c303, c312, c321, 1315, 1338 (2 bytes opcode) -> B4
@@ -645,6 +644,7 @@ Found (marked "!!!!")
 BF -> pc: 6af3, 6b01, ca73, ab39 (2 bytes opcode) -> B1
 C4 -> pc: deb4 -> 92 from bbmanw
 EC -> pc: 966e, 9679 -> 12 from bbmanw
+D2 -> pc: 631c (when you've to insert the high score) (6e, 6f) -> 6e
 
 the ones marked with "new" are checked against dynablst and bomberman tables
 */

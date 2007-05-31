@@ -12,7 +12,6 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "profiler.h"
-#include <time.h>
 #include <ctype.h>
 
 
@@ -24,7 +23,7 @@
 #define MAX_TOKEN_LEN		64
 
 /* max time between key presses */
-#define RECORD_TIME			(CLOCKS_PER_SEC*2/3)
+#define RECORD_TIME			(osd_ticks_per_second()*2/3)
 
 
 
@@ -576,7 +575,7 @@ static input_code code_count;
 /* Static information used in key/joy recording */
 static input_code record_seq[SEQ_MAX];			/* buffer for key recording */
 static int record_count;						/* number of key/joy press recorded */
-static clock_t record_last;						/* time of last key/joy press */
+static osd_ticks_t record_last;					/* time of last key/joy press */
 static UINT8 record_analog;						/* are we recording an analog sequence? */
 
 
@@ -1314,7 +1313,7 @@ void seq_read_async_start(int analog)
 
 	/* reset the recording count and the clock */
 	record_count = 0;
-	record_last = clock();
+	record_last = osd_ticks();
 	record_analog = analog;
 
 	/* reset code memory, otherwise this memory may interferes with the input memory */
@@ -1338,7 +1337,7 @@ int seq_read_async(input_seq *seq, int first)
 		return 1;
 
 	/* if we're at the end, or if the RECORD_TIME has passed, we're done */
-	if (record_count == SEQ_MAX || (record_count > 0 && clock() > record_last + RECORD_TIME))
+	if (record_count == SEQ_MAX || (record_count > 0 && osd_ticks() > record_last + RECORD_TIME))
 	{
 		int seqnum = 0;
 
@@ -1419,7 +1418,7 @@ int seq_read_async(input_seq *seq, int first)
 
 			/* append the code and reset the clock */
 			record_seq[record_count++] = newcode;
-			record_last = clock();
+			record_last = osd_ticks();
 		}
 	}
 
@@ -1459,7 +1458,7 @@ int seq_read_async(input_seq *seq, int first)
 		if (newcode != code_count)
 		{
 			record_seq[record_count++] = newcode;
-			record_last = clock() - RECORD_TIME;
+			record_last = osd_ticks() - RECORD_TIME;
 		}
 	}
 

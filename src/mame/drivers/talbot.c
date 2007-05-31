@@ -152,7 +152,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 } /* end of array */
 };
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = videoram[tile_index];
 	int color = colorram[tile_index] & 0x1f;

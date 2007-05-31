@@ -56,7 +56,7 @@ VIDEO_UPDATE( livequiz );
 
 static tilemap *tmap;
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 code = livequiz_gfxram[ tile_index + 0x7000 ];
 	SET_TILE_INFO(1, code & 0xfff, (code >> 12) & 0xf, TILE_FLIPXY( 0 ));

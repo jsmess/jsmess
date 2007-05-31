@@ -12,7 +12,7 @@ static int layerpri[3];
 
 ***************************************************************************/
 
-static void xmen_tile_callback(int layer,int bank,int *code,int *color)
+static void xmen_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	if (layer == 0)

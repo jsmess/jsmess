@@ -100,31 +100,31 @@ static const gfx_layout sys24_char_layout = {
 };
 #endif
 
-static void sys24_tile_info_0s(int tile_index)
+static TILE_GET_INFO( sys24_tile_info_0s )
 {
 	UINT16 val = sys24_tile_ram[tile_index];
-	tile_info.priority = (val & 0x8000) != 0;
+	tileinfo->priority = (val & 0x8000) != 0;
 	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
 }
 
-static void sys24_tile_info_0w(int tile_index)
+static TILE_GET_INFO( sys24_tile_info_0w )
 {
 	UINT16 val = sys24_tile_ram[tile_index|0x1000];
-	tile_info.priority = (val & 0x8000) != 0;
+	tileinfo->priority = (val & 0x8000) != 0;
 	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
 }
 
-static void sys24_tile_info_1s(int tile_index)
+static TILE_GET_INFO( sys24_tile_info_1s )
 {
 	UINT16 val = sys24_tile_ram[tile_index|0x2000];
-	tile_info.priority = (val & 0x8000) != 0;
+	tileinfo->priority = (val & 0x8000) != 0;
 	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
 }
 
-static void sys24_tile_info_1w(int tile_index)
+static TILE_GET_INFO( sys24_tile_info_1w )
 {
 	UINT16 val = sys24_tile_ram[tile_index|0x3000];
-	tile_info.priority = (val & 0x8000) != 0;
+	tileinfo->priority = (val & 0x8000) != 0;
 	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
 }
 

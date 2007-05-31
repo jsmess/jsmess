@@ -213,7 +213,7 @@ static int scrolly=0;
 static UINT8 reg_a002=0;
 static int bank=-1;
 
-static void get_gfx0b_tile_info(int tile_index)
+static TILE_GET_INFO( get_gfx0b_tile_info )
 {
 	int code  = gfx0_vram[tile_index];
 	int color = gfx0_cram[tile_index];
@@ -232,7 +232,7 @@ static void get_gfx0b_tile_info(int tile_index)
 			0)
 }
 
-static void get_gfx0a_tile_info(int tile_index)
+static TILE_GET_INFO( get_gfx0a_tile_info )
 {
 	int code  = gfx0_vram[tile_index];
 	int color = gfx0_cram[tile_index];
@@ -251,7 +251,7 @@ static void get_gfx0a_tile_info(int tile_index)
 			0)
 }
 
-static void get_gfx1_tile_info(int tile_index)
+static TILE_GET_INFO( get_gfx1_tile_info )
 {
 	int code  = gfx1_vram[tile_index];
 	int color = gfx1_cram[tile_index];

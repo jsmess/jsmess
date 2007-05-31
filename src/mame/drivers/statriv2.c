@@ -97,7 +97,7 @@ static tilemap* statriv2_tilemap;
 
 /* Video Related, move to video later */
 
-static void get_statriv2_tile_info(int tile_index)
+static TILE_GET_INFO( get_statriv2_tile_info )
 {
 	int code = statriv2_videoram[0x400+tile_index];
 	int attr = statriv2_videoram[tile_index] & 0x3f;

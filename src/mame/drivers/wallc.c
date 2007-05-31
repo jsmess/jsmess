@@ -123,7 +123,7 @@ static WRITE8_HANDLER( wallc_videoram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0)
 }

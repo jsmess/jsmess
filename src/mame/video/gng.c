@@ -24,7 +24,7 @@ static UINT8 scrolly[2];
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	unsigned char attr = gng_fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
@@ -34,7 +34,7 @@ static void get_fg_tile_info(int tile_index)
 			TILE_FLIPYX((attr & 0x30) >> 4))
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char attr = gng_bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(

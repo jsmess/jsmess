@@ -134,7 +134,7 @@ static UINT32 stadhero_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_row
 	return (col & 0xf) + ((row & 0xf) << 4) + ((row & 0x30) << 4) + ((col & 0x30) << 6);
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int tile,color;
 
@@ -149,7 +149,7 @@ static void get_pf2_tile_info(int tile_index)
 			0)
 }
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int tile=stadhero_pf1_data[tile_index];
 	int color=tile >> 12;

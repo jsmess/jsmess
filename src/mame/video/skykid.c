@@ -91,7 +91,7 @@ static UINT32 tx_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 	return offs;
 }
 
-static void tx_get_tile_info(int tile_index)
+static TILE_GET_INFO( tx_get_tile_info )
 {
 	/* the hardware has two character sets, one normal and one flipped. When
        screen is flipped, character flip is done by selecting the 2nd character set.
@@ -105,7 +105,7 @@ static void tx_get_tile_info(int tile_index)
 }
 
 
-static void bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( bg_get_tile_info )
 {
 	int code = skykid_videoram[tile_index];
 	int attr = skykid_videoram[tile_index+0x800];

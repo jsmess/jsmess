@@ -20,7 +20,7 @@ WRITE8_HANDLER( bsktball_videoram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = videoram[tile_index];
 	int code = ((attr & 0x0f) << 2) | ((attr & 0x30) >> 4);

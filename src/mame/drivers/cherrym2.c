@@ -48,7 +48,7 @@ static WRITE8_HANDLER( cm_colorram_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index];

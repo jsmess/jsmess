@@ -33,16 +33,16 @@ struct terminal
 
 static struct terminal *current_terminal;
 
-static void terminal_gettileinfo(int memory_offset)
+static TILE_GET_INFO(terminal_gettileinfo)
 {
 	int ch, gfxfont, code, color;
 	
-	ch = current_terminal->mem[memory_offset];
+	ch = current_terminal->mem[tile_index];
 	code = ch & ((1 << current_terminal->char_bits) - 1);
 	color = ch >> current_terminal->char_bits;
 	gfxfont = current_terminal->gfx;
 
-	if ((memory_offset == current_terminal->cur_offset) && !current_terminal->cur_hidden && current_terminal->getcursorcode)
+	if ((tile_index == current_terminal->cur_offset) && !current_terminal->cur_hidden && current_terminal->getcursorcode)
 		code = current_terminal->getcursorcode(code);
 
 	SET_TILE_INFO(

@@ -76,7 +76,7 @@ WRITE16_HANDLER( ddragon3_fg_videoram16_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT16 attr = ddragon3_bg_videoram16[tile_index];
 	int code = (attr & 0x0fff) | ((ddragon3_bg_tilebase & 0x01) << 12);
@@ -85,7 +85,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int offs = tile_index * 2;
 	UINT16 attr = ddragon3_fg_videoram16[offs];

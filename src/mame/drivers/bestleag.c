@@ -25,7 +25,7 @@ Changes 29/03/2005 - Pierpaolo Prazzoli
 UINT16 *bestleag_txram,*bestleag_bgram,*bestleag_fgram,*bestleag_vregs;
 static tilemap *tx_tilemap,*bg_tilemap,*fg_tilemap;
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int code = bestleag_txram[tile_index];
 
@@ -36,7 +36,7 @@ static void get_tx_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = bestleag_bgram[tile_index];
 
@@ -47,7 +47,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = bestleag_fgram[tile_index];
 

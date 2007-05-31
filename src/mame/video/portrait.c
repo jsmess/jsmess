@@ -29,7 +29,7 @@ WRITE8_HANDLER( portrait_fgvideo_write )
 	}
 }
 
-static void get_tile_info( const UINT8 *source, int tile_index )
+INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, const UINT8 *source )
 {
 	int attr    = source[tile_index*2+0];
 	int tilenum = source[tile_index*2+1];
@@ -55,14 +55,14 @@ static void get_tile_info( const UINT8 *source, int tile_index )
 	SET_TILE_INFO( 0, tilenum, color, flags )
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
-	get_tile_info( portrait_bgvideoram, tile_index );
+	get_tile_info( machine, tileinfo, tile_index, portrait_bgvideoram );
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
-	get_tile_info( portrait_fgvideoram, tile_index );
+	get_tile_info( machine, tileinfo, tile_index, portrait_fgvideoram );
 }
 
 VIDEO_START( portrait )

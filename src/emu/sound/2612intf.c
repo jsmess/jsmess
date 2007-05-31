@@ -17,7 +17,7 @@
 #include "sound/2612intf.h"
 
 
-#ifdef BUILD_YM2612
+#if (BUILD_YM2612)
 
 struct ym2612_info
 {

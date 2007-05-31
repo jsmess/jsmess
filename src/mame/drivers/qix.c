@@ -621,6 +621,10 @@ static MACHINE_DRIVER_START( qix )
 	MDRV_CPU_ADD_TAG("sound", M6802, SOUND_CLOCK_OSC/2/4)	/* 0.92 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
+	/* high interleave needed to ensure correct text in service mode */
+	/* Zookeeper settings and high score table seem especially sensitive to this */
+	MDRV_INTERLEAVE(1000)
+
 	MDRV_MACHINE_START(qix)
 	MDRV_MACHINE_RESET(qix)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -656,13 +660,6 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_MACHINE_START(qixmcu)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( elecyoyo )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcu)
-
-	MDRV_INTERLEAVE(100)	// fixes hang in attract mode
-MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zookeep )
 
@@ -1119,13 +1116,6 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( kram )
-{
-	/* we need to override one PIA handler to prevent controls from getting disabled */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9400, 0x97ff, 0, 0, zookeep_pia_0_w);
-}
-
-
 static DRIVER_INIT( kram3 )
 {
 	const UINT8 *patch;
@@ -1188,16 +1178,10 @@ static DRIVER_INIT( kram3 )
 
 		i += 4;
 	}
-
-	driver_init_kram(machine);
 }
 
 static DRIVER_INIT( zookeep )
 {
-	/* we need to override two PIA handlers to prevent controls from getting disabled */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1400, 0x17ff, 0, 0, zookeep_pia_0_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1c00, 0x1fff, 0, 0, zookeep_pia_2_w);
-
 	/* configure the banking */
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU2) + 0xa000, 0);
 	memory_configure_bank(1, 1, 1, memory_region(REGION_CPU2) + 0x10000, 0);
@@ -1225,10 +1209,10 @@ GAME( 1981, qixa,     qix,      qix,      qix,      0,        ROT270, "Taito Ame
 GAME( 1981, qixb,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, qix2,     qix,      qix,      qix,      0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
 GAME( 1981, sdungeon, 0,        mcu,      sdungeon, 0,        ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
-GAME( 1982, elecyoyo, 0,        elecyoyo, elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, elecyoy2, elecyoyo, elecyoyo, elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kram,     0,        mcu,      kram,     kram,     ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, kram2,    kram,     mcu,      kram,     kram,     ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, elecyoyo, 0,        mcu,      elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, elecyoy2, elecyoyo, mcu,      elecyoyo, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, kram,     0,        mcu,      kram,     0,        ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, kram2,    kram,     mcu,      kram,     0,        ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram3,    kram,     qix,      kram,     kram3,    ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep,  0,        zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zookeep2, zookeep,  zookeep,  zookeep,  zookeep,  ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", GAME_SUPPORTS_SAVE )

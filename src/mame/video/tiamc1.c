@@ -125,7 +125,7 @@ PALETTE_INIT( tiamc1 )
 	}
 }
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	int code = tiamc1_tileram[tile_index];
 
@@ -135,7 +135,7 @@ static void get_bg1_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, 0, 0)
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int code = tiamc1_tileram[tile_index + 1024];
 

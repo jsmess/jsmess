@@ -47,7 +47,7 @@ static void fitfight_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 	}
 }
 
-static void get_fof_bak_tile_info(int tile_index)
+static TILE_GET_INFO( get_fof_bak_tile_info )
 {
 	int code = fof_bak_tileram[tile_index*2+1];
 	int colr = fof_bak_tileram[tile_index*2] & 0x1f;
@@ -64,7 +64,7 @@ WRITE16_HANDLER(  fof_bak_tileram_w )
 }
 
 
-static void get_fof_mid_tile_info(int tile_index)
+static TILE_GET_INFO( get_fof_mid_tile_info )
 {
 	int code = fof_mid_tileram[tile_index*2+1];
 	int colr = fof_mid_tileram[tile_index*2] & 0x1f;
@@ -81,7 +81,7 @@ WRITE16_HANDLER( fof_mid_tileram_w )
 	tilemap_mark_tile_dirty(fof_mid_tilemap,offset/2);
 }
 
-static void get_fof_txt_tile_info(int tile_index)
+static TILE_GET_INFO( get_fof_txt_tile_info )
 {
 	int code = fof_txt_tileram[tile_index*2+1];
 	int colr = fof_txt_tileram[tile_index*2] & 0x1f;

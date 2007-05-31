@@ -99,7 +99,7 @@ static void reset_yscroll_callback(int param);
  *
  *************************************/
 
-static void get_alpha_tile_info(int tile_index)
+static TILE_GET_INFO( get_alpha_tile_info )
 {
 	UINT16 data = atarigen_alpha[tile_index];
 	int code = data & 0x3ff;
@@ -109,7 +109,7 @@ static void get_alpha_tile_info(int tile_index)
 }
 
 
-static void get_playfield_tile_info(int tile_index)
+static TILE_GET_INFO( get_playfield_tile_info )
 {
 	UINT16 data = atarigen_playfield[tile_index];
 	UINT16 lookup = playfield_lookup[((data >> 8) & 0x7f) | (playfield_tile_bank << 7)];

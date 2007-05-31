@@ -27,7 +27,7 @@ static void xexex_sprite_callback(int *code, int *color, int *priority_mask)
 	*color = sprite_colorbase | (c & 0x001f);
 }
 
-static void xexex_tile_callback(int layer, int *code, int *color)
+static void xexex_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = layer_colorbase[layer] | (*color>>2 & 0x0f);
 }

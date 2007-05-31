@@ -248,7 +248,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 }
 };
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index] + char_bank[tile_index] * 0x100;
 

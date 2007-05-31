@@ -7,14 +7,14 @@ static UINT16 ninjakd2_scrollx, ninjakd2_scrolly;
 static tilemap *fg_tilemap, *bg_tilemap;
 static mame_bitmap *bitmap_sp;	/* for sprite overdraw */
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = ((ninjakd2_bg_videoram[tile_index*2 + 1] & 0xc0) << 2) | ninjakd2_bg_videoram[tile_index*2];
 	int color = ninjakd2_bg_videoram[tile_index*2 + 1] & 0xf;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((ninjakd2_bg_videoram[tile_index*2 + 1] & 0x30) >> 4))
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = ((ninjakd2_fg_videoram[tile_index*2 + 1] & 0xc0) << 2) | ninjakd2_fg_videoram[tile_index*2];
 	int color = ninjakd2_fg_videoram[tile_index*2 + 1] & 0xf;

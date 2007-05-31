@@ -20,7 +20,7 @@ UINT8 *angelkds_txvideoram, *angelkds_bgbotvideoram, *angelkds_bgtopvideoram;
 static int angelkds_txbank;
 
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int tileno;
 
@@ -56,7 +56,7 @@ if (angelkds_txbank != data)
 static int angelkds_bgtopbank;
 
 
-static void get_bgtop_tile_info(int tile_index)
+static TILE_GET_INFO( get_bgtop_tile_info )
 {
 	int tileno;
 
@@ -97,7 +97,7 @@ WRITE8_HANDLER( angelkds_bgtopscroll_write )
 
 static int angelkds_bgbotbank;
 
-static void get_bgbot_tile_info(int tile_index)
+static TILE_GET_INFO( get_bgbot_tile_info )
 {
 	int tileno;
 

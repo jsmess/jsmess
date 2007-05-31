@@ -177,7 +177,7 @@ static const int        ENVCNT[ 0x20 ]
                                     /* Returns SUSTAIN rate         */
 
 /* Handle endianness */
-#ifdef MSB_FIRST
+#ifndef LSB_FIRST
 #define LEtoME16( x )                                                \
     ( ( ( ( x ) >> 8 ) & 0xFF ) | ( ( ( x ) << 8 ) & 0xFF00 ) )
 #define MEtoLE16( x )                                                \

@@ -28,7 +28,7 @@ static UINT32 flyball_get_memory_offset(UINT32 col, UINT32 row, UINT32 num_cols,
 }
 
 
-static void flyball_get_tile_info(int tile_index)
+static TILE_GET_INFO( flyball_get_tile_info )
 {
 	UINT8 data = flyball_playfield_ram[tile_index];
 

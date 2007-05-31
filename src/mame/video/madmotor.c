@@ -28,7 +28,7 @@ static UINT32 pf1_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x20) << 5) + ((col & 0x20) << 6);
 }
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int tile,color;
 
@@ -50,7 +50,7 @@ static UINT32 pf2_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x10) << 5);
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int tile,color;
 
@@ -72,7 +72,7 @@ static UINT32 pf3_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x30) << 4) + ((col & 0x10) << 6);
 }
 
-static void get_pf3_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3_tile_info )
 {
 	int tile,color;
 
@@ -94,7 +94,7 @@ static UINT32 pf3a_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4);
 }
 
-static void get_pf3a_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3a_tile_info )
 {
 	int tile,color;
 

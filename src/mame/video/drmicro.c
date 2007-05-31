@@ -40,7 +40,7 @@ READ8_HANDLER( drmicro_videoram_r )
 
 /****************************************************************************/
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	int code,col,flags;
 
@@ -54,7 +54,7 @@ static void get_bg1_tile_info(int tile_index)
 	SET_TILE_INFO( 0, code, col, flags)
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int code,col,flags;
 

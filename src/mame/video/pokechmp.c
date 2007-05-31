@@ -22,7 +22,7 @@ WRITE8_HANDLER( pokechmp_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index*2+1] + ((videoram[tile_index*2] & 0x3f) << 8);
 	int color = videoram[tile_index*2] >> 6;

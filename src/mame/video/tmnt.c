@@ -16,7 +16,7 @@ static tilemap *roz_tilemap;
 
 static int glfgreat_roz_rom_bank,glfgreat_roz_char_bank,glfgreat_roz_rom_mode;
 
-static void glfgreat_get_roz_tile_info(int tile_index)
+static TILE_GET_INFO( glfgreat_get_roz_tile_info )
 {
 	UINT8 *rom = memory_region(REGION_USER1);
 	int code;
@@ -28,7 +28,7 @@ static void glfgreat_get_roz_tile_info(int tile_index)
 	SET_TILE_INFO(0,code & 0x3fff,code >> 14,0)
 }
 
-static void prmrsocr_get_roz_tile_info(int tile_index)
+static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
 {
 	UINT8 *rom = memory_region(REGION_USER1);
 	int code = rom[tile_index+0x20000] + 256*rom[tile_index];
@@ -46,9 +46,9 @@ static void prmrsocr_get_roz_tile_info(int tile_index)
 
 /* Missing in Action */
 
-static void mia_tile_callback(int layer,int bank,int *code,int *color)
+static void mia_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
-	tile_info.flags = (*color & 0x04) ? TILE_FLIPX : 0;
+	*flags = (*color & 0x04) ? TILE_FLIPX : 0;
 	if (layer == 0)
 	{
 		*code |= ((*color & 0x01) << 8);
@@ -61,7 +61,7 @@ static void mia_tile_callback(int layer,int bank,int *code,int *color)
 	}
 }
 
-static void cuebrckj_tile_callback(int layer,int bank,int *code,int *color)
+static void cuebrckj_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	if (layer == 0)
 	{
@@ -75,14 +75,14 @@ static void cuebrckj_tile_callback(int layer,int bank,int *code,int *color)
 	}
 }
 
-static void tmnt_tile_callback(int layer,int bank,int *code,int *color)
+static void tmnt_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9)
 			| (bank << 13);
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-static void ssbl_tile_callback(int layer,int bank,int *code,int *color)
+static void ssbl_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	if (layer == 0)
 	{
@@ -101,7 +101,7 @@ static void ssbl_tile_callback(int layer,int bank,int *code,int *color)
 
 static int detatwin_rombank;
 
-static void detatwin_tile_callback(int layer,int bank,int *code,int *color)
+static void detatwin_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8)

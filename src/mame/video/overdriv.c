@@ -27,16 +27,16 @@ static void overdriv_sprite_callback(int *code,int *color,int *priority_mask)
 
 ***************************************************************************/
 
-static void zoom_callback_0(int *code,int *color)
+static void zoom_callback_0(int *code,int *color,int *flags)
 {
-	tile_info.flags = (*color & 0x40) ? TILE_FLIPX : 0;
+	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = zoom_colorbase[0] + ((*color & 0x3c) >> 2);
 }
 
-static void zoom_callback_1(int *code,int *color)
+static void zoom_callback_1(int *code,int *color,int *flags)
 {
-	tile_info.flags = (*color & 0x40) ? TILE_FLIPX : 0;
+	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = zoom_colorbase[1] + ((*color & 0x3c) >> 2);
 }

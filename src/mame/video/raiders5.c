@@ -34,7 +34,7 @@ static tilemap *foreground_tilemap;
  *
  *************************************/
 
-static void get_background_tile_info(int tile_index)
+static TILE_GET_INFO( get_background_tile_info )
 {
 	UINT8 bank = ((raiders5_background_colorram[tile_index] >> 1) & 0x01) + 3;  /* ? */
 
@@ -47,7 +47,7 @@ static void get_background_tile_info(int tile_index)
 }
 
 
-static void get_foreground_tile_info(int tile_index)
+static TILE_GET_INFO( get_foreground_tile_info )
 {
 	UINT16 code = raiders5_foreground_videoram[tile_index];
 

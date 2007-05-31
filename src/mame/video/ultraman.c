@@ -30,19 +30,19 @@ static void sprite_callback(int *code,int *color,int *priority,int *shadow)
 
 ***************************************************************************/
 
-static void zoom_callback_0(int *code,int *color)
+static void zoom_callback_0(int *code,int *color,int *flags)
 {
 	*code |= ((*color & 0x07) << 8) | (bank0 << 11);
 	*color = zoom_colorbase[0] + ((*color & 0xf8) >> 3);
 }
 
-static void zoom_callback_1(int *code,int *color)
+static void zoom_callback_1(int *code,int *color,int *flags)
 {
 	*code |= ((*color & 0x07) << 8) | (bank1 << 11);
 	*color = zoom_colorbase[1] + ((*color & 0xf8) >> 3);
 }
 
-static void zoom_callback_2(int *code,int *color)
+static void zoom_callback_2(int *code,int *color,int *flags)
 {
 	*code |= ((*color & 0x07) << 8) | (bank2 << 11);
 	*color = zoom_colorbase[2] + ((*color & 0xf8) >> 3);

@@ -94,7 +94,7 @@ VIDEO_UPDATE( suna8 );
 static tilemap *bg_tilemap;
 static int tiles, rombank, page;
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code, attr;
 	if (code_pressed(KEYCODE_X))

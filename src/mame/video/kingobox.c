@@ -178,7 +178,7 @@ WRITE8_HANDLER( kingofb_f800_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int bank = ((attr & 0x04) >> 2) + 2;
@@ -188,7 +188,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(bank, code, color, 0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = kingofb_colorram2[tile_index];
 	int bank = (attr & 0x02) >> 1;
@@ -252,7 +252,7 @@ VIDEO_UPDATE( kingofb )
 
 /* Ring King */
 
-static void ringking_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( ringking_get_bg_tile_info )
 {
 	int code = (tile_index / 16) ? videoram[tile_index] : 0;
 	int color = ((colorram[tile_index] & 0x70) >> 4) + 8 * palette_bank;

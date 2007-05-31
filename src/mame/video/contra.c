@@ -61,7 +61,7 @@ PALETTE_INIT( contra )
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = contra_fg_cram[tile_index];
 	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;
@@ -85,7 +85,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = contra_bg_cram[tile_index];
 	int bit0 = (K007121_ctrlram[1][0x05] >> 0) & 0x03;
@@ -109,7 +109,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int attr = contra_text_cram[tile_index];
 	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;

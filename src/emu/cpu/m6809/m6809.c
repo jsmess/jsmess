@@ -442,7 +442,7 @@ static void m6809_reset(void)
 	m6809.int_state = 0;
 	m6809.nmi_state = CLEAR_LINE;
 	m6809.irq_state[0] = CLEAR_LINE;
-	m6809.irq_state[0] = CLEAR_LINE;
+	m6809.irq_state[1] = CLEAR_LINE;
 
 	DPD = 0;			/* Reset direct page register */
 
@@ -1184,7 +1184,7 @@ void m6809_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6809");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 6809");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.11");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) John Butler 1997"); break;
 

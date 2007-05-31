@@ -32,7 +32,7 @@ static void moo_sprite_callback(int *code, int *color, int *priority_mask)
 	*color = sprite_colorbase | (*color & 0x001f);
 }
 
-static void moo_tile_callback(int layer, int *code, int *color)
+static void moo_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = layer_colorbase[layer] | (*color>>2 & 0x0f);
 }

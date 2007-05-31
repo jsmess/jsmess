@@ -9,7 +9,7 @@ int shangkid_gfx_type;
 
 
 
-static void get_bg_tile_info(int tile_index){
+static TILE_GET_INFO( get_bg_tile_info ){
 	int attributes = videoram[tile_index+0x800];
 	int tile_number = videoram[tile_index]+0x100*(attributes&0x3);
 	int color;
@@ -44,7 +44,7 @@ static void get_bg_tile_info(int tile_index){
 				(attributes&0x80)?TILE_FLIPX:0)
 	}
 
-	tile_info.priority =
+	tileinfo->priority =
 		(memory_region( REGION_PROMS )[0x800+color*4]==2)?1:0;
 }
 

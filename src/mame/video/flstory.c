@@ -14,13 +14,13 @@ static int char_bank,palette_bank,flipscreen,gfxctrl;
 UINT8 *flstory_scrlram;
 
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index*2];
 	int attr = videoram[tile_index*2+1];
 	int tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * char_bank;
 	int flags = TILE_FLIPYX((attr & 0x18) >> 3) | TILE_SPLIT((attr & 0x20) >> 5);
-	tile_info.priority = (attr & 0x20) >> 5;
+	tileinfo->priority = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
 			0,
 			tile_number,
@@ -28,7 +28,7 @@ static void get_tile_info(int tile_index)
 			flags)
 }
 
-static void victnine_get_tile_info(int tile_index)
+static TILE_GET_INFO( victnine_get_tile_info )
 {
 	int code = videoram[tile_index*2];
 	int attr = videoram[tile_index*2+1];

@@ -140,7 +140,7 @@ WRITE8_HANDLER( m92_paletteram_w )
 
 /*****************************************************************************/
 
-static void get_pf1_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int tile,color,pri;
 	tile_index = 4*tile_index+pf1_vram_ptr;
@@ -158,7 +158,7 @@ static void get_pf1_tile_info(int tile_index)
 			TILE_FLIPYX((m92_vram_data[tile_index+3] & 0x6)>>1) | TILE_SPLIT(pri))
 }
 
-static void get_pf2_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf2_vram_ptr;
@@ -176,7 +176,7 @@ static void get_pf2_tile_info(int tile_index)
 			TILE_FLIPYX((m92_vram_data[tile_index+3] & 0x6)>>1) | TILE_SPLIT(pri))
 }
 
-static void get_pf3_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3_tile_info )
 {
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf3_vram_ptr;
@@ -193,7 +193,7 @@ static void get_pf3_tile_info(int tile_index)
 			TILE_FLIPYX((m92_vram_data[tile_index+3] & 0x6)>>1) | TILE_SPLIT(pri))
 }
 
-static void get_pf1_wide_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf1_wide_tile_info )
 {
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf1_vram_ptr;
@@ -211,7 +211,7 @@ static void get_pf1_wide_tile_info(int tile_index)
 			TILE_FLIPYX((m92_vram_data[tile_index+3] & 0x6)>>1) | TILE_SPLIT(pri))
 }
 
-static void get_pf3_wide_tile_info(int tile_index)
+static TILE_GET_INFO( get_pf3_wide_tile_info )
 {
 	int tile,color,pri;
 	tile_index = 4*tile_index + pf3_vram_ptr;

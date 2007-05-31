@@ -125,7 +125,7 @@ WRITE8_HANDLER( yunsung8_flipscreen_w )
 #define DIM_NX_0			(0x40)
 #define DIM_NY_0			(0x20)
 
-static void get_tile_info_0( int tile_index )
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	int code  =  yunsung8_videoram_0[0x1000+tile_index * 2 + 0] + yunsung8_videoram_0[0x1000+tile_index * 2 + 1] * 256;
 	int color =  yunsung8_videoram_0[0x0800+ tile_index] & 0x07;
@@ -141,7 +141,7 @@ static void get_tile_info_0( int tile_index )
 #define DIM_NX_1			(0x40)
 #define DIM_NY_1			(0x20)
 
-static void get_tile_info_1( int tile_index )
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	int code  =  yunsung8_videoram_1[0x1000+ tile_index * 2 + 0] + yunsung8_videoram_1[0x1000+tile_index * 2 + 1] * 256;
 	int color =  yunsung8_videoram_1[0x0800+ tile_index] & 0x3f;

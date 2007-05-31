@@ -30,7 +30,7 @@ static UINT8 *hitme_vidram;
  *
  *************************************/
 
-static void get_hitme_tile_info(int tile_index)
+static TILE_GET_INFO( get_hitme_tile_info )
 {
 	/* the code is the low 6 bits */
 	UINT8 code = hitme_vidram[tile_index] & 0x3f;

@@ -54,7 +54,7 @@ UINT16 *fuuki16_vregs,  *fuuki16_priority, *fuuki16_unknown;
 \
 static tilemap *tilemap_##_N_; \
 \
-static void get_tile_info_##_N_(int tile_index) \
+static TILE_GET_INFO( get_tile_info_##_N_ ) \
 { \
 	UINT16 code = fuuki16_vram_##_N_[ 2 * tile_index + 0 ]; \
 	UINT16 attr = fuuki16_vram_##_N_[ 2 * tile_index + 1 ]; \

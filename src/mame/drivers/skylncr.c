@@ -28,7 +28,7 @@ static WRITE8_HANDLER( skylncr_colorram_w )
 	tilemap_mark_tile_dirty(tmap, offset);
 }
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 code = skylncr_videoram[ tile_index ] + (skylncr_colorram[ tile_index ] << 8);
 	SET_TILE_INFO(0, code, 0, TILE_FLIPYX( 0 ));
@@ -47,7 +47,7 @@ static WRITE8_HANDLER( skylncr_colorram2_w )
 	tilemap_mark_tile_dirty(tmap2, offset);
 }
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	UINT16 code = skylncr_videoram2[ tile_index ] + (skylncr_colorram2[ tile_index ] << 8);
 	SET_TILE_INFO(1, code, 0, TILE_FLIPYX( 0 ));

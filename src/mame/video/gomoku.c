@@ -63,7 +63,7 @@ PALETTE_INIT( gomoku )
 
 ******************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = (gomoku_videoram[tile_index]);
 	int attr = (gomoku_colorram[tile_index]);

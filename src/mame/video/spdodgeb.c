@@ -59,7 +59,7 @@ static UINT32 background_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char code = spdodgeb_videoram[tile_index];
 	unsigned char attr = spdodgeb_videoram[tile_index + 0x800];

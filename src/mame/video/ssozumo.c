@@ -126,7 +126,7 @@ WRITE8_HANDLER( ssozumo_flipscreen_w )
 	flip_screen_set(data & 0x80);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x08) << 5);
 	int color = (colorram[tile_index] & 0x30) >> 4;
@@ -135,7 +135,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = ssozumo_videoram2[tile_index] + 256 * (ssozumo_colorram2[tile_index] & 0x07);
 	int color = (ssozumo_colorram2[tile_index] & 0x30) >> 4;

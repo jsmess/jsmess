@@ -63,7 +63,7 @@ WRITE8_HANDLER( flip_screen_w )
 	flip_screen_set(data);
 }
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = tecfri_videoram[tile_index] + ((tecfri_colorram[tile_index] & 0x07) << 8);
 	int color = (tecfri_colorram[tile_index] >> 4) & 0x0f;
@@ -72,7 +72,7 @@ static void get_tile_info_bg(int tile_index)
 	SET_TILE_INFO(0, code, color, flags)
 }
 
-static void get_tile_info_fg(int tile_index)
+static TILE_GET_INFO( get_tile_info_fg )
 {
 	int code = tecfri_videoram2[tile_index] + ((tecfri_colorram2[tile_index] & 0x07) << 8);
 	int color = (tecfri_colorram2[tile_index] >> 4) & 0x0f;

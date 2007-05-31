@@ -17,7 +17,7 @@ extern UINT16 *drgnmst_rowscrollram;
 extern UINT16 *drgnmst_vidregs2;
 
 
-static void get_drgnmst_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_drgnmst_fg_tile_info )
 {
 	int tileno,colour, flipyx;
 	tileno = drgnmst_fg_videoram[tile_index*2] & 0xfff;
@@ -35,7 +35,7 @@ WRITE16_HANDLER( drgnmst_fg_videoram_w )
 
 
 
-static void get_drgnmst_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_drgnmst_bg_tile_info )
 {
 	int tileno,colour,flipyx;
 	tileno = (drgnmst_bg_videoram[tile_index*2]& 0x1fff)+0x800;
@@ -51,7 +51,7 @@ WRITE16_HANDLER( drgnmst_bg_videoram_w )
 	tilemap_mark_tile_dirty(drgnmst_bg_tilemap,offset/2);
 }
 
-static void get_drgnmst_md_tile_info(int tile_index)
+static TILE_GET_INFO( get_drgnmst_md_tile_info )
 {
 	int tileno,colour,flipyx;
 	tileno = (drgnmst_md_videoram[tile_index*2]& 0x7fff)-0x2000;

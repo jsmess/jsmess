@@ -68,7 +68,7 @@ WRITE16_HANDLER( prehisle_control16_w )
 	}
 }
 
-static void get_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg2_tile_info )
 {
 	UINT8 *tilerom = memory_region(REGION_GFX5);
 
@@ -81,7 +81,7 @@ static void get_bg2_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = prehisle_bg_videoram16[tile_index];
 	int code = attr & 0x7ff;
@@ -91,7 +91,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(2, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = videoram16[tile_index];
 	int code = attr & 0xfff;

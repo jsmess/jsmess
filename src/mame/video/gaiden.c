@@ -19,7 +19,7 @@ static mame_bitmap *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT16 *videoram1 = &gaiden_videoram3[0x0800];
 	UINT16 *videoram2 = gaiden_videoram3;
@@ -30,7 +30,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT16 *videoram1 = &gaiden_videoram2[0x0800];
 	UINT16 *videoram2 = gaiden_videoram2;
@@ -41,22 +41,22 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info_raiga(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info_raiga )
 {
 	UINT16 *videoram1 = &gaiden_videoram2[0x0800];
 	UINT16 *videoram2 = gaiden_videoram2;
 
 	/* bit 3 controls blending */
-	tile_info.priority = (videoram2[tile_index] & 0x08) >> 3;
+	tileinfo->priority = (videoram2[tile_index] & 0x08) >> 3;
 
 	SET_TILE_INFO(
 			2,
 			videoram1[tile_index] & 0x0fff,
-			((videoram2[tile_index] & 0xf0) >> 4) | (tile_info.priority ? 0x80 : 0x00),
+			((videoram2[tile_index] & 0xf0) >> 4) | (tileinfo->priority ? 0x80 : 0x00),
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	UINT16 *videoram1 = &gaiden_videoram[0x0400];
 	UINT16 *videoram2 = gaiden_videoram;

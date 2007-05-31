@@ -66,7 +66,7 @@ static UINT32 background_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char attr = ddragon_bgvideoram[2*tile_index];
 	SET_TILE_INFO(
@@ -76,7 +76,7 @@ static void get_bg_tile_info(int tile_index)
 			TILE_FLIPYX((attr & 0xc0) >> 6))
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	unsigned char attr = ddragon_fgvideoram[2*tile_index];
 	SET_TILE_INFO(
@@ -86,7 +86,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_16color_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_16color_tile_info )
 {
 	unsigned char attr = ddragon_fgvideoram[2*tile_index];
 	SET_TILE_INFO(

@@ -40,7 +40,7 @@ static void crtc_interrupt_gen(int param);
  *
  *************************************/
 
-INLINE void get_fromance_tile_info(int tile_index,int layer)
+INLINE void get_fromance_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer)
 {
 	int tile = ((local_videoram[layer][0x0000 + tile_index] & 0x80) << 9) |
 				(local_videoram[layer][0x1000 + tile_index] << 8) |
@@ -50,10 +50,10 @@ INLINE void get_fromance_tile_info(int tile_index,int layer)
 	SET_TILE_INFO(layer, tile, color, 0);
 }
 
-static void get_fromance_bg_tile_info(int tile_index) { get_fromance_tile_info(tile_index, 0); }
-static void get_fromance_fg_tile_info(int tile_index) { get_fromance_tile_info(tile_index, 1); }
+static TILE_GET_INFO( get_fromance_bg_tile_info ) { get_fromance_tile_info(machine,tileinfo,tile_index, 0); }
+static TILE_GET_INFO( get_fromance_fg_tile_info ) { get_fromance_tile_info(machine,tileinfo,tile_index, 1); }
 
-INLINE void get_nekkyoku_tile_info(int tile_index,int layer)
+INLINE void get_nekkyoku_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer)
 {
 	int tile = (local_videoram[layer][0x0000 + tile_index] << 8) |
 				local_videoram[layer][0x1000 + tile_index];
@@ -62,8 +62,8 @@ INLINE void get_nekkyoku_tile_info(int tile_index,int layer)
 	SET_TILE_INFO(layer, tile, color, 0);
 }
 
-static void get_nekkyoku_bg_tile_info(int tile_index) { get_nekkyoku_tile_info(tile_index, 0); }
-static void get_nekkyoku_fg_tile_info(int tile_index) { get_nekkyoku_tile_info(tile_index, 1); }
+static TILE_GET_INFO( get_nekkyoku_bg_tile_info ) { get_nekkyoku_tile_info(machine, tileinfo, tile_index, 0); }
+static TILE_GET_INFO( get_nekkyoku_fg_tile_info ) { get_nekkyoku_tile_info(machine, tileinfo, tile_index, 1); }
 
 
 

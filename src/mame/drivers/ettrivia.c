@@ -167,7 +167,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 }
 };
 
-INLINE void get_tile_info(int tile_index, UINT8 *vidram, int gfx_code)
+INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT8 *vidram, int gfx_code)
 {
 	int code = vidram[tile_index];
 	int color = (code >> 5) + 8 * palreg;
@@ -177,14 +177,14 @@ INLINE void get_tile_info(int tile_index, UINT8 *vidram, int gfx_code)
 	SET_TILE_INFO(gfx_code,code,color,0)
 }
 
-static void get_tile_info_bg(int tile_index)
+static TILE_GET_INFO( get_tile_info_bg )
 {
-	get_tile_info(tile_index, bg_videoram, 0);
+	get_tile_info(machine, tileinfo, tile_index, bg_videoram, 0);
 }
 
-static void get_tile_info_fg(int tile_index)
+static TILE_GET_INFO( get_tile_info_fg )
 {
-	get_tile_info(tile_index, fg_videoram, 1);
+	get_tile_info(machine, tileinfo, tile_index, fg_videoram, 1);
 }
 
 VIDEO_START( ettrivia )

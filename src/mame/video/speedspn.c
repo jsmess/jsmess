@@ -10,7 +10,7 @@ static int speedspn_bank_vidram = 0;
 static UINT8* speedspn_vidram;
 
 
-static void get_speedspn_tile_info(int tile_index)
+static TILE_GET_INFO( get_speedspn_tile_info )
 {
 	int code = speedspn_vidram[tile_index*2+1] | (speedspn_vidram[tile_index*2] << 8);
 	int attr = speedspn_attram[tile_index^0x400];

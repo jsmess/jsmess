@@ -23,7 +23,7 @@ static tilemap *tx_tilemap,*fg_tilemap,*bg_tilemap;
 
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = wc90_bgvideoram[tile_index];
 	int tile = wc90_bgvideoram[tile_index + 0x800] +
@@ -35,7 +35,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = wc90_fgvideoram[tile_index];
 	int tile = wc90_fgvideoram[tile_index + 0x800] +
@@ -47,7 +47,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	SET_TILE_INFO(
 			0,
@@ -56,7 +56,7 @@ static void get_tx_tile_info(int tile_index)
 			0)
 }
 
-static void track_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( track_get_bg_tile_info )
 {
 	int attr = wc90_bgvideoram[tile_index];
 	int tile = wc90_bgvideoram[tile_index + 0x800] +
@@ -68,7 +68,7 @@ static void track_get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void track_get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( track_get_fg_tile_info )
 {
 	int attr = wc90_fgvideoram[tile_index];
 	int tile = wc90_fgvideoram[tile_index + 0x800] +

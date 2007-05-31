@@ -310,7 +310,7 @@ WRITE8_HANDLER( sraider_io_w )
 	redclash_set_stars_speed((data&0x07) - 1);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + 32 * (colorram[tile_index] & 0x08);
 	int color = colorram[tile_index] & 0x07;
@@ -318,7 +318,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void get_grid_tile_info(int tile_index)
+static TILE_GET_INFO( get_grid_tile_info )
 {
 	if (tile_index < 512)
 		SET_TILE_INFO(3, tile_index, 0, 0)

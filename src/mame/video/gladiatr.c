@@ -23,7 +23,7 @@ static int fg_tile_bank, bg_tile_bank;
 
 ***************************************************************************/
 
-static void bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( bg_get_tile_info )
 {
 	unsigned char attr = gladiatr_colorram[tile_index];
 
@@ -34,7 +34,7 @@ static void bg_get_tile_info(int tile_index)
 			0)
 }
 
-static void fg_get_tile_info(int tile_index)
+static TILE_GET_INFO( fg_get_tile_info )
 {
 	SET_TILE_INFO(
 			0,

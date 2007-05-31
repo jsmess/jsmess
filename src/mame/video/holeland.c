@@ -18,7 +18,7 @@ static tilemap *bg_tilemap;
 
 ***************************************************************************/
 
-static void holeland_get_tile_info(int tile_index)
+static TILE_GET_INFO( holeland_get_tile_info )
 {
 	int attr = colorram[tile_index];
 	int tile_number = videoram[tile_index] | ((attr & 0x03) << 8);
@@ -34,7 +34,7 @@ static void holeland_get_tile_info(int tile_index)
 			TILE_FLIPYX((attr >> 2) & 0x03) | TILE_SPLIT((attr >> 4) & 1))
 }
 
-static void crzrally_get_tile_info(int tile_index)
+static TILE_GET_INFO( crzrally_get_tile_info )
 {
 	int attr = colorram[tile_index];
 	int tile_number = videoram[tile_index] | ((attr & 0x03) << 8);

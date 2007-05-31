@@ -1,50 +1,68 @@
 /***************************************************************************
 
-Cinematronics Embargo driver
+    Cinematronics Embargo driver
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/s2650/s2650.h"
 
-static int dial_enable_1;
-static int dial_enable_2;
 
-static int input_select;
+static UINT8 *embargo_videoram;
+static size_t embargo_videoram_size;
+
+static UINT8 dial_enable_1;
+static UINT8 dial_enable_2;
+static UINT8 input_select;
 
 
+
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
 
 static VIDEO_UPDATE( embargo )
 {
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	offs_t offs;
+
+	for (offs = 0; offs < embargo_videoram_size; offs++)
+	{
+		int i;
+
+		UINT8 x = offs << 3;
+		UINT8 y = offs >> 5;
+		UINT8 data = embargo_videoram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x01) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			data = data >> 1;
+			x = x + 1;
+		}
+	}
+
 	return 0;
 }
 
 
-static WRITE8_HANDLER( embargo_videoram_w )
-{
-	int col = offset % 32;
-	int row = offset / 32;
 
-	int i;
+/*************************************
+ *
+ *  Input handling
+ *
+ *************************************/
 
-	for (i = 0; i < 8; i++)
-	{
-		pen_t pen = ((data >> i) & 1) ? RGB_WHITE : RGB_BLACK;
-		*BITMAP_ADDR32(tmpbitmap, row, 8 * col + i) = pen;
-	}
-
-	videoram[offset] = data;
-}
-
-
-static READ8_HANDLER( embargo_input_r )
+static READ8_HANDLER( input_port_bit_r )
 {
 	return (readinputport(1) << (7 - input_select)) & 0x80;
 }
 
 
-static READ8_HANDLER( embargo_dial_r )
+static READ8_HANDLER( dial_r )
 {
 	UINT8 lo = 0;
 	UINT8 hi = 0;
@@ -58,8 +76,8 @@ static READ8_HANDLER( embargo_dial_r )
 
 	static const UINT8 map[] =
 	{
-		0x0, 0xB, 0x1, 0x2, 0x4, 0x4, 0x2, 0x3,
-		0x9, 0xA, 0x8, 0x9, 0x8, 0x5, 0x7, 0x6
+		0x00, 0x0b, 0x01, 0x02, 0x04, 0x04, 0x02, 0x03,
+		0x09, 0x0a, 0x08, 0x09, 0x08, 0x05, 0x07, 0x06
 	};
 
 	if (dial_enable_1 && !dial_enable_2)
@@ -67,6 +85,7 @@ static READ8_HANDLER( embargo_dial_r )
 		lo = readinputport(3);
 		hi = readinputport(4);
 	}
+
 	if (dial_enable_2 && !dial_enable_1)
 	{
 		lo = readinputport(5);
@@ -82,62 +101,91 @@ static READ8_HANDLER( embargo_dial_r )
 		{
 			mapped_lo = i;
 		}
+
 		if (map[i] == hi)
 		{
 			mapped_hi = i;
 		}
 	}
 
-	return 16 * mapped_hi + mapped_lo;
+	return (mapped_hi << 4) | mapped_lo;
 }
 
 
-static WRITE8_HANDLER( embargo_port1_w )
+static WRITE8_HANDLER( port_1_w )
 {
-	dial_enable_1 = data & 1; /* other bits unknown */
+	dial_enable_1 = data & 0x01; /* other bits unknown */
 }
-static WRITE8_HANDLER( embargo_port2_w )
+
+
+static WRITE8_HANDLER( port_2_w )
 {
-	dial_enable_2 = data & 1; /* other bits unknown */
+	dial_enable_2 = data & 0x01; /* other bits unknown */
 }
 
 
-static WRITE8_HANDLER( embargo_input_w )
+static WRITE8_HANDLER( input_select_w )
 {
-	input_select = data & 7;
+	input_select = data & 0x07;
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x1e00, 0x3dff) AM_READ(MRA8_RAM)
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( embargo )
+{
+	/* register for state saving */
+	state_save_register_global(dial_enable_1);
+	state_save_register_global(dial_enable_2);
+	state_save_register_global(input_select);
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1e00, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&embargo_videoram) AM_SIZE(&embargo_videoram_size)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x3dff) AM_WRITE(embargo_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-ADDRESS_MAP_END
 
+/*************************************
+ *
+ *  Port handlers
+ *
+ *************************************/
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(embargo_dial_r)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(input_port_2_r)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(embargo_input_r)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_WRITE(embargo_port1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(embargo_port2_w)
+static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_0_r, port_1_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(dial_r, port_2_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(MWA8_NOP) /* always 0xFE */
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(embargo_input_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(input_port_2_r)
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(input_port_bit_r, input_select_w)
 ADDRESS_MAP_END
 
 
-INPUT_PORTS_START( embargo )
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
+static INPUT_PORTS_START( embargo )
 
 	PORT_START /* port 0x01 */
 	PORT_DIPNAME( 0x03, 0x00, "Rounds" )
@@ -161,36 +209,54 @@ INPUT_PORTS_START( embargo )
 
 	PORT_START
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(1)
+
 	PORT_START
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(2)
+
 	PORT_START
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(3)
+
 	PORT_START
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(4)
 
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( embargo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(S2650, 625000)
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_IO_MAP(readport, writeport)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(main_io_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_MACHINE_START(embargo)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_UPDATE(embargo)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(embargo)
+	MDRV_SCREEN_REFRESH_RATE(60)
 
-	/* sound hardware */
 MACHINE_DRIVER_END
 
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( embargo )
 	ROM_REGION( 0x8000, REGION_CPU1, 0 )
@@ -205,4 +271,11 @@ ROM_START( embargo )
 ROM_END
 
 
-GAME( 1977, embargo, 0, embargo, embargo, 0, ROT0, "Cinematronics", "Embargo", GAME_NO_SOUND )
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1977, embargo, 0, embargo, embargo, 0, ROT0, "Cinematronics", "Embargo", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

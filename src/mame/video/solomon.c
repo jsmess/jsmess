@@ -50,7 +50,7 @@ WRITE8_HANDLER( solomon_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = solomon_colorram2[tile_index];
 	int code = solomon_videoram2[tile_index] + 256 * (attr & 0x07);
@@ -60,7 +60,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + 256 * (attr & 0x07);

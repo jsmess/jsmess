@@ -77,7 +77,7 @@ WRITE8_HANDLER( commando_c804_w )
 	flip_screen_set(data & 0x80);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0xc0) << 2);
@@ -87,7 +87,7 @@ static void get_bg_tile_info(int tile_index)
 	SET_TILE_INFO(1, code, color, flags)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = commando_colorram2[tile_index];
 	int code = commando_videoram2[tile_index] + ((attr & 0xc0) << 2);

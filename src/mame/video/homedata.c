@@ -406,7 +406,7 @@ PALETTE_INIT( pteacher )
 
 ***************************************************************************/
 
-INLINE void mrokumei_info0( int tile_index, int page, int gfxbank )
+INLINE void mrokumei_info0( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x2000 * page;
 	int attr  = videoram[addr];
@@ -415,7 +415,7 @@ INLINE void mrokumei_info0( int tile_index, int page, int gfxbank )
 
 	SET_TILE_INFO( 0, code, color, homedata_flipscreen );
 }
-INLINE void mrokumei_info1( int tile_index, int page, int gfxbank )
+INLINE void mrokumei_info1( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
 	int attr  = videoram[addr];
@@ -425,13 +425,13 @@ INLINE void mrokumei_info1( int tile_index, int page, int gfxbank )
 	SET_TILE_INFO( 1, code, color, homedata_flipscreen );
 }
 
-static void mrokumei_get_info0_0(int tile_index) { mrokumei_info0( tile_index, 0,  blitter_bank & 0x03 ); }
-static void mrokumei_get_info1_0(int tile_index) { mrokumei_info0( tile_index, 1,  blitter_bank & 0x03 ); }
-static void mrokumei_get_info0_1(int tile_index) { mrokumei_info1( tile_index, 0, (blitter_bank & 0x38) >> 3 ); }
-static void mrokumei_get_info1_1(int tile_index) { mrokumei_info1( tile_index, 1, (blitter_bank & 0x38) >> 3 ); }
+static TILE_GET_INFO( mrokumei_get_info0_0 ) { mrokumei_info0( machine, tileinfo, tile_index, 0,  blitter_bank & 0x03 ); }
+static TILE_GET_INFO( mrokumei_get_info1_0 ) { mrokumei_info0( machine, tileinfo, tile_index, 1,  blitter_bank & 0x03 ); }
+static TILE_GET_INFO( mrokumei_get_info0_1 ) { mrokumei_info1( machine, tileinfo, tile_index, 0, (blitter_bank & 0x38) >> 3 ); }
+static TILE_GET_INFO( mrokumei_get_info1_1 ) { mrokumei_info1( machine, tileinfo, tile_index, 1, (blitter_bank & 0x38) >> 3 ); }
 
 
-INLINE void reikaids_info( int tile_index, int page, int layer, int gfxbank )
+INLINE void reikaids_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
 	int addr  = tile_index * 4 + layer + 0x2000 * page;
 	int attr  = videoram[addr];
@@ -452,17 +452,17 @@ INLINE void reikaids_info( int tile_index, int page, int layer, int gfxbank )
      *      xxxx.x---   layer#0
      *      ----.-xxx   layer#2
      */
-static void reikaids_get_info0_0(int tile_index) { reikaids_info( tile_index, 0, 0,  (reikaids_gfx_bank[1]>>3)); }
-static void reikaids_get_info1_0(int tile_index) { reikaids_info( tile_index, 1, 0,  (reikaids_gfx_bank[1]>>3)); }
-static void reikaids_get_info0_1(int tile_index) { reikaids_info( tile_index, 0, 1, ((reikaids_gfx_bank[0]&0x78)>>3)); }
-static void reikaids_get_info1_1(int tile_index) { reikaids_info( tile_index, 1, 1, ((reikaids_gfx_bank[0]&0x78)>>3)); }
-static void reikaids_get_info0_2(int tile_index) { reikaids_info( tile_index, 0, 2,  (reikaids_gfx_bank[1]&0x7)); }
-static void reikaids_get_info1_2(int tile_index) { reikaids_info( tile_index, 1, 2,  (reikaids_gfx_bank[1]&0x7)); }
-static void reikaids_get_info0_3(int tile_index) { reikaids_info( tile_index, 0, 3,  (reikaids_gfx_bank[0]&0x7)); }
-static void reikaids_get_info1_3(int tile_index) { reikaids_info( tile_index, 1, 3,  (reikaids_gfx_bank[0]&0x7)); }
+static TILE_GET_INFO( reikaids_get_info0_0 ) { reikaids_info( machine, tileinfo, tile_index, 0, 0,  (reikaids_gfx_bank[1]>>3)); }
+static TILE_GET_INFO( reikaids_get_info1_0 ) { reikaids_info( machine, tileinfo, tile_index, 1, 0,  (reikaids_gfx_bank[1]>>3)); }
+static TILE_GET_INFO( reikaids_get_info0_1 ) { reikaids_info( machine, tileinfo, tile_index, 0, 1, ((reikaids_gfx_bank[0]&0x78)>>3)); }
+static TILE_GET_INFO( reikaids_get_info1_1 ) { reikaids_info( machine, tileinfo, tile_index, 1, 1, ((reikaids_gfx_bank[0]&0x78)>>3)); }
+static TILE_GET_INFO( reikaids_get_info0_2 ) { reikaids_info( machine, tileinfo, tile_index, 0, 2,  (reikaids_gfx_bank[1]&0x7)); }
+static TILE_GET_INFO( reikaids_get_info1_2 ) { reikaids_info( machine, tileinfo, tile_index, 1, 2,  (reikaids_gfx_bank[1]&0x7)); }
+static TILE_GET_INFO( reikaids_get_info0_3 ) { reikaids_info( machine, tileinfo, tile_index, 0, 3,  (reikaids_gfx_bank[0]&0x7)); }
+static TILE_GET_INFO( reikaids_get_info1_3 ) { reikaids_info( machine, tileinfo, tile_index, 1, 3,  (reikaids_gfx_bank[0]&0x7)); }
 
 
-INLINE void pteacher_info( int tile_index, int page, int layer, int gfxbank )
+INLINE void pteacher_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
 	int attr  = videoram[addr];
@@ -472,13 +472,13 @@ INLINE void pteacher_info( int tile_index, int page, int layer, int gfxbank )
 	SET_TILE_INFO( layer, code, color, homedata_flipscreen );
 }
 
-static void pteacher_get_info0_0(int tile_index) { pteacher_info( tile_index, 0, 0, pteacher_gfx_bank & 0x0f ); }
-static void pteacher_get_info1_0(int tile_index) { pteacher_info( tile_index, 1, 0, pteacher_gfx_bank & 0x0f ); }
-static void pteacher_get_info0_1(int tile_index) { pteacher_info( tile_index, 0, 1, pteacher_gfx_bank >> 4 ); }
-static void pteacher_get_info1_1(int tile_index) { pteacher_info( tile_index, 1, 1, pteacher_gfx_bank >> 4 ); }
+static TILE_GET_INFO( pteacher_get_info0_0 ) { pteacher_info( machine, tileinfo, tile_index, 0, 0, pteacher_gfx_bank & 0x0f ); }
+static TILE_GET_INFO( pteacher_get_info1_0 ) { pteacher_info( machine, tileinfo, tile_index, 1, 0, pteacher_gfx_bank & 0x0f ); }
+static TILE_GET_INFO( pteacher_get_info0_1 ) { pteacher_info( machine, tileinfo, tile_index, 0, 1, pteacher_gfx_bank >> 4 ); }
+static TILE_GET_INFO( pteacher_get_info1_1 ) { pteacher_info( machine, tileinfo, tile_index, 1, 1, pteacher_gfx_bank >> 4 ); }
 
 
-INLINE void lemnangl_info( int tile_index, int page, int layer, int gfxset, int gfxbank )
+INLINE void lemnangl_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
 	int attr  = videoram[addr];
@@ -488,10 +488,10 @@ INLINE void lemnangl_info( int tile_index, int page, int layer, int gfxset, int 
 	SET_TILE_INFO( 2*layer + gfxset, code, color, homedata_flipscreen );
 }
 
-static void lemnangl_get_info0_0(int tile_index) { lemnangl_info( tile_index, 0, 0,  blitter_bank & 1,       pteacher_gfx_bank & 0x0f ); }
-static void lemnangl_get_info1_0(int tile_index) { lemnangl_info( tile_index, 1, 0,  blitter_bank & 1,       pteacher_gfx_bank & 0x0f ); }
-static void lemnangl_get_info0_1(int tile_index) { lemnangl_info( tile_index, 0, 1, (blitter_bank & 2) >> 1, pteacher_gfx_bank >> 4 ); }
-static void lemnangl_get_info1_1(int tile_index) { lemnangl_info( tile_index, 1, 1, (blitter_bank & 2) >> 1, pteacher_gfx_bank >> 4 ); }
+static TILE_GET_INFO( lemnangl_get_info0_0 ) { lemnangl_info( machine, tileinfo, tile_index, 0, 0,  blitter_bank & 1,       pteacher_gfx_bank & 0x0f ); }
+static TILE_GET_INFO( lemnangl_get_info1_0 ) { lemnangl_info( machine, tileinfo, tile_index, 1, 0,  blitter_bank & 1,       pteacher_gfx_bank & 0x0f ); }
+static TILE_GET_INFO( lemnangl_get_info0_1 ) { lemnangl_info( machine, tileinfo, tile_index, 0, 1, (blitter_bank & 2) >> 1, pteacher_gfx_bank >> 4 ); }
+static TILE_GET_INFO( lemnangl_get_info1_1 ) { lemnangl_info( machine, tileinfo, tile_index, 1, 1, (blitter_bank & 2) >> 1, pteacher_gfx_bank >> 4 ); }
 
 
 /***************************************************************************

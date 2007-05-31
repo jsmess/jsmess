@@ -106,7 +106,7 @@ WRITE8_HANDLER( airbustr_scrollregs_w )
 	tilemap_set_scrollx(fg_tilemap, 0, ((highbits << 8) & 0x100) + fg_scrollx);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = airbustr_colorram2[tile_index];
 	int code = airbustr_videoram2[tile_index] + ((attr & 0x0f) << 8);
@@ -115,7 +115,7 @@ static void get_fg_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + ((attr & 0x0f) << 8);

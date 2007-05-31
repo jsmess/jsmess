@@ -105,7 +105,7 @@ static UINT32 darkseal_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_row
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-INLINE void get_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
+INLINE void get_bg_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int gfx_bank,UINT16 *gfx_base)
 {
 	int tile,color;
 
@@ -120,10 +120,10 @@ INLINE void get_bg_tile_info(int tile_index,int gfx_bank,UINT16 *gfx_base)
 			0)
 }
 
-static void get_bg_tile_info2(int tile_index) { get_bg_tile_info(tile_index,1,darkseal_pf2_data); }
-static void get_bg_tile_info3(int tile_index) { get_bg_tile_info(tile_index,2,darkseal_pf3_data); }
+static TILE_GET_INFO( get_bg_tile_info2 ) { get_bg_tile_info(machine,tileinfo,tile_index,1,darkseal_pf2_data); }
+static TILE_GET_INFO( get_bg_tile_info3 ) { get_bg_tile_info(machine,tileinfo,tile_index,2,darkseal_pf3_data); }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tile=darkseal_pf1_data[tile_index];
 	int color=tile >> 12;

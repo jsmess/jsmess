@@ -100,7 +100,6 @@
 
  *****************************************************************************/
 
-#include <signal.h>
 #include "debugger.h"
 #include "sh2.h"
 
@@ -2325,14 +2324,6 @@ static void sh2_reset(void)
 	sh2.internal_irq_level = -1;
 }
 
-/* Shut down CPU core */
-static void sh2_exit(void)
-{
-	if (sh2.m)
-		free(sh2.m);
-	sh2.m = NULL;
-}
-
 /* Execute cycles - returns number of cycles actually run */
 static int sh2_execute(int cycles)
 {
@@ -2950,12 +2941,7 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
 	sh2.dma_timer[1] = timer_alloc(sh2_dmac_callback);
 	timer_adjust(sh2.dma_timer[1], TIME_NEVER, 0, 0);
 
-	sh2.m = malloc(0x200);
-	if (!sh2.m)
-	{
-		logerror("SH2 failed to malloc FREGS\n");
-		raise( SIGABRT );
-	}
+	sh2.m = auto_malloc(0x200);
 
 	if(conf)
 		sh2.is_slave = conf->is_slave;
@@ -3140,7 +3126,6 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh2_set_context;		break;
 		case CPUINFO_PTR_INIT:							info->init = sh2_init;					break;
 		case CPUINFO_PTR_RESET:							info->reset = sh2_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = sh2_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh2_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 #ifdef MAME_DEBUG

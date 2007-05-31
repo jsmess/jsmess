@@ -104,7 +104,7 @@ PALETTE_INIT( wwjgtin )
 
 ***************************************************************************/
 
-static void lasso_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( lasso_get_bg_tile_info )
 {
 	int code  = lasso_videoram[tile_index];
 	int color = lasso_colorram[tile_index];
@@ -114,7 +114,7 @@ static void lasso_get_bg_tile_info(int tile_index)
 				  0)
 }
 
-static void wwjgtin_get_track_tile_info(int tile_index)
+static TILE_GET_INFO( wwjgtin_get_track_tile_info )
 {
 	UINT8 *ROM = memory_region(REGION_USER1);
 	int code  = ROM[tile_index];
@@ -125,7 +125,7 @@ static void wwjgtin_get_track_tile_info(int tile_index)
 				  0)
 }
 
-static void pinbo_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( pinbo_get_bg_tile_info )
 {
 	int code  = lasso_videoram[tile_index];
 	int color = lasso_colorram[tile_index];

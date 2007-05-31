@@ -55,7 +55,7 @@ static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
     Callbacks for the TileMap code
 ***************************************************************************/
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code, tile_number, color;
 
@@ -69,7 +69,7 @@ static void get_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code, tile_number, color;
 
@@ -83,7 +83,7 @@ static void get_fg_tile_info(int tile_index)
 			0)
 }
 
-static void get_tx_tile_info(int tile_index)
+static TILE_GET_INFO( get_tx_tile_info )
 {
 	int code, tile_number, color;
 

@@ -12,7 +12,7 @@ extern UINT16 *pass_fg_videoram;
 
 /* background tilemap stuff */
 
-static void get_pass_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_pass_bg_tile_info )
 {
 	int tileno,fx;
 
@@ -33,7 +33,7 @@ WRITE16_HANDLER( pass_bg_videoram_w )
 
 /* foreground 'sprites' tilemap stuff */
 
-static void get_pass_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_pass_fg_tile_info )
 {
 	int tileno, flip;
 

@@ -78,7 +78,7 @@ colorram format (2 bytes per one tilemap character line, 8 pixels height):
     offset 1    xxxx xxxx   x scroll (8 LSB bits)
 */
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile_number = videoram[tile_index];
 	int tile_attrib = colorram[(tile_index/64)*2];

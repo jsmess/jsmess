@@ -186,7 +186,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 	}
 }
 
-static void yard_get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( yard_get_bg_tile_info )
 {
 	int offs = tile_index * 2;
 	int attr = videoram[offs + 1];

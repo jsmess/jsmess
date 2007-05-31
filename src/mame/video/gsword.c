@@ -158,7 +158,7 @@ WRITE8_HANDLER( gsword_scroll_w )
 	tilemap_set_scrolly(bg_tilemap, 0, data);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((charbank & 0x03) << 8);
 	int color = ((code & 0x3c0) >> 6) + 16 * charpalbank;

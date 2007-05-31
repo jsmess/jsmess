@@ -73,14 +73,14 @@ static tilemap *darkhors_tmap, *darkhors_tmap2;
 UINT32 *darkhors_tmapram,  *darkhors_tmapscroll;
 UINT32 *darkhors_tmapram2, *darkhors_tmapscroll2;
 
-static void get_tile_info_0(int tile_index)
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 tile		=	darkhors_tmapram[tile_index] >> 16;
 	UINT16 color	=	darkhors_tmapram[tile_index] & 0xffff;
 	SET_TILE_INFO(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-static void get_tile_info_1(int tile_index)
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 tile		=	darkhors_tmapram2[tile_index] >> 16;
 	UINT16 color	=	darkhors_tmapram2[tile_index] & 0xffff;

@@ -160,7 +160,7 @@ WRITE8_HANDLER( roundup5_crt_w )
 
 /********************************************************************/
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile=videoram[2*tile_index]+((videoram[2*tile_index+1]&0xf)<<8);
 	int color=videoram[2*tile_index+1]>>4;
@@ -172,7 +172,7 @@ static void get_text_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg_tile_info_cyclwarr(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info_cyclwarr )
 {
 	int tile=cyclwarr_videoram2[tile_index+0x1400];
 	int color=tile >> 14;
@@ -186,7 +186,7 @@ static void get_bg_tile_info_cyclwarr(int tile_index)
 			0)
 }
 
-static void get_text_tile_info_cyclwarr(int tile_index)
+static TILE_GET_INFO( get_text_tile_info_cyclwarr )
 {
 	int tile=cyclwarr_videoram[tile_index+0x400];
 	int color=tile >> 12;

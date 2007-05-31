@@ -23,20 +23,20 @@ static int color;
   Tilemap callbacks
 ***************************************************************************/
 
-static void dblwidth_gettileinfo(int memory_offset)
+static TILE_GET_INFO(dblwidth_gettileinfo)
 {
 	SET_TILE_INFO(
 		1,									/* gfx */
-		translate[videoram[memory_offset]],	/* character */
+		translate[videoram[tile_index]],	/* character */
 		color,								/* color */
 		0)									/* flags */
 }
 
-static void normwidth_gettileinfo(int memory_offset)
+static TILE_GET_INFO(normwidth_gettileinfo)
 {
 	SET_TILE_INFO(
 		0,									/* gfx */
-		translate[videoram[memory_offset]],	/* character */
+		translate[videoram[tile_index]],	/* character */
 		color,								/* color */
 		0)									/* flags */
 }

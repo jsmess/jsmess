@@ -22,7 +22,7 @@ tilemap *ltcasino_tilemap;
 
 /* Video */
 
-static void get_ltcasino_tile_info(int tile_index)
+static TILE_GET_INFO( get_ltcasino_tile_info )
 {
 	int tileno, colour;
 

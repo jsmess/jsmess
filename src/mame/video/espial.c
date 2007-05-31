@@ -79,7 +79,7 @@ PALETTE_INIT( espial )
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = espial_videoram[tile_index];
 	UINT8 col = espial_colorram[tile_index];

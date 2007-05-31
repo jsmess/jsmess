@@ -139,7 +139,7 @@ static UINT32 pacman_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 
 	return offs;
 }
 
-static void pacman_get_tile_info(int tile_index)
+static TILE_GET_INFO( pacman_get_tile_info )
 {
 	int code = videoram[tile_index] | (charbank << 8);
 	int attr = (colorram[tile_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
@@ -355,7 +355,7 @@ S2650 Games
 
 **************************************************************************/
 
-static void s2650_get_tile_info(int tile_index)
+static TILE_GET_INFO( s2650_get_tile_info )
 {
 	int colbank, code, attr;
 
@@ -490,7 +490,7 @@ static UINT32 jrpacman_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT3
 	return offs;
 }
 
-static void jrpacman_get_tile_info(int tile_index)
+static TILE_GET_INFO( jrpacman_get_tile_info )
 {
 	int color_index, code, attr;
 	if( tile_index < 1792 )

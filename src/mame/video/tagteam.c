@@ -125,7 +125,7 @@ WRITE8_HANDLER( tagteam_flipscreen_w )
 	}
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + 256 * colorram[tile_index];
 	int color = palettebank * 2; // GUESS

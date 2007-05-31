@@ -37,7 +37,7 @@ PALETTE_INIT( sprint4 )
 }
 
 
-static void sprint4_tile_info(int tile_index)
+static TILE_GET_INFO( sprint4_tile_info )
 {
 	UINT8 code = videoram[tile_index];
 

@@ -80,7 +80,7 @@ static void lemmings_drawsprites(mame_bitmap *bitmap, UINT16 *spritedata, int gf
 
 /******************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 tile=lemmings_vram_data[tile_index];
 

@@ -309,7 +309,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ -1 }
 };
 
-static void get_ppmast93_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_ppmast93_bg_tile_info )
 {
 	int code = (ppmast93_bgram[tile_index*2+1] << 8) | ppmast93_bgram[tile_index*2];
 	SET_TILE_INFO(
@@ -319,7 +319,7 @@ static void get_ppmast93_bg_tile_info(int tile_index)
 			0)
 }
 
-static void get_ppmast93_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_ppmast93_fg_tile_info )
 {
 	int code = (ppmast93_fgram[tile_index*2+1] << 8) | ppmast93_fgram[tile_index*2];
 	SET_TILE_INFO(

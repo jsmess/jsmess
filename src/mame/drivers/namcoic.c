@@ -35,20 +35,20 @@ void namco_tilemap_invalidate( void )
 	}
 } /* namco_tilemap_invalidate */
 
-INLINE void get_tile_info(int tile_index,UINT16 *vram)
+INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *vram)
 {
 	int tile, mask;
 	mTilemapInfo.cb( vram[tile_index], &tile, &mask );
-	tile_info.mask_data = mTilemapInfo.maskBaseAddr+mask*8;
+	tileinfo->mask_data = mTilemapInfo.maskBaseAddr+mask*8;
 	SET_TILE_INFO(mTilemapInfo.gfxbank,tile,0,0)
 } /* get_tile_info */
 
-static void get_tile_info0(int tile_index) { get_tile_info(tile_index,&mTilemapInfo.videoram[0x0000]); }
-static void get_tile_info1(int tile_index) { get_tile_info(tile_index,&mTilemapInfo.videoram[0x1000]); }
-static void get_tile_info2(int tile_index) { get_tile_info(tile_index,&mTilemapInfo.videoram[0x2000]); }
-static void get_tile_info3(int tile_index) { get_tile_info(tile_index,&mTilemapInfo.videoram[0x3000]); }
-static void get_tile_info4(int tile_index) { get_tile_info(tile_index,&mTilemapInfo.videoram[0x4008]); }
-static void get_tile_info5(int tile_index) { get_tile_info(tile_index,&mTilemapInfo.videoram[0x4408]); }
+static TILE_GET_INFO( get_tile_info0 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x0000]); }
+static TILE_GET_INFO( get_tile_info1 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x1000]); }
+static TILE_GET_INFO( get_tile_info2 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x2000]); }
+static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x3000]); }
+static TILE_GET_INFO( get_tile_info4 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x4008]); }
+static TILE_GET_INFO( get_tile_info5 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x4408]); }
 
 int
 namco_tilemap_init( int gfxbank, void *maskBaseAddr,
@@ -983,7 +983,7 @@ static int mRozMaskRegion;
  * Graphics ROM addressing varies across games.
  */
 static void
-roz_get_info( int tile_index, int which )
+roz_get_info( running_machine *machine, tile_data *tileinfo, int tile_index, int which)
 {
 	UINT16 tile = rozvideoram16[tile_index];
 	int bank, mangle;
@@ -1043,19 +1043,19 @@ roz_get_info( int tile_index, int which )
 		break;
 	}
 	SET_TILE_INFO( mRozGfxBank,mangle,0/*color*/,0/*flag*/ );
-	tile_info.mask_data = 32*tile + (UINT8 *)memory_region( mRozMaskRegion );
+	tileinfo->mask_data = 32*tile + (UINT8 *)memory_region( mRozMaskRegion );
 } /* roz_get_info */
 
-static void
-roz_get_info0( int tile_index )
+static
+TILE_GET_INFO( roz_get_info0 )
 {
-	roz_get_info( tile_index,0 );
+	roz_get_info( machine,tileinfo,tile_index,0 );
 } /* roz_get_info0 */
 
-static void
-roz_get_info1( int tile_index )
+static
+TILE_GET_INFO( roz_get_info1 )
 {
-	roz_get_info( tile_index,1 );
+	roz_get_info( machine,tileinfo,tile_index,1 );
 } /* roz_get_info1 */
 
 static UINT32
@@ -1073,7 +1073,7 @@ int
 namco_roz_init( int gfxbank, int maskregion )
 {
 	int i;
-	static void (*roz_info[ROZ_TILEMAP_COUNT])(int tile_index) =
+	static tile_get_info_fn roz_info[ROZ_TILEMAP_COUNT] =
 	{
 		roz_get_info0,
 		roz_get_info1
@@ -1503,7 +1503,7 @@ static const gfx_layout RoadTileLayout =
 	0x200, /* offset to next tile */
 };
 
-void get_road_info( int tile_index )
+TILE_GET_INFO( get_road_info )
 {
 	UINT16 data = mpRoadRAM[tile_index];
 	/* ------xx xxxxxxxx tile number

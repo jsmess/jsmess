@@ -14,7 +14,148 @@
 
 #include "driver.h"
 #include "machine/8255ppi.h"
-#include "clayshoo.h"
+
+
+
+static UINT8 *clayshoo_videoram;
+static size_t clayshoo_videoram_size;
+
+static UINT8 input_port_select;
+static UINT8 analog_port_val;
+static mame_timer *analog_timer_1;
+static mame_timer *analog_timer_2;
+
+
+
+/*************************************
+ *
+ *  Digital control handling functions
+ *
+ *************************************/
+
+static WRITE8_HANDLER( input_port_select_w )
+{
+	input_port_select = data;
+}
+
+
+static UINT8 difficulty_input_port_r(int bit)
+{
+	UINT8 ret = 0;
+
+	/* read fake port and remap the buttons to 2 bits */
+	UINT8	raw = readinputportbytag("FAKE");
+
+	if (raw & (1 << (bit + 1)))
+		ret = 0x03;		/* expert */
+	else if (raw & (1 << (bit + 2)))
+		ret = 0x01;		/* pro */
+	else
+		ret = 0x00;		/* amateur otherwise */
+
+	return ret;
+}
+
+
+static READ8_HANDLER( input_port_r )
+{
+	UINT8 ret = 0;
+
+	switch (input_port_select)
+	{
+	case 0x01:	ret = readinputportbytag("IN0"); break;
+	case 0x02:	ret = readinputportbytag("IN1"); break;
+	case 0x04:	ret = (readinputportbytag("IN2") & 0xf0) |
+					   difficulty_input_port_r(0) |
+					  (difficulty_input_port_r(3) << 2); break;
+	case 0x08:	ret = readinputportbytag("IN3"); break;
+	case 0x10:
+	case 0x20:	break;	/* these two are not really used */
+	default: logerror("Unexpected port read: %02X\n", input_port_select);
+	}
+
+	return ret;
+}
+
+
+
+/*************************************
+ *
+ *  Analog control handling functions
+ *
+ *************************************/
+
+static void reset_analog_bit(int bit)
+{
+	analog_port_val &= ~bit;
+}
+
+
+static mame_time compute_duration(int analog_pos)
+{
+	/* the 58 comes from the length of the loop used to
+       read the analog position */
+	return MAME_TIME_IN_CYCLES(58 * analog_pos, 0);
+}
+
+
+static WRITE8_HANDLER( analog_reset_w )
+{
+	/* reset the analog value, and start the two times that will fire
+       off in a short period proportional to the position of the
+       analog control and set the appropriate bit. */
+
+	analog_port_val = 0xff;
+
+	mame_timer_adjust(analog_timer_1, compute_duration(readinputportbytag("AN1")), 0x02, time_zero);
+	mame_timer_adjust(analog_timer_2, compute_duration(readinputportbytag("AN2")), 0x01, time_zero);
+}
+
+
+static READ8_HANDLER( analog_r )
+{
+	return analog_port_val;
+}
+
+
+static void create_analog_timers(void)
+{
+	analog_timer_1 = mame_timer_alloc(reset_analog_bit);
+	analog_timer_2 = mame_timer_alloc(reset_analog_bit);
+}
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+static ppi8255_interface ppi8255_intf =
+{
+	2, 							/* 2 chips */
+	{ 0, 0 },					/* Port A read */
+	{ 0, input_port_r },		/* Port B read */
+	{ 0, 0 },					/* Port C read */
+	{ 0, input_port_select_w },	/* Port A write */
+	{ 0, 0 },					/* Port B write */
+	{ 0, 0 /* sound effects */},/* Port C write */
+};
+
+
+static MACHINE_START( clayshoo )
+{
+	ppi8255_init(&ppi8255_intf);
+
+	create_analog_timers();
+
+	/* register for state saving */
+	state_save_register_global(input_port_select);
+	state_save_register_global(analog_port_val);
+
+	return 0;
+}
 
 
 
@@ -24,30 +165,36 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( clayshoo_videoram_w )
+static VIDEO_UPDATE( clayshoo )
 {
-	UINT8 x,y;
-	int i;
+	offs_t offs;
 
-
-	x = ((offset & 0x1f) << 3);
-	y = 191 - (offset >> 5);
-
-	for (i = 0; i < 8; i++)
+	for (offs = 0; offs < clayshoo_videoram_size; offs++)
 	{
-		pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
-		*BITMAP_ADDR32(tmpbitmap, y, x) = pen;
+		int i;
 
-		x++;
-		data <<= 1;
+		UINT8 x = offs << 3;
+		UINT8 y = ~(offs >> 5);
+		UINT8 data = clayshoo_videoram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			data = data << 1;
+			x = x + 1;
+		}
 	}
+
+	return 0;
 }
 
 
 
 /*************************************
  *
- *  Main CPU memory handlers
+ *  Memory handlers
  *
  *************************************/
 
@@ -55,11 +202,18 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_WRITE(clayshoo_videoram_w)	 /* 6k of video ram according to readme */
-	AM_RANGE(0x9800, 0xa800) AM_WRITE(MWA8_NOP)				 /* not really mapped, but cleared */
-	AM_RANGE(0xc800, 0xc800) AM_READWRITE(clayshoo_analog_r, clayshoo_analog_reset_w)
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(&clayshoo_videoram) AM_SIZE(&clayshoo_videoram_size)	/* 6k of video ram according to readme */
+	AM_RANGE(0x9800, 0xa800) AM_WRITE(MWA8_NOP)	  /* not really mapped, but cleared */
+	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
 ADDRESS_MAP_END
 
+
+
+/*************************************
+ *
+ *  Port handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
@@ -149,18 +303,19 @@ static MACHINE_DRIVER_START( clayshoo )
 	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
-	MDRV_MACHINE_RESET(clayshoo)
+	MDRV_MACHINE_START(clayshoo)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_UPDATE(clayshoo)
+
+	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(256, 192)
-	MDRV_SCREEN_VISIBLE_AREA(8, 247, 8, 183)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 64, 255)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+
 MACHINE_DRIVER_END
 
 
@@ -188,4 +343,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, clayshoo, 0, clayshoo, clayshoo, 0, ROT0, "Allied Leisure", "Clay Shoot", GAME_NO_SOUND )
+GAME( 1979, clayshoo, 0, clayshoo, clayshoo, 0, ROT0, "Allied Leisure", "Clay Shoot", GAME_NO_SOUND | GAME_SUPPORTS_SAVE)

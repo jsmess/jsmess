@@ -47,7 +47,7 @@ VIDEO_EOF( tokib )
 	buffer_spriteram16_w(0,0,0);
 }
 
-static void get_text_tile_info(int tile_index)
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile = videoram16[tile_index];
 	int color=(tile>>12)&0xf;
@@ -61,7 +61,7 @@ static void get_text_tile_info(int tile_index)
 			0)
 }
 
-static void get_back_tile_info(int tile_index)
+static TILE_GET_INFO( get_back_tile_info )
 {
 	int tile = toki_background1_videoram16[tile_index];
 	int color=(tile>>12)&0xf;
@@ -75,7 +75,7 @@ static void get_back_tile_info(int tile_index)
 			0)
 }
 
-static void get_fore_tile_info(int tile_index)
+static TILE_GET_INFO( get_fore_tile_info )
 {
 	int tile = toki_background2_videoram16[tile_index];
 	int color=(tile>>12)&0xf;

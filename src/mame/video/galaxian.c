@@ -38,8 +38,8 @@ size_t galaxian_spriteram2_size;
 size_t galaxian_bulletsram_size;
 
 
-static void get_tile_info(int tile_index);
-static void rockclim_get_tile_info(int tile_index);
+static TILE_GET_INFO( get_tile_info );
+static TILE_GET_INFO( rockclim_get_tile_info );
 static tilemap *bg_tilemap;
 static tilemap *rockclim_tilemap;
 static int mooncrst_gfxextend;
@@ -880,7 +880,7 @@ VIDEO_START( rockclim )
 	return ret;
 }
 
-static void drivfrcg_get_tile_info(int tile_index)
+static TILE_GET_INFO( drivfrcg_get_tile_info )
 {
 	int code = galaxian_videoram[tile_index];
 	UINT8 x = tile_index & 0x1f;
@@ -979,7 +979,7 @@ WRITE8_HANDLER( racknrol_tiles_bank_w )
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 }
 
-static void racknrol_get_tile_info(int tile_index)
+static TILE_GET_INFO( racknrol_get_tile_info )
 {
 	int code = galaxian_videoram[tile_index];
 	UINT8 x = tile_index & 0x1f;
@@ -1039,7 +1039,7 @@ VIDEO_START( bongo )
 	return ret;
 }
 
-static void dambustr_get_tile_info2(int tile_index)
+static TILE_GET_INFO( dambustr_get_tile_info2 )
 {
 	UINT8 x = tile_index & 0x1f;
 
@@ -2129,7 +2129,7 @@ static void start_stars_scroll_timer()
 
 ***************************************************************************/
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 x = tile_index & 0x1f;
 
@@ -2149,7 +2149,7 @@ static void get_tile_info(int tile_index)
 	SET_TILE_INFO(0, code, color, 0)
 }
 
-static void rockclim_get_tile_info(int tile_index)
+static TILE_GET_INFO( rockclim_get_tile_info )
 {
 	UINT16 code = rockclim_videoram[tile_index];
 	SET_TILE_INFO(2, code, 0, 0)

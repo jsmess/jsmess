@@ -15,7 +15,7 @@ static tilemap *dbz_bg1_tilemap, *dbz_bg2_tilemap;
 UINT16 *dbz_bg1_videoram, *dbz_bg2_videoram;
 static int sprite_colorbase, layer_colorbase[6], layer[5], layerpri[5];
 
-static void dbz_tile_callback(int layer, int *code, int *color)
+static void dbz_tile_callback(int layer, int *code, int *color, int *flags)
 {
 	*color = (layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
 }
@@ -40,7 +40,7 @@ WRITE16_HANDLER( dbz_bg2_videoram_w )
 	tilemap_mark_tile_dirty(dbz_bg2_tilemap,offset/2);
 }
 
-static void get_dbz_bg2_tile_info(int tile_index)
+static TILE_GET_INFO( get_dbz_bg2_tile_info )
 {
 	int tileno, colour, flag;
 
@@ -57,7 +57,7 @@ WRITE16_HANDLER( dbz_bg1_videoram_w )
 	tilemap_mark_tile_dirty(dbz_bg1_tilemap,offset/2);
 }
 
-static void get_dbz_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_dbz_bg1_tile_info )
 {
 	int tileno, colour, flag;
 

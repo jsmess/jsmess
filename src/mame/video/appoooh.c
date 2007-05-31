@@ -120,7 +120,7 @@ PALETTE_INIT( robowres )
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = appoooh_fg_videoram[tile_index] + 256 * ((appoooh_fg_colorram[tile_index]>>5) & 7);
 
@@ -132,7 +132,7 @@ static void get_fg_tile_info(int tile_index)
 	);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = appoooh_bg_videoram[tile_index] + 256 * ((appoooh_bg_colorram[tile_index]>>5) & 7);
 

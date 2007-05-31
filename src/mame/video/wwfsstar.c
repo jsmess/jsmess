@@ -38,7 +38,7 @@ WRITE16_HANDLER( wwfsstar_bg0_videoram_w )
  Tilemap Related Functions
 *******************************************************************************/
 
-static void get_fg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg0_tile_info )
 {
 	/*- FG0 RAM Format -**
 
@@ -73,7 +73,7 @@ static UINT32 bg0_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-static void get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg0_tile_info )
 {
 	/*- BG0 RAM Format -**
 

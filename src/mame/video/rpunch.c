@@ -39,7 +39,7 @@ static UINT8 bins, gins;
  *
  *************************************/
 
-static void get_bg0_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg0_tile_info )
 {
 	int data = videoram16[tile_index];
 	int code;
@@ -53,7 +53,7 @@ static void get_bg0_tile_info(int tile_index)
 			0)
 }
 
-static void get_bg1_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg1_tile_info )
 {
 	int data = videoram16[videoram_size / 4 + tile_index];
 	int code;

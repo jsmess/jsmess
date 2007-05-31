@@ -23,7 +23,7 @@ WRITE8_HANDLER( djboy_scrolly_w )
 	djboy_scrolly = data;
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	unsigned char attr;
 	attr = videoram[tile_index + 0x400];

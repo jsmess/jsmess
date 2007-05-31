@@ -46,7 +46,7 @@ static WRITE16_HANDLER( fg_tilemapram_w )
 	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
 }
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int tileno, attr;
 	tileno = fg_tilemapram[tile_index*2];
@@ -60,7 +60,7 @@ static WRITE16_HANDLER( bg_tilemapram_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tileno, attr;
 	tileno = bg_tilemapram[tile_index*2];

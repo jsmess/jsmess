@@ -35,7 +35,7 @@ PALETTE_INIT( xyonix )
 }
 
 
-static void get_xyonix_tile_info(int tile_index)
+static TILE_GET_INFO( get_xyonix_tile_info )
 {
 	int tileno;
 	int attr = xyonix_vidram[tile_index+0x1000+1];

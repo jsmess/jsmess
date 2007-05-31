@@ -26,6 +26,15 @@
     - there is a register at 0x5002. 0xff is written there when game is played,
       0x00 otherwise. Its purpose is unknown.
 
+
+    Notes by Roberto Fresca:
+
+    - Added multigame (set2).
+    - Main differences are:
+         - Control program: Offset 0x79b4 = JMP $c4c4 was changed to JMP $c4c6.
+         - ROM at 0x80000:  Several things patched and/or relocated.
+                            Most original NOPs were replaced by proper code.
+
 */
 
 #include "driver.h"
@@ -306,5 +315,25 @@ ROM_START( multigam )
 	ROM_FILL( 0x60000, 0x20000, 0x00 )
 ROM_END
 
+ROM_START( multigmb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "mg_4.bin", 0x0000, 0x8000, CRC(079226c1) SHA1(f4ceedd9b6cc3454550be7421dc75904ad664545) )
 
-GAME( 1992, multigam, 0, multigam, multigam, multigam, ROT0, "unknown", "Multi Game", 0 )
+	ROM_REGION( 0xC0000, REGION_USER1, 0 )
+	ROM_LOAD( "1.bin",    0x00000, 0x20000, CRC(e0bb14a5) SHA1(74026f59dfb08456183adaaf381bb28830212a1c) )
+	ROM_LOAD( "2.bin",    0x20000, 0x20000, CRC(f52c07ad) SHA1(51be288bcf5aeab5bdd95ee93a6d807867e30e97) )
+	ROM_LOAD( "3.bin",    0x40000, 0x20000, CRC(92e8303e) SHA1(4a735fce22cdea65801aa7e4e00fa8c15a022ea4) )
+	ROM_LOAD( "4.bin",    0x60000, 0x20000, CRC(f5c50f29) SHA1(6f3bd969d9d82a0d92aa6119375a607ccdb5d8b9) )
+	ROM_LOAD( "mg_9.bin", 0x80000, 0x20000, CRC(47f968af) SHA1(ed60bda060984e5acc2c6b6cac5b36eafbb2b631) )
+	ROM_LOAD( "6.bin",    0xa0000, 0x20000, CRC(fb129b09) SHA1(b677937d6cf7800359dc6d35dd2de3ec27919d71) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, 0 )
+	ROM_LOAD( "8.bin", 0x00000, 0x20000, CRC(509c0e94) SHA1(9e87c74e76afe6c3a7ba194439434f54e2c879eb) )
+	ROM_LOAD( "9.bin", 0x20000, 0x20000, CRC(48416f20) SHA1(f461fcbff6d2fa4774d64c26475089d1aeea7fb5) )
+	ROM_LOAD( "10.bin", 0x40000, 0x20000, CRC(869d1661) SHA1(ac155bd24ebfea8e064859e1a05317001286f9ae) )
+	ROM_FILL( 0x60000, 0x20000, 0x00 )
+ROM_END
+
+
+GAME( 1992, multigam, 0, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )
+GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 2)", 0 )

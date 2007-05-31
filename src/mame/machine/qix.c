@@ -524,35 +524,6 @@ WRITE8_HANDLER( qix_pia_0_w )
 
 /*************************************
  *
- *  PIA/Protection(?) workarounds
- *
- *************************************/
-
-WRITE8_HANDLER( zookeep_pia_0_w )
-{
-	/* Hack: Kram and Zoo Keeper for some reason (protection?) leave the port A */
-	/* DDR set to 0xff, so they cannot read the player 1 controls. Here we force */
-	/* the DDR to 0, so the controls work correctly. */
-	if (offset == 0)
-		data = 0;
-	qix_pia_0_w(offset, data);
-}
-
-
-WRITE8_HANDLER( zookeep_pia_2_w )
-{
-	/* Hack: Zoo Keeper for some reason (protection?) leaves the port A */
-	/* DDR set to 0xff, so they cannot read the player 2 controls. Here we force */
-	/* the DDR to 0, so the controls work correctly. */
-	if (offset == 0)
-		data = 0;
-	pia_2_w(offset, data);
-}
-
-
-
-/*************************************
- *
  *  Cocktail flip
  *
  *************************************/

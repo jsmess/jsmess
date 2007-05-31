@@ -40,7 +40,7 @@ PALETTE_INIT( mogura )
 }
 
 
-static void get_mogura_tile_info(int tile_index)
+static TILE_GET_INFO( get_mogura_tile_info )
 {
 	int code = mogura_tileram[tile_index];
 	int attr = mogura_tileram[tile_index+0x800];

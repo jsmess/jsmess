@@ -19,7 +19,7 @@ static UINT32 bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-static void bg_tile_info(int tile_index)
+static TILE_GET_INFO( bg_tile_info )
 {
 	int code = quizpani_bg_videoram[tile_index];
 
@@ -30,7 +30,7 @@ static void bg_tile_info(int tile_index)
 			0)
 }
 
-static void txt_tile_info(int tile_index)
+static TILE_GET_INFO( txt_tile_info )
 {
 	int code = quizpani_txt_videoram[tile_index];
 

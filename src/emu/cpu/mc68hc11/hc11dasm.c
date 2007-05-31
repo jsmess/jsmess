@@ -1236,14 +1236,14 @@ static UINT32 decode_opcode(UINT32 pc, M68HC11_OPCODE *op_table)
 			imm8 = fetch();
 			mask = fetch();
 			rel8 = fetch();
-			print("%s (0x%04X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+2+rel8);
+			print("%s (0x%04X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+4+rel8);
 			break;
 
 		case EA_IND_X_IMM8_REL:
 			imm8 = fetch();
 			mask = fetch();
 			rel8 = fetch();
-			print("%s (X+0x%02X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+2+rel8);
+			print("%s (X+0x%02X), 0x%02X, [0x%04X]", op_table->mnemonic, imm8, mask, pc+4+rel8);
 			break;
 
 		case EA_IND_Y:

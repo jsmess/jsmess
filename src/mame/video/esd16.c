@@ -67,7 +67,7 @@ VIDEO_UPDATE( esd16 );
 
 tilemap *esdtilemap_0, *esdtilemap_1, *esdtilemap_1_16x16;
 
-static void get_tile_info_0(int tile_index)
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 code = esd16_vram_0[tile_index];
 	SET_TILE_INFO(
@@ -77,7 +77,7 @@ static void get_tile_info_0(int tile_index)
 			0)
 }
 
-static void get_tile_info_1(int tile_index)
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 code = esd16_vram_1[tile_index];
 	SET_TILE_INFO(
@@ -87,7 +87,7 @@ static void get_tile_info_1(int tile_index)
 			0)
 }
 
-static void get_tile_info_1_16x16(int tile_index)
+static TILE_GET_INFO( get_tile_info_1_16x16 )
 {
 	UINT16 code = esd16_vram_1[tile_index];
 	SET_TILE_INFO(

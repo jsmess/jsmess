@@ -78,7 +78,7 @@ UINT32 metlclsh_bgtilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_
 	return	(row & 7) + ((row & ~7) << 4) + ((col & 0xf) << 3) + ((col & ~0xf) << 4);
 }
 
-static void get_bg_tile_info(int tile_index)
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	SET_TILE_INFO(1, metlclsh_bgram[tile_index] + (metlclsh_gfxbank << 7),0,0)
 }
@@ -122,12 +122,12 @@ WRITE8_HANDLER( metlclsh_bgram_w )
 
 ***************************************************************************/
 
-static void get_fg_tile_info(int tile_index)
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	UINT8 code = metlclsh_fgram[tile_index + 0x000];
 	UINT8 attr = metlclsh_fgram[tile_index + 0x400];
 	SET_TILE_INFO(2, code + ((attr & 0x03) << 8), (attr >> 5) & 3, 0)
-	tile_info.priority = ((attr & 0x80) ? 1 : 2);
+	tileinfo->priority = ((attr & 0x80) ? 1 : 2);
 }
 
 WRITE8_HANDLER( metlclsh_fgram_w )

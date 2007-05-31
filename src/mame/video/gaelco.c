@@ -37,25 +37,25 @@ tilemap *pant[2];
       1  | xxxxxxxx -------- | not used
 */
 
-static void get_tile_info_gaelco_screen0(int tile_index)
+static TILE_GET_INFO( get_tile_info_gaelco_screen0 )
 {
 	int data = gaelco_videoram[tile_index << 1];
 	int data2 = gaelco_videoram[(tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
 
-	tile_info.priority = (data2 >> 6) & 0x03;
+	tileinfo->priority = (data2 >> 6) & 0x03;
 
 	SET_TILE_INFO(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03))
 }
 
 
-static void get_tile_info_gaelco_screen1(int tile_index)
+static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 {
 	int data = gaelco_videoram[(0x1000/2) + (tile_index << 1)];
 	int data2 = gaelco_videoram[(0x1000/2) + (tile_index << 1) + 1];
 	int code = ((data & 0xfffc) >> 2);
 
-	tile_info.priority = (data2 >> 6) & 0x03;
+	tileinfo->priority = (data2 >> 6) & 0x03;
 
 	SET_TILE_INFO(1, 0x4000 + code, data2 & 0x3f, TILE_FLIPYX(data & 0x03))
 }

@@ -53,7 +53,7 @@ x-x- ---- ---- ---- extra tile number.
 ---- ---- xxxx xxxx tile number
 */
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 vram_data = (((vram_hi[tile_index] & 0xff) << 8) | (vram_lo[tile_index] & 0xff));
 	UINT16 region = (vram_data & 0x4000) >> 14;

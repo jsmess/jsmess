@@ -34,21 +34,21 @@ static UINT32 bg_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
 	return (col&0xf) | ((row&0xf)<<4) | ((col&0x70)<<4) | ((row&0xf0)<<7);
 }
 
-static void get_pf3_tile_info( int tile_index )
+static TILE_GET_INFO( get_pf3_tile_info )
 {
 	const UINT8 *bgMap = memory_region(REGION_GFX6);
 	int code=(bgMap[tile_index*2]<<8) | bgMap[tile_index*2+1];
 	SET_TILE_INFO(4,code&0x7ff,code>>12,0);
 }
 
-static void get_pf2_tile_info( int tile_index )
+static TILE_GET_INFO( get_pf2_tile_info )
 {
 	const UINT8 *bgMap = memory_region(REGION_GFX7);
 	int code=(bgMap[tile_index*2]<<8) | bgMap[tile_index*2+1];
 	SET_TILE_INFO(3,code&0x7ff,code>>12,0);
 }
 
-static void get_pf1_tile_info( int tile_index )
+static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int offs=tile_index*2;
 	int tile=deadang_video_data[offs]+(deadang_video_data[offs+1]<<8);
@@ -58,7 +58,7 @@ static void get_pf1_tile_info( int tile_index )
 	SET_TILE_INFO(2,tile+deadangle_tilebank*0x1000,color,0)
 }
 
-static void get_text_tile_info( int tile_index )
+static TILE_GET_INFO( get_text_tile_info )
 {
 	int offs=tile_index*2;
 	int tile=videoram[offs]+((videoram[offs+1]&0xc0)<<2);

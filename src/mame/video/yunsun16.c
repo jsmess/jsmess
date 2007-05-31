@@ -54,7 +54,7 @@ UINT32 yunsun16_tilemap_scan_pages(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 
 			(col % TILES_PER_PAGE_X) * TILES_PER_PAGE_Y;
 }
 
-static void get_tile_info_0(int tile_index)
+static TILE_GET_INFO( get_tile_info_0 )
 {
 	UINT16 code = yunsun16_vram_0[ 2 * tile_index + 0 ];
 	UINT16 attr = yunsun16_vram_0[ 2 * tile_index + 1 ];
@@ -65,7 +65,7 @@ static void get_tile_info_0(int tile_index)
 			(attr & 0x20) ? TILE_FLIPX : 0)
 }
 
-static void get_tile_info_1(int tile_index)
+static TILE_GET_INFO( get_tile_info_1 )
 {
 	UINT16 code = yunsun16_vram_1[ 2 * tile_index + 0 ];
 	UINT16 attr = yunsun16_vram_1[ 2 * tile_index + 1 ];

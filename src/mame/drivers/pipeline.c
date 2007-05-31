@@ -64,7 +64,7 @@ static UINT8 vidctrl;
 static UINT8 *palram;
 static UINT8 toMCU, fromMCU, ddrA;
 
-static void get_tile_info(int tile_index)
+static TILE_GET_INFO( get_tile_info )
 {
 	int code = vram2[tile_index]+vram2[tile_index+0x800]*256;
 	SET_TILE_INFO(
@@ -74,7 +74,7 @@ static void get_tile_info(int tile_index)
 		0)
 }
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	int code =vram1[tile_index]+((vram1[tile_index+0x800]>>4))*256;
 	int color=((vram1[tile_index+0x800])&0xf);

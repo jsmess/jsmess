@@ -168,7 +168,7 @@ WRITE8_HANDLER( lockon_vram_2_w )
 }
 
 /* 8*8 characters */
-static void get_lockon_tile_info0(int tile_index)
+static TILE_GET_INFO( get_lockon_tile_info0 )
 {
 	int upper, lower, tileno, color;
   	tile_index <<= 1;
@@ -181,7 +181,7 @@ static void get_lockon_tile_info0(int tile_index)
 }
 
 /* Scene tiles */
-static void get_lockon_tile_info1(int tile_index)
+static TILE_GET_INFO( get_lockon_tile_info1 )
 {
   	int upper, lower, tileno, color;
  	tile_index <<= 1;
@@ -194,7 +194,7 @@ static void get_lockon_tile_info1(int tile_index)
 }
 
 /* HUD tiles */
-static void get_lockon_tile_info2(int tile_index)
+static TILE_GET_INFO( get_lockon_tile_info2 )
 {
   	int upper, lower, tileno, color;
  	tile_index <<= 1;

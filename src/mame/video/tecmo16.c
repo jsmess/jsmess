@@ -23,22 +23,22 @@ static int flipscreen, game_is_riot;
 
 /******************************************************************************/
 
-static void fg_get_tile_info(int tile_index)
+static TILE_GET_INFO( fg_get_tile_info )
 {
 	int tile = tecmo16_videoram[tile_index] & 0x1fff;
 	int color = tecmo16_colorram[tile_index] & 0x0f;
 
 	/* bit 4 controls blending */
-	tile_info.priority = (tecmo16_colorram[tile_index] & 0x10) >> 4;
+	tileinfo->priority = (tecmo16_colorram[tile_index] & 0x10) >> 4;
 
 	SET_TILE_INFO(
 			1,
 			tile,
-			color | (tile_info.priority ? 0x70 : 0x00),
+			color | (tileinfo->priority ? 0x70 : 0x00),
 			0)
 }
 
-static void bg_get_tile_info(int tile_index)
+static TILE_GET_INFO( bg_get_tile_info )
 {
 	int tile = tecmo16_videoram2[tile_index] & 0x1fff;
 	int color = (tecmo16_colorram2[tile_index] & 0x0f)+0x10;
@@ -50,7 +50,7 @@ static void bg_get_tile_info(int tile_index)
 			0)
 }
 
-static void tx_get_tile_info(int tile_index)
+static TILE_GET_INFO( tx_get_tile_info )
 {
 	int tile = tecmo16_charram[tile_index];
 	SET_TILE_INFO(

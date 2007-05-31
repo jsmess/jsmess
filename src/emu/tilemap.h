@@ -72,17 +72,21 @@ struct _tile_data
 	void *user_data;		/* user-supplied tilemap-wide pointer */
 };
 
-extern tile_data tile_info;
+#define tile_info (*tileinfo)
+
+typedef void (*tile_get_info_fn)(running_machine *machine, tile_data *tileinfo, int tile_index);
+
+#define TILE_GET_INFO( _name ) void _name(running_machine *machine, tile_data *tileinfo, int tile_index)
 
 #define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS) { \
-	const gfx_element *gfx = Machine->gfx[(GFX)]; \
+	const gfx_element *gfx = machine->gfx[(GFX)]; \
 	int _code = (CODE) % gfx->total_elements; \
-	tile_info.tile_number = _code; \
-	tile_info.pen_data = gfx->gfxdata + _code*gfx->char_modulo; \
-	tile_info.pal_data = &gfx->colortable[gfx->color_granularity * (COLOR)]; \
-	tile_info.pen_usage = gfx->pen_usage?gfx->pen_usage[_code]:0; \
-	tile_info.flags = FLAGS; \
-	if (gfx->flags & GFX_PACKED) tile_info.flags |= TILE_4BPP; \
+	tileinfo->tile_number = _code; \
+	tileinfo->pen_data = gfx->gfxdata + _code*gfx->char_modulo; \
+	tileinfo->pal_data = &gfx->colortable[gfx->color_granularity * (COLOR)]; \
+	tileinfo->pen_usage = gfx->pen_usage?gfx->pen_usage[_code]:0; \
+	tileinfo->flags = FLAGS; \
+	if (gfx->flags & GFX_PACKED) tileinfo->flags |= TILE_4BPP; \
 }
 
 /* tile flags, set by get_tile_info callback */
@@ -113,7 +117,7 @@ extern mame_bitmap *priority_bitmap;
 void tilemap_init( running_machine *machine );
 
 tilemap *tilemap_create(
-	void (*tile_get_info)( int memory_offset ),
+	tile_get_info_fn tile_get_info,
 	UINT32 (*get_memory_offset)( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows ),
 	int type,
 	int tile_width, int tile_height,

@@ -18,14 +18,14 @@ static tilemap *tilemap1,*tilemap2;
 
 ***************************************************************************/
 
-static void get_tile_info1(int tile_index)
+static TILE_GET_INFO( get_tile_info1 )
 {
 	int code = crshrace_videoram1[tile_index];
 
 	SET_TILE_INFO(1,(code & 0xfff) + (roz_bank << 12),code >> 12,0)
 }
 
-static void get_tile_info2(int tile_index)
+static TILE_GET_INFO( get_tile_info2 )
 {
 	int code = crshrace_videoram2[tile_index];
 
