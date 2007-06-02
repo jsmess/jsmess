@@ -5156,10 +5156,16 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	TCHAR* t_filename;
 	TCHAR* t_statedir = 0;
 	TCHAR* t_artdir = 0;
-	
+	TCHAR t_filename_buffer[MAX_PATH]  = {0, };
+	char *utf8_filename;
+
+	// convert the filename to UTF-8 and copy into buffer
 	t_filename = tstring_from_utf8(filename);
-	if( !t_filename )
-		return FALSE;
+	if (t_filename != NULL)
+	{
+		snprintf(t_filename_buffer, ARRAY_LENGTH(t_filename_buffer), "%s", t_filename);
+		free(t_filename);
+	}
 
 	of.lStructSize       = sizeof(of);
 	of.hwndOwner         = hMain;
@@ -5185,18 +5191,16 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	of.lpstrCustomFilter = NULL;
 	of.nMaxCustFilter    = 0;
 	of.nFilterIndex      = 1;
-	of.lpstrFile         = t_filename;
-	of.nMaxFile          = MAX_PATH;
+	of.lpstrFile         = t_filename_buffer;
+	of.nMaxFile          = ARRAY_LENGTH(t_filename_buffer);
 	of.lpstrFileTitle    = NULL;
 	of.nMaxFileTitle     = 0;
 	if (filetype == FILETYPE_SAVESTATE_FILES)
 	{
 		t_statedir = tstring_from_utf8(GetStateDir());
 		if( !t_statedir )
-		{
-			free(t_filename);
 			return FALSE;
-		}
+
 		of.lpstrInitialDir = t_statedir;
 	}
 	else
@@ -5205,10 +5209,8 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		{
 			t_artdir = tstring_from_utf8(GetArtDir());
 			if( !t_artdir )
-			{
-				free(t_filename);
 				return FALSE;
-			}
+
 			of.lpstrInitialDir = t_artdir;
 		}
 		else
@@ -5251,7 +5253,12 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 		free(t_artdir);
 	if( t_statedir )
 		free(t_statedir);
-	free(t_filename);
+
+	utf8_filename = utf8_from_tstring(t_filename_buffer);
+	if (utf8_filename != NULL)
+	{
+		snprintf(filename, MAX_PATH, "%s", utf8_filename);
+	}
 
 	return success;
 }
