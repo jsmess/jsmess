@@ -1489,17 +1489,17 @@ static WRITE8_HANDLER( d_pia1_pb_w )
 
 static WRITE8_HANDLER( dragon64_pia1_pb_w )
 {
-	int	ddr;
+	int ddr;
 	
 	d_pia1_pb_w(0, data);
 
-	ddr=~pia_get_port_b_z_mask(1);
+	ddr = ~pia_get_port_b_z_mask(1);
 	
 	/* If bit 2 of the pia1 ddrb is 1 then this pin is an output so use it */
 	/* to control the paging of the 32k and 64k basic roms */
 	/* Otherwise it set as an input, with an EXTERNAL pull-up so it should */
 	/* always be high (enabling 32k basic rom) */
-	if(ddr & 0x04)
+	if (ddr & 0x04)
 	{
 		dragon_page_rom(data & 0x04);
 	}	
@@ -1556,8 +1556,6 @@ static void dragon_page_rom(int	romswitch)
 {
 	UINT8 *bank;
 	
-printf("Dragon:paging rom: %d\n",romswitch);
-
 	if (romswitch) 
 		bank = coco_rom;		/* This is the 32k mode basic(64)/boot rom(alpha)  */
 	else
@@ -1869,8 +1867,6 @@ static void setup_memory_map(void)
 	int 		block_index;		/* Index of block being processed */
 	int	 	wbank;			/* bank no to go in this block */
 	UINT8 		*offset;		/* offset into coco rom for rom mapping */
-
-printf("Setting up memory\n");
 
 	/* Set last RAM block dependent on map type */
 	if (maptype)
