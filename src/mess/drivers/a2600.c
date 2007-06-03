@@ -13,6 +13,8 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/tiaintf.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
+//#include "formats/a26_cas.h"
 #include "video/tia.h"
 #include "inputx.h"
 #include "zlib.h"
@@ -57,6 +59,8 @@ static UINT8 modeSS_byte;
 static UINT32 modeSS_byte_started;
 static unsigned modeSS_write_delay;
 static unsigned modeSS_write_enabled;
+static unsigned modeSS_write_pending;
+static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
 
 
@@ -378,9 +382,9 @@ static WRITE8_HANDLER(mode3E_RAM_w) {
 OPBASE_HANDLER( modeSS_opbase )
 {
 	if ( address & 0x1000 ) {
-		opcode_mask = 0x07ff;
-		opcode_memory_min = 0x0000;
-		opcode_memory_max = 0x0fff;
+		opcode_mask = 0x7ff;
+		opcode_memory_min = ( address & 0xf800 );
+		opcode_memory_max = ( address & 0xf800 ) | 0x7ff;
 		if ( address & 0x800 ) {
 			opcode_arg_base = bank_base[2];
 			opcode_base = bank_base[2];
@@ -398,11 +402,13 @@ static READ8_HANDLER(modeSS_r)
 	UINT8 data = ( offset & 0x800 ) ? bank_base[2][offset & 0x7FF] : bank_base[1][offset];
 
 	//logerror("%04X: read from modeSS area offset = %04X\n", activecpu_get_pc(), offset);
-	if ( offset < 0x100 )
+	if ( offset < 0x100 && ! modeSS_write_pending )
 	{
 		modeSS_byte = offset;
 		modeSS_byte_started = activecpu_gettotalcycles();
+		modeSS_write_pending = 1;
 	} else {
+		modeSS_write_pending = 0;
 		/* Control register "write" */
 		if ( offset == 0xFF8 ) {
 			//logerror("%04X: write to modeSS control register data = %02X\n", activecpu_get_pc(), modeSS_byte);
@@ -412,41 +418,55 @@ static READ8_HANDLER(modeSS_r)
 			case 0x00:
 				bank_base[1] = extra_RAM + 2 * 0x800;
 				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				modeSS_high_ram_enabled = 0;
 				break;
 			case 0x04:
 				bank_base[1] = extra_RAM;
 				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				modeSS_high_ram_enabled = 0;
 				break;
 			case 0x08:
 				bank_base[1] = extra_RAM + 2 * 0x800;
 				bank_base[2] = extra_RAM;
+				modeSS_high_ram_enabled = 1;
 				break;
 			case 0x0C:
 				bank_base[1] = extra_RAM;
 				bank_base[2] = extra_RAM + 2 * 0x800;
+				modeSS_high_ram_enabled = 1;
 				break;
 			case 0x10:
 				bank_base[1] = extra_RAM + 2 * 0x800;
 				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				modeSS_high_ram_enabled = 0;
 				break;
 			case 0x14:
 				bank_base[1] = extra_RAM + 0x800;
 				bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(REGION_CPU1) + 0x1800 : CART;
+				modeSS_high_ram_enabled = 0;
 				break;
 			case 0x18:
 				bank_base[1] = extra_RAM + 2 * 0x800;
 				bank_base[2] = extra_RAM + 0x800;
+				modeSS_high_ram_enabled = 1;
 				break;
 			case 0x1C:
 				bank_base[1] = extra_RAM + 0x800;
 				bank_base[2] = extra_RAM + 2 * 0x800;
+				modeSS_high_ram_enabled = 1;
 				break;
 			}
 			memory_set_bankptr( 1, bank_base[1] );
 			memory_set_bankptr( 2, bank_base[2] );
 		} else if ( offset == 0xFF9 ) {
 			/* Cassette port read */
-			//logerror("%04X: Cassette port read\n", activecpu_get_pc());
+			double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
+			//logerror("%04X: Cassette port read, tap_val = %f\n", activecpu_get_pc(), tap_val);
+			if ( tap_val < 0 ) {
+				data = 0x00;
+			} else {
+				data = 0x01;
+			}
 		} else {
 			/* Possible RAM write */
 			if ( modeSS_write_enabled ) {
@@ -455,7 +475,10 @@ static READ8_HANDLER(modeSS_r)
 				if ( diff - modeSS_diff_adjust == 5 ) {
 					//logerror("%04X: RAM write offset = %04X, data = %02X\n", activecpu_get_pc(), offset, modeSS_byte );
 					if ( offset & 0x800 ) {
-						// TODO: Add support for writing to RAM in high area
+						if ( modeSS_high_ram_enabled ) {
+							bank_base[2][offset & 0x7FF] = modeSS_byte;
+							data = modeSS_byte;
+						}
 					} else {
 						bank_base[1][offset] = modeSS_byte;
 						data = modeSS_byte;
@@ -749,7 +772,7 @@ static READ8_HANDLER(a2600_get_databus_contents) {
 	UINT8	last_byte, prev_byte;
 
 	last_address = activecpu_get_pc() - 1;
-	if ( ! ( last_address & 0x1E80 ) ) {
+	if ( ! ( last_address & 0x1080 ) ) {
 		return offset;
 	}
 	last_byte = program_read_byte_8( last_address );
@@ -757,7 +780,7 @@ static READ8_HANDLER(a2600_get_databus_contents) {
 		return last_byte;
 	}
 	prev_address = last_address - 1;
-	if ( ! ( prev_address & 0x1E80 ) ) {
+	if ( ! ( prev_address & 0x1080 ) ) {
 		return last_byte;
 	}
 	prev_byte = program_read_byte_8( prev_address );
@@ -787,7 +810,7 @@ static MACHINE_START( a2600 )
 	int mode = 0xFF; /* readinputport(10); */
 	int chip = 0xFF; /* readinputport(11); */
 
-	extra_RAM = auto_malloc(0x8600);
+	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 
 	r6532_init(0, &r6532_interface);
 
@@ -1031,6 +1054,7 @@ static MACHINE_START( a2600 )
 		memory_set_bankptr( 1, bank_base[1] );
 		memory_set_bankptr( 2, bank_base[2] );
 		modeSS_write_enabled = 0;
+		modeSS_write_pending = 0;
 		memory_set_opbase_handler( 0, modeSS_opbase );
 		break;
 	}
@@ -1261,8 +1285,23 @@ static void a2600_cartslot_getinfo(const device_class *devclass, UINT32 state, u
 	}
 }
 
+static void a2600_cassette_getinfo( const device_class *devclass, UINT32 state, union devinfo *info ) {
+	switch( state ) {
+	case DEVINFO_INT_COUNT:
+		info->i = 1;
+		break;
+//	case DEVINFO_PTR_CASSETTE_FORMATS:
+//		info->p = (void *)a26_cassette_formats;
+//		break;
+	default:
+		cassette_device_getinfo( devclass, state, info );
+		break;
+	}
+}
+
 SYSTEM_CONFIG_START(a2600)
 	CONFIG_DEVICE(a2600_cartslot_getinfo)
+	CONFIG_DEVICE(a2600_cassette_getinfo)
 SYSTEM_CONFIG_END
 
 
