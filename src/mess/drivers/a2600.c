@@ -64,86 +64,133 @@ static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
 
 
-static const UINT32 games[][2] =
-{
-	{ 0x91b8f1b2, modeAV }, // Decathlon
-	{ 0x2452adab, modeAV }, // Decathlon PAL
-	{ 0xe127c012, modeAV }, // Robot Tank
-	{ 0xcded5569, modeAV }, // Robot Tank PAL
-	{ 0x600e7c77, modeAV }, // Space Shuttle PAL (Only the PAL version uses Activision style banking, the US release is regular 8K banking)
-	{ 0xb60ab310, modeAV }, // Thwocker Prototype
-	{ 0x3ba0d9bf, modePB }, // Frogger II
-	{ 0x09cdd3ea, modePB }, // Frogger II PAL
-	{ 0x0d78e8a9, modePB }, // Gyruss
-	{ 0xba14b37b, modePB }, // Gyruss PAL
-	{ 0x34d3ffc8, modePB }, // James Bond 007
-	{ 0x59b96db3, modePB }, // Lord of the Rings Prototype
-	{ 0xe680a1c9, modePB }, // Montezuma's Revenge
-	{ 0xb687a91f, modePB }, // Montezuma's Revenge (trained)
-	{ 0x044735b9, modePB }, // Mr Do's Castle
-	{ 0x7d287f20, modePB }, // Popeye
-	{ 0x742ac749, modePB }, // Popeye PAL
-	{ 0xa87be8fd, modePB }, // Q-bert's Qubes
-	{ 0xd9f499c5, modePB }, // Q-bert's Qubes
-	{ 0xde97103d, modePB }, // Super Cobra
-	{ 0x380d78b3, modePB }, // Super Cobra PAL
-	{ 0x0886a55d, modePB }, // Star Wars Death Star Battle
-	{ 0x2a2bd248, modePB }, // Star Wars Death Star Battle PAL
-	{ 0xd11E05fe, modePB }, // Star Wars Ewok Adventure Prototype PAL
-	{ 0x65c31ca4, modePB }, // Star Wars Arcade Game
-	{ 0x273bda48, modePB }, // Star Wars Arcade Game PAL
-	{ 0x47efd61d, modePB }, // Star Wars Arcade Game Prototype
-	{ 0xfd8c81e5, modePB }, // Tooth Protectors
-	{ 0xec959bf2, modePB }, // Tutankham
-	{ 0x8fbe2b84, modePB }, // Tutankham PAL
-	{ 0xc5baae6f, modePB }, // Tutankham Zelda Hack
-/*
-	{ 0x1f95351a, modeTV }, // Espial
-	{ 0x34b80a97, modeTV }, // Espial PAL
-	{ 0xbd08d915, modeTV }, // Miner 2049er
-	{ 0xbfa477cd, modeTV }, // Miner 2049er Volume II
-	{ 0x71e814e9, modeTV }, // Miner 2049er Volume II
-	{ 0xdb376663, modeTV }, // Polaris
-	{ 0x25b78f89, modeTV }, // Polaris
-	{ 0x71ecefaf, modeTV }, // Polaris
-	{ 0xc820bd75, modeTV }, // River Patrol
-	{ 0xdd183a4f, modeTV }, // Springer
-*/
-	{ 0xAAFF3AB1, mode3E }, // not BoulderDash
-	{ 0x8cdfb7ec, mode3E }, // not BoulderDash PAL
-/*
-	{ 0xb53b33f1, modeUA }, // Funky Fish Prototype
-	{ 0x35589cec, modeUA }, // Pleiads Prototype
-*/
-/*
-	{ 0xdf2bc303, modeMN }, // Bump 'n' Jump
-	{ 0xc183fbbc, modeMN }, // Burgertime
-	{ 0x66f1849e, modeMN }, // Burgertime (E7)
-	{ 0x0603e177, modeMN }, // Masters of the Universe
-*/
+/// bing bing bing.. fix oddball sudoku mappers someday (crc fb67e1c5)
 
-/*	{ 0x14f126c0, modeCV }, // Magicard
-	{ 0x34b0b5c2, modeCV }  // Video Life
-*/
-	{ 0xc3a3f073, modeSS }, // Starpath Supercharger BIOS
-};
-
-static int detect_modeCV(void)
+static int detect_modeDC(void)
 {
 	int i,numfound = 0;
-	unsigned char TVsignature1[3] = { 0x9d, 0xff, 0xf3 };
-	unsigned char TVsignature2[3] = { 0x99, 0x00, 0xf4 };
-	if (cart_size == 0x0800 || cart_size == 0x1000)
+	// signature is also in 'video reflex'.. maybe figure out that controller port someday...
+	unsigned char signature[3] = { 0x8d, 0xf0, 0xff };
+	if (cart_size == 0x10000)
 	{
-		for (i = 0; i < cart_size - sizeof TVsignature1; i++)
+		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], TVsignature1,sizeof TVsignature1))
+			if (!memcmp(&CART[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
-			if (!memcmp(&CART[i], TVsignature2,sizeof TVsignature2))
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_mode3E(void)
+{
+	// this one is a little hacky.. looks for STY $3e, which is unique to
+	// 'not boulderdash', but is the only example i have (cow)
+	int i,numfound = 0;
+	unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
+	if (cart_size == 0x0800 || cart_size == 0x1000)
+	{
+		for (i = 0; i < cart_size - sizeof signature; i++)
+		{
+			if (!memcmp(&CART[i], signature,sizeof signature))
 			{
 				numfound = 1;
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_modeSS(void)
+{
+	int i,numfound = 0;
+	unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
+	if (cart_size == 0x0800 || cart_size == 0x1000)
+	{
+		for (i = 0; i < cart_size - sizeof signature; i++)
+		{
+			if (!memcmp(&CART[i], signature,sizeof signature))
+			{
+				numfound = 1;
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_modeAV(void)
+{
+	int i,j,numfound = 0;
+	unsigned char signatures[][5] =  {
+									{ 0x20, 0x00, 0xd0, 0xc6, 0xc5 },
+									{ 0x20, 0xc3, 0xf8, 0xa5, 0x82 },
+									{ 0xd0, 0xfb, 0x20, 0x73, 0xfe },
+									{ 0x20, 0x00, 0xf0, 0x84, 0xd6 }};
+	if (cart_size == 0x2000)
+	{
+		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		{
+			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
+			{
+				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				{
+					numfound = 1;
+				}
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_modePB(void)
+{
+	int i,j,numfound = 0;
+	unsigned char signatures[][3] =  {
+									{ 0x8d, 0xe0, 0x1f },
+									{ 0x8d, 0xe0, 0x5f },
+									{ 0x8d, 0xe9, 0xff },
+									{ 0xad, 0xe9, 0xff },
+									{ 0xad, 0xed, 0xff },
+									{ 0xad, 0xf3, 0xbf }};
+	if (cart_size == 0x2000)
+	{
+		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		{
+			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
+			{
+				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				{
+					numfound = 1;
+				}
+			}
+		}
+	}
+	if (numfound) return 1;
+	return 0;
+}
+
+static int detect_modeCV(void)
+{
+	int i,j,numfound = 0;
+	unsigned char signatures[][3] = {
+									{ 0x9d, 0xff, 0xf3 },
+									{ 0x99, 0x00, 0xf4 }};
+	if (cart_size == 0x0800 || cart_size == 0x1000)
+	{
+		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		{
+			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
+			{
+				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				{
+					numfound = 1;
+				}
 			}
 		}
 	}
@@ -154,12 +201,12 @@ static int detect_modeCV(void)
 static int detect_modeMN(void)
 {
 	int i,numfound = 0;
-	unsigned char TVsignature[3] = { 0xad, 0xe5, 0xff };
+	unsigned char signature[3] = { 0xad, 0xe5, 0xff };
 	if (cart_size == 0x4000)
 	{
-		for (i = 0; i < cart_size - sizeof TVsignature; i++)
+		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], TVsignature,sizeof TVsignature))
+			if (!memcmp(&CART[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -172,12 +219,12 @@ static int detect_modeMN(void)
 static int detect_modeUA(void)
 {
 	int i,numfound = 0;
-	unsigned char TVsignature[3] = { 0x8d, 0x40, 0x02 };
+	unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
 	if (cart_size == 0x2000)
 	{
-		for (i = 0; i < cart_size - sizeof TVsignature; i++)
+		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], TVsignature,sizeof TVsignature))
+			if (!memcmp(&CART[i], signature,sizeof signature))
 			{
 				numfound = 1;
 			}
@@ -190,18 +237,18 @@ static int detect_modeUA(void)
 static int detect_8K_modeTV(void)
 {
 	int i,numfound = 0;
-	unsigned char TVsignature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
-	unsigned char TVsignature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
+	unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
+	unsigned char signature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
 	// have to look for two signatures because 'not boulderdash' gives false positive otherwise
 	if (cart_size == 0x2000)
 	{
-		for (i = 0; i < cart_size - sizeof TVsignature1; i++)
+		for (i = 0; i < cart_size - sizeof signature1; i++)
 		{
-			if (!memcmp(&CART[i], TVsignature1,sizeof TVsignature1))
+			if (!memcmp(&CART[i], signature1,sizeof signature1))
 			{
 				numfound |= 0x01;
 			}
-			if (!memcmp(&CART[i], TVsignature2,sizeof TVsignature2))
+			if (!memcmp(&CART[i], signature2,sizeof signature2))
 			{
 				numfound |= 0x02;
 			}
@@ -214,12 +261,12 @@ static int detect_8K_modeTV(void)
 static int detect_32K_modeTV(void)
 {
 	int i,numfound = 0;
-	unsigned char TVsignature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
+	unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
 	if (cart_size >= 0x8000)
 	{
-		for (i = 0; i < cart_size - sizeof TVsignature; i++)
+		for (i = 0; i < cart_size - sizeof signature; i++)
 		{
-			if (!memcmp(&CART[i], TVsignature,sizeof TVsignature))
+			if (!memcmp(&CART[i], signature,sizeof signature))
 			{
 				numfound++;
 			}
@@ -231,8 +278,24 @@ static int detect_32K_modeTV(void)
 
 static int detect_super_chip(void)
 {
-	int i;
+	int i,j;
+	unsigned char signatures[][5] = {
+									{ 0xa2, 0x7f, 0x9d, 0x00, 0xf0 }, // dig dug
+									{ 0xae, 0xf6, 0xff, 0x4c, 0x00 }}; // off the wall
 
+	if (cart_size == 0x4000)
+	{
+		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		{
+			for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
+			{
+				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				{
+					return 1;
+				}
+			}
+		}
+	}
 	for (i = 0x1000; i < cart_size; i += 0x1000)
 	{
 		if (memcmp(CART, CART + i, 0x100))
@@ -245,7 +308,6 @@ static int detect_super_chip(void)
 	if ( ( i & 0x0FFF ) < 0x0100 ) {
 		return 0;
 	}
-
 	return 1;
 }
 
@@ -659,7 +721,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
-					if ( ( readinputport(12) >> 3*i ) & 0x01 ) {
+					if ( ( readinputport(10) >> 3*i ) & 0x01 ) {
 						return TIA_INPUT_PORT_ALWAYS_OFF;
 					} else {
 						return TIA_INPUT_PORT_ALWAYS_ON;
@@ -679,7 +741,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
-					if ( ( readinputport(12) >> 3*i ) & 0x02 ) {
+					if ( ( readinputport(10) >> 3*i ) & 0x02 ) {
 						return TIA_INPUT_PORT_ALWAYS_OFF;
 					} else {
 						return TIA_INPUT_PORT_ALWAYS_ON;
@@ -729,7 +791,7 @@ static READ16_HANDLER(a2600_read_input_port) {
 		case 0x01:	/* Paddle */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
-					if ( ( readinputport(12) >> 3*i ) & 0x04 ) {
+					if ( ( readinputport(10) >> 3*i ) & 0x04 ) {
 						return TIA_INPUT_PORT_ALWAYS_OFF;
 					} else {
 						return TIA_INPUT_PORT_ALWAYS_ON;
@@ -806,9 +868,9 @@ static void setup_riot(int dummy) {
 
 static MACHINE_START( a2600 )
 {
-	/* NPW 6-Mar-2006 - The MAME core changed, and now I cannot use readinputport() here properly */
-	int mode = 0xFF; /* readinputport(10); */
-	int chip = 0xFF; /* readinputport(11); */
+
+	int mode = 0xFF;
+	int chip = 0xFF;
 
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 
@@ -826,10 +888,6 @@ static MACHINE_START( a2600 )
 
 	if (mode == 0xff)
 	{
-		UINT32 crc = crc32(0, CART, cart_size);
-
-		int i;
-
 		switch (cart_size)
 		{
 		case 0x800:
@@ -850,63 +908,37 @@ static MACHINE_START( a2600 )
 		case 0x8000:
 			mode = mode32;
 			break;
-		case 0x10000:
-			mode = modeDC;
-			break;
 		case 0x80000:
 			mode = modeTV;
 			break;
 		}
 
-		if (detect_modeCV())
-		{
-			mode = modeCV;
-		}
-		if (detect_modeMN())
-		{
-			mode = modeMN;
-		}
-		if (detect_modeUA())
-		{
-			mode = modeUA;
-		}
-		if (detect_8K_modeTV())
-		{
-			mode = modeTV;
-		}
-		if (detect_32K_modeTV())
-		{
-			mode = modeTV;
-		}
-		for (i = 0; 8 * i < sizeof games; i++)
-		{
-			if (games[i][0] == crc)
-			{
-				mode = games[i][1];
-			}
-		}
-	}
+		if (detect_modeDC()) mode = modeDC;
+		if (detect_mode3E()) mode = mode3E;
+		if (detect_modeAV()) mode = modeAV;
+		if (detect_modeSS()) mode = modeSS;
+		if (detect_modePB()) mode = modePB;
+		if (detect_modeCV()) mode = modeCV;
+		if (detect_modeMN()) mode = modeMN;
+		if (detect_modeUA()) mode = modeUA;
+		if (detect_8K_modeTV()) mode = modeTV;
+		if (detect_32K_modeTV()) mode = modeTV;
 
+	}
 	/* auto-detect super chip */
 
-	if (chip == 0xff)
+	chip = 0;
+
+	if (cart_size == 0x2000 || cart_size == 0x4000 || cart_size == 0x8000)
 	{
-		UINT32 crc = crc32(0, CART, cart_size);
-
-		chip = 0;
-
-		if (cart_size == 0x2000 || cart_size == 0x4000 || cart_size == 0x8000)
-		{
-			chip = detect_super_chip();
-		}
-
-		if (crc == 0xee7b80d1) chip = 1; // Dig Dug
-		if (crc == 0xa09779ea) chip = 1; // Off the Wall
-		if (crc == 0x861c4aca) chip = 1; // Fatal Run (PAL) (alt)
-		if (crc == 0x991d2348) chip = 1; // Fatal Run (PAL)
-		if (crc == 0x7169337a) chip = 1; // Fatal Run (PAL) (NTSC fixed)
-
+		chip = detect_super_chip();
 	}
+
+	/* Super chip games:
+	   dig dig, crystal castles, millipede, stargate, defender ii, jr. Pac Man,
+	   desert falcon, dark chambers, super football, sprintmaster, fatal run,
+	   off the wall, shooting arcade, secret quest, radar lock, save mary, klax
+	*/
 
 	/* set up ROM banks */
 
@@ -1155,30 +1187,7 @@ INPUT_PORTS_START( a2600 )
 	//PORT_CATEGORY_ITEM(    0x04, "Keypad", 23 )
 	//PORT_CATEGORY_ITEM(    0x08, "Lightgun", 24 )
 
-	PORT_START /* [10] */
-	PORT_CONFNAME( 0xff, 0xff, "Bank Mode" )
-	PORT_CONFSETTING(    0xff, "Auto" )
-	PORT_CONFSETTING(    mode2K, "2K" )
-	PORT_CONFSETTING(    mode4K, "4K" )
-	PORT_CONFSETTING(    mode8K, "8K" )
-	PORT_CONFSETTING(    mode12, "12K" )
-	PORT_CONFSETTING(    mode16, "16K" )
-	PORT_CONFSETTING(    mode32, "32K" )
-	PORT_CONFSETTING(    modeAV, "Activision" )
-	PORT_CONFSETTING(    modeCV, "CommaVid" )
-	PORT_CONFSETTING(    modeDC, "Dynacom" )
-	PORT_CONFSETTING(    modeMN, "M Network" )
-	PORT_CONFSETTING(    modePB, "Parker Brothers" )
-	PORT_CONFSETTING(    modeTV, "Tigervision" )
-	PORT_CONFSETTING(    modeUA, "UA Limited" )
-
-	PORT_START /* [11] */
-	PORT_CONFNAME( 0xff, 0xff, "Super Chip" )
-	PORT_CONFSETTING(    0xff, "Auto" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ))
-	PORT_CONFSETTING(    0x01, DEF_STR( On ))
-
-	PORT_START	/* [12] left keypad */
+	PORT_START	/* [10] left keypad */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 1") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 2") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 3") PORT_CODE(KEYCODE_9_PAD)
@@ -1192,7 +1201,7 @@ INPUT_PORTS_START( a2600 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 0") PORT_CODE(KEYCODE_DEL_PAD)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left #") PORT_CODE(KEYCODE_ENTER_PAD)
 
-	PORT_START  /* [13] right keypad */
+	PORT_START  /* [11] right keypad */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 1")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 2")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 3")
