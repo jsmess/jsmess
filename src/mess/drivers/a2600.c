@@ -64,8 +64,6 @@ static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
 
 
-/// bing bing bing.. fix oddball sudoku mappers someday (crc fb67e1c5)
-
 static int detect_modeDC(void)
 {
 	int i,numfound = 0;
@@ -89,6 +87,8 @@ static int detect_mode3E(void)
 {
 	// this one is a little hacky.. looks for STY $3e, which is unique to
 	// 'not boulderdash', but is the only example i have (cow)
+	// Would have used STA $3e, but 'Alien' and 'Star Raiders' do that for unknown reasons
+
 	int i,numfound = 0;
 	unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
 	if (cart_size == 0x0800 || cart_size == 0x1000)
@@ -200,15 +200,20 @@ static int detect_modeCV(void)
 
 static int detect_modeMN(void)
 {
-	int i,numfound = 0;
-	unsigned char signature[3] = { 0xad, 0xe5, 0xff };
+	int i,j,numfound = 0;
+	unsigned char signatures[][3] = {
+									{ 0xad, 0xe5, 0xff },
+									{ 0x8d, 0xe7, 0xff }};
 	if (cart_size == 0x4000)
 	{
-		for (i = 0; i < cart_size - sizeof signature; i++)
+		for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
-			if (!memcmp(&CART[i], signature,sizeof signature))
+			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
-				numfound = 1;
+				if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0]))
+				{
+					numfound = 1;
+				}
 			}
 		}
 	}
@@ -886,45 +891,41 @@ static MACHINE_START( a2600 )
 
 	/* auto-detect bank mode */
 
-	if (mode == 0xff)
+	switch (cart_size)
 	{
-		switch (cart_size)
-		{
-		case 0x800:
-			mode = mode2K;
-			break;
-		case 0x1000:
-			mode = mode4K;
-			break;
-		case 0x2000:
-			mode = mode8K;
-			break;
-		case 0x3000:
-			mode = mode12;
-			break;
-		case 0x4000:
-			mode = mode16;
-			break;
-		case 0x8000:
-			mode = mode32;
-			break;
-		case 0x80000:
-			mode = modeTV;
-			break;
-		}
-
-		if (detect_modeDC()) mode = modeDC;
-		if (detect_mode3E()) mode = mode3E;
-		if (detect_modeAV()) mode = modeAV;
-		if (detect_modeSS()) mode = modeSS;
-		if (detect_modePB()) mode = modePB;
-		if (detect_modeCV()) mode = modeCV;
-		if (detect_modeMN()) mode = modeMN;
-		if (detect_modeUA()) mode = modeUA;
-		if (detect_8K_modeTV()) mode = modeTV;
-		if (detect_32K_modeTV()) mode = modeTV;
-
+	case 0x800:
+		mode = mode2K;
+		break;
+	case 0x1000:
+		mode = mode4K;
+		break;
+	case 0x2000:
+		mode = mode8K;
+		break;
+	case 0x3000:
+		mode = mode12;
+		break;
+	case 0x4000:
+		mode = mode16;
+		break;
+	case 0x8000:
+		mode = mode32;
+		break;
+	case 0x80000:
+		mode = modeTV;
+		break;
 	}
+	if (detect_modeDC()) mode = modeDC;
+	if (detect_mode3E()) mode = mode3E;
+	if (detect_modeAV()) mode = modeAV;
+	if (detect_modeSS()) mode = modeSS;
+	if (detect_modePB()) mode = modePB;
+	if (detect_modeCV()) mode = modeCV;
+	if (detect_modeMN()) mode = modeMN;
+	if (detect_modeUA()) mode = modeUA;
+	if (detect_8K_modeTV()) mode = modeTV;
+	if (detect_32K_modeTV()) mode = modeTV;
+
 	/* auto-detect super chip */
 
 	chip = 0;
