@@ -1053,21 +1053,13 @@ static void MySetColumnInfo(int *order, int *shown)
 static INT_PTR CALLBACK MyColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	INT_PTR result = 0;
-	char* utf8_columnnames;
-	const char* utf8_ptr;
 	int nColumnCount = Picker_GetColumnCount(MyColumnDialogProc_hwndPicker);
 	LPCTSTR *ppszColumnNames = Picker_GetColumnNames(MyColumnDialogProc_hwndPicker);
-	utf8_columnnames = utf8_from_tstring(*ppszColumnNames);
-	if( !utf8_columnnames )
-		return result;
-	
-	utf8_ptr = utf8_columnnames;
 	
 	result = InternalColumnDialogProc(hDlg, Msg, wParam, lParam, nColumnCount,
-		MyColumnDialogProc_shown, MyColumnDialogProc_order, &utf8_ptr,
+		MyColumnDialogProc_shown, MyColumnDialogProc_order, ppszColumnNames,
 		MyGetRealColumnOrder, MyGetColumnInfo, MySetColumnInfo);
 		
-	free(utf8_columnnames);
 	return result;
 }
 
