@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "inputx.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -255,6 +256,22 @@ static UINT8 read_keyboard(int pa)
 	return 0xff;
 }
 
+static READ8_HANDLER( pia_porta_r )
+{
+	/*
+		PA0		Keyboard raster player 1 output
+		PA1		Keyboard raster player 1 output
+		PA2		Keyboard raster player 2 output
+		PA3		Keyboard raster player 2 output
+		PA4		?
+		PA5		?
+		PA6		?
+		PA7		?
+	*/
+
+	return 0xff;
+}
+
 static READ8_HANDLER( pia_portb_r )
 {
 	/*
@@ -342,7 +359,7 @@ static WRITE8_HANDLER( pia_cb2_w )
 
 static const pia6821_interface crvision_pia_intf =
 {
-	0,				// input A
+	pia_porta_r,	// input A
 	pia_portb_r,	// input B
 	pia_ca1_r,		// input CA1 (+5V)
 	pia_cb1_r,		// input CB1 (SN76489 pin READY )
@@ -507,7 +524,24 @@ static void crvision_cartslot_getinfo(const device_class *devclass, UINT32 state
 	}
 }
 
+static void crvision_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		default:										cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
 SYSTEM_CONFIG_START( crvision )
+	CONFIG_DEVICE(crvision_cartslot_getinfo)
+	CONFIG_DEVICE(crvision_cassette_getinfo)
+SYSTEM_CONFIG_END
+
+SYSTEM_CONFIG_START( fnvision )
 	CONFIG_DEVICE(crvision_cartslot_getinfo)
 SYSTEM_CONFIG_END
 
@@ -515,4 +549,4 @@ SYSTEM_CONFIG_END
 
 /*    YEAR	NAME	  PARENT	COMPAT	MACHINE		INPUT		INIT	CONFIG      COMPANY				FULLNAME */
 COMP( 1981, crvision, 0,		0,		crvision,	crvision,	0,		crvision,	"Video Technology", "CreatiVision (NTSC)", GAME_SUPPORTS_SAVE )
-CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		crvision,	"Video Technology", "FunVision Computer Video Games System (PAL)", GAME_SUPPORTS_SAVE )
+CONS( 1983, fnvision, crvision, 0,		fnvision,	crvision,	0,		fnvision,	"Video Technology", "FunVision Computer Video Games System (PAL)", GAME_SUPPORTS_SAVE )
