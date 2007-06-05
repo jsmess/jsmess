@@ -53,6 +53,8 @@ System Driver Changes:
 
 - [A2600] Rewrote player graphics drawing and handling. [Wilbert Pol]
 
+- [A2600] Added SuperCharger support. [Wilbert Pol]
+
 - [AMIGA] Updated the Amiga driver to output the power and drive LED status
   to the artwork system. [Dirk Best]
 

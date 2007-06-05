@@ -530,6 +530,7 @@ $(MESSOBJ)/atari.a:						\
 	$(MESS_DRIVERS)/jaguar.o	\
 	$(MAME_AUDIO)/jaguar.o			\
 	$(MAME_VIDEO)/jaguar.o			\
+	$(MESS_FORMATS)/a26_cas.o	\
 #	$(MESS_DRIVERS)/atarist.o
 
 $(MESSOBJ)/gce.a:	                     \

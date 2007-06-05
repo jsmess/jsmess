@@ -14,7 +14,7 @@
 #include "sound/tiaintf.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-//#include "formats/a26_cas.h"
+#include "formats/a26_cas.h"
 #include "video/tia.h"
 #include "inputx.h"
 #include "zlib.h"
@@ -1300,9 +1300,9 @@ static void a2600_cassette_getinfo( const device_class *devclass, UINT32 state, 
 	case DEVINFO_INT_COUNT:
 		info->i = 1;
 		break;
-//	case DEVINFO_PTR_CASSETTE_FORMATS:
-//		info->p = (void *)a26_cassette_formats;
-//		break;
+	case DEVINFO_PTR_CASSETTE_FORMATS:
+		info->p = (void *)a26_cassette_formats;
+		break;
 	default:
 		cassette_device_getinfo( devclass, state, info );
 		break;
