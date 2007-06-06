@@ -93,6 +93,8 @@ Source Changes:
 
 - Added many SHA1 hashes. [Fabio Priuli]
 
+- Added several testdrivers to real drivers.  [Oliver Stoeneberg]
+
 
 
 0.115

@@ -11,7 +11,6 @@
 #include "includes/odyssey2.h"
 #include "image.h"
 #include "devices/cartslot.h"
-#include "zlib.h"
 #include "osdmess.h"
 
 static UINT8 *ram;

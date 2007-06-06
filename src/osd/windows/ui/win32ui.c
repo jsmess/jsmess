@@ -5163,7 +5163,7 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	t_filename = tstring_from_utf8(filename);
 	if (t_filename != NULL)
 	{
-		snprintf(t_filename_buffer, ARRAY_LENGTH(t_filename_buffer), "%s", t_filename);
+		_sntprintf(t_filename_buffer, ARRAY_LENGTH(t_filename_buffer), TEXT("%s"), t_filename);
 		free(t_filename);
 	}
 

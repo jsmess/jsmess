@@ -958,7 +958,7 @@ missing:
 
 */
 
-/*     YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY   FULLNAME */
+/*     YEAR  NAME    PARENT  BIOS	COMPAT  MACHINE  INPUT  INIT  CONFIG  COMPANY   FULLNAME */
 /*
 // PU-7/PU-8
 CONS( 1994, psx,    0,      0,      psxntsc, psx,   psx,  psx,    "Sony",   "Sony Playstation (scph1000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

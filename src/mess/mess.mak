@@ -411,7 +411,7 @@ DRVLIBS = \
 	$(MESSOBJ)/vtech.a \
 	$(MESSOBJ)/3do.a \
 	$(MESSOBJ)/shared.a \
-
+#	$(MESSOBJ)/exeltel.a \
 
 
 #-------------------------------------------------
