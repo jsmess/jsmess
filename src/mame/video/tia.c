@@ -1270,9 +1270,14 @@ static WRITE8_HANDLER( RESP0_w )
 				int min_x = p0gfx.start_drawing[i];
 				int size = ( 8 - p0gfx.start_pixel[i] ) * p0gfx.size[i];
 				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
-					/* This copy has started drawing */
-					p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
-					p0gfx.start_drawing[i] = curr_x;
+					if ( curr_x >= min_x ) {
+						/* This copy has started drawing */
+						p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
+						p0gfx.start_drawing[i] = curr_x;
+					} else {
+						/* This copy is waiting to start drawing */
+						p0gfx.start_drawing[i] = horzP0;
+					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
 					   it as done/invalid, the data will be reset in the next loop. */
@@ -1322,9 +1327,14 @@ static WRITE8_HANDLER( RESP1_w )
 				int min_x = p1gfx.start_drawing[i];
 				int size = ( 8 - p1gfx.start_pixel[i] ) * p1gfx.size[i];
 				if ( curr_x >= ( min_x - 5 ) % 160 && curr_x < ( min_x + size ) % 160 ) {
-					/* This copy has started drawing */
-					p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
-					p1gfx.start_drawing[i] = curr_x;
+					if ( curr_x >= min_x ) {
+						/* This copy has started drawing */
+						p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
+						p1gfx.start_drawing[i] = curr_x;
+					} else {    
+						/* This copy is waiting to start drawing */
+						p1gfx.start_drawing[i] = horzP1;
+					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
 					   it as done/invalid, the data will be reset in the next loop. */
