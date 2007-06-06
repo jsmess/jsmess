@@ -5,10 +5,12 @@ Atari 2600 SuperCharger support
 */
 
 #include "mame.h"
+#include "driver.h"
 #include "a26_cas.h"
 
 #define A26_CAS_SIZE			8448
 #define A26_WAV_FREQUENCY		44100
+#define A26_WAV_FREQUENCY_PAL	43697.37
 #define WAVE_LOW				0xF600
 #define WAVE_HIGH				0x0500
 #define WAVE_NULL				0
@@ -149,6 +151,9 @@ static casserr_t a26_cassette_identify( cassette_image *cassette, struct Cassett
 
 	size = cassette_image_size( cassette );
 	if ( size == A26_CAS_SIZE ) {
+		if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
+			a26_legacy_fill_wave.sample_frequency = A26_WAV_FREQUENCY_PAL;
+		}
 		return cassette_legacy_identify( cassette, opts, &a26_legacy_fill_wave );
 	}
 	return CASSETTE_ERROR_INVALIDIMAGE;
