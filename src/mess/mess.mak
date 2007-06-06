@@ -495,7 +495,6 @@ $(MESSOBJ)/coleco.a:   \
 	$(MESS_MACHINE)/adam.o		\
 	$(MESS_DRIVERS)/adam.o		\
 	$(MESS_FORMATS)/adam_dsk.o	\
-	$(MESS_DRIVERS)/fnvision.o	\
 	
 $(MESSOBJ)/arcadia.a:  \
 	$(MESS_DRIVERS)/arcadia.o	\
@@ -873,6 +872,7 @@ $(MESSOBJ)/vtech.a :   \
 	$(MESS_DRIVERS)/vtech2.o	\
 	$(MESS_FORMATS)/vt_cas.o	\
 	$(MESS_FORMATS)/vt_dsk.o	\
+	$(MESS_DRIVERS)/crvision.o	\
 
 $(MESSOBJ)/jupiter.a : \
 	$(MESS_DRIVERS)/jupiter.o	\
