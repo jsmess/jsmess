@@ -515,6 +515,7 @@ static void state_save_register(void)
 static int video_start_common(UINT32 (*get_memory_offset)(UINT32,UINT32,UINT32,UINT32))
 {
 	bg_tilemap = tilemap_create(get_tile_info,get_memory_offset,TILEMAP_TRANSPARENT,8,8,32,32);
+	tilemap_set_scrolldx(bg_tilemap, 0, -128);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 
@@ -1091,11 +1092,8 @@ VIDEO_START( dambustr )
 
 WRITE8_HANDLER( galaxian_videoram_w )
 {
-	if (galaxian_videoram[offset] != data)
-	{
-		galaxian_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	galaxian_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 READ8_HANDLER( galaxian_videoram_r )
@@ -1221,11 +1219,8 @@ WRITE8_HANDLER( galaxian_gfxbank_w )
 
 WRITE8_HANDLER( rockclim_videoram_w )
 {
-	if (rockclim_videoram[offset] != data)
-	{
-		rockclim_videoram[offset] = data;
-		tilemap_mark_tile_dirty(rockclim_tilemap, offset);
-	}
+	rockclim_videoram[offset] = data;
+	tilemap_mark_tile_dirty(rockclim_tilemap, offset);
 }
 
 WRITE8_HANDLER( rockclim_scroll_w )

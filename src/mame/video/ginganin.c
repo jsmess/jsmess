@@ -111,10 +111,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE16_HANDLER( ginganin_fgram16_w )
 {
-	UINT16 oldword = ginganin_fgram16[offset];
 	COMBINE_DATA(&ginganin_fgram16[offset]);
-	if (oldword != ginganin_fgram16[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 
@@ -136,10 +134,8 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 WRITE16_HANDLER( ginganin_txtram16_w )
 {
-	UINT16 oldword = ginganin_txtram16[offset];
 	COMBINE_DATA(&ginganin_txtram16[offset]);
-	if (oldword != ginganin_txtram16[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 

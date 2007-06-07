@@ -39,20 +39,14 @@ PALETTE_INIT( kopunch )
 
 WRITE8_HANDLER( kopunch_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kopunch_videoram2_w )
 {
-	if (kopunch_videoram2[offset] != data)
-	{
-		kopunch_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	kopunch_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kopunch_scroll_x_w )

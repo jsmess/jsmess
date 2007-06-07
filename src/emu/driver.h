@@ -25,10 +25,10 @@
 
 #define MEMCARD_HANDLER(name)	void memcard_handler_##name(running_machine *machine, mame_file *file, int action)
 
-#define MACHINE_START(name)		int machine_start_##name(running_machine *machine)
+#define MACHINE_START(name)		void machine_start_##name(running_machine *machine)
 #define MACHINE_RESET(name)		void machine_reset_##name(running_machine *machine)
 
-#define SOUND_START(name)		int sound_start_##name(running_machine *machine)
+#define SOUND_START(name)		void sound_start_##name(running_machine *machine)
 #define SOUND_RESET(name)		void sound_reset_##name(running_machine *machine)
 
 #define VIDEO_START(name)		int video_start_##name(running_machine *machine)
@@ -185,7 +185,7 @@ struct _machine_config
 	INT32				watchdog_vblank_count;		/* number of VBLANKs until the watchdog kills us */
 	double				watchdog_time;				/* length of time until the watchdog kills us */
 
-	int 				(*machine_start)(running_machine *machine);		/* one-time machine start callback */
+	void 				(*machine_start)(running_machine *machine);		/* one-time machine start callback */
 	void 				(*machine_reset)(running_machine *machine);		/* machine reset callback */
 
 	void 				(*nvram_handler)(running_machine *machine, mame_file *file, int read_or_write); /* NVRAM save/load callback  */
@@ -207,7 +207,7 @@ struct _machine_config
 	sound_config		sound[MAX_SOUND];			/* array of sound chips in the system */
 	speaker_config		speaker[MAX_SPEAKER];		/* array of speakers in the system */
 
-	int					(*sound_start)(running_machine *machine);		/* one-time sound start callback */
+	void				(*sound_start)(running_machine *machine);		/* one-time sound start callback */
 	void				(*sound_reset)(running_machine *machine);		/* sound reset callback */
 };
 

@@ -148,6 +148,7 @@ INLINE void swap_register(UINT32 *a, UINT32 *b)
 
 static void systemreg_write_latency_effect(void)
 {
+	int i;
 	UINT32 data = sharc.systemreg_latency_data;
 	UINT32 old_data = sharc.systemreg_previous_data;
 
@@ -249,25 +250,13 @@ static void systemreg_write_latency_effect(void)
 			}
 			if ((data & 0x80) != (oldreg & 0x80))
 			{
-				swap_register(&sharc.r[8].r, &sharc.reg_alt[8].r);
-				swap_register(&sharc.r[9].r, &sharc.reg_alt[9].r);
-				swap_register(&sharc.r[10].r, &sharc.reg_alt[10].r);
-				swap_register(&sharc.r[11].r, &sharc.reg_alt[11].r);
-				swap_register(&sharc.r[12].r, &sharc.reg_alt[12].r);
-				swap_register(&sharc.r[13].r, &sharc.reg_alt[13].r);
-				swap_register(&sharc.r[14].r, &sharc.reg_alt[14].r);
-				swap_register(&sharc.r[15].r, &sharc.reg_alt[15].r);
+				for (i=8; i<16; i++)
+					swap_register((UINT32*)&sharc.r[i].r, (UINT32*)&sharc.reg_alt[i].r);
 			}
 			if ((data & 0x400) != (oldreg & 0x400))
 			{
-				swap_register(&sharc.r[0].r, &sharc.reg_alt[0].r);
-				swap_register(&sharc.r[1].r, &sharc.reg_alt[1].r);
-				swap_register(&sharc.r[2].r, &sharc.reg_alt[2].r);
-				swap_register(&sharc.r[3].r, &sharc.reg_alt[3].r);
-				swap_register(&sharc.r[4].r, &sharc.reg_alt[4].r);
-				swap_register(&sharc.r[5].r, &sharc.reg_alt[5].r);
-				swap_register(&sharc.r[6].r, &sharc.reg_alt[6].r);
-				swap_register(&sharc.r[7].r, &sharc.reg_alt[7].r);
+				for (i=0; i<8; i++)
+					swap_register((UINT32*)&sharc.r[i].r, (UINT32*)&sharc.reg_alt[i].r);
 			}
 			break;
 		}

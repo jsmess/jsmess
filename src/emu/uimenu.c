@@ -948,7 +948,7 @@ static UINT32 menu_analog(UINT32 state)
 	ui_menu_draw(item_list, menu_items, state, NULL);
 
 	/* handle generic menu keys */
-	if (ui_menu_generic_keys((int *) &state, menu_items))
+	if (ui_menu_generic_keys(&state, menu_items))
 		return state;
 
 	/* handle left/right arrows */

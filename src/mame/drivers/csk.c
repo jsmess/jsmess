@@ -572,7 +572,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x08000, &charlayout2,  0, 16 },
 	{ REGION_GFX2, 0x0c000, &charlayout2,  0, 16 },
 	{ REGION_GFX2, 0x00000, &charlayout2,  0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( csk227it )
@@ -614,7 +614,7 @@ static MACHINE_DRIVER_START( csk234it )
  */
 
 ROM_START( csk227it )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "v227i.bin",   0x0000, 0x10000, CRC(df1ebf49) SHA1(829c7575d3d3780557405b3a61859901df6dbe4f) )
 
 	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -632,7 +632,7 @@ ROM_START( csk227it )
 ROM_END
 
 ROM_START( csk234it )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "v234it.bin",   0x0000, 0x10000, CRC(344b7059)  SHA1(990cb84e35c0c50d3be9fbb76a11395114dc6c9b) )
 
 	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -672,7 +672,7 @@ This doesn't attempt to decode the gfx.
 
 */
 ROM_START( stellecu )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	/* there is data at 0x18000 which is probably mapped somewhere */
 	ROM_LOAD( "u35.bin",   0x0000, 0x20000, CRC(914b7c59) SHA1(3275b5016524467199f32d653c757bfe4f9cfc60) )
 

@@ -620,7 +620,6 @@ static struct K054539interface k054539_interface =
 static MACHINE_START( lethalen )
 {
 	state_save_register_global(cur_control2);
-	return 0;
 }
 
 static MACHINE_RESET( lethalen )
@@ -647,7 +646,7 @@ static const gfx_layout lethal_6bpp =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &lethal_6bpp,   0x000/*0x400*/, 256  }, /* sprites tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( lethalen )

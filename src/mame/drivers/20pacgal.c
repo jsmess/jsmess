@@ -225,7 +225,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	/* the game dynamically modifies these */
 	{ 0, 0, &charlayout,   0, 64 },
 	{ 0, 0, &spritelayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

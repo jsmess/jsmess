@@ -30,7 +30,7 @@ static const char *astinvad_sample_names[] =
 	"6.wav",
 	"7.wav",
 	"8.wav",
-	0       /* end of array */
+	0
 };
 
 /* sample sound IDs - must match sample file name table above */

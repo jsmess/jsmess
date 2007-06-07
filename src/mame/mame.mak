@@ -628,7 +628,7 @@ $(MAMEOBJ)/cvs.a: \
 
 $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/actfancr.o $(VIDEO)/actfancr.o \
-	$(DRIVERS)/astrof.o $(AUDIO)/astrof.o $(VIDEO)/astrof.o \
+	$(DRIVERS)/astrof.o $(AUDIO)/astrof.o \
 	$(DRIVERS)/backfire.o \
 	$(DRIVERS)/battlera.o $(VIDEO)/battlera.o \
 	$(DRIVERS)/boogwing.o $(VIDEO)/boogwing.o \

@@ -679,7 +679,7 @@ static const gfx_layout bglayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &bglayout,     0x0000, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 MACHINE_DRIVER_START( plygonet )

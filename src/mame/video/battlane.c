@@ -65,11 +65,8 @@ WRITE8_HANDLER( battlane_scrolly_w )
 
 WRITE8_HANDLER( battlane_tileram_w )
 {
-	if (battlane_tileram[offset] != data)
-	{
-	    battlane_tileram[offset] = data;
-		//tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+    battlane_tileram[offset] = data;
+	//tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( battlane_spriteram_w )

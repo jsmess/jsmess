@@ -239,7 +239,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &spritelayout,  0, 2 },	/* colors 0x00-0x0f */
 	{ REGION_GFX2, 0, &tilelayout,   32, 4 },	/* colors 0x20-0x3f */
 	{ REGION_GFX2, 0, &tilelayout2,  32, 4 },	/* colors 0x20-0x3f */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -298,7 +298,7 @@ ROM_START( battlane )
 	ROM_REGION( 0x8000, REGION_USER1, 0 )     /*  */
 	ROM_LOAD( "da00-5",     0x0000, 0x8000, CRC(85b4ed73) SHA1(b8e61eedf8fb75bb07f1df91a7465cee2b6ff372) )
 
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	/* first half of da00-5 will be copied at 0x4000-0x7fff */
 	ROM_COPY( REGION_USER1, 0x0000, 0x4000, 0x4000 )
 	ROM_LOAD( "da01-5",     0x8000, 0x8000, CRC(7a6c3f02) SHA1(bee1ee858f81453a53afc2d016f549924801b090) )
@@ -326,7 +326,7 @@ ROM_START( battlan2 )
 	ROM_REGION( 0x8000, REGION_USER1, 0 )
 	ROM_LOAD( "da00-3",     0x0000, 0x8000, CRC(7a0a5d58) SHA1(ef97e5a64a668c437c18cda931c52bf39b580b4a) )
 
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	/* first half of da00-3 will be copied at 0x4000-0x7fff */
 	ROM_COPY( REGION_USER1, 0x0000, 0x4000, 0x4000 )
 	ROM_LOAD( "da01-3",     0x8000, 0x8000, CRC(d9e40800) SHA1(dc87ae0d8631c220dbbddbf0e49b6bdaeb635269) )
@@ -354,7 +354,7 @@ ROM_START( battlan3 )
 	ROM_REGION( 0x8000, REGION_USER1, 0 )
 	ROM_LOAD( "bl_04.rom",  0x0000, 0x8000, CRC(5681564c) SHA1(25b3a715e91976830d87c7c45b93b473df709241) )
 
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	/* first half of bl_04.rom will be copied at 0x4000-0x7fff */
 	ROM_COPY( REGION_USER1, 0x0000, 0x4000, 0x4000 )
 	ROM_LOAD( "bl_05.rom",  0x8000, 0x8000, CRC(001c4bbe) SHA1(4320c0a85b5b3505ac7292673759e5288cf4187f) )

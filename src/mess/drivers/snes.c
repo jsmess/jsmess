@@ -256,7 +256,7 @@ static void snes_machine_stop(running_machine *machine)
 static MACHINE_START( snes_mess )
 {
 	add_exit_callback(machine, snes_machine_stop);
-	return machine_start_snes(machine);
+	machine_start_snes(machine);
 }
 
 static int device_load_snes_cart(mess_image *image)

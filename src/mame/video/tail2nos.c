@@ -79,10 +79,8 @@ VIDEO_START( tail2nos )
 
 WRITE16_HANDLER( tail2nos_bgvideoram_w )
 {
-	int oldword = tail2nos_bgvideoram[offset];
 	COMBINE_DATA(&tail2nos_bgvideoram[offset]);
-	if (oldword != tail2nos_bgvideoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 READ16_HANDLER( tail2nos_zoomdata_r )

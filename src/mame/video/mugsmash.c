@@ -85,11 +85,8 @@ static TILE_GET_INFO( get_mugsmash_tile_info1 )
 
 WRITE16_HANDLER( mugsmash_videoram1_w )
 {
-	if (mugsmash_videoram1[offset] != data)
-	{
-		mugsmash_videoram1[offset] = data;
-		tilemap_mark_tile_dirty(mugsmash_tilemap1,offset/2);
-	}
+	mugsmash_videoram1[offset] = data;
+	tilemap_mark_tile_dirty(mugsmash_tilemap1,offset/2);
 }
 
 static TILE_GET_INFO( get_mugsmash_tile_info2 )
@@ -114,11 +111,8 @@ static TILE_GET_INFO( get_mugsmash_tile_info2 )
 
 WRITE16_HANDLER( mugsmash_videoram2_w )
 {
-	if (mugsmash_videoram2[offset] != data)
-	{
-		mugsmash_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(mugsmash_tilemap2,offset/2);
-	}
+	mugsmash_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(mugsmash_tilemap2,offset/2);
 }
 
 WRITE16_HANDLER (mugsmash_reg_w)

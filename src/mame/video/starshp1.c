@@ -136,13 +136,8 @@ WRITE8_HANDLER( starshp1_playfield_w )
 	if (starshp1_mux != 0)
 	{
 		offset ^= 0x1f;
-
-		if (starshp1_playfield_ram[offset] != data)
-		{
-			tilemap_mark_tile_dirty(bg_tilemap, offset);
-		}
-
 		starshp1_playfield_ram[offset] = data;
+		tilemap_mark_tile_dirty(bg_tilemap, offset);
 	}
 }
 

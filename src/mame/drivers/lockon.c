@@ -140,31 +140,22 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 /* Characters */
 WRITE8_HANDLER( lockon_vram_0_w )
 {
-        if (lockon_vram0[offset]!=data)
-        {
-        	tilemap_mark_tile_dirty(lockon_tilemap0,offset/2);
-        }
-        lockon_vram0[offset] = data;
+    lockon_vram0[offset] = data;
+   	tilemap_mark_tile_dirty(lockon_tilemap0,offset/2);
 }
 
 /* Scene */
 WRITE8_HANDLER( lockon_vram_1_w )
 {
-        if (lockon_vram1[offset]!=data)
-        {
-        	tilemap_mark_tile_dirty(lockon_tilemap1,offset/2);
-        }
         lockon_vram1[offset] = data;
+       	tilemap_mark_tile_dirty(lockon_tilemap1,offset/2);
 }
 
 /* HUD */
 WRITE8_HANDLER( lockon_vram_2_w )
 {
-        if (lockon_vram2[offset]!=data)
-        {
-        	tilemap_mark_tile_dirty(lockon_tilemap2,offset/2);
-        }
         lockon_vram2[offset] = data;
+       	tilemap_mark_tile_dirty(lockon_tilemap2,offset/2);
 }
 
 /* 8*8 characters */

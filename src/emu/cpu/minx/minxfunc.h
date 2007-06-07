@@ -33,7 +33,7 @@ INLINE UINT8 ADDC8( UINT8 arg1, UINT8 arg2 ) {
 }
 
 INLINE UINT16 ADDC16( UINT16 arg1, UINT16 arg2 ) {
-	UINT32 res = arg1 + arg2 + ( ( regs.F & FLAG_C ) ? 1 : 0 );;
+	UINT32 res = arg1 + arg2 + ( ( regs.F & FLAG_C ) ? 1 : 0 );
 	regs.F = ( regs.F & ~ ( FLAG_S | FLAG_O | FLAG_C | FLAG_Z ) )
 		| ( ( res & 0x8000 ) ? FLAG_S : 0 )
 		| ( ( ( arg2 ^ arg1 ^ 0x8000 ) & ( arg2 ^ res ) & 0x8000 ) ? FLAG_O : 0 )

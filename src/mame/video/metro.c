@@ -99,10 +99,8 @@ static TILE_GET_INFO( metro_K053936_gstrik2_get_tile_info )
 
 WRITE16_HANDLER( metro_K053936_w )
 {
-	UINT16 oldword = metro_K053936_ram[offset];
 	COMBINE_DATA(&metro_K053936_ram[offset]);
-	if (oldword != metro_K053936_ram[offset])
-		tilemap_mark_tile_dirty(metro_K053936_tilemap,offset);
+	tilemap_mark_tile_dirty(metro_K053936_tilemap,offset);
 }
 
 UINT32 tilemap_scan_gstrik2( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
@@ -307,9 +305,7 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 
 INLINE void metro_vram_w(offs_t offset,UINT16 data,UINT16 mem_mask,int layer,UINT16 *vram)
 {
-	UINT16 olddata = vram[offset];
-	UINT16 newdata = COMBINE_DATA(&vram[offset]);
-	if ( newdata != olddata )
+	COMBINE_DATA(&vram[offset]);
 	{
 		/* Account for the window */
 		int col		=	(offset % BIG_NX) - ((metro_window[layer * 2 + 1] / 8) % BIG_NX);

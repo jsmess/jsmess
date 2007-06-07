@@ -403,7 +403,7 @@ static const gfx_decode gfxdecodeinfo_hvysmsh[] =
 	{ REGION_GFX1, 0, &charlayout,          0, 32 },	/* Characters 8x8 */
 	{ REGION_GFX1, 0, &tilelayout,          0, 32 },	/* Tiles 16x16 */
 	{ REGION_GFX2, 0, &spritelayout,      512, 32 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

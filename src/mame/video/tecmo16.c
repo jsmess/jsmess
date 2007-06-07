@@ -135,43 +135,33 @@ VIDEO_START( riot )
 
 WRITE16_HANDLER( tecmo16_videoram_w )
 {
-	int oldword = tecmo16_videoram[offset];
 	COMBINE_DATA(&tecmo16_videoram[offset]);
-	if (oldword != tecmo16_videoram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_colorram_w )
 {
-	int oldword = tecmo16_colorram[offset];
 	COMBINE_DATA(&tecmo16_colorram[offset]);
-	if (oldword != tecmo16_colorram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_videoram2_w )
 {
-	int oldword = tecmo16_videoram2[offset];
 	COMBINE_DATA(&tecmo16_videoram2[offset]);
-	if (oldword != tecmo16_videoram2[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_colorram2_w )
 {
-	int oldword = tecmo16_colorram2[offset];
 	COMBINE_DATA(&tecmo16_colorram2[offset]);
-	if (oldword != tecmo16_colorram2[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 
 WRITE16_HANDLER( tecmo16_charram_w )
 {
-	int oldword = tecmo16_charram[offset];
 	COMBINE_DATA(&tecmo16_charram[offset]);
-	if (oldword != tecmo16_charram[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE16_HANDLER( tecmo16_flipscreen_w )

@@ -262,7 +262,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &tile_16x16_layout,      0x300, 32 },	/* Tiles (16x16) */
 	{ REGION_GFX4, 0, &spritelayout,           0x500, 32 },	/* Sprites (16x16) */
 	{ REGION_GFX5, 0, &spritelayout,           0x700, 16 },	/* Sprites (16x16) */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /**********************************************************************************/

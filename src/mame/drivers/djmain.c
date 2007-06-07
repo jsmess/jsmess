@@ -1143,7 +1143,7 @@ static const gfx_layout spritelayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &spritelayout, 0,  (0x4440/4)/16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1191,7 +1191,6 @@ static MACHINE_START( djmain )
 	state_save_register_global_array(obj_regs);
 
 	state_save_register_func_postload(sndram_set_bank);
-	return 0;
 }
 
 

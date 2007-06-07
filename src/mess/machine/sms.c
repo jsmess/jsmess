@@ -714,7 +714,6 @@ static void setup_banks( void ) {
 
 MACHINE_START(sms) {
 	add_exit_callback(machine, sms_machine_stop);
-	return 0;
 }
 
 MACHINE_RESET(sms)

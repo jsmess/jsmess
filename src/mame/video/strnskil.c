@@ -45,11 +45,8 @@ PALETTE_INIT( strnskil )
 
 WRITE8_HANDLER( strnskil_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( strnskil_scroll_x_w )

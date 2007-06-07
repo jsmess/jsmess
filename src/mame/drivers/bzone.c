@@ -229,7 +229,6 @@ UINT8 rb_input_select;
 static MACHINE_START( bzone )
 {
 	state_save_register_global(analog_data);
-	return 0;
 }
 
 
@@ -237,7 +236,6 @@ static MACHINE_START( redbaron )
 {
 	state_save_register_global(analog_data);
 	state_save_register_global(rb_input_select);
-	return 0;
 }
 
 
@@ -654,7 +652,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( bzone )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "036414.01",  0x5000, 0x0800, CRC(efbc3fa0) SHA1(6d284fab34b09dde8aa0df7088711d4723f07970) )
 	ROM_LOAD( "036413.01",  0x5800, 0x0800, CRC(5d9d9111) SHA1(42638cff53a9791a0f18d316f62a0ea8eea4e194) )
 	ROM_LOAD( "036412.01",  0x6000, 0x0800, CRC(ab55cbd2) SHA1(6bbb8316d9f8588ea0893932f9174788292b8edc) )
@@ -681,7 +679,7 @@ ROM_END
 
 
 ROM_START( bzone2 )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "036414a.01", 0x5000, 0x0800, CRC(13de36d5) SHA1(40e356ddc5c042bc1ce0b71f51e8b6de72daf1e4) )
 	ROM_LOAD( "036413.01",  0x5800, 0x0800, CRC(5d9d9111) SHA1(42638cff53a9791a0f18d316f62a0ea8eea4e194) )
 	ROM_LOAD( "036412.01",  0x6000, 0x0800, CRC(ab55cbd2) SHA1(6bbb8316d9f8588ea0893932f9174788292b8edc) )
@@ -708,7 +706,7 @@ ROM_END
 
 
 ROM_START( bzonec ) /* cocktail version */
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "bz1g4800",   0x4800, 0x0800, CRC(e228dd64) SHA1(247c788b4ccadf6c1e9201ad4f31d55c0036ff0f) )
 	ROM_LOAD( "bz1f5000",   0x5000, 0x0800, CRC(dddfac9a) SHA1(e6f2761902e1ffafba437a1117e9ba40f116087d) )
 	ROM_LOAD( "bz1e5800",   0x5800, 0x0800, CRC(7e00e823) SHA1(008e491a8074dac16e56c3aedec32d4b340158ce) )
@@ -736,7 +734,7 @@ ROM_END
 
 
 ROM_START( bradley )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "btc1.bin",   0x4000, 0x0800, CRC(0bb8e049) SHA1(158517ff9a4e8ae7270ccf7eab87bf77427a4a8c) )
 	ROM_LOAD( "btd1.bin",   0x4800, 0x0800, CRC(9e0566d4) SHA1(f14aa5c3d14136c5e9a317004f82d44a8d5d6815) )
 	ROM_LOAD( "bte1.bin",   0x5000, 0x0800, CRC(64ee6a42) SHA1(33d0713ed2a1f4c1c443dce1f053321f2c279293) )
@@ -765,7 +763,7 @@ ROM_END
 
 
 ROM_START( redbaron )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "037587.01",  0x4800, 0x0800, CRC(60f23983) SHA1(7a9e5380bf49bf50a2d8ab0e0bd1ba3ac8efde24) )
 	ROM_CONTINUE(           0x5800, 0x0800 )
 	ROM_LOAD( "037000.01e", 0x5000, 0x0800, CRC(69bed808) SHA1(27d99efc74113cdcbbf021734b8a5a5fdb78c04c) )

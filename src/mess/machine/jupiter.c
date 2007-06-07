@@ -125,7 +125,6 @@ MACHINE_START( jupiter )
 	}
 
 	add_exit_callback(machine, jupiter_machine_stop);
-	return 0;
 }
 
 static void jupiter_machine_stop(running_machine *machine)

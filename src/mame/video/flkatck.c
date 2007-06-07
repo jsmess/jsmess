@@ -94,18 +94,14 @@ VIDEO_START( flkatck )
 
 WRITE8_HANDLER( flkatck_k007121_w )
 {
-	if (offset < 0x1000){	/* tiles */
-		if (k007121_ram[offset] != data)
-		{
-			k007121_ram[offset] = data;
-			if (offset & 0x800)	/* score */
-				tilemap_mark_tile_dirty(k007121_tilemap[1],offset & 0x3ff);
-			else
-				tilemap_mark_tile_dirty(k007121_tilemap[0],offset & 0x3ff);
-		}
+	k007121_ram[offset] = data;
+	if (offset < 0x1000)	/* tiles */
+	{
+		if (offset & 0x800)	/* score */
+			tilemap_mark_tile_dirty(k007121_tilemap[1],offset & 0x3ff);
+		else
+			tilemap_mark_tile_dirty(k007121_tilemap[0],offset & 0x3ff);
 	}
-	else	/* sprites */
-		k007121_ram[offset] = data;
 }
 
 WRITE8_HANDLER( flkatck_k007121_regs_w )

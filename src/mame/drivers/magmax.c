@@ -79,8 +79,6 @@ static MACHINE_START( magmax )
 	state_save_register_global(LS74_clr);
 	state_save_register_global(LS74_q);
 	state_save_register_global(gain_control);
-
-	return 0;
 }
 
 static MACHINE_RESET( magmax )

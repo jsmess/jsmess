@@ -241,7 +241,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &tilelayout,   0, 128 },
 	{ REGION_GFX1, 0x2000, &spritelayout, 0, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -283,8 +283,7 @@ static MACHINE_DRIVER_START( jrpacman )
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(128*4)
+	MDRV_PALETTE_LENGTH(128*4)
 
 	MDRV_PALETTE_INIT(pacman)
 	MDRV_VIDEO_START(jrpacman)
@@ -307,7 +306,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( jrpacman )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "jrp8d.bin",             0x0000, 0x2000, CRC(e3fa972e) SHA1(5ea34621213c649ca2848ab31aab2cbe751723d4) )
 	ROM_LOAD( "jrp8e.bin",             0x2000, 0x2000, CRC(ec889e94) SHA1(8294e9e79f8fd19a419431fa690e6ac4a1302f58) )
 	ROM_LOAD( "jrp8h.bin",             0x8000, 0x2000, CRC(35f1fc6e) SHA1(b84b34560b9aae18b24274712b052283faa01730) )

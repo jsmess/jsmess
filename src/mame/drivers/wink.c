@@ -294,7 +294,7 @@ static const gfx_layout charlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout, 0, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static READ8_HANDLER( sound_r )
@@ -361,11 +361,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( wink )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "midcoin-wink00.rom", 0x0000, 0x4000, CRC(044f82d6) SHA1(4269333578c4fb14891b937c683aa5b105a193e7) )
 	ROM_LOAD( "midcoin-wink01.rom", 0x4000, 0x4000, CRC(acb0a392) SHA1(428c24845a27b8021823a4a930071b3b47108f01) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "midcoin-wink05.rom", 0x0000, 0x2000, CRC(c6c9d9cf) SHA1(99984905282c2310058d1ce93aec68d8a920b2c0) )
 
 	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -375,11 +375,11 @@ ROM_START( wink )
 ROM_END
 
 ROM_START( winka )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "wink0.bin",    0x0000, 0x4000, CRC(554d86e5) SHA1(bf2de874a62d9137f79063d6ca1906b1ed0c87e6) )
 	ROM_LOAD( "wink1.bin",    0x4000, 0x4000, CRC(9d8ad539) SHA1(77246df8195f7e3f3b06edc08d344801bf62e1ba) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "wink5.bin",    0x0000, 0x2000, CRC(c6c9d9cf) SHA1(99984905282c2310058d1ce93aec68d8a920b2c0) )
 
 	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE )

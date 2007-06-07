@@ -253,7 +253,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   448, 16 }, /* colors 448 - 511 */
 	{ REGION_GFX2, 0, &tilelayout,   128,  8 }, /* colors 128 - 255 */
 	{ REGION_GFX3, 0, &spritelayout, 256,  8 }, /* colors 256 - 383 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -322,7 +322,7 @@ ROM_START( srumbler )
 	ROM_LOAD( "12f_sr07.bin", 0x30000, 0x08000, CRC(de785076) SHA1(bdb104c6c875f5362c0d1ba9a8c5dd450c9c014b) )  /* RC7 */
 	ROM_LOAD( "11f_sr06.bin", 0x38000, 0x08000, CRC(a70f4fd4) SHA1(21be3865b9f7fa265f265a565bab896357d7464f) )  /* RC6 */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "2f_sr05.bin",  0x0000, 0x8000, CRC(0177cebe) SHA1(0fa94d2057f509a6fe1de210bf513efc82f1ffe7) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -365,7 +365,7 @@ ROM_START( srumblr2 )
 	ROM_LOAD( "12f_sr07.bin", 0x30000, 0x08000, CRC(de785076) SHA1(bdb104c6c875f5362c0d1ba9a8c5dd450c9c014b) )  /* RC7 */
 	ROM_LOAD( "11f_sr06.bin", 0x38000, 0x08000, CRC(a70f4fd4) SHA1(21be3865b9f7fa265f265a565bab896357d7464f) )  /* RC6 */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "rc05.2f",      0x0000, 0x8000, CRC(ea04fa07) SHA1(e29bfc3ed9e6606206ee41c90aaaeddffa26c1b4) )  /* AUDIO (different) */
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -408,7 +408,7 @@ ROM_START( rushcrsh )
 	ROM_LOAD( "12f_sr07.bin", 0x30000, 0x08000, CRC(de785076) SHA1(bdb104c6c875f5362c0d1ba9a8c5dd450c9c014b) )  /* RC7 */
 	ROM_LOAD( "11f_sr06.bin", 0x38000, 0x08000, CRC(a70f4fd4) SHA1(21be3865b9f7fa265f265a565bab896357d7464f) )  /* RC6 */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "rc05.2f",      0x0000, 0x8000, CRC(ea04fa07) SHA1(e29bfc3ed9e6606206ee41c90aaaeddffa26c1b4) )  /* AUDIO (different) */
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )

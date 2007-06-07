@@ -24,7 +24,6 @@ static MACHINE_START( bishi )
 {
 	state_save_register_global(cur_control);
 	state_save_register_global(cur_control2);
-	return 0;
 }
 
 

@@ -128,20 +128,14 @@ VIDEO_START( ddrible )
 
 WRITE8_HANDLER( ddrible_fg_videoram_w )
 {
-	if (ddrible_fg_videoram[offset] != data)
-	{
-		ddrible_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset & 0xbff);
-	}
+	ddrible_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset & 0xbff);
 }
 
 WRITE8_HANDLER( ddrible_bg_videoram_w )
 {
-	if (ddrible_bg_videoram[offset] != data)
-	{
-		ddrible_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0xbff);
-	}
+	ddrible_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0xbff);
 }
 
 /***************************************************************************

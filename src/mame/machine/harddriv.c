@@ -169,8 +169,6 @@ MACHINE_START( harddriv )
 	som_memory = (UINT16 *)auto_malloc(0x8000);
 	sim_memory_size = memory_region_length(REGION_USER1) / 2;
 	adsp_pgm_memory_word = (UINT16 *)((UINT8 *)hdadsp_pgm_memory + 1);
-
-	return 0;
 }
 
 

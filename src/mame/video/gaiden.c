@@ -176,10 +176,8 @@ WRITE16_HANDLER( gaiden_bgscrolly_w )
 
 WRITE16_HANDLER( gaiden_videoram3_w )
 {
-	int oldword = gaiden_videoram3[offset];
 	COMBINE_DATA(&gaiden_videoram3[offset]);
-	if (oldword != gaiden_videoram3[offset])
-		tilemap_mark_tile_dirty(background,offset & 0x07ff);
+	tilemap_mark_tile_dirty(background,offset & 0x07ff);
 }
 
 WRITE16_HANDLER( gaiden_flip_w )
@@ -196,10 +194,8 @@ READ16_HANDLER( gaiden_videoram3_r )
 
 WRITE16_HANDLER( gaiden_videoram2_w )
 {
-	int oldword = gaiden_videoram2[offset];
 	COMBINE_DATA(&gaiden_videoram2[offset]);
-	if (oldword != gaiden_videoram2[offset])
-		tilemap_mark_tile_dirty(foreground,offset & 0x07ff);
+	tilemap_mark_tile_dirty(foreground,offset & 0x07ff);
 }
 
 READ16_HANDLER( gaiden_videoram2_r )
@@ -209,10 +205,8 @@ READ16_HANDLER( gaiden_videoram2_r )
 
 WRITE16_HANDLER( gaiden_videoram_w )
 {
-	int oldword = gaiden_videoram[offset];
 	COMBINE_DATA(&gaiden_videoram[offset]);
-	if (oldword != gaiden_videoram[offset])
-		tilemap_mark_tile_dirty(text_layer,offset & 0x03ff);
+	tilemap_mark_tile_dirty(text_layer,offset & 0x03ff);
 }
 
 

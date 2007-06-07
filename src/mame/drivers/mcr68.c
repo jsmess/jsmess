@@ -822,8 +822,7 @@ static const gfx_layout zwackery_layout =
 	RGN_FRAC(1,2),
 	8,
 	{ 0, 0, 0, 0, 0, 0, 0, 0 },
-	{  3,  2,  1,  0, 11, 10,  9,  8,
-	  19, 18, 17, 16, 27, 26, 25, 24 },
+	{ STEP4(3,-1), STEP4(11,-1), STEP4(19,-1), STEP4(27,-1) },
 	{ 4, RGN_FRAC(1,2)+4, 0, RGN_FRAC(1,2)+0, 36, RGN_FRAC(1,2)+36, 32, RGN_FRAC(1,2)+32,
 	  68, RGN_FRAC(1,2)+68, 64, RGN_FRAC(1,2)+64, 100, RGN_FRAC(1,2)+100, 96, RGN_FRAC(1,2)+96 },
 	128
@@ -831,9 +830,9 @@ static const gfx_layout zwackery_layout =
 
 static const gfx_decode gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &mcr_bg_layout,     0, 4 },
+	{ REGION_GFX1, 0, &mcr_bg_layout,     0, 4, 2, 2 },
 	{ REGION_GFX2, 0, &mcr_sprite_layout, 0, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode zwackery_gfxdecodeinfo[] =
@@ -841,7 +840,7 @@ static const gfx_decode zwackery_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &zwackery_layout,       0, 16 },
 	{ REGION_GFX2, 0, &mcr_sprite_layout, 0x800, 32 },
 	{ REGION_GFX1, 0, &zwackery_layout,       0, 16 },	/* yes, an extra copy */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -100,11 +100,8 @@ WRITE8_HANDLER( mstworld_video_bank_w )
 
 WRITE8_HANDLER( mgakuen_videoram_w )
 {
-	if (pang_videoram[offset] != data)
-	{
-		pang_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
-	}
+	pang_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 READ8_HANDLER( mgakuen_videoram_r )
@@ -140,11 +137,8 @@ READ8_HANDLER( pang_videoram_r )
 
 WRITE8_HANDLER( pang_colorram_w )
 {
-	if (pang_colorram[offset] != data)
-	{
-		pang_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	pang_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 READ8_HANDLER( pang_colorram_r )

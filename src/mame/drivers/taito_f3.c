@@ -382,7 +382,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x000000, &tile_layout, 	       0, 512 }, /* Tiles area */
 	{ REGION_GFX1, 0x000000, &spriteram_layout, 4096, 256 }, /* Sprites area */
 	{ 0,           0x000000, &pivotlayout,         0,  64 }, /* Dynamically modified */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/
@@ -436,7 +436,6 @@ NVRAM_HANDLER( taito_f3 )
 static MACHINE_START(f3)
 {
 	state_save_register_global_array(coin_word);
-	return 0;
 }
 
 static MACHINE_DRIVER_START( f3 )

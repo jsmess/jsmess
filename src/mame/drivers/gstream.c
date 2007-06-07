@@ -502,7 +502,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &sprites32_layout, 0, 0x80 },
 	{ REGION_GFX1, 0, &sprites_layout, 0, 0x80 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

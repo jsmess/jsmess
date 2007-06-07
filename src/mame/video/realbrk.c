@@ -94,16 +94,14 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE16_HANDLER( realbrk_vram_0_w )
 {
-	UINT16 old_data	=	realbrk_vram_0[offset];
-	UINT16 new_data	=	COMBINE_DATA(&realbrk_vram_0[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_0,offset/2);
+	COMBINE_DATA(&realbrk_vram_0[offset]);
+	tilemap_mark_tile_dirty(tilemap_0,offset/2);
 }
 
 WRITE16_HANDLER( realbrk_vram_1_w )
 {
-	UINT16 old_data	=	realbrk_vram_1[offset];
-	UINT16 new_data	=	COMBINE_DATA(&realbrk_vram_1[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_1,offset/2);
+	COMBINE_DATA(&realbrk_vram_1[offset]);
+	tilemap_mark_tile_dirty(tilemap_1,offset/2);
 }
 
 /***************************************************************************
@@ -132,9 +130,8 @@ static TILE_GET_INFO( get_tile_info_2 )
 
 WRITE16_HANDLER( realbrk_vram_2_w )
 {
-	UINT16 old_data	=	realbrk_vram_2[offset];
-	UINT16 new_data	=	COMBINE_DATA(&realbrk_vram_2[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_2,offset);
+	COMBINE_DATA(&realbrk_vram_2[offset]);
+	tilemap_mark_tile_dirty(tilemap_2,offset);
 }
 
 

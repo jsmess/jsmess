@@ -117,30 +117,24 @@ VIDEO_START( deniam )
 
 WRITE16_HANDLER( deniam_videoram_w )
 {
-	int oldword = deniam_videoram[offset];
+	int page,i;
 	COMBINE_DATA(&deniam_videoram[offset]);
-	if (oldword != deniam_videoram[offset])
-	{
-		int page,i;
 
-		page = offset >> 11;
-		for (i = 0;i < 4;i++)
-		{
-			if (bg_page[i] == page)
-				tilemap_mark_tile_dirty(bg_tilemap,i * 0x800 + (offset & 0x7ff));
-			if (fg_page[i] == page)
-				tilemap_mark_tile_dirty(fg_tilemap,i * 0x800 + (offset & 0x7ff));
-		}
+	page = offset >> 11;
+	for (i = 0;i < 4;i++)
+	{
+		if (bg_page[i] == page)
+			tilemap_mark_tile_dirty(bg_tilemap,i * 0x800 + (offset & 0x7ff));
+		if (fg_page[i] == page)
+			tilemap_mark_tile_dirty(fg_tilemap,i * 0x800 + (offset & 0x7ff));
 	}
 }
 
 
 WRITE16_HANDLER( deniam_textram_w )
 {
-	int oldword = deniam_textram[offset];
 	COMBINE_DATA(&deniam_textram[offset]);
-	if (oldword != deniam_textram[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 

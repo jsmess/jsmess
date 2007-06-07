@@ -1657,7 +1657,7 @@ static const gfx_decode spi_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &spi_spritelayout4, 0x3ff, 1 },
 	{ REGION_GFX3, 0, &spi_spritelayout5, 0x3ff, 1 },
 #endif
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /********************************************************************************/

@@ -28,11 +28,8 @@ static TILE_GET_INFO( get_oneshot_bg_tile_info )
 
 WRITE16_HANDLER( oneshot_bg_videoram_w )
 {
-	if (oneshot_bg_videoram[offset] != data)
-	{
-		COMBINE_DATA(&oneshot_bg_videoram[offset]);
-		tilemap_mark_tile_dirty(oneshot_bg_tilemap,offset/2);
-	}
+	COMBINE_DATA(&oneshot_bg_videoram[offset]);
+	tilemap_mark_tile_dirty(oneshot_bg_tilemap,offset/2);
 }
 
 /* mid tilemap */
@@ -47,11 +44,8 @@ static TILE_GET_INFO( get_oneshot_mid_tile_info )
 
 WRITE16_HANDLER( oneshot_mid_videoram_w )
 {
-	if (oneshot_mid_videoram[offset] != data)
-	{
-		COMBINE_DATA(&oneshot_mid_videoram[offset]);
-		tilemap_mark_tile_dirty(oneshot_mid_tilemap,offset/2);
-	}
+	COMBINE_DATA(&oneshot_mid_videoram[offset]);
+	tilemap_mark_tile_dirty(oneshot_mid_tilemap,offset/2);
 }
 
 
@@ -67,11 +61,8 @@ static TILE_GET_INFO( get_oneshot_fg_tile_info )
 
 WRITE16_HANDLER( oneshot_fg_videoram_w )
 {
-	if (oneshot_fg_videoram[offset] != data)
-	{
-		COMBINE_DATA(&oneshot_fg_videoram[offset]);
-		tilemap_mark_tile_dirty(oneshot_fg_tilemap,offset/2);
-	}
+	COMBINE_DATA(&oneshot_fg_videoram[offset]);
+	tilemap_mark_tile_dirty(oneshot_fg_tilemap,offset/2);
 }
 
 VIDEO_START( oneshot )

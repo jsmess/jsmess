@@ -295,7 +295,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &speedspn_charlayout,   0x000, 0x40 },
 	{ REGION_GFX2, 0, &speedspn_spritelayout, 0x000, 0x40 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /*** MACHINE DRIVER **********************************************************/

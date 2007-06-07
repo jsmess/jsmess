@@ -264,7 +264,6 @@ static MACHINE_START( cliffhgr )
 {
 	discinfo = laserdisc_init(LASERDISC_TYPE_PR8210, get_disk_handle(0), 0);
 	irq_timer = mame_timer_alloc(cliff_irq_callback);
-	return 0;
 }
 
 static MACHINE_RESET( cliffhgr )

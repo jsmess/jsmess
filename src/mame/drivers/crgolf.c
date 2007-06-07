@@ -68,7 +68,6 @@ static MACHINE_START( crgolf )
 	state_save_register_global(sound_to_main_data);
 	state_save_register_global(sample_offset);
 	state_save_register_global(sample_count);
-	return 0;
 }
 
 

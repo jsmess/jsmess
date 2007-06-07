@@ -62,18 +62,14 @@ VIDEO_START( crshrace )
 
 WRITE16_HANDLER( crshrace_videoram1_w )
 {
-	int oldword = crshrace_videoram1[offset];
 	COMBINE_DATA(&crshrace_videoram1[offset]);
-	if (oldword != crshrace_videoram1[offset])
-		tilemap_mark_tile_dirty(tilemap1,offset);
+	tilemap_mark_tile_dirty(tilemap1,offset);
 }
 
 WRITE16_HANDLER( crshrace_videoram2_w )
 {
-	int oldword = crshrace_videoram2[offset];
 	COMBINE_DATA(&crshrace_videoram2[offset]);
-	if (oldword != crshrace_videoram2[offset])
-		tilemap_mark_tile_dirty(tilemap2,offset);
+	tilemap_mark_tile_dirty(tilemap2,offset);
 }
 
 WRITE16_HANDLER( crshrace_roz_bank_w )

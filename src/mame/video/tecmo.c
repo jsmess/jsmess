@@ -115,29 +115,20 @@ VIDEO_START( tecmo )
 
 WRITE8_HANDLER( tecmo_txvideoram_w )
 {
-	if (tecmo_txvideoram[offset] != data)
-	{
-		tecmo_txvideoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
-	}
+	tecmo_txvideoram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( tecmo_fgvideoram_w )
 {
-	if (tecmo_fgvideoram[offset] != data)
-	{
-		tecmo_fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x1ff);
-	}
+	tecmo_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x1ff);
 }
 
 WRITE8_HANDLER( tecmo_bgvideoram_w )
 {
-	if (tecmo_bgvideoram[offset] != data)
-	{
-		tecmo_bgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x1ff);
-	}
+	tecmo_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x1ff);
 }
 
 WRITE8_HANDLER( tecmo_fgscroll_w )

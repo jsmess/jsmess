@@ -1288,7 +1288,6 @@ static WRITE8_HANDLER( port8_w )
 static MACHINE_START( namcona1 )
 {
 	C140_set_base(0, namcona1_workram);
-	return 0;
 }
 
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.

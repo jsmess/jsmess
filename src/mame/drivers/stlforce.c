@@ -196,7 +196,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &stlforce_bglayout, 0, 256  },
 	{ REGION_GFX1, 0, &stlforce_txlayout, 0, 256  },
 	{ REGION_GFX2, 0, &stlforce_splayout, 0, 256  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static UINT8 stlforce_default_eeprom[128] = {

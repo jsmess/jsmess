@@ -260,7 +260,7 @@ static const gfx_layout charlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x00000, &charlayout, 0, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static struct YM2203interface ym2203_interface =

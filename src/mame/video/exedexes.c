@@ -93,20 +93,14 @@ PALETTE_INIT( exedexes )
 
 WRITE8_HANDLER( exedexes_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap, offset);
 }
 
 WRITE8_HANDLER( exedexes_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		colorram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, offset);
-	}
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap, offset);
 }
 
 WRITE8_HANDLER( exedexes_c804_w )

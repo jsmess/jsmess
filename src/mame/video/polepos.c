@@ -278,13 +278,9 @@ READ16_HANDLER( polepos_view16_r )
 
 WRITE16_HANDLER( polepos_view16_w )
 {
-	UINT16 oldword = polepos_view16_memory[offset];
 	COMBINE_DATA(&polepos_view16_memory[offset]);
-	if (oldword != polepos_view16_memory[offset])
-	{
-		if (offset < 0x400)
-			tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	if (offset < 0x400)
+		tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 READ8_HANDLER( polepos_view_r )
@@ -294,13 +290,9 @@ READ8_HANDLER( polepos_view_r )
 
 WRITE8_HANDLER( polepos_view_w )
 {
-	UINT16 oldword = polepos_view16_memory[offset];
 	polepos_view16_memory[offset] = (polepos_view16_memory[offset] & 0xff00) | data;
-	if (oldword != polepos_view16_memory[offset])
-	{
-		if (offset < 0x400)
-			tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	if (offset < 0x400)
+		tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE16_HANDLER( polepos_view16_hscroll_w )
@@ -334,12 +326,8 @@ READ16_HANDLER( polepos_alpha16_r )
 
 WRITE16_HANDLER( polepos_alpha16_w )
 {
-	UINT16 oldword = polepos_alpha16_memory[offset];
 	COMBINE_DATA(&polepos_alpha16_memory[offset]);
-	if (oldword != polepos_alpha16_memory[offset])
-	{
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 READ8_HANDLER( polepos_alpha_r )
@@ -349,12 +337,8 @@ READ8_HANDLER( polepos_alpha_r )
 
 WRITE8_HANDLER( polepos_alpha_w )
 {
-	UINT16 oldword = polepos_alpha16_memory[offset];
 	polepos_alpha16_memory[offset] = (polepos_alpha16_memory[offset] & 0xff00) | data;
-	if (oldword != polepos_alpha16_memory[offset])
-	{
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 

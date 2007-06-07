@@ -1020,7 +1020,6 @@ static MACHINE_START( nc100 )
 
 	add_reset_callback(machine, nc100_machine_reset);
 	add_exit_callback(machine, nc100_machine_stop);
-	return 0;
 }
 
 
@@ -1429,7 +1428,6 @@ static MACHINE_START( nc200 )
 
 	add_reset_callback(machine, nc200_machine_reset);
 	add_exit_callback(machine, nc200_machine_stop);
-	return 0;
 }
 
 /*

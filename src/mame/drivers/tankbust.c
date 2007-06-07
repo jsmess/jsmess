@@ -357,7 +357,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &spritelayout,	0x00, 2 },	/* sprites 32x32  (2 * 16 colors) */
 	{ REGION_GFX2, 0, &charlayout,		0x20, 8 },	/* bg tilemap characters */
 	{ REGION_GFX3, 0, &charlayout2,		0x60, 16  },	/* txt tilemap characters*/
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static struct AY8910interface ay8910_interface =

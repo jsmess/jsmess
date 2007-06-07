@@ -50,10 +50,8 @@ VIDEO_START( ohmygod )
 
 WRITE16_HANDLER( ohmygod_videoram_w )
 {
-	int oldword = ohmygod_videoram[offset];
 	COMBINE_DATA(&ohmygod_videoram[offset]);
-	if (oldword != ohmygod_videoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( ohmygod_spritebank_w )

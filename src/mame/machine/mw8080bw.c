@@ -109,8 +109,6 @@ MACHINE_START( mw8080bw )
 {
 	mw8080bw_create_interrupt_timer();
 	mb14241_init(0);
-
-	return machine_start_mw8080bw_audio(machine);
 }
 
 

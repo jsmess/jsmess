@@ -260,7 +260,7 @@ static DRIVER_INIT( multigam )
 static const gfx_decode multigam_gfxdecodeinfo[] =
 {
 	/* none, the ppu generates one */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( multigam )

@@ -55,12 +55,8 @@ WRITE8_HANDLER( sprint2_collision_reset2_w )
 
 WRITE8_HANDLER( sprint2_video_ram_w )
 {
-	if (data != sprint2_video_ram[offset])
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	sprint2_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

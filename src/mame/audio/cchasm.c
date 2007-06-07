@@ -183,8 +183,6 @@ SOUND_START( cchasm )
 	z80ctc_init (0, &ctc_intf);
 
 	mame_timer_pulse(make_mame_time(0, machine->screen[0].refresh), 0, cchasm_sh_update);
-
-	return 0;
 }
 
 

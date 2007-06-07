@@ -451,7 +451,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout, 256, 8 },	/* 16x16 Background */
 	{ REGION_GFX3, 0, &tilelayout, 384, 8 },	/* 16x16 Background */
 	{ REGION_GFX4, 0, &tilelayout, 128, 8 },	/* Sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -527,17 +527,17 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( xsleena )
-	ROM_REGION( 0x14000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x14000, REGION_CPU1, 0 )
 	ROM_LOAD( "s-10.7d",      0x08000, 0x8000, CRC(370164be) SHA1(65c9951cac7dc3943fa4d5f9919ebb4c4f29b3ae) )
 	ROM_LOAD( "s-11.7c",      0x04000, 0x4000, CRC(d22bf859) SHA1(9edb159bef2eba2c5d93c03c15fbcb87eea52236) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x14000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x14000, REGION_CPU2, 0 )
 	ROM_LOAD( "s-2.3b",       0x08000, 0x8000, CRC(a1a860e2) SHA1(fb2b152bfafc44608039774436ddf3b17eed979c) )
 	ROM_LOAD( "s-1.2b",       0x04000, 0x4000, CRC(948b9757) SHA1(3ea840cc47ae6a66f3e5f6a2f3e88475dcfe1840) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 //  ROM_REGION( 0x800, REGION_CPU4, 0 )
@@ -581,17 +581,17 @@ ROM_START( xsleena )
 ROM_END
 
 ROM_START( xsleenab )
-	ROM_REGION( 0x14000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x14000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.rom",        0x08000, 0x8000, CRC(79f515a7) SHA1(e61f18e3639dd9afe16c7bcb90fa7be31905e2c6) )
 	ROM_LOAD( "s-11.7c",      0x04000, 0x4000, CRC(d22bf859) SHA1(9edb159bef2eba2c5d93c03c15fbcb87eea52236) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x14000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x14000, REGION_CPU2, 0 )
 	ROM_LOAD( "s-2.3b",       0x08000, 0x8000, CRC(a1a860e2) SHA1(fb2b152bfafc44608039774436ddf3b17eed979c) )
 	ROM_LOAD( "s-1.2b",       0x04000, 0x4000, CRC(948b9757) SHA1(3ea840cc47ae6a66f3e5f6a2f3e88475dcfe1840) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -632,17 +632,17 @@ ROM_START( xsleenab )
 ROM_END
 
 ROM_START( solarwar )
-	ROM_REGION( 0x14000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x14000, REGION_CPU1, 0 )
 	ROM_LOAD( "p9-0.bin",     0x08000, 0x8000, CRC(8ff372a8) SHA1(0fc396e662419fb9cb5bea11748aa8e0e8d072e6) )
 	ROM_LOAD( "pa-0.bin",     0x04000, 0x4000, CRC(154f946f) SHA1(25b776eb9c494e5302795ae79e494cbfc7c104b1) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x14000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x14000, REGION_CPU2, 0 )
 	ROM_LOAD( "p1-0.bin",     0x08000, 0x8000, CRC(f5f235a3) SHA1(9f57dd7c5e514afa750edc6da6d263bf1e913c14) )
 	ROM_LOAD( "p0-0.bin",     0x04000, 0x4000, CRC(51ae95ae) SHA1(e03f7ccb0b33b05547577c60a7f92dc75e24b4d6) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 //  ROM_REGION( 0x800, REGION_CPU4, 0 )

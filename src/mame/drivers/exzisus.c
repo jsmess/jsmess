@@ -346,7 +346,7 @@ static const gfx_decode exzisus_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 256 },
 	{ REGION_GFX2, 0, &charlayout, 256, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

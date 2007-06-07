@@ -225,7 +225,6 @@ static SOUND_START( astrob )
 {
 	state_save_register_global_array(sound_state);
 	state_save_register_global(sound_rate);
-	return 0;
 }
 
 
@@ -466,7 +465,6 @@ static SOUND_START( 005 )
 	state_save_register_global(sound_data);
 	state_save_register_global(square_state);
 	state_save_register_global(square_count);
-	return 0;
 }
 
 
@@ -680,7 +678,6 @@ MACHINE_DRIVER_END
 static SOUND_START( spaceod )
 {
 	state_save_register_global_array(sound_state);
-	return 0;
 }
 
 
@@ -869,7 +866,6 @@ static SOUND_START( monsterb )
 	state_save_register_global(sound_addr);
 	state_save_register_global(n7751_command);
 	state_save_register_global(n7751_busy);
-	return 0;
 }
 
 

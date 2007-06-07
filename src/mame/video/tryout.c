@@ -64,11 +64,8 @@ READ8_HANDLER( tryout_vram_r )
 
 WRITE8_HANDLER( tryout_videoram_w )
 {
-	if( videoram[offset] != data )
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( tryout_vram_w )

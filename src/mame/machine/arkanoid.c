@@ -38,8 +38,6 @@ MACHINE_START( arkanoid )
 
 	state_save_register_global(portC_out);
 	state_save_register_global(ddrC);
-
-	return 0;
 }
 
 MACHINE_RESET( arkanoid )

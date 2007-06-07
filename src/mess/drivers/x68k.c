@@ -1830,8 +1830,6 @@ MACHINE_START( x68000 )
 	// start mouse timer
 	timer_adjust(mouse_timer,TIME_NOW,0,TIME_IN_MSEC(2));  // a guess for now
 	sys.mouse.inputtype = 0;
-
-	return 0;
 }
 
 DRIVER_INIT( x68000 )

@@ -83,31 +83,22 @@ VIDEO_START( kyugo )
 
 WRITE8_HANDLER( kyugo_fgvideoram_w )
 {
-	if (kyugo_fgvideoram[offset] != data)
-	{
-		kyugo_fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty( fg_tilemap, offset );
-	}
+	kyugo_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty( fg_tilemap, offset );
 }
 
 
 WRITE8_HANDLER( kyugo_bgvideoram_w )
 {
-	if (kyugo_bgvideoram[offset] != data)
-	{
-		kyugo_bgvideoram[offset] = data;
-		tilemap_mark_tile_dirty( bg_tilemap, offset );
-	}
+	kyugo_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
 
 WRITE8_HANDLER( kyugo_bgattribram_w )
 {
-	if (kyugo_bgattribram[offset] != data)
-	{
-		kyugo_bgattribram[offset] = data;
-		tilemap_mark_tile_dirty( bg_tilemap, offset );
-	}
+	kyugo_bgattribram[offset] = data;
+	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
 

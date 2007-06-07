@@ -240,7 +240,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x00000, &pokechmp_charlayout,   0x100, 32 }, /* chars */
 	{ REGION_GFX2, 0x00000, &pokechmp_spritelayout,   0,  32 }, /* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

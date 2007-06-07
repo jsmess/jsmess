@@ -151,15 +151,13 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE16_HANDLER( afega_vram_0_w )
 {
-	UINT16 old_data	=	afega_vram_0[offset];
-	UINT16 new_data	=	COMBINE_DATA(&afega_vram_0[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_0,offset);
+	COMBINE_DATA(&afega_vram_0[offset]);
+	tilemap_mark_tile_dirty(tilemap_0,offset);
 }
 WRITE16_HANDLER( afega_vram_1_w )
 {
-	UINT16 old_data	=	afega_vram_1[offset];
-	UINT16 new_data	=	COMBINE_DATA(&afega_vram_1[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_1,offset);
+	COMBINE_DATA(&afega_vram_1[offset]);
+	tilemap_mark_tile_dirty(tilemap_1,offset);
 }
 
 

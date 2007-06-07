@@ -180,21 +180,16 @@ WRITE16_HANDLER( gaelco2_vram_w )
 	int pant1_start = ((gaelco2_vregs[1] >> 9) & 0x07)*0x1000;
 	int pant1_end = pant1_start + 0x1000;
 
-	int oldword = gaelco2_videoram[offset];
 	COMBINE_DATA(&gaelco2_videoram[offset]);
 
 	/* tilemap 0 writes */
 	if ((offset >= pant0_start) && (offset < pant0_end)){
-		if (oldword != gaelco2_videoram[offset]){
-			tilemap_mark_tile_dirty(pant[0], ((offset << 1) & 0x1fff) >> 2);
-		}
+		tilemap_mark_tile_dirty(pant[0], ((offset << 1) & 0x1fff) >> 2);
 	}
 
 	/* tilemap 1 writes */
 	if ((offset >= pant1_start) && (offset < pant1_end)){
-		if (oldword != gaelco2_videoram[offset]){
-			tilemap_mark_tile_dirty(pant[1], ((offset << 1) & 0x1fff) >> 2);
-		}
+		tilemap_mark_tile_dirty(pant[1], ((offset << 1) & 0x1fff) >> 2);
 	}
 }
 

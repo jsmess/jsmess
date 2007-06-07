@@ -304,7 +304,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &gumbo_layout,   0x0, 2  }, /* bg tiles */
 	{ REGION_GFX2, 0, &gumbo2_layout,  0x0, 2  }, /* fg tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

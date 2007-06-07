@@ -169,38 +169,26 @@ WRITE8_HANDLER( appoooh_scroll_w )
 
 WRITE8_HANDLER( appoooh_fg_videoram_w )
 {
-	if (appoooh_fg_videoram[offset] != data)
-	{
-		appoooh_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	appoooh_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( appoooh_fg_colorram_w )
 {
-	if (appoooh_fg_colorram[offset] != data)
-	{
-		appoooh_fg_colorram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	appoooh_fg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( appoooh_bg_videoram_w )
 {
-	if (appoooh_bg_videoram[offset] != data)
-	{
-		appoooh_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	appoooh_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( appoooh_bg_colorram_w )
 {
-	if (appoooh_bg_colorram[offset] != data)
-	{
-		appoooh_bg_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	appoooh_bg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( appoooh_out_w )

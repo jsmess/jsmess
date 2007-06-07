@@ -269,14 +269,14 @@ static const gfx_decode gfxdecodeinfo_iqblock[] =
 {
 	{ REGION_GFX1, 0, &tilelayout1, 0, 16 },	/* only odd color codes are used */
 	{ REGION_GFX2, 0, &tilelayout2, 0,  4 },	/* only color codes 0 and 3 used */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_cabaret[] =
 {
 	{ REGION_GFX1, 0, &tilelayout1, 0, 16 },
 	{ REGION_GFX2, 0, &tilelayout3, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -89,15 +89,13 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE32_HANDLER( darkhors_tmapram_w )
 {
-	UINT32 old_data	=	darkhors_tmapram[offset];
-	UINT32 new_data	=	COMBINE_DATA(&darkhors_tmapram[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(darkhors_tmap, offset);
+	COMBINE_DATA(&darkhors_tmapram[offset]);
+	tilemap_mark_tile_dirty(darkhors_tmap, offset);
 }
 WRITE32_HANDLER( darkhors_tmapram2_w )
 {
-	UINT32 old_data	=	darkhors_tmapram2[offset];
-	UINT32 new_data	=	COMBINE_DATA(&darkhors_tmapram2[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(darkhors_tmap2, offset);
+	COMBINE_DATA(&darkhors_tmapram2[offset]);
+	tilemap_mark_tile_dirty(darkhors_tmap2, offset);
 }
 
 static void darkhors_draw_sprites(mame_bitmap *bitmap)

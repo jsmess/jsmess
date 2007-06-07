@@ -67,29 +67,20 @@ VIDEO_START( kickgoal )
 
 WRITE16_HANDLER( kickgoal_fgram_w )
 {
-	if (kickgoal_fgram[offset] != data)
-	{
-		kickgoal_fgram[offset] = data;
-		tilemap_mark_tile_dirty(kickgoal_fgtm,offset/2);
-	}
+	kickgoal_fgram[offset] = data;
+	tilemap_mark_tile_dirty(kickgoal_fgtm,offset/2);
 }
 
 WRITE16_HANDLER( kickgoal_bgram_w )
 {
-	if (kickgoal_bgram[offset] != data)
-	{
-		kickgoal_bgram[offset] = data;
-		tilemap_mark_tile_dirty(kickgoal_bgtm,offset/2);
-	}
+	kickgoal_bgram[offset] = data;
+	tilemap_mark_tile_dirty(kickgoal_bgtm,offset/2);
 }
 
 WRITE16_HANDLER( kickgoal_bg2ram_w )
 {
-	if (kickgoal_bg2ram[offset] != data)
-	{
-		kickgoal_bg2ram[offset] = data;
-		tilemap_mark_tile_dirty(kickgoal_bg2tm,offset/2);
-	}
+	kickgoal_bg2ram[offset] = data;
+	tilemap_mark_tile_dirty(kickgoal_bg2tm,offset/2);
 }
 
 

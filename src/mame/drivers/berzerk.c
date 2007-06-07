@@ -274,8 +274,6 @@ static MACHINE_START( berzerk )
 	state_save_register_global(intercept);
 	state_save_register_global(irq_enabled);
 	state_save_register_global(nmi_enabled);
-
-	return 0;
 }
 
 

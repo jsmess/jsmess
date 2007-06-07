@@ -1039,7 +1039,7 @@ READ8_HANDLER( profpac_videoram_r )
 WRITE8_HANDLER( profpac_videoram_w )
 {
 	UINT16 oldbits = profpac_videoram[profpac_writepage * 0x4000 + offset];
-	UINT16 newbits, result;
+	UINT16 newbits, result = 0;
 
 	/* apply the 2->4 bit expansion first */
 	newbits = (profpac_colormap[(data >> 6) & 3] << 12) |

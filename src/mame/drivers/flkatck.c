@@ -253,7 +253,7 @@ static const gfx_layout gfxlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &gfxlayout, 0, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void volume_callback0(int v)

@@ -158,7 +158,7 @@ static const gfx_layout char16layout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &char16layout,   0, 1  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* input ports */

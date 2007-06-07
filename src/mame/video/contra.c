@@ -166,55 +166,37 @@ VIDEO_START( contra )
 
 WRITE8_HANDLER( contra_fg_vram_w )
 {
-	if (contra_fg_vram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-		contra_fg_vram[offset] = data;
-	}
+	contra_fg_vram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( contra_fg_cram_w ){
-	if (contra_fg_cram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-		contra_fg_cram[offset] = data;
-	}
+	contra_fg_cram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( contra_bg_vram_w )
 {
-	if (contra_bg_vram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-		contra_bg_vram[offset] = data;
-	}
+	contra_bg_vram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( contra_bg_cram_w )
 {
-	if (contra_bg_cram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-		contra_bg_cram[offset] = data;
-	}
+	contra_bg_cram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( contra_text_vram_w )
 {
-	if (contra_text_vram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-		contra_text_vram[offset] = data;
-	}
+	contra_text_vram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( contra_text_cram_w )
 {
-	if (contra_text_cram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-		contra_text_cram[offset] = data;
-	}
+	contra_text_cram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( contra_K007121_ctrl_0_w )

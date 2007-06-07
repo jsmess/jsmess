@@ -1280,7 +1280,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &hng64_16_layout,     0x0, 0x10 }, /* scroll tiles */
 	{ REGION_GFX2, 0, &hng64_4_16_layout,   0x0, 0x100 }, /* sprite tiles */
 	{ REGION_GFX2, 0, &hng64_16_layout,     0x0, 0x10 }, /* sprite tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 DRIVER_INIT( hng64 )

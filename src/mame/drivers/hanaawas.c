@@ -191,7 +191,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout_1bpp, 0, 32 },
 	{ REGION_GFX1, 0, &charlayout_3bpp, 0, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -244,7 +244,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( hanaawas )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )       /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.1e",    	0x0000, 0x2000, CRC(618dc1e3) SHA1(31817f256512352db0d27322998d9dcf95a993cf) )
 	ROM_LOAD( "2.3e",    	0x2000, 0x1000, CRC(5091b67f) SHA1(5a66740b8829b9b4d3aea274f9ff36e0b9e8c151) )
 	ROM_LOAD( "3.4e",    	0x4000, 0x1000, CRC(dcb65067) SHA1(37964ff4016bd927b9f13b4358b831bb667f993b) )

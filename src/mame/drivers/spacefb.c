@@ -195,8 +195,6 @@ static WRITE8_HANDLER( spacefb_port_2_w )
 static MACHINE_START( spacefb )
 {
 	create_interrupt_timer();
-
-	return 0;
 }
 
 

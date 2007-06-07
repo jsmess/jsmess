@@ -1110,7 +1110,7 @@ ROM_START( hotsmash )
 ROM_END
 
 ROM_START( sqix )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "b03-01-1",     0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
@@ -1130,7 +1130,7 @@ ROM_END
 
 /* this was probably a bootleg */
 ROM_START( sqixa )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "sq01.97",      0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
@@ -1149,7 +1149,7 @@ ROM_START( sqixa )
 ROM_END
 
 ROM_START( sqixbl )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "cpu.2",        0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
@@ -1165,7 +1165,7 @@ ROM_START( sqixbl )
 ROM_END
 
 ROM_START( perestrf )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	/* 0x8000 - 0x10000 in the rom is empty anyway */
 	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
 
@@ -1180,7 +1180,7 @@ ROM_START( perestrf )
 ROM_END
 
 ROM_START( perestro )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	/* 0x8000 - 0x10000 in the rom is empty anyway */
 	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
 

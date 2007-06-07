@@ -60,7 +60,7 @@ static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc);
     and the track number
 -------------------------------------------------*/
 
-INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, int *tracknum)
+INLINE UINT32 physical_to_chd_lba(cdrom_file *file, UINT32 physlba, UINT32 *tracknum)
 {
 	UINT32 chdlba;
 	int track;

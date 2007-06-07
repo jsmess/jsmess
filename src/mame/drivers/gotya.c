@@ -144,7 +144,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 16 },
 	{ REGION_GFX2, 0, &spritelayout, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -181,7 +181,7 @@ static const char *sample_names[] =
 	"18.wav",	/* 'Come on!' */				// 194a
 	"19.wav",	/* 'I love you!' */				// 194a
 	"1a.wav",	/* 'See you again!' */			// 194a
-	0       /* end of array */
+	0
 };
 
 static struct Samplesinterface samples_interface =
@@ -229,7 +229,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( thehand )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "hand6.bin",	0x0000, 0x1000, CRC(a33b806c) SHA1(1e552af5362e7b003f55e78bb59589e1db55557c) )
 	ROM_LOAD( "hand5.bin",	0x1000, 0x1000, CRC(89bcde82) SHA1(d074bb6a1975160eb533d5fd9289170a68209046) )
 	ROM_LOAD( "hand4.bin",	0x2000, 0x1000, CRC(c6844a83) SHA1(84e220dce3f5ddee9dd0377f3bebdd4027fc9108) )
@@ -257,7 +257,7 @@ ROM_START( thehand )
 ROM_END
 
 ROM_START( gotya )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "gb-06.bin",	0x0000, 0x1000, CRC(7793985a) SHA1(23aa8bd161e700bea59b92075423cdf55e9a26c3) )
 	ROM_LOAD( "gb-05.bin",	0x1000, 0x1000, CRC(683d188b) SHA1(5341c62f5cf384c73be0d7a0a230bb8cebfbe709) )
 	ROM_LOAD( "gb-04.bin",	0x2000, 0x1000, CRC(15b72f09) SHA1(bd941722ed1310d5c8ca8a44899368cba3815f3b) )

@@ -572,29 +572,20 @@ VIDEO_START( lemnangl )
 
 WRITE8_HANDLER( mrokumei_videoram_w )
 {
-	if( videoram[offset] != data )
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
 }
 
 WRITE8_HANDLER( reikaids_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][offset & 3], (offset & 0xffc) >> 2 );
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][offset & 3], (offset & 0xffc) >> 2 );
 }
 
 WRITE8_HANDLER( pteacher_videoram_w )
 {
-	if( videoram[offset] != data )
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
 }
 
 WRITE8_HANDLER( reikaids_gfx_bank_w )

@@ -167,7 +167,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &charlayout,   0, 64 },
 	{ REGION_GFX1, 0x0000, &spritelayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -225,7 +225,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ambush )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )       /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ambush.h7",    0x0000, 0x2000, CRC(ce306563) SHA1(c69b5c4465187a8eda6367d6cd3e0b71a57588d1) )
 	ROM_LOAD( "ambush.g7",    0x2000, 0x2000, CRC(90291409) SHA1(82f1e109bd066ad9fdea1ce0086be6c334e2658a) )
 	ROM_LOAD( "ambush.f7",    0x4000, 0x2000, CRC(d023ca29) SHA1(1ac44960cf6d79936517a9ad4bae6ccd825c9496) )
@@ -245,7 +245,7 @@ ROM_END
 
 /* displays an M next to ROM 1 during the test, why? */
 ROM_START( ambusht )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )       /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "a1.i7",    0x0000, 0x2000, CRC(a7cd149d) SHA1(470ebe60bc23a7908fb96caef8074d65f8c57625) )
 	ROM_LOAD( "a2.g7",    0x2000, 0x2000, CRC(8328d88a) SHA1(690f0af10a0550566b67ee570f849b2764448d15) )
 	ROM_LOAD( "a3.f7",    0x4000, 0x2000, CRC(8db57ab5) SHA1(5cc7d7ebdfc91fb8d9ed52836d70c1de68001402) )
@@ -264,7 +264,7 @@ ROM_START( ambusht )
 ROM_END
 
 ROM_START( ambushv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )       /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "n1_h7.bin",    0x0000, 0x2000, CRC(3c0833b4) SHA1(dd0cfb6da281742114abfe652d38038b078b959e) )
 	ROM_LOAD( "ambush.g7",    0x2000, 0x2000, CRC(90291409) SHA1(82f1e109bd066ad9fdea1ce0086be6c334e2658a) )
 	ROM_LOAD( "ambush.f7",    0x4000, 0x2000, CRC(d023ca29) SHA1(1ac44960cf6d79936517a9ad4bae6ccd825c9496) )

@@ -963,19 +963,15 @@ if (code_pressed(KEYCODE_Z))
 
 WRITE16_HANDLER( cps1_gfxram_w )
 {
-	int oldword = cps1_gfxram[offset];
+	int page = (offset >> 7) & 0x3c0;
 	COMBINE_DATA(&cps1_gfxram[offset]);
-	if (oldword != cps1_gfxram[offset])
-	{
-		int page = (offset >> 7) & 0x3c0;
 
-		if (page == (cps1_port(CPS1_SCROLL1_BASE) & 0x3c0))
-			tilemap_mark_tile_dirty(cps1_bg_tilemap[0],offset/2 & 0x0fff);
-		if (page == (cps1_port(CPS1_SCROLL2_BASE) & 0x3c0))
-			tilemap_mark_tile_dirty(cps1_bg_tilemap[1],offset/2 & 0x0fff);
-		if (page == (cps1_port(CPS1_SCROLL3_BASE) & 0x3c0))
-			tilemap_mark_tile_dirty(cps1_bg_tilemap[2],offset/2 & 0x0fff);
-	}
+	if (page == (cps1_port(CPS1_SCROLL1_BASE) & 0x3c0))
+		tilemap_mark_tile_dirty(cps1_bg_tilemap[0],offset/2 & 0x0fff);
+	if (page == (cps1_port(CPS1_SCROLL2_BASE) & 0x3c0))
+		tilemap_mark_tile_dirty(cps1_bg_tilemap[1],offset/2 & 0x0fff);
+	if (page == (cps1_port(CPS1_SCROLL3_BASE) & 0x3c0))
+		tilemap_mark_tile_dirty(cps1_bg_tilemap[2],offset/2 & 0x0fff);
 }
 
 

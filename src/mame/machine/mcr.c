@@ -103,16 +103,12 @@ static WRITE8_HANDLER( ipu_break_changed );
 
 gfx_layout mcr_bg_layout =
 {
-	16,16,
+	8,8,
 	RGN_FRAC(1,2),
 	4,
-	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+1, 0, 1 },
-	{  0,  0,  2,  2,  4,  4,  6,  6,
-	   8,  8, 10, 10, 12, 12, 14, 14 },
-	{ 0*8,  0*8,  2*8,  2*8,
-	  4*8,  4*8,  6*8,  6*8,
-	  8*8,  8*8, 10*8, 10*8,
-	 12*8, 12*8, 14*8, 14*8 },
+	{ STEP2(RGN_FRAC(1,2),1), STEP2(RGN_FRAC(0,2),1) },
+	{ STEP8(0,2) },
+	{ STEP8(0,16) },
 	16*8
 };
 
@@ -122,31 +118,12 @@ gfx_layout mcr_sprite_layout =
 	32,32,
 	RGN_FRAC(1,4),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4,
-	  RGN_FRAC(1,4)+0, RGN_FRAC(1,4)+4,
-	  RGN_FRAC(2,4)+0, RGN_FRAC(2,4)+4,
-	  RGN_FRAC(3,4)+0, RGN_FRAC(3,4)+4,
-	  8, 12,
-	  RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+12,
-	  RGN_FRAC(2,4)+8, RGN_FRAC(2,4)+12,
-	  RGN_FRAC(3,4)+8, RGN_FRAC(3,4)+12,
-	  16, 20,
-	  RGN_FRAC(1,4)+16, RGN_FRAC(1,4)+20,
-	  RGN_FRAC(2,4)+16, RGN_FRAC(2,4)+20,
-	  RGN_FRAC(3,4)+16, RGN_FRAC(3,4)+20,
-	  24, 28,
-	  RGN_FRAC(1,4)+24, RGN_FRAC(1,4)+28,
-	  RGN_FRAC(2,4)+24, RGN_FRAC(2,4)+28,
-	  RGN_FRAC(3,4)+24, RGN_FRAC(3,4)+28 },
-	{ 32*0,  32*1,  32*2,  32*3,
-	  32*4,  32*5,  32*6,  32*7,
-	  32*8,  32*9,  32*10, 32*11,
-	  32*12, 32*13, 32*14, 32*15,
-	  32*16, 32*17, 32*18, 32*19,
-	  32*20, 32*21, 32*22, 32*23,
-	  32*24, 32*25, 32*26, 32*27,
-	  32*28, 32*29, 32*30, 32*31 },
+	{ STEP4(0,1) },
+	{ STEP2(RGN_FRAC(0,4)+0,4), STEP2(RGN_FRAC(1,4)+0,4), STEP2(RGN_FRAC(2,4)+0,4), STEP2(RGN_FRAC(3,4)+0,4),
+	  STEP2(RGN_FRAC(0,4)+8,4), STEP2(RGN_FRAC(1,4)+8,4), STEP2(RGN_FRAC(2,4)+8,4), STEP2(RGN_FRAC(3,4)+8,4),
+	  STEP2(RGN_FRAC(0,4)+16,4), STEP2(RGN_FRAC(1,4)+16,4), STEP2(RGN_FRAC(2,4)+16,4), STEP2(RGN_FRAC(3,4)+16,4),
+	  STEP2(RGN_FRAC(0,4)+24,4), STEP2(RGN_FRAC(1,4)+24,4), STEP2(RGN_FRAC(2,4)+24,4), STEP2(RGN_FRAC(3,4)+24,4) },
+	{ STEP32(0,32) },
 	32*32
 };
 
@@ -294,7 +271,6 @@ MACHINE_START( mcr )
 	z80ctc_init(0, &ctc_intf);
 
 	state_save_register_global(mcr_cocktail_flip);
-	return 0;
 }
 
 
@@ -315,7 +291,6 @@ MACHINE_START( nflfoot )
 
 	/* allocate a timer for the IPU watchdog */
 	ipu_watchdog_timer = mame_timer_alloc(ipu_watchdog_reset);
-	return 0;
 }
 
 
@@ -361,7 +336,6 @@ MACHINE_START( mcr68 )
 	state_save_register_global(zwackery_sound_data);
 
 	state_save_register_global(mcr_cocktail_flip);
-	return 0;
 }
 
 
@@ -418,7 +392,8 @@ MACHINE_START( zwackery )
 	pia_config(2, &zwackery_pia_2_intf);
 	pia_config(3, &zwackery_pia_3_intf);
 	pia_config(4, &zwackery_pia_4_intf);
-	return machine_start_mcr68(machine);
+
+	machine_start_mcr68(machine);
 }
 
 

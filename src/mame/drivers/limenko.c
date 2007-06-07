@@ -75,26 +75,20 @@ static WRITE32_HANDLER( limenko_paletteram_w )
 
 static WRITE32_HANDLER( bg_videoram_w )
 {
-	UINT32 oldword = bg_videoram[offset];
 	COMBINE_DATA(&bg_videoram[offset]);
-	if (oldword != bg_videoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 static WRITE32_HANDLER( md_videoram_w )
 {
-	UINT32 oldword = md_videoram[offset];
 	COMBINE_DATA(&md_videoram[offset]);
-	if (oldword != md_videoram[offset])
-		tilemap_mark_tile_dirty(md_tilemap,offset);
+	tilemap_mark_tile_dirty(md_tilemap,offset);
 }
 
 static WRITE32_HANDLER( fg_videoram_w )
 {
-	UINT32 oldword = fg_videoram[offset];
 	COMBINE_DATA(&fg_videoram[offset]);
-	if (oldword != fg_videoram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 static WRITE32_HANDLER( spotty_soundlatch_w )
@@ -474,7 +468,7 @@ static gfx_layout tile_layout =
 static gfx_decode limenko_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tile_layout, 0, 16 }, /* tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

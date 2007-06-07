@@ -336,7 +336,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &ship_layout, 6, 1 },
 	{ REGION_GFX3, 0, &pt_layout, 0, 1 },
 	{ REGION_GFX4, 0, &torpedo_layout, 4, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

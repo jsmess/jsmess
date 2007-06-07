@@ -468,11 +468,8 @@ READ8_HANDLER( galaga_videoram_r )
 
 WRITE8_HANDLER( galaga_videoram_w )
 {
-	if (galaga_videoram[offset] != data)
-	{
-		galaga_videoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
-	}
+	galaga_videoram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( galaga_starcontrol_w )

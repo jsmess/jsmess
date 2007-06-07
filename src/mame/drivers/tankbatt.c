@@ -254,7 +254,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 64 },
 	{ REGION_GFX1, 0, &bulletlayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -317,7 +317,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tankbatt )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tb1-1.1a",  0x6000, 0x0800, CRC(278a0b8c) SHA1(11ea8fe8401b3cd986616a30a759c0ac1a5ce73b) )
 	ROM_LOAD( "tb1-2.1b",  0x6800, 0x0800, CRC(e0923370) SHA1(8d3dbea877bed9f9c267d8002dc180f6eb1e5a8f) )
 	ROM_LOAD( "tb1-3.1c",  0x7000, 0x0800, CRC(85005ea4) SHA1(91583081803a5ef600fb90bee34be9edd87f157e) )

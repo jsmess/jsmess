@@ -218,7 +218,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x0000, &charlayout8,   256, 32 }, /* tiles */
 	{ REGION_GFX1, 0x0000, &spritelayout4,   0, 64 }, /* sprites */
 	{ REGION_GFX2, 0x0000, &spritelayout8, 256, 32 }, /* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static struct MSM5205interface msm5205_interface =

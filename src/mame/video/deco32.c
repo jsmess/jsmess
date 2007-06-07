@@ -27,41 +27,28 @@ UINT16 *deco32_raster_display_list;
 
 WRITE32_HANDLER( deco32_pf1_data_w )
 {
-	const UINT32 oldword=deco32_pf1_data[offset];
 	COMBINE_DATA(&deco32_pf1_data[offset]);
-
-	if (oldword!=deco32_pf1_data[offset]) {
-		tilemap_mark_tile_dirty(pf1_tilemap,offset);
-		if (pf1a_tilemap && offset<0x400)
-			tilemap_mark_tile_dirty(pf1a_tilemap,offset);
-	}
+	tilemap_mark_tile_dirty(pf1_tilemap,offset);
+	if (pf1a_tilemap && offset<0x400)
+		tilemap_mark_tile_dirty(pf1a_tilemap,offset);
 }
 
 WRITE32_HANDLER( deco32_pf2_data_w )
 {
-	const UINT32 oldword=deco32_pf2_data[offset];
 	COMBINE_DATA(&deco32_pf2_data[offset]);
-
-	if (oldword!=deco32_pf2_data[offset])
-		tilemap_mark_tile_dirty(pf2_tilemap,offset);
+	tilemap_mark_tile_dirty(pf2_tilemap,offset);
 }
 
 WRITE32_HANDLER( deco32_pf3_data_w )
 {
-	const UINT32 oldword=deco32_pf3_data[offset];
 	COMBINE_DATA(&deco32_pf3_data[offset]);
-
-	if (oldword!=deco32_pf3_data[offset])
-		tilemap_mark_tile_dirty(pf3_tilemap,offset);
+	tilemap_mark_tile_dirty(pf3_tilemap,offset);
 }
 
 WRITE32_HANDLER( deco32_pf4_data_w )
 {
-	const UINT32 oldword=deco32_pf4_data[offset];
 	COMBINE_DATA(&deco32_pf4_data[offset]);
-
-	if (oldword!=deco32_pf4_data[offset])
-		tilemap_mark_tile_dirty(pf4_tilemap,offset);
+	tilemap_mark_tile_dirty(pf4_tilemap,offset);
 }
 
 /******************************************************************************/

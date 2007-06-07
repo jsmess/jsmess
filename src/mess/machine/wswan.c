@@ -210,14 +210,12 @@ MACHINE_START( wswan ) {
 	system_type = WSWAN;
 	add_exit_callback( machine, wswan_machine_stop );
 	wswan_setup_bios();
-	return 0;
 }
 
 MACHINE_START( wscolor ) {
 	system_type = WSC;
 	add_exit_callback( machine, wswan_machine_stop );
 	wswan_setup_bios();
-	return 0;
 }
 
 MACHINE_RESET( wswan )

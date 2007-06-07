@@ -207,12 +207,8 @@ WRITE8_HANDLER( bking2_hitclr_w )
 
 WRITE8_HANDLER( bking2_playfield_w )
 {
-	if (bking2_playfield_ram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
-	}
-
 	bking2_playfield_ram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 

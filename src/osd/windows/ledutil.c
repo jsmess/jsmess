@@ -705,6 +705,11 @@ static void led_set_state(int state)
 					keybd_event(vk[k], 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 				}
 			}
+
+			keyState[VK_NUMLOCK] = (keyState[VK_NUMLOCK] & ~1) | ((state >> 0) & 1);
+			keyState[VK_CAPITAL] = (keyState[VK_CAPITAL] & ~1) | ((state >> 1) & 1);
+			keyState[VK_SCROLL] = (keyState[VK_SCROLL] & ~1) | ((state >> 2) & 1);
+			SetKeyboardState(&keyState[0]);
 			break;
 		}
 

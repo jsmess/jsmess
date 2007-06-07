@@ -235,7 +235,6 @@ static MACHINE_START( slapshot )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 
@@ -520,7 +519,7 @@ static const gfx_decode slapshot_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0x0, &tilelayout,  0, 256 },	/* sprite parts */
 	{ REGION_GFX1, 0x0, &slapshot_charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -564,14 +564,14 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &spritelayout, 0, 1 },		/* sprite prom 2 */
 	{ REGION_GFX4, 0, &spritelayout, 0, 1 },		/* sprite prom 3 (unused) */
 	{ REGION_GFX5, 0, &spritelayout, 0, 1 },		/* sprite prom 4 (unused) */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
 static const gfx_decode minferno_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -696,7 +696,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( deadeye )
-	ROM_REGION( 0x08000, REGION_CPU1, 0 ) 	/* 32K for code */
+	ROM_REGION( 0x08000, REGION_CPU1, 0 )
 	ROM_LOAD( "de1.8h",       0x0000, 0x0400, CRC(bd09e4dc) SHA1(5428835f6bc3d162496fdce174fcaaaba98c09f9) )
 	ROM_LOAD( "de2.9h",       0x0400, 0x0400, CRC(b89edec3) SHA1(5ce0058f23b7e5c832029ca97d9a40d1494bf972) )
 	ROM_LOAD( "de3.10h",      0x0800, 0x0400, CRC(acf24438) SHA1(d7ea668ee19a167cb006c92e9606e20ef13d052e) )
@@ -723,7 +723,7 @@ ROM_START( deadeye )
 ROM_END
 
 ROM_START( bowl3d )
-	ROM_REGION( 0x08000, REGION_CPU1, 0 ) 	/* 32K for code */
+	ROM_REGION( 0x08000, REGION_CPU1, 0 )
 	ROM_LOAD( "b3d.h8",       0x0000, 0x0400, CRC(be38feeb) SHA1(feab3c61ce1e351c02f6ffa7f7f2ac90e62e7719) )
 	ROM_LOAD( "b3d.h9",       0x0400, 0x0400, CRC(4e8acead) SHA1(3c00f0d05b9cb80a2245bc68a45732ab6ac87b7f) )
 	ROM_LOAD( "b3d.h10",      0x0800, 0x0400, CRC(16677267) SHA1(0131f68e87d6326870f95c1ff364a97436b6c4d8) )
@@ -756,7 +756,7 @@ ROM_END
 
 
 ROM_START( gypsyjug )
-	ROM_REGION( 0x08000, REGION_CPU1, 0 ) 	/* 32K for code */
+	ROM_REGION( 0x08000, REGION_CPU1, 0 )
 	ROM_LOAD( "gj.1b",        0x0000, 0x0400, CRC(f6a71d9f) SHA1(11a86ae781297e4077a69e6809487022fed9c444) )
 	ROM_LOAD( "gj.2b",        0x0400, 0x0400, CRC(94c14455) SHA1(ed704680c2b83d1726d1a17d64f5d57925a495b2) )
 	ROM_LOAD( "gj.3b",        0x0800, 0x0400, CRC(87ee0490) SHA1(7ecca4df9755b604d179d407e7c9c04d616b689b) )
@@ -786,7 +786,7 @@ ROM_END
 
 
 ROM_START( minferno )
-	ROM_REGION( 0x08000, REGION_CPU1, ROMREGION_INVERT )	/* 32K for code */
+	ROM_REGION( 0x08000, REGION_CPU1, ROMREGION_INVERT )
 	ROM_LOAD_NIB_LOW ( "inferno.f5",	0x0000, 0x0400, CRC(58472a73) SHA1(7f8b9502c3db11219d6b765dec7b6ff3f62d6c8b) )
 	ROM_LOAD_NIB_HIGH( "inferno.e5",	0x0000, 0x0400, CRC(451942af) SHA1(0a03d74c1b98771d2170c76ca41e972300c34c3a) )
 	ROM_LOAD_NIB_LOW ( "inferno.f6",	0x0400, 0x0400, CRC(d85a195b) SHA1(8250f8e80a9bf196d7bf122af9aad0ae00dedd26) )

@@ -60,11 +60,8 @@ VIDEO_START( speedbal )
 
 WRITE8_HANDLER( speedbal_foreground_videoram_w )
 {
-	if (speedbal_foreground_videoram[offset] != data)
-	{
-		speedbal_foreground_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset>>1);
-	}
+	speedbal_foreground_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset>>1);
 }
 
 /*************************************
@@ -75,11 +72,8 @@ WRITE8_HANDLER( speedbal_foreground_videoram_w )
 
 WRITE8_HANDLER( speedbal_background_videoram_w )
 {
-	if (speedbal_background_videoram[offset] != data)
-	{
-		speedbal_background_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset>>1);
-	}
+	speedbal_background_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset>>1);
 }
 
 

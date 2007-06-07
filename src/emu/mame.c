@@ -1317,10 +1317,8 @@ static void init_machine(running_machine *machine)
 	sound_init(machine);
 
 	/* call the driver's _START callbacks */
-	if (machine->drv->machine_start != NULL && (*machine->drv->machine_start)(machine) != 0)
-		fatalerror("Unable to start machine emulation");
-	if (machine->drv->sound_start != NULL && (*machine->drv->sound_start)(machine) != 0)
-		fatalerror("Unable to start sound emulation");
+	if (machine->drv->machine_start != NULL) (*machine->drv->machine_start)(machine);
+	if (machine->drv->sound_start != NULL) (*machine->drv->sound_start)(machine);
 	if (machine->drv->video_start != NULL && (*machine->drv->video_start)(machine) != 0)
 		fatalerror("Unable to start video emulation");
 

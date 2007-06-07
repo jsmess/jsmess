@@ -76,20 +76,14 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE8_HANDLER( thedeep_vram_0_w )
 {
-	if (thedeep_vram_0[offset] != data)
-	{
-		thedeep_vram_0[offset] = data;
-		tilemap_mark_tile_dirty(tilemap_0, offset / 2);
-	}
+	thedeep_vram_0[offset] = data;
+	tilemap_mark_tile_dirty(tilemap_0, offset / 2);
 }
 
 WRITE8_HANDLER( thedeep_vram_1_w )
 {
-	if (thedeep_vram_1[offset] != data)
-	{
-		thedeep_vram_1[offset] = data;
-		tilemap_mark_tile_dirty(tilemap_1, offset / 2);
-	}
+	thedeep_vram_1[offset] = data;
+	tilemap_mark_tile_dirty(tilemap_1, offset / 2);
 }
 
 

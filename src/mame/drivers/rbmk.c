@@ -446,7 +446,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &rbmk32_layout,   0x0, 16  },
 	{ REGION_GFX2, 0, &rbmk8_layout,   0x100, 16  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 VIDEO_START(rbmk)

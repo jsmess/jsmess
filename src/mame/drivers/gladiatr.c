@@ -647,7 +647,7 @@ static const gfx_decode gladiatr_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   0x200, 1 },
 	{ REGION_GFX2, 0, &tilelayout,   0x000, 32 },
 	{ REGION_GFX3, 0, &spritelayout, 0x100, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

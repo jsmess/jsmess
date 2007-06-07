@@ -321,7 +321,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,      0, 16 },
 	{ REGION_GFX2, 0, &spritelayout, 16*8, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode sht_gfxdecodeinfo[] =
@@ -383,13 +383,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( travrusa )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "zr1-0.m3", 0x0000, 0x2000, CRC(be066c0a) SHA1(fed0ef114b08519b99d77485b73768a838d2f06e) )
 	ROM_LOAD( "zr1-5.l3", 0x2000, 0x2000, CRC(145d6b34) SHA1(c9e2bd1d3e62c496e4c5057c4012b069dfcf592d) )
 	ROM_LOAD( "zr1-6a.k3", 0x4000, 0x2000, CRC(e1b51383) SHA1(34f4476c1bcc28c53c8ffa7b614f443a329aae13) )
 	ROM_LOAD( "zr1-7.j3", 0x6000, 0x2000, CRC(85cd1a51) SHA1(7eb046514845cb9d2507ee24d1b2f7cc5402ac02) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "mr10.1a",      0xf000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -409,13 +409,13 @@ ROM_START( travrusa )
 ROM_END
 
 ROM_START( motorace )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
 	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )	/* encrypted */
 	ROM_LOAD( "mr1.3l",       0x2000, 0x2000, CRC(0904ed58) SHA1(2776e031cb58f99103bc35299bffd7612d954608) )
 	ROM_LOAD( "mr2.3k",       0x4000, 0x2000, CRC(8a2374ec) SHA1(7159731f5ef2485e3c822e3e8e51e9583dd1c6bc) )
 	ROM_LOAD( "mr3.3j",       0x6000, 0x2000, CRC(2f04c341) SHA1(ae990d9d4abdd7d6ef9d21aa62125fe2e0067623) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "mr10.1a",      0xf000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )

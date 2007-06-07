@@ -398,7 +398,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x18000, &tilelayout1,  0x80, 16 },
 	{ REGION_GFX2, 0x19000, &tilelayout2,  0x80, 16 },
 	{ REGION_GFX3, 0x00000, &spritelayout, 0x40,  8 },	/* use colors 0x40-0x7f */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
@@ -549,7 +549,7 @@ ROM_START( brkthru )
 	ROM_LOAD( "brkthru.13",   0x0000, 0x0100, CRC(aae44269) SHA1(7c66aeb93577104109d264ee8b848254256c81eb) ) /* red and green component */
 	ROM_LOAD( "brkthru.14",   0x0100, 0x0100, CRC(f2d4822a) SHA1(f535e91b87ff01f2a73662856fd3f72907ca62e9) ) /* blue component */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64K for sound CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "brkthru.5",    0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) )
 ROM_END
 
@@ -589,7 +589,7 @@ ROM_START( brkthruj )
 	ROM_LOAD( "brkthru.13",   0x0000, 0x0100, CRC(aae44269) SHA1(7c66aeb93577104109d264ee8b848254256c81eb) ) /* red and green component */
 	ROM_LOAD( "brkthru.14",   0x0100, 0x0100, CRC(f2d4822a) SHA1(f535e91b87ff01f2a73662856fd3f72907ca62e9) ) /* blue component */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64K for sound CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "brkthru.5",    0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) )
 ROM_END
 
@@ -630,7 +630,7 @@ ROM_START( forcebrk )
 	ROM_LOAD( "brkthru.13",   0x0000, 0x0100, CRC(aae44269) SHA1(7c66aeb93577104109d264ee8b848254256c81eb) ) /* red and green component */
 	ROM_LOAD( "brkthru.14",   0x0100, 0x0100, CRC(f2d4822a) SHA1(f535e91b87ff01f2a73662856fd3f72907ca62e9) ) /* blue component */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64K for sound CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "brkthru.5",    0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) )
 ROM_END
 
@@ -670,7 +670,7 @@ ROM_START( darwin )
 	ROM_LOAD( "df.12",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) /* red and green component */
 	ROM_LOAD( "df.13",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) /* blue component */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64K for sound CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "darw_08.rom",  0x8000, 0x8000, CRC(6b580d58) SHA1(a70aebc6b4a291b4adddbb41d092b2682fc2d421) )
 ROM_END
 

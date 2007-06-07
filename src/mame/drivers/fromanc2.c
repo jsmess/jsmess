@@ -659,7 +659,7 @@ static const gfx_decode fromanc2_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &fromanc2_tilelayout, (256 * 2), (256 * 2) },
 	{ REGION_GFX3, 0, &fromanc2_tilelayout, (512 * 2), (256 * 2) },
 	{ REGION_GFX4, 0, &fromanc2_tilelayout, (768 * 2), (256 * 2) },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_layout fromancr_tilelayout =
@@ -678,7 +678,7 @@ static const gfx_decode fromancr_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &fromancr_tilelayout, (512 * 2), 2 },
 	{ REGION_GFX2, 0, &fromancr_tilelayout, (256 * 2), 2 },
 	{ REGION_GFX3, 0, &fromancr_tilelayout, (  0 * 2), 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

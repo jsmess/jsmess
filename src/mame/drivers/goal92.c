@@ -306,7 +306,7 @@ static const gfx_decode goal92_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &layout_16x16x4,		   0*16,   16 }, // BG Layer
 	{ REGION_GFX2, 0, &layout_16x16x4,		  16*16,   16 }, // Mid Layer
 	{ REGION_GFX2, 0, &layout_16x16x4,		  32*16,   16 }, // FG Layer
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -173,8 +173,6 @@ MACHINE_START( neogeo )
 	/* register state save */
 	neogeo_register_main_savestate();
 	neogeo_register_sub_savestate();
-
-	return 0;
 }
 
 

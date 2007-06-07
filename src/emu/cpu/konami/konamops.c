@@ -3049,7 +3049,7 @@ INLINE void incw_di( void )
 	r = t;
 	++r.d;
 	CLR_NZV;
-	SET_FLAGS16(t.d, t.d, r.d);;
+	SET_FLAGS16(t.d, t.d, r.d);
 	WM16(EAD,&r);
 }
 
@@ -3094,7 +3094,7 @@ INLINE void decw_di( void )
 	r = t;
 	--r.d;
 	CLR_NZV;
-	SET_FLAGS16(t.d, t.d, r.d);;
+	SET_FLAGS16(t.d, t.d, r.d);
 	WM16(EAD,&r);
 }
 

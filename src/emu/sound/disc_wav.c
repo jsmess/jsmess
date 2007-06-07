@@ -702,7 +702,7 @@ void dss_op_amp_osc_step(node_description *node)
 	double dt;			// change in time
 	double vC;			// Current voltage on capacitor, before dt
 	double vCnext = 0;	// Voltage on capacitor, after dt
-	double iCharge[2];
+	double iCharge[2] = {0};
 	UINT8 force_charge = 0;
 	UINT8 enable = DSS_OP_AMP_OSC__ENABLE;
 

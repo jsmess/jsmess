@@ -70,13 +70,9 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER( sprint8_video_ram_w )
 {
-	if (data != sprint8_video_ram[offset])
-	{
-		tilemap_mark_tile_dirty(tilemap1, offset);
-		tilemap_mark_tile_dirty(tilemap2, offset);
-	}
-
 	sprint8_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(tilemap1, offset);
+	tilemap_mark_tile_dirty(tilemap2, offset);
 }
 
 

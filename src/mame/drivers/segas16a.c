@@ -551,6 +551,54 @@ static void quartet_i8751_sim(void)
 
 /*************************************
  *
+ *  Ace Attacker custom I/O
+ *
+ *************************************/
+
+static READ16_HANDLER( aceattaa_custom_io_r )
+{
+	switch (offset & (0x3000/2))
+	{
+		case 0x1000/2:
+			switch (offset & 3)
+			{
+				case 0x01:
+				{
+					switch (video_control & 0xf)
+					{
+						case 0x00: return readinputportbytag("P1");
+						case 0x04: return readinputportbytag("ANALOGX1");
+						case 0x08: return readinputportbytag("ANALOGY1");
+						case 0x0c: return readinputportbytag("UNUSED");
+					}
+					break;
+				}
+
+				case 0x02:
+					return readinputportbytag("DIAL1") | (readinputportbytag("DIAL2") << 4);
+
+				case 0x03:
+				{
+					switch (video_control & 0xf)
+					{
+						case 0x00: return readinputportbytag("P2");
+						case 0x04: return readinputportbytag("ANALOGX2");
+						case 0x08: return readinputportbytag("ANALOGY2");
+						case 0x0c: return readinputportbytag("POW2");
+					}
+					break;
+				}
+			}
+			break;
+	}
+
+	return standard_io_r(offset, mem_mask);
+}
+
+
+
+/*************************************
+ *
  *  Major League custom I/O
  *
  *************************************/
@@ -926,6 +974,94 @@ INPUT_PORTS_END
  *  Game-specific port definitions
  *
  *************************************/
+
+static INPUT_PORTS_START( aceattaa )
+	PORT_INCLUDE( system16a_generic )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )			/* Block Switch */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	/* Block Switch */
+
+	/* This is the direction control of the "hand" device for player 1 */
+	/* I'm sure there is a better way to do this but I don't fully understand how the device works yet */
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 )
+
+	/* This is the power control of the "hand" device for player 1 */
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 )
+
+	/* This is the direction control of the "hand" device for player 2 */
+	/* I'm sure there is a better way to do this but I don't fully understand how the device works yet */
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(2)
+
+	/* This is the power control of the "hand" device for player 2 */
+	PORT_START_TAG("POW2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e, 0x0e, "Starting Points" )  PORT_DIPLOCATION("SWB:2,3,4")
+	PORT_DIPSETTING(    0x06, "2000" )
+	PORT_DIPSETTING(    0x0a, "3000" )
+	PORT_DIPSETTING(    0x0c, "4000" )
+	PORT_DIPSETTING(    0x0e, "5000" )
+	PORT_DIPSETTING(    0x08, "6000" )
+	PORT_DIPSETTING(    0x04, "7000" )
+	PORT_DIPSETTING(    0x02, "8000" )
+	PORT_DIPSETTING(    0x00, "9000" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("ANALOGX1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+
+	PORT_START_TAG("ANALOGY1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+
+	PORT_START_TAG("DIAL1")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+
+	PORT_START_TAG("ANALOGX2")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5) PORT_REVERSE
+
+	PORT_START_TAG("ANALOGY2")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(75) PORT_KEYDELTA(5)
+
+	PORT_START_TAG("DIAL2")
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( afighter )
 	PORT_INCLUDE( system16a_2button )
@@ -2691,6 +2827,13 @@ static DRIVER_INIT( generic_16a )
 }
 
 
+static DRIVER_INIT( aceattaa )
+{
+	system16a_generic_init(machine);
+	custom_io_r = aceattaa_custom_io_r;
+}
+
+
 static DRIVER_INIT( afighter )
 {
 	void fd1089_decrypt_0018(void);
@@ -2782,7 +2925,7 @@ GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   quartet,     ROT0,  
 GAME( 1986, quart2,   quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (unprotected)", 0 )
 
 /* System 16A */
-GAME( 1986, aceattaa, aceattac, system16a       , shinobi,  generic_16a, ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", GAME_NOT_WORKING )
+GAME( 1988, aceattaa, aceattac, system16a       , aceattaa, aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", 0 )
 GAME( 1986, afighter, 0,        system16a_no7751, afighter, afighter,    ROT270, "Sega",           "Action Fighter, FD1089A 317-0018", 0 )
 GAME( 1986, alexkidd, 0,        system16a,        alexkidd, generic_16a, ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 2, unprotected)", 0 )
 GAME( 1986, alexkid1, alexkidd, system16a,        alexkidd, alexkid1,    ROT0,   "Sega",           "Alex Kidd: The Lost Stars (set 1, FD1089A 317-unknown)", 0 )

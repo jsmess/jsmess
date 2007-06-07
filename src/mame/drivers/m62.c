@@ -1311,7 +1311,7 @@ static const gfx_decode kungfum_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout_1024,       0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,        256, 32 },	/* use colors 256-511 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode battroad_gfxdecodeinfo[] =
@@ -1319,14 +1319,14 @@ static const gfx_decode battroad_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout_1024,       0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,        256, 32 },	/* use colors 256-511 */
 	{ REGION_GFX3, 0, &battroad_charlayout,	512, 32 },	/* use colors 512-543 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode ldrun3_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout_2048,      0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode lotlot_gfxdecodeinfo[] =
@@ -1334,7 +1334,7 @@ static const gfx_decode lotlot_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &lotlot_charlayout,    0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
 	{ REGION_GFX3, 0, &lotlot_charlayout,  512, 32 },	/* use colors 512-767 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode kidniki_gfxdecodeinfo[] =
@@ -1342,7 +1342,7 @@ static const gfx_decode kidniki_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout_4096,      0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
 	{ REGION_GFX3, 0, &kidniki_charlayout,   0, 32 },	/* use colors   0-255 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode spelunkr_gfxdecodeinfo[] =
@@ -1350,7 +1350,7 @@ static const gfx_decode spelunkr_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout_4096,	     0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
 	{ REGION_GFX3, 0, &spelunk2_charlayout,  0, 32 },	/* use colors   0-255 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode spelunk2_gfxdecodeinfo[] =
@@ -1358,7 +1358,7 @@ static const gfx_decode spelunk2_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout_4096,	     0, 64 },	/* use colors   0-511 */
 	{ REGION_GFX2, 0, &spritelayout,       512, 32 },	/* use colors 512-767 */
 	{ REGION_GFX3, 0, &spelunk2_charlayout,  0, 64 },	/* use colors   0-511 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode youjyudn_gfxdecodeinfo[] =
@@ -1366,7 +1366,7 @@ static const gfx_decode youjyudn_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &youjyudn_tilelayout,  0, 32 },	/* use colors   0-255 */
 	{ REGION_GFX2, 0, &spritelayout,       256, 32 },	/* use colors 256-511 */
 	{ REGION_GFX3, 0, &kidniki_charlayout, 128, 16 },	/* use colors 128-255 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1583,7 +1583,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kungfum )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "a-4e-c.bin",   0x0000, 0x4000, CRC(b6e2d083) SHA1(17e2cfe2b9d6121239803aba7132918e54ae02bf) )
 	ROM_LOAD( "a-4d-c.bin",   0x4000, 0x4000, CRC(7532918e) SHA1(9d513d5a3b99cc54c4491371cd44af048ef0fb33) )
 
@@ -1624,7 +1624,7 @@ ROM_START( kungfum )
 ROM_END
 
 ROM_START( kungfud )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "snx_a-4e-d", 0x0000, 0x4000, CRC(fc330a46) SHA1(50edbd6131310afa17d476e278a7098ab1cfae73) )
 	ROM_LOAD( "snx_a-4d-d", 0x4000, 0x4000, CRC(1b2fd32f) SHA1(34487dacf2ec9fbf55148953a9f248fae9442568) )
 
@@ -1658,7 +1658,7 @@ ROM_START( kungfud )
 ROM_END
 
 ROM_START( spartanx )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "a-4e-c-j.bin", 0x0000, 0x4000, CRC(32a0a9a6) SHA1(fbb601a4c98a131013ea49a6877f2cd8139434fa) )
 	ROM_LOAD( "a-4d-c-j.bin", 0x4000, 0x4000, CRC(3173ea78) SHA1(cb6102abf9cf8df531f6e808b59e076831456ff5) )
 
@@ -1699,7 +1699,7 @@ ROM_START( spartanx )
 ROM_END
 
 ROM_START( kungfub )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c5.5h",        0x0000, 0x4000, CRC(5d8e791d) SHA1(90cd911f715a50a90427abd89b38272a6df08d69) )
 	ROM_LOAD( "c4.5k",        0x4000, 0x4000, CRC(4000e2b8) SHA1(719b0aa1fd0cbe671178ac728d76d439bd7932d9) )
 
@@ -1757,7 +1757,7 @@ ROM_START( kungfub )
 ROM_END
 
 ROM_START( kungfub2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "kf4",          0x0000, 0x4000, CRC(3f65313f) SHA1(bd584896f558440a0f7bf8e1ca49bf478fe77553) )
 	ROM_LOAD( "kf5",          0x4000, 0x4000, CRC(9ea325f3) SHA1(7c35128a3e70e5994a5e17db656dec1a53c1fe67) )
 
@@ -1798,7 +1798,7 @@ ROM_START( kungfub2 )
 ROM_END
 
 ROM_START( battroad )
-	ROM_REGION( 0x1e000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x1e000, REGION_CPU1, 0 )
 	ROM_LOAD( "br-a-4e.b",	0x00000, 0x2000, CRC(9bf14768) SHA1(53169553b956e5bcbd3fae13b86ab859cd08c955) )
 	ROM_LOAD( "br-a-4d.b",	0x02000, 0x2000, CRC(39ca1627) SHA1(bbeb59ad93b4eb874dc3c1eebfc1136c0c5112c8) )
 	ROM_LOAD( "br-a-4b.b",	0x04000, 0x2000, CRC(1865bb22) SHA1(990cfffc4fc0ade8bb4ebd02d107f8657728f976) )
@@ -1846,7 +1846,7 @@ ROM_START( battroad )
 ROM_END
 
 ROM_START( ldrun )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lr-a-4e",      0x0000, 0x2000, CRC(5d7e2a4d) SHA1(fe8aeff360f6c3a8606d67a8b95148c3c2ef7267) )
 	ROM_LOAD( "lr-a-4d",      0x2000, 0x2000, CRC(96f20473) SHA1(e400c43f3f32e12f68ca204c60bcebdb2b3da55d) )
 	ROM_LOAD( "lr-a-4b",      0x4000, 0x2000, CRC(b041c4a9) SHA1(77768b03ea2497e25c3e47b68a0eb2fe3e9aea35) )
@@ -1879,7 +1879,7 @@ ROM_START( ldrun )
 ROM_END
 
 ROM_START( ldruna )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "roma4c",       0x0000, 0x2000, CRC(279421e1) SHA1(051e103b2ade4a332053ba05aa7f126dd9b97c2c) )
 	ROM_LOAD( "lr-a-4d",      0x2000, 0x2000, CRC(96f20473) SHA1(e400c43f3f32e12f68ca204c60bcebdb2b3da55d) )
 	ROM_LOAD( "roma4b",       0x4000, 0x2000, CRC(3c464bad) SHA1(df34a9ec2f29f8d2a2ef1a2fc065ba7541ea4178) )
@@ -1951,7 +1951,7 @@ ROM_START( ldrun2 )
 ROM_END
 
 ROM_START( ldrun3 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lr3a4eb.bin",  0x0000, 0x4000, CRC(09affc47) SHA1(1cd56b967e4c8ada6c6e1015aead5f7551034358) )
 	ROM_LOAD( "lr3a4db.bin",  0x4000, 0x4000, CRC(23a02178) SHA1(0560b92dfc9b57d01abb62a7b270beb27fa42040) )
 	ROM_LOAD( "lr3a4bb.bin",  0x8000, 0x4000, CRC(3d501a1a) SHA1(a92ff743eb21145154fa717ee9e6ede4da458aa9) )
@@ -1987,7 +1987,7 @@ ROM_START( ldrun3 )
 ROM_END
 
 ROM_START( ldrun3jp )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lr3-a-4e",     0x0000, 0x4000, CRC(5b334e8e) SHA1(018ee450f88feaf5da025e01d2d839b29d5f1559) )
 	ROM_LOAD( "lr3-a-4d.a",   0x4000, 0x4000, CRC(a84bc931) SHA1(0348d238a85a059a6423794910adec4462e14f27) )
 	ROM_LOAD( "lr3-a-4b.a",   0x8000, 0x4000, CRC(be09031d) SHA1(c124163895d295969b66386fee91c89bbd8b8774) )
@@ -2056,7 +2056,7 @@ ROM_START( ldrun4 )
 ROM_END
 
 ROM_START( lotlot )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lot-a-4e",     0x0000, 0x4000, CRC(2913d08f) SHA1(829115333825a9483322a910efee9ee470d85a0e) )
 	ROM_LOAD( "lot-a-4d",     0x4000, 0x4000, CRC(0443095f) SHA1(2c3ca107b54519632513a75b80a1a7d8b971f2b1) )
 
@@ -2536,7 +2536,7 @@ ROM_START( youjyudn )
 ROM_END
 
 ROM_START( horizon )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "hrza-4e",   0x0000, 0x4000, CRC(98b96ba2) SHA1(8478ec3b39c970c6008f078cbb5ab39462865015) )
 	ROM_LOAD( "hrza-4d",   0x4000, 0x4000, CRC(06b06ac7) SHA1(d9ae9633455733fd14fc4d448b85365bfebef446) )
 	ROM_LOAD( "hrza-4b",   0x8000, 0x4000, CRC(39c0bd02) SHA1(8d3b465ef7db11863cd2d343656e99cfb77c89ef) )

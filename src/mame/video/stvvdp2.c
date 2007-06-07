@@ -3609,7 +3609,7 @@ static void stv_vdp2_draw_basic_tilemap(mame_bitmap *bitmap, const rectangle *cl
 				data = stv_vdp2_vram[newbase + offs];
 				tilecode = (data & 0x00007fff);
 				pal   = (data &    0x007f0000)>>16;
-	//          specialc = (data & 0x10000000)>>28;;
+	//          specialc = (data & 0x10000000)>>28;
 				flipyx   = (data & 0xc0000000)>>30;
 			}
 /* WE'VE GOT THE TILE INFO ... */
@@ -5519,7 +5519,7 @@ static void stv_vdp2_get_window1_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s
 
 static int stv_vdp2_window_process(int x,int y)
 {
-	static UINT16 s_x,e_x,s_y,e_y;
+	UINT16 s_x=0,e_x=0,s_y=0,e_y=0;
 
 	if ((stv2_current_tilemap.window_control & 6) == 0)
 		return 0;
@@ -5589,7 +5589,7 @@ static int stv_vdp2_window_process(int x,int y)
 
 static int stv_vdp2_apply_window_on_layer(rectangle *cliprect)
 {
-	UINT16 s_x,e_x,s_y,e_y;
+	UINT16 s_x=0,e_x=0,s_y=0,e_y=0;
 
 	if ( stv2_current_tilemap.window_control == 0x12 )
 	{

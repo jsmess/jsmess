@@ -478,7 +478,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x00000, &sprites,     0, 4 },
 	{ REGION_GFX2, 0x00000, &tiles1,      0, 4 },
 	{ REGION_GFX2, 0x00000, &tiles2,      0, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode prosport_gfxdecodeinfo[] =
@@ -487,7 +487,7 @@ static const gfx_decode prosport_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x00000, &sprites,     0, 4 },
 	{ REGION_GFX2, 0x00000, &pro_tiles,   0, 4 },
 	{ REGION_GFX2, 0x00800, &pro_tiles,   0, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /*************************************

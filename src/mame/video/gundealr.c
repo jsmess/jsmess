@@ -77,20 +77,14 @@ VIDEO_START( gundealr )
 
 WRITE8_HANDLER( gundealr_bg_videoram_w )
 {
-	if (gundealr_bg_videoram[offset] != data)
-	{
-		gundealr_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
-	}
+	gundealr_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( gundealr_fg_videoram_w )
 {
-	if (gundealr_fg_videoram[offset] != data)
-	{
-		gundealr_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset/2);
-	}
+	gundealr_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( gundealr_paletteram_w )

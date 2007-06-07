@@ -285,13 +285,9 @@ WRITE8_HANDLER( firetrk_drone_rot_w )
 
 WRITE8_HANDLER( firetrk_playfield_w )
 {
-	if (firetrk_playfield_ram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(tilemap1, offset);
-		tilemap_mark_tile_dirty(tilemap2, offset);
-	}
-
 	firetrk_playfield_ram[offset] = data;
+	tilemap_mark_tile_dirty(tilemap1, offset);
+	tilemap_mark_tile_dirty(tilemap2, offset);
 }
 
 

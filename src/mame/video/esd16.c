@@ -99,20 +99,15 @@ static TILE_GET_INFO( get_tile_info_1_16x16 )
 
 WRITE16_HANDLER( esd16_vram_0_w )
 {
-	UINT16 old_data	=	esd16_vram_0[offset];
-	UINT16 new_data	=	COMBINE_DATA(&esd16_vram_0[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(esdtilemap_0,offset);
+	COMBINE_DATA(&esd16_vram_0[offset]);
+	tilemap_mark_tile_dirty(esdtilemap_0,offset);
 }
 
 WRITE16_HANDLER( esd16_vram_1_w )
 {
-	UINT16 old_data	=	esd16_vram_1[offset];
-	UINT16 new_data	=	COMBINE_DATA(&esd16_vram_1[offset]);
-	if (old_data != new_data)
-	{
-		tilemap_mark_tile_dirty(esdtilemap_1,offset);
-		tilemap_mark_tile_dirty(esdtilemap_1_16x16,offset);
-	}
+	COMBINE_DATA(&esd16_vram_1[offset]);
+	tilemap_mark_tile_dirty(esdtilemap_1,offset);
+	tilemap_mark_tile_dirty(esdtilemap_1_16x16,offset);
 }
 
 WRITE16_HANDLER( esd16_tilemap0_color_w )

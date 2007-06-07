@@ -340,7 +340,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &fgtilelayout,   0x0200, 16384  },
 	{ REGION_GFX2, 0, &bgtilelayout,   0x0300, 16384  },
 	{ REGION_GFX3, 0, &spritelayout,   0x0000, 16384  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void irqhandler(int linestate)

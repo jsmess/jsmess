@@ -152,7 +152,6 @@ static MACHINE_START( foodf )
 {
 	state_save_register_global(whichport);
 	scanline_timer = mame_timer_alloc(scanline_update);
-	return 0;
 }
 
 

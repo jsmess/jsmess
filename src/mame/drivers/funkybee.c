@@ -292,7 +292,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &charlayout,	  0, 8 },
 	{ REGION_GFX1, 0, &spritelayout, 16, 4 },
 	{ REGION_GFX2, 0, &spritelayout, 16, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -320,7 +320,6 @@ static MACHINE_DRIVER_START( funkybee )
 	MDRV_SCREEN_VISIBLE_AREA(12, 32*8-1-12, 0*8, 28*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(funkybee)
 	MDRV_VIDEO_START(funkybee)
@@ -342,7 +341,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( funkybee )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "funkybee.1",    0x0000, 0x1000, CRC(3372cb33) SHA1(09f2673cdeaadba8211d86a19e727aebb4d8be9d) )
 	ROM_LOAD( "funkybee.3",    0x1000, 0x1000, CRC(7bf7c62f) SHA1(f8e5514c17fddb8ed95e5e18aab81ad0ebcc41af) )
 	ROM_LOAD( "funkybee.2",    0x2000, 0x1000, CRC(8cc0fe8e) SHA1(416d97db0a2219ea46f2caa55787253e16a5ef32) )
@@ -362,7 +361,7 @@ ROM_END
    there are 2 lives less then in the original game
    TODO: insert correct DIPSWITCH, where lives is "1,2,3,4" instead of "3,4,5,6" */
 ROM_START( funkbeeb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "senza_orca.fb1", 0x0000, 0x1000, CRC(7f2e7f85) SHA1(d4b63add3a97fc80aeafcd72a261302ab52d60a7) )
 	ROM_LOAD( "funkybee.3",     0x1000, 0x1000, CRC(7bf7c62f) SHA1(f8e5514c17fddb8ed95e5e18aab81ad0ebcc41af) )
 	ROM_LOAD( "funkybee.2",     0x2000, 0x1000, CRC(8cc0fe8e) SHA1(416d97db0a2219ea46f2caa55787253e16a5ef32) )
@@ -379,7 +378,7 @@ ROM_START( funkbeeb )
 ROM_END
 
 ROM_START( skylancr )
-  	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+  	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1sl.5a",        0x0000, 0x2000, CRC(e80b315e) SHA1(0c02aa9f0d4bdfc3482c400d0e4e38fd3912a512) )
 	ROM_LOAD( "2sl.5c",        0x2000, 0x2000, CRC(9d70567b) SHA1(05ff6f0c4b4d928e937556d9943a76f6cbc0f05f) )
 	ROM_LOAD( "3sl.5d",        0x4000, 0x2000, CRC(64c39457) SHA1(b54a57a8576c2f852b765350c4504ccc3f5a431c) )
@@ -395,7 +394,7 @@ ROM_START( skylancr )
 ROM_END
 
 ROM_START( skylance )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.5a",          0x0000, 0x2000, CRC(82d55824) SHA1(5c457e720ac8611bea4bc7e63ba4ee1c11200471) )
 	ROM_LOAD( "2.5c",          0x2000, 0x2000, CRC(dff3a682) SHA1(e3197e106c2c6d198d2769b63701222d48a196d1) )
 	ROM_LOAD( "3.5d",          0x4000, 0x1000, CRC(7c006ee6) SHA1(22719d4d0ad5c4f534a1613e0d74cab73973bab7) )

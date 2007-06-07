@@ -173,20 +173,14 @@ VIDEO_START( stfight )
 
 WRITE8_HANDLER( stfight_text_char_w )
 {
-	if (stfight_text_char_ram[offset] != data)
-	{
-		stfight_text_char_ram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	stfight_text_char_ram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( stfight_text_attr_w )
 {
-	if (stfight_text_attr_ram[offset] != data)
-	{
-		stfight_text_attr_ram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	stfight_text_attr_ram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( stfight_sprite_bank_w )

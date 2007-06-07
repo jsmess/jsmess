@@ -570,7 +570,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX5, 0, &spritelayout1,  320, 8 },	/* 320-383 normal sprites */
 	{ REGION_GFX5, 0, &spritelayout2,  320, 8 },	/* 320-383 large sprites */
 													/* 384-399 is background */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -647,7 +647,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( senjyo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "08m_05t.bin", 0x0000, 0x2000, CRC(b1f3544d) SHA1(59997164dfb740fce1862d89754be7517303161a) )
 	ROM_LOAD( "08k_04t.bin", 0x2000, 0x2000, CRC(e34468a8) SHA1(1931788e4ebe0dab9525f795b639be6544a6b31a) )
 	ROM_LOAD( "08j_03t.bin", 0x4000, 0x2000, CRC(c33aedee) SHA1(5adf83268ef7b91194dea41204bdb931a14f2158) )
@@ -688,7 +688,7 @@ ROM_START( senjyo )
 ROM_END
 
 ROM_START( starforc )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "starforc.3",   0x0000, 0x4000, CRC(8ba27691) SHA1(2b8b1e634ef5bed5c61a078e64a6dda77f84cdf5) )
 	ROM_LOAD( "starforc.2",   0x4000, 0x4000, CRC(0fc4d2d6) SHA1(0743e3928d5cc0e3f1bcdaf4b0cc83aeb7a2f7a8) )
 
@@ -764,7 +764,7 @@ ROM_START( starfore )
 ROM_END
 
 ROM_START( megaforc )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "mf3.bin",      0x0000, 0x4000, CRC(d3ea82ec) SHA1(e15fda65ba24517cc04abc55b5d079a33327553c) )
 	ROM_LOAD( "mf2.bin",      0x4000, 0x4000, CRC(aa320718) SHA1(cbbf8e4d06a1ecf77d776058d965afdaa7f5b47f) )
 
@@ -801,7 +801,7 @@ ROM_START( megaforc )
 ROM_END
 
 ROM_START( baluba )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "0",   		  0x0000, 0x4000, CRC(0e2ebe32) SHA1(d5cac260b19dc4e8d2064a7e3de5d52ab0eb95d0) )
 	ROM_LOAD( "1",   		  0x4000, 0x4000, CRC(cde97076) SHA1(ef47851b2ed0d820e1564545795b707d00d5c6ce) )
 

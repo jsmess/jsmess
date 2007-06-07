@@ -1385,7 +1385,7 @@ static const gfx_layout tilelayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout,  0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* Honey Doll */
@@ -1406,13 +1406,13 @@ static const gfx_decode honeydol_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout,  0, 64 }, // how does it use 0-15
 	{ REGION_GFX2, 0, &honeydol_tilelayout8bpp,  0, 4 },
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode twinadv_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout,  0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* Winter Bobble */
@@ -1468,13 +1468,13 @@ static const gfx_decode sb3_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout,  0, 16 },
 	{ REGION_GFX2, 0, &sb3_tilebglayout,  0, 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode hyperpac_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &hyperpac_tilelayout,  0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */

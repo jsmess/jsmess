@@ -399,7 +399,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,              0, 256 },
 	{ REGION_GFX2, 0, &charlayout,          256*4, 256 },
 	{ REGION_GFX3, 0, &spritelayout,  256*4+256*4, 2*64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -458,7 +458,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pacland )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "pl5_01b.bin",  0x08000, 0x4000, CRC(b0ea7631) SHA1(424afa6f397310c7af39c9e8b580aa9ccd42c39c) )
 	ROM_LOAD( "pl5_02.bin",   0x0C000, 0x4000, CRC(d903e84e) SHA1(25338726227bfbec65847879aac5228a6a307db4) )
 	/* all the following are banked at 0x4000-0x5fff */
@@ -467,7 +467,7 @@ ROM_START( pacland )
 	ROM_LOAD( "pl1-5",        0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl3_06.bin",   0x1c000, 0x4000, CRC(2ffe3319) SHA1(c2540321cd5a1fe29ecb077abdf8f997893192e9) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "pl1-7",          0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
 
@@ -492,7 +492,7 @@ ROM_START( pacland )
 ROM_END
 
 ROM_START( pacland2 )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "pl6_01.bin",   0x08000, 0x4000, CRC(4c96e11c) SHA1(c136dc3877155b7a600173c876f6a53394d9260d) )
 	ROM_LOAD( "pl6_02.bin",   0x0C000, 0x4000, CRC(8cf5bd8d) SHA1(0771ca1ab5db58f5632583a5e6e84660e8ab727d) )
 	/* all the following are banked at 0x4000-0x5fff */
@@ -501,7 +501,7 @@ ROM_START( pacland2 )
 	ROM_LOAD( "pl1-5",        0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl1-6",        0x1c000, 0x4000, CRC(b01e59a9) SHA1(e5b093852d33a4d09969d111fa6e42e964aa4dac) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "pl1-7",          0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
 
@@ -526,7 +526,7 @@ ROM_START( pacland2 )
 ROM_END
 
 ROM_START( pacland3 )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "pln1-1",       0x08000, 0x4000, CRC(f729fb94) SHA1(332ff2e4aae67eb8ed0f52048097f74323a176f8) )
 	ROM_LOAD( "pln1-2",       0x0C000, 0x4000, CRC(5c66eb6f) SHA1(376233f51e655df8922886c1e808a2f37ccae5d4) )
 	/* all the following are banked at 0x4000-0x5fff */
@@ -535,7 +535,7 @@ ROM_START( pacland3 )
 	ROM_LOAD( "pl1-5",        0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl1-6",        0x1c000, 0x4000, CRC(b01e59a9) SHA1(e5b093852d33a4d09969d111fa6e42e964aa4dac) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "pl1-7",          0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
 
@@ -560,7 +560,7 @@ ROM_START( pacland3 )
 ROM_END
 
 ROM_START( paclandm )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "pl1-1",        0x08000, 0x4000, CRC(a938ae99) SHA1(bf12097d8c69685cb7af763f9b9617c767aaed2f) )
 	ROM_LOAD( "pl1-2",        0x0C000, 0x4000, CRC(3fe43bb5) SHA1(14e6144d06ff2fd786f383f36f1b8238ac364849) )
 	/* all the following are banked at 0x4000-0x5fff */
@@ -569,7 +569,7 @@ ROM_START( paclandm )
 	ROM_LOAD( "pl1-5",        0x18000, 0x4000, CRC(7af66200) SHA1(f44161ded1633e9801b7a9cd84d481e53823f5d9) )
 	ROM_LOAD( "pl1-6",        0x1c000, 0x4000, CRC(b01e59a9) SHA1(e5b093852d33a4d09969d111fa6e42e964aa4dac) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "pl1-7",          0x8000, 0x2000, CRC(8c5becae) SHA1(14d67136395c4c64472980a69648ce2d479ae67f) ) /* sub program for the mcu */
 	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* Internal code from the MCU */
 

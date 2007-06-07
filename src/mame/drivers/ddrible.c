@@ -321,7 +321,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x00000, &charlayout,    16,  1 },	/* colors 16-31 */
 	{ REGION_GFX1, 0x20000, &spritelayout,  32,  1 },	/* colors 32-47 */
 	{ REGION_GFX2, 0x40000, &spritelayout,  64, 16 },	/* colors  0-15 but using lookup table */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static struct YM2203interface ym2203_interface =

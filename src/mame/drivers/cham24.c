@@ -249,7 +249,7 @@ static DRIVER_INIT( cham24 )
 static const gfx_decode cham24_gfxdecodeinfo[] =
 {
 	/* none, the ppu generates one */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( cham24 )

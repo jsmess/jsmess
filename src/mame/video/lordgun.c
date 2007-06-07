@@ -92,30 +92,26 @@ static TILE_GET_INFO( get_tile_info_3 )
 
 WRITE16_HANDLER( lordgun_vram_0_w )
 {
-	UINT16 oldword = lordgun_vram_0[offset];
-	UINT16 newword = COMBINE_DATA(&lordgun_vram_0[offset]);
-	if (oldword != newword)	tilemap_mark_tile_dirty(tilemap_0, offset/2);
+	COMBINE_DATA(&lordgun_vram_0[offset]);
+	tilemap_mark_tile_dirty(tilemap_0, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_1_w )
 {
-	UINT16 oldword = lordgun_vram_1[offset];
-	UINT16 newword = COMBINE_DATA(&lordgun_vram_1[offset]);
-	if (oldword != newword)	tilemap_mark_tile_dirty(tilemap_1, offset/2);
+	COMBINE_DATA(&lordgun_vram_1[offset]);
+	tilemap_mark_tile_dirty(tilemap_1, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_2_w )
 {
-	UINT16 oldword = lordgun_vram_2[offset];
-	UINT16 newword = COMBINE_DATA(&lordgun_vram_2[offset]);
-	if (oldword != newword)	tilemap_mark_tile_dirty(tilemap_2, offset/2);
+	COMBINE_DATA(&lordgun_vram_2[offset]);
+	tilemap_mark_tile_dirty(tilemap_2, offset/2);
 }
 
 WRITE16_HANDLER( lordgun_vram_3_w )
 {
-	UINT16 oldword = lordgun_vram_3[offset];
-	UINT16 newword = COMBINE_DATA(&lordgun_vram_3[offset]);
-	if (oldword != newword)	tilemap_mark_tile_dirty(tilemap_3, offset/2);
+	COMBINE_DATA(&lordgun_vram_3[offset]);
+	tilemap_mark_tile_dirty(tilemap_3, offset/2);
 }
 
 /***************************************************************************

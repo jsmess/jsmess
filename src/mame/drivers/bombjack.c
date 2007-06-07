@@ -84,7 +84,6 @@ static UINT8 latch;
 static MACHINE_START( bombjack )
 {
 	state_save_register_global(latch);
-	return 0;
 }
 
 
@@ -299,7 +298,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x0000, &charlayout2,      0, 16 },	/* background tiles */
 	{ REGION_GFX3, 0x0000, &spritelayout1,    0, 16 },	/* normal sprites */
 	{ REGION_GFX3, 0x1000, &spritelayout2,    0, 16 },	/* large sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -356,7 +355,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( bombjack )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "09_j01b.bin",  0x0000, 0x2000, CRC(c668dc30) SHA1(51dd6a2688b42e9f28f0882bd76f75be7ec3222a) )
 	ROM_LOAD( "10_l01b.bin",  0x2000, 0x2000, CRC(52a1e5fb) SHA1(e1cdc4b4efbc6c7a1e4fa65019486617f2acba1b) )
 	ROM_LOAD( "11_m01b.bin",  0x4000, 0x2000, CRC(b68a062a) SHA1(43bae56494ac0202aaa8f1ed5c1ed1bff775b2b8) )
@@ -386,7 +385,7 @@ ROM_START( bombjack )
 ROM_END
 
 ROM_START( bombjac2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "09_j01b.bin",  0x0000, 0x2000, CRC(c668dc30) SHA1(51dd6a2688b42e9f28f0882bd76f75be7ec3222a) )
 	ROM_LOAD( "10_l01b.bin",  0x2000, 0x2000, CRC(52a1e5fb) SHA1(e1cdc4b4efbc6c7a1e4fa65019486617f2acba1b) )
 	ROM_LOAD( "11_m01b.bin",  0x4000, 0x2000, CRC(b68a062a) SHA1(43bae56494ac0202aaa8f1ed5c1ed1bff775b2b8) )

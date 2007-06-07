@@ -839,7 +839,7 @@ static const gfx_decode argus_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout_1024, 8*16,  16 },
 	{ REGION_GFX3, 0, &tilelayout_256,  24*16, 16 },
 	{ REGION_GFX4, 0, &charlayout,      40*16, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode valtric_gfxdecodeinfo[] =
@@ -847,7 +847,7 @@ static const gfx_decode valtric_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout_1024, 0*16, 16 },
 	{ REGION_GFX2, 0, &tilelayout_2048, 16*16, 16 },
 	{ REGION_GFX3, 0, &charlayout,      32*16, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode butasan_gfxdecodeinfo[] =
@@ -856,7 +856,7 @@ static const gfx_decode butasan_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout_1024, 16*16, 16 },
 	{ REGION_GFX3, 0, &tilelayout_512,  12*16, 16 },
 	{ REGION_GFX4, 0, &charlayout,      32*16, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode bombsa_gfxdecodeinfo[] =
@@ -864,7 +864,7 @@ static const gfx_decode bombsa_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout_1024, 32*16, 16 },
 	{ REGION_GFX2, 0, &tilelayout_1024, 0*16, 16 },
 	{ REGION_GFX3, 0, &charlayout,      16*16, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( argus )

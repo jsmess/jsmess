@@ -882,7 +882,6 @@ static WRITE8_HANDLER( tshoot_lamp_w )
 MACHINE_START( joust2 )
 {
 	williams_cvsd_init(3);
-	return 0;
 }
 
 

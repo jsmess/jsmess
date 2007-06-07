@@ -65,21 +65,15 @@ VIDEO_START( marineb )
 
 WRITE8_HANDLER( marineb_videoram_w )
 {
-	if (marineb_videoram[offset] != data)
-	{
-		marineb_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	marineb_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( marineb_colorram_w )
 {
-	if (marineb_colorram[offset] != data)
-	{
-		marineb_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	marineb_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

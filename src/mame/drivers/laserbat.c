@@ -517,7 +517,7 @@ static const gfx_decode laserbat_gfxdecodeinfo[] =
 	{ REGION_CPU1, 0x1600, &s2636_character10, 0,   8 },	/* s2636 #2  */
 	{ REGION_CPU1, 0x1700, &s2636_character10, 0,   8 },	/* s2636 #3  */
 	{ REGION_GFX2, 0x0000, &sprites_layout,    0,   8 },	/* Sprites   */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static TILE_GET_INFO( get_tile_info )
@@ -664,7 +664,6 @@ static struct AY8910interface ay8910_interface =
 static MACHINE_START( catnmous )
 {
 	pia_config(0, &pia_0_intf);
-	return 0;
 }
 
 static MACHINE_RESET( catnmous )

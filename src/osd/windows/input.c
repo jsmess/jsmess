@@ -2729,12 +2729,12 @@ static void set_rawmouse_device_name(const TCHAR *raw_string, unsigned int mouse
 		instance_result = RegQueryValueEx(reg_key,
 								TEXT("LocationInformation"),
 								NULL, NULL,
-								mouse_name[mouse_num],
+								(LPBYTE)mouse_name[mouse_num],
 								&name_length)
 				&& RegQueryValueEx(reg_key,
 								TEXT("DeviceDesc"),
 								NULL, NULL,
-								mouse_name[mouse_num],
+								(LPBYTE)mouse_name[mouse_num],
 								&name_length);
 		RegCloseKey(reg_key);
 	}
@@ -2826,7 +2826,7 @@ static void set_rawmouse_device_name(const TCHAR *raw_string, unsigned int mouse
 		instance_result = RegQueryValueEx(sub_key,
 								TEXT("LocationInformation"),
 								NULL, NULL,
-								mouse_name[mouse_num],
+								(LPBYTE)mouse_name[mouse_num],
 								&name_length);
 		RegCloseKey(sub_key);
 		RegCloseKey(reg_key);

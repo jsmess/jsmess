@@ -72,11 +72,8 @@ WRITE16_HANDLER( pushman_scroll_w )
 
 WRITE16_HANDLER( pushman_videoram_w )
 {
-	int oldword = videoram16[offset];
-
 	COMBINE_DATA(&videoram16[offset]);
-	if (oldword != videoram16[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 

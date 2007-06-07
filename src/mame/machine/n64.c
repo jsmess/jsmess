@@ -825,7 +825,7 @@ static AUDIO_DMA *audio_fifo_get_top(void)
 
 static void start_audio_dma(void)
 {
-	UINT16 *ram = (UINT16*)rdram;
+	INT16 *ram = (INT16*)rdram;
 	AUDIO_DMA *current = audio_fifo_get_top();
 
 	ram = &ram[current->address/2];

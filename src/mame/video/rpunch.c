@@ -109,18 +109,10 @@ VIDEO_START( rpunch )
 
 WRITE16_HANDLER( rpunch_videoram_w )
 {
-	int oldword = videoram16[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
-
-	if (oldword != newword)
-	{
-		int tmap = offset >> 12;
-		int tile_index = offset & 0xfff;
-
-		videoram16[offset] = newword;
-		tilemap_mark_tile_dirty(background[tmap],tile_index);
-	}
+	int tmap = offset >> 12;
+	int tile_index = offset & 0xfff;
+	COMBINE_DATA(&videoram16[offset]);
+	tilemap_mark_tile_dirty(background[tmap],tile_index);
 }
 
 

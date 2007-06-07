@@ -177,7 +177,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	/* sprites use colors 256-511 + 512-767 */
 	{ REGION_GFX1, 0x6000, &charlayout, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -232,7 +232,7 @@ ROM_START( suprloco )
 	ROM_LOAD( "ic15.bin",     0x4000, 0x4000, CRC(5a1d2fb0) SHA1(fdb9416e5530718245fd597073a63feddb233c3c) )	/* encrypted */
 	ROM_LOAD( "ic28.bin",     0x8000, 0x4000, CRC(a597828a) SHA1(61004d112591fd2d752c39df71c1304d9308daae) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ic64.bin",     0x0000, 0x2000, CRC(0aa57207) SHA1(b29b533505cb5b47c90534f2f610baeb7265d030) )
 
 	ROM_REGION( 0xe000, REGION_GFX1, ROMREGION_DISPOSE )

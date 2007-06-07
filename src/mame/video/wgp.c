@@ -155,13 +155,11 @@ READ16_HANDLER( wgp_pivram_word_r )
 
 WRITE16_HANDLER( wgp_pivram_word_w )
 {
-	UINT16 oldword = wgp_pivram[offset];
 	COMBINE_DATA(&wgp_pivram[offset]);
 
 	if (offset<0x3000)
 	{
-		if (oldword != wgp_pivram[offset])
-			tilemap_mark_tile_dirty(wgp_piv_tilemap[(offset / 0x1000)], (offset % 0x1000) );
+		tilemap_mark_tile_dirty(wgp_piv_tilemap[(offset / 0x1000)], (offset % 0x1000) );
 	}
 	else if ((offset >=0x3400) && (offset<0x4000))
 	{
@@ -169,8 +167,7 @@ WRITE16_HANDLER( wgp_pivram_word_w )
 	}
 	else if ((offset >=0x8000) && (offset<0xb000))
 	{
-		if (oldword != wgp_pivram[offset])
-			tilemap_mark_tile_dirty(wgp_piv_tilemap[((offset - 0x8000)/ 0x1000)], (offset % 0x1000) );
+		tilemap_mark_tile_dirty(wgp_piv_tilemap[((offset - 0x8000)/ 0x1000)], (offset % 0x1000) );
 	}
 }
 

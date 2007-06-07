@@ -1324,14 +1324,11 @@ WRITE16_HANDLER( namco_rozbank16_w )
 static void
 writerozvideo( int offset, UINT16 data )
 {
-	if( rozvideoram16[offset]!=data )
+	int i;
+	rozvideoram16[offset] = data;
+	for( i=0; i<ROZ_TILEMAP_COUNT; i++ )
 	{
-		int i;
-		rozvideoram16[offset] = data;
-		for( i=0; i<ROZ_TILEMAP_COUNT; i++ )
-		{
-			tilemap_mark_tile_dirty( mRozTilemap[i], offset );
-		}
+		tilemap_mark_tile_dirty( mRozTilemap[i], offset );
 	}
 } /* writerozvideo */
 

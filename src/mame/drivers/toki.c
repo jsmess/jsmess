@@ -359,7 +359,7 @@ static const gfx_decode toki_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &toki_spritelayout, 0*16, 16 },
 	{ REGION_GFX3, 0, &toki_tilelayout,  32*16, 16 },
 	{ REGION_GFX4, 0, &toki_tilelayout,  48*16, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_layout tokib_charlayout =
@@ -407,7 +407,7 @@ static const gfx_decode tokib_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tokib_spriteslayout,  0*16, 16 },
 	{ REGION_GFX3, 0, &tokib_tilelayout,	32*16, 16 },
 	{ REGION_GFX4, 0, &tokib_tilelayout,	48*16, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

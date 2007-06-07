@@ -130,8 +130,6 @@ static void start_interrupt_timers(void)
 static MACHINE_START( enigma2 )
 {
 	create_interrupt_timers();
-
-	return 0;
 }
 
 

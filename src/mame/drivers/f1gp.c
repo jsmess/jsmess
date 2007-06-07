@@ -459,7 +459,7 @@ static const gfx_decode f1gp_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &spritelayout, 0x100, 16 },
 	{ REGION_GFX3, 0, &spritelayout, 0x200, 16 },
 	{ REGION_GFX4, 0, &tilelayout,   0x300, 16 },	/* changed at runtime */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode f1gp2_gfxdecodeinfo[] =
@@ -467,7 +467,7 @@ static const gfx_decode f1gp2_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   0x000,  1 },
 	{ REGION_GFX2, 0, &spritelayout, 0x200, 32 },
 	{ REGION_GFX3, 0, &tilelayout,   0x100, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

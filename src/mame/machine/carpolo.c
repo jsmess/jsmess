@@ -514,7 +514,6 @@ MACHINE_START( carpolo )
 	/* set up the PIA's */
 	pia_config(0, &pia_0_intf);
 	pia_config(1, &pia_1_intf);
-	return 0;
 }
 
 MACHINE_RESET( carpolo )

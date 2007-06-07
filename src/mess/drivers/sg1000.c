@@ -324,8 +324,6 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( sg1000 )
 {
 	TMS9928A_configure(&tms9928a_interface);
-
-	return 0;
 }
 
 // SC-3000
@@ -401,8 +399,6 @@ static MACHINE_START( sc3000 )
 {
 	TMS9928A_configure(&tms9928a_interface);
 	ppi8255_init(&sc3000_ppi8255_intf);
-
-	return 0;
 }
 
 // SF-7000
@@ -538,8 +534,6 @@ static MACHINE_START( sf7000 )
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1), 0);
 	memory_configure_bank(1, 1, 1, mess_ram, 0);
 	memory_configure_bank(2, 0, 1, mess_ram, 0);
-
-	return 0;
 }
 
 static MACHINE_RESET( sf7000 )

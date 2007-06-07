@@ -224,7 +224,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,          0, 1 },     /* char set #1 */
 	{ REGION_GFX1, 0, &spritelayout,        0, 1 },     /* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -246,7 +246,6 @@ static MACHINE_DRIVER_START( dommy )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(btime)
 	MDRV_VIDEO_START(btime)
@@ -280,7 +279,6 @@ static MACHINE_DRIVER_START( scregg )
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(btime)
 	MDRV_VIDEO_START(btime)
@@ -298,7 +296,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dommy )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "dommy.e01",  0xa000, 0x2000, CRC(9ae064ed) SHA1(73082e5254d54d8386f580cc82a74242a6debd84) )
 	ROM_LOAD( "dommy.e11",  0xc000, 0x2000, CRC(7c4fad5c) SHA1(fb733ac979092a6fc278836b82d8ed3fae7a20d9) )
 	ROM_LOAD( "dommy.e21",  0xe000, 0x2000, CRC(cd1a4d55) SHA1(f7f4f5ef2e89519652e8401e75dc4e2b8edf4bae) )
@@ -315,7 +313,7 @@ ROM_START( dommy )
 ROM_END
 
 ROM_START( scregg )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "scregg.e14",   0x3000, 0x1000, CRC(29226d77) SHA1(e1a329a4452eeb90801d001140ce865bf1ea7716) )
 	ROM_LOAD( "scregg.d14",   0x4000, 0x1000, CRC(eb143880) SHA1(73b3ca6e0d72cd0db951ae9ed1552cf8b7d91e68) )
 	ROM_LOAD( "scregg.c14",   0x5000, 0x1000, CRC(4455f262) SHA1(fc7b2d9094fa5e25c1bf4b68386f640f4502e0c0) )
@@ -337,7 +335,7 @@ ROM_START( scregg )
 ROM_END
 
 ROM_START( eggs )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "e14.bin",      0x3000, 0x1000, CRC(4e216f9d) SHA1(7b9d984481c8227e417dae4a1adbb5dec5f959b7) )
 	ROM_LOAD( "d14.bin",      0x4000, 0x1000, CRC(4edb267f) SHA1(f5d1a79b13d6fbb92561b4e4cfb78465114497d1) )
 	ROM_LOAD( "c14.bin",      0x5000, 0x1000, CRC(15a5c48c) SHA1(70141c739a8c019554a6c5257ad12606a1542b1f) )

@@ -17,9 +17,8 @@ static int orbit_flip_screen;
 
 WRITE8_HANDLER( orbit_playfield_w )
 {
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-
 	orbit_playfield_ram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

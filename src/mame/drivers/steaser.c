@@ -76,7 +76,7 @@ static const gfx_layout steaser_layout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &steaser_layout,   0x0, 2  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

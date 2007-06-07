@@ -1789,14 +1789,14 @@ static const gfx_decode gfxdecodeinfo_bosco[] =
 	{ REGION_GFX1, 0, &charlayout_2bpp,       0, 64 },
 	{ REGION_GFX2, 0, &spritelayout_bosco, 64*4, 64 },
 	{ REGION_GFX3, 0, &dotlayout,     64*4+64*4,  1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_galaga[] =
 {
 	{ REGION_GFX1, 0, &charlayout_2bpp,        0, 64 },
 	{ REGION_GFX2, 0, &spritelayout_galaga, 64*4, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_xevious[] =
@@ -1804,7 +1804,7 @@ static const gfx_decode gfxdecodeinfo_xevious[] =
 	{ REGION_GFX1, 0, &charlayout_xevious, 128*4+64*8,  64 },
 	{ REGION_GFX2, 0, &bgcharlayout,                0, 128 },
 	{ REGION_GFX3, 0, &spritelayout_xevious,    128*4,  64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_digdug[] =
@@ -1812,7 +1812,7 @@ static const gfx_decode gfxdecodeinfo_digdug[] =
 	{ REGION_GFX1, 0, &charlayout_digdug,         0, 16 },
 	{ REGION_GFX2, 0, &spritelayout_galaga,    16*2, 64 },
 	{ REGION_GFX3, 0, &charlayout_2bpp, 64*4 + 16*2, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -2624,7 +2624,7 @@ ROM_START( xevious )
 	ROM_LOAD( "xvi_5.3f",     0x0000, 0x1000, CRC(c85b703f) SHA1(15f1c005b9d806a384ab1f2240b9c580bfe83893) )
 	ROM_LOAD( "xvi_6.3j",     0x1000, 0x1000, CRC(e18cdaad) SHA1(6b79efee1a9642edb9f752101737132401248aed) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
 	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
@@ -2675,7 +2675,7 @@ ROM_START( xeviousa )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "xea-4c-a.bin", 0x0000, 0x2000, CRC(14d8fa03) SHA1(e8114141394adda86184b146f2497cfeef7fc2eb) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
 	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
@@ -2726,7 +2726,7 @@ ROM_START( xeviousb )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "4c.bin",       0x0000, 0x2000, CRC(827e7747) SHA1(d22645d71b164613834336e26e6942506a0e7eaa) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
 	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
@@ -2780,7 +2780,7 @@ ROM_START( xeviousc )
 	ROM_LOAD( "xv2_5.3f",     0x0000, 0x1000, CRC(f8cc2861) SHA1(9b02c00cff6c771d46776416295f9e12a2166cc5) )
 	ROM_LOAD( "xvi_6.3j",     0x1000, 0x1000, CRC(e18cdaad) SHA1(6b79efee1a9642edb9f752101737132401248aed) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
 	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
@@ -2834,7 +2834,7 @@ ROM_START( xevios )
 	ROM_LOAD( "xvi_5.3f",     0x0000, 0x1000, CRC(c85b703f) SHA1(15f1c005b9d806a384ab1f2240b9c580bfe83893) )
 	ROM_LOAD( "xvi_6.3j",     0x1000, 0x1000, CRC(e18cdaad) SHA1(6b79efee1a9642edb9f752101737132401248aed) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
 	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */
@@ -2891,7 +2891,7 @@ ROM_START( battles )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b_3.bin",      0x0000, 0x2000, CRC(0ede5706) SHA1(65b235c5abe487612e11d0235410f1ca59b06e95) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
 	ROM_REGION( 0x10000, REGION_CPU4, 0 )	/* 64k for the CUSTOM I/O Emulation CPU */
@@ -2942,7 +2942,7 @@ ROM_START( sxevious )
 	ROM_LOAD( "cpu_3f.rom",   0x0000, 0x1000, CRC(d4bd3d81) SHA1(5831bb306bd650779207936bfd00f25864733abb) )
 	ROM_LOAD( "cpu_3j.rom",   0x1000, 0x1000, CRC(af06be5f) SHA1(5a020822387ab8c69214db961180760fa9853e6e) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "xvi_7.2c",     0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
 
 	ROM_REGION( 0x800, REGION_CPU4, 0 )     /* 2k for the 50xx  */

@@ -219,7 +219,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,         0, 16*8 }, /* characters */
 	{ REGION_GFX2, 0, &spritelayout, 16*16*8, 16*8 }, /* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( scotrsht )
@@ -265,7 +265,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( scotrsht )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "gx545_g03_12c.bin", 0x8000, 0x4000, CRC(b808e0d3) SHA1(d42b6979ade705a7522bd0bbc3eaa6d661580902) )
 	ROM_CONTINUE(				   0x4000, 0x4000 )
 	ROM_LOAD( "gx545_g02_10c.bin", 0xc000, 0x4000, CRC(b22c0586) SHA1(07c21609c6cdfe2b8dd734d21086c5236ff8197b) )

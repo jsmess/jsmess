@@ -218,7 +218,6 @@ MACHINE_START( qix )
 	pia_config(3, &qix_pia_3_intf);
 	pia_config(4, &qix_pia_4_intf);
 	pia_config(5, &qix_pia_5_intf);
-	return 0;
 }
 
 MACHINE_RESET( qix )
@@ -244,7 +243,6 @@ MACHINE_START( qixmcu )
 	/* set up save states */
 	state_save_register_global_array(qix_68705_port_in);
 	state_save_register_global(qix_coinctrl);
-	return 0;
 }
 
 MACHINE_START( slither )
@@ -254,7 +252,6 @@ MACHINE_START( slither )
 	pia_config(1, &slither_pia_1_intf);
 	pia_config(2, &slither_pia_2_intf);
 	pia_config(3, &slither_pia_3_intf);
-	return 0;
 }
 
 

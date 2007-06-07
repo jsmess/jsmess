@@ -63,11 +63,8 @@ static tilemap *k3_bg_tilemap;
 
 static WRITE16_HANDLER( k3_bgram_w )
 {
-	if (k3_bgram[offset] != data)
-	{
-		COMBINE_DATA(&k3_bgram[offset]);
-		tilemap_mark_tile_dirty(k3_bg_tilemap,offset);
-	}
+	COMBINE_DATA(&k3_bgram[offset]);
+	tilemap_mark_tile_dirty(k3_bg_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
@@ -257,7 +254,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &k3_layout,   0x0, 2  }, /* bg tiles */
 	{ REGION_GFX2, 0, &k3_layout,   0x0, 2  }, /* bg tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

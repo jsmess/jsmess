@@ -43,8 +43,6 @@ MACHINE_START( taitosj )
 	state_save_register_global(address);
 	state_save_register_global(spacecr_prot_value);
 	state_save_register_global(protection_value);
-
-	return 0;
 }
 
 MACHINE_RESET( taitosj )

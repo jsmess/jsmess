@@ -1062,7 +1062,6 @@ static MACHINE_START( namcos12 )
 	state_save_register_global( m_n_bankoffset );
 	state_save_register_global( m_n_bankoffseth );
 	state_save_register_func_postload( s12_resetbank );
-	return 0;
 }
 
 static unsigned char kcram[ 12 ];

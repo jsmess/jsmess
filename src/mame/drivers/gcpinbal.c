@@ -358,7 +358,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &tilelayout,       0, 256 },	/* sprites & playfield */
 	{ REGION_GFX1, 0, &charlayout,       0, 256 },	/* sprites & playfield */
 	{ REGION_GFX2, 0, &char_8x8_layout,  0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

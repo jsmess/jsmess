@@ -811,13 +811,11 @@ static void atari_machine_start(int type, const pia6821_interface *pia_intf, int
 MACHINE_START( a400 )
 {
 	atari_machine_start(ATARI_400, &atari_pia_interface, TRUE);
-	return 0;
 }
 
 MACHINE_START( a600xl )
 {
 	atari_machine_start(ATARI_600XL, &a600xl_pia_interface, TRUE);
-	return 0;
 }
 
 
@@ -831,7 +829,6 @@ MACHINE_START( a600xl )
 MACHINE_START( a800 )
 {
 	atari_machine_start(ATARI_800, &atari_pia_interface, TRUE);
-	return 0;
 }
 
 
@@ -886,7 +883,6 @@ DEVICE_UNLOAD( a800_cart )
 MACHINE_START( a800xl )
 {
 	atari_machine_start(ATARI_800XL, &a800xl_pia_interface, TRUE);
-	return 0;
 }
 
 
@@ -944,7 +940,6 @@ DEVICE_LOAD( a800xl_cart )
 MACHINE_START( a5200 )
 {
 	atari_machine_start(ATARI_800XL, NULL, FALSE);
-	return 0;
 }
 
 

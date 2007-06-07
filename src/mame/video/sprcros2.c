@@ -44,20 +44,14 @@ PALETTE_INIT( sprcros2 )
 
 WRITE8_HANDLER( sprcros2_fgvideoram_w )
 {
-	if (sprcros2_fgvideoram[offset] != data)
-	{
-		sprcros2_fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(sprcros2_fgtilemap,offset&0x3ff);
-	}
+	sprcros2_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(sprcros2_fgtilemap,offset&0x3ff);
 }
 
 WRITE8_HANDLER( sprcros2_bgvideoram_w )
 {
-	if (sprcros2_bgvideoram[offset] != data)
-	{
-		sprcros2_bgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(sprcros2_bgtilemap,offset&0x3ff);
-	}
+	sprcros2_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(sprcros2_bgtilemap,offset&0x3ff);
 }
 
 WRITE8_HANDLER( sprcros2_bgscrollx_w )

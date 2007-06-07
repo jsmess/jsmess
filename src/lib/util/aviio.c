@@ -2658,6 +2658,17 @@ static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *da
 }
 
 
+static void u64toa(UINT64 val, char *output)
+{
+	UINT32 lo = (UINT32)(val & 0xffffffff);
+	UINT32 hi = (UINT32)(val >> 32);
+	if (hi != 0)
+		sprintf(output, "%X%08X", hi, lo);
+	else
+		sprintf(output, "%X", lo);
+}
+
+
 /*-------------------------------------------------
     printf_chunk_recursive - print information
     about a chunk recursively
@@ -2665,6 +2676,7 @@ static avi_error huffyuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *da
 
 static void printf_chunk_recursive(avi_file *file, avi_chunk *container, int indent)
 {
+	char size[20], offset[20];
 	avi_chunk curchunk;
 	int avierr;
 
@@ -2674,12 +2686,14 @@ static void printf_chunk_recursive(avi_file *file, avi_chunk *container, int ind
 		UINT32 chunksize = curchunk.size;
 		int recurse = FALSE;
 
-		printf("%*schunk = %c%c%c%c, size=%I64d (%I64X)\n", indent, "",
+		u64toa(curchunk.size, size);
+		u64toa(curchunk.offset, offset);
+		printf("%*schunk = %c%c%c%c, size=%s (%s)\n", indent, "",
 				(UINT8)(curchunk.type >> 0),
 				(UINT8)(curchunk.type >> 8),
 				(UINT8)(curchunk.type >> 16),
 				(UINT8)(curchunk.type >> 24),
-				curchunk.size, curchunk.offset);
+				size, offset);
 
 		/* certain chunks are just containers; recurse into them */
 		switch (curchunk.type)

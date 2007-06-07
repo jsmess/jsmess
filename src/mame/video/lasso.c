@@ -188,20 +188,14 @@ VIDEO_START( pinbo )
 
 WRITE8_HANDLER( lasso_videoram_w )
 {
-	if (lasso_videoram[offset] != data)
-	{
-		lasso_videoram[offset] = data;
-		tilemap_mark_tile_dirty( bg_tilemap, offset );
-	}
+	lasso_videoram[offset] = data;
+	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
 WRITE8_HANDLER( lasso_colorram_w )
 {
-	if (lasso_colorram[offset] != data)
-	{
-		lasso_colorram[offset] = data;
-		tilemap_mark_tile_dirty( bg_tilemap, offset );
-	}
+	lasso_colorram[offset] = data;
+	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
 

@@ -220,9 +220,8 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 WRITE16_HANDLER( gdfs_tmapram_w )
 {
-	UINT16 old_data	=	gdfs_tmapram[offset];
-	UINT16 new_data	=	COMBINE_DATA(&gdfs_tmapram[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(gdfs_tmap, offset);
+	COMBINE_DATA(&gdfs_tmapram[offset]);
+	tilemap_mark_tile_dirty(gdfs_tmap, offset);
 }
 
 VIDEO_START( gdfs )

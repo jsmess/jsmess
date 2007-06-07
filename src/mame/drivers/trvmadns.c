@@ -240,7 +240,7 @@ static const gfx_layout charlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_CPU1, 0x6000, &charlayout, 0, 4 }, // doesn't matter where we point this, all the tiles are decoded while the game runs
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static TILE_GET_INFO( get_bg_tile_info )

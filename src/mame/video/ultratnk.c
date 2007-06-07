@@ -161,10 +161,6 @@ VIDEO_EOF( ultratnk )
 
 WRITE8_HANDLER( ultratnk_video_ram_w )
 {
-	if (data != videoram[offset])
-	{
-		tilemap_mark_tile_dirty(playfield, offset);
-	}
-
 	videoram[offset] = data;
+	tilemap_mark_tile_dirty(playfield, offset);
 }

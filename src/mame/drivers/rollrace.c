@@ -232,7 +232,7 @@ static const gfx_decode gfxdecodeinfo[] =
 		{ REGION_GFX4, 0x0000, &spritelayout,	0,	32 },
 		{ REGION_GFX5, 0x0000, &spritelayout,	0,	32 },
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( rollrace )
@@ -257,7 +257,6 @@ static MACHINE_DRIVER_START( rollrace )
 	MDRV_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(32*8)
 
 	MDRV_PALETTE_INIT(wiz)
 	MDRV_VIDEO_START(generic)
@@ -292,7 +291,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( fightrol )
-	ROM_REGION( 0x10000, REGION_CPU1,0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1,0 )
 	ROM_LOAD( "4.8k", 0x0000, 0x2000, CRC(efa2f430) SHA1(6aeb2a41e4fba97a0ac1b24fe5437e25b6c6b6c5) )
 	ROM_LOAD( "5.8h", 0x2000, 0x2000, CRC(2497d9f6) SHA1(4f4cfed47efc603bf057dd24b761beecf5b929f4) )
 	ROM_LOAD( "6.8f", 0x4000, 0x2000, CRC(f39727b9) SHA1(08a1300172b4100cb80c9a5d8942408255d8e330) )
@@ -339,7 +338,7 @@ ROM_START( fightrol )
 ROM_END
 
 ROM_START( rollace )
-	ROM_REGION( 0x10000, REGION_CPU1,0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1,0 )
 	ROM_LOAD( "w1.8k", 0x0000, 0x2000, CRC(c0bd3cf3) SHA1(a44d69b8c3249b5093261a32d0e0404992fa7f7a) )
 	ROM_LOAD( "w2.8h", 0x2000, 0x2000, CRC(c1900a75) SHA1(f7ec968b6bcb6ee6db98628cdf566ae0a501edba) )
 	ROM_LOAD( "w3.8f", 0x4000, 0x2000, CRC(16ceced6) SHA1(241119959ffdf26780258bcc5651eca0c6a6128f) )
@@ -386,7 +385,7 @@ ROM_START( rollace )
 ROM_END
 
 ROM_START( rollace2 )
-	ROM_REGION( 0x10000, REGION_CPU1,0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1,0 )
 	ROM_LOAD( "8k.764", 0x0000, 0x2000, CRC(a7abff82) SHA1(d49635f98b28b2b5e2833d25b0961addac2c3e6f) )
 	ROM_LOAD( "8h.764", 0x2000, 0x2000, CRC(9716ba03) SHA1(8a7bfc1dce3b1b0c634690e0637e0a30776c0334) )
 	ROM_LOAD( "8f.764", 0x4000, 0x2000, CRC(3eadb0e8) SHA1(6ff5b76360597f3a6a9718e505295c8557e569ae) )

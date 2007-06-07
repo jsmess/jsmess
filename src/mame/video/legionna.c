@@ -55,34 +55,26 @@ WRITE16_HANDLER( legionna_control_w )
 
 WRITE16_HANDLER( legionna_background_w )
 {
-	int oldword = legionna_back_data[offset];
 	COMBINE_DATA(&legionna_back_data[offset]);
-	if (oldword != legionna_back_data[offset])
-		tilemap_mark_tile_dirty(background_layer,offset);
+	tilemap_mark_tile_dirty(background_layer,offset);
 }
 
 WRITE16_HANDLER( legionna_midground_w )
 {
-	int oldword = legionna_mid_data[offset];
 	COMBINE_DATA(&legionna_mid_data[offset]);
-	if (oldword != legionna_mid_data[offset])
-		tilemap_mark_tile_dirty(midground_layer,offset);
+	tilemap_mark_tile_dirty(midground_layer,offset);
 }
 
 WRITE16_HANDLER( legionna_foreground_w )
 {
-	int oldword = legionna_fore_data[offset];
 	COMBINE_DATA(&legionna_fore_data[offset]);
-	if (oldword != legionna_fore_data[offset])
-		tilemap_mark_tile_dirty(foreground_layer,offset);
+	tilemap_mark_tile_dirty(foreground_layer,offset);
 }
 
 WRITE16_HANDLER( legionna_text_w )
 {
-	int oldword = legionna_textram[offset];
 	COMBINE_DATA(&legionna_textram[offset]);
-	if (oldword != legionna_textram[offset])
-		tilemap_mark_tile_dirty(text_layer,offset);
+	tilemap_mark_tile_dirty(text_layer,offset);
 }
 
 static TILE_GET_INFO( get_back_tile_info )

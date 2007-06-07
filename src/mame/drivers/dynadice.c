@@ -39,12 +39,9 @@ static int ay_data;
 
 WRITE8_HANDLER( dynadice_videoram_w )
 {
-	if( videoram[offset] != data )
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-		tilemap_mark_all_tiles_dirty(top_tilemap);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_all_tiles_dirty(top_tilemap);
 }
 
 static WRITE8_HANDLER( sound_data_w )

@@ -13,22 +13,16 @@ static tilemap *fg_tilemap;
 
 WRITE8_HANDLER( renegade_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		offset = offset % (64 * 16);
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	offset = offset % (64 * 16);
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( renegade_videoram2_w )
 {
-	if (renegade_videoram2[offset] != data)
-	{
-		renegade_videoram2[offset] = data;
-		offset = offset % (32 * 32);
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	renegade_videoram2[offset] = data;
+	offset = offset % (32 * 32);
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( renegade_flipscreen_w )

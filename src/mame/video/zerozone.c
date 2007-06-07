@@ -13,11 +13,8 @@ static tilemap *zerozone_tilemap;
 
 WRITE16_HANDLER( zerozone_tilemap_w )
 {
-	if (zerozone_videoram[offset] != data)
-	{
-		COMBINE_DATA(&zerozone_videoram[offset]);
-		tilemap_mark_tile_dirty(zerozone_tilemap,offset);
-	}
+	COMBINE_DATA(&zerozone_videoram[offset]);
+	tilemap_mark_tile_dirty(zerozone_tilemap,offset);
 }
 
 

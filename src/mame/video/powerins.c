@@ -139,10 +139,8 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 WRITE16_HANDLER( powerins_vram_0_w )
 {
-	UINT16 oldword = powerins_vram_0[offset];
-	UINT16 newword = COMBINE_DATA(&powerins_vram_0[offset]);
-	if (oldword != newword)
-		tilemap_mark_tile_dirty(tilemap_0, offset);
+	COMBINE_DATA(&powerins_vram_0[offset]);
+	tilemap_mark_tile_dirty(tilemap_0, offset);
 }
 
 UINT32 powerins_get_memory_offset_0(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
@@ -181,10 +179,8 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE16_HANDLER( powerins_vram_1_w )
 {
-	UINT16 oldword = powerins_vram_1[offset];
-	UINT16 newword = COMBINE_DATA(&powerins_vram_1[offset]);
-	if (oldword != newword)
-		tilemap_mark_tile_dirty(tilemap_1, offset);
+	COMBINE_DATA(&powerins_vram_1[offset]);
+	tilemap_mark_tile_dirty(tilemap_1, offset);
 }
 
 

@@ -13,20 +13,14 @@ static tilemap *foreground, *background;
 
 WRITE8_HANDLER( portrait_bgvideo_write )
 {
-	if (portrait_bgvideoram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(background,offset/2);
-		portrait_bgvideoram[offset] = data;
-	}
+	tilemap_mark_tile_dirty(background,offset/2);
+	portrait_bgvideoram[offset] = data;
 }
 
 WRITE8_HANDLER( portrait_fgvideo_write )
 {
-	if (portrait_fgvideoram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(foreground,offset/2);
-		portrait_fgvideoram[offset] = data;
-	}
+	tilemap_mark_tile_dirty(foreground,offset/2);
+	portrait_fgvideoram[offset] = data;
 }
 
 INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, const UINT8 *source )

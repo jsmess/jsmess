@@ -610,7 +610,7 @@ static const gfx_decode omegaf_gfxdecodeinfo[] =
 	{ REGION_GFX4, 0, &omegaf_spritelayout,    32*16, 16},
 	{ REGION_GFX4, 0, &omegaf_bigspritelayout, 32*16, 16},
 	{ REGION_GFX5, 0, &omegaf_charlayout,      48*16, 16},
-	{ -1} /* end of array */
+	{ -1}
 };
 
 static const gfx_decode robokid_gfxdecodeinfo[] =
@@ -621,7 +621,7 @@ static const gfx_decode robokid_gfxdecodeinfo[] =
 	{ REGION_GFX4, 0, &robokid_spritelayout,    32*16, 16},
 	{ REGION_GFX4, 0, &robokid_bigspritelayout, 32*16, 16},
 	{ REGION_GFX5, 0, &omegaf_charlayout,       48*16, 16},
-	{ -1} /* end of array */
+	{ -1}
 };
 
 

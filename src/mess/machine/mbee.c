@@ -99,13 +99,11 @@ static void mbee_machine_start(opbase_handler handler)
 MACHINE_START( mbee )
 {
 	mbee_machine_start(mbee_opbase_handler);
-	return 0;
 }
 
 MACHINE_START( mbee56 )
 {
 	mbee_machine_start(mbee56_opbase_handler);
-	return 0;
 }
 
 static mess_image *cassette_device_image(void)

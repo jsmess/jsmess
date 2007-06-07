@@ -124,11 +124,8 @@ VIDEO_START( toypop )
 
 WRITE8_HANDLER( toypop_videoram_w )
 {
-	if (toypop_videoram[offset] != data)
-	{
-		toypop_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-	}
+	toypop_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( toypop_palettebank_w )

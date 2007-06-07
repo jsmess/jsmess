@@ -554,20 +554,20 @@ static const gfx_layout charlayout =
 static const gfx_decode syvalion_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout, 0,     32*16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode recordbr_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout, 0,     32*16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode dleague_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout, 0,     32*16 },
 	{ REGION_GFX2, 0, &charlayout, 32*16, 16    },	// seems to be bogus...?
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -575,7 +575,6 @@ static MACHINE_START( taitoh )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 

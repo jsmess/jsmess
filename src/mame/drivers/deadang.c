@@ -289,7 +289,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0x000000, &spritelayout, 1024, 16 },
 	{ REGION_GFX4, 0x000000, &spritelayout,  256, 16 },
 	{ REGION_GFX5, 0x000000, &spritelayout,    0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* Sound Interfaces */

@@ -161,22 +161,19 @@ READ8_HANDLER( namcos1_videoram_r )
 
 WRITE8_HANDLER( namcos1_videoram_w )
 {
-	if (namcos1_videoram[offset] != data)
-	{
-		namcos1_videoram[offset] = data;
-		if (offset < 0x7000)
-		{   /* background 0-3 */
-			int layer = offset >> 13;
-			int num = (offset & 0x1fff) >> 1;
+	namcos1_videoram[offset] = data;
+	if (offset < 0x7000)
+	{   /* background 0-3 */
+		int layer = offset >> 13;
+		int num = (offset & 0x1fff) >> 1;
+		tilemap_mark_tile_dirty(bg_tilemap[layer],num);
+	}
+	else
+	{   /* foreground 4-5 */
+		int layer = (offset >> 11 & 1) + 4;
+		int num = ((offset & 0x7ff) - 0x10) >> 1;
+		if (num >= 0 && num < 0x3f0)
 			tilemap_mark_tile_dirty(bg_tilemap[layer],num);
-		}
-		else
-		{   /* foreground 4-5 */
-			int layer = (offset >> 11 & 1) + 4;
-			int num = ((offset & 0x7ff) - 0x10) >> 1;
-			if (num >= 0 && num < 0x3f0)
-				tilemap_mark_tile_dirty(bg_tilemap[layer],num);
-		}
 	}
 }
 

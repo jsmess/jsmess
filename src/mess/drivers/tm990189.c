@@ -211,7 +211,6 @@ static const TMS9928a_interface tms9918_interface =
 static MACHINE_START( tm990_189_v )
 {
 	TMS9928A_configure(&tms9918_interface);
-	return 0;
 }
 
 static MACHINE_RESET( tm990_189_v )

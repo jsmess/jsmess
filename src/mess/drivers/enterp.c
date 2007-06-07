@@ -238,7 +238,6 @@ static MACHINE_START(enterprise)
 {
 	wd17xx_init(WD_TYPE_177X, enterp_wd177x_callback, NULL);
 	add_reset_callback(machine, enterprise_reset);
-	return 0;
 }
 
 static  READ8_HANDLER ( enterprise_wd177x_read )

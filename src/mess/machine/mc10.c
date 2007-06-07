@@ -217,5 +217,4 @@ MACHINE_START( mc10 )
 
 	state_save_register_global(mc10_bfff);
 	state_save_register_global(mc10_keyboard_strobe);
-	return 0;
 }

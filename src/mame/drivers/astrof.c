@@ -1,239 +1,630 @@
-/*
-    Driver For DECO   ASTRO FIGHTER/TOMAHAWK 777
+/***************************************************************************
 
-    Initial Version
+    Astro Fighter hardware
 
-    Lee Taylor 28/11/1997
+    driver by Lee Taylor 28/11/1997
 
-*** Astro Battle added by HIGHWAYMAN with help from Reip.
+    Games supported:
+        * Astro Fighter (3 sets)
+        * Astro Battle (2 sets)
+        * Astro Fire
+        * Astro Combat (2 sets)
+        * Super Star Battle
+        * Tomahawk 777 late version with changed game play
+        * Tomahawk 777 early version
 
-2 sets, 1 may be a bad set, or they may simply be different - dont know yet.
-protection involves the eprom datalines being routed through an 8bit x 256byte prom.
-it *may* have a more complex palette, it needs to be investigated when i get more time.
+    Notes:
+        * Astro Battle added by HIGHWAYMAN with help from Reip.
+          2 sets, 1 may be a bad set, or they may simply be different - don't know yet.
+          protection involves the eprom datalines being routed through an 8bit x 256byte prom.
+          it *may* have a more complex palette, it needs to be investigated when i get more time.
 
+        * Astro Fighter set differences:
 
-    Astro Fighter Sets:
+          The differences are minor. From newest to oldest:
 
-    The differences are minor. From newest to oldest:
+          Main Set: 16Kbit ROMs
+                    Green/Hollow empty fuel bar.
+                    60 points for every bomb destroyed.
 
-    Main Set: 16Kbit ROMs
-              Green/Hollow empty fuel bar.
-              60 points for every bomb destroyed.
+          Set 2:    8Kbit ROMs
+                    Blue/Solid empty fuel bar.
+                    60 points for every bomb destroyed.
 
-    Set 2:    8Kbit ROMs
-              Blue/Solid empty fuel bar.
-              60 points for every bomb destroyed.
+          Set 3:    8Kbit ROMs
+                    Blue/Solid empty fuel bar.
+                   300 points for every seven bombs destroyed.
 
-    Set 3:    8Kbit ROMs
-              Blue/Solid empty fuel bar.
-              300 points for every seven bombs destroyed.
+        * I know there must be at least one other rom set for Astro Fighter
+          I have played one that stoped between waves to show the next enemy
 
+    Known issues/to-do's:
+        * Is Astro Fighter supposed to have a blue background???
+        * Analog sound in all games
+        * Verify DIPs for clones
 
-To Do!!
-       Figure out the correct vblank interval. The one I'm using seems to be
-       ok for Astro Fighter, but the submarine in Tomahawk flickers.
-       Maybe the video rate should 57FPS as the Burger Time games?
+****************************************************************************/
 
-       Rotation Support
-
-Also....
-        I know there must be at least one other rom set for Astro Fighter
-        I have played one that stoped between waves to show the next enemy
-*/
 
 #include "driver.h"
-#include "sound/samples.h"
-#include "includes/astrof.h"
+#include "astrof.h"
 
-static int abattle_count;
+
+#define MASTER_CLOCK  		(10595000)
+#define MAIN_CPU_CLOCK  	(MASTER_CLOCK / 16)
+#define PIXEL_CLOCK  		(MASTER_CLOCK / 2)
+#define HTOTAL				(0x150)
+#define HBEND				(0x000)
+#define HBSTART				(0x100)
+#define ASTROF_VTOTAL		(0x107)
+#define ASTROF_VBEND		(0x008)
+#define VBSTART				(0x100)
+#define TOMAHAWK_VTOTAL		(0x118)
+#define TOMAHAWK_VBEND		(0x000)
+
+
+
+static UINT8 *astrof_videoram;
+static size_t astrof_videoram_size;
+static UINT8 *astrof_colorram;
+static UINT8 *tomahawk_protection;
+
+static mame_timer *irq_timer;
+
+static UINT8 *astrof_color;
+static UINT8 astrof_palette_bank;
+static UINT8 red_on;
+static UINT8 flipscreen;
+static UINT8 screen_off;
+
+static UINT16 abattle_count;
+
+
+
+/*************************************
+ *
+ *  IRQ generation
+ *
+ *************************************/
+
+static READ8_HANDLER( irq_ack_r )
+{
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
+
+	return 0;
+}
+
+
+static void irq_callback(int param)
+{
+	cpunum_set_input_line(0, 0, ASSERT_LINE);
+
+	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, time_zero);
+}
+
+
+static void create_irq_timer(void)
+{
+	irq_timer = mame_timer_alloc(irq_callback);
+}
+
+
+static void start_irq_timer(void)
+{
+	mame_timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, time_zero);
+}
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( tomahawk )
+{
+	create_irq_timer();
+
+	/* register for state saving */
+	state_save_register_global(red_on);
+	state_save_register_global(flipscreen);
+	state_save_register_global(screen_off);
+}
+
+
+static MACHINE_START( astrof )
+{
+	/* register for state saving */
+	state_save_register_global(astrof_palette_bank);
+
+	machine_start_astrof_audio(machine);
+	machine_start_tomahawk(machine);
+}
+
+
+static MACHINE_START( abattle )
+{
+	/* register for state saving */
+	state_save_register_global(abattle_count);
+
+	machine_start_astrof(machine);
+}
+
+
+
+/*************************************
+ *
+ *  Machine reset
+ *
+ *************************************/
+
+static MACHINE_RESET( astrof )
+{
+	start_irq_timer();
+}
+
+
+static MACHINE_RESET( abattle )
+{
+	machine_reset_astrof(machine);
+
+	abattle_count = 0;
+}
+
+
+
+/*************************************
+ *
+ *  Input handling
+ *
+ *************************************/
+
+static INTERRUPT_GEN( coin_nmi )
+{
+	UINT32 coin = readinputportbytag("COIN");
+	UINT32 service = readinputportbytag("SERVICE");
+
+	/* both the coin input and the serice credit generates an NMI */
+	if (coin || service)
+		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+
+	/* the coin input is also connected to the coin counter */
+	if (coin)
+	{
+		coin_counter_w(0, 1);
+		coin_counter_w(0, 0);
+	}
+}
+
+
+static UINT32 astrof_p1_controls_r(void *param)
+{
+	return readinputportbytag("P1");
+}
+
+
+static UINT32 astrof_p2_controls_r(void *param)
+{
+	UINT32 ret;
+
+	/* on an upright cabinets, a single set of controls
+       is connected to both sets of pins on the edge
+       connector */
+	if (readinputportbytag("CAB"))
+		ret = readinputportbytag("P2");
+	else
+		ret = readinputportbytag("P1");
+
+	return ret;
+}
+
+
+
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
+
+#define ASTROF_NUM_PENS		(0x10)
+#define TOMAHAWK_NUM_PENS	(0x20)
+
+
+static VIDEO_START( astrof )
+{
+	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
+	astrof_colorram = auto_malloc(astrof_videoram_size / 2);
+	state_save_register_global_pointer(astrof_colorram, astrof_videoram_size / 2);
+
+	return 0;
+}
+
+
+static rgb_t make_pen(UINT8 data)
+{
+	UINT8 r1_bit = ((data >> 0) & 0x01) | red_on;
+	UINT8 r2_bit = ((data >> 1) & 0x01) | red_on;
+	UINT8 g1_bit = ( data >> 2) & 0x01;
+	UINT8 g2_bit = ( data >> 3) & 0x01;
+	UINT8 b1_bit = ( data >> 4) & 0x01;
+	UINT8 b2_bit = ( data >> 5) & 0x01;
+
+	/* this is probably not quite right, but I don't have the
+       knowledge to figure out the actual weights - ZV */
+	UINT8 r = (0xc0 * r1_bit) + (0x3f * r2_bit);
+	UINT8 g = (0xc0 * g1_bit) + (0x3f * g2_bit);
+	UINT8 b = (0xc0 * b1_bit) + (0x3f * b2_bit);
+
+	return MAKE_RGB(r, g, b);
+}
+
+
+static void astrof_get_pens(pen_t *pens)
+{
+	offs_t i;
+
+	for (i = 0; i < ASTROF_NUM_PENS; i++)
+	{
+		UINT8 data = memory_region(REGION_PROMS)[(astrof_palette_bank << 4) | i];
+
+		pens[i] = make_pen(data);
+	}
+}
+
+
+static void tomahawk_get_pens(pen_t *pens)
+{
+	offs_t i;
+
+	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
+	{
+		UINT8 data = memory_region(REGION_PROMS)[i];
+
+		pens[i] = make_pen(data);
+	}
+}
+
+
+static WRITE8_HANDLER( astrof_videoram_w )
+{
+	astrof_videoram[offset] = data;
+	astrof_colorram[offset >> 1] = *astrof_color & 0x0e;
+}
+
+
+static WRITE8_HANDLER( tomahawk_videoram_w )
+{
+	astrof_videoram[offset] = data;
+	astrof_colorram[offset >> 1] = (*astrof_color & 0x0e) | ((*astrof_color & 0x01) << 4);
+}
+
+
+static WRITE8_HANDLER( video_control_1_w )
+{
+	flipscreen = ((data >> 0) & 0x01) & readinputportbytag("FLIP");
+
+	/* this ties to the CLR pin of the shift registers */
+	screen_off = ((data >> 1) & 0x01);
+
+	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1*/
+	/* D3-D7 - not connected */
+
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+}
+
+
+static WRITE8_HANDLER( astrof_video_control_2_w )
+{
+	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
+	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
+
+	astrof_palette_bank = (data >> 2) & 0x01;
+
+	red_on = (data >> 3) & 0x01;
+
+	/* D4-D7 - not connected */
+
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+}
+
+
+static WRITE8_HANDLER( tomahawk_video_control_2_w )
+{
+	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
+	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
+	/* D2 - not connected */
+
+	red_on = (data >> 3) & 0x01;
+
+	video_screen_update_partial(0, video_screen_get_vpos(0));
+}
+
+
+static void video_update_common(mame_bitmap *bitmap, const rectangle *cliprect, pen_t *pens)
+{
+	offs_t offs;
+
+	for (offs = 0; offs < astrof_videoram_size; offs++)
+	{
+		UINT8 data;
+		int i;
+
+		UINT8 color = astrof_colorram[offs >> 1];
+
+		pen_t back_pen = pens[color | 0x00];
+		pen_t fore_pen = pens[color | 0x01];
+
+		UINT8 y = offs;
+		UINT8 x = offs >> 8 << 3;
+
+		if (!flipscreen)
+			y = ~y;
+
+		if ((y <= cliprect->min_y) || (y >= cliprect->max_y))
+			continue;
+
+		if (screen_off)
+			data = 0;
+		else
+			data = astrof_videoram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x01) ? fore_pen : back_pen;
+
+			if (flipscreen)
+				*BITMAP_ADDR32(bitmap, y, 255 - x) = pen;
+			else
+				*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x = x + 1;
+			data = data >> 1;
+		}
+	}
+}
+
+
+static VIDEO_UPDATE( astrof )
+{
+	pen_t pens[ASTROF_NUM_PENS];
+
+	astrof_get_pens(pens);
+
+	video_update_common(bitmap, cliprect, pens);
+
+	return 0;
+}
+
+
+static VIDEO_UPDATE( tomahawk )
+{
+	pen_t pens[TOMAHAWK_NUM_PENS];
+
+	tomahawk_get_pens(pens);
+
+	video_update_common(bitmap, cliprect, pens);
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Protection
+ *
+ *************************************/
 
 static READ8_HANDLER( shoot_r )
 {
 	/* not really sure about this */
 	return mame_rand(Machine) & 8;
 }
+
+
 static READ8_HANDLER( abattle_coin_prot_r )
 {
-	if(abattle_count < 0x100)
-	{
-		abattle_count++;
-		return 7;
-	}
-	else
-	{
-		abattle_count = 0;
-		return 0;
-	}
+	abattle_count = (abattle_count + 1) % 0x0101;
+
+	return abattle_count ? 0x07 : 0x00;
 }
+
 
 static READ8_HANDLER( afire_coin_prot_r )
 {
-	if(!abattle_count)
-	{
-		abattle_count++;
-		return 7;
-	}
-	else
-	{
-		abattle_count = 0;
-		return 0;
-	}
+	abattle_count = abattle_count ^ 0x01;
+
+	return abattle_count ? 0x07 : 0x00;
 }
+
+
+static READ8_HANDLER( tomahawk_protection_r )
+{
+	/* flip the byte */
+	return BITSWAP8(*tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( astrof_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_MIRROR(0x3c00)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(astrof_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_RAM) AM_BASE(&astrof_color)
-	AM_RANGE(0x8004, 0x8004) AM_WRITE(astrof_video_control1_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(astrof_video_control2_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(astrof_sample1_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(astrof_sample2_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0xd000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_NOP
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(astrof_videoram_w) AM_BASE(&astrof_videoram) AM_SIZE(&astrof_videoram_size)
+	AM_RANGE(0x6000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
+	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&astrof_color)
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, video_control_1_w)
+	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, astrof_video_control_2_w)
+	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, astrof_audio_1_w)
+	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, astrof_audio_2_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler8("IN"), MWA8_NOP)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler8("DSW"), MWA8_NOP)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, MWA8_NOP)
+	AM_RANGE(0xa003, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( tomahawk_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(tomahawk_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_RAM) AM_BASE(&astrof_color)
-	AM_RANGE(0x8004, 0x8004) AM_WRITE(astrof_video_control1_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(tomahawk_video_control2_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(MWA8_NOP)                        // Sound triggers
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(MWA8_RAM) AM_BASE(&tomahawk_protection)
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0xa003, 0xa003) AM_READ(tomahawk_protection_r)
-	AM_RANGE(0xd000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_NOP
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(tomahawk_videoram_w) AM_BASE(&astrof_videoram) AM_SIZE(&astrof_videoram_size)
+	AM_RANGE(0x6000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
+	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&astrof_color)
+	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, video_control_1_w)
+	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, tomahawk_video_control_2_w)
+	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, tomahawk_audio_w)
+	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&tomahawk_protection)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler8("IN"), MWA8_NOP)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READWRITE(port_tag_to_handler8("DSW"), MWA8_NOP)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, MWA8_NOP)
+	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ff8) AM_READWRITE(tomahawk_protection_r, MWA8_NOP)
+	AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 
-/***************************************************************************
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
-  These games don't have VBlank interrupts.
-  Interrupts are still used by the game: but they are related to coin
-  slots.
-
-***************************************************************************/
-static INTERRUPT_GEN( astrof_interrupt )
-{
-	if (readinputportbytag("FAKE") & 1)	/* Coin */
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static MACHINE_RESET( abattle )
-{
-	abattle_count = 0;
-}
-
-
-INPUT_PORTS_START( astrof )
-	PORT_START_TAG("IN0")
+static INPUT_PORTS_START( astrof )
+	PORT_START_TAG("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-/* Player 1 Controls */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-/* Player 2 Controls */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p1_controls_r, 0)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p2_controls_r, 0)
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+  /*PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )*/
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-/* 0x0c gives 2 Coins/1 Credit */
-
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, "3000" )
 	PORT_DIPSETTING(    0x10, "5000" )
 	PORT_DIPSETTING(    0x20, "7000" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START_TAG("FAKE")
-	/* The coin slots are not memory mapped. Coin insertion causes a NMI. */
-	/* This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	/* The cabinet selector is not memory mapped, but just disables the */
-	/* screen flip logic */
+	PORT_START_TAG("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("FLIP")
+	PORT_DIPNAME( 0x01, 0x00, "Flip Screen for Player 2" ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("CAB")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( abattle )
-	PORT_START_TAG("IN0")
+
+static INPUT_PORTS_START( abattle )
+	PORT_START_TAG("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-/* Player 1 Controls */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-/* Player 2 Controls */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p1_controls_r, 0)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(astrof_p2_controls_r, 0)
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+  /*PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )*/
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-/* 0x0c gives 2 Coins/1 Credit */
-
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x10, "7000" )
 	PORT_DIPSETTING(    0x20, "10000" )
-	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )\
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START_TAG("FAKE")
-	/* The coin slots are not memory mapped. Coin insertion causes a NMI. */
-	/* This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	/* The cabinet selector is not memory mapped, but just disables the */
-	/* screen flip logic */
+	PORT_START_TAG("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("FLIP")
+	PORT_DIPNAME( 0x01, 0x00, "Flip Screen for Player 2" ) PORT_DIPLOCATION("SW:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("CAB")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( tomahawk )
-	PORT_START_TAG("IN0")
+
+static INPUT_PORTS_START( tomahawk )
+	PORT_START_TAG("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -241,103 +632,132 @@ INPUT_PORTS_START( tomahawk )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+  	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+  	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+  /*PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )*/
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-/* 0x0c gives 2 Coins/1 Credit */
-
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x10, "7000" )
 	PORT_DIPSETTING(    0x20, "10000" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )  /* Only on Tomahawk 777 */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START_TAG("FAKE")
-	/* The coin slots are not memory mapped. Coin insertion causes a NMI. */
-	/* This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	/* The cabinet selector is not memory mapped, but just disables the */
-	/* screen flip logic */
+	PORT_START_TAG("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("FLIP")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+
+
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( base )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_VBLANK_INT(coin_nmi,1)
+
+	MDRV_MACHINE_RESET(astrof)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_START(astrof)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+
+MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( astrof )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 10595000/16)	/* 0.66 MHz */
+	MDRV_IMPORT_FROM(base)
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(astrof_map,0)
-	MDRV_CPU_VBLANK_INT(astrof_interrupt,1)
+
+	MDRV_MACHINE_START(astrof)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_VIDEO_START(astrof)
 	MDRV_VIDEO_UPDATE(astrof)
 
-	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(8, 256-1-8, 8, 256-1-8)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(3400))
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, ASTROF_VTOTAL, ASTROF_VBEND, VBSTART)
 
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	/* audio hardware */
+	MDRV_IMPORT_FROM(astrof_audio)
 
-	MDRV_SOUND_ADD_TAG("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(astrof_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( abattle )
+
+	/* basic machine hardware */
 	MDRV_IMPORT_FROM(astrof)
+
+	MDRV_MACHINE_START(abattle)
 	MDRV_MACHINE_RESET(abattle)
+
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( tomahawk )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(astrof)
+	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(tomahawk_map,0)
 
-	/* sound hardware */
-	MDRV_SOUND_REPLACE("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(tomahawk_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_MACHINE_START(tomahawk)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(tomahawk)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, TOMAHAWK_VTOTAL, TOMAHAWK_VBEND, VBSTART)
+
+	/* audio hardware */
+	MDRV_IMPORT_FROM(tomahawk_audio)
+
 MACHINE_DRIVER_END
 
 
-/***************************************************************************
 
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( astrof )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "afii.6",       0xd000, 0x0800, CRC(d6cd13a4) SHA1(359b00b02f4256f1138c8526214c6a34d2e5b47a) )
 	ROM_LOAD( "afii.5",       0xd800, 0x0800, CRC(6fd3c4df) SHA1(73aad03e2588ac9f249d5751eb4a7c7cd12fd3b9) )
 	ROM_LOAD( "afii.4",       0xe000, 0x0800, CRC(9612dae3) SHA1(8ee1797c212e06c381972b7b555f240ff317d75d) )
@@ -349,8 +769,9 @@ ROM_START( astrof )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
+
 ROM_START( astrof2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "kei2",         0xd000, 0x0400, CRC(9f0bd355) SHA1(45db9229dcd8bbd366ff13c683625c3d1c175598) )
 	ROM_LOAD( "keii",         0xd400, 0x0400, CRC(71f229f0) SHA1(be426360567066df01fb428dc5cd2d6ef01a4cf7) )
 	ROM_LOAD( "kei0",         0xd800, 0x0400, CRC(88114f7c) SHA1(e64ae3cac92d2a3c02edc8e81c88d5d275e89293) )
@@ -368,8 +789,9 @@ ROM_START( astrof2 )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
+
 ROM_START( astrof3 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "kei2",         0xd000, 0x0400, CRC(9f0bd355) SHA1(45db9229dcd8bbd366ff13c683625c3d1c175598) )
 	ROM_LOAD( "keii",         0xd400, 0x0400, CRC(71f229f0) SHA1(be426360567066df01fb428dc5cd2d6ef01a4cf7) )
 	ROM_LOAD( "kei0",         0xd800, 0x0400, CRC(88114f7c) SHA1(e64ae3cac92d2a3c02edc8e81c88d5d275e89293) )
@@ -387,8 +809,9 @@ ROM_START( astrof3 )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
+
 ROM_START( abattle )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "10405-b.bin",  0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
 	ROM_LOAD( "10405-a.bin",  0xd400, 0x0400, CRC(3fbbeeba) SHA1(1c9f519a0797f90524adf187b0761f150db0828d) )
 	ROM_LOAD( "10405-9.bin",  0xd800, 0x0400, CRC(354cf432) SHA1(138956ea8064eba0dcd8b2f175d4981b689a2077) )
@@ -409,8 +832,9 @@ ROM_START( abattle )
 	ROM_LOAD( "2h-prot.bin",  0x0000, 0x0100, CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
 ROM_END
 
+
 ROM_START( abattle2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "10405-b.bin",  0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
 	ROM_LOAD( "10405-a.bin",  0xd400, 0x0400, CRC(3fbbeeba) SHA1(1c9f519a0797f90524adf187b0761f150db0828d) )
 	ROM_LOAD( "10405-9.bin",  0xd800, 0x0400, CRC(354cf432) SHA1(138956ea8064eba0dcd8b2f175d4981b689a2077) )
@@ -431,8 +855,9 @@ ROM_START( abattle2 )
 	ROM_LOAD( "2h-prot.bin",  0x0000, 0x0100, CRC(a6bdd18c) SHA1(438bfc543730afdb531204585f17a68ddc03ded0) )
 ROM_END
 
+
 ROM_START( afire )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.bin",        0xd400, 0x0400, CRC(ce8b6e4f) SHA1(b85ab709d80324df5d2c4b0dbbc5e6aeb4003077) )
 	ROM_LOAD( "9.bin",        0xd800, 0x0400, CRC(e0f45b07) SHA1(091e1ea4b3726888dc488bb01e0bd4e588eccae5) )
@@ -450,10 +875,11 @@ ROM_START( afire )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
+
 /* This is a newer revision of "Astro Combat" (most probably manufactured by Sidam),
    with correct spelling for FUEL and the main boss sporting "CB". */
 ROM_START( acombat )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.bin",        0xd400, 0x0400, CRC(ce8b6e4f) SHA1(b85ab709d80324df5d2c4b0dbbc5e6aeb4003077) )
 	ROM_LOAD( "9.bin",        0xd800, 0x0400, CRC(e0f45b07) SHA1(091e1ea4b3726888dc488bb01e0bd4e588eccae5) )
@@ -471,10 +897,11 @@ ROM_START( acombat )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
+
 /* It is on older revision of "Astro Combat" (most probably manufactured by Sidam),
    with incorrect spelling for fuel as FLUEL and the main boss sporting "PZ" */
 ROM_START( acombato )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.bin",        0xd400, 0x0400, CRC(ce8b6e4f) SHA1(b85ab709d80324df5d2c4b0dbbc5e6aeb4003077) )
 	ROM_LOAD( "9.bin",        0xd800, 0x0400, CRC(e0f45b07) SHA1(091e1ea4b3726888dc488bb01e0bd4e588eccae5) )
@@ -492,8 +919,9 @@ ROM_START( acombato )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
+
 ROM_START( sstarbtl )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.rom",        0xd400, 0x0400, CRC(5a75891d) SHA1(71cde93a219ec3735cead7ec89f77bc8b11bfc64) )
 	ROM_LOAD( "9.rom",        0xd800, 0x0400, CRC(de3f8063) SHA1(77b89ef0b356316e463d7575c037069d0c14a850) )
@@ -511,24 +939,9 @@ ROM_START( sstarbtl )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
+
 ROM_START( tomahawk )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
-	ROM_LOAD( "l8-1",         0xdc00, 0x0400, CRC(7c911661) SHA1(3fc75bb0e6a89d41d76f82eeb0fde7d33809dddf) )
-	ROM_LOAD( "l7-1",         0xe000, 0x0400, CRC(adeffb69) SHA1(8ff7ada883825a8b56cae3368ce377228922ab1d) )
-	ROM_LOAD( "l6-1",         0xe400, 0x0400, CRC(9116e59d) SHA1(22a6d410fff8534b3aa7eb2ed0a8c096c890acf5) )
-	ROM_LOAD( "l5-1",         0xe800, 0x0400, CRC(01e4c7c4) SHA1(fbb37539d08284bae6454cd57650e8507a88acdb) )
-	ROM_LOAD( "l4-1",         0xec00, 0x0400, CRC(d9f69cb0) SHA1(d6a2dcaf867f33068e7d7ad7a3faf62a360456a6) )
-	ROM_LOAD( "l3-1",         0xf000, 0x0400, CRC(7ce7183f) SHA1(949c7b696fe215b68af450299c91e90fb27b0141) )
-	ROM_LOAD( "l2-1",         0xf400, 0x0400, CRC(43fea29d) SHA1(6890311440089a16d2e4d502855670723df41e16) )
-	ROM_LOAD( "l1-1",         0xf800, 0x0400, CRC(f2096ba9) SHA1(566f6d49cdacb5e39c40eb3773640270ef5f272c) )
-	ROM_LOAD( "l0-1",         0xfc00, 0x0400, CRC(42edbc28) SHA1(bab1fe8591509783dfdd4f53b9159263b9201970) )
-
-	ROM_REGION( 0x0020, REGION_PROMS, 0 )
-	ROM_LOAD( "t777.clr",     0x0000, 0x0020, CRC(d6a528fd) SHA1(5fc08252a2d7c5405f601efbfb7d84bec328d733) )
-ROM_END
-
-ROM_START( tomahaw5 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "thawk.l8",     0xdc00, 0x0400, CRC(b01dab4b) SHA1(d8b4266359a3b18d649f539fad8dce4d73cec412) )
 	ROM_LOAD( "thawk.l7",     0xe000, 0x0400, CRC(3a6549e8) SHA1(2ba622d78596c72998784432cf8fbbe733c50ce5) )
 	ROM_LOAD( "thawk.l6",     0xe400, 0x0400, CRC(863e47f7) SHA1(e8e48560c217025796be20f51c50ec276dba3eb5) )
@@ -543,6 +956,31 @@ ROM_START( tomahaw5 )
 	ROM_LOAD( "t777.clr",     0x0000, 0x0020, CRC(d6a528fd) SHA1(5fc08252a2d7c5405f601efbfb7d84bec328d733) )
 ROM_END
 
+
+ROM_START( tomahaw1 )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "l8-1",         0xdc00, 0x0400, CRC(7c911661) SHA1(3fc75bb0e6a89d41d76f82eeb0fde7d33809dddf) )
+	ROM_LOAD( "l7-1",         0xe000, 0x0400, CRC(adeffb69) SHA1(8ff7ada883825a8b56cae3368ce377228922ab1d) )
+	ROM_LOAD( "l6-1",         0xe400, 0x0400, CRC(9116e59d) SHA1(22a6d410fff8534b3aa7eb2ed0a8c096c890acf5) )
+	ROM_LOAD( "l5-1",         0xe800, 0x0400, CRC(01e4c7c4) SHA1(fbb37539d08284bae6454cd57650e8507a88acdb) )
+	ROM_LOAD( "l4-1",         0xec00, 0x0400, CRC(d9f69cb0) SHA1(d6a2dcaf867f33068e7d7ad7a3faf62a360456a6) )
+	ROM_LOAD( "l3-1",         0xf000, 0x0400, CRC(7ce7183f) SHA1(949c7b696fe215b68af450299c91e90fb27b0141) )
+	ROM_LOAD( "l2-1",         0xf400, 0x0400, CRC(43fea29d) SHA1(6890311440089a16d2e4d502855670723df41e16) )
+	ROM_LOAD( "l1-1",         0xf800, 0x0400, CRC(f2096ba9) SHA1(566f6d49cdacb5e39c40eb3773640270ef5f272c) )
+	ROM_LOAD( "l0-1",         0xfc00, 0x0400, CRC(42edbc28) SHA1(bab1fe8591509783dfdd4f53b9159263b9201970) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "t777.clr",     0x0000, 0x0020, CRC(d6a528fd) SHA1(5fc08252a2d7c5405f601efbfb7d84bec328d733) )
+ROM_END
+
+
+
+/*************************************
+ *
+ *  Game specific initialization
+ *
+ *************************************/
+
 static DRIVER_INIT( abattle )
 {
 	/* use the protection prom to decrypt the roms */
@@ -551,14 +989,13 @@ static DRIVER_INIT( abattle )
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
-	{
 		rom[i] = prom[rom[i]];
-	}
 
 	/* set up protection handlers */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
+
 
 static DRIVER_INIT( afire )
 {
@@ -566,12 +1003,13 @@ static DRIVER_INIT( afire )
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
-		rom[i] = rom[i] ^ 0xff;
+		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
 }
+
 
 static DRIVER_INIT( sstarbtl )
 {
@@ -579,21 +1017,29 @@ static DRIVER_INIT( sstarbtl )
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
-		rom[i] = rom[i] ^ 0xff;
+		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
-GAME( 1979, astrof,   0,        astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 1)", 0 )
-GAME( 1979, astrof2,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 2)", 0 )
-GAME( 1979, astrof3,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 3)", 0 )
-GAME( 1979, abattle,  astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 1)", 0 )
-GAME( 1979, abattle2, astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 2)", 0 )
-GAME( 1979, afire,    astrof,   abattle,  abattle,  afire,   ROT90, "Rene Pierre", "Astro Fire", 0 )
-GAME( 1979, acombat,  astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat (newer, CB)", 0 )
-GAME( 1979, acombato, astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat (older, PZ)", 0 )
-GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", 0 )
-GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 1)", GAME_NO_SOUND )
-GAME( 1980, tomahaw5, tomahawk, tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 5)", GAME_NO_SOUND )
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1979, astrof,   0,        astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, astrof2,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, astrof3,  astrof,   astrof,   astrof,   0,		 ROT90, "Data East",   "Astro Fighter (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1979, abattle,  astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, abattle2, astrof,	abattle,  abattle,  abattle, ROT90, "Sidam",	   "Astro Battle (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, afire,    astrof,   abattle,  abattle,  afire,   ROT90, "Rene Pierre", "Astro Fire", GAME_SUPPORTS_SAVE )
+GAME( 1979, acombat,  astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat (newer, CB)", GAME_SUPPORTS_SAVE )
+GAME( 1979, acombato, astrof,   abattle,  abattle,  afire,   ROT90, "bootleg",     "Astro Combat (older, PZ)", GAME_SUPPORTS_SAVE )
+GAME( 1979, sstarbtl, astrof,   abattle,  abattle,  sstarbtl,ROT90, "bootleg",     "Super Star Battle", GAME_SUPPORTS_SAVE )
+GAME( 1980, tomahawk, 0,        tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 5)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, tomahaw1, tomahawk, tomahawk, tomahawk, 0,       ROT90, "Data East",   "Tomahawk 777 (Revision 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -149,7 +149,6 @@ MACHINE_START( genesis )
 	state_save_register_global(irq2_int);
 	state_save_register_global(scanline_int);
 	state_save_register_global(vblank_int);
-	return 0;
 }
 
 

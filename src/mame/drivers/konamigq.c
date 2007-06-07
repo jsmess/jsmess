@@ -357,7 +357,6 @@ static MACHINE_START( konamigq )
 	state_save_register_global_array(sndto000);
 	state_save_register_global_array(sndtor3k);
 	state_save_register_global_array(sector_buffer);
-	return 0;
 }
 
 static MACHINE_RESET( konamigq )

@@ -60,20 +60,14 @@ PALETTE_INIT( olibochu )
 
 WRITE8_HANDLER( olibochu_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( olibochu_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( olibochu_flipscreen_w )
@@ -364,7 +358,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,     0, 64 },
 	{ REGION_GFX2, 0, &spritelayout, 256, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

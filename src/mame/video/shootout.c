@@ -63,16 +63,12 @@ static TILE_GET_INFO( get_fg_tile_info ){
 }
 
 WRITE8_HANDLER( shootout_videoram_w ){
-	if( videoram[offset]!=data ){
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty( background, offset&0x3ff );
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty( background, offset&0x3ff );
 }
 WRITE8_HANDLER( shootout_textram_w ){
-	if( shootout_textram[offset]!=data ){
-		shootout_textram[offset] = data;
-		tilemap_mark_tile_dirty( foreground, offset&0x3ff );
-	}
+	shootout_textram[offset] = data;
+	tilemap_mark_tile_dirty( foreground, offset&0x3ff );
 }
 
 VIDEO_START( shootout ){

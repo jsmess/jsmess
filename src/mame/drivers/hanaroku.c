@@ -227,7 +227,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &hanaroku_charlayout,   0, 32  },
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

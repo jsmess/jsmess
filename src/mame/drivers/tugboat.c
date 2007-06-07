@@ -174,7 +174,6 @@ MACHINE_START( tugboat )
 {
 	pia_config(0, &pia0_intf);
 	pia_config(1, &pia1_intf);
-	return 0;
 }
 
 MACHINE_RESET( tugboat )

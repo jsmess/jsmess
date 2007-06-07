@@ -256,7 +256,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ 0, 0, &tiles,       0,  16 }, /* Dynamically modified */
 	{ 0, 0, &sprites,   256,  16 }, /* Dynamically modified */
 	{ 0, 0, &tiles  ,   256,  16 }, /* Blank tile */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

@@ -290,7 +290,7 @@ static const gfx_decode redalert_gfxdecodeinfo[] =
 	{ 0, 0x3000, &backlayout,	0, 8 }, 	/* the game dynamically modifies this */
 	{ 0, 0x4800, &charlayout,	0, 8 }, 	/* the game dynamically modifies this */
 	{ 0, 0x4400, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode demoneye_gfxdecodeinfo[] =
@@ -299,7 +299,7 @@ static const gfx_decode demoneye_gfxdecodeinfo[] =
 	{ 0, 0x4800, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
 	{ 0, 0x4400, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
 	{ 0, 0x5400, &spritelayout,16, 4 }, 	/* the game dynamically modifies this */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* Arbitrary colortable */
@@ -408,7 +408,6 @@ static const pia6821_interface pia_0_intf =
 MACHINE_START( demoneye )
 {
 	pia_config(0, &pia_0_intf);
-	return 0;
 }
 
 MACHINE_RESET( demoneye )
@@ -463,7 +462,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( redalert )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rag5",         	0x5000, 0x1000, CRC(d7c9cdd6) SHA1(5ff5cdceaa00083b745cf5c74b096f7edfadf737) )
 	ROM_LOAD( "rag6",         	0x6000, 0x1000, CRC(cb2a308c) SHA1(9f3bc22bad31165e080e81d4a3fb0ec2aad235fe) )
 	ROM_LOAD( "rag7n",        	0x7000, 0x1000, CRC(82ab2dae) SHA1(f8328b048384afac245f1c16a2d0864ffe0b4741) )
@@ -473,11 +472,11 @@ ROM_START( redalert )
 	ROM_LOAD( "ragab",        	0xa000, 0x1000, CRC(ab99f5ed) SHA1(a93713bb03d61cce64adc89b874b67adea7c53cd) )
 	ROM_LOAD( "ragb",         	0xb000, 0x1000, CRC(8e0d1661) SHA1(bff4ddca761ddd70113490f50777e62c66813685) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "w3s1",         	0x7800, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 	ROM_RELOAD(                0xf800, 0x0800 )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "ras1b",        	0x0000, 0x1000, CRC(ec690845) SHA1(26a84738bd45ed21dac6c8383ebd9c3b9831024a) )
 	ROM_LOAD( "ras2",         	0x1000, 0x1000, CRC(fae94cfc) SHA1(2fd798706bb3afda3fb55bc877e597cc4e5d0c15) )
 	ROM_LOAD( "ras3",         	0x2000, 0x1000, CRC(20d56f3e) SHA1(5c32ee3365407e6d3f7ab5662e9ecbac437ed4cb) )

@@ -455,7 +455,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   0,16 },	/*  8x8  chars */
 	{ REGION_GFX2, 0, &tilelayout, 128, 8 },	/* 16x16 sprites */
 	{ REGION_GFX3, 0, &tilelayout, 256, 8 },	/* 16x16 background tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void chinagat_irq_handler(int irq) {

@@ -20,20 +20,14 @@ static tilemap *bg_tilemap,*fg_tilemap;
 
 static WRITE8_HANDLER( background_w )
 {
-	if (bgvideoram[offset] != data)
-	{
-		bgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( foreground_w )
 {
-	if (fgvideoram[offset] != data)
-	{
-		fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( bg_bank_w )

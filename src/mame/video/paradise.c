@@ -74,11 +74,8 @@ static tilemap *tilemap_0,*tilemap_1,*tilemap_2;
 /* Background */
 WRITE8_HANDLER( paradise_vram_0_w )
 {
-	if (paradise_vram_0[offset] != data)
-	{
-		paradise_vram_0[offset] = data;
-		tilemap_mark_tile_dirty(tilemap_0, offset % 0x400);
-	}
+	paradise_vram_0[offset] = data;
+	tilemap_mark_tile_dirty(tilemap_0, offset % 0x400);
 }
 
 /* 16 color tiles with paradise_palbank as color code */
@@ -109,11 +106,8 @@ static TILE_GET_INFO( get_tile_info_0 )
 /* Midground */
 WRITE8_HANDLER( paradise_vram_1_w )
 {
-	if (paradise_vram_1[offset] != data)
-	{
-		paradise_vram_1[offset] = data;
-		tilemap_mark_tile_dirty(tilemap_1, offset % 0x400);
-	}
+	paradise_vram_1[offset] = data;
+	tilemap_mark_tile_dirty(tilemap_1, offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_1 )
@@ -126,11 +120,8 @@ static TILE_GET_INFO( get_tile_info_1 )
 /* Foreground */
 WRITE8_HANDLER( paradise_vram_2_w )
 {
-	if (paradise_vram_2[offset] != data)
-	{
-		paradise_vram_2[offset] = data;
-		tilemap_mark_tile_dirty(tilemap_2, offset % 0x400);
-	}
+	paradise_vram_2[offset] = data;
+	tilemap_mark_tile_dirty(tilemap_2, offset % 0x400);
 }
 
 static TILE_GET_INFO( get_tile_info_2 )

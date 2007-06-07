@@ -102,26 +102,20 @@ static const gfx_layout charlayout =
 gfx_decode yumefuda_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &charlayout,   0, 0x10 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
 static WRITE8_HANDLER( yumefuda_vram_w )
 {
-	if(videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 static WRITE8_HANDLER( yumefuda_cram_w )
 {
-	if(colorram[offset] != data)
-	{
-		colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 static UINT8 *cus_ram;

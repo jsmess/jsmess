@@ -551,7 +551,7 @@ static const gfx_decode vigilant_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &back_layout,   512,  2 },	/* actually the background uses colors */
 													/* 256-511, but giving it exclusive */
 													/* pens we can handle it more easily. */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode buccanrs_gfxdecodeinfo[] =
@@ -561,14 +561,14 @@ static const gfx_decode buccanrs_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &buccaneer_back_layout,   512,  2 },	/* actually the background uses colors */
 													/* 256-511, but giving it exclusive */
 													/* pens we can handle it more easily. */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode kikcubic_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &text_layout,   0, 16 },
 	{ REGION_GFX2, 0, &sprite_layout, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

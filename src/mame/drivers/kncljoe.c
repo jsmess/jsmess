@@ -173,7 +173,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   0x00, 16 },	/* colors 0x00-0x7f direct mapped */
 	{ REGION_GFX2, 0, &spritelayout, 0x80, 16 },	/* colors 0x80-0x8f with lookup table */
 	{ REGION_GFX3, 0, &spritelayout, 0x80, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -209,7 +209,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( kncljoe )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )  /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "kj-1.bin", 0x0000, 0x4000, CRC(4e4f5ff2) SHA1(7d889aa4f4138f01014c1dda391f82396074cfab) )
 	ROM_LOAD( "kj-2.bin", 0x4000, 0x4000, CRC(cb11514b) SHA1(c75d4019d1617493ff074ce8187a81ad70d9b60c) )
 	ROM_LOAD( "kj-3.bin", 0x8000, 0x4000, CRC(0f50697b) SHA1(412c6aba270824299ca2a74e9bea42b83e69797b) )
@@ -241,7 +241,7 @@ ROM_START( kncljoe )
 ROM_END
 
 ROM_START( kncljoea )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )  /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "kj01.bin", 0x0000, 0x4000, CRC(f251019e) SHA1(a7ca2fae57ce698ec19e118e967c74eb92341803) )
 	ROM_LOAD( "kj-2.bin", 0x4000, 0x4000, CRC(cb11514b) SHA1(c75d4019d1617493ff074ce8187a81ad70d9b60c) )
 	ROM_LOAD( "kj-3.bin", 0x8000, 0x4000, CRC(0f50697b) SHA1(412c6aba270824299ca2a74e9bea42b83e69797b) )
@@ -273,7 +273,7 @@ ROM_START( kncljoea )
 ROM_END
 
 ROM_START( bcrusher )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )  /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "bcrush1.bin", 0x0000, 0x4000, CRC(e8979196) SHA1(f1aff40e645760c786510c77a4841acb782ba157) )
 	ROM_LOAD( "bcrush2.bin", 0x4000, 0x4000, CRC(1be4c731) SHA1(11f3a33263d66172902dfb6f3fe2d0ab5cad38d7) )
 	ROM_LOAD( "bcrush3.bin", 0x8000, 0x4000, CRC(0772d993) SHA1(430f0319bd4765add2f1ee197e7217fdf9ae79c8) )

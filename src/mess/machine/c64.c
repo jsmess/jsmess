@@ -1002,7 +1002,6 @@ MACHINE_START( c64 )
 	if (!ultimax)
 		c64_bankswitch (1);
 	memory_set_opbase_handler( 0, c64_opbase );
-	return 0;
 }
 
 

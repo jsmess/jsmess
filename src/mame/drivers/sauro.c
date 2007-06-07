@@ -317,14 +317,14 @@ static const gfx_decode sauro_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout, 0, 64 },
 	{ REGION_GFX2, 0, &charlayout, 0, 64 },
 	{ REGION_GFX3, 0, &sauro_spritelayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode trckydoc_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout, 0, 64 },
 	{ REGION_GFX2, 0, &trckydoc_spritelayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static INTERRUPT_GEN( sauro_interrupt )
@@ -393,11 +393,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( sauro )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )          /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sauro-2.bin",     0x00000, 0x8000, CRC(19f8de25) SHA1(52eea7c0416ab0a8dbb3d1664b2f57ab7a405a67) )
 	ROM_LOAD( "sauro-1.bin",     0x08000, 0x8000, CRC(0f8b876f) SHA1(6e61a8934a2cc3c80c1f47dd59aa43aaeec12f75) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )          /* 64k for sound CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sauro-3.bin",     0x00000, 0x8000, CRC(0d501e1b) SHA1(20a56ff30d4fa5d2f483a449703b49153839f6bc) )
 
 	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -421,7 +421,7 @@ ROM_START( sauro )
 ROM_END
 
 ROM_START( trckydoc )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )          /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "trckydoc.d9",  0x0000,  0x8000, CRC(c6242fc3) SHA1(c8a6f6abe8b51061a113ed75fead0479df68ec40) )
 	ROM_LOAD( "trckydoc.b9",  0x8000,  0x8000, CRC(8645c840) SHA1(79c2acfc1aeafbe94afd9d230200bd7cdd7bcd1b) )
 
@@ -445,7 +445,7 @@ ROM_START( trckydoc )
 ROM_END
 
 ROM_START( trckydca )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )          /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "trckydca.d9",  0x0000,  0x8000, CRC(99c38aa4) SHA1(298a19439cc17743e10d101c50a26b9a7348299e) )
 	ROM_LOAD( "trckydca.b9",  0x8000,  0x8000, CRC(b6048a15) SHA1(d982fafbfa391ef9bab50bfd52607494e2a9eedf) )
 

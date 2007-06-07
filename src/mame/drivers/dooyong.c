@@ -53,10 +53,18 @@ Flying Tiger
 
 
 extern UINT8 *lastday_txvideoram;
-extern UINT8 *lastday_bgscroll,*lastday_fgscroll,*bluehawk_fg2scroll;
-extern UINT16 *rshark_scroll1,*rshark_scroll2,*rshark_scroll3,*rshark_scroll4;
-extern UINT16 *popbingo_scroll, *popbingo_scroll2;
+extern UINT16 *popbingo_scroll2;
 
+WRITE8_HANDLER( dooyong_bgscroll8_w );
+WRITE8_HANDLER( dooyong_fgscroll8_w );
+WRITE8_HANDLER( dooyong_fg2scroll8_w );
+WRITE16_HANDLER( rshark_bgscroll16_w );
+WRITE16_HANDLER( rshark_bg2scroll16_w );
+WRITE16_HANDLER( rshark_fgscroll16_w );
+WRITE16_HANDLER( rshark_fg2scroll16_w );
+WRITE16_HANDLER( popbingo_bgscroll16_w );
+WRITE8_HANDLER( lastday_txvideoram8_w );
+WRITE8_HANDLER( bluehawk_txvideoram8_w );
 WRITE8_HANDLER( lastday_ctrl_w );
 WRITE8_HANDLER( pollux_ctrl_w );
 WRITE8_HANDLER( primella_ctrl_w );
@@ -71,8 +79,13 @@ VIDEO_UPDATE( primella );
 VIDEO_UPDATE( rshark );
 VIDEO_UPDATE( popbingo );
 VIDEO_START( lastday );
+VIDEO_START( gulfstrm );
+VIDEO_START( pollux );
+VIDEO_START( bluehawk );
 VIDEO_START( flytiger );
 VIDEO_START( primella );
+VIDEO_START( rshark );
+VIDEO_START( popbingo );
 VIDEO_EOF( dooyong );
 VIDEO_EOF( rshark );
 
@@ -88,7 +101,6 @@ if (data & 0xf8) popmessage("bankswitch %02x",data);
 static MACHINE_START( lastday )
 {
 	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1) + 0x10000, 0x4000);
-	return 0;
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -115,13 +127,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastday_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc006) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_bgscroll)
-	AM_RANGE(0xc008, 0xc00e) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_fgscroll)
+	AM_RANGE(0xc000, 0xc006) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xc008, 0xc00e) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xc010, 0xc010) AM_WRITE(lastday_ctrl_w)	/* coin counter, flip screen */
 	AM_RANGE(0xc011, 0xc011) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc012, 0xc012) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(lastday_txvideoram8_w) AM_BASE(&lastday_txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
@@ -142,12 +154,12 @@ static ADDRESS_MAP_START( pollux_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(lastday_txvideoram8_w) AM_BASE(&lastday_txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)	/* coin counter, flip screen */
 	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xf018, 0xf01e) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_bgscroll)
-	AM_RANGE(0xf020, 0xf026) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_fgscroll)
+	AM_RANGE(0xf018, 0xf01e) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xf020, 0xf026) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -179,11 +191,11 @@ static ADDRESS_MAP_START( bluehawk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xc008, 0xc008) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc010, 0xc010) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc018, 0xc01c) AM_WRITE(MWA8_RAM) AM_BASE(&bluehawk_fg2scroll)
-	AM_RANGE(0xc040, 0xc044) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_bgscroll)
-	AM_RANGE(0xc048, 0xc04c) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_fgscroll)
+	AM_RANGE(0xc018, 0xc01c) AM_WRITE(dooyong_fg2scroll8_w)
+	AM_RANGE(0xc040, 0xc044) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xc048, 0xc04c) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(bluehawk_txvideoram8_w) AM_BASE(&lastday_txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
@@ -210,10 +222,10 @@ static ADDRESS_MAP_START( flytiger_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xe010, 0xe010) AM_WRITE(flytiger_ctrl_w)	/* coin counter, flip screen */
 	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xe030, 0xe036) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_bgscroll)
-	AM_RANGE(0xe040, 0xe046) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_fgscroll)
+	AM_RANGE(0xe030, 0xe036) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xe040, 0xe046) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(lastday_txvideoram8_w) AM_BASE(&lastday_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primella_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -233,12 +245,12 @@ static ADDRESS_MAP_START( primella_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(MWA8_RAM)	/* what is this? looks like a palette? scratchpad RAM maybe? */
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(bluehawk_txvideoram8_w) AM_BASE(&lastday_txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(primella_ctrl_w)	/* bank switch, flip screen etc */
 	AM_RANGE(0xf810, 0xf810) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xfc00, 0xfc04) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_bgscroll)
-	AM_RANGE(0xfc08, 0xfc0c) AM_WRITE(MWA8_RAM) AM_BASE(&lastday_fgscroll)
+	AM_RANGE(0xfc00, 0xfc04) AM_WRITE(dooyong_bgscroll8_w)
+	AM_RANGE(0xfc08, 0xfc0c) AM_WRITE(dooyong_fgscroll8_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rshark_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -258,13 +270,13 @@ static ADDRESS_MAP_START( rshark_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x04cfff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x04d000, 0x04dfff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x04e000, 0x04ffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x0c4000, 0x0c4009) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll4)
-	AM_RANGE(0x0c4010, 0x0c4019) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll3)
+	AM_RANGE(0x0c4000, 0x0c4009) AM_WRITE(rshark_bgscroll16_w)
+	AM_RANGE(0x0c4010, 0x0c4019) AM_WRITE(rshark_bg2scroll16_w)
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(rshark_ctrl_w)	/* flip screen + unknown stuff */
-	AM_RANGE(0x0cc000, 0x0cc009) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll2)
-	AM_RANGE(0x0cc010, 0x0cc019) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll1)
+	AM_RANGE(0x0cc000, 0x0cc009) AM_WRITE(rshark_fgscroll16_w)
+	AM_RANGE(0x0cc010, 0x0cc019) AM_WRITE(rshark_fg2scroll16_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superx_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -284,13 +296,13 @@ static ADDRESS_MAP_START( superx_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d0000, 0x0dcfff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x0dd000, 0x0ddfff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0de000, 0x0dffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x084000, 0x084009) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll4)
-	AM_RANGE(0x084010, 0x084019) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll3)
+	AM_RANGE(0x084000, 0x084009) AM_WRITE(rshark_bgscroll16_w)
+	AM_RANGE(0x084010, 0x084019) AM_WRITE(rshark_bg2scroll16_w)
 	AM_RANGE(0x088000, 0x088fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x080012, 0x080013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(rshark_ctrl_w)	/* flip screen + unknown stuff */
-	AM_RANGE(0x08c000, 0x08c009) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll2)
-	AM_RANGE(0x08c010, 0x08c019) AM_WRITE(MWA16_RAM) AM_BASE(&rshark_scroll1)
+	AM_RANGE(0x08c000, 0x08c009) AM_WRITE(rshark_fgscroll16_w)
+	AM_RANGE(0x08c010, 0x08c019) AM_WRITE(rshark_fg2scroll16_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popbingo_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -313,7 +325,7 @@ static ADDRESS_MAP_START( popbingo_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(rshark_ctrl_w)
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITE(MWA16_NOP) // ?
-	AM_RANGE(0x0c4000, 0x0c401b) AM_RAM AM_BASE(&popbingo_scroll)
+	AM_RANGE(0x0c4000, 0x0c401b) AM_WRITE(popbingo_bgscroll16_w)
 	AM_RANGE(0x0cc000, 0x0cc01b) AM_RAM AM_BASE(&popbingo_scroll2) // not used atm
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
@@ -839,7 +851,7 @@ static const gfx_decode lastday_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &spritelayout,       256, 16 },
 	{ REGION_GFX3, 0, &tilelayout,         768, 16 },
 	{ REGION_GFX4, 0, &tilelayout,         512, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode flytiger_gfxdecodeinfo[] =
@@ -848,7 +860,7 @@ static const gfx_decode flytiger_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &spritelayout,       256, 16 },
 	{ REGION_GFX3, 0, &tilelayout,         768, 16 },
 	{ REGION_GFX4, 0, &tilelayout,         512, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode bluehawk_gfxdecodeinfo[] =
@@ -858,7 +870,7 @@ static const gfx_decode bluehawk_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &tilelayout,         768, 16 },
 	{ REGION_GFX4, 0, &tilelayout,         512, 16 },
 	{ REGION_GFX5, 0, &tilelayout,           0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode primella_gfxdecodeinfo[] =
@@ -867,7 +879,7 @@ static const gfx_decode primella_gfxdecodeinfo[] =
 	/* no sprites */
 	{ REGION_GFX2, 0, &tilelayout,         768, 16 },
 	{ REGION_GFX3, 0, &tilelayout,         512, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode rshark_gfxdecodeinfo[] =
@@ -878,7 +890,7 @@ static const gfx_decode rshark_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &spritelayout,       512, 16 },
 	{ REGION_GFX4, 0, &spritelayout,       768, 16 },
 	{ REGION_GFX5, 0, &spritelayout,      1024, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode popbingo_gfxdecodeinfo[] =
@@ -886,7 +898,7 @@ static const gfx_decode popbingo_gfxdecodeinfo[] =
 	/* no chars */
 	{ REGION_GFX1, 0, &rshark_spritelayout,   0, 16 },
 	{ REGION_GFX2, 0, &popbingo_tilelayout, 256,  1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void irqhandler(int irq)
@@ -1019,6 +1031,7 @@ static MACHINE_DRIVER_START( gulfstrm )
 	MDRV_GFXDECODE(lastday_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)
 
+	MDRV_VIDEO_START(gulfstrm)
 	MDRV_VIDEO_EOF(dooyong)
 	MDRV_VIDEO_UPDATE(gulfstrm)
 
@@ -1050,6 +1063,7 @@ static MACHINE_DRIVER_START( pollux )
 	MDRV_GFXDECODE(lastday_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)
 
+	MDRV_VIDEO_START(pollux)
 	MDRV_VIDEO_EOF(dooyong)
 	MDRV_VIDEO_UPDATE(pollux)
 
@@ -1081,6 +1095,7 @@ static MACHINE_DRIVER_START( bluehawk )
 	MDRV_GFXDECODE(bluehawk_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)
 
+	MDRV_VIDEO_START(bluehawk)
 	MDRV_VIDEO_EOF(dooyong)
 	MDRV_VIDEO_UPDATE(bluehawk)
 
@@ -1180,6 +1195,7 @@ static MACHINE_DRIVER_START( rshark )
 	MDRV_GFXDECODE(rshark_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
+	MDRV_VIDEO_START(rshark)
 	MDRV_VIDEO_EOF(rshark)
 	MDRV_VIDEO_UPDATE(rshark)
 
@@ -1209,6 +1225,7 @@ static MACHINE_DRIVER_START( superx ) // dif mem map
 	MDRV_GFXDECODE(rshark_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
+	MDRV_VIDEO_START(rshark)
 	MDRV_VIDEO_EOF(rshark)
 	MDRV_VIDEO_UPDATE(rshark)
 
@@ -1238,6 +1255,7 @@ static MACHINE_DRIVER_START( popbingo )
 	MDRV_GFXDECODE(popbingo_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2048)
 
+	MDRV_VIDEO_START(popbingo)
 	MDRV_VIDEO_EOF(rshark)
 	MDRV_VIDEO_UPDATE(popbingo)
 

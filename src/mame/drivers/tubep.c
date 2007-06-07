@@ -272,8 +272,6 @@ static MACHINE_START( tubep )
 	interrupt_timer = mame_timer_alloc(scanline_callback);
 
 	tubep_setup_save_state();
-
-	return 0;
 }
 
 static MACHINE_RESET( tubep )
@@ -285,8 +283,6 @@ static MACHINE_RESET( tubep )
 static MACHINE_START( rjammer )
 {
 	tubep_setup_save_state();
-
-	return 0;
 }
 
 /****************************************************************/

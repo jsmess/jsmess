@@ -354,7 +354,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x1c000, &tilelayout,			3*16*16, 16*16 },
 	{ REGION_GFX2, 0x1e000, &tilelayout,			3*16*16, 16*16 },
 	{ REGION_GFX3, 0x00000, &spritelayout,		0*16*16, 16*16 }, // sprites
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -434,15 +434,15 @@ static MACHINE_DRIVER_START( wc90b )
 MACHINE_DRIVER_END
 
 ROM_START( wc90b )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )	/* c000-ffff is not used */
 	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* 96k for code */  /* Second CPU */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )  /* Second CPU */
 	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
 	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x18000, REGION_CPU3, 0 )	/* 192k for the audio CPU */
+	ROM_REGION( 0x18000, REGION_CPU3, 0 )
 	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 

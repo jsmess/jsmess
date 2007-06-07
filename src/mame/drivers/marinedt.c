@@ -110,11 +110,8 @@ static UINT8 collh, cxh, cyrh, cyqh;
 
 static WRITE8_HANDLER( tx_tileram_w )
 {
-	if (tx_tileram[offset] != data)
-	{
-		tx_tileram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, offset);
-	}
+	tx_tileram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap, offset);
 }
 
 static ADDRESS_MAP_START( marinedt_readmem, ADDRESS_SPACE_PROGRAM, 8 )

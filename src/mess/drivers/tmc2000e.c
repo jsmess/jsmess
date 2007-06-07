@@ -153,8 +153,6 @@ static CDP1802_CONFIG tmc2000e_config =
 static MACHINE_START( tmc2000e )
 {
 	state_save_register_global(keylatch);
-
-	return 0;
 }
 
 static MACHINE_RESET( tmc2000e )

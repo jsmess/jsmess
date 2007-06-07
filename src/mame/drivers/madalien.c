@@ -494,11 +494,8 @@ WRITE8_HANDLER( madalien_shift_reg_w )
 
 WRITE8_HANDLER( madalien_videoram_w )
 {
-	if (madalien_videoram[offset] != data)
-	{
-		madalien_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	madalien_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( madalien_flip_screen_w )
@@ -555,7 +552,7 @@ static const gfx_decode madalien_gfxdecodeinfo[] =
 {
 	{ 0, 0, &charlayout_memory,	0, 8 }, /* characters (the game dynamically modifies them) */
 	{ REGION_GFX1, 0, &tilelayout,	0, 8 },	/* background tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -679,7 +676,6 @@ static MACHINE_DRIVER_START( madalien )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(madalien_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2*32)
-	MDRV_COLORTABLE_LENGTH(2*32)
 	MDRV_PALETTE_INIT(madalien)
 	MDRV_VIDEO_START(madalien)
 	MDRV_VIDEO_UPDATE(madalien)

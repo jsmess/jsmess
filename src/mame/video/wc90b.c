@@ -82,29 +82,20 @@ VIDEO_START( wc90b )
 
 WRITE8_HANDLER( wc90b_bgvideoram_w )
 {
-	if (wc90b_bgvideoram[offset] != data)
-	{
-		wc90b_bgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
-	}
+	wc90b_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( wc90b_fgvideoram_w )
 {
-	if (wc90b_fgvideoram[offset] != data)
-	{
-		wc90b_fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x7ff);
-	}
+	wc90b_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( wc90b_txvideoram_w )
 {
-	if (wc90b_txvideoram[offset] != data)
-	{
-		wc90b_txvideoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset & 0x7ff);
-	}
+	wc90b_txvideoram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x7ff);
 }
 
 

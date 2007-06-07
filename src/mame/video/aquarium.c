@@ -105,11 +105,8 @@ static TILE_GET_INFO( get_aquarium_txt_tile_info )
 
 WRITE16_HANDLER( aquarium_txt_videoram_w )
 {
-	if (aquarium_txt_videoram[offset] != data)
-	{
-		aquarium_txt_videoram[offset] = data;
-		tilemap_mark_tile_dirty(aquarium_txt_tilemap,offset);
-	}
+	aquarium_txt_videoram[offset] = data;
+	tilemap_mark_tile_dirty(aquarium_txt_tilemap,offset);
 }
 
 /* MID Layer */
@@ -129,11 +126,8 @@ static TILE_GET_INFO( get_aquarium_mid_tile_info )
 
 WRITE16_HANDLER( aquarium_mid_videoram_w )
 {
-	if (aquarium_mid_videoram[offset] != data)
-	{
-		aquarium_mid_videoram[offset] = data;
-		tilemap_mark_tile_dirty(aquarium_mid_tilemap,offset/2);
-	}
+	aquarium_mid_videoram[offset] = data;
+	tilemap_mark_tile_dirty(aquarium_mid_tilemap,offset/2);
 }
 
 /* BAK Layer */
@@ -153,11 +147,8 @@ static TILE_GET_INFO( get_aquarium_bak_tile_info )
 
 WRITE16_HANDLER( aquarium_bak_videoram_w )
 {
-	if (aquarium_bak_videoram[offset] != data)
-	{
-		aquarium_bak_videoram[offset] = data;
-		tilemap_mark_tile_dirty(aquarium_bak_tilemap,offset/2);
-	}
+	aquarium_bak_videoram[offset] = data;
+	tilemap_mark_tile_dirty(aquarium_bak_tilemap,offset/2);
 }
 
 VIDEO_START(aquarium)

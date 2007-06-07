@@ -54,26 +54,14 @@ READ16_HANDLER( ddragon3_scroll16_r )
 
 WRITE16_HANDLER( ddragon3_bg_videoram16_w )
 {
-	UINT16 oldword = ddragon3_bg_videoram16[offset];
-
 	COMBINE_DATA(&ddragon3_bg_videoram16[offset]);
-
-	if (oldword != ddragon3_bg_videoram16[offset])
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE16_HANDLER( ddragon3_fg_videoram16_w )
 {
-	UINT16 oldword = ddragon3_fg_videoram16[offset];
-
 	COMBINE_DATA(&ddragon3_fg_videoram16[offset]);
-
-	if (oldword != ddragon3_fg_videoram16[offset])
-	{
-		tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
-	}
+	tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

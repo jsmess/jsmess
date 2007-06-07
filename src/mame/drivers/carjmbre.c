@@ -180,7 +180,7 @@ static const gfx_decode carjmbre_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &carjmbre_charlayout,   0, 16 },
 	{ REGION_GFX2, 0, &carjmbre_spritelayout, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( carjmbre )

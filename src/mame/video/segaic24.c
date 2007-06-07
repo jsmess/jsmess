@@ -598,9 +598,8 @@ READ16_HANDLER(sys24_char_r)
 
 WRITE16_HANDLER(sys24_tile_w)
 {
-	UINT16 old = sys24_tile_ram[offset];
 	COMBINE_DATA(sys24_tile_ram + offset);
-	if(offset < 0x4000 && old != sys24_tile_ram[offset])
+	if(offset < 0x4000)
 		tilemap_mark_tile_dirty(sys24_tile_layer[offset >> 12], offset & 0xfff);
 }
 

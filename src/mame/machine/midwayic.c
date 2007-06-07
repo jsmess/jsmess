@@ -1094,5 +1094,5 @@ WRITE32_HANDLER( midway_ide_asic_w )
 
 	/* everything else is byte-sized */
 	else
-		ide_controller32_0_w(ideoffs, data << shift, ~(0xff << shift));;
+		ide_controller32_0_w(ideoffs, data << shift, ~(0xff << shift));
 }

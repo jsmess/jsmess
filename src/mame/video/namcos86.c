@@ -161,11 +161,8 @@ READ8_HANDLER( rthunder_videoram1_r )
 
 WRITE8_HANDLER( rthunder_videoram1_w )
 {
-	if (rthunder_videoram1[offset] != data)
-	{
-		rthunder_videoram1[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap[offset/0x1000],(offset & 0xfff)/2);
-	}
+	rthunder_videoram1[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap[offset/0x1000],(offset & 0xfff)/2);
 }
 
 READ8_HANDLER( rthunder_videoram2_r )
@@ -175,11 +172,8 @@ READ8_HANDLER( rthunder_videoram2_r )
 
 WRITE8_HANDLER( rthunder_videoram2_w )
 {
-	if (rthunder_videoram2[offset] != data)
-	{
-		rthunder_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap[2+offset/0x1000],(offset & 0xfff)/2);
-	}
+	rthunder_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap[2+offset/0x1000],(offset & 0xfff)/2);
 }
 
 WRITE8_HANDLER( rthunder_tilebank_select_w )

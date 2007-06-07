@@ -23,8 +23,6 @@ static int sprite_xoff, bg0_dx, bg1_dx[2];
 
 WRITE16_HANDLER( wwfwfest_fg0_videoram_w )
 {
-	int oldword = wwfwfest_fg0_videoram[offset];
-
 	/* Videoram is 8 bit, upper & lower byte writes end up in the same place */
 	if (ACCESSING_MSB && ACCESSING_LSB) {
 		COMBINE_DATA(&wwfwfest_fg0_videoram[offset]);
@@ -34,24 +32,19 @@ WRITE16_HANDLER( wwfwfest_fg0_videoram_w )
 		wwfwfest_fg0_videoram[offset]=data&0xff;
 	}
 
-	if (oldword != wwfwfest_fg0_videoram[offset])
-		tilemap_mark_tile_dirty(fg0_tilemap,offset/2);
+	tilemap_mark_tile_dirty(fg0_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( wwfwfest_bg0_videoram_w )
 {
-	int oldword = wwfwfest_bg0_videoram[offset];
 	COMBINE_DATA(&wwfwfest_bg0_videoram[offset]);
-	if (oldword != wwfwfest_bg0_videoram[offset])
-		tilemap_mark_tile_dirty(bg0_tilemap,offset/2);
+	tilemap_mark_tile_dirty(bg0_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( wwfwfest_bg1_videoram_w )
 {
-	int oldword = wwfwfest_bg1_videoram[offset];
 	COMBINE_DATA(&wwfwfest_bg1_videoram[offset]);
-	if (oldword != wwfwfest_bg1_videoram[offset])
-		tilemap_mark_tile_dirty(bg1_tilemap,offset);
+	tilemap_mark_tile_dirty(bg1_tilemap,offset);
 }
 
 /*******************************************************************************

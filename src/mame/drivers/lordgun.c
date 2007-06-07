@@ -321,7 +321,7 @@ static const gfx_decode lordgun_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &lordgun_16x16x6_layout,  0x600, 0x200/0x40  },	// [2] Tilemap 1
 	{ REGION_GFX3, 0, &lordgun_32x32x6_layout,  0x700, 0x100/0x40  },	// [3] Tilemap 2
 	{ REGION_GFX2, 0, &lordgun_8x8x6_layout,    0x400, 0x400/0x40  },	// [4] Tilemap 3
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

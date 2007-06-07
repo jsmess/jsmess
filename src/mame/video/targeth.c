@@ -64,7 +64,6 @@ static TILE_GET_INFO( get_tile_info_targeth_screen1 )
 WRITE16_HANDLER( targeth_vram_w )
 {
 	targeth_videoram[offset] = data;
-
 	tilemap_mark_tile_dirty(pant[(offset & 0x1fff) >> 12], ((offset << 1) & 0x1fff) >> 2);
 }
 

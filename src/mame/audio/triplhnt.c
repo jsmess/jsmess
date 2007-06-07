@@ -13,7 +13,7 @@ static const char *triplhnt_sample_names[] =
 	"*triplhnt",
 	"bear_rac.wav",
 	"witch.wav",
-	0       /* end of array */
+	0
 };
 
 struct Samplesinterface triplhnt_samples_interface =

@@ -415,7 +415,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &mugsmash_layout,   0x00, 16  }, /* sprites */
 	{ REGION_GFX2, 0, &mugsmash2_layout,  0x100, 256  }, /* bg tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void irq_handler(int irq)

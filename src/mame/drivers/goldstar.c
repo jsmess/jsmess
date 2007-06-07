@@ -266,19 +266,19 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 16 },
 	{ REGION_GFX2, 0, &tilelayout, 128,  8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 static const gfx_decode gfxdecodeinfobl[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 16 },
 	{ REGION_GFX2, 0, &tilelayoutbl, 128,  8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 static const gfx_decode gfxdecodeinfoml[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 16 },
 	{ REGION_GFX2, 0x18000, &tilelayout, 128,  8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -408,7 +408,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( goldstar )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "gs4-cpu.bin",  0x0000, 0x10000, CRC(73e47d4d) SHA1(df2d8233572dc12e8a4b56e5d4f6c566e4ababc9) )
 
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -423,7 +423,7 @@ ROM_END
 
 
 ROM_START( goldstbl )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "gsb-cpu.bin",  0x0000, 0x10000, CRC(82b238c3) SHA1(1306e700e213f423bdd79b182aa11335796f7f38) )
 
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -438,7 +438,7 @@ ROM_END
 
 
 ROM_START( moonlght )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "4.bin",  	  0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )
 
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )

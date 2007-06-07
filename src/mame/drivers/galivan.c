@@ -544,7 +544,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout_512,            0,   8 },
 	{ REGION_GFX2, 0, &tilelayout,             8*16,  16 },
 	{ REGION_GFX3, 0, &spritelayout_512, 8*16+16*16, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode ninjemak_gfxdecodeinfo[] =
@@ -552,7 +552,7 @@ static const gfx_decode ninjemak_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout_1024,            0,   8 },
 	{ REGION_GFX2, 0, &tilelayout,              8*16,  16 },
 	{ REGION_GFX3, 0, &spritelayout_1024, 8*16+16*16, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

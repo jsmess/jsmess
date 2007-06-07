@@ -1134,7 +1134,7 @@ static void setup_playback(running_machine *machine)
 	file_error filerr;
 
 	struct ext_header xheader;
-	unsigned char check[7];
+	char check[7];
 
 	/* if no file, nothing to do */
 	if (filename == NULL || filename[0] == 0)
@@ -1887,7 +1887,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 	UINT32 entrytype = INPUT_TOKEN_INVALID;
 	input_port_entry *port = NULL;
 	const char *modify_tag = NULL;
-	int seq_index[3];
+	int seq_index[3] = {0};
 
 	/* loop over tokens until we hit the end */
 	while (entrytype != INPUT_TOKEN_END)

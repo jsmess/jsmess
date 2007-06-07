@@ -58,11 +58,8 @@ VIDEO_START( vb )
 
 WRITE8_HANDLER( vb_videoram_w )
 {
-	if (vb_videoram[offset] != data)
-	{
-		vb_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	vb_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 READ8_HANDLER( vb_attrib_r )
@@ -72,10 +69,8 @@ READ8_HANDLER( vb_attrib_r )
 
 WRITE8_HANDLER( vb_attrib_w )
 {
-	if( vb_attribram[offset] != data ){
-		vb_attribram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	vb_attribram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 void vb_bgprombank_w( int bank )

@@ -126,20 +126,15 @@ static void sshangha_drawsprites(mame_bitmap *bitmap, UINT16 *spritesrc, UINT16 
 
 WRITE16_HANDLER( sshangha_pf2_data_w )
 {
-	UINT16 oldword=sshangha_pf2_data[offset];
 	COMBINE_DATA(&sshangha_pf2_data[offset]);
-	if (oldword!=sshangha_pf2_data[offset])
-		tilemap_mark_tile_dirty(pf2_tilemap,offset);
+	tilemap_mark_tile_dirty(pf2_tilemap,offset);
 }
 
 WRITE16_HANDLER( sshangha_pf1_data_w )
 {
-	UINT16 oldword=sshangha_pf1_data[offset];
 	COMBINE_DATA(&sshangha_pf1_data[offset]);
-	if (oldword!=sshangha_pf1_data[offset]) {
-		tilemap_mark_tile_dirty(pf1_8x8_tilemap,offset);
-		tilemap_mark_tile_dirty(pf1_16x16_tilemap,offset);
-	}
+	tilemap_mark_tile_dirty(pf1_8x8_tilemap,offset);
+	tilemap_mark_tile_dirty(pf1_16x16_tilemap,offset);
 }
 
 WRITE16_HANDLER( sshangha_control_0_w )

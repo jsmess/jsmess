@@ -354,7 +354,7 @@ static const gfx_layout charlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -446,13 +446,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kikikai )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 )    /* 196k for code */
+	ROM_REGION( 0x28000, REGION_CPU1, 0 )
 	ROM_LOAD( "a85-17.rom", 0x00000, 0x08000, CRC(c141d5ab) SHA1(fe3622ba283e514416c43a44f83f922a958b27cd) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "a85-16.rom", 0x10000, 0x10000, CRC(4094d750) SHA1(05e0ad177a3eb144b203784ecb6242a0fc5c4d4d) ) /* banked at 0x8000           */
 	ROM_COPY(  REGION_CPU1, 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )    /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a85-11.rom", 0x0000, 0x8000, CRC(cc3539db) SHA1(4239a40fdee65cba613e4b4ec54cf7899480e366) )
 
 	ROM_REGION( 0x0800, REGION_CPU3, 0 )    /* 2k for the microcontroller */
@@ -471,13 +471,13 @@ ROM_START( kikikai )
 ROM_END
 
 ROM_START( knightb )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 )    /* 196k for code */
+	ROM_REGION( 0x28000, REGION_CPU1, 0 )
 	ROM_LOAD( "a85-17.rom", 0x00000, 0x08000, CRC(c141d5ab) SHA1(fe3622ba283e514416c43a44f83f922a958b27cd) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "a85-16.rom", 0x10000, 0x10000, CRC(4094d750) SHA1(05e0ad177a3eb144b203784ecb6242a0fc5c4d4d) ) /* banked at 0x8000           */
 	ROM_COPY(  REGION_CPU1, 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )    /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a85-11.rom", 0x0000, 0x8000, CRC(cc3539db) SHA1(4239a40fdee65cba613e4b4ec54cf7899480e366) )
 
 	ROM_REGION( 0x0800, REGION_CPU3, 0 )    /* 2k for the microcontroller */
@@ -496,13 +496,13 @@ ROM_START( knightb )
 ROM_END
 
 ROM_START( kicknrun )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 )    /* 196k for code */
+	ROM_REGION( 0x28000, REGION_CPU1, 0 )
 	ROM_LOAD( "a87-08.bin", 0x00000, 0x08000, CRC(715e1b04) SHA1(60b7259758ec73f1cc945556e9c2b25766b745a8) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "a87-07.bin", 0x10000, 0x10000, CRC(6cb6ebfe) SHA1(fca61fc2ad8fadc1e15b9ff84c7469b68d16e885) ) /* banked at 0x8000           */
 	ROM_COPY(  REGION_CPU1, 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )    /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a87-06.bin", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x0800, REGION_CPU3, 0 )    /* 2k for the microcontroller */
@@ -528,13 +528,13 @@ ROM_START( kicknrun )
 ROM_END
 
 ROM_START( mexico86 )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 )    /* 196k for code */
+	ROM_REGION( 0x28000, REGION_CPU1, 0 )
 	ROM_LOAD( "2_g.bin",    0x00000, 0x08000, CRC(2bbfe0fb) SHA1(8f047e001ea8e49d28f73e546c82812af1c2533c) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "1_f.bin",    0x10000, 0x10000, CRC(0b93e68e) SHA1(c6fbcce83103e3e71a7a1ef9f18a10622ed6b951) ) /* banked at 0x8000           */
 	ROM_COPY(  REGION_CPU1, 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )    /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a87-06.bin", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x0800, REGION_CPU3, 0 )    /* 2k for the microcontroller */

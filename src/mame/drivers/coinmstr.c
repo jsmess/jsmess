@@ -602,7 +602,6 @@ static MACHINE_START( quizmstr )
 	pia_config(0, &quizmstr_pia_0_intf);
 	pia_config(1, &quizmstr_pia_1_intf);
 	pia_config(2, &quizmstr_pia_2_intf);
-	return 0;
 }
 
 static MACHINE_RESET( quizmstr )
@@ -615,7 +614,6 @@ static MACHINE_START( trailblz )
 	pia_config(0, &trailblz_pia_0_intf);
 	pia_config(1, &trailblz_pia_1_intf);
 	pia_config(2, &trailblz_pia_2_intf);
-	return 0;
 }
 
 static MACHINE_RESET( trailblz )

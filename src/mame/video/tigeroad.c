@@ -5,11 +5,8 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE16_HANDLER( tigeroad_videoram_w )
 {
-	if (videoram16[offset] != data)
-	{
-		COMBINE_DATA(&videoram16[offset]);
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	COMBINE_DATA(&videoram16[offset]);
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE16_HANDLER( tigeroad_videoctrl_w )

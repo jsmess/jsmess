@@ -1296,21 +1296,21 @@ static const gfx_decode pspikes_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &pspikes_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
 	{ REGION_GFX2, 0, &pspikes_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode pspikesb_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &pspikesb_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
 	{ REGION_GFX2, 0, &pspikesb_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode pallavol_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &pspikesb_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
 	{ REGION_GFX2, 0, &pallavol_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1320,7 +1320,7 @@ static const gfx_decode turbofrc_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &pspikes_charlayout,   256, 16 },
 	{ REGION_GFX3, 0, &pspikes_spritelayout, 512, 16 },
 	{ REGION_GFX4, 0, &pspikes_spritelayout, 768, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode aerofgtb_gfxdecodeinfo[] =
@@ -1329,7 +1329,7 @@ static const gfx_decode aerofgtb_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &pspikes_charlayout,    256, 16 },
 	{ REGION_GFX3, 0, &aerofgtb_spritelayout, 512, 16 },
 	{ REGION_GFX4, 0, &aerofgtb_spritelayout, 768, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode aerofgt_gfxdecodeinfo[] =
@@ -1338,7 +1338,7 @@ static const gfx_decode aerofgt_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &aerofgt_charlayout,   256, 16 },
 	{ REGION_GFX2, 0, &aerofgt_spritelayout, 512, 16 },
 	{ REGION_GFX3, 0, &aerofgt_spritelayout, 768, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode aerfboot_gfxdecodeinfo[] =
@@ -1347,14 +1347,14 @@ static const gfx_decode aerfboot_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x20000, &aerfboot_charlayout,   256, 16 },
 	{ REGION_GFX2, 0,       &aerfboot_spritelayout, 512, 16 },
 	{ REGION_GFX3, 0,       &aerfboot_spritelayout, 768, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode wbbc97_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &pspikes_charlayout,      0, 64 },	/* colors    0-1023 in 8 banks */
 	{ REGION_GFX2, 0, &wbbc97_spritelayout, 1024, 64 },	/* colors 1024-2047 in 4 banks */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void irqhandler(int irq)
@@ -2397,7 +2397,7 @@ ROM_START( aerfboot )
 	ROM_LOAD16_BYTE( "afb_ep2.u3",  0x00000, 0x40000, CRC(2bb9edf7) SHA1(cf0a62070fc0803dd8c473c375f6a2d1884ba2bf) )
 	ROM_LOAD16_BYTE( "afb_ep3.u2",  0x00001, 0x40000, CRC(475d3df3) SHA1(58bde24e9dea2fb0d7ae4f2a574b06bc1a33a13d) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "afb_ep1.u17",  0x0000, 0x8000, CRC(d41b5ab2) SHA1(17d9b999c9af1f332d67e7ce1a2f71fd08178303) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )

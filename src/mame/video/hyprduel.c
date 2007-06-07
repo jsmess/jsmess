@@ -251,9 +251,8 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 
 INLINE void hyprduel_vram_w(offs_t offset,UINT16 data,UINT16 mem_mask,int layer,UINT16 *vram)
 {
-	UINT16 olddata = vram[offset];
-	UINT16 newdata = COMBINE_DATA(&vram[offset]);
-	if ( newdata != olddata )
+	COMBINE_DATA(&vram[offset]);
+
 	{
 		/* Account for the window */
 		int col		=	(offset % BIG_NX) - ((hyprduel_window[layer * 2 + 1] / 8) % BIG_NX);

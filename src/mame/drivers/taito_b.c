@@ -2545,7 +2545,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },  /* text */
 	{ REGION_GFX1, 0, &tilelayout,  0, 256 },  /* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_layout rambo3_charlayout =
@@ -2575,7 +2575,7 @@ static const gfx_decode rambo3_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &rambo3_charlayout,  0, 256 },  /* text */
 	{ REGION_GFX1, 0, &rambo3_tilelayout,  0, 256 },  /* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

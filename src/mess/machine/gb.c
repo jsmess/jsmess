@@ -240,7 +240,6 @@ static void gb_init(void) {
 MACHINE_START( gb )
 {
 	add_exit_callback(machine, gb_machine_stop);
-	return 0;
 }
 
 MACHINE_RESET( gb )

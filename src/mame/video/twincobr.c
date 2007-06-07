@@ -213,13 +213,8 @@ READ16_HANDLER( twincobr_txram_r )
 }
 WRITE16_HANDLER( twincobr_txram_w )
 {
-	UINT16 oldword = twincobr_txvideoram16[txoffs];
-
-	if (data != oldword)
-	{
-		COMBINE_DATA(&twincobr_txvideoram16[txoffs]);
-		tilemap_mark_tile_dirty(tx_tilemap,txoffs);
-	}
+	COMBINE_DATA(&twincobr_txvideoram16[txoffs]);
+	tilemap_mark_tile_dirty(tx_tilemap,txoffs);
 }
 
 WRITE16_HANDLER( twincobr_bgoffs_w )
@@ -233,13 +228,8 @@ READ16_HANDLER( twincobr_bgram_r )
 }
 WRITE16_HANDLER( twincobr_bgram_w )
 {
-	UINT16 oldword = twincobr_bgvideoram16[bgoffs+twincobr_bg_ram_bank];
-
-	if (data != oldword)
-	{
-		COMBINE_DATA(&twincobr_bgvideoram16[bgoffs+twincobr_bg_ram_bank]);
-		tilemap_mark_tile_dirty(bg_tilemap,(bgoffs+twincobr_bg_ram_bank));
-	}
+	COMBINE_DATA(&twincobr_bgvideoram16[bgoffs+twincobr_bg_ram_bank]);
+	tilemap_mark_tile_dirty(bg_tilemap,(bgoffs+twincobr_bg_ram_bank));
 }
 
 WRITE16_HANDLER( twincobr_fgoffs_w )
@@ -253,13 +243,8 @@ READ16_HANDLER( twincobr_fgram_r )
 }
 WRITE16_HANDLER( twincobr_fgram_w )
 {
-	UINT16 oldword = twincobr_fgvideoram16[fgoffs];
-
-	if (data != oldword)
-	{
-		COMBINE_DATA(&twincobr_fgvideoram16[fgoffs]);
-		tilemap_mark_tile_dirty(fg_tilemap,fgoffs);
-	}
+	COMBINE_DATA(&twincobr_fgvideoram16[fgoffs]);
+	tilemap_mark_tile_dirty(fg_tilemap,fgoffs);
 }
 
 

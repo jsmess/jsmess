@@ -215,16 +215,13 @@ READ8_HANDLER( tceptor_bg_ram_r )
 
 WRITE8_HANDLER( tceptor_bg_ram_w )
 {
-	if (tceptor_bg_ram[offset] != data)
-	{
-		tceptor_bg_ram[offset] = data;
+	tceptor_bg_ram[offset] = data;
 
-		offset /= 2;
-		if (offset < 0x800)
-			tilemap_mark_tile_dirty(bg1_tilemap, offset);
-		else
-			tilemap_mark_tile_dirty(bg2_tilemap, offset - 0x800);
-	}
+	offset /= 2;
+	if (offset < 0x800)
+		tilemap_mark_tile_dirty(bg1_tilemap, offset);
+	else
+		tilemap_mark_tile_dirty(bg2_tilemap, offset - 0x800);
 }
 
 WRITE8_HANDLER( tceptor_bg_scroll_w )

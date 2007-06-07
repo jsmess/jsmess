@@ -198,10 +198,8 @@ READ16_HANDLER( inufuku_bg_videoram_r )
 
 WRITE16_HANDLER( inufuku_bg_videoram_w )
 {
-	int oldword = inufuku_bg_videoram[offset];
 	COMBINE_DATA(&inufuku_bg_videoram[offset]);
-	if (oldword != inufuku_bg_videoram[offset])
-		tilemap_mark_tile_dirty(inufuku_bg_tilemap, offset);
+	tilemap_mark_tile_dirty(inufuku_bg_tilemap, offset);
 }
 
 READ16_HANDLER( inufuku_text_videoram_r )
@@ -211,10 +209,8 @@ READ16_HANDLER( inufuku_text_videoram_r )
 
 WRITE16_HANDLER( inufuku_text_videoram_w )
 {
-	int oldword = inufuku_text_videoram[offset];
 	COMBINE_DATA(&inufuku_text_videoram[offset]);
-	if (oldword != inufuku_text_videoram[offset])
-		tilemap_mark_tile_dirty(inufuku_text_tilemap, offset);
+	tilemap_mark_tile_dirty(inufuku_text_tilemap, offset);
 }
 
 

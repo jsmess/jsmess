@@ -420,7 +420,7 @@ static READ8_HANDLER( protection_r )
 
 static WRITE8_HANDLER( protection_w )
 {
-	protection_ram[offset] = data ^ 0xff;;
+	protection_ram[offset] = data ^ 0xff;
 
 	if (offset == 0x0fff && data == 0)
 		memcpy(&protection_ram[0x0fe0],protection_crc,CRC_LEN);
@@ -2007,14 +2007,14 @@ static const gfx_decode m72_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &spritelayout,    0, 16 },
 	{ REGION_GFX2, 0, &tilelayout,    256, 16 },
 	{ REGION_GFX3, 0, &tilelayout,    256, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode rtype2_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &spritelayout,     0, 16 },
 	{ REGION_GFX2, 0, &tilelayout,     256, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode majtitle_gfxdecodeinfo[] =
@@ -2022,7 +2022,7 @@ static const gfx_decode majtitle_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &spritelayout,     0, 16 },
 	{ REGION_GFX2, 0, &tilelayout,     256, 16 },
 	{ REGION_GFX3, 0, &spritelayout,     0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -2932,7 +2932,7 @@ ROM_START( dbreed )
 	ROM_CONTINUE(					  0x60000, 0x10000 )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "db-a-sp-.14",   0x0000, 0x10000, CRC(54a61560) SHA1(e5fccfcedcadbab1667900f98370043c1907dd89) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2991,7 +2991,7 @@ ROM_START( rtype2 )
 	ROM_LOAD16_BYTE( "ic59.9b",      0x40000, 0x20000, CRC(0fd123bf) SHA1(1133163f6716e9a4bbb437b3a471477d0bd97051) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ic17.4f",      0x0000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3023,7 +3023,7 @@ ROM_START( rtype2j )
 	ROM_LOAD16_BYTE( "rt2-a-l1.59",  0x40000, 0x20000, CRC(12ec1676) SHA1(10cee9a87dd954444b0e64fad7f15a5ae529890d) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ic17.4f",      0x0000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3055,7 +3055,7 @@ ROM_START( majtitle )
 	ROM_LOAD16_BYTE( "mt_l1.bin",    0x40000, 0x20000, CRC(8dbd91b5) SHA1(2bd01f3fba0fa1ca4b6f8ff57e7dc4434c42ce48) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "mt_sp.bin",    0x0000, 0x10000, CRC(e44260a9) SHA1(a2512033c8cca9a8064eae1ada721202edf06e8e) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3089,7 +3089,7 @@ ROM_START( hharry )
 	ROM_LOAD16_BYTE( "a-l1-0.rom",   0x60000, 0x10000, CRC(bc6ac5f9) SHA1(c6afba4967a8055f6b63827697425eac743f5a75) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a-sp-0.rom",   0x0000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3117,7 +3117,7 @@ ROM_START( hharryu )
 	ROM_LOAD16_BYTE( "a-l1-f.9b",    0x60000, 0x10000, CRC(b23e966c) SHA1(f506f6d1f4f7874070e91d1df8f141cca031ce29) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a-sp-0.rom",   0x0000, 0x10000, CRC(80e210e7) SHA1(66cff58fb37c52e1d8e0567e13b774253e862585) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3145,7 +3145,7 @@ ROM_START( dkgensan )
 	ROM_LOAD16_BYTE( "gen-a-l1.bin", 0x60000, 0x10000, CRC(894f8a9f) SHA1(57a0885c52a094def03b129a450cc891e6c075c6) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "gen-a-sp.bin", 0x0000, 0x10000, CRC(e83cfc2c) SHA1(3193bdd06a9712fc499e6fc90a33140463ef59fe) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3204,7 +3204,7 @@ ROM_START( poundfor )
 	ROM_LOAD16_BYTE( "ppa-l1.9c",    0x40000, 0x20000, CRC(5b07b087) SHA1(04a2403eb8c443cb92b880edc612542acdbcafa4) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ppa-sp.4j",    0x0000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3232,7 +3232,7 @@ ROM_START( poundfou )
 	ROM_LOAD16_BYTE( "ppa-l1.9c",    0x40000, 0x20000, CRC(5b07b087) SHA1(04a2403eb8c443cb92b880edc612542acdbcafa4) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ppa-sp.4j",    0x0000, 0x10000, CRC(3f458a5b) SHA1(d73740b2a548bf8a895909da0841f18d9ed32668) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3289,7 +3289,7 @@ ROM_START( cosmccop )
 	ROM_LOAD16_BYTE( "cc-d-l0b.bin", 0x00000, 0x40000, CRC(eff87f70) SHA1(61f49b8738cf31546d4182680b761705274b01bf) )
 	ROM_RELOAD(                      0x80000, 0x40000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "cc-d-sp.bin", 0x0000, 0x10000, CRC(3e3ace60) SHA1(d89b1b84de2887598bb7bcb17b1df1ec8d1862a9) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3346,7 +3346,7 @@ ROM_START( kengo )
 	ROM_LOAD16_BYTE( "ken_d-l0.rom", 0x00000, 0x20000, CRC(04dc0f81) SHA1(b296529f0bc26d53b344449dfa5a08eca70f30d8) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ken_d-sp.rom", 0x0000, 0x10000, CRC(233ca1cf) SHA1(4ebb6162773bd586a10016ccd77998a9b880f474) )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE )

@@ -79,11 +79,8 @@ VIDEO_START( citycon )
 
 WRITE8_HANDLER( citycon_videoram_w )
 {
-	if (citycon_videoram[offset] != data)
-	{
-		citycon_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	citycon_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 

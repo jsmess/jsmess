@@ -516,7 +516,6 @@ static MACHINE_START( xmen )
 {
 	state_save_register_global(sound_curbank);
 	state_save_register_func_postload(sound_reset_bank);
-	return 0;
 }
 
 static MACHINE_DRIVER_START( xmen )

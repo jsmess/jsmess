@@ -263,7 +263,7 @@ static const gfx_decode tagteam_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 4 }, /* chars */
 	{ REGION_GFX1, 0, &spritelayout, 0, 4 }, /* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -290,7 +290,6 @@ static MACHINE_DRIVER_START( tagteam )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(tagteam_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(tagteam)
 	MDRV_VIDEO_START(tagteam)
@@ -312,7 +311,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( bigprowr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "bf00-1.20",    0x08000, 0x2000, CRC(8aba32c9) SHA1(9228082a8251feaf25849311c3de63ca42cf659e) )
 	ROM_LOAD( "bf01.33",      0x0a000, 0x2000, CRC(0a41f3ae) SHA1(1b82cd864f0bd7f16f961fec0b88307996abb166) )
 	ROM_LOAD( "bf02.34",      0x0c000, 0x2000, CRC(a28b0a0e) SHA1(50b40048a3e2efb2afb7acfb4efde6dbc25fc009) )
@@ -343,7 +342,7 @@ ROM_START( bigprowr )
 ROM_END
 
 ROM_START( tagteam )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "prowbf0.bin",  0x08000, 0x2000, CRC(6ec3afae) SHA1(8ae11cb41a72bda053ce8b79c383503da5324cd1) )
 	ROM_LOAD( "prowbf1.bin",  0x0a000, 0x2000, CRC(b8fdd176) SHA1(afa8e890ac54101eef0274c8aabe25d188085a18) )
 	ROM_LOAD( "prowbf2.bin",  0x0c000, 0x2000, CRC(3d33a923) SHA1(e6402290fca72f4fa3a76e37957b9d4f5b4aeddb) )

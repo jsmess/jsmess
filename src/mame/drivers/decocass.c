@@ -398,7 +398,7 @@ static const gfx_decode decocass_gfxdecodeinfo[] =
 	{ 0, 0xd000, &tilelayout,		32, 2 },  /* background tiles */
 	{ 0, 0xd800, &objlayout,		48, 4 },  /* object */
 	{ 0, 0xffff, &missilelayout,	 0, 8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static PALETTE_INIT( decocass )
@@ -708,7 +708,7 @@ MACHINE_DRIVER_END
 
 
 #define DECOCASS_BIOS \
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */ \
+	ROM_REGION( 0x10000, REGION_CPU1, 0 ) \
 	ROM_LOAD_BIOS( 0, "rms8.cpu",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) \
 	ROM_LOAD_BIOS( 1, "dsp3.p0b",     0xf000, 0x0800, CRC(b67a91d9) SHA1(681c040be0f0ed1ba0a50161b36d0ad8e1c8c5cb) ) \
 	ROM_LOAD_BIOS( 1, "dsp3.p1b",     0xf800, 0x0800, CRC(3bfff5f3) SHA1(4e9437cb1b76d64da6b37f01bd6e879fb399e8ce) ) \
@@ -716,7 +716,7 @@ MACHINE_DRIVER_END
 #define DECOCASS_COMMON_ROMS	\
 	DECOCASS_BIOS \
 \
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	  /* 64k for the audio CPU */ \
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	  \
 	ROM_LOAD( "rms8.snd",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) \
 \
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	  /* 4k for the MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \

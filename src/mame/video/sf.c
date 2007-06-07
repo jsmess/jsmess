@@ -80,10 +80,8 @@ VIDEO_START( sf )
 
 WRITE16_HANDLER( sf_videoram_w )
 {
-	int oldword = sf_videoram[offset];
 	COMBINE_DATA(&sf_videoram[offset]);
-	if (oldword != sf_videoram[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE16_HANDLER( sf_bg_scroll_w )

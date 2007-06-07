@@ -131,11 +131,8 @@ static WRITE8_HANDLER( ddayjlc_bgram_w )
 	if(!offset)
 		tilemap_set_scrollx(bg_tilemap,0,data+8);
 
-	if( bgram[offset] != data )
-	{
-		bgram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset&0x3ff);
-	}
+	bgram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset&0x3ff);
 }
 
 static WRITE8_HANDLER( ddayjlc_videoram_w )

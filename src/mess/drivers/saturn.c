@@ -2138,8 +2138,6 @@ MACHINE_START( saturn )
 	state_save_register_global(pmode);
 	state_save_register_global(smpcSR);
 	state_save_register_global_array(SMEM);
-
-	return 0;
 }
 
 MACHINE_RESET( saturn )

@@ -143,7 +143,7 @@ static const gfx_decode gfxdecodeinfo_cowrace[] =
 {
 	{ REGION_GFX1, 0x000000, &layout8x8x4, 0, 0x1 },
 	{ REGION_GFX2, 0x000000, &layout8x8x2, 0, 0x1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 INPUT_PORTS_START( cowrace )

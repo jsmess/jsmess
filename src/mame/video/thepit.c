@@ -237,21 +237,15 @@ VIDEO_START( suprmous )
 
 WRITE8_HANDLER( thepit_videoram_w )
 {
-	if (thepit_videoram[offset] != data)
-	{
-		thepit_videoram[offset] = data;
-		tilemap_mark_tile_dirty(thepit_tilemap, offset);
-	}
+	thepit_videoram[offset] = data;
+	tilemap_mark_tile_dirty(thepit_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( thepit_colorram_w )
 {
-	if (thepit_colorram[offset] != data)
-	{
-		thepit_colorram[offset] = data;
-		tilemap_mark_tile_dirty(thepit_tilemap, offset);
-	}
+	thepit_colorram[offset] = data;
+	tilemap_mark_tile_dirty(thepit_tilemap, offset);
 }
 
 

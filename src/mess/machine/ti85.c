@@ -199,7 +199,6 @@ MACHINE_START( ti81 )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MWA8_ROM);
 	memory_set_bankptr(1,memory_region(REGION_CPU1) + 0x010000);
 	memory_set_bankptr(2,memory_region(REGION_CPU1) + 0x014000);
-	return 0;
 }
 
 MACHINE_START( ti85 )
@@ -233,7 +232,6 @@ MACHINE_START( ti85 )
 
 	add_reset_callback(machine, ti85_reset_serial);
 	add_exit_callback(machine, ti85_free_serial_data_memory);
-	return 0;
 }
 
 MACHINE_START( ti86 )
@@ -274,7 +272,6 @@ MACHINE_START( ti86 )
 
 	add_reset_callback(machine, ti85_reset_serial);
 	add_exit_callback(machine, ti85_free_serial_data_memory);
-	return 0;
 }
 
 /* I/O ports handlers */

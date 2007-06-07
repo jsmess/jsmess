@@ -24,13 +24,9 @@ static mame_bitmap* helper3;
 
 WRITE8_HANDLER( tank8_video_ram_w )
 {
-	if (data != tank8_video_ram[offset])
-	{
-		tilemap_mark_tile_dirty(tilemap1, offset);
-		tilemap_mark_tile_dirty(tilemap2, offset);
-	}
-
 	tank8_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(tilemap1, offset);
+	tilemap_mark_tile_dirty(tilemap2, offset);
 }
 
 

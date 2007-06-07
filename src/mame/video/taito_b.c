@@ -301,18 +301,14 @@ READ16_HANDLER( TC0180VCU_word_r )
 
 WRITE16_HANDLER( TC0180VCU_word_w )
 {
-  UINT16 oldword = TC0180VCU_ram[offset];
-  COMBINE_DATA(&TC0180VCU_ram[offset]);
+	COMBINE_DATA(&TC0180VCU_ram[offset]);
 
-  if (oldword != TC0180VCU_ram[offset])
-  {
-    if ((offset & 0x7000) == fg_rambank[0] || (offset & 0x7000) == fg_rambank[1])
-      tilemap_mark_tile_dirty(fg_tilemap,offset & 0x0fff);
-    if ((offset & 0x7000) == bg_rambank[0] || (offset & 0x7000) == bg_rambank[1])
-      tilemap_mark_tile_dirty(bg_tilemap,offset & 0x0fff);
-    if ((offset & 0x7800) == tx_rambank)
-      tilemap_mark_tile_dirty(tx_tilemap,offset & 0x7ff);
-  }
+	if ((offset & 0x7000) == fg_rambank[0] || (offset & 0x7000) == fg_rambank[1])
+		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x0fff);
+	if ((offset & 0x7000) == bg_rambank[0] || (offset & 0x7000) == bg_rambank[1])
+		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x0fff);
+	if ((offset & 0x7800) == tx_rambank)
+		tilemap_mark_tile_dirty(tx_tilemap,offset & 0x7ff);
 }
 
 READ16_HANDLER( TC0180VCU_framebuffer_word_r )

@@ -144,32 +144,25 @@ READ16_HANDLER( madmotor_pf3_data_r )
 
 WRITE16_HANDLER( madmotor_pf1_data_w )
 {
-	int oldword = madmotor_pf1_data[offset];
 	COMBINE_DATA(&madmotor_pf1_data[offset]);
-	if (oldword != madmotor_pf1_data[offset])
-		tilemap_mark_tile_dirty(madmotor_pf1_tilemap,offset);
+	tilemap_mark_tile_dirty(madmotor_pf1_tilemap,offset);
 }
 
 WRITE16_HANDLER( madmotor_pf2_data_w )
 {
-	int oldword = madmotor_pf2_data[offset];
 	COMBINE_DATA(&madmotor_pf2_data[offset]);
-	if (oldword != madmotor_pf2_data[offset])
-		tilemap_mark_tile_dirty(madmotor_pf2_tilemap,offset);
+	tilemap_mark_tile_dirty(madmotor_pf2_tilemap,offset);
 }
 
 WRITE16_HANDLER( madmotor_pf3_data_w )
 {
-	int oldword = madmotor_pf3_data[offset];
 	COMBINE_DATA(&madmotor_pf3_data[offset]);
-	if (oldword != madmotor_pf3_data[offset])
-	{
-		/* Mark the dirty position on the 512 x 1024 version */
-		tilemap_mark_tile_dirty(madmotor_pf3_tilemap,offset);
 
-		/* Mark the dirty position on the 2048 x 256 version */
-		tilemap_mark_tile_dirty(madmotor_pf3a_tilemap,offset);
-	}
+	/* Mark the dirty position on the 512 x 1024 version */
+	tilemap_mark_tile_dirty(madmotor_pf3_tilemap,offset);
+
+	/* Mark the dirty position on the 2048 x 256 version */
+	tilemap_mark_tile_dirty(madmotor_pf3a_tilemap,offset);
 }
 
 WRITE16_HANDLER( madmotor_pf1_control_w )

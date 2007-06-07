@@ -206,8 +206,6 @@ static MACHINE_START( cloud9 )
 	/* setup for save states */
 	state_save_register_global(irq_state);
 	state_save_register_global_pointer(generic_nvram, generic_nvram_size);
-
-	return 0;
 }
 
 

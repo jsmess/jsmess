@@ -272,8 +272,6 @@ static MACHINE_START( r2dtank )
 	state_save_register_global(flipscreen);
 	state_save_register_global(ttl74123_output);
 	state_save_register_global(AY8910_selected);
-
-	return 0;
 }
 
 

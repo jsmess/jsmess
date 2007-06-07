@@ -211,11 +211,8 @@ WRITE8_HANDLER( fortyl_pixram_w )
 
 WRITE8_HANDLER( fortyl_bg_videoram_w )
 {
-	if( videoram[offset]!=data )
-	{
-		videoram[offset]=data;
-		tilemap_mark_tile_dirty(background,offset);
-	}
+	videoram[offset]=data;
+	tilemap_mark_tile_dirty(background,offset);
 }
 READ8_HANDLER( fortyl_bg_videoram_r )
 {

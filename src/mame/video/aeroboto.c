@@ -98,11 +98,8 @@ WRITE8_HANDLER( aeroboto_3000_w )
 
 WRITE8_HANDLER( aeroboto_videoram_w )
 {
-	if (aeroboto_videoram[offset] != data)
-	{
-		aeroboto_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	aeroboto_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( aeroboto_tilecolor_w )

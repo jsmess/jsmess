@@ -324,7 +324,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tile_8x8_layout,     0, 32 },	/* Tiles (8x8) */
 	{ REGION_GFX1, 0, &tile_16x16_layout,   0, 32 },	/* Tiles (16x16) */
 	{ REGION_GFX2, 0, &spritelayout,      512, 32 },	/* Sprites (16x16) */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_layout bootleg_spritelayout =
@@ -342,7 +342,7 @@ static const gfx_layout bootleg_spritelayout =
 static const gfx_decode bootleg_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &bootleg_spritelayout,     0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

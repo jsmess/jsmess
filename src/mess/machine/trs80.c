@@ -322,7 +322,6 @@ MACHINE_START( trs80 )
 	wd17xx_init(WD_TYPE_179X,trs80_fdc_callback, NULL);
 	add_reset_callback(machine, trs80_machine_reset);
 	add_exit_callback(machine, tape_put_close);
-	return 0;
 }
 
 /*************************************

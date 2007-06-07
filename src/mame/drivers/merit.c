@@ -655,7 +655,7 @@ gfx_decode merit_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tiles8x8x1_layout, 0, 128 },
 	{ REGION_GFX1, 8, &tiles8x8x3_layout, 0,  32 }, // flipped tiles
 	{ REGION_GFX2, 8, &tiles8x8x1_layout, 0, 128 }, // flipped tiles
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static ppi8255_interface ppi8255_intf =

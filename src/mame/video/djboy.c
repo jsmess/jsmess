@@ -36,11 +36,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 WRITE8_HANDLER( djboy_videoram_w )
 {
-	if( videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty( background, offset & 0x7ff);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty( background, offset & 0x7ff);
 }
 
 VIDEO_START( djboy )

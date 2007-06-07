@@ -340,7 +340,6 @@ MACHINE_START( cgenie )
 
 	add_reset_callback(machine, cgenie_machine_reset);
 	add_exit_callback(machine, tape_put_close);
-	return 0;
 }
 
 

@@ -1743,7 +1743,7 @@ static const gfx_decode gfxdecodeinfo_captaven[] =
 	{ REGION_GFX1, 0, &tilelayout,        512, 32 },	/* Tiles 16x16 */
 	{ REGION_GFX2, 0, &tilelayout2,      1024,  4 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &spritelayout,        0, 32 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_fghthist[] =
@@ -1752,7 +1752,7 @@ static const gfx_decode gfxdecodeinfo_fghthist[] =
 	{ REGION_GFX1, 0, &tilelayout,        256,  16 },	/* Tiles 16x16 */
 	{ REGION_GFX2, 0, &tilelayout,        512,  32 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &spritelayout,     1024, 128 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_dragngun[] =
@@ -1762,7 +1762,7 @@ static const gfx_decode gfxdecodeinfo_dragngun[] =
 	{ REGION_GFX3, 0, &tilelayout2,      1024,  4 },	/* Tiles 16x16 */
 	{ REGION_GFX4, 0, &spritelayout4,       0, 32 },	/* Sprites 16x16 */
 	{ REGION_GFX4, 0, &spritelayout5,       0, 32 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_tattass[] =
@@ -1772,7 +1772,7 @@ static const gfx_decode gfxdecodeinfo_tattass[] =
 	{ REGION_GFX2, 0, &tilelayout,        512, 32 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &spritelayout2,    1536, 16 },	/* Sprites 16x16 */
 	{ REGION_GFX4, 0, &spritelayout,     1024+256, 32 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_nslasher[] =
@@ -1782,7 +1782,7 @@ static const gfx_decode gfxdecodeinfo_nslasher[] =
 	{ REGION_GFX2, 0, &tilelayout,        512, 32 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &spritelayout_5bpp,1024, 16 },	/* Sprites 16x16 */
 	{ REGION_GFX4, 0, &spritelayout,     1536, 32 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /**********************************************************************************/

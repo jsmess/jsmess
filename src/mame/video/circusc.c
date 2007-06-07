@@ -124,20 +124,14 @@ VIDEO_START( circusc )
 
 WRITE8_HANDLER( circusc_videoram_w )
 {
-	if (circusc_videoram[offset] != data)
-	{
-		circusc_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	circusc_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( circusc_colorram_w )
 {
-	if (circusc_colorram[offset] != data)
-	{
-		circusc_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	circusc_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( circusc_flipscreen_w )

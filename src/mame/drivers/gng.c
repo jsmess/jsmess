@@ -62,8 +62,6 @@ static MACHINE_START( gng )
 	UINT8 *rombase = memory_region(REGION_CPU1);
 	memory_configure_bank(1,0,4,&rombase[0x10000],0x2000);
 	memory_configure_bank(1,4,1,&rombase[0x4000],0x2000);
-
-	return 0;
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -334,7 +332,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,	 0x80, 16 },	/* colors 0x80-0xbf */
 	{ REGION_GFX2, 0, &tilelayout,	 0x00,	8 },	/* colors 0x00-0x3f */
 	{ REGION_GFX3, 0, &spritelayout, 0x40,	4 },	/* colors 0x40-0x7f */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

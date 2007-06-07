@@ -37,11 +37,8 @@ static TILE_GET_INFO( get_mcatadv_tile_info1 )
 
 WRITE16_HANDLER( mcatadv_videoram1_w )
 {
-	if (mcatadv_videoram1[offset] != data)
-	{
-		COMBINE_DATA(&mcatadv_videoram1[offset]);
-		tilemap_mark_tile_dirty(mcatadv_tilemap1,offset/2);
-	}
+	COMBINE_DATA(&mcatadv_videoram1[offset]);
+	tilemap_mark_tile_dirty(mcatadv_tilemap1,offset/2);
 }
 
 static TILE_GET_INFO( get_mcatadv_tile_info2 )
@@ -58,11 +55,8 @@ static TILE_GET_INFO( get_mcatadv_tile_info2 )
 
 WRITE16_HANDLER( mcatadv_videoram2_w )
 {
-	if (mcatadv_videoram2[offset] != data)
-	{
-		COMBINE_DATA(&mcatadv_videoram2[offset]);
-		tilemap_mark_tile_dirty(mcatadv_tilemap2,offset/2);
-	}
+	COMBINE_DATA(&mcatadv_videoram2[offset]);
+	tilemap_mark_tile_dirty(mcatadv_tilemap2,offset/2);
 }
 
 

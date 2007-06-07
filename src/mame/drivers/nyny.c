@@ -239,8 +239,6 @@ static MACHINE_START( nyny )
 	state_save_register_global(star_enable);
 	state_save_register_global(star_delay_counter);
 	state_save_register_global(star_shift_reg);
-
-	return 0;
 }
 
 

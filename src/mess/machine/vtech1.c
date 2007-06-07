@@ -132,19 +132,16 @@ static void common_init_machine(int base)
 MACHINE_START(laser110)
 {
 	common_init_machine(0x8000);
-	return 0;
 }
 
 MACHINE_START(laser210)
 {
 	common_init_machine(0x9000);
-	return 0;
 }
 
 MACHINE_START(laser310)
 {
 	common_init_machine(0xb800);
-	return 0;
 }
 
 

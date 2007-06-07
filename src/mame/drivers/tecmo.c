@@ -541,7 +541,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &spritelayout, 0, 16 },	/* colors   0 - 255 */
 	{ REGION_GFX3, 0, &tilelayout, 512, 16 },	/* colors 512 - 767 */
 	{ REGION_GFX4, 0, &tilelayout, 768, 16 },	/* colors 768 - 1023 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -631,12 +631,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rygar )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x18000, REGION_CPU1, 0 )
 	ROM_LOAD( "5.5p",         0x00000, 0x08000, CRC(062cd55d) SHA1(656e29c890f5de964920b7841b3e11469cd20051) ) /* code */
 	ROM_LOAD( "cpu_5m.bin",   0x08000, 0x04000, CRC(7ac5191b) SHA1(305f39d974f906f9bc24e9fe2ca58e647925ab63) ) /* code */
 	ROM_LOAD( "cpu_5j.bin",   0x10000, 0x08000, CRC(ed76d606) SHA1(39c8a07e9a1f218ad088d00a2c9dfc993efafb6b) ) /* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "cpu_4h.bin",   0x0000, 0x2000, CRC(e4a2fa87) SHA1(ed58187dbbcf59358496a98ffd6c227a87d6c433) )
 
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -665,12 +665,12 @@ ROM_START( rygar )
 ROM_END
 
 ROM_START( rygar2 )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x18000, REGION_CPU1, 0 )
 	ROM_LOAD( "cpu_5p.bin",   0x00000, 0x08000, CRC(e79c054a) SHA1(1aaffa53d121d5c55899bf18e85c42333fe0df54) ) /* code */
 	ROM_LOAD( "cpu_5m.bin",   0x08000, 0x04000, CRC(7ac5191b) SHA1(305f39d974f906f9bc24e9fe2ca58e647925ab63) ) /* code */
 	ROM_LOAD( "cpu_5j.bin",   0x10000, 0x08000, CRC(ed76d606) SHA1(39c8a07e9a1f218ad088d00a2c9dfc993efafb6b) ) /* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "cpu_4h.bin",   0x0000, 0x2000, CRC(e4a2fa87) SHA1(ed58187dbbcf59358496a98ffd6c227a87d6c433) )
 
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -699,13 +699,13 @@ ROM_START( rygar2 )
 ROM_END
 
 ROM_START( rygarj )
-	ROM_REGION( 0x18000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x18000, REGION_CPU1, 0 )
 
 	ROM_LOAD( "cpuj_5p.bin",  0x00000, 0x08000, CRC(b39698ba) SHA1(01a5a12a71973ad117b0bbd763e470f89c439e45) ) /* code */
 	ROM_LOAD( "cpuj_5m.bin",  0x08000, 0x04000, CRC(3f180979) SHA1(c4c2e9f83b06b8677978800bfcc39f4ba3b344ab) ) /* code */
 	ROM_LOAD( "cpuj_5j.bin",  0x10000, 0x08000, CRC(69e44e8f) SHA1(e979760a3582e64788c043adf7e475f0e1b75033) ) /* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "cpu_4h.bin",   0x0000, 0x2000, CRC(e4a2fa87) SHA1(ed58187dbbcf59358496a98ffd6c227a87d6c433) )
 
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -734,11 +734,11 @@ ROM_START( rygarj )
 ROM_END
 
 ROM_START( silkworm )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "silkworm.4",   0x00000, 0x10000, CRC(a5277cce) SHA1(3886a3f3d1230d49d541f884c5b29938e13f98c8) )	/* c000-ffff is not used */
 	ROM_LOAD( "silkworm.5",   0x10000, 0x10000, CRC(a6c7bb51) SHA1(75f6625459ab65f2d47a282c1295d4db38f5fe51) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )
 	ROM_LOAD( "silkworm.3",   0x0000, 0x8000, CRC(b589f587) SHA1(0be5e2bf3daf3e28d63fdc8c89bb6fe7c48c6c3f) )
 
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -767,11 +767,11 @@ ROM_START( silkworm )
 ROM_END
 
 ROM_START( silkwrm2 )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "r4",           0x00000, 0x10000, CRC(6df3df22) SHA1(9d6201c2df014bdb6877dfff936dddde1fe6fbd0) )	/* c000-ffff is not used */
 	ROM_LOAD( "silkworm.5",   0x10000, 0x10000, CRC(a6c7bb51) SHA1(75f6625459ab65f2d47a282c1295d4db38f5fe51) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )
 	ROM_LOAD( "r3",           0x0000, 0x8000, CRC(b79848d0) SHA1(d8162ab847bd0768572454d9775b0e9ed92b9519) )
 
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -800,11 +800,11 @@ ROM_START( silkwrm2 )
 ROM_END
 
 ROM_START( gemini )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "gw04-5s.rom",  0x00000, 0x10000, CRC(ff9de855) SHA1(34167af8456a081f68b338f10d4319ce1e703fd4) )	/* c000-ffff is not used */
 	ROM_LOAD( "gw05-6s.rom",  0x10000, 0x10000, CRC(5a6947a9) SHA1(18b7aeb0f0e2c396bc759118dd7c45fd6070b804) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "gw03-5h.rom",  0x0000, 0x8000, CRC(9bc79596) SHA1(61de9ddd45140e8ed88173294bd26147e2abfa21) )
 
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )

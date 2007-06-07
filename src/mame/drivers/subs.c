@@ -28,19 +28,12 @@
  *
  *************************************/
 
-static unsigned short colortable_source[] =
-{
-	0x00, 0x01,		/* Right screen */
-	0x02, 0x03		/* Left screen */
-};
-
 static PALETTE_INIT( subs )
 {
 	palette_set_color(machine,0,0x00,0x00,0x00); /* BLACK - modified on video invert */
 	palette_set_color(machine,1,0xff,0xff,0xff); /* WHITE - modified on video invert */
 	palette_set_color(machine,2,0x00,0x00,0x00); /* BLACK - modified on video invert */
 	palette_set_color(machine,3,0xff,0xff,0xff); /* WHITE - modified on video invert*/
-	memcpy(colortable,colortable_source,sizeof(colortable_source));
 }
 
 
@@ -205,7 +198,6 @@ static MACHINE_DRIVER_START( subs )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(4)
-	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MDRV_SCREEN_ADD("left", 0x000)
@@ -248,7 +240,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( subs )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "34190.p1",     0x2800, 0x0800, CRC(a88aef21) SHA1(3811c137041ca43a6e49fbaf7d9d8ef37ba190a2) )
 	ROM_LOAD( "34191.p2",     0x3000, 0x0800, CRC(2c652e72) SHA1(097b665e803cbc57b5a828403a8d9a258c19e97f) )
 	ROM_LOAD( "34192.n2",     0x3800, 0x0800, CRC(3ce63d33) SHA1(a413cb3e0d03dc40a50f5b03b76a4edbe7906f3e) )

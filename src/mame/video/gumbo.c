@@ -10,11 +10,8 @@ static tilemap *gumbo_fg_tilemap;
 
 WRITE16_HANDLER( gumbo_bg_videoram_w )
 {
-	if (gumbo_bg_videoram[offset] != data)
-	{
-		COMBINE_DATA(&gumbo_bg_videoram[offset]);
-		tilemap_mark_tile_dirty(gumbo_bg_tilemap,offset);
-	}
+	COMBINE_DATA(&gumbo_bg_videoram[offset]);
+	tilemap_mark_tile_dirty(gumbo_bg_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_gumbo_bg_tile_info )
@@ -27,11 +24,8 @@ static TILE_GET_INFO( get_gumbo_bg_tile_info )
 
 WRITE16_HANDLER( gumbo_fg_videoram_w )
 {
-	if (gumbo_fg_videoram[offset] != data)
-	{
-		COMBINE_DATA(&gumbo_fg_videoram[offset]);
-		tilemap_mark_tile_dirty(gumbo_fg_tilemap,offset);
-	}
+	COMBINE_DATA(&gumbo_fg_videoram[offset]);
+	tilemap_mark_tile_dirty(gumbo_fg_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_gumbo_fg_tile_info )

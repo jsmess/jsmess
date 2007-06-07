@@ -114,11 +114,8 @@ VIDEO_START( suprloco )
 
 WRITE8_HANDLER( suprloco_videoram_w )
 {
-	if (suprloco_videoram[offset] != data)
-	{
-		suprloco_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
-	}
+	suprloco_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 static int suprloco_scrollram[32];

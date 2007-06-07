@@ -1880,7 +1880,6 @@ static MACHINE_RESET( plus )
 static MACHINE_START( plus )
 {
 	amstrad_plus_asic_ram = memory_region(REGION_USER1);  // 16kB RAM for ASIC, memory-mapped registers.
-	return 0;
 }
 
 static MACHINE_RESET( kccomp )

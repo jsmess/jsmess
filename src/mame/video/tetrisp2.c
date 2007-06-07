@@ -164,9 +164,8 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 WRITE16_HANDLER( tetrisp2_vram_bg_w )
 {
-	UINT16 old_data	=	tetrisp2_vram_bg[offset];
-	UINT16 new_data	=	COMBINE_DATA(&tetrisp2_vram_bg[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_bg,offset/2);
+	COMBINE_DATA(&tetrisp2_vram_bg[offset]);
+	tilemap_mark_tile_dirty(tilemap_bg,offset/2);
 }
 
 
@@ -187,9 +186,8 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 WRITE16_HANDLER( tetrisp2_vram_fg_w )
 {
-	UINT16 old_data	=	tetrisp2_vram_fg[offset];
-	UINT16 new_data	=	COMBINE_DATA(&tetrisp2_vram_fg[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_fg,offset/2);
+	COMBINE_DATA(&tetrisp2_vram_fg[offset]);
+	tilemap_mark_tile_dirty(tilemap_fg,offset/2);
 }
 
 
@@ -206,9 +204,8 @@ static TILE_GET_INFO( get_tile_info_rot )
 
 WRITE16_HANDLER( tetrisp2_vram_rot_w )
 {
-	UINT16 old_data	=	tetrisp2_vram_rot[offset];
-	UINT16 new_data	=	COMBINE_DATA(&tetrisp2_vram_rot[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_rot,offset/2);
+	COMBINE_DATA(&tetrisp2_vram_rot[offset]);
+	tilemap_mark_tile_dirty(tilemap_rot,offset/2);
 }
 
 static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
@@ -224,9 +221,8 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_bg )
 
 WRITE16_HANDLER( rocknms_sub_vram_bg_w )
 {
-	UINT16 old_data	=	rocknms_sub_vram_bg[offset];
-	UINT16 new_data	=	COMBINE_DATA(&rocknms_sub_vram_bg[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_sub_bg,offset/2);
+	COMBINE_DATA(&rocknms_sub_vram_bg[offset]);
+	tilemap_mark_tile_dirty(tilemap_sub_bg,offset/2);
 }
 
 
@@ -243,9 +239,8 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_fg )
 
 WRITE16_HANDLER( rocknms_sub_vram_fg_w )
 {
-	UINT16 old_data	=	rocknms_sub_vram_fg[offset];
-	UINT16 new_data	=	COMBINE_DATA(&rocknms_sub_vram_fg[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_sub_fg,offset/2);
+	COMBINE_DATA(&rocknms_sub_vram_fg[offset]);
+	tilemap_mark_tile_dirty(tilemap_sub_fg,offset/2);
 }
 
 
@@ -262,9 +257,8 @@ static TILE_GET_INFO( get_tile_info_rocknms_sub_rot )
 
 WRITE16_HANDLER( rocknms_sub_vram_rot_w )
 {
-	UINT16 old_data	=	rocknms_sub_vram_rot[offset];
-	UINT16 new_data	=	COMBINE_DATA(&rocknms_sub_vram_rot[offset]);
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_sub_rot,offset/2);
+	COMBINE_DATA(&rocknms_sub_vram_rot[offset]);
+	tilemap_mark_tile_dirty(tilemap_sub_rot,offset/2);
 }
 
 

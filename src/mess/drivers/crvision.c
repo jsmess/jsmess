@@ -380,8 +380,6 @@ static MACHINE_START( crvision )
 
 	TMS9928A_configure(&tms9918_intf);
 	pia_config(0, &crvision_pia_intf);
-
-	return 0;
 }
 
 static MACHINE_START( fnvision )
@@ -391,8 +389,6 @@ static MACHINE_START( fnvision )
 
 	TMS9928A_configure(&tms9929_intf);
 	pia_config(0, &crvision_pia_intf);
-
-	return 0;
 }
 
 static MACHINE_RESET( crvision )

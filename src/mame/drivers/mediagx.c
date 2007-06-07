@@ -107,8 +107,8 @@ static UINT32 parport;
 
 static UINT32 cx5510_regs[256/4];
 
-static UINT16 *dacl;
-static UINT16 *dacr;
+static INT16 *dacl;
+static INT16 *dacr;
 static int dacl_ptr = 0;
 static int dacr_ptr = 0;
 
@@ -779,7 +779,7 @@ static const gfx_decode CGA_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x0800, &CGA_charlayout,              0, 256 },   /* Font 1 */
 	{ REGION_GFX1, 0x1000, &CGA_charlayout,              0, 256 },   /* Font 2 */
 	{ REGION_GFX1, 0x1800, &CGA_charlayout,              0, 256 },   /* Font 3*/
-    { -1 } /* end of array */
+    { -1 }
 };
 
 INPUT_PORTS_START(mediagx)

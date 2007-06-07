@@ -229,28 +229,14 @@ VIDEO_UPDATE( acommand )
 
 WRITE16_HANDLER( ac_bgvram_w )
 {
-	int oldword = ac_bgvram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
-
-	if (oldword != newword)
-	{
-		ac_bgvram[offset] = newword;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	COMBINE_DATA(&ac_bgvram[offset]);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE16_HANDLER( ac_txvram_w )
 {
-	int oldword = ac_txvram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
-
-	if (oldword != newword)
-	{
-		ac_txvram[offset] = newword;
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	COMBINE_DATA(&ac_txvram[offset]);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 static WRITE16_HANDLER(ac_bgscroll_w)
@@ -520,7 +506,7 @@ static const gfx_decode acommand_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout, 0x2700, 16 }, /*???*/
 	{ REGION_GFX2, 0, &tilelayout, 0x1800, 256 },
 	{ REGION_GFX3, 0, &tilelayout, 0x1800, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static INTERRUPT_GEN( acommand_irq )

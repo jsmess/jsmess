@@ -743,7 +743,7 @@ static const char *gaplus_sample_names[] =
 {
 	"*gaplus",
 	"bang.wav",
-	0       /* end of array */
+	0
 };
 
 static struct Samplesinterface samples_interface =

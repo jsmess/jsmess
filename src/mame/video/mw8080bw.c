@@ -45,9 +45,7 @@ VIDEO_UPDATE( mw8080bw )
 
 			/* end of screen? */
 			if (y == 0)
-			{
 				break;
-			}
 		}
 		/* the video RAM is read at every 8 pixels starting with pixel 4 */
 		else if ((x & 0x07) == 0x04)
@@ -79,19 +77,18 @@ VIDEO_UPDATE( mw8080bw )
 
 VIDEO_UPDATE( spcenctr )
 {
-	UINT8 draw_line, draw_trench, draw_floor;
-	UINT8 width, floor_width, center;
 	UINT8 line_buf[256]; /* 256x1 bit RAM */
+
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
+	UINT8 draw_line = 0;
+	UINT8 draw_trench = 0;
+	UINT8 draw_floor = 0;
+	UINT8 width = spcenctr_get_trench_width();
+	UINT8 floor_width = width;
+	UINT8 center = spcenctr_get_trench_center();
 
-	draw_line = 0;
-	draw_trench = 0;
-	draw_floor = 0;
-	width = spcenctr_get_trench_width();
-	floor_width = spcenctr_get_trench_width();
-	center = spcenctr_get_trench_center();
 	memset(line_buf, 0, 256);
 
 	while (1)
@@ -106,17 +103,13 @@ VIDEO_UPDATE( spcenctr )
 			line_buf[x] = draw_line;
 
 			if (!bit)
-			{
 				pen = draw_line ? PHANTOM2_TOP_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_TOP_TRENCH_DARK_RGB32_PEN;
-			}
 		}
 		/* sides of trench? */
 		else if (!(floor_width & 0x80) && (draw_trench || draw_floor))
 		{
 			if (!bit)
-			{
 				pen = line_buf[x] ? PHANTOM2_SIDE_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_SIDE_TRENCH_DARK_RGB32_PEN;
-			}
 		}
 		/* bottom of trench? */
 		else if (draw_floor)
@@ -124,9 +117,7 @@ VIDEO_UPDATE( spcenctr )
 			line_buf[x] = line_buf[x - 1];
 
 			if (!bit)
-			{
 				pen = line_buf[x] ? PHANTOM2_BOTTOM_TRENCH_LIGHT_RGB32_PEN : PHANTOM2_BOTTOM_TRENCH_DARK_RGB32_PEN;
-			}
 		}
 
 		*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
@@ -156,29 +147,31 @@ VIDEO_UPDATE( spcenctr )
 				video_data = video_data >> 1;
 			}
 
-			/* update the cloud control for the next line */
+			/* update the trench control for the next line */
 			offs = ((offs_t)y << 5) | 0x1f;
 			trench_control = mw8080bw_ram[offs];
 
-			if (trench_control & 0x40)  draw_trench = 1;
-			if (trench_control & 0x20)  draw_trench = 0;
+			if (trench_control & 0x40)
+				draw_trench = 1;
 
-			if (trench_control & 0x10)  draw_floor = 1;
-			if (trench_control & 0x08)  draw_floor = 0;
+			if (trench_control & 0x20)
+				draw_trench = 0;
+
+			if (trench_control & 0x10)
+				draw_floor = 1;
+
+			if (trench_control & 0x08)
+				draw_floor = 0;
 
 			draw_line = (trench_control & 0x80) >> 7;
 
 			/* add the lower 2 bits stored in the slope array to width */
 			if (draw_trench)
-			{
 				width = width + (spcenctr_get_trench_slope(y) & 0x03);
-			}
 
 			/* add the higher 2 bits stored in the slope array to floor width */
 			if (draw_floor)
-			{
 				floor_width = floor_width + ((spcenctr_get_trench_slope(y) & 0x0c) >> 2);
-			}
 
 			/* next row, video_data is now 0, so the next line will start
                with 4 blank pixels */
@@ -186,9 +179,7 @@ VIDEO_UPDATE( spcenctr )
 
 			/* end of screen? */
 			if (y == 0)
-			{
 				break;
-			}
 		}
 		/* the video RAM is read at every 8 pixels starting with pixel 4 */
 		else if ((x & 0x07) == 0x04)
@@ -249,13 +240,9 @@ VIDEO_UPDATE( phantom2 )
 
 		/* if background color, cloud gfx in the background */
 		if ((bit == 0) && (cloud_data & 0x01))
-		{
 			pen = PHANTOM2_RGB32_CLOUD_PEN;
-		}
 		else
-		{
 			pen = bit ? RGB_WHITE : RGB_BLACK;
-		}
 
 		*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pen;
 
@@ -277,13 +264,9 @@ VIDEO_UPDATE( phantom2 )
 		{
 			/* load or shift? */
 			if (load_shift_reg)
-			{
 				cloud_data = cloud_data_to_load;
-			}
 			else
-			{
 				cloud_data = cloud_data >> 1;
-			}
 		}
 
 		/* end of line? */
@@ -304,9 +287,7 @@ VIDEO_UPDATE( phantom2 )
 			cloud_counter = cloud_counter + 1;
 
 			if (cloud_counter == PHANTOM2_CLOUD_COUNTER_END)
-			{
 				cloud_counter = PHANTOM2_CLOUD_COUNTER_START;
-			}
 
 			/* next row of pixels, video_data is now 0, so the next
                line will start with 4 blank pixels */
@@ -314,9 +295,7 @@ VIDEO_UPDATE( phantom2 )
 
 			/* end of screen? */
 			if (y == 0)
-			{
 				break;
-			}
 		}
 		/* the video RAM is read at every 8 pixels starting with pixel 4 */
 		else if ((x & 0x07) == 0x04)
@@ -337,9 +316,7 @@ VIDEO_EOF( phantom2 )
 	cloud_counter = cloud_counter + MW8080BW_VTOTAL;
 
 	if (cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)
-	{
 		cloud_counter = PHANTOM2_CLOUD_COUNTER_START + (cloud_counter - PHANTOM2_CLOUD_COUNTER_END);
-	}
 
 	phantom2_set_cloud_counter(cloud_counter);
 }
@@ -400,9 +377,7 @@ VIDEO_UPDATE( invaders )
 
 			/* end of screen? */
 			if (y == 0)
-			{
 				break;
-			}
 		}
 		/* the video RAM is read at every 8 pixels starting with pixel 4 */
 		else if ((x & 0x07) == 0x04)

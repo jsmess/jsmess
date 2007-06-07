@@ -288,7 +288,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x000000, &layout16x16,  0, 0x100 },
 	{ REGION_GFX2, 0x000000, &layout8x8_2,  0, 0x80 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

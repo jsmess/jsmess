@@ -135,7 +135,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, 		&tilelayout,      0, 2 },
 	{ REGION_GFX1, 0x10000, &tilelayout,      0, 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static INTERRUPT_GEN( trucocl_interrupt )

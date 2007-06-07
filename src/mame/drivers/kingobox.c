@@ -464,7 +464,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x01000, &charlayout,   256,  8 },	/* characters */
 	{ REGION_GFX2, 0x00000, &spritelayout,   0, 32 },	/* sprites */
 	{ REGION_GFX3, 0x00000, &tilelayout,     0, 32 },	/* bg tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* Ring King */
@@ -537,7 +537,7 @@ static const gfx_decode rk_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x00000, &rk_spritelayout,   0, 32 },	/* sprites */
 	{ REGION_GFX3, 0x00000, &rk_tilelayout,     0, 32 },	/* sprites/bg tiles */
 	{ REGION_GFX4, 0x00000, &rk_bglayout,       0, 32 },	/* bg tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static struct AY8910interface ay8910_interface =
@@ -659,7 +659,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kingofb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "d09_22.bin",   0x00000, 0x4000, CRC(6220bfa2) SHA1(cb329406ed07b71f9d2c40fc6c2c196daaa56fc8) )
 	ROM_LOAD( "e09_23.bin",   0x04000, 0x4000, CRC(5782fdd8) SHA1(6c8c1114ce7863f9e8331796e2c5fb4928904b55) )
 
@@ -669,7 +669,7 @@ ROM_START( kingofb )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "j09_dcr.bin",  0x00000, 0x2000, CRC(379f4f84) SHA1(c8171e15fe243857b6ca8f32c1cc09f12fa4c07c) )
 
-	ROM_REGION( 0x10000, REGION_CPU4, 0 )     /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU4, 0 )
 	ROM_LOAD( "f05_18.bin",   0x00000, 0x4000, CRC(c057e28e) SHA1(714d8f14d55a070efcf205f8946269181bf2198b) )
 	ROM_LOAD( "h05_19.bin",   0x04000, 0x4000, CRC(060253dd) SHA1(9a24fc6aca64262e935971f96b3a103df9711f20) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
@@ -705,7 +705,7 @@ ROM_END
 
 /* Ring King */
 ROM_START( ringking )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cx13.9f",      0x00000, 0x8000, CRC(93e38c02) SHA1(8f96f16f2904ef83101448fdf201b98b8e75e1d6) )
 	ROM_LOAD( "cx14.11f",     0x08000, 0x4000, CRC(a435acb0) SHA1(2c9d4e8471d87ce148f9c2180769350401914fc0) )
 
@@ -715,7 +715,7 @@ ROM_START( ringking )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "cx00.4c",      0x00000, 0x2000, CRC(880b8aa7) SHA1(e5ee80cac85a62ae5a677115a74c08e433cd4fc9) )
 
-	ROM_REGION( 0x10000, REGION_CPU4, 0 )     /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU4, 0 )
 	ROM_LOAD( "cx12.4ef",     0x00000, 0x8000, CRC(1d5d6c6b) SHA1(ea771f3e25850319f2fecfc91400fc1b9df606ef) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
 
@@ -742,7 +742,7 @@ ROM_START( ringking )
 ROM_END
 
 ROM_START( ringkin2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rkngm1.bin",   0x00000, 0x8000, CRC(086921ea) SHA1(c5a594be0738a80c5f912dc819332ff61aa6fc4b) )
 	ROM_LOAD( "rkngm2.bin",   0x08000, 0x4000, CRC(c0b636a4) SHA1(c3640a5597242e735673e1dbf8bf866e9122a20f) )
 
@@ -752,7 +752,7 @@ ROM_START( ringkin2 )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "cx00.4c",      0x00000, 0x2000, CRC(880b8aa7) SHA1(e5ee80cac85a62ae5a677115a74c08e433cd4fc9) )
 
-	ROM_REGION( 0x10000, REGION_CPU4, 0 )     /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU4, 0 )
 	ROM_LOAD( "cx12.4ef",     0x00000, 0x8000, CRC(1d5d6c6b) SHA1(ea771f3e25850319f2fecfc91400fc1b9df606ef) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
 
@@ -779,7 +779,7 @@ ROM_START( ringkin2 )
 ROM_END
 
 ROM_START( ringkin3 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "14.9d",        0x00000, 0x4000, CRC(63627b8b) SHA1(eea736c8eec59fa561b9d1b5aa43df5410d8dde7) )
 	ROM_LOAD( "15.9e",        0x04000, 0x4000, CRC(e7557489) SHA1(49dce8f6ce26283fbdca17d75699de4d636a900a) )
 	ROM_LOAD( "16.9f",        0x08000, 0x4000, CRC(a3b3bb16) SHA1(4b4cb95a6bf4608ada1669208d9cabc3f856585a) )
@@ -790,7 +790,7 @@ ROM_START( ringkin3 )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "j09_dcr.bin",  0x00000, 0x2000, CRC(379f4f84) SHA1(c8171e15fe243857b6ca8f32c1cc09f12fa4c07c) )
 
-	ROM_REGION( 0x10000, REGION_CPU4, 0 )     /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU4, 0 )
 	ROM_LOAD( "f05_18.bin",   0x00000, 0x4000, CRC(c057e28e) SHA1(714d8f14d55a070efcf205f8946269181bf2198b) )
 	ROM_LOAD( "h05_19.bin",   0x04000, 0x4000, CRC(060253dd) SHA1(9a24fc6aca64262e935971f96b3a103df9711f20) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
@@ -821,7 +821,7 @@ ROM_START( ringkin3 )
 ROM_END
 
 ROM_START( ringkinw )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "15.9d",        0x00000, 0x4000, CRC(8263f517) SHA1(942012bfcc98dd2cd0437e015a164933c99d0f36) )
 	ROM_LOAD( "16.9e",        0x04000, 0x4000, CRC(daadd700) SHA1(2405e954a28d18ae8c30955d0ad7c25c9abb2bd3) )
 
@@ -831,7 +831,7 @@ ROM_START( ringkinw )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "17.xx",        0x00000, 0x2000, CRC(379f4f84) SHA1(c8171e15fe243857b6ca8f32c1cc09f12fa4c07c) )
 
-	ROM_REGION( 0x10000, REGION_CPU4, 0 )     /* 64k for the audio cpu */
+	ROM_REGION( 0x10000, REGION_CPU4, 0 )
 	ROM_LOAD( "18.4f",        0x00000, 0x4000, CRC(c057e28e) SHA1(714d8f14d55a070efcf205f8946269181bf2198b) )
 	ROM_LOAD( "19.4h",        0x04000, 0x4000, CRC(060253dd) SHA1(9a24fc6aca64262e935971f96b3a103df9711f20) )
 	ROM_LOAD( "20.4j",        0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )

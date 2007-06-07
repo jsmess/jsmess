@@ -624,7 +624,7 @@ ROM_START( mhavoc )
 	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 16k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) )
 	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
 
@@ -655,7 +655,7 @@ ROM_START( mhavoc2 )
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 16k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "136025.108",   0x08000, 0x4000, CRC(93faf210) SHA1(7744368a1d520f986d1c4246113a7e24fcdd6d04) )
 	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
 
@@ -684,7 +684,7 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.907",   0x1c000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 16k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "136025.908",   0x08000, 0x4000, CRC(c52ec664) SHA1(08120a385f71b17ec02a3c2ef856ff835a91773e) )
 	ROM_RELOAD(               0x0c000, 0x4000 ) /* reset+interrupt vectors */
 
@@ -715,7 +715,7 @@ ROM_START( mhavocp )
 	/* the last 0x1000 is used for the 2 RAM pages */
 
 	/* Gamma Processor ROM */
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 16k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "136025.008",   0x8000, 0x4000, CRC(22ea7399) SHA1(eeda8cc40089506063835a62c3273e7dd3918fd5) )
 	ROM_RELOAD(               0xc000, 0x4000 )/* reset+interrupt vectors */
 

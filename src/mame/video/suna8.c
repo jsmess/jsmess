@@ -127,25 +127,19 @@ READ8_HANDLER( suna8_banked_spriteram_r )
 
 WRITE8_HANDLER( suna8_spriteram_w )
 {
-	if (spriteram[offset] != data)
-	{
-		spriteram[offset] = data;
+	spriteram[offset] = data;
 #if TILEMAPS
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 #endif
-	}
 }
 
 WRITE8_HANDLER( suna8_banked_spriteram_w )
 {
 	offset += suna8_spritebank * 0x2000;
-	if (spriteram[offset] != data)
-	{
-		spriteram[offset] = data;
+	spriteram[offset] = data;
 #if TILEMAPS
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 #endif
-	}
 }
 
 /*

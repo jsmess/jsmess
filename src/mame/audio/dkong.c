@@ -38,8 +38,6 @@ SOUND_START( dkong )
 	climb = 0;
 	sh_climb_count = 0;
 	snapjaw = 0;
-
-	return 0;
 }
 
 

@@ -232,15 +232,8 @@ READ16_HANDLER( nmk_bgvideoram_r )
 
 WRITE16_HANDLER( nmk_bgvideoram_w )
 {
-	int oldword = nmk_bgvideoram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
-
-	if (oldword != newword)
-	{
-		nmk_bgvideoram[offset] = newword;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	COMBINE_DATA(&nmk_bgvideoram[offset]);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 READ16_HANDLER( nmk_fgvideoram_r )
@@ -268,15 +261,8 @@ READ16_HANDLER( nmk_txvideoram_r )
 
 WRITE16_HANDLER( nmk_txvideoram_w )
 {
-	int oldword = nmk_txvideoram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
-
-	if (oldword != newword)
-	{
-		nmk_txvideoram[offset] = newword;
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	COMBINE_DATA(&nmk_txvideoram[offset]);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 static int mustang_bg_xscroll;

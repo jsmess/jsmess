@@ -31,20 +31,14 @@ static unsigned char *char_bank;
 
 WRITE8_HANDLER( supdrapo_videoram_w )
 {
-	if( videoram[offset] != data )
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( supdrapo_char_bank_w )
 {
-	if( char_bank[offset] != data )
-	{
-		char_bank[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	char_bank[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )

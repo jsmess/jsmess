@@ -122,20 +122,14 @@ VIDEO_START( labyrunr )
 
 WRITE8_HANDLER( labyrunr_vram1_w )
 {
-	if (labyrunr_videoram1[offset] != data)
-	{
-		labyrunr_videoram1[offset] = data;
-		tilemap_mark_tile_dirty(layer0,offset & 0x3ff);
-	}
+	labyrunr_videoram1[offset] = data;
+	tilemap_mark_tile_dirty(layer0,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( labyrunr_vram2_w )
 {
-	if (labyrunr_videoram2[offset] != data)
-	{
-		labyrunr_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(layer1,offset & 0x3ff);
-	}
+	labyrunr_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(layer1,offset & 0x3ff);
 }
 
 

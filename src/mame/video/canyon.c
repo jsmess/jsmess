@@ -14,12 +14,8 @@ UINT8* canyon_videoram;
 
 WRITE8_HANDLER( canyon_videoram_w )
 {
-	if (canyon_videoram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	canyon_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

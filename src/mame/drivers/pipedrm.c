@@ -510,7 +510,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &bglayout,    0, 64 },
 	{ REGION_GFX2, 0, &bglayout,    0, 64 },
 	{ REGION_GFX3, 0, &splayout, 1024, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -518,7 +518,7 @@ static const gfx_decode gfxdecodeinfo_hatris[] =
 {
 	{ REGION_GFX1, 0, &bglayout,    0, 128 },
 	{ REGION_GFX2, 0, &bglayout,    0, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

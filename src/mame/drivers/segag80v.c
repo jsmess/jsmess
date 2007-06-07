@@ -197,8 +197,6 @@ static MACHINE_START( g80v )
 	state_save_register_global(spinner_select);
 	state_save_register_global(spinner_sign);
 	state_save_register_global(spinner_count);
-
-	return 0;
 }
 
 

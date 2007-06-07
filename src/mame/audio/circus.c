@@ -10,7 +10,7 @@ static const char *circus_sample_names[] =
 	"pop.wav",
 	"miss.wav",
 	"bounce.wav",
-	0       /* end of array */
+	0
 };
 
 struct Samplesinterface circus_samples_interface =
@@ -23,7 +23,7 @@ static const char *crash_sample_names[] =
 {
 	"*crash",
 	"crash.wav",
-	0       /* end of array */
+	0
 };
 
 struct Samplesinterface crash_samples_interface =
@@ -39,7 +39,7 @@ static const char *ripcord_sample_names[] =
 	"scream.wav",
 	"chute.wav",
 	"whistle.wav",
-	0       /* end of array */
+	0
 };
 
 struct Samplesinterface ripcord_samples_interface =
@@ -56,7 +56,7 @@ static const char *robotbwl_sample_names[] =
 	"balldrop.wav",
 	"demerit.wav",
 	"reward.wav",
-	0       /* end of array */
+	0
 };
 
 struct Samplesinterface robotbwl_samples_interface =

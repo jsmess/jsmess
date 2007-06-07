@@ -889,7 +889,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout, 512, 16 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &tilelayout, 768, 16 },	/* Tiles 16x16 */
 	{ REGION_GFX4, 0, &tilelayout, 256, 16 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode midres_gfxdecodeinfo[] =
@@ -898,7 +898,7 @@ static const gfx_decode midres_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout, 512, 16 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &tilelayout, 768, 16 },	/* Tiles 16x16 */
 	{ REGION_GFX4, 0, &tilelayout,   0, 16 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

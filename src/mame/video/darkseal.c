@@ -232,26 +232,20 @@ static void darkseal_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 WRITE16_HANDLER( darkseal_pf1_data_w )
 {
-	UINT16 oldword=darkseal_pf1_data[offset];
 	COMBINE_DATA(&darkseal_pf1_data[offset]);
-	if (oldword!=darkseal_pf1_data[offset])
-		tilemap_mark_tile_dirty(pf1_tilemap,offset);
+	tilemap_mark_tile_dirty(pf1_tilemap,offset);
 }
 
 WRITE16_HANDLER( darkseal_pf2_data_w )
 {
-	UINT16 oldword=darkseal_pf2_data[offset];
 	COMBINE_DATA(&darkseal_pf2_data[offset]);
-	if (oldword!=darkseal_pf2_data[offset])
-		tilemap_mark_tile_dirty(pf2_tilemap,offset);
+	tilemap_mark_tile_dirty(pf2_tilemap,offset);
 }
 
 WRITE16_HANDLER( darkseal_pf3_data_w )
 {
-	UINT16 oldword=darkseal_pf3_data[offset];
 	COMBINE_DATA(&darkseal_pf3_data[offset]);
-	if (oldword!=darkseal_pf3_data[offset])
-		tilemap_mark_tile_dirty(pf3_tilemap,offset);
+	tilemap_mark_tile_dirty(pf3_tilemap,offset);
 }
 
 WRITE16_HANDLER( darkseal_pf3b_data_w ) /* Mirror */

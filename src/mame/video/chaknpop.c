@@ -126,11 +126,8 @@ WRITE8_HANDLER( chaknpop_gfxmode_w )
 
 WRITE8_HANDLER( chaknpop_txram_w )
 {
-	if (chaknpop_txram[offset] != data)
-	{
-		chaknpop_txram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, offset);
-	}
+	chaknpop_txram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap, offset);
 }
 
 WRITE8_HANDLER( chaknpop_attrram_w )

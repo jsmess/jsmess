@@ -489,8 +489,6 @@ static MACHINE_START( destryer )
 	state_save_register_global_array(cidelsa_pcb);
 	state_save_register_global(cdp1869_prd);
 	state_save_register_global(cdp1869_pcb);
-
-	return 0;
 }
 
 static MACHINE_START( draco )
@@ -501,8 +499,6 @@ static MACHINE_START( draco )
 	state_save_register_global(cdp1869_pcb);
 	state_save_register_global(draco_sound);
 	state_save_register_global(draco_ay_latch);
-
-	return 0;
 }
 
 static MACHINE_RESET( destryer )

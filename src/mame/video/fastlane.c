@@ -106,20 +106,14 @@ VIDEO_START( fastlane )
 
 WRITE8_HANDLER( fastlane_vram1_w )
 {
-	if (fastlane_videoram1[offset] != data)
-	{
-		tilemap_mark_tile_dirty(layer0,offset & 0x3ff);
-		fastlane_videoram1[offset] = data;
-	}
+	fastlane_videoram1[offset] = data;
+	tilemap_mark_tile_dirty(layer0,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( fastlane_vram2_w )
 {
-	if (fastlane_videoram2[offset] != data)
-	{
-		tilemap_mark_tile_dirty(layer1,offset & 0x3ff);
-		fastlane_videoram2[offset] = data;
-	}
+	fastlane_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(layer1,offset & 0x3ff);
 }
 
 

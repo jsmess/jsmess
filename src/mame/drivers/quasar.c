@@ -411,7 +411,7 @@ static const gfx_decode gfxdecodeinfo[] =
   	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #1  */
   	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #2  */
   	{ REGION_GFX1, 0x0000, &s2636_character10, 2072, 8 },	/* s2636 #3  */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static INTERRUPT_GEN( quasar_interrupt )

@@ -113,26 +113,20 @@ VIDEO_START( bionicc )
 
 WRITE16_HANDLER( bionicc_bgvideoram_w )
 {
-	int oldword = bionicc_bgvideoram[offset];
 	COMBINE_DATA(&bionicc_bgvideoram[offset]);
-	if (oldword != bionicc_bgvideoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( bionicc_fgvideoram_w )
 {
-	int oldword = bionicc_fgvideoram[offset];
 	COMBINE_DATA(&bionicc_fgvideoram[offset]);
-	if (oldword != bionicc_fgvideoram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( bionicc_txvideoram_w )
 {
-	int oldword = bionicc_txvideoram[offset];
 	COMBINE_DATA(&bionicc_txvideoram[offset]);
-	if (oldword != bionicc_txvideoram[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset&0x3ff);
+	tilemap_mark_tile_dirty(tx_tilemap,offset&0x3ff);
 }
 
 WRITE16_HANDLER( bionicc_paletteram_w )

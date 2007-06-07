@@ -874,7 +874,7 @@ static MACHINE_START( maze )
 	state_save_register_global(maze_tone_timing_state);
 	state_save_register_func_postload(maze_update_discrete);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -959,7 +959,7 @@ MACHINE_START( boothill )
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -1159,7 +1159,7 @@ static MACHINE_START( desertgu )
 	/* setup for save states */
 	state_save_register_global(desertgu_controller_select);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -1174,13 +1174,9 @@ static UINT32 desertgu_gun_input_r(void *param)
 	UINT32 ret;
 
 	if (desertgu_controller_select)
-	{
 		ret = readinputportbytag(DESERTGU_GUN_X_PORT_TAG);
-	}
 	else
-	{
 		ret = readinputportbytag(DESERTGU_GUN_Y_PORT_TAG);
-	}
 
 	return ret;
 }
@@ -1191,13 +1187,9 @@ static UINT32 desertgu_dip_sw_0_1_r(void *param)
 	UINT32 ret;
 
 	if (desertgu_controller_select)
-	{
 		ret = readinputportbytag(DESERTGU_DIP_SW_0_1_SET_2_TAG);
-	}
 	else
-	{
 		ret = readinputportbytag(DESERTGU_DIP_SW_0_1_SET_1_TAG);
-	}
 
 	return ret;
 }
@@ -1309,13 +1301,9 @@ static UINT32 dplay_pitch_left_input_r(void *param)
 	UINT32 ret;
 
 	if (readinputportbytag(DPLAY_CAB_TYPE_PORT_TAG) == DPLAY_CAB_TYPE_UPRIGHT)
-	{
 		ret = readinputportbytag(DPLAY_L_PITCH_PORT_TAG);
-	}
 	else
-	{
 		ret = readinputportbytag(DPLAY_R_PITCH_PORT_TAG);
-	}
 
 	return ret;
 }
@@ -1497,7 +1485,7 @@ MACHINE_START( gmissile )
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -1589,7 +1577,7 @@ MACHINE_START( m4 )
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -1686,7 +1674,7 @@ static MACHINE_START( clowns )
 	/* setup for save states */
 	state_save_register_global(clowns_controller_select);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -2030,13 +2018,16 @@ static void adjust_strobe_timers(void)
        frequency of 9Hz and a duty cycle of 95% */
 	if (spcenctr_strobe_state)
 	{
-		mame_timer_adjust(spcenctr_strobe_on_timer, time_zero, 1, double_to_mame_time(TIME_IN_SEC(SPCENCTR_STROBE_PERIOD)));
-		mame_timer_adjust(spcenctr_strobe_off_timer, double_to_mame_time(TIME_IN_SEC(SPCENCTR_STROBE_PERIOD) * SPCENCTR_DUTY_CYCLE), 0, double_to_mame_time(TIME_IN_SEC(SPCENCTR_STROBE_PERIOD)));
+		double strobe_period = TIME_IN_SEC(SPCENCTR_STROBE_PERIOD);
+		mame_time strobe_period_mt = double_to_mame_time(strobe_period);
+
+		mame_timer_adjust(spcenctr_strobe_on_timer, time_zero, 1, strobe_period_mt);
+		mame_timer_adjust(spcenctr_strobe_off_timer, double_to_mame_time(strobe_period * SPCENCTR_DUTY_CYCLE), 0, strobe_period_mt);
 	}
 	else
 	{
 		mame_timer_adjust(spcenctr_strobe_on_timer, time_never, 0, time_zero);
-		mame_timer_adjust(spcenctr_strobe_off_timer, time_never, 0, time_zero);
+		mame_timer_adjust(spcenctr_strobe_off_timer, time_zero, 0, time_zero);
 	}
 }
 
@@ -2060,7 +2051,7 @@ static MACHINE_START( spcenctr )
 	state_save_register_global_array(spcenctr_trench_slope);
 	state_save_register_func_postload(adjust_strobe_timers);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -2227,7 +2218,7 @@ static MACHINE_START( phantom2 )
 	/* setup for save states */
 	state_save_register_global(phantom2_cloud_counter);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -2468,7 +2459,7 @@ static MACHINE_START( invaders )
 	/* setup for save states */
 	state_save_register_global(invaders_flip_screen);
 
-	return machine_start_mw8080bw(machine);
+	machine_start_mw8080bw(machine);
 }
 
 
@@ -2502,14 +2493,9 @@ static UINT32 invaders_sw6_sw7_r(void *param)
        cocktail PCB: HI */
 
 	if (invaders_is_cabinet_cocktail())
-	{
 		ret = 0x03;
-	}
 	else
-	{
 		ret = readinputportbytag(INVADERS_SW6_SW7_PORT_TAG);
-	}
-
 
 	return ret;
 }
@@ -2523,14 +2509,9 @@ static UINT32 invaders_sw5_r(void *param)
        cocktail PCB: HI */
 
 	if (invaders_is_cabinet_cocktail())
-	{
 		ret = 0x01;
-	}
 	else
-	{
 		ret = readinputportbytag(INVADERS_SW5_PORT_TAG);
-	}
-
 
 	return ret;
 }
@@ -2544,14 +2525,9 @@ static UINT32 invaders_in0_control_r(void *param)
        cocktail PCB: HI */
 
 	if (invaders_is_cabinet_cocktail())
-	{
 		ret = 0x07;
-	}
 	else
-	{
 		ret = readinputportbytag(INVADERS_P1_CONTROL_PORT_TAG);
-	}
-
 
 	return ret;
 }
@@ -2565,14 +2541,9 @@ static UINT32 invaders_in2_control_r(void *param)
        cocktail PCB: P2 controls */
 
 	if (invaders_is_cabinet_cocktail())
-	{
 		ret = readinputportbytag(INVADERS_P2_CONTROL_PORT_TAG);
-	}
 	else
-	{
 		ret = readinputportbytag(INVADERS_P1_CONTROL_PORT_TAG);
-	}
-
 
 	return ret;
 }
@@ -2881,6 +2852,7 @@ ROM_START( seawolf )
 	ROM_LOAD( "sw0044.e",   0x0c00, 0x0400, CRC(c3557d6a) SHA1(bd345dd72fed8ce15da76c381782b025f71b006f) )
 ROM_END
 
+
 ROM_START( gunfight )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "7609h.bin",  0x0000, 0x0400, CRC(0b117d73) SHA1(99d01313e251818d336281700e206d9003c71dae) )
@@ -2889,12 +2861,14 @@ ROM_START( gunfight )
 	ROM_LOAD( "7609e.bin",  0x0c00, 0x0400, CRC(773264e2) SHA1(de3f2e6841122bbe6e2fda5b87d37842c072289a) )
 ROM_END
 
+
 ROM_START( tornbase )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tb.h",       0x0000, 0x0800, CRC(653f4797) SHA1(feb4c802aa3e0c2a66823cd032496cca5742c883) )
 	ROM_LOAD( "tb.g",       0x0800, 0x0800, CRC(b63dcdb3) SHA1(bdaa0985bcb5257204ee10faa11a4e02a38b9ac5) )
 	ROM_LOAD( "tb.f",       0x1000, 0x0800, CRC(215e070c) SHA1(425915b37e5315f9216707de0850290145f69a30) )
 ROM_END
+
 
 ROM_START( 280zzzap )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -2906,11 +2880,13 @@ ROM_START( 280zzzap )
 	ROM_LOAD( "zzzapc",     0x1400, 0x0400, CRC(6e85aeaf) SHA1(ffa6bb84ef1f7c2d72fd26c24bd33aa014aeab7e) )
 ROM_END
 
+
 ROM_START( maze )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "maze.h",     0x0000, 0x0800, CRC(f2860cff) SHA1(62b3fd3d04bf9c5dd9b50964374fb884dc0ab79c) )
 	ROM_LOAD( "maze.g",     0x0800, 0x0800, CRC(65fad839) SHA1(893f0a7621e7df19f777be991faff0db4a9ad571) )
 ROM_END
+
 
 ROM_START( boothill )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -2919,6 +2895,7 @@ ROM_START( boothill )
 	ROM_LOAD( "romf.cpu",   0x1000, 0x0800, CRC(3fdafd79) SHA1(b18e8ac9df40c4687ac1acd5174eb99f2ef60081) )
 	ROM_LOAD( "rome.cpu",   0x1800, 0x0800, CRC(374529f4) SHA1(18c57b79df0c66052eef40a694779a5ade15d0e0) )
 ROM_END
+
 
 ROM_START( checkmat )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -2929,6 +2906,7 @@ ROM_START( checkmat )
 	ROM_LOAD( "checkmat.d", 0x1000, 0x0400, NO_DUMP )	/* language ROM */
 ROM_END
 
+
 ROM_START( desertgu )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "desertgu.h", 0x0000, 0x0800, CRC(c0030d7c) SHA1(4d0a3a59d4f8181c6e30966a6b1d19ba5b29c398) )
@@ -2936,6 +2914,7 @@ ROM_START( desertgu )
 	ROM_LOAD( "desertgu.f", 0x1000, 0x0800, CRC(808e46f1) SHA1(1cc4e9b0aa7e9546c133bd40d40ede6f2fbe93ba) )
 	ROM_LOAD( "desertgu.e", 0x1800, 0x0800, CRC(ac64dc62) SHA1(202433dfb174901bd3b91e843d9d697a8333ef9e) )
 ROM_END
+
 
 ROM_START( dplay )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -2945,6 +2924,7 @@ ROM_START( dplay )
 	ROM_LOAD( "dplay619.e", 0x1800, 0x0800, CRC(65cab4fc) SHA1(1ce7cb832e95e4a6d0005bf730eec39225b2e960) )
 ROM_END
 
+
 ROM_START( lagunar )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lagunar.h",  0x0000, 0x0800, CRC(0cd5a280) SHA1(89a744c912070f11b0b90b0cc92061e238b00b64) )
@@ -2952,6 +2932,7 @@ ROM_START( lagunar )
 	ROM_LOAD( "lagunar.f",  0x1000, 0x0800, CRC(62692ca7) SHA1(d62051bd1b45ca6e60df83942ff26a64ae25a97b) )
 	ROM_LOAD( "lagunar.e",  0x1800, 0x0800, CRC(20e098ed) SHA1(e0c52c013f5e93794b363d7762ce0f34ba98c660) )
 ROM_END
+
 
 ROM_START( gmissile )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -2961,6 +2942,7 @@ ROM_START( gmissile )
 	ROM_LOAD( "gm_623.e",   0x1800, 0x0800, CRC(f350146b) SHA1(a07000a979b1a735754eca623cc880988924877f) )
 ROM_END
 
+
 ROM_START( m4 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "m4.h",       0x0000, 0x0800, CRC(9ee2a0b5) SHA1(b81b4001c90ac6db25edd838652c42913022d9a9) )
@@ -2968,6 +2950,7 @@ ROM_START( m4 )
 	ROM_LOAD( "m4.f",       0x1000, 0x0800, CRC(9ded9956) SHA1(449204a50efd3345cde815ca5f1fb596843a30ac) )
 	ROM_LOAD( "m4.e",       0x1800, 0x0800, CRC(b6983238) SHA1(3f3b99b33135e144c111d2ebaac8f9433c269bc5) )
 ROM_END
+
 
 ROM_START( clowns )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -2979,6 +2962,7 @@ ROM_START( clowns )
 	ROM_LOAD( "c2.cpu",     0x1400, 0x0400, CRC(154d129a) SHA1(61eebb319ee3a6be598b764b295c18a93a953c1e) )
 ROM_END
 
+
 ROM_START( clowns1 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "clownsv1.h", 0x0000, 0x0400, CRC(5560c951) SHA1(b6972e1918604263579de577ec58fa6a91e8ff3e) )
@@ -2989,6 +2973,7 @@ ROM_START( clowns1 )
 	ROM_LOAD( "clownsv1.c", 0x1400, 0x0400, CRC(12968e52) SHA1(71e4f09d30b992a4ac44b0e88e83b4f8a0f63caa) )
 ROM_END
 
+
 ROM_START( einning )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ei.h",       0x0000, 0x0800, CRC(eff9c7af) SHA1(316fffc972bd9935ead5ee4fd629bddc8a8ed5ce) )
@@ -2998,6 +2983,7 @@ ROM_START( einning )
 	ROM_LOAD( "ei.b",       0x5000, 0x0800, CRC(56b407d4) SHA1(95e4be5b2f28192df85c6118079de2e68838b67c) )
 ROM_END
 
+
 ROM_START( shuffle )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "shuffle.h",  0x0000, 0x0800, CRC(0d422a18) SHA1(909c5b9e3c1194abd101cbf993a2ed7c8fbeb5d0) )
@@ -3006,6 +2992,7 @@ ROM_START( shuffle )
 	ROM_LOAD( "shuffle.e",  0x1800, 0x0800, CRC(2c118357) SHA1(178db02aaa70963dd8dbcb9b8651209913c539af) )
 ROM_END
 
+
 ROM_START( dogpatch )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "dogpatch.h", 0x0000, 0x0800, CRC(74ebdf4d) SHA1(6b31f9563b0f79fe9128ee83e85a3e2f90d7985b) )
@@ -3013,6 +3000,7 @@ ROM_START( dogpatch )
 	ROM_LOAD( "dogpatch.f", 0x1000, 0x0800, CRC(a975b011) SHA1(fb807d9eefde7177d7fd7ab06fc2dbdc58ae6fcb) )
 	ROM_LOAD( "dogpatch.e", 0x1800, 0x0800, CRC(c12b1f60) SHA1(f0504e16d2ce60a0fb3fc2af8c323bfca0143818) )
 ROM_END
+
 
 ROM_START( spcenctr )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -3026,6 +3014,7 @@ ROM_START( spcenctr )
 	ROM_LOAD( "4m26.a",     0x5800, 0x0800, CRC(7f1d1f44) SHA1(2f4951171a55e7ac072742fa24eceeee6aca7e39) )
 ROM_END
 
+
 ROM_START( phantom2 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "phantom2.h", 0x0000, 0x0800, CRC(0e3c2439) SHA1(450182e590845c651530b2c84e1f11fe2451dcf6) )
@@ -3037,6 +3026,7 @@ ROM_START( phantom2 )
 	ROM_LOAD( "p2clouds.f2",0x0000, 0x0800, CRC(dcdd2927) SHA1(d8d42c6594e36c12b40ee6342a9ad01a8bbdef75) )
 ROM_END
 
+
 ROM_START( bowler )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "h.cpu",      0x0000, 0x0800, CRC(74c29b93) SHA1(9cbd5b7b8a4c889406b6bc065360f74c036320b2) )
@@ -3046,6 +3036,7 @@ ROM_START( bowler )
 	ROM_LOAD( "d.cpu",      0x4000, 0x0800, CRC(e7dbc9d9) SHA1(05049a69ee588de85db86df188e7670778b77e90) )
 ROM_END
 
+
 ROM_START( invaders )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "invaders.h", 0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
@@ -3054,12 +3045,14 @@ ROM_START( invaders )
 	ROM_LOAD( "invaders.e", 0x1800, 0x0800, CRC(14e538b0) SHA1(1d6ca0c99f9df71e2990b610deb9d7da0125e2d8) )
 ROM_END
 
+
 ROM_START( blueshrk )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "blueshrk.h", 0x0000, 0x0800, CRC(4ff94187) SHA1(7cb80e2ccc34983bfd688c549ffc032d6dacf880) )
 	ROM_LOAD( "blueshrk.g", 0x0800, 0x0800, CRC(e49368fd) SHA1(2495ba48532bb714361e4f0e94c9317161c6c77f) )
 	ROM_LOAD( "blueshrk.f", 0x1000, 0x0800, CRC(86cca79d) SHA1(7b4633fb8033ee2c0e692135c383ebf57deef0e5) )
 ROM_END
+
 
 ROM_START( invad2ct )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )

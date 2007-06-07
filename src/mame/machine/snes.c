@@ -367,7 +367,6 @@ MACHINE_START( snes )
 	snes_ram[WRMPYA] = 0xff;
 	snes_ram[WRDIVL] = 0xff;
 	snes_ram[WRDIVH] = 0xff;
-	return 0;
 }
 
 MACHINE_RESET( snes )

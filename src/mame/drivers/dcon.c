@@ -269,7 +269,7 @@ static const gfx_decode dcon_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &dcon_tilelayout,    1024+512, 16 },
 	{ REGION_GFX4, 0, &dcon_tilelayout,    1024+256, 16 },
 	{ REGION_GFX5, 0, &dcon_tilelayout,           0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

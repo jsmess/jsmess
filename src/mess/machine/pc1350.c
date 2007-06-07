@@ -190,5 +190,4 @@ MACHINE_START( pc1350 )
 		memory_install_read8_handler(0,  ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_NOP);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_NOP);
 	}
-	return 0;
 }

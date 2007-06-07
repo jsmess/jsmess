@@ -351,7 +351,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &char5bpplayout,   0x400, 32 },
 	{ REGION_GFX2, 0, &char_8x8_layout,  0x200, 32 },
 	{ REGION_GFX4, 0, &char5bpplayout,   0x400, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void irq_handler(int irq)

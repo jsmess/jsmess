@@ -441,7 +441,7 @@ static const gfx_decode quizdna_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x0000, &fglayout,  0x7e0,  16 },
 	{ REGION_GFX2, 0x0000, &bglayout,  0x000, 128 },
 	{ REGION_GFX3, 0x0000, &objlayout, 0x600,  32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

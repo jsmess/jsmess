@@ -318,7 +318,6 @@ static MACHINE_START( taitoair )
 
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 
@@ -571,7 +570,7 @@ static const gfx_layout tilelayout =
 static const gfx_decode airsys_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout, 0, 32*16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

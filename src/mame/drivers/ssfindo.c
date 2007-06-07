@@ -449,7 +449,7 @@ static READ32_HANDLER(io_r)
 
 static WRITE32_HANDLER(io_w)
 {
-	UINT32 temp;
+	UINT32 temp = 0;
 	COMBINE_DATA(&temp);
 
 #if 0

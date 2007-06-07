@@ -122,18 +122,14 @@ READ16_HANDLER( f1gp_rozvideoram_r )
 
 WRITE16_HANDLER( f1gp_rozvideoram_w )
 {
-	int oldword = f1gp_rozvideoram[offset];
 	COMBINE_DATA(&f1gp_rozvideoram[offset]);
-	if (oldword != f1gp_rozvideoram[offset])
-		tilemap_mark_tile_dirty(roz_tilemap,offset);
+	tilemap_mark_tile_dirty(roz_tilemap,offset);
 }
 
 WRITE16_HANDLER( f1gp_fgvideoram_w )
 {
-	int oldword = f1gp_fgvideoram[offset];
 	COMBINE_DATA(&f1gp_fgvideoram[offset]);
-	if (oldword != f1gp_fgvideoram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( f1gp_fgscroll_w )

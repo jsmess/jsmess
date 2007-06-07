@@ -68,11 +68,8 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 \
 WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
 { \
-	if (fuuki32_vram_##_N_[offset] != data) \
-	{ \
-		COMBINE_DATA(&fuuki32_vram_##_N_[offset]); \
-		tilemap_mark_tile_dirty(tilemap_##_N_,offset); \
-	} \
+	COMBINE_DATA(&fuuki32_vram_##_N_[offset]); \
+	tilemap_mark_tile_dirty(tilemap_##_N_,offset); \
 }
 
 #define LAYER_4BPP( _N_ ) \
@@ -88,11 +85,8 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 \
 WRITE32_HANDLER( fuuki32_vram_##_N_##_w ) \
 { \
-	if (fuuki32_vram_##_N_[offset] != data) \
-	{ \
-		COMBINE_DATA(&fuuki32_vram_##_N_[offset]); \
-		tilemap_mark_tile_dirty(tilemap_##_N_,offset); \
-	} \
+	COMBINE_DATA(&fuuki32_vram_##_N_[offset]); \
+	tilemap_mark_tile_dirty(tilemap_##_N_,offset); \
 }
 
 

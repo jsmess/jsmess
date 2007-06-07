@@ -143,8 +143,6 @@ static MACHINE_START( embargo )
 	state_save_register_global(dial_enable_1);
 	state_save_register_global(dial_enable_2);
 	state_save_register_global(input_select);
-
-	return 0;
 }
 
 

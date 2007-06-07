@@ -113,26 +113,20 @@ VIDEO_START( toki )
 
 WRITE16_HANDLER( toki_foreground_videoram16_w )
 {
-	int oldword = videoram16[offset];
 	COMBINE_DATA(&videoram16[offset]);
-	if (oldword != videoram16[offset])
-		tilemap_mark_tile_dirty(text_layer,offset);
+	tilemap_mark_tile_dirty(text_layer,offset);
 }
 
 WRITE16_HANDLER( toki_background1_videoram16_w )
 {
-	int oldword = toki_background1_videoram16[offset];
 	COMBINE_DATA(&toki_background1_videoram16[offset]);
-	if (oldword != toki_background1_videoram16[offset])
-		tilemap_mark_tile_dirty(background_layer,offset);
+	tilemap_mark_tile_dirty(background_layer,offset);
 }
 
 WRITE16_HANDLER( toki_background2_videoram16_w )
 {
-	int oldword = toki_background2_videoram16[offset];
 	COMBINE_DATA(&toki_background2_videoram16[offset]);
-	if (oldword != toki_background2_videoram16[offset])
-		tilemap_mark_tile_dirty(foreground_layer,offset);
+	tilemap_mark_tile_dirty(foreground_layer,offset);
 }
 
 /***************************************************************************

@@ -159,7 +159,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout, 0, 1 },
 	{ REGION_GFX2, 0, &charlayout, 0, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -197,7 +197,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kopunch )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "epr1105.x",    0x0000, 0x1000, CRC(34ef5e79) SHA1(2827c68f4c902f447a304d3ab0258c7819a0e4ca) )
 	ROM_LOAD( "epr1106.x",    0x1000, 0x1000, CRC(25a5c68b) SHA1(9761418c6f3903f8aaceece658739fe5bf5c0803) )
 

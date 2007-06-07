@@ -43,7 +43,7 @@ WRITE8_HANDLER( beezer_map_w )
       bit 0 -- 1.2 kohm resistor  -- RED
     */
 
-	int r, g, b, bit0, bit1, bit2;;
+	int r, g, b, bit0, bit1, bit2;
 
 	/* red component */
 	bit0 = (data >> 0) & 0x01;

@@ -244,7 +244,7 @@ static const gfx_decode flyball_gfx_decode_info[] =
 {
 	{ REGION_GFX1, 0, &flyball_tiles_layout, 0, 2 },
 	{ REGION_GFX2, 0, &flyball_sprites_layout, 2, 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

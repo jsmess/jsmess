@@ -21,11 +21,8 @@ static TILE_GET_INFO( get_shadfrce_fgtile_info )
 
 WRITE16_HANDLER( shadfrce_fgvideoram_w )
 {
-	if (shadfrce_fgvideoram[offset] != data)
-	{
-		shadfrce_fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(shadfrce_fgtilemap,offset/2);
-	}
+	shadfrce_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(shadfrce_fgtilemap,offset/2);
 }
 
 static TILE_GET_INFO( get_shadfrce_bg0tile_info )
@@ -44,11 +41,8 @@ static TILE_GET_INFO( get_shadfrce_bg0tile_info )
 
 WRITE16_HANDLER( shadfrce_bg0videoram_w )
 {
-	if (shadfrce_bg0videoram[offset] != data)
-	{
-		shadfrce_bg0videoram[offset] = data;
-		tilemap_mark_tile_dirty(shadfrce_bg0tilemap,offset/2);
-	}
+	shadfrce_bg0videoram[offset] = data;
+	tilemap_mark_tile_dirty(shadfrce_bg0tilemap,offset/2);
 }
 
 static TILE_GET_INFO( get_shadfrce_bg1tile_info )
@@ -63,11 +57,8 @@ static TILE_GET_INFO( get_shadfrce_bg1tile_info )
 
 WRITE16_HANDLER( shadfrce_bg1videoram_w )
 {
-	if (shadfrce_bg1videoram[offset] != data)
-	{
-		shadfrce_bg1videoram[offset] = data;
-		tilemap_mark_tile_dirty(shadfrce_bg1tilemap,offset);
-	}
+	shadfrce_bg1videoram[offset] = data;
+	tilemap_mark_tile_dirty(shadfrce_bg1tilemap,offset);
 }
 
 

@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "res_net.h"
 
 
 UINT8 *mappy_videoram;
@@ -8,6 +9,8 @@ static UINT8 mappy_scroll;
 static tilemap *bg_tilemap;
 
 static mame_bitmap *sprite_bitmap;
+
+static UINT16 *transmask;
 
 
 /***************************************************************************
@@ -39,70 +42,136 @@ static mame_bitmap *sprite_bitmap;
 
 PALETTE_INIT( superpac )
 {
+	static const int resistances[3] = { 1000, 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
+	rgb_t palette[32];
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], gweights, 0, 0,
+			2, &resistances[1], bweights, 0, 0);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		palette_set_color(machine,i,r,g,b);
-		color_prom++;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		palette[i] = MAKE_RGB(r, g, b);
 	}
 
-	/* characters */
-	for (i = 0; i < 64*4; i++)
-		colortable[i] = (color_prom[i] & 0x0f) ^ 0x1f;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 32;
 
-	/* sprites */
+	/* allocate memory for mask of pens that are transparent in sprites */
+	transmask = auto_malloc(64 * sizeof(transmask[0]));
+	memset(transmask, 0, 64 * sizeof(transmask[0]));
+
+	/* characters map to the upper 16 palette entries */
+	for (i = 0; i < 64*4; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		rgb_t palentry = palette[(ctabentry ^ 15) + 0x10];
+		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+	}
+
+	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
-		colortable[i] = color_prom[i] & 0x0f;
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		rgb_t palentry = palette[ctabentry];
+		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+
+		/* if the color table maps to palette entry 15, it is transparent */
+		if (ctabentry == 15)
+			transmask[(i - 64*4)/4] |= 1 << (i % 4);
+	}
 }
 
 PALETTE_INIT( mappy )
 {
+	static const int resistances[3] = { 1000, 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
+	rgb_t palette[32];
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], gweights, 0, 0,
+			2, &resistances[1], bweights, 0, 0);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		palette_set_color(machine,i,r,g,b);
-		color_prom++;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		palette[i] = MAKE_RGB(r, g, b);
 	}
 
-	/* characters */
-	for (i = 0*4;i < 64*4;i++)
-		colortable[i] = (color_prom[i^3] & 0x0f) + 0x10;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 32;
 
-	/* sprites */
-	for (i = 64*4;i < machine->drv->color_table_len;i++)
-		colortable[i] = color_prom[i] & 0x0f;
+	/* allocate memory for mask of pens that are transparent in sprites */
+	transmask = auto_malloc(64 * sizeof(transmask[0]));
+	memset(transmask, 0, 64 * sizeof(transmask[0]));
+
+	/* characters map to the upper 16 palette entries */
+	for (i = 0*4; i < 64*4; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		rgb_t palentry = palette[ctabentry + 0x10];
+		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+	}
+
+	/* sprites map to the lower 16 palette entries */
+	for (i = 64*4; i < machine->drv->total_colors; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		rgb_t palentry = palette[ctabentry];
+		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+
+		/* if the color table maps to palette entry 15, it is transparent */
+		if (ctabentry == 15)
+			transmask[(i - 64*4)/16] |= 1 << (i % 16);
+	}
 }
 
 
@@ -119,44 +188,73 @@ PALETTE_INIT( mappy )
 
 PALETTE_INIT( phozon )
 {
+	static const int resistances[4] = { 2200, 1000, 470, 220 };
+	double rweights[4], gweights[4], bweights[4];
+	rgb_t palette[32];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0; i < machine->drv->total_colors; i++){
-		int bit0,bit1,bit2,bit3,r,g,b;
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			4, &resistances[0], rweights, 0, 0,
+			4, &resistances[0], gweights, 0, 0,
+			4, &resistances[0], bweights, 0, 0);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 32; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+
 		/* green component */
 		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+
 		/* blue component */
 		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
 		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
 		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine,i,r,g,b);
+		palette[i] = MAKE_RGB(r, g, b);
 	}
 
-	color_prom += 0x300;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-	/* characters */
-	for (i = 0; i < TOTAL_COLORS(0); i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f);
-	/* sprites */
-	for (i = 0; i < TOTAL_COLORS(1); i++)
-		COLOR(1,i) = (*(color_prom++) & 0x0f) + 0x10;
+	/* allocate memory for mask of pens that are transparent in sprites */
+	transmask = auto_malloc(64 * sizeof(transmask[0]));
+	memset(transmask, 0, 64 * sizeof(transmask[0]));
+
+	/* characters map to the lower 16 palette entries */
+	for (i = 0; i < 64*4; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		rgb_t palentry = palette[ctabentry];
+		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+	}
+
+	/* sprites map to the upper 16 palette entries */
+	for (i = 64*4; i < 128*4; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		rgb_t palentry = palette[ctabentry + 0x10];
+		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+
+		/* if the color table maps to palette entry 15, it is transparent */
+		if (ctabentry == 15)
+			transmask[(i - 64*4)/4] |= 1 << (i % 4);
+	}
 }
 
 
@@ -340,7 +438,7 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 		/* is it on? */
 		if ((spriteram_3[offs+1] & 2) == 0)
 		{
-			static int gfx_offs[2][2] =
+			static const UINT8 gfx_offs[2][2] =
 			{
 				{ 0, 1 },
 				{ 2, 3 }
@@ -376,7 +474,7 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_COLOR,trans_color);
+						cliprect,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 				}
 			}
 		}
@@ -414,8 +512,8 @@ static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 		/* is it on? */
 		if ((spriteram_3[offs+1] & 2) == 0)
 		{
-			static int size[4] = { 1, 0, 3, 0 };	/* 16, 8, 32 pixels; fourth combination unused? */
-			static int gfx_offs[4][4] =
+			static const UINT8 size[4] = { 1, 0, 3, 0 };	/* 16, 8, 32 pixels; fourth combination unused? */
+			static const UINT8 gfx_offs[4][4] =
 			{
 				{ 0, 1, 4, 5 },
 				{ 2, 3, 6, 7 },
@@ -450,7 +548,7 @@ static void phozon_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect 
 						color,
 						flipx,flipy,
 						sx + 8*x,sy + 8*y,
-						cliprect,TRANSPARENCY_COLOR,31);
+						cliprect,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 				}
 			}
 		}

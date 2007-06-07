@@ -51,11 +51,8 @@ static tilemap *fg_tilemap;
 
 WRITE8_HANDLER( tunhunt_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tunhunt_mott_w )

@@ -536,11 +536,8 @@ READ8_HANDLER( argus_txram_r )
 
 WRITE8_HANDLER( argus_txram_w )
 {
-	if (argus_txram[ offset ] != data)
-	{
-		argus_txram[ offset ] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, offset >> 1);
-	}
+	argus_txram[ offset ] = data;
+	tilemap_mark_tile_dirty(tx_tilemap, offset >> 1);
 }
 
 READ8_HANDLER( bombsa_txram_r )
@@ -587,11 +584,8 @@ READ8_HANDLER( butasan_txram_r )
 
 WRITE8_HANDLER( butasan_txram_w )
 {
-	if (butasan_txram[ offset ] != data)
-	{
-		butasan_txram[ offset ] = data;
-		tilemap_mark_tile_dirty(tx_tilemap, (offset ^ 0x7c0) >> 1);
-	}
+	butasan_txram[ offset ] = data;
+	tilemap_mark_tile_dirty(tx_tilemap, (offset ^ 0x7c0) >> 1);
 }
 
 READ8_HANDLER( argus_bg1ram_r )
@@ -601,11 +595,8 @@ READ8_HANDLER( argus_bg1ram_r )
 
 WRITE8_HANDLER( argus_bg1ram_w )
 {
-	if (argus_bg1ram[ offset ] != data)
-	{
-		argus_bg1ram[ offset ] = data;
-		tilemap_mark_tile_dirty(bg1_tilemap, offset >> 1);
-	}
+	argus_bg1ram[ offset ] = data;
+	tilemap_mark_tile_dirty(bg1_tilemap, offset >> 1);
 }
 
 READ8_HANDLER( butasan_bg0ram_r )
@@ -615,17 +606,14 @@ READ8_HANDLER( butasan_bg0ram_r )
 
 WRITE8_HANDLER( butasan_bg0ram_w )
 {
-	if (butasan_bg0ram[ offset ] != data)
-	{
-		int idx;
+	int idx;
 
-		butasan_bg0ram[ offset ] = data;
+	butasan_bg0ram[ offset ] = data;
 
-		idx = ((offset & 0x01f) >> 1) | ((offset & 0x400) >> 6);
-		idx |= (offset & 0x3e0) ^ 0x1e0;
+	idx = ((offset & 0x01f) >> 1) | ((offset & 0x400) >> 6);
+	idx |= (offset & 0x3e0) ^ 0x1e0;
 
-		tilemap_mark_tile_dirty(bg0_tilemap, idx);
-	}
+	tilemap_mark_tile_dirty(bg0_tilemap, idx);
 }
 
 READ8_HANDLER( butasan_bg1ram_r )
@@ -635,17 +623,14 @@ READ8_HANDLER( butasan_bg1ram_r )
 
 WRITE8_HANDLER( butasan_bg1ram_w )
 {
-	if (butasan_bg1ram[ offset ] != data)
-	{
-		int idx;
+	int idx;
 
-		butasan_bg1ram[ offset ] = data;
+	butasan_bg1ram[ offset ] = data;
 
-		idx = (offset & 0x00f) | ((offset & 0x200) >> 5) | ((offset & 0x1f0) << 1);
-		idx ^= 0x0f0;
+	idx = (offset & 0x00f) | ((offset & 0x200) >> 5) | ((offset & 0x1f0) << 1);
+	idx ^= 0x0f0;
 
-		tilemap_mark_tile_dirty(bg1_tilemap, idx);
-	}
+	tilemap_mark_tile_dirty(bg1_tilemap, idx);
 }
 
 WRITE8_HANDLER ( argus_bg0_scrollx_w )

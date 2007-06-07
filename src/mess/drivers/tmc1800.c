@@ -256,8 +256,6 @@ static CDP1802_CONFIG tmc2000_config =
 static MACHINE_START( tmc1800 )
 {
 	state_save_register_global(keylatch);
-
-	return 0;
 }
 
 static MACHINE_RESET( tmc1800 )
@@ -271,8 +269,6 @@ static MACHINE_START( tmc2000 )
 
 	memory_configure_bank(1, 0, 1, memory_region(REGION_CPU1) + 0x8000, 0);
 	memory_configure_bank(1, 1, 1, &colorram, 0);
-
-	return 0;
 }
 
 static MACHINE_RESET( tmc2000 )

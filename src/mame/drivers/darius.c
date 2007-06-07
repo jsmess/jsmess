@@ -820,7 +820,7 @@ static const gfx_decode darius_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout,   0, 256 },	/* sprites */
 	{ REGION_GFX1, 0, &charlayout,   0, 256 },	/* scr tiles */
 	{ REGION_GFX3, 0, &char2layout,  0, 256 },	/* top layer scr tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1231,7 +1231,6 @@ MACHINE_START( darius )
 	state_save_register_global(adpcm_command);
 	state_save_register_global(nmi_enable);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 

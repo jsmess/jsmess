@@ -1075,8 +1075,6 @@ MACHINE_START ( to7 )
   state_save_register_global( to7_lightpen_step );
   state_save_register_global_pointer( (thom_vram), 0x2000 * 2 );
   state_save_register_global_pointer( (mem + 0x10000), 0x4000 * 4 );
- 
-  return 0;
 }
 
 
@@ -1266,8 +1264,6 @@ MACHINE_START ( to770 )
   state_save_register_global_pointer( thom_vram, 0x2000 * 2 );
   state_save_register_global_pointer( (mem + 0x10000), 0x4000 * 4 );
   state_save_register_global_pointer( (mem + 0x20000), 0x4000 * 6 );
-
-  return 0;
 }
 
 
@@ -1550,8 +1546,6 @@ MACHINE_START ( mo5 )
   state_save_register_global( mo5_reg_cart );
   state_save_register_global_pointer( thom_vram, 0x2000 * 2 );
   state_save_register_global_pointer( (mem + 0x10000), 0x4000 * 8 );
-
-  return 0;
 }
 
 
@@ -2364,8 +2358,6 @@ MACHINE_START ( to9 )
   state_save_register_global_pointer( thom_vram, 0x2000 * 2 );
   state_save_register_global_pointer( (mem + 0x10000), 0x4000 * 4 );
   state_save_register_global_pointer( (mem + 0x40000), 0x4000 * 10 );
-
-  return 0;
 }
 
 
@@ -3100,8 +3092,6 @@ MACHINE_START ( to8 )
   state_save_register_global( to8_cart_vpage );
   state_save_register_global_pointer( (mem + 0x10000), 0x4000 * 4 );
   state_save_register_global_pointer( (mem + 0x30000), 0x4000 * 32 );
-
-  return 0;
 }
 
 
@@ -3244,8 +3234,6 @@ MACHINE_START ( to9p )
   state_save_register_global( to8_cart_vpage );
   state_save_register_global_pointer( (mem + 0x10000), 0x4000 * 4 );
   state_save_register_global_pointer( (mem + 0x30000), 0x4000 * 32 );
-
-  return 0;
 }
 
 
@@ -3730,8 +3718,6 @@ MACHINE_START ( mo6 )
   state_save_register_global( mo5_reg_cart );
   state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
   state_save_register_global_pointer( thom_vram, 0x4000 * 8 );
-
-  return 0;
 }
 
 
@@ -3957,6 +3943,4 @@ MACHINE_START ( mo5nr )
   state_save_register_global( mo5_reg_cart );
   state_save_register_global_pointer( (mem + 0x10000), 0x10000 );
   state_save_register_global_pointer( thom_vram, 0x4000 * 8 );
-
-  return 0;
 }

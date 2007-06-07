@@ -260,8 +260,6 @@ static MACHINE_START( exidy )
 	cassette_timer = timer_alloc(exidy_cassette_timer_callback);
 
 	wd17xx_init(WD_TYPE_179X, NULL, NULL);
-
-	return 0;
 }
 
 static MACHINE_RESET( exidy )

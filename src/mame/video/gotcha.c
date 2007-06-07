@@ -53,18 +53,14 @@ VIDEO_START( gotcha )
 
 WRITE16_HANDLER( gotcha_fgvideoram_w )
 {
-	int oldword = gotcha_fgvideoram[offset];
 	COMBINE_DATA(&gotcha_fgvideoram[offset]);
-	if (oldword != gotcha_fgvideoram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( gotcha_bgvideoram_w )
 {
-	int oldword = gotcha_bgvideoram[offset];
 	COMBINE_DATA(&gotcha_bgvideoram[offset]);
-	if (oldword != gotcha_bgvideoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE16_HANDLER( gotcha_gfxbank_select_w )

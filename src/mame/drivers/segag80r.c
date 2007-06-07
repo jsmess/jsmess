@@ -169,8 +169,6 @@ static MACHINE_START( g80r )
 	input_port_set_changed_callback(port_tag_to_index("SERVICESW"), 0x01, service_switch, NULL);
 
 	/* register for save states */
-
-	return 0;
 }
 
 

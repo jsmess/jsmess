@@ -181,7 +181,6 @@ static MACHINE_START( jedi )
 	state_save_register_global(speech_write_buffer);
 	state_save_register_global(speech_strobe_state);
 	state_save_register_global(nvram_enabled);
-	return 0;
 }
 
 

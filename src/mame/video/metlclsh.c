@@ -101,11 +101,8 @@ WRITE8_HANDLER( metlclsh_bgram_w )
 	else
 	{
 		/* tilemap */
-		if (metlclsh_bgram[offset] != data)
-		{
-			metlclsh_bgram[offset] = data;
-			tilemap_mark_tile_dirty(bg_tilemap,offset & 0x1ff);
-		}
+		metlclsh_bgram[offset] = data;
+		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x1ff);
 	}
 }
 
@@ -132,11 +129,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE8_HANDLER( metlclsh_fgram_w )
 {
-	if (metlclsh_fgram[offset] != data)
-	{
-		metlclsh_fgram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
-	}
+	metlclsh_fgram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
 }
 
 

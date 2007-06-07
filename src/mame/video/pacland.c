@@ -194,20 +194,14 @@ VIDEO_START( pacland )
 
 WRITE8_HANDLER( pacland_videoram_w )
 {
-	if (pacland_videoram[offset] != data)
-	{
-		pacland_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
-	}
+	pacland_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( pacland_videoram2_w )
 {
-	if (pacland_videoram2[offset] != data)
-	{
-		pacland_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
-	}
+	pacland_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( pacland_scroll0_w )

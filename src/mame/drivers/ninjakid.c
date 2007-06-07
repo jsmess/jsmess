@@ -82,7 +82,6 @@ static MACHINE_START( ninjakid )
 {
 	/* Save State Stuff */
 	state_save_register_global(ninjakun_io_a002_ctrl);
-	return 0;
 }
 
 /*******************************************************************************

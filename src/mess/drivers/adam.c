@@ -580,7 +580,6 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( adam )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	return 0;
 }
 
 static MACHINE_RESET( adam )

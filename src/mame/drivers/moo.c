@@ -615,7 +615,6 @@ static MACHINE_START( moo )
 {
 	state_save_register_global(cur_control2);
 	state_save_register_global_array(protram);
-	return 0;
 }
 
 static MACHINE_RESET( moo )

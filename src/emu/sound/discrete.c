@@ -689,7 +689,7 @@ static void setup_disc_logs(discrete_info *info)
 	for (log_num = 0; log_num < info->num_csvlogs; log_num++)
 	{
 		sprintf(name, "discrete%d_%d.csv", info->sndindex, log_num);
-		info->disc_csv_file[log_num] = fopen(name, "w");;
+		info->disc_csv_file[log_num] = fopen(name, "w");
 		/* Output some header info */
 		fprintf(info->disc_csv_file[log_num], "\"MAME Discrete System Node Log\"\n");
 		fprintf(info->disc_csv_file[log_num], "\"Log Version\", 1.0\n");

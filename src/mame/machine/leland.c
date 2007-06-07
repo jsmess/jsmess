@@ -362,8 +362,6 @@ MACHINE_START( leland )
 
 	/* start scanline interrupts going */
 	master_int_timer = mame_timer_alloc(leland_interrupt_callback);
-
-	return 0;
 }
 
 
@@ -417,8 +415,6 @@ MACHINE_START( ataxx )
 
 	/* start scanline interrupts going */
 	master_int_timer = mame_timer_alloc(ataxx_interrupt_callback);
-
-	return 0;
 }
 
 

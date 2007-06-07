@@ -248,20 +248,14 @@ VIDEO_START( ninjemak )
 
 WRITE8_HANDLER( galivan_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( galivan_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		colorram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 /* Written through port 40 */

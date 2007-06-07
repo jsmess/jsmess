@@ -155,14 +155,11 @@ static TILE_GET_INFO( get_tile_info_0b )
 
 WRITE8_HANDLER( clshroad_vram_0_w )
 {
-	if (clshroad_vram_0[offset] != data)
-	{
-		int tile_index = offset / 2;
-		int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
-		clshroad_vram_0[offset] = data;
-		if (tile_index & 0x20)	tilemap_mark_tile_dirty(tilemap_0a, tile);
-		else					tilemap_mark_tile_dirty(tilemap_0b, tile);
-	}
+	int tile_index = offset / 2;
+	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
+	clshroad_vram_0[offset] = data;
+	if (tile_index & 0x20)	tilemap_mark_tile_dirty(tilemap_0a, tile);
+	else					tilemap_mark_tile_dirty(tilemap_0b, tile);
 }
 
 /***************************************************************************
@@ -224,11 +221,8 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE8_HANDLER( clshroad_vram_1_w )
 {
-	if (clshroad_vram_1[offset] != data)
-	{
-		clshroad_vram_1[offset] = data;
-		tilemap_mark_tile_dirty(tilemap_1, offset % 0x400);
-	}
+	clshroad_vram_1[offset] = data;
+	tilemap_mark_tile_dirty(tilemap_1, offset % 0x400);
 }
 
 

@@ -2490,8 +2490,6 @@ MACHINE_START( mpu4_vid )
 // setup the standard oki MSC1937 display ///////////////////////////////
 
 	vfd_init(0, VFDTYPE_MSC1937,0);   // ?
-
-	return 0;
 }
 
 static MACHINE_START( mpu4 )
@@ -2527,8 +2525,6 @@ static MACHINE_START( mpu4 )
 // setup the standard oki MSC1937 display ///////////////////////////////
 
 	vfd_init(0, VFDTYPE_MSC1937,0);
-
-	return 0;
 }
 
 /*
@@ -2791,7 +2787,7 @@ static const gfx_layout dealemcharlayout =
 static const gfx_decode dealemgfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &dealemcharlayout, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 UINT8 *dealem_videoram,*dealem_charram;
@@ -2867,21 +2863,15 @@ VIDEO_START(dealem)
 
 WRITE8_HANDLER( dealem_videoram_w )
 {
-	if (dealem_videoram[offset] != data)
-	{
-		dealem_videoram[offset] = data;
-		tilemap_mark_tile_dirty(dealem_tilemap, offset);
-	}
+	dealem_videoram[offset] = data;
+	tilemap_mark_tile_dirty(dealem_tilemap, offset);
 }
 
 // this is wrong, the PAL handles the colour selection
 WRITE8_HANDLER( dealem_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		colorram[offset] = data;
-		tilemap_mark_tile_dirty(dealem_tilemap, offset);
-	}
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(dealem_tilemap, offset);
 }
 
 VIDEO_UPDATE(dealem)
@@ -3246,13 +3236,13 @@ ROM_START( matinga )
 ROM_END
 
 ROM_START( connect4 )
-	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00  )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00  )
 	ROM_LOAD( "connect4.p2",  0x8000, 0x4000,  CRC(6090633c) )
 	ROM_LOAD( "connect4.p1",  0xC000, 0x4000,  CRC(b1af50c0) )
 ROM_END
 
 ROM_START( dealem )
-	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00  )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, ROMREGION_ERASE00  )
 	ROM_LOAD( "zenndlem.u6",	0x8000, 0x8000,  CRC(571e5c05) SHA1(89b4c331407a04eae34bb187b036791e0a671533) )
 
 	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )

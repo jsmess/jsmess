@@ -165,7 +165,7 @@ VIDEO_UPDATE(go2000)
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &go2000_layout,   0x0, 0x80  }, /* tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

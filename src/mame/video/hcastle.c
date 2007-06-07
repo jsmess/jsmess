@@ -126,20 +126,14 @@ VIDEO_START( hcastle )
 
 WRITE8_HANDLER( hcastle_pf1_video_w )
 {
-	if (hcastle_pf1_videoram[offset] != data)
-	{
-		hcastle_pf1_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset & 0xbff);
-	}
+	hcastle_pf1_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset & 0xbff);
 }
 
 WRITE8_HANDLER( hcastle_pf2_video_w )
 {
-	if (hcastle_pf2_videoram[offset] != data)
-	{
-		hcastle_pf2_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0xbff);
-	}
+	hcastle_pf2_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0xbff);
 }
 
 WRITE8_HANDLER( hcastle_gfxbank_w )

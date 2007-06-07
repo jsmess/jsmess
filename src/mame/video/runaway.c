@@ -40,12 +40,8 @@ WRITE8_HANDLER( runaway_paletteram_w )
 
 WRITE8_HANDLER( runaway_video_ram_w )
 {
-	if (data != runaway_video_ram[offset])
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	runaway_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

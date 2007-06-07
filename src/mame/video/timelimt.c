@@ -87,20 +87,14 @@ VIDEO_START( timelimt )
 
 WRITE8_HANDLER( timelimt_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( timelimt_bg_videoram_w )
 {
-	if (timelimt_bg_videoram[offset] != data)
-	{
-		timelimt_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	timelimt_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( timelimt_scroll_x_lsb_w )

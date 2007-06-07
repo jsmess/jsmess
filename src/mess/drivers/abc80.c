@@ -1056,7 +1056,6 @@ INTERRUPT_GEN( abc80_nmi_interrupt )
 static MACHINE_START( abc80 )
 {
 	z80pio_init(0, &abc80_pio_interface);
-	return 0;
 }
 
 /* Machine Drivers */

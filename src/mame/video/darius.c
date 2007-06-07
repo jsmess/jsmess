@@ -70,14 +70,9 @@ READ16_HANDLER( darius_fg_layer_r )
 
 WRITE16_HANDLER( darius_fg_layer_w )
 {
-	int oldword = darius_fg_ram[offset];
-
 	COMBINE_DATA(&darius_fg_ram[offset]);
-	if (oldword != darius_fg_ram[offset])
-	{
-		if (offset < 0x4000)
-			tilemap_mark_tile_dirty(fg_tilemap,(offset & 0x1fff));
-	}
+	if (offset < 0x4000)
+		tilemap_mark_tile_dirty(fg_tilemap,(offset & 0x1fff));
 }
 
 /***************************************************************************/

@@ -27,12 +27,8 @@ static TILE_GET_INFO( get_tile_info )
 
 static WRITE8_HANDLER( mgolf_vram_w )
 {
-	if (mgolf_video_ram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	mgolf_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

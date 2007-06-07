@@ -640,7 +640,6 @@ static MACHINE_START( qdrmfgp )
 	state_save_register_global(control);
 	state_save_register_global(qdrmfgp_pal);
 	state_save_register_global(gp2_irq_control);
-	return 0;
 }
 
 static MACHINE_RESET( qdrmfgp )

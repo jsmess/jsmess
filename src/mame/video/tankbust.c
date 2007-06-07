@@ -103,11 +103,8 @@ VIDEO_START( tankbust )
 
 WRITE8_HANDLER( tankbust_background_videoram_w )
 {
-	if( videoram[offset]!=data )
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_videoram_r )
 {
@@ -116,11 +113,8 @@ READ8_HANDLER( tankbust_background_videoram_r )
 
 WRITE8_HANDLER( tankbust_background_colorram_w )
 {
-	if( colorram[offset]!=data )
-	{
-		colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_colorram_r )
 {
@@ -129,11 +123,8 @@ READ8_HANDLER( tankbust_background_colorram_r )
 
 WRITE8_HANDLER( tankbust_txtram_w )
 {
-	if( txt_ram[offset]!=data )
-	{
-		txt_ram[offset] = data;
-		tilemap_mark_tile_dirty(txt_tilemap, offset);
-	}
+	txt_ram[offset] = data;
+	tilemap_mark_tile_dirty(txt_tilemap, offset);
 }
 READ8_HANDLER( tankbust_txtram_r )
 {

@@ -522,7 +522,6 @@ static MACHINE_START( avigo )
 
 	add_reset_callback(machine, avigo_machine_reset);
 	add_exit_callback(machine, avigo_machine_stop);
-	return 0;
 }
 
 

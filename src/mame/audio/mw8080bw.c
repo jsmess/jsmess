@@ -25,18 +25,15 @@ static UINT8 port_2_last;
 
 /*************************************
  *
- *  Machine setup
+ *  Audio setup
  *
  *************************************/
 
-
-MACHINE_START( mw8080bw_audio )
+static SOUND_START( samples )
 {
 	/* setup for save states */
 	state_save_register_global(port_1_last);
 	state_save_register_global(port_2_last);
-
-	return 0;
 }
 
 
@@ -47,7 +44,6 @@ MACHINE_START( mw8080bw_audio )
  *  by a few of these games
  *
  *************************************/
-
 
 #define MIDWAY_TONE_EN				NODE_100
 #define MIDWAY_TONE_DATA_L			NODE_101
@@ -86,13 +82,13 @@ WRITE8_HANDLER( midway_tone_generator_hi_w )
 }
 
 
+
 /*************************************
  *
  *  Implementation of the common
  *  noise circuits
  *
  *************************************/
-
 
 static const discrete_lfsr_desc midway_lfsr =
 {
@@ -119,7 +115,6 @@ static const discrete_lfsr_desc midway_lfsr =
  *
  *************************************/
 
-
 static const char *seawolf_sample_names[] =
 {
 	"*seawolf",
@@ -140,6 +135,8 @@ static struct Samplesinterface seawolf_samples_interface =
 
 
 MACHINE_DRIVER_START( seawolf_audio )
+	MDRV_SOUND_START(samples)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(seawolf_samples_interface)
@@ -181,7 +178,6 @@ WRITE8_HANDLER( seawolf_audio_w )
  *
  *************************************/
 
-
 static const char *gunfight_sample_names[] =
 {
 	"*gunfight",
@@ -199,6 +195,8 @@ static struct Samplesinterface gunfight_samples_interface =
 
 
 MACHINE_DRIVER_START( gunfight_audio )
+	MDRV_SOUND_START(samples)
+
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -256,7 +254,6 @@ WRITE8_HANDLER( gunfight_audio_w )
  *  Tornado Baseball
  *
  *************************************/
-
 
 #define TORNBASE_SQUAREW_240		NODE_01
 #define TORNBASE_SQUAREW_960		NODE_02
@@ -348,7 +345,6 @@ WRITE8_HANDLER( tornbase_audio_w )
  *
  *************************************/
 
-
 MACHINE_DRIVER_START( zzzap_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 MACHINE_DRIVER_END
@@ -393,7 +389,6 @@ WRITE8_HANDLER( zzzap_audio_2_w )
  *  Discrete sound emulation: Feb 2007, D.R.
  *
  *************************************/
-
 
 /* nodes - inputs */
 #define MAZE_P1_DATA			NODE_01
@@ -599,7 +594,6 @@ void maze_write_discrete(UINT8 maze_tone_timing_state)
  *  Discrete sound emulation: Jan 2007, D.R.
  *
  *************************************/
-
 
 /* nodes - inputs */
 #define BOOTHILL_GAME_ON_EN			NODE_01
@@ -833,7 +827,6 @@ WRITE8_HANDLER( boothill_audio_w )
  *  Checkmate
  *
  *************************************/
-
 
 /* nodes - inputs */
 #define CHECKMAT_BOOM_EN			NODE_01
@@ -1069,7 +1062,6 @@ WRITE8_HANDLER( checkmat_audio_w )
  *  Discrete sound emulation: Jan 2007, D.R.
  *
  *************************************/
-
 
 /* nodes - inputs */
 #define DESERTGU_GAME_ON_EN					NODE_01
@@ -1326,7 +1318,6 @@ WRITE8_HANDLER( desertgu_audio_2_w )
  *  Discrete sound emulation: Jan 2007, D.R.
  *
  *************************************/
-
 
 /* nodes - inputs */
 #define DPLAY_GAME_ON_EN	NODE_01
@@ -1606,7 +1597,6 @@ WRITE8_HANDLER( dplay_audio_w )
  *
  *************************************/
 
-
 static const char *gmissile_sample_names[] =
 {
 	"*gmissile",
@@ -1624,6 +1614,8 @@ static struct Samplesinterface gmissile_samples_interface =
 
 
 MACHINE_DRIVER_START( gmissile_audio )
+	MDRV_SOUND_START(samples)
+
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -1703,7 +1695,6 @@ WRITE8_HANDLER( gmissile_audio_3_w )
 
 /* Noise clock was breadboarded and measured at 3760Hz */
 
-
 static const char *m4_sample_names[] =
 {
 	"*m4",
@@ -1721,6 +1712,8 @@ static struct Samplesinterface m4_samples_interface =
 
 
 MACHINE_DRIVER_START( m4_audio )
+	MDRV_SOUND_START(samples)
+
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -1793,7 +1786,6 @@ WRITE8_HANDLER( m4_audio_2_w )
  *  Discrete sound emulation: Mar 2005, D.R.
  *
  *************************************/
-
 
 /* nodes - inputs */
 #define CLOWNS_POP_BOTTOM_EN		NODE_01
@@ -2008,6 +2000,8 @@ static struct Samplesinterface clowns_samples_interface =
 
 
 MACHINE_DRIVER_START( clowns_audio )
+	MDRV_SOUND_START(samples)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
@@ -2102,7 +2096,6 @@ WRITE8_HANDLER( shuffle_audio_2_w )
  *
  *************************************/
 
-
 static const discrete_op_amp_tvca_info dogpatch_music_tvca_info =
 {
 	RES_M(3.3),
@@ -2180,8 +2173,9 @@ WRITE8_HANDLER( dogpatch_audio_w )
  *
  *  Space Encounters
  *
+ *  Discrete sound emulation:
+ *  Apr 2007, D.R.
  *************************************/
-
 
 static struct SN76477interface spcenctr_sn76477_interface =
 {
@@ -2210,11 +2204,6 @@ static struct SN76477interface spcenctr_sn76477_interface =
 	1				/* 9  enable (variable)      */
 };
 
-
-/*************************************
- *  Discrete sound emulation:
- *  Apr 2007, D.R.
- *************************************/
 
 /* nodes - inputs */
 #define SPCENCTR_ENEMY_SHIP_SHOT_EN		NODE_01
@@ -2761,7 +2750,6 @@ WRITE8_HANDLER( spcenctr_audio_3_w )
  *
  *************************************/
 
-
 static const char *phantom2_sample_names[] =
 {
 	"*phantom2",
@@ -2779,6 +2767,8 @@ static struct Samplesinterface phantom2_samples_interface =
 
 
 MACHINE_DRIVER_START( phantom2_audio )
+	MDRV_SOUND_START(samples)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(phantom2_samples_interface)
@@ -2829,12 +2819,9 @@ WRITE8_HANDLER( phantom2_audio_2_w )
  *
  *  Bowling Alley
  *
- *************************************/
-
-
-/*************************************
  *  Discrete sound emulation:
  *  Apr 2007, D.R.
+ *
  *************************************/
 
 /* nodes - inputs */
@@ -3001,8 +2988,10 @@ WRITE8_HANDLER( bowler_audio_6_w )
  *  they would work under SEAL. The port info was also gleaned from
  *  his emulator. These sounds should also work on all the invader games.
  *
+ *  Discrete sound emulation:
+ *  Apr 2007, D.R.
+ *
  *************************************/
-
 
 static struct SN76477interface invaders_sn76477_interface =
 {
@@ -3058,6 +3047,8 @@ static struct Samplesinterface invaders_samples_interface =
 
 /* left in for all games that hack into invaders samples for audio */
 MACHINE_DRIVER_START( invaders_samples_audio )
+	MDRV_SOUND_START(samples)
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SN76477, 0)
@@ -3069,11 +3060,6 @@ MACHINE_DRIVER_START( invaders_samples_audio )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-
-/*************************************
- *  Discrete sound emulation:
- *  Apr 2007, D.R.
- *************************************/
 
 /* nodes - inputs */
 #define INVADERS_SAUCER_HIT_EN				01
@@ -3829,7 +3815,6 @@ WRITE8_HANDLER( blueshrk_audio_w )
  *  Space Invaders II (cocktail)
  *
  *************************************/
-
 
 static struct SN76477interface invad2ct_p1_sn76477_interface =
 {

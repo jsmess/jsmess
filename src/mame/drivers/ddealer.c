@@ -172,7 +172,7 @@ static const gfx_layout charlayout =
 static const gfx_decode jalmah_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_RESET (ddealer)

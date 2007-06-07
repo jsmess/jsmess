@@ -88,7 +88,6 @@ static TILE_GET_INFO( get_fg_tile_info )
 WRITE32_HANDLER( silkroad_fgram_w )
 {
 	COMBINE_DATA(&silkroad_vidram[offset]);
-
 	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 

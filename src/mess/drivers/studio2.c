@@ -237,8 +237,6 @@ static MACHINE_START( studio2 )
 {
 	state_save_register_global(cdp1802_mode);
 	state_save_register_global(keylatch);
-
-	return 0;
 }
 
 static MACHINE_RESET( studio2 )

@@ -283,7 +283,7 @@ static const gfx_layout charlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_CPU1, 0x2800, &charlayout, 0, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

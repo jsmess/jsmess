@@ -102,18 +102,14 @@ VIDEO_UPDATE( stadhero )
 
 WRITE16_HANDLER( stadhero_pf1_data_w )
 {
-	UINT16 oldword=stadhero_pf1_data[offset];
 	COMBINE_DATA(&stadhero_pf1_data[offset]);
-	if (oldword!=stadhero_pf1_data[offset])
-		tilemap_mark_tile_dirty(pf1_tilemap,offset);
+	tilemap_mark_tile_dirty(pf1_tilemap,offset);
 }
 
 WRITE16_HANDLER( stadhero_pf2_data_w )
 {
-	UINT16 oldword=stadhero_pf2_data[offset];
 	COMBINE_DATA(&stadhero_pf2_data[offset]);
-	if (oldword!=stadhero_pf2_data[offset])
-		tilemap_mark_tile_dirty(pf2_tilemap,offset);
+	tilemap_mark_tile_dirty(pf2_tilemap,offset);
 }
 
 WRITE16_HANDLER( stadhero_pf2_control_0_w )

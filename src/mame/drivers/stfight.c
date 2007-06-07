@@ -475,7 +475,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0x0000, &bglayout,     16*4+16*16,       16 },
 	{ REGION_GFX3, 0x0020, &bglayout,     16*4+16*16,       16 },
 	{ REGION_GFX4, 0x0000, &spritelayout, 16*4+16*16+16*16, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static struct MSM5205interface msm5205_interface =

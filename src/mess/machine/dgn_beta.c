@@ -1158,7 +1158,6 @@ MACHINE_START( dgnbeta )
 	}
 	LogDatWrites=0;
 #endif	/* MAME_DEBUG */
-	return 0;
 }
 
 

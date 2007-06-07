@@ -85,11 +85,8 @@ READ16_HANDLER( splash_vram_r )
 
 WRITE16_HANDLER( splash_vram_w )
 {
-	int oldword = splash_videoram[offset];
 	COMBINE_DATA(&splash_videoram[offset]);
-
-	if (oldword != splash_videoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 1);
+	tilemap_mark_tile_dirty(bg_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 1);
 }
 
 static void splash_draw_bitmap(mame_bitmap *bitmap,const rectangle *cliprect)

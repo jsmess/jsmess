@@ -332,7 +332,6 @@ MACHINE_START( pdp1 )
 
 	add_reset_callback(machine, pdp1_machine_reset);
 	add_exit_callback(machine, pdp1_machine_stop);
-	return 0;
 }
 
 

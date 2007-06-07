@@ -141,20 +141,14 @@ static void set_background_palette_intensity(void)
 
 WRITE8_HANDLER( psychic5_bg_videoram_w )
 {
-	if (psychic5_bg_videoram[offset] != data)
-	{
-		psychic5_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
-	}
+	psychic5_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( psychic5_fg_videoram_w )
 {
-	if (psychic5_fg_videoram[offset] != data)
-	{
-		psychic5_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
-	}
+	psychic5_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
 }
 
 READ8_HANDLER( psychic5_paged_ram_r )

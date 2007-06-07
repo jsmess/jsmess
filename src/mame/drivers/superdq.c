@@ -151,7 +151,6 @@ PALETTE_INIT( superdq )
 static MACHINE_START( superdq )
 {
 	discinfo = laserdisc_init(LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-	return 0;
 }
 
 static INTERRUPT_GEN( superdq_vblank )

@@ -113,20 +113,14 @@ READ8_HANDLER( pandoras_cram_r )
 
 WRITE8_HANDLER( pandoras_vram_w )
 {
-	if (videoram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(layer0,offset);
-		videoram[offset] = data;
-	}
+	tilemap_mark_tile_dirty(layer0,offset);
+	videoram[offset] = data;
 }
 
 WRITE8_HANDLER( pandoras_cram_w )
 {
-	if (colorram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(layer0,offset);
-		colorram[offset] = data;
-	}
+	tilemap_mark_tile_dirty(layer0,offset);
+	colorram[offset] = data;
 }
 
 WRITE8_HANDLER( pandoras_scrolly_w )

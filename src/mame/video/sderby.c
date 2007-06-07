@@ -23,10 +23,8 @@ static TILE_GET_INFO( get_sderby_tile_info )
 
 WRITE16_HANDLER( sderby_videoram_w )
 {
-	int oldword = sderby_videoram[offset];
 	COMBINE_DATA(&sderby_videoram[offset]);
-	if (oldword != sderby_videoram[offset])
-		tilemap_mark_tile_dirty(sderby_tilemap,offset/2);
+	tilemap_mark_tile_dirty(sderby_tilemap,offset/2);
 }
 
 /* MD Layer */
@@ -43,10 +41,8 @@ static TILE_GET_INFO( get_sderby_md_tile_info )
 
 WRITE16_HANDLER( sderby_md_videoram_w )
 {
-	int oldword = sderby_md_videoram[offset];
 	COMBINE_DATA(&sderby_md_videoram[offset]);
-	if (oldword != sderby_md_videoram[offset])
-		tilemap_mark_tile_dirty(sderby_md_tilemap,offset/2);
+	tilemap_mark_tile_dirty(sderby_md_tilemap,offset/2);
 }
 
 /* FG Layer */
@@ -63,10 +59,8 @@ static TILE_GET_INFO( get_sderby_fg_tile_info )
 
 WRITE16_HANDLER( sderby_fg_videoram_w )
 {
-	int oldword = sderby_fg_videoram[offset];
 	COMBINE_DATA(&sderby_fg_videoram[offset]);
-	if (oldword != sderby_fg_videoram[offset])
-		tilemap_mark_tile_dirty(sderby_fg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(sderby_fg_tilemap,offset/2);
 }
 
 

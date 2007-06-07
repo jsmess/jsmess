@@ -233,24 +233,16 @@ WRITE8_HANDLER( mpatrol_scroll_w )
 
 WRITE8_HANDLER( mpatrol_videoram_w )
 {
-	if (data != videoram[offset])
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 
 WRITE8_HANDLER( mpatrol_colorram_w )
 {
-	if (data != colorram[offset])
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

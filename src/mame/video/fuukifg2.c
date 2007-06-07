@@ -63,9 +63,8 @@ static TILE_GET_INFO( get_tile_info_##_N_ ) \
 \
 WRITE16_HANDLER( fuuki16_vram_##_N_##_w ) \
 { \
-	UINT16 old_data	=	fuuki16_vram_##_N_[offset]; \
-	UINT16 new_data	=	COMBINE_DATA(&fuuki16_vram_##_N_[offset]); \
-	if (old_data != new_data)	tilemap_mark_tile_dirty(tilemap_##_N_,offset/2); \
+	COMBINE_DATA(&fuuki16_vram_##_N_[offset]); \
+	tilemap_mark_tile_dirty(tilemap_##_N_,offset/2); \
 }
 
 LAYER( 0 )

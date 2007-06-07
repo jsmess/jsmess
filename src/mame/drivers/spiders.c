@@ -377,8 +377,6 @@ static MACHINE_START( spiders )
 	state_save_register_global(gfx_rom_ctrl_mode);
 	state_save_register_global(gfx_rom_ctrl_latch);
 	state_save_register_global(gfx_rom_ctrl_data);
-
-	return 0;
 }
 
 

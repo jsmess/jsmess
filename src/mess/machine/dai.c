@@ -138,7 +138,6 @@ MACHINE_START( dai )
 	pit8253_init(1, &dai_pit8253_intf);
 
 	timer_set(0, 0, dai_bootstrap_callback);
-	return 0;
 }
 
 /***************************************************************************

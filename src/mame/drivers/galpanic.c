@@ -967,7 +967,7 @@ static const gfx_layout spritelayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &spritelayout,  256, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -989,7 +989,6 @@ static MACHINE_DRIVER_START( galpanic )
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024 + 32768)
-	MDRV_COLORTABLE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(galpanic)
 	MDRV_VIDEO_START(galpanic)

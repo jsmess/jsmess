@@ -2104,7 +2104,6 @@ MACHINE_START( bbca )
 {
 	via_config(0, &bbcb_system_via);
 	via_set_clock(0,1000000);
-	return 0;
 }
 
 MACHINE_RESET( bbca )
@@ -2147,7 +2146,6 @@ MACHINE_START( bbcb )
 	    wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
 	//	break;
 	//}
-	return 0;
 }
 
 MACHINE_RESET( bbcb )
@@ -2205,7 +2203,6 @@ MACHINE_START( bbcbp )
 	via_set_clock(1,1000000);
 
 	wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
-	return 0;
 }
 
 MACHINE_RESET( bbcbp )
@@ -2243,7 +2240,6 @@ MACHINE_START( bbcm )
 	via_set_clock(1,1000000);
 
 	wd17xx_init(WD_TYPE_177X,bbc_wd177x_callback, NULL);
-	return 0;
 }
 
 MACHINE_RESET( bbcm )

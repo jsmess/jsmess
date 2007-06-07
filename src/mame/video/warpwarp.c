@@ -210,20 +210,14 @@ VIDEO_START( warpwarp )
 
 WRITE8_HANDLER( geebee_videoram_w )
 {
-	if (geebee_videoram[offset] != data)
-	{
-		geebee_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-	}
+	geebee_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( warpwarp_videoram_w )
 {
-	if (warpwarp_videoram[offset] != data)
-	{
-		warpwarp_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-	}
+	warpwarp_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
 }
 
 

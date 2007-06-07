@@ -82,7 +82,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.115u3.  This incorporates all features of the
+- The core is based on MAME 0.115u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - WD17xx cleanups.  [Nate Woods]

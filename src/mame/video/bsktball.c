@@ -13,11 +13,8 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( bsktball_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

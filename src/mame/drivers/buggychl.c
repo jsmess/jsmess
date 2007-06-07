@@ -382,7 +382,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ 0,           0, &charlayout,   0, 8 }, /* decoded at runtime */
 	/* sprites are drawn pixel by pixel by draw_sprites() */
 	{ REGION_GFX1, 0, &spritelayout, 0, 8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -453,7 +453,6 @@ static MACHINE_DRIVER_START( buggychl )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(128+128)
-	MDRV_COLORTABLE_LENGTH(128)
 
 	MDRV_PALETTE_INIT(buggychl)
 	MDRV_VIDEO_START(buggychl)
@@ -482,7 +481,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( buggychl )
-	ROM_REGION( 0x1c000, REGION_CPU1, 0 )  /* 64k for code */
+	ROM_REGION( 0x1c000, REGION_CPU1, 0 )
 	ROM_LOAD( "a22-04-2.23", 0x00000, 0x4000, CRC(16445a6a) SHA1(5ce7b0b1aeb3b6cd400965467f913558f39c251f) )
 	ROM_LOAD( "a22-05-2.22", 0x04000, 0x4000, CRC(d57430b2) SHA1(3e5b8c21a342d8e26c12a78535748073bc5b8742) )
 	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) /* banked */
@@ -512,7 +511,7 @@ ROM_START( buggychl )
 ROM_END
 
 ROM_START( buggycht )
-	ROM_REGION( 0x1c000, REGION_CPU1, 0 )  /* 64k for code */
+	ROM_REGION( 0x1c000, REGION_CPU1, 0 )
 	ROM_LOAD( "bu04.bin",    0x00000, 0x4000, CRC(f90ab854) SHA1(d4536c98be35de3d888548e2de15f8435ca4f08c) )
 	ROM_LOAD( "bu05.bin",    0x04000, 0x4000, CRC(543d0949) SHA1(b7b0b0319f5376e7cfcfd0e8a4fa6fea566e0206) )
 	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) /* banked */

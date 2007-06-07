@@ -679,7 +679,7 @@ static const gfx_layout bklayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &bklayout, 0, 8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

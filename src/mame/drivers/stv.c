@@ -2635,7 +2635,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ 0, 0, &tiles8x8x8_layout,   0x00, 0x20  },
 	{ 0, 0, &tiles16x16x8_layout, 0x00, 0x20  },
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 struct sh2_config sh2_conf_master = { 0 };
@@ -2700,8 +2700,6 @@ MACHINE_START( stv )
 	state_save_register_global(scsp_last_line);
 
 	stv_register_protection_savestates(); // machine/stvprot.c
-
-	return 0;
 }
 
 MACHINE_RESET( stv )

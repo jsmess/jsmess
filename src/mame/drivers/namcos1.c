@@ -957,7 +957,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &tilelayout,   0x0800,   8 },  /* characters */
 	{ REGION_GFX3, 0, &spritelayout, 0x0000, 128 },  /* sprites 32/16/8/4 dots */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

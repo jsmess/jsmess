@@ -322,7 +322,7 @@ static const gfx_decode gunbustr_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0x0, &tile16x16_layout,  0, 512 },
 	{ REGION_GFX1, 0x0, &charlayout,        0, 512 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

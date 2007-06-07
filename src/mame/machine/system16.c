@@ -48,7 +48,7 @@ static const gfx_layout charlayout =
 
 gfx_decode sys16_gfxdecodeinfo[] = {
 	{ REGION_GFX1, 0, &charlayout,	0, 1024 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

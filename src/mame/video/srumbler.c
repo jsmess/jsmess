@@ -71,20 +71,14 @@ VIDEO_START( srumbler )
 
 WRITE8_HANDLER( srumbler_foreground_w )
 {
-	if (srumbler_foregroundram[offset] != data)
-	{
-		srumbler_foregroundram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset/2);
-	}
+	srumbler_foregroundram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( srumbler_background_w )
 {
-	if (srumbler_backgroundram[offset] != data)
-	{
-		srumbler_backgroundram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
-	}
+	srumbler_backgroundram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 

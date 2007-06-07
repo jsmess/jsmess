@@ -74,11 +74,8 @@ static TILE_GET_INFO( get_bsb_tile_info )
 
 WRITE16_HANDLER( bsb_videoram_w )
 {
-	if (bsb_videoram[offset] != data)
-	{
-		bsb_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bsb_tilemap,offset);
-	}
+	bsb_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bsb_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_bsb_tile2_info )
@@ -93,11 +90,8 @@ static TILE_GET_INFO( get_bsb_tile2_info )
 
 WRITE16_HANDLER( bsb_videoram2_w )
 {
-	if (bsb_videoram2[offset] != data)
-	{
-		bsb_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(bsb_tilemap2,offset);
-	}
+	bsb_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(bsb_tilemap2,offset);
 }
 
 
@@ -113,11 +107,8 @@ static TILE_GET_INFO( get_bsb_tile3_info )
 
 WRITE16_HANDLER( bsb_videoram3_w )
 {
-	if (bsb_videoram3[offset] != data)
-	{
-		bsb_videoram3[offset] = data;
-		tilemap_mark_tile_dirty(bsb_tilemap3,offset);
-	}
+	bsb_videoram3[offset] = data;
+	tilemap_mark_tile_dirty(bsb_tilemap3,offset);
 }
 
 /* Video Start / Update */

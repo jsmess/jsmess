@@ -864,13 +864,13 @@ static const gfx_layout ballbros_tilelayout =
 static const gfx_decode superman_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x000000, &tilelayout,    0, 256 },	 /* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode ballbros_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x000000, &ballbros_tilelayout,    0, 256 },	 /* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -906,7 +906,6 @@ MACHINE_START( taitox )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 /**************************************************************************/

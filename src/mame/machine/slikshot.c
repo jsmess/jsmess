@@ -405,7 +405,7 @@ static void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 bea
 static void compute_sensors(void)
 {
 	UINT16 inter1, inter2, inter3;
-	UINT16 word1, word2, word3;
+	UINT16 word1 = 0, word2 = 0, word3 = 0;
 	UINT8 beams;
 
 	/* skip if we're not ready */

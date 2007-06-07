@@ -29,9 +29,11 @@
 #define FRAC_DEN(offset) (((offset) >> 23) & 0x0f)
 #define FRAC_OFFSET(offset) ((offset) & 0x007fffff)
 
-#define STEP4(START,STEP)  (START),(START)+1*(STEP),(START)+2*(STEP),(START)+3*(STEP)
+#define STEP2(START,STEP)  (START),(START)+(STEP)
+#define STEP4(START,STEP)  STEP2(START,STEP),STEP2((START)+2*(STEP),STEP)
 #define STEP8(START,STEP)  STEP4(START,STEP),STEP4((START)+4*(STEP),STEP)
 #define STEP16(START,STEP) STEP8(START,STEP),STEP8((START)+8*(STEP),STEP)
+#define STEP32(START,STEP) STEP16(START,STEP),STEP16((START)+16*(STEP),STEP)
 
 
 struct _gfx_layout
@@ -100,6 +102,7 @@ struct _gfx_decode
 	const gfx_layout *gfxlayout;
 	UINT16 color_codes_start;	/* offset in the color lookup table where color codes start */
 	UINT16 total_color_codes;	/* total number of color codes */
+	UINT8 xscale, yscale;		/* optional pixel scaling factors */
 };
 
 

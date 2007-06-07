@@ -428,7 +428,7 @@ VIDEO_UPDATE(rabbit)
 	/* prio isnt certain but seems to work.. */
 	for (prilevel = 0xf; prilevel >0; prilevel--)
 	{
-		if (prilevel == ((rabbit_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 3);;
+		if (prilevel == ((rabbit_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 3);
 		if (prilevel == ((rabbit_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 2);
 		if (prilevel == ((rabbit_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 1);
 		if (prilevel == ((rabbit_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 0);
@@ -1039,7 +1039,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_USER2, 0, &rabbit_8x8x8_layout,   0x0, 0x1000  },
 	{ REGION_USER2, 0, &rabbit_16x16x8_layout, 0x0, 0x1000  },
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* irq 6 = vblank

@@ -138,5 +138,4 @@ MACHINE_START( coupe )
 {
     wd17xx_init(WD_TYPE_177X,NULL, NULL);
 	add_reset_callback(machine, coupe_reset);
-	return 0;
 }

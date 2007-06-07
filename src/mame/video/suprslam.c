@@ -96,10 +96,8 @@ static void suprslam_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect
 
 WRITE16_HANDLER( suprslam_screen_videoram_w )
 {
-	if (suprslam_screen_videoram[offset] != data) {
-		suprslam_screen_videoram[offset] = data;
-		tilemap_mark_tile_dirty(suprslam_screen_tilemap,offset);
-	}
+	suprslam_screen_videoram[offset] = data;
+	tilemap_mark_tile_dirty(suprslam_screen_tilemap,offset);
 }
 
 
@@ -120,10 +118,8 @@ static TILE_GET_INFO( get_suprslam_tile_info )
 /* BG LAYER */
 WRITE16_HANDLER( suprslam_bg_videoram_w )
 {
-	if (suprslam_bg_videoram[offset] != data) {
-		suprslam_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(suprslam_bg_tilemap,offset);
-	}
+	suprslam_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(suprslam_bg_tilemap,offset);
 }
 
 

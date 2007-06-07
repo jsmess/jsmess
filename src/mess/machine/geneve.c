@@ -289,7 +289,6 @@ MACHINE_START( geneve )
 		ti99_usbsm_init(TRUE);
 
 	add_exit_callback(machine, machine_stop_geneve);
-	return 0;
 }
 
 static void machine_stop_geneve(running_machine *machine)

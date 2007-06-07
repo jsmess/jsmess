@@ -854,25 +854,20 @@ READ16_HANDLER( PC080SN_word_1_r )
 
 static void PC080SN_word_w(int chip,offs_t offset,UINT16 data,UINT32 mem_mask)
 {
-	int oldword = PC080SN_ram[chip][offset];
-
 	COMBINE_DATA(&PC080SN_ram[chip][offset]);
-	if (oldword != PC080SN_ram[chip][offset])
+	if (!PC080SN_dblwidth)
 	{
-		if (!PC080SN_dblwidth)
-		{
-			if (offset < 0x2000)
-				tilemap_mark_tile_dirty(PC080SN_tilemap[chip][0],offset / 2);
-			else if (offset >= 0x4000 && offset < 0x6000)
-				tilemap_mark_tile_dirty(PC080SN_tilemap[chip][1],(offset & 0x1fff) / 2);
-		}
-		else
-		{
-			if (offset < 0x4000)
-				tilemap_mark_tile_dirty(PC080SN_tilemap[chip][0],(offset & 0x1fff));
-			else if (offset >= 0x4000 && offset < 0x8000)
-				tilemap_mark_tile_dirty(PC080SN_tilemap[chip][1],(offset & 0x1fff));
-		}
+		if (offset < 0x2000)
+			tilemap_mark_tile_dirty(PC080SN_tilemap[chip][0],offset / 2);
+		else if (offset >= 0x4000 && offset < 0x6000)
+			tilemap_mark_tile_dirty(PC080SN_tilemap[chip][1],(offset & 0x1fff) / 2);
+	}
+	else
+	{
+		if (offset < 0x4000)
+			tilemap_mark_tile_dirty(PC080SN_tilemap[chip][0],(offset & 0x1fff));
+		else if (offset >= 0x4000 && offset < 0x8000)
+			tilemap_mark_tile_dirty(PC080SN_tilemap[chip][1],(offset & 0x1fff));
 	}
 }
 
@@ -1638,79 +1633,75 @@ READ16_HANDLER( TC0080VCO_word_r )
 
 WRITE16_HANDLER( TC0080VCO_word_w )
 {
-	int oldword = TC0080VCO_ram[offset];
 	COMBINE_DATA(&TC0080VCO_ram[offset]);
 
 	/* A lot of TC0080VCO writes require no action... */
 
-	if (oldword != TC0080VCO_ram[offset])
+	if (offset < 0x1000/2)
 	{
-		if (offset < 0x1000/2)
-		{
-			TC0080VCO_char_dirty[offset / 8] = 1;
-			TC0080VCO_chars_dirty = 1;
+		TC0080VCO_char_dirty[offset / 8] = 1;
+		TC0080VCO_chars_dirty = 1;
 #if 0
-			if (!TC0080VCO_has_tx)
-			{
-				if (TC0080VCO_ram[offset])
-				popmessage("Write non-zero to TC0080VCO char ram\nPlease report to MAMEDEV");
-			}
-#endif
-		}
-		else if (offset < 0x2000/2)	/* fg0 (text layer) */
+		if (!TC0080VCO_has_tx)
 		{
-			tilemap_mark_tile_dirty( TC0080VCO_tilemap[2],(offset &0x07ff) * 2 );
-			tilemap_mark_tile_dirty( TC0080VCO_tilemap[2],(offset &0x07ff) * 2 + 1 );
-#if 0
-			if (!TC0080VCO_has_tx)
-			{
-				if (TC0080VCO_ram[offset])
-				popmessage("Write non-zero to TC0080VCO fg0\nPlease report to MAMEDEV");
-			}
-#endif
-		}
-		else if (offset < 0xc000/2)	/* chain ram */
-		{}
-		else if (offset < 0xe000/2)	/* bg0 (0) */
-			tilemap_mark_tile_dirty(TC0080VCO_tilemap[0],(offset & 0xfff));
-
-		else if (offset < 0x10000/2)	/* bg1 (0) */
-			tilemap_mark_tile_dirty(TC0080VCO_tilemap[1],(offset & 0xfff));
-
-		else if (offset < 0x11000/2)
-		{
-			TC0080VCO_char_dirty[(offset - 0x10000/2) / 8] = 1;
-			TC0080VCO_chars_dirty = 1;
-#if 0
-			if (!TC0080VCO_has_tx)
-			{
-				if (TC0080VCO_ram[offset])
-				popmessage("Write non-zero to TC0080VCO char-hi ram\nPlease report to MAMEDEV");
-			}
-#endif
-		}
-		else if (offset < 0x12000/2)	/* unknown/unused */
-		{
-#if 1
 			if (TC0080VCO_ram[offset])
-			popmessage("Write non-zero to mystery TC0080VCO area\nPlease report to MAMEDEV");
-#endif
+			popmessage("Write non-zero to TC0080VCO char ram\nPlease report to MAMEDEV");
 		}
-		else if (offset < 0x1c000/2)	/* chain ram */
-		{}
-		else if (offset < 0x1e000/2)	/* bg0 (1) */
-			tilemap_mark_tile_dirty(TC0080VCO_tilemap[0],(offset & 0xfff));
-
-		else if (offset < 0x20000/2)	/* bg1 (1) */
-			tilemap_mark_tile_dirty(TC0080VCO_tilemap[1],(offset & 0xfff));
-
-		else if (offset < 0x20400/2)	/* bg0 rowscroll */
-		{}
-		else if (offset < 0x20800/2)	/* sprite ram */
-		{}
-		else if (offset < 0x20fff/2)
-			TC0080VCO_scrollram_w(offset-(0x20800/2),TC0080VCO_ram[offset],mem_mask);
+#endif
 	}
+	else if (offset < 0x2000/2)	/* fg0 (text layer) */
+	{
+		tilemap_mark_tile_dirty( TC0080VCO_tilemap[2],(offset &0x07ff) * 2 );
+		tilemap_mark_tile_dirty( TC0080VCO_tilemap[2],(offset &0x07ff) * 2 + 1 );
+#if 0
+		if (!TC0080VCO_has_tx)
+		{
+			if (TC0080VCO_ram[offset])
+			popmessage("Write non-zero to TC0080VCO fg0\nPlease report to MAMEDEV");
+		}
+#endif
+	}
+	else if (offset < 0xc000/2)	/* chain ram */
+	{}
+	else if (offset < 0xe000/2)	/* bg0 (0) */
+		tilemap_mark_tile_dirty(TC0080VCO_tilemap[0],(offset & 0xfff));
+
+	else if (offset < 0x10000/2)	/* bg1 (0) */
+		tilemap_mark_tile_dirty(TC0080VCO_tilemap[1],(offset & 0xfff));
+
+	else if (offset < 0x11000/2)
+	{
+		TC0080VCO_char_dirty[(offset - 0x10000/2) / 8] = 1;
+		TC0080VCO_chars_dirty = 1;
+#if 0
+		if (!TC0080VCO_has_tx)
+		{
+			if (TC0080VCO_ram[offset])
+			popmessage("Write non-zero to TC0080VCO char-hi ram\nPlease report to MAMEDEV");
+		}
+#endif
+	}
+	else if (offset < 0x12000/2)	/* unknown/unused */
+	{
+#if 1
+		if (TC0080VCO_ram[offset])
+		popmessage("Write non-zero to mystery TC0080VCO area\nPlease report to MAMEDEV");
+#endif
+	}
+	else if (offset < 0x1c000/2)	/* chain ram */
+	{}
+	else if (offset < 0x1e000/2)	/* bg0 (1) */
+		tilemap_mark_tile_dirty(TC0080VCO_tilemap[0],(offset & 0xfff));
+
+	else if (offset < 0x20000/2)	/* bg1 (1) */
+		tilemap_mark_tile_dirty(TC0080VCO_tilemap[1],(offset & 0xfff));
+
+	else if (offset < 0x20400/2)	/* bg0 rowscroll */
+	{}
+	else if (offset < 0x20800/2)	/* sprite ram */
+	{}
+	else if (offset < 0x20fff/2)
+		TC0080VCO_scrollram_w(offset-(0x20800/2),TC0080VCO_ram[offset],mem_mask);
 }
 
 
@@ -2464,39 +2455,34 @@ READ16_HANDLER( TC0100SCN_word_2_r )
 
 static void TC0100SCN_word_w(int chip,offs_t offset,UINT16 data,UINT32 mem_mask)
 {
-	int oldword = TC0100SCN_ram[chip][offset];
-
 	COMBINE_DATA(&TC0100SCN_ram[chip][offset]);
-	if (oldword != TC0100SCN_ram[chip][offset])
+	if (!TC0100SCN_dblwidth[chip])
 	{
-		if (!TC0100SCN_dblwidth[chip])
+		if (offset < 0x2000)
+			tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][0][0],offset / 2);
+		else if (offset < 0x3000)
+			tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][2][0],(offset & 0x0fff));
+		else if (offset < 0x3800)
 		{
-			if (offset < 0x2000)
-				tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][0][0],offset / 2);
-			else if (offset < 0x3000)
-				tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][2][0],(offset & 0x0fff));
-			else if (offset < 0x3800)
-			{
-				TC0100SCN_char_dirty[chip][(offset - 0x3000) / 8] = 1;
-				TC0100SCN_chars_dirty[chip] = 1;
-			}
-			else if (offset >= 0x4000 && offset < 0x6000)
-				tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][1][0],(offset & 0x1fff) / 2);
+			TC0100SCN_char_dirty[chip][(offset - 0x3000) / 8] = 1;
+			TC0100SCN_chars_dirty[chip] = 1;
 		}
-		else	/* Double-width tilemaps have a different memory map */
+		else if (offset >= 0x4000 && offset < 0x6000)
+			tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][1][0],(offset & 0x1fff) / 2);
+	}
+	else	/* Double-width tilemaps have a different memory map */
+	{
+		if (offset < 0x4000)
+			tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][0][1],offset / 2);
+		else if (offset >= 0x4000 && offset < 0x8000)
+			tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][1][1],(offset & 0x3fff) / 2);
+		else if (offset >= 0x8800 && offset < 0x9000)
 		{
-			if (offset < 0x4000)
-				tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][0][1],offset / 2);
-			else if (offset >= 0x4000 && offset < 0x8000)
-				tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][1][1],(offset & 0x3fff) / 2);
-			else if (offset >= 0x8800 && offset < 0x9000)
-			{
-				TC0100SCN_char_dirty[chip][(offset - 0x8800) / 8] = 1;
-				TC0100SCN_chars_dirty[chip] = 1;
-			}
-			else if (offset >= 0x9000)
-				tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][2][1],(offset & 0x0fff));
+			TC0100SCN_char_dirty[chip][(offset - 0x8800) / 8] = 1;
+			TC0100SCN_chars_dirty[chip] = 1;
 		}
+		else if (offset >= 0x9000)
+			tilemap_mark_tile_dirty(TC0100SCN_tilemap[chip][2][1],(offset & 0x0fff));
 	}
 }
 
@@ -2842,13 +2828,8 @@ READ16_HANDLER( TC0430GRW_word_r )
 
 WRITE16_HANDLER( TC0280GRD_word_w )
 {
-	int oldword = TC0280GRD_ram[offset];
-
 	COMBINE_DATA(&TC0280GRD_ram[offset]);
-	if (oldword != TC0280GRD_ram[offset])
-	{
-		tilemap_mark_tile_dirty(TC0280GRD_tilemap,offset);
-	}
+	tilemap_mark_tile_dirty(TC0280GRD_tilemap,offset);
 }
 
 WRITE16_HANDLER( TC0430GRW_word_w )
@@ -3354,52 +3335,48 @@ READ16_HANDLER( TC0480SCP_word_r )
 
 static void TC0480SCP_word_write(offs_t offset,UINT16 data,UINT32 mem_mask)
 {
-	int oldword = TC0480SCP_ram[offset];
 	COMBINE_DATA(&TC0480SCP_ram[offset]);
 
-	if (oldword != TC0480SCP_ram[offset])
+	if (!TC0480SCP_dblwidth)
 	{
-		if (!TC0480SCP_dblwidth)
+		if (offset < 0x2000)
 		{
-			if (offset < 0x2000)
-			{
-				tilemap_mark_tile_dirty(TC0480SCP_tilemap[(offset /
-					0x800)][TC0480SCP_dblwidth],((offset % 0x800) / 2));
-			}
-			else if (offset < 0x6000)
-			{   /* do nothing */
-			}
-			else if (offset < 0x7000)
-			{
-				tilemap_mark_tile_dirty(TC0480SCP_tilemap[4][TC0480SCP_dblwidth],
-					(offset - 0x6000));
-			}
-			else if (offset <= 0x7fff)
-			{
-				TC0480SCP_char_dirty[(offset - 0x7000) / 16] = 1;
-				TC0480SCP_chars_dirty = 1;
-			}
+			tilemap_mark_tile_dirty(TC0480SCP_tilemap[(offset /
+				0x800)][TC0480SCP_dblwidth],((offset % 0x800) / 2));
 		}
-		else
+		else if (offset < 0x6000)
+		{   /* do nothing */
+		}
+		else if (offset < 0x7000)
 		{
-			if (offset < 0x4000)
-			{
-				tilemap_mark_tile_dirty(TC0480SCP_tilemap[(offset /
-					0x1000)][TC0480SCP_dblwidth],((offset % 0x1000) / 2));
-			}
-			else if (offset < 0x6000)
-			{   /* do nothing */
-			}
-			else if (offset < 0x7000)
-			{
-				tilemap_mark_tile_dirty(TC0480SCP_tilemap[4][TC0480SCP_dblwidth],
-					(offset - 0x6000));
-			}
-			else if (offset <= 0x7fff)
-			{
-				TC0480SCP_char_dirty[(offset - 0x7000) / 16] = 1;
-				TC0480SCP_chars_dirty = 1;
-			}
+			tilemap_mark_tile_dirty(TC0480SCP_tilemap[4][TC0480SCP_dblwidth],
+				(offset - 0x6000));
+		}
+		else if (offset <= 0x7fff)
+		{
+			TC0480SCP_char_dirty[(offset - 0x7000) / 16] = 1;
+			TC0480SCP_chars_dirty = 1;
+		}
+	}
+	else
+	{
+		if (offset < 0x4000)
+		{
+			tilemap_mark_tile_dirty(TC0480SCP_tilemap[(offset /
+				0x1000)][TC0480SCP_dblwidth],((offset % 0x1000) / 2));
+		}
+		else if (offset < 0x6000)
+		{   /* do nothing */
+		}
+		else if (offset < 0x7000)
+		{
+			tilemap_mark_tile_dirty(TC0480SCP_tilemap[4][TC0480SCP_dblwidth],
+				(offset - 0x6000));
+		}
+		else if (offset <= 0x7fff)
+		{
+			TC0480SCP_char_dirty[(offset - 0x7000) / 16] = 1;
+			TC0480SCP_chars_dirty = 1;
 		}
 	}
 }

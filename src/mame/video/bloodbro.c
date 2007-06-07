@@ -79,26 +79,20 @@ VIDEO_START( bloodbro )
 
 WRITE16_HANDLER( bloodbro_bgvideoram_w )
 {
-	int oldword = bloodbro_bgvideoram[offset];
 	COMBINE_DATA(&bloodbro_bgvideoram[offset]);
-	if (oldword != bloodbro_bgvideoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE16_HANDLER( bloodbro_fgvideoram_w )
 {
-	int oldword = bloodbro_fgvideoram[offset];
 	COMBINE_DATA(&bloodbro_fgvideoram[offset]);
-	if (oldword != bloodbro_fgvideoram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( bloodbro_txvideoram_w )
 {
-	int oldword = bloodbro_txvideoram[offset];
 	COMBINE_DATA(&bloodbro_txvideoram[offset]);
-	if (oldword != bloodbro_txvideoram[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 

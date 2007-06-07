@@ -106,20 +106,14 @@ WRITE8_HANDLER( tsamurai_textbank2_w )
 
 WRITE8_HANDLER( tsamurai_bg_videoram_w )
 {
-	if( tsamurai_videoram[offset]!=data )
-	{
-		tsamurai_videoram[offset]=data;
-		offset = offset/2;
-		tilemap_mark_tile_dirty(background,offset);
-	}
+	tsamurai_videoram[offset]=data;
+	offset = offset/2;
+	tilemap_mark_tile_dirty(background,offset);
 }
 WRITE8_HANDLER( tsamurai_fg_videoram_w )
 {
-	if( videoram[offset]!=data )
-	{
-		videoram[offset]=data;
-		tilemap_mark_tile_dirty(foreground,offset);
-	}
+	videoram[offset]=data;
+	tilemap_mark_tile_dirty(foreground,offset);
 }
 WRITE8_HANDLER( tsamurai_fg_colorram_w )
 {

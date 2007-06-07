@@ -104,16 +104,14 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE16_HANDLER( blmbycar_vram_0_w )
 {
-	UINT16 oldword = blmbycar_vram_0[offset];
-	UINT16 newword = COMBINE_DATA(&blmbycar_vram_0[offset]);
-	if (oldword != newword)	tilemap_mark_tile_dirty(tilemap_0, offset/2);
+	COMBINE_DATA(&blmbycar_vram_0[offset]);
+	tilemap_mark_tile_dirty(tilemap_0, offset/2);
 }
 
 WRITE16_HANDLER( blmbycar_vram_1_w )
 {
-	UINT16 oldword = blmbycar_vram_1[offset];
-	UINT16 newword = COMBINE_DATA(&blmbycar_vram_1[offset]);
-	if (oldword != newword)	tilemap_mark_tile_dirty(tilemap_1, offset/2);
+	COMBINE_DATA(&blmbycar_vram_1[offset]);
+	tilemap_mark_tile_dirty(tilemap_1, offset/2);
 }
 
 

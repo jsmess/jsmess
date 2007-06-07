@@ -439,7 +439,7 @@ static int render_font_load_cached_bdf(render_font *font, const char *filename)
 	bytes = mame_fread(file, data, MIN(CACHED_BDF_HASH_SIZE, font->rawsize));
 	if (bytes != MIN(CACHED_BDF_HASH_SIZE, font->rawsize))
 		goto error;
-	hash = crc32(0, data, bytes) ^ (UINT32)font->rawsize;
+	hash = crc32(0, (const UINT8*)data, bytes) ^ (UINT32)font->rawsize;
 
 	/* create the cached filename */
 	cachedname = mame_strdup(filename);
@@ -668,7 +668,7 @@ static int render_font_load_cached(render_font *font, mame_file *file, UINT32 ha
 		ch->yoffs = (INT16)((info[6] << 8) | info[7]);
 		ch->bmwidth = (info[8] << 8) | info[9];
 		ch->bmheight = (info[10] << 8) | info[11];
-		ch->rawdata = data + offset;
+		ch->rawdata = (char *)data + offset;
 
 		/* advance the offset past the character */
 		offset += (ch->bmwidth * ch->bmheight + 7) / 8;
@@ -678,7 +678,7 @@ static int render_font_load_cached(render_font *font, mame_file *file, UINT32 ha
 
 	/* reuse the chartable as a temporary buffer */
 	font->format = FONT_FORMAT_CACHED;
-	font->rawdata = data;
+	font->rawdata = (char *)data;
 	return 0;
 
 error:

@@ -274,7 +274,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0x08000, &tile2,          0, 4 },
 	{ REGION_GFX3, 0x0c000, &tile1,          0, 4 },
 	{ REGION_GFX3, 0x0c000, &tile2,          0, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -348,7 +348,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( exprraid )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cz01",    0x4000, 0x4000, CRC(dc8f9fba) SHA1(cae6af54fc0081d606b6884e8873aed356a37ba9) )
 	ROM_LOAD( "cz00",    0x8000, 0x8000, CRC(a81290bc) SHA1(ddb0acda6124427bee691f9926c41fda27ed816e) )
 
@@ -387,7 +387,7 @@ ROM_START( exprraid )
 ROM_END
 
 ROM_START( exprrada )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cz01-2e.15a", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
 	ROM_LOAD( "cz00-4e.16b", 0x8000, 0x8000, CRC(910f6ccc) SHA1(1dbf164a7add9335d90ee07b6db9a162a28e407b) )
 
@@ -426,7 +426,7 @@ ROM_START( exprrada )
 ROM_END
 
 ROM_START( wexpress )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "2",       0x4000, 0x4000, CRC(ea5e5a8f) SHA1(fa92bcb6b97c2966cd330b309eba73f9c059f14e) )
 	ROM_LOAD( "1",       0x8000, 0x8000, CRC(a7daae12) SHA1(a97f4bc05a3ec096d8c717bdf096f4b0e59dc2c2) )
 
@@ -465,7 +465,7 @@ ROM_START( wexpress )
 ROM_END
 
 ROM_START( wexpresb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "wexpress.3", 0x4000, 0x4000, CRC(b4dd0fa4) SHA1(8d17eb28ae92486c67859871ea2bef8f50f39dbd) )
 	ROM_LOAD( "wexpress.1", 0x8000, 0x8000, CRC(e8466596) SHA1(dbbd3b84d0f017292595fc19f7412b984851221a) )
 
@@ -500,7 +500,7 @@ ROM_START( wexpresb )
 ROM_END
 
 ROM_START( wexpresc )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "s2",      0x4000, 0x4000, CRC(40d70fcb) SHA1(1327d39f872a39e020972952e5756ca59c55f9d0) )
 	ROM_LOAD( "s1",      0x8000, 0x8000, CRC(7c573824) SHA1(f5e4d4f0866c08c88d012a77e8aa2e74a779f986) )
 

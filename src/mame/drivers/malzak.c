@@ -425,7 +425,7 @@ static const gfx_decode malzak_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x0000, &saa5050_charlayout, 0, 128},
 	{ REGION_GFX2, 0x0000, &saa5050_hilayout, 0, 128},
 	{ REGION_GFX2, 0x0000, &saa5050_lolayout, 0, 128},
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 //static int val = -1;

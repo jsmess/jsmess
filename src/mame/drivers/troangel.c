@@ -194,7 +194,7 @@ static const gfx_decode troangel_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x1000, &spritelayout, 32*8, 32 },
 	{ REGION_GFX2, 0x2000, &spritelayout, 32*8, 32 },
 	{ REGION_GFX2, 0x3000, &spritelayout, 32*8, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

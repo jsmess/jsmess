@@ -110,7 +110,7 @@ static const char *frogs_sample_names[] =
 	"hop.wav",
 	"splash.wav",
 	"zip.wav",
-	0       /* end of array */
+	0
 };
 
 static struct Samplesinterface frogs_samples_interface =
@@ -140,8 +140,6 @@ static void frogs_croak_callback(int param)
 MACHINE_START( frogs_audio )
 {
 	frogs_croak_timer = mame_timer_alloc(frogs_croak_callback);
-
-	return 0;
 }
 
 

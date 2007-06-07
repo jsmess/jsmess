@@ -29,11 +29,8 @@ extern size_t tx1_objectram_size;
 
 WRITE8_HANDLER( tx1_vram_w )
 {
-        if (tx1_vram[offset]!=data)
-        {
-        	tilemap_mark_tile_dirty(tx1_tilemap,offset/2);
-        }
 	tx1_vram[offset] = data;
+	tilemap_mark_tile_dirty(tx1_tilemap,offset/2);
 }
 
 static TILE_GET_INFO( get_tx1_tile_info )
@@ -167,20 +164,14 @@ PALETTE_INIT( buggyboy )
 
 WRITE8_HANDLER( buggyb1_vram_w )
 {
-        if (buggyb1_vram[offset]!=data)
-        {
-        	tilemap_mark_tile_dirty(buggyb1_tilemap,offset/2);
-        }
 	buggyb1_vram[offset] = data;
+	tilemap_mark_tile_dirty(buggyb1_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( buggyboy_vram_w )
 {
-        if (buggyboy_vram[offset]!=data)
-        {
-        	tilemap_mark_tile_dirty(buggyboy_tilemap,offset/2);
-        }
 	buggyboy_vram[offset] = data;
+	tilemap_mark_tile_dirty(buggyboy_tilemap,offset/2);
 }
 
 

@@ -1117,7 +1117,6 @@ static MACHINE_START( a2600 )
 
 		memory_set_bankptr(9, extra_RAM);
 	}
-	return 0;
 }
 
 

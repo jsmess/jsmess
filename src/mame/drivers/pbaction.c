@@ -253,7 +253,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x00000, &charlayout2,  128,  8 },	/* 128-255 background */
 	{ REGION_GFX3, 0x00000, &spritelayout1,  0, 16 },	/*   0-127 normal sprites */
 	{ REGION_GFX3, 0x01000, &spritelayout2,  0, 16 },	/*   0-127 large sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -312,7 +312,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pbaction )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "b-p7.bin",     0x0000, 0x4000, CRC(8d6dcaae) SHA1(c9e605f9d291cb8c7163655ea96c605b7d30365f) )
 	ROM_LOAD( "b-n7.bin",     0x4000, 0x4000, CRC(d54d5402) SHA1(a4c3205bfe5fba8bb1ff3ad15941a77c35b44a27) )
 	ROM_LOAD( "b-l7.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
@@ -339,7 +339,7 @@ ROM_END
 
 
 ROM_START( pbactio2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pba16.bin",     0x0000, 0x4000, CRC(4a239ebd) SHA1(74e6da0485ac78093b4f09953fa3accb14bc3e43) )
 	ROM_LOAD( "pba15.bin",     0x4000, 0x4000, CRC(3afef03a) SHA1(dec714415d2fd00c9021171a48f6c94b40888ae8) )
 	ROM_LOAD( "pba14.bin",     0x8000, 0x2000, CRC(c0a98c8a) SHA1(442f37af31db13fd98602dd7f9eeae5529da0f44) )
@@ -368,7 +368,7 @@ ROM_START( pbactio2 )
 ROM_END
 
 ROM_START( pbactio3 )
-	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "14.bin",     0x0000, 0x4000, CRC(f17a62eb) SHA1(8dabfc0ad127c154c0293a65df32d52d57dd9755) )
 	ROM_LOAD( "12.bin",     0x4000, 0x4000, CRC(ec3c64c6) SHA1(6130b80606d717f95e219316c2d3fa0a1980ea1d) )
 	ROM_LOAD( "13.bin",     0x8000, 0x4000, CRC(c93c851e) SHA1(b41077708fce4ccbcecdeae32af8821ca5322e87) )

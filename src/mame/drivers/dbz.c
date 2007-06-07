@@ -430,7 +430,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX3, 0, &bglayout, 0, 512 },
 	{ REGION_GFX4, 0, &bglayout, 0, 512 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /**********************************************************************************/

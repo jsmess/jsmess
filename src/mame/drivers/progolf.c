@@ -186,7 +186,7 @@ static gfx_decode gfxdecodeinfo[] =
 
 	{ REGION_GFX2, 0x0000, &progolf_charlayout2, 0, 8 }, /* sprites */
 	{ REGION_GFX2, 0x0000, &progolf_spritelayout2, 0, 8 }, /* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

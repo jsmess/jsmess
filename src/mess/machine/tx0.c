@@ -173,7 +173,6 @@ MACHINE_START( tx0 )
 
 	add_reset_callback(machine, tx0_machine_reset);
 	add_exit_callback(machine, tx0_machine_stop);
-	return 0;
 }
 
 

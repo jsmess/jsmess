@@ -289,7 +289,7 @@ static const gfx_layout tilelayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout, 4096, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

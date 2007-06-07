@@ -241,7 +241,7 @@ static const gfx_decode tail2nos_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tail2nos_charlayout,   0, 128 },
 	{ REGION_GFX2, 0, &tail2nos_spritelayout, 0, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

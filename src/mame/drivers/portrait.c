@@ -246,7 +246,7 @@ static const gfx_layout tile_layout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x00000, &tile_layout, 0, 0x100 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( portrait )

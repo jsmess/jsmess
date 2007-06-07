@@ -71,8 +71,6 @@ MACHINE_RESET( mw8080bw );
 
 /*----------- defined in audio/mw8080bw.c -----------*/
 
-MACHINE_START( mw8080bw_audio );
-
 WRITE8_HANDLER( midway_tone_generator_lo_w );
 WRITE8_HANDLER( midway_tone_generator_hi_w );
 

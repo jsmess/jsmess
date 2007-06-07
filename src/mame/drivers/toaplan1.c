@@ -1550,28 +1550,28 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x00000, &tilelayout,		0, 64 },
 	{ REGION_GFX2, 0x00000, &tilelayout,	64*16, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode rallybik_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x00000, &tilelayout,			  0, 64 },
 	{ REGION_GFX2, 0x00000, &rallybik_spr_layout, 64*16, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode outzone_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x00000, &vm_tilelayout, 	0, 64 },
 	{ REGION_GFX2, 0x00000, &tilelayout,	64*16, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode vm_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x00000, &tilelayout,		0, 64 },
 	{ REGION_GFX2, 0x00000, &vm_tilelayout, 64*16, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

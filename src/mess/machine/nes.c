@@ -162,8 +162,6 @@ MACHINE_START( nes )
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xFFF9, 0xFFFD, 0, 0, MWA8_BANK11);
 		memory_set_bankptr(11, (void *) infinite_loop);
 	}
-
-	return 0;
 }
 
 static void nes_machine_stop(running_machine *machine)

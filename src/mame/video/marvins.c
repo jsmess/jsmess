@@ -96,23 +96,20 @@ WRITE8_HANDLER( marvins_spriteram_w )
 
 WRITE8_HANDLER( marvins_foreground_ram_w )
 {
-	if (offset < 0x800 && spriteram_2[offset] != data) tilemap_mark_tile_dirty(fg_tilemap,offset);
-
 	spriteram_2[offset] = data;
+	if (offset < 0x800) tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( marvins_background_ram_w )
 {
-	if (offset < 0x800 && spriteram_3[offset] != data) tilemap_mark_tile_dirty(bg_tilemap,offset);
-
 	spriteram_3[offset] = data;
+	if (offset < 0x800) tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( marvins_text_ram_w )
 {
-	if (offset < 0x400 && videoram[offset] != data) tilemap_mark_tile_dirty(tx_tilemap,offset);
-
 	videoram[offset] = data;
+	if (offset < 0x400) tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 /***************************************************************************

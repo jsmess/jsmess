@@ -786,7 +786,7 @@ static const gfx_decode topspeed_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x0, &tile16x8_layout,  0, 256 },	/* sprite parts */
 	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
 	// Road Lines gfxdecodable ?
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -827,7 +827,6 @@ static MACHINE_START( topspeed )
 
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 static MACHINE_DRIVER_START( topspeed )

@@ -98,7 +98,6 @@ static MACHINE_START( lvpoker )
 	state_save_register_global(payout);
 	state_save_register_global(pulse);
 	state_save_register_global(result);
-	return 0;
 }
 
 static MACHINE_RESET( lvpoker )
@@ -489,7 +488,6 @@ static MACHINE_DRIVER_START( lvcards )
 	MDRV_SCREEN_VISIBLE_AREA(8*0, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(lvcards)
 	MDRV_VIDEO_START(lvcards)

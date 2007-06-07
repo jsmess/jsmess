@@ -260,7 +260,7 @@ static const gfx_decode gfxdecodeinfo_skylncr[] =
 	{ REGION_GFX1, 0, &layout8x8x8,			0, 2 },
 	{ REGION_GFX2, 0, &layout8x32x8_rot,	0, 2 },
 	{ REGION_GFX2, 0, &layout8x32x8,		0, 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 INPUT_PORTS_START( skylncr )

@@ -359,7 +359,7 @@ static const gfx_decode CGA_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x0800, &CGA_charlayout,              0, 256 },   /* Font 1 */
 	{ REGION_GFX1, 0x1000, &CGA_charlayout,              0, 256 },   /* Font 2 */
 	{ REGION_GFX1, 0x1800, &CGA_charlayout,              0, 256 },   /* Font 3*/
-    { -1 } /* end of array */
+    { -1 }
 };
 
 #define AT_KEYB_HELPER(bit, text, key1) \

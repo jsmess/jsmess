@@ -343,7 +343,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &taotaido_layout,  0x000, 256  }, /* sprites */
 	{ REGION_GFX2, 0, &taotaido_layout,  0x300, 256  }, /* bg tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void irqhandler(int irq)

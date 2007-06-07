@@ -75,20 +75,14 @@ VIDEO_START( goindol )
 
 WRITE8_HANDLER( goindol_fg_videoram_w )
 {
-	if (goindol_fg_videoram[offset] != data)
-	{
-		goindol_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset / 2);
-	}
+	goindol_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset / 2);
 }
 
 WRITE8_HANDLER( goindol_bg_videoram_w )
 {
-	if (goindol_bg_videoram[offset] != data)
-	{
-		goindol_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset / 2);
-	}
+	goindol_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset / 2);
 }
 
 

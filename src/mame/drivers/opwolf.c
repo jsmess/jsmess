@@ -242,8 +242,6 @@ static MACHINE_START( opwolf )
 	state_save_register_global_array(adpcm_c);
 	state_save_register_global_array(adpcm_pos);
 	state_save_register_global_array(adpcm_end);
-
-	return 0;
 }
 
 static MACHINE_RESET( opwolf )
@@ -477,14 +475,14 @@ static const gfx_decode opwolf_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites */
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* scr tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode opwolfb_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &tilelayout_b,  0, 256 },	/* sprites */
 	{ REGION_GFX1, 0, &charlayout_b,  0, 256 },	/* scr tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

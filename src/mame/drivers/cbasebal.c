@@ -246,7 +246,7 @@ static const gfx_decode cbasebal_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &cbasebal_textlayout,   256,  8 }, /* colors 256- 287 */
 	{ REGION_GFX2, 0, &cbasebal_tilelayout,   768, 16 }, /* colors 768-1023 */
 	{ REGION_GFX3, 0, &cbasebal_spritelayout, 512,  8 }, /* colors 512- 639 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -289,7 +289,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( cbasebal )
-	ROM_REGION( 0x90000, REGION_CPU1, 0 )	/* 576k for code */
+	ROM_REGION( 0x90000, REGION_CPU1, 0 )
 	ROM_LOAD( "cbj10.11j",    0x00000, 0x08000, CRC(bbff0acc) SHA1(db9e2c89e030255851789caaf85f24dc73609d9b) )
 	ROM_LOAD( "cbj07.16f",    0x10000, 0x20000, CRC(8111d13f) SHA1(264e21e824c87f55da326440c6ed71e1c287a63e) )
 	ROM_LOAD( "cbj06.14f",    0x30000, 0x20000, CRC(9aaa0e37) SHA1(1a7b96b44c66b58f06707aafb1806520747b8c76) )

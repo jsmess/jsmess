@@ -210,10 +210,8 @@ static TILE_GET_INFO( get_welltris_tile_info )
 
 WRITE16_HANDLER( welltris_charvideoram_w )
 {
-	int oldword = welltris_charvideoram[offset];
 	COMBINE_DATA(&welltris_charvideoram[offset]);
-	if (oldword != welltris_charvideoram[offset])
-		tilemap_mark_tile_dirty(char_tilemap, offset);
+	tilemap_mark_tile_dirty(char_tilemap, offset);
 }
 
 VIDEO_START( welltris )

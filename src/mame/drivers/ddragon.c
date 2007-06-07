@@ -1447,7 +1447,7 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 ROM_END
 
 ROM_START( ddragon2 )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x28000, REGION_CPU1, 0 )
 	ROM_LOAD( "26a9-04.bin",  0x08000, 0x8000, CRC(f2cfc649) SHA1(d3f1e0bae02472914a940222e4f600170a91736d) )
 	ROM_LOAD( "26aa-03.bin",  0x10000, 0x8000, CRC(44dd5d4b) SHA1(427c4e419668b41545928cfc96435c010ecdc88b) )
 	ROM_LOAD( "26ab-0.bin",   0x18000, 0x8000, CRC(49ddddcd) SHA1(91dc53718d04718b313f23d86e241027c89d1a03) )
@@ -1483,7 +1483,7 @@ ROM_START( ddragon2 )
 ROM_END
 
 ROM_START( ddragn2u )
-	ROM_REGION( 0x28000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x28000, REGION_CPU1, 0 )
 	ROM_LOAD( "26a9-04.bin",  0x08000, 0x8000, CRC(f2cfc649) SHA1(d3f1e0bae02472914a940222e4f600170a91736d) )
 	ROM_LOAD( "26aa-03.bin",  0x10000, 0x8000, CRC(44dd5d4b) SHA1(427c4e419668b41545928cfc96435c010ecdc88b) )
 	ROM_LOAD( "26ab-0.bin",   0x18000, 0x8000, CRC(49ddddcd) SHA1(91dc53718d04718b313f23d86e241027c89d1a03) )
@@ -1740,7 +1740,6 @@ static MACHINE_START( ddragon )
 {
 	state_save_register_global(bank_data);
 	state_save_register_func_postload_int(ddragon_restore_state, 0);
-	return 0;
 }
 
 static DRIVER_INIT( toffy )

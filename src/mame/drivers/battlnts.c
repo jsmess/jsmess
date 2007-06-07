@@ -323,7 +323,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,		0, 1 }, /* colors  0-15 */
 	{ REGION_GFX2, 0, &spritelayout, 4*16, 1 }, /* colors 64-79 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /***************************************************************************

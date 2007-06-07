@@ -148,7 +148,7 @@ static const gfx_decode gfxdecodeinfo[] =
     { REGION_GFX3, 0x0100, &spritelayout2, 0, 1 },
     { REGION_GFX3, 0x0200, &spritelayout2, 0, 1 },
     { REGION_GFX3, 0x0300, &spritelayout2, 0, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -170,7 +170,7 @@ static const char *starcrus_sample_names[] =
     "explos1.wav",	/* explosion sound, first part, channel 1 */
     "explos2.wav",	/* explosion sound, second part, channel 1 */
     "launch.wav",	/* launch sound, channels 2 and 3 */
-    0   /* end of array */
+    0
 };
 
 static struct Samplesinterface samples_interface =

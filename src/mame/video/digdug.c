@@ -179,11 +179,8 @@ READ8_HANDLER( digdug_videoram_r )
 
 WRITE8_HANDLER( digdug_videoram_w )
 {
-	if (digdug_videoram[offset] != data)
-	{
-		digdug_videoram[offset] = data;
-		tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
-	}
+	digdug_videoram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( digdug_PORT_w )

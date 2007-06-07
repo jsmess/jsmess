@@ -239,7 +239,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tilelayout, 0x100, 16 }, /* Background */
 	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 }, /* Text */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

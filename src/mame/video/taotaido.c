@@ -166,11 +166,8 @@ WRITE16_HANDLER( taotaido_tileregs_w )
 
 WRITE16_HANDLER( taotaido_bgvideoram_w )
 {
-	if (taotaido_bgram[offset] != data)
-	{
-		COMBINE_DATA(&taotaido_bgram[offset]);
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	COMBINE_DATA(&taotaido_bgram[offset]);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 static TILE_GET_INFO( taotaido_bg_tile_info )

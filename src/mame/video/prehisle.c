@@ -18,22 +18,14 @@ static tilemap *bg2_tilemap, *bg_tilemap, *fg_tilemap;
 
 WRITE16_HANDLER( prehisle_bg_videoram16_w )
 {
-	UINT16 oldword = prehisle_bg_videoram16[offset];
 	COMBINE_DATA(&prehisle_bg_videoram16[offset]);
-	if (oldword != prehisle_bg_videoram16[offset])
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE16_HANDLER( prehisle_fg_videoram16_w )
 {
-	UINT16 oldword = videoram16[offset];
 	COMBINE_DATA(&videoram16[offset]);
-	if (oldword != videoram16[offset])
-	{
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 READ16_HANDLER( prehisle_control16_r )

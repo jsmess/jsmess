@@ -827,5 +827,4 @@ MACHINE_START( c65 )
 
 	c65_bankswitch_interface(0xff);
 	c65_bankswitch ();
-	return 0;
 }

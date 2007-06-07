@@ -249,7 +249,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tiles8x8_layout,   0x000, 256  }, /* sprites */
 	{ REGION_GFX1, 0, &tiles16x16_layout,   0x000, 256  }, /* sprites */
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( sderby )

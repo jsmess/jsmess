@@ -666,7 +666,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   768, 64 }, /* colors 768-1023 */
 	{ REGION_GFX2, 0, &tilelayout,     0, 32 }, /* colors   0-511 */
 	{ REGION_GFX3, 0, &spritelayout, 512, 16 }, /* colors 512-767 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -697,7 +697,7 @@ static const gfx_decode turtship_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,          768, 64 },	/* colors 768-1023 */
 	{ REGION_GFX2, 0, &turtship_tilelayout,   0, 32 },	/* colors   0-511 */
 	{ REGION_GFX3, 0, &spritelayout,        512, 16 },	/* colors 512-767 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
@@ -850,7 +850,7 @@ ROM_START( sidearms )
 	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
 	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
 
 	ROM_REGION( 0x08000, REGION_USER1, 0 )    /* starfield data */
@@ -895,7 +895,7 @@ ROM_START( sidearmr )
 	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
 	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
 
 	ROM_REGION( 0x08000, REGION_USER1, 0 )    /* starfield data */
@@ -940,7 +940,7 @@ ROM_START( sidearjp )
 	ROM_LOAD( "a_14e.rom",    0x10000, 0x08000, CRC(4925ed03) SHA1(b11dbd9889db89cff008ca21beb6b1b70d983e16) )        /* 0+1 */
 	ROM_LOAD( "a_12e.rom",    0x18000, 0x08000, CRC(81d0ece7) SHA1(5c1d154f9c1de6b5f5d7abf5d413e9c493461e6f) )        /* 2+3 */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "a_04k.rom",    0x0000, 0x8000, CRC(34efe2d2) SHA1(e1d8895c113e4dee1a132e2471d75dfa6c36b620) )
 
 	ROM_REGION( 0x08000, REGION_USER1, 0 )    /* starfield data */
@@ -985,7 +985,7 @@ ROM_START( turtship )
 	ROM_LOAD( "t-2.3g",    0x10000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
 	ROM_LOAD( "t-1.bin",   0x18000, 0x08000, CRC(a258ffec) SHA1(caa689607ebe450a68736933dbfaf6bf9b6d3487) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "t-4.8a",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1018,7 +1018,7 @@ ROM_START( turtshij )
 	ROM_LOAD( "t-2.3g",    0x10000, 0x08000, CRC(2327b35a) SHA1(bf7b5e11c3f75aff7d09c0fc4ad61fb4bcb38100) )
 	ROM_LOAD( "t-1.3e",    0x18000, 0x08000, CRC(845a9ab0) SHA1(f1455aeca92d129c7ed145d76e5093f41ce62ccb) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "t-4.8a",    0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1051,7 +1051,7 @@ ROM_START( turtshik )
 	ROM_LOAD( "turtship.002",  0x10000, 0x08000, CRC(e576f482) SHA1(3be3792cb437bff0345681a3a2fdefefa3439357) )
 	ROM_LOAD( "turtship.001",  0x18000, 0x08000, CRC(a9b64240) SHA1(38c59877de6055230c3250ef74abc97e4ed88cb6) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "t-4.8a",        0x00000, 0x08000, CRC(1cbe48e8) SHA1(6ac5981d36a44595bb8dc847c54c7be7b374f82c) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1083,7 +1083,7 @@ ROM_START( dyger )
 	ROM_LOAD( "d-2.3g",  0x10000, 0x08000, CRC(059ac4dc) SHA1(fe46d819946e168b4a8188302737fdde957743ea) )
 	ROM_LOAD( "d-1.3e",  0x18000, 0x08000, CRC(d8440f66) SHA1(3b2ee8c09d40edbe76d5004ed9074add0d4e4fd0) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "d-4.8a",  0x0000, 0x8000, CRC(8a256c09) SHA1(2c692af62da7c12b7d4f3f79264ee045a2cfa39f) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1116,7 +1116,7 @@ ROM_START( dygera )
 	ROM_LOAD( "d-2.3g",  0x10000, 0x08000, CRC(059ac4dc) SHA1(fe46d819946e168b4a8188302737fdde957743ea) )
 	ROM_LOAD( "d-1.3e",  0x18000, 0x08000, CRC(d8440f66) SHA1(3b2ee8c09d40edbe76d5004ed9074add0d4e4fd0) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "d-4.8a",  0x0000, 0x8000, CRC(8a256c09) SHA1(2c692af62da7c12b7d4f3f79264ee045a2cfa39f) )
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1148,7 +1148,7 @@ ROM_START( twinfalc )	/* Shows "Notice  This game is for use in Korea only..." T
 	ROM_LOAD( "t-15.bin",    0x00000, 0x08000, CRC(e1f20144) SHA1(911781232fc1a7d6e36abb1c45e68a4398d8deac) )
 	ROM_LOAD( "t-14.bin",    0x10000, 0x10000, CRC(c499ff83) SHA1(d99bb8cb04485638c5f05584cffdd2fbbe061af7) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "t-1.b4",     0x0000, 0x8000, CRC(b84bc980) SHA1(d2d302a96a9e3197f27144e525a901cfb9da09e4) )
 
 	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1180,7 +1180,7 @@ ROM_START( whizz )	/* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Seri
 	ROM_LOAD( "t-15.l11",    0x00000, 0x08000, CRC(73161302) SHA1(de815bba66c376cea775139f4285de0b1a589d88) )
 	ROM_LOAD( "t-14.k11",    0x10000, 0x10000, CRC(bf248879) SHA1(f46f15e3949221e59d8c37de9c23473a74c2927e) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "t-1.b4",     0x0000, 0x8000, CRC(b84bc980) SHA1(d2d302a96a9e3197f27144e525a901cfb9da09e4) )
 
 	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE )

@@ -1528,21 +1528,14 @@ READ8_HANDLER( K007342_r )
 
 WRITE8_HANDLER( K007342_w )
 {
+	K007342_ram[offset] = data;
 	if (offset < 0x1000)
 	{		/* layer 0 */
-		if (K007342_ram[offset] != data)
-		{
-			K007342_ram[offset] = data;
-			tilemap_mark_tile_dirty(K007342_tilemap[0],offset & 0x7ff);
-		}
+		tilemap_mark_tile_dirty(K007342_tilemap[0],offset & 0x7ff);
 	}
 	else
 	{						/* layer 1 */
-		if (K007342_ram[offset] != data)
-		{
-			K007342_ram[offset] = data;
-			tilemap_mark_tile_dirty(K007342_tilemap[1],offset & 0x7ff);
-		}
+		tilemap_mark_tile_dirty(K007342_tilemap[1],offset & 0x7ff);
 	}
 }
 
@@ -2102,12 +2095,9 @@ WRITE8_HANDLER( K052109_w )
 {
 	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
 	{
-		if (K052109_ram[offset] != data)
-		{
-			if (offset >= 0x4000) has_extra_video_ram = 1;  /* kludge for X-Men */
-			K052109_ram[offset] = data;
-			tilemap_mark_tile_dirty(K052109_tilemap[(offset & 0x1800) >> 11],offset & 0x7ff);
-		}
+		if (offset >= 0x4000) has_extra_video_ram = 1;  /* kludge for X-Men */
+		K052109_ram[offset] = data;
+		tilemap_mark_tile_dirty(K052109_tilemap[(offset & 0x1800) >> 11],offset & 0x7ff);
 	}
 	else	/* control registers */
 	{
@@ -4729,11 +4719,8 @@ READ8_HANDLER( K051316_2_r )
 
 void K051316_w(int chip,int offset,int data)
 {
-	if (K051316_ram[chip][offset] != data)
-	{
-		K051316_ram[chip][offset] = data;
-		tilemap_mark_tile_dirty(K051316_tilemap[chip],offset & 0x3ff);
-	}
+	K051316_ram[chip][offset] = data;
+	tilemap_mark_tile_dirty(K051316_tilemap[chip],offset & 0x3ff);
 }
 
 WRITE8_HANDLER( K051316_0_w )

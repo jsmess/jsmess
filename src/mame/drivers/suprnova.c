@@ -242,7 +242,7 @@ static void hit_calc_axis(UINT16 x1p, UINT16 x1s, UINT16 x2p, UINT16 x2s, UINT16
 			  UINT16 *x1_p1, UINT16 *x1_p2, UINT16 *x2_p1, UINT16 *x2_p2,
 			  INT16 *x_in, UINT16 *x1tox2)
 {
-	UINT16 x1l, x1r, x2l, x2r;
+	UINT16 x1l=0, x1r=0, x2l=0, x2r=0;
 	hit_calc_orig(x1p, x1s, org,      &x1l, &x1r);
 	hit_calc_orig(x2p, x2s, org >> 8, &x2l, &x2r);
 

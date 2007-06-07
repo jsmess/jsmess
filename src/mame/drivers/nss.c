@@ -448,7 +448,7 @@ static struct CustomSound_interface snes_sound_interface =
 
 static const gfx_decode gfxdecodeinfo[] =
 {
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static PALETTE_INIT( snes )

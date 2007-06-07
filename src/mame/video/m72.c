@@ -355,20 +355,14 @@ READ8_HANDLER( m72_videoram2_r )
 
 WRITE8_HANDLER( m72_videoram1_w )
 {
-	if (m72_videoram1[offset] != data)
-	{
-		m72_videoram1[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset/4);
-	}
+	m72_videoram1[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset/4);
 }
 
 WRITE8_HANDLER( m72_videoram2_w )
 {
-	if (m72_videoram2[offset] != data)
-	{
-		m72_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/4);
-	}
+	m72_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/4);
 }
 
 WRITE8_HANDLER( m72_irq_line_w )

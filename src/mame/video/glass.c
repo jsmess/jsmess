@@ -118,11 +118,8 @@ WRITE16_HANDLER( glass_blitter_w )
 
 WRITE16_HANDLER( glass_vram_w )
 {
-	int oldword = glass_videoram[offset];
 	COMBINE_DATA(&glass_videoram[offset]);
-
-	if (oldword != glass_videoram[offset])
-		tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
+	tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
 }
 
 

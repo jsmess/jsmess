@@ -210,26 +210,20 @@ VIDEO_START( hrdtimes )
 
 WRITE16_HANDLER( wbeachvl_txvideoram_w )
 {
-	int oldword = wbeachvl_videoram1[offset];
 	COMBINE_DATA(&wbeachvl_videoram1[offset]);
-	if (oldword != wbeachvl_videoram1[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset / 2);
+	tilemap_mark_tile_dirty(tx_tilemap,offset / 2);
 }
 
 WRITE16_HANDLER( wbeachvl_fgvideoram_w )
 {
-	int oldword = wbeachvl_videoram2[offset];
 	COMBINE_DATA(&wbeachvl_videoram2[offset]);
-	if (oldword != wbeachvl_videoram2[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset / 2);
+	tilemap_mark_tile_dirty(fg_tilemap,offset / 2);
 }
 
 WRITE16_HANDLER( wbeachvl_bgvideoram_w )
 {
-	int oldword = wbeachvl_videoram3[offset];
 	COMBINE_DATA(&wbeachvl_videoram3[offset]);
-	if (oldword != wbeachvl_videoram3[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset / 2);
+	tilemap_mark_tile_dirty(bg_tilemap,offset / 2);
 }
 
 WRITE16_HANDLER( hrdtimes_txvideoram_w )

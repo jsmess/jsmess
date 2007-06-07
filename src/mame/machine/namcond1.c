@@ -22,8 +22,6 @@ MACHINE_START( namcond1 )
 {
 	state_save_register_global(namcond1_h8_irq5_enabled);
 	state_save_register_global(namcond1_gfxbank);
-
-	return 0;
 }
 
 MACHINE_RESET( namcond1 )

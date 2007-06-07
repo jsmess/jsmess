@@ -1620,7 +1620,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 	UINT32 *src = &fifobase[readptr / 4];
 	UINT32 command = *src++;
 	int count, inc, code, i;
-	setup_vertex svert;
+	setup_vertex svert = {0};
 	offs_t target;
 	int cycles = 0;
 

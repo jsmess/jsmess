@@ -488,21 +488,41 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
 	for (i = 0; i < MAX_GFX_ELEMENTS && gfxdecodeinfo[i].memory_region != -1; i++)
 	{
 		int region_length = 8 * memory_region_length(gfxdecodeinfo[i].memory_region);
+		int xscale = (gfxdecodeinfo[i].xscale == 0) ? 1 : gfxdecodeinfo[i].xscale;
+		int yscale = (gfxdecodeinfo[i].yscale == 0) ? 1 : gfxdecodeinfo[i].yscale;
 		UINT32 extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
 		gfx_layout glcopy;
 		int j;
 
 		/* make a copy of the layout */
 		glcopy = *gfxdecodeinfo[i].gfxlayout;
-		if (glcopy.extxoffs)
-		{
+
+		/* copy the X and Y offsets into temporary arrays */
+		memcpy(extxoffs, glcopy.xoffset, sizeof(glcopy.xoffset));
+		memcpy(extyoffs, glcopy.yoffset, sizeof(glcopy.yoffset));
+
+		/* if there are extended offsets, copy them over top */
+		if (glcopy.extxoffs != NULL)
 			memcpy(extxoffs, glcopy.extxoffs, glcopy.width * sizeof(extxoffs[0]));
-			glcopy.extxoffs = extxoffs;
-		}
-		if (glcopy.extyoffs)
-		{
+		if (glcopy.extyoffs != NULL)
 			memcpy(extyoffs, glcopy.extyoffs, glcopy.height * sizeof(extyoffs[0]));
-			glcopy.extyoffs = extyoffs;
+
+		/* always use the extended offsets here */
+		glcopy.extxoffs = extxoffs;
+		glcopy.extyoffs = extyoffs;
+
+		/* expand X and Y by the scale factors */
+		if (xscale > 1)
+		{
+			glcopy.width *= xscale;
+			for (j = glcopy.width - 1; j >= 0; j--)
+				extxoffs[j] = extxoffs[j / xscale];
+		}
+		if (yscale > 1)
+		{
+			glcopy.height *= yscale;
+			for (j = glcopy.height - 1; j >= 0; j--)
+				extyoffs[j] = extyoffs[j / yscale];
 		}
 
 		/* if the character count is a region fraction, compute the effective total */
@@ -512,9 +532,6 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
 		/* for non-raw graphics, decode the X and Y offsets */
 		if (glcopy.planeoffset[0] != GFX_RAW)
 		{
-			UINT32 *xoffset = glcopy.extxoffs ? extxoffs : glcopy.xoffset;
-			UINT32 *yoffset = glcopy.extyoffs ? extyoffs : glcopy.yoffset;
-
 			/* loop over all the planes, converting fractions */
 			for (j = 0; j < glcopy.planes; j++)
 			{
@@ -526,16 +543,16 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
 			/* loop over all the X/Y offsets, converting fractions */
 			for (j = 0; j < glcopy.width; j++)
 			{
-				UINT32 value = xoffset[j];
+				UINT32 value = extxoffs[j];
 				if (IS_FRAC(value))
-					xoffset[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+					extxoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
 			}
 
 			for (j = 0; j < glcopy.height; j++)
 			{
-				UINT32 value = yoffset[j];
+				UINT32 value = extyoffs[j];
 				if (IS_FRAC(value))
-					yoffset[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+					extyoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
 			}
 		}
 
@@ -558,7 +575,7 @@ static void allocate_graphics(const gfx_decode *gfxdecodeinfo)
 		Machine->gfx[i] = allocgfx(&glcopy);
 
 		/* if we have a remapped colortable, point our local colortable to it */
-		if (Machine->remapped_colortable)
+		if (Machine->remapped_colortable != NULL)
 			Machine->gfx[i]->colortable = &Machine->remapped_colortable[gfxdecodeinfo[i].color_codes_start];
 		Machine->gfx[i]->total_colors = gfxdecodeinfo[i].total_color_codes;
 	}
@@ -1299,7 +1316,7 @@ static void update_throttle(mame_time emutime)
 	if (emu_delta_subseconds < 0 || emu_delta_subseconds > MAX_SUBSECONDS / 10)
 	{
 		if (LOG_THROTTLE)
-			logerror("Resync due to weird emutime delta: 0.%018I64d\n", emu_delta_subseconds);
+			logerror("Resync due to weird emutime delta: 0.%09d%09d\n", (int)(emu_delta_subseconds / 1000000000), (int)(emu_delta_subseconds % 1000000000));
 		goto resync;
 	}
 
@@ -1340,7 +1357,7 @@ static void update_throttle(mame_time emutime)
 		(real_is_ahead_subseconds < 0 && popcount[global.throttle_history & 0xff] < 6))
 	{
 		if (LOG_THROTTLE)
-			logerror("Resync due to being behind: 0.%018I64d (history=%08X)\n", -real_is_ahead_subseconds, global.throttle_history);
+			logerror("Resync due to being behind: 0.%09d%09d (history=%08X)\n", (int)(-real_is_ahead_subseconds / 1000000000), (int)((-real_is_ahead_subseconds) % 1000000000), global.throttle_history);
 		goto resync;
 	}
 

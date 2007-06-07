@@ -462,7 +462,7 @@ static const gfx_decode gfxdecodeinfo_backfire[] =
 	{ REGION_GFX2, 0, &tilelayout,      0, 128 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &spritelayout,    0x200, 32 },	/* Sprites 16x16 (screen 1) */
 	{ REGION_GFX4, 0, &spritelayout,    0x600, 32 },	/* Sprites 16x16 (screen 2) */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -593,8 +593,6 @@ static MACHINE_START( mtx512 )
 	mtx_rompage = 0;
 	mtx_set_bank_offsets (0, 0x2000, 0xa0000, 0x8000,
 			      0x6000, 0x4000, 0x2000, 0);
-
-	return 0;
 }
 
 static INTERRUPT_GEN( mtx_interrupt )

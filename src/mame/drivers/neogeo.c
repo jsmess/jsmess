@@ -1272,7 +1272,7 @@ static const gfx_decode neogeo_mvs_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout, 0, 16 },
 	{ REGION_GFX2, 0, &charlayout, 0, 16 },
 	{ REGION_GFX3, 0, &dummy_mvs_tilelayout, 0, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

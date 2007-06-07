@@ -405,7 +405,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0x000, 32 },	/* colors 0x000-0x1ff */
 	{ REGION_GFX2, 0, &spritelayout, 0x200, 32 },	/* colors 0x200-0x3ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -448,7 +448,6 @@ static MACHINE_DRIVER_START( spdodgeb )
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(spdodgeb)
 	MDRV_VIDEO_START(spdodgeb)

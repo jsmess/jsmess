@@ -152,42 +152,32 @@ WRITE16_HANDLER( lastduel_scroll_w )
 
 WRITE16_HANDLER( lastduel_scroll1_w )
 {
-	int oldword = lastduel_scroll1[offset];
 	COMBINE_DATA(&lastduel_scroll1[offset]);
-	if (oldword != lastduel_scroll1[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( lastduel_scroll2_w )
 {
-	int oldword = lastduel_scroll2[offset];
 	COMBINE_DATA(&lastduel_scroll2[offset]);
-	if (oldword != lastduel_scroll2[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( lastduel_vram_w )
 {
-	int oldword = lastduel_vram[offset];
 	COMBINE_DATA(&lastduel_vram[offset]);
-	if (oldword != lastduel_vram[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE16_HANDLER( madgear_scroll1_w )
 {
-	int oldword = lastduel_scroll1[offset];
 	COMBINE_DATA(&lastduel_scroll1[offset]);
-	if (oldword != lastduel_scroll1[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x7ff);
+	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x7ff);
 }
 
 WRITE16_HANDLER( madgear_scroll2_w )
 {
-	int oldword = lastduel_scroll2[offset];
 	COMBINE_DATA(&lastduel_scroll2[offset]);
-	if (oldword != lastduel_scroll2[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
 }
 
 

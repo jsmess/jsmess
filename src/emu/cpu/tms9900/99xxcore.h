@@ -984,7 +984,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			return program_read_byte_8(addr);;
+			return program_read_byte_8(addr);
 		}
 		else if (addr < 0xfffc)
 		{

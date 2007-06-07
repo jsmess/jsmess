@@ -618,7 +618,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,      0,  8 },
 	{ REGION_GFX2, 0, &spritelayout,  4*8, 16 },
 	{ REGION_GFX2, 0, &spritelayout2, 4*8, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode sraider_gfxdecodeinfo[] =
@@ -628,7 +628,7 @@ static const gfx_decode sraider_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &spritelayout2, 4*8, 16 },
 	{ REGION_USER1, 0, &gridlayout, 32+64, 1 },
 	{ REGION_USER1, 0, &gridlayout2, 32+64, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -658,10 +658,10 @@ static MACHINE_DRIVER_START( ladybug )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(SN76496, 4000000)
+   MDRV_SOUND_ADD(SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(SN76496, 4000000)
+   MDRV_SOUND_ADD(SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -760,7 +760,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ladybug )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lb1.cpu",      0x0000, 0x1000, CRC(d09e0adb) SHA1(ddc1f849cbcefb64b70a26c2a4c993f0516af814) )
 	ROM_LOAD( "lb2.cpu",      0x1000, 0x1000, CRC(88bc4a0a) SHA1(193c9f90b7550020c0923cb158dff7d5faa53bc6) )
 	ROM_LOAD( "lb3.cpu",      0x2000, 0x1000, CRC(53e9efce) SHA1(1960e9cd896b6a65197aefc3f10348103552b598) )
@@ -783,7 +783,7 @@ ROM_START( ladybug )
 ROM_END
 
 ROM_START( ladybugb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lb1a.cpu",     0x0000, 0x1000, CRC(ec135e54) SHA1(69fc6db04b28c25eda329fc88c235267ca93a09f) )
 	ROM_LOAD( "lb2a.cpu",     0x1000, 0x1000, CRC(3049c5c6) SHA1(51ceb70fa4789ff91c9bb1e157be5b6c09ff3c8e) )
 	ROM_LOAD( "lb3a.cpu",     0x2000, 0x1000, CRC(b0fef837) SHA1(37e9d8d157c3af12cd97534a42dd21f621ac501b) )
@@ -806,7 +806,7 @@ ROM_START( ladybugb )
 ROM_END
 
 ROM_START( ladybgb2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lb1b.cpu",     0x0000, 0x1000, CRC(35d61e65) SHA1(43b797f1882e0acbf6685deea82de77e78d2c917) )
 	ROM_LOAD( "lb2b.cpu",     0x1000, 0x1000, CRC(a13e0fe4) SHA1(9e2876d8390d2b072d064b197057089a25c13a4a) )
 	ROM_LOAD( "lb3b.cpu",     0x2000, 0x1000, CRC(ee8ac716) SHA1(ead222d2cd022ea3a4559e3cff08cabf2486eb68) )
@@ -829,7 +829,7 @@ ROM_START( ladybgb2 )
 ROM_END
 
 ROM_START( snapjack )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sj2a.bin",     0x0000, 0x1000, CRC(6b30fcda) SHA1(85e4ebbbe8e8d6c79a14387d7a6818abc9430037) )
 	ROM_LOAD( "sj2b.bin",     0x1000, 0x1000, CRC(1f1088d1) SHA1(0fd5204ea27e9bdd811e9ea21e9bbab84b916f4a) )
 	ROM_LOAD( "sj2c.bin",     0x2000, 0x1000, CRC(edd65f3a) SHA1(763d588f0755a22c0f24269e6f38979fd516693f) )
@@ -852,7 +852,7 @@ ROM_START( snapjack )
 ROM_END
 
 ROM_START( cavenger )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1",            0x0000, 0x1000, CRC(9e0cc781) SHA1(f23bd6b9f427c26ac996a5c8ba29f356cf45c78a) )
 	ROM_LOAD( "2",            0x1000, 0x1000, CRC(5ce5b950) SHA1(170e3f8be592dcccb8868474f40f8f2223e8a8b5) )
 	ROM_LOAD( "3",            0x2000, 0x1000, CRC(bc28218d) SHA1(4b0f1b38a5837b7ffc9aec6c28c6eb72cfa46226) )
@@ -930,12 +930,12 @@ ROM_START( dorodon2 )
 ROM_END
 
 ROM_START( sraider )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sraid3.r4",    0x0000, 0x2000, CRC(0f389774) SHA1(c67596e6bf00175ff0a241506cd2f88114d05933) )
 	ROM_LOAD( "sraid2.n4",    0x2000, 0x2000, CRC(38a48db0) SHA1(6f4f384d702fb8ee4bb2ef579638239d57e32ddd) )
 	ROM_LOAD( "sraid1.m4",    0x4000, 0x2000, CRC(2f302a4e) SHA1(3a902ce6858f38df88b60830bef4b1d45b09b2df) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sraid-s4.h6",  0x0000, 0x2000, CRC(57173a12) SHA1(6cb8fd4826e499f9a4e63621d58bc4b596cc261e) )
 	ROM_LOAD( "sraid-s5.j6",  0x2000, 0x2000, CRC(5a459179) SHA1(a261c8f3c7c4cd4587c003bbbe815d2c4e01ffbc) )
 	ROM_LOAD( "sraid-s6.l6",  0x4000, 0x2000, CRC(ea3aa25d) SHA1(353c0d075d5e0a3bc25a65e2748f5eb5212a844d) )

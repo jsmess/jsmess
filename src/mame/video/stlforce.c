@@ -25,11 +25,8 @@ static TILE_GET_INFO( get_stlforce_bg_tile_info )
 
 WRITE16_HANDLER( stlforce_bg_videoram_w )
 {
-	if (stlforce_bg_videoram[offset] != data)
-	{
-		stlforce_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(stlforce_bg_tilemap,offset);
-	}
+	stlforce_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(stlforce_bg_tilemap,offset);
 }
 
 /* middle layer, low */
@@ -49,11 +46,8 @@ static TILE_GET_INFO( get_stlforce_mlow_tile_info )
 
 WRITE16_HANDLER( stlforce_mlow_videoram_w )
 {
-	if (stlforce_mlow_videoram[offset] != data)
-	{
-		stlforce_mlow_videoram[offset] = data;
-		tilemap_mark_tile_dirty(stlforce_mlow_tilemap,offset);
-	}
+	stlforce_mlow_videoram[offset] = data;
+	tilemap_mark_tile_dirty(stlforce_mlow_tilemap,offset);
 }
 
 /* middle layer, high */
@@ -73,11 +67,8 @@ static TILE_GET_INFO( get_stlforce_mhigh_tile_info )
 
 WRITE16_HANDLER( stlforce_mhigh_videoram_w )
 {
-	if (stlforce_mhigh_videoram[offset] != data)
-	{
-		stlforce_mhigh_videoram[offset] = data;
-		tilemap_mark_tile_dirty(stlforce_mhigh_tilemap,offset);
-	}
+	stlforce_mhigh_videoram[offset] = data;
+	tilemap_mark_tile_dirty(stlforce_mhigh_tilemap,offset);
 }
 
 /* text layer, appears to be the top layer */
@@ -98,11 +89,8 @@ static TILE_GET_INFO( get_stlforce_tx_tile_info )
 
 WRITE16_HANDLER( stlforce_tx_videoram_w )
 {
-	if (stlforce_tx_videoram[offset] != data)
-	{
-		stlforce_tx_videoram[offset] = data;
-		tilemap_mark_tile_dirty(stlforce_tx_tilemap,offset);
-	}
+	stlforce_tx_videoram[offset] = data;
+	tilemap_mark_tile_dirty(stlforce_tx_tilemap,offset);
 }
 
 /* sprites - quite a bit still needs doing .. */

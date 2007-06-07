@@ -844,13 +844,13 @@ static const gfx_layout bglayout_8bpp =
 static const gfx_decode gfxdecodeinfo_gaiapols[] =
 {
 	{ REGION_GFX3, 0, &bglayout_4bpp, 0x0000, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_dadandrn[] =
 {
 	{ REGION_GFX3, 0, &bglayout_8bpp, 0x0000, 8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_START( mystwarr )
@@ -864,8 +864,6 @@ static MACHINE_START( mystwarr )
 	state_save_register_global(mw_irq_control);
 	state_save_register_global(cur_sound_region);
 	state_save_register_func_postload(reset_sound_region);
-
-	return 0;
 }
 
 static MACHINE_RESET(mystwarr)

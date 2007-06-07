@@ -135,7 +135,6 @@ static MACHINE_START( astrocde )
 	state_save_register_global(profpac_bank);
 
 	port_1_last = port_2_last = 0xff;
-	return 0;
 }
 
 
@@ -509,7 +508,7 @@ static MACHINE_START( tenpindx )
 	/* initialize the CTC */
 	ctc_intf.baseclock = machine->drv->cpu[0].cpu_clock;
 	z80ctc_init(0, &ctc_intf);
-	return machine_start_astrocde(machine);
+	machine_start_astrocde(machine);
 }
 
 

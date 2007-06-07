@@ -1727,5 +1727,4 @@ MACHINE_START( apple2gs )
 	/* init the various subsystems */
 	scc_init(NULL);
 	apple2gs_setup_memory();
-	return 0;
 }

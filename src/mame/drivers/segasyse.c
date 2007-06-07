@@ -704,6 +704,5 @@ static MACHINE_START( segasyse )
 	state_save_register_global(hintpending);
 	state_save_register_global(rombank);
 	state_save_register_func_postload(segae_bankswitch);
-	return 0;
 }
 

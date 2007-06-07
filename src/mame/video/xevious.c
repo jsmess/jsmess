@@ -268,38 +268,26 @@ READ8_HANDLER( xevious_bg_colorram_r )
 
 WRITE8_HANDLER( xevious_fg_videoram_w )
 {
-	if (xevious_fg_videoram[offset] != data)
-	{
-		xevious_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	xevious_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_fg_colorram_w )
 {
-	if (xevious_fg_colorram[offset] != data)
-	{
-		xevious_fg_colorram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	xevious_fg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_bg_videoram_w )
 {
-	if (xevious_bg_videoram[offset] != data)
-	{
-		xevious_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	xevious_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_bg_colorram_w )
 {
-	if (xevious_bg_colorram[offset] != data)
-	{
-		xevious_bg_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	xevious_bg_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( xevious_vh_latch_w )

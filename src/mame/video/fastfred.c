@@ -144,12 +144,8 @@ VIDEO_START( fastfred )
 
 WRITE8_HANDLER( fastfred_videoram_w )
 {
-	if (fastfred_videoram[offset] != data)
-	{
-		fastfred_videoram[offset] = data;
-
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	fastfred_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
@@ -367,11 +363,8 @@ static TILE_GET_INFO( imago_get_tile_info_web )
 
 WRITE8_HANDLER( imago_fg_videoram_w )
 {
-	if( imago_fg_videoram[offset] != data)
-	{
-		imago_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	imago_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( imago_charbank_w )

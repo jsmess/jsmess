@@ -70,20 +70,14 @@ PALETTE_INIT( mystston )
 
 WRITE8_HANDLER( mystston_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( mystston_videoram2_w )
 {
-	if (mystston_videoram2[offset] != data)
-	{
-		mystston_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset & 0x1ff);
-	}
+	mystston_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset & 0x1ff);
 }
 
 WRITE8_HANDLER( mystston_scroll_w )

@@ -18,7 +18,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 12;		/* my source says 14 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -40,7 +40,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadWord(EA);
 			nec_ICount = old - 12;		/* my source says 14 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -62,7 +62,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 14;		/* my source says 14 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -84,7 +84,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadWord(EA);
 			nec_ICount = old - 14;		/* my source says 14 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -105,7 +105,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 13;
 		}
@@ -126,7 +126,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadWord(EA);
 			nec_ICount = old - 13;
 		}
@@ -147,7 +147,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 18;		/* my source says 18 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -172,7 +172,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadWord(EA);
 			nec_ICount = old - 18;		/* my source says 14 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -197,7 +197,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 13;		/* my source says 15 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -220,7 +220,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadWord(EA);
 			nec_ICount = old - 13;		/* my source says 14 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -243,7 +243,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 15;		/* my source says 15 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -266,7 +266,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadWord(EA);
 			nec_ICount = old - 15;		/* my source says 15 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -289,7 +289,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 14;		/* my source says 15 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -337,7 +337,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 19;
 		}
@@ -362,7 +362,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadWord(EA);
 			nec_ICount = old - 19;		/* my source says 15 cycles everytime and not
                                          * ModRM-dependent like GetEA[] does..hmmm */
@@ -533,7 +533,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 28;
 		}
@@ -557,7 +557,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          * else
          * {
          *     int old=nec_ICount;
-         *     (*GetEA[ModRM])();;
+         *     (*GetEA[ModRM])();
          *     tmp=ReadWord(EA);
          *     nec_ICount=old-33;
          * }
@@ -582,7 +582,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			nec_ICount = old - 33;
 		}
@@ -603,7 +603,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          * }
          * else {
          *     int old=nec_ICount;
-         *     (*GetEA[ModRM])();;
+         *     (*GetEA[ModRM])();
          *     tmp=ReadWord(EA);
          *     nec_ICount=old-33;
          * }
@@ -694,7 +694,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		{
 			int old = nec_ICount;
 
-			(*GetEA[ModRM]) ();;
+			(*GetEA[ModRM]) ();
 			tmp = ReadByte(EA);
 			logerror("ModRM=%04x  Byte=%04x\n", EA, tmp);
 			nec_ICount = old - 33;

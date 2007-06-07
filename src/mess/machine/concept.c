@@ -105,7 +105,6 @@ MACHINE_START(concept)
 
 	concept_hdc_init(1);	/* Flat cable Hard Disk Controller in Slot 2 */
 	concept_fdc_init(2);	/* Floppy Disk Controller in Slot 3 */
-	return 0;
 }
 
 static void install_expansion_slot(int slot,

@@ -373,7 +373,6 @@ static const TMS9928a_interface tms9118_interface =
 static MACHINE_START(ti99_8_60hz)
 {
 	TMS9928A_configure(&tms9118_interface);
-	return 0;
 }
 
 static const TMS9928a_interface tms9129_interface =
@@ -387,7 +386,6 @@ static const TMS9928a_interface tms9129_interface =
 static MACHINE_START(ti99_8_50hz)
 {
 	TMS9928A_configure(&tms9129_interface);
-	return 0;
 }
 
 static struct tms9995reset_param ti99_8_processor_config =

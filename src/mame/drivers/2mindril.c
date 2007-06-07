@@ -98,7 +98,7 @@ static const gfx_layout drill_layout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &drill_layout,  0x0, 256  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 void drill_interrupt5(int x)

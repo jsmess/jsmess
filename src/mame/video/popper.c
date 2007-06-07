@@ -40,42 +40,30 @@ PALETTE_INIT( popper )
 
 WRITE8_HANDLER( popper_ol_videoram_w )
 {
-	if (popper_ol_videoram[offset] != data)
-	{
-		popper_ol_videoram[offset] = data;
-		tilemap_mark_tile_dirty(popper_ol_p123_tilemap,offset);
-		tilemap_mark_tile_dirty(popper_ol_p0_tilemap,offset);
-	}
+	popper_ol_videoram[offset] = data;
+	tilemap_mark_tile_dirty(popper_ol_p123_tilemap,offset);
+	tilemap_mark_tile_dirty(popper_ol_p0_tilemap,offset);
 }
 
 WRITE8_HANDLER( popper_videoram_w )
 {
-	if (popper_videoram[offset] != data)
-	{
-		popper_videoram[offset] = data;
-		tilemap_mark_tile_dirty(popper_p123_tilemap,offset);
-		tilemap_mark_tile_dirty(popper_p0_tilemap,offset);
-	}
+	popper_videoram[offset] = data;
+	tilemap_mark_tile_dirty(popper_p123_tilemap,offset);
+	tilemap_mark_tile_dirty(popper_p0_tilemap,offset);
 }
 
 WRITE8_HANDLER( popper_ol_attribram_w )
 {
-	if (popper_ol_attribram[offset] != data)
-	{
-		popper_ol_attribram[offset] = data;
-		tilemap_mark_tile_dirty(popper_ol_p123_tilemap,offset);
-		tilemap_mark_tile_dirty(popper_ol_p0_tilemap,offset);
-	}
+	popper_ol_attribram[offset] = data;
+	tilemap_mark_tile_dirty(popper_ol_p123_tilemap,offset);
+	tilemap_mark_tile_dirty(popper_ol_p0_tilemap,offset);
 }
 
 WRITE8_HANDLER( popper_attribram_w )
 {
-	if (popper_attribram[offset] != data)
-	{
-		popper_attribram[offset] = data;
-		tilemap_mark_tile_dirty(popper_p123_tilemap,offset);
-		tilemap_mark_tile_dirty(popper_p0_tilemap,offset);
-	}
+	popper_attribram[offset] = data;
+	tilemap_mark_tile_dirty(popper_p123_tilemap,offset);
+	tilemap_mark_tile_dirty(popper_p0_tilemap,offset);
 }
 
 WRITE8_HANDLER( popper_flipscreen_w )

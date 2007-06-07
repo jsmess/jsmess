@@ -320,7 +320,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( exerion )
-	ROM_REGION( 0x6000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
 	ROM_LOAD( "exerion.07",   0x0000, 0x2000, CRC(4c78d57d) SHA1(ac702e9ad2bc05493fb1355858667c31c36acfe4) )
 	ROM_LOAD( "exerion.08",   0x2000, 0x2000, CRC(dcadc1df) SHA1(91388f617cfaa4289ca1c84c697fcfdd8834ae15) )
 	ROM_LOAD( "exerion.09",   0x4000, 0x2000, CRC(34cc4d14) SHA1(511c9de038f7bcaf6f7c96f2cbbe50a80673fa72) )
@@ -351,7 +351,7 @@ ROM_END
 
 
 ROM_START( exeriont )
-	ROM_REGION( 0x6000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
 	ROM_LOAD( "prom5.4p",     0x0000, 0x4000, CRC(58b4dc1b) SHA1(3e34d1eda0b0537dac1062e96259d4cc7c64049c) )
 	ROM_LOAD( "prom6.4s",     0x4000, 0x2000, CRC(fca18c2d) SHA1(31077dada3ed4aa2e26af933f589e01e0c71e5cd) )
 
@@ -381,7 +381,7 @@ ROM_END
 
 
 ROM_START( exerionb )
-	ROM_REGION( 0x6000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
 	ROM_LOAD( "eb5.bin",      0x0000, 0x4000, CRC(da175855) SHA1(11ea46fd1d504e16e5ffc604d74c1ce210d6be1c) )
 	ROM_LOAD( "eb6.bin",      0x4000, 0x2000, CRC(0dbe2eff) SHA1(5b0e5e8453619beec46c4350d1b2ed571fe3dc24) )
 

@@ -265,22 +265,16 @@ static TILE_GET_INFO( get_gfx1_tile_info )
 
 static WRITE8_HANDLER( gfx0_vram_w )
 {
-	if(gfx0_vram[offset] != data)
-	{
-		gfx0_vram[offset] = data;
-		tilemap_mark_tile_dirty(gfx0a_tilemap,offset);
-		tilemap_mark_tile_dirty(gfx0b_tilemap,offset);
-	}
+	gfx0_vram[offset] = data;
+	tilemap_mark_tile_dirty(gfx0a_tilemap,offset);
+	tilemap_mark_tile_dirty(gfx0b_tilemap,offset);
 }
 
 static WRITE8_HANDLER( gfx0_cram_w )
 {
-	if(gfx0_cram[offset] != data)
-	{
-		gfx0_cram[offset] = data;
-		tilemap_mark_tile_dirty(gfx0a_tilemap,offset);
-		tilemap_mark_tile_dirty(gfx0b_tilemap,offset);
-	}
+	gfx0_cram[offset] = data;
+	tilemap_mark_tile_dirty(gfx0a_tilemap,offset);
+	tilemap_mark_tile_dirty(gfx0b_tilemap,offset);
 }
 static READ8_HANDLER( gfx0_vram_r )
 {
@@ -297,21 +291,15 @@ static READ8_HANDLER( gfx0_cram_r )
 static WRITE8_HANDLER( gfx1_vram_w )
 {
 	FIX_OFFSET();
-	if(gfx1_vram[offset] != data)
-	{
-		gfx1_vram[offset] = data;
-		tilemap_mark_tile_dirty(gfx1_tilemap,offset);
-	}
+	gfx1_vram[offset] = data;
+	tilemap_mark_tile_dirty(gfx1_tilemap,offset);
 }
 
 static WRITE8_HANDLER( gfx1_cram_w )
 {
 	FIX_OFFSET();
-	if(gfx1_cram[offset] != data)
-	{
-		gfx1_cram[offset] = data;
-		tilemap_mark_tile_dirty(gfx1_tilemap,offset);
-	}
+	gfx1_cram[offset] = data;
+	tilemap_mark_tile_dirty(gfx1_tilemap,offset);
 }
 static READ8_HANDLER( gfx1_vram_r )
 {

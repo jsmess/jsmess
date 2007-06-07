@@ -17,7 +17,6 @@ static void apexc_teletyper_putchar(int character);
 static MACHINE_START(apexc)
 {
 	apexc_teletyper_init();
-	return 0;
 }
 
 

@@ -293,6 +293,5 @@ MACHINE_START( electron )
 	timer_set( 0.0, 0, setup_beep );
 	electron_tape_timer = timer_alloc( electron_tape_timer_handler );
 	add_reset_callback(machine, electron_reset);
-	return 0;
 }
 

@@ -120,7 +120,6 @@ static const TMS9928a_interface tms9929a_interface =
 static MACHINE_START(tutor)
 {
 	TMS9928A_configure(&tms9929a_interface);
-	return 0;
 }
 
 static MACHINE_RESET(tutor)

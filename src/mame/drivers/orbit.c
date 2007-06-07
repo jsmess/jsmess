@@ -252,7 +252,7 @@ static const gfx_decode orbit_gfx_decode_info[] =
 	{ REGION_GFX1, 0, &orbit_upper_sprite_layout, 0, 1 },
 	{ REGION_GFX1, 0, &orbit_lower_sprite_layout, 0, 1 },
 	{ REGION_GFX2, 0, &orbit_tile_layout, 0, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

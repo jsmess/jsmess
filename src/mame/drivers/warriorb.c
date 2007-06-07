@@ -458,7 +458,7 @@ static const gfx_decode warriorb_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites */
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* scr tiles (screen 1) */
 	{ REGION_GFX3, 0, &charlayout,  0, 256 },	/* scr tiles (screen 2) */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -768,7 +768,6 @@ MACHINE_START( warriorb )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 MACHINE_RESET( taito_dualscreen )

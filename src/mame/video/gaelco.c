@@ -68,11 +68,8 @@ static TILE_GET_INFO( get_tile_info_gaelco_screen1 )
 
 WRITE16_HANDLER( gaelco_vram_w )
 {
-	int oldword = gaelco_videoram[offset];
 	COMBINE_DATA(&gaelco_videoram[offset]);
-
-	if (oldword != gaelco_videoram[offset])
-		tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
+	tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
 }
 
 /***************************************************************************

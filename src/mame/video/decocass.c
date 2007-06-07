@@ -225,16 +225,12 @@ WRITE8_HANDLER( decocass_charram_w )
 
 WRITE8_HANDLER( decocass_fgvideoram_w )
 {
-	if (data == decocass_fgvideoram[offset])
-		return;
 	decocass_fgvideoram[offset] = data;
 	tilemap_mark_tile_dirty( fg_tilemap, offset );
 }
 
 WRITE8_HANDLER( decocass_colorram_w )
 {
-	if (data == decocass_colorram[offset])
-		return;
 	decocass_colorram[offset] = data;
 	tilemap_mark_tile_dirty( fg_tilemap, offset );
 }

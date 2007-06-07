@@ -261,7 +261,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &char_layout,   16*4+8*8, 16 }, /* characters */
 	{ REGION_GFX2, 0, &sprite_layout, 16*4, 	 8 }, /* sprites */
 	{ REGION_GFX3, 0, &tile_layout,   0,		16 }, /* tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void shootout_snd_irq(int linestate)
@@ -374,7 +374,7 @@ ROM_START( shootout )
 	ROM_LOAD( "cu02.c3",        0x10000, 0x8000, CRC(2a913730) SHA1(584488278d58c4d34a2eebeaf39518f87cf5eecd) ) /* opcodes encrypted */
 	ROM_LOAD( "cu01.c1",        0x18000, 0x4000, CRC(8843c3ae) SHA1(c58ed4acac566f890cadf62bcbcced07a59243fc) ) /* opcodes encrypted */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "cu09.j1",        0x0c000, 0x4000, CRC(c4cbd558) SHA1(0e940ae99febc1161e5f35550aa75afca88cb5e9) ) /* Sound CPU */
 
 	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )

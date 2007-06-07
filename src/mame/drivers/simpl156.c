@@ -454,7 +454,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tile_16x16_layout,   0,     32 },	/* Tiles (16x16) */
 	{ REGION_GFX2, 0, &spritelayout, 0x200, 32},	/* Sprites (16x16) */
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 NVRAM_HANDLER( simpl156 )

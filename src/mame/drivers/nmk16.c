@@ -2842,7 +2842,7 @@ static const gfx_decode tharrier_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout, 0x000, 16 },	/* color 0x200-0x2ff */
 	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 },	/* color 0x000-0x0ff */
 	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode macross_gfxdecodeinfo[] =
@@ -2850,7 +2850,7 @@ static const gfx_decode macross_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout, 0x200, 16 },	/* color 0x200-0x2ff */
 	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 },	/* color 0x000-0x0ff */
 	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode macross2_gfxdecodeinfo[] =
@@ -2858,7 +2858,7 @@ static const gfx_decode macross2_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout, 0x300, 16 },	/* color 0x300-0x3ff */
 	{ REGION_GFX2, 0, &tilelayout, 0x000, 16 },	/* color 0x000-0x0ff */
 	{ REGION_GFX3, 0, &tilelayout, 0x100, 32 },	/* color 0x100-0x2ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode bjtwin_gfxdecodeinfo[] =
@@ -2866,7 +2866,7 @@ static const gfx_decode bjtwin_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout, 0x000, 16 },	/* color 0x000-0x0ff */
 	{ REGION_GFX2, 0, &charlayout, 0x000, 16 },	/* color 0x000-0x0ff */
 	{ REGION_GFX3, 0, &tilelayout, 0x100, 16 },	/* color 0x100-0x1ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode bioship_gfxdecodeinfo[] =

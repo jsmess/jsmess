@@ -408,7 +408,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x000000, &charlayout,     0,	2 },	/* colors 00..31 */
 	{ REGION_GFX1, 0x040000, &spritelayout,   32,	16 },	/* colors 32..47 but using lookup table */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /***************************************************************************

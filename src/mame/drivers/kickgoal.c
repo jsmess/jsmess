@@ -622,7 +622,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &fg816_charlayout,   0x000, 0x40 },
 	{ REGION_GFX1, 0, &bg1632_charlayout,  0x000, 0x40 },
 	{ REGION_GFX1, 0, &bg3264_charlayout,  0x000, 0x40 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_layout actionhw_fg88_alt_charlayout =
@@ -655,7 +655,7 @@ static const gfx_decode actionhw_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &actionhw_fg88_alt_charlayout,   0x000, 0x40 },
 	{ REGION_GFX1, 0, &actionhw_bg1616_charlayout,  0x000, 0x40 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* MACHINE drivers ***********************************************************/

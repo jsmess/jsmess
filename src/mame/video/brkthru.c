@@ -98,11 +98,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 WRITE8_HANDLER( brkthru_bgram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 
@@ -114,11 +111,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE8_HANDLER( brkthru_fgram_w )
 {
-	if (brkthru_videoram[offset] != data)
-	{
-		brkthru_videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	brkthru_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 VIDEO_START( brkthru )

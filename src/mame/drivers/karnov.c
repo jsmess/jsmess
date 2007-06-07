@@ -642,7 +642,7 @@ static const gfx_decode karnov_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &chars,     0,  4 },	/* colors 0-31 */
 	{ REGION_GFX2, 0, &tiles,   512, 16 },	/* colors 512-767 */
 	{ REGION_GFX3, 0, &sprites, 256, 16 },	/* colors 256-511 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/
@@ -707,7 +707,6 @@ static MACHINE_DRIVER_START( karnov )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(karnov_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(karnov)
 	MDRV_VIDEO_START(karnov)
@@ -747,7 +746,6 @@ static MACHINE_DRIVER_START( wndrplnt )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(karnov_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(karnov)
 	MDRV_VIDEO_START(wndrplnt)

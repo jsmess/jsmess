@@ -1295,21 +1295,21 @@ static const gfx_decode gfxdecodeinfo_opengolf[] =
 {
 	{ REGION_GFX3, 0, &t1_charlayout8, 0x0000, 8 },
 	{ REGION_GFX4, 0, &t1_charlayout6, 0x0000, 8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_racinfrc[] =
 {
 	{ REGION_GFX3, 0, &t1_charlayout6, 0x0000, 8 },
 	{ REGION_GFX4, 0, &t1_charlayout6, 0x0000, 8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
 static const gfx_decode gfxdecodeinfo_type34[] =
 {
 	{ REGION_GFX3, 0, &bglayout_8bpp, 0x0000, 8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( konamigx )
@@ -3424,7 +3424,6 @@ MACHINE_START( konamigx )
 	state_save_register_global(konamigx_wrport1_1);
 	state_save_register_global_array(sndto020);
 	state_save_register_global_array(sndto000);
-	return 0;
 }
 
 MACHINE_RESET(konamigx)

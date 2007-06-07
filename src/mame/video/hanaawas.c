@@ -70,23 +70,17 @@ PALETTE_INIT( hanaawas )
 
 WRITE8_HANDLER( hanaawas_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hanaawas_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		colorram[offset] = data;
+	colorram[offset] = data;
 
-		/* dirty both current and next offsets */
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-		tilemap_mark_tile_dirty(bg_tilemap, (offset + (flip_screen ? -1 : 1)) & 0x03ff);
-	}
+	/* dirty both current and next offsets */
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(bg_tilemap, (offset + (flip_screen ? -1 : 1)) & 0x03ff);
 }
 
 WRITE8_HANDLER( hanaawas_portB_w )

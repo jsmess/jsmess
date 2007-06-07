@@ -110,8 +110,6 @@ static MACHINE_START( vip )
 	state_save_register_global(keylatch);
 
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1), 0x8000);
-
-	return 0;
 }
 
 static MACHINE_RESET( vip )

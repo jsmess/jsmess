@@ -113,10 +113,6 @@ WRITE8_HANDLER( videopin_ball_w )
 
 WRITE8_HANDLER( videopin_video_ram_w )
 {
-	if (videopin_video_ram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	videopin_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }

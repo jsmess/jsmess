@@ -1519,7 +1519,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &pgm8_charlayout,    0x800, 32  }, /* 8x8x4 Tiles */
 	{ REGION_GFX2, 0, &pgm32_charlayout,   0x400, 32  }, /* 32x32x5 Tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /*** Machine Driver **********************************************************/

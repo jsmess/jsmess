@@ -269,20 +269,14 @@ ui_draw_text(buf,50,8*6);
 
 WRITE8_HANDLER( cntsteer_foreground_w )
 {
-	if( videoram[offset] != data )
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( cntsteer_background_w )
 {
-	if( videoram2[offset] != data )
-	{
-		videoram2[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram2[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 #if 0
@@ -704,7 +698,7 @@ static const gfx_decode cntsteer_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x00000, &cntsteer_charlayout, 0, 256 }, /* Only 1 used so far :/ */
 	{ REGION_GFX2, 0x00000, &sprites,			  0, 256 },
 	{ REGION_GFX3, 0x00000, &tilelayout,		  0, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -713,7 +707,7 @@ static const gfx_decode zerotrgt_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x00000, &zerotrgt_charlayout, 0, 256 }, /* Only 1 used so far :/ */
 	{ REGION_GFX2, 0x00000, &sprites,			  0, 256 },
    	{ REGION_GFX3, 0x00000, &tilelayout,		  0, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /***************************************************************************/

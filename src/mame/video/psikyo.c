@@ -104,9 +104,7 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 WRITE32_HANDLER( psikyo_vram_0_w )
 {
-	UINT32 newlong = psikyo_vram_0[offset];
-	UINT32 oldlong = COMBINE_DATA(&psikyo_vram_0[offset]);
-	if (oldlong == newlong)	return;
+	COMBINE_DATA(&psikyo_vram_0[offset]);
 	if (ACCESSING_MSW32)
 	{
 		tilemap_mark_tile_dirty(tilemap_0_size0, offset*2);
@@ -126,9 +124,7 @@ WRITE32_HANDLER( psikyo_vram_0_w )
 
 WRITE32_HANDLER( psikyo_vram_1_w )
 {
-	UINT32 newlong = psikyo_vram_1[offset];
-	UINT32 oldlong = COMBINE_DATA(&psikyo_vram_1[offset]);
-	if (oldlong == newlong)	return;
+	COMBINE_DATA(&psikyo_vram_1[offset]);
 	if (ACCESSING_MSW32)
 	{
 		tilemap_mark_tile_dirty(tilemap_1_size0, offset*2);

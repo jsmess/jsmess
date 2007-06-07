@@ -132,20 +132,14 @@ VIDEO_START( chinagat )
 
 WRITE8_HANDLER( ddragon_bgvideoram_w )
 {
-	if (ddragon_bgvideoram[offset] != data)
-	{
-		ddragon_bgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
-	}
+	ddragon_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 WRITE8_HANDLER( ddragon_fgvideoram_w )
 {
-	if (ddragon_fgvideoram[offset] != data)
-	{
-		ddragon_fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset/2);
-	}
+	ddragon_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
 }
 
 

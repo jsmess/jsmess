@@ -230,7 +230,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   32, 1 },	/* seems correct */
 	{ REGION_GFX2, 0, &charlayout,    0, 1 },	/* seems correct */
 	{ REGION_GFX3, 0, &spritelayout,  0, 8 },	/* ?? */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode progress_gfxdecodeinfo[] =
@@ -238,7 +238,7 @@ static const gfx_decode progress_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,   32, 1 },	/* seems correct */
 	{ REGION_GFX2, 0, &charlayout,    0, 1 },	/* seems correct */
 	{ REGION_GFX3, 0, &spritelayout, 64, 4 },	/* seems correct */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /***************************************************************************/
@@ -282,7 +282,6 @@ static MACHINE_DRIVER_START( timelimt )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(64)
-	MDRV_COLORTABLE_LENGTH(64)
 
 	MDRV_PALETTE_INIT(timelimt)
 	MDRV_VIDEO_START(timelimt)
@@ -305,7 +304,6 @@ static MACHINE_DRIVER_START( progress )
 
 	MDRV_GFXDECODE(progress_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(96)
-	MDRV_COLORTABLE_LENGTH(96)
 
 MACHINE_DRIVER_END
 

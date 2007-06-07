@@ -18,20 +18,14 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( zodiack_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( zodiack_videoram2_w )
 {
-	if (zodiack_videoram2[offset] != data)
-	{
-		zodiack_videoram2[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	zodiack_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( zodiack_attributes_w )

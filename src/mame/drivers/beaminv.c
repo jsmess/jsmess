@@ -116,8 +116,6 @@ static MACHINE_START( beaminv )
 
 	/* setup for save states */
 	state_save_register_global(controller_select);
-
-	return 0;
 }
 
 

@@ -115,8 +115,6 @@ static MACHINE_START( dcheese )
 	state_save_register_global(soundlatch_full);
 	state_save_register_global(sound_control);
 	state_save_register_global(sound_msb_latch);
-
-	return 0;
 }
 
 

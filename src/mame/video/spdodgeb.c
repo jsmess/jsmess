@@ -139,11 +139,8 @@ WRITE8_HANDLER( spdodgeb_ctrl_w )
 
 WRITE8_HANDLER( spdodgeb_videoram_w )
 {
-	if (spdodgeb_videoram[offset] != data)
-	{
-		spdodgeb_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
-	}
+	spdodgeb_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
 }
 
 

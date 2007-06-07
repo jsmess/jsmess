@@ -273,7 +273,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   128,  4 },	/* colors 128-159 */
 	{ REGION_GFX2, 0, &spritelayout,   0, 16 },	/* colors   0-127 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -373,10 +373,10 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( sidepckt )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "dh00",         0x00000, 0x10000, CRC(251b316e) SHA1(c777d87621b8fefe0e33156be03da8aed733db9a) )
 
-    ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio cpu */
+    ROM_REGION( 0x10000, REGION_CPU2, 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
     ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -395,10 +395,10 @@ ROM_START( sidepckt )
 ROM_END
 
 ROM_START( sidepctj )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "dh00.bin",     0x00000, 0x10000, CRC(a66bc28d) SHA1(cd62ce1dce6fe42d9745eec50d11e86b076d28e1) )
 
-    ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio cpu */
+    ROM_REGION( 0x10000, REGION_CPU2, 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
     ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -417,11 +417,11 @@ ROM_START( sidepctj )
 ROM_END
 
 ROM_START( sidepctb )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "sp_09.bin",    0x04000, 0x4000, CRC(3c6fe54b) SHA1(4025ac48d75f171f4c979d3fcd6a2f8da18cef4f) )
     ROM_LOAD( "sp_08.bin",    0x08000, 0x8000, CRC(347f81cd) SHA1(5ab06130f35788e51a881cc0f387649532145bd6) )
 
-    ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for the audio cpu */
+    ROM_REGION( 0x10000, REGION_CPU2, 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
     ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )

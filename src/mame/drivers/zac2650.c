@@ -318,7 +318,7 @@ static const gfx_decode tinvader_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tinvader_character,  0, 2 },
   	{ REGION_CPU1, 0x1F00, &s2636_character8, 0, 2 },	/* dynamic */
   	{ REGION_CPU1, 0x1F00, &s2636_character16, 0, 2 },	/* dynamic */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( tinvader )

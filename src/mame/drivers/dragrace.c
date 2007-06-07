@@ -298,7 +298,7 @@ static const gfx_decode dragrace_gfx_decode_info[] =
 {
 	{ REGION_GFX1, 0, &dragrace_tile_layout1, 0, 4 },
 	{ REGION_GFX2, 0, &dragrace_tile_layout2, 8, 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -230,18 +230,14 @@ static UINT8 prot_val, input_data, priority_reg, gfx_bank;
 
 static WRITE16_HANDLER( fg_videoram_w )
 {
-	int oldword = fg_videoram[offset];
 	COMBINE_DATA(&fg_videoram[offset]);
-	if (oldword != fg_videoram[offset])
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 static WRITE16_HANDLER( bg_videoram_w )
 {
-	int oldword = bg_videoram[offset];
 	COMBINE_DATA(&bg_videoram[offset]);
-	if (oldword != bg_videoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 static WRITE16_HANDLER( nmg5_soundlatch_w )
@@ -982,7 +978,6 @@ static MACHINE_START( nmg5 )
 	state_save_register_global(priority_reg);
 	state_save_register_global(input_data);
 	state_save_register_item_array("nmg5", 0, nmg5_bitmap);
-	return 0;
 }
 
 static MACHINE_RESET( nmg5 )

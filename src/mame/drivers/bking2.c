@@ -500,7 +500,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &crowlayout, 4*8,         4  }, /* crow */
 	{ REGION_GFX3, 0, &balllayout, 4*8+4*4,     4  }, /* ball 1 */
 	{ REGION_GFX4, 0, &balllayout, 4*8+4*4+4*2, 4  }, /* ball 2 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

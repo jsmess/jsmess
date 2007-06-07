@@ -251,7 +251,6 @@ static MACHINE_START( renegade )
 
 	state_save_register_global(bank);
 	state_save_register_func_postload(setbank);
-	return 0;
 }
 
 DRIVER_INIT( kuniokun )

@@ -132,20 +132,14 @@ VIDEO_START( timeplt )
 
 WRITE8_HANDLER( timeplt_videoram_w )
 {
-	if (timeplt_videoram[offset] != data)
-	{
-		timeplt_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	timeplt_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( timeplt_colorram_w )
 {
-	if (timeplt_colorram[offset] != data)
-	{
-		timeplt_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	timeplt_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( timeplt_flipscreen_w )

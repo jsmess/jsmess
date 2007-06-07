@@ -712,7 +712,7 @@ static const gfx_decode welltris_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &welltris_charlayout,   16* 0, 4*16 },
 	{ REGION_GFX2, 0, &welltris_spritelayout, 16*96, 2*16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

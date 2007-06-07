@@ -387,7 +387,6 @@ static MACHINE_START( zaxxon )
 
 	/* register for save states */
 	state_save_register_global(int_enabled);
-	return 0;
 }
 
 

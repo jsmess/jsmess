@@ -24,11 +24,8 @@ static TILE_GET_INFO( get_pass_bg_tile_info )
 
 WRITE16_HANDLER( pass_bg_videoram_w )
 {
-	if (pass_bg_videoram[offset] != data)
-	{
-		pass_bg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(pass_bg_tilemap,offset);
-	}
+	pass_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(pass_bg_tilemap,offset);
 }
 
 /* foreground 'sprites' tilemap stuff */
@@ -46,11 +43,8 @@ static TILE_GET_INFO( get_pass_fg_tile_info )
 
 WRITE16_HANDLER( pass_fg_videoram_w )
 {
-	if (pass_fg_videoram[offset] != data)
-	{
-		pass_fg_videoram[offset] = data;
-		tilemap_mark_tile_dirty(pass_fg_tilemap,offset);
-	}
+	pass_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(pass_fg_tilemap,offset);
 }
 
 /* video update / start */

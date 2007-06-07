@@ -39,11 +39,8 @@ VIDEO_START( mole )
 
 WRITE8_HANDLER( mole_videoram_w )
 {
-	if (tileram[offset] != data)
-	{
-		tileram[offset] = data | (tile_bank << 8);
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	tileram[offset] = data | (tile_bank << 8);
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mole_tilebank_w )

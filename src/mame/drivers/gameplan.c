@@ -477,8 +477,6 @@ static MACHINE_START( gameplan )
 	r6532_init(0, &r6532_interface);
 
 	create_via_0_timer();
-
-	return 0;
 }
 
 
@@ -491,8 +489,6 @@ static MACHINE_START( leprechn )
 	r6532_init(0, &r6532_interface);
 
 	create_via_0_timer();
-
-	return 0;
 }
 
 

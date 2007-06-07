@@ -2839,8 +2839,6 @@ MACHINE_START( dragon32 )
 	init.fdc_cart_hardware	= "dragon_fdc";
 	
 	generic_coco12_dragon_init(machine, &init);
-	
-	return 0;
 }
 
 MACHINE_START( dragon64 )
@@ -2860,8 +2858,6 @@ MACHINE_START( dragon64 )
 
 	/* Init Serial port */
 	acia_6551_init();
-		
-	return 0;
 }
 
 MACHINE_START( d64plus )
@@ -2885,8 +2881,6 @@ MACHINE_START( d64plus )
 	/* Init Dragon plus registers */
 	dragon_plus_reg = 0;
 	plus_reg_w(0,0);
-		
-	return 0;
 }
 
 MACHINE_START( tanodr64 )
@@ -2906,8 +2900,6 @@ MACHINE_START( tanodr64 )
 	
 	/* Init Serial port */
 	acia_6551_init();
-	
-	return 0;
 }
 
 MACHINE_START( dgnalpha )
@@ -2933,8 +2925,6 @@ MACHINE_START( dgnalpha )
 	dgnalpha_just_reset=1;
 	
 	wd17xx_init(WD_TYPE_179X, dgnalpha_fdc_callback, NULL);
-	
-	return 0;
 }
 
 /******* Machine Setups CoCos **********/
@@ -2953,8 +2943,6 @@ MACHINE_START( coco )
 	init.fdc_cart_hardware	= "coco_fdc";
 	
 	generic_coco12_dragon_init(machine, &init);
-	
-	return 0;
 }
 
 MACHINE_START( coco2 )
@@ -2971,8 +2959,6 @@ MACHINE_START( coco2 )
 	init.fdc_cart_hardware	= "coco_fdc";
 	
 	generic_coco12_dragon_init(machine, &init);
-
-	return 0;
 }
 
 static void coco3_machine_reset(running_machine *machine)
@@ -3035,7 +3021,6 @@ MACHINE_START( coco3 )
 	state_save_register_func_postload(coco3_state_postload);
 
 	video_crosshair_set_screenmask_callback(Machine, crosshairs_get_screen);
-	return 0;
 }
 
 /***************************************************************************

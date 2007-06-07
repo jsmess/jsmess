@@ -21,12 +21,8 @@ static TILE_GET_INFO( get_tile_info )
 
 static WRITE8_HANDLER( cball_vram_w )
 {
-	if (cball_video_ram[offset] != data)
-	{
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
-
 	cball_video_ram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

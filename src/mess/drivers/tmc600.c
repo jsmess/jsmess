@@ -312,8 +312,6 @@ static MACHINE_START( tmc600 )
 	state_save_register_global(vismac_blink);
 	state_save_register_global_array(vismac_colorram);
 	state_save_register_global(keylatch);
-
-	return 0;
 }
 
 static MACHINE_RESET( tmc600 )

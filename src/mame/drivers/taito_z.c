@@ -1407,7 +1407,6 @@ static MACHINE_START( taitoz )
 
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 
@@ -3102,7 +3101,7 @@ static const gfx_decode taitoz_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0x0, &tile16x8_layout,  0, 256 },	/* sprite parts */
 	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx
@@ -3113,14 +3112,14 @@ static const gfx_decode chasehq_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x0, &tile16x16_layout,  0, 256 },	/* sprite parts */
 	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
 	{ REGION_GFX4, 0x0, &tile16x16_layout,  0, 256 },	/* sprite parts */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode dblaxle_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0x0, &tile16x8_layout,  0, 256 },	/* sprite parts */
 	{ REGION_GFX1, 0x0, &dblaxle_charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -168,11 +168,8 @@ VIDEO_START( zaccaria )
 
 WRITE8_HANDLER( zaccaria_videoram_w )
 {
-	if (zaccaria_videoram[offset] != data)
-	{
-		zaccaria_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-	}
+	zaccaria_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( zaccaria_attributes_w )

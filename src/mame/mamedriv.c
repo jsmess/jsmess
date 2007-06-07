@@ -1645,7 +1645,8 @@ const game_driver * const drivers[] =
 	DRIVER( bonzeado )	/* B41 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( bonzeadu )	/* B41 (c) 1988 Taito America Corporation (US) */
 	DRIVER( jigkmgri )	/* B41 (c) 1988 Taito Corporation (Japan)*/
-	DRIVER( asuka )		/* B68 (c) 1988 Taito Corporation (Japan) */
+	DRIVER( asuka )		/* B68 (c) 1988 Taito Corporation (World) */
+	DRIVER( asukaj )	/* B68 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( mofflott )	/* C17 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( cadash )	/* C21 (c) 1989 Taito Corporation Japan */
 	DRIVER( cadashj )	/* C21 (c) 1989 Taito Corporation */
@@ -3953,8 +3954,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( acombat )	/* bootleg */
 	DRIVER( acombato )	/* bootleg */
 	DRIVER( sstarbtl )	/* bootleg */
-	DRIVER( tomahawk )	/* (c) [1980?] */
-	DRIVER( tomahaw5 )	/* (c) [1980?] */
+	DRIVER( tomahawk )	/* (c) 1980 Data East, Inc. */
+	DRIVER( tomahaw1 )	/* (c) 1980 Data East, Inc. */
 	DRIVER( progolf )	/* (c) 1981 */
 	DRIVER( progolfa )	/* (c) 1981 */
 	DRIVER( prosoccr )	/* (c) 1983 */

@@ -609,7 +609,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &angelkds_charlayout,   0, 16 },
 	{ REGION_GFX4, 0, &angelkds_charlayout,   0, 16 },
 	{ REGION_GFX2, 0, &angelkds_spritelayout, 0x20, 0x0d },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /*** Machine Driver

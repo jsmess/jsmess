@@ -272,14 +272,14 @@ static const gfx_decode holeland_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &holeland_charlayout,   0, 256 },
 	{ REGION_GFX2, 0, &holeland_spritelayout, 0, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode crzrally_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &crzrally_charlayout,   0, 256 },
 	{ REGION_GFX2, 0, &crzrally_spritelayout, 0, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

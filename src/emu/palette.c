@@ -275,9 +275,12 @@ void palette_init(running_machine *machine)
 	palette_alloc(machine, palette);
 
 	/* set up save/restore of the palette */
-	state_save_register_global_pointer(palette->raw_color, palette->total_colors);
-	state_save_register_global_pointer(palette->pen_brightness, machine->drv->total_colors);
-	state_save_register_func_postload(palette_reset);
+	if (machine->drv->total_colors > 0)
+	{
+		state_save_register_global_pointer(palette->raw_color, palette->total_colors);
+		state_save_register_global_pointer(palette->pen_brightness, machine->drv->total_colors);
+		state_save_register_func_postload(palette_reset);
+	}
 }
 
 

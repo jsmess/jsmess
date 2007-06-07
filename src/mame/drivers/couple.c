@@ -428,7 +428,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tiles8x8x4_layout, 0, 16 },
 	{ REGION_GFX1, 8, &tiles8x8x3_layout, 0, 32 }, //flipped tiles
 	{ REGION_GFX2, 8, &tiles8x8x4_layout, 0, 16 }, //flipped tiles
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( couple )

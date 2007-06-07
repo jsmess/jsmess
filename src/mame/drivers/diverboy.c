@@ -188,7 +188,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &diverboy_spritelayout, 0, 4*16 },
 	{ REGION_GFX2, 0, &diverboy_spritelayout, 0, 4*16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

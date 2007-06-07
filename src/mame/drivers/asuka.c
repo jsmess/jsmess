@@ -970,7 +970,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* OBJ */
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* SCR */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1362,6 +1362,29 @@ ROM_START( asuka )
 	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
 ROM_END
 
+ROM_START( asukaj )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )     /* 1024k for 68000 code */
+	ROM_LOAD16_BYTE( "b68-09.bin",  0x00000, 0x20000, CRC(1eaa1bbb) SHA1(01ca6a5f3c47dab49654b84601119714eb329cc5) )
+	ROM_LOAD16_BYTE( "b68-08.bin",  0x00001, 0x20000, CRC(8cc96e60) SHA1(dc94f3fd48c0407ec72e8330bc688e9e16d39213) )
+	/* 0x040000 - 0x7ffff is intentionally empty */
+	ROM_LOAD16_WORD( "b68-03.bin",  0x80000, 0x80000, CRC(d3a59b10) SHA1(35a2ff18b64e73ac5e17484354c0cc58bc2cd7fc) )	/* Fix ROM */
+
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "b68-01.bin",  0x00000, 0x80000, CRC(89f32c94) SHA1(74fbb699e05e2336509cb5ac06ed94335ff870d5) )	/* SCR tiles (8 x 8) */
+
+	ROM_REGION( 0xa0000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD       ( "b68-02.bin", 0x00000, 0x80000, CRC(f5018cd3) SHA1(860ce140ae369556d03d5d78987b87c0d6070df5) )	/* Sprites (16 x 16) */
+	ROM_LOAD16_BYTE( "b68-07.bin", 0x80000, 0x10000, CRC(c113acc8) SHA1(613c61a78df73dcb0b9c9018ae829e865baac772) )
+	ROM_LOAD16_BYTE( "b68-06.bin", 0x80001, 0x10000, CRC(f517e64d) SHA1(8be491bfe0f7eed58521de9d31da677acf635c23) )
+
+	ROM_REGION( 0x1c000, REGION_CPU2, 0 )	/* sound cpu */
+	ROM_LOAD( "b68-11.bin", 0x00000, 0x04000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) )
+	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+
+	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
+ROM_END
+
 ROM_START( mofflott )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )     /* 1024k for 68000 code */
 	ROM_LOAD16_BYTE( "c17-09.bin",  0x00000, 0x20000, CRC(05ee110f) SHA1(8cedd911d3fdcca1e409260d12dd03a2fb35ef86) )
@@ -1559,7 +1582,8 @@ GAME( 1988, bonzeadv, 0,        bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporatio
 GAME( 1988, bonzeado, bonzeadv, bonzeadv, bonzeadv, 0, ROT0,   "Taito Corporation Japan", "Bonze Adventure (World, Older)", 0 )
 GAME( 1988, bonzeadu, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito America Corporation", "Bonze Adventure (US)", 0 )
 GAME( 1988, jigkmgri, bonzeadv, bonzeadv, jigkmgri, 0, ROT0,   "Taito Corporation", "Jigoku Meguri (Japan)", 0 )
-GAME( 1988, asuka,    0,        asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (Japan)", 0 )
+GAME( 1988, asuka,    0,        asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (World)", 0 )
+GAME( 1988, asukaj,   asuka,    asuka,    asuka,    0, ROT270, "Taito Corporation", "Asuka & Asuka (Japan)", 0 )
 GAME( 1989, mofflott, 0,        mofflott, mofflott, 0, ROT270, "Taito Corporation", "Maze of Flott (Japan)", 0 )
 GAME( 1989, cadash,   0,        cadash,   cadash,   0, ROT0,   "Taito Corporation Japan", "Cadash (World)", 0 )
 GAME( 1989, cadashj,  cadash,   cadash,   cadashj,  0, ROT0,   "Taito Corporation", "Cadash (Japan)", 0 )

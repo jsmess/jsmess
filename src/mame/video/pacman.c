@@ -18,8 +18,10 @@
 
 #include "driver.h"
 #include "includes/pacman.h"
+#include "res_net.h"
 
 static tilemap *bg_tilemap;
+static UINT8 *transmask;
 static UINT8 charbank;
 static UINT8 spritebank;
 static UINT8 palettebank;
@@ -67,61 +69,80 @@ static rectangle spritevisiblearea =
   The palette PROMs are connected to the RGB output this way:
 
   bit 3 -- 220 ohm resistor  -- BLUE
-     -- 470 ohm resistor  -- BLUE
-     -- 220 ohm resistor  -- GREEN
+        -- 470 ohm resistor  -- BLUE
+        -- 220 ohm resistor  -- GREEN
   bit 0 -- 470 ohm resistor  -- GREEN
 
   bit 3 -- 1  kohm resistor  -- GREEN
-     -- 220 ohm resistor  -- RED
-     -- 470 ohm resistor  -- RED
+        -- 220 ohm resistor  -- RED
+        -- 470 ohm resistor  -- RED
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
 
 PALETTE_INIT( pacman )
 {
+	static const int resistances[3] = { 1000, 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
+	rgb_t palette[32];
 	int i;
-	for (i = 0;i < 32;i++)
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances[0], rweights, 0, 0,
+			3, &resistances[0], gweights, 0, 0,
+			2, &resistances[1], bweights, 0, 0);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
+
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
 		/* blue component */
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		palette_set_color(machine,i,r,g,b);
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		palette[i] = MAKE_RGB(r, g, b);
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 32;
 
-	/* character lookup table */
-	/* sprites use the same color lookup table as characters */
-	for (i = 0;i < 64*4;i++)
+	/* allocate memory for mask of pens that are transparent in sprites */
+	transmask = auto_malloc(64);
+	memset(transmask, 0, 64);
+
+	/* color table; 64 entries total of 4 colors each */
+	for (i = 0; i < 64*4; i++)
 	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		rgb_t palentry;
+
+		/* if this color table entry maps to pen 0, mark the appropriate pens in the transmask */
+		if (ctabentry == 0)
+			transmask[i/4] |= 1 << (i % 4);
+
 		/* first palette bank */
-		colortable[i] = color_prom[i] & 0x0f;
+		palentry = palette[0x00 + ctabentry];
+		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
 
 		/* second palette bank */
-		if( colortable[i] != 0 )
-		{
-			colortable[i + 64*4] = colortable[i] + 0x10;
-		}
-		else
-		{
-			colortable[i + 64*4] = 0;
-		}
+		palentry = palette[0x10 + ctabentry];
+		palette_set_color(machine, i + 64*4, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
 	}
 }
 
@@ -216,7 +237,7 @@ WRITE8_HANDLER( pacman_flipscreen_w )
 VIDEO_UPDATE( pacman )
 {
 	if (bgpriority != 0)
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(bitmap,machine->pens[0],cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_IGNORE_TRANSPARENCY,0);
 
@@ -231,49 +252,53 @@ VIDEO_UPDATE( pacman )
 		/* order, to have the correct priorities. */
 		for (offs = spriteram_size - 2;offs > 2*2;offs -= 2)
 		{
+			int color;
 			int sx,sy;
 
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
+			color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
 
 			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
+					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+					&spriteclip,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
+					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx - 256,sy,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+					&spriteclip,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 		}
 		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 		/* one pixel to the left to get a more correct placement */
 		for (offs = 2*2;offs >= 0;offs -= 2)
 		{
+			int color;
 			int sx,sy;
 
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
+			color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
 
 			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
+					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy + xoffsethack,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+					&spriteclip,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx(bitmap,machine->gfx[1],
 					( spriteram[offs] >> 2 ) | (spritebank << 6),
-					( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 ),
+					color,
 					spriteram[offs] & 2,spriteram[offs] & 1,
 					sx - 256,sy + xoffsethack,
-					&spriteclip,TRANSPARENCY_COLOR,0);
+					&spriteclip,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 		}
 	}
 
@@ -395,37 +420,41 @@ VIDEO_UPDATE( s2650games )
 
 	for (offs = spriteram_size - 2;offs > 2*2;offs -= 2)
 	{
+		int color;
 		int sx,sy;
 
 
 		sx = 255 - spriteram_2[offs + 1];
 		sy = spriteram_2[offs] - 15;
+		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
 		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3) << 6),
-				spriteram[offs + 1] & 0x1f,
+				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0);
+				cliprect,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 	}
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
 	for (offs = 2*2;offs >= 0;offs -= 2)
 	{
+		int color;
 		int sx,sy;
 
 
 		sx = 255 - spriteram_2[offs + 1];
 		sy = spriteram_2[offs] - 15;
+		color = spriteram[offs + 1] & 0x1f;
 
 		/* TODO: ?? */
 		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3)<<6),
-				spriteram[offs + 1] & 0x1f,
+				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy + xoffsethack,
-				cliprect,TRANSPARENCY_COLOR,0);
+				cliprect,TRANSPARENCY_PENS,transmask[color & 0x3f]);
 	}
 	return 0;
 }

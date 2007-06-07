@@ -256,7 +256,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &sprite_layout,  32*16, 16 },	/* Sprites 16x16 */
 	{ REGION_GFX2, 0, &sprite_layout,  48*16, 16 },	/* Sprites 16x16 */
 	{ 0,           0, &charlayout,         0, 16 }, /* Dynamically modified */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

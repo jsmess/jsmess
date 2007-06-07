@@ -27,7 +27,6 @@ WRITE8_HANDLER(homerun_banking_w)
 
 WRITE8_HANDLER( homerun_videoram_w )
 {
-
 	homerun_videoram[offset]=data;
 	tilemap_mark_tile_dirty(homerun_tilemap,offset&0xfff);
 }

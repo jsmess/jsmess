@@ -385,7 +385,7 @@ static const gfx_decode vb_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,     0, 8 },	/* 8x8 chars */
 	{ REGION_GFX2, 0, &spritelayout, 128, 8 },	/* 16x16 sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void vball_irq_handler(int irq)

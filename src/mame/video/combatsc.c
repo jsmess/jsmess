@@ -278,20 +278,17 @@ READ8_HANDLER( combasc_video_r )
 
 WRITE8_HANDLER( combasc_video_w )
 {
-	if( videoram[offset]!=data )
+	videoram[offset] = data;
+	if( offset<0x800 )
 	{
-		videoram[offset] = data;
-		if( offset<0x800 )
-		{
-			if (combasc_video_circuit)
-				tilemap_mark_tile_dirty(bg_tilemap[1],offset & 0x3ff);
-			else
-				tilemap_mark_tile_dirty(bg_tilemap[0],offset & 0x3ff);
-		}
-		else if( offset<0x1000 && combasc_video_circuit==0 )
-		{
-			tilemap_mark_tile_dirty( textlayer,offset & 0x3ff);
-		}
+		if (combasc_video_circuit)
+			tilemap_mark_tile_dirty(bg_tilemap[1],offset & 0x3ff);
+		else
+			tilemap_mark_tile_dirty(bg_tilemap[0],offset & 0x3ff);
+	}
+	else if( offset<0x1000 && combasc_video_circuit==0 )
+	{
+		tilemap_mark_tile_dirty( textlayer,offset & 0x3ff);
 	}
 }
 

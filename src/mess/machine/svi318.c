@@ -620,7 +620,6 @@ static const TMS9928a_interface tms9928a_interface =
 MACHINE_START( svi318 )
 {
 	TMS9928A_configure(&tms9928a_interface);
-	return 0;
 }
 
 MACHINE_RESET( svi318 )

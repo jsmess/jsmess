@@ -501,7 +501,7 @@ static const gfx_layout charlayout =
 gfx_decode adder2_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1,  0, &charlayout, 0, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 ///////////////////////////////////////////////////////////////////////////

@@ -1167,7 +1167,7 @@ static const gfx_decode raiden2_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x00000, &raiden2_charlayout,   0x700, 128 },
 	{ REGION_GFX2, 0x00000, &raiden2_tilelayout,   0x400, 128 },
 	{ REGION_GFX3, 0x00000, &raiden2_spritelayout, 0x000, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /* INTERRUPTS */

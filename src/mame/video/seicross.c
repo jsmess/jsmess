@@ -58,28 +58,22 @@ PALETTE_INIT( seicross )
 
 WRITE8_HANDLER( seicross_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( seicross_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		/* bit 5 of the address is not used for color memory. There is just */
-		/* 512k of memory; every two consecutive rows share the same memory */
-		/* region. */
-		offset &= 0xffdf;
+	/* bit 5 of the address is not used for color memory. There is just */
+	/* 512k of memory; every two consecutive rows share the same memory */
+	/* region. */
+	offset &= 0xffdf;
 
-		colorram[offset] = data;
-		colorram[offset + 0x20] = data;
+	colorram[offset] = data;
+	colorram[offset + 0x20] = data;
 
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-		tilemap_mark_tile_dirty(bg_tilemap, offset + 0x20);
-	}
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(bg_tilemap, offset + 0x20);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

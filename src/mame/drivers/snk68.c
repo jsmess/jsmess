@@ -664,21 +664,21 @@ static const gfx_decode pow_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,		 0, 128 },
 	{ REGION_GFX2, 0, &pow_spritelayout, 0, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode searchar_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,			  0,  16 },
 	{ REGION_GFX2, 0, &searchar_spritelayout, 0, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode ikari3_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,			0,	16 },
 	{ REGION_GFX2, 0, &ikari3_spritelayout, 0, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

@@ -133,20 +133,14 @@ VIDEO_START( cop01 )
 
 WRITE8_HANDLER( cop01_background_w )
 {
-	if (cop01_bgvideoram[offset] != data)
-	{
-		cop01_bgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
-	}
+	cop01_bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( cop01_foreground_w )
 {
-	if (cop01_fgvideoram[offset] != data)
-	{
-		cop01_fgvideoram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	cop01_fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( cop01_vreg_w )

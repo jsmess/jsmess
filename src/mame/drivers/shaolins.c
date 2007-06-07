@@ -211,7 +211,7 @@ static const gfx_decode shaolins_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &shaolins_charlayout,         0, 16*8 },
 	{ REGION_GFX2, 0, &shaolins_spritelayout, 16*8*16, 16*8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -257,7 +257,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kicker )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "kikrd8.bin",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
 	ROM_LOAD( "kikrd9.bin",   0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
 	ROM_LOAD( "kikrd11.bin",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )
@@ -279,7 +279,7 @@ ROM_START( kicker )
 ROM_END
 
 ROM_START( shaolins )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "kikrd8.bin",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
 	ROM_LOAD( "kikrd9.bin",   0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
 	ROM_LOAD( "kikrd11.bin",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )

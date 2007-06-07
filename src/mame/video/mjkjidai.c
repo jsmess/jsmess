@@ -47,11 +47,8 @@ VIDEO_START( mjkjidai )
 
 WRITE8_HANDLER( mjkjidai_videoram_w )
 {
-	if (mjkjidai_videoram[offset] != data)
-	{
-		mjkjidai_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
-	}
+	mjkjidai_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( mjkjidai_ctrl_w )

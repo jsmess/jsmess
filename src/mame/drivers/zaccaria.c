@@ -245,7 +245,6 @@ static MACHINE_START( zaccaria )
 {
 	pia_config(0, &pia_0_intf);
 	pia_config(1, &pia_1_intf);
-	return 0;
 }
 
 static MACHINE_RESET( zaccaria )
@@ -640,7 +639,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,      0, 32 },
 	{ REGION_GFX1, 0, &spritelayout, 32*8, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -724,7 +723,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( monymony )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cpu1.1a",           0x0000, 0x1000, CRC(13c227ca) SHA1(be305d112917904dd130b08f6b5186e3fbcb858a) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "cpu2.1b",           0x1000, 0x1000, CRC(87372545) SHA1(04618d007a93b3f6706f56b10bdf39727d7d748d) )
@@ -759,7 +758,7 @@ ROM_START( monymony )
 ROM_END
 
 ROM_START( jackrabt )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cpu-01.1a",    0x0000, 0x1000, CRC(499efe97) SHA1(f0efc910a5343001b27637779e1d4de218d44a4e) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "cpu-01.2l",    0x1000, 0x1000, CRC(4772e557) SHA1(71c1eb49c978799294e732e65a77eba330d8da9b) )
@@ -798,7 +797,7 @@ ROM_START( jackrabt )
 ROM_END
 
 ROM_START( jackrab2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1cpu2.1a",     0x0000, 0x1000, CRC(f9374113) SHA1(521f293f1894bcaf21e44bc7841a20ae29232da3) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "2cpu2.1b",     0x1000, 0x1000, CRC(0a0eea4a) SHA1(4dfd9b2511d480bb5cc918f7d91013205911d377) )
@@ -833,7 +832,7 @@ ROM_START( jackrab2 )
 ROM_END
 
 ROM_START( jackrabs )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1cpu.1a",      0x0000, 0x1000, CRC(6698dc65) SHA1(33e3518846e88dc34f4b6c4e9ca9f8999c0460c8) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "2cpu.1b",      0x1000, 0x1000, CRC(42b32929) SHA1(5b400d434ce903c74f58780a422a8c2594af90be) )

@@ -338,8 +338,6 @@ static void raster_interrupt_callback(int param)
 static MACHINE_START( namcofl )
 {
 	raster_interrupt_timer = mame_timer_alloc(raster_interrupt_callback);
-
-	return 0;
 }
 
 

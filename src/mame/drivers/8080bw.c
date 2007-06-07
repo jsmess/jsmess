@@ -2202,7 +2202,6 @@ Another (same checksums) dump came from board labeled SI-7811M-2
 static MACHINE_START( darthvdr )
 {
 	/* do nothing for now - different interrupt system */
-	return 0;
 }
 
 

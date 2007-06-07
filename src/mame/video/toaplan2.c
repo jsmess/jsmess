@@ -615,14 +615,9 @@ READ16_HANDLER( toaplan2_txvideoram16_r )
 
 WRITE16_HANDLER( toaplan2_txvideoram16_w )
 {
-	UINT16 oldword = toaplan2_txvideoram16[offset];
-
-	if (oldword != data)
-	{
-		COMBINE_DATA(&toaplan2_txvideoram16[offset]);
-		if (offset < (toaplan2_tx_vram_size/4))
-			tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	COMBINE_DATA(&toaplan2_txvideoram16[offset]);
+	if (offset < (toaplan2_tx_vram_size/4))
+		tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 READ16_HANDLER( toaplan2_txvideoram16_offs_r )
@@ -803,7 +798,6 @@ READ16_HANDLER( toaplan2_1_videoram16_r )
 
 void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
-	UINT16 oldword = 0;
 	offs_t vram_offset;
 
 	switch (toaplan2_voffs[controller] & 0xfc00)
@@ -811,32 +805,20 @@ void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT32 mem_mask, int cont
 		case 0x0400:
 		case 0x0000:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_BG_VRAM_SIZE/2)-1);
-				oldword = bgvideoram16[controller][vram_offset];
-				if (data != oldword)
-				{
-					COMBINE_DATA(&bgvideoram16[controller][vram_offset]);
-					tilemap_mark_tile_dirty(bg_tilemap[controller],vram_offset/2);
-				}
+				COMBINE_DATA(&bgvideoram16[controller][vram_offset]);
+				tilemap_mark_tile_dirty(bg_tilemap[controller],vram_offset/2);
 				break;
 		case 0x0c00:
 		case 0x0800:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_FG_VRAM_SIZE/2)-1);
-				oldword = fgvideoram16[controller][vram_offset];
-				if (data != oldword)
-				{
-					COMBINE_DATA(&fgvideoram16[controller][vram_offset]);
-					tilemap_mark_tile_dirty(fg_tilemap[controller],vram_offset/2);
-				}
+				COMBINE_DATA(&fgvideoram16[controller][vram_offset]);
+				tilemap_mark_tile_dirty(fg_tilemap[controller],vram_offset/2);
 				break;
 		case 0x1400:
 		case 0x1000:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_TOP_VRAM_SIZE/2)-1);
-				oldword = topvideoram16[controller][vram_offset];
-				if (data != oldword)
-				{
-					COMBINE_DATA(&topvideoram16[controller][vram_offset]);
-					tilemap_mark_tile_dirty(top_tilemap[controller],vram_offset/2);
-				}
+				COMBINE_DATA(&topvideoram16[controller][vram_offset]);
+				tilemap_mark_tile_dirty(top_tilemap[controller],vram_offset/2);
 				break;
 		case 0x1800:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_SPRITERAM_SIZE/2)-1);

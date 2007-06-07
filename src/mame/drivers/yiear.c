@@ -245,7 +245,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   16, 1 },
 	{ REGION_GFX2, 0, &spritelayout,  0, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -276,7 +276,6 @@ static MACHINE_DRIVER_START( yiear )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(yiear)
 	MDRV_VIDEO_START(yiear)
@@ -301,7 +300,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( yiear )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "i08.10d",      0x08000, 0x4000, CRC(e2d7458b) SHA1(1b192130b5cd879ab686a21aa2b518c90edd89aa) )
 	ROM_LOAD( "i07.8d",       0x0c000, 0x4000, CRC(7db7442e) SHA1(d604a995a5505251904447ad697fc9e7f94bf241) )
 
@@ -323,7 +322,7 @@ ROM_START( yiear )
 ROM_END
 
 ROM_START( yiear2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "d12_8.bin",    0x08000, 0x4000, CRC(49ecd9dd) SHA1(15692029351e87837cc5a251947ff315fd723aa4) )
 	ROM_LOAD( "d14_7.bin",    0x0c000, 0x4000, CRC(bc2e1208) SHA1(a5a0c78ff4e02bd7da3eab3842dfe99956e74155) )
 

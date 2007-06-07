@@ -37,20 +37,14 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( rmhaihai_videoram_w )
 {
-	if (videoram[offset] != data)
-	{
-		videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( rmhaihai_colorram_w )
 {
-	if (colorram[offset] != data)
-	{
-		colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -495,13 +489,13 @@ static const gfx_layout charlayout =
 static const gfx_decode gfxdecodeinfo1[] =
 {
 	{ REGION_GFX1, 0, &charlayout, 0, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo2[] =
 {
 	{ REGION_GFX1, 0, &charlayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -590,7 +584,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rmhaihai )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "s3-6.11g",     0x00000, 0x2000, CRC(e7af7ba2) SHA1(1b0f87a16006a96e5b59e055966addac3e2ca926) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "s3-4.8g",      0x04000, 0x2000, CRC(f849e75c) SHA1(4636bcaa7cddb9bc012212098a25f3c57cfc6b51) )
@@ -617,7 +611,7 @@ ROM_START( rmhaihai )
 ROM_END
 
 ROM_START( rmhaihib )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "s-30-6.11g",   0x00000,  0x2000, CRC(f3e13cc8) SHA1(7eb9b17ea9efb5b2891ec40a9ff9744e84c0511c) )
 	ROM_CONTINUE(             0x06000,  0x2000 )
 	ROM_LOAD( "s-30-4.8g",    0x04000,  0x2000, CRC(f6642584) SHA1(5160baf267fd5dd8385ea5a9ff82e9c220fee342) )
@@ -644,7 +638,7 @@ ROM_START( rmhaihib )
 ROM_END
 
 ROM_START( rmhaijin )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "s-4-6.11g",    0x00000, 0x2000, CRC(474c9ace) SHA1(9161a5c64054f079d57676f3d7f61ca149018f61) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "s-4-4.8g",     0x04000, 0x2000, CRC(c76ab584) SHA1(7d76fa6166108d6a511d5311c0d34b55364afec1) )
@@ -671,7 +665,7 @@ ROM_START( rmhaijin )
 ROM_END
 
 ROM_START( rmhaisei )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sei-11.h11",   0x00000, 0x2000, CRC(7c35692b) SHA1(8890ca90ae84c63bfd2b4857bbdd02bd9a2f29a9) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "sei-10.h8",    0x04000, 0x2000, CRC(cbd58124) SHA1(562eb13c2dc441294b1b7dafe37ac27a9b7bba2b) )

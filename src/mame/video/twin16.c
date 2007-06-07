@@ -39,14 +39,8 @@ static tilemap *fg_tilemap;
 
 WRITE16_HANDLER( twin16_videoram2_w )
 {
-	int oldword = twin16_videoram2[offset];
-
 	COMBINE_DATA(&twin16_videoram2[offset]);
-
-	if (oldword != twin16_videoram2[offset])
-	{
-		tilemap_mark_tile_dirty(fg_tilemap, offset);
-	}
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE16_HANDLER( twin16_paletteram_word_w )

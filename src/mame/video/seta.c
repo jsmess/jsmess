@@ -399,28 +399,20 @@ static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info( machine, tileinfo, tile
 
 WRITE16_HANDLER( seta_vram_0_w )
 {
-	UINT16 oldword = seta_vram_0[offset];
-	UINT16 newword = COMBINE_DATA(&seta_vram_0[offset]);
-	if (oldword != newword)
-	{
-		if (offset & 0x1000)
-			tilemap_mark_tile_dirty(tilemap_1, offset & 0x7ff);
-		else
-			tilemap_mark_tile_dirty(tilemap_0, offset & 0x7ff);
-	}
+	COMBINE_DATA(&seta_vram_0[offset]);
+	if (offset & 0x1000)
+		tilemap_mark_tile_dirty(tilemap_1, offset & 0x7ff);
+	else
+		tilemap_mark_tile_dirty(tilemap_0, offset & 0x7ff);
 }
 
 WRITE16_HANDLER( seta_vram_2_w )
 {
-	UINT16 oldword = seta_vram_2[offset];
-	UINT16 newword = COMBINE_DATA(&seta_vram_2[offset]);
-	if (oldword != newword)
-	{
-		if (offset & 0x1000)
-			tilemap_mark_tile_dirty(tilemap_3, offset & 0x7ff);
-		else
-			tilemap_mark_tile_dirty(tilemap_2, offset & 0x7ff);
-	}
+	COMBINE_DATA(&seta_vram_2[offset]);
+	if (offset & 0x1000)
+		tilemap_mark_tile_dirty(tilemap_3, offset & 0x7ff);
+	else
+		tilemap_mark_tile_dirty(tilemap_2, offset & 0x7ff);
 }
 
 WRITE16_HANDLER( twineagl_tilebank_w )

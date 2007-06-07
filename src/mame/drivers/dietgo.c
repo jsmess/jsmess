@@ -189,7 +189,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tile_8x8_layout,     0, 32 },	/* Tiles (8x8) */
 	{ REGION_GFX1, 0, &tile_16x16_layout,   0, 32 },	/* Tiles (16x16) */
 	{ REGION_GFX2, 0, &spritelayout,      512, 16 },	/* Sprites (16x16) */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static void sound_irq(int state)

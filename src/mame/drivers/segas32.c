@@ -1975,7 +1975,7 @@ static const gfx_layout bgcharlayout =
 static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &bgcharlayout,   0x00, 0x3ff  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

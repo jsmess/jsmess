@@ -325,7 +325,7 @@ static const gfx_decode matmania_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,              0, 4 },
 	{ REGION_GFX2, 0, &tilelayout,            4*8, 4 },
 	{ REGION_GFX3, 0, &matmania_spritelayout, 8*8, 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode maniach_gfxdecodeinfo[] =
@@ -333,7 +333,7 @@ static const gfx_decode maniach_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &charlayout,             0, 4 },
 	{ REGION_GFX2, 0, &maniach_tilelayout,   4*8, 4 },
 	{ REGION_GFX3, 0, &maniach_spritelayout, 8*8, 2 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -361,7 +361,6 @@ static MACHINE_DRIVER_START( matmania )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(matmania_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(64+16)
-	MDRV_COLORTABLE_LENGTH(64+16)
 
 	MDRV_PALETTE_INIT(matmania)
 	MDRV_VIDEO_START(matmania)
@@ -419,7 +418,6 @@ static MACHINE_DRIVER_START( maniach )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(maniach_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(64+16)
-	MDRV_COLORTABLE_LENGTH(64+16)
 
 	MDRV_PALETTE_INIT(matmania)
 	MDRV_VIDEO_START(matmania)
@@ -443,7 +441,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( matmania )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "k0-03",        0x4000, 0x4000, CRC(314ab8a4) SHA1(dc86b2f71a9af8524edad2317343b0d05fe5ef4a) )
 	ROM_LOAD( "k1-03",        0x8000, 0x4000, CRC(3b3c3f08) SHA1(65f0c5dba0b8eeb5c2d42b050cac37c475e6a398) )
 	ROM_LOAD( "k2-03",        0xc000, 0x4000, CRC(286c0917) SHA1(50d6133406e7db0694b02858c7d06725744cf243) )
@@ -493,7 +491,7 @@ ROM_START( matmania )
 ROM_END
 
 ROM_START( excthour )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "e29",          0x04000, 0x4000, CRC(c453e855) SHA1(52ce83042ec04e7ba5b45a61316d6281cb10170a) )
 	ROM_LOAD( "e28",          0x08000, 0x4000, CRC(17b63708) SHA1(01c868b7ea32c4857f7187ce73a4cab5b4def246) )
 	ROM_LOAD( "e27",          0x0c000, 0x4000, CRC(269ab3bc) SHA1(f2f307c5fc6d50167be8904bef8c7ef21209be50) )
@@ -543,7 +541,7 @@ ROM_START( excthour )
 ROM_END
 
 ROM_START( maniach )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "mc-mb2.bin",   0x04000, 0x4000, CRC(a6da1ba8) SHA1(d861c1c68b25272205939df43cdcca423ba7c937) )
 	ROM_LOAD( "mc-ma2.bin",   0x08000, 0x4000, CRC(84583323) SHA1(f1512fec6f3e03dc633a96917a114b0b6369c577) )
 	ROM_LOAD( "mc-m92.bin",   0x0c000, 0x4000, CRC(e209a500) SHA1(d1a3ab91ffbc321a51c99a2170aca3e217b22576) )
@@ -603,7 +601,7 @@ ROM_START( maniach )
 ROM_END
 
 ROM_START( maniach2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ic40-mb1",     0x04000, 0x4000, CRC(b337a867) SHA1(a615283a70700028267e223df00e70bdd159ec09) )
 	ROM_LOAD( "ic41-ma1",     0x08000, 0x4000, CRC(85ec8279) SHA1(dada5fa6981573a1fbb235becbc647e1e2d497e1) )
 	ROM_LOAD( "ic42-m91",     0x0c000, 0x4000, CRC(a14b86dd) SHA1(73172dfeb34846beaa713c8886d56ed691139d06) )

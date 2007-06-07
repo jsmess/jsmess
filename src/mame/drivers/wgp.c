@@ -1139,7 +1139,7 @@ static const gfx_decode wgp_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0x0, &wgp_tilelayout,  0, 256 },		/* sprites */
 	{ REGION_GFX1, 0x0, &charlayout,  0, 256 },		/* sprites & playfield */
 	{ REGION_GFX2, 0x0, &wgp_tile2layout,  0, 256 },	/* piv */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1176,8 +1176,6 @@ static MACHINE_START( wgp )
 
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-
-	return 0;
 }
 
 static MACHINE_DRIVER_START( wgp )

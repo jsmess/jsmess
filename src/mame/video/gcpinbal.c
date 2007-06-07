@@ -105,23 +105,19 @@ READ16_HANDLER( gcpinbal_tilemaps_word_r )
 
 WRITE16_HANDLER( gcpinbal_tilemaps_word_w )
 {
-	UINT16 oldword = gcpinbal_tilemapram[offset];
 	COMBINE_DATA(&gcpinbal_tilemapram[offset]);
 
 	if (offset<0x800)	/* BG0 */
 	{
-		if (oldword != gcpinbal_tilemapram[offset])
-			tilemap_mark_tile_dirty(gcpinbal_tilemap[0],offset/2);
+		tilemap_mark_tile_dirty(gcpinbal_tilemap[0],offset/2);
 	}
 	else if ((offset<0x1000))	/* BG1 */
 	{
-		if (oldword != gcpinbal_tilemapram[offset])
-			tilemap_mark_tile_dirty(gcpinbal_tilemap[1],(offset%0x800)/2);
+		tilemap_mark_tile_dirty(gcpinbal_tilemap[1],(offset%0x800)/2);
 	}
 	else if ((offset<0x1800))	/* FG */
 	{
-		if (oldword != gcpinbal_tilemapram[offset])
-			tilemap_mark_tile_dirty(gcpinbal_tilemap[2],(offset%0x800));
+		tilemap_mark_tile_dirty(gcpinbal_tilemap[2],(offset%0x800));
 	}
 }
 

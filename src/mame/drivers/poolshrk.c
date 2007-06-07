@@ -199,7 +199,7 @@ static const gfx_decode poolshrk_gfx_decode_info[] =
 {
 	{ REGION_GFX1, 0, &poolshrk_sprite_layout, 0, 2 },
 	{ REGION_GFX2, 0, &poolshrk_tile_layout, 0, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

@@ -260,7 +260,7 @@ static const gfx_decode raiden_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &raiden_spritelayout,   0, 16 },
 	{ REGION_GFX3, 0, &raiden_spritelayout, 256, 16 },
 	{ REGION_GFX4, 0, &raiden_spritelayout, 512, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

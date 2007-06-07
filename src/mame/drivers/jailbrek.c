@@ -218,7 +218,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0, 16 }, /* characters */
 	{ REGION_GFX2, 0, &spritelayout, 16*16, 16 }, /* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -272,7 +272,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( jailbrek )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "jailb11d.bin", 0x8000, 0x4000, CRC(a0b88dfd) SHA1(f999e382b9d3b812fca41f4d0da3ea692fef6b19) )
 	ROM_LOAD( "jailb9d.bin",  0xc000, 0x4000, CRC(444b7d8e) SHA1(c708b67c2d249448dae9a3d10c24d13ba6849597) )
 
@@ -297,7 +297,7 @@ ROM_START( jailbrek )
 ROM_END
 
 ROM_START( manhatan )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for code */
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
     ROM_LOAD( "507-n03.11d", 0x8000, 0x4000, CRC(e5039f7e) SHA1(0f12484ed40444d978e0405c27bdd027ae2e2a0b) )
     ROM_LOAD( "507-n02.9d",  0xc000, 0x4000, CRC(143cc62c) SHA1(9520dbb1b6f1fa439e03d4caa9bed96ef8f805f2) )
 
@@ -358,7 +358,7 @@ ROM_END
 */
 
 ROM_START( jailbrkb )
-    ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* 64k for code */
+    ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.k6",    0x8000, 0x8000, CRC(df0e8fc7) SHA1(62e59dbb3941ed8af365e96906315318d9aee060) )
 
     ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE ) /* characters */
@@ -413,8 +413,6 @@ static MACHINE_START( jailbrek )
 {
     state_save_register_global(irq_enable);
     state_save_register_global(nmi_enable);
-
-	return 0;
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )

@@ -1974,26 +1974,26 @@ static const gfx_decode alpha68k_II_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,   0,  16 },
 	{ REGION_GFX2, 0, &spritelayout, 0, 128 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode alpha68k_V_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout_V,    0,  16 },
 	{ REGION_GFX2, 0, &spritelayout_V,  0, 256 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode paddle_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &paddle_layout,  0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode tnexspce_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &tnexspce_layout,  0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode sstingry_gfxdecodeinfo[] =
@@ -2002,7 +2002,7 @@ static const gfx_decode sstingry_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x00000, &sting_layout2,  0, 32 },
 	{ REGION_GFX1, 0x10000, &sting_layout1,  0, 32 },
 	{ REGION_GFX1, 0x10000, &sting_layout3,  0, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode kyros_gfxdecodeinfo[] =
@@ -2015,7 +2015,7 @@ static const gfx_decode kyros_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x30000, &kyros_char_layout2,  0, 32 },
 	{ REGION_GFX1, 0x48000, &kyros_char_layout1,  0, 32 },
 	{ REGION_GFX1, 0x48000, &kyros_char_layout2,  0, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode jongbou_gfxdecodeinfo[] =
@@ -2025,7 +2025,7 @@ static const gfx_decode jongbou_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &jongbou_layout3,  0, 32 },
 	{ REGION_GFX1, 0, &jongbou_layout4,  0, 32 },
 	{ REGION_GFX1, 0, &jongbou_layout5,  0, 32 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

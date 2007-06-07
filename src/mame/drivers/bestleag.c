@@ -313,7 +313,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &bestleag_charlayout,     0x200, 16 },
 	{ REGION_GFX1, 0, &bestleag_char16layout,   0x000, 32 },
 	{ REGION_GFX2, 0, &bestleag_char16layout,   0x300, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( bestleag )

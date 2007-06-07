@@ -170,14 +170,11 @@ READ8_HANDLER( bosco_videoram_r )
 
 WRITE8_HANDLER( bosco_videoram_w )
 {
-	if (bosco_videoram[offset] != data)
-	{
-		bosco_videoram[offset] = data;
-		if (offset & 0x400)
-			tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-		else
-			tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
-	}
+	bosco_videoram[offset] = data;
+	if (offset & 0x400)
+		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+	else
+		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( bosco_scrollx_w )

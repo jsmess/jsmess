@@ -203,7 +203,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0x0000, &charlayout,     0, 16 }, /* FG */
 	{ REGION_GFX1, 0x8000, &charlayout,   256, 16 }, /* BG */
 	{ REGION_GFX1, 0x4000, &charlayout,   256, 16 }, /* BG (?)*/
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

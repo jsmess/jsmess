@@ -61,7 +61,7 @@ static const char *blockade_sample_names[] =
 {
     "*blockade",
     "boom.wav",
-    0   /* end of array */
+    0
 };
 
 struct Samplesinterface blockade_samples_interface =

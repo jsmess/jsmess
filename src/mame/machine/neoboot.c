@@ -406,7 +406,7 @@ void decrypt_cthd2003(void)
 
  	free(tmp);
 
-	memcpy(romdata-0x10000,romdata,0x10000);;
+	memcpy(romdata-0x10000,romdata,0x10000);
 
 	cthd2003_c(0);
 }

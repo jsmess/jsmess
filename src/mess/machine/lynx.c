@@ -1211,5 +1211,4 @@ MACHINE_START( lynx )
 	memset(&suzy, 0, sizeof(suzy));
 
 	add_reset_callback(machine, lynx_reset);
-	return 0;
 }

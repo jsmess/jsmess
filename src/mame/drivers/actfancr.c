@@ -366,7 +366,7 @@ static const gfx_decode actfan_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &chars,       0, 16 },
 	{ REGION_GFX2, 0, &sprites,   512, 16 },
 	{ REGION_GFX3, 0, &tiles,     256, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode triothep_gfxdecodeinfo[] =
@@ -374,7 +374,7 @@ static const gfx_decode triothep_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &chars,       0, 16 },
 	{ REGION_GFX2, 0, &sprites,   256, 16 },
 	{ REGION_GFX3, 0, &tiles,     512, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

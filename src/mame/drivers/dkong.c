@@ -268,8 +268,6 @@ static MACHINE_START( dkong )
 	tt = 0;
 	decay = 0;
 	hunchloopback = 0;
-
-	return 0;
 }
 
 static MACHINE_RESET( dkong )
@@ -1559,14 +1557,14 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &charlayout,   0, 64 },
 	{ REGION_GFX2, 0x0000, &spritelayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode pestplce_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0x0000, &charlayout,			   0, 64 },
 	{ REGION_GFX2, 0x0000, &pestplce_spritelayout, 0, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const char *dkong_sample_names[] =
@@ -1632,8 +1630,7 @@ static MACHINE_DRIVER_START( radarscp )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
-	MDRV_PALETTE_LENGTH(256+2)
-	MDRV_COLORTABLE_LENGTH(64*4)	/* two extra colors for stars and radar grid */
+	MDRV_PALETTE_LENGTH(256+2) 	/* two extra colors for stars and radar grid */
 
 	MDRV_PALETTE_INIT(dkong)
 	MDRV_VIDEO_START(dkong)
@@ -1672,7 +1669,6 @@ static MACHINE_DRIVER_START( dkong )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4)
 
 	MDRV_PALETTE_INIT(dkong)
 	MDRV_VIDEO_START(dkong)
@@ -1719,7 +1715,6 @@ static MACHINE_DRIVER_START( hunchbkd )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4)
 
 	MDRV_PALETTE_INIT(dkong)
 	MDRV_VIDEO_START(dkong)
@@ -1795,7 +1790,6 @@ static MACHINE_DRIVER_START( dkongjr )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4)
 
 	MDRV_PALETTE_INIT(dkong)
 	MDRV_VIDEO_START(dkong)
@@ -1843,7 +1837,6 @@ static MACHINE_DRIVER_START( pestplce )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(pestplce_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4)
 
 	MDRV_PALETTE_INIT(dkong)	// wrong!
 	MDRV_VIDEO_START(dkong)
@@ -1881,7 +1874,6 @@ static MACHINE_DRIVER_START( epos )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4)
 
 	MDRV_PALETTE_INIT(dkong)
 	MDRV_VIDEO_START(dkong)
@@ -1937,7 +1929,6 @@ static MACHINE_DRIVER_START( dkong3 )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4)
 
 	MDRV_PALETTE_INIT(dkong3)
 	MDRV_VIDEO_START(dkong)
@@ -1963,7 +1954,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( radarscp )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "trs2c5fc",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs2c5gc",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
 	ROM_LOAD( "trs2c5hc",     0x2000, 0x1000, CRC(51b8263d) SHA1(09687f2c40cf09ffc2aeddde4a4fa32800847f01) )
@@ -1994,7 +1985,7 @@ ROM_START( radarscp )
 ROM_END
 
 ROM_START( dkong )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
@@ -2030,7 +2021,7 @@ I use more appropreate filenames for color PROMs.
 ROM_END
 
 ROM_START( dkongo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )	// tkg3c.5f
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )	// tkg3c.5g
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )	// tkg3c.5h
@@ -2066,7 +2057,7 @@ I use more appropreate filenames for color PROMs.
 ROM_END
 
 ROM_START( dkongjp )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )
 	ROM_LOAD( "5g.cpu",       0x1000, 0x1000, CRC(d326599b) SHA1(94c7382604d0a123a442d53f9641f366dfbb7631) )
 	ROM_LOAD( "5h.cpu",       0x2000, 0x1000, CRC(ff31ac89) SHA1(9626a9e6df0d1b0ff273dbbe986f670200f91f75) )
@@ -2101,7 +2092,7 @@ I use more appropreate filenames for color PROMs.
 ROM_END
 
 ROM_START( dkongjo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )
 	ROM_LOAD( "c_5g_b.bin",   0x1000, 0x1000, CRC(3b2a6635) SHA1(32c62e00863ab99c6f263587d9d5bb775a68f3de) )
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )
@@ -2136,7 +2127,7 @@ I use more appropreate filenames for color PROMs.
 ROM_END
 
 ROM_START( dkongjo1 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )
 	ROM_LOAD( "5g.cpu",       0x1000, 0x1000, CRC(d326599b) SHA1(94c7382604d0a123a442d53f9641f366dfbb7631) )
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )
@@ -2171,7 +2162,7 @@ I use more appropreate filenames for color PROMs.
 ROM_END
 
 ROM_START( dkongjr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "dkj.5b",       0x0000, 0x1000, CRC(dea28158) SHA1(08baf84ae6f9b40a2c743fe1d8c158c74a40e95a) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "dkj.5c",       0x2000, 0x0800, CRC(6fb5faf6) SHA1(ce1cfde71a9e2a8b5896a6301d386f72869a1d2e) )
@@ -2203,7 +2194,7 @@ ROM_START( dkongjr )
 ROM_END
 
 ROM_START( dkongjrj )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c_5ba.bin",    0x0000, 0x1000, CRC(50a015ce) SHA1(edcafdf8f989dd25bb142817084d270a6942577a) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "c_5ca.bin",    0x2000, 0x0800, CRC(c0a18f0d) SHA1(6d7396b98c0a7fa508dc233f90e5a8359439c97b) )
@@ -2235,7 +2226,7 @@ ROM_START( dkongjrj )
 ROM_END
 
 ROM_START( dkngjnrj )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "dkjp.5b",      0x0000, 0x1000, CRC(7b48870b) SHA1(4f737559e2bf5cc28824220417d7a2827361221f) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "dkjp.5c",      0x2000, 0x0800, CRC(12391665) SHA1(3141ed5096097c48ac128636330ab6837a665d40) )
@@ -2267,7 +2258,7 @@ ROM_START( dkngjnrj )
 ROM_END
 
 ROM_START( dkongjrb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "dkjr1",        0x0000, 0x1000, CRC(ec7e097f) SHA1(c10885d8724434030094a106c5b6de7fa6976d0f) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "c_5ca.bin",    0x2000, 0x0800, CRC(c0a18f0d) SHA1(6d7396b98c0a7fa508dc233f90e5a8359439c97b) )
@@ -2299,7 +2290,7 @@ ROM_START( dkongjrb )
 ROM_END
 
 ROM_START( dkngjnrb )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "djr1-c.5c",    0x2000, 0x0800, CRC(982e30e8) SHA1(4d93d79e6ab1cad678af509cb3be4166b239bfa6) )
@@ -2332,7 +2323,7 @@ ROM_START( dkngjnrb )
 ROM_END
 
 ROM_START( pestplce )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pest.1p",      0x0000, 0x1000, CRC(80d50721) SHA1(9c0e7571b1664dce741595a2d13dc9d7709b35a9) )
 	ROM_CONTINUE(			  0x3000, 0x1000 )
 	ROM_LOAD( "pest.2p",      0x2000, 0x0800, CRC(9c3681cc) SHA1(c12e8e7ab79c9fde92cca2c589904f68cf52cbf1) )
@@ -2366,7 +2357,7 @@ ROM_START( pestplce )
 ROM_END
 
 ROM_START( dkong3 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "dk3c.7b",      0x0000, 0x2000, CRC(38d5f38e) SHA1(5a6bb0e5070211515e3d56bd7d4c2d1655ac1621) )
 	ROM_LOAD( "dk3c.7c",      0x2000, 0x2000, CRC(c9134379) SHA1(ecddb3694b93cb3dc98c3b1aeeee928e27529aba) )
 	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
@@ -2395,7 +2386,7 @@ ROM_START( dkong3 )
 ROM_END
 
 ROM_START( dkong3j )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "dk3c.7b",      0x0000, 0x2000, CRC(38d5f38e) SHA1(5a6bb0e5070211515e3d56bd7d4c2d1655ac1621) )
 	ROM_LOAD( "dk3c.7c",      0x2000, 0x2000, CRC(c9134379) SHA1(ecddb3694b93cb3dc98c3b1aeeee928e27529aba) )
 	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
@@ -2424,7 +2415,7 @@ ROM_START( dkong3j )
 ROM_END
 
 ROM_START( dkong3b )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "5b.bin",       0x0000, 0x1000, CRC(549979bc) SHA1(58532f39285db0b081089e54a23041d83bec49aa) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "5c-2.bin",     0x2000, 0x0800, CRC(b9dcbae6) SHA1(a7a7a3d79cb1eed93e54dff508c61cbc24797007) )
@@ -2458,7 +2449,7 @@ ROM_START( dkong3b )
 ROM_END
 
 ROM_START( hunchbkd )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "hb.5e",        0x0000, 0x1000, CRC(4c3ac070) SHA1(636843b33f1b7e994b112fa29e65038098528b8c) )
 	ROM_LOAD( "hbsc-1.5c",    0x2000, 0x1000, CRC(9b0e6234) SHA1(a7405451e5cd42bc276c659ec5a2136dbb7b6aba) )
 	ROM_LOAD( "hb.5b",        0x4000, 0x1000, CRC(4cde80f3) SHA1(3d93d8e454b2c517971a99c5700b6e943f975a11) )
@@ -2485,7 +2476,7 @@ ROM_START( hunchbkd )
 ROM_END
 
 ROM_START( sbdk )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "sb-dk.ap",     0x0000, 0x1000, CRC(fef0ef9c) SHA1(8d3de7f96354672d906b2e124f3fb355f3201ed2) )
 	ROM_LOAD( "sb-dk.ay",     0x2000, 0x1000, CRC(2e9dade2) SHA1(74e5770fd362fd0242b8174b0ea5383fdf893cb3) )
 	ROM_LOAD( "sb-dk.as",     0x4000, 0x1000, CRC(e6d200f3) SHA1(3787334df76e629baa9ef5362495cd3af7777358) )
@@ -2511,7 +2502,7 @@ ROM_START( sbdk )
 ROM_END
 
 ROM_START( herbiedk )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "5f.cpu",        0x0000, 0x1000, CRC(c7ab3ac6) SHA1(5ef8c0ac1acd09a0f6c1536d0525cc27bb87b167) )
 	ROM_LOAD( "5g.cpu",        0x2000, 0x1000, CRC(d1031aa6) SHA1(6f5eadf43f1a59333833b3ee72d8d3043ac8c899) )
 	ROM_LOAD( "5h.cpu",        0x4000, 0x1000, CRC(c0daf551) SHA1(f39058fa05ad69e839e7c0281cb1fad80cfa3134) )
@@ -2541,7 +2532,7 @@ ROM_START( herbiedk )
 ROM_END
 
 ROM_START( herodk )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "red-dot.rgt",  0x0c00, 0x0400, CRC(9c4af229) SHA1(8b7330457acdd8d92f2853f3e5f8c18f8991c5c9) )	/* encrypted */
 	ROM_CONTINUE(             0x0800, 0x0400 )
 	ROM_CONTINUE(             0x0400, 0x0400 )
@@ -2572,7 +2563,7 @@ ROM_START( herodk )
 ROM_END
 
 ROM_START( herodku )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "2764.8h",      0x0c00, 0x0400, CRC(989ce053) SHA1(852401856a2d91118d1bd0b3db892b57d0ac949c) )
 	ROM_CONTINUE(             0x0800, 0x0400 )
 	ROM_CONTINUE(             0x0400, 0x0400 )
@@ -2601,7 +2592,7 @@ ROM_START( herodku )
 ROM_END
 
 ROM_START( spclforc )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "27128.8f",     0x0000, 0x1000, CRC(1e9b8d26) SHA1(783e733cfb5d8fa560a6e6a7b49f782abc60bb58) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -2624,7 +2615,7 @@ ROM_START( spclforc )
 ROM_END
 
 ROM_START( spcfrcii )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "spfc2.8f",     0x0000, 0x1000, CRC(87f9bb6c) SHA1(f432ff205336280ae11ef4b3061be48e19e07d76) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -2647,7 +2638,7 @@ ROM_START( spcfrcii )
 ROM_END
 
 ROM_START( 8ballact )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "8b-dk.5e",     0x0400, 0x0400, CRC(166c1c9b) SHA1(fd5661dbb4617a1daff7949ef030b8572bdebb85) )
 	ROM_CONTINUE(			  0x0000, 0x0400 )
 	ROM_CONTINUE(			  0x0c00, 0x0400 )
@@ -2676,7 +2667,7 @@ ROM_START( 8ballact )
 ROM_END
 
 ROM_START( 8ballat2 )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 )	/* 32k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "8b-jr.5b",     0x0400, 0x0400, CRC(579cd634) SHA1(93d81539459f7198d8cbf05b3e66a40466aee2d9) )
 	ROM_CONTINUE(			  0x0000, 0x0400 )
 	ROM_CONTINUE(			  0x0c00, 0x0400 )

@@ -122,11 +122,8 @@ WRITE8_HANDLER( hexion_bankedram_w )
 		if (pmcbank)
 		{
 //logerror("%04x: bankedram_w offset %04x, data %02x, bankctrl = %02x\n",activecpu_get_pc(),offset,data,bankctrl);
-			if (vram[rambank][offset] != data)
-			{
-				vram[rambank][offset] = data;
-				tilemap_mark_tile_dirty(bg_tilemap[rambank],offset/4);
-			}
+			vram[rambank][offset] = data;
+			tilemap_mark_tile_dirty(bg_tilemap[rambank],offset/4);
 		}
 		else
 			logerror("%04x pmc internal ram %04x = %02x\n",activecpu_get_pc(),offset,data);

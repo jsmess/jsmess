@@ -671,46 +671,29 @@ READ16_HANDLER( rallybik_tileram16_r )
 
 WRITE16_HANDLER( toaplan1_tileram16_w )
 {
-	UINT16 oldword = 0;
 	offs_t vram_offset;
 
 	switch (pf_voffs & 0xf000)	/* Locate Layer (PlayField) */
 	{
 		case 0x0000:
 				vram_offset = ((pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				oldword = pf1_tilevram16[vram_offset];
-				if (data != oldword)
-				{
-					COMBINE_DATA(&pf1_tilevram16[vram_offset]);
-					tilemap_mark_tile_dirty(pf1_tilemap,vram_offset/2);
-				}
+				COMBINE_DATA(&pf1_tilevram16[vram_offset]);
+				tilemap_mark_tile_dirty(pf1_tilemap,vram_offset/2);
 				break;
 		case 0x1000:
 				vram_offset = ((pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				oldword = pf2_tilevram16[vram_offset];
-				if (data != oldword)
-				{
-					COMBINE_DATA(&pf2_tilevram16[vram_offset]);
-					tilemap_mark_tile_dirty(pf2_tilemap,vram_offset/2);
-				}
+				COMBINE_DATA(&pf2_tilevram16[vram_offset]);
+				tilemap_mark_tile_dirty(pf2_tilemap,vram_offset/2);
 				break;
 		case 0x2000:
 				vram_offset = ((pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				oldword = pf3_tilevram16[vram_offset];
-				if (data != oldword)
-				{
-					COMBINE_DATA(&pf3_tilevram16[vram_offset]);
-					tilemap_mark_tile_dirty(pf3_tilemap,vram_offset/2);
-				}
+				COMBINE_DATA(&pf3_tilevram16[vram_offset]);
+				tilemap_mark_tile_dirty(pf3_tilemap,vram_offset/2);
 				break;
 		case 0x3000:
 				vram_offset = ((pf_voffs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE/2)-1);
-				oldword = pf4_tilevram16[vram_offset];
-				if (data != oldword)
-				{
-					COMBINE_DATA(&pf4_tilevram16[vram_offset]);
-					tilemap_mark_tile_dirty(pf4_tilemap,vram_offset/2);
-				}
+				COMBINE_DATA(&pf4_tilevram16[vram_offset]);
+				tilemap_mark_tile_dirty(pf4_tilemap,vram_offset/2);
 				break;
 		default:
 				logerror("Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n",data,pf_voffs,offset);

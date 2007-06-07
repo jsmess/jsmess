@@ -127,31 +127,22 @@ VIDEO_START( netwars )
 
 WRITE8_HANDLER( espial_videoram_w )
 {
-	if (espial_videoram[offset] != data)
-	{
-		espial_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	espial_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( espial_colorram_w )
 {
-	if (espial_colorram[offset] != data)
-	{
-		espial_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	espial_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( espial_attributeram_w )
 {
-	if (espial_attributeram[offset] != data)
-	{
-		espial_attributeram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	espial_attributeram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

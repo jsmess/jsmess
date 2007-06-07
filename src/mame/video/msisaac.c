@@ -134,29 +134,20 @@ WRITE8_HANDLER( msisaac_bg2_textbank_w )
 
 WRITE8_HANDLER( msisaac_bg_videoram_w )
 {
-	if( msisaac_videoram[offset]!=data )
-	{
-		msisaac_videoram[offset]=data;
-		tilemap_mark_tile_dirty(background,offset);
-	}
+	msisaac_videoram[offset]=data;
+	tilemap_mark_tile_dirty(background,offset);
 }
 
 WRITE8_HANDLER( msisaac_bg2_videoram_w )
 {
-	if( msisaac_videoram2[offset]!=data )
-	{
-		msisaac_videoram2[offset]=data;
-		tilemap_mark_tile_dirty(background2,offset);
-	}
+	msisaac_videoram2[offset]=data;
+	tilemap_mark_tile_dirty(background2,offset);
 }
 
 WRITE8_HANDLER( msisaac_fg_videoram_w )
 {
-	if( videoram[offset]!=data )
-	{
-		videoram[offset]=data;
-		tilemap_mark_tile_dirty(foreground,offset);
-	}
+	videoram[offset]=data;
+	tilemap_mark_tile_dirty(foreground,offset);
 }
 
 

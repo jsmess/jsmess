@@ -218,15 +218,8 @@ DRIVER_INIT( cybertnk )
 
 static WRITE16_HANDLER( tx_vram_w )
 {
-	int oldword = tx_vram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
-
-	if (oldword != newword)
-	{
-		tx_vram[offset] = newword;
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
-	}
+	COMBINE_DATA(&tx_vram[offset]);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 static WRITE16_HANDLER( share_w )

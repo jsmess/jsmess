@@ -802,7 +802,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout,    0, 32 },	/* Tiles 16x16 */
 	{ REGION_GFX3, 0, &tilelayout,  512, 64 },	/* Tiles 16x16 */
 	{ REGION_GFX4, 0, &spritelayout,768, 32 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_robocop2[] =
@@ -812,7 +812,7 @@ static const gfx_decode gfxdecodeinfo_robocop2[] =
 	{ REGION_GFX3, 0, &tilelayout,  512, 64 },	/* Tiles 16x16 */
 	{ REGION_GFX4, 0, &spritelayout,768, 32 },	/* Sprites 16x16 */
 	{ REGION_GFX3, 0, &tilelayout_8bpp,  512, 1 },	/* Tiles 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_mutantf[] =
@@ -822,7 +822,7 @@ static const gfx_decode gfxdecodeinfo_mutantf[] =
 	{ REGION_GFX3, 0, &tilelayout,          0, 64 },	/* Tiles 16x16 */
 	{ REGION_GFX4, 0, &spritelayout,      256, 128 },	/* Sprites 16x16 */
 	{ REGION_GFX5, 0, &spritelayout,     1024+768, 16 },	/* Sprites 16x16 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /**********************************************************************************/

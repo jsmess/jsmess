@@ -522,7 +522,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x0000, &bscharlayout, 16*4,  8 }, /* big sprite char set */
 	{ REGION_GFX1, 0x0000, &spritelayout,    0, 16 }, /* sprite set #1 */
 	{ REGION_GFX1, 0x2000, &spritelayout,    0, 16 }, /* sprite set #2 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static gfx_decode tr_gfxdecodeinfo[] =
@@ -531,7 +531,7 @@ static gfx_decode tr_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x0000, &trcharlayout,      0, 40 },
 	{ REGION_GFX1, 0x0000, &trspritelayout,    0, 40 },
 	{ REGION_GFX3, 0x0000, &trcharlayout,   	 0, 40 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( yamato )
@@ -618,7 +618,7 @@ ROM_START( yamato )
 	/* hole at 6000-6fff */
 	ROM_LOAD( "11.5a",        0x7000, 0x1000, CRC(35987485) SHA1(1f0cb545bbd52982cbf801bc1dd2c4087af2f5f7) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -651,7 +651,7 @@ ROM_START( yamato2 )
 	/* hole at 6000-6fff */
 	/* 7000-7fff not present here */
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -677,7 +677,7 @@ ROM_START( yamato2 )
 ROM_END
 
 ROM_START( toprollr )
-	ROM_REGION( 0x10000*2, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000*2, REGION_CPU1, 0 )
 	ROM_LOAD( "10.k3", 0xc000, 0x2000, CRC(1e8914a6) SHA1(ec17f185f890d04ce75a5d8edf8b32da60e7a8d8) )
 	ROM_LOAD( "11.l3", 0xe000, 0x2000, CRC(b20a9fa2) SHA1(accd3296447eca002b0808e7b02832f5e35407e8) )
 

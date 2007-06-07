@@ -1027,9 +1027,9 @@ static const gfx_layout spyhunt_alphalayout =
 
 static const gfx_decode gfxdecodeinfo[] =
 {
-	{ REGION_GFX1, 0, &mcr_bg_layout,     0, 4 },
+	{ REGION_GFX1, 0, &mcr_bg_layout,     0, 4, 2, 2 },
 	{ REGION_GFX2, 0, &mcr_sprite_layout, 0, 4 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1038,7 +1038,7 @@ static const gfx_decode spyhunt_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &spyhunt_charlayout,  1*16, 1 },
 	{ REGION_GFX2, 0, &mcr_sprite_layout,   0*16, 4 },
 	{ REGION_GFX3, 0, &spyhunt_alphalayout, 4*16, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -1157,7 +1157,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( demoderm )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pro0.3b",      0x00000, 0x8000, CRC(2e24527b) SHA1(df8d1129b52ca0f4326c7c7e4f10d81b4ced65b5) )
 	ROM_LOAD( "pro1.5b",      0x08000, 0x8000, CRC(034c00fc) SHA1(0f0e8f123a34c330021bce76ed7f38bcb2e9af4e) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1183,7 +1183,7 @@ ROM_END
 
 
 ROM_START( sarge )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cpu_3b.bin",   0x00000, 0x8000, CRC(da31a58f) SHA1(29b97caf61f8f59042519a6b501cd1d15099dd59) )
 	ROM_LOAD( "cpu_5b.bin",   0x08000, 0x8000, CRC(6800e746) SHA1(018c2b622b3654530ebc2c299b3f745777163d4b) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1205,7 +1205,7 @@ ROM_END
 
 
 ROM_START( maxrpm )
-	ROM_REGION( 0x12000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x12000, REGION_CPU1, 0 )
 	ROM_LOAD( "pro.0",        0x00000, 0x8000, CRC(3f9ec35f) SHA1(ebdcf480aee5569af631106cc6478adc26c4ac24) )
 	ROM_LOAD( "pro.1",        0x08000, 0x8000, CRC(f628bb30) SHA1(0514906b9764a7f02a730a610affea4d42a4510d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1227,7 +1227,7 @@ ROM_END
 
 
 ROM_START( rampage )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pro0rev3.3b",  0x00000, 0x8000, CRC(2f7ca03c) SHA1(1e3a1f213fd67938adf14ea0d04dab687ea8f4ef) )
 	ROM_LOAD( "pro1rev3.5b",  0x08000, 0x8000, CRC(d89bd9a4) SHA1(3531464ffe49dfaf2755d9e2dc1aea23819b3a5d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1251,7 +1251,7 @@ ROM_END
 
 
 ROM_START( rampage2 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pro0rev2.3b",  0x00000, 0x8000, CRC(3f1d0293) SHA1(d68f04b9b3fc377b9e57b823db4e7f9cfedbcf99) )
 	ROM_LOAD( "pro1rev2.5b",  0x08000, 0x8000, CRC(58523d75) SHA1(5cd512864568ec7793bda0164f21e7d72a7ea817) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1275,7 +1275,7 @@ ROM_END
 
 
 ROM_START( powerdrv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pdrv3b.bin",   0x00000, 0x8000, CRC(d870b704) SHA1(300d6ff3c92a45f5c4f28c171280174924aecb6c) )
 	ROM_LOAD( "pdrv5b.bin",   0x08000, 0x8000, CRC(fa0544ad) SHA1(55a9cf8c8648761443e4a5a3b214f4d6236cbaff) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1299,7 +1299,7 @@ ROM_END
 
 
 ROM_START( stargrds )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pro-0.3b",  0x00000, 0x8000, CRC(3ad94aa2) SHA1(1e17ac70fddee1f3d0dd71172e15a7a256168a70) )
 	ROM_LOAD( "pro-1.5b",  0x08000, 0x8000, CRC(dba428b0) SHA1(72efa2f02e95f05a5503ced136fbdf3fcdf57554) )
 	ROM_FILL(              0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1321,7 +1321,7 @@ ROM_END
 
 
 ROM_START( spyhunt )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "cpu_pg0.6d",   0x0000, 0x2000, CRC(1721b88f) SHA1(c7a641f0c05bd343ebc79e1c1be3a26da5fb77f0) )
 	ROM_LOAD( "cpu_pg1.7d",   0x2000, 0x2000, CRC(909d044f) SHA1(67237c3efde568d52e9f8b0d36df726d05a9d9e4) )
 	ROM_LOAD( "cpu_pg2.8d",   0x4000, 0x2000, CRC(afeeb8bd) SHA1(fde32863d08a745dfe19f1c1382810eab6aebcec) )
@@ -1329,7 +1329,7 @@ ROM_START( spyhunt )
 	ROM_LOAD( "cpu_pg4.10d",  0x8000, 0x2000, CRC(a3033c15) SHA1(e9811450a7c952561912777d679fe45a6b5a794a) )
 	ROM_LOAD( "cpu_pg5.11d",  0xa000, 0x4000, CRC(53a4f7cd) SHA1(051b07ae993e14b329507710c0f7cadaa952f9ae) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "snd_0sd.a8",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
@@ -1364,14 +1364,14 @@ ROM_END
 
 
 ROM_START( crater )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "crcpu.6d",     0x0000, 0x2000, CRC(ad31f127) SHA1(d03506570cd08bcdb39d7c6b9de4f9628c7373e9) )
 	ROM_LOAD( "crcpu.7d",     0x2000, 0x2000, CRC(3743c78f) SHA1(05605041c7a5ef2a8271cc3dd1aae4c82c8797eb) )
 	ROM_LOAD( "crcpu.8d",     0x4000, 0x2000, CRC(c95f9088) SHA1(2162c4ef2cc29857b10d64ec9e09ca6d086fa9e7) )
 	ROM_LOAD( "crcpu.9d",     0x6000, 0x2000, CRC(a03c4b11) SHA1(6a442a0828942dc51dbe0d3f19be855a52c12f39) )
 	ROM_LOAD( "crcpu.10d",    0x8000, 0x2000, CRC(44ae4cbd) SHA1(2188bf697f1b3fcbb2ad6cbd4d9098e3b8d56a95) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "crsnd4.a7",    0x0000, 0x1000, CRC(fd666cb5) SHA1(257174266e264db8ac9af5f2296fd0a22847f85f) )
 	ROM_LOAD( "crsnd1.a8",    0x1000, 0x1000, CRC(90bf2c4c) SHA1(7adfbf2251b5d46043d614554320e2fe544cc570) )
 	ROM_LOAD( "crsnd2.a9",    0x2000, 0x1000, CRC(3b8deef1) SHA1(a14186a33a7b5ca07086ce44fb1c8c64900654d0) )
@@ -1402,7 +1402,7 @@ ROM_END
 
 
 ROM_START( turbotag )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ttprog0.bin",  0x0000, 0x2000, CRC(6110fd80) SHA1(544d3cd24b047797c2006a9fac499c14140960db) )
 	ROM_LOAD( "ttprog1.bin",  0x2000, 0x2000, BAD_DUMP CRC(b0505e18) SHA1(b6871484f9a0663a9bcffd58368be5ae7717d29c) )
 	ROM_LOAD( "ttprog2.bin",  0x4000, 0x2000, CRC(c4141237) SHA1(c1d10da4961e94bd8c2b30a2f9e0cbd8080eb56d) )

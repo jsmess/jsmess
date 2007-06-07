@@ -550,7 +550,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &bgtilelayout, 512, 16 },
 	{ REGION_GFX3, 0, &sprite8layout, 0,   16 },
 
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /*** Sound Bits

@@ -6318,7 +6318,7 @@ static const gfx_layout wiggie_layout =
 static const gfx_decode wiggie_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &wiggie_layout,   0x0, 32  }, /* bg tiles */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 

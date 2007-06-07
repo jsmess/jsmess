@@ -38,27 +38,24 @@ unsigned char *lkage_scroll, *lkage_vreg;
 
 WRITE8_HANDLER( lkage_videoram_w )
 {
-	if( videoram[offset]!=data )
+	videoram[offset] = data;
+
+	switch( offset/0x400 )
 	{
-		videoram[offset] = data;
+	case 0:
+		tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
+		break;
 
-		switch( offset/0x400 )
-		{
-		case 0:
-			tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
-			break;
+	case 1:
+		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
+		break;
 
-		case 1:
-			tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
-			break;
+	case 2:
+		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+		break;
 
-		case 2:
-			tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-			break;
-
-		default:
-			break;
-		}
+	default:
+		break;
 	}
 } /* lkage_videoram_w */
 

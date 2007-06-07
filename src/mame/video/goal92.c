@@ -29,26 +29,20 @@ WRITE16_HANDLER( goal92_fg_bank_w )
 
 WRITE16_HANDLER( goal92_text_w )
 {
-	int oldword = goal92_textram[offset];
 	COMBINE_DATA(&goal92_textram[offset]);
-	if (oldword != goal92_textram[offset])
-		tilemap_mark_tile_dirty(text_layer,offset);
+	tilemap_mark_tile_dirty(text_layer,offset);
 }
 
 WRITE16_HANDLER( goal92_background_w )
 {
-	int oldword = goal92_back_data[offset];
 	COMBINE_DATA(&goal92_back_data[offset]);
-	if (oldword != goal92_back_data[offset])
-		tilemap_mark_tile_dirty(background_layer,offset);
+	tilemap_mark_tile_dirty(background_layer,offset);
 }
 
 WRITE16_HANDLER( goal92_foreground_w )
 {
-	int oldword = goal92_fore_data[offset];
 	COMBINE_DATA(&goal92_fore_data[offset]);
-	if (oldword != goal92_fore_data[offset])
-		tilemap_mark_tile_dirty(foreground_layer,offset);
+	tilemap_mark_tile_dirty(foreground_layer,offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )

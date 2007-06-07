@@ -3777,14 +3777,14 @@ static const gfx_decode finalb_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &finalb_tilelayout,  0, 64 },	/* sprites & playfield, 6-bit deep */
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode taitof2_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode pivot_gfxdecodeinfo[] =
@@ -3792,14 +3792,14 @@ static const gfx_decode pivot_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* sprites & playfield */
 	{ REGION_GFX3, 0, &pivotlayout, 0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode yuyugogo_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
 	{ REGION_GFX1, 0, &yuyugogo_charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode thundfox_gfxdecodeinfo[] =
@@ -3807,7 +3807,7 @@ static const gfx_decode thundfox_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
 	{ REGION_GFX1, 0, &charlayout,  0, 256 },	/* TC0100SCN #1 */
 	{ REGION_GFX3, 0, &charlayout,  0, 256 },	/* TC0100SCN #2 */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_layout deadconx_charlayout =
@@ -3825,7 +3825,7 @@ static const gfx_decode deadconx_gfxdecodeinfo[] =
 {
 	{ REGION_GFX2, 0, &tilelayout,  0, 256 },	/* sprites & playfield */
 	{ REGION_GFX1, 0, &deadconx_charlayout,  0, 256 },	/* sprites & playfield */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -3866,7 +3866,6 @@ MACHINE_START( f2 )
 {
 	state_save_register_global(banknum);
 	state_save_register_func_postload(reset_sound_region);
-	return 0;
 }
 
 MACHINE_RESET( qcrayon )

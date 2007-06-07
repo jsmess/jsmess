@@ -48,34 +48,26 @@ static UINT16 *mwarr_ram;
 
 static WRITE16_HANDLER( bg_videoram_w )
 {
-	int oldword = bg_videoram[offset];
 	COMBINE_DATA(&bg_videoram[offset]);
-	if (oldword != bg_videoram[offset])
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 static WRITE16_HANDLER( mlow_videoram_w )
 {
-	int oldword = mlow_videoram[offset];
 	COMBINE_DATA(&mlow_videoram[offset]);
-	if (oldword != mlow_videoram[offset])
-		tilemap_mark_tile_dirty(mlow_tilemap,offset);
+	tilemap_mark_tile_dirty(mlow_tilemap,offset);
 }
 
 static WRITE16_HANDLER( mhigh_videoram_w )
 {
-	int oldword = mhigh_videoram[offset];
 	COMBINE_DATA(&mhigh_videoram[offset]);
-	if (oldword != mhigh_videoram[offset])
-		tilemap_mark_tile_dirty(mhigh_tilemap,offset);
+	tilemap_mark_tile_dirty(mhigh_tilemap,offset);
 }
 
 static WRITE16_HANDLER( tx_videoram_w )
 {
-	int oldword = tx_videoram[offset];
 	COMBINE_DATA(&tx_videoram[offset]);
-	if (oldword != tx_videoram[offset])
-		tilemap_mark_tile_dirty(tx_tilemap,offset);
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 static WRITE16_HANDLER( oki1_bank_w )
@@ -274,7 +266,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &mwarr_tile16_layout,  256,  8 },
 	{ REGION_GFX4, 0, &mwarr_tile16_layout,  128,  8 },
 	{ REGION_GFX5, 0, &mwarr_tile16_layout,    0,  8 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static TILE_GET_INFO( get_bg_tile_info )

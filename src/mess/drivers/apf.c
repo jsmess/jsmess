@@ -316,13 +316,11 @@ static MACHINE_START( apf_imagination )
 	pia_config(1,&apf_imagination_pia_interface);
 	apf_common_init();
 	wd17xx_init(WD_TYPE_179X, NULL, NULL);
-	return 0;
 }
 
 static MACHINE_START( apf_m1000 )
 {
 	apf_common_init();
-	return 0;
 }
 
 static WRITE8_HANDLER(apf_dischw_w)

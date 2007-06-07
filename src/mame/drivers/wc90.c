@@ -327,7 +327,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX2, 0x00000, &tilelayout,		2*16*16, 16*16 },
 	{ REGION_GFX3, 0x00000, &tilelayout,		3*16*16, 16*16 },
 	{ REGION_GFX4, 0x00000, &spritelayout,		0*16*16, 16*16 }, // sprites
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -390,15 +390,15 @@ static MACHINE_DRIVER_START( wc90t )
 MACHINE_DRIVER_END
 
 ROM_START( wc90 )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "ic87_01.bin",  0x00000, 0x08000, CRC(4a1affbc) SHA1(bc531e97ca31c66fdac194e2d79d5c6ba1300556) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* 96k for code */  /* Second CPU */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )  /* Second CPU */
 	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic56_03.bin",  0x10000, 0x10000, CRC(1ac02b3b) SHA1(4f8dc049d404072150342f3c2df04789a73ce244) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
 
 	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -423,15 +423,15 @@ ROM_START( wc90 )
 ROM_END
 
 ROM_START( wc90a )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "wc90-1.bin",   0x00000, 0x08000, CRC(d1804e1a) SHA1(eec7374f4d23c89843f38fffff436635adb43b63) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* 96k for code */  /* Second CPU */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )  /* Second CPU */
 	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic56_03.bin",  0x10000, 0x10000, CRC(1ac02b3b) SHA1(4f8dc049d404072150342f3c2df04789a73ce244) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
 
 	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -456,15 +456,15 @@ ROM_START( wc90a )
 ROM_END
 
 ROM_START( wc90t )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 )	/* 128k for code */
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "wc90a-1.bin",  0x00000, 0x08000, CRC(b6f51a68) SHA1(e0263dee35bf99cb4288a1df825bbbca17c85d36) )	/* c000-ffff is not used */
 	ROM_LOAD( "wc90a-2.bin",  0x10000, 0x10000, CRC(c50f2a98) SHA1(0fbeabadebfa75515d5e35bfcc565ecfa4d6e693) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* 96k for code */  /* Second CPU */
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )  /* Second CPU */
 	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )	/* c000-ffff is not used */
 	ROM_LOAD( "wc90a-3.bin",  0x10000, 0x10000, CRC(8c7a9542) SHA1(a06a7cd40d41692c4cc2a35d9c69b944c5baf163) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for the audio CPU */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
 
 	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )

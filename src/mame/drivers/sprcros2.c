@@ -270,7 +270,7 @@ static const gfx_decode sprcros2_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &sprcros2_bglayout,     0,   16 },
 	{ REGION_GFX2, 0, &sprcros2_spritelayout, 256, 6  },
 	{ REGION_GFX3, 0, &sprcros2_fglayout,     512, 64 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static INTERRUPT_GEN( sprcros2_m_interrupt )
@@ -297,7 +297,6 @@ static MACHINE_START( sprcros2 )
 {
 	state_save_register_global(sprcros2_m_port7);
 	state_save_register_global(sprcros2_s_port3);
-	return 0;
 }
 
 static MACHINE_DRIVER_START( sprcros2 )

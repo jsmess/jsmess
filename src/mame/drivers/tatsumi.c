@@ -570,14 +570,14 @@ static const gfx_decode gfxdecodeinfo_apache3[] =
 {
 	{ REGION_GFX1, 0, &roundup5_charlayout,    1024, 128},
 	{ REGION_GFX4, 0, &cyclwarr_charlayout,     768, 16},
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode roundup5_gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &roundup5_charlayout,     1024, 256},
 	{ 0, 0, &roundup5_vramlayout,					0, 16},
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode cyclwarr_gfxdecodeinfo[] =
@@ -585,7 +585,7 @@ static const gfx_decode cyclwarr_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &roundup5_charlayout,    8192, 512},
 	{ REGION_GFX5, 0, &cyclwarr_charlayout,    0, 512},
 	{ REGION_GFX5, 0, &cyclwarr_charlayout2,   0, 512},
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

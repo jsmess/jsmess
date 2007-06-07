@@ -345,14 +345,11 @@ VIDEO_START( rallyx )
 
 WRITE8_HANDLER( rallyx_videoram_w )
 {
-	if (rallyx_videoram[offset] != data)
-	{
-		rallyx_videoram[offset] = data;
-		if (offset & 0x400)
-			tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-		else
-			tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
-	}
+	rallyx_videoram[offset] = data;
+	if (offset & 0x400)
+		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+	else
+		tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( rallyx_scrollx_w )

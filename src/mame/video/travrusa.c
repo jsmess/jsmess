@@ -230,11 +230,8 @@ VIDEO_START( travrusa )
 
 WRITE8_HANDLER( travrusa_videoram_w )
 {
-	if (travrusa_videoram[offset] != data)
-	{
-		travrusa_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset/2);
-	}
+	travrusa_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
 

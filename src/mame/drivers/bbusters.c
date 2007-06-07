@@ -626,7 +626,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX3, 0, &spritelayout, 512, 16 },
 	{ REGION_GFX4, 0, &tilelayout,   768, 16 },
 	{ REGION_GFX5, 0, &tilelayout,  1024+256, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode gfxdecodeinfo_mechatt[] =
@@ -636,7 +636,7 @@ static const gfx_decode gfxdecodeinfo_mechatt[] =
 	{ REGION_GFX3, 0, &spritelayout, 512, 16 },
 	{ REGION_GFX4, 0, &tilelayout,   512, 16 },
 	{ REGION_GFX5, 0, &tilelayout,   768, 16 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 /******************************************************************************/

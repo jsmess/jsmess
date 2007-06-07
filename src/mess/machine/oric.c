@@ -1180,7 +1180,6 @@ MACHINE_START( oric )
 
 
 	wd17xx_init(WD_TYPE_179X,oric_wd179x_callback, NULL);
-	return 0;
 }
 
 
@@ -1513,5 +1512,4 @@ MACHINE_START( telestrat )
 	via_set_clock(1,1000000);
 
 	wd17xx_init(WD_TYPE_179X,oric_wd179x_callback, NULL);
-	return 0;
 }

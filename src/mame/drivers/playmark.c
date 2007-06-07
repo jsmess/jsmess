@@ -885,7 +885,7 @@ static const gfx_decode gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout,   0x000,  8 },	/* colors 0x000-0x07f */
 	{ REGION_GFX1, 0, &charlayout,   0x080,  8 },	/* colors 0x080-0x0ff */
 	/* background bitmap uses colors 0x100-0x1ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -932,7 +932,7 @@ static const gfx_decode wbeachvl_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &wspritelayout, 0x600, 16 },	/* colors 0x600-0x7ff */
 	{ REGION_GFX1, 0, &wtilelayout,   0x000, 16 },	/* colors 0x000-0x3ff */
 	{ REGION_GFX1, 0, &wcharlayout,   0x400,  8 },	/* colors 0x400-0x5ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode excelsr_gfxdecodeinfo[] =
@@ -941,7 +941,7 @@ static const gfx_decode excelsr_gfxdecodeinfo[] =
 	{ REGION_GFX1, 0, &tilelayout, 0x000,  8 },	/* colors 0x000-0x07f */
 	{ REGION_GFX1, 0, &tilelayout, 0x080,  8 },	/* colors 0x080-0x0ff */
 	/* background bitmap uses colors 0x100-0x1ff */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static const gfx_decode hrdtimes_gfxdecodeinfo[] =
@@ -949,7 +949,7 @@ static const gfx_decode hrdtimes_gfxdecodeinfo[] =
 	{ REGION_GFX2, 0, &tilelayout,         0x200, 32 },	/* colors 0x200-0x2ff */
 	{ REGION_GFX1, 0, &tilelayout,         0x000, 16 },	/* colors 0x000-0x0ff */
 	{ REGION_GFX1, 0, &hrdtimes_charlayout, 0x100,  8 },	/* colors 0x100-0x17f */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( bigtwin )

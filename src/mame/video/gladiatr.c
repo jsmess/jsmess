@@ -90,29 +90,20 @@ VIDEO_START( gladiatr )
 
 WRITE8_HANDLER( gladiatr_videoram_w )
 {
-	if (gladiatr_videoram[offset] != data)
-	{
-		gladiatr_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	gladiatr_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( gladiatr_colorram_w )
 {
-	if (gladiatr_colorram[offset] != data)
-	{
-		gladiatr_colorram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset);
-	}
+	gladiatr_colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( gladiatr_textram_w )
 {
-	if (gladiatr_textram[offset] != data)
-	{
-		gladiatr_textram[offset] = data;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
+	gladiatr_textram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( gladiatr_paletteram_w )

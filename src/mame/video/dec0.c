@@ -554,13 +554,10 @@ WRITE16_HANDLER( dec0_pf1_control_1_w )
 
 WRITE16_HANDLER( dec0_pf1_data_w )
 {
-	UINT16 oldword=dec0_pf1_data[offset];
 	COMBINE_DATA(&dec0_pf1_data[offset]);
-	if (oldword!=dec0_pf1_data[offset]) {
-		tilemap_mark_tile_dirty(pf1_tilemap_0,offset);
-		tilemap_mark_tile_dirty(pf1_tilemap_1,offset);
-		tilemap_mark_tile_dirty(pf1_tilemap_2,offset);
-	}
+	tilemap_mark_tile_dirty(pf1_tilemap_0,offset);
+	tilemap_mark_tile_dirty(pf1_tilemap_1,offset);
+	tilemap_mark_tile_dirty(pf1_tilemap_2,offset);
 }
 
 WRITE16_HANDLER( dec0_pf2_control_0_w )
@@ -575,13 +572,10 @@ WRITE16_HANDLER( dec0_pf2_control_1_w )
 
 WRITE16_HANDLER( dec0_pf2_data_w )
 {
-	UINT16 oldword=dec0_pf2_data[offset];
 	COMBINE_DATA(&dec0_pf2_data[offset]);
-	if (oldword!=dec0_pf2_data[offset]) {
-		tilemap_mark_tile_dirty(pf2_tilemap_0,offset);
-		tilemap_mark_tile_dirty(pf2_tilemap_1,offset);
-		tilemap_mark_tile_dirty(pf2_tilemap_2,offset);
-	}
+	tilemap_mark_tile_dirty(pf2_tilemap_0,offset);
+	tilemap_mark_tile_dirty(pf2_tilemap_1,offset);
+	tilemap_mark_tile_dirty(pf2_tilemap_2,offset);
 }
 
 WRITE16_HANDLER( dec0_pf3_control_0_w )
@@ -596,13 +590,10 @@ WRITE16_HANDLER( dec0_pf3_control_1_w )
 
 WRITE16_HANDLER( dec0_pf3_data_w )
 {
-	UINT16 oldword=dec0_pf3_data[offset];
 	COMBINE_DATA(&dec0_pf3_data[offset]);
-	if (oldword!=dec0_pf3_data[offset]) {
-		tilemap_mark_tile_dirty(pf3_tilemap_0,offset);
-		tilemap_mark_tile_dirty(pf3_tilemap_1,offset);
-		tilemap_mark_tile_dirty(pf3_tilemap_2,offset);
-	}
+	tilemap_mark_tile_dirty(pf3_tilemap_0,offset);
+	tilemap_mark_tile_dirty(pf3_tilemap_1,offset);
+	tilemap_mark_tile_dirty(pf3_tilemap_2,offset);
 }
 
 WRITE16_HANDLER( dec0_priority_w )

@@ -751,11 +751,8 @@ static TILE_GET_INFO( get_text_tile_info ){
 }
 
 WRITE16_HANDLER( sys16_textram_w ){
-	int oldword = sys16_textram[offset];
 	COMBINE_DATA( &sys16_textram[offset] );
-	if( oldword!=sys16_textram[offset] ){
-		tilemap_mark_tile_dirty( text_layer, offset );
-	}
+	tilemap_mark_tile_dirty( text_layer, offset );
 }
 
 /***************************************************************************/

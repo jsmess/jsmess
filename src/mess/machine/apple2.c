@@ -1608,6 +1608,5 @@ MACHINE_START( apple2 )
 
 	/* perform initial reset */
 	apple2_reset(machine);
-	return 0;
 }
 

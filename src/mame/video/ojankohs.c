@@ -132,10 +132,8 @@ READ8_HANDLER( ojankohs_videoram_r )
 
 WRITE8_HANDLER( ojankohs_videoram_w )
 {
-	if (ojankohs_videoram[offset] != data) {
-		ojankohs_videoram[offset] = data;
-		tilemap_mark_tile_dirty(ojankohs_tilemap, offset);
-	}
+	ojankohs_videoram[offset] = data;
+	tilemap_mark_tile_dirty(ojankohs_tilemap, offset);
 }
 
 READ8_HANDLER( ojankohs_colorram_r )

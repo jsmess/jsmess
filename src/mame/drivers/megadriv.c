@@ -78,7 +78,7 @@ UINT16* megadrive_vdp_palette_lookup_shadow;
 UINT16* megadrive_vdp_palette_lookup_highlight;
 UINT8 oldscreenwidth = 3;
 UINT16* megadrive_ram;
-UINT8 megadrive_vram_fill_pending = 0;;
+UINT8 megadrive_vram_fill_pending = 0;
 UINT16 megadrive_vram_fill_length = 0;
 int genesis_scanline_counter = 0;
 int megadrive_sprite_collision = 0;

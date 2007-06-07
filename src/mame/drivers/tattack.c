@@ -161,7 +161,7 @@ static gfx_layout charlayout =
 static gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0     , &charlayout,  0, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static PALETTE_INIT( tattack  )
@@ -218,7 +218,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tattack )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for main CPU */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rom.9a",		0x0000, 0x1000, CRC(47120994) SHA1(b6e90abbc50cba77df4c0aaf50d1f97b99e33b6d) )
 
 	ROM_REGION( 0x1000, REGION_GFX1, 0 )

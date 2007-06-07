@@ -20,18 +20,14 @@ static tilemap *fg0_tilemap, *bg0_tilemap;
 
 WRITE16_HANDLER( wwfsstar_fg0_videoram_w )
 {
-	int oldword = wwfsstar_fg0_videoram[offset];
 	COMBINE_DATA(&wwfsstar_fg0_videoram[offset]);
-	if (oldword != wwfsstar_fg0_videoram[offset])
-		tilemap_mark_tile_dirty(fg0_tilemap,offset/2);
+	tilemap_mark_tile_dirty(fg0_tilemap,offset/2);
 }
 
 WRITE16_HANDLER( wwfsstar_bg0_videoram_w )
 {
-	int oldword =wwfsstar_bg0_videoram[offset];
 	COMBINE_DATA(&wwfsstar_bg0_videoram[offset]);
-	if (oldword != wwfsstar_bg0_videoram[offset])
-		tilemap_mark_tile_dirty(bg0_tilemap,offset/2);
+	tilemap_mark_tile_dirty(bg0_tilemap,offset/2);
 }
 
 /*******************************************************************************

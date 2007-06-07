@@ -81,11 +81,8 @@ VIDEO_START( superqix )
 
 WRITE8_HANDLER( superqix_videoram_w )
 {
-	if (superqix_videoram[offset] != data)
-	{
-		superqix_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset & 0x3ff);
-	}
+	superqix_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( superqix_bitmapram_w )

@@ -505,7 +505,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,  0x00, 0x01 }, /* offset into colors, # of colors */
 	{ REGION_GFX2, 0, &fieldlayout, 0x02, 0x01 }, /* offset into colors, # of colors */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -515,7 +515,7 @@ static const gfx_decode soccer_gfxdecodeinfo[] =
 	{ REGION_GFX3, 0x0400, &soccer_fieldlayout, 0x06, 0x01 }, /* offset into colors, # of colors */
 	{ REGION_GFX2, 0x0000, &spritelayout,       0x02, 0x02 }, /* offset into colors, # of colors */
 	{ REGION_GFX3, 0x0000, &spritemasklayout,   0x06, 0x03 }, /* offset into colors, # of colors */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -591,7 +591,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( atarifb )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "03302602.m1", 0x6800, 0x0800, CRC(352e35db) SHA1(ae3f1bdb274858edf203dbffe4ba2912c065cff2) )
 	ROM_LOAD( "03302801.p1", 0x7000, 0x0800, CRC(a79c79ca) SHA1(7791b431e9aadb09fd286ae56699c4beda54830a) )
 	ROM_LOAD( "03302702.n1", 0x7800, 0x0800, CRC(e7e916ae) SHA1(d3a188809e83c311699cb103040c4525b36a56e3) )
@@ -606,7 +606,7 @@ ROM_END
 
 
 ROM_START( atarifb1 )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "03302601.m1", 0x6800, 0x0800, CRC(f8ce7ed8) SHA1(54520d7d31c6c8f9028b7253a33aba3b2c35ae7c) )
 	ROM_LOAD( "03302801.p1", 0x7000, 0x0800, CRC(a79c79ca) SHA1(7791b431e9aadb09fd286ae56699c4beda54830a) )
 	ROM_LOAD( "03302701.n1", 0x7800, 0x0800, CRC(7740be51) SHA1(3f610061f081eb5589b00a496877bc58f6e0f09f) )
@@ -649,7 +649,7 @@ ROM_END
 
 
 ROM_START( abaseb )
-	ROM_REGION( 0x8000, REGION_CPU1, 0 ) /* 64k for code */
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
 	ROM_LOAD( "34738-01.n0", 0x6000, 0x0800, CRC(edcfffe8) SHA1(a445668352da5039ed1a090bcdf2ce092215f165) )
 	ROM_LOAD( "34737-03.m1", 0x6800, 0x0800, CRC(7250863f) SHA1(83ec735a60d74ca9c3e3f5d4b248071f3e3330af) )
 	ROM_LOAD( "34735-01.p1", 0x7000, 0x0800, CRC(54854d7c) SHA1(536d57b00929bf9d1cd1b209b41004cb78e2cd93) )

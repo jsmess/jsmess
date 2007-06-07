@@ -401,8 +401,6 @@ static MACHINE_START( missile )
 	state_save_register_global(flipscreen);
 	state_save_register_global(madsel_delay);
 	state_save_register_global(madsel_lastpc);
-
-	return 0;
 }
 
 

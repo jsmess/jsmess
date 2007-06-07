@@ -181,18 +181,14 @@ VIDEO_START( wbbc97 )
 
 WRITE16_HANDLER( aerofgt_bg1videoram_w )
 {
-	int oldword = aerofgt_bg1videoram[offset];
 	COMBINE_DATA(&aerofgt_bg1videoram[offset]);
-	if (oldword != aerofgt_bg1videoram[offset])
-		tilemap_mark_tile_dirty(bg1_tilemap,offset);
+	tilemap_mark_tile_dirty(bg1_tilemap,offset);
 }
 
 WRITE16_HANDLER( aerofgt_bg2videoram_w )
 {
-	int oldword = aerofgt_bg2videoram[offset];
 	COMBINE_DATA(&aerofgt_bg2videoram[offset]);
-	if (oldword != aerofgt_bg2videoram[offset])
-		tilemap_mark_tile_dirty(bg2_tilemap,offset);
+	tilemap_mark_tile_dirty(bg2_tilemap,offset);
 }
 
 

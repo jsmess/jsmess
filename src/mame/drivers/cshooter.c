@@ -474,7 +474,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0,     &cshooter_charlayout,   0, 64  },
 	{ REGION_GFX1, 128/8, &cshooter_charlayout,   0, 64  },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 static MACHINE_DRIVER_START( cshooter )

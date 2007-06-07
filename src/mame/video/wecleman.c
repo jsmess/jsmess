@@ -490,10 +490,8 @@ TILE_GET_INFO( wecleman_get_fg_tile_info )
 /* Pages that compose both the background and the foreground */
 WRITE16_HANDLER( wecleman_pageram_w )
 {
-	UINT16 old_data = wecleman_pageram[offset];
-	UINT16 new_data = COMBINE_DATA(&wecleman_pageram[offset]);
+	COMBINE_DATA(&wecleman_pageram[offset]);
 
-	if ( old_data != new_data )
 	{
 		int page,col,row;
 

@@ -69,11 +69,8 @@ VIDEO_START( skydiver )
 
 WRITE8_HANDLER( skydiver_videoram_w )
 {
-	if (skydiver_videoram[offset] != data)
-	{
-		skydiver_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap, offset);
-	}
+	skydiver_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 

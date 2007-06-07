@@ -224,11 +224,8 @@ READ8_HANDLER( gaplus_videoram_r )
 
 WRITE8_HANDLER( gaplus_videoram_w )
 {
-	if (gaplus_videoram[offset] != data)
-	{
-		gaplus_videoram[offset] = data;
-		tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
-	}
+	gaplus_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( gaplus_starfield_control_w )

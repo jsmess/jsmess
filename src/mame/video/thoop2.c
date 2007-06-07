@@ -74,11 +74,8 @@ static TILE_GET_INFO( get_tile_info_thoop2_screen1 )
 
 WRITE16_HANDLER( thoop2_vram_w )
 {
-	int oldword = thoop2_videoram[offset];
 	COMBINE_DATA(&thoop2_videoram[offset]);
-
-	if (oldword != thoop2_videoram[offset])
-		tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
+	tilemap_mark_tile_dirty(pant[offset >> 11],((offset << 1) & 0x0fff) >> 2);
 }
 
 /***************************************************************************

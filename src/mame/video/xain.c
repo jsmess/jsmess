@@ -109,29 +109,20 @@ VIDEO_START( xain )
 
 WRITE8_HANDLER( xain_bgram0_w )
 {
-	if (xain_bgram0[offset] != data)
-	{
-		xain_bgram0[offset] = data;
-		tilemap_mark_tile_dirty(bgram0_tilemap,offset & 0x3ff);
-	}
+	xain_bgram0[offset] = data;
+	tilemap_mark_tile_dirty(bgram0_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( xain_bgram1_w )
 {
-	if (xain_bgram1[offset] != data)
-	{
-		xain_bgram1[offset] = data;
-		tilemap_mark_tile_dirty(bgram1_tilemap,offset & 0x3ff);
-	}
+	xain_bgram1[offset] = data;
+	tilemap_mark_tile_dirty(bgram1_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( xain_charram_w )
 {
-	if (xain_charram[offset] != data)
-	{
-		xain_charram[offset] = data;
-		tilemap_mark_tile_dirty(char_tilemap,offset & 0x3ff);
-	}
+	xain_charram[offset] = data;
+	tilemap_mark_tile_dirty(char_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( xain_scrollxP0_w )

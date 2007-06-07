@@ -444,7 +444,7 @@ static const gfx_decode gfxdecodeinfo[] =
 {
 	{ REGION_GFX1, 0, &charlayout,      0, 16 },	/* chars */
 	{ REGION_GFX2, 0, &spritelayout, 16*2, 64 },	/* sprites */
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
@@ -540,7 +540,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( skyskipr )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tnx1-c.2a",    0x0000, 0x1000, CRC(bdc7f218) SHA1(9a5f5959b9228912f810568ddad70daa81c4daac) )
 	ROM_LOAD( "tnx1-c.2b",    0x1000, 0x1000, CRC(cbe601a8) SHA1(78edc384b75b7958906f887d11eb7cf235d6dc44) )
 	ROM_LOAD( "tnx1-c.2c",    0x2000, 0x1000, CRC(5ca79abf) SHA1(0712364ad8785a146c4a146cc688c4892dd59c93) )
@@ -568,7 +568,7 @@ ROM_START( skyskipr )
 ROM_END
 
 ROM_START( popeye )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "c-7a",         0x0000, 0x2000, CRC(9af7c821) SHA1(592acfe221b5c3bd9b920f639b141f37a56d6997) )
 	ROM_LOAD( "c-7b",         0x2000, 0x2000, CRC(c3704958) SHA1(af96d10fa9bdb86b00c89d10f67cb5ca5586f446) )
 	ROM_LOAD( "c-7c",         0x4000, 0x2000, CRC(5882ebf9) SHA1(5531229b37f9ba0ede7fdc24909e3c3efbc8ade4) )
@@ -593,7 +593,7 @@ ROM_START( popeye )
 ROM_END
 
 ROM_START( popeyeu )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "7a",           0x0000, 0x2000, CRC(0bd04389) SHA1(3b08186c9b20dd4dfb92df98941b18999f23aece) )
 	ROM_LOAD( "7b",           0x2000, 0x2000, CRC(efdf02c3) SHA1(4fa616bdb4e21f752e46890d007c911fff9ceadc) )
 	ROM_LOAD( "7c",           0x4000, 0x2000, CRC(8eee859e) SHA1(a597d5655d06d565653c64b18ed8842625e15088) )
@@ -618,7 +618,7 @@ ROM_START( popeyeu )
 ROM_END
 
 ROM_START( popeyef )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "tpp2-c_f.7a",  0x0000, 0x2000, CRC(5fc5264d) SHA1(6c3d4df748c55293b6de58bd874a08f8164b878d) )
 	ROM_LOAD( "tpp2-c_f.7b",  0x2000, 0x2000, CRC(51de48e8) SHA1(7573931c6fcb53ee5ab9408906cd8eb2ba271c64) )
 	ROM_LOAD( "tpp2-c_f.7c",  0x4000, 0x2000, CRC(62df9647) SHA1(65d043b4142aa3ad2db7a1d4e1a2c22656ca7ade) )
@@ -643,7 +643,7 @@ ROM_START( popeyef )
 ROM_END
 
 ROM_START( popeyebl )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "po1",          0x0000, 0x2000, CRC(b14a07ca) SHA1(b8666a4c6b833f60905692774e30e73f0795df11) )
 	ROM_LOAD( "po2",          0x2000, 0x2000, CRC(995475ff) SHA1(5cd5ac23a73722e32c80cd6ffc435584750a46c9) )
 	ROM_LOAD( "po3",          0x4000, 0x2000, CRC(99d6a04a) SHA1(b683a5bb1ac4f6bec7478760c8ad0ff7c00bc652) )

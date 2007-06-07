@@ -318,7 +318,7 @@ static const gfx_decode destroyr_gfx_decode_info[] =
 	{ REGION_GFX2, 0, &destroyr_minor_object_layout, 4, 1 },
 	{ REGION_GFX3, 0, &destroyr_major_object_layout, 0, 1 },
 	{ REGION_GFX4, 0, &destroyr_waves_layout, 4, 1 },
-	{ -1 } /* end of array */
+	{ -1 }
 };
 
 
