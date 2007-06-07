@@ -67,6 +67,20 @@ Notes:
 
 */
 
+/*
+
+	TODO:
+
+	- proper emulation of the VISMAC interface (cursor blinking, color RAM), schematics are needed
+	- tape interface
+	- disk interface
+	- CPU frequency needs to be derived from the schematics
+	- memory expansions
+	- serial interface expansion card
+	- centronics printer handshaking
+
+*/
+
 #include "driver.h"
 #include "inputx.h"
 #include "devices/printer.h"

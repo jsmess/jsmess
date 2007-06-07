@@ -1,3 +1,11 @@
+/*
+
+	TODO:
+
+	- proper emulation of the monstrous keyboard
+
+*/
+
 #include "driver.h"
 #include "inputx.h"
 #include "devices/cartslot.h"
