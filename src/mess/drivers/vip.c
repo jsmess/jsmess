@@ -201,4 +201,4 @@ static DRIVER_INIT( vip )
 /* System Drivers */
 
 //    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY   FULLNAME
-COMP( 1977,	vip,		0,		0,		vip,		vip,		vip,		vip,	"RCA",		"COSMAC VIP", GAME_SUPPORTS_SAVE )
+COMP( 1977,	vip,		0,		0,		vip,		vip,		vip,		vip,	"RCA",		"Cosmac VIP (VP-111)", GAME_SUPPORTS_SAVE )
