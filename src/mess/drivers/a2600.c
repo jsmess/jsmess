@@ -2,10 +2,6 @@
 
   Atari VCS 2600 driver
 
-  On a real TV it appears there's some space between the pixels on the
-  display. The current TIA implementation does not display these spaces
-  between the pixels.
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -17,7 +13,6 @@
 #include "formats/a26_cas.h"
 #include "video/tia.h"
 #include "inputx.h"
-#include "zlib.h"
 
 #define CART memory_region(REGION_USER1)
 
@@ -727,9 +722,9 @@ static READ16_HANDLER(a2600_read_input_port) {
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
 					if ( ( readinputport(10) >> 3*i ) & 0x01 ) {
-						return TIA_INPUT_PORT_ALWAYS_OFF;
-					} else {
 						return TIA_INPUT_PORT_ALWAYS_ON;
+					} else {
+						return TIA_INPUT_PORT_ALWAYS_OFF;
 					}
 				}
 			}
@@ -747,9 +742,9 @@ static READ16_HANDLER(a2600_read_input_port) {
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
 					if ( ( readinputport(10) >> 3*i ) & 0x02 ) {
-						return TIA_INPUT_PORT_ALWAYS_OFF;
-					} else {
 						return TIA_INPUT_PORT_ALWAYS_ON;
+					} else {
+						return TIA_INPUT_PORT_ALWAYS_OFF;
 					}
 				}
 			}
@@ -766,6 +761,11 @@ static READ16_HANDLER(a2600_read_input_port) {
 		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
+					if ( ( readinputport(11) >> 3*i ) & 0x01 ) {
+						return TIA_INPUT_PORT_ALWAYS_ON;
+					} else {
+						return TIA_INPUT_PORT_ALWAYS_OFF;
+					}
 				}
 			}
 		default:
@@ -781,6 +781,11 @@ static READ16_HANDLER(a2600_read_input_port) {
 		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
+					if ( ( readinputport(11) >> 3*i ) & 0x02 ) {
+						return TIA_INPUT_PORT_ALWAYS_ON;
+					} else {
+						return TIA_INPUT_PORT_ALWAYS_OFF;
+					}
 				}
 			}
 		default:
@@ -791,18 +796,19 @@ static READ16_HANDLER(a2600_read_input_port) {
 		switch ( readinputport(9) / 16 ) {
 		case 0x00:	/* Joystick */
 			return readinputport(4);
-		case 0x04:	/* Keypad */
-			return 0xff;
 		case 0x01:	/* Paddle */
+			return 0xff;
+		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
 					if ( ( readinputport(10) >> 3*i ) & 0x04 ) {
-						return TIA_INPUT_PORT_ALWAYS_OFF;
+						return 0xff;
 					} else {
-						return TIA_INPUT_PORT_ALWAYS_ON;
+						return 0x00;
 					}
 				}
 			}
+			return 0xff;
 		default:
 			return 0xff;
 		}
@@ -811,13 +817,19 @@ static READ16_HANDLER(a2600_read_input_port) {
 		switch ( readinputport(9) & 0x0f ) {
 		case 0x00:	/* Joystick */
 			return readinputport(5);
-		case 0x04:	/* Keypad */
-			return 0xff;
 		case 0x01:	/* Paddle */
+			return 0xff;
+		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
+					if ( ( readinputport(11) >> 3*i ) & 0x04 ) {
+						return 0x00;
+					} else {
+						return 0xff;
+					}
 				}
 			}
+			return 0xff;
 		default:
 			return 0xff;
 		}
@@ -1178,13 +1190,13 @@ INPUT_PORTS_START( a2600 )
 	PORT_CATEGORY_ITEM(    0x00, DEF_STR( Joystick ), 10 )
 	PORT_CATEGORY_ITEM(    0x10, "Paddles", 11 )
 	//PORT_CATEGORY_ITEM(    0x20, "Driving", 12 )
-	//PORT_CATEGORY_ITEM(    0x40, "Keypad", 13 )
+	PORT_CATEGORY_ITEM(    0x40, "Keypad", 13 )
 	//PORT_CATEGORY_ITEM(    0x80, "Lightgun", 14 )
 	PORT_CATEGORY_CLASS( 0x0f, 0x00, "Right Controller" )
 	PORT_CATEGORY_ITEM(    0x00, DEF_STR( Joystick ), 20 )
 	PORT_CATEGORY_ITEM(    0x01, "Paddles", 21 )
 	//PORT_CATEGORY_ITEM(    0x02, "Driving", 22 )
-	//PORT_CATEGORY_ITEM(    0x04, "Keypad", 23 )
+	PORT_CATEGORY_ITEM(    0x04, "Keypad", 23 )
 	//PORT_CATEGORY_ITEM(    0x08, "Lightgun", 24 )
 
 	PORT_START	/* [10] left keypad */

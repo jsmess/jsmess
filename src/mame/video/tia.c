@@ -723,30 +723,6 @@ static void update_bitmap(int next_x, int next_y)
 }
 
 
-static void button_callback(int dummy)
-{
-	int button0 = 0x80;
-	int button1 = 0x80;
-
-	if ( tia_read_input_port )
-	{
-		button0 = tia_read_input_port(4,0xFFFF) & 0x80;
-		button1 = tia_read_input_port(5,0xFFFF) & 0x80;
-	}
-
-	if (VBLANK & 0x40)
-	{
-		INPT4 &= button0;
-		INPT5 &= button1;
-	}
-	else
-	{
-		INPT4 = button0;
-		INPT5 = button1;
-	}
-}
-
-
 static WRITE8_HANDLER( WSYNC_w )
 {
 	int cycles = activecpu_gettotalcycles() - frame_cycles;
@@ -1518,8 +1494,16 @@ READ8_HANDLER( tia_r )
 	case 0xB:
 		return data | INPT_r(3);
 	case 0xC:
+		{
+			int	button = tia_read_input_port ? ( tia_read_input_port(4,0xFFFF) & 0x80 ) : 0x80;
+			INPT4 = ( VBLANK & 0x40) ? ( INPT4 & button ) : button;
+		}
 		return data | INPT4;
 	case 0xD:
+		{
+			int button = tia_read_input_port ? ( tia_read_input_port(5,0xFFFF) & 0x80 ) : 0x80;
+			INPT5 = ( VBLANK & 0x40) ? ( INPT5 & button ) : button;
+		}
 		return data | INPT5;
 	}
 
@@ -1737,13 +1721,11 @@ static void tia_reset(running_machine *machine)
 
 
 
-void tia_init_internal(int freq, const struct tia_interface* ti)
+void tia_init(const struct tia_interface* ti)
 {
 	int	i;
 
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call tia_init at init time!");
-
-	timer_pulse(TIME_IN_HZ(freq), 0, button_callback);
 
 	INPT4 = 0x80;
 	INPT5 = 0x80;
@@ -1798,12 +1780,7 @@ void tia_init_internal(int freq, const struct tia_interface* ti)
 	add_reset_callback(Machine, tia_reset);
 }
 
-void tia_init(const struct tia_interface* ti)
-{
-	tia_init_internal(60, ti);
-}
-
 void tia_init_pal(const struct tia_interface* ti)
 {
-	tia_init_internal(50, ti);
+	tia_init(ti);
 }
