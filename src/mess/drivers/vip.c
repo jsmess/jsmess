@@ -1,3 +1,15 @@
+/*
+
+	TODO:
+	
+	- cdp1802 program counter starts at 0x0001 on every other reset-run cycle!?
+	- pcb layout guru-style readme
+	- tape interface
+	- discrete sound from NE555
+	- artwork
+
+*/
+
 #include "driver.h"
 #include "image.h"
 #include "inputx.h"
@@ -5,6 +17,8 @@
 #include "devices/cassette.h"
 #include "sound/beep.h"
 #include "video/cdp1861.h"
+
+#define XTAL 3521280
 
 extern int cdp1861_efx;
 
@@ -25,14 +39,15 @@ static WRITE8_HANDLER( bankswitch_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( vip_map, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x03ff) AM_RAMBANK(1)
-	AM_RANGE(0x0400, 0x0fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_ROM
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+    AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(1)
+	AM_RANGE(0x8000, 0x81ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vip_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(cdp1861_dispon_r, cdp1861_dispoff_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
+//	AM_RANGE(0x03, 0x03) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
@@ -57,20 +72,34 @@ INPUT_PORTS_START( vip )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F TW") PORT_CODE(KEYCODE_F)
 
-	PORT_START
+	PORT_START_TAG("RUN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
+static int vip_reset = 1;
+
 static UINT8 vip_mode_r(void)
 {
-	if (readinputport(1) & 0x01)
+	if (readinputportbytag("RUN") & 0x01)
 	{
+		if (vip_reset)
+		{
+			memory_set_bank(1, 1);
+			vip_reset = 0;
+		}
+
 		return CDP1802_MODE_RUN;
 	}
 	else
 	{
+		if (!vip_reset)
+		{
+			machine_reset_cdp1861(Machine);
+			vip_reset = 1;
+		}
+
 		return CDP1802_MODE_RESET;
 	}
 }
@@ -108,6 +137,16 @@ static CDP1802_CONFIG vip_config =
 static MACHINE_START( vip )
 {
 	state_save_register_global(keylatch);
+	state_save_register_global(vip_reset);
+
+	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, MRA8_BANK1);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, MWA8_BANK1);
+
+	if (mess_ram_size < 0x8000)
+	{
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MRA8_NOP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MWA8_NOP);
+	}
 
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1), 0x8000);
 }
@@ -116,7 +155,6 @@ static MACHINE_RESET( vip )
 {
 	machine_reset_cdp1861(machine);
 	memory_set_bank(1, 1);
-	cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /* Machine Drivers */
@@ -125,7 +163,7 @@ static MACHINE_DRIVER_START( vip )
 
 	// basic machine hardware
 
-	MDRV_CPU_ADD(CDP1802, 3579545/2)
+	MDRV_CPU_ADD(CDP1802, XTAL/2)
 	MDRV_CPU_PROGRAM_MAP(vip_map, 0)
 	MDRV_CPU_IO_MAP(vip_io_map, 0)
 	MDRV_CPU_CONFIG(vip_config)
@@ -137,7 +175,7 @@ static MACHINE_DRIVER_START( vip )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(3579545/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
+	MDRV_SCREEN_RAW_PARAMS(XTAL/2, CDP1861_SCREEN_WIDTH, CDP1861_HBLANK_END, CDP1861_HBLANK_START, CDP1861_TOTAL_SCANLINES, CDP1861_SCANLINE_VBLANK_END, CDP1861_SCANLINE_VBLANK_START)
 
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
@@ -154,9 +192,8 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( vip )
-	ROM_REGION( 0x10000,REGION_CPU1, 0 )
-	ROM_LOAD( "monitor.rom", 0x8000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
-	ROM_LOAD( "chip8.rom",	 0x8200, 0x0200, CRC(3e0f50f0) SHA1(4a9759035f99d125859cdf6ad71b8728637dcf4f) )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "cdpr566.u10", 0x8000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
 ROM_END
 
 /* System Configuration */
@@ -185,20 +222,18 @@ SYSTEM_CONFIG_END
 static void setup_beep(int dummy)
 {
 	beep_set_state( 0, 0 );
-	beep_set_frequency( 0, 300 );
+	beep_set_frequency( 0, 1400 );
 }
 
 static DRIVER_INIT( vip )
 {
-	// enable power led
+	// turn on power led
 	set_led_status(0, 1);
-
-	memory_region(REGION_CPU1)[0x8022] = 0x3e; //bn3, default monitor
 
 	timer_set(0.0, 0, setup_beep);
 }
 
 /* System Drivers */
 
-//    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY   FULLNAME
-COMP( 1977,	vip,		0,		0,		vip,		vip,		vip,		vip,	"RCA",		"Cosmac VIP (VP-111)", GAME_SUPPORTS_SAVE )
+//    YEAR	NAME		PARENT	COMPAT	MACHINE		INPUT		INIT		CONFIG      COMPANY FULLNAME
+COMP(1977,	vip,		0,		0,		vip,		vip,		vip,		vip,		"RCA",	"Cosmac VIP (VP-711)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
