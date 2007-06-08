@@ -823,9 +823,9 @@ static READ16_HANDLER(a2600_read_input_port) {
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
 					if ( ( readinputport(11) >> 3*i ) & 0x04 ) {
-						return 0x00;
-					} else {
 						return 0xff;
+					} else {
+						return 0x00;
 					}
 				}
 			}
