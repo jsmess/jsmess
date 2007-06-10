@@ -18,7 +18,7 @@
 
 #define MASTER_CLOCK_NTSC	3579575
 #define MASTER_CLOCK_PAL	3546894
-#define CATEGORY_SELECT		32
+#define CATEGORY_SELECT		256
 
 enum
 {
@@ -645,6 +645,7 @@ static WRITE8_HANDLER( switch_A_w )
 
 static  READ8_HANDLER( switch_A_r )
 {
+	static const UINT8 driving_lookup[4] = { 0x00, 0x02, 0x03, 0x01 };
 	UINT8 val = 0;
 
 	/* Left controller port */
@@ -655,6 +656,10 @@ static  READ8_HANDLER( switch_A_r )
 		break;
 	case 0x01:  /* Paddle */
 		val |= readinputport(7) & 0xF0;
+		break;
+	case 0x02:	/* Driving */
+		val |= 0xC0;
+		val |= ( driving_lookup[ ( readinputport(12) & 0x18 ) >> 3 ] << 4 );
 		break;
 	default:
 		val |= 0xF0;
@@ -669,6 +674,10 @@ static  READ8_HANDLER( switch_A_r )
 		break;
 	case 0x01:	/* Paddle */
 		val |= readinputport(7) & 0x0F;
+		break;
+	case 0x02:	/* Driving */
+		val |= 0x0C;
+		val |= ( driving_lookup[ ( readinputport(13) & 0x18 ) >> 3 ] );
 		break;
 	default:
 		val |= 0x0F;
@@ -814,6 +823,8 @@ static READ16_HANDLER(a2600_read_input_port) {
 			return readinputport(4);
 		case 0x01:	/* Paddle */
 			return 0xff;
+		case 0x02:	/* Driving */
+			return readinputport(4) << 3;
 		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_left_column >> i ) & 0x01 ) ) {
@@ -836,6 +847,8 @@ static READ16_HANDLER(a2600_read_input_port) {
 			return readinputport(5);
 		case 0x01:	/* Paddle */
 			return 0xff;
+		case 0x02:	/* Driving */
+			return readinputport(5) << 3;
 		case 0x04:	/* Keypad */
 			for ( i = 0; i < 4; i++ ) {
 				if ( ! ( ( keypad_right_column >> i ) & 0x01 ) ) {
@@ -1161,11 +1174,13 @@ INPUT_PORTS_START( a2600 )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_MINMAX(0,255) PORT_CATEGORY(21) PORT_PLAYER(4) PORT_REVERSE PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD)
 
 	PORT_START /* [4] */
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(12) PORT_PLAYER(1)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CATEGORY(10) PORT_PLAYER(1)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CATEGORY(10) PORT_PLAYER(1)
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(10) PORT_PLAYER(1)
 
 	PORT_START /* [5] */
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(22) PORT_PLAYER(2)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CATEGORY(20) PORT_PLAYER(2)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CATEGORY(20) PORT_PLAYER(2)
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CATEGORY(20) PORT_PLAYER(2)
@@ -1207,20 +1222,20 @@ INPUT_PORTS_START( a2600 )
 	PORT_DIPSETTING(    0x00, "B" )
 
 	PORT_START /* [9] */
-	PORT_CATEGORY_CLASS( 0x3e0, 0x00, "Left Controller" )
-	PORT_CATEGORY_ITEM(    0x000, DEF_STR( Joystick ), 10 )
-	PORT_CATEGORY_ITEM(    0x020, "Paddles", 11 )
-	//PORT_CATEGORY_ITEM(    0x040, "Driving", 12 )
-	PORT_CATEGORY_ITEM(    0x080, "Keypad", 13 )
-	//PORT_CATEGORY_ITEM(    0x100, "Lightgun", 14 )
-	PORT_CATEGORY_ITEM(    0x200, "Joystick w/Boostergrip", 10 )
-	PORT_CATEGORY_CLASS( 0x01f, 0x00, "Right Controller" )
-	PORT_CATEGORY_ITEM(    0x000, DEF_STR( Joystick ), 20 )
-	PORT_CATEGORY_ITEM(    0x001, "Paddles", 21 )
-	//PORT_CATEGORY_ITEM(    0x002, "Driving", 22 )
-	PORT_CATEGORY_ITEM(    0x004, "Keypad", 23 )
-	//PORT_CATEGORY_ITEM(    0x008, "Lightgun", 24 )
-	PORT_CATEGORY_ITEM(    0x010, "Joystick w/Boostergrip", 20 )
+	PORT_CATEGORY_CLASS( 0x1f00, 0x00, "Left Controller" )
+	PORT_CATEGORY_ITEM(    0x0000, DEF_STR( Joystick ), 10 )
+	PORT_CATEGORY_ITEM(    0x0100, "Paddles", 11 )
+	PORT_CATEGORY_ITEM(    0x0200, "Driving", 12 )
+	PORT_CATEGORY_ITEM(    0x0400, "Keypad", 13 )
+	//PORT_CATEGORY_ITEM(    0x0800, "Lightgun", 14 )
+	PORT_CATEGORY_ITEM(    0x1000, "Joystick w/Boostergrip", 10 )
+	PORT_CATEGORY_CLASS( 0x001f, 0x00, "Right Controller" )
+	PORT_CATEGORY_ITEM(    0x0000, DEF_STR( Joystick ), 20 )
+	PORT_CATEGORY_ITEM(    0x0001, "Paddles", 21 )
+	PORT_CATEGORY_ITEM(    0x0002, "Driving", 22 )
+	PORT_CATEGORY_ITEM(    0x0004, "Keypad", 23 )
+	//PORT_CATEGORY_ITEM(    0x0008, "Lightgun", 24 )
+	PORT_CATEGORY_ITEM(    0x0010, "Joystick w/Boostergrip", 20 )
 
 	PORT_START	/* [10] left keypad */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 1") PORT_CODE(KEYCODE_7_PAD)
@@ -1249,6 +1264,13 @@ INPUT_PORTS_START( a2600 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right *") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right 0") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(23) PORT_NAME("right #") PORT_CODE(KEYCODE_N)
+
+	PORT_START	/* [12] left driving controller */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_CATEGORY(12) PORT_SENSITIVITY(120) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START	/* [13] right driving controller */
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_CATEGORY(22) PORT_SENSITIVITY(120) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
 INPUT_PORTS_END
 
 
