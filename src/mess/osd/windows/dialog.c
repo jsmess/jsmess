@@ -21,6 +21,7 @@
 #include "winutils.h"
 #include "windows/input.h"
 #include "windows/window.h"
+#include "winutf8.h"
 
 #ifdef UNDER_CE
 #include "invokegx.h"
@@ -834,15 +835,20 @@ int win_dialog_add_combobox(dialog_box *dialog, const char *item_label, int defa
 
 int win_dialog_add_combobox_item(dialog_box *dialog, const char *item_label, int item_data)
 {
+	TCHAR* t_item_label = NULL;
 	// create our own copy of the string
 	if (item_label)
 	{
-		item_label = pool_strdup(dialog->mempool, item_label);
-		if (!item_label)
+		TCHAR* tmp = tstring_from_utf8(item_label);
+		if( !tmp )
+			return 1;
+		t_item_label = win_dialog_tcsdup(dialog, tmp);
+		free(tmp);
+		if (!t_item_label)
 			return 1;
 	}
 
-	if (dialog_add_trigger(dialog, dialog->item_count, TRIGGER_INITDIALOG, CB_ADDSTRING, NULL, 0, (LPARAM) item_label, NULL, NULL))
+	if (dialog_add_trigger(dialog, dialog->item_count, TRIGGER_INITDIALOG, CB_ADDSTRING, NULL, 0, (LPARAM) t_item_label, NULL, NULL))
 		return 1;
 	dialog->combo_string_count++;
 	if (dialog_add_trigger(dialog, dialog->item_count, TRIGGER_INITDIALOG, CB_SETITEMDATA, NULL, dialog->combo_string_count-1, (LPARAM) item_data, NULL, NULL))
@@ -872,7 +878,7 @@ static INT_PTR CALLBACK adjuster_sb_wndproc(HWND sbwnd, UINT msg, WPARAM wparam,
 {
 	INT_PTR result;
 	struct adjuster_sb_stuff *stuff;
-	TCHAR buf[64];
+	char buf[64];
 	HWND dlgwnd, editwnd;
 	int value, id;
 	LONG_PTR l;
@@ -885,8 +891,8 @@ static INT_PTR CALLBACK adjuster_sb_wndproc(HWND sbwnd, UINT msg, WPARAM wparam,
 		id = GetWindowLong(sbwnd, GWL_ID);
 		dlgwnd = GetParent(sbwnd);
 		editwnd = GetDlgItem(dlgwnd, id - 1);
-		GetWindowText(editwnd, buf, sizeof(buf) / sizeof(buf[0]));
-		value = _ttoi(buf);
+		win_get_window_text_utf8(editwnd, buf, sizeof(buf) / sizeof(buf[0]));
+		value = atoi(buf);
 
 		switch(wparam)
 		{
@@ -905,8 +911,8 @@ static INT_PTR CALLBACK adjuster_sb_wndproc(HWND sbwnd, UINT msg, WPARAM wparam,
 			value = stuff->min_value;
 		else if (value > stuff->max_value)
 			value = stuff->max_value;
-		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%d"), value);
-		SetWindowText(editwnd, buf);
+		_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", value);
+		win_set_window_text_utf8(editwnd, buf);
 		result = 0;
 	}
 	else
@@ -1061,14 +1067,11 @@ static void seqselect_settext(HWND editwnd)
 	struct seqselect_stuff *stuff;
 	LONG_PTR lp;
 	char buf[512];
-	TCHAR *t_buf;
 
 	lp = GetWindowLongPtr(editwnd, GWLP_USERDATA);
 	stuff = (struct seqselect_stuff *) lp;
 	seq_name(&stuff->newcode, buf, sizeof(buf) / sizeof(buf[0]));
-	t_buf = tstring_from_utf8(buf);
-	SetWindowText(editwnd, t_buf);
-	free(t_buf);
+	win_set_window_text_utf8(editwnd, buf);
 
 	if (GetFocus() == editwnd)
 		SendMessage(editwnd, EM_SETSEL, 0, -1);

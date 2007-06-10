@@ -214,7 +214,7 @@ int mess_validitychecks(void)
 		{
 			if (drivers[i]->compatible_with && !(drivers[i]->compatible_with->flags & NOT_A_DRIVER))
 			{
-				mame_printf_error("%s: both compatbile_with and clone_of are specified\n", drivers[i]->name);
+				mame_printf_error("%s: both compatible_with and clone_of are specified\n", drivers[i]->name);
 				error = 1;
 			}
 

@@ -45,8 +45,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	// run validity checks and if appropriate, warn the user
 	if (imgtool_validitychecks())
 	{
-		MessageBox(window,
-			TEXT("Imgtool has failed its consistency checks; this build has problems"),
+		win_message_box_utf8(window,
+			"Imgtool has failed its consistency checks; this build has problems",
 			wimgtool_producttext, MB_OK);
 	}
 #endif

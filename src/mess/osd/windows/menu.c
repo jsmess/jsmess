@@ -31,6 +31,7 @@
 #include "devices/cassette.h"
 #include "windows/window.h"
 #include "uimess.h"
+#include "winutf8.h"
 
 #ifdef UNDER_CE
 #include "invokegx.h"
@@ -870,19 +871,12 @@ static void change_device(HWND wnd, mess_image *img, int is_save)
 		// error?
 		if (err)
 		{
-			TCHAR *t_buffer;
-			TCHAR *t_appname;
-
 			snprintf(buffer, sizeof(buffer) / sizeof(buffer[0]),
 				"Error when %s the image: %s",
 				is_save ? "creating" : "loading",
 				image_error(img));
 
-			t_buffer = tstring_from_utf8(buffer);
-			t_appname = tstring_from_utf8(APPNAME);
-			MessageBox(wnd, t_buffer, t_appname, MB_OK);
-			free(t_buffer);
-			free(t_appname);
+			win_message_box_utf8(wnd, buffer, APPNAME, MB_OK);
 		}
 	}
 

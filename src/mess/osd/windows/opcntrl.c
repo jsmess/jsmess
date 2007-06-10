@@ -16,6 +16,7 @@
 
 #include "opcntrl.h"
 #include "strconv.h"
+#include "winutf8.h"
 
 
 static const TCHAR guide_prop[] = TEXT("opcntrl_guide");
@@ -139,7 +140,7 @@ static BOOL prepare_editbox(HWND control, const struct OptionGuide *guide,
 	const char *optspec)
 {
 	optreserr_t err = OPTIONRESOLUTION_ERROR_SUCCESS;
-	TCHAR buf[32];
+	char buf[32];
 	int val, has_option, option_count;
 
 	has_option = guide && optspec;
@@ -156,7 +157,7 @@ static BOOL prepare_editbox(HWND control, const struct OptionGuide *guide,
 				err = option_resolution_getdefault(optspec, guide->parameter, &val);
 				if (err)
 					goto done;
-				_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%d"), val);
+				_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", val);
 				break;
 
 			default:
@@ -174,7 +175,7 @@ static BOOL prepare_editbox(HWND control, const struct OptionGuide *guide,
 
 done:
 	assert(err != OPTIONRESOLTUION_ERROR_INTERNAL);
-	SetWindowText(control, buf);
+	win_set_window_text_utf8(control, buf);
 	EnableWindow(control, !err && has_option);
 	return err == OPTIONRESOLUTION_ERROR_SUCCESS;
 }
@@ -183,7 +184,7 @@ done:
 
 static BOOL check_editbox(HWND control)
 {
-	TCHAR buf[256];
+	char buf[256];
 	const struct OptionGuide *guide;
 	const char *optspec;
 	optreserr_t err;
@@ -193,19 +194,19 @@ static BOOL check_editbox(HWND control)
 	guide = (const struct OptionGuide *) GetProp(control, guide_prop);
 	optspec = (const char *) GetProp(control, spec_prop);
 
-	GetWindowText(control, buf, sizeof(buf) / sizeof(buf[0]));
+	win_get_window_text_utf8(control, buf, sizeof(buf) / sizeof(buf[0]));
 
 	switch(guide->option_type)
 	{
 		case OPTIONTYPE_INT:
-			val = _ttoi(buf);
+			val = atoi(buf);
 			err = option_resolution_isvalidvalue(optspec, guide->parameter, val);
 			if (err)
 			{
 				h = GetProp(control, value_prop);
 				val = (int) h;
-				_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%d"), val);
-				SetWindowText(control, buf);
+				_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", val);
+				win_set_window_text_utf8(control, buf);
 			}
 			else
 			{
@@ -269,7 +270,7 @@ BOOL win_adjust_option_control(HWND control, int delta)
 	const struct OptionGuide *guide;
 	const char *optspec;
 	struct OptionRange ranges[128];
-	TCHAR buf[64];
+	char buf[64];
 	int val, original_val, i;
 	BOOL changed = FALSE;
 
@@ -284,8 +285,8 @@ BOOL win_adjust_option_control(HWND control, int delta)
 	option_resolution_listranges(optspec, guide->parameter,
 		ranges, sizeof(ranges) / sizeof(ranges[0]));
 
-	GetWindowText(control, buf, sizeof(buf) / sizeof(buf[0]));
-	original_val = _ttoi(buf);
+	win_get_window_text_utf8(control, buf, sizeof(buf) / sizeof(buf[0]));
+	original_val = atoi(buf);
 	val = original_val + delta;
 
 	for (i = 0; ranges[i].min >= 0; i++)
@@ -305,8 +306,8 @@ BOOL win_adjust_option_control(HWND control, int delta)
 
 	if (val != original_val)
 	{
-		_sntprintf(buf, sizeof(buf) / sizeof(buf[0]), TEXT("%d"), val);
-		SetWindowText(control, buf);
+		_snprintf(buf, sizeof(buf) / sizeof(buf[0]), "%d", val);
+		win_set_window_text_utf8(control, buf);
 	}
 	return TRUE;
 }
@@ -316,26 +317,24 @@ BOOL win_adjust_option_control(HWND control, int delta)
 optreserr_t win_add_resolution_parameter(HWND control, option_resolution *resolution)
 {
 	const struct OptionGuide *guide;
-	TCHAR buf[256];
+	char buf[256];
 	optreserr_t err;
-	char *alloc_text = NULL;
 	const char *text;
 	const char *old_text;
 	int i;
 
-	if (!GetWindowText(control, buf, sizeof(buf) / sizeof(buf[0])))
+	if (!win_get_window_text_utf8(control, buf, sizeof(buf) / sizeof(buf[0])))
 	{
 		err = OPTIONRESOLTUION_ERROR_INTERNAL;
-		goto done;
+		return err;
 	}
-	alloc_text = utf8_from_tstring(buf);
-	text = alloc_text;
+	text = buf;
 
 	guide = (const struct OptionGuide *) GetProp(control, guide_prop);
 	if (!guide)
 	{
 		err = OPTIONRESOLTUION_ERROR_INTERNAL;
-		goto done;
+		return err;
 	}
 
 	if (guide->option_type == OPTIONTYPE_ENUM_BEGIN)
@@ -358,13 +357,11 @@ optreserr_t win_add_resolution_parameter(HWND control, option_resolution *resolu
 	{
 		err = option_resolution_add_param(resolution, guide->identifier, text);
 		if (err)
-			goto done;
+			return err;
 	}
 
 	err = OPTIONRESOLUTION_ERROR_SUCCESS;
-done:
-	if (alloc_text)
-		free(alloc_text);
+
 	return err;
 }
 

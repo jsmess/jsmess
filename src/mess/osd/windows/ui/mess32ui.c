@@ -657,13 +657,15 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 	const char *typname;
     int i;
     TCHAR* t_filter;
+    TCHAR* t_buffer;
 
 	s = szFilter;
     *filename = 0;
 
     // Common image types
     strcpy(s, "Common image types");
-    s += strlen(s) + 1;
+    s += strlen(s);
+    *(s++) = '|';
     for (i = 0; imagetypes[i].ext; i++)
 	{
 		assert(!IsBadStringPtr(imagetypes[i].ext, ~0));
@@ -673,13 +675,15 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
         s += strlen(s);
         *(s++) = ';';
     }
-    *(s++) = '\0';
+    *(s++) = '|';
 
     // All files
     strcpy(s, "All files (*.*)");
-    s += strlen(s) + 1;
+    s += strlen(s);
+    *(s++) = '|';
     strcpy(s, "*.*");
-    s += strlen(s) + 1;
+    s += strlen(s);
+    *(s++) = '|';
 
     // The others
     for (i = 0; imagetypes[i].ext; i++)
@@ -690,26 +694,32 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 			typname = lookupdevice(imagetypes[i].dev->type)->dlgname;
 
         strcpy(s, typname);
-        //strcpy(s, imagetypes[i].ext);
         s += strlen(s);
         strcpy(s, " (*.");
-        //strcpy(s, " files (*.");
         s += strlen(s);
         strcpy(s, imagetypes[i].ext);
         s += strlen(s);
         *(s++) = ')';
-        *(s++) = '\0';
+        *(s++) = '|';
         *(s++) = '*';
         *(s++) = '.';
         strcpy(s, imagetypes[i].ext);
         s += strlen(s);
-        *(s++) = '\0';
+        *(s++) = '|';
     }
-    *(s++) = '\0';
+    *(s++) = '|';
     
-    t_filter = tstring_from_utf8(szFilter);
-    if( !t_filter )
+    t_buffer = tstring_from_utf8(szFilter);
+    if( !t_buffer )
 	    return FALSE;
+
+	// convert a pipe-char delimited string into a NUL delimited string
+	t_filter = (LPTSTR) alloca((_tcslen(t_buffer) + 2) * sizeof(*t_filter));
+	for (i = 0; t_buffer[i] != '\0'; i++)
+		t_filter[i] = (t_buffer[i] != '|') ? t_buffer[i] : '\0';
+	t_filter[i++] = '\0';
+	t_filter[i++] = '\0';
+	free(t_buffer);
 
     of.lStructSize = sizeof(of);
     of.hwndOwner = GetMainWindow();
@@ -1327,7 +1337,7 @@ static void CALLBACK MessTestsTimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, 
 		KillTimer(NULL, s_nTestingTimer);
 		s_nTestingTimer = 0;
 
-		MessageBox(GetMainWindow(), "Tests successfully completed!", MAME32NAME, MB_OK);
+		MessageBox(GetMainWindow(), TEXT("Tests successfully completed!"), TEXT(MAME32NAME), MB_OK);
 	}
 	else
 	{

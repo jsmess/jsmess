@@ -95,6 +95,8 @@ Source Changes:
 
 - Added several testdrivers to real drivers.  [Oliver Stoeneberg]
 
+- [Windows] UNICODE=1 fixes.  [Oliver Stoeneberg]
+
 
 
 0.115
