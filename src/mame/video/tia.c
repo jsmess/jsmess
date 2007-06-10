@@ -761,6 +761,10 @@ static WRITE8_HANDLER( VBLANK_w )
 	{
 		paddle_cycles = activecpu_gettotalcycles();
 	}
+	if ( ! ( VBLANK & 0x40 ) ) {
+		INPT4 = 0x80;
+		INPT5 = 0x80;
+	}
 	VBLANK = data;
 }
 
