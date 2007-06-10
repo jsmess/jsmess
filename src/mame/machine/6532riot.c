@@ -99,6 +99,9 @@ static void r6532_write_portB(int n, UINT8 data)
 }
 
 
+// truly aweful hack to test some things in 2600 MESS driver
+int r6532countdownenabled = 0;
+
 static void r6532_write(int n, offs_t offset, UINT8 data)
 {
 	if (offset & 4)
@@ -122,7 +125,7 @@ static void r6532_write(int n, offs_t offset, UINT8 data)
 				r6532[n]->shift = 10;
 				break;
 			}
-
+			r6532countdownenabled = 1;
 			r6532[n]->target = activecpu_gettotalcycles() + (data << r6532[n]->shift);
 		}
 		else
@@ -156,20 +159,23 @@ static void r6532_write(int n, offs_t offset, UINT8 data)
 
 static UINT8 r6532_read_timer(int n, int enable)
 {
-	int count = ( r6532[n]->target ? r6532[n]->target : 5 ) - activecpu_gettotalcycles();
-
-	if (count >= 0)
-	{
-		return count >> r6532[n]->shift;
-	}
-	else
-	{
-		if (count != -1)
+	if (r6532countdownenabled) {
+		int count = ( r6532[n]->target ? r6532[n]->target : 5 ) - activecpu_gettotalcycles();
+		if (count >= 0)
 		{
-			r6532[n]->cleared = 1;
+			return count >> r6532[n]->shift;
 		}
+		else
+		{
+			if (count != -1)
+			{
+				r6532[n]->cleared = 1;
+			}
 
-		return count & 0xFF;
+			return count & 0xFF;
+		}
+	} else {
+		return 0;
 	}
 }
 
