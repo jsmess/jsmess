@@ -629,7 +629,6 @@ static ADDRESS_MAP_START(a2600_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x1000, 0x1FFF)                   AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-
 static WRITE8_HANDLER( switch_A_w )
 {
 	/* Left controller port */
@@ -638,8 +637,13 @@ static WRITE8_HANDLER( switch_A_w )
 	}
 
 	/* Right controller port */
-	if ( readinputport(9) % CATEGORY_SELECT == 0x04 ) {
+	switch( readinputport(9) % CATEGORY_SELECT ) {
+	case 0x04:	/* Keypad */
 		keypad_right_column = data & 0x0F;
+		break;
+	case 0x20:	/* KidVid voice module */
+		cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), ( data & 0x02 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY, CASSETTE_MOTOR_DISABLED );
+		break;
 	}
 }
 
@@ -1131,6 +1135,8 @@ static MACHINE_START( a2600 )
 		modeSS_write_enabled = 0;
 		modeSS_write_pending = 0;
 		memory_set_opbase_handler( 0, modeSS_opbase );
+		/* Already start the motor of the cassette for the user */
+		cassette_change_state( image_from_devtype_and_index( IO_CASSETTE, 0 ), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 	}
 
@@ -1229,13 +1235,14 @@ INPUT_PORTS_START( a2600 )
 	PORT_CATEGORY_ITEM(    0x0400, "Keypad", 13 )
 	//PORT_CATEGORY_ITEM(    0x0800, "Lightgun", 14 )
 	PORT_CATEGORY_ITEM(    0x1000, "Joystick w/Boostergrip", 10 )
-	PORT_CATEGORY_CLASS( 0x001f, 0x00, "Right Controller" )
+	PORT_CATEGORY_CLASS( 0x003f, 0x00, "Right Controller" )
 	PORT_CATEGORY_ITEM(    0x0000, DEF_STR( Joystick ), 20 )
 	PORT_CATEGORY_ITEM(    0x0001, "Paddles", 21 )
 	PORT_CATEGORY_ITEM(    0x0002, "Driving", 22 )
 	PORT_CATEGORY_ITEM(    0x0004, "Keypad", 23 )
 	//PORT_CATEGORY_ITEM(    0x0008, "Lightgun", 24 )
 	PORT_CATEGORY_ITEM(    0x0010, "Joystick w/Boostergrip", 20 )
+	PORT_CATEGORY_ITEM(    0x0020, "KidVid Voice Module", 26 )
 
 	PORT_START	/* [10] left keypad */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CATEGORY(13) PORT_NAME("left 1") PORT_CODE(KEYCODE_7_PAD)
@@ -1295,7 +1302,9 @@ static MACHINE_DRIVER_START( a2600 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(TIA, MASTER_CLOCK_NTSC/114)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( a2600p )
@@ -1319,7 +1328,9 @@ static MACHINE_DRIVER_START( a2600p )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(TIA, MASTER_CLOCK_PAL/114)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MDRV_SOUND_ADD(WAVE, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
 
@@ -1355,6 +1366,15 @@ static void a2600_cassette_getinfo( const device_class *devclass, UINT32 state, 
 	switch( state ) {
 	case DEVINFO_INT_COUNT:
 		info->i = 1;
+		break;
+	case DEVINFO_INT_WRITEABLE:
+		info->i = 0;
+		break;
+	case DEVINFO_INT_CREATABLE:
+		info->i = 0;
+		break;
+	case DEVINFO_INT_CASSETTE_DEFAULT_STATE:
+		info->i = CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED;
 		break;
 	case DEVINFO_PTR_CASSETTE_FORMATS:
 		info->p = (void *)a26_cassette_formats;
