@@ -172,5 +172,5 @@ SYSTEM_CONFIG_END
 
 /*    YEAR  NAME  PARENT  BIOS  COMPAT  MACHINE INPUT  INIT  CONFIG  COMPANY  FULLNAME  FLAGS */
 CONSB(1991, 3do,       0,     3do,   0,     3do, 3do, 0, 3do, "3DO", "3DO", GAME_NOT_WORKING )
-CONSB(1991, 3do_pal, 3do, 3do_pal, 	 0, 3do_pal, 3do, 0, 3do, "3DO (PAL)", "3DO", GAME_NOT_WORKING )
+CONSB(1991, 3do_pal, 3do, 3do_pal, 	 0, 3do_pal, 3do, 0, 3do, "3DO", "3DO (PAL)", GAME_NOT_WORKING )
 
