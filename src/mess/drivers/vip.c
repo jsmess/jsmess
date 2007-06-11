@@ -2,6 +2,7 @@
 
 	TODO:
 	
+	- quickload
 	- pcb layout guru-style readme
 	- tape interface
 	- discrete sound from NE555
@@ -19,6 +20,7 @@
 #include "inputx.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/cassette.h"
+#include "devices/snapquik.h"
 #include "sound/beep.h"
 #include "video/cdp1861.h"
 
@@ -214,6 +216,36 @@ ROM_END
 
 /* System Configuration */
 
+QUICKLOAD_LOAD( vip )
+{
+	int size = image_length(image);
+
+	if (size < 0x8000)
+	{
+		if (image_fread(image, memory_region(REGION_CPU1), size) != size)
+		{
+			return INIT_FAIL;
+		}
+	}
+
+	return INIT_PASS;
+}
+
+static void vip_quickload_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* quickload */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "cos"); break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_QUICKLOAD_LOAD:				info->f = (genf *) quickload_load_vip; break;
+
+		default:										quickload_device_getinfo(devclass, state, info); break;
+	}
+}
+
 static void vip_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
 {
 	/* cassette */
@@ -231,6 +263,7 @@ SYSTEM_CONFIG_START( vip )
 	CONFIG_RAM			( 4 * 1024)
 	CONFIG_RAM			(32 * 1024)
 	CONFIG_DEVICE(vip_cassette_getinfo)
+	CONFIG_DEVICE(vip_quickload_getinfo)
 SYSTEM_CONFIG_END
 
 /* Driver Initialization */
