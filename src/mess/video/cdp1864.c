@@ -136,26 +136,6 @@ void cdp1864_dma_w(UINT8 data)
 	cdp1864.dmaptr++;
 }
 
-MACHINE_RESET( cdp1864 )
-{
-	cdp1864_int_timer = mame_timer_alloc(cdp1864_int_tick);
-	cdp1864_efx_timer = mame_timer_alloc(cdp1864_efx_tick);
-	cdp1864_dma_timer = mame_timer_alloc(cdp1864_dma_tick);
-
-	mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_START, 0), 0, time_zero);
-	mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
-	mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMA_START, 0), 0, time_zero);
-
-	cdp1864.disp = 0;
-	cdp1864.dmaout = 0;
-	cdp1864.dmaptr = 0;
-	cdp1864.bgcolor = 0;
-
-	cdp1864_efx = CLEAR_LINE;
-
-	cdp1864_audio_output_enable(0);
-}
-
 WRITE8_HANDLER( cdp1864_step_bgcolor_w )
 {
 	cdp1864.disp = 1;
@@ -190,12 +170,36 @@ READ8_HANDLER( cdp1864_dispon_r )
 READ8_HANDLER( cdp1864_dispoff_r )
 {
 	cdp1864.disp = 0;
+	cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
 
 	return 0xff;
 }
 
+MACHINE_RESET( cdp1864 )
+{
+	mame_timer_adjust(cdp1864_int_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_INT_START, 0), 0, time_zero);
+	mame_timer_adjust(cdp1864_efx_timer, video_screen_get_time_until_pos(0, CDP1864_SCANLINE_EFX_TOP_START, 0), 0, time_zero);
+	mame_timer_adjust(cdp1864_dma_timer, MAME_TIME_IN_CYCLES(CDP1864_CYCLES_DMA_START, 0), 0, time_zero);
+
+	cdp1864.disp = 0;
+	cdp1864.dmaout = 0;
+	cdp1864.dmaptr = 0;
+	cdp1864.bgcolor = 0;
+
+	cpunum_set_input_line(0, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
+	cpunum_set_input_line(0, CDP1802_INPUT_LINE_DMAOUT, CLEAR_LINE);
+	cdp1864_efx = CLEAR_LINE;
+
+	cdp1864_audio_output_enable(0);
+}
+
 VIDEO_START( cdp1864 )
 {
+	cdp1864_int_timer = mame_timer_alloc(cdp1864_int_tick);
+	cdp1864_efx_timer = mame_timer_alloc(cdp1864_efx_tick);
+	cdp1864_dma_timer = mame_timer_alloc(cdp1864_dma_tick);
+
 	/* allocate the temporary bitmap */
 	cdptmpbitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
 
