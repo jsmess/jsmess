@@ -143,6 +143,9 @@ static CDP1802_CONFIG vip_config =
 
 static MACHINE_START( vip )
 {
+	UINT8 *ram= memory_region(REGION_CPU1);
+	UINT16 addr;
+
 	state_save_register_global(keylatch);
 	state_save_register_global(vip_reset);
 	state_save_register_global(vip_run);
@@ -154,6 +157,11 @@ static MACHINE_START( vip )
 	{
 		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MRA8_UNMAP);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MWA8_UNMAP);
+	}
+
+	for (addr = 0; addr < mess_ram_size; addr++)
+	{
+		ram[addr] = mame_rand(Machine) & 0xff;
 	}
 
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1), 0x8000);
