@@ -2,11 +2,15 @@
 
 	TODO:
 	
-	- cdp1802 program counter starts at 0x0001 on every other reset-run cycle!?
 	- pcb layout guru-style readme
 	- tape interface
 	- discrete sound from NE555
 	- artwork
+	- VP-550/551 Super Sound Board
+	- VP-590 Color Board
+	- VP-595 Simple Sound Board
+	- VP-601/611 ASCII Keyboard
+	- VP-700 Expanded Tiny Basic Board
 
 */
 
@@ -78,16 +82,18 @@ INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
-static int vip_reset = 1;
+static int vip_run;
+static int vip_reset;
 
 static UINT8 vip_mode_r(void)
 {
 	if (readinputportbytag("RUN") & 0x01)
 	{
-		if (vip_reset)
+		if (!vip_run)
 		{
 			memory_set_bank(1, 1);
 			vip_reset = 0;
+			vip_run = 1;
 		}
 
 		return CDP1802_MODE_RUN;
@@ -98,6 +104,7 @@ static UINT8 vip_mode_r(void)
 		{
 			machine_reset_cdp1861(Machine);
 			vip_reset = 1;
+			vip_run = 0;
 		}
 
 		return CDP1802_MODE_RESET;
@@ -138,14 +145,15 @@ static MACHINE_START( vip )
 {
 	state_save_register_global(keylatch);
 	state_save_register_global(vip_reset);
+	state_save_register_global(vip_run);
 
 	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, MRA8_BANK1);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, mess_ram_size - 1, 0, 0, MWA8_BANK1);
 
 	if (mess_ram_size < 0x8000)
 	{
-		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MRA8_NOP);
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MWA8_NOP);
+		memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MRA8_UNMAP);
+		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, mess_ram_size, 0x7fff, 0, 0, MWA8_UNMAP);
 	}
 
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1), 0x8000);

@@ -207,8 +207,6 @@ static void cdp1802_run(void)
 		I = 0;
 		N = 0;
 		Q = 0;
-		X = 0;
-		P = 0;
 		IE = 1;
 
 		cdp1802_ICount -= CDP1802_CYCLES_RESET;
