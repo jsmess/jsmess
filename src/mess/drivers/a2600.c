@@ -60,6 +60,57 @@ static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
 
 
+// try to detect 2600 controller setup. returns UINT16 with left/right controller info
+// packed into each byte
+static unsigned int detect_2600controllers(void)
+{
+#define JOYS 0x01
+#define PADD 0x02
+#define KEYP 0x04
+#define LGUN 0x08
+#define INDY 0x10
+#define BOOS 0x20
+// todo kidvid, compumate
+
+	unsigned int left,right;
+	int i,j,foundkeypad = 0;
+	unsigned char signatures[][5] =  {
+									{ 0x55, 0xa5, 0x3c, 0x29, 0}, // star raiders
+									{ 0xf9, 0xff, 0xa5, 0x80, 1}, // sentinel
+									{ 0x81, 0x02, 0xe8, 0x86, 1}, // shooting arcade
+									{ 0x02, 0xa9, 0xec, 0x8d, 1}, // guntest4 tester
+									{ 0x85, 0x2c, 0x85, 0xa7, 2}, // indy 500
+									{ 0x89, 0x8a, 0x99, 0xaa, 3}, // omega race
+									{ 0x9a, 0x8e, 0x81, 0x02, 4},
+									{ 0xdd, 0x8d, 0x80, 0x02, 4},
+									{ 0x85, 0x8e, 0x81, 0x02, 4},
+									{ 0x8d, 0x81, 0x02, 0xe6, 4},
+									{ 0xff, 0x8d, 0x81, 0x02, 4}};
+	// start with this.. if anyone finds a game that does NOT work with both controllers enabled
+	// it can be fixed here with a new signature (note that the Coleco Gemini has this setup also)
+	left = JOYS+PADD; right = JOYS+PADD;
+	// default for bad dumps and roms too large to have special controllers
+	if ((cart_size > 0x4000) || (cart_size & 0x7ff)) return (left << 8) + right;
+
+	for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+	{
+		for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
+		{
+			if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0] - 1))
+			{
+				int k = signatures[j][4];
+				if (k == 0) return (JOYS << 8) + KEYP;
+				if (k == 1) return (LGUN << 8);
+				if (k == 2) return (INDY << 8) + INDY;
+				if (k == 3) return (BOOS << 8) + BOOS;
+				if (k == 4) foundkeypad = 1;
+			}
+		}
+	}
+	if (foundkeypad) return (KEYP << 8) + KEYP;
+	return (left << 8) + right;
+}
+
 static int detect_modeDC(void)
 {
 	int i,numfound = 0;
@@ -909,31 +960,31 @@ static struct tia_interface tia_interface =
 	a2600_get_databus_contents
 };
 
-static void setup_riot(int dummy) {
-	/* It appears the 6532 is running in 64 cycle mode with some random timer value
-	   on startup. This is not verified against real hardware yet! */
-	cpuintrf_push_context(0);
-//	r6532_0_w( 0x14, 100 /*( mame_rand(Machine) & 0x7F ) | 0x60 */);
-	cpuintrf_pop_context();
-}
-
 static MACHINE_START( a2600 )
 {
 
 	int mode = 0xFF;
 	int chip = 0xFF;
+	unsigned int controltemp;
+	unsigned char controlleft,controlright;
 
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 
 	r6532_init(0, &r6532_interface);
-
-	timer_set( 0.0, 0, setup_riot );
 
 	if ( !strcmp( Machine->gamedrv->name, "a2600p" ) ) {
 		tia_init_pal( &tia_interface );
 	} else {
 		tia_init( &tia_interface );
 	}
+
+	/* auto-detect special controllers */
+
+	controltemp = detect_2600controllers();
+	controlleft = controltemp >> 8;
+	controlright = controltemp & 0xff;
+	//printf("CT %04x\nleft: $%02x\nright: $%02x\n",controltemp,controlleft,controlright);
+	// todo setup all the PORT_ stuff here
 
 	/* auto-detect bank mode */
 
@@ -1226,19 +1277,19 @@ INPUT_PORTS_START( a2600 )
 	PORT_DIPSETTING(    0x00, "B" )
 
 	PORT_START /* [9] */
-	PORT_CATEGORY_CLASS( 0x1f00, 0x00, "Left Controller" )
+	PORT_CATEGORY_CLASS( 0x3f00, 0x00, "Left Controller" )
 	PORT_CATEGORY_ITEM(    0x0000, DEF_STR( Joystick ), 10 )
 	PORT_CATEGORY_ITEM(    0x0100, "Paddles", 11 )
 	PORT_CATEGORY_ITEM(    0x0200, "Driving", 12 )
 	PORT_CATEGORY_ITEM(    0x0400, "Keypad", 13 )
-	//PORT_CATEGORY_ITEM(    0x0800, "Lightgun", 14 )
+	PORT_CATEGORY_ITEM(    0x0800, "Lightgun", 14 )
 	PORT_CATEGORY_ITEM(    0x1000, "Booster Grip", 10 )
 	PORT_CATEGORY_CLASS( 0x003f, 0x00, "Right Controller" )
 	PORT_CATEGORY_ITEM(    0x0000, DEF_STR( Joystick ), 20 )
 	PORT_CATEGORY_ITEM(    0x0001, "Paddles", 21 )
 	PORT_CATEGORY_ITEM(    0x0002, "Driving", 22 )
 	PORT_CATEGORY_ITEM(    0x0004, "Keypad", 23 )
-	//PORT_CATEGORY_ITEM(    0x0008, "Lightgun", 24 )
+	PORT_CATEGORY_ITEM(    0x0008, "Lightgun", 24 )
 	PORT_CATEGORY_ITEM(    0x0010, "Booster Grip", 20 )
 	PORT_CATEGORY_ITEM(    0x0020, "KidVid Voice Module", 26 )
 
@@ -1276,6 +1327,17 @@ INPUT_PORTS_START( a2600 )
 	PORT_START	/* [13] right driving controller */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_CATEGORY(22) PORT_SENSITIVITY(40) PORT_KEYDELTA(5) PORT_PLAYER(2)
 
+//	PORT_START	/* [14] left light gun X */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CATEGORY(14) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+//	PORT_START	/* [15] left light gun Y */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CATEGORY(14) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+//	PORT_START	/* [16] right light gun X */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CATEGORY(24) PORT_CROSSHAIR( X, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+
+//	PORT_START	/* [17] right light gun Y */
+//	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CATEGORY(24) PORT_CROSSHAIR( Y, 1.0, 0.0, 0 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
