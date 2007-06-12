@@ -84,8 +84,6 @@ VIDEO_START( wrally )
 
 	tilemap_set_transparent_pen(pant[0],0);
 	tilemap_set_transparent_pen(pant[1],0);
-
-	return 0;
 }
 
 

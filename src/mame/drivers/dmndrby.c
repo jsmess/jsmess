@@ -136,7 +136,6 @@ static const gfx_decode gfxdecodeinfo[] =
 
 VIDEO_START(dderby)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(dderby)

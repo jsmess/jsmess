@@ -6,7 +6,7 @@
 
 #include "driver.h"
 
-unsigned char *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
+UINT8 *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
 
 int tecmo_video_type = 0;
 /*
@@ -25,7 +25,7 @@ static tilemap *tx_tilemap,*fg_tilemap,*bg_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char attr = tecmo_bgvideoram[tile_index+0x200];
+	UINT8 attr = tecmo_bgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			3,
 			tecmo_bgvideoram[tile_index] + ((attr & 0x07) << 8),
@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	unsigned char attr = tecmo_fgvideoram[tile_index+0x200];
+	UINT8 attr = tecmo_fgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			2,
 			tecmo_fgvideoram[tile_index] + ((attr & 0x07) << 8),
@@ -45,7 +45,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( gemini_get_bg_tile_info )
 {
-	unsigned char attr = tecmo_bgvideoram[tile_index+0x200];
+	UINT8 attr = tecmo_bgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			3,
 			tecmo_bgvideoram[tile_index] + ((attr & 0x70) << 4),
@@ -55,7 +55,7 @@ static TILE_GET_INFO( gemini_get_bg_tile_info )
 
 static TILE_GET_INFO( gemini_get_fg_tile_info )
 {
-	unsigned char attr = tecmo_fgvideoram[tile_index+0x200];
+	UINT8 attr = tecmo_fgvideoram[tile_index+0x200];
 	SET_TILE_INFO(
 			2,
 			tecmo_fgvideoram[tile_index] + ((attr & 0x70) << 4),
@@ -65,7 +65,7 @@ static TILE_GET_INFO( gemini_get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	unsigned char attr = tecmo_txvideoram[tile_index+0x400];
+	UINT8 attr = tecmo_txvideoram[tile_index+0x400];
 	SET_TILE_INFO(
 			0,
 			tecmo_txvideoram[tile_index] + ((attr & 0x03) << 8),
@@ -101,8 +101,6 @@ VIDEO_START( tecmo )
 
 	tilemap_set_scrolldx(bg_tilemap,-48,256+48);
 	tilemap_set_scrolldx(fg_tilemap,-48,256+48);
-
-	return 0;
 }
 
 

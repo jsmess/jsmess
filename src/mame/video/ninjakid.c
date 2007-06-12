@@ -13,8 +13,8 @@ UINT8 ninjakun_io_8000_ctrl[4];
 *******************************************************************************/
 
 static TILE_GET_INFO( get_fg_tile_info ){
-	unsigned int tile_number = videoram[tile_index] & 0xFF;
-	unsigned char attr  = videoram[tile_index+0x400];
+	UINT32 tile_number = videoram[tile_index] & 0xFF;
+	UINT8 attr  = videoram[tile_index+0x400];
 	tile_number += (attr & 0x20) << 3; /* bank */
 	SET_TILE_INFO(
 			0,
@@ -24,8 +24,8 @@ static TILE_GET_INFO( get_fg_tile_info ){
 }
 
 static TILE_GET_INFO( get_bg_tile_info ){
-	unsigned int tile_number = videoram[tile_index+0x800] & 0xFF;
-	unsigned char attr  = videoram[tile_index+0xc00];
+	UINT32 tile_number = videoram[tile_index+0x800] & 0xFF;
+	UINT8 attr  = videoram[tile_index+0xc00];
 	tile_number += (attr & 0xC0) << 2; /* bank */
 	SET_TILE_INFO(
 			1,
@@ -206,8 +206,6 @@ VIDEO_START( ninjakid ){
 	state_save_register_global_array(ninjakun_io_8000_ctrl);
 	state_save_register_global(flipscreen);
 //  state_save_register_global(old_scroll);
-
-	return 0;
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect ){

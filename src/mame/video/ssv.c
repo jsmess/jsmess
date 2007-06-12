@@ -144,7 +144,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 int shadow_pen_mask, shadow_pen_shift;
 
 void ssv_drawgfx(	mame_bitmap *bitmap, const gfx_element *gfx,
-					unsigned int code,unsigned int color,int flipx,int flipy,int x0,int y0,
+					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					const rectangle *cliprect, int shadow	)
 {
 	UINT8 *source, *addr, pen;
@@ -195,19 +195,14 @@ void ssv_drawgfx(	mame_bitmap *bitmap, const gfx_element *gfx,
 VIDEO_START( ssv )
 {
 	machine->gfx[0]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
-
-	return 0;
 }
 
 VIDEO_START( eaglshot )
 {
-	if ( video_start_ssv(machine) )
-		return 1;
+	video_start_ssv(machine);
 
 	eaglshot_gfxram		=	(UINT16*)auto_malloc(16 * 0x40000);
 	eaglshot_dirty_tile	=	(char*)auto_malloc(16 * 0x40000 / (16*8));
-
-	return 0;
 }
 
 static tilemap *gdfs_tmap;
@@ -226,8 +221,7 @@ WRITE16_HANDLER( gdfs_tmapram_w )
 
 VIDEO_START( gdfs )
 {
-	if ( video_start_ssv(machine) )
-		return 1;
+	video_start_ssv(machine);
 
 	machine->gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
@@ -238,8 +232,6 @@ VIDEO_START( gdfs )
 											TILEMAP_TRANSPARENT, 16,16, 0x100,0x100	);
 
 	tilemap_set_transparent_pen(gdfs_tmap, 0);
-
-	return 0;
 }
 
 /* Scroll values + CRT controller registers */
@@ -407,7 +399,7 @@ WRITE16_HANDLER( paletteram16_xrgb_swap_word_w )
 	g = data1 >> 8;
 	b = data1 & 0xff;
 
-	palette_set_color(Machine, offset>>1, r, g, b);
+	palette_set_color(Machine, offset>>1, MAKE_RGB(r, g, b));
 }
 
 /***************************************************************************

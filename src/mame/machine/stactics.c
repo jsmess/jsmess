@@ -4,7 +4,7 @@
 /* needed in video/stactics.c */
 int stactics_vert_pos;
 int stactics_horiz_pos;
-unsigned char *stactics_motor_on;
+UINT8 *stactics_motor_on;
 
 /* defined in video/stactics.c */
 extern int stactics_vblank_count;

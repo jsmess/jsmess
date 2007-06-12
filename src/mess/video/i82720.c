@@ -1399,12 +1399,12 @@ static unsigned char COMPIS_palette[16*3] =
 
 static PALETTE_INIT( compis_gdc )
 {
-	palette_set_colors(machine, 0, COMPIS_palette, COMPIS_PALETTE_SIZE);
+	palette_set_colors_rgb(machine, 0, COMPIS_palette, COMPIS_PALETTE_SIZE);
 }
 
 static compis_gdc_interface sIntf;
 
-static int compis_gdc_start (const compis_gdc_interface *intf)
+static void compis_gdc_start (const compis_gdc_interface *intf)
 {
 	/* Only 32KB or 128KB of VRAM */
 	switch(intf->vramsize)
@@ -1414,7 +1414,8 @@ static int compis_gdc_start (const compis_gdc_interface *intf)
 			gdc_mess.vramsize = (intf->vramsize)/2;
 			break;
 		default:
-			return 1;
+			fatalerror("error");
+			break;
 	}
 
 	/* Video mode, HRG or UHRG */
@@ -1427,12 +1428,9 @@ static int compis_gdc_start (const compis_gdc_interface *intf)
 	/* back bitmap */
 
 	gdc_mess.tmpbmp = auto_bitmap_alloc (640, 400, BITMAP_FORMAT_INDEXED16);
-	if (!gdc_mess.tmpbmp ) {
-		return 1;
-	}
 	gdc_fifo_reset(&gdc);
 	videoram_size = gdc_mess.vramsize;
-	return video_start_generic_bitmapped(Machine);
+	video_start_generic_bitmapped(Machine);
 }
 
 VIDEO_UPDATE(compis_gdc)
@@ -1466,7 +1464,7 @@ VIDEO_UPDATE(compis_gdc)
 
 VIDEO_START ( compis_gdc )
 {
-	return compis_gdc_start(&sIntf);
+	compis_gdc_start(&sIntf);
 }
 
 void mdrv_compisgdc(machine_config *machine,

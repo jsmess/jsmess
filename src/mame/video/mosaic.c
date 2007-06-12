@@ -56,8 +56,6 @@ VIDEO_START( mosaic )
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,     8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0xff);
-
-	return 0;
 }
 
 

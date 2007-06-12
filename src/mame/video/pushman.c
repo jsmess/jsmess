@@ -18,7 +18,7 @@ static UINT32 background_scan_rows(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	unsigned char *bgMap = memory_region(REGION_GFX4);
+	UINT8 *bgMap = memory_region(REGION_GFX4);
 	int tile;
 
 	tile=bgMap[tile_index<<1]+(bgMap[(tile_index<<1)+1]<<8);
@@ -53,8 +53,6 @@ VIDEO_START( pushman )
 	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,   TILEMAP_TRANSPARENT, 8, 8, 32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,3);
-
-	return 0;
 }
 
 

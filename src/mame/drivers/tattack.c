@@ -50,7 +50,6 @@ VIDEO_UPDATE( tattack )
 VIDEO_START( tattack )
 {
 		tmap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32 );
-		return 0;
 }
 
 static ADDRESS_MAP_START( mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -178,8 +177,8 @@ static PALETTE_INIT( tattack  )
 		else
 			r=g=b=128;
 
-		palette_set_color(machine,2*i,0x00,0x00,0x00);
-		palette_set_color(machine,2*i+1,r,g,b);
+		palette_set_color(machine,2*i,MAKE_RGB(0x00,0x00,0x00));
+		palette_set_color(machine,2*i+1,MAKE_RGB(r,g,b));
 	}
 }
 

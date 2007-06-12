@@ -417,9 +417,9 @@ ROM_END
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
 DRIVER_INIT( skyfox )
 {
-	unsigned char *RAM = memory_region(REGION_GFX1);
-	unsigned char *end = RAM + memory_region_length(REGION_GFX1);
-	unsigned char buf[32*32];
+	UINT8 *RAM = memory_region(REGION_GFX1);
+	UINT8 *end = RAM + memory_region_length(REGION_GFX1);
+	UINT8 buf[32*32];
 
 	while (RAM < end)
 	{

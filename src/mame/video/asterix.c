@@ -45,11 +45,8 @@ static void asterix_tile_callback(int layer, int *code, int *color, int *flags)
 VIDEO_START( asterix )
 {
 	K053251_vh_start();
-
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, asterix_tile_callback, 1))
-		return 1;
-	if (K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER, asterix_sprite_callback))
-		return 1;
+	K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, asterix_tile_callback, 1);
+	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER, asterix_sprite_callback);
 
 	K056832_set_LayerOffset(0, 89, 0);
 	K056832_set_LayerOffset(1, 91, 0);
@@ -57,8 +54,6 @@ VIDEO_START( asterix )
 	K056832_set_LayerOffset(3, 95, 0);
 
 	K053245_set_SpriteOffset(0,-3,-1);
-
-	return 0;
 }
 
 /* useful function to sort the three tile layers by priority order */

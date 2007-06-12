@@ -189,25 +189,25 @@ static PALETTE_INIT( sms ) {
 		int r = i & 0x03;
 		int g = ( i & 0x0C ) >> 2;
 		int b = ( i & 0x30 ) >> 4;
-		palette_set_color(machine, i, r << 6, g << 6, b << 6 );
+		palette_set_color_rgb(machine, i, r << 6, g << 6, b << 6 );
 	}
 	/* TMS9918 palette */
-	palette_set_color(machine, 64+ 0,   0,   0,   0 );
-	palette_set_color(machine, 64+ 1,   0,   0,   0 );
-	palette_set_color(machine, 64+ 2,  33, 200,  66 );
-	palette_set_color(machine, 64+ 3,  94, 220, 120 );
-	palette_set_color(machine, 64+ 4,  84,  85, 237 );
-	palette_set_color(machine, 64+ 5, 125, 118, 252 );
-	palette_set_color(machine, 64+ 6, 212,  82,  77 );
-	palette_set_color(machine, 64+ 7,  66, 235, 245 );
-	palette_set_color(machine, 64+ 8, 252,  85,  84 );
-	palette_set_color(machine, 64+ 9, 255, 121, 120 );
-	palette_set_color(machine, 64+10, 212, 193,  84 );
-	palette_set_color(machine, 64+11, 230, 206, 128 );
-	palette_set_color(machine, 64+12,  33, 176,  59 );
-	palette_set_color(machine, 64+13, 201,  91, 186 );
-	palette_set_color(machine, 64+14, 204, 204, 204 );
-	palette_set_color(machine, 64+15, 255, 255, 255 );
+	palette_set_color_rgb(machine, 64+ 0,   0,   0,   0 );
+	palette_set_color_rgb(machine, 64+ 1,   0,   0,   0 );
+	palette_set_color_rgb(machine, 64+ 2,  33, 200,  66 );
+	palette_set_color_rgb(machine, 64+ 3,  94, 220, 120 );
+	palette_set_color_rgb(machine, 64+ 4,  84,  85, 237 );
+	palette_set_color_rgb(machine, 64+ 5, 125, 118, 252 );
+	palette_set_color_rgb(machine, 64+ 6, 212,  82,  77 );
+	palette_set_color_rgb(machine, 64+ 7,  66, 235, 245 );
+	palette_set_color_rgb(machine, 64+ 8, 252,  85,  84 );
+	palette_set_color_rgb(machine, 64+ 9, 255, 121, 120 );
+	palette_set_color_rgb(machine, 64+10, 212, 193,  84 );
+	palette_set_color_rgb(machine, 64+11, 230, 206, 128 );
+	palette_set_color_rgb(machine, 64+12,  33, 176,  59 );
+	palette_set_color_rgb(machine, 64+13, 201,  91, 186 );
+	palette_set_color_rgb(machine, 64+14, 204, 204, 204 );
+	palette_set_color_rgb(machine, 64+15, 255, 255, 255 );
 }
 
 static PALETTE_INIT( gamegear ) {
@@ -216,7 +216,7 @@ static PALETTE_INIT( gamegear ) {
 		int r = i & 0x000F;
 		int g = ( i & 0x00F0 ) >> 4;
 		int b = ( i & 0x0F00 ) >> 8;
-		palette_set_color(machine, i, r << 4, g << 4, b << 4 );
+		palette_set_color_rgb(machine, i, r << 4, g << 4, b << 4 );
 	}
 }
 
@@ -226,19 +226,19 @@ const smsvdp_configuration config_315_5378 = { MODEL_315_5378, sms_int_callback 
 const smsvdp_configuration config_store = { MODEL_315_5124, sms_store_int_callback };
 
 VIDEO_START(sega_315_5124) {
-	return smsvdp_video_init( &config_315_5124 );
+	smsvdp_video_init( &config_315_5124 );
 }
 
 VIDEO_START(sega_315_5246) {
-	return smsvdp_video_init( &config_315_5246 );
+	smsvdp_video_init( &config_315_5246 );
 }
 
 VIDEO_START(sega_315_5378) {
-	return smsvdp_video_init( &config_315_5378 );
+	smsvdp_video_init( &config_315_5378 );
 }
 
 VIDEO_START(sega_store_315_5124) {
-	return smsvdp_video_init( &config_store );
+	smsvdp_video_init( &config_store );
 }
 
 static MACHINE_DRIVER_START(sms1ntsc)

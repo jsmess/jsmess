@@ -8,6 +8,8 @@
 #define LOG(n,x)
 #endif
 
+extern UINT8 *decocass_rambase;
+
 extern WRITE8_HANDLER( decocass_coin_counter_w );
 extern WRITE8_HANDLER( decocass_sound_command_w );
 extern READ8_HANDLER( decocass_sound_data_r );

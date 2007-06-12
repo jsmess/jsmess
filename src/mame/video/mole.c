@@ -17,7 +17,7 @@ PALETTE_INIT( mole )
 	int i;
 
 	for (i = 0; i < 8; i++) {
-		palette_set_color(machine, i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
+		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1));
 	}
 }
 
@@ -33,8 +33,6 @@ VIDEO_START( mole )
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 40, 25);
-
-	return 0;
 }
 
 WRITE8_HANDLER( mole_videoram_w )

@@ -8,7 +8,7 @@
 *   variables
 */
 
-unsigned char *fortyl_video_ctrl;
+UINT8 *fortyl_video_ctrl;
 
 static UINT8 fortyl_flipscreen,fortyl_pix_redraw;
 static UINT8 fortyl_xoffset = 128;
@@ -56,7 +56,7 @@ PALETTE_INIT( fortyl )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -114,8 +114,6 @@ VIDEO_START( fortyl )
 
 	tilemap_set_scroll_rows(background,32);
 	tilemap_set_transparent_pen(background,0);
-
-	return 0;
 }
 
 

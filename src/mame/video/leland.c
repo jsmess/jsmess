@@ -65,22 +65,19 @@ VIDEO_START( leland )
 
 	/* reset videoram */
     memset(leland_video_ram, 0, VRAM_SIZE);
-	return 0;
 }
 
 
 VIDEO_START( ataxx )
 {
 	/* first do the standard stuff */
-	if (video_start_leland(machine))
-		return 1;
+	video_start_leland(machine);
 
 	/* allocate memory */
 	ataxx_qram = auto_malloc(QRAM_SIZE);
 
 	/* reset QRAM */
 	memset(ataxx_qram, 0, QRAM_SIZE);
-	return 0;
 }
 
 

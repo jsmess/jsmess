@@ -169,7 +169,6 @@ PALETTE_INIT(murogem)
 
 VIDEO_START(murogem)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(murogem)

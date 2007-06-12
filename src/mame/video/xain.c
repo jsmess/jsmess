@@ -32,7 +32,7 @@
 
 #include "driver.h"
 
-unsigned char *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
+UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
 static tilemap *char_tilemap, *bgram0_tilemap, *bgram1_tilemap;
 
@@ -95,8 +95,6 @@ VIDEO_START( xain )
 	tilemap_set_transparent_pen(bgram0_tilemap,0);
 	tilemap_set_transparent_pen(bgram1_tilemap,0);
 	tilemap_set_transparent_pen(char_tilemap,0);
-
-	return 0;
 }
 
 
@@ -127,7 +125,7 @@ WRITE8_HANDLER( xain_charram_w )
 
 WRITE8_HANDLER( xain_scrollxP0_w )
 {
-	static unsigned char xain_scrollxP0[2];
+	static UINT8 xain_scrollxP0[2];
 
 	xain_scrollxP0[offset] = data;
 	tilemap_set_scrollx(bgram0_tilemap, 0, xain_scrollxP0[0]|(xain_scrollxP0[1]<<8));
@@ -135,7 +133,7 @@ WRITE8_HANDLER( xain_scrollxP0_w )
 
 WRITE8_HANDLER( xain_scrollyP0_w )
 {
-	static unsigned char xain_scrollyP0[2];
+	static UINT8 xain_scrollyP0[2];
 
 	xain_scrollyP0[offset] = data;
 	tilemap_set_scrolly(bgram0_tilemap, 0, xain_scrollyP0[0]|(xain_scrollyP0[1]<<8));
@@ -143,7 +141,7 @@ WRITE8_HANDLER( xain_scrollyP0_w )
 
 WRITE8_HANDLER( xain_scrollxP1_w )
 {
-	static unsigned char xain_scrollxP1[2];
+	static UINT8 xain_scrollxP1[2];
 
 	xain_scrollxP1[offset] = data;
 	tilemap_set_scrollx(bgram1_tilemap, 0, xain_scrollxP1[0]|(xain_scrollxP1[1]<<8));
@@ -151,7 +149,7 @@ WRITE8_HANDLER( xain_scrollxP1_w )
 
 WRITE8_HANDLER( xain_scrollyP1_w )
 {
-	static unsigned char xain_scrollyP1[2];
+	static UINT8 xain_scrollyP1[2];
 
 	xain_scrollyP1[offset] = data;
 	tilemap_set_scrolly(bgram1_tilemap, 0, xain_scrollyP1[0]|(xain_scrollyP1[1]<<8));

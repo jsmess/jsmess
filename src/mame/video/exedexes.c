@@ -64,7 +64,7 @@ PALETTE_INIT( exedexes )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -185,8 +185,6 @@ VIDEO_START( exedexes )
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_transparent_pen(tx_tilemap, 207);
-
-	return 0;
 }
 
 static void exedexes_draw_sprites(mame_bitmap *bitmap, int priority)

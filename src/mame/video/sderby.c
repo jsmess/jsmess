@@ -102,9 +102,6 @@ VIDEO_START( sderby )
 
 	sderby_fg_tilemap = tilemap_create(get_sderby_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,64,32);
 	tilemap_set_transparent_pen(sderby_fg_tilemap,0);
-
-
-	return 0;
 }
 
 VIDEO_UPDATE( sderby )

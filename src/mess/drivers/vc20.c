@@ -619,7 +619,7 @@ INPUT_PORTS_END
 /* Initialise the vc20 palette */
 static PALETTE_INIT( vc20 )
 {
-	palette_set_colors(machine, 0, vic6560_palette, sizeof(vic6560_palette) / 3);
+	palette_set_colors_rgb(machine, 0, vic6560_palette, sizeof(vic6560_palette) / 3);
 /*	memcpy(sys_colortable,colortable,sizeof(colortable)); */
 }
 

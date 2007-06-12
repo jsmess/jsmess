@@ -254,8 +254,6 @@ static void draw_driver(mame_bitmap* bitmap, const rectangle* cliprect)
 VIDEO_START( sspeedr )
 {
 	toggle = 0;
-
-	return 0;
 }
 
 

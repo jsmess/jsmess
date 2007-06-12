@@ -668,7 +668,7 @@ int scsicd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			break;
 
 		case SCSIOP_ALLOC_INSTANCE:
-			instance = (SCSICd *)malloc(sizeof(SCSICd));
+			instance = (SCSICd *)malloc_or_die(sizeof(SCSICd));
 
 			instance->lba = 0;
 			instance->blocks = 0;

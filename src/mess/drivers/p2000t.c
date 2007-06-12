@@ -98,7 +98,7 @@ static unsigned short p2000m_colortable[2 * 2] =
 
 static PALETTE_INIT( p2000m )
 {
-	palette_set_colors(machine, 0, p2000m_palette, sizeof(p2000m_palette) / 3);
+	palette_set_colors_rgb(machine, 0, p2000m_palette, sizeof(p2000m_palette) / 3);
 	memcpy(colortable, p2000m_colortable, sizeof (p2000m_colortable));
 }
 

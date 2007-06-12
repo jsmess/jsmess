@@ -49,7 +49,7 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
@@ -540,12 +540,10 @@ static void voodoo_vblank_0(int param)
 
 VIDEO_START( nwktr )
 {
-	if (voodoo_start(0, 0, VOODOO_1, 2, 2, 2))
-		return 1;
-
+	voodoo_start(0, 0, VOODOO_1, 2, 2, 2);
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
-	return K001604_vh_start(0);
+	K001604_vh_start(0);
 }
 
 

@@ -1151,7 +1151,7 @@ static VIDEO_START( cps )
 	memset(cps1_old_palette, 0x00, cps1_palette_size);
 	for (i = 0;i < cps1_palette_entries*16;i++)
 	{
-		palette_set_color(machine,i,0,0,0);
+		palette_set_color(machine,i,MAKE_RGB(0,0,0));
 	}
 
     cps1_buffered_obj = auto_malloc (cps1_obj_size);
@@ -1179,12 +1179,7 @@ static VIDEO_START( cps )
 	cps1_output[CPS1_OTHER_BASE/2]   = 0x9100;
 	cps1_output[CPS1_PALETTE_BASE/2] = 0x90c0;
 
-	if (!cps1_game_config)
-	{
-		logerror("cps1_game_config hasn't been set up yet");
-		return -1;
-	}
-
+	assert_always(cps1_game_config, "cps1_game_config hasn't been set up yet");
 
 	/* Set up old base */
 	cps1_get_video_base();   /* Calculate base pointers */
@@ -1197,14 +1192,12 @@ static VIDEO_START( cps )
 	palette_basecolor[3] = 3*32;	/* scroll3 */
 	palette_basecolor[4] = 4*32;	/* stars1 */
 	palette_basecolor[5] = 5*32;	/* stars2 */
-
-	return 0;
 }
 
 VIDEO_START( cps1 )
 {
     cps_version=1;
-    return video_start_cps(machine);
+    video_start_cps(machine);
 }
 
 VIDEO_START( cps2 )
@@ -1213,7 +1206,7 @@ VIDEO_START( cps2 )
     {
         cps_version=2;
     }
-    return video_start_cps(machine);
+    video_start_cps(machine);
 }
 
 /***************************************************************************
@@ -1242,7 +1235,7 @@ void cps1_build_palette(void)
 			green = ((palette>>4)&0x0f) * bright * 0x11 / 0x1f;
 			blue  = ((palette>>0)&0x0f) * bright * 0x11 / 0x1f;
 
-			palette_set_color (Machine, offset, red, green, blue);
+			palette_set_color (Machine, offset, MAKE_RGB(red, green, blue));
 			cps1_old_palette[offset] = palette;
 		}
 	}

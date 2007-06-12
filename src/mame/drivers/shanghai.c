@@ -621,7 +621,7 @@ static READ8_HANDLER( HD63484_status_r )
 
 static WRITE8_HANDLER( HD63484_address_w )
 {
-	static unsigned char reg[2];
+	static UINT8 reg[2];
 
 	reg[offset] = data;
 	regno = reg[0];	/* only low 8 bits are used */
@@ -631,7 +631,7 @@ static WRITE8_HANDLER( HD63484_address_w )
 
 static WRITE8_HANDLER( HD63484_data_w )
 {
-	static unsigned char dat[2];
+	static UINT8 dat[2];
 
 	dat[offset] = data;
 	if (offset == 1)
@@ -703,13 +703,12 @@ PALETTE_INIT( shanghai )
 		bit2 = (i >> 1) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
 VIDEO_START( shanghai )
 {
-	return HD63484_start();
 }
 
 VIDEO_UPDATE( shanghai )

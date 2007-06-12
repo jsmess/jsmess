@@ -214,7 +214,6 @@ INPUT_PORTS_END
 
 VIDEO_START(meijinsn)
 {
-	return 0;
 }
 
 PALETTE_INIT( meijinsn )
@@ -251,7 +250,7 @@ PALETTE_INIT( meijinsn )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

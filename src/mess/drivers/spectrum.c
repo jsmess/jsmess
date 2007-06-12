@@ -1944,7 +1944,7 @@ static unsigned short spectrum_colortable[128*2] = {
 /* Initialise the palette */
 static PALETTE_INIT( spectrum )
 {
-	palette_set_colors(machine, 0, spectrum_palette, sizeof(spectrum_palette) / 3);
+	palette_set_colors_rgb(machine, 0, spectrum_palette, sizeof(spectrum_palette) / 3);
 	memcpy(colortable, spectrum_colortable, sizeof(spectrum_colortable));
 }
 

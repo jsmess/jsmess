@@ -62,7 +62,7 @@ PALETTE_INIT( mystston )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i + 24, r, g, b);	// first 24 colors are from RAM
+		palette_set_color(machine, i + 24, MAKE_RGB(r, g, b));	// first 24 colors are from RAM
 
 		color_prom++;
 	}
@@ -130,8 +130,6 @@ VIDEO_START( mystston )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

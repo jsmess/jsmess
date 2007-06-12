@@ -204,8 +204,6 @@ VIDEO_START( adder2 )
 	tilemap0 = tilemap_create(get_tile0_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 50, 35);
 
 	tilemap1 = tilemap_create(get_tile1_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 50, 35);
-
-	return 0;
 }
 
 // video update ///////////////////////////////////////////////////////////
@@ -230,22 +228,22 @@ void adder2_update(mame_bitmap *bitmap)
 
 PALETTE_INIT( adder2 )
 {
-	palette_set_color(machine, 0,0x00,0x00,0x00);
-	palette_set_color(machine, 1,0x00,0x00,0xFF);
-	palette_set_color(machine, 2,0x00,0xFF,0x00);
-	palette_set_color(machine, 3,0x00,0xFF,0xFF);
-	palette_set_color(machine, 4,0xFF,0x00,0x00);
-	palette_set_color(machine, 5,0xFF,0x00,0xFF);
-	palette_set_color(machine, 6,0xFF,0xFF,0x00);
-	palette_set_color(machine, 7,0xFF,0xFF,0xFF);
-	palette_set_color(machine, 8,0x80,0x80,0x80);
-	palette_set_color(machine, 9,0x00,0x00,0x80);
-	palette_set_color(machine,10,0x00,0x80,0x00);
-	palette_set_color(machine,11,0x00,0x80,0x80);
-	palette_set_color(machine,12,0x80,0x00,0x00);
-	palette_set_color(machine,13,0x80,0x00,0x80);
-	palette_set_color(machine,14,0x80,0x80,0x00);
-	palette_set_color(machine,15,0x80,0x80,0x80);
+	palette_set_color(machine, 0,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine, 1,MAKE_RGB(0x00,0x00,0xFF));
+	palette_set_color(machine, 2,MAKE_RGB(0x00,0xFF,0x00));
+	palette_set_color(machine, 3,MAKE_RGB(0x00,0xFF,0xFF));
+	palette_set_color(machine, 4,MAKE_RGB(0xFF,0x00,0x00));
+	palette_set_color(machine, 5,MAKE_RGB(0xFF,0x00,0xFF));
+	palette_set_color(machine, 6,MAKE_RGB(0xFF,0xFF,0x00));
+	palette_set_color(machine, 7,MAKE_RGB(0xFF,0xFF,0xFF));
+	palette_set_color(machine, 8,MAKE_RGB(0x80,0x80,0x80));
+	palette_set_color(machine, 9,MAKE_RGB(0x00,0x00,0x80));
+	palette_set_color(machine,10,MAKE_RGB(0x00,0x80,0x00));
+	palette_set_color(machine,11,MAKE_RGB(0x00,0x80,0x80));
+	palette_set_color(machine,12,MAKE_RGB(0x80,0x00,0x00));
+	palette_set_color(machine,13,MAKE_RGB(0x80,0x00,0x80));
+	palette_set_color(machine,14,MAKE_RGB(0x80,0x80,0x00));
+	palette_set_color(machine,15,MAKE_RGB(0x80,0x80,0x80));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -295,7 +293,7 @@ static WRITE8_HANDLER( screen_ram_w )
 		r = ((data & 0x18)>>3) *  85;  // 00011000b = 0x18
 		g = ((data & 0x06)>>1) *  85;  // 00000110b = 0x06
 		b = ((data & 0x01)   ) * 255;
-		palette_set_color(Machine, pal, r,g,b);
+		palette_set_color(Machine, pal, MAKE_RGB(r,g,b));
 	}
 
 	if ( adder2_screen_page_reg & SL_ACCESS )

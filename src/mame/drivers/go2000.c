@@ -129,7 +129,6 @@ static const gfx_layout go2000_layout =
 
 VIDEO_START(go2000)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(go2000)

@@ -57,7 +57,7 @@ PALETTE_INIT( playch10 )
 
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -101,8 +101,6 @@ VIDEO_START( playch10 )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 
 	ppu2c0x_init( &ppu_interface );
-
-	return 0;
 }
 
 /***************************************************************************

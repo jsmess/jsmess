@@ -120,10 +120,10 @@ static INTERRUPT_GEN( sprint2 )
 
 static PALETTE_INIT( sprint2 )
 {
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 1, 0x5b, 0x5b, 0x5b);
-	palette_set_color(machine, 2, 0xa4, 0xa4, 0xa4);
-	palette_set_color(machine, 3, 0xff, 0xff, 0xff);
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 1, MAKE_RGB(0x5b, 0x5b, 0x5b));
+	palette_set_color(machine, 2, MAKE_RGB(0xa4, 0xa4, 0xa4));
+	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));
 
 	colortable[0x0] = 1;	/* black playfield */
 	colortable[0x1] = 0;

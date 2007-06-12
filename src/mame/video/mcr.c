@@ -117,7 +117,6 @@ VIDEO_START( mcr )
 			assert_always(0, "Unknown mcr board");
 			break;
 	}
-	return 0;
 }
 
 
@@ -130,7 +129,7 @@ VIDEO_START( mcr )
 
 static void mcr_set_color(int index, int data)
 {
-	palette_set_color(Machine, index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
+	palette_set_color_rgb(Machine, index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 
@@ -147,7 +146,7 @@ static void journey_set_color(int index, int data)
 	b = (b << 5) | (b << 1);
 
 	/* set the BG color */
-	palette_set_color(Machine, index, r, g, b);
+	palette_set_color(Machine, index, MAKE_RGB(r, g, b));
 
 	/* if this is an odd entry in the upper palette bank, the hardware */
 	/* hard-codes a low 1 bit -- this is used for better grayscales */
@@ -159,7 +158,7 @@ static void journey_set_color(int index, int data)
 	}
 
 	/* set the FG color */
-	palette_set_color(Machine, index + 64, r, g, b);
+	palette_set_color(Machine, index + 64, MAKE_RGB(r, g, b));
 }
 
 

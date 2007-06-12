@@ -22,7 +22,7 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 
-extern unsigned char *spdodgeb_videoram;
+extern UINT8 *spdodgeb_videoram;
 
 PALETTE_INIT( spdodgeb );
 VIDEO_START( spdodgeb );
@@ -87,7 +87,7 @@ static void spd_adpcm_int(int chip)
 	}
 	else
 	{
-		unsigned char *ROM = memory_region(REGION_SOUND1) + 0x10000 * chip;
+		UINT8 *ROM = memory_region(REGION_SOUND1) + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
 		MSM5205_data_w(chip,adpcm_data[chip] >> 4);

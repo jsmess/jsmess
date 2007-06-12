@@ -54,7 +54,7 @@ VIDEO_START( cbm700 )
 		}
 	}
 
-    return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 void cbmb_vh_cursor(struct crtc6845_cursor *cursor)

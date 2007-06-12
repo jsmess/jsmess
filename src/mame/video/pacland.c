@@ -92,7 +92,7 @@ static void switch_palette(running_machine *machine)
 
 		color_prom++;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -180,8 +180,6 @@ VIDEO_START( pacland )
 	spriteram = pacland_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
 	spriteram_3 = spriteram_2 + 0x800;
-
-	return 0;
 }
 
 

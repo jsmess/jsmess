@@ -326,7 +326,7 @@ static void apple2_hires_draw(mame_bitmap *bitmap, const rectangle *cliprect, in
   video core
 ***************************************************************************/
 
-int apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
+void apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
 {
 	int i, j;
 	UINT16 c;
@@ -420,38 +420,33 @@ int apple2_video_start(const UINT8 *vram, size_t vram_size, UINT32 ignored_softs
 	memset(&old_a2, 0, sizeof(old_a2));
 	text_videobase = lores_videobase = 0;
 	a2_videomask = ~ignored_softswitches;
-	return 0;
 }
 
 
 
 VIDEO_START( apple2 )
 {
-	if (apple2_video_start(mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4))
-		return 1;
+	apple2_video_start(mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
 	/* hack to fix the colors on apple2/apple2p */
 	fgcolor = 0;
 	bgcolor = 15;
-	return 0;
 }
 
 
 VIDEO_START( apple2p )
 {
-	if (apple2_video_start(mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8))
-		return 1;
+	apple2_video_start(mess_ram, mess_ram_size, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
 	/* hack to fix the colors on apple2/apple2p */
 	fgcolor = 0;
 	bgcolor = 15;
-	return 0;
 }
 
 
 VIDEO_START( apple2e )
 {
-	return apple2_video_start(mess_ram, mess_ram_size, 0, 8);
+	apple2_video_start(mess_ram, mess_ram_size, 0, 8);
 }
 
 

@@ -468,8 +468,6 @@ VIDEO_START( pangpang )
 
 	sprite_xoffset = -1;
 	sprite_yoffset = 0;
-
-	return 0;
 }
 
 
@@ -485,8 +483,6 @@ VIDEO_START( tumblepb )
 
 	sprite_xoffset = -1;
 	sprite_yoffset = 0;
-
-	return 0;
 }
 
 VIDEO_START( sdfight )
@@ -502,8 +498,6 @@ VIDEO_START( sdfight )
 	/* aligned to monitor test */
 	sprite_xoffset = 0;
 	sprite_yoffset = 1;
-
-	return 0;
 }
 
 VIDEO_START( fncywld )
@@ -518,8 +512,6 @@ VIDEO_START( fncywld )
 
 	sprite_xoffset = -1;
 	sprite_yoffset = 0;
-
-	return 0;
 }
 
 VIDEO_START( jumppop )
@@ -540,8 +532,6 @@ VIDEO_START( jumppop )
 
 	sprite_xoffset = -1;
 	sprite_yoffset = 0;
-
-	return 0;
 }
 
 
@@ -845,8 +835,6 @@ VIDEO_START( suprtrio )
 
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
 	bcstory_tilebank = 0;
-
-	return 0;
 }
 
 

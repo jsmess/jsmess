@@ -53,9 +53,9 @@ WRITE8_HANDLER( paradise_palette_w )
 {
 	paletteram[offset] = data;
 	offset %= 0x800;
-	palette_set_color(Machine,offset,	paletteram[offset + 0x800 * 0],
-										paletteram[offset + 0x800 * 1],
-										paletteram[offset + 0x800 * 2]	);
+	palette_set_color_rgb(Machine,offset,	paletteram[offset + 0x800 * 0],
+											paletteram[offset + 0x800 * 1],
+											paletteram[offset + 0x800 * 2]	);
 }
 
 /***************************************************************************
@@ -86,9 +86,9 @@ WRITE8_HANDLER( paradise_palbank_w )
 	int bank2 = (data & 0xf0);
 
 	for (i = 0; i < 15; i++)
-		palette_set_color(Machine,0x800+i,	paletteram[0x200 + bank2 + i + 0x800 * 0],
-											paletteram[0x200 + bank2 + i + 0x800 * 1],
-											paletteram[0x200 + bank2 + i + 0x800 * 2]	);
+		palette_set_color_rgb(Machine,0x800+i,	paletteram[0x200 + bank2 + i + 0x800 * 0],
+												paletteram[0x200 + bank2 + i + 0x800 * 1],
+												paletteram[0x200 + bank2 + i + 0x800 * 2]	);
 	if (paradise_palbank != bank1)
 	{
 		paradise_palbank = bank1;
@@ -174,7 +174,6 @@ VIDEO_START( paradise )
 	tilemap_set_transparent_pen(tilemap_0,0x0f);
 	tilemap_set_transparent_pen(tilemap_1,0xff);
 	tilemap_set_transparent_pen(tilemap_2,0xff);
-	return 0;
 }
 
 

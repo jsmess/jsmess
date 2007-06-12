@@ -244,7 +244,7 @@ static MACHINE_RESET( tm990_189_v )
 
 static PALETTE_INIT( tm990_189 )
 {
-	palette_set_colors(machine, 0, tm990_189_palette, tm990_189_palette_size);
+	palette_set_colors_rgb(machine, 0, tm990_189_palette, tm990_189_palette_size);
 
 	/*memcpy(colortable, & tm990_189_colortable, sizeof(tm990_189_colortable));*/
 }

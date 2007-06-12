@@ -164,8 +164,6 @@ VIDEO_START( stadhero )
 	pf2_tilemap =     tilemap_create(get_pf2_tile_info,stadhero_scan,TILEMAP_OPAQUE,     16,16,64,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
-
-	return 0;
 }
 
 /******************************************************************************/

@@ -13,7 +13,7 @@
 
 
 
-static unsigned char buffer0[9],buffer1[9];
+static UINT8 buffer0[9],buffer1[9];
 
 
 

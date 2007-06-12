@@ -10,10 +10,10 @@
 #include "includes/cclimber.h"
 
 
-unsigned char *cclimber_bsvideoram;
+UINT8 *cclimber_bsvideoram;
 size_t cclimber_bsvideoram_size;
-unsigned char *cclimber_bigspriteram;
-unsigned char *cclimber_column_scroll;
+UINT8 *cclimber_bigspriteram;
+UINT8 *cclimber_column_scroll;
 static int palettebank;
 static int sidepanel_enabled;
 
@@ -63,7 +63,7 @@ PALETTE_INIT( cclimber )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -154,7 +154,7 @@ PALETTE_INIT( swimmer )
 		bit2 = (color_prom[i+256] >> 3) & 0x01;
 		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		/* side panel */
 		if (i % 8)
@@ -194,20 +194,20 @@ PALETTE_INIT( swimmer )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		palette_set_color(machine,i+256,r,g,b);
+		palette_set_color(machine,i+256,MAKE_RGB(r,g,b));
 
 		if (i % 8 == 0) COLOR(2,i) = BGPEN;  /* enforce transparency */
 		else COLOR(2,i) = i+256;
 	}
 
 	/* background */
-	palette_set_color(machine,BGPEN,0,0,0);
+	palette_set_color(machine,BGPEN,MAKE_RGB(0,0,0));
 	/* side panel background color */
 #if 0
 	// values calculated from the resistors don't seem to match the real board
-	palette_set_color(machine,SIDEPEN,0x24,0x5d,0x4e);
+	palette_set_color(machine,SIDEPEN,MAKE_RGB(0x24,0x5d,0x4e));
 #endif
-	palette_set_color(machine,SIDEPEN,0x20,0x98,0x79);
+	palette_set_color(machine,SIDEPEN,MAKE_RGB(0x20,0x98,0x79));
 }
 
 
@@ -252,7 +252,7 @@ WRITE8_HANDLER( swimmer_bgcolor_w )
 	bit2 = (data >> 2) & 0x01;
 	b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-	palette_set_color(Machine,BGPEN,r,g,b);
+	palette_set_color(Machine,BGPEN,MAKE_RGB(r,g,b));
 }
 
 
@@ -815,7 +815,6 @@ static TILE_GET_INFO( get_tile_info_bg )
 VIDEO_START( toprollr )
 {
 	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
-	return 0;
 }
 
 static void trdrawbigsprite(mame_bitmap *bitmap,const rectangle *cliprect,int priority)

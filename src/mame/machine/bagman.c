@@ -23,19 +23,19 @@
 
 
 /*table holds outputs of all ANDs (after AND map)*/
-static unsigned char andmap[64];
+static UINT8 andmap[64];
 
 /*table holds inputs (ie. not x, x, not q, q) to the AND map*/
-static unsigned char columnvalue[32];
+static UINT8 columnvalue[32];
 
 /*8 output pins (actually 6 output and 2 input/output)*/
-static unsigned char outvalue[8];
+static UINT8 outvalue[8];
 
 /*      64 rows x 32 columns
 **  1 - fuse blown: disconnected from input (equal to 1)
 **  0 - fuse not blown: connected to input (ie. x, not x, q, not q accordingly)
 */
-static unsigned char fusemap[64*32]=
+static UINT8 fusemap[64*32]=
 {
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,1,0,1,1,1,1,1,
@@ -106,8 +106,8 @@ static unsigned char fusemap[64*32]=
 
 static void update_pal(void)
 {
-unsigned short rowoffs;
-unsigned char row, column, val;
+UINT16 rowoffs;
+UINT8 row, column, val;
 
 /*calculate all rows ANDs*/
 	for (row = 0; row < 64; row++)
@@ -209,7 +209,7 @@ unsigned char row, column, val;
 
 WRITE8_HANDLER( bagman_pal16r6_w )
 {
-unsigned char line;
+UINT8 line;
 
 	line = offset*4;
 	columnvalue[line  ] = data&1;

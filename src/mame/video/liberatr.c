@@ -276,8 +276,6 @@ VIDEO_START( liberatr )
 	/* for each planet in the planet ROMs */
 	liberatr_init_planet(liberatr_planets[0], &memory_region(REGION_GFX1)[0x2000]);
 	liberatr_init_planet(liberatr_planets[1], &memory_region(REGION_GFX1)[0x0000]);
-
-	return 0;
 }
 
 

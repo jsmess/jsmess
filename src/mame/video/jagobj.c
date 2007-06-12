@@ -24,7 +24,7 @@ static UINT8 *blend_y, *blend_cc;
  *
  *************************************/
 
-int jagobj_init(void)
+void jagobj_init(void)
 {
 	int i;
 
@@ -55,8 +55,6 @@ int jagobj_init(void)
 		else if (c2 > 0x0f) c2 = 0x0f;
 		blend_cc[i] = (c2 << 4) | c1;
 	}
-
-	return 0;
 }
 
 

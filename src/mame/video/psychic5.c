@@ -73,7 +73,7 @@ void psychic5_paletteram_w(int color_offs, int offset, int data)
 
 	jal_blend_table[(offset / 2)-color_offs] = a ;
 
-	palette_set_color(Machine,(offset / 2)-color_offs,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(Machine,(offset / 2)-color_offs,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 static void set_background_palette_intensity(void)
@@ -112,11 +112,11 @@ static void set_background_palette_intensity(void)
 			if (ix != 0x0)						/* Tint the grey */
 			{
 				UINT32 result = jal_blend_func(MAKE_RGB(val,val,val), MAKE_RGB(ir, ig, ib), jal_blend_table[0xff]) ;
-				palette_set_color(Machine, 0x100+i, RGB_RED(result), RGB_GREEN(result), RGB_BLUE(result)) ;
+				palette_set_color(Machine, 0x100+i, result) ;
 			}
 			else								/* Just leave plain grey */
 			{
-				palette_set_color(Machine,0x100+i,val,val,val);
+				palette_set_color(Machine,0x100+i,MAKE_RGB(val,val,val));
 			}
 		}
 		else
@@ -127,11 +127,11 @@ static void set_background_palette_intensity(void)
 				if (ix != 0x0)		/* Tint the world */
 				{
 					UINT32 result = jal_blend_func(MAKE_RGB(r, g, b), MAKE_RGB(ir, ig, ib), jal_blend_table[0xff]) ;
-					palette_set_color(Machine, 0x100+i, RGB_RED(result), RGB_GREEN(result), RGB_BLUE(result)) ;
+					palette_set_color(Machine, 0x100+i, result) ;
 				}
 				else				/* Leave the world as-is */
 				{
-					palette_set_color(Machine,0x100+i,r,g,b) ;
+					palette_set_color(Machine,0x100+i,MAKE_RGB(r,g,b)) ;
 				}
 			}
 		}
@@ -288,8 +288,6 @@ VIDEO_START( psychic5 )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
-
-    return 0;
 }
 
 #define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, Machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);

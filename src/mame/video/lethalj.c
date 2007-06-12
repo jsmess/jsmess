@@ -89,7 +89,6 @@ VIDEO_START( lethalj )
 	/* predetermine blitter info */
 	blitter_base = (UINT16 *)memory_region(REGION_GFX1);
 	blitter_rows = memory_region_length(REGION_GFX1) / (2*BLITTER_SOURCE_WIDTH);
-	return 0;
 }
 
 

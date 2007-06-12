@@ -379,7 +379,7 @@ static void pirates_decrypt_68k(void)
     for (i=0; i<rom_size/2; i++)
     {
         int adrl, adrr;
-        unsigned char vl, vr;
+        UINT8 vl, vr;
 
         adrl = BITSWAP24(i,23,22,21,20,19,18,4,8,3,14,2,15,17,0,9,13,10,5,16,7,12,6,1,11);
         vl = BITSWAP8(buf[adrl],    4,2,7,1,6,5,0,3);

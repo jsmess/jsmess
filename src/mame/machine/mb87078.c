@@ -6,14 +6,15 @@
 
  *****************************************************************************/
 
+#include "osdcore.h"
 #include "machine/mb87078.h"
 
 struct MB87078 {
 	const struct MB87078interface *intf;
 	int gain[4];		/* gain index 0-63,64,65 */
 	int channel_latch;	/* current channel */
-	unsigned char latch[4*2];	/* 6bit+3bit 4 data latches */
-	unsigned char reset_comp;
+	UINT8 latch[4*2];	/* 6bit+3bit 4 data latches */
+	UINT8 reset_comp;
 };
 
 static struct MB87078 chip[MAX_MB87078];

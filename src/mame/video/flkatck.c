@@ -10,7 +10,7 @@
 static tilemap *k007121_tilemap[2];
 static rectangle k007121_clip[2];
 
-unsigned char *k007121_ram;
+UINT8 *k007121_ram;
 
 int flkatck_irq_enabled;
 
@@ -81,8 +81,6 @@ VIDEO_START( flkatck )
 	k007121_clip[1] = machine->screen[0].visarea;
 	k007121_clip[1].max_x = 39;
 	k007121_clip[1].min_x = 0;
-
-	return 0;
 }
 
 

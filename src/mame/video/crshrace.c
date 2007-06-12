@@ -49,8 +49,6 @@ VIDEO_START( crshrace )
 
 	tilemap_set_transparent_pen(tilemap1,0x0f);
 	tilemap_set_transparent_pen(tilemap2,0xff);
-
-	return 0;
 }
 
 

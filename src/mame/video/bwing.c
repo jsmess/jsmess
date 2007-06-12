@@ -153,7 +153,7 @@ WRITE8_HANDLER( bwing_paletteram_w )
 		if (b > 0xff) b = 0xff;
 	}
 
-	palette_set_color(Machine, offset, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
 
 	#if BW_DEBUG
 		paletteram[offset+0x40] = palatch;
@@ -223,8 +223,6 @@ VIDEO_START( bwing )
 		dwptr[0] = 0;
 		for(i=1; i<BW_NTILES; i++) dwptr[i] = -1;
 	}
-
-	return(0);
 }
 
 //****************************************************************************

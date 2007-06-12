@@ -10,13 +10,13 @@
 
 #define CPK_VIDEO_SIZE	0x800
 
-unsigned char * cpk_colorram;
-unsigned char * cpk_videoram;
-unsigned char * cpk_palette;
-unsigned char * cpk_palette2;
-unsigned char * cpk_expram;
+UINT8 * cpk_colorram;
+UINT8 * cpk_videoram;
+UINT8 * cpk_palette;
+UINT8 * cpk_palette2;
+UINT8 * cpk_expram;
 
-static unsigned char * dirtybuffer1;
+static UINT8 * dirtybuffer1;
 static mame_bitmap *tmpbitmap2;
 
 static int hopperOK = 0;
@@ -43,7 +43,7 @@ WRITE8_HANDLER( cpk_palette2_w )
 	cpk_palette2[offset] = data;
 
 	newword = cpk_palette[offset] + 256 * cpk_palette2[offset];
-	palette_set_color(Machine,offset,pal5bit(newword >> 0),pal5bit(newword >> 5),pal5bit(newword >> 10));
+	palette_set_color_rgb(Machine,offset,pal5bit(newword >> 0),pal5bit(newword >> 5),pal5bit(newword >> 10));
 }
 
 /* Video handling */
@@ -78,7 +78,7 @@ WRITE8_HANDLER( cpk_colorram_w )
 
 READ8_HANDLER( cpk_expansion_r )
 {
-	unsigned char * RAM = memory_region(REGION_GFX3);
+	UINT8 * RAM = memory_region(REGION_GFX3);
 	return RAM[offset];
 }
 
@@ -98,14 +98,14 @@ VIDEO_START( cska )
 {
 	int i;
 
-	dirtybuffer  = auto_malloc(CPK_VIDEO_SIZE * sizeof(unsigned char));
-	dirtybuffer1 = auto_malloc(CPK_VIDEO_SIZE * sizeof(unsigned char));
-	cpk_colorram = auto_malloc(CPK_VIDEO_SIZE * sizeof(unsigned char));
-	cpk_videoram = auto_malloc(CPK_VIDEO_SIZE * sizeof(unsigned char));
-	cpk_expram   = auto_malloc(CPK_VIDEO_SIZE * sizeof(unsigned char));
+	dirtybuffer  = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
+	dirtybuffer1 = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
+	cpk_colorram = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
+	cpk_videoram = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
+	cpk_expram   = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
 
-	cpk_palette  = auto_malloc(0x800 * sizeof(unsigned char));
-	cpk_palette2 = auto_malloc(0x800 * sizeof(unsigned char));
+	cpk_palette  = auto_malloc(0x800 * sizeof(UINT8));
+	cpk_palette2 = auto_malloc(0x800 * sizeof(UINT8));
 
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
@@ -115,8 +115,6 @@ VIDEO_START( cska )
         {
 //               palette_used_colors[64 * i] = PALETTE_COLOR_TRANSPARENT;
         }
-
-	return 0;
 }
 
 
@@ -164,7 +162,7 @@ MACHINE_RESET (cpk)
 
 INTERRUPT_GEN( cska_interrupt )
 {
-	unsigned char * RAM = memory_region(REGION_CPU1);
+	UINT8 * RAM = memory_region(REGION_CPU1);
 
 	RAM[ hopperOK ] = 1;	/* simulate hopper working! */
 

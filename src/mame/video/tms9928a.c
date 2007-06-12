@@ -77,24 +77,24 @@
     E Gray          0.80    0.47    0.47    0.80    0.80    0.80    204 204 204
     F White         1.00    0.47    0.47    1.00    1.00    1.00    255 255 255
 */
-static unsigned char TMS9928A_palette[16*3] =
+static const rgb_t TMS9928A_palette[16] =
 {
-	0, 0, 0,
-	0, 0, 0,
-	33, 200, 66,
-	94, 220, 120,
-	84, 85, 237,
-	125, 118, 252,
-	212, 82, 77,
-	66, 235, 245,
-	252, 85, 84,
-	255, 121, 120,
-	212, 193, 84,
-	230, 206, 128,
-	33, 176, 59,
-	201, 91, 186,
-	204, 204, 204,
-	255, 255, 255
+	MAKE_RGB(0, 0, 0),
+	MAKE_RGB(0, 0, 0),
+	MAKE_RGB(33, 200, 66),
+	MAKE_RGB(94, 220, 120),
+	MAKE_RGB(84, 85, 237),
+	MAKE_RGB(125, 118, 252),
+	MAKE_RGB(212, 82, 77),
+	MAKE_RGB(66, 235, 245),
+	MAKE_RGB(252, 85, 84),
+	MAKE_RGB(255, 121, 120),
+	MAKE_RGB(212, 193, 84),
+	MAKE_RGB(230, 206, 128),
+	MAKE_RGB(33, 176, 59),
+	MAKE_RGB(201, 91, 186),
+	MAKE_RGB(204, 204, 204),
+	MAKE_RGB(255, 255, 255)
 };
 
 /*
@@ -191,11 +191,9 @@ void TMS9928A_reset () {
     _TMS9928A_set_dirty (1);
 }
 
-static int TMS9928A_start (const TMS9928a_interface *intf)
+static void TMS9928A_start (const TMS9928a_interface *intf)
 {
-    /* 4, 8 or 16 kB vram please */
-    if (! ((intf->vram == 0x1000) || (intf->vram == 0x2000) || (intf->vram == 0x4000)) )
-        return 1;
+    assert_always(((intf->vram == 0x1000) || (intf->vram == 0x2000) || (intf->vram == 0x4000)), "4, 8 or 16 kB vram please");
 
     tms.model = intf->model;
 
@@ -250,8 +248,6 @@ static int TMS9928A_start (const TMS9928a_interface *intf)
 	state_save_register_item("tms9928a", 0, tms.Addr);
 	state_save_register_item("tms9928a", 0, tms.INT);
 	state_save_register_item_pointer("tms9928a", 0, tms.vMem, intf->vram);
-
-    return 0;
 }
 
 const rectangle *TMS9928A_get_visarea (void)
@@ -478,7 +474,7 @@ VIDEO_UPDATE( tms9928a )
         c = tms.Regs[7] & 15; if (!c) c=1;
         if (tms.BackColour != c) {
             tms.BackColour = c;
-            palette_set_color (machine, 0,
+            palette_set_color_rgb (machine, 0,
                 TMS9928A_palette[c * 3], TMS9928A_palette[c * 3 + 1],
                 TMS9928A_palette[c * 3 + 2]);
         }
@@ -936,7 +932,7 @@ void TMS9928A_configure (const TMS9928a_interface *intf)
 VIDEO_START( tms9928a )
 {
 	assert(sIntf.model != TMS_INVALID_MODEL);
-	return TMS9928A_start(&sIntf);
+	TMS9928A_start(&sIntf);
 }
 
 

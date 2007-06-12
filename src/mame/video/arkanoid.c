@@ -79,8 +79,6 @@ VIDEO_START( arkanoid )
 
 	state_save_register_global(gfxbank);
 	state_save_register_global(palettebank);
-
-	return 0;
 }
 
 static void arkanoid_draw_sprites( mame_bitmap *bitmap )

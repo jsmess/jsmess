@@ -551,7 +551,7 @@ static int final_decrypt(int i,int moreffff)
 
 
 /* note: address is the word offset (physical address / 2) */
-static int decode(int address,int val,unsigned char *main_key,int gkey1,int gkey2,int gkey3,int vector_fetch)
+static int decode(int address,int val,UINT8 *main_key,int gkey1,int gkey2,int gkey3,int vector_fetch)
 {
 	int mainkey,key_F,key_6a,key_7a,key_6b;
 	int key_0a,key_0b,key_0c;
@@ -671,14 +671,14 @@ static int decode(int address,int val,unsigned char *main_key,int gkey1,int gkey
 
 static int global_key1,global_key2,global_key3;
 
-int fd1094_decode(int address,int val,unsigned char *key,int vector_fetch)
+int fd1094_decode(int address,int val,UINT8 *key,int vector_fetch)
 {
 	if (!key) return 0;
 
 	return decode(address,val,key,global_key1,global_key2,global_key3,vector_fetch);
 }
 
-int fd1094_set_state(unsigned char *key,int state)
+int fd1094_set_state(UINT8 *key,int state)
 {
 	static int selected_state,irq_mode;
 

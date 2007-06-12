@@ -481,7 +481,7 @@ static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
 static PALETTE_INIT( apexc )
 {
-	palette_set_colors(machine, 0, apexc_palette, APEXC_PALETTE_SIZE);
+	palette_set_colors_rgb(machine, 0, apexc_palette, APEXC_PALETTE_SIZE);
 
 	memcpy(colortable, & apexc_colortable, sizeof(apexc_colortable));
 }
@@ -490,7 +490,6 @@ static VIDEO_START( apexc )
 {
 	apexc_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	fillbitmap(apexc_bitmap, Machine->pens[0], &/*Machine->visible_area*/teletyper_window);
-	return 0;
 }
 
 /* draw a small 8*8 LED (well, there were no LEDs at the time, so let's call this a lamp ;-) ) */

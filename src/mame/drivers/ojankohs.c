@@ -74,14 +74,14 @@ static MACHINE_RESET( ojankohs )
 
 static WRITE8_HANDLER( ojankohs_rombank_w )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	memory_set_bankptr(1, &ROM[0x10000 + (0x4000 * (data & 0x3f))]);
 }
 
 static WRITE8_HANDLER( ojankoy_rombank_w )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	memory_set_bankptr(1, &ROM[0x10000 + (0x4000 * (data & 0x1f))]);
 

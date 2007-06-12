@@ -61,14 +61,9 @@ VIDEO_START( 88games )
 	layer_colorbase[2] = 16;
 	sprite_colorbase = 32;
 	zoom_colorbase = 48;
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback))
-		return 1;
-	if (K051316_vh_start_0(REGION_GFX3,4,TILEMAP_TRANSPARENT,0,zoom_callback))
-		return 1;
-
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
+	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(REGION_GFX3,4,TILEMAP_TRANSPARENT,0,zoom_callback);
 }
 
 

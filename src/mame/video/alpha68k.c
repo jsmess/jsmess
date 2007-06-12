@@ -37,7 +37,7 @@ WRITE16_HANDLER( alpha68k_paletteram_w )
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01);
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
 
-	palette_set_color(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 /******************************************************************************/
@@ -75,8 +75,6 @@ VIDEO_START( alpha68k )
 	fix_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
-
-	return 0;
 }
 
 /******************************************************************************/
@@ -393,7 +391,7 @@ PALETTE_INIT( kyros )
 		bit3 = (color_prom[0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -430,7 +428,7 @@ PALETTE_INIT( paddlem )
 		bit3 = (color_prom[0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 

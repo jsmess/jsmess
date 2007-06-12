@@ -41,7 +41,7 @@ PALETTE_INIT( trucocl )
 	int i;
 
 	for (i = 0;i < 32;i++)
-		palette_set_color(machine,i,pal4bit(color_prom[i] >> 0),pal4bit(color_prom[i+32] >> 0),pal4bit(color_prom[i+32] >> 4));
+		palette_set_color_rgb(machine,i,pal4bit(color_prom[i] >> 0),pal4bit(color_prom[i+32] >> 0),pal4bit(color_prom[i+32] >> 4));
 }
 
 WRITE8_HANDLER( trucocl_videoram_w )
@@ -73,8 +73,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( trucocl )
 {
 	bg_tilemap = tilemap_create( get_bg_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32 );
-
-	return 0;
 }
 
 VIDEO_UPDATE( trucocl )

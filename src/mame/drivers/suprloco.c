@@ -17,7 +17,7 @@ TODO:
 #include "machine/segacrpt.h"
 #include "sound/sn76496.h"
 
-extern unsigned char *suprloco_videoram;
+extern UINT8 *suprloco_videoram;
 
 PALETTE_INIT( suprloco );
 VIDEO_START( suprloco );
@@ -262,7 +262,7 @@ DRIVER_INIT( suprloco )
 	/* convert graphics to 4bpp from 3bpp */
 
 	int i, j, k, color_source, color_dest;
-	unsigned char *source, *dest, *lookup;
+	UINT8 *source, *dest, *lookup;
 
 	source = memory_region(REGION_GFX1);
 	dest   = source + 0x6000;

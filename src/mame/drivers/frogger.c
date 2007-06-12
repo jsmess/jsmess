@@ -254,7 +254,6 @@ static MACHINE_DRIVER_START( frogger )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(frogger_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
-	MDRV_COLORTABLE_LENGTH(8*4)
 
 	MDRV_PALETTE_INIT(frogger)
 	MDRV_VIDEO_START(frogger)

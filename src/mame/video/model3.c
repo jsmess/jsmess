@@ -23,10 +23,10 @@ typedef struct {
 typedef struct
 {
 	VERTEX v[3];
-	unsigned char texture_x, texture_y;
-	unsigned char texture_width, texture_height;
-	unsigned char transparency, texture_coord_shift;
-	unsigned char texture_format, param;
+	UINT8 texture_x, texture_y;
+	UINT8 texture_width, texture_height;
+	UINT8 transparency, texture_coord_shift;
+	UINT8 texture_format, param;
 	int intensity;
 	UINT32 color;
 	int viewport_priority;
@@ -175,8 +175,6 @@ VIDEO_START( model3 )
 			texture_mirror_table[j][t] = (t < size) ? t & (size-1) : size - (t & (size-1)) - 1;
 		}
 	}
-
-	return 0;
 }
 
 static void draw_tile_4bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
@@ -533,7 +531,7 @@ WRITE64_HANDLER( real3d_polygon_ram_w )
 	}
 }
 
-static const unsigned char texture_decode[64] =
+static const UINT8 texture_decode[64] =
 {
 	 0,  1,  4,  5,  8,  9, 12, 13,
 	 2,  3,  6,  7, 10, 11, 14, 15,

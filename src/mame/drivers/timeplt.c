@@ -44,7 +44,7 @@ same as Pooyan
 #include "audio/timeplt.h"
 
 
-extern unsigned char *timeplt_videoram,*timeplt_colorram;
+extern UINT8 *timeplt_videoram,*timeplt_colorram;
 
 READ8_HANDLER( timeplt_scanline_r );
 WRITE8_HANDLER( timeplt_videoram_w );

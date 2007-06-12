@@ -17,7 +17,7 @@
 #include "2610intf.h"
 #include "fm.h"
 
-#if BUILD_YM2610
+#if (BUILD_YM2610||BUILD_YM2610B)
 
 static int sound_type = SOUND_YM2610;
 struct ym2610_info
@@ -441,6 +441,7 @@ WRITE16_HANDLER( YM2610_data_port_1_B_lsb_w ){
 		YM2610Write(info->chip,3,data);
 	}
 }
+#endif
 
 /**************** end of file ****************/
 
@@ -449,6 +450,7 @@ WRITE16_HANDLER( YM2610_data_port_1_B_lsb_w ){
  * Generic get_info
  **************************************************************************/
 
+#if BUILD_YM2610
 static void ym2610_set_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)
@@ -478,12 +480,14 @@ void ym2610_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004, The MAME Team"; break;
 	}
 }
+#endif
 
 
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
+#if BUILD_YM2610B
 static void ym2610b_set_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)

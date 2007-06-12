@@ -26,7 +26,7 @@ PALETTE_INIT( truco )
 			b >>= 1;
 		}
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

@@ -16,7 +16,6 @@
 
 VIDEO_START( nc )
 {
-	return 0;
 }
 
 /* two colours */
@@ -26,19 +25,19 @@ static unsigned short nc_colour_table[NC_NUM_COLOURS] =
 };
 
 /* black/white */
-static unsigned char nc_palette[NC_NUM_COLOURS * 3] =
+static const rgb_t nc_palette[NC_NUM_COLOURS * 3] =
 {
-	0x060, 0x060, 0x060,
-	0x000, 0x000, 0x000,
-	0x080, 0x0a0, 0x060,
-    0x000, 0x000, 0x000
+	MAKE_RGB(0x060, 0x060, 0x060),
+	MAKE_RGB(0x000, 0x000, 0x000),
+	MAKE_RGB(0x080, 0x0a0, 0x060),
+    MAKE_RGB(0x000, 0x000, 0x000)
 };
 
 
 /* Initialise the palette */
 PALETTE_INIT( nc )
 {
-	palette_set_colors(machine, 0, nc_palette, sizeof(nc_palette) / 3);
+	palette_set_colors(machine, 0, nc_palette, ARRAY_LENGTH(nc_palette));
 	memcpy(colortable, nc_colour_table, sizeof (nc_colour_table));
 }
 

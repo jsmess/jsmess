@@ -52,10 +52,10 @@ write:
 #include "driver.h"
 #include "sound/ay8910.h"
 
-extern unsigned char *dday_bgvideoram;
-extern unsigned char *dday_fgvideoram;
-extern unsigned char *dday_textvideoram;
-extern unsigned char *dday_colorram;
+extern UINT8 *dday_bgvideoram;
+extern UINT8 *dday_fgvideoram;
+extern UINT8 *dday_textvideoram;
+extern UINT8 *dday_colorram;
 
 PALETTE_INIT( dday );
 VIDEO_START( dday );

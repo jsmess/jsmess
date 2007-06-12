@@ -52,7 +52,6 @@ VIDEO_START( laser )
 {
 	videoram_size = 0x04000;
 	dirtybuffer = (UINT8*) auto_malloc(videoram_size);
-	return 0;
 }
 
 static int offs_2[192] = {

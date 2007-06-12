@@ -5,10 +5,10 @@
 #include "driver.h"
 
 #if 0
-static unsigned short *file1_data;
+static UINT16 *file1_data;
 static int file1_size;
 
-static unsigned short *result_data;
+static UINT16 *result_data;
 
 static int decrypt_tarzan()
 {
@@ -37,7 +37,7 @@ static int decrypt_tarzan()
 
   result_data = malloc_or_die(file1_size);
   for(i=0; i<file1_size/2; i++) {
-    unsigned short x = file1_data[i];
+    UINT16 x = file1_data[i];
 
     if((i & 0x10c0) == 0x0000)
       x ^= 0x0001;
@@ -71,7 +71,6 @@ static int decrypt_tarzan()
 
 VIDEO_START(tarzan)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(tarzan)

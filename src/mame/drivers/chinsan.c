@@ -48,7 +48,6 @@ UINT8 chinsan_port_select;
 
 VIDEO_START(chinsan)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(chinsan)
@@ -530,7 +529,7 @@ static DRIVER_INIT( chinsan )
 
 	for (i=0;i<0x100;i++)
 	{
-		palette_set_color(machine,i,src[i+0x200]<<4,src[i+0x100]<<4,src[i+0x000]<<4);
+		palette_set_color_rgb(machine,i,pal4bit(src[i+0x200]),pal4bit(src[i+0x100]),pal4bit(src[i+0x000]));
 	}
 }
 

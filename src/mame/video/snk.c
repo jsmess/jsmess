@@ -72,8 +72,6 @@ VIDEO_START( snk )
 	tmpbitmap = auto_bitmap_alloc( 512, 512, machine->screen[0].format );
 
 	memset( dirtybuffer, 0xff, MAX_VRAM_SIZE );
-
-	return 0;
 }
 
 /**************************************************************************************/
@@ -261,7 +259,6 @@ VIDEO_START( sgladiat )
 	dirtybuffer = auto_malloc( MAX_VRAM_SIZE );
 	tmpbitmap = auto_bitmap_alloc( 512, 256, machine->screen[0].format );
 	memset( dirtybuffer, 0xff, MAX_VRAM_SIZE );
-	return 0;
 }
 
 static void sgladiat_draw_background( mame_bitmap *bitmap, int scrollx, int scrolly )
@@ -561,7 +558,7 @@ VIDEO_UPDATE( tdfever )
 		gfx_drawmode_table[13] = DRAWMODE_SHADOW;
 		gfx_drawmode_table[14] = DRAWMODE_SOURCE;
 
-		for (i=0x10e; i<0x200; i+=0x10) palette_set_color(machine,i,snk_blink_parity,snk_blink_parity,snk_blink_parity);
+		for (i=0x10e; i<0x200; i+=0x10) palette_set_color(machine,i,MAKE_RGB(snk_blink_parity,snk_blink_parity,snk_blink_parity));
 		snk_blink_parity ^= 0x7f;
 	}
 	tdfever_draw_sp( bitmap, sp_scroll_x, sp_scroll_y, 0 );

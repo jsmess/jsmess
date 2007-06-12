@@ -37,7 +37,7 @@ VIDEO_START( firebatl );
 VIDEO_START( clshroad );
 VIDEO_UPDATE( clshroad );
 
-extern unsigned char *wiping_soundregs;
+extern UINT8 *wiping_soundregs;
 void *wiping_sh_start(int clock, const struct CustomSound_interface *config);
 WRITE8_HANDLER( wiping_sound_w );
 

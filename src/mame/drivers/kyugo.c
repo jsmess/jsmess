@@ -7,7 +7,7 @@
     someone@secureshell.com
 
     Games supported:
-        * Gyrodine - (c) 1984 Taito Corporation.
+        * Gyrodine - (c) 1984 Crux
         * Son of Phoenix - (c) 1985 Associated Overseas MFR, Inc.
         * Repulse - (c) 1985 Sega
         * '99 The last war - (c) 1985 Proma
@@ -630,6 +630,7 @@ ROM_START( gyrodine )
 	ROM_LOAD( "m1.2c",  0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
+
 ROM_START( gyrodinc )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rom2",   0x0000, 0x2000, CRC(85ddea38) SHA1(fe7e8d7962850b17c39cac627994d78768b094f8) )
@@ -668,6 +669,47 @@ ROM_START( gyrodinc )
 	ROM_LOAD( "a21.18", 0x0200, 0x0100, CRC(23c0c449) SHA1(4a37821a6a16ae0cfdcfb0fa64733c03ba9e4815) ) /* blue */
 	ROM_LOAD( "a21.20", 0x0300, 0x0020, CRC(efc4985e) SHA1(b2fa02e388fbbe1077e79699efccb2d47cb83ba5) ) /* char lookup table */
 	ROM_LOAD( "m1.2c",  0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+ROM_END
+
+
+ROM_START( buzzard )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "rom2",       0x0000, 0x2000, CRC(85ddea38) SHA1(fe7e8d7962850b17c39cac627994d78768b094f8) )
+	ROM_LOAD( "a21.03",     0x2000, 0x2000, CRC(4e9323bd) SHA1(86ae4c6a29898fdb0e559ec2aac99fc874910fea) )
+	ROM_LOAD( "a21.04",     0x4000, 0x2000, CRC(57e659d4) SHA1(4c0e73d0661360731691a32a6e94f41b69315f93) )
+	ROM_LOAD( "a21.05",     0x6000, 0x2000, CRC(1e7293f3) SHA1(64695b80b409b02314334fb325f4d0c42a6d4d5b) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "a21.01",     0x0000, 0x2000, CRC(b2ce0aa2) SHA1(576754105819aec64781a5c8e8540b21fcfd346b) )
+
+	ROM_REGION( 0x01000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "buzl01.bin", 0x00000, 0x1000, CRC(65d728d0) SHA1(12da6cd2c9a8acca98c194dac6dd0edd6384118c) ) /* chars */
+
+	ROM_REGION( 0x06000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "a21.08",     0x00000, 0x2000, CRC(a57df1c9) SHA1(63505f63e978c52c43fe863dca056b52f7ebd501) ) /* tiles - plane 0 */
+	ROM_LOAD( "a21.07",     0x02000, 0x2000, CRC(63623ba3) SHA1(bcb80fc0edf7c4d1f82a2ff6d0bad9d2ccaf48c6) ) /* tiles - plane 1 */
+	ROM_LOAD( "a21.06",     0x04000, 0x2000, CRC(4cc969a9) SHA1(0b89f4142c2fcc0a882fbc3514d8d11027e78e01) ) /* tiles - plane 2 */
+
+	ROM_REGION( 0x18000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "a21.14",     0x00000, 0x2000, CRC(9c5c4d5b) SHA1(0d0c9efb63b761acfaf51d17c525f94430ad703d) ) /* sprites - plane 0 */
+	/* 0x03000-0x04fff empty */
+	ROM_LOAD( "a21.13",     0x04000, 0x2000, CRC(d36b5aad) SHA1(8fac23474ffd3a62e2283eadbc8d278cd9c70105) ) /* sprites - plane 0 */
+	/* 0x07000-0x08fff empty */
+	ROM_LOAD( "a21.12",     0x08000, 0x2000, CRC(f387aea2) SHA1(de4aad7ad9ecc6a058b88c67bb18ee02605d9951) ) /* sprites - plane 1 */
+	/* 0x0b000-0x0cfff empty */
+	ROM_LOAD( "a21.11",     0x0c000, 0x2000, CRC(87967d7d) SHA1(d8026df749947a16f643d9b28640c9d293edd4a7) ) /* sprites - plane 1 */
+	/* 0x0f000-0x10fff empty */
+	ROM_LOAD( "a21.10",     0x10000, 0x2000, CRC(59640ab4) SHA1(747cb265f4504399837111c0dd48f07e05a57cc4) ) /* sprites - plane 2 */
+	/* 0x13000-0x14fff empty */
+	ROM_LOAD( "a21.09",     0x14000, 0x2000, CRC(22ad88d8) SHA1(3bdf93ca582d7454fc9e70bd6ce3cd076e0762aa) ) /* sprites - plane 2 */
+	/* 0x17000-0x18fff empty */
+
+	ROM_REGION( 0x0340, REGION_PROMS, 0 )
+	ROM_LOAD( "a21.16",     0x0000, 0x0100, CRC(cc25fb56) SHA1(5f533c4b4f49ba147c83d6a20d1e795c71db3c41) ) /* red */
+	ROM_LOAD( "a21.17",     0x0100, 0x0100, CRC(ca054448) SHA1(4bad8147905cbe9ec8bb5bcd8016e9950c5d95a9) ) /* green */
+	ROM_LOAD( "a21.18",     0x0200, 0x0100, CRC(23c0c449) SHA1(4a37821a6a16ae0cfdcfb0fa64733c03ba9e4815) ) /* blue */
+	ROM_LOAD( "a21.20",     0x0300, 0x0020, CRC(efc4985e) SHA1(b2fa02e388fbbe1077e79699efccb2d47cb83ba5) ) /* char lookup table */
+	ROM_LOAD( "m1.2c",      0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
 
@@ -1177,8 +1219,9 @@ static DRIVER_INIT( srdmissn )
  *
  *************************************/
 
-GAME( 1984, gyrodine, 0,        gyrodine, gyrodine, gyrodine, ROT90, "Taito Corporation", "Gyrodine", 0 )
-GAME( 1984, gyrodinc, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Taito Corporation (Crux license)", "Gyrodine (Crux)", 0 )
+GAME( 1984, gyrodine, 0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", 0 )
+GAME( 1984, gyrodinc, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", 0 )
+GAME( 1984, buzzard,  gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", 0 )
 GAME( 1985, sonofphx, 0,        sonofphx, sonofphx, 0,        ROT90, "Associated Overseas MFR, Inc", "Son of Phoenix", 0 )
 GAME( 1985, repulse,  sonofphx, sonofphx, sonofphx, 0,        ROT90, "Sega", "Repulse", 0 )
 GAME( 1985, 99lstwar, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War", 0 )

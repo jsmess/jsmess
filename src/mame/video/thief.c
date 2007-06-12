@@ -75,7 +75,7 @@ WRITE8_HANDLER( thief_color_map_w ){
 	int r = intensity[(data & 0x03) >> 0];
     int g = intensity[(data & 0x0C) >> 2];
     int b = intensity[(data & 0x30) >> 4];
-	palette_set_color( Machine,offset,r,g,b );
+	palette_set_color( Machine,offset,MAKE_RGB(r,g,b) );
 }
 
 /***************************************************************************/
@@ -90,7 +90,7 @@ WRITE8_HANDLER( thief_color_plane_w ){
 }
 
 READ8_HANDLER( thief_videoram_r ){
-	unsigned char *source = &videoram[offset];
+	UINT8 *source = &videoram[offset];
 	if( thief_video_control&0x02 ) source+=0x2000*4; /* foreground/background */
 	return source[thief_read_mask*0x2000];
 }
@@ -126,12 +126,10 @@ VIDEO_START( thief ){
 
 	thief_coprocessor.image_ram = auto_malloc( 0x2000 );
 	thief_coprocessor.context_ram = auto_malloc( 0x400 );
-
-	return 0;
 }
 
 VIDEO_UPDATE( thief ){
-	unsigned int offs;
+	UINT32 offs;
 	int flipscreen = thief_video_control&1;
 	const pen_t *pal_data = machine->pens;
 	UINT8 *dirty = dirtybuffer;

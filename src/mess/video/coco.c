@@ -89,18 +89,15 @@ static void internal_video_start_coco(m6847_type type)
 VIDEO_START( dragon )
 {
 	internal_video_start_coco(M6847_VERSION_ORIGINAL_PAL);
-	return 0;
 }
 
 VIDEO_START( coco )
 {
 	internal_video_start_coco(M6847_VERSION_ORIGINAL_NTSC);
-	return 0;
 }
 
 VIDEO_START( coco2b )
 {
 	internal_video_start_coco(M6847_VERSION_M6847T1_NTSC);
-	return 0;
 }
 

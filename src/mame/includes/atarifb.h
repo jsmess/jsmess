@@ -45,9 +45,9 @@ extern discrete_sound_block abaseb_discrete_interface[];
 
 extern size_t atarifb_alphap1_vram_size;
 extern size_t atarifb_alphap2_vram_size;
-extern unsigned char *atarifb_alphap1_vram;
-extern unsigned char *atarifb_alphap2_vram;
-extern unsigned char *atarifb_scroll_register;
+extern UINT8 *atarifb_alphap1_vram;
+extern UINT8 *atarifb_alphap2_vram;
+extern UINT8 *atarifb_scroll_register;
 
 WRITE8_HANDLER( atarifb_scroll_w );
 WRITE8_HANDLER( atarifb_alphap1_vram_w );

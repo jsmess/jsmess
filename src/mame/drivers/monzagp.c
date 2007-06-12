@@ -81,12 +81,11 @@ Known issues:
 
 VIDEO_START( monzagp )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( monzagp )
 { /* WRONG */
-	unsigned char *source = videoram;
+	UINT8 *source = videoram;
 	int sy;
 //  return;
 	for( sy=0; sy<256; sy++ )

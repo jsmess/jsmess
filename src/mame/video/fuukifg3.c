@@ -128,8 +128,6 @@ VIDEO_START( fuuki32 )
 
 	//machine->gfx[1]->color_granularity=16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
 	//machine->gfx[2]->color_granularity=16;
-
-	return 0;
 }
 
 

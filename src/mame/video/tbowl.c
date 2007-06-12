@@ -211,8 +211,6 @@ VIDEO_START( tbowl )
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_transparent_pen(bg2_tilemap,0);
-
-	return 0;
 }
 
 

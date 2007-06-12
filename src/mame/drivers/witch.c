@@ -690,8 +690,6 @@ VIDEO_START(witch)
   tilemap_set_palette_offset(gfx0a_tilemap,0x100);
   tilemap_set_palette_offset(gfx0b_tilemap,0x100);
   tilemap_set_palette_offset(gfx1_tilemap,0x200);
-
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap)

@@ -88,8 +88,6 @@ VIDEO_START( shangha3 )
 		for (i = 0;i < 128;i++)
 			machine->shadow_table[machine->pens[i]] = machine->pens[i+128];
 	}
-
-	return 0;
 }
 
 

@@ -91,8 +91,6 @@ VIDEO_START( tickee )
 	/* start a timer going on the first scanline of every frame */
 	setup_gun_timer = mame_timer_alloc(setup_gun_interrupts);
 	mame_timer_adjust(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0, time_zero);
-
-	return 0;
 }
 
 

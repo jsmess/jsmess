@@ -129,7 +129,7 @@ WRITE16_HANDLER( metro_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	/* We need the ^0xff because we had to invert the pens in the gfx */
-	palette_set_color(Machine,offset^0xff,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(Machine,offset^0xff,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 
@@ -408,8 +408,6 @@ VIDEO_START( metro_14100 )
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[1],0);
 	tilemap_set_transparent_pen(bg_tilemap[2],0);
-
-	return 0;
 }
 
 VIDEO_START( metro_14220 )
@@ -437,8 +435,6 @@ VIDEO_START( metro_14220 )
 	tilemap_set_scrolldx(bg_tilemap[0], -2, 2);
 	tilemap_set_scrolldx(bg_tilemap[1], -2, 2);
 	tilemap_set_scrolldx(bg_tilemap[2], -2, 2);
-
-	return 0;
 }
 
 VIDEO_START( metro_14300 )
@@ -465,14 +461,11 @@ VIDEO_START( metro_14300 )
 	tilemap_set_transparent_pen(tilemap_16x16[0],0);
 	tilemap_set_transparent_pen(tilemap_16x16[1],0);
 	tilemap_set_transparent_pen(tilemap_16x16[2],0);
-
-	return 0;
 }
 
 VIDEO_START( blzntrnd )
 {
-	if (video_start_metro_14220(machine))
-		return 1;
+	video_start_metro_14220(machine);
 
 	has_zoom = 1;
 
@@ -485,14 +478,11 @@ VIDEO_START( blzntrnd )
 	tilemap_set_scrolldx(bg_tilemap[0], 8, -8);
 	tilemap_set_scrolldx(bg_tilemap[1], 8, -8);
 	tilemap_set_scrolldx(bg_tilemap[2], 8, -8);
-
-	return 0;
 }
 
 VIDEO_START( gstrik2 )
 {
-	if (video_start_metro_14220(machine))
-		return 1;
+	video_start_metro_14220(machine);
 
 	has_zoom = 1;
 
@@ -505,8 +495,6 @@ VIDEO_START( gstrik2 )
 	tilemap_set_scrolldx(bg_tilemap[0], 8, -8);
 	tilemap_set_scrolldx(bg_tilemap[1], 0, 0);
 	tilemap_set_scrolldx(bg_tilemap[2], 8, -8);
-
-	return 0;
 }
 
 /***************************************************************************
@@ -575,8 +563,8 @@ void metro_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const int region		=	REGION_GFX1;
 
-	unsigned char *base_gfx	=	memory_region(region);
-	unsigned char *gfx_max	=	base_gfx + memory_region_length(region);
+	UINT8 *base_gfx	=	memory_region(region);
+	UINT8 *gfx_max	=	base_gfx + memory_region_length(region);
 
 	int max_x				=	Machine->screen[0].width;
 	int max_y				=	Machine->screen[0].height;
@@ -609,7 +597,7 @@ void metro_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 		for (j=0; j<sprites; j++)
 		{
 			int x,y, attr,code,color,flipx,flipy, zoom, curr_pri,width,height;
-			unsigned char *gfxdata;
+			UINT8 *gfxdata;
 
 			/* Exponential zoom table extracted from daitoride */
 			static const int zoomtable[0x40] =

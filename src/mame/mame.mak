@@ -1301,7 +1301,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/buggychl.o $(MACHINE)/buggychl.o $(VIDEO)/buggychl.o \
 	$(DRIVERS)/chaknpop.o $(MACHINE)/chaknpop.o $(VIDEO)/chaknpop.o \
 	$(DRIVERS)/champbwl.o \
-	$(DRIVERS)/changela.o \
+	$(DRIVERS)/changela.o $(VIDEO)/changela.o \
 	$(DRIVERS)/crbaloon.o $(VIDEO)/crbaloon.o $(AUDIO)/crbaloon.o \
 	$(DRIVERS)/darius.o $(VIDEO)/darius.o \
 	$(DRIVERS)/darkmist.o $(VIDEO)/darkmist.o \

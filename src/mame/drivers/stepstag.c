@@ -114,7 +114,6 @@ static const gfx_decode gfxdecodeinfo[] =
 
 VIDEO_START(stepstag)
 {
-	return 0;
 }
 VIDEO_UPDATE(stepstag)
 {

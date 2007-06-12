@@ -8,7 +8,7 @@ extern UINT16 *welltris_pixelram;
 extern UINT16 *welltris_charvideoram;
 
 static tilemap *char_tilemap;
-static unsigned char gfxbank[8];
+static UINT8 gfxbank[8];
 static UINT16 charpalettebank;
 static UINT16 spritepalettebank;
 static UINT16 pixelpalettebank;
@@ -219,8 +219,6 @@ VIDEO_START( welltris )
 	char_tilemap = tilemap_create(get_welltris_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(char_tilemap, 15);
-
-	return 0;
 }
 
 static void welltris_drawbackground(mame_bitmap *bitmap, const rectangle *cliprect)

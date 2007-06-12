@@ -94,11 +94,13 @@ drc_core *drc_init(UINT8 cpunum, drc_config *config)
 	/* allocate the sequence and tentative lists */
 	drc->sequence_count_max = config->max_instructions;
 	drc->sequence_list = malloc(drc->sequence_count_max * sizeof(*drc->sequence_list));
+	if (!drc->sequence_list)
+		return NULL;
 	drc->tentative_count_max = config->max_instructions;
 	if (drc->tentative_count_max)
 	{
 		drc->tentative_list = malloc(drc->tentative_count_max * sizeof(*drc->tentative_list));
-		if (!drc->sequence_list || !drc->tentative_list)
+		if (!drc->tentative_list)
 			return NULL;
 	}
 
@@ -216,8 +218,7 @@ void drc_begin_sequence(drc_core *drc, UINT32 pc)
 	if (drc->lookup_l1[l1index] == drc->lookup_l2_recompile)
 	{
 		/* create a new copy of the recompile table */
-		drc->lookup_l1[l1index] = malloc(sizeof(*drc->lookup_l2_recompile) * (1 << drc->l2bits));
-		assert_always(drc->lookup_l1[l1index], "Out of memory");
+		drc->lookup_l1[l1index] = malloc_or_die(sizeof(*drc->lookup_l2_recompile) * (1 << drc->l2bits));
 
 		memcpy(drc->lookup_l1[l1index], drc->lookup_l2_recompile, sizeof(*drc->lookup_l2_recompile) * (1 << drc->l2bits));
 	}

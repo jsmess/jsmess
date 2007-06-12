@@ -187,7 +187,7 @@ VIDEO_START( zx )
 {
 	ula_nmi = timer_alloc(zx_ula_nmi);
 	ula_irq_active = 0;
-	return video_start_generic_bitmapped(machine);
+	video_start_generic_bitmapped(machine);
 }
 
 VIDEO_EOF( zx )

@@ -184,7 +184,6 @@ VIDEO_START( mc10 )
 	cfg.get_attributes = mc10_get_attributes;
 	cfg.get_video_ram = mc10_get_video_ram;
 	m6847_init(&cfg);
-	return 0;
 }
 
 

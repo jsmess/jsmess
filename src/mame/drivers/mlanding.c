@@ -207,7 +207,6 @@ VIDEO_START(mlanding)
 
 	for	(i=0;i<8;i++)
 		ml_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	return 0;
 }
 
 VIDEO_UPDATE(mlanding)

@@ -74,22 +74,22 @@ Atomic Robokid  256x192(H)  512x512
   Variables
 **************************************************************************/
 
-unsigned char *omegaf_fg_videoram;
-unsigned char *omegaf_bg0_videoram;
-unsigned char *omegaf_bg1_videoram;
-unsigned char *omegaf_bg2_videoram;
+UINT8 *omegaf_fg_videoram;
+UINT8 *omegaf_bg0_videoram;
+UINT8 *omegaf_bg1_videoram;
+UINT8 *omegaf_bg2_videoram;
 size_t omegaf_fgvideoram_size;
 
 static int omegaf_bg0_bank = 0;
 static int omegaf_bg1_bank = 0;
 static int omegaf_bg2_bank = 0;
 
-unsigned char *omegaf_bg0_scroll_x;
-unsigned char *omegaf_bg1_scroll_x;
-unsigned char *omegaf_bg2_scroll_x;
-unsigned char *omegaf_bg0_scroll_y;
-unsigned char *omegaf_bg1_scroll_y;
-unsigned char *omegaf_bg2_scroll_y;
+UINT8 *omegaf_bg0_scroll_x;
+UINT8 *omegaf_bg1_scroll_x;
+UINT8 *omegaf_bg2_scroll_x;
+UINT8 *omegaf_bg0_scroll_y;
+UINT8 *omegaf_bg1_scroll_y;
+UINT8 *omegaf_bg2_scroll_y;
 
 static tilemap *fg_tilemap;
 static tilemap *bg0_tilemap;
@@ -247,7 +247,7 @@ static TILE_GET_INFO( get_fg_tile_info )
   Initialize and destroy video hardware emulation
 ***************************************************************************/
 
-static int videoram_alloc(int size)
+static void videoram_alloc(int size)
 {
 	/* create video ram */
 	omegaf_bg0_videoram = auto_malloc(size);
@@ -260,8 +260,6 @@ static int videoram_alloc(int size)
 	memset( omegaf_bg2_videoram, 0x00, size );
 
 	bitmap_sp = auto_bitmap_alloc (Machine -> screen[0].width, Machine -> screen[0].height, Machine -> screen[0].format  );
-
-	return 0;
 }
 
 VIDEO_START( omegaf )
@@ -269,8 +267,7 @@ VIDEO_START( omegaf )
 	scrollx_mask = 0x07ff;
 	bank_mask = 7;
 
-	if ( videoram_alloc(0x2000) )
-		return 1;
+	videoram_alloc(0x2000);
 
 	/*                           Info               Offset             Type                 w   h  col  row */
 	fg_tilemap  = tilemap_create(get_fg_tile_info,  tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,  8,  32, 32);
@@ -282,8 +279,6 @@ VIDEO_START( omegaf )
 	tilemap_set_transparent_pen( bg0_tilemap, 15 );
 	tilemap_set_transparent_pen( bg1_tilemap, 15 );
 	tilemap_set_transparent_pen( bg2_tilemap, 15 );
-
-	return 0;
 }
 
 VIDEO_START( robokid )
@@ -291,8 +286,7 @@ VIDEO_START( robokid )
 	scrollx_mask = 0x01ff;
 	bank_mask = 1;
 
-	if ( videoram_alloc(0x0800) )
-		return 1;
+	videoram_alloc(0x0800);
 
 	/*                           Info               Offset             Type                         w   h  col  row */
 	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,  8,  32, 32);
@@ -303,8 +297,6 @@ VIDEO_START( robokid )
 	tilemap_set_transparent_pen( fg_tilemap,  15 );
 	tilemap_set_transparent_pen( bg1_tilemap, 15 );
 	tilemap_set_transparent_pen( bg2_tilemap, 15 );
-
-	return 0;
 }
 
 

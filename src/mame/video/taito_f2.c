@@ -78,7 +78,7 @@ static UINT8 f2_spriteblendmode; // todo - move into taitoic.c
 
 /***********************************************************************************/
 
-int taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,int y_offs,
+void taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,int y_offs,
 		int flip_xoffs,int flip_yoffs,int flip_text_x_offs,int flip_text_yoffs)
 {
 	int i,chips;
@@ -92,33 +92,27 @@ int taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,int
 
 	chips = number_of_TC0100SCN();
 
-	if (chips < 0)	/* we have an erroneous TC0100SCN configuration */
-		return 1;
+	assert_always(chips >= 0, "erroneous TC0100SCN configuratiom");
 
 	if (has_TC0480SCP())	/* it's a tc0480scp game */
 	{
-		if (TC0480SCP_vh_start(TC0480SCP_GFX_NUM,f2_hide_pixels,f2_tilemap_xoffs,
-		   f2_tilemap_yoffs,f2_text_xoffs,0,-1,0,f2_tilemap_col_base))
-			return 1;
+		TC0480SCP_vh_start(TC0480SCP_GFX_NUM,f2_hide_pixels,f2_tilemap_xoffs,
+		   f2_tilemap_yoffs,f2_text_xoffs,0,-1,0,f2_tilemap_col_base);
 	}
 	else	/* it's a tc0100scn game */
 	{
-		if (TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,f2_hide_pixels,0,
-			flip_xoffs,flip_yoffs,flip_text_x_offs,flip_text_yoffs,TC0100SCN_SINGLE_VDU))
-			return 1;
+		TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,f2_hide_pixels,0,
+			flip_xoffs,flip_yoffs,flip_text_x_offs,flip_text_yoffs,TC0100SCN_SINGLE_VDU);
 	}
 
 	if (has_TC0110PCR())
-		if (TC0110PCR_vh_start())
-			return 1;
+		TC0110PCR_vh_start();
 
 	if (has_TC0280GRD())
-		if (TC0280GRD_vh_start(TC0280GRD_GFX_NUM))
-			return 1;
+		TC0280GRD_vh_start(TC0280GRD_GFX_NUM);
 
 	if (has_TC0430GRW())
-		if (TC0430GRW_vh_start(TC0430GRW_GFX_NUM))
-			return 1;
+		TC0430GRW_vh_start(TC0430GRW_GFX_NUM);
 
 	if (has_TC0360PRI())
 		TC0360PRI_vh_start();	/* Purely for save-state purposes */
@@ -142,8 +136,6 @@ int taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,int
 	state_save_register_global(sprites_active_area);
 	state_save_register_global_pointer(spriteram_delayed, spriteram_size/2);
 	state_save_register_global_pointer(spriteram_buffered, spriteram_size/2);
-
-	return 0;
 }
 
 
@@ -153,96 +145,90 @@ int taitof2_core_vh_start (int sprite_type,int hide,int flip_hide,int x_offs,int
 
 VIDEO_START( taitof2_default )
 {
-	return (taitof2_core_vh_start(0,0,0,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,0,0,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_megab )   /* Megab, Liquidk */
 {
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_quiz )   /* Quiz Crayons, Quiz Jinsei */
 {
-	return (taitof2_core_vh_start(3,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(3,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_finalb )
 {
-	return (taitof2_core_vh_start(0,1,1,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,1,1,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_ssi )
 {
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_growl )
 {
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_ninjak )
 {
-	return (taitof2_core_vh_start(0,0,0,0,0,0,0,1,2));
+	taitof2_core_vh_start(0,0,0,0,0,0,0,1,2);
 }
 
 VIDEO_START( taitof2_qzchikyu )
 {
-	return (taitof2_core_vh_start(0,0,4,0,0,-4,0,-11,0));
+	taitof2_core_vh_start(0,0,4,0,0,-4,0,-11,0);
 }
 
 VIDEO_START( taitof2_solfigtr )
 {
-	return (taitof2_core_vh_start(0,3,-3,0,0,6,0,6,0));
+	taitof2_core_vh_start(0,3,-3,0,0,6,0,6,0);
 }
 
 VIDEO_START( taitof2_koshien )
 {
-	return (taitof2_core_vh_start(0,1,-1,0,0,2,0,0,0));
+	taitof2_core_vh_start(0,1,-1,0,0,2,0,0,0);
 }
 
 VIDEO_START( taitof2_gunfront )
 {
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_thundfox )
 {
-	return (taitof2_core_vh_start(0,3,-3,0,0,5,0,4,1));
+	taitof2_core_vh_start(0,3,-3,0,0,5,0,4,1);
 }
 
 VIDEO_START( taitof2_mjnquest )
 {
-	int failed = (taitof2_core_vh_start(0,0,0,0,0,0,0,0,0));	/* non-zero = failure */
-	if (!failed)  TC0100SCN_set_bg_tilemask(0x7fff);
-
-	return failed;
+	taitof2_core_vh_start(0,0,0,0,0,0,0,0,0);
+	TC0100SCN_set_bg_tilemask(0x7fff);
 }
 
 VIDEO_START( taitof2_footchmp )
 {
-	int failed;
 	f2_tilemap_xoffs = 0x1d;
 	f2_tilemap_yoffs = 0x08;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	failed = (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 
 	f2_game = FOOTCHMP;
-	return failed;
 }
 
 VIDEO_START( taitof2_hthero )
 {
-	int failed;
 	f2_tilemap_xoffs = 0x33;
 	f2_tilemap_yoffs = - 0x04;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	failed = (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 
 	f2_game = FOOTCHMP;
-	return failed;
 }
 
 VIDEO_START( taitof2_deadconx )
@@ -251,7 +237,7 @@ VIDEO_START( taitof2_deadconx )
 	f2_tilemap_yoffs = 0x08;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_deadconj )
@@ -260,7 +246,7 @@ VIDEO_START( taitof2_deadconj )
 	f2_tilemap_yoffs = - 0x05;
 	f2_text_xoffs = -1;
 	f2_tilemap_col_base = 0;
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_metalb )
@@ -269,43 +255,43 @@ VIDEO_START( taitof2_metalb )
 	f2_tilemap_yoffs = - 0x04;
 	f2_text_xoffs = 1;	/* not the usual -1 */
 	f2_tilemap_col_base = 256;   /* separate palette area for tilemaps */
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_yuyugogo )
 {
-	return (taitof2_core_vh_start(1,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(1,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_yesnoj )
 {
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_dinorex )
 {
-	return (taitof2_core_vh_start(3,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(3,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_dondokod )	/* dondokod, cameltry */
 {
 	f2_pivot_xdisp = -16;
 	f2_pivot_ydisp = 0;
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_pulirula )
 {
 	f2_pivot_xdisp = -10;	/* alignment seems correct (see level 2, falling */
 	f2_pivot_ydisp = 16;	/* block of ice after armour man) */
-	return (taitof2_core_vh_start(2,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(2,3,3,0,0,0,0,0,0);
 }
 
 VIDEO_START( taitof2_driftout )
 {
 	f2_pivot_xdisp = -16;
 	f2_pivot_ydisp = 16;
-	return (taitof2_core_vh_start(0,3,3,0,0,0,0,0,0));
+	taitof2_core_vh_start(0,3,3,0,0,0,0,0,0);
 }
 
 
@@ -379,7 +365,7 @@ WRITE16_HANDLER( koshien_spritebank_w )
 }
 
 static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int scalex, int scaley)
 {
 	const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)]; /* ASG 980209 */
@@ -589,7 +575,7 @@ static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,int *prim
 	int code,color,spritedata,spritecont,flipx,flipy;
 	int xcurrent,ycurrent,big_sprite=0;
 	int y_no=0, x_no=0, xlatch=0, ylatch=0, last_continuation_tile=0;   /* for zooms */
-	unsigned int zoomword, zoomx, zoomy, zx=0, zy=0, zoomxlatch=0, zoomylatch=0;   /* for zooms */
+	UINT32 zoomword, zoomx, zoomy, zx=0, zy=0, zoomxlatch=0, zoomylatch=0;   /* for zooms */
 	int scroll1x, scroll1y;
 	int scrollx=0, scrolly=0;
 	int curx,cury;

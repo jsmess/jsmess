@@ -68,7 +68,6 @@ INPUT_PORTS_END
 
 VIDEO_START( sfkick )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( sfkick )

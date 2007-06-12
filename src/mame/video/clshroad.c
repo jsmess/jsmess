@@ -56,7 +56,7 @@ PALETTE_INIT( clshroad )
 {
 	int i;
 	for (i = 0;i < 256;i++)
-		palette_set_color(machine,i,	pal4bit(color_prom[i + 256 * 0]),
+		palette_set_color_rgb(machine,i,	pal4bit(color_prom[i + 256 * 0]),
 								        pal4bit(color_prom[i + 256 * 1]),
 								        pal4bit(color_prom[i + 256 * 2]));
 }
@@ -93,7 +93,7 @@ PALETTE_INIT( firebatl )
 		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 #endif
 
@@ -248,8 +248,6 @@ VIDEO_START( firebatl )
 	tilemap_set_transparent_pen( tilemap_0a, 0 );
 	tilemap_set_transparent_pen( tilemap_0b, 0 );
 	tilemap_set_transparent_pen( tilemap_1,  0x0f );
-
-	return 0;
 }
 
 VIDEO_START( clshroad )
@@ -274,8 +272,6 @@ VIDEO_START( clshroad )
 	tilemap_set_transparent_pen( tilemap_0a, 0x0f );
 	tilemap_set_transparent_pen( tilemap_0b, 0x0f );
 	tilemap_set_transparent_pen( tilemap_1,  0x0f );
-
-	return 0;
 }
 
 

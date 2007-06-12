@@ -13,11 +13,11 @@
 #include "sound/dac.h"
 
 
-unsigned char meadows_0c00 = 0;
-unsigned char meadows_0c01 = 0;
-unsigned char meadows_0c02 = 0;
-unsigned char meadows_0c03 = 0;
-static unsigned char meadows_dac  = 0;
+UINT8 meadows_0c00 = 0;
+UINT8 meadows_0c01 = 0;
+UINT8 meadows_0c02 = 0;
+UINT8 meadows_0c03 = 0;
+static UINT8 meadows_dac  = 0;
 static int dac_enable;
 
 #define BASE_CLOCK		5000000
@@ -54,9 +54,9 @@ void meadows_sh_start(void)
 /************************************/
 void meadows_sh_update(void)
 {
-static  unsigned char latched_0c01 = 0;
-static	unsigned char latched_0c02 = 0;
-static	unsigned char latched_0c03 = 0;
+static  UINT8 latched_0c01 = 0;
+static	UINT8 latched_0c02 = 0;
+static	UINT8 latched_0c03 = 0;
 int preset, amp;
 
     if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)

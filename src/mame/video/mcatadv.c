@@ -159,7 +159,7 @@ static void mcatadv_drawsprites ( mame_bitmap *bitmap, const rectangle *cliprect
 void mcatadv_draw_tilemap_part(UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap* current_tilemap, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int flip;
-	unsigned int drawline;
+	UINT32 drawline;
 	rectangle clip;
 
 	clip.min_x = cliprect->min_x;
@@ -264,8 +264,6 @@ VIDEO_START( mcatadv )
 
 	palette_bank1 = 0;
 	palette_bank2 = 0;
-
-	return 0;
 }
 
 VIDEO_EOF( mcatadv )

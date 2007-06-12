@@ -33,7 +33,7 @@ unsigned short pocketc_colortable[8][2] = {
 
 PALETTE_INIT( pocketc )
 {
-	palette_set_colors(machine, 0, pocketc_palette, sizeof(pocketc_palette) / 3);
+	palette_set_colors_rgb(machine, 0, pocketc_palette, sizeof(pocketc_palette) / 3);
 	memcpy(colortable,pocketc_colortable,sizeof(pocketc_colortable));
 }
 
@@ -51,7 +51,7 @@ VIDEO_START( pocketc )
 	}
 #endif
 
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 void pocketc_draw_special(mame_bitmap *bitmap,

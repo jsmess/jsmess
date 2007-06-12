@@ -258,10 +258,10 @@ VIDEO_START( stfight );
 VIDEO_UPDATE( stfight );
 
 // video
-extern unsigned char *stfight_text_char_ram;
-extern unsigned char *stfight_text_attr_ram;
-extern unsigned char *stfight_vh_latch_ram;
-extern unsigned char *stfight_sprite_ram;
+extern UINT8 *stfight_text_char_ram;
+extern UINT8 *stfight_text_attr_ram;
+extern UINT8 *stfight_vh_latch_ram;
+extern UINT8 *stfight_sprite_ram;
 
 static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)

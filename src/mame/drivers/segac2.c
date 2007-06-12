@@ -276,7 +276,7 @@ static WRITE16_HANDLER( palette_w )
 	b = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 
 	/* set the color */
-	palette_set_color(Machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(Machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 

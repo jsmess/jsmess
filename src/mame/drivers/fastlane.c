@@ -17,7 +17,7 @@ TODO:
 #include "sound/k007232.h"
 
 /* from video/fastlane.c */
-extern unsigned char *fastlane_k007121_regs,*fastlane_videoram1,*fastlane_videoram2;
+extern UINT8 *fastlane_k007121_regs,*fastlane_videoram1,*fastlane_videoram2;
 WRITE8_HANDLER( fastlane_vram1_w );
 WRITE8_HANDLER( fastlane_vram2_w );
 PALETTE_INIT( fastlane );
@@ -49,7 +49,7 @@ WRITE8_HANDLER( k007121_registers_w )
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(0,data & 0x01);

@@ -8,19 +8,19 @@
 /*----------- defined in drivers/megaplay.c -----------*/
 
 extern UINT16 *ic36_ram;
-extern unsigned char bios_6204;
-extern unsigned char bios_ctrl[6];
+extern UINT8 bios_6204;
+extern UINT8 bios_ctrl[6];
 
 /*----------- defined in drivers/megatech.c -----------*/
 
-extern unsigned int bios_ctrl_inputs;
+extern UINT32 bios_ctrl_inputs;
 extern READ8_HANDLER (megatech_bios_port_be_bf_r);
 extern WRITE8_HANDLER (megatech_bios_port_be_bf_w);
 extern INTERRUPT_GEN (megatech_irq);
 
 /*----------- defined in drivers/genesis.c -----------*/
 
-extern unsigned char *genesis_z80_ram;
+extern UINT8 *genesis_z80_ram;
 extern UINT16 *genesis_68k_ram;
 extern MACHINE_START( genesis );
 extern MACHINE_RESET( genesis );

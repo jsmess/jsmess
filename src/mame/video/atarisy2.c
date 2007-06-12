@@ -126,8 +126,7 @@ VIDEO_START( atarisy2 )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 128,64);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
+	atarimo_init(0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,48);
@@ -136,7 +135,6 @@ VIDEO_START( atarisy2 )
 	/* reset the statics */
 	yscroll_reset_timer = mame_timer_alloc(reset_yscroll_callback);
 	videobank = 0;
-	return 0;
 }
 
 
@@ -237,7 +235,7 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;
 	green = (color_table[(newword >> 8) & 15] * inten) >> 4;
 	blue = (color_table[(newword >> 4) & 15] * inten) >> 4;
-	palette_set_color(Machine, offset, red, green, blue);
+	palette_set_color(Machine, offset, MAKE_RGB(red, green, blue));
 }
 
 

@@ -122,8 +122,6 @@ VIDEO_START(bigstrkb)
 	tilemap_set_transparent_pen(bsb_tilemap,15);
 //  tilemap_set_transparent_pen(bsb_tilemap2,15);
 	tilemap_set_transparent_pen(bsb_tilemap3,15);
-
- 	return 0;
 }
 
 VIDEO_UPDATE(bigstrkb)

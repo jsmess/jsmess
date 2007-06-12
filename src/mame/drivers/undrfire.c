@@ -155,7 +155,7 @@ static WRITE32_HANDLER( color_ram_w )
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
 
-		palette_set_color(Machine,offset,r,g,b);
+		palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -708,7 +708,7 @@ static READ32_HANDLER( main_cycle_r )
 
 DRIVER_INIT( undrfire )
 {
-	unsigned int offset,i;
+	UINT32 offset,i;
 	UINT8 *gfx = memory_region(REGION_GFX3);
 	int size=memory_region_length(REGION_GFX3);
 	int data;

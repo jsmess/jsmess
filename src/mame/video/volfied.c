@@ -19,7 +19,7 @@ VIDEO_START( volfied )
 	state_save_register_global(video_ctrl);
 	state_save_register_global(video_mask);
 
-	return PC090OJ_vh_start(0, 0, 0, 0);
+	PC090OJ_vh_start(0, 0, 0, 0);
 }
 
 

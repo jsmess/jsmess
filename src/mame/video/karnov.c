@@ -6,7 +6,7 @@
 
 #include "driver.h"
 
-static unsigned char *dirty_f;
+static UINT8 *dirty_f;
 static mame_bitmap *bitmap_f;
 UINT16 karnov_scroll[2], *karnov_pf_data;
 static tilemap *fix_tilemap;
@@ -63,7 +63,7 @@ PALETTE_INIT( karnov )
 		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -243,8 +243,6 @@ VIDEO_START( karnov )
 	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_START( wndrplnt )
@@ -258,8 +256,6 @@ VIDEO_START( wndrplnt )
 	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
-
-	return 0;
 }
 
 /******************************************************************************/

@@ -54,8 +54,8 @@ VIDEO_START( raidena );
 WRITE8_HANDLER( raiden_control_w );
 VIDEO_UPDATE( raiden );
 
-static unsigned char *raiden_shared_ram;
-extern unsigned char *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
+static UINT8 *raiden_shared_ram;
+extern UINT8 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
 /***************************************************************************/
 
@@ -531,11 +531,11 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 static void common_decrypt(void)
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int i;
-	unsigned char a;
+	UINT8 a;
 
-	static const unsigned char xor_table[4][16]={
+	static const UINT8 xor_table[4][16]={
 	  {0xF1,0xF9,0xF5,0xFD,0xF1,0xF1,0x3D,0x3D,   /* rom 3 */
 	   0x73,0xFB,0x77,0xFF,0x73,0xF3,0x3F,0x3F},
 	  {0xDF,0xFF,0xFF,0xFF,0xDB,0xFF,0xFB,0xFF,   /* rom 4 */

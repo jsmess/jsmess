@@ -49,7 +49,7 @@ PALETTE_INIT( josvolly )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -92,7 +92,7 @@ PALETTE_INIT( gsword )
 		bit2 = (color_prom[i] >> 3) & 1;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 2*256;
@@ -168,8 +168,6 @@ VIDEO_START( gsword )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 64);
-
-	return 0;
 }
 
 void gsword_draw_sprites(mame_bitmap *bitmap)

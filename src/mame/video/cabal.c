@@ -47,8 +47,6 @@ VIDEO_START( cabal )
 
 	tilemap_set_transparent_pen(text_layer,3);
 	tilemap_set_transparent_pen(background_layer,15);
-
-	return 0;
 }
 
 

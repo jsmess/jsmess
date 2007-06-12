@@ -15,7 +15,6 @@ static UINT32 *vram;
 
 static VIDEO_START( ultrsprt )
 {
-	return 0;
 }
 
 static VIDEO_UPDATE( ultrsprt )
@@ -70,8 +69,8 @@ static WRITE32_HANDLER(palette_w)
 	g2 = (g2 << 3) | (g2 >> 2);
 	b2 = (b2 << 3) | (b2 >> 2);
 
-	palette_set_color(Machine, (offset*2)+0, r1, g1, b1);
-	palette_set_color(Machine, (offset*2)+1, r2, g2, b2);
+	palette_set_color(Machine, (offset*2)+0, MAKE_RGB(r1, g1, b1));
+	palette_set_color(Machine, (offset*2)+1, MAKE_RGB(r2, g2, b2));
 }
 
 static READ32_HANDLER(eeprom_r)

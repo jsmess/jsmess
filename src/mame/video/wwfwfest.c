@@ -233,20 +233,15 @@ VIDEO_START( wwfwfest )
 	tilemap_set_transparent_pen(bg0_tilemap,0);
 
 	sprite_xoff = bg0_dx = bg1_dx[0] = bg1_dx[1] = 0;
-
-	return 0;
 }
 
 VIDEO_START( wwfwfstb )
 {
-	if(video_start_wwfwfest(machine))
-		return 1;
+	video_start_wwfwfest(machine);
 
 	sprite_xoff = 2;
 	bg0_dx = bg1_dx[0] = -4;
 	bg1_dx[1] = -2;
-
-	return 0;
 }
 
 VIDEO_UPDATE( wwfwfest )

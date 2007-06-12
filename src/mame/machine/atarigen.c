@@ -1316,7 +1316,7 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 	b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-	palette_set_color(Machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(Machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 
@@ -1340,7 +1340,7 @@ WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color(Machine, palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(Machine, palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 }
 
@@ -1363,7 +1363,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color(Machine, offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(Machine, offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	if (ACCESSING_LSW32)
@@ -1374,7 +1374,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color(Machine, offset * 2 + 1, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(Machine, offset * 2 + 1, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 }
 

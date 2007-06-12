@@ -141,8 +141,6 @@ VIDEO_START( kaypro )
 	videoram_size = KAYPRO_SCREEN_W * KAYPRO_SCREEN_H;
 
 	kaypro_terminal = terminal_create(0, ' ', 10, kaypro_getcursorcode, KAYPRO_SCREEN_W, KAYPRO_SCREEN_H);
-	if (!kaypro_terminal)
-		return 1;
 
 	kaypro_putstr(
 	/* a test of GB1/GB2 video mode graphics */ \
@@ -183,7 +181,6 @@ VIDEO_START( kaypro )
 		"\200\263\200\242\200\203\200\263\200\263\200\263\200\263" \
 		"\200\203\200\203\r\n" \
 		"\033C5"); /* end video mode */
-	return 0;
 }
 
 VIDEO_UPDATE( kaypro )
@@ -196,13 +193,13 @@ VIDEO_UPDATE( kaypro )
 	{
 		if (blink_count & 16)
 		{
-			palette_set_color(machine, 3, 0,240,	0);
-			palette_set_color(machine, 4, 0,120,	0);
+			palette_set_color_rgb(machine, 3, 0,240,	0);
+			palette_set_color_rgb(machine, 4, 0,120,	0);
 		}
 		else
 		{
-			palette_set_color(machine, 3, 0,	0,	0);
-			palette_set_color(machine, 4, 0,	0,	0);
+			palette_set_color_rgb(machine, 3, 0,	0,	0);
+			palette_set_color_rgb(machine, 4, 0,	0,	0);
 		}
 	}
 

@@ -486,7 +486,7 @@ ROM_END
 
 static void crimfght_banking( int lines )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs = 0;
 
 	/* bit 5 = select work RAM or palette */
@@ -508,7 +508,7 @@ static void crimfght_banking( int lines )
 
 static MACHINE_RESET( crimfght )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)crimfght_banking);
 

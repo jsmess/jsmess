@@ -52,7 +52,7 @@ PALETTE_INIT( seicross )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -91,8 +91,6 @@ VIDEO_START( seicross )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
-
-	return 0;
 }
 
 static void seicross_draw_sprites( mame_bitmap *bitmap )

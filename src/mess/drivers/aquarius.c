@@ -113,7 +113,7 @@ static unsigned short aquarius_colortable[] =
 
 static PALETTE_INIT( aquarius )
 {
-	palette_set_colors(machine, 0, aquarius_palette, sizeof(aquarius_palette) / 3);
+	palette_set_colors_rgb(machine, 0, aquarius_palette, sizeof(aquarius_palette) / 3);
 	memcpy(colortable, aquarius_colortable, sizeof (aquarius_colortable));
 }
 

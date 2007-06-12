@@ -534,7 +534,7 @@ static WRITE16_HANDLER( robocop_68000_share_w )
 static void h6280_decrypt(int memory_area)
 {
 	int i;
-	unsigned char *RAM = memory_region(memory_area);
+	UINT8 *RAM = memory_region(memory_area);
 
 	/* Read each byte, decrypt it */
 	for (i=0x00000; i<0x10000; i++)
@@ -543,7 +543,7 @@ static void h6280_decrypt(int memory_area)
 
 DRIVER_INIT( hippodrm )
 {
-	unsigned char *RAM = memory_region(REGION_CPU3);
+	UINT8 *RAM = memory_region(REGION_CPU3);
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_r);
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_w);
@@ -560,7 +560,7 @@ DRIVER_INIT( hippodrm )
 
 DRIVER_INIT( slyspy )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 
 	h6280_decrypt(REGION_CPU2);
 

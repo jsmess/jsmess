@@ -9,8 +9,8 @@
 #include "driver.h"
 
 
-unsigned char *ambush_scrollram;
-unsigned char *ambush_colorbank;
+UINT8 *ambush_scrollram;
+UINT8 *ambush_colorbank;
 
 
 /***************************************************************************
@@ -44,7 +44,7 @@ PALETTE_INIT( ambush )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

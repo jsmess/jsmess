@@ -52,7 +52,7 @@ PALETTE_INIT( irobot )
 	{
 	    int r,g,b;
 		int bits,intensity;
-	    unsigned int color;
+	    UINT32 color;
 
 	    color = *color_prom;
 	    intensity = color & 0x03;
@@ -62,7 +62,7 @@ PALETTE_INIT( irobot )
 	    g = 28 * bits * intensity;
 	    bits = (color >> 2) & 0x03;
 	    b = 28 * bits * intensity;
-		palette_set_color(machine,i+64,r,g,b);
+		palette_set_color(machine,i+64,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -82,7 +82,7 @@ WRITE8_HANDLER( irobot_paletteram_w )
 {
     int r,g,b;
 	int bits,intensity;
-    unsigned int color;
+    UINT32 color;
 
     color = ((data << 1) | (offset & 0x01)) ^ 0x1ff;
     intensity = color & 0x07;
@@ -92,7 +92,7 @@ WRITE8_HANDLER( irobot_paletteram_w )
     g = 12 * bits * intensity;
     bits = (color >> 7) & 0x03;
     r = 12 * bits * intensity;
-    palette_set_color(Machine,(offset >> 1) & 0x3F,r,g,b);
+    palette_set_color(Machine,(offset >> 1) & 0x3F,MAKE_RGB(r,g,b));
 }
 
 
@@ -127,8 +127,6 @@ VIDEO_START( irobot )
 	ir_xmin = ir_ymin = 0;
 	ir_xmax = machine->screen[0].width;
 	ir_ymax = machine->screen[0].height;
-
-	return 0;
 }
 
 
@@ -236,7 +234,7 @@ void irobot_run_video(void)
 	UINT16 *combase16 = (UINT16 *)irobot_combase;
 	int sx,sy,ex,ey,sx2,ey2;
 	int color;
-	unsigned int d1;
+	UINT32 d1;
 	int lpnt,spnt,spnt2;
 	int shp;
 	INT32 word1,word2;

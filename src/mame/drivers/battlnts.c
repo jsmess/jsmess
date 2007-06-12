@@ -34,7 +34,7 @@ WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bankaddress;
 
 	/* bits 6 & 7 = bank number */

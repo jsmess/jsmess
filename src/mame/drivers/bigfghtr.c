@@ -167,8 +167,6 @@ VIDEO_START( bigfghtr )
 
 	tilemap_set_transparent_pen(fg_tilemap,0xf);
 	tilemap_set_transparent_pen(tx_tilemap,0xf);
-
-	return 0;
 }
 
 WRITE16_HANDLER(text_videoram_w )

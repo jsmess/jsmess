@@ -39,27 +39,27 @@ Only a handful of games were released for this system.
 #define MP_ROM  0x10
 #define MP_GAME 0
 
-static unsigned int bios_bank; // ROM bank selection
-static unsigned short game_banksel;  // Game bank selection
-static unsigned int bios_mode = MP_ROM;  // determines whether ROM banks or Game data
+static UINT32 bios_bank; // ROM bank selection
+static UINT16 game_banksel;  // Game bank selection
+static UINT32 bios_mode = MP_ROM;  // determines whether ROM banks or Game data
                                   // is to read from 0x8000-0xffff
-static unsigned int bios_width;  // determines the way the game info ROM is read
-unsigned char bios_ctrl[6];
-static unsigned char bios_6600;
-unsigned char bios_6204;
-static unsigned char bios_6403;
-static unsigned char bios_6404;
-static unsigned char* ic3_ram;
-//static unsigned char ic36_ram[0x4000];
-static unsigned char ic37_ram[0x8000];
+static UINT32 bios_width;  // determines the way the game info ROM is read
+UINT8 bios_ctrl[6];
+static UINT8 bios_6600;
+UINT8 bios_6204;
+static UINT8 bios_6403;
+static UINT8 bios_6404;
+static UINT8* ic3_ram;
+//static UINT8 ic36_ram[0x4000];
+static UINT8 ic37_ram[0x8000];
 UINT16 *ic36_ram;
 
-static unsigned int readpos = 1;  // serial bank selection position (9-bit)
+static UINT32 readpos = 1;  // serial bank selection position (9-bit)
 
 
 static MACHINE_RESET( megaplay )
 {
-//  unsigned char* ram = memory_region(REGION_CPU3);
+//  UINT8* ram = memory_region(REGION_CPU3);
 
 	/* mirroring of ram etc. */
 	memory_set_bankptr(1, &genesis_z80_ram[0]);

@@ -20,7 +20,6 @@ All of these have encrypted program roms, which will need decrypting
 
 VIDEO_START(igs_m68)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(igs_m68)

@@ -16,19 +16,19 @@
 #include "sound/samples.h"
 #include "sound/dac.h"
 
-unsigned char targ_spec_flag;
-static unsigned char targ_sh_ctrl0=0;
-static unsigned char targ_sh_ctrl1=0;
-static unsigned char tone_active;
+UINT8 targ_spec_flag;
+static UINT8 targ_sh_ctrl0=0;
+static UINT8 targ_sh_ctrl1=0;
+static UINT8 tone_active;
 
 #define MAXFREQ_A_TARG 125000
 #define MAXFREQ_A_SPECTAR 525000
 
 static int sound_a_freq;
-static unsigned char tone_pointer;
-static unsigned char tone_offset;
+static UINT8 tone_pointer;
+static UINT8 tone_offset;
 
-static unsigned char tone_prom[32] =
+static UINT8 tone_prom[32] =
 {
     0xE5,0xE5,0xED,0xED,0xE5,0xE5,0xED,0xED,0xE7,0xE7,0xEF,0xEF,0xE7,0xE7,0xEF,0xEF,
     0xC1,0xE1,0xC9,0xE9,0xC5,0xE5,0xCD,0xED,0xC3,0xE3,0xCB,0xEB,0xC7,0xE7,0xCF,0xEF

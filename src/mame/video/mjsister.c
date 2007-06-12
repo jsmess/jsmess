@@ -27,11 +27,9 @@ VIDEO_START( mjsister )
 	mjsister_tmpbitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
 	mjsister_videoram0 = auto_malloc(0x8000);
 	mjsister_videoram1 = auto_malloc(0x8000);
-
-	return 0;
 }
 
-void mjsister_plot0(int offset,unsigned char data)
+void mjsister_plot0(int offset,UINT8 data)
 {
 	int x,y,c1,c2;
 
@@ -45,7 +43,7 @@ void mjsister_plot0(int offset,unsigned char data)
 	*BITMAP_ADDR16(mjsister_tmpbitmap0, y, x*2+1) = Machine->pens[c2];
 }
 
-void mjsister_plot1(int offset,unsigned char data)
+void mjsister_plot1(int offset,UINT8 data)
 {
 	int x,y,c1,c2;
 

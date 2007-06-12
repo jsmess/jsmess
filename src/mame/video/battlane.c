@@ -50,7 +50,7 @@ WRITE8_HANDLER( battlane_palette_w )
 	bit2 = (~data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(Machine, offset, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
 }
 
 WRITE8_HANDLER( battlane_scrollx_w )
@@ -147,8 +147,6 @@ VIDEO_START( battlane )
 		TILEMAP_OPAQUE, 16, 16, 32, 32);
 
 	screen_bitmap = auto_bitmap_alloc(32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
-
-	return 0;
 }
 
 static void battlane_draw_sprites( mame_bitmap *bitmap )

@@ -43,12 +43,7 @@ VIDEO_START( tx0 )
 {
 	/* alloc bitmaps for our private fun */
 	panel_bitmap = auto_bitmap_alloc(panel_window_width, panel_window_height, BITMAP_FORMAT_INDEXED16);
-	if (!panel_bitmap)
-		return 1;
-
 	typewriter_bitmap = auto_bitmap_alloc(typewriter_window_width, typewriter_window_height, BITMAP_FORMAT_INDEXED16);
-	if (!typewriter_bitmap)
-		return 1;
 
 	/* set up out bitmaps */
 	tx0_draw_panel_backdrop(panel_bitmap);
@@ -56,10 +51,7 @@ VIDEO_START( tx0 )
 	fillbitmap(typewriter_bitmap, Machine->pens[pen_typewriter_bg], &typewriter_bitmap_bounds);
 
 	/* initialize CRT */
-	if (video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height))
-		return 1;
-
-	return 0;
+	video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
 }
 
 

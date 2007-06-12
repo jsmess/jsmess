@@ -48,11 +48,11 @@ struct x76f100_chip
 	int bit;
 	int byte;
 	int command;
-	unsigned char write_buffer[ SIZE_WRITE_BUFFER ];
-	unsigned char *response_to_reset;
-	unsigned char *write_password;
-	unsigned char *read_password;
-	unsigned char *data;
+	UINT8 write_buffer[ SIZE_WRITE_BUFFER ];
+	UINT8 *response_to_reset;
+	UINT8 *write_password;
+	UINT8 *read_password;
+	UINT8 *data;
 };
 
 #define SIZE_RESPONSE_TO_RESET ( 4 )
@@ -76,7 +76,7 @@ struct x76f100_chip x76f100[ X76F100_MAXCHIP ];
 #define STATE_READ_DATA ( 6 )
 #define STATE_WRITE_DATA ( 7 )
 
-void x76f100_init( int chip, unsigned char *data )
+void x76f100_init( int chip, UINT8 *data )
 {
 	int offset;
 	struct x76f100_chip *c;
@@ -190,7 +190,7 @@ void x76f100_rst_write( int chip, int rst )
 	c->rst = rst;
 }
 
-static unsigned char *x76f100_password( struct x76f100_chip *c )
+static UINT8 *x76f100_password( struct x76f100_chip *c )
 {
 	if( ( c->command & 0xe1 ) == COMMAND_READ )
 	{

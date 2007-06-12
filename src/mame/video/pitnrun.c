@@ -114,7 +114,7 @@ WRITE8_HANDLER(pitnrun_color_select_w)
 void pitnrun_spotlights(void)
 {
 	int x,y,i,b,datapix;
-	unsigned char *ROM = memory_region(REGION_USER1);
+	UINT8 *ROM = memory_region(REGION_USER1);
 	for(i=0;i<4;i++)
 	 for(y=0;y<128;y++)
 	  for(x=0;x<16;x++)
@@ -148,7 +148,7 @@ PALETTE_INIT (pitnrun)
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	/* fake bg palette for lightning effect*/
@@ -170,7 +170,7 @@ PALETTE_INIT (pitnrun)
 		g/=3;
 		b/=3;
 
-		palette_set_color(machine,i+16,(r>0xff)?0xff:r,(g>0xff)?0xff:g,(b>0xff)?0xff:b);
+		palette_set_color_rgb(machine,i+16,(r>0xff)?0xff:r,(g>0xff)?0xff:g,(b>0xff)?0xff:b);
 
 	}
 }
@@ -185,7 +185,7 @@ VIDEO_START(pitnrun)
 	tmp_bitmap[2] = auto_bitmap_alloc(128,128,machine->screen[0].format);
 	tmp_bitmap[3] = auto_bitmap_alloc(128,128,machine->screen[0].format);
 	pitnrun_spotlights();
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 static void pitnrun_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
@@ -230,19 +230,19 @@ VIDEO_UPDATE( pitnrun )
 #ifdef MAME_DEBUG
 	if (code_pressed_memory(KEYCODE_Q))
 	{
-		unsigned char *ROM = memory_region(REGION_CPU1);
+		UINT8 *ROM = memory_region(REGION_CPU1);
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
 	if (code_pressed_memory(KEYCODE_W))
 	{
-		unsigned char *ROM = memory_region(REGION_CPU1);
+		UINT8 *ROM = memory_region(REGION_CPU1);
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
 	if (code_pressed_memory(KEYCODE_E))
 	{
-		unsigned char *ROM = memory_region(REGION_CPU1);
+		UINT8 *ROM = memory_region(REGION_CPU1);
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}

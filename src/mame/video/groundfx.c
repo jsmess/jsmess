@@ -24,19 +24,14 @@ VIDEO_START( groundfx )
 {
 	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
 
-	if (TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0))
-		return 1;
-
-	if (TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0))
-		return 1;
+	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
+	TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);
 
 	/* Hack */
 	hack_cliprect.min_x=69;
 	hack_cliprect.max_x=250;
 	hack_cliprect.min_y=24 + 5;
 	hack_cliprect.max_y=24 + 44;
-
-	return 0;
 }
 
 /***************************************************************

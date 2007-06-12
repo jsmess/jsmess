@@ -85,7 +85,7 @@ static gfx_layout objlayout =
  *************************************/
 
 static void update_timers(int scanline);
-static int decode_gfx(UINT16 *pflookup, UINT16 *molookup);
+static void decode_gfx(UINT16 *pflookup, UINT16 *molookup);
 static int get_bank(UINT8 prom1, UINT8 prom2, int bpp);
 static void int3_callback(int scanline);
 static void int3off_callback(int param);
@@ -172,15 +172,13 @@ VIDEO_START( atarisy1 )
 	int i, size;
 
 	/* first decode the graphics */
-	if (!decode_gfx(playfield_lookup, motable))
-		return 1;
+	decode_gfx(playfield_lookup, motable);
 
 	/* initialize the playfield */
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 64,64);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
+	atarimo_init(0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,32);
@@ -206,7 +204,6 @@ VIDEO_START( atarisy1 )
 	scanline_timer = mame_timer_alloc(int3_callback);
 	int3off_timer = mame_timer_alloc(int3off_callback);
 	yscroll_reset_timer = mame_timer_alloc(reset_yscroll_callback);
-	return 0;
 }
 
 
@@ -544,7 +541,7 @@ VIDEO_UPDATE( atarisy1 )
  *
  *************************************/
 
-static int decode_gfx(UINT16 *pflookup, UINT16 *molookup)
+static void decode_gfx(UINT16 *pflookup, UINT16 *molookup)
 {
 	UINT8 *prom1 = &memory_region(REGION_PROMS)[0x000];
 	UINT8 *prom2 = &memory_region(REGION_PROMS)[0x200];
@@ -575,8 +572,6 @@ static int decode_gfx(UINT16 *pflookup, UINT16 *molookup)
 
 			/* determine the bank */
 			bank = get_bank(*prom1, *prom2, bpp);
-			if (bank < 0)
-				return 0;
 
 			/* set the value */
 			if (obj == 0)
@@ -598,7 +593,6 @@ static int decode_gfx(UINT16 *pflookup, UINT16 *molookup)
 			}
 		}
 	}
-	return 1;
 }
 
 
@@ -646,8 +640,7 @@ static int get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (Machine->gfx[gfx_index] == NULL)
 			break;
-	if (gfx_index == MAX_GFX_ELEMENTS)
-		return -1;
+	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* tweak the structure for the number of bitplanes we have */
 	objlayout.planes = bpp;

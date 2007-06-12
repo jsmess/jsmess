@@ -44,8 +44,8 @@ VIDEO_START( xexex )
 	K054338_vh_start();
 	K053250_vh_start(1, &region);
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, xexex_tile_callback, 0)) return 1;
-	if (K053247_vh_start(REGION_GFX2, -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback)) return 1;
+	K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
+	K053247_vh_start(REGION_GFX2, -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);
 
 	// Xexex has relative plane offsets of -2,2,4,6 vs. -2,0,2,3 in MW and GX.
 	K056832_set_LayerOffset(0, -2, 16);
@@ -56,8 +56,6 @@ VIDEO_START( xexex )
 	K053250_set_LayerOffset(0, -5,-16);
 
 	K054338_invert_alpha(0);
-
-	return 0;
 }
 
 /* useful function to sort the four tile layers by priority order */

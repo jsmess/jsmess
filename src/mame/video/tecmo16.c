@@ -82,8 +82,6 @@ VIDEO_START( fstarfrc )
 	tilemap_set_scrolly(tx_tilemap,0,-16);
 	flipscreen = 0;
 	game_is_riot = 0;
-
-	return 0;
 }
 
 VIDEO_START( ginkun )
@@ -104,8 +102,6 @@ VIDEO_START( ginkun )
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	flipscreen = 0;
 	game_is_riot = 0;
-
-	return 0;
 }
 
 VIDEO_START( riot )
@@ -127,8 +123,6 @@ VIDEO_START( riot )
 	tilemap_set_scrolldy(tx_tilemap,-16,-16);
 	flipscreen = 0;
 	game_is_riot = 1;
-
-	return 0;
 }
 
 /******************************************************************************/

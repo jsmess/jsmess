@@ -63,8 +63,8 @@ Mario Lemeux Hockey     171-5782    837-6963-59       610-0239-59          MPR-1
 #include "rendlay.h"
 
 /* Megatech BIOS specific */
-static unsigned int bios_port_ctrl;
-unsigned int bios_ctrl_inputs;
+static UINT32 bios_port_ctrl;
+UINT32 bios_ctrl_inputs;
 
 #define MASTER_CLOCK		53693100
 
@@ -274,8 +274,8 @@ ADDRESS_MAP_END
 
 
 /* basically from src/drivers/segasyse.c */
-unsigned char segae_vdp_ctrl_r ( UINT8 chip );
-unsigned char segae_vdp_data_r ( UINT8 chip );
+UINT8 segae_vdp_ctrl_r ( UINT8 chip );
+UINT8 segae_vdp_data_r ( UINT8 chip );
 void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
 void segae_vdp_data_w ( UINT8 chip, UINT8 data );
 

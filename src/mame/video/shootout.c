@@ -6,7 +6,7 @@
 #include "driver.h"
 
 static tilemap *background, *foreground;
-extern unsigned char *shootout_textram;
+extern UINT8 *shootout_textram;
 
 
 PALETTE_INIT( shootout )
@@ -34,7 +34,7 @@ PALETTE_INIT( shootout )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -75,7 +75,6 @@ VIDEO_START( shootout ){
 	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 	foreground = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
 		tilemap_set_transparent_pen( foreground, 0 );
-		return 0;
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int bank_bits ){

@@ -12,9 +12,9 @@ Is this a Konami board?
 
 static int dataoffset=0;
 
-extern unsigned char *goldstar_video1, *goldstar_video2, *goldstar_video3;
+extern UINT8 *goldstar_video1, *goldstar_video2, *goldstar_video3;
 extern size_t goldstar_video_size;
-extern unsigned char *goldstar_scroll1, *goldstar_scroll2, *goldstar_scroll3;
+extern UINT8 *goldstar_scroll1, *goldstar_scroll2, *goldstar_scroll3;
 
 WRITE8_HANDLER( goldstar_video1_w );
 WRITE8_HANDLER( goldstar_video2_w );
@@ -24,7 +24,7 @@ VIDEO_START( goldstar );
 VIDEO_UPDATE( goldstar );
 
 
-static unsigned char *nvram;
+static UINT8 *nvram;
 static size_t nvram_size;
 
 static NVRAM_HANDLER( goldstar )

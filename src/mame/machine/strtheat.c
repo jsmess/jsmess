@@ -25,7 +25,7 @@ static void strtheat_decrypt_rom_8(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 
@@ -58,7 +58,7 @@ static void strtheat_decrypt_rom_9(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 
@@ -90,7 +90,7 @@ static void strtheat_decrypt_rom_A(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 
@@ -122,7 +122,7 @@ static void strtheat_decrypt_rom_B(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 

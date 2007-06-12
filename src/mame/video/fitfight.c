@@ -109,9 +109,6 @@ VIDEO_START(fitfight)
 
 	fof_txt_tilemap = tilemap_create(get_fof_txt_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,128, 32);
 	tilemap_set_transparent_pen(fof_txt_tilemap,0);
-
-
-	return 0;
 }
 
 VIDEO_UPDATE(fitfight)

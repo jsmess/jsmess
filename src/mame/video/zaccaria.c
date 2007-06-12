@@ -71,7 +71,7 @@ PALETTE_INIT( zaccaria )
          */
 		if (((i % 64) / 8) == 0)
 		{
-			palette_set_color(machine,i,0,0,0);
+			palette_set_color(machine,i,MAKE_RGB(0,0,0));
 		}
 		else
 		{
@@ -89,7 +89,7 @@ PALETTE_INIT( zaccaria )
 			bit0 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
 			bit1 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
 			b = 0x66 * bit0 + 0x96 * bit1;
-			palette_set_color(machine,i,r,g,b);
+			palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		}
 
 		color_prom++;
@@ -133,7 +133,7 @@ PALETTE_INIT( zaccaria )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	unsigned char attr = zaccaria_videoram[tile_index + 0x400];
+	UINT8 attr = zaccaria_videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
 			zaccaria_videoram[tile_index] + ((attr & 0x03) << 8),
@@ -154,8 +154,6 @@ VIDEO_START( zaccaria )
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap,32);
-
-	return 0;
 }
 
 

@@ -122,8 +122,6 @@ VIDEO_START( prosoccr )
 	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_START( boomrang )
@@ -133,8 +131,6 @@ VIDEO_START( boomrang )
 
 	tilemap_set_transmask(background_tilemap,0,0x0001,0x007e); /* Bottom 1 pen/Top 7 pens */
 	tilemap_set_transparent_pen(fix_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_START( liberate )
@@ -143,8 +139,6 @@ VIDEO_START( liberate )
 	fix_tilemap = tilemap_create(get_fix_tile_info,fix_scan,TILEMAP_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
-
-	return 0;
 }
 
 /***************************************************************************/
@@ -180,9 +174,9 @@ PALETTE_INIT( liberate )
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		color_prom++;
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
-	palette_set_color(machine,32,0,0,0); /* Allocate black for when no background is displayed */
+	palette_set_color(machine,32,MAKE_RGB(0,0,0)); /* Allocate black for when no background is displayed */
 }
 
 /***************************************************************************/

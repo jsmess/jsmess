@@ -64,7 +64,7 @@ WRITE16_HANDLER( unico_palette_w )
 	COMBINE_DATA(&paletteram16[offset]);
 	data1 = paletteram16[offset & ~1];
 	data2 = paletteram16[offset |  1];
-	palette_set_color( Machine,offset/2,
+	palette_set_color_rgb( Machine,offset/2,
 		 (data1 >> 8) & 0xFC,
 		 (data1 >> 0) & 0xFC,
 		 (data2 >> 8) & 0xFC	);
@@ -73,7 +73,7 @@ WRITE16_HANDLER( unico_palette_w )
 WRITE32_HANDLER( unico_palette32_w )
 {
 	UINT32 rgb0 = COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color( Machine,offset,
+	palette_set_color_rgb( Machine,offset,
 		 (rgb0 >> 24) & 0xFC,
 		 (rgb0 >> 16) & 0xFC,
 		 (rgb0 >>  8) & 0xFC	);
@@ -163,7 +163,6 @@ VIDEO_START( unico )
 	tilemap_set_transparent_pen(tilemap_0,0x00);
 	tilemap_set_transparent_pen(tilemap_1,0x00);
 	tilemap_set_transparent_pen(tilemap_2,0x00);
-	return 0;
 }
 
 VIDEO_START( zeropnt2 )
@@ -191,7 +190,6 @@ VIDEO_START( zeropnt2 )
 	tilemap_set_transparent_pen(tilemap_0,0x00);
 	tilemap_set_transparent_pen(tilemap_1,0x00);
 	tilemap_set_transparent_pen(tilemap_2,0x00);
-	return 0;
 }
 
 

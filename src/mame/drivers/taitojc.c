@@ -405,7 +405,7 @@ static WRITE32_HANDLER( taitojc_palette_w )
 	g = (color >> 16) & 0xff;
 	b = (color >>  0) & 0xff;
 
-	palette_set_color(Machine,offset, r, g, b);
+	palette_set_color(Machine,offset, MAKE_RGB(r, g, b));
 }
 
 static READ32_HANDLER ( jc_control_r )

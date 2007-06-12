@@ -70,8 +70,7 @@ VIDEO_START(polygonet_vh_start)
 		if (machine->gfx[ttl_gfx_index] == 0)
 			break;
 
-	if (ttl_gfx_index == MAX_GFX_ELEMENTS)
-		return 1;
+	assert(ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
 	machine->gfx[ttl_gfx_index] = allocgfx(&charlayout);
@@ -94,8 +93,6 @@ VIDEO_START(polygonet_vh_start)
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
 	state_save_register_global_array(ttl_vram);
-
-	return 0;
 }
 
 VIDEO_UPDATE(polygonet_vh_screenrefresh)

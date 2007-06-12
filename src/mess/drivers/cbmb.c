@@ -732,7 +732,7 @@ static gfx_decode cbm700_gfxdecodeinfo[] =
 
 static PALETTE_INIT( cbm700 )
 {
-	palette_set_colors(machine, 0, cbm700_palette, sizeof(cbm700_palette) / 3);
+	palette_set_colors_rgb(machine, 0, cbm700_palette, sizeof(cbm700_palette) / 3);
     memcpy(colortable,cbmb_colortable,sizeof(cbmb_colortable));
 }
 

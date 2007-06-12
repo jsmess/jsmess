@@ -92,11 +92,8 @@ VIDEO_START( apple1 )
 		8,			/* use 8 bits for the character code */
 		apple1_getcursorcode,
 		40, 24);	/* 40 columns, 24 rows */
-	if (!apple1_terminal)
-		return 1;
 
 	terminal_setcursor(apple1_terminal, 0, 0);
-	return 0;
 }
 
 /* This function handles all writes to the video display. */

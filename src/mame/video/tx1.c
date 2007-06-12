@@ -50,7 +50,6 @@ VIDEO_START( tx1 )
 {
 	tx1_tilemap = tilemap_create(get_tx1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,128,64);
 	tilemap_set_transparent_pen(tx1_tilemap,0xff);
-	return 0;
 }
 
 VIDEO_UPDATE( tx1 )
@@ -117,7 +116,7 @@ PALETTE_INIT( buggyboy )
 		bit4 = (color_prom[i+0x300]) & 1;
                 b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 
@@ -347,7 +346,6 @@ VIDEO_START( buggyb1 )
 {
 	buggyb1_tilemap = tilemap_create(get_buggyb1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,64,64);
         tilemap_set_transparent_pen(buggyb1_tilemap, 0);
-	return 0;
 }
 
 
@@ -355,7 +353,6 @@ VIDEO_START( buggyboy )
 {
 	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,128,64);
         tilemap_set_transparent_pen(buggyboy_tilemap, 0);
-	return 0;
 }
 
 

@@ -45,7 +45,7 @@ static struct tms34061_interface tms34061intf =
 VIDEO_START( capbowl )
 {
 	/* initialize TMS34061 emulation */
-    return tms34061_start(&tms34061intf);
+    tms34061_start(&tms34061intf);
 }
 
 
@@ -181,7 +181,7 @@ VIDEO_UPDATE( capbowl )
 		/* first update the palette for this scanline */
 		for (x = 0; x < 16; x++)
 		{
-			palette_set_color(machine, ybase + x, pal4bit(src[0]), pal4bit(src[1] >> 4), pal4bit(src[1]));
+			palette_set_color_rgb(machine, ybase + x, pal4bit(src[0]), pal4bit(src[1] >> 4), pal4bit(src[1]));
 			src += 2;
 		}
 

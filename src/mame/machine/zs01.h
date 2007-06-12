@@ -12,7 +12,7 @@
 typedef void (*zs01_write_handler)( int pin, int value );
 typedef int (*zs01_read_handler)( int pin );
 
-extern void zs01_init( int chip, unsigned char *data, zs01_write_handler write, zs01_read_handler read, unsigned char *ds2401 );
+extern void zs01_init( int chip, UINT8 *data, zs01_write_handler write, zs01_read_handler read, UINT8 *ds2401 );
 extern void zs01_cs_write( int chip, int cs );
 extern void zs01_rst_write( int chip, int rst );
 extern void zs01_scl_write( int chip, int scl );

@@ -68,7 +68,6 @@ static int nAyCtrl, nAyData;
 
 VIDEO_START(mirax)
 {
-	return 0;
 }
 
 

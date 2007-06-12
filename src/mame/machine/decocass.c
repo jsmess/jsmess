@@ -1572,7 +1572,7 @@ static void decocass_state_save_postload(void)
 #if 0
 	/* fix me - this won't work anymore */
 	int A;
-	unsigned char *mem = memory_region(REGION_CPU1);
+	UINT8 *mem = memory_region(REGION_CPU1);
 	int diff = memory_region_length(REGION_CPU1) / 2;
 
 	memory_set_opcode_base(0, mem + diff);

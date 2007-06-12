@@ -13,7 +13,7 @@ J Clegg
 
 #include "driver.h"
 
-unsigned char *travrusa_videoram;
+UINT8 *travrusa_videoram;
 
 static tilemap *bg_tilemap;
 
@@ -71,7 +71,7 @@ PALETTE_INIT( travrusa )
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 256;
@@ -98,7 +98,7 @@ PALETTE_INIT( travrusa )
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+128,r,g,b);
+		palette_set_color(machine,i+128,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 32;
@@ -139,7 +139,7 @@ PALETTE_INIT( shtrider )
 		bit2 = (color_prom[i+256] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 512;
@@ -167,7 +167,7 @@ PALETTE_INIT( shtrider )
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+128,r,g,b);
+		palette_set_color(machine,i+128,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 32;
@@ -188,7 +188,7 @@ PALETTE_INIT( shtrider )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	unsigned char attr = travrusa_videoram[2*tile_index+1];
+	UINT8 attr = travrusa_videoram[2*tile_index+1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
 
 	if ((attr & 0x0f) == 0x0f) flags |= TILE_SPLIT(1);	/* tunnels */
@@ -216,8 +216,6 @@ VIDEO_START( travrusa )
 	tilemap_set_transmask(bg_tilemap,1,0x3f,0xc0); /* split type 1 has pens 6 and 7 opaque - tunnels */
 
 	tilemap_set_scroll_rows(bg_tilemap,4);
-
-	return 0;
 }
 
 

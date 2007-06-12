@@ -9,7 +9,7 @@ UINT16 *gradius3_gfxram;
 int gradius3_priority;
 static int layer_colorbase[3],sprite_colorbase;
 static int dirtygfx;
-static unsigned char *dirtychar;
+static UINT8 *dirtychar;
 
 
 
@@ -81,10 +81,8 @@ VIDEO_START( gradius3 )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 48;
 	sprite_colorbase = 16;
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,gradius3_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,gradius3_sprite_callback))
-		return 1;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,gradius3_tile_callback);
+	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,gradius3_sprite_callback);
 
 	K052109_set_layer_offsets(2, -2, 0);
 	K051960_set_sprite_offsets(2, 0);
@@ -96,8 +94,6 @@ VIDEO_START( gradius3 )
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
-
-	return 0;
 }
 
 

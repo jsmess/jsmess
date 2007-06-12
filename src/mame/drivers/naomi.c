@@ -439,7 +439,6 @@ Naomi 2 / GD-ROM             |           |              |
 
 static VIDEO_START(naomi)
 {
-	return 0;
 }
 
 static VIDEO_UPDATE(naomi)

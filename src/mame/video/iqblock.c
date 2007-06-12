@@ -52,8 +52,6 @@ VIDEO_START( iqblock )
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_scroll_cols(fg_tilemap,64);
-
-	return 0;
 }
 
 

@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "video/konamiic.h"
 
-unsigned char *labyrunr_videoram1,*labyrunr_videoram2,*labyrunr_scrollram;
+UINT8 *labyrunr_videoram1,*labyrunr_videoram2,*labyrunr_scrollram;
 static tilemap *layer0, *layer1;
 static rectangle clip0, clip1;
 
@@ -108,8 +108,6 @@ VIDEO_START( labyrunr )
 	clip1.min_x = 0;
 
 	tilemap_set_scroll_cols(layer0,32);
-
-	return 0;
 }
 
 

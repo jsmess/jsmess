@@ -34,7 +34,7 @@ static void setcolor(int color,int rgb)
 	bit3 = (rgb >> 11) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(Machine,color,r,g,b);
+	palette_set_color(Machine,color,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( blockout_paletteram_w )
@@ -62,8 +62,6 @@ VIDEO_START( blockout )
 {
 	/* Allocate temporary bitmaps */
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-	return 0;
 }
 
 

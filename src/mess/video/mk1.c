@@ -21,7 +21,7 @@ static unsigned short mk1_colortable[] =
 
 PALETTE_INIT( mk1 )
 {
-	palette_set_colors(machine, 0, mk1_palette, sizeof(mk1_palette) / 3);
+	palette_set_colors_rgb(machine, 0, mk1_palette, sizeof(mk1_palette) / 3);
 	memcpy(colortable, mk1_colortable, sizeof(mk1_colortable));
 }
 
@@ -30,7 +30,6 @@ VIDEO_START( mk1 )
 	/* artwork seams to need this */
     videoram_size = 6 * 2 + 24;
     videoram = (UINT8*)auto_malloc (videoram_size);
-	return 0;
 }
 
 UINT8 mk1_led[4]= {0};

@@ -20,9 +20,8 @@ UINT8 tiamc1_layers_ctrl;
 UINT8 tiamc1_bg_vshift;
 UINT8 tiamc1_bg_hshift;
 
-UINT8 tiamc1_colormap[16];
-
 static tilemap *bg_tilemap1, *bg_tilemap2;
+static rgb_t *palette;
 
 WRITE8_HANDLER( tiamc1_videoram_w )
 {
@@ -82,16 +81,9 @@ WRITE8_HANDLER( tiamc1_bg_hshift_w ) {
 	tiamc1_bg_hshift = data;
 }
 
-#define COLOR(gfxn,offs) (Machine->gfx[gfxn]->colortable[Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 WRITE8_HANDLER( tiamc1_palette_w )
 {
-	COLOR(0, offset) = data;
-	COLOR(1, offset) = data;
-
-	tiamc1_colormap[offset] = data;
-
-	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	palette_set_color(Machine, offset, palette[data]);
 }
 
 PALETTE_INIT( tiamc1 )
@@ -110,6 +102,8 @@ PALETTE_INIT( tiamc1 )
 	int r, g, b, ir, ig, ib;
 	float tcol;
 
+	palette = auto_malloc(256 * sizeof(*palette));
+
 	for (col = 0; col < 256; col++) {
 		ir = (col >> 3) & 7;
 		ig = col & 7;
@@ -121,7 +115,7 @@ PALETTE_INIT( tiamc1 )
 		tcol = 255.0f * b_v[ib] / b_v[0];
 		b = 255 - (((int)tcol) & 255);
 
-		palette_set_color(machine,col,r,g,b);
+		palette[col] = MAKE_RGB(r,g,b);
 	}
 }
 
@@ -145,16 +139,6 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	SET_TILE_INFO(0, code, 0, 0)
 }
 
-static void restore_colormap(void)
-{
-	int i;
-
-	for (i = 0; i < 16; i++) {
-		COLOR(0, i) = tiamc1_colormap[i];
-		COLOR(1, i) = tiamc1_colormap[i];
-	}
-}
-
 VIDEO_START( tiamc1 )
 {
 	bg_tilemap1 = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,
@@ -169,11 +153,6 @@ VIDEO_START( tiamc1 )
 	state_save_register_global(tiamc1_layers_ctrl);
 	state_save_register_global(tiamc1_bg_vshift);
 	state_save_register_global(tiamc1_bg_hshift);
-	state_save_register_global_pointer(tiamc1_colormap, 16);
-
-	state_save_register_func_postload(restore_colormap);
-
-	return 0;
 }
 
 static void tiamc1_draw_sprites( mame_bitmap *bitmap )

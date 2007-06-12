@@ -87,7 +87,7 @@ PALETTE_INIT( galivan )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -214,8 +214,6 @@ VIDEO_START( galivan )
 	state_save_register_global(flipscreen);
 	state_save_register_global(write_layers);
 	state_save_register_global(layers);
-
-	return 0;
 }
 
 VIDEO_START( ninjemak )
@@ -234,8 +232,6 @@ VIDEO_START( ninjemak )
 	state_save_register_global_array(scrolly);
 	state_save_register_global(flipscreen);
 	state_save_register_global(ninjemak_dispdisable);
-
-	return 0;
 }
 
 

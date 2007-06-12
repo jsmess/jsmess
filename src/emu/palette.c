@@ -442,7 +442,7 @@ void palette_config(running_machine *machine)
 		{
 			/* refresh the palette to support shadows in static palette games */
 			for (i = 0; i < machine->drv->total_colors; i++)
-				palette_set_color(machine, i, RGB_RED(palette->raw_color[i]), RGB_GREEN(palette->raw_color[i]), RGB_BLUE(palette->raw_color[i]));
+				palette_set_color(machine, i, palette->raw_color[i]);
 
 			/* map the UI pens */
 			if (palette->total_colors_with_ui <= 65534)
@@ -834,26 +834,11 @@ static void palette_reset(void)
     entry
 -------------------------------------------------*/
 
-void palette_set_color(running_machine *machine, pen_t pen, UINT8 r, UINT8 g, UINT8 b)
+void palette_set_color(running_machine *machine, pen_t pen, rgb_t rgb)
 {
 	palette_private *palette = machine->palette_data;
 	assert(pen < palette->total_colors);
-	internal_modify_pen(machine, palette, pen, MAKE_RGB(r, g, b), palette->pen_brightness[pen]);
-}
-
-
-/*-------------------------------------------------
-    palette_set_colors - set multiple palette
-    entries from an array of RGB triples
--------------------------------------------------*/
-
-void palette_set_colors(running_machine *machine, pen_t color_base, const UINT8 *colors, int color_count)
-{
-	while (color_count--)
-	{
-		palette_set_color(machine, color_base++, colors[0], colors[1], colors[2]);
-		colors += 3;
-	}
+	internal_modify_pen(machine, palette, pen, rgb, palette->pen_brightness[pen]);
 }
 
 

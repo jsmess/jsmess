@@ -215,7 +215,7 @@ static unsigned short comquest_colortable[1][2] = {
 
 static PALETTE_INIT( comquest )
 {
-	palette_set_colors(machine, 0, comquest_palette, sizeof(comquest_palette) / 3);
+	palette_set_colors_rgb(machine, 0, comquest_palette, sizeof(comquest_palette) / 3);
 	memcpy(colortable, comquest_colortable,sizeof(comquest_colortable));
 }
 

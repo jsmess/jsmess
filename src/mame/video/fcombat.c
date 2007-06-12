@@ -80,7 +80,7 @@ PALETTE_INIT( fcombat )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -116,7 +116,7 @@ PALETTE_INIT( fcombat )
 VIDEO_START( fcombat )
 {
 	bgmap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 16, 16,32*8*2,32);
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 

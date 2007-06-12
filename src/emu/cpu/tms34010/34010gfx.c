@@ -1106,7 +1106,7 @@ static void FUNCTION_NAME(pixblt)(int src_is_linear, int dst_is_linear)
 			readwrites++;
 
 			/* fetch the initial dest word */
-			if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY)
+			if (PIXEL_OP_REQUIRES_SOURCE || TRANSPARENCY || (daddr & 0x0f) != 0)
 			{
 				dstword = (*word_read)(dstwordaddr << 1);
 				readwrites++;
@@ -1163,6 +1163,15 @@ static void FUNCTION_NAME(pixblt)(int src_is_linear, int dst_is_linear)
 			/* flush any remaining words */
 			if (dstbit > 0)
 			{
+				/* if we're right-partial, read and mask the remaining bits */
+				if (dstbit != 16)
+				{
+					UINT16 origdst = (*word_read)(dstwordaddr << 1);
+					UINT16 mask = 0xffff << dstbit;
+					dstword = (dstword & ~mask) | (origdst & mask);
+					readwrites++;
+				}
+
 				(*word_write)(dstwordaddr++ << 1, dstword);
 				readwrites++;
 			}

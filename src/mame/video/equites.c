@@ -28,7 +28,7 @@ extern int equites_id, equites_flip;
 
 static tilemap *charmap0, *charmap1, *activecharmap, *inactivecharmap;
 static UINT16 *defcharram, *charram0, *charram1, *activecharram, *inactivecharram;
-static unsigned char *dirtybuf;
+static UINT8 *dirtybuf;
 static int maskwidth, maskheight, maskcolor;
 static int scrollx, scrolly;
 static int bgcolor[4];
@@ -82,7 +82,7 @@ PALETTE_INIT( equites )
 
 	for (i=0; i<256; i++)
 	{
-		palette_set_color(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
+		palette_set_color_rgb(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
 		colortable[i] = i;
 	}
 
@@ -112,8 +112,6 @@ VIDEO_START( equites )
 	tilemap_set_scrolldy(charmap0, BMPAD, BMPAD);
 
 	video_init_common();
-
-	return (0);
 }
 
 // Splendor Blast Hardware
@@ -124,7 +122,7 @@ PALETTE_INIT( splndrbt )
 
 	for (i=0; i<0x100; i++)
 	{
-		palette_set_color(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
+		palette_set_color_rgb(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
 		colortable[i] = (i & 3 || (i > 0x3f && i < 0x80) || i > 0xbf) ? i : 0;
 
 	}
@@ -215,7 +213,7 @@ VIDEO_START( splndrbt )
 {
 #define BMW (1<<BMW_l2)
 
-	unsigned char *buf8ptr;
+	UINT8 *buf8ptr;
 	int i;
 
 	assert(machine->screen[0].format == BITMAP_FORMAT_INDEXED16);
@@ -250,8 +248,6 @@ VIDEO_START( splndrbt )
 
 	video_init_common();
 	splndrbt_video_reset();
-
-	return (0);
 }
 
 MACHINE_RESET( splndrbt )

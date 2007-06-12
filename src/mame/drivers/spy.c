@@ -38,7 +38,7 @@ static INTERRUPT_GEN( spy_interrupt )
 
 
 static int rambank,pmcbank;
-static unsigned char *ram;
+static UINT8 *ram;
 
 static READ8_HANDLER( spy_bankedram1_r )
 {
@@ -153,7 +153,7 @@ this is the data written to internal ram on startup:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 	int offs;
 
 	/* bit 0 = RAM bank? */

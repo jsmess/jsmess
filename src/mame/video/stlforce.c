@@ -193,6 +193,4 @@ VIDEO_START( stlforce )
 	tilemap_set_scroll_rows(stlforce_bg_tilemap, 256);
 	tilemap_set_scroll_rows(stlforce_mlow_tilemap, 256);
 	tilemap_set_scroll_rows(stlforce_mhigh_tilemap, 256);
-
-	return 0;
 }

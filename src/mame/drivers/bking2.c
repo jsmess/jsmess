@@ -87,7 +87,7 @@ static WRITE8_HANDLER( bk3_h_w)
 
 static READ8_HANDLER( bk3_r )
 {
-	unsigned char *rom = memory_region(REGION_USER2);
+	UINT8 *rom = memory_region(REGION_USER2);
 	return rom[bk3_h*256+bk3_l];
 }
 
@@ -116,7 +116,7 @@ Todo:
 \-How to handle the reads at port($6f)?
 \-In-depth game untested.
 */
-static unsigned char mcu_val;
+static UINT8 mcu_val;
 
 static WRITE8_HANDLER( mcu_data_w )
 {

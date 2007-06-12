@@ -48,7 +48,6 @@
 
 VIDEO_START(cd32)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(cd32)

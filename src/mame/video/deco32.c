@@ -137,7 +137,7 @@ static void updateAceRam(void)
 			r = (UINT8)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
 		}
 
-		palette_set_color(Machine,i,r,g,b);
+		palette_set_color(Machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -156,7 +156,7 @@ WRITE32_HANDLER( deco32_nonbuffered_palette_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	r = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE32_HANDLER( deco32_buffered_palette_w )
@@ -184,7 +184,7 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 				g = (paletteram32[i] >> 8) & 0xff;
 				r = (paletteram32[i] >> 0) & 0xff;
 
-				palette_set_color(Machine,i,r,g,b);
+				palette_set_color(Machine,i,MAKE_RGB(r,g,b));
 			}
 		}
 	}
@@ -344,7 +344,7 @@ static void fghthist_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
     colour/alpha/priority.
 */
 void deco32_drawsprite(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int priority,int flipx,int flipy,int sx,int sy,
+		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip)
 {
 	int ox,oy,cx,cy;
@@ -455,7 +455,7 @@ static void nslasher_drawsprites(mame_bitmap *bitmap, const UINT32 *spritedata, 
 }
 
 INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
 		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height )
 {
@@ -963,8 +963,6 @@ VIDEO_START( captaven )
 	deco32_pf2_colourbank=16;
 	deco32_pf4_colourbank=0;
 	has_ace_ram=0;
-
-	return 0;
 }
 
 VIDEO_START( fghthist )
@@ -976,8 +974,7 @@ VIDEO_START( fghthist )
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
-	if (!deco_allocate_sprite_bitmap())
-		return 1;
+	deco_allocate_sprite_bitmap();
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -987,8 +984,6 @@ VIDEO_START( fghthist )
 	deco32_raster_display_list=0;
 	deco32_pf2_colourbank=deco32_pf4_colourbank=0;
 	has_ace_ram=0;
-
-	return 0;
 }
 
 VIDEO_START( dragngun )
@@ -1012,8 +1007,6 @@ VIDEO_START( dragngun )
 	alpha_set_level(0x80);
 	state_save_register_global(dragngun_sprite_ctrl);
 	has_ace_ram=0;
-
-	return 0;
 }
 
 VIDEO_START( lockload )
@@ -1038,8 +1031,6 @@ VIDEO_START( lockload )
 	alpha_set_level(0x80);
 	state_save_register_global(dragngun_sprite_ctrl);
 	has_ace_ram=0;
-
-	return 0;
 }
 
 VIDEO_START( nslasher )
@@ -1066,8 +1057,6 @@ VIDEO_START( nslasher )
 	state_save_register_global(deco32_pri);
 	alpha_set_level(0x80);
 	has_ace_ram=1;
-
-	return 0;
 }
 
 /******************************************************************************/

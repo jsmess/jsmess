@@ -123,7 +123,6 @@ VIDEO_START(pturn)
 	tilemap_set_transparent_pen(pturn_fgmap,0);
 	pturn_bgmap = tilemap_create(get_pturn_bg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32*8);
 	tilemap_set_transparent_pen(pturn_bgmap,0);
-	return 0;
 }
 
 VIDEO_UPDATE(pturn)

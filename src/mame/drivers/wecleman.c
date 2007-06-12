@@ -1279,13 +1279,13 @@ void wecleman_unpack_sprites(void)
 {
 	const int region       = REGION_GFX1;	// sprites
 
-	const unsigned int len = memory_region_length(region);
-	unsigned char *src     = memory_region(region) + len / 2 - 1;
-	unsigned char *dst     = memory_region(region) + len - 1;
+	const UINT32 len = memory_region_length(region);
+	UINT8 *src     = memory_region(region) + len / 2 - 1;
+	UINT8 *dst     = memory_region(region) + len - 1;
 
 	while(dst > src)
 	{
-		unsigned char data = *src--;
+		UINT8 data = *src--;
 		if( (data&0xf0) == 0xf0 ) data &= 0x0f;
 		if( (data&0x0f) == 0x0f ) data &= 0xf0;
 		*dst-- = data & 0xF;    *dst-- = data >> 4;
@@ -1312,7 +1312,7 @@ static void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _1
 DRIVER_INIT( wecleman )
 {
 	int i;
-	unsigned char *RAM;
+	UINT8 *RAM;
 //  UINT16 *RAM1 = (UINT16 *) memory_region(REGION_CPU1);   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
@@ -1405,20 +1405,20 @@ ROM_END
 
 void hotchase_sprite_decode( int num16_banks, int bank_size )
 {
-	unsigned char *base, *temp;
+	UINT8 *base, *temp;
 	int i;
 
 	base = memory_region(REGION_GFX1);	// sprites
 	temp = malloc_or_die( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
-		unsigned char *finish   = base + 2*bank_size*i;
-		unsigned char *dest     = finish - 2*bank_size;
+		UINT8 *finish   = base + 2*bank_size*i;
+		UINT8 *dest     = finish - 2*bank_size;
 
-		unsigned char *p1 = temp;
-		unsigned char *p2 = temp+bank_size/2;
+		UINT8 *p1 = temp;
+		UINT8 *p2 = temp+bank_size/2;
 
-		unsigned char data;
+		UINT8 data;
 
 		memcpy (temp, base+bank_size*(i-1), bank_size);
 
@@ -1456,7 +1456,7 @@ DRIVER_INIT( hotchase )
 //  UINT16 *RAM1 = (UINT16) memory_region(REGION_CPU1); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	/* Decode GFX Roms */
 

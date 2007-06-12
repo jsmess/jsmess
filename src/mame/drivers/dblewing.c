@@ -140,13 +140,10 @@ static int dblewing_bank_callback(const int bank)
 
 VIDEO_START(dblewing)
 {
-	if (deco16_1_video_init())
-		return 1;
+	deco16_1_video_init();
 
 	deco16_set_tilemap_bank_callback(0,dblewing_bank_callback);
 	deco16_set_tilemap_bank_callback(1,dblewing_bank_callback);
-
-	return 0;
 }
 
 VIDEO_UPDATE(dblewing)

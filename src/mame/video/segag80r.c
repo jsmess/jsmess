@@ -114,7 +114,7 @@ static void g80_set_palette_entry(int entry, UINT8 data)
 	bit1 = (b >> 1) & 0x01;
 	b = combine_2_weights(bweights, bit0, bit1);
 
-	palette_set_color(Machine, entry, r, g, b);
+	palette_set_color(Machine, entry, MAKE_RGB(r, g, b));
 }
 
 
@@ -156,7 +156,7 @@ static void spaceod_bg_init_palette(running_machine *machine)
 		bit1 = (b >> 1) & 0x01;
 		b = combine_2_weights(tbweights, bit0, bit1);
 
-		palette_set_color(machine, 64 + i, r, g, b);
+		palette_set_color(machine, 64 + i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -261,8 +261,6 @@ VIDEO_START( segag80r )
 	state_save_register_global(bg_scrolly);
 
 	state_save_register_global(pignewt_bg_color_offset);
-
-	return 0;
 }
 
 

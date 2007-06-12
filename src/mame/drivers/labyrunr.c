@@ -15,7 +15,7 @@ Driver by Nicola Salmoria
 
 
 /* from video/labyrunr.c */
-extern unsigned char *labyrunr_videoram1,*labyrunr_videoram2,*labyrunr_scrollram;
+extern UINT8 *labyrunr_videoram1,*labyrunr_videoram2,*labyrunr_scrollram;
 PALETTE_INIT( labyrunr );
 WRITE8_HANDLER( labyrunr_vram1_w );
 WRITE8_HANDLER( labyrunr_vram2_w );
@@ -39,7 +39,7 @@ static INTERRUPT_GEN( labyrunr_interrupt )
 static WRITE8_HANDLER( labyrunr_bankswitch_w )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 if (data & 0xe0) popmessage("bankswitch %02x",data);
 

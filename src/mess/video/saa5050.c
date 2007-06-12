@@ -101,16 +101,14 @@ static	unsigned	short	saa5050_colortable[64 * 2] =	/* bgnd, fgnd */
 
 static PALETTE_INIT( saa5050 )
 {
-	palette_set_colors(machine, 0, saa5050_palette, sizeof(saa5050_palette) / 3);
+	palette_set_colors_rgb(machine, 0, saa5050_palette, sizeof(saa5050_palette) / 3);
 	memcpy(colortable, saa5050_colortable, sizeof (saa5050_colortable));
 }
 
 static VIDEO_START( saa5050 )
 {
 	frame_count = 0;
-	if( video_start_generic(machine) )
-		return 1;
-    return 0;
+	video_start_generic(machine);
 }
 
 static void saa5050_vh_callback (void)

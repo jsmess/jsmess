@@ -204,7 +204,7 @@ static pen_t *pen_table;
  *************************************/
 
 /* from jagobj.c */
-static int jagobj_init(void);
+static void jagobj_init(void);
 static void process_object_list(mame_bitmap *bitmap, const rectangle *cliprect);
 
 /* from jagblit.c */
@@ -371,7 +371,7 @@ void jaguar_set_palette(UINT16 vmode)
 		case 0x000:
 		{
 			/* set color 0 to black */
-			palette_set_color(Machine, colors++, 0, 0, 0);
+			palette_set_color(Machine, colors++, MAKE_RGB(0, 0, 0));
 
 			/* due to the way YCC colorspace maps onto RGB, there are multiple entries for black */
 			/* take advantage of this so we don't have to use all 64k colors */
@@ -386,7 +386,7 @@ void jaguar_set_palette(UINT16 vmode)
 				else
 				{
 					pen_table[i] = colors;
-					palette_set_color(Machine, colors++, r, g, b);
+					palette_set_color(Machine, colors++, MAKE_RGB(r, g, b));
 				}
 			}
 			break;
@@ -397,7 +397,7 @@ void jaguar_set_palette(UINT16 vmode)
 		case 0x107:
 		{
 			/* set color 0 to black */
-			palette_set_color(Machine, colors++, 0, 0, 0);
+			palette_set_color(Machine, colors++, MAKE_RGB(0, 0, 0));
 
 			/* due to the way YCC colorspace maps onto RGB, there are multiple entries for black */
 			/* take advantage of this so we don't have to use all 64k colors */
@@ -423,7 +423,7 @@ void jaguar_set_palette(UINT16 vmode)
 				else
 				{
 					pen_table[i] = colors;
-					palette_set_color(Machine, colors++, r, g, b);
+					palette_set_color(Machine, colors++, MAKE_RGB(r, g, b));
 				}
 			}
 			break;
@@ -433,9 +433,9 @@ void jaguar_set_palette(UINT16 vmode)
 		case 0x006:
 		{
 			/* we cheat a little here to squeeze into 65534 colors */
-			palette_set_color(Machine, colors++, 0,  0, 0);
-			palette_set_color(Machine, colors++, 0,  8, 0);
-			palette_set_color(Machine, colors++, 0, 16, 0);
+			palette_set_color(Machine, colors++, MAKE_RGB(0,  0, 0));
+			palette_set_color(Machine, colors++, MAKE_RGB(0,  8, 0));
+			palette_set_color(Machine, colors++, MAKE_RGB(0, 16, 0));
 			pen_table[0] = 0;
 			pen_table[1] = 1;
 			pen_table[2] = 1;
@@ -446,7 +446,7 @@ void jaguar_set_palette(UINT16 vmode)
 			for (i = 5; i < 65536; i++)
 			{
 				pen_table[i] = colors;
-				palette_set_color(Machine, colors++, pal5bit(i >> 11), pal6bit(i >> 0), pal5bit(i >> 6));
+				palette_set_color_rgb(Machine, colors++, pal5bit(i >> 11), pal6bit(i >> 0), pal5bit(i >> 6));
 			}
 			break;
 		}
@@ -728,8 +728,7 @@ READ32_HANDLER( cojag_gun_input_r )
 
 VIDEO_START( cojag )
 {
-	if (jagobj_init())
-		return 1;
+	jagobj_init();
 
 	pen_table = auto_malloc(65536 * sizeof(pen_t));
 
@@ -740,7 +739,6 @@ VIDEO_START( cojag )
 	state_save_register_global_array(gpu_regs);
 	state_save_register_global(cpu_irq_state);
 	state_save_register_func_postload(update_cpu_irq);
-	return 0;
 }
 
 

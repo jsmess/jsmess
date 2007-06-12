@@ -33,7 +33,7 @@ VIDEO_START( blockhl );
 VIDEO_UPDATE( blockhl );
 
 static int palette_selected;
-static unsigned char *ram;
+static UINT8 *ram;
 static int rombank;
 
 static INTERRUPT_GEN( blockhl_interrupt )
@@ -313,7 +313,7 @@ ROM_END
 
 static void blockhl_banking( int lines )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs;
 
 	/* bits 0-1 = ROM bank */
@@ -340,7 +340,7 @@ static void blockhl_banking( int lines )
 
 static MACHINE_RESET( blockhl )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)blockhl_banking);
 

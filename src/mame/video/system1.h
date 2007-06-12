@@ -15,13 +15,13 @@
 #define system1_BACKGROUND_MEMORY_SINGLE 0
 #define system1_BACKGROUND_MEMORY_BANKED 1
 
-extern unsigned char 	*system1_scroll_y;
-extern unsigned char 	*system1_scroll_x;
-extern unsigned char 	*system1_videoram;
-extern unsigned char 	*system1_backgroundram;
-extern unsigned char 	*system1_sprites_collisionram;
-extern unsigned char 	*system1_background_collisionram;
-extern unsigned char 	*system1_scrollx_ram;
+extern UINT8 	*system1_scroll_y;
+extern UINT8 	*system1_scroll_x;
+extern UINT8 	*system1_videoram;
+extern UINT8 	*system1_backgroundram;
+extern UINT8 	*system1_sprites_collisionram;
+extern UINT8 	*system1_background_collisionram;
+extern UINT8 	*system1_scrollx_ram;
 extern size_t system1_videoram_size;
 extern size_t system1_backgroundram_size;
 

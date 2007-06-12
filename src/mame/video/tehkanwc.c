@@ -98,8 +98,6 @@ VIDEO_START( tehkanwc )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 /*

@@ -105,8 +105,6 @@ VIDEO_START( bioship )
 	memset(spriteram_old2,0,spriteram_size);
 
 	videoshift =  0;	/* 256x224 screen, no shift */
-
-	return 0;
 }
 
 VIDEO_START( strahl )
@@ -125,7 +123,6 @@ VIDEO_START( strahl )
 
 	videoshift =  0;	/* 256x224 screen, no shift */
 	background_bitmap = NULL;
-	return 0;
 }
 
 VIDEO_START( macross )
@@ -142,8 +139,6 @@ VIDEO_START( macross )
 
 	videoshift =  0;	/* 256x224 screen, no shift */
 	background_bitmap = NULL;
-
-	return 0;
 }
 
 VIDEO_START( gunnail )
@@ -162,8 +157,6 @@ VIDEO_START( gunnail )
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
 	background_bitmap = NULL;
-
-	return 0;
 }
 
 VIDEO_START( macross2 )
@@ -181,7 +174,6 @@ VIDEO_START( macross2 )
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
 	background_bitmap = NULL;
-	return 0;
 }
 
 VIDEO_START( tdragon2 )
@@ -199,7 +191,6 @@ VIDEO_START( tdragon2 )
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
 	background_bitmap = NULL;
-	return 0;
 }
 
 VIDEO_START( bjtwin )
@@ -214,7 +205,6 @@ VIDEO_START( bjtwin )
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
 	background_bitmap = NULL;
-	return 0;
 }
 
 

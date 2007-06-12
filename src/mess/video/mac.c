@@ -17,8 +17,8 @@ static int screen_buffer;
 
 PALETTE_INIT( mac )
 {
-	palette_set_color(machine, 0, 0xff, 0xff, 0xff);
-	palette_set_color(machine, 1, 0x00, 0x00, 0x00);
+	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
 }
 
 
@@ -33,7 +33,6 @@ void mac_set_screen_buffer(int buffer)
 VIDEO_START( mac )
 {
 	screen_buffer = 0;
-	return 0;
 }
 
 

@@ -50,7 +50,6 @@ UINT8 discoboy_gfxbank;
 
 VIDEO_START( discoboy )
 {
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
@@ -119,7 +118,7 @@ VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(Machine, i/2, r, g, b);
+		palette_set_color(Machine, i/2, MAKE_RGB(r, g, b));
 	}
 
 	for (i=0;i<0x800;i+=2)
@@ -132,7 +131,7 @@ VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(Machine, (i/2)+0x400, r, g, b);
+		palette_set_color(Machine, (i/2)+0x400, MAKE_RGB(r, g, b));
 	}
 
 	fillbitmap(bitmap, 0x3ff, cliprect);
@@ -165,7 +164,7 @@ VIDEO_UPDATE( discoboy )
 
 void discoboy_setrombank(UINT8 data)
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	data &=0x2f;
 	memory_set_bankptr(1, &ROM[0x6000+(data*0x1000)] );
 }
@@ -184,7 +183,7 @@ static WRITE8_HANDLER( discoboy_port_00_w )
 
 static WRITE8_HANDLER( discoboy_port_01_w )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	int rombank;
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
@@ -507,7 +506,7 @@ MACHINE_DRIVER_END
 
 DRIVER_INIT( discoboy )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	discoboy_ram_part1 = auto_malloc(0x800);
 	discoboy_ram_part2 = auto_malloc(0x800);

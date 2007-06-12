@@ -77,8 +77,6 @@ VIDEO_START( bbuster )
 
 	tilemap_set_transparent_pen(pf1_tilemap, 15);
 	tilemap_set_transparent_pen(fix_tilemap, 15);
-
-	return 0;
 }
 
 VIDEO_START( mechatt )
@@ -89,8 +87,6 @@ VIDEO_START( mechatt )
 
 	tilemap_set_transparent_pen(pf1_tilemap, 15);
 	tilemap_set_transparent_pen(fix_tilemap, 15);
-
-	return 0;
 }
 
 /******************************************************************************/
@@ -110,7 +106,7 @@ VIDEO_START( mechatt )
 		else if (dy&0x40) code+=32;				\
 		else if (dx&0x40) code+=16
 
-INLINE const UINT8 *get_source_ptr(unsigned int sprite, int dx, int dy, int bank, int block)
+INLINE const UINT8 *get_source_ptr(UINT32 sprite, int dx, int dy, int bank, int block)
 {
 	const gfx_element *gfx=Machine->gfx[bank];
 	int source_base,code=0;
@@ -150,10 +146,10 @@ INLINE const UINT8 *get_source_ptr(unsigned int sprite, int dx, int dy, int bank
 	return gfx->gfxdata + ((source_base+(dy%16)) * gfx->line_modulo);
 }
 
-static void bbusters_draw_block(mame_bitmap *dest,int x,int y,int size,int flipx,int flipy,unsigned int sprite,int color,int bank,int block)
+static void bbusters_draw_block(mame_bitmap *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
 	const pen_t *pal = &Machine->gfx[bank]->colortable[Machine->gfx[bank]->color_granularity * (color % Machine->gfx[bank]->total_colors)];
-	unsigned int xinc=(scale_line_count * 0x10000 ) / size;
+	UINT32 xinc=(scale_line_count * 0x10000 ) / size;
 	UINT8 pixel;
 	int x_index;
 	int dy=y;

@@ -236,7 +236,6 @@ VIDEO_START( itech32 )
 	enable_latch[1] = (itech32_planes > 1) ? 1 : 0;
 
 	is_drivedge = 0;
-	return 0;
 }
 
 
@@ -350,7 +349,7 @@ WRITE16_HANDLER( timekill_paletteram_w )
 	g = paletteram16[offset & ~1] >> 8;
 	b = paletteram16[offset |  1] >> 8;
 
-	palette_set_color(Machine, offset / 2, r, g, b);
+	palette_set_color(Machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -367,7 +366,7 @@ WRITE16_HANDLER( bloodstm_paletteram_w )
 	g = paletteram16[offset & ~1] >> 8;
 	b = paletteram16[offset |  1] & 0xff;
 
-	palette_set_color(Machine, offset / 2, r, g, b);
+	palette_set_color(Machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -381,7 +380,7 @@ WRITE32_HANDLER( drivedge_paletteram_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 16) & 0xff;
 
-	palette_set_color(Machine, offset, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -395,7 +394,7 @@ WRITE32_HANDLER( itech020_paletteram_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = paletteram32[offset] & 0xff;
 
-	palette_set_color(Machine, offset, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
 }
 
 

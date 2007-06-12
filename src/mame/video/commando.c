@@ -94,8 +94,6 @@ VIDEO_START( commando )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 3);
-
-	return 0;
 }
 
 static void commando_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

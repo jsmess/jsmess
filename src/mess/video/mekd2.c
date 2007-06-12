@@ -30,7 +30,7 @@ PALETTE_INIT( mekd2 )
 	/* initialize 16 colors with shades of red (orange) */
 	for (i = 0; i < 16; i++)
 	{
-		palette_set_color(machine, i,
+		palette_set_color_rgb(machine, i,
 			24 + (i + 1) * (i + 1) - 1,
 			(i + 1) * (i + 1) / 4,
 			0);
@@ -39,11 +39,11 @@ PALETTE_INIT( mekd2 )
 		colortable[2 * i + 1] = i;
 	}
 
-	palette_set_color(machine, 16, 0, 0, 0);
-	palette_set_color(machine, 17, 30, 30, 30);
-	palette_set_color(machine, 18, 90, 90, 90);
-	palette_set_color(machine, 19, 50, 50, 50);
-	palette_set_color(machine, 20, 255, 255, 255);
+	palette_set_color_rgb(machine, 16, 0, 0, 0);
+	palette_set_color_rgb(machine, 17, 30, 30, 30);
+	palette_set_color_rgb(machine, 18, 90, 90, 90);
+	palette_set_color_rgb(machine, 19, 50, 50, 50);
+	palette_set_color_rgb(machine, 20, 255, 255, 255);
 
 	colortable[2 * 16 + 0 * 4 + 0] = 17;
 	colortable[2 * 16 + 0 * 4 + 1] = 18;
@@ -70,7 +70,7 @@ VIDEO_START( mekd2 )
 	}
 #endif
 
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 VIDEO_UPDATE( mekd2 )

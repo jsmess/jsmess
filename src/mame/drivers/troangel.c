@@ -41,7 +41,7 @@ New Tropical Angel:
 #include "driver.h"
 #include "audio/irem.h"
 
-extern unsigned char *troangel_scroll;
+extern UINT8 *troangel_scroll;
 WRITE8_HANDLER( troangel_flipscreen_w );
 PALETTE_INIT( troangel );
 VIDEO_UPDATE( troangel );

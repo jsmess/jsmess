@@ -878,7 +878,7 @@ static void sound_cpu_decrypt(void)
 
 static DRIVER_INIT( prosport )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int i;
 
 	/* Main cpu has the nibbles swapped */

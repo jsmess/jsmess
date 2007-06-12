@@ -87,7 +87,6 @@ ADDRESS_MAP_END
 
 VIDEO_START(sliver)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(sliver)

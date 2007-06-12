@@ -271,7 +271,6 @@ VIDEO_START(wheelfir)
 	wheelfir_tmp_bitmap[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	wheelfir_tmp_bitmap[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	wheelfir_tmp_bitmap[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	return 0;
 }
 
 static UINT8 wheelfir_palette[8192];
@@ -322,7 +321,7 @@ VIDEO_UPDATE(wheelfir)
 		r = wheelfir_palette[x];
 		g = wheelfir_palette[x+1];
 		b = wheelfir_palette[x+2];
-		palette_set_color(machine,x/3,r,g,b);
+		palette_set_color(machine,x/3,MAKE_RGB(r,g,b));
 
 	}
 

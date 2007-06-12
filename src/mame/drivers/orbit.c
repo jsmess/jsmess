@@ -258,8 +258,8 @@ static const gfx_decode orbit_gfx_decode_info[] =
 
 static PALETTE_INIT( orbit )
 {
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 1, 0xFF, 0xFF, 0xFF);
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 1, MAKE_RGB(0xFF, 0xFF, 0xFF));
 }
 
 

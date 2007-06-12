@@ -894,7 +894,6 @@ static  READ8_HANDLER(parallel_via_in_b)
 
 VIDEO_START( lisa )
 {
-	return 0;
 }
 
 /*

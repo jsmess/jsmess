@@ -90,8 +90,6 @@ VIDEO_START( qix )
 	state_save_register_global(vram_mask);
 	state_save_register_global(qix_palettebank);
 	state_save_register_global(leds);
-
-	return 0;
 }
 
 
@@ -263,7 +261,7 @@ WRITE8_HANDLER( qix_paletteram_w )
 	blue = table[(bits << 2) | intensity];
 
 	/* update the palette */
-	palette_set_color(Machine, offset, red, green, blue);
+	palette_set_color(Machine, offset, MAKE_RGB(red, green, blue));
 }
 
 

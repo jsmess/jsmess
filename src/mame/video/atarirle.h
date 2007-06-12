@@ -71,7 +71,7 @@ struct atarirle_desc
 ##########################################################################*/
 
 /* setup/shutdown */
-int atarirle_init(int map, const struct atarirle_desc *desc);
+void atarirle_init(int map, const struct atarirle_desc *desc);
 
 /* control handlers */
 void atarirle_control_w(int map, UINT8 bits);

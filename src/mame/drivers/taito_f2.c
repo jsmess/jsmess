@@ -5865,8 +5865,8 @@ ROM_END
 DRIVER_INIT( finalb )
 {
 	int i;
-	unsigned char data;
-	unsigned int offset;
+	UINT8 data;
+	UINT32 offset;
 	UINT8 *gfx = memory_region(REGION_GFX2);
 
 	offset = 0x100000;

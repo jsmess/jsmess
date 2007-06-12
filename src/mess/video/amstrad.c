@@ -103,85 +103,85 @@ static unsigned long Mode3Lookup[256];
 /* The Amstrad CPC has a fixed palette of 27 colours generated from 3 levels of Red, Green and Blue.
 The hardware allows selection of 32 colours, but these extra colours are copies of existing colours.*/ 
 
-unsigned char amstrad_palette[32 * 3] =
+static const rgb_t amstrad_palette[32] =
 {
-	0x080, 0x080, 0x080,			   /* white */
-	0x080, 0x080, 0x080,			   /* white */
-	0x000, 0x0ff, 0x080,			   /* sea green */
-	0x0ff, 0x0ff, 0x080,			   /* pastel yellow */
-	0x000, 0x000, 0x080,			   /* blue */
-	0x0ff, 0x000, 0x080,			   /* purple */
-	0x000, 0x080, 0x080,			   /* cyan */
-	0x0ff, 0x080, 0x080,			   /* pink */
-	0x0ff, 0x000, 0x080,			   /* purple */
-	0x0ff, 0x0ff, 0x080,			   /* pastel yellow */
-	0x0ff, 0x0ff, 0x000,			   /* bright yellow */
-	0x0ff, 0x0ff, 0x0ff,			   /* bright white */
-	0x0ff, 0x000, 0x000,			   /* bright red */
-	0x0ff, 0x000, 0x0ff,			   /* bright magenta */
-	0x0ff, 0x080, 0x000,			   /* orange */
-	0x0ff, 0x080, 0x0ff,			   /* pastel magenta */
-	0x000, 0x000, 0x080,			   /* blue */
-	0x000, 0x0ff, 0x080,			   /* sea green */
-	0x000, 0x0ff, 0x000,			   /* bright green */
-	0x000, 0x0ff, 0x0ff,			   /* bright cyan */
-	0x000, 0x000, 0x000,			   /* black */
-	0x000, 0x000, 0x0ff,			   /* bright blue */
-	0x000, 0x080, 0x000,			   /* green */
-	0x000, 0x080, 0x0ff,			   /* sky blue */
-	0x080, 0x000, 0x080,			   /* magenta */
-	0x080, 0x0ff, 0x080,			   /* pastel green */
-	0x080, 0x0ff, 0x080,			   /* lime */
-	0x080, 0x0ff, 0x0ff,			   /* pastel cyan */
-	0x080, 0x000, 0x000,			   /* Red */
-	0x080, 0x000, 0x0ff,			   /* mauve */
-	0x080, 0x080, 0x000,			   /* yellow */
-	0x080, 0x080, 0x0ff	  		   /* pastel blue */
+	MAKE_RGB(0x080, 0x080, 0x080),			   /* white */
+	MAKE_RGB(0x080, 0x080, 0x080),			   /* white */
+	MAKE_RGB(0x000, 0x0ff, 0x080),			   /* sea green */
+	MAKE_RGB(0x0ff, 0x0ff, 0x080),			   /* pastel yellow */
+	MAKE_RGB(0x000, 0x000, 0x080),			   /* blue */
+	MAKE_RGB(0x0ff, 0x000, 0x080),			   /* purple */
+	MAKE_RGB(0x000, 0x080, 0x080),			   /* cyan */
+	MAKE_RGB(0x0ff, 0x080, 0x080),			   /* pink */
+	MAKE_RGB(0x0ff, 0x000, 0x080),			   /* purple */
+	MAKE_RGB(0x0ff, 0x0ff, 0x080),			   /* pastel yellow */
+	MAKE_RGB(0x0ff, 0x0ff, 0x000),			   /* bright yellow */
+	MAKE_RGB(0x0ff, 0x0ff, 0x0ff),			   /* bright white */
+	MAKE_RGB(0x0ff, 0x000, 0x000),			   /* bright red */
+	MAKE_RGB(0x0ff, 0x000, 0x0ff),			   /* bright magenta */
+	MAKE_RGB(0x0ff, 0x080, 0x000),			   /* orange */
+	MAKE_RGB(0x0ff, 0x080, 0x0ff),			   /* pastel magenta */
+	MAKE_RGB(0x000, 0x000, 0x080),			   /* blue */
+	MAKE_RGB(0x000, 0x0ff, 0x080),			   /* sea green */
+	MAKE_RGB(0x000, 0x0ff, 0x000),			   /* bright green */
+	MAKE_RGB(0x000, 0x0ff, 0x0ff),			   /* bright cyan */
+	MAKE_RGB(0x000, 0x000, 0x000),			   /* black */
+	MAKE_RGB(0x000, 0x000, 0x0ff),			   /* bright blue */
+	MAKE_RGB(0x000, 0x080, 0x000),			   /* green */
+	MAKE_RGB(0x000, 0x080, 0x0ff),			   /* sky blue */
+	MAKE_RGB(0x080, 0x000, 0x080),			   /* magenta */
+	MAKE_RGB(0x080, 0x0ff, 0x080),			   /* pastel green */
+	MAKE_RGB(0x080, 0x0ff, 0x080),			   /* lime */
+	MAKE_RGB(0x080, 0x0ff, 0x0ff),			   /* pastel cyan */
+	MAKE_RGB(0x080, 0x000, 0x000),			   /* Red */
+	MAKE_RGB(0x080, 0x000, 0x0ff),			   /* mauve */
+	MAKE_RGB(0x080, 0x080, 0x000),			   /* yellow */
+	MAKE_RGB(0x080, 0x080, 0x0ff)	  		   /* pastel blue */
 };
 
 /* the green brightness is equal to the firmware colour index */
-unsigned char amstrad_green_palette[32 * 3] =
+static const rgb_t amstrad_green_palette[32] =
 {
-	0x000, 0x07F, 0x000,        /*13*/
-	0x000, 0x07F, 0x000,        /*13*/
-	0x000, 0x0BA, 0x000,        /*19*/
-	0x000, 0x0F5, 0x000,        /*25*/
-	0x000, 0x009, 0x000,        /*1*/
-	0x000, 0x044, 0x000,        /*7*/
-	0x000, 0x062, 0x000,        /*10*/
-	0x000, 0x09C, 0x000,        /*16*/
-	0x000, 0x044, 0x000,        /*7*/
-	0x000, 0x0F5, 0x000,        /*25*/
-	0x000, 0x0EB, 0x000,        /*24*/
-	0x000, 0x0FF, 0x000,        /*26*/
-	0x000, 0x03A, 0x000,        /*6*/
-	0x000, 0x04E, 0x000,        /*8*/
-	0x000, 0x093, 0x000,        /*15*/
-	0x000, 0x0A6, 0x000,        /*17*/
-	0x000, 0x009, 0x000,        /*1*/
-	0x000, 0x0BA, 0x000,        /*19*/
-	0x000, 0x0B0, 0x000,        /*18*/
-	0x000, 0x0C4, 0x000,        /*20*/
-	0x000, 0x000, 0x000,        /*0*/
-	0x000, 0x013, 0x000,        /*2*/
-	0x000, 0x058, 0x000,        /*9*/
-	0x000, 0x06B, 0x000,        /*11*/
-	0x000, 0x027, 0x000,        /*4*/
-	0x000, 0x0D7, 0x000,        /*22*/
-	0x000, 0x0CD, 0x000,        /*21*/
-	0x000, 0x0E1, 0x000,        /*23*/
-	0x000, 0x01D, 0x000,        /*3*/
-	0x000, 0x031, 0x000,        /*5*/
-	0x000, 0x075, 0x000,        /*12*/
-	0x000, 0x089, 0x000         /*14*/
+	MAKE_RGB(0x000, 0x07F, 0x000),        /*13*/
+	MAKE_RGB(0x000, 0x07F, 0x000),        /*13*/
+	MAKE_RGB(0x000, 0x0BA, 0x000),        /*19*/
+	MAKE_RGB(0x000, 0x0F5, 0x000),        /*25*/
+	MAKE_RGB(0x000, 0x009, 0x000),        /*1*/
+	MAKE_RGB(0x000, 0x044, 0x000),        /*7*/
+	MAKE_RGB(0x000, 0x062, 0x000),        /*10*/
+	MAKE_RGB(0x000, 0x09C, 0x000),        /*16*/
+	MAKE_RGB(0x000, 0x044, 0x000),        /*7*/
+	MAKE_RGB(0x000, 0x0F5, 0x000),        /*25*/
+	MAKE_RGB(0x000, 0x0EB, 0x000),        /*24*/
+	MAKE_RGB(0x000, 0x0FF, 0x000),        /*26*/
+	MAKE_RGB(0x000, 0x03A, 0x000),        /*6*/
+	MAKE_RGB(0x000, 0x04E, 0x000),        /*8*/
+	MAKE_RGB(0x000, 0x093, 0x000),        /*15*/
+	MAKE_RGB(0x000, 0x0A6, 0x000),        /*17*/
+	MAKE_RGB(0x000, 0x009, 0x000),        /*1*/
+	MAKE_RGB(0x000, 0x0BA, 0x000),        /*19*/
+	MAKE_RGB(0x000, 0x0B0, 0x000),        /*18*/
+	MAKE_RGB(0x000, 0x0C4, 0x000),        /*20*/
+	MAKE_RGB(0x000, 0x000, 0x000),        /*0*/
+	MAKE_RGB(0x000, 0x013, 0x000),        /*2*/
+	MAKE_RGB(0x000, 0x058, 0x000),        /*9*/
+	MAKE_RGB(0x000, 0x06B, 0x000),        /*11*/
+	MAKE_RGB(0x000, 0x027, 0x000),        /*4*/
+	MAKE_RGB(0x000, 0x0D7, 0x000),        /*22*/
+	MAKE_RGB(0x000, 0x0CD, 0x000),        /*21*/
+	MAKE_RGB(0x000, 0x0E1, 0x000),        /*23*/
+	MAKE_RGB(0x000, 0x01D, 0x000),        /*3*/
+	MAKE_RGB(0x000, 0x031, 0x000),        /*5*/
+	MAKE_RGB(0x000, 0x075, 0x000),        /*12*/
+	MAKE_RGB(0x000, 0x089, 0x000)         /*14*/
 };
 /* Initialise the palette */
 PALETTE_INIT( amstrad_cpc )
 {
    	if ( ((readinputportbytag("green_display")) & 0x01)==0 )
-	   palette_set_colors(machine, 0, amstrad_palette, sizeof(amstrad_palette) / 3);
+	   palette_set_colors(machine, 0, amstrad_palette, ARRAY_LENGTH(amstrad_palette));
    	else
-	   palette_set_colors(machine, 0, amstrad_green_palette, sizeof(amstrad_green_palette) / 3);   	
+	   palette_set_colors(machine, 0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));
 }
 
 /*************************************************************************/
@@ -242,7 +242,7 @@ PALETTE_INIT( kccomp )
 	for (i=0; i<32; i++)
 	{
 		colortable[i] = i;
-		palette_set_color(machine, i,
+		palette_set_color_rgb(machine, i,
 			kccomp_get_colour_element((color_prom[i]>>2) & 0x03),
 			kccomp_get_colour_element((color_prom[i]>>4) & 0x03),
 			kccomp_get_colour_element((color_prom[i]>>0) & 0x03));
@@ -273,14 +273,14 @@ PALETTE_INIT( amstrad_plus )
 		g = ( g << 4 ) | ( g );
 		b = ( b << 4 ) | ( b );
 
-		palette_set_color(machine, i+48, g, r, b);
+		palette_set_color_rgb(machine, i+48, g, r, b);
 		colortable[i+48] = i+48;  // take into account the original palette, and sprite palette
 	}
 }
 
 void amstrad_plus_setspritecolour(unsigned int off, int r, int g, int b)
 {
-	palette_set_color(Machine, (off/2) + 33, r, g, b);
+	palette_set_color_rgb(Machine, (off/2) + 33, r, g, b);
 }
 
 static void amstrad_init_lookups(void)
@@ -1121,7 +1121,4 @@ VIDEO_START( amstrad )
 
 	amstrad_bitmap = auto_bitmap_alloc(AMSTRAD_SCREEN_WIDTH, AMSTRAD_SCREEN_HEIGHT, BITMAP_FORMAT_INDEXED16);
 	display_update = 1;
-
-	return 0;
-
 }

@@ -52,13 +52,10 @@ VIDEO_START( rollerg )
 	sprite_colorbase = 16;
 	zoom_colorbase = 0;
 
-	if (K053245_vh_start(0,REGION_GFX1,NORMAL_PLANE_ORDER,sprite_callback))
-		return 1;
-	if (K051316_vh_start_0(REGION_GFX2,4,TILEMAP_TRANSPARENT,0,zoom_callback))
-		return 1;
+	K053245_vh_start(0,REGION_GFX1,NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(REGION_GFX2,4,TILEMAP_TRANSPARENT,0,zoom_callback);
 
 	K051316_set_offset(0, 22, 1);
-	return 0;
 }
 
 

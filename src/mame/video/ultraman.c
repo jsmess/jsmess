@@ -63,23 +63,14 @@ VIDEO_START( ultraman )
 	zoom_colorbase[1] = 64;
 	zoom_colorbase[2] = 128;
 
-	if (K051960_vh_start(SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback))
-		return 1;
-
-	if (K051316_vh_start_0(ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0))
-		return 1;
-
-	if (K051316_vh_start_1(ZOOMROM1_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_1))
-		return 1;
-
-	if (K051316_vh_start_2(ZOOMROM2_MEM_REGION,4,TILEMAP_OPAQUE,0,zoom_callback_2))
-		return 1;
+	K051960_vh_start(SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0);
+	K051316_vh_start_1(ZOOMROM1_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_1);
+	K051316_vh_start_2(ZOOMROM2_MEM_REGION,4,TILEMAP_OPAQUE,0,zoom_callback_2);
 
 	K051316_set_offset(0, 8, 0);
 	K051316_set_offset(1, 8, 0);
 	K051316_set_offset(2, 8, 0);
-
-	return 0;
 }
 
 

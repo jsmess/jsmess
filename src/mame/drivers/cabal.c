@@ -128,7 +128,7 @@ void cabalbl_adpcm_stop(void *token)
 
 static void cabalbl_play_adpcm( int channel, int which ){
 	if( which!=0xff ){
-		unsigned char *RAM = memory_region(REGION_SOUND1);
+		UINT8 *RAM = memory_region(REGION_SOUND1);
 		int offset = channel*0x10000;
 		int start,len;
 

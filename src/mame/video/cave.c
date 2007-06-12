@@ -98,9 +98,9 @@ static int screen_width, screen_height;
 
 static struct {
 	int clip_left, clip_right, clip_top, clip_bottom;
-	unsigned char *baseaddr;
+	UINT8 *baseaddr;
 	int line_offset;
-	unsigned char *baseaddr_zbuf;
+	UINT8 *baseaddr_zbuf;
 	int line_offset_zbuf;
 } blit;
 
@@ -115,7 +115,7 @@ static UINT16 sprite_zbuf_baseval = 0x10000-MAX_SPRITE_NUM;
 static void (*get_sprite_info)(void);
 static void (*cave_sprite_draw)( int priority );
 
-static int sprite_init_cave(void);
+static void sprite_init_cave(void);
 static void sprite_draw_cave( int priority );
 static void sprite_draw_cave_zbuf( int priority );
 static void sprite_draw_donpachi( int priority );
@@ -387,7 +387,7 @@ static int cave_row_effect_offs_n;
 static int cave_row_effect_offs_f;
 static int background_color;
 
-int cave_vh_start( int num )
+void cave_vh_start( int num )
 {
 	tilemap_0 = 0;
 	tilemap_1 = 0;
@@ -403,6 +403,8 @@ int cave_vh_start( int num )
 	old_tiledim_1 = 0;
 	old_tiledim_2 = 0;
 	old_tiledim_3 = 0;
+
+	assert((num >= 1) && (num <= 4));
 
 	switch( num )
 	{
@@ -435,13 +437,9 @@ int cave_vh_start( int num )
 			tilemap_set_scroll_cols(tilemap_0, 1);
 
 			break;
-
-		default:
-			logerror("ERROR: Unsupported number of layers: %d\n",num);
-			return 1;
 	}
 
-	if (sprite_init_cave())	return 1;
+	sprite_init_cave();
 
 	cave_layers_offs_x = 0x13;
 	cave_layers_offs_y = -0x12;
@@ -467,20 +465,17 @@ int cave_vh_start( int num )
 			background_color = 0x7f00;
 			cave_layers_offs_y++;
 	}
-
-	return 0;
 }
 
-VIDEO_START( cave_1_layer )		{	return cave_vh_start(1);	}
-VIDEO_START( cave_2_layers )	{	return cave_vh_start(2);	}
-VIDEO_START( cave_3_layers )	{	return cave_vh_start(3);	}
-VIDEO_START( cave_4_layers )	{	return cave_vh_start(4);	}
+VIDEO_START( cave_1_layer )		{	cave_vh_start(1);	}
+VIDEO_START( cave_2_layers )	{	cave_vh_start(2);	}
+VIDEO_START( cave_3_layers )	{	cave_vh_start(3);	}
+VIDEO_START( cave_4_layers )	{	cave_vh_start(4);	}
 
 
 VIDEO_START( sailormn_3_layers )
 {
-	if (cave_vh_start(2))
-		return 1;
+	cave_vh_start(2);
 
 	/* Layer 2 (8x8) needs to be handled differently */
 	tilemap_2 = tilemap_create(	sailormn_get_tile_info_2, tilemap_scan_rows,
@@ -488,8 +483,6 @@ VIDEO_START( sailormn_3_layers )
 	tilemap_set_transparent_pen(tilemap_2, 0);
 	tilemap_set_scroll_rows(tilemap_2, 1);
 	tilemap_set_scroll_cols(tilemap_2, 1);
-
-	return 0;
 }
 
 /***************************************************************************
@@ -529,7 +522,7 @@ static void get_sprite_info_cave(void)
 	const int region				=	REGION_GFX1;
 
 	const pen_t          *base_pal	=	Machine->remapped_colortable + 0;
-	const unsigned char  *base_gfx	=	memory_region(region);
+	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
 	UINT16      *source			=	spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
@@ -650,7 +643,7 @@ static void get_sprite_info_donpachi(void)
 	const int region				=	REGION_GFX1;
 
 	const pen_t          *base_pal	=	Machine->remapped_colortable + 0;
-	const unsigned char  *base_gfx	=	memory_region(region);
+	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
 	UINT16      *source			=	spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
@@ -725,7 +718,7 @@ static void get_sprite_info_donpachi(void)
 }
 
 
-static int sprite_init_cave(void)
+static void sprite_init_cave(void)
 {
 	screen_width = Machine->screen[0].width;
 	screen_height = Machine->screen[0].height;
@@ -751,8 +744,6 @@ static int sprite_init_cave(void)
 
 	memset(sprite_table,0,sizeof(sprite_table));
 	cave_sprite_draw = sprite_draw_donpachi;
-
-	return 0;
 }
 
 
@@ -888,17 +879,17 @@ static void do_blit_zoom16_cave( const struct sprite_cave *sprite ){
 	}
 
 	{
-		const unsigned char *pen_data = sprite->pen_data -1 -sprite->line_offset;
+		const UINT8 *pen_data = sprite->pen_data -1 -sprite->line_offset;
 		const pen_t         *pal_data = sprite->pal_data;
 		int x,y;
-		unsigned char pen;
+		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
 		UINT16 *dest = (UINT16 *)(blit.baseaddr + blit.line_offset*y1);
 		int ycount = ycount0;
 
 		for( y=y1; y!=y2; y+=dy ){
 			int xcount;
-			const unsigned char *source;
+			const UINT8 *source;
 
 			if (ycount&0xffff0000){
 				xcount = xcount0;
@@ -980,10 +971,10 @@ static void do_blit_zoom16_cave_zb( const struct sprite_cave *sprite ){
 	}
 
 	{
-		const unsigned char *pen_data = sprite->pen_data -1 -sprite->line_offset;
+		const UINT8 *pen_data = sprite->pen_data -1 -sprite->line_offset;
 		const pen_t         *pal_data = sprite->pal_data;
 		int x,y;
-		unsigned char pen;
+		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
 		UINT16 *dest = (UINT16 *)(blit.baseaddr + blit.line_offset*y1);
 		int pitchz = blit.line_offset_zbuf*dy/2;
@@ -993,7 +984,7 @@ static void do_blit_zoom16_cave_zb( const struct sprite_cave *sprite ){
 
 		for( y=y1; y!=y2; y+=dy ){
 			int xcount;
-			const unsigned char *source;
+			const UINT8 *source;
 
 			if (ycount&0xffff0000){
 				xcount = xcount0;
@@ -1074,16 +1065,16 @@ static void do_blit_16_cave( const struct sprite_cave *sprite ){
 	}
 
 	{
-		const unsigned char *pen_data = sprite->pen_data;
+		const UINT8 *pen_data = sprite->pen_data;
 		const pen_t         *pal_data = sprite->pal_data;
 		int x,y;
-		unsigned char pen;
+		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
 		UINT16 *dest = (UINT16 *)(blit.baseaddr + blit.line_offset*y1);
 
 		pen_data+=sprite->line_offset*ycount0+xcount0;
 		for( y=y1; y!=y2; y+=dy ){
-			const unsigned char *source;
+			const UINT8 *source;
 			source = pen_data;
 			for( x=x1; x!=x2; x+=dx ){
 				pen = *source;
@@ -1151,10 +1142,10 @@ static void do_blit_16_cave_zb( const struct sprite_cave *sprite ){
 	}
 
 	{
-		const unsigned char *pen_data = sprite->pen_data;
+		const UINT8 *pen_data = sprite->pen_data;
 		const pen_t         *pal_data = sprite->pal_data;
 		int x,y;
-		unsigned char pen;
+		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
 		UINT16 *dest = (UINT16 *)(blit.baseaddr + blit.line_offset*y1);
 		int pitchz = blit.line_offset_zbuf*dy/2;
@@ -1163,7 +1154,7 @@ static void do_blit_16_cave_zb( const struct sprite_cave *sprite ){
 
 		pen_data+=sprite->line_offset*ycount0+xcount0;
 		for( y=y1; y!=y2; y+=dy ){
-			const unsigned char *source;
+			const UINT8 *source;
 			source = pen_data;
 			for( x=x1; x!=x2; x+=dx ){
 				pen = *source;

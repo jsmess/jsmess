@@ -1546,9 +1546,11 @@ INLINE UINT8 check_interrupts(void)
 		case V_RITI:
 			// no flags are cleared, TI and RI remain set until reset by software
 			break;
+#if (HAS_I8052 || HAS_I8752)
 		case V_TF2:
 			// no flags are cleared according to manual
 			break;
+#endif
 	}
 
 	//Clear vars.. (these are part of the 8051 structure for speed, so we don't have to dynamically allocate space each time)
@@ -2209,7 +2211,7 @@ INLINE void	update_serial(int cyc)
 /****************************************************************************
  * 8752 Section
  ****************************************************************************/
-#if (HAS_I8752)
+#if (HAS_I8052 || HAS_I8752)
 void i8752_init (int index, int clock, const void *config, int (*irqcallback)(int))	{ i8051_init(index, clock, config, irqcallback); }
 void i8752_reset (void)
 {
@@ -2493,6 +2495,7 @@ void i8051_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+#if (HAS_I8052)
 void i8052_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
@@ -2509,7 +2512,9 @@ void i8052_get_info(UINT32 state, cpuinfo *info)
 		default:										i8051_get_info(state, info);			break;
 	}
 }
+#endif
 
+#if (HAS_I8751)
 void i8751_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
@@ -2519,7 +2524,9 @@ void i8751_get_info(UINT32 state, cpuinfo *info)
 		default:										i8051_get_info(state, info);			break;
 	}
 }
+#endif
 
+#if (HAS_I8752)
 void i8752_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
@@ -2536,4 +2543,4 @@ void i8752_get_info(UINT32 state, cpuinfo *info)
 		default:										i8051_get_info(state, info);			break;
 	}
 }
-
+#endif

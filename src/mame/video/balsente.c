@@ -48,8 +48,6 @@ VIDEO_START( balsente )
 	/* register for saving */
 	state_save_register_global_pointer(local_videoram, 256 * 256);
 	state_save_register_global(palettebank_vis);
-
-	return 0;
 }
 
 
@@ -108,7 +106,7 @@ WRITE8_HANDLER( balsente_paletteram_w )
 	g = paletteram[(offset & ~3) + 1];
 	b = paletteram[(offset & ~3) + 2];
 
-	palette_set_color(Machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(Machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 

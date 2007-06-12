@@ -12,7 +12,7 @@
 
 UINT8 *cop01_bgvideoram,*cop01_fgvideoram;
 
-static unsigned char mightguy_vreg[4];
+static UINT8 mightguy_vreg[4];
 static tilemap *bg_tilemap,*fg_tilemap;
 
 
@@ -43,7 +43,7 @@ PALETTE_INIT( cop01 )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -119,8 +119,6 @@ VIDEO_START( cop01 )
 	/* priority doesn't exactly work this way, see above */
 	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x0fff,0xf000); /* split type 1 has pens 0-11 transparent in front half */
-
-	return 0;
 }
 
 

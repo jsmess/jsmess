@@ -119,7 +119,6 @@ static void install_expansion_slot(int slot,
 
 VIDEO_START(concept)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(concept)

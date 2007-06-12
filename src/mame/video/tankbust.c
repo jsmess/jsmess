@@ -90,8 +90,6 @@ VIDEO_START( tankbust )
 
 
 	tilemap_set_transparent_pen(txt_tilemap, 0);
-
-	return 0;
 }
 
 

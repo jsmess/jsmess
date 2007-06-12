@@ -127,8 +127,6 @@ VIDEO_START( airbustr )
 	tilemap_set_scrolldy(bg_tilemap, 0x100, 0x1ff);
 	tilemap_set_scrolldx(fg_tilemap, 0x094, 0x06a);
 	tilemap_set_scrolldy(fg_tilemap, 0x100, 0x1ff);
-
-	return 0;
 }
 
 /*      Sprites

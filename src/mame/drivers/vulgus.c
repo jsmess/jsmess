@@ -43,9 +43,9 @@ c001      YM2203 #2 write
 #include "sound/ay8910.h"
 
 
-extern unsigned char *vulgus_fgvideoram;
-extern unsigned char *vulgus_bgvideoram;
-extern unsigned char *vulgus_scroll_low,*vulgus_scroll_high;
+extern UINT8 *vulgus_fgvideoram;
+extern UINT8 *vulgus_bgvideoram;
+extern UINT8 *vulgus_scroll_low,*vulgus_scroll_high;
 
 WRITE8_HANDLER( vulgus_fgvideoram_w );
 WRITE8_HANDLER( vulgus_bgvideoram_w );

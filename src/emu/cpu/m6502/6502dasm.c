@@ -740,12 +740,10 @@ static unsigned internal_m6502_dasm(const struct op6502_info *opinfo, char *buff
 	return (pc - PC) | flags;
 }
 
-#if (HAS_M6502)
 unsigned m6502_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return internal_m6502_dasm(op6502, buffer, pc, oprom, opram);
 }
-#endif
 
 #if (HAS_M65SC02)
 unsigned m65sc02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
@@ -754,7 +752,7 @@ unsigned m65sc02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *
 }
 #endif
 
-#if (HAS_M65C02)
+#if (HAS_M65C02||HAS_M65SC02||HAS_DECO16)
 unsigned m65c02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return internal_m6502_dasm(op65c02, buffer, pc, oprom, opram);

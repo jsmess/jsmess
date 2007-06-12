@@ -132,11 +132,11 @@ Palette3*:  585D (low), 5899 (high), len = 60   (used alternatively with pal3)
 #include "cpu/z80/z80.h"
 
 
-extern unsigned char * cpk_colorram;
-extern unsigned char * cpk_videoram;
-extern unsigned char * cpk_palette;
-extern unsigned char * cpk_palette2;
-extern unsigned char * cpk_expram;
+extern UINT8 * cpk_colorram;
+extern UINT8 * cpk_videoram;
+extern UINT8 * cpk_palette;
+extern UINT8 * cpk_palette2;
+extern UINT8 * cpk_expram;
 
 
 MACHINE_RESET (cpk);
@@ -697,7 +697,7 @@ ROM_END
 static DRIVER_INIT( cska )
 {
 	int A;
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 
 	for (A = 0;A < 0x10000;A++)

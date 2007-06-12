@@ -43,7 +43,7 @@ Twenty four 8116 rams.
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
-extern unsigned char *deco_charram;
+extern UINT8 *deco_charram;
 
 PALETTE_INIT( btime );
 VIDEO_START( btime );
@@ -282,7 +282,7 @@ ROM_END
 DRIVER_INIT( progolf )
 {
 	int A;
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 	UINT8* decrypted = auto_malloc(0x10000);
 
 	memory_set_decrypted_region(0,0x0000,0xffff, decrypted);

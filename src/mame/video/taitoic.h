@@ -17,7 +17,7 @@ int has_TC0480SCP(void);
 
 /***************************************************************************/
 
-int PC080SN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int y_invert,int opaque,int dblwidth);
+void PC080SN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int y_invert,int opaque,int dblwidth);
 READ16_HANDLER ( PC080SN_word_0_r );
 WRITE16_HANDLER( PC080SN_word_0_w );
 WRITE16_HANDLER( PC080SN_xscroll_word_0_w );
@@ -40,7 +40,7 @@ void PC080SN_tilemap_draw_special(mame_bitmap *bitmap,const rectangle *cliprect,
 
 /***************************************************************************/
 
-int PC090OJ_vh_start(int gfxnum,int x_offset,int y_offset,int use_buffer);
+void PC090OJ_vh_start(int gfxnum,int x_offset,int y_offset,int use_buffer);
 
 READ16_HANDLER( PC090OJ_word_0_r );
 WRITE16_HANDLER( PC090OJ_word_0_w );
@@ -53,7 +53,7 @@ extern UINT16 PC090OJ_sprite_ctrl;
 
 /***************************************************************************/
 
-int TC0080VCO_vh_start(int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_flip_yoffs);
+void TC0080VCO_vh_start(int gfxnum,int has_fg0,int bg_xoffs,int bg_yoffs,int bg_flip_yoffs);
 
 READ16_HANDLER ( TC0080VCO_word_r );
 WRITE16_HANDLER( TC0080VCO_word_w );
@@ -67,7 +67,7 @@ void TC0080VCO_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int la
 /* When writing a driver pass zero for all the offsets initially then
    tweak them later. Most TC0100SCN games have y_offset=0 */
 
-int TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_xoffs,
+void TC0100SCN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int flip_xoffs,
 		int flip_yoffs,int flip_text_xoffs,int flip_text_yoffs,int multiscrn_xoffs);
 
 /* Function to set separate color banks for the three tilemapped layers.
@@ -117,14 +117,14 @@ int TC0100SCN_bottomlayer(int chip);
 
 /***************************************************************************/
 
-int TC0280GRD_vh_start(int gfxnum);
+void TC0280GRD_vh_start(int gfxnum);
 READ16_HANDLER ( TC0280GRD_word_r );
 WRITE16_HANDLER( TC0280GRD_word_w );
 WRITE16_HANDLER( TC0280GRD_ctrl_word_w );
 void TC0280GRD_tilemap_update(int base_color);
 void TC0280GRD_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority);
 
-int TC0430GRW_vh_start(int gfxnum);
+void TC0430GRW_vh_start(int gfxnum);
 READ16_HANDLER ( TC0430GRW_word_r );
 WRITE16_HANDLER( TC0430GRW_word_w );
 WRITE16_HANDLER( TC0430GRW_ctrl_word_w );
@@ -138,7 +138,7 @@ void TC0430GRW_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffs
    then tweak them once you have the 4 bg layer positions correct. Col_base
    may be needed when tilemaps use a palette area from sprites. */
 
-int TC0480SCP_vh_start(int gfxnum,int pixels,int x_offset,int y_offset,int text_xoffs,int text_yoffs,int flip_xoffs,int flip_yoffs,int col_base);
+void TC0480SCP_vh_start(int gfxnum,int pixels,int x_offset,int y_offset,int text_xoffs,int text_yoffs,int flip_xoffs,int flip_yoffs,int col_base);
 READ16_HANDLER ( TC0480SCP_word_r );
 WRITE16_HANDLER( TC0480SCP_word_w );
 READ16_HANDLER ( TC0480SCP_ctrl_word_r );
@@ -166,15 +166,15 @@ extern int TC0480SCP_pri_reg;
 
 READ16_HANDLER( TC0150ROD_word_r );
 WRITE16_HANDLER( TC0150ROD_word_w );
-int TC0150ROD_vh_start(void);
+void TC0150ROD_vh_start(void);
 void TC0150ROD_draw(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs,int palette_offs,int type,int road_trans,UINT32 low_priority,UINT32 high_priority);
 
 
 /***************************************************************************/
 
-int TC0110PCR_vh_start(void);
-int TC0110PCR_1_vh_start(void);	/* 2nd chip */
-int TC0110PCR_2_vh_start(void);	/* 3rd chip */
+void TC0110PCR_vh_start(void);
+void TC0110PCR_1_vh_start(void);	/* 2nd chip */
+void TC0110PCR_2_vh_start(void);	/* 3rd chip */
 READ16_HANDLER ( TC0110PCR_word_r );
 READ16_HANDLER ( TC0110PCR_word_1_r );	/* 2nd chip */
 READ16_HANDLER ( TC0110PCR_word_2_r );	/* 3rd chip */
@@ -185,7 +185,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_2_w );	/* 3rd chip */
 WRITE16_HANDLER( TC0110PCR_step1_rbswap_word_w );	/* swaps red and blue components */
 WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w );	/* only 4 bits per color gun */
 
-int TC0360PRI_vh_start(void);	/* must be called to ensure regs saved in state.c */
+void TC0360PRI_vh_start(void);	/* must be called to ensure regs saved in state.c */
 WRITE8_HANDLER( TC0360PRI_w );
 WRITE16_HANDLER( TC0360PRI_halfword_w );
 WRITE16_HANDLER( TC0360PRI_halfword_swap_w );

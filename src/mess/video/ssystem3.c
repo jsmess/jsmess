@@ -22,7 +22,7 @@ static unsigned short ssystem3_colortable[1][2] = {
 
 PALETTE_INIT( ssystem3 )
 {
-	palette_set_colors(machine, 0, ssystem3_palette, sizeof(ssystem3_palette) / 3);
+	palette_set_colors_rgb(machine, 0, ssystem3_palette, sizeof(ssystem3_palette) / 3);
 	memcpy(colortable,ssystem3_colortable,sizeof(ssystem3_colortable));
 }
 
@@ -41,7 +41,7 @@ VIDEO_START( ssystem3 )
 	}
 #endif
 
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 static const char led[]={

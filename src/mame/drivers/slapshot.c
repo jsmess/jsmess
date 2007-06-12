@@ -170,7 +170,7 @@ static WRITE16_HANDLER( color_ram_word_w )
 		g = (color_ram[offset] &0xff00) >> 8;
 		b = (color_ram[offset] &0xff);
 
-		palette_set_color(Machine,offset/2,r,g,b);
+		palette_set_color(Machine,offset/2,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -721,7 +721,7 @@ ROM_END
 
 static DRIVER_INIT( slapshot )
 {
-	unsigned int offset,i;
+	UINT32 offset,i;
 	UINT8 *gfx = memory_region(REGION_GFX2);
 	int size=memory_region_length(REGION_GFX2);
 	int data;

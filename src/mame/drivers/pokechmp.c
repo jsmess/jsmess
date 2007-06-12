@@ -99,7 +99,7 @@ static WRITE8_HANDLER( pokechmp_sound_w )
 
 INLINE void pokechmp_set_color(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	palette_set_color_rgb(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 

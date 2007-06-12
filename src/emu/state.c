@@ -258,8 +258,7 @@ void state_save_register_memory(const char *module, UINT32 instance, const char 
 	}
 
 	/* create the full name */
-	totalname = malloc(8 + 1 + strlen(module) + 1 + 8 + 1 + strlen(name) + 1);
-	assert_always(totalname != NULL, "Out of memory allocate save state name");
+	totalname = malloc_or_die(8 + 1 + strlen(module) + 1 + 8 + 1 + strlen(name) + 1);
 	sprintf(totalname, "%X/%s/%X/%s", ss_current_tag, module, instance, name);
 
 	/* look for duplicates and an entry to insert in front of */
@@ -277,9 +276,7 @@ void state_save_register_memory(const char *module, UINT32 instance, const char 
 
 	/* didn't find one; allocate a new one */
 	next = *entry;
-	*entry = malloc(sizeof(**entry));
-	if (!*entry)
-		fatalerror("Out of memory allocating a new save state entry");
+	*entry = malloc_or_die(sizeof(**entry));
 	memset(*entry, 0, sizeof(**entry));
 
 	/* fill in the rest */
@@ -332,9 +329,7 @@ static void register_func_void(ss_func **root, void (*func)(void))
 			fatalerror("Duplicate save state function (%d, 0x%p)", ss_current_tag, func);
 
 	/* allocate a new entry */
-	*cur = malloc(sizeof(ss_func));
-	if (*cur == NULL)
-		fatalerror("malloc failed in ss_register_func");
+	*cur = malloc_or_die(sizeof(ss_func));
 
 	/* fill it in */
 	(*cur)->next       = NULL;
@@ -374,9 +369,7 @@ static void register_func_int(ss_func **root, void (*func)(int), int param)
 			fatalerror("Duplicate save state function (%d, %d, 0x%x)", ss_current_tag, param, (int)func);
 
 	/* allocate a new entry */
-	*cur = malloc(sizeof(ss_func));
-	if (*cur == NULL)
-		fatalerror("malloc failed in ss_register_func");
+	*cur = malloc_or_die(sizeof(ss_func));
 
 	/* fill it in */
 	(*cur)->next       = NULL;
@@ -417,9 +410,7 @@ static void register_func_ptr(ss_func **root, void (*func)(void *), void *param)
 			fatalerror("Duplicate save state function (%d, %p, 0x%x)", ss_current_tag, param, (int)func);
 
 	/* allocate a new entry */
-	*cur = malloc(sizeof(ss_func));
-	if (*cur == NULL)
-		fatalerror("malloc failed in ss_register_func");
+	*cur = malloc_or_die(sizeof(ss_func));
 
 	/* fill it in */
 	(*cur)->next       = NULL;
@@ -756,9 +747,7 @@ int state_save_save_begin(mame_file *file)
 	TRACE(logerror("   total size %u\n", ss_dump_size));
 
 	/* allocate memory for the array */
-	ss_dump_array = malloc(ss_dump_size);
-	if (!ss_dump_array)
-		logerror("malloc failed in state_save_save_begin\n");
+	ss_dump_array = malloc_or_die(ss_dump_size);
 	return 0;
 }
 
@@ -848,7 +837,7 @@ int state_save_load_begin(mame_file *file)
 
 	/* read the file into memory */
 	ss_dump_size = mame_fsize(file);
-	ss_dump_array = malloc(ss_dump_size);
+	ss_dump_array = malloc_or_die(ss_dump_size);
 	ss_dump_file = file;
 	mame_fread(ss_dump_file, ss_dump_array, ss_dump_size);
 
@@ -856,6 +845,9 @@ int state_save_load_begin(mame_file *file)
 	if (validate_header(ss_dump_array, NULL, get_signature(), popmessage, "Error: "))
 	{
 		free(ss_dump_array);
+		ss_dump_array = NULL;
+		ss_dump_size = 0;
+		ss_dump_file = NULL;
 		return 1;
 	}
 

@@ -112,25 +112,21 @@ VIDEO_START( midtunit )
 	state_save_register_global_pointer(local_videoram, 0x100000/sizeof(local_videoram[0]));
 	state_save_register_global(videobank_select);
 	state_save_register_global_array(dma_register);
-
-	return 0;
 }
 
 
 VIDEO_START( midwunit )
 {
-	int result = video_start_midtunit(machine);
+	video_start_midtunit(machine);
 	midtunit_gfx_rom_large = 1;
-	return result;
 }
 
 
 VIDEO_START( midxunit )
 {
-	int result = video_start_midtunit(machine);
+	video_start_midtunit(machine);
 	midtunit_gfx_rom_large = 1;
 	videobank_select = 1;
-	return result;
 }
 
 
@@ -312,7 +308,7 @@ WRITE16_HANDLER( midtunit_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 

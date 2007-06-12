@@ -10,7 +10,7 @@
 #include "video/konamiic.h"
 
 
-unsigned char ajax_priority;
+UINT8 ajax_priority;
 static int layer_colorbase[3],sprite_colorbase,zoom_colorbase;
 
 
@@ -75,14 +75,9 @@ VIDEO_START( ajax )
 	layer_colorbase[2] = 32;
 	sprite_colorbase = 16;
 	zoom_colorbase = 6;	/* == 48 since it's 7-bit graphics */
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback))
-		return 1;
-	if (K051316_vh_start_0(REGION_GFX3,7,TILEMAP_TRANSPARENT,0,zoom_callback))
-		return 1;
-
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
+	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(REGION_GFX3,7,TILEMAP_TRANSPARENT,0,zoom_callback);
 }
 
 

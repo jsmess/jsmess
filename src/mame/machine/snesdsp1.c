@@ -118,8 +118,8 @@ static double SinTable2[INCR];
 // init DSP1 math tables
 void InitDSP1(void)
 {
-	unsigned int i;
-	unsigned char *dspin = memory_region(REGION_USER6);
+	UINT32 i;
+	UINT8 *dspin = memory_region(REGION_USER6);
 
 	dsp1_waitcmd = dsp1_first_parm = 1;
 

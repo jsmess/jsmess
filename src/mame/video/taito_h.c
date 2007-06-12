@@ -81,26 +81,17 @@ static int zoomy_conv_table[] =
 
 VIDEO_START( syvalion )
 {
-	if ( TC0080VCO_vh_start(0,1,1,1,-2))
-		return 1;
-
-	return 0;
+	TC0080VCO_vh_start(0,1,1,1,-2);
 }
 
 VIDEO_START( recordbr )
 {
-	if ( TC0080VCO_vh_start(0,0,1,1,-2))
-		return 1;
-
-	return 0;
+	TC0080VCO_vh_start(0,0,1,1,-2);
 }
 
 VIDEO_START( dleague )
 {
-	if ( TC0080VCO_vh_start(0,0,1,1,-2))
-		return 1;
-
-	return 0;
+	TC0080VCO_vh_start(0,0,1,1,-2);
 }
 
 

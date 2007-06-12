@@ -46,8 +46,7 @@ VIDEO_START( midzeus )
 	waveram = auto_malloc(2 * WAVERAM_WIDTH * WAVERAM_HEIGHT * sizeof(*waveram));
 
 	for (i = 0; i < 32768; i++)
-		palette_set_color(machine, i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
-	return 0;
+		palette_set_color_rgb(machine, i, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 }
 
 VIDEO_UPDATE( midzeus )

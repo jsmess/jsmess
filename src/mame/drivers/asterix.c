@@ -20,7 +20,7 @@ VIDEO_START( asterix );
 VIDEO_UPDATE( asterix );
 WRITE16_HANDLER( asterix_spritebank_w );
 
-static unsigned char cur_control2;
+static UINT8 cur_control2;
 static int init_eeprom_count;
 
 static struct EEPROM_interface eeprom_interface =

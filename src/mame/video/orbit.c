@@ -56,8 +56,6 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( orbit )
 {
 	bg_tilemap = tilemap_create(get_tile_info, get_memory_offset, 0, 16, 16, 32, 30);
-
-	return 0;
 }
 
 

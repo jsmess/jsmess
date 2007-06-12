@@ -10,11 +10,11 @@
 
 #define BGHEIGHT 64
 
-static unsigned char bg1xpos;
-static unsigned char bg1ypos;
-static unsigned char bg2xpos;
-static unsigned char bg2ypos;
-static unsigned char bgcontrol;
+static UINT8 bg1xpos;
+static UINT8 bg1ypos;
+static UINT8 bg2xpos;
+static UINT8 bg2ypos;
+static UINT8 bgcontrol;
 
 static tilemap* bg_tilemap;
 
@@ -82,7 +82,7 @@ PALETTE_INIT( mpatrol )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -108,7 +108,7 @@ PALETTE_INIT( mpatrol )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+512,r,g,b);
+		palette_set_color(machine,i+512,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -136,7 +136,7 @@ PALETTE_INIT( mpatrol )
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+512+32,r,g,b);
+		palette_set_color(machine,i+512+32,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -211,7 +211,6 @@ VIDEO_START( mpatrol )
 	{
 		tilemap_set_scrollx(bg_tilemap, y, 255);
 	}
-	return 0;
 }
 
 

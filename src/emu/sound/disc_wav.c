@@ -50,6 +50,7 @@ struct dss_lfsr_context
 	double			t;
 	UINT8			reset_on_high;
 	UINT8			invert_output;
+	UINT8			out_is_f0;
 };
 
 struct dss_noise_context
@@ -138,6 +139,17 @@ struct dss_trianglewave_context
 	double phase;
 };
 
+struct dss_inverter_osc_context
+{
+	double	w;
+	double  wc;
+	double	vCap;
+	double  vG2_old;
+	double	Rp;
+	double  R1;
+	double	tf_a;
+	double	tf_b;
+};
 
 /************************************************************************
  *
@@ -431,7 +443,10 @@ void dss_lfsr_step(node_description *node)
 		context->lfsr_reg=dss_lfsr_function(DISC_LFSR_REPLACE,(context->lfsr_reg), fbresult<<(lfsr_desc->bitlength), ((2<<(lfsr_desc->bitlength))-1));
 
 		/* Now select the output bit */
-		node->output=((context->lfsr_reg)>>(lfsr_desc->output_bit))&0x01;
+		if (context->out_is_f0)
+			node->output = fbresult & 0x01;
+		else
+			node->output=((context->lfsr_reg)>>(lfsr_desc->output_bit))&0x01;
 
 		/* Final inversion if required */
 		if(context->invert_output) node->output=(node->output)?0.0:1.0;
@@ -456,6 +471,7 @@ void dss_lfsr_reset(node_description *node)
 
 	context->reset_on_high = (lfsr_desc->flags & DISC_LFSR_FLAG_RESET_TYPE_H) ? 1 : 0;
 	context->invert_output = lfsr_desc->flags & DISC_LFSR_FLAG_OUT_INVERT;
+	context->out_is_f0 = (lfsr_desc->flags & DISC_LFSR_FLAG_OUTPUT_F0) ? 1 : 0;
 
 	if ((lfsr_desc->clock_type < DISC_CLK_ON_F_EDGE) || (lfsr_desc->clock_type > DISC_CLK_IS_FREQ))
 		discrete_log("Invalid clock type passed in NODE_%d\n", node->node - NODE_START);
@@ -1442,6 +1458,97 @@ void dss_squarewave2_reset(node_description *node)
 	dss_squarewave2_step(node);
 }
 
+/************************************************************************
+ *
+ * DSS_INVERTER_OSC - Usage of node_description values
+ *
+ * input0    - Enable input value
+ * input1    - RC Resistor
+ * input2    - RP Resistor
+ * input3    - C Capacitor
+ * input4    - Desc
+ *
+ ************************************************************************/
+#define DSS_INVERTER_OSC__ENABLE	(*(node->input[0]))
+#define DSS_INVERTER_OSC__RC		(*(node->input[1]))
+#define DSS_INVERTER_OSC__RP		(*(node->input[2]))
+#define DSS_INVERTER_OSC__C			(*(node->input[3]))
+
+static double dss_inverter_tf(node_description *node, double x)
+{
+	const discrete_inverter_osc_desc *info = node->custom;
+	struct dss_inverter_osc_context *context = node->context;
+
+	x = x / info->vB;
+	if (x>0)
+	 	return info->vB * exp(-context->tf_a * pow(x,context->tf_b));
+	else
+		return info->vB;
+}
+
+void dss_inverter_osc_step(node_description *node)
+{
+	struct dss_inverter_osc_context *context = node->context;
+	const discrete_inverter_osc_desc *info = node->custom;
+	double diff,vG1,vG2, vG3, vI;
+
+	/* Get new state */
+	vI = context->vCap + context->vG2_old;
+	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
+	{
+		case DISC_OSC_INVERTER_IS_TYPE1:
+		case DISC_OSC_INVERTER_IS_TYPE3:
+			vG1 = dss_inverter_tf(node,vI);
+			vG2 = dss_inverter_tf(node,vG1);
+			vG3 = dss_inverter_tf(node,vG2);
+			break;
+		case DISC_OSC_INVERTER_IS_TYPE2:
+			vG1 = 0;
+			vG3 = dss_inverter_tf(node,vI);
+			vG2 = dss_inverter_tf(node,vG3);
+			break;
+		default:
+			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", node->node - NODE_00);
+	}
+	if ((info->clamp >= 0.0) && ((vI< - info->clamp) || (vI> info->vB+info->clamp)))
+	{
+		vI = MAX(vI, (- info->clamp));
+		vI = MIN(vI, info->vB + info->clamp);
+		diff = vG3 * (context->Rp / (context->Rp + context->R1))
+		     - (context->vCap + vG2)
+		     + vI*(context->R1 / (context->Rp + context->R1));
+		diff = diff - diff * exp(context->wc * discrete_current_context->sample_time);
+	}
+	else
+	{
+		diff = vG3 - (context->vCap + vG2);
+		diff = diff - diff * exp(context->w * discrete_current_context->sample_time);
+	}
+	context->vCap += diff;
+	context->vG2_old = vG2;
+	if ((info->options & DISC_OSC_INVERTER_TYPE_MASK)==DISC_OSC_INVERTER_IS_TYPE3)
+		node->output = vG1;
+	else
+		node->output = vG3;
+}
+
+void dss_inverter_osc_reset(node_description *node)
+{
+	struct dss_inverter_osc_context *context = node->context;
+	const discrete_inverter_osc_desc *info = node->custom;
+
+	/* exponent */
+	context->w = -1.0 / (DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__C);
+	context->wc = -1.0 / ((DSS_INVERTER_OSC__RC * DSS_INVERTER_OSC__RP) / (DSS_INVERTER_OSC__RP + DSS_INVERTER_OSC__RC) * DSS_INVERTER_OSC__C);
+	node->output = 0;
+	context->vCap = 0;
+	context->vG2_old = 0;
+	context->Rp = DSS_INVERTER_OSC__RP;
+	context->R1 = DSS_INVERTER_OSC__RC;
+	context->tf_b = (log(0.0 - log(info->vOutLow/info->vB)) - log(0.0 - log((info->vOutHigh/info->vB))) ) / log(info->vInRise / info->vInFall);
+	context->tf_a = log(0.0 - log(info->vOutLow/info->vB)) - context->tf_b * log(info->vInRise/info->vB);
+	context->tf_a = exp(context->tf_a);
+}
 
 /************************************************************************
  *

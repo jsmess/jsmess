@@ -35,8 +35,6 @@ static WRITE8_HANDLER( mgolf_vram_w )
 static VIDEO_START( mgolf )
 {
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return bg_tilemap == NULL;
 }
 
 
@@ -128,10 +126,10 @@ static MACHINE_RESET( mgolf )
 
 static PALETTE_INIT( mgolf )
 {
-	palette_set_color(machine, 0, 0x80, 0x80, 0x80);
-	palette_set_color(machine, 1, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 2, 0x80, 0x80, 0x80);
-	palette_set_color(machine, 3, 0xff, 0xff, 0xff);
+	palette_set_color(machine, 0, MAKE_RGB(0x80, 0x80, 0x80));
+	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 2, MAKE_RGB(0x80, 0x80, 0x80));
+	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 

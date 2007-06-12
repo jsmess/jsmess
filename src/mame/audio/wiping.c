@@ -25,21 +25,21 @@ typedef struct
 	int frequency;
 	int counter;
 	int volume;
-	const unsigned char *wave;
+	const UINT8 *wave;
 	int oneshot;
 	int oneshotplaying;
 } sound_channel;
 
 
 /* globals available to everyone */
-unsigned char *wiping_soundregs;
+UINT8 *wiping_soundregs;
 
 /* data about the sound system */
 static sound_channel channel_list[MAX_VOICES];
 static sound_channel *last_channel;
 
 /* global sound parameters */
-static const unsigned char *sound_prom,*sound_rom;
+static const UINT8 *sound_prom,*sound_rom;
 static int num_voices;
 static int sound_enable;
 static sound_stream *stream;
@@ -104,7 +104,7 @@ static void wiping_update_mono(void *param, stream_sample_t **inputs, stream_sam
 		/* only update if we have non-zero volume and frequency */
 		if (v && f)
 		{
-			const unsigned char *w = voice->wave;
+			const UINT8 *w = voice->wave;
 			int c = voice->counter;
 
 			mix = mixer_buffer;

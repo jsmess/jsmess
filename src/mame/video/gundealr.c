@@ -10,7 +10,7 @@
 
 
 
-unsigned char *gundealr_bg_videoram,*gundealr_fg_videoram;
+UINT8 *gundealr_bg_videoram,*gundealr_fg_videoram;
 
 static tilemap *bg_tilemap,*fg_tilemap;
 static int flipscreen;
@@ -25,7 +25,7 @@ static int flipscreen;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char attr = gundealr_bg_videoram[2*tile_index+1];
+	UINT8 attr = gundealr_bg_videoram[2*tile_index+1];
 	SET_TILE_INFO(
 			0,
 			gundealr_bg_videoram[2*tile_index] + ((attr & 0x07) << 8),
@@ -41,7 +41,7 @@ static UINT32 gundealr_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_row
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	unsigned char attr = gundealr_fg_videoram[2*tile_index+1];
+	UINT8 attr = gundealr_fg_videoram[2*tile_index+1];
 	SET_TILE_INFO(
 			1,
 			gundealr_fg_videoram[2*tile_index] + ((attr & 0x03) << 8),
@@ -63,8 +63,6 @@ VIDEO_START( gundealr )
 	fg_tilemap = tilemap_create(get_fg_tile_info,gundealr_scan,    TILEMAP_TRANSPARENT,16,16,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
-
-	return 0;
 }
 
 
@@ -102,12 +100,12 @@ WRITE8_HANDLER( gundealr_paletteram_w )
 	b = (val >> 4) & 0x0f;
 	/* TODO: the bottom 4 bits are used as well, but I'm not sure about the meaning */
 
-	palette_set_color(Machine,offset / 2,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(Machine,offset / 2,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 WRITE8_HANDLER( gundealr_fg_scroll_w )
 {
-	static unsigned char scroll[4];
+	static UINT8 scroll[4];
 
 	scroll[offset] = data;
 	tilemap_set_scrollx(fg_tilemap,0,scroll[1] | ((scroll[0] & 0x03) << 8));
@@ -116,7 +114,7 @@ WRITE8_HANDLER( gundealr_fg_scroll_w )
 
 WRITE8_HANDLER( yamyam_fg_scroll_w )
 {
-	static unsigned char scroll[4];
+	static UINT8 scroll[4];
 
 	scroll[offset] = data;
 	tilemap_set_scrollx(fg_tilemap,0,scroll[0] | ((scroll[1] & 0x03) << 8));

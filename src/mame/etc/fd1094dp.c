@@ -37,7 +37,7 @@ char srcpath[250],dstfilename[250];
 		 (BIT(val, B1) <<  1) | \
 		 (BIT(val, B0) <<  0))
 
-unsigned short buffer[0x2000];
+UINT16 buffer[0x2000];
 int little_endian;
 
 int is_little_endian(void)
@@ -487,7 +487,7 @@ void find_global_key(void)
 }
 
 
-unsigned char mainkey[0x2000];
+UINT8 mainkey[0x2000];
 
 void find_main_key(void)
 {

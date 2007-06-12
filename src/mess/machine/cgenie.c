@@ -804,7 +804,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 				b = 15;
 			}
 		}
-		palette_set_color(Machine, 0, r, g, b);
+		palette_set_color_rgb(Machine, 0, r, g, b);
 	}
 
 	/* character mode changed ? */

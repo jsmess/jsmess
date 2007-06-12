@@ -61,7 +61,7 @@ VIDEO_START( jedi )
 	bgexbitmap = auto_bitmap_alloc(512, 512, machine->screen[0].format);
 
 	/* reserve color 1024 for black (disabled display) */
-	palette_set_color(machine, 1024, 0, 0, 0);
+	palette_set_color(machine, 1024, MAKE_RGB(0, 0, 0));
 
 	/* register for saving */
 	state_save_register_global(jedi_vscroll);
@@ -70,8 +70,6 @@ VIDEO_START( jedi )
 	state_save_register_global(video_off);
 	state_save_register_global(smooth_table);
 	state_save_register_func_postload(jedi_postload);
-
-	return 0;
 }
 
 
@@ -118,7 +116,7 @@ WRITE8_HANDLER( jedi_paletteram_w )
 	bits = (color >> 0) & 7;
 	b = 5 * bits * intensity;
 
-	palette_set_color(Machine, offset & 0x3ff, r, g, b);
+	palette_set_color(Machine, offset & 0x3ff, MAKE_RGB(r, g, b));
 }
 
 

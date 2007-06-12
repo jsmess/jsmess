@@ -95,8 +95,6 @@ VIDEO_START( lastduel )
 
 	sprite_flipy_mask = 0x40;
 	sprite_pri_mask = 0x00;
-
-	return 0;
 }
 
 VIDEO_START( madgear )
@@ -111,8 +109,6 @@ VIDEO_START( madgear )
 
 	sprite_flipy_mask = 0x80;
 	sprite_pri_mask = 0x10;
-
-	return 0;
 }
 
 

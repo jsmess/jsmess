@@ -1,7 +1,7 @@
 #include "driver.h"
 
 
-unsigned char *mexico86_protection_ram;
+UINT8 *mexico86_protection_ram;
 
 
 static int kikikai_mcu_running, kikikai_mcu_initialised;
@@ -230,7 +230,7 @@ INTERRUPT_GEN( mexico86_m68705_interrupt )
 
 
 
-static unsigned char portA_in,portA_out,ddrA;
+static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( mexico86_68705_portA_r )
 {
@@ -267,7 +267,7 @@ WRITE8_HANDLER( mexico86_68705_ddrA_w )
  *  7   W  not used?
  */
 
-static unsigned char portB_in,portB_out,ddrB;
+static UINT8 portB_in,portB_out,ddrB;
 
 READ8_HANDLER( mexico86_68705_portB_r )
 {

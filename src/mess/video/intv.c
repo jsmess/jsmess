@@ -14,8 +14,7 @@ VIDEO_START( intv )
 {
 	//int i,j,k;
 
-	if (video_start_generic_bitmapped(machine))
-		return 1;
+	video_start_generic_bitmapped(machine);
 
 /*
     for (i = 0; i < 8; i++) {
@@ -61,8 +60,6 @@ VIDEO_START( intv )
 		intv_gramdirtybytes[i] = 1;
     }
 */
-
-    return 0;
 }
 
 /* NPW 20-Apr-2002 - Changing this to fix compilation errors with MSVC */
@@ -779,11 +776,8 @@ VIDEO_START( intvkbd )
 {
 	videoram_size = 0x0800;
 	videoram = auto_malloc(videoram_size);
-
-    if (video_start_generic(machine))
-        return 1;
-
-	return video_start_intv(machine);
+    video_start_generic(machine);
+	video_start_intv(machine);
 }
 
 /* very rudimentary support for the tms9927 character generator IC */

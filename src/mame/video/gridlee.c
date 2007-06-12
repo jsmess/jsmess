@@ -47,7 +47,7 @@ PALETTE_INIT( gridlee )
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		palette_set_color(machine,i,pal4bit(color_prom[0x0000]),pal4bit(color_prom[0x0800]),pal4bit(color_prom[0x1000]));
+		palette_set_color_rgb(machine,i,pal4bit(color_prom[0x0000]),pal4bit(color_prom[0x0800]),pal4bit(color_prom[0x1000]));
 		color_prom++;
 	}
 }
@@ -67,7 +67,6 @@ VIDEO_START( gridlee )
 
 	/* reset the palette */
 	palettebank_vis = 0;
-	return 0;
 }
 
 

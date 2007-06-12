@@ -3,12 +3,12 @@
 #include "cpu/i8039/i8039.h"
 #include "sound/dac.h"
 
-static unsigned int port_8255_c03 = 0;
-static unsigned int port_8255_c47 = 0;
-static unsigned int port_7751_p27 = 0;
-static unsigned int rom_offset = 0;
-static unsigned int rom_base = 0;
-static unsigned int rom_bank = 0;
+static UINT32 port_8255_c03 = 0;
+static UINT32 port_8255_c47 = 0;
+static UINT32 port_7751_p27 = 0;
+static UINT32 rom_offset = 0;
+static UINT32 rom_base = 0;
+static UINT32 rom_bank = 0;
 
 static void trigger_7751_sound(int data)
 {
@@ -52,7 +52,7 @@ READ8_HANDLER( sys16_7751_audio_8255_r )
 /* read from BUS */
 READ8_HANDLER( sys16_7751_sh_rom_r )
 {
-	unsigned char *sound_rom = memory_region(REGION_SOUND1);
+	UINT8 *sound_rom = memory_region(REGION_SOUND1);
 
 	return sound_rom[rom_offset+rom_base];
 }

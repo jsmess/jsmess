@@ -9,7 +9,7 @@
 #include "driver.h"
 
 
-unsigned char *mrdo_bgvideoram,*mrdo_fgvideoram;
+UINT8 *mrdo_bgvideoram,*mrdo_fgvideoram;
 static tilemap *bg_tilemap,*fg_tilemap;
 static int flipscreen;
 
@@ -96,7 +96,7 @@ PALETTE_INIT( mrdo )
 		bits0 = (color_prom[a1] >> 4) & 0x03;
 		bits2 = (color_prom[a2] >> 4) & 0x03;
 		b = weight[bits0 + (bits2 << 2)];
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 64;
@@ -125,7 +125,7 @@ PALETTE_INIT( mrdo )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char attr = mrdo_bgvideoram[tile_index];
+	UINT8 attr = mrdo_bgvideoram[tile_index];
 	SET_TILE_INFO(
 			1,
 			mrdo_bgvideoram[tile_index+0x400] + ((attr & 0x80) << 1),
@@ -135,7 +135,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	unsigned char attr = mrdo_fgvideoram[tile_index];
+	UINT8 attr = mrdo_fgvideoram[tile_index];
 	SET_TILE_INFO(
 			0,
 			mrdo_fgvideoram[tile_index+0x400] + ((attr & 0x80) << 1),
@@ -158,8 +158,6 @@ VIDEO_START( mrdo )
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 

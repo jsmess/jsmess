@@ -54,7 +54,7 @@ PALETTE_INIT( gunsmoke )
 
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 
@@ -167,8 +167,6 @@ VIDEO_START( gunsmoke )
 	state_save_register_global(objon);
 	state_save_register_global(bgon);
 	state_save_register_global(sprite3bank);
-
-	return 0;
 }
 
 static void gunsmoke_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

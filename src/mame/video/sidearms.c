@@ -15,7 +15,7 @@ UINT8 *sidearms_bg_scrolly;
 
 static UINT8 *tilerom;
 static int bgon, objon, staron, charon, flipon;
-static unsigned int hflop_74a_n, hcount_191, vcount_191, latch_374;
+static UINT32 hflop_74a_n, hcount_191, vcount_191, latch_374;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
@@ -83,7 +83,7 @@ WRITE8_HANDLER( sidearms_gfxctrl_w )
 
 WRITE8_HANDLER( sidearms_star_scrollx_w )
 {
-	unsigned int last_state = hcount_191;
+	UINT32 last_state = hcount_191;
 
 	hcount_191++;
 	hcount_191 &= 0x1ff;
@@ -169,8 +169,6 @@ VIDEO_START( sidearms )
 	latch_374 = vcount_191 = hcount_191 = 0;
 
 	flipon = charon = staron = objon = bgon = 0;
-
-	return 0;
 }
 
 void sidearms_draw_sprites_region( mame_bitmap *bitmap, int start_offset, int end_offset )
@@ -209,7 +207,7 @@ void sidearms_draw_sprites_region( mame_bitmap *bitmap, int start_offset, int en
 static void sidearms_draw_starfield( mame_bitmap *bitmap )
 {
 	int x, y, i;
-	unsigned int hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
+	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
 	UINT8 *sf_rom;
 	UINT16 *lineptr;
 	int pixadv, lineadv;

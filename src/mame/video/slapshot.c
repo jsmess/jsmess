@@ -41,15 +41,9 @@ VIDEO_START( slapshot_core )
 	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
 
 	if (has_TC0480SCP())	/* it's a tc0480scp game */
-	{
-		if (TC0480SCP_vh_start(TC0480SCP_GFX_NUM,taito_hide_pixels,30,9,-1,1,0,2,256))
-			return 1;
-	}
+		TC0480SCP_vh_start(TC0480SCP_GFX_NUM,taito_hide_pixels,30,9,-1,1,0,2,256);
 	else	/* it's a tc0100scn game */
-	{
-		if (TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0))
-			return 1;
-	}
+		TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
 
 	TC0360PRI_vh_start();	/* Purely for save-state purposes */
 
@@ -66,15 +60,13 @@ VIDEO_START( slapshot_core )
 	state_save_register_global(sprites_active_area);
 	state_save_register_global_pointer(spriteram_delayed, spriteram_size/2);
 	state_save_register_global_pointer(spriteram_buffered, spriteram_size/2);
-
-	return 0;
 }
 
 VIDEO_START( slapshot )
 {
 	taito_hide_pixels = 3;
 	taito_sprite_type = 2;
-	return video_start_slapshot_core(machine);
+	video_start_slapshot_core(machine);
 }
 
 
@@ -141,7 +133,7 @@ static void slapshot_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect,
 	int code,color,spritedata,spritecont,flipx,flipy;
 	int xcurrent,ycurrent,big_sprite=0;
 	int y_no=0, x_no=0, xlatch=0, ylatch=0, last_continuation_tile=0;   /* for zooms */
-	unsigned int zoomword, zoomx, zoomy, zx=0, zy=0, zoomxlatch=0, zoomylatch=0;   /* for zooms */
+	UINT32 zoomword, zoomx, zoomy, zx=0, zy=0, zoomxlatch=0, zoomylatch=0;   /* for zooms */
 	int scroll1x, scroll1y;
 	int scrollx=0, scrolly=0;
 	int curx,cury;

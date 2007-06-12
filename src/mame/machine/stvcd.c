@@ -39,7 +39,7 @@
 static cdrom_file *cdrom = (cdrom_file *)NULL;
 
 static void cd_readTOC(void);
-static void cd_readblock(unsigned long fad, unsigned char *dat);
+static void cd_readblock(UINT32 fad, UINT8 *dat);
 static void cd_playdata(void);
 
 #define MAX_FILTERS	(24)
@@ -47,10 +47,10 @@ static void cd_playdata(void);
 
 typedef struct
 {
-	unsigned char flags;		// iso9660 flags
-	unsigned long length;		// length of file
-	unsigned long firstfad;		// first sector of file
-	unsigned char name[128];
+	UINT8 flags;		// iso9660 flags
+	UINT32 length;		// length of file
+	UINT32 firstfad;		// first sector of file
+	UINT8 name[128];
 } direntryT;
 
 typedef struct
@@ -132,15 +132,15 @@ static int cddevicenum;
 static UINT16 cr1, cr2, cr3, cr4;
 static UINT16 hirqmask, hirqreg;
 static UINT16 cd_stat;
-static unsigned int cd_curfad = 0;
+static UINT32 cd_curfad = 0;
 static UINT32 in_buffer = 0;	// amount of data in the buffer
 static int oddframe = 0;
 static UINT32 fadstoplay = 0;
 static int buffull, sectorstore, freeblocks;
 
 // iso9660 utilities
-static void read_new_dir(unsigned long fileno);
-static void make_dir_current(unsigned long fad);
+static void read_new_dir(UINT32 fileno);
+static void make_dir_current(UINT32 fad);
 
 static direntryT curroot;		// root entry of current filesystem
 static direntryT *curdir;		// current directory
@@ -365,7 +365,7 @@ static void cd_defragblocks(partitionT *part)
 
 static UINT16 cd_readWord(UINT32 addr)
 {
-	unsigned short rv;
+	UINT16 rv;
 
 	switch (addr & 0xffff)
 	{
@@ -538,7 +538,7 @@ static UINT32 cd_readLong(UINT32 addr)
 
 static void cd_writeWord(UINT32 addr, UINT16 data)
 {
-	unsigned long temp;
+	UINT32 temp;
 
 	switch(addr & 0xffff)
 	{
@@ -1408,11 +1408,11 @@ WRITE32_HANDLER( stvcd_w )
 }
 
 // iso9660 parsing
-static void read_new_dir(unsigned long fileno)
+static void read_new_dir(UINT32 fileno)
 {
 	int foundpd, i;
-	unsigned long cfad, dirfad;
-	unsigned char sect[2048];
+	UINT32 cfad, dirfad;
+	UINT8 sect[2048];
 
 	if (fileno == 0xffffff)
 	{
@@ -1468,7 +1468,7 @@ static void read_new_dir(unsigned long fileno)
 			// easy to fix, but make sure we *need* to first
 			if (curroot.length > 14336)
 			{
-				mame_printf_error("ERROR: root directory too big (%ld)\n", curroot.length);
+				mame_printf_error("ERROR: root directory too big (%d)\n", curroot.length);
 			}
 
 			// done with all that, read the root directory now
@@ -1479,18 +1479,18 @@ static void read_new_dir(unsigned long fileno)
 	{
 		if (curdir[fileno].length > 14336)
 		{
-			mame_printf_error("ERROR: new directory too big (%ld)!\n", curdir[fileno].length);
+			mame_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
 		}
 		make_dir_current(curdir[fileno].firstfad);
 	}
 }
 
 // makes the directory pointed to by FAD current
-static void make_dir_current(unsigned long fad)
+static void make_dir_current(UINT32 fad)
 {
 	int i;
-	unsigned long nextent, numentries;
-	unsigned char sect[14336];
+	UINT32 nextent, numentries;
+	UINT8 sect[14336];
 	direntryT *curentry;
 
 	memset(sect, 0, 14336);
@@ -1519,7 +1519,7 @@ static void make_dir_current(unsigned long fad)
 		free((void *)curdir);
 	}
 
-	curdir = (direntryT *)malloc(sizeof(direntryT)*numentries);
+	curdir = (direntryT *)malloc_or_die(sizeof(direntryT)*numentries);
 	curentry = curdir;
 	numfiles = numentries;
 
@@ -1846,7 +1846,7 @@ static void cd_playdata(void)
 }
 
 // loads a single sector off the CD, anywhere from FAD 150 on up
-static void cd_readblock(unsigned long fad, unsigned char *dat)
+static void cd_readblock(UINT32 fad, UINT8 *dat)
 {
 	if (cdrom)
 	{

@@ -34,8 +34,6 @@ WRITE8_HANDLER( spaceint_videoram_w )
 VIDEO_START( spaceint )
 {
 	colorram = auto_malloc(videoram_size);
-
-	return 0;
 }
 
 

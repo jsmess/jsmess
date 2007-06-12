@@ -95,7 +95,7 @@ namconb1_install_palette( void )
 
 			for( byte_offset=0; byte_offset<4; byte_offset++ )
 			{
-				palette_set_color( Machine, pen++, r>>24, g>>24, b>>24 );
+				palette_set_color_rgb( Machine, pen++, r>>24, g>>24, b>>24 );
 				r<<=8; g<<=8; b<<=8;
 			}
 		}
@@ -222,12 +222,8 @@ NB1objcode2tile( int code )
 
 VIDEO_START( namconb1 )
 {
-	if( namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), NB1TilemapCB )==0 )
-	{
-		namco_obj_init(NAMCONB1_SPRITEGFX,0x0,NB1objcode2tile);
-		return 0; /* no error */
-	}
-	return -1;
+	namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), NB1TilemapCB );
+	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,NB1objcode2tile);
 } /* namconb1 */
 
 /****************************************************************************************************/
@@ -288,14 +284,7 @@ NB2objcode2tile( int code )
 
 VIDEO_START( namconb2 )
 {
-	if( namco_tilemap_init(
-		NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), NB2TilemapCB ) == 0 )
-	{
-		namco_obj_init(NAMCONB1_SPRITEGFX,0x0,NB2objcode2tile);
-		if( namco_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION)==0 )
-		{
-			return 0;
-		}
-	}
-	return -1;
+	namco_tilemap_init(NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), NB2TilemapCB );
+	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,NB2objcode2tile);
+	namco_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namconb2_vh_start */

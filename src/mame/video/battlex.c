@@ -28,14 +28,14 @@ PALETTE_INIT( battlex )
 			}
 #endif
 
-			palette_set_color(machine, i + 16 * col,r,g,b);
+			palette_set_color(machine, i + 16 * col,MAKE_RGB(r,g,b));
 		}
 	}
 }
 
 WRITE8_HANDLER( battlex_palette_w )
 {
-	palette_set_color(Machine,16*8 + offset,pal1bit(data >> 2),pal1bit(data >> 0),pal1bit(data >> 1));
+	palette_set_color_rgb(Machine,16*8 + offset,pal1bit(data >> 2),pal1bit(data >> 0),pal1bit(data >> 1));
 }
 
 WRITE8_HANDLER( battlex_scroll_x_lsb_w )
@@ -79,8 +79,6 @@ VIDEO_START( battlex )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 64, 32);
-
-	return 0;
 }
 
 static void battlex_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )

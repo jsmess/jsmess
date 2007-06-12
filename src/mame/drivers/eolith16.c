@@ -101,8 +101,6 @@ INPUT_PORTS_END
 VIDEO_START( eolith16 )
 {
 	vram = auto_malloc(0x10000*2);
-
-	return 0;
 }
 
 VIDEO_UPDATE( eolith16 )
@@ -158,7 +156,7 @@ PALETTE_INIT( eolith16 )
 		bit1 = (c >> 7) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine,c,r,g,b);
+		palette_set_color(machine,c,MAKE_RGB(r,g,b));
 	}
 }
 

@@ -20,8 +20,8 @@ segac2.c
 /******************** Sega Genesis ******************************/
 
 /* Genesis based */
-static unsigned int	z80_68000_latch			= 0;
-static unsigned int	z80_latch_bitcount		= 0;
+static UINT32	z80_68000_latch			= 0;
+static UINT32	z80_latch_bitcount		= 0;
 
 /* interrupt states */
 static UINT8		irq2_int;			/* INT2 */
@@ -33,7 +33,7 @@ static mame_timer *	scan_timer;
 
 static int z80running;
 UINT16 *genesis_68k_ram;
-unsigned char *genesis_z80_ram;
+UINT8 *genesis_z80_ram;
 
 
 
@@ -661,7 +661,7 @@ static WRITE8_HANDLER ( genesis_bank_select_w ) /* note value will be meaningles
 //  if (!z80running) logerror("undead Z80 latch write!\n");
 	if (z80_latch_bitcount == 0) z80_68000_latch = 0;
 
-	z80_68000_latch = z80_68000_latch | ((( ((unsigned char)data) & 0x01) << (15+z80_latch_bitcount)));
+	z80_68000_latch = z80_68000_latch | ((( ((UINT8)data) & 0x01) << (15+z80_latch_bitcount)));
  	logerror("value %x written to latch\n", data);
 	z80_latch_bitcount++;
 	if (z80_latch_bitcount == 9)

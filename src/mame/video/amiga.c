@@ -128,7 +128,7 @@ PALETTE_INIT( amiga )
 	int i;
 
 	for (i = 0; i < 0x1000; i++)
-		palette_set_color(machine, i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
+		palette_set_color_rgb(machine, i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
 }
 
 
@@ -156,7 +156,7 @@ VIDEO_START( amiga )
 	/* reset the genlock color */
 	genlock_color = 0xffff;
 
-	return video_start_generic_bitmapped(machine);
+	video_start_generic_bitmapped(machine);
 }
 
 

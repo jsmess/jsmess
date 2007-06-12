@@ -216,6 +216,7 @@
  * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)
  * DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE)
  * DISCRETE_RCDISC5(NODE,ENAB,IN0,RVAL,CVAL)
+ * DISCRETE_RCINTEGRATE(NODE,ENAB,IN0,IN1,RVAL0,RVAL1,CVAL)
  * DISCRETE_RCFILTER(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCFILTER_VREF(NODE,ENAB,IN0,RVAL,CVAL,VREF)
  *
@@ -440,6 +441,7 @@
  *     flags: DISC_LFSR_FLAG_OUT_INVERT     - invert output
  *            DISC_LFSR_FLAG_RESET_TYPE_L   - reset when LOW (Defalut)
  *            DISC_LFSR_FLAG_RESET_TYPE_H   - reset when HIGH
+ *            DISC_LFSR_FLAG_OUTPUT_F0      - output is result of F0
  *
  *  The diagram below outlines the structure of the LFSR model.
  *
@@ -920,6 +922,71 @@
  *     DISC_SCHMITT_OSC_ENAB_IS_NOR
  *
  * EXAMPLES: see Fire Truck, Monte Carlo, Super Bug
+ *
+ ***********************************************************************
+ *
+ * DISCRETE_INVERTER_OSC - Inverter gate oscillator circuits
+ *
+ * TYPE 1/3
+ *               .----------------------------> Netlist Node (Type 3)
+ *               |
+ *        |\     |  |\        |\
+ *        | \    |  | \       | \
+ *     +--|S >o--+--|-->o--+--|  >o--+--------> Netlist Node (Type 1)
+ *     |  | /       | /    |  | /    |
+ *     |  |/        |/     |  |/     |
+ *     Z                   |         |
+ *     Z RP               ---        |
+ *     Z                  --- C      |
+ *     |                   |     R1  |
+ *     '-------------------+----ZZZ--'
+ *
+ * TYPE 2
+ *
+ *        |\        |\
+ *        | \       | \
+ *     +--|S >o--+--|-->o--+-------> Netlist Node
+ *     |  | /    |  | /    |
+ *     |  |/     |  |/     |
+ *     Z         Z         |
+ *     Z RP      Z R1     ---
+ *     Z         Z        --- C
+ *     |         |         |
+ *     '-------------------+
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_INVERTER_OSC( name of node,
+ *                            enable node or static value,
+ *                            R1 static value,
+ *                            RP static value
+ *                            C  static value,
+ *                            address of discrete_inverter_osc_desc structure)
+ *
+ *     discrete_inverter_osc_desc = {vB, vOutLow, vOutHigh, vInRise, vInFall, clamp, options}
+ *
+ *     Where
+ *        vB       Supply Voltage
+ *        vOutLow  Low Output voltage
+ *        vOutHigh High Output voltage
+ *        vInRise  voltage that triggers the gate input to go high (vGate) on rise
+ *        vInFall  voltage that triggers the gate input to go low (0V) on fall
+ *        clamp    internal diode clamp:  [-clamp ... vb+clamp] if clamp>= 0
+ *        options  bitmaped options
+ *
+ *     There is a macro DEFAULT_CD40XX_VALUES(_vB) which may be used to initialize the
+ *     structure with .... = { 5, DEFAULT_CD40XX_VALUES(5), DISC_OSC_INVERTER_IS_TYPE1}
+ *
+ *     The parameters are used to construct a input/output transfer function.
+ *
+ *     Option Values
+ *
+ *         DISC_OSC_INVERTER_IS_TYPE1
+ *         DISC_OSC_INVERTER_IS_TYPE2
+ *         DISC_OSC_INVERTER_IS_TYPE3
+ *         DISC_OSC_INVERTER_OUT_IS_LOGIC
+ *
+ * EXAMPLES: see dkong
  *
  ***********************************************************************
  =======================================================================
@@ -2355,6 +2422,88 @@
  *
  ***********************************************************************
  *
+ * DISCRETE_RCDISC_MODULATED - RC triggered by logic and modulated
+ *
+ *           vP  >---.
+ *                   |
+ *                   Z
+ *                   Z  R1
+ *             O.C.  Z
+ *             |\    |   R2   C1                R3
+ *  INPUT1 >---| o---+--ZZZ---||------+----+---ZZZ------+---> node
+ *             |/                     |    |           /
+ *                                   / \   Z         |/
+ *                            Diode -----  Z R4  .---| NPN
+ *                                    |    Z     |   |\
+ *                                    |    |     |     >
+ *                                   gnd  gnd    |      |
+ *                                               |     gnd
+ *  INPUT2 >----------ZZZ------------------------.
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_RCDISC_MODULATED(name of node,
+ *                      enable,
+ *                      INPUT1 node (or value),
+ *                      INPUT2 node (or value),
+ *                      R1 value in OHMS,
+ *                      R2 value in OHMS,
+ *                      R3 value in OHMS,
+ *                      R4 value in OHMS,
+ *                      C1 value in FARADS,
+ *                      vP value in VOLTS)
+ *
+ * EXAMPLES: dkong
+ *
+ ***********************************************************************
+ *
+ * DISCRETE_RCINTEGRATE - RC integration circuit/amplifier
+ *
+ *
+ *  vP    >-------------------+
+ *                            |
+ *                            Z
+ *                            Z R3
+ *                            Z
+ *                            |
+ *                            +-----------------> node (Type 3)
+ *                           /
+ *                         |/
+ *  INPUT  >---------------| NPN
+ *                          \    .--------------> node (Type 2)
+ *                           >   |  R1
+ *                            +--+--ZZZ-+-------> node (Type 1)
+ *                            |         |
+ *                            Z        ---
+ *                            Z R2    C---
+ *                            Z         |
+ *                            |         |
+ *                           gnd       gnd
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_RCINTEGRATE(name of node,
+ *                          enable,
+ *                          INPUT node (or value),
+ *                          R1 value in OHMS,
+ *                          R2 value in OHMS,
+ *                          R3 value in OHMS,
+ *                          C  value in FARADS,
+ *                          vP node (or value in VOLTS)
+ *                          TYPE)
+ *
+ * TYPE: RC_INTEGRATE_TYPE1, RC_INTEGRATE_TYPE2, RC_INTEGRATE_TYPE3
+ *
+ * Actually an amplifier as well. Primary reason for implementation was integration.
+ * The integration configuration (TYPE3, R3=0) works quite well, the amplifying
+ * configuration is missing a good, yet simple ( :-) ) transistor model. Around the
+ * defined working point the amplifier delivers results.
+ *
+ * EXAMPLES: dkong
+ *
+ *
+ ***********************************************************************
+ *
  * DISCRETE_RCFILTER - Simple single pole RC filter network (vRef = 0)
  * DISCRETE_RCFILTER_VREF - Same but refrenced to vRef not 0V
  *
@@ -2905,6 +3054,7 @@
 #define DISC_LFSR_FLAG_OUT_INVERT		0x01
 #define DISC_LFSR_FLAG_RESET_TYPE_L		0x00
 #define DISC_LFSR_FLAG_RESET_TYPE_H		0x02
+#define DISC_LFSR_FLAG_OUTPUT_F0		0x04
 
 /* Sample & Hold supported clock types */
 #define DISC_SAMPHOLD_REDGE				0
@@ -3033,6 +3183,13 @@ enum
 #define DISC_OUT_ACTIVE_HIGH			0x00
 
 #define DISC_CD4066_THRESHOLD           2.75
+
+/* Integrate */
+
+#define DISC_RC_INTEGRATE_TYPE1						0x00
+#define DISC_RC_INTEGRATE_TYPE2						0x01
+#define DISC_RC_INTEGRATE_TYPE3						0x02
+
 /*************************************
  *
  *  The discrete sound blocks as
@@ -3363,6 +3520,32 @@ struct _discrete_custom_info
 typedef struct _discrete_custom_info discrete_custom_info;
 
 
+// Taken from the transfer characteristerics diagram in CD4049UB datasheet (TI)
+// There is no default trigger point and vI-vO is a continuous function
+// Therefore for the use here, just take a linear approach for vInRise and vInFall
+
+//#define DEFAULT_CD40XX_VALUES(_vB)    -0.1e-6,0.1e-6,(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.8,(_vB)/5.0*3.2
+#define DEFAULT_CD40XX_VALUES(_vB) 	(_vB),(_vB)*0.02,(_vB)*0.98,(_vB)/5.0*1.5,(_vB)/5.0*3.5, 0.1
+
+#define DISC_OSC_INVERTER_IS_TYPE1			0x00
+#define DISC_OSC_INVERTER_IS_TYPE2			0x01
+#define DISC_OSC_INVERTER_IS_TYPE3			0x02
+#define DISC_OSC_INVERTER_TYPE_MASK			0x03
+
+#define DISC_OSC_INVERTER_OUT_IS_LOGIC		0x04
+
+struct _discrete_inverter_osc_desc
+{
+	double	vB;
+	double	vOutLow;
+	double	vOutHigh;
+	double	vInFall;	// voltage that triggers the gate input to go low (0V) on fall
+	double	vInRise;	// voltage that triggers the gate input to go high (vGate) on rise
+	double	clamp; 		// voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
+	int		options;	// bitmaped options
+};
+typedef struct _discrete_inverter_osc_desc discrete_inverter_osc_desc;
+
 
 /*************************************
  *
@@ -3449,6 +3632,7 @@ enum
 	DSS_SQUAREWAVE,		/* Square Wave generator, adjustable frequency based */
 	DSS_SQUAREWFIX,		/* Square Wave generator, fixed frequency based (faster) */
 	DSS_SQUAREWAVE2,	/* Square Wave generator, time based */
+	DSS_INVERTER_OSC,	/* Oscillator based on inverter circuits */
 	DSS_TRIANGLEWAVE,	/* Triangle wave generator, frequency based */
 	/* Component specific */
 	DSS_OP_AMP_OSC,		/* Op Amp Oscillator */
@@ -3503,6 +3687,8 @@ enum
 	DST_RCDISC3,		/* Charge/discharge with diode */
 	DST_RCDISC4,		/* various Charge/discharge circuits */
 	DST_RCDISC5,        /* Diode in series with R//C */
+	DST_RCINTEGRATE,	/* NPN RC charge/discharge network */
+	DST_RCDISC_MOD,		/* Two diode mixer with Transistor and charge/discharge network */
 	DST_RCFILTER,		/* Simple RC Filter network */
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
 	DST_RCFILTERN,		/* Simple RC Filter network */
@@ -3569,6 +3755,7 @@ enum
 #define DISCRETE_SQUAREWAVE2(NODE,ENAB,AMPL,T_OFF,T_ON,BIAS,TSHIFT)     { NODE, DSS_SQUAREWAVE2 , 6, { ENAB,AMPL,T_OFF,T_ON,BIAS,NODE_NC }, { ENAB,AMPL,T_OFF,T_ON,BIAS,TSHIFT }, NULL, "Square Wave 2" },
 #define DISCRETE_TRIANGLEWAVE(NODE,ENAB,FREQ,AMPL,BIAS,PHASE)           { NODE, DSS_TRIANGLEWAVE, 5, { ENAB,FREQ,AMPL,BIAS,NODE_NC }, { ENAB,FREQ,AMPL,BIAS,PHASE }, NULL, "Triangle Wave" },
 /* Component specific */
+#define DISCRETE_INVERTER_OSC(NODE,ENAB,RCHARGE,RP,C,INFO)              { NODE, DSS_INVERTER_OSC, 4, { ENAB,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RCHARGE,RP,C }, INFO, "Inverter Oscillator" },
 #define DISCRETE_OP_AMP_OSCILLATOR(NODE,ENAB,INFO)                      { NODE, DSS_OP_AMP_OSC  , 1, { ENAB }, { ENAB }, INFO, "Op Amp Oscillator" },
 #define DISCRETE_OP_AMP_VCO1(NODE,ENAB,VMOD1,INFO)                      { NODE, DSS_OP_AMP_OSC  , 2, { ENAB,VMOD1 }, { ENAB,VMOD1 }, INFO, "Op Amp VCO 1-vMod" },
 #define DISCRETE_OP_AMP_VCO2(NODE,ENAB,VMOD1,VMOD2,INFO)                { NODE, DSS_OP_AMP_OSC  , 3, { ENAB,VMOD1,VMOD2 }, { ENAB,VMOD1,VMOD2 }, INFO, "Op Amp VCO 2-vMod" },
@@ -3622,7 +3809,7 @@ enum
 /* Component specific */
 #define DISCRETE_COMP_ADDER(NODE,ENAB,DATA,TABLE)                       { NODE, DST_COMP_ADDER  , 2, { ENAB,DATA }, { ENAB,DATA }, TABLE, "Selectable R or C component Adder" },
 #define DISCRETE_DAC_R1(NODE,ENAB,DATA,VDATA,LADDER)                    { NODE, DST_DAC_R1      , 3, { ENAB,DATA,VDATA }, { ENAB,DATA,VDATA }, LADDER, "DAC with R1 Ladder" },
-#define DISCRETE_DIODE_MIXER2(NODE,ENAB,VJUNC,IN0,IN1)                  { NODE, DST_DIODE_MIX   , 4, { ENAB,NODE_NC,IN0,IN1 }, { ENAB,VJUNC,IN0,IN1 }, INFO, "Diode Mixer 2 Stage" },
+#define DISCRETE_DIODE_MIXER2(NODE,ENAB,VJUNC,IN0,IN1)                  { NODE, DST_DIODE_MIX   , 4, { ENAB,NODE_NC,IN0,IN1 }, { ENAB,VJUNC,IN0,IN1 }, NULL, "Diode Mixer 2 Stage" },
 #define DISCRETE_DIODE_MIXER3(NODE,ENAB,VJUNC,IN0,IN1,IN2)              { NODE, DST_DIODE_MIX   , 5, { ENAB,NODE_NC,IN0,IN1,IN2 }, { ENAB,VJUNC,IN0,IN1,IN2 }, INFO, "Diode Mixer 3 Stage" },
 #define DISCRETE_DIODE_MIXER4(NODE,ENAB,VJUNC,IN0,IN1,IN2,IN3)          { NODE, DST_DIODE_MIX   , 6, { ENAB,NODE_NC,IN0,IN1,IN2,IN3 }, { ENAB,VJUNC,IN0,IN1,IN2,IN3 }, INFO, "Diode Mixer 4 Stage" },
 #define DISCRETE_INTEGRATE(NODE,TRG0,TRG1,INFO)                         { NODE, DST_INTEGRATE   , 2, { TRG0,TRG1 }, { TRG0,TRG1 }, INFO, "Various Integraton Circuit" },
@@ -3651,6 +3838,8 @@ enum
 #define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)               { NODE, DST_RCDISC3     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL }, NULL, "RC Discharge 3" },
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) { NODE, DST_RCDISC4     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE }, NULL, "RC Discharge 4" },
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "RC Discharge 5" },
+#define DISCRETE_RCINTEGRATE(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)		{ NODE, DST_RCINTEGRATE     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "RC Discharge 6" },
+#define DISCRETE_RCDISC_MODULATED(NODE,ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)			{ NODE, DST_RCDISC_MOD     , 9, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "Modulated RC Discharge" },
 #define DISCRETE_RCFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_RCFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "RC Filter" },
 #define DISCRETE_RCFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_RCFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "RC Filter to VREF" },
 /* For testing - seem to be buggered.  Use versions not ending in N. */

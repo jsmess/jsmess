@@ -303,7 +303,7 @@ WRITE16_HANDLER( seta_vregs_w )
 
 				if (new_bank != seta_samples_bank)
 				{
-					unsigned char *rom = memory_region(REGION_SOUND1);
+					UINT8 *rom = memory_region(REGION_SOUND1);
 					int samples_len = memory_region_length(REGION_SOUND1);
 					int addr;
 
@@ -467,8 +467,6 @@ VIDEO_START( seta_2_layers )
 
 		find_offsets();
 		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
-
-		return 0;
 }
 
 
@@ -497,8 +495,6 @@ VIDEO_START( seta_1_layer )
 
 		find_offsets();
 		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
-
-		return 0;
 }
 
 VIDEO_START( twineagl_1_layer )
@@ -525,8 +521,6 @@ VIDEO_START( twineagl_1_layer )
 
 		find_offsets();
 		seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
-
-		return 0;
 }
 
 
@@ -539,15 +533,12 @@ VIDEO_START( seta_no_layers )
 	tilemap_3 = 0;
 	find_offsets();
 	seta_samples_bank = -1;	// set the samples bank to an out of range value at start-up
-	return 0;
 }
 
 VIDEO_START( oisipuzl_2_layers )
 {
-	if (video_start_seta_2_layers(machine))
-		return 1;
+	video_start_seta_2_layers(machine);
 	tilemaps_flip = 1;
-	return 0;
 }
 
 
@@ -632,8 +623,8 @@ PALETTE_INIT( usclssic )
 
 		data = (color_prom[x*2] <<8) | color_prom[x*2+1];
 
-		if (x>=0x100) palette_set_color(machine,x,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
-		else palette_set_color(machine,x+0x300,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+		if (x>=0x100) palette_set_color_rgb(machine,x,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+		else palette_set_color_rgb(machine,x+0x300,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 	}
 
 	for( color = 0; color < 32; color++ )

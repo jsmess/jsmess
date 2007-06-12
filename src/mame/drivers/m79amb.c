@@ -149,7 +149,7 @@ static INTERRUPT_GEN( M79_interrupt )
 
 static DRIVER_INIT( m79amb )
 {
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 	int i;
 
 	/* PROM data is active low */

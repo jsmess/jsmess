@@ -154,7 +154,7 @@ static WRITE8_HANDLER( paletteram_IIBBGGRR_w )
 	b = (data >> 2) & 0x0c;
 	if (b) b |= i;
 
-	palette_set_color(Machine,offset,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(Machine,offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 

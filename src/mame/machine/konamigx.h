@@ -88,7 +88,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 					tilemap *sub2, int sub2flags,
 					int mixerflags);
 
-int konamigx_mixer_init(int objdma);
+void konamigx_mixer_init(int objdma);
 void konamigx_mixer_primode(int mode);
 
 

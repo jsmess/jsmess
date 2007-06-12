@@ -105,8 +105,6 @@ VIDEO_START( toki )
 	tilemap_set_transparent_pen(text_layer,15);
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
-
-	return 0;
 }
 
 /*************************************/

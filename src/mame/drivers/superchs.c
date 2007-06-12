@@ -107,7 +107,7 @@ static WRITE32_HANDLER( superchs_palette_w )
 	g = (a &0xff00) >> 8;
 	b = (a &0xff);
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( superchs_input_r )

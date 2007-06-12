@@ -380,10 +380,9 @@ static void init_tables(void)
 
 	/* allocate the mirror table */
 	if (!mirror_table)
-		mirror_table = malloc(65536 * sizeof(mirror_table[0]));
+		mirror_table = malloc_or_die(65536 * sizeof(mirror_table[0]));
 
 	/* fill in the mirror table */
-	if (mirror_table)
 		for (i = 0; i < 65536; i++)
 			mirror_table[i] = ((i >> 15) & 0x0001) | ((i >> 13) & 0x0002) |
 			                  ((i >> 11) & 0x0004) | ((i >> 9)  & 0x0008) |
@@ -396,10 +395,9 @@ static void init_tables(void)
 
 	/* allocate the condition table */
 	if (!condition_table)
-		condition_table = malloc(32 * 8 * sizeof(condition_table[0]));
+		condition_table = malloc_or_die(32 * 8 * sizeof(condition_table[0]));
 
 	/* fill in the condition table */
-	if (condition_table)
 		for (i = 0; i < 8; i++)
 			for (j = 0; j < 32; j++)
 			{

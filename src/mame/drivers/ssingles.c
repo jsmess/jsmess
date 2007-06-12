@@ -51,7 +51,6 @@ static WRITE8_HANDLER(ssingles_vram_w)
 
 VIDEO_START(ssingles)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(ssingles)

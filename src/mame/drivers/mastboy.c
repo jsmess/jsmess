@@ -459,7 +459,6 @@ int mastboy_m5205_sambit0, mastboy_m5205_sambit1;
 
 VIDEO_START(mastboy)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(mastboy)
@@ -471,7 +470,7 @@ VIDEO_UPDATE(mastboy)
 	{
 		int coldat = mastboy_colram[i+1] |  (mastboy_colram[i+0]<<8);
 
-		palette_set_color(machine,i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
+		palette_set_color_rgb(machine,i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
 
 	for (y=0;y<32;y++)

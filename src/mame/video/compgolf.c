@@ -32,7 +32,7 @@ PALETTE_INIT( compgolf )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -75,8 +75,6 @@ VIDEO_START( compgolf )
 	text_tilemap = tilemap_create(get_text_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(text_tilemap,0);
-
-	return 0;
 }
 
 /*

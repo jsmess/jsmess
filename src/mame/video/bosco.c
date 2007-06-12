@@ -52,7 +52,7 @@ PALETTE_INIT( bosco )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -84,7 +84,7 @@ PALETTE_INIT( bosco )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		palette_set_color(machine,i + 32,r,g,b);
+		palette_set_color(machine,i + 32,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -151,8 +151,6 @@ VIDEO_START( bosco )
 	state_save_register_global(stars_scrolly);
 	state_save_register_global(bosco_starcontrol);
 	state_save_register_global_array(bosco_starblink);
-
-	return 0;
 }
 
 

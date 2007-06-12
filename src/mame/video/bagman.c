@@ -79,7 +79,7 @@ PALETTE_INIT( bagman )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -105,8 +105,6 @@ VIDEO_START( bagman )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void bagman_draw_sprites( mame_bitmap *bitmap )

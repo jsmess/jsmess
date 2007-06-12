@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_playfield2_tile_info )
  *
  *************************************/
 
-static int video_start_cyberbal_common(int screens)
+static void video_start_cyberbal_common(int screens)
 {
 	static const struct atarimo_desc mo0desc =
 	{
@@ -172,8 +172,7 @@ static int video_start_cyberbal_common(int screens)
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 16,8, 64,64);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &mo0desc))
-		return 1;
+	atarimo_init(0, &mo0desc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16,8, 64,32);
@@ -187,8 +186,7 @@ static int video_start_cyberbal_common(int screens)
 		tilemap_set_scrollx(atarigen_playfield2_tilemap, 0, 0);
 
 		/* initialize the motion objects */
-		if (!atarimo_init(1, &mo1desc))
-			return 1;
+		atarimo_init(1, &mo1desc);
 
 		/* initialize the alphanumerics */
 		atarigen_alpha2_tilemap = tilemap_create(get_alpha2_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16,8, 64,32);
@@ -201,32 +199,25 @@ static int video_start_cyberbal_common(int screens)
 	current_slip[1] = 0;
 	total_screens = screens;
 	current_screen = 0;
-	return 0;
 }
 
 
 VIDEO_START( cyberbal )
 {
-	int result = video_start_cyberbal_common(2);
-	if (!result)
-	{
-		/* adjust the sprite positions */
-		atarimo_set_xscroll(0, 4);
-		atarimo_set_xscroll(1, 4);
-	}
-	return result;
+	video_start_cyberbal_common(2);
+
+	/* adjust the sprite positions */
+	atarimo_set_xscroll(0, 4);
+	atarimo_set_xscroll(1, 4);
 }
 
 
 VIDEO_START( cyberb2p )
 {
-	int result = video_start_cyberbal_common(1);
-	if (!result)
-	{
-		/* adjust the sprite positions */
-		atarimo_set_xscroll(0, 5);
-	}
-	return result;
+	video_start_cyberbal_common(1);
+
+	/* adjust the sprite positions */
+	atarimo_set_xscroll(0, 5);
 }
 
 
@@ -259,7 +250,7 @@ INLINE void set_palette_entry(int entry, UINT16 value)
 	g = ((value >> 4) & 0x3e) | ((value >> 15) & 1);
 	b = ((value << 1) & 0x3e) | ((value >> 15) & 1);
 
-	palette_set_color(Machine, entry, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(Machine, entry, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 

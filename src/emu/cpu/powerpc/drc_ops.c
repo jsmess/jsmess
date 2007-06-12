@@ -3740,7 +3740,9 @@ static UINT32 recompile_dsa(drc_core *drc, UINT32 op)
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
+#endif /* HAS_PPC602 */
 
+#if (HAS_PPC602 || HAS_MPC8240)
 static UINT32 recompile_tlbli(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -3750,5 +3752,5 @@ static UINT32 recompile_tlbld(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
-#endif /* HAS_PPC602 */
+#endif
 

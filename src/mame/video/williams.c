@@ -189,7 +189,6 @@ VIDEO_START( williams )
 	blitter_init(williams_blitter_config, NULL);
 	create_palette_lookup();
 	state_save_register();
-	return 0;
 }
 
 
@@ -198,7 +197,6 @@ VIDEO_START( blaster )
 	blitter_init(williams_blitter_config, memory_region(REGION_PROMS));
 	create_palette_lookup();
 	state_save_register();
-	return 0;
 }
 
 
@@ -215,7 +213,6 @@ VIDEO_START( williams2 )
 	tilemap_set_scrolldx(bg_tilemap, 2, 0);
 
 	state_save_register();
-	return 0;
 }
 
 
@@ -368,9 +365,8 @@ static void create_palette_lookup(void)
 
 WRITE8_HANDLER( williams_paletteram_w )
 {
-	rgb_t color = palette_lookup[data];
 	paletteram[offset] = data;
-	palette_set_color(Machine, offset, RGB_RED(color), RGB_GREEN(color), RGB_BLUE(color));
+	palette_set_color(Machine, offset, palette_lookup[data]);
 }
 
 
@@ -401,7 +397,7 @@ WRITE8_HANDLER( williams2_paletteram_w )
 	b = ((entry_hi >> 0) & 15) * i;
 	g = ((entry_lo >> 4) & 15) * i;
 	r = ((entry_lo >> 0) & 15) * i;
-	palette_set_color(Machine, offset / 2, r, g, b);
+	palette_set_color(Machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -553,11 +549,9 @@ WRITE8_HANDLER( blaster_scanline_control_w )
 
 WRITE8_HANDLER( blaster_palette_0_w )
 {
-	rgb_t color = palette_lookup[data ^ 0xff];
-
 	video_screen_update_partial(0, video_screen_get_vpos(0));
 	blaster_palette_0[offset] = data;
-	palette_set_color(Machine, 16 + offset, RGB_RED(color), RGB_GREEN(color), RGB_BLUE(color));
+	palette_set_color(Machine, 16 + offset, palette_lookup[data ^ 0xff]);
 }
 
 

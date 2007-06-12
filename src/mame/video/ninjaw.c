@@ -28,34 +28,27 @@ static VIDEO_START( ninjaw_core )
 
 	chips = number_of_TC0100SCN();
 
-	if (chips <= 0)	/* we have an erroneous TC0100SCN configuration */
-		return 1;
+	assert_always(chips > 0, "we have an erroneous TC0100SCN configuration");
 
-	if (TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0))
-		return 1;
+	TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
 
 	if (has_TC0110PCR())
-		if (TC0110PCR_vh_start())
-			return 1;
+		TC0110PCR_vh_start();
 
 	if (has_second_TC0110PCR())
-		if (TC0110PCR_1_vh_start())
-			return 1;
+		TC0110PCR_1_vh_start();
 
 	if (has_third_TC0110PCR())
-		if (TC0110PCR_2_vh_start())
-			return 1;
+		TC0110PCR_2_vh_start();
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
 	TC0100SCN_set_chip_colbanks(0x0,0x100,0x200);
-
-	return 0;
 }
 
 VIDEO_START( ninjaw )
 {
 	taito_hide_pixels = 22;
-	return video_start_ninjaw_core(machine);
+	video_start_ninjaw_core(machine);
 }
 
 /************************************************************

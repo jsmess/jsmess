@@ -171,7 +171,6 @@ VIDEO_START( dlair )
 	overlay_bitmap = NULL;
 
 	add_exit_callback(machine, video_cleanup);
-	return 0;
 }
 
 
@@ -181,23 +180,21 @@ PALETTE_INIT( dleuro )
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 		colortable[2 * i + 0] = 8;
 		colortable[2 * i + 1] = i;
 	}
-	palette_set_color(machine, 8, 0, 0, 0);
+	palette_set_color(machine, 8, MAKE_RGB(0, 0, 0));
 }
 
 
 VIDEO_START( dleuro )
 {
-	int result = video_start_dlair(machine);
+	video_start_dlair(machine);
 
 	overlay_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	fillbitmap(overlay_bitmap, 8, NULL);
 	overlay_texture = render_texture_alloc(overlay_bitmap, NULL, 0, TEXFORMAT_PALETTE16, NULL, NULL);
-
-	return result;
 }
 
 

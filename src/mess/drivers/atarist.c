@@ -112,8 +112,7 @@ static VIDEO_START( atarist )
 {
 	int i;
 	for (i=0; i<512; i++)
-		palette_set_color(machine, i,((i>>6)&7)*0x24,((i>>3)&7)*0x24,(i&7)*0x24);
-	return 0;
+		palette_set_color_rgb(machine, i,((i>>6)&7)*0x24,((i>>3)&7)*0x24,(i&7)*0x24);
 }
 
 void atarist_drawborder(int line)

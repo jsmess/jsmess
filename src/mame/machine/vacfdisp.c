@@ -100,7 +100,7 @@ static const char OKI1937ASCII[]=
 
   */
 
-static unsigned short BFMcharset[]=
+static UINT16 BFMcharset[]=
 {           // FEDC BA98 7654 3210
 	0xA626, // 1010 0110 0010 0110 @.
 	0xE027, // 1110 0000 0010 0111 A.
@@ -191,7 +191,7 @@ we actually have 18 segments, including the semicolon portions.
 This means our segment maths needs to be more than 16-bit to work!
 */
 
-static unsigned int OKIcharset[]=
+static UINT32 OKIcharset[]=
 {           // 11 10 FEDC BA98 7654 3210
 	0x0507F, //  0  0 0101 0000 0111 1111 @.
 	0x044CF, //  0  0 0100 0100 1100 1111 A.

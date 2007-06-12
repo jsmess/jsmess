@@ -13,8 +13,8 @@
 #include "cpu/konami/konami.h"
 #include "video/konamiic.h"
 
-unsigned char *ajax_sharedram;
-extern unsigned char ajax_priority;
+UINT8 *ajax_sharedram;
+extern UINT8 ajax_priority;
 static int firq_enable;
 
 /*  ajax_bankswitch_w:
@@ -36,7 +36,7 @@ static int firq_enable;
 
 static WRITE8_HANDLER( ajax_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bankaddress = 0;
 
 	/* rom select */
@@ -192,7 +192,7 @@ WRITE8_HANDLER( ajax_sharedram_w )
 
 WRITE8_HANDLER( ajax_bankswitch_2_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bankaddress;
 
 	/* enable char ROM reading through the video RAM */

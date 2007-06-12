@@ -87,7 +87,7 @@ static void amerdart_scanline(running_machine *machine, int screen, mame_bitmap 
 		for (x = 0; x < 16; x++)
 		{
 			UINT16 pal = vram_base[x];
-			palette_set_color(machine, scanline * 16 + x, pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
+			palette_set_color_rgb(machine, scanline * 16 + x, pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
 	for (x = params->heblnk; x < params->hsblnk; x += 4)
@@ -124,13 +124,13 @@ static void coolpool_scanline(running_machine *machine, int screen, mame_bitmap 
  *
  *************************************/
 
-static void coolpool_to_shiftreg(unsigned int address, UINT16 *shiftreg)
+static void coolpool_to_shiftreg(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
 }
 
 
-static void coolpool_from_shiftreg(unsigned int address, UINT16 *shiftreg)
+static void coolpool_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
 }

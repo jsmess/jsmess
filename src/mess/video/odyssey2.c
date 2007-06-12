@@ -170,7 +170,6 @@ VIDEO_START( odyssey2 )
 	odyssey2_vh_hpos = 0;
 	odyssey2_display = (UINT8 *) auto_malloc(8 * 8 * 256);
 	memset(odyssey2_display, 0, 8 * 8 * 256);
-	return 0;
 }
 
 INLINE int get_horiz_clock_beam_pos( void )
@@ -210,7 +209,7 @@ INLINE int in_vblank( void )
 
 PALETTE_INIT( odyssey2 )
 {
-	palette_set_colors(machine, 0, odyssey2_colors, sizeof(odyssey2_colors) / 3);
+	palette_set_colors_rgb(machine, 0, odyssey2_colors, sizeof(odyssey2_colors) / 3);
 	colortable[0] = 0;
 	colortable[1] = 1;
 }

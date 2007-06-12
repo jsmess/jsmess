@@ -458,7 +458,7 @@ static UINT8 fn(UINT8 in, const struct optimised_sbox *sboxes, UINT32 key)
 
 // srckey is the 64-bit master key (2x32 bits)
 // dstkey will contain the 96-bit key for the 1st FN (4x24 bits)
-void expand_1st_key(unsigned int *dstkey, const unsigned int *srckey)
+void expand_1st_key(UINT32 *dstkey, const UINT32 *srckey)
 {
 	static const int bits[96] =
 	{
@@ -493,7 +493,7 @@ void expand_1st_key(unsigned int *dstkey, const unsigned int *srckey)
 
 // srckey is the 64-bit master key (2x32 bits) XORed with the subkey
 // dstkey will contain the 96-bit key for the 2nd FN (4x24 bits)
-void expand_2nd_key(unsigned int *dstkey, const unsigned int *srckey)
+void expand_2nd_key(UINT32 *dstkey, const UINT32 *srckey)
 {
 	static const int bits[96] =
 	{
@@ -595,7 +595,7 @@ static UINT16 feistel(UINT16 val, const int *bitsA, const int *bitsB,
 
 
 
-static int extract_inputs(unsigned int val, const int *inputs)
+static int extract_inputs(UINT32 val, const int *inputs)
 {
 	int i;
 	int res = 0;
@@ -640,7 +640,7 @@ static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
 }
 
 
-static void cps2_decrypt(const UINT32 *master_key, unsigned int upper_limit)
+static void cps2_decrypt(const UINT32 *master_key, UINT32 upper_limit)
 {
 	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
 	int length = memory_region_length(REGION_CPU1);

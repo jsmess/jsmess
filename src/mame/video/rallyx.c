@@ -145,7 +145,7 @@ PALETTE_INIT( rallyx )
 			b = 0x50 * bit0 + 0xab * bit1;
 		}
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -178,7 +178,7 @@ PALETTE_INIT( rallyx )
 			bits = (i >> 4) & 0x03;
 			b = map[bits];
 
-			palette_set_color(machine,i + 32,r,g,b);
+			palette_set_color(machine,i + 32,MAKE_RGB(r,g,b));
 		}
 	}
 }
@@ -331,8 +331,6 @@ VIDEO_START( rallyx )
 			}
 		}
 	}
-
-	return 0;
 }
 
 

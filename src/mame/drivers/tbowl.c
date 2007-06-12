@@ -48,7 +48,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( tbowlb_bankswitch_w )
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -71,7 +71,7 @@ static WRITE8_HANDLER( tbowlc_bankswitch_w )
 
 ***/
 
-static unsigned char *shared_ram;
+static UINT8 *shared_ram;
 
 static READ8_HANDLER( shared_r )
 {
@@ -210,7 +210,7 @@ static void tbowl_adpcm_int(int num)
 	}
 	else
 	{
-		unsigned char *ROM = memory_region(REGION_SOUND1) + 0x10000 * num;
+		UINT8 *ROM = memory_region(REGION_SOUND1) + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
 		MSM5205_data_w(num,adpcm_data[num] >> 4);

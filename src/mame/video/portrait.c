@@ -65,7 +65,6 @@ VIDEO_START( portrait )
 	foreground = tilemap_create( get_fg_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 32, 32 );
 
 		tilemap_set_transparent_pen( foreground, 0 );
-		return 0;
 }
 
 /* probably not right */
@@ -85,7 +84,7 @@ PALETTE_INIT( portrait )
 		bit2 = (color_prom[i] >> 4) & 0x01;
 		b = 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

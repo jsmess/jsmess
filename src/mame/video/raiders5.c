@@ -72,8 +72,6 @@ VIDEO_START( raiders5 )
 	tilemap_set_scrolldx(background_tilemap, 7, 0);
 
 	tilemap_set_transparent_pen(foreground_tilemap, 0);
-
-	return 0;
 }
 
 

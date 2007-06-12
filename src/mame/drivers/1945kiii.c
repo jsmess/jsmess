@@ -77,7 +77,6 @@ static TILE_GET_INFO( get_k3_bg_tile_info )
 VIDEO_START(k3)
 {
 	k3_bg_tilemap = tilemap_create(get_k3_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,      16, 16, 32,64);
-	return 0;
 }
 
 static void k3_draw_sprites ( mame_bitmap *bitmap, const rectangle *cliprect )

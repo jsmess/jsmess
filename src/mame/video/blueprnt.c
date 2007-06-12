@@ -27,7 +27,7 @@ PALETTE_INIT( blueprnt )
 		int r = ((i >> 0) & 1) * ((i & 0x08) ? 0xbf : 0xff);
 		int g = ((i >> 2) & 1) * ((i & 0x08) ? 0xbf : 0xff);
 		int b = ((i >> 1) & 1) * ((i & 0x08) ? 0xbf : 0xff);
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	/* chars */
@@ -86,8 +86,6 @@ VIDEO_START( blueprnt )
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scroll_cols(bg_tilemap, 32);
-
-	return 0;
 }
 
 static void blueprnt_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

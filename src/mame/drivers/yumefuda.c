@@ -74,8 +74,6 @@ static TILE_GET_INFO( y_get_bg_tile_info )
 VIDEO_START( yumefuda )
 {
 	bg_tilemap = tilemap_create(y_get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( yumefuda )
@@ -187,7 +185,7 @@ static WRITE8_HANDLER( mux_w )
 	//0x14000 bonus game
 	//0x16000 ?
 	if(bank!=new_bank) {
-		unsigned char *ROM = memory_region(REGION_CPU1);
+		UINT8 *ROM = memory_region(REGION_CPU1);
 		UINT32 bankaddress;
 
 		bank = new_bank;

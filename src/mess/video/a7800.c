@@ -74,8 +74,7 @@ VIDEO_START( a7800 )
 {
 	int i;
 
-	if (video_start_generic_bitmapped(machine))
-		return 1;
+	video_start_generic_bitmapped(machine);
 
 	for(i=0; i<8; i++)
 	{
@@ -98,8 +97,6 @@ VIDEO_START( a7800 )
 	maria_bcntl = 0;
 	maria_kangaroo = 0;
 	maria_rm = 0;
-
-	return 0;
 }
 
 /***************************************************************************

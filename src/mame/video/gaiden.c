@@ -84,8 +84,6 @@ VIDEO_START( gaiden )
 	tilemap_set_transparent_pen(background, 0);
 	tilemap_set_transparent_pen(foreground, 0);
 	tilemap_set_transparent_pen(text_layer, 0);
-
-	return 0;
 }
 
 VIDEO_START( raiga )
@@ -104,8 +102,6 @@ VIDEO_START( raiga )
 
 	/* set up sprites */
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-
-	return 0;
 }
 
 VIDEO_START( drgnbowl )
@@ -120,8 +116,6 @@ VIDEO_START( drgnbowl )
 
 	tilemap_set_scrolldx(background, -248, 248);
 	tilemap_set_scrolldx(foreground, -252, 252);
-
-	return 0;
 }
 
 

@@ -219,7 +219,7 @@ static int cps1_sound_fade_timer;
 
 static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 	int length = memory_region_length(REGION_CPU2) - 0x10000;
 	int bankaddr;
 
@@ -311,7 +311,7 @@ struct QSound_interface qsound_interface =
 	REGION_SOUND1
 };
 
-static unsigned char *qsound_sharedram1,*qsound_sharedram2;
+static UINT8 *qsound_sharedram1,*qsound_sharedram2;
 
 INTERRUPT_GEN( cps1_qsound_interrupt )
 {
@@ -321,7 +321,7 @@ INTERRUPT_GEN( cps1_qsound_interrupt )
 
 READ16_HANDLER( qsound_rom_r )
 {
-	unsigned char *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(REGION_USER1);
 
 	if (rom) return rom[offset] | 0xff00;
 	else
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
     Z80 bank register for music note data. It's odd that it isn't encrypted
     though.
     */
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bankaddress=0x10000+((data&0x0f)*0x4000);
 	if (bankaddress >= memory_region_length(REGION_CPU2))
 	{

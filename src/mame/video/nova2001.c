@@ -56,7 +56,7 @@ PALETTE_INIT( nova2001 )
 		/* blue component */
 		b = (((*color_prom >> 4) & 0x0c) | intensity) * 0x11;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -155,8 +155,6 @@ VIDEO_START( nova2001 )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void nova2001_draw_sprites( mame_bitmap *bitmap )

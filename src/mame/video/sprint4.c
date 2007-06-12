@@ -16,12 +16,12 @@ int sprint4_collision[4];
 
 PALETTE_INIT( sprint4 )
 {
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00); /* black  */
-	palette_set_color(machine, 1, 0xfc, 0xdf, 0x80); /* peach  */
-	palette_set_color(machine, 2, 0xf0, 0x00, 0xf0); /* violet */
-	palette_set_color(machine, 3, 0x00, 0xf0, 0x0f); /* green  */
-	palette_set_color(machine, 4, 0x30, 0x4f, 0xff); /* blue   */
-	palette_set_color(machine, 5, 0xff, 0xff, 0xff); /* white  */
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00)); /* black  */
+	palette_set_color(machine, 1, MAKE_RGB(0xfc, 0xdf, 0x80)); /* peach  */
+	palette_set_color(machine, 2, MAKE_RGB(0xf0, 0x00, 0xf0)); /* violet */
+	palette_set_color(machine, 3, MAKE_RGB(0x00, 0xf0, 0x0f)); /* green  */
+	palette_set_color(machine, 4, MAKE_RGB(0x30, 0x4f, 0xff)); /* blue   */
+	palette_set_color(machine, 5, MAKE_RGB(0xff, 0xff, 0xff)); /* white  */
 
 	colortable[0] = 0;
 	colortable[2] = 0;
@@ -57,8 +57,6 @@ VIDEO_START( sprint4 )
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 

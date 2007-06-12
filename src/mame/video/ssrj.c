@@ -1,7 +1,7 @@
 #include "driver.h"
 
 static tilemap *tilemap1,*tilemap2,*tilemap4;
-unsigned char *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
+UINT8 *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
 
 /* tilemap 1 */
 
@@ -237,7 +237,6 @@ VIDEO_START( ssrj )
 	tilemap4 = tilemap_create( get_tile_info4,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32 );
 	tilemap_set_transparent_pen(tilemap2,0);
 	tilemap_set_transparent_pen(tilemap4,0);
-	return 0;
 }
 
 
@@ -276,7 +275,7 @@ PALETTE_INIT( ssrj )
 	int i,j;
 	for(i=0;i<4*4;i++)
 	 for(j=0;j<8;j++)
-	  palette_set_color(machine,i*8+j,fakecols[i][j][0],fakecols[i][j][1],fakecols[i][j][2]);
+	  palette_set_color_rgb(machine,i*8+j,fakecols[i][j][0],fakecols[i][j][1],fakecols[i][j][2]);
 }
 
 VIDEO_UPDATE( ssrj )

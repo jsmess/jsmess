@@ -965,7 +965,7 @@ static READ16_HANDLER( namcos21_dsp_control_r )
 
 #define PTRAM_SIZE 0x20000
 static UINT8 *ptram;
-static unsigned int ptram_addr;
+static UINT32 ptram_addr;
 
 static WRITE16_HANDLER( namcos21_dsp_data_w )
 {

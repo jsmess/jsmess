@@ -15,9 +15,7 @@ size_t jupiter_charram_size;
 
 VIDEO_START( jupiter )
 {
-	if( video_start_generic(machine) )
-		return 1;
-    return 0;
+	video_start_generic(machine);
 }
 
 WRITE8_HANDLER( jupiter_vh_charram_w )

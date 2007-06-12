@@ -115,7 +115,7 @@ PALETTE_INIT( v9938 )
 
 	/* create the full 512 colour palette */
 	for (i=0;i<512;i++)
-		palette_set_color(machine, i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
+		palette_set_color_rgb(machine, i, pal3bit(i >> 6), pal3bit(i >> 3), pal3bit(i >> 0));
 }
 
 /*
@@ -132,7 +132,7 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 PALETTE_INIT( v9958 )
 {
 	int r,g,b,y,j,k,i,k0,j0,n;
-	unsigned char pal[19268*3];
+	UINT8 pal[19268*3];
 
 	/* init v9938 512-color palette */
 	palette_init_v9938(machine, colortable, color_prom);
@@ -175,7 +175,7 @@ PALETTE_INIT( v9958 )
 			pal[i*3+0] = r;
 			pal[i*3+1] = g;
 			pal[i*3+2] = b;
-			palette_set_color(machine, i+512, r, g, b);
+			palette_set_color(machine, i+512, MAKE_RGB(r, g, b));
 			pal_indYJK[y | j << 5 | k << (5 + 6)] = i + 512;
 			i++;
 		}
@@ -403,7 +403,7 @@ WRITE8_HANDLER (v9938_command_w)
 
 ***************************************************************************/
 
-int v9938_init (running_machine *machine, int model, int vram_size, void (*callback)(int) )
+void v9938_init (running_machine *machine, int model, int vram_size, void (*callback)(int) )
 {
 	memset (&vdp, 0, sizeof (vdp) );
 
@@ -430,7 +430,7 @@ int v9938_init (running_machine *machine, int model, int vram_size, void (*callb
 	else
 		vdp.vram_exp = NULL;
 
-	return video_start_generic_bitmapped(machine);
+	video_start_generic_bitmapped(machine);
 }
 
 void v9938_reset (void)

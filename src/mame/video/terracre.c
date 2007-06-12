@@ -119,7 +119,7 @@ PALETTE_INIT( amazon )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -203,7 +203,6 @@ VIDEO_START( amazon )
 	background = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,16,16,64,32);
 	foreground = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TRANSPARENT,8,8,64,32);
 		tilemap_set_transparent_pen(foreground,0xf);
-		return 0;
 
 	/* register for saving */
 	state_save_register_global(xscroll);

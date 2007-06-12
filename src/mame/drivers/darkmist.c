@@ -34,8 +34,8 @@ VIDEO_START(darkmist);
 VIDEO_UPDATE(darkmist);
 PALETTE_INIT(darkmist);
 
-unsigned char * darkmist_scroll;
-unsigned char * darkmist_workram;
+UINT8 * darkmist_scroll;
+UINT8 * darkmist_workram;
 
 int darkmist_hw;
 
@@ -422,7 +422,7 @@ static void decrypt_gfx(void)
 static void decrypt_snd(void)
 {
 	int i;
-	unsigned char *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(REGION_CPU2);
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -431,7 +431,7 @@ static void decrypt_snd(void)
 static DRIVER_INIT(darkmist)
 {
 	int i;
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	UINT8 *buffer = malloc_or_die(0x10000);
 	UINT8 *decrypt = auto_malloc(0x8000);
 

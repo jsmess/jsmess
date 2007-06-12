@@ -20,49 +20,32 @@ static UINT16 sprites_flipscreen = 0;
 VIDEO_START( rastan )
 {
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	if (PC080SN_vh_start(1,0,0,0,0,0,0))
-		return 1;
-
-	if (PC090OJ_vh_start(1,0,0,0))
-		return 1;
-
-	return 0;
+	PC080SN_vh_start(1,0,0,0,0,0,0);
+	PC090OJ_vh_start(1,0,0,0);
 }
 
 VIDEO_START( opwolf )
 {
-	if (PC080SN_vh_start(1,1,0,0,0,0,0))
-		return 1;
-
-	if (PC090OJ_vh_start(0,0,0,0))
-		return 1;
-
-	return 0;
+	PC080SN_vh_start(1,1,0,0,0,0,0);
+	PC090OJ_vh_start(0,0,0,0);
 }
 
 VIDEO_START( rainbow )
 {
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	if (PC080SN_vh_start(1,1,0,0,0,0,0))
-		return 1;
-
-	if (PC090OJ_vh_start(0,0,0,0))
-		return 1;
-
-	return 0;
+	PC080SN_vh_start(1,1,0,0,0,0,0);
+	PC090OJ_vh_start(0,0,0,0);
 }
 
 VIDEO_START( jumping )
 {
-	if (PC080SN_vh_start(1,1,0,0,1,0,0))
-		return 1;
+	PC080SN_vh_start(1,1,0,0,1,0,0);
 
 	PC080SN_set_trans_pen(0,1,15);
 
 	/* not 100% sure Jumping needs to save both... */
 	state_save_register_global(sprite_ctrl);
 	state_save_register_global(sprites_flipscreen);
-	return 0;
 }
 
 

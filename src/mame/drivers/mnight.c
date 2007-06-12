@@ -18,12 +18,12 @@ WRITE8_HANDLER( mnight_background_enable_w );
 VIDEO_START( mnight );
 VIDEO_UPDATE( mnight );
 
-extern unsigned char    *mnight_scrolly_ram;
-extern unsigned char    *mnight_scrollx_ram;
-extern unsigned char    *mnight_bgenable_ram;
-extern unsigned char    *mnight_spoverdraw_ram;
-extern unsigned char    *mnight_background_videoram;
-extern unsigned char    *mnight_foreground_videoram;
+extern UINT8    *mnight_scrolly_ram;
+extern UINT8    *mnight_scrollx_ram;
+extern UINT8    *mnight_bgenable_ram;
+extern UINT8    *mnight_spoverdraw_ram;
+extern UINT8    *mnight_background_videoram;
+extern UINT8    *mnight_foreground_videoram;
 extern size_t mnight_backgroundram_size;
 extern size_t mnight_foregroundram_size;
 
@@ -46,7 +46,7 @@ READ8_HANDLER( mnight_bankselect_r )
 
 WRITE8_HANDLER( mnight_bankselect_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1+main_cpu_num);
+	UINT8 *RAM = memory_region(REGION_CPU1+main_cpu_num);
 	int bankaddress;
 
 	if ( data != mnight_bank_latch )

@@ -48,7 +48,7 @@ VIDEO_START(moo)
 	K053251_vh_start();
 	K054338_vh_start();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, moo_tile_callback, 0)) return 1;
+	K056832_vh_start(REGION_GFX1, K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
 
 	if (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"))
 	{
@@ -75,11 +75,9 @@ VIDEO_START(moo)
 		offsy =  23;
 	}
 
-	if (K053247_vh_start(REGION_GFX2, offsx, offsy, NORMAL_PLANE_ORDER, moo_sprite_callback)) return 1;
+	K053247_vh_start(REGION_GFX2, offsx, offsy, NORMAL_PLANE_ORDER, moo_sprite_callback);
 
 	K054338_invert_alpha(0);
-
-	return 0;
 }
 
 /* useful function to sort the three tile layers by priority order */

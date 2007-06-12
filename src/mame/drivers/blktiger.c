@@ -18,7 +18,7 @@ Notes:
 #include "sound/2203intf.h"
 
 
-extern unsigned char *blktiger_txvideoram;
+extern UINT8 *blktiger_txvideoram;
 
 WRITE8_HANDLER( blktiger_screen_layout_w );
 

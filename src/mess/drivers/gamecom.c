@@ -86,7 +86,7 @@ static PALETTE_INIT( gamecom )
 	int index;
 	for ( index = 0; index < GAMECOM_PALETTE_LENGTH; index++ )
 	{
-		palette_set_color(machine,  4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
+		palette_set_color_rgb(machine,  4-index, palette[index*3+0], palette[index*3+1], palette[index*3+2] );
 		colortable[index] = index;
 	}
 }

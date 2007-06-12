@@ -21,7 +21,6 @@ INLINE void pcw_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 VIDEO_START( pcw )
 {
-	return 0;
 }
 
 extern unsigned int roller_ram_addr;
@@ -35,17 +34,17 @@ static unsigned short pcw_colour_table[PCW_NUM_COLOURS] =
 };
 
 /* black/white */
-static unsigned char pcw_palette[PCW_NUM_COLOURS * 3] =
+static const rgb_t pcw_palette[PCW_NUM_COLOURS] =
 {
-	0x000, 0x000, 0x000,
-	0x0ff, 0x0ff, 0x0ff
+	MAKE_RGB(0x000, 0x000, 0x000),
+	MAKE_RGB(0x0ff, 0x0ff, 0x0ff)
 };
 
 
 /* Initialise the palette */
 PALETTE_INIT( pcw )
 {
-	palette_set_colors(machine, 0, pcw_palette, sizeof(pcw_palette) / 3);
+	palette_set_colors(machine, 0, pcw_palette, ARRAY_LENGTH(pcw_palette));
 	memcpy(colortable, pcw_colour_table, sizeof (pcw_colour_table));
 }
 

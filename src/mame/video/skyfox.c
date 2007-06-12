@@ -38,7 +38,7 @@
 
 /* Variables only used here: */
 
-static unsigned char vreg[8];
+static UINT8 vreg[8];
 
 
 /* Variables that driver has access to: */
@@ -119,13 +119,13 @@ PALETTE_INIT( skyfox )
 		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	/* Grey scale for the background??? */
 	for (i = 0; i < 256; i++)
 	{
-		palette_set_color(machine,i+256,i,i,i);
+		palette_set_color(machine,i+256,MAKE_RGB(i,i,i));
 	}
 }
 
@@ -243,7 +243,7 @@ void skyfox_draw_sprites(mame_bitmap *bitmap)
 
 void skyfox_draw_background(mame_bitmap *bitmap)
 {
-	unsigned char *RAM	=	memory_region(REGION_GFX2);
+	UINT8 *RAM	=	memory_region(REGION_GFX2);
 	int x,y,i;
 
 	/* The foreground stars (sprites) move at twice this speed when

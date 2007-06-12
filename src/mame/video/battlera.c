@@ -12,7 +12,7 @@
 
 static int HuC6270_registers[20];
 static int VDC_register,vram_ptr;
-static unsigned char *HuC6270_vram,*tile_dirty,*sprite_dirty,*vram_dirty;
+static UINT8 *HuC6270_vram,*tile_dirty,*sprite_dirty,*vram_dirty;
 static mame_bitmap *tile_bitmap,*front_bitmap;
 
 static int current_scanline,inc_value;
@@ -41,8 +41,6 @@ VIDEO_START( battlera )
 	inc_value=1;
 	current_scanline=0;
 	irq_enable=rcr_enable=sb_enable=bb_enable=0;
-
-	return 0;
 }
 
 /******************************************************************************/
@@ -55,7 +53,7 @@ WRITE8_HANDLER( battlera_palette_w )
 	if (offset%2) offset-=1;
 
 	pal_word=paletteram[offset] | (paletteram[offset+1]<<8);
-	palette_set_color(Machine, offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
+	palette_set_color_rgb(Machine, offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
 }
 
 /******************************************************************************/

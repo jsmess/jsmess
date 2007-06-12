@@ -90,16 +90,14 @@ PALETTE_INIT( superpac )
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		rgb_t palentry = palette[(ctabentry ^ 15) + 0x10];
-		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i, palette[(ctabentry ^ 15) + 0x10]);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		rgb_t palentry = palette[ctabentry];
-		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i, palette[ctabentry]);
 
 		/* if the color table maps to palette entry 15, it is transparent */
 		if (ctabentry == 15)
@@ -157,16 +155,14 @@ PALETTE_INIT( mappy )
 	for (i = 0*4; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		rgb_t palentry = palette[ctabentry + 0x10];
-		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i, palette[ctabentry + 0x10]);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < machine->drv->total_colors; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		rgb_t palentry = palette[ctabentry];
-		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i, palette[ctabentry]);
 
 		/* if the color table maps to palette entry 15, it is transparent */
 		if (ctabentry == 15)
@@ -240,16 +236,14 @@ PALETTE_INIT( phozon )
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		rgb_t palentry = palette[ctabentry];
-		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i, palette[ctabentry]);
 	}
 
 	/* sprites map to the upper 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		rgb_t palentry = palette[ctabentry + 0x10];
-		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i, palette[ctabentry + 0x10]);
 
 		/* if the color table maps to palette entry 15, it is transparent */
 		if (ctabentry == 15)
@@ -304,7 +298,7 @@ static UINT32 mappy_tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 nu
 
 static TILE_GET_INFO( superpac_get_tile_info )
 {
-	unsigned char attr = mappy_videoram[tile_index + 0x400];
+	UINT8 attr = mappy_videoram[tile_index + 0x400];
 	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
@@ -315,7 +309,7 @@ static TILE_GET_INFO( superpac_get_tile_info )
 
 static TILE_GET_INFO( phozon_get_tile_info )
 {
-	unsigned char attr = mappy_videoram[tile_index + 0x400];
+	UINT8 attr = mappy_videoram[tile_index + 0x400];
 	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
@@ -326,7 +320,7 @@ static TILE_GET_INFO( phozon_get_tile_info )
 
 static TILE_GET_INFO( mappy_get_tile_info )
 {
-	unsigned char attr = mappy_videoram[tile_index + 0x800];
+	UINT8 attr = mappy_videoram[tile_index + 0x800];
 	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
@@ -353,8 +347,6 @@ VIDEO_START( superpac )
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
 	spriteram_3 = spriteram_2 + 0x800;
-
-	return 0;
 }
 
 VIDEO_START( phozon )
@@ -366,8 +358,6 @@ VIDEO_START( phozon )
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
 	spriteram_3 = spriteram_2 + 0x800;
-
-	return 0;
 }
 
 VIDEO_START( mappy )
@@ -380,8 +370,6 @@ VIDEO_START( mappy )
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
 	spriteram_3 = spriteram_2 + 0x800;
-
-	return 0;
 }
 
 
@@ -429,7 +417,7 @@ WRITE8_HANDLER( mappy_scroll_w )
 ***************************************************************************/
 
 /* also used by toypop.c */
-void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int trans_color )
+void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, const UINT16 *transmask_table )
 {
 	int offs;
 
@@ -474,7 +462,7 @@ void mappy_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int xof
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						cliprect,TRANSPARENCY_PENS,transmask[color & 0x3f]);
+						cliprect,TRANSPARENCY_PENS,transmask_table[color & 0x3f]);
 				}
 			}
 		}
@@ -564,7 +552,7 @@ VIDEO_UPDATE( superpac )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
 
 	fillbitmap(sprite_bitmap,15,cliprect);
-	mappy_draw_sprites(sprite_bitmap,cliprect,0,0,15);
+	mappy_draw_sprites(sprite_bitmap,cliprect,0,0,transmask);
 	copybitmap(bitmap,sprite_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,15);
 
 	/* Redraw the high priority characters */
@@ -607,7 +595,7 @@ VIDEO_UPDATE( mappy )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_IGNORE_TRANSPARENCY,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_IGNORE_TRANSPARENCY,0);
 
-	mappy_draw_sprites(bitmap,cliprect,0,0,15);
+	mappy_draw_sprites(bitmap,cliprect,0,0,transmask);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);

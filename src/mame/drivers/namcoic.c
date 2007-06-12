@@ -50,7 +50,7 @@ static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_ind
 static TILE_GET_INFO( get_tile_info4 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x4008]); }
 static TILE_GET_INFO( get_tile_info5 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x4408]); }
 
-int
+void
 namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	void (*cb)( UINT16 code, int *gfx, int *mask) )
 {
@@ -85,7 +85,6 @@ namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 		tilemap_set_scrolldx( mTilemapInfo.tmap[5], 0, 96 );
 		tilemap_set_scrolldy( mTilemapInfo.tmap[5], 0, 40 );
 
-		return 0;
 } /* namco_tilemap_init */
 
 void
@@ -267,7 +266,7 @@ WRITE32_HANDLER( namco_tilemapvideoram32_le_w )
 
 static void zdrawgfxzoom(
 		mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
 		int scalex, int scaley, int zpos )
 {
@@ -1069,7 +1068,7 @@ namco_roz_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
 	return row*128+col;
 } /* namco_roz_scan*/
 
-int
+void
 namco_roz_init( int gfxbank, int maskregion )
 {
 	int i;
@@ -1095,7 +1094,6 @@ namco_roz_init( int gfxbank, int maskregion )
 				16,16,
 				256,256 );
 		}
-		return 0;
 } /* namco_roz_init */
 
 struct RozParam
@@ -1565,7 +1563,7 @@ RoadMarkAllDirty(void)
 	mbRoadSomethingIsDirty = 1;
 }
 
-int
+void
 namco_road_init( int gfxbank )
 {
 	mbRoadNeedTransparent = 0;
@@ -1592,7 +1590,6 @@ namco_road_init( int gfxbank )
 					state_save_register_global_pointer(mpRoadRAM,   0x20000 / 2);
 					state_save_register_func_postload(RoadMarkAllDirty);
 
-					return 0;
 		}
 	}
 } /* namco_road_init */

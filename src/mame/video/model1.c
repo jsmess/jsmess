@@ -683,7 +683,7 @@ static float max4f(float a, float b, float c, float d)
 	return m;
 }
 
-static const unsigned char num_of_times[]={1,1,1,1,2,2,2,3};
+static const UINT8 num_of_times[]={1,1,1,1,2,2,2,3};
 static float compute_specular(struct vector *normal, struct vector *light,float diffuse,int lmode)
 {
 #if 0
@@ -1421,8 +1421,7 @@ VIDEO_START(model1)
 	vxx=vyy=vzz=0;
 	ayy = 0;
 
-	if(sys24_tile_vh_start(0x3fff))
-		return 1;
+	sys24_tile_vh_start(0x3fff);
 
 	poly_rom = (UINT32 *)memory_region(REGION_USER1);
 	poly_ram = auto_malloc(0x400000*4);
@@ -1438,7 +1437,6 @@ VIDEO_START(model1)
 	state_save_register_global_pointer(tgp_ram, 0x100000-0x40000);
 	state_save_register_global_pointer(poly_ram, 0x40000);
 	state_save_register_global_array(listctl);
-	return 0;
 }
 
 VIDEO_UPDATE(model1)

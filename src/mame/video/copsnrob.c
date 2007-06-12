@@ -8,11 +8,11 @@
 #include "copsnrob.h"
 
 
-unsigned char *copsnrob_bulletsram;
-unsigned char *copsnrob_carimage;
-unsigned char *copsnrob_cary;
-unsigned char *copsnrob_trucky;
-unsigned char *copsnrob_truckram;
+UINT8 *copsnrob_bulletsram;
+UINT8 *copsnrob_carimage;
+UINT8 *copsnrob_cary;
+UINT8 *copsnrob_trucky;
+UINT8 *copsnrob_truckram;
 
 
 /***************************************************************************

@@ -34,7 +34,7 @@ extern discrete_sound_block bsktball_discrete_interface[];
 
 /*----------- defined in video/bsktball.c -----------*/
 
-extern unsigned char *bsktball_motion;
+extern UINT8 *bsktball_motion;
 
 VIDEO_START( bsktball );
 VIDEO_UPDATE( bsktball );

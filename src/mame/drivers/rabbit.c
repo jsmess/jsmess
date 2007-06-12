@@ -357,8 +357,6 @@ VIDEO_START(rabbit)
 	rabbit_sprite_clip.max_x = 0x1000-1;
 	rabbit_sprite_clip.min_y = 0;
 	rabbit_sprite_clip.max_y = 0x1000-1;
-
-	return 0;
 }
 
 /*
@@ -473,7 +471,7 @@ static WRITE32_HANDLER( rabbit_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(Machine,offset^0xff,r,g,b);
+	palette_set_color(Machine,offset^0xff,MAKE_RGB(r,g,b));
 }
 
 READ32_HANDLER( rabbit_tilemap0_r )
@@ -792,7 +790,7 @@ static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(Machine,(offset^0xff)+0x2000,r,g,b);
+	palette_set_color(Machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
 }
 
 
@@ -1151,8 +1149,6 @@ VIDEO_START(tmmjprd)
 	rabbit_sprite_clip.max_x = 0x1000-1;
 	rabbit_sprite_clip.min_y = 0;
 	rabbit_sprite_clip.max_y = 0x1000-1;
-
-	return 0;
 }
 
 

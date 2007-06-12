@@ -37,8 +37,6 @@ static TILE_GET_INFO( get_ltcasino_tile_info )
 VIDEO_START(ltcasino)
 {
 	ltcasino_tilemap = tilemap_create(get_ltcasino_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,64,32);
-
-	return 0;
 }
 
 

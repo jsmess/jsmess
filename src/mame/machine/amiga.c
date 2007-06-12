@@ -378,15 +378,15 @@ UINT32 amiga_joystick_convert(void *param)
  *
  *************************************/
 
-static unsigned int blit_ascending(void)
+static UINT32 blit_ascending(void)
 {
-	unsigned int shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
-	unsigned int shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
-	unsigned int height = (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff;
-	unsigned int width = CUSTOM_REG(REG_BLTSIZE) & 0x3f;
+	UINT32 shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
+	UINT32 shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
+	UINT32 height = (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff;
+	UINT32 width = CUSTOM_REG(REG_BLTSIZE) & 0x3f;
 	UINT32 acca = 0, accb = 0;
-	unsigned int blitsum = 0;
-	unsigned int x, y;
+	UINT32 blitsum = 0;
+	UINT32 x, y;
 
 	/* normalize height/width */
 	if (height == 0)
@@ -401,8 +401,8 @@ static unsigned int blit_ascending(void)
 		for (x = 0; x < width; x++)
 		{
 			UINT16 abc0, abc1, abc2, abc3;
-			unsigned int tempa, tempd = 0;
-			unsigned int b;
+			UINT32 tempa, tempd = 0;
+			UINT32 b;
 
 			/* fetch data for A */
 			if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
@@ -445,7 +445,7 @@ static unsigned int blit_ascending(void)
 			/* now loop over bits and compute the destination value */
 			for (b = 0; b < 4; b++)
 			{
-				unsigned int bit;
+				UINT32 bit;
 
 				/* shift previous data up 4 bits */
 				tempd <<= 4;
@@ -505,17 +505,17 @@ static unsigned int blit_ascending(void)
  *
  *************************************/
 
-static unsigned int blit_descending(void)
+static UINT32 blit_descending(void)
 {
-	unsigned int fill_exclusive = (CUSTOM_REG(REG_BLTCON1) >> 4);
-	unsigned int fill_inclusive = (CUSTOM_REG(REG_BLTCON1) >> 3);
-	unsigned int shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
-	unsigned int shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
-	unsigned int height = (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff;
-	unsigned int width = CUSTOM_REG(REG_BLTSIZE) & 0x3f;
+	UINT32 fill_exclusive = (CUSTOM_REG(REG_BLTCON1) >> 4);
+	UINT32 fill_inclusive = (CUSTOM_REG(REG_BLTCON1) >> 3);
+	UINT32 shifta = (CUSTOM_REG(REG_BLTCON0) >> 12) & 0xf;
+	UINT32 shiftb = (CUSTOM_REG(REG_BLTCON1) >> 12) & 0xf;
+	UINT32 height = (CUSTOM_REG(REG_BLTSIZE) >> 6) & 0x3ff;
+	UINT32 width = CUSTOM_REG(REG_BLTSIZE) & 0x3f;
 	UINT32 acca = 0, accb = 0;
-	unsigned int blitsum = 0;
-	unsigned int x, y;
+	UINT32 blitsum = 0;
+	UINT32 x, y;
 
 	/* normalize height/width */
 	if (height == 0)
@@ -526,14 +526,14 @@ static unsigned int blit_descending(void)
 	/* iterate over the height */
 	for (y = 0; y < height; y++)
 	{
-		unsigned int fill_state = (CUSTOM_REG(REG_BLTCON1) >> 2) & 1;
+		UINT32 fill_state = (CUSTOM_REG(REG_BLTCON1) >> 2) & 1;
 
 		/* iterate over the width */
 		for (x = 0; x < width; x++)
 		{
 			UINT16 abc0, abc1, abc2, abc3;
-			unsigned int tempa, tempd = 0;
-			unsigned int b;
+			UINT32 tempa, tempd = 0;
+			UINT32 b;
 
 			/* fetch data for A */
 			if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
@@ -576,8 +576,8 @@ static unsigned int blit_descending(void)
 			/* now loop over bits and compute the destination value */
 			for (b = 0; b < 4; b++)
 			{
-				unsigned int prev_fill_state;
-				unsigned int bit;
+				UINT32 prev_fill_state;
+				UINT32 bit;
 
 				/* shift previous data up 4 bits */
 				tempd >>= 4;
@@ -692,12 +692,12 @@ static unsigned int blit_descending(void)
     BLTAMOD = 4 * (dy - dx) and BLTBMOD = 4 * dy.
 */
 
-static unsigned int blit_line(void)
+static UINT32 blit_line(void)
 {
-	unsigned int singlemode = (CUSTOM_REG(REG_BLTCON1) & 0x0002) ? 0x0000 : 0xffff;
-	unsigned int singlemask = 0xffff;
-	unsigned int blitsum = 0;
-	unsigned int height;
+	UINT32 singlemode = (CUSTOM_REG(REG_BLTCON1) & 0x0002) ? 0x0000 : 0xffff;
+	UINT32 singlemask = 0xffff;
+	UINT32 blitsum = 0;
+	UINT32 height;
 
 	/* see if folks are breaking the rules */
 	if ((CUSTOM_REG(REG_BLTSIZE) & 0x003f) != 0x0002)
@@ -714,7 +714,7 @@ static unsigned int blit_line(void)
 	while (height--)
 	{
 		UINT16 abc0, abc1, abc2, abc3;
-		unsigned int tempa, tempb, tempd = 0;
+		UINT32 tempa, tempb, tempd = 0;
 		int b, dx, dy;
 
 		/* fetch data for C */
@@ -740,7 +740,7 @@ static unsigned int blit_line(void)
 		/* now loop over bits and compute the destination value */
 		for (b = 0; b < 4; b++)
 		{
-			unsigned int bit;
+			UINT32 bit;
 
 			/* shift previous data up 4 bits */
 			tempd <<= 4;
@@ -847,7 +847,7 @@ static unsigned int blit_line(void)
 
 static void amiga_blitter_proc(int param)
 {
-	unsigned int blitsum = 0;
+	UINT32 blitsum = 0;
 
 	/* logging */
 	if (LOG_BLITS)

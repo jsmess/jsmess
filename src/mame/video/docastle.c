@@ -30,7 +30,7 @@ static tilemap *bg_tilemap, *fg_tilemap;
   bit 0 -- 390 ohm resistor  -- BLUE
 
 ***************************************************************************/
-static void convert_color_prom(running_machine *machine,unsigned short *colortable,const unsigned char *color_prom,
+static void convert_color_prom(running_machine *machine,UINT16 *colortable,const UINT8 *color_prom,
 		int priority)
 {
 	int i,j;
@@ -59,15 +59,15 @@ static void convert_color_prom(running_machine *machine,unsigned short *colortab
 		bit2 = (*color_prom >> 1) & 0x01;
 		b = 0x23 * bit0 + 0x4b * bit1 + 0x91 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* reserve one color for the transparent pen (none of the game colors can have */
 	/* these RGB components) */
-	palette_set_color(machine,256,1,1,1);
+	palette_set_color(machine,256,MAKE_RGB(1,1,1));
 	/* and the last color for the sprite covering pen */
-	palette_set_color(machine,257,2,2,2);
+	palette_set_color(machine,257,MAKE_RGB(2,2,2));
 
 
 	/* characters */
@@ -205,8 +205,6 @@ VIDEO_START( docastle )
 		TILEMAP_TRANSPARENT_COLOR, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 256);
-
-	return 0;
 }
 
 static void docastle_draw_sprites( mame_bitmap *bitmap )

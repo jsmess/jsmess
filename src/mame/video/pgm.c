@@ -319,9 +319,6 @@ VIDEO_START( pgm )
 	/* we render each sprite to a bitmap then copy the bitmap to screen bitmap with zooming */
 	/* easier this way because of the funky sprite format */
 	sprite_temp_render = auto_malloc(0x400*0x200*2);
-
-
-	return 0;
 }
 
 VIDEO_UPDATE( pgm )

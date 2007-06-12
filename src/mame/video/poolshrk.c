@@ -32,8 +32,6 @@ VIDEO_START( poolshrk )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
-
-	return 0;
 }
 
 

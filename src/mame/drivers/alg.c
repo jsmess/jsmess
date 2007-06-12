@@ -76,13 +76,11 @@ static VIDEO_START( alg )
 	add_exit_callback(machine, video_cleanup);
 
 	/* standard video start */
-	if (video_start_amiga(machine))
-		return 1;
+	video_start_amiga(machine);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	render_container_set_palette_alpha(render_container_get_screen(0), 4096, 0x00);
 	amiga_set_genlock_color(4096);
-	return 0;
 }
 
 

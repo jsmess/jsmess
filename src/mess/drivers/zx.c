@@ -370,19 +370,19 @@ static unsigned short zx_colortable[] =
 
 static PALETTE_INIT( zx80 )
 {
-	palette_set_colors(machine, 0, zx80_palette, sizeof(zx80_palette) / 3);
+	palette_set_colors_rgb(machine, 0, zx80_palette, sizeof(zx80_palette) / 3);
 	memcpy(colortable, zx_colortable, sizeof (zx_colortable));
 }
 
 static PALETTE_INIT( zx81 )
 {
-	palette_set_colors(machine, 0, zx81_palette, sizeof(zx81_palette) / 3);
+	palette_set_colors_rgb(machine, 0, zx81_palette, sizeof(zx81_palette) / 3);
 	memcpy(colortable, zx_colortable, sizeof (zx_colortable));
 }
 
 static PALETTE_INIT( ts1000 )
 {
-	palette_set_colors(machine, 0, ts1000_palette, sizeof(ts1000_palette) / 3);
+	palette_set_colors_rgb(machine, 0, ts1000_palette, sizeof(ts1000_palette) / 3);
 	memcpy(colortable, zx_colortable, sizeof (zx_colortable));
 }
 

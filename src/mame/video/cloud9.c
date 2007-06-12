@@ -59,7 +59,6 @@ VIDEO_START( cloud9 )
 	state_save_register_global_pointer(videoram, 0x8000);
 	state_save_register_global_array(video_control);
 	state_save_register_global_array(bitmode_addr);
-	return 0;
 }
 
 
@@ -112,7 +111,7 @@ WRITE8_HANDLER( cloud9_paletteram_w )
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(bweights, bit0, bit1, bit2);
 
-	palette_set_color(Machine, offset & 0x3f, r, g, b);
+	palette_set_color(Machine, offset & 0x3f, MAKE_RGB(r, g, b));
 }
 
 

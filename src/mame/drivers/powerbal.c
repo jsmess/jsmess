@@ -369,8 +369,6 @@ VIDEO_START( powerbal )
 	xoffset = -20;
 
 	tilemap_set_scrolly(bg_tilemap, 0, bg_yoffset);
-
-	return 0;
 }
 
 VIDEO_UPDATE( powerbal )

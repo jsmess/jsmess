@@ -52,7 +52,7 @@ unsigned short hp48_colortable[0x20][2] = {
 
 PALETTE_INIT( hp48 )
 {
-	palette_set_colors(machine, 0, hp48_palette, sizeof(hp48_palette) / 3);
+	palette_set_colors_rgb(machine, 0, hp48_palette, sizeof(hp48_palette) / 3);
 	memcpy(colortable,hp48_colortable,sizeof(hp48_colortable));
 }
 
@@ -70,7 +70,7 @@ VIDEO_START( hp48 )
 	}
 #endif
 
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 static void hp48_draw_special(mame_bitmap *bitmap,int x, int y, const char *figure, int color)

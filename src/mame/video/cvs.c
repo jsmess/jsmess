@@ -43,11 +43,11 @@ static int    character_page=0;
 static int    scroll_reg = 0;
 static int    stars_scroll=0;
 
-static unsigned char *dirty_character;
-static unsigned char *character_1_ram;
-static unsigned char *character_2_ram;
-static unsigned char *character_3_ram;
-unsigned char *bullet_ram;
+static UINT8 *dirty_character;
+static UINT8 *character_1_ram;
+static UINT8 *character_2_ram;
+static UINT8 *character_3_ram;
+UINT8 *bullet_ram;
 
 mame_bitmap *collision_bitmap;
 mame_bitmap *collision_background;
@@ -228,7 +228,7 @@ WRITE8_HANDLER( cvs_bullet_w )
 		data ^= 0xff;
 
 		paletteram[offset] = data;
-		palette_set_color(Machine, offset, pal2bit(data >> 0), pal3bit(data >> 2), pal3bit(data >> 5));
+		palette_set_color_rgb(Machine, offset, pal2bit(data >> 0), pal3bit(data >> 2), pal3bit(data >> 5));
     }
 }
 
@@ -410,8 +410,6 @@ VIDEO_START( cvs )
 	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 	collision_background = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 	scrolled_background = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-
-	return 0;
 }
 
 INTERRUPT_GEN( cvs_interrupt )

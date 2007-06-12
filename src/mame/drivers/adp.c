@@ -144,7 +144,6 @@ ADDRESS_MAP_END
 
 VIDEO_START(skattv)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(skattv)

@@ -70,7 +70,6 @@ VIDEO_START( centiped )
 
 	state_save_register_global(centiped_flipscreen);
 	state_save_register_global(bullsdrt_sprites_bank);
-	return 0;
 }
 
 
@@ -81,7 +80,6 @@ VIDEO_START( warlords )
 	/* we overload centiped_flipscreen here to track the cocktail/upright state */
 	centiped_flipscreen = readinputport(0) & 0x80;
 	tilemap_set_flip(bg_tilemap, centiped_flipscreen ? TILEMAP_FLIPX : 0);
-	return 0;
 }
 
 
@@ -91,7 +89,6 @@ VIDEO_START( milliped )
 
 	centiped_flipscreen = 0;
 	state_save_register_global(centiped_flipscreen);
-	return 0;
 }
 
 
@@ -100,7 +97,6 @@ VIDEO_START( bullsdrt )
 	bg_tilemap = tilemap_create(bullsdrt_get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 32,32);
 
 	centiped_flipscreen = 0;
-	return 0;
 }
 
 
@@ -249,7 +245,7 @@ WRITE8_HANDLER( centiped_paletteram_w )
 	/* any palette changes unless the write is to a palette RAM address */
 	/* that is actually used */
 	if (offset & 4)
-		palette_set_color(Machine, ((offset >> 1) & 4) | (offset & 3), r, g, b);
+		palette_set_color(Machine, ((offset >> 1) & 4) | (offset & 3), MAKE_RGB(r, g, b));
 }
 
 
@@ -284,7 +280,7 @@ PALETTE_INIT( warlords )
 			int grey = (r * 0x4d / 0xff) + (g * 0x96 / 0xff) + (b * 0x1c / 0xff);
 			r = g = b = grey;
 		}
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -368,7 +364,7 @@ WRITE8_HANDLER( milliped_paletteram_w )
 	bit2 = (~data >> 2) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(Machine, offset, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
 }
 
 

@@ -8,10 +8,10 @@ Atari Starship 1 video emulation
 #include "includes/starshp1.h"
 #include <math.h>
 
-unsigned char* starshp1_playfield_ram;
-unsigned char* starshp1_hpos_ram;
-unsigned char* starshp1_vpos_ram;
-unsigned char* starshp1_obj_ram;
+UINT8* starshp1_playfield_ram;
+UINT8* starshp1_hpos_ram;
+UINT8* starshp1_vpos_ram;
+UINT8* starshp1_obj_ram;
 
 int starshp1_ship_explode;
 int starshp1_ship_picture;
@@ -79,8 +79,6 @@ VIDEO_START( starshp1 )
 	}
 
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-
-	return 0;
 }
 
 

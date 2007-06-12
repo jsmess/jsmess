@@ -4587,14 +4587,14 @@ DRIVER_INIT( metlhawk )
 {
 	/* unscramble sprites */
 	int i, j, k, l;
-	unsigned char *data = memory_region(REGION_GFX1);
+	UINT8 *data = memory_region(REGION_GFX1);
 	for(i=0; i<0x200000; i+=32*32)
 	{
 		for(j=0; j<32*32; j+=32*4)
 		{
 			for(k=0; k<32; k+=4)
 			{
-				unsigned char v;
+				UINT8 v;
 				int a;
 
 				a = i+j+k+32;

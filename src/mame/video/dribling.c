@@ -30,7 +30,7 @@ PALETTE_INIT( dribling )
 		g *= 0x55;
 		b *= 0xff;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

@@ -108,7 +108,6 @@ ADDRESS_MAP_END
 VIDEO_START(twins)
 {
 	twins_pal = auto_malloc(0x100*2);
-	return 0;
 }
 
 VIDEO_UPDATE(twins)
@@ -133,7 +132,7 @@ VIDEO_UPDATE(twins)
 		b = (dat>>10) & 0x1f;
 		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
 
-		palette_set_color(machine,i, pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,i, pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 
 	count=0;
@@ -212,7 +211,6 @@ MACHINE_DRIVER_END
 VIDEO_START(twinsa)
 {
 	twins_pal = auto_malloc(0x1000*2);
-	return 0;
 }
 
 VIDEO_UPDATE(twinsa)
@@ -230,7 +228,7 @@ VIDEO_UPDATE(twinsa)
 		g = twins_pal[i+1];
 		b = twins_pal[i+2];
 
-		palette_set_color(machine,i/3, r<<2, g<<2, b<<2);
+		palette_set_color_rgb(machine,i/3, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	count=0;

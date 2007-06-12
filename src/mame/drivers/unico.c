@@ -115,8 +115,8 @@ static WRITE16_HANDLER( zeropnt_sound_bank_w )
            contains garbage. Indeed, only banks 0&1 are used */
 
 		int bank = (data >> 8 ) & 1;
-		unsigned char *dst	= memory_region(REGION_SOUND1);
-		unsigned char *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
+		UINT8 *dst	= memory_region(REGION_SOUND1);
+		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 
 		coin_counter_w(0,data & 0x1000);
@@ -238,8 +238,8 @@ static WRITE32_HANDLER( zeropnt2_sound_bank_w )
 	if (ACCESSING_MSB32)
 	{
 		int bank = ((data >> 24) & 3) % 4;
-		unsigned char *dst	= memory_region(REGION_SOUND1);
-		unsigned char *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
+		UINT8 *dst	= memory_region(REGION_SOUND1);
+		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
 }

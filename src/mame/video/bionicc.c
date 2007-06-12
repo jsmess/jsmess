@@ -99,8 +99,6 @@ VIDEO_START( bionicc )
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x8000); /* split type 0 is completely transparent in front half */
 	tilemap_set_transmask(fg_tilemap,1,0xffc1,0x803e); /* split type 1 has pens 1-5 opaque in front half */
 	tilemap_set_transparent_pen(bg_tilemap,15);
-
-	return 0;
 }
 
 

@@ -8,8 +8,8 @@
 
 #include "driver.h"
 
-extern unsigned char *nyny_videoram ;
-extern unsigned char *nyny_colourram ;
+extern UINT8 *nyny_videoram ;
+extern UINT8 *nyny_colourram ;
 
 static mame_bitmap *tmpbitmap1;
 static mame_bitmap *tmpbitmap2;
@@ -22,7 +22,7 @@ PALETTE_INIT( nyny )
 
 	for (i = 0;i < machine->drv->total_colors;i++)
 	{
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
+		palette_set_color_rgb(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 	}
 }
 
@@ -40,8 +40,6 @@ VIDEO_START( nyny )
 
 	nyny_videoram = auto_malloc(0x4000);
 	nyny_colourram = auto_malloc(0x4000);
-
-	return 0;
 }
 
 /***************************************************************************

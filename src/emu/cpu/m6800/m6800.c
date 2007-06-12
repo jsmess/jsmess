@@ -1658,6 +1658,9 @@ void hd63701_trap_pc(void)
 	TAKE_TRAP;
 }
 
+static READ8_HANDLER( m6803_internal_registers_r );
+static WRITE8_HANDLER( m6803_internal_registers_w );
+
 READ8_HANDLER( hd63701_internal_registers_r )
 {
 	return m6803_internal_registers_r(offset);

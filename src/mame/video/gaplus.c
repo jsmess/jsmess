@@ -59,7 +59,7 @@ PALETTE_INIT( gaplus )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 0x300;
@@ -103,7 +103,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 
 static TILE_GET_INFO( get_tile_info )
 {
-	unsigned char attr = gaplus_videoram[tile_index + 0x400];
+	UINT8 attr = gaplus_videoram[tile_index + 0x400];
 	tileinfo->priority = (attr & 0x40) >> 6;
 	SET_TILE_INFO(
 			0,
@@ -138,7 +138,7 @@ struct star {
 };
 static struct star stars[MAX_STARS];
 
-static unsigned char gaplus_starfield_control[4];
+static UINT8 gaplus_starfield_control[4];
 static int total_stars;
 
 static void starfield_init( void )
@@ -205,8 +205,6 @@ VIDEO_START( gaplus )
 	spriteram_3 = spriteram_2 + 0x800;
 
 	starfield_init();
-
-	return 0;
 }
 
 

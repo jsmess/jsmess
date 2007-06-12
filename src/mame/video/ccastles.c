@@ -59,7 +59,6 @@ VIDEO_START( ccastles )
 	state_save_register_global_array(bitmode_addr);
 	state_save_register_global(hscroll);
 	state_save_register_global(vscroll);
-	return 0;
 }
 
 
@@ -125,7 +124,7 @@ WRITE8_HANDLER( ccastles_paletteram_w )
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(bweights, bit0, bit1, bit2);
 
-	palette_set_color(Machine, offset & 0x1f, r, g, b);
+	palette_set_color(Machine, offset & 0x1f, MAKE_RGB(r, g, b));
 }
 
 

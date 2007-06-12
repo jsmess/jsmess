@@ -13,659 +13,31 @@ Tomasz Slanina
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 
-static unsigned char portA_in,portA_out,ddrA;
-static unsigned char portB_out,ddrB;
-static unsigned char portC_in,portC_out,ddrC;
 
-static unsigned char mcu_out;
-static unsigned char mcu_in;
-static unsigned char mcu_PC1;
-static unsigned char mcu_PC0;
+VIDEO_START( changela );
+VIDEO_UPDATE( changela );
 
-static UINT32 slopeROM_bank;
-static UINT32 address;
+WRITE8_HANDLER( changela_colors_w );
+WRITE8_HANDLER( changela_mem_device_select_w );
+WRITE8_HANDLER( changela_mem_device_w );
+READ8_HANDLER( changela_mem_device_r );
+WRITE8_HANDLER( changela_slope_rom_addr_hi_w );
+WRITE8_HANDLER( changela_slope_rom_addr_lo_w );
 
-static UINT8 * memory_devices;
-static UINT32  mem_dev_selected; /* an offset within memory_devices area */
+
+static UINT8 portA_in,portA_out,ddrA;
+static UINT8 portB_out,ddrB;
+static UINT8 portC_in,portC_out,ddrC;
+
+static UINT8 mcu_out;
+static UINT8 mcu_in;
+static UINT8 mcu_PC1;
+static UINT8 mcu_PC0;
 
 MACHINE_RESET (changela)
 {
 	mcu_PC1=0;
 	mcu_PC0=0;
-}
-
-
-VIDEO_START( changela )
-{
-	memory_devices = auto_malloc(4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
-	return 0;
-}
-
-
-/*
---+-------------------+-----------------------------------------------------+-----------------------------------------------------------------
-St|  PROM contents:   |                Main signals:                        |                      DESCRIPTION
-at+-------------------+-----------------------------------------------------+-----------------------------------------------------------------
-e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
-  |                   |           enable GateU61Enable Enable     Enable    |
---+-------------------+-----------------------------------------------------+-----------------------------------------------------------------
-00|0 0 0 0 1 1 0 1 0d | 1     1      0      1            0          1       |                                       (noop ROM 00-lsb to adder)
-01|0 0 0 0 1 1 1 1 0f | 0     1      0      1            1          0       |   ROM 00-lsb to train, and to RAM 00
-02|0 1 0 0 1 1 0 1 4d | 1     0      1      1            0          1       |                                       (noop RAM 00 to adder)
-03|0 0 1 0 1 1 1 1 2f | 0     1      0      1            1          0       |   ROM 00-msb to train, and to RAM 01
-04|1 1 0 0 1 1 0 1 cd | 1     0      1      1            0          1       |                                       (noop RAM 00 to adder)
-05|0 0 0 0 1 1 1 1 0f | 0     1      0      1            1          0       |   ROM 01-lsb to train, and to RAM 02
-06|0 1 0 0 1 1 0 1 4d | 1     0      1      1            0          1       |                                       (noop RAM 02 to adder)
-07|0 0 1 0 1 1 1 1 2f | 0     1      0      1            1          0       |   ROM 01-msb to train, and to RAM 03
-08|1 1 0 0 0 1 0 1 c5 | 1     0      1      1            0          1       |   CLR carry
-09|0 0 0 0 1 1 0 1 0d | 1     1      0      1            0          1       |   ROM 02-lsb to adder
-0a|0 1 1 0 1 1 0 1 6d | 1     0      1      1            0          1       |   RAM 05 to adder
-0b|1 1 1 0 1 1 1 0 ee | 0     1      1      0            1          0       |   Adder to train, and to RAM 05, CLOCK carry
-0c|0 0 0 0 1 1 0 1 0d | 1     1      0      1            0          1       |   ROM 02-msb to adder
-0d|0 1 1 0 1 1 0 1 6d | 1     0      1      1            0          1       |   RAM 07 to adder
-0e|1 1 1 0 1 1 1 0 ee | 0     1      1      0            1          0       |   Adder to train, and to RAM 07, CLOCK carry
-0f|0 0 0 0 1 1 0 1 0d | 1     1      0      1            0          1       |   ROM 03-lsb to adder
-10|0 1 1 0 1 1 0 1 6d | 1     0      1      1            0          1       |   RAM 09 to adder
-11|1 1 1 0 1 1 1 0 ee | 0     1      1      0            1          0       |   Adder to train, and to RAM 09, CLOCK carry
-12|1 0 0 0 1 1 0 1 8d | 1     1      0      1            0          1       |                                       (noop ROM 03-msb to adder)
-13|0 1 0 0 1 1 0 1 4d | 1     0      1      1            0          1       |                                       (noop RAM 0c to adder)
-14|0 0 0 0 0 0 0 1 01 | 1     1      0      1            0          1       |   ROM 04-lsb to adder, CLR carry
-15|0 1 1 0 1 0 0 1 69 | 1     0      1      1            0          1       |   RAM 0d to adder
-16|1 1 1 0 1 0 1 0 ea | 0     1      1      0            1          0       |   Adder to train and to RAM 0d, CLOCK carry
-17|0 0 0 0 1 0 0 1 09 | 1     1      0      1            0          1       |   ROM 04-msb to adder
-18|0 1 1 0 1 0 0 1 69 | 1     0      1      1            0          1       |   RAM 0f to adder
-19|1 1 1 0 1 0 1 0 ea | 0     1      1      0            1          0       |   Adder to train and to RAM 0f, CLOCK carry
-1a|0 0 0 1 1 0 0 1 19 | 1     1      0      1            0          1       |   ROM 05-lsb to adder, /LD HOSC
-1b|0 1 1 0 1 0 0 1 69 | 1     0      1      1            0          1       |   RAM 11 to adder
-1c|1 1 1 0 1 0 1 0 ea | 0     1      1      0            1          0       |   Adder to train and to RAM 11, CLOCK carry
-1d|0 0 0 0 1 0 0 1 09 | 1     1      0      1            0          1       |   ROM 05-msb to adder
-1e|0 1 1 0 1 0 0 1 69 | 1     0      1      1            0          1       |   RAM 13 to adder
-1f|1 1 1 0 1 0 1 0 ea | 0     1      1      0            1          0       |   Adder to train and to RAM 13, CLOCK carry
-                        *   =========================   ====================
-                        *   only one of these signals   these signals select
-                        *   can be active at a time     the output for the result
-                        *    ------- SOURCE --------     ----- TARGET -----
-                        *
-                 ******************
-                 result needs to be
-                 written back to RAM
-*/
-
-
-static UINT8 train[16];
-static UINT8 ls195_latch;
-
-VIDEO_UPDATE( changela )
-{
-	int i;
-	int sx,sy;
-	const UINT8 * obj0rom;
-	const UINT8 *pSource;
-	const UINT8 *ROM1;
-	const UINT8 *ROM111;
-	UINT8 *RAM1;
-	UINT8 *RAM2;
-	UINT8 tile,attr;
-
-	UINT8 ls377_u110 = 0;
-	int carry, add1, add2;
-
-
-	fillbitmap( bitmap, 0x00, cliprect );
-
-
-	RAM1 = memory_devices + 0x0800;
-	RAM2 = memory_devices + 0x1000;
-	ROM1 = memory_region(REGION_USER2) + slopeROM_bank + ((address&0x7e)<<2);
-	ROM111 = memory_region(REGION_GFX1) + 0;
-
-	ls195_latch = 0;
-
-logerror("bank=%4x addr=%4x\n", slopeROM_bank, address);
-
-    /* /PRELOAD */
-	/* address = 0xff */
-
-		/* step 1: ROM 00-lsb to train, and to RAM 00 */
-		i =  ROM1[0] & 0x0f;
-		train[0] = RAM1[0x20] = i;
-		/* step 3: ROM 00-msb to train, and to RAM 01 */
-		i = (ROM1[0]>>4) & 0x0f;
-		train[1] = RAM1[0x21] = i;
-		/* step 5: ROM 01-lsb to train, and to RAM 02 */
-		i =  ROM1[1] & 0x0f;
-		train[2] = RAM1[0x22] = i;
-		/* step 7: ROM 01-msb to train, and to RAM 03 */
-		i = (ROM1[1]>>4) & 0x0f;
-		train[3] = RAM1[0x23] = i;
-
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x5] & 0x0f;
-		/* step b: Adder to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x7] & 0x0f;
-		/* step e: Adder to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x9] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0xd] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0xf] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x11] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x13] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-
-    /* /PRELOAD */
-	/* address = 0x00 */
-
-		/* step 1: ROM 00-lsb to train, and to RAM 00 */
-		i =  ROM1[0] & 0x0f;
-		train[0] = RAM1[0x20] = i;
-		/* step 3: ROM 00-msb to train, and to RAM 01 */
-		i = (ROM1[0]>>4) & 0x0f;
-		train[1] = RAM1[0x21] = i;
-		/* step 5: ROM 01-lsb to train, and to RAM 02 */
-		i =  ROM1[1] & 0x0f;
-		train[2] = RAM1[0x22] = i;
-		/* step 7: ROM 01-msb to train, and to RAM 03 */
-		i = (ROM1[1]>>4) & 0x0f;
-		train[3] = RAM1[0x23] = i;
-
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x5] & 0x0f;
-		/* step b: Adder to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x7] & 0x0f;
-		/* step e: Adder to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x9] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0xd] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0xf] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x11] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x13] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-
-	ROM1 = memory_region(REGION_USER2) + slopeROM_bank + (((address+1)&0x7e)<<2);
-
-
-logerror("addrlow=%4x (addr=%4x)\n", (((address+1)&0x7e)<<2), address );
-
-	for (sy = 0; sy < 128; sy++)
-	{
-		int ls163_u107;
-
-	/* compute the math train */
-
-		/* step 1: ROM 00-lsb to train, and to RAM 00 */
-		i =  ROM1[0] & 0x0f;
-		train[0] = RAM1[0x20] = i;
-		/* step 3: ROM 00-msb to train, and to RAM 01 */
-		i = (ROM1[0]>>4) & 0x0f;
-		train[1] = RAM1[0x21] = i;
-		/* step 5: ROM 01-lsb to train, and to RAM 02 */
-		i =  ROM1[1] & 0x0f;
-		train[2] = RAM1[0x22] = i;
-		/* step 7: ROM 01-msb to train, and to RAM 03 */
-		i = (ROM1[1]>>4) & 0x0f;
-		train[3] = RAM1[0x23] = i;
-
-
-if (sy&1)
-{
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x25] & 0x0f;
-		/* step b: add2 to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x27] & 0x0f;
-		/* step e: add2 to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x29] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0x2d] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0x2f] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x31] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x33] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add2) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-	return 0;
-}
-else
-{
-		/* step 8: CLEAR CARRY */
-		carry = 0;
-
-		/* step 9: ROM 02-lsb to adder */
-		add1 = ROM1[2] & 0x0f;
-		/* step a: RAM 05 to adder */
-		add2 = RAM1[0x25] & 0x0f;
-		/* step b: Adder to train, and to RAM 05, CLOCK carry */
-		train[4] = RAM1[0x25] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step c: ROM 02-msb to adder */
-		add1 = (ROM1[2]>>4) & 0x0f;
-		/* step d: RAM 07 to adder */
-		add2 = RAM1[0x27] & 0x0f;
-		/* step e: Adder to train, and to RAM 07, CLOCK carry */
-		train[5] = RAM1[0x27] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step f: ROM 03-lsb to adder */
-		add1 = ROM1[3] & 0x0f;
-		/* step10: RAM 09 to adder */
-		add2 = RAM1[0x29] & 0x0f;
-		/* step11: Adder to train, and to RAM 09, CLOCK carry */
-		train[6] = RAM1[0x29] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step14: ROM 04-lsb to adder, CLR carry */
-		carry = 0;
-		add1 = ROM1[4] & 0x0f;
-		/* step15: RAM 0d to adder */
-		add2 = RAM1[0x2d] & 0x0f;
-		/* step16: Adder to train and to RAM 0d, CLOCK carry */
-		train[7] = RAM1[0x2d] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step17: ROM 04-msb to adder */
-		add1 = (ROM1[4]>>4) & 0x0f;
-		/* step18: RAM 0f to adder */
-		add2 = RAM1[0x2f] & 0x0f;
-		/* step19: Adder to train and to RAM 0f, CLOCK carry */
-		train[8] = RAM1[0x2f] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1a: ROM 05-lsb to adder, /LD HOSC */
-/* HOSC */
-
-		add1 = ROM1[5] & 0x0f;
-		/* step1b: RAM 11 to adder */
-		add2 = RAM1[0x31] & 0x0f;
-		/* step1c: Adder to train and to RAM 11, CLOCK carry */
-		train[9] = RAM1[0x31] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-
-		/* step1d: ROM 05-msb to adder */
-		add1 = (ROM1[5]>>4) & 0x0f;
-		/* step1e: RAM 13 to adder */
-		add2 = RAM1[0x33] & 0x0f;
-		/* step1f: Adder to train and to RAM 13, CLOCK carry */
-		train[10] = RAM1[0x33] = ((add1+add2+carry) & 0x0f);
-		carry = ((add1+add2+carry) & 0x10) >> 4;
-}
-
-
-
-/* "burst of 16 10 MHz clocks" */
-		for (sx = 0; sx < 16; sx++)
-		{
-			int tmph,tmpv;
-
-			tmpv = (train[8]<<0) | (train[9]<<4) | (train[10]<<8);
-			tmpv>>=2;
-
-			tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-					/* RWCLK */
-					train[4]++;
-					if (train[4] > 15)
-					{
-						train[4] &= 15;
-						train[5]++;
-						if (train[5] > 15)
-						{
-							train[5] &= 15;
-							train[6]++;
-							train[6] &= 15;
-						}
-					}
-					tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-
-					if ((tmph&7)==7)
-						ls377_u110 = RAM2[((tmph&0x1f8)>>3) | ((tmpv&0x1f0)<<2)];
-
-					if ((tmph&1)==0)
-						ls195_latch = ROM111[((tmph>>1)&3) | ((tmpv&15)<<2) | ((ls377_u110&0x7f)<<6) ];
-					else
-						ls195_latch>>=4;
-		}
-
-
-
-/* draw the scanline */
-
-		ls163_u107 = 0x80 | ((train[0] | (train[1]<<4)) >> 1);
-
-		for (sx = 0; sx < 256; sx++)
-		{
-			int tmph,tmpv;
-
-			tmpv = (train[8]<<0) | (train[9]<<4) | (train[10]<<8);
-			tmpv>>=2;
-			tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-
-			ls163_u107 += 4; /* ls163s clocked at 20MHz = 4 clocks per pixel */
-
-			if (ls163_u107 >= 256)
-			{
-				while (ls163_u107 >= 256)
-				{
-					ls163_u107-=256;
-					/* RWCLK */
-					train[4]++;
-					if (train[4] > 15)
-					{
-						train[4] &= 15;
-						train[5]++;
-						if (train[5] > 15)
-						{
-							train[5] &= 15;
-							train[6]++;
-							train[6] &= 15;
-						}
-					}
-					ls163_u107+= (0x80 | ((train[2] | (train[3]<<4)) >> 1));
-
-					tmph = (train[4]<<0) | (train[5]<<4) | (train[6]<<8);
-
-					if ((tmph&7)==7)
-						ls377_u110 = RAM2[((tmph&0x1f8)>>3) | ((tmpv&0x1f0)<<2)];
-
-					if ((tmph&1)==0)
-						ls195_latch = ROM111[((tmph>>1)&3) | ((tmpv&15)<<2) | ((ls377_u110&0x7f)<<6) ];
-					else
-						ls195_latch>>=4;
-				}
-				if (ls163_u107 >= 256)
-					popmessage("ERROR!!!!");
-			}
-
-			if ( (sy>=cliprect->min_y) && (sy<=cliprect->max_y) )
-			{
-				int data  = (ls195_latch>>0) & 0x0f;
-				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[data];
-			}
-		}
-
-		if (sy&1)
-			ROM1+=8;	/* every second line */
-	}
-
-
-	/* OBJ 0 - sprites */
-	obj0rom = memory_region(REGION_USER1);
-
-	pSource = spriteram;
-	for (i = 0; i < 0x400; i+=4)
-	{
-		int vr,hr,hs;
-		UINT32 syy,hsize;
-		UINT8  roz;
-		UINT32 vsiz;
-		UINT32 ypos;
-		UINT32 xpos;
-
-		roz = pSource[i+0];			/* 0x80->VR, 0x40->HR, 0x20->HS */
-		vsiz= roz & 0x1f;			/* vertical size-1 (0 = one line) */
-		ypos= 0x100-pSource[i+1];
-		xpos= pSource[i+3];
-		tile= pSource[i+2];
-		vr = (roz&0x80)>>7;
-		hr = (roz&0x40)>>6;
-		hs = (roz&0x20)>>5;	/* horizontal size in 8 bytes units (2 pixels per byte) */
-
-		for (syy = 0; syy <= vsiz; syy++)
-		{
-			unsigned int ls00 = ( (vr^((syy>>4)&1)) & ((vsiz>>4)&1) )^1;
-			unsigned int A7 = (ls00 & (tile&1)) ^1;
-			unsigned int A8 = ((tile&2)>>1) ^ (hr&hs) ^ hs /*^hs = ^/Qls109*/ ;
-			UINT32 rom_addr = ((tile>>2)<<9) | (A8<<8) | (A7<<7) | ((syy&0x0f)<<3);
-
-			if (vr)	/* vertical rotate */
-				rom_addr ^= (0x0f<<3);
-
-			for (hsize = 0; hsize <= hs; hsize++)
-			{
-				if (hsize==1)
-					rom_addr ^= 0x100;
-
-				if ( ((syy+ypos)>=cliprect->min_y) && ((syy+ypos)<=cliprect->max_y) )
-				{
-
-					for (sx = 0; sx < 8; sx++)	/* 8 steps == 16 pixels */
-					{
-						UINT32 xp,yp,pixdata;
-						UINT8 data;
-
-						if (!hr)
-							data = obj0rom[rom_addr+sx];
-						else
-						{
-							data = obj0rom[rom_addr+(sx^7)];
-							data = ((data&0x0f)<<4) | ((data&0xf0)>>4); /* horizontal rotate */
-						}
-
-						xp = 2*sx + xpos + hsize*16;
-						yp = syy + ypos - vsiz;
-
-						pixdata = (data>>4) & 0x0f;
-						if ((xp<256) && (yp<256))
-						{
-							if ( (pixdata!=0x0f) && (pixdata!=0) )
-								*BITMAP_ADDR16(bitmap, yp, xp) = Machine->pens[16+pixdata];
-						}
-
-						pixdata = data & 0x0f;
-						xp++;
-						if ((xp<256) && (yp<256))
-						{
-							if ( (pixdata!=0x0f) && (pixdata!=0) )
-								*BITMAP_ADDR16(bitmap, yp, xp) = Machine->pens[16+pixdata];
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/* OBJ 1 - text */
-	pSource = videoram;
-	attr = 0;
-	for (sy = 0; sy < 256; sy+=8)
-	{
-		for (sx = 0; sx < 256; sx+=8)
-		{
-			tile = pSource[0];
-			if (!pSource[1]&0x10) /* D4=0 enables latch at U32 */
-				attr = pSource[1];
-			pSource += 2;
-#if 1
-			drawgfx(bitmap, Machine->gfx[1],
-				tile,
-				8 + ((attr>>6)&0x03), /* color; OBJ1s use palette entries 0x20-0x2f (color code=8) */
-				0,0, /* flip */
-				sx+(attr&0x0f),sy,
-				cliprect,
-				TRANSPARENCY_PEN,3 ); /* fix it: should be 7 */
-#endif
-		}
-	}
-	return 0;
-}
-
-
-static WRITE8_HANDLER (colors_w)
-{
-	int bit0, bit1, bit2, r, g, b;
-	UINT32 c, color_index;
-
-	c = (data) | ((offset&1)<<8); /* a0 used as D8 bit input */
-
-	c ^= 0x1ff; /* active low */
-
-	color_index = offset/2;
-	color_index ^=0x30;	/* A4 and A5 lines are negated */
-
-	/* red component */
-	bit0 = (c >> 0) & 0x01;
-	bit1 = (c >> 1) & 0x01;
-	bit2 = (c >> 2) & 0x01;
-	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-	/* green component */
-	bit0 = (c >> 3) & 0x01;
-	bit1 = (c >> 4) & 0x01;
-	bit2 = (c >> 5) & 0x01;
-	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-	/* blue component */
-	bit0 = (c >> 6) & 0x01;
-	bit1 = (c >> 7) & 0x01;
-	bit2 = (c >> 8) & 0x01;
-	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-	palette_set_color(Machine,color_index,r,g,b);
 }
 
 static READ8_HANDLER( mcu_r )
@@ -787,12 +159,24 @@ static READ8_HANDLER( changela_25_r )
 
 static READ8_HANDLER( changela_30_r )
 {
-	return readinputport(7);	//wheel control (clocked input) signal on bits 3,2,1,0
+	return readinputport(7) & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
 }
 
 static READ8_HANDLER( changela_31_r )
 {
-	return 0x00;	//wheel UP/DOWN control signal on bit 3, collisions on bits:2,1,0
+	/* If the new value is less than the old value, and it did not wrap around,
+       or if the new value is greater than the old value, and it did wrap around,
+       then we are moving LEFT. */
+	static UINT8 prev_value = 0;
+	int dir = 0;
+
+	if( (readinputport(7) < prev_value && (prev_value - readinputport(7)) < 0x80)
+	||  (readinputport(7) > prev_value && (readinputport(7) - prev_value) > 0x80) )
+		dir = 1;
+
+	prev_value = readinputport(7);
+
+	return dir << 3;	//wheel UP/DOWN control signal on bit 3, collisions on bits:2,1,0`
 }
 
 static READ8_HANDLER( changela_2c_r )
@@ -837,68 +221,13 @@ static WRITE8_HANDLER( changela_coin_counter_w )
 }
 
 
-static int dev_sel;
-
-
-static WRITE8_HANDLER( mem_device_select_w )
-{
-	dev_sel = data & 7;
-
-	mem_dev_selected = 0;
-
-	if(dev_sel > 3)
-	{
-		popmessage("memory device selected = %i", dev_sel);
-	}
-
-	mem_dev_selected = dev_sel * 0x800;
-
-	/*
-    dev_sel possible settings:
-    0 - not connected (no device)
-    1 - ADR1 is 2114 RAM at U59 (state machine) (accessible range: 0x0000-0x003f)
-    2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
-    3 - ADR3 is 2128 RAM at U114? (Tree RAM)    (accessible range: 0x0000-0x07ff)
-    4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
-    5 - SLOPE is ROM at U44 (state machine)     (accessible range: 0x0000-0x07ff)
-    */
-}
-
-static WRITE8_HANDLER( mem_device_w )
-{
-	memory_devices[mem_dev_selected + offset] = data;
-
-    if((mem_dev_selected==0x800) & (offset>0x3f))
-		popmessage("RAM1 offset=%4x",offset);
-
-}
-static READ8_HANDLER( mem_device_r )
-{
-	return memory_devices[mem_dev_selected + offset];
-}
-
-
-
-
-static WRITE8_HANDLER( slope_rom_addr_hi_w )
-{
-	slopeROM_bank = (data&3)<<9;
-//  popmessage("bank = %04x", slopeROM_bank);
-}
-
-static WRITE8_HANDLER( slope_rom_addr_lo_w )
-{
-	address = data;
-//    popmessage("address = %04x", address);
-}
-
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_READ(MRA8_RAM)				/* OBJ0 RAM */
 	AM_RANGE(0x9000, 0x97ff) AM_READ(MRA8_RAM)				/* OBJ1 RAM */
 	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_ROM)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(mem_device_r)			/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(changela_mem_device_r)			/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
 	AM_RANGE(0xd000, 0xd000) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0xd010, 0xd010) AM_READ(AY8910_read_port_1_r)
@@ -921,16 +250,16 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM) 				/* Processor ROM */
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) 	/* OBJ0 RAM (A10 = GND )*/
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram)		/* OBJ1 RAM */
-	AM_RANGE(0xa000, 0xa07f) AM_WRITE(colors_w) AM_BASE(&colorram)		/* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
+	AM_RANGE(0xa000, 0xa07f) AM_WRITE(changela_colors_w) AM_BASE(&colorram)		/* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
 	AM_RANGE(0xb000, 0xbfff) AM_WRITE(MWA8_ROM)				/* Processor ROM */
 
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(mem_device_w)			/* River-Tree RAMs, slope ROM, tree ROM */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(changela_mem_device_w)			/* River-Tree RAMs, slope ROM, tree ROM */
 
 	/* LS138 - U16 */
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(MWA8_NOP)				/* not connected */
-	AM_RANGE(0xc900, 0xc900) AM_WRITE(mem_device_select_w)	/* selects the memory device to be accessible at 0xc000-0xc7ff */
-	AM_RANGE(0xca00, 0xca00) AM_WRITE(slope_rom_addr_hi_w)
-	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(slope_rom_addr_lo_w)
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(changela_mem_device_select_w)	/* selects the memory device to be accessible at 0xc000-0xc7ff */
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(changela_slope_rom_addr_hi_w)
+	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(changela_slope_rom_addr_lo_w)
 
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(AY8910_write_port_0_w)
@@ -953,93 +282,102 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( changela )
 	PORT_START /* 0 */ /* DSWA */
-	PORT_DIPNAME( 0x07, 0x06, "Steering Wheel Ratio" )
-	PORT_DIPSETTING(    0x06, "Recommended" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Loop on Memory Failures" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Control Type" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_DIPSETTING(    0x20, "Steering Wheel" )
+	PORT_DIPNAME( 0x07, 0x01, "Steering Wheel Ratio" )
+	PORT_DIPSETTING(    0x01, "Recommended" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Ignore Memory Failures" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Controls ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
+	PORT_DIPSETTING(    0x00, "Steering Wheel" )
 	PORT_DIPNAME( 0x40, 0x40, "Diagnostic" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Number of Players" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Players ) )
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
 
 	PORT_START /* 1 */ /* DSWB */
-	PORT_DIPNAME( 0x01, 0x00, "Max Bonus Fuels" )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x03, "99" )
-	PORT_DIPNAME( 0x0c, 0x00, "Game Difficulty" )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Very_Easy) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x30, 0x00, "Traffic Difficulty" )
-	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x03, 0x00, "Max Bonus Fuels" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x00, "99" )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Difficulty" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x30, 0x20, "Traffic Difficulty" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x40, 0x00, "Land Collisions Enabled" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Car Collisions Enabled" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START /* 2 */ /* DSWC - coinage (see manual) */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, "Car Collisions Enabled" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	PORT_START /* 2 */ /* DSWC - coinage */
+	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(	0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0xa0, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0xb0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(	0xc0, DEF_STR( 2C_4C ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0xd0, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(	0xe0, DEF_STR( 2C_6C ) )
+	PORT_DIPSETTING(	0x30, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(	0xf0, DEF_STR( 2C_7C ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(	0x50, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(	0x60, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(	0x70, DEF_STR( 1C_7C ) )
+	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(	0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x0a, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x0b, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(	0x0c, DEF_STR( 2C_4C ) )
+	PORT_DIPSETTING(	0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x0d, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(	0x0e, DEF_STR( 2C_6C ) )
+	PORT_DIPSETTING(	0x03, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(	0x0f, DEF_STR( 2C_7C ) )
+	PORT_DIPSETTING(	0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(	0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(	0x06, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(	0x07, DEF_STR( 1C_7C ) )
+
 	PORT_START /* 3 */ /* DSWD - bonus */
-	PORT_DIPNAME( 0x01, 0x01, "Right Coin" )
+	PORT_DIPNAME( 0x01, 0x01, "Right Coin Counter" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Left Coin" )
+	PORT_DIPNAME( 0x02, 0x02, "Left Coin Counter" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1c, 0x00, "Credits for Bonus" )
-	PORT_DIPSETTING(    0x1c, "0" )
-	PORT_DIPSETTING(    0x14, "1" )
-	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x04, "6" )
-	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x14, "5" )
+	PORT_DIPSETTING(    0x18, "6" )
+	PORT_DIPSETTING(    0x1c, "7" )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0xc0, 0xc0, "King of the World" )
-	PORT_DIPSETTING(    0x00, "No Name" )
-	PORT_DIPSETTING(    0x80, "Short Name" )
-	PORT_DIPSETTING(    0xc0, "Long Name" )
+	PORT_DIPNAME( 0xc0, 0x00, "King of the World" )
+	PORT_DIPSETTING(    0x80, "No Name" )
+	PORT_DIPSETTING(    0x40, "Short Name" )
+	PORT_DIPSETTING(    0x00, "Long Name" )
 
 	PORT_START /* port 4 */ /* MCU */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1064,53 +402,22 @@ INPUT_PORTS_START( changela )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) //gas1
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) //gas2
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) //gas2
 
 	PORT_START /* 7 */ /* 0xDx30 DRIVING_WHEEL */
-	PORT_BIT( 0x0f, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0x0f) PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
-//PORT_BIT(  mask,default,type ) PORT_MINMAX(min,max) PORT_SENSITIVITY(sensitivity) PORT_KEYDELTA(delta)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 
 
 INPUT_PORTS_END
 
 
-static const gfx_layout tile_layout =
-{
-	8,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{	0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,
-		8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
-	16*32
-};
-
-static const gfx_layout obj1_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 0,4 },
-	{ 0,1,2,3, 8,9,10,11 },
-	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16 },
-	8*8*2
-};
-
-static const gfx_decode gfxdecodeinfo[] =
-{
-	{ REGION_GFX1, 0x0000, &tile_layout, 0, 4 },
-	{ REGION_GFX2, 0x0000, &obj1_layout, 0, 16 },
-	{ -1 }
-};
-
 static struct AY8910interface ay8910_interface_1 = {
 	input_port_0_r,
-	input_port_2_r
+	input_port_1_r
 };
 
 static struct AY8910interface ay8910_interface_2 = {
-	input_port_1_r,
+	input_port_2_r,
 	input_port_3_r
 };
 
@@ -1137,7 +444,7 @@ static MACHINE_DRIVER_START( changela )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(chl_interrupt,4)
 
-	MDRV_CPU_ADD(M68705,2000000/M68705_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(M68705,2500000/M68705_CLOCK_DIVIDER)
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1147,8 +454,7 @@ static MACHINE_DRIVER_START( changela )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)  /* vert size is a guess */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(gfxdecodeinfo)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 	MDRV_PALETTE_LENGTH(0x40)
 
 	MDRV_VIDEO_START(changela)
@@ -1181,7 +487,7 @@ ROM_START( changela )
 	ROM_LOAD( "cl111",	0x0000, 0x2000, CRC(41c0149d) SHA1(3ea53a3821b044b3d0451fec1b4ee2c28da393ca) )
 	ROM_LOAD( "cl113",	0x2000, 0x2000, CRC(ddf99926) SHA1(e816b88302c5639c7284f4845d450f232d63a10c) )
 
-	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )	/* obj 1 data */
+	ROM_REGION( 0x1000, REGION_GFX2, 0 )	/* obj 1 data */
 	ROM_LOAD( "cl46",	0x0000, 0x1000, CRC(9c0a7d28) SHA1(fac9180ea0d9aeea56a84b35cc0958f0dd86a801) )
 
 	ROM_REGION( 0x8000, REGION_USER1, 0 )	/* obj 0 data */

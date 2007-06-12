@@ -253,7 +253,7 @@ WRITE8_HANDLER( angelkds_paletteram_w )
 	paletteram[offset] = data;
 
 	no=offset & 0xff;
-	palette_set_color(Machine,no,pal4bit(paletteram[no]),pal4bit(paletteram[no]>>4),pal4bit(paletteram[no+0x100]));
+	palette_set_color_rgb(Machine,no,pal4bit(paletteram[no]),pal4bit(paletteram[no]>>4),pal4bit(paletteram[no+0x100]));
 }
 
 /*** Video Start & Update
@@ -271,8 +271,6 @@ VIDEO_START( angelkds )
 
 	bgtop_tilemap = tilemap_create(get_bgtop_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32);
 	tilemap_set_transparent_pen(bgtop_tilemap,15);
-
-	return 0;
 }
 
 /* enable bits are uncertain */

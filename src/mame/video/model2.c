@@ -84,8 +84,7 @@ static TEXTURE_PARAMETER texture_parameter[32];
 
 VIDEO_START(model2)
 {
-	if(sys24_tile_vh_start(0x3fff))
-		return 1;
+	sys24_tile_vh_start(0x3fff);
 
 	tribuffer = auto_malloc(TRIBUFFER_SIZE * sizeof(TRIANGLE));
 
@@ -94,8 +93,6 @@ VIDEO_START(model2)
 
 	texture_rom = (UINT16*)memory_region(REGION_USER3);
 	texture_ram = auto_malloc(0x10000 * sizeof(UINT16));
-
-	return 0;
 }
 
 VIDEO_UPDATE(model2)

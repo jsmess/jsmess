@@ -1,7 +1,7 @@
 #include "driver.h"
 
 
-unsigned char *troangel_scroll;
+UINT8 *troangel_scroll;
 
 static int flipscreen;
 
@@ -56,7 +56,7 @@ PALETTE_INIT( troangel )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		COLOR(0,i) = i;
 		color_prom++;
 	}
@@ -87,7 +87,7 @@ PALETTE_INIT( troangel )
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+256,r,g,b);
+		palette_set_color(machine,i+256,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -198,7 +198,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 
 	for (offs = spriteram_size-4;offs >= 0;offs -= 4)
 	{
-		unsigned char attributes = spriteram[offs+1];
+		UINT8 attributes = spriteram[offs+1];
 		int sx = spriteram[offs+3];
 		int sy = ((224-spriteram[offs+0]-32)&0xff)+32;
 		int code = spriteram[offs+2];

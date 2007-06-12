@@ -26,8 +26,8 @@ Notes:
 
 
 
-extern unsigned char *gng_fgvideoram;
-extern unsigned char *gng_bgvideoram;
+extern UINT8 *gng_fgvideoram;
+extern UINT8 *gng_bgvideoram;
 WRITE8_HANDLER( gng_fgvideoram_w );
 WRITE8_HANDLER( gng_bgvideoram_w );
 WRITE8_HANDLER( gng_bgscrollx_w );

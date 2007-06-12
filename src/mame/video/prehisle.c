@@ -108,8 +108,6 @@ VIDEO_START( prehisle )
 
 	/* register for saving */
 	state_save_register_global(invert_controls);
-
-	return 0;
 }
 
 static void prehisle_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int foreground )

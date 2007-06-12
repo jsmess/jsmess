@@ -104,10 +104,10 @@ ADDRESS_MAP_END
 /* based on snk.c: */
 
 /* Added by Takahiro Nogi. 1999/09/27 */
-static unsigned char MC6840_index0;
-static unsigned char MC6840_register0;
-static unsigned char MC6840_index1;
-static unsigned char MC6840_register1;
+static UINT8 MC6840_index0;
+static UINT8 MC6840_register0;
+static UINT8 MC6840_index1;
+static UINT8 MC6840_register1;
 static int S_TEMPO = 0;
 static int S_TEMPO_OLD = 0;
 static int MC6809_CTR = 0;

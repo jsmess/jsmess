@@ -317,8 +317,6 @@ VIDEO_START( firetrk )
 		car[0].layout = 3;
 		car[1].layout = 4;
 	}
-
-	return 0;
 }
 
 

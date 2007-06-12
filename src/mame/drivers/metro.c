@@ -1931,7 +1931,7 @@ static WRITE16_HANDLER( blzntrnd_sound_w )
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
@@ -4634,10 +4634,10 @@ static DRIVER_INIT( balcube )
 
 	while(src < end)
 	{
-		static const unsigned char scramble[16] =
+		static const UINT8 scramble[16] =
 		 { 0x0,0x8,0x4,0xc,0x2,0xa,0x6,0xe,0x1,0x9,0x5,0xd,0x3,0xb,0x7,0xf };
 
-		unsigned char data;
+		UINT8 data;
 
 		data  =  *src;
 		*src  =  (scramble[data & 0xF] << 4) | scramble[data >> 4];

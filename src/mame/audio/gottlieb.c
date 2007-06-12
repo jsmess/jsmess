@@ -161,7 +161,7 @@ WRITE8_HANDLER( gottlieb_speech_clock_DAC_w )
        128-bytes ram,
        either with the first 128 bytes of the page or the last 128 bytes */
 
-unsigned char *riot_ram;
+UINT8 *riot_ram;
 
 READ8_HANDLER( riot_ram_r )
 {
@@ -173,7 +173,7 @@ WRITE8_HANDLER( riot_ram_w )
 	riot_ram[offset&0x7f]=data;
 }
 
-static unsigned char riot_regs[32];
+static UINT8 riot_regs[32];
     /* lazy handling of the 6532's I/O, and no handling of timers at all */
 
 READ8_HANDLER( gottlieb_riot_r )

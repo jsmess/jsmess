@@ -13,10 +13,10 @@ extern int deco16_raster_display_position;
 
 extern int deco16_pf1_colour_bank,deco16_pf2_colour_bank,deco16_pf3_colour_bank,deco16_pf4_colour_bank;
 
-int deco16_1_video_init(void);
-int deco16_2_video_init(int split);
-int deco16_2_video_init_half_width(void);
-int deco_allocate_sprite_bitmap(void);
+void deco16_1_video_init(void);
+void deco16_2_video_init(int split);
+void deco16_2_video_init_half_width(void);
+void deco_allocate_sprite_bitmap(void);
 
 void deco16_pf12_update(const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
 void deco16_pf34_update(const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
@@ -38,7 +38,7 @@ void deco16_tilemap_34_combine_draw(mame_bitmap *bitmap, const rectangle *clipre
 
 void deco16_clear_sprite_priority_bitmap(void);
 void deco16_pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri);
 
 tilemap *deco16_get_tilemap(int pf, int size);

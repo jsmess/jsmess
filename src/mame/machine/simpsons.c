@@ -6,7 +6,7 @@
 
 /* from video */
 extern void simpsons_video_banking( int select );
-extern unsigned char *simpsons_xtraram;
+extern UINT8 *simpsons_xtraram;
 
 int simpsons_firq_enabled;
 
@@ -124,7 +124,7 @@ static void simpsons_banking( int lines )
 
 MACHINE_RESET( simpsons )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)simpsons_banking);
 

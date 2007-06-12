@@ -82,7 +82,7 @@ WRITE16_HANDLER( fromanc2_paletteram_0_w )
 
 	// GGGG_GRRR_RRBB_BBBx
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color(Machine, 0x000 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	palette_set_color_rgb(Machine, 0x000 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 WRITE16_HANDLER( fromanc2_paletteram_1_w )
@@ -93,7 +93,7 @@ WRITE16_HANDLER( fromanc2_paletteram_1_w )
 
 	// GGGG_GRRR_RRBB_BBBx
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color(Machine, 0x100 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	palette_set_color_rgb(Machine, 0x100 + color, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 
@@ -115,7 +115,7 @@ WRITE16_HANDLER( fromancr_paletteram_0_w )
 
 	// xGGG_GGRR_RRRB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color(Machine, 0x000 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
+	palette_set_color_rgb(Machine, 0x000 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 }
 
 WRITE16_HANDLER( fromancr_paletteram_1_w )
@@ -126,7 +126,7 @@ WRITE16_HANDLER( fromancr_paletteram_1_w )
 
 	// xGGG_GGRR_RRRB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color(Machine, 0x100 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
+	palette_set_color_rgb(Machine, 0x100 + color, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 }
 
 
@@ -148,7 +148,7 @@ WRITE16_HANDLER( fromanc4_paletteram_0_w )
 
 	// xRRR_RRGG_GGGB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color(Machine, 0x000 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(Machine, 0x000 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 WRITE16_HANDLER( fromanc4_paletteram_1_w )
@@ -159,7 +159,7 @@ WRITE16_HANDLER( fromanc4_paletteram_1_w )
 
 	// xRRR_RRGG_GGGB_BBBB
 	color = ((offset & 0x0700) << 1) + (offset & 0x00ff);
-	palette_set_color(Machine, 0x100 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(Machine, 0x100 + color, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
@@ -397,8 +397,6 @@ VIDEO_START( fromanc2 )
 	tilemap_set_transparent_pen(fromanc2_tilemap[1][1], 0x000);
 	tilemap_set_transparent_pen(fromanc2_tilemap[1][2], 0x000);
 	tilemap_set_transparent_pen(fromanc2_tilemap[1][3], 0x000);
-
-	return 0;
 }
 
 VIDEO_START( fromancr )
@@ -426,8 +424,6 @@ VIDEO_START( fromancr )
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][2], 0x0ff);
 	tilemap_set_transparent_pen(fromanc2_tilemap[1][1], 0x0ff);
 	tilemap_set_transparent_pen(fromanc2_tilemap[1][2], 0x0ff);
-
-	return 0;
 }
 
 
@@ -456,8 +452,6 @@ VIDEO_START( fromanc4 )
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][2], 0x000);
 	tilemap_set_transparent_pen(fromanc2_tilemap[1][1], 0x000);
 	tilemap_set_transparent_pen(fromanc2_tilemap[1][2], 0x000);
-
-	return 0;
 }
 
 /******************************************************************************

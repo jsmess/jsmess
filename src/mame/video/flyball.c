@@ -51,8 +51,6 @@ VIDEO_START( flyball )
 {
 	flyball_tilemap = tilemap_create(flyball_get_tile_info,
 		flyball_get_memory_offset, TILEMAP_OPAQUE, 8, 16, 32, 16);
-
-	return 0;
 }
 
 

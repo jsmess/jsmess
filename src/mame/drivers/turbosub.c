@@ -60,7 +60,6 @@ static UINT8 INTER_CPU_REG;
 
 VIDEO_START( turbosub )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( turbosub )
@@ -122,7 +121,7 @@ static READ8_HANDLER( G_STATUS_R )
 static WRITE8_HANDLER( G_STATUS_W )
 {
 	int bankaddress;
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
 	memory_set_bankptr(1,&ROM[bankaddress]);
 

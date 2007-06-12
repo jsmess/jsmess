@@ -32,7 +32,7 @@ PALETTE_INIT( sidepckt )
 		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -46,7 +46,7 @@ PALETTE_INIT( sidepckt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	unsigned char attr = colorram[tile_index];
+	UINT8 attr = colorram[tile_index];
 	SET_TILE_INFO(
 			0,
 			videoram[tile_index] + ((attr & 0x07) << 8),
@@ -70,8 +70,6 @@ VIDEO_START( sidepckt )
 	tilemap_set_transmask(bg_tilemap,1,0x01,0xfe); /* split type 1 has pen 0 transparent in front half */
 
 	tilemap_set_flip(ALL_TILEMAPS,TILEMAP_FLIPX);
-
-	return 0;
 }
 
 

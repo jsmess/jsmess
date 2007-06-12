@@ -125,12 +125,10 @@ VIDEO_START( vtech1_monochrome )
 	}
 
 	common_video_start(vtech1_palette_mono);
-	return 0;
 }
 
 
 VIDEO_START( vtech1 )
 {
 	common_video_start(NULL);
-	return 0;
 }

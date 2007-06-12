@@ -316,8 +316,6 @@ static VIDEO_START( berzerk )
 
 	TTL74181_config(LS181_10C, 0);
 	TTL74181_write(LS181_10C, TTL74181_INPUT_M, 1, 1);
-
-	return 0;
 }
 
 

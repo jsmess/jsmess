@@ -23,16 +23,16 @@
 
 static int interrupt_enable;
 
-typedef unsigned short word;
-typedef unsigned char byte;
+typedef UINT16 word;
+typedef UINT8 byte;
 
 #define PreDecryptedRoms
 
 #ifndef PreDecryptedRoms
 static int s0,s1,s2,s3; /* 1 bit registers inside decoder PAL */
-static unsigned char shadowROM[0xffff];
-static unsigned char used[0xFFFF];
-unsigned long numberUsed = 0;
+static UINT8 shadowROM[0xffff];
+static UINT8 used[0xFFFF];
+UINT32 numberUsed = 0;
 #else
 struct {
     int count;
@@ -463,7 +463,7 @@ the top of this file. It is included here for completeness.
 
 #include <stdio.h>
 
-typedef unsigned char byte;
+typedef UINT8 byte;
 
 void CreateJrDecodeTable(byte *x, int length);
 void Load(char *name,byte *buffer,int from, int length);

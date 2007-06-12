@@ -146,7 +146,7 @@ PALETTE_INIT( madalien )
 		bit1 = (color_prom[i] >> 5) & 0x01;
 		b = 0x40 * bit0 + 0x80 * bit1;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 
 		/* Colors for bits 1 and 2 swapped */
 		j = i;
@@ -160,7 +160,7 @@ PALETTE_INIT( madalien )
 				j |= 0x02;
 				break;
 		};
-		palette_set_color(machine, j+n, r, g, b);
+		palette_set_color(machine, j+n, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -273,8 +273,6 @@ VIDEO_START( madalien )
 	for( x=0; x<64; x++ )
 		for( y=0; y<128; y++ )
 			madalien_headlight_source[y][64+x] = madalien_headlight_source[y][63-x];
-
-	return 0;
 }
 
 

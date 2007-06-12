@@ -38,8 +38,6 @@ VIDEO_START( nitedrvr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void nitedrvr_draw_box( mame_bitmap *bitmap, int bx, int by, int ex, int ey )

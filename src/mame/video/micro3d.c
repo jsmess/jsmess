@@ -55,7 +55,7 @@ extern UINT8 ti_uart[8];
 
 void changecolor_BBBBBRRRRRGGGGGG(pen_t color,int data)
 {
-	palette_set_color(Machine,color,pal5bit(data >> 6),pal5bit(data >> 1),pal5bit(data >> 11));
+	palette_set_color_rgb(Machine,color,pal5bit(data >> 6),pal5bit(data >> 1),pal5bit(data >> 11));
 }
 
 WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
@@ -66,7 +66,6 @@ WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
 
 VIDEO_START(micro3d)
 {
-	return 0;
 }
 
 void micro3d_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)

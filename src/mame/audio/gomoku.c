@@ -26,7 +26,7 @@ typedef struct
 	int frequency;
 	int counter;
 	int volume;
-	const unsigned char *wave;
+	const UINT8 *wave;
 	int oneshotplaying;
 } sound_channel;
 
@@ -40,7 +40,7 @@ static sound_channel channel_list[MAX_VOICES];
 static sound_channel *last_channel;
 
 /* global sound parameters */
-static const unsigned char *sound_rom;
+static const UINT8 *sound_rom;
 static int num_voices;
 static int sound_enable;
 static sound_stream *stream;
@@ -106,7 +106,7 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 		/* only update if we have non-zero volume and frequency */
 		if (v && f)
 		{
-			const unsigned char *w = voice->wave;
+			const UINT8 *w = voice->wave;
 			int c = voice->counter;
 
 			mix = mixer_buffer;

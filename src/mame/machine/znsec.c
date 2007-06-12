@@ -85,9 +85,9 @@
 #include "znsec.h"
 
 typedef struct {
-	const unsigned char *transform;
-	unsigned char state;
-	unsigned char bit;
+	const UINT8 *transform;
+	UINT8 state;
+	UINT8 bit;
 } znsec_state;
 
 static znsec_state zns[2];
@@ -96,10 +96,10 @@ static znsec_state zns[2];
 // Given the value for x7..x0 and linear transform coefficients a7..a0
 // compute the value of the transform
 #if 0
-static int c_linear(unsigned char x, unsigned char a)
+static int c_linear(UINT8 x, UINT8 a)
 {
 	int i;
-	unsigned char r;
+	UINT8 r;
 	x &= a;
 	r = 0;
 	for(i=0; i<8; i++)
@@ -110,9 +110,9 @@ static int c_linear(unsigned char x, unsigned char a)
 #endif
 
 // Derive the sbox xor mask for a given input and select bit
-static unsigned char compute_sbox_coef(int chip, int sel, int bit)
+static UINT8 compute_sbox_coef(int chip, int sel, int bit)
 {
-	unsigned char r;
+	UINT8 r;
 	if(!sel)
 		return zns[chip].transform[bit];
 	r = compute_sbox_coef(chip, (sel-1) & 7, (bit-1) & 7);
@@ -124,10 +124,10 @@ static unsigned char compute_sbox_coef(int chip, int sel, int bit)
 }
 
 // Apply the sbox for a input 0 bit
-static unsigned char apply_bit_sbox(int chip, unsigned char state, int sel)
+static UINT8 apply_bit_sbox(int chip, UINT8 state, int sel)
 {
 	int i;
-	unsigned char r = 0;
+	UINT8 r = 0;
 	for(i=0; i<8; i++)
 		if(state & (1<<i))
 			r ^= compute_sbox_coef(chip, sel, i);
@@ -135,17 +135,17 @@ static unsigned char apply_bit_sbox(int chip, unsigned char state, int sel)
 }
 
 // Apply a sbox
-static unsigned char apply_sbox(unsigned char state, const unsigned char *sbox)
+static UINT8 apply_sbox(UINT8 state, const UINT8 *sbox)
 {
 	int i;
-	unsigned char r = 0;
+	UINT8 r = 0;
 	for(i=0; i<8; i++)
 		if(state & (1<<i))
 			r ^= sbox[i];
 	return r;
 }
 
-void znsec_init(int chip, const unsigned char *transform)
+void znsec_init(int chip, const UINT8 *transform)
 {
 	zns[chip].transform = transform;
 	zns[chip].state = 0xfc;
@@ -158,10 +158,10 @@ void znsec_start(int chip)
 	zns[chip].bit = 0;
 }
 
-unsigned char znsec_step(int chip, unsigned char input)
+UINT8 znsec_step(int chip, UINT8 input)
 {
-	unsigned char res;
-	static const unsigned char initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
+	UINT8 res;
+	static const UINT8 initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
 
 	if (zns[chip].bit==0)
 	{

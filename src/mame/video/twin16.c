@@ -49,7 +49,7 @@ WRITE16_HANDLER( twin16_paletteram_word_w )
 	offset &= ~1;
 
 	data = ((paletteram16[offset] & 0xff) << 8) | (paletteram16[offset + 1] & 0xff);
-	palette_set_color(Machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette_set_color_rgb(Machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 WRITE16_HANDLER( fround_gfx_bank_w )
@@ -506,8 +506,6 @@ VIDEO_START( twin16 )
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 VIDEO_START( fround )
@@ -516,8 +514,6 @@ VIDEO_START( fround )
 		TILEMAP_TRANSPARENT, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 VIDEO_EOF( twin16 )

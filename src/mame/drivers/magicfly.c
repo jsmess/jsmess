@@ -365,8 +365,6 @@ VIDEO_START(magicfly)
 {
 	bg_tilemap = tilemap_create(get_magicfly_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 29);
-
-	return 0;
 }
 
 static TILE_GET_INFO( get_7mezzo_tile_info )
@@ -399,11 +397,6 @@ VIDEO_START( 7mezzo )
 {
 	bg_tilemap = tilemap_create(get_7mezzo_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 29);
-
-	if ( !bg_tilemap )
-		return 1;
-
-	return 0;
 }
 
 VIDEO_UPDATE( magicfly )
@@ -415,18 +408,18 @@ VIDEO_UPDATE( magicfly )
 PALETTE_INIT( magicfly )
 {
     /* 1st gfx bank */
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 2, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 4, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 6, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 10, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 11, 0x00, 0xff, 0x00);
-	palette_set_color(machine, 12, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 14, 0x00, 0x00, 0x00);
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 2, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 4, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 6, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 10, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 11, MAKE_RGB(0x00, 0xff, 0x00));
+	palette_set_color(machine, 12, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 14, MAKE_RGB(0x00, 0x00, 0x00));
 
 	/* 2nd gfx bank */
-	palette_set_color(machine, 22, 0xe0, 0xe0, 0xe0);
-	palette_set_color(machine, 23, 0xff, 0xff, 0xff);
+	palette_set_color(machine, 22, MAKE_RGB(0xe0, 0xe0, 0xe0));
+	palette_set_color(machine, 23, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 

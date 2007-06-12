@@ -108,7 +108,6 @@ static const gfx_decode gfxdecodeinfo[] =
 
 VIDEO_START( rcorsair )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( rcorsair )

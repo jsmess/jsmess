@@ -13,7 +13,7 @@ extern UINT16 *s24_mainram1;
 
 #define S16_NUMCACHE 8
 
-static unsigned char *s24_fd1094_key; // the memory region containing key
+static UINT8 *s24_fd1094_key; // the memory region containing key
 static UINT16 *s24_fd1094_cpuregion; // the CPU region with encrypted code
 static UINT32  s24_fd1094_cpuregionsize; // the size of this region in bytes
 
@@ -77,7 +77,7 @@ void s24_fd1094_setstate_and_decrypt(int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-void s24_fd1094_cmp_callback(unsigned int val, int reg)
+void s24_fd1094_cmp_callback(UINT32 val, int reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{

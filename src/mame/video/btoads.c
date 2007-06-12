@@ -52,7 +52,6 @@ VIDEO_START( btoads )
 	/* initialize the swapped pointers */
 	vram_fg_draw = (UINT8 *)btoads_vram_fg0;
 	vram_fg_display = (UINT8 *)btoads_vram_fg1;
-	return 0;
 }
 
 

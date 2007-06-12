@@ -48,7 +48,7 @@ static int malzak_bank1;
 extern int malzak_x;
 extern int malzak_y;
 
-extern unsigned char* saa5050_vidram;  /* Video RAM for SAA 5050 */
+extern UINT8* saa5050_vidram;  /* Video RAM for SAA 5050 */
 
 // in video/malzak.c
 VIDEO_START( malzak );
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( ram_mirror_w )
 
 static READ8_HANDLER( bank_r )
 {
-	unsigned char* bank = memory_region(REGION_USER2);
+	UINT8* bank = memory_region(REGION_USER2);
 
 	return bank[offset + (malzak_bank1 * 0x0400)];
 }
@@ -131,7 +131,7 @@ static READ8_HANDLER( s2636_portA_r )
 /*
 static READ8_HANDLER( bank2_r )
 {  // probably very wrong :)
-    unsigned char* bank = memory_region(REGION_USER1);
+    UINT8* bank = memory_region(REGION_USER1);
 
     return bank[offset + (malzak_bank1 * 0x0400)];
 }
@@ -391,16 +391,16 @@ static const gfx_layout saa5050_lolayout =
 	8 * 10
 };
 
-static unsigned char saa5050_palette[8 * 3] =
+static const rgb_t saa5050_palette[8] =
 {
-	0x00, 0x00, 0x00,	/* black */
-	0xff, 0x00, 0x00,	/* red */
-	0x00, 0xff, 0x00,	/* green */
-	0xff, 0xff, 0x00,	/* yellow */
-	0x00, 0x00, 0xff,	/* blue */
-	0xff, 0x00, 0xff,	/* magenta */
-	0x00, 0xff, 0xff,	/* cyan */
-	0xff, 0xff, 0xff	/* white */
+	MAKE_RGB(0x00, 0x00, 0x00),	/* black */
+	MAKE_RGB(0xff, 0x00, 0x00),	/* red */
+	MAKE_RGB(0x00, 0xff, 0x00),	/* green */
+	MAKE_RGB(0xff, 0xff, 0x00),	/* yellow */
+	MAKE_RGB(0x00, 0x00, 0xff),	/* blue */
+	MAKE_RGB(0xff, 0x00, 0xff),	/* magenta */
+	MAKE_RGB(0x00, 0xff, 0xff),	/* cyan */
+	MAKE_RGB(0xff, 0xff, 0xff)	/* white */
 };
 
 /* bgnd, fgnd */
@@ -433,7 +433,7 @@ static const gfx_decode malzak_gfxdecodeinfo[] =
 
 static PALETTE_INIT( malzak )
 {
-	palette_set_colors(machine, 0, saa5050_palette, sizeof(saa5050_palette) / 3);
+	palette_set_colors(machine, 0, saa5050_palette, ARRAY_LENGTH(saa5050_palette));
 	memcpy(colortable, saa5050_colortable, sizeof (saa5050_colortable));
 }
 

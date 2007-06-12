@@ -31,7 +31,7 @@ PALETTE_INIT(mz700)
 
     for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine, i, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00);
+		palette_set_color_rgb(machine, i, (i & 2) ? 0xff : 0x00, (i & 4) ? 0xff : 0x00, (i & 1) ? 0xff : 0x00);
 	}
 
 	for (i = 0; i < 256; i++)
@@ -43,9 +43,7 @@ PALETTE_INIT(mz700)
 
 VIDEO_START(mz700)
 {
-	if (video_start_generic(machine))
-		return 1;
-    return 0;
+	video_start_generic(machine);
 }
 
 //void mz700_vh_screenrefresh(mame_bitmap *bitmap, int full_refresh)

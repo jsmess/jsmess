@@ -32,7 +32,7 @@ HW info :
 #include "driver.h"
 #include "sound/ay8910.h"
 
-extern unsigned char *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
+extern UINT8 *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
 
 WRITE8_HANDLER(ssrj_vram1_w);
 WRITE8_HANDLER(ssrj_vram2_w);
@@ -49,7 +49,7 @@ static int oldport=0x80;
 
 MACHINE_RESET(ssrj)
 {
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 	memset(&rom[0xc000],0,0x3fff); /* req for some control types */
 	oldport=0x80;
 }

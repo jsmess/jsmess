@@ -47,12 +47,11 @@ Notes:
 
 #include "driver.h"
 
-static unsigned char *unkram;
-static unsigned char *mainram;
+static UINT8 *unkram;
+static UINT8 *mainram;
 
 VIDEO_START( gunpey )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( gunpey )

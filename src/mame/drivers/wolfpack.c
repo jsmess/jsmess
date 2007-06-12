@@ -53,16 +53,16 @@ static PALETTE_INIT( wolfpack )
 {
 	int i;
 
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 1, 0xc1, 0xc1, 0xc1);
-	palette_set_color(machine, 2, 0x81, 0x81, 0x81);
-	palette_set_color(machine, 3, 0x48, 0x48, 0x48);
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 1, MAKE_RGB(0xc1, 0xc1, 0xc1));
+	palette_set_color(machine, 2, MAKE_RGB(0x81, 0x81, 0x81));
+	palette_set_color(machine, 3, MAKE_RGB(0x48, 0x48, 0x48));
 
 	for (i = 0; i < 4; i++)
 	{
 		rgb_t color = palette_get_color(machine, i);
 
-		palette_set_color(machine, 4 + i,
+		palette_set_color_rgb(machine, 4 + i,
 			RGB_RED(color) < 0xb8   ? RGB_RED(color)   + 0x48 : 0xff,
 			RGB_GREEN(color) < 0xb8 ? RGB_GREEN(color) + 0x48 : 0xff,
 			RGB_BLUE(color) < 0xb8  ? RGB_BLUE(color)  + 0x48 : 0xff);
@@ -357,7 +357,6 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 	MDRV_GFXDECODE(gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(8)
 	MDRV_PALETTE_INIT(wolfpack)
 	MDRV_VIDEO_START(wolfpack)
 	MDRV_VIDEO_UPDATE(wolfpack)

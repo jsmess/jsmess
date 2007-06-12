@@ -104,7 +104,7 @@ void littlerb_data_write(UINT16 data)
 			r = littlerb_region2[x+1];
 			g = littlerb_region2[x+2];
 
-			palette_set_color(Machine,x/3,r,g,b);
+			palette_set_color(Machine,x/3,MAKE_RGB(r,g,b));
 		}
 
 
@@ -297,7 +297,7 @@ PALETTE_INIT( littlerb )
 {
 	int i;
 	for(i = 0; i < 256; i++)
-		palette_set_color(machine,i,i,i,i);
+		palette_set_color(machine,i,MAKE_RGB(i,i,i));
 }
 
 VIDEO_START(littlerb)
@@ -307,8 +307,6 @@ VIDEO_START(littlerb)
 //  littlerb_region2 = auto_malloc(0x800*2);
 //  littlerb_region3 = auto_malloc(0x20*2);
 //  littlerb_region4 = auto_malloc(0x40000*2);
-
-	return 0;
 }
 
 void littlerb_drawsprite(mame_bitmap *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )

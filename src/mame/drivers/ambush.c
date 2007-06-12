@@ -37,8 +37,8 @@ TODO:
 #include "sound/ay8910.h"
 
 
-extern unsigned char *ambush_scrollram;
-extern unsigned char *ambush_colorbank;
+extern UINT8 *ambush_scrollram;
+extern UINT8 *ambush_colorbank;
 
 PALETTE_INIT( ambush );
 VIDEO_UPDATE( ambush );

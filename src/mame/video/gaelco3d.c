@@ -78,8 +78,6 @@ VIDEO_START( gaelco3d )
 
 	state_save_register_bitmap("video", 0, "screenbits", screenbits);
 	state_save_register_bitmap("video", 0, "zbuffer", zbuffer);
-
-	return 0;
 }
 
 

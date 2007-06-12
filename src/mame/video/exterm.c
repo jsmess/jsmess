@@ -25,7 +25,7 @@ PALETTE_INIT( exterm )
 
 	/* initialize 555 RGB lookup */
 	for (i = 0; i < 32768; i++)
-		palette_set_color(machine, i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
+		palette_set_color_rgb(machine, i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 }
 
 
@@ -36,25 +36,25 @@ PALETTE_INIT( exterm )
  *
  *************************************/
 
-void exterm_to_shiftreg_master(unsigned int address, UINT16 *shiftreg)
+void exterm_to_shiftreg_master(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &exterm_master_videoram[TOWORD(address)], 256 * sizeof(UINT16));
 }
 
 
-void exterm_from_shiftreg_master(unsigned int address, UINT16 *shiftreg)
+void exterm_from_shiftreg_master(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&exterm_master_videoram[TOWORD(address)], shiftreg, 256 * sizeof(UINT16));
 }
 
 
-void exterm_to_shiftreg_slave(unsigned int address, UINT16 *shiftreg)
+void exterm_to_shiftreg_slave(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &exterm_slave_videoram[TOWORD(address)], 256 * 2 * sizeof(UINT8));
 }
 
 
-void exterm_from_shiftreg_slave(unsigned int address, UINT16 *shiftreg)
+void exterm_from_shiftreg_slave(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&exterm_slave_videoram[TOWORD(address)], shiftreg, 256 * 2 * sizeof(UINT8));
 }

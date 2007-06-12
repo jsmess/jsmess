@@ -839,13 +839,11 @@ static void internal_video_start_coco3(m6847_type type)
 VIDEO_START( coco3 )
 {
 	internal_video_start_coco3(M6847_VERSION_GIME_NTSC);
-	return 0;
 }
 
 VIDEO_START( coco3p )
 {
 	internal_video_start_coco3(M6847_VERSION_GIME_PAL);
-	return 0;
 }
 
 

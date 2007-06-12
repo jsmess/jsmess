@@ -38,7 +38,7 @@ PALETTE_INIT( n8080 )
 	int i;
 
 	for (i = 0; i < 8; i++)
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
+		palette_set_color_rgb(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 }
 
 
@@ -52,11 +52,11 @@ PALETTE_INIT( helifire )
 	{
 		int level = 0xff * exp(-3 * i / 255.); /* capacitor discharge */
 
-		palette_set_color(machine,0x000 + 8 + i, 0x00, 0x00, level);   /* shades of blue */
-		palette_set_color(machine,0x100 + 8 + i, 0x00, 0xC0, level);   /* shades of blue w/ green star */
+		palette_set_color(machine,0x000 + 8 + i, MAKE_RGB(0x00, 0x00, level));   /* shades of blue */
+		palette_set_color(machine,0x100 + 8 + i, MAKE_RGB(0x00, 0xC0, level));   /* shades of blue w/ green star */
 
-		palette_set_color(machine,0x200 + 8 + i, level, 0x00, 0x00);   /* shades of red */
-		palette_set_color(machine,0x300 + 8 + i, level, 0xC0, 0x00);   /* shades of red w/ green star */
+		palette_set_color(machine,0x200 + 8 + i, MAKE_RGB(level, 0x00, 0x00));   /* shades of red */
+		palette_set_color(machine,0x300 + 8 + i, MAKE_RGB(level, 0xC0, 0x00));   /* shades of red w/ green star */
 	}
 }
 
@@ -112,8 +112,6 @@ VIDEO_START( spacefev )
 
 	spacefev_red_screen = 0;
 	spacefev_red_cannon = 0;
-
-	return 0;
 }
 
 
@@ -123,8 +121,6 @@ VIDEO_START( sheriff )
 
 	sheriff_color_mode = 0;
 	sheriff_color_data = 0;
-
-	return 0;
 }
 
 
@@ -151,8 +147,6 @@ VIDEO_START( helifire )
 	flip_screen = 0;
 
 	helifire_flash = 0;
-
-	return 0;
 }
 
 
@@ -398,7 +392,7 @@ VIDEO_EOF( helifire )
 			}
 		}
 
-		palette_set_color(machine,i,
+		palette_set_color_rgb(machine,i,
 			R ? 255 : 0,
 			G ? 255 : 0,
 			B ? 255 : 0);

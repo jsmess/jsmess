@@ -110,7 +110,7 @@ static PALETTE_INIT( wallc )
 		bit7 = (color_prom[i] >> 7) & 0x01;
 		b = combine_3_weights(weights_b, bit7, bit1, bit0);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -128,8 +128,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( wallc )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_y,	TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( wallc )
@@ -239,8 +237,8 @@ static const gfx_decode gfxdecodeinfo[] =
 
 static DRIVER_INIT( wallc )
 {
-	unsigned char c;
-	unsigned int i;
+	UINT8 c;
+	UINT32 i;
 
 	UINT8 *ROM = memory_region(REGION_CPU1);
 
@@ -254,8 +252,8 @@ static DRIVER_INIT( wallc )
 
 static DRIVER_INIT( wallca )
 {
-	unsigned char c;
-	unsigned int i;
+	UINT8 c;
+	UINT32 i;
 
 	UINT8 *ROM = memory_region(REGION_CPU1);
 

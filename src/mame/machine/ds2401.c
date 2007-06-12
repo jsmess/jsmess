@@ -41,7 +41,7 @@ struct ds2401_chip
 	int shift;
 	int rx;
 	int tx;
-	unsigned char *data;
+	UINT8 *data;
 	void *timer;
 	void *reset_timer;
 	mame_time t_samp;
@@ -136,7 +136,7 @@ static void ds2401_tick( int chip )
 	}
 }
 
-void ds2401_init( int chip, unsigned char *data )
+void ds2401_init( int chip, UINT8 *data )
 {
 	struct ds2401_chip *c = &ds2401[ chip ];
 

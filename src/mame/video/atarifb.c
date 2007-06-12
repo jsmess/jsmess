@@ -11,9 +11,9 @@
 /* local */
 size_t atarifb_alphap1_vram_size;
 size_t atarifb_alphap2_vram_size;
-unsigned char *atarifb_alphap1_vram;
-unsigned char *atarifb_alphap2_vram;
-unsigned char *atarifb_scroll_register;
+UINT8 *atarifb_alphap1_vram;
+UINT8 *atarifb_alphap2_vram;
+UINT8 *atarifb_scroll_register;
 
 
 static const rectangle bigfield_area = {  4*8, 34*8-1, 0*8, 32*8-1 };

@@ -605,8 +605,6 @@ VIDEO_START(skns)
 
 	machine->gfx[2]->color_granularity=256;
 	machine->gfx[3]->color_granularity=256;
-
-	return 0;
 }
 
 static void supernova_draw_a( mame_bitmap *bitmap, const rectangle *cliprect, int tran )

@@ -116,8 +116,8 @@ static WRITE16_HANDLER( yunsun16_sound_bank_w )
 	if (ACCESSING_LSB)
 	{
 		int bank = data & 3;
-		unsigned char *dst	= memory_region(REGION_SOUND1);
-		unsigned char *src	= dst + 0x80000 + 0x20000 * bank;
+		UINT8 *dst	= memory_region(REGION_SOUND1);
+		UINT8 *src	= dst + 0x80000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
 }

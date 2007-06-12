@@ -56,7 +56,7 @@ WRITE16_HANDLER( blmbycar_okibank_w )
 {
 	if (ACCESSING_LSB)
 	{
-		unsigned char *RAM = memory_region(REGION_SOUND1);
+		UINT8 *RAM = memory_region(REGION_SOUND1);
 		memcpy(&RAM[0x30000],&RAM[0x40000 + 0x10000*(data & 0xf)],0x10000);
 	}
 }

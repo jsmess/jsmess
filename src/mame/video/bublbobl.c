@@ -10,7 +10,7 @@
 
 
 
-unsigned char *bublbobl_objectram;
+UINT8 *bublbobl_objectram;
 size_t bublbobl_objectram_size;
 int bublbobl_video_enable;
 

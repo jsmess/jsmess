@@ -222,7 +222,7 @@ static unsigned short kaypro_colortable[] =
 /* Initialise the palette */
 static PALETTE_INIT( kaypro )
 {
-	palette_set_colors(machine, 0, kaypro_palette, sizeof(kaypro_palette) / 3);
+	palette_set_colors_rgb(machine, 0, kaypro_palette, sizeof(kaypro_palette) / 3);
     memcpy(colortable, kaypro_colortable, sizeof(kaypro_colortable));
 }
 

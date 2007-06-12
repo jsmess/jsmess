@@ -93,70 +93,52 @@ static VIDEO_START( common )
 	state_save_register_global_pointer(midyunit_cmos_ram, (0x2000 * 4)/sizeof(midyunit_cmos_ram[0]));
 	state_save_register_global(videobank_select);
 	state_save_register_global_array(dma_register);
-
-	return 0;
 }
 
 
 VIDEO_START( midyunit_4bit )
 {
-	int result = video_start_common(machine);
 	int i;
 
-	/* handle failure */
-	if (result)
-		return result;
+	video_start_common(machine);
 
 	/* init for 4-bit */
 	for (i = 0; i < 65536; i++)
 		pen_map[i] = ((i & 0xf000) >> 8) | (i & 0x000f);
 	palette_mask = 0x00ff;
-
-	return 0;
 }
 
 
 VIDEO_START( midyunit_6bit )
 {
-	int result = video_start_common(machine);
 	int i;
 
-	/* handle failure */
-	if (result)
-		return result;
+	video_start_common(machine);
 
 	/* init for 6-bit */
 	for (i = 0; i < 65536; i++)
 		pen_map[i] = ((i & 0xc000) >> 8) | (i & 0x0f3f);
 	palette_mask = 0x0fff;
-
-	return 0;
 }
 
 
 VIDEO_START( mkyawdim )
 {
-	int result = video_start_midyunit_6bit(machine);
+	video_start_midyunit_6bit(machine);
 	yawdim_dma = 1;
-	return result;
 }
 
 
 VIDEO_START( midzunit )
 {
-	int result = video_start_common(machine);
 	int i;
 
-	/* handle failure */
-	if (result)
-		return result;
+	video_start_common(machine);
 
 	/* init for 8-bit */
 	for (i = 0; i < 65536; i++)
 		pen_map[i] = i & 0x1fff;
 	palette_mask = 0x1fff;
-
-	return 0;
 }
 
 
@@ -284,7 +266,7 @@ WRITE16_HANDLER( midyunit_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color(Machine, offset & palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
+	palette_set_color_rgb(Machine, offset & palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
 

@@ -49,8 +49,6 @@ VIDEO_START( circus )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void draw_line(mame_bitmap *bitmap, int x1, int y1, int x2, int y2, int dotted)
@@ -208,7 +206,7 @@ static void ripcord_draw_skydiver( mame_bitmap *bitmap )
 	pen_t *pal_ptr;
 	UINT8  *src_lineptr, *src_pixptr;
 	UINT16 *dst_lineptr, *dst_lineend;
-	unsigned int code, color;
+	UINT32 code, color;
 	int sx, sy;
 	int src_pitch, dst_width, dst_height, dst_pitch, dst_pixoffs, dst_pixend;
 	int collision, eax, edx;

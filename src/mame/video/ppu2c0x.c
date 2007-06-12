@@ -68,6 +68,7 @@ typedef struct {
 	mame_bitmap				*bitmap;				/* target bitmap */
 	UINT8					*videoram;				/* video ram */
 	UINT8					*spriteram;				/* sprite ram */
+	pen_t					*colortable;			/* color table modified at run time */
 	pen_t					*colortable_mono;		/* monochromatic color table modified at run time */
 	UINT8					*dirtychar;				/* an array flagging dirty characters */
 	int						chars_are_dirty;		/* master flag to check if theres any dirty character */
@@ -98,6 +99,7 @@ typedef struct {
 	int						scan_scale;				/* scan scale */
 	int						scanlines_per_frame;	/* number of scanlines per frame */
 	int						mirror_state;
+	rgb_t					palette[64*4];			/* palette for this chip */
 } ppu2c0x_chip;
 
 /* our local copy of the interface */
@@ -225,7 +227,7 @@ void ppu2c0x_init_palette( int first_entry )
 					B = 255;
 
 				/* Round, and set the value */
-				palette_set_color(Machine, first_entry++, floor(R+.5), floor(G+.5), floor(B+.5));
+				palette_set_color_rgb(Machine, first_entry++, floor(R+.5), floor(G+.5), floor(B+.5));
 			}
 		}
 	}
@@ -301,6 +303,7 @@ void ppu2c0x_init( const ppu2c0x_interface *interface )
 		chips[i].videoram = auto_malloc( VIDEORAM_SIZE );
 		chips[i].spriteram = auto_malloc( SPRITERAM_SIZE );
 		chips[i].dirtychar = auto_malloc( CHARGEN_NUM_CHARS );
+		chips[i].colortable = auto_malloc( sizeof( default_colortable ) );
 		chips[i].colortable_mono = auto_malloc( sizeof( default_colortable_mono ) );
 
 		/* clear videoram & spriteram */
@@ -335,10 +338,6 @@ void ppu2c0x_init( const ppu2c0x_interface *interface )
 			UINT8 *src = chips[i].has_videorom ? memory_region( intf->vrom_region[i] ) : chips[i].videoram;
 			Machine->gfx[intf->gfx_layout_number[i]] = allocgfx( &ppu_charlayout );
 			decodegfx( Machine->gfx[intf->gfx_layout_number[i]], src, 0, Machine->gfx[intf->gfx_layout_number[i]]->total_elements );
-
-			if ( Machine->remapped_colortable )
-				Machine->gfx[intf->gfx_layout_number[i]]->colortable = &Machine->remapped_colortable[intf->color_base[i]];
-
 			Machine->gfx[intf->gfx_layout_number[i]]->total_colors = 8;
 		}
 
@@ -411,7 +410,7 @@ static void draw_background( const int num, UINT8 *line_priority )
 	else
 	{
 		color_mask = 0xff;
-		color_table = Machine->gfx[gfx_bank]->colortable;
+		color_table = chips[num].colortable;
 	}
 
 	/* cache the background pen */
@@ -524,7 +523,7 @@ static void draw_sprites( const int num, UINT8 *line_priority )
 	const int char_modulo = Machine->gfx[gfx_bank]->char_modulo;
 	const int line_modulo = Machine->gfx[gfx_bank]->line_modulo;
 	const UINT8 *sprite_ram = chips[num].spriteram;
-	pen_t *color_table = Machine->gfx[gfx_bank]->colortable;
+	pen_t *color_table = chips[num].colortable;
 	UINT8 *gfx_data = Machine->gfx[gfx_bank]->gfxdata;
 	int *ppu_regs = &chips[num].regs[0];
 
@@ -978,13 +977,13 @@ void ppu2c0x_reset( int num, int scan_scale )
 	{
 		int color_base = intf->color_base[num];
 
-		for( i = 0; i < ( sizeof( default_colortable_mono ) / sizeof( default_colortable_mono[0] ) ); i++ )
+		for( i = 0; i < ARRAY_LENGTH( default_colortable_mono ); i++ )
 		{
 			/* monochromatic table */
 			chips[num].colortable_mono[i] = Machine->pens[default_colortable_mono[i] + color_base];
 
 			/* color table */
-			Machine->gfx[intf->gfx_layout_number[num]]->colortable[i] = Machine->pens[default_colortable[i] + color_base];
+			chips[num].colortable[i] = Machine->pens[default_colortable[i] + color_base];
 		}
 	}
 
@@ -1127,7 +1126,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 				{
 					UINT8 oldColor = this_ppu->videoram[i+0x3f00];
 
-					Machine->gfx[intf->gfx_layout_number[num]]->colortable[i] = Machine->pens[color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS)*2];
+					this_ppu->colortable[i] = Machine->pens[color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS)*2];
 				}
 			}
 
@@ -1243,7 +1242,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 					if ( tempAddr & 0x03 )
 					{
-						Machine->gfx[intf->gfx_layout_number[num]]->colortable[ tempAddr & 0x1f ] = Machine->pens[color_base + data + colorEmphasis];
+						this_ppu->colortable[ tempAddr & 0x1f ] = Machine->pens[color_base + data + colorEmphasis];
 						this_ppu->colortable_mono[tempAddr & 0x1f] = Machine->pens[color_base + (data & 0xf0) + colorEmphasis];
 					}
 
@@ -1256,7 +1255,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 						this_ppu->back_color = data;
 						for( i = 0; i < 32; i += 4 )
 						{
-							Machine->gfx[intf->gfx_layout_number[num]]->colortable[ i ] = Machine->pens[color_base + data + colorEmphasis];
+							this_ppu->colortable[ i ] = Machine->pens[color_base + data + colorEmphasis];
 							this_ppu->colortable_mono[i] = Machine->pens[color_base + (data & 0xf0) + colorEmphasis];
 						}
 					}

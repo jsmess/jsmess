@@ -161,7 +161,7 @@ VIDEO_UPDATE( angelkds );
 static WRITE8_HANDLER ( angelkds_cpu_bank_write )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(REGION_USER1);
 
 	bankaddress = data & 0x0f;
 	memory_set_bankptr(1,&RAM[bankaddress*0x4000]);

@@ -63,13 +63,13 @@ static WRITE32_HANDLER( limenko_paletteram_w )
 	if(ACCESSING_LSW32)
 	{
 		paldata = paletteram32[offset] & 0x7fff;
-		palette_set_color(Machine, offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		palette_set_color_rgb(Machine, offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 
 	if(ACCESSING_MSW32)
 	{
 		paldata = (paletteram32[offset] >> 16) & 0x7fff;
-		palette_set_color(Machine, offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		palette_set_color_rgb(Machine, offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 }
 
@@ -193,10 +193,10 @@ static void limenko_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	int i;
 	int sprites_on_screen = (limenko_videoreg[0] & 0x1ff0000) >> 16;
 
-	unsigned char *base_gfx	= memory_region(REGION_GFX1);
-	unsigned char *gfx_max	= base_gfx + memory_region_length(REGION_GFX1);
+	UINT8 *base_gfx	= memory_region(REGION_GFX1);
+	UINT8 *gfx_max	= base_gfx + memory_region_length(REGION_GFX1);
 
-	unsigned char *gfxdata;
+	UINT8 *gfxdata;
 	gfx_element gfx;
 
 	for(i = 0; i <= sprites_on_screen*2; i += 2)
@@ -279,8 +279,6 @@ VIDEO_START( limenko )
 
 	tilemap_set_transparent_pen(md_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_UPDATE( limenko )

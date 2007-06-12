@@ -32,7 +32,7 @@ TODO:
 #include "sound/2203intf.h"
 
 
-extern unsigned char *lkage_scroll, *lkage_vreg;
+extern UINT8 *lkage_scroll, *lkage_vreg;
 WRITE8_HANDLER( lkage_videoram_w );
 VIDEO_START( lkage );
 VIDEO_UPDATE( lkage );
@@ -507,7 +507,7 @@ ROM_START( lkageb3 )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) )	/* unknown */
 ROM_END
 
-static unsigned char mcu_val;
+static UINT8 mcu_val;
 
 /*Note: This probably uses another MCU dump,which is undumped.*/
 

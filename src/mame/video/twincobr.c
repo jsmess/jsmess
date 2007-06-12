@@ -101,7 +101,7 @@ static TILE_GET_INFO( get_tx_tile_info )
     Start the video hardware emulation.
 ***************************************************************************/
 
-static int twincobr_create_tilemaps(void)
+static void twincobr_create_tilemaps(void)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,64);
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,64);
@@ -109,8 +109,6 @@ static int twincobr_create_tilemaps(void)
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_START( toaplan0 )
@@ -120,7 +118,7 @@ VIDEO_START( toaplan0 )
 	twincobr_bgvideoram_size = 0x2000;	/* banked two times 0x1000 */
 	twincobr_fgvideoram_size = 0x1000;
 
-	if (twincobr_create_tilemaps()) return 1;
+	twincobr_create_tilemaps();
 
 	twincobr_txvideoram16 = auto_malloc(twincobr_txvideoram_size*2);
 	memset(twincobr_txvideoram16,0,twincobr_txvideoram_size*2);
@@ -154,8 +152,6 @@ VIDEO_START( toaplan0 )
 	state_save_register_global(twincobr_flip_screen);
 	state_save_register_global(wardner_sprite_hack);
 	state_save_register_func_postload(twincobr_restore_screen);
-
-	return 0;
 }
 
 static void twincobr_restore_screen(void)

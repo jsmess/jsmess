@@ -45,7 +45,7 @@ static WRITE16_HANDLER( layer2_videoram_w )
 static WRITE16_HANDLER( paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color( Machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	palette_set_color_rgb( Machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 static WRITE16_HANDLER( magic10_misc_w )
@@ -303,8 +303,6 @@ VIDEO_START( magic10 )
 
 	tilemap_set_scrollx(layer2_tilemap,0,layer2_offset[0]);
 	tilemap_set_scrolly(layer2_tilemap,0,layer2_offset[1]);
-
-	return 0;
 }
 
 VIDEO_UPDATE( magic10 )

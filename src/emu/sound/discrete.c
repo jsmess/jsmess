@@ -190,6 +190,7 @@ static discrete_module module_list[] =
 	{ DSS_SQUAREWAVE2 ,"DSS_SQUAREWAVE2" ,sizeof(struct dss_squarewave_context)  ,dss_squarewave2_reset ,dss_squarewave2_step },
 	{ DSS_TRIANGLEWAVE,"DSS_TRIANGLEWAVE",sizeof(struct dss_trianglewave_context),dss_trianglewave_reset,dss_trianglewave_step},
 	/* Component specific modules */
+	{ DSS_INVERTER_OSC ,"DSS_INVERTER_OSC" ,sizeof(struct dss_inverter_osc_context) ,dss_inverter_osc_reset ,dss_inverter_osc_step },
 	{ DSS_OP_AMP_OSC  ,"DSS_OP_AMP_OSC"  ,sizeof(struct dss_op_amp_osc_context)  ,dss_op_amp_osc_reset  ,dss_op_amp_osc_step  },
 	{ DSS_SCHMITT_OSC ,"DSS_SCHMITT_OSC" ,sizeof(struct dss_schmitt_osc_context) ,dss_schmitt_osc_reset ,dss_schmitt_osc_step },
 	/* Not yet implemented */
@@ -241,6 +242,8 @@ static discrete_module module_list[] =
 	{ DST_RCDISC3     ,"DST_RCDISC3"     ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     },
 	{ DST_RCDISC4     ,"DST_RCDISC4"     ,sizeof(struct dst_rcdisc4_context)     ,dst_rcdisc4_reset     ,dst_rcdisc4_step     },
 	{ DST_RCDISC5     ,"DST_RCDISC5"     ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc5_reset     ,dst_rcdisc5_step     },
+	{ DST_RCINTEGRATE ,"DST_RCINTEGRATE" ,sizeof(struct dst_rcdisc_context)      ,dst_rcintegrate_reset ,dst_rcintegrate_step   },
+	{ DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step },
 	{ DST_RCFILTER    ,"DST_RCFILTER"    ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    },
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
 	{ DST_RCFILTERN   ,"DST_RCFILTERN"   ,sizeof(struct dss_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     },

@@ -55,7 +55,7 @@ static READ8_HANDLER( tankbust_soundlatch_r )
 }
 
 //port B of ay8910#0
-static unsigned int timer1=0;
+static UINT32 timer1=0;
 static READ8_HANDLER( tankbust_soundtimer_r )
 {
 	int ret;
@@ -173,7 +173,7 @@ PALETTE_INIT( tankbust )
 		r = 0x55 * bit0 + 0xaa * bit1;
 #endif
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

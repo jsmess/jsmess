@@ -205,14 +205,13 @@ PALETTE_INIT( koikoi ) //wrong
 		g=bit1*255;
 		b=bit2*255;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
 VIDEO_START(koikoi)
 {
 	koikoi_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
-	return 0;
 }
 
 VIDEO_UPDATE(koikoi)

@@ -212,8 +212,6 @@ VIDEO_START( cdp1864 )
 	state_save_register_global(cdp1864.audio);
 	state_save_register_global(cdp1864.bgcolor);
 	state_save_register_global(cdp1864.latch);
-
-	return 0;
 }
 
 VIDEO_UPDATE( cdp1864 )
@@ -253,7 +251,7 @@ static void cdp1864_init_palette(double res_r, double res_g, double res_b, doubl
 
 		luma = (luma * 0xff) / 100;
 
-		palette_set_color( Machine, i, r, g, b );
+		palette_set_color_rgb( Machine, i, r, g, b );
 	}
 }
 

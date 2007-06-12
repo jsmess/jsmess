@@ -72,13 +72,10 @@ static int dietgo_bank_callback(const int bank)
 
 VIDEO_START(dietgo)
 {
-	if (deco16_1_video_init())
-		return 1;
+	deco16_1_video_init();
 
 	deco16_set_tilemap_bank_callback(0, dietgo_bank_callback);
 	deco16_set_tilemap_bank_callback(1, dietgo_bank_callback);
-
-	return 0;
 }
 
 VIDEO_UPDATE(dietgo)

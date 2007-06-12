@@ -10,9 +10,9 @@
 
 
 
-unsigned char *firetrap_bg1videoram;
-unsigned char *firetrap_bg2videoram;
-unsigned char *firetrap_fgvideoram;
+UINT8 *firetrap_bg1videoram;
+UINT8 *firetrap_bg2videoram;
+UINT8 *firetrap_fgvideoram;
 
 static tilemap *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
 
@@ -68,7 +68,7 @@ PALETTE_INIT( firetrap )
 		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -104,7 +104,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0)
 }
 
-INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, unsigned char *bgvideoram, int gfx_region)
+INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
 {
 	int code, color;
 
@@ -142,8 +142,6 @@ VIDEO_START( firetrap )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg1_tilemap,0);
-
-	return 0;
 }
 
 
@@ -174,7 +172,7 @@ WRITE8_HANDLER( firetrap_bg2videoram_w )
 
 WRITE8_HANDLER( firetrap_bg1_scrollx_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 
 	scroll[offset] = data;
 	tilemap_set_scrollx(bg1_tilemap,0,scroll[0] | (scroll[1] << 8));
@@ -182,7 +180,7 @@ WRITE8_HANDLER( firetrap_bg1_scrollx_w )
 
 WRITE8_HANDLER( firetrap_bg1_scrolly_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 
 	scroll[offset] = data;
 	tilemap_set_scrolly(bg1_tilemap,0,-(scroll[0] | (scroll[1] << 8)));
@@ -190,7 +188,7 @@ WRITE8_HANDLER( firetrap_bg1_scrolly_w )
 
 WRITE8_HANDLER( firetrap_bg2_scrollx_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 
 	scroll[offset] = data;
 	tilemap_set_scrollx(bg2_tilemap,0,scroll[0] | (scroll[1] << 8));
@@ -198,7 +196,7 @@ WRITE8_HANDLER( firetrap_bg2_scrollx_w )
 
 WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 
 	scroll[offset] = data;
 	tilemap_set_scrolly(bg2_tilemap,0,-(scroll[0] | (scroll[1] << 8)));

@@ -96,17 +96,17 @@ static void (*rambank_modify_notifiers[12])(int) =
 };
 
 static void (*current_notifier[4])(int);
-static unsigned char *current_base[4];
+static UINT8 *current_base[4];
 
 static int cur_rombank, cur_rombank2, cur_rambank[4];
 static int irq_adr_table[3];
 static int irq_enable = 0;
 
-unsigned char *taitol_rambanks;
+UINT8 *taitol_rambanks;
 
-static unsigned char *palette_ram;
-static unsigned char *empty_ram;
-static unsigned char *shared_ram;
+static UINT8 *palette_ram;
+static UINT8 *empty_ram;
+static UINT8 *shared_ram;
 
 static read8_handler porte0_r;
 static read8_handler porte1_r;
@@ -115,9 +115,9 @@ static read8_handler portf1_r;
 
 static void palette_notifier(int addr)
 {
-	unsigned char *p = palette_ram + (addr & ~1);
-	unsigned char byte0 = *p++;
-	unsigned char byte1 = *p;
+	UINT8 *p = palette_ram + (addr & ~1);
+	UINT8 byte0 = *p++;
+	UINT8 byte1 = *p;
 
 	//  addr &= 0x1ff;
 
@@ -128,7 +128,7 @@ logerror("Large palette ? %03x (%04x)\n", addr, activecpu_get_pc());
 	else
 	{
 		//      r = g = b = ((addr & 0x1e) != 0)*255;
-		palette_set_color(Machine, addr/2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
+		palette_set_color_rgb(Machine, addr/2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
 	}
 }
 
@@ -796,7 +796,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 	int banknum = (data - 1) & 3;
 
 	memory_set_bankptr (7, &RAM [0x10000 + (banknum * 0x4000)]);
@@ -2239,7 +2239,7 @@ static WRITE8_HANDLER( portA_w )
 	if (cur_bank != (data & 0x03) )
 	{
 		int bankaddress;
-		unsigned char *RAM = memory_region(REGION_CPU2);
+		UINT8 *RAM = memory_region(REGION_CPU2);
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
@@ -3000,8 +3000,8 @@ ROM_END
 // bits 7..0 => bits 0..7
 static DRIVER_INIT( plottina )
 {
-	unsigned char tab[256];
-	unsigned char *p;
+	UINT8 tab[256];
+	UINT8 *p;
 	int i;
 
 	for(i=0;i<256;i++)
@@ -3022,7 +3022,7 @@ static DRIVER_INIT( plottina )
 
 static DRIVER_INIT( evilston )
 {
-	unsigned char *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(REGION_CPU2);
 	ROM[0x72]=0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }

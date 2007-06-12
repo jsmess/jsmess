@@ -36,9 +36,9 @@
 
 
 
-static unsigned char decryptd(unsigned char e)
+static UINT8 decryptd(UINT8 e)
 {
-	unsigned char d;
+	UINT8 d;
 
 	d  = (e & 0x80) >> 3;
 	d |= (e & 0x40) >> 3;
@@ -52,9 +52,9 @@ static unsigned char decryptd(unsigned char e)
 	return d;
 }
 
-static unsigned int decrypta1(unsigned int e)
+static UINT32 decrypta1(UINT32 e)
 {
-	unsigned int d;
+	UINT32 d;
 
 	d  = (e & 0x800)     ;
 	d |= (e & 0x400) >> 7;
@@ -72,9 +72,9 @@ static unsigned int decrypta1(unsigned int e)
 	return d;
 }
 
-static unsigned int decrypta2(unsigned int e)
+static UINT32 decrypta2(UINT32 e)
 {
-	unsigned int d;
+	UINT32 d;
 	d  = (e & 0x800)     ;
 	d |= (e & 0x400) >> 2;
 	d |= (e & 0x200) >> 2;
@@ -97,7 +97,7 @@ static unsigned int decrypta2(unsigned int e)
 static void mspacman_decode(void)
 {
 	int i;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 
 
@@ -179,7 +179,7 @@ static void mspacman_decode(void)
 
 MACHINE_RESET( mspacman )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	mspacman_decode();
 
 	memory_configure_bank(1, 0, 2, &RAM[0x00000], 0x10000);

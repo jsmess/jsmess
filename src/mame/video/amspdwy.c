@@ -80,8 +80,6 @@ VIDEO_START( amspdwy )
 {
 	bg_tilemap	=	tilemap_create(	get_tile_info,	tilemap_scan_cols_back,
 								TILEMAP_OPAQUE,	8,8,	0x20, 0x20 );
-
-	return 0;
 }
 
 

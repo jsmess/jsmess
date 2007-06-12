@@ -65,8 +65,6 @@ VIDEO_START( citycon )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scroll_rows(fg_tilemap,32);
-
-	return 0;
 }
 
 
@@ -149,7 +147,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 INLINE void changecolor_RRRRGGGGBBBBxxxx(int color,int indx)
 {
 	int data = paletteram[2*indx | 1] | (paletteram[2*indx] << 8);
-	palette_set_color(Machine,color,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
+	palette_set_color_rgb(Machine,color,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
 }
 
 VIDEO_UPDATE( citycon )

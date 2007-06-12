@@ -675,7 +675,6 @@ VIDEO_START( bbca )
 	BBC_Video_RAM= memory_region(REGION_CPU1);
 	vidmem_RAM=vidmem;
 	draw_function=*BBC_draw_hi_res;
-	return 0;
 }
 
 VIDEO_START( bbcb )
@@ -688,7 +687,6 @@ VIDEO_START( bbcb )
 	BBC_Video_RAM= memory_region(REGION_CPU1);
 	vidmem_RAM=vidmem;
 	draw_function=*BBC_draw_hi_res;
-	return 0;
 }
 
 VIDEO_START( bbcbp )
@@ -703,7 +701,6 @@ VIDEO_START( bbcbp )
 	BBC_Video_RAM= memory_region(REGION_CPU1);
 	vidmem_RAM=vidmem;
 	draw_function=*BBC_draw_hi_res;
-	return 0;
 }
 
 VIDEO_START( bbcm )
@@ -717,5 +714,4 @@ VIDEO_START( bbcm )
 	BBC_Video_RAM= memory_region(REGION_CPU1);
 	vidmem_RAM=vidmem;
 	draw_function=*BBC_draw_hi_res;
-	return 0;
 }

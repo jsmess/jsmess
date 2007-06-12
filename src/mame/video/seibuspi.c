@@ -205,8 +205,8 @@ WRITE32_HANDLER( palette_dma_start_w )
 			UINT32 color = spimainram[(video_dma_address / 4) + i - 0x200];
 			if (palette_ram[i] != color) {
 				palette_ram[i] = color;
-				palette_set_color( Machine, (i * 2), pal5bit(palette_ram[i] >> 0), pal5bit(palette_ram[i] >> 5), pal5bit(palette_ram[i] >> 10) );
-				palette_set_color( Machine, (i * 2) + 1, pal5bit(palette_ram[i] >> 16), pal5bit(palette_ram[i] >> 21), pal5bit(palette_ram[i] >> 26) );
+				palette_set_color_rgb( Machine, (i * 2), pal5bit(palette_ram[i] >> 0), pal5bit(palette_ram[i] >> 5), pal5bit(palette_ram[i] >> 10) );
+				palette_set_color_rgb( Machine, (i * 2) + 1, pal5bit(palette_ram[i] >> 16), pal5bit(palette_ram[i] >> 21), pal5bit(palette_ram[i] >> 26) );
 			}
 		}
 	}
@@ -230,7 +230,7 @@ WRITE32_HANDLER( video_dma_address_w )
 	COMBINE_DATA( &video_dma_address );
 }
 
-static void draw_blend_gfx(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, unsigned int code, unsigned int color, int flipx, int flipy, int sx, int sy)
+static void draw_blend_gfx(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
 	UINT8 *dp;
 	int i, j;
@@ -496,7 +496,7 @@ VIDEO_START( spi )
 	memset(sprite_ram, 0, 0x1000);
 
 	for (i=0; i < 6144; i++) {
-		palette_set_color(machine, i, 0, 0, 0);
+		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
 	}
 
 	memset(alpha_table, 0, 6144 * sizeof(UINT8));
@@ -534,8 +534,6 @@ VIDEO_START( spi )
 	{
 		bg_fore_layer_position = 0x8000;
 	}
-
-	return 0;
 }
 
 static void set_rowscroll(tilemap *layer, int scroll, INT16* rows)

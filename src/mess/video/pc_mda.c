@@ -90,7 +90,7 @@ PALETTE_INIT( pc_mda )
 {
 	int i;
 	for(i = 0; i < (sizeof(cga_palette) / 3); i++)
-		palette_set_color(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
+		palette_set_color_rgb(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
     memcpy(colortable, mda_colortable, sizeof(mda_colortable));
 }
 
@@ -211,7 +211,7 @@ VIDEO_START( pc_mda )
 	memory_set_bankptr(11, videoram);
 
 	pc_mda_init_video();
-	return pc_video_start(&config, pc_mda_choosevideomode, videoram_size) ? INIT_PASS : INIT_FAIL;
+	pc_video_start(&config, pc_mda_choosevideomode, videoram_size) ? INIT_PASS : INIT_FAIL;
 }
 
 /*

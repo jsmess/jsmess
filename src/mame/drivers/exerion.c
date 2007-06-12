@@ -72,9 +72,9 @@ static WRITE8_HANDLER( exerion_portb_w )
 static READ8_HANDLER( exerion_protection_r )
 {
 	if (activecpu_get_pc() == 0x4143)
-		return memory_region(REGION_CPU1)[0x33c0 + (exerion_ram[0x600d] << 2) + offset];
+		return memory_region(REGION_CPU1)[0x33c0 + (exerion_ram[0xd] << 2) + offset];
 	else
-		return exerion_ram[0x6008 + offset];
+		return exerion_ram[0x8 + offset];
 }
 
 

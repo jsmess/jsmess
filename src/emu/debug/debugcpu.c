@@ -1512,9 +1512,7 @@ int debug_hotspot_track(int cpunum, int numspots, int threshhold)
 	if (numspots > 0)
 	{
 		/* allocate memory for hotspots */
-		info->hotspots = malloc(sizeof(*info->hotspots) * numspots);
-		if (!info->hotspots)
-			fatalerror("Out of memory allocating hotspot info");
+		info->hotspots = malloc_or_die(sizeof(*info->hotspots) * numspots);
 		memset(info->hotspots, 0xff, sizeof(*info->hotspots) * numspots);
 
 		/* fill in the info */

@@ -198,8 +198,6 @@ VIDEO_START( ashnojoe )
 	tilemap_set_transparent_pen(joetilemap3,15);
 	tilemap_set_transparent_pen(joetilemap4,15);
 	tilemap_set_transparent_pen(joetilemap5,15);
-
-	return 0;
 }
 
 VIDEO_UPDATE( ashnojoe )

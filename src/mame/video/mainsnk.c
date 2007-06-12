@@ -57,7 +57,7 @@ static void stuff_palette( running_machine *machine, int source_index, int dest_
 		bit3 = (color_prom[0x800] >> 1) & 0x01;
 		blue = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color( machine, dest_index++, red, green, blue );
+		palette_set_color( machine, dest_index++, MAKE_RGB(red, green, blue) );
 		color_prom++;
 	}
 
@@ -109,7 +109,6 @@ VIDEO_START(mainsnk)
 	me_bg_tilemap = tilemap_create(get_me_bg_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,8,8,32, 32);
 	tilemap_set_scrollx( me_fg_tilemap, 0, -mainsnk_offset );
 	tilemap_set_scrollx( me_bg_tilemap, 0, -mainsnk_offset );
-	return 0;
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )

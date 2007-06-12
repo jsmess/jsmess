@@ -26,7 +26,7 @@ static UINT8 scrolly[2];
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	unsigned char attr = gng_fgvideoram[tile_index + 0x400];
+	UINT8 attr = gng_fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
 			gng_fgvideoram[tile_index] + ((attr & 0xc0) << 2),
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char attr = gng_bgvideoram[tile_index + 0x400];
+	UINT8 attr = gng_bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			1,
 			gng_bgvideoram[tile_index] + ((attr & 0xc0) << 2),
@@ -65,8 +65,6 @@ VIDEO_START( gng )
 	/* register to save state */
 	state_save_register_global_array(scrollx);
 	state_save_register_global_array(scrolly);
-
-	return 0;
 }
 
 
@@ -123,7 +121,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
-		unsigned char attributes = buffered_spriteram[offs+1];
+		UINT8 attributes = buffered_spriteram[offs+1];
 		int sx = buffered_spriteram[offs + 3] - 0x100 * (attributes & 0x01);
 		int sy = buffered_spriteram[offs + 2];
 		int flipx = attributes & 0x04;

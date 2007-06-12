@@ -96,7 +96,6 @@ VIDEO_START(vc4000)
     }
 
 	vc4000_video.bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-    return 0;
 }
 
 READ8_HANDLER(vc4000_video_r)

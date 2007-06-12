@@ -20,10 +20,7 @@ VIDEO_START( gunbustr )
 {
 	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
 
-	if (TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x20,0x07,-1,-1,-1,0,0))
-		return 1;
-
-	return 0;
+	TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x20,0x07,-1,-1,-1,0,0);
 }
 
 /************************************************************

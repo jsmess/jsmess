@@ -427,7 +427,7 @@ static const unsigned short oric_colortable[8] =
 /* Initialise the palette */
 static PALETTE_INIT( oric )
 {
-	palette_set_colors(machine, 0, oric_palette, sizeof(oric_palette) / 3);
+	palette_set_colors_rgb(machine, 0, oric_palette, sizeof(oric_palette) / 3);
 	memcpy(colortable, oric_colortable,sizeof(oric_colortable));
 }
 

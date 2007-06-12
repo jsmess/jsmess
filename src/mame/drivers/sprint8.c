@@ -66,30 +66,30 @@ static void fill_palette(running_machine *machine, int team)
 	{
 		if (team)
 		{
-			palette_set_color(machine, i + 0, 0xff, 0x00, 0x00); /* red     */
-			palette_set_color(machine, i + 1, 0x00, 0x00, 0xff); /* blue    */
-			palette_set_color(machine, i + 2, 0xff, 0x00, 0x00); /* red     */
-			palette_set_color(machine, i + 3, 0x00, 0x00, 0xff); /* blue    */
-			palette_set_color(machine, i + 4, 0xff, 0x00, 0x00); /* red     */
-			palette_set_color(machine, i + 5, 0x00, 0x00, 0xff); /* blue    */
-			palette_set_color(machine, i + 6, 0xff, 0x00, 0x00); /* red     */
-			palette_set_color(machine, i + 7, 0x00, 0x00, 0xff); /* blue    */
+			palette_set_color(machine, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			palette_set_color(machine, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			palette_set_color(machine, i + 2, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			palette_set_color(machine, i + 3, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			palette_set_color(machine, i + 4, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			palette_set_color(machine, i + 5, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			palette_set_color(machine, i + 6, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			palette_set_color(machine, i + 7, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
 		}
 		else
 		{
-			palette_set_color(machine, i + 0, 0xff, 0x00, 0x00); /* red     */
-			palette_set_color(machine, i + 1, 0x00, 0x00, 0xff); /* blue    */
-			palette_set_color(machine, i + 2, 0xff, 0xff, 0x00); /* yellow  */
-			palette_set_color(machine, i + 3, 0x00, 0xff, 0x00); /* green   */
-			palette_set_color(machine, i + 4, 0xff, 0x00, 0xff); /* magenta */
-			palette_set_color(machine, i + 5, 0xe0, 0xc0, 0x70); /* puce    */
-			palette_set_color(machine, i + 6, 0x00, 0xff, 0xff); /* cyan    */
-			palette_set_color(machine, i + 7, 0xff, 0xaa, 0xaa); /* pink    */
+			palette_set_color(machine, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			palette_set_color(machine, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			palette_set_color(machine, i + 2, MAKE_RGB(0xff, 0xff, 0x00)); /* yellow  */
+			palette_set_color(machine, i + 3, MAKE_RGB(0x00, 0xff, 0x00)); /* green   */
+			palette_set_color(machine, i + 4, MAKE_RGB(0xff, 0x00, 0xff)); /* magenta */
+			palette_set_color(machine, i + 5, MAKE_RGB(0xe0, 0xc0, 0x70)); /* puce    */
+			palette_set_color(machine, i + 6, MAKE_RGB(0x00, 0xff, 0xff)); /* cyan    */
+			palette_set_color(machine, i + 7, MAKE_RGB(0xff, 0xaa, 0xaa)); /* pink    */
 		}
 	}
 
-	palette_set_color(machine, 16, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 17, 0xff, 0xff, 0xff);
+	palette_set_color(machine, 16, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 17, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 

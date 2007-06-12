@@ -14,7 +14,7 @@ driver by Nicola Salmoria
 
 extern UINT16 *blockout_videoram;
 extern UINT16 *blockout_frontvideoram;
-extern unsigned char *blockout_frontcolor;
+extern UINT8 *blockout_frontcolor;
 
 WRITE16_HANDLER( blockout_videoram_w );
 WRITE16_HANDLER( blockout_paletteram_w );

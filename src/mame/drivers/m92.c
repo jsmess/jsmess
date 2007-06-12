@@ -202,7 +202,7 @@ static UINT16 sound_status;
 static UINT32 bankaddress;
 
 static int m92_irq_vectorbase;
-static unsigned char *m92_ram,*m92_snd_ram;
+static UINT8 *m92_ram,*m92_snd_ram;
 
 #define M92_IRQ_0 ((m92_irq_vectorbase+0)/4)  /* VBL interrupt*/
 #define M92_IRQ_1 ((m92_irq_vectorbase+4)/4)  /* Sprite buffer complete interrupt */
@@ -226,7 +226,7 @@ VIDEO_START( m92 );
 VIDEO_UPDATE( m92 );
 
 extern int m92_raster_irq_position,m92_raster_enable;
-extern unsigned char *m92_vram_data,*m92_spritecontrol;
+extern UINT8 *m92_vram_data,*m92_spritecontrol;
 
 extern int m92_sprite_buffer_busy,m92_game_kludge;
 
@@ -234,7 +234,7 @@ extern int m92_sprite_buffer_busy,m92_game_kludge;
 
 static void set_m92_bank(void)
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[bankaddress]);
 }
 
@@ -251,14 +251,14 @@ static MACHINE_START( m92 )
 
 static READ8_HANDLER( m92_eeprom_r )
 {
-	unsigned char *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(REGION_USER1);
 //  logerror("%05x: EEPROM RE %04x\n",activecpu_get_pc(),offset);
 	return RAM[offset/2];
 }
 
 static WRITE8_HANDLER( m92_eeprom_w )
 {
-	unsigned char *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(REGION_USER1);
 //  logerror("%05x: EEPROM WR %04x\n",activecpu_get_pc(),offset);
 	RAM[offset/2]=data;
 }
@@ -2139,7 +2139,7 @@ ROM_END
 
 static void m92_startup(int hasbanks)
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	if (hasbanks)
 	{
@@ -2161,7 +2161,7 @@ static void m92_startup(int hasbanks)
 	m92_sprite_buffer_busy=0x80;
 }
 
-static void init_m92(const unsigned char *decryption_table, int hasbanks)
+static void init_m92(const UINT8 *decryption_table, int hasbanks)
 {
 	m92_startup(hasbanks);
 	setvector_callback(VECTOR_INIT);
@@ -2243,7 +2243,7 @@ static DRIVER_INIT( lethalth )
 
 static DRIVER_INIT( nbbatman )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	init_m92(leagueman_decryption_table, 1);
 
@@ -2273,7 +2273,7 @@ static DRIVER_INIT( dsccr94j )
 
 static DRIVER_INIT( gunforc2 )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	init_m92(lethalth_decryption_table, 1);
 	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
 }

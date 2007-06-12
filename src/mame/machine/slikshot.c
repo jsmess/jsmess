@@ -642,7 +642,7 @@ int main(int argc, char *argv[])
 
 	if (argc == 5)
 	{
-		unsigned int sens0, sens1, sens2, sens3;
+		UINT32 sens0, sens1, sens2, sens3;
 
 		sscanf(argv[1], "%x", &sens0);
 		sscanf(argv[2], "%x", &sens1);
@@ -667,7 +667,7 @@ int main(int argc, char *argv[])
 	}
 	else if (argc == 4)
 	{
-		unsigned int xin, vxin, vyin;
+		UINT32 xin, vxin, vyin;
 		UINT16 sens0, sens1, sens2, sens3;
 
 		sscanf(argv[1], "%x", &xin);

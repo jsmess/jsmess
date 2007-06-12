@@ -103,8 +103,6 @@ VIDEO_START( lemmings )
 
 	tilemap_set_transparent_pen(vram_tilemap,0);
 	fillbitmap(bitmap0,0x100,0);
-
-	return 0;
 }
 
 VIDEO_EOF( lemmings )

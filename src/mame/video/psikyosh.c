@@ -393,9 +393,9 @@ static void psikyosh_drawbackground( mame_bitmap *bitmap, const rectangle *clipr
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
 void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int offsx,int offsy,
+		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		const rectangle *clip,int transparency,int transparent_color,
-		int zoomx, int zoomy, int wide, int high, unsigned int z)
+		int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
 	rectangle myclip; /* Clip to screen boundaries */
 	int code_offset = 0;
@@ -1070,7 +1070,6 @@ VIDEO_START( psikyosh )
 		}
 	}
 
-	return 0;
 }
 
 static void psikyosh_prelineblend( mame_bitmap *bitmap, const rectangle *cliprect )

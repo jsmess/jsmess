@@ -51,7 +51,7 @@ PALETTE_INIT( dogfgt )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+16,r,g,b);
+		palette_set_color(machine,i+16,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -86,8 +86,6 @@ VIDEO_START( dogfgt )
 	bitmapram = auto_malloc(BITMAPRAM_SIZE);
 
 	pixbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
-
-	return 0;
 }
 
 

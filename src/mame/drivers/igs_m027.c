@@ -139,7 +139,6 @@ VIDEO_START(igs_majhong)
 	//igs_bg_tilemap= tilemap_create(get_bg_tilemap_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,64,32);
 	//tilemap_set_transparent_pen(igs_bg_tilemap,15);
 	logerror("Video START OK!\n");
-	return 0;
 }
 
 VIDEO_UPDATE(igs_majhong)
@@ -201,7 +200,7 @@ ADDRESS_MAP_END
     Code Decryption
 
 ***************************************************************************/
-static const unsigned char sdwx_tab[] =
+static const UINT8 sdwx_tab[] =
 {
 	0x49,0x47,0x53,0x30,0x30,0x35,0x35,0x52,0x44,0x34,0x30,0x32,0x30,0x36,0x32,0x31,
 	0x8A,0xBB,0x20,0x67,0x97,0xA5,0x20,0x45,0x6B,0xC0,0xE8,0x0C,0x80,0xFB,0x49,0xAA,

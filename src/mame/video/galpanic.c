@@ -14,8 +14,6 @@ VIDEO_START( galpanic )
 	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	galpanic_clear_sprites = 1;
-
-	return 0;
 }
 
 PALETTE_INIT( galpanic )
@@ -26,7 +24,7 @@ PALETTE_INIT( galpanic )
 
 	/* initialize 555 RGB lookup */
 	for (i = 0;i < 32768;i++)
-		palette_set_color(machine,i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+		palette_set_color_rgb(machine,i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
 }
 
 
@@ -48,7 +46,7 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	/* bit 0 seems to be a transparency flag for the front bitmap */
-	palette_set_color(Machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(Machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 

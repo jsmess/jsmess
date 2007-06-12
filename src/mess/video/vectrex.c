@@ -270,14 +270,11 @@ VIDEO_START( vectrex )
 	imager_freq = 1;
 
 	imager_timer = timer_alloc(vectrex_imager_right_eye);
-	if (!imager_timer)
-		return 1;
 	timer_adjust(imager_timer, 1.0/imager_freq, 2, 1.0/imager_freq);
-
 
 	lp_t = mame_timer_alloc(lightpen_trigger);
 
-	return video_start_vector(machine);
+	video_start_vector(machine);
 }
 
 
@@ -470,5 +467,5 @@ VIDEO_START( raaspec )
 	z_factor = 2;
 
 	raaspec_led_w (0, 0xff);
-	return video_start_vector(machine);
+	video_start_vector(machine);
 }

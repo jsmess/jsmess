@@ -18,7 +18,6 @@ static mame_bitmap *helper;
 VIDEO_START( skyraid )
 {
 	helper = auto_bitmap_alloc(128, 240, machine->screen[0].format);
-	return 0;
 }
 
 

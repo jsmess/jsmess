@@ -44,7 +44,6 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 
 static VIDEO_START( ip204415 )
 {
-	return 0;
 }
 
 static VIDEO_UPDATE( ip204415 )

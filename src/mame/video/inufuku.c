@@ -227,8 +227,6 @@ VIDEO_START( inufuku )
 
 	tilemap_set_transparent_pen(inufuku_bg_tilemap, 255);
 	tilemap_set_transparent_pen(inufuku_text_tilemap, 255);
-
-	return 0;
 }
 
 

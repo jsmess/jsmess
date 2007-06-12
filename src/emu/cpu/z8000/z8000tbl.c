@@ -548,8 +548,7 @@ void z8000_init(int index, int clock, const void *config, int (*irqcallback)(int
 	z8000_exec = (Z8000_exec *)malloc(0x10000 * sizeof(Z8000_exec));
 	if( !z8000_exec )
 	{
-		logerror("cannot allocate Z8000 execution table\n");
-		return;
+		fatalerror("cannot allocate Z8000 execution table\n");
 	}
 
 	/* set up the zero, sign, parity lookup table */

@@ -140,8 +140,6 @@ VIDEO_START( ladyfrog )
   paletteram_2 = auto_malloc(0x200);
   tilemap_set_scroll_cols(bg_tilemap,32);
   tilemap_set_scrolldy( bg_tilemap,   15, 15 );
-  return 0;
-
 }
 
 

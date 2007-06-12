@@ -306,14 +306,14 @@ static const gfx_decode triplhnt_gfx_decode_info[] =
 
 static PALETTE_INIT( triplhnt )
 {
-	palette_set_color(machine, 0, 0xAF, 0xAF, 0xAF);  /* sprites */
-	palette_set_color(machine, 1, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 2, 0xFF, 0xFF, 0xFF);
-	palette_set_color(machine, 3, 0x50, 0x50, 0x50);
-	palette_set_color(machine, 4, 0x00, 0x00, 0x00);  /* tiles */
-	palette_set_color(machine, 5, 0x3F, 0x3F, 0x3F);
-	palette_set_color(machine, 6, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 7, 0x3F, 0x3F, 0x3F);
+	palette_set_color(machine, 0, MAKE_RGB(0xAF, 0xAF, 0xAF));  /* sprites */
+	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 2, MAKE_RGB(0xFF, 0xFF, 0xFF));
+	palette_set_color(machine, 3, MAKE_RGB(0x50, 0x50, 0x50));
+	palette_set_color(machine, 4, MAKE_RGB(0x00, 0x00, 0x00));  /* tiles */
+	palette_set_color(machine, 5, MAKE_RGB(0x3F, 0x3F, 0x3F));
+	palette_set_color(machine, 6, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 7, MAKE_RGB(0x3F, 0x3F, 0x3F));
 }
 
 

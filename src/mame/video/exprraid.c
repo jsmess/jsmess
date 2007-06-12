@@ -90,8 +90,6 @@ VIDEO_START( exprraid )
 
 	tilemap_set_scroll_rows(bg_tilemap, 2);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void exprraid_draw_sprites( mame_bitmap *bitmap )

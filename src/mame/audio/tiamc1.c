@@ -109,7 +109,7 @@ void timer8253_tick(struct timer8253struct *t,int chn) {
 
 
 
-void timer8253_wr(struct timer8253struct *t, int reg, unsigned char val)
+void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val)
 {
 	int chn;
 

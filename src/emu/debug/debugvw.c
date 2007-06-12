@@ -1501,12 +1501,12 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 		/* allocate address array */
 		if (dasmdata->address)
 			free(dasmdata->address);
-		dasmdata->address = malloc(sizeof(dasmdata->address[0]) * dasmdata->allocated_rows);
+		dasmdata->address = malloc_or_die(sizeof(dasmdata->address[0]) * dasmdata->allocated_rows);
 
 		/* allocate disassembly buffer */
 		if (dasmdata->dasm)
 			free(dasmdata->dasm);
-		dasmdata->dasm = malloc(sizeof(dasmdata->dasm[0]) * dasmdata->allocated_rows * dasmdata->allocated_cols);
+		dasmdata->dasm = malloc_or_die(sizeof(dasmdata->dasm[0]) * dasmdata->allocated_rows * dasmdata->allocated_cols);
 	}
 
 	/* iterate over lines */

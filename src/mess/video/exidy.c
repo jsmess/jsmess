@@ -16,7 +16,6 @@
 
 VIDEO_START( exidy )
 {
-	return 0;
 }
 
 /* two colours */
@@ -36,7 +35,7 @@ static unsigned char exidy_palette[EXIDY_NUM_COLOURS * 3] =
 /* Initialise the palette */
 PALETTE_INIT( exidy )
 {
-	palette_set_colors(machine, 0, exidy_palette, sizeof(exidy_palette) / 3);
+	palette_set_colors_rgb(machine, 0, exidy_palette, sizeof(exidy_palette) / 3);
 	memcpy(colortable, exidy_colour_table, sizeof (exidy_colour_table));
 }
 

@@ -84,7 +84,7 @@ static WRITE8_HANDLER( sprcros2_sharedram_w )
 
 static WRITE8_HANDLER( sprcros2_m_port7_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	//76543210
 	//x------- unused
@@ -105,7 +105,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 
 static WRITE8_HANDLER( sprcros2_s_port3_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 
 	//76543210
 	//xxxx---- unused

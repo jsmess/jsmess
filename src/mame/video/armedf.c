@@ -120,8 +120,6 @@ VIDEO_START( armedf )
 	{
 		tilemap_set_scrollx(armedf_tx_tilemap,0,-128);
 	}
-
-	return 0;
 }
 
 /***************************************************************************

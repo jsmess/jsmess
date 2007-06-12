@@ -255,7 +255,7 @@ static WRITE16_HANDLER( airsys_paletteram16_w )	/* xxBBBBxRRRRxGGGG */
 	COMBINE_DATA(&paletteram16[offset]);
 
 	a = paletteram16[offset];
-	palette_set_color(Machine,offset,pal4bit(a >> 0),pal4bit(a >> 5),pal4bit(a >> 10));
+	palette_set_color_rgb(Machine,offset,pal4bit(a >> 0),pal4bit(a >> 5),pal4bit(a >> 10));
 }
 
 

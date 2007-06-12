@@ -12,7 +12,7 @@ PALETTE_INIT( flower )
 
 	for (i=0; i<256; i++)
 	{
-		palette_set_color(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
+		palette_set_color_rgb(machine, i, pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200]));
 		colortable[i] = i;
 	}
 }
@@ -149,9 +149,6 @@ VIDEO_START(flower)
 
 	tilemap_set_scrolly(flower_text_tilemap, 0, 16);
 	tilemap_set_scrolly(flower_text_right_tilemap, 0, 16);
-
-	return 0;
-
 }
 
 VIDEO_UPDATE( flower )

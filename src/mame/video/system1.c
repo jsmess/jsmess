@@ -9,13 +9,13 @@
 
 #include "system1.h"
 
-unsigned char *system1_scroll_y;
-unsigned char *system1_scroll_x;
-unsigned char *system1_videoram;
-unsigned char *system1_backgroundram;
-unsigned char *system1_sprites_collisionram;
-unsigned char *system1_background_collisionram;
-unsigned char *system1_scrollx_ram;
+UINT8 *system1_scroll_y;
+UINT8 *system1_scroll_x;
+UINT8 *system1_videoram;
+UINT8 *system1_backgroundram;
+UINT8 *system1_sprites_collisionram;
+UINT8 *system1_background_collisionram;
+UINT8 *system1_scrollx_ram;
 size_t system1_videoram_size;
 size_t system1_backgroundram_size;
 
@@ -29,7 +29,7 @@ static mame_bitmap *tmp_bitmap;
 //static int system1_pixel_mode = 0
 static UINT8 system1_background_memory,system1_video_mode=0;
 
-static const unsigned char *system1_color_prom;
+static const UINT8 *system1_color_prom;
 
 static UINT8 *wbml_paged_videoram;
 static UINT8 wbml_videoram_bank=0,wbml_videoram_bank_latch=0;
@@ -103,7 +103,7 @@ WRITE8_HANDLER( system1_paletteram_w )
 		b = pal2bit(data >> 6);
 	}
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 void system1_postload(void)
@@ -127,8 +127,6 @@ VIDEO_START( system1 )
 	state_save_register_global(system1_video_mode);
 
 	system1_sprite_xoffset = 1;
-
-	return 0;
 }
 
 VIDEO_START( wbml )
@@ -152,8 +150,6 @@ VIDEO_START( wbml )
 	state_save_register_global_pointer(wbml_paged_videoram, 0x4000);
 	state_save_register_global(wbml_videoram_bank);
 	state_save_register_global(wbml_videoram_bank_latch);
-
-	return 0;
 }
 
 WRITE8_HANDLER( system1_videomode_w )
@@ -257,10 +253,10 @@ WRITE8_HANDLER( system1_sprites_collisionram_w )
 static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 {
 	int sy,row,height,src,bank;
-	unsigned char *sprite_base;
+	UINT8 *sprite_base;
 	pen_t *sprite_palette;
 	INT16 skip;	/* bytes to skip before drawing each row (can be negative) */
-	unsigned char *gfx;
+	UINT8 *gfx;
 
 
 	sprite_base	= spriteram + 0x10 * spr_number;
@@ -339,7 +335,7 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 static void draw_sprites(mame_bitmap *bitmap)
 {
 	int spr_number,sprite_bottom_y,sprite_top_y;
-	unsigned char *sprite_base;
+	UINT8 *sprite_base;
 
 
 	memset(sprite_onscreen_map,255,256*256);
@@ -722,7 +718,7 @@ static void wbml_draw_bg(mame_bitmap *bitmap, int trasp)
 
 	for (page=0; page < 4; page++)
 	{
-		const unsigned char *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
+		const UINT8 *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
 		int startx = (page&1)*256+xscroll;
 		int starty = (page>>1)*256+yscroll;
 		int row,col;
@@ -822,7 +818,7 @@ static void ufosensi_draw_bg(mame_bitmap *bitmap, int trasp)
 
 	for (page=0; page < 4; page++)
 	{
-		const unsigned char *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
+		const UINT8 *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
 		int starty = (page>>1)*256+yscroll;
 		int row,col;
 

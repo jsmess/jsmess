@@ -199,7 +199,7 @@ static void *dmadelay_timer;
 
 static struct sprite_entry {
 	int pri;
-	unsigned int adr;
+	UINT32 adr;
 } sprites[0x100];
 
 static void generate_sprites(UINT32 src, UINT32 spr, int count)
@@ -211,7 +211,7 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 	ecount = 0;
 
 	for(i=0; i<count; i++) {
-		unsigned int adr = src + 0x100*i;
+		UINT32 adr = src + 0x100*i;
 		int pri;
 		if(!program_read_word(adr+2))
 			continue;
@@ -226,21 +226,21 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 	//qsort(sprites, ecount, sizeof(struct sprite_entry), pri_comp);
 
 	for(i=0; i<ecount; i++) {
-		unsigned int adr = sprites[i].adr;
+		UINT32 adr = sprites[i].adr;
 		if(adr) {
-			unsigned int set =(program_read_word(adr) << 16)|program_read_word(adr+2);
-			unsigned short glob_x = program_read_word(adr+4);
-			unsigned short glob_y = program_read_word(adr+8);
-			unsigned short flip_x = program_read_word(adr+12) ? 0x1000 : 0x0000;
-			unsigned short flip_y = program_read_word(adr+14) ? 0x2000 : 0x0000;
-			unsigned short glob_f = flip_x | (flip_y ^ 0x2000);
-			unsigned short zoom_x = program_read_word(adr+20);
-			unsigned short zoom_y = program_read_word(adr+22);
-			unsigned short color_val    = 0x0000;
-			unsigned short color_mask   = 0xffff;
-			unsigned short color_set    = 0x0000;
-			unsigned short color_rotate = 0x0000;
-			unsigned short v;
+			UINT32 set =(program_read_word(adr) << 16)|program_read_word(adr+2);
+			UINT16 glob_x = program_read_word(adr+4);
+			UINT16 glob_y = program_read_word(adr+8);
+			UINT16 flip_x = program_read_word(adr+12) ? 0x1000 : 0x0000;
+			UINT16 flip_y = program_read_word(adr+14) ? 0x2000 : 0x0000;
+			UINT16 glob_f = flip_x | (flip_y ^ 0x2000);
+			UINT16 zoom_x = program_read_word(adr+20);
+			UINT16 zoom_y = program_read_word(adr+22);
+			UINT16 color_val    = 0x0000;
+			UINT16 color_mask   = 0xffff;
+			UINT16 color_set    = 0x0000;
+			UINT16 color_rotate = 0x0000;
+			UINT16 v;
 
 			v = program_read_word(adr+24);
 			if(v & 0x8000) {
@@ -273,12 +273,12 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 
 			if(set >= 0x200000 && set < 0xd00000)
 			{
-				unsigned short count2 = program_read_word(set);
+				UINT16 count2 = program_read_word(set);
 				set += 2;
 				while(count2) {
-					unsigned short idx  = program_read_word(set);
-					unsigned short flip = program_read_word(set+2);
-					unsigned short col  = program_read_word(set+4);
+					UINT16 idx  = program_read_word(set);
+					UINT16 flip = program_read_word(set+2);
+					UINT16 col  = program_read_word(set+4);
 					short y = program_read_word(set+6);
 					short x = program_read_word(set+8);
 
@@ -371,13 +371,13 @@ static void daiskiss_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 	generate_sprites(0xc00000, 0xd20000, 0x100);
 }
 
-static unsigned char esc_program[4096];
+static UINT8 esc_program[4096];
 static void (*esc_cb)(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 
 static WRITE32_HANDLER( esc_w )
 {
-	unsigned int opcode;
-	unsigned int params;
+	UINT32 opcode;
+	UINT32 params;
 
 	/* ignore NULL writes to the ESC (these appear to be "keepalives" on the real hardware) */
 	if (!data)

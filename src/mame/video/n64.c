@@ -307,7 +307,6 @@ VIDEO_START(n64)
 	blender2a_g[0] = blender2a_g[1] = &pixel_color.r;
 	blender2a_b[0] = blender2a_b[1] = &pixel_color.r;
 	blender2b_a[0] = blender2b_a[1] = &pixel_color.r;
-	return 0;
 }
 
 VIDEO_UPDATE(n64)

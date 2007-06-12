@@ -416,8 +416,6 @@ static VIDEO_START( nyny )
 {
 	/* configure the CRT controller */
 	crtc6845_config(0, &crtc6845_intf);
-
-	return 0;
 }
 
 

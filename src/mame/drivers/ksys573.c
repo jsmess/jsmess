@@ -1320,7 +1320,7 @@ static void flash_init( void )
 	int i;
 	int chip;
 	int size;
-	unsigned char *data;
+	UINT8 *data;
 	static struct
 	{
 		int *start;
@@ -2000,7 +2000,7 @@ static DRIVER_INIT( gtrfrks )
 
 /* GX894 digital i/o */
 
-static unsigned char ds2401_xid[] =
+static UINT8 ds2401_xid[] =
 {
 	0x3d, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x01
 };

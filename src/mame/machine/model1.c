@@ -1013,7 +1013,7 @@ static void track_lookup(void)
 	int offi, offd, len;
 	float dist;
 	int i;
-	unsigned int behaviour, entry;
+	UINT32 behaviour, entry;
 	float height;
 
 	logerror("TGP track_lookup %f, 0x%x, %f, %f (%x)\n", a, b, c, d, activecpu_get_pc());

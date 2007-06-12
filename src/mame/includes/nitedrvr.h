@@ -34,6 +34,6 @@ extern discrete_sound_block nitedrvr_discrete_interface[];
 
 /*----------- defined in video/nitedrvr.c -----------*/
 
-extern unsigned char *nitedrvr_hvc;
+extern UINT8 *nitedrvr_hvc;
 WRITE8_HANDLER( nitedrvr_hvc_w );
 VIDEO_UPDATE( nitedrvr );

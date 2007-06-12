@@ -150,8 +150,7 @@ static int dassault_bank_callback(const int bank)
 
 VIDEO_START( dassault )
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(0,dassault_bank_callback);
 	deco16_set_tilemap_bank_callback(1,dassault_bank_callback);
@@ -159,8 +158,6 @@ VIDEO_START( dassault )
 	deco16_set_tilemap_bank_callback(3,dassault_bank_callback);
 
 	alpha_set_level(0x80);
-
-	return 0;
 }
 
 /******************************************************************************/

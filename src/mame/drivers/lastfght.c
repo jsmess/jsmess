@@ -73,7 +73,6 @@ INPUT_PORTS_END
 
 static VIDEO_START( lastfght )
 {
-	return 0;
 }
 
 static VIDEO_UPDATE( lastfght )
@@ -150,7 +149,7 @@ static WRITE16_HANDLER(colordac_w)
 	if(ACCESSING_LSB)
 	{
 		colorram[clr_offset]=data;
-		palette_set_color(Machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
+		palette_set_color_rgb(Machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
 		clr_offset=(clr_offset+1)%768;
 	}
 

@@ -37,7 +37,7 @@ struct	{
 } saa5050_state;
 
 
-unsigned char* saa5050_vidram;  /* Video RAM for SAA 5050 */
+UINT8* saa5050_vidram;  /* Video RAM for SAA 5050 */
 
 static mame_bitmap* collision_bitmap;
 
@@ -58,8 +58,6 @@ VIDEO_START( malzak )
 	saa5050_vidram = auto_malloc(0x800);
 	s2636_1_ram = auto_malloc(0x100);
 	s2636_2_ram = auto_malloc(0x100);
-
-	return 0;
 }
 
 VIDEO_UPDATE( malzak )

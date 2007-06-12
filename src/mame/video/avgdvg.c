@@ -1324,7 +1324,7 @@ static VIDEO_START( avgdvg )
 	state_save_register_item("AVG", 0, vg->clipx_max);
 	state_save_register_item("AVG", 0, vg->clipy_max);
 
-	return video_start_vector(machine);
+	video_start_vector(machine);
 }
 
 
@@ -1471,48 +1471,48 @@ VIDEO_START( dvg )
 {
 	vgc = &dvg_default;
 	vg = &vgd;
-	return video_start_avgdvg(machine);
+	video_start_avgdvg(machine);
 }
 
 VIDEO_START( avg )
 {
 	vgc = &avg_default;
 	vg = &vgd;
-	return video_start_avgdvg(machine);
+	video_start_avgdvg(machine);
 }
 
 VIDEO_START( avg_starwars )
 {
 	vgc = &avg_starwars;
 	vg = &vgd;
-	return video_start_avgdvg(machine);
+	video_start_avgdvg(machine);
 }
 
 VIDEO_START( avg_tempest )
 {
 	vgc = &avg_tempest;
 	vg = &vgd;
-	return video_start_avgdvg(machine);
+	video_start_avgdvg(machine);
 }
 
 VIDEO_START( avg_mhavoc )
 {
 	vgc = &avg_mhavoc;
 	vg = &vgd;
-	return video_start_avgdvg(machine);
+	video_start_avgdvg(machine);
 }
 
 VIDEO_START( avg_bzone )
 {
 	vgc = &avg_bzone;
 	vg = &vgd;
-	return video_start_avgdvg(machine);
+	video_start_avgdvg(machine);
 }
 
 VIDEO_START( avg_quantum )
 {
 	vgc = &avg_quantum;
 	vg = &vgd;
-	return video_start_avgdvg(machine);
+	video_start_avgdvg(machine);
 }
 

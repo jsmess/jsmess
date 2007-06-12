@@ -179,8 +179,6 @@ VIDEO_START( spbactn )
 	/* allocate bitmaps */
 	tile_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	tile_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-
-	return 0;
 }
 
 VIDEO_UPDATE( spbactn )

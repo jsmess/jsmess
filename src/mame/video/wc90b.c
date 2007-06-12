@@ -68,8 +68,6 @@ VIDEO_START( wc90b )
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);
-
-	return 0;
 }
 
 

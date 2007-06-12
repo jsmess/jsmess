@@ -37,7 +37,7 @@ PALETTE_INIT( funkybee )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -91,8 +91,6 @@ VIDEO_START( funkybee )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, funkybee_tilemap_scan,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void funkybee_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

@@ -37,7 +37,7 @@ a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
 #include "sound/sn76496.h"
 
 
-extern unsigned char *spcforce_scrollram;
+extern UINT8 *spcforce_scrollram;
 
 WRITE8_HANDLER( spcforce_flip_screen_w );
 VIDEO_UPDATE( spcforce );
@@ -230,7 +230,7 @@ static const gfx_decode gfxdecodeinfo[] =
 
 
 /* 1-bit RGB palette */
-static unsigned short colortable_source[] =
+static UINT16 colortable_source[] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
 	0, 0, 1, 2, 3, 4, 5, 6,	 /* not sure about these, but they are only used */
@@ -245,7 +245,7 @@ static PALETTE_INIT( spcforce )
 {
 	int i;
 	for (i = 0; i < 8; i++)
-		palette_set_color(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	memcpy(colortable,colortable_source,sizeof(colortable_source));
 }
 

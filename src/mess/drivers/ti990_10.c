@@ -129,7 +129,7 @@ static VIDEO_START( ti990_10 )
 		ti990_set_int10
 	};
 
-	return vdt911_init_term(0, & params);
+	vdt911_init_term(0, & params);
 }
 
 static VIDEO_UPDATE( ti990_10 )

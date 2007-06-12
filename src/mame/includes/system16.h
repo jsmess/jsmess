@@ -274,6 +274,6 @@ extern UINT16 *sys16_gr_pal;
 extern UINT16 *sys16_gr_flip;
 extern int sys16_gr_palette;
 extern int sys16_gr_palette_default;
-extern unsigned char sys16_gr_colorflip[2][4];
+extern UINT8 sys16_gr_colorflip[2][4];
 extern UINT16 *sys16_gr_second_road;
 

@@ -240,7 +240,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 	b = pal5bit(b);
 
 	/* update game palette */
-	palette_set_color(Machine, 4096*0 + offset, r, g, b);
+	palette_set_color(Machine, 4096*0 + offset, MAKE_RGB(r, g, b));
 
 	/* update shadow/highligh palettes */
 	for (i = 1; i < 16; i++){
@@ -252,7 +252,7 @@ WRITE16_HANDLER( gaelco2_palette_w )
 		auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
 		auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
 
-		palette_set_color(Machine, 4096*i + offset, auxr, auxg, auxb);
+		palette_set_color(Machine, 4096*i + offset, MAKE_RGB(auxr, auxg, auxb));
 	}
 }
 
@@ -280,8 +280,6 @@ VIDEO_START( gaelco2 )
 	tilemap_set_scroll_cols(pant[1], 1);
 
 	dual_monitor = 0;
-
-	return 0;
 }
 
 VIDEO_START( gaelco2_dual )
@@ -302,8 +300,6 @@ VIDEO_START( gaelco2_dual )
 	tilemap_set_scroll_cols(pant[1], 1);
 
 	dual_monitor = 1;
-
-	return 0;
 }
 
 /***************************************************************************

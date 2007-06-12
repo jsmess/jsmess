@@ -681,8 +681,6 @@ VIDEO_START( f3 )
 			tile_opaque_pf[c]=chk_trans_or_opa;
 		}
 	}
-
-	return 0;
 }
 
 /******************************************************************************/
@@ -811,7 +809,7 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 		b = (paletteram32[offset] >> 0) & 0xff;
 	}
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 /******************************************************************************/
@@ -2637,8 +2635,8 @@ static void f3_scanline_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 	pri++;
 
 INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,
-		unsigned int color,
+		UINT32 code,
+		UINT32 color,
 		int flipx,int flipy,
 		int sx,int sy,
 		const rectangle *clip,
@@ -2800,8 +2798,8 @@ INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 
 INLINE void f3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,
-		unsigned int color,
+		UINT32 code,
+		UINT32 color,
 		int flipx,int flipy,
 		int sx,int sy,
 		const rectangle *clip,
@@ -3237,7 +3235,7 @@ static void f3_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( f3 )
 {
-	unsigned int sy_fix[5],sx_fix[5];
+	UINT32 sy_fix[5],sx_fix[5];
 	int tile;
 
 	f3_skip_this_frame=0;

@@ -31,8 +31,7 @@ VIDEO_START( cgenie )
 {
 	videoram_size = 0x4000;
 
-	if( video_start_generic(machine) != 0 )
-        return 1;
+	video_start_generic(machine);
 
     dlybitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
@@ -41,8 +40,6 @@ VIDEO_START( cgenie )
 
 	colorbuffer = (UINT8*)auto_malloc(64 * 32 * 8);
 	memset(colorbuffer, 0, 64 * 32 * 8);
-
-	return 0;
 }
 
 /***************************************************************************

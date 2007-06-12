@@ -25,7 +25,7 @@ PALETTE_INIT( strnskil )
 		int g = color_prom[machine->drv->total_colors];
 		int b = color_prom[2*machine->drv->total_colors];
 
-		palette_set_color(machine,i,pal4bit(r),pal4bit(g),pal4bit(b));
+		palette_set_color_rgb(machine,i,pal4bit(r),pal4bit(g),pal4bit(b));
 		color_prom++;
 	}
 
@@ -80,8 +80,6 @@ VIDEO_START( strnskil )
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 32);
-
-	return 0;
 }
 
 static void strnskil_draw_sprites( mame_bitmap *bitmap )

@@ -20,8 +20,8 @@ static char *orig_roms;
 // and we want the original data
 static void mystwarr_save_orig_tiles(void)
 {
-	unsigned char *s = memory_region(REGION_GFX1);
-	unsigned char *pFinish = s+memory_region_length(REGION_GFX1)-3;
+	UINT8 *s = memory_region(REGION_GFX1);
+	UINT8 *pFinish = s+memory_region_length(REGION_GFX1)-3;
 
 	orig_roms = malloc_or_die(memory_region_length(REGION_GFX1));
 	memcpy(orig_roms, s, memory_region_length(REGION_GFX1));
@@ -53,7 +53,7 @@ static void mystwarr_save_orig_tiles(void)
 
 static void mystwarr_rest_orig_tiles(void)
 {
-	unsigned char *s = memory_region(REGION_GFX1);
+	UINT8 *s = memory_region(REGION_GFX1);
 
 	// restore the original data so the ROM test can pass
 	memcpy(s, orig_roms, memory_region_length(REGION_GFX1));
@@ -138,8 +138,8 @@ static void martchmp_sprite_callback(int *code, int *color, int *priority)
 static TILE_GET_INFO( get_gai_936_tile_info )
 {
 	int tileno, colour;
-	unsigned char *ROM = memory_region(REGION_GFX4);
-	unsigned char *dat1 = ROM, *dat2 = ROM + 0x20000, *dat3 = ROM + 0x60000;
+	UINT8 *ROM = memory_region(REGION_GFX4);
+	UINT8 *dat1 = ROM, *dat2 = ROM + 0x20000, *dat3 = ROM + 0x60000;
 
 	tileno = dat3[tile_index] | ((dat2[tile_index]&0x3f)<<8);
 
@@ -164,19 +164,13 @@ VIDEO_START(gaiapols)
 
 	mystwarr_save_orig_tiles();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles();
 
-	if (K055673_vh_start(REGION_GFX2, 1, -61, -22, gaiapols_sprite_callback)) // stage2 brick walls
-	{
-		return 1;
-	}
+	K055673_vh_start(REGION_GFX2, 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
 
-	if (konamigx_mixer_init(0)) return 1;
+	konamigx_mixer_init(0);
 
 	K056832_set_LayerOffset(0, -2+2-1, 0-1);
 	K056832_set_LayerOffset(1,  0+2, 0);
@@ -188,15 +182,13 @@ VIDEO_START(gaiapols)
 
 	ult_936_tilemap = tilemap_create(get_gai_936_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 512, 512);
 	tilemap_set_transparent_pen(ult_936_tilemap, 0);
-
-	return 0;
 }
 
 static TILE_GET_INFO( get_ult_936_tile_info )
 {
 	int tileno, colour;
-	unsigned char *ROM = memory_region(REGION_GFX4);
-	unsigned char *dat1 = ROM, *dat2 = ROM + 0x40000;
+	UINT8 *ROM = memory_region(REGION_GFX4);
+	UINT8 *dat1 = ROM, *dat2 = ROM + 0x40000;
 
 	tileno = dat2[tile_index] | ((dat1[tile_index]&0x1f)<<8);
 
@@ -214,19 +206,13 @@ VIDEO_START(dadandrn)
 
 	mystwarr_save_orig_tiles();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles();
 
-	if (K055673_vh_start(REGION_GFX2, 0, -42, -22, gaiapols_sprite_callback))
-	{
-		return 1;
-	}
+	K055673_vh_start(REGION_GFX2, 0, -42, -22, gaiapols_sprite_callback);
 
-	if (konamigx_mixer_init(0)) return 1;
+	konamigx_mixer_init(0);
 
 	konamigx_mixer_primode(1);
 
@@ -240,8 +226,6 @@ VIDEO_START(dadandrn)
 
 	ult_936_tilemap = tilemap_create(get_ult_936_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 512, 512);
 	tilemap_set_transparent_pen(ult_936_tilemap, 0);
-
-	return 0;
 }
 
 VIDEO_START(mystwarr)
@@ -253,19 +237,13 @@ VIDEO_START(mystwarr)
 
 	mystwarr_save_orig_tiles();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles();
 
-	if (K055673_vh_start(REGION_GFX2, 0, -48, -24, mystwarr_sprite_callback))
-	{
-		return 1;
-	}
+	K055673_vh_start(REGION_GFX2, 0, -48, -24, mystwarr_sprite_callback);
 
-	if (konamigx_mixer_init(0)) return 1;
+	konamigx_mixer_init(0);
 
 	K056832_set_LayerOffset(0, -2-3, 0);
 	K056832_set_LayerOffset(1,  0-3, 0);
@@ -273,8 +251,6 @@ VIDEO_START(mystwarr)
 	K056832_set_LayerOffset(3,  3-3, 0);
 
 	cbparam = 0;
-
-	return 0;
 }
 
 VIDEO_START(metamrph)
@@ -289,19 +265,13 @@ VIDEO_START(metamrph)
 
 	mystwarr_save_orig_tiles();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles();
 
-	if (K055673_vh_start(REGION_GFX2, 1, -51, -22, metamrph_sprite_callback))
-	{
-		return 1;
-	}
+	K055673_vh_start(REGION_GFX2, 1, -51, -22, metamrph_sprite_callback);
 
-	if (konamigx_mixer_init(0)) return 1;
+	konamigx_mixer_init(0);
 
 	// other reference, floor at first boss
 	K056832_set_LayerOffset(0, -2+4, 0); // text
@@ -310,8 +280,6 @@ VIDEO_START(metamrph)
 	K056832_set_LayerOffset(3,  3+4, 0); // attract sky background to sea
 
 	K053250_set_LayerOffset(0, -7, 0);
-
-	return 0;
 }
 
 VIDEO_START(viostorm)
@@ -323,26 +291,18 @@ VIDEO_START(viostorm)
 
 	mystwarr_save_orig_tiles();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles();
 
-	if (K055673_vh_start(REGION_GFX2, 1, -62, -23, metamrph_sprite_callback))
-	{
-		return 1;
-	}
+	K055673_vh_start(REGION_GFX2, 1, -62, -23, metamrph_sprite_callback);
 
-	if (konamigx_mixer_init(0)) return 1;
+	konamigx_mixer_init(0);
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
-
-	return 0;
 }
 
 VIDEO_START(martchmp)
@@ -354,19 +314,13 @@ VIDEO_START(martchmp)
 
 	mystwarr_save_orig_tiles();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
 	mystwarr_rest_orig_tiles();
 
-	if (K055673_vh_start(REGION_GFX2, 0, -58, -23, martchmp_sprite_callback))
-	{
-		return 1;
-	}
+	K055673_vh_start(REGION_GFX2, 0, -58, -23, martchmp_sprite_callback);
 
-	if (konamigx_mixer_init(0)) return 1;
+	konamigx_mixer_init(0);
 
 	K056832_set_LayerOffset(0, -2-4, 0);
 	K056832_set_LayerOffset(1,  0-4, 0);
@@ -374,8 +328,6 @@ VIDEO_START(martchmp)
 	K056832_set_LayerOffset(3,  3-4, 0);
 
 	K054338_invert_alpha(0);
-
-	return 0;
 }
 
 

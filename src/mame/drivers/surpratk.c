@@ -21,7 +21,7 @@ VIDEO_UPDATE( surpratk );
 
 
 static int videobank;
-static unsigned char *ram;
+static UINT8 *ram;
 
 static INTERRUPT_GEN( surpratk_interrupt )
 {
@@ -324,7 +324,7 @@ ROM_END
 
 static void surpratk_banking(int lines)
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs = 0;
 
 logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);

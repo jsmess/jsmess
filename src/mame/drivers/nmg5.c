@@ -802,8 +802,6 @@ VIDEO_START( nmg5 )
 	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,64);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)

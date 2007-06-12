@@ -121,12 +121,12 @@ PALETTE_INIT( carpolo )
 		b = ((b_voltage[*color_prom & 0x03       ] - MIN_VOLTAGE) / (MAX_VOLTAGE - MIN_VOLTAGE)) * 255.;
 
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		// score color is same as net color
 		if (i == NET_COLOR)
 		{
-			palette_set_color(machine,SCORE_COLOR,r,g,b);
+			palette_set_color(machine,SCORE_COLOR,MAKE_RGB(r,g,b));
 		}
 
 		color_prom++;
@@ -181,8 +181,6 @@ VIDEO_START( carpolo )
 	sprite_goal_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH,SPRITE_HEIGHT+GOAL_HEIGHT,machine->screen[0].format);
 
 	sprite_border_collision_bitmap = auto_bitmap_alloc(SPRITE_WIDTH,SPRITE_HEIGHT,machine->screen[0].format);
-
-	return 0;
 }
 
 

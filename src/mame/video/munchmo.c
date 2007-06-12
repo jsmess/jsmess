@@ -33,7 +33,7 @@ PALETTE_INIT( mnchmobl )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -70,7 +70,6 @@ VIDEO_START( mnchmobl )
 	dirtybuffer = auto_malloc(0x100);
 	memset( dirtybuffer, 1, 0x100 );
 	tmpbitmap = auto_bitmap_alloc(512,512,machine->screen[0].format);
-	return 0;
 }
 
 READ8_HANDLER( mnchmobl_videoram_r )
@@ -97,7 +96,7 @@ static void draw_status( mame_bitmap *bitmap )
 	for( row=0; row<4; row++ )
 	{
 		int sy,sx = (row&1)*8;
-		const unsigned char *source = mnchmobl_status_vram + (~row&1)*32;
+		const UINT8 *source = mnchmobl_status_vram + (~row&1)*32;
 		if( row<=1 )
 		{
 			source+=2*32;
@@ -122,7 +121,7 @@ static void draw_background( mame_bitmap *bitmap )
     ROM B1.2C contains 256 tilemaps defining 4x4 configurations of
     the tiles in ROM B2.2B
 */
-	unsigned char *tile_data = memory_region(REGION_GFX2);
+	UINT8 *tile_data = memory_region(REGION_GFX2);
 	const gfx_element *gfx = Machine->gfx[1];
 	int offs;
 

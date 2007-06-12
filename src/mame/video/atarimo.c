@@ -114,13 +114,6 @@ struct atarimo_data
     MACROS
 ##########################################################################*/
 
-/* verification macro for void functions */
-#define VERIFY(cond, msg) if (!(cond)) { logerror(msg); return; }
-
-/* verification macro for non-void functions */
-#define VERIFYRETFREE(cond, msg, ret) if (!(cond)) { logerror(msg); return (ret); }
-
-
 /* data extraction */
 #define EXTRACT_DATA(_input, _mask) (((_input)->data[(_mask).word] >> (_mask).shift) & (_mask).mask)
 
@@ -337,13 +330,13 @@ static void force_update(int scanline)
     the attribute lookup table.
 ---------------------------------------------------------------*/
 
-int atarimo_init(int map, const struct atarimo_desc *desc)
+void atarimo_init(int map, const struct atarimo_desc *desc)
 {
 	gfx_element *gfx = Machine->gfx[desc->gfxindex];
 	struct atarimo_data *mo = &atarimo[map];
 	int i;
 
-	VERIFYRETFREE(map >= 0 && map < ATARIMO_MAX, "atarimo_init: map out of range", 0)
+	assert_always(map >= 0 && map < ATARIMO_MAX, "atarimo_init: map out of range");
 
 	/* determine the masks first */
 	convert_mask(&desc->linkmask,      &mo->linkmask);
@@ -459,8 +452,6 @@ int atarimo_init(int map, const struct atarimo_desc *desc)
 	logerror("  spriteram mask=%X, size=%d\n", mo->spriterammask, mo->spriteramsize);
 	logerror("  slipram mask=%X, size=%d\n", mo->sliprammask, mo->slipramsize);
 	logerror("  bitmap size=%dx%d\n", mo->bitmapwidth, mo->bitmapheight);
-
-	return 1;
 }
 
 

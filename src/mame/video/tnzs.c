@@ -39,7 +39,7 @@ PALETTE_INIT( arknoid2 )
 	for (i = 0;i < machine->drv->total_colors;i++)
 	{
 		col = (color_prom[i]<<8)+color_prom[i+512];
-		palette_set_color(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
+		palette_set_color_rgb(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
 
@@ -53,11 +53,11 @@ PALETTE_INIT( arknoid2 )
 
 ***************************************************************************/
 
-void tnzs_vh_draw_background(mame_bitmap *bitmap,unsigned char *m)
+void tnzs_vh_draw_background(mame_bitmap *bitmap,UINT8 *m)
 {
 	int x,y,column,tot,flag;
 	int scrollx, scrolly;
-	unsigned int upperbits;
+	UINT32 upperbits;
 	int ctrl2	=	tnzs_objctrl[1];
 
 
@@ -138,11 +138,11 @@ void tnzs_vh_draw_background(mame_bitmap *bitmap,unsigned char *m)
 }
 
 void tnzs_vh_draw_foreground(mame_bitmap *bitmap,
-							 unsigned char *char_pointer,
-							 unsigned char *x_pointer,
-							 unsigned char *y_pointer,
-							 unsigned char *ctrl_pointer,
-							 unsigned char *color_pointer)
+							 UINT8 *char_pointer,
+							 UINT8 *x_pointer,
+							 UINT8 *y_pointer,
+							 UINT8 *ctrl_pointer,
+							 UINT8 *color_pointer)
 {
 	int i;
 	int ctrl2	=	tnzs_objctrl[1];

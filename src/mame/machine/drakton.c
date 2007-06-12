@@ -11,8 +11,8 @@
 
 static void drakton_decrypt_rom_8(void)
 {
-	unsigned char oldbyte,newbyte;
-	unsigned char *ROM;
+	UINT8 oldbyte,newbyte;
+	UINT8 *ROM;
 	int mem;
 
 	ROM = memory_region(REGION_CPU1);
@@ -34,8 +34,8 @@ static void drakton_decrypt_rom_8(void)
 
 static void drakton_decrypt_rom_9(void)
 {
-	unsigned char oldbyte,newbyte;
-	unsigned char *ROM;
+	UINT8 oldbyte,newbyte;
+	UINT8 *ROM;
 	int mem;
 
 	ROM = memory_region(REGION_CPU1);
@@ -57,8 +57,8 @@ static void drakton_decrypt_rom_9(void)
 
 static void drakton_decrypt_rom_A(void)
 {
-	unsigned char oldbyte,newbyte;
-	unsigned char *ROM;
+	UINT8 oldbyte,newbyte;
+	UINT8 *ROM;
 	int mem;
 
 	ROM = memory_region(REGION_CPU1);
@@ -80,8 +80,8 @@ static void drakton_decrypt_rom_A(void)
 
 static void drakton_decrypt_rom_B(void)
 {
-	unsigned char oldbyte,newbyte;
-	unsigned char *ROM;
+	UINT8 oldbyte,newbyte;
+	UINT8 *ROM;
 	int mem;
 
 	ROM = memory_region(REGION_CPU1);

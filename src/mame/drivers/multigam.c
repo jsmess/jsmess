@@ -242,7 +242,6 @@ static const ppu2c0x_interface ppu_interface =
 static VIDEO_START( multigam )
 {
 	ppu2c0x_init( &ppu_interface );
-	return 0;
 }
 
 static VIDEO_UPDATE( multigam )

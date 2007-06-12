@@ -48,7 +48,6 @@ static UINT8 *				hsyncram;
 VIDEO_START( beathead )
 {
 	hsyncram = auto_malloc(0x800);
-	return 0;
 }
 
 
@@ -137,7 +136,7 @@ WRITE32_HANDLER( beathead_palette_w )
 	int r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 0x01);
 	int g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 0x01);
 	int b = ((newword << 1) & 0x3e) | ((newword >> 15) & 0x01);
-	palette_set_color(Machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(Machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 

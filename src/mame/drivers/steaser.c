@@ -38,7 +38,6 @@ ROMs
 
 VIDEO_START(steaser)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(steaser)

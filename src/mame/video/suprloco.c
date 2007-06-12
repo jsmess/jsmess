@@ -8,7 +8,7 @@
 
 #include "driver.h"
 
-unsigned char *suprloco_videoram;
+UINT8 *suprloco_videoram;
 
 static tilemap *bg_tilemap;
 static int control;
@@ -55,15 +55,15 @@ PALETTE_INIT( suprloco )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		/* hack: generate a second bank of sprite palette with red changed to purple */
 		if (i >= 256)
 		{
 			if ((i & 0x0f) == 0x09)
-				palette_set_color(machine,i+256,r,g,0xff);
+				palette_set_color(machine,i+256,MAKE_RGB(r,g,0xff));
 			else
-				palette_set_color(machine,i+256,r,g,b);
+				palette_set_color(machine,i+256,MAKE_RGB(r,g,b));
 		}
 	}
 }
@@ -78,7 +78,7 @@ PALETTE_INIT( suprloco )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	unsigned char attr = suprloco_videoram[2*tile_index+1];
+	UINT8 attr = suprloco_videoram[2*tile_index+1];
 	SET_TILE_INFO(
 			0,
 			suprloco_videoram[2*tile_index] | ((attr & 0x03) << 8),
@@ -100,8 +100,6 @@ VIDEO_START( suprloco )
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 
 	tilemap_set_scroll_rows(bg_tilemap,32);
-
-	return 0;
 }
 
 
@@ -196,7 +194,7 @@ INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y
 static void render_sprite(mame_bitmap *bitmap,const rectangle *cliprect,int spr_number)
 {
 	int sx,sy,col,row,height,src,adjy,dy;
-	unsigned char *spr_reg;
+	UINT8 *spr_reg;
 	pen_t *spr_palette;
 	short skip;	/* bytes to skip before drawing each row (can be negative) */
 
@@ -267,7 +265,7 @@ static void render_sprite(mame_bitmap *bitmap,const rectangle *cliprect,int spr_
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int spr_number;
-	unsigned char *spr_reg;
+	UINT8 *spr_reg;
 
 
 	for (spr_number = 0;spr_number < (spriteram_size >> 4);spr_number++)

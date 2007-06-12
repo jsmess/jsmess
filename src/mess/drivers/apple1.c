@@ -148,7 +148,7 @@ static unsigned short apple1_colortable[] =
 
 static PALETTE_INIT( apple1 )
 {
-	palette_set_colors(machine, 0, apple1_palette, sizeof(apple1_palette) / 3);
+	palette_set_colors_rgb(machine, 0, apple1_palette, sizeof(apple1_palette) / 3);
 	memcpy(colortable, apple1_colortable, sizeof (apple1_colortable));
 }
 

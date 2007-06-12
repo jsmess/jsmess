@@ -43,13 +43,13 @@ struct pic8259
 	UINT8 interrupt_mask;
 
 	UINT8 input;
-	unsigned int special : 1;
+	UINT32 special : 1;
 
 	/* ICW1 state */
-	unsigned int level_trig_mode : 1;
-	unsigned int vector_size : 1;
-	unsigned int cascade : 1;
-	unsigned int icw4_needed : 1;
+	UINT32 level_trig_mode : 1;
+	UINT32 vector_size : 1;
+	UINT32 cascade : 1;
+	UINT32 icw4_needed : 1;
 
 	/* ICW2 state */
 	UINT8 base;
@@ -58,10 +58,10 @@ struct pic8259
 	UINT8 slave;
 
 	/* ICW4 state */
-	unsigned int nested : 1;
-	unsigned int mode : 2;
-	unsigned int auto_eoi : 1;
-	unsigned int is_x86 : 1;
+	UINT32 nested : 1;
+	UINT32 mode : 2;
+	UINT32 auto_eoi : 1;
+	UINT32 is_x86 : 1;
 };
 
 static struct pic8259 *pic;

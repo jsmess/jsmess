@@ -26,7 +26,7 @@ WRITE16_HANDLER( sshangha_palette_24bit_w )
 	g = (paletteram16[offset+1] >> 8) & 0xff;
 	r = (paletteram16[offset+1] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset/2,r,g,b);
+	palette_set_color(Machine,offset/2,MAKE_RGB(r,g,b));
 }
 
 static void sshangha_tilemap_draw(mame_bitmap *bitmap)
@@ -178,8 +178,6 @@ VIDEO_START( sshangha )
 
 	tilemap_set_transparent_pen(pf1_8x8_tilemap,0);
 	tilemap_set_transparent_pen(pf1_16x16_tilemap,0);
-
-	return 0;
 }
 
 /******************************************************************************/

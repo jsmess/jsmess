@@ -946,7 +946,6 @@ static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = ALPHA8201_init;			break;
 		case CPUINFO_PTR_RESET:							info->reset = ALPHA8201_reset;			break;
 		case CPUINFO_PTR_EXIT:							info->exit = ALPHA8201_exit;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = ALPHA8201_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 #ifdef MAME_DEBUG
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ALPHA8201_dasm;		break;

@@ -235,7 +235,7 @@ static UINT8 vc_pal_240[] =
 
 static struct
 {
-	unsigned char sms2_name[40];
+	UINT8 sms2_name[40];
 	int sms2_valid;
 	int sms2_height;
 	int sms2_tilemap_height;
@@ -495,7 +495,7 @@ void vdp_data_w(UINT8 data, struct sms_vdp* chip)
 					r = (palword & 0x000f)>>0;
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
-					palette_set_color(Machine,(chip->addr_reg&0x3e)/2, r<<4, g<<4, b<<4);
+					palette_set_color_rgb(Machine,(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
 					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=(b<<1)|(g<<6)|(r<<11);
 				}
 			}
@@ -510,7 +510,7 @@ void vdp_data_w(UINT8 data, struct sms_vdp* chip)
 				r = (data & 0x03)>>0;
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
-				palette_set_color(Machine,chip->addr_reg&0x1f, r<<6, g<<6, b<<6);
+				palette_set_color_rgb(Machine,chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
 				chip->cram_mamecolours[chip->addr_reg&0x1f]=(b<<3)|(g<<8)|(r<<13);
 			}
 
@@ -1146,10 +1146,6 @@ VIDEO_START(sms)
 //  vdp->is_pal = 1;
 //  vdp->sms_total_scanlines = 313;
 //  vdp->sms_framerate = 50;
-
-
-
-	return 0;
 }
 
 

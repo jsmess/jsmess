@@ -49,7 +49,7 @@ struct ssg_callbacks
   void YM2608UpdateRequest(void *param);
   #define YM2608UpdateReq(chip) YM2608UpdateRequest(chip);
 #endif
-#if BUILD_YM2610
+#if (BUILD_YM2610||BUILD_YM2610B)
   /* in 2610intf.c */
   void YM2610UpdateRequest(void *param);
   #define YM2610UpdateReq(chip) YM2610UpdateRequest(chip);

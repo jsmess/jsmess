@@ -27,13 +27,12 @@ unsigned short primo_colortable[1][2] =
 
 PALETTE_INIT( primo )
 {
-	palette_set_colors(machine, 0, primo_palette, sizeof(primo_palette) / 3);
+	palette_set_colors_rgb(machine, 0, primo_palette, sizeof(primo_palette) / 3);
 	memcpy(colortable, primo_colortable, sizeof (primo_colortable));
 }
 
 VIDEO_START( primo )
 {
-	return 0;
 }
 
 static void primo_draw_scanline(mame_bitmap *bitmap, int primo_scanline)

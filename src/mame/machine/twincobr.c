@@ -21,7 +21,7 @@ static int twincobr_dsp_on;
 static int twincobr_dsp_BIO;
 static int fsharkbt_8741;
 static int dsp_execute;
-static unsigned int dsp_addr_w, main_ram_seg;
+static UINT32 dsp_addr_w, main_ram_seg;
 
 #if LOG_DSP_CALLS
 const static int toaplan_port_type[2] = { 0x7800c, 0x5c };

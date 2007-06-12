@@ -44,7 +44,7 @@ extern UINT8 hintpending;
 
 /*-- Prototypes --*/
 
-int	segae_vdp_start( UINT8 chip );
+void segae_vdp_start( UINT8 chip );
 void segae_vdp_stop( UINT8 chip );
 
 void segae_vdp_processcmd ( UINT8 chip, UINT16 cmd );
@@ -69,11 +69,10 @@ VIDEO_START( segae )
 	segasyse_palettebase = 0;
 
 	for (temp=0;temp<CHIPS;temp++)
-		if (segae_vdp_start(temp)) return 1;
+		segae_vdp_start(temp);
 
 	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
 	memset(cache_bitmap, 0, (16+256+16) * 192);
-	return 0;
 }
 
 VIDEO_UPDATE( segae )
@@ -90,15 +89,13 @@ VIDEO_UPDATE( segae )
 /* these are used by megatech */
 
 /* starts vdp for bios screen only */
-int start_megatech_video_normal(void)
+void start_megatech_video_normal(void)
 {
 	segasyse_palettebase = 0x40;
 
-	if (segae_vdp_start(0)) return 1;
+	segae_vdp_start(0);
 
 	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
-
-	return 0;
 }
 
 void update_megatech_video_normal(mame_bitmap *bitmap, const rectangle *cliprect )
@@ -138,7 +135,7 @@ void update_megaplay_video_normal(mame_bitmap *bitmap, const rectangle *cliprect
        successful then if one allocation fails we can free up the previous ones
 *******************************************************************************/
 
-int	segae_vdp_start( UINT8 chip )
+void segae_vdp_start( UINT8 chip )
 {
 	UINT8 temp;
 
@@ -171,7 +168,7 @@ int	segae_vdp_start( UINT8 chip )
 	/*- Black the Palette -*/
 
 	for (temp=0;temp<32;temp++)
-		palette_set_color(Machine, temp + 32*chip+segasyse_palettebase, 0, 0, 0);
+		palette_set_color(Machine, temp + 32*chip+segasyse_palettebase, MAKE_RGB(0, 0, 0));
 
 	/* Save State Stuff (based on video/taitoic.c) */
 
@@ -183,9 +180,6 @@ int	segae_vdp_start( UINT8 chip )
 	state_save_register_item("VDP", chip, segae_vdp_accessmode[chip]);
 	state_save_register_item("VDP", chip, segae_vdp_accessaddr[chip]);
 	state_save_register_item("VDP", chip, segae_vdp_vrambank[chip]);
-
-
-	return 0;
 }
 
 /*******************************************************************************
@@ -213,7 +207,7 @@ int	segae_vdp_start( UINT8 chip )
   bits 5,6,7 are cleared after a read
 ***************************************/
 
-unsigned char segae_vdp_ctrl_r ( UINT8 chip )
+UINT8 segae_vdp_ctrl_r ( UINT8 chip )
 {
 	UINT8 temp;
 
@@ -227,7 +221,7 @@ unsigned char segae_vdp_ctrl_r ( UINT8 chip )
 	return temp;
 }
 
-unsigned char segae_vdp_data_r ( UINT8 chip )
+UINT8 segae_vdp_data_r ( UINT8 chip )
 {
 	UINT8 temp;
 
@@ -275,7 +269,7 @@ void segae_vdp_data_w ( UINT8 chip, UINT8 data )
 			g = (segae_vdp_cram[chip][segae_vdp_accessaddr[chip]] & 0x0c) >> 2;
 			b = (segae_vdp_cram[chip][segae_vdp_accessaddr[chip]] & 0x30) >> 4;
 
-			palette_set_color(Machine, segae_vdp_accessaddr[chip] + 32*chip+segasyse_palettebase, pal2bit(r), pal2bit(g), pal2bit(b));
+			palette_set_color_rgb(Machine, segae_vdp_accessaddr[chip] + 32*chip+segasyse_palettebase, pal2bit(r), pal2bit(g), pal2bit(b));
 		}
 
 		segae_vdp_accessaddr[chip] += 1;

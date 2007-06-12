@@ -72,7 +72,7 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 	if (offset < 0x0800)		// c000-c7ff    Banked Palette RAM
 	{
 		int bank = yunsung8_videobank & 2;
-		unsigned char *RAM;
+		UINT8 *RAM;
 		int color;
 
 		if (bank)	RAM = yunsung8_videoram_0;
@@ -82,7 +82,7 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 		color = RAM[offset & ~1] | (RAM[offset | 1] << 8);
 
 		/* BBBBBGGGGGRRRRRx */
-		palette_set_color(Machine, offset/2 + (bank ? 0x400:0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
+		palette_set_color_rgb(Machine, offset/2 + (bank ? 0x400:0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
 	}
 	else
 	{
@@ -172,7 +172,6 @@ VIDEO_START( yunsung8 )
 								TILEMAP_TRANSPARENT, 8,8, DIM_NX_1, DIM_NY_1 );
 
 		tilemap_set_transparent_pen(tilemap_1,0);
-		return 0;
 }
 
 

@@ -9,8 +9,8 @@
 #include "driver.h"
 #include "lwings.h"
 
-unsigned char *lwings_fgvideoram;
-unsigned char *lwings_bg1videoram;
+UINT8 *lwings_fgvideoram;
+UINT8 *lwings_bg1videoram;
 
 static int bAvengersHardware, bg2_image;
 static tilemap *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
@@ -94,8 +94,6 @@ VIDEO_START( lwings )
 	bg1_tilemap = tilemap_create(lwings_get_bg1_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,     16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,3);
-
-	return 0;
 }
 
 VIDEO_START( trojan )
@@ -109,14 +107,12 @@ VIDEO_START( trojan )
 		tilemap_set_transmask(bg1_tilemap,1,0xf07f,0x0f81); /* split type 1 has pens 7-11 opaque in front half */
 
 		bAvengersHardware = 0;
-		return 0;
 }
 
 VIDEO_START( avengers )
 {
-	int result = video_start_trojan(machine);
+	video_start_trojan(machine);
 	bAvengersHardware = 1;
-	return result;
 }
 
 /***************************************************************************
@@ -140,7 +136,7 @@ WRITE8_HANDLER( lwings_bg1videoram_w )
 
 WRITE8_HANDLER( lwings_bg1_scrollx_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 
 	scroll[offset] = data;
 	tilemap_set_scrollx(bg1_tilemap,0,scroll[0] | (scroll[1] << 8));
@@ -148,7 +144,7 @@ WRITE8_HANDLER( lwings_bg1_scrollx_w )
 
 WRITE8_HANDLER( lwings_bg1_scrolly_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 
 	scroll[offset] = data;
 	tilemap_set_scrolly(bg1_tilemap,0,scroll[0] | (scroll[1] << 8));

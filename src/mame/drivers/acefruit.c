@@ -49,8 +49,6 @@ static void acefruit_refresh(int ref)
 VIDEO_START( acefruit )
 {
 	acefruit_refresh_timer = timer_alloc( acefruit_refresh );
-
-	return 0;
 }
 
 INTERRUPT_GEN( acefruit_vblank )
@@ -233,14 +231,14 @@ WRITE8_HANDLER( acefruit_solenoid_w )
 PALETTE_INIT( acefruit )
 {
 	/* sprites */
-	palette_set_color( Machine, 0, 0x00, 0x00, 0x00 );
-	palette_set_color( Machine, 1, 0x00, 0x00, 0xff );
-	palette_set_color( Machine, 2, 0x00, 0xff, 0x00 );
-	palette_set_color( Machine, 3, 0xff, 0x7f, 0x00 );
-	palette_set_color( Machine, 4, 0xff, 0x00, 0x00 );
-	palette_set_color( Machine, 5, 0xff, 0xff, 0x00 );
-	palette_set_color( Machine, 6, 0xff, 0xff, 0xff );
-	palette_set_color( Machine, 7, 0x7f, 0x3f, 0x1f );
+	palette_set_color( Machine, 0, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( Machine, 1, MAKE_RGB(0x00, 0x00, 0xff) );
+	palette_set_color( Machine, 2, MAKE_RGB(0x00, 0xff, 0x00) );
+	palette_set_color( Machine, 3, MAKE_RGB(0xff, 0x7f, 0x00) );
+	palette_set_color( Machine, 4, MAKE_RGB(0xff, 0x00, 0x00) );
+	palette_set_color( Machine, 5, MAKE_RGB(0xff, 0xff, 0x00) );
+	palette_set_color( Machine, 6, MAKE_RGB(0xff, 0xff, 0xff) );
+	palette_set_color( Machine, 7, MAKE_RGB(0x7f, 0x3f, 0x1f) );
 
 	colortable[ 0 ] = 0;
 	colortable[ 1 ] = 1;
@@ -252,10 +250,10 @@ PALETTE_INIT( acefruit )
 	colortable[ 7 ] = 7;
 
 	/* tiles */
-	palette_set_color( Machine, 8, 0xff, 0xff, 0xff );
-	palette_set_color( Machine, 9, 0x00, 0x00, 0xff );
-	palette_set_color( Machine, 10, 0x00, 0xff, 0x00 );
-	palette_set_color( Machine, 11, 0xff, 0x00, 0x00 );
+	palette_set_color( Machine, 8, MAKE_RGB(0xff, 0xff, 0xff) );
+	palette_set_color( Machine, 9, MAKE_RGB(0x00, 0x00, 0xff) );
+	palette_set_color( Machine, 10, MAKE_RGB(0x00, 0xff, 0x00) );
+	palette_set_color( Machine, 11, MAKE_RGB(0xff, 0x00, 0x00) );
 
 	colortable[ 8 ] = 0;
 	colortable[ 9 ] = 8;

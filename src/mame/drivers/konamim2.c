@@ -109,7 +109,6 @@ static UINT32 irq_active;
 
 VIDEO_START( m2 )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( m2 )

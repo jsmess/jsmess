@@ -70,8 +70,6 @@ VIDEO_START( kyugo )
 
 	tilemap_set_scrolldx(fg_tilemap,   0, 224);
 	tilemap_set_scrolldx(bg_tilemap, -32, 32);
-
-	return 0;
 }
 
 

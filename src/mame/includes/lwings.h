@@ -1,7 +1,7 @@
 /*----------- defined in video/lwings.c -----------*/
 
-extern unsigned char *lwings_fgvideoram;
-extern unsigned char *lwings_bg1videoram;
+extern UINT8 *lwings_fgvideoram;
+extern UINT8 *lwings_bg1videoram;
 
 WRITE8_HANDLER( lwings_fgvideoram_w );
 WRITE8_HANDLER( lwings_bg1videoram_w );

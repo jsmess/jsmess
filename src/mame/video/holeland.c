@@ -58,14 +58,11 @@ VIDEO_START( holeland )
 
 	tilemap_set_transmask(bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x01,0xfe); /* split type 1 has pen 0? transparent in front half */
-	return 0;
 }
 
 VIDEO_START( crzrally )
 {
 	bg_tilemap = tilemap_create(crzrally_get_tile_info,tilemap_scan_cols,TILEMAP_SPLIT,8,8,32,32);
-
-	return 0;
 }
 
 WRITE8_HANDLER( holeland_videoram_w )

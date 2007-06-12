@@ -146,8 +146,6 @@ VIDEO_START( suprslam )
 	K053936_set_offset(0, -45, -21);
 
 	tilemap_set_transparent_pen(suprslam_screen_tilemap,15);
-
-	return 0;
 }
 
 VIDEO_UPDATE( suprslam )

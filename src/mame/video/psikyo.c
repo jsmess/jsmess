@@ -241,8 +241,6 @@ VIDEO_START( psikyo )
 
 		tilemap_set_scroll_rows(tilemap_1_size3,0x10*16);	// line scrolling
 		tilemap_set_scroll_cols(tilemap_1_size3,1);
-
-		return 0;
 }
 
 
@@ -300,7 +298,7 @@ static void psikyo_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, 
 
 	UINT16 *spritelist	=	(UINT16 *)(spritebuf2 + 0x1800/4);
 
-	unsigned char *TILES	=	memory_region(REGION_USER1);	// Sprites LUT
+	UINT8 *TILES	=	memory_region(REGION_USER1);	// Sprites LUT
 	int TILES_LEN			=	memory_region_length(REGION_USER1);
 
 	int width	=	Machine->screen[0].width;

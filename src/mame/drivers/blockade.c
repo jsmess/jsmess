@@ -440,19 +440,19 @@ static const gfx_decode blasto_gfxdecodeinfo[] =
 
 static PALETTE_INIT( green )
 {
-	palette_set_color(machine,0,0x00,0x00,0x00); /* BLACK */
-	palette_set_color(machine,1,0x00,0xff,0x00); /* GREEN */     /* overlay (Blockade) */
+	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	palette_set_color(machine,1,MAKE_RGB(0x00,0xff,0x00)); /* GREEN */     /* overlay (Blockade) */
 }
 
 static PALETTE_INIT( yellow )
 {
-	palette_set_color(machine,0,0x00,0x00,0x00); /* BLACK */
-	palette_set_color(machine,1,0xff,0xff,0x20); /* YELLOW */     /* overlay (Hustle) */
+	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0x20)); /* YELLOW */     /* overlay (Hustle) */
 }
 static PALETTE_INIT( bw )
 {
-	palette_set_color(machine,0,0x00,0x00,0x00); /* BLACK */
-	palette_set_color(machine,1,0xff,0xff,0xff); /* WHITE */     /* Comotion/Blasto */
+	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */     /* Comotion/Blasto */
 }
 
 

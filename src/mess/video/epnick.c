@@ -91,7 +91,7 @@ PALETTE_INIT( nick )
 		nick_colour_palette[(i*3)+2] = NICK_GET_BLUE8(i);
 	}
 
-	palette_set_colors(machine, 0, nick_colour_palette, sizeof(nick_colour_palette) / 3);
+	palette_set_colors_rgb(machine, 0, nick_colour_palette, sizeof(nick_colour_palette) / 3);
 	memcpy(colortable, nick_colour_table, sizeof(nick_colour_table));
 	//color_prom=malloc(0*sizeof(char));
 }

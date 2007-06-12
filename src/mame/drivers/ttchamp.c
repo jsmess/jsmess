@@ -47,7 +47,6 @@ static UINT8*peno_vram;
 
 VIDEO_START(ttchamp)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(ttchamp)
@@ -66,7 +65,7 @@ VIDEO_UPDATE(ttchamp)
 //      b = (dat>>10)&0x1f;
 //      g = (dat>>5)&0x1f;
 //      r = (dat>>0)&0x1f;
-//      palette_set_color(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
+//      palette_set_color_rgb(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
 //  }
 
 	count=0;
@@ -100,7 +99,7 @@ static WRITE8_HANDLER( paloff_h_w )
 WRITE8_HANDLER( pcup_prgbank_w )
 {
     int bank;
-    unsigned char *ROM1 = memory_region(REGION_USER1);
+    UINT8 *ROM1 = memory_region(REGION_USER1);
 
     bank = (data>>4) &0x07;
     memory_set_bankptr(2,&ROM1[0x80000*(bank)]);
@@ -124,7 +123,7 @@ static WRITE8_HANDLER( paldat_h_w )
     paloff = (paloff_h <<8)|paloff_l;
     paloff &=0x7fff;
 
-    palette_set_color(Machine,paloff,pal5bit(paldat>>0),pal5bit(paldat>>5),pal5bit(paldat>>10));
+    palette_set_color_rgb(Machine,paloff,pal5bit(paldat>>0),pal5bit(paldat>>5),pal5bit(paldat>>10));
 }
 
 static READ8_HANDLER( peno_rand )
@@ -353,7 +352,7 @@ ROM_END
 
 static DRIVER_INIT (ttchamp)
 {
-	unsigned char *ROM1 = memory_region(REGION_USER1);
+	UINT8 *ROM1 = memory_region(REGION_USER1);
 	memory_set_bankptr(1,&ROM1[0x120000]);
 	memory_set_bankptr(2,&ROM1[0x180000]);
 }

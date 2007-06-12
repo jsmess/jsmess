@@ -49,7 +49,7 @@ PALETTE_INIT( timelimt ) {
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -79,8 +79,6 @@ VIDEO_START( timelimt )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 /***************************************************************************/

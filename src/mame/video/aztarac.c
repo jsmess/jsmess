@@ -91,5 +91,5 @@ VIDEO_START( aztarac )
 	xcenter=((xmax + xmin) / 2) << 16;
 	ycenter=((ymax + ymin) / 2) << 16;
 
-	return video_start_vector(machine);
+	video_start_vector(machine);
 }

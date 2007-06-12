@@ -215,7 +215,7 @@ static unsigned short arcadia_colortable[1][2] = {
 
 static PALETTE_INIT( arcadia )
 {
-	palette_set_colors(machine, 0, arcadia_palette, sizeof (arcadia_palette)/3);
+	palette_set_colors_rgb(machine, 0, arcadia_palette, sizeof (arcadia_palette)/3);
     memcpy(colortable, arcadia_colortable,sizeof(arcadia_colortable));
 }
 

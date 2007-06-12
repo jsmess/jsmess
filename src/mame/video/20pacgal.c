@@ -37,7 +37,7 @@ static void switch_palette(void)
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(Machine,i,r,g,b);
+		palette_set_color(Machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -53,8 +53,6 @@ PALETTE_INIT( 20pacgal )
 VIDEO_START( 20pacgal )
 {
 	chr_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-	return 0;
 }
 
 

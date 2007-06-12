@@ -66,10 +66,7 @@ VIDEO_START( pdp1 )
 	fillbitmap(typewriter_bitmap, Machine->pens[pen_typewriter_bg], &typewriter_bitmap_bounds);
 
 	/* initialize CRT */
-	if (video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height))
-		return 1;
-
-	return 0;
+	video_start_crt(pen_crt_num_levels, crt_window_offset_x, crt_window_offset_y, crt_window_width, crt_window_height);
 }
 
 

@@ -89,14 +89,14 @@ PALETTE_INIT( zodiack )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
 
 	/* white for bullets */
 
-	palette_set_color(machine,machine->drv->total_colors-1,0xff,0xff,0xff);
+	palette_set_color(machine,machine->drv->total_colors-1,MAKE_RGB(0xff,0xff,0xff));
 
 	for (i = 0;i < TOTAL_COLORS(0);i+=2)
 	{
@@ -142,8 +142,6 @@ VIDEO_START( zodiack )
 	tilemap_set_scroll_cols(fg_tilemap, 32);
 
 	flip_screen = 0;
-
-	return 0;
 }
 
 static void zodiack_draw_bullets( mame_bitmap *bitmap )

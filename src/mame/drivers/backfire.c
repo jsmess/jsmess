@@ -73,8 +73,7 @@ VIDEO_START(backfire)
 	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
 	state_save_register_global_pointer(deco16_pf34_control, 0x10/2);
 
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_pf1_colour_bank = 0x00;
 	deco16_pf2_colour_bank = 0x40;
@@ -88,8 +87,6 @@ VIDEO_START(backfire)
 
 	backfire_left =  auto_bitmap_alloc(80*8, 32*8, BITMAP_FORMAT_INDEXED16);
 	backfire_right = auto_bitmap_alloc(80*8, 32*8, BITMAP_FORMAT_INDEXED16);
-
-	return 0;
 }
 
 static void backfire_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
@@ -264,7 +261,7 @@ static WRITE32_HANDLER(backfire_eeprom_w)
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 

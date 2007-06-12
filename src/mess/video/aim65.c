@@ -74,15 +74,15 @@ static const int dl1416a_segments[0x80]={ // witch segments must be turned on fo
 	0x0000, 0x0000, 0x0000, 0x0000
 };
 
-static unsigned char aim65_palette[] =
+static const rgb_t aim65_palette[] =
 {
-  	0x20,0x02,0x05,
-	0xc0, 0, 0,
+  	MAKE_RGB(0x20,0x02,0x05),
+	MAKE_RGB(0xc0, 0, 0),
 };
 
 PALETTE_INIT( aim65 )
 {
-	palette_set_colors(machine, 0, aim65_palette, sizeof(aim65_palette) / 3);
+	palette_set_colors(machine, 0, aim65_palette, ARRAY_LENGTH(aim65_palette));
 }
 
 void aim65_printer_inc(void)
@@ -159,7 +159,7 @@ VIDEO_START( aim65 )
 	}
 #endif
 
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 static const char led[] = {

@@ -26,7 +26,7 @@ int nb1413m3_sndrombank2;
 int nb1413m3_busyctr;
 int nb1413m3_busyflag;
 int nb1413m3_inputport;
-unsigned char *nb1413m3_nvram;
+UINT8 *nb1413m3_nvram;
 size_t nb1413m3_nvram_size;
 
 static int nb1413m3_74ls193_counter;
@@ -351,7 +351,7 @@ WRITE8_HANDLER( nb1413m3_sndrombank2_w )
 
 READ8_HANDLER( nb1413m3_gfxrom_r )
 {
-	unsigned char *GFXROM = memory_region(REGION_GFX1);
+	UINT8 *GFXROM = memory_region(REGION_GFX1);
 
 	return GFXROM[(0x20000 * (nb1413m3_gfxrombank | ((nb1413m3_sndrombank1 & 0x02) << 3))) + ((0x0200 * nb1413m3_gfxradr_h) + (0x0002 * nb1413m3_gfxradr_l)) + (offset & 0x01)];
 }

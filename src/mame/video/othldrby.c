@@ -71,8 +71,6 @@ VIDEO_START( othldrby )
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[1],0);
 	tilemap_set_transparent_pen(bg_tilemap[2],0);
-
-	return 0;
 }
 
 
@@ -83,7 +81,7 @@ VIDEO_START( othldrby )
 
 ***************************************************************************/
 
-static unsigned int vram_addr,vreg_addr;
+static UINT32 vram_addr,vreg_addr;
 
 WRITE16_HANDLER( othldrby_videoram_addr_w )
 {

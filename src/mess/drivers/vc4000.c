@@ -175,7 +175,7 @@ static const unsigned short vc4000_colortable[1][2] =
 
 static PALETTE_INIT( vc4000 )
 {
-	palette_set_colors(machine, 0, vc4000_palette, sizeof(vc4000_palette) / 3);
+	palette_set_colors_rgb(machine, 0, vc4000_palette, sizeof(vc4000_palette) / 3);
 	memcpy(colortable, vc4000_colortable,sizeof(vc4000_colortable));
 }
 

@@ -10,8 +10,8 @@
 
 
 
-unsigned char *finalizr_scroll;
-unsigned char *finalizr_videoram2,*finalizr_colorram2;
+UINT8 *finalizr_scroll;
+UINT8 *finalizr_videoram2,*finalizr_colorram2;
 static int spriterambank,charbank;
 
 
@@ -47,7 +47,7 @@ PALETTE_INIT( finalizr )
 		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -75,8 +75,6 @@ VIDEO_START( finalizr )
 	memset(dirtybuffer,1,videoram_size);
 
 	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
-
-	return 0;
 }
 
 
@@ -145,7 +143,7 @@ VIDEO_UPDATE( finalizr )
 
 	/* Draw the sprites. */
 	{
-		unsigned char *sr;
+		UINT8 *sr;
 
 
 		if (spriterambank != 0)

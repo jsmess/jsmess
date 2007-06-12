@@ -121,7 +121,6 @@ VIDEO_START( yunsun16 )
 
 	tilemap_set_transparent_pen(tilemap_0,0xff);
 	tilemap_set_transparent_pen(tilemap_1,0xff);
-	return 0;
 }
 
 

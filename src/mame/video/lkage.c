@@ -1,8 +1,8 @@
 #include "driver.h"
 
 static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
-static unsigned char bg_tile_bank, fg_tile_bank;
-unsigned char *lkage_scroll, *lkage_vreg;
+static UINT8 bg_tile_bank, fg_tile_bank;
+UINT8 *lkage_scroll, *lkage_vreg;
 
 /*
     lkage_scroll[0x00]: text layer horizontal scroll
@@ -91,15 +91,13 @@ VIDEO_START( lkage )
 	tilemap_set_scrolldx(bg_tilemap,-5,-5+24);
 	tilemap_set_scrolldx(fg_tilemap,-3,-3+24);
 	tilemap_set_scrolldx(tx_tilemap,-1,-1+24);
-
-	return 0;
 } /* VIDEO_START( lkage ) */
 
 static void
 draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const unsigned char *source = spriteram;
-	const unsigned char *finish = source+0x60;
+	const UINT8 *source = spriteram;
+	const UINT8 *finish = source+0x60;
 	while( source<finish )
 	{
 		int attributes = source[2];

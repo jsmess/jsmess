@@ -78,7 +78,7 @@ static int musobana_outcoin_flag;
 
 static void niyanpai_soundbank_w(int data)
 {
-	unsigned char *SNDROM = memory_region(REGION_CPU2);
+	UINT8 *SNDROM = memory_region(REGION_CPU2);
 
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -100,7 +100,7 @@ static void niyanpai_soundclr_w(int offset, int data)
 
 
 /* TMPZ84C011 PIO emulation */
-static unsigned char pio_dir[5], pio_latch[5];
+static UINT8 pio_dir[5], pio_latch[5];
 
 static int tmpz84c011_pio_r(int offset)
 {
@@ -220,8 +220,8 @@ static MACHINE_RESET( niyanpai )
 
 static void initialize_driver(void)
 {
-	unsigned char *MAINROM = memory_region(REGION_CPU1);
-	unsigned char *SNDROM = memory_region(REGION_CPU2);
+	UINT8 *MAINROM = memory_region(REGION_CPU1);
+	UINT8 *SNDROM = memory_region(REGION_CPU2);
 
 	// main program patch (USR0 -> IRQ LEVEL1)
 	MAINROM[(25 * 4) + 0] = MAINROM[(64 * 4) + 0];
@@ -251,7 +251,7 @@ static DRIVER_INIT( mhhonban )	{ initialize_driver(); }
 
 static READ16_HANDLER( niyanpai_dipsw_r )
 {
-	unsigned char dipsw_a, dipsw_b;
+	UINT8 dipsw_a, dipsw_b;
 
 	dipsw_a = (((readinputport(0) & 0x01) << 7) | ((readinputport(0) & 0x02) << 5) |
 			   ((readinputport(0) & 0x04) << 3) | ((readinputport(0) & 0x08) << 1) |

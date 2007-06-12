@@ -56,7 +56,7 @@ static UINT8 *tileram;
 
 static PALETTE_INIT( attckufo )
 {
-	palette_set_colors(machine, 0, attckufo_palette, sizeof(attckufo_palette) / 3);
+	palette_set_colors(machine, 0, attckufo_palette, ARRAY_LENGTH(attckufo_palette));
 }
 
 

@@ -1,7 +1,7 @@
 #include "driver.h"
 
 
-extern unsigned char *taitol_rambanks;
+extern UINT8 *taitol_rambanks;
 
 static tilemap *bg18_tilemap;
 static tilemap *bg19_tilemap;
@@ -12,7 +12,7 @@ static int horshoes_gfxbank = 0;
 static int bankc[4];
 static int flipscreen;
 #define SPRITERAM_SIZE 0x400
-static unsigned char buff_spriteram[SPRITERAM_SIZE];
+static UINT8 buff_spriteram[SPRITERAM_SIZE];
 
 
 /***************************************************************************
@@ -87,13 +87,11 @@ VIDEO_START( taitol )
 	tilemap_set_transparent_pen(ch1a_tilemap,0);
 
 	for (i=0;i<256;i++)
-		palette_set_color(machine, i, 0, 0, 0);
+		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
 
 	tilemap_set_scrolldx(ch1a_tilemap,-8,-8);
 	tilemap_set_scrolldx(bg18_tilemap,28,-11);
 	tilemap_set_scrolldx(bg19_tilemap,38,-21);
-
-	return 0;
 }
 
 
@@ -348,7 +346,7 @@ VIDEO_UPDATE( taitol )
 
 VIDEO_EOF( taitol )
 {
-	unsigned char *spriteram = taitol_rambanks + 0x7000;
+	UINT8 *spriteram = taitol_rambanks + 0x7000;
 
 	memcpy(buff_spriteram,spriteram,SPRITERAM_SIZE);
 }

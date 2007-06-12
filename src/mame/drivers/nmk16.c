@@ -205,7 +205,7 @@ WRITE16_HANDLER ( ssmissin_sound_w )
 
 WRITE8_HANDLER ( ssmissin_soundbank_w )
 {
-	unsigned char *rom = memory_region(REGION_SOUND1);
+	UINT8 *rom = memory_region(REGION_SOUND1);
 	int bank;
 
 	bank = data & 0x3;
@@ -4794,9 +4794,9 @@ ROM_END
 
 
 
-static unsigned char decode_byte(unsigned char src, unsigned char *bitp)
+static UINT8 decode_byte(UINT8 src, UINT8 *bitp)
 {
-	unsigned char ret, i;
+	UINT8 ret, i;
 
 	ret = 0;
 	for (i=0; i<8; i++)
@@ -4805,15 +4805,15 @@ static unsigned char decode_byte(unsigned char src, unsigned char *bitp)
 	return ret;
 }
 
-static unsigned long bjtwin_address_map_bg0(unsigned long addr)
+static UINT32 bjtwin_address_map_bg0(UINT32 addr)
 {
    return ((addr&0x00004)>> 2) | ((addr&0x00800)>> 10) | ((addr&0x40000)>>16);
 }
 
 
-static unsigned short decode_word(unsigned short src, unsigned char *bitp)
+static UINT16 decode_word(UINT16 src, UINT8 *bitp)
 {
-	unsigned short ret, i;
+	UINT16 ret, i;
 
 	ret=0;
 	for (i=0; i<16; i++)
@@ -4823,7 +4823,7 @@ static unsigned short decode_word(unsigned short src, unsigned char *bitp)
 }
 
 
-static unsigned long bjtwin_address_map_sprites(unsigned long addr)
+static UINT32 bjtwin_address_map_sprites(UINT32 addr)
 {
    return ((addr&0x00010)>> 4) | ((addr&0x20000)>>16) | ((addr&0x100000)>>18);
 }
@@ -4832,10 +4832,10 @@ static unsigned long bjtwin_address_map_sprites(unsigned long addr)
 static void decode_gfx(void)
 {
 	/* GFX are scrambled.  We decode them here.  (BIG Thanks to Antiriad for descrambling info) */
-	unsigned char *rom;
+	UINT8 *rom;
 	int A;
 
-	static unsigned char decode_data_bg[8][8] =
+	static UINT8 decode_data_bg[8][8] =
 	{
 		{0x3,0x0,0x7,0x2,0x5,0x1,0x4,0x6},
 		{0x1,0x2,0x6,0x5,0x4,0x0,0x3,0x7},
@@ -4847,7 +4847,7 @@ static void decode_gfx(void)
 		{0x3,0x4,0x7,0x6,0x2,0x0,0x5,0x1},
 	};
 
-	static unsigned char decode_data_sprite[8][16] =
+	static UINT8 decode_data_sprite[8][16] =
 	{
 		{0x9,0x3,0x4,0x5,0x7,0x1,0xb,0x8,0x0,0xd,0x2,0xc,0xe,0x6,0xf,0xa},
 		{0x1,0x3,0xc,0x4,0x0,0xf,0xb,0xa,0x8,0x5,0xe,0x6,0xd,0x2,0x7,0x9},
@@ -4872,7 +4872,7 @@ static void decode_gfx(void)
 	rom = memory_region(REGION_GFX3);
 	for (A = 0;A < memory_region_length(REGION_GFX3);A += 2)
 	{
-		unsigned short tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
+		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
 		rom[A+1] = tmp >> 8;
 		rom[A] = tmp & 0xff;
 	}
@@ -4883,17 +4883,17 @@ static void decode_tdragonb(void)
 	/* Descrambling Info Again Taken from Raine, Huge Thanks to Antiriad and the Raine Team for
        going Open Source, best of luck in future development. */
 
-	unsigned char *rom;
+	UINT8 *rom;
 	int A;
 
 	/* The Main 68k Program of the Bootleg is Bitswapped */
-	static unsigned char decode_data_tdragonb[1][16] =
+	static UINT8 decode_data_tdragonb[1][16] =
 	{
 		{0xe,0xc,0xa,0x8,0x7,0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x6,0x4,0x2,0x0},
 	};
 
 	/* Graphic Roms Could Also Do With Rearranging to make things simpler */
-	static unsigned char decode_data_tdragonbgfx[1][8] =
+	static UINT8 decode_data_tdragonbgfx[1][8] =
 	{
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
@@ -4902,11 +4902,11 @@ static void decode_tdragonb(void)
 	for (A = 0;A < memory_region_length(REGION_CPU1);A += 2)
 	{
 #ifdef LSB_FIRST
-		unsigned short tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_tdragonb[0]);
+		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_tdragonb[0]);
 		rom[A+1] = tmp >> 8;
 		rom[A] = tmp & 0xff;
 #else
-		unsigned short tmp = decode_word( rom[A]*256 + rom[A+1], decode_data_tdragonb[0]);
+		UINT16 tmp = decode_word( rom[A]*256 + rom[A+1], decode_data_tdragonb[0]);
 		rom[A] = tmp >> 8;
 		rom[A+1] = tmp & 0xff;
 #endif
@@ -4928,11 +4928,11 @@ static void decode_tdragonb(void)
 static void decode_ssmissin(void)
 {
 	/* Like Thunder Dragon Bootleg without the Program Rom Swapping */
-	unsigned char *rom;
+	UINT8 *rom;
 	int A;
 
 	/* Graphic Roms Could Also Do With Rearranging to make things simpler */
-	static unsigned char decode_data_tdragonbgfx[1][8] =
+	static UINT8 decode_data_tdragonbgfx[1][8] =
 	{
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};

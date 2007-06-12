@@ -224,8 +224,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "sound/samples.h"
 #include "includes/tnzs.h"
 
-unsigned char *tnzs_objram, *tnzs_sharedram;
-unsigned char *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
+UINT8 *tnzs_objram, *tnzs_sharedram;
+UINT8 *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
 
 
 /* max samples */
@@ -236,7 +236,7 @@ static int samplesize[MAX_SAMPLES];
 
 void kageki_init_samples(void)
 {
-	unsigned char *scan, *src;
+	UINT8 *scan, *src;
 	INT16 *dest;
 	int start, size;
 	int i, n;

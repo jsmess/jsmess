@@ -782,7 +782,7 @@ PALETTE_INIT( x68000 )
 		g = (pal & 0x7c00) >> 7;
 		r = (pal & 0x03e0) >> 2;
 		b = (pal & 0x001f) << 3;
-		palette_set_color(machine,pal+512,r,g,b);
+		palette_set_color_rgb(machine,pal+512,r,g,b);
 	}
 }
 
@@ -892,8 +892,6 @@ VIDEO_START( x68000 )
 	tilemap_set_transparent_pen(x68k_bg1_16,0);
 
 //	timer_adjust(scanline_timer,TIME_NOW,0,TIME_IN_HZ(55.45)/568);
-
-	return 0;
 }
 
 VIDEO_UPDATE( x68000 )

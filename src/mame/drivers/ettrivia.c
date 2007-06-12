@@ -193,8 +193,6 @@ VIDEO_START( ettrivia )
 	fg_tilemap = tilemap_create( get_tile_info_fg,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,32 );
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_UPDATE( ettrivia )

@@ -165,7 +165,7 @@ PALETTE_INIT( tia_NTSC )
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette_set_color(machine,8 * i + j,
+			palette_set_color_rgb(machine,8 * i + j,
 				(UINT8) (255 * R + 0.5),
 				(UINT8) (255 * G + 0.5),
 				(UINT8) (255 * B + 0.5));
@@ -223,7 +223,7 @@ PALETTE_INIT( tia_PAL )
 			if (G > 1) G = 1;
 			if (B > 1) B = 1;
 
-			palette_set_color(machine,8 * i + j,
+			palette_set_color_rgb(machine,8 * i + j,
 				(UINT8) (255 * R + 0.5),
 				(UINT8) (255 * G + 0.5),
 				(UINT8) (255 * B + 0.5));
@@ -239,8 +239,6 @@ VIDEO_START( tia )
 
 	helper[0] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
 	helper[1] = auto_bitmap_alloc(cx, cy, machine->screen[0].format);
-
-	return 0;
 }
 
 
@@ -1021,7 +1019,7 @@ static WRITE8_HANDLER( HMOVE_w )
 		horzBL %= 160;
 
 		/* When HMOVE is triggered on CPU cycle 75, the HBlank period on the
-		   next line is also extended. */
+           next line is also extended. */
 		if (curr_x >= 157)
 		{
 			curr_y += 1;
@@ -1094,7 +1092,7 @@ static WRITE8_HANDLER( NUSIZ0_w )
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-					   it as done/invalid, the data will be reset in the next loop. */
+                       it as done/invalid, the data will be reset in the next loop. */
 					p0gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1167,7 +1165,7 @@ static WRITE8_HANDLER( NUSIZ1_w )
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-					   it as done/invalid, the data will be reset in the next loop. */
+                       it as done/invalid, the data will be reset in the next loop. */
 					p1gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1260,7 +1258,7 @@ static WRITE8_HANDLER( RESP0_w )
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-					   it as done/invalid, the data will be reset in the next loop. */
+                       it as done/invalid, the data will be reset in the next loop. */
 					p0gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1311,13 +1309,13 @@ static WRITE8_HANDLER( RESP1_w )
 						/* This copy has started drawing */
 						p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
 						p1gfx.start_drawing[i] = curr_x;
-					} else {    
+					} else {
 						/* This copy is waiting to start drawing */
 						p1gfx.start_drawing[i] = horzP1;
 					}
 				} else {
 					/* We are passed the copy or the copy still needs to be done. Mark
-					   it as done/invalid, the data will be reset in the next loop. */
+                       it as done/invalid, the data will be reset in the next loop. */
 					p1gfx.start_pixel[i] = 8;
 				}
 			}
@@ -1456,8 +1454,8 @@ READ8_HANDLER( tia_r )
 {
 	 /* lower bits 0 - 5 seem to depend on the last byte on the
          data bus. If the driver supplied a routine to retrieve
-	     that we will call that, otherwise we will use the lower
-	     bit of the offset.
+         that we will call that, otherwise we will use the lower
+         bit of the offset.
     */
 	UINT8 data = offset & 0x3f;
 

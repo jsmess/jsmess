@@ -38,8 +38,6 @@ VIDEO_START( fgoal )
 {
 	fgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
 	bgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
-
-	return 0;
 }
 
 

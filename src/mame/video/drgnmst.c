@@ -144,8 +144,6 @@ VIDEO_START(drgnmst)
 
 	// do the other tilemaps have rowscroll too? probably not ..
 	tilemap_set_scroll_rows(drgnmst_md_tilemap,1024);
-
-	return 0;
 }
 
 VIDEO_UPDATE(drgnmst)

@@ -664,7 +664,7 @@ static unsigned short atari_colortable[] =
 /* Initialise the palette */
 static PALETTE_INIT( atari )
 {
-	palette_set_colors(machine, 0, atari_palette, sizeof(atari_palette) / 3);
+	palette_set_colors_rgb(machine, 0, atari_palette, sizeof(atari_palette) / 3);
 	memcpy(colortable,atari_colortable,sizeof(atari_colortable));
 }
 

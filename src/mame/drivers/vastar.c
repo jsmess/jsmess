@@ -77,7 +77,7 @@ READ8_HANDLER( vastar_bg2videoram_r );
 VIDEO_START( vastar );
 VIDEO_UPDATE( vastar );
 
-static unsigned char *vastar_sharedram;
+static UINT8 *vastar_sharedram;
 
 
 

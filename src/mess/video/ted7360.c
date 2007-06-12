@@ -944,7 +944,6 @@ VIDEO_START( ted7360 )
 	cursorelement->total_colors = 2;
 	ted7360_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, ted7360_video_stop);
-	return 0;
 }
 
 static void ted7360_draw_character (int ybegin, int yend, int ch, int yoff, int xoff,

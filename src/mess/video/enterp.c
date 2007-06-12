@@ -15,7 +15,7 @@
 VIDEO_START( enterprise )
 {
 	Nick_vh_start();
-	return video_start_generic_bitmapped(machine);
+	video_start_generic_bitmapped(machine);
 }
 
 /***************************************************************************

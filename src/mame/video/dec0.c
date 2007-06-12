@@ -130,7 +130,7 @@ static void update_24bitcol(int offset)
 	g = (paletteram16[offset] >> 8) & 0xff;
 	b = (paletteram16_2[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( dec0_paletteram_rg_w )
@@ -227,8 +227,8 @@ static void custom_tilemap_draw(mame_bitmap *bitmap,
 	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
 	int x, y, p;
 	int column_offset=0, src_x=0, src_y=0;
-	unsigned int scrollx=control1[0];
-	unsigned int scrolly=control1[1];
+	UINT32 scrollx=control1[0];
+	UINT32 scrolly=control1[1];
 	int width_mask = src_bitmap->width - 1;
 	int height_mask = src_bitmap->height - 1;
 	int row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
@@ -706,16 +706,12 @@ VIDEO_START( dec0_nodma )
 	pf3_tilemap_2 = tilemap_create(get_pf3_tile_info,tile_shape2_scan,    TILEMAP_TRANSPARENT,16,16, 16, 64);
 
 	dec0_spriteram=spriteram16;
-
-	return 0;
 }
 
 VIDEO_START( dec0 )
 {
 	video_start_dec0_nodma(machine);
 	dec0_spriteram=auto_malloc(0x800);
-
-	return 0;
 }
 
 /******************************************************************************/

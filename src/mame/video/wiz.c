@@ -21,32 +21,29 @@ static rectangle spritevisibleareaflipx =
 	2*8, 30*8-1
 };
 
-unsigned char *wiz_videoram2;
-unsigned char *wiz_colorram2;
-unsigned char *wiz_attributesram;
-unsigned char *wiz_attributesram2;
+UINT8 *wiz_videoram2;
+UINT8 *wiz_colorram2;
+UINT8 *wiz_attributesram;
+UINT8 *wiz_attributesram2;
 
 static INT32 flipx, flipy;
 static INT32 bgpen;
 
-unsigned char *wiz_sprite_bank;
-static unsigned char char_bank[2];
-static unsigned char palbank[2];
+UINT8 *wiz_sprite_bank;
+static UINT8 char_bank[2];
+static UINT8 palbank[2];
 static int palette_bank;
 
 
 VIDEO_START( wiz )
 {
-	if (video_start_generic(machine))
-		return 1;
+	video_start_generic(machine);
 
 	state_save_register_global_array(char_bank);
 	state_save_register_global_array(palbank);
 	state_save_register_global(flipx);
 	state_save_register_global(flipy);
 	state_save_register_global(bgpen);
-
-	return 0;
 }
 
 /***************************************************************************
@@ -88,7 +85,7 @@ PALETTE_INIT( wiz )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -235,7 +232,7 @@ static void draw_foreground(mame_bitmap *bitmap, int colortype)
 	}
 }
 
-static void draw_sprites(mame_bitmap *bitmap, unsigned char* sprite_ram,
+static void draw_sprites(mame_bitmap *bitmap, UINT8* sprite_ram,
                          int bank, const rectangle* visible_area)
 {
 	int offs;

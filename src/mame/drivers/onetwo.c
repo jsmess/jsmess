@@ -60,7 +60,7 @@ static WRITE8_HANDLER( onetwo_fgram_w )
 
 static WRITE8_HANDLER( onetwo_cpubank_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *RAM = memory_region(REGION_CPU1) + 0x10000;
 
 	memory_set_bankptr(1,&RAM[data * 0x4000]);
 }
@@ -84,7 +84,7 @@ static void setColor(int offset)
 		r=paletteram[offset]&0x1f;
 		g=paletteram_2[offset]&0x1f;
 		b=((paletteram[offset]&0x60)>>2)|((paletteram_2[offset]&0xe0)>>5);
-		palette_set_color(Machine,offset,r<<3,g<<3,b<<3);
+		palette_set_color_rgb(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static WRITE8_HANDLER(palette1_w)
@@ -244,8 +244,6 @@ static const gfx_decode gfxdecodeinfo[] =
 VIDEO_START( onetwo )
 {
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,64,32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( onetwo )

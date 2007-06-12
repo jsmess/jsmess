@@ -50,5 +50,4 @@ VIDEO_START(apf)
 	cfg.get_attributes = apf_get_attributes;
 	cfg.get_video_ram = apf_get_video_ram;
 	m6847_init(&cfg);
-	return 0;
 }

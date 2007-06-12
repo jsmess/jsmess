@@ -63,7 +63,7 @@ bottom line of the screen
 /* These are defined in machine/stactics.c */
 extern int stactics_vert_pos;
 extern int stactics_horiz_pos;
-extern unsigned char *stactics_motor_on;
+extern UINT8 *stactics_motor_on;
 
 /* These are needed by machine/stactics.c  */
 int stactics_vblank_count;
@@ -71,25 +71,25 @@ int stactics_shot_standby;
 int stactics_shot_arrive;
 
 /* These are needed by driver/stactics.c   */
-unsigned char *stactics_scroll_ram;
-unsigned char *stactics_videoram_b;
-unsigned char *stactics_chardata_b;
-unsigned char *stactics_videoram_d;
-unsigned char *stactics_chardata_d;
-unsigned char *stactics_videoram_e;
-unsigned char *stactics_chardata_e;
-unsigned char *stactics_videoram_f;
-unsigned char *stactics_chardata_f;
-unsigned char *stactics_display_buffer;
+UINT8 *stactics_scroll_ram;
+UINT8 *stactics_videoram_b;
+UINT8 *stactics_chardata_b;
+UINT8 *stactics_videoram_d;
+UINT8 *stactics_chardata_d;
+UINT8 *stactics_videoram_e;
+UINT8 *stactics_chardata_e;
+UINT8 *stactics_videoram_f;
+UINT8 *stactics_chardata_f;
+UINT8 *stactics_display_buffer;
 
-static unsigned char *dirty_videoram_b;
-static unsigned char *dirty_chardata_b;
-static unsigned char *dirty_videoram_d;
-static unsigned char *dirty_chardata_d;
-static unsigned char *dirty_videoram_e;
-static unsigned char *dirty_chardata_e;
-static unsigned char *dirty_videoram_f;
-static unsigned char *dirty_chardata_f;
+static UINT8 *dirty_videoram_b;
+static UINT8 *dirty_chardata_b;
+static UINT8 *dirty_videoram_d;
+static UINT8 *dirty_chardata_d;
+static UINT8 *dirty_videoram_e;
+static UINT8 *dirty_chardata_e;
+static UINT8 *dirty_videoram_f;
+static UINT8 *dirty_chardata_f;
 
 static int d_offset;
 static int e_offset;
@@ -103,7 +103,7 @@ static mame_bitmap *bitmap_D;
 static mame_bitmap *bitmap_E;
 static mame_bitmap *bitmap_F;
 
-static unsigned char *beamdata;
+static UINT8 *beamdata;
 static int states_per_frame;
 
 #define DIRTY_CHARDATA_SIZE  0x100
@@ -112,7 +112,7 @@ static int states_per_frame;
 /* The first 16 came from the 7448 BCD to 7-segment decoder data sheet */
 /* The rest are made up */
 
-static unsigned char stactics_special_chars[32*8] = {
+static UINT8 stactics_special_chars[32*8] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space */
     0x80, 0x80, 0x80, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* extras... */
     0xf0, 0x80, 0x80, 0xf0, 0x00, 0x00, 0xf0, 0x00,   /* extras... */
@@ -157,7 +157,7 @@ PALETTE_INIT( stactics )
     int i,j;
 
     #define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-    #define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs*sizeof(unsigned short)])
+    #define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs*sizeof(UINT16)])
 
     /* Now make the palette */
 
@@ -179,7 +179,7 @@ PALETTE_INIT( stactics )
         /* blue component */
         b = 0xff * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
     }
 
     /* The color prom in Space Tactics is used for both   */
@@ -228,8 +228,8 @@ PALETTE_INIT( stactics )
 VIDEO_START( stactics )
 {
     int i,j;
-    const unsigned char *firebeam_data;
-    unsigned char firechar[256*8*9];
+    const UINT8 *firebeam_data;
+    UINT8 firechar[256*8*9];
 
     tmpbitmap  = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
     tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
@@ -325,8 +325,6 @@ VIDEO_START( stactics )
     stactics_vert_pos = 0;
     stactics_horiz_pos = 0;
     *stactics_motor_on = 0;
-
-    return 0;
 }
 
 

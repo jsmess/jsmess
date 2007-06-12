@@ -83,7 +83,7 @@ UINT16 *inufuku_text_videoram;
 UINT16 *inufuku_spriteram1;
 UINT16 *inufuku_spriteram2;
 size_t inufuku_spriteram1_size;
-static unsigned short pending_command;
+static UINT16 pending_command;
 
 WRITE16_HANDLER( inufuku_paletteram_w );
 READ16_HANDLER( inufuku_bg_videoram_r );
@@ -120,7 +120,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( inufuku_soundrombank_w )
 {
-	unsigned char *ROM = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *ROM = memory_region(REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(1, ROM + (data & 0x03) * 0x8000);
 }
@@ -152,9 +152,9 @@ static DRIVER_INIT( inufuku )
 
 static READ16_HANDLER( inufuku_eeprom_r )
 {
-	unsigned short soundflag;
-	unsigned short eeprom;
-	unsigned short inputport;
+	UINT16 soundflag;
+	UINT16 eeprom;
+	UINT16 inputport;
 
 	soundflag = pending_command ? 0x0000 : 0x0080;	// bit7
 	eeprom = (EEPROM_read_bit() & 1) << 6;			// bit6

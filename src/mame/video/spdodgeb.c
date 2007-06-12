@@ -2,7 +2,7 @@
 #include "cpu/m6502/m6502.h"
 
 
-unsigned char *spdodgeb_videoram;
+UINT8 *spdodgeb_videoram;
 
 static int tile_palbank;
 static int sprite_palbank;
@@ -41,7 +41,7 @@ PALETTE_INIT( spdodgeb )
 		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -61,8 +61,8 @@ static UINT32 background_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_r
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char code = spdodgeb_videoram[tile_index];
-	unsigned char attr = spdodgeb_videoram[tile_index + 0x800];
+	UINT8 code = spdodgeb_videoram[tile_index];
+	UINT8 attr = spdodgeb_videoram[tile_index + 0x800];
 	SET_TILE_INFO(
 			0,
 			code + ((attr & 0x1f) << 8),
@@ -82,8 +82,6 @@ VIDEO_START( spdodgeb )
 	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,TILEMAP_OPAQUE,8,8,64,32);
 
 	tilemap_set_scroll_rows(bg_tilemap,32);
-
-	return 0;
 }
 
 
@@ -158,7 +156,7 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = Machine->gfx[1];
-	unsigned char *src;
+	UINT8 *src;
 	int i;
 
 	src = spriteram;

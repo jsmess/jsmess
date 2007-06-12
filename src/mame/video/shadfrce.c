@@ -75,8 +75,6 @@ VIDEO_START( shadfrce )
 	shadfrce_bg1tilemap = tilemap_create(get_shadfrce_bg1tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 16, 16,32,32);
 
 	shadfrce_spvideoram_old = auto_malloc(spriteram_size);
-
-	return 0;
 }
 
 WRITE16_HANDLER ( shadfrce_bg0scrollx_w )

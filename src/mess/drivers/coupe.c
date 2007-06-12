@@ -397,7 +397,7 @@ static PALETTE_INIT( coupe )
 		if (a&0x40)
 			green+=4*36;
 
-		palette_set_color(machine, a, red, green, blue);
+		palette_set_color_rgb(machine, a, red, green, blue);
 		coupe_colortable[a]=a;
 	}
 	memcpy(colortable,coupe_colortable,sizeof(coupe_colortable));

@@ -99,9 +99,9 @@ READ8_HANDLER( buggychl_mcu_r );
 READ8_HANDLER( buggychl_mcu_status_r );
 
 /* in video */
-extern unsigned char *buggychl_scrollv,*buggychl_scrollh;
-extern unsigned char buggychl_sprite_lookup[0x2000];
-extern unsigned char *buggychl_character_ram;
+extern UINT8 *buggychl_scrollv,*buggychl_scrollh;
+extern UINT8 buggychl_sprite_lookup[0x2000];
+extern UINT8 *buggychl_character_ram;
 
 PALETTE_INIT( buggychl );
 VIDEO_START( buggychl );

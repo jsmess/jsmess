@@ -65,7 +65,6 @@ VIDEO_START( mcr68 )
 	/* initialize the background tilemap */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16,16, 32,32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
-	return 0;
 }
 
 
@@ -118,8 +117,6 @@ VIDEO_START( zwackery )
 			gfxdata2 += gfx2->line_modulo;
 		}
 	}
-
-	return 0;
 }
 
 
@@ -136,7 +133,7 @@ WRITE16_HANDLER( mcr68_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color(Machine, offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
+	palette_set_color_rgb(Machine, offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
 
@@ -146,7 +143,7 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color(Machine, offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
+	palette_set_color_rgb(Machine, offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 
 

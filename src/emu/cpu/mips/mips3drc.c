@@ -452,7 +452,7 @@ static void mips3_reset(int bigendian, int mips4, UINT32 prid)
     RM7000 = 0x2700
 */
 
-#if (HAS_R4600)
+#if (HAS_R4600||HAS_R4650)
 static void r4600be_reset(void)
 {
 	mips3_reset(1, 0, 0x2000);

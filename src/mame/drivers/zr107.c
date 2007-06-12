@@ -30,8 +30,8 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color(Machine, (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
-	palette_set_color(Machine, (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(Machine, (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
+	palette_set_color_rgb(Machine, (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 #define NUM_LAYERS	2
@@ -48,13 +48,8 @@ VIDEO_START( zr107 )
 	 	{{ 0, 0}, {0, 0}, {0, 0}, {0, 0}}
 	};
 
-	if (K056832_vh_start(REGION_GFX2, K056832_BPP_8, 1, scrolld, game_tile_callback, 0))
-		return 1;
-
-	if (K001005_init() != 0)
-		return 1;
-
-	return 0;
+	K056832_vh_start(REGION_GFX2, K056832_BPP_8, 1, scrolld, game_tile_callback, 0);
+	K001005_init();
 }
 
 VIDEO_UPDATE( zr107 )

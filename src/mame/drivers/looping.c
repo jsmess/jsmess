@@ -149,7 +149,7 @@ PALETTE_INIT( looping )
 		bit1 = (color_prom[i] >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -177,7 +177,6 @@ VIDEO_START( looping )
 	state->bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 32,32);
 
 	tilemap_set_scroll_cols(state->bg_tilemap, 0x20);
-	return 0;
 }
 
 

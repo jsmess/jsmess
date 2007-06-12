@@ -66,8 +66,6 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( couple )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,64,32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( couple )
@@ -190,7 +188,7 @@ static PALETTE_INIT( couple )
 		bit3 = (color_prom[i] >> 2) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		//color_prom++;
 	}
 }

@@ -7,7 +7,7 @@ UINT16 *aerofgt_spriteram1,*aerofgt_spriteram2,*aerofgt_spriteram3;
 UINT16 *wbbc97_bitmapram;
 size_t aerofgt_spriteram1_size,aerofgt_spriteram2_size,aerofgt_spriteram3_size;
 
-static unsigned char gfxbank[8];
+static UINT8 gfxbank[8];
 static UINT16 bg1scrollx,bg1scrolly,bg2scrollx,bg2scrolly,wbbc97_bitmap_enable;
 
 static int charpalettebank,spritepalettebank;
@@ -99,8 +99,6 @@ VIDEO_START( pspikes )
 	/* no bg2 in this game */
 
 	sprite_gfx = 1;
-
-	return 0;
 }
 
 
@@ -114,8 +112,6 @@ VIDEO_START( karatblz )
 	spritepalettebank = 0;
 
 	sprite_gfx = 2;
-
-	return 0;
 }
 
 VIDEO_START( spinlbrk )
@@ -143,8 +139,6 @@ VIDEO_START( spinlbrk )
 	aerofgt_spriteram1_size = 0x4000;
 	for (i = 0;i < aerofgt_spriteram1_size/2;i++)
 		aerofgt_spriteram1[i] = i;
-
-	return 0;
 }
 
 VIDEO_START( turbofrc )
@@ -157,8 +151,6 @@ VIDEO_START( turbofrc )
 	spritepalettebank = 0;
 
 	sprite_gfx = 2;
-
-	return 0;
 }
 
 VIDEO_START( wbbc97 )
@@ -169,8 +161,6 @@ VIDEO_START( wbbc97 )
 	tilemap_set_transparent_pen(bg1_tilemap,15);
 
 	sprite_gfx = 1;
-
-	return 0;
 }
 
 /***************************************************************************

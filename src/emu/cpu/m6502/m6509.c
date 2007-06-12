@@ -372,7 +372,7 @@ void m6509_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXECUTE:						info->execute = m6509_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 #ifdef MAME_DEBUG
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6510_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6502_dasm;			break;
 #endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502_ICount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map = construct_map_m6509_mem; break;

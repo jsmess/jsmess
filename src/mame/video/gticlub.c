@@ -168,7 +168,7 @@ static int K001005_bitmap_page = 0;
 
 void K001005_swap_buffers(void);
 
-int K001005_init(void)
+void K001005_init(void)
 {
 	int i;
 	K001005_bitmap[0] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
@@ -192,8 +192,6 @@ int K001005_init(void)
 		tex_mirror_table[2][i] = ((i & 0x3f) >= 0x20) ? (0x1f - (i & 0x1f)) : i & 0x1f;
 		tex_mirror_table[3][i] = ((i & 0x7f) >= 0x40) ? (0x3f - (i & 0x3f)) : i & 0x3f;
 	}
-
-	return 0;
 }
 
 // rearranges the texture data to a more practical order
@@ -1017,10 +1015,8 @@ void K001005_swap_buffers(void)
 
 VIDEO_START( gticlub )
 {
-	if (K001005_init() != 0)
-		return 1;
-
-	return K001604_vh_start(0);
+	K001005_init();
+	K001604_vh_start(0);
 }
 
 static int tick = 0;

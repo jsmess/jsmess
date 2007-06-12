@@ -33,59 +33,59 @@ static tilemap *fg_tilemap, *bg_tilemap;
 ***************************************************************************/
 PALETTE_INIT( 1942 )
 {
-	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	rgb_t palette[256];
+	int i, colorbase;
 
-
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < 256; i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
-
 		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0*256] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0*256] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0*256] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0*256] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* green component */
-		bit0 = (color_prom[i + machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + 1*256] >> 0) & 0x01;
+		bit1 = (color_prom[i + 1*256] >> 1) & 0x01;
+		bit2 = (color_prom[i + 1*256] >> 2) & 0x01;
+		bit3 = (color_prom[i + 1*256] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		/* blue component */
-		bit0 = (color_prom[i + 2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + 2*256] >> 0) & 0x01;
+		bit1 = (color_prom[i + 2*256] >> 1) & 0x01;
+		bit2 = (color_prom[i + 2*256] >> 2) & 0x01;
+		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette[i] = MAKE_RGB(r,g,b);
 	}
 
-	color_prom += 3*machine->drv->total_colors;
+	color_prom += 3*256;
 	/* color_prom now points to the beginning of the lookup table */
 
 
-	/* characters use colors 128-143 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = *(color_prom++) + 128;
+	/* characters use palette entries 128-143 */
+	colorbase = 0;
+	for (i = 0; i < 64*4; i++)
+		palette_set_color(machine, colorbase + i, palette[0x80 | *color_prom++]);
+	colorbase += 64*4;
 
-	/* background tiles use colors 0-63 in four banks */
-	for (i = 0;i < TOTAL_COLORS(1)/4;i++)
+	/* background tiles use palette entries 0-63 in four banks */
+	for (i = 0; i < 32*8; i++)
 	{
-		COLOR(1,i) = *color_prom;
-		COLOR(1,i+32*8) = *color_prom + 16;
-		COLOR(1,i+2*32*8) = *color_prom + 32;
-		COLOR(1,i+3*32*8) = *color_prom + 48;
+		palette_set_color(machine, colorbase + 0*32*8 + i, palette[0x00 | *color_prom]);
+		palette_set_color(machine, colorbase + 1*32*8 + i, palette[0x10 | *color_prom]);
+		palette_set_color(machine, colorbase + 2*32*8 + i, palette[0x20 | *color_prom]);
+		palette_set_color(machine, colorbase + 3*32*8 + i, palette[0x30 | *color_prom]);
 		color_prom++;
 	}
+	colorbase += 4*32*8;
 
-	/* sprites use colors 64-79 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-		COLOR(2,i) = *(color_prom++) + 64;
+	/* sprites use palette entries 64-79 */
+	for (i = 0; i < 16*16; i++)
+		palette_set_color(machine, colorbase + i, palette[0x40 | *color_prom++]);
 }
 
 
@@ -137,8 +137,6 @@ VIDEO_START( 1942 )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
 	state_save_register_global(c1942_palette_bank);
-
-	return 0;
 }
 
 

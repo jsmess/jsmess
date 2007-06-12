@@ -25,11 +25,11 @@ it will crash shortly afterwards tho
 #include "audio/seibu.h"
 
 static tilemap *background_layer,*midground_layer,*foreground_layer,*text_layer;
-static unsigned char *back_data,*fore_data,*mid_data, *w1ram;
+static UINT8 *back_data,*fore_data,*mid_data, *w1ram;
 static int bg_bank=0, fg_bank=6, mid_bank=1, bg_col=0, fg_col=1, mid_col=2;
 
 static int tick;
-static unsigned char *mainram;
+static UINT8 *mainram;
 
 static int c_r[0xc000], c_w[0xc000];
 
@@ -240,8 +240,6 @@ VIDEO_START(raiden2)
 	tilemap_set_transparent_pen(text_layer,15);
 
 	tick = 0;
-
-	return 0;
 }
 
 // XXX
@@ -260,9 +258,9 @@ VIDEO_UPDATE (raiden2)
 	int info_1, info_2, info_3;
 
 #if 0
-	static unsigned char zz[16];
-	static unsigned char zz2[32];
-	static unsigned char zz3[12];
+	static UINT8 zz[16];
+	static UINT8 zz2[32];
+	static UINT8 zz3[12];
 #endif
 
 	info_1 = mainram[0x6cc] & 1;
@@ -1965,9 +1963,9 @@ static const int swx[32] = {
   13, 20,  5, 12,  8, 29, 26, 21,
 };
 
-static unsigned int sw(unsigned int v)
+static UINT32 sw(UINT32 v)
 {
-  unsigned int r = 0;
+  UINT32 r = 0;
   int i;
   for(i=0; i<32; i++)
     if(v & (1 << swx[i]))
@@ -1975,7 +1973,7 @@ static unsigned int sw(unsigned int v)
   return r;
 }
 
-static const unsigned char rotate[512] = {
+static const UINT8 rotate[512] = {
   0x11, 0x17, 0x0d, 0x03, 0x17, 0x1f, 0x08, 0x1a, 0x0f, 0x04, 0x1e, 0x13, 0x19, 0x0e, 0x0e, 0x05,
   0x06, 0x07, 0x08, 0x08, 0x0d, 0x18, 0x11, 0x1a, 0x0b, 0x06, 0x12, 0x0c, 0x1f, 0x0b, 0x1c, 0x19,
   0x00, 0x1b, 0x0c, 0x09, 0x1d, 0x18, 0x1a, 0x16, 0x1a, 0x08, 0x03, 0x04, 0x0f, 0x1d, 0x16, 0x07,
@@ -2012,49 +2010,49 @@ static const unsigned char rotate[512] = {
 };
 
 
-static const unsigned int xmap_low_01[8] = { 0x915b174c, 0xd1e3d41d, 0x7afd901e, 0x890aeda6, 0xdaa66bf6, 0xcf3a5859, 0x1fc8ae80, 0xd7c864c2 };
-static const unsigned int xmap_low_03[8] = { 0xc9b43501, 0x2d4136ef, 0x5a3e2047, 0xccab4852, 0x67770213, 0xcc1c22ee, 0x7f767fe5, 0xae783fa3 };
-static const unsigned int xmap_low_07[8] = { 0x533ce0ff, 0x21561e2b, 0x5e52735b, 0x2f89d3c0, 0x383ee980, 0x807ae78a, 0x6dfab360, 0xccd84e92 };
-static const unsigned int xmap_low_23[8] = { 0xa3b39673, 0xb3a21d4a, 0x07440937, 0xa9005a05, 0x12bbf9d7, 0x257164a7, 0x6162a1e4, 0x862c5d73 };
+static const UINT32 xmap_low_01[8] = { 0x915b174c, 0xd1e3d41d, 0x7afd901e, 0x890aeda6, 0xdaa66bf6, 0xcf3a5859, 0x1fc8ae80, 0xd7c864c2 };
+static const UINT32 xmap_low_03[8] = { 0xc9b43501, 0x2d4136ef, 0x5a3e2047, 0xccab4852, 0x67770213, 0xcc1c22ee, 0x7f767fe5, 0xae783fa3 };
+static const UINT32 xmap_low_07[8] = { 0x533ce0ff, 0x21561e2b, 0x5e52735b, 0x2f89d3c0, 0x383ee980, 0x807ae78a, 0x6dfab360, 0xccd84e92 };
+static const UINT32 xmap_low_23[8] = { 0xa3b39673, 0xb3a21d4a, 0x07440937, 0xa9005a05, 0x12bbf9d7, 0x257164a7, 0x6162a1e4, 0x862c5d73 };
 
-static const unsigned int xmap_low_31[8] = { 0x76fa8a84, 0x2f3f4960, 0x82087362, 0x40aebf9e, 0x02854535, 0xfcbd325a, 0x7b8823f3, 0xcbd62b3a };
+static const UINT32 xmap_low_31[8] = { 0x76fa8a84, 0x2f3f4960, 0x82087362, 0x40aebf9e, 0x02854535, 0xfcbd325a, 0x7b8823f3, 0xcbd62b3a };
 
-static const unsigned int xmap_high_00[8] = { 0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f };
-static const unsigned int xmap_high_02[8] = { 0x3caa374d, 0xfabf45a5, 0x2633d9ba, 0x05573b6a, 0x03234029, 0x185b17b0, 0x53afc974, 0x2067077d };
-static const unsigned int xmap_high_03[8] = { 0xdb36b4d7, 0x1e79e916, 0xfcc75654, 0x8b552464, 0x856a3eb4, 0xb60c7c2e, 0xf325d2ee, 0x5cbd9b38 };
-static const unsigned int xmap_high_04[8] = { 0x91a1acfe, 0x5adaac01, 0x9dc40024, 0x1c87c08b, 0x34ab1b76, 0x631175d5, 0x017b85e6, 0x13359cd1 };
-static const unsigned int xmap_high_06[8] = { 0xd46b6286, 0x2da93768, 0xf95f5b47, 0x657b472e, 0x05ed940f, 0x86364f88, 0x863d5fed, 0xe3f1ef82 };
-static const unsigned int xmap_high_21[8] = { 0x1d51f8b6, 0xcc1b30b3, 0x9bf75b9d, 0x2c57e2cd, 0x3b5138de, 0xba5c69c4, 0x422c4b8e, 0xd5465cf6 };
-static const unsigned int xmap_high_20[8] = { 0x41d4146c, 0x536d7b04, 0x59d60240, 0x7d01cc23, 0x8a0e5ce4, 0x11e0b0db, 0x513381e1, 0x3264be61 };
-static const unsigned int xmap_high_10[8] = { 0xc04f0362, 0x44fa6936, 0xc048b0db, 0x704897b2, 0x7e28568f, 0xfb9e070f, 0xc34a5704, 0xd5888a6f };
-static const unsigned int xmap_high_11[8] = { 0xd88e9b92, 0xda49726b, 0xc13f86b7, 0x6ce2a1b0, 0xb3adc6e9, 0xd83c2f64, 0xa14c1efc, 0xe98a3c19 };
-static const unsigned int xmap_high_13[8] = { 0x03f8a061, 0x19f39b5a, 0x13a17ae2, 0x85c06682, 0x42118566, 0x78e4ff8a, 0xbee64f97, 0x5eecb443 };
-static const unsigned int xmap_high_15[8] = { 0x1c6f2b4f, 0x9eebe281, 0x784b85d8, 0x401d6412, 0x0370ae0a, 0xa791d0b3, 0x89d290ea, 0x4666f009 };
-static const unsigned int xmap_high_16[8] = { 0xbe2beb93, 0xac9284fb, 0xa629fdbf, 0x82fe33dc, 0x75f1a31b, 0xee1f4f24, 0xaecc7e1e, 0xcd9b419e };
+static const UINT32 xmap_high_00[8] = { 0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f };
+static const UINT32 xmap_high_02[8] = { 0x3caa374d, 0xfabf45a5, 0x2633d9ba, 0x05573b6a, 0x03234029, 0x185b17b0, 0x53afc974, 0x2067077d };
+static const UINT32 xmap_high_03[8] = { 0xdb36b4d7, 0x1e79e916, 0xfcc75654, 0x8b552464, 0x856a3eb4, 0xb60c7c2e, 0xf325d2ee, 0x5cbd9b38 };
+static const UINT32 xmap_high_04[8] = { 0x91a1acfe, 0x5adaac01, 0x9dc40024, 0x1c87c08b, 0x34ab1b76, 0x631175d5, 0x017b85e6, 0x13359cd1 };
+static const UINT32 xmap_high_06[8] = { 0xd46b6286, 0x2da93768, 0xf95f5b47, 0x657b472e, 0x05ed940f, 0x86364f88, 0x863d5fed, 0xe3f1ef82 };
+static const UINT32 xmap_high_21[8] = { 0x1d51f8b6, 0xcc1b30b3, 0x9bf75b9d, 0x2c57e2cd, 0x3b5138de, 0xba5c69c4, 0x422c4b8e, 0xd5465cf6 };
+static const UINT32 xmap_high_20[8] = { 0x41d4146c, 0x536d7b04, 0x59d60240, 0x7d01cc23, 0x8a0e5ce4, 0x11e0b0db, 0x513381e1, 0x3264be61 };
+static const UINT32 xmap_high_10[8] = { 0xc04f0362, 0x44fa6936, 0xc048b0db, 0x704897b2, 0x7e28568f, 0xfb9e070f, 0xc34a5704, 0xd5888a6f };
+static const UINT32 xmap_high_11[8] = { 0xd88e9b92, 0xda49726b, 0xc13f86b7, 0x6ce2a1b0, 0xb3adc6e9, 0xd83c2f64, 0xa14c1efc, 0xe98a3c19 };
+static const UINT32 xmap_high_13[8] = { 0x03f8a061, 0x19f39b5a, 0x13a17ae2, 0x85c06682, 0x42118566, 0x78e4ff8a, 0xbee64f97, 0x5eecb443 };
+static const UINT32 xmap_high_15[8] = { 0x1c6f2b4f, 0x9eebe281, 0x784b85d8, 0x401d6412, 0x0370ae0a, 0xa791d0b3, 0x89d290ea, 0x4666f009 };
+static const UINT32 xmap_high_16[8] = { 0xbe2beb93, 0xac9284fb, 0xa629fdbf, 0x82fe33dc, 0x75f1a31b, 0xee1f4f24, 0xaecc7e1e, 0xcd9b419e };
 
-static const unsigned int zmap_0[8] = { 0x08b01003, 0xed4037ec, 0x9a3a3044, 0x0daf5851, 0xa7725210, 0x0c1822ed, 0xbf726fe6, 0x6e783ea0 };
-static const unsigned int zmap_1[8] = { 0xc6783a02, 0x1e8239df, 0xa53d108b, 0xcc5784a1, 0x9bbb0123, 0xcc2c11dd, 0xbfb9bfda, 0x5db43f53 };
+static const UINT32 zmap_0[8] = { 0x08b01003, 0xed4037ec, 0x9a3a3044, 0x0daf5851, 0xa7725210, 0x0c1822ed, 0xbf726fe6, 0x6e783ea0 };
+static const UINT32 zmap_1[8] = { 0xc6783a02, 0x1e8239df, 0xa53d108b, 0xcc5784a1, 0x9bbb0123, 0xcc2c11dd, 0xbfb9bfda, 0x5db43f53 };
 
-static const unsigned int zmap_2[32] = {
+static const UINT32 zmap_2[32] = {
   0x1b301017, 0x02310910, 0x04404644, 0x08042024, 0x050a3aa4, 0xb6087024, 0xa2204208, 0x1c9d9228,
   0x00c04200, 0xe0821041, 0x0018a803, 0x6402d208, 0x3a104109, 0x005082c0, 0x00920910, 0x20404007,
   0xc006a0c0, 0x1c48e006, 0xf8871010, 0x83510440, 0x80600410, 0x00040c0a, 0x510590e6, 0x40200910,
   0x24090928, 0x010406a8, 0x032001a8, 0x10a80993, 0x40858042, 0x49a30111, 0x0c482401, 0x830224c0
 };
 
-static const unsigned int zmap_3[32] = {
+static const UINT32 zmap_3[32] = {
   0xd46b6286, 0x2da93768, 0xf95f5b47, 0x657b472e, 0x05ed940f, 0x86364f88, 0x863d5fed, 0xe3f1ef82,
   0x2b949d79, 0xd256c897, 0x06a0a4b8, 0x9a84b8d1, 0xfa126bf0, 0x79c9b077, 0x79c2a012, 0x1c0e107d,
   0x146dc646, 0x31e1d76e, 0x01d84b57, 0xe62a436e, 0x858d901f, 0x86324382, 0xd738cf0b, 0xa3d1e692,
   0x0f9d9451, 0xd352ce3f, 0x0580a510, 0x8a2cb142, 0xba97ebb2, 0x306ab166, 0x758a8413, 0x9f0c34bd,
 };
 
-static const unsigned int zmap_4[16] = {
+static const UINT32 zmap_4[16] = {
   0xdb36b4d7, 0x1e79e916, 0xfcc75654, 0x8b552464, 0x856a3eb4, 0xb60c7c2e, 0xf325d2ee, 0x5cbd9b38,
   0x24c94b28, 0xe18616e9, 0x0338a9ab, 0x74aadb9b, 0x7a95c14b, 0x49f383d1, 0x0cda2d11, 0xa34264c7,
 };
 
-static const unsigned int zmap_5[32] = {
+static const UINT32 zmap_5[32] = {
   0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f,
   0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f,
   0x3f39193f, 0x03350fb8, 0x076047ec, 0x18ac29b7, 0x458fbae6, 0xffab7135, 0xae686609, 0x9f9fb6e8,
@@ -2062,23 +2060,23 @@ static const unsigned int zmap_5[32] = {
 };
 
 #if 0
-static unsigned int xrot(unsigned int v, int r)
+static UINT32 xrot(UINT32 v, int r)
 {
   return (v >> r) | (v << (32-r));
 }
 #endif
 
-static unsigned int yrot(unsigned int v, int r)
+static UINT32 yrot(UINT32 v, int r)
 {
   return (v << r) | (v >> (32-r));
 }
 
-static int bt(const unsigned int *tb, int v)
+static int bt(const UINT32 *tb, int v)
 {
   return (tb[v/32] & (1<<(v % 32))) != 0;
 }
 
-static unsigned int gr(int i)
+static UINT32 gr(int i)
 {
   int idx = i & 0xff;
   if(i & 0x008000)
@@ -2088,9 +2086,9 @@ static unsigned int gr(int i)
   return rotate[idx];
 }
 
-static unsigned int gm(int i)
+static UINT32 gm(int i)
 {
-  unsigned int x;
+  UINT32 x;
   int idx = i & 0xff;
   int idx2 = ((i>>8) & 0x1ff) | ((i>>9) & 0x200);
   int i1, i2;
@@ -2165,9 +2163,9 @@ static unsigned int gm(int i)
   return x;
 }
 
-static unsigned int trans(unsigned int v, unsigned int x)
+static UINT32 trans(UINT32 v, UINT32 x)
 {
-  unsigned int R = v^x, r = R;
+  UINT32 R = v^x, r = R;
 
   if((R & (1<<8)) && (v & (1<<30)))
     r ^= 1<<9;
@@ -2202,9 +2200,9 @@ static unsigned int trans(unsigned int v, unsigned int x)
 static void decrypt_sprites(void)
 {
   int i;
-  unsigned int *data = (unsigned int *)memory_region(REGION_GFX3);
+  UINT32 *data = (UINT32 *)memory_region(REGION_GFX3);
   for(i=0; i<0x800000/4; i++) {
-    unsigned int x1, v1, y1;
+    UINT32 x1, v1, y1;
 
     int idx = i & 0xff;
     int i2;
@@ -2232,7 +2230,7 @@ static void decrypt_sprites(void)
 static DRIVER_INIT (raiden2)
 {
 	/* wrong , there must be some banking this just stops it crashing */
-	unsigned char *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(REGION_USER1);
 
 	memory_set_bankptr(1,&RAM[0x000000]);
 	memory_set_bankptr(2,&RAM[0x040000]);
@@ -2243,7 +2241,7 @@ static DRIVER_INIT (raiden2)
 static DRIVER_INIT (r2nocpu)
 {
 	/* wrong , there must be some banking this just stops it crashing */
-	unsigned char *RAM = memory_region(REGION_USER1);
+	UINT8 *RAM = memory_region(REGION_USER1);
 
 	memory_set_bankptr(1,&RAM[0x000000]);
 	memory_set_bankptr(2,&RAM[0x040000]);

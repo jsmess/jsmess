@@ -20,7 +20,7 @@ static unsigned char sym1_palette[] =
 
 PALETTE_INIT( sym1 )
 {
-	palette_set_colors(machine, 0, sym1_palette, sizeof(sym1_palette) / 3);
+	palette_set_colors_rgb(machine, 0, sym1_palette, sizeof(sym1_palette) / 3);
 }
 
 VIDEO_START( sym1 )
@@ -37,10 +37,7 @@ VIDEO_START( sym1 )
 	}
 #endif
 
-	if (video_start_generic(machine) != 0)
-        return 1;
-
-    return 0;
+	video_start_generic(machine);
 }
 
 static const char led[] =

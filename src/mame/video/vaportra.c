@@ -24,8 +24,7 @@ static int vaportra_bank_callback(const int bank)
 
 VIDEO_START( vaportra )
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_pf1_rowscroll = 0;
 	deco16_pf2_rowscroll = 0;
@@ -41,9 +40,6 @@ VIDEO_START( vaportra )
 	deco16_pf2_colour_bank=0x20;
 	deco16_pf4_colour_bank=0x40;
 	deco16_pf3_colour_bank=0x30;
-
-
-	return 0;
 }
 
 /******************************************************************************/
@@ -64,7 +60,7 @@ static void update_24bitcol(int offset)
 	g = (paletteram16[offset] >> 8) & 0xff;
 	b = (paletteram16_2[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( vaportra_palette_24bit_rg_w )

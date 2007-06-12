@@ -5,19 +5,19 @@
 #define GFX_COLOR_CODES(gfxn) 		Machine->gfx[gfxn]->total_colors
 #define GFX_ELEM_COLORS(gfxn) 		Machine->gfx[gfxn]->color_granularity
 
-unsigned char   *mnight_scrolly_ram;
-unsigned char   *mnight_scrollx_ram;
-unsigned char   *mnight_bgenable_ram;
-unsigned char   *mnight_spoverdraw_ram;
-unsigned char   *mnight_background_videoram;
+UINT8   *mnight_scrolly_ram;
+UINT8   *mnight_scrollx_ram;
+UINT8   *mnight_bgenable_ram;
+UINT8   *mnight_spoverdraw_ram;
+UINT8   *mnight_background_videoram;
 size_t mnight_backgroundram_size;
-unsigned char   *mnight_foreground_videoram;
+UINT8   *mnight_foreground_videoram;
 size_t mnight_foregroundram_size;
 
 static mame_bitmap *bitmap_bg;
 static mame_bitmap *bitmap_sp;
 
-static unsigned char     *bg_dirtybuffer;
+static UINT8     *bg_dirtybuffer;
 static int       bg_enable = 1;
 static int       sp_overdraw = 0;
 
@@ -37,8 +37,6 @@ VIDEO_START( mnight )
 	mnight_mark_background_dirty() ;
 
 	state_save_register_func_postload(mnight_mark_background_dirty) ;
-
-	return 0;
 }
 
 

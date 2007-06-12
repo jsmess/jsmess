@@ -3,9 +3,9 @@
 
 
 
-unsigned char *buggychl_scrollv,*buggychl_scrollh;
-unsigned char buggychl_sprite_lookup[0x2000];
-unsigned char *buggychl_character_ram;
+UINT8 *buggychl_scrollv,*buggychl_scrollh;
+UINT8 buggychl_sprite_lookup[0x2000];
+UINT8 *buggychl_character_ram;
 
 static int *dirtychar;
 
@@ -20,7 +20,7 @@ PALETTE_INIT( buggychl )
 
 	/* arbitrary blue shading for the sky */
 	for (i = 0;i < 128;i++)
-		palette_set_color(machine,i+128,0,i,2*i);
+		palette_set_color(machine,i+128,MAKE_RGB(0,i,2*i));
 }
 
 
@@ -35,8 +35,6 @@ VIDEO_START( buggychl )
 
 	memset(dirtybuffer,1,videoram_size);
 	memset(dirtychar,0xff,256 * sizeof(*dirtychar));
-
-	return 0;
 }
 
 
@@ -185,8 +183,8 @@ static void draw_sprites(mame_bitmap *bitmap)
 	for (offs = 0;offs < spriteram_size;offs += 4)
 	{
 		int sx,sy,flipy,zoom,ch,x,px,y;
-		const unsigned char *lookup;
-		const unsigned char *zoomx_rom,*zoomy_rom;
+		const UINT8 *lookup;
+		const UINT8 *zoomx_rom,*zoomy_rom;
 
 
 		sx = spriteram[offs+3] - ((spriteram[offs+2] & 0x80) << 1);

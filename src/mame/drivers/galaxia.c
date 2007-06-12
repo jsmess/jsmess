@@ -29,7 +29,6 @@ UINT8 *galaxia_video;
 
 VIDEO_START( galaxia )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( galaxia )

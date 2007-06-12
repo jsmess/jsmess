@@ -390,8 +390,8 @@ static WRITE8_HANDLER (segae_port_be_bf_w);
 VIDEO_START( segae );
 VIDEO_UPDATE( segae );
 
-unsigned char segae_vdp_ctrl_r ( UINT8 chip );
-unsigned char segae_vdp_data_r ( UINT8 chip );
+UINT8 segae_vdp_ctrl_r ( UINT8 chip );
+UINT8 segae_vdp_data_r ( UINT8 chip );
 void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
 void segae_vdp_data_w ( UINT8 chip, UINT8 data );
 void segae_drawscanline(int line, int chips, int blank);

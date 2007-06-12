@@ -64,7 +64,7 @@ static void dirty_tilemaps(void)	// will be used for save states
 }
 #endif
 
-int gcpinbal_core_vh_start (void)
+void gcpinbal_core_vh_start (void)
 {
 	int xoffs = 0;
 	int yoffs = 0;
@@ -84,13 +84,11 @@ int gcpinbal_core_vh_start (void)
 	tilemap_set_scrolldy( gcpinbal_tilemap[0],-yoffs,0 );
 	tilemap_set_scrolldy( gcpinbal_tilemap[1],-yoffs,0 );
 	tilemap_set_scrolldy( gcpinbal_tilemap[2],-yoffs,0 );
-
-	return 0;
 }
 
 VIDEO_START( gcpinbal )
 {
-	return (gcpinbal_core_vh_start());
+	gcpinbal_core_vh_start();
 }
 
 

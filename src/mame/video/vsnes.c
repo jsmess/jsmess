@@ -48,13 +48,11 @@ static const ppu2c0x_interface ppu_dual_interface =
 VIDEO_START( vsnes )
 {
 	ppu2c0x_init( &ppu_interface );
-	return 0;
 }
 
 VIDEO_START( vsdual )
 {
 	ppu2c0x_init( &ppu_dual_interface );
-	return 0;
 }
 
 /***************************************************************************

@@ -405,8 +405,6 @@ VIDEO_START(varia)
 	tilemap_set_transparent_pen(vmetal_texttilemap,0);
 	tilemap_set_transparent_pen(vmetal_mid1tilemap,0);
 	tilemap_set_transparent_pen(vmetal_mid2tilemap,0);
-
-	return 0;
 }
 
 VIDEO_UPDATE(varia)

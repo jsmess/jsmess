@@ -144,8 +144,7 @@ static int boogwing_bank_callback2(const int bank)
 
 VIDEO_START(boogwing)
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(1,boogwing_bank_callback);
 	deco16_set_tilemap_bank_callback(2,boogwing_bank_callback2);
@@ -154,8 +153,6 @@ VIDEO_START(boogwing)
 	deco16_set_tilemap_transparency_mask(1, 0x1f); // 5bpp graphics
 
 	alpha_set_level(0x80);
-
-	return 0;
 }
 
 VIDEO_UPDATE(boogwing)

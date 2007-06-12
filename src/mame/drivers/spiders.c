@@ -508,8 +508,6 @@ static VIDEO_START( spiders )
 {
 	/* configure the CRT controller */
 	crtc6845_config(0, &crtc6845_intf);
-
-	return 0;
 }
 
 

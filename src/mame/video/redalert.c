@@ -8,23 +8,23 @@
 
 #include "driver.h"
 
-unsigned char *redalert_backram;
-unsigned char *redalert_spriteram1;
-unsigned char *redalert_spriteram2;
-unsigned char *redalert_spriteram3;
-unsigned char *redalert_characterram;
-unsigned char *redalert_characterram2;
+UINT8 *redalert_backram;
+UINT8 *redalert_spriteram1;
+UINT8 *redalert_spriteram2;
+UINT8 *redalert_spriteram3;
+UINT8 *redalert_characterram;
+UINT8 *redalert_characterram2;
 
-static unsigned char redalert_dirtyback[0x400];
-static unsigned char redalert_dirtycharacter[0x100];
-static unsigned char redalert_dirtycharacter2[0x100];
-static unsigned char redalert_backcolor[0x400];
+static UINT8 redalert_dirtyback[0x400];
+static UINT8 redalert_dirtycharacter[0x100];
+static UINT8 redalert_dirtycharacter2[0x100];
+static UINT8 redalert_backcolor[0x400];
 
 
 /* There might be a color PROM that dictates this? */
 /* These guesses are based on comparing the color bars on the test
    screen with the picture in the manual */
-static unsigned char color_lookup[] = {
+static UINT8 color_lookup[] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,
 	1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,
 	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,

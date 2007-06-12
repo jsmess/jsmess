@@ -93,7 +93,6 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 
 VIDEO_START(pangofun)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(pangofun)

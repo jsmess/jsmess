@@ -10,15 +10,15 @@
 #include "res_net.h"
 #include "includes/phoenix.h"
 
-unsigned char *naughtyb_videoram2;
+UINT8 *naughtyb_videoram2;
 
 static int videoreg;
 
 /* use these to draw charset B */
-unsigned char *naughtyb_scrollreg;
+UINT8 *naughtyb_scrollreg;
 
 /* use this to select palette */
-static unsigned char palreg;
+static UINT8 palreg;
 
 /* used in Naughty Boy to select video bank */
 static int bankreg;
@@ -107,7 +107,7 @@ PALETTE_INIT( naughtyb )
 		/*b = 0x55 * bit0 + 0xaa * bit1;*/
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -158,8 +158,6 @@ VIDEO_START( naughtyb )
 	memset(dirtybuffer, 1, videoram_size);
 
 	tmpbitmap = auto_bitmap_alloc(68*8,28*8,machine->screen[0].format);
-
-	return 0;
 }
 
 

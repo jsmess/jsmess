@@ -58,7 +58,7 @@ static WRITE8_HANDLER(vroulet_paletteram_w)
 		{
 			a=paletteram[((i*8+j)*2)&0xff ];
 			b=paletteram[((i*8+j)*2+1)&0xff ];
-			palette_set_color(Machine,i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			palette_set_color_rgb(Machine,i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
 }
@@ -88,8 +88,6 @@ VIDEO_START(vroulet)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 VIDEO_UPDATE(vroulet)

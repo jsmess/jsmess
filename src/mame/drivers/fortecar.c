@@ -116,7 +116,6 @@ static const gfx_decode gfxdecodeinfo[] =
 
 VIDEO_START(fortecar)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(fortecar)

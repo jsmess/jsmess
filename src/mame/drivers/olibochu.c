@@ -42,7 +42,7 @@ PALETTE_INIT( olibochu )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -95,8 +95,6 @@ VIDEO_START( olibochu )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void olibochu_draw_sprites( mame_bitmap *bitmap )

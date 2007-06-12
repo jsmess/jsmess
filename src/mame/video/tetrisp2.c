@@ -71,14 +71,14 @@ WRITE16_HANDLER( tetrisp2_palette_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color(Machine,offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(Machine,offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 WRITE16_HANDLER( rocknms_sub_palette_w )
 {
 	data = COMBINE_DATA(&paletteram16_2[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color(Machine,(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(Machine,(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 
@@ -281,8 +281,6 @@ VIDEO_START( tetrisp2 )
 	tilemap_set_transparent_pen(tilemap_bg,0);
 	tilemap_set_transparent_pen(tilemap_fg,0);
 	tilemap_set_transparent_pen(tilemap_rot,0);
-
-	return 0;
 }
 
 VIDEO_START( rockntread )
@@ -302,8 +300,6 @@ VIDEO_START( rockntread )
 	tilemap_set_transparent_pen(tilemap_bg, 0);
 	tilemap_set_transparent_pen(tilemap_fg, 0);
 	tilemap_set_transparent_pen(tilemap_rot, 0);
-
-	return 0;
 }
 
 
@@ -340,8 +336,6 @@ VIDEO_START( rocknms )
 	tilemap_set_transparent_pen(tilemap_sub_bg, 0);
 	tilemap_set_transparent_pen(tilemap_sub_fg, 0);
 	tilemap_set_transparent_pen(tilemap_sub_rot, 0);
-
-	return 0;
 }
 
 

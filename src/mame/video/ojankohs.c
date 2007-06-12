@@ -55,7 +55,7 @@ PALETTE_INIT( ojankoy )
 		bit4 = (color_prom[machine->drv->total_colors] >> 4) & 0x01;
 		b = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -78,7 +78,7 @@ WRITE8_HANDLER( ojankohs_palette_w )
 			((ojankohs_paletteram[offset + 1] & 0xe0) >> 5);
 	b = (ojankohs_paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( ccasino_palette_w )
@@ -97,7 +97,7 @@ WRITE8_HANDLER( ccasino_palette_w )
 			((ojankohs_paletteram[offset + 1] & 0xe0) >> 5);
 	b = (ojankohs_paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( ojankoc_palette_w )
@@ -115,7 +115,7 @@ WRITE8_HANDLER( ojankoc_palette_w )
 	g = (color >>  5) & 0x1f;
 	b = (color >>  0) & 0x1f;
 
-	palette_set_color(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 
@@ -212,7 +212,7 @@ void ojankoc_flipscreen(int data)
 {
 	static int ojankoc_flipscreen_old = 0;
 	int x, y;
-	unsigned char color1, color2;
+	UINT8 color1, color2;
 
 	ojankohs_flipscreen = (data & 0x80) >> 7;
 
@@ -282,8 +282,6 @@ VIDEO_START( ojankohs )
 	ojankohs_videoram = auto_malloc(0x2000);
 	ojankohs_colorram = auto_malloc(0x1000);
 	ojankohs_paletteram = auto_malloc(0x800);
-
-	return 0;
 }
 
 VIDEO_START( ojankoy )
@@ -292,8 +290,6 @@ VIDEO_START( ojankoy )
 	ojankohs_videoram = auto_malloc(0x2000);
 	ojankohs_colorram = auto_malloc(0x1000);
 	ojankohs_paletteram = auto_malloc(0x800);
-
-	return 0;
 }
 
 VIDEO_START( ojankoc )
@@ -301,8 +297,6 @@ VIDEO_START( ojankoc )
 	ojankoc_tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	ojankohs_videoram = auto_malloc(0x8000);
 	ojankohs_paletteram = auto_malloc(0x20);
-
-	return 0;
 }
 
 

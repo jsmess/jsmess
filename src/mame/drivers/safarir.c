@@ -118,7 +118,7 @@ static PALETTE_INIT( safarir )
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		palette_set_color(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 
 		colortable[(i * 2) + 0] = 0;
 		colortable[(i * 2) + 1] = i;
@@ -162,8 +162,6 @@ static VIDEO_START( safarir )
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 

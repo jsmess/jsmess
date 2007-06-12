@@ -10,13 +10,13 @@
 #include "driver.h"
 
 
-static unsigned char from_mcu;
+static UINT8 from_mcu;
 static int mcu_sent = 0,main_sent = 0;
 
 
-static unsigned char portA_in,portA_out,ddrA;
-static unsigned char portB_in,portB_out,ddrB;
-static unsigned char portC_in,portC_out,ddrC;
+static UINT8 portA_in,portA_out,ddrA;
+static UINT8 portB_in,portB_out,ddrB;
+static UINT8 portC_in,portC_out,ddrC;
 
 READ8_HANDLER( bigevglf_68705_portA_r )
 {

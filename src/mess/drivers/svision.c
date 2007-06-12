@@ -343,15 +343,15 @@ static const unsigned char svisionn_palette[] =
 
 static PALETTE_INIT( svision )
 {
-	palette_set_colors(machine, 0, svision_palette, sizeof(svision_palette) / 3);
+	palette_set_colors_rgb(machine, 0, svision_palette, sizeof(svision_palette) / 3);
 }
 static PALETTE_INIT( svisionn )
 {
-	palette_set_colors(machine, 0, svisionn_palette, sizeof(svisionn_palette) / 3);
+	palette_set_colors_rgb(machine, 0, svisionn_palette, sizeof(svisionn_palette) / 3);
 }
 static PALETTE_INIT( svisionp )
 {
-	palette_set_colors(machine, 0, svisionp_palette, sizeof(svisionp_palette) / 3);
+	palette_set_colors_rgb(machine, 0, svisionp_palette, sizeof(svisionp_palette) / 3);
 }
 
 static VIDEO_UPDATE( svision )

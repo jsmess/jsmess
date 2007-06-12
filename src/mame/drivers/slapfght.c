@@ -190,10 +190,10 @@ $8609 - $860f    High score characters to display to screen for highest score
 #include "sound/ay8910.h"
 
 /* video */
-extern unsigned char *slapfight_videoram;
-extern unsigned char *slapfight_colorram;
+extern UINT8 *slapfight_videoram;
+extern UINT8 *slapfight_colorram;
 extern size_t slapfight_videoram_size;
-extern unsigned char *slapfight_scrollx_lo,*slapfight_scrollx_hi,*slapfight_scrolly;
+extern UINT8 *slapfight_scrollx_lo,*slapfight_scrollx_hi,*slapfight_scrolly;
 VIDEO_UPDATE( slapfight );
 VIDEO_UPDATE( perfrman );
 VIDEO_START( slapfight );
@@ -207,7 +207,7 @@ WRITE8_HANDLER( slapfight_palette_bank_w );
 
 /* MACHINE */
 MACHINE_RESET( slapfight );
-extern unsigned char *slapfight_dpram;
+extern UINT8 *slapfight_dpram;
 extern size_t slapfight_dpram_size;
 WRITE8_HANDLER( slapfight_dpram_w );
 READ8_HANDLER( slapfight_dpram_r );

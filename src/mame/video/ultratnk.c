@@ -17,10 +17,10 @@ int ultratnk_collision[4];
 
 PALETTE_INIT( ultratnk )
 {
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 1, 0xa4, 0xa4, 0xa4);
-	palette_set_color(machine, 2, 0x5b, 0x5b, 0x5b);
-	palette_set_color(machine, 3, 0xff, 0xff, 0xff);
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 1, MAKE_RGB(0xa4, 0xa4, 0xa4));
+	palette_set_color(machine, 2, MAKE_RGB(0x5b, 0x5b, 0x5b));
+	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));
 
 	colortable[0] = color_prom[0x00] & 3;
 	colortable[2] = color_prom[0x00] & 3;
@@ -56,8 +56,6 @@ VIDEO_START( ultratnk )
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	playfield = tilemap_create(ultratnk_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 

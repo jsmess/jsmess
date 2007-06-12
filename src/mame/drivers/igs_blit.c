@@ -83,8 +83,6 @@ VIDEO_START(igs)
 	}
 
 	chmplst2_pen_hi = 0;
-
-	return 0;
 }
 
 VIDEO_UPDATE(igs)
@@ -358,7 +356,7 @@ static WRITE16_HANDLER( igs_palette_w )
 	COMBINE_DATA(&paletteram16[offset]);
 
 	rgb = (paletteram16[offset & 0x7ff] & 0xff) | ((paletteram16[offset | 0x800] & 0xff) << 8);
-	palette_set_color(Machine,offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
+	palette_set_color_rgb(Machine,offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
 }
 
 

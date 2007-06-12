@@ -1794,6 +1794,8 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 
 	/* otherwise, allocate a new entry */
 	symbol = malloc(sizeof(*symbol));
+	if (!symbol)
+		return 0;
 	memset(symbol, 0, sizeof(*symbol));
 
 	/* allocate space for a copy of the string */

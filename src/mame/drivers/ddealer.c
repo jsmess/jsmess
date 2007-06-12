@@ -112,7 +112,6 @@ static int respcount;
 
 VIDEO_START( ddealer )
 {
-	return 0;
 }
 
 static void ddealer_protection(void)

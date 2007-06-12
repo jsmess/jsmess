@@ -56,8 +56,6 @@ static UINT32 tilemap_scan_cols_flipy( UINT32 col, UINT32 row, UINT32 num_cols, 
 VIDEO_START( jack )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void jack_draw_sprites( mame_bitmap *bitmap )
@@ -124,7 +122,7 @@ PALETTE_INIT( joinem )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -139,8 +137,6 @@ static TILE_GET_INFO( joinem_get_bg_tile_info )
 VIDEO_START( joinem )
 {
 	bg_tilemap = tilemap_create(joinem_get_bg_tile_info, tilemap_scan_cols_flipy, TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void joinem_draw_sprites( mame_bitmap *bitmap )

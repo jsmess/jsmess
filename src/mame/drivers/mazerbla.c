@@ -107,8 +107,6 @@ VIDEO_START( mazerbla )
 	tmpbitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmaps[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmaps[3] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-	return 0;
 }
 
 #if 0
@@ -585,7 +583,7 @@ static WRITE8_HANDLER(cfb_backgnd_color_w)
 		bit0 = (data >> 0) & 0x01;
 		b = combine_3_weights(weights_b, bit0, bit1, bit2);
 
-		palette_set_color(Machine, 255, r, g, b);
+		palette_set_color(Machine, 255, MAKE_RGB(r, g, b));
 		//logerror("background color (port 01) write=%02x\n",data);
 	}
 }
@@ -689,7 +687,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-unsigned char * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     if ((mode<=0x07) || (mode>=0x10))
@@ -854,7 +852,7 @@ int bits = 0;
 
 UINT8 color_base=0;
 
-unsigned char * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
+UINT8 * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
 
 /*
     //if (0) //(mode != 0x07)
@@ -978,7 +976,7 @@ unsigned char * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x1
 						b = combine_3_weights(weights_b, bit0, bit1, bit2);
 
 						if ((x+y*16)<255)//keep color 255 free for use as background color
-							palette_set_color(Machine, x+y*16, r, g, b);
+							palette_set_color(Machine, x+y*16, MAKE_RGB(r, g, b));
 
 						lookup_RAM[ lookup_offs + x + y*16 ] = colour;
 					}

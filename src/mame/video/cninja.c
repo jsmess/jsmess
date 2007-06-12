@@ -41,20 +41,16 @@ static int mutantf_2_bank_callback(const int bank)
 
 VIDEO_START( cninja )
 {
-	if (deco16_2_video_init(1))
-		return 1;
+	deco16_2_video_init(1);
 
 	deco16_set_tilemap_bank_callback(2,cninja_bank_callback);
 	deco16_set_tilemap_bank_callback(3,cninja_bank_callback);
 	deco16_set_tilemap_colour_base(3,48);
-
-	return 0;
 }
 
 VIDEO_START( stoneage )
 {
-	if (deco16_2_video_init(1))
-		return 1;
+	deco16_2_video_init(1);
 
 	deco16_set_tilemap_bank_callback(2,edrandy_bank_callback);
 	deco16_set_tilemap_bank_callback(3,edrandy_bank_callback);
@@ -64,39 +60,30 @@ VIDEO_START( stoneage )
 	tilemap_set_scrolldx(deco16_get_tilemap(3,0),-10,-10);
 	tilemap_set_scrolldx(deco16_get_tilemap(1,0),-10,-10);
 	tilemap_set_scrolldx(deco16_get_tilemap(0,1),2,2);
-
-	return 0;
 }
 
 VIDEO_START( edrandy )
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(2,edrandy_bank_callback);
 	deco16_set_tilemap_bank_callback(3,edrandy_bank_callback);
 	deco16_set_tilemap_colour_base(3,48);
-
-	return 0;
 }
 
 VIDEO_START( robocop2 )
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(1,robocop2_bank_callback);
 	deco16_set_tilemap_bank_callback(2,robocop2_bank_callback);
 	deco16_set_tilemap_bank_callback(3,robocop2_bank_callback);
 	deco16_set_tilemap_colour_base(3,48);
-
-	return 0;
 }
 
 VIDEO_START( mutantf )
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(0,mutantf_1_bank_callback);
 	deco16_set_tilemap_bank_callback(1,mutantf_2_bank_callback);
@@ -108,8 +95,6 @@ VIDEO_START( mutantf )
 	deco16_set_tilemap_colour_base(3,0x40);
 
 	alpha_set_level(0x80);
-
-	return 0;
 }
 
 /******************************************************************************/

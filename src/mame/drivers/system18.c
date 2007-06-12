@@ -910,7 +910,7 @@ static MACHINE_RESET( mwalkbl ){
 }
 
 static DRIVER_INIT( mwalkbl ){
-	unsigned char *RAM= memory_region(REGION_CPU2);
+	UINT8 *RAM= memory_region(REGION_CPU2);
 	static const int mwalk_sound_info[] =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -1091,7 +1091,7 @@ static MACHINE_RESET( astormbl ){
 
 
 static DRIVER_INIT( astormbl ){
-	unsigned char *RAM= memory_region(REGION_CPU2);
+	UINT8 *RAM= memory_region(REGION_CPU2);
 	static const int astormbl_sound_info[] =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K

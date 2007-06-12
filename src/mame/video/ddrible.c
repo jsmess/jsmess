@@ -11,10 +11,10 @@
 extern int ddrible_int_enable_0;
 extern int ddrible_int_enable_1;
 
-unsigned char *ddrible_fg_videoram;
-unsigned char *ddrible_bg_videoram;
-unsigned char *ddrible_spriteram_1;
-unsigned char *ddrible_spriteram_2;
+UINT8 *ddrible_fg_videoram;
+UINT8 *ddrible_bg_videoram;
+UINT8 *ddrible_spriteram_1;
+UINT8 *ddrible_spriteram_2;
 
 static int ddribble_vregs[2][5];
 static int charbank[2];
@@ -82,7 +82,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	unsigned char attr = ddrible_fg_videoram[tile_index];
+	UINT8 attr = ddrible_fg_videoram[tile_index];
 	int num = ddrible_fg_videoram[tile_index + 0x400] +
 			((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + ((charbank[0] & 2) << 10);
 	SET_TILE_INFO(
@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char attr = ddrible_bg_videoram[tile_index];
+	UINT8 attr = ddrible_bg_videoram[tile_index];
 	int num = ddrible_bg_videoram[tile_index + 0x400] +
 			((attr & 0xc0) << 2) + ((attr & 0x20) << 5) + (charbank[1] << 11);
 	SET_TILE_INFO(
@@ -116,8 +116,6 @@ VIDEO_START( ddrible )
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan,TILEMAP_OPAQUE,     8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 /***************************************************************************
@@ -160,10 +158,10 @@ byte #4:    attributes
 
 ***************************************************************************/
 
-static void ddribble_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, unsigned char* source, int lenght, int gfxset, int flipscreen )
+static void ddribble_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, UINT8* source, int lenght, int gfxset, int flipscreen )
 {
 	gfx_element *gfx = Machine->gfx[gfxset];
-	const unsigned char *finish = source + lenght;
+	const UINT8 *finish = source + lenght;
 
 	while( source < finish )
 	{

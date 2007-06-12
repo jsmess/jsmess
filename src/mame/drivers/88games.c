@@ -15,7 +15,7 @@
 static MACHINE_RESET( 88games );
 static void k88games_banking( int lines );
 
-static unsigned char *ram;
+static UINT8 *ram;
 static UINT8 *banked_rom;
 static UINT8 *paletteram_1000;
 static int videobank;
@@ -504,7 +504,7 @@ ROM_END
 
 static void k88games_banking( int lines )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs;
 
 logerror("%04x: bank select %02x\n",activecpu_get_pc(),lines);

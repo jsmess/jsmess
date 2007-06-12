@@ -146,8 +146,6 @@ VIDEO_START(jackpool)
 
 	tilemap_set_transparent_pen(jackpool_layer0_tilemap,0);
 	tilemap_set_transparent_pen(jackpool_layer2_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_UPDATE(jackpool)

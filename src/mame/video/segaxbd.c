@@ -32,18 +32,13 @@ VIDEO_START( xboard )
 	segaic16_palette_init(0x2000);
 
 	/* initialize the tile/text layers */
-	if (segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2))
-		return 1;
+	segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2);
 
 	/* initialize the sprites */
-	if (segaic16_sprites_init(0, SEGAIC16_SPRITES_XBOARD, 0x000, 0))
-		return 1;
+	segaic16_sprites_init(0, SEGAIC16_SPRITES_XBOARD, 0x000, 0);
 
 	/* initialize the road */
-	if (segaic16_road_init(0, SEGAIC16_ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166))
-		return 1;
-
-	return 0;
+	segaic16_road_init(0, SEGAIC16_ROAD_XBOARD, 0x1700, 0x1720, 0x1780, -166);
 }
 
 

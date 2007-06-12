@@ -36,7 +36,7 @@ PALETTE_INIT( sprtmtch )
 		int r = BITSWAP8((x >>  0) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int g = BITSWAP8((x >>  5) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int b = BITSWAP8((x >> 10) & 0x1f, 7,6,5, 0,1,2,3,4 );
-		palette_set_color(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -811,8 +811,6 @@ VIDEO_START( hanamai )
 
 	Video_Reset();
 	layer_layout = LAYOUT_HANAMAI;
-
-	return 0;
 }
 
 VIDEO_START( hnoridur )
@@ -830,15 +828,12 @@ VIDEO_START( hnoridur )
 	layer_layout = LAYOUT_HNORIDUR;
 
 	priority_table = priority_hnoridur;
-
-	return 0;
 }
 
 VIDEO_START( mcnpshnt )
 {
-	if (video_start_hnoridur(machine))	return 1;
+	video_start_hnoridur(machine);
 	priority_table = priority_mcnpshnt;
-	return 0;
 }
 
 VIDEO_START( sprtmtch )
@@ -852,8 +847,6 @@ VIDEO_START( sprtmtch )
 
 	Video_Reset();
 	layer_layout = LAYOUT_DRGPUNCH;
-
-	return 0;
 }
 
 VIDEO_START( jantouki )
@@ -879,8 +872,6 @@ VIDEO_START( jantouki )
 	layer_layout = LAYOUT_JANTOUKI;
 
 	update_irq_func = jantouki_update_irq;
-
-	return 0;
 }
 
 VIDEO_START( mjdialq2 )
@@ -892,28 +883,22 @@ VIDEO_START( mjdialq2 )
 	layer_layout = LAYOUT_MJDIALQ2;
 
 	update_irq_func = 0;
-
-	return 0;
 }
 
 VIDEO_START( mjelctrn )
 {
-	if (video_start_hnoridur(machine))	return 1;
+	video_start_hnoridur(machine);
 
 	priority_table = priority_mjelctrn;
 	update_irq_func = mjelctrn_update_irq;
-
-	return 0;
 }
 
 VIDEO_START( neruton )
 {
-	if (video_start_hnoridur(machine))	return 1;
+	video_start_hnoridur(machine);
 
 //  priority_table = priority_mjelctrn;
 	update_irq_func = neruton_update_irq;
-
-	return 0;
 }
 
 /***************************************************************************

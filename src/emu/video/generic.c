@@ -210,7 +210,7 @@ INLINE UINT32 paletteram32_be(offs_t offset)
 
 INLINE void set_color_444(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color(Machine, color, pal4bit(data >> rshift), pal4bit(data >> gshift), pal4bit(data >> bshift));
+	palette_set_color_rgb(Machine, color, pal4bit(data >> rshift), pal4bit(data >> gshift), pal4bit(data >> bshift));
 }
 
 
@@ -231,7 +231,7 @@ INLINE void set_color_4444(pen_t color, int ishift, int rshift, int gshift, int 
 	g = ((data >> gshift) & 15) * i;
 	b = ((data >> bshift) & 15) * i;
 
-	palette_set_color(Machine, color, r, g, b);
+	palette_set_color_rgb(Machine, color, r, g, b);
 }
 
 
@@ -243,7 +243,7 @@ INLINE void set_color_4444(pen_t color, int ishift, int rshift, int gshift, int 
 
 INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	palette_set_color_rgb(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 
@@ -255,7 +255,7 @@ INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT1
 
 INLINE void set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
-	palette_set_color(Machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
+	palette_set_color_rgb(Machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
 
 
@@ -338,7 +338,6 @@ VIDEO_START( generic )
 
 	/* on a restore, we automatically zap the dirty buffer */
 	state_save_register_func_postload(video_generic_postload);
-	return 0;
 }
 
 
@@ -354,7 +353,6 @@ VIDEO_START( generic_bitmapped )
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_bitmap("video", 0, "tmpbitmap", tmpbitmap);
-	return 0;
 }
 
 
@@ -649,8 +647,8 @@ void flip_screen_y_set(int on)
 
 PALETTE_INIT( black_and_white )
 {
-	palette_set_color(machine,0,0x00,0x00,0x00); /* black */
-	palette_set_color(machine,1,0xff,0xff,0xff); /* white */
+	palette_set_color(machine,0,RGB_BLACK); /* black */
+	palette_set_color(machine,1,RGB_WHITE); /* white */
 }
 
 
@@ -693,7 +691,7 @@ PALETTE_INIT( RRRR_GGGG_BBBB )
 		bit3 = (color_prom[i + 2*Machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -755,7 +753,7 @@ READ32_HANDLER( paletteram32_r )
 WRITE8_HANDLER( paletteram_RRRGGGBB_w )
 {
 	paletteram[offset] = data;
-	palette_set_color(Machine, offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data >> 0));
+	palette_set_color_rgb(Machine, offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data >> 0));
 }
 
 
@@ -766,7 +764,7 @@ WRITE8_HANDLER( paletteram_RRRGGGBB_w )
 WRITE8_HANDLER( paletteram_BBGGGRRR_w )
 {
 	paletteram[offset] = data;
-	palette_set_color(Machine, offset, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+	palette_set_color_rgb(Machine, offset, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 }
 
 
@@ -779,7 +777,7 @@ WRITE8_HANDLER( paletteram_BBGGRRII_w )
 	int i = (data >> 0) & 3;
 
 	paletteram[offset] = data;
-	palette_set_color(Machine, offset, pal4bit(((data >> 0) & 0x0c) | i),
+	palette_set_color_rgb(Machine, offset, pal4bit(((data >> 0) & 0x0c) | i),
 	                                   pal4bit(((data >> 2) & 0x0c) | i),
 	                                   pal4bit(((data >> 4) & 0x0c) | i));
 }
@@ -1044,9 +1042,9 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBRGBx_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
 	data = paletteram16[offset];
-	palette_set_color(Machine, offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
-	                                   pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
-	                                   pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
+	palette_set_color_rgb(Machine, offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
+	                                       pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
+	                                       pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
 }
 
 

@@ -45,9 +45,6 @@ VIDEO_START( speedbal )
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
 	tilemap_set_transmask(fg_tilemap,1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
-
-	return 0;
-
 }
 
 

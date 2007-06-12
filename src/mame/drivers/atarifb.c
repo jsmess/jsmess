@@ -121,7 +121,7 @@ int atarifb_game;
  *
  *************************************/
 
-static const unsigned short colortable_source[] =
+static const UINT16 colortable_source[] =
 {
 	0x02, 0x00, /* chars */
 	0x03, 0x02, /* sprites */
@@ -133,10 +133,10 @@ static const unsigned short colortable_source[] =
 
 static PALETTE_INIT( atarifb )
 {
-	palette_set_color(machine,0,0x00,0x00,0x00); /* black  */
-	palette_set_color(machine,1,0x80,0x80,0x80); /* grey  */
-	palette_set_color(machine,2,0xff,0xff,0xff); /* white  */
-	palette_set_color(machine,3,0x40,0x40,0x40); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine,1,MAKE_RGB(0x80,0x80,0x80)); /* grey  */
+	palette_set_color(machine,2,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine,3,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
 	memcpy(colortable,colortable_source,sizeof(colortable_source));
 }
 

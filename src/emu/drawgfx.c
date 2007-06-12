@@ -259,7 +259,7 @@ gfx_element *allocgfx(const gfx_layout *gl)
 	gfx->total_elements = gl->total;
 	gfx->color_granularity = 1 << gl->planes;
 	if (gfx->color_granularity <= 32)
-		gfx->pen_usage = malloc(gfx->total_elements * sizeof(*gfx->pen_usage));
+		gfx->pen_usage = malloc_or_die(gfx->total_elements * sizeof(*gfx->pen_usage));
 
 	/* raw graphics case */
 	if (gl->planeoffset[0] == GFX_RAW)
@@ -282,7 +282,7 @@ gfx_element *allocgfx(const gfx_layout *gl)
 		gfx->char_modulo = gfx->line_modulo * gfx->height;
 
 		/* allocate memory for the data */
-		gfx->gfxdata = malloc(gfx->total_elements * gfx->char_modulo * sizeof(UINT8));
+		gfx->gfxdata = malloc_or_die(gfx->total_elements * gfx->char_modulo * sizeof(UINT8));
 	}
 
 	return gfx;

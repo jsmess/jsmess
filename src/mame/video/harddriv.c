@@ -136,8 +136,6 @@ VIDEO_START( harddriv )
 
 	/* init VRAM pointers */
 	vram_mask = hdgsp_vram_size - 1;
-
-	return 0;
 }
 
 
@@ -381,7 +379,7 @@ INLINE void gsp_palette_change(int offset)
 	int red = (hdgsp_paletteram_lo[offset] >> 8) & 0xff;
 	int green = hdgsp_paletteram_lo[offset] & 0xff;
 	int blue = hdgsp_paletteram_hi[offset] & 0xff;
-	palette_set_color(Machine, offset, red, green, blue);
+	palette_set_color(Machine, offset, MAKE_RGB(red, green, blue));
 }
 
 

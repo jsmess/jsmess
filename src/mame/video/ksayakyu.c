@@ -40,7 +40,7 @@ PALETTE_INIT( ksayakyu )
 			b2=memory_region(REGION_PROMS)[j*16+i+8];
 
 			b1=b2|(b1<<8);
-			palette_set_color(machine,j*8+i,pal5bit(b1 >> 10),pal5bit(b1 >> 0),pal5bit(b1 >> 5));
+			palette_set_color_rgb(machine,j*8+i,pal5bit(b1 >> 10),pal5bit(b1 >> 0),pal5bit(b1 >> 5));
 		}
 }
 
@@ -65,8 +65,8 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const unsigned char *source = spriteram+spriteram_size-4;
-	const unsigned char *finish = spriteram;
+	const UINT8 *source = spriteram+spriteram_size-4;
+	const UINT8 *finish = spriteram;
 
 	while( source>=finish ) /* is order correct ? */
 	{
@@ -103,7 +103,6 @@ VIDEO_START(ksayakyu)
 	ksayakyu_tilemap = tilemap_create(get_ksayakyu_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,32,32*8);
 	ksayakyu_textmap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 8, 8,32,32);
 	tilemap_set_transparent_pen(ksayakyu_textmap,0);
-	return 0;
 }
 
 VIDEO_UPDATE(ksayakyu)

@@ -9,7 +9,7 @@
 
 static int LD1=0;
 static int LD2=0;
-static unsigned int NMION = 0;
+static UINT32 NMION = 0;
 
 /***************************************************************************
 bsktball_nmion_w

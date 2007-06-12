@@ -62,7 +62,6 @@ static MACHINE_RESET( suprgolf )
 static VIDEO_START( suprgolf )
 {
 	suprgolf_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32 );
-	return 0;
 }
 
 static VIDEO_UPDATE( suprgolf )

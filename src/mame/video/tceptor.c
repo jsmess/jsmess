@@ -65,7 +65,7 @@ PALETTE_INIT( tceptor )
 		bit3 = (color_prom[2*totcolors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 
@@ -257,7 +257,7 @@ WRITE8_HANDLER( tceptor_bg_scroll_w )
 
 /*******************************************************************/
 
-static int decode_bg(int region)
+static void decode_bg(int region)
 {
 	static const gfx_layout bg_layout =
 	{
@@ -272,12 +272,13 @@ static int decode_bg(int region)
 
 	int gfx_index = bg;
 	UINT8 *src = memory_region(region) + 0x8000;
-	unsigned char *buffer;
+	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
 
-	if (!(buffer = malloc(len)))
-		return 1;
+	buffer = malloc(len);
+
+	assert_always(buffer, "Out of memory");
 
 	/* expand rom tc2-19.10d */
 	for (i = 0; i < len / 2; i++)
@@ -296,11 +297,9 @@ static int decode_bg(int region)
 	/* set the color information */
 	Machine->gfx[gfx_index]->colortable = &Machine->remapped_colortable[2048];
 	Machine->gfx[gfx_index]->total_colors = 64;
-
-	return 0;
 }
 
-static int decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
+static void decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
 	Machine->gfx[gfx_index] = allocgfx(layout);
@@ -309,12 +308,10 @@ static int decode_sprite(int gfx_index, const gfx_layout *layout, const void *da
 	/* set the color information */
 	Machine->gfx[gfx_index]->colortable = &Machine->remapped_colortable[1024];
 	Machine->gfx[gfx_index]->total_colors = 64;
-
-	return 0;
 }
 
 // fix sprite order
-static int decode_sprite16(int region)
+static void decode_sprite16(int region)
 {
 	static const gfx_layout spr16_layout =
 	{
@@ -339,8 +336,7 @@ static int decode_sprite16(int region)
 	int i, y;
 
 	dst = (UINT8 *)malloc(len);
-	if (!src || !dst)
-		return 1;
+	assert_always(dst, "Out of memory");
 
 	for (i = 0; i < len / (4*4*16); i++)
 		for (y = 0; y < 16; y++)
@@ -359,16 +355,13 @@ static int decode_sprite16(int region)
 			       4);
 		}
 
-	if (decode_sprite(sprite16, &spr16_layout, dst))
-		return 1;
+	decode_sprite(sprite16, &spr16_layout, dst);
 
 	free(dst);
-
-	return 0;
 }
 
 // fix sprite order
-static int decode_sprite32(int region)
+static void decode_sprite32(int region)
 {
 	static const gfx_layout spr32_layout =
 	{
@@ -399,8 +392,7 @@ static int decode_sprite32(int region)
 	int i;
 
 	dst = (UINT8 *)malloc(len);
-	if (!src || !dst)
-		return 1;
+	assert_always(dst, "Out of memory");
 
 	memset(dst, 0, len);
 
@@ -415,12 +407,9 @@ static int decode_sprite32(int region)
 		memcpy(&dst[size * (i + total)], &src[size * (code + total)], size);
 	}
 
-	if (decode_sprite(sprite32, &spr32_layout, dst))
-		return 1;
+	decode_sprite(sprite32, &spr32_layout, dst);
 
 	free(dst);
-
-	return 0;
 }
 
 static void mark_all_tiles_dirty(void)
@@ -438,26 +427,21 @@ VIDEO_START( tceptor )
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)
 			break;
-	if (gfx_index + 4 > MAX_GFX_ELEMENTS)
-		return 1;
+	assert(gfx_index + 4 <= MAX_GFX_ELEMENTS);
 
 	bg = gfx_index++;
-	if (decode_bg(REGION_GFX2))
-		return 1;
+	decode_bg(REGION_GFX2);
 
 	sprite16 = gfx_index++;
-	if (decode_sprite16(REGION_GFX3))
-		return 1;
+	decode_sprite16(REGION_GFX3);
 
 	sprite32 = gfx_index++;
-	if (decode_sprite32(REGION_GFX4))
-		return 1;
+	decode_sprite32(REGION_GFX4);
 
 	/* allocate temp bitmaps */
 	temp_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	if (namco_road_init(gfx_index))
-		return 1;
+	namco_road_init(gfx_index);
 
 	namco_road_set_transparent_color(machine->remapped_colortable[0xfff]);
 
@@ -479,8 +463,6 @@ VIDEO_START( tceptor )
 	state_save_register_global(bg2_scroll_y);
 
 	state_save_register_func_postload(mark_all_tiles_dirty);
-
-	return 0;
 }
 
 

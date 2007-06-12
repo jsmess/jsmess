@@ -22,7 +22,7 @@ VIDEO_UPDATE( flkatck );
 WRITE8_HANDLER( flkatck_k007121_w );
 WRITE8_HANDLER( flkatck_k007121_regs_w );
 
-extern unsigned char *k007121_ram;
+extern UINT8 *k007121_ram;
 extern int flkatck_irq_enabled;
 
 /***************************************************************************/
@@ -40,7 +40,7 @@ static INTERRUPT_GEN( flkatck_interrupt )
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bankaddress = 0;
 
 	/* bits 3-4: coin counters */

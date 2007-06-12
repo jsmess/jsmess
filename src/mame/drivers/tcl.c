@@ -43,7 +43,6 @@ Notes:
 
 VIDEO_START( tcl )
 {
-	return 0;
 }
 VIDEO_UPDATE( tcl )
 {

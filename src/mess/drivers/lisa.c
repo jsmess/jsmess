@@ -35,8 +35,8 @@ ADDRESS_MAP_END
 /* init with simple, fixed, B/W palette */
 static PALETTE_INIT( lisa )
 {
-	palette_set_color(machine, 0, 0xff, 0xff, 0xff);
-	palette_set_color(machine, 1, 0x00, 0x00, 0x00);
+	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
 }
 
 

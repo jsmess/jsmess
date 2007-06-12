@@ -355,7 +355,7 @@ static unsigned short cgenie_colortable[] =
 /* Initialise the palette */
 static PALETTE_INIT( cgenie )
 {
-	palette_set_colors(machine, 0, cgenie_palette, sizeof(cgenie_palette) / 3);
+	palette_set_colors_rgb(machine, 0, cgenie_palette, sizeof(cgenie_palette) / 3);
 	memcpy(colortable, cgenie_colortable, sizeof(cgenie_colortable));
 }
 

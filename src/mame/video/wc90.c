@@ -95,8 +95,6 @@ VIDEO_START( wc90 )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_START( wc90t )
@@ -107,8 +105,6 @@ VIDEO_START( wc90t )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);
-
-	return 0;
 }
 
 

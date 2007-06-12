@@ -29,8 +29,6 @@ VIDEO_START( ninjakd2 )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
 	bitmap_sp = auto_bitmap_alloc (machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-
-	return 0;
 }
 
 WRITE8_HANDLER( ninjakd2_bgvideoram_w )

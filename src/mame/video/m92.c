@@ -50,7 +50,7 @@ static INT32 pf1_shape,pf2_shape,pf3_shape;
 static INT32 m92_sprite_list;
 
 int m92_raster_irq_position,m92_raster_enable;
-unsigned char *m92_vram_data,*m92_spritecontrol;
+UINT8 *m92_vram_data,*m92_spritecontrol;
 int m92_game_kludge;
 
 extern void m92_sprite_interrupt(void);
@@ -442,8 +442,6 @@ VIDEO_START( m92 )
 	state_save_register_global(m92_palette_bank);
 
 	state_save_register_global_pointer(paletteram, 0x1000);
-
-	return 0;
 }
 
 /*****************************************************************************/

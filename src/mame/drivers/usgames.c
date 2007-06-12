@@ -41,7 +41,7 @@ extern UINT8 *usg_videoram,*usg_charram;
 
 static WRITE8_HANDLER( usg_rombank_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);

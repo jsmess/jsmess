@@ -52,7 +52,7 @@ VIDEO_START( pc1403 )
 		DOWN=pos[1].y;
 		RIGHT=pos[1].x;
 	}
-    return video_start_pocketc(machine);
+    video_start_pocketc(machine);
 }
 
 

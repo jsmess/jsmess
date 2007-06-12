@@ -97,7 +97,7 @@ PALETTE_INIT( thedeep )
 {
 	int i;
 	for (i = 0;i < 512;i++)
-		palette_set_color(machine,i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
+		palette_set_color_rgb(machine,i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));
 }
 
 /***************************************************************************
@@ -115,8 +115,6 @@ VIDEO_START( thedeep )
 	tilemap_set_transparent_pen( tilemap_1,  0 );
 
 	tilemap_set_scroll_cols(tilemap_0, 0x20);	// column scroll for the background
-
-	return 0;
 }
 
 /***************************************************************************

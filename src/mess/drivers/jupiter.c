@@ -95,7 +95,7 @@ static unsigned short jupiter_colortable[] =
 
 static PALETTE_INIT( jupiter )
 {
-	palette_set_colors(machine, 0, jupiter_palette, sizeof(jupiter_palette) / 3);
+	palette_set_colors_rgb(machine, 0, jupiter_palette, sizeof(jupiter_palette) / 3);
 	memcpy (colortable, jupiter_colortable, sizeof (jupiter_colortable));
 }
 

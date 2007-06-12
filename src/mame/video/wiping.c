@@ -45,7 +45,7 @@ PALETTE_INIT( wiping )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -200,7 +200,7 @@ VIDEO_UPDATE( wiping )
 #if 0
 {
 	int i,j;
-	extern unsigned char *wiping_soundregs;
+	extern UINT8 *wiping_soundregs;
 
 	for (i = 0;i < 8;i++)
 	{

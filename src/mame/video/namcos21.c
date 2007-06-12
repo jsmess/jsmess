@@ -28,7 +28,7 @@ static INT16 *mpPolyFrameBufferZ;
 static UINT16 *mpPolyFrameBufferPens2;
 static INT16 *mpPolyFrameBufferZ2;
 
-static int
+static void
 AllocatePolyFrameBuffer( void )
 {
 	mpPolyFrameBufferZ     = auto_malloc( FRAMEBUFFER_SIZE_IN_BYTES );
@@ -38,7 +38,6 @@ AllocatePolyFrameBuffer( void )
 
 		namcos21_ClearPolyFrameBuffer();
 		namcos21_ClearPolyFrameBuffer();
-		return 0;
 } /* AllocatePolyFrameBuffer */
 
 void
@@ -91,15 +90,11 @@ static int objcode2tile( int code )
 
 VIDEO_START( namcos21 )
 {
-	if( AllocatePolyFrameBuffer()==0 )
-	{
-		namco_obj_init(
-			0,		/* gfx bank */
-			0xf,	/* reverse palette mapping */
-			objcode2tile );
-		return 0;
-	}
-	return -1;
+	AllocatePolyFrameBuffer();
+	namco_obj_init(
+		0,		/* gfx bank */
+		0xf,	/* reverse palette mapping */
+		objcode2tile );
 } /* VIDEO_START( namcos21 ) */
 
 static void
@@ -135,7 +130,7 @@ update_palette( void )
 		g = data1&0xff;
 		b = data2&0xff;
 
-		palette_set_color( Machine,i, r,g,b );
+		palette_set_color( Machine,i, MAKE_RGB(r,g,b) );
 	}
 } /* update_palette */
 

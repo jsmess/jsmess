@@ -7,8 +7,8 @@
 #include "driver.h"
 
 
-unsigned char *brkthru_scroll;
-unsigned char *brkthru_videoram;
+UINT8 *brkthru_scroll;
+UINT8 *brkthru_videoram;
 size_t brkthru_videoram_size;
 static int bgscroll;
 static int bgbasecolor;
@@ -67,7 +67,7 @@ PALETTE_INIT( brkthru )
 		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -122,8 +122,6 @@ VIDEO_START( brkthru )
 
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
 	tilemap_set_transparent_pen( bg_tilemap, 0 );
-
-	return 0;
 }
 
 
@@ -135,7 +133,7 @@ WRITE8_HANDLER( brkthru_1800_w )
 	else if (offset == 1)
 	{
 		int bankaddress;
-		unsigned char *RAM = memory_region(REGION_CPU1);
+		UINT8 *RAM = memory_region(REGION_CPU1);
 
 
 		/* bit 0-2 = ROM bank select */
@@ -165,7 +163,7 @@ WRITE8_HANDLER( brkthru_1800_w )
 
 
 #if 0
-static void show_register( mame_bitmap *bitmap, int x, int y, unsigned long data )
+static void show_register( mame_bitmap *bitmap, int x, int y, UINT32 data )
 {
 	char buf[5];
 
@@ -286,7 +284,7 @@ VIDEO_UPDATE( brkthru )
 	/* fg layer */
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
-/*  show_register(bitmap,8,8,(unsigned long)flipscreen); */
+/*  show_register(bitmap,8,8,(UINT32)flipscreen); */
 
 	return 0;
 }

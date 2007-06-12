@@ -81,10 +81,7 @@ static int zoomy_conv_table[] =
 
 VIDEO_START( taitoair )
 {
-	if ( TC0080VCO_vh_start(0,0,1,1,-2))
-		return 1;
-
-	return 0;
+	TC0080VCO_vh_start(0,0,1,1,-2);
 }
 
 

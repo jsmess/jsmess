@@ -446,7 +446,7 @@ static PALETTE_INIT( vtech2 )
 {
 	int i;
 
-	palette_set_colors(machine, 0, vt_palette, sizeof(vt_palette) / 3);
+	palette_set_colors_rgb(machine, 0, vt_palette, sizeof(vt_palette) / 3);
 
 	for (i = 0; i < 256; i++)
 	{

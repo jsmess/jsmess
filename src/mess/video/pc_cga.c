@@ -320,7 +320,7 @@ static VIDEO_START( pc_cga )
 		videoram = auto_malloc(videoram_size);
 	memory_set_bankptr(11, videoram);
 
-	return internal_pc_cga_video_start(M6845_PERSONALITY_GENUINE);
+	internal_pc_cga_video_start(M6845_PERSONALITY_GENUINE);
 }
 
 
@@ -363,7 +363,7 @@ static void pc_cga_check_palette(void)
 	if (p != cga.palette)
 	{
 		for(i = 0; i < (sizeof(cga_palette) / (3 * CGA_PALETTE_SETS)); i++)
-			palette_set_color(Machine, i, cga_palette[i + p][0], 
+			palette_set_color_rgb(Machine, i, cga_palette[i + p][0], 
 					     cga_palette[i + p][1],
 					     cga_palette[i + p][2]);
 		cga.palette = p;
@@ -804,7 +804,7 @@ static void cga_gfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
 	/* The fact that our palette is located in cga_colortable is a vestigial
 	 * aspect from when we were doing that ugly trick where drawgfx() would
 	 * handle graphics drawing.  Truthfully, we should probably be using
-	 * palette_set_color() here and not doing the palette lookup in the loop
+	 * palette_set_color_rgb() here and not doing the palette lookup in the loop
 	 */
 	palette = &cga_colortable[256*2 + 16*2] + colorset * 4;
 
@@ -826,7 +826,7 @@ static void cga_gfx_1bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
 	/* The fact that our palette is located in cga_colortable is a vestigial
 	 * aspect from when we were doing that silly trick where drawgfx() would
 	 * handle graphics drawing.  Truthfully, we should probably be using
-	 * palette_set_color() here and not doing the palette lookup in the loop
+	 * palette_set_color_rgb() here and not doing the palette lookup in the loop
 	 */
 	palette = &cga_colortable[256*2] + (cga.color_select & 0xf) * 2;
 
@@ -1072,7 +1072,7 @@ static void cga_pgfx_2bpp(mame_bitmap *bitmap, struct crtc6845 *crtc)
 	/* The fact that our palette is located in cga_colortable is a vestigial
 	 * aspect from when we were doing that ugly trick where drawgfx() would
 	 * handle graphics drawing.  Truthfully, we should probably be using
-	 * palette_set_color() here and not doing the palette lookup in the loop
+	 * palette_set_color_rgb() here and not doing the palette lookup in the loop
 	 */
 	palette = &cga_colortable[256*2 + 16*2] + colorset * 4;
 
@@ -1422,5 +1422,5 @@ VIDEO_START( pc1512 )
 	pc1512.read = 0;
 	
 	/* PC1512 cut-down 6845 */
-	return internal_pc_cga_video_start(M6845_PERSONALITY_PC1512);
+	internal_pc_cga_video_start(M6845_PERSONALITY_PC1512);
 }

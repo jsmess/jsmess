@@ -606,8 +606,6 @@ VIDEO_START( lastday )
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global(sprites_disabled);
-
-	return 0;
 }
 
 VIDEO_START( gulfstrm )
@@ -626,8 +624,6 @@ VIDEO_START( gulfstrm )
 
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
-
-	return 0;
 }
 
 VIDEO_START( pollux )
@@ -644,8 +640,6 @@ VIDEO_START( pollux )
 
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
-
-	return 0;
 }
 
 VIDEO_START( bluehawk )
@@ -666,8 +660,6 @@ VIDEO_START( bluehawk )
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global_array(fg2scroll8);
-
-	return 0;
 }
 
 VIDEO_START( flytiger )
@@ -686,8 +678,6 @@ VIDEO_START( flytiger )
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global(flytiger_pri);
-
-	return 0;
 }
 
 VIDEO_START( primella )
@@ -707,8 +697,6 @@ VIDEO_START( primella )
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global(tx_pri);
-
-	return 0;
 }
 
 VIDEO_START( rshark )
@@ -731,8 +719,6 @@ VIDEO_START( rshark )
 	state_save_register_global_array(fgscroll8);
 	state_save_register_global_array(fg2scroll8);
 	state_save_register_global(rshark_pri);
-
-	return 0;
 }
 
 VIDEO_START( popbingo )
@@ -742,8 +728,6 @@ VIDEO_START( popbingo )
 
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global(rshark_pri);
-
-	return 0;
 }
 
 VIDEO_EOF( dooyong )

@@ -54,7 +54,7 @@ PALETTE_INIT( 1943 )
 
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
 	color_prom += 3*machine->drv->total_colors;
@@ -190,8 +190,6 @@ VIDEO_START( 1943 )
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void c1943_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int priority )

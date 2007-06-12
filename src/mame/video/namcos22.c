@@ -761,7 +761,7 @@ poly3d_DrawQuad( mame_bitmap *pBitmap, int textureBank, int color, Poly3dVertex 
 static void
 mydrawgfxzoom(
 	mame_bitmap *dest_bmp,const gfx_element *gfx,
-	unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+	UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 	const rectangle *clip,int transparency,int transparent_color,
 	int scalex, int scaley, int z, int prioverchar )
 {
@@ -1367,8 +1367,8 @@ UINT32 *namcos22_czattr;
 UINT32 *namcos22_tilemapattr;
 
 static int cgsomethingisdirty;
-static unsigned char *cgdirty;
-static unsigned char *dirtypal;
+static UINT8 *cgdirty;
+static UINT8 *dirtypal;
 
 READ32_HANDLER( namcos22_czram_r )
 {
@@ -1529,11 +1529,11 @@ namcos22_draw_direct_poly( const UINT16 *pSource )
    node->data.quad3d.vh = -240;
 } /* namcos22_draw_direct_poly */
 
-static int
+static void
 Prepare3dTexture( void *pTilemapROM, void *pTextureROM )
 {
     int i;
-    if( pTilemapROM && pTextureROM )
+    assert( pTilemapROM && pTextureROM );
     { /* following setup is Namco System 22 specific */
 	      const UINT8 *pPackedTileAttr = 0x200000 + (UINT8 *)pTilemapROM;
 	      UINT8 *pUnpackedTileAttr = auto_malloc(0x080000*2);
@@ -1549,10 +1549,8 @@ Prepare3dTexture( void *pTilemapROM, void *pTextureROM )
    	   mpTextureTileMap16 = pTilemapROM;
          mpTextureTileData = pTextureROM;
    	   PatchTexture();
- 	      return 0;
       }
    }
-   return -1;
 } /* Prepare3dTexture */
 
 static void
@@ -1792,7 +1790,7 @@ UpdatePaletteS( void ) /* for Super System22 - apply gamma correction and prelim
 				int r = nthbyte(paletteram32,which+0x00000);
 				int g = nthbyte(paletteram32,which+0x08000);
 				int b = nthbyte(paletteram32,which+0x10000);
-				palette_set_color( Machine,which,r,g,b );
+				palette_set_color( Machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
 		}
@@ -1813,7 +1811,7 @@ UpdatePalette( void ) /* for System22 - ignore gamma/fader effects for now */
 				int r = nthbyte(paletteram32,which+0x00000);
 				int g = nthbyte(paletteram32,which+0x08000);
 				int b = nthbyte(paletteram32,which+0x10000);
-				palette_set_color( Machine,which,r,g,b );
+				palette_set_color( Machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
 		}
@@ -2550,7 +2548,7 @@ WRITE32_HANDLER( namcos22_paletteram_w )
 	dirtypal[offset&(0x7fff/4)] = 1;
 }
 
-static int
+static void
 video_start_common( void )
 {
 	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64 );
@@ -2559,43 +2557,29 @@ video_start_common( void )
 	mbDSPisActive = 0;
 	memset( namcos22_polygonram, 0xcc, 0x20000 );
 
-	if( Prepare3dTexture(
-		memory_region(REGION_TEXTURE_TILEMAP),
-      Machine->gfx[GFX_TEXTURE_TILE]->gfxdata ) == 0 )
-	{
-		dirtypal = auto_malloc(NAMCOS22_PALETTE_SIZE/4);
-		{
-			cgdirty = auto_malloc( 0x400 );
-			{
-				mPtRomSize = memory_region_length(REGION_POINTROM)/3;
-				mpPolyL = memory_region(REGION_POINTROM);
-				mpPolyM = mpPolyL + mPtRomSize;
-				mpPolyH = mpPolyM + mPtRomSize;
-				return 0; /* no error */
-			}
-		}
-	}
-	return -1; /* error */
+	Prepare3dTexture(memory_region(REGION_TEXTURE_TILEMAP), Machine->gfx[GFX_TEXTURE_TILE]->gfxdata );
+	dirtypal = auto_malloc(NAMCOS22_PALETTE_SIZE/4);
+	cgdirty = auto_malloc( 0x400 );
+	mPtRomSize = memory_region_length(REGION_POINTROM)/3;
+	mpPolyL = memory_region(REGION_POINTROM);
+	mpPolyM = mpPolyL + mPtRomSize;
+	mpPolyH = mpPolyM + mPtRomSize;
 }
 
 VIDEO_START( namcos22 )
 {
-   int result;
    mbSuperSystem22 = 0;
-   result = video_start_common();
-   return result;
+   video_start_common();
 }
 
 VIDEO_START( namcos22s )
 {
-   int result;
    mbSuperSystem22 = 1;
    namcos22_czram[0] = auto_malloc( 0x200 );
    namcos22_czram[1] = auto_malloc( 0x200 );
    namcos22_czram[2] = auto_malloc( 0x200 );
    namcos22_czram[3] = auto_malloc( 0x200 );
-   result = video_start_common();
-   return result;
+   video_start_common();
 }
 
 VIDEO_UPDATE( namcos22s )
@@ -2742,7 +2726,7 @@ Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name )
    fprintf( f, "%s:\n", name );
    for( addr=addr1; addr<=addr2; addr+=16 )
    {
-      unsigned char data[16];
+      UINT8 data[16];
       int bHasNonZero = 0;
       int i;
       for( i=0; i<16; i++ )

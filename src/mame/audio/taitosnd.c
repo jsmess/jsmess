@@ -28,13 +28,13 @@
 
 typedef struct TC0140SYT
 {
-	unsigned char slavedata[4];	/* Data on master->slave port (4 nibbles) */
-	unsigned char masterdata[4];/* Data on slave->master port (4 nibbles) */
-	unsigned char mainmode;		/* Access mode on master cpu side */
-	unsigned char submode;		/* Access mode on slave cpu side */
-	unsigned char status;		/* Status data */
-	unsigned char nmi_enabled;	/* 1 if slave cpu has nmi's enabled */
-	unsigned char nmi_req;		/* 1 if slave cpu has a pending nmi */
+	UINT8 slavedata[4];	/* Data on master->slave port (4 nibbles) */
+	UINT8 masterdata[4];/* Data on slave->master port (4 nibbles) */
+	UINT8 mainmode;		/* Access mode on master cpu side */
+	UINT8 submode;		/* Access mode on slave cpu side */
+	UINT8 status;		/* Status data */
+	UINT8 nmi_enabled;	/* 1 if slave cpu has nmi's enabled */
+	UINT8 nmi_req;		/* 1 if slave cpu has a pending nmi */
 } TC0140SYT;
 
 static struct TC0140SYT tc0140syt;
@@ -213,7 +213,7 @@ WRITE8_HANDLER( taitosound_slave_comm_w )
 
 READ8_HANDLER( taitosound_slave_comm_r )
 {
-	unsigned char res = 0;
+	UINT8 res = 0;
 
 	switch ( tc0140syt.submode )
 	{

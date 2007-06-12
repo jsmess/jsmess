@@ -19,6 +19,8 @@
 #if (HAS_PPC603)
 static void ppcdrc603_init(int index, int clock, const void *_config, int (*irqcallback)(int));
 static void ppcdrc603_exit(void);
+#endif
+#if (HAS_PPC603 || HAS_MPC8240)
 static void ppcdrc603_reset(void);
 static int ppcdrc603_execute(int cycles);
 static void ppcdrc603_set_irq_line(int irqline, int state);
@@ -1207,7 +1209,9 @@ static void ppcdrc603_exit(void)
 #endif
 	drc_exit(ppc.drc);
 }
+#endif
 
+#if (HAS_PPC603 || HAS_MPC8240)
 static void ppcdrc603_reset(void)
 {
 	ppc.pc = ppc.npc = 0xfff00100;

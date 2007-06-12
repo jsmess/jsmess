@@ -189,7 +189,7 @@ PALETTE_INIT(cardline)
 		bit0 = (data >> 0) & 0x01;
 		bit1 = (data >> 1) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

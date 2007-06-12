@@ -24,7 +24,7 @@ static tilemap *bg_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	unsigned char code = aeroboto_videoram[tile_index];
+	UINT8 code = aeroboto_videoram[tile_index];
 	SET_TILE_INFO(
 			0,
 			code + (aeroboto_charbank << 8),
@@ -63,8 +63,6 @@ VIDEO_START( aeroboto )
 		free(temp);
 	}
 	#endif
-
-	return 0;
 }
 
 

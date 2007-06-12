@@ -82,7 +82,7 @@ static WRITE32_HANDLER( paletteram32_w )
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(Machine, offset, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
 }
 
 

@@ -105,7 +105,7 @@ bypass ROM check sum
 };
 
 static const int *mcu_patch_data = NULL;
-static unsigned char *mcu_shared_ram;
+static UINT8 *mcu_shared_ram;
 static WRITE8_HANDLER( cexctsccr_mcu_halt_w )
 {
 	const int *p;

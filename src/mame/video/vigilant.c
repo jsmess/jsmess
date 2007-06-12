@@ -23,8 +23,8 @@ static rectangle bottomvisiblearea =
 	6*8, 32*8-1
 };
 
-unsigned char *vigilant_paletteram;
-unsigned char *vigilant_sprite_paletteram;
+UINT8 *vigilant_paletteram;
+UINT8 *vigilant_sprite_paletteram;
 
 static int horiz_scroll_low=0;
 static int horiz_scroll_high=0;
@@ -43,8 +43,6 @@ VIDEO_START( vigilant )
 	video_start_generic(machine);
 
 	bg_bitmap = auto_bitmap_alloc(512*4,256,machine->screen[0].format);
-
-	return 0;
 }
 
 
@@ -113,7 +111,7 @@ WRITE8_HANDLER( vigilant_paletteram_w )
 	g = (paletteram[bank + offset + 0x100] << 3) & 0xFF;
 	b = (paletteram[bank + offset + 0x200] << 3) & 0xFF;
 
-	palette_set_color(Machine, (bank >> 2) + offset,r,g,b);
+	palette_set_color(Machine, (bank >> 2) + offset,MAKE_RGB(r,g,b));
 }
 
 
@@ -298,13 +296,13 @@ VIDEO_UPDATE( vigilant )
 		g = (paletteram[0x500 + 16 * rear_color + i] << 3) & 0xFF;
 		b = (paletteram[0x600 + 16 * rear_color + i] << 3) & 0xFF;
 
-		palette_set_color(machine,512 + i,r,g,b);
+		palette_set_color(machine,512 + i,MAKE_RGB(r,g,b));
 
 		r = (paletteram[0x400 + 16 * rear_color + 32 + i] << 3) & 0xFF;
 		g = (paletteram[0x500 + 16 * rear_color + 32 + i] << 3) & 0xFF;
 		b = (paletteram[0x600 + 16 * rear_color + 32 + i] << 3) & 0xFF;
 
-		palette_set_color(machine,512 + 16 + i,r,g,b);
+		palette_set_color(machine,512 + 16 + i,MAKE_RGB(r,g,b));
 	}
 
 	if (rear_disable)	 /* opaque foreground */

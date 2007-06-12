@@ -34,8 +34,6 @@ VIDEO_START( starfire )
 	memset(starfire_videoram, 0, 0x2000);
 	memset(starfire_colorram, 0, 0x2000);
 	memset(scanline_dirty, 1, 256);
-
-	return 0;
 }
 
 
@@ -80,7 +78,7 @@ WRITE8_HANDLER( starfire_colorram_w )
 		if (!(starfire_vidctrl1 & 0x40))
 			return;
 
-		palette_set_color(Machine, palette_index, pal3bit((data << 1) & 0x06) | ((offset >> 8) & 0x01), pal3bit(data >> 5), pal3bit(data >> 2));
+		palette_set_color_rgb(Machine, palette_index, pal3bit((data << 1) & 0x06) | ((offset >> 8) & 0x01), pal3bit(data >> 5), pal3bit(data >> 2));
 	}
 
 	/* handle writes to the rest of color RAM */

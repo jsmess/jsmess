@@ -85,10 +85,7 @@ static void supbtime_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)
 
 VIDEO_START(supbtime)
 {
-	if (deco16_1_video_init())
-		return 1;
-
-	return 0;
+	deco16_1_video_init();
 }
 
 VIDEO_UPDATE(supbtime)

@@ -76,8 +76,6 @@ VIDEO_START( quizpani )
 	bg_tilemap  = tilemap_create(bg_tile_info, bg_scan,TILEMAP_OPAQUE,16,16,256,32);
 	txt_tilemap = tilemap_create(txt_tile_info,bg_scan,TILEMAP_TRANSPARENT,16,16,256,32);
 	tilemap_set_transparent_pen(txt_tilemap,15);
-
-	return 0;
 }
 
 VIDEO_UPDATE( quizpani )

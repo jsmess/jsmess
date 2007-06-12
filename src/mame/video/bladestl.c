@@ -52,13 +52,8 @@ VIDEO_START( bladestl )
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 1;
 
-	if (K007342_vh_start(0,tile_callback))
-		return 1;
-
-	if (K007420_vh_start(1,sprite_callback))
-		return 1;
-
-	return 0;
+	K007342_vh_start(0,tile_callback);
+	K007420_vh_start(1,sprite_callback);
 }
 
 /***************************************************************************

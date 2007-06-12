@@ -96,14 +96,11 @@ VIDEO_START( toobin )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 128,64);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
+	atarimo_init(0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,48);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
-
-	return 0;
 }
 
 
@@ -130,7 +127,7 @@ WRITE16_HANDLER( toobin_paletteram_w )
 		if (green) green += 38;
 		if (blue) blue += 38;
 
-		palette_set_color(Machine, offset & 0x3ff, red, green, blue);
+		palette_set_color(Machine, offset & 0x3ff, MAKE_RGB(red, green, blue));
 		if (!(newword & 0x8000))
 			palette_set_brightness(Machine, offset & 0x3ff, brightness);
 		else

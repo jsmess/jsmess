@@ -383,7 +383,7 @@ void write_cram_value(int offset, int data)
 	  	r = ((data >> 1)&0x07);
 		g = ((data >> 5)&0x07);
 		b = ((data >> 9)&0x07);
-		palette_set_color(Machine,offset,r<<5,g<<5,b<<5);
+		palette_set_color_rgb(Machine,offset,pal3bit(r),pal3bit(g),pal3bit(b));
 		megadrive_vdp_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
 		megadrive_vdp_palette_lookup_shadow[offset] = (b<<1) | (g<<6) | (r<<11);
 		megadrive_vdp_palette_lookup_highlight[offset] = ((b|0x08)<<1) | ((g|0x08)<<6) | ((r|0x08)<<11);
@@ -2484,8 +2484,6 @@ VIDEO_START(megadriv)
 	memset(megadrive_vdp_palette_lookup,0x00,0x40*2);
 	memset(megadrive_vdp_palette_lookup_shadow,0x00,0x40*2);
 	memset(megadrive_vdp_palette_lookup_highlight,0x00,0x40*2);
-
-	return 0;
 }
 
 VIDEO_UPDATE(megadriv)

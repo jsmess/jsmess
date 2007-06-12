@@ -50,7 +50,7 @@ WRITE8_HANDLER( nbmj8991_palette_type1_w )
 	g = ((paletteram[offset + 1] & 0xf0) >> 4);
 	b = ((paletteram[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_HANDLER( nbmj8991_palette_type2_w )
@@ -67,7 +67,7 @@ WRITE8_HANDLER( nbmj8991_palette_type2_w )
 	g = (((paletteram[offset + 0] & 0x03) << 3) | ((paletteram[offset + 1] & 0xe0) >> 5));
 	b = ((paletteram[offset + 1] & 0x1f) >> 0);
 
-	palette_set_color(Machine, (offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(Machine, (offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( nbmj8991_palette_type3_w )
@@ -84,7 +84,7 @@ WRITE8_HANDLER( nbmj8991_palette_type3_w )
 	g = ((paletteram[offset + 0] & 0xf0) >> 4);
 	b = ((paletteram[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 /******************************************************************************
@@ -151,7 +151,7 @@ static void nbmj8991_vramflip(void)
 {
 	static int nbmj8991_flipscreen_old = 0;
 	int x, y;
-	unsigned char color1, color2;
+	UINT8 color1, color2;
 
 	if (nbmj8991_flipscreen == nbmj8991_flipscreen_old) return;
 
@@ -189,7 +189,7 @@ static void blitter_timer_callback(int param)
 
 static void nbmj8991_gfxdraw(void)
 {
-	unsigned char *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(REGION_GFX1);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -197,7 +197,7 @@ static void nbmj8991_gfxdraw(void)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	unsigned char color, color1, color2;
+	UINT8 color, color1, color2;
 	int gfxaddr;
 
 	nb1413m3_busyctr = 0;
@@ -300,7 +300,6 @@ VIDEO_START( nbmj8991 )
 	nbmj8991_videoram = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT8));
 	nbmj8991_clut = auto_malloc(0x800 * sizeof(UINT8));
 	memset(nbmj8991_videoram, 0x00, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
-	return 0;
 }
 
 VIDEO_UPDATE( nbmj8991_type1 )

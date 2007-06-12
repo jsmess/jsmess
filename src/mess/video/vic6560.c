@@ -171,7 +171,6 @@ VIDEO_START( vic6560 )
 	pointerelement->total_colors = 3;
 	vic6560_bitmap = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	add_exit_callback(machine, vic6560_video_stop);
-	return 0;
 }
 
 WRITE8_HANDLER ( vic6560_port_w )

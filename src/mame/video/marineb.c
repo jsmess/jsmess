@@ -51,8 +51,6 @@ VIDEO_START( marineb )
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
-
-	return 0;
 }
 
 

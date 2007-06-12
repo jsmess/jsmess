@@ -226,7 +226,7 @@ ADDRESS_MAP_END
 
 static UINT32 adpcm_pos[2],adpcm_end[2];
 
-//static unsigned char adpcm_d[0x08];
+//static UINT8 adpcm_d[0x08];
 //0 - start ROM offset LSB
 //1 - start ROM offset MSB
 //2 - end ROM offset LSB

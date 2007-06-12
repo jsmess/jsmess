@@ -8,10 +8,10 @@ DRIVER_INIT( ckongb );
 
 /*----------- defined in video/cclimber.c -----------*/
 
-extern unsigned char *cclimber_bsvideoram;
+extern UINT8 *cclimber_bsvideoram;
 extern size_t cclimber_bsvideoram_size;
-extern unsigned char *cclimber_bigspriteram;
-extern unsigned char *cclimber_column_scroll;
+extern UINT8 *cclimber_bigspriteram;
+extern UINT8 *cclimber_column_scroll;
 
 extern UINT8 *toprollr_videoram2;
 extern UINT8 *toprollr_videoram3;

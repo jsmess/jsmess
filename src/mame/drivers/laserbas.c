@@ -25,7 +25,6 @@ VIDEO_START(laserbas)
 {
 	vram1=auto_malloc(0x8000);
 	vram2=auto_malloc(0x8000);
-	return 0;
 }
 
 VIDEO_UPDATE(laserbas)
@@ -72,7 +71,7 @@ static READ8_HANDLER( read_unk )
 
 static WRITE8_HANDLER(palette_w)
 {
-	palette_set_color(Machine,offset,pal3bit(data>>5),pal3bit(data>>2),pal2bit(data));
+	palette_set_color_rgb(Machine,offset,pal3bit(data>>5),pal3bit(data>>2),pal2bit(data));
 }
 
 static WRITE8_HANDLER(vrambank_w)

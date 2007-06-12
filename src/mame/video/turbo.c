@@ -74,7 +74,7 @@ PALETTE_INIT( turbo )
 		bit1 = (i >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -113,7 +113,7 @@ PALETTE_INIT( subroc3d )
 		bit1 = (i >> 7) & 1;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -154,7 +154,7 @@ PALETTE_INIT( buckrog )
 		bit3 = (i >> 7) & 1;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -180,7 +180,6 @@ VIDEO_START( turbo )
 
 	/* initialize the foreground tilemap */
 	state->fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 32,32);
-	return 0;
 }
 
 
@@ -194,7 +193,6 @@ VIDEO_START( buckrog )
 	/* allocate the bitmap RAM */
 	state->buckrog_bitmap_ram = auto_malloc(0xe000);
 	state_save_register_global_pointer(state->buckrog_bitmap_ram, 0xe000);
-	return 0;
 }
 
 

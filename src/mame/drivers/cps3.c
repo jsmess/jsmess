@@ -251,7 +251,6 @@ Notes:
 
 VIDEO_START(cps3)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(cps3)

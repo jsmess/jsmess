@@ -2,7 +2,7 @@
 
 /*defined in drivers/darkmist.c */
 
-extern unsigned char * darkmist_scroll;
+extern UINT8 * darkmist_scroll;
 extern int darkmist_hw;
 
 static int spritebank;
@@ -77,7 +77,7 @@ PALETTE_INIT(darkmist)
 	int i;
 
 	/* black color */
-	palette_set_color(machine, 0x100, 0,0,0);
+	palette_set_color(machine, 0x100, MAKE_RGB(0,0,0));
 
 	/* color lookup tables */
 
@@ -122,7 +122,7 @@ WRITE8_HANDLER(darkmist_palette_w)
 {
 	paletteram[offset]=data;
 	offset&=0xff;
-	palette_set_color(Machine, offset, pal4bit(paletteram[offset+0x200]), pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]));
+	palette_set_color_rgb(Machine, offset, pal4bit(paletteram[offset+0x200]), pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]));
 }
 
 READ8_HANDLER(darkmist_palette_r)
@@ -142,8 +142,6 @@ VIDEO_START(darkmist)
 	txtilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32 );
 	tilemap_set_transparent_pen(fgtilemap, 0);
 	tilemap_set_transparent_pen(txtilemap, 0);
-
-	return 0;
 }
 
 VIDEO_UPDATE( darkmist)

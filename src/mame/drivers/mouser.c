@@ -15,8 +15,8 @@
 #include "driver.h"
 #include "sound/ay8910.h"
 
-unsigned char mouser_sound_byte;
-unsigned char mouser_nmi_enable;
+UINT8 mouser_sound_byte;
+UINT8 mouser_nmi_enable;
 
 /* From "video/mouser.c" */
 PALETTE_INIT( mouser );

@@ -38,7 +38,5 @@ VIDEO_START( atom )
 	cfg.get_attributes = atom_get_attributes;
 	cfg.get_video_ram = atom_get_video_ram;
 	m6847_init(&cfg);
-
-	return 0;
 }
 

@@ -95,7 +95,7 @@ void fd1094_setstate_and_decrypt(int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-void fd1094_cmp_callback(unsigned int val, int reg)
+void fd1094_cmp_callback(UINT32 val, int reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{

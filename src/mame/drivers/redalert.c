@@ -14,12 +14,12 @@ ask.  - Mike Balfour (mab22@po.cwru.edu)
 #include "sound/ay8910.h"
 
 /* video/redalert.c */
-extern unsigned char *redalert_backram;
-extern unsigned char *redalert_spriteram1;
-extern unsigned char *redalert_spriteram2;
-extern unsigned char *redalert_spriteram3;
-extern unsigned char *redalert_characterram;
-extern unsigned char *redalert_characterram2;
+extern UINT8 *redalert_backram;
+extern UINT8 *redalert_spriteram1;
+extern UINT8 *redalert_spriteram2;
+extern UINT8 *redalert_spriteram3;
+extern UINT8 *redalert_characterram;
+extern UINT8 *redalert_characterram2;
 WRITE8_HANDLER( redalert_backram_w );
 WRITE8_HANDLER( redalert_spriteram1_w );
 WRITE8_HANDLER( redalert_spriteram2_w );
@@ -303,7 +303,7 @@ static const gfx_decode demoneye_gfxdecodeinfo[] =
 };
 
 /* Arbitrary colortable */
-static unsigned short colortable_source[] =
+static UINT16 colortable_source[] =
 {
 	0,7,
 	0,6,
@@ -323,15 +323,15 @@ static unsigned short colortable_source[] =
 static PALETTE_INIT( redalert )
 {
 	/* Arbitrary colors */
-	palette_set_color(machine,0,0x40,0x80,0xff);	/* Background */
-	palette_set_color(machine,1,0x00,0x00,0xff);	/* Blue */
-	palette_set_color(machine,2,0xff,0x00,0xff);	/* Magenta */
-	palette_set_color(machine,3,0x00,0xff,0xff);	/* Cyan */
-	palette_set_color(machine,4,0xff,0x00,0x00);	/* Red */
-	palette_set_color(machine,5,0xff,0x80,0x00);	/* Orange */
-	palette_set_color(machine,6,0xff,0xff,0x00);	/* Yellow */
-	palette_set_color(machine,7,0xff,0xff,0xff);	/* White */
-	palette_set_color(machine,8,0x00,0x00,0x00);	/* Black */
+	palette_set_color(machine,0,MAKE_RGB(0x40,0x80,0xff));	/* Background */
+	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0xff));	/* Blue */
+	palette_set_color(machine,2,MAKE_RGB(0xff,0x00,0xff));	/* Magenta */
+	palette_set_color(machine,3,MAKE_RGB(0x00,0xff,0xff));	/* Cyan */
+	palette_set_color(machine,4,MAKE_RGB(0xff,0x00,0x00));	/* Red */
+	palette_set_color(machine,5,MAKE_RGB(0xff,0x80,0x00));	/* Orange */
+	palette_set_color(machine,6,MAKE_RGB(0xff,0xff,0x00));	/* Yellow */
+	palette_set_color(machine,7,MAKE_RGB(0xff,0xff,0xff));	/* White */
+	palette_set_color(machine,8,MAKE_RGB(0x00,0x00,0x00));	/* Black */
 
 	memcpy(colortable,colortable_source,sizeof(colortable_source));
 }

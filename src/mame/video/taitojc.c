@@ -187,8 +187,7 @@ VIDEO_START( taitojc )
 		if (machine->gfx[taitojc_gfx_index] == 0)
 			break;
 
-	if (taitojc_gfx_index == MAX_GFX_ELEMENTS)
-		return 1;
+	assert(taitojc_gfx_index != MAX_GFX_ELEMENTS);
 
 	taitojc_tilemap = tilemap_create(taitojc_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 64, 64);
 	taitojc_dirty_map = auto_malloc(TAITOJC_NUM_TILES);
@@ -221,8 +220,6 @@ VIDEO_START( taitojc )
 	framebuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-
-	return 0;
 }
 
 //static int tick = 0;

@@ -71,7 +71,7 @@ static void lasso_set_color(int i, int data)
 	bit1 = (data >> 7) & 0x01;
 	b = 0x4f * bit0 + 0xa8 * bit1;
 
-	palette_set_color( Machine,i,r,g,b );
+	palette_set_color( Machine,i,MAKE_RGB(r,g,b) );
 }
 
 PALETTE_INIT( lasso )
@@ -149,8 +149,6 @@ VIDEO_START( lasso )
 
 	/* register for saving */
 	state_save_register_global(gfxbank);
-
-	return 0;
 }
 
 VIDEO_START( wwjgtin )
@@ -164,8 +162,6 @@ VIDEO_START( wwjgtin )
 	/* register for saving */
 	state_save_register_global(gfxbank);
 	state_save_register_global(wwjgtin_track_enable);
-
-	return 0;
 }
 
 VIDEO_START( pinbo )
@@ -175,8 +171,6 @@ VIDEO_START( pinbo )
 
 	/* register for saving */
 	state_save_register_global(gfxbank);
-
-	return 0;
 }
 
 

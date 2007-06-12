@@ -145,8 +145,6 @@ VIDEO_START(silkroad)
 
 	fg3_tilemap = tilemap_create(get_fg3_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64, 64);
 		tilemap_set_transparent_pen(fg3_tilemap,0);
-
-	return 0;
 }
 
 static int enable1=1,enable2=1,enable3=1;

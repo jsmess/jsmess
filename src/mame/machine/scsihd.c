@@ -247,7 +247,7 @@ int scsihd_dispatch(int operation, void *file, INT64 intparm, UINT8 *ptrparm)
 			break;
 
 		case SCSIOP_ALLOC_INSTANCE:
-			instance = (SCSIHd *)malloc(sizeof(SCSIHd));
+			instance = (SCSIHd *)malloc_or_die(sizeof(SCSIHd));
 
 			instance->lba = 0;
 			instance->blocks = 0;

@@ -7,7 +7,6 @@
 
 VIDEO_START(igs_180)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(igs_180)

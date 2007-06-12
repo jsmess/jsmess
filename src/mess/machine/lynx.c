@@ -1117,7 +1117,7 @@ WRITE8_HANDLER(mikey_write)
 		mikey.data[offset]=data;
 		lynx_draw_lines(lynx_line);
 #if 0
-		palette_set_color(offset&0xf,
+		palette_set_color_rgb(offset&0xf,
 					(mikey.data[0xb0+(offset&0xf)]&0xf)<<4,
 					(mikey.data[0xa0+(offset&0xf)]&0xf)<<4,
 					mikey.data[0xb0+(offset&0xf)]&0xf0 );

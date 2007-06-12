@@ -17,7 +17,7 @@ static int palbank;
 static int total_pixmaps;
 
 
-static int common_vh_start(int num_pixmaps)
+static void common_vh_start(int num_pixmaps)
 {
 	int i;
 
@@ -32,18 +32,16 @@ static int common_vh_start(int num_pixmaps)
 		else
 			pixmap[i] = NULL;
 	}
-
-	return 0;
 }
 
 VIDEO_START( hnayayoi )
 {
-	return common_vh_start(4);	/* 4 bitmaps -> 2 layers */
+	common_vh_start(4);	/* 4 bitmaps -> 2 layers */
 }
 
 VIDEO_START( untoucha )
 {
-	return common_vh_start(8);	/* 8 bitmaps -> 4 layers */
+	common_vh_start(8);	/* 8 bitmaps -> 4 layers */
 }
 
 

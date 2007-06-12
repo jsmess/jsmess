@@ -27,7 +27,7 @@ A3-1J
 #include "sound/ay8910.h"
 
 static tilemap *fg_tilemap;
-static unsigned char *char_bank;
+static UINT8 *char_bank;
 
 WRITE8_HANDLER( supdrapo_videoram_w )
 {
@@ -252,8 +252,6 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( supdrapo )
 {
 	fg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( supdrapo )

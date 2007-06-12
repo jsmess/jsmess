@@ -95,8 +95,6 @@ VIDEO_START( drtomy )
 	tilemap_fg = tilemap_create(get_tile_info_fg,tilemap_scan_rows,TILEMAP_TRANSPARENT, 16,16,32,32);
 
 	tilemap_set_transparent_pen(tilemap_fg,0);
-
-	return 0;
 }
 
 VIDEO_UPDATE( drtomy )

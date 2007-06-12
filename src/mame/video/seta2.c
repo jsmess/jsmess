@@ -363,7 +363,6 @@ VIDEO_START( seta2 )
 	buffered_spriteram16 = auto_malloc(spriteram_size);
 
 	yoffset = 0;
-	return 0;
 }
 
 VIDEO_START( seta2_offset )
@@ -371,7 +370,6 @@ VIDEO_START( seta2_offset )
 	video_start_seta2(machine);
 
 	yoffset = 0x10;
-	return 0;
 }
 
 VIDEO_UPDATE( seta2 )

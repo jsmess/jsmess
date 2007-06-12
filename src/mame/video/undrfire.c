@@ -26,15 +26,11 @@ VIDEO_START( undrfire )
 
 	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
 
-	if (TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0))
-		return 1;
-
-	if (TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0))
-		return 1;
+	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
+	TC0480SCP_vh_start(TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);
 
 	for (i=0; i<16384; i++) /* Fix later - some weird colours in places */
-		palette_set_color(machine,i,0,0,0);
-	return 0;
+		palette_set_color(machine,i,MAKE_RGB(0,0,0));
 }
 
 /***************************************************************

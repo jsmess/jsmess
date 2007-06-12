@@ -321,7 +321,7 @@ WRITE8_HANDLER( balsente_random_reset_w )
 
 READ8_HANDLER( balsente_random_num_r )
 {
-	unsigned int cc;
+	UINT32 cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
 	cc = activecpu_gettotalcycles();

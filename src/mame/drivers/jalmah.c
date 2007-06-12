@@ -192,8 +192,6 @@ VIDEO_START( jalmah )
 	tilemap_set_transparent_pen(sc1_tilemap,15);
 	tilemap_set_transparent_pen(sc2_tilemap,15);
 	tilemap_set_transparent_pen(sc3_tilemap,15);
-
-	return 0;
 }
 
 #define MCU_READ(_number_,_bit_,_offset_,_retval_)\

@@ -69,7 +69,7 @@ namcofl_install_palette( void )
 
 			for( byte_offset=0; byte_offset<4; byte_offset++ )
 			{
-				palette_set_color( Machine, pen++, r&0xff, g&0xff, b&0xff);
+				palette_set_color_rgb( Machine, pen++, r&0xff, g&0xff, b&0xff);
 				r>>=8; g>>=8; b>>=8;
 			}
 		}
@@ -179,13 +179,7 @@ VIDEO_START( namcofl )
 	credits1 = credits2 = 0;
 	old_coin_state = readinputport(3)&0x30;
 
-	if( namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), TilemapCB ) == 0 )
-	{
-		namco_obj_init(NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
-		if( namco_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION)==0 )
-		{
-			return 0;
-		}
-	}
-	return -1;
+	namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), TilemapCB );
+	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
+	namco_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namcofl_vh_start */

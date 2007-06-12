@@ -487,25 +487,19 @@ static void update_widget_irq(void);
 
 static VIDEO_START( seattle )
 {
-	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0))
-		return 1;
+	voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
 	voodoo_set_stall_callback(0, voodoo_stall);
-
-	return 0;
 }
 
 
 static VIDEO_START( flagstaff )
 {
-	if (voodoo_start(0, 0, VOODOO_1, 2, 4, 4))
-		return 1;
+	voodoo_start(0, 0, VOODOO_1, 2, 4, 4);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
 	voodoo_set_stall_callback(0, voodoo_stall);
-
-	return 0;
 }
 
 

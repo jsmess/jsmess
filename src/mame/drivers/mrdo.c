@@ -17,7 +17,7 @@ VBlank duration: 1/VSYNC * (70/262) = 4368 us
 #include "sound/sn76496.h"
 
 
-extern unsigned char *mrdo_bgvideoram,*mrdo_fgvideoram;
+extern UINT8 *mrdo_bgvideoram,*mrdo_fgvideoram;
 WRITE8_HANDLER( mrdo_bgvideoram_w );
 WRITE8_HANDLER( mrdo_fgvideoram_w );
 WRITE8_HANDLER( mrdo_scrollx_w );
@@ -33,7 +33,7 @@ VIDEO_UPDATE( mrdo );
 /* if a read from this address doesn't return the value it expects. */
 READ8_HANDLER( mrdo_SECRE_r )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	return RAM[ activecpu_get_reg(Z80_HL) ];
 }
 

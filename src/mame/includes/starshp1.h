@@ -34,10 +34,10 @@ extern int starshp1_attract;
 
 /*----------- defined in video/starshp1.c -----------*/
 
-extern unsigned char *starshp1_playfield_ram;
-extern unsigned char *starshp1_hpos_ram;
-extern unsigned char *starshp1_vpos_ram;
-extern unsigned char *starshp1_obj_ram;
+extern UINT8 *starshp1_playfield_ram;
+extern UINT8 *starshp1_hpos_ram;
+extern UINT8 *starshp1_vpos_ram;
+extern UINT8 *starshp1_obj_ram;
 
 extern int starshp1_ship_explode;
 extern int starshp1_ship_picture;

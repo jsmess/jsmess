@@ -1715,7 +1715,7 @@ static void BuildTable(void)
 {
 	int i;
 	if(!OpTable)
-		OpTable=malloc(sizeof(_OP)*0x10000);
+		OpTable=malloc_or_die(sizeof(_OP)*0x10000);
 	for(i=0;i<0x10000;++i)
 		OpTable[i]=DecodeOp(i);
 }

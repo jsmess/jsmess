@@ -42,7 +42,7 @@ PALETTE_INIT( kangaroo )
 	int i;
 
 	for (i = 0;i < machine->drv->total_colors;i++)
-		palette_set_color(machine,i,pal1bit(i >> 2),pal1bit(i >> 1),pal1bit(i >> 0));
+		palette_set_color_rgb(machine,i,pal1bit(i >> 2),pal1bit(i >> 1),pal1bit(i >> 0));
 }
 
 
@@ -59,8 +59,6 @@ VIDEO_START( kangaroo )
 	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	videoram = auto_malloc(machine->screen[0].width*machine->screen[0].height);
-
-	return 0;
 }
 
 
@@ -86,7 +84,7 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 
 WRITE8_HANDLER( kangaroo_bank_select_w )
 {
-	unsigned char *RAM = memory_region(REGION_GFX1);
+	UINT8 *RAM = memory_region(REGION_GFX1);
 
 
 	/* this is a VERY crude way to handle the banked ROMs - but it's */
@@ -116,7 +114,7 @@ WRITE8_HANDLER( kangaroo_color_mask_w )
 		g = ((i & 2) >> 1) * ((data & 0x10) ? 0xff : 0x7f);
 		b = ((i & 1) >> 0) * ((data & 0x08) ? 0xff : 0x7f);
 
-		palette_set_color(Machine,8+i,r,g,b);
+		palette_set_color(Machine,8+i,MAKE_RGB(r,g,b));
 	}
 
 	/* color mask for B plane */
@@ -129,7 +127,7 @@ WRITE8_HANDLER( kangaroo_color_mask_w )
 		g = ((i & 2) >> 1) * ((data & 0x02) ? 0xff : 0x7f);
 		b = ((i & 1) >> 0) * ((data & 0x01) ? 0xff : 0x7f);
 
-		palette_set_color(Machine,16+i,r,g,b);
+		palette_set_color(Machine,16+i,MAKE_RGB(r,g,b));
 	}
 }
 

@@ -129,7 +129,7 @@ static void fir_filter(INT32 *input, INT16 *output, int count);
 #define intelLong(x) (x)
 #else
 #define intelShort(x) (((x) << 8) | ((x) >> 8))
-#define intelLong(x) ((((x) << 24) | (((unsigned long) (x)) >> 24) | (( (x) & 0x0000ff00) << 8) | (( (x) & 0x00ff0000) >> 8)))
+#define intelLong(x) ((((x) << 24) | (((UINT32) (x)) >> 24) | (( (x) & 0x0000ff00) << 8) | (( (x) & 0x00ff0000) >> 8)))
 #endif
 
 static FILE *wavfile;

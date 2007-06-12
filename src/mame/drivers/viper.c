@@ -42,10 +42,7 @@ static UINT8 backup_ram[0x2000];
 
 VIDEO_START(viper)
 {
-	if (voodoo_start(0, 0, VOODOO_3, 16, 16, 16))
-		return 1;
-
-	return 0;
+	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
 }
 
 VIDEO_UPDATE(viper)

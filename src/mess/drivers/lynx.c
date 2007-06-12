@@ -195,7 +195,7 @@ static PALETTE_INIT( lynx )
 
     for (i=0; i< 0x1000; i++)
 	{
-		palette_set_color(machine, i,
+		palette_set_color_rgb(machine, i,
 			((i >> 0) & 0x0f) * 0x11,
 			((i >> 4) & 0x0f) * 0x11,
 			((i >> 8) & 0x0f) * 0x11);

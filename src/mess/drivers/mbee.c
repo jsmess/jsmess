@@ -232,7 +232,7 @@ static const UINT8 palette[] =
 static PALETTE_INIT( mbee )
 {
 	int i;
-	palette_set_colors(machine, 0, palette, sizeof(palette) / 3);
+	palette_set_colors_rgb(machine, 0, palette, sizeof(palette) / 3);
 	for( i = 0; i < 256; i++ )
 	{
 		colortable[2*i+0] = i / 32;

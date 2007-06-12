@@ -51,13 +51,10 @@ VIDEO_START( wcvol95 )
 	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
 	state_save_register_global_pointer(paletteram16, 0x1000/2);
 
-	if (deco16_1_video_init())
-		return 1;
+	deco16_1_video_init();
 
 	deco16_set_tilemap_bank_callback(0, simpl156_bank_callback);
 	deco16_set_tilemap_bank_callback(1, simpl156_bank_callback);
-
-	return 0;
 }
 
 /* spriteram is really 16-bit.. this can be changed to use 16-bit ram like the tilemaps
@@ -213,7 +210,7 @@ static WRITE32_HANDLER(wcvol95_eeprom_w)
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 

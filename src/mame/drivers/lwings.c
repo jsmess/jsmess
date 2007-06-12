@@ -75,7 +75,7 @@ READ8_HANDLER( avengers_adpcm_r )
 
 static WRITE8_HANDLER( lwings_bankswitch_w )
 {
-	unsigned char *RAM;
+	UINT8 *RAM;
 	int bank;
 
 	/* bit 0 is flip screen */

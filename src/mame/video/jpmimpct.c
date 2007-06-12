@@ -60,7 +60,7 @@ WRITE16_HANDLER( bt477_w )
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(Machine, bt477.address, color[0], color[1], color[2]);
+				palette_set_color(Machine, bt477.address, MAKE_RGB(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */
@@ -98,12 +98,12 @@ READ16_HANDLER( bt477_r )
  *
  *************************************/
 
-void jpmimpct_to_shiftreg(unsigned int address, UINT16 *shiftreg)
+void jpmimpct_to_shiftreg(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &tms_vram[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-void jpmimpct_from_shiftreg(unsigned int address, UINT16 *shiftreg)
+void jpmimpct_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&tms_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }
@@ -146,6 +146,4 @@ VIDEO_START( jpmimpct )
 	state_save_register_global(bt477.pixmask);
 	state_save_register_global(bt477.command);
 	state_save_register_global(bt477.color);
-
-	return 0;
 }

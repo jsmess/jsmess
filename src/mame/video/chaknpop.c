@@ -65,7 +65,7 @@ PALETTE_INIT( chaknpop )
 		bit2 = (col >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -198,8 +198,6 @@ VIDEO_START( chaknpop )
 
 	state_save_register_func_postload(set_vram_bank);
 	state_save_register_func_postload(tx_tilemap_mark_all_dirty);
-
-	return 0;
 }
 
 

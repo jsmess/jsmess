@@ -126,7 +126,7 @@ static UINT8		window_width;				/* window width */
 ******************************************************************************/
 
 
-int start_genesis_vdp(int screen_number)
+void start_genesis_vdp(int screen_number)
 {
 	static const UINT8 vdp_init[24] =
 	{
@@ -199,13 +199,11 @@ int start_genesis_vdp(int screen_number)
 	state_save_register_global(bgcol);
 	state_save_register_global(window_down);
 	state_save_register_global(window_vpos);
-
-	return 0;
 }
 
 VIDEO_START(genesis)
 {
-	return start_genesis_vdp(0);
+	start_genesis_vdp(0);
 }
 
 
@@ -218,8 +216,6 @@ VIDEO_START( segac2 )
 	genesis_sp_pal_lookup[1] = 0x110;
 	genesis_sp_pal_lookup[2] = 0x120;
 	genesis_sp_pal_lookup[3] = 0x130;
-
-	return 0;
 }
 
 
@@ -227,10 +223,7 @@ VIDEO_START( megatech )
 {
 	start_genesis_vdp(1);
 
-	if (start_megatech_video_normal())
-		return 1;
-
-	return 0;
+	start_megatech_video_normal();
 }
 
 
@@ -238,14 +231,11 @@ VIDEO_START( megaplay )
 {
 	start_genesis_vdp(0);
 
-	if (start_megatech_video_normal())
-		return 1;
-
-	return 0;
+	start_megatech_video_normal();
 }
 
 
-int start_system18_vdp(void)
+void start_system18_vdp(void)
 {
 	start_genesis_vdp(0);
 
@@ -254,8 +244,6 @@ int start_system18_vdp(void)
 	genesis_bg_pal_lookup[1] = genesis_sp_pal_lookup[1] = 0x1810;
 	genesis_bg_pal_lookup[2] = genesis_sp_pal_lookup[2] = 0x1820;
 	genesis_bg_pal_lookup[3] = genesis_sp_pal_lookup[3] = 0x1830;
-
-	return 0;
 }
 
 
@@ -523,7 +511,7 @@ static void vdp_data_w(int data)
 		case 0x03:		/* Palette write */
 			{
 				int offset = (vdp_address/2) % CRAM_SIZE;
-				palette_set_color(Machine, offset + genesis_palette_base, pal3bit(data >> 1), pal3bit(data >> 5), pal3bit(data >> 9));
+				palette_set_color_rgb(Machine, offset + genesis_palette_base, pal3bit(data >> 1), pal3bit(data >> 5), pal3bit(data >> 9));
 			}
 			break;
 

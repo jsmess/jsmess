@@ -1,7 +1,7 @@
 /*----------- defined in drivers/tnzs.c -----------*/
 
-extern unsigned char *tnzs_objram, *tnzs_sharedram;
-extern unsigned char *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
+extern UINT8 *tnzs_objram, *tnzs_sharedram;
+extern UINT8 *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
 
 
 /*----------- defined in machine/tnzs.c -----------*/

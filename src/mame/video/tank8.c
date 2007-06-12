@@ -96,8 +96,6 @@ VIDEO_START( tank8 )
 
 	tilemap_set_scrolly(tilemap1, 0, 2 * 24);
 	tilemap_set_scrolly(tilemap2, 0, 2 * 24);
-
-	return 0;
 }
 
 

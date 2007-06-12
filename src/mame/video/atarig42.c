@@ -126,8 +126,7 @@ VIDEO_START( atarig42 )
 	adjusted_modesc.palettebase = atarig42_motion_object_base;
 	for (i = 0; i < 8; i++)
 		adjusted_modesc.colormask.data[i] &= atarig42_motion_object_mask;
-	if (!atarirle_init(0, &adjusted_modesc))
-		return 1;
+	atarirle_init(0, &adjusted_modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,32);
@@ -139,7 +138,6 @@ VIDEO_START( atarig42 )
 	playfield_color_bank = 0;
 	playfield_xscroll = 0;
 	playfield_yscroll = 0;
-	return 0;
 }
 
 

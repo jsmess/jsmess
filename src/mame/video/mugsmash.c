@@ -144,8 +144,6 @@ VIDEO_START( mugsmash )
 	tilemap_set_transparent_pen(mugsmash_tilemap1,0);
 
 	mugsmash_tilemap2 = tilemap_create(get_mugsmash_tile_info2,tilemap_scan_rows,TILEMAP_OPAQUE, 16, 16,32,32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( mugsmash )

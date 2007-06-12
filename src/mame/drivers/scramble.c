@@ -70,7 +70,7 @@ static void reset_talking (void)
 
 int ad2083_speech_rom_read_bit(void)
 {
-	unsigned char *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(REGION_SOUND1);
 	int bit;
 
 	speech_rom_address %= memory_region_length(REGION_SOUND1);
@@ -1999,7 +1999,6 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(scramble_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_COLORTABLE_LENGTH(8*4)
 
 	MDRV_PALETTE_INIT(scramble)
 	MDRV_VIDEO_START(scramble)

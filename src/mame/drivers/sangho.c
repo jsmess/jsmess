@@ -226,7 +226,7 @@ static INTERRUPT_GEN( sangho_interrupt )
 
 static VIDEO_START( sangho )
 {
-	return v9938_init (machine, MODEL_V9938, 0x20000, msx_vdp_interrupt);
+	v9938_init (machine, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
 static MACHINE_DRIVER_START(pzlestar)

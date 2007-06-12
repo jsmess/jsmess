@@ -61,7 +61,7 @@ PALETTE_INIT( thepit )
        this is wrong, but I don't know where to pick the colors from */
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 
 	for (i = 0; i < machine->drv->total_colors - 8; i++)
@@ -83,7 +83,7 @@ PALETTE_INIT( thepit )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i + 8, r, g, b);
+		palette_set_color(machine, i + 8, MAKE_RGB(r, g, b));
 	}
 
 	/* background priority colors */
@@ -115,7 +115,7 @@ PALETTE_INIT( suprmous )
        this is wrong, but I don't know where to pick the colors from */
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette_set_color_rgb(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 
 	for (i = 0; i < machine->drv->total_colors - 8; i++)
@@ -126,7 +126,7 @@ PALETTE_INIT( suprmous )
 
 		UINT8 b = BITSWAP8(color_prom[i + 0x00], 0, 1, 2, 3, 4, 5, 6, 7) & 0x1f;
 
-		palette_set_color(machine, i + 8, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine, i + 8, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
 	for (i = 0;i < machine->drv->color_table_len;i++)
@@ -205,16 +205,12 @@ VIDEO_START( thepit )
 	video_start_common(8, 4);
 
 	graphics_bank = 0;	/* not used in this game */
-
-	return 0;
 }
 
 
 VIDEO_START( intrepid )
 {
 	video_start_common(8, 4);
-
-	return 0;
 }
 
 
@@ -223,8 +219,6 @@ VIDEO_START( suprmous )
 	video_start_common(4, 8);
 
 	graphics_bank = 0;	/* not used in this game */
-
-	return 0;
 }
 
 

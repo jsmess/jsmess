@@ -300,7 +300,7 @@ for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
         keys       |= m;
         keyed_on   |= m;
         vl          = DSPregs[ ( v<<4 ) + 4 ];
-        vp->samp_id = *( unsigned long * )&sd[ vl ];
+        vp->samp_id = *( UINT32 * )&sd[ vl ];
         vp->mem_ptr = LEtoME16( sd[ vl ].vptr );
 
 #ifdef DBG_KEY
@@ -359,7 +359,7 @@ for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
         continue;
         }
 
-    vp->pitch = LEtoME16( *( ( unsigned short * )&DSPregs[ V + 2 ] ) )
+    vp->pitch = LEtoME16( *( ( UINT16 * )&DSPregs[ V + 2 ] ) )
               & 0x3FFF;
 
 #ifndef NO_PMOD
@@ -432,7 +432,7 @@ for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
                     }
                 }
             vp->header_cnt = 8;
-            vl             = ( unsigned char )spc_ram[ vp->mem_ptr++ ];
+            vl             = ( UINT8 )spc_ram[ vp->mem_ptr++ ];
             vp->range      = vl >> 4;
             vp->end        = vl & 3;
             vp->filter     = ( vl & 12 ) >> 2;
@@ -497,7 +497,7 @@ for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
                stderr,
                "V%d: shifted delta=%04X\n",
                v,
-               ( unsigned short )outx
+               ( UINT16 )outx
                );
 #endif
 
@@ -539,7 +539,7 @@ for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
                stderr,
                "V%d: filter + delta=%04X\n",
                v,
-               ( unsigned short )outx
+               ( UINT16 )outx
                );
 #endif
 
@@ -651,12 +651,12 @@ fprintf(
 echo_base = ( ( DSPregs[ 0x6D ] << 8 ) + echo_ptr ) & 0xFFFF;
 FIRlbuf[ FIRptr ]
   = ( signed short )LEtoME16(
-                            *( unsigned short * )
+                            *( UINT16 * )
                               &spc_ram[ echo_base ]
                             );
 FIRrbuf[ FIRptr ]
   = ( signed short )LEtoME16(
-                            *( unsigned short * )
+                            *( UINT16 * )
                               &spc_ram[ echo_base + sizeof( short ) ]
                             );
 
@@ -732,16 +732,16 @@ if( !( DSPregs[ 0x6C ] & 0x20 ) )
     fprintf(
            stderr,
            "Echo: Writing %04X,%04X at location %04X\n",
-           ( unsigned short )echol,
-           ( unsigned short )echor,
+           ( UINT16 )echol,
+           ( UINT16 )echor,
            echo_base
            );
 #endif
 
-    *( unsigned short * )&spc_ram[ echo_base ]
-        = MEtoLE16( ( unsigned short )echol );
-    *( unsigned short * )&spc_ram[ echo_base + sizeof( short ) ]
-        = MEtoLE16( ( unsigned short )echor );
+    *( UINT16 * )&spc_ram[ echo_base ]
+        = MEtoLE16( ( UINT16 )echol );
+    *( UINT16 * )&spc_ram[ echo_base + sizeof( short ) ]
+        = MEtoLE16( ( UINT16 )echor );
     }
 
 echo_ptr += 2 * sizeof( short );

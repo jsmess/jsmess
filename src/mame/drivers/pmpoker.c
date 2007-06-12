@@ -408,8 +408,6 @@ VIDEO_START( pmpoker )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 29);
-
-	return 0;
 }
 
 VIDEO_UPDATE( pmpoker )
@@ -450,7 +448,7 @@ PALETTE_INIT( pottnpkr )
 		b = bit2 * 0xff;
 
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 

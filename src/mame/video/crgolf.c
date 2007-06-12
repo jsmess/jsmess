@@ -176,7 +176,7 @@ PALETTE_INIT( crgolf )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -205,8 +205,6 @@ VIDEO_START( crgolf )
 	state_save_register_bitmap("video", 0, "screena", screena);
 	state_save_register_bitmap("video", 0, "screenb", screenb);
 	state_save_register_bitmap("video", 0, "highbit", highbit);
-
-	return 0;
 }
 
 

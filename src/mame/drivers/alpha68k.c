@@ -789,7 +789,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( sound_bank_w )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 
 	bankaddress = 0x10000 + (data) * 0x4000;
 	memory_set_bankptr(7,&RAM[bankaddress]);

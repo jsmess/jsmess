@@ -71,7 +71,7 @@ static void theglobp_decrypt_rom_8(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 
@@ -108,7 +108,7 @@ static void theglobp_decrypt_rom_9(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 
@@ -143,7 +143,7 @@ static void theglobp_decrypt_rom_A(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 
@@ -178,7 +178,7 @@ static void theglobp_decrypt_rom_B(void)
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	RAM = memory_region(REGION_CPU1);
 
@@ -240,7 +240,7 @@ READ8_HANDLER( theglobp_decrypt_rom )
 
 MACHINE_RESET( theglobp )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little

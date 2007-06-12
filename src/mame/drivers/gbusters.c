@@ -24,7 +24,7 @@ VIDEO_START( gbusters );
 VIDEO_UPDATE( gbusters );
 
 static int palette_selected;
-static unsigned char *ram;
+static UINT8 *ram;
 
 static INTERRUPT_GEN( gbusters_interrupt )
 {
@@ -390,7 +390,7 @@ ROM_END
 
 static void gbusters_banking( int lines )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs = 0x10000;
 
 	/* bits 0-3 ROM bank */
@@ -407,7 +407,7 @@ static void gbusters_banking( int lines )
 
 static MACHINE_RESET( gbusters )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)gbusters_banking);
 

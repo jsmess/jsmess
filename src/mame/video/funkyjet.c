@@ -11,10 +11,7 @@
 
 VIDEO_START( funkyjet )
 {
-	if (deco16_1_video_init())
-		return 1;
-
-	return 0;
+	deco16_1_video_init();
 }
 
 static void funkyjet_drawsprites(mame_bitmap *bitmap, const rectangle *cliprect)

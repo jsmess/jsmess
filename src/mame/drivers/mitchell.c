@@ -116,8 +116,8 @@ WRITE8_HANDLER( pang_gfxctrl_w );
 WRITE8_HANDLER( pang_paletteram_w );
 READ8_HANDLER( pang_paletteram_r );
 
-extern unsigned char *pang_videoram;
-extern unsigned char *pang_colorram;
+extern UINT8 *pang_videoram;
+extern UINT8 *pang_colorram;
 
 extern size_t pang_videoram_size;
 
@@ -145,7 +145,7 @@ static struct EEPROM_interface eeprom_interface =
 	"0111"	/* erase command */
 };
 
-static unsigned char *nvram;
+static UINT8 *nvram;
 static size_t nvram_size;
 static int init_eeprom_count;
 

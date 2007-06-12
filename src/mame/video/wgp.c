@@ -54,18 +54,16 @@ static void dirty_piv_tilemaps(void)
 }
 
 
-int wgp_core_vh_start (int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
+void wgp_core_vh_start (int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
 {
 	wgp_piv_tilemap[0] = tilemap_create(get_piv0_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
 	wgp_piv_tilemap[1] = tilemap_create(get_piv1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
 	wgp_piv_tilemap[2] = tilemap_create(get_piv2_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64);
 
-	if (TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0))
-		return 1;
+	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
 
 	if (has_TC0110PCR())
-		if (TC0110PCR_vh_start())
-			return 1;
+		TC0110PCR_vh_start();
 
 	wgp_piv_xoffs = piv_xoffs;
 	wgp_piv_yoffs = piv_yoffs;
@@ -89,18 +87,16 @@ int wgp_core_vh_start (int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
 
 	/* colors from saved states are often screwy (and this doesn't help...) */
 	state_save_register_func_postload(dirty_piv_tilemaps);
-
-	return 0;
 }
 
 VIDEO_START( wgp )
 {
-	return (wgp_core_vh_start(0,0,32,16));
+	wgp_core_vh_start(0,0,32,16);
 }
 
 VIDEO_START( wgp2 )
 {
-	return (wgp_core_vh_start(4,2,32,16));
+	wgp_core_vh_start(4,2,32,16);
 }
 
 

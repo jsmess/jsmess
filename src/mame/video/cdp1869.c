@@ -183,7 +183,7 @@ static void cdp1869_set_color(int i, int c, int l)
 	g = (c & 1) ? luma : 0;
 	b = (c & 2) ? luma : 0;
 
-	palette_set_color( Machine, i, r, g, b );
+	palette_set_color( Machine, i, MAKE_RGB(r, g, b) );
 }
 
 PALETTE_INIT( cdp1869 )
@@ -472,8 +472,6 @@ VIDEO_START( cdp1869 )
 	state_save_register_item_array("cdp1869", 0, cdp1869.pram);
 	state_save_register_item("cdp1869", 0, cdp1869.cramsize);
 	state_save_register_item("cdp1869", 0, cdp1869.pramsize);
-
-	return 0;
 }
 
 VIDEO_UPDATE( cdp1869 )

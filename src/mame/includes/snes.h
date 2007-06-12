@@ -477,7 +477,7 @@ typedef enum                        /* ADSR state type              */
 
 typedef struct                      /* Voice state type             */
     {
-    unsigned short  mem_ptr;        /* Sample data memory pointer   */
+    UINT16  mem_ptr;        /* Sample data memory pointer   */
     int             end;            /* End or loop after block      */
     int             envcnt;         /* Counts to envelope update    */
     env_state_t32   envstate;       /* Current envelope state       */
@@ -489,7 +489,7 @@ typedef struct                      /* Voice state type             */
     int             on_cnt;         /* Is it time to turn on yet?   */
     int             pitch;          /* Sample pitch (4096->32000Hz) */
     int             range;          /* Last header's range          */
-    unsigned long   samp_id;        /* Sample ID#                   */
+    UINT32   samp_id;        /* Sample ID#                   */
     int             sampptr;        /* Where in sampbuf we are      */
     signed long     smp1;           /* Last sample (for BRR filter) */
     signed long     smp2;           /* Second-to-last sample decoded*/
@@ -498,8 +498,8 @@ typedef struct                      /* Voice state type             */
 
 typedef struct                      /* Source directory entry       */
     {
-    unsigned short  vptr;           /* Ptr to start of sample data  */
-    unsigned short  lptr;           /* Loop pointer in sample data  */
+    UINT16  vptr;           /* Ptr to start of sample data  */
+    UINT16  lptr;           /* Loop pointer in sample data  */
     } src_dir_type;
 
 /*========== MACROS ==========*/

@@ -9,7 +9,7 @@
 #include "driver.h"
 
 
-unsigned char *spcforce_scrollram;
+UINT8 *spcforce_scrollram;
 
 
 WRITE8_HANDLER( spcforce_flip_screen_w )

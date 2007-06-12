@@ -199,8 +199,6 @@ VIDEO_START( gdrawpkr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 31);
-
-	return 0;
 }
 
 VIDEO_UPDATE( gdrawpkr )
@@ -241,7 +239,7 @@ PALETTE_INIT( gdrawpkr )
 		b = bit2 * 0xff;
 
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 

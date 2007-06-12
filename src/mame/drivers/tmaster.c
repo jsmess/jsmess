@@ -18,7 +18,6 @@ GFX might be some kind of blitter device, with memory mapped framebuffer?
 
 VIDEO_START( tmaster )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( tmaster )

@@ -109,7 +109,7 @@ PALETTE_INIT( pc_aga )
 {
 	int i;
 	for(i = 0; i < (sizeof(cga_palette) / 3); i++)
-		palette_set_color(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
+		palette_set_color_rgb(machine, i, cga_palette[i][0], cga_palette[i][1], cga_palette[i][2]);
 	memcpy(colortable,cga_colortable,sizeof(cga_colortable));
 	memcpy((char*)colortable+sizeof(cga_colortable), mda_colortable, sizeof(mda_colortable));
 }
@@ -220,10 +220,8 @@ VIDEO_START( pc_aga )
 		break;
 	}
 
-	if (!pc_video_start(&config, pc_aga_choosevideomode, videoram_size))
-		return 1;
+	pc_video_start(&config, pc_aga_choosevideomode, videoram_size);
 	pc_aga_set_mode(AGA_COLOR);
-	return 0;
 }
 
 
@@ -231,8 +229,7 @@ VIDEO_START( pc200 )
 {
 	int buswidth;
 
-	if (video_start_pc_aga(machine))
-		return 1;
+	video_start_pc_aga(machine);
 
 	buswidth = cputype_databus_width(Machine->drv->cpu[0].cpu_type, ADDRESS_SPACE_PROGRAM);
 	switch(buswidth) {
@@ -245,7 +242,6 @@ VIDEO_START( pc200 )
 		fatalerror("CGA:  Bus width %d not supported\n", buswidth);
 		break;
 	}
-	return 0;
 }
 
 /***************************************************************************

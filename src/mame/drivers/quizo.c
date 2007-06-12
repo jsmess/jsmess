@@ -59,7 +59,7 @@ PALETTE_INIT(quizo)
 		bit2 = (*color_prom >> 7) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -67,8 +67,6 @@ PALETTE_INIT(quizo)
 VIDEO_START( quizo )
 {
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-	return 0;
 }
 
 VIDEO_UPDATE( quizo )

@@ -27,9 +27,9 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 
 #include <math.h>
 
-static void set_color(int color, unsigned char r, unsigned char g, unsigned char b, int highlight)
+static void set_color(int color, UINT8 r, UINT8 g, UINT8 b, int highlight)
 {
-	palette_set_color (Machine, color, r, g, b);
+	palette_set_color (Machine, color, MAKE_RGB(r, g, b));
 
 	if(highlight) {
 		r = 255-0.6*(255-r);
@@ -40,7 +40,7 @@ static void set_color(int color, unsigned char r, unsigned char g, unsigned char
 		g = 0.6*g;
 		b = 0.6*b;
 	}
-	palette_set_color (Machine,color+Machine->drv->total_colors/2, r, g, b);
+	palette_set_color (Machine,color+Machine->drv->total_colors/2, MAKE_RGB(r, g, b));
 }
 
 // 315-5242
@@ -74,7 +74,7 @@ enum {SYS24_TILES = 0x4000};
 
 static UINT16 *sys24_char_ram, *sys24_tile_ram;
 static UINT16 sys24_tile_mask;
-static unsigned char *sys24_char_dirtymap;
+static UINT8 *sys24_char_dirtymap;
 static int sys24_char_dirty, sys24_char_gfx_index;
 static tilemap *sys24_tile_layer[4];
 
@@ -134,15 +134,14 @@ static void sys24_tile_dirtyall(void)
 	sys24_char_dirty = 1;
 }
 
-int sys24_tile_vh_start(UINT16 tile_mask)
+void sys24_tile_vh_start(UINT16 tile_mask)
 {
 	sys24_tile_mask = tile_mask;
 
 	for(sys24_char_gfx_index = 0; sys24_char_gfx_index < MAX_GFX_ELEMENTS; sys24_char_gfx_index++)
 		if (Machine->gfx[sys24_char_gfx_index] == 0)
 			break;
-	if(sys24_char_gfx_index == MAX_GFX_ELEMENTS)
-		return 1;
+	assert(sys24_char_gfx_index != MAX_GFX_ELEMENTS);
 
 	sys24_char_ram = auto_malloc(0x80000);
 
@@ -180,8 +179,6 @@ int sys24_tile_vh_start(UINT16 tile_mask)
 	state_save_register_global_pointer(sys24_tile_ram, 0x10000/2);
 	state_save_register_global_pointer(sys24_char_ram, 0x80000/2);
 	state_save_register_func_postload(sys24_tile_dirtyall);
-
-	return 0;
 }
 
 void sys24_tile_update(void)
@@ -191,7 +188,7 @@ void sys24_tile_update(void)
 		for(i=0; i<SYS24_TILES; i++) {
 			if(sys24_char_dirtymap[i]) {
 				sys24_char_dirtymap[i] = 0;
-				decodechar(Machine->gfx[sys24_char_gfx_index], i, (unsigned char *)sys24_char_ram, &sys24_char_layout);
+				decodechar(Machine->gfx[sys24_char_gfx_index], i, (UINT8 *)sys24_char_ram, &sys24_char_layout);
 			}
 		}
 		tilemap_mark_all_tiles_dirty(sys24_tile_layer[0]);
@@ -639,13 +636,12 @@ WRITE32_HANDLER(sys24_char32_w)
 
 static UINT16 *sys24_sprite_ram;
 
-int sys24_sprite_vh_start(void)
+void sys24_sprite_vh_start(void)
 {
 	sys24_sprite_ram = auto_malloc(0x40000);
 
 	state_save_register_global_pointer(sys24_sprite_ram, 0x40000/2);
 	//  kc = 0;
-	return 0;
 }
 
 /* System24 sprites
@@ -882,11 +878,10 @@ READ16_HANDLER(sys24_sprite_r)
 
 static UINT16 sys24_mixer_reg[0x10];
 
-int sys24_mixer_vh_start(void)
+void sys24_mixer_vh_start(void)
 {
 	memset(sys24_mixer_reg, 0, sizeof(sys24_mixer_reg));
 	state_save_register_global_array(sys24_mixer_reg);
-	return 0;
 }
 
 WRITE16_HANDLER (sys24_mixer_w)

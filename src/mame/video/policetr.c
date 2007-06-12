@@ -49,8 +49,6 @@ VIDEO_START( policetr )
 
 	/* the destination bitmap is not directly accessible to the CPU */
 	dstbitmap = auto_malloc(DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
-
-	return 0;
 }
 
 
@@ -345,7 +343,7 @@ WRITE32_HANDLER( policetr_palette_data_w )
 		palette_data[palette_index] = (data >> 16) & 0xff;
 		if (++palette_index == 3)
 		{
-			palette_set_color(Machine, palette_offset, palette_data[0], palette_data[1], palette_data[2]);
+			palette_set_color(Machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
 			palette_index = 0;
 		}
 	}

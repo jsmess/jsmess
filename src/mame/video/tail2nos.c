@@ -10,7 +10,7 @@ static tilemap *bg_tilemap;
 static int charbank,charpalette,video_enable;
 static UINT16 *zoomdata;
 static int dirtygfx;
-static unsigned char *dirtychar;
+static UINT8 *dirtychar;
 
 #define TOTAL_CHARS 0x400
 
@@ -54,8 +54,7 @@ VIDEO_START( tail2nos )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,32);
 
-	if (K051316_vh_start_0(REGION_GFX3,4,TILEMAP_OPAQUE,0,zoom_callback))
-		return 1;
+	K051316_vh_start_0(REGION_GFX3,4,TILEMAP_OPAQUE,0,zoom_callback);
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -65,8 +64,6 @@ VIDEO_START( tail2nos )
 	K051316_wraparound_enable(0,1);
 	K051316_set_offset(0,-89,-14);
 	zoomdata = (UINT16 *)memory_region(REGION_GFX3);
-
-	return 0;
 }
 
 

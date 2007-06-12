@@ -39,13 +39,12 @@ unsigned short galaxy_colortable[1][2] =
 
 PALETTE_INIT( galaxy )
 {
-	palette_set_colors(machine, 0, galaxy_palette, sizeof(galaxy_palette) / 3);
+	palette_set_colors_rgb(machine, 0, galaxy_palette, sizeof(galaxy_palette) / 3);
 	memcpy(colortable, galaxy_colortable, sizeof (galaxy_colortable));
 }
 
 VIDEO_START( galaxy )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( galaxy )

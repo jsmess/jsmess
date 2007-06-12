@@ -60,7 +60,7 @@ PALETTE_INIT( trackfld )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -170,8 +170,6 @@ VIDEO_START( trackfld )
 		TILEMAP_OPAQUE, 8, 8, 64, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 32);
-
-	return 0;
 }
 
 static void trackfld_draw_sprites( mame_bitmap *bitmap )

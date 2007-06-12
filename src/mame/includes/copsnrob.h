@@ -11,10 +11,10 @@ READ8_HANDLER( copsnrob_gun_position_r );
 
 /*----------- defined in video/copsnrob.c -----------*/
 
-extern unsigned char *copsnrob_bulletsram;
-extern unsigned char *copsnrob_carimage;
-extern unsigned char *copsnrob_cary;
-extern unsigned char *copsnrob_trucky;
-extern unsigned char *copsnrob_truckram;
+extern UINT8 *copsnrob_bulletsram;
+extern UINT8 *copsnrob_carimage;
+extern UINT8 *copsnrob_cary;
+extern UINT8 *copsnrob_trucky;
+extern UINT8 *copsnrob_truckram;
 
 VIDEO_UPDATE( copsnrob );

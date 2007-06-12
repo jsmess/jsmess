@@ -119,8 +119,6 @@ VIDEO_START( bigtwin )
 	pri_masks[0] = 0;
 	pri_masks[1] = 0;
 	pri_masks[2] = 0;
-
-	return 0;
 }
 
 
@@ -136,8 +134,6 @@ VIDEO_START( wbeachvl )
 	pri_masks[0] = 0xfff0;
 	pri_masks[1] = 0xfffc;
 	pri_masks[2] = 0;
-
-	return 0;
 }
 
 VIDEO_START( excelsr )
@@ -150,8 +146,6 @@ VIDEO_START( excelsr )
 	pri_masks[0] = 0;
 	pri_masks[1] = 0xfffc;
 	pri_masks[2] = 0xfff0;
-
-	return 0;
 }
 
 VIDEO_START( hotmind )
@@ -174,8 +168,6 @@ VIDEO_START( hotmind )
 	pri_masks[0] = 0xfff0;
 	pri_masks[1] = 0xfffc;
 	pri_masks[2] = 0;
-
-	return 0;
 }
 
 VIDEO_START( hrdtimes )
@@ -198,8 +190,6 @@ VIDEO_START( hrdtimes )
 	pri_masks[0] = 0xfff0;
 	pri_masks[1] = 0xfffc;
 	pri_masks[2] = 0;
-
-	return 0;
 }
 
 /***************************************************************************
@@ -260,7 +250,7 @@ WRITE16_HANDLER( bigtwin_paletteram_w )
 	g |= ((val & 0x04) >> 2);
 	b |= ((val & 0x02) >> 1);
 
-	palette_set_color(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 WRITE16_HANDLER( bigtwin_scroll_w )

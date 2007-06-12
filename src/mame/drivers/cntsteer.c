@@ -60,7 +60,7 @@ PALETTE_INIT( zerotrgt )
 		bit2 = (color_prom[i+256] >> 2) & 0x01;
 		b = /*255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 static int colo=0;
@@ -87,8 +87,6 @@ VIDEO_START( zerotrgt )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
 	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX|TILEMAP_FLIPY);
-
-	return 0;
 }
 
 static void drawsprites(mame_bitmap *bitmap, int pri)

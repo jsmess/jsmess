@@ -7,8 +7,8 @@
 /*
 *   variables
 */
-unsigned char *msisaac_videoram;
-unsigned char *msisaac_videoram2;
+UINT8 *msisaac_videoram;
+UINT8 *msisaac_videoram2;
 
 static int textbank1, bg2_textbank;
 
@@ -66,8 +66,6 @@ VIDEO_START( msisaac )
 
 	tilemap_set_transparent_pen(background2,0);
 	tilemap_set_transparent_pen(foreground,0);
-
-	return 0;
 }
 
 
@@ -158,8 +156,8 @@ WRITE8_HANDLER( msisaac_fg_videoram_w )
 ***************************************************************************/
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 {
-	const unsigned char *source = spriteram+32*4-4;
-	const unsigned char *finish = spriteram; /* ? */
+	const UINT8 *source = spriteram+32*4-4;
+	const UINT8 *finish = spriteram; /* ? */
 
 	while( source>=finish )
 	{

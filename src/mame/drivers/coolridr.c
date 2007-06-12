@@ -74,7 +74,6 @@ SEGA CUSTOM IC :
 
 VIDEO_START(coolridr)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(coolridr)

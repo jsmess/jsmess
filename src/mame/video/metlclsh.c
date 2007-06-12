@@ -149,8 +149,6 @@ VIDEO_START( metlclsh )
 
 	tilemap_set_transparent_pen( bg_tilemap, 0 );
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
-
-	return 0;
 }
 
 

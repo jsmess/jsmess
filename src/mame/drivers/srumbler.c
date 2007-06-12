@@ -12,7 +12,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 
-extern unsigned char *srumbler_backgroundram,*srumbler_foregroundram;
+extern UINT8 *srumbler_backgroundram,*srumbler_foregroundram;
 
 WRITE8_HANDLER( srumbler_background_w );
 WRITE8_HANDLER( srumbler_foreground_w );
@@ -36,9 +36,9 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
       that as well to be 100% accurate.
      */
 	int i;
-	unsigned char *ROM = memory_region(REGION_USER1);
-	unsigned char *prom1 = memory_region(REGION_PROMS) + (data & 0xf0);
-	unsigned char *prom2 = memory_region(REGION_PROMS) + 0x100 + ((data & 0x0f) << 4);
+	UINT8 *ROM = memory_region(REGION_USER1);
+	UINT8 *prom1 = memory_region(REGION_PROMS) + (data & 0xf0);
+	UINT8 *prom2 = memory_region(REGION_PROMS) + 0x100 + ((data & 0x0f) << 4);
 
 	for (i = 0x05;i < 0x10;i++)
 	{

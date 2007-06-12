@@ -34,13 +34,13 @@ PALETTE_INIT( mermaid )
 		int g = 0x21 * BIT(*color_prom, 3) + 0x47 * BIT(*color_prom, 4) + 0x97 * BIT(*color_prom, 5);
 		int b =                              0x47 * BIT(*color_prom, 6) + 0x97 * BIT(*color_prom, 7);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 
 		color_prom++;
 	}
 
 	// blue background
-	palette_set_color(machine, TOTAL_COLORS(0), 0, 0, 0xff);
+	palette_set_color(machine, TOTAL_COLORS(0), MAKE_RGB(0, 0, 0xff));
 
 	// set up background palette
     COLOR(2,0) = 32;
@@ -150,8 +150,6 @@ VIDEO_START( mermaid )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 	tilemap_set_scroll_cols(fg_tilemap, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void mermaid_draw_sprites( mame_bitmap *bitmap )

@@ -71,7 +71,7 @@ static void toki_adpcm_int (int data)
 static WRITE8_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
@@ -724,7 +724,7 @@ static DRIVER_INIT( toki )
 
 DRIVER_INIT( tokib )
 {
-	unsigned char *temp = malloc_or_die(65536 * 2);
+	UINT8 *temp = malloc_or_die(65536 * 2);
 	int i, offs;
 
 	/* invert the sprite data in the ROMs */
@@ -734,7 +734,7 @@ DRIVER_INIT( tokib )
 	/* merge background tile graphics together */
 		for (offs = 0; offs < memory_region_length(REGION_GFX3); offs += 0x20000)
 		{
-			unsigned char *base = &memory_region(REGION_GFX3)[offs];
+			UINT8 *base = &memory_region(REGION_GFX3)[offs];
 			memcpy (temp, base, 65536 * 2);
 			for (i = 0; i < 16; i++)
 			{
@@ -746,7 +746,7 @@ DRIVER_INIT( tokib )
 		}
 		for (offs = 0; offs < memory_region_length(REGION_GFX4); offs += 0x20000)
 		{
-			unsigned char *base = &memory_region(REGION_GFX4)[offs];
+			UINT8 *base = &memory_region(REGION_GFX4)[offs];
 			memcpy (temp, base, 65536 * 2);
 			for (i = 0; i < 16; i++)
 			{

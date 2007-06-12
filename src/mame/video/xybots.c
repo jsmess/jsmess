@@ -85,14 +85,11 @@ VIDEO_START( xybots )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 64,32);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
+	atarimo_init(0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 64,32);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
-
-	return 0;
 }
 
 

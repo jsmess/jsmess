@@ -141,5 +141,4 @@ VIDEO_UPDATE( psikyo4 )
 VIDEO_START( psikyo4 )
 {
 	machine->gfx[0]->color_granularity=32; /* 256 colour sprites with palette selectable on 32 colour boundaries */
-	return 0;
 }

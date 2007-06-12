@@ -187,8 +187,6 @@ VIDEO_START( vector )
 
 	/* allocate memory for tables */
 	vector_list = auto_malloc (MAX_POINTS * sizeof (vector_list[0]));
-
-	return 0;
 }
 
 

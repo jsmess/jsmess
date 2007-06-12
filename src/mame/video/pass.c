@@ -63,6 +63,4 @@ VIDEO_START( pass )
 	pass_fg_tilemap = tilemap_create(get_pass_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT, 4, 4,128,64);
 
 	tilemap_set_transparent_pen(pass_fg_tilemap,255);
-
-	return 0;
 }

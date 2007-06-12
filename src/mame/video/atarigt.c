@@ -141,8 +141,7 @@ VIDEO_START( atarigt )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, atarigt_playfield_scan, TILEMAP_OPAQUE, 8,8, 128,64);
 
 	/* initialize the motion objects */
-	if (!atarirle_init(0, &adjusted_modesc))
-		return 1;
+	atarirle_init(0, &adjusted_modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 64,32);
@@ -170,7 +169,6 @@ VIDEO_START( atarigt )
 	playfield_yscroll = 0;
 	tram_checksum = 0;
 	memset(atarigt_colorram, 0, 0x80000);
-	return 0;
 }
 
 

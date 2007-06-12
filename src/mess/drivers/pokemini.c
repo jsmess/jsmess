@@ -43,7 +43,7 @@ static PALETTE_INIT( pokemini ) {
 	};
 	int i;
 	for( i = 0; i < 4; i++ ) {
-		palette_set_color( machine, i, pokemini_pal[i][0], pokemini_pal[i][1], pokemini_pal[i][2] );
+		palette_set_color_rgb( machine, i, pokemini_pal[i][0], pokemini_pal[i][1], pokemini_pal[i][2] );
 	}
 }
 

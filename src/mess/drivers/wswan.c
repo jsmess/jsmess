@@ -106,7 +106,7 @@ static PALETTE_INIT( wswan )
 	for( ii = 0; ii < 16; ii++ )
 	{
 		UINT8 shade = ii * (256 / 16);
-		palette_set_color(machine,  15 - ii, shade, shade, shade );
+		palette_set_color_rgb(machine,  15 - ii, shade, shade, shade );
 	}
 }
 
@@ -116,7 +116,7 @@ static PALETTE_INIT( wscolor ) {
 		int r = ( i & 0x0F00 ) >> 8;
 		int g = ( i & 0x00F0 ) >> 4;
 		int b = i & 0x000F;
-		palette_set_color(machine,  i, r << 4, g << 4, b << 4 );
+		palette_set_color_rgb(machine,  i, r << 4, g << 4, b << 4 );
 	}
 }
 

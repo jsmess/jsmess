@@ -212,11 +212,8 @@ VIDEO_START( mia )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,mia_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback))
-		return 1;
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,mia_tile_callback);
+	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
 VIDEO_START( cuebrckj )
@@ -225,11 +222,8 @@ VIDEO_START( cuebrckj )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,cuebrckj_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback))
-		return 1;
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,cuebrckj_tile_callback);
+	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
 VIDEO_START( tmnt )
@@ -238,32 +232,22 @@ VIDEO_START( tmnt )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,tmnt_sprite_callback))
-		return 1;
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(REGION_GFX2,REVERSE_PLANE_ORDER,tmnt_sprite_callback);
 }
 
 VIDEO_START( punkshot )
 {
 	K053251_vh_start();
-
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,punkshot_sprite_callback))
-		return 1;
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,punkshot_sprite_callback);
 }
 
 VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 {
 	K053251_vh_start();
-
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback))
-		return 1;
-	if (K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback))
-		return 1;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
 	K05324x_set_z_rejection(0);
 
@@ -273,40 +257,27 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 	state_save_register_global(dim_v);
 	state_save_register_global(lastdim);
 	state_save_register_global(lasten);
-
-	return 0;
 }
 
 VIDEO_START( sunsetbl )
 {
 	K053251_vh_start();
-
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,ssbl_tile_callback))
-		return 1;
-	if (K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback))
-		return 1;
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,ssbl_tile_callback);
+	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 }
 
 VIDEO_START( detatwin )
 {
 	K053251_vh_start();
-
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,detatwin_tile_callback))
-		return 1;
-	if (K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,detatwin_sprite_callback))
-		return 1;
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,detatwin_tile_callback);
+	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,detatwin_sprite_callback);
 }
 
 VIDEO_START( glfgreat )
 {
 	K053251_vh_start();
-
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback))
-		return 1;
-	if (K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback))
-		return 1;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
 	roz_tilemap = tilemap_create(glfgreat_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,512,512);
 
@@ -314,29 +285,20 @@ VIDEO_START( glfgreat )
 
 	K053936_wraparound_enable(0, 1);
 	K053936_set_offset(0, 85, 0);
-
-	return 0;
 }
 
 VIDEO_START( thndrx2 )
 {
 	K053251_vh_start();
-
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,thndrx2_sprite_callback))
-		return 1;
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
 }
 
 VIDEO_START( prmrsocr )
 {
 	K053251_vh_start();
-
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback))
-		return 1;
-	if (K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback))
-		return 1;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
+	K053245_vh_start(0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
 
 	roz_tilemap = tilemap_create(prmrsocr_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,512,256);
 
@@ -344,8 +306,6 @@ VIDEO_START( prmrsocr )
 
 	K053936_wraparound_enable(0, 0);
 	K053936_set_offset(0, 85, 1);
-
-	return 0;
 }
 
 
@@ -362,7 +322,7 @@ WRITE16_HANDLER( tmnt_paletteram_word_w )
 	offset &= ~1;
 
 	data = (paletteram16[offset] << 8) | paletteram16[offset+1];
-	palette_set_color(Machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb(Machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 

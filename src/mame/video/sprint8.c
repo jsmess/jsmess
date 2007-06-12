@@ -86,8 +86,6 @@ VIDEO_START( sprint8 )
 
 	tilemap_set_scrolly(tilemap1, 0, +24);
 	tilemap_set_scrolly(tilemap2, 0, +24);
-
-	return 0;
 }
 
 

@@ -43,7 +43,7 @@ static void stuff_palette( running_machine *machine, int source_index, int dest_
 		bit3 = (color_prom[0x400] >> 1) & 0x01;
 		blue = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color( machine, dest_index++, red, green, blue );
+		palette_set_color( machine, dest_index++, MAKE_RGB(red, green, blue) );
 		color_prom++;
 	}
 }
@@ -102,8 +102,6 @@ VIDEO_START( jcross )
 	tilemap_set_transparent_pen(bg_tilemap,0x0f);
 	tilemap_set_transparent_pen(tx_tilemap,0xf);
 	tilemap_set_scrolldx( bg_tilemap,   16, 22 );
-	return 0;
-
 }
 
 /***************************************************************************

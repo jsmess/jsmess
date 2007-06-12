@@ -22,9 +22,9 @@ To enter service mode, keep 1&2 pressed on reset
 
 void konami1_decode(void);
 
-extern unsigned char *circusc_spritebank;
-extern unsigned char *circusc_scroll;
-extern unsigned char *circusc_videoram,*circusc_colorram;
+extern UINT8 *circusc_spritebank;
+extern UINT8 *circusc_scroll;
+extern UINT8 *circusc_videoram,*circusc_colorram;
 
 UINT8 sn_latch;
 

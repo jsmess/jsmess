@@ -15,9 +15,9 @@ driver by Nicola Salmoria
 
 void konami1_decode(void);
 
-extern unsigned char *finalizr_scroll;
-extern unsigned char *finalizr_videoram2,*finalizr_colorram2;
-static unsigned char *finalizr_interrupt_enable;
+extern UINT8 *finalizr_scroll;
+extern UINT8 *finalizr_videoram2,*finalizr_colorram2;
+static UINT8 *finalizr_interrupt_enable;
 
 int finalizr_T1_line;
 

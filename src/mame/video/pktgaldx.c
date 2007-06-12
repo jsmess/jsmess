@@ -78,12 +78,9 @@ static int pktgaldx_bank_callback(const int bank)
 /* Video on the orginal */
 VIDEO_START(pktgaldx)
 {
-	if (deco16_1_video_init())
-		return 1;
+	deco16_1_video_init();
 
 	deco16_set_tilemap_bank_callback(1,pktgaldx_bank_callback);
-
-	return 0;
 }
 
 VIDEO_UPDATE(pktgaldx)
@@ -103,7 +100,6 @@ VIDEO_UPDATE(pktgaldx)
 /* Video for the bootleg */
 VIDEO_START(pktgaldb)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(pktgaldb)

@@ -59,7 +59,7 @@ PALETTE_INIT( mario )
 		bit1 = (*color_prom >> 1) & 1;
 		b = 255 - (0x55 * bit0 + 0xaa * bit1);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -129,8 +129,6 @@ VIDEO_START( mario )
 
 	state_save_register_global(gfx_bank);
 	state_save_register_global(palette_bank);
-
-	return 0;
 }
 
 static void mario_draw_sprites( mame_bitmap *bitmap )

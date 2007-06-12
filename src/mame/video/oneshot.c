@@ -74,8 +74,6 @@ VIDEO_START( oneshot )
 	tilemap_set_transparent_pen(oneshot_bg_tilemap,0);
 	tilemap_set_transparent_pen(oneshot_mid_tilemap,0);
 	tilemap_set_transparent_pen(oneshot_fg_tilemap,0);
-
-	return 0;
 }
 
 static void oneshot_drawcrosshairs( mame_bitmap *bitmap, const rectangle *cliprect )

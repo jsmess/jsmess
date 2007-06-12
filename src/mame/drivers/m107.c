@@ -19,9 +19,9 @@
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
 
-extern unsigned char *m107_vram_data;
+extern UINT8 *m107_vram_data;
 extern int m107_spritesystem;
-static unsigned char *m107_ram;
+static UINT8 *m107_ram;
 static int m107_irq_vectorbase,m107_vblank,raster_enable;
 extern int m107_raster_irq_position,m107_sprite_list;
 
@@ -43,7 +43,7 @@ READ8_HANDLER( m107_vram_r );
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	if (offset==1) return; /* Unused top byte */
 	memory_set_bankptr(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
@@ -682,7 +682,7 @@ ROM_END
 
 static DRIVER_INIT( firebarr )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
 	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
@@ -700,7 +700,7 @@ static DRIVER_INIT( firebarr )
 
 static DRIVER_INIT( dsoccr94 )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
 	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
@@ -719,7 +719,7 @@ static DRIVER_INIT( dsoccr94 )
 
 static DRIVER_INIT( wpksoc )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
 	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */

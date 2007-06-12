@@ -62,8 +62,6 @@ VIDEO_START( goindol )
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 
@@ -93,7 +91,7 @@ WRITE8_HANDLER( goindol_bg_videoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int gfxbank, unsigned char *sprite_ram)
+static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int gfxbank, UINT8 *sprite_ram)
 {
 	int offs,sx,sy,tile,palette;
 

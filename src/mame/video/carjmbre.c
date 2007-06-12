@@ -32,7 +32,7 @@ PALETTE_INIT( carjmbre )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -57,13 +57,13 @@ WRITE8_HANDLER( carjmbre_bgcolor_w )
 		memset(dirtybuffer,1,videoram_size);
 
 		for (i=0;i<64;i+=4)
-			palette_set_color(Machine, i, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)!=0?0x50:0);
+			palette_set_color_rgb(Machine, i, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)!=0?0x50:0);
 	}
 }
 
 static TILE_GET_INFO( get_carjmbre_tile_info ){
-	unsigned int tile_number = videoram[tile_index] & 0xFF;
-	unsigned char attr  = videoram[tile_index+0x400];
+	UINT32 tile_number = videoram[tile_index] & 0xFF;
+	UINT8 attr  = videoram[tile_index+0x400];
 	tile_number += (attr & 0x80) << 1; /* bank */
 	SET_TILE_INFO(
 			0,
@@ -86,8 +86,6 @@ VIDEO_START( carjmbre )
 
 	state_save_register_global(carjmbre_flipscreen);
 	state_save_register_global(carjmbre_bgcolor);
-
-	return 0;
 }
 
 VIDEO_UPDATE( carjmbre )

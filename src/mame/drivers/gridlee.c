@@ -250,7 +250,7 @@ static void poly17_init(void)
 
 static READ8_HANDLER( random_num_r )
 {
-	unsigned int cc;
+	UINT32 cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
 	cc = activecpu_gettotalcycles();

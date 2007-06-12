@@ -58,7 +58,7 @@ PALETTE_INIT( rockola )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i, r, g, b);
+		palette_set_color(machine,i, MAKE_RGB(r, g, b));
 
 		color_prom++;
 	}
@@ -187,8 +187,6 @@ VIDEO_START( rockola )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 VIDEO_UPDATE( rockola )
@@ -235,7 +233,7 @@ PALETTE_INIT( satansat )
 
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 
 		color_prom++;
 	}
@@ -318,6 +316,4 @@ VIDEO_START( satansat )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }

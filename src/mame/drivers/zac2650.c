@@ -238,8 +238,8 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( zac2650 )
 {
-	palette_set_color(machine,0,0x00,0x00,0x00); /* BLACK */
-	palette_set_color(machine,1,0xff,0xff,0xff); /* WHITE */
+	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 	colortable[0] = 0;
 	colortable[1] = 1;
 	colortable[2] = 0;

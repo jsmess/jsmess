@@ -130,7 +130,7 @@ VIDEO_UPDATE( missb2 )
 
 INLINE void bg_changecolor_RRRRGGGGBBBBxxxx(pen_t color,int data)
 {
-	palette_set_color(Machine,color+256,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
+	palette_set_color_rgb(Machine,color+256,pal4bit(data >> 12),pal4bit(data >> 8),pal4bit(data >> 4));
 }
 
 static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )

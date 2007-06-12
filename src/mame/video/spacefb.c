@@ -162,8 +162,6 @@ VIDEO_START( spacefb )
        but most likely, the actual star position is random as the hardware
        uses whatever value is on the shift register on power-up */
 	star_shift_reg = 0x18f89;
-
-	return 0;
 }
 
 

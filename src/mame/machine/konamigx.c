@@ -17,12 +17,12 @@
 
 static struct
 {
-	unsigned char control;
-	unsigned char program[1024];
-	unsigned int tables[256];
+	UINT8 control;
+	UINT8 program[1024];
+	UINT32 tables[256];
 	int curpos;
 	int bytepos;
-	unsigned int tmp;
+	UINT32 tmp;
 } tms57002;
 
 static int ldw = 0;
@@ -127,7 +127,7 @@ WRITE8_HANDLER( tms57002_data_w )
 
 READ8_HANDLER( tms57002_data_r )
 {
-	unsigned char res;
+	UINT8 res;
 
 	chk_ldw();
 
@@ -459,7 +459,7 @@ void K053936GP_1_zoom_draw(mame_bitmap *bitmap, const rectangle *cliprect,
 */
 
 INLINE void zdrawgfxzoom32GP( mame_bitmap *bitmap, const gfx_element *gfx, const rectangle *cliprect,
-		unsigned int code, unsigned int color, int flipx, int flipy, int sx, int sy,
+		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
 #define FP     19
@@ -1193,7 +1193,7 @@ void K053247GP_set_SpriteOffset(int offsx, int offsy)
 	K053247_dy = offsy;
 }
 
-int konamigx_mixer_init(int objdma)
+void konamigx_mixer_init(int objdma)
 {
 	gx_objdma = 0;
 	gx_primode = 0;
@@ -1215,8 +1215,6 @@ int konamigx_mixer_init(int objdma)
 
 	palette_set_shadow_dRGB32(Machine, 3,-80,-80,-80, 0);
 	K054338_invert_alpha(1);
-
-	return(0);
 }
 
 void konamigx_mixer_primode(int mode)
@@ -1355,7 +1353,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 		for (i=j+1; i<6; i++)
 		{
 			temp2 = layerpri[i];
-			if ((unsigned int)temp1 <= (unsigned int)temp2)
+			if ((UINT32)temp1 <= (UINT32)temp2)
 			{
 				layerpri[i] = temp1; layerpri[j] = temp1 = temp2;
 				temp2 = layerid[i]; layerid[i] = layerid[j]; layerid[j] = temp2;
@@ -1549,7 +1547,7 @@ void konamigx_mixer(mame_bitmap *bitmap, const rectangle *cliprect,
 		{
 			temp3 = objbuf[i];
 			temp4 = objpool[temp3].order;
-			if ((unsigned int)temp2 <= (unsigned int)temp4) { temp2 = temp4; objbuf[i] = temp1; objbuf[j] = temp1 = temp3; }
+			if ((UINT32)temp2 <= (UINT32)temp4) { temp2 = temp4; objbuf[i] = temp1; objbuf[j] = temp1 = temp3; }
 		}
 	}
 

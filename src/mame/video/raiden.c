@@ -2,7 +2,7 @@
 #include "driver.h"
 
 static tilemap *bg_layer,*fg_layer,*tx_layer;
-unsigned char *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
+UINT8 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
 static int flipscreen,ALTERNATE;
 
@@ -91,8 +91,6 @@ VIDEO_START( raiden )
 
 	tilemap_set_transparent_pen(fg_layer,15);
 	tilemap_set_transparent_pen(tx_layer,15);
-
-	return 0;
 }
 
 VIDEO_START( raidena )
@@ -104,8 +102,6 @@ VIDEO_START( raidena )
 
 	tilemap_set_transparent_pen(fg_layer,15);
 	tilemap_set_transparent_pen(tx_layer,15);
-
-	return 0;
 }
 
 WRITE8_HANDLER( raiden_control_w )

@@ -168,8 +168,6 @@ VIDEO_START(macrossp)
 	machine->gfx[3]->color_granularity=64;
 
 	alpha_set_level(0x80); /* guess */
-
-	return 0;
 }
 
 

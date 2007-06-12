@@ -89,7 +89,7 @@ PALETTE_INIT( fuuki16 )
 	/* The game does not initialise the palette at startup. It should
        be totally black */
 	for (pen = 0; pen < machine->drv->total_colors; pen++)
-		palette_set_color(machine,pen,0,0,0);
+		palette_set_color(machine,pen,MAKE_RGB(0,0,0));
 }
 
 VIDEO_START( fuuki16 )
@@ -112,8 +112,6 @@ VIDEO_START( fuuki16 )
 	tilemap_set_transparent_pen(tilemap_3,0x0f);	// 4 bits
 
 	machine->gfx[2]->color_granularity=16; /* 256 colour tiles with palette selectable on 16 colour boundaries */
-
-	return 0;
 }
 
 

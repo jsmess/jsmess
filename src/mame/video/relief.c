@@ -93,10 +93,7 @@ VIDEO_START( relief )
 	tilemap_set_transparent_pen(atarigen_playfield2_tilemap, 0);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
-
-	return 0;
+	atarimo_init(0, &modesc);
 }
 
 

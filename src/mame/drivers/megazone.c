@@ -17,13 +17,13 @@ To enter service mode, keep 1&2 pressed on reset
 
 void konami1_decode(void);
 
-extern unsigned char *megazone_scrollx;
-extern unsigned char *megazone_scrolly;
+extern UINT8 *megazone_scrollx;
+extern UINT8 *megazone_scrolly;
 
-static unsigned char *megazone_sharedram;
+static UINT8 *megazone_sharedram;
 
-extern unsigned char *megazone_videoram2;
-extern unsigned char *megazone_colorram2;
+extern UINT8 *megazone_videoram2;
+extern UINT8 *megazone_colorram2;
 extern size_t megazone_videoram2_size;
 
 static int i8039_status;

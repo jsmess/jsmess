@@ -340,8 +340,8 @@ static INTERRUPT_GEN( sound_interrupt )
 
 static PALETTE_INIT( meadows )
 {
-	palette_set_color(machine,0,0x00,0x00,0x00); /* BLACK */
-	palette_set_color(machine,1,0xff,0xff,0xff); /* WHITE */
+	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 }
 
 
@@ -809,7 +809,7 @@ ROM_END
 /* A fake for the missing ball sprites #3 and #4 */
 static DRIVER_INIT( gypsyjug )
 {
-	static unsigned char ball[16*2] =
+	static UINT8 ball[16*2] =
 	{
 		0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 		0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
@@ -832,7 +832,7 @@ static DRIVER_INIT( gypsyjug )
 static DRIVER_INIT( minferno )
 {
 	int i, length;
-	unsigned char *mem;
+	UINT8 *mem;
 
 	/* Create an inverted copy of the graphics data */
 	mem = memory_region(REGION_GFX1);

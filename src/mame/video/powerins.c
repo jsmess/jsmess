@@ -95,7 +95,7 @@ WRITE16_HANDLER( powerins_paletteram16_w )
 	int g = ((newword >>  7) & 0x1E ) | ((newword >> 2) & 0x01);
 	int b = ((newword >>  3) & 0x1E ) | ((newword >> 1) & 0x01);
 
-	palette_set_color( Machine,offset, pal5bit(r),pal5bit(g),pal5bit(b) );
+	palette_set_color_rgb( Machine,offset, pal5bit(r),pal5bit(g),pal5bit(b) );
 }
 
 
@@ -216,8 +216,6 @@ VIDEO_START( powerins )
 		tilemap_set_scroll_rows(tilemap_1,1);
 		tilemap_set_scroll_cols(tilemap_1,1);
 		tilemap_set_transparent_pen(tilemap_1,15);
-
-		return 0;
 }
 
 

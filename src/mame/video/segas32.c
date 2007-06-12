@@ -286,7 +286,7 @@ static void sprite_render_list(void);
  *
  *************************************/
 
-static int common_start(int multi32)
+static void common_start(int multi32)
 {
 	int tmap;
 
@@ -327,19 +327,18 @@ static int common_start(int multi32)
 
 	/* initialize videoram */
 	system32_videoram[0x1ff00/2] = 0x8000;
-	return 0;
 }
 
 
 VIDEO_START( system32 )
 {
-	return common_start(0);
+	common_start(0);
 }
 
 
 VIDEO_START( multi32 )
 {
-	return common_start(1);
+	common_start(1);
 }
 
 
@@ -417,7 +416,7 @@ INLINE void update_color(int offset, UINT16 data)
 	/* nice display when you hit F4, which is useful for debugging */
 
 	/* set the color */
-	palette_set_color(Machine, offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette_set_color_rgb(Machine, offset, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 

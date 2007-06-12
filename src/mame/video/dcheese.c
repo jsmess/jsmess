@@ -52,7 +52,7 @@ PALETTE_INIT( dcheese )
 	for (i = 0; i < 65534; i++)
 	{
 		int data = *src++;
-		palette_set_color(machine, i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
+		palette_set_color_rgb(machine, i, pal6bit(data >> 0), pal5bit(data >> 6), pal5bit(data >> 11));
 	}
 }
 
@@ -114,8 +114,6 @@ VIDEO_START( dcheese )
 	state_save_register_global_array(blitter_yparam);
 	state_save_register_global_array(blitter_vidparam);
 	state_save_register_global_bitmap(dstbitmap);
-
-	return 0;
 }
 
 

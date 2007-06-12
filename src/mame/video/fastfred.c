@@ -70,7 +70,7 @@ static void set_color(pen_t pen, int i)
 	bit3 = (fastfred_color_prom[i + 0x200] >> 3) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(Machine,pen,r,g,b);
+	palette_set_color_rgb(Machine,pen,r,g,b);
 }
 
 PALETTE_INIT( fastfred )
@@ -131,8 +131,6 @@ VIDEO_START( fastfred )
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
-
-	return 0;
 }
 
 
@@ -390,10 +388,8 @@ VIDEO_START( imago )
 	galaxian_stars_on = 1;
 
 	/* web colors */
-	palette_set_color(machine,256+64+0,0x50,0x00,0x00);
-	palette_set_color(machine,256+64+1,0x00,0x00,0x00);
-
-	return 0;
+	palette_set_color(machine,256+64+0,MAKE_RGB(0x50,0x00,0x00));
+	palette_set_color(machine,256+64+1,MAKE_RGB(0x00,0x00,0x00));
 }
 
 VIDEO_UPDATE( imago )

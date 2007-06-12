@@ -77,7 +77,7 @@ void *tms5110_create(int index)
 {
 	struct tms5110 *tms;
 
-	tms = malloc(sizeof(*tms));
+	tms = malloc_or_die(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
 	state_save_register_item_array("tms5110", index, tms->fifo);

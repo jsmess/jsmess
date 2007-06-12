@@ -818,10 +818,10 @@ static void dduxbl_update_proc( void )
 	sys16_bg_scrolly = sys16_extraram2[0x0000/2];
 
 	{
-		unsigned char lu = sys16_extraram2[0x0020/2] & 0xff;
-		unsigned char ru = sys16_extraram2[0x0022/2] & 0xff;
-		unsigned char ld = sys16_extraram2[0x0024/2] & 0xff;
-		unsigned char rd = sys16_extraram2[0x0026/2] & 0xff;
+		UINT8 lu = sys16_extraram2[0x0020/2] & 0xff;
+		UINT8 ru = sys16_extraram2[0x0022/2] & 0xff;
+		UINT8 ld = sys16_extraram2[0x0024/2] & 0xff;
+		UINT8 rd = sys16_extraram2[0x0026/2] & 0xff;
 
 		if (lu==4 && ld==4 && ru==5 && rd==5)
 		{ // fix a bug in chicago round (un-tested in MAME)

@@ -68,13 +68,13 @@ static void convert_palette(running_machine *machine,const UINT8 *color_prom)
 		bit3 = (color_prom[2*1024] >> 3) & 0x01;
 		b = 255 - (0x10 * bit0 + 0x21 * bit1 + 0x46 * bit2 + 0x88 * bit3);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* reserve the last color for the transparent pen (none of the game colors has */
 	/* these RGB components) */
-	palette_set_color(machine,1024,240,240,240);
+	palette_set_color(machine,1024,MAKE_RGB(240,240,240));
 }
 
 
@@ -227,7 +227,6 @@ VIDEO_START( punchout )
 	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8,8, 16,32);
 
 	fgtilemap = NULL;
-	return 0;
 }
 
 
@@ -272,7 +271,6 @@ VIDEO_START( armwrest )
 
 	fgtilemap = tilemap_create(armwrest_fg_get_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 8,8, 32,32);
 	tilemap_set_transparent_pen(fgtilemap, 7);
-	return 0;
 }
 
 

@@ -16,32 +16,28 @@
  *
  *************************************/
 
-static int video_start_common(int type)
+static void video_start_common(int type)
 {
 	/* compute palette info */
 	segaic16_palette_init(0x800);
 
 	/* initialize the tile/text layers */
-	if (segaic16_tilemap_init(0, type, 0x000, 0, 2))
-		return 1;
+	segaic16_tilemap_init(0, type, 0x000, 0, 2);
 
 	/* initialize the sprites */
-	if (segaic16_sprites_init(0, SEGAIC16_SPRITES_16B, 0x400, 0))
-		return 1;
-
-	return 0;
+	segaic16_sprites_init(0, SEGAIC16_SPRITES_16B, 0x400, 0);
 }
 
 
 VIDEO_START( system16b )
 {
-	return video_start_common(SEGAIC16_TILEMAP_16B);
+	video_start_common(SEGAIC16_TILEMAP_16B);
 }
 
 
 VIDEO_START( timscanr )
 {
-	return video_start_common(SEGAIC16_TILEMAP_16B_ALT);
+	video_start_common(SEGAIC16_TILEMAP_16B_ALT);
 }
 
 

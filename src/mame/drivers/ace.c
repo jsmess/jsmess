@@ -40,9 +40,9 @@ A1                   2101            2101
 #include "driver.h"
 
 
-static unsigned char *ace_scoreram;
-static unsigned char *ace_ram2;
-static unsigned char *ace_characterram;
+static UINT8 *ace_scoreram;
+static UINT8 *ace_ram2;
+static UINT8 *ace_characterram;
 
 
 static int objpos[8];
@@ -112,8 +112,8 @@ VIDEO_UPDATE( ace )
 
 static PALETTE_INIT( ace )
 {
-	palette_set_color(machine,0,0x10,0x20,0xd0); /* light bluish */
-	palette_set_color(machine,1,0xff,0xff,0xff); /* white */
+	palette_set_color(machine,0,MAKE_RGB(0x10,0x20,0xd0)); /* light bluish */
+	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white */
 }
 
 

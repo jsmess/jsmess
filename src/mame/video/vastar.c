@@ -82,8 +82,6 @@ VIDEO_START( vastar )
 
 	tilemap_set_scroll_cols(bg1_tilemap, 32);
 	tilemap_set_scroll_cols(bg2_tilemap, 32);
-
-	return 0;
 }
 
 

@@ -1,10 +1,10 @@
 #include "driver.h"
 
-unsigned char *lsasquad_scrollram;
+UINT8 *lsasquad_scrollram;
 
 
 
-static void draw_layer(mame_bitmap *bitmap,unsigned char *scrollram)
+static void draw_layer(mame_bitmap *bitmap,UINT8 *scrollram)
 {
 	int offs,scrollx,scrolly;
 

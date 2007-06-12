@@ -49,7 +49,7 @@ UINT16 *blmbycar_vram_1, *blmbycar_scroll_1;
 WRITE16_HANDLER( blmbycar_palette_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color( Machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	palette_set_color_rgb( Machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 
@@ -138,8 +138,6 @@ VIDEO_START( blmbycar )
 		tilemap_set_scroll_rows(tilemap_1,1);
 		tilemap_set_scroll_cols(tilemap_1,1);
 		tilemap_set_transparent_pen(tilemap_1,0);
-
-		return 0;
 }
 
 

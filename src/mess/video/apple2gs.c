@@ -20,15 +20,8 @@ UINT16 apple2gs_bordercolor;
 VIDEO_START( apple2gs )
 {
 	apple2gs_bordercolor = 0;
-
-	if (apple2_video_start(apple2gs_slowmem, 0x20000, 0, 8))
-		return 1;
-
+	apple2_video_start(apple2gs_slowmem, 0x20000, 0, 8);
 	apple2gs_legacy_gfx = auto_bitmap_alloc(560, 192, BITMAP_FORMAT_INDEXED16);
-	if (!apple2gs_legacy_gfx)
-		return 1;
-
-	return 0;
 }
 
 
@@ -57,7 +50,7 @@ VIDEO_UPDATE( apple2gs )
 		/* use Apple IIgs super hires video */
 		for (i = 0; i < 256; i++)
 		{
-			palette_set_color(machine, i + 16,
+			palette_set_color_rgb(machine, i + 16,
 				((apple2gs_slowmem[0x19E00 + (i * 2) + 1] >> 0) & 0x0F) * 17,
 				((apple2gs_slowmem[0x19E00 + (i * 2) + 0] >> 4) & 0x0F) * 17,
 				((apple2gs_slowmem[0x19E00 + (i * 2) + 0] >> 0) & 0x0F) * 17);

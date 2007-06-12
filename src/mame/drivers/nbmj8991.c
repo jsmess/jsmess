@@ -118,7 +118,7 @@ static DRIVER_INIT( vanilla )
 
 static DRIVER_INIT( finalbny )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -144,7 +144,7 @@ static DRIVER_INIT( hyouban )
 static DRIVER_INIT( galkaika )
 {
 #if 1
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -155,7 +155,7 @@ static DRIVER_INIT( galkaika )
 static DRIVER_INIT( tokyogal )
 {
 #if 1
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -166,7 +166,7 @@ static DRIVER_INIT( tokyogal )
 static DRIVER_INIT( tokimbsj )
 {
 #if 1
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;

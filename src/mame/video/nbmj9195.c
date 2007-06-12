@@ -68,7 +68,7 @@ WRITE8_HANDLER( nbmj9195_palette_w )
 		g = ((nbmj9195_palette[offset + 0] & 0xf0) >> 4);
 		b = ((nbmj9195_palette[offset + 1] & 0x0f) >> 0);
 
-		palette_set_color(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -91,7 +91,7 @@ WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
 	g = nbmj9195_nb22090_palette[(0x100 + (offs_h * 0x300) + offs_l)];
 	b = nbmj9195_nb22090_palette[(0x200 + (offs_h * 0x300) + offs_l)];
 
-	palette_set_color(Machine, ((offs_h * 0x100) + offs_l), r, g, b);
+	palette_set_color(Machine, ((offs_h * 0x100) + offs_l), MAKE_RGB(r, g, b));
 }
 
 /******************************************************************************
@@ -101,7 +101,7 @@ WRITE8_HANDLER( nbmj9195_nb22090_palette_w )
 int nbmj9195_blitter_r(int vram, int offset)
 {
 	int ret;
-	unsigned char *GFXROM = memory_region(REGION_GFX1);
+	UINT8 *GFXROM = memory_region(REGION_GFX1);
 
 	switch (offset)
 	{
@@ -183,7 +183,7 @@ static void nbmj9195_vramflip(int vram)
 {
 	static int nbmj9195_flipscreen_old[VRAM_MAX] = { 0, 0 };
 	int x, y;
-	unsigned short color1, color2;
+	UINT16 color1, color2;
 
 	if (nbmj9195_flipscreen[vram] == nbmj9195_flipscreen_old[vram]) return;
 
@@ -229,7 +229,7 @@ static void blitter_timer_callback(int param)
 
 static void nbmj9195_gfxdraw(int vram)
 {
-	unsigned char *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(REGION_GFX1);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -237,7 +237,7 @@ static void nbmj9195_gfxdraw(int vram)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	unsigned short color, color1, color2;
+	UINT16 color, color1, color2;
 	int gfxaddr;
 
 	nb19010_busyctr = 0;
@@ -412,7 +412,6 @@ VIDEO_START( nbmj9195_1layer )
 	nbmj9195_scanline[0] = nbmj9195_scanline[1] = SCANLINE_MIN;
 	nb19010_busyflag = 1;
 	gfxdraw_mode = 0;
-	return 0;
 }
 
 VIDEO_START( nbmj9195_2layer )
@@ -429,7 +428,6 @@ VIDEO_START( nbmj9195_2layer )
 	nbmj9195_scanline[0] = nbmj9195_scanline[1] = SCANLINE_MIN;
 	nb19010_busyflag = 1;
 	gfxdraw_mode = 1;
-	return 0;
 }
 
 VIDEO_START( nbmj9195_nb22090 )
@@ -450,7 +448,6 @@ VIDEO_START( nbmj9195_nb22090 )
 	nbmj9195_scanline[0] = nbmj9195_scanline[1] = SCANLINE_MIN;
 	nb19010_busyflag = 1;
 	gfxdraw_mode = 2;
-	return 0;
 }
 
 /******************************************************************************

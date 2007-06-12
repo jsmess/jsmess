@@ -23,13 +23,12 @@ WRITE8_HANDLER ( funybubl_paldatawrite )
 
 	coldat = funybubl_paletteram[colchanged*4] | (funybubl_paletteram[colchanged*4+1] << 8) | (funybubl_paletteram[colchanged*4+2] << 16) | (funybubl_paletteram[colchanged*4+3] << 24);
 
-	palette_set_color(Machine,colchanged,pal6bit(coldat >> 12),pal6bit(coldat >> 0),pal6bit(coldat >> 6));
+	palette_set_color_rgb(Machine,colchanged,pal6bit(coldat >> 12),pal6bit(coldat >> 0),pal6bit(coldat >> 6));
 }
 
 
 VIDEO_START(funybubl)
 {
-	return 0;
 }
 
 static void funybubl_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )

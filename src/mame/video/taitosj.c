@@ -13,14 +13,14 @@
 #endif
 
 
-unsigned char *taitosj_videoram2,*taitosj_videoram3;
-unsigned char *taitosj_characterram;
-unsigned char *taitosj_scroll;
-unsigned char *taitosj_colscrolly;
-unsigned char *taitosj_gfxpointer;
-unsigned char *taitosj_colorbank,*taitosj_video_priority;
-unsigned char *kikstart_scrollram;
-unsigned char *taitosj_spritebank;
+UINT8 *taitosj_videoram2,*taitosj_videoram3;
+UINT8 *taitosj_characterram;
+UINT8 *taitosj_scroll;
+UINT8 *taitosj_colscrolly;
+UINT8 *taitosj_gfxpointer;
+UINT8 *taitosj_colorbank,*taitosj_video_priority;
+UINT8 *kikstart_scrollram;
+UINT8 *taitosj_spritebank;
 static UINT8 taitosj_collision_reg[4];
 static UINT8 *dirtybuffer2,*dirtybuffer3;
 static mame_bitmap *taitosj_tmpbitmap[3];
@@ -176,7 +176,7 @@ WRITE8_HANDLER( taitosj_paletteram_w )
 	bit2 = (~val >> 2) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(Machine,offset / 2,r,g,b);
+	palette_set_color(Machine,offset / 2,MAKE_RGB(r,g,b));
 }
 
 static void taitosj_postload(void)
@@ -207,8 +207,7 @@ VIDEO_START( taitosj )
 	dirtybuffer3  = dirtybuffer2 = 0;
 
 
-	if (video_start_generic(machine) != 0)
-		return 1;
+	video_start_generic(machine);
 
 	dirtybuffer2 = auto_malloc(videoram_size);
 	memset(dirtybuffer2,1,videoram_size);
@@ -241,8 +240,6 @@ VIDEO_START( taitosj )
 	state_save_register_global_array(taitosj_collision_reg);
 	state_save_register_global(taitosj_video_enable);
 	state_save_register_global_array(flipscreen);
-
-	return 0;
 }
 
 

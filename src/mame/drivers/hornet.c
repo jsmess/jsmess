@@ -390,7 +390,7 @@ void K037122_tile_draw(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
 static void update_palette_color(int chip, UINT32 palette_base, int color)
 {
 	UINT32 data = K037122_tile_ram[chip][(palette_base/4) + color];
-	palette_set_color(Machine, color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
+	palette_set_color_rgb(Machine, color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 }
 
 READ32_HANDLER(K037122_sram_r)
@@ -501,40 +501,33 @@ static void voodoo_vblank_1(int param)
 VIDEO_START( hornet )
 {
 	if (voodoo_version == 0)
-	{
-		if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0))
-			return 1;
-	}
+		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
 	else
-	{
-		if (voodoo_start(0, 0, VOODOO_2, 2, 4, 0))
-			return 1;
-	}
+		voodoo_start(0, 0, VOODOO_2, 2, 4, 0);
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
-	return K037122_vh_start(0);
+	K037122_vh_start(0);
 }
 
 VIDEO_START( hornet_2board )
 {
 	if (voodoo_version == 0)
 	{
-		if (voodoo_start(0, 0, VOODOO_1, 2, 4, 0) ||
-		    voodoo_start(1, 1, VOODOO_1, 2, 4, 0))
-			return 1;
+		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
+		voodoo_start(1, 1, VOODOO_1, 2, 4, 0);
 	}
 	else
 	{
-		if (voodoo_start(0, 0, VOODOO_2, 2, 4, 0) ||
-			voodoo_start(1, 1, VOODOO_2, 2, 4, 0))
-			return 1;
+		voodoo_start(0, 0, VOODOO_2, 2, 4, 0);
+		voodoo_start(1, 1, VOODOO_2, 2, 4, 0);
 	}
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 	voodoo_set_vblank_callback(1, voodoo_vblank_1);
 
-	return K037122_vh_start(0) | K037122_vh_start(1);
+	K037122_vh_start(0);
+	K037122_vh_start(1);
 }
 
 

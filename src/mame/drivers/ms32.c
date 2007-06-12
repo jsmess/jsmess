@@ -2145,10 +2145,10 @@ static void rearrange_sprites(void)
 {
 	/* sprites are not encrypted, but we need to move the data around to handle them as 256x256 tiles */
 	int i;
-	unsigned char *source_data;
+	UINT8 *source_data;
 	int source_size;
 
-	unsigned char *result_data;
+	UINT8 *result_data;
 
 	source_data = memory_region       ( REGION_GFX1 );
 	source_size = memory_region_length( REGION_GFX1 );
@@ -2170,10 +2170,10 @@ static void rearrange_sprites(void)
 static void decrypt_ms32_tx(int addr_xor,int data_xor)
 {
 	int i;
-	unsigned char *source_data;
+	UINT8 *source_data;
 	int source_size;
 
-	unsigned char *result_data;
+	UINT8 *result_data;
 
 	source_data = memory_region       ( REGION_GFX4 );
 	source_size = memory_region_length( REGION_GFX4 );
@@ -2224,10 +2224,10 @@ static void decrypt_ms32_tx(int addr_xor,int data_xor)
 static void decrypt_ms32_bg(int addr_xor,int data_xor)
 {
 	int i;
-	unsigned char *source_data;
+	UINT8 *source_data;
 	int source_size;
 
-	unsigned char *result_data;
+	UINT8 *result_data;
 
 	source_data = memory_region       ( REGION_GFX3 );
 	source_size = memory_region_length( REGION_GFX3 );

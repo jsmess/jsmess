@@ -2,9 +2,9 @@
 #include "includes/pacman.h"
 
 
-static unsigned char decrypt(int addr, unsigned char e)
+static UINT8 decrypt(int addr, UINT8 e)
 {
-	static const unsigned char swap_xor_table[6][9] =
+	static const UINT8 swap_xor_table[6][9] =
 	{
 		{ 7,6,5,4,3,2,1,0, 0x00 },
 		{ 7,6,5,4,3,2,1,0, 0x28 },
@@ -18,8 +18,8 @@ static unsigned char decrypt(int addr, unsigned char e)
 		0,2,4,2,4,0,4,2,2,0,2,2,4,0,4,2,
 		2,2,4,0,4,2,4,0,0,4,0,4,4,2,4,2
 	};
-	unsigned int method = 0;
-	const unsigned char *tbl;
+	UINT32 method = 0;
+	const UINT8 *tbl;
 
 
 	/* pick method from bits 0 2 5 7 9 of the address */
@@ -42,7 +42,7 @@ static unsigned char decrypt(int addr, unsigned char e)
 void pacplus_decode(void)
 {
 	int i;
-	unsigned char *RAM;
+	UINT8 *RAM;
 
 	/* CPU ROMs */
 

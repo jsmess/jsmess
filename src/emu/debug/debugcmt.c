@@ -133,7 +133,7 @@ int debug_comment_add(int cpu_num, offs_t addr, const char *comment, rgb_t color
 	int match = 0;
 
 	/* Create a new item to insert into the list */
-	debug_comment *insert_me = (debug_comment*) malloc(sizeof(debug_comment));
+	debug_comment *insert_me = (debug_comment*) malloc_or_die(sizeof(debug_comment));
 	insert_me->color = color;
 	insert_me->is_valid = 1;
 	insert_me->address = addr;

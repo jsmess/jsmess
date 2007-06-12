@@ -49,8 +49,8 @@ ADDRESS_MAP_END
 /* Is the palette black on white or white on black??? */
 static PALETTE_INIT( concept )
 {
-	palette_set_color(machine, 0, 0xff, 0xff, 0xff);
-	palette_set_color(machine, 1, 0x00, 0x00, 0x00);
+	palette_set_color_rgb(machine, 0, 0xff, 0xff, 0xff);
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0x00);
 }
 
 /* concept machine */

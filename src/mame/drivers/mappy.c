@@ -1702,6 +1702,13 @@ static MACHINE_DRIVER_START( mappy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( digdug2 )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM( mappy )
+	MDRV_WATCHDOG_VBLANK_INIT(0)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( todruaga )
 
 	/* basic machine hardware */
@@ -2162,6 +2169,6 @@ GAME( 1983, mappy,    0,        mappy,    mappy,    58_58,    ROT90, "Namco", "M
 GAME( 1983, mappyj,   mappy,    mappy,    mappy,    58_58,    ROT90, "Namco", "Mappy (Japan)", 0 )
 GAME( 1984, todruaga, 0,        todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (New Ver.)", 0 )
 GAME( 1984, todruago, todruaga, todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (Old Ver.)", 0 )
-GAME( 1985, digdug2,  0,        mappy,    digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", 0 )
-GAME( 1985, digdug2o, digdug2,  mappy,    digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", 0 )
+GAME( 1985, digdug2,  0,        digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", 0 )
+GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", 0 )
 GAME( 1985, motos,    0,        mappy,    motos,    56out_56, ROT90, "Namco", "Motos", 0 )

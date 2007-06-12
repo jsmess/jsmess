@@ -112,8 +112,6 @@ VIDEO_START( hcastle )
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan,TILEMAP_OPAQUE,     8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 
@@ -180,7 +178,7 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 
 /*****************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, unsigned char *sbank, int bank )
+static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
 {
 	int bank_base = (bank == 0) ? 0x4000 * (gfx_bank & 1) : 0;
 	K007121_sprites_draw(bank,bitmap,cliprect,sbank,(K007121_ctrlram[bank][6]&0x30)*2,0,bank_base,-1);

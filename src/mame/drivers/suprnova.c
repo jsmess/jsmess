@@ -848,7 +848,7 @@ static void palette_set_rgb_brightness (int offset, UINT8 brightness_r, UINT8 br
 		r <<= 3;
 	}
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 // This ignores the alpha values atm.
@@ -970,7 +970,7 @@ static WRITE32_HANDLER ( skns_palette_ram_w )
 		r <<= 3;
 	}
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 static WRITE32_HANDLER( skns_v3t_w )

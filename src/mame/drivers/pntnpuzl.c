@@ -186,8 +186,6 @@ UINT16* pntnpuzl_bank;
 VIDEO_START( pntnpuzl )
 {
 	pntnpuzl_3a0000ram=auto_malloc(0x100000);
-
-	return 0;
 }
 
 VIDEO_UPDATE( pntnpuzl )
@@ -264,7 +262,7 @@ WRITE16_HANDLER( pntnpuzl_palette_w )
 		rgb[sub++] = data & 0xff;
 		if (sub == 3)
 		{
-			palette_set_color(Machine,indx++,pal6bit(rgb[0]),pal6bit(rgb[1]),pal6bit(rgb[2]));
+			palette_set_color_rgb(Machine,indx++,pal6bit(rgb[0]),pal6bit(rgb[1]),pal6bit(rgb[2]));
 			sub = 0;
 			if (indx == 256) indx = 0;
 		}

@@ -14,7 +14,7 @@ void *attckufo_custom_start(int clock, const struct CustomSound_interface *confi
 
 /*----------- defined in video/attckufo.c -----------*/
 
-extern unsigned char attckufo_palette[16 * 3];
+extern const rgb_t attckufo_palette[16];
 extern UINT8 attckufo_regs[16];
 
 VIDEO_UPDATE( attckufo );

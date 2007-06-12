@@ -28,7 +28,7 @@ static int mjsister_input_sel2;
 
 static int rombank0,rombank1;
 
-static unsigned int dac_adr,dac_bank,dac_adr_s,dac_adr_e,dac_busy;
+static UINT32 dac_adr,dac_bank,dac_adr_s,dac_adr_e,dac_busy;
 
 /****************************************************************************/
 

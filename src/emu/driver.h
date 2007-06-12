@@ -31,7 +31,7 @@
 #define SOUND_START(name)		void sound_start_##name(running_machine *machine)
 #define SOUND_RESET(name)		void sound_reset_##name(running_machine *machine)
 
-#define VIDEO_START(name)		int video_start_##name(running_machine *machine)
+#define VIDEO_START(name)		void video_start_##name(running_machine *machine)
 #define VIDEO_RESET(name)		void video_reset_##name(running_machine *machine)
 
 #define PALETTE_INIT(name)		void palette_init_##name(running_machine *machine, UINT16 *colortable, const UINT8 *color_prom)
@@ -199,7 +199,7 @@ struct _machine_config
 	screen_config		screen[MAX_SCREENS];		/* total number of screens */
 
 	void 				(*init_palette)(running_machine *machine, UINT16 *colortable, const UINT8 *color_prom); /* one-time palette init callback  */
-	int					(*video_start)(running_machine *machine);		/* one-time video start callback */
+	void				(*video_start)(running_machine *machine);		/* one-time video start callback */
 	void				(*video_reset)(running_machine *machine);		/* video reset callback */
 	void				(*video_eof)(running_machine *machine);			/* end-of-frame video callback */
 	UINT32				(*video_update)(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect); /* video update callback */

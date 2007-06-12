@@ -144,8 +144,6 @@ VIDEO_START( tinvader )
 
 	spritebitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-	return 0;
 }
 
 static void tinvader_draw_sprites( mame_bitmap *bitmap )

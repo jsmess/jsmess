@@ -60,19 +60,12 @@ VIDEO_START( chqflag )
 	zoom_colorbase[0] = 0x10;
 	zoom_colorbase[1] = 0x02;
 
-	if (K051960_vh_start(SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback))
-		return 1;
-
-	if (K051316_vh_start_0(ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0))
-		return 1;
-
-	if (K051316_vh_start_1(ZOOMROM1_MEM_REGION,8,TILEMAP_SPLIT_PENBIT,0xc0,zoom_callback_1))
-		return 1;
+	K051960_vh_start(SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback);
+	K051316_vh_start_0(ZOOMROM0_MEM_REGION,4,TILEMAP_TRANSPARENT,0,zoom_callback_0);
+	K051316_vh_start_1(ZOOMROM1_MEM_REGION,8,TILEMAP_SPLIT_PENBIT,0xc0,zoom_callback_1);
 
 	K051316_set_offset(0,7,0);
 	K051316_wraparound_enable(1,1);
-
-	return 0;
 }
 
 /***************************************************************************

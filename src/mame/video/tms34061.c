@@ -74,7 +74,7 @@ static void tms34061_interrupt(int param);
  *
  *************************************/
 
-int tms34061_start(struct tms34061_interface *interface)
+void tms34061_start(struct tms34061_interface *interface)
 {
 	/* reset the data */
 	memset(&tms34061, 0, sizeof(tms34061));
@@ -118,7 +118,6 @@ int tms34061_start(struct tms34061_interface *interface)
 
 	/* start vertical interrupt timer */
 	tms34061.timer = mame_timer_alloc(tms34061_interrupt);
-	return 0;
 }
 
 

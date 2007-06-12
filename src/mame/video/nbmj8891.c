@@ -56,7 +56,7 @@ WRITE8_HANDLER( nbmj8891_palette_type1_w )
 	g = ((nbmj8891_palette[offset + 1] & 0xf0) >> 4);
 	b = ((nbmj8891_palette[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_HANDLER( nbmj8891_palette_type2_r )
@@ -78,7 +78,7 @@ WRITE8_HANDLER( nbmj8891_palette_type2_w )
 	g = ((nbmj8891_palette[offset + 0x000] & 0xf0) >> 4);
 	b = ((nbmj8891_palette[offset + 0x100] & 0x0f) >> 0);
 
-	palette_set_color(Machine, (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(Machine, (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_HANDLER( nbmj8891_palette_type3_r )
@@ -100,7 +100,7 @@ WRITE8_HANDLER( nbmj8891_palette_type3_w )
 	g = ((nbmj8891_palette[offset + 0] & 0xf0) >> 4);
 	b = ((nbmj8891_palette[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(Machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_HANDLER( nbmj8891_clutsel_w )
@@ -291,8 +291,8 @@ void nbmj8891_vramflip(int vram)
 {
 	static int nbmj8891_flipscreen_old = 0;
 	int x, y;
-	unsigned char color1, color2;
-	unsigned char *vidram;
+	UINT8 color1, color2;
+	UINT8 *vidram;
 
 	if (nbmj8891_flipscreen == nbmj8891_flipscreen_old) return;
 
@@ -333,7 +333,7 @@ static void blitter_timer_callback(int param)
 
 static void nbmj8891_gfxdraw(void)
 {
-	unsigned char *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(REGION_GFX1);
 
 	int x, y;
 	int dx1, dx2, dy1, dy2;
@@ -341,7 +341,7 @@ static void nbmj8891_gfxdraw(void)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	unsigned char color, color1, color2;
+	UINT8 color, color1, color2;
 	int gfxaddr;
 
 	nb1413m3_busyctr = 0;
@@ -488,7 +488,7 @@ static void nbmj8891_gfxdraw(void)
 ******************************************************************************/
 VIDEO_START( nbmj8891_1layer )
 {
-	unsigned char *CLUT = memory_region(REGION_USER1);
+	UINT8 *CLUT = memory_region(REGION_USER1);
 	int i;
 
 	nbmj8891_tmpbitmap0 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
@@ -500,8 +500,6 @@ VIDEO_START( nbmj8891_1layer )
 
 	if (nb1413m3_type == NB1413M3_TAIWANMB)
 		for (i = 0; i < 0x0800; i++) nbmj8891_clut[i] = CLUT[i];
-
-	return 0;
 }
 
 VIDEO_START( nbmj8891_2layer )
@@ -516,7 +514,6 @@ VIDEO_START( nbmj8891_2layer )
 	memset(nbmj8891_videoram1, 0xff, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
 	machine->pens[0x07f] = 0xff;	/* palette_transparent_pen */
 	gfxdraw_mode = 1;
-	return 0;
 }
 
 /******************************************************************************

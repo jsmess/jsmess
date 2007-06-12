@@ -130,19 +130,16 @@ PALETTE_INIT( pacman )
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		rgb_t palentry;
 
 		/* if this color table entry maps to pen 0, mark the appropriate pens in the transmask */
 		if (ctabentry == 0)
 			transmask[i/4] |= 1 << (i % 4);
 
 		/* first palette bank */
-		palentry = palette[0x00 + ctabentry];
-		palette_set_color(machine, i, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i, palette[0x00 + ctabentry]);
 
 		/* second palette bank */
-		palentry = palette[0x10 + ctabentry];
-		palette_set_color(machine, i + 64*4, RGB_RED(palentry), RGB_GREEN(palentry), RGB_BLUE(palentry));
+		palette_set_color(machine, i + 64*4, palette[0x10 + ctabentry]);
 	}
 }
 
@@ -204,8 +201,6 @@ VIDEO_START( pacman )
 
 	tilemap_set_scrolldx( bg_tilemap, 0, 384 - 288 );
 	tilemap_set_scrolldy( bg_tilemap, 0, 264 - 224 );
-
-	return 0;
 }
 
 WRITE8_HANDLER( pacman_videoram_w )
@@ -328,8 +323,6 @@ VIDEO_START( pengo )
 	xoffsethack = 0;
 
 	bg_tilemap = tilemap_create( pacman_get_tile_info, pacman_scan_rows, TILEMAP_OPAQUE, 8, 8, 36, 28 );
-
-    return 0;
 }
 
 WRITE8_HANDLER( pengo_palettebank_w )
@@ -370,7 +363,7 @@ Van Van
 WRITE8_HANDLER( vanvan_bgcolor_w )
 {
 	int c = 0xaa * (data & 1);
-	palette_set_color(Machine,0,c,c,c);
+	palette_set_color(Machine,0,MAKE_RGB(c,c,c));
 }
 
 
@@ -408,8 +401,6 @@ VIDEO_START( s2650games )
 	bg_tilemap = tilemap_create( s2650_get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32 );
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( s2650games )
@@ -582,7 +573,6 @@ VIDEO_START( jrpacman )
 
 	tilemap_set_transparent_pen( bg_tilemap, 0 );
 	tilemap_set_scroll_cols( bg_tilemap, 36 );
-	return 0;
 }
 
 WRITE8_HANDLER( jrpacman_videoram_w )

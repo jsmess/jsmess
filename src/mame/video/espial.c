@@ -67,7 +67,7 @@ PALETTE_INIT( espial )
 		bit2 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -103,8 +103,6 @@ VIDEO_START( espial )
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
-
-	return 0;
 }
 
 VIDEO_START( netwars )
@@ -114,8 +112,6 @@ VIDEO_START( netwars )
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 	tilemap_set_scrolldy(bg_tilemap, 0, 0x100);
-
-	return 0;
 }
 
 

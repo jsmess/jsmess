@@ -23,7 +23,7 @@ PALETTE_INIT( kchamp )
 		green = color_prom[machine->drv->total_colors+i];
 		blue = color_prom[2*machine->drv->total_colors+i];
 
-		palette_set_color(machine,i,pal4bit(red),pal4bit(green),pal4bit(blue));
+		palette_set_color_rgb(machine,i,pal4bit(red),pal4bit(green),pal4bit(blue));
 
 		*(colortable++) = i;
 	}
@@ -58,8 +58,6 @@ VIDEO_START( kchamp )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 /*

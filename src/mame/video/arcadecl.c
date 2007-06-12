@@ -70,18 +70,15 @@ VIDEO_START( arcadecl )
 	};
 
 	/* initialize the playfield */
-	if (!rampart_bitmap_init(43*8, 30*8))
-		return 1;
+	rampart_bitmap_init(43*8, 30*8);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
+	atarimo_init(0, &modesc);
 
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -4);
 	atarimo_set_yscroll(0, 0x110);
 	has_mo = (machine->gfx[0]->total_elements > 10);
-	return 0;
 }
 
 

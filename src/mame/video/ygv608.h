@@ -310,9 +310,9 @@ typedef struct _ygv608 {
    *  Shortcut variables
    */
 
-  unsigned int bits16;          // bits per pattern (8/16)
-  unsigned int page_x, page_y;  // pattern page size
-  unsigned int pny_shift;       // y coord multiplier
+  UINT32 bits16;          // bits per pattern (8/16)
+  UINT32 page_x, page_y;  // pattern page size
+  UINT32 pny_shift;       // y coord multiplier
   UINT8 na8_mask;       // mask on/off na11/9:8
   int col_shift;                // shift in scroll table column index
 
@@ -320,8 +320,8 @@ typedef struct _ygv608 {
   UINT32 ax, dx, dxy, ay, dy, dyx;
 
   // base address shortcuts
-  unsigned int base_addr[2][8];
-  unsigned int base_y_shift;    // for extracting pattern y coord 'base'
+  UINT32 base_addr[2][8];
+  UINT32 base_y_shift;    // for extracting pattern y coord 'base'
 
   UINT8 screen_resize;  // screen requires resize
   UINT8 tilemap_resize; // tilemap requires resize

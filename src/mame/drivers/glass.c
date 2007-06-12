@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_SOUND1);
+	UINT8 *RAM = memory_region(REGION_SOUND1);
 
 	if (ACCESSING_LSB){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);

@@ -16,15 +16,15 @@ TODO: - background is misplaced in wbmlju
 
 ******************************************************************************/
 
-static unsigned char *system1_ram;
-
-
 #include "driver.h"
 #include "video/system1.h"
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
+
+static UINT8 *system1_ram;
+
 
 static MACHINE_RESET( system1 )
 {
@@ -4624,7 +4624,7 @@ static DRIVER_INIT( dakkochn )
 static DRIVER_INIT( myherok )
 {
 	int A;
-	unsigned char *rom;
+	UINT8 *rom;
 
 	/* additionally to the usual protection, all the program ROMs have data lines */
 	/* D0 and D1 swapped. */
@@ -4651,7 +4651,7 @@ static DRIVER_INIT( myherok )
 	for (A = 0;A < 0xc000;A++)
 	{
 		int A1;
-		unsigned char temp;
+		UINT8 temp;
 
 		A1 = (A & 0xffcf) | ((A & 0x0010) << 1) | ((A & 0x0020) >> 1);
 		if (A < A1)

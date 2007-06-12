@@ -28,12 +28,12 @@ MAIN BOARD:
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 
-extern unsigned char *matmania_videoram2,*matmania_colorram2;
+extern UINT8 *matmania_videoram2,*matmania_colorram2;
 extern size_t matmania_videoram2_size;
-extern unsigned char *matmania_videoram3,*matmania_colorram3;
+extern UINT8 *matmania_videoram3,*matmania_colorram3;
 extern size_t matmania_videoram3_size;
-extern unsigned char *matmania_scroll;
-extern unsigned char *matmania_pageselect;
+extern UINT8 *matmania_scroll;
+extern UINT8 *matmania_pageselect;
 
 WRITE8_HANDLER( matmania_paletteram_w );
 PALETTE_INIT( matmania );

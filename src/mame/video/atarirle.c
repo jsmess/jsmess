@@ -137,7 +137,7 @@ static UINT16 *rle_table[8];
     STATIC FUNCTION DECLARATIONS
 ##########################################################################*/
 
-static int build_rle_tables(void);
+static void build_rle_tables(void);
 static int count_objects(const UINT16 *base, int length);
 static void prescan_rle(const struct atarirle_data *mo, int which);
 static void sort_and_render(struct atarirle_data *mo);
@@ -268,19 +268,17 @@ INLINE int convert_mask(const struct atarirle_entry *input, struct atarirle_mask
     the attribute lookup table.
 ---------------------------------------------------------------*/
 
-int atarirle_init(int map, const struct atarirle_desc *desc)
+void atarirle_init(int map, const struct atarirle_desc *desc)
 {
 	const UINT16 *base = (const UINT16 *)memory_region(desc->region);
 	struct atarirle_data *mo = &atarirle[map];
 	int i;
 
 	/* verify the map index */
-	if (map < 0 || map >= ATARIRLE_MAX)
-		return 0;
+	assert_always(map >= 0 && map < ATARIRLE_MAX, "Invalid map index");
 
 	/* build and allocate the generic tables */
-	if (!build_rle_tables())
-		return 0;
+	build_rle_tables();
 
 	/* determine the masks first */
 	convert_mask(&desc->codemask,     &mo->codemask);
@@ -357,7 +355,6 @@ int atarirle_init(int map, const struct atarirle_desc *desc)
 	}
 
 	mo->partial_scanline = -1;
-	return 1;
 }
 
 
@@ -525,14 +522,10 @@ mame_bitmap *atarirle_get_vram(int map, int idx)
     build_rle_tables: Builds internal table for RLE mapping.
 ---------------------------------------------------------------*/
 
-static int build_rle_tables(void)
+static void build_rle_tables(void)
 {
 	UINT16 *base;
 	int i;
-
-	/* if we've already done it, don't bother */
-//  if (rle_table[0])
-//      return 0;
 
 	/* allocate all 5 tables */
 	base = auto_malloc(0x500 * sizeof(UINT16));
@@ -578,8 +571,6 @@ static int build_rle_tables(void)
 		else
 			rle_table[4][i] = (((i & 0xc0) + 0x40) << 2) | (i & 0x3f);
 	}
-
-	return 1;
 }
 
 

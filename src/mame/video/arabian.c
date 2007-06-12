@@ -39,7 +39,7 @@ PALETTE_INIT( arabian )
 	/* there are effectively 6 bits of color: 2 red, 2 green, 2 blue */
 	for (i = 0; i < 64; i++)
 	{
-		palette_set_color(machine, i,
+		palette_set_color_rgb(machine, i,
 			((i >> 5) & 1) * (153*192/255) + ((i >> 4) & 1) * (102*192/255) + ((i & 0x30) ? 63 : 0),
 			((i >> 3) & 1) * (156*192/255) + ((i >> 2) & 1) * (99*192/255) + ((i & 0x0c) ? 63 : 0),
 			((i >> 1) & 1) * 192 + ((i >> 0) & 1) * 63);
@@ -213,8 +213,6 @@ VIDEO_START( arabian )
 		converted_gfx[offs * 4 + 1] = p3;
 		converted_gfx[offs * 4 + 0] = p4;
 	}
-
-	return 0;
 }
 
 

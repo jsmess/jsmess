@@ -136,7 +136,7 @@ static WRITE8_HANDLER( palette_w )
 //      int bit = (i & 0x300)>>8;
 		offset = ((i & 0x7f)<<3) | ((i & 0x80) >> 5);
 
-		palette_set_color(Machine,i,
+		palette_set_color_rgb(Machine,i,
 				pal4bit(BIT(paletteram[offset],0)*0x1 + BIT(paletteram[offset+1],0)*0x2 + BIT(paletteram[offset+2],0)*0x4 + BIT(paletteram[offset+3],0)*0x8),
 				pal4bit(BIT(paletteram[offset],1)*0x1 + BIT(paletteram[offset+1],1)*0x2 + BIT(paletteram[offset+2],1)*0x4 + BIT(paletteram[offset+3],1)*0x8),
 				pal4bit(BIT(paletteram[offset],2)*0x1 + BIT(paletteram[offset+1],2)*0x2 + BIT(paletteram[offset+2],2)*0x4 + BIT(paletteram[offset+3],2)*0x8));
@@ -617,8 +617,6 @@ static TILE_GET_INFO( get_tile_info_bg )
 VIDEO_START( merit )
 {
 	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,64,32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( merit )

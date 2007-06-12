@@ -50,7 +50,7 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 #include "driver.h"
 #include "audio/irem.h"
 
-extern unsigned char *travrusa_videoram;
+extern UINT8 *travrusa_videoram;
 
 PALETTE_INIT( travrusa );
 PALETTE_INIT( shtrider );
@@ -492,7 +492,7 @@ ROM_END
 DRIVER_INIT( motorace )
 {
 	int A,j;
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 	UINT8 *buffer = malloc_or_die(0x2000);
 
 		memcpy(buffer,rom,0x2000);
@@ -510,7 +510,7 @@ DRIVER_INIT( motorace )
 static DRIVER_INIT( shtridra )
 {
 	int A;
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)

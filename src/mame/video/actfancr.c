@@ -8,7 +8,7 @@
 
 
 static UINT8 actfancr_control_1[0x20],actfancr_control_2[0x20];
-unsigned char *actfancr_pf1_data,*actfancr_pf2_data,*actfancr_pf1_rowscroll_data;
+UINT8 *actfancr_pf1_data,*actfancr_pf2_data,*actfancr_pf1_rowscroll_data;
 static tilemap *pf1_tilemap,*pf1_alt_tilemap,*pf2_tilemap;
 static int flipscreen;
 
@@ -93,8 +93,6 @@ VIDEO_START( actfancr )
 	tilemap_set_transparent_pen(pf2_tilemap,0);
 
 	register_savestate();
-
-	return 0;
 }
 
 VIDEO_START( triothep )
@@ -107,8 +105,6 @@ VIDEO_START( triothep )
 	pf1_alt_tilemap=NULL;
 
 	register_savestate();
-
-	return 0;
 }
 
 /******************************************************************************/

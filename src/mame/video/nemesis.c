@@ -145,7 +145,7 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 	bit5=(data >>  14)&1;
 	b = MULTIPLIER;
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( salamander_palette_word_w )
@@ -154,7 +154,7 @@ WRITE16_HANDLER( salamander_palette_word_w )
 	offset &= ~1;
 
 	data = ((paletteram16[offset] << 8) & 0xff00) | (paletteram16[offset+1] & 0xff);
-	palette_set_color(Machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb(Machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 WRITE16_HANDLER( nemesis_videoram1b_word_w )
@@ -251,8 +251,6 @@ VIDEO_START( nemesis )
 
 	flipscreen = 0;
 	tilemap_flip = 0;
-
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)

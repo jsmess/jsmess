@@ -349,7 +349,7 @@ static WRITE8_HANDLER( airbustr_paletteram_w )
 	paletteram[offset] = data;
 	val = (paletteram[offset | 1] << 8) | paletteram[offset & ~1];
 
-	palette_set_color(Machine, offset/2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
+	palette_set_color_rgb(Machine, offset/2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
 
 static WRITE8_HANDLER( airbustr_coin_counter_w )

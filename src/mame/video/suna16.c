@@ -83,7 +83,6 @@ WRITE16_HANDLER( suna16_flipscreen_w )
 VIDEO_START( suna16 )
 {
 	paletteram16_2 = auto_malloc( 0x100 * sizeof(UINT16) );
-	return 0;
 }
 
 READ16_HANDLER( suna16_paletteram16_r )
@@ -96,7 +95,7 @@ WRITE16_HANDLER( suna16_paletteram16_w )
 {
 	if (color_bank)	data = COMBINE_DATA(&paletteram16_2[offset]);
 	else			data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color( Machine, offset + (color_bank ? 0x100 : 0),pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb( Machine, offset + (color_bank ? 0x100 : 0),pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 

@@ -97,10 +97,10 @@ READ8_HANDLER( daikaiju_sound_status_r )
 
 ***************************************************************************/
 
-static unsigned char from_main,from_mcu;
+static UINT8 from_main,from_mcu;
 static int mcu_sent = 0,main_sent = 0;
 
-static unsigned char portA_in,portA_out,ddrA;
+static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( lsasquad_68705_portA_r )
 {
@@ -130,7 +130,7 @@ WRITE8_HANDLER( lsasquad_68705_ddrA_w )
  *  2   W  when 0->1, copies port A to the latch for the main CPU
  */
 
-static unsigned char portB_in,portB_out,ddrB;
+static UINT8 portB_in,portB_out,ddrB;
 
 READ8_HANDLER( lsasquad_68705_portB_r )
 {

@@ -236,8 +236,6 @@ static VIDEO_START( astrof )
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
 	astrof_colorram = auto_malloc(astrof_videoram_size / 2);
 	state_save_register_global_pointer(astrof_colorram, astrof_videoram_size / 2);
-
-	return 0;
 }
 
 

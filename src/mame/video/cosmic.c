@@ -110,7 +110,7 @@ PALETTE_INIT( panic )
 			b = 0xaa;
 		else
 			b = 0xff * ((i >> 2) & 1);
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 
@@ -139,7 +139,7 @@ PALETTE_INIT( cosmica )
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	for (i = 0;i < machine->drv->total_colors;i++)
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
+		palette_set_color_rgb(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 
 
 	for (i = 0;i < TOTAL_COLORS(0)/2;i++)
@@ -176,7 +176,7 @@ PALETTE_INIT( cosmicg )
 
 		g = 0xaa * ((i >> 1) & 1);
 		b = 0xaa * ((i >> 2) & 1);
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 
@@ -201,7 +201,7 @@ PALETTE_INIT( magspot2 )
 
 		g = 0xff * ((i >> 1) & 1);
 		b = 0xff * ((i >> 2) & 1);
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 
@@ -224,7 +224,7 @@ PALETTE_INIT( nomnlnd )
 
 
 	for (i = 0;i < machine->drv->total_colors;i++)
-		palette_set_color(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
+		palette_set_color_rgb(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 
 
 	for (i = 0;i < TOTAL_COLORS(0);i++)

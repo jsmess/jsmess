@@ -19,7 +19,7 @@ static int vimana_latch;
 static int demonwld_dsp_on;
 static int demonwld_dsp_BIO;
 static int dsp_execute;							/* Demon world */
-static unsigned int dsp_addr_w, main_ram_seg;	/* Demon world */
+static UINT32 dsp_addr_w, main_ram_seg;	/* Demon world */
 
 int toaplan1_unk_reset_port;
 

@@ -8,11 +8,11 @@
 #include "video/konamiic.h"
 
 //static int spriteram_offset;
-static unsigned char *private_spriteram_2,*private_spriteram;
+static UINT8 *private_spriteram_2,*private_spriteram;
 
-unsigned char *contra_fg_vram,*contra_fg_cram;
-unsigned char *contra_text_vram,*contra_text_cram;
-unsigned char *contra_bg_vram,*contra_bg_cram;
+UINT8 *contra_fg_vram,*contra_fg_cram;
+UINT8 *contra_text_vram,*contra_text_cram;
+UINT8 *contra_bg_vram,*contra_bg_cram;
 
 static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 static rectangle bg_clip, fg_clip, tx_clip;
@@ -154,7 +154,6 @@ VIDEO_START( contra )
 	tx_clip.min_x = 0;
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-	return 0;
 }
 
 
@@ -249,7 +248,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int bank )
 {
-	const unsigned char *source;
+	const UINT8 *source;
 	int base_color = (K007121_ctrlram[bank][6]&0x30)*2;
 
 	if (bank==0) source=private_spriteram;

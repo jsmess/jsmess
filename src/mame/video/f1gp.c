@@ -10,7 +10,7 @@ size_t f1gp_spr1cgram_size,f1gp_spr2cgram_size;
 
 static UINT16 *zoomdata;
 static int dirtygfx,flipscreen,gfxctrl;
-static unsigned char *dirtychar;
+static UINT8 *dirtychar;
 
 #define TOTAL_CHARS 0x800
 
@@ -66,8 +66,6 @@ VIDEO_START( f1gp )
 	memset(dirtychar,1,TOTAL_CHARS);
 
 	zoomdata = (UINT16 *)memory_region(REGION_GFX4);
-
-	return 0;
 }
 
 VIDEO_START( f1gp2 )
@@ -88,8 +86,6 @@ VIDEO_START( f1gp2 )
 	memset(dirtychar,1,TOTAL_CHARS);
 
 	zoomdata = (UINT16 *)memory_region(REGION_GFX4);
-
-	return 0;
 }
 
 

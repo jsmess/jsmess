@@ -98,8 +98,6 @@ VIDEO_START( victory )
 	video_control = 0;
 	memset(&micro, 0, sizeof(micro));
 	micro.timer = mame_timer_alloc(NULL);
-
-	return 0;
 }
 
 
@@ -170,7 +168,7 @@ WRITE8_HANDLER( victory_charram_w )
 
 WRITE8_HANDLER( victory_paletteram_w )
 {
-	palette_set_color(Machine, offset & 0x3f, pal3bit(((offset & 0x80) >> 5) | ((data & 0xc0) >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
+	palette_set_color_rgb(Machine, offset & 0x3f, pal3bit(((offset & 0x80) >> 5) | ((data & 0xc0) >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 

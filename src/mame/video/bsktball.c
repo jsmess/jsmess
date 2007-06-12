@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "bsktball.h"
 
-unsigned char *bsktball_motion;
+UINT8 *bsktball_motion;
 
 static tilemap *bg_tilemap;
 
@@ -31,8 +31,6 @@ VIDEO_START( bsktball )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void bsktball_draw_sprites( mame_bitmap *bitmap )

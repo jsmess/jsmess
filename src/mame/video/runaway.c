@@ -33,7 +33,7 @@ WRITE8_HANDLER( runaway_paletteram_w )
 		0x47 * ((~data >> 0) & 1) +
 		0x97 * ((~data >> 1) & 1);
 
-	palette_set_color(Machine, offset, R, G, B);
+	palette_set_color(Machine, offset, MAKE_RGB(R, G, B));
 }
 
 
@@ -77,16 +77,12 @@ static TILE_GET_INFO( qwak_get_tile_info )
 VIDEO_START( runaway )
 {
 	bg_tilemap = tilemap_create(runaway_get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 30);
-
-	return bg_tilemap == NULL;
 }
 
 
 VIDEO_START( qwak )
 {
 	bg_tilemap = tilemap_create(qwak_get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 30);
-
-	return bg_tilemap == NULL;
 }
 
 

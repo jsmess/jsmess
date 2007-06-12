@@ -22,7 +22,7 @@ UINT8 *horizon_scrollram;
 static tilemap *m62_background;
 static tilemap *m62_foreground;
 static UINT8 flipscreen;
-static const unsigned char *sprite_height_prom;
+static const UINT8 *sprite_height_prom;
 static INT32 m62_background_hscroll;
 static INT32 m62_background_vscroll;
 
@@ -77,7 +77,7 @@ PALETTE_INIT( irem )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -116,7 +116,7 @@ PALETTE_INIT( battroad )
 		bit3 = (color_prom[2*512] >> 3) & 0x01;
 		b =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -142,7 +142,7 @@ PALETTE_INIT( battroad )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+512,r,g,b);
+		palette_set_color(machine,i+512,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 32;
@@ -180,7 +180,7 @@ PALETTE_INIT( spelunk2 )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -211,7 +211,7 @@ PALETTE_INIT( spelunk2 )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b =  0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i+512,r,g,b);
+		palette_set_color(machine,i+512,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -349,7 +349,7 @@ static void draw_sprites(mame_bitmap *bitmap, int colormask, int prioritymask, i
 	}
 }
 
-int m62_start( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+void m62_start( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_background = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, x1, y1, x2, y2 );
 
@@ -366,11 +366,9 @@ int m62_start( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int y
 	{
 		tilemap_set_scroll_cols( m62_background, cols );
 	}
-
-	return 0;
 }
 
-int m62_textlayer( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+void m62_textlayer( tile_get_info_fn tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_foreground = tilemap_create( tile_get_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, x1, y1, x2, y2 );
 
@@ -382,8 +380,6 @@ int m62_textlayer( tile_get_info_fn tile_get_info, int rows, int cols, int x1, i
 	{
 		tilemap_set_scroll_cols( m62_foreground, cols );
 	}
-
-	return 0;
 }
 
 WRITE8_HANDLER( kungfum_tileram_w )
@@ -436,7 +432,7 @@ VIDEO_UPDATE( kungfum )
 
 VIDEO_START( kungfum )
 {
-	return m62_start( get_kungfum_bg_tile_info, 32, 0, 8, 8, 64, 32 );
+	m62_start( get_kungfum_bg_tile_info, 32, 0, 8, 8, 64, 32 );
 }
 
 
@@ -477,7 +473,7 @@ VIDEO_UPDATE( ldrun )
 
 VIDEO_START( ldrun )
 {
-	return m62_start( get_ldrun_bg_tile_info, 1, 1, 8, 8, 64, 32 );
+	m62_start( get_ldrun_bg_tile_info, 1, 1, 8, 8, 64, 32 );
 }
 
 static TILE_GET_INFO( get_ldrun2_bg_tile_info )
@@ -505,7 +501,7 @@ static TILE_GET_INFO( get_ldrun2_bg_tile_info )
 
 VIDEO_START( ldrun2 )
 {
-	return m62_start( get_ldrun2_bg_tile_info, 1, 1, 8, 8, 64, 32 );
+	m62_start( get_ldrun2_bg_tile_info, 1, 1, 8, 8, 64, 32 );
 }
 
 static TILE_GET_INFO( get_battroad_bg_tile_info )
@@ -558,8 +554,8 @@ VIDEO_UPDATE( battroad )
 
 VIDEO_START( battroad )
 {
-	return m62_start( get_battroad_bg_tile_info, 1, 1, 8, 8, 64, 32 ) ||
-		m62_textlayer( get_battroad_fg_tile_info, 1, 1, 8, 8, 32, 32 );
+	m62_start( get_battroad_bg_tile_info, 1, 1, 8, 8, 64, 32 );
+	m62_textlayer( get_battroad_fg_tile_info, 1, 1, 8, 8, 32, 32 );
 }
 
 
@@ -585,7 +581,7 @@ VIDEO_UPDATE( ldrun4 )
 
 VIDEO_START( ldrun4 )
 {
-	return m62_start( get_ldrun4_bg_tile_info, 1, 0, 8, 8, 64, 32 );
+	m62_start( get_ldrun4_bg_tile_info, 1, 0, 8, 8, 64, 32 );
 }
 
 
@@ -629,8 +625,8 @@ VIDEO_UPDATE( lotlot )
 
 VIDEO_START( lotlot )
 {
-	return m62_start( get_lotlot_bg_tile_info, 1, 1, 12, 10, 32, 64 ) ||
-		m62_textlayer( get_lotlot_fg_tile_info, 1, 1, 12, 10, 32, 64 );
+	m62_start( get_lotlot_bg_tile_info, 1, 1, 12, 10, 32, 64 );
+	m62_textlayer( get_lotlot_fg_tile_info, 1, 1, 12, 10, 32, 64 );
 }
 
 
@@ -698,7 +694,7 @@ VIDEO_START( kidniki )
 
 	register_savestate();
 
-	return m62_textlayer( get_kidniki_fg_tile_info, 1, 1, 12, 8, 32, 64 );
+	m62_textlayer( get_kidniki_fg_tile_info, 1, 1, 12, 8, 32, 64 );
 }
 
 
@@ -746,8 +742,8 @@ VIDEO_UPDATE( spelunkr )
 
 VIDEO_START( spelunkr )
 {
-	return m62_start( get_spelunkr_bg_tile_info, 1, 1, 8, 8, 64, 64 ) ||
-		m62_textlayer( get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
+	m62_start( get_spelunkr_bg_tile_info, 1, 1, 8, 8, 64, 64 );
+	m62_textlayer( get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
 }
 
 
@@ -788,8 +784,8 @@ VIDEO_UPDATE( spelunk2 )
 
 VIDEO_START( spelunk2 )
 {
-	return m62_start( get_spelunk2_bg_tile_info, 1, 1, 8, 8, 64, 64 ) ||
-		m62_textlayer( get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
+	m62_start( get_spelunk2_bg_tile_info, 1, 1, 8, 8, 64, 64 );
+	m62_textlayer( get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
 }
 
 
@@ -835,8 +831,8 @@ VIDEO_UPDATE( youjyudn )
 
 VIDEO_START( youjyudn )
 {
-	return m62_start( get_youjyudn_bg_tile_info, 1, 0, 8, 16, 64, 16 ) ||
-		m62_textlayer( get_youjyudn_fg_tile_info, 1, 1, 12, 8, 32, 32 );
+	m62_start( get_youjyudn_bg_tile_info, 1, 0, 8, 16, 64, 16 );
+	m62_textlayer( get_youjyudn_fg_tile_info, 1, 1, 12, 8, 32, 32 );
 }
 
 
@@ -877,5 +873,5 @@ VIDEO_UPDATE( horizon )
 
 VIDEO_START( horizon )
 {
-	return m62_start( get_horizon_bg_tile_info, 32, 0, 8, 8, 64, 32 );
+	m62_start( get_horizon_bg_tile_info, 32, 0, 8, 8, 64, 32 );
 }

@@ -85,7 +85,7 @@ PALETTE_INIT( mbmj8688_8bit )
 		bit2 = ((i >> 7) & 0x01);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -102,7 +102,7 @@ PALETTE_INIT( mbmj8688_12bit )
 		g = ((i & 0x38) >> 2) | (((i >> 8) & 0x02) >> 1);
 		b = ((i & 0xc0) >> 4) | (((i >> 8) & 0x0c) >> 2);
 
-		palette_set_color(machine, i, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(machine, i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -118,7 +118,7 @@ PALETTE_INIT( mbmj8688_16bit )
 		g = (((i & 0x3800) >>  9) | ((i & 0x0018) >>  3));	// G 5bit
 		b = (((i & 0xc000) >> 11) | ((i & 0x00e0) >>  5));	// B 5bit
 
-		palette_set_color(machine, i, pal6bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine, i, pal6bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -245,7 +245,7 @@ void mjsikaku_vramflip(void)
 {
 	static int mjsikaku_flipscreen_old = 0;
 	int x, y;
-	unsigned short color1, color2;
+	UINT16 color1, color2;
 
 	if (mjsikaku_flipscreen == mjsikaku_flipscreen_old) return;
 
@@ -292,7 +292,7 @@ static void blitter_timer_callback(int param)
 
 static void mbmj8688_gfxdraw(int gfxtype)
 {
-	unsigned char *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(REGION_GFX1);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -301,7 +301,7 @@ static void mbmj8688_gfxdraw(int gfxtype)
 	int skipx, skipy;
 	int ctrx, ctry;
 	int gfxaddr;
-	unsigned short color, color1, color2;
+	UINT16 color, color1, color2;
 
 	if (gfxtype == GFXTYPE_PURE_12BIT)
 	{
@@ -553,7 +553,7 @@ static void mbmj8688_gfxdraw(int gfxtype)
 
 ******************************************************************************/
 
-static int common_video_start(void)
+static void common_video_start(void)
 {
 	mjsikaku_tmpbitmap = auto_bitmap_alloc(512, 256, Machine->screen[0].format);
 	mjsikaku_videoram = auto_malloc(512 * 256 * sizeof(UINT16));
@@ -561,38 +561,36 @@ static int common_video_start(void)
 	memset(mjsikaku_videoram, 0, (512 * 256 * sizeof(UINT16)));
 
 	mjsikaku_scrolly = 0;	// reset because crystalg/crystal2 don't write to this register
-
-	return 0;
 }
 
 VIDEO_START( mbmj8688_8bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_8BIT;
-	return common_video_start();
+	common_video_start();
 }
 
 VIDEO_START( mbmj8688_hybrid_12bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_HYBRID_12BIT;
-	return common_video_start();
+	common_video_start();
 }
 
 VIDEO_START( mbmj8688_pure_12bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_PURE_12BIT;
-	return common_video_start();
+	common_video_start();
 }
 
 VIDEO_START( mbmj8688_hybrid_16bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_HYBRID_16BIT;
-	return common_video_start();
+	common_video_start();
 }
 
 VIDEO_START( mbmj8688_pure_16bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
-	return common_video_start();
+	common_video_start();
 }
 
 VIDEO_START( mbmj8688_pure_16bit_LCD )
@@ -602,7 +600,7 @@ VIDEO_START( mbmj8688_pure_16bit_LCD )
 	HD61830B_ram[0] = auto_malloc(0x10000);
 	HD61830B_ram[1] = auto_malloc(0x10000);
 
-	return common_video_start();
+	common_video_start();
 }
 
 

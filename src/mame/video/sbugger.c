@@ -30,10 +30,7 @@ WRITE8_HANDLER( sbugger_videoram_attr_w )
 
 VIDEO_START(sbugger)
 {
-
 	sbugger_tilemap = tilemap_create(get_sbugger_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 16,64,16);
-
-	return 0;
 }
 
 VIDEO_UPDATE(sbugger)
@@ -55,8 +52,8 @@ PALETTE_INIT(sbugger)
 		int b = rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine,i*2+1,r,g,b);
-		palette_set_color(machine,i*2,0,0,0);
+		palette_set_color(machine,i*2+1,MAKE_RGB(r,g,b));
+		palette_set_color(machine,i*2,MAKE_RGB(0,0,0));
 
 	}
 

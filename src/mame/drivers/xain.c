@@ -146,7 +146,7 @@ TODO:
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
 
-static unsigned char *xain_sharedram;
+static UINT8 *xain_sharedram;
 static int vblank;
 
 VIDEO_UPDATE( xain );
@@ -160,7 +160,7 @@ WRITE8_HANDLER( xain_bgram0_w );
 WRITE8_HANDLER( xain_bgram1_w );
 WRITE8_HANDLER( xain_flipscreen_w );
 
-extern unsigned char *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
+extern UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
 
 static READ8_HANDLER( xain_sharedram_r )
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( xain_sharedram_w )
 
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	xain_pri=data&0x7;
 
@@ -190,7 +190,7 @@ static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 
 	if (data & 0x01) {memory_set_bankptr(2,&RAM[0x10000]);}
 	else {memory_set_bankptr(2,&RAM[0x4000]);}
@@ -689,7 +689,7 @@ ROM_END
 
 DRIVER_INIT( xsleena )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	/* do the same patch as the bootleg xsleena */
 	RAM[0xd488] = 0x12;
@@ -702,7 +702,7 @@ DRIVER_INIT( xsleena )
 
 DRIVER_INIT( solarwar )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	/* do the same patch as the bootleg xsleena */
 	RAM[0xd47e] = 0x12;

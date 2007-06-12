@@ -78,8 +78,6 @@ VIDEO_START( renegade )
 
 	state_save_register_global(renegade_scrollx);
 	state_save_register_func_postload(all_tiles_dirty);
-
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)

@@ -29,7 +29,7 @@ WRITE8_HANDLER( NMK112_okibank_w )
 	int chip	=	(offset & 4) >> 2;
 	int banknum	=	offset & 3;
 
-	unsigned char *rom	=	memory_region(REGION_SOUND1 + chip);
+	UINT8 *rom	=	memory_region(REGION_SOUND1 + chip);
 	int size			=	memory_region_length(REGION_SOUND1 + chip) - 0x40000;
 	int bankaddr		=	(data * BANKSIZE) % size;
 

@@ -616,7 +616,6 @@ static MACHINE_RESET(crystal)
 
 static VIDEO_START(crystal)
 {
-	return 0;
 }
 
 static void plot_pixel_rgb(mame_bitmap *bitmap, int x, int y , int color)

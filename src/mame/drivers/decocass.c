@@ -57,8 +57,9 @@
 #include "machine/decocass.h"
 #include "sound/ay8910.h"
 
+UINT8 *decocass_rambase;
+
 static UINT8 *decrypted;
-static UINT8 *rambase;
 
 /***************************************************************************
  *
@@ -71,8 +72,8 @@ INLINE int swap_bits_5_6(int data)
 	return (data & 0x9f) | ((data & 0x20) << 1) | ((data & 0x40) >> 1);
 }
 
-static WRITE8_HANDLER( ram1_w )       { decrypted[0x0000 + offset] = swap_bits_5_6(data); rambase[0x0000 + offset] = data;  }
-static WRITE8_HANDLER( ram2_w )       { decrypted[0x2000 + offset] = swap_bits_5_6(data); rambase[0x2000 + offset] = data;  }
+static WRITE8_HANDLER( ram1_w )       { decrypted[0x0000 + offset] = swap_bits_5_6(data); decocass_rambase[0x0000 + offset] = data;  }
+static WRITE8_HANDLER( ram2_w )       { decrypted[0x2000 + offset] = swap_bits_5_6(data); decocass_rambase[0x2000 + offset] = data;  }
 static WRITE8_HANDLER( charram_w )    { decrypted[0x6000 + offset] = swap_bits_5_6(data); decocass_charram_w(offset, data); }
 static WRITE8_HANDLER( fgvideoram_w ) { decrypted[0xc000 + offset] = swap_bits_5_6(data); decocass_fgvideoram_w(offset, data); }
 static WRITE8_HANDLER( fgcolorram_w ) { decrypted[0xc400 + offset] = swap_bits_5_6(data); decocass_colorram_w(offset, data); }
@@ -85,37 +86,19 @@ static READ8_HANDLER( mirrorvideoram_r ) { offset = ((offset >> 5) & 0x1f) | ((o
 static READ8_HANDLER( mirrorcolorram_r ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); return decocass_colorram[offset]; }
 
 
-static ADDRESS_MAP_START( decocass_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x5fff) AM_READ(MRA8_RAM)				/* RMS3 RAM */
-	AM_RANGE(0x6000, 0xafff) AM_READ(MRA8_RAM)				/* RMS3 RAM or DE-0091xx board */
-	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_RAM)				/* RMS3 RAM */
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)				/* DSP3 videoram + colorram */
-	AM_RANGE(0xc800, 0xcbff) AM_READ(mirrorvideoram_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_READ(mirrorcolorram_r)
-	AM_RANGE(0xd000, 0xdbff) AM_READ(MRA8_RAM)				/* B103 RAM */
-	AM_RANGE(0xe300, 0xe300) AM_READ(input_port_7_r) 		/* DSW1 */
-	AM_RANGE(0xe301, 0xe301) AM_READ(input_port_8_r) 		/* DSW2 */
-	AM_RANGE(0xe500, 0xe5ff) AM_READ(decocass_e5xx_r)		/* read data from 8041/status */
-	AM_RANGE(0xe600, 0xe6ff) AM_READ(decocass_input_r)		/* inputs */
-	AM_RANGE(0xe700, 0xe700) AM_READ(decocass_sound_data_r)	/* read sound CPU data */
-	AM_RANGE(0xe701, 0xe701) AM_READ(decocass_sound_ack_r)	/* read sound CPU ack status */
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( decocass_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(ram1_w) AM_BASE(&rambase)
-	AM_RANGE(0x2000, 0x5fff) AM_WRITE(ram2_w)	/* RMS3 RAM */
-	AM_RANGE(0x6000, 0xbfff) AM_WRITE(charram_w) AM_BASE(&decocass_charram) /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(fgvideoram_w) AM_BASE(&decocass_fgvideoram) AM_SIZE(&decocass_fgvideoram_size)  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(fgcolorram_w) AM_BASE(&decocass_colorram) AM_SIZE(&decocass_colorram_size)
-	AM_RANGE(0xc800, 0xcbff) AM_WRITE(mirrorvideoram_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(tileram_w) AM_BASE(&decocass_tileram) AM_SIZE(&decocass_tileram_size)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(objectram_w) AM_BASE(&decocass_objectram) AM_SIZE(&decocass_objectram_size)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(decocass_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xe300, 0xe300) AM_WRITE(decocass_watchdog_count_w)
-	AM_RANGE(0xe301, 0xe301) AM_WRITE(decocass_watchdog_flip_w)
+static ADDRESS_MAP_START( decocass_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(MRA8_RAM, ram1_w) AM_BASE(&decocass_rambase)
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(MRA8_RAM, ram2_w)	/* RMS3 RAM */
+	AM_RANGE(0x6000, 0xbfff) AM_READWRITE(MRA8_RAM, charram_w) AM_BASE(&decocass_charram) /* still RMS3 RAM */
+	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(MRA8_RAM, fgvideoram_w) AM_BASE(&decocass_fgvideoram) AM_SIZE(&decocass_fgvideoram_size)  /* DSP3 RAM */
+	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(MRA8_RAM, fgcolorram_w) AM_BASE(&decocass_colorram) AM_SIZE(&decocass_colorram_size)
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorcolorram_r, mirrorvideoram_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorvideoram_r, mirrorcolorram_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(MRA8_RAM, tileram_w) AM_BASE(&decocass_tileram) AM_SIZE(&decocass_tileram_size)
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, objectram_w) AM_BASE(&decocass_objectram) AM_SIZE(&decocass_objectram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_READWRITE(MRA8_RAM, decocass_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe300, 0xe300) AM_READWRITE(input_port_7_r, decocass_watchdog_count_w)
+	AM_RANGE(0xe301, 0xe301) AM_READWRITE(input_port_8_r, decocass_watchdog_flip_w)
 	AM_RANGE(0xe302, 0xe302) AM_WRITE(decocass_color_missiles_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(decocass_reset_w)
 
@@ -136,49 +119,36 @@ static ADDRESS_MAP_START( decocass_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(decocass_nmi_reset_w)
 	AM_RANGE(0xe420, 0xe42f) AM_WRITE(decocass_adc_w)
 
-	AM_RANGE(0xe500, 0xe5ff) AM_WRITE(decocass_e5xx_w)
+	AM_RANGE(0xe500, 0xe5ff) AM_READWRITE(decocass_e5xx_r, decocass_e5xx_w)	/* read data from 8041/status */
 
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xe600, 0xe6ff) AM_READ(decocass_input_r)		/* inputs */
+	AM_RANGE(0xe700, 0xe700) AM_READ(decocass_sound_data_r)	/* read sound CPU data */
+	AM_RANGE(0xe701, 0xe701) AM_READ(decocass_sound_ack_r)	/* read sound CPU ack status */
+
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(decocass_sound_nmi_enable_r)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(decocass_sound_data_ack_reset_r)
-	AM_RANGE(0xa000, 0xafff) AM_READ(decocass_sound_command_r)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( decocass_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(decocass_sound_nmi_enable_w)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(decocass_sound_data_ack_reset_w)
+static ADDRESS_MAP_START( decocass_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(decocass_sound_nmi_enable_r, decocass_sound_nmi_enable_w)
+	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(decocass_sound_data_ack_reset_r, decocass_sound_data_ack_reset_w)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0xa000, 0xafff) AM_READ(decocass_sound_command_r)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(decocass_sound_data_w)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x0800, 0x083f) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( decocass_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0800, 0x083f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x0800, 0x083f) AM_WRITE(MWA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( decocass_mcu_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(i8041_p1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(i8041_p2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( decocass_mcu_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_WRITE(i8041_p1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(i8041_p2_w)
+static ADDRESS_MAP_START( decocass_mcu_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x01, 0x01) AM_READWRITE(i8041_p1_r, i8041_p1_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(i8041_p2_r, i8041_p2_w)
 ADDRESS_MAP_END
 
 INPUT_PORTS_START( decocass )
@@ -431,14 +401,14 @@ static MACHINE_DRIVER_START( decocass )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502,750000)
-	MDRV_CPU_PROGRAM_MAP(decocass_readmem,decocass_writemem)
+	MDRV_CPU_PROGRAM_MAP(decocass_map,0)
 
 	MDRV_CPU_ADD(M6502,500000) /* 500 kHz */
-	MDRV_CPU_PROGRAM_MAP(decocass_sound_readmem,decocass_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(decocass_sound_map,0)
 
 	MDRV_CPU_ADD(I8X41,500000) /* 500 kHz ( I doubt it is 400kHz Al! )*/
-	MDRV_CPU_PROGRAM_MAP(decocass_mcu_readmem,decocass_mcu_writemem)
-	MDRV_CPU_IO_MAP(decocass_mcu_readport,decocass_mcu_writeport)
+	MDRV_CPU_PROGRAM_MAP(decocass_mcu_map,0)
+	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(TIME_IN_USEC(3072)		/* frames per second, vblank duration */)

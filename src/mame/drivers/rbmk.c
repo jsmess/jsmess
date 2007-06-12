@@ -451,7 +451,6 @@ static const gfx_decode gfxdecodeinfo[] =
 
 VIDEO_START(rbmk)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(rbmk)

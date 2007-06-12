@@ -147,8 +147,6 @@ VIDEO_START( ginganin )
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);
-
-	return 0;
 }
 
 

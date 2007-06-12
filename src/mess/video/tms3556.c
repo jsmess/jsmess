@@ -233,7 +233,7 @@ static PALETTE_INIT(tms3556)
 		red = (i & 1) ? 255 : 0;	/* red */
 		green = (i & 2) ? 255 : 0;	/* green */
 		blue = (i & 4) ? 255 : 0;	/* blue */
-		palette_set_color(machine, i, red, green, blue);
+		palette_set_color_rgb(machine, i, red, green, blue);
 	}
 }
 

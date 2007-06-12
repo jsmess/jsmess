@@ -71,7 +71,6 @@ VIDEO_START( oric )
 	timer_pulse(TIME_IN_HZ(50), 0, oric_vh_timer_callback);
 	/* mode */
 	oric_vh_update_attribute((1<<3)|(1<<4));
-    return 0;
 }
 
 

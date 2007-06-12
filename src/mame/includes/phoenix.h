@@ -23,8 +23,8 @@ void *popflame_sh_start(int clock, const struct CustomSound_interface *config);
 
 /*----------- defined in video/naughtyb.c -----------*/
 
-extern unsigned char *naughtyb_videoram2;
-extern unsigned char *naughtyb_scrollreg;
+extern UINT8 *naughtyb_videoram2;
+extern UINT8 *naughtyb_scrollreg;
 extern int naughtyb_cocktail;
 
 WRITE8_HANDLER( naughtyb_videoram2_w );

@@ -10,7 +10,7 @@
 #include "driver.h"
 
 
-unsigned char *slapfight_dpram;
+UINT8 *slapfight_dpram;
 size_t slapfight_dpram_size;
 
 int slapfight_status;
@@ -18,9 +18,9 @@ int getstar_sequence_index;
 int getstar_sh_intenabled;
 
 static int slapfight_status_state;
-extern unsigned char *getstar_e803;
+extern UINT8 *getstar_e803;
 
-static unsigned char mcu_val;
+static UINT8 mcu_val;
 
 /* Perform basic machine initialisation */
 MACHINE_RESET( slapfight )
@@ -87,14 +87,14 @@ WRITE8_HANDLER( slapfight_port_07_w )
 
 WRITE8_HANDLER( slapfight_port_08_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	memory_set_bankptr(1,&RAM[0x10000]);
 }
 
 WRITE8_HANDLER( slapfight_port_09_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	memory_set_bankptr(1,&RAM[0x14000]);
 }
@@ -123,8 +123,8 @@ READ8_HANDLER( slapfight_port_00_r )
 */
 READ8_HANDLER( getstar_e803_r )
 {
-	static const unsigned char seq[] = { 0, 1, ((0+5)^0x56) };
-unsigned char val;
+	static const UINT8 seq[] = { 0, 1, ((0+5)^0x56) };
+UINT8 val;
 
 	val = seq[getstar_sequence_index];
 	getstar_sequence_index = (getstar_sequence_index+1)%3;
@@ -155,11 +155,11 @@ WRITE8_HANDLER( getstar_port_04_w )
 
 /* Tiger Heli MCU */
 
-static unsigned char from_main,from_mcu;
+static UINT8 from_main,from_mcu;
 static int mcu_sent = 0,main_sent = 0;
-static unsigned char portA_in,portA_out,ddrA;
-static unsigned char portB_in,portB_out,ddrB;
-static unsigned char portC_in,portC_out,ddrC;
+static UINT8 portA_in,portA_out,ddrA;
+static UINT8 portB_in,portB_out,ddrB;
+static UINT8 portC_in,portC_out,ddrC;
 
 READ8_HANDLER( tigerh_68705_portA_r )
 {

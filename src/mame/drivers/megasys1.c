@@ -2700,7 +2700,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 
 	if ((protection_val & 0x90) == 0x90)
 	{
-		unsigned char *RAM = memory_region(okim6295_interface_region_1_pin7high.region);
+		UINT8 *RAM = memory_region(okim6295_interface_region_1_pin7high.region);
 		int new_bank = (protection_val & 0x7) % 7;
 
 		if (bank != new_bank)

@@ -493,7 +493,7 @@ static WRITE8_HANDLER( ramdac_w )
 			ramdac.color_w[ramdac.count_w] = pal6bit(data);
 			if (++ramdac.count_w == 3)
 			{
-				palette_set_color(Machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
+				palette_set_color_rgb(Machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
 				ramdac.count_w = 0;
 				ramdac.addr_w++;
 			}

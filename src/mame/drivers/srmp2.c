@@ -79,8 +79,8 @@ extern int mjyuugi_gfx_bank;
 
 static int srmp2_adpcm_bank;
 static int srmp2_adpcm_data;
-static unsigned long srmp2_adpcm_sptr;
-static unsigned long srmp2_adpcm_eptr;
+static UINT32 srmp2_adpcm_sptr;
+static UINT32 srmp2_adpcm_eptr;
 
 static int srmp2_port_select;
 
@@ -197,7 +197,7 @@ static WRITE16_HANDLER( srmp2_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	unsigned char *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(REGION_SOUND1);
 
 	srmp2_adpcm_sptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	srmp2_adpcm_eptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -220,7 +220,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	unsigned char *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(REGION_SOUND1);
 
 	srmp2_adpcm_sptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	srmp2_adpcm_eptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -236,7 +236,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
 
 static void srmp2_adpcm_int(int num)
 {
-	unsigned char *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(REGION_SOUND1);
 
 	if (srmp2_adpcm_sptr)
 	{
@@ -364,7 +364,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
     xxx- ---- : ADPCM ROM bank
 */
 
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	int addr;
 
 	srmp2_adpcm_bank = ((data & 0xe0) >> 5);

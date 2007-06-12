@@ -1064,7 +1064,7 @@ static MACHINE_START( namcos12 )
 	state_save_register_func_postload( s12_resetbank );
 }
 
-static unsigned char kcram[ 12 ];
+static UINT8 kcram[ 12 ];
 
 static WRITE32_HANDLER( kcoff_w )
 {

@@ -124,7 +124,7 @@ WRITE16_HANDLER( paletteram16_xRGB_w )
 	g = ((paldat & 0x0000ff00) >>8);
 	b = ((paldat & 0x00ff0000) >>16);
 
-	palette_set_color(Machine,pen,r,g,b);
+	palette_set_color(Machine,pen,MAKE_RGB(r,g,b));
 }
 
 READ16_HANDLER( pckgaldx_protection_r )

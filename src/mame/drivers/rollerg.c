@@ -335,7 +335,7 @@ ROM_END
 
 static void rollerg_banking( int lines )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs = 0;
 
 

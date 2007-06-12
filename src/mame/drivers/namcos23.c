@@ -371,8 +371,6 @@ VIDEO_START( ss23 )
 {
 	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,64,64 );
 	tilemap_set_transparent_pen( bgtilemap, 0xf );
-
-	return 0;
 }
 
 #if 0
@@ -569,7 +567,7 @@ INLINE void UpdatePalette( int entry )
 		int r = nthbyte(paletteram32,which+0x00001);
 		int g = nthbyte(paletteram32,which+0x08001);
 		int b = nthbyte(paletteram32,which+0x18001);
-		palette_set_color( Machine,which,r,g,b );
+		palette_set_color( Machine,which,MAKE_RGB(r,g,b) );
 	}
 }
 

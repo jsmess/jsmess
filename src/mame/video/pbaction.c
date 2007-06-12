@@ -80,8 +80,6 @@ VIDEO_START( pbaction )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void pbaction_draw_sprites( mame_bitmap *bitmap )

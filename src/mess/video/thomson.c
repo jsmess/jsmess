@@ -965,8 +965,6 @@ VIDEO_START ( thom )
   state_save_register_global( thom_bheight );
   state_save_register_global( thom_hires );
   state_save_register_global( thom_hires_better );
-
-  return 0;
 }
 
 PALETTE_INIT ( thom )
@@ -981,7 +979,7 @@ PALETTE_INIT ( thom )
     UINT8 g = 255. * pow( ((i>> 4) & 15) / 15., gamma );
     UINT8 b = 255. * pow( ((i >> 8) & 15) / 15., gamma );
     /* UINT8 alpha = i & 0x1000 ? 0 : 255;  TODO: transparency */
-    palette_set_color(machine,  i, r, g, b );
+    palette_set_color_rgb(machine,  i, r, g, b );
   }
 }
 

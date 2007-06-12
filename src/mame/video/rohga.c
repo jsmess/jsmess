@@ -28,21 +28,17 @@ VIDEO_START( rohga )
 {
 	rohga_spriteram = (UINT16*)auto_malloc(0x800);
 
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(0,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(1,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(2,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(3,wizdfire_bank_callback);
-
-	return 0;
 }
 
 VIDEO_START( wizdfire )
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(0,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(1,wizdfire_bank_callback);
@@ -52,14 +48,11 @@ VIDEO_START( wizdfire )
 	deco16_pf1_rowscroll=deco16_pf2_rowscroll=0;
 
 	alpha_set_level(0x80);
-
-	return 0;
 }
 
 VIDEO_START( nitrobal )
 {
-	if (deco16_2_video_init_half_width())
-		return 1;
+	deco16_2_video_init_half_width();
 
 	deco16_set_tilemap_bank_callback(0,wizdfire_bank_callback);
 	deco16_set_tilemap_bank_callback(1,wizdfire_bank_callback);
@@ -72,8 +65,6 @@ VIDEO_START( nitrobal )
 	deco16_set_tilemap_colour_mask(3,0);
 
 	alpha_set_level(0x80);
-
-	return 0;
 }
 
 /******************************************************************************/

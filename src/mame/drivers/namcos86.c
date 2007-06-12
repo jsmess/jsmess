@@ -202,7 +202,7 @@ WRITE8_HANDLER( rthunder_spriteram_w );
 
 static WRITE8_HANDLER( bankswitch1_w )
 {
-	unsigned char *base = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *base = memory_region(REGION_CPU1) + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
@@ -213,7 +213,7 @@ static WRITE8_HANDLER( bankswitch1_w )
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
 {
-	unsigned char *base = memory_region(REGION_USER1);
+	UINT8 *base = memory_region(REGION_USER1);
 
 	if (base == 0) return;
 
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
-	unsigned char *base = memory_region(REGION_CPU2) + 0x10000;
+	UINT8 *base = memory_region(REGION_CPU2) + 0x10000;
 
 	memory_set_bankptr(2,base + ((data & 0x03) * 0x2000));
 }
@@ -344,7 +344,7 @@ static WRITE8_HANDLER( cus115_w )
 
 static MACHINE_RESET( namco86 )
 {
-	unsigned char *base = memory_region(REGION_CPU1) + 0x10000;
+	UINT8 *base = memory_region(REGION_CPU1) + 0x10000;
 
 	memory_set_bankptr(1,base);
 }
@@ -1551,8 +1551,8 @@ ROM_END
 static DRIVER_INIT( namco86 )
 {
 	int size;
-	unsigned char *gfx;
-	unsigned char *buffer;
+	UINT8 *gfx;
+	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
 	gfx = memory_region(REGION_GFX1);
@@ -1560,17 +1560,17 @@ static DRIVER_INIT( namco86 )
 	buffer = malloc_or_die( size );
 
 	{
-		unsigned char *dest1 = gfx;
-		unsigned char *dest2 = gfx + ( size / 2 );
-		unsigned char *mono = gfx + size;
+		UINT8 *dest1 = gfx;
+		UINT8 *dest2 = gfx + ( size / 2 );
+		UINT8 *mono = gfx + size;
 		int i;
 
 		memcpy( buffer, gfx, size );
 
 		for ( i = 0; i < size; i += 2 )
 		{
-			unsigned char data1 = buffer[i];
-			unsigned char data2 = buffer[i+1];
+			UINT8 data1 = buffer[i];
+			UINT8 data2 = buffer[i+1];
 			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
 			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
 
@@ -1585,17 +1585,17 @@ static DRIVER_INIT( namco86 )
 	buffer = malloc_or_die( size );
 
 	{
-		unsigned char *dest1 = gfx;
-		unsigned char *dest2 = gfx + ( size / 2 );
-		unsigned char *mono = gfx + size;
+		UINT8 *dest1 = gfx;
+		UINT8 *dest2 = gfx + ( size / 2 );
+		UINT8 *mono = gfx + size;
 		int i;
 
 		memcpy( buffer, gfx, size );
 
 		for ( i = 0; i < size; i += 2 )
 		{
-			unsigned char data1 = buffer[i];
-			unsigned char data2 = buffer[i+1];
+			UINT8 data1 = buffer[i];
+			UINT8 data2 = buffer[i+1];
 			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
 			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
 

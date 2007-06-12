@@ -22,7 +22,6 @@ ADDRESS_MAP_END
 
 static VIDEO_START(ddz)
 {
-	return 0;
 }
 
 

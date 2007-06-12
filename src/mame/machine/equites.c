@@ -185,7 +185,7 @@ static void equites_synth_callback (int param)
 
 // Optimized Mersenne Twister - courtesy of Shawn J. Cokus, University of Washington
 
-typedef unsigned long uint32;
+typedef UINT32 uint32;
 
 #define N              (624)                 // length of state vector
 #define M              (397)                 // a period parameter

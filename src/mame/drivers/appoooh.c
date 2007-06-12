@@ -53,7 +53,7 @@ Credits:
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
 
-static unsigned char *adpcmptr = 0;
+static UINT8 *adpcmptr = 0;
 static int appoooh_adpcm_data;
 
 static void appoooh_adpcm_int(int num)
@@ -78,7 +78,7 @@ static void appoooh_adpcm_int(int num)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	unsigned char *RAM = memory_region(REGION_SOUND1);
+	UINT8 *RAM = memory_region(REGION_SOUND1);
 	adpcmptr  = &RAM[data*256];
 	MSM5205_reset_w(0,0);
 	appoooh_adpcm_data=-1;

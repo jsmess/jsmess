@@ -19,7 +19,7 @@
 
 static void *nmi_timer;
 
-static unsigned char customio[16];
+static UINT8 customio[16];
 static char battles_customio_command;
 static char battles_customio_prev_command;
 static char battles_customio_command_count;

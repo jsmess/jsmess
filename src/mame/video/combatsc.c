@@ -238,8 +238,6 @@ VIDEO_START( combasc )
 		tilemap_set_transparent_pen(textlayer,0);
 
 		tilemap_set_scroll_rows(textlayer,32);
-
-		return 0;
 }
 
 VIDEO_START( combascb )
@@ -261,8 +259,6 @@ VIDEO_START( combascb )
 
 		tilemap_set_scroll_rows(bg_tilemap[0],32);
 		tilemap_set_scroll_rows(bg_tilemap[1],32);
-
-		return 0;
 }
 
 /***************************************************************************

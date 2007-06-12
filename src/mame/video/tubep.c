@@ -100,7 +100,7 @@ PALETTE_INIT( rjammer )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine,i, r,g,b);
+		palette_set_color(machine,i, MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -292,7 +292,7 @@ PALETTE_INIT( tubep )
 		bit1 = (*color_prom >> 7) & 0x01;
 		b = combine_2_weights(weights_txt_b, bit0, bit1);
 
-		palette_set_color(machine,i, r,g,b);
+		palette_set_color(machine,i, MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -440,7 +440,7 @@ PALETTE_INIT( tubep )
 			//logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);
 			//logerror("r:%3i g:%3i b:%3i\n",r,g,b );
 
-			palette_set_color(machine,32+i*0x40+sh, r,g,b);
+			palette_set_color(machine,32+i*0x40+sh, MAKE_RGB(r,g,b));
 		}
 	}
 }
@@ -473,8 +473,6 @@ VIDEO_START( tubep )
 	state_save_register_global(ls175_e8);
 	state_save_register_global(ls377_data);
 	state_save_register_global(page);
-
-	return 0;
 }
 
 WRITE8_HANDLER( tubep_textram_w )
@@ -519,10 +517,10 @@ static void draw_sprite(void)
 {
 	UINT32	XDOT;
 	UINT32	YDOT;
-	unsigned char * romCxx  = memory_region(REGION_USER2)+0x00000;
-	unsigned char * romD10  = memory_region(REGION_USER2)+0x10000;
-	unsigned char * romEF13 = memory_region(REGION_USER2)+0x12000;
-	unsigned char * romHI2  = memory_region(REGION_USER2)+0x14000;
+	UINT8 * romCxx  = memory_region(REGION_USER2)+0x00000;
+	UINT8 * romD10  = memory_region(REGION_USER2)+0x10000;
+	UINT8 * romEF13 = memory_region(REGION_USER2)+0x12000;
+	UINT8 * romHI2  = memory_region(REGION_USER2)+0x14000;
 
 
 	for (YDOT=0; (YDOT^YSize) != 0x00; YDOT++)
@@ -669,7 +667,7 @@ VIDEO_UPDATE( tubep )
 		pen_t *pens = &machine->pens[ 32 ]; //change it later
 
 		UINT32 h,v;
-		unsigned char * romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
+		UINT8 * romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
 
 		for (v = 2*8; v < 30*8; v++)	/* only for visible area */
 		{
@@ -783,9 +781,9 @@ VIDEO_UPDATE( rjammer )
 		pen_t *pens = &machine->pens[ 0x00 ];
 
 		UINT32 h,v;
-		unsigned char * rom13D  = memory_region(REGION_USER1);
-		unsigned char * rom11BD = memory_region(REGION_USER1)+0x1000;
-		unsigned char * rom19C  = memory_region(REGION_USER1)+0x5000;
+		UINT8 * rom13D  = memory_region(REGION_USER1);
+		UINT8 * rom11BD = memory_region(REGION_USER1)+0x1000;
+		UINT8 * rom19C  = memory_region(REGION_USER1)+0x5000;
 
 
 	/* this can be optimized further by extracting constants out of the loop */

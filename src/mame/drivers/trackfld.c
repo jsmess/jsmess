@@ -26,7 +26,7 @@ MAIN BOARD:
 
 
 extern void konami1_decode(void);
-extern UINT8 konami1_decodebyte( UINT8 opcode, unsigned short address );
+extern UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address );
 
 
 extern UINT8 *trackfld_scroll;

@@ -963,7 +963,7 @@ ADDRESS_MAP_END
 #if 0
 static WRITE8_HANDLER( blazeon_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bank = data & 7;
 	memory_set_bankptr(15, &RAM[bank * 0x10000 + 0x1000]);
 }
@@ -988,7 +988,7 @@ ADDRESS_MAP_END
 
 WRITE8_HANDLER( sandscrp_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bank = data & 0x07;
 
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
@@ -2508,7 +2508,7 @@ MACHINE_DRIVER_END
 */
 void kaneko16_unscramble_tiles(int region)
 {
-	unsigned char *RAM	=	memory_region(region);
+	UINT8 *RAM	=	memory_region(region);
 	int size			=	memory_region_length(region);
 	int i;
 

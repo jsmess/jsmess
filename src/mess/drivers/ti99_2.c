@@ -142,7 +142,7 @@ static unsigned short ti99_2_colortable[] =
 
 static PALETTE_INIT(ti99_2)
 {
-	palette_set_colors(machine, 0, ti99_2_palette, TI99_2_PALETTE_SIZE);
+	palette_set_colors_rgb(machine, 0, ti99_2_palette, TI99_2_PALETTE_SIZE);
 	memcpy(colortable, & ti99_2_colortable, sizeof(ti99_2_colortable));
 }
 
@@ -150,7 +150,7 @@ static VIDEO_START(ti99_2)
 {
 	videoram_size = 768;
 
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 #define ti99_2_video_w videoram_w

@@ -255,13 +255,13 @@ static PALETTE_INIT( jollyjgr )
 		bit1 = BIT(*color_prom,7);
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* bitmap palette */
 	for (i = 0;i < 8;i++)
-		palette_set_color(machine,32 + i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
+		palette_set_color_rgb(machine,32 + i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
 }
 
 /* Tilemap is the same as in Galaxian */
@@ -277,8 +277,6 @@ VIDEO_START( jollyjgr )
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scroll_cols(bg_tilemap, 32);
-
-	return 0;
 }
 
 static void draw_bitmap(mame_bitmap *bitmap)

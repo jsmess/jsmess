@@ -22,17 +22,13 @@ VIDEO_START( shangon )
 	segaic16_palette_init(0x1000);
 
 	/* initialize the tile/text layers */
-	if (segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B_ALT, 0x000, 0, 2))
-		return 1;
+	segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B_ALT, 0x000, 0, 2);
 
 	/* initialize the sprites */
-	if (segaic16_sprites_init(0, SEGAIC16_SPRITES_16B, 0x400, 0))
-		return 1;
+	segaic16_sprites_init(0, SEGAIC16_SPRITES_16B, 0x400, 0);
 
 	/* initialize the road */
-	if (segaic16_road_init(0, SEGAIC16_ROAD_OUTRUN, 0x7f6, 0x7c0, 0x7c0, 0))
-		return 1;
-	return 0;
+	segaic16_road_init(0, SEGAIC16_ROAD_OUTRUN, 0x7f6, 0x7c0, 0x7c0, 0);
 }
 
 
@@ -42,18 +38,13 @@ VIDEO_START( outrun )
 	segaic16_palette_init(0x1000);
 
 	/* initialize the tile/text layers */
-	if (segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x000, 0, 2))
-		return 1;
+	segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x000, 0, 2);
 
 	/* initialize the sprites */
-	if (segaic16_sprites_init(0, SEGAIC16_SPRITES_OUTRUN, 0x800, 0))
-		return 1;
+	segaic16_sprites_init(0, SEGAIC16_SPRITES_OUTRUN, 0x800, 0);
 
 	/* initialize the road */
-	if (segaic16_road_init(0, SEGAIC16_ROAD_OUTRUN, 0x400, 0x420, 0x780, 0))
-		return 1;
-
-	return 0;
+	segaic16_road_init(0, SEGAIC16_ROAD_OUTRUN, 0x400, 0x420, 0x780, 0);
 }
 
 

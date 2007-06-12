@@ -16,7 +16,7 @@ static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char *base = memory_region(REGION_GFX5) + 2*tile_index;
+	UINT8 *base = memory_region(REGION_GFX5) + 2*tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000+1]<<8) | base[1];
@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	unsigned char *base = memory_region(REGION_GFX5) + 0x20000 + 2*tile_index;
+	UINT8 *base = memory_region(REGION_GFX5) + 0x20000 + 2*tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000+1]<<8) | base[1];
@@ -66,8 +66,6 @@ VIDEO_START( sf )
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,3);
-
-	return 0;
 }
 
 

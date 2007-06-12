@@ -10,7 +10,7 @@
 
 UINT8 *konami1_decrypted;
 
-UINT8 konami1_decodebyte( UINT8 opcode, unsigned short address )
+UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
 {
 /*
 >

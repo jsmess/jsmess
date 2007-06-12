@@ -79,7 +79,6 @@ VIDEO_START( apple3 )
 			hgr_map[(i * 8) + j] = 0x2000 + v + (j * 0x400);
 		}
 	}
-	return 0;
 }
 
 

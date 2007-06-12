@@ -467,16 +467,16 @@ struct ics2115_interface pgm_ics2115_interface = {
 
 /* Calendar Emulation */
 
-static unsigned char CalVal, CalMask, CalCom=0, CalCnt=0;
+static UINT8 CalVal, CalMask, CalCom=0, CalCnt=0;
 
-static unsigned char bcd(unsigned char data)
+static UINT8 bcd(UINT8 data)
 {
 	return ((data / 10) << 4) | (data % 10);
 }
 
 READ16_HANDLER( pgm_calendar_r )
 {
-	unsigned char calr;
+	UINT8 calr;
 	calr = (CalVal & CalMask) ? 1 : 0;
 	CalMask <<= 1;
 	return calr;
@@ -1698,7 +1698,7 @@ static void expand_colourdata(void)
 
 static void pgm_basic_init(void)
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&ROM[0x100000]);
 
 	expand_32x32x5bpp();
@@ -1882,13 +1882,13 @@ WRITE16_HANDLER( killbld_prot_w )
 
 			if(data==1)	//Execute cmd
 			{
-				unsigned short cmd=killbld_sharedprotram[0x200/2];
+				UINT16 cmd=killbld_sharedprotram[0x200/2];
 				//mame_printf_debug("command %04x\n",cmd);
 				if(cmd==0x6d)	//Store values to asic ram
 				{
-					unsigned int p1=(killbld_sharedprotram[0x298/2] << 16) | killbld_sharedprotram[0x29a/2];
-					unsigned int p2=(killbld_sharedprotram[0x29c/2] << 16) | killbld_sharedprotram[0x29e/2];
-					static unsigned int Regs[0x10];
+					UINT32 p1=(killbld_sharedprotram[0x298/2] << 16) | killbld_sharedprotram[0x29a/2];
+					UINT32 p2=(killbld_sharedprotram[0x29c/2] << 16) | killbld_sharedprotram[0x29e/2];
+					static UINT32 Regs[0x10];
 					if((p2&0xFFFF)==0x9)	//Set value
 					{
 						int reg=(p2>>16)&0xFFFF;
@@ -1917,10 +1917,10 @@ WRITE16_HANDLER( killbld_prot_w )
 				}
 				if(cmd==0x4f)	//memcpy with encryption / scrambling
 				{
-					unsigned short src=killbld_sharedprotram[0x290/2]>>1; // ?
-					unsigned int dst=killbld_sharedprotram[0x292/2];
-					unsigned short size=killbld_sharedprotram[0x294/2];
-					unsigned short mode=killbld_sharedprotram[0x296/2];
+					UINT16 src=killbld_sharedprotram[0x290/2]>>1; // ?
+					UINT32 dst=killbld_sharedprotram[0x292/2];
+					UINT16 size=killbld_sharedprotram[0x294/2];
+					UINT16 mode=killbld_sharedprotram[0x296/2];
 
 
 				//  int a=1;
@@ -2028,7 +2028,7 @@ WRITE16_HANDLER( killbld_prot_w )
 READ16_HANDLER( killbld_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	unsigned short res ;
+	UINT16 res ;
 
 	offset&=0xf;
 	res=0;
@@ -2213,14 +2213,14 @@ static MACHINE_RESET( olds )
 }
 
 
-unsigned short olds_bs,olds_cmd3;
+UINT16 olds_bs,olds_cmd3;
 
 
-//unsigned short olds_r16(unsigned int addr)
+//UINT16 olds_r16(UINT32 addr)
 READ16_HANDLER( olds_r16 )
 {
 //  int offset=addr&0xf;
-	unsigned short res ;
+	UINT16 res ;
 	res=0;
 
 	if(offset==1)
@@ -2242,7 +2242,7 @@ READ16_HANDLER( olds_r16 )
 	return res;
 }
 
-//void olds_w16(unsigned int addr,unsigned short data)
+//void olds_w16(UINT32 addr,UINT16 data)
 WRITE16_HANDLER( olds_w16 )
 {
 //  int offset=addr&0xf;
@@ -2269,14 +2269,14 @@ WRITE16_HANDLER( olds_w16 )
 		}
 		else if(kb_cmd==3)
 		{
-			//unsigned short cmd=fast_r16(0x403026);
-			unsigned short cmd = 0;
+			//UINT16 cmd=fast_r16(0x403026);
+			UINT16 cmd = 0;
 			if(cmd==0x12)	//memcpy
 			{
-			//  unsigned short src=fast_r16(0x40306A);
-			//  unsigned int dst=0x400000+(fast_r16(0x403084)<<1);
-			//  unsigned short size=fast_r16(0x4030A2);
-			//  unsigned short mode=fast_r16(0x40303E)&0xf;
+			//  UINT16 src=fast_r16(0x40306A);
+			//  UINT32 dst=0x400000+(fast_r16(0x403084)<<1);
+			//  UINT16 size=fast_r16(0x4030A2);
+			//  UINT16 mode=fast_r16(0x40303E)&0xf;
 				//int a=1;
 			}
 			//else

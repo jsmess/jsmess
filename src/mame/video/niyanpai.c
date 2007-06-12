@@ -67,7 +67,7 @@ WRITE16_HANDLER( niyanpai_palette_w )
 			g  = ((niyanpai_palette[(0x080 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
 			b  = ((niyanpai_palette[(0x100 + (offs_h * 0x180) + offs_l)] & 0xff00) >> 8);
 
-			palette_set_color(Machine, ((offs_h << 8) + (offs_l << 1) + 0), r, g, b);
+			palette_set_color(Machine, ((offs_h << 8) + (offs_l << 1) + 0), MAKE_RGB(r, g, b));
 		}
 
 		if (ACCESSING_LSB16)
@@ -76,7 +76,7 @@ WRITE16_HANDLER( niyanpai_palette_w )
 			g  = ((niyanpai_palette[(0x080 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
 			b  = ((niyanpai_palette[(0x100 + (offs_h * 0x180) + offs_l)] & 0x00ff) >> 0);
 
-			palette_set_color(Machine, ((offs_h << 8) + (offs_l << 1) + 1), r, g, b);
+			palette_set_color(Machine, ((offs_h << 8) + (offs_l << 1) + 1), MAKE_RGB(r, g, b));
 		}
 	}
 }
@@ -88,7 +88,7 @@ WRITE16_HANDLER( niyanpai_palette_w )
 int niyanpai_blitter_r(int vram, int offset)
 {
 	int ret;
-	unsigned char *GFXROM = memory_region(REGION_GFX1);
+	UINT8 *GFXROM = memory_region(REGION_GFX1);
 
 	switch (offset)
 	{
@@ -151,7 +151,7 @@ static void niyanpai_vramflip(int vram)
 {
 	static int niyanpai_flipscreen_old[VRAM_MAX] = { 0, 0, 0 };
 	int x, y;
-	unsigned short color1, color2;
+	UINT16 color1, color2;
 
 	if (niyanpai_flipscreen[vram] == niyanpai_flipscreen_old[vram]) return;
 
@@ -194,7 +194,7 @@ static void blitter_timer_callback(int param)
 
 static void niyanpai_gfxdraw(int vram)
 {
-	unsigned char *GFX = memory_region(REGION_GFX1);
+	UINT8 *GFX = memory_region(REGION_GFX1);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -202,7 +202,7 @@ static void niyanpai_gfxdraw(int vram)
 	int sizex, sizey;
 	int skipx, skipy;
 	int ctrx, ctry;
-	unsigned short color, color1, color2;
+	UINT16 color, color1, color2;
 	int gfxaddr;
 
 	nb19010_busyctr = 0;
@@ -391,7 +391,6 @@ VIDEO_START( niyanpai )
 	memset(niyanpai_videoworkram[1], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
 	memset(niyanpai_videoworkram[2], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
 	nb19010_busyflag = 1;
-	return 0;
 }
 
 /******************************************************************************

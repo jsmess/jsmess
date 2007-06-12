@@ -152,7 +152,7 @@ Notes:
 #include "sound/2203intf.h"
 
 /* in video/lsasquad.c */
-extern unsigned char *lsasquad_scrollram;
+extern UINT8 *lsasquad_scrollram;
 VIDEO_UPDATE( lsasquad );
 VIDEO_UPDATE( daikaiju );
 
@@ -187,7 +187,7 @@ MACHINE_RESET(daikaiju);
 
 WRITE8_HANDLER( lsasquad_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	/* bits 0-2 select ROM bank */
 	memory_set_bankptr(1,&ROM[0x10000 + 0x2000 * (data & 7)]);
@@ -788,7 +788,7 @@ ROM_END
 
 static void init_common(void)
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	/* an instruction at $7FFF straddles the bank switch boundary at
        $8000 into rom bank #0 and then continues into the bank so

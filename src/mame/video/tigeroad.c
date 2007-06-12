@@ -151,8 +151,6 @@ VIDEO_START( tigeroad )
 	tilemap_set_transmask(bg_tilemap, 1, 0x1ff, 0xfe00);
 
 	tilemap_set_transparent_pen(fg_tilemap, 3);
-
-	return 0;
 }
 
 VIDEO_UPDATE( tigeroad )

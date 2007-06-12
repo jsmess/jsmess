@@ -86,14 +86,11 @@ VIDEO_START( skullxbo )
 	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_cols, TILEMAP_OPAQUE, 16,8, 64,64);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
+	atarimo_init(0, &modesc);
 
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16,8, 64,32);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
-
-	return 0;
 }
 
 

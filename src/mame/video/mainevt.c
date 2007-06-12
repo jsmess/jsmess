@@ -72,12 +72,8 @@ VIDEO_START( mainevt )
 	layer_colorbase[2] = 4;
 	sprite_colorbase = 12;
 
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,mainevt_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,mainevt_sprite_callback))
-		return 1;
-
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,mainevt_tile_callback);
+	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,mainevt_sprite_callback);
 }
 
 VIDEO_START( dv )
@@ -87,12 +83,8 @@ VIDEO_START( dv )
 	layer_colorbase[2] = 4;
 	sprite_colorbase = 8;
 
-	if (K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,dv_tile_callback))
-		return 1;
-	if (K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,dv_sprite_callback))
-		return 1;
-
-	return 0;
+	K052109_vh_start(REGION_GFX1,NORMAL_PLANE_ORDER,dv_tile_callback);
+	K051960_vh_start(REGION_GFX2,NORMAL_PLANE_ORDER,dv_sprite_callback);
 }
 
 /*****************************************************************************/

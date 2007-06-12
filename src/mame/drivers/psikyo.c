@@ -391,7 +391,7 @@ WRITE8_HANDLER( psikyo_clear_nmi_w )
 
 WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bank = data & 3;
 	memory_set_bankptr(1, &RAM[bank * 0x8000 + 0x10000]);
 }
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 
 WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 	int bank = (data >> 4) & 3;
 
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes
@@ -1800,7 +1800,7 @@ ROM_END
 DRIVER_INIT( sngkace )
 {
 	{
-		unsigned char *RAM	=	memory_region(REGION_SOUND1);
+		UINT8 *RAM	=	memory_region(REGION_SOUND1);
 		int len				=	memory_region_length(REGION_SOUND1);
 		int i;
 
@@ -1826,7 +1826,7 @@ DRIVER_INIT( sngkace )
 #if 0
 	if (!strcmp(machine->gamedrv->name,"sngkace"))
 	{
-		unsigned char *ROM	=	memory_region(REGION_CPU1);
+		UINT8 *ROM	=	memory_region(REGION_CPU1);
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;

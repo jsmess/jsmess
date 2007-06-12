@@ -1173,7 +1173,7 @@ WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(sys.video.gfx_pal+offset);
 		val = sys.video.gfx_pal[offset];
-		palette_set_color(Machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(Machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 
@@ -1181,7 +1181,7 @@ WRITE16_HANDLER( x68k_vid_w )
 	{
 		COMBINE_DATA(sys.video.text_pal+offset);
 		val = sys.video.text_pal[offset];
-		palette_set_color(Machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
+		palette_set_color_rgb(Machine,offset,(val & 0x07c0) >> 3,(val & 0xf800) >> 8,(val & 0x003e) << 2);
 		return;
 	}
 

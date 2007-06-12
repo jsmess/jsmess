@@ -2,7 +2,7 @@
 
 static int flipscreen;
 static tilemap *layer0;
-extern unsigned char *pandoras_sharedram;
+extern UINT8 *pandoras_sharedram;
 
 /***********************************************************************
 
@@ -50,7 +50,7 @@ PALETTE_INIT( pandoras )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -73,7 +73,7 @@ PALETTE_INIT( pandoras )
 
 static TILE_GET_INFO( get_tile_info0 )
 {
-	unsigned char attr = colorram[tile_index];
+	UINT8 attr = colorram[tile_index];
 	SET_TILE_INFO(
 			0,
 			videoram[tile_index] + ((attr & 0x10) << 4),
@@ -91,8 +91,6 @@ static TILE_GET_INFO( get_tile_info0 )
 VIDEO_START( pandoras )
 {
 	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
-
-	return 0;
 }
 
 /***************************************************************************
@@ -140,7 +138,7 @@ WRITE8_HANDLER( pandoras_flipscreen_w )
 
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, unsigned char* sr)
+static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, UINT8* sr)
 {
 	int offs;
 

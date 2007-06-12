@@ -179,7 +179,6 @@ VIDEO_START( dynadice )
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
 	top_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_OPAQUE,8,8,2,32);
 	tilemap_set_scrollx(bg_tilemap, 0, -16 );
-	return 0;
 }
 
 VIDEO_UPDATE( dynadice )
@@ -195,7 +194,7 @@ PALETTE_INIT( dynadice )
 {
 	int i;
 	for(i=0;i<8;i++)
-		palette_set_color(machine,i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+		palette_set_color_rgb(machine,i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 static MACHINE_DRIVER_START( dynadice )

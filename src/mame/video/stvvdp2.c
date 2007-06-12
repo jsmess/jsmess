@@ -2357,7 +2357,7 @@ INLINE UINT16 stv_add_blend(UINT16 a, UINT16 b)
 }
 
 static void stv_vdp2_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
 		int sprite_screen_width, int sprite_screen_height)
 {
@@ -2689,7 +2689,7 @@ static void stv_vdp2_compute_color_offset_RGB555_UINT16(UINT16 *rgb, int cor)
 	*rgb = (_r << 10) |  (_g << 5) | _b;
 }
 
-static void stv_vdp2_drawgfx_rgb555( mame_bitmap *dest_bmp, unsigned int code, int flipx, int flipy,
+static void stv_vdp2_drawgfx_rgb555( mame_bitmap *dest_bmp, UINT32 code, int flipx, int flipy,
 									 int sx, int sy, const rectangle *clip, int transparency)
 {
 	rectangle myclip;
@@ -5110,7 +5110,7 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((stv_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((stv_vdp2_cram[offset] & 0x000000ff) >> 0);
-			palette_set_color(Machine,offset,r,g,b);
+			palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 		}
 		break;
 		/*Mode 0*/
@@ -5121,11 +5121,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color(Machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(Machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color(Machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(Machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 		/*Mode 1*/
@@ -5136,11 +5136,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color(Machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(Machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color(Machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(Machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 	}
@@ -5162,7 +5162,7 @@ static void refresh_palette_data()
 				b = ((stv_vdp2_cram[c_i] & 0x00ff0000) >> 16);
 				g = ((stv_vdp2_cram[c_i] & 0x0000ff00) >> 8);
 				r = ((stv_vdp2_cram[c_i] & 0x000000ff) >> 0);
-				palette_set_color(Machine,c_i,r,g,b);
+				palette_set_color(Machine,c_i,MAKE_RGB(r,g,b));
 			}
 			break;
 			/*Mode 0*/
@@ -5173,11 +5173,11 @@ static void refresh_palette_data()
 				b = ((stv_vdp2_cram[c_i] & 0x00007c00) >> 10);
 				g = ((stv_vdp2_cram[c_i] & 0x000003e0) >> 5);
 				r = ((stv_vdp2_cram[c_i] & 0x0000001f) >> 0);
-				palette_set_color(Machine,(c_i*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+				palette_set_color_rgb(Machine,(c_i*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 				b = ((stv_vdp2_cram[c_i] & 0x7c000000) >> 26);
 				g = ((stv_vdp2_cram[c_i] & 0x03e00000) >> 21);
 				r = ((stv_vdp2_cram[c_i] & 0x001f0000) >> 16);
-				palette_set_color(Machine,c_i*2,pal5bit(r),pal5bit(g),pal5bit(b));
+				palette_set_color_rgb(Machine,c_i*2,pal5bit(r),pal5bit(g),pal5bit(b));
 			}
 			break;
 			/*Mode 1*/
@@ -5188,11 +5188,11 @@ static void refresh_palette_data()
 				b = ((stv_vdp2_cram[c_i] & 0x00007c00) >> 10);
 				g = ((stv_vdp2_cram[c_i] & 0x000003e0) >> 5);
 				r = ((stv_vdp2_cram[c_i] & 0x0000001f) >> 0);
-				palette_set_color(Machine,(c_i*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+				palette_set_color_rgb(Machine,(c_i*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 				b = ((stv_vdp2_cram[c_i] & 0x7c000000) >> 26);
 				g = ((stv_vdp2_cram[c_i] & 0x03e00000) >> 21);
 				r = ((stv_vdp2_cram[c_i] & 0x001f0000) >> 16);
-				palette_set_color(Machine,c_i*2,pal5bit(r),pal5bit(g),pal5bit(b));
+				palette_set_color_rgb(Machine,c_i*2,pal5bit(r),pal5bit(g),pal5bit(b));
 			}
 			break;
 		}
@@ -5303,8 +5303,6 @@ VIDEO_START( stv_vdp2 )
 	debug.l_en = 0xff;
 	debug.error = 0xffffffff;
 	debug.roz = 0;
-
-	return 0;
 }
 
 static void stv_vdp2_dynamic_res_change()
@@ -5372,7 +5370,7 @@ static void	stv_vdp2_fade_effects()
 		r = t_r;
 		g = t_g;
 		b = t_b;
-		palette_set_color(Machine,i+(2048*1),r,g,b);
+		palette_set_color(Machine,i+(2048*1),MAKE_RGB(r,g,b));
 
 		/*Fade B*/
 		color = palette_get_color(Machine, i);
@@ -5388,7 +5386,7 @@ static void	stv_vdp2_fade_effects()
 		r = t_r;
 		g = t_g;
 		b = t_b;
-		palette_set_color(Machine,i+(2048*2),r,g,b);
+		palette_set_color(Machine,i+(2048*2),MAKE_RGB(r,g,b));
 	}
 	//popmessage("%04x %04x %04x %04x %04x %04x",STV_VDP2_COAR,STV_VDP2_COAG,STV_VDP2_COAB,STV_VDP2_COBR,STV_VDP2_COBG,STV_VDP2_COBB);
 }

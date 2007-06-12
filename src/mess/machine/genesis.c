@@ -1027,7 +1027,7 @@ VIDEO_START(genesis)
 {
 	genesis_vdp_start (&genesis_vdp);
 	oldscreenmode = 0xff; // driver specific
-	return video_start_generic_bitmapped(machine);
+	video_start_generic_bitmapped(machine);
 }
 
 VIDEO_UPDATE(genesis)
@@ -1071,7 +1071,7 @@ VIDEO_UPDATE(genesis)
 		g = (paldat & 0x00e0) >>4;
 		b = (paldat & 0x0e00) >>8;
 
-		palette_set_color(machine, i,r<<4,g<<4,b<<4);
+		palette_set_color_rgb(machine, i,r<<4,g<<4,b<<4);
 
 	}
 

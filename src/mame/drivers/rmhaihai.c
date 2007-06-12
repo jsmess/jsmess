@@ -60,8 +60,6 @@ VIDEO_START( rmhaihai )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 64, 32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( rmhaihai )

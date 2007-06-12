@@ -312,7 +312,7 @@ WRITE8_HANDLER( tmnt_sres_w )
 static void tmnt_decode_sample(void)
 {
 	int i;
-	unsigned char *source = memory_region(REGION_SOUND3);
+	UINT8 *source = memory_region(REGION_SOUND3);
 
 	sampledata = auto_malloc(0x40000*sizeof(sampledata[0]));
 
@@ -1142,8 +1142,8 @@ WRITE16_HANDLER( tmnt2_1c0800_w )
     COMBINE_DATA( tmnt2_1c0800 + offset);
     if ( offset == 0x0008 && ( tmnt2_1c0800[0x8] & 0xff00 ) == 0x8200 )
 	{
-		unsigned int CellSrc;
-		unsigned int CellVar;
+		UINT32 CellSrc;
+		UINT32 CellVar;
 		UINT16 *src;
 		int dst;
 		int x,y;
@@ -4081,11 +4081,11 @@ static DRIVER_INIT( gfx )
 
 static DRIVER_INIT( mia )
 {
-	unsigned char *gfxdata;
+	UINT8 *gfxdata;
 	int len;
 	int i,j,k,A,B;
 	int bits[32];
-	unsigned char *temp;
+	UINT8 *temp;
 
 
 	driver_init_gfx(machine);
@@ -4176,11 +4176,11 @@ static DRIVER_INIT( mia )
 
 static DRIVER_INIT( tmnt )
 {
-	unsigned char *gfxdata;
+	UINT8 *gfxdata;
 	int len;
 	int i,j,k,A,B,entry;
 	int bits[32];
-	unsigned char *temp;
+	UINT8 *temp;
 
 
 	driver_init_gfx(machine);
@@ -4231,7 +4231,7 @@ static DRIVER_INIT( tmnt )
 	memcpy(temp,gfxdata,len);
 	for (A = 0;A < len/4;A++)
 	{
-		unsigned char *code_conv_table = &memory_region(REGION_PROMS)[0x0000];
+		UINT8 *code_conv_table = &memory_region(REGION_PROMS)[0x0000];
 #define CA0 0
 #define CA1 1
 #define CA2 2
@@ -4247,7 +4247,7 @@ static DRIVER_INIT( tmnt )
 		/* 9 low bits of the sprite line address, which bit to pick it from. */
 		/* For example, when the PROM contains 4, which applies to 4x2 sprites, */
 		/* bit OA1 comes from CA5, OA2 from CA0, and so on. */
-		static unsigned char bit_pick_table[10][8] =
+		static UINT8 bit_pick_table[10][8] =
 		{
 			/*0(1x1) 1(2x1) 2(1x2) 3(2x2) 4(4x2) 5(2x4) 6(4x4) 7(8x8) */
 			{ CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3 },	/* CA3 */

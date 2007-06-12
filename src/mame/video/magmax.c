@@ -68,7 +68,7 @@ PALETTE_INIT( magmax )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -90,7 +90,7 @@ PALETTE_INIT( magmax )
 VIDEO_START( magmax )
 {
 	int i,v;
-	unsigned char * prom14D = memory_region(REGION_USER2);
+	UINT8 * prom14D = memory_region(REGION_USER2);
 
 	/* Set up save state */
 	state_save_register_global(magmax_vreg);
@@ -105,8 +105,6 @@ VIDEO_START( magmax )
 		v = (prom14D[i] << 4) + prom14D[i + 0x100];
 		prom_tab[i] = ((v&0x1f)<<8) | ((v&0x10)<<10) | ((v&0xe0)>>1); /*convert data into more useful format*/
 	}
-
-	return 0;
 }
 
 
@@ -129,7 +127,7 @@ VIDEO_UPDATE( magmax )
 	else
 	{
 		UINT32 h,v;
-		unsigned char * rom18B = memory_region(REGION_USER1);
+		UINT8 * rom18B = memory_region(REGION_USER1);
 		UINT32 scroll_h = (*magmax_scroll_x) & 0x3fff;
 		UINT32 scroll_v = (*magmax_scroll_y) & 0xff;
 

@@ -178,7 +178,7 @@
 static void lfkp(int mask)
 {
 	int A;
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 
 	for (A = 0x0000;A < 0x8000-14;A++)
@@ -231,7 +231,7 @@ static void look_for_known_plaintext(void)
 	lfkp(0x57);
 }
 
-static void read_table_from_disk(unsigned char *xortable)
+static void read_table_from_disk(UINT8 *xortable)
 {
 	FILE *f;
 
@@ -244,7 +244,7 @@ static void read_table_from_disk(unsigned char *xortable)
 }
 #endif
 
-static void sega_decode(const unsigned char convtable[32][4])
+static void sega_decode(const UINT8 convtable[32][4])
 {
 	int A;
 
@@ -298,7 +298,7 @@ static void sega_decode(const unsigned char convtable[32][4])
 
 void buckrog_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -327,7 +327,7 @@ void buckrog_decode(void)
 
 void pengo_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -356,7 +356,7 @@ void pengo_decode(void)
 
 void szaxxon_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -385,7 +385,7 @@ void szaxxon_decode(void)
 
 void suprloco_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -414,7 +414,7 @@ void suprloco_decode(void)
 
 void yamato_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -445,7 +445,7 @@ void toprollr_decode(void)
 	/* same tables as in Yamato, but encrypted ROM is banked */
 	UINT8 *decrypted;
 
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -509,7 +509,7 @@ void toprollr_decode(void)
 
 void sindbadm_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -538,7 +538,7 @@ void sindbadm_decode(void)
 
 void regulus_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -567,7 +567,7 @@ void regulus_decode(void)
 
 void mrviking_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -596,7 +596,7 @@ void mrviking_decode(void)
 
 void swat_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -625,7 +625,7 @@ void swat_decode(void)
 
 void flicky_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -654,7 +654,7 @@ void flicky_decode(void)
 
 void futspy_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -683,7 +683,7 @@ void futspy_decode(void)
 
 void wmatch_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -712,7 +712,7 @@ void wmatch_decode(void)
 
 void bullfgtj_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -741,7 +741,7 @@ void bullfgtj_decode(void)
 
 void pbaction_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -770,7 +770,7 @@ void pbaction_decode(void)
 
 void spatter_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -799,7 +799,7 @@ void spatter_decode(void)
 
 void pitfall2_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -828,7 +828,7 @@ void pitfall2_decode(void)
 
 void nprinces_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -857,7 +857,7 @@ void nprinces_decode(void)
 
 void seganinj_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -886,7 +886,7 @@ void seganinj_decode(void)
 
 void imsorry_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -915,7 +915,7 @@ void imsorry_decode(void)
 
 void teddybb_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -944,7 +944,7 @@ void teddybb_decode(void)
 
 void myheroj_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -973,7 +973,7 @@ void myheroj_decode(void)
 
 void hvymetal_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -1002,7 +1002,7 @@ void hvymetal_decode(void)
 
 void lvcards_decode(void)
 {
-	static const unsigned char convtable[32][4] =
+	static const UINT8 convtable[32][4] =
 	{
 		/*       opcode                   data                     address      */
 		/*  A    B    C    D         A    B    C    D                           */
@@ -1041,11 +1041,11 @@ void lvcards_decode(void)
 
 ******************************************************************************/
 
-static void sega_decode_2(const unsigned char opcode_xor[64],const int opcode_swap_select[64],
-		const unsigned char data_xor[64],const int data_swap_select[64])
+static void sega_decode_2(const UINT8 opcode_xor[64],const int opcode_swap_select[64],
+		const UINT8 data_xor[64],const int data_swap_select[64])
 {
 	int A;
-	static const unsigned char swaptable[24][4] =
+	static const UINT8 swaptable[24][4] =
 	{
 		{ 6,4,2,0 }, { 4,6,2,0 }, { 2,4,6,0 }, { 0,4,2,6 },
 		{ 6,2,4,0 }, { 6,0,2,4 }, { 6,4,0,2 }, { 2,6,4,0 },
@@ -1065,8 +1065,8 @@ static void sega_decode_2(const unsigned char opcode_xor[64],const int opcode_sw
 	for (A = 0x0000;A < 0x8000;A++)
 	{
 		int row;
-		unsigned char src;
-		const unsigned char *tbl;
+		UINT8 src;
+		const UINT8 *tbl;
 
 
 		src = rom[A];
@@ -1089,7 +1089,7 @@ static void sega_decode_2(const unsigned char opcode_xor[64],const int opcode_sw
 
 void fdwarrio_decode(void)
 {
-	static const unsigned char opcode_xor[64] =
+	static const UINT8 opcode_xor[64] =
 	{
 		0x40,0x50,0x44,0x54,0x41,0x51,0x45,0x55,
 		0x40,0x50,0x44,0x54,0x41,0x51,0x45,0x55,
@@ -1101,7 +1101,7 @@ void fdwarrio_decode(void)
 		0x40,0x50,0x44,0x54,0x41,0x51,0x45,0x55,
 	};
 
-	static const unsigned char data_xor[64] =
+	static const UINT8 data_xor[64] =
 	{
 		0x10,0x04,0x14,0x01,0x11,0x05,0x15,0x00,
 		0x10,0x04,0x14,0x01,0x11,0x05,0x15,0x00,
@@ -1137,7 +1137,7 @@ void fdwarrio_decode(void)
 
 void astrofl_decode(void)
 {
-	static const unsigned char opcode_xor[64] =
+	static const UINT8 opcode_xor[64] =
 	{
 		0x04,0x51,0x40,0x01,0x55,0x44,0x05,0x50,0x41,0x00,0x54,0x45,
 		0x04,0x51,0x40,0x01,0x55,0x44,0x05,0x50,0x41,0x00,0x54,0x45,
@@ -1147,7 +1147,7 @@ void astrofl_decode(void)
 		0x04,0x51,0x40,0x01,0x55,0x44,0x05,0x50,
 	};
 
-	static const unsigned char data_xor[64] =
+	static const UINT8 data_xor[64] =
 	{
 		0x54,0x15,0x44,0x51,0x10,0x41,0x55,0x14,0x45,0x50,0x11,0x40,
 		0x54,0x15,0x44,0x51,0x10,0x41,0x55,0x14,0x45,0x50,0x11,0x40,
@@ -1182,7 +1182,7 @@ void astrofl_decode(void)
 
 void wboy2_decode(void)
 {
-	static const unsigned char opcode_xor[64] =
+	static const UINT8 opcode_xor[64] =
 	{
 		0x00,0x45,0x11,0x01,0x44,0x10,0x55,0x05,0x41,0x14,0x04,0x40,0x15,0x51,
 		0x01,0x44,0x10,0x00,0x45,0x11,0x54,0x04,0x40,0x15,0x05,0x41,0x14,0x50,
@@ -1192,7 +1192,7 @@ void wboy2_decode(void)
 		0x00,0x45,0x11,0x01,
 	};
 
-	static const unsigned char data_xor[64] =
+	static const UINT8 data_xor[64] =
 	{
 		0x55,0x05,0x41,0x14,0x50,0x00,0x15,0x51,0x01,0x44,0x10,0x55,0x05,0x11,
 		0x54,0x04,0x40,0x15,0x51,0x01,0x14,0x50,0x00,0x45,0x11,0x54,0x04,0x10,
@@ -1247,7 +1247,7 @@ void wboy2_decode(void)
 
 void robowres_decode(void)
 {
-	static const unsigned char opcode_xor[64] =
+	static const UINT8 opcode_xor[64] =
 	{
 		0x00,0x41,0x10,0x51,0x04,0x45,0x14, 0x00,0x41,0x10,0x51,0x04,0x45,0x14, 0x55,
 		0x01,0x40,0x11,0x50,0x05,0x44,0x15, 0x01,0x40,0x11,0x50,0x05,0x44,0x15, 0x54,
@@ -1257,7 +1257,7 @@ void robowres_decode(void)
 		0x50,0x05
 	};
 
-	static const unsigned char data_xor[64] =
+	static const UINT8 data_xor[64] =
 	{
 		0x45,0x14,0x55,0x01,0x40,0x11,0x50, 0x05,0x44,0x15,0x54,0x00,0x41,0x10, 0x05,
 		0x44,0x15,0x54,0x00,0x41,0x10,0x51, 0x04,0x45,0x14,0x55,0x01,0x40,0x11, 0x04,
@@ -1307,7 +1307,7 @@ void robowres_decode(void)
 
 static void sega_decode_317(int order, int opcode_shift, int data_shift)
 {
-	static const unsigned char xor1_317[1+64] =
+	static const UINT8 xor1_317[1+64] =
 	{
 		0x54,
 		0x14,0x15,0x41,0x14,0x50,0x55,0x05,0x41,0x01,0x10,0x51,0x05,0x11,0x05,0x14,0x55,
@@ -1316,7 +1316,7 @@ static void sega_decode_317(int order, int opcode_shift, int data_shift)
 		0x10,0x15,0x51,0x50,0x00,0x15,0x51,0x44,0x15,0x04,0x44,0x44,0x50,0x10,0x04,0x04,
 	};
 
-	static const unsigned char xor2_317[2+64] =
+	static const UINT8 xor2_317[2+64] =
 	{
 		0x04,
 		0x44,

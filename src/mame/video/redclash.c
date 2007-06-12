@@ -39,7 +39,7 @@ PALETTE_INIT( redclash )
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x47 * bit1 + 0x97 * bit2;
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	/* This is for the stars colors */
@@ -55,7 +55,7 @@ PALETTE_INIT( redclash )
 			g = 0x47 * bit1 + 0x97 * bit2;
 			bit1 = i & 0x01;
 			r = 0x47 * bit1;
-			palette_set_color(machine,i,r,g,b);
+			palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	/* characters */
@@ -158,8 +158,6 @@ VIDEO_START( redclash )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void redclash_draw_sprites( mame_bitmap *bitmap )

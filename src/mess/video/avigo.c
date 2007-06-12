@@ -128,16 +128,12 @@ VIDEO_START( avigo )
 
     /* allocate video memory */
     avigo_video_memory = auto_malloc(((AVIGO_SCREEN_WIDTH>>3)*AVIGO_SCREEN_HEIGHT));
-/*	
-	backdrop_refresh(avigo_backdrop);
-*/
 	Machine->gfx[0] = stylus_pointer = allocgfx(&pointerlayout);
 	decodegfx(stylus_pointer, pointermask, 0, 1);
 	stylus_pointer->colortable = stylus_color_table;
 	stylus_pointer->total_colors = 3;
 	stylus_color_table[1] = Machine->pens[0];
 	stylus_color_table[2] = Machine->pens[1]; 
-	return 0;
 }
 
 /* two colours */
@@ -159,7 +155,7 @@ PALETTE_INIT( avigo )
 {
 /*	char *backdrop_name;
     int used = 2; */
-	palette_set_colors(machine, 0, avigo_palette, sizeof(avigo_palette) / 3);
+	palette_set_colors_rgb(machine, 0, avigo_palette, sizeof(avigo_palette) / 3);
     memcpy(colortable, avigo_colour_table, sizeof (avigo_colour_table));
 
 	/* load backdrop */

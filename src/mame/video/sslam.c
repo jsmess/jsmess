@@ -151,8 +151,6 @@ VIDEO_START(sslam)
 
 	sprites_x_offset = 0;
 	state_save_register_global(sprites_x_offset);
-
-	return 0;
 }
 
 VIDEO_START(powerbls)
@@ -161,8 +159,6 @@ VIDEO_START(powerbls)
 
 	sprites_x_offset = -21;
 	state_save_register_global(sprites_x_offset);
-
-	return 0;
 }
 
 VIDEO_UPDATE(sslam)

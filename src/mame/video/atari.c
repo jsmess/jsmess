@@ -770,7 +770,7 @@ VIDEO_START( atari )
 		memset(antic.video[i], 0, sizeof(VIDEO));
     }
 
-    return video_start_generic_bitmapped(machine);
+    video_start_generic_bitmapped(machine);
 }
 
 /************************************************************************

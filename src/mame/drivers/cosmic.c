@@ -32,7 +32,7 @@ WRITE8_HANDLER( cosmic_color_register_w );
 WRITE8_HANDLER( cosmic_background_enable_w );
 
 
-static unsigned int pixel_clock = 0;
+static UINT32 pixel_clock = 0;
 
 
 

@@ -83,7 +83,7 @@ UpdatePalette( int offset )
 	color = paletteram16[offset];
 
 	/* -RRRRRGGGGGBBBBB */
-	palette_set_color( Machine, offset, pal5bit(color >> 10), pal5bit(color >> 5), pal5bit(color >> 0));
+	palette_set_color_rgb( Machine, offset, pal5bit(color >> 10), pal5bit(color >> 5), pal5bit(color >> 0));
 } /* namcona1_paletteram_w */
 
 READ16_HANDLER( namcona1_paletteram_r )
@@ -245,8 +245,6 @@ VIDEO_START( namcona1 )
 			gfx1->colortable = machine->remapped_colortable;
 			gfx1->total_colors = machine->drv->total_colors/2;
 			machine->gfx[1] = gfx1;
-
-			return 0;
 } /* namcona1_vh_start */
 
 /*************************************************************************/

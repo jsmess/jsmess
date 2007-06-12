@@ -59,7 +59,7 @@ WRITE8_HANDLER( tsamurai_bg_videoram_w );
 WRITE8_HANDLER( tsamurai_fg_videoram_w );
 WRITE8_HANDLER( tsamurai_fg_colorram_w );
 extern VIDEO_START( tsamurai );
-extern unsigned char *tsamurai_videoram;
+extern UINT8 *tsamurai_videoram;
 
 extern VIDEO_START( vsgongf );
 extern VIDEO_UPDATE( vsgongf );

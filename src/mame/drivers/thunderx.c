@@ -40,7 +40,7 @@ static void thunderx_firq_callback(int x)
 
 static int palette_selected;
 static int rambank,pmcbank;
-static unsigned char *ram,*pmcram;
+static UINT8 *ram,*pmcram;
 
 static READ8_HANDLER( scontra_bankedram_r )
 {
@@ -187,8 +187,8 @@ this is the data written to internal ram on startup:
 
 static void run_collisions(int s0, int e0, int s1, int e1, int cm, int hm)
 {
-	unsigned char*	p0;
-	unsigned char*	p1;
+	UINT8*	p0;
+	UINT8*	p1;
 	int				ii,jj;
 
 	p0 = &pmcram[16 + 5*s0];
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 
 WRITE8_HANDLER( scontra_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs;
 
 //logerror("%04x: bank switch %02x\n",activecpu_get_pc(),data);
@@ -1020,7 +1020,7 @@ ROM_END
 
 static void thunderx_banking( int lines )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int offs;
 
 //  logerror("thunderx %04x: bank select %02x\n", activecpu_get_pc(), lines );
@@ -1032,14 +1032,14 @@ static void thunderx_banking( int lines )
 
 static MACHINE_RESET( scontra )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	paletteram = &RAM[0x30000];
 }
 
 static MACHINE_RESET( thunderx )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)thunderx_banking);
 	memory_set_bankptr( 1, &RAM[0x10000] ); /* init the default bank */

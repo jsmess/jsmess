@@ -141,8 +141,6 @@ VIDEO_START( dcon )
 	tilemap_set_transparent_pen(text_layer,15);
 
 	dcon_gfx_bank_select = 0;
-
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)

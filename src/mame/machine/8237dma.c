@@ -34,8 +34,8 @@ struct dma8237
 		UINT8 mode;
 	} chan[4];
 
-	unsigned int msb : 1;
-	unsigned int eop : 1;
+	UINT32 msb : 1;
+	UINT32 eop : 1;
 	UINT8 temp;
 	UINT8 command;
 	UINT8 drq;
@@ -178,7 +178,7 @@ static void dma8237_update_status(int which)
 {
 	UINT16 pending_transfer;
 	int channel;
-	unsigned int new_eop;
+	UINT32 new_eop;
 
 	if ((dma[which].status & 0xF0) == 0)
 	{

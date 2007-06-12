@@ -37,7 +37,6 @@ COLOR.BPR  color
 
 VIDEO_START(mjsiyoub)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(mjsiyoub)

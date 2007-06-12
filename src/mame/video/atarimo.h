@@ -91,7 +91,7 @@ struct atarimo_rect_list
 ##########################################################################*/
 
 /* setup/shutdown */
-int atarimo_init(int map, const struct atarimo_desc *desc);
+void atarimo_init(int map, const struct atarimo_desc *desc);
 UINT16 *atarimo_get_code_lookup(int map, int *size);
 UINT8 *atarimo_get_color_lookup(int map, int *size);
 UINT8 *atarimo_get_gfx_lookup(int map, int *size);

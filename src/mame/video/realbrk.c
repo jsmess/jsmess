@@ -174,7 +174,6 @@ VIDEO_START(realbrk)
 	tmpbitmap1 = auto_bitmap_alloc(	32,
 									32,
 									machine->screen[0].format);
-	return 0;
 }
 
 /***************************************************************************

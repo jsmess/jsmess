@@ -1239,7 +1239,7 @@ MACHINE_RESET( darius )
 	int  i;
 
 	/**** setup sound bank image ****/
-	unsigned char *RAM = memory_region(REGION_CPU2);
+	UINT8 *RAM = memory_region(REGION_CPU2);
 
 	for( i = 3; i >= 0; i-- ){
 		memcpy( RAM + 0x8000*i + 0x10000, RAM,            0x4000 );

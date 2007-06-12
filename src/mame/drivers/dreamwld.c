@@ -147,8 +147,6 @@ VIDEO_START(dreamwld)
 	tilemap_set_transparent_pen(dreamwld_bg2_tilemap,0);
 	dreamwld_tilebankold[0] = dreamwld_tilebankold[1] = -1;
 	dreamwld_tilebank[0] = dreamwld_tilebank[1] = 0;
-
-	return 0;
 }
 
 VIDEO_UPDATE(dreamwld)
@@ -213,10 +211,10 @@ WRITE32_HANDLER( dreamwld_palette_w )
 	color = offset*2;
 
 	dat = paletteram32[offset]&0x7fff;
-	palette_set_color(Machine,color+1,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
+	palette_set_color_rgb(Machine,color+1,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
 
 	dat = (paletteram32[offset]>>16)&0x7fff;
-	palette_set_color(Machine,color,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
+	palette_set_color_rgb(Machine,color,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
 
 }
 

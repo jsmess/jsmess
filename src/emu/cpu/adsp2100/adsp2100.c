@@ -453,6 +453,7 @@ static void check_irqs(void)
 {
 	UINT8 check;
 
+#if (HAS_ADSP2181)
 	if (chip_type >= CHIP_TYPE_ADSP2181)
 	{
 		/* check IRQ2 */
@@ -502,7 +503,9 @@ static void check_irqs(void)
 		if (check && adsp2181_generate_irq(ADSP2181_TIMER, 9))
 			return;
 	}
-	else if (chip_type >= CHIP_TYPE_ADSP2101)
+	else
+#endif
+	if (chip_type >= CHIP_TYPE_ADSP2101)
 	{
 		/* check IRQ2 */
 		check = (adsp2100.icntl & 4) ? adsp2100.irq_latch[ADSP2101_IRQ2] : adsp2100.irq_state[ADSP2101_IRQ2];
@@ -587,6 +590,7 @@ static void adsp2100_get_context(void *dst)
 }
 
 
+#if (HAS_ADSP2100)
 static void adsp2100_set_context(void *src)
 {
 	/* copy the context */
@@ -602,6 +606,7 @@ static void adsp2100_set_context(void *src)
 	/* check for IRQs */
 	check_irqs();
 }
+#endif
 
 
 
@@ -1929,8 +1934,8 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* set per CPU */						break;
+		case CPUINFO_PTR_SET_CONTEXT:					/* set per CPU */						break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = adsp2100_get_context; break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = adsp2100_set_context; break;
 		case CPUINFO_PTR_INIT:							info->init = adsp2100_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = adsp2100_reset;			break;
 		case CPUINFO_PTR_EXIT:							info->exit = adsp2100_exit;				break;
@@ -2059,6 +2064,17 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
+{
+	/* see how many words we need to copy */
+	int pagelen = (srcdata[(3)] + 1) * 8;
+	int i;
+	for (i = 0; i < pagelen; i++)
+	{
+		UINT32 opcode = (srcdata[(i*4+0)] << 16) | (srcdata[(i*4+1)] << 8) | srcdata[(i*4+2)];
+		dstdata[i] = opcode;
+	}
+}
 
 #if (HAS_ADSP2100)
 /**************************************************************************
@@ -2219,14 +2235,7 @@ static void adsp2104_set_context(void *src)
 
 void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 {
-	/* see how many words we need to copy */
-	int pagelen = (srcdata[(3)] + 1) * 8;
-	int i;
-	for (i = 0; i < pagelen; i++)
-	{
-		UINT32 opcode = (srcdata[(i*4+0)] << 16) | (srcdata[(i*4+1)] << 8) | srcdata[(i*4+2)];
-		dstdata[i] = opcode;
-	}
+	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
 static void adsp2104_set_info(UINT32 state, cpuinfo *info)
@@ -2314,7 +2323,7 @@ static void adsp2105_set_context(void *src)
 
 void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 {
-	adsp2104_load_boot_data(srcdata, dstdata);
+	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
 static void adsp2105_set_info(UINT32 state, cpuinfo *info)
@@ -2396,7 +2405,7 @@ static void adsp2115_set_context(void *src)
 
 void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 {
-	adsp2104_load_boot_data(srcdata, dstdata);
+	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
 static void adsp2115_set_info(UINT32 state, cpuinfo *info)
@@ -2484,7 +2493,7 @@ static void adsp2181_set_context(void *src)
 
 void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 {
-	adsp2104_load_boot_data(srcdata, dstdata);
+	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
 static void adsp2181_set_info(UINT32 state, cpuinfo *info)

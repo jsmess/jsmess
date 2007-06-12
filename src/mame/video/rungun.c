@@ -87,10 +87,7 @@ VIDEO_START(rng)
 		8*8*4
 	};
 
-	if (K055673_vh_start(REGION_GFX2, 1, -8, 15, rng_sprite_callback))
-	{
-		return(1);
-	}
+	K055673_vh_start(REGION_GFX2, 1, -8, 15, rng_sprite_callback);
 
 	K053936_wraparound_enable(0, 0);
 	K053936_set_offset(0, 34, 9);
@@ -103,8 +100,7 @@ VIDEO_START(rng)
 		if (machine->gfx[ttl_gfx_index] == 0)
 			break;
 
-	if (ttl_gfx_index == MAX_GFX_ELEMENTS)
-		return(1);
+	assert(ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
 	machine->gfx[ttl_gfx_index] = allocgfx(&charlayout);
@@ -129,8 +125,6 @@ VIDEO_START(rng)
 	state_save_register_global_array(ttl_vram);
 
 	sprite_colorbase = 0x20;
-
-	return(0);
 }
 
 VIDEO_UPDATE(rng)

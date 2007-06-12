@@ -128,7 +128,7 @@ static VIDEO_UPDATE( ti990_4 )
 
 static VIDEO_START( ti990_4 )
 {
-	return asr733_init_term(0, ti990_set_int6);
+	asr733_init_term(0, ti990_set_int6);
 }
 
 static VIDEO_UPDATE( ti990_4 )

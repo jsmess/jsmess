@@ -240,8 +240,8 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 		nitedrvr_crash_data_en = 1;
 		nitedrvr_crash_data = 0x0f;
 		/* Invert video */
-		palette_set_color(Machine,1,0x00,0x00,0x00); /* BLACK */
-		palette_set_color(Machine,0,0xff,0xff,0xff); /* WHITE */
+		palette_set_color(Machine,1,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+		palette_set_color(Machine,0,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 	}
 	discrete_sound_w(NITEDRVR_BANG_DATA, nitedrvr_crash_data_en ? nitedrvr_crash_data : 0);	// Crash Volume
 }
@@ -257,14 +257,14 @@ void nitedrvr_crash_toggle(int dummy)
 		if (nitedrvr_crash_data & 0x01)
 		{
 			/* Invert video */
-			palette_set_color(Machine,1,0x00,0x00,0x00); /* BLACK */
-			palette_set_color(Machine,0,0xff,0xff,0xff); /* WHITE */
+			palette_set_color(Machine,1,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(Machine,0,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 		else
 		{
 			/* Normal video */
-			palette_set_color(Machine,0,0x00,0x00,0x00); /* BLACK */
-			palette_set_color(Machine,1,0xff,0xff,0xff); /* WHITE */
+			palette_set_color(Machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(Machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 	}
 }

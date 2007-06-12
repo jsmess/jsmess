@@ -2754,13 +2754,13 @@ static void unpack_sprites(void)
 {
 	const int region		=	REGION_GFX1;	// sprites
 
-	const unsigned int len	=	memory_region_length(region);
-	unsigned char *src		=	memory_region(region) + len / 2 - 1;
-	unsigned char *dst		=	memory_region(region) + len - 1;
+	const UINT32 len	=	memory_region_length(region);
+	UINT8 *src		=	memory_region(region) + len / 2 - 1;
+	UINT8 *dst		=	memory_region(region) + len - 1;
 
 	while(dst > src)
 	{
-		unsigned char data = *src--;
+		UINT8 data = *src--;
 		/* swap even and odd pixels */
 		*dst-- = data >> 4;		*dst-- = data & 0xF;
 	}
@@ -2772,16 +2772,16 @@ static void ddonpach_unpack_sprites(void)
 {
 	const int region		=	REGION_GFX1;	// sprites
 
-	const unsigned int len	=	memory_region_length(region);
-	unsigned char *src		=	memory_region(region) + len / 2 - 1;
-	unsigned char *dst		=	memory_region(region) + len - 1;
+	const UINT32 len	=	memory_region_length(region);
+	UINT8 *src		=	memory_region(region) + len / 2 - 1;
+	UINT8 *dst		=	memory_region(region) + len - 1;
 
 	while(dst > src)
 	{
-		unsigned char data1= *src--;
-		unsigned char data2= *src--;
-		unsigned char data3= *src--;
-		unsigned char data4= *src--;
+		UINT8 data1= *src--;
+		UINT8 data2= *src--;
+		UINT8 data3= *src--;
+		UINT8 data4= *src--;
 
 		/* swap even and odd pixels, and even and odd words */
 		*dst-- = data2 & 0xF;		*dst-- = data2 >> 4;
@@ -2797,13 +2797,13 @@ static void esprade_unpack_sprites(void)
 {
 	const int region		=	REGION_GFX1;	// sprites
 
-	unsigned char *src		=	memory_region(region);
-	unsigned char *dst		=	memory_region(region) + memory_region_length(region);
+	UINT8 *src		=	memory_region(region);
+	UINT8 *dst		=	memory_region(region) + memory_region_length(region);
 
 	while(src < dst)
 	{
-		unsigned char data1 = src[0];
-		unsigned char data2 = src[1];
+		UINT8 data1 = src[0];
+		UINT8 data2 = src[1];
 
 		src[0] = ((data1 & 0x0f)<<4) + (data2 & 0x0f);
 		src[1] = (data1 & 0xf0) + ((data2 & 0xf0)>>4);
@@ -4199,12 +4199,12 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 void sailormn_unpack_tiles( const int region )
 {
-	unsigned char *src		=	memory_region(region) + (memory_region_length(region)/4)*3 - 1;
-	unsigned char *dst		=	memory_region(region) + (memory_region_length(region)/4)*4 - 2;
+	UINT8 *src		=	memory_region(region) + (memory_region_length(region)/4)*3 - 1;
+	UINT8 *dst		=	memory_region(region) + (memory_region_length(region)/4)*4 - 2;
 
 	while(src <= dst)
 	{
-		unsigned char data = src[0];
+		UINT8 data = src[0];
 
 		dst[0] = ((data & 0x03) << 4) + ((data & 0x0c) >> 2);
 		dst[1] = ((data & 0x30) >> 0) + ((data & 0xc0) >> 6);
@@ -4352,7 +4352,7 @@ DRIVER_INIT( hotdogst )
 
 DRIVER_INIT( mazinger )
 {
-	unsigned char *buffer;
+	UINT8 *buffer;
 	UINT8 *src = memory_region(REGION_GFX1);
 	int len = memory_region_length(REGION_GFX1);
 
@@ -4395,7 +4395,7 @@ DRIVER_INIT( metmqstr )
 
 DRIVER_INIT( pwrins2j )
 {
-	unsigned char *buffer;
+	UINT8 *buffer;
 	UINT8 *src = memory_region(REGION_GFX1);
 	int len = memory_region_length(REGION_GFX1);
 	int i, j;
@@ -4441,7 +4441,7 @@ DRIVER_INIT( pwrinst2 )
 
 DRIVER_INIT( sailormn )
 {
-	unsigned char *buffer;
+	UINT8 *buffer;
 	UINT8 *src = memory_region(REGION_GFX1);
 	int len = memory_region_length(REGION_GFX1);
 

@@ -325,8 +325,6 @@ VIDEO_START( mwarr )
 	tilemap_set_scroll_rows(bg_tilemap, 256);
 	tilemap_set_scroll_rows(mlow_tilemap, 256);
 	tilemap_set_scroll_rows(mhigh_tilemap, 256);
-
-	return 0;
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

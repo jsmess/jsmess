@@ -594,7 +594,7 @@ INPUT_PORTS_END
 /* Initialise the c16 palette */
 static PALETTE_INIT( c16 )
 {
-	palette_set_colors(machine, 0, ted7360_palette, sizeof(ted7360_palette) / 3);
+	palette_set_colors_rgb(machine, 0, ted7360_palette, sizeof(ted7360_palette) / 3);
 }
 
 #if 0

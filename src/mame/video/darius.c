@@ -50,15 +50,12 @@ VIDEO_START( darius )
 	spritelist = auto_malloc(0x800 * sizeof(*spritelist));
 
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	if ( PC080SN_vh_start(1,1,-16,8,0,1,1) )
-		return 1;
+	PC080SN_vh_start(1,1,-16,8,0,1,1);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
 	/* colors from saved states are often screwy (and this doesn't help...) */
 	state_save_register_func_postload(dirty_fg_tilemap);
-
-	return 0;
 }
 
 /***************************************************************************/

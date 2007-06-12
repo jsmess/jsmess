@@ -40,7 +40,7 @@ WRITE8_HANDLER( sichuan2_paletteram_w )
 
 	offset &= 0xff;
 
-	palette_set_color(Machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
+	palette_set_color_rgb(Machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -56,8 +56,6 @@ VIDEO_START( sichuan2 )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 64, 32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( sichuan2 )

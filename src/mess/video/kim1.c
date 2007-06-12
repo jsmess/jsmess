@@ -18,7 +18,7 @@ PALETTE_INIT( kim1 )
 	/* initialize 16 colors with shades of red (orange) */
     for (i = 0; i < 16; i++)
     {
-		palette_set_color(machine, i,
+		palette_set_color_rgb(machine, i,
 			24 + (i + 1) * (i + 1) - 1,
 			(i + 1) * (i + 1) / 4,
 			0);
@@ -26,11 +26,11 @@ PALETTE_INIT( kim1 )
         colortable[2 * i + 1] = i;
     }
 
-	palette_set_color(machine, 16,   0,   0,   0);
-	palette_set_color(machine, 17,  30,  30,  30);
-	palette_set_color(machine, 18,  90,  90,  90);
-	palette_set_color(machine, 19,  50,  50,  50);
-	palette_set_color(machine, 20, 255, 255, 255);
+	palette_set_color_rgb(machine, 16,   0,   0,   0);
+	palette_set_color_rgb(machine, 17,  30,  30,  30);
+	palette_set_color_rgb(machine, 18,  90,  90,  90);
+	palette_set_color_rgb(machine, 19,  50,  50,  50);
+	palette_set_color_rgb(machine, 20, 255, 255, 255);
 
     colortable[2 * 16 + 0 * 4 + 0] = 17;
     colortable[2 * 16 + 0 * 4 + 1] = 18;
@@ -48,7 +48,7 @@ VIDEO_START( kim1 )
     videoram_size = 6 * 2 + 24;
     videoram = auto_malloc (videoram_size);
 
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 VIDEO_UPDATE( kim1 )

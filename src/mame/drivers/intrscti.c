@@ -63,7 +63,6 @@ static const gfx_decode gfxdecodeinfo[] =
 
 VIDEO_START(intrscti)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(intrscti)

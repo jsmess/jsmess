@@ -91,7 +91,7 @@ static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	logerror( "cpu1_bankswitch( 0x%02x )\n", data );
 	if( data < 4 )
 	{
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU3);
+	UINT8 *RAM = memory_region(REGION_CPU3);
 
 	if( data<3 )
 	{

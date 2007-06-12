@@ -31,18 +31,18 @@ gladiatr and Great Swordsman set.
 #define CMD_4a 2
 
 typedef struct TAITO8741_status{
-	unsigned char toData;    /* to host data      */
-	unsigned char fromData;  /* from host data    */
-	unsigned char fromCmd;   /* from host command */
-	unsigned char status;    /* b0 = rd ready,b1 = wd full,b2 = cmd ?? */
-	unsigned char mode;
-	unsigned char phase;
-	unsigned char txd[8];
-	unsigned char rxd[8];
-	unsigned char parallelselect;
-	unsigned char txpoint;
+	UINT8 toData;    /* to host data      */
+	UINT8 fromData;  /* from host data    */
+	UINT8 fromCmd;   /* from host command */
+	UINT8 status;    /* b0 = rd ready,b1 = wd full,b2 = cmd ?? */
+	UINT8 mode;
+	UINT8 phase;
+	UINT8 txd[8];
+	UINT8 rxd[8];
+	UINT8 parallelselect;
+	UINT8 txpoint;
 	int connect;
-	unsigned char pending4a;
+	UINT8 pending4a;
 	int serial_out;
 	int coins;
 	read8_handler portHandler;
@@ -78,7 +78,7 @@ static int taito8741_hostcmd_r(I8741 *st)
 
 /* TAITO8741 I8741 emulation */
 
-void taito8741_serial_rx(I8741 *st,unsigned char *data)
+void taito8741_serial_rx(I8741 *st,UINT8 *data)
 {
 	memcpy(st->rxd,data,8);
 }

@@ -125,7 +125,7 @@ static	unsigned	short	nascom1_colortable[] =
 
 static PALETTE_INIT( nascom1 )
 {
-	palette_set_colors(machine, 0, nascom1_palette, sizeof(nascom1_palette) / 3);
+	palette_set_colors_rgb(machine, 0, nascom1_palette, sizeof(nascom1_palette) / 3);
 	memcpy(colortable, nascom1_colortable, sizeof (nascom1_colortable));
 }
 

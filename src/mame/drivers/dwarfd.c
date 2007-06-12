@@ -459,7 +459,6 @@ INPUT_PORTS_END
 
 VIDEO_START(dwarfd)
 {
-	return 0;
 }
 
 void drawCrt(mame_bitmap *bitmap,const rectangle *cliprect)
@@ -669,12 +668,12 @@ PALETTE_INIT(dwarfd)
 		int b = rand()|0x80;
 		if (i == 0) r = g = b = 0;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
-	palette_set_color(machine, 8, 255, 255, 0);
-	palette_set_color(machine, 12, 127, 127, 255);
-	palette_set_color(machine, 4, 0, 255, 0);
-	palette_set_color(machine, 6, 255, 0, 0);
+	palette_set_color(machine, 8, MAKE_RGB(255, 255, 0));
+	palette_set_color(machine, 12, MAKE_RGB(127, 127, 255));
+	palette_set_color(machine, 4, MAKE_RGB(0, 255, 0));
+	palette_set_color(machine, 6, MAKE_RGB(255, 0, 0));
 }
 
 static struct AY8910interface ay8910_interface =

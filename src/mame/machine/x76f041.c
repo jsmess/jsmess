@@ -51,13 +51,13 @@ struct x76f041_chip
 	int byte;
 	int command;
 	int address;
-	unsigned char write_buffer[ SIZE_WRITE_BUFFER ];
-	unsigned char *response_to_reset;
-	unsigned char *write_password;
-	unsigned char *read_password;
-	unsigned char *configuration_password;
-	unsigned char *configuration_registers;
-	unsigned char *data;
+	UINT8 write_buffer[ SIZE_WRITE_BUFFER ];
+	UINT8 *response_to_reset;
+	UINT8 *write_password;
+	UINT8 *read_password;
+	UINT8 *configuration_password;
+	UINT8 *configuration_registers;
+	UINT8 *data;
 };
 
 #define SIZE_RESPONSE_TO_RESET ( 4 )
@@ -107,7 +107,7 @@ struct x76f041_chip x76f041[ X76F041_MAXCHIP ];
 #define STATE_READ_CONFIGURATION_REGISTERS ( 8 )
 #define STATE_WRITE_CONFIGURATION_REGISTERS ( 9 )
 
-void x76f041_init( int chip, unsigned char *data )
+void x76f041_init( int chip, UINT8 *data )
 {
 	int offset;
 	struct x76f041_chip *c;
@@ -229,7 +229,7 @@ void x76f041_rst_write( int chip, int rst )
 	c->rst = rst;
 }
 
-static unsigned char *x76f041_password( struct x76f041_chip *c )
+static UINT8 *x76f041_password( struct x76f041_chip *c )
 {
 	switch( c->command & 0xe0 )
 	{

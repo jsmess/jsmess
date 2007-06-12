@@ -57,7 +57,7 @@ static tilemap *fg_tilemap;
   The bootleg is the same, but the outputs are not inverted.
 
 ***************************************************************************/
-static void convert_color_prom(running_machine *machine,unsigned short *colortable,const unsigned char *color_prom)
+static void convert_color_prom(running_machine *machine,UINT16 *colortable,const UINT8 *color_prom)
 {
 	int i,pal_index;
 
@@ -89,7 +89,7 @@ static void convert_color_prom(running_machine *machine,unsigned short *colortab
 		bit2 = ((color_prom[prom_offs] ^ invertmask) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,pal_index++,r,g,b);
+		palette_set_color(machine,pal_index++,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 32;
@@ -116,7 +116,7 @@ static void convert_color_prom(running_machine *machine,unsigned short *colortab
 		bit2 = ((color_prom[256] ^ invertmask) >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,pal_index++,r,g,b);
+		palette_set_color(machine,pal_index++,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -182,7 +182,7 @@ static void set_background_palette(running_machine *machine,int bank)
 		}
 		b = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -271,8 +271,6 @@ VIDEO_START( skyskipr )
 		TILEMAP_TRANSPARENT, 16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 VIDEO_START( popeye )
@@ -287,8 +285,6 @@ VIDEO_START( popeye )
 		TILEMAP_TRANSPARENT, 16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void popeye_draw_background(mame_bitmap *bitmap, const rectangle *cliprect)

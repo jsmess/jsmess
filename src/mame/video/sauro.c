@@ -91,8 +91,6 @@ VIDEO_START( sauro )
 		TILEMAP_TRANSPARENT, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	return 0;
 }
 
 static void sauro_draw_sprites( mame_bitmap *bitmap )
@@ -160,8 +158,6 @@ VIDEO_START( trckydoc )
 {
 	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_cols,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 static void trckydoc_draw_sprites( mame_bitmap *bitmap )

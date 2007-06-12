@@ -375,6 +375,7 @@ static void wr_px(INT32 val)    { adsp2100.px = val; }
 static void wr_ifc(INT32 val)
 {
 	adsp2100.ifc = val;
+#if (HAS_ADSP2181)
 	if (chip_type >= CHIP_TYPE_ADSP2181)
 	{
 		/* clear timer */
@@ -395,6 +396,7 @@ static void wr_ifc(INT32 val)
 		if (val & 0x8000) adsp2100.irq_latch[ADSP2181_IRQ2] = 1;
 	}
 	else
+#endif
 	{
 		/* clear timer */
 		if (val & 0x002) adsp2100.irq_latch[ADSP2101_IRQ0] = 0;

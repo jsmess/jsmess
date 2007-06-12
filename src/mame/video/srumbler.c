@@ -9,7 +9,7 @@
 #include "driver.h"
 
 
-unsigned char *srumbler_backgroundram,*srumbler_foregroundram;
+UINT8 *srumbler_backgroundram,*srumbler_foregroundram;
 static tilemap *bg_tilemap,*fg_tilemap;
 
 
@@ -22,7 +22,7 @@ static tilemap *bg_tilemap,*fg_tilemap;
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	unsigned char attr = srumbler_foregroundram[2*tile_index];
+	UINT8 attr = srumbler_foregroundram[2*tile_index];
 	SET_TILE_INFO(
 			0,
 			srumbler_foregroundram[2*tile_index + 1] + ((attr & 0x03) << 8),
@@ -32,7 +32,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	unsigned char attr = srumbler_backgroundram[2*tile_index];
+	UINT8 attr = srumbler_backgroundram[2*tile_index];
 	SET_TILE_INFO(
 			1,
 			srumbler_backgroundram[2*tile_index + 1] + ((attr & 0x07) << 8),
@@ -57,8 +57,6 @@ VIDEO_START( srumbler )
 
 	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x07ff,0xf800); /* split type 1 has pens 0-10 transparent in front half */
-
-	return 0;
 }
 
 

@@ -14,7 +14,6 @@ static struct {
 VIDEO_START( comquest )
 {
 	(void) comquest_video;
-    return 0;
 }
 
 VIDEO_UPDATE( comquest )

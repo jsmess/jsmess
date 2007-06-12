@@ -63,7 +63,7 @@ PALETTE_INIT( phoenix )
 		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -103,7 +103,7 @@ PALETTE_INIT( pleiads )
 		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
 		b = 0x55 * bit0 + 0xaa * bit1;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -179,8 +179,6 @@ VIDEO_START( phoenix )
 	tilemap_set_scrolldy(fg_tilemap,0,48);
 	tilemap_set_scrolldx(bg_tilemap,0,8);
 	tilemap_set_scrolldy(bg_tilemap,0,48);
-
-	return 0;
 }
 
 

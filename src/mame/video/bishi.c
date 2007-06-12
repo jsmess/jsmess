@@ -30,7 +30,7 @@ VIDEO_START(bishi)
 	K055555_vh_start();
 	K054338_vh_start();
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_8, 1, NULL, bishi_tile_callback, 0)) return 1;
+	K056832_vh_start(REGION_GFX1, K056832_BPP_8, 1, NULL, bishi_tile_callback, 0);
 
 	K056832_set_LayerAssociation(0);
 
@@ -44,7 +44,6 @@ VIDEO_START(bishi)
 	layer_colorbase[1] = 0x40;	// this one is wrong
 	layer_colorbase[2] = 0x80;
 	layer_colorbase[3] = 0xc0;
-	return 0;
 }
 
 /* useful function to sort the three tile layers by priority order */

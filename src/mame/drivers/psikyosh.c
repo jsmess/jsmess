@@ -284,6 +284,7 @@ static UINT8 daraku_eeprom[16]   = { 0x03,0x02,0x00,0x48,0x00,0x00,0x00,0x00,0x0
 static UINT8 s1945iii_eeprom[16] = { 0x00,0x00,0x00,0x00,0x00,0x01,0x11,0x70,0x25,0x25,0x25,0x00,0x01,0x00,0x11,0xe0 };
 static UINT8 dragnblz_eeprom[16] = { 0x00,0x01,0x11,0x70,0x25,0x25,0x25,0x00,0x01,0x00,0x11,0xe0,0x00,0x00,0x00,0x00 };
 static UINT8 gnbarich_eeprom[16] = { 0x00,0x0f,0x42,0x40,0x08,0x0a,0x00,0x00,0x01,0x06,0x42,0x59,0x00,0x00,0x00,0x00 };
+static UINT8 mjgtaste_eeprom[16] = { 0x00,0x00,0x00,0x01,0x01,0x00,0x01,0x01,0x00,0x00,0x00,0x04,0x00,0x00,0x00,0x00 };
 
 int use_factory_eeprom;
 
@@ -373,6 +374,12 @@ static NVRAM_HANDLER(93C56)
  				if (use_factory_eeprom==EEPROM_GNBARICH) /* Might as well do Gnbarich as well, otherwise the highscore is incorrect */
  					memcpy(eeprom_data+0xf0, gnbarich_eeprom, 0x10);
 
+ 				if (use_factory_eeprom==EEPROM_MJGTASTE) /* We don't emulate the Mahjong panel yet, so default it to joystick */
+				{
+ 					memcpy(eeprom_data+0x00, mjgtaste_eeprom, 0x10);
+					memcpy(eeprom_data+0xf0, mjgtaste_eeprom, 0x10);
+				}
+
 				EEPROM_set_data(eeprom_data,0x100);
 			}
 		}
@@ -424,7 +431,7 @@ static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 static WRITE32_HANDLER( psikyosh_vidregs_w )
@@ -436,7 +443,7 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 	{
 		if (!(mem_mask & 0x000000ff) || !(mem_mask & 0x0000ff00))	// Bank
 		{
-			unsigned char *ROM = memory_region(REGION_GFX1);
+			UINT8 *ROM = memory_region(REGION_GFX1);
 			memory_set_bankptr(2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
 		}
 	}
@@ -448,7 +455,7 @@ static UINT32 sample_offs = 0;
 
 static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 {
-	unsigned char *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(REGION_SOUND1);
 
 	return ROM[sample_offs++]<<16;
 }
@@ -992,10 +999,12 @@ ROM_START( dragnblz )
 	ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) )
 	ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) )
 
-	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) /* Samples - Not Dumped */
+	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7fd1b225) SHA1(6aa61021ada51393bbb34fd1aea00b8feccc8197) )
 ROM_END
 
+/* Most of the roms on this board are from Dragon Blaze and not used by the game, they're needed for the board to
+   work, but the content doesn't matter. */
 ROM_START( gnbarich )
 	ROM_REGION( 0x100000, REGION_CPU1, 0)
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u21",   0x000000, 0x080000, CRC(c136cd9c) SHA1(ab66c4f5196a66a97dbb5832336a203421cf40fa) )
@@ -1032,36 +1041,38 @@ ROM_START( gnbarich )
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7b10436b) SHA1(c731fcce024e286a677ca10a91761c1ee06094a5) )
 ROM_END
 
+/* Most of the roms on this board are from Dragon Blaze and not used by the game, they're needed for the board to
+   work, but the content doesn't matter. */
 ROM_START( mjgtaste )
 	ROM_REGION( 0x100000, REGION_CPU1, 0)
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(5f2041dc) SHA1(f3862ffdb8df0cf921ce1cb0236935731e7729a7) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(f5ff7876) SHA1(4c909db9c97f29fd79df6dacd29762688701b973) )
 
 	/* exact number of gfx / sound roms may be incorrect */
-	ROM_REGION( 0x2c00000, REGION_GFX1, ROMTEST_GFX )	/* Sprites */
-	ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "2h.u13", 0x0800002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "3l.u6",  0x0c00000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "3h.u14", 0x0c00002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "4l.u7",  0x1000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "4h.u15", 0x1000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "5l.u8",  0x1400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "5h.u16", 0x1400002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "6l.u1",  0x1800000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "6h.u2",  0x1800002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "7l.u19", 0x1c00000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "7h.u20", 0x1c00002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "8l.u28", 0x2000000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "8h.u29", 0x2000002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "9l.u41", 0x2400000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "9h.u42", 0x2400002, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, NO_DUMP )
-	ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, NO_DUMP )
+	ROM_REGION( 0x2c00000, REGION_GFX1, ROMTEST_GFX | ROMREGION_ERASE00 )	/* Sprites */
+	ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(30da42b1) SHA1(8485f2c0e7769b50b95d962afe14fa7ae74cd887) )
+	ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(629c1d44) SHA1(61909091328bb7b6d3e6e0bff91e14c9b4b86c2c) )
+	ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, CRC(1f6126ab) SHA1(e9fc70ca42798c04a4d4e1ef1113a59477c77fdc) )
+	ROM_LOAD32_WORD( "2h.u13", 0x0800002, 0x200000, CRC(dba34e46) SHA1(ae26ef5f90431274764aaa72ae179c4c7572d2ad) )
+	ROM_LOAD32_WORD( "3l.u6",  0x0c00000, 0x200000, CRC(1023e35e) SHA1(47a6f6f205703e6ee86b6e77b386060f4b2d87df) )
+	ROM_LOAD32_WORD( "3h.u14", 0x0c00002, 0x200000, CRC(8aebec7f) SHA1(f56ab20901688665438b1efd254d5796d43c6625) )
+	ROM_LOAD32_WORD( "4l.u7",  0x1000000, 0x200000, CRC(9acf018b) SHA1(9d1e34273a8cfb0ef481c9f31459960bb93b6431) )
+	ROM_LOAD32_WORD( "4h.u15", 0x1000002, 0x200000, CRC(f93e154c) SHA1(f783c6ddb3727eeface1df7c1d0bc3bb28bef047) )
+//  ROM_LOAD32_WORD( "5l.u8",  0x1400000, 0x200000, CRC(68d03ccf) SHA1(d2bf6da5fa6e346b05872ed9616ffe51c3768f50) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "5h.u16", 0x1400002, 0x200000, CRC(5450fbca) SHA1(7a804263549cea951782a67855e69cb8cb417e98) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "6l.u1",  0x1800000, 0x200000, CRC(8b52c90b) SHA1(e1067ef252870787e46c62015e5778b4e641e68d) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "6h.u2",  0x1800002, 0x200000, CRC(7362f929) SHA1(9ced06202e3f104d30377aeef489021d26e87f73) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "7l.u19", 0x1c00000, 0x200000, CRC(b4f4d86e) SHA1(2ad786c5626c98e6943ae05688a1b66307ceac84) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "7h.u20", 0x1c00002, 0x200000, CRC(44b7b9cc) SHA1(3f8122b62ea1183d9fb3aad32d0e47bd32244f87) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "8l.u28", 0x2000000, 0x200000, CRC(cd079f89) SHA1(49c46eb36bc0458428a7fad3fe622f5ed974073b) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "8h.u29", 0x2000002, 0x200000, CRC(3edb508a) SHA1(72b07fb34a94cc127de02070604b1ff31f3d46c7) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "9l.u41", 0x2400000, 0x200000, CRC(0b53cd78) SHA1(e2071d9fe6c7be4e289b491587ab431c164e59da) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "9h.u42", 0x2400002, 0x200000, CRC(bc61998a) SHA1(75dbefe712104c64576196c27c25dbed59ae3923) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) ) /* From Dragon Blaze */
+//  ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) ) /* From Dragon Blaze */
 
 	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) /* Samples - Not Dumped */
-	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD( "snd0.u52", 0x000000, 0x400000, CRC(0179f018) SHA1(16ae63e021230356777342ed902e02407a1a1b82) )
 ROM_END
 
 /* are these right? should i fake the counter return?
@@ -1226,7 +1237,7 @@ static DRIVER_INIT( s1945ii )
 
 static DRIVER_INIT( daraku )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
 	use_factory_eeprom=EEPROM_DARAKU;
@@ -1240,7 +1251,7 @@ static DRIVER_INIT( sbomberb )
 
 static DRIVER_INIT( gunbird2 )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
 	use_factory_eeprom=EEPROM_DEFAULT;
@@ -1248,7 +1259,7 @@ static DRIVER_INIT( gunbird2 )
 
 static DRIVER_INIT( s1945iii )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
 	use_factory_eeprom=EEPROM_S1945III;
@@ -1269,7 +1280,7 @@ static DRIVER_INIT( gnbarich )
 static DRIVER_INIT( mjgtaste )
 {
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
-	use_factory_eeprom=EEPROM_DEFAULT;
+	use_factory_eeprom=EEPROM_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }
 
@@ -1289,4 +1300,4 @@ GAME( 1999, s1945iii, 0,        psikyo5,     s1945iii, s1945iii, ROT270, "Psikyo
 /* ps5v2 */
 GAME( 2000, dragnblz, 0,        psikyo5,     dragnblz, dragnblz, ROT270, "Psikyo", "Dragon Blaze", 0 )
 GAME( 2001, gnbarich, 0,        psikyo5,     gnbarich, gnbarich, ROT270, "Psikyo", "Gunbarich", 0 )
-GAME( 2002, mjgtaste, 0,        psikyo5,     mjgtaste, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", GAME_NOT_WORKING )
+GAME( 2002, mjgtaste, 0,        psikyo5,     mjgtaste, mjgtaste, ROT0,   "Psikyo", "Mahjong G-Taste", 0 )

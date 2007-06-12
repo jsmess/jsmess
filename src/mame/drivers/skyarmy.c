@@ -92,7 +92,7 @@ PALETTE_INIT( skyarmy )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -101,7 +101,6 @@ VIDEO_START( skyarmy )
 {
         skyarmy_tilemap = tilemap_create(get_skyarmy_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,32,32);
         tilemap_set_scroll_cols(skyarmy_tilemap,32);
-	return 0;
 }
 
 

@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_gx_psac_tile_info )
 static TILE_GET_INFO( get_gx_psac3_tile_info )
 {
 	int tileno, colour, flip;
-	unsigned char *tmap = memory_region(REGION_GFX4);
+	UINT8 *tmap = memory_region(REGION_GFX4);
 
 	tileno = tmap[tile_index*2] | ((tmap[(tile_index*2)+1] & 0x0f)<<8);
 	colour = (psac_colorbase << 8);
@@ -141,14 +141,14 @@ static void konamigx_alpha_tile_callback(int layer, int *code, int *color, int *
 > so, well, the top bits of the code are suspicious
 */
 
-static int _gxcommoninitnosprites(void)
+static void _gxcommoninitnosprites(void)
 {
 	int i;
 
 	K054338_vh_start();
 	K055555_vh_start();
 
-	if (konamigx_mixer_init(0)) return 1;
+	konamigx_mixer_init(0);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -168,21 +168,16 @@ static int _gxcommoninitnosprites(void)
 	K056832_set_LayerOffset(1,  0, 0);
 	K056832_set_LayerOffset(2,  2, 0);
 	K056832_set_LayerOffset(3,  3, 0);
-
-	return 0;
 }
 
-static int _gxcommoninit(void)
+static void _gxcommoninit(void)
 {
 	// (+ve values move objects to the right and -ve values move objects to the left)
-	if (K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback))
-	{
-		return 1;
-	}
+	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX, -26, -23, konamigx_type2_sprite_callback);
 
 	gx_rozenable = 0;
 
-	return _gxcommoninitnosprites();
+	_gxcommoninitnosprites();
 }
 
 
@@ -193,12 +188,9 @@ VIDEO_START(konamigx_5bpp)
 	else
 		game_tile_callback = konamigx_type2_tile_callback;
 
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, game_tile_callback, 0);
 
-	if (_gxcommoninit()) return 1;
+	_gxcommoninit();
 
 	/* here are some hand tuned per game scroll offsets to go with the per game visible areas,
        i see no better way of doing this for now... */
@@ -229,159 +221,100 @@ VIDEO_START(konamigx_5bpp)
 	{
 		K053247GP_set_SpriteOffset(-42, -23);
 	}
-
-	return 0;
 }
 
 VIDEO_START(winspike)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 0);
+	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
 
-	if (K055673_vh_start(REGION_GFX2, K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback))
-	{
-		return 1;
-	}
-
-	if (_gxcommoninitnosprites()) return 1;
-
-	return 0;
+	_gxcommoninitnosprites();
 }
 
 VIDEO_START(dragoonj)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback);
 
-	if (K055673_vh_start(REGION_GFX2, K055673_LAYOUT_RNG, -53, -23, konamigx_dragoonj_sprite_callback))
-	{
-		return 1;
-	}
-
-	if (_gxcommoninitnosprites()) return 1;
+	_gxcommoninitnosprites();
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
-
-	return 0;
 }
 
 VIDEO_START(le2)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_8, 1, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback);
 
-	if (K055673_vh_start(REGION_GFX2, K055673_LAYOUT_LE2, -46, -23, konamigx_le2_sprite_callback))
-	{
-		return 1;
-	}
-
-	if (_gxcommoninitnosprites()) return 1;
+	_gxcommoninitnosprites();
 
 	konamigx_mixer_primode(-1); // swapped layer B and C priorities?
-
-	return 0;
 }
 
 VIDEO_START(konamigx_6bpp)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 
-	if (_gxcommoninit()) return 1;
+	_gxcommoninit();
 
 	if (!strcmp(machine->gamedrv->name,"tokkae") || !strcmp(machine->gamedrv->name,"tkmmpzdm"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 		konamigx_mixer_primode(5);
 	}
-
-	return 0;
 }
 
 VIDEO_START(konamigx_type3)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
 
-	if (_gxcommoninit()) return 1;
+	_gxcommoninit();
 
 	gx_psac_tilemap = tilemap_create(get_gx_psac3_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 256, 1024);
 	gx_rozenable = 1;
 
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, 0, 0);
-
-	return 0;
 }
 
 VIDEO_START(konamigx_type4)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 
-	if (_gxcommoninit()) return 1;
+	_gxcommoninit();
 
 	gx_psac_tilemap = tilemap_create(get_gx_psac_tile_info, tilemap_scan_rows, TILEMAP_TRANSPARENT, 16, 16, 128, 128);
 	gx_rozenable = 1;
 
 	K053936_wraparound_enable(0, 0);
 	K053936GP_set_offset(0, 0, 0);
-
-	return 0;
 }
 
 VIDEO_START(konamigx_6bpp_2)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
 
 	if (!strcmp(machine->gamedrv->name,"salmndr2"))
 	{
-		if (K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback))
-		{
-			return 1;
-		}
+		K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
-		if (_gxcommoninitnosprites()) return 1;
+		_gxcommoninitnosprites();
 	}
 	else
 	{
-		if (_gxcommoninit()) return 1;
+		_gxcommoninit();
 	}
-
-	return 0;
 }
 
 VIDEO_START(opengolf)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_5, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
-	if (K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback))
-	{
-		return 1;
-	}
-
-	if (_gxcommoninitnosprites()) return 1;
+	_gxcommoninitnosprites();
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
@@ -394,23 +327,14 @@ VIDEO_START(opengolf)
 	tilemap_set_transparent_pen(gx_psac_tilemap2, 0);
 
 	gx_rozenable = 0;
-
-	return 0;
 }
 
 VIDEO_START(racinfrc)
 {
-	if (K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0))
-	{
-		return 1;
-	}
+	K056832_vh_start(REGION_GFX1, K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback);
 
-	if (K055673_vh_start(REGION_GFX2, K055673_LAYOUT_GX, -53, -23, konamigx_type2_sprite_callback))
-	{
-		return 1;
-	}
-
-	if (_gxcommoninitnosprites()) return 1;
+	_gxcommoninitnosprites();
 
 	K056832_set_LayerOffset(0, -2+1, 0);
 	K056832_set_LayerOffset(1,  0+1, 0);
@@ -423,8 +347,6 @@ VIDEO_START(racinfrc)
 	tilemap_set_transparent_pen(gx_psac_tilemap2, 0);
 
 	gx_rozenable = 0;
-
-	return 0;
 }
 
 VIDEO_UPDATE(konamigx)
@@ -498,7 +420,7 @@ WRITE32_HANDLER( konamigx_palette_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE32_HANDLER( konamigx_palette2_w )
@@ -515,7 +437,7 @@ WRITE32_HANDLER( konamigx_palette2_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 // main monitor for type 3

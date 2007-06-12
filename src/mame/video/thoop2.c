@@ -97,8 +97,6 @@ VIDEO_START( thoop2 )
 	for (i = 0; i < 5; i++){
 		sprite_table[i] = auto_malloc(512*sizeof(int));
 	}
-
-	return 0;
 }
 
 /***************************************************************************

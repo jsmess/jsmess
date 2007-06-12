@@ -91,8 +91,6 @@ VIDEO_START( tunhunt )
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrollx(fg_tilemap, 0, 64);
-
-	return 0;
 }
 
 PALETTE_INIT( tunhunt )
@@ -148,7 +146,7 @@ Color Array Ram Assignments:
 */
 static void update_palette( void )
 {
-//  const unsigned char *color_prom = memory_region( REGION_PROMS );
+//  const UINT8 *color_prom = memory_region( REGION_PROMS );
 /*
     The actual contents of the color proms (unused by this driver)
     are as follows:
@@ -200,7 +198,7 @@ static void update_palette( void )
 		green	= APPLY_SHADE(green,shade);
 		blue	= APPLY_SHADE(blue,shade);
 
-		palette_set_color( Machine,i,red,green,blue );
+		palette_set_color( Machine,i,MAKE_RGB(red,green,blue) );
 	}
 }
 
@@ -224,7 +222,7 @@ static void draw_motion_object( mame_bitmap *bitmap )
 	int x,span_data;
 	int color;
 	int count;
-	const unsigned char *source;
+	const UINT8 *source;
 	rectangle clip = Machine->screen[0].visarea;
 
 	for( line=0; line<64; line++ )

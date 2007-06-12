@@ -166,8 +166,6 @@ VIDEO_START( legionna )
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
 	tilemap_set_transparent_pen(text_layer,15);
-
-	return 0;
 }
 
 VIDEO_START( denjinmk )
@@ -183,8 +181,6 @@ VIDEO_START( denjinmk )
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
 	tilemap_set_transparent_pen(text_layer,7);//?
-
-	return 0;
 }
 
 VIDEO_START( cupsoc )
@@ -200,8 +196,6 @@ VIDEO_START( cupsoc )
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
 	tilemap_set_transparent_pen(text_layer,15);
-
-	return 0;
 }
 
 

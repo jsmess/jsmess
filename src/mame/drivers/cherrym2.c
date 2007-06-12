@@ -55,7 +55,6 @@ VIDEO_START(cm2)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-	return 0;
 }
 
 VIDEO_UPDATE(cm2)

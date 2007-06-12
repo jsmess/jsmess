@@ -18,8 +18,7 @@ static int bank_callback(const int bank)
 
 VIDEO_START( twocrude )
 {
-	if (deco16_2_video_init(0))
-		return 1;
+	deco16_2_video_init(0);
 
 	deco16_set_tilemap_bank_callback(0, bank_callback);
 	deco16_set_tilemap_bank_callback(1, bank_callback);
@@ -30,9 +29,6 @@ VIDEO_START( twocrude )
 	deco16_pf2_colour_bank=0x20;
 	deco16_pf4_colour_bank=0x40;
 	deco16_pf3_colour_bank=0x30;
-
-
-	return 0;
 }
 
 /******************************************************************************/
@@ -45,7 +41,7 @@ static void update_24bitcol(int offset)
 	g = (UINT8)((float)((paletteram16[offset] >> 8) & 0xff)*1.75);
 	b = (UINT8)((float)((paletteram16_2[offset] >> 0) & 0xff)*1.75);
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( twocrude_palette_24bit_rg_w )

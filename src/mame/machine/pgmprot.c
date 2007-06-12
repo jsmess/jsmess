@@ -8,13 +8,13 @@ extern UINT16 *pgm_mainram;
 
 
 /*** (PSTARS) ***/
-unsigned short PSTARSKEY;
-static unsigned short PSTARSINT[2];
-static unsigned int PSTARS_REGS[16];
-static unsigned int PSTARS_VAL;
+UINT16 PSTARSKEY;
+static UINT16 PSTARSINT[2];
+static UINT32 PSTARS_REGS[16];
+static UINT32 PSTARS_VAL;
 
-static unsigned short pstar_e7,pstar_b1,pstar_ce;
-static unsigned short pstar_ram[3];
+static UINT16 pstar_e7,pstar_b1,pstar_ce;
+static UINT16 pstar_ram[3];
 
 static int Pstar_ba[0x1E]={
 	0x02,0x00,0x00,0x01,0x00,0x03,0x00,0x00, //0
@@ -130,8 +130,8 @@ READ16_HANDLER (PSTARS_r16)
 {
 	if(offset==0)
 	{
-		unsigned short d=PSTARS_VAL&0xffff;
-		unsigned short realkey;
+		UINT16 d=PSTARS_VAL&0xffff;
+		UINT16 realkey;
 		realkey=PSTARSKEY>>8;
 		realkey|=PSTARSKEY;
 		d^=realkey;
@@ -140,8 +140,8 @@ READ16_HANDLER (PSTARS_r16)
 	}
 	else if(offset==1)
 	{
-		unsigned short d=PSTARS_VAL>>16;
-		unsigned short realkey;
+		UINT16 d=PSTARS_VAL>>16;
+		UINT16 realkey;
 		realkey=PSTARSKEY>>8;
 		realkey|=PSTARSKEY;
 		d^=realkey;
@@ -161,7 +161,7 @@ WRITE16_HANDLER (PSTARS_w16)
 
 	if(offset==1)
 	{
-		unsigned short realkey;
+		UINT16 realkey;
 		if((data>>8)==0xff)
 			PSTARSKEY=0xff00;
 		realkey=PSTARSKEY>>8;
@@ -350,7 +350,7 @@ static void asic3_compute_hold(void)
 
 READ16_HANDLER( pgm_asic3_r )
 {
-	unsigned char res = 0;
+	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
 	switch(asic3_reg) {
@@ -427,19 +427,19 @@ WRITE16_HANDLER( pgm_asic3_reg_w )
 
 /*** Knights of Valour / Sango / PhotoY2k Protection (from ElSemi) (ASIC28) ***/
 
-static unsigned short ASIC28KEY;
-static unsigned short ASIC28REGS[10];
-static unsigned short ASICPARAMS[256];
-static unsigned short ASIC28RCNT=0;
-static const unsigned int B0TABLE[16]={2,0,1,4,3}; //maps char portraits to tables
+static UINT16 ASIC28KEY;
+static UINT16 ASIC28REGS[10];
+static UINT16 ASICPARAMS[256];
+static UINT16 ASIC28RCNT=0;
+static const UINT32 B0TABLE[16]={2,0,1,4,3}; //maps char portraits to tables
 
 // photo2yk bonus stage
-static const unsigned int AETABLE[16]={0x00,0x0a,0x14,
+static const UINT32 AETABLE[16]={0x00,0x0a,0x14,
 		0x01,0x0b,0x15,
 		0x02,0x0c,0x16};
 
 //Not sure if BATABLE is complete
-static const unsigned int BATABLE[0x40]=
+static const UINT32 BATABLE[0x40]=
 	{0x00,0x29,0x2c,0x35,0x3a,0x41,0x4a,0x4e,  //0x00
      0x57,0x5e,0x77,0x79,0x7a,0x7b,0x7c,0x7d, //0x08
      0x7e,0x7f,0x80,0x81,0x82,0x85,0x86,0x87, //0x10
@@ -447,7 +447,7 @@ static const unsigned int BATABLE[0x40]=
      0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,
      0x9e,0xa3,0xd4,0xa9,0xaf,0xb5,0xbb,0xc1};
 
-static unsigned int E0REGS[16];
+static UINT32 E0REGS[16];
 
 
 READ16_HANDLER (sango_protram_r)
@@ -472,8 +472,8 @@ READ16_HANDLER (sango_protram_r)
 	return 0x0000;
 }
 
-static unsigned int photoy2k_seqpos;
-static unsigned int photoy2k_trf[3], photoy2k_soff;
+static UINT32 photoy2k_seqpos;
+static UINT32 photoy2k_trf[3], photoy2k_soff;
 
 #define BITSWAP10(val,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
                 ((BIT(val, B9) <<  9) | \
@@ -487,10 +487,10 @@ static unsigned int photoy2k_trf[3], photoy2k_soff;
                  (BIT(val, B1) <<  1) | \
                  (BIT(val, B0) <<  0))
 
-static unsigned int photoy2k_spritenum(void)
+static UINT32 photoy2k_spritenum(void)
 {
-	unsigned int base = photoy2k_seqpos & 0xffc00;
-	unsigned int low  = photoy2k_seqpos & 0x003ff;
+	UINT32 base = photoy2k_seqpos & 0xffc00;
+	UINT32 low  = photoy2k_seqpos & 0x003ff;
 
 	switch((photoy2k_seqpos >> 10) & 0xf) {
 	case 0x0:
@@ -522,9 +522,9 @@ static unsigned int photoy2k_spritenum(void)
 }
 
 READ16_HANDLER (ASIC28_r16)
-//unsigned short ASIC28_r16(unsigned int addr)
+//UINT16 ASIC28_r16(UINT32 addr)
 {
-	unsigned int val=(ASIC28REGS[1]<<16)|(ASIC28REGS[0]);
+	UINT32 val=(ASIC28REGS[1]<<16)|(ASIC28REGS[0]);
 
 //logerror("Asic28 Read PC = %06x Command = %02x ??\n",activecpu_get_pc(), ASIC28REGS[1]);
 
@@ -539,7 +539,7 @@ READ16_HANDLER (ASIC28_r16)
 
 		case 0x21: // PhotoY2k spritenum conversion 3/4
 			if(!ASIC28RCNT) {
-				extern const unsigned int pgmy2ks[];
+				extern const UINT32 pgmy2ks[];
 				photoy2k_trf[2] = val & 0xffff;
 				logerror("ASIC28: PhotoY2K spr3 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[1], activecpu_get_pc());
 				if(photoy2k_trf[0] < 0x3c00)
@@ -603,7 +603,7 @@ READ16_HANDLER (ASIC28_r16)
 			{
 				int v2=ASIC28REGS[0]&0x0f;
 				int v1=(ASIC28REGS[0]&0x0f00)>>8;
-//              unsigned short tmp=E0REGS[v2];
+//              UINT16 tmp=E0REGS[v2];
 				//E0REGS[v2]=E0REGS[v1];
 				//E0REGS[v1]=tmp;
 				if(ASIC28REGS[0]==0x102)
@@ -707,8 +707,8 @@ READ16_HANDLER (ASIC28_r16)
 //  if(addr==0x500000)
 	if(offset==0)
 	{
-		unsigned short d=val&0xffff;
-		unsigned short realkey;
+		UINT16 d=val&0xffff;
+		UINT16 realkey;
 		realkey=ASIC28KEY>>8;
 		realkey|=ASIC28KEY;
 		d^=realkey;
@@ -717,8 +717,8 @@ READ16_HANDLER (ASIC28_r16)
 //  else if(addr==0x500002)
 	else if(offset==1)
 	{
-		unsigned short d=val>>16;
-		unsigned short realkey;
+		UINT16 d=val>>16;
+		UINT16 realkey;
 		realkey=ASIC28KEY>>8;
 		realkey|=ASIC28KEY;
 		d^=realkey;
@@ -734,12 +734,12 @@ READ16_HANDLER (ASIC28_r16)
 }
 
 WRITE16_HANDLER (ASIC28_w16)
-//void ASIC28_w16(unsigned int addr,unsigned short data)
+//void ASIC28_w16(UINT32 addr,UINT16 data)
 {
 //  if(addr==0x500000)
 	if(offset==0)
 	{
-		unsigned short realkey;
+		UINT16 realkey;
 		realkey=ASIC28KEY>>8;
 		realkey|=ASIC28KEY;
 		data^=realkey;
@@ -749,7 +749,7 @@ WRITE16_HANDLER (ASIC28_w16)
 //  if(addr==0x500002)
 	if(offset==1)
 	{
-		unsigned short realkey;
+		UINT16 realkey;
 
 		ASIC28KEY=data&0xff00;
 
@@ -763,13 +763,13 @@ WRITE16_HANDLER (ASIC28_w16)
 		ASICPARAMS[ASIC28REGS[1]&0xff]=ASIC28REGS[0];
 		if(ASIC28REGS[1]==0xE7)
 		{
-			unsigned int E0R=(ASICPARAMS[0xE7]>>12)&0xf;
+			UINT32 E0R=(ASICPARAMS[0xE7]>>12)&0xf;
 			E0REGS[E0R]&=0xffff;
 			E0REGS[E0R]|=ASIC28REGS[0]<<16;
 		}
 		if(ASIC28REGS[1]==0xE5)
 		{
-			unsigned int E0R=(ASICPARAMS[0xE7]>>12)&0xf;
+			UINT32 E0R=(ASICPARAMS[0xE7]>>12)&0xf;
 			E0REGS[E0R]&=0xff0000;
 			E0REGS[E0R]|=ASIC28REGS[0];
 		}
@@ -818,29 +818,29 @@ AddReadArea (0xda0000,0xdaffff,0,dw3_r8,dw3_r16,dw3_r32);
 
 #define DW3BITSWAP(s,d,bs,bd)  d=((d&(~(1<<bd)))|(((s>>bs)&1)<<bd))
 
-unsigned short dw3_Rw[8];
-unsigned char *dw3_R=(unsigned char *) dw3_Rw;
+UINT16 dw3_Rw[8];
+UINT8 *dw3_R=(UINT8 *) dw3_Rw;
 
-unsigned char dw3_r8(unsigned int addr)
+UINT8 dw3_r8(UINT32 addr)
 {
 	if(addr>=0xDA5610 && addr<=0xDA5613)
-		return *((unsigned char *) (dw3_R+((addr-0xDA5610)^1)));
+		return *((UINT8 *) (dw3_R+((addr-0xDA5610)^1)));
 	return 0;
 }
 
-unsigned short dw3_r16(unsigned int addr)
+UINT16 dw3_r16(UINT32 addr)
 {
 	if(addr>=0xDA5610 && addr<=0xDA5613)
-		return *((unsigned short *) (dw3_R+(addr-0xDA5610)));
+		return *((UINT16 *) (dw3_R+(addr-0xDA5610)));
 	return 0;
 }
 
-unsigned int dw3_r32(unsigned int addr)
+UINT32 dw3_r32(UINT32 addr)
 {
 	return 0;
 }
 
-void dw3_w8(unsigned int addr,unsigned char val)
+void dw3_w8(UINT32 addr,UINT8 val)
 {
 	if(addr==0xDA5610)
 		dw3_R[1]=val;
@@ -852,18 +852,18 @@ void dw3_w8(unsigned int addr,unsigned char val)
 		dw3_R[2]=val;
 }
 
-void dw3_w16(unsigned int addr,unsigned short val)
+void dw3_w16(UINT32 addr,UINT16 val)
 {
 	if(addr>=0xDA5610 && addr<=0xDA5613)
 	{
-		unsigned short *s=((unsigned short *) (dw3_R+(addr-0xDA5610)));
+		UINT16 *s=((UINT16 *) (dw3_R+(addr-0xDA5610)));
 		*s=val;
 		if(addr==0xDA5610)
 		{
 			if(val==1)
 			{
-				unsigned short v1=dw3_Rw[1];
-				unsigned short v2=0;
+				UINT16 v1=dw3_Rw[1];
+				UINT16 v2=0;
 				DW3BITSWAP(v1,v2,0,0);
 				DW3BITSWAP(v1,v2,1,1);
 				DW3BITSWAP(v1,v2,7,2);
@@ -881,7 +881,7 @@ void dw3_w16(unsigned int addr,unsigned short val)
 }
 
 
-void dw3_w32(unsigned int addr,unsigned int val)
+void dw3_w32(UINT32 addr,UINT32 val)
 {
 
 }

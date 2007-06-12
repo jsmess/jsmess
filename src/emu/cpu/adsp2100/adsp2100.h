@@ -56,7 +56,6 @@ enum
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-#if (HAS_ADSP2100)
 #define ADSP2100_IRQ0		0		/* IRQ0 */
 #define ADSP2100_SPORT1_RX	0		/* SPORT1 receive IRQ */
 #define ADSP2100_IRQ1		1		/* IRQ1 */
@@ -64,10 +63,10 @@ enum
 #define ADSP2100_IRQ2		2		/* IRQ2 */
 #define ADSP2100_IRQ3		3		/* IRQ3 */
 
+#if (HAS_ADSP2100)
 extern void adsp2100_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#if (HAS_ADSP2101)
 /**************************************************************************
  * ADSP2101 section
  **************************************************************************/
@@ -81,6 +80,7 @@ extern void adsp2100_get_info(UINT32 state, cpuinfo *info);
 #define ADSP2101_SPORT0_TX	4		/* SPORT0 transmit IRQ */
 #define ADSP2101_TIMER		5		/* internal timer IRQ */
 
+#if (HAS_ADSP2101)
 extern void adsp2101_get_info(UINT32 state, cpuinfo *info);
 #endif
 

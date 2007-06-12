@@ -100,7 +100,7 @@ PALETTE_INIT( yamato )
 		bit3 = (color_prom[64] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 	color_prom += 64;
@@ -127,7 +127,7 @@ PALETTE_INIT( yamato )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+64,r,g,b);
+		palette_set_color(machine,i+64,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -152,7 +152,7 @@ PALETTE_INIT( yamato )
 	/* fake colors for bg gradient */
 	for (i = 0;i < 256;i++)
 	{
-		palette_set_color(machine,i+16*4+8*4,0,0,i);
+		palette_set_color(machine,i+16*4+8*4,MAKE_RGB(0,0,i));
 	}
 }
 
@@ -188,7 +188,7 @@ PALETTE_INIT( toprollr )
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 

@@ -149,8 +149,6 @@ VIDEO_START( lordgun )
 	tilemap_set_scroll_rows(tilemap_3,1);
 	tilemap_set_scroll_cols(tilemap_3,1);
 	tilemap_set_transparent_pen(tilemap_3,0x3f);
-
-	return 0;
 }
 
 /***************************************************************************

@@ -62,7 +62,7 @@ static int nbmj9195_outcoin_flag;
 static int mscoutm_inputport;
 
 
-static unsigned char *nbmj9195_nvram;
+static UINT8 *nbmj9195_nvram;
 static size_t nbmj9195_nvram_size;
 
 
@@ -80,7 +80,7 @@ static NVRAM_HANDLER( nbmj9195 )
 
 static void nbmj9195_soundbank_w(int data)
 {
-	unsigned char *SNDROM = memory_region(REGION_CPU2);
+	UINT8 *SNDROM = memory_region(REGION_CPU2);
 
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -166,7 +166,7 @@ static READ8_HANDLER( mscoutm_dipsw_1_r )
 
 /* TMPZ84C011 PIO emulation */
 
-static unsigned char pio_dir[5 * 2], pio_latch[5 * 2];
+static UINT8 pio_dir[5 * 2], pio_latch[5 * 2];
 
 static int tmpz84c011_pio_r(int offset)
 {
@@ -546,7 +546,7 @@ static MACHINE_RESET( sailorws )
 
 static void initialize_driver(void)
 {
-	unsigned char *ROM = memory_region(REGION_CPU2);
+	UINT8 *ROM = memory_region(REGION_CPU2);
 
 	// sound program patch
 	ROM[0x0213] = 0x00;			// DI -> NOP

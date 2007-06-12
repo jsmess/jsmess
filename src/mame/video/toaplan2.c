@@ -403,7 +403,7 @@ static TILE_GET_INFO( get_text_tile_info )
   Start the video hardware emulation.
 
 ***************************************************************************/
-static int create_tilemaps_0(void)
+static void create_tilemaps_0(void)
 {
 	top_tilemap[0] = tilemap_create(get_top0_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
 	fg_tilemap[0] = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
@@ -412,11 +412,9 @@ static int create_tilemaps_0(void)
 	tilemap_set_transparent_pen(top_tilemap[0],0);
 	tilemap_set_transparent_pen(fg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
-
-	return 0;
 }
 
-static int create_tilemaps_1(void)
+static void create_tilemaps_1(void)
 {
 	top_tilemap[1] = tilemap_create(get_top1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
 	fg_tilemap[1] = tilemap_create(get_fg1_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
@@ -425,11 +423,9 @@ static int create_tilemaps_1(void)
 	tilemap_set_transparent_pen(top_tilemap[1],0);
 	tilemap_set_transparent_pen(fg_tilemap[1],0);
 	tilemap_set_transparent_pen(bg_tilemap[1],0);
-
-	return 0;
 }
 
-static int truxton2_create_tilemaps_0(void)
+static void truxton2_create_tilemaps_0(void)
 {
 	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,32);
 	top_tilemap[0] = tilemap_create(get_top0_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
@@ -443,11 +439,9 @@ static int truxton2_create_tilemaps_0(void)
 	tilemap_set_transparent_pen(top_tilemap[0],0);
 	tilemap_set_transparent_pen(fg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
-
-	return 0;
 }
 
-static int batrider_create_tilemaps_0(void)
+static void batrider_create_tilemaps_0(void)
 {
 	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,64,32);
 	top_tilemap[0] = tilemap_create(batrider_get_top0_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,16,16,32,32);
@@ -461,12 +455,10 @@ static int batrider_create_tilemaps_0(void)
 	tilemap_set_transparent_pen(top_tilemap[0],0);
 	tilemap_set_transparent_pen(fg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
-
-	return 0;
 }
 
 
-static int toaplan2_vram_alloc(int controller)
+static void toaplan2_vram_alloc(int controller)
 {
 	spriteram16_new[controller] = auto_malloc(TOAPLAN2_SPRITERAM_SIZE);
 	memset(spriteram16_new[controller],0,TOAPLAN2_SPRITERAM_SIZE);
@@ -484,53 +476,40 @@ static int toaplan2_vram_alloc(int controller)
 	memset(bgvideoram16[controller],0,TOAPLAN2_BG_VRAM_SIZE);
 
 	spriteram16_n[controller] = spriteram16_now[controller];
-
-	return 0;
 }
 
-static int toaplan2_vh_start(int controller)
+static void toaplan2_vh_start(int controller)
 {
-	static int error_level = 0;
-
-	if (toaplan2_vram_alloc(controller))
-		return 1;
+	toaplan2_vram_alloc(controller);
 
 	if (controller == 0)
 	{
-		error_level |= create_tilemaps_0();
+		create_tilemaps_0();
 	}
 	if (controller == 1)
 	{
-		error_level |= create_tilemaps_1();
+		create_tilemaps_1();
 	}
-	return error_level;
 }
 
 VIDEO_START( toaplan2_0 )
 {
 	defaultOffsets();
-	return toaplan2_vh_start(0);
+	toaplan2_vh_start(0);
 }
 
 VIDEO_START( toaplan2_1 )
 {
-	int error_level = 0;
-	error_level |= toaplan2_vh_start(0);
-	error_level |= toaplan2_vh_start(1);
+	toaplan2_vh_start(0);
+	toaplan2_vh_start(1);
 	defaultOffsets();
-	return error_level;
 }
 
 VIDEO_START( truxton2_0 )
 {
-	if (toaplan2_vram_alloc(0))
-	{
-		return 1;
-	}
-	if (truxton2_create_tilemaps_0())
-	{
-		return 1;
-	}
+	toaplan2_vram_alloc(0);
+	truxton2_create_tilemaps_0();
+
 	if(!strcmp(machine->gamedrv->name,"fixeighb"))
 	{
 		xoffset[0]=-26;
@@ -549,22 +528,14 @@ VIDEO_START( truxton2_0 )
 		defaultOffsets();
 		tilemap_set_scrolldx(tx_tilemap, 0x1d4 +1, 0x2a);
 	}
-	return 0;
 }
 
 VIDEO_START( battleg_0 )
 {
-	if (toaplan2_vram_alloc(0))
-	{
-		return 1;
-	}
-	if (truxton2_create_tilemaps_0())
-	{
-		return 1;
-	}
+	toaplan2_vram_alloc(0);
+	truxton2_create_tilemaps_0();
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
-	return 0;
 }
 
 VIDEO_START( batrider_0 )
@@ -572,16 +543,13 @@ VIDEO_START( batrider_0 )
 	raizing_tx_gfxram16 = auto_malloc(RAIZING_TX_GFXRAM_SIZE);
 	memset(raizing_tx_gfxram16,0,RAIZING_TX_GFXRAM_SIZE);
 
-	if (toaplan2_vram_alloc(0))
-		return 1;
+	toaplan2_vram_alloc(0);
 	spriteram16_n[0] = spriteram16_new[0];
 
-	if (batrider_create_tilemaps_0())
-		return 1;
+	batrider_create_tilemaps_0();
 
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
-	return 0;
 }
 
 

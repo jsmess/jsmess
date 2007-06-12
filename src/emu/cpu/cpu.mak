@@ -567,14 +567,14 @@ CPUDEFS += -DHAS_PENTIUM=$(if $(filter PENTIUM,$(CPUS)),1,0)
 CPUDEFS += -DHAS_MEDIAGX=$(if $(filter MEDIAGX,$(CPUS)),1,0)
 
 ifneq ($(filter I86 I88 I186 I188,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/i86
+OBJDIRS += $(CPUOBJ)/i86 $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/i86/i86.o
 DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
 
 
 ifneq ($(filter I286,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/i86
+OBJDIRS += $(CPUOBJ)/i86 $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/i86/i286.o
 DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
@@ -737,7 +737,7 @@ $(CPUOBJ)/pic16c5x/pic16c5x.o:	$(CPUSRC)/pic16c5x/pic16c5x.c \
 CPUDEFS += -DHAS_R3000=$(if $(filter R3000,$(CPUS)),1,0)
 
 ifneq ($(filter R3000,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/r3000
+OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/r3000.o
 DBGOBJS += $(CPUOBJ)/mips/r3kdasm.o
 endif
@@ -1094,13 +1094,13 @@ CPUDEFS += -DHAS_V30MZ=$(if $(filter V30MZ,$(CPUS)),1,0)
 CPUDEFS += -DHAS_V33=$(if $(filter V33,$(CPUS)),1,0)
 
 ifneq ($(filter V20 V30 V33,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/nec
+OBJDIRS += $(CPUOBJ)/nec $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/nec/nec.o
 DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
 
 ifneq ($(filter V30MZ,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/v30mz
+OBJDIRS += $(CPUOBJ)/v30mz $(CPUOBJ)/i386
 CPUOBJS += $(CPUOBJ)/v30mz/v30mz.o
 DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
@@ -1572,7 +1572,7 @@ $(CPUOBJ)/z80/z80.o:	$(CPUSRC)/z80/z80.c \
 CPUDEFS += -DHAS_Z180=$(if $(filter Z180,$(CPUS)),1,0)
 
 ifneq ($(filter Z180,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/z180
+OBJDIRS += $(CPUOBJ)/z180 $(CPUOBJ)/z80
 CPUOBJS += $(CPUOBJ)/z180/z180.o $(CPUOBJ)/z80/z80daisy.o
 DBGOBJS += $(CPUOBJ)/z180/z180dasm.o
 endif

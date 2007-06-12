@@ -10,7 +10,7 @@
 #include "driver.h"
 
 
-static unsigned char from_main,from_mcu;
+static UINT8 from_main,from_mcu;
 static int mcu_sent = 0,main_sent = 0;
 
 
@@ -23,7 +23,7 @@ static int mcu_sent = 0,main_sent = 0;
 
 ***************************************************************************/
 
-static unsigned char portA_in,portA_out,ddrA;
+static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( lkage_68705_portA_r )
 {
@@ -53,7 +53,7 @@ WRITE8_HANDLER( lkage_68705_ddrA_w )
  *  2   W  when 0->1, copies port A to the latch for the main CPU
  */
 
-static unsigned char portB_in,portB_out,ddrB;
+static UINT8 portB_in,portB_out,ddrB;
 
 READ8_HANDLER( lkage_68705_portB_r )
 {
@@ -87,7 +87,7 @@ WRITE8_HANDLER( lkage_68705_ddrB_w )
 }
 
 
-static unsigned char portC_in,portC_out,ddrC;
+static UINT8 portC_in,portC_out,ddrC;
 
 READ8_HANDLER( lkage_68705_portC_r )
 {

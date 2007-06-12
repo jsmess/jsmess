@@ -189,8 +189,7 @@ static struct tms34061_interface tms34061intf =
 VIDEO_START( itech8 )
 {
 	/* initialize TMS34061 emulation */
-    if (tms34061_start(&tms34061intf))
-		return 1;
+    tms34061_start(&tms34061intf);
 
 	/* get the TMS34061 display state */
 	tms34061_get_display_state(&tms_state);
@@ -201,8 +200,6 @@ VIDEO_START( itech8 )
 	/* fetch the GROM base */
 	grom_base = memory_region(REGION_GFX1);
 	grom_size = memory_region_length(REGION_GFX1);
-
-	return 0;
 }
 
 

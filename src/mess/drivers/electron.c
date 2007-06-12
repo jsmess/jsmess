@@ -27,26 +27,26 @@ Missing:
 #include "devices/cassette.h"
 #include "formats/uef_cas.h"
 
-unsigned short electron_colour_table[8]=
+static const unsigned short electron_colour_table[8]=
 {
 	0,1,2,3,4,5,6,7
 };
 
-unsigned char   electron_palette[8*3]=
+static const rgb_t electron_palette[8]=
 {
-	0x0ff,0x0ff,0x0ff,
-	0x000,0x0ff,0x0ff,
-	0x0ff,0x000,0x0ff,
-	0x000,0x000,0x0ff,
-	0x0ff,0x0ff,0x000,
-	0x000,0x0ff,0x000,
-	0x0ff,0x000,0x000,
-	0x000,0x000,0x000
+	MAKE_RGB(0x0ff,0x0ff,0x0ff),
+	MAKE_RGB(0x000,0x0ff,0x0ff),
+	MAKE_RGB(0x0ff,0x000,0x0ff),
+	MAKE_RGB(0x000,0x000,0x0ff),
+	MAKE_RGB(0x0ff,0x0ff,0x000),
+	MAKE_RGB(0x000,0x0ff,0x000),
+	MAKE_RGB(0x0ff,0x000,0x000),
+	MAKE_RGB(0x000,0x000,0x000)
 };
 
 static PALETTE_INIT( electron )
 {
-	palette_set_colors(machine, 0, electron_palette, sizeof(electron_palette) / 3);
+	palette_set_colors(machine, 0, electron_palette, ARRAY_LENGTH(electron_palette));
 	memcpy(colortable,electron_colour_table,sizeof(electron_colour_table));
 }
 

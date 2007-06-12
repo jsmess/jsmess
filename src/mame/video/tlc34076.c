@@ -54,7 +54,7 @@ static void update_palette(int which)
 				g = pal6bit(g);
 				b = pal6bit(b);
 			}
-			palette_set_color(Machine, i, r, g, b);
+			palette_set_color(Machine, i, MAKE_RGB(r, g, b));
 		}
 }
 

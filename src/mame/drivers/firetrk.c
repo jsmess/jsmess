@@ -253,10 +253,10 @@ static PALETTE_INIT( firetrk )
 		3, 0, 0, 3
 	};
 
-	palette_set_color(machine, 0, 0x00, 0x00, 0x00);
-	palette_set_color(machine, 1, 0x5b, 0x5b, 0x5b);
-	palette_set_color(machine, 2, 0xa4, 0xa4, 0xa4);
-	palette_set_color(machine, 3, 0xff, 0xff, 0xff);
+	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, 1, MAKE_RGB(0x5b, 0x5b, 0x5b));
+	palette_set_color(machine, 2, MAKE_RGB(0xa4, 0xa4, 0xa4));
+	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));
 
 	memcpy(colortable, colortable_source, sizeof(colortable_source));
 }
@@ -264,7 +264,7 @@ static PALETTE_INIT( firetrk )
 
 static void prom_to_palette(int number, UINT8 val)
 {
-	palette_set_color(Machine, number, pal1bit(val >> 2), pal1bit(val >> 1), pal1bit(val >> 0));
+	palette_set_color_rgb(Machine, number, pal1bit(val >> 2), pal1bit(val >> 1), pal1bit(val >> 0));
 }
 
 
@@ -338,8 +338,8 @@ static PALETTE_INIT( montecar )
 	prom_to_palette(number++, p[0x1C8]);
 	prom_to_palette(number++, p[0x1CC]);
 
-	palette_set_color(machine, number++, 0x00, 0x00, 0x00);
-	palette_set_color(machine, number++, 0xff, 0xff, 0xff);
+	palette_set_color(machine, number++, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, number++, MAKE_RGB(0xff, 0xff, 0xff));
 
 	memcpy(colortable, colortable_source, sizeof(colortable_source));
 }

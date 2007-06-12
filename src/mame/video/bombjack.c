@@ -74,8 +74,6 @@ VIDEO_START( bombjack )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
 	state_save_register_global(background_image);
-
-	return 0;
 }
 
 static void bombjack_draw_sprites( mame_bitmap *bitmap )

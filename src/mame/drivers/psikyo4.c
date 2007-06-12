@@ -189,8 +189,8 @@ static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(Machine,offset,r,g,b);
-	palette_set_color(Machine,offset+0x800,r,g,b); // For screen 2
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(Machine,offset+0x800,MAKE_RGB(r,g,b)); // For screen 2
 }
 
 static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
@@ -202,7 +202,7 @@ static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
 	g = ((bgpen_1[0] & 0x00ff0000) >>16);
 	r = ((bgpen_1[0] & 0xff000000) >>24);
 
-	palette_set_color(Machine,0x1000,r,g,b); // Clear colour for screen 1
+	palette_set_color(Machine,0x1000,MAKE_RGB(r,g,b)); // Clear colour for screen 1
 }
 
 static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
@@ -214,7 +214,7 @@ static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
 	g = ((bgpen_2[0] & 0x00ff0000) >>16);
 	r = ((bgpen_2[0] & 0xff000000) >>24);
 
-	palette_set_color(Machine,0x1001,r,g,b); // Clear colour for screen 2
+	palette_set_color(Machine,0x1001,MAKE_RGB(r,g,b)); // Clear colour for screen 2
 }
 
 static WRITE32_HANDLER( ps4_screen1_brt_w )
@@ -279,7 +279,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 	{
 		if (!(mem_mask & 0x000000ff) || !(mem_mask & 0x0000ff00))	// Bank
 		{
-			unsigned char *ROM = memory_region(REGION_GFX1);
+			UINT8 *ROM = memory_region(REGION_GFX1);
 			memory_set_bankptr(2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
 		}
 	}
@@ -291,7 +291,7 @@ static UINT32 sample_offs = 0;
 
 static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 {
-	unsigned char *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(REGION_SOUND1);
 
 	return ROM[sample_offs++]<<16;
 }
@@ -1011,7 +1011,7 @@ static void install_hotgmck_pcm_bank(void)
 
 static DRIVER_INIT( hotgmck )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800000, 0x5800007, 0, 0, hotgmck_io32_r ); // Different Inputs
 	install_hotgmck_pcm_bank();	// Banked PCM ROM

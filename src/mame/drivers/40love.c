@@ -251,7 +251,7 @@ extern WRITE8_HANDLER( fortyl_pixram_sel_w );
 extern READ8_HANDLER( fortyl_pixram_r );
 extern WRITE8_HANDLER( fortyl_pixram_w );
 
-extern unsigned char *fortyl_video_ctrl;
+extern UINT8 *fortyl_video_ctrl;
 extern int fortyl_pix_color[4];
 
 

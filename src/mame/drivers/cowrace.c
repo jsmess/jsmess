@@ -36,7 +36,6 @@ VIDEO_START( cowrace )
 							TILEMAP_TRANSPARENT, 8,8, 0x20,0x20	);
 
 	tilemap_set_transparent_pen(tmap, 0);
-	return 0;
 }
 
 VIDEO_UPDATE( cowrace )

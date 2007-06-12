@@ -308,7 +308,7 @@ static void machine_stop_geneve(running_machine *machine)
 */
 VIDEO_START(geneve)
 {
-	return v9938_init(machine, MODEL_V9938, /*0x20000*/0x30000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
+	v9938_init(machine, MODEL_V9938, /*0x20000*/0x30000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
 }
 
 /*

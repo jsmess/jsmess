@@ -52,7 +52,7 @@ f80b      ????
 
 
 extern int tecmo_video_type;
-extern unsigned char *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
+extern UINT8 *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
 
 WRITE8_HANDLER( tecmo_txvideoram_w );
 WRITE8_HANDLER( tecmo_fgvideoram_w );
@@ -69,7 +69,7 @@ VIDEO_UPDATE( tecmo );
 WRITE8_HANDLER( tecmo_bankswitch_w )
 {
 	int bankaddress;
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -111,7 +111,7 @@ static void tecmo_adpcm_int(int num)
 	}
 	else
 	{
-		unsigned char *ROM = memory_region(REGION_SOUND1);
+		UINT8 *ROM = memory_region(REGION_SOUND1);
 
 		adpcm_data = ROM[adpcm_pos++];
 		MSM5205_data_w(0,adpcm_data >> 4);

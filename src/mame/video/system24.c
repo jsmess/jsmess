@@ -4,16 +4,9 @@
 
 VIDEO_START(system24)
 {
-	if(sys24_tile_vh_start(0xfff))
-		return 1;
-
-	if(sys24_sprite_vh_start())
-		return 1;
-
-	if(sys24_mixer_vh_start())
-		return 1;
-
-	return 0;
+	sys24_tile_vh_start(0xfff);
+	sys24_sprite_vh_start();
+	sys24_mixer_vh_start();
 }
 
 static int layer_cmp(const void *pl1, const void *pl2)

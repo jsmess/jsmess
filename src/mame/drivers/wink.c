@@ -270,8 +270,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( wink )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( wink )
@@ -390,7 +388,7 @@ ROM_END
 
 static DRIVER_INIT( wink )
 {
-	unsigned int i;
+	UINT32 i;
 	UINT8 *ROM = memory_region(REGION_CPU1);
 	UINT8 *buffer = malloc_or_die(0x8000);
 

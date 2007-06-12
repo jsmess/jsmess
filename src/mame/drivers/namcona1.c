@@ -740,7 +740,7 @@ static WRITE16_HANDLER( mcu_command_w )
  */
 static READ16_HANDLER( custom_key_r )
 {
-	static unsigned char keyseq;
+	static UINT8 keyseq;
 	static UINT16 count;
 	int old_count;
 

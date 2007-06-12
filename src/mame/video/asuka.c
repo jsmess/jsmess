@@ -6,33 +6,26 @@
 
 /**********************************************************/
 
-int asuka_core_video_start(int x_offs,int buffering)
+void asuka_core_video_start(int x_offs,int buffering)
 {
-	if (PC090OJ_vh_start(0,0,8,buffering))	/* gfxset, x offset, y offset, buffering */
-		return 1;
-
-	if (TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0))
-		return 1;
-
-	if (TC0110PCR_vh_start())
-		return 1;
-
-	return 0;
+	PC090OJ_vh_start(0,0,8,buffering);	/* gfxset, x offset, y offset, buffering */
+	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
+	TC0110PCR_vh_start();
 }
 
 VIDEO_START( asuka )
 {
-	return (asuka_core_video_start(0,0));
+	asuka_core_video_start(0,0);
 }
 
 VIDEO_START( galmedes )
 {
-	return (asuka_core_video_start(1,0));
+	asuka_core_video_start(1,0);
 }
 
 VIDEO_START( cadash )
 {
-	return (asuka_core_video_start(1,1));
+	asuka_core_video_start(1,1);
 }
 
 /**************************************************************

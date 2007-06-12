@@ -85,7 +85,6 @@ static void draw_background( mame_bitmap *bitmap ){
 }
 
 VIDEO_START( mrflea ){
-	return 0;
 }
 
 VIDEO_UPDATE( mrflea )

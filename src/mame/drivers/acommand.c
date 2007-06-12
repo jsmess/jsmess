@@ -153,8 +153,6 @@ VIDEO_START( acommand )
 	ac_vregs = auto_malloc(0x80);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
-
-	return 0;
 }
 
 

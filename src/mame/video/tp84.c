@@ -78,7 +78,7 @@ PALETTE_INIT( tp84 )
 		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -211,8 +211,6 @@ VIDEO_START( tp84 )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
 	sprite_mux_buffer = auto_malloc(256 * spriteram_size);
-
-	return 0;
 }
 
 static void tp84_draw_sprites(mame_bitmap *bitmap)

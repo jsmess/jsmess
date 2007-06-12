@@ -19,7 +19,7 @@ WRITE8_HANDLER( hexa_videoram_w )
 
 WRITE8_HANDLER( hexa_d008_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bankaddress;
 
 	/* bit 0 = flipx (or y?) */
@@ -65,8 +65,6 @@ VIDEO_START( hexa )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_OPAQUE, 8, 8, 32, 32);
-
-	return 0;
 }
 
 /***************************************************************************

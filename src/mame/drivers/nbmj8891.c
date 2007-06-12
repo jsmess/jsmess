@@ -122,7 +122,7 @@ static DRIVER_INIT( omotesnd )
 #endif
 
 #if 1
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	// Protection ROM check skip
 	ROM[0x0106] = 0x00;
@@ -194,7 +194,7 @@ static DRIVER_INIT( mgmen89 )
 static DRIVER_INIT( mjfocus )
 {
 	UINT8 *prot = memory_region(REGION_USER1);
-	unsigned char *ram = memory_region(REGION_CPU1) + 0xf800;
+	UINT8 *ram = memory_region(REGION_CPU1) + 0xf800;
 	int i;
 
 	/* need to clear RAM otherwise it doesn't boot... */
@@ -216,7 +216,7 @@ static DRIVER_INIT( mjfocus )
 static DRIVER_INIT( mjfocusm )
 {
 #if 1
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	// Protection ROM check skip
 	ROM[0x014e] = 0x00;
@@ -228,7 +228,7 @@ static DRIVER_INIT( mjfocusm )
 
 static DRIVER_INIT( scandal )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;

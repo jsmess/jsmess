@@ -120,7 +120,7 @@ static WRITE16_HANDLER( legionna_paletteram16_w )	/* xBBBBxRRRRxGGGGx */
 	int a;
 	COMBINE_DATA(&paletteram16[offset]);
 	a = paletteram16[offset];
-	palette_set_color(Machine,offset,pal4bit(a >> 1),pal4bit(a >> 6),pal4bit(a >> 11));
+	palette_set_color_rgb(Machine,offset,pal4bit(a >> 1),pal4bit(a >> 6),pal4bit(a >> 11));
 }
 
 

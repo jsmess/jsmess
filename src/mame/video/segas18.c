@@ -40,7 +40,7 @@ static UINT8 vdp_mixing;
  *
  *************************************/
 
-extern int start_system18_vdp(void);
+extern void start_system18_vdp(void);
 extern void update_system18_vdp(mame_bitmap *bitmap, const rectangle *cliprect);
 
 
@@ -57,20 +57,16 @@ VIDEO_START( system18 )
 	segaic16_palette_init(0x800);
 
 	/* initialize the tile/text layers */
-	if (segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x000, 0, 8))
-		return 1;
+	segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x000, 0, 8);
 
 	/* initialize the sprites */
-	if (segaic16_sprites_init(0, SEGAIC16_SPRITES_16B, 0x400, 0))
-		return 1;
+	segaic16_sprites_init(0, SEGAIC16_SPRITES_16B, 0x400, 0);
 
 	/* create the VDP */
-	if (start_system18_vdp())
-		return 1;
+	start_system18_vdp();
 
 	/* create a temp bitmap to draw the VDP data into */
 	tempbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	return 0;
 }
 
 

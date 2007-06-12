@@ -130,7 +130,7 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 {
 	if (f3_game==KIRAMEKI) {
 		UINT16 *rom = (UINT16 *)memory_region(REGION_CPU2);
-		unsigned int idx;
+		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
 		if (ACCESSING_LSW32)
@@ -3130,8 +3130,8 @@ ROM_END
 
 static void tile_decode(int uses_5bpp_tiles)
 {
-	unsigned char lsb,msb;
-	unsigned int offset,i;
+	UINT8 lsb,msb;
+	UINT32 offset,i;
 	UINT8 *gfx = memory_region(REGION_GFX2);
 	int size=memory_region_length(REGION_GFX2);
 	int half=size/2,data;

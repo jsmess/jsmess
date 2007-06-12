@@ -1,6 +1,6 @@
 #include "driver.h"
 
-unsigned char *blktiger_txvideoram;
+UINT8 *blktiger_txvideoram;
 
 #define BGRAM_BANK_SIZE 0x1000
 #define BGRAM_BANKS 4
@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 		0,0,0,0,
 		0,0,0,0
 	};
-	unsigned char attr = scroll_ram[2*tile_index + 1];
+	UINT8 attr = scroll_ram[2*tile_index + 1];
 	int color = (attr & 0x78) >> 3;
 	SET_TILE_INFO(
 			1,
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	unsigned char attr = blktiger_txvideoram[tile_index + 0x400];
+	UINT8 attr = blktiger_txvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
 			blktiger_txvideoram[tile_index] + ((attr & 0xe0) << 3),
@@ -93,8 +93,6 @@ VIDEO_START( blktiger )
 	state_save_register_global(objon);
 	state_save_register_global(bgon);
 	state_save_register_global_pointer(scroll_ram, BGRAM_BANK_SIZE * BGRAM_BANKS);
-
-	return 0;
 }
 
 
@@ -133,7 +131,7 @@ WRITE8_HANDLER( blktiger_bgvideoram_bank_w )
 
 WRITE8_HANDLER( blktiger_scrolly_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 	int scrolly;
 
 	scroll[offset] = data;
@@ -144,7 +142,7 @@ WRITE8_HANDLER( blktiger_scrolly_w )
 
 WRITE8_HANDLER( blktiger_scrollx_w )
 {
-	static unsigned char scroll[2];
+	static UINT8 scroll[2];
 	int scrollx;
 
 	scroll[offset] = data;

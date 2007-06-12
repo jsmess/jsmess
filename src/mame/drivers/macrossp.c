@@ -252,7 +252,7 @@ static WRITE32_HANDLER( paletteram32_macrossp_w )
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(Machine,offset,r,g,b);
+	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
 }
 
 

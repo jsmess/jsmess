@@ -12,7 +12,7 @@
 
 #define xxxx 0x00
 
-const unsigned char ga2_v25_opcode_table[256] = {
+const UINT8 ga2_v25_opcode_table[256] = {
      xxxx,xxxx,0xEA,xxxx,xxxx,0x8B,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,
      xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xFA,
      xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x49,xxxx,xxxx,xxxx,
@@ -36,7 +36,7 @@ const unsigned char ga2_v25_opcode_table[256] = {
 void nec_v25_cpu_decrypt(void)
 {
 	int i;
-	unsigned char *rom = memory_region(REGION_CPU3);
+	UINT8 *rom = memory_region(REGION_CPU3);
 	UINT8* decrypted = auto_malloc(0x100000);
 	UINT8* temp = malloc_or_die(0x100000);
 
@@ -83,7 +83,7 @@ READ16_HANDLER( ga2_dpram_r )
 #if 0 // simulation
 READ16_HANDLER(ga2_sprite_protection_r)
 {
-	static unsigned int prot[16] =
+	static UINT32 prot[16] =
 	{
 		0x0a, 0,
 		0xc5, 0,
@@ -122,7 +122,7 @@ READ16_HANDLER(ga2_wakeup_protection_r)
 
 WRITE16_HANDLER(sonic_level_load_protection)
 {
-	unsigned short level;
+	UINT16 level;
 //Perform write
 	system32_workram[CLEARED_LEVELS / 2] = (data & ~mem_mask) | (system32_workram[CLEARED_LEVELS / 2] & mem_mask);
 
@@ -183,7 +183,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
 	switch (offset)
 	{

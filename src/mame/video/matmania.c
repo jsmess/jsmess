@@ -16,15 +16,15 @@
 
 
 
-unsigned char *matmania_videoram2,*matmania_colorram2;
+UINT8 *matmania_videoram2,*matmania_colorram2;
 size_t matmania_videoram2_size;
-unsigned char *matmania_videoram3,*matmania_colorram3;
+UINT8 *matmania_videoram3,*matmania_colorram3;
 size_t matmania_videoram3_size;
-unsigned char *matmania_scroll;
+UINT8 *matmania_scroll;
 static mame_bitmap *tmpbitmap2;
-static unsigned char *dirtybuffer2;
+static UINT8 *dirtybuffer2;
 
-unsigned char *matmania_pageselect;
+UINT8 *matmania_pageselect;
 
 /***************************************************************************
 
@@ -79,7 +79,7 @@ PALETTE_INIT( matmania )
 		bit3 = (color_prom[64] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -117,7 +117,7 @@ WRITE8_HANDLER( matmania_paletteram_w )
 	bit3 = (val >> 3) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(Machine,offs2 + 64,r,g,b);
+	palette_set_color(Machine,offs2 + 64,MAKE_RGB(r,g,b));
 }
 
 
@@ -139,8 +139,6 @@ VIDEO_START( matmania )
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
 	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,2 * machine->screen[0].height,machine->screen[0].format);
-
-	return 0;
 }
 
 

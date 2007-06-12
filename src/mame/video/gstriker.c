@@ -581,8 +581,6 @@ VIDEO_START(gstriker)
 	CG10103_init(1);
 	CG10103_set_gfx_region(0, 2);
 	CG10103_set_pal_base(0, 0x10);
-
-	return 0;
 }
 
 VIDEO_START(twrldc94)
@@ -605,7 +603,5 @@ VIDEO_START(twrldc94)
 	CG10103_init(1);
 	CG10103_set_gfx_region(0, 2);
 	CG10103_set_pal_base(0, 0x60);
-
-	return 0;
 }
 

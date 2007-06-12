@@ -625,7 +625,7 @@ static const unsigned short apple2_colortable[] =
 /* Initialize the palette */
 PALETTE_INIT( apple2 )
 {
-	palette_set_colors(machine, 0, apple2_palette, sizeof(apple2_palette) / 3);
+	palette_set_colors_rgb(machine, 0, apple2_palette, sizeof(apple2_palette) / 3);
 	memcpy(colortable, apple2_colortable, sizeof(apple2_colortable));
 }
 

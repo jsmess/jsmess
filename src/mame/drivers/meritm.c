@@ -33,7 +33,6 @@
 
 VIDEO_START(meritm)
 {
-	return 0;
 }
 
 VIDEO_UPDATE(meritm)

@@ -77,13 +77,11 @@ static void nes_vh_start(ppu_t ppu_type, double scanlines_per_frame)
 VIDEO_START( nes_ntsc )
 {
 	nes_vh_start(PPU_2C02, PPU_NTSC_SCANLINES_PER_FRAME);
-	return 0;
 }
 
 VIDEO_START( nes_pal )
 {
 	nes_vh_start(PPU_2C07, PPU_PAL_SCANLINES_PER_FRAME);
-	return 0;
 }
 
 PALETTE_INIT( nes )

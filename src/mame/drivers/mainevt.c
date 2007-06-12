@@ -58,7 +58,7 @@ static INTERRUPT_GEN( dv_interrupt )
 
 WRITE8_HANDLER( mainevt_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 	int bankaddress;
 
 	/* bit 0-1 ROM bank select */

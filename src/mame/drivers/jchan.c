@@ -432,8 +432,6 @@ VIDEO_START(jchan)
 	buffered_spriteram32 = auto_malloc ( 0x4000 );
 	spriteram_size = 0x4000;
 	skns_spc_regs = auto_malloc (0x40);
-
-	return 0;
 }
 
 extern void skns_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect );

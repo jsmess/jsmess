@@ -89,8 +89,6 @@ VIDEO_START( ms32 )
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	brt[0] = brt[1] = 0xffff;
-
-	return 0;
 }
 
 /********** PALETTE WRITES **********/
@@ -117,7 +115,7 @@ static void update_color(int color)
 		b = ((ms32_palram[color*2+1] & 0x00ff) >>0 );
 	}
 
-	palette_set_color(Machine,color,r,g,b);
+	palette_set_color(Machine,color,MAKE_RGB(r,g,b));
 }
 
 WRITE32_HANDLER( ms32_brightness_w )

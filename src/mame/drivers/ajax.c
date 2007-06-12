@@ -15,7 +15,7 @@ TO DO:
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 
-extern unsigned char *ajax_sharedram;
+extern UINT8 *ajax_sharedram;
 
 static WRITE8_HANDLER( k007232_extvol_w );
 static WRITE8_HANDLER( sound_bank_w );

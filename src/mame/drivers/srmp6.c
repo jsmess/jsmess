@@ -66,7 +66,6 @@ Dumped 06/15/2000
 
 VIDEO_START(srmp6)
 {
-	return 0;
 }
 
 /* sprite RAM format: 8 words, 1st word = 0x8000 means end of list

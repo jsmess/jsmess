@@ -65,7 +65,7 @@ PALETTE_INIT( zaxxon )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the character color codes */
@@ -124,7 +124,7 @@ static TILE_GET_INFO( congo_get_fg_tile_info )
  *
  *************************************/
 
-static int video_start_common(tile_get_info_fn fg_tile_info)
+static void video_start_common(tile_get_info_fn fg_tile_info)
 {
 	/* reset globals */
 	bg_enable = 0;
@@ -149,19 +149,18 @@ static int video_start_common(tile_get_info_fn fg_tile_info)
 	state_save_register_global(bg_color);
 	state_save_register_global(bg_position);
 	state_save_register_global(fg_color);
-	return 0;
 }
 
 
 VIDEO_START( zaxxon )
 {
-	return video_start_common(zaxxon_get_fg_tile_info);
+	video_start_common(zaxxon_get_fg_tile_info);
 }
 
 
 VIDEO_START( razmataz )
 {
-	return video_start_common(razmataz_get_fg_tile_info);
+	video_start_common(razmataz_get_fg_tile_info);
 }
 
 
@@ -176,7 +175,7 @@ VIDEO_START( congo )
 	state_save_register_global_array(congo_custom);
 	state_save_register_global_pointer(spriteram, 0x100);
 
-	return video_start_common(congo_get_fg_tile_info);
+	video_start_common(congo_get_fg_tile_info);
 }
 
 

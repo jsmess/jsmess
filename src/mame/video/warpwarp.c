@@ -20,14 +20,14 @@ int warpwarp_ball_sizex, warpwarp_ball_sizey;
 static tilemap *bg_tilemap;
 
 
-static unsigned char geebee_palette[] =
+static const rgb_t geebee_palette[] =
 {
-	0x00,0x00,0x00, /* black */
-	0xff,0xff,0xff, /* white */
-	0x7f,0x7f,0x7f  /* grey  */
+	MAKE_RGB(0x00,0x00,0x00), /* black */
+	MAKE_RGB(0xff,0xff,0xff), /* white */
+	MAKE_RGB(0x7f,0x7f,0x7f)  /* grey  */
 };
 
-static unsigned short geebee_colortable[] =
+static UINT16 geebee_colortable[] =
 {
 	 0, 1,
 	 1, 0,
@@ -35,7 +35,7 @@ static unsigned short geebee_colortable[] =
 	 2, 0
 };
 
-static unsigned short navarone_colortable[] =
+static UINT16 navarone_colortable[] =
 {
 	 0, 2,
 	 2, 0,
@@ -47,7 +47,7 @@ PALETTE_INIT( geebee )
 {
 	int i;
 	for (i = 0; i < sizeof(geebee_palette)/3; i++)
-		palette_set_color(machine,i,geebee_palette[i*3+0],geebee_palette[i*3+1],geebee_palette[i*3+2]);
+		palette_set_color(machine,i,geebee_palette[i]);
 	memcpy(colortable, geebee_colortable, sizeof (geebee_colortable));
 }
 
@@ -56,7 +56,7 @@ PALETTE_INIT( navarone )
 {
 	int i;
 	for (i = 0; i < sizeof(geebee_palette)/3; i++)
-		palette_set_color(machine,i,geebee_palette[i*3+0],geebee_palette[i*3+1],geebee_palette[i*3+2]);
+		palette_set_color(machine,i,geebee_palette[i]);
 	memcpy(colortable, navarone_colortable, sizeof (navarone_colortable));
 }
 
@@ -107,7 +107,7 @@ PALETTE_INIT( warpwarp )
 		bit2 = (i >> 7) & 0x01;
 		b = 0x1f * bit0 + 0x3c * bit1 + 0xa4 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	for (i = 0;i < machine->drv->color_table_len;i += 2)
@@ -182,22 +182,16 @@ static TILE_GET_INFO( warpwarp_get_tile_info )
 VIDEO_START( geebee )
 {
 	bg_tilemap = tilemap_create(geebee_get_tile_info,tilemap_scan,TILEMAP_OPAQUE,8,8,34,28);
-
-	return 0;
 }
 
 VIDEO_START( navarone )
 {
 	bg_tilemap = tilemap_create(navarone_get_tile_info,tilemap_scan,TILEMAP_OPAQUE,8,8,34,28);
-
-	return 0;
 }
 
 VIDEO_START( warpwarp )
 {
 	bg_tilemap = tilemap_create(warpwarp_get_tile_info,tilemap_scan,TILEMAP_TRANSPARENT,8,8,34,28);
-
-	return 0;
 }
 
 

@@ -188,7 +188,7 @@ ROM_END
 static DRIVER_INIT( hexa )
 {
 #if 0
-	unsigned char *RAM = memory_region(REGION_CPU1);
+	UINT8 *RAM = memory_region(REGION_CPU1);
 
 
 	/* Hexa is not protected or anything, but it keeps writing 0x3f to register */

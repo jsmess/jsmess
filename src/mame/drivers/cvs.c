@@ -94,7 +94,7 @@ PALETTE_INIT( cvs );
 VIDEO_UPDATE( cvs );
 VIDEO_START( cvs );
 
-extern unsigned char *bullet_ram;
+extern UINT8 *bullet_ram;
 
 WRITE8_HANDLER( cvs_videoram_w );
 WRITE8_HANDLER( cvs_bullet_w );
@@ -184,7 +184,7 @@ WRITE8_HANDLER( control_port_w )
 
 int cvs_speech_rom_read_bit(void)
 {
-	unsigned char *ROM = memory_region(REGION_SOUND1);
+	UINT8 *ROM = memory_region(REGION_SOUND1);
     int bit;
 
 	speech_rom_address %= memory_region_length(REGION_SOUND1);

@@ -66,7 +66,7 @@ WRITE8_HANDLER( cloak_paletteram_w )
 	bit2 = (b >> 2) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(Machine,offset & 0x3f,r,g,b);
+	palette_set_color(Machine,offset & 0x3f,MAKE_RGB(r,g,b));
 }
 
 WRITE8_HANDLER( cloak_clearbmp_w )
@@ -195,8 +195,6 @@ VIDEO_START( cloak )
 	state_save_register_global_pointer(tmpvideoram, 256*256);
 	state_save_register_global_pointer(tmpvideoram2, 256*256);
 	state_save_register_func_postload(refresh_bitmaps);
-
-	return 0;
 }
 
 static void cloak_draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )

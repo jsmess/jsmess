@@ -106,8 +106,6 @@ static VIDEO_START( gameplan )
 {
 	gameplan_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	gameplan_videoram = auto_malloc(gameplan_videoram_size);
-
-	return 0;
 }
 
 

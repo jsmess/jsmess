@@ -117,12 +117,12 @@ static WRITE32_HANDLER( gstream_palette_w )
 
 	COMBINE_DATA(&paletteram32[offset]);
 
-	palette_set_color(Machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
+	palette_set_color_rgb(Machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
 		                             pal5bit(paletteram32[offset] >> (6+16)),
 									 pal5bit(paletteram32[offset] >> (11+16)));
 
 
-	palette_set_color(Machine,offset*2+1,pal5bit(paletteram32[offset] >> (0)),
+	palette_set_color_rgb(Machine,offset*2+1,pal5bit(paletteram32[offset] >> (0)),
 		                             pal5bit(paletteram32[offset] >> (6)),
 									 pal5bit(paletteram32[offset] >> (11)));
 }
@@ -546,9 +546,7 @@ VIDEO_START(gstream)
 	/* Default to black palette to avoid garbage being drawn in MAME's default colours on startup
        because that wouldn't happen on the PCB */
 	for (i=0;i<0x1c00;i++)
-		palette_set_color(Machine,i,0,0,0);
-
-	return 0;
+		palette_set_color(Machine,i,MAKE_RGB(0,0,0));
 }
 
 VIDEO_UPDATE(gstream)

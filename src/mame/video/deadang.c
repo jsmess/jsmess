@@ -77,8 +77,6 @@ VIDEO_START( deadang )
 	tilemap_set_transparent_pen(pf2_layer, 15);
 	tilemap_set_transparent_pen(pf1_layer, 15);
 	tilemap_set_transparent_pen(text_layer, 15);
-
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap)

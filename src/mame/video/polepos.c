@@ -83,7 +83,7 @@ PALETTE_INIT( polepos )
 		bit3 = (color_prom[0x200 + i] >> 3) & 1;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	/*******************************************************
@@ -201,8 +201,6 @@ VIDEO_START( polepos )
 	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT_COLOR,8,8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0x2f);
-
-	return 0;
 }
 
 
@@ -426,7 +424,7 @@ static void draw_road(mame_bitmap *bitmap)
 }
 
 static void zoom_sprite( mame_bitmap *bitmap,int big,
-		unsigned int code,unsigned int color,int flipx,int sx,int sy,
+		UINT32 code,UINT32 color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
 	const gfx_element *gfx = Machine->gfx[big ? 3 : 2];

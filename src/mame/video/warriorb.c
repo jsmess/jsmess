@@ -5,40 +5,34 @@
 
 /**********************************************************/
 
-static int warriorb_core_vh_start (int x_offs,int multiscrn_xoffs)
+static void warriorb_core_vh_start (int x_offs,int multiscrn_xoffs)
 {
 	int chips;
 
 	chips = number_of_TC0100SCN();
 
-	if (chips <= 0)	/* we have an erroneous TC0100SCN configuration */
-		return 1;
+	assert_always(chips > 0, "erroneous TC0100SCN configuration");
 
-	if (TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,multiscrn_xoffs))
-		return 1;
+	TC0100SCN_vh_start(chips,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,multiscrn_xoffs);
 
 	if (has_TC0110PCR())
-		if (TC0110PCR_vh_start())
-			return 1;
+		TC0110PCR_vh_start();
 
 	if (has_second_TC0110PCR())
-		if (TC0110PCR_1_vh_start())
-			return 1;
+		TC0110PCR_1_vh_start();
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
 	TC0100SCN_set_chip_colbanks(0,0x100,0x0);
-
-	return 0;
 }
 
 VIDEO_START( darius2d )
 {
-	return (warriorb_core_vh_start(4,0));
+	warriorb_core_vh_start(4,0);
 }
 
 VIDEO_START( warriorb )
 {
-	return (warriorb_core_vh_start(4,1));
+	warriorb_core_vh_start(4,1);
 }
 
 

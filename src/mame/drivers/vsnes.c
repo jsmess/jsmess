@@ -2069,12 +2069,6 @@ INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "Wrong 3" )
 INPUT_PORTS_END
 
-static const gfx_decode nes_gfxdecodeinfo[] =
-{
-	/* none, the ppu generates one */
-	{ -1 }
-};
-
 static struct NESinterface nes_interface_1 =
 {
 	REGION_CPU1
@@ -2100,7 +2094,6 @@ static MACHINE_DRIVER_START( vsnes )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(nes_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(8*4*16)
 
 	MDRV_PALETTE_INIT(vsnes)
@@ -2134,7 +2127,6 @@ static MACHINE_DRIVER_START( vsdual )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(nes_gfxdecodeinfo)
 	MDRV_PALETTE_LENGTH(2*8*4*16)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 

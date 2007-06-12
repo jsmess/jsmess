@@ -353,7 +353,7 @@ static int read_summary_log(const char *filename, int index)
 				if (curfile == NULL)
 				{
 					fprintf(stderr, "Unexpected @@@@@source= tag\n");
-					return 1;
+					goto error;
 				}
 
 				/* copy the string */
@@ -367,6 +367,8 @@ static int read_summary_log(const char *filename, int index)
 
 				/* allocate a copy of the string */
 				lists[index].dir = malloc(strlen(dirname) + 1);
+				if (lists[index].dir == NULL)
+					goto error;
 				strcpy(lists[index].dir, dirname);
 				fprintf(stderr, "Directory %s\n", lists[index].dir);
 			}

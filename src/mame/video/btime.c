@@ -74,7 +74,7 @@ PALETTE_INIT( btime )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -119,7 +119,7 @@ PALETTE_INIT( lnc )
 		bit2 = (color_prom[i] >> 0) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -141,8 +141,6 @@ VIDEO_START( btime )
     bnj_scroll1 = 0;
     bnj_scroll2 = 0;
     btime_palette = 0;
-
-    return 0;
 }
 
 
@@ -151,7 +149,7 @@ VIDEO_START( bnj )
     /* the background area is twice as wide as the screen */
     background_bitmap = auto_bitmap_alloc(2*machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-    return video_start_btime(machine);
+    video_start_btime(machine);
 }
 
 

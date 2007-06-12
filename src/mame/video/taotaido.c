@@ -200,8 +200,6 @@ VIDEO_START(taotaido)
 
 	taotaido_spriteram2_old = auto_malloc(0x10000);
 	taotaido_spriteram2_older = auto_malloc(0x10000);
-
-	return 0;
 }
 
 

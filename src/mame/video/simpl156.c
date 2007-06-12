@@ -149,11 +149,8 @@ VIDEO_START( simpl156 )
 	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
 	state_save_register_global_pointer(paletteram16, 0x1000/2);
 
-	if (deco16_1_video_init())
-		return 1;
+	deco16_1_video_init();
 
 	deco16_set_tilemap_bank_callback(0, simpl156_bank_callback);
 	deco16_set_tilemap_bank_callback(1, simpl156_bank_callback);
-
-	return 0;
 }

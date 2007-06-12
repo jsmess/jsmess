@@ -134,9 +134,8 @@ int palette_get_total_colors_with_ui(running_machine *machine);
 rgb_t *palette_get_raw_colors(running_machine *machine);
 rgb_t *palette_get_adjusted_colors(running_machine *machine);
 
-void palette_set_color(running_machine *machine, pen_t pen, UINT8 r, UINT8 g, UINT8 b);
+void palette_set_color(running_machine *machine, pen_t pen, rgb_t rgb);
 rgb_t palette_get_color(running_machine *machine, pen_t pen);
-void palette_set_colors(running_machine *machine, pen_t color_base, const UINT8 *colors, int color_count);
 
 void palette_set_brightness(running_machine *machine, pen_t pen, double bright);
 void palette_set_shadow_factor(running_machine *machine, double factor);
@@ -153,6 +152,29 @@ pen_t get_white_pen(running_machine *machine);
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    palette_set_color_rgb - set a single palette
+    entry with individual R,G,B components
+-------------------------------------------------*/
+
+INLINE void palette_set_color_rgb(running_machine *machine, pen_t pen, UINT8 r, UINT8 g, UINT8 b)
+{
+	palette_set_color(machine, pen, MAKE_RGB(r, g, b));
+}
+
+
+/*-------------------------------------------------
+    palette_set_colors - set multiple palette
+    entries from an array of rgb_t values
+-------------------------------------------------*/
+
+INLINE void palette_set_colors(running_machine *machine, pen_t color_base, const rgb_t *colors, int color_count)
+{
+	while (color_count--)
+		palette_set_color(machine, color_base++, *colors++);
+}
+
 
 /*-------------------------------------------------
     pal1bit - convert a 1-bit value to 8 bits

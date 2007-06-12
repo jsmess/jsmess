@@ -241,7 +241,7 @@ static int samplelen[8];
 void ninjakd2_init_samples(void)
 {
 	int i,n;
-	unsigned char *source = memory_region(REGION_SOUND1);
+	UINT8 *source = memory_region(REGION_SOUND1);
 	static const int sample_info [9][2] = { {0x0000,0x0A00},{0x0A00,0x1D00},{0x2700,0x1700},
 	{0x3E00,0x1500},{0x5300,0x0B00},{0x5E00,0x0A00},{0x6800,0x0E00},{0x7600,0x1E00},{0xF000,0x0400} };
 
@@ -267,7 +267,7 @@ READ8_HANDLER( ninjakd2_bankselect_r )
 
 WRITE8_HANDLER( ninjakd2_bankselect_w )
 {
-	unsigned char *ROM = memory_region(REGION_CPU1);
+	UINT8 *ROM = memory_region(REGION_CPU1);
 	int bankaddress;
 
 	if (data != ninjakd2_bank_latch)

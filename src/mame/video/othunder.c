@@ -30,14 +30,10 @@ static VIDEO_START( othunder_core )
 
 	spritelist = auto_malloc(0x2000 * sizeof(*spritelist));
 
-	if (TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0))
-		return 1;
+	TC0100SCN_vh_start(1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
 
 	if (has_TC0110PCR())
-		if (TC0110PCR_vh_start())
-			return 1;
-
-	return 0;
+		TC0110PCR_vh_start();
 }
 
 VIDEO_START( othunder )
@@ -46,7 +42,7 @@ VIDEO_START( othunder )
        alignment, but the bg layers [or one of them] are wrong */
 
 	taito_hide_pixels = 4;
-	return video_start_othunder_core(machine);
+	video_start_othunder_core(machine);
 }
 
 

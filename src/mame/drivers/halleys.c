@@ -1062,7 +1062,7 @@ static PALETTE_INIT( halleys )
 	for (count=0; count<1024; count++)
 	{
 		pal_ptr[count] = 0;
-		palette_set_color(machine, count, 0, 0, 0);
+		palette_set_color(machine, count, MAKE_RGB(0, 0, 0));
 	}
 
 	// 00-31: palette RAM(ffc0-ffdf)
@@ -1083,7 +1083,7 @@ static PALETTE_INIT( halleys )
 			g = r + count + BG_MONO;
 			r += i;
 			pal_ptr[g] = d;
-			palette_set_color(machine, g, r, r, r);
+			palette_set_color(machine, g, MAKE_RGB(r, r, r));
 		}
 	}
 
@@ -1098,7 +1098,7 @@ static PALETTE_INIT( halleys )
 		g = d    & 0x0c; g |= i;
 		b = d<<2 & 0x0c; b |= i;
 
-		palette_set_color(machine, j, pal4bit(r), pal4bit(g), pal4bit(b));
+		palette_set_color_rgb(machine, j, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -1166,13 +1166,13 @@ static WRITE8_HANDLER( halleys_paletteram_IIRRGGBB_w )
 	g = d    & 0x0c; g |= i;  g = g<<4 | g;
 	b = d<<2 & 0x0c; b |= i;  b = b<<4 | b;
 
-	palette_set_color(Machine, offset, r, g, b);
-	palette_set_color(Machine, offset+SP_2BACK, r, g, b);
-	palette_set_color(Machine, offset+SP_ALPHA, r, g, b);
-	palette_set_color(Machine, offset+SP_COLLD, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(Machine, offset+SP_2BACK, MAKE_RGB(r, g, b));
+	palette_set_color(Machine, offset+SP_ALPHA, MAKE_RGB(r, g, b));
+	palette_set_color(Machine, offset+SP_COLLD, MAKE_RGB(r, g, b));
 
 	halleys_decode_rgb(&r, &g, &b, offset, 0);
-	palette_set_color(Machine, offset+0x20, r, g, b);
+	palette_set_color(Machine, offset+0x20, MAKE_RGB(r, g, b));
 }
 
 
@@ -1202,8 +1202,6 @@ static VIDEO_START( halleys )
 
 		alpha_table[(src<<8)+dst] = c | BG_RGB;
 	}
-
-	return(0);
 }
 
 

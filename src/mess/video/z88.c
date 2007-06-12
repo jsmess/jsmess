@@ -29,18 +29,18 @@ static unsigned short z88_colour_table[Z88_NUM_COLOURS] =
 };
 
 /* black/white */
-static unsigned char z88_palette[Z88_NUM_COLOURS * 3] =
+static const rgb_t z88_palette[Z88_NUM_COLOURS] =
 {
-	0x000, 0x000, 0x000,
-	0x0ff, 0x0ff, 0x0ff,
-	0x080, 0x080, 0x080
+	MAKE_RGB(0x000, 0x000, 0x000),
+	MAKE_RGB(0x0ff, 0x0ff, 0x0ff),
+	MAKE_RGB(0x080, 0x080, 0x080)
 };
 
 
 /* Initialise the palette */
 PALETTE_INIT( z88 )
 {
-	palette_set_colors(machine, 0, z88_palette, sizeof(z88_palette) / 3);
+	palette_set_colors(machine, 0, z88_palette, ARRAY_LENGTH(z88_palette));
 	memcpy(colortable, z88_colour_table, sizeof (z88_colour_table));
 }
 

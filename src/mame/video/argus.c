@@ -322,8 +322,6 @@ VIDEO_START( argus )
 
 	jal_blend_table = auto_malloc(0xc00);
 	memset(jal_blend_table,0,0xc00) ;
-
-	return 0;
 }
 
 VIDEO_START( valtric )
@@ -337,8 +335,6 @@ VIDEO_START( valtric )
 	mosaicbitmap=auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	jal_blend_table = auto_malloc(0xc00);
 	memset(jal_blend_table,0,0xc00) ;
-
-	return 0;
 }
 
 VIDEO_START( butasan )
@@ -362,8 +358,6 @@ VIDEO_START( butasan )
 
 	jal_blend_table = auto_malloc(0xc00);
 	memset(jal_blend_table,0,0xc00) ;
-
-	return 0;
 }
 
 #if 0
@@ -425,8 +419,6 @@ VIDEO_START( bombsa )
 //  memset(jal_blend_table,0,0xc00) ;
 
 	bomba_otherram = auto_malloc(0x1000);
-
-	return 0;
 }
 
 /***************************************************************************
@@ -461,7 +453,7 @@ static void argus_write_dummy_rams( int dramoffs, int vromoffs )
 
 static void bombsa_change_palette(int color, int data)
 {
-	palette_set_color(Machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	palette_set_color_rgb(Machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 
@@ -469,7 +461,7 @@ static void argus_change_palette(int color, int data)
 {
 	jal_blend_table[color] = data & 0x0f ;
 
-	palette_set_color(Machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	palette_set_color_rgb(Machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 static void argus_change_bg_palette(int color, int data)
@@ -497,7 +489,7 @@ static void argus_change_bg_palette(int color, int data)
 			g = 0;
 	}
 
-	palette_set_color(Machine, color, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(Machine, color, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 

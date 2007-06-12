@@ -59,7 +59,7 @@ static void SetPostShortcuts( int reg );
 #ifdef MAME_DEBUG
 static void ShowYGV608Registers( void );
 #if 0
-static void dump_block( char *name, unsigned char *block, int len );
+static void dump_block( char *name, UINT8 *block, int len );
 #endif
 #endif
 
@@ -114,7 +114,7 @@ static TILE_GET_INFO( get_tile_info_A_8 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	unsigned char   attr = 0;
+	UINT8   attr = 0;
 	int             pattern_name_base = 0;
 	int             set = ((ygv608.regs.s.r7 & r7_md) == MD_1PLANE_256COLOUR
 			        	? GFX_8X8_8BIT : GFX_8X8_4BIT );
@@ -207,7 +207,7 @@ static TILE_GET_INFO( get_tile_info_B_8 )
 	int             col = tile_index >> 6;
 	int             row = tile_index & 0x3f;
 
-	unsigned char   attr = 0;
+	UINT8   attr = 0;
 	int             pattern_name_base = ( ( ygv608.page_y << ygv608.pny_shift )
 						<< ygv608.bits16 );
 	int             set = GFX_8X8_4BIT;
@@ -304,7 +304,7 @@ static TILE_GET_INFO( get_tile_info_A_16 )
   int             col = tile_index >> 6;
   int             row = tile_index & 0x3f;
 
-  unsigned char   attr = 0;
+  UINT8   attr = 0;
   int             pattern_name_base = 0;
   int             set = ((ygv608.regs.s.r7 & r7_md) == MD_1PLANE_256COLOUR
 			            ? GFX_16X16_8BIT : GFX_16X16_4BIT );
@@ -393,7 +393,7 @@ static TILE_GET_INFO( get_tile_info_B_16 )
   int             col = tile_index >> 6;
   int             row = tile_index & 0x3f;
 
-  unsigned char   attr = 0;
+  UINT8   attr = 0;
   int             pattern_name_base = ( ( ygv608.page_y << ygv608.pny_shift )
 					<< ygv608.bits16 );
   int             set = GFX_16X16_4BIT;
@@ -531,8 +531,6 @@ VIDEO_START( ygv608 )
 	tilemap_B = NULL;
 
 	ygv608_register_state_save();
-
-	return 0;
 }
 
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
@@ -1224,7 +1222,7 @@ WRITE16_HANDLER( ygv608_w )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				palette_set_color(Machine,ygv608.regs.s.cc,
+				palette_set_color_rgb(Machine,ygv608.regs.s.cc,
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][0]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][1]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][2]) );
@@ -1314,11 +1312,11 @@ void HandleYGV608Reset( void )
 void HandleRomTransfers( void )
 {
 #if 0
-  static unsigned char *sdt = (unsigned char *)ygv608.scroll_data_table;
-  static unsigned char *sat = (unsigned char *)ygv608.sprite_attribute_table.b;
+  static UINT8 *sdt = (UINT8 *)ygv608.scroll_data_table;
+  static UINT8 *sat = (UINT8 *)ygv608.sprite_attribute_table.b;
 
   /* fudge copy from sprite data for now... */
-  unsigned char *RAM = Machine->memory_region[0];
+  UINT8 *RAM = Machine->memory_region[0];
   int i;
 
   int src = ( ( (int)ygv608.regs.s.tb13 << 8 ) +
@@ -1581,11 +1579,11 @@ void SetPostShortcuts( int reg )
 #define nSHOW_SOURCE_MODE
 
 #if 0
-void dump_block( char *name, unsigned char *block, int len )
+void dump_block( char *name, UINT8 *block, int len )
 {
   int i;
 
-  logerror( "unsigned char %s[] = {\n", name );
+  logerror( "UINT8 %s[] = {\n", name );
   for( i=0; i<len; i++ ) {
     if( i%8 == 0 )
       logerror( " " );
@@ -1612,19 +1610,19 @@ READ16_HANDLER( debug_trigger )
 #ifdef SHOW_SOURCE_MODE
 #if 0
   dump_block( "ygv608_regs",
-	      (unsigned char *)ygv608.regs.b,
+	      (UINT8 *)ygv608.regs.b,
 	      64 );
   dump_block( "ygv608_pnt",
-	      (unsigned char *)ygv608.pattern_name_table,
+	      (UINT8 *)ygv608.pattern_name_table,
 	      4096 );
   dump_block( "ygv608_sat",
-	      (unsigned char *)ygv608.sprite_attribute_table.b,
+	      (UINT8 *)ygv608.sprite_attribute_table.b,
 	      256 );
   dump_block( "ygv608_sdt",
-	      (unsigned char *)ygv608.scroll_data_table,
+	      (UINT8 *)ygv608.scroll_data_table,
 	      512 );
   dump_block( "ygv608_cp",
-	      (unsigned char *)ygv608.colour_palette,
+	      (UINT8 *)ygv608.colour_palette,
 	      768 );
 #endif
 

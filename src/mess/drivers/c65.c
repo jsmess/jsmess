@@ -265,7 +265,7 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( c65 )
 {
-	palette_set_colors(machine, 0, vic3_palette, sizeof(vic3_palette) / 3);
+	palette_set_colors_rgb(machine, 0, vic3_palette, sizeof(vic3_palette) / 3);
 }
 
 #if 0

@@ -91,7 +91,7 @@ WRITE16_HANDLER( glass_blitter_w )
 		/* fill the screen bitmap with the current picture */
 		{
 			int i, j;
-			unsigned char *gfx = (unsigned char *)memory_region(REGION_GFX3);
+			UINT8 *gfx = (UINT8 *)memory_region(REGION_GFX3);
 
 			gfx = gfx + (current_command & 0x07)*0x10000 + (current_command & 0x08)*0x10000 + 0x140;
 
@@ -137,8 +137,6 @@ VIDEO_START( glass )
 
 	tilemap_set_transparent_pen(pant[0],0);
 	tilemap_set_transparent_pen(pant[1],0);
-
-	return 0;
 }
 
 

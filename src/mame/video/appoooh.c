@@ -9,8 +9,8 @@
 #include "driver.h"
 #include "appoooh.h"
 
-unsigned char *appoooh_fg_videoram,*appoooh_fg_colorram;
-unsigned char *appoooh_bg_videoram,*appoooh_bg_colorram;
+UINT8 *appoooh_fg_videoram,*appoooh_fg_colorram;
+UINT8 *appoooh_bg_videoram,*appoooh_bg_colorram;
 
 #define CHR1_OFST 0x00  /* palette page of char set #1 */
 #define CHR2_OFST 0x10  /* palette page of char set #2 */
@@ -56,7 +56,7 @@ PALETTE_INIT( appoooh )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -101,7 +101,7 @@ PALETTE_INIT( robowres )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -157,8 +157,6 @@ VIDEO_START( appoooh )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scrolldy(fg_tilemap,8,8);
 	tilemap_set_scrolldy(bg_tilemap,8,8);
-
-	return 0;
 }
 
 WRITE8_HANDLER( appoooh_scroll_w )
@@ -209,7 +207,7 @@ WRITE8_HANDLER( appoooh_out_w )
 
 	/* bit 6 ROM bank select */
 	{
-		unsigned char *RAM = memory_region(REGION_CPU1);
+		UINT8 *RAM = memory_region(REGION_CPU1);
 
 		memory_set_bankptr(1,&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}
@@ -220,7 +218,7 @@ WRITE8_HANDLER( appoooh_out_w )
 static void appoooh_draw_sprites(mame_bitmap *dest_bmp,
 		const rectangle *cliprect,
         const gfx_element *gfx,
-        unsigned char *sprite)
+        UINT8 *sprite)
 {
 	int offs;
 
@@ -253,7 +251,7 @@ static void appoooh_draw_sprites(mame_bitmap *dest_bmp,
 static void robowres_draw_sprites(mame_bitmap *dest_bmp,
 		const rectangle *cliprect,
         const gfx_element *gfx,
-        unsigned char *sprite)
+        UINT8 *sprite)
 {
 	int offs;
 

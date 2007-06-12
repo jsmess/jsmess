@@ -65,7 +65,7 @@ PALETTE_INIT( gyruss )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -89,8 +89,6 @@ VIDEO_START( gyruss )
 	state_save_register_global(flipscreen);
 	state_save_register_global(scanline);
 	state_save_register_global_pointer(sprite_mux_buffer,256*spriteram_size);
-
-	return video_start_generic(machine);
 }
 
 

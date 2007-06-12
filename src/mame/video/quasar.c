@@ -38,7 +38,7 @@
 
 VIDEO_START( cvs );
 
-extern unsigned char *bullet_ram;
+extern UINT8 *bullet_ram;
 
 extern mame_bitmap *collision_bitmap;
 extern mame_bitmap *collision_background;
@@ -51,7 +51,7 @@ extern int CollisionRegister;
 //static int    scroll[8];
 //static int    scroll_reg = 0;
 
-unsigned char *effectram;
+UINT8 *effectram;
 int           effectcontrol;
 
 static mame_bitmap *effect_bitmap;
@@ -67,7 +67,7 @@ PALETTE_INIT( quasar )
 
 	for(col = 0;col < 8; col++)
 	{
-		palette_set_color(machine,col,pal1bit(col >> 0),pal1bit(col >> 1),pal1bit(col >> 2));
+		palette_set_color_rgb(machine,col,pal1bit(col >> 0),pal1bit(col >> 1),pal1bit(col >> 2));
 	}
 
 	// Address 0-2 from graphic rom
@@ -107,13 +107,13 @@ PALETTE_INIT( quasar )
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
 		// Intensity 1
-  	    palette_set_color(machine,256+i,r>>2,g>>2,b>>2);
+  	    palette_set_color_rgb(machine,256+i,r>>2,g>>2,b>>2);
 
 		// Intensity 2
- 	    palette_set_color(machine,512+i,(r>>2)+(r>>3),(g>>2)+(g>>3),(b>>2)+(b>>2));
+ 	    palette_set_color_rgb(machine,512+i,(r>>2)+(r>>3),(g>>2)+(g>>3),(b>>2)+(b>>2));
 
 		// Intensity 3
-  	    palette_set_color(machine,768+i,r>>1,g>>1,b>>1);
+  	    palette_set_color_rgb(machine,768+i,r>>1,g>>1,b>>1);
 	}
 
     /* Sprites */
@@ -140,7 +140,7 @@ VIDEO_START( quasar )
 
 	effect_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-	return video_start_cvs(machine);
+	video_start_cvs(machine);
 }
 
 VIDEO_UPDATE( quasar )

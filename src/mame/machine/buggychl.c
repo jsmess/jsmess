@@ -2,7 +2,7 @@
 #include "cpu/z80/z80.h"
 
 
-static unsigned char from_main,from_mcu;
+static UINT8 from_main,from_mcu;
 static int mcu_sent = 0,main_sent = 0;
 
 
@@ -14,7 +14,7 @@ static int mcu_sent = 0,main_sent = 0;
 
 ***************************************************************************/
 
-static unsigned char portA_in,portA_out,ddrA;
+static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( buggychl_68705_portA_r )
 {
@@ -53,7 +53,7 @@ WRITE8_HANDLER( buggychl_68705_ddrA_w )
  *               the main Z80 memory location to access]
  */
 
-static unsigned char portB_in,portB_out,ddrB;
+static UINT8 portB_in,portB_out,ddrB;
 
 READ8_HANDLER( buggychl_68705_portB_r )
 {
@@ -96,7 +96,7 @@ WRITE8_HANDLER( buggychl_68705_ddrB_w )
  *  1   R  0 when pending command 68705->Z80
  */
 
-static unsigned char portC_in,portC_out,ddrC;
+static UINT8 portC_in,portC_out,ddrC;
 
 READ8_HANDLER( buggychl_68705_portC_r )
 {

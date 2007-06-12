@@ -1310,8 +1310,6 @@ VIDEO_START( hng64 )
 	// The general display list of polygons in the scene...
 	// !! This really should be a dynamic array !!
 	polys = auto_malloc(MAX_ONSCREEN_POLYS * sizeof(struct polygon))  ;
-
-	return 0;
 }
 
 ///////////////

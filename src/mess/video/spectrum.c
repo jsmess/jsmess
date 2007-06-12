@@ -45,7 +45,6 @@ VIDEO_START( spectrum )
 
 	memset(charsdirty,1,0x300);
 	EventList_Initialise(30000);
-	return 0;
 }
 
 /* screen is stored as:
@@ -269,8 +268,6 @@ VIDEO_START( spectrum_128 )
 	flash_invert = 0;
 
 	EventList_Initialise(30000);
-
-	return 0;
 }
 
 /* Refresh the spectrum 128 screen (code modified from COUPE.C) */

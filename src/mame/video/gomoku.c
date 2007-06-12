@@ -51,7 +51,7 @@ PALETTE_INIT( gomoku )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i, r, g, b);
+		palette_set_color(machine,i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
@@ -114,9 +114,9 @@ WRITE8_HANDLER( gomoku_bg_dispsw_w )
 
 VIDEO_START( gomoku )
 {
-	unsigned char *GOMOKU_BG_X = memory_region( REGION_USER1 );
-	unsigned char *GOMOKU_BG_Y = memory_region( REGION_USER2 );
-	unsigned char *GOMOKU_BG_D = memory_region( REGION_USER3 );
+	UINT8 *GOMOKU_BG_X = memory_region( REGION_USER1 );
+	UINT8 *GOMOKU_BG_Y = memory_region( REGION_USER2 );
+	UINT8 *GOMOKU_BG_D = memory_region( REGION_USER3 );
 	int x, y;
 	int bgdata;
 	int color;
@@ -149,8 +149,6 @@ VIDEO_START( gomoku )
 			*BITMAP_ADDR16(gomoku_bg_bitmap, (255 - y - 1), (255 - x + 7)) = color;
 		}
 	}
-
-	return 0;
 }
 
 
@@ -162,9 +160,9 @@ VIDEO_START( gomoku )
 
 VIDEO_UPDATE( gomoku )
 {
-	unsigned char *GOMOKU_BG_X = memory_region( REGION_USER1 );
-	unsigned char *GOMOKU_BG_Y = memory_region( REGION_USER2 );
-	unsigned char *GOMOKU_BG_D = memory_region( REGION_USER3 );
+	UINT8 *GOMOKU_BG_X = memory_region( REGION_USER1 );
+	UINT8 *GOMOKU_BG_Y = memory_region( REGION_USER2 );
+	UINT8 *GOMOKU_BG_D = memory_region( REGION_USER3 );
 	int x, y;
 	int bgram;
 	int bgoffs;

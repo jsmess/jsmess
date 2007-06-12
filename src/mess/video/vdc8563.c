@@ -208,8 +208,6 @@ VIDEO_START( vdc8563 )
 {
 	vdc.ram=(UINT8*) auto_malloc(0x20000);
 	vdc.dirty=vdc.ram+0x10000;
-
-	return (!vdc.ram);
 }
 
 #define CHAR_WIDTH (((vdc.reg[0x16]&0xf0)>>4)+1)

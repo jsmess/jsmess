@@ -26,8 +26,8 @@
 
 #include "driver.h"
 
-static unsigned char *m90_spriteram;
-unsigned char *m90_video_data;
+static UINT8 *m90_spriteram;
+UINT8 *m90_video_data;
 static tilemap *pf1_layer,*pf2_layer,*pf1_wide_layer,*pf2_wide_layer;
 static INT32 m90_video_control_data[16];
 
@@ -64,8 +64,6 @@ VIDEO_START( m90 )
 	tilemap_set_transparent_pen(pf1_wide_layer,0);
 
 	state_save_register_global_array(m90_video_control_data);
-
-	return 0;
 }
 
 static void m90_drawsprites(mame_bitmap *bitmap,const rectangle *cliprect)

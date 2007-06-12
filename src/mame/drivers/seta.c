@@ -1228,7 +1228,7 @@ ym3812
 
 /* Variables and functions only used here */
 
-static unsigned char *sharedram;
+static UINT8 *sharedram;
 
 
 #if __uPD71054_TIMER
@@ -1239,9 +1239,9 @@ static unsigned char *sharedram;
 ------------------------------*/
 static struct st_chip {
 	void			*timer[3];			// Timer
-	unsigned short	max[3];				// Max counter
-	unsigned short	write_select;		// Max counter write select
-	unsigned char	reg[4];				//
+	UINT16	max[3];				// Max counter
+	UINT16	write_select;		// Max counter write select
+	UINT8	reg[4];				//
 } uPD71054;
 
 /*------------------------------
@@ -1710,8 +1710,8 @@ WRITE16_HANDLER( usclssic_lockout_w )
 
 INLINE void usc_changecolor_xRRRRRGGGGGBBBBB(pen_t color,int data)
 {
-	if (color>=0x100) palette_set_color(Machine,color-0x100,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
-	else palette_set_color(Machine,color+0x200,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+	if (color>=0x100) palette_set_color_rgb(Machine,color-0x100,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+	else palette_set_color_rgb(Machine,color+0x200,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 }
 
 WRITE16_HANDLER( usc_paletteram16_xRRRRRGGGGGBBBBB_word_w )
@@ -8893,7 +8893,7 @@ static READ16_HANDLER( downtown_protection_r )
 	{
 		case 0xa3:
 		{
-			static const unsigned char word[] = "WALTZ0";
+			static const UINT8 word[] = "WALTZ0";
 			if (offset >= 0x100/2 && offset <= 0x10a/2)	return word[offset-0x100/2];
 			else										return 0;
 		}

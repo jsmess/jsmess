@@ -18,7 +18,7 @@ typedef struct _RP5H01 {
 	int enabled;		/* chip enable */
 	int old_reset;		/* reset pin state (level-triggered) */
 	int old_clock;		/* clock pin state (level-triggered) */
-	unsigned char *data;
+	UINT8 *data;
 } RP5H01;
 
 static RP5H01 RP5H01_state[MAX_RP5H01];

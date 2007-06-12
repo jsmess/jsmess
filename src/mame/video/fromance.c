@@ -110,8 +110,6 @@ VIDEO_START( fromance )
 	state_save_register_global(crtc_register);
 	state_save_register_global_array(crtc_data);
 	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
-
-	return 0;
 }
 
 VIDEO_START( nekkyoku )
@@ -151,16 +149,12 @@ VIDEO_START( nekkyoku )
 	state_save_register_global(crtc_register);
 	state_save_register_global_array(crtc_data);
 	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
-
-	return 0;
 }
 
 VIDEO_START( pipedrm )
 {
 	video_start_fromance(machine);
 	scrolly_ofs = 0x00;
-
-	return 0;
 }
 
 VIDEO_START( hatris )
@@ -168,8 +162,6 @@ VIDEO_START( hatris )
 	video_start_fromance(machine);
 	scrollx_ofs = 0xB9;
 	scrolly_ofs = 0x00;
-
-	return 0;
 }
 
 /*************************************
@@ -219,7 +211,7 @@ WRITE8_HANDLER( fromance_paletteram_w )
 
 	/* compute R,G,B */
 	palword = (local_paletteram[offset | 1] << 8) | local_paletteram[offset & ~1];
-	palette_set_color(Machine, offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
+	palette_set_color_rgb(Machine, offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
 }
 
 

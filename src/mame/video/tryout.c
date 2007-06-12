@@ -36,7 +36,7 @@ PALETTE_INIT( tryout )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -180,8 +180,6 @@ VIDEO_START( tryout )
 	tryout_vram_gfx=auto_malloc(0x6000);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	return 0;
 }
 
 static void draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)

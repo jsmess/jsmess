@@ -53,7 +53,7 @@ PALETTE_INIT( speedatk )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 0x10;
@@ -100,8 +100,6 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( speedatk )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE,8,8,34,32);
-
-	return 0;
 }
 
 VIDEO_UPDATE( speedatk )

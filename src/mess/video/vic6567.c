@@ -729,7 +729,6 @@ VIDEO_START( vic2 )
 		if (i & 0xc0)
 			vic2.multi_collision[i] |= 0xc0;
 	}
-	return 0;
 }
 
 static void vic2_draw_character (int ybegin, int yend, int ch,
@@ -1340,7 +1339,7 @@ VIDEO_UPDATE( vic2 )
 
 static PALETTE_INIT( vic2 )
 {
-	palette_set_colors(machine, 0, vic2_palette, sizeof(vic2_palette) / 3);
+	palette_set_colors_rgb(machine, 0, vic2_palette, sizeof(vic2_palette) / 3);
 }
 
 MACHINE_DRIVER_START( vh_vic2 )

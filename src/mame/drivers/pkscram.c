@@ -232,8 +232,6 @@ VIDEO_START( pkscramble )
 
 	tilemap_set_transparent_pen(md_tilemap,15);
 	tilemap_set_transparent_pen(fg_tilemap,15);
-
-	return 0;
 }
 
 VIDEO_UPDATE( pkscramble )

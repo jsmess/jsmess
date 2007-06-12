@@ -36,14 +36,14 @@ static UINT16 colormap[] = {
 /* Initialise the palette */
 PALETTE_INIT( channelf )
 {
-	palette_set_colors(machine, 0, channelf_palette, sizeof(channelf_palette) / 3);
+	palette_set_colors_rgb(machine, 0, channelf_palette, sizeof(channelf_palette) / 3);
 }
 
 VIDEO_START( channelf )
 {
 	videoram_size = 0x2000;
 	videoram = auto_malloc(videoram_size);
-	return video_start_generic(machine);
+	video_start_generic(machine);
 }
 
 static int recalc_palette_offset(int reg1, int reg2)

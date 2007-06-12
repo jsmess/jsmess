@@ -95,7 +95,7 @@ static unsigned char kc85_palette[KC85_PALETTE_SIZE * 3] =
 /* Initialise the palette */
 PALETTE_INIT( kc85 )
 {
-	palette_set_colors(machine, 0, kc85_palette, sizeof(kc85_palette) / 3);
+	palette_set_colors_rgb(machine, 0, kc85_palette, sizeof(kc85_palette) / 3);
 	memcpy(colortable, kc85_colour_table, sizeof (kc85_colour_table));
 }
 
@@ -593,8 +593,6 @@ VIDEO_START( kc85_4 )
         (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
 
 	kc85_4_display_video_ram = kc85_4_video_ram;
-
-	return 0;
 }
 
 void kc85_4_video_ram_select_bank(int bank)
@@ -694,7 +692,6 @@ VIDEO_UPDATE( kc85_4 )
 VIDEO_START( kc85_3 )
 {
 	kc85_common_vh_start();
-	return 0;
 }
 
 

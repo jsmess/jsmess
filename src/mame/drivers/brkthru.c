@@ -51,8 +51,8 @@ Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
 #include "sound/3812intf.h"
 
 
-unsigned char *brkthru_nmi_enable; /* needs to be tracked down */
-extern unsigned char *brkthru_videoram;
+UINT8 *brkthru_nmi_enable; /* needs to be tracked down */
+extern UINT8 *brkthru_videoram;
 extern size_t brkthru_videoram_size;
 
 WRITE8_HANDLER( brkthru_1800_w );

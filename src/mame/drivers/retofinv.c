@@ -60,7 +60,7 @@ extern UINT8 *retofinv_fg_videoram;
 extern UINT8 *retofinv_bg_videoram;
 extern UINT8 *retofinv_sharedram;
 
-static unsigned char cpu2_m6000=0;
+static UINT8 cpu2_m6000=0;
 
 
 static WRITE8_HANDLER( cpu1_reset_w )

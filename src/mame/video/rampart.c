@@ -78,16 +78,13 @@ VIDEO_START( rampart )
 	};
 
 	/* initialize the playfield */
-	if (!rampart_bitmap_init(43*8, 30*8))
-		return 1;
+	rampart_bitmap_init(43*8, 30*8);
 
 	/* initialize the motion objects */
-	if (!atarimo_init(0, &modesc))
-		return 1;
+	atarimo_init(0, &modesc);
 
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -4);
-	return 0;
 }
 
 
@@ -136,7 +133,7 @@ VIDEO_UPDATE( rampart )
  *
  *************************************/
 
-int rampart_bitmap_init(int _xdim, int _ydim)
+void rampart_bitmap_init(int _xdim, int _ydim)
 {
 	/* set the dimensions */
 	xdim = _xdim;
@@ -148,7 +145,6 @@ int rampart_bitmap_init(int _xdim, int _ydim)
 
 	/* allocate playfield bitmap */
 	pfbitmap = auto_bitmap_alloc(xdim, ydim, Machine->screen[0].format);
-	return 1;
 }
 
 

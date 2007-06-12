@@ -161,7 +161,7 @@ static WRITE32_HANDLER( avengrs_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 static READ32_HANDLER( avengrs_sound_r )

@@ -3,7 +3,6 @@
 
 VIDEO_START( osm200 )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( osm200 )

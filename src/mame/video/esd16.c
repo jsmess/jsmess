@@ -147,8 +147,6 @@ VIDEO_START( esd16 )
 	tilemap_set_transparent_pen(esdtilemap_0,0x00);
 	tilemap_set_transparent_pen(esdtilemap_1,0x00);
 	tilemap_set_transparent_pen(esdtilemap_1_16x16,0x00);
-
-	return 0;
 }
 
 

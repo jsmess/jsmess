@@ -14,7 +14,7 @@
 #define RENDER_LOW	(1)
 #define RENDER_AUTO	(2)
 
-int v9938_init (running_machine *, int, int, void (*callback)(int));
+void v9938_init (running_machine *, int, int, void (*callback)(int));
 void v9938_reset (void);
 int v9938_interrupt (void);
 void v9938_set_sprite_limit (int);

@@ -143,9 +143,8 @@ static VIDEO_START(firebeat)
 	gcu[1].vram = auto_malloc(0x2000000);
 	memset(gcu[0].vram, 0, 0x2000000);
 	memset(gcu[1].vram, 0, 0x2000000);
-
-	return 0;
 }
+
 
 static void gcu_draw_object(int chip, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *cmd)
 {

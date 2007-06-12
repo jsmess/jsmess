@@ -513,34 +513,25 @@ static void remap_dynamic_addresses(void);
 
 static VIDEO_START( vegas_voodoo2 )
 {
-	if (voodoo_start(0, 0, VOODOO_2, 2, 4, 4))
-		return 1;
+	voodoo_start(0, 0, VOODOO_2, 2, 4, 4);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
-
-	return 0;
 }
 
 
 static VIDEO_START( vegas_voodoo_banshee )
 {
-	if (voodoo_start(0, 0, VOODOO_BANSHEE, 16, 16, 0))
-		return 1;
+	voodoo_start(0, 0, VOODOO_BANSHEE, 16, 16, 0);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
-
-	return 0;
 }
 
 
 static VIDEO_START( vegas_voodoo3 )
 {
-	if (voodoo_start(0, 0, VOODOO_3, 16, 16, 16))
-		return 1;
+	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
-
-	return 0;
 }
 
 

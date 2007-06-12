@@ -148,7 +148,7 @@ WRITE8_HANDLER( ppmast93_bgram_w )
 
 WRITE8_HANDLER( ppmast93_port4_w )
 {
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 	int bank;
 
 	coin_counter_w(0, data & 0x08);
@@ -335,8 +335,6 @@ VIDEO_START( ppmast93 )
 	ppmast93_fg_tilemap = tilemap_create(get_ppmast93_fg_tile_info,tilemap_scan_rows,TILEMAP_TRANSPARENT,8,8,32, 32);
 
 	tilemap_set_transparent_pen(ppmast93_fg_tilemap,0);
-
-	return 0;
 }
 
 VIDEO_UPDATE( ppmast93 )

@@ -15,8 +15,8 @@ UINT8 (*sega_decrypt)(offs_t,UINT8);
 /****************************************************************************/
 static UINT8 sega_decrypt62(offs_t pc, UINT8 lo)
 {
-	unsigned int i = 0;
-	unsigned int b = lo;
+	UINT32 i = 0;
+	UINT32 b = lo;
 
 	switch (pc & 0x03)
 	{
@@ -64,8 +64,8 @@ static UINT8 sega_decrypt62(offs_t pc, UINT8 lo)
 /****************************************************************************/
 static UINT8 sega_decrypt63(offs_t pc, UINT8 lo)
 {
-	unsigned int i = 0;
-	unsigned int b = lo;
+	UINT32 i = 0;
+	UINT32 b = lo;
 
 	switch (pc & 0x09)
 	{
@@ -113,8 +113,8 @@ static UINT8 sega_decrypt63(offs_t pc, UINT8 lo)
 /****************************************************************************/
 static UINT8 sega_decrypt64(offs_t pc, UINT8 lo)
 {
-	unsigned int i = 0;
-	unsigned int b = lo;
+	UINT32 i = 0;
+	UINT32 b = lo;
 
 	switch (pc & 0x03)
 	{
@@ -163,8 +163,8 @@ static UINT8 sega_decrypt64(offs_t pc, UINT8 lo)
 /****************************************************************************/
 static UINT8 sega_decrypt70(offs_t pc, UINT8 lo)
 {
-	unsigned int i = 0;
-	unsigned int b = lo;
+	UINT32 i = 0;
+	UINT32 b = lo;
 
 	switch (pc & 0x09)
 	{
@@ -212,8 +212,8 @@ static UINT8 sega_decrypt70(offs_t pc, UINT8 lo)
 /****************************************************************************/
 static UINT8 sega_decrypt76(offs_t pc, UINT8 lo)
 {
-	unsigned int i = 0;
-	unsigned int b = lo;
+	UINT32 i = 0;
+	UINT32 b = lo;
 
 	switch (pc & 0x09)
 	{
@@ -261,8 +261,8 @@ static UINT8 sega_decrypt76(offs_t pc, UINT8 lo)
 /****************************************************************************/
 static UINT8 sega_decrypt82(offs_t pc, UINT8 lo)
 {
-	unsigned int i = 0;
-	unsigned int b = lo;
+	UINT32 i = 0;
+	UINT32 b = lo;
 
 	switch (pc & 0x11)
 	{

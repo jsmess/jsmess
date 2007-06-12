@@ -2633,7 +2633,7 @@ READ16_HANDLER ( _4in1_02_read )
 
 static DRIVER_INIT(4in1boot)
 {
-	unsigned char *buffer;
+	UINT8 *buffer;
 	UINT8 *src = memory_region(REGION_CPU1);
 	int len = memory_region_length(REGION_CPU1);
 
@@ -2666,7 +2666,7 @@ static DRIVER_INIT(4in1boot)
 
 static DRIVER_INIT(snowbro3)
 {
-	unsigned char *buffer;
+	UINT8 *buffer;
 	UINT8 *src = memory_region(REGION_CPU1);
 	int len = memory_region_length(REGION_CPU1);
 

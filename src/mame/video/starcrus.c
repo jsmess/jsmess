@@ -60,8 +60,6 @@ VIDEO_START( starcrus )
 
 	proj1_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
 	proj2_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
-
-	return 0;
 }
 
 WRITE8_HANDLER( starcrus_ship_parm_1_w )

@@ -174,8 +174,6 @@ static VIDEO_START( supertnk )
 	supertnk_videoram[0] = auto_malloc(supertnk_videoram_size);
 	supertnk_videoram[1] = auto_malloc(supertnk_videoram_size);
 	supertnk_videoram[2] = auto_malloc(supertnk_videoram_size);
-
-	return 0;
 }
 
 

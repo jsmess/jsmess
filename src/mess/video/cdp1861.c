@@ -161,8 +161,6 @@ VIDEO_START( cdp1861 )
 
 	state_save_register_global(cdp1861.disp);
 	state_save_register_global(cdp1861.dmaout);
-
-	return 0;
 }
 
 VIDEO_UPDATE( cdp1861 )

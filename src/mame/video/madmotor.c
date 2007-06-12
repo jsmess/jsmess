@@ -121,8 +121,6 @@ VIDEO_START( madmotor )
 	tilemap_set_transparent_pen(madmotor_pf1_tilemap,0);
 	tilemap_set_transparent_pen(madmotor_pf2_tilemap,0);
 	tilemap_set_scroll_rows(madmotor_pf1_tilemap,512);
-
-	return 0;
 }
 
 /******************************************************************************/

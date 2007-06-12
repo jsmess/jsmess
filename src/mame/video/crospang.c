@@ -199,8 +199,6 @@ VIDEO_START( crospang )
 //  ysproff = 7;
 	xsproff = 5;
 	ysproff = 7;
-
-	return 0;
 }
 
 VIDEO_UPDATE( crospang )

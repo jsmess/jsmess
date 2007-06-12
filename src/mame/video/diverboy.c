@@ -8,7 +8,6 @@ size_t diverboy_spriteram_size;
 
 VIDEO_START(diverboy)
 {
-	return 0;
 }
 
 static void diverboy_drawsprites( mame_bitmap *bitmap, const rectangle *cliprect )

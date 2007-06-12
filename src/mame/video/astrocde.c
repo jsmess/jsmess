@@ -163,7 +163,7 @@ PALETTE_INIT( astrocde )
 			g = MIN(g, 255);
 			b = MAX(b, 0);
 			b = MIN(b, 255);
-			palette_set_color(machine, color * 16 + luma, r, g, b);
+			palette_set_color(machine, color * 16 + luma, MAKE_RGB(r, g, b));
 		}
 	}
 }
@@ -209,7 +209,7 @@ PALETTE_INIT( profpac )
 		bit3 = (i >> 11) & 0x01;
 		r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -233,8 +233,6 @@ VIDEO_START( astrocde )
 	/* initialize the sparkle and stars */
 	if (astrocade_video_config & AC_STARS)
 		init_sparklestar();
-
-	return 0;
 }
 
 
@@ -262,8 +260,6 @@ VIDEO_START( profpac )
 	state_save_register_global(profpac_writemode);
 	state_save_register_global(profpac_writemask);
 	state_save_register_global(profpac_vw);
-
-	return 0;
 }
 
 
@@ -394,15 +390,20 @@ VIDEO_UPDATE( profpac )
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
+		int effy = mame_vpos_to_astrocade_vpos(y);
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-		UINT16 offset = profpac_vispage * 0x4000 + y * 80;
+		UINT16 offset = profpac_vispage * 0x4000 + effy * 80;
 		int x;
 
+		/* star with black */
+
 		/* iterate over groups of 4 pixels */
-		for (x = 0; x < 80; x++)
+		for (x = 0; x < 456/4; x++)
 		{
+			int effx = x - HORZ_OFFSET/4;
+
 			/* select either video data or background data */
-			UINT16 data = (y < vblank) ? profpac_videoram[offset++] : 0;
+			UINT16 data = (effx >= 0 && effx < 80 && effy >= 0 && effy < vblank) ? profpac_videoram[offset++] : 0;
 
 			/* iterate over the 4 pixels */
 			*dest++ = profpac_palette[(data >> 12) & 0x0f];

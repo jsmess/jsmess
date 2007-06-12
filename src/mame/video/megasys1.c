@@ -291,8 +291,6 @@ VIDEO_START( megasys1 )
 	if (strcmp(machine->gamedrv->name, "lomakai") == 0 ||
 		strcmp(machine->gamedrv->name, "makaiden") == 0)
 		hardware_type_z = 1;
-
- 	return 0;
 }
 
 /***************************************************************************

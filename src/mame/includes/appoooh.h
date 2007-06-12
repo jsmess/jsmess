@@ -1,7 +1,7 @@
 /* ----------- defined in video/appoooh.c -----------*/
 
-extern unsigned char *appoooh_fg_videoram,*appoooh_fg_colorram;
-extern unsigned char *appoooh_bg_videoram,*appoooh_bg_colorram;
+extern UINT8 *appoooh_fg_videoram,*appoooh_fg_colorram;
+extern UINT8 *appoooh_bg_videoram,*appoooh_bg_colorram;
 WRITE8_HANDLER( appoooh_fg_videoram_w );
 WRITE8_HANDLER( appoooh_fg_colorram_w );
 WRITE8_HANDLER( appoooh_bg_videoram_w );

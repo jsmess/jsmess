@@ -1229,7 +1229,7 @@ static DRIVER_INIT( condor )
 
 static DRIVER_INIT( survival )
 {
-	unsigned char *rom = memory_region(REGION_CPU1);
+	UINT8 *rom = memory_region(REGION_CPU1);
 
 	rom[0x0157] = 0x21;	/* ROM check */
 	rom[0x02e8] = 0x21; /* crash due to protection, it still locks up somewhere else */

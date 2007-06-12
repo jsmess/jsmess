@@ -55,7 +55,6 @@ VIDEO_START( foodf )
 			3,	&resistances[0], rweights, 0, 0,
 			3,	&resistances[0], gweights, 0, 0,
 			2,	&resistances[1], bweights, 0, 0);
-	return 0;
 }
 
 
@@ -108,7 +107,7 @@ WRITE16_HANDLER( foodf_paletteram_w )
 	bit1 = (newword >> 7) & 0x01;
 	b = combine_2_weights(bweights, bit0, bit1);
 
-	palette_set_color(Machine, offset, r, g, b);
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
 }
 
 

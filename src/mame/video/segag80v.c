@@ -326,12 +326,12 @@ void sega_generate_vector_list(void)
 
 VIDEO_START( sega )
 {
-	if (vectorram_size == 0)
-		return 1;
+	assert_always(vectorram_size != 0, "vectorram==0");
+
 	min_x =machine->screen[0].visarea.min_x;
 	min_y =machine->screen[0].visarea.min_y;
 
-	return video_start_vector(machine);
+	video_start_vector(machine);
 }
 
 

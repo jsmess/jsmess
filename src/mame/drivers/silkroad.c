@@ -141,7 +141,7 @@ VIDEO_UPDATE(silkroad);
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color(Machine,offset,pal5bit(paletteram32[offset] >> (10+16)),pal5bit(paletteram32[offset] >> (5+16)),pal5bit(paletteram32[offset] >> (0+16)));
+	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> (10+16)),pal5bit(paletteram32[offset] >> (5+16)),pal5bit(paletteram32[offset] >> (0+16)));
 }
 
 /* player inputs */
@@ -423,7 +423,7 @@ DRIVER_INIT( silkroad )
 
 	UINT8 *src = memory_region(REGION_GFX1)+0x1000000;
 	int len = 0x0200000;
-	unsigned char *buffer;
+	UINT8 *buffer;
 
 	int tileoffset = 0x1300*64; // verify
 

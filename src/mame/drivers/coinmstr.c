@@ -536,8 +536,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( coinmstr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8, 46, 64);
-
-	return 0;
 }
 
 VIDEO_UPDATE( coinmstr )

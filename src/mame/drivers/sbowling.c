@@ -53,7 +53,7 @@ static UINT8 pix[2] = {0, 0};
 
 static TILE_GET_INFO( get_sb_tile_info )
 {
-	unsigned char *rom = memory_region(REGION_USER1);
+	UINT8 *rom = memory_region(REGION_USER1);
 	int tileno = rom[tile_index + bgmap * 1024];
 
 	SET_TILE_INFO(0, tileno, 0, 0)
@@ -103,7 +103,6 @@ VIDEO_START(sbowling)
 {
 	tmpbitmap = auto_bitmap_alloc(32*8,32*8,machine->screen[0].format);
 	sb_tilemap = tilemap_create(get_sb_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 8, 8, 32, 32);
-	return 0;
 }
 
 static WRITE8_HANDLER( pix_shift_w )
@@ -324,7 +323,7 @@ static PALETTE_INIT( sbowling )
 		bit2 = (color_prom[i+0x400] >> 3) & 0x01;
 		r = (int)(outputs_r[ (bit0<<0) | (bit1<<1) | (bit2<<2) ] + 0.5);
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
 

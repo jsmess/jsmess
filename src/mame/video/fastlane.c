@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "video/konamiic.h"
 
-unsigned char *fastlane_k007121_regs,*fastlane_videoram1,*fastlane_videoram2;
+UINT8 *fastlane_k007121_regs,*fastlane_videoram1,*fastlane_videoram2;
 static tilemap *layer0, *layer1;
 static rectangle clip0, clip1;
 
@@ -94,8 +94,6 @@ VIDEO_START( fastlane )
 	clip1 = machine->screen[0].visarea;
 	clip1.max_x = 39;
 	clip1.min_x = 0;
-
-	return 0;
 }
 
 /***************************************************************************

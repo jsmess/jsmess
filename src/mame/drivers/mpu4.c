@@ -459,7 +459,6 @@ void awp_lamp_draw(void)
 
 VIDEO_START( mpu4 )
 {
-	return 0;
 }
 
 // video update ///////////////////////////////////////////////////////////
@@ -487,22 +486,22 @@ VIDEO_UPDATE( mpu4 )
 
 PALETTE_INIT( mpu4 )
 {
-	palette_set_color(machine, 0,0x00,0x00,0x00);
-	palette_set_color(machine, 1,0x00,0x00,0xFF);
-	palette_set_color(machine, 2,0x00,0xFF,0x00);
-	palette_set_color(machine, 3,0x00,0xFF,0xFF);
-	palette_set_color(machine, 4,0xFF,0x00,0x00);
-	palette_set_color(machine, 5,0xFF,0x00,0xFF);
-	palette_set_color(machine, 6,0xFF,0xFF,0x00);
-	palette_set_color(machine, 7,0xFF,0xFF,0xFF);
-	palette_set_color(machine, 8,0x80,0x80,0x80);
-	palette_set_color(machine, 9,0x00,0x00,0x80);
-	palette_set_color(machine,10,0x00,0x80,0x00);
-	palette_set_color(machine,11,0x00,0x80,0x80);
-	palette_set_color(machine,12,0x80,0x00,0x00);
-	palette_set_color(machine,13,0x80,0x00,0x80);
-	palette_set_color(machine,14,0x80,0x80,0x00);
-	palette_set_color(machine,15,0x80,0x80,0x80);
+	palette_set_color(machine, 0,MAKE_RGB(0x00,0x00,0x00));
+	palette_set_color(machine, 1,MAKE_RGB(0x00,0x00,0xFF));
+	palette_set_color(machine, 2,MAKE_RGB(0x00,0xFF,0x00));
+	palette_set_color(machine, 3,MAKE_RGB(0x00,0xFF,0xFF));
+	palette_set_color(machine, 4,MAKE_RGB(0xFF,0x00,0x00));
+	palette_set_color(machine, 5,MAKE_RGB(0xFF,0x00,0xFF));
+	palette_set_color(machine, 6,MAKE_RGB(0xFF,0xFF,0x00));
+	palette_set_color(machine, 7,MAKE_RGB(0xFF,0xFF,0xFF));
+	palette_set_color(machine, 8,MAKE_RGB(0x80,0x80,0x80));
+	palette_set_color(machine, 9,MAKE_RGB(0x00,0x00,0x80));
+	palette_set_color(machine,10,MAKE_RGB(0x00,0x80,0x00));
+	palette_set_color(machine,11,MAKE_RGB(0x00,0x80,0x80));
+	palette_set_color(machine,12,MAKE_RGB(0x80,0x00,0x00));
+	palette_set_color(machine,13,MAKE_RGB(0x80,0x00,0x80));
+	palette_set_color(machine,14,MAKE_RGB(0x80,0x80,0x00));
+	palette_set_color(machine,15,MAKE_RGB(0x80,0x80,0x80));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1837,8 +1836,7 @@ VIDEO_START( mpu4_vid )
 		if (machine->gfx[mpu4_gfx_index] == 0)
 			break;
 
-	if (mpu4_gfx_index == MAX_GFX_ELEMENTS)
-		return 1;
+	assert(mpu4_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[mpu4_gfx_index+0] = allocgfx(&mpu4_vid_char_8x8_layout);
@@ -1857,8 +1855,6 @@ VIDEO_START( mpu4_vid )
 	machine->gfx[mpu4_gfx_index+3]->total_colors = machine->drv->total_colors / 16;
 
 	scn2675_IR_pointer = 0;
-
-	return 0;
 }
 
 /* palette support is very preliminary */
@@ -1876,7 +1872,7 @@ WRITE16_HANDLER( ef9369_data_w )
 
 	color = ef9369_counter/2;
 	coldat = (ef9369_palette[color*2+1]<<8)|ef9369_palette[color*2];
-	palette_set_color(Machine,color,pal4bit(coldat >> 0),pal4bit(coldat >> 8),pal4bit(coldat >> 4));
+	palette_set_color_rgb(Machine,color,pal4bit(coldat >> 0),pal4bit(coldat >> 8),pal4bit(coldat >> 4));
 
 	ef9369_counter++;
 	if (ef9369_counter>31) ef9369_counter = 31;
@@ -2838,7 +2834,7 @@ PALETTE_INIT( dealem )
 		bit2 = BIT(*color_prom,7);
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -2857,8 +2853,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START(dealem)
 {
 	dealem_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,32,32);
-
-	return 0;
 }
 
 WRITE8_HANDLER( dealem_videoram_w )

@@ -22,7 +22,7 @@ PALETTE_INIT(usg)
 		g = 0x7f * g * (i + 1);
 		b = 0x7f * b * (i + 1);
 
-		palette_set_color(machine,j,r,g,b);
+		palette_set_color(machine,j,MAKE_RGB(r,g,b));
 	}
 
 	for (j = 0;j < 256;j++)
@@ -47,8 +47,6 @@ static TILE_GET_INFO( get_usg_tile_info )
 VIDEO_START(usg)
 {
 	usg_tilemap = tilemap_create(get_usg_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8,64,32);
-
-	return 0;
 }
 
 

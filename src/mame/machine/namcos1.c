@@ -31,7 +31,7 @@ typedef struct
 	read8_handler bank_handler_r;
 	write8_handler bank_handler_w;
 	int           bank_offset;
-	unsigned char *bank_pointer;
+	UINT8 *bank_pointer;
 } bankhandler;
 
 /* hardware elements of 1Mbytes physical memory space */
@@ -753,7 +753,7 @@ WRITE8_HANDLER( namcos1_subcpu_bank_w )
 *******************************************************************************/
 
 static void namcos1_install_bank(int start,int end,read8_handler hr,write8_handler hw,
-			  int offset,unsigned char *pointer)
+			  int offset,UINT8 *pointer)
 {
 	int i;
 	for(i=start;i<=end;i++)

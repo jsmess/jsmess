@@ -284,7 +284,7 @@ subb_ex,cmpb_ex,sbcb_ex,illegal,andb_ex,bitb_ex,ldb_ex, stb_ex,
 eorb_ex,adcb_ex,orb_ex, addb_ex,illegal,illegal,ldx_ex, stx_ex
 };
 
-#if (HAS_M6803)
+#if (HAS_M6801||HAS_M6803)
 static void (*m6803_insn[0x100])(void) = {
 illegal,nop,	illegal,illegal,lsrd,	asld,	tap,	tpa,
 inx,	dex,	clv,	sev,	clc,	sec,	cli,	sei,

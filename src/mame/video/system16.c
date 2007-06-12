@@ -165,7 +165,7 @@ UINT16 *sys16_gr_pal;
 UINT16 *sys16_gr_flip;
 int sys16_gr_palette;
 int sys16_gr_palette_default;
-unsigned char sys16_gr_colorflip[2][4];
+UINT8 sys16_gr_colorflip[2][4];
 UINT16 *sys16_gr_second_road;
 
 static tilemap *background, *foreground, *text_layer;
@@ -199,7 +199,7 @@ READ16_HANDLER( sys16_tileram_r ){
 static void draw_sprite( //*
 	mame_bitmap *bitmap,
 	const rectangle *cliprect,
-	const unsigned char *addr, int pitch,
+	const UINT8 *addr, int pitch,
 	const pen_t *paldata,
 	int x0, int y0, int screen_width, int screen_height,
 	int width, int height,
@@ -340,7 +340,7 @@ static void draw_sprite( //*
 static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int b3d ) //*
 {
 	const pen_t *base_pal = Machine->gfx[0]->colortable;
-	const unsigned char *base_gfx = memory_region(REGION_GFX2);
+	const UINT8 *base_gfx = memory_region(REGION_GFX2);
 	const int gfx_rom_size = memory_region_length(REGION_GFX2);
 	const UINT16 *source = sys16_spriteram;
 	struct sys16_sprite_attributes sprite;
@@ -521,9 +521,9 @@ WRITE16_HANDLER( sys16_paletteram_w )
 		gh = combine_6_weights(weights[1][1], g0, g1, g2, g3, g4, 1);
 		bh = combine_6_weights(weights[1][2], b0, b1, b2, b3, b4, 1);
 
-		palette_set_color( Machine, offset, r, g, b );
+		palette_set_color( Machine, offset, MAKE_RGB(r, g, b) );
 
-		palette_set_color( Machine, offset+Machine->drv->total_colors/2,rs,gs,bs);
+		palette_set_color( Machine, offset+Machine->drv->total_colors/2,MAKE_RGB(rs,gs,bs));
 	}
 }
 
@@ -819,7 +819,7 @@ VIDEO_START( system16 ){
 		/* initialize all entries to black - needed for Golden Axe*/
 		int i;
 		for( i=0; i<machine->drv->total_colors; i++ ){
-			palette_set_color( machine, i, 0,0,0 );
+			palette_set_color( machine, i, MAKE_RGB(0,0,0) );
 		}
 
 		if(sys16_bg1_trans) tilemap_set_transparent_pen( background, 0 );
@@ -853,8 +853,6 @@ VIDEO_START( system16 ){
 		sys16_textlayer_hi_max=0xff;
 
 		sys16_18_mode=0;
-
-		return 0;
 	}
 }
 
@@ -885,8 +883,7 @@ VIDEO_START( system18old ){
 		8,8,
 		64*2,32*2 );
 
-	if( video_start_system16(machine) )
-		return 1;
+	video_start_system16(machine);
 
 			tilemap_set_transparent_pen( foreground2, 0 );
 
@@ -909,8 +906,6 @@ VIDEO_START( system18old ){
 			sys16_fg_priority_mode=3;
 			sys16_bg_priority_value=0x1800;
 			sys16_fg_priority_value=0x2000;
-
-			return 0;
 }
 
 /***************************************************************************/

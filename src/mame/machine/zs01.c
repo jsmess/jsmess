@@ -51,14 +51,14 @@ struct zs01_chip
 	int shift;
 	int bit;
 	int byte;
-	unsigned char write_buffer[ SIZE_WRITE_BUFFER ];
-	unsigned char read_buffer[ SIZE_READ_BUFFER ];
-	unsigned char response_key[ SIZE_KEY ];
-	unsigned char *response_to_reset;
-	unsigned char *command_key;
-	unsigned char *data_key;
-	unsigned char *data;
-	unsigned char *ds2401;
+	UINT8 write_buffer[ SIZE_WRITE_BUFFER ];
+	UINT8 read_buffer[ SIZE_READ_BUFFER ];
+	UINT8 response_key[ SIZE_KEY ];
+	UINT8 *response_to_reset;
+	UINT8 *command_key;
+	UINT8 *data_key;
+	UINT8 *data;
+	UINT8 *ds2401;
 	zs01_write_handler write;
 	zs01_read_handler read;
 };
@@ -73,7 +73,7 @@ struct zs01_chip zs01[ ZS01_MAXCHIP ];
 #define STATE_LOAD_COMMAND ( 2 )
 #define STATE_READ_DATA ( 3 )
 
-void zs01_init( int chip, unsigned char *data, zs01_write_handler write, zs01_read_handler read, unsigned char *ds2401 )
+void zs01_init( int chip, UINT8 *data, zs01_write_handler write, zs01_read_handler read, UINT8 *ds2401 )
 {
 	int offset;
 	struct zs01_chip *c;
@@ -196,14 +196,14 @@ void zs01_cs_write( int chip, int cs )
 	c->cs = cs;
 }
 
-static void zs01_decrypt( unsigned char *destination, unsigned char *source, int length, unsigned char *key, unsigned char previous_byte )
+static void zs01_decrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
 {
-	unsigned int a0;
-	unsigned int v1;
-	unsigned int v0;
-	unsigned int a1;
-	unsigned int t1;
-	unsigned int t0;
+	UINT32 a0;
+	UINT32 v1;
+	UINT32 v0;
+	UINT32 a1;
+	UINT32 t1;
+	UINT32 t0;
 
 	length--;
 	if( length >= 0 )
@@ -243,15 +243,15 @@ static void zs01_decrypt( unsigned char *destination, unsigned char *source, int
 	}
 }
 
-static void zs01_decrypt2( unsigned char *destination, unsigned char *source, int length, unsigned char *key, unsigned char previous_byte )
+static void zs01_decrypt2( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
 {
-	unsigned int a0;
-	unsigned int v1;
-	unsigned int v0;
-	unsigned int a1;
-	unsigned int t2;
-	unsigned int t1;
-	unsigned int t0;
+	UINT32 a0;
+	UINT32 v1;
+	UINT32 v0;
+	UINT32 a1;
+	UINT32 t2;
+	UINT32 t1;
+	UINT32 t0;
 
 	t2 = 0;
 	if( length >= 0 )
@@ -291,13 +291,13 @@ static void zs01_decrypt2( unsigned char *destination, unsigned char *source, in
 	}
 }
 
-static void zs01_encrypt( unsigned char *destination, unsigned char *source, int length, unsigned char *key, unsigned int previous_byte )
+static void zs01_encrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT32 previous_byte )
 {
-	unsigned int t0;
-	unsigned int v0;
-	unsigned int v1;
-	unsigned int a0;
-	unsigned int a1;
+	UINT32 t0;
+	UINT32 v0;
+	UINT32 v1;
+	UINT32 a0;
+	UINT32 a1;
 
 	length--;
 	if( length >= 0 )
@@ -339,12 +339,12 @@ static void zs01_encrypt( unsigned char *destination, unsigned char *source, int
 	}
 }
 
-static UINT16 zs01_crc( unsigned char *buffer, unsigned int length )
+static UINT16 zs01_crc( UINT8 *buffer, UINT32 length )
 {
-	unsigned int v1;
-	unsigned int a3;
-	unsigned int v0;
-	unsigned int a2;
+	UINT32 v1;
+	UINT32 a3;
+	UINT32 v0;
+	UINT32 a2;
 
 	v1 = 0xffff;
 	a3 = 0;

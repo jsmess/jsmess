@@ -57,8 +57,6 @@ VIDEO_START( superdq )
 	superdq_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_OPAQUE, 8, 8, 32, 32);
 
 	add_exit_callback(machine, video_cleanup);
-
-	return 0;
 }
 
 VIDEO_UPDATE( superdq )
@@ -144,7 +142,7 @@ PALETTE_INIT( superdq )
 		bit1 = (color_prom[i] >> 0) & 0x01;
 		b = combine_2_weights(bweights, bit1, bit0);
 
-		palette_set_color(machine, i, r, g, b);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 

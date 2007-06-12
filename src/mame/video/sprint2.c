@@ -28,8 +28,6 @@ VIDEO_START( sprint2 )
 	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_OPAQUE, 16, 8, 32, 32);
-
-	return 0;
 }
 
 

@@ -112,7 +112,7 @@ PALETTE_INIT( astrocade )
 				B = 255;
 
 			/* Round, and set the value */
-			palette_set_color(machine, i*8+j, floor(R+.5), floor(G+.5),  floor(B+.5));
+			palette_set_color_rgb(machine, i*8+j, floor(R+.5), floor(G+.5),  floor(B+.5));
 		}
 	}
 

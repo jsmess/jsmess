@@ -46,8 +46,6 @@ VIDEO_START( gotcha )
 
 	tilemap_set_scrolldx(fg_tilemap,-1,0);
 	tilemap_set_scrolldx(bg_tilemap,-5,0);
-
-	return 0;
 }
 
 

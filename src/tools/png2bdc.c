@@ -128,10 +128,13 @@ static int render_font_save_cached(render_font *font, const char *filename, UINT
 
 	/* allocate an array to hold the character data */
 	chartable = malloc(numchars * CACHED_CHAR_SIZE);
-	memset(chartable, 0, numchars * CACHED_CHAR_SIZE);
 
 	/* allocate a temp buffer to compress into */
 	tempbuffer = malloc(65536);
+	if (chartable == NULL || tempbuffer == NULL)
+		goto error;
+
+	memset(chartable, 0, numchars * CACHED_CHAR_SIZE);
 
 	/* write the header */
 	dest = tempbuffer;
@@ -398,6 +401,8 @@ int main(int argc, char *argv[])
 
 	/* allocate a font */
 	font = malloc(sizeof(*font));
+	if (font == NULL)
+		return 1;
 	memset(font, 0, sizeof(*font));
 
 	/* iterate over input files */

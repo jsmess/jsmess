@@ -26,7 +26,7 @@ WRITE8_HANDLER(beg_palette_w)
 
 	paletteram[offset] = data;
 	color = paletteram[offset&0x3ff] | (paletteram[0x400+(offset&0x3ff)] << 8);
-	palette_set_color(Machine, offset&0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
+	palette_set_color_rgb(Machine, offset&0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
 }
 
 WRITE8_HANDLER( beg_gfxcontrol_w )
@@ -66,7 +66,6 @@ VIDEO_START( bigevglf )
 	tmp_bitmap[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmp_bitmap[3] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	vidram = auto_malloc(0x100*0x100 * 4);
-	return 0;
 }
 
 void beg_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)

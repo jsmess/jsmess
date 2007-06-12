@@ -8,12 +8,12 @@
 
 #include "driver.h"
 
-unsigned char *megazone_scrollx;
-unsigned char *megazone_scrolly;
+UINT8 *megazone_scrollx;
+UINT8 *megazone_scrolly;
 static int flipscreen;
 
-unsigned char *megazone_videoram2;
-unsigned char *megazone_colorram2;
+UINT8 *megazone_videoram2;
+UINT8 *megazone_colorram2;
 size_t megazone_videoram2_size;
 
 /***************************************************************************
@@ -68,7 +68,7 @@ PALETTE_INIT( megazone )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,r,g,b);
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -101,8 +101,6 @@ VIDEO_START( megazone )
 	memset(dirtybuffer,1,videoram_size);
 
 	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
-
-	return 0;
 }
 
 

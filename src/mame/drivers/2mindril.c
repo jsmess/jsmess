@@ -52,7 +52,6 @@ See pic for more details
 
 VIDEO_START( drill )
 {
-	return 0;
 }
 
 VIDEO_UPDATE( drill )

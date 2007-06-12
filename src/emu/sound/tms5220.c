@@ -132,7 +132,7 @@ void *tms5220_create(int index)
 {
 	struct tms5220 *tms;
 
-	tms = malloc(sizeof(*tms));
+	tms = malloc_or_die(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
 	state_save_register_item_array("tms5220", index, tms->fifo);

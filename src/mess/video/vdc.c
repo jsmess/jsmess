@@ -26,10 +26,6 @@ VIDEO_START( pce )
 
 	/* create display bitmap */
 	vdc.bmp = auto_bitmap_alloc(360, 256, BITMAP_FORMAT_INDEXED16);
-	if(!vdc.bmp)
-		return 1;
-
-	return 0;
 }
 
 
@@ -289,7 +285,7 @@ WRITE8_HANDLER ( vce_w )
                 r = ((vdc.vce_data[i].w >> 3) & 7) << 5;
                 g = ((vdc.vce_data[i].w >> 6) & 7) << 5;
                 b = ((vdc.vce_data[i].w >> 0) & 7) << 5;
-                palette_set_color(Machine, i, r, g, b);
+                palette_set_color_rgb(Machine, i, r, g, b);
              }
 
              /* bump internal address */

@@ -29,8 +29,7 @@ VIDEO_START( goldstar )
 {
 //        int i;
 
-	if (video_start_generic(machine) != 0)
-		return 1;
+	video_start_generic(machine);
 
 	dirtybuffer1 = auto_malloc(3 * goldstar_video_size * sizeof(UINT8));
 	dirtybuffer2 = dirtybuffer1 + goldstar_video_size;
@@ -43,8 +42,6 @@ VIDEO_START( goldstar )
 
 	/* leave everything at the default, but map all foreground 0 pens as transparent */
 //        for (i = 0;i < 16;i++) palette_used_colors[8 * i] = PALETTE_COLOR_TRANSPARENT;
-
-	return 0;
 }
 
 

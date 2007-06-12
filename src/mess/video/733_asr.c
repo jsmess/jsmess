@@ -113,7 +113,7 @@ gfx_decode asr733_gfxdecodeinfo[] =
 
 PALETTE_INIT( asr733 )
 {
-	palette_set_colors(machine, 0, asr_palette, asr733_palette_size);
+	palette_set_colors_rgb(machine, 0, asr_palette, asr733_palette_size);
 
 	memcpy(colortable, & asr_colortable, sizeof(asr_colortable));
 }

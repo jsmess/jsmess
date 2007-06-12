@@ -265,7 +265,7 @@ PALETTE_INIT( psx )
 
 	for( n_colour = 0; n_colour < 0x10000; n_colour++ )
 	{
-		palette_set_color( machine, n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
+		palette_set_color_rgb( machine, n_colour, pal5bit(n_colour >> 0), pal5bit(n_colour >> 5), pal5bit(n_colour >> 10) );
 	}
 }
 
@@ -528,7 +528,7 @@ static int DebugTextureDisplay( mame_bitmap *bitmap )
 			int n_x;
 			int n_xi;
 			int n_yi;
-			unsigned short p_n_interleave[ 1024 ];
+			UINT16 p_n_interleave[ 1024 ];
 
 			for( n_x = 0; n_x < Machine->screen[0].width; n_x++ )
 			{
@@ -627,7 +627,7 @@ static void updatevisiblearea( void )
 	video_screen_configure(0, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_SUBSECONDS(refresh));
 }
 
-static int psx_gpu_init( void )
+static void psx_gpu_init( void )
 {
 	int n_line;
 	int n_level;
@@ -781,20 +781,18 @@ static int psx_gpu_init( void )
 	state_save_register_global( psxgpu.n_ti );
 
 	state_save_register_func_postload( updatevisiblearea );
-
-	return 0;
 }
 
 VIDEO_START( psx_type1 )
 {
 	m_n_gputype = 1;
-	return psx_gpu_init();
+	psx_gpu_init();
 }
 
 VIDEO_START( psx_type2 )
 {
 	m_n_gputype = 2;
-	return psx_gpu_init();
+	psx_gpu_init();
 }
 
 VIDEO_UPDATE( psx )

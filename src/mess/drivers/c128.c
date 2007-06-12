@@ -970,8 +970,8 @@ static PALETTE_INIT( c128 )
 {
 	int i;
 
-	palette_set_colors(machine, 0, vic2_palette, sizeof(vic2_palette) / 3);
-	palette_set_colors(machine, sizeof(vic2_palette) / 3, vdc8563_palette, sizeof(vdc8563_palette) / 3);
+	palette_set_colors_rgb(machine, 0, vic2_palette, sizeof(vic2_palette) / 3);
+	palette_set_colors_rgb(machine, sizeof(vic2_palette) / 3, vdc8563_palette, sizeof(vdc8563_palette) / 3);
 
 	for (i=0; i<0x100; i++) {
 		colortable[i*2]=0x10+((i&0xf0)>>4);

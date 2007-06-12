@@ -10,7 +10,7 @@
 
 
 
-static unsigned char mask = 0;
+static UINT8 mask = 0;
 
 WRITE8_HANDLER( ramtek_mask_w )
 {

@@ -80,22 +80,22 @@ static int SpriteOffset[4] = {0,0x10,0x20,0x40};
 
 /* To adjust sprites against bitmap */
 
-unsigned char *s2636_1_ram;
-unsigned char *s2636_2_ram;
-unsigned char *s2636_3_ram;
+UINT8 *s2636_1_ram;
+UINT8 *s2636_2_ram;
+UINT8 *s2636_3_ram;
 
 mame_bitmap *s2636_1_bitmap;
 mame_bitmap *s2636_2_bitmap;
 mame_bitmap *s2636_3_bitmap;
 
-unsigned char s2636_1_dirty[4];
-unsigned char s2636_2_dirty[4];
-unsigned char s2636_3_dirty[4];
+UINT8 s2636_1_dirty[4];
+UINT8 s2636_2_dirty[4];
+UINT8 s2636_3_dirty[4];
 
 int s2636_x_offset=0;
 int s2636_y_offset=0;
 
-void s2636_w(unsigned char *workram,int offset,int data,unsigned char *dirty)
+void s2636_w(UINT8 *workram,int offset,int data,UINT8 *dirty)
 {
 	if (workram[offset] != data)
     {
@@ -125,7 +125,7 @@ void s2636_w(unsigned char *workram,int offset,int data,unsigned char *dirty)
 /* Check for Collision between 2 sprites */
 /*****************************************/
 
-static int SpriteCheck(int first,int second,unsigned char *workram,int Graphics_Bank,mame_bitmap *collision_bitmap)
+static int SpriteCheck(int first,int second,UINT8 *workram,int Graphics_Bank,mame_bitmap *collision_bitmap)
 {
 	int Checksum=0;
 	int x,y;
@@ -218,7 +218,7 @@ static int SpriteCheck(int first,int second,unsigned char *workram,int Graphics_
 	return Checksum;
 }
 
-void Update_Bitmap(mame_bitmap *bitmap,unsigned char *workram,unsigned char *dirty,int Graphics_Bank,mame_bitmap *collision_bitmap)
+void Update_Bitmap(mame_bitmap *bitmap,UINT8 *workram,UINT8 *dirty,int Graphics_Bank,mame_bitmap *collision_bitmap)
 {
 	int CollisionSprite = 0;
     int spriteno;

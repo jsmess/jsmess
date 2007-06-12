@@ -595,9 +595,9 @@ ROM_END
 
 static void fix_bwp3(void)
 {
-	unsigned char *rom = bwp3_rombase;
+	UINT8 *rom = bwp3_rombase;
 	int i, j = bwp3_romsize;
-	unsigned char ah, al;
+	UINT8 ah, al;
 
 	// swap nibbles
 	for (i=0; i<j; i++) { ah = al = rom[i]; rom[i] = (ah >> 4) | (al << 4); }

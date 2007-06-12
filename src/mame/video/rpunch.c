@@ -96,7 +96,6 @@ VIDEO_START( rpunch )
 
 	/* reset the timer */
 	crtc_timer = mame_timer_alloc(crtc_interrupt_gen);
-	return 0;
 }
 
 

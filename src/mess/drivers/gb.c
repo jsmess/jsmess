@@ -494,7 +494,7 @@ static PALETTE_INIT( gb )
 	int ii;
 	for( ii = 0; ii < 4; ii++)
 	{
-		palette_set_color(machine, ii, palette[ii*3+0], palette[ii*3+1], palette[ii*3+2]);
+		palette_set_color_rgb(machine, ii, palette[ii*3+0], palette[ii*3+1], palette[ii*3+2]);
 		colortable[ii] = ii;
 	}
 }
@@ -504,7 +504,7 @@ static PALETTE_INIT( gbp )
 	int ii;
 	for( ii = 0; ii < 4; ii++)
 	{
-		palette_set_color(machine, ii, palette[(ii + 4)*3+0], palette[(ii + 4)*3+1], palette[(ii + 4)*3+2]);
+		palette_set_color_rgb(machine, ii, palette[(ii + 4)*3+0], palette[(ii + 4)*3+1], palette[(ii + 4)*3+2]);
 		colortable[ii] = ii;
 	}
 }
@@ -518,7 +518,7 @@ static PALETTE_INIT( sgb )
 		r = (ii & 0x1F) << 3;
 		g = ((ii >> 5) & 0x1F) << 3;
 		b = ((ii >> 10) & 0x1F) << 3;
-		palette_set_color(machine,  ii, r, g, b );
+		palette_set_color_rgb(machine,  ii, r, g, b );
 	}
 
 	/* Some default colours for non-SGB games */
@@ -540,7 +540,7 @@ static PALETTE_INIT( gbc )
 		r = (ii & 0x1F) << 3;
 		g = ((ii >> 5) & 0x1F) << 3;
 		b = ((ii >> 10) & 0x1F) << 3;
-		palette_set_color( machine, ii, r, g, b );
+		palette_set_color_rgb( machine, ii, r, g, b );
 	}
 
 	/* Background is initialised as white */
@@ -554,7 +554,7 @@ static PALETTE_INIT( gbc )
 static PALETTE_INIT( megaduck ) {
 	int ii;
 	for( ii = 0; ii < 4; ii++) {
-		palette_set_color(machine, ii, palette_megaduck[ii*3+0], palette_megaduck[ii*3+1], palette_megaduck[ii*3+2]);
+		palette_set_color_rgb(machine, ii, palette_megaduck[ii*3+0], palette_megaduck[ii*3+1], palette_megaduck[ii*3+2]);
 		colortable[ii] = ii;
 	}
 }

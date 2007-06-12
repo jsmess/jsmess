@@ -34,7 +34,7 @@ WRITE16_HANDLER(f3_68000_share_w)
 
 WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	unsigned int max_banks_this_game=(memory_region_length(REGION_SOUND1)/0x200000)-1;
+	UINT32 max_banks_this_game=(memory_region_length(REGION_SOUND1)/0x200000)-1;
 
 #if 0
 {

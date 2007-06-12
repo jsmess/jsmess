@@ -117,7 +117,6 @@ ADDRESS_MAP_END
 VIDEO_START(hotblock)
 {
 	hotblock_pal=auto_malloc(0x10000);
-	return 0;
 }
 
 VIDEO_UPDATE(hotblock)
@@ -132,7 +131,7 @@ VIDEO_UPDATE(hotblock)
 	for (i=0;i<256;i++)
 	{
 		int dat=(hotblock_pal[i*2+1]<<8)|hotblock_pal[i*2];
-		palette_set_color(machine,i,pal5bit(dat>>0),pal5bit(dat>>5),pal5bit(dat>>10));
+		palette_set_color_rgb(machine,i,pal5bit(dat>>0),pal5bit(dat>>5),pal5bit(dat>>10));
 	}
 
 	count=0;
