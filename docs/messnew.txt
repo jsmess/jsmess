@@ -36,8 +36,8 @@ System Driver Changes:
   set before pixel 80.  (bug #1174) [Wilbert Pol]
 
 - [A2600] Paddles no longer auto-center.  Set default keys for
-  player 4. (bug #1176 and bug #1167) Fixed up Booster Grip Controller
-  buttons, and fixed player two Booster Grip. [Christopher Stone]
+  player 4. (bug #1176 and bug #1167)  Adjusted Driving Controller
+  sensitivity, and fixed player two Booster Grip. [Christopher Stone]
 
 - [A2600] Fixed delay behavior when resetting BL/M0/M1 position during
   HMOVE period.  [Wilbert Pol]
