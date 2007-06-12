@@ -93,7 +93,8 @@ Source Changes:
 
 - Added many SHA1 hashes. [Fabio Priuli]
 
-- Added several testdrivers to real drivers.  [Oliver Stoeneberg]
+- Added some missing TESTDRIVERs to messdriv.c that were only specified in the
+  driver source files.  [Oliver Stoeneberg]
 
 - [Windows] UNICODE=1 fixes.  [Oliver Stoeneberg]
 
