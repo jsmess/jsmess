@@ -438,10 +438,13 @@ static READ8_HANDLER( sio2_r )
 	switch (offset)
 	{
 	case 0:
+		return z80sio_d_r(0, 0);
 	case 1:
+		return z80sio_c_r(0, 0);
 	case 2:
+		return z80sio_d_r(0, 1);
 	case 3:
-		break;
+		return z80sio_c_r(0, 1);
 	}
 
 	return 0;
@@ -452,12 +455,16 @@ static WRITE8_HANDLER( sio2_w )
 	switch (offset)
 	{
 	case 0:
+		z80sio_d_w(0, 0, data);
 		break;
 	case 1:
+		z80sio_c_w(0, 0, data);
 		break;
 	case 2:
+		z80sio_d_w(0, 1, data);
 		break;
 	case 3:
+		z80sio_c_w(0, 1, data);
 		break;
 	}
 }
@@ -619,7 +626,7 @@ static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_READ(crtc_r)
 	AM_RANGE(0x38, 0x39) AM_MIRROR(0xff00) AM_WRITE(crtc_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff00) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x50, 0x53) AM_MIRROR(0xff00) AM_READWRITE(ctc_r, ctc_w)
+	AM_RANGE(0x50, 0x53) AM_MIRROR(0xff00) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_READWRITE(strobe_r, strobe_w)
 ADDRESS_MAP_END
 
@@ -658,7 +665,7 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_READ(crtc_r)
 	AM_RANGE(0x32, 0x35) AM_MIRROR(0xff00) AM_READWRITE(sio2_r, sio2_w)
 	AM_RANGE(0x38, 0x39) AM_MIRROR(0xff00) AM_WRITE(crtc_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff00) AM_READWRITE(ctc_r, ctc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff00) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_READWRITE(strobe_r, strobe_w)
 ADDRESS_MAP_END
 
@@ -682,7 +689,7 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_READWRITE(sync_r, fgctlprom_w)
 	AM_RANGE(0x38, 0x39) AM_MIRROR(0xff00) AM_WRITE(crtc_w)
 	AM_RANGE(0x40, 0x41) AM_MIRROR(0xff00) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff00) AM_READWRITE(ctc_r, ctc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff00) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_READWRITE(strobe_r, strobe_w)
 ADDRESS_MAP_END
 
