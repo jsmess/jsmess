@@ -605,22 +605,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc80_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM	// Work RAM
+	AM_RANGE(0x8000, 0xffff) AM_RAM	// Work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x02) AM_READ(in_r)
-	AM_RANGE(0x05, 0x05) AM_READ(pling_r)
-	AM_RANGE(0x00, 0x05) AM_WRITE(out_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(io_reset_r, hrc_w)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x30, 0x32) AM_WRITE(ram_ctrl_w)
-	AM_RANGE(0x31, 0x31) AM_READ(crtc_r)
-	AM_RANGE(0x38, 0x39) AM_WRITE(crtc_w)
-	AM_RANGE(0x40, 0x43) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(ctc_r, ctc_w)
-	AM_RANGE(0x80, 0xff) AM_READWRITE(strobe_r, strobe_w)
+	AM_RANGE(0x00, 0x02) AM_MIRROR(0xff00) AM_READ(in_r)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff00) AM_READ(pling_r)
+	AM_RANGE(0x00, 0x05) AM_MIRROR(0xff00) AM_WRITE(out_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(io_reset_r, hrc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x30, 0x32) AM_MIRROR(0xff00) AM_WRITE(ram_ctrl_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_READ(crtc_r)
+	AM_RANGE(0x38, 0x39) AM_MIRROR(0xff00) AM_WRITE(crtc_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff00) AM_READWRITE(sio2_r, sio2_w)
+	AM_RANGE(0x50, 0x53) AM_MIRROR(0xff00) AM_READWRITE(ctc_r, ctc_w)
+	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_READWRITE(strobe_r, strobe_w)
 ADDRESS_MAP_END
 
 // ABC 55/77 keyboard
@@ -650,16 +650,16 @@ static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
-/*	AM_RANGE(0x00, 0x02) AM_READ(in_r)
-	AM_RANGE(0x00, 0x05) AM_WRITE(out_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(io_reset_r, hrc_w)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x31, 0x31) AM_READ(crtc_r)
-	AM_RANGE(0x32, 0x35) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x38, 0x39) AM_WRITE(crtc_w)
-	AM_RANGE(0x60, 0x63) AM_READWRITE(ctc_r, ctc_w)
-	AM_RANGE(0x80, 0xff) AM_READWRITE(strobe_r, strobe_w)*/
+	AM_RANGE(0x00, 0x02) AM_MIRROR(0xff00) AM_READ(in_r)
+	AM_RANGE(0x00, 0x05) AM_MIRROR(0xff00) AM_WRITE(out_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(io_reset_r, hrc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_READ(crtc_r)
+	AM_RANGE(0x32, 0x35) AM_MIRROR(0xff00) AM_READWRITE(sio2_r, sio2_w)
+	AM_RANGE(0x38, 0x39) AM_MIRROR(0xff00) AM_WRITE(crtc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff00) AM_READWRITE(ctc_r, ctc_w)
+	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_READWRITE(strobe_r, strobe_w)
 ADDRESS_MAP_END
 
 // ABC 806
@@ -671,19 +671,19 @@ static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
-/*	AM_RANGE(0x00, 0x02) AM_READ(in_r)
-	AM_RANGE(0x00, 0x05) AM_WRITE(out_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(io_reset_r, hrc_w)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(dart_r, dart_w)
-	AM_RANGE(0x31, 0x31) AM_READ(crtc_r)
-	AM_RANGE(0x34, 0x34) AM_READWRITE(bankswitch_r, bankswitch_w)
-	AM_RANGE(0x35, 0x35) AM_READWRITE(attribute_r, attribute_w)
-	AM_RANGE(0x37, 0x37) AM_READWRITE(sync_r, fgctlprom_w)
-	AM_RANGE(0x38, 0x39) AM_WRITE(crtc_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(sio2_r, sio2_w)
-	AM_RANGE(0x60, 0x63) AM_READWRITE(ctc_r, ctc_w)
-	AM_RANGE(0x80, 0xff) AM_READWRITE(strobe_r, strobe_w)*/
+	AM_RANGE(0x00, 0x02) AM_MIRROR(0xff00) AM_READ(in_r)
+	AM_RANGE(0x00, 0x05) AM_MIRROR(0xff00) AM_WRITE(out_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(io_reset_r, hrc_w)
+	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) AM_READWRITE(dart_r, dart_w)
+	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff00) AM_READ(crtc_r)
+	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(bankswitch_r, bankswitch_w)
+	AM_RANGE(0x35, 0x35) AM_MIRROR(0xff00) AM_READWRITE(attribute_r, attribute_w)
+	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_READWRITE(sync_r, fgctlprom_w)
+	AM_RANGE(0x38, 0x39) AM_MIRROR(0xff00) AM_WRITE(crtc_w)
+	AM_RANGE(0x40, 0x41) AM_MIRROR(0xff00) AM_READWRITE(sio2_r, sio2_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff00) AM_READWRITE(ctc_r, ctc_w)
+	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_READWRITE(strobe_r, strobe_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
