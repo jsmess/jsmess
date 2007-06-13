@@ -60,17 +60,19 @@ static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
 
 
-// try to detect 2600 controller setup. returns UINT16 with left/right controller info
-// packed into each byte
-static unsigned int detect_2600controllers(void)
+// try to detect 2600 controller setup. returns 32bits with left/right controller info
+
+static unsigned long detect_2600controllers(void)
 {
-#define JOYS 0x01
-#define PADD 0x02
-#define KEYP 0x04
-#define LGUN 0x08
-#define INDY 0x10
-#define BOOS 0x20
-// todo kidvid, compumate
+#define JOYS 0x001
+#define PADD 0x002
+#define KEYP 0x004
+#define LGUN 0x008
+#define INDY 0x010
+#define BOOS 0x020
+#define KVID 0x040
+#define CMTE 0x080
+#define MLNK 0x100
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
@@ -85,12 +87,18 @@ static unsigned int detect_2600controllers(void)
 									{ 0xdd, 0x8d, 0x80, 0x02, 4},
 									{ 0x85, 0x8e, 0x81, 0x02, 4},
 									{ 0x8d, 0x81, 0x02, 0xe6, 4},
-									{ 0xff, 0x8d, 0x81, 0x02, 4}};
+									{ 0xff, 0x8d, 0x81, 0x02, 4},
+									{ 0xa9, 0x03, 0x8d, 0x81, 5},
+									{ 0xa9, 0x73, 0x8d, 0x80, 6},
+									{ 0x82, 0x02, 0x85, 0x8f, 7}, // Mind Maze
+									{ 0xa9, 0x30, 0x8d, 0x80, 7}, // BionicB
+									{ 0x02, 0x8e, 0x81, 0x02, 7}, // Telepathy
+									{ 0xa6, 0xef, 0xb5, 0x38, 8}}; // Warlords.. paddles ONLY
 	// start with this.. if anyone finds a game that does NOT work with both controllers enabled
 	// it can be fixed here with a new signature (note that the Coleco Gemini has this setup also)
 	left = JOYS+PADD; right = JOYS+PADD;
 	// default for bad dumps and roms too large to have special controllers
-	if ((cart_size > 0x4000) || (cart_size & 0x7ff)) return (left << 8) + right;
+	if ((cart_size > 0x4000) || (cart_size & 0x7ff)) return (left << 16) + right;
 
 	for (i = 0; i < cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 	{
@@ -99,16 +107,20 @@ static unsigned int detect_2600controllers(void)
 			if (!memcmp(&CART[i], &signatures[j],sizeof signatures[0] - 1))
 			{
 				int k = signatures[j][4];
-				if (k == 0) return (JOYS << 8) + KEYP;
-				if (k == 1) return (LGUN << 8);
-				if (k == 2) return (INDY << 8) + INDY;
-				if (k == 3) return (BOOS << 8) + BOOS;
+				if (k == 0) return (JOYS << 16) + KEYP;
+				if (k == 1) return (LGUN << 16);
+				if (k == 2) return (INDY << 16) + INDY;
+				if (k == 3) return (BOOS << 16) + BOOS;
+				if (k == 5) return (JOYS << 16) + KVID;
+				if (k == 6) return (CMTE << 16) + CMTE;
+				if (k == 7) return (MLNK << 16) + MLNK;
+				if (k == 8) return (PADD << 16) + PADD;
 				if (k == 4) foundkeypad = 1;
 			}
 		}
 	}
-	if (foundkeypad) return (KEYP << 8) + KEYP;
-	return (left << 8) + right;
+	if (foundkeypad) return (KEYP << 16) + KEYP;
+	return (left << 16) + right;
 }
 
 static int detect_modeDC(void)
@@ -965,8 +977,8 @@ static MACHINE_START( a2600 )
 
 	int mode = 0xFF;
 	int chip = 0xFF;
-	unsigned int controltemp;
-	unsigned char controlleft,controlright;
+	unsigned long controltemp;
+	unsigned int controlleft,controlright;
 
 	extra_RAM = new_memory_region( machine, REGION_USER2, 0x8600, ROM_REQUIRED );
 
@@ -981,9 +993,9 @@ static MACHINE_START( a2600 )
 	/* auto-detect special controllers */
 
 	controltemp = detect_2600controllers();
-	controlleft = controltemp >> 8;
-	controlright = controltemp & 0xff;
-	//printf("CT %04x\nleft: $%02x\nright: $%02x\n",controltemp,controlleft,controlright);
+	controlleft = controltemp >> 16;
+	controlright = controltemp & 0xffff;
+	printf("CT %08lx\nleft: $%04x\nright: $%04x\n",controltemp,controlleft,controlright);
 	// todo setup all the PORT_ stuff here
 
 	/* auto-detect bank mode */
