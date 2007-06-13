@@ -2,7 +2,6 @@
 
 	TODO:
 	
-	- quickload
 	- pcb layout guru-style readme
 	- tape interface
 	- discrete sound from NE555

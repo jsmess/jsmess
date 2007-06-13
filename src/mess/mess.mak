@@ -80,7 +80,7 @@ CPUS += V20
 #CPUS += V33
 #CPUS += V60
 #CPUS += V70
-#CPUS += I8035
+CPUS += I8035
 CPUS += I8039
 CPUS += I8048
 #CPUS += N7751
@@ -1087,6 +1087,7 @@ $(MESSOBJ)/tx0.a:				\
 
 $(MESSOBJ)/luxor.a:					\
 	$(MESS_DRIVERS)/abc80.o	\
+	$(MESS_DRIVERS)/abc80x.o	\
 
 $(MESSOBJ)/sgi.a:						\
 	$(MESS_MACHINE)/sgi.o		\
