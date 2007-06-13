@@ -55,11 +55,14 @@
 
 	TODO:
 
+	- add rest of the DOS roms
 	- hook up 1.5MHZ to CTC triggers 0-2
 	- use MAME CRTC6845 implementation
 	- connect CTC to DART/SIO
-	- port mirroring
+	- proper port mirroring
 	- COM port DIP switch
+	- HR graphics board
+	- floppy controller board
 
 */
 
@@ -67,6 +70,7 @@
 #include "video/generic.h"
 #include "video/crtc6845.h"
 #include "includes/centroni.h"
+#include "includes/serial.h"
 #include "devices/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
@@ -153,7 +157,9 @@ VIDEO_UPDATE( abc800 )
 
 /* Read/Write Handlers */
 
-// ABC bus
+// ABC Bus
+
+static int abcbus_strobe;
 
 static READ8_HANDLER( abcbus_data_r )
 {
@@ -164,18 +170,36 @@ static WRITE8_HANDLER( abcbus_data_w )
 {
 }
 
+static READ8_HANDLER( abcbus_status_r )
+{
+	return 0xff;
+}
+
+static WRITE8_HANDLER( abcbus_select_w )
+{
+}
+
+static WRITE8_HANDLER( abcbus_command_w )
+{
+}
+
 static READ8_HANDLER( abcbus_reset_r )
 {
+	abcbus_strobe = CLEAR_LINE;
+
 	return 0xff;
 }
 
 static READ8_HANDLER( abcbus_strobe_r )
 {
+	abcbus_strobe = ASSERT_LINE;
+
 	return 0xff;
 }
 
 static WRITE8_HANDLER( abcbus_strobe_w )
 {
+	abcbus_strobe = ASSERT_LINE;
 }
 
 // HR
@@ -261,17 +285,6 @@ static WRITE8_HANDLER( sio2_w )
 
 // DART
 
-/*
-typedef struct
-{
-	UINT8 latch;
-	UINT8 wreg[8];
-	UINT8 rreg[3];	
-} typDART;
-
-static typDART abc80_dart[2];
-*/
-
 static READ8_HANDLER( dart_r )
 {
 	switch (offset)
@@ -283,7 +296,7 @@ static READ8_HANDLER( dart_r )
 		break;
 	}
 
-	return 0;
+	return 0xff;
 }
 
 static WRITE8_HANDLER( dart_w )
@@ -303,16 +316,16 @@ static WRITE8_HANDLER( dart_w )
 
 // ABC55/77 keyboard
 
-static READ8_HANDLER( abc77_keyboard_r )
+static READ8_HANDLER( abc77_data_r )
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( abc77_keyboard_w )
+static WRITE8_HANDLER( abc77_data_w )
 {
 }
 
-static WRITE8_HANDLER( abc77_keyboard_status_w )
+static WRITE8_HANDLER( abc77_status_w )
 {
 }
 
@@ -324,12 +337,14 @@ static ADDRESS_MAP_START( abc800_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8000, 0xffff) AM_RAM	// Work RAM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x02) AM_MIRROR(0xff00) AM_READ(abcbus_data_r)
-	AM_RANGE(0x00, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_data_w)
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_select_w)
+	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) AM_READWRITE(dart_r, dart_w)
@@ -343,35 +358,31 @@ static ADDRESS_MAP_START( abc800_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0xff) AM_MIRROR(0xff00) AM_READWRITE(abcbus_strobe_r, abcbus_strobe_w)
 ADDRESS_MAP_END
 
-// ABC 55/77 keyboard
+// ABC 77 keyboard
 
 static ADDRESS_MAP_START( abc77_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc77_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_WRITE(abc77_keyboard_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(abc77_keyboard_r, abc77_keyboard_status_w)
-ADDRESS_MAP_END
-
-// HR high resolution graphics card
-
-static ADDRESS_MAP_START( hr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x00, 0x00) AM_WRITE(abc77_data_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(abc77_data_r, abc77_status_w)
 ADDRESS_MAP_END
 
 // ABC 802
 
 static ADDRESS_MAP_START( abc802_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x02) AM_MIRROR(0xff00) AM_READ(abcbus_data_r)
-	AM_RANGE(0x00, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_data_w)
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_select_w)
+	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) AM_READWRITE(dart_r, dart_w)
@@ -386,14 +397,17 @@ ADDRESS_MAP_END
 // ABC 806
 
 static ADDRESS_MAP_START( abc806_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_WRITE(abc800_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x02) AM_MIRROR(0xff00) AM_READ(abcbus_data_r)
-	AM_RANGE(0x00, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_data_w)
+	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_select_w)
+	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_command_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READWRITE(abcbus_reset_r, hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) AM_READWRITE(dart_r, dart_w)
@@ -593,7 +607,7 @@ static gfx_decode gfxdecodeinfo_abc802[] =
 
 static void abc800_ctc_interrupt(int state)
 {
-	cpunum_set_input_line(1, 0, state);
+	cpunum_set_input_line(0, 0, state);
 }
 
 static z80ctc_interface abc800_ctc_intf =
@@ -699,53 +713,6 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_CPU_IO_MAP(abc806_io_map, 0)
 MACHINE_DRIVER_END
 
-/* Devices */
-
-DEVICE_LOAD( abc800_floppy )
-{
-	int size, tracks, heads, sectors;
-
-	if (image_has_been_created(image))
-		return INIT_FAIL;
-
-	size = image_length (image);
-	switch (size)
-	{
-	case 80*1024: /* Scandia Metric FD2 */
-		tracks = 40;
-		heads = 1;
-		sectors = 8;
-		break;
-	case 160*1024: /* ABC 830 */
-		tracks = 40;
-		heads = 1;
-		sectors = 16;
-		break;
-	case 640*1024: /* ABC 832/834 */
-		tracks = 80;
-		heads = 2;
-		sectors = 16;
-		break;
-	case 1001*1024: /* ABC 838 */
-		tracks = 77;
-		heads = 2;
-		sectors = 26;
-		break;
-	default:
-		return INIT_FAIL;
-	}
-
-	if (device_load_basicdsk_floppy(image)==INIT_PASS)
-	{
-		/* sector id's 0-9 */
-		/* drive, tracks, heads, sectors per track, sector length, dir_sector, dir_length, first sector id */
-		basicdsk_set_geometry(image, tracks, heads, sectors, 256, 0, 0, FALSE);
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
 /* ROMs */
 
 /*
@@ -801,19 +768,33 @@ ROM_START( abc800m )
 	ROM_LOAD( "vum-se.7c",  0x0000, 0x0800, CRC(f9152163) SHA1(997313781ddcbbb7121dbf9eb5f2c6b4551fc799) )
 ROM_END
 
+SYSTEM_BIOS_START( abc802 )
+	SYSTEM_BIOS_ADD( 0, "v19", "DOS v.19" )
+	SYSTEM_BIOS_ADD( 1, "v20", "DOS v.20" )
+SYSTEM_BIOS_END
+
 ROM_START( abc802 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "abc02-11.9f",  0x0000, 0x2000, CRC(b86537b2) SHA1(4b7731ef801f9a03de0b5acd955f1e4a1828355d) )
-	ROM_LOAD( "abc12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
-	ROM_LOAD( "abc22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
-//	ROM_LOAD( "abc32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574) ) // v1.9
-	ROM_LOAD( "abc32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60) ) // v2.0
+	ROM_LOAD(  "abc02-11.9f",  0x0000, 0x2000, CRC(b86537b2) SHA1(4b7731ef801f9a03de0b5acd955f1e4a1828355d) )
+	ROM_LOAD(  "abc12-11.11f", 0x2000, 0x2000, CRC(3561c671) SHA1(f12a7c0fe5670ffed53c794d96eb8959c4d9f828) )
+	ROM_LOAD(  "abc22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
+	ROMX_LOAD( "abc32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574), ROM_BIOS(1) ) // v1.9
+	ROMX_LOAD( "abc32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(2) ) // v2.0
 
 	ROM_ABC77
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "abct2-11.3g",  0x0000, 0x2000, CRC(e21601ee) SHA1(2e838ebd7692e5cb9ba4e80fe2aa47ea2584133a) )
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_LOAD( "abcp2-11.2g", 0x0000, 0x0400, NO_DUMP ) // PAL16R4
 ROM_END
+
+SYSTEM_BIOS_START( abc806 )
+	SYSTEM_BIOS_ADD( 0, "v19",		"DOS v.19" )
+	SYSTEM_BIOS_ADD( 1, "v20",		"DOS v.20" )
+	SYSTEM_BIOS_ADD( 2, "catnet",	"CAT-NET" )
+SYSTEM_BIOS_END
 
 ROM_START( abc806 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -823,36 +804,173 @@ ROM_START( abc806 )
 	ROM_LOAD( "abc36-11.1j",  0x3000, 0x1000, CRC(b50e418e) SHA1(991a59ed7796bdcfed310012b2bec50f0b8df01c) )
 	ROM_LOAD( "abc46-11.2m",  0x4000, 0x1000, CRC(17a87c7d) SHA1(49a7c33623642b49dea3d7397af5a8b9dde8185b) )
 	ROM_LOAD( "abc56-11.2l",  0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
-//	ROM_LOAD( "abc66-21.2k",  0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485) )
-	ROM_LOAD( "abc66-31.2k",  0x6000, 0x1000, CRC(a2e38260) SHA1(0dad83088222cb076648e23f50fec2fddc968883) )
-//	ROM_LOAD( "cmd8_5.2k",	  0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839) ) // CATNET
-	ROM_LOAD( "abc76-11.2j",  0x7000, 0x1000, CRC(3eb5f6a1) SHA1(02d4e38009c71b84952eb3b8432ad32a98a7fe16) )
+	ROMX_LOAD( "abc66-21.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(1) ) // v.19
+	ROMX_LOAD( "abc66-31.2k", 0x6000, 0x1000, CRC(a2e38260) SHA1(0dad83088222cb076648e23f50fec2fddc968883), ROM_BIOS(2) ) // v.20
+	ROMX_LOAD( "cmd8_5.2k",	  0x6000, 0x1000, CRC(25430ef7) SHA1(03a36874c23c215a19b0be14ad2f6b3b5fb2c839), ROM_BIOS(3) ) // CATNET
+	ROM_LOAD( "abc76-11.2j",  0x7000, 0x1000, CRC(3eb5f6a1) SHA1(02d4e38009c71b84952eb3b8432ad32a98a7fe16) ) // 6490238-02
 
 	ROM_ABC77
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "abct061.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) )
+	ROM_LOAD( "6490243-01.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) )
 ROM_END
 
 /* System Configuration */
 
+static void abc800_cassette_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* cassette */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		default:										cassette_device_getinfo(devclass, state, info); break;
+	}
+}
+
+DEVICE_LOAD( abc800_floppy )
+{
+	int size, tracks, heads, sectors;
+
+	if (image_has_been_created(image))
+		return INIT_FAIL;
+
+	size = image_length (image);
+	switch (size)
+	{
+	case 80*1024: /* Scandia Metric FD2 */
+		tracks = 40;
+		heads = 1;
+		sectors = 8;
+		break;
+	case 160*1024: /* ABC 830 */
+		tracks = 40;
+		heads = 1;
+		sectors = 16;
+		break;
+	case 640*1024: /* ABC 832/834 */
+		tracks = 80;
+		heads = 2;
+		sectors = 16;
+		break;
+	case 1001*1024: /* ABC 838 */
+		tracks = 77;
+		heads = 2;
+		sectors = 26;
+		break;
+	default:
+		return INIT_FAIL;
+	}
+
+	if (device_load_basicdsk_floppy(image)==INIT_PASS)
+	{
+		/* sector id's 0-9 */
+		/* drive, tracks, heads, sectors per track, sector length, dir_sector, dir_length, first sector id */
+		basicdsk_set_geometry(image, tracks, heads, sectors, 256, 0, 0, FALSE);
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+static void abc800_floppy_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* floppy */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 2; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_LOAD:							info->load = device_load_basicdsk_floppy; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "dsk"); break;
+
+		default:										legacybasicdsk_device_getinfo(devclass, state, info); break;
+	}
+}
+
+static void abc800_printer_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* printer */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		default:										printer_device_getinfo(devclass, state, info); break;
+	}
+}
+
+DEVICE_LOAD( abc800_serial )
+{
+	/* filename specified */
+	if (serial_device_load(image)==INIT_PASS)
+	{
+		/* setup transmit parameters */
+		serial_device_setup(image, 9600 >> readinputportbytag("BAUD"), 8, 1, SERIAL_PARITY_NONE);
+
+		serial_device_set_protocol(image, SERIAL_PROTOCOL_NONE);
+
+		/* and start transmit */
+		serial_device_set_transmit_state(image, 1);
+
+		return INIT_PASS;
+	}
+
+	return INIT_FAIL;
+}
+
+static void abc800_serial_getinfo(const device_class *devclass, UINT32 state, union devinfo *info)
+{
+	/* serial */
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TYPE:							info->i = IO_SERIAL; break;
+		case DEVINFO_INT_COUNT:							info->i = 1; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_PTR_INIT:							info->init = serial_device_init; break;
+		case DEVINFO_PTR_LOAD:							info->load = device_load_abc800_serial; break;
+		case DEVINFO_PTR_UNLOAD:						info->unload = serial_device_unload; break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "txt"); break;
+	}
+}
+
 SYSTEM_CONFIG_START( abc800 )
-	CONFIG_RAM_DEFAULT	( 16 * 1024)
+	CONFIG_RAM_DEFAULT(16 * 1024)
+	CONFIG_RAM		  (32 * 1024)
+	CONFIG_DEVICE(abc800_cassette_getinfo)
+	CONFIG_DEVICE(abc800_printer_getinfo)
+	CONFIG_DEVICE(abc800_floppy_getinfo)
+	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( abc802 )
-	CONFIG_RAM_DEFAULT	( 32 * 1024)
+	CONFIG_RAM_DEFAULT(32 * 1024)
+	CONFIG_DEVICE(abc800_cassette_getinfo)
+	CONFIG_DEVICE(abc800_printer_getinfo)
+	CONFIG_DEVICE(abc800_floppy_getinfo)
+	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 SYSTEM_CONFIG_START( abc806 )
-	CONFIG_RAM_DEFAULT	(160 * 1024)
-	CONFIG_RAM		(544 * 1024)
+	CONFIG_RAM_DEFAULT(32 * 1024)
+	CONFIG_DEVICE(abc800_cassette_getinfo)
+	CONFIG_DEVICE(abc800_printer_getinfo)
+	CONFIG_DEVICE(abc800_floppy_getinfo)
+	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
 /* System Drivers */
 
-/*    YEAR	NAME  PARENT  COMPAT MACHINE  INPUT	INIT CONFIG	 COMPANY             FULLNAME */
-COMP( 1981, abc800c, 0,       0, abc800c, abc800, 0, abc800, "Luxor Datorer AB", "ABC 800C/HR", GAME_NOT_WORKING )
-COMP( 1981, abc800m, abc800c, 0, abc800m, abc800, 0, abc800, "Luxor Datorer AB", "ABC 800M/HR", GAME_NOT_WORKING )
-COMP( 1983, abc802,  0,       0, abc802,  abc802, 0, abc802, "Luxor Datorer AB", "ABC 802", GAME_NOT_WORKING )
-COMP( 1983, abc806,  0,       0, abc806,  abc806, 0, abc806, "Luxor Datorer AB", "ABC 806", GAME_NOT_WORKING )
+//	   YEAR  NAME		PARENT		BIOS	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY			FULLNAME
+COMP ( 1981, abc800c,	0,					0,		abc800c,	abc800,		0,		abc800,		"Luxor Datorer AB", "ABC 800C", GAME_NOT_WORKING )
+COMP ( 1981, abc800m,	abc800c,			0,		abc800m,	abc800,		0,		abc800,		"Luxor Datorer AB", "ABC 800M", GAME_NOT_WORKING )
+COMPB( 1983, abc802,	0,			abc802,	0,		abc802,		abc802,		0,		abc802,		"Luxor Datorer AB", "ABC 802", GAME_NOT_WORKING )
+COMPB( 1983, abc806,	0,			abc806,	0,		abc806,		abc806,		0,		abc806,		"Luxor Datorer AB", "ABC 806", GAME_NOT_WORKING )
