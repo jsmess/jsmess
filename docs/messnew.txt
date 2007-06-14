@@ -65,6 +65,8 @@ System Driver Changes:
 
 - [VIP] Fixed the RUN/RESET switch to work like the original. [Curt Coder]
 
+- [ABC80] Fixed the keyboard, although scanning is very slow. [Curt Coder]
+
 
 
 User Interface Changes:
