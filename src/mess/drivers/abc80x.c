@@ -967,10 +967,28 @@ SYSTEM_CONFIG_START( abc806 )
 	CONFIG_DEVICE(abc800_serial_getinfo)
 SYSTEM_CONFIG_END
 
+/* Driver Initialization */
+
+static offs_t abc800_opbase_handler(offs_t pc)
+{
+	if (pc >= 0x7800 && pc < 0x8000)
+	{
+		opcode_base = opcode_arg_base = memory_region(REGION_CPU1);
+		return ~0;
+	}
+
+	return pc;
+}
+
+static DRIVER_INIT( abc800 )
+{
+	memory_set_opbase_handler(0, abc800_opbase_handler);
+}
+
 /* System Drivers */
 
 //	   YEAR  NAME		PARENT		BIOS	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY			FULLNAME
-COMP ( 1981, abc800c,	0,					0,		abc800c,	abc800,		0,		abc800,		"Luxor Datorer AB", "ABC 800C", GAME_NOT_WORKING )
-COMP ( 1981, abc800m,	abc800c,			0,		abc800m,	abc800,		0,		abc800,		"Luxor Datorer AB", "ABC 800M", GAME_NOT_WORKING )
-COMPB( 1983, abc802,	0,			abc802,	0,		abc802,		abc802,		0,		abc802,		"Luxor Datorer AB", "ABC 802", GAME_NOT_WORKING )
-COMPB( 1983, abc806,	0,			abc806,	0,		abc806,		abc806,		0,		abc806,		"Luxor Datorer AB", "ABC 806", GAME_NOT_WORKING )
+COMP ( 1981, abc800c,	0,					0,		abc800c,	abc800,		abc800,	abc800,		"Luxor Datorer AB", "ABC 800C", GAME_NOT_WORKING )
+COMP ( 1981, abc800m,	abc800c,			0,		abc800m,	abc800,		abc800,	abc800,		"Luxor Datorer AB", "ABC 800M", GAME_NOT_WORKING )
+COMPB( 1983, abc802,	0,			abc802,	0,		abc802,		abc802,		abc800,	abc802,		"Luxor Datorer AB", "ABC 802", GAME_NOT_WORKING )
+COMPB( 1983, abc806,	0,			abc806,	0,		abc806,		abc806,		abc800,	abc806,		"Luxor Datorer AB", "ABC 806", GAME_NOT_WORKING )
