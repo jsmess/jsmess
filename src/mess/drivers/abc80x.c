@@ -56,6 +56,7 @@
 	TODO:
 
 	- add rest of the DOS roms
+	- keyboard
 	- hook up 1.5MHZ to CTC triggers 0-2
 	- use MAME CRTC6845 implementation
 	- connect CTC to DART/SIO
@@ -77,6 +78,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
+#include "machine/z80dart.h"
 
 #define X01 12000000.0
 
@@ -290,10 +292,13 @@ static READ8_HANDLER( dart_r )
 	switch (offset)
 	{
 	case 0:
+		return z80dart_d_r(0, 0);
 	case 1:
+		return z80dart_c_r(0, 0);
 	case 2:
+		return z80dart_d_r(0, 1);
 	case 3:
-		break;
+		return z80dart_c_r(0, 1);
 	}
 
 	return 0xff;
@@ -304,12 +309,16 @@ static WRITE8_HANDLER( dart_w )
 	switch (offset)
 	{
 	case 0:
+		z80dart_d_w(0, 0, data);
 		break;
 	case 1:
+		z80dart_c_w(0, 0, data);
 		break;
 	case 2:
+		z80dart_d_w(0, 1, data);
 		break;
 	case 3:
+		z80dart_c_w(0, 1, data);
 		break;
 	}
 }
@@ -605,54 +614,74 @@ static gfx_decode gfxdecodeinfo_abc802[] =
 
 /* Machine Initialization */
 
-static void abc800_ctc_interrupt(int state)
+static void ctc_interrupt(int state)
 {
 	cpunum_set_input_line(0, 0, state);
 }
 
 static z80ctc_interface abc800_ctc_intf =
 {
-	X01/2/2,            /* clock */
-	0,              	/* timer disables */
-	abc800_ctc_interrupt,  	/* interrupt handler */
-	0,					/* ZC/TO0 callback */
-	0,              	/* ZC/TO1 callback */
-	0               	/* ZC/TO2 callback */
+	X01/2/2,				/* clock */
+	0,              		/* timer disables */
+	ctc_interrupt,  		/* interrupt handler */
+	0,						/* ZC/TO0 callback */
+	0,              		/* ZC/TO1 callback */
+	0               		/* ZC/TO2 callback */
 };
 
-WRITE8_HANDLER( serial_transmit )
+WRITE8_HANDLER( sio_serial_transmit )
 {
 }
 
-static int serial_receive(int ch)
+static int sio_serial_receive(int ch)
 {
 	return -1;
 }
 
 static z80sio_interface abc800_sio_intf =
 {
-	X01/2/2,            /* clock */
-	0,					/* interrupt handler */
-	0,					/* DTR changed handler */
-	0,					/* RTS changed handler */
-	0,					/* BREAK changed handler */
-	serial_transmit,	/* transmit handler */
-	serial_receive		/* receive handler */
+	X01/2/2,				/* clock */
+	0,						/* interrupt handler */
+	0,						/* DTR changed handler */
+	0,						/* RTS changed handler */
+	0,						/* BREAK changed handler */
+	sio_serial_transmit,	/* transmit handler */
+	sio_serial_receive		/* receive handler */
+};
+
+WRITE8_HANDLER( dart_serial_transmit )
+{
+}
+
+static int dart_serial_receive(int ch)
+{
+	return -1;
+}
+
+static z80dart_interface abc800_dart_intf =
+{
+	X01/2/2,				/* clock */
+	0,						/* interrupt handler */
+	0,						/* DTR changed handler */
+	0,						/* RTS changed handler */
+	0,						/* BREAK changed handler */
+	dart_serial_transmit,	/* transmit handler */
+	dart_serial_receive		/* receive handler */
 };
 
 struct z80_irq_daisy_chain abc800_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
 	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 },
-	// insert DART here
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ z80dart_reset, z80dart_irq_state, z80dart_irq_ack, z80dart_irq_reti, 0 },
+	{ 0, 0, 0, 0, -1 }
 };
 
 static MACHINE_START( abc800 )
 {
 	z80ctc_init(0, &abc800_ctc_intf); // CLK/TRG 0-2 are connected to a 1.5MHz signal, how to map this?
 	z80sio_init(0, &abc800_sio_intf);
-	//z80dart_init(0, &abc800_dart_intf);
+	z80dart_init(0, &abc800_dart_intf);
 }
 
 /* Machine Drivers */

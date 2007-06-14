@@ -475,7 +475,8 @@ $(MESSOBJ)/shared.a: \
 	$(MAME_MACHINE)/6526cia.o	\
 	$(MESS_FORMATS)/coco_cas.o	\
 	$(MESS_FORMATS)/coco_dsk.o	\
-	$(MESS_MACHINE)/mm58274c.o
+	$(MESS_MACHINE)/mm58274c.o \
+	$(MESS_MACHINE)/z80dart.o
 
 
 
