@@ -59,7 +59,6 @@ static unsigned modeSS_write_pending;
 static unsigned modeSS_high_ram_enabled;
 static unsigned modeSS_diff_adjust;
 
-
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
 
 static unsigned long detect_2600controllers(void)
@@ -73,6 +72,9 @@ static unsigned long detect_2600controllers(void)
 #define KVID 0x040
 #define CMTE 0x080
 #define MLNK 0x100
+#define AMSE 0x200
+#define CX22 0x400
+#define CX80 0x800
 
 	unsigned int left,right;
 	int i,j,foundkeypad = 0;
@@ -81,7 +83,9 @@ static unsigned long detect_2600controllers(void)
 									{ 0xf9, 0xff, 0xa5, 0x80, 1}, // sentinel
 									{ 0x81, 0x02, 0xe8, 0x86, 1}, // shooting arcade
 									{ 0x02, 0xa9, 0xec, 0x8d, 1}, // guntest4 tester
-									{ 0x85, 0x2c, 0x85, 0xa7, 2}, // indy 500
+									{ 0x85, 0x2c, 0x85, 0xa7, 2}, // INDY 500
+									{ 0xa1, 0x8d, 0x9d, 0x02, 2}, // omega race INDY
+									{ 0x65, 0x72, 0x44, 0x43, 2}, // Sprintmaster INDY
 									{ 0x89, 0x8a, 0x99, 0xaa, 3}, // omega race
 									{ 0x9a, 0x8e, 0x81, 0x02, 4},
 									{ 0xdd, 0x8d, 0x80, 0x02, 4},
@@ -90,9 +94,13 @@ static unsigned long detect_2600controllers(void)
 									{ 0xff, 0x8d, 0x81, 0x02, 4},
 									{ 0xa9, 0x03, 0x8d, 0x81, 5},
 									{ 0xa9, 0x73, 0x8d, 0x80, 6},
-									{ 0x82, 0x02, 0x85, 0x8f, 7}, // Mind Maze
-									{ 0xa9, 0x30, 0x8d, 0x80, 7}, // BionicB
+//									{ 0x82, 0x02, 0x85, 0x8f, 7}, // Mind Maze (really Mind Link??)
+									{ 0xa9, 0x30, 0x8d, 0x80, 7}, // Bionic Breakthrough
 									{ 0x02, 0x8e, 0x81, 0x02, 7}, // Telepathy
+									{ 0x41, 0x6d, 0x69, 0x67, 9}, // Missile Command Amiga Mouse
+									{ 0x43, 0x58, 0x2d, 0x32, 10}, // Missile Command CX22 TrackBall
+									{ 0x43, 0x58, 0x2d, 0x38, 11}, // Missile Command CX80 TrackBall
+									{ 0x4e, 0xa8, 0xa4, 0xa2, 12}, // Omega Race for Joystick ONLY
 									{ 0xa6, 0xef, 0xb5, 0x38, 8}}; // Warlords.. paddles ONLY
 	// start with this.. if anyone finds a game that does NOT work with both controllers enabled
 	// it can be fixed here with a new signature (note that the Coleco Gemini has this setup also)
@@ -115,6 +123,10 @@ static unsigned long detect_2600controllers(void)
 				if (k == 6) return (CMTE << 16) + CMTE;
 				if (k == 7) return (MLNK << 16) + MLNK;
 				if (k == 8) return (PADD << 16) + PADD;
+				if (k == 9) return (AMSE << 16) + AMSE;
+				if (k == 10) return (CX22 << 16) + CX22;
+				if (k == 11) return (CX80 << 16) + CX80;
+				if (k == 12) return (JOYS << 16) + JOYS;
 				if (k == 4) foundkeypad = 1;
 			}
 		}
@@ -587,6 +599,7 @@ static READ8_HANDLER(modeSS_r)
 		} else if ( offset == 0xFF9 ) {
 			/* Cassette port read */
 			double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
+printf("%04X: Cassette port read, tap_val = %f\n", activecpu_get_pc(), tap_val);
 			//logerror("%04X: Cassette port read, tap_val = %f\n", activecpu_get_pc(), tap_val);
 			if ( tap_val < 0 ) {
 				data = 0x00;
@@ -995,7 +1008,7 @@ static MACHINE_START( a2600 )
 	controltemp = detect_2600controllers();
 	controlleft = controltemp >> 16;
 	controlright = controltemp & 0xffff;
-	printf("CT %08lx\nleft: $%04x\nright: $%04x\n",controltemp,controlleft,controlright);
+	// printf("CT %08lx\nleft: $%04x\nright: $%04x\n",controltemp,controlleft,controlright);
 	// todo setup all the PORT_ stuff here
 
 	/* auto-detect bank mode */
