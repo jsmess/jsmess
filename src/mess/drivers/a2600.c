@@ -599,7 +599,6 @@ static READ8_HANDLER(modeSS_r)
 		} else if ( offset == 0xFF9 ) {
 			/* Cassette port read */
 			double tap_val = cassette_input( image_from_devtype_and_index( IO_CASSETTE, 0 ) );
-printf("%04X: Cassette port read, tap_val = %f\n", activecpu_get_pc(), tap_val);
 			//logerror("%04X: Cassette port read, tap_val = %f\n", activecpu_get_pc(), tap_val);
 			if ( tap_val < 0 ) {
 				data = 0x00;
@@ -1008,7 +1007,6 @@ static MACHINE_START( a2600 )
 	controltemp = detect_2600controllers();
 	controlleft = controltemp >> 16;
 	controlright = controltemp & 0xffff;
-	// printf("CT %08lx\nleft: $%04x\nright: $%04x\n",controltemp,controlleft,controlright);
 	// todo setup all the PORT_ stuff here
 
 	/* auto-detect bank mode */
