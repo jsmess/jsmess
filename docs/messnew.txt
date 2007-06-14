@@ -11,6 +11,7 @@ New System Drivers Supported (in no particular order):
 - Texas Instruments TI-83 (not working) [Curt Coder]
 - Texas Instruments TI-83 Plus (not working) [Curt Coder]
 - VTech CreatiVision [Curt Coder]
+- Samsung Gam*Boy II [Wilbert Pol]
 
 
 
