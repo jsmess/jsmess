@@ -55,7 +55,6 @@
 
 	TODO:
 
-	- add rest of the DOS roms
 	- keyboard
 	- hook up 1.5MHZ to CTC triggers 0-2
 	- use MAME CRTC6845 implementation
@@ -64,10 +63,13 @@
 	- COM port DIP switch
 	- HR graphics board
 	- floppy controller board
+	- Facit DTC
+	- hard disks (ABC-850 10MB, ABC-852 20MB, ABC-856 60MB)
 
 */
 
 #include "driver.h"
+#include "inputx.h"
 #include "video/generic.h"
 #include "video/crtc6845.h"
 #include "includes/centroni.h"
@@ -669,7 +671,7 @@ static z80dart_interface abc800_dart_intf =
 	dart_serial_receive		/* receive handler */
 };
 
-struct z80_irq_daisy_chain abc800_daisy_chain[] =
+static struct z80_irq_daisy_chain abc800_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
 	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 },
@@ -845,7 +847,7 @@ ROM_START( abc806 )
 	ROM_ABC77
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "6490243-01.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) )
+	ROM_LOAD( "abct6-11.7c",   0x0000, 0x1000, CRC(b17c51c5) SHA1(e466e80ec989fbd522c89a67d274b8f0bed1ff72) ) // 6490243-01
 ROM_END
 
 /* System Configuration */
