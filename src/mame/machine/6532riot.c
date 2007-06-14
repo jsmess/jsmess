@@ -2,6 +2,13 @@
 
   RIOT 6532 emulation
 
+The timer seems to follow these rules:
+- When the timer flag changes from 0 to 1 the timer continues to count
+  down at a 1 cycle rate.
+- When the timer is being read or written the timer flag is reset.
+- When the timer flag is set and the timer contents are 0, the counting
+  stops.
+
 TODO:
 - irq callback for timer overflow
 
@@ -165,9 +172,19 @@ static UINT8 r6532_read_timer(int n, int enable)
 		if (count != -1)
 		{
 			r6532[n]->cleared = 1;
+			if (r6532[n]->intf.irq_func != NULL)
+			{
+				(*r6532[n]->intf.irq_func)(CLEAR_LINE);
+			}
 		}
 
-		return ( count > -256 ) ? count & 0xFF : 0;
+		/* Timer flag is cleared, so adjust the target */
+		count = ( count > -256 ) ? count & 0xFF : 0;
+		r6532[n]->target = activecpu_gettotalcycles() + ( count << r6532[n]->shift );
+		if (r6532[n]->intf.irq_func != NULL)
+		{
+		}
+		return count;
 	}
 }
 
@@ -200,17 +217,25 @@ static UINT8 r6532_read_irq_flags(int n)
 	int count = r6532[n]->target - activecpu_gettotalcycles();
 	int res = 0;
 
-	if (count < 0 && !r6532[n]->cleared)
-		res |= 0x80;
+	if ( !r6532[n]->cleared )
+	{
+		if ( count < 0 )
+			res |= 0x80;
+		if ( count < -1 )
+		{
+			r6532[n]->cleared = 1;
+			if ( r6532[n]->intf.irq_func != NULL )
+				(*r6532[n]->intf.irq_func)(CLEAR_LINE);
+		}
+	}
 
 	if (r6532[n]->pa7_flag)
 	{
 		res |= 0x40;
 		r6532[n]->pa7_flag = 0;
 
-		if (r6532[n]->intf.irq_func != NULL)
+		if (r6532[n]->intf.irq_func != NULL && count != -1)
 		{
-			/* TODO: shouldn't clear line if timer irq pending */
 			(*r6532[n]->intf.irq_func)(CLEAR_LINE);
 		}
 	}
