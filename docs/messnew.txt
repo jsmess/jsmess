@@ -72,6 +72,8 @@ System Driver Changes:
 
 User Interface Changes:
 -----------------------
+- Fixed bug mounting files in the old UI.  (bug #1149) [Oliver Stoeneberg]
+
 - [Windows GUI] Fixed a couple of static text fields.  (bug #1073) [Oliver
   Stoeneberg]
 

@@ -572,6 +572,7 @@ static int fileselect(int selected, const char *default_selection, const char *w
 					else
 					{
 						osd_getcurdir(entered_filename, sizeof(entered_filename) / sizeof(entered_filename[0]));
+						strncatz(entered_filename, PATH_SEPARATOR, sizeof(entered_filename) / sizeof(entered_filename[0]));
 						strncatz(entered_filename, fs_item[sel].text, sizeof(entered_filename) / sizeof(entered_filename[0]));
 					}
 
