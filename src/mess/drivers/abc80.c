@@ -136,7 +136,7 @@ static WRITE8_HANDLER( abcbus_data_w )
 
 static READ8_HANDLER( abcbus_status_r )
 {
-	return 0xff;
+	return 0x00;
 }
 
 static WRITE8_HANDLER( abcbus_select_w )
@@ -216,7 +216,6 @@ static void abc80_keyboard_scan(void)
 				if (data & ibit)
 				{
 					keycode = abc80_keycodes[irow][icol];
-					popmessage("%u", keycode);
 				}
 				ibit <<= 1;
 			}			
@@ -237,7 +236,6 @@ static void abc80_keyboard_scan(void)
 	else
 	{
 		z80pio_p_w(0, 0, keylatch);
-					popmessage("%u", 0);
 	}
 }
 
@@ -294,12 +292,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(abcbus_status_r, abcbus_select_w)
-	AM_RANGE(0x02, 0x05) AM_WRITE(abcbus_command_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(abc80_sound_w)
-	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
-	AM_RANGE(0x38, 0x3b) AM_READWRITE(abc80_pio_r, abc80_pio_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(abcbus_data_r, abcbus_data_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff00) AM_READWRITE(abcbus_status_r, abcbus_select_w)
+	AM_RANGE(0x02, 0x05) AM_MIRROR(0xff00) AM_WRITE(abcbus_command_w)
+	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_WRITE(abc80_sound_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_READ(abcbus_reset_r)
+	AM_RANGE(0x38, 0x3b) AM_MIRROR(0xff00) AM_READWRITE(abc80_pio_r, abc80_pio_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -567,13 +565,21 @@ int device_load_abc80_floppy(mess_image *image)
 
 /* ROMs */
 
+SYSTEM_BIOS_START( abc80 )
+	SYSTEM_BIOS_ADD( 0, "abcdos",		"ABC-DOS" )
+	SYSTEM_BIOS_ADD( 1, "abcdosdd",		"ABC-DOS DD" )
+	SYSTEM_BIOS_ADD( 2, "udf20",		"UDF-DOS v.20" )
+SYSTEM_BIOS_END
+
 ROM_START( abc80 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "za3508.a2", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9) )
 	ROM_LOAD( "za3509.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1) )
 	ROM_LOAD( "za3506.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b) )
 	ROM_LOAD( "za3507.a5", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710) )
-	ROM_LOAD( "floppy",    0x6000, 0x1000, NO_DUMP )
+	ROMX_LOAD("abcdos",    0x6000, 0x1000, CRC(2cb2192f) SHA1(a6b3a9587714f8db807c05bee6c71c0684363744), ROM_BIOS(1) )
+	ROMX_LOAD("abcdosdd",  0x6000, 0x1000, CRC(36db4c15) SHA1(ae462633f3a9c142bb029beb14749a84681377fa), ROM_BIOS(2) )
+	ROMX_LOAD("udfdos20",  0x6000, 0x1000, CRC(69b09c0b) SHA1(403997a06cf6495b8fa13dc74eff6a64ef7aa53e), ROM_BIOS(3) )
 	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
 	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
 
@@ -647,5 +653,5 @@ SYSTEM_CONFIG_END
 
 /* Drivers */
 
-/*    YEAR	NAME  PARENT  COMPAT MACHINE  INPUT	INIT CONFIG	 COMPANY             FULLNAME */
-COMP( 1978, abc80,   0,       0, abc80,   abc80,  0, abc80,  "Luxor Datorer AB", "ABC 80", GAME_NOT_WORKING )
+//	   YEAR  NAME		PARENT		BIOS	COMPAT	MACHINE		INPUT		INIT	CONFIG		COMPANY				FULLNAME
+COMPB( 1978, abc80,		0,			abc80,	0,		abc80,		abc80,		0,		abc80,		"Luxor Datorer AB", "ABC 80", GAME_NOT_WORKING )
