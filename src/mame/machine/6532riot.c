@@ -25,7 +25,6 @@ struct R6532
 	UINT8 DDRB;
 
 	int shift;
-	int cleared;
 
 	UINT32 target;
 
@@ -123,8 +122,6 @@ static void r6532_write(int n, offs_t offset, UINT8 data)
 	{
 		if (offset & 0x10)
 		{
-			r6532[n]->cleared = 0;
-
 			switch (offset & 3)
 			{
 			case 0:
@@ -184,17 +181,16 @@ static UINT8 r6532_read_timer(int n)
 	{
 		if (count != -1)
 		{
-			r6532[n]->cleared = 1;
 			if (r6532[n]->intf.irq_func != NULL && r6532[n]->timer_irq)
 			{
 				(*r6532[n]->intf.irq_func)(CLEAR_LINE);
 			}
-		}
 
-		/* Timer flag is cleared, so adjust the target */
-		count = ( count > -256 ) ? count & 0xFF : 0;
-		r6532[n]->target = activecpu_gettotalcycles() + ( count << r6532[n]->shift );
-		timer_adjust( r6532[n]->timer, TIME_IN_CYCLES( ( count << r6532[n]->shift ) + 1, 0 ), n, 0 );
+			/* Timer flag is cleared, so adjust the target */
+			count = ( count > -256 ) ? count & 0xFF : 0;
+			r6532[n]->target = activecpu_gettotalcycles() + ( count << r6532[n]->shift );
+			timer_adjust( r6532[n]->timer, TIME_IN_CYCLES( ( count << r6532[n]->shift ) + 1, 0 ), n, 0 );
+		}
 		return count;
 	}
 }
@@ -228,16 +224,18 @@ static UINT8 r6532_read_irq_flags(int n)
 	int count = r6532[n]->target - activecpu_gettotalcycles();
 	int res = 0;
 
-	if ( !r6532[n]->cleared )
+	
+	if ( count < 0 )
+		res |= 0x80;
+	if ( count < -1 )
 	{
-		if ( count < 0 )
-			res |= 0x80;
-		if ( count < -1 )
-		{
-			r6532[n]->cleared = 1;
-			if ( r6532[n]->intf.irq_func != NULL )
-				(*r6532[n]->intf.irq_func)(CLEAR_LINE);
-		}
+		if ( r6532[n]->intf.irq_func != NULL )
+			(*r6532[n]->intf.irq_func)(CLEAR_LINE);
+
+		/* Timer flag is cleared, so adjust the target */
+		count = ( count > -256 ) ? count & 0xFF : 0;
+		r6532[n]->target = activecpu_gettotalcycles() + ( count << r6532[n]->shift );
+		timer_adjust( r6532[n]->timer, TIME_IN_CYCLES( ( count << r6532[n]->shift ) + 1, 0 ), n, 0 );
 	}
 
 	if (r6532[n]->pa7_flag)
@@ -313,7 +311,6 @@ void r6532_init(int n, const struct R6532interface* intf)
 	r6532[n]->DDRB = 0;
 
 	r6532[n]->shift = 10;
-	r6532[n]->cleared = 0;
 
 	r6532[n]->target = 0xff*1024;
 
