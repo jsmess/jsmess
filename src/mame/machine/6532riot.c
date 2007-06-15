@@ -142,7 +142,7 @@ static void r6532_write(int n, offs_t offset, UINT8 data)
 			}
 			r6532[n]->target = activecpu_gettotalcycles() + (data << r6532[n]->shift);
 			r6532[n]->timer_irq_enable = (offset & 8);
-			timer_adjust( r6532[n]->timer, TIME_IN_CYCLES( 0, ( ( data << r6532[n]->shift ) + 1 ) ), n, 0 );
+			timer_adjust( r6532[n]->timer, TIME_IN_CYCLES( ( data << r6532[n]->shift ) + 1, 0 ), n, 0 );
 		}
 		else
 		{
@@ -194,7 +194,7 @@ static UINT8 r6532_read_timer(int n)
 		/* Timer flag is cleared, so adjust the target */
 		count = ( count > -256 ) ? count & 0xFF : 0;
 		r6532[n]->target = activecpu_gettotalcycles() + ( count << r6532[n]->shift );
-		timer_adjust( r6532[n]->timer, TIME_IN_CYCLES( 0, ( ( count << r6532[n]->shift ) + 1 ) ), n, 0 );
+		timer_adjust( r6532[n]->timer, TIME_IN_CYCLES( ( count << r6532[n]->shift ) + 1, 0 ), n, 0 );
 		return count;
 	}
 }
